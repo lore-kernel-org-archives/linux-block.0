@@ -2,190 +2,173 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1800C5519F
-	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 09:23:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23BA7C5519F
+	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 09:47:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 84B2F2224C
-	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 09:23:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A064B2222F
+	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 09:47:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SUXK9CWI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727043AbgKTJXA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 Nov 2020 04:23:00 -0500
-Received: from out30-43.freemail.mail.aliyun.com ([115.124.30.43]:46319 "EHLO
-        out30-43.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726618AbgKTJXA (ORCPT
+        id S1725824AbgKTJrX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 Nov 2020 04:47:23 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:43553 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725797AbgKTJrW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Nov 2020 04:23:00 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04426;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0UFz0ukx_1605864175;
-Received: from admindeMacBook-Pro-2.local(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0UFz0ukx_1605864175)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Fri, 20 Nov 2020 17:22:56 +0800
-Subject: Re: [PATCH v4 1/2] block: disable iopoll for split bio
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     axboe@kernel.dk, ming.lei@redhat.com, linux-block@vger.kernel.org,
-        io-uring@vger.kernel.org, joseph.qi@linux.alibaba.com
-References: <20201117075625.46118-1-jefflexu@linux.alibaba.com>
- <20201117075625.46118-2-jefflexu@linux.alibaba.com>
- <20201119175234.GA20944@infradead.org>
-From:   JeffleXu <jefflexu@linux.alibaba.com>
-Message-ID: <c080d087-84c1-a019-1398-5358025e090f@linux.alibaba.com>
-Date:   Fri, 20 Nov 2020 17:22:55 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.12.1
+        Fri, 20 Nov 2020 04:47:22 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1605865640;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=cU3J/fz7tTdowivwTK/lvYlaR+G2ZQYtPawRZVRqIMw=;
+        b=SUXK9CWICKmTw3sLWvc5Ci821RjqgXWuha3o3LLS+Rr+iJDiTcm9rwVhkFIMZWDY/3E+iH
+        fofqdLwWnTFb0BT+VSi4ypZ59wVB6vLMCuauMi756W1f5FzInnD6PLl7UdXsEdQ9Vk5Pfs
+        KaxLVu+PaYNFvnazOSXakA+ecaZ5E6k=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-582-HhHckuKdOR2PWGmH7tnn-A-1; Fri, 20 Nov 2020 04:47:17 -0500
+X-MC-Unique: HhHckuKdOR2PWGmH7tnn-A-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 89018107ACE3;
+        Fri, 20 Nov 2020 09:47:16 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id EEA7A5C1D5;
+        Fri, 20 Nov 2020 09:47:09 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 0AK9l8cu000874;
+        Fri, 20 Nov 2020 04:47:08 -0500
+Received: from localhost (mpatocka@localhost)
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 0AK9l85p000870;
+        Fri, 20 Nov 2020 04:47:08 -0500
+X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
+Date:   Fri, 20 Nov 2020 04:47:08 -0500 (EST)
+From:   Mikulas Patocka <mpatocka@redhat.com>
+X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
+To:     John Dorminy <jdorminy@redhat.com>
+cc:     David Teigland <teigland@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>,
+        Heinz Mauelshagen <heinzm@redhat.com>,
+        device-mapper development <dm-devel@redhat.com>,
+        Marian Csontos <mcsontos@redhat.com>,
+        Zdenek Kabelac <zkabelac@redhat.com>,
+        Mike Snitzer <msnitzer@redhat.com>
+Subject: Re: [dm-devel] [PATCH] blk-settings: make sure that max_sectors is
+ aligned on "logical_block_size" boundary.
+In-Reply-To: <CAMeeMh8uaZkOHGUsvfaM7Fyqov5wKNfCp_FfBy7S39EG3Ktc7w@mail.gmail.com>
+Message-ID: <alpine.LRH.2.02.2011200443100.28876@file01.intranet.prod.int.rdu2.redhat.com>
+References: <20201118203127.GA30066@redhat.com> <20201118203408.GB30066@redhat.com> <fc7c4efd-0bb3-f023-19c6-54359d279ca8@redhat.com> <alpine.LRH.2.02.2011190810001.32672@file01.intranet.prod.int.rdu2.redhat.com> <20201119172807.GC1879@redhat.com>
+ <alpine.LRH.2.02.2011191337180.588@file01.intranet.prod.int.rdu2.redhat.com> <alpine.LRH.2.02.2011191517360.10231@file01.intranet.prod.int.rdu2.redhat.com> <CAMeeMh8uaZkOHGUsvfaM7Fyqov5wKNfCp_FfBy7S39EG3Ktc7w@mail.gmail.com>
+User-Agent: Alpine 2.02 (LRH 1266 2009-07-14)
 MIME-Version: 1.0
-In-Reply-To: <20201119175234.GA20944@infradead.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
-On 11/20/20 1:52 AM, Christoph Hellwig wrote:
-> On Tue, Nov 17, 2020 at 03:56:24PM +0800, Jeffle Xu wrote:
->> iopoll is initially for small size, latency sensitive IO. It doesn't
->> work well for big IO, especially when it needs to be split to multiple
->> bios. In this case, the returned cookie of __submit_bio_noacct_mq() is
->> indeed the cookie of the last split bio. The completion of *this* last
->> split bio done by iopoll doesn't mean the whole original bio has
->> completed. Callers of iopoll still need to wait for completion of other
->> split bios.
->>
->> Besides bio splitting may cause more trouble for iopoll which isn't
->> supposed to be used in case of big IO.
->>
->> iopoll for split bio may cause potential race if CPU migration happens
->> during bio submission. Since the returned cookie is that of the last
->> split bio, polling on the corresponding hardware queue doesn't help
->> complete other split bios, if these split bios are enqueued into
->> different hardware queues. Since interrupts are disabled for polling
->> queues, the completion of these other split bios depends on timeout
->> mechanism, thus causing a potential hang.
->>
->> iopoll for split bio may also cause hang for sync polling. Currently
->> both the blkdev and iomap-based fs (ext4/xfs, etc) support sync polling
->> in direct IO routine. These routines will submit bio without REQ_NOWAIT
->> flag set, and then start sync polling in current process context. The
->> process may hang in blk_mq_get_tag() if the submitted bio has to be
->> split into multiple bios and can rapidly exhaust the queue depth. The
->> process are waiting for the completion of the previously allocated
->> requests, which should be reaped by the following polling, and thus
->> causing a deadlock.
->>
->> To avoid these subtle trouble described above, just disable iopoll for
->> split bio.
->>
->> Suggested-by: Ming Lei <ming.lei@redhat.com>
->> Signed-off-by: Jeffle Xu <jefflexu@linux.alibaba.com>
->> ---
->>   block/blk-merge.c | 7 +++++++
->>   block/blk-mq.c    | 6 ++++--
->>   2 files changed, 11 insertions(+), 2 deletions(-)
->>
->> diff --git a/block/blk-merge.c b/block/blk-merge.c
->> index bcf5e4580603..53ad781917a2 100644
->> --- a/block/blk-merge.c
->> +++ b/block/blk-merge.c
->> @@ -279,6 +279,13 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
->>   	return NULL;
->>   split:
->>   	*segs = nsegs;
->> +
->> +	/*
->> +	 * bio splitting may cause subtle trouble such as hang when doing iopoll,
-> Please capitalize the first character of a multi-line comments.  Also
-> this adds an overly long line.
 
-Regards.
+On Thu, 19 Nov 2020, John Dorminy wrote:
 
+> Greetings;
+> 
+> Might I suggest using SECTOR_SIZE instead of 512? Or, perhaps, >>
+> SECTOR_SHIFT instead of / 512.
 
->
->> +	hctx = q->queue_hw_ctx[blk_qc_t_to_queue_num(cookie)];
->> +	if (hctx->type != HCTX_TYPE_POLL)
->> +		return 0;
-> I think this is good as a sanity check, but shouldn't we be able to
-> avoid even hitting this patch if we ensure that BLK_QC_T_NONE is
-> returned after a bio is split?
+Yes, that's a good point.
 
-Actually I had thought about returning  BLK_QC_T_NONE for split bio, but 
-got blocked.
+> I don't understand the three conditionals. I believe max_sectors is
+> supposed to be <= min(max_dev_sectors, max_hw_sectors), but I don't
+> understand why max_sectors being small should adjust max_hw_sectors
+> and max_dev_sectors. Are the conditions perhaps supposed to be
+> different, adjusting each max_*sectors up to at least PAGE_SIZE /
+> SECTOR_SIZE?
 
+I copied this pattern from blk_queue_max_hw_sectors. Perhaps, we could 
+use:
+	t->max_sectors = round_down(t->max_sectors, t->logical_block_size / 512);
+	if (!t->max_sectors)
+		t->max_sectors = t->logical_block_size / 512;
+instead.
 
-At the beginning, I want to identify split bio by checking if @split is 
-NULL in __blk_queue_split().
+Jens, what do you think is better?
 
-```
+Mikulas
 
-                 split = blk_bio_segment_split(q, *bio, &q->bio_split, 
-nr_segs);
-                 break;
-         }
-
-         if (split) {
-
-             /* bio got split */
-
-```
-
-But it's not the case. Even if @split is NULL, the input @bio may be the 
-*last* split bio.
-
-
-Then I want to identify split bio by checking loop times in 
-__submit_bio_noacct_mq().
-
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1008,12 +1008,15 @@ static blk_qc_t __submit_bio_noacct_mq(struct 
-bio *bio)
-  {
-         struct bio_list bio_list[2] = { };
-         blk_qc_t ret = BLK_QC_T_NONE;
-+       int split = -1;
-
-         current->bio_list = bio_list;
-
-         do {
-                 struct gendisk *disk = bio->bi_disk;
-
-+               split = min(split + 1, 1)
-+
-                 if (unlikely(bio_queue_enter(bio) != 0))
-                         continue;
-
-@@ -1027,7 +1030,7 @@ static blk_qc_t __submit_bio_noacct_mq(struct bio 
-*bio)
-         } while ((bio = bio_list_pop(&bio_list[0])));
-
-         current->bio_list = NULL;
--       return ret;
-+       return split ? BLK_QC_T_NONE : ret;
-  }
-
-But the bio-based routine will call blk_mq_submit_bio() directly, bypassing
-
-__submit_bio_noacct_mq().
-
-
-It seems that we have to add one specific flag to identify split bio.
-
-
-Or we could use BIO_CHAIN to identify the *last* split bio from normal 
-bio, since the
-
-last split bio is always marked with BIO_CHAIN. Then we can identify the 
-last split
-
-bio by BIO_CHAIN, and the others by checking if @split is NULL in 
-__blk_queue_split().
-
-
--- 
-Thanks,
-Jeffle
+> Perhaps, like e.g. blk_queue_max_hw_sectors(), the
+> conditionals should log if they are adjusting max_*sectors up to the
+> minimum.
+> 
+> Thanks!
+> 
+> John Dorminy
+> 
+> On Thu, Nov 19, 2020 at 3:37 PM Mikulas Patocka <mpatocka@redhat.com> wrote:
+> >
+> > We get these I/O errors when we run md-raid1 on the top of dm-integrity on
+> > the top of ramdisk:
+> > device-mapper: integrity: Bio not aligned on 8 sectors: 0xff00, 0xff
+> > device-mapper: integrity: Bio not aligned on 8 sectors: 0xff00, 0xff
+> > device-mapper: integrity: Bio not aligned on 8 sectors: 0xffff, 0x1
+> > device-mapper: integrity: Bio not aligned on 8 sectors: 0xffff, 0x1
+> > device-mapper: integrity: Bio not aligned on 8 sectors: 0x8048, 0xff
+> > device-mapper: integrity: Bio not aligned on 8 sectors: 0x8147, 0xff
+> > device-mapper: integrity: Bio not aligned on 8 sectors: 0x8246, 0xff
+> > device-mapper: integrity: Bio not aligned on 8 sectors: 0x8345, 0xbb
+> >
+> > The ramdisk device has logical_block_size 512 and max_sectors 255. The
+> > dm-integrity device uses logical_block_size 4096 and it doesn't affect the
+> > "max_sectors" value - thus, it inherits 255 from the ramdisk. So, we have
+> > a device with max_sectors not aligned on logical_block_size.
+> >
+> > The md-raid device sees that the underlying leg has max_sectors 255 and it
+> > will split the bios on 255-sector boundary, making the bios unaligned on
+> > logical_block_size.
+> >
+> > In order to fix the bug, we round down max_sectors to logical_block_size.
+> >
+> > Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
+> > Cc: stable@vger.kernel.org
+> >
+> > ---
+> >  block/blk-settings.c |   10 ++++++++++
+> >  1 file changed, 10 insertions(+)
+> >
+> > Index: linux-2.6/block/blk-settings.c
+> > ===================================================================
+> > --- linux-2.6.orig/block/blk-settings.c 2020-10-29 12:20:46.000000000 +0100
+> > +++ linux-2.6/block/blk-settings.c      2020-11-19 21:20:18.000000000 +0100
+> > @@ -591,6 +591,16 @@ int blk_stack_limits(struct queue_limits
+> >                 ret = -1;
+> >         }
+> >
+> > +       t->max_sectors = round_down(t->max_sectors, t->logical_block_size / 512);
+> > +       if (t->max_sectors < PAGE_SIZE / 512)
+> > +               t->max_sectors = PAGE_SIZE / 512;
+> > +       t->max_hw_sectors = round_down(t->max_hw_sectors, t->logical_block_size / 512);
+> > +       if (t->max_sectors < PAGE_SIZE / 512)
+> > +               t->max_hw_sectors = PAGE_SIZE / 512;
+> > +       t->max_dev_sectors = round_down(t->max_dev_sectors, t->logical_block_size / 512);
+> > +       if (t->max_sectors < PAGE_SIZE / 512)
+> > +               t->max_dev_sectors = PAGE_SIZE / 512;
+> > +
+> >         /* Discard alignment and granularity */
+> >         if (b->discard_granularity) {
+> >                 alignment = queue_limit_discard_alignment(b, start);
+> >
+> > --
+> > dm-devel mailing list
+> > dm-devel@redhat.com
+> > https://www.redhat.com/mailman/listinfo/dm-devel
+> >
+> 
 
