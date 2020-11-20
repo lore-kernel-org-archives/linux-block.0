@@ -2,116 +2,120 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AAA8C6379F
-	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 18:54:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7850BC2D0E4
+	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 19:13:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EA00C22464
-	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 18:54:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1BA8B22254
+	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 19:13:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="y6BwGzsU"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="RDxVpA9P"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732065AbgKTSxw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 Nov 2020 13:53:52 -0500
-Received: from mail.kernel.org ([198.145.29.99]:34856 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730460AbgKTSxv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Nov 2020 13:53:51 -0500
-Received: from kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com (unknown [163.114.132.6])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id D19712242B;
-        Fri, 20 Nov 2020 18:53:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1605898429;
-        bh=RlEnelajx5E1UvOiu4TwGuYZq41CYqRzy+OE2vpEZwM=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=y6BwGzsUDu1zr4tV0nGpfLuqNb1AQVwTl3HIlZXKXQmalkVaXzcKTw6PaiYzn6cs4
-         cCrQcjpmBltf5qc0pbll6lEfWSr4jv5MMDA/VHBdadKQQtZqXFk9pYOspqu5FdKf1A
-         HiIo+vycYYhwL3jW0KIV5eL5D/2xlLalPiHVxUuA=
-Date:   Fri, 20 Nov 2020 10:53:44 -0800
-From:   Jakub Kicinski <kuba@kernel.org>
-To:     "Gustavo A. R. Silva" <gustavoars@kernel.org>
-Cc:     linux-kernel@vger.kernel.org, alsa-devel@alsa-project.org,
-        amd-gfx@lists.freedesktop.org, bridge@lists.linux-foundation.org,
-        ceph-devel@vger.kernel.org, cluster-devel@redhat.com,
-        coreteam@netfilter.org, devel@driverdev.osuosl.org,
-        dm-devel@redhat.com, drbd-dev@lists.linbit.com,
-        dri-devel@lists.freedesktop.org, GR-everest-linux-l2@marvell.com,
-        GR-Linux-NIC-Dev@marvell.com, intel-gfx@lists.freedesktop.org,
-        intel-wired-lan@lists.osuosl.org, keyrings@vger.kernel.org,
-        linux1394-devel@lists.sourceforge.net, linux-acpi@vger.kernel.org,
-        linux-afs@lists.infradead.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-arm-msm@vger.kernel.org,
-        linux-atm-general@lists.sourceforge.net,
-        linux-block@vger.kernel.org, linux-can@vger.kernel.org,
-        linux-cifs@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-decnet-user@lists.sourceforge.net,
-        linux-ext4@vger.kernel.org, linux-fbdev@vger.kernel.org,
-        linux-geode@lists.infradead.org, linux-gpio@vger.kernel.org,
-        linux-hams@vger.kernel.org, linux-hwmon@vger.kernel.org,
-        linux-i3c@lists.infradead.org, linux-ide@vger.kernel.org,
-        linux-iio@vger.kernel.org, linux-input@vger.kernel.org,
-        linux-integrity@vger.kernel.org,
-        linux-mediatek@lists.infradead.org, linux-media@vger.kernel.org,
-        linux-mmc@vger.kernel.org, linux-mm@kvack.org,
-        linux-mtd@lists.infradead.org, linux-nfs@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-usb@vger.kernel.org, linux-watchdog@vger.kernel.org,
-        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-        netfilter-devel@vger.kernel.org, nouveau@lists.freedesktop.org,
-        op-tee@lists.trustedfirmware.org, oss-drivers@netronome.com,
-        patches@opensource.cirrus.com, rds-devel@oss.oracle.com,
-        reiserfs-devel@vger.kernel.org, samba-technical@lists.samba.org,
-        selinux@vger.kernel.org, target-devel@vger.kernel.org,
-        tipc-discussion@lists.sourceforge.net,
-        usb-storage@lists.one-eyed-alien.net,
-        virtualization@lists.linux-foundation.org,
-        wcn36xx@lists.infradead.org, x86@kernel.org,
-        xen-devel@lists.xenproject.org, linux-hardening@vger.kernel.org,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Nathan Chancellor <natechancellor@gmail.com>,
-        Miguel Ojeda <ojeda@kernel.org>, Joe Perches <joe@perches.com>,
-        Kees Cook <keescook@chromium.org>
-Subject: Re: [PATCH 000/141] Fix fall-through warnings for Clang
-Message-ID: <20201120105344.4345c14e@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
-In-Reply-To: <cover.1605896059.git.gustavoars@kernel.org>
-References: <cover.1605896059.git.gustavoars@kernel.org>
+        id S1730445AbgKTTNx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 Nov 2020 14:13:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48098 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729108AbgKTTNx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 20 Nov 2020 14:13:53 -0500
+Received: from mail-il1-x143.google.com (mail-il1-x143.google.com [IPv6:2607:f8b0:4864:20::143])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 061FDC0613CF
+        for <linux-block@vger.kernel.org>; Fri, 20 Nov 2020 11:13:53 -0800 (PST)
+Received: by mail-il1-x143.google.com with SMTP id y9so9526218ilb.0
+        for <linux-block@vger.kernel.org>; Fri, 20 Nov 2020 11:13:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:references:from:message-id:date:user-agent:mime-version
+         :in-reply-to:content-language:content-transfer-encoding;
+        bh=tvNx5XnyWpt/n1aMipepTW4MqUSEwdEoKFXk+0/H3qI=;
+        b=RDxVpA9P+JmgpmGIkLFsXCHlHxgLx/38Mh8SquDC9s24USPwHA40d5HPTYmUZL+LUd
+         yeGXGQPsyd4SFqE2GqP9fVAtVTOwBNkPiRzhV4Vn14wvbEBTrfe/ueC3nwQQCK4GgNQ7
+         zOqKK0IimHf9/Lt3myrkdxsHqk04UpoM/aZ8wYLR+JSCGis/xzvI9+zg4O70xYCuG1V0
+         i1VW6LVg2U9kGzaW+dCnAv1Igg/3OzhNOjkA0xcPuXc07L+XkMlfiUzaf9+RcxONCWFE
+         Ow0Duz6Ubccz0ZMAG71VFzAyvhiniVAs+/pvKOTIxdWVKOmRbGAHqfKMo8J6aCWG+rac
+         qeMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=tvNx5XnyWpt/n1aMipepTW4MqUSEwdEoKFXk+0/H3qI=;
+        b=OiYaxcgVVla1gI+6xQ0rJR5A0nLQgtVuykYelg99FTmhHcwRNTeDIbP0LD31177HJb
+         rVTLJIWJ1DRkAU2KYYSqEeZ56pYcQ4hNkF0Z4qUkAgvC5XkoSiUoVlbqEwqKCzfVkA/P
+         8CNS5Hyt/vGFfa3YW4zHH4MxTpV5hjVI3YHxPDeOq7swapU4GpeMipcd2/n9ohjlVcg3
+         sT2goa59YpqARFEA+9SuAwpgpD47oK9/FOgZilHQPns+PsjshYnSDA2B4xafSJQUUTFd
+         /YJ3o8Cyq2Mp+xVRvndbF+yfVOqrCn31LB5mZfD2mVD0IjKaJdIZuuQBq1SUkc9oyBf2
+         0ROw==
+X-Gm-Message-State: AOAM532nrl9z1HYkVConrXkgorRM1JZbweeuOYZpXUBKRsNnAFIyigJa
+        g1aZ1g1pB7JsJFBsXQnOlrsREQ==
+X-Google-Smtp-Source: ABdhPJwq4ixTeMPPsxO0VSepWRnWGcruHLniLW76PhfAmwVK4+kydITGWd9Sk69V9+6k/4hmT0SN9Q==
+X-Received: by 2002:a92:d591:: with SMTP id a17mr10863532iln.51.1605899632350;
+        Fri, 20 Nov 2020 11:13:52 -0800 (PST)
+Received: from [192.168.1.30] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id h16sm2275299ile.14.2020.11.20.11.13.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 20 Nov 2020 11:13:51 -0800 (PST)
+Subject: Re: [PATCH] block: don't ignore REQ_NOWAIT for direct IO
+To:     Pavel Begunkov <asml.silence@gmail.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <546c66d26ae71abc151aa2074c3dd75ff5efb529.1605892141.git.asml.silence@gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <389a12f6-729e-327f-bef9-e3691ef4f78a@kernel.dk>
+Date:   Fri, 20 Nov 2020 12:13:51 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <546c66d26ae71abc151aa2074c3dd75ff5efb529.1605892141.git.asml.silence@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 20 Nov 2020 12:21:39 -0600 Gustavo A. R. Silva wrote:
-> This series aims to fix almost all remaining fall-through warnings in
-> order to enable -Wimplicit-fallthrough for Clang.
+On 11/20/20 10:10 AM, Pavel Begunkov wrote:
+> io_uring's direct nowait requests end up waiting on io_schedule() in
+> sbitmap, that's seems to be so because blkdev_direct_IO() fails to
+> propagate IOCB_NOWAIT to a bio and hence to blk-mq.
 > 
-> In preparation to enable -Wimplicit-fallthrough for Clang, explicitly
-> add multiple break/goto/return/fallthrough statements instead of just
-> letting the code fall through to the next case.
+> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+> ---
+>  fs/block_dev.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 > 
-> Notice that in order to enable -Wimplicit-fallthrough for Clang, this
-> change[1] is meant to be reverted at some point. So, this patch helps
-> to move in that direction.
-> 
-> Something important to mention is that there is currently a discrepancy
-> between GCC and Clang when dealing with switch fall-through to empty case
-> statements or to cases that only contain a break/continue/return
-> statement[2][3][4].
+> diff --git a/fs/block_dev.c b/fs/block_dev.c
+> index 9e84b1928b94..e7e860c78d93 100644
+> --- a/fs/block_dev.c
+> +++ b/fs/block_dev.c
+> @@ -263,6 +263,8 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
+>  		bio.bi_opf = dio_bio_write_op(iocb);
+>  		task_io_account_write(ret);
+>  	}
+> +	if (iocb->ki_flags & IOCB_NOWAIT)
+> +		bio.bi_opf |= REQ_NOWAIT;
+>  	if (iocb->ki_flags & IOCB_HIPRI)
+>  		bio_set_polled(&bio, iocb);
 
-Are we sure we want to make this change? Was it discussed before?
+Was thinking this wasn't needed, but I guess that users could do sync && NOWAIT
+and get -EAGAIN if using preadv2/pwritev2.
 
-Are there any bugs Clangs puritanical definition of fallthrough helped
-find?
+> @@ -416,6 +418,8 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
+>  			bio->bi_opf = dio_bio_write_op(iocb);
+>  			task_io_account_write(bio->bi_iter.bi_size);
+>  		}
+> +		if (iocb->ki_flags & IOCB_NOWAIT)
+> +			bio->bi_opf |= REQ_NOWAIT;
+>  
+>  		dio->size += bio->bi_iter.bi_size;
+>  		pos += bio->bi_iter.bi_size;
 
-IMVHO compiler warnings are supposed to warn about issues that could
-be bugs. Falling through to default: break; can hardly be a bug?!
+Looks fine to me, we definitely should not be waiting on tags for IOCB_NOWAIT
+IO. Will run some shakedown and test for 5.11.
+
+-- 
+Jens Axboe
+
