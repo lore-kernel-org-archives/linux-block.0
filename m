@@ -4,155 +4,200 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6351C388F9
-	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 01:27:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15085C63697
+	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 01:36:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6740822255
-	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 01:27:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 93BB222259
+	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 01:36:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FCh7ag1k"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XyQUfAho"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726321AbgKTB1s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 Nov 2020 20:27:48 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22144 "EHLO
+        id S1727164AbgKTBfv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 Nov 2020 20:35:51 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58603 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726683AbgKTB1s (ORCPT
+        by vger.kernel.org with ESMTP id S1727037AbgKTBfv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 Nov 2020 20:27:48 -0500
+        Thu, 19 Nov 2020 20:35:51 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1605835667;
+        s=mimecast20190719; t=1605836149;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=MYquISkn3nZV5YB0okA6VfbOmAn2onUZzzDzkWZvjkE=;
-        b=FCh7ag1kd2NMfAcWb5f7QaH822S8ODzpXzrUK4nSsXbRvb9aN68S35eTkJtUrnJux1uclF
-        Z3489P2hzL+m1bApTKcGQXnq7uVLadub9KJBvimCelGKmXLyrKHnMX3z6dhYW03ZTntnac
-        5JFvKnKCexBzP/wHcNrM0MeCaDT0zmo=
-Received: from mail-vk1-f197.google.com (mail-vk1-f197.google.com
- [209.85.221.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-464-uAJpxo4LPj6entF9S0el4Q-1; Thu, 19 Nov 2020 20:27:43 -0500
-X-MC-Unique: uAJpxo4LPj6entF9S0el4Q-1
-Received: by mail-vk1-f197.google.com with SMTP id w63so3388567vka.3
-        for <linux-block@vger.kernel.org>; Thu, 19 Nov 2020 17:27:43 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=MYquISkn3nZV5YB0okA6VfbOmAn2onUZzzDzkWZvjkE=;
-        b=nkFxJL6SImvhSEfLSpCgGYmfoynEKqx4q50VpcKP40D5feB8MIX5pYeiRPTDOTGvXa
-         fKL/JJPgF97vSGxpOKTsXxe8UkQQ3ueLwBD3sJIwdMKzhsWYgScZMHe0qek82ubhnWj0
-         SAZmPlrTvYJ/LTI0gRMuopZ8ULmNPHzJfv+9uMzrR7+nwEgKDkfD5ktHXZFIcyACNbHf
-         e+D172WnElZMjhOU9qi3rROXoO2Hm930ka/1gkmHgJBcNyXHlaGghAzdogHg94mX/aOU
-         LjmOQCncpjsrY5dxnZNE8XOcpr1ADZB80FP4XWARyO8aGr+RADdqc+nPjBJ/q0Nroo8d
-         fxJw==
-X-Gm-Message-State: AOAM5338I7OIGNT9vU2sxJ668qyh5NEpfxrz+BCAWxgaasc4gqRR/F/c
-        Bh1+q9YlcqiY7Y8BXxw3NL1sMScVxg3VUy2KII1fsKooNZiPpnSxunTeOvuJT4zlJQgYwF7KF7e
-        HJx/MABAEeoXI+eVpKUlm5LUWS9qXquH5HU/MFyI=
-X-Received: by 2002:ab0:224b:: with SMTP id z11mr13378388uan.103.1605835663207;
-        Thu, 19 Nov 2020 17:27:43 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzE8trd4VpMwa8E8M6LiMEVo96dOkpqmDZ8DGxXQs4TM+71O6XXrABn/oUZi7Sf+whezhrwuz2dhE2fWIxvft0=
-X-Received: by 2002:ab0:224b:: with SMTP id z11mr13378372uan.103.1605835663000;
- Thu, 19 Nov 2020 17:27:43 -0800 (PST)
+        bh=1CXbWMn85vsEetZ5zh1R84Ze1IVkbnw3ZzkmmkOOrow=;
+        b=XyQUfAhomMXLA8gUPOuz+SMqJxt4LEFjY+HyYW+EPCD/gS6MchroIOxk8Pq84PVRCHLQj4
+        pWpmeulK4ktHyqYUgnoBhzxLgObYE/+Gbsa+tK1xGei2tQgKL8DdArtolykM6eQqfsV3JG
+        RSjDEuxaX/jR+KgQuVSKITiKQOlqrVA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-143-thKV15HcN8WCa_4SonMg3Q-1; Thu, 19 Nov 2020 20:35:44 -0500
+X-MC-Unique: thKV15HcN8WCa_4SonMg3Q-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 464DE107ACE3;
+        Fri, 20 Nov 2020 01:35:43 +0000 (UTC)
+Received: from T590 (ovpn-13-9.pek2.redhat.com [10.72.13.9])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id C1A6760853;
+        Fri, 20 Nov 2020 01:35:34 +0000 (UTC)
+Date:   Fri, 20 Nov 2020 09:35:29 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-scsi@vger.kernel.org
+Cc:     Omar Sandoval <osandov@fb.com>,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
+        Sumanesh Samanta <sumanesh.samanta@broadcom.com>,
+        "Ewan D . Milne" <emilne@redhat.com>,
+        Hannes Reinecke <hare@suse.de>
+Subject: [PATCH V6 10/13] megaraid_sas: v2 replace sdev_busy with local
+ counter
+Message-ID: <20201120013529.GA333150@T590>
+References: <20201119094705.280390-1-ming.lei@redhat.com>
+ <20201119095147.GB279559@T590>
 MIME-Version: 1.0
-References: <20201118203127.GA30066@redhat.com> <20201118203408.GB30066@redhat.com>
- <fc7c4efd-0bb3-f023-19c6-54359d279ca8@redhat.com> <alpine.LRH.2.02.2011190810001.32672@file01.intranet.prod.int.rdu2.redhat.com>
- <20201119172807.GC1879@redhat.com> <alpine.LRH.2.02.2011191337180.588@file01.intranet.prod.int.rdu2.redhat.com>
- <alpine.LRH.2.02.2011191517360.10231@file01.intranet.prod.int.rdu2.redhat.com>
-In-Reply-To: <alpine.LRH.2.02.2011191517360.10231@file01.intranet.prod.int.rdu2.redhat.com>
-From:   John Dorminy <jdorminy@redhat.com>
-Date:   Thu, 19 Nov 2020 20:27:32 -0500
-Message-ID: <CAMeeMh8uaZkOHGUsvfaM7Fyqov5wKNfCp_FfBy7S39EG3Ktc7w@mail.gmail.com>
-Subject: Re: [dm-devel] [PATCH] blk-settings: make sure that max_sectors is
- aligned on "logical_block_size" boundary.
-To:     Mikulas Patocka <mpatocka@redhat.com>
-Cc:     David Teigland <teigland@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        Heinz Mauelshagen <heinzm@redhat.com>,
-        device-mapper development <dm-devel@redhat.com>,
-        Marian Csontos <mcsontos@redhat.com>,
-        Zdenek Kabelac <zkabelac@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201119095147.GB279559@T590>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Greetings;
+From e98ce3cf552ae173f1b8bcb19219f2e88dd3bf86 Mon Sep 17 00:00:00 2001
+From: Kashyap Desai <kashyap.desai@broadcom.com>
+Date: Thu, 19 Nov 2020 12:39:01 +0530
+Subject: [PATCH V6 10/13] megaraid_sas: v2 replace sdev_busy with local counter
 
-Might I suggest using SECTOR_SIZE instead of 512? Or, perhaps, >>
-SECTOR_SHIFT instead of / 512.
+use local tracking of per sdev outstanding command since sdev_busy in
+SML is improved for performance reason using sbitmap (earlier it was
+atomic variable).
 
-I don't understand the three conditionals. I believe max_sectors is
-supposed to be <= min(max_dev_sectors, max_hw_sectors), but I don't
-understand why max_sectors being small should adjust max_hw_sectors
-and max_dev_sectors. Are the conditions perhaps supposed to be
-different, adjusting each max_*sectors up to at least PAGE_SIZE /
-SECTOR_SIZE? Perhaps, like e.g. blk_queue_max_hw_sectors(), the
-conditionals should log if they are adjusting max_*sectors up to the
-minimum.
+Cc: Omar Sandoval <osandov@fb.com>
+Cc: Kashyap Desai <kashyap.desai@broadcom.com>
+Cc: Sumanesh Samanta <sumanesh.samanta@broadcom.com>
+Cc: Ewan D. Milne <emilne@redhat.com>
+Cc: Hannes Reinecke <hare@suse.de>
+Signed-off-by: Kashyap Desai <kashyap.desai@broadcom.com>
 
-Thanks!
+Fix checkpatch ERROR and WARNING.
 
-John Dorminy
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+V5->V6:
+	- fix one check in megasas_sdev_busy_read
 
-On Thu, Nov 19, 2020 at 3:37 PM Mikulas Patocka <mpatocka@redhat.com> wrote:
->
-> We get these I/O errors when we run md-raid1 on the top of dm-integrity on
-> the top of ramdisk:
-> device-mapper: integrity: Bio not aligned on 8 sectors: 0xff00, 0xff
-> device-mapper: integrity: Bio not aligned on 8 sectors: 0xff00, 0xff
-> device-mapper: integrity: Bio not aligned on 8 sectors: 0xffff, 0x1
-> device-mapper: integrity: Bio not aligned on 8 sectors: 0xffff, 0x1
-> device-mapper: integrity: Bio not aligned on 8 sectors: 0x8048, 0xff
-> device-mapper: integrity: Bio not aligned on 8 sectors: 0x8147, 0xff
-> device-mapper: integrity: Bio not aligned on 8 sectors: 0x8246, 0xff
-> device-mapper: integrity: Bio not aligned on 8 sectors: 0x8345, 0xbb
->
-> The ramdisk device has logical_block_size 512 and max_sectors 255. The
-> dm-integrity device uses logical_block_size 4096 and it doesn't affect the
-> "max_sectors" value - thus, it inherits 255 from the ramdisk. So, we have
-> a device with max_sectors not aligned on logical_block_size.
->
-> The md-raid device sees that the underlying leg has max_sectors 255 and it
-> will split the bios on 255-sector boundary, making the bios unaligned on
-> logical_block_size.
->
-> In order to fix the bug, we round down max_sectors to logical_block_size.
->
-> Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
-> Cc: stable@vger.kernel.org
->
-> ---
->  block/blk-settings.c |   10 ++++++++++
->  1 file changed, 10 insertions(+)
->
-> Index: linux-2.6/block/blk-settings.c
-> ===================================================================
-> --- linux-2.6.orig/block/blk-settings.c 2020-10-29 12:20:46.000000000 +0100
-> +++ linux-2.6/block/blk-settings.c      2020-11-19 21:20:18.000000000 +0100
-> @@ -591,6 +591,16 @@ int blk_stack_limits(struct queue_limits
->                 ret = -1;
->         }
->
-> +       t->max_sectors = round_down(t->max_sectors, t->logical_block_size / 512);
-> +       if (t->max_sectors < PAGE_SIZE / 512)
-> +               t->max_sectors = PAGE_SIZE / 512;
-> +       t->max_hw_sectors = round_down(t->max_hw_sectors, t->logical_block_size / 512);
-> +       if (t->max_sectors < PAGE_SIZE / 512)
-> +               t->max_hw_sectors = PAGE_SIZE / 512;
-> +       t->max_dev_sectors = round_down(t->max_dev_sectors, t->logical_block_size / 512);
-> +       if (t->max_sectors < PAGE_SIZE / 512)
-> +               t->max_dev_sectors = PAGE_SIZE / 512;
-> +
->         /* Discard alignment and granularity */
->         if (b->discard_granularity) {
->                 alignment = queue_limit_discard_alignment(b, start);
->
-> --
-> dm-devel mailing list
-> dm-devel@redhat.com
-> https://www.redhat.com/mailman/listinfo/dm-devel
->
+ drivers/scsi/megaraid/megaraid_sas.h        |  2 +
+ drivers/scsi/megaraid/megaraid_sas_fusion.c | 47 +++++++++++++++++----
+ 2 files changed, 41 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/scsi/megaraid/megaraid_sas.h b/drivers/scsi/megaraid/megaraid_sas.h
+index 5e4137f10e0e..2299342d5b2d 100644
+--- a/drivers/scsi/megaraid/megaraid_sas.h
++++ b/drivers/scsi/megaraid/megaraid_sas.h
+@@ -2019,10 +2019,12 @@ union megasas_frame {
+  * struct MR_PRIV_DEVICE - sdev private hostdata
+  * @is_tm_capable: firmware managed tm_capable flag
+  * @tm_busy: TM request is in progress
++ * @sdev_priv_busy: pending command per sdev
+  */
+ struct MR_PRIV_DEVICE {
+ 	bool is_tm_capable;
+ 	bool tm_busy;
++	atomic_t sdev_priv_busy;
+ 	atomic_t r1_ldio_hint;
+ 	u8 interface_type;
+ 	u8 task_abort_tmo;
+diff --git a/drivers/scsi/megaraid/megaraid_sas_fusion.c b/drivers/scsi/megaraid/megaraid_sas_fusion.c
+index fd607287608e..e9ec9b7b1c36 100644
+--- a/drivers/scsi/megaraid/megaraid_sas_fusion.c
++++ b/drivers/scsi/megaraid/megaraid_sas_fusion.c
+@@ -220,6 +220,40 @@ megasas_clear_intr_fusion(struct megasas_instance *instance)
+ 	return 1;
+ }
+ 
++static inline void
++megasas_sdev_busy_inc(struct megasas_instance *instance,
++		      struct scsi_cmnd *scmd)
++{
++	if (instance->perf_mode == MR_BALANCED_PERF_MODE) {
++		struct MR_PRIV_DEVICE *mr_device_priv_data =
++			scmd->device->hostdata;
++		atomic_inc(&mr_device_priv_data->sdev_priv_busy);
++	}
++}
++
++static inline void
++megasas_sdev_busy_dec(struct megasas_instance *instance,
++		      struct scsi_cmnd *scmd)
++{
++	if (instance->perf_mode == MR_BALANCED_PERF_MODE) {
++		struct MR_PRIV_DEVICE *mr_device_priv_data =
++			scmd->device->hostdata;
++		atomic_dec(&mr_device_priv_data->sdev_priv_busy);
++	}
++}
++
++static inline int
++megasas_sdev_busy_read(struct megasas_instance *instance,
++		       struct scsi_cmnd *scmd)
++{
++	if (instance->perf_mode == MR_BALANCED_PERF_MODE) {
++		struct MR_PRIV_DEVICE *mr_device_priv_data =
++			scmd->device->hostdata;
++		return atomic_read(&mr_device_priv_data->sdev_priv_busy);
++	}
++	return 0;
++}
++
+ /**
+  * megasas_get_cmd_fusion -	Get a command from the free pool
+  * @instance:		Adapter soft state
+@@ -357,15 +391,9 @@ megasas_get_msix_index(struct megasas_instance *instance,
+ 		       struct megasas_cmd_fusion *cmd,
+ 		       u8 data_arms)
+ {
+-	int sdev_busy;
+-
+-	/* TBD - if sml remove device_busy in future, driver
+-	 * should track counter in internal structure.
+-	 */
+-	sdev_busy = atomic_read(&scmd->device->device_busy);
+-
+ 	if (instance->perf_mode == MR_BALANCED_PERF_MODE &&
+-	    sdev_busy > (data_arms * MR_DEVICE_HIGH_IOPS_DEPTH)) {
++	    (megasas_sdev_busy_read(instance, scmd) >
++	    (data_arms * MR_DEVICE_HIGH_IOPS_DEPTH))) {
+ 		cmd->request_desc->SCSIIO.MSIxIndex =
+ 			mega_mod64((atomic64_add_return(1, &instance->high_iops_outstanding) /
+ 					MR_HIGH_IOPS_BATCH_COUNT), instance->low_latency_index_start);
+@@ -3390,6 +3418,7 @@ megasas_build_and_issue_cmd_fusion(struct megasas_instance *instance,
+ 	 * Issue the command to the FW
+ 	 */
+ 
++	megasas_sdev_busy_inc(instance, scmd);
+ 	megasas_fire_cmd_fusion(instance, req_desc);
+ 
+ 	if (r1_cmd)
+@@ -3450,6 +3479,7 @@ megasas_complete_r1_command(struct megasas_instance *instance,
+ 		scmd_local->SCp.ptr = NULL;
+ 		megasas_return_cmd_fusion(instance, cmd);
+ 		scsi_dma_unmap(scmd_local);
++		megasas_sdev_busy_dec(instance, scmd_local);
+ 		scmd_local->scsi_done(scmd_local);
+ 	}
+ }
+@@ -3550,6 +3580,7 @@ complete_cmd_fusion(struct megasas_instance *instance, u32 MSIxIndex,
+ 				scmd_local->SCp.ptr = NULL;
+ 				megasas_return_cmd_fusion(instance, cmd_fusion);
+ 				scsi_dma_unmap(scmd_local);
++				megasas_sdev_busy_dec(instance, scmd_local);
+ 				scmd_local->scsi_done(scmd_local);
+ 			} else	/* Optimal VD - R1 FP command completion. */
+ 				megasas_complete_r1_command(instance, cmd_fusion);
+-- 
+2.25.4
 
