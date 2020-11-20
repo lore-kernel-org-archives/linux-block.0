@@ -2,132 +2,134 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00BBAC5519F
-	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 11:21:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F37CC56202
+	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 12:39:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A7FA122264
-	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 11:21:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 281252222F
+	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 12:39:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="oj+SDrsU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727248AbgKTLVX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 Nov 2020 06:21:23 -0500
-Received: from mx2.suse.de ([195.135.220.15]:57330 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727197AbgKTLVX (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Nov 2020 06:21:23 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id C4C79AED9;
-        Fri, 20 Nov 2020 11:21:21 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 2825E1E130B; Fri, 20 Nov 2020 12:21:21 +0100 (CET)
-Date:   Fri, 20 Nov 2020 12:21:21 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
-        Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Coly Li <colyli@suse.de>, Mike Snitzer <snitzer@redhat.com>,
-        dm-devel@redhat.com, Richard Weinberger <richard@nod.at>,
-        Jan Kara <jack@suse.com>, linux-block@vger.kernel.org,
-        xen-devel@lists.xenproject.org, linux-bcache@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: Re: [PATCH 14/20] block: remove the nr_sects field in struct
- hd_struct
-Message-ID: <20201120112121.GB15537@quack2.suse.cz>
-References: <20201118084800.2339180-1-hch@lst.de>
- <20201118084800.2339180-15-hch@lst.de>
- <20201119120525.GW1981@quack2.suse.cz>
- <20201120090820.GD21715@lst.de>
+        id S1726548AbgKTMje (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 Nov 2020 07:39:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43278 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725797AbgKTMje (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 20 Nov 2020 07:39:34 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2694C0613CF;
+        Fri, 20 Nov 2020 04:39:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=ciE5aBA53xTPaf+5Nm3ffgv4TXhSHOyh/nrWlpGzLOA=; b=oj+SDrsUGxmA4qgYqUnqKlay7/
+        9ffY3cwPRHaFZmCQxEetGBrbPrUY/anZVNnjJNTEBqjvIZUeTxwYLBkFoP+vVpcEvsXnqd0ZXwUDI
+        o93nMllkSF2SI/4zVtYCUPHbM5FwU26281cRmgrmBhuIQXZwUClr+0zW/EhSE2LOsffY8mNEFCivz
+        8twPo7EbMICBmXg2duDZCWp9VecrbmoVeYO8Nv6MgYDSXPGfSzC5CoAOM9ICYgx4OoA8iMURPvWz2
+        boi0Jt60q9KZWE5H+Wve9lslOmFqFp9BXQMoHU3XAjbwIooHwjb3Li3rKiqMLhbDhh2ZeEUXw6CoR
+        NGpbCDrw==;
+Received: from willy by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kg5hL-00006I-6z; Fri, 20 Nov 2020 12:39:31 +0000
+Date:   Fri, 20 Nov 2020 12:39:31 +0000
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Pavel Begunkov <asml.silence@gmail.com>,
+        Ming Lei <ming.lei@redhat.com>, linux-fsdevel@vger.kernel.org,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 1/2] iov_iter: optimise iov_iter_npages for bvec
+Message-ID: <20201120123931.GN29991@casper.infradead.org>
+References: <cover.1605827965.git.asml.silence@gmail.com>
+ <ab04202d0f8c1424da47251085657c436d762785.1605827965.git.asml.silence@gmail.com>
+ <20201120012017.GJ29991@casper.infradead.org>
+ <35d5db17-f6f6-ec32-944e-5ecddcbcb0f1@gmail.com>
+ <20201120022200.GB333150@T590>
+ <e70a3c05-a968-7802-df81-0529eaa7f7b4@gmail.com>
+ <20201120025457.GM29991@casper.infradead.org>
+ <20201120081429.GA30801@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201120090820.GD21715@lst.de>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20201120081429.GA30801@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri 20-11-20 10:08:20, Christoph Hellwig wrote:
-> On Thu, Nov 19, 2020 at 01:05:25PM +0100, Jan Kara wrote:
-> > > @@ -613,7 +613,7 @@ void guard_bio_eod(struct bio *bio)
-> > >  	rcu_read_lock();
-> > >  	part = __disk_get_part(bio->bi_disk, bio->bi_partno);
-> > >  	if (part)
-> > > -		maxsector = part_nr_sects_read(part);
-> > > +		maxsector = bdev_nr_sectors(part->bdev);
-> > >  	else
-> > >  		maxsector = get_capacity(bio->bi_disk);
+On Fri, Nov 20, 2020 at 08:14:29AM +0000, Christoph Hellwig wrote:
+> On Fri, Nov 20, 2020 at 02:54:57AM +0000, Matthew Wilcox wrote:
+> > On Fri, Nov 20, 2020 at 02:25:08AM +0000, Pavel Begunkov wrote:
+> > > On 20/11/2020 02:22, Ming Lei wrote:
+> > > > iov_iter_npages(bvec) still can be improved a bit by the following way:
+> > > 
+> > > Yep, was doing exactly that, +a couple of other places that are in my way.
 > > 
-> > I have to say that after these changes I find it a bit confusing that we
-> > have get/set_capacity() and bdev_nr_sectors() / bdev_set_nr_sectors() and
-> > they are all the same thing (i_size of the bdev). Is there a reason for the
-> > distinction?
+> > Are you optimising the right thing here?  Assuming you're looking at
+> > the one in do_blockdev_direct_IO(), wouldn't we be better off figuring
+> > out how to copy the bvecs directly from the iov_iter into the bio
+> > rather than calling dio_bio_add_page() for each page?
 > 
-> get_capacity/set_capacity are the existing unchanged interfaces that
-> work on struct gendisk, and unchanged from what we had before.  They also
-> have lots of users which makes them kinda awkward to touch.
-> 
-> bdev_nr_sectors is the public interface to query the size for any
-> kind of struct block device, to be used by consumers of the block
-> device interface.
-> 
-> bdev_set_nr_sectors is a private helper for the partitions core that
-> avoids duplicating a bit of code, and works on partitions.
+> Which is most effectively done by stopping to to use *blockdev_direct_IO
+> and switching to iomap instead :)
 
-OK, I guess I'll get used to this...
+But iomap still calls iov_iter_npages().  So maybe we need something like
+this ...
 
-> > > @@ -38,6 +38,16 @@ static void disk_add_events(struct gendisk *disk);
-> > >  static void disk_del_events(struct gendisk *disk);
-> > >  static void disk_release_events(struct gendisk *disk);
-> > >  
-> > > +void set_capacity(struct gendisk *disk, sector_t sectors)
-> > > +{
-> > > +	struct block_device *bdev = disk->part0.bdev;
-> > > +
-> > > +	spin_lock(&bdev->bd_size_lock);
-> > > +	i_size_write(bdev->bd_inode, (loff_t)sectors << SECTOR_SHIFT);
-> > > +	spin_unlock(&bdev->bd_size_lock);
-> > 
-> > AFAICT bd_size_lock is pointless after these changes so we can just remove
-> > it?
-> 
-> I don't think it is, as reuqiring bd_mutex for size updates leads to
-> rather awkward lock ordering problems.
-
-OK, let me ask differently: What is bd_size_lock protecting now? Ah, I see,
-on 32-bit it is needed to prevent torn writes to i_size, right?
-
-> > >  	if (capacity != size && capacity != 0 && size != 0) {
-> > >  		char *envp[] = { "RESIZE=1", NULL };
-> > >  
-> > > +		pr_info("%s: detected capacity change from %lld to %lld\n",
-> > > +		       disk->disk_name, size, capacity);
-> > 
-> > So we are now missing above message for transitions from / to 0 capacity?
-> > Is there any other notification in the kernel log when e.g. media is
-> > inserted into a CD-ROM drive? I remember using these messages for detecting
-> > that...
-> 
-> True, I guess we should keep the messages for that case at least under
-> some circumstances.  Let me take a closer look at what could make sense.
-> 
-> > Also what about GENHD_FL_HIDDEN devices? Are we sure we never set capacity
-> > for them?
-> 
-> We absolutely set the capacity for them, as we have to.  And even use
-> this interface.  But yes, I think we should skip sending the uevent for
-> them.
-
-Also previously we were not printing any messages for hidden devices and
-now we do. I'm not sure whether that's intended or not.
-
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
+index 933f234d5bec..1c5a802a45d9 100644
+--- a/fs/iomap/direct-io.c
++++ b/fs/iomap/direct-io.c
+@@ -250,7 +250,7 @@ iomap_dio_bio_actor(struct inode *inode, loff_t pos, loff_t length,
+ 	orig_count = iov_iter_count(dio->submit.iter);
+ 	iov_iter_truncate(dio->submit.iter, length);
+ 
+-	nr_pages = iov_iter_npages(dio->submit.iter, BIO_MAX_PAGES);
++	nr_pages = bio_iov_iter_npages(dio->submit.iter);
+ 	if (nr_pages <= 0) {
+ 		ret = nr_pages;
+ 		goto out;
+@@ -308,7 +308,7 @@ iomap_dio_bio_actor(struct inode *inode, loff_t pos, loff_t length,
+ 		dio->size += n;
+ 		copied += n;
+ 
+-		nr_pages = iov_iter_npages(dio->submit.iter, BIO_MAX_PAGES);
++		nr_pages = bio_iov_iter_npages(dio->submit.iter);
+ 		iomap_dio_submit_bio(dio, iomap, bio, pos);
+ 		pos += n;
+ 	} while (nr_pages);
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index c6d765382926..86cc74f84b30 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -10,6 +10,7 @@
+ #include <linux/ioprio.h>
+ /* struct bio, bio_vec and BIO_* flags are defined in blk_types.h */
+ #include <linux/blk_types.h>
++#include <linux/uio.h>
+ 
+ #define BIO_DEBUG
+ 
+@@ -447,6 +448,16 @@ bool __bio_try_merge_page(struct bio *bio, struct page *page,
+ void __bio_add_page(struct bio *bio, struct page *page,
+ 		unsigned int len, unsigned int off);
+ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter);
++
++static inline int bio_iov_iter_npages(const struct iov_iter *i)
++{
++	if (!iov_iter_count(i))
++		return 0;
++	if (iov_iter_is_bvec(i))
++		return 1;
++	return iov_iter_npages(i, BIO_MAX_PAGES);
++}
++
+ void bio_release_pages(struct bio *bio, bool mark_dirty);
+ extern void bio_set_pages_dirty(struct bio *bio);
+ extern void bio_check_pages_dirty(struct bio *bio);
