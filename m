@@ -2,109 +2,125 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D1D5C63777
-	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 13:29:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DCEEC56201
+	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 14:19:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1DD4E222BA
-	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 13:29:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A2FE12223F
+	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 14:19:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D7loTL+I"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725890AbgKTN3T convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 Nov 2020 08:29:19 -0500
-Received: from eu-smtp-delivery-151.mimecast.com ([207.82.80.151]:22419 "EHLO
-        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725801AbgKTN3T (ORCPT
+        id S1727367AbgKTOTN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 Nov 2020 09:19:13 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:38650 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726172AbgKTOTN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Nov 2020 08:29:19 -0500
-Received: from AcuMS.aculab.com (156.67.243.126 [156.67.243.126]) (Using
- TLS) by relay.mimecast.com with ESMTP id
- uk-mta-264-OD_kpoYPO02kqUFppqEYAg-1; Fri, 20 Nov 2020 13:29:14 +0000
-X-MC-Unique: OD_kpoYPO02kqUFppqEYAg-1
-Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) by
- AcuMS.aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) with Microsoft SMTP
- Server (TLS) id 15.0.1347.2; Fri, 20 Nov 2020 13:29:14 +0000
-Received: from AcuMS.Aculab.com ([fe80::43c:695e:880f:8750]) by
- AcuMS.aculab.com ([fe80::43c:695e:880f:8750%12]) with mapi id 15.00.1347.000;
- Fri, 20 Nov 2020 13:29:14 +0000
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'Pavel Begunkov' <asml.silence@gmail.com>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-CC:     Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH v2 1/2] iov_iter: optimise iov_iter_npages for bvec
-Thread-Topic: [PATCH v2 1/2] iov_iter: optimise iov_iter_npages for bvec
-Thread-Index: AQHWvsvDuqyPv2EDYECI7EFyRCltYanRAzeA
-Date:   Fri, 20 Nov 2020 13:29:14 +0000
-Message-ID: <e8067cc132b449b9b0e910622b5210ad@AcuMS.aculab.com>
-References: <cover.1605827965.git.asml.silence@gmail.com>
- <ab04202d0f8c1424da47251085657c436d762785.1605827965.git.asml.silence@gmail.com>
-In-Reply-To: <ab04202d0f8c1424da47251085657c436d762785.1605827965.git.asml.silence@gmail.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+        Fri, 20 Nov 2020 09:19:13 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1605881952;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=U2mwuzAr8M1MiLjzgLIsl2biBSHzHXT6NMUGrYk0JOY=;
+        b=D7loTL+IQP0SWnM+aW7AAARUiMjfxvt4lPCoyJfl3sgQxM7u9e3wrIXC2dhsLMnjOgeUgs
+        YRIHbbalT4YrDRKRN8y68LIWICC55pQyWfQIO62HW3GGSF1ZLBPzrsqCZCPUGlqqZK4D1S
+        pIDwHX/8uZqz8iWuLq3GFqptpFJlsWs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-20-_vIuexxhMce60sa3kAVpcA-1; Fri, 20 Nov 2020 09:19:10 -0500
+X-MC-Unique: _vIuexxhMce60sa3kAVpcA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 210341009608;
+        Fri, 20 Nov 2020 14:19:09 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 522605D6D1;
+        Fri, 20 Nov 2020 14:19:02 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 0AKEJ1bW026562;
+        Fri, 20 Nov 2020 09:19:01 -0500
+Received: from localhost (mpatocka@localhost)
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 0AKEJ169026549;
+        Fri, 20 Nov 2020 09:19:01 -0500
+X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
+Date:   Fri, 20 Nov 2020 09:19:01 -0500 (EST)
+From:   Mikulas Patocka <mpatocka@redhat.com>
+X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
+To:     David Teigland <teigland@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        John Dorminy <jdorminy@redhat.com>
+cc:     heinzm@redhat.com, Mike Snitzer <msnitzer@redhat.com>,
+        Zdenek Kabelac <zkabelac@redhat.com>,
+        Marian Csontos <mcsontos@redhat.com>,
+        linux-block@vger.kernel.org, dm-devel@redhat.com
+Subject: [PATCH v2] blk-settings: make sure that max_sectors is aligned on
+ "logical_block_size" boundary.
+In-Reply-To: <alpine.LRH.2.02.2011191517360.10231@file01.intranet.prod.int.rdu2.redhat.com>
+Message-ID: <alpine.LRH.2.02.2011200909150.23894@file01.intranet.prod.int.rdu2.redhat.com>
+References: <20201118203127.GA30066@redhat.com> <20201118203408.GB30066@redhat.com> <fc7c4efd-0bb3-f023-19c6-54359d279ca8@redhat.com> <alpine.LRH.2.02.2011190810001.32672@file01.intranet.prod.int.rdu2.redhat.com> <20201119172807.GC1879@redhat.com>
+ <alpine.LRH.2.02.2011191337180.588@file01.intranet.prod.int.rdu2.redhat.com> <alpine.LRH.2.02.2011191517360.10231@file01.intranet.prod.int.rdu2.redhat.com>
+User-Agent: Alpine 2.02 (LRH 1266 2009-07-14)
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
-        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Pavel Begunkov
-> Sent: 19 November 2020 23:25
->
-> The block layer spends quite a while in iov_iter_npages(), but for the
-> bvec case the number of pages is already known and stored in
-> iter->nr_segs, so it can be returned immediately as an optimisation
-> 
-> Perf for an io_uring benchmark with registered buffers (i.e. bvec) shows
-> ~1.5-2.0% total cycle count spent in iov_iter_npages(), that's dropped
-> by this patch to ~0.2%.
-> 
-> Reviewed-by: Jens Axboe <axboe@kernel.dk>
-> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-> ---
->  lib/iov_iter.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
-> 
-> diff --git a/lib/iov_iter.c b/lib/iov_iter.c
-> index 1635111c5bd2..0fa7ac330acf 100644
-> --- a/lib/iov_iter.c
-> +++ b/lib/iov_iter.c
-> @@ -1594,6 +1594,8 @@ int iov_iter_npages(const struct iov_iter *i, int maxpages)
->  		return 0;
->  	if (unlikely(iov_iter_is_discard(i)))
->  		return 0;
-> +	if (unlikely(iov_iter_is_bvec(i)))
-> +		return min_t(int, i->nr_segs, maxpages);
-> 
->  	if (unlikely(iov_iter_is_pipe(i))) {
+We get I/O errors when we run md-raid1 on the top of dm-integrity on the
+top of ramdisk.
+device-mapper: integrity: Bio not aligned on 8 sectors: 0xff00, 0xff
+device-mapper: integrity: Bio not aligned on 8 sectors: 0xff00, 0xff
+device-mapper: integrity: Bio not aligned on 8 sectors: 0xffff, 0x1
+device-mapper: integrity: Bio not aligned on 8 sectors: 0xffff, 0x1
+device-mapper: integrity: Bio not aligned on 8 sectors: 0x8048, 0xff
+device-mapper: integrity: Bio not aligned on 8 sectors: 0x8147, 0xff
+device-mapper: integrity: Bio not aligned on 8 sectors: 0x8246, 0xff
+device-mapper: integrity: Bio not aligned on 8 sectors: 0x8345, 0xbb
 
-Is it worth putting an extra condition around these three 'unlikely' cases.
-ie:
-	if (unlikely((iov_iter_type(i) & (ITER_DISCARD | ITER_BVEC | ITER_PIPE)) {
-		if (iov_iter_is_discard(i))
-			return 0;
-		if (iov_iter_is_bvec(i))
-			return min_t(int, i->nr_segs, maxpages);
-		/* Must be ITER_PIPE */
+The ramdisk device has logical_block_size 512 and max_sectors 255. The
+dm-integrity device uses logical_block_size 4096 and it doesn't affect the
+"max_sectors" value - thus, it inherits 255 from the ramdisk. So, we have
+a device with max_sectors not aligned on logical_block_size.
 
-	David
+The md-raid device sees that the underlying leg has max_sectors 255 and it
+will split the bios on 255-sector boundary, making the bios unaligned on
+logical_block_size.
 
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-Registration No: 1397386 (Wales)
+In order to fix the bug, we round down max_sectors to logical_block_size.
+
+Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
+Cc: stable@vger.kernel.org
+
+---
+ block/blk-settings.c |   10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+Index: linux-2.6/block/blk-settings.c
+===================================================================
+--- linux-2.6.orig/block/blk-settings.c	2020-10-29 12:20:46.000000000 +0100
++++ linux-2.6/block/blk-settings.c	2020-11-20 15:07:59.000000000 +0100
+@@ -591,6 +591,16 @@ int blk_stack_limits(struct queue_limits
+ 		ret = -1;
+ 	}
+ 
++	t->max_sectors = round_down(t->max_sectors, t->logical_block_size >> SECTOR_SHIFT);
++	if (t->max_sectors < PAGE_SIZE >> SECTOR_SHIFT)
++		t->max_sectors = PAGE_SIZE >> SECTOR_SHIFT;
++	t->max_hw_sectors = round_down(t->max_hw_sectors, t->logical_block_size >> SECTOR_SHIFT);
++	if (t->max_hw_sectors < PAGE_SIZE >> SECTOR_SHIFT)
++		t->max_hw_sectors = PAGE_SIZE >> SECTOR_SHIFT;
++	t->max_dev_sectors = round_down(t->max_dev_sectors, t->logical_block_size >> SECTOR_SHIFT);
++	if (t->max_dev_sectors < PAGE_SIZE >> SECTOR_SHIFT)
++		t->max_dev_sectors = PAGE_SIZE >> SECTOR_SHIFT;
++
+ 	/* Discard alignment and granularity */
+ 	if (b->discard_granularity) {
+ 		alignment = queue_limit_discard_alignment(b, start);
 
