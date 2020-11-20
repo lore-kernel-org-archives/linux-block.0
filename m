@@ -2,53 +2,82 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58BBFC63777
-	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 18:49:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 570EAC64E7D
+	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 18:53:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 02CD62245F
-	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 18:49:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1B3AA2242B
+	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 18:53:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="1VKHBBzu"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="TqIGKvJK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729825AbgKTStf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 Nov 2020 13:49:35 -0500
-Received: from mail.kernel.org ([198.145.29.99]:33578 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729800AbgKTStf (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Nov 2020 13:49:35 -0500
-Received: from sol.localdomain (172-10-235-113.lightspeed.sntcca.sbcglobal.net [172.10.235.113])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 0A3662242B;
-        Fri, 20 Nov 2020 18:49:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1605898174;
-        bh=Ol1V+awsZyShvCLrIsyrRkGBuRBH+qkCbl7XsdSlcFg=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=1VKHBBzuW4zruQo2TgG699JZYdIwW3reEUuEr6z9lVwFMgFR/Bmo6pqrZMUqPK6eN
-         hykUyyeHU6R7oTXMoUHjToBcOIDWEkgBva81y7xv5fXROyzHRfrgpQI32gcUdeMv6g
-         quXAfwYB0r6u6WMRoRCKgR0ZZk3oBoTjnjdRm7kM=
-Date:   Fri, 20 Nov 2020 10:49:31 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-fscrypt@vger.kernel.org, Satya Tangirala <satyat@google.com>
+        id S1731570AbgKTSxM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 Nov 2020 13:53:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44812 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729154AbgKTSxL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 20 Nov 2020 13:53:11 -0500
+Received: from mail-il1-x144.google.com (mail-il1-x144.google.com [IPv6:2607:f8b0:4864:20::144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92D5FC0613CF
+        for <linux-block@vger.kernel.org>; Fri, 20 Nov 2020 10:53:10 -0800 (PST)
+Received: by mail-il1-x144.google.com with SMTP id a19so3663471ilm.3
+        for <linux-block@vger.kernel.org>; Fri, 20 Nov 2020 10:53:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=KGmpqHXl2E5s58RjENuxxIDXzRsrZkrBKU0UphW/tR8=;
+        b=TqIGKvJKPK0LUXhmilcXhOka1tg1kLUiKi7ISSNktbKjbiSOicJEmiktUi4xgS5AtU
+         r4lUrkGPrs2z3TiS++cbxgGVVEbsMvv/VcpQUW4h/j0skRqbCqZOXp94MTnRUUrMQy8k
+         h/ojIxYkFV7aT7omVFBOgZj88t7rtja7EjX1OQdkgV97PgSbQCxW+Ek19iAnxyK1ARgU
+         TlAZtWadfNPWmQVIcHPo3gKGqh2XqjVTueMhzeQNJqBoFyddCCjAVS4dcprd8IBrS/5e
+         K+pKJSnypocwmHXxMZAnmklUw3a9kISwnFnpyKOuiUDQCkBJ1zzxvGsyge+OUA8D/9U9
+         Nurw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=KGmpqHXl2E5s58RjENuxxIDXzRsrZkrBKU0UphW/tR8=;
+        b=ooaEclJmDu5Ca8+3duawaNo6/v1+WJHBXkQDBqCMQOCGCKJBzdk8qYdCRr25SCIEzs
+         r9stHzL5/D8vqIkhH01g5o0jdmoVkA3Xbj6ZE9FqpBSf5XLoVLao5EpD0mGX9DEk8Hix
+         52Q1TuAdwdzTHPcOQK8j5KN/vIku1RfnJhZbRBbWwtiN3Rv//MskFaPTdnC/wCy2GD+s
+         er6F2YiZ2rkUKI+qau3gfeg3HQbx0+XxDbd28OtodvNSL174A916XaGhUraoukR/ogIL
+         KExHGSAWYgwU34rwGJDS6d56F3inUl0SJzulY7z3V4DkIlJiHF1p7/dkIIRCeynk86r/
+         XYpA==
+X-Gm-Message-State: AOAM530ecj1mfBF+am8dOxubebT/CjB4b5YPRYgmNCeoJO/D1sgzmq+V
+        EUoWHseMOOxsFz+eOeQwakjnSw==
+X-Google-Smtp-Source: ABdhPJzq+otmd5dEMF2vstKk7rtHVtNtjfOIqW98HYZS9XU3pcHjmdZBIcCVxu3T75f3CJnw7ARc8g==
+X-Received: by 2002:a92:cf51:: with SMTP id c17mr28414694ilr.113.1605898389924;
+        Fri, 20 Nov 2020 10:53:09 -0800 (PST)
+Received: from [192.168.1.30] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id c13sm2177021ilr.39.2020.11.20.10.53.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 20 Nov 2020 10:53:09 -0800 (PST)
 Subject: Re: [PATCH v2] block/keyslot-manager: prevent crash when num_slots=1
-Message-ID: <X7gPu4RdTfXnxkYk@sol.localdomain>
+To:     Eric Biggers <ebiggers@kernel.org>, linux-block@vger.kernel.org
+Cc:     linux-fscrypt@vger.kernel.org, Satya Tangirala <satyat@google.com>
 References: <20201111214855.428044-1-ebiggers@kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <d0d64133-1d4f-fa50-18c1-8f3d09bb2a70@kernel.dk>
+Date:   Fri, 20 Nov 2020 11:53:08 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 In-Reply-To: <20201111214855.428044-1-ebiggers@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 11, 2020 at 01:48:55PM -0800, Eric Biggers wrote:
+On 11/11/20 2:48 PM, Eric Biggers wrote:
 > From: Eric Biggers <ebiggers@google.com>
 > 
 > If there is only one keyslot, then blk_ksm_init() computes
@@ -63,31 +92,9 @@ On Wed, Nov 11, 2020 at 01:48:55PM -0800, Eric Biggers wrote:
 > 
 >     kvm-xfstests -c ext4 -g encrypt -m inlinecrypt \
 >                  -o blk-crypto-fallback.num_keyslots=1
-> 
-> Fixes: 1b2628397058 ("block: Keyslot Manager for Inline Encryption")
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-> ---
->  block/keyslot-manager.c | 7 +++++++
->  1 file changed, 7 insertions(+)
-> 
-> diff --git a/block/keyslot-manager.c b/block/keyslot-manager.c
-> index 35abcb1ec051d..86f8195d8039e 100644
-> --- a/block/keyslot-manager.c
-> +++ b/block/keyslot-manager.c
-> @@ -103,6 +103,13 @@ int blk_ksm_init(struct blk_keyslot_manager *ksm, unsigned int num_slots)
->  	spin_lock_init(&ksm->idle_slots_lock);
->  
->  	slot_hashtable_size = roundup_pow_of_two(num_slots);
-> +	/*
-> +	 * hash_ptr() assumes bits != 0, so ensure the hash table has at least 2
-> +	 * buckets.  This only makes a difference when there is only 1 keyslot.
-> +	 */
-> +	if (slot_hashtable_size < 2)
-> +		slot_hashtable_size = 2;
-> +
->  	ksm->log_slot_ht_size = ilog2(slot_hashtable_size);
->  	ksm->slot_hashtable = kvmalloc_array(slot_hashtable_size,
->  					     sizeof(ksm->slot_hashtable[0]),
-> 
 
-Ping?
+Applied for 5.10, thanks.
+
+-- 
+Jens Axboe
+
