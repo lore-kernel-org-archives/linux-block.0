@@ -2,95 +2,150 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF10AC2D0E4
-	for <linux-block@archiver.kernel.org>; Sat, 21 Nov 2020 00:04:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55E3DC2D0E4
+	for <linux-block@archiver.kernel.org>; Sat, 21 Nov 2020 00:04:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9F23723A65
-	for <linux-block@archiver.kernel.org>; Sat, 21 Nov 2020 00:04:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1D29223A65
+	for <linux-block@archiver.kernel.org>; Sat, 21 Nov 2020 00:04:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fgov9oQO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dWyUhrKB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726587AbgKUAEe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 Nov 2020 19:04:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36908 "EHLO
+        id S1727943AbgKUAEg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 Nov 2020 19:04:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36918 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726426AbgKUAEd (ORCPT
+        with ESMTP id S1726335AbgKUAEf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Nov 2020 19:04:33 -0500
-Received: from mail-wm1-x342.google.com (mail-wm1-x342.google.com [IPv6:2a00:1450:4864:20::342])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60B5FC0613CF;
-        Fri, 20 Nov 2020 16:04:33 -0800 (PST)
-Received: by mail-wm1-x342.google.com with SMTP id 10so12672250wml.2;
-        Fri, 20 Nov 2020 16:04:33 -0800 (PST)
+        Fri, 20 Nov 2020 19:04:35 -0500
+Received: from mail-wm1-x343.google.com (mail-wm1-x343.google.com [IPv6:2a00:1450:4864:20::343])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20C49C061A04;
+        Fri, 20 Nov 2020 16:04:35 -0800 (PST)
+Received: by mail-wm1-x343.google.com with SMTP id 1so12079565wme.3;
+        Fri, 20 Nov 2020 16:04:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=xkYcfvmDakdmQmwnyVh4JPSG/cRSYOu+JefUy3uu6fQ=;
-        b=Fgov9oQOCvWkU9MvXIoP+uug07hlE1qO3PwWuX64UNJlMOBdC/Fn55wK8XSqhGH773
-         2ElcXSP3YNl5MGrabuSr/nEFddfyQHTstRUgBZddD3/+KfdXVrJ0XBzpoj3Rm+ocMPX3
-         pCMZeWyOq1fbZEpjuqPTigPiwYZL+DCQiargi95TBsfxSZ/gYzlqRXOs7xLxKhxBiNRx
-         B+Bw/3mN+p46WU1mV7sHUguFWjXfLLhlnKTC9ATfEwTcVBTRG/TTq/uVww42Ggui/5TC
-         9qULLQHEGf4gy5hSSYKT0Gd7FdBtWt1IxnZUbR3z9nRb6GvyVSndPwEqoyNgHujcMul8
-         OTDw==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=f8U62WcszabPEjfRiz8PL6bPd6YXedpkQur+ELLcNC4=;
+        b=dWyUhrKB2cftTV9R6ZY4W1ouEZ4mrMBqCyJgfYIyUF0gFgTKdE4Px68sj52ErRNcQZ
+         ZiYy7MBTweHDvI9bELzzsN7aqLwWuJSv/JtW1duYFn2Z9rtfe2flmqHggDQr32PFw54Q
+         tgrhodXZ67uj3x2ZVgulw/hCe2Var45F/EmJjMcym5uBrwARWV7mc2fZUxOA3bq+ER+T
+         +vN9aDcwAQ4J4nDTLDI3PC7AzrzsN23tKQe2Nd8NkwxeUI4rch/W7iVY+8yhETcMWz87
+         DmxSfCJjv4NiyKlxizl5eQtVe5/TCnsi/5kEWqcLJmyP/cb4eRJm2m8hKnA3UJ2sgC2W
+         qhsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=xkYcfvmDakdmQmwnyVh4JPSG/cRSYOu+JefUy3uu6fQ=;
-        b=N3VQBTD8AE1lfA+6fImP/vLzbOR5StzN1skJlNXD4SBaPbP2Jq5w01L1lmXABi+ecZ
-         sDUCVhf+uRutZbEdS/CgKJRDn/NC0WCZU59KBwc3MQsC1J40PSltc6g5NAfwt+DqmDtj
-         qqnp/KnHvVgsXdjWykqohzX0hoCO8gBLUt7e3S13hXe94nE7/XnKubfcgCoRjzr7Pj0B
-         53NKljEcFp6ysA0Fo03flDYBZAKcdQpK4a/nt7nVgxLStnff21FmpiSRNB29LUPmZa/z
-         mUOXSZU0QpEAWYRpD5CJxsqt7rM6X+3IKRER9Dc3CE35hNvPL97iUNI3nyomJ/AQAUuF
-         RsCg==
-X-Gm-Message-State: AOAM530b0VOVp3uIzEuM2KEHacoToUnlhMsCun9U+lyoyRI+LcAgUzOh
-        nU94mamK3kW4Aaf7s8OoNJ4N3LDKZao=
-X-Google-Smtp-Source: ABdhPJxmv+Yf88QGJBlRgfyp9AxCDwe7mH52rrASD3Qti38rEr3MAgqNxwFUTQVMMOG7ETUYAqEIkA==
-X-Received: by 2002:a1c:2c2:: with SMTP id 185mr12451580wmc.103.1605917072001;
-        Fri, 20 Nov 2020 16:04:32 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=f8U62WcszabPEjfRiz8PL6bPd6YXedpkQur+ELLcNC4=;
+        b=VqMpPI37bASBNtOY8EXTsK74x2heobGc1/itaByJ/uiNI69SiUU0hKTmgEmTKu9BYZ
+         allwg6Q8tu1hpZh3QsBCp7U8fVRyDKHRxrIc7rC1b4qYV1O0APYIG8xfeM4nUm/cT9vG
+         /V8uHi0R/Mya0UjWK88y2J3Rv8D03UosFXnTqgx8+zhR1RWOzioGO6w1EfvGAS/4rqhS
+         S8xswvMek6XHWZ01+fkDbw0B9jacCIOQf0r7PCnLMbUkGwBq0tkeYbdhevs1P8uPfBdA
+         MuKTShkukOQQJuZVRhKfppTRRj9CrbP2JFDhziMzsYwn3wK4seb48xFx9cgJXbpMQPHs
+         3bYQ==
+X-Gm-Message-State: AOAM530zUWaFjJKizY6V3eFvLMb7CbAW/VXP+XW6nQLobwZSIiKAjPoX
+        QldW1MCh9wgufSENRFDB3AU3vz5VRuw=
+X-Google-Smtp-Source: ABdhPJw4FnGisGN+PCv2bPrnHld1JjJGWhuUDS7LLmsbjAai+/qdqUw4QuNHBpcpi1wVm0yNWpGxqQ==
+X-Received: by 2002:a1c:4086:: with SMTP id n128mr12588662wma.68.1605917073885;
+        Fri, 20 Nov 2020 16:04:33 -0800 (PST)
 Received: from localhost.localdomain (host109-152-100-189.range109-152.btcentralplus.com. [109.152.100.189])
-        by smtp.gmail.com with ESMTPSA id d3sm6145518wmb.5.2020.11.20.16.04.30
+        by smtp.gmail.com with ESMTPSA id d3sm6145518wmb.5.2020.11.20.16.04.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Nov 2020 16:04:31 -0800 (PST)
+        Fri, 20 Nov 2020 16:04:33 -0800 (PST)
 From:   Pavel Begunkov <asml.silence@gmail.com>
 To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         Omar Sandoval <osandov@osandov.com>
 Cc:     linux-kernel@vger.kernel.org
-Subject: [PATCH for-next 0/2] optimise sbitmap deferred clear
-Date:   Sat, 21 Nov 2020 00:01:14 +0000
-Message-Id: <cover.1605908165.git.asml.silence@gmail.com>
+Subject: [PATCH 2/2] sbitmap: remove swap_lock
+Date:   Sat, 21 Nov 2020 00:01:16 +0000
+Message-Id: <e903f4b2fa327e4bbe5ad80b4bcffac3de17a780.1605908165.git.asml.silence@gmail.com>
 X-Mailer: git-send-email 2.24.0
+In-Reply-To: <cover.1605908165.git.asml.silence@gmail.com>
+References: <cover.1605908165.git.asml.silence@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In short, sbitmap_deferred_clear() lights up pretty much in my profiler,
-so these optimisations gave me ~1% more t-put. All the heavy stuff is in
-[2/2]. Would love someones eye to check it.
+map->swap_lock serialises concurrent calls to sbitmap_deferred_clear(),
+however that function is already works in atomic fashion and guarantees
+to not loose bits while applying map->cleared bitmask.
 
-I also want to replace cmpxchg() in that function with a single
-atomic and, that's slightly lighter and also transfers it from
-lock-free to wait-free, that's pretty neat.
-The problem is that apparently there is a non-atomic_t atomic and,
-and atomic_t is unsigned int but all the bitmap do unsigned long.
-Advice is welcome.
+Remove spinlocking in sbitmap_deferred_clear(). For a one-threaded
+tag allocation heavy test on top of nullblk it yields ~1.0-1.5% t-put
+increase, and according to perf 3% -> 1.5% cycle reduction of
+sbitmap_get().
 
-Pavel Begunkov (2):
-  sbitmap: optimise sbitmap_deferred_clear()
-  sbitmap: remove swap_lock
-
+Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+---
  include/linux/sbitmap.h |  5 -----
- lib/sbitmap.c           | 21 +++++++--------------
- 2 files changed, 7 insertions(+), 19 deletions(-)
+ lib/sbitmap.c           | 14 +++-----------
+ 2 files changed, 3 insertions(+), 16 deletions(-)
 
+diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
+index e40d019c3d9d..74cc6384715e 100644
+--- a/include/linux/sbitmap.h
++++ b/include/linux/sbitmap.h
+@@ -32,11 +32,6 @@ struct sbitmap_word {
+ 	 * @cleared: word holding cleared bits
+ 	 */
+ 	unsigned long cleared ____cacheline_aligned_in_smp;
+-
+-	/**
+-	 * @swap_lock: Held while swapping word <-> cleared
+-	 */
+-	spinlock_t swap_lock;
+ } ____cacheline_aligned_in_smp;
+ 
+ /**
+diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+index 49afb34e8340..238d9849f24b 100644
+--- a/lib/sbitmap.c
++++ b/lib/sbitmap.c
+@@ -16,13 +16,9 @@ static inline bool sbitmap_deferred_clear(struct sbitmap *sb, int index)
+ {
+ 	struct sbitmap_word *map = &sb->map[index];
+ 	unsigned long mask, val;
+-	bool ret = false;
+-	unsigned long flags;
+ 
+-	spin_lock_irqsave(&map->swap_lock, flags);
+-
+-	if (!map->cleared)
+-		goto out_unlock;
++	if (!READ_ONCE(map->cleared))
++		return false;
+ 
+ 	/*
+ 	 * First get a stable cleared mask, setting the old mask to 0.
+@@ -36,10 +32,7 @@ static inline bool sbitmap_deferred_clear(struct sbitmap *sb, int index)
+ 		val = map->word;
+ 	} while (cmpxchg(&map->word, val, val & ~mask) != val);
+ 
+-	ret = true;
+-out_unlock:
+-	spin_unlock_irqrestore(&map->swap_lock, flags);
+-	return ret;
++	return true;
+ }
+ 
+ int sbitmap_init_node(struct sbitmap *sb, unsigned int depth, int shift,
+@@ -81,7 +74,6 @@ int sbitmap_init_node(struct sbitmap *sb, unsigned int depth, int shift,
+ 	for (i = 0; i < sb->map_nr; i++) {
+ 		sb->map[i].depth = min(depth, bits_per_word);
+ 		depth -= sb->map[i].depth;
+-		spin_lock_init(&sb->map[i].swap_lock);
+ 	}
+ 	return 0;
+ }
 -- 
 2.24.0
 
