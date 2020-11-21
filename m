@@ -7,48 +7,48 @@ X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88EC0C64E7C
-	for <linux-block@archiver.kernel.org>; Sat, 21 Nov 2020 14:14:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E47FC63697
+	for <linux-block@archiver.kernel.org>; Sat, 21 Nov 2020 14:15:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 479B72224A
-	for <linux-block@archiver.kernel.org>; Sat, 21 Nov 2020 14:14:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3CC0422264
+	for <linux-block@archiver.kernel.org>; Sat, 21 Nov 2020 14:15:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AisNYH/7"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OVsSJWar"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728048AbgKUOOU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 21 Nov 2020 09:14:20 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:59025 "EHLO
+        id S1728099AbgKUOOe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 21 Nov 2020 09:14:34 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37049 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728046AbgKUOOS (ORCPT
+        by vger.kernel.org with ESMTP id S1728040AbgKUOOe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 21 Nov 2020 09:14:18 -0500
+        Sat, 21 Nov 2020 09:14:34 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1605968056;
+        s=mimecast20190719; t=1605968073;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Cts/UysbCeke0SRrY+6cxZefIvVJUV/6NiBfhTcZI1c=;
-        b=AisNYH/7xCgNWFQlIX0gMCYrpvKq2XJYDc0K1+fs864hyt5hBiyv24yQGsgvqeUMrVNMGC
-        CWnTllZdZwdgMJ/B1toMlTpG9Eg0VlSufeV9pfOrubnZgDJcR/8wJLWESnIV6G9jRBTBhg
-        NR7V6TQJJqNnNbfVYIqVM/yharCNuz0=
+        bh=MOxzf6AmZSNKfEnpa+Mn4aEC9Xg4TZA2VqmfqOCv8zg=;
+        b=OVsSJWariqH1oI4a1gcaTJOGhESKpsZQianXHHISl82Yn7ToRVGhLrF5jInwATgbYRegIB
+        YKXOne/mfqFzWdoBc7wuFHDSd35WHKjyN5M+UY4sCoqC3SE6cehj321wy5AwIkylH9kmNT
+        iEA+dTpXQTkcWNDSY/+yMdc56MI+dkY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-592-05YIL5MQOp25jyuwwWcgug-1; Sat, 21 Nov 2020 09:14:13 -0500
-X-MC-Unique: 05YIL5MQOp25jyuwwWcgug-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+ us-mta-163-EkozzKeyPzuaN7Np9QIgOw-1; Sat, 21 Nov 2020 09:14:29 -0500
+X-MC-Unique: EkozzKeyPzuaN7Np9QIgOw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2BD94804766;
-        Sat, 21 Nov 2020 14:14:12 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A458780ED8E;
+        Sat, 21 Nov 2020 14:14:27 +0000 (UTC)
 Received: from warthog.procyon.org.uk (ovpn-112-246.rdu2.redhat.com [10.10.112.246])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 59C9D5C253;
-        Sat, 21 Nov 2020 14:14:10 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1DBE35D6BA;
+        Sat, 21 Nov 2020 14:14:25 +0000 (UTC)
 Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
         Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
         Kingdom.
         Registered in England and Wales under Company Registration No. 3798903
-Subject: [PATCH 06/29] iov_iter: Split copy_mc_to_iter()
+Subject: [PATCH 08/29] iov_iter: Split the iterate_all_kinds() macro
 From:   David Howells <dhowells@redhat.com>
 To:     Pavel Begunkov <asml.silence@gmail.com>,
         Matthew Wilcox <willy@infradead.org>,
@@ -58,149 +58,66 @@ Cc:     dhowells@redhat.com,
         Linus Torvalds <torvalds@linux-foundation.org>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Date:   Sat, 21 Nov 2020 14:14:09 +0000
-Message-ID: <160596804951.154728.12388891412575059303.stgit@warthog.procyon.org.uk>
+Date:   Sat, 21 Nov 2020 14:14:25 +0000
+Message-ID: <160596806531.154728.6113611661561602930.stgit@warthog.procyon.org.uk>
 In-Reply-To: <160596800145.154728.7192318545120181269.stgit@warthog.procyon.org.uk>
 References: <160596800145.154728.7192318545120181269.stgit@warthog.procyon.org.uk>
 User-Agent: StGit/0.23
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Split copy_mc_to_iter() by type.
+Split the iterate_all_kinds() macro into iovec, bvec and kvec variants.
+It doesn't handle pipes and the discard variant is a no-op and can be built
+in directly.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 ---
 
- lib/iov_iter.c |   54 +++++++++++++++++++++++++++++++++---------------------
- 1 file changed, 33 insertions(+), 21 deletions(-)
+ lib/iov_iter.c |   27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
 
 diff --git a/lib/iov_iter.c b/lib/iov_iter.c
-index 0865e0b6eee9..7c1d92f7d020 100644
+index 5b18dfe0dcc7..934193627540 100644
 --- a/lib/iov_iter.c
 +++ b/lib/iov_iter.c
-@@ -758,7 +758,7 @@ static unsigned long copy_mc_to_page(struct page *page, size_t offset,
- 	return ret;
+@@ -106,6 +106,33 @@ static inline bool page_copy_sane(struct page *page, size_t offset, size_t n);
+ 	}							\
  }
  
--static size_t copy_mc_pipe_to_iter(const void *addr, size_t bytes,
-+static size_t pipe_copy_mc_to_iter(const void *addr, size_t bytes,
- 				struct iov_iter *i)
- {
- 	struct pipe_inode_info *pipe = i->pipe;
-@@ -815,18 +815,23 @@ static size_t copy_mc_pipe_to_iter(const void *addr, size_t bytes,
-  *   Compare to copy_to_iter() where only ITER_IOVEC attempts might return
-  *   a short copy.
-  */
--static size_t xxx_copy_mc_to_iter(const void *addr, size_t bytes, struct iov_iter *i)
-+static size_t iovec_copy_mc_to_iter(const void *addr, size_t bytes, struct iov_iter *i)
- {
- 	const char *from = addr;
--	unsigned long rem, curr_addr, s_addr = (unsigned long) addr;
- 
--	if (unlikely(iov_iter_is_pipe(i)))
--		return copy_mc_pipe_to_iter(addr, bytes, i);
--	if (iter_is_iovec(i))
--		might_fault();
--	iterate_and_advance(i, bytes, v,
-+	might_fault();
-+	iterate_and_advance_iovec(i, bytes, v,
- 		copyout_mc(v.iov_base, (from += v.iov_len) - v.iov_len,
--			   v.iov_len),
-+			   v.iov_len));
-+	return bytes;
++#define iterate_over_iovec(i, n, v, CMD) {			\
++	if (likely(n)) {					\
++		size_t skip = i->iov_offset;			\
++		const struct iovec *iov;			\
++		struct iovec v;					\
++		iterate_iovec(i, n, v, iov, skip, (CMD))	\
++	}							\
 +}
 +
-+static size_t bvec_copy_mc_to_iter(const void *addr, size_t bytes, struct iov_iter *i)
-+{
-+	const char *from = addr;
-+	unsigned long rem, curr_addr, s_addr = (unsigned long) addr;
-+
-+	iterate_and_advance_bvec(i, bytes, v,
- 		({
- 		rem = copy_mc_to_page(v.bv_page, v.bv_offset,
- 				      (from += v.bv_len) - v.bv_len, v.bv_len);
-@@ -835,18 +840,25 @@ static size_t xxx_copy_mc_to_iter(const void *addr, size_t bytes, struct iov_ite
- 			bytes = curr_addr - s_addr - rem;
- 			return bytes;
- 		}
--		}),
--		({
--		rem = copy_mc_to_kernel(v.iov_base, (from += v.iov_len)
--					- v.iov_len, v.iov_len);
-+		}))
-+	return bytes;
++#define iterate_over_bvec(i, n, v, CMD) {			\
++	if (likely(n)) {					\
++		size_t skip = i->iov_offset;			\
++		struct bio_vec v;				\
++		struct bvec_iter __bi;				\
++		iterate_bvec(i, n, v, __bi, skip, (CMD))	\
++	}							\
 +}
 +
-+static size_t kvec_copy_mc_to_iter(const void *addr, size_t bytes, struct iov_iter *i)
-+{
-+	const char *from = addr;
-+	unsigned long rem, curr_addr, s_addr = (unsigned long) addr;
++#define iterate_over_kvec(i, n, v, CMD) {			\
++	if (likely(n)) {					\
++		size_t skip = i->iov_offset;			\
++		const struct kvec *kvec;			\
++		struct kvec v;					\
++		iterate_kvec(i, n, v, kvec, skip, (CMD))	\
++	}							\
++}
 +
-+	iterate_and_advance_kvec(i, bytes, v, ({
-+		rem = copy_mc_to_kernel(v.iov_base,
-+					(from += v.iov_len) - v.iov_len,
-+					v.iov_len);
- 		if (rem) {
- 			curr_addr = (unsigned long) from;
- 			bytes = curr_addr - s_addr - rem;
- 			return bytes;
- 		}
--		})
--	)
--
-+		}));
- 	return bytes;
- }
- #endif /* CONFIG_ARCH_HAS_COPY_MC */
-@@ -1939,7 +1951,7 @@ static const struct iov_iter_ops iovec_iter_ops = {
- 	.copy_from_iter_flushcache	= xxx_copy_from_iter_flushcache,
- #endif
- #ifdef CONFIG_ARCH_HAS_COPY_MC
--	.copy_mc_to_iter		= xxx_copy_mc_to_iter,
-+	.copy_mc_to_iter		= iovec_copy_mc_to_iter,
- #endif
- 	.csum_and_copy_to_iter		= xxx_csum_and_copy_to_iter,
- 	.csum_and_copy_from_iter	= xxx_csum_and_copy_from_iter,
-@@ -1973,7 +1985,7 @@ static const struct iov_iter_ops kvec_iter_ops = {
- 	.copy_from_iter_flushcache	= xxx_copy_from_iter_flushcache,
- #endif
- #ifdef CONFIG_ARCH_HAS_COPY_MC
--	.copy_mc_to_iter		= xxx_copy_mc_to_iter,
-+	.copy_mc_to_iter		= kvec_copy_mc_to_iter,
- #endif
- 	.csum_and_copy_to_iter		= xxx_csum_and_copy_to_iter,
- 	.csum_and_copy_from_iter	= xxx_csum_and_copy_from_iter,
-@@ -2007,7 +2019,7 @@ static const struct iov_iter_ops bvec_iter_ops = {
- 	.copy_from_iter_flushcache	= xxx_copy_from_iter_flushcache,
- #endif
- #ifdef CONFIG_ARCH_HAS_COPY_MC
--	.copy_mc_to_iter		= xxx_copy_mc_to_iter,
-+	.copy_mc_to_iter		= bvec_copy_mc_to_iter,
- #endif
- 	.csum_and_copy_to_iter		= xxx_csum_and_copy_to_iter,
- 	.csum_and_copy_from_iter	= xxx_csum_and_copy_from_iter,
-@@ -2041,7 +2053,7 @@ static const struct iov_iter_ops pipe_iter_ops = {
- 	.copy_from_iter_flushcache	= xxx_copy_from_iter_flushcache,
- #endif
- #ifdef CONFIG_ARCH_HAS_COPY_MC
--	.copy_mc_to_iter		= xxx_copy_mc_to_iter,
-+	.copy_mc_to_iter		= pipe_copy_mc_to_iter,
- #endif
- 	.csum_and_copy_to_iter		= xxx_csum_and_copy_to_iter,
- 	.csum_and_copy_from_iter	= xxx_csum_and_copy_from_iter,
-@@ -2075,7 +2087,7 @@ static const struct iov_iter_ops discard_iter_ops = {
- 	.copy_from_iter_flushcache	= xxx_copy_from_iter_flushcache,
- #endif
- #ifdef CONFIG_ARCH_HAS_COPY_MC
--	.copy_mc_to_iter		= xxx_copy_mc_to_iter,
-+	.copy_mc_to_iter		= discard_copy_to_iter,
- #endif
- 	.csum_and_copy_to_iter		= xxx_csum_and_copy_to_iter,
- 	.csum_and_copy_from_iter	= xxx_csum_and_copy_from_iter,
+ #define iterate_and_advance(i, n, v, I, B, K) {			\
+ 	if (unlikely(i->count < n))				\
+ 		n = i->count;					\
 
 
