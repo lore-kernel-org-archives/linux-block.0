@@ -2,136 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0E7FC56202
-	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 22:21:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF10AC2D0E4
+	for <linux-block@archiver.kernel.org>; Sat, 21 Nov 2020 00:04:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3891C24199
-	for <linux-block@archiver.kernel.org>; Fri, 20 Nov 2020 22:21:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9F23723A65
+	for <linux-block@archiver.kernel.org>; Sat, 21 Nov 2020 00:04:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="th/UjqVc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fgov9oQO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728578AbgKTWVa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 Nov 2020 17:21:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49258 "EHLO
+        id S1726587AbgKUAEe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 Nov 2020 19:04:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36908 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728362AbgKTWV3 (ORCPT
+        with ESMTP id S1726426AbgKUAEd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Nov 2020 17:21:29 -0500
-Received: from mail-yb1-xb43.google.com (mail-yb1-xb43.google.com [IPv6:2607:f8b0:4864:20::b43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5ED15C061A04;
-        Fri, 20 Nov 2020 14:21:29 -0800 (PST)
-Received: by mail-yb1-xb43.google.com with SMTP id 10so9964113ybx.9;
-        Fri, 20 Nov 2020 14:21:29 -0800 (PST)
+        Fri, 20 Nov 2020 19:04:33 -0500
+Received: from mail-wm1-x342.google.com (mail-wm1-x342.google.com [IPv6:2a00:1450:4864:20::342])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60B5FC0613CF;
+        Fri, 20 Nov 2020 16:04:33 -0800 (PST)
+Received: by mail-wm1-x342.google.com with SMTP id 10so12672250wml.2;
+        Fri, 20 Nov 2020 16:04:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=29/AaAKKWIjlxKBDiu42mXe16/c3LUzQvTdn0Wctw9g=;
-        b=th/UjqVcversiy9gEUr46cKRrhHywr0iTgf9mzUejm+T3/Jtu2c6ftjob7N1dnOe2S
-         rGVMit/4Gqy7ZDqW+do8x9wI8RCPt/cmuWncILsoBuux3CBAtfG8gT+eTL8wiBVSM5EH
-         rDgxqkIvK+vUXnfhgj71GxYIUQH1hInVNMbCl5+3prik9RGhi+hsmul85xXuf9uJVr2L
-         NGLQGWDmOXXHg4l9XujW0HrVyacbE3Q1QSLAkLJ0BjE5AdFqhLyeU3T8/6+nJ9hH0JSR
-         o1vAVeqr6Bt+/W6rGIwrn7PuvAvMGRmk1Avx4k6vjCg8etglRiDTMnimrqKcX/KEsNCP
-         0CAw==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=xkYcfvmDakdmQmwnyVh4JPSG/cRSYOu+JefUy3uu6fQ=;
+        b=Fgov9oQOCvWkU9MvXIoP+uug07hlE1qO3PwWuX64UNJlMOBdC/Fn55wK8XSqhGH773
+         2ElcXSP3YNl5MGrabuSr/nEFddfyQHTstRUgBZddD3/+KfdXVrJ0XBzpoj3Rm+ocMPX3
+         pCMZeWyOq1fbZEpjuqPTigPiwYZL+DCQiargi95TBsfxSZ/gYzlqRXOs7xLxKhxBiNRx
+         B+Bw/3mN+p46WU1mV7sHUguFWjXfLLhlnKTC9ATfEwTcVBTRG/TTq/uVww42Ggui/5TC
+         9qULLQHEGf4gy5hSSYKT0Gd7FdBtWt1IxnZUbR3z9nRb6GvyVSndPwEqoyNgHujcMul8
+         OTDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=29/AaAKKWIjlxKBDiu42mXe16/c3LUzQvTdn0Wctw9g=;
-        b=g6dF/T3IXVX8QT4MfDxe+zp+ZIZ9xHCuMvUBvTX6zqjs95vMoZCWRjOR8ZvnplwSFE
-         MpW7FRJ+Cocr8Ai+2u86hCuhUCXhzTl/KKj91vXaqYUhzxnR9kkROQOnLFCEmRZKla1D
-         /TWlHYZvWd31yby8t+xuOaetfQfCA2rnKbYtvImZQoEgF4bMcyOH0wDgheWTNO/AQcgq
-         vKJHu61yvY4IK3yHPMgnP62czhvJ3I6HVNj4LuPzgNFrgnx06uPJAt0tvxIYKvpgGW+N
-         wvCFfMuDeRyb4r/j+b87COnXbi+be8kDhPqdSYEtYbeDyH//DWkZBm0w3V06nDyXNEdi
-         ds0A==
-X-Gm-Message-State: AOAM533E6x8M4HleYo3hGWOidsXyMY+wptATrgMwyVNBk+Ieg+ndwvCB
-        qvPHidvB8XuYLS48BjmsDU0X4FK8+hiPxZdptxg=
-X-Google-Smtp-Source: ABdhPJzYUhkcjTyH5GIcOV5fWMsl+OUdzem471zLY9usW3RhV8izQIRbyESMTmZwFikqgbfOQQqVvSSQCZzBPJX4q90=
-X-Received: by 2002:a5b:40e:: with SMTP id m14mr22113400ybp.33.1605910888617;
- Fri, 20 Nov 2020 14:21:28 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=xkYcfvmDakdmQmwnyVh4JPSG/cRSYOu+JefUy3uu6fQ=;
+        b=N3VQBTD8AE1lfA+6fImP/vLzbOR5StzN1skJlNXD4SBaPbP2Jq5w01L1lmXABi+ecZ
+         sDUCVhf+uRutZbEdS/CgKJRDn/NC0WCZU59KBwc3MQsC1J40PSltc6g5NAfwt+DqmDtj
+         qqnp/KnHvVgsXdjWykqohzX0hoCO8gBLUt7e3S13hXe94nE7/XnKubfcgCoRjzr7Pj0B
+         53NKljEcFp6ysA0Fo03flDYBZAKcdQpK4a/nt7nVgxLStnff21FmpiSRNB29LUPmZa/z
+         mUOXSZU0QpEAWYRpD5CJxsqt7rM6X+3IKRER9Dc3CE35hNvPL97iUNI3nyomJ/AQAUuF
+         RsCg==
+X-Gm-Message-State: AOAM530b0VOVp3uIzEuM2KEHacoToUnlhMsCun9U+lyoyRI+LcAgUzOh
+        nU94mamK3kW4Aaf7s8OoNJ4N3LDKZao=
+X-Google-Smtp-Source: ABdhPJxmv+Yf88QGJBlRgfyp9AxCDwe7mH52rrASD3Qti38rEr3MAgqNxwFUTQVMMOG7ETUYAqEIkA==
+X-Received: by 2002:a1c:2c2:: with SMTP id 185mr12451580wmc.103.1605917072001;
+        Fri, 20 Nov 2020 16:04:32 -0800 (PST)
+Received: from localhost.localdomain (host109-152-100-189.range109-152.btcentralplus.com. [109.152.100.189])
+        by smtp.gmail.com with ESMTPSA id d3sm6145518wmb.5.2020.11.20.16.04.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Nov 2020 16:04:31 -0800 (PST)
+From:   Pavel Begunkov <asml.silence@gmail.com>
+To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Omar Sandoval <osandov@osandov.com>
+Cc:     linux-kernel@vger.kernel.org
+Subject: [PATCH for-next 0/2] optimise sbitmap deferred clear
+Date:   Sat, 21 Nov 2020 00:01:14 +0000
+Message-Id: <cover.1605908165.git.asml.silence@gmail.com>
+X-Mailer: git-send-email 2.24.0
 MIME-Version: 1.0
-References: <cover.1605896059.git.gustavoars@kernel.org>
-In-Reply-To: <cover.1605896059.git.gustavoars@kernel.org>
-From:   Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date:   Fri, 20 Nov 2020 23:21:17 +0100
-Message-ID: <CANiq72=E_gEVvqUUTSqU4zegC2=yZSTM4b=4G-iofp6d3=UgWQ@mail.gmail.com>
-Subject: Re: [PATCH 000/141] Fix fall-through warnings for Clang
-To:     "Gustavo A. R. Silva" <gustavoars@kernel.org>
-Cc:     linux-kernel <linux-kernel@vger.kernel.org>,
-        alsa-devel@alsa-project.org, amd-gfx@lists.freedesktop.org,
-        bridge@lists.linux-foundation.org, ceph-devel@vger.kernel.org,
-        cluster-devel@redhat.com, coreteam@netfilter.org,
-        devel@driverdev.osuosl.org, dm-devel@redhat.com,
-        drbd-dev@lists.linbit.com, dri-devel@lists.freedesktop.org,
-        GR-everest-linux-l2@marvell.com, GR-Linux-NIC-Dev@marvell.com,
-        intel-gfx@lists.freedesktop.org, intel-wired-lan@lists.osuosl.org,
-        keyrings@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
-        linux-acpi@vger.kernel.org, linux-afs@lists.infradead.org,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-arm-msm@vger.kernel.org,
-        linux-atm-general@lists.sourceforge.net,
-        linux-block@vger.kernel.org, linux-can@vger.kernel.org,
-        linux-cifs@vger.kernel.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-decnet-user@lists.sourceforge.net,
-        Ext4 Developers List <linux-ext4@vger.kernel.org>,
-        linux-fbdev@vger.kernel.org, linux-geode@lists.infradead.org,
-        linux-gpio@vger.kernel.org, linux-hams@vger.kernel.org,
-        linux-hwmon@vger.kernel.org, linux-i3c@lists.infradead.org,
-        linux-ide@vger.kernel.org, linux-iio@vger.kernel.org,
-        linux-input <linux-input@vger.kernel.org>,
-        linux-integrity@vger.kernel.org,
-        linux-mediatek@lists.infradead.org,
-        Linux Media Mailing List <linux-media@vger.kernel.org>,
-        linux-mmc@vger.kernel.org, Linux-MM <linux-mm@kvack.org>,
-        linux-mtd@lists.infradead.org, linux-nfs@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-usb@vger.kernel.org, linux-watchdog@vger.kernel.org,
-        linux-wireless <linux-wireless@vger.kernel.org>,
-        Network Development <netdev@vger.kernel.org>,
-        netfilter-devel@vger.kernel.org, nouveau@lists.freedesktop.org,
-        op-tee@lists.trustedfirmware.org, oss-drivers@netronome.com,
-        patches@opensource.cirrus.com, rds-devel@oss.oracle.com,
-        reiserfs-devel@vger.kernel.org, samba-technical@lists.samba.org,
-        selinux@vger.kernel.org, target-devel@vger.kernel.org,
-        tipc-discussion@lists.sourceforge.net,
-        usb-storage@lists.one-eyed-alien.net,
-        virtualization@lists.linux-foundation.org,
-        wcn36xx@lists.infradead.org,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        xen-devel@lists.xenproject.org, linux-hardening@vger.kernel.org,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Nathan Chancellor <natechancellor@gmail.com>,
-        Miguel Ojeda <ojeda@kernel.org>, Joe Perches <joe@perches.com>,
-        Kees Cook <keescook@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Gustavo,
+In short, sbitmap_deferred_clear() lights up pretty much in my profiler,
+so these optimisations gave me ~1% more t-put. All the heavy stuff is in
+[2/2]. Would love someones eye to check it.
 
-On Fri, Nov 20, 2020 at 7:21 PM Gustavo A. R. Silva
-<gustavoars@kernel.org> wrote:
->
-> Hi all,
->
-> This series aims to fix almost all remaining fall-through warnings in
-> order to enable -Wimplicit-fallthrough for Clang.
+I also want to replace cmpxchg() in that function with a single
+atomic and, that's slightly lighter and also transfers it from
+lock-free to wait-free, that's pretty neat.
+The problem is that apparently there is a non-atomic_t atomic and,
+and atomic_t is unsigned int but all the bitmap do unsigned long.
+Advice is welcome.
 
-Thanks for this.
+Pavel Begunkov (2):
+  sbitmap: optimise sbitmap_deferred_clear()
+  sbitmap: remove swap_lock
 
-Since this warning is reliable in both/all compilers and we are
-eventually getting rid of all the cases, what about going even further
-and making it an error right after?
+ include/linux/sbitmap.h |  5 -----
+ lib/sbitmap.c           | 21 +++++++--------------
+ 2 files changed, 7 insertions(+), 19 deletions(-)
 
-Cheers,
-Miguel
+-- 
+2.24.0
+
