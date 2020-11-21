@@ -6,68 +6,67 @@ X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13486C5519F
-	for <linux-block@archiver.kernel.org>; Sat, 21 Nov 2020 18:21:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77225C388F9
+	for <linux-block@archiver.kernel.org>; Sat, 21 Nov 2020 18:23:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C6A7E22206
-	for <linux-block@archiver.kernel.org>; Sat, 21 Nov 2020 18:21:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3688422206
+	for <linux-block@archiver.kernel.org>; Sat, 21 Nov 2020 18:23:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="OWXHkUpT"
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="dH00Lj87"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728084AbgKUSVl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 21 Nov 2020 13:21:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35544 "EHLO
+        id S1727048AbgKUSXe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 21 Nov 2020 13:23:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35838 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727374AbgKUSVi (ORCPT
+        with ESMTP id S1727032AbgKUSXe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 21 Nov 2020 13:21:38 -0500
-Received: from mail-lj1-x243.google.com (mail-lj1-x243.google.com [IPv6:2a00:1450:4864:20::243])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1CB7C0613CF
-        for <linux-block@vger.kernel.org>; Sat, 21 Nov 2020 10:21:37 -0800 (PST)
-Received: by mail-lj1-x243.google.com with SMTP id p12so13523503ljc.9
-        for <linux-block@vger.kernel.org>; Sat, 21 Nov 2020 10:21:37 -0800 (PST)
+        Sat, 21 Nov 2020 13:23:34 -0500
+Received: from mail-lf1-x143.google.com (mail-lf1-x143.google.com [IPv6:2a00:1450:4864:20::143])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3301C061A4A
+        for <linux-block@vger.kernel.org>; Sat, 21 Nov 2020 10:23:33 -0800 (PST)
+Received: by mail-lf1-x143.google.com with SMTP id u18so18103957lfd.9
+        for <linux-block@vger.kernel.org>; Sat, 21 Nov 2020 10:23:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linux-foundation.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=MXimiLJTrNupHkZvWwFLioXTRq0xyflB27lsWAkpfI4=;
-        b=OWXHkUpTUVUoKPLewahV2bn8y9YWUhTKYYqZPcYsYz/RxIyBL9VvoEJydt/4b22Nc/
-         FTt0PAtaMLOG4UkWlpyTiyFvNX9w7VTVF8V5pJRqz8mT2iV3leIIRlo5cQY61ut3NtZU
-         1FFF98JuFgYzZovWcgU3304W0AGFjzWEOXuJI=
+        bh=m7cZfFDWETupzrz1W/PA0N75+saduUeI+gk15nXI7Q0=;
+        b=dH00Lj87XUWDjVhZTS31u5fK+b2ZiXmaVewWBK/V48aWDdpvmlY8lYEZ3TsPZy+JuP
+         Piggiet9UE2qE2SNHmspoYRK7bxHTomINqVwsLJcANApC/MOgACoEjU5ZxHckGmnDp1N
+         lQ0V7X3C4QU5N8npwm/3beAXsfs54Clu8S4xY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=MXimiLJTrNupHkZvWwFLioXTRq0xyflB27lsWAkpfI4=;
-        b=aq73rFuvAE4CMQjneS3cnP1/GIv4SDOQNw/mNixHxQXocKvT/+s0ogU86ac7rnyL3s
-         gVFVx8bPD0Wi69BPTFJ5UrkwM5bSCyr/T2bcGnprQP5TYzZPhPpttH84jhcdwwgD47YZ
-         /gjQa0TFGTYcPktyVHLtwQTCV+gSMsrZWageTOS49Zv78eyOoAqXmVn/DLz+nYKNb0K4
-         SB4TXCILIU/KwBEIKsbVex7w9hMPFS0rllyuiZTiDkq08AW2mjDJLQdFVpSHOm+p1wok
-         ToZslXJuCQVyWPAdAOZKvMIshexWRK1+CbbBnO8p0So0qyl3kA/4Z32fsUQDQNqLKkDG
-         tycA==
-X-Gm-Message-State: AOAM532PLEgTAxjmBx1o+MspC4F0OqJf+uq8flIe3GADaujp4remak9C
-        iCyiCeJoXiCdg3rM3hKB7bB64aXVP48PCQ==
-X-Google-Smtp-Source: ABdhPJztbVjH7ilspaeOye7cv/8X3qlTlO3foQq6s5+Vw8P5tKHBySfXD0FRjB7+DWz+rsSp+faPvQ==
-X-Received: by 2002:a2e:9046:: with SMTP id n6mr10912211ljg.22.1605982895273;
-        Sat, 21 Nov 2020 10:21:35 -0800 (PST)
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com. [209.85.167.41])
-        by smtp.gmail.com with ESMTPSA id x139sm784965lff.45.2020.11.21.10.21.34
+        bh=m7cZfFDWETupzrz1W/PA0N75+saduUeI+gk15nXI7Q0=;
+        b=S2WSFVyY5CfTi0kEJJMm8G9Yiuncf6+dO0yYSjQixrVk3m4U2iVQJDV9af5IQzRlat
+         +q2NC2Pl8ejXy/GAJC4/ThfwtgxMeRb4WFCq8SUlB/bTsiC0lRbiVVZsbwWYHDhZJl2Q
+         dCK1hIwjSFdnCVw/gLwgR9Gxky5nVno4mdS8AHKUU/uJ/Tl0t6lzDUkZsd1p7S4/2tcR
+         O1GsCTY5a8NU8j+qmALCGjkYvdUhboCzerXcM1RttZ9Cgt1fX0aAFP3b+YgIL8LUR96P
+         F8gvm9pfIL/zyUfn8mUm6IV7Wdcag0U59qSFobPbz2uReHIRecsrCPi+1jKdbjoHozSo
+         r69A==
+X-Gm-Message-State: AOAM53102eKVSyM9PwG8MVV2qKWh2CNqeL+uq1JRp3YTSwN/ePE8Krmk
+        wUW4U1DXPVFaCWDLbPD0oMKP73sp2mcw8A==
+X-Google-Smtp-Source: ABdhPJwqOAtwsouRn9aafr82f0vKlAj+Yh8O8qmrWv+l47+gU3aaxpIbRaLzcmDw8GdoZJtPJhRWjQ==
+X-Received: by 2002:a19:5d55:: with SMTP id p21mr815424lfj.115.1605983011678;
+        Sat, 21 Nov 2020 10:23:31 -0800 (PST)
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com. [209.85.167.52])
+        by smtp.gmail.com with ESMTPSA id r7sm782506lfc.206.2020.11.21.10.23.29
         for <linux-block@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 21 Nov 2020 10:21:34 -0800 (PST)
-Received: by mail-lf1-f41.google.com with SMTP id f11so18141955lfs.3
-        for <linux-block@vger.kernel.org>; Sat, 21 Nov 2020 10:21:34 -0800 (PST)
-X-Received: by 2002:a19:7f55:: with SMTP id a82mr11475617lfd.603.1605982893826;
- Sat, 21 Nov 2020 10:21:33 -0800 (PST)
+        Sat, 21 Nov 2020 10:23:30 -0800 (PST)
+Received: by mail-lf1-f52.google.com with SMTP id z21so18082812lfe.12
+        for <linux-block@vger.kernel.org>; Sat, 21 Nov 2020 10:23:29 -0800 (PST)
+X-Received: by 2002:a19:ae06:: with SMTP id f6mr11146486lfc.133.1605983009454;
+ Sat, 21 Nov 2020 10:23:29 -0800 (PST)
 MIME-Version: 1.0
 References: <160596800145.154728.7192318545120181269.stgit@warthog.procyon.org.uk>
- <160596801020.154728.15935034745159191564.stgit@warthog.procyon.org.uk>
-In-Reply-To: <160596801020.154728.15935034745159191564.stgit@warthog.procyon.org.uk>
+In-Reply-To: <160596800145.154728.7192318545120181269.stgit@warthog.procyon.org.uk>
 From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Sat, 21 Nov 2020 10:21:17 -0800
-X-Gmail-Original-Message-ID: <CAHk-=wjttbQzVUR-jSW-Q42iOUJtu4zCxYe9HO3ovLGOQ_3jSA@mail.gmail.com>
-Message-ID: <CAHk-=wjttbQzVUR-jSW-Q42iOUJtu4zCxYe9HO3ovLGOQ_3jSA@mail.gmail.com>
-Subject: Re: [PATCH 01/29] iov_iter: Switch to using a table of operations
+Date:   Sat, 21 Nov 2020 10:23:13 -0800
+X-Gmail-Original-Message-ID: <CAHk-=wj3p3eScaULtpCtWwS9NGFxT7dVTTC3mg1VyAyO2L5j7w@mail.gmail.com>
+Message-ID: <CAHk-=wj3p3eScaULtpCtWwS9NGFxT7dVTTC3mg1VyAyO2L5j7w@mail.gmail.com>
+Subject: Re: [PATCH 00/29] RFC: iov_iter: Switch to using an ops table
 To:     David Howells <dhowells@redhat.com>
 Cc:     Pavel Begunkov <asml.silence@gmail.com>,
         Matthew Wilcox <willy@infradead.org>,
@@ -83,37 +82,11 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 On Sat, Nov 21, 2020 at 6:13 AM David Howells <dhowells@redhat.com> wrote:
 >
-> Switch to using a table of operations.  In a future patch the individual
-> methods will be split up by type.  For the moment, however, the ops tables
-> just jump directly to the old functions - which are now static.  Inline
-> wrappers are provided to jump through the hooks.
+> Can someone recommend a good way to benchmark this properly?  The problem
+> is that the difference this makes relative to the amount of time taken to
+> actually do I/O is tiny.
 
-So I think conceptually this is the right thing to do, but I have a
-couple of worries:
+Maybe try /dev/zero -> /dev/null to try a load where the IO itself is
+cheap. Or vmsplice to /dev/null?
 
- - do we really need all those different versions? I'm thinking
-"iter_full" versions in particular. They I think the iter_full version
-could just be wrappers that call the regular iter thing and verify the
-end result is full (and revert if not). No?
-
- - I don't like the xxx_iter_op naming - even as a temporary thing.
-
-   Please don't use "xxx" as a placeholder. It's not a great grep
-pattern, it's not really descriptive, and we've literally had issues
-with things being marked as spam when you use that. So it's about the
-worst pattern to use.
-
-   Use "anycase" - or something like that - which is descriptive and
-greps much better (ie not a single hit for that pattern in the kernel
-either before or after).
-
- - I worry a bit about the indirect call overhead and spectre v2.
-
-   So yeah, it would be good to have benchmarks to make sure this
-doesn't regress for some simple case.
-
-Other than those things, my initial reaction is "this does seem cleaner".
-
-Al?
-
-              Linus
+         Linus
