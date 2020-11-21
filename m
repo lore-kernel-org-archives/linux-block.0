@@ -2,130 +2,61 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D1F7C6379D
-	for <linux-block@archiver.kernel.org>; Sat, 21 Nov 2020 00:04:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B032FC5519F
+	for <linux-block@archiver.kernel.org>; Sat, 21 Nov 2020 00:29:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6559022470
-	for <linux-block@archiver.kernel.org>; Sat, 21 Nov 2020 00:04:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6E3AB22470
+	for <linux-block@archiver.kernel.org>; Sat, 21 Nov 2020 00:29:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tlmfXEe0"
+	dkim=pass (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="lQGaz+d6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726335AbgKUAEk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 Nov 2020 19:04:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36912 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726426AbgKUAEg (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 Nov 2020 19:04:36 -0500
-Received: from mail-wr1-x441.google.com (mail-wr1-x441.google.com [IPv6:2a00:1450:4864:20::441])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3296DC0613CF;
-        Fri, 20 Nov 2020 16:04:34 -0800 (PST)
-Received: by mail-wr1-x441.google.com with SMTP id b6so12633383wrt.4;
-        Fri, 20 Nov 2020 16:04:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=nLnJQH0E0C7l5lcYS8gWKVR7TD7aW3JoBdngAU0UscA=;
-        b=tlmfXEe0CPnh4SkvdOsVi69o4CZ42w+AAEuBUFeMOFPwAm7dCta9SWzVpGlEfEaBuf
-         Cyzp8xY9cWFcv+pncxJRZDJDPh5qCi877gOelq2yNhHDwGaFD5iV0OhcrDQ6wwdbgQv6
-         5Gc9e1gcxuFBPyRzpJm2zkOO8XgENmRWNm2bqjIBuZVK3aGrkn40F7Z24rdJeuLf9q5j
-         EXzT8Az9nF4lwI503qeS0GUmxSNCFHYN0uvaW2nmL74EYuymxuf+5QL61h20kXDaG7Os
-         AZkTKvlTcEf+8iEz9Z1u7ZOZhlMJ3FTLjybr49QyINN1S51MN0I5Vj7MylRfGZdjPM3O
-         ZAdA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=nLnJQH0E0C7l5lcYS8gWKVR7TD7aW3JoBdngAU0UscA=;
-        b=nJgpra/3F5+bFlRLEtC5If13WY9Y85uy4U9CgX9mN6JEblVEMXvAqaaSfzOmvVg9P2
-         rAYUaDtZ3djUikIMDrGionmLNVrbTSHOFGH4ywL0T4IhbhCCuyyZAhtQYRz85vINaUUN
-         ZXIkfYBjDBh1mUKOxnEkAFDhd0irl5T9MNQ5pXWKyQJ7VNJWxEZ+OgGixxd15TeESCT0
-         5CDTV3IwyCcUVlBgAgInuusZBT+BRX/DbT0Z1jCcMuTbeowzu89EHwDyz4/4qtLvsRgW
-         A4cdEALv+WCFeq2cjetxeVgaWH/1yp/pNDieaND9n0OVLzriRx/MFAovr7+m4NakFz6K
-         c6ZA==
-X-Gm-Message-State: AOAM530qfYCoD/Y9V5XWrEkkED5myU3QAxuvqgeUZ0Rm5dmb4xK+UF89
-        9x2rKlmE4nQxHobl8nO1G6BXg2C+448=
-X-Google-Smtp-Source: ABdhPJxYImrkFubhC5IzJzob31RzRpVGqL/Cc5x/Qr5KBr1Pag6olnXxVYoCqL/bsR0+a8kg6eLwAw==
-X-Received: by 2002:adf:82f5:: with SMTP id 108mr19073426wrc.269.1605917072924;
-        Fri, 20 Nov 2020 16:04:32 -0800 (PST)
-Received: from localhost.localdomain (host109-152-100-189.range109-152.btcentralplus.com. [109.152.100.189])
-        by smtp.gmail.com with ESMTPSA id d3sm6145518wmb.5.2020.11.20.16.04.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Nov 2020 16:04:32 -0800 (PST)
-From:   Pavel Begunkov <asml.silence@gmail.com>
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Omar Sandoval <osandov@osandov.com>
-Cc:     linux-kernel@vger.kernel.org
-Subject: [PATCH 1/2] sbitmap: optimise sbitmap_deferred_clear()
-Date:   Sat, 21 Nov 2020 00:01:15 +0000
-Message-Id: <9b17f6db792526413e368dbb72bf7aca12b327d3.1605908165.git.asml.silence@gmail.com>
-X-Mailer: git-send-email 2.24.0
-In-Reply-To: <cover.1605908165.git.asml.silence@gmail.com>
-References: <cover.1605908165.git.asml.silence@gmail.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        id S1726587AbgKUA3F (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 Nov 2020 19:29:05 -0500
+Received: from mail.kernel.org ([198.145.29.99]:60730 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726426AbgKUA3E (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 20 Nov 2020 19:29:04 -0500
+Subject: Re: [GIT PULL] Block fixes for 5.10-rc
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1605918544;
+        bh=+e8vSI3xuYITt/LG4Seon7nnNYdOxPkhoHCXGswfmDA=;
+        h=From:In-Reply-To:References:Date:To:Cc:From;
+        b=lQGaz+d6hoadnhpeKAN4FQX97MAfMVQ0OikagQN+zV8lYKUd7Sfo8o7sNKUSSsr5g
+         I+XVIb/EMYER6gruN0Fl9G+6VeJ8bwv4W9GN9TanRk0nXM+qwwL6ADjKHOGCXkmHGf
+         LIYbmssQXhBKokG5QnVOBj2qcSF5NstwKZxl6k3o=
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <5e56dcf2-0320-c637-e6ee-143de81f2c41@kernel.dk>
+References: <5e56dcf2-0320-c637-e6ee-143de81f2c41@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <5e56dcf2-0320-c637-e6ee-143de81f2c41@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git tags/block-5.10-2020-11-20
+X-PR-Tracked-Commit-Id: 45f703a0d4b87f940ea150367dc4f4a9c06fa868
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 4fd84bc9692958cd07b3a3320dba26baa04a17d0
+Message-Id: <160591854446.19527.4210552002507911018.pr-tracker-bot@kernel.org>
+Date:   Sat, 21 Nov 2020 00:29:04 +0000
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Because of spinlocks and atomics sbitmap_deferred_clear() have to reload
-&sb->map[index] on each access even though the map address won't change.
-Hint it by explicitly caching it in a variable.
+The pull request you sent on Fri, 20 Nov 2020 11:45:35 -0700:
 
-Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
----
- lib/sbitmap.c | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+> git://git.kernel.dk/linux-block.git tags/block-5.10-2020-11-20
 
-diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-index 267aa7709416..49afb34e8340 100644
---- a/lib/sbitmap.c
-+++ b/lib/sbitmap.c
-@@ -14,30 +14,31 @@
-  */
- static inline bool sbitmap_deferred_clear(struct sbitmap *sb, int index)
- {
-+	struct sbitmap_word *map = &sb->map[index];
- 	unsigned long mask, val;
- 	bool ret = false;
- 	unsigned long flags;
- 
--	spin_lock_irqsave(&sb->map[index].swap_lock, flags);
-+	spin_lock_irqsave(&map->swap_lock, flags);
- 
--	if (!sb->map[index].cleared)
-+	if (!map->cleared)
- 		goto out_unlock;
- 
- 	/*
- 	 * First get a stable cleared mask, setting the old mask to 0.
- 	 */
--	mask = xchg(&sb->map[index].cleared, 0);
-+	mask = xchg(&map->cleared, 0);
- 
- 	/*
- 	 * Now clear the masked bits in our free word
- 	 */
- 	do {
--		val = sb->map[index].word;
--	} while (cmpxchg(&sb->map[index].word, val, val & ~mask) != val);
-+		val = map->word;
-+	} while (cmpxchg(&map->word, val, val & ~mask) != val);
- 
- 	ret = true;
- out_unlock:
--	spin_unlock_irqrestore(&sb->map[index].swap_lock, flags);
-+	spin_unlock_irqrestore(&map->swap_lock, flags);
- 	return ret;
- }
- 
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/4fd84bc9692958cd07b3a3320dba26baa04a17d0
+
+Thank you!
+
 -- 
-2.24.0
-
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
