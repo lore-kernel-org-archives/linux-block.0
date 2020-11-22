@@ -2,94 +2,159 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1B95C63697
-	for <linux-block@archiver.kernel.org>; Sun, 22 Nov 2020 16:17:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8361CC83014
+	for <linux-block@archiver.kernel.org>; Sun, 22 Nov 2020 16:17:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6ECD72080A
-	for <linux-block@archiver.kernel.org>; Sun, 22 Nov 2020 16:17:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 46E8620789
+	for <linux-block@archiver.kernel.org>; Sun, 22 Nov 2020 16:17:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="JOJBa8yN"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="ECdUiFoz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727898AbgKVQQr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 22 Nov 2020 11:16:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39236 "EHLO
+        id S1728144AbgKVQRV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 22 Nov 2020 11:17:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39300 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727728AbgKVQQr (ORCPT
+        with ESMTP id S1728104AbgKVQRJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 22 Nov 2020 11:16:47 -0500
-Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6B8FC0613CF
-        for <linux-block@vger.kernel.org>; Sun, 22 Nov 2020 08:16:46 -0800 (PST)
-Received: by mail-lf1-x130.google.com with SMTP id s27so437803lfp.5
-        for <linux-block@vger.kernel.org>; Sun, 22 Nov 2020 08:16:46 -0800 (PST)
+        Sun, 22 Nov 2020 11:17:09 -0500
+Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F48CC094241
+        for <linux-block@vger.kernel.org>; Sun, 22 Nov 2020 08:17:06 -0800 (PST)
+Received: by mail-pf1-x444.google.com with SMTP id x24so296032pfn.6
+        for <linux-block@vger.kernel.org>; Sun, 22 Nov 2020 08:17:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Y9qAYYU7qLTqNGo8meREqfnSUbV871EDhNHo/cPoPy0=;
-        b=JOJBa8yNjePop47L7cV+OC01ssZuHPnNFJld0CgcBFPCtRLRKQCAAIqxiZd3X3Mq3x
-         ZJxhVnqFNeBAOK92EV2XPKknvp46I1QFjWWd16nru3bOmtX+gDl8zwUzEWFW0s+M/6Ff
-         vfCfjTe0Kq8a5+Nn9iuYScYXwuiA0aLJ8YBk3Q3ALy7ehtC7mGfYb0ZZriH/5CxF7NKD
-         UZJgEXfTssgs6mAubTzC4pCYj+Yt+tBhsWUD6MVGh9hIJJshM6UbvYwGJMY9QG6Fk1rz
-         fMBcj6V3piRj3WE3Rw/LWZX2QnbyJIW/L9CL2LMY+xDRE6EXma83OEVE9gDX6LctXa7A
-         NF0g==
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=9LoGd3XD212DnUOzzxWdBwAHKcFiABUM1eku/Z5s9PQ=;
+        b=ECdUiFozoGotedNMltHxGvt7ELeQp/og9KGaJat0+erwcdPPWVCrU8KkW+JV4RYPeo
+         GTWUobzmr0s313q/lzhn4jF5RxJP4nhZO/aj20hZaH8d/g/a456RbO+LKniOS4LntN7M
+         GHx9cYZv8xWYKIg8n9C3ZJn+Q+L/6/s35hbx0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Y9qAYYU7qLTqNGo8meREqfnSUbV871EDhNHo/cPoPy0=;
-        b=KSqHHt1GSvzN/SgxAc1kmVHtNr/U5dVxLmHguNvx89EPsU6vnnh+m0QpSKZtU+Y4Lg
-         IiLWpT0lALE9rIeWMwGd495Weyjub1h3yPKqKthH82cF7TCTDsoBAQDbOW1dGnRRaqVJ
-         M2+vX1ImrDo18SB2T3dTbzTquoKjk2wn9fwgEKz4Qc4mkXuvIB98DfmWrSFroSRzZ1j6
-         u+80ALB8N8hA9v6G9m+Kj7oiG3wQeOq1dsldgvXVdokjOuPSHaCDpDb1MrPVdQTpxwDI
-         24OBg6g79uUaRJ7V/5WvrTrGuBIzm86x1cn41rDTDgIRK0viKZv+OE/FlaTjPU0N485+
-         OoZw==
-X-Gm-Message-State: AOAM531h7DJrMJDu8zLDRrGn/VTYWCpVm19dVkQ39ayMpsCNtevJ6vmo
-        vuYKtM5/YSUjykDnYNLVUHSNQH60ayoVNzJASRPB
-X-Google-Smtp-Source: ABdhPJx0pPbNmP1x9mLEZheeiCp0mfGIwihnljTToQL9L3KLjTYS0c1anSmYXet3/3dncIFTArKJAjMplhgmP9VN6sM=
-X-Received: by 2002:a19:f207:: with SMTP id q7mr11121546lfh.588.1606061805283;
- Sun, 22 Nov 2020 08:16:45 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=9LoGd3XD212DnUOzzxWdBwAHKcFiABUM1eku/Z5s9PQ=;
+        b=TN2SLYft0uPUAF5vGBq2QXbrG3WfLqYGMOU/ITNQtc4ehN3ro/TSW2LnXMa/nmV+cG
+         J7ZfZ/YZZFuhCF+TQDHqERrArWWE1xEDOOXI4ZJlZP7ZpS57mOl+cTlTFJrditTv+AXq
+         QZUIm9gMzFQnpTH/K2yRzPm1i+7QQEzrmxSkGpDAnn0kcuhQsFdbFAPYyWNEkesuTBvL
+         qYZgO/3d5yggnKquGuD5DYGThnTdfKVQwFK+hoz94x3asoOUCJeBQt9fSDYT3L+B5xVR
+         0v0I1TSKrFKbinEM15ehvmEy5Xi61Bkq3K0p5GAtkKIa9GSBB/VN4Lt1n6E2YXnMdDYN
+         gCGA==
+X-Gm-Message-State: AOAM533iJIr/o1w5mtG6TWIAF9KQP9Pi8yp/anuzTrSYy5cY81nqUT2P
+        ApCcndp+u9YQ35ccNvT4AdCZqg==
+X-Google-Smtp-Source: ABdhPJzjrfS3ZVuiz5fqtjIAbZtKQ5pfqPy3q+oKf7VtoFjoXLjA79CcRlXr5vTeWnitsMgA/HY0Vg==
+X-Received: by 2002:a63:1d0b:: with SMTP id d11mr21383404pgd.368.1606061825374;
+        Sun, 22 Nov 2020 08:17:05 -0800 (PST)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id k4sm9841327pfg.130.2020.11.22.08.17.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 22 Nov 2020 08:17:04 -0800 (PST)
+Date:   Sun, 22 Nov 2020 08:17:03 -0800
+From:   Kees Cook <keescook@chromium.org>
+To:     Jakub Kicinski <kuba@kernel.org>
+Cc:     "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        linux-kernel@vger.kernel.org, alsa-devel@alsa-project.org,
+        amd-gfx@lists.freedesktop.org, bridge@lists.linux-foundation.org,
+        ceph-devel@vger.kernel.org, cluster-devel@redhat.com,
+        coreteam@netfilter.org, devel@driverdev.osuosl.org,
+        dm-devel@redhat.com, drbd-dev@lists.linbit.com,
+        dri-devel@lists.freedesktop.org, GR-everest-linux-l2@marvell.com,
+        GR-Linux-NIC-Dev@marvell.com, intel-gfx@lists.freedesktop.org,
+        intel-wired-lan@lists.osuosl.org, keyrings@vger.kernel.org,
+        linux1394-devel@lists.sourceforge.net, linux-acpi@vger.kernel.org,
+        linux-afs@lists.infradead.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-arm-msm@vger.kernel.org,
+        linux-atm-general@lists.sourceforge.net,
+        linux-block@vger.kernel.org, linux-can@vger.kernel.org,
+        linux-cifs@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-decnet-user@lists.sourceforge.net,
+        linux-ext4@vger.kernel.org, linux-fbdev@vger.kernel.org,
+        linux-geode@lists.infradead.org, linux-gpio@vger.kernel.org,
+        linux-hams@vger.kernel.org, linux-hwmon@vger.kernel.org,
+        linux-i3c@lists.infradead.org, linux-ide@vger.kernel.org,
+        linux-iio@vger.kernel.org, linux-input@vger.kernel.org,
+        linux-integrity@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, linux-media@vger.kernel.org,
+        linux-mmc@vger.kernel.org, linux-mm@kvack.org,
+        linux-mtd@lists.infradead.org, linux-nfs@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-usb@vger.kernel.org, linux-watchdog@vger.kernel.org,
+        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+        netfilter-devel@vger.kernel.org, nouveau@lists.freedesktop.org,
+        op-tee@lists.trustedfirmware.org, oss-drivers@netronome.com,
+        patches@opensource.cirrus.com, rds-devel@oss.oracle.com,
+        reiserfs-devel@vger.kernel.org, samba-technical@lists.samba.org,
+        selinux@vger.kernel.org, target-devel@vger.kernel.org,
+        tipc-discussion@lists.sourceforge.net,
+        usb-storage@lists.one-eyed-alien.net,
+        virtualization@lists.linux-foundation.org,
+        wcn36xx@lists.infradead.org, x86@kernel.org,
+        xen-devel@lists.xenproject.org, linux-hardening@vger.kernel.org,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Nathan Chancellor <natechancellor@gmail.com>,
+        Miguel Ojeda <ojeda@kernel.org>, Joe Perches <joe@perches.com>
+Subject: Re: [PATCH 000/141] Fix fall-through warnings for Clang
+Message-ID: <202011220816.8B6591A@keescook>
+References: <cover.1605896059.git.gustavoars@kernel.org>
+ <20201120105344.4345c14e@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
+ <202011201129.B13FDB3C@keescook>
+ <20201120115142.292999b2@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
 MIME-Version: 1.0
-References: <CAHg0Huzvhg7ZizbCGQyyVNdnAWmQCsypRWvdBzm0GWwPzXD0dw@mail.gmail.com>
- <3b2f6267-e7a0-4266-867d-b0109d5a7cb4@acm.org> <CAHg0HuyGr8BfgBvXUG7N5WYyXKEzyh3i7eA=2XZxbW3zyXLTsA@mail.gmail.com>
- <cc14aa58-254e-5c33-89ab-6f3900143164@acm.org>
-In-Reply-To: <cc14aa58-254e-5c33-89ab-6f3900143164@acm.org>
-From:   Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Date:   Sun, 22 Nov 2020 17:16:34 +0100
-Message-ID: <CAHg0Huw35m_WiwFqcTEHpCz94=JhaKZdEuV-F=aetQ_SEQgauA@mail.gmail.com>
-Subject: Re: [RFC] Reliable Multicast on top of RTRS
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     linux-rdma@vger.kernel.org, linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201120115142.292999b2@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Sep 4, 2020 at 5:33 PM Bart Van Assche <bvanassche@acm.org> wrote:
->
-> On 2020-09-04 04:35, Danil Kipnis wrote:
-> > On Thu, Sep 3, 2020 at 1:07 AM Bart Van Assche <bvanassche@acm.org> wrote:
-> >> How will it be guaranteed that the resulting software does
-> >> not suffer from the problems that have been solved by the introduction
-> >> of the DRBD activity log
-> >> (https://www.linbit.com/drbd-user-guide/users-guide-drbd-8-4/#s-activity-log)?
-> >
-> > The above would require some kind of activity log also, I'm afraid.
->
-> How about collaborating with the DRBD team? My concern is that otherwise
-> we will end up with two drivers in the kernel that implement block device
-> replication between servers connected over a network.
+On Fri, Nov 20, 2020 at 11:51:42AM -0800, Jakub Kicinski wrote:
+> On Fri, 20 Nov 2020 11:30:40 -0800 Kees Cook wrote:
+> > On Fri, Nov 20, 2020 at 10:53:44AM -0800, Jakub Kicinski wrote:
+> > > On Fri, 20 Nov 2020 12:21:39 -0600 Gustavo A. R. Silva wrote:  
+> > > > This series aims to fix almost all remaining fall-through warnings in
+> > > > order to enable -Wimplicit-fallthrough for Clang.
+> > > > 
+> > > > In preparation to enable -Wimplicit-fallthrough for Clang, explicitly
+> > > > add multiple break/goto/return/fallthrough statements instead of just
+> > > > letting the code fall through to the next case.
+> > > > 
+> > > > Notice that in order to enable -Wimplicit-fallthrough for Clang, this
+> > > > change[1] is meant to be reverted at some point. So, this patch helps
+> > > > to move in that direction.
+> > > > 
+> > > > Something important to mention is that there is currently a discrepancy
+> > > > between GCC and Clang when dealing with switch fall-through to empty case
+> > > > statements or to cases that only contain a break/continue/return
+> > > > statement[2][3][4].  
+> > > 
+> > > Are we sure we want to make this change? Was it discussed before?
+> > > 
+> > > Are there any bugs Clangs puritanical definition of fallthrough helped
+> > > find?
+> > > 
+> > > IMVHO compiler warnings are supposed to warn about issues that could
+> > > be bugs. Falling through to default: break; can hardly be a bug?!  
+> > 
+> > It's certainly a place where the intent is not always clear. I think
+> > this makes all the cases unambiguous, and doesn't impact the machine
+> > code, since the compiler will happily optimize away any behavioral
+> > redundancy.
+> 
+> If none of the 140 patches here fix a real bug, and there is no change
+> to machine code then it sounds to me like a W=2 kind of a warning.
 
-Will take a closer look at drbd,
+FWIW, this series has found at least one bug so far:
+https://lore.kernel.org/lkml/CAFCwf11izHF=g1mGry1fE5kvFFFrxzhPSM6qKAO8gxSp=Kr_CQ@mail.gmail.com/
 
-Thank you,
-Danil.
-
->
-> Thanks,
->
-> Bart.
+-- 
+Kees Cook
