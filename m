@@ -2,91 +2,83 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77225C388F9
-	for <linux-block@archiver.kernel.org>; Sat, 21 Nov 2020 18:23:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04BBAC5519F
+	for <linux-block@archiver.kernel.org>; Sun, 22 Nov 2020 09:40:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3688422206
-	for <linux-block@archiver.kernel.org>; Sat, 21 Nov 2020 18:23:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8027720795
+	for <linux-block@archiver.kernel.org>; Sun, 22 Nov 2020 09:40:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="dH00Lj87"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dI4KdVpp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727048AbgKUSXe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 21 Nov 2020 13:23:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35838 "EHLO
+        id S1727318AbgKVJk1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 22 Nov 2020 04:40:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727032AbgKUSXe (ORCPT
+        with ESMTP id S1726741AbgKVJk0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 21 Nov 2020 13:23:34 -0500
-Received: from mail-lf1-x143.google.com (mail-lf1-x143.google.com [IPv6:2a00:1450:4864:20::143])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3301C061A4A
-        for <linux-block@vger.kernel.org>; Sat, 21 Nov 2020 10:23:33 -0800 (PST)
-Received: by mail-lf1-x143.google.com with SMTP id u18so18103957lfd.9
-        for <linux-block@vger.kernel.org>; Sat, 21 Nov 2020 10:23:33 -0800 (PST)
+        Sun, 22 Nov 2020 04:40:26 -0500
+Received: from mail-pg1-x542.google.com (mail-pg1-x542.google.com [IPv6:2607:f8b0:4864:20::542])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75547C0613CF;
+        Sun, 22 Nov 2020 01:40:26 -0800 (PST)
+Received: by mail-pg1-x542.google.com with SMTP id 62so11426395pgg.12;
+        Sun, 22 Nov 2020 01:40:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
+        d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=m7cZfFDWETupzrz1W/PA0N75+saduUeI+gk15nXI7Q0=;
-        b=dH00Lj87XUWDjVhZTS31u5fK+b2ZiXmaVewWBK/V48aWDdpvmlY8lYEZ3TsPZy+JuP
-         Piggiet9UE2qE2SNHmspoYRK7bxHTomINqVwsLJcANApC/MOgACoEjU5ZxHckGmnDp1N
-         lQ0V7X3C4QU5N8npwm/3beAXsfs54Clu8S4xY=
+        bh=8E2Nlp+Ctf60nM81/7FfdYzhBZP3JLnLEDBD2M4sIsk=;
+        b=dI4KdVppj/D7oc3RwSzIbUqAUIvld1t4wZcJhrZs9kCi19D2uer+bPlvP7zxQxhzZe
+         XSTFUhzdHPzc89SFEzdukwI4YeRHosmx4hvmF9eKGu6CxdTXOdacilwTYOC6WE8XddyI
+         3P3/+86L42Vt/upbWtGqQcL8UC0U1iK5KeLYN+QDXpKvOgpyn9h4YY7N/vxxgISwabFo
+         QOHLrUoovlK596p6InZV6ng9xZ03E2Acbz2L9QXp1LYsy4YeMRru1h26TcnKm1hQr2nk
+         ZC/2KOalhsM0JdSj1z8Nfj6TZENZI26Q57QLe4yNkueEBdq9BjEXsZs1UfdHJCdLYbJg
+         09vA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=m7cZfFDWETupzrz1W/PA0N75+saduUeI+gk15nXI7Q0=;
-        b=S2WSFVyY5CfTi0kEJJMm8G9Yiuncf6+dO0yYSjQixrVk3m4U2iVQJDV9af5IQzRlat
-         +q2NC2Pl8ejXy/GAJC4/ThfwtgxMeRb4WFCq8SUlB/bTsiC0lRbiVVZsbwWYHDhZJl2Q
-         dCK1hIwjSFdnCVw/gLwgR9Gxky5nVno4mdS8AHKUU/uJ/Tl0t6lzDUkZsd1p7S4/2tcR
-         O1GsCTY5a8NU8j+qmALCGjkYvdUhboCzerXcM1RttZ9Cgt1fX0aAFP3b+YgIL8LUR96P
-         F8gvm9pfIL/zyUfn8mUm6IV7Wdcag0U59qSFobPbz2uReHIRecsrCPi+1jKdbjoHozSo
-         r69A==
-X-Gm-Message-State: AOAM53102eKVSyM9PwG8MVV2qKWh2CNqeL+uq1JRp3YTSwN/ePE8Krmk
-        wUW4U1DXPVFaCWDLbPD0oMKP73sp2mcw8A==
-X-Google-Smtp-Source: ABdhPJwqOAtwsouRn9aafr82f0vKlAj+Yh8O8qmrWv+l47+gU3aaxpIbRaLzcmDw8GdoZJtPJhRWjQ==
-X-Received: by 2002:a19:5d55:: with SMTP id p21mr815424lfj.115.1605983011678;
-        Sat, 21 Nov 2020 10:23:31 -0800 (PST)
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com. [209.85.167.52])
-        by smtp.gmail.com with ESMTPSA id r7sm782506lfc.206.2020.11.21.10.23.29
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 21 Nov 2020 10:23:30 -0800 (PST)
-Received: by mail-lf1-f52.google.com with SMTP id z21so18082812lfe.12
-        for <linux-block@vger.kernel.org>; Sat, 21 Nov 2020 10:23:29 -0800 (PST)
-X-Received: by 2002:a19:ae06:: with SMTP id f6mr11146486lfc.133.1605983009454;
- Sat, 21 Nov 2020 10:23:29 -0800 (PST)
+        bh=8E2Nlp+Ctf60nM81/7FfdYzhBZP3JLnLEDBD2M4sIsk=;
+        b=IKAeLRcfa1TjgSI2xLSGLVoRTpo/PKMyigcIX9O9zZQ87K1vDjr3HDRG5uW7qlz6yE
+         sXOKCN7TOpdarubz5LQ0Fz5If2r4StzvRZsV4mq3+1w0Zv2bWK28Ig5egFiAYTXaWxC0
+         SLesiCqIQ4BhdHnqyuPj3SYrUwO4r59kxPkliB+EssJTDAYceT2lVEe5BCoJfhs2ehdy
+         A2GCVBuXCSUQV9WsEKq/+eBlxEFfwF3ziYy2YTmbqJY+VVOxvHEQqRP7evIukPesnXZ2
+         IeuAXcOe6imoxeGr6svgJJWbwu6wMifGXO+34hw6gh0wquSbm+xk13VUnNIOeQjp/ZDd
+         bM0A==
+X-Gm-Message-State: AOAM533Yc2Umfn5ogMg0uwKbbRv5cdxmySYvPp9u1VsxM94Hnik1p5FZ
+        qdGMSk18Qv6nQmlRhSyb+wnfpR45Zxr6SXC2iQ==
+X-Google-Smtp-Source: ABdhPJwUXAL8UTLtiteP/awxdRud2NlOzelqRy4rOZ3PjxzIIYAW8YRA45l1wTmrCHLmrxpentpIC+Q3EGp2a8O6MaQ=
+X-Received: by 2002:a17:90a:fd0d:: with SMTP id cv13mr19884875pjb.124.1606038025792;
+ Sun, 22 Nov 2020 01:40:25 -0800 (PST)
 MIME-Version: 1.0
-References: <160596800145.154728.7192318545120181269.stgit@warthog.procyon.org.uk>
-In-Reply-To: <160596800145.154728.7192318545120181269.stgit@warthog.procyon.org.uk>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Sat, 21 Nov 2020 10:23:13 -0800
-X-Gmail-Original-Message-ID: <CAHk-=wj3p3eScaULtpCtWwS9NGFxT7dVTTC3mg1VyAyO2L5j7w@mail.gmail.com>
-Message-ID: <CAHk-=wj3p3eScaULtpCtWwS9NGFxT7dVTTC3mg1VyAyO2L5j7w@mail.gmail.com>
-Subject: Re: [PATCH 00/29] RFC: iov_iter: Switch to using an ops table
-To:     David Howells <dhowells@redhat.com>
-Cc:     Pavel Begunkov <asml.silence@gmail.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+References: <20201115101514.954-1-rsalvaterra@gmail.com> <20201119222610.GD3113267@google.com>
+ <CALjTZvbK6_UqDQFhMxdEQAR-FbsZKrztkEFronvoFpLUWsi_gw@mail.gmail.com>
+ <20201120214013.GD3377168@google.com> <CALjTZvafTn4Mv5cp=QpGnmSkn=p++Chy+VeBKCOWuM5rUTXFJQ@mail.gmail.com>
+In-Reply-To: <CALjTZvafTn4Mv5cp=QpGnmSkn=p++Chy+VeBKCOWuM5rUTXFJQ@mail.gmail.com>
+From:   Rui Salvaterra <rsalvaterra@gmail.com>
+Date:   Sun, 22 Nov 2020 09:40:14 +0000
+Message-ID: <CALjTZvbRfFRWzN7Umsi7Yd3PZVK_rc1CtRL-g8wL3C+cS4kWoQ@mail.gmail.com>
+Subject: Re: [PATCH v5] zram: break the strict dependency from lzo
+To:     Minchan Kim <minchan@kernel.org>
+Cc:     ngupta@vflare.org, sergey.senozhatsky.work@gmail.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Nov 21, 2020 at 6:13 AM David Howells <dhowells@redhat.com> wrote:
+Hi, Minchan,
+
+On Sat, 21 Nov 2020 at 00:44, Rui Salvaterra <rsalvaterra@gmail.com> wrote:
 >
-> Can someone recommend a good way to benchmark this properly?  The problem
-> is that the difference this makes relative to the amount of time taken to
-> actually do I/O is tiny.
+> Well, it's quite possible I mis{read,applied} your patch.
 
-Maybe try /dev/zero -> /dev/null to try a load where the IO itself is
-cheap. Or vmsplice to /dev/null?
+And I obviously did. Your kconfig suggestion does basically the same,
+in a more simplified way. I guess a v6 is in order.
 
-         Linus
+Thanks,
+Rui
