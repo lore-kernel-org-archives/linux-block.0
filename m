@@ -2,129 +2,173 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8BFDC5519F
-	for <linux-block@archiver.kernel.org>; Sun, 22 Nov 2020 22:35:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F2E9C64E7C
+	for <linux-block@archiver.kernel.org>; Sun, 22 Nov 2020 22:36:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 813052075A
-	for <linux-block@archiver.kernel.org>; Sun, 22 Nov 2020 22:35:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DADA220776
+	for <linux-block@archiver.kernel.org>; Sun, 22 Nov 2020 22:36:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="it2DEm5q";
+	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="it2DEm5q"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726867AbgKVWeo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 22 Nov 2020 17:34:44 -0500
-Received: from eu-smtp-delivery-151.mimecast.com ([185.58.86.151]:28785 "EHLO
-        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726363AbgKVWen (ORCPT
+        id S1726993AbgKVWgK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 22 Nov 2020 17:36:10 -0500
+Received: from bedivere.hansenpartnership.com ([96.44.175.130]:42588 "EHLO
+        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726477AbgKVWgG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 22 Nov 2020 17:34:43 -0500
-Received: from AcuMS.aculab.com (156.67.243.126 [156.67.243.126]) (Using
- TLS) by relay.mimecast.com with ESMTP id
- uk-mta-137-fQDVZIgbMS2BrZY7UtebNg-1; Sun, 22 Nov 2020 22:34:38 +0000
-X-MC-Unique: fQDVZIgbMS2BrZY7UtebNg-1
-Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) by
- AcuMS.aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) with Microsoft SMTP
- Server (TLS) id 15.0.1347.2; Sun, 22 Nov 2020 22:34:37 +0000
-Received: from AcuMS.Aculab.com ([fe80::43c:695e:880f:8750]) by
- AcuMS.aculab.com ([fe80::43c:695e:880f:8750%12]) with mapi id 15.00.1347.000;
- Sun, 22 Nov 2020 22:34:37 +0000
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'Linus Torvalds' <torvalds@linux-foundation.org>,
-        David Howells <dhowells@redhat.com>
-CC:     Pavel Begunkov <asml.silence@gmail.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH 01/29] iov_iter: Switch to using a table of operations
-Thread-Topic: [PATCH 01/29] iov_iter: Switch to using a table of operations
-Thread-Index: AQHWwQTEMI88twW4zUSLxoYAnZFgBanUtsxQ
-Date:   Sun, 22 Nov 2020 22:34:37 +0000
-Message-ID: <3ba98abf0ddb4f16af7166db201fe9c1@AcuMS.aculab.com>
-References: <160596800145.154728.7192318545120181269.stgit@warthog.procyon.org.uk>
- <160596801020.154728.15935034745159191564.stgit@warthog.procyon.org.uk>
- <CAHk-=wjttbQzVUR-jSW-Q42iOUJtu4zCxYe9HO3ovLGOQ_3jSA@mail.gmail.com>
- <254318.1606051984@warthog.procyon.org.uk>
- <CAHk-=wggLYmTe5jm7nWvywcNNxUd=Vm4eGFYq8MjNZizpOzBLw@mail.gmail.com>
-In-Reply-To: <CAHk-=wggLYmTe5jm7nWvywcNNxUd=Vm4eGFYq8MjNZizpOzBLw@mail.gmail.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+        Sun, 22 Nov 2020 17:36:06 -0500
+Received: from localhost (localhost [127.0.0.1])
+        by bedivere.hansenpartnership.com (Postfix) with ESMTP id 3EEFD12808AA;
+        Sun, 22 Nov 2020 14:36:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=hansenpartnership.com; s=20151216; t=1606084565;
+        bh=y5Oo39UQGhMKIHztx5i9osM+IVUxOt/AInbXjgVEmOM=;
+        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+        b=it2DEm5qbX6tNKGabRZf0YZ7FJN256ppIXEFnMqNHN+XY9h76oTIzuZgEyEoREiKM
+         yiP/0zNVKPNW1kWiLTindkrOQ7bXlSJOTVsRohihqSOzq1tvOmtHcybKKU2pQsn+gK
+         kXbE7Tzelwaqt/71bFtBSSIQ6PZYHLF3M7J5PGe0=
+Received: from bedivere.hansenpartnership.com ([127.0.0.1])
+        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id YhaEdPXdRRpF; Sun, 22 Nov 2020 14:36:05 -0800 (PST)
+Received: from jarvis.int.hansenpartnership.com (unknown [IPv6:2601:600:8280:66d1::527])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id B820412808A7;
+        Sun, 22 Nov 2020 14:36:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=hansenpartnership.com; s=20151216; t=1606084565;
+        bh=y5Oo39UQGhMKIHztx5i9osM+IVUxOt/AInbXjgVEmOM=;
+        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+        b=it2DEm5qbX6tNKGabRZf0YZ7FJN256ppIXEFnMqNHN+XY9h76oTIzuZgEyEoREiKM
+         yiP/0zNVKPNW1kWiLTindkrOQ7bXlSJOTVsRohihqSOzq1tvOmtHcybKKU2pQsn+gK
+         kXbE7Tzelwaqt/71bFtBSSIQ6PZYHLF3M7J5PGe0=
+Message-ID: <1c7d7fde126bc0acf825766de64bf2f9b888f216.camel@HansenPartnership.com>
+Subject: Re: [PATCH 000/141] Fix fall-through warnings for Clang
+From:   James Bottomley <James.Bottomley@HansenPartnership.com>
+To:     Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Cc:     Kees Cook <keescook@chromium.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        alsa-devel@alsa-project.org, amd-gfx@lists.freedesktop.org,
+        bridge@lists.linux-foundation.org, ceph-devel@vger.kernel.org,
+        cluster-devel@redhat.com, coreteam@netfilter.org,
+        devel@driverdev.osuosl.org, dm-devel@redhat.com,
+        drbd-dev@lists.linbit.com, dri-devel@lists.freedesktop.org,
+        GR-everest-linux-l2@marvell.com, GR-Linux-NIC-Dev@marvell.com,
+        intel-gfx@lists.freedesktop.org, intel-wired-lan@lists.osuosl.org,
+        keyrings@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
+        linux-acpi@vger.kernel.org, linux-afs@lists.infradead.org,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-arm-msm@vger.kernel.org,
+        linux-atm-general@lists.sourceforge.net,
+        linux-block@vger.kernel.org, linux-can@vger.kernel.org,
+        linux-cifs@vger.kernel.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-decnet-user@lists.sourceforge.net,
+        Ext4 Developers List <linux-ext4@vger.kernel.org>,
+        linux-fbdev@vger.kernel.org, linux-geode@lists.infradead.org,
+        linux-gpio@vger.kernel.org, linux-hams@vger.kernel.org,
+        linux-hwmon@vger.kernel.org, linux-i3c@lists.infradead.org,
+        linux-ide@vger.kernel.org, linux-iio@vger.kernel.org,
+        linux-input <linux-input@vger.kernel.org>,
+        linux-integrity@vger.kernel.org,
+        linux-mediatek@lists.infradead.org,
+        Linux Media Mailing List <linux-media@vger.kernel.org>,
+        linux-mmc@vger.kernel.org, Linux-MM <linux-mm@kvack.org>,
+        linux-mtd@lists.infradead.org, linux-nfs@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-usb@vger.kernel.org, linux-watchdog@vger.kernel.org,
+        linux-wireless <linux-wireless@vger.kernel.org>,
+        Network Development <netdev@vger.kernel.org>,
+        netfilter-devel@vger.kernel.org, nouveau@lists.freedesktop.org,
+        op-tee@lists.trustedfirmware.org, oss-drivers@netronome.com,
+        patches@opensource.cirrus.com, rds-devel@oss.oracle.com,
+        reiserfs-devel@vger.kernel.org, samba-technical@lists.samba.org,
+        selinux@vger.kernel.org, target-devel@vger.kernel.org,
+        tipc-discussion@lists.sourceforge.net,
+        usb-storage@lists.one-eyed-alien.net,
+        virtualization@lists.linux-foundation.org,
+        wcn36xx@lists.infradead.org,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        xen-devel@lists.xenproject.org, linux-hardening@vger.kernel.org,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Nathan Chancellor <natechancellor@gmail.com>,
+        Miguel Ojeda <ojeda@kernel.org>, Joe Perches <joe@perches.com>
+Date:   Sun, 22 Nov 2020 14:36:00 -0800
+In-Reply-To: <CANiq72nZrHWTA4_Msg6MP9snTyenC6-eGfD27CyfNSu7QoVZbw@mail.gmail.com>
+References: <cover.1605896059.git.gustavoars@kernel.org>
+         <20201120105344.4345c14e@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
+         <202011201129.B13FDB3C@keescook>
+         <20201120115142.292999b2@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
+         <202011220816.8B6591A@keescook>
+         <9b57fd4914b46f38d54087d75e072d6e947cb56d.camel@HansenPartnership.com>
+         <CANiq72nZrHWTA4_Msg6MP9snTyenC6-eGfD27CyfNSu7QoVZbw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.34.4 
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
-        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-RnJvbTogTGludXMgVG9ydmFsZHMNCj4gU2VudDogMjIgTm92ZW1iZXIgMjAyMCAxOToyMg0KPiBT
-dWJqZWN0OiBSZTogW1BBVENIIDAxLzI5XSBpb3ZfaXRlcjogU3dpdGNoIHRvIHVzaW5nIGEgdGFi
-bGUgb2Ygb3BlcmF0aW9ucw0KPiANCj4gT24gU3VuLCBOb3YgMjIsIDIwMjAgYXQgNTozMyBBTSBE
-YXZpZCBIb3dlbGxzIDxkaG93ZWxsc0ByZWRoYXQuY29tPiB3cm90ZToNCj4gPg0KPiA+IEkgZG9u
-J3Qga25vdyBlbm91Z2ggYWJvdXQgaG93IHNwZWN0cmUgdjIgd29ya3MgdG8gc2F5IGlmIHRoaXMg
-d291bGQgYmUgYQ0KPiA+IHByb2JsZW0gZm9yIHRoZSBvcHMtdGFibGUgYXBwcm9hY2gsIGJ1dCB3
-b3VsZG4ndCBpdCBhbHNvIGFmZmVjdCB0aGUgY2hhaW4gb2YNCj4gPiBjb25kaXRpb25hbCBicmFu
-Y2hlcyB0aGF0IHdlIGN1cnJlbnRseSB1c2UsIHNpbmNlIGl0J3MgYnJhbmNoLXByZWRpY3Rpb24N
-Cj4gPiBiYXNlZD8NCj4gDQo+IE5vLCByZWd1bGFyIGNvbmRpdGlvbmFsIGJyYW5jaGVzIGFyZW4n
-dCBhIHByb2JsZW0uIFllcywgdGhleSBtYXkNCj4gbWlzcHJlZGljdCwgYnV0IG91dHNpZGUgb2Yg
-YSBmZXcgdmVyeSByYXJlIGNhc2VzIHRoYXQgd2UgaGFuZGxlDQo+IHNwZWNpYWxseSwgdGhhdCdz
-IG5vdCBhbiBpc3N1ZS4NCj4gDQo+IFdoeT8gQmVjYXVzZSB0aGV5IGFsd2F5cyBtaXNwcmVkaWN0
-IHRvIG9uZSBvciB0aGUgb3RoZXIgc2lkZSwgc28gdGhlDQo+IGNvZGUgZmxvdyBtYXkgYmUgbWlz
-LXByZWRpY3RlZCwgYnV0IGl0IGlzIGZhaXJseSBjb250cm9sbGVkLg0KPiANCj4gSW4gY29udHJh
-c3QsIGFuIGluZGlyZWN0IGp1bXAgY2FuIG1pc3ByZWRpY3QgdGhlIHRhcmdldCwgYW5kIGJyYW5j
-aA0KPiBfYW55d2hlcmVfLCBhbmQgdGhlIGF0dGFjayB2ZWN0b3JzIGNhbiBwb2lzb24gdGhlIEJU
-QiAoYnJhbmNoIHRhcmdldA0KPiBidWZmZXIpLCBzbyBvdXIgbWl0aWdhdGlvbiBmb3IgdGhhdCBp
-cyB0aGF0IGV2ZXJ5IHNpbmdsZSBpbmRpcmVjdA0KPiBicmFuY2ggaXNuJ3QgcHJlZGljdGVkIGF0
-IGFsbCAodXNpbmcgInJldHBvbGluZSIpLg0KPiANCj4gU28gYSBjb25kaXRpb25hbCBicmFuY2gg
-dGFrZXMgemVybyBjeWNsZXMgd2hlbiBwcmVkaWN0ZWQgKGFuZCBtb3N0DQo+IHdpbGwgcHJlZGlj
-dCBxdWl0ZSB3ZWxsKS4gQW5kIGFzIERhdmlkIExhaWdodCBwb2ludGVkIG91dCBhIGNvbXBpbGVy
-DQo+IGNhbiBhbHNvIHR1cm4gYSBzZXJpZXMgb2YgY29uZGl0aW9uYWwgYnJhbmNoZXMgaW50byBh
-IHRyZWUsIG1lYW5zIHRoYXQNCj4gTiBjb25kaXRpb25hbCBicmFuY2hlcyBiYXNpY2FsbHkgb25s
-eSBuZWVkcyBsb2cyKE4pIGNvbmRpdGlvbmFscw0KPiBleGVjdXRlZC4NCg0KVGhlIGNvbXBpbGVy
-IGNhbiBjb252ZXJ0IGEgc3dpdGNoIHN0YXRlbWVudCBpbnRvIGEgYnJhbmNoIHRyZWUuDQpCdXQg
-SSBkb24ndCB0aGluayBpdCBjYW4gY29udmVydCB0aGUgJ2lmIGNoYWluJyBpbiB0aGUgY3VycmVu
-dCBjb2RlDQp0byBvbmUuDQoNClRoZXJlIGlzIGFsc28gdGhlIHByb2JsZW0gdGhhdCBzb21lIHg4
-NiBjcHUgY2FuJ3QgcHJlZGljdCBicmFuY2hlcw0KaWYgdG9vIG1hbnkgaGFwcGVuIGluIHRoZSBz
-YW1lIGNhY2hlIGxpbmUgKG9yIHNpbWlsYXIpLg0KDQo+IEluIGNvbnRyYXN0LCB3aXRoIHJldHBv
-bGluZSBpbiBwbGFjZSwgYW4gaW5kaXJlY3QgYnJhbmNoIHdpbGwNCj4gYmFzaWNhbGx5IGFsd2F5
-cyB0YWtlIHNvbWV0aGluZyBsaWtlIDI1LTMwIGN5Y2xlcywgYmVjYXVzZSBpdCBhbHdheXMNCj4g
-bWlzcHJlZGljdHMuDQoNCkkgYWxzbyB3b25kZXIgaWYgYSByZXRwb2xpbmUgYWxzbyB0cmFzaGVz
-IHRoZSByZXR1cm4gc3RhY2sgb3B0aW1pc2F0aW9uLg0KKElmIHRoYXQgaXMgZXZlciByZWFsbHkg
-YSBzaWduaWZpY2FudCBnYWluIGZvciByZWFsIGZ1bmN0aW9ucy4pDQogDQouLi4NCj4gU28gdGhp
-cyBpcyBub3QgaW4gYW55IHdheSAiaW5kaXJlY3QgYnJhbmNoZXMgYXJlIGJhZCIuIEl0J3MgbW9y
-ZSBvZiBhDQo+ICJpbmRpcmVjdCBicmFuY2hlcyByZWFsbHkgYXJlbid0IG5lY2Vzc2FyaWx5IGJl
-dHRlciB0aGFuIGEgY291cGxlIG9mDQo+IGNvbmRpdGlvbmFscywgYW5kIF9tYXlfIGJlIG11Y2gg
-d29yc2UiLg0KDQpFdmVuIHdpdGhvdXQgcmV0cG9saW5lcywgdGhlIGp1bXAgdGFibGUgaXMgbGlr
-ZWx5IHRvIGEgZGF0YS1jYWNoZQ0KbWlzcyAoYW5kIG1heWJlIGEgVExCIG1pc3MpIHVubGVzcyB5
-b3UgYXJlIHJ1bm5pbmcgaG90LWNhY2hlLg0KVGhhdCBpcyBwcm9iYWJseSBhbiBleHRyYSBjYWNo
-ZSBtaXNzIG9uIHRvcCBvZiB0aGUgSS1jYWNoZSBvbmVzLg0KRXZlbiB3b3JzZSBpZiB5b3UgZW5k
-IHVwIHdpdGggdGhlIGp1bXAgdGFibGUgbmVhciB0aGUgY29kZQ0Kc2luY2UgdGhlIGRhdGEgY2Fj
-aGUgbGluZSBhbmQgVExCIG1pZ2h0IG5ldmVyIGJlIHNoYXJlZC4NCg0KU28gYSB2ZXJ5IHNob3J0
-IHN3aXRjaCBzdGF0ZW1lbnQgaXMgbGlrZWx5IHRvIGJlIGJldHRlciBhcw0KY29uZGl0aW9uYWwg
-anVtcHMgYW55d2F5Lg0KDQo+IEZvciBleGFtcGxlLCBsb29rIGF0IHRoaXMgZ2NjIGJ1Z3ppbGxh
-Og0KPiANCj4gICAgIGh0dHBzOi8vZ2NjLmdudS5vcmcvYnVnemlsbGEvc2hvd19idWcuY2dpP2lk
-PTg2OTUyDQo+IA0KPiB3aGljaCBiYXNpY2FsbHkgaXMgYWJvdXQgdGhlIGNvbXBpbGVyIGdlbmVy
-YXRpbmcgYSBqdW1wIHRhYmxlIChpcyBhDQo+IHNpbmdsZSBpbmRpcmVjdCBicmFuY2gpIHZzIGEg
-c2VyaWVzIG9mIGNvbmRpdGlvbmFsIGJyYW5jaGVzLiBXaXRoDQo+IHJldHBvbGluZSwgdGhlIGNy
-b3NzLW92ZXIgcG9pbnQgaXMgYmFzaWNhbGx5IHdoZW4geW91IG5lZWQgdG8gaGF2ZQ0KPiBvdmVy
-IDEwIGNvbmRpdGlvbmFsIGJyYW5jaGVzIC0gYW5kIGJlY2F1c2Ugb2YgdGhlIGxvZzIoTikgYmVo
-YXZpb3IsDQo+IHRoYXQncyBhcm91bmQgYSB0aG91c2FuZCBjYXNlcyENCg0KVGhhdCB3YXMgYSBo
-b3QtY2FjaGUgdGVzdC4NCkNvbGQtY2FjaGUgaXMgbGlrZWx5IHRvIGZhdm91ciB0aGUgcmV0cG9s
-aW5lIGEgbGl0dGxlIHNvb25lci4NCihBbmQgdGhlIHJldHBvbGluZSAocHJvYmJhbHkpIHdvbid0
-IGJlIChtdWNoKSB3b3JzZSB0aGFuIHRoZQ0KbWlkLXByZWRpY3RlZCBpbmRpcmVjdCBqdW1wLg0K
-DQpJIGRvIHdvbmRlciBob3cgbXVjaCBvZiB0aGUga2VybmVsIGFjdHVhbGx5IHJ1bnMgaG90LWNh
-Y2hlPw0KRXhjZXB0IGZvciBwYXJ0cyB0aGF0IGV4cGxpY2l0bHkgcnVuIHRoaW5ncyBpbiBidXJz
-dHMuDQoNCglEYXZpZA0KDQotDQpSZWdpc3RlcmVkIEFkZHJlc3MgTGFrZXNpZGUsIEJyYW1sZXkg
-Um9hZCwgTW91bnQgRmFybSwgTWlsdG9uIEtleW5lcywgTUsxIDFQVCwgVUsNClJlZ2lzdHJhdGlv
-biBObzogMTM5NzM4NiAoV2FsZXMpDQo=
+On Sun, 2020-11-22 at 21:35 +0100, Miguel Ojeda wrote:
+> On Sun, Nov 22, 2020 at 7:22 PM James Bottomley
+> <James.Bottomley@hansenpartnership.com> wrote:
+> > Well, it's a problem in an error leg, sure, but it's not a really
+> > compelling reason for a 141 patch series, is it?  All that fixing
+> > this error will do is get the driver to print "oh dear there's a
+> > problem" under four more conditions than it previously did.
+> > 
+> > We've been at this for three years now with nearly a thousand
+> > patches, firstly marking all the fall throughs with /* fall through
+> > */ and later changing it to fallthrough.  At some point we do have
+> > to ask if the effort is commensurate with the protection
+> > afforded.  Please tell me our reward for all this effort isn't a
+> > single missing error print.
+> 
+> It isn't that much effort, isn't it?
+
+Well, it seems to be three years of someone's time plus the maintainer
+review time and series disruption of nearly a thousand patches.  Let's
+be conservative and assume the producer worked about 30% on the series
+and it takes about 5-10 minutes per patch to review, merge and for
+others to rework existing series.  So let's say it's cost a person year
+of a relatively junior engineer producing the patches and say 100h of
+review and application time.  The latter is likely the big ticket item
+because it's what we have in least supply in the kernel (even though
+it's 20x vs the producer time).
+
+>  Plus we need to take into account the future mistakes that it might
+> prevent, too. So even if there were zero problems found so far, it is
+> still a positive change.
+
+Well, the question I was asking is if it's worth the cost which I've
+tried to outline above.
+
+> I would agree if these changes were high risk, though; but they are
+> almost trivial.
+
+It's not about the risk of the changes it's about the cost of
+implementing them.  Even if you discount the producer time (which
+someone gets to pay for, and if I were the engineering manager, I'd be
+unhappy about), the review/merge/rework time is pretty significant in
+exchange for six minor bug fixes.  Fine, when a new compiler warning
+comes along it's certainly reasonable to see if we can benefit from it
+and the fact that the compiler people think it's worthwhile is enough
+evidence to assume this initially.  But at some point you have to ask
+whether that assumption is supported by the evidence we've accumulated
+over the time we've been using it.  And if the evidence doesn't support
+it perhaps it is time to stop the experiment.
+
+James
+
 
