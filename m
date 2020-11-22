@@ -6,119 +6,125 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF101C63697
-	for <linux-block@archiver.kernel.org>; Sun, 22 Nov 2020 22:11:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8BFDC5519F
+	for <linux-block@archiver.kernel.org>; Sun, 22 Nov 2020 22:35:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B616020776
-	for <linux-block@archiver.kernel.org>; Sun, 22 Nov 2020 22:11:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 813052075A
+	for <linux-block@archiver.kernel.org>; Sun, 22 Nov 2020 22:35:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726238AbgKVWK7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 22 Nov 2020 17:10:59 -0500
-Received: from asavdk4.altibox.net ([109.247.116.15]:51724 "EHLO
-        asavdk4.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725782AbgKVWK6 (ORCPT
+        id S1726867AbgKVWeo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 22 Nov 2020 17:34:44 -0500
+Received: from eu-smtp-delivery-151.mimecast.com ([185.58.86.151]:28785 "EHLO
+        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726363AbgKVWen (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 22 Nov 2020 17:10:58 -0500
-Received: from ravnborg.org (unknown [188.228.123.71])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by asavdk4.altibox.net (Postfix) with ESMTPS id 2C52280567;
-        Sun, 22 Nov 2020 23:10:42 +0100 (CET)
-Date:   Sun, 22 Nov 2020 23:10:40 +0100
-From:   Sam Ravnborg <sam@ravnborg.org>
-To:     James Bottomley <James.Bottomley@hansenpartnership.com>
-Cc:     Kees Cook <keescook@chromium.org>,
-        Jakub Kicinski <kuba@kernel.org>, alsa-devel@alsa-project.org,
-        linux-atm-general@lists.sourceforge.net,
-        reiserfs-devel@vger.kernel.org, linux-iio@vger.kernel.org,
-        linux-wireless@vger.kernel.org, linux-fbdev@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
-        Nathan Chancellor <natechancellor@gmail.com>,
-        linux-ide@vger.kernel.org, dm-devel@redhat.com,
-        keyrings@vger.kernel.org, linux-mtd@lists.infradead.org,
-        GR-everest-linux-l2@marvell.com, wcn36xx@lists.infradead.org,
-        samba-technical@lists.samba.org, linux-i3c@lists.infradead.org,
-        linux1394-devel@lists.sourceforge.net,
-        linux-afs@lists.infradead.org,
-        usb-storage@lists.one-eyed-alien.net, drbd-dev@lists.linbit.com,
-        devel@driverdev.osuosl.org, linux-cifs@vger.kernel.org,
-        rds-devel@oss.oracle.com,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        linux-scsi@vger.kernel.org, linux-rdma@vger.kernel.org,
-        oss-drivers@netronome.com, bridge@lists.linux-foundation.org,
-        linux-security-module@vger.kernel.org,
-        amd-gfx@lists.freedesktop.org,
-        linux-stm32@st-md-mailman.stormreply.com, cluster-devel@redhat.com,
-        linux-acpi@vger.kernel.org, coreteam@netfilter.org,
-        intel-wired-lan@lists.osuosl.org, linux-input@vger.kernel.org,
-        Miguel Ojeda <ojeda@kernel.org>,
-        tipc-discussion@lists.sourceforge.net, linux-ext4@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-watchdog@vger.kernel.org,
-        selinux@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        intel-gfx@lists.freedesktop.org, linux-geode@lists.infradead.org,
-        linux-can@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-gpio@vger.kernel.org, op-tee@lists.trustedfirmware.org,
-        linux-mediatek@lists.infradead.org, xen-devel@lists.xenproject.org,
-        nouveau@lists.freedesktop.org, linux-hams@vger.kernel.org,
-        ceph-devel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        target-devel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-hwmon@vger.kernel.org, x86@kernel.org,
-        linux-nfs@vger.kernel.org, GR-Linux-NIC-Dev@marvell.com,
-        linux-mm@kvack.org, netdev@vger.kernel.org,
-        linux-decnet-user@lists.sourceforge.net, linux-mmc@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        linux-renesas-soc@vger.kernel.org, linux-sctp@vger.kernel.org,
-        linux-usb@vger.kernel.org, netfilter-devel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, patches@opensource.cirrus.com,
-        Joe Perches <joe@perches.com>, linux-integrity@vger.kernel.org,
-        linux-hardening@vger.kernel.org
-Subject: Re: [PATCH 000/141] Fix fall-through warnings for Clang
-Message-ID: <20201122221040.GD566387@ravnborg.org>
-References: <cover.1605896059.git.gustavoars@kernel.org>
- <20201120105344.4345c14e@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
- <202011201129.B13FDB3C@keescook>
- <20201120115142.292999b2@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
- <202011220816.8B6591A@keescook>
- <9b57fd4914b46f38d54087d75e072d6e947cb56d.camel@HansenPartnership.com>
+        Sun, 22 Nov 2020 17:34:43 -0500
+Received: from AcuMS.aculab.com (156.67.243.126 [156.67.243.126]) (Using
+ TLS) by relay.mimecast.com with ESMTP id
+ uk-mta-137-fQDVZIgbMS2BrZY7UtebNg-1; Sun, 22 Nov 2020 22:34:38 +0000
+X-MC-Unique: fQDVZIgbMS2BrZY7UtebNg-1
+Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) by
+ AcuMS.aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) with Microsoft SMTP
+ Server (TLS) id 15.0.1347.2; Sun, 22 Nov 2020 22:34:37 +0000
+Received: from AcuMS.Aculab.com ([fe80::43c:695e:880f:8750]) by
+ AcuMS.aculab.com ([fe80::43c:695e:880f:8750%12]) with mapi id 15.00.1347.000;
+ Sun, 22 Nov 2020 22:34:37 +0000
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'Linus Torvalds' <torvalds@linux-foundation.org>,
+        David Howells <dhowells@redhat.com>
+CC:     Pavel Begunkov <asml.silence@gmail.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH 01/29] iov_iter: Switch to using a table of operations
+Thread-Topic: [PATCH 01/29] iov_iter: Switch to using a table of operations
+Thread-Index: AQHWwQTEMI88twW4zUSLxoYAnZFgBanUtsxQ
+Date:   Sun, 22 Nov 2020 22:34:37 +0000
+Message-ID: <3ba98abf0ddb4f16af7166db201fe9c1@AcuMS.aculab.com>
+References: <160596800145.154728.7192318545120181269.stgit@warthog.procyon.org.uk>
+ <160596801020.154728.15935034745159191564.stgit@warthog.procyon.org.uk>
+ <CAHk-=wjttbQzVUR-jSW-Q42iOUJtu4zCxYe9HO3ovLGOQ_3jSA@mail.gmail.com>
+ <254318.1606051984@warthog.procyon.org.uk>
+ <CAHk-=wggLYmTe5jm7nWvywcNNxUd=Vm4eGFYq8MjNZizpOzBLw@mail.gmail.com>
+In-Reply-To: <CAHk-=wggLYmTe5jm7nWvywcNNxUd=Vm4eGFYq8MjNZizpOzBLw@mail.gmail.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9b57fd4914b46f38d54087d75e072d6e947cb56d.camel@HansenPartnership.com>
-X-CMAE-Score: 0
-X-CMAE-Analysis: v=2.3 cv=VafZwmh9 c=1 sm=1 tr=0
-        a=S6zTFyMACwkrwXSdXUNehg==:117 a=S6zTFyMACwkrwXSdXUNehg==:17
-        a=kj9zAlcOel0A:10 a=VwQbUJbxAAAA:8 a=pGLkceISAAAA:8
-        a=7T594MSkF3521FIrX4wA:9 a=CjuIK1q_8ugA:10 a=AjGcO6oz07-iQ99wixmX:22
+Authentication-Results: relay.mimecast.com;
+        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi James.
+RnJvbTogTGludXMgVG9ydmFsZHMNCj4gU2VudDogMjIgTm92ZW1iZXIgMjAyMCAxOToyMg0KPiBT
+dWJqZWN0OiBSZTogW1BBVENIIDAxLzI5XSBpb3ZfaXRlcjogU3dpdGNoIHRvIHVzaW5nIGEgdGFi
+bGUgb2Ygb3BlcmF0aW9ucw0KPiANCj4gT24gU3VuLCBOb3YgMjIsIDIwMjAgYXQgNTozMyBBTSBE
+YXZpZCBIb3dlbGxzIDxkaG93ZWxsc0ByZWRoYXQuY29tPiB3cm90ZToNCj4gPg0KPiA+IEkgZG9u
+J3Qga25vdyBlbm91Z2ggYWJvdXQgaG93IHNwZWN0cmUgdjIgd29ya3MgdG8gc2F5IGlmIHRoaXMg
+d291bGQgYmUgYQ0KPiA+IHByb2JsZW0gZm9yIHRoZSBvcHMtdGFibGUgYXBwcm9hY2gsIGJ1dCB3
+b3VsZG4ndCBpdCBhbHNvIGFmZmVjdCB0aGUgY2hhaW4gb2YNCj4gPiBjb25kaXRpb25hbCBicmFu
+Y2hlcyB0aGF0IHdlIGN1cnJlbnRseSB1c2UsIHNpbmNlIGl0J3MgYnJhbmNoLXByZWRpY3Rpb24N
+Cj4gPiBiYXNlZD8NCj4gDQo+IE5vLCByZWd1bGFyIGNvbmRpdGlvbmFsIGJyYW5jaGVzIGFyZW4n
+dCBhIHByb2JsZW0uIFllcywgdGhleSBtYXkNCj4gbWlzcHJlZGljdCwgYnV0IG91dHNpZGUgb2Yg
+YSBmZXcgdmVyeSByYXJlIGNhc2VzIHRoYXQgd2UgaGFuZGxlDQo+IHNwZWNpYWxseSwgdGhhdCdz
+IG5vdCBhbiBpc3N1ZS4NCj4gDQo+IFdoeT8gQmVjYXVzZSB0aGV5IGFsd2F5cyBtaXNwcmVkaWN0
+IHRvIG9uZSBvciB0aGUgb3RoZXIgc2lkZSwgc28gdGhlDQo+IGNvZGUgZmxvdyBtYXkgYmUgbWlz
+LXByZWRpY3RlZCwgYnV0IGl0IGlzIGZhaXJseSBjb250cm9sbGVkLg0KPiANCj4gSW4gY29udHJh
+c3QsIGFuIGluZGlyZWN0IGp1bXAgY2FuIG1pc3ByZWRpY3QgdGhlIHRhcmdldCwgYW5kIGJyYW5j
+aA0KPiBfYW55d2hlcmVfLCBhbmQgdGhlIGF0dGFjayB2ZWN0b3JzIGNhbiBwb2lzb24gdGhlIEJU
+QiAoYnJhbmNoIHRhcmdldA0KPiBidWZmZXIpLCBzbyBvdXIgbWl0aWdhdGlvbiBmb3IgdGhhdCBp
+cyB0aGF0IGV2ZXJ5IHNpbmdsZSBpbmRpcmVjdA0KPiBicmFuY2ggaXNuJ3QgcHJlZGljdGVkIGF0
+IGFsbCAodXNpbmcgInJldHBvbGluZSIpLg0KPiANCj4gU28gYSBjb25kaXRpb25hbCBicmFuY2gg
+dGFrZXMgemVybyBjeWNsZXMgd2hlbiBwcmVkaWN0ZWQgKGFuZCBtb3N0DQo+IHdpbGwgcHJlZGlj
+dCBxdWl0ZSB3ZWxsKS4gQW5kIGFzIERhdmlkIExhaWdodCBwb2ludGVkIG91dCBhIGNvbXBpbGVy
+DQo+IGNhbiBhbHNvIHR1cm4gYSBzZXJpZXMgb2YgY29uZGl0aW9uYWwgYnJhbmNoZXMgaW50byBh
+IHRyZWUsIG1lYW5zIHRoYXQNCj4gTiBjb25kaXRpb25hbCBicmFuY2hlcyBiYXNpY2FsbHkgb25s
+eSBuZWVkcyBsb2cyKE4pIGNvbmRpdGlvbmFscw0KPiBleGVjdXRlZC4NCg0KVGhlIGNvbXBpbGVy
+IGNhbiBjb252ZXJ0IGEgc3dpdGNoIHN0YXRlbWVudCBpbnRvIGEgYnJhbmNoIHRyZWUuDQpCdXQg
+SSBkb24ndCB0aGluayBpdCBjYW4gY29udmVydCB0aGUgJ2lmIGNoYWluJyBpbiB0aGUgY3VycmVu
+dCBjb2RlDQp0byBvbmUuDQoNClRoZXJlIGlzIGFsc28gdGhlIHByb2JsZW0gdGhhdCBzb21lIHg4
+NiBjcHUgY2FuJ3QgcHJlZGljdCBicmFuY2hlcw0KaWYgdG9vIG1hbnkgaGFwcGVuIGluIHRoZSBz
+YW1lIGNhY2hlIGxpbmUgKG9yIHNpbWlsYXIpLg0KDQo+IEluIGNvbnRyYXN0LCB3aXRoIHJldHBv
+bGluZSBpbiBwbGFjZSwgYW4gaW5kaXJlY3QgYnJhbmNoIHdpbGwNCj4gYmFzaWNhbGx5IGFsd2F5
+cyB0YWtlIHNvbWV0aGluZyBsaWtlIDI1LTMwIGN5Y2xlcywgYmVjYXVzZSBpdCBhbHdheXMNCj4g
+bWlzcHJlZGljdHMuDQoNCkkgYWxzbyB3b25kZXIgaWYgYSByZXRwb2xpbmUgYWxzbyB0cmFzaGVz
+IHRoZSByZXR1cm4gc3RhY2sgb3B0aW1pc2F0aW9uLg0KKElmIHRoYXQgaXMgZXZlciByZWFsbHkg
+YSBzaWduaWZpY2FudCBnYWluIGZvciByZWFsIGZ1bmN0aW9ucy4pDQogDQouLi4NCj4gU28gdGhp
+cyBpcyBub3QgaW4gYW55IHdheSAiaW5kaXJlY3QgYnJhbmNoZXMgYXJlIGJhZCIuIEl0J3MgbW9y
+ZSBvZiBhDQo+ICJpbmRpcmVjdCBicmFuY2hlcyByZWFsbHkgYXJlbid0IG5lY2Vzc2FyaWx5IGJl
+dHRlciB0aGFuIGEgY291cGxlIG9mDQo+IGNvbmRpdGlvbmFscywgYW5kIF9tYXlfIGJlIG11Y2gg
+d29yc2UiLg0KDQpFdmVuIHdpdGhvdXQgcmV0cG9saW5lcywgdGhlIGp1bXAgdGFibGUgaXMgbGlr
+ZWx5IHRvIGEgZGF0YS1jYWNoZQ0KbWlzcyAoYW5kIG1heWJlIGEgVExCIG1pc3MpIHVubGVzcyB5
+b3UgYXJlIHJ1bm5pbmcgaG90LWNhY2hlLg0KVGhhdCBpcyBwcm9iYWJseSBhbiBleHRyYSBjYWNo
+ZSBtaXNzIG9uIHRvcCBvZiB0aGUgSS1jYWNoZSBvbmVzLg0KRXZlbiB3b3JzZSBpZiB5b3UgZW5k
+IHVwIHdpdGggdGhlIGp1bXAgdGFibGUgbmVhciB0aGUgY29kZQ0Kc2luY2UgdGhlIGRhdGEgY2Fj
+aGUgbGluZSBhbmQgVExCIG1pZ2h0IG5ldmVyIGJlIHNoYXJlZC4NCg0KU28gYSB2ZXJ5IHNob3J0
+IHN3aXRjaCBzdGF0ZW1lbnQgaXMgbGlrZWx5IHRvIGJlIGJldHRlciBhcw0KY29uZGl0aW9uYWwg
+anVtcHMgYW55d2F5Lg0KDQo+IEZvciBleGFtcGxlLCBsb29rIGF0IHRoaXMgZ2NjIGJ1Z3ppbGxh
+Og0KPiANCj4gICAgIGh0dHBzOi8vZ2NjLmdudS5vcmcvYnVnemlsbGEvc2hvd19idWcuY2dpP2lk
+PTg2OTUyDQo+IA0KPiB3aGljaCBiYXNpY2FsbHkgaXMgYWJvdXQgdGhlIGNvbXBpbGVyIGdlbmVy
+YXRpbmcgYSBqdW1wIHRhYmxlIChpcyBhDQo+IHNpbmdsZSBpbmRpcmVjdCBicmFuY2gpIHZzIGEg
+c2VyaWVzIG9mIGNvbmRpdGlvbmFsIGJyYW5jaGVzLiBXaXRoDQo+IHJldHBvbGluZSwgdGhlIGNy
+b3NzLW92ZXIgcG9pbnQgaXMgYmFzaWNhbGx5IHdoZW4geW91IG5lZWQgdG8gaGF2ZQ0KPiBvdmVy
+IDEwIGNvbmRpdGlvbmFsIGJyYW5jaGVzIC0gYW5kIGJlY2F1c2Ugb2YgdGhlIGxvZzIoTikgYmVo
+YXZpb3IsDQo+IHRoYXQncyBhcm91bmQgYSB0aG91c2FuZCBjYXNlcyENCg0KVGhhdCB3YXMgYSBo
+b3QtY2FjaGUgdGVzdC4NCkNvbGQtY2FjaGUgaXMgbGlrZWx5IHRvIGZhdm91ciB0aGUgcmV0cG9s
+aW5lIGEgbGl0dGxlIHNvb25lci4NCihBbmQgdGhlIHJldHBvbGluZSAocHJvYmJhbHkpIHdvbid0
+IGJlIChtdWNoKSB3b3JzZSB0aGFuIHRoZQ0KbWlkLXByZWRpY3RlZCBpbmRpcmVjdCBqdW1wLg0K
+DQpJIGRvIHdvbmRlciBob3cgbXVjaCBvZiB0aGUga2VybmVsIGFjdHVhbGx5IHJ1bnMgaG90LWNh
+Y2hlPw0KRXhjZXB0IGZvciBwYXJ0cyB0aGF0IGV4cGxpY2l0bHkgcnVuIHRoaW5ncyBpbiBidXJz
+dHMuDQoNCglEYXZpZA0KDQotDQpSZWdpc3RlcmVkIEFkZHJlc3MgTGFrZXNpZGUsIEJyYW1sZXkg
+Um9hZCwgTW91bnQgRmFybSwgTWlsdG9uIEtleW5lcywgTUsxIDFQVCwgVUsNClJlZ2lzdHJhdGlv
+biBObzogMTM5NzM4NiAoV2FsZXMpDQo=
 
-> > > If none of the 140 patches here fix a real bug, and there is no
-> > > change to machine code then it sounds to me like a W=2 kind of a
-> > > warning.
-> > 
-> > FWIW, this series has found at least one bug so far:
-> > https://lore.kernel.org/lkml/CAFCwf11izHF=g1mGry1fE5kvFFFrxzhPSM6qKAO8gxSp=Kr_CQ@mail.gmail.com/
-> 
-> 
-> Well, it's a problem in an error leg, sure, but it's not a really
-> compelling reason for a 141 patch series, is it?  All that fixing this
-> error will do is get the driver to print "oh dear there's a problem"
-> under four more conditions than it previously did.
-
-You are asking the wrong question here.
-
-Yuo should ask  how many hours could have been saved by all the bugs
-people have been fighting with and then fixed *before* the code
-hit the kernel at all.
-
-My personal experience is that I, more than once, have had errors
-related to a missing break in my code. So this warnings is IMO a win.
-
-And if we are only ~100 patches to have it globally enabled then it is a
-no-brainer in my book.
-
-	Sam
