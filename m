@@ -2,120 +2,114 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F768C64E7C
-	for <linux-block@archiver.kernel.org>; Sun, 22 Nov 2020 15:39:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35156C5519F
+	for <linux-block@archiver.kernel.org>; Sun, 22 Nov 2020 16:08:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E5897212CC
-	for <linux-block@archiver.kernel.org>; Sun, 22 Nov 2020 15:39:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CF3862076E
+	for <linux-block@archiver.kernel.org>; Sun, 22 Nov 2020 16:08:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VosA01iu"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="Eo76B3qt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728020AbgKVPjR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 22 Nov 2020 10:39:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33486 "EHLO
+        id S1727567AbgKVQIa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 22 Nov 2020 11:08:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727935AbgKVPjJ (ORCPT
+        with ESMTP id S1727317AbgKVQI3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 22 Nov 2020 10:39:09 -0500
-Received: from mail-ej1-x644.google.com (mail-ej1-x644.google.com [IPv6:2a00:1450:4864:20::644])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AC84C0613CF;
-        Sun, 22 Nov 2020 07:39:09 -0800 (PST)
-Received: by mail-ej1-x644.google.com with SMTP id bo9so14038244ejb.13;
-        Sun, 22 Nov 2020 07:39:09 -0800 (PST)
+        Sun, 22 Nov 2020 11:08:29 -0500
+Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 635DFC0613CF
+        for <linux-block@vger.kernel.org>; Sun, 22 Nov 2020 08:08:29 -0800 (PST)
+Received: by mail-lf1-x131.google.com with SMTP id a9so20401533lfh.2
+        for <linux-block@vger.kernel.org>; Sun, 22 Nov 2020 08:08:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=nQLCp8kee4CMboEl3huLY3cDgMLf3XHMfMZ5RHWYbWE=;
-        b=VosA01iuUvY60bnAzgbI5f6Qy3dP17zZoyNNw+NfIb+i/ggx7GQUDXRwSRhj/5ZjZz
-         TKcSA7sc4J39LFSsUtz0L7zG54THPZlbuAe1i9HSY2rFes+/xT7MyX+8ZQDcdIJG3wA2
-         Pvg39IHXaewLASwtTPiASI6KA4iaC7kAsjRmNeQtP3t0gQV0zpbypssxLZ8xY8K7Sd81
-         ijcPJp10HYfzLXjXwMd+/kpYzZaRU64i+u5rkEkx03lSTBXAtFBbisFnnE7qwEP/lCuT
-         IBsg8CUw/zPI6ZAFQ+q/9ap6ynPsJlW85PTcHyojBjMwySy+QfB1NAV1ymuBfYim/Vso
-         FzyA==
+        d=cloud.ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=safEzczHGHLXs45ryoEAbi+vFjxDiy4IY9/ZKygPeno=;
+        b=Eo76B3qt1Iak9u+z31PtXQiZoVCKTWV2jZKDS91tXdNvEgzikGvFxeyOxH8UKgG9WF
+         w6CAiu0PIqWisd1OOR6l/SUpvKxHdCcRWyNdbPjxj8V5vuuo4HvtZR9lbP+OivvlIu9B
+         vR/ekmYVE43reG3CpC8eV5N+5ZRKQS7roSZgvWtUGpYvbfpEFYUCSFwg2l3Sx/JX3dXA
+         AceERB9NkIUcIIM+FqNoPFSyMTB0BrvvFGwcS3VlclZuagdcL/EHCU+OVIHesWYcn4kB
+         BtQfsuarcYnG9Cv0KO2Z7kHEtqInD0b5Sbmry2VWzqRGppsk9DpyG/5Ps3s5taCBHTfe
+         juFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=nQLCp8kee4CMboEl3huLY3cDgMLf3XHMfMZ5RHWYbWE=;
-        b=SuquFvTXhY0/3gekuF1aWwuqgpyGE51SxaqyS8C4Nc2yp6gyL8WpoPBsmsBV1Djri8
-         8AD3WcNMhfVa1dNjpRTQakr4QbwqpgSp13evB3AgbhScgub+uGO/yXmRXtjoT+aEOSvk
-         apzxcUXArXx7KlFUbcy8jdqlsa+CobTtzyg3tOhxglq3molnAwQ7mu+aPHyMWrdr1Tpl
-         RamDqgr3LRLbT8gbPf4cConUBSqPG2WVpAd6NrE2eKOhFiB0A0UMzBdaesD1RIsFCLna
-         47je9dygrmwggpiMGArTyYLD7cdV6SArXqP3h5hs+eEVt90cL/i2rl+/u1H6TbV5pJHG
-         vENQ==
-X-Gm-Message-State: AOAM5309ysgwJCNGnCzdNm7W7VO7BU3VSDegjXTTBYVg31AFGR094jKX
-        9BrODYq+3ajWSI6ylMQ1t48=
-X-Google-Smtp-Source: ABdhPJxAWNxAu1sQTAaKYHc2/PQ2GtrkJyUPEOno6RGB2ExQYrdKdXVW3Zm79WIp71ZzAMsjY5a3ZA==
-X-Received: by 2002:a17:906:c41:: with SMTP id t1mr40733350ejf.19.1606059548209;
-        Sun, 22 Nov 2020 07:39:08 -0800 (PST)
-Received: from localhost.localdomain (host109-152-100-189.range109-152.btcentralplus.com. [109.152.100.189])
-        by smtp.gmail.com with ESMTPSA id q19sm3693742ejz.90.2020.11.22.07.39.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 22 Nov 2020 07:39:07 -0800 (PST)
-From:   Pavel Begunkov <asml.silence@gmail.com>
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Omar Sandoval <osandov@osandov.com>
-Cc:     linux-kernel@vger.kernel.org
-Subject: [PATCH v2 3/4] sbitmap: replace CAS with atomic and
-Date:   Sun, 22 Nov 2020 15:35:47 +0000
-Message-Id: <6c9b6664bcd12faa9d1a9969a32774a75d1d316f.1606058975.git.asml.silence@gmail.com>
-X-Mailer: git-send-email 2.24.0
-In-Reply-To: <cover.1606058975.git.asml.silence@gmail.com>
-References: <cover.1606058975.git.asml.silence@gmail.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=safEzczHGHLXs45ryoEAbi+vFjxDiy4IY9/ZKygPeno=;
+        b=taBPz8/pDZx1kgh9/ACx3PvezPE2TC7nG0ruDkFvNTsD7qxdR3/tdXu/YOj9oyfFhj
+         kNYGBMnQU79EYOJG0K33lwn+J1qmeHUDbT53Z9wa/A0QWn9jI2Sfw/TS4q9P4R975H3f
+         CkcXvUAfAil6uYudumAc6r6EhfEs3Jbj6ZOXfZWoa/Kkl2Bsd240KVxgLpWQY3WzyXpO
+         ymgyNgaA8PRYxGXgGV6Otb8Kkdi6eu61PWpe8Y5WBSDE2d+pdFZQsTpRzM7IYRg8em1G
+         nOENR2EWGd0x57FuyZ5jgXUjPAT6iW1bJkkYnKWah9V01ai8l8wFpCFf1vbPZ1Vy2p99
+         PsbA==
+X-Gm-Message-State: AOAM531/lyl9SOe5dP64nn6QjDqnMIqDIBKDWb4IXwl86BZ9Swq+lgQT
+        Tyg0Lk3p4JsDKEYrMTReGpWt61rb6pU62fSXW9jwmT72PMxh
+X-Google-Smtp-Source: ABdhPJxytEe46vZYdqpmquTHcqOtJ6iCost52VJxvqnFhXqqqLVsS0bJnFZk7HNiDucyLAFRUgZ/LmZWN0GCc44beEE=
+X-Received: by 2002:a19:ca:: with SMTP id 193mr83210lfa.331.1606061307677;
+ Sun, 22 Nov 2020 08:08:27 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CAHg0Huzvhg7ZizbCGQyyVNdnAWmQCsypRWvdBzm0GWwPzXD0dw@mail.gmail.com>
+ <5438d63e-0879-1d7b-cac1-f20fa24ecedb@grimberg.me>
+In-Reply-To: <5438d63e-0879-1d7b-cac1-f20fa24ecedb@grimberg.me>
+From:   Danil Kipnis <danil.kipnis@cloud.ionos.com>
+Date:   Sun, 22 Nov 2020 17:08:16 +0100
+Message-ID: <CAHg0Huzufxh1bjATpAy6PppTLFaj3N4S1HevNjpGwNE=zmqObQ@mail.gmail.com>
+Subject: Re: [RFC] Reliable Multicast on top of RTRS
+To:     Sagi Grimberg <sagi@grimberg.me>
+Cc:     linux-rdma@vger.kernel.org, linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-sbitmap_deferred_clear() does CAS loop to propagate cleared bits,
-replace it with equivalent atomic bitwise and. That's slightly faster
-and makes wait-free instead of lock-free as before.
+Hi Sagi,
 
-The atomic can be relaxed (i.e. barrier-less) because following
-sbitmap_get*() deal with synchronisation, see comments in
-sbitmap_queue_clear().
+On Fri, Sep 4, 2020 at 12:18 AM Sagi Grimberg <sagi@grimberg.me> wrote:
+>
+>
+> > Hi @,
+> >
+> > RTRS allows for reliable transmission of sg lists between two hosts
+> > over rdma. It is optimised for block io. One can implement a client
+> > and a server module on top of RTRS which would allow for reliable
+> > transmission to a group of hosts.
+> >
+> > In the networking world this is called reliable multicast. I think one
+> > can say that reliable multicast is an equivalent to what is called
+> > "mirror" in the storage world.
+>
+> md-raid1
 
-It's ok to cast to atomic_long_t, that's what bitops/lock.h does.
+Exact
 
-Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
----
- lib/sbitmap.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+>
+> > There is something called XoR network
+> > coding which seems to be an equivalent of raid5.
+>
+> md-raid5
 
-diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-index 4fd877048ba8..c18b518a16ba 100644
---- a/lib/sbitmap.c
-+++ b/lib/sbitmap.c
-@@ -14,7 +14,7 @@
-  */
- static inline bool sbitmap_deferred_clear(struct sbitmap_word *map)
- {
--	unsigned long mask, val;
-+	unsigned long mask;
- 
- 	if (!READ_ONCE(map->cleared))
- 		return false;
-@@ -27,10 +27,8 @@ static inline bool sbitmap_deferred_clear(struct sbitmap_word *map)
- 	/*
- 	 * Now clear the masked bits in our free word
- 	 */
--	do {
--		val = map->word;
--	} while (cmpxchg(&map->word, val, val & ~mask) != val);
--
-+	atomic_long_andnot(mask, (atomic_long_t *)&map->word);
-+	BUILD_BUG_ON(sizeof(atomic_long_t) != sizeof(map->word));
- 	return true;
- }
- 
--- 
-2.24.0
+Exact
 
+>
+> > There is also Reed
+> > Solomon network coding.
+> >
+> > Having a reliable multicast with coding rdma-based transport layer
+> > would allow for very flexible and scalable designs of distributed
+> > replication solutions based on different in-kernel transport, block
+> > and replication drivers.
+> >
+> > What do you think?
+>
+> You should probably use the device-mapper stack or modify it to fit your
+> needs.
+
+Will look into the dm framework,
+Thank you,
+Danil.
