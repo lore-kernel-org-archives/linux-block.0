@@ -2,144 +2,115 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 431AAC5519F
-	for <linux-block@archiver.kernel.org>; Sun, 22 Nov 2020 23:05:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECEB7C5519F
+	for <linux-block@archiver.kernel.org>; Mon, 23 Nov 2020 03:18:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 009A320773
-	for <linux-block@archiver.kernel.org>; Sun, 22 Nov 2020 23:05:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="WmZvrZ8S";
-	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="WmZvrZ8S"
+	by mail.kernel.org (Postfix) with ESMTP id B80D82137B
+	for <linux-block@archiver.kernel.org>; Mon, 23 Nov 2020 03:18:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726163AbgKVXEm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 22 Nov 2020 18:04:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45218 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725964AbgKVXEm (ORCPT
+        id S1727902AbgKWDR6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 22 Nov 2020 22:17:58 -0500
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:44560 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727709AbgKWDR5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 22 Nov 2020 18:04:42 -0500
-Received: from bedivere.hansenpartnership.com (bedivere.hansenpartnership.com [IPv6:2607:fcd0:100:8a00::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CF11C0613D3;
-        Sun, 22 Nov 2020 15:04:42 -0800 (PST)
-Received: from localhost (localhost [127.0.0.1])
-        by bedivere.hansenpartnership.com (Postfix) with ESMTP id 5C1741280900;
-        Sun, 22 Nov 2020 15:04:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=hansenpartnership.com; s=20151216; t=1606086281;
-        bh=ampKVWKUqLiKYyObj0dhEgltdPGbsuliUrstEBadWMw=;
-        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
-        b=WmZvrZ8SISP4O7CkmRRwRn7Ww4EqbFeoj9AudkGWHrTHPvBGVyYGXPtxxL5/3UBwZ
-         KEGMUiR7FBhAVO42W5uBkyouydambEWUMRvvMR32eyWutkJh8vdHwfKrPde3Z6lPQr
-         zwZuERjUvzNlbmlNByqn4M9h7sLDVk7BBiQeo3h4=
-Received: from bedivere.hansenpartnership.com ([127.0.0.1])
-        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id PvG_3ynFL_Uj; Sun, 22 Nov 2020 15:04:41 -0800 (PST)
-Received: from jarvis.int.hansenpartnership.com (unknown [IPv6:2601:600:8280:66d1::527])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 9178D12808F6;
-        Sun, 22 Nov 2020 15:04:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=hansenpartnership.com; s=20151216; t=1606086281;
-        bh=ampKVWKUqLiKYyObj0dhEgltdPGbsuliUrstEBadWMw=;
-        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
-        b=WmZvrZ8SISP4O7CkmRRwRn7Ww4EqbFeoj9AudkGWHrTHPvBGVyYGXPtxxL5/3UBwZ
-         KEGMUiR7FBhAVO42W5uBkyouydambEWUMRvvMR32eyWutkJh8vdHwfKrPde3Z6lPQr
-         zwZuERjUvzNlbmlNByqn4M9h7sLDVk7BBiQeo3h4=
-Message-ID: <c3371b7c15ed30b92e9bb8609ff65bdaa0ef61fa.camel@HansenPartnership.com>
-Subject: Re: [PATCH 000/141] Fix fall-through warnings for Clang
-From:   James Bottomley <James.Bottomley@HansenPartnership.com>
-To:     Finn Thain <fthain@telegraphics.com.au>,
-        Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Cc:     Kees Cook <keescook@chromium.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        alsa-devel@alsa-project.org, amd-gfx@lists.freedesktop.org,
-        bridge@lists.linux-foundation.org, ceph-devel@vger.kernel.org,
-        cluster-devel@redhat.com, coreteam@netfilter.org,
-        devel@driverdev.osuosl.org, dm-devel@redhat.com,
-        drbd-dev@lists.linbit.com, dri-devel@lists.freedesktop.org,
-        GR-everest-linux-l2@marvell.com, GR-Linux-NIC-Dev@marvell.com,
-        intel-gfx@lists.freedesktop.org, intel-wired-lan@lists.osuosl.org,
-        keyrings@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
-        linux-acpi@vger.kernel.org, linux-afs@lists.infradead.org,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-arm-msm@vger.kernel.org,
-        linux-atm-general@lists.sourceforge.net,
-        linux-block@vger.kernel.org, linux-can@vger.kernel.org,
-        linux-cifs@vger.kernel.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-decnet-user@lists.sourceforge.net,
-        Ext4 Developers List <linux-ext4@vger.kernel.org>,
-        linux-fbdev@vger.kernel.org, linux-geode@lists.infradead.org,
-        linux-gpio@vger.kernel.org, linux-hams@vger.kernel.org,
-        linux-hwmon@vger.kernel.org, linux-i3c@lists.infradead.org,
-        linux-ide@vger.kernel.org, linux-iio@vger.kernel.org,
-        linux-input <linux-input@vger.kernel.org>,
-        linux-integrity@vger.kernel.org,
-        linux-mediatek@lists.infradead.org,
-        Linux Media Mailing List <linux-media@vger.kernel.org>,
-        linux-mmc@vger.kernel.org, Linux-MM <linux-mm@kvack.org>,
-        linux-mtd@lists.infradead.org, linux-nfs@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-usb@vger.kernel.org, linux-watchdog@vger.kernel.org,
-        linux-wireless <linux-wireless@vger.kernel.org>,
-        Network Development <netdev@vger.kernel.org>,
-        netfilter-devel@vger.kernel.org, nouveau@lists.freedesktop.org,
-        op-tee@lists.trustedfirmware.org, oss-drivers@netronome.com,
-        patches@opensource.cirrus.com, rds-devel@oss.oracle.com,
-        reiserfs-devel@vger.kernel.org, samba-technical@lists.samba.org,
-        selinux@vger.kernel.org, target-devel@vger.kernel.org,
-        tipc-discussion@lists.sourceforge.net,
-        usb-storage@lists.one-eyed-alien.net,
-        virtualization@lists.linux-foundation.org,
-        wcn36xx@lists.infradead.org,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        xen-devel@lists.xenproject.org, linux-hardening@vger.kernel.org,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Nathan Chancellor <natechancellor@gmail.com>,
-        Miguel Ojeda <ojeda@kernel.org>, Joe Perches <joe@perches.com>
-Date:   Sun, 22 Nov 2020 15:04:36 -0800
-In-Reply-To: <alpine.LNX.2.23.453.2011230938390.7@nippy.intranet>
-References: <cover.1605896059.git.gustavoars@kernel.org>
-         <20201120105344.4345c14e@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
-         <202011201129.B13FDB3C@keescook>
-         <20201120115142.292999b2@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
-         <202011220816.8B6591A@keescook>
-         <9b57fd4914b46f38d54087d75e072d6e947cb56d.camel@HansenPartnership.com>
-         <CANiq72nZrHWTA4_Msg6MP9snTyenC6-eGfD27CyfNSu7QoVZbw@mail.gmail.com>
-         <alpine.LNX.2.23.453.2011230938390.7@nippy.intranet>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.34.4 
+        Sun, 22 Nov 2020 22:17:57 -0500
+Received: by mail-pf1-f195.google.com with SMTP id y7so13570110pfq.11;
+        Sun, 22 Nov 2020 19:17:57 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=JdacO1PAka2oa8mQksw1pu4/yi2dGdopCnDapBlAxf0=;
+        b=B6nkBYVYegoslGXaLiga1mnoEnOqoEjKa6S5FMgwkkSYCVvAJHFuM3HGMzpY72uuPW
+         9sbcDSLuQCesl2pX4VEKtiIjt3W7Jgw2USSQazxkBNjTo6v02Z4J7HeT98mGdP9eLqBd
+         KLSiKOwg+PFzcBuAu5ISLDn/JPJzVqjq8Q236CRQ6BFWFilIM2dsuJ1M2inBYBfDV4XZ
+         oxWAXR/nS8UKwRPB6GJq0czjuoCPOaZ0OVkEiptQ2beBqtcK1Ci8J1DBqZXg7aRXWBWY
+         OUdF6g4/v+8kbWrcAH623Ft5mpVPmnHpsvM1kMl3gY308o+MTQJ0ByCDuQnzXtg0F6iS
+         fkVQ==
+X-Gm-Message-State: AOAM533+WFE4Geq2F9LnHFUpe9LQLw2cFPXCB1zZDYcnYauVA5m6PUgp
+        hKeL0lGp7LRxu9EgFL0ggaQ=
+X-Google-Smtp-Source: ABdhPJwyCJz/xswKK8RgXirTVtta98y+e6uasurYUM3006ZYr7Yb2rwEFSqSIH1NbyPMBTTwMWB3Yg==
+X-Received: by 2002:a17:90a:f691:: with SMTP id cl17mr1534082pjb.206.1606101476735;
+        Sun, 22 Nov 2020 19:17:56 -0800 (PST)
+Received: from asus.hsd1.ca.comcast.net (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
+        by smtp.gmail.com with ESMTPSA id w12sm3578751pfn.136.2020.11.22.19.17.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 22 Nov 2020 19:17:55 -0800 (PST)
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     "Martin K . Petersen" <martin.petersen@oracle.com>
+Cc:     "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Ming Lei <ming.lei@redhat.com>, linux-scsi@vger.kernel.org,
+        linux-block@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH v3 0/9] Rework runtime suspend and SCSI domain validation
+Date:   Sun, 22 Nov 2020 19:17:40 -0800
+Message-Id: <20201123031749.14912-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 2020-11-23 at 09:54 +1100, Finn Thain wrote:
-> But is anyone keeping score of the regressions? If unreported bugs
-> count, what about unreported regressions?
+Hi Martin,
 
-Well, I was curious about the former (obviously no tool will tell me
-about the latter), so I asked git what patches had a fall-through
-series named in a fixes tag and these three popped out:
+The SCSI runtime suspend and domain validation mechanisms both use
+scsi_device_quiesce(). scsi_device_quiesce() restricts blk_queue_enter() to
+BLK_MQ_REQ_PREEMPT requests. There is a conflict between the requirements
+of runtime suspend and SCSI domain validation: no requests must be sent to
+runtime suspended devices that are in the state RPM_SUSPENDED while
+BLK_MQ_REQ_PREEMPT requests must be processed during SCSI domain
+validation. This conflict is resolved by reworking the SCSI domain
+validation implementation.
 
-9cf51446e686 bpf, powerpc: Fix misuse of fallthrough in bpf_jit_comp()
-6a9dc5fd6170 lib: Revert use of fallthrough pseudo-keyword in lib/
-91dbd73a1739 mips/oprofile: Fix fallthrough placement
+Hybernation, runtime suspend and SCSI domain validation have been retested.
 
-I don't think any of these is fixing a significant problem, but they
-did cause someone time and trouble to investigate.
+Please consider this patch series for kernel v5.11.
 
-James
+Thanks,
 
+Bart.
+
+Changes between v2 and v3:
+- Inlined scsi_mq_alloc_queue() into scsi_alloc_sdev() as requested by
+  Christoph.
+
+Changes between v1 and v2:
+- Rebased this patch series on top of kernel v5.10-rc1.
+
+Alan Stern (1):
+  block: Do not accept any requests while suspended
+
+Bart Van Assche (8):
+  block: Fix a race in the runtime power management code
+  ide: Do not set the RQF_PREEMPT flag for sense requests
+  scsi: Pass a request queue pointer to __scsi_execute()
+  scsi: Inline scsi_mq_alloc_queue()
+  scsi: Do not wait for a request in scsi_eh_lock_door()
+  scsi_transport_spi: Make spi_execute() accept a request queue pointer
+  scsi_transport_spi: Freeze request queues instead of quiescing
+  block, scsi, ide: Only process PM requests if rpm_status != RPM_ACTIVE
+
+ block/blk-core.c                  |  12 +--
+ block/blk-mq-debugfs.c            |   1 -
+ block/blk-mq.c                    |   4 +-
+ block/blk-pm.c                    |  15 +--
+ block/blk-pm.h                    |  14 ++-
+ drivers/ide/ide-atapi.c           |   1 -
+ drivers/ide/ide-io.c              |   3 +-
+ drivers/ide/ide-pm.c              |   2 +-
+ drivers/scsi/scsi_error.c         |   7 +-
+ drivers/scsi/scsi_lib.c           |  72 ++++++--------
+ drivers/scsi/scsi_priv.h          |   3 +-
+ drivers/scsi/scsi_scan.c          |  12 ++-
+ drivers/scsi/scsi_transport_spi.c | 151 ++++++++++++++++++------------
+ include/linux/blk-mq.h            |   4 +-
+ include/linux/blkdev.h            |   6 +-
+ include/scsi/scsi_device.h        |  14 ++-
+ 16 files changed, 175 insertions(+), 146 deletions(-)
 
