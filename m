@@ -2,99 +2,162 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-22.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83C24C388F9
-	for <linux-block@archiver.kernel.org>; Mon, 23 Nov 2020 22:54:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18B6FC63697
+	for <linux-block@archiver.kernel.org>; Mon, 23 Nov 2020 23:25:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 253BE206D8
-	for <linux-block@archiver.kernel.org>; Mon, 23 Nov 2020 22:54:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C6F91206A1
+	for <linux-block@archiver.kernel.org>; Mon, 23 Nov 2020 23:25:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hd8DEuKD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YVpWE1Ga"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732594AbgKWWxs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 Nov 2020 17:53:48 -0500
-Received: from mail.kernel.org ([198.145.29.99]:51798 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387487AbgKWWxq (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Nov 2020 17:53:46 -0500
-Received: from embeddedor (187-162-31-110.static.axtel.net [187.162.31.110])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E0DFC206D8;
-        Mon, 23 Nov 2020 22:53:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1606172025;
-        bh=Y754Uxsb+oRdteJzxeLGJZ0Nr6qJ2w8yPhIjK1E9ygw=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Hd8DEuKDlU/OBnXmphx1Bjt66POq5VZAkAJuwm05bXMWgCP0KNMsZhuX1pGccgVAQ
-         CuJqNVszqNMvfApMAr7ZRwkEnkR59sOEF5TtNw+vX34N/EMP+A/lHmONMXhkr1ttvy
-         rNUTWmbmeyjT6VfheHX8QTYB5CtlRKh4XbeKEb9c=
-Date:   Mon, 23 Nov 2020 16:53:59 -0600
-From:   "Gustavo A. R. Silva" <gustavoars@kernel.org>
-To:     boris.ostrovsky@oracle.com
-Cc:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>,
-        Juergen Gross <jgross@suse.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, xen-devel@lists.xenproject.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-hardening@vger.kernel.org
-Subject: Re: [PATCH 058/141] xen-blkfront: Fix fall-through warnings for Clang
-Message-ID: <20201123225359.GP21644@embeddedor>
-References: <cover.1605896059.git.gustavoars@kernel.org>
- <33057688012c34dd60315ad765ff63f070e98c0c.1605896059.git.gustavoars@kernel.org>
- <e8d67ea1-3d0d-509a-a2f1-cf1758bb373f@oracle.com>
+        id S1726371AbgKWXYv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 Nov 2020 18:24:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44442 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725320AbgKWXYt (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 23 Nov 2020 18:24:49 -0500
+Received: from mail-wr1-x444.google.com (mail-wr1-x444.google.com [IPv6:2a00:1450:4864:20::444])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11C7FC0613CF;
+        Mon, 23 Nov 2020 15:24:49 -0800 (PST)
+Received: by mail-wr1-x444.google.com with SMTP id s8so20447995wrw.10;
+        Mon, 23 Nov 2020 15:24:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:references:autocrypt:subject:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=UnwtktLjTAV/jmHMTDv2SE7u5b+YrWXDA2YR3n/dS8I=;
+        b=YVpWE1GaOpI8em08mEaHrJnBNT6uQE2byOZ1I+KhF5VtYsMWVEfW02GrBPLG7ZdyQe
+         r4zsqDF8gJZ5DcInQuBhlYwaX32R1TbagnNkoVwOz5f6DKAVbvRiguHUv1MC8VbRj9Cb
+         I4cjlU2IZwikf1T6p7yJiyUN2vegfeq29xNnUA+t7Ko615ks5FSb6xCXfG6UYua0fqtD
+         DMwmHAkbayO8/eevzg/2qdNOnRze2zhWRjX/Wb8Cbyb4OAW3THIsHQuLHrOaCu7L8wTy
+         Zy6DC+ROQuvYjI3ns1Xv97AuQ2KHvetzM6JliET0oWRbMjpMOuDU0jmv+UPhldaRAYRJ
+         wyuA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:references:autocrypt:subject
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=UnwtktLjTAV/jmHMTDv2SE7u5b+YrWXDA2YR3n/dS8I=;
+        b=NjHcgyYFLeraeYGqsc3vuaTkUHPZnvOPDK9+kO+nRWaihayJMl2pxikpqKLFao46di
+         QcSo8ATVI4R+h6/JvB1P44mxCyMz6xSLpzIUlMQzfXR2PfaNFZwOQAaNzXZTBZCEjFh8
+         UzDusuB9xQqlVHGRMGJRU19Cc/dy4ckj/zJSdpom3f28ooL2IPl7nPRmmtAf6YcAHIRc
+         pkM94wZQ8Jvndp/1pAgypVFAELNsq6Yn/B07KpPzoh/cnYDcfwHTiKsu3VA9kJrOoDSH
+         iKWN7PBkzgvH7VTUNO5MghesPeVcBJdFkAFE3cVy4zYaC/2EkPxT/3z0G/yU99mhxQf2
+         CvPg==
+X-Gm-Message-State: AOAM530vusXD6LmQOTSZ2UYooy+SdHnFkg9V1BjofVVq99t/Y6ovx4gM
+        B6F9ht56xb/QPMaWbkIQ2jPxbXS5kKhA3O5W
+X-Google-Smtp-Source: ABdhPJzSfKI604g1VoEX9+y3jkyeIYv24e/idimICuJQliWRsZ70cvfrppeGICa4AM+1XzzWxff6tQ==
+X-Received: by 2002:a5d:6310:: with SMTP id i16mr2060964wru.284.1606173887588;
+        Mon, 23 Nov 2020 15:24:47 -0800 (PST)
+Received: from [192.168.1.42] (host109-152-100-135.range109-152.btcentralplus.com. [109.152.100.135])
+        by smtp.gmail.com with ESMTPSA id j14sm9151458wrs.49.2020.11.23.15.24.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 23 Nov 2020 15:24:47 -0800 (PST)
+From:   Pavel Begunkov <asml.silence@gmail.com>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Matthew Wilcox <willy@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <160596800145.154728.7192318545120181269.stgit@warthog.procyon.org.uk>
+ <160596801020.154728.15935034745159191564.stgit@warthog.procyon.org.uk>
+ <a23b9038-b553-fdc3-c461-384aeeddb6f3@gmail.com>
+Autocrypt: addr=asml.silence@gmail.com; prefer-encrypt=mutual; keydata=
+ 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 bA==
+Subject: Re: [PATCH 01/29] iov_iter: Switch to using a table of operations
+Message-ID: <adc90511-2484-039e-f67f-486b2c3ea9f7@gmail.com>
+Date:   Mon, 23 Nov 2020 23:21:38 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e8d67ea1-3d0d-509a-a2f1-cf1758bb373f@oracle.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <a23b9038-b553-fdc3-c461-384aeeddb6f3@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Nov 20, 2020 at 04:36:26PM -0500, boris.ostrovsky@oracle.com wrote:
+On 21/11/2020 14:31, Pavel Begunkov wrote:
+> On 21/11/2020 14:13, David Howells wrote:
+>> Switch to using a table of operations.  In a future patch the individual
+>> methods will be split up by type.  For the moment, however, the ops tables
+>> just jump directly to the old functions - which are now static.  Inline
+>> wrappers are provided to jump through the hooks.
+>>
+>> Signed-off-by: David Howells <dhowells@redhat.com>
+>> ---
+>>
+>>  fs/io_uring.c       |    2 
+>>  include/linux/uio.h |  241 ++++++++++++++++++++++++++++++++++--------
+>>  lib/iov_iter.c      |  293 +++++++++++++++++++++++++++++++++++++++------------
+>>  3 files changed, 422 insertions(+), 114 deletions(-)
+>>
+>> diff --git a/fs/io_uring.c b/fs/io_uring.c
+>> index 4ead291b2976..baa78f58ae5c 100644
+>> --- a/fs/io_uring.c
+>> +++ b/fs/io_uring.c
+>> @@ -3192,7 +3192,7 @@ static void io_req_map_rw(struct io_kiocb *req, const struct iovec *iovec,
+>>  	rw->free_iovec = iovec;
+>>  	rw->bytes_done = 0;
+>>  	/* can only be fixed buffers, no need to do anything */
+>> -	if (iter->type == ITER_BVEC)
+>> +	if (iov_iter_is_bvec(iter))
 > 
-> On 11/20/20 1:32 PM, Gustavo A. R. Silva wrote:
-> > In preparation to enable -Wimplicit-fallthrough for Clang, fix a warning
-> > by explicitly adding a break statement instead of letting the code fall
-> > through to the next case.
-> >
-> > Link: https://github.com/KSPP/linux/issues/115
-> > Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
-> > ---
-> >  drivers/block/xen-blkfront.c | 1 +
-> >  1 file changed, 1 insertion(+)
-> >
-> > diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
-> > index 48629d3433b4..34b028be78ab 100644
-> > --- a/drivers/block/xen-blkfront.c
-> > +++ b/drivers/block/xen-blkfront.c
-> > @@ -2462,6 +2462,7 @@ static void blkback_changed(struct xenbus_device *dev,
-> >  			break;
-> >  		if (talk_to_blkback(dev, info))
-> >  			break;
-> > +		break;
-> >  	case XenbusStateInitialising:
-> >  	case XenbusStateInitialised:
-> >  	case XenbusStateReconfiguring:
-> 
-> 
-> Reviewed-by Boris Ostrovsky <boris.ostrovsky@oracle.com>
-> 
-> 
-> (for patch 138 as well)
+> Could you split this io_uring change and send for 5.10?
+> Or I can do it for you if you wish.
 
-Thank you for both reviews, Boris.
+FYI, I stole this chunk with right attributes. It should go through
+io_uring 5.10, so shouldn't be a problem if you just drop it.
 
-> Although I thought using 'fallthrough' attribute was the more common approach.
-
-I've got it. I will consider that for a future patch.
-
-Thanks
---
-Gustavo
+-- 
+Pavel Begunkov
