@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5931BC64E69
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFFB4C64E7D
 	for <linux-block@archiver.kernel.org>; Mon, 23 Nov 2020 03:18:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2985F2158C
+	by mail.kernel.org (Postfix) with ESMTP id B73EC212CC
 	for <linux-block@archiver.kernel.org>; Mon, 23 Nov 2020 03:18:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727922AbgKWDSA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 22 Nov 2020 22:18:00 -0500
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:44560 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727911AbgKWDSA (ORCPT
+        id S1727995AbgKWDSG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 22 Nov 2020 22:18:06 -0500
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:35224 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727966AbgKWDSE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 22 Nov 2020 22:18:00 -0500
-Received: by mail-pf1-f193.google.com with SMTP id y7so13570163pfq.11;
-        Sun, 22 Nov 2020 19:17:59 -0800 (PST)
+        Sun, 22 Nov 2020 22:18:04 -0500
+Received: by mail-pf1-f194.google.com with SMTP id e8so1680504pfh.2;
+        Sun, 22 Nov 2020 19:18:03 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=NS2/LWJgfKnaWgsdnGvEKSQ6HreXoy5m6pflViridOg=;
-        b=mPLpC1/5vBOjn4dQmMC00QMR9G5ANFc9SvPtKAMRxq4vabnmIT0Bg50aCHxsm6cFGz
-         1F7Jya1T0zDAhYizm5mOwx2C1fTHpfqMf6YG91L+dq3JeXwTaijWuix2tQACyBpjFKiq
-         YfFWyubTVa/A2ODv7Z6OdgK9Vc13CMxC5L5gjbDoLCovvNMfzGNQpHWRBzPe0QyogtKQ
-         rZkFITJPJVPlmZGaD0dHtoOJcu/VnzFE9nrMivUEl5E3EOJCKw+jYShkrQ4uJB+Hruzk
-         +isW2RRT+lEzKFvvmajJnT3ORAtHVsdO/GIe3C8hr5fJ8eYJF3sPKDSynL+SNLfmiDmc
-         Sfbg==
-X-Gm-Message-State: AOAM531pB12p49HqzRZvdRIEx1jT6cr/75WzIGF5lZZ3mKbiMwht+G8o
-        Ja0l5eppQ7DMoznHvkrWneE=
-X-Google-Smtp-Source: ABdhPJzrjluYfs7/aZf3abR/AZ1d+Cy6V5LXlpx5SjvPdL7rra3+1TiI3+YBdyWDqYgU0bC9zGkMkw==
-X-Received: by 2002:a65:679a:: with SMTP id e26mr6737241pgr.394.1606101478901;
-        Sun, 22 Nov 2020 19:17:58 -0800 (PST)
+        bh=7U1bBg9mtcxgLSyUamru5veGVT0V1fCjsWqTiK4UHjc=;
+        b=qt/C8qREgv/xLSTEblfYV+dYhpQHqFgdV7xp2DOBpS1lShgYSZ13VWxGSr/mTJSdLe
+         GlxpP9ub9CO8S4lKy5+WgTcj46Veicmq0vztpTvTCAY6d4B9SXvt/zdVhrOjj1zLhu5n
+         NueNJr6dkvC+0asKhg301RUFB/5QxpBaCCgfI8EoTkLTPGdl+Fl1WFe2ecwLNU2ThhaG
+         yzh4GUhKaF7SkYZiaPdkrrz1iE7YHJU8LsKFwyanCzBJX0gj9Tvac56EF8mMI64IUn23
+         JmR31ZOp1oxCDRN1It5953NpeCrZnvvN+ydRLSxWwg0pfbsEnGR7uxErAt+2gB3ZF4IG
+         7sEg==
+X-Gm-Message-State: AOAM531jDAB8MELoAIt/NIbFf45aIKRkYBRBL4+591o3mqa/XpEp8u8r
+        i8ffTqQot6IciekXOk9ubi8=
+X-Google-Smtp-Source: ABdhPJzwBKZTBTKXA/zbytcb/gOcpT30qXYxttCAJ6kyqqBHL1fy5iI9m4Qj8ogDX7EFbAMOTRLWXA==
+X-Received: by 2002:a62:b417:0:b029:18b:8c55:849f with SMTP id h23-20020a62b4170000b029018b8c55849fmr22700983pfn.27.1606101483225;
+        Sun, 22 Nov 2020 19:18:03 -0800 (PST)
 Received: from asus.hsd1.ca.comcast.net (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
-        by smtp.gmail.com with ESMTPSA id w12sm3578751pfn.136.2020.11.22.19.17.56
+        by smtp.gmail.com with ESMTPSA id w12sm3578751pfn.136.2020.11.22.19.18.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 22 Nov 2020 19:17:58 -0800 (PST)
+        Sun, 22 Nov 2020 19:18:02 -0800 (PST)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     "Martin K . Petersen" <martin.petersen@oracle.com>
 Cc:     "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
@@ -49,12 +49,12 @@ Cc:     "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
         Ming Lei <ming.lei@redhat.com>, linux-scsi@vger.kernel.org,
         linux-block@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
         Alan Stern <stern@rowland.harvard.edu>,
+        Can Guo <cang@codeaurora.org>,
         Stanley Chu <stanley.chu@mediatek.com>,
-        "Rafael J . Wysocki" <rafael.j.wysocki@intel.com>,
-        stable <stable@vger.kernel.org>, Can Guo <cang@codeaurora.org>
-Subject: [PATCH v3 1/9] block: Fix a race in the runtime power management code
-Date:   Sun, 22 Nov 2020 19:17:41 -0800
-Message-Id: <20201123031749.14912-2-bvanassche@acm.org>
+        "Rafael J . Wysocki" <rafael.j.wysocki@intel.com>
+Subject: [PATCH v3 3/9] scsi: Pass a request queue pointer to __scsi_execute()
+Date:   Sun, 22 Nov 2020 19:17:43 -0800
+Message-Id: <20201123031749.14912-4-bvanassche@acm.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201123031749.14912-1-bvanassche@acm.org>
 References: <20201123031749.14912-1-bvanassche@acm.org>
@@ -64,65 +64,94 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-With the current implementation the following race can happen:
-* blk_pre_runtime_suspend() calls blk_freeze_queue_start() and
-  blk_mq_unfreeze_queue().
-* blk_queue_enter() calls blk_queue_pm_only() and that function returns
-  true.
-* blk_queue_enter() calls blk_pm_request_resume() and that function does
-  not call pm_request_resume() because the queue runtime status is
-  RPM_ACTIVE.
-* blk_pre_runtime_suspend() changes the queue status into RPM_SUSPENDING.
+This patch does not change any functionality but makes a later patch easier
+to read.
 
-Fix this race by changing the queue runtime status into RPM_SUSPENDING
-before switching q_usage_counter to atomic mode.
-
-Acked-by: Alan Stern <stern@rowland.harvard.edu>
-Acked-by: Stanley Chu <stanley.chu@mediatek.com>
+Reviewed-by: Alan Stern <stern@rowland.harvard.edu>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Can Guo <cang@codeaurora.org>
+Cc: Can Guo <cang@codeaurora.org>
+Cc: Stanley Chu <stanley.chu@mediatek.com>
 Cc: Ming Lei <ming.lei@redhat.com>
 Cc: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
-Cc: stable <stable@vger.kernel.org>
-Fixes: 986d413b7c15 ("blk-mq: Enable support for runtime power management")
-Signed-off-by: Can Guo <cang@codeaurora.org>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/blk-pm.c | 15 +++++++++------
- 1 file changed, 9 insertions(+), 6 deletions(-)
+ drivers/scsi/scsi_lib.c    | 12 +++++-------
+ include/scsi/scsi_device.h |  8 ++++----
+ 2 files changed, 9 insertions(+), 11 deletions(-)
 
-diff --git a/block/blk-pm.c b/block/blk-pm.c
-index b85234d758f7..17bd020268d4 100644
---- a/block/blk-pm.c
-+++ b/block/blk-pm.c
-@@ -67,6 +67,10 @@ int blk_pre_runtime_suspend(struct request_queue *q)
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index b7ac14571415..a7252df74c7b 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -221,7 +221,7 @@ void scsi_queue_insert(struct scsi_cmnd *cmd, int reason)
  
- 	WARN_ON_ONCE(q->rpm_status != RPM_ACTIVE);
+ /**
+  * __scsi_execute - insert request and wait for the result
+- * @sdev:	scsi device
++ * @q:		queue to insert the request into
+  * @cmd:	scsi command
+  * @data_direction: data direction
+  * @buffer:	data buffer
+@@ -237,7 +237,7 @@ void scsi_queue_insert(struct scsi_cmnd *cmd, int reason)
+  * Returns the scsi_cmnd result field if a command was executed, or a negative
+  * Linux error code if we didn't get that far.
+  */
+-int __scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
++int __scsi_execute(struct request_queue *q, const unsigned char *cmd,
+ 		 int data_direction, void *buffer, unsigned bufflen,
+ 		 unsigned char *sense, struct scsi_sense_hdr *sshdr,
+ 		 int timeout, int retries, u64 flags, req_flags_t rq_flags,
+@@ -247,15 +247,13 @@ int __scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
+ 	struct scsi_request *rq;
+ 	int ret = DRIVER_ERROR << 24;
  
-+	spin_lock_irq(&q->queue_lock);
-+	q->rpm_status = RPM_SUSPENDING;
-+	spin_unlock_irq(&q->queue_lock);
-+
+-	req = blk_get_request(sdev->request_queue,
+-			data_direction == DMA_TO_DEVICE ?
++	req = blk_get_request(q, data_direction == DMA_TO_DEVICE ?
+ 			REQ_OP_SCSI_OUT : REQ_OP_SCSI_IN, BLK_MQ_REQ_PREEMPT);
+ 	if (IS_ERR(req))
+ 		return ret;
+ 	rq = scsi_req(req);
+ 
+-	if (bufflen &&	blk_rq_map_kern(sdev->request_queue, req,
+-					buffer, bufflen, GFP_NOIO))
++	if (bufflen && blk_rq_map_kern(q, req, buffer, bufflen, GFP_NOIO))
+ 		goto out;
+ 
+ 	rq->cmd_len = COMMAND_SIZE(cmd[0]);
+@@ -268,7 +266,7 @@ int __scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
  	/*
- 	 * Increase the pm_only counter before checking whether any
- 	 * non-PM blk_queue_enter() calls are in progress to avoid that any
-@@ -89,15 +93,14 @@ int blk_pre_runtime_suspend(struct request_queue *q)
- 	/* Switch q_usage_counter back to per-cpu mode. */
- 	blk_mq_unfreeze_queue(q);
+ 	 * head injection *required* here otherwise quiesce won't work
+ 	 */
+-	blk_execute_rq(req->q, NULL, req, 1);
++	blk_execute_rq(q, NULL, req, 1);
  
--	spin_lock_irq(&q->queue_lock);
--	if (ret < 0)
-+	if (ret < 0) {
-+		spin_lock_irq(&q->queue_lock);
-+		q->rpm_status = RPM_ACTIVE;
- 		pm_runtime_mark_last_busy(q->dev);
--	else
--		q->rpm_status = RPM_SUSPENDING;
--	spin_unlock_irq(&q->queue_lock);
-+		spin_unlock_irq(&q->queue_lock);
- 
--	if (ret)
- 		blk_clear_pm_only(q);
-+	}
- 
- 	return ret;
- }
+ 	/*
+ 	 * Some devices (USB mass-storage in particular) may transfer
+diff --git a/include/scsi/scsi_device.h b/include/scsi/scsi_device.h
+index 1a5c9a3df6d6..f47fdf9cf788 100644
+--- a/include/scsi/scsi_device.h
++++ b/include/scsi/scsi_device.h
+@@ -438,7 +438,7 @@ extern const char *scsi_device_state_name(enum scsi_device_state);
+ extern int scsi_is_sdev_device(const struct device *);
+ extern int scsi_is_target_device(const struct device *);
+ extern void scsi_sanitize_inquiry_string(unsigned char *s, int len);
+-extern int __scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
++extern int __scsi_execute(struct request_queue *q, const unsigned char *cmd,
+ 			int data_direction, void *buffer, unsigned bufflen,
+ 			unsigned char *sense, struct scsi_sense_hdr *sshdr,
+ 			int timeout, int retries, u64 flags,
+@@ -449,9 +449,9 @@ extern int __scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
+ ({									\
+ 	BUILD_BUG_ON((sense) != NULL &&					\
+ 		     sizeof(sense) != SCSI_SENSE_BUFFERSIZE);		\
+-	__scsi_execute(sdev, cmd, data_direction, buffer, bufflen,	\
+-		       sense, sshdr, timeout, retries, flags, rq_flags,	\
+-		       resid);						\
++	__scsi_execute(sdev->request_queue, cmd, data_direction,	\
++		       buffer, bufflen, sense, sshdr, timeout, retries,	\
++		       flags, rq_flags, resid);				\
+ })
+ static inline int scsi_execute_req(struct scsi_device *sdev,
+ 	const unsigned char *cmd, int data_direction, void *buffer,
