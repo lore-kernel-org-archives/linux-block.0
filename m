@@ -5,48 +5,44 @@ X-Spam-Level:
 X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52ACFC64E69
-	for <linux-block@archiver.kernel.org>; Mon, 23 Nov 2020 18:01:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FD8CC8300B
+	for <linux-block@archiver.kernel.org>; Mon, 23 Nov 2020 18:01:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0800320758
-	for <linux-block@archiver.kernel.org>; Mon, 23 Nov 2020 18:01:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 104012078E
+	for <linux-block@archiver.kernel.org>; Mon, 23 Nov 2020 18:01:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388691AbgKWSAH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 Nov 2020 13:00:07 -0500
-Received: from mga18.intel.com ([134.134.136.126]:9945 "EHLO mga18.intel.com"
+        id S2389535AbgKWSAp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 Nov 2020 13:00:45 -0500
+Received: from mga12.intel.com ([192.55.52.136]:8569 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2390610AbgKWSAH (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Nov 2020 13:00:07 -0500
-IronPort-SDR: pBNKLOF1sk6eefNQ+eje0MH4tymOhndepAsnWV7Xbd9VqzZ1QxhPJSzLE2GgNKyR5j7hsYDh5v
- wmGJPJdqek4w==
-X-IronPort-AV: E=McAfee;i="6000,8403,9814"; a="159581607"
+        id S1729686AbgKWSAp (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 23 Nov 2020 13:00:45 -0500
+IronPort-SDR: kYOZs1+kqnRoF41PQPB4B1GaclnsVigiYDs7gd1CWzXTcv5GfqhEVCJ1PfMi+A5fzcC0os8Xzk
+ Lh9W+aV2AUrg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9814"; a="151072817"
 X-IronPort-AV: E=Sophos;i="5.78,364,1599548400"; 
-   d="scan'208";a="159581607"
+   d="scan'208";a="151072817"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Nov 2020 10:00:05 -0800
-IronPort-SDR: uwGS3K3pbOs/n8e3wfn9KSb+BAlxZAUWi5s9FXtFaA2IazgHHzCxCxY6XTxNpdDDAwGpPReZG2
- LHtz1I4W769g==
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Nov 2020 10:00:37 -0800
+IronPort-SDR: uIJ4xAF3qw/Rcf2+KRTJQ9eAiso9qCyOcgRGhS6DXYqHRVSdfyYteyYsRbbBLbRpVGCXhW3EjL
+ 3CoEmmfbw+EA==
 X-IronPort-AV: E=Sophos;i="5.78,364,1599548400"; 
-   d="scan'208";a="536180669"
+   d="scan'208";a="332267090"
 Received: from suygunge-mobl.ger.corp.intel.com (HELO localhost) ([10.249.40.108])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Nov 2020 10:00:01 -0800
+  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Nov 2020 10:00:34 -0800
 From:   Jani Nikula <jani.nikula@intel.com>
 To:     linux-kernel@vger.kernel.org
 Cc:     Christoph Hellwig <hch@infradead.org>,
         Andrew Morton <akpm@linux-foundation.org>,
         intel-gfx@lists.freedesktop.org, jani.nikula@intel.com,
-        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        ath11k@lists.infradead.org, ath10k@lists.infradead.org,
-        Kalle Valo <kvalo@codeaurora.org>,
-        linux-wireless@vger.kernel.org,
-        QCA ath9k Development <ath9k-devel@qca.qualcomm.com>
-Subject: [PATCH 4/9] relay: allow the use of const callback structs
-Date:   Mon, 23 Nov 2020 19:59:24 +0200
-Message-Id: <cc3ff292e4eb4fdc56bee3d690c7b8e39209cd37.1606153547.git.jani.nikula@intel.com>
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: [PATCH 9/9] blktrace: make relay callbacks const
+Date:   Mon, 23 Nov 2020 19:59:29 +0200
+Message-Id: <7ff5ce0b735901eb4f10e13da2704f1d8c4a2507.1606153547.git.jani.nikula@intel.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <cover.1606153547.git.jani.nikula@intel.com>
 References: <cover.1606153547.git.jani.nikula@intel.com>
@@ -56,142 +52,29 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-None of the relay users require the use of mutable structs for
-callbacks, however the relay code does. Instead of assigning the default
-callback for subbuf_start, add a wrapper to conditionally call the
-client callback if available, and fall back to default behaviour
-otherwise.
+Now that relay_open() accepts const callbacks, make relay callbacks
+const.
 
-This lets all relay users make their struct rchan_callbacks const data.
-
-Cc: linux-block@vger.kernel.org
 Cc: Jens Axboe <axboe@kernel.dk>
-Cc: ath11k@lists.infradead.org
-Cc: ath10k@lists.infradead.org
-Cc: Kalle Valo <kvalo@codeaurora.org>
-Cc: linux-wireless@vger.kernel.org
-Cc: QCA ath9k Development <ath9k-devel@qca.qualcomm.com>
-Cc: intel-gfx@lists.freedesktop.org
-Cc: Christoph Hellwig <hch@infradead.org>
+Cc: linux-block@vger.kernel.org
 Signed-off-by: Jani Nikula <jani.nikula@intel.com>
-
 ---
+ kernel/trace/blktrace.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-v2: Simplify after nuking some callbacks and making some others
-mandatory in previous patches, as per Christoph's review comments.
-
-I thought about adding wrappers for the now-mandatory create_buf_file
-and remove_buf_file as well, for consistency, but ended up leaving them
-out.
----
- include/linux/relay.h |  4 ++--
- kernel/relay.c        | 35 +++++++++++------------------------
- 2 files changed, 13 insertions(+), 26 deletions(-)
-
-diff --git a/include/linux/relay.h b/include/linux/relay.h
-index 99d024475ba5..72b876dd5cb8 100644
---- a/include/linux/relay.h
-+++ b/include/linux/relay.h
-@@ -62,7 +62,7 @@ struct rchan
- 	size_t subbuf_size;		/* sub-buffer size */
- 	size_t n_subbufs;		/* number of sub-buffers per buffer */
- 	size_t alloc_size;		/* total buffer size allocated */
--	struct rchan_callbacks *cb;	/* client callbacks */
-+	const struct rchan_callbacks *cb; /* client callbacks */
- 	struct kref kref;		/* channel refcount */
- 	void *private_data;		/* for user-defined data */
- 	size_t last_toobig;		/* tried to log event > subbuf size */
-@@ -157,7 +157,7 @@ struct rchan *relay_open(const char *base_filename,
- 			 struct dentry *parent,
- 			 size_t subbuf_size,
- 			 size_t n_subbufs,
--			 struct rchan_callbacks *cb,
-+			 const struct rchan_callbacks *cb,
- 			 void *private_data);
- extern int relay_late_setup_files(struct rchan *chan,
- 				  const char *base_filename,
-diff --git a/kernel/relay.c b/kernel/relay.c
-index dd4ec4ec07f3..02bdba5372cb 100644
---- a/kernel/relay.c
-+++ b/kernel/relay.c
-@@ -252,19 +252,14 @@ EXPORT_SYMBOL_GPL(relay_buf_full);
-  * High-level relay kernel API and associated functions.
-  */
- 
--/*
-- * rchan_callback implementations defining default channel behavior.  Used
-- * in place of corresponding NULL values in client callback struct.
-- */
--
--/*
-- * subbuf_start() default callback.  Does nothing.
-- */
--static int subbuf_start_default_callback (struct rchan_buf *buf,
--					  void *subbuf,
--					  void *prev_subbuf,
--					  size_t prev_padding)
-+/* subbuf_start callback wrapper */
-+static int cb_subbuf_start(struct rchan_buf *buf, void *subbuf,
-+			   void *prev_subbuf, size_t prev_padding)
- {
-+	if (buf->chan->cb->subbuf_start)
-+		return buf->chan->cb->subbuf_start(buf, subbuf,
-+						   prev_subbuf, prev_padding);
-+
- 	if (relay_buf_full(buf))
- 		return 0;
- 
-@@ -314,7 +309,7 @@ static void __relay_reset(struct rchan_buf *buf, unsigned int init)
- 	for (i = 0; i < buf->chan->n_subbufs; i++)
- 		buf->padding[i] = 0;
- 
--	buf->chan->cb->subbuf_start(buf, buf->data, NULL, 0);
-+	cb_subbuf_start(buf, buf->data, NULL, 0);
+diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+index f1022945e346..b5c4b9ade960 100644
+--- a/kernel/trace/blktrace.c
++++ b/kernel/trace/blktrace.c
+@@ -449,7 +449,7 @@ static struct dentry *blk_create_buf_file_callback(const char *filename,
+ 					&relay_file_operations);
  }
  
- /**
-@@ -442,14 +437,6 @@ static void relay_close_buf(struct rchan_buf *buf)
- 	kref_put(&buf->kref, relay_remove_buf);
- }
- 
--static void setup_callbacks(struct rchan *chan,
--				   struct rchan_callbacks *cb)
--{
--	if (!cb->subbuf_start)
--		cb->subbuf_start = subbuf_start_default_callback;
--	chan->cb = cb;
--}
--
- int relay_prepare_cpu(unsigned int cpu)
- {
- 	struct rchan *chan;
-@@ -495,7 +482,7 @@ struct rchan *relay_open(const char *base_filename,
- 			 struct dentry *parent,
- 			 size_t subbuf_size,
- 			 size_t n_subbufs,
--			 struct rchan_callbacks *cb,
-+			 const struct rchan_callbacks *cb,
- 			 void *private_data)
- {
- 	unsigned int i;
-@@ -529,7 +516,7 @@ struct rchan *relay_open(const char *base_filename,
- 		chan->has_base_filename = 1;
- 		strlcpy(chan->base_filename, base_filename, NAME_MAX);
- 	}
--	setup_callbacks(chan, cb);
-+	chan->cb = cb;
- 	kref_init(&chan->kref);
- 
- 	mutex_lock(&relay_channels_mutex);
-@@ -712,7 +699,7 @@ size_t relay_switch_subbuf(struct rchan_buf *buf, size_t length)
- 	new_subbuf = buf->subbufs_produced % buf->chan->n_subbufs;
- 	new = buf->start + new_subbuf * buf->chan->subbuf_size;
- 	buf->offset = 0;
--	if (!buf->chan->cb->subbuf_start(buf, new, old, buf->prev_padding)) {
-+	if (!cb_subbuf_start(buf, new, old, buf->prev_padding)) {
- 		buf->offset = buf->chan->subbuf_size + 1;
- 		return 0;
- 	}
+-static struct rchan_callbacks blk_relay_callbacks = {
++static const struct rchan_callbacks blk_relay_callbacks = {
+ 	.subbuf_start		= blk_subbuf_start_callback,
+ 	.create_buf_file	= blk_create_buf_file_callback,
+ 	.remove_buf_file	= blk_remove_buf_file_callback,
 -- 
 2.20.1
 
