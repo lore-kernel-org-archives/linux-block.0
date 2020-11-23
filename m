@@ -2,120 +2,191 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7989C6379F
-	for <linux-block@archiver.kernel.org>; Mon, 23 Nov 2020 10:05:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68F89C2D0E4
+	for <linux-block@archiver.kernel.org>; Mon, 23 Nov 2020 10:31:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A100D20658
-	for <linux-block@archiver.kernel.org>; Mon, 23 Nov 2020 10:05:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F1BCD2074B
+	for <linux-block@archiver.kernel.org>; Mon, 23 Nov 2020 10:31:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="enyh4iQO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728459AbgKWKFW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 Nov 2020 05:05:22 -0500
-Received: from mail-il1-f197.google.com ([209.85.166.197]:34320 "EHLO
-        mail-il1-f197.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728371AbgKWKFU (ORCPT
+        id S1727907AbgKWKb1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 Nov 2020 05:31:27 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50610 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727107AbgKWKb1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Nov 2020 05:05:20 -0500
-Received: by mail-il1-f197.google.com with SMTP id q10so9327801ile.1
-        for <linux-block@vger.kernel.org>; Mon, 23 Nov 2020 02:05:17 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=zBgwzi68qzrXdjI3v6aoG522nFgE68o6wE8yIJVg79k=;
-        b=QkSq7BIOcnLZw+NWHq0UtF6ruF17ARpUGuaqE0lgNASho+mjAwNfaVwUgNZq5vgAzE
-         oPENvIWzw4E62C8SrKMfPTJbEZGqrbyXto25YeLKV6w9+Lida7ZC7l6mavmz5RHqgF9E
-         uZVFNoPK6TrUocX8ROiMh2/eT4nKG/ewGFUpTUPPuI0dLeskNKg+qyq5rmz/B7T4HNzN
-         zXk91CkYbNzZGMusx/VuIiULrM4y3N6ZzkLOEnowt075ojq2FFMNoNjXHQLRaJKd9BWA
-         mM0zXwaG8zRim+9GNklh/RyA1SiqOxbZOtIiTViY7dqU6JWmy6gFdlGfew2MmBSGSJzY
-         Uy6Q==
-X-Gm-Message-State: AOAM532ZY4qcfdjqDuuoXt2e/Uto+4+6BlwEtaMiX614GAU3KtSphRuP
-        NdZ3KMLxvHPmolYPSgXsdtlq6Xi1qvW+HeYq6HG9muqN0mFR
-X-Google-Smtp-Source: ABdhPJy/m127PjSfJZCUQU/mwsLeNdRiRvVWiuIaQd1AajQ0eMm2H7W/z3v1a9fEx16vH1FVCnPRPmMkV8o3l0I68CN8QhiikeaB
+        Mon, 23 Nov 2020 05:31:27 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1606127484;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=a2z/wTVqHabYzS0sinajYT9PD1Lj3hHjwZuxraPE9e4=;
+        b=enyh4iQOpzFiIFPtPhyFzYHR4JUoVIDzCS0fH+vK7poMHXedRJpc6IWr/jz9PQcEBpfsXa
+        0nhazYyhAIlFbQjjhJFvLazep06kDuoGx1mJv7pXbOxZIfNYYm8AwFmctJAbC7zN0O6WJm
+        VvcIU+ZK9oJTfO+7eCtv2IPYb3IYd9c=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-513-vQc1ymdZO6SkDI75tMfuEg-1; Mon, 23 Nov 2020 05:31:20 -0500
+X-MC-Unique: vQc1ymdZO6SkDI75tMfuEg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3D17051DD;
+        Mon, 23 Nov 2020 10:31:18 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-112-111.rdu2.redhat.com [10.10.112.111])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BB3256086F;
+        Mon, 23 Nov 2020 10:31:15 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <20201123080506.GA30578@infradead.org>
+References: <20201123080506.GA30578@infradead.org> <160596800145.154728.7192318545120181269.stgit@warthog.procyon.org.uk> <160596801020.154728.15935034745159191564.stgit@warthog.procyon.org.uk>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     dhowells@redhat.com, Pavel Begunkov <asml.silence@gmail.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 01/29] iov_iter: Switch to using a table of operations
 MIME-Version: 1.0
-X-Received: by 2002:a02:b146:: with SMTP id s6mr29551471jah.10.1606125917639;
- Mon, 23 Nov 2020 02:05:17 -0800 (PST)
-Date:   Mon, 23 Nov 2020 02:05:17 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000c91a4805b4c354d5@google.com>
-Subject: WARNING in nbd_config_put
-From:   syzbot <syzbot+547e604b2b1c65869d7f@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, josef@toxicpanda.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, nbd@other.debian.org,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <516983.1606127474.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date:   Mon, 23 Nov 2020 10:31:14 +0000
+Message-ID: <516984.1606127474@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+Christoph Hellwig <hch@infradead.org> wrote:
 
-syzbot found the following issue on:
+> Please run performance tests.  I think the indirect calls could totally
+> wreck things like high performance direct I/O, especially using io_uring
+> on x86.
 
-HEAD commit:    27bba9c5 Merge tag 'scsi-fixes' of git://git.kernel.org/pu..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=15ffd94d500000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=e7f3c831f4536ec1
-dashboard link: https://syzkaller.appspot.com/bug?extid=547e604b2b1c65869d7f
-compiler:       gcc (GCC) 10.1.0-syz 20200507
-userspace arch: i386
+Here's an initial test using fio and null_blk.  I left null_blk in its def=
+ault
+configuration and used the following command line:
 
-Unfortunately, I don't have any reproducer for this issue yet.
+fio --ioengine=3Dlibaio --direct=3D1 --gtod_reduce=3D1 --name=3Dreadtest -=
+-filename=3D/dev/nullb0 --bs=3D4k --iodepth=3D128 --time_based --runtime=3D=
+120 --readwrite=3Drandread --iodepth_low=3D96 --iodepth_batch=3D16 --numjo=
+bs=3D4
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+547e604b2b1c65869d7f@syzkaller.appspotmail.com
+I borrowed some of the parameters from an email I found online, so I'm not
+sure if they're that useful.
 
-------------[ cut here ]------------
-WARNING: CPU: 3 PID: 27869 at kernel/workqueue.c:4396 destroy_workqueue.cold+0x5/0x71 kernel/workqueue.c:4396
-Modules linked in:
-CPU: 3 PID: 27869 Comm: syz-executor.3 Not tainted 5.10.0-rc4-syzkaller #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel-1.12.0-59-gc9ba5276e321-prebuilt.qemu.org 04/01/2014
-RIP: 0010:destroy_workqueue.cold+0x5/0x71 kernel/workqueue.c:4396
-Code: 00 90 4a 89 f7 f1 89 c6 e8 01 80 00 00 c6 44 24 37 01 e9 a1 a7 9b f8 48 c7 c7 80 f1 00 8b e8 9a f4 04 f9 eb c2 e8 63 76 c3 f8 <0f> 0b 48 c7 c6 00 95 4a 89 48 c7 c7 40 90 4a 89 49 8d 96 60 01 00
-RSP: 0018:ffffc900009f7a30 EFLAGS: 00010046
-RAX: 0000000000040000 RBX: 0000000000000002 RCX: ffffc90023698000
-RDX: 0000000000040000 RSI: ffffffff88acb97d RDI: 0000000000000005
-RBP: 000000000000000f R08: 0000000000000001 R09: 0000000000000003
-R10: 0000000000000001 R11: 0000000000000000 R12: dffffc0000000000
-R13: ffff888024e1dc00 R14: ffff88801270a000 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff88802cf00000(0063) knlGS:00000000f5524b40
-CS:  0010 DS: 002b ES: 002b CR0: 0000000080050033
-CR2: 0000000001991fe8 CR3: 000000001216e000 CR4: 0000000000350ee0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- nbd_config_put+0x3d3/0x870 drivers/block/nbd.c:1231
- nbd_release+0x103/0x190 drivers/block/nbd.c:1523
- __blkdev_put+0x642/0x890 fs/block_dev.c:1782
- blkdev_close+0x8c/0xb0 fs/block_dev.c:1851
- __fput+0x285/0x920 fs/file_table.c:281
- task_work_run+0xdd/0x190 kernel/task_work.c:151
- get_signal+0xd89/0x1f00 kernel/signal.c:2562
- arch_do_signal+0x82/0x2390 arch/x86/kernel/signal.c:811
- exit_to_user_mode_loop kernel/entry/common.c:161 [inline]
- exit_to_user_mode_prepare+0x100/0x1a0 kernel/entry/common.c:191
- syscall_exit_to_user_mode+0x38/0x260 kernel/entry/common.c:266
- __do_fast_syscall_32+0x62/0x80 arch/x86/entry/common.c:138
- do_fast_syscall_32+0x2f/0x70 arch/x86/entry/common.c:160
- entry_SYSENTER_compat_after_hwframe+0x4d/0x5c
-RIP: 0023:0xf7f6c549
-Code: 03 74 c0 01 10 05 03 74 b8 01 10 06 03 74 b4 01 10 07 03 74 b0 01 10 08 03 74 d8 01 00 00 00 00 00 51 52 55 89 e5 0f 34 cd 80 <5d> 5a 59 c3 90 90 90 90 eb 0d 90 90 90 90 90 90 90 90 90 90 90 90
-RSP: 002b:00000000f55240bc EFLAGS: 00000296 ORIG_RAX: 0000000000000036
-RAX: fffffffffffffe00 RBX: 0000000000000003 RCX: 000000000000ab03
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000000
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+I tried three different sets of patches: none, just the first (which adds =
+the
+jump table without getting rid of the conditional branches), and all of th=
+em.
+
+I'm not sure which stats are of particular interest here, so I took the tw=
+o
+summary stats from the output of fio and also added together the "issued r=
+wts:
+total=3Da,b,c,d" from each test thread (only the first of which is non-zer=
+o).
+
+The CPU is an Intel(R) Core(TM) i3-4170 CPU @ 3.70GHz, so 4 single-thread
+cores, and 16G of RAM.  No virtualisation is involved.
+
+Unpatched:
+
+   READ: bw=3D4109MiB/s (4308MB/s), 1025MiB/s-1029MiB/s (1074MB/s-1079MB/s=
+), io=3D482GiB (517GB), run=3D120001-120001msec
+   READ: bw=3D4097MiB/s (4296MB/s), 1020MiB/s-1029MiB/s (1070MB/s-1079MB/s=
+), io=3D480GiB (516GB), run=3D120001-120001msec
+   READ: bw=3D4113MiB/s (4312MB/s), 1025MiB/s-1031MiB/s (1075MB/s-1082MB/s=
+), io=3D482GiB (517GB), run=3D120001-120001msec
+   READ: bw=3D4125MiB/s (4325MB/s), 1028MiB/s-1033MiB/s (1078MB/s-1084MB/s=
+), io=3D483GiB (519GB), run=3D120001-120001msec
+
+  nullb0: ios=3D126017326/0, merge=3D53/0, ticks=3D3538817/0, in_queue=3D3=
+538817, util=3D100.00%
+  nullb0: ios=3D125655193/0, merge=3D55/0, ticks=3D3548157/0, in_queue=3D3=
+548157, util=3D100.00%
+  nullb0: ios=3D126133014/0, merge=3D58/0, ticks=3D3545621/0, in_queue=3D3=
+545621, util=3D100.00%
+  nullb0: ios=3D126512562/0, merge=3D57/0, ticks=3D3531600/0, in_queue=3D3=
+531600, util=3D100.00%
+
+  sum issued rwts =3D 126224632
+  sum issued rwts =3D 125861368
+  sum issued rwts =3D 126340344
+  sum issued rwts =3D 126718648
+
+Just first patch:
+
+   READ: bw=3D4106MiB/s (4306MB/s), 1023MiB/s-1030MiB/s (1073MB/s-1080MB/s=
+), io=3D481GiB (517GB), run=3D120001-120001msec
+   READ: bw=3D4126MiB/s (4327MB/s), 1029MiB/s-1034MiB/s (1079MB/s-1084MB/s=
+), io=3D484GiB (519GB), run=3D120001-120001msec
+   READ: bw=3D4109MiB/s (4308MB/s), 1025MiB/s-1029MiB/s (1075MB/s-1079MB/s=
+), io=3D481GiB (517GB), run=3D120001-120001msec
+   READ: bw=3D4097MiB/s (4296MB/s), 1023MiB/s-1025MiB/s (1073MB/s-1074MB/s=
+), io=3D480GiB (516GB), run=3D120001-120001msec
+
+  nullb0: ios=3D125939152/0, merge=3D62/0, ticks=3D3534917/0, in_queue=3D3=
+534917, util=3D100.00%
+  nullb0: ios=3D126554181/0, merge=3D61/0, ticks=3D3532067/0, in_queue=3D3=
+532067, util=3D100.00%
+  nullb0: ios=3D126012346/0, merge=3D54/0, ticks=3D3530504/0, in_queue=3D3=
+530504, util=3D100.00%
+  nullb0: ios=3D125653775/0, merge=3D54/0, ticks=3D3537438/0, in_queue=3D3=
+537438, util=3D100.00%
+
+  sum issued rwts =3D 126144952
+  sum issued rwts =3D 126765368
+  sum issued rwts =3D 126215928
+  sum issued rwts =3D 125864120
+
+All patches:
+  nullb0: ios=3D10477062/0, merge=3D2/0, ticks=3D284992/0, in_queue=3D2849=
+92, util=3D95.87%
+  nullb0: ios=3D10405246/0, merge=3D2/0, ticks=3D291886/0, in_queue=3D2918=
+86, util=3D99.82%
+  nullb0: ios=3D10425583/0, merge=3D1/0, ticks=3D291699/0, in_queue=3D2916=
+99, util=3D99.22%
+  nullb0: ios=3D10438845/0, merge=3D3/0, ticks=3D292445/0, in_queue=3D2924=
+45, util=3D99.31%
+
+   READ: bw=3D4118MiB/s (4318MB/s), 1028MiB/s-1032MiB/s (1078MB/s-1082MB/s=
+), io=3D483GiB (518GB), run=3D120001-120001msec
+   READ: bw=3D4109MiB/s (4308MB/s), 1024MiB/s-1030MiB/s (1073MB/s-1080MB/s=
+), io=3D481GiB (517GB), run=3D120001-120001msec
+   READ: bw=3D4108MiB/s (4308MB/s), 1026MiB/s-1029MiB/s (1076MB/s-1079MB/s=
+), io=3D481GiB (517GB), run=3D120001-120001msec
+   READ: bw=3D4112MiB/s (4312MB/s), 1025MiB/s-1031MiB/s (1075MB/s-1081MB/s=
+), io=3D482GiB (517GB), run=3D120001-120001msec
+
+  nullb0: ios=3D126282410/0, merge=3D58/0, ticks=3D3557384/0, in_queue=3D3=
+557384, util=3D100.00%
+  nullb0: ios=3D126004837/0, merge=3D67/0, ticks=3D3565235/0, in_queue=3D3=
+565235, util=3D100.00%
+  nullb0: ios=3D125988876/0, merge=3D59/0, ticks=3D3563026/0, in_queue=3D3=
+563026, util=3D100.00%
+  nullb0: ios=3D126118279/0, merge=3D57/0, ticks=3D3566122/0, in_queue=3D3=
+566122, util=3D100.00%
+
+  sum issued rwts =3D 126494904
+  sum issued rwts =3D 126214200
+  sum issued rwts =3D 126198200
+  sum issued rwts =3D 126328312
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+David
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
