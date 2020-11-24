@@ -2,74 +2,79 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5970EC64E7C
-	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 13:53:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E37AC2D0E4
+	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 13:57:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 023C62076E
-	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 13:53:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="uFy7Ttpe"
+	by mail.kernel.org (Postfix) with ESMTP id 0AAB22076E
+	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 13:57:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388679AbgKXNx1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Nov 2020 08:53:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37526 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388659AbgKXNx1 (ORCPT
+        id S2388209AbgKXN5D (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Nov 2020 08:57:03 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:7979 "EHLO
+        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388472AbgKXN5D (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Nov 2020 08:53:27 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29140C0613D6;
-        Tue, 24 Nov 2020 05:53:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=ZXWWj8sGpheRB/oPAny/oeYYPMI5xkrPoBeF/PO6t/I=; b=uFy7Ttpe28lYbENky3PW90QaTq
-        xG4wEg+wloh0hNvJWawTJQg7XQAS91A4oAPYqDqFFgSWTUjyMdGkcvWeSWNAAcnJJnpdJMC7Jm0Jq
-        M95Jiv0GtCKP7Jwi7y4hV5eX/5ntAWKqVIIOuyD36/oMrxKN+22zQUxm/erDkZPH5EFs5kxiNk/qX
-        fbYUgHkg+8QptScbUSZ6yFCMWEuoNILFEypZ+PtlRUpUS1f/iW3EWfM0Vm7XWaklqtf+Jppv9QouI
-        MA/OL8tDwMa4wuUd7DIRsV4kdVDn9/qL5FTWuQlH76deZdi3dut2mc+76r0aL8ewuSlgqLBT+dwl6
-        clkzRyQg==;
-Received: from willy by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1khYkr-00014M-IZ; Tue, 24 Nov 2020 13:53:13 +0000
-Date:   Tue, 24 Nov 2020 13:53:13 +0000
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Coly Li <colyli@suse.de>, Mike Snitzer <snitzer@redhat.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jan Kara <jack@suse.cz>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        dm-devel@redhat.com, Richard Weinberger <richard@nod.at>,
-        Jan Kara <jack@suse.com>, linux-block@vger.kernel.org,
-        xen-devel@lists.xenproject.org, linux-bcache@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: Re: [PATCH 02/45] filemap: consistently use ->f_mapping over
- ->i_mapping
-Message-ID: <20201124135313.GA4327@casper.infradead.org>
-References: <20201124132751.3747337-1-hch@lst.de>
- <20201124132751.3747337-3-hch@lst.de>
+        Tue, 24 Nov 2020 08:57:03 -0500
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.60])
+        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4CgQYP1nYLzhgGs;
+        Tue, 24 Nov 2020 21:56:41 +0800 (CST)
+Received: from huawei.com (10.175.113.133) by DGGEMS411-HUB.china.huawei.com
+ (10.3.19.211) with Microsoft SMTP Server id 14.3.487.0; Tue, 24 Nov 2020
+ 21:56:53 +0800
+From:   Wang Hai <wanghai38@huawei.com>
+To:     <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH] block: fix error return code in mm_pci_probe()
+Date:   Tue, 24 Nov 2020 21:59:38 +0800
+Message-ID: <20201124135938.21790-1-wanghai38@huawei.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201124132751.3747337-3-hch@lst.de>
+Content-Type: text/plain
+X-Originating-IP: [10.175.113.133]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Nov 24, 2020 at 02:27:08PM +0100, Christoph Hellwig wrote:
-> Use file->f_mapping in all remaining places that have a struct file
-> available to properly handle the case where inode->i_mapping !=
-> file_inode(file)->i_mapping.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+Fix to return a negative error code from the error handling
+case instead of 0, as done elsewhere in this function.
 
-Reviewed-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Reported-by: Hulk Robot <hulkci@huawei.com>
+Signed-off-by: Wang Hai <wanghai38@huawei.com>
+---
+ drivers/block/umem.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/block/umem.c b/drivers/block/umem.c
+index 2b95d7b33b91..5eb44e4a91ee 100644
+--- a/drivers/block/umem.c
++++ b/drivers/block/umem.c
+@@ -877,6 +877,7 @@ static int mm_pci_probe(struct pci_dev *dev, const struct pci_device_id *id)
+ 	if (card->mm_pages[0].desc == NULL ||
+ 	    card->mm_pages[1].desc == NULL) {
+ 		dev_printk(KERN_ERR, &card->dev->dev, "alloc failed\n");
++		ret = -ENOMEM;
+ 		goto failed_alloc;
+ 	}
+ 	reset_page(&card->mm_pages[0]);
+@@ -888,8 +889,10 @@ static int mm_pci_probe(struct pci_dev *dev, const struct pci_device_id *id)
+ 	spin_lock_init(&card->lock);
+ 
+ 	card->queue = blk_alloc_queue(NUMA_NO_NODE);
+-	if (!card->queue)
++	if (!card->queue) {
++		ret = -ENOMEM;
+ 		goto failed_alloc;
++	}
+ 
+ 	tasklet_init(&card->tasklet, process_page, (unsigned long)card);
+ 
+-- 
+2.17.1
+
