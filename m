@@ -5,39 +5,39 @@ X-Spam-Level:
 X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1D39C64E7C
-	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 13:28:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B355C83019
+	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 13:28:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 69389204EC
-	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 13:28:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2159C2076E
+	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 13:28:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="pWcZmhed"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="PBlG+SI1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388022AbgKXN2a (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Nov 2020 08:28:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33548 "EHLO
+        id S2388115AbgKXN2d (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Nov 2020 08:28:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33558 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388071AbgKXN2a (ORCPT
+        with ESMTP id S2388014AbgKXN2d (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Nov 2020 08:28:30 -0500
+        Tue, 24 Nov 2020 08:28:33 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7D35C0613D6;
-        Tue, 24 Nov 2020 05:28:29 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD830C0613D6;
+        Tue, 24 Nov 2020 05:28:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=Q/MCT6maV/iKaSxRRRnLFBnoEWfPfC40ypgl1Ci8nRk=; b=pWcZmhed1VtM52P3q1JMqqjfxR
-        GWMfkfGGh21/NCT85snknz3WDUM0FCyAbepRt+ZELj82dad4m3br4Sawb66pKbQxSAEUaJxSeL+Ll
-        71lYUsvhjLKgY/YbGp0X++3PkxXh+KrssNfKTT0h2mCWPuefl+mBpjJwTcCV+e1SRjBbrscsDgFCm
-        lMW8Geg/e4WV3fB64E9SDr1XU5cgwgMIdLeq0nWxNCx03aqe1+hiU2wmbmGncWiO1/xxhiOEuXkHa
-        z9KSmzy5zBC51q81wbv9yHNv1xP232XeeVA1TEmOLWeYTbWgkPDrO0cmsehbzSHT+I2DtVpVX0ELT
-        qGUkh4WA==;
+        bh=aYwkX4I6zMx34nzrdb7tYezzW5eC03Czg70BjD05yqI=; b=PBlG+SI1LP3b7gr/lJlKmKFFJd
+        bocVKBuspYZb9+bd6oRwQGEd0L7j3hQYuLx9nBobabPLesfL8HLab1E4KCm/5+LC3aeewsBsrF0Ec
+        hulcbyCIFfsfA8vcNobuzkqbXhMEwxxlSaiC+PbDLVpuj7Vfeb4n/Hc03FWeCTlPALu7BKMacg7VB
+        VdoUIV8XfOoQvjg+7Lpil7jQgfh2pOibzDF+EEKPx14W4pVYNFzWxgoqa5dOjKsd+dX8NOcHTR0xd
+        r+KlCQy9eeFmFLAe7pGrffUSOJRf0kI5rzxEXRSylWdG/EZ+5D3kd5agpzXpiDKm6I3+ieiU+g83C
+        6CbAnNrA==;
 Received: from [2001:4bb8:180:5443:c70:4a89:bc61:3] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1khYMO-0006UA-S8; Tue, 24 Nov 2020 13:27:58 +0000
+        id 1khYMk-0006Xd-Im; Tue, 24 Nov 2020 13:28:19 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
@@ -51,9 +51,9 @@ Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
         xen-devel@lists.xenproject.org, linux-bcache@vger.kernel.org,
         linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
         linux-mm@kvack.org
-Subject: [PATCH 02/45] filemap: consistently use ->f_mapping over ->i_mapping
-Date:   Tue, 24 Nov 2020 14:27:08 +0100
-Message-Id: <20201124132751.3747337-3-hch@lst.de>
+Subject: [PATCH 16/45] block: change the hash used for looking up block devices
+Date:   Tue, 24 Nov 2020 14:27:22 +0100
+Message-Id: <20201124132751.3747337-17-hch@lst.de>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201124132751.3747337-1-hch@lst.de>
 References: <20201124132751.3747337-1-hch@lst.de>
@@ -64,67 +64,66 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use file->f_mapping in all remaining places that have a struct file
-available to properly handle the case where inode->i_mapping !=
-file_inode(file)->i_mapping.
+Adding the minor to the major creates tons of pointless conflicts. Just
+use the dev_t itself, which is 32-bits and thus is guaranteed to fit
+into ino_t.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Reviewed-by: Jan Kara <jack@suse.cz>
 ---
- mm/filemap.c | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
+ fs/block_dev.c | 26 ++------------------------
+ 1 file changed, 2 insertions(+), 24 deletions(-)
 
-diff --git a/mm/filemap.c b/mm/filemap.c
-index d5e7c2029d16b4..4f583489aa3c2a 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -2886,14 +2886,14 @@ EXPORT_SYMBOL(filemap_map_pages);
- 
- vm_fault_t filemap_page_mkwrite(struct vm_fault *vmf)
- {
-+	struct address_space *mapping = vmf->vma->vm_file->f_mapping;
- 	struct page *page = vmf->page;
--	struct inode *inode = file_inode(vmf->vma->vm_file);
- 	vm_fault_t ret = VM_FAULT_LOCKED;
- 
--	sb_start_pagefault(inode->i_sb);
-+	sb_start_pagefault(mapping->host->i_sb);
- 	file_update_time(vmf->vma->vm_file);
- 	lock_page(page);
--	if (page->mapping != inode->i_mapping) {
-+	if (page->mapping != mapping) {
- 		unlock_page(page);
- 		ret = VM_FAULT_NOPAGE;
- 		goto out;
-@@ -2906,7 +2906,7 @@ vm_fault_t filemap_page_mkwrite(struct vm_fault *vmf)
- 	set_page_dirty(page);
- 	wait_for_stable_page(page);
- out:
--	sb_end_pagefault(inode->i_sb);
-+	sb_end_pagefault(mapping->host->i_sb);
- 	return ret;
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index f6a2a06ad262fa..437f67e12b2838 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -863,35 +863,12 @@ void __init bdev_cache_init(void)
+ 	blockdev_superblock = bd_mnt->mnt_sb;   /* For writeback */
  }
  
-@@ -3149,10 +3149,9 @@ void dio_warn_stale_pagecache(struct file *filp)
+-/*
+- * Most likely _very_ bad one - but then it's hardly critical for small
+- * /dev and can be fixed when somebody will need really large one.
+- * Keep in mind that it will be fed through icache hash function too.
+- */
+-static inline unsigned long hash(dev_t dev)
+-{
+-	return MAJOR(dev)+MINOR(dev);
+-}
+-
+-static int bdev_test(struct inode *inode, void *data)
+-{
+-	return BDEV_I(inode)->bdev.bd_dev == *(dev_t *)data;
+-}
+-
+-static int bdev_set(struct inode *inode, void *data)
+-{
+-	BDEV_I(inode)->bdev.bd_dev = *(dev_t *)data;
+-	return 0;
+-}
+-
+ static struct block_device *bdget(dev_t dev)
  {
- 	static DEFINE_RATELIMIT_STATE(_rs, 86400 * HZ, DEFAULT_RATELIMIT_BURST);
- 	char pathname[128];
--	struct inode *inode = file_inode(filp);
- 	char *path;
+ 	struct block_device *bdev;
+ 	struct inode *inode;
  
--	errseq_set(&inode->i_mapping->wb_err, -EIO);
-+	errseq_set(&filp->f_mapping->wb_err, -EIO);
- 	if (__ratelimit(&_rs)) {
- 		path = file_path(filp, pathname, sizeof(pathname));
- 		if (IS_ERR(path))
-@@ -3179,7 +3178,7 @@ generic_file_direct_write(struct kiocb *iocb, struct iov_iter *from)
+-	inode = iget5_locked(blockdev_superblock, hash(dev),
+-			bdev_test, bdev_set, &dev);
+-
++	inode = iget_locked(blockdev_superblock, dev);
+ 	if (!inode)
+ 		return NULL;
  
- 	if (iocb->ki_flags & IOCB_NOWAIT) {
- 		/* If there are pages to writeback, return */
--		if (filemap_range_has_page(inode->i_mapping, pos,
-+		if (filemap_range_has_page(file->f_mapping, pos,
- 					   pos + write_len - 1))
- 			return -EAGAIN;
- 	} else {
+@@ -903,6 +880,7 @@ static struct block_device *bdget(dev_t dev)
+ 		bdev->bd_super = NULL;
+ 		bdev->bd_inode = inode;
+ 		bdev->bd_part_count = 0;
++		bdev->bd_dev = dev;
+ 		inode->i_mode = S_IFBLK;
+ 		inode->i_rdev = dev;
+ 		inode->i_bdev = bdev;
 -- 
 2.29.2
 
