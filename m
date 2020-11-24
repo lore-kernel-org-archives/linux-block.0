@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15B2AC82589
-	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 13:28:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CD25C64E7B
+	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 13:28:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B699C2087D
-	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 13:28:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D95312083E
+	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 13:28:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="r7g7yDYe"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Ea+9q0/5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388179AbgKXN2v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Nov 2020 08:28:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33628 "EHLO
+        id S2388159AbgKXN2w (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Nov 2020 08:28:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33626 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388169AbgKXN2s (ORCPT
+        with ESMTP id S2388167AbgKXN2s (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Tue, 24 Nov 2020 08:28:48 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5592EC061A4E;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 509CEC061A4D;
         Tue, 24 Nov 2020 05:28:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=sq5VpPGxfF2kkzPYx3vsaAUL0wGdgrOW5ZX0PlEgXAM=; b=r7g7yDYegpOMYt6pXHT1n2T/zL
-        b+34jNgNj1tqJxcH7t0JJgm5YSYrAtr0jsN0ntOiFWGVGQBvQLKDCgR5mzzN9SAvsnGUCUSMCZa8p
-        /jNdYw4WlvwYdf5CpUizYYHu/xAYk355tkiXksQmCQGNLHP8ZC2DL3uUNmRLg5pK5X1gsbof/8y6v
-        AlMTcb3SwkfSJQBWsX/dbEB0oVCqGZPCMXGazDcXv2FtJ+wf0ze4J1u5xmJtxpSz/wiePAgP+4AIj
-        7ZsCXN0JNSmkxlPdRln6ziBOqtp786hyG/LrQzjhTGVFCS9+d2vPB0+p0o+KT6w4hV+fkcpCAVEG2
-        itOl4TdQ==;
+        bh=Mhpy0Cb59wkbzThtZwDnrbLXD1rWczYtJDTvhh8SMU0=; b=Ea+9q0/5U1C3lxpYG+cp8W8+yq
+        HDJXNs1xkR6d5Q3Tqe8DzJMoqEQ7/6jzh7BdzDFOCgM6eJtZ/NdJBDr4wa1fg4oXr74Y5kroSq79K
+        VzT26zUATIM8C+jMZIcZTGU/6xcbiiu6NMExdkpxZExa8l29GhQ0Qte1UYrKyFBP9keFbOOHO8Do8
+        pg6wptGVpopV7o1YV4zwjSA2vi6DqZrN+W1PPJvGBKFgFYLTf6Hhc/xGBLAwEP1JaP8w6JU559eQE
+        bqw7WPqgNie7PhEXK192YC8HvtakiLkYEPYmuhZflhhpqi33qULhu7LUJVG5R4zXadf40txQOM3eh
+        EzrjvHUQ==;
 Received: from [2001:4bb8:180:5443:c70:4a89:bc61:3] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1khYMm-0006Xu-0n; Tue, 24 Nov 2020 13:28:20 +0000
+        id 1khYMx-0006bA-OT; Tue, 24 Nov 2020 13:28:32 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
@@ -51,9 +51,9 @@ Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
         xen-devel@lists.xenproject.org, linux-bcache@vger.kernel.org,
         linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
         linux-mm@kvack.org
-Subject: [PATCH 17/45] init: refactor name_to_dev_t
-Date:   Tue, 24 Nov 2020 14:27:23 +0100
-Message-Id: <20201124132751.3747337-18-hch@lst.de>
+Subject: [PATCH 24/45] blk-cgroup: stop abusing get_gendisk
+Date:   Tue, 24 Nov 2020 14:27:30 +0100
+Message-Id: <20201124132751.3747337-25-hch@lst.de>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201124132751.3747337-1-hch@lst.de>
 References: <20201124132751.3747337-1-hch@lst.de>
@@ -64,255 +64,247 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Split each case into a self-contained helper, and move the block
-dependent code entirely under the pre-existing #ifdef CONFIG_BLOCK.
-This allows to remove the blk_lookup_devt stub in genhd.h.
+Properly open the device instead of relying on deep internals by
+using get_gendisk.  Note that this uses FMODE_NDELAY without either
+FMODE_READ or FMODE_WRITE, which is a special open mode to allow
+for opening without media access, thus avoiding unexpexted interactions
+especially on removable media.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Reviewed-by: Jan Kara <jack@suse.cz>
-Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 ---
- include/linux/genhd.h |   7 +-
- init/do_mounts.c      | 183 +++++++++++++++++++++---------------------
- 2 files changed, 91 insertions(+), 99 deletions(-)
+ block/blk-cgroup.c         | 42 +++++++++++++++++++-------------------
+ block/blk-iocost.c         | 36 ++++++++++++++++----------------
+ include/linux/blk-cgroup.h |  4 ++--
+ 3 files changed, 41 insertions(+), 41 deletions(-)
 
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index 22f5b9fd96f8bf..ca5e356084c353 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -388,18 +388,13 @@ static inline void bd_unlink_disk_holder(struct block_device *bdev,
- }
- #endif /* CONFIG_SYSFS */
- 
-+dev_t blk_lookup_devt(const char *name, int partno);
- #ifdef CONFIG_BLOCK
- void printk_all_partitions(void);
--dev_t blk_lookup_devt(const char *name, int partno);
- #else /* CONFIG_BLOCK */
- static inline void printk_all_partitions(void)
- {
- }
--static inline dev_t blk_lookup_devt(const char *name, int partno)
--{
--	dev_t devt = MKDEV(0, 0);
--	return devt;
--}
- #endif /* CONFIG_BLOCK */
- 
- #endif /* _LINUX_GENHD_H */
-diff --git a/init/do_mounts.c b/init/do_mounts.c
-index b5f9604d0c98a2..aef2f24461c7f1 100644
---- a/init/do_mounts.c
-+++ b/init/do_mounts.c
-@@ -90,7 +90,6 @@ static int match_dev_by_uuid(struct device *dev, const void *data)
- 	return 0;
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 54fbe1e80cc41a..23437b96ea41e6 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -556,22 +556,22 @@ static struct blkcg_gq *blkg_lookup_check(struct blkcg *blkcg,
  }
  
--
  /**
-  * devt_from_partuuid - looks up the dev_t of a partition by its UUID
-  * @uuid_str:	char array containing ascii UUID
-@@ -186,7 +185,83 @@ static int match_dev_by_label(struct device *dev, const void *data)
- 
- 	return 0;
- }
--#endif
-+
-+static dev_t devt_from_partlabel(const char *label)
-+{
-+	struct device *dev;
-+	dev_t devt = 0;
-+
-+	dev = class_find_device(&block_class, NULL, label, &match_dev_by_label);
-+	if (dev) {
-+		devt = dev->devt;
-+		put_device(dev);
-+	}
-+
-+	return devt;
-+}
-+
-+static dev_t devt_from_devname(const char *name)
-+{
-+	dev_t devt = 0;
-+	int part;
-+	char s[32];
-+	char *p;
-+
-+	if (strlen(name) > 31)
-+		return 0;
-+	strcpy(s, name);
-+	for (p = s; *p; p++) {
-+		if (*p == '/')
-+			*p = '!';
-+	}
-+
-+	devt = blk_lookup_devt(s, 0);
-+	if (devt)
-+		return devt;
-+
-+	/*
-+	 * Try non-existent, but valid partition, which may only exist after
-+	 * opening the device, like partitioned md devices.
-+	 */
-+	while (p > s && isdigit(p[-1]))
-+		p--;
-+	if (p == s || !*p || *p == '0')
-+		return 0;
-+
-+	/* try disk name without <part number> */
-+	part = simple_strtoul(p, NULL, 10);
-+	*p = '\0';
-+	devt = blk_lookup_devt(s, part);
-+	if (devt)
-+		return devt;
-+
-+	/* try disk name without p<part number> */
-+	if (p < s + 2 || !isdigit(p[-2]) || p[-1] != 'p')
-+		return 0;
-+	p[-1] = '\0';
-+	return blk_lookup_devt(s, part);
-+}
-+#endif /* CONFIG_BLOCK */
-+
-+static dev_t devt_from_devnum(const char *name)
-+{
-+	unsigned maj, min, offset;
-+	dev_t devt = 0;
-+	char *p, dummy;
-+
-+	if (sscanf(name, "%u:%u%c", &maj, &min, &dummy) == 2 ||
-+	    sscanf(name, "%u:%u:%u:%c", &maj, &min, &offset, &dummy) == 3) {
-+		devt = MKDEV(maj, min);
-+		if (maj != MAJOR(devt) || min != MINOR(devt))
-+			return 0;
-+	} else {
-+		devt = new_decode_dev(simple_strtoul(name, &p, 16));
-+		if (*p)
-+			return 0;
-+	}
-+
-+	return devt;
-+}
- 
- /*
-  *	Convert a name into device number.  We accept the following variants:
-@@ -218,101 +293,23 @@ static int match_dev_by_label(struct device *dev, const void *data)
-  *	name contains slashes, the device name has them replaced with
-  *	bangs.
+- * blkg_conf_prep - parse and prepare for per-blkg config update
++ * blkcg_conf_open_bdev - parse and open bdev for per-blkg config update
+  * @inputp: input string pointer
+  *
+  * Parse the device node prefix part, MAJ:MIN, of per-blkg config update
+- * from @input and get and return the matching gendisk.  *@inputp is
++ * from @input and get and return the matching bdev.  *@inputp is
+  * updated to point past the device node prefix.  Returns an ERR_PTR()
+  * value on error.
+  *
+  * Use this function iff blkg_conf_prep() can't be used for some reason.
   */
--
- dev_t name_to_dev_t(const char *name)
+-struct gendisk *blkcg_conf_get_disk(char **inputp)
++struct block_device *blkcg_conf_open_bdev(char **inputp)
  {
--	char s[32];
--	char *p;
--	dev_t res = 0;
--	int part;
--
-+	if (strcmp(name, "/dev/nfs") == 0)
-+		return Root_NFS;
-+	if (strcmp(name, "/dev/cifs") == 0)
-+		return Root_CIFS;
-+	if (strcmp(name, "/dev/ram") == 0)
-+		return Root_RAM0;
- #ifdef CONFIG_BLOCK
--	if (strncmp(name, "PARTUUID=", 9) == 0) {
--		name += 9;
--		res = devt_from_partuuid(name);
--		if (!res)
--			goto fail;
--		goto done;
--	} else if (strncmp(name, "PARTLABEL=", 10) == 0) {
--		struct device *dev;
--
--		dev = class_find_device(&block_class, NULL, name + 10,
--					&match_dev_by_label);
--		if (!dev)
--			goto fail;
--
--		res = dev->devt;
--		put_device(dev);
--		goto done;
--	}
-+	if (strncmp(name, "PARTUUID=", 9) == 0)
-+		return devt_from_partuuid(name + 9);
-+	if (strncmp(name, "PARTLABEL=", 10) == 0)
-+		return devt_from_partlabel(name + 10);
-+	if (strncmp(name, "/dev/", 5) == 0)
-+		return devt_from_devname(name + 5);
- #endif
--
--	if (strncmp(name, "/dev/", 5) != 0) {
--		unsigned maj, min, offset;
--		char dummy;
--
--		if ((sscanf(name, "%u:%u%c", &maj, &min, &dummy) == 2) ||
--		    (sscanf(name, "%u:%u:%u:%c", &maj, &min, &offset, &dummy) == 3)) {
--			res = MKDEV(maj, min);
--			if (maj != MAJOR(res) || min != MINOR(res))
--				goto fail;
--		} else {
--			res = new_decode_dev(simple_strtoul(name, &p, 16));
--			if (*p)
--				goto fail;
--		}
--		goto done;
--	}
--
--	name += 5;
--	res = Root_NFS;
--	if (strcmp(name, "nfs") == 0)
--		goto done;
--	res = Root_CIFS;
--	if (strcmp(name, "cifs") == 0)
--		goto done;
--	res = Root_RAM0;
--	if (strcmp(name, "ram") == 0)
--		goto done;
--
--	if (strlen(name) > 31)
--		goto fail;
--	strcpy(s, name);
--	for (p = s; *p; p++)
--		if (*p == '/')
--			*p = '!';
--	res = blk_lookup_devt(s, 0);
--	if (res)
--		goto done;
--
--	/*
--	 * try non-existent, but valid partition, which may only exist
--	 * after revalidating the disk, like partitioned md devices
--	 */
--	while (p > s && isdigit(p[-1]))
--		p--;
--	if (p == s || !*p || *p == '0')
--		goto fail;
--
--	/* try disk name without <part number> */
--	part = simple_strtoul(p, NULL, 10);
--	*p = '\0';
--	res = blk_lookup_devt(s, part);
--	if (res)
--		goto done;
--
--	/* try disk name without p<part number> */
--	if (p < s + 2 || !isdigit(p[-2]) || p[-1] != 'p')
--		goto fail;
--	p[-1] = '\0';
--	res = blk_lookup_devt(s, part);
--	if (res)
--		goto done;
--
--fail:
--	return 0;
--done:
--	return res;
-+	return devt_from_devnum(name);
- }
- EXPORT_SYMBOL_GPL(name_to_dev_t);
+ 	char *input = *inputp;
+ 	unsigned int major, minor;
+-	struct gendisk *disk;
+-	int key_len, part;
++	struct block_device *bdev;
++	int key_len;
  
+ 	if (sscanf(input, "%u:%u%n", &major, &minor, &key_len) != 2)
+ 		return ERR_PTR(-EINVAL);
+@@ -581,16 +581,16 @@ struct gendisk *blkcg_conf_get_disk(char **inputp)
+ 		return ERR_PTR(-EINVAL);
+ 	input = skip_spaces(input);
+ 
+-	disk = get_gendisk(MKDEV(major, minor), &part);
+-	if (!disk)
++	bdev = blkdev_get_by_dev(MKDEV(major, minor), FMODE_NDELAY, NULL);
++	if (!bdev)
+ 		return ERR_PTR(-ENODEV);
+-	if (part) {
+-		put_disk_and_module(disk);
++	if (bdev_is_partition(bdev)) {
++		blkdev_put(bdev, FMODE_NDELAY);
+ 		return ERR_PTR(-ENODEV);
+ 	}
+ 
+ 	*inputp = input;
+-	return disk;
++	return bdev;
+ }
+ 
+ /**
+@@ -607,18 +607,18 @@ struct gendisk *blkcg_conf_get_disk(char **inputp)
+  */
+ int blkg_conf_prep(struct blkcg *blkcg, const struct blkcg_policy *pol,
+ 		   char *input, struct blkg_conf_ctx *ctx)
+-	__acquires(rcu) __acquires(&disk->queue->queue_lock)
++	__acquires(rcu) __acquires(&bdev->bd_disk->queue->queue_lock)
+ {
+-	struct gendisk *disk;
++	struct block_device *bdev;
+ 	struct request_queue *q;
+ 	struct blkcg_gq *blkg;
+ 	int ret;
+ 
+-	disk = blkcg_conf_get_disk(&input);
+-	if (IS_ERR(disk))
+-		return PTR_ERR(disk);
++	bdev = blkcg_conf_open_bdev(&input);
++	if (IS_ERR(bdev))
++		return PTR_ERR(bdev);
+ 
+-	q = disk->queue;
++	q = bdev->bd_disk->queue;
+ 
+ 	rcu_read_lock();
+ 	spin_lock_irq(&q->queue_lock);
+@@ -689,7 +689,7 @@ int blkg_conf_prep(struct blkcg *blkcg, const struct blkcg_policy *pol,
+ 			goto success;
+ 	}
+ success:
+-	ctx->disk = disk;
++	ctx->bdev = bdev;
+ 	ctx->blkg = blkg;
+ 	ctx->body = input;
+ 	return 0;
+@@ -700,7 +700,7 @@ int blkg_conf_prep(struct blkcg *blkcg, const struct blkcg_policy *pol,
+ 	spin_unlock_irq(&q->queue_lock);
+ 	rcu_read_unlock();
+ fail:
+-	put_disk_and_module(disk);
++	blkdev_put(bdev, FMODE_NDELAY);
+ 	/*
+ 	 * If queue was bypassing, we should retry.  Do so after a
+ 	 * short msleep().  It isn't strictly necessary but queue
+@@ -723,11 +723,11 @@ EXPORT_SYMBOL_GPL(blkg_conf_prep);
+  * with blkg_conf_prep().
+  */
+ void blkg_conf_finish(struct blkg_conf_ctx *ctx)
+-	__releases(&ctx->disk->queue->queue_lock) __releases(rcu)
++	__releases(&ctx->bdev->bd_disk->queue->queue_lock) __releases(rcu)
+ {
+-	spin_unlock_irq(&ctx->disk->queue->queue_lock);
++	spin_unlock_irq(&ctx->bdev->bd_disk->queue->queue_lock);
+ 	rcu_read_unlock();
+-	put_disk_and_module(ctx->disk);
++	blkdev_put(ctx->bdev, FMODE_NDELAY);
+ }
+ EXPORT_SYMBOL_GPL(blkg_conf_finish);
+ 
+diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+index bbe86d1199dc5b..9f219718e9813c 100644
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -3120,23 +3120,23 @@ static const match_table_t qos_tokens = {
+ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
+ 			     size_t nbytes, loff_t off)
+ {
+-	struct gendisk *disk;
++	struct block_device *bdev;
+ 	struct ioc *ioc;
+ 	u32 qos[NR_QOS_PARAMS];
+ 	bool enable, user;
+ 	char *p;
+ 	int ret;
+ 
+-	disk = blkcg_conf_get_disk(&input);
+-	if (IS_ERR(disk))
+-		return PTR_ERR(disk);
++	bdev = blkcg_conf_open_bdev(&input);
++	if (IS_ERR(bdev))
++		return PTR_ERR(bdev);
+ 
+-	ioc = q_to_ioc(disk->queue);
++	ioc = q_to_ioc(bdev->bd_disk->queue);
+ 	if (!ioc) {
+-		ret = blk_iocost_init(disk->queue);
++		ret = blk_iocost_init(bdev->bd_disk->queue);
+ 		if (ret)
+ 			goto err;
+-		ioc = q_to_ioc(disk->queue);
++		ioc = q_to_ioc(bdev->bd_disk->queue);
+ 	}
+ 
+ 	spin_lock_irq(&ioc->lock);
+@@ -3231,12 +3231,12 @@ static ssize_t ioc_qos_write(struct kernfs_open_file *of, char *input,
+ 	ioc_refresh_params(ioc, true);
+ 	spin_unlock_irq(&ioc->lock);
+ 
+-	put_disk_and_module(disk);
++	blkdev_put(bdev, FMODE_NDELAY);
+ 	return nbytes;
+ einval:
+ 	ret = -EINVAL;
+ err:
+-	put_disk_and_module(disk);
++	blkdev_put(bdev, FMODE_NDELAY);
+ 	return ret;
+ }
+ 
+@@ -3287,23 +3287,23 @@ static const match_table_t i_lcoef_tokens = {
+ static ssize_t ioc_cost_model_write(struct kernfs_open_file *of, char *input,
+ 				    size_t nbytes, loff_t off)
+ {
+-	struct gendisk *disk;
++	struct block_device *bdev;
+ 	struct ioc *ioc;
+ 	u64 u[NR_I_LCOEFS];
+ 	bool user;
+ 	char *p;
+ 	int ret;
+ 
+-	disk = blkcg_conf_get_disk(&input);
+-	if (IS_ERR(disk))
+-		return PTR_ERR(disk);
++	bdev = blkcg_conf_open_bdev(&input);
++	if (IS_ERR(bdev))
++		return PTR_ERR(bdev);
+ 
+-	ioc = q_to_ioc(disk->queue);
++	ioc = q_to_ioc(bdev->bd_disk->queue);
+ 	if (!ioc) {
+-		ret = blk_iocost_init(disk->queue);
++		ret = blk_iocost_init(bdev->bd_disk->queue);
+ 		if (ret)
+ 			goto err;
+-		ioc = q_to_ioc(disk->queue);
++		ioc = q_to_ioc(bdev->bd_disk->queue);
+ 	}
+ 
+ 	spin_lock_irq(&ioc->lock);
+@@ -3356,13 +3356,13 @@ static ssize_t ioc_cost_model_write(struct kernfs_open_file *of, char *input,
+ 	ioc_refresh_params(ioc, true);
+ 	spin_unlock_irq(&ioc->lock);
+ 
+-	put_disk_and_module(disk);
++	blkdev_put(bdev, FMODE_NDELAY);
+ 	return nbytes;
+ 
+ einval:
+ 	ret = -EINVAL;
+ err:
+-	put_disk_and_module(disk);
++	blkdev_put(bdev, FMODE_NDELAY);
+ 	return ret;
+ }
+ 
+diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
+index c8fc9792ac776d..b9f3c246c3c908 100644
+--- a/include/linux/blk-cgroup.h
++++ b/include/linux/blk-cgroup.h
+@@ -197,12 +197,12 @@ void blkcg_print_blkgs(struct seq_file *sf, struct blkcg *blkcg,
+ u64 __blkg_prfill_u64(struct seq_file *sf, struct blkg_policy_data *pd, u64 v);
+ 
+ struct blkg_conf_ctx {
+-	struct gendisk			*disk;
++	struct block_device		*bdev;
+ 	struct blkcg_gq			*blkg;
+ 	char				*body;
+ };
+ 
+-struct gendisk *blkcg_conf_get_disk(char **inputp);
++struct block_device *blkcg_conf_open_bdev(char **inputp);
+ int blkg_conf_prep(struct blkcg *blkcg, const struct blkcg_policy *pol,
+ 		   char *input, struct blkg_conf_ctx *ctx);
+ void blkg_conf_finish(struct blkg_conf_ctx *ctx);
 -- 
 2.29.2
 
