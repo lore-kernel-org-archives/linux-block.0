@@ -2,73 +2,110 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-21.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 640C7C2D0E4
-	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 03:29:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4827C2D0E4
+	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 03:34:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1513D2085B
-	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 03:29:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5620F2085B
+	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 03:34:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726736AbgKXD3i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 Nov 2020 22:29:38 -0500
-Received: from mail-pg1-f176.google.com ([209.85.215.176]:38256 "EHLO
-        mail-pg1-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726528AbgKXD3i (ORCPT
+        id S1727393AbgKXDdw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 Nov 2020 22:33:52 -0500
+Received: from out30-54.freemail.mail.aliyun.com ([115.124.30.54]:41461 "EHLO
+        out30-54.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726039AbgKXDdw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Nov 2020 22:29:38 -0500
-Received: by mail-pg1-f176.google.com with SMTP id j19so16200296pgg.5
-        for <linux-block@vger.kernel.org>; Mon, 23 Nov 2020 19:29:38 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=tk7+VHs3A54MHBNnCv10uKUdSrI/jE3yN5ABibRDiUY=;
-        b=ik9tdeTWbjQDcrzI6nW1AATooKxzRfvrtB8u4MIb9G/q9qalPLaroj8AOtKKKMidFp
-         ldG6asCi03Q7PXsW1ETZs7qBYNVB2eO71qjxDfMzcjPpgFV91DrxEbHcA2pjeiAsCqit
-         u1+8NVS/EQtkevZZDrfZ/tE3DlbXojHw3qSBpumy3GZeJX9Fh52amQrugJnyzQcfYfsc
-         RvJGtEGJnQT565z9err1ZWVrk3U7KLynKCcmF06EVSlWqhOKOeNQzTs/0XuArOb0Kfi7
-         v/+rNdbM5+79EPQqoQn6b1Fsu/h4W3JjXmZBuhKC5DUK4sRl0mraL0tEGqL52xBKP9Oa
-         Bv6A==
-X-Gm-Message-State: AOAM531pbLAn/ygN9AFnQM6N2l2tZGiXJR6MWyWb1cM3WR40TIrerLn+
-        3VklUESi1WCwJf12OimFEIQdgcHRAmQ=
-X-Google-Smtp-Source: ABdhPJyKNuXF8srsElWxl86G5Fv8L7MJYCVGyM5K556Aqe/33OS8zCTCadCOeAMy+wSk8rwc6jhmFA==
-X-Received: by 2002:a63:161a:: with SMTP id w26mr2058225pgl.17.1606188577594;
-        Mon, 23 Nov 2020 19:29:37 -0800 (PST)
-Received: from [192.168.3.218] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
-        by smtp.gmail.com with ESMTPSA id 3sm13007624pfv.92.2020.11.23.19.29.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Nov 2020 19:29:36 -0800 (PST)
-Subject: Re: [PATCH blktests 4/5] common/rc: _have_iproute2 fix for "ip -V"
- change
-To:     Yi Zhang <yi.zhang@redhat.com>, osandov@osandov.com
-Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        sagi@grimberg.me
-References: <20201124010427.18595-1-yi.zhang@redhat.com>
- <20201124010427.18595-5-yi.zhang@redhat.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <6f235fda-3d68-f0cc-f714-5c1daf67c28b@acm.org>
-Date:   Mon, 23 Nov 2020 19:29:35 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.3
-MIME-Version: 1.0
-In-Reply-To: <20201124010427.18595-5-yi.zhang@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        Mon, 23 Nov 2020 22:33:52 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R441e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=alimailimapcm10staff010182156082;MF=baolin.wang@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0UGNj0Wa_1606188829;
+Received: from localhost(mailfrom:baolin.wang@linux.alibaba.com fp:SMTPD_---0UGNj0Wa_1606188829)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Tue, 24 Nov 2020 11:33:49 +0800
+From:   Baolin Wang <baolin.wang@linux.alibaba.com>
+To:     axboe@kernel.dk, tj@kernel.org
+Cc:     baolin.wang@linux.alibaba.com, baolin.wang7@gmail.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 1/7] blk-iocost: Fix some typos in comments
+Date:   Tue, 24 Nov 2020 11:33:30 +0800
+Message-Id: <54cf5f249bf91a6d1a0ea18a1024ba1af861f9c5.1606186717.git.baolin.wang@linux.alibaba.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <cover.1606186717.git.baolin.wang@linux.alibaba.com>
+References: <cover.1606186717.git.baolin.wang@linux.alibaba.com>
+In-Reply-To: <cover.1606186717.git.baolin.wang@linux.alibaba.com>
+References: <cover.1606186717.git.baolin.wang@linux.alibaba.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/23/20 5:04 PM, Yi Zhang wrote:
-> With bellow commit, the version will be updated base on the tag
-       ^^^^^^
-       below?
-> fbef6555 replace SNAPSHOT with auto-generated version string
+Fix some typos in comments.
 
-Thanks,
+Signed-off-by: Baolin Wang <baolin.wang@linux.alibaba.com>
+---
+ block/blk-iocost.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-Bart.
+diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+index bbe86d1..4ffde36 100644
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -39,7 +39,7 @@
+  * On top of that, a size cost proportional to the length of the IO is
+  * added.  While simple, this model captures the operational
+  * characteristics of a wide varienty of devices well enough.  Default
+- * paramters for several different classes of devices are provided and the
++ * parameters for several different classes of devices are provided and the
+  * parameters can be configured from userspace via
+  * /sys/fs/cgroup/io.cost.model.
+  *
+@@ -77,7 +77,7 @@
+  *
+  * This constitutes the basis of IO capacity distribution.  Each cgroup's
+  * vtime is running at a rate determined by its hweight.  A cgroup tracks
+- * the vtime consumed by past IOs and can issue a new IO iff doing so
++ * the vtime consumed by past IOs and can issue a new IO if doing so
+  * wouldn't outrun the current device vtime.  Otherwise, the IO is
+  * suspended until the vtime has progressed enough to cover it.
+  *
+@@ -155,7 +155,7 @@
+  * Instead of debugfs or other clumsy monitoring mechanisms, this
+  * controller uses a drgn based monitoring script -
+  * tools/cgroup/iocost_monitor.py.  For details on drgn, please see
+- * https://github.com/osandov/drgn.  The ouput looks like the following.
++ * https://github.com/osandov/drgn.  The output looks like the following.
+  *
+  *  sdb RUN   per=300ms cur_per=234.218:v203.695 busy= +1 vrate= 62.12%
+  *                 active      weight      hweight% inflt% dbt  delay usages%
+@@ -492,7 +492,7 @@ struct ioc_gq {
+ 	/*
+ 	 * `vtime` is this iocg's vtime cursor which progresses as IOs are
+ 	 * issued.  If lagging behind device vtime, the delta represents
+-	 * the currently available IO budget.  If runnning ahead, the
++	 * the currently available IO budget.  If running ahead, the
+ 	 * overage.
+ 	 *
+ 	 * `vtime_done` is the same but progressed on completion rather
+@@ -1046,7 +1046,7 @@ static void __propagate_weights(struct ioc_gq *iocg, u32 active, u32 inuse,
+ 
+ 		/*
+ 		 * The delta between inuse and active sums indicates that
+-		 * that much of weight is being given away.  Parent's inuse
++		 * much of weight is being given away.  Parent's inuse
+ 		 * and active should reflect the ratio.
+ 		 */
+ 		if (parent->child_active_sum) {
+@@ -2400,7 +2400,7 @@ static u64 adjust_inuse_and_calc_cost(struct ioc_gq *iocg, u64 vtime,
+ 		return cost;
+ 
+ 	/*
+-	 * We only increase inuse during period and do so iff the margin has
++	 * We only increase inuse during period and do so if the margin has
+ 	 * deteriorated since the previous adjustment.
+ 	 */
+ 	if (margin >= iocg->saved_margin || margin >= margins->low ||
+-- 
+1.8.3.1
+
