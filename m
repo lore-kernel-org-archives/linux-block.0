@@ -5,39 +5,39 @@ X-Spam-Level:
 X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70986C83039
-	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 13:28:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA10EC8301D
+	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 13:28:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 18285206F9
-	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 13:28:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 61924208C3
+	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 13:28:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="X+rA73r6"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ZoLAX4Iy"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388170AbgKXN2s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Nov 2020 08:28:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33620 "EHLO
+        id S2388117AbgKXN2g (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Nov 2020 08:28:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33566 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388166AbgKXN2s (ORCPT
+        with ESMTP id S2388014AbgKXN2e (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Nov 2020 08:28:48 -0500
+        Tue, 24 Nov 2020 08:28:34 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADBD0C0613D6;
-        Tue, 24 Nov 2020 05:28:47 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 436A2C0613D6;
+        Tue, 24 Nov 2020 05:28:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=X5DUE98moi230PHv1tVgCiHzV+UhCd8lztDnZO9kG5c=; b=X+rA73r6QDOVyee+DSa3rW8b35
-        OeKaTwg4NHeZa8iiOjrhEjDtW7DX4fOMB9c6aebaBDKuxk+IsDdUW0f7EuZlr2Pov3PURxlMx5rSK
-        PBcTmBTO0WyZ7LcgWQ6Xl/0zPJFv0c+ZKh43ZOCIkVopkoFOK48fZGWf8ai+Cj/OoZO3jhvVw5m5Q
-        yaSWPl46Vb8ovXNenLX8KK6YPvBJf1LP9VoLMLET0fF69TiH7hVM4rzUe6WIONjC+Mkq9y1ueE05Y
-        CfQTDXafYdPFj4peFCtKw/0RrMBMz1uLe6nNpgZh858syqReHUhfMsbGLdWOS/inGodpPctzqcSuj
-        FQUx+Tzw==;
+        bh=2AKcef4DY6iJcprvQynjGgbCIgh8d3+qztu8J6nwbBU=; b=ZoLAX4IygcjKDDGL+R/L/NGfMA
+        YlwR4qVUSVXjC/FQMPi9yNLQklagBSMZXN97OugbTjH0foML7tKuGRsO8QpQgajPY1ljXymAqnVGj
+        hBYSVVrFavzJRjAMnvihP4CU0J0lD++Ohhxbd0ATXtBWfXwjb/MhAMjN2LmALGIzwn1CsBVK8t7wz
+        SLIy4zz38tAxtqZlDxVQ3r1Vyfx0sAlWysmBq2CqEt2VFhQHpxjxBLAjG2dhmtEJWNshJafCuVX9Q
+        8FnIDbA6123YSNJdoCn/kvc5rA13f5YX11HXcmevu5u8KVx9s1pGUvc4r6ukRByzfoXWk785N632H
+        EJ0mLWSQ==;
 Received: from [2001:4bb8:180:5443:c70:4a89:bc61:3] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1khYMo-0006YR-Rc; Tue, 24 Nov 2020 13:28:23 +0000
+        id 1khYMY-0006VC-60; Tue, 24 Nov 2020 13:28:06 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
@@ -51,9 +51,9 @@ Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
         xen-devel@lists.xenproject.org, linux-bcache@vger.kernel.org,
         linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
         linux-mm@kvack.org
-Subject: [PATCH 19/45] init: cleanup match_dev_by_uuid and match_dev_by_label
-Date:   Tue, 24 Nov 2020 14:27:25 +0100
-Message-Id: <20201124132751.3747337-20-hch@lst.de>
+Subject: [PATCH 08/45] loop: do not call set_blocksize
+Date:   Tue, 24 Nov 2020 14:27:14 +0100
+Message-Id: <20201124132751.3747337-9-hch@lst.de>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201124132751.3747337-1-hch@lst.de>
 References: <20201124132751.3747337-1-hch@lst.de>
@@ -64,54 +64,28 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Avoid a totally pointless goto label, and use the same style of
-comparism for both helpers.
+set_blocksize is used by file systems to use their preferred buffer cache
+block size.  Block drivers should not set it.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Reviewed-by: Jan Kara <jack@suse.cz>
-Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 ---
- init/do_mounts.c | 18 ++++++------------
- 1 file changed, 6 insertions(+), 12 deletions(-)
+ drivers/block/loop.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/init/do_mounts.c b/init/do_mounts.c
-index afa26a4028d25e..5879edf083b318 100644
---- a/init/do_mounts.c
-+++ b/init/do_mounts.c
-@@ -79,15 +79,10 @@ static int match_dev_by_uuid(struct device *dev, const void *data)
- 	const struct uuidcmp *cmp = data;
- 	struct hd_struct *part = dev_to_part(dev);
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 9a27d4f1c08aac..b42c728620c9e4 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1164,9 +1164,6 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
+ 	size = get_loop_size(lo, file);
+ 	loop_set_size(lo, size);
  
--	if (!part->info)
--		goto no_match;
+-	set_blocksize(bdev, S_ISBLK(inode->i_mode) ?
+-		      block_size(inode->i_bdev) : PAGE_SIZE);
 -
--	if (strncasecmp(cmp->uuid, part->info->uuid, cmp->len))
--		goto no_match;
--
-+	if (!part->info ||
-+	    strncasecmp(cmp->uuid, part->info->uuid, cmp->len))
-+		return 0;
- 	return 1;
--no_match:
--	return 0;
- }
- 
- /**
-@@ -174,10 +169,9 @@ static int match_dev_by_label(struct device *dev, const void *data)
- 	const char *label = data;
- 	struct hd_struct *part = dev_to_part(dev);
- 
--	if (part->info && !strcmp(label, part->info->volname))
--		return 1;
--
--	return 0;
-+	if (!part->info || strcmp(label, part->info->volname))
-+		return 0;
-+	return 1;
- }
- 
- static dev_t devt_from_partlabel(const char *label)
+ 	lo->lo_state = Lo_bound;
+ 	if (part_shift)
+ 		lo->lo_flags |= LO_FLAGS_PARTSCAN;
 -- 
 2.29.2
 
