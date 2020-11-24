@@ -2,144 +2,102 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F07EC2D0E4
-	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 18:01:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EED76C6379D
+	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 18:04:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1266B206D5
-	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 18:01:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AEB81206D5
+	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 18:04:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hy/pnL6M"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="is4ScJMt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390845AbgKXSB6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Nov 2020 13:01:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48056 "EHLO
+        id S2404136AbgKXSEB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Nov 2020 13:04:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390842AbgKXSB6 (ORCPT
+        with ESMTP id S1728945AbgKXSEB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Nov 2020 13:01:58 -0500
-Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E90BAC0613D6
-        for <linux-block@vger.kernel.org>; Tue, 24 Nov 2020 10:01:57 -0800 (PST)
-Received: by mail-wr1-x431.google.com with SMTP id p8so23277107wrx.5
-        for <linux-block@vger.kernel.org>; Tue, 24 Nov 2020 10:01:57 -0800 (PST)
+        Tue, 24 Nov 2020 13:04:01 -0500
+Received: from mail-qk1-x741.google.com (mail-qk1-x741.google.com [IPv6:2607:f8b0:4864:20::741])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFB08C0613D6;
+        Tue, 24 Nov 2020 10:04:00 -0800 (PST)
+Received: by mail-qk1-x741.google.com with SMTP id l2so21723413qkf.0;
+        Tue, 24 Nov 2020 10:04:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=2UeSxtr8F5MKjjgRzkdBiAIGeYvef1JkimaFWN5LzuM=;
-        b=Hy/pnL6MgrnpG01xX/KfSrrnJv0CKyFAUCJzV5xgh7iVP6PPdzLI1Rk/I0bvxlgXfs
-         DHuBu+hWsFov0AdPn4sY83VHHuHjBWLXy3PYvVoO4Cu+a0MT2RGpu15jZZttoojj+KL0
-         NcBlS9AUxoNc4YInW9JN+DzVW0JnRj/jKnfw50xBW0SE+UnJ7YzSD9zsbUpe/6rhzEqa
-         mQH9DlB/lhTOGCm174aaH7MoBy+lqYvikq9BpPQQTFVVfa0db+sHmM6bkyHxpQewKBou
-         HdaSpKqqoQSPqAqPaANoQheQeHhQ4hTFC7sdXqufqRRSfoYEDvXgR4omCCuYFSv2uqcX
-         EuNA==
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=8qZ2mbF42a4EoCPjpueBEzfe9XOwF2IptTReGgUwObs=;
+        b=is4ScJMtRgB8A67gco8/ShkniDzY10n7rMewX714/9E8uwhLChpIiLuhS9NYdAwKZO
+         wwPFFE1umeJEQtu7KDxbrmdClPTpQcYjr1RpDpjnuZBK1iq0PQfGRfm19X+XI49NQayK
+         8lAFgH0g1BclA/vf2p2mEb1VckBHMRHQuZY2MAZGNuGYbRuKC1k7RL8V45KondL8dAgu
+         pkggwpY/K/3AGEFSp3YuAHk/ID2wYfhEWzIb5TQJq39NiNddKNAmZTO9FhKaayKgBddH
+         Z4wiCaTnVN8dlV2LZgcg+T7QWmffCA0edb1cuImXXMdzH67nJfiqgEY4ncID7PjQAYKh
+         /ZGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=2UeSxtr8F5MKjjgRzkdBiAIGeYvef1JkimaFWN5LzuM=;
-        b=ZYxUNf8qSPlbyxjA79yjFwE1l6xt+LrzffGmyM3Tf8sb4v+RfuiFVWaWvSPysFP9Fl
-         birjeCo1mTuCY6ccIUjWMxjg9nSpcCcRzittPK6GgXYDU2Ff5nn4okD191/N+7wUfH6v
-         VXPY83oJ/ziJYXJPbLs2EhkKgUomSb5Os3NLkyQSUhUawiEg8u/xJYekX+42MGE6Dt1a
-         VQfS3bD/KbyQGIGhoe6F2OlHrBOIL3g1IkInX4OWVSt5APEI9AlaV1G4uEwuRYZXOKzO
-         6wzkH7vIa52AP9vJDEwfjB4MWYLKkDQ5oZnXe8wyIIf3Bg+yUG+hXO0dZ8ij9udU7YIf
-         hIWw==
-X-Gm-Message-State: AOAM530YnirpWVEH02AW4i8q+TU8SlyhSzX9gOpPNV+obYS6dUQ1ECYu
-        xsVHmk2WnpI2Gczxm2wnefg=
-X-Google-Smtp-Source: ABdhPJzpMyQdO2xkf3pOxKT5kSF9qcXbAUrJ+RwOSeI7IcKlVg+jj/SnDcnG/Y1NJ8XSlk5PS2/LxQ==
-X-Received: by 2002:adf:e449:: with SMTP id t9mr6659789wrm.257.1606240916660;
-        Tue, 24 Nov 2020 10:01:56 -0800 (PST)
-Received: from localhost.localdomain (host109-152-100-135.range109-152.btcentralplus.com. [109.152.100.135])
-        by smtp.gmail.com with ESMTPSA id x4sm12246403wrv.81.2020.11.24.10.01.54
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=8qZ2mbF42a4EoCPjpueBEzfe9XOwF2IptTReGgUwObs=;
+        b=d6DHjdJRsXIAyhuzzQGB2cDDK00FvW9xeTKRd83jonBdF9eoKqZzxhmT6x4wf6CiKR
+         KtCvmbkH+opxH/7hGXHcbsdeYeg2DiPDrxK/mJ2/ELOOtwR78z7fsy1O6Sy3xsBm4f19
+         gxwjskdO8UBHzQbS6A/i7pqX3LB+yljDKK+qEarY4BbWZbH7Ru4SJSbm+L/hNMyQqd7j
+         QM6tdjqb+7UHqm245XR616UxE11dC3z66CwtT7h78BqmTk8M+03AzVIwY1VUH+JuP0AG
+         akNV6Kfl/lvo5ufsnRdb8H4BpScyAv6wucPcf8Ae2J9Lz0w4dQSZfxgyR7UwpK/eX/Zt
+         mxfA==
+X-Gm-Message-State: AOAM530RuBpKSjUPia7QYvlM6BfxKqblNzYmsMwxaag/tzut7mZRGcOx
+        QcREZjSMyfF4lB3ZAzzYrlw=
+X-Google-Smtp-Source: ABdhPJypHMVf10j8dqLbG3/kMc2wzxScN+9Rw3Fm44OZCed30V+ovAuzBFJQGc76NiRl6CUPNsyaww==
+X-Received: by 2002:ae9:e007:: with SMTP id m7mr5836885qkk.416.1606241040110;
+        Tue, 24 Nov 2020 10:04:00 -0800 (PST)
+Received: from localhost (dhcp-6c-ae-f6-dc-d8-61.cpe.echoes.net. [72.28.8.195])
+        by smtp.gmail.com with ESMTPSA id c14sm13621716qko.29.2020.11.24.10.03.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Nov 2020 10:01:55 -0800 (PST)
-From:   Pavel Begunkov <asml.silence@gmail.com>
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Cc:     Ming Lei <ming.lei@redhat.com>,
-        Christoph Hellwig <hch@infradead.org>
-Subject: [PATCH 2/2] bio: optimise bvec iteration
-Date:   Tue, 24 Nov 2020 17:58:13 +0000
-Message-Id: <e1acd31d91a1e9501a5420d6ac1488a4412a0353.1606240077.git.asml.silence@gmail.com>
-X-Mailer: git-send-email 2.24.0
-In-Reply-To: <cover.1606240077.git.asml.silence@gmail.com>
-References: <cover.1606240077.git.asml.silence@gmail.com>
+        Tue, 24 Nov 2020 10:03:59 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Tue, 24 Nov 2020 13:03:36 -0500
+From:   Tejun Heo <tj@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Josef Bacik <josef@toxicpanda.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Coly Li <colyli@suse.de>, Mike Snitzer <snitzer@redhat.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jan Kara <jack@suse.cz>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        dm-devel@redhat.com, Richard Weinberger <richard@nod.at>,
+        Jan Kara <jack@suse.com>, linux-block@vger.kernel.org,
+        xen-devel@lists.xenproject.org, linux-bcache@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: Re: [PATCH 21/45] block: refactor blkdev_get
+Message-ID: <X71K+JS+xnGs+EPF@mtj.duckdns.org>
+References: <20201124132751.3747337-1-hch@lst.de>
+ <20201124132751.3747337-22-hch@lst.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201124132751.3747337-22-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-__bio_for_each_bvec(), __bio_for_each_segment() and bio_copy_data_iter()
-fall under conditions of bvec_iter_advance_single(), which is a faster
-and slimmer version of bvec_iter_advance(). Add
-bio_advance_iter_single() and convert them.
+On Tue, Nov 24, 2020 at 02:27:27PM +0100, Christoph Hellwig wrote:
+> Move more code that is only run on the outer open but not the open of
+> the underlying whole device when opening a partition into blkdev_get,
+> which leads to a much easier to follow structure.
+> 
+> This allows to simplify the disk and module refcounting so that one
+> reference is held for each open, similar to what we do with normal
+> file operations.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
----
- block/bio.c         |  4 ++--
- include/linux/bio.h | 17 +++++++++++++++--
- 2 files changed, 17 insertions(+), 4 deletions(-)
+Acked-by: Tejun Heo <tj@kernel.org>
 
-diff --git a/block/bio.c b/block/bio.c
-index fa01bef35bb1..8e718920457a 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1212,8 +1212,8 @@ void bio_copy_data_iter(struct bio *dst, struct bvec_iter *dst_iter,
- 
- 		flush_dcache_page(dst_bv.bv_page);
- 
--		bio_advance_iter(src, src_iter, bytes);
--		bio_advance_iter(dst, dst_iter, bytes);
-+		bio_advance_iter_single(src, src_iter, bytes);
-+		bio_advance_iter_single(dst, dst_iter, bytes);
- 	}
- }
- EXPORT_SYMBOL(bio_copy_data_iter);
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index c6d765382926..d55d53c49ae4 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -148,11 +148,24 @@ static inline void bio_advance_iter(const struct bio *bio,
- 		/* TODO: It is reasonable to complete bio with error here. */
- }
- 
-+/* @bytes should be less or equal to bvec[i->bi_idx].bv_len */
-+static inline void bio_advance_iter_single(const struct bio *bio,
-+					   struct bvec_iter *iter,
-+					   unsigned int bytes)
-+{
-+	iter->bi_sector += bytes >> 9;
-+
-+	if (bio_no_advance_iter(bio))
-+		iter->bi_size -= bytes;
-+	else
-+		bvec_iter_advance_single(bio->bi_io_vec, iter, bytes);
-+}
-+
- #define __bio_for_each_segment(bvl, bio, iter, start)			\
- 	for (iter = (start);						\
- 	     (iter).bi_size &&						\
- 		((bvl = bio_iter_iovec((bio), (iter))), 1);		\
--	     bio_advance_iter((bio), &(iter), (bvl).bv_len))
-+	     bio_advance_iter_single((bio), &(iter), (bvl).bv_len))
- 
- #define bio_for_each_segment(bvl, bio, iter)				\
- 	__bio_for_each_segment(bvl, bio, iter, (bio)->bi_iter)
-@@ -161,7 +174,7 @@ static inline void bio_advance_iter(const struct bio *bio,
- 	for (iter = (start);						\
- 	     (iter).bi_size &&						\
- 		((bvl = mp_bvec_iter_bvec((bio)->bi_io_vec, (iter))), 1); \
--	     bio_advance_iter((bio), &(iter), (bvl).bv_len))
-+	     bio_advance_iter_single((bio), &(iter), (bvl).bv_len))
- 
- /* iterate over multi-page bvec */
- #define bio_for_each_bvec(bvl, bio, iter)			\
+Thanks.
+
 -- 
-2.24.0
-
+tejun
