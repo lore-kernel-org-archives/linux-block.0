@@ -2,112 +2,125 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B06FC2D0E4
-	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 11:25:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D57DFC56201
+	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 11:38:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B76362073C
-	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 11:25:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7FBE22075A
+	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 11:38:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="MFZotgzj"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZaeHVS9h"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728664AbgKXLZw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Nov 2020 06:25:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42884 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728346AbgKXLZw (ORCPT
+        id S1732932AbgKXLiD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Nov 2020 06:38:03 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:20505 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1732792AbgKXLiB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Nov 2020 06:25:52 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5879EC0613D6;
-        Tue, 24 Nov 2020 03:25:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=1Dpp35VNzzVY1mp0WA/1Cvo1UHAnm1YWWDrLG3ha8rE=; b=MFZotgzjDln27OPQ2DNNT42slG
-        6vQ5a/ewh8C1T8ij73qDW+8f9nfl/3jWUnhcflW4k8GnUn6HINjYaQUMUqT2LAruEJj9+VhaBwSan
-        P7aHYs+TIVXrKl/H505uH3yUZmlOmn1TvUCeLnRal+jspF5EbSzJXihplXNSlsl2bpNKKnGzBfXN3
-        w1w9hLNVdVlb6rVAH1CKu34Yy9eULOSK6q27s4+w85kaNRttS3kaRaMILPvi70rGK6Do7h8eyZeCi
-        QI/QHq2YCKdD+Hah/GPLIZYdApXrUrRKlYz/Ygz0se8V/BjWhgr6vUswjI4oZVZ4wTuJ/Z1qzHEaL
-        XR8dtOSQ==;
-Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1khWSB-0007Cm-Vv; Tue, 24 Nov 2020 11:25:48 +0000
-Date:   Tue, 24 Nov 2020 11:25:47 +0000
-From:   Christoph Hellwig <hch@infradead.org>
-To:     JeffleXu <jefflexu@linux.alibaba.com>
-Cc:     Christoph Hellwig <hch@infradead.org>, axboe@kernel.dk,
-        ming.lei@redhat.com, linux-block@vger.kernel.org,
-        io-uring@vger.kernel.org, joseph.qi@linux.alibaba.com
-Subject: Re: [PATCH v4 2/2] block,iomap: disable iopoll when split needed
-Message-ID: <20201124112547.GA26805@infradead.org>
-References: <20201117075625.46118-1-jefflexu@linux.alibaba.com>
- <20201117075625.46118-3-jefflexu@linux.alibaba.com>
- <20201119175516.GB20944@infradead.org>
- <ed355fc8-6fc8-5ffd-f1e9-6ba19f761a09@linux.alibaba.com>
+        Tue, 24 Nov 2020 06:38:01 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1606217880;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=4EKV2Um7/yJIu8VsarQJwEZ8n5C8kG7HOAuj6t2iAfw=;
+        b=ZaeHVS9hO9Uv/9xTBxANgzR/xV7H8rwhBKrbmk7rw1a6sfmRifZ3aoyAh9xGICH71++lMU
+        f3qTyrB2bInxG9nChXMUJJQJjz7I3mlFuA3aodHgT70CmrJSDUdeRZ0hEpk9G572D5f6kM
+        lF8n4EEJZXMW4qaBSj/mBBIeaijsU7c=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-96-fkJl_pP-Mdu07RMLrlJGVw-1; Tue, 24 Nov 2020 06:37:56 -0500
+X-MC-Unique: fkJl_pP-Mdu07RMLrlJGVw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9E9518C0211;
+        Tue, 24 Nov 2020 11:37:37 +0000 (UTC)
+Received: from T590 (ovpn-13-202.pek2.redhat.com [10.72.13.202])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 567556F450;
+        Tue, 24 Nov 2020 11:37:33 +0000 (UTC)
+Date:   Tue, 24 Nov 2020 19:37:29 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Pavel Begunkov <asml.silence@gmail.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 5.11] block: optimise for_each_bvec() advance
+Message-ID: <20201124113729.GA88892@T590>
+References: <60aaa6caab3d061cf7194716c27a10920b5bd7ad.1606212786.git.asml.silence@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ed355fc8-6fc8-5ffd-f1e9-6ba19f761a09@linux.alibaba.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <60aaa6caab3d061cf7194716c27a10920b5bd7ad.1606212786.git.asml.silence@gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Nov 20, 2020 at 06:06:54PM +0800, JeffleXu wrote:
+On Tue, Nov 24, 2020 at 10:21:23AM +0000, Pavel Begunkov wrote:
+> Because of how for_each_bvec() works it never advances across multiple
+> entries at a time, so bvec_iter_advance() is an overkill. Add
+> specialised bvec_iter_advance_single() that is faster. It also handles
+> zero-len bvecs, so can kill bvec_iter_skip_zero_bvec().
 > 
-> On 11/20/20 1:55 AM, Christoph Hellwig wrote:
-> > > diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
-> > > index 933f234d5bec..396ac0f91a43 100644
-> > > --- a/fs/iomap/direct-io.c
-> > > +++ b/fs/iomap/direct-io.c
-> > > @@ -309,6 +309,16 @@ iomap_dio_bio_actor(struct inode *inode, loff_t pos, loff_t length,
-> > >   		copied += n;
-> > >   		nr_pages = iov_iter_npages(dio->submit.iter, BIO_MAX_PAGES);
-> > > +		/*
-> > > +		 * The current dio needs to be split into multiple bios here.
-> > > +		 * iopoll for split bio will cause subtle trouble such as
-> > > +		 * hang when doing sync polling, while iopoll is initially
-> > > +		 * for small size, latency sensitive IO. Thus disable iopoll
-> > > +		 * if split needed.
-> > > +		 */
-> > > +		if (nr_pages)
-> > > +			dio->iocb->ki_flags &= ~IOCB_HIPRI;
-> > I think this is confusing two things.
+>    text    data     bss     dec     hex filename
+> before:
+>   23977     805       0   24782    60ce lib/iov_iter.o
+> before, bvec_iter_advance() w/o WARN_ONCE()
+>   22886     600       0   23486    5bbe ./lib/iov_iter.o
+> after:
+>   21862     600       0   22462    57be lib/iov_iter.o
 > 
-> Indeed there's two level of split concerning this issue when doing sync
-> iopoll.
+> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+> ---
+>  include/linux/bvec.h | 16 +++++++++++-----
+>  1 file changed, 11 insertions(+), 5 deletions(-)
 > 
+> diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+> index 2efec10bf792..4a304dfafa18 100644
+> --- a/include/linux/bvec.h
+> +++ b/include/linux/bvec.h
+> @@ -121,18 +121,24 @@ static inline bool bvec_iter_advance(const struct bio_vec *bv,
+>  	return true;
+>  }
+>  
+> -static inline void bvec_iter_skip_zero_bvec(struct bvec_iter *iter)
+> +static inline void bvec_iter_advance_single(const struct bio_vec *bv,
+> +				struct bvec_iter *iter, unsigned int bytes)
+>  {
+> -	iter->bi_bvec_done = 0;
+> -	iter->bi_idx++;
+> +	unsigned int done = iter->bi_bvec_done + bytes;
+> +
+> +	if (done == bv[iter->bi_idx].bv_len) {
+> +		done = 0;
+> +		iter->bi_idx++;
+> +	}
+> +	iter->bi_bvec_done = done;
+> +	iter->bi_size -= bytes;
+>  }
+>  
+>  #define for_each_bvec(bvl, bio_vec, iter, start)			\
+>  	for (iter = (start);						\
+>  	     (iter).bi_size &&						\
+>  		((bvl = bvec_iter_bvec((bio_vec), (iter))), 1);	\
+> -	     (bvl).bv_len ? (void)bvec_iter_advance((bio_vec), &(iter),	\
+> -		     (bvl).bv_len) : bvec_iter_skip_zero_bvec(&(iter)))
+> +	     bvec_iter_advance_single((bio_vec), &(iter), (bvl).bv_len))
+>  
+>  /* for iterating one bio from start to end */
+>  #define BVEC_ITER_ALL_INIT (struct bvec_iter)				\
+> -- 
+> 2.24.0
 > 
-> The first is that one bio got split in block-core, and patch 1 of this patch
-> set just fixes this.
-> 
-> 
-> Second is that one dio got split into multiple bios in fs layer, and patch 2
-> fixes this.
-> 
-> 
-> >   One is that we don't handle
-> > polling well when there are multiple bios.  For this I think we should
-> > only call bio_set_polled when we know there is a single bio.
-> 
-> 
-> How about the following patch:
-> 
-> 
-> --- a/fs/iomap/direct-io.c
-> +++ b/fs/iomap/direct-io.c
-> @@ -60,12 +60,12 @@ int iomap_dio_iopoll(struct kiocb *kiocb, bool spin)
-> ??EXPORT_SYMBOL_GPL(iomap_dio_iopoll);
-> 
-> ??static void iomap_dio_submit_bio(struct iomap_dio *dio, struct iomap
-> *iomap,
-> -???????????????????????????? struct bio *bio, loff_t pos)
-> +???????????????????????????? struct bio *bio, loff_t pos, bool split)
 
-This seems pretty messed up by your mailer and I have a hard time
-reading it.  Can you resend it?
+Looks fine,
+
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+
+Thanks,
+Ming
+
