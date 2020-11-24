@@ -2,322 +2,122 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48167C2D0E4
-	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 21:08:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE751C6379D
+	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 21:19:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 90C3620715
-	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 21:08:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7996420715
+	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 21:19:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="al1tezwu"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OzhyL5qO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729550AbgKXVIQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Nov 2020 16:08:16 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39470 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728312AbgKXVIQ (ORCPT
+        id S1730727AbgKXVTP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Nov 2020 16:19:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50416 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730537AbgKXVTO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Nov 2020 16:08:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1606252093;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=9WuJKBZA7v6dln/Ze4aIM10HFqbp/pynhdLtgpd/B4c=;
-        b=al1tezwuvjyRnWCXp2LxQVKWLhNxtbv2nTincnVLjun3jEzmoWHuRXI3GoAgg41NWJE5mf
-        +8gcwJaZgROoTaS7tm8fAsV1HWacMHRIocp+FLhtTJGE/h5SnkRqiJwtO87q7EBHi9VVxa
-        wzLifgnXf2NSl9V5gokPQrn2bTcGUOc=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-143-GL8KffeTMhClNMBk8pv1TA-1; Tue, 24 Nov 2020 16:08:11 -0500
-X-MC-Unique: GL8KffeTMhClNMBk8pv1TA-1
-Received: by mail-wm1-f69.google.com with SMTP id y21so13985wma.6
-        for <linux-block@vger.kernel.org>; Tue, 24 Nov 2020 13:08:11 -0800 (PST)
+        Tue, 24 Nov 2020 16:19:14 -0500
+Received: from mail-qv1-xf44.google.com (mail-qv1-xf44.google.com [IPv6:2607:f8b0:4864:20::f44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87980C0613D6;
+        Tue, 24 Nov 2020 13:19:14 -0800 (PST)
+Received: by mail-qv1-xf44.google.com with SMTP id x13so11347052qvk.8;
+        Tue, 24 Nov 2020 13:19:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=sg9SO3UStMfqHkCvNI1YBGGkjTmKJ7UaheqYby9uxnM=;
+        b=OzhyL5qOUmNMCmaqmA0AJ7YTZnOa5s8lOvdGSd5gsRFwIjVjcK9RMkEdmOZVvPKHkC
+         HEfwzTPFGhRpcwv4Zdi1eKZAQCSJDqL9242nm6t+004qxnjr2Wo1RG+dvaQzjYpDTlFJ
+         y4MEeMckfEdVhdL9TeWxoL3uJseLhfNpPNLJKI+4lWddjQrQSYtmPS6DbLtZKSCyuI0M
+         VPOnBALIPZDz9HaljCXz/QtzQMoFkORQ/oSOcQG0yJ5cuTGS83XWqbo7FaIck74bBkz3
+         zSrrMusanZp5T2dH6BfcuYD799YU+BVDp+VbnKu/pAzjL4fvbG44Apq0OxYfntbUtAy3
+         IgsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=9WuJKBZA7v6dln/Ze4aIM10HFqbp/pynhdLtgpd/B4c=;
-        b=ZOQciFYuqMLa0oQ/Q07oFA+xnsvYsGR7whFq8K771hIlAJBH15QwazVv8MTIfak+t6
-         D1YgehmgavaOamWa1kwc9qigZAS9OJEhr7MRgtBoVkE3Dc6jJgsC85iQNnBlWJFrxs+6
-         Z4xQ7z5o8TQkTkL6WqZJJGXB1ufyg4yMgdAVkG3k/A9YUtEEx6OZ4FT/g6lAvJrS0IjU
-         uoaLEed148tZBvUzMjZftZIkvOCN/AvzOkjGpix7lfJul82HGNJ9CzBdRXIRP8CBWM65
-         hn3+EQwufcPD0QrPNa1EETsElOUN/YrpStLu4gICZsQ/u0ZvjJdx0Jfd5SEsBzywadNp
-         s0vw==
-X-Gm-Message-State: AOAM532NXgoR2Pa3Jj0e6ZprF5KfxlRdWLlcsM8pIEbOF1x5MW2LpHjz
-        LzIDOPg4mmq4MWdYFKBoxs4G0dDc4yS2FiwCMkVOvMAsWJYEXa4x1eLFcckb209bFPX1YBlSp9n
-        NvgdN+8xZUTiCO72EcMxj1hA=
-X-Received: by 2002:a5d:570d:: with SMTP id a13mr381875wrv.193.1606252090787;
-        Tue, 24 Nov 2020 13:08:10 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzoKIBssI4HGDyzY0qu85iBHGqHaEokuLsbgGjIwpz+g5/1A4bY+pROXvrDQETbZQrYR4rQSg==
-X-Received: by 2002:a5d:570d:: with SMTP id a13mr381855wrv.193.1606252090578;
-        Tue, 24 Nov 2020 13:08:10 -0800 (PST)
-Received: from redhat.com (bzq-79-176-44-197.red.bezeqint.net. [79.176.44.197])
-        by smtp.gmail.com with ESMTPSA id w3sm193480wma.3.2020.11.24.13.08.08
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=sg9SO3UStMfqHkCvNI1YBGGkjTmKJ7UaheqYby9uxnM=;
+        b=n1g0JJ/RP4SqAk6Mdjy3JiroCAh092BbKP4Eja5VZuIY35pQMygfzj/LJ9aq7Ku0gW
+         qKjJZRIJ+bxGeonBTfcdjCfZmk5BXzfblqDqpSp/59EzixJMNHfaTaopzyHQesBaEE6z
+         vk30+zdRANglw/sfmUOgMOZ4hjtgY3POPGRta9bSQQd2cLyI4k5y+r4X0VR0iHgMm8bi
+         AEfKHo6li6zxq63NxPk2PenHHjvc0tpeCelzId80ze8T7rCh5hU02JvF6w1wrqbnxkFu
+         qaDDWBoV7YpD0Rgw00kLn9OE7S/9zQJFtkMHqq48iZr6n5X8X3ySPnzpY/w49q9u6yCh
+         IOuQ==
+X-Gm-Message-State: AOAM532NXsdJBNG+KTnvZF/WK4ktYltxuDwbcdFCMKmiNuHSlY2jmeb2
+        1AQF5ZjcRbJDe5WfHdR5adg=
+X-Google-Smtp-Source: ABdhPJymsM7t3QC8HGlAx0p+5Wt4X/uLuUZsX3zmVjKyK1/8swtwKOE7/+uzSFJWv6qwdRjGjoCR5w==
+X-Received: by 2002:a0c:fa08:: with SMTP id q8mr548456qvn.25.1606252753574;
+        Tue, 24 Nov 2020 13:19:13 -0800 (PST)
+Received: from localhost (dhcp-6c-ae-f6-dc-d8-61.cpe.echoes.net. [72.28.8.195])
+        by smtp.gmail.com with ESMTPSA id c27sm387614qkk.57.2020.11.24.13.19.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Nov 2020 13:08:09 -0800 (PST)
-Date:   Tue, 24 Nov 2020 16:08:06 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Laurent Vivier <lvivier@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Paul Mackerras <paulus@samba.org>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        linux-block@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
-        linuxppc-dev@lists.ozlabs.org, linux-pci@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH 0/2] powerpc/pseries: fix MSI/X IRQ affinity on pseries
-Message-ID: <20201124160747-mutt-send-email-mst@kernel.org>
-References: <20201124200308.1110744-1-lvivier@redhat.com>
+        Tue, 24 Nov 2020 13:19:12 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Tue, 24 Nov 2020 16:18:49 -0500
+From:   Tejun Heo <tj@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Josef Bacik <josef@toxicpanda.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Coly Li <colyli@suse.de>, Mike Snitzer <snitzer@redhat.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jan Kara <jack@suse.cz>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        dm-devel@redhat.com, Richard Weinberger <richard@nod.at>,
+        Jan Kara <jack@suse.com>, linux-block@vger.kernel.org,
+        xen-devel@lists.xenproject.org, linux-bcache@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: Re: [PATCH 25/45] block: reference struct block_device from struct
+ hd_struct
+Message-ID: <X714udEyPuGarVYp@mtj.duckdns.org>
+References: <20201124132751.3747337-1-hch@lst.de>
+ <20201124132751.3747337-26-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201124200308.1110744-1-lvivier@redhat.com>
+In-Reply-To: <20201124132751.3747337-26-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Nov 24, 2020 at 09:03:06PM +0100, Laurent Vivier wrote:
-> With virtio, in multiqueue case, each queue IRQ is normally
-> bound to a different CPU using the affinity mask.
-> 
-> This works fine on x86_64 but totally ignored on pseries.
-> 
-> This is not obvious at first look because irqbalance is doing
-> some balancing to improve that.
-> 
-> It appears that the "managed" flag set in the MSI entry
-> is never copied to the system IRQ entry.
-> 
-> This series passes the affinity mask from rtas_setup_msi_irqs()
-> to irq_domain_alloc_descs() by adding an affinity parameter to
-> irq_create_mapping().
-> 
-> The first patch adds the parameter (no functional change), the
-> second patch passes the actual affinity mask to irq_create_mapping()
-> in rtas_setup_msi_irqs().
-> 
-> For instance, with 32 CPUs VM and 32 queues virtio-scsi interface:
-> 
-> ... -smp 32 -device virtio-scsi-pci,id=virtio_scsi_pci0,num_queues=32
-> 
-> for IRQ in $(grep virtio2-request /proc/interrupts |cut -d: -f1); do
->     for file in /proc/irq/$IRQ/ ; do
->         echo -n "IRQ: $(basename $file) CPU: " ; cat $file/smp_affinity_list
->     done
-> done
-> 
-> Without the patch (and without irqbalanced)
-> 
-> IRQ: 268 CPU: 0-31
-> IRQ: 269 CPU: 0-31
-> IRQ: 270 CPU: 0-31
-> IRQ: 271 CPU: 0-31
-> IRQ: 272 CPU: 0-31
-> IRQ: 273 CPU: 0-31
-> IRQ: 274 CPU: 0-31
-> IRQ: 275 CPU: 0-31
-> IRQ: 276 CPU: 0-31
-> IRQ: 277 CPU: 0-31
-> IRQ: 278 CPU: 0-31
-> IRQ: 279 CPU: 0-31
-> IRQ: 280 CPU: 0-31
-> IRQ: 281 CPU: 0-31
-> IRQ: 282 CPU: 0-31
-> IRQ: 283 CPU: 0-31
-> IRQ: 284 CPU: 0-31
-> IRQ: 285 CPU: 0-31
-> IRQ: 286 CPU: 0-31
-> IRQ: 287 CPU: 0-31
-> IRQ: 288 CPU: 0-31
-> IRQ: 289 CPU: 0-31
-> IRQ: 290 CPU: 0-31
-> IRQ: 291 CPU: 0-31
-> IRQ: 292 CPU: 0-31
-> IRQ: 293 CPU: 0-31
-> IRQ: 294 CPU: 0-31
-> IRQ: 295 CPU: 0-31
-> IRQ: 296 CPU: 0-31
-> IRQ: 297 CPU: 0-31
-> IRQ: 298 CPU: 0-31
-> IRQ: 299 CPU: 0-31
-> 
-> With the patch:
-> 
-> IRQ: 265 CPU: 0
-> IRQ: 266 CPU: 1
-> IRQ: 267 CPU: 2
-> IRQ: 268 CPU: 3
-> IRQ: 269 CPU: 4
-> IRQ: 270 CPU: 5
-> IRQ: 271 CPU: 6
-> IRQ: 272 CPU: 7
-> IRQ: 273 CPU: 8
-> IRQ: 274 CPU: 9
-> IRQ: 275 CPU: 10
-> IRQ: 276 CPU: 11
-> IRQ: 277 CPU: 12
-> IRQ: 278 CPU: 13
-> IRQ: 279 CPU: 14
-> IRQ: 280 CPU: 15
-> IRQ: 281 CPU: 16
-> IRQ: 282 CPU: 17
-> IRQ: 283 CPU: 18
-> IRQ: 284 CPU: 19
-> IRQ: 285 CPU: 20
-> IRQ: 286 CPU: 21
-> IRQ: 287 CPU: 22
-> IRQ: 288 CPU: 23
-> IRQ: 289 CPU: 24
-> IRQ: 290 CPU: 25
-> IRQ: 291 CPU: 26
-> IRQ: 292 CPU: 27
-> IRQ: 293 CPU: 28
-> IRQ: 294 CPU: 29
-> IRQ: 295 CPU: 30
-> IRQ: 299 CPU: 31
-> 
-> This matches what we have on an x86_64 system.
+Hello,
 
+Please see lkml.kernel.org/r/X708BTJ5njtbC2z1@mtj.duckdns.org for a few nits
+on the previous version.
 
-Makes sense to me. FWIW
-
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-
-> Laurent Vivier (2):
->   genirq: add an affinity parameter to irq_create_mapping()
->   powerpc/pseries: pass MSI affinity to irq_create_mapping()
+On Tue, Nov 24, 2020 at 02:27:31PM +0100, Christoph Hellwig wrote:
+> To simplify block device lookup and a few other upcoming areas, make sure
+> that we always have a struct block_device available for each disk and
+> each partition.  The only downside of this is that each device and
+> partition uses a little more memory.  The upside will be that a lot of
+> code can be simplified.
 > 
->  arch/arc/kernel/intc-arcv2.c                  | 4 ++--
->  arch/arc/kernel/mcip.c                        | 2 +-
->  arch/arm/common/sa1111.c                      | 2 +-
->  arch/arm/mach-s3c/irq-s3c24xx.c               | 3 ++-
->  arch/arm/plat-orion/gpio.c                    | 2 +-
->  arch/mips/ath25/ar2315.c                      | 4 ++--
->  arch/mips/ath25/ar5312.c                      | 4 ++--
->  arch/mips/lantiq/irq.c                        | 2 +-
->  arch/mips/pci/pci-ar2315.c                    | 3 ++-
->  arch/mips/pic32/pic32mzda/time.c              | 2 +-
->  arch/mips/ralink/irq.c                        | 2 +-
->  arch/powerpc/kernel/pci-common.c              | 2 +-
->  arch/powerpc/kvm/book3s_xive.c                | 2 +-
->  arch/powerpc/platforms/44x/ppc476.c           | 4 ++--
->  arch/powerpc/platforms/cell/interrupt.c       | 4 ++--
->  arch/powerpc/platforms/cell/iommu.c           | 3 ++-
->  arch/powerpc/platforms/cell/pmu.c             | 2 +-
->  arch/powerpc/platforms/cell/spider-pic.c      | 2 +-
->  arch/powerpc/platforms/cell/spu_manage.c      | 6 +++---
->  arch/powerpc/platforms/maple/pci.c            | 2 +-
->  arch/powerpc/platforms/pasemi/dma_lib.c       | 5 +++--
->  arch/powerpc/platforms/pasemi/msi.c           | 2 +-
->  arch/powerpc/platforms/pasemi/setup.c         | 4 ++--
->  arch/powerpc/platforms/powermac/pci.c         | 2 +-
->  arch/powerpc/platforms/powermac/pic.c         | 2 +-
->  arch/powerpc/platforms/powermac/smp.c         | 2 +-
->  arch/powerpc/platforms/powernv/opal-irqchip.c | 5 +++--
->  arch/powerpc/platforms/powernv/pci.c          | 2 +-
->  arch/powerpc/platforms/powernv/vas.c          | 2 +-
->  arch/powerpc/platforms/ps3/interrupt.c        | 2 +-
->  arch/powerpc/platforms/pseries/ibmebus.c      | 2 +-
->  arch/powerpc/platforms/pseries/msi.c          | 2 +-
->  arch/powerpc/sysdev/fsl_mpic_err.c            | 2 +-
->  arch/powerpc/sysdev/fsl_msi.c                 | 2 +-
->  arch/powerpc/sysdev/mpic.c                    | 3 ++-
->  arch/powerpc/sysdev/mpic_u3msi.c              | 2 +-
->  arch/powerpc/sysdev/xics/xics-common.c        | 2 +-
->  arch/powerpc/sysdev/xive/common.c             | 2 +-
->  arch/sh/boards/mach-se/7343/irq.c             | 2 +-
->  arch/sh/boards/mach-se/7722/irq.c             | 2 +-
->  arch/sh/boards/mach-x3proto/gpio.c            | 2 +-
->  arch/xtensa/kernel/perf_event.c               | 2 +-
->  arch/xtensa/kernel/smp.c                      | 2 +-
->  arch/xtensa/kernel/time.c                     | 2 +-
->  drivers/ata/pata_macio.c                      | 2 +-
->  drivers/base/regmap/regmap-irq.c              | 2 +-
->  drivers/bus/moxtet.c                          | 2 +-
->  drivers/clocksource/ingenic-timer.c           | 2 +-
->  drivers/clocksource/timer-riscv.c             | 2 +-
->  drivers/extcon/extcon-max8997.c               | 3 ++-
->  drivers/gpio/gpio-bcm-kona.c                  | 2 +-
->  drivers/gpio/gpio-brcmstb.c                   | 2 +-
->  drivers/gpio/gpio-davinci.c                   | 2 +-
->  drivers/gpio/gpio-em.c                        | 3 ++-
->  drivers/gpio/gpio-grgpio.c                    | 2 +-
->  drivers/gpio/gpio-mockup.c                    | 2 +-
->  drivers/gpio/gpio-mpc8xxx.c                   | 2 +-
->  drivers/gpio/gpio-mvebu.c                     | 2 +-
->  drivers/gpio/gpio-tb10x.c                     | 2 +-
->  drivers/gpio/gpio-tegra.c                     | 2 +-
->  drivers/gpio/gpio-wm831x.c                    | 2 +-
->  drivers/gpio/gpiolib.c                        | 2 +-
->  drivers/gpu/drm/amd/amdgpu/amdgpu_irq.c       | 3 ++-
->  drivers/gpu/ipu-v3/ipu-common.c               | 2 +-
->  drivers/hid/hid-rmi.c                         | 2 +-
->  drivers/i2c/busses/i2c-cht-wc.c               | 2 +-
->  drivers/i2c/i2c-core-base.c                   | 2 +-
->  drivers/i2c/muxes/i2c-mux-pca954x.c           | 2 +-
->  drivers/ide/pmac.c                            | 2 +-
->  drivers/iio/dummy/iio_dummy_evgen.c           | 3 ++-
->  drivers/input/rmi4/rmi_bus.c                  | 2 +-
->  drivers/irqchip/irq-ath79-misc.c              | 3 ++-
->  drivers/irqchip/irq-bcm2835.c                 | 3 ++-
->  drivers/irqchip/irq-csky-mpintc.c             | 2 +-
->  drivers/irqchip/irq-eznps.c                   | 2 +-
->  drivers/irqchip/irq-mips-gic.c                | 8 +++++---
->  drivers/irqchip/irq-mmp.c                     | 4 ++--
->  drivers/irqchip/irq-versatile-fpga.c          | 2 +-
->  drivers/irqchip/irq-vic.c                     | 2 +-
->  drivers/macintosh/macio_asic.c                | 2 +-
->  drivers/memory/omap-gpmc.c                    | 2 +-
->  drivers/mfd/ab8500-core.c                     | 2 +-
->  drivers/mfd/arizona-irq.c                     | 5 +++--
->  drivers/mfd/db8500-prcmu.c                    | 2 +-
->  drivers/mfd/mfd-core.c                        | 2 +-
->  drivers/mfd/stmpe.c                           | 5 +++--
->  drivers/mfd/tc3589x.c                         | 2 +-
->  drivers/mfd/tps6586x.c                        | 2 +-
->  drivers/mfd/wm8994-irq.c                      | 5 +++--
->  drivers/misc/cxl/irq.c                        | 2 +-
->  drivers/misc/ocxl/afu_irq.c                   | 2 +-
->  drivers/misc/ocxl/link.c                      | 2 +-
->  drivers/net/dsa/mv88e6xxx/chip.c              | 2 +-
->  drivers/net/dsa/mv88e6xxx/global2.c           | 2 +-
->  drivers/net/dsa/qca/ar9331.c                  | 2 +-
->  drivers/net/dsa/rtl8366rb.c                   | 3 ++-
->  drivers/net/ethernet/ibm/ibmvnic.c            | 4 ++--
->  drivers/net/usb/lan78xx.c                     | 2 +-
->  drivers/pci/controller/pci-ftpci100.c         | 2 +-
->  drivers/pci/controller/pci-tegra.c            | 2 +-
->  drivers/pci/controller/pcie-rcar-host.c       | 2 +-
->  drivers/pci/controller/pcie-xilinx-cpm.c      | 4 ++--
->  drivers/pci/controller/pcie-xilinx.c          | 2 +-
->  drivers/pinctrl/mediatek/mtk-eint.c           | 2 +-
->  drivers/pinctrl/nomadik/pinctrl-abx500.c      | 3 ++-
->  drivers/pinctrl/pinctrl-at91-pio4.c           | 3 ++-
->  drivers/pinctrl/pinctrl-rockchip.c            | 2 +-
->  drivers/pinctrl/samsung/pinctrl-samsung.c     | 2 +-
->  drivers/pinctrl/sunxi/pinctrl-sunxi.c         | 2 +-
->  drivers/power/supply/lp8788-charger.c         | 2 +-
->  drivers/rtc/rtc-lp8788.c                      | 2 +-
->  drivers/rtc/rtc-max8997.c                     | 3 ++-
->  drivers/rtc/rtc-max8998.c                     | 3 ++-
->  drivers/scsi/cxlflash/ocxl_hw.c               | 2 +-
->  drivers/ssb/driver_gpio.c                     | 4 ++--
->  drivers/staging/hikey9xx/hi6421-spmi-pmic.c   | 2 +-
->  drivers/staging/octeon-usb/octeon-hcd.c       | 2 +-
->  drivers/tty/hvc/hvsi.c                        | 2 +-
->  drivers/tty/serial/pmac_zilog.c               | 6 +++---
->  drivers/watchdog/octeon-wdt-main.c            | 2 +-
->  include/linux/irqdomain.h                     | 3 ++-
->  kernel/irq/irqdomain.c                        | 8 +++++---
->  sound/soc/codecs/rt5677.c                     | 2 +-
->  123 files changed, 171 insertions(+), 146 deletions(-)
-> 
-> -- 
-> 2.28.0
-> 
+> With that all we need to look up the block device is to lookup the inode
+> and do a few sanity checks on the gendisk, instead of the separate lookup
+> for the gendisk.  These checks are in a new RCU critical section and
+> the disk is now freed using kfree_rcu().
 
+I might be confused but am wondering whether RCU is needed. It's currently
+used to ensure that gendisk is accessible in the blkdev_get path but
+wouldn't it be possible to simply pin gendisk from block_devices? The
+gendisk and hd_structs hold the base refs of the block_devices and in turn
+the block_devices pin the gendisk. When the gendisk gets deleted, it puts
+the base refs of the block devices but stays around while the block devices
+are being accessed.
+
+Also, would it make sense to separate out lookup_sem removal? I *think* it's
+there to ensure that the same bdev doesn't get associated with old and new
+gendisks at the same time but can't wrap my head around how it works
+exactly. I can see that this may not be needed once the lifetimes of gendisk
+and block_devices are tied together but that may warrant a bit more
+explanation.
+
+Thanks.
+
+-- 
+tejun
