@@ -8,64 +8,64 @@ X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62B48C56202
-	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 18:01:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F07EC2D0E4
+	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 18:01:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EC56D206D5
-	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 18:01:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1266B206D5
+	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 18:01:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oa8w8BnV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hy/pnL6M"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390840AbgKXSB5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Nov 2020 13:01:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48048 "EHLO
+        id S2390845AbgKXSB6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Nov 2020 13:01:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48056 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390831AbgKXSB5 (ORCPT
+        with ESMTP id S2390842AbgKXSB6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Nov 2020 13:01:57 -0500
-Received: from mail-wr1-x441.google.com (mail-wr1-x441.google.com [IPv6:2a00:1450:4864:20::441])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71729C0613D6
-        for <linux-block@vger.kernel.org>; Tue, 24 Nov 2020 10:01:55 -0800 (PST)
-Received: by mail-wr1-x441.google.com with SMTP id m6so23245436wrg.7
-        for <linux-block@vger.kernel.org>; Tue, 24 Nov 2020 10:01:55 -0800 (PST)
+        Tue, 24 Nov 2020 13:01:58 -0500
+Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E90BAC0613D6
+        for <linux-block@vger.kernel.org>; Tue, 24 Nov 2020 10:01:57 -0800 (PST)
+Received: by mail-wr1-x431.google.com with SMTP id p8so23277107wrx.5
+        for <linux-block@vger.kernel.org>; Tue, 24 Nov 2020 10:01:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=RnDyqCPp/6fDB95MN1DP8Xo/I0mJ9d7WkCe+ujIWeMI=;
-        b=oa8w8BnVruBihFbUs4fvu2zkpR3U0xMwjGk/WD+rSe82p+L+O6i6op0uybzJSAEAs5
-         rhwmxucD4OHOVad3fob07bQgtFPaohYhtzO1geM5N4QXFOVmo5J8oNfN0az7H+UkvUv3
-         ERVLXxsiVDOh92IZZ2fJnl3kil5kTsnAyQQLCuNdQRZSQvCJi9/5gvua8OKRJMVDc+0P
-         N7+wmEGakqQz8Dr2sBBNXF4b9xADX9uDRLzoCUSQG/K2Rx5185K3xzRacRXThAJ3E4dO
-         ZemeIDeZIfZAbJb9nEH+Y5AWY0rtj9h5xpbl1Oi7okF4dpwsOoJDHb1ZIc/p9WKDlKay
-         arSA==
+        bh=2UeSxtr8F5MKjjgRzkdBiAIGeYvef1JkimaFWN5LzuM=;
+        b=Hy/pnL6MgrnpG01xX/KfSrrnJv0CKyFAUCJzV5xgh7iVP6PPdzLI1Rk/I0bvxlgXfs
+         DHuBu+hWsFov0AdPn4sY83VHHuHjBWLXy3PYvVoO4Cu+a0MT2RGpu15jZZttoojj+KL0
+         NcBlS9AUxoNc4YInW9JN+DzVW0JnRj/jKnfw50xBW0SE+UnJ7YzSD9zsbUpe/6rhzEqa
+         mQH9DlB/lhTOGCm174aaH7MoBy+lqYvikq9BpPQQTFVVfa0db+sHmM6bkyHxpQewKBou
+         HdaSpKqqoQSPqAqPaANoQheQeHhQ4hTFC7sdXqufqRRSfoYEDvXgR4omCCuYFSv2uqcX
+         EuNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=RnDyqCPp/6fDB95MN1DP8Xo/I0mJ9d7WkCe+ujIWeMI=;
-        b=he3y/YOK2RFzTDJy2NSv+LTgc6IXcDiW6FfBOuBhCZ7FKF54s3ScXdGscGCulzFTsh
-         wL5674+cPukoxwwDHiXkFTymck6RtTWXy8iXf355gk9QzbRq7z3xxD4ZrG6r08dxexGO
-         1eiMf7hHs+WFh1PkvT3atpLzxXXC66mgq4s51R9+7d6r7KzMCy2Be049zDi3m4qL4TOB
-         SlxvT+TVJJUyTtUz4T46FNH9URRrrplSDmaByEJELSXEwxkP80ker2JdeagrmvOg8kUc
-         93ROg1ivDEAi2ASzTfCSXk9vP728lLz8JiHZ/foc9BfOOl9lL0owRvy4wl0BosVFqsGB
-         MZEg==
-X-Gm-Message-State: AOAM532YAPdgAJ7nolpZATN1n0E+Pz6nUNXrQWK+Dex+BVB9pSsR47dk
-        5ahta+inP6jBDKLgYZWsGrgRoAkJVGaUug==
-X-Google-Smtp-Source: ABdhPJzabclDeqmDn8WfZC/+S3AFH9m+R67gb+dUw2yuCetnKW3eXhUYfdz8lj/hxTBaJEETp3hb/Q==
-X-Received: by 2002:adf:f6c7:: with SMTP id y7mr6357533wrp.147.1606240914137;
-        Tue, 24 Nov 2020 10:01:54 -0800 (PST)
+        bh=2UeSxtr8F5MKjjgRzkdBiAIGeYvef1JkimaFWN5LzuM=;
+        b=ZYxUNf8qSPlbyxjA79yjFwE1l6xt+LrzffGmyM3Tf8sb4v+RfuiFVWaWvSPysFP9Fl
+         birjeCo1mTuCY6ccIUjWMxjg9nSpcCcRzittPK6GgXYDU2Ff5nn4okD191/N+7wUfH6v
+         VXPY83oJ/ziJYXJPbLs2EhkKgUomSb5Os3NLkyQSUhUawiEg8u/xJYekX+42MGE6Dt1a
+         VQfS3bD/KbyQGIGhoe6F2OlHrBOIL3g1IkInX4OWVSt5APEI9AlaV1G4uEwuRYZXOKzO
+         6wzkH7vIa52AP9vJDEwfjB4MWYLKkDQ5oZnXe8wyIIf3Bg+yUG+hXO0dZ8ij9udU7YIf
+         hIWw==
+X-Gm-Message-State: AOAM530YnirpWVEH02AW4i8q+TU8SlyhSzX9gOpPNV+obYS6dUQ1ECYu
+        xsVHmk2WnpI2Gczxm2wnefg=
+X-Google-Smtp-Source: ABdhPJzpMyQdO2xkf3pOxKT5kSF9qcXbAUrJ+RwOSeI7IcKlVg+jj/SnDcnG/Y1NJ8XSlk5PS2/LxQ==
+X-Received: by 2002:adf:e449:: with SMTP id t9mr6659789wrm.257.1606240916660;
+        Tue, 24 Nov 2020 10:01:56 -0800 (PST)
 Received: from localhost.localdomain (host109-152-100-135.range109-152.btcentralplus.com. [109.152.100.135])
-        by smtp.gmail.com with ESMTPSA id x4sm12246403wrv.81.2020.11.24.10.01.52
+        by smtp.gmail.com with ESMTPSA id x4sm12246403wrv.81.2020.11.24.10.01.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Nov 2020 10:01:53 -0800 (PST)
+        Tue, 24 Nov 2020 10:01:55 -0800 (PST)
 From:   Pavel Begunkov <asml.silence@gmail.com>
 To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
 Cc:     Ming Lei <ming.lei@redhat.com>,
         Christoph Hellwig <hch@infradead.org>
-Subject: [PATCH 1/2] block: optimise for_each_bvec() advance
-Date:   Tue, 24 Nov 2020 17:58:12 +0000
-Message-Id: <8a399fe52e05c5aece4424b4ce114ec4e5b40b99.1606240077.git.asml.silence@gmail.com>
+Subject: [PATCH 2/2] bio: optimise bvec iteration
+Date:   Tue, 24 Nov 2020 17:58:13 +0000
+Message-Id: <e1acd31d91a1e9501a5420d6ac1488a4412a0353.1606240077.git.asml.silence@gmail.com>
 X-Mailer: git-send-email 2.24.0
 In-Reply-To: <cover.1606240077.git.asml.silence@gmail.com>
 References: <cover.1606240077.git.asml.silence@gmail.com>
@@ -75,63 +75,71 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Because of how for_each_bvec() works it never advances across multiple
-entries at a time, so bvec_iter_advance() is an overkill. Add
-specialised bvec_iter_advance_single() that is faster. It also handles
-zero-len bvecs, so can kill bvec_iter_skip_zero_bvec().
+__bio_for_each_bvec(), __bio_for_each_segment() and bio_copy_data_iter()
+fall under conditions of bvec_iter_advance_single(), which is a faster
+and slimmer version of bvec_iter_advance(). Add
+bio_advance_iter_single() and convert them.
 
-   text    data     bss     dec     hex filename
-before:
-  23977     805       0   24782    60ce lib/iov_iter.o
-before, bvec_iter_advance() w/o WARN_ONCE()
-  22886     600       0   23486    5bbe ./lib/iov_iter.o
-after:
-  21862     600       0   22462    57be lib/iov_iter.o
-
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
 Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
 ---
- include/linux/bvec.h | 20 +++++++++++++++-----
- 1 file changed, 15 insertions(+), 5 deletions(-)
+ block/bio.c         |  4 ++--
+ include/linux/bio.h | 17 +++++++++++++++--
+ 2 files changed, 17 insertions(+), 4 deletions(-)
 
-diff --git a/include/linux/bvec.h b/include/linux/bvec.h
-index 2efec10bf792..ff832e698efb 100644
---- a/include/linux/bvec.h
-+++ b/include/linux/bvec.h
-@@ -121,18 +121,28 @@ static inline bool bvec_iter_advance(const struct bio_vec *bv,
- 	return true;
+diff --git a/block/bio.c b/block/bio.c
+index fa01bef35bb1..8e718920457a 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1212,8 +1212,8 @@ void bio_copy_data_iter(struct bio *dst, struct bvec_iter *dst_iter,
+ 
+ 		flush_dcache_page(dst_bv.bv_page);
+ 
+-		bio_advance_iter(src, src_iter, bytes);
+-		bio_advance_iter(dst, dst_iter, bytes);
++		bio_advance_iter_single(src, src_iter, bytes);
++		bio_advance_iter_single(dst, dst_iter, bytes);
+ 	}
+ }
+ EXPORT_SYMBOL(bio_copy_data_iter);
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index c6d765382926..d55d53c49ae4 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -148,11 +148,24 @@ static inline void bio_advance_iter(const struct bio *bio,
+ 		/* TODO: It is reasonable to complete bio with error here. */
  }
  
--static inline void bvec_iter_skip_zero_bvec(struct bvec_iter *iter)
-+/*
-+ * A simpler version of bvec_iter_advance(), @bytes should not span
-+ * across multiple bvec entries, i.e. bytes <= bv[i->bi_idx].bv_len
-+ */
-+static inline void bvec_iter_advance_single(const struct bio_vec *bv,
-+				struct bvec_iter *iter, unsigned int bytes)
- {
--	iter->bi_bvec_done = 0;
--	iter->bi_idx++;
-+	unsigned int done = iter->bi_bvec_done + bytes;
++/* @bytes should be less or equal to bvec[i->bi_idx].bv_len */
++static inline void bio_advance_iter_single(const struct bio *bio,
++					   struct bvec_iter *iter,
++					   unsigned int bytes)
++{
++	iter->bi_sector += bytes >> 9;
 +
-+	if (done == bv[iter->bi_idx].bv_len) {
-+		done = 0;
-+		iter->bi_idx++;
-+	}
-+	iter->bi_bvec_done = done;
-+	iter->bi_size -= bytes;
- }
- 
- #define for_each_bvec(bvl, bio_vec, iter, start)			\
++	if (bio_no_advance_iter(bio))
++		iter->bi_size -= bytes;
++	else
++		bvec_iter_advance_single(bio->bi_io_vec, iter, bytes);
++}
++
+ #define __bio_for_each_segment(bvl, bio, iter, start)			\
  	for (iter = (start);						\
  	     (iter).bi_size &&						\
- 		((bvl = bvec_iter_bvec((bio_vec), (iter))), 1);	\
--	     (bvl).bv_len ? (void)bvec_iter_advance((bio_vec), &(iter),	\
--		     (bvl).bv_len) : bvec_iter_skip_zero_bvec(&(iter)))
-+	     bvec_iter_advance_single((bio_vec), &(iter), (bvl).bv_len))
+ 		((bvl = bio_iter_iovec((bio), (iter))), 1);		\
+-	     bio_advance_iter((bio), &(iter), (bvl).bv_len))
++	     bio_advance_iter_single((bio), &(iter), (bvl).bv_len))
  
- /* for iterating one bio from start to end */
- #define BVEC_ITER_ALL_INIT (struct bvec_iter)				\
+ #define bio_for_each_segment(bvl, bio, iter)				\
+ 	__bio_for_each_segment(bvl, bio, iter, (bio)->bi_iter)
+@@ -161,7 +174,7 @@ static inline void bio_advance_iter(const struct bio *bio,
+ 	for (iter = (start);						\
+ 	     (iter).bi_size &&						\
+ 		((bvl = mp_bvec_iter_bvec((bio)->bi_io_vec, (iter))), 1); \
+-	     bio_advance_iter((bio), &(iter), (bvl).bv_len))
++	     bio_advance_iter_single((bio), &(iter), (bvl).bv_len))
+ 
+ /* iterate over multi-page bvec */
+ #define bio_for_each_bvec(bvl, bio, iter)			\
 -- 
 2.24.0
 
