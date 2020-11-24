@@ -2,101 +2,301 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE218C6379D
-	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 19:48:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2D1DC63777
+	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 20:03:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 52CB0206CA
-	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 19:48:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 69F292086A
+	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 20:03:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jOV4zvc5"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qgin9l/z"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728163AbgKXTrO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Nov 2020 14:47:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36134 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728160AbgKXTrM (ORCPT
+        id S1729980AbgKXUD0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Nov 2020 15:03:26 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20923 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729970AbgKXUDZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Nov 2020 14:47:12 -0500
-Received: from mail-qk1-x744.google.com (mail-qk1-x744.google.com [IPv6:2607:f8b0:4864:20::744])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E715C0613D6;
-        Tue, 24 Nov 2020 11:47:12 -0800 (PST)
-Received: by mail-qk1-x744.google.com with SMTP id v143so50574qkb.2;
-        Tue, 24 Nov 2020 11:47:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=V2TOjLdoUaYrySYqHg0oeA6ickZUCz64YonJi1MX7zw=;
-        b=jOV4zvc5ykqwIR5EZxEdhoTt8gbdvwT6+6X/TSUVT/z8HYM0C2tjvbbgLMctpzeJXh
-         RGgnK/f6uWChM4BxAbOX4p18Fwq1/chEXov7aPAYOwuKTjdA655sPluEae6103/B37UZ
-         mtHW9DvASGebX6RreWH7qhpVzv5BxklJgKQSxfx5joha57iIHUUTiDQJHNfLS9atfGSt
-         ExNgjoQWPu/xgn5sRgfmq3jVVaBwbHob8XGT+JoMXjhTpfpEBrU2/+S555WpdkNVIh4j
-         Jpy0MqgRWGJT79DbBEN/JVT9ea84He6RSeOcPWGIlVmK+xMy8dzyAD0z3NQbnkk9QV/T
-         mQ+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=V2TOjLdoUaYrySYqHg0oeA6ickZUCz64YonJi1MX7zw=;
-        b=YRvY7c2xKSnJV3yvYWiG08+v/DQ2nGoyc/2LGn2yAXfQgvGcXBfVhQMBmb3zE126uK
-         OLjhKXOZITyqdTo5Gcy+54QehkGnPv4L0f29+vY3DcjSNPO45cNVK496RWvaZQjaL0YZ
-         2MYx2Eug6R8+AL9QZVcFc/FU9T0Q4veUpw7i8W3+NwysgxTfhcUjv89Tk9zrqqr7wRmY
-         lqyx2ULkovbXTk3gX4j9G9N8PCaeqsa2HtrdBipfrdTueXzPwRS745nxuG/1/dOq9luo
-         mifyXdkb2ILiafoajQXgxRy5QviOJIVhy+IMXu0xr86WAQ4i8XXUoOpZpBpbks9KSESM
-         si8A==
-X-Gm-Message-State: AOAM530x4TWl6ZSFlbDmjo2ZU3HLerQ+An25XMWD3HRZWIfyww5wGlWS
-        p7via9J4dEBPHwdj+V89fg8=
-X-Google-Smtp-Source: ABdhPJzCbEzsnsSHZbAP8aBMoagyKuXkYbNxYHgU470rrYkN9D5aTPe0QJyzDBb8iwv2DZpxdq68Ww==
-X-Received: by 2002:a37:6cd:: with SMTP id 196mr3775536qkg.96.1606247231211;
-        Tue, 24 Nov 2020 11:47:11 -0800 (PST)
-Received: from localhost (dhcp-6c-ae-f6-dc-d8-61.cpe.echoes.net. [72.28.8.195])
-        by smtp.gmail.com with ESMTPSA id 137sm123792qkj.109.2020.11.24.11.47.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Nov 2020 11:47:10 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Tue, 24 Nov 2020 14:46:47 -0500
-From:   Tejun Heo <tj@kernel.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Josef Bacik <josef@toxicpanda.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Coly Li <colyli@suse.de>, Mike Snitzer <snitzer@redhat.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jan Kara <jack@suse.cz>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        dm-devel@redhat.com, Richard Weinberger <richard@nod.at>,
-        Jan Kara <jack@suse.com>, linux-block@vger.kernel.org,
-        xen-devel@lists.xenproject.org, linux-bcache@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: Re: [PATCH 24/45] blk-cgroup: stop abusing get_gendisk
-Message-ID: <X71jJywIZTSxLoqQ@mtj.duckdns.org>
-References: <20201124132751.3747337-1-hch@lst.de>
- <20201124132751.3747337-25-hch@lst.de>
+        Tue, 24 Nov 2020 15:03:25 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1606248203;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=DOLfU9QYMGrspYJyzvFCDSDoj+0Yb7d+LpKKWf0+TiU=;
+        b=Qgin9l/zXnLe1ejYSDH/JjU1QBBAokXq+wbOQxIkCefP+S74wU4IDji37Kslje8a67r7Na
+        56UKPvEZyghmyllKkmgzi2gOdEfBq0jG2iC1FQ71Ivp6jDUp2jfEzUzpxzd7rgvveJrLVs
+        1XkS2nWMPlGtQieTJm7nLDTscs4Cn3k=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-161-6_d5NO5PPCy6SULvgRXZBQ-1; Tue, 24 Nov 2020 15:03:19 -0500
+X-MC-Unique: 6_d5NO5PPCy6SULvgRXZBQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2F411107AD88;
+        Tue, 24 Nov 2020 20:03:17 +0000 (UTC)
+Received: from thinkpad.redhat.com (ovpn-113-83.ams2.redhat.com [10.36.113.83])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B80705D6AB;
+        Tue, 24 Nov 2020 20:03:09 +0000 (UTC)
+From:   Laurent Vivier <lvivier@redhat.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Paul Mackerras <paulus@samba.org>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        linux-block@vger.kernel.org,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Marc Zyngier <maz@kernel.org>, linuxppc-dev@lists.ozlabs.org,
+        linux-pci@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Laurent Vivier <lvivier@redhat.com>
+Subject: [PATCH 0/2] powerpc/pseries: fix MSI/X IRQ affinity on pseries
+Date:   Tue, 24 Nov 2020 21:03:06 +0100
+Message-Id: <20201124200308.1110744-1-lvivier@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201124132751.3747337-25-hch@lst.de>
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Nov 24, 2020 at 02:27:30PM +0100, Christoph Hellwig wrote:
-> Properly open the device instead of relying on deep internals by
-> using get_gendisk.  Note that this uses FMODE_NDELAY without either
-> FMODE_READ or FMODE_WRITE, which is a special open mode to allow
-> for opening without media access, thus avoiding unexpexted interactions
-> especially on removable media.
+With virtio, in multiqueue case, each queue IRQ is normally=0D
+bound to a different CPU using the affinity mask.=0D
+=0D
+This works fine on x86_64 but totally ignored on pseries.=0D
+=0D
+This is not obvious at first look because irqbalance is doing=0D
+some balancing to improve that.=0D
+=0D
+It appears that the "managed" flag set in the MSI entry=0D
+is never copied to the system IRQ entry.=0D
+=0D
+This series passes the affinity mask from rtas_setup_msi_irqs()=0D
+to irq_domain_alloc_descs() by adding an affinity parameter to=0D
+irq_create_mapping().=0D
+=0D
+The first patch adds the parameter (no functional change), the=0D
+second patch passes the actual affinity mask to irq_create_mapping()=0D
+in rtas_setup_msi_irqs().=0D
+=0D
+For instance, with 32 CPUs VM and 32 queues virtio-scsi interface:=0D
+=0D
+... -smp 32 -device virtio-scsi-pci,id=3Dvirtio_scsi_pci0,num_queues=3D32=0D
+=0D
+for IRQ in $(grep virtio2-request /proc/interrupts |cut -d: -f1); do=0D
+    for file in /proc/irq/$IRQ/ ; do=0D
+        echo -n "IRQ: $(basename $file) CPU: " ; cat $file/smp_affinity_lis=
+t=0D
+    done=0D
+done=0D
+=0D
+Without the patch (and without irqbalanced)=0D
+=0D
+IRQ: 268 CPU: 0-31=0D
+IRQ: 269 CPU: 0-31=0D
+IRQ: 270 CPU: 0-31=0D
+IRQ: 271 CPU: 0-31=0D
+IRQ: 272 CPU: 0-31=0D
+IRQ: 273 CPU: 0-31=0D
+IRQ: 274 CPU: 0-31=0D
+IRQ: 275 CPU: 0-31=0D
+IRQ: 276 CPU: 0-31=0D
+IRQ: 277 CPU: 0-31=0D
+IRQ: 278 CPU: 0-31=0D
+IRQ: 279 CPU: 0-31=0D
+IRQ: 280 CPU: 0-31=0D
+IRQ: 281 CPU: 0-31=0D
+IRQ: 282 CPU: 0-31=0D
+IRQ: 283 CPU: 0-31=0D
+IRQ: 284 CPU: 0-31=0D
+IRQ: 285 CPU: 0-31=0D
+IRQ: 286 CPU: 0-31=0D
+IRQ: 287 CPU: 0-31=0D
+IRQ: 288 CPU: 0-31=0D
+IRQ: 289 CPU: 0-31=0D
+IRQ: 290 CPU: 0-31=0D
+IRQ: 291 CPU: 0-31=0D
+IRQ: 292 CPU: 0-31=0D
+IRQ: 293 CPU: 0-31=0D
+IRQ: 294 CPU: 0-31=0D
+IRQ: 295 CPU: 0-31=0D
+IRQ: 296 CPU: 0-31=0D
+IRQ: 297 CPU: 0-31=0D
+IRQ: 298 CPU: 0-31=0D
+IRQ: 299 CPU: 0-31=0D
+=0D
+With the patch:=0D
+=0D
+IRQ: 265 CPU: 0=0D
+IRQ: 266 CPU: 1=0D
+IRQ: 267 CPU: 2=0D
+IRQ: 268 CPU: 3=0D
+IRQ: 269 CPU: 4=0D
+IRQ: 270 CPU: 5=0D
+IRQ: 271 CPU: 6=0D
+IRQ: 272 CPU: 7=0D
+IRQ: 273 CPU: 8=0D
+IRQ: 274 CPU: 9=0D
+IRQ: 275 CPU: 10=0D
+IRQ: 276 CPU: 11=0D
+IRQ: 277 CPU: 12=0D
+IRQ: 278 CPU: 13=0D
+IRQ: 279 CPU: 14=0D
+IRQ: 280 CPU: 15=0D
+IRQ: 281 CPU: 16=0D
+IRQ: 282 CPU: 17=0D
+IRQ: 283 CPU: 18=0D
+IRQ: 284 CPU: 19=0D
+IRQ: 285 CPU: 20=0D
+IRQ: 286 CPU: 21=0D
+IRQ: 287 CPU: 22=0D
+IRQ: 288 CPU: 23=0D
+IRQ: 289 CPU: 24=0D
+IRQ: 290 CPU: 25=0D
+IRQ: 291 CPU: 26=0D
+IRQ: 292 CPU: 27=0D
+IRQ: 293 CPU: 28=0D
+IRQ: 294 CPU: 29=0D
+IRQ: 295 CPU: 30=0D
+IRQ: 299 CPU: 31=0D
+=0D
+This matches what we have on an x86_64 system.=0D
+=0D
+Laurent Vivier (2):=0D
+  genirq: add an affinity parameter to irq_create_mapping()=0D
+  powerpc/pseries: pass MSI affinity to irq_create_mapping()=0D
+=0D
+ arch/arc/kernel/intc-arcv2.c                  | 4 ++--=0D
+ arch/arc/kernel/mcip.c                        | 2 +-=0D
+ arch/arm/common/sa1111.c                      | 2 +-=0D
+ arch/arm/mach-s3c/irq-s3c24xx.c               | 3 ++-=0D
+ arch/arm/plat-orion/gpio.c                    | 2 +-=0D
+ arch/mips/ath25/ar2315.c                      | 4 ++--=0D
+ arch/mips/ath25/ar5312.c                      | 4 ++--=0D
+ arch/mips/lantiq/irq.c                        | 2 +-=0D
+ arch/mips/pci/pci-ar2315.c                    | 3 ++-=0D
+ arch/mips/pic32/pic32mzda/time.c              | 2 +-=0D
+ arch/mips/ralink/irq.c                        | 2 +-=0D
+ arch/powerpc/kernel/pci-common.c              | 2 +-=0D
+ arch/powerpc/kvm/book3s_xive.c                | 2 +-=0D
+ arch/powerpc/platforms/44x/ppc476.c           | 4 ++--=0D
+ arch/powerpc/platforms/cell/interrupt.c       | 4 ++--=0D
+ arch/powerpc/platforms/cell/iommu.c           | 3 ++-=0D
+ arch/powerpc/platforms/cell/pmu.c             | 2 +-=0D
+ arch/powerpc/platforms/cell/spider-pic.c      | 2 +-=0D
+ arch/powerpc/platforms/cell/spu_manage.c      | 6 +++---=0D
+ arch/powerpc/platforms/maple/pci.c            | 2 +-=0D
+ arch/powerpc/platforms/pasemi/dma_lib.c       | 5 +++--=0D
+ arch/powerpc/platforms/pasemi/msi.c           | 2 +-=0D
+ arch/powerpc/platforms/pasemi/setup.c         | 4 ++--=0D
+ arch/powerpc/platforms/powermac/pci.c         | 2 +-=0D
+ arch/powerpc/platforms/powermac/pic.c         | 2 +-=0D
+ arch/powerpc/platforms/powermac/smp.c         | 2 +-=0D
+ arch/powerpc/platforms/powernv/opal-irqchip.c | 5 +++--=0D
+ arch/powerpc/platforms/powernv/pci.c          | 2 +-=0D
+ arch/powerpc/platforms/powernv/vas.c          | 2 +-=0D
+ arch/powerpc/platforms/ps3/interrupt.c        | 2 +-=0D
+ arch/powerpc/platforms/pseries/ibmebus.c      | 2 +-=0D
+ arch/powerpc/platforms/pseries/msi.c          | 2 +-=0D
+ arch/powerpc/sysdev/fsl_mpic_err.c            | 2 +-=0D
+ arch/powerpc/sysdev/fsl_msi.c                 | 2 +-=0D
+ arch/powerpc/sysdev/mpic.c                    | 3 ++-=0D
+ arch/powerpc/sysdev/mpic_u3msi.c              | 2 +-=0D
+ arch/powerpc/sysdev/xics/xics-common.c        | 2 +-=0D
+ arch/powerpc/sysdev/xive/common.c             | 2 +-=0D
+ arch/sh/boards/mach-se/7343/irq.c             | 2 +-=0D
+ arch/sh/boards/mach-se/7722/irq.c             | 2 +-=0D
+ arch/sh/boards/mach-x3proto/gpio.c            | 2 +-=0D
+ arch/xtensa/kernel/perf_event.c               | 2 +-=0D
+ arch/xtensa/kernel/smp.c                      | 2 +-=0D
+ arch/xtensa/kernel/time.c                     | 2 +-=0D
+ drivers/ata/pata_macio.c                      | 2 +-=0D
+ drivers/base/regmap/regmap-irq.c              | 2 +-=0D
+ drivers/bus/moxtet.c                          | 2 +-=0D
+ drivers/clocksource/ingenic-timer.c           | 2 +-=0D
+ drivers/clocksource/timer-riscv.c             | 2 +-=0D
+ drivers/extcon/extcon-max8997.c               | 3 ++-=0D
+ drivers/gpio/gpio-bcm-kona.c                  | 2 +-=0D
+ drivers/gpio/gpio-brcmstb.c                   | 2 +-=0D
+ drivers/gpio/gpio-davinci.c                   | 2 +-=0D
+ drivers/gpio/gpio-em.c                        | 3 ++-=0D
+ drivers/gpio/gpio-grgpio.c                    | 2 +-=0D
+ drivers/gpio/gpio-mockup.c                    | 2 +-=0D
+ drivers/gpio/gpio-mpc8xxx.c                   | 2 +-=0D
+ drivers/gpio/gpio-mvebu.c                     | 2 +-=0D
+ drivers/gpio/gpio-tb10x.c                     | 2 +-=0D
+ drivers/gpio/gpio-tegra.c                     | 2 +-=0D
+ drivers/gpio/gpio-wm831x.c                    | 2 +-=0D
+ drivers/gpio/gpiolib.c                        | 2 +-=0D
+ drivers/gpu/drm/amd/amdgpu/amdgpu_irq.c       | 3 ++-=0D
+ drivers/gpu/ipu-v3/ipu-common.c               | 2 +-=0D
+ drivers/hid/hid-rmi.c                         | 2 +-=0D
+ drivers/i2c/busses/i2c-cht-wc.c               | 2 +-=0D
+ drivers/i2c/i2c-core-base.c                   | 2 +-=0D
+ drivers/i2c/muxes/i2c-mux-pca954x.c           | 2 +-=0D
+ drivers/ide/pmac.c                            | 2 +-=0D
+ drivers/iio/dummy/iio_dummy_evgen.c           | 3 ++-=0D
+ drivers/input/rmi4/rmi_bus.c                  | 2 +-=0D
+ drivers/irqchip/irq-ath79-misc.c              | 3 ++-=0D
+ drivers/irqchip/irq-bcm2835.c                 | 3 ++-=0D
+ drivers/irqchip/irq-csky-mpintc.c             | 2 +-=0D
+ drivers/irqchip/irq-eznps.c                   | 2 +-=0D
+ drivers/irqchip/irq-mips-gic.c                | 8 +++++---=0D
+ drivers/irqchip/irq-mmp.c                     | 4 ++--=0D
+ drivers/irqchip/irq-versatile-fpga.c          | 2 +-=0D
+ drivers/irqchip/irq-vic.c                     | 2 +-=0D
+ drivers/macintosh/macio_asic.c                | 2 +-=0D
+ drivers/memory/omap-gpmc.c                    | 2 +-=0D
+ drivers/mfd/ab8500-core.c                     | 2 +-=0D
+ drivers/mfd/arizona-irq.c                     | 5 +++--=0D
+ drivers/mfd/db8500-prcmu.c                    | 2 +-=0D
+ drivers/mfd/mfd-core.c                        | 2 +-=0D
+ drivers/mfd/stmpe.c                           | 5 +++--=0D
+ drivers/mfd/tc3589x.c                         | 2 +-=0D
+ drivers/mfd/tps6586x.c                        | 2 +-=0D
+ drivers/mfd/wm8994-irq.c                      | 5 +++--=0D
+ drivers/misc/cxl/irq.c                        | 2 +-=0D
+ drivers/misc/ocxl/afu_irq.c                   | 2 +-=0D
+ drivers/misc/ocxl/link.c                      | 2 +-=0D
+ drivers/net/dsa/mv88e6xxx/chip.c              | 2 +-=0D
+ drivers/net/dsa/mv88e6xxx/global2.c           | 2 +-=0D
+ drivers/net/dsa/qca/ar9331.c                  | 2 +-=0D
+ drivers/net/dsa/rtl8366rb.c                   | 3 ++-=0D
+ drivers/net/ethernet/ibm/ibmvnic.c            | 4 ++--=0D
+ drivers/net/usb/lan78xx.c                     | 2 +-=0D
+ drivers/pci/controller/pci-ftpci100.c         | 2 +-=0D
+ drivers/pci/controller/pci-tegra.c            | 2 +-=0D
+ drivers/pci/controller/pcie-rcar-host.c       | 2 +-=0D
+ drivers/pci/controller/pcie-xilinx-cpm.c      | 4 ++--=0D
+ drivers/pci/controller/pcie-xilinx.c          | 2 +-=0D
+ drivers/pinctrl/mediatek/mtk-eint.c           | 2 +-=0D
+ drivers/pinctrl/nomadik/pinctrl-abx500.c      | 3 ++-=0D
+ drivers/pinctrl/pinctrl-at91-pio4.c           | 3 ++-=0D
+ drivers/pinctrl/pinctrl-rockchip.c            | 2 +-=0D
+ drivers/pinctrl/samsung/pinctrl-samsung.c     | 2 +-=0D
+ drivers/pinctrl/sunxi/pinctrl-sunxi.c         | 2 +-=0D
+ drivers/power/supply/lp8788-charger.c         | 2 +-=0D
+ drivers/rtc/rtc-lp8788.c                      | 2 +-=0D
+ drivers/rtc/rtc-max8997.c                     | 3 ++-=0D
+ drivers/rtc/rtc-max8998.c                     | 3 ++-=0D
+ drivers/scsi/cxlflash/ocxl_hw.c               | 2 +-=0D
+ drivers/ssb/driver_gpio.c                     | 4 ++--=0D
+ drivers/staging/hikey9xx/hi6421-spmi-pmic.c   | 2 +-=0D
+ drivers/staging/octeon-usb/octeon-hcd.c       | 2 +-=0D
+ drivers/tty/hvc/hvsi.c                        | 2 +-=0D
+ drivers/tty/serial/pmac_zilog.c               | 6 +++---=0D
+ drivers/watchdog/octeon-wdt-main.c            | 2 +-=0D
+ include/linux/irqdomain.h                     | 3 ++-=0D
+ kernel/irq/irqdomain.c                        | 8 +++++---=0D
+ sound/soc/codecs/rt5677.c                     | 2 +-=0D
+ 123 files changed, 171 insertions(+), 146 deletions(-)=0D
+=0D
+-- =0D
+2.28.0=0D
+=0D
 
-I'm not sure FMODE_NDELAY does that. e.g. sd_open() does media change check
-and full revalidation including disk spin up regadless of NDELAY and it's
-odd and can lead to nasty surprises to require cgroup configuration updates
-to wait for SCSI EH.
-
-Thanks.
-
--- 
-tejun
