@@ -7,50 +7,50 @@ X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17C74C6379F
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 526FBC64E69
 	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 01:05:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ADF7520721
+	by mail.kernel.org (Postfix) with ESMTP id 01B1D20758
 	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 01:05:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NGod7eig"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P3YG0if+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728193AbgKXBFD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 Nov 2020 20:05:03 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51408 "EHLO
+        id S1728209AbgKXBFG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 Nov 2020 20:05:06 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22953 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728149AbgKXBFD (ORCPT
+        by vger.kernel.org with ESMTP id S1728149AbgKXBFF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Nov 2020 20:05:03 -0500
+        Mon, 23 Nov 2020 20:05:05 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1606179902;
+        s=mimecast20190719; t=1606179905;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=0QRgWQAgp2wbMXFshIMqSuj8+Y5bpwNzqyWYNL833Vg=;
-        b=NGod7eigIv91mIAm0ujAz9JJaL0MGMC2yG/w6C2BN4i2g8h3oMRIXEgvIySnpTjW7dTTlA
-        zeyH3jbBcBXiOs5TvWeeAeh251rjMZ6B/9Q+R61axJyRtaiNysxE5w2Hz9j2IwVXVxTZot
-        Y2acKQIXOpVDIVXdH69Kr8GxySYEUcs=
+        bh=L2hH9HMbD7m3D18dSNHVZjKe3HFdYJgzZXEL8KtrsMA=;
+        b=P3YG0if+o2cfsmfalVqR3ZwU5PD9QJVm9x26R/4BRnlDR7nuHCLCUShdL/hWczvV6uogE3
+        m4rxmZml4NN5QwTbf1LNseMJpSEvVOpNhQW3dkm55C6qHi1pggC86yENeHXQPDPRVxP2A5
+        wxp9nFcrsa6dkcs0dWgoj4RBh1eQwOs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-95-M0YeAQSHMVqG5czEIDxiRw-1; Mon, 23 Nov 2020 20:05:00 -0500
-X-MC-Unique: M0YeAQSHMVqG5czEIDxiRw-1
+ us-mta-537-LKpQkwyrP52Wrb6FHFDnSg-1; Mon, 23 Nov 2020 20:05:03 -0500
+X-MC-Unique: LKpQkwyrP52Wrb6FHFDnSg-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0F97980EDA9;
-        Tue, 24 Nov 2020 01:04:59 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5E9A980EDAD;
+        Tue, 24 Nov 2020 01:05:01 +0000 (UTC)
 Received: from dhcp-12-105.nay.redhat.com (unknown [10.66.61.33])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 38DEC1346D;
-        Tue, 24 Nov 2020 01:04:56 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8927E1346D;
+        Tue, 24 Nov 2020 01:04:59 +0000 (UTC)
 From:   Yi Zhang <yi.zhang@redhat.com>
 To:     osandov@osandov.com, bvanassche@acm.org
 Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
         sagi@grimberg.me
-Subject: [PATCH blktests 3/5] tests/nvmeof-mp/012: fix the schedulers list
-Date:   Tue, 24 Nov 2020 09:04:25 +0800
-Message-Id: <20201124010427.18595-4-yi.zhang@redhat.com>
+Subject: [PATCH blktests 4/5] common/rc: _have_iproute2 fix for "ip -V" change
+Date:   Tue, 24 Nov 2020 09:04:26 +0800
+Message-Id: <20201124010427.18595-5-yi.zhang@redhat.com>
 In-Reply-To: <20201124010427.18595-1-yi.zhang@redhat.com>
 References: <20201124010427.18595-1-yi.zhang@redhat.com>
 MIME-Version: 1.0
@@ -60,57 +60,31 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-There is no cfg scheduler and new added kyber scheduler in lastest kernel,
-so get the scheduler from sysfs
+With bellow commit, the version will be updated base on the tag
+fbef6555 replace SNAPSHOT with auto-generated version string
 
 To reproduce it:
-$ ./check nvmeof-mp/012
-nvmeof-mp/012 (dm-mpath on top of multiple I/O schedulers)   [passed]
-    runtime  5.922s  ...  8.804s
-
-$ cat results/nodev/nvmeof-mp/012.full  | grep -n "Changing scheduler"
-31:Changing scheduler of dm-3 from mq-deadline kyber [bfq] none into cfq failed
-47:Changing scheduler of dm-3 from mq-deadline kyber [bfq] none into cfq failed
+$ ./check srp/015
+common/rc: line 98: [: ip utility, iproute2-5.9.0: integer expression expected
 
 Signed-off-by: Yi Zhang <yi.zhang@redhat.com>
 ---
- tests/nvmeof-mp/012 | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ common/rc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/nvmeof-mp/012 b/tests/nvmeof-mp/012
-index ae6a92c..96adc70 100755
---- a/tests/nvmeof-mp/012
-+++ b/tests/nvmeof-mp/012
-@@ -8,7 +8,7 @@ DESCRIPTION="dm-mpath on top of multiple I/O schedulers"
- QUICK=1
- 
- test_io_schedulers() {
--	local dev m
-+	local dev m dm scheds
- 
- 	# Load all I/O scheduler kernel modules
- 	for m in "/lib/modules/$(uname -r)/kernel/block/"*.ko; do
-@@ -17,15 +17,17 @@ test_io_schedulers() {
- 	for mq in y n; do
- 		use_blk_mq ${mq} || return $?
- 		dev=$(get_bdev 0) || return $?
--		for sched in noop deadline bfq cfq; do
--			set_scheduler "$(basename "$(readlink -f "${dev}")")" $sched \
-+		dm=$(basename "$(readlink -f "${dev}")") || return $?
-+		scheds=$(sed 's/[][]//g' /sys/block/"$dm"/queue/scheduler) || return $?
-+		for sched in $scheds; do
-+			set_scheduler "$dm" "$sched" \
- 				      >>"$FULL" 2>&1 || continue
- 			echo "I/O scheduler: $sched; use_blk_mq: $mq" >>"$FULL"
- 			run_fio --verify=md5 --rw=randwrite --bs=4K --size=64K \
- 				--ioengine=libaio --iodepth=64 \
- 				--iodepth_batch=32 --group_reporting --sync=1 \
- 				--direct=1 --filename="$dev" \
--				--name=${sched} --thread --numjobs=1 \
-+				--name="${sched}" --thread --numjobs=1 \
- 				--output="${RESULTS_DIR}/nvmeof-mp/012-${sched}-${mq}.txt" \
- 				>>"$FULL" ||
- 				return $?
+diff --git a/common/rc b/common/rc
+index 0d7a3cd..37eb873 100644
+--- a/common/rc
++++ b/common/rc
+@@ -95,7 +95,7 @@ _have_iproute2() {
+ 		SKIP_REASON="ip utility not found"
+ 		return 1
+ 	fi
+-	if [ "$snapshot" -lt "$1" ]; then
++	if [[ "$snapshot" =~ ^[0-9]+$ && "$snapshot" -lt "$1" ]]; then
+ 		SKIP_REASON="ip utility too old"
+ 		return 1
+ 	fi
 -- 
 2.21.0
 
