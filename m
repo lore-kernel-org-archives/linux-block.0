@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABA01C83027
-	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 13:28:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA993C63798
+	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 13:28:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6CA06206F9
-	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 13:28:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 707ED20872
+	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 13:28:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="JPuFDbn3"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="cByrnVSU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388131AbgKXN2j (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Nov 2020 08:28:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33584 "EHLO
+        id S2388090AbgKXN23 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Nov 2020 08:28:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33530 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388122AbgKXN2i (ORCPT
+        with ESMTP id S2388071AbgKXN2Z (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Nov 2020 08:28:38 -0500
+        Tue, 24 Nov 2020 08:28:25 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2142C061A4E;
-        Tue, 24 Nov 2020 05:28:37 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C5F6C0613D6;
+        Tue, 24 Nov 2020 05:28:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=qbQZqUyuqbWI0k7YOCxXBM7JuauYhSOH9/mPud+JBEQ=; b=JPuFDbn3CeG05+vmoNAk65fF+e
-        E+AWjN7EiPbhuy8d43uHrVAUMryHcbvWp/sIQsb2keLu3WxSA8fNQgXpu6WDI/oPIzGdu1t9jnCoh
-        ALo16cLEzPbEOBDyyUQhXe2zb4Wg1WnXZR7b7Of0uxXZvBhKgYdSIm1GQtyXmTB80hVs2aO5jg3Wd
-        JxN4GkeL/03jRIvwuCVHER5Yi938IlSwfy+kOfinhXXDGRCH8xrqmYFJRsvf9MdJi8dfiZSzBVDNv
-        9Y5vxWaV8co6fpHvChVu6aEJa1JKBk5/o4XXJCwXXE79GGFIwkJ9LI5tm5QxCZm0GqpKScG6vBm6n
-        A4zKiNLQ==;
+        bh=qLuO7hD0TG0p9aylN+kHqBJxf5z3v4FVxxZ2M17hRmY=; b=cByrnVSUwNsV+8vL6OejYZMzYW
+        g8VICMIEorS+0pOBvVioVLf/hyD/zxobeo8PAet5DaDiGdRDYy0L5JNIcM3yD1NCnwpsR6gWUVB5i
+        Lptsh/7GyC3dYE+HryC4wV9CakS+3V2vvPvT4vRhVftfmO4XobgclczjV5yeEVlKRsJvJ9LwjX+8o
+        1vNw6Sl4pqdKC25En8sUougbgcvCNyLxzyGGHsEPu8enWgOfJoKU0RIKHjBkbhK7GxVxYfvwMvJI6
+        Vf9vnnAEkii3NBNG4XOnzwMMzJMYdhpc7IAUijTjrAXJlfebUq3ghdAO/ZeMpsZrhIZUAVgWmW/K4
+        kMYMHe4Q==;
 Received: from [2001:4bb8:180:5443:c70:4a89:bc61:3] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1khYMN-0006U7-DO; Tue, 24 Nov 2020 13:27:55 +0000
+        id 1khYMb-0006Vh-99; Tue, 24 Nov 2020 13:28:09 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
@@ -51,9 +51,9 @@ Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
         xen-devel@lists.xenproject.org, linux-bcache@vger.kernel.org,
         linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
         linux-mm@kvack.org
-Subject: [PATCH 01/45] blk-cgroup: fix a hd_struct leak in blkcg_fill_root_iostats
-Date:   Tue, 24 Nov 2020 14:27:07 +0100
-Message-Id: <20201124132751.3747337-2-hch@lst.de>
+Subject: [PATCH 10/45] dm: remove the block_device reference in struct mapped_device
+Date:   Tue, 24 Nov 2020 14:27:16 +0100
+Message-Id: <20201124132751.3747337-11-hch@lst.de>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201124132751.3747337-1-hch@lst.de>
 References: <20201124132751.3747337-1-hch@lst.de>
@@ -64,28 +64,92 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-disk_get_part needs to be paired with a disk_put_part.
+Get rid of the long-lasting struct block_device reference in
+struct mapped_device.  The only remaining user is the freeze code,
+where we can trivially look up the block device at freeze time
+and release the reference at thaw time.
 
-Fixes: ef45fe470e1 ("blk-cgroup: show global disk stats in root cgroup io.stat")
 Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Reviewed-by: Jan Kara <jack@suse.cz>
-Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Acked-by: Tejun Heo <tj@kernel.org>
+Acked-by: Mike Snitzer <snitzer@redhat.com>
 ---
- block/blk-cgroup.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/md/dm-core.h |  2 --
+ drivers/md/dm.c      | 25 ++++++++++++++-----------
+ 2 files changed, 14 insertions(+), 13 deletions(-)
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index c68bdf58c9a6e1..54fbe1e80cc41a 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -849,6 +849,7 @@ static void blkcg_fill_root_iostats(void)
- 			blkg_iostat_set(&blkg->iostat.cur, &tmp);
- 			u64_stats_update_end(&blkg->iostat.sync);
- 		}
-+		disk_put_part(part);
- 	}
+diff --git a/drivers/md/dm-core.h b/drivers/md/dm-core.h
+index aace147effcacb..086d293c2b036c 100644
+--- a/drivers/md/dm-core.h
++++ b/drivers/md/dm-core.h
+@@ -102,8 +102,6 @@ struct mapped_device {
+ 	/* kobject and completion */
+ 	struct dm_kobject_holder kobj_holder;
+ 
+-	struct block_device *bdev;
+-
+ 	struct dm_stats stats;
+ 
+ 	/* for blk-mq request-based DM support */
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index ab0a8335f098d9..48051db006f30c 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -1744,11 +1744,6 @@ static void cleanup_mapped_device(struct mapped_device *md)
+ 
+ 	cleanup_srcu_struct(&md->io_barrier);
+ 
+-	if (md->bdev) {
+-		bdput(md->bdev);
+-		md->bdev = NULL;
+-	}
+-
+ 	mutex_destroy(&md->suspend_lock);
+ 	mutex_destroy(&md->type_lock);
+ 	mutex_destroy(&md->table_devices_lock);
+@@ -1840,10 +1835,6 @@ static struct mapped_device *alloc_dev(int minor)
+ 	if (!md->wq)
+ 		goto bad;
+ 
+-	md->bdev = bdget_disk(md->disk, 0);
+-	if (!md->bdev)
+-		goto bad;
+-
+ 	dm_stats_init(&md->stats);
+ 
+ 	/* Populate the mapping, nobody knows we exist yet */
+@@ -2384,11 +2375,16 @@ struct dm_table *dm_swap_table(struct mapped_device *md, struct dm_table *table)
+  */
+ static int lock_fs(struct mapped_device *md)
+ {
++	struct block_device *bdev;
+ 	int r;
+ 
+ 	WARN_ON(test_bit(DMF_FROZEN, &md->flags));
+ 
+-	r = freeze_bdev(md->bdev);
++	bdev = bdget_disk(md->disk, 0);
++	if (!bdev)
++		return -ENOMEM;
++	r = freeze_bdev(bdev);
++	bdput(bdev);
+ 	if (!r)
+ 		set_bit(DMF_FROZEN, &md->flags);
+ 	return r;
+@@ -2396,9 +2392,16 @@ static int lock_fs(struct mapped_device *md)
+ 
+ static void unlock_fs(struct mapped_device *md)
+ {
++	struct block_device *bdev;
++
+ 	if (!test_bit(DMF_FROZEN, &md->flags))
+ 		return;
+-	thaw_bdev(md->bdev);
++
++	bdev = bdget_disk(md->disk, 0);
++	if (!bdev)
++		return;
++	thaw_bdev(bdev);
++	bdput(bdev);
+ 	clear_bit(DMF_FROZEN, &md->flags);
  }
  
 -- 
