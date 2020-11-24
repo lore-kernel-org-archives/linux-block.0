@@ -2,36 +2,35 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-21.7 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4827C2D0E4
-	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 03:34:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89B9DC6379F
+	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 03:34:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5620F2085B
-	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 03:34:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 58DC820867
+	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 03:34:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727393AbgKXDdw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 Nov 2020 22:33:52 -0500
-Received: from out30-54.freemail.mail.aliyun.com ([115.124.30.54]:41461 "EHLO
-        out30-54.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726039AbgKXDdw (ORCPT
+        id S1729140AbgKXDdz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 Nov 2020 22:33:55 -0500
+Received: from out30-57.freemail.mail.aliyun.com ([115.124.30.57]:55849 "EHLO
+        out30-57.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727781AbgKXDdx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 Nov 2020 22:33:52 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R441e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=alimailimapcm10staff010182156082;MF=baolin.wang@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0UGNj0Wa_1606188829;
-Received: from localhost(mailfrom:baolin.wang@linux.alibaba.com fp:SMTPD_---0UGNj0Wa_1606188829)
+        Mon, 23 Nov 2020 22:33:53 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04407;MF=baolin.wang@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0UGN4rt._1606188830;
+Received: from localhost(mailfrom:baolin.wang@linux.alibaba.com fp:SMTPD_---0UGN4rt._1606188830)
           by smtp.aliyun-inc.com(127.0.0.1);
-          Tue, 24 Nov 2020 11:33:49 +0800
+          Tue, 24 Nov 2020 11:33:50 +0800
 From:   Baolin Wang <baolin.wang@linux.alibaba.com>
 To:     axboe@kernel.dk, tj@kernel.org
 Cc:     baolin.wang@linux.alibaba.com, baolin.wang7@gmail.com,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 1/7] blk-iocost: Fix some typos in comments
-Date:   Tue, 24 Nov 2020 11:33:30 +0800
-Message-Id: <54cf5f249bf91a6d1a0ea18a1024ba1af861f9c5.1606186717.git.baolin.wang@linux.alibaba.com>
+Subject: [PATCH 4/7] blk-iocost: Add a flag to indicate if need update hwi
+Date:   Tue, 24 Nov 2020 11:33:33 +0800
+Message-Id: <beb9ab5875427431b58e1001e481b7a43e9188eb.1606186717.git.baolin.wang@linux.alibaba.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <cover.1606186717.git.baolin.wang@linux.alibaba.com>
 References: <cover.1606186717.git.baolin.wang@linux.alibaba.com>
@@ -41,71 +40,51 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Fix some typos in comments.
+We can get the hwa and hwi at one time if no debt need to pay off,
+thus add a flag to indicate if the hw_inuse has been changed and
+need to update, which can avoid calling current_hweight() twice
+for no debt iocgs.
 
 Signed-off-by: Baolin Wang <baolin.wang@linux.alibaba.com>
 ---
- block/blk-iocost.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ block/blk-iocost.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index bbe86d1..4ffde36 100644
+index 089f3fe..5305afd 100644
 --- a/block/blk-iocost.c
 +++ b/block/blk-iocost.c
-@@ -39,7 +39,7 @@
-  * On top of that, a size cost proportional to the length of the IO is
-  * added.  While simple, this model captures the operational
-  * characteristics of a wide varienty of devices well enough.  Default
-- * paramters for several different classes of devices are provided and the
-+ * parameters for several different classes of devices are provided and the
-  * parameters can be configured from userspace via
-  * /sys/fs/cgroup/io.cost.model.
-  *
-@@ -77,7 +77,7 @@
-  *
-  * This constitutes the basis of IO capacity distribution.  Each cgroup's
-  * vtime is running at a rate determined by its hweight.  A cgroup tracks
-- * the vtime consumed by past IOs and can issue a new IO iff doing so
-+ * the vtime consumed by past IOs and can issue a new IO if doing so
-  * wouldn't outrun the current device vtime.  Otherwise, the IO is
-  * suspended until the vtime has progressed enough to cover it.
-  *
-@@ -155,7 +155,7 @@
-  * Instead of debugfs or other clumsy monitoring mechanisms, this
-  * controller uses a drgn based monitoring script -
-  * tools/cgroup/iocost_monitor.py.  For details on drgn, please see
-- * https://github.com/osandov/drgn.  The ouput looks like the following.
-+ * https://github.com/osandov/drgn.  The output looks like the following.
-  *
-  *  sdb RUN   per=300ms cur_per=234.218:v203.695 busy= +1 vrate= 62.12%
-  *                 active      weight      hweight% inflt% dbt  delay usages%
-@@ -492,7 +492,7 @@ struct ioc_gq {
- 	/*
- 	 * `vtime` is this iocg's vtime cursor which progresses as IOs are
- 	 * issued.  If lagging behind device vtime, the delta represents
--	 * the currently available IO budget.  If runnning ahead, the
-+	 * the currently available IO budget.  If running ahead, the
- 	 * overage.
- 	 *
- 	 * `vtime_done` is the same but progressed on completion rather
-@@ -1046,7 +1046,7 @@ static void __propagate_weights(struct ioc_gq *iocg, u32 active, u32 inuse,
+@@ -1405,10 +1405,11 @@ static void iocg_kick_waitq(struct ioc_gq *iocg, bool pay_debt,
+ 	u64 vshortage, expires, oexpires;
+ 	s64 vbudget;
+ 	u32 hwa;
++	bool need_update_hwi = false;
  
- 		/*
- 		 * The delta between inuse and active sums indicates that
--		 * that much of weight is being given away.  Parent's inuse
-+		 * much of weight is being given away.  Parent's inuse
- 		 * and active should reflect the ratio.
- 		 */
- 		if (parent->child_active_sum) {
-@@ -2400,7 +2400,7 @@ static u64 adjust_inuse_and_calc_cost(struct ioc_gq *iocg, u64 vtime,
- 		return cost;
+ 	lockdep_assert_held(&iocg->waitq.lock);
  
- 	/*
--	 * We only increase inuse during period and do so iff the margin has
-+	 * We only increase inuse during period and do so if the margin has
- 	 * deteriorated since the previous adjustment.
+-	current_hweight(iocg, &hwa, NULL);
++	current_hweight(iocg, &hwa, &ctx.hw_inuse);
+ 	vbudget = now->vnow - atomic64_read(&iocg->vtime);
+ 
+ 	/* pay off debt */
+@@ -1423,6 +1424,7 @@ static void iocg_kick_waitq(struct ioc_gq *iocg, bool pay_debt,
+ 		atomic64_add(vpay, &iocg->done_vtime);
+ 		iocg_pay_debt(iocg, abs_vpay, now);
+ 		vbudget -= vpay;
++		need_update_hwi = true;
+ 	}
+ 
+ 	if (iocg->abs_vdebt || iocg->delay)
+@@ -1445,7 +1447,8 @@ static void iocg_kick_waitq(struct ioc_gq *iocg, bool pay_debt,
+ 	 * after the above debt payment.
  	 */
- 	if (margin >= iocg->saved_margin || margin >= margins->low ||
+ 	ctx.vbudget = vbudget;
+-	current_hweight(iocg, NULL, &ctx.hw_inuse);
++	if (need_update_hwi)
++		current_hweight(iocg, NULL, &ctx.hw_inuse);
+ 
+ 	__wake_up_locked_key(&iocg->waitq, TASK_NORMAL, &ctx);
+ 
 -- 
 1.8.3.1
 
