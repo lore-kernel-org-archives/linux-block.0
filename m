@@ -2,95 +2,130 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75ED8C2D0E4
-	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 12:26:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F6FBC2D0E4
+	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 12:50:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 145622076E
-	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 12:26:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B31B32073C
+	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 12:50:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q2pmLjkQ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jFaJ647b"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387543AbgKXM02 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Nov 2020 07:26:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52250 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1733231AbgKXM01 (ORCPT
+        id S2387619AbgKXMud (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Nov 2020 07:50:33 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:42258 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1732512AbgKXMuc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Nov 2020 07:26:27 -0500
-Received: from mail-qt1-x844.google.com (mail-qt1-x844.google.com [IPv6:2607:f8b0:4864:20::844])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B85ACC0613D6;
-        Tue, 24 Nov 2020 04:26:27 -0800 (PST)
-Received: by mail-qt1-x844.google.com with SMTP id d5so6831449qtn.0;
-        Tue, 24 Nov 2020 04:26:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=3VmFnou2nD4lcYGUPrMqThXCue7L4UhclP4oij42Kbk=;
-        b=Q2pmLjkQax53DfEJqAJ++rfXRuCUfTMdSrNvTnPX432cf0gQiAL3+rv3sWj3pG2My/
-         oRdarF4chfZ/NGCWEsg2aUxLBAr7DM0+LX5j3dmwR37bMrIIw9a2t0+E+kgW+uzsRvYc
-         g8kM86RUe+4+vv//4l1WUE0yyA289I+AFdLve44wNIShUP964g0YZBC6/O2hSjbZ07AU
-         S+AiwdwqWWOpdsi3wwn8TVFeRWE/u7jWG4pRzv/CGg3KS5VD7Ier0L558UzN4+P3vh8c
-         3eIrk+wHnJy7NT29VnOUcXmovGz+97HAGUQWfQatJC0i/4bkcHptLw7Lu0lLat1XLRR0
-         0C4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=3VmFnou2nD4lcYGUPrMqThXCue7L4UhclP4oij42Kbk=;
-        b=QOYY+DvKsuE0yZzIGpF/TxiYGY4nSbKE8vc0R3o3dMWP1uONBI5+0FkK2KnLpT8AqO
-         FdeqTtDEvUWSWMyU6b28rYOnoZrV+Ri/oHeQ6M60I1QsaSjALCV3dfEi7saK0fqD44P9
-         Q8m4jC69bL7NuNi9kcowGH1lg9nOynHfa5z3rJQV3vJP/PLWVHvmxhBi/rFA8FbEpFhn
-         /Tvg12vKjlqt8OTo63e6qhrLblkuLItbRa+Og5rxkhRBPWwbHo6ZedIMT+UiXRMajQZf
-         70o/pF5ip9G9ulZnnWhRJwussE1vZmeRb8sjuvQpSG/jGBxKsdVNFSDVvC3pkbCy+xgV
-         ppLg==
-X-Gm-Message-State: AOAM530Bxm/5R8BDUG5TUKrJOFqkJMRCKobL7XADZ0eVl6+UkjZAvw0N
-        SGv/o3sTp5QCGSLjvH4Cqk8=
-X-Google-Smtp-Source: ABdhPJzEc+iLQWYgDMndDYVqthGkMbJAnqvSsODxlzYXE5vX4s2url7RgqZoX9eivJ6nNv6zlRow0w==
-X-Received: by 2002:aed:3c42:: with SMTP id u2mr4081287qte.159.1606220786736;
-        Tue, 24 Nov 2020 04:26:26 -0800 (PST)
-Received: from localhost (dhcp-6c-ae-f6-dc-d8-61.cpe.echoes.net. [72.28.8.195])
-        by smtp.gmail.com with ESMTPSA id t2sm8643187qkb.2.2020.11.24.04.26.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Nov 2020 04:26:25 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Tue, 24 Nov 2020 07:26:03 -0500
-From:   Tejun Heo <tj@kernel.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Josef Bacik <josef@toxicpanda.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Coly Li <colyli@suse.de>, Mike Snitzer <snitzer@redhat.com>,
-        dm-devel@redhat.com, Richard Weinberger <richard@nod.at>,
-        Jan Kara <jack@suse.com>, linux-block@vger.kernel.org,
-        xen-devel@lists.xenproject.org, linux-bcache@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: Re: [PATCH 01/20] blk-cgroup: fix a hd_struct leak in
- blkcg_fill_root_iostats
-Message-ID: <X7z7215hVXzg3FGA@mtj.duckdns.org>
-References: <20201118084800.2339180-1-hch@lst.de>
- <20201118084800.2339180-2-hch@lst.de>
+        Tue, 24 Nov 2020 07:50:32 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1606222231;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=85J5ydxTbt/EblYQnFmb9dU7jIz8RU2wol+TDenY5jI=;
+        b=jFaJ647b4z+TdWbjGmvUVooDB+7j7LUi8OmaE0RWgd6nZqSWf5PruZILeiZYf7pR5uFd5k
+        KvzIX4PEmGjkICrUd78SER4/BRHzUO7EjMSARMnVHEkdprqw/jKzJlFlZgNMXozlC+k6Io
+        JxOQ9im8Ox6v7NwqNMR0AKtb8sRjngc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-228-y8Fb6_MOMjGqGxjHxIppEg-1; Tue, 24 Nov 2020 07:50:27 -0500
+X-MC-Unique: y8Fb6_MOMjGqGxjHxIppEg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4F5D0180DE0D;
+        Tue, 24 Nov 2020 12:50:25 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-112-111.rdu2.redhat.com [10.10.112.111])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4F8DB60C64;
+        Tue, 24 Nov 2020 12:50:23 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <74f6fb34-c4c2-6a7e-3614-78c34246c6bd@gmail.com>
+References: <74f6fb34-c4c2-6a7e-3614-78c34246c6bd@gmail.com> <20201123080506.GA30578@infradead.org> <160596800145.154728.7192318545120181269.stgit@warthog.procyon.org.uk> <160596801020.154728.15935034745159191564.stgit@warthog.procyon.org.uk> <516984.1606127474@warthog.procyon.org.uk>
+To:     Pavel Begunkov <asml.silence@gmail.com>
+Cc:     dhowells@redhat.com, Christoph Hellwig <hch@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 01/29] iov_iter: Switch to using a table of operations
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201118084800.2339180-2-hch@lst.de>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1155890.1606222222.1@warthog.procyon.org.uk>
+Date:   Tue, 24 Nov 2020 12:50:22 +0000
+Message-ID: <1155891.1606222222@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 18, 2020 at 09:47:41AM +0100, Christoph Hellwig wrote:
-> disk_get_part needs to be paired with a disk_put_part.
-> 
-> Fixes: ef45fe470e1 ("blk-cgroup: show global disk stats in root cgroup io.stat")
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+Pavel Begunkov <asml.silence@gmail.com> wrote:
 
-Acked-by: Tejun Heo <tj@kernel.org>
+> fio is relatively heavy, I'd suggest to try fio/t/io_uring with nullblk
 
-Thanks.
+no patches:
 
--- 
-tejun
+IOPS=885152, IOS/call=25/25, inflight=64 (64)
+IOPS=890400, IOS/call=25/25, inflight=32 (32)
+IOPS=890656, IOS/call=25/25, inflight=64 (64)
+IOPS=896096, IOS/call=25/25, inflight=96 (96)
+IOPS=876256, IOS/call=25/25, inflight=128 (128)
+IOPS=905056, IOS/call=25/25, inflight=128 (128)
+IOPS=882912, IOS/call=25/25, inflight=96 (96)
+IOPS=887392, IOS/call=25/25, inflight=64 (32)
+IOPS=897152, IOS/call=25/25, inflight=128 (128)
+IOPS=871392, IOS/call=25/25, inflight=32 (32)
+IOPS=865088, IOS/call=25/25, inflight=96 (96)
+IOPS=880032, IOS/call=25/25, inflight=32 (32)
+IOPS=905376, IOS/call=25/25, inflight=96 (96)
+IOPS=898016, IOS/call=25/25, inflight=128 (128)
+IOPS=885792, IOS/call=25/25, inflight=64 (64)
+IOPS=897632, IOS/call=25/25, inflight=96 (96)
+
+first patch only:
+
+IOPS=876640, IOS/call=25/25, inflight=64 (64)
+IOPS=878208, IOS/call=25/25, inflight=64 (64)
+IOPS=884000, IOS/call=25/25, inflight=64 (64)
+IOPS=900864, IOS/call=25/25, inflight=64 (64)
+IOPS=878496, IOS/call=25/25, inflight=64 (64)
+IOPS=870944, IOS/call=25/25, inflight=32 (32)
+IOPS=900672, IOS/call=25/25, inflight=32 (32)
+IOPS=882368, IOS/call=25/25, inflight=128 (128)
+IOPS=877120, IOS/call=25/25, inflight=128 (128)
+IOPS=861856, IOS/call=25/25, inflight=64 (64)
+IOPS=892896, IOS/call=25/25, inflight=96 (96)
+IOPS=875808, IOS/call=25/25, inflight=128 (128)
+IOPS=887808, IOS/call=25/25, inflight=32 (80)
+IOPS=889984, IOS/call=25/25, inflight=128 (128)
+
+all patches:
+
+IOPS=872192, IOS/call=25/25, inflight=96 (96)
+IOPS=887360, IOS/call=25/25, inflight=32 (32)
+IOPS=894432, IOS/call=25/25, inflight=128 (128)
+IOPS=884640, IOS/call=25/25, inflight=32 (32)
+IOPS=886784, IOS/call=25/25, inflight=32 (32)
+IOPS=884160, IOS/call=25/25, inflight=96 (96)
+IOPS=886944, IOS/call=25/25, inflight=96 (96)
+IOPS=903360, IOS/call=25/25, inflight=128 (128)
+IOPS=887744, IOS/call=25/25, inflight=64 (64)
+IOPS=891072, IOS/call=25/25, inflight=32 (32)
+IOPS=900512, IOS/call=25/25, inflight=128 (128)
+IOPS=888544, IOS/call=25/25, inflight=128 (128)
+IOPS=877312, IOS/call=25/25, inflight=128 (128)
+IOPS=895008, IOS/call=25/25, inflight=128 (128)
+IOPS=889376, IOS/call=25/25, inflight=128 (128)
+
+David
+
