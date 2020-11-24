@@ -2,259 +2,192 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7A28C63777
-	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 16:39:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53289C63777
+	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 17:00:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8D6D8206D5
-	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 16:39:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E2505206D9
+	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 17:00:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pkS1IsRK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390341AbgKXQi5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Nov 2020 11:38:57 -0500
-Received: from mail-1.ca.inter.net ([208.85.220.69]:59825 "EHLO
-        mail-1.ca.inter.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390337AbgKXQi4 (ORCPT
+        id S2390003AbgKXRAN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Nov 2020 12:00:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38454 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731540AbgKXRAM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Nov 2020 11:38:56 -0500
-Received: from localhost (offload-3.ca.inter.net [208.85.220.70])
-        by mail-1.ca.inter.net (Postfix) with ESMTP id 7CD692EA0FA;
-        Tue, 24 Nov 2020 11:38:55 -0500 (EST)
-Received: from mail-1.ca.inter.net ([208.85.220.69])
-        by localhost (offload-3.ca.inter.net [208.85.220.70]) (amavisd-new, port 10024)
-        with ESMTP id qWgJReFE2muH; Tue, 24 Nov 2020 11:29:01 -0500 (EST)
-Received: from [192.168.48.23] (host-104-157-204-209.dyn.295.ca [104.157.204.209])
-        (using TLSv1 with cipher DHE-RSA-AES128-SHA (128/128 bits))
-        (No client certificate requested)
-        (Authenticated sender: dgilbert@interlog.com)
-        by mail-1.ca.inter.net (Postfix) with ESMTPSA id BEE702EA106;
-        Tue, 24 Nov 2020 11:38:54 -0500 (EST)
-Reply-To: dgilbert@interlog.com
-Subject: Re: [PATCH v1 3/3] scsi_debug: iouring iopoll support
-To:     Kashyap Desai <kashyap.desai@broadcom.com>,
-        linux-scsi@vger.kernel.org
-Cc:     linux-block@vger.kernel.org
-References: <20201015133721.63476-1-kashyap.desai@broadcom.com>
-From:   Douglas Gilbert <dgilbert@interlog.com>
-Message-ID: <56c55fed-3034-9fbf-b089-a07e74d9b05b@interlog.com>
-Date:   Tue, 24 Nov 2020 11:38:54 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Tue, 24 Nov 2020 12:00:12 -0500
+Received: from mail-qt1-x843.google.com (mail-qt1-x843.google.com [IPv6:2607:f8b0:4864:20::843])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2D17C0613D6;
+        Tue, 24 Nov 2020 09:00:12 -0800 (PST)
+Received: by mail-qt1-x843.google.com with SMTP id l2so921407qtq.4;
+        Tue, 24 Nov 2020 09:00:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=fWmahOo+BxCVV9NEre8zWFBYKORZfhSvfmLWizAk7Sk=;
+        b=pkS1IsRKMFFQKIiQOFY8WLSirKTKy5vlf5vBnIHJQYY8QvEC/15BTkG00rjnGztDPS
+         MPnwXECAwJubj26/AKIoLsOqJXTzH20co1dwm6n/ihZPA8R/GncgR5Nn7BAW2WaJHH5L
+         tpbCDHrNvMRBQDAisHHKNo7eGDqcuHeaFIgkH8ZC9CSiQc7xH6mkLcfA+jtEEIACMHfa
+         u3OVfgqj6hqatE6LBJWSWupUvafe+983boP6OtbOOXJy3CJYXaRV2xsgTTuY8gHl3o7O
+         iFEoPfxU2lYaOEolDJw8+Asj3AIZ8QN2eniPlD554d4692r1CYqrwtcGwNWS1nLFzZNO
+         sY1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=fWmahOo+BxCVV9NEre8zWFBYKORZfhSvfmLWizAk7Sk=;
+        b=T5Vi3ueX0W25PF93XmmUFrCiYgiJM+s7LwVylXATvJAThumXEg/2dVjEW6OkkAfLxg
+         MJH2L2jgfwtRvfAwbS7rjlzTGurjUYl9wOArQEJv44Vd/dKfFy7oQTU8zyKyDTXbpQNM
+         XFx5+MlNEuv+LyP75XkTjfV5z6Syescv6OOQj2Il8oVDf9G05YdDC+G6lyKvIXx6jMXk
+         iWTXTSJp17w2SbxKNrHluk/4DQYuro9nslRW5XQJEMfjDfjdZKMkY7capC97E9+7zny5
+         kT0BhI07qckOa1S35AJgr7kQJrXFn22T5knylif+yb2lJluk1n2Dr8tmwQKlEvDfdR+U
+         JyhA==
+X-Gm-Message-State: AOAM532GwkHAtLmL8pcXmhNAvnECCB1xpM1Zn2uW5/Ihv49Z4Et/lk3f
+        GYvsNXpXgZ+ko3PhE5Yp12M=
+X-Google-Smtp-Source: ABdhPJw9lXoUdb+9nSlmHwoziLxai+Rt3I7zgIJ1oTBqcvjWZC4/0fG7FN8qIJjp6NzaYQdsfu0bWw==
+X-Received: by 2002:a05:622a:18d:: with SMTP id s13mr5279508qtw.306.1606237211875;
+        Tue, 24 Nov 2020 09:00:11 -0800 (PST)
+Received: from localhost (dhcp-6c-ae-f6-dc-d8-61.cpe.echoes.net. [72.28.8.195])
+        by smtp.gmail.com with ESMTPSA id q20sm13543500qke.0.2020.11.24.09.00.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Nov 2020 09:00:11 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Tue, 24 Nov 2020 11:59:49 -0500
+From:   Tejun Heo <tj@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Josef Bacik <josef@toxicpanda.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Coly Li <colyli@suse.de>, Mike Snitzer <snitzer@redhat.com>,
+        dm-devel@redhat.com, Richard Weinberger <richard@nod.at>,
+        Jan Kara <jack@suse.com>, linux-block@vger.kernel.org,
+        xen-devel@lists.xenproject.org, linux-bcache@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: Re: [PATCH 11/20] block: reference struct block_device from struct
+ hd_struct
+Message-ID: <X708BTJ5njtbC2z1@mtj.duckdns.org>
+References: <20201118084800.2339180-1-hch@lst.de>
+ <20201118084800.2339180-12-hch@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <20201015133721.63476-1-kashyap.desai@broadcom.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-CA
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201118084800.2339180-12-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-10-15 9:37 a.m., Kashyap Desai wrote:
-> Add support of iouring iopoll interface in scsi_debug.
-> This feature requires shared hosttag support in kernel and driver.
+Hello,
 
-I am continuing to test this patch. There is one fix shown inline below
-plus a question near the end.
+This is great. So much simpler & better. Some nits below.
 
-Doug Gilbert
+> diff --git a/block/partitions/core.c b/block/partitions/core.c
+> index a02e224115943d..0ba0bf44b88af3 100644
+> --- a/block/partitions/core.c
+> +++ b/block/partitions/core.c
+> @@ -340,12 +340,11 @@ void delete_partition(struct hd_struct *part)
+>  	device_del(part_to_dev(part));
+>  
+>  	/*
+> -	 * Remove gendisk pointer from idr so that it cannot be looked up
+> -	 * while RCU period before freeing gendisk is running to prevent
+> -	 * use-after-free issues. Note that the device number stays
+> -	 * "in-use" until we really free the gendisk.
+> +	 * Remove the block device from the inode hash, so that it cannot be
+> +	 * looked up while waiting for the RCU grace period.
+>  	 */
+> -	blk_invalidate_devt(part_devt(part));
+> +	remove_inode_hash(part->bdev->bd_inode);
 
-> Signed-off-by: Kashyap Desai <kashyap.desai@broadcom.com>
-> Cc: dgilbert@interlog.com
-> Cc: linux-block@vger.kernel.org
-> ---
->   drivers/scsi/scsi_debug.c | 123 ++++++++++++++++++++++++++++++++++++++
->   1 file changed, 123 insertions(+)
-> 
-> diff --git a/drivers/scsi/scsi_debug.c b/drivers/scsi/scsi_debug.c
-> index a87e40aec11f..4d9cc6af588c 100644
-> --- a/drivers/scsi/scsi_debug.c
-> +++ b/drivers/scsi/scsi_debug.c
-> @@ -826,6 +826,7 @@ static int sdeb_zbc_max_open = DEF_ZBC_MAX_OPEN_ZONES;
->   static int sdeb_zbc_nr_conv = DEF_ZBC_NR_CONV_ZONES;
->   
->   static int submit_queues = DEF_SUBMIT_QUEUES;  /* > 1 for multi-queue (mq) */
-> +static int poll_queues; /* iouring iopoll interface.*/
->   static struct sdebug_queue *sdebug_q_arr;  /* ptr to array of submit queues */
->   
->   static DEFINE_RWLOCK(atomic_rw);
-> @@ -5422,6 +5423,14 @@ static int schedule_resp(struct scsi_cmnd *cmnd, struct sdebug_dev_info *devip,
->   	cmnd->host_scribble = (unsigned char *)sqcp;
->   	sd_dp = sqcp->sd_dp;
->   	spin_unlock_irqrestore(&sqp->qc_lock, iflags);
+I don't think this is necessary now that the bdev and inode lifetimes are
+one. Before, punching out the association early was necessary because we
+could be in a situation where we can successfully look up a part from idr
+and then try to pin the associated disk which may already be freed. With the
+new code, the lookup is through the inode whose lifetime is one and the same
+with gendisk, so use-after-free isn't possible and __blkdev_get() will
+reliably reject such open attempts.
+
+...
+> diff --git a/fs/block_dev.c b/fs/block_dev.c
+> index 4c4d6c30382c06..e94633dc6ad93b 100644
+> --- a/fs/block_dev.c
+> +++ b/fs/block_dev.c
+> @@ -870,34 +870,50 @@ void __init bdev_cache_init(void)
+>  	blockdev_superblock = bd_mnt->mnt_sb;   /* For writeback */
+>  }
+>  
+> -static struct block_device *bdget(dev_t dev)
+> +struct block_device *bdev_alloc(struct gendisk *disk, u8 partno)
+>  {
+>  	struct block_device *bdev;
+>  	struct inode *inode;
+>  
+> -	inode = iget_locked(blockdev_superblock, dev);
+> +	inode = new_inode(blockdev_superblock);
+>  	if (!inode)
+>  		return NULL;
+>  
+> -	bdev = &BDEV_I(inode)->bdev;
+> +	bdev = I_BDEV(inode);
+> +	spin_lock_init(&bdev->bd_size_lock);
+> +	bdev->bd_disk = disk;
+> +	bdev->bd_partno = partno;
+> +	bdev->bd_contains = NULL;
+> +	bdev->bd_super = NULL;
+> +	bdev->bd_inode = inode;
+> +	bdev->bd_part_count = 0;
 > +
-> +	/* Do not complete IO from default completion path.
-> +	 * Let it to be on queue.
-> +	 * Completion should happen from mq_poll interface.
-> +	 */
-> +	if ((sqp - sdebug_q_arr) >= (submit_queues - poll_queues))
-> +		return 0;
-> +
->   	if (!sd_dp) {
->   		sd_dp = kzalloc(sizeof(*sd_dp), GFP_ATOMIC);
->   		if (!sd_dp) {
-> @@ -5604,6 +5613,7 @@ module_param_named(sector_size, sdebug_sector_size, int, S_IRUGO);
->   module_param_named(statistics, sdebug_statistics, bool, S_IRUGO | S_IWUSR);
->   module_param_named(strict, sdebug_strict, bool, S_IRUGO | S_IWUSR);
->   module_param_named(submit_queues, submit_queues, int, S_IRUGO);
-> +module_param_named(poll_queues, poll_queues, int, S_IRUGO);
->   module_param_named(tur_ms_to_ready, sdeb_tur_ms_to_ready, int, S_IRUGO);
->   module_param_named(unmap_alignment, sdebug_unmap_alignment, int, S_IRUGO);
->   module_param_named(unmap_granularity, sdebug_unmap_granularity, int, S_IRUGO);
-> @@ -5673,6 +5683,7 @@ MODULE_PARM_DESC(sector_size, "logical block size in bytes (def=512)");
->   MODULE_PARM_DESC(statistics, "collect statistics on commands, queues (def=0)");
->   MODULE_PARM_DESC(strict, "stricter checks: reserved field in cdb (def=0)");
->   MODULE_PARM_DESC(submit_queues, "support for block multi-queue (def=1)");
-> +MODULE_PARM_DESC(poll_queues, "support for iouring iopoll queues");
->   MODULE_PARM_DESC(tur_ms_to_ready, "TEST UNIT READY millisecs before initial good status (def=0)");
->   MODULE_PARM_DESC(unmap_alignment, "lowest aligned thin provisioning lba (def=0)");
->   MODULE_PARM_DESC(unmap_granularity, "thin provisioning granularity in blocks (def=1)");
-> @@ -7140,6 +7151,104 @@ static int resp_not_ready(struct scsi_cmnd *scp, struct sdebug_dev_info *devip)
->   	return check_condition_result;
->   }
->   
-> +static int sdebug_map_queues(struct Scsi_Host *shost)
-> +{
-> +	int i, qoff;
-> +
-> +	if (shost->nr_hw_queues == 1)
-> +		return 0;
-> +
-> +	for (i = 0, qoff = 0; i < HCTX_MAX_TYPES; i++) {
-> +		struct blk_mq_queue_map *map = &shost->tag_set.map[i];
-> +
-> +		map->nr_queues  = 0;
-> +
-> +		if (i == HCTX_TYPE_DEFAULT)
-> +			map->nr_queues = submit_queues - poll_queues;
-> +		else if (i == HCTX_TYPE_POLL)
-> +			map->nr_queues = poll_queues;
-> +
-> +		if (!map->nr_queues) {
-> +			BUG_ON(i == HCTX_TYPE_DEFAULT);
-> +			continue;
-> +		}
-> +
-> +		map->queue_offset = qoff;
-> +		blk_mq_map_queues(map);
-> +
-> +		qoff += map->nr_queues;
+> +	inode->i_mode = S_IFBLK;
+> +	inode->i_rdev = 0;
+> +	inode->i_bdev = bdev;
+> +	inode->i_data.a_ops = &def_blk_aops;
+
+Missing the call to mapping_set_gfp_mask().
+
+>  
+> -	if (inode->i_state & I_NEW) {
+> -		spin_lock_init(&bdev->bd_size_lock);
+> -		bdev->bd_contains = NULL;
+> -		bdev->bd_super = NULL;
+> -		bdev->bd_inode = inode;
+> -		bdev->bd_part_count = 0;
+> -		bdev->bd_dev = dev;
+> -		inode->i_mode = S_IFBLK;
+> -		inode->i_rdev = dev;
+> -		inode->i_bdev = bdev;
+> -		inode->i_data.a_ops = &def_blk_aops;
+> -		mapping_set_gfp_mask(&inode->i_data, GFP_USER);
+> -		unlock_new_inode(inode);
+> -	}
+>  	return bdev;
+>  }
+...
+>  /**
+>   * bdgrab -- Grab a reference to an already referenced block device
+>   * @bdev:	Block device to grab a reference to.
+> @@ -957,6 +973,10 @@ static struct block_device *bd_acquire(struct inode *inode)
+>  		bd_forget(inode);
+>  
+>  	bdev = bdget(inode->i_rdev);
+> +	if (!bdev) {
+> +		blk_request_module(inode->i_rdev);
+> +		bdev = bdget(inode->i_rdev);
 > +	}
-> +
-> +	return 0;
-> +
-> +}
-> +
-> +static int sdebug_blk_mq_poll(struct Scsi_Host *shost, unsigned int queue_num)
-> +{
-> +	int qc_idx;
-> +	int retiring = 0;
-> +	unsigned long iflags;
-> +	struct sdebug_queue *sqp;
-> +	struct sdebug_queued_cmd *sqcp;
-> +	struct scsi_cmnd *scp;
-> +	struct sdebug_dev_info *devip;
-> +	int num_entries = 0;
-> +
-> +	sqp = sdebug_q_arr + queue_num;
-> +
-> +	do {
-> +		spin_lock_irqsave(&sqp->qc_lock, iflags);
-> +		qc_idx = find_first_bit(sqp->in_use_bm, sdebug_max_queue);
-> +		if (unlikely((qc_idx < 0) || (qc_idx >= SDEBUG_CANQUEUE)))
 
-The above line IMO needs to be:
-		if (unlikely((qc_idx < 0) || (qc_idx >= sdebug_max_queue)))
+One side effect here is that, before, a device which uses the traditional
+consecutive devt range would reserve all minors for the partitions whether
+they exist or not and fail open requests without requesting the matching
+module. After the change, trying to open an non-existent partition would
+trigger module probe. I don't think the behavior change is consequential in
+any sane not-crazily-arcane setup but it might be worth mentioning in the
+commit log.
 
-If not, when sdebug_max_queue < SDEBUG_CANQUEUE and there is no request waiting
-then "scp is NULL, ..." is reported suggesting there is an error.
+Thank you.
 
-> +			goto out;
-> +
-> +		sqcp = &sqp->qc_arr[qc_idx];
-> +		scp = sqcp->a_cmnd;
-> +		if (unlikely(scp == NULL)) {
-> +			pr_err("scp is NULL, queue_num=%d, qc_idx=%d from %s\n",
-> +			       queue_num, qc_idx, __func__);
-> +			goto out;
-> +		}
-> +		devip = (struct sdebug_dev_info *)scp->device->hostdata;
-> +		if (likely(devip))
-> +			atomic_dec(&devip->num_in_q);
-> +		else
-> +			pr_err("devip=NULL from %s\n", __func__);
-> +		if (unlikely(atomic_read(&retired_max_queue) > 0))
-> +			retiring = 1;
-> +
-> +		sqcp->a_cmnd = NULL;
-> +		if (unlikely(!test_and_clear_bit(qc_idx, sqp->in_use_bm))) {
-> +			pr_err("Unexpected completion sqp %p queue_num=%d qc_idx=%d from %s\n",
-> +				sqp, queue_num, qc_idx, __func__);
-> +			goto out;
-> +		}
-> +
-> +		if (unlikely(retiring)) {	/* user has reduced max_queue */
-> +			int k, retval;
-> +
-> +			retval = atomic_read(&retired_max_queue);
-> +			if (qc_idx >= retval) {
-> +				pr_err("index %d too large\n", retval);
-> +				goto out;
-> +			}
-> +			k = find_last_bit(sqp->in_use_bm, retval);
-> +			if ((k < sdebug_max_queue) || (k == retval))
-> +				atomic_set(&retired_max_queue, 0);
-> +			else
-> +				atomic_set(&retired_max_queue, k + 1);
-> +		}
-> +		spin_unlock_irqrestore(&sqp->qc_lock, iflags);
-> +		scp->scsi_done(scp); /* callback to mid level */
-> +		num_entries++;
-> +	} while (1);
-> +
-> +out:
-> +	spin_unlock_irqrestore(&sqp->qc_lock, iflags);
-> +	return num_entries;
-> +}
-> +
-> +
->   static int scsi_debug_queuecommand(struct Scsi_Host *shost,
->   				   struct scsi_cmnd *scp)
->   {
-> @@ -7318,6 +7427,8 @@ static struct scsi_host_template sdebug_driver_template = {
->   	.ioctl =		scsi_debug_ioctl,
->   	.queuecommand =		scsi_debug_queuecommand,
->   	.change_queue_depth =	sdebug_change_qdepth,
-> +	.map_queues =		sdebug_map_queues,
-> +	.mq_poll =		sdebug_blk_mq_poll,
->   	.eh_abort_handler =	scsi_debug_abort,
->   	.eh_device_reset_handler = scsi_debug_device_reset,
->   	.eh_target_reset_handler = scsi_debug_target_reset,
-> @@ -7365,6 +7476,18 @@ static int sdebug_driver_probe(struct device *dev)
->   	if (sdebug_host_max_queue)
->   		hpnt->host_tagset = 1;
->   
-> +	/* poll queues are possible for nr_hw_queues > 1 */
-> +	if (hpnt->nr_hw_queues == 1)
-> +		poll_queues = 0;
-> +
-> +	/* poll queues  */
-> +	if (poll_queues >= submit_queues) {
-
-So the above line rules out poll_queues == submit_queues; is that the
-intention? If so, a short explanation of why in a comment would be
-helpful. Helpful at least to me who would like to document this option.
-
-> +		pr_warn("%s: trim poll_queues to 1\n", my_name);
-> +		poll_queues = 1;
-> +	}
-> +	if (poll_queues)
-> +		hpnt->nr_maps = 3;
-> +
->   	sdbg_host->shost = hpnt;
->   	*((struct sdebug_host_info **)hpnt->hostdata) = sdbg_host;
->   	if ((hpnt->this_id >= 0) && (sdebug_num_tgts > hpnt->this_id))
-> 
-
+-- 
+tejun
