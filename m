@@ -2,145 +2,139 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 229C7C56201
-	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 15:05:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8DE3C63798
+	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 15:30:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B1EE12086A
-	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 15:05:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 63BA6206D8
+	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 15:30:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VyMwavay"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="08jMZAO1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388166AbgKXPEY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Nov 2020 10:04:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48592 "EHLO
+        id S2389651AbgKXPaa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Nov 2020 10:30:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52690 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731164AbgKXPEX (ORCPT
+        with ESMTP id S2388503AbgKXPaa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Nov 2020 10:04:23 -0500
-Received: from mail-wr1-x443.google.com (mail-wr1-x443.google.com [IPv6:2a00:1450:4864:20::443])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A85BC0613D6;
-        Tue, 24 Nov 2020 07:04:22 -0800 (PST)
-Received: by mail-wr1-x443.google.com with SMTP id p8so22658030wrx.5;
-        Tue, 24 Nov 2020 07:04:22 -0800 (PST)
+        Tue, 24 Nov 2020 10:30:30 -0500
+Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD299C0617A6
+        for <linux-block@vger.kernel.org>; Tue, 24 Nov 2020 07:30:28 -0800 (PST)
+Received: by mail-pf1-x444.google.com with SMTP id q10so18839818pfn.0
+        for <linux-block@vger.kernel.org>; Tue, 24 Nov 2020 07:30:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=to:cc:references:from:autocrypt:subject:message-id:date:user-agent
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=Sy/v8vbr0389Zkg1PgKmJJV9z+FSnOz00Ua8W+up/RI=;
-        b=VyMwavayGFGPsb3NN77FKVmFDEBqiGinc9OcQt+ZDinFdkQZzhWmGAQjvP1NFWkQ5h
-         FV6wLEMgecUE4SeSU92BnE54V0RDvOSd39OKcdUBymHWzJLa4cjfExPULPpzDFPS54wS
-         N/+IryOQ64RfzMzCOH4g/kQvVJzWdVa9qjcr0kI3t+okJu6iEkFIwuZ/Q6Fy36y7qnzM
-         HSVPtZdM9Dz9LSyzI8YzHUyFVbtUMZITFZ3dAwSln5yBScM+P/ZvMncPBkqohNl6VT5/
-         U4DUO7s2LhiLqNdN9eLNq8Hq5luyR8WZJ7pAGlzH91utUmrOxw+qTE1ZkWz9GjBEyTUw
-         FaYg==
+        bh=eMDUIiphwgQu/Rl/7QXTUEvd8hL5aoXhajraaKwKCps=;
+        b=08jMZAO19NC9YGv7ez1yKZVfbZHhH83VeOXbl5BSm1jpFljRj8AfKYBbquA1RFDkPd
+         VlraeOIrzu9B5B6/lgakO3mOkna3BHnN3ELg+Z6NC9l5pqZ9HFTP5TPyAEILiEZW9Ucd
+         fftOP2GSFWUomHxVtCLr//vdPyaFZafYwCwkvKrjXwT/VeVcTEahuhW7V6ppBKxUDPUI
+         PlNZSAZ6RMMC6ayPh9uaYs4fF7QgyMrGLbf80wTTczF/nZjKeQ3ePt0cJeg7IFzSmeim
+         6doUr62NdtL/CXelB9IFsVHFom1ra/hsQoRcja0CZdnKBUDdb03bP3h3dRCfvJAqh1bi
+         ibSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:autocrypt:subject
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=Sy/v8vbr0389Zkg1PgKmJJV9z+FSnOz00Ua8W+up/RI=;
-        b=m/l50/mMpVMZo+mLejbkm3R2Dwdfa/tyMFHc/YreEwmry/SeKPT7gWpEdJIFxM64ZQ
-         DIAK1Q5C859nBvxLcM+E/KqCdJHKeWw65JQnsvWhO3SKMBmbdvOxMBM2bvk0n8QQMt1w
-         VrTbSevj59oKXe++MPTOlTx7J7NH4NN1+88dFzxb6puWQDp5gWL1pbfGjcP1nCLUHJ0M
-         cBmYJHk71tB/B1dsTNrUDDBeoYeWZAIecdqUJhieg/J4zfoHj9Els/FiBlQzWfnNoSup
-         n/6vX8OkSzUvqtqFl638N1EjktV4kUqdt4Q2Mu81NPX0xfQpZTqk2dJH9wEvnvH3cqRO
-         xVLw==
-X-Gm-Message-State: AOAM5312VUYcLVZb8Uo0VaWpz4CiMVPJKIZg8voDZa9u0LYmcLxR/EQ/
-        6eg8gj/Qu0rQkKHTNddGAzF94t5PJ7IqbuKJ
-X-Google-Smtp-Source: ABdhPJzo4stX1Pr471g3hrk/K+eeUG1/SpdwziWJX1yVx1IxHebqKht0/bZNeA+3g6+QBgNNh5zFuA==
-X-Received: by 2002:adf:f852:: with SMTP id d18mr5509351wrq.232.1606230260830;
-        Tue, 24 Nov 2020 07:04:20 -0800 (PST)
-Received: from [192.168.1.166] (host109-152-100-189.range109-152.btcentralplus.com. [109.152.100.189])
-        by smtp.gmail.com with ESMTPSA id n67sm6132840wmf.25.2020.11.24.07.04.19
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=eMDUIiphwgQu/Rl/7QXTUEvd8hL5aoXhajraaKwKCps=;
+        b=rGaF4bl20P8HPQ5+QaQoZjkMOI9Vm8RFooBiI2LsBwPBjeThlxcGH9IxWyqSuFAxFD
+         I41UhUuCKZEK3o1PgYsASbksqUP2tFXcdi2MBtgqEj/dPk1zBv1r0hQpKXuoO6UTJYHs
+         z9X434iyEhAMemXI4YV64qQQ5k9zJog8VuBPZ4kWqlXP9/ZR8fHYRwwFpT43/vBJTeoR
+         o+412hk2VxaTff+I/Yl3K8rIm9pVA71FJgYn3YxnMZX9JampznkzAr5beTXj6I8s6USA
+         KF46a6sPjbU/dj0wiVYDfn55oN1lA85Wh/Ku9yJEPugZMmHIWllScVhBOeMm7iur7sRp
+         LXKw==
+X-Gm-Message-State: AOAM532Gl3WhqBLMNEf+5qtGC063Or15gzv6llaf0/2CBrhgcywstC3Q
+        Ukf812xiMc7OYdh9bw11pj+hBg==
+X-Google-Smtp-Source: ABdhPJzgTdOGgxS19PCgtmRGESJ4KGJeMYsFILdAGpKHr15AmdL2UFHLUgRjeSs+TeBNwaQM8zLKLQ==
+X-Received: by 2002:a17:90a:4601:: with SMTP id w1mr5612148pjg.109.1606231828348;
+        Tue, 24 Nov 2020 07:30:28 -0800 (PST)
+Received: from [192.168.1.134] ([66.219.217.173])
+        by smtp.gmail.com with ESMTPSA id ne22sm3574644pjb.45.2020.11.24.07.30.26
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Nov 2020 07:04:20 -0800 (PST)
-To:     John Garry <john.garry@huawei.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, Omar Sandoval <osandov@osandov.com>
-Cc:     linux-kernel@vger.kernel.org
-References: <cover.1606058975.git.asml.silence@gmail.com>
- <ddfa166d93f38e812751b6ff986fd5403b7893b7.1606058975.git.asml.silence@gmail.com>
- <e71a58b5-1315-d655-4e1e-cd7529acfd6b@huawei.com>
-From:   Pavel Begunkov <asml.silence@gmail.com>
-Autocrypt: addr=asml.silence@gmail.com; prefer-encrypt=mutual; keydata=
- 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 bA==
-Subject: Re: [PATCH v2 1/4] sbitmap: optimise sbitmap_deferred_clear()
-Message-ID: <6d3413c3-7cc9-8c6d-50c6-183d135a2193@gmail.com>
-Date:   Tue, 24 Nov 2020 15:01:10 +0000
+        Tue, 24 Nov 2020 07:30:27 -0800 (PST)
+Subject: Re: [PATCH 01/29] iov_iter: Switch to using a table of operations
+To:     David Howells <dhowells@redhat.com>,
+        Pavel Begunkov <asml.silence@gmail.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <74f6fb34-c4c2-6a7e-3614-78c34246c6bd@gmail.com>
+ <20201123080506.GA30578@infradead.org>
+ <160596800145.154728.7192318545120181269.stgit@warthog.procyon.org.uk>
+ <160596801020.154728.15935034745159191564.stgit@warthog.procyon.org.uk>
+ <516984.1606127474@warthog.procyon.org.uk>
+ <1155891.1606222222@warthog.procyon.org.uk>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <5b8ce555-7451-d977-22e7-e5d080ef2e1a@kernel.dk>
+Date:   Tue, 24 Nov 2020 08:30:25 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <e71a58b5-1315-d655-4e1e-cd7529acfd6b@huawei.com>
+In-Reply-To: <1155891.1606222222@warthog.procyon.org.uk>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 24/11/2020 14:11, John Garry wrote:
-> On 22/11/2020 15:35, Pavel Begunkov wrote:
->> Because of spinlocks and atomics sbitmap_deferred_clear() have to reload
->> &sb->map[index] on each access even though the map address won't change.
->> Pass in sbitmap_word instead of {sb, index}, so it's cached in a
->> variable. It also improves code generation of
->> sbitmap_find_bit_in_index().
->>
->> Signed-off-by: Pavel Begunkov<asml.silence@gmail.com>
+On 11/24/20 5:50 AM, David Howells wrote:
+> Pavel Begunkov <asml.silence@gmail.com> wrote:
 > 
-> Looks ok, even though a bit odd not be passing a struct sbitmap * now
+>> fio is relatively heavy, I'd suggest to try fio/t/io_uring with nullblk
+> 
+> no patches:
 
-IMHO, narrower context is better, so looks more natural to me.
+Here's what I get. nullb0 using blk-mq, and submit_queues==NPROC.
+iostats and merging disabled, using 8k bs for t/io_uring to ensure we
+have > 1 segment. Everything pinned to the same CPU to ensure
+reproducibility and stability. Kernel has CONFIG_RETPOLINE enabled.
 
-> Reviewed-by: John Garry <john.garry@huawei.com>
+5.10-rc5:
+IOPS=2453184, IOS/call=32/31, inflight=128 (128)
+IOPS=2435648, IOS/call=32/32, inflight=64 (64)
+IOPS=2448544, IOS/call=32/31, inflight=96 (96)
+IOPS=2439584, IOS/call=32/31, inflight=128 (128)
+IOPS=2454176, IOS/call=32/32, inflight=32 (32)
 
-Thanks!
+5.10-rc5+all patches
+IOPS=2304224, IOS/call=32/32, inflight=64 (64)
+IOPS=2309216, IOS/call=32/32, inflight=32 (32)
+IOPS=2305376, IOS/call=32/31, inflight=128 (128)
+IOPS=2300544, IOS/call=32/32, inflight=128 (128)
+IOPS=2301728, IOS/call=32/32, inflight=32 (32)
+
+which looks to be around a 6% drop.
+
+Using actual hardware instead of just null_blk:
+
+5.10-rc5:
+IOPS=854163, IOS/call=31/31, inflight=101 (101)
+IOPS=855495, IOS/call=31/31, inflight=117 (117)
+IOPS=856118, IOS/call=31/31, inflight=100 (100)
+IOPS=855863, IOS/call=31/31, inflight=113 (113)
+IOPS=856282, IOS/call=31/31, inflight=116 (116)
+
+5.10-rc5+all patches
+IOPS=833391, IOS/call=31/31, inflight=100 (100)
+IOPS=838342, IOS/call=31/31, inflight=100 (100)
+IOPS=839921, IOS/call=31/31, inflight=105 (105)
+IOPS=841607, IOS/call=31/31, inflight=123 (123)
+IOPS=843625, IOS/call=31/31, inflight=107 (107)
+
+which looks to be around 2-3%, but we're also running at a much
+slower rate (830K vs ~2.3M).
 
 -- 
-Pavel Begunkov
+Jens Axboe
+
