@@ -2,97 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3B2FC63777
-	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 17:41:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F51AC56202
+	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 18:01:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5CA9A2087C
-	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 17:41:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BD6DD206D5
+	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 18:01:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jYivczMQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XCU6FL9e"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2403876AbgKXRl3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Nov 2020 12:41:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44858 "EHLO
+        id S2390838AbgKXSBy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Nov 2020 13:01:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2403820AbgKXRl3 (ORCPT
+        with ESMTP id S2390831AbgKXSBx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Nov 2020 12:41:29 -0500
-Received: from mail-qk1-x743.google.com (mail-qk1-x743.google.com [IPv6:2607:f8b0:4864:20::743])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23378C0613D6;
-        Tue, 24 Nov 2020 09:41:29 -0800 (PST)
-Received: by mail-qk1-x743.google.com with SMTP id l2so21578383qkf.0;
-        Tue, 24 Nov 2020 09:41:29 -0800 (PST)
+        Tue, 24 Nov 2020 13:01:53 -0500
+Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0C97C0613D6
+        for <linux-block@vger.kernel.org>; Tue, 24 Nov 2020 10:01:53 -0800 (PST)
+Received: by mail-wr1-x429.google.com with SMTP id m6so23245330wrg.7
+        for <linux-block@vger.kernel.org>; Tue, 24 Nov 2020 10:01:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=4ibQynBLG5sCe4CZqYbUkQUaNNDbglWF2wLslYnfqek=;
-        b=jYivczMQqsxh7yyiSCMC+J2uq1jjrgFqCn4zGdT7y8l1tR+lBZj0zWSEvbd0W8jl8w
-         Gi4Cj5Zx4gKHsuI0fIL4rp4709gHxtA9wRWySVLNwDnlcHxfBP3hG6ecjPkRXqH0UxZp
-         xk0pqka3Sqe63I6EZOHEKoOfA/4WJiEaugJWCMjne3X9nHRMXe7fYlZPuOXRYu6gUE1t
-         VJ+e81XD/b5aNX2a+wyW4GmbUwrk6CKBJ/6iNXNyc9y/IvYXsxz32um6sHRBVWQzYyqm
-         IRQIL0vettN12q9xzjv+kftrmu3uKde1tlzjzfXundOzi243rFxdMC5NVy5kvvEXsk4Q
-         MK1Q==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=uyPaDEgxnhkda5ON45tyMJ+cO7d9IDL/IheDlTow2W8=;
+        b=XCU6FL9epl6xZZityRT3ARR9jgKYKGYvqEvMaVBP1gNYDi37sJhY6etAxM/rJGMLR2
+         x3XQv91YQ5LtYMbQWBmtz4xKXLYqGt/aZbSJbTW/B2bf9obWfptzlRE/YkQbWC96fSIE
+         Mryj89ysuwBpyju6ZlqOhbAp8cAZ0esF1lfu4r+Fl7x8c9YjhNdFP8dXV55/1zSGc+L2
+         iUYAvOEXwUWEEYUObub1TnpOP4dUxFyoW9pE4A/BpDHHbLh2TVeKOn8Ta3eniTXTiPe8
+         CJlbhJaYjNlxf0XGGsIxcnvqy37alAZrJUKuqoO+abZlD/BivdUaPz1qNFymzhNCqzVK
+         1kvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=4ibQynBLG5sCe4CZqYbUkQUaNNDbglWF2wLslYnfqek=;
-        b=XS4LVIoGLNdwz2c9kAAo9GS5QCeVabTl6QCGv+S2U+mbF5hihSZTvxl8h+wZgWzdHo
-         /FFgrfeyYTnkf+B7Ub8ovzW2IuPaGD+3W/LkQiAqJ/K/aD1M6XL4de/UKayGf8p8V/Qs
-         0jS23bEZIDypB3RHE8xci4Y46dhlavZOLnBO1s/bP6SrOSPhkZWbONE863jwJNsaOHbA
-         mbVqefLRLzv+4fdqkFbv+mt/nijjSa6T0QsmZsc2cwVkPOnbvQJVAxIw42AHa40COxWF
-         JWi0u953+NPfYwwJ9ntQ3kz9D9X5n9m3kYIBbkuYdBDfkvsTpOfu06n/MhLxdzkkNQgJ
-         MDtQ==
-X-Gm-Message-State: AOAM532hhyMC4o8bEBzuVFQfMOuYSLzrCVGDR28HJnQXkQ2l6VcFJ30u
-        4zoyxLAprIj8zeTNh4Pw8tY=
-X-Google-Smtp-Source: ABdhPJwbAXPcygkLKUFdmjuytzuRV0DzFXM5PwNCTshXeMizxUWtjVUL4UzMNPmTvdVp88+fUo1SSg==
-X-Received: by 2002:a37:8c41:: with SMTP id o62mr5500995qkd.240.1606239688196;
-        Tue, 24 Nov 2020 09:41:28 -0800 (PST)
-Received: from localhost (dhcp-6c-ae-f6-dc-d8-61.cpe.echoes.net. [72.28.8.195])
-        by smtp.gmail.com with ESMTPSA id y3sm7003885qkl.110.2020.11.24.09.41.27
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=uyPaDEgxnhkda5ON45tyMJ+cO7d9IDL/IheDlTow2W8=;
+        b=esp7tNTI/qSapwdoIURmuEMM4yRZYbRKRmzhyQBLaAkrF9KawNY16VnnRMU7uLAFwO
+         9C20mq6AjtpxGD/O3lelB/3cvuK09KTFkH0srT+QrFjQHGq5enq6oFUdnyV+2v87K/HB
+         P2BtIv2Lq/+DsQWeU1TOipGx8XDSPHiXfROaJJNAEvPmg+llrdEDP/rNR9jxRiqDYgEK
+         ozKcte6w5WkxIhiRpMUn3gj8MCGl5WwuzuiREQHx4z8xtlHL7Fpd0/u1ixL9M7R5b/Bc
+         gsTuxE1FMbufY9GuCPmV1G7CbX42yvEQfuh1BwEeHNxMpeQnLfmqYAl/9X+H4v+k0u1A
+         B25A==
+X-Gm-Message-State: AOAM531kUuEzLePakt9jdE1su3P0G4pi2Ix4xHgasAHEArQ8+luL2WV7
+        PiXHY7kopRxdCwYO9ppEF0I=
+X-Google-Smtp-Source: ABdhPJxgBkwuOaJG6x0ucQ4wZ4GzAhei1mI5GD5a1YjSncdh+gYFMQnihNAZblDsN9pIXKy0f24XNw==
+X-Received: by 2002:a05:6000:11c2:: with SMTP id i2mr6594883wrx.21.1606240912237;
+        Tue, 24 Nov 2020 10:01:52 -0800 (PST)
+Received: from localhost.localdomain (host109-152-100-135.range109-152.btcentralplus.com. [109.152.100.135])
+        by smtp.gmail.com with ESMTPSA id x4sm12246403wrv.81.2020.11.24.10.01.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Nov 2020 09:41:27 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Tue, 24 Nov 2020 12:41:05 -0500
-From:   Tejun Heo <tj@kernel.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Josef Bacik <josef@toxicpanda.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Coly Li <colyli@suse.de>, Mike Snitzer <snitzer@redhat.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jan Kara <jack@suse.cz>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        dm-devel@redhat.com, Richard Weinberger <richard@nod.at>,
-        Jan Kara <jack@suse.com>, linux-block@vger.kernel.org,
-        xen-devel@lists.xenproject.org, linux-bcache@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: Re: [PATCH 20/45] block: refactor __blkdev_put
-Message-ID: <X71FsRDFtHWxVJOg@mtj.duckdns.org>
-References: <20201124132751.3747337-1-hch@lst.de>
- <20201124132751.3747337-21-hch@lst.de>
+        Tue, 24 Nov 2020 10:01:51 -0800 (PST)
+From:   Pavel Begunkov <asml.silence@gmail.com>
+To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Cc:     Ming Lei <ming.lei@redhat.com>,
+        Christoph Hellwig <hch@infradead.org>
+Subject: [PATCH 0/2] optimise bvec/bio iteration
+Date:   Tue, 24 Nov 2020 17:58:11 +0000
+Message-Id: <cover.1606240077.git.asml.silence@gmail.com>
+X-Mailer: git-send-email 2.24.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201124132751.3747337-21-hch@lst.de>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Nov 24, 2020 at 02:27:26PM +0100, Christoph Hellwig wrote:
-> Reorder the code to have one big section for the last close, and to use
-> bdev_is_partition.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Reviewed-by: Jan Kara <jack@suse.cz>
+This adds simpler versions of bvec_iter_advance() and bio_advance_iter()
+(i.e. *_single()), that are faster but work with the restriction that
+@bytes shouldn't be more than available in the current bvec segment.
 
-Acked-by: Tejun Heo <tj@kernel.org>
+That covers most of bvec/bio iteration/foreach, that are massively
+inlined, and thus also nicely shrinks binary.
+
+Others non core-block users might be updated on case by case basis
+(if applicable) after the change is merged.
+
+Pavel Begunkov (2):
+  block: optimise for_each_bvec() advance
+  bio: optimise bvec iteration
+
+ block/bio.c          |  4 ++--
+ include/linux/bio.h  | 17 +++++++++++++++--
+ include/linux/bvec.h | 20 +++++++++++++++-----
+ 3 files changed, 32 insertions(+), 9 deletions(-)
 
 -- 
-tejun
+2.24.0
+
