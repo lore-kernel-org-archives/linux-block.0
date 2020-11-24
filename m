@@ -2,63 +2,112 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C1E3C2D0E4
-	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 11:22:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B06FC2D0E4
+	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 11:25:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 089F22076E
-	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 11:22:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B76362073C
+	for <linux-block@archiver.kernel.org>; Tue, 24 Nov 2020 11:25:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="kkHuprtq"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="MFZotgzj"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732351AbgKXLWw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 Nov 2020 06:22:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42422 "EHLO
+        id S1728664AbgKXLZw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 Nov 2020 06:25:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42884 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729105AbgKXLWw (ORCPT
+        with ESMTP id S1728346AbgKXLZw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 Nov 2020 06:22:52 -0500
+        Tue, 24 Nov 2020 06:25:52 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0EE2C0613D6;
-        Tue, 24 Nov 2020 03:22:51 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5879EC0613D6;
+        Tue, 24 Nov 2020 03:25:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
         References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=nuWr5GTJh/MjvsEtoKMKb3zOYkiDXCsXpoOiUqjyZko=; b=kkHuprtqF3Jyi/BoVfRQT1orxN
-        YkTBUOh6lJYKJKhviXmNE+zVwhMZWU90DTUuuD3MPM3dz9w1IAGpWypITMSwroIJfHpa2u6qvYiBh
-        n0kuHznfi8seWQnZ2op22Wq3VJlNkFW8gSwPOjIXc2K539Vmgu2oLSOKAMTNKCdusZzoMtHGgrYbc
-        fefGXdH+Sp9zCrfsdYxi9qBR4OFfyg3O7qeEh181MQdyz7MLLGTeLEEdX+X3h/ZuXx5YX54VHSJAx
-        L0p8+ad4v2zy+1rUsIg8f6VMocS196/feOZV5p8fTfCiyI65yd7jPThhVW39/+Wek4P0ANs8VqydR
-        NfdNnEcg==;
+        bh=1Dpp35VNzzVY1mp0WA/1Cvo1UHAnm1YWWDrLG3ha8rE=; b=MFZotgzjDln27OPQ2DNNT42slG
+        6vQ5a/ewh8C1T8ij73qDW+8f9nfl/3jWUnhcflW4k8GnUn6HINjYaQUMUqT2LAruEJj9+VhaBwSan
+        P7aHYs+TIVXrKl/H505uH3yUZmlOmn1TvUCeLnRal+jspF5EbSzJXihplXNSlsl2bpNKKnGzBfXN3
+        w1w9hLNVdVlb6rVAH1CKu34Yy9eULOSK6q27s4+w85kaNRttS3kaRaMILPvi70rGK6Do7h8eyZeCi
+        QI/QHq2YCKdD+Hah/GPLIZYdApXrUrRKlYz/Ygz0se8V/BjWhgr6vUswjI4oZVZ4wTuJ/Z1qzHEaL
+        XR8dtOSQ==;
 Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1khWPJ-0006xa-Uh; Tue, 24 Nov 2020 11:22:50 +0000
-Date:   Tue, 24 Nov 2020 11:22:49 +0000
+        id 1khWSB-0007Cm-Vv; Tue, 24 Nov 2020 11:25:48 +0000
+Date:   Tue, 24 Nov 2020 11:25:47 +0000
 From:   Christoph Hellwig <hch@infradead.org>
-To:     Pavel Begunkov <asml.silence@gmail.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        ming.lei@redhat.com, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 5.11] block: optimise for_each_bvec() advance
-Message-ID: <20201124112249.GB25573@infradead.org>
-References: <60aaa6caab3d061cf7194716c27a10920b5bd7ad.1606212786.git.asml.silence@gmail.com>
+To:     JeffleXu <jefflexu@linux.alibaba.com>
+Cc:     Christoph Hellwig <hch@infradead.org>, axboe@kernel.dk,
+        ming.lei@redhat.com, linux-block@vger.kernel.org,
+        io-uring@vger.kernel.org, joseph.qi@linux.alibaba.com
+Subject: Re: [PATCH v4 2/2] block,iomap: disable iopoll when split needed
+Message-ID: <20201124112547.GA26805@infradead.org>
+References: <20201117075625.46118-1-jefflexu@linux.alibaba.com>
+ <20201117075625.46118-3-jefflexu@linux.alibaba.com>
+ <20201119175516.GB20944@infradead.org>
+ <ed355fc8-6fc8-5ffd-f1e9-6ba19f761a09@linux.alibaba.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <60aaa6caab3d061cf7194716c27a10920b5bd7ad.1606212786.git.asml.silence@gmail.com>
+In-Reply-To: <ed355fc8-6fc8-5ffd-f1e9-6ba19f761a09@linux.alibaba.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Nov 24, 2020 at 10:21:23AM +0000, Pavel Begunkov wrote:
-> Because of how for_each_bvec() works it never advances across multiple
-> entries at a time, so bvec_iter_advance() is an overkill. Add
-> specialised bvec_iter_advance_single() that is faster. It also handles
-> zero-len bvecs, so can kill bvec_iter_skip_zero_bvec().
+On Fri, Nov 20, 2020 at 06:06:54PM +0800, JeffleXu wrote:
+> 
+> On 11/20/20 1:55 AM, Christoph Hellwig wrote:
+> > > diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
+> > > index 933f234d5bec..396ac0f91a43 100644
+> > > --- a/fs/iomap/direct-io.c
+> > > +++ b/fs/iomap/direct-io.c
+> > > @@ -309,6 +309,16 @@ iomap_dio_bio_actor(struct inode *inode, loff_t pos, loff_t length,
+> > >   		copied += n;
+> > >   		nr_pages = iov_iter_npages(dio->submit.iter, BIO_MAX_PAGES);
+> > > +		/*
+> > > +		 * The current dio needs to be split into multiple bios here.
+> > > +		 * iopoll for split bio will cause subtle trouble such as
+> > > +		 * hang when doing sync polling, while iopoll is initially
+> > > +		 * for small size, latency sensitive IO. Thus disable iopoll
+> > > +		 * if split needed.
+> > > +		 */
+> > > +		if (nr_pages)
+> > > +			dio->iocb->ki_flags &= ~IOCB_HIPRI;
+> > I think this is confusing two things.
+> 
+> Indeed there's two level of split concerning this issue when doing sync
+> iopoll.
+> 
+> 
+> The first is that one bio got split in block-core, and patch 1 of this patch
+> set just fixes this.
+> 
+> 
+> Second is that one dio got split into multiple bios in fs layer, and patch 2
+> fixes this.
+> 
+> 
+> >   One is that we don't handle
+> > polling well when there are multiple bios.  For this I think we should
+> > only call bio_set_polled when we know there is a single bio.
+> 
+> 
+> How about the following patch:
+> 
+> 
+> --- a/fs/iomap/direct-io.c
+> +++ b/fs/iomap/direct-io.c
+> @@ -60,12 +60,12 @@ int iomap_dio_iopoll(struct kiocb *kiocb, bool spin)
+> ??EXPORT_SYMBOL_GPL(iomap_dio_iopoll);
+> 
+> ??static void iomap_dio_submit_bio(struct iomap_dio *dio, struct iomap
+> *iomap,
+> -???????????????????????????? struct bio *bio, loff_t pos)
+> +???????????????????????????? struct bio *bio, loff_t pos, bool split)
 
-bvec_iter_advance_single needs a comment describing how it can be
-used.  Also can you take a look at the other callers and see who
-can be switched over?  If you are not sure ask the relevant maintainers.
+This seems pretty messed up by your mailer and I have a hard time
+reading it.  Can you resend it?
