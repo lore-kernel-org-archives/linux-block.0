@@ -2,105 +2,162 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FB24C5519F
-	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 12:26:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87897C63777
+	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 12:29:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 18213206E5
-	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 12:26:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NI3hsJLo"
+	by mail.kernel.org (Postfix) with ESMTP id 3E8F9206F9
+	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 12:29:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729110AbgKYMZy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 Nov 2020 07:25:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48888 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729009AbgKYMZy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Nov 2020 07:25:54 -0500
-Received: from mail-qt1-x844.google.com (mail-qt1-x844.google.com [IPv6:2607:f8b0:4864:20::844])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3132CC0613D4;
-        Wed, 25 Nov 2020 04:25:54 -0800 (PST)
-Received: by mail-qt1-x844.google.com with SMTP id f27so1408137qtv.6;
-        Wed, 25 Nov 2020 04:25:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=AzMPFzJsIYAM/Ura8MDMvcJNVcf2nY/hliPxxmhHH8E=;
-        b=NI3hsJLo9ep6kUNCSc3HT9LB3wtoDh6y/+bb7SGCK9JFhUDcNjDyoJnAam9P0JArC+
-         MC1eOpifZCh336PLstRZWiSdKwSL9TZ3aMG9ok2baLd8zdlMfiiLks0JhD7cJSnPhqXs
-         oGzHvu6HnlkPkkGZz1+0eryde/cY/YAQg6G4mbcw+HGTHFiIGze0urQxCXfazwxw4ej8
-         M/Y5HryeaBPzmIcejhp/HOcLXRSDiKYM5XLvsl+VpKFVIYPSaYjhi8oYHHeyFcJG0HBx
-         EpQLIYEEXrtDNvuIByXG23b0WaLXSAdlPGYdsSnlwsHALlvHurynZMMQBGRJ9x5dGXov
-         7k3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=AzMPFzJsIYAM/Ura8MDMvcJNVcf2nY/hliPxxmhHH8E=;
-        b=luT+20Suk7AlqgRfIvTGEaEZ3TsSpeIjbpfD+dja/KMuf8TdwpEnrm0DclcgGR9QaT
-         UX2VEpio3yiXUQKYQezBM2Xv07okJwuMZVo4fx9anTTxHLcHdz/EyIGlkG5/ToOJQvLA
-         YIa+2ztG0Hsj6uB7S7zj8qtooO5w2d2cJFr1VqRdpD4oFCL/J8cpJFVAqqQBZeW7RQ8m
-         SZGQyUovD9yfYobG6TqcByQM+eEU62xqvw8zXD9g4TtYctoZ9BYDQicCaUHw2JO3xpWx
-         12SM03Jn8QV21GfkLq5fShIVh5Mh9mQr+ymbAQZsJ4NE9aUgaY5HhLtfavJXBlSz0+gu
-         BKWg==
-X-Gm-Message-State: AOAM532Xc7GHFhbBTwvzcjYY9c4FJmBqBHl+J+6Hhc7lp464WHp3LhTw
-        cGLK5e3N0wDdKlFH8v5oRBAgz2W7p4IxJA==
-X-Google-Smtp-Source: ABdhPJz6rkfqMXBD5RfnLcrxuJBxqoo6Y7ksjwMgc60r/aG5Zm4G96TGymWQnmMGdicRaIbHMje7eg==
-X-Received: by 2002:ac8:6642:: with SMTP id j2mr2708156qtp.323.1606307153347;
-        Wed, 25 Nov 2020 04:25:53 -0800 (PST)
-Received: from localhost (dhcp-6c-ae-f6-dc-d8-61.cpe.echoes.net. [72.28.8.195])
-        by smtp.gmail.com with ESMTPSA id j13sm2333491qtc.81.2020.11.25.04.25.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Nov 2020 04:25:52 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Wed, 25 Nov 2020 07:25:29 -0500
-From:   Tejun Heo <tj@kernel.org>
-To:     Baolin Wang <baolin.wang@linux.alibaba.com>
-Cc:     axboe@kernel.dk, baolin.wang7@gmail.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 6/7] blk-iocost: Factor out the active iocgs' state check
- into a separate function
-Message-ID: <X75NOaW6AYyGZSF7@mtj.duckdns.org>
-References: <cover.1606186717.git.baolin.wang@linux.alibaba.com>
- <aa1f4c6e637974d7195bf4e019880e50acdd5ca5.1606186717.git.baolin.wang@linux.alibaba.com>
+        id S1729240AbgKYM3z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 Nov 2020 07:29:55 -0500
+Received: from mx2.suse.de ([195.135.220.15]:35206 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725616AbgKYM3z (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 25 Nov 2020 07:29:55 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id BF41AACBD;
+        Wed, 25 Nov 2020 12:29:53 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 416E21E130F; Wed, 25 Nov 2020 13:29:53 +0100 (CET)
+Date:   Wed, 25 Nov 2020 13:29:53 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Coly Li <colyli@suse.de>, Mike Snitzer <snitzer@redhat.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jan Kara <jack@suse.cz>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        dm-devel@redhat.com, Richard Weinberger <richard@nod.at>,
+        Jan Kara <jack@suse.com>, linux-block@vger.kernel.org,
+        xen-devel@lists.xenproject.org, linux-bcache@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: Re: [PATCH 04/45] fs: simplify freeze_bdev/thaw_bdev
+Message-ID: <20201125122953.GH16944@quack2.suse.cz>
+References: <20201124132751.3747337-1-hch@lst.de>
+ <20201124132751.3747337-5-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aa1f4c6e637974d7195bf4e019880e50acdd5ca5.1606186717.git.baolin.wang@linux.alibaba.com>
+In-Reply-To: <20201124132751.3747337-5-hch@lst.de>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+On Tue 24-11-20 14:27:10, Christoph Hellwig wrote:
+> Store the frozen superblock in struct block_device to avoid the awkward
+> interface that can return a sb only used a cookie, an ERR_PTR or NULL.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-On Tue, Nov 24, 2020 at 11:33:35AM +0800, Baolin Wang wrote:
-> -static void ioc_timer_fn(struct timer_list *timer)
-> +/*
-> + * Waiters determine the sleep durations based on the vrate they
-> + * saw at the time of sleep.  If vrate has increased, some waiters
-> + * could be sleeping for too long.  Wake up tardy waiters which
-> + * should have woken up in the last period and expire idle iocgs.
-> + */
+Some comments below...
 
-Please reflow the comment.
-
-...
-> +	nr_debtors = ioc_check_iocg_state(ioc, &now);
-
-How about ioc_check_iocgs()?
-
+> diff --git a/fs/block_dev.c b/fs/block_dev.c
+> index d8664f5c1ff669..60492620d51866 100644
+> --- a/fs/block_dev.c
+> +++ b/fs/block_dev.c
+> @@ -548,55 +548,47 @@ EXPORT_SYMBOL(fsync_bdev);
+>   * count down in thaw_bdev(). When it becomes 0, thaw_bdev() will unfreeze
+>   * actually.
+>   */
+> -struct super_block *freeze_bdev(struct block_device *bdev)
+> +int freeze_bdev(struct block_device *bdev)
+>  {
+>  	struct super_block *sb;
+>  	int error = 0;
+>  
+>  	mutex_lock(&bdev->bd_fsfreeze_mutex);
+> -	if (++bdev->bd_fsfreeze_count > 1) {
+> -		/*
+> -		 * We don't even need to grab a reference - the first call
+> -		 * to freeze_bdev grab an active reference and only the last
+> -		 * thaw_bdev drops it.
+> -		 */
+> -		sb = get_super(bdev);
+> -		if (sb)
+> -			drop_super(sb);
+> -		mutex_unlock(&bdev->bd_fsfreeze_mutex);
+> -		return sb;
+> -	}
+> +	if (++bdev->bd_fsfreeze_count > 1)
+> +		goto done;
+>  
+>  	sb = get_active_super(bdev);
+>  	if (!sb)
+> -		goto out;
+> +		goto sync;
+>  	if (sb->s_op->freeze_super)
+>  		error = sb->s_op->freeze_super(sb);
+>  	else
+>  		error = freeze_super(sb);
+> +	deactivate_super(sb);
 > +
->  	commit_weights(ioc);
+>  	if (error) {
+> -		deactivate_super(sb);
+>  		bdev->bd_fsfreeze_count--;
+> -		mutex_unlock(&bdev->bd_fsfreeze_mutex);
+> -		return ERR_PTR(error);
+> +		goto done;
+>  	}
+> -	deactivate_super(sb);
+> - out:
+> +	bdev->bd_fsfreeze_sb = sb;
+> +
+> +sync:
+>  	sync_blockdev(bdev);
+> +done:
+>  	mutex_unlock(&bdev->bd_fsfreeze_mutex);
+> -	return sb;	/* thaw_bdev releases s->s_umount */
+> +	return error;	/* thaw_bdev releases s->s_umount */
 
-I think it'd make more sense to move commit_weights() inside the new
-function.
+The comment about thaw_bdev() seems to be stale? At least I don't see what
+it's speaking about...
 
-Thanks.
+>  }
+>  EXPORT_SYMBOL(freeze_bdev);
+>  
+>  /**
+>   * thaw_bdev  -- unlock filesystem
+>   * @bdev:	blockdevice to unlock
+> - * @sb:		associated superblock
+>   *
+>   * Unlocks the filesystem and marks it writeable again after freeze_bdev().
+>   */
+> -int thaw_bdev(struct block_device *bdev, struct super_block *sb)
+> +int thaw_bdev(struct block_device *bdev)
+>  {
+> +	struct super_block *sb;
+>  	int error = -EINVAL;
+>  
+>  	mutex_lock(&bdev->bd_fsfreeze_mutex);
+> @@ -607,6 +599,7 @@ int thaw_bdev(struct block_device *bdev, struct super_block *sb)
+>  	if (--bdev->bd_fsfreeze_count > 0)
+>  		goto out;
+>  
+> +	sb = bdev->bd_fsfreeze_sb;
+>  	if (!sb)
+>  		goto out;
+>  
+> @@ -618,7 +611,7 @@ int thaw_bdev(struct block_device *bdev, struct super_block *sb)
+>  		bdev->bd_fsfreeze_count++;
+>  out:
+>  	mutex_unlock(&bdev->bd_fsfreeze_mutex);
+> -	return error;
+> +	return 0;
 
+But we now won't return -EINVAL if this gets called e.g. with
+bd_fsfreeze_count == 0, right?
+
+									Honza
 -- 
-tejun
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
