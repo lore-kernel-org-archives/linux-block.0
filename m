@@ -2,156 +2,85 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C14AC64E7A
-	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 11:17:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93CBDC5519F
+	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 11:31:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 38F1B20857
-	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 11:17:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1E8C9206D4
+	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 11:31:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wl/tuJ1F"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aujxCesO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727114AbgKYLRP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 Nov 2020 06:17:15 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:41325 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727268AbgKYLRP (ORCPT
+        id S1728161AbgKYLbJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 Nov 2020 06:31:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40406 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725792AbgKYLbJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Nov 2020 06:17:15 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1606303033;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=JS6xr5LtUlr5j8jszduDjhIpqmpjZKnCMk7lXNfXS5E=;
-        b=Wl/tuJ1FiP2YQPQt00jbpdYlwbpjsaj3PTDMJbMHFAmUv5pef1HEo92u09hbHrscg3nOfy
-        4jrgqsLlBHffjf4HOM7V7HMV6DzunbA2IUz4zzyGf35hWy0UM5qFJQ9nVmtfZwhZ+kHZuZ
-        OTGu/TzSjCZLr/BsFfZhV4CKFoRGY7Q=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-242-AvhW3TIpOWq-3zY-Q-MqcQ-1; Wed, 25 Nov 2020 06:17:09 -0500
-X-MC-Unique: AvhW3TIpOWq-3zY-Q-MqcQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E4C9A1E7C1;
-        Wed, 25 Nov 2020 11:17:07 +0000 (UTC)
-Received: from thinkpad.redhat.com (ovpn-113-83.ams2.redhat.com [10.36.113.83])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1A63D10023BF;
-        Wed, 25 Nov 2020 11:17:04 +0000 (UTC)
-From:   Laurent Vivier <lvivier@redhat.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     linux-block@vger.kernel.org, Paul Mackerras <paulus@samba.org>,
-        linux-pci@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Marc Zyngier <maz@kernel.org>, linuxppc-dev@lists.ozlabs.org,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>, Greg Kurz <groug@kaod.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Laurent Vivier <lvivier@redhat.com>
-Subject: [PATCH v2 1/2] genirq: add an irq_create_mapping_affinity() function
-Date:   Wed, 25 Nov 2020 12:16:56 +0100
-Message-Id: <20201125111657.1141295-2-lvivier@redhat.com>
-In-Reply-To: <20201125111657.1141295-1-lvivier@redhat.com>
-References: <20201125111657.1141295-1-lvivier@redhat.com>
+        Wed, 25 Nov 2020 06:31:09 -0500
+Received: from mail-io1-xd42.google.com (mail-io1-xd42.google.com [IPv6:2607:f8b0:4864:20::d42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFA45C0613D4;
+        Wed, 25 Nov 2020 03:31:08 -0800 (PST)
+Received: by mail-io1-xd42.google.com with SMTP id z136so1026404iof.3;
+        Wed, 25 Nov 2020 03:31:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=lGlvuabGufuxy6ujt/Rc7r7lPdDL7IxgeI87NR4IWa8=;
+        b=aujxCesOJ9iF8uyVKIgwnpJX3SgqGJ6u5G5iAml09Fd7SzN1UI2jk+YmQI0zYMu0sq
+         sxwXLYA/hIdrs8RvMFdR6VrIXPZ8nRwvh3Kl5VXAuctuFlwE/YQkXJf1dPm7+0r4Y5jV
+         s0iOn2G4HfGpafPkuM2pM+1t+D4eQxBRqd6pb8nPNk16hyYzYrQT+kQgFPQfFZ/X/z2J
+         lCO80FuS9DgQk20zkaC9bm3ldapFcIVNwvMjFINfGXy2WrELoyqo+3WNmWKS/wnzBDB0
+         lk13q1jh/u3/Sx2CBG5I40GL/0WWKtEydtSZwrfBAl2R+sUjpgjiG/a2eSGZc6FLdCKw
+         07yQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=lGlvuabGufuxy6ujt/Rc7r7lPdDL7IxgeI87NR4IWa8=;
+        b=bPueIiv6cEn0VSUy2vIPdC5OPep2tau2b4D/6AV/ZezPpTbcW5mhQ60auEOI44psap
+         IEsCr8wATN10cfm6RUm3cVkhv8/WrqTXrOn05NClPo4XBW1T3plG+sI72UJixN4xmvWv
+         ZmX3hgzHaC+DG2qiEHQWM7FJDSs4gdrl349kEISfwbwBqgE1AUPTjDy4i0DgGFNYszAg
+         WhaHpacgWuRAJDawQA+60FoWWyqVK1fIMxN5dTYoP1WcTXzKi/YjksmGAEFzPHXxOu6r
+         I5vDJUZiUg860tZBTHY5q96JqNo347xSXazUCyGxhLKhH1GT74PtKP7ms8DT41udcH+k
+         Ix2A==
+X-Gm-Message-State: AOAM531zs9iMh5u0k8+IwVbTCy0XXbUskQQ8eBjY7WtMEQ22X4W01VPl
+        o0to0bZwoUC65EGec7cOMco=
+X-Google-Smtp-Source: ABdhPJwoA5m584VMLHOvmW1s/OSUpuiYo6A68F7i3Hb++UdP5jaalpukZyBEuuOkSrp2FJeUFcwTrQ==
+X-Received: by 2002:a6b:db18:: with SMTP id t24mr2135845ioc.51.1606303867972;
+        Wed, 25 Nov 2020 03:31:07 -0800 (PST)
+Received: from localhost (dhcp-6c-ae-f6-dc-d8-61.cpe.echoes.net. [72.28.8.195])
+        by smtp.gmail.com with ESMTPSA id a7sm944187ioa.50.2020.11.25.03.31.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Nov 2020 03:31:07 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Wed, 25 Nov 2020 06:30:45 -0500
+From:   Tejun Heo <tj@kernel.org>
+To:     Baolin Wang <baolin.wang@linux.alibaba.com>
+Cc:     axboe@kernel.dk, baolin.wang7@gmail.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/7] blk-iocost: Fix some typos in comments
+Message-ID: <X75AZeHmESipRzcH@mtj.duckdns.org>
+References: <cover.1606186717.git.baolin.wang@linux.alibaba.com>
+ <54cf5f249bf91a6d1a0ea18a1024ba1af861f9c5.1606186717.git.baolin.wang@linux.alibaba.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <54cf5f249bf91a6d1a0ea18a1024ba1af861f9c5.1606186717.git.baolin.wang@linux.alibaba.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This function adds an affinity parameter to irq_create_mapping().
-This parameter is needed to pass it to irq_domain_alloc_descs().
+On Tue, Nov 24, 2020 at 11:33:30AM +0800, Baolin Wang wrote:
+> Fix some typos in comments.
+> 
+> Signed-off-by: Baolin Wang <baolin.wang@linux.alibaba.com>
 
-irq_create_mapping() is a wrapper around irq_create_mapping_affinity()
-to pass NULL for the affinity parameter.
+Acked-by: Tejun Heo <tj@kernel.org>
 
-No functional change.
-
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
----
- include/linux/irqdomain.h | 12 ++++++++++--
- kernel/irq/irqdomain.c    | 13 ++++++++-----
- 2 files changed, 18 insertions(+), 7 deletions(-)
-
-diff --git a/include/linux/irqdomain.h b/include/linux/irqdomain.h
-index 71535e87109f..ea5a337e0f8b 100644
---- a/include/linux/irqdomain.h
-+++ b/include/linux/irqdomain.h
-@@ -384,11 +384,19 @@ extern void irq_domain_associate_many(struct irq_domain *domain,
- extern void irq_domain_disassociate(struct irq_domain *domain,
- 				    unsigned int irq);
- 
--extern unsigned int irq_create_mapping(struct irq_domain *host,
--				       irq_hw_number_t hwirq);
-+extern unsigned int irq_create_mapping_affinity(struct irq_domain *host,
-+				      irq_hw_number_t hwirq,
-+				      const struct irq_affinity_desc *affinity);
- extern unsigned int irq_create_fwspec_mapping(struct irq_fwspec *fwspec);
- extern void irq_dispose_mapping(unsigned int virq);
- 
-+static inline unsigned int irq_create_mapping(struct irq_domain *host,
-+					      irq_hw_number_t hwirq)
-+{
-+	return irq_create_mapping_affinity(host, hwirq, NULL);
-+}
-+
-+
- /**
-  * irq_linear_revmap() - Find a linux irq from a hw irq number.
-  * @domain: domain owning this hardware interrupt
-diff --git a/kernel/irq/irqdomain.c b/kernel/irq/irqdomain.c
-index cf8b374b892d..e4ca69608f3b 100644
---- a/kernel/irq/irqdomain.c
-+++ b/kernel/irq/irqdomain.c
-@@ -624,17 +624,19 @@ unsigned int irq_create_direct_mapping(struct irq_domain *domain)
- EXPORT_SYMBOL_GPL(irq_create_direct_mapping);
- 
- /**
-- * irq_create_mapping() - Map a hardware interrupt into linux irq space
-+ * irq_create_mapping_affinity() - Map a hardware interrupt into linux irq space
-  * @domain: domain owning this hardware interrupt or NULL for default domain
-  * @hwirq: hardware irq number in that domain space
-+ * @affinity: irq affinity
-  *
-  * Only one mapping per hardware interrupt is permitted. Returns a linux
-  * irq number.
-  * If the sense/trigger is to be specified, set_irq_type() should be called
-  * on the number returned from that call.
-  */
--unsigned int irq_create_mapping(struct irq_domain *domain,
--				irq_hw_number_t hwirq)
-+unsigned int irq_create_mapping_affinity(struct irq_domain *domain,
-+				       irq_hw_number_t hwirq,
-+				       const struct irq_affinity_desc *affinity)
- {
- 	struct device_node *of_node;
- 	int virq;
-@@ -660,7 +662,8 @@ unsigned int irq_create_mapping(struct irq_domain *domain,
- 	}
- 
- 	/* Allocate a virtual interrupt number */
--	virq = irq_domain_alloc_descs(-1, 1, hwirq, of_node_to_nid(of_node), NULL);
-+	virq = irq_domain_alloc_descs(-1, 1, hwirq, of_node_to_nid(of_node),
-+				      affinity);
- 	if (virq <= 0) {
- 		pr_debug("-> virq allocation failed\n");
- 		return 0;
-@@ -676,7 +679,7 @@ unsigned int irq_create_mapping(struct irq_domain *domain,
- 
- 	return virq;
- }
--EXPORT_SYMBOL_GPL(irq_create_mapping);
-+EXPORT_SYMBOL_GPL(irq_create_mapping_affinity);
- 
- /**
-  * irq_create_strict_mappings() - Map a range of hw irqs to fixed linux irqs
 -- 
-2.28.0
-
+tejun
