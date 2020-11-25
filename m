@@ -2,143 +2,155 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEF40C5519F
-	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 08:30:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A43C5C83017
+	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 09:10:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 78E3B206CA
-	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 08:30:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6218F208CA
+	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 09:10:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Slj/FZR3"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=mess.org header.i=@mess.org header.b="SJYLrwiK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726315AbgKYI34 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 Nov 2020 03:29:56 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38558 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725998AbgKYI34 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Nov 2020 03:29:56 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1606292995;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=TpFqwDvp3DGW7pb3qAfueVzEyeCDHNA2CR+YHC8EuxY=;
-        b=Slj/FZR3+qaHTucfU+u5RwE4dnBTcdxE3Nay67QQfoAzQmP7VGSkau1iwkbljG05JY9Kx4
-        80YEZAdVMfdxUycFPQM8vhbJEQH0HwEwaBv1R/EqJoELxdCOAwgXog016CCEv4ttP24eaz
-        S5eLd8WReSDrMW7SAiJxy/VRHNdBK6I=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-75-kr2xS0eGNOeuwa2wEArijw-1; Wed, 25 Nov 2020 03:29:52 -0500
-X-MC-Unique: kr2xS0eGNOeuwa2wEArijw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7FF78187652B;
-        Wed, 25 Nov 2020 08:29:51 +0000 (UTC)
-Received: from T590 (ovpn-12-140.pek2.redhat.com [10.72.12.140])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 58F841346D;
-        Wed, 25 Nov 2020 08:29:41 +0000 (UTC)
-Date:   Wed, 25 Nov 2020 16:29:37 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jeffle Xu <jefflexu@linux.alibaba.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        joseph.qi@linux.alibaba.com, hch@infradead.org
-Subject: Re: [PATCH v6] block: disable iopoll for split bio
-Message-ID: <20201125082937.GB28463@T590>
-References: <20201125064147.25389-1-jefflexu@linux.alibaba.com>
+        id S1727022AbgKYJJw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 Nov 2020 04:09:52 -0500
+Received: from gofer.mess.org ([88.97.38.141]:33717 "EHLO gofer.mess.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726284AbgKYJJw (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 25 Nov 2020 04:09:52 -0500
+X-Greylist: delayed 492 seconds by postgrey-1.27 at vger.kernel.org; Wed, 25 Nov 2020 04:09:46 EST
+Received: by gofer.mess.org (Postfix, from userid 1000)
+        id C2D44C63FB; Wed, 25 Nov 2020 09:01:14 +0000 (GMT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=mess.org; s=2020;
+        t=1606294874; bh=KH9dzgywMXfGPGDwmO8Qm6o//zr8KQDL4nO6EawRuDY=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=SJYLrwiKZrmMRjkeBYo7cqsbs6xljPuQypU3vE6W0mhxhiBNmXN2bqL5RV07d2awA
+         Wb5Oa7L0TiIxfU/vxoLt2vFycI3gN8Kh1qdOF59uK2dEnqITAnDV+wsiQw/exDF78D
+         hoTz22IC76edW7bl4Xm8hYrqoRAlLOCNTSbizDTKI7x8BBnutJW03OyPsTxurVqfdC
+         T9t8y4uSMzXA9L5TYoAbkkzEdR07qHfBTYdhaiYGGYuE1E1bdzLhtRTU2iYu251NBa
+         zqIr2827TZMk9I1fNh/951tgkmCQWewUCt5nrmXnkgqHhLp9nxDE6gWAGCUXG6XCXv
+         3mw8Hv064saVQ==
+Date:   Wed, 25 Nov 2020 09:01:14 +0000
+From:   Sean Young <sean@mess.org>
+To:     James Bottomley <James.Bottomley@HansenPartnership.com>
+Cc:     Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
+        Kees Cook <keescook@chromium.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        alsa-devel@alsa-project.org, amd-gfx@lists.freedesktop.org,
+        bridge@lists.linux-foundation.org, ceph-devel@vger.kernel.org,
+        cluster-devel@redhat.com, coreteam@netfilter.org,
+        devel@driverdev.osuosl.org, dm-devel@redhat.com,
+        drbd-dev@lists.linbit.com, dri-devel@lists.freedesktop.org,
+        GR-everest-linux-l2@marvell.com, GR-Linux-NIC-Dev@marvell.com,
+        intel-gfx@lists.freedesktop.org, intel-wired-lan@lists.osuosl.org,
+        keyrings@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
+        linux-acpi@vger.kernel.org, linux-afs@lists.infradead.org,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-arm-msm@vger.kernel.org,
+        linux-atm-general@lists.sourceforge.net,
+        linux-block@vger.kernel.org, linux-can@vger.kernel.org,
+        linux-cifs@vger.kernel.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-decnet-user@lists.sourceforge.net,
+        Ext4 Developers List <linux-ext4@vger.kernel.org>,
+        linux-fbdev@vger.kernel.org, linux-geode@lists.infradead.org,
+        linux-gpio@vger.kernel.org, linux-hams@vger.kernel.org,
+        linux-hwmon@vger.kernel.org, linux-i3c@lists.infradead.org,
+        linux-ide@vger.kernel.org, linux-iio@vger.kernel.org,
+        linux-input <linux-input@vger.kernel.org>,
+        linux-integrity@vger.kernel.org,
+        linux-mediatek@lists.infradead.org,
+        Linux Media Mailing List <linux-media@vger.kernel.org>,
+        linux-mmc@vger.kernel.org, Linux-MM <linux-mm@kvack.org>,
+        linux-mtd@lists.infradead.org, linux-nfs@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-usb@vger.kernel.org, linux-watchdog@vger.kernel.org,
+        linux-wireless <linux-wireless@vger.kernel.org>,
+        Network Development <netdev@vger.kernel.org>,
+        netfilter-devel@vger.kernel.org, nouveau@lists.freedesktop.org,
+        op-tee@lists.trustedfirmware.org, oss-drivers@netronome.com,
+        patches@opensource.cirrus.com, rds-devel@oss.oracle.com,
+        reiserfs-devel@vger.kernel.org, samba-technical@lists.samba.org,
+        selinux@vger.kernel.org, target-devel@vger.kernel.org,
+        tipc-discussion@lists.sourceforge.net,
+        usb-storage@lists.one-eyed-alien.net,
+        virtualization@lists.linux-foundation.org,
+        wcn36xx@lists.infradead.org,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        xen-devel@lists.xenproject.org, linux-hardening@vger.kernel.org,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Nathan Chancellor <natechancellor@gmail.com>,
+        Miguel Ojeda <ojeda@kernel.org>, Joe Perches <joe@perches.com>
+Subject: Re: [PATCH 000/141] Fix fall-through warnings for Clang
+Message-ID: <20201125090114.GA24274@gofer.mess.org>
+References: <cover.1605896059.git.gustavoars@kernel.org>
+ <20201120105344.4345c14e@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
+ <202011201129.B13FDB3C@keescook>
+ <20201120115142.292999b2@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
+ <202011220816.8B6591A@keescook>
+ <9b57fd4914b46f38d54087d75e072d6e947cb56d.camel@HansenPartnership.com>
+ <CANiq72nZrHWTA4_Msg6MP9snTyenC6-eGfD27CyfNSu7QoVZbw@mail.gmail.com>
+ <1c7d7fde126bc0acf825766de64bf2f9b888f216.camel@HansenPartnership.com>
+ <CANiq72m22Jb5_+62NnwX8xds2iUdWDMAqD8PZw9cuxdHd95W0A@mail.gmail.com>
+ <fc45750b6d0277c401015b7aa11e16cd15f32ab2.camel@HansenPartnership.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201125064147.25389-1-jefflexu@linux.alibaba.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <fc45750b6d0277c401015b7aa11e16cd15f32ab2.camel@HansenPartnership.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 25, 2020 at 02:41:47PM +0800, Jeffle Xu wrote:
-> iopoll is initially for small size, latency sensitive IO. It doesn't
-> work well for big IO, especially when it needs to be split to multiple
-> bios. In this case, the returned cookie of __submit_bio_noacct_mq() is
-> indeed the cookie of the last split bio. The completion of *this* last
-> split bio done by iopoll doesn't mean the whole original bio has
-> completed. Callers of iopoll still need to wait for completion of other
-> split bios.
+On Mon, Nov 23, 2020 at 07:58:06AM -0800, James Bottomley wrote:
+> On Mon, 2020-11-23 at 15:19 +0100, Miguel Ojeda wrote:
+> > On Sun, Nov 22, 2020 at 11:36 PM James Bottomley
+> > <James.Bottomley@hansenpartnership.com> wrote:
+> > > It's not about the risk of the changes it's about the cost of
+> > > implementing them.  Even if you discount the producer time (which
+> > > someone gets to pay for, and if I were the engineering manager, I'd
+> > > be unhappy about), the review/merge/rework time is pretty
+> > > significant in exchange for six minor bug fixes.  Fine, when a new
+> > > compiler warning comes along it's certainly reasonable to see if we
+> > > can benefit from it and the fact that the compiler people think
+> > > it's worthwhile is enough evidence to assume this initially.  But
+> > > at some point you have to ask whether that assumption is supported
+> > > by the evidence we've accumulated over the time we've been using
+> > > it.  And if the evidence doesn't support it perhaps it is time to
+> > > stop the experiment.
+> > 
+> > Maintainers routinely review 1-line trivial patches, not to mention
+> > internal API changes, etc.
 > 
-> Besides bio splitting may cause more trouble for iopoll which isn't
-> supposed to be used in case of big IO.
+> We're also complaining about the inability to recruit maintainers:
 > 
-> iopoll for split bio may cause potential race if CPU migration happens
-> during bio submission. Since the returned cookie is that of the last
-> split bio, polling on the corresponding hardware queue doesn't help
-> complete other split bios, if these split bios are enqueued into
-> different hardware queues. Since interrupts are disabled for polling
-> queues, the completion of these other split bios depends on timeout
-> mechanism, thus causing a potential hang.
+> https://www.theregister.com/2020/06/30/hard_to_find_linux_maintainers_says_torvalds/
 > 
-> iopoll for split bio may also cause hang for sync polling. Currently
-> both the blkdev and iomap-based fs (ext4/xfs, etc) support sync polling
-> in direct IO routine. These routines will submit bio without REQ_NOWAIT
-> flag set, and then start sync polling in current process context. The
-> process may hang in blk_mq_get_tag() if the submitted bio has to be
-> split into multiple bios and can rapidly exhaust the queue depth. The
-> process are waiting for the completion of the previously allocated
-> requests, which should be reaped by the following polling, and thus
-> causing a deadlock.
+> And burn out:
 > 
-> To avoid these subtle trouble described above, just disable iopoll for
-> split bio.
+> http://antirez.com/news/129
 > 
-> Suggested-by: Ming Lei <ming.lei@redhat.com>
-> Signed-off-by: Jeffle Xu <jefflexu@linux.alibaba.com>
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> ---
->  block/bio.c               |  2 ++
->  block/blk-merge.c         | 12 ++++++++++++
->  block/blk-mq.c            |  3 +++
->  include/linux/blk_types.h |  1 +
->  4 files changed, 18 insertions(+)
-> 
-> diff --git a/block/bio.c b/block/bio.c
-> index fa01bef35bb1..7f7ddc22a30d 100644
-> --- a/block/bio.c
-> +++ b/block/bio.c
-> @@ -684,6 +684,8 @@ void __bio_clone_fast(struct bio *bio, struct bio *bio_src)
->  	bio_set_flag(bio, BIO_CLONED);
->  	if (bio_flagged(bio_src, BIO_THROTTLED))
->  		bio_set_flag(bio, BIO_THROTTLED);
-> +	if (bio_flagged(bio_src, BIO_SPLIT))
-> +		bio_set_flag(bio, BIO_SPLIT);
->  	bio->bi_opf = bio_src->bi_opf;
->  	bio->bi_ioprio = bio_src->bi_ioprio;
->  	bio->bi_write_hint = bio_src->bi_write_hint;
-> diff --git a/block/blk-merge.c b/block/blk-merge.c
-> index bcf5e4580603..a2890cebf99f 100644
-> --- a/block/blk-merge.c
-> +++ b/block/blk-merge.c
-> @@ -279,6 +279,18 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
->  	return NULL;
->  split:
->  	*segs = nsegs;
-> +
-> +	/*
-> +	 * Bio splitting may cause subtle trouble such as hang when doing sync
-> +	 * iopoll in direct IO routine. Given performance gain of iopoll for
-> +	 * big IO can be trival, disable iopoll when split needed. We need
-> +	 * BIO_SPLIT to identify bios need this workaround. Since currently
-> +	 * only normal IO under mq routine may suffer this issue, BIO_SPLIT is
-> +	 * only marked here.
-> +	 */
-> +	bio->bi_opf &= ~REQ_HIPRI;
-> +	bio_set_flag(bio, BIO_SPLIT);
+> The whole crux of your argument seems to be maintainers' time isn't
+> important so we should accept all trivial patches ... I'm pushing back
+> on that assumption in two places, firstly the valulessness of the time
+> and secondly that all trivial patches are valuable.
 
-You may need to put the above into one helper, and call the helper for
-other splitted cases(discard, write zero and write same) too.
+You're assuming burn out or recruitment problems is due to patch workload
+or too many "trivial" patches.
 
-thanks,
-Ming
+In my experience, "other maintainers" is by far the biggest cause of
+burn out for my kernel maintenance work.
 
+Certainly arguing with a maintainer about some obviously-correct patch
+series must be a good example of this.
+
+
+Sean
