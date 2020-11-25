@@ -2,251 +2,108 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BA82C56202
-	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 12:19:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48502C56202
+	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 12:20:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2D1AF2076B
-	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 12:19:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E37B9206F7
+	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 12:20:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lIoMv/m3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726039AbgKYMTN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 Nov 2020 07:19:13 -0500
-Received: from mx2.suse.de ([195.135.220.15]:55506 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726009AbgKYMTN (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Nov 2020 07:19:13 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 1AB0FACBD;
-        Wed, 25 Nov 2020 12:19:11 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id D76D91E130F; Wed, 25 Nov 2020 13:19:10 +0100 (CET)
-Date:   Wed, 25 Nov 2020 13:19:10 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Coly Li <colyli@suse.de>, Mike Snitzer <snitzer@redhat.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jan Kara <jack@suse.cz>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        dm-devel@redhat.com, Richard Weinberger <richard@nod.at>,
-        Jan Kara <jack@suse.com>, linux-block@vger.kernel.org,
-        xen-devel@lists.xenproject.org, linux-bcache@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: Re: [PATCH 03/45] fs: remove get_super_thawed and
- get_super_exclusive_thawed
-Message-ID: <20201125121910.GG16944@quack2.suse.cz>
-References: <20201124132751.3747337-1-hch@lst.de>
- <20201124132751.3747337-4-hch@lst.de>
+        id S1728900AbgKYMUJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 Nov 2020 07:20:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47952 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725616AbgKYMUI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 25 Nov 2020 07:20:08 -0500
+Received: from mail-qt1-x841.google.com (mail-qt1-x841.google.com [IPv6:2607:f8b0:4864:20::841])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB1B3C0613D4;
+        Wed, 25 Nov 2020 04:20:08 -0800 (PST)
+Received: by mail-qt1-x841.google.com with SMTP id f93so1379585qtb.10;
+        Wed, 25 Nov 2020 04:20:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=an/jJ9Rku2m0NqJB2xb52Vc8jeFzL41elSo1CJ3zhfo=;
+        b=lIoMv/m3nzPitwyRrwrREDEROejhitkPv3aFT2D2jpgZpc3trqRv2eAu3zKJvqLfdE
+         NYA7TQrix2E1AEw/fRzdgM1FBUXV8Y5VHnBOXanTxWTqTr9u41Nu2wFrc9Zavk5n/ngF
+         SwFEN8UR2dYHE0hFbrce93aHrRQvIQ+NLIt8ah00uF+R+fSBZeBGq4eZhDh0r6qpLfmW
+         PDVdoowY9ejEhW916QSYsTGMIyQwp2yJPGSwsVY07r3C36tK03jPaIXer881mXo+Ysmb
+         xpMHqy/ztwRuFHjxfDomFY3k1bybfCfxcHUNIajpYmbqm0usFbsOt12jWXFa0Ol5RV50
+         XMdg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=an/jJ9Rku2m0NqJB2xb52Vc8jeFzL41elSo1CJ3zhfo=;
+        b=XBTOe9zwxiwJ3eL8T48hZkiKWTPkDKL4Mg5wP+JmV5ez5WXGUAYM5x3os4aNk8Bv0S
+         jja3m1+IatX3SMjVLIl4M8lfMmwfC8eLhSMgRwKjZODsXvWG/i6qwFzXVidAwsBpMRvV
+         4tDEOjbsDGE+GtdHV5wOsPD7TZk0mFbNxpJs9hgkarMfufPXjsXvkKJHqS/1/2pklDLy
+         Chr1Fm7qbUC3MS482FLHayVFuT21/956x0FG2HoHxXYsd1k7FEAx05xKfXPjakJc7S5+
+         fqIsGhM0pLXHFdCH7EgpiRCHjEvWgGhtc4OJi4cF+D7RV7eKURT0vjBngyFLiDJZuCFO
+         aoIg==
+X-Gm-Message-State: AOAM533x+TsjUiH4wPuNU3VrC2D/vlIZ0pMT9j1UIrOssHPFcg4piEd1
+        m9yG2OnIDzt5qmxwdX9eITtGKyJ1SG3CZw==
+X-Google-Smtp-Source: ABdhPJzL4u77kOEb9WpRYIKrAKJJF0Zlj1TZIbzykpt+aWgrqRnwWPZMOz8Fkk9+uRWCxKWbkS+ZYA==
+X-Received: by 2002:aed:2664:: with SMTP id z91mr2736206qtc.290.1606306807869;
+        Wed, 25 Nov 2020 04:20:07 -0800 (PST)
+Received: from localhost (dhcp-6c-ae-f6-dc-d8-61.cpe.echoes.net. [72.28.8.195])
+        by smtp.gmail.com with ESMTPSA id e126sm2350330qkb.90.2020.11.25.04.20.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Nov 2020 04:20:07 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Wed, 25 Nov 2020 07:19:43 -0500
+From:   Tejun Heo <tj@kernel.org>
+To:     Baolin Wang <baolin.wang@linux.alibaba.com>
+Cc:     axboe@kernel.dk, baolin.wang7@gmail.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 5/7] blk-iocost: Move the usage ratio calculation to the
+ correct place
+Message-ID: <X75L39ZY3GQ+eL0B@mtj.duckdns.org>
+References: <cover.1606186717.git.baolin.wang@linux.alibaba.com>
+ <89a6e1223944e96e0e5e001191d87dd8079345c8.1606186717.git.baolin.wang@linux.alibaba.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201124132751.3747337-4-hch@lst.de>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <89a6e1223944e96e0e5e001191d87dd8079345c8.1606186717.git.baolin.wang@linux.alibaba.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue 24-11-20 14:27:09, Christoph Hellwig wrote:
-> Just open code the wait in the only caller of both functions.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-
-Fine by me. You can add:
-
-Reviewed-by: Jan Kara <jack@suse.cz>
-
-								Honza
-
-> ---
->  fs/internal.h      |  2 ++
->  fs/quota/quota.c   | 31 +++++++++++++++++++++-------
->  fs/super.c         | 51 ++--------------------------------------------
->  include/linux/fs.h |  4 +---
->  4 files changed, 29 insertions(+), 59 deletions(-)
-> 
-> diff --git a/fs/internal.h b/fs/internal.h
-> index a7cd0f64faa4ab..47be21dfeebef5 100644
-> --- a/fs/internal.h
-> +++ b/fs/internal.h
-> @@ -114,7 +114,9 @@ extern struct file *alloc_empty_file_noaccount(int, const struct cred *);
->   */
->  extern int reconfigure_super(struct fs_context *);
->  extern bool trylock_super(struct super_block *sb);
-> +struct super_block *__get_super(struct block_device *bdev, bool excl);
->  extern struct super_block *user_get_super(dev_t);
-> +void put_super(struct super_block *sb);
->  extern bool mount_capable(struct fs_context *);
+Hello,
+> @@ -2225,6 +2207,25 @@ static void ioc_timer_fn(struct timer_list *timer)
+>  		     time_before64(vtime, now.vnow - ioc->margins.low))) {
+>  			u32 hwa, old_hwi, hwm, new_hwi;
 >  
->  /*
-> diff --git a/fs/quota/quota.c b/fs/quota/quota.c
-> index 9af95c7a0bbe3c..f3d32b0d9008f2 100644
-> --- a/fs/quota/quota.c
-> +++ b/fs/quota/quota.c
-> @@ -20,6 +20,7 @@
->  #include <linux/writeback.h>
->  #include <linux/nospec.h>
->  #include "compat.h"
-> +#include "../internal.h"
->  
->  static int check_quotactl_permission(struct super_block *sb, int type, int cmd,
->  				     qid_t id)
-> @@ -868,6 +869,7 @@ static struct super_block *quotactl_block(const char __user *special, int cmd)
->  	struct block_device *bdev;
->  	struct super_block *sb;
->  	struct filename *tmp = getname(special);
-> +	bool excl = false, thawed = false;
->  
->  	if (IS_ERR(tmp))
->  		return ERR_CAST(tmp);
-> @@ -875,17 +877,32 @@ static struct super_block *quotactl_block(const char __user *special, int cmd)
->  	putname(tmp);
->  	if (IS_ERR(bdev))
->  		return ERR_CAST(bdev);
-> -	if (quotactl_cmd_onoff(cmd))
-> -		sb = get_super_exclusive_thawed(bdev);
-> -	else if (quotactl_cmd_write(cmd))
-> -		sb = get_super_thawed(bdev);
-> -	else
-> -		sb = get_super(bdev);
+> +			if (vdone != vtime) {
+> +				u64 inflight_us = DIV64_U64_ROUND_UP(
+> +					cost_to_abs_cost(vtime - vdone, hw_inuse),
+> +					ioc->vtime_base_rate);
 > +
-> +	if (quotactl_cmd_onoff(cmd)) {
-> +		excl = true;
-> +		thawed = true;
-> +	} else if (quotactl_cmd_write(cmd)) {
-> +		thawed = true;
-> +	}
+> +				usage_us = max(usage_us, inflight_us);
+> +			}
 > +
-> +retry:
-> +	sb = __get_super(bdev, excl);
-> +	if (thawed && sb && sb->s_writers.frozen != SB_UNFROZEN) {
-> +		if (excl)
-> +			up_write(&sb->s_umount);
-> +		else
-> +			up_read(&sb->s_umount);
-> +		wait_event(sb->s_writers.wait_unfrozen,
-> +			   sb->s_writers.frozen == SB_UNFROZEN);
-> +		put_super(sb);
-> +		goto retry;
-> +	}
+> +			/* convert to hweight based usage ratio */
+> +			if (time_after64(iocg->activated_at, ioc->period_at))
+> +				usage_dur = max_t(u64, now.now - iocg->activated_at, 1);
+> +			else
+> +				usage_dur = max_t(u64, now.now - ioc->period_at, 1);
 > +
->  	bdput(bdev);
->  	if (!sb)
->  		return ERR_PTR(-ENODEV);
-> -
->  	return sb;
-> +
->  #else
->  	return ERR_PTR(-ENODEV);
->  #endif
-> diff --git a/fs/super.c b/fs/super.c
-> index 98bb0629ee108e..343e5c1e538d2a 100644
-> --- a/fs/super.c
-> +++ b/fs/super.c
-> @@ -307,7 +307,7 @@ static void __put_super(struct super_block *s)
->   *	Drops a temporary reference, frees superblock if there's no
->   *	references left.
->   */
-> -static void put_super(struct super_block *sb)
-> +void put_super(struct super_block *sb)
->  {
->  	spin_lock(&sb_lock);
->  	__put_super(sb);
-> @@ -740,7 +740,7 @@ void iterate_supers_type(struct file_system_type *type,
->  
->  EXPORT_SYMBOL(iterate_supers_type);
->  
-> -static struct super_block *__get_super(struct block_device *bdev, bool excl)
-> +struct super_block *__get_super(struct block_device *bdev, bool excl)
->  {
->  	struct super_block *sb;
->  
-> @@ -789,53 +789,6 @@ struct super_block *get_super(struct block_device *bdev)
->  }
->  EXPORT_SYMBOL(get_super);
->  
-> -static struct super_block *__get_super_thawed(struct block_device *bdev,
-> -					      bool excl)
-> -{
-> -	while (1) {
-> -		struct super_block *s = __get_super(bdev, excl);
-> -		if (!s || s->s_writers.frozen == SB_UNFROZEN)
-> -			return s;
-> -		if (!excl)
-> -			up_read(&s->s_umount);
-> -		else
-> -			up_write(&s->s_umount);
-> -		wait_event(s->s_writers.wait_unfrozen,
-> -			   s->s_writers.frozen == SB_UNFROZEN);
-> -		put_super(s);
-> -	}
-> -}
-> -
-> -/**
-> - *	get_super_thawed - get thawed superblock of a device
-> - *	@bdev: device to get the superblock for
-> - *
-> - *	Scans the superblock list and finds the superblock of the file system
-> - *	mounted on the device. The superblock is returned once it is thawed
-> - *	(or immediately if it was not frozen). %NULL is returned if no match
-> - *	is found.
-> - */
-> -struct super_block *get_super_thawed(struct block_device *bdev)
-> -{
-> -	return __get_super_thawed(bdev, false);
-> -}
-> -EXPORT_SYMBOL(get_super_thawed);
-> -
-> -/**
-> - *	get_super_exclusive_thawed - get thawed superblock of a device
-> - *	@bdev: device to get the superblock for
-> - *
-> - *	Scans the superblock list and finds the superblock of the file system
-> - *	mounted on the device. The superblock is returned once it is thawed
-> - *	(or immediately if it was not frozen) and s_umount semaphore is held
-> - *	in exclusive mode. %NULL is returned if no match is found.
-> - */
-> -struct super_block *get_super_exclusive_thawed(struct block_device *bdev)
-> -{
-> -	return __get_super_thawed(bdev, true);
-> -}
-> -EXPORT_SYMBOL(get_super_exclusive_thawed);
-> -
->  /**
->   * get_active_super - get an active reference to the superblock of a device
->   * @bdev: device to get the superblock for
-> diff --git a/include/linux/fs.h b/include/linux/fs.h
-> index 8667d0cdc71e76..a61df0dd4f1989 100644
-> --- a/include/linux/fs.h
-> +++ b/include/linux/fs.h
-> @@ -1409,7 +1409,7 @@ enum {
->  
->  struct sb_writers {
->  	int				frozen;		/* Is sb frozen? */
-> -	wait_queue_head_t		wait_unfrozen;	/* for get_super_thawed() */
-> +	wait_queue_head_t		wait_unfrozen;	/* wait for thaw */
->  	struct percpu_rw_semaphore	rw_sem[SB_FREEZE_LEVELS];
->  };
->  
-> @@ -3132,8 +3132,6 @@ extern struct file_system_type *get_filesystem(struct file_system_type *fs);
->  extern void put_filesystem(struct file_system_type *fs);
->  extern struct file_system_type *get_fs_type(const char *name);
->  extern struct super_block *get_super(struct block_device *);
-> -extern struct super_block *get_super_thawed(struct block_device *);
-> -extern struct super_block *get_super_exclusive_thawed(struct block_device *bdev);
->  extern struct super_block *get_active_super(struct block_device *bdev);
->  extern void drop_super(struct super_block *sb);
->  extern void drop_super_exclusive(struct super_block *sb);
-> -- 
-> 2.29.2
-> 
+> +			usage = clamp_t(u32,
+> +				DIV64_U64_ROUND_UP(usage_us * WEIGHT_ONE,
+> +						   usage_dur),
+> +				1, WEIGHT_ONE);
+
+Can you please move the variable declarations inside the block together with
+the code?
+
+Thanks.
+
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+tejun
