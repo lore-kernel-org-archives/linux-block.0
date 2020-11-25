@@ -2,73 +2,127 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63406C63777
-	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 12:47:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5232FC63777
+	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 12:49:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 144DC206E5
-	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 12:47:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F0622206F7
+	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 12:49:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727682AbgKYMrH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 Nov 2020 07:47:07 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:7987 "EHLO
+        id S1728361AbgKYMtd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 Nov 2020 07:49:33 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:7988 "EHLO
         szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726009AbgKYMrH (ORCPT
+        with ESMTP id S1726295AbgKYMtd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Nov 2020 07:47:07 -0500
-Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.59])
-        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4Ch0yC15Z8zhhMs;
-        Wed, 25 Nov 2020 20:46:43 +0800 (CST)
-Received: from huawei.com (10.175.124.27) by DGGEMS407-HUB.china.huawei.com
- (10.3.19.207) with Microsoft SMTP Server id 14.3.487.0; Wed, 25 Nov 2020
- 20:46:51 +0800
-From:   Wang ShaoBo <bobo.shaobowang@huawei.com>
-To:     <danil.kipnis@cloud.ionos.com>
-CC:     <jinpu.wang@cloud.ionos.com>, <axboe@kernel.dk>,
+        Wed, 25 Nov 2020 07:49:33 -0500
+Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.60])
+        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4Ch1161SpnzhhMs;
+        Wed, 25 Nov 2020 20:49:14 +0800 (CST)
+Received: from [10.174.179.62] (10.174.179.62) by
+ DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
+ 14.3.487.0; Wed, 25 Nov 2020 20:49:20 +0800
+Subject: Re: [RFC PATCH] blk-cgroup: prevent rcu_sched detected stalls
+ warnings in blkg_destroy_all()
+To:     Tejun Heo <tj@kernel.org>
+CC:     <axboe@kernel.dk>, <cgroups@vger.kernel.org>,
         <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <huawei.libin@huawei.com>, <cj.chengjian@huawei.com>,
-        <bobo.shaobowang@huawei.com>
-Subject: [PATCH] block/rnbd: server: Fix error return code in rnbd_srv_create_dev_sysfs()
-Date:   Wed, 25 Nov 2020 20:46:47 +0800
-Message-ID: <20201125124647.30327-1-bobo.shaobowang@huawei.com>
-X-Mailer: git-send-email 2.17.1
+        <yi.zhang@huawei.com>, <zhangxiaoxu5@huawei.com>,
+        <houtao1@huawei.com>
+References: <20201121083420.3857433-1-yukuai3@huawei.com>
+ <X75O8BNVSX3ZE86w@mtj.duckdns.org>
+From:   "yukuai (C)" <yukuai3@huawei.com>
+Message-ID: <a24c48a3-6f17-98ac-47ad-770dd7e775ec@huawei.com>
+Date:   Wed, 25 Nov 2020 20:49:19 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.175.124.27]
+In-Reply-To: <X75O8BNVSX3ZE86w@mtj.duckdns.org>
+Content-Type: text/plain; charset="gbk"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.179.62]
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Fix to return -ENOMEM error code from the error handling case where
-kobject_create_and_add() failed instead of 0 in rnbd_srv_create_dev_sysfs(),
-as done elsewhere in this function.
+On 2020/11/25 20:32, Tejun Heo wrote:
+> Hello,
+> 
+> Thanks for the fix. A couple comments below.
+> 
+> On Sat, Nov 21, 2020 at 04:34:20PM +0800, Yu Kuai wrote:
+>> +#define BLKG_DESTROY_BATH 4096
+> 
+> I think you meant BLKG_DESTROY_BATCH.
+> 
+>>   static void blkg_destroy_all(struct request_queue *q)
+>>   {
+>>   	struct blkcg_gq *blkg, *n;
+>> +	int count = BLKG_DESTROY_BATH;
+> 
+> But might as well just write 4096 here.
+> 
+>>   	spin_lock_irq(&q->queue_lock);
+>>   	list_for_each_entry_safe(blkg, n, &q->blkg_list, q_node) {
+>>   		struct blkcg *blkcg = blkg->blkcg;
+>>   
+>> +		/*
+>> +		 * If the list is too long, the loop can took a long time,
+>> +		 * thus relese the lock for a while when a batch of blkcg
+>> +		 * were destroyed.
+>> +		 */
+>> +		if (!(--count)) {
+>> +			count = BLKG_DESTROY_BATH;
+>> +			spin_unlock_irq(&q->queue_lock);
+>> +			cond_resched();
+>> +			spin_lock_irq(&q->queue_lock);
+> 
+> You can't continue iteration after dropping both locks. You'd have to jump
+> out of loop and start list_for_each_entry_safe() again.
 
-Signed-off-by: Wang ShaoBo <bobo.shaobowang@huawei.com>
----
- drivers/block/rnbd/rnbd-srv-sysfs.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Thanks for your review, it's right. On the other hand
+blkcg_activate_policy() and blkcg_deactivate_policy() might have the
+same issue. My idea is that inserting a bookmark to the list, and
+restard from here.
 
-diff --git a/drivers/block/rnbd/rnbd-srv-sysfs.c b/drivers/block/rnbd/rnbd-srv-sysfs.c
-index 106775c074d1..5ba1a31ad626 100644
---- a/drivers/block/rnbd/rnbd-srv-sysfs.c
-+++ b/drivers/block/rnbd/rnbd-srv-sysfs.c
-@@ -52,8 +52,10 @@ int rnbd_srv_create_dev_sysfs(struct rnbd_srv_dev *dev,
- 
- 	dev->dev_sessions_kobj = kobject_create_and_add("sessions",
- 							&dev->dev_kobj);
--	if (!dev->dev_sessions_kobj)
-+	if (!dev->dev_sessions_kobj) {
-+		ret = -ENOMEM;
- 		goto put_dev_kobj;
-+	}
- 
- 	bdev_kobj = &disk_to_dev(bdev->bd_disk)->kobj;
- 	ret = sysfs_create_link(&dev->dev_kobj, bdev_kobj, "block_dev");
--- 
-2.17.1
+By the way, I found that blk_throtl_update_limit_valid() is called from
+throtl_pd_offline(). If CONFIG_BLK_DEV_THROTTLING_LOW is off, lower
+limit will always be zero, therefor a lot of time will be wasted to
+iterate descendants to find a nonzero lower limit.
 
+Do you think it's ok to do such modification:
+
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index b771c4299982..d52cac9f3a7c 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -587,6 +587,7 @@ static void throtl_pd_online(struct blkg_policy_data 
+*pd)
+         tg_update_has_rules(tg);
+  }
+
++#ifdef CONFIG_BLK_DEV_THROTTLING_LOW
+  static void blk_throtl_update_limit_valid(struct throtl_data *td)
+  {
+         struct cgroup_subsys_state *pos_css;
+@@ -607,6 +608,11 @@ static void blk_throtl_update_limit_valid(struct 
+throtl_data *td)
+
+         td->limit_valid[LIMIT_LOW] = low_valid;
+  }
++#else
++static inline void blk_throtl_update_limit_valid(struct throtl_data *td)
++{
++}
++#endif
+
+  static void throtl_upgrade_state(struct throtl_data *td);
+  static void throtl_pd_offline(struct blkg_policy_data *pd)
+
+Thanks!
+Yu Kuai
