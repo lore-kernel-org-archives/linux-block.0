@@ -2,206 +2,73 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE2CFC5519F
-	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 12:38:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63406C63777
+	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 12:47:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 50C2B206E5
-	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 12:38:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 144DC206E5
+	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 12:47:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729118AbgKYMhw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 Nov 2020 07:37:52 -0500
-Received: from mx2.suse.de ([195.135.220.15]:42972 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726654AbgKYMhw (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Nov 2020 07:37:52 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id C45A3AC22;
-        Wed, 25 Nov 2020 12:37:50 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 557991E130F; Wed, 25 Nov 2020 13:37:50 +0100 (CET)
-Date:   Wed, 25 Nov 2020 13:37:50 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Coly Li <colyli@suse.de>, Mike Snitzer <snitzer@redhat.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jan Kara <jack@suse.cz>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        dm-devel@redhat.com, Richard Weinberger <richard@nod.at>,
-        Jan Kara <jack@suse.com>, linux-block@vger.kernel.org,
-        xen-devel@lists.xenproject.org, linux-bcache@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: Re: [PATCH 06/45] zram: remove the claim mechanism
-Message-ID: <20201125123750.GJ16944@quack2.suse.cz>
-References: <20201124132751.3747337-1-hch@lst.de>
- <20201124132751.3747337-7-hch@lst.de>
+        id S1727682AbgKYMrH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 Nov 2020 07:47:07 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:7987 "EHLO
+        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726009AbgKYMrH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 25 Nov 2020 07:47:07 -0500
+Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.59])
+        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4Ch0yC15Z8zhhMs;
+        Wed, 25 Nov 2020 20:46:43 +0800 (CST)
+Received: from huawei.com (10.175.124.27) by DGGEMS407-HUB.china.huawei.com
+ (10.3.19.207) with Microsoft SMTP Server id 14.3.487.0; Wed, 25 Nov 2020
+ 20:46:51 +0800
+From:   Wang ShaoBo <bobo.shaobowang@huawei.com>
+To:     <danil.kipnis@cloud.ionos.com>
+CC:     <jinpu.wang@cloud.ionos.com>, <axboe@kernel.dk>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <huawei.libin@huawei.com>, <cj.chengjian@huawei.com>,
+        <bobo.shaobowang@huawei.com>
+Subject: [PATCH] block/rnbd: server: Fix error return code in rnbd_srv_create_dev_sysfs()
+Date:   Wed, 25 Nov 2020 20:46:47 +0800
+Message-ID: <20201125124647.30327-1-bobo.shaobowang@huawei.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201124132751.3747337-7-hch@lst.de>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain
+X-Originating-IP: [10.175.124.27]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue 24-11-20 14:27:12, Christoph Hellwig wrote:
-> The zram claim mechanism was added to ensure no new opens come in
-> during teardown.  But the proper way to archive that is to call
-					  ^^^ achieve
+Fix to return -ENOMEM error code from the error handling case where
+kobject_create_and_add() failed instead of 0 in rnbd_srv_create_dev_sysfs(),
+as done elsewhere in this function.
 
-> del_gendisk first, which takes care of all that.  Once del_gendisk
-> is called in the right place, the reset side can also be simplified
-> as no I/O can be outstanding on a block device that is not open.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Wang ShaoBo <bobo.shaobowang@huawei.com>
+---
+ drivers/block/rnbd/rnbd-srv-sysfs.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Otherwise I didn't find anything obviously wrong with the patch but I don't
-feel confident enough with zram to really give you my reviewed-by on this
-one.
-
-								Honza
-
-> ---
->  drivers/block/zram/zram_drv.c | 72 ++++++++---------------------------
->  1 file changed, 15 insertions(+), 57 deletions(-)
-> 
-> diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-> index 6d15d51cee2b7e..2e6d75ec1afddb 100644
-> --- a/drivers/block/zram/zram_drv.c
-> +++ b/drivers/block/zram/zram_drv.c
-> @@ -1756,64 +1756,33 @@ static ssize_t disksize_store(struct device *dev,
->  static ssize_t reset_store(struct device *dev,
->  		struct device_attribute *attr, const char *buf, size_t len)
->  {
-> -	int ret;
-> -	unsigned short do_reset;
-> -	struct zram *zram;
-> +	struct zram *zram = dev_to_zram(dev);
->  	struct block_device *bdev;
-> +	unsigned short do_reset;
-> +	int ret = 0;
->  
->  	ret = kstrtou16(buf, 10, &do_reset);
->  	if (ret)
->  		return ret;
-> -
->  	if (!do_reset)
->  		return -EINVAL;
->  
-> -	zram = dev_to_zram(dev);
->  	bdev = bdget_disk(zram->disk, 0);
->  	if (!bdev)
->  		return -ENOMEM;
->  
->  	mutex_lock(&bdev->bd_mutex);
-> -	/* Do not reset an active device or claimed device */
-> -	if (bdev->bd_openers || zram->claim) {
-> -		mutex_unlock(&bdev->bd_mutex);
-> -		bdput(bdev);
-> -		return -EBUSY;
-> -	}
-> -
-> -	/* From now on, anyone can't open /dev/zram[0-9] */
-> -	zram->claim = true;
-> +	if (bdev->bd_openers)
-> +		ret = -EBUSY;
-> +	else
-> +		zram_reset_device(zram);
->  	mutex_unlock(&bdev->bd_mutex);
-> -
-> -	/* Make sure all the pending I/O are finished */
-> -	fsync_bdev(bdev);
-> -	zram_reset_device(zram);
->  	bdput(bdev);
->  
-> -	mutex_lock(&bdev->bd_mutex);
-> -	zram->claim = false;
-> -	mutex_unlock(&bdev->bd_mutex);
-> -
-> -	return len;
-> -}
-> -
-> -static int zram_open(struct block_device *bdev, fmode_t mode)
-> -{
-> -	int ret = 0;
-> -	struct zram *zram;
-> -
-> -	WARN_ON(!mutex_is_locked(&bdev->bd_mutex));
-> -
-> -	zram = bdev->bd_disk->private_data;
-> -	/* zram was claimed to reset so open request fails */
-> -	if (zram->claim)
-> -		ret = -EBUSY;
-> -
-> -	return ret;
-> +	return ret ? ret : len;
->  }
->  
->  static const struct block_device_operations zram_devops = {
-> -	.open = zram_open,
->  	.submit_bio = zram_submit_bio,
->  	.swap_slot_free_notify = zram_slot_free_notify,
->  	.rw_page = zram_rw_page,
-> @@ -1821,7 +1790,6 @@ static const struct block_device_operations zram_devops = {
->  };
->  
->  static const struct block_device_operations zram_wb_devops = {
-> -	.open = zram_open,
->  	.submit_bio = zram_submit_bio,
->  	.swap_slot_free_notify = zram_slot_free_notify,
->  	.owner = THIS_MODULE
-> @@ -1974,32 +1942,22 @@ static int zram_add(void)
->  
->  static int zram_remove(struct zram *zram)
->  {
-> -	struct block_device *bdev;
-> -
-> -	bdev = bdget_disk(zram->disk, 0);
-> -	if (!bdev)
-> -		return -ENOMEM;
-> +	struct block_device *bdev = bdget_disk(zram->disk, 0);
->  
-> -	mutex_lock(&bdev->bd_mutex);
-> -	if (bdev->bd_openers || zram->claim) {
-> -		mutex_unlock(&bdev->bd_mutex);
-> +	if (bdev) {
-> +		if (bdev->bd_openers) {
-> +			bdput(bdev);
-> +			return -EBUSY;
-> +		}
->  		bdput(bdev);
-> -		return -EBUSY;
->  	}
->  
-> -	zram->claim = true;
-> -	mutex_unlock(&bdev->bd_mutex);
-> -
-> +	del_gendisk(zram->disk);
->  	zram_debugfs_unregister(zram);
-> -
-> -	/* Make sure all the pending I/O are finished */
-> -	fsync_bdev(bdev);
->  	zram_reset_device(zram);
-> -	bdput(bdev);
->  
->  	pr_info("Removed device: %s\n", zram->disk->disk_name);
->  
-> -	del_gendisk(zram->disk);
->  	blk_cleanup_queue(zram->disk->queue);
->  	put_disk(zram->disk);
->  	kfree(zram);
-> -- 
-> 2.29.2
-> 
+diff --git a/drivers/block/rnbd/rnbd-srv-sysfs.c b/drivers/block/rnbd/rnbd-srv-sysfs.c
+index 106775c074d1..5ba1a31ad626 100644
+--- a/drivers/block/rnbd/rnbd-srv-sysfs.c
++++ b/drivers/block/rnbd/rnbd-srv-sysfs.c
+@@ -52,8 +52,10 @@ int rnbd_srv_create_dev_sysfs(struct rnbd_srv_dev *dev,
+ 
+ 	dev->dev_sessions_kobj = kobject_create_and_add("sessions",
+ 							&dev->dev_kobj);
+-	if (!dev->dev_sessions_kobj)
++	if (!dev->dev_sessions_kobj) {
++		ret = -ENOMEM;
+ 		goto put_dev_kobj;
++	}
+ 
+ 	bdev_kobj = &disk_to_dev(bdev->bd_disk)->kobj;
+ 	ret = sysfs_create_link(&dev->dev_kobj, bdev_kobj, "block_dev");
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+2.17.1
+
