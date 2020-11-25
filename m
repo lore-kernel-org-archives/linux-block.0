@@ -2,113 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82099C56201
-	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 18:12:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6A5FC63798
+	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 18:12:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 39CB8206F9
-	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 18:12:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5E5E9206F9
+	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 18:12:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="qK7mydwf"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731621AbgKYSL5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 Nov 2020 13:11:57 -0500
-Received: from 2.mo52.mail-out.ovh.net ([178.33.105.233]:59181 "EHLO
-        2.mo52.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730774AbgKYSL5 (ORCPT
+        id S1732687AbgKYSMN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 Nov 2020 13:12:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46466 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731561AbgKYSMN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Nov 2020 13:11:57 -0500
-X-Greylist: delayed 2255 seconds by postgrey-1.27 at vger.kernel.org; Wed, 25 Nov 2020 13:11:56 EST
-Received: from mxplan5.mail.ovh.net (unknown [10.109.156.21])
-        by mo52.mail-out.ovh.net (Postfix) with ESMTPS id 3A81A217625;
-        Wed, 25 Nov 2020 18:34:19 +0100 (CET)
-Received: from kaod.org (37.59.142.105) by DAG8EX1.mxp5.local (172.16.2.71)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Wed, 25 Nov
- 2020 18:34:18 +0100
-Authentication-Results: garm.ovh; auth=pass (GARM-105G006b56b7170-7741-40ac-97e5-c5413baab032,
-                    13817E1CA0648EB9EE095497159C33290D197662) smtp.auth=groug@kaod.org
-Date:   Wed, 25 Nov 2020 18:34:12 +0100
-From:   Greg Kurz <groug@kaod.org>
-To:     Marc Zyngier <maz@kernel.org>
-CC:     Laurent Vivier <lvivier@redhat.com>,
-        Denis Kirjanov <kda@linux-powerpc.org>,
-        <linux-kernel@vger.kernel.org>, <linux-pci@vger.kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Paul Mackerras <paulus@samba.org>,
-        <linuxppc-dev@lists.ozlabs.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        <linux-block@vger.kernel.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH v3 2/2] powerpc/pseries: pass MSI affinity to
- irq_create_mapping()
-Message-ID: <20201125183412.351c96ee@bahia.lan>
-In-Reply-To: <5419d1790c9ea0d9d7791ae887794285@kernel.org>
-References: <20201125150932.1150619-1-lvivier@redhat.com>
-        <20201125150932.1150619-3-lvivier@redhat.com>
-        <CAOJe8K1Q7sGf67bdj-2Mthkj4XNR4fOSskV1dyh62AdzefhpAQ@mail.gmail.com>
-        <7184880b-0351-ae18-d2e1-fab7b79fc864@redhat.com>
-        <5419d1790c9ea0d9d7791ae887794285@kernel.org>
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        Wed, 25 Nov 2020 13:12:13 -0500
+Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69A00C0613D4
+        for <linux-block@vger.kernel.org>; Wed, 25 Nov 2020 10:12:13 -0800 (PST)
+Received: by mail-pf1-x443.google.com with SMTP id s21so3056194pfu.13
+        for <linux-block@vger.kernel.org>; Wed, 25 Nov 2020 10:12:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=0fTEKA1BMnqAP7zyIDbxBxAhXdG9fLKBB1cVyiZbdIk=;
+        b=qK7mydwfThuEnHCeCqtsAec7PjmKPgL006jyoRQUHxhQEzYX+v3i8lrsi4NLokEEOO
+         2U/+qVQm9hgjSY9fD8BTvL6bBIefJ+o7tDJUUy3mymwO0VFTWNLWC7noIUr0jP0rl/xl
+         XabZauDW8EaoIhbulQIbQyZFhLcw5KpEFnGnTtN/FMfB8KNLUKxooQnIxjGCpYTCyvUO
+         SxhhVaT+OITiAuHLzZH3IZwCBfgrMDL2Qmg+ne7fzqxkhTPRTS1zJ9tHeSs8SJ2vJoyB
+         t/bZOTzF45Zv/YLXfH3CzFehdxjhpEt4aoWsb1K3ogSDoRYBOaz0nA3txU2Phrk/0SCO
+         SwxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=0fTEKA1BMnqAP7zyIDbxBxAhXdG9fLKBB1cVyiZbdIk=;
+        b=s/6WarSVqsJ9IpBIDf/KOk/a+GIB4oq4bT0wCSBdVQQiZHA7F5OUgT9NXFgFVqVhas
+         FQCOR123e1UE7iIUk9G2Rnn2D9ikZORU0S7dWX/6Ow+emqrn3w/3zPijdzaZmnbVVC8I
+         5m3Lo5mPqhfBYzD6LdKdBOfo1H1oR4Q6hholth/2JCTW5xI++Pli9aWDrlg+qtRcI4CJ
+         v94KZWqpzOPFcnn7++QU0qwMyxuPPsTOPCV6S9IUSlcF4ZTbohIV45cx5+SgfxIK/eYr
+         QGQmc/RyqCNckJp7VLlupdfhc+mfqdwr9STfHYc/s4Y9RowSAX9aXJu6FghApapgwfoq
+         vVMA==
+X-Gm-Message-State: AOAM531Wg8Gu80aZsGI4uw7HAzIBf3iFTQ73iaqm3LqI6phD72sBgCRK
+        mKIvAGaj8XiuSY9sYbuPNmiu5NTWNGZrIg==
+X-Google-Smtp-Source: ABdhPJxMcVFdDN6YNX7OtkH8nV+bfaC8jrFj8a32FW1Y5/fvpiESvMPLvlFD6Cj4vMf/zHD7iOHVNA==
+X-Received: by 2002:a63:8a42:: with SMTP id y63mr4054002pgd.364.1606327932905;
+        Wed, 25 Nov 2020 10:12:12 -0800 (PST)
+Received: from ?IPv6:2605:e000:100e:8c61:ffc0:fc77:4500:e880? ([2605:e000:100e:8c61:ffc0:fc77:4500:e880])
+        by smtp.gmail.com with ESMTPSA id s21sm2588977pgk.52.2020.11.25.10.12.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 25 Nov 2020 10:12:12 -0800 (PST)
+Subject: Re: [PATCH] block: remove unused BIO_SPLIT_ENTRIES
+To:     Jeffle Xu <jefflexu@linux.alibaba.com>
+Cc:     linux-block@vger.kernel.org, joseph.qi@linux.alibaba.com
+References: <20201125065817.34148-1-jefflexu@linux.alibaba.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <4e4cee43-dec4-5f03-a2a3-603c21c69d31@kernel.dk>
+Date:   Wed, 25 Nov 2020 11:12:13 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
+In-Reply-To: <20201125065817.34148-1-jefflexu@linux.alibaba.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [37.59.142.105]
-X-ClientProxiedBy: DAG6EX2.mxp5.local (172.16.2.52) To DAG8EX1.mxp5.local
- (172.16.2.71)
-X-Ovh-Tracer-GUID: d6bac3c7-d957-44cb-8e9b-55ca8dec327a
-X-Ovh-Tracer-Id: 10779928659030088123
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedrudehtddguddtfecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgihesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepfedutdeijeejveehkeeileetgfelteekteehtedtieefffevhffflefftdefleejnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrddutdehnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehmshhtsehrvgguhhgrthdrtghomh
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 25 Nov 2020 16:42:30 +0000
-Marc Zyngier <maz@kernel.org> wrote:
+On 11/24/20 11:58 PM, Jeffle Xu wrote:
+> Since commit 4b1faf931650 ("block: Kill bio_pair_split()"), there's
+> no user of BIO_SPLIT_ENTRIES anymore.
 
-> On 2020-11-25 16:24, Laurent Vivier wrote:
-> > On 25/11/2020 17:05, Denis Kirjanov wrote:
-> >> On 11/25/20, Laurent Vivier <lvivier@redhat.com> wrote:
-> >>> With virtio multiqueue, normally each queue IRQ is mapped to a CPU.
-> >>> 
-> >>> But since commit 0d9f0a52c8b9f ("virtio_scsi: use virtio IRQ 
-> >>> affinity")
-> >>> this is broken on pseries.
-> >> 
-> >> Please add "Fixes" tag.
-> > 
-> > In fact, the code in commit 0d9f0a52c8b9f is correct.
-> > 
-> > The problem is with MSI/X irq affinity and pseries. So this patch
-> > fixes more than virtio_scsi. I put this information because this
-> > commit allows to clearly show the problem. Perhaps I should remove
-> > this line in fact?
-> 
-> This patch does not fix virtio_scsi at all, which as you noticed, is
-> correct. It really fixes the PPC MSI setup, which is starting to show
-> its age. So getting rid of the reference seems like the right thing to 
-> do.
-> 
-> I'm also not keen on the BugId thing. It should really be a lore link.
-> I also cannot find any such tag in the kernel, nor is it a documented
-> practice. The last reference to a Bugzilla entry seems to have happened
-> with 786b5219081ff16 (five years ago).
-> 
+Applied, thanks.
 
-My bad, I suggested BugId to Laurent but the intent was actually BugLink,
-which seems to be commonly used in the kernel.
-
-Cheers,
-
---
-Greg
-
-> Thanks,
-> 
->          M.
+-- 
+Jens Axboe
 
