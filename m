@@ -2,83 +2,60 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61F0FC5519F
-	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 13:20:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F071C5519F
+	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 13:35:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EC73A206F7
-	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 13:20:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="zfCRgVqm";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="RVIMh+DQ"
+	by mail.kernel.org (Postfix) with ESMTP id C3E89206E5
+	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 13:35:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728558AbgKYNUX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 Nov 2020 08:20:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57340 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727700AbgKYNUX (ORCPT
+        id S1729508AbgKYNfY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 Nov 2020 08:35:24 -0500
+Received: from out30-132.freemail.mail.aliyun.com ([115.124.30.132]:38668 "EHLO
+        out30-132.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729399AbgKYNfY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Nov 2020 08:20:23 -0500
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BC96C0613D4;
-        Wed, 25 Nov 2020 05:20:23 -0800 (PST)
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1606310421;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Fb1yTCfVx8pU95ckndYGNJP7rgnPUEX5zBWS1/t7lBo=;
-        b=zfCRgVqmQUanbSMxfM/AJBOVwzgLL+DQrzJCrYt0JDvFzGOKPG77UXL46Q+/Y0xr3vQD8c
-        vcRH8CqoiNaIqybeabsAF6TpLsiPmS4Xj+ZfYrP5yjM5hmLL9arfuIJZFRn9fv7y8sQN/p
-        fHmhReSvpEcJTQJKF+c2m4LXh1F5KGF6G+Nb7l5u8wgFx3fNGv99Jo/Ou3xlPK3CNCfGZV
-        4eh6SQuD7NzGO2bFdt9HxPc64Wjtr+ulOR5XtvlplLP0xQw4fsmppWiq23ceve/9jlG0iJ
-        TjUp/wuqXY1iAf9Ge2dpXQlO7/fdsL5h9FWyj/Gn9P2fh9t1pki7H9U36BR85Q==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1606310421;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Fb1yTCfVx8pU95ckndYGNJP7rgnPUEX5zBWS1/t7lBo=;
-        b=RVIMh+DQ2MU+geLoHmWuSvDZ1IFvbZM1Ns3HEQAkmO0PTHfdyXlwZqOtkQjMfbj9D4C0YM
-        bRnfHM/KOZ1pynAw==
-To:     Laurent Vivier <lvivier@redhat.com>, linux-kernel@vger.kernel.org
-Cc:     linux-block@vger.kernel.org, Paul Mackerras <paulus@samba.org>,
-        linux-pci@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
-        linuxppc-dev@lists.ozlabs.org,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>, Greg Kurz <groug@kaod.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Laurent Vivier <lvivier@redhat.com>
-Subject: Re: [PATCH v2 1/2] genirq: add an irq_create_mapping_affinity() function
-In-Reply-To: <20201125111657.1141295-2-lvivier@redhat.com>
-References: <20201125111657.1141295-1-lvivier@redhat.com> <20201125111657.1141295-2-lvivier@redhat.com>
-Date:   Wed, 25 Nov 2020 14:20:21 +0100
-Message-ID: <87sg8xk1yi.fsf@nanos.tec.linutronix.de>
+        Wed, 25 Nov 2020 08:35:24 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R211e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04394;MF=baolin.wang@linux.alibaba.com;NM=1;PH=DS;RN=5;SR=0;TI=SMTPD_---0UGW7mH6_1606311317;
+Received: from 30.0.173.120(mailfrom:baolin.wang@linux.alibaba.com fp:SMTPD_---0UGW7mH6_1606311317)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Wed, 25 Nov 2020 21:35:18 +0800
+Subject: Re: [PATCH 3/7] blk-iocost: Just open code the q_name()
+To:     Tejun Heo <tj@kernel.org>
+Cc:     axboe@kernel.dk, baolin.wang7@gmail.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <cover.1606186717.git.baolin.wang@linux.alibaba.com>
+ <3bdc9526ac839a6952db8cd50cf0e75280614b1d.1606186717.git.baolin.wang@linux.alibaba.com>
+ <X75BGjo8B1fgKwui@mtj.duckdns.org>
+From:   Baolin Wang <baolin.wang@linux.alibaba.com>
+Message-ID: <2bc32abe-1328-1d01-cbd3-68286808ab21@linux.alibaba.com>
+Date:   Wed, 25 Nov 2020 21:35:17 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <X75BGjo8B1fgKwui@mtj.duckdns.org>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Laurent,
 
-On Wed, Nov 25 2020 at 12:16, Laurent Vivier wrote:
 
-The proper subsystem prefix is: 'genirq/irqdomain:' and the first letter
-after the colon wants to be uppercase.
+> On Tue, Nov 24, 2020 at 11:33:32AM +0800, Baolin Wang wrote:
+>> The simple q_name() function is only called from ioc_name(),
+>> just open code it to make code more readable.
+>>
+>> Signed-off-by: Baolin Wang <baolin.wang@linux.alibaba.com>
+> 
+> I'm not sure this is an improvement. Either way seems fine to me. So, why
+> change?
 
-> This function adds an affinity parameter to irq_create_mapping().
-> This parameter is needed to pass it to irq_domain_alloc_descs().
-
-A changelog has to explain the WHY. 'The parameter is needed' is not
-really useful information.
-
-Thanks,
-
-        tglx
-
+Yes, this may be not called an 'improvement'. Just from my taste of 
+reading code, there is no need to factor out a separate function only 
+including 4 lines code and called by only one place. Anyway I can drop
+this patch if you think this is unnecessary. Thanks.
