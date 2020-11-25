@@ -2,66 +2,109 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1998BC56201
-	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 06:58:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C070EC63777
+	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 07:04:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C786520872
-	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 06:58:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 72501206E5
+	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 07:04:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726027AbgKYG6T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 Nov 2020 01:58:19 -0500
-Received: from out30-43.freemail.mail.aliyun.com ([115.124.30.43]:35727 "EHLO
+        id S1726654AbgKYHEB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 Nov 2020 02:04:01 -0500
+Received: from out30-43.freemail.mail.aliyun.com ([115.124.30.43]:38023 "EHLO
         out30-43.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725836AbgKYG6T (ORCPT
+        by vger.kernel.org with ESMTP id S1726059AbgKYHEB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Nov 2020 01:58:19 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R211e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04395;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=3;SR=0;TI=SMTPD_---0UGTpWZU_1606287497;
-Received: from localhost(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0UGTpWZU_1606287497)
+        Wed, 25 Nov 2020 02:04:01 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R661e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04407;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0UGULzvk_1606287837;
+Received: from admindeMacBook-Pro-2.local(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0UGULzvk_1606287837)
           by smtp.aliyun-inc.com(127.0.0.1);
-          Wed, 25 Nov 2020 14:58:18 +0800
-From:   Jeffle Xu <jefflexu@linux.alibaba.com>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, joseph.qi@linux.alibaba.com
-Subject: [PATCH] block: remove unused BIO_SPLIT_ENTRIES
-Date:   Wed, 25 Nov 2020 14:58:17 +0800
-Message-Id: <20201125065817.34148-1-jefflexu@linux.alibaba.com>
-X-Mailer: git-send-email 2.27.0
+          Wed, 25 Nov 2020 15:03:57 +0800
+Subject: Re: [PATCH v4 2/2] block,iomap: disable iopoll when split needed
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     axboe@kernel.dk, ming.lei@redhat.com, linux-block@vger.kernel.org,
+        io-uring@vger.kernel.org, joseph.qi@linux.alibaba.com
+References: <20201117075625.46118-1-jefflexu@linux.alibaba.com>
+ <20201117075625.46118-3-jefflexu@linux.alibaba.com>
+ <20201119175516.GB20944@infradead.org>
+ <ed355fc8-6fc8-5ffd-f1e9-6ba19f761a09@linux.alibaba.com>
+ <20201124112547.GA26805@infradead.org>
+From:   JeffleXu <jefflexu@linux.alibaba.com>
+Message-ID: <4de531ca-e9bc-9ddb-e6b7-3c153a8a4658@linux.alibaba.com>
+Date:   Wed, 25 Nov 2020 15:03:56 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.5.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20201124112547.GA26805@infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Since commit 4b1faf931650 ("block: Kill bio_pair_split()"), there's
-no user of BIO_SPLIT_ENTRIES anymore.
+Sorry for that, I will send a new version later.
 
-Signed-off-by: Jeffle Xu <jefflexu@linux.alibaba.com>
----
- include/linux/bio.h | 6 ------
- 1 file changed, 6 deletions(-)
+On 11/24/20 7:25 PM, Christoph Hellwig wrote:
+> On Fri, Nov 20, 2020 at 06:06:54PM +0800, JeffleXu wrote:
+>>
+>> On 11/20/20 1:55 AM, Christoph Hellwig wrote:
+>>>> diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
+>>>> index 933f234d5bec..396ac0f91a43 100644
+>>>> --- a/fs/iomap/direct-io.c
+>>>> +++ b/fs/iomap/direct-io.c
+>>>> @@ -309,6 +309,16 @@ iomap_dio_bio_actor(struct inode *inode, loff_t pos, loff_t length,
+>>>>   		copied += n;
+>>>>   		nr_pages = iov_iter_npages(dio->submit.iter, BIO_MAX_PAGES);
+>>>> +		/*
+>>>> +		 * The current dio needs to be split into multiple bios here.
+>>>> +		 * iopoll for split bio will cause subtle trouble such as
+>>>> +		 * hang when doing sync polling, while iopoll is initially
+>>>> +		 * for small size, latency sensitive IO. Thus disable iopoll
+>>>> +		 * if split needed.
+>>>> +		 */
+>>>> +		if (nr_pages)
+>>>> +			dio->iocb->ki_flags &= ~IOCB_HIPRI;
+>>> I think this is confusing two things.
+>>
+>> Indeed there's two level of split concerning this issue when doing sync
+>> iopoll.
+>>
+>>
+>> The first is that one bio got split in block-core, and patch 1 of this patch
+>> set just fixes this.
+>>
+>>
+>> Second is that one dio got split into multiple bios in fs layer, and patch 2
+>> fixes this.
+>>
+>>
+>>>   One is that we don't handle
+>>> polling well when there are multiple bios.  For this I think we should
+>>> only call bio_set_polled when we know there is a single bio.
+>>
+>>
+>> How about the following patch:
+>>
+>>
+>> --- a/fs/iomap/direct-io.c
+>> +++ b/fs/iomap/direct-io.c
+>> @@ -60,12 +60,12 @@ int iomap_dio_iopoll(struct kiocb *kiocb, bool spin)
+>> ??EXPORT_SYMBOL_GPL(iomap_dio_iopoll);
+>>
+>> ??static void iomap_dio_submit_bio(struct iomap_dio *dio, struct iomap
+>> *iomap,
+>> -???????????????????????????? struct bio *bio, loff_t pos)
+>> +???????????????????????????? struct bio *bio, loff_t pos, bool split)
+> 
+> This seems pretty messed up by your mailer and I have a hard time
+> reading it.  Can you resend it?
+> 
 
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index c6d765382926..ecf67108f091 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -711,12 +711,6 @@ static inline bool bioset_initialized(struct bio_set *bs)
- 	return bs->bio_slab != NULL;
- }
- 
--/*
-- * a small number of entries is fine, not going to be performance critical.
-- * basically we just need to survive
-- */
--#define BIO_SPLIT_ENTRIES 2
--
- #if defined(CONFIG_BLK_DEV_INTEGRITY)
- 
- #define bip_for_each_vec(bvl, bip, iter)				\
 -- 
-2.27.0
-
+Thanks,
+Jeffle
