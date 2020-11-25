@@ -2,118 +2,109 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFD06C5519F
-	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 12:51:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62A89C5519F
+	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 12:53:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7213F206E5
-	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 12:51:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 065D6206E5
+	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 12:53:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h7OFb4cE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729016AbgKYMvv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 Nov 2020 07:51:51 -0500
-Received: from smtpout1.mo804.mail-out.ovh.net ([79.137.123.220]:41929 "EHLO
-        smtpout1.mo804.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728902AbgKYMvv (ORCPT
+        id S1729240AbgKYMxg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 Nov 2020 07:53:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53182 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728944AbgKYMxf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Nov 2020 07:51:51 -0500
-Received: from mxplan5.mail.ovh.net (unknown [10.109.143.90])
-        by mo804.mail-out.ovh.net (Postfix) with ESMTPS id B96687545376;
-        Wed, 25 Nov 2020 13:51:47 +0100 (CET)
-Received: from kaod.org (37.59.142.100) by DAG8EX1.mxp5.local (172.16.2.71)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Wed, 25 Nov
- 2020 13:51:46 +0100
-Authentication-Results: garm.ovh; auth=pass (GARM-100R003f5f17775-3d78-4887-bece-db38842b427c,
-                    13817E1CA0648EB9EE095497159C33290D197662) smtp.auth=groug@kaod.org
-Date:   Wed, 25 Nov 2020 13:51:45 +0100
-From:   Greg Kurz <groug@kaod.org>
-To:     Laurent Vivier <lvivier@redhat.com>
-CC:     <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        "Paul Mackerras" <paulus@samba.org>, <linux-pci@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Marc Zyngier <maz@kernel.org>, <linuxppc-dev@lists.ozlabs.org>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Michael Ellerman <mpe@ellerman.id.au>
-Subject: Re: [PATCH v2 2/2] powerpc/pseries: pass MSI affinity to
- irq_create_mapping()
-Message-ID: <20201125135145.64a51c4e@bahia.lan>
-In-Reply-To: <20201125111657.1141295-3-lvivier@redhat.com>
-References: <20201125111657.1141295-1-lvivier@redhat.com>
-        <20201125111657.1141295-3-lvivier@redhat.com>
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        Wed, 25 Nov 2020 07:53:35 -0500
+Received: from mail-qv1-xf42.google.com (mail-qv1-xf42.google.com [IPv6:2607:f8b0:4864:20::f42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7672C0613D4;
+        Wed, 25 Nov 2020 04:53:35 -0800 (PST)
+Received: by mail-qv1-xf42.google.com with SMTP id y11so829300qvu.10;
+        Wed, 25 Nov 2020 04:53:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=2X0u1zymrYQOExBICa76gdQ48XGpkWMEvIhEcoogarU=;
+        b=h7OFb4cEn3IpHhhmZsFcA2eih4hE1UpgsipaoC3FI2JkDg6aKHoI1bASA8i3rOFMzB
+         RrPBAUJWAS+C7jH6bfxUekTUIfftfA/e2mf7MGBFHctQIlbpHuum4v/Oqwi80+CZszaP
+         /36qAXSlJkmebZWFvlGQgg6buFqwe0ePfG2VJqk58y8bOoqNsEfLyzR6+ckzM8sFCWK1
+         5C6rU+hO/4CCwKSLu/gQCovGnIz7UBzovijPSThu1Whb77PECc/SsguTi2Ep2+/+assZ
+         l35vCvidV9OAgmqAyO7q1fdcOJmw/JI4UC0M5Rs73SylB8xrhqAyTVZUaGSUgTLmWqZO
+         mIOA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=2X0u1zymrYQOExBICa76gdQ48XGpkWMEvIhEcoogarU=;
+        b=Q8nNzOc67AacoCs59kaKaxgRcAqIzG1ZwHYIaQ9WIbtDIIyFGaMXrG12VvJ3JR72L7
+         E/HyT7oguG+KVn0pwWT17AZ/vtihNexcFCaN+7B/JXKGnit+84unBDQjHJ8p6dFFlfmM
+         AG7X+xZncjrgmqfDU9lx81FP+grVY/czchAhg5iyIJcYXQRY7auecOHqny6LZ/tzk9oy
+         GsfMsOAtyKR5T5lqA9/w4pcp7Dik2pZsF1ETu7Ro8j+6qBjR2S0GKGY2XJy7bDBqKBpv
+         MzJHwzVOfPu7bzwEeh/FmlE9e2cDYU2cY0KlWuP/cLqo411PVrLtWh+j57pSPF+r4Y3D
+         YFnA==
+X-Gm-Message-State: AOAM530B5rXB9+JI+5vhnsA4ZFD+wnzw+v2sl8VXxNjV7qrPP4oO2CBc
+        vgy8+0yA0DIp42iTpArTaM0=
+X-Google-Smtp-Source: ABdhPJwotE2y9hQoQS9N1nGwrTGSUxiAQCHyd9CM4dgXKm89kDF1OzE9AXingzDvopSqKtJjo1rc8A==
+X-Received: by 2002:ad4:43ca:: with SMTP id o10mr3368150qvs.25.1606308814790;
+        Wed, 25 Nov 2020 04:53:34 -0800 (PST)
+Received: from localhost (dhcp-6c-ae-f6-dc-d8-61.cpe.echoes.net. [72.28.8.195])
+        by smtp.gmail.com with ESMTPSA id b3sm2131612qte.85.2020.11.25.04.53.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Nov 2020 04:53:34 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Wed, 25 Nov 2020 07:53:12 -0500
+From:   Tejun Heo <tj@kernel.org>
+To:     "yukuai (C)" <yukuai3@huawei.com>
+Cc:     axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com, zhangxiaoxu5@huawei.com, houtao1@huawei.com
+Subject: Re: [RFC PATCH] blk-cgroup: prevent rcu_sched detected stalls
+ warnings in blkg_destroy_all()
+Message-ID: <X75TuKMuO2Ru+rVt@mtj.duckdns.org>
+References: <20201121083420.3857433-1-yukuai3@huawei.com>
+ <X75O8BNVSX3ZE86w@mtj.duckdns.org>
+ <a24c48a3-6f17-98ac-47ad-770dd7e775ec@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [37.59.142.100]
-X-ClientProxiedBy: DAG1EX2.mxp5.local (172.16.2.2) To DAG8EX1.mxp5.local
- (172.16.2.71)
-X-Ovh-Tracer-GUID: f9887add-59a7-4ca7-a478-288848d6728e
-X-Ovh-Tracer-Id: 6008646329849649656
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedrudehtddggeeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfhisehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpedvfefgtdegleduudejjeelfffghfehtdeigefggfduvdfgkeevgfeftedtjeehveenucffohhmrghinheprhgvughhrghtrdgtohhmnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrddutddtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehmphgvsegvlhhlvghrmhgrnhdrihgurdgruh
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a24c48a3-6f17-98ac-47ad-770dd7e775ec@huawei.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 25 Nov 2020 12:16:57 +0100
-Laurent Vivier <lvivier@redhat.com> wrote:
+Hello,
 
-> With virtio multiqueue, normally each queue IRQ is mapped to a CPU.
+On Wed, Nov 25, 2020 at 08:49:19PM +0800, yukuai (C) wrote:
+> > You can't continue iteration after dropping both locks. You'd have to jump
+> > out of loop and start list_for_each_entry_safe() again.
 > 
-> But since commit 0d9f0a52c8b9f ("virtio_scsi: use virtio IRQ affinity")
-> this is broken on pseries.
+> Thanks for your review, it's right. On the other hand
+> blkcg_activate_policy() and blkcg_deactivate_policy() might have the
+> same issue. My idea is that inserting a bookmark to the list, and
+> restard from here.
+
+For destruction, as we're destroying the list anyway, we don't need to
+insert bookmark and start over from the beginning. For [de]activate policy,
+we might need something fancier or change locking so that we can sleep while
+iterating. However, policy [de]activations are a lot less of a problem as
+they aren't operations which can happen commonly.
+
+> By the way, I found that blk_throtl_update_limit_valid() is called from
+> throtl_pd_offline(). If CONFIG_BLK_DEV_THROTTLING_LOW is off, lower
+> limit will always be zero, therefor a lot of time will be wasted to
+> iterate descendants to find a nonzero lower limit.
 > 
-> The affinity is correctly computed in msi_desc but this is not applied
-> to the system IRQs.
-> 
-> It appears the affinity is correctly passed to rtas_setup_msi_irqs() but
-> lost at this point and never passed to irq_domain_alloc_descs()
-> (see commit 06ee6d571f0e ("genirq: Add affinity hint to irq allocation"))
-> because irq_create_mapping() doesn't take an affinity parameter.
-> 
-> As the previous patch has added the affinity parameter to
-> irq_create_mapping() we can forward the affinity from rtas_setup_msi_irqs()
-> to irq_domain_alloc_descs().
-> 
-> With this change, the virtqueues are correctly dispatched between the CPUs
-> on pseries.
-> 
+> Do you think it's ok to do such modification:
 
-Since it is public, maybe add:
+Yeah, sure. Looks fine to me.
 
-BugId: https://bugzilla.redhat.com/show_bug.cgi?id=1702939
+Thanks.
 
-?
-
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-> ---
-
-Anyway,
-
-Reviewed-by: Greg Kurz <groug@kaod.org>
-
->  arch/powerpc/platforms/pseries/msi.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/powerpc/platforms/pseries/msi.c b/arch/powerpc/platforms/pseries/msi.c
-> index 133f6adcb39c..b3ac2455faad 100644
-> --- a/arch/powerpc/platforms/pseries/msi.c
-> +++ b/arch/powerpc/platforms/pseries/msi.c
-> @@ -458,7 +458,8 @@ static int rtas_setup_msi_irqs(struct pci_dev *pdev, int nvec_in, int type)
->  			return hwirq;
->  		}
->  
-> -		virq = irq_create_mapping(NULL, hwirq);
-> +		virq = irq_create_mapping_affinity(NULL, hwirq,
-> +						   entry->affinity);
->  
->  		if (!virq) {
->  			pr_debug("rtas_msi: Failed mapping hwirq %d\n", hwirq);
-
+-- 
+tejun
