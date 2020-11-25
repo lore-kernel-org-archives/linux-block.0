@@ -2,143 +2,90 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 759B4C56202
-	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 16:25:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4942C56201
+	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 16:29:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0582C20789
-	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 16:25:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A8n7liN1"
+	by mail.kernel.org (Postfix) with ESMTP id 92D1721534
+	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 16:29:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730988AbgKYQZG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 Nov 2020 11:25:06 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:34814 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729690AbgKYQZD (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Nov 2020 11:25:03 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1606321502;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=o/Y0frm+n6+KcF0/nn/2XkdcdJw5e1jlF8WzBJfpXEs=;
-        b=A8n7liN1YPvOaYE5ZQMoTJJRmc5focnNKaKElcxA8bQKRPXXFPRMtL7TzmF/uY2izWN7Qu
-        xmXKw8T+24q6TGKTZVZwtDQn7EnPkj5zcuinfOVZ30SAv3oOHV/ELjV2XmLmJ4zkwp2rZi
-        XFMRGibEeHx7lBL4dUanxOG38mzxOj8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-578-JMyfGYw_NGS3vgQc4F4nCg-1; Wed, 25 Nov 2020 11:24:58 -0500
-X-MC-Unique: JMyfGYw_NGS3vgQc4F4nCg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BA308101AFA7;
-        Wed, 25 Nov 2020 16:24:55 +0000 (UTC)
-Received: from [10.36.113.83] (ovpn-113-83.ams2.redhat.com [10.36.113.83])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9D09E10016F4;
-        Wed, 25 Nov 2020 16:24:47 +0000 (UTC)
-Subject: Re: [PATCH v3 2/2] powerpc/pseries: pass MSI affinity to
- irq_create_mapping()
-To:     Denis Kirjanov <kda@linux-powerpc.org>
-Cc:     linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        Paul Mackerras <paulus@samba.org>, Greg Kurz <groug@kaod.org>,
-        linuxppc-dev@lists.ozlabs.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        linux-block@vger.kernel.org,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Marc Zyngier <maz@kernel.org>
-References: <20201125150932.1150619-1-lvivier@redhat.com>
- <20201125150932.1150619-3-lvivier@redhat.com>
- <CAOJe8K1Q7sGf67bdj-2Mthkj4XNR4fOSskV1dyh62AdzefhpAQ@mail.gmail.com>
-From:   Laurent Vivier <lvivier@redhat.com>
-Message-ID: <7184880b-0351-ae18-d2e1-fab7b79fc864@redhat.com>
-Date:   Wed, 25 Nov 2020 17:24:45 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+        id S1731484AbgKYQ3c (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 Nov 2020 11:29:32 -0500
+Received: from verein.lst.de ([213.95.11.211]:59650 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730840AbgKYQ3c (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 25 Nov 2020 11:29:32 -0500
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 948AB68B02; Wed, 25 Nov 2020 17:29:26 +0100 (CET)
+Date:   Wed, 25 Nov 2020 17:29:26 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Tejun Heo <tj@kernel.org>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Coly Li <colyli@suse.de>, Mike Snitzer <snitzer@redhat.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jan Kara <jack@suse.cz>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        dm-devel@redhat.com, Richard Weinberger <richard@nod.at>,
+        Jan Kara <jack@suse.com>, linux-block@vger.kernel.org,
+        xen-devel@lists.xenproject.org, linux-bcache@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: Re: [PATCH 23/45] block: remove i_bdev
+Message-ID: <20201125162926.GA1024@lst.de>
+References: <20201124132751.3747337-1-hch@lst.de> <20201124132751.3747337-24-hch@lst.de> <X71g4Tm+3RiRg4Gf@mtj.duckdns.org>
 MIME-Version: 1.0
-In-Reply-To: <CAOJe8K1Q7sGf67bdj-2Mthkj4XNR4fOSskV1dyh62AdzefhpAQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <X71g4Tm+3RiRg4Gf@mtj.duckdns.org>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 25/11/2020 17:05, Denis Kirjanov wrote:
-> On 11/25/20, Laurent Vivier <lvivier@redhat.com> wrote:
->> With virtio multiqueue, normally each queue IRQ is mapped to a CPU.
->>
->> But since commit 0d9f0a52c8b9f ("virtio_scsi: use virtio IRQ affinity")
->> this is broken on pseries.
+On Tue, Nov 24, 2020 at 02:37:05PM -0500, Tejun Heo wrote:
+> On Tue, Nov 24, 2020 at 02:27:29PM +0100, Christoph Hellwig wrote:
+> > Switch the block device lookup interfaces to directly work with a dev_t
+> > so that struct block_device references are only acquired by the
+> > blkdev_get variants (and the blk-cgroup special case).  This means that
+> > we not don't need an extra reference in the inode and can generally
+>      ^
+>      now
+> > simplify handling of struct block_device to keep the lookups contained
+> > in the core block layer code.
+> > 
+> > Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ...
+> > @@ -1689,14 +1599,12 @@ static int blkdev_open(struct inode * inode, struct file * filp)
+> >  	if ((filp->f_flags & O_ACCMODE) == 3)
+> >  		filp->f_mode |= FMODE_WRITE_IOCTL;
+> >  
+> > -	bdev = bd_acquire(inode);
+> > -	if (bdev == NULL)
+> > -		return -ENOMEM;
+> > -
+> > +	bdev = blkdev_get_by_dev(inode->i_rdev, filp->f_mode, filp);
+> > +	if (IS_ERR(bdev))
+> > +		return PTR_ERR(bdev);
+> >  	filp->f_mapping = bdev->bd_inode->i_mapping;
+> >  	filp->f_wb_err = filemap_sample_wb_err(filp->f_mapping);
+> > -
+> > -	return blkdev_get(bdev, filp->f_mode, filp);
+> > +	return 0;
+> >  }
 > 
-> Please add "Fixes" tag.
+> I was wondering whether losing the stale bdev flushing in bd_acquire() would
+> cause user-visible behavior changes but can't see how it would given that
+> userland has no way of holding onto a specific instance of block inode.
+> Maybe it's something worth mentioning in the commit message?
 
-In fact, the code in commit 0d9f0a52c8b9f is correct.
-
-The problem is with MSI/X irq affinity and pseries. So this patch fixes more than
-virtio_scsi. I put this information because this commit allows to clearly show the
-problem. Perhaps I should remove this line in fact?
-
-Thanks,
-Laurent
-
-> 
-> Thanks!
-> 
->>
->> The affinity is correctly computed in msi_desc but this is not applied
->> to the system IRQs.
->>
->> It appears the affinity is correctly passed to rtas_setup_msi_irqs() but
->> lost at this point and never passed to irq_domain_alloc_descs()
->> (see commit 06ee6d571f0e ("genirq: Add affinity hint to irq allocation"))
->> because irq_create_mapping() doesn't take an affinity parameter.
->>
->> As the previous patch has added the affinity parameter to
->> irq_create_mapping() we can forward the affinity from rtas_setup_msi_irqs()
->> to irq_domain_alloc_descs().
->>
->> With this change, the virtqueues are correctly dispatched between the CPUs
->> on pseries.
->>
->> BugId: https://bugzilla.redhat.com/show_bug.cgi?id=1702939
->> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
->> Reviewed-by: Greg Kurz <groug@kaod.org>
->> ---
->>  arch/powerpc/platforms/pseries/msi.c | 3 ++-
->>  1 file changed, 2 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/powerpc/platforms/pseries/msi.c
->> b/arch/powerpc/platforms/pseries/msi.c
->> index 133f6adcb39c..b3ac2455faad 100644
->> --- a/arch/powerpc/platforms/pseries/msi.c
->> +++ b/arch/powerpc/platforms/pseries/msi.c
->> @@ -458,7 +458,8 @@ static int rtas_setup_msi_irqs(struct pci_dev *pdev, int
->> nvec_in, int type)
->>  			return hwirq;
->>  		}
->>
->> -		virq = irq_create_mapping(NULL, hwirq);
->> +		virq = irq_create_mapping_affinity(NULL, hwirq,
->> +						   entry->affinity);
->>
->>  		if (!virq) {
->>  			pr_debug("rtas_msi: Failed mapping hwirq %d\n", hwirq);
->> --
->> 2.28.0
->>
->>
-> 
-
+With stale bdev flushing do you mean the call to bd_forget if
+i_bdev exists but is unhashed?  It doesn't actually flush anything but
+just detaches the old bdev from the inode so that the new one can be
+attached.  That problem goes away by definition if we don't attach
+the bdev to the inode.
