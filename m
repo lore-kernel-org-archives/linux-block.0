@@ -2,119 +2,109 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3917C6379D
-	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 13:43:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8902EC56202
+	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 14:10:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 749AA206E5
-	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 13:43:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 32E272083E
+	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 14:10:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h/OT5/8s"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727939AbgKYNnl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 Nov 2020 08:43:41 -0500
-Received: from out30-133.freemail.mail.aliyun.com ([115.124.30.133]:40344 "EHLO
-        out30-133.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729594AbgKYNnk (ORCPT
+        id S1729723AbgKYOJ7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 Nov 2020 09:09:59 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59090 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729578AbgKYOJ6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Nov 2020 08:43:40 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04426;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=5;SR=0;TI=SMTPD_---0UGWBy5N_1606311815;
-Received: from localhost(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0UGWBy5N_1606311815)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Wed, 25 Nov 2020 21:43:35 +0800
-From:   Jeffle Xu <jefflexu@linux.alibaba.com>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, joseph.qi@linux.alibaba.com,
-        ming.lei@redhat.com, hch@infradead.org
-Subject: [PATCH v7] block: disable iopoll for split bio
-Date:   Wed, 25 Nov 2020 21:43:35 +0800
-Message-Id: <20201125134335.63479-1-jefflexu@linux.alibaba.com>
-X-Mailer: git-send-email 2.27.0
+        Wed, 25 Nov 2020 09:09:58 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1606313397;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=L7x1+zQZq5AdNReGA03HZCNw2qvTVYRyYsN6XftQCxU=;
+        b=h/OT5/8s0S+UEIuo/PCfje1kCO0N58LvGMdtv9P0bLP0T1P3VIbIBuHfNAta933NA453r2
+        HC977uFrFpYN5VufEvuJCJ/lQ7u0LaknH2DImnIAgmc7Nzh694cOEojPIZKofeh7KUNasI
+        h7SMVgBrrQ5x2buyNnksb4wTwEbx5qQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-73-oVkqOzzQNAWKywPe2GBTeA-1; Wed, 25 Nov 2020 09:09:52 -0500
+X-MC-Unique: oVkqOzzQNAWKywPe2GBTeA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3D261185E482;
+        Wed, 25 Nov 2020 14:09:50 +0000 (UTC)
+Received: from [10.36.113.83] (ovpn-113-83.ams2.redhat.com [10.36.113.83])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1CB195D9CA;
+        Wed, 25 Nov 2020 14:09:42 +0000 (UTC)
+Subject: Re: [PATCH v2 1/2] genirq: add an irq_create_mapping_affinity()
+ function
+To:     Thomas Gleixner <tglx@linutronix.de>, linux-kernel@vger.kernel.org
+Cc:     linux-block@vger.kernel.org, Paul Mackerras <paulus@samba.org>,
+        linux-pci@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+        linuxppc-dev@lists.ozlabs.org,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>, Greg Kurz <groug@kaod.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Michael Ellerman <mpe@ellerman.id.au>
+References: <20201125111657.1141295-1-lvivier@redhat.com>
+ <20201125111657.1141295-2-lvivier@redhat.com>
+ <87sg8xk1yi.fsf@nanos.tec.linutronix.de>
+From:   Laurent Vivier <lvivier@redhat.com>
+Message-ID: <e32641f7-0993-8923-7d74-5ac57a60f10d@redhat.com>
+Date:   Wed, 25 Nov 2020 15:09:42 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <87sg8xk1yi.fsf@nanos.tec.linutronix.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-iopoll is initially for small size, latency sensitive IO. It doesn't
-work well for big IO, especially when it needs to be split to multiple
-bios. In this case, the returned cookie of __submit_bio_noacct_mq() is
-indeed the cookie of the last split bio. The completion of *this* last
-split bio done by iopoll doesn't mean the whole original bio has
-completed. Callers of iopoll still need to wait for completion of other
-split bios.
+On 25/11/2020 14:20, Thomas Gleixner wrote:
+> Laurent,
+> 
+> On Wed, Nov 25 2020 at 12:16, Laurent Vivier wrote:
+> 
+> The proper subsystem prefix is: 'genirq/irqdomain:' and the first letter
+> after the colon wants to be uppercase.
 
-Besides bio splitting may cause more trouble for iopoll which isn't
-supposed to be used in case of big IO.
+Ok.
 
-iopoll for split bio may cause potential race if CPU migration happens
-during bio submission. Since the returned cookie is that of the last
-split bio, polling on the corresponding hardware queue doesn't help
-complete other split bios, if these split bios are enqueued into
-different hardware queues. Since interrupts are disabled for polling
-queues, the completion of these other split bios depends on timeout
-mechanism, thus causing a potential hang.
+>> This function adds an affinity parameter to irq_create_mapping().
+>> This parameter is needed to pass it to irq_domain_alloc_descs().
+> 
+> A changelog has to explain the WHY. 'The parameter is needed' is not
+> really useful information.
+> 
 
-iopoll for split bio may also cause hang for sync polling. Currently
-both the blkdev and iomap-based fs (ext4/xfs, etc) support sync polling
-in direct IO routine. These routines will submit bio without REQ_NOWAIT
-flag set, and then start sync polling in current process context. The
-process may hang in blk_mq_get_tag() if the submitted bio has to be
-split into multiple bios and can rapidly exhaust the queue depth. The
-process are waiting for the completion of the previously allocated
-requests, which should be reaped by the following polling, and thus
-causing a deadlock.
+The reason of this change is explained in PATCH 2.
 
-To avoid these subtle trouble described above, just disable iopoll for
-split bio and return BLK_QC_T_NONE in this case. The side effect is that
-non-HIPRI IO also returns BLK_QC_T_NONE now. It should be acceptable
-since the returned cookie is never used for non-HIPRI IO.
+I have two patches, one to change the interface with no functional change (PATCH 1) and
+one to fix the problem (PATCH 2). Moreover they don't cover the same subsystems.
 
-Suggested-by: Ming Lei <ming.lei@redhat.com>
-Signed-off-by: Jeffle Xu <jefflexu@linux.alibaba.com>
----
- block/blk-merge.c | 8 ++++++++
- block/blk-mq.c    | 6 +++++-
- 2 files changed, 13 insertions(+), 1 deletion(-)
+I can either:
+- merge the two patches
+- or make a reference in the changelog of PATCH 1 to PATCH 2
+  (something like "(see folowing patch "powerpc/pseries: pass MSI affinity to
+   irq_create_mapping()")")
+- or copy some information from PATCH 2
+  (something like "this parameter is needed by rtas_setup_msi_irqs() to pass the affinity
+   to irq_domain_alloc_descs() to fix multiqueue affinity")
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index bcf5e4580603..8a2f1fb7bb16 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -279,6 +279,14 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 	return NULL;
- split:
- 	*segs = nsegs;
-+
-+	/*
-+	 * Bio splitting may cause subtle trouble such as hang when doing sync
-+	 * iopoll in direct IO routine. Given performance gain of iopoll for
-+	 * big IO can be trival, disable iopoll when split needed.
-+	 */
-+	bio->bi_opf &= ~REQ_HIPRI;
-+
- 	return bio_split(bio, sectors, GFP_NOIO, bs);
- }
- 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 55bcee5dc032..4acd702575cd 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2265,7 +2265,11 @@ blk_qc_t blk_mq_submit_bio(struct bio *bio)
- 		blk_mq_sched_insert_request(rq, false, true, true);
- 	}
- 
--	return cookie;
-+	if (bio->bi_opf & REQ_HIPRI)
-+		return cookie;
-+
-+	return BLK_QC_T_NONE;
-+
- queue_exit:
- 	blk_queue_exit(q);
- 	return BLK_QC_T_NONE;
--- 
-2.27.0
+What do you prefer?
+
+Thanks,
+Laurent
 
