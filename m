@@ -2,108 +2,247 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48502C56202
-	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 12:20:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17A77C64E75
+	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 12:24:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E37B9206F7
-	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 12:20:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 624DA2087C
+	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 12:24:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lIoMv/m3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GyrkIL7r"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728900AbgKYMUJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 Nov 2020 07:20:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47952 "EHLO
+        id S1729196AbgKYMYk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 Nov 2020 07:24:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725616AbgKYMUI (ORCPT
+        with ESMTP id S1725616AbgKYMYj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Nov 2020 07:20:08 -0500
-Received: from mail-qt1-x841.google.com (mail-qt1-x841.google.com [IPv6:2607:f8b0:4864:20::841])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB1B3C0613D4;
-        Wed, 25 Nov 2020 04:20:08 -0800 (PST)
-Received: by mail-qt1-x841.google.com with SMTP id f93so1379585qtb.10;
-        Wed, 25 Nov 2020 04:20:08 -0800 (PST)
+        Wed, 25 Nov 2020 07:24:39 -0500
+Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42F21C0613D6
+        for <linux-block@vger.kernel.org>; Wed, 25 Nov 2020 04:24:39 -0800 (PST)
+Received: by mail-pf1-x443.google.com with SMTP id 131so2151689pfb.9
+        for <linux-block@vger.kernel.org>; Wed, 25 Nov 2020 04:24:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=an/jJ9Rku2m0NqJB2xb52Vc8jeFzL41elSo1CJ3zhfo=;
-        b=lIoMv/m3nzPitwyRrwrREDEROejhitkPv3aFT2D2jpgZpc3trqRv2eAu3zKJvqLfdE
-         NYA7TQrix2E1AEw/fRzdgM1FBUXV8Y5VHnBOXanTxWTqTr9u41Nu2wFrc9Zavk5n/ngF
-         SwFEN8UR2dYHE0hFbrce93aHrRQvIQ+NLIt8ah00uF+R+fSBZeBGq4eZhDh0r6qpLfmW
-         PDVdoowY9ejEhW916QSYsTGMIyQwp2yJPGSwsVY07r3C36tK03jPaIXer881mXo+Ysmb
-         xpMHqy/ztwRuFHjxfDomFY3k1bybfCfxcHUNIajpYmbqm0usFbsOt12jWXFa0Ol5RV50
-         XMdg==
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=9IH0l2L/ELs04A0W/6GC4nhC0e+RvRGWJ1bAzD1+dFc=;
+        b=GyrkIL7rJc/Wrkz9wtYqXZYvGBry6qXFkQono0nmrBFDlUCiGmbX9ByD1wUhih87ZW
+         XCd/8etF0h65aGuVNHVvGVnSoIRV2cIFxWeuMsMEKDZ+SIKsK6eM3KIHPaY2Au+pxfCB
+         jFmSmO0a8jtSnIjbAi/709gkMW9hnqxggrhUNIGI/2GrlejcLn7tyz9MFlSEpE31y19Z
+         9ARaZhNBbaKZzII6ioDoEFmbbi01XI+4/fF65wWR3SGfZuCMoV2cgGUJ8Osa8sFeqdbz
+         KLllcyBsC3gtRPDbq4Yc+z3inKaZT7D05cYTb7CBHNDdR/afLH0A7E5JHrBWilMAefn4
+         uS6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=an/jJ9Rku2m0NqJB2xb52Vc8jeFzL41elSo1CJ3zhfo=;
-        b=XBTOe9zwxiwJ3eL8T48hZkiKWTPkDKL4Mg5wP+JmV5ez5WXGUAYM5x3os4aNk8Bv0S
-         jja3m1+IatX3SMjVLIl4M8lfMmwfC8eLhSMgRwKjZODsXvWG/i6qwFzXVidAwsBpMRvV
-         4tDEOjbsDGE+GtdHV5wOsPD7TZk0mFbNxpJs9hgkarMfufPXjsXvkKJHqS/1/2pklDLy
-         Chr1Fm7qbUC3MS482FLHayVFuT21/956x0FG2HoHxXYsd1k7FEAx05xKfXPjakJc7S5+
-         fqIsGhM0pLXHFdCH7EgpiRCHjEvWgGhtc4OJi4cF+D7RV7eKURT0vjBngyFLiDJZuCFO
-         aoIg==
-X-Gm-Message-State: AOAM533x+TsjUiH4wPuNU3VrC2D/vlIZ0pMT9j1UIrOssHPFcg4piEd1
-        m9yG2OnIDzt5qmxwdX9eITtGKyJ1SG3CZw==
-X-Google-Smtp-Source: ABdhPJzL4u77kOEb9WpRYIKrAKJJF0Zlj1TZIbzykpt+aWgrqRnwWPZMOz8Fkk9+uRWCxKWbkS+ZYA==
-X-Received: by 2002:aed:2664:: with SMTP id z91mr2736206qtc.290.1606306807869;
-        Wed, 25 Nov 2020 04:20:07 -0800 (PST)
-Received: from localhost (dhcp-6c-ae-f6-dc-d8-61.cpe.echoes.net. [72.28.8.195])
-        by smtp.gmail.com with ESMTPSA id e126sm2350330qkb.90.2020.11.25.04.20.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Nov 2020 04:20:07 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Wed, 25 Nov 2020 07:19:43 -0500
-From:   Tejun Heo <tj@kernel.org>
-To:     Baolin Wang <baolin.wang@linux.alibaba.com>
-Cc:     axboe@kernel.dk, baolin.wang7@gmail.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 5/7] blk-iocost: Move the usage ratio calculation to the
- correct place
-Message-ID: <X75L39ZY3GQ+eL0B@mtj.duckdns.org>
-References: <cover.1606186717.git.baolin.wang@linux.alibaba.com>
- <89a6e1223944e96e0e5e001191d87dd8079345c8.1606186717.git.baolin.wang@linux.alibaba.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=9IH0l2L/ELs04A0W/6GC4nhC0e+RvRGWJ1bAzD1+dFc=;
+        b=SKqrts4zcKVRI5jyVNEZez5yGfATz7QYzQuBCcURzZW/8qmtRcAySVKvg3ARl63mWz
+         LsALTsXlkQaCJHLtTfEn4eMUA8LOSjiaJrxM74dpA4z89g2K0bO+SEybRM17q+JLRX8h
+         9CEt95kfwNiWyIEfRX2MmJPiQ5L+ONjJ9+S0Yz75Y7tKoWt6okh+yz5z5Pa585YUyx4l
+         UUhzCrZQD5kHPhzhbuVoa31qmD4Z2n2dLlQ64IxHE2tcBzyievY2zD8EpLyt3zqqYBl6
+         4yAiGYAkj4O6eAdLO16HsArRrwkoS5Nwu6Ec7S/91LYSyIkkjSEUhqGfVkn/VJDhKONB
+         xnPQ==
+X-Gm-Message-State: AOAM5300E+7kmUEmT3Agrl+gi6tnZV1JNRa5sOiDC5WxDxu9jCInJOFa
+        TsyELX52yWzymdzO2PqTsY43t5cZikjlxkYzibOOfg==
+X-Google-Smtp-Source: ABdhPJySo35UzNwHodlreVMfJuWPwHO1z+zkcbFfSYU3Avf+sN4n16LJPBb97SBockWyJEKx3Xs8q1wCvzejZmwrmAM=
+X-Received: by 2002:a62:7905:0:b029:197:f300:5a2a with SMTP id
+ u5-20020a6279050000b0290197f3005a2amr2898775pfc.30.1606307078380; Wed, 25 Nov
+ 2020 04:24:38 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <89a6e1223944e96e0e5e001191d87dd8079345c8.1606186717.git.baolin.wang@linux.alibaba.com>
+References: <202011201129.B13FDB3C@keescook> <20201120115142.292999b2@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
+ <202011220816.8B6591A@keescook> <9b57fd4914b46f38d54087d75e072d6e947cb56d.camel@HansenPartnership.com>
+ <ca071decb87cc7e905411423c05a48f9fd2f58d7.camel@perches.com>
+ <0147972a72bc13f3629de8a32dee6f1f308994b5.camel@HansenPartnership.com>
+ <d8d1e9add08cdd4158405e77762d4946037208f8.camel@perches.com>
+ <dbd2cb703ed9eefa7dde9281ea26ab0f7acc8afe.camel@HansenPartnership.com>
+ <20201123130348.GA3119@embeddedor> <8f5611bb015e044fa1c0a48147293923c2d904e4.camel@HansenPartnership.com>
+ <202011241327.BB28F12F6@keescook> <a841536fe65bb33f1c72ce2455a6eb47a0107565.camel@HansenPartnership.com>
+In-Reply-To: <a841536fe65bb33f1c72ce2455a6eb47a0107565.camel@HansenPartnership.com>
+From:   Nick Desaulniers <ndesaulniers@google.com>
+Date:   Wed, 25 Nov 2020 04:24:27 -0800
+Message-ID: <CAKwvOdkGBn7nuWTAqrORMeN1G+w3YwBfCqqaRD2nwvoAXKi=Aw@mail.gmail.com>
+Subject: Re: [Intel-wired-lan] [PATCH 000/141] Fix fall-through warnings for Clang
+To:     James Bottomley <James.Bottomley@hansenpartnership.com>
+Cc:     Kees Cook <keescook@chromium.org>,
+        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Joe Perches <joe@perches.com>,
+        Jakub Kicinski <kuba@kernel.org>, alsa-devel@alsa-project.org,
+        linux-atm-general@lists.sourceforge.net,
+        reiserfs-devel@vger.kernel.org, linux-iio@vger.kernel.org,
+        linux-wireless <linux-wireless@vger.kernel.org>,
+        linux-fbdev@vger.kernel.org,
+        dri-devel <dri-devel@lists.freedesktop.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Nathan Chancellor <natechancellor@gmail.com>,
+        linux-ide@vger.kernel.org, dm-devel@redhat.com,
+        keyrings@vger.kernel.org, linux-mtd@lists.infradead.org,
+        GR-everest-linux-l2@marvell.com, wcn36xx@lists.infradead.org,
+        samba-technical@lists.samba.org, linux-i3c@lists.infradead.org,
+        linux1394-devel@lists.sourceforge.net,
+        linux-afs@lists.infradead.org,
+        usb-storage@lists.one-eyed-alien.net, drbd-dev@lists.linbit.com,
+        devel@driverdev.osuosl.org, linux-cifs@vger.kernel.org,
+        rds-devel@oss.oracle.com, linux-scsi@vger.kernel.org,
+        linux-rdma@vger.kernel.org, oss-drivers@netronome.com,
+        bridge@lists.linux-foundation.org,
+        linux-security-module@vger.kernel.org,
+        amd-gfx list <amd-gfx@lists.freedesktop.org>,
+        linux-stm32@st-md-mailman.stormreply.com, cluster-devel@redhat.com,
+        linux-acpi@vger.kernel.org, coreteam@netfilter.org,
+        intel-wired-lan@lists.osuosl.org, linux-input@vger.kernel.org,
+        Miguel Ojeda <ojeda@kernel.org>,
+        tipc-discussion@lists.sourceforge.net, linux-ext4@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-watchdog@vger.kernel.org,
+        selinux@vger.kernel.org,
+        linux-arm-msm <linux-arm-msm@vger.kernel.org>,
+        intel-gfx@lists.freedesktop.org, linux-geode@lists.infradead.org,
+        linux-can@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-gpio@vger.kernel.org, op-tee@lists.trustedfirmware.org,
+        linux-mediatek@lists.infradead.org, xen-devel@lists.xenproject.org,
+        nouveau@lists.freedesktop.org, linux-hams@vger.kernel.org,
+        ceph-devel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-hwmon@vger.kernel.org,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        linux-nfs@vger.kernel.org, GR-Linux-NIC-Dev@marvell.com,
+        Linux Memory Management List <linux-mm@kvack.org>,
+        Network Development <netdev@vger.kernel.org>,
+        linux-decnet-user@lists.sourceforge.net, linux-mmc@vger.kernel.org,
+        Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
+        linux-sctp@vger.kernel.org, linux-usb@vger.kernel.org,
+        netfilter-devel@vger.kernel.org,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>, patches@opensource.cirrus.com,
+        linux-integrity@vger.kernel.org, target-devel@vger.kernel.org,
+        linux-hardening@vger.kernel.org,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        Greg KH <gregkh@linuxfoundation.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
-> @@ -2225,6 +2207,25 @@ static void ioc_timer_fn(struct timer_list *timer)
->  		     time_before64(vtime, now.vnow - ioc->margins.low))) {
->  			u32 hwa, old_hwi, hwm, new_hwi;
->  
-> +			if (vdone != vtime) {
-> +				u64 inflight_us = DIV64_U64_ROUND_UP(
-> +					cost_to_abs_cost(vtime - vdone, hw_inuse),
-> +					ioc->vtime_base_rate);
-> +
-> +				usage_us = max(usage_us, inflight_us);
-> +			}
-> +
-> +			/* convert to hweight based usage ratio */
-> +			if (time_after64(iocg->activated_at, ioc->period_at))
-> +				usage_dur = max_t(u64, now.now - iocg->activated_at, 1);
-> +			else
-> +				usage_dur = max_t(u64, now.now - ioc->period_at, 1);
-> +
-> +			usage = clamp_t(u32,
-> +				DIV64_U64_ROUND_UP(usage_us * WEIGHT_ONE,
-> +						   usage_dur),
-> +				1, WEIGHT_ONE);
+On Tue, Nov 24, 2020 at 11:05 PM James Bottomley
+<James.Bottomley@hansenpartnership.com> wrote:
+>
+> On Tue, 2020-11-24 at 13:32 -0800, Kees Cook wrote:
+> > We already enable -Wimplicit-fallthrough globally, so that's not the
+> > discussion. The issue is that Clang is (correctly) even more strict
+> > than GCC for this, so these are the remaining ones to fix for full
+> > Clang coverage too.
+> >
+> > People have spent more time debating this already than it would have
+> > taken to apply the patches. :)
+>
+> You mean we've already spent 90% of the effort to come this far so we
+> might as well go the remaining 10% because then at least we get some
+> return? It's certainly a clinching argument in defence procurement ...
 
-Can you please move the variable declarations inside the block together with
-the code?
+So developers and distributions using Clang can't have
+-Wimplicit-fallthrough enabled because GCC is less strict (which has
+been shown in this thread to lead to bugs)?  We'd like to have nice
+things too, you know.
 
-Thanks.
+I even agree that most of the churn comes from
 
+case 0:
+  ++x;
+default:
+  break;
+
+which I have a patch for: https://reviews.llvm.org/D91895.  I agree
+that can never lead to bugs.  But that's not the sole case of this
+series, just most of them.
+
+Though, note how the reviewer (C++ spec editor and clang front end
+owner) in https://reviews.llvm.org/D91895 even asks in that review how
+maybe a new flag would be more appropriate for a watered
+down/stylistic variant of the existing behavior.  And if the current
+wording of Documentation/process/deprecated.rst around "fallthrough"
+is a straightforward rule of thumb, I kind of agree with him.
+
+>
+> > This is about robustness and language wrangling. It's a big code-
+> > base, and this is the price of our managing technical debt for
+> > permanent robustness improvements. (The numbers I ran from Gustavo's
+> > earlier patches were that about 10% of the places adjusted were
+> > identified as legitimate bugs being fixed. This final series may be
+> > lower, but there are still bugs being found from it -- we need to
+> > finish this and shut the door on it for good.)
+>
+> I got my six patches by analyzing the lwn.net report of the fixes that
+> was cited which had 21 of which 50% didn't actually change the emitted
+> code, and 25% didn't have a user visible effect.
+>
+> But the broader point I'm making is just because the compiler people
+> come up with a shiny new warning doesn't necessarily mean the problem
+
+That's not what this is though; you're attacking a strawman.  I'd
+encourage you to bring that up when that actually occurs, unlike this
+case since it's actively hindering getting -Wimplicit-fallthrough
+enabled for Clang.  This is not a shiny new warning; it's already on
+for GCC and has existed in both compilers for multiple releases.
+
+And I'll also note that warnings are warnings and not errors because
+they cannot be proven to be bugs in 100% of cases, but they have led
+to bugs in the past.  They require a human to review their intent and
+remove ambiguities.  If 97% of cases would end in a break ("Expert C
+Programming: Deep C Secrets" - Peter van der Linden), then it starts
+to look to me like a language defect; certainly an incorrectly chosen
+default.  But the compiler can't know those 3% were intentional,
+unless you're explicit for those exceptional cases.
+
+> it's detecting is one that causes us actual problems in the code base.
+> I'd really be happier if we had a theory about what classes of CVE or
+> bug we could eliminate before we embrace the next new warning.
+
+We don't generally file CVEs and waiting for them to occur might be
+too reactive, but I agree that pointing to some additional
+documentation in commit messages about how a warning could lead to a
+bug would make it clearer to reviewers why being able to enable it
+treewide, even if there's no bug in their particular subsystem, is in
+the general interest of the commons.
+
+On Mon, Nov 23, 2020 at 7:58 AM James Bottomley
+<James.Bottomley@hansenpartnership.com> wrote:
+>
+> We're also complaining about the inability to recruit maintainers:
+>
+> https://www.theregister.com/2020/06/30/hard_to_find_linux_maintainers_says_torvalds/
+>
+> And burn out:
+>
+> http://antirez.com/news/129
+>
+> The whole crux of your argument seems to be maintainers' time isn't
+> important so we should accept all trivial patches ... I'm pushing back
+> on that assumption in two places, firstly the valulessness of the time
+> and secondly that all trivial patches are valuable.
+
+It's critical to the longevity of any open source project that there
+are not single points of failure.  If someone is not expendable or
+replaceable (or claims to be) then that's a risk to the project and a
+bottleneck.  Not having a replacement in training or some form of
+redundancy is short sighted.
+
+If trivial patches are adding too much to your workload, consider
+training a co-maintainer or asking for help from one of your reviewers
+whom you trust.  I don't doubt it's hard to find maintainers, but
+existing maintainers should go out of their way to entrust
+co-maintainers especially when they find their workload becomes too
+high.  And reviewing/picking up trivial patches is probably a great
+way to get started.  If we allow too much knowledge of any one
+subsystem to collect with one maintainer, what happens when that
+maintainer leaves the community (which, given a finite lifespan, is an
+inevitability)?
 -- 
-tejun
+Thanks,
+~Nick Desaulniers
