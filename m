@@ -2,137 +2,120 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEFF9C5519F
-	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 12:31:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69B16C5519F
+	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 12:33:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 92C08206F7
-	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 12:31:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 070F0206E5
+	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 12:33:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m8eiXGIf"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729370AbgKYMbf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 Nov 2020 07:31:35 -0500
-Received: from mx2.suse.de ([195.135.220.15]:35994 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729348AbgKYMbf (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Nov 2020 07:31:35 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 6A34EAF0E;
-        Wed, 25 Nov 2020 12:31:33 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 3DD711E130F; Wed, 25 Nov 2020 13:31:33 +0100 (CET)
-Date:   Wed, 25 Nov 2020 13:31:33 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Coly Li <colyli@suse.de>, Mike Snitzer <snitzer@redhat.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jan Kara <jack@suse.cz>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        dm-devel@redhat.com, Richard Weinberger <richard@nod.at>,
-        Jan Kara <jack@suse.com>, linux-block@vger.kernel.org,
-        xen-devel@lists.xenproject.org, linux-bcache@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: Re: [PATCH 05/45] mtip32xx: remove the call to fsync_bdev on removal
-Message-ID: <20201125123133.GI16944@quack2.suse.cz>
-References: <20201124132751.3747337-1-hch@lst.de>
- <20201124132751.3747337-6-hch@lst.de>
+        id S1728046AbgKYMdU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 Nov 2020 07:33:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50036 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725616AbgKYMdT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 25 Nov 2020 07:33:19 -0500
+Received: from mail-qt1-x843.google.com (mail-qt1-x843.google.com [IPv6:2607:f8b0:4864:20::843])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BD2AC0613D4;
+        Wed, 25 Nov 2020 04:33:12 -0800 (PST)
+Received: by mail-qt1-x843.google.com with SMTP id f93so1404627qtb.10;
+        Wed, 25 Nov 2020 04:33:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=H3aqrBY6oYhCd62SVodU601+HB4mzl3pG4lUcfT04Cg=;
+        b=m8eiXGIffxTQcl9qWmpoUZgBsSzJBJL+g8a+25Jt5FKxrq5reTIQJIvOqHam06ytUT
+         +AVBi6gElJoegN0PJweNe4OCeUoDzFODyFHPyIln49wZ5mShP7YmWW3JcvzSHisvU3RY
+         HvY920z0TDVKvZHVGUl0hW04u6KPVUTYgkRsiSfEQ5wXOQlIapC1e1DPv6ahx8onYMVI
+         RK3uA/nnhPE9+aELC01Cnp4okGEgdmF1asc72P2GBtujVywjnmfE22z+BSjYMM6mL8Q6
+         c9LsElOYkPJODDqa7BlptGqmUGWMtnSAY3T7eNQCvLF8h3PLrE397W3APYrR+NuKSx2g
+         3d/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=H3aqrBY6oYhCd62SVodU601+HB4mzl3pG4lUcfT04Cg=;
+        b=BI6cbfed42i6bo1We2KRaaxHDJcLlfR+Kq+bl+Zi/Cv78i/NipGuewMcSUpFM/LQNL
+         VDd2JOybOQCYBCBmvBet2vzdL9GOpZZZyR10oTWfdBBi/7RH+74xqxg8MZnDncShXrlv
+         W2tDXjBYLey79nFLZFyVl+iX6Eb9pfkglT4AwDSi6hfUbyIKJ/lioK+p6fY1yEDKIMEf
+         xCFFfItOywsDbxaQ4mypXJtcaHvNX7D/tQlROXorXffDEo92P+cu/Cpj8Vax+YrwBKpq
+         tzpsG538/GEVcvwvi7eT74l/GInS/UITBVLJGievB+giAhSMHewABpRLNT7uoG/FO+nG
+         8I6w==
+X-Gm-Message-State: AOAM53125sVVZcShwwr2oMioNmWX8beh4eFXVaA763HLqqUZ2lkfmNEd
+        whV9Ko0GcDBZU9jedmW9A84=
+X-Google-Smtp-Source: ABdhPJzocuRXVD+bPmrqSjVXD61c/mr1QuassCJZAWcu3BRdBXPc1L3HjKV+b5/kdsWDa9hsVQr+qg==
+X-Received: by 2002:ac8:7a87:: with SMTP id x7mr2792856qtr.253.1606307591437;
+        Wed, 25 Nov 2020 04:33:11 -0800 (PST)
+Received: from localhost (dhcp-6c-ae-f6-dc-d8-61.cpe.echoes.net. [72.28.8.195])
+        by smtp.gmail.com with ESMTPSA id a123sm2264134qkc.52.2020.11.25.04.33.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Nov 2020 04:33:10 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Wed, 25 Nov 2020 07:32:48 -0500
+From:   Tejun Heo <tj@kernel.org>
+To:     Yu Kuai <yukuai3@huawei.com>
+Cc:     axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com, zhangxiaoxu5@huawei.com, houtao1@huawei.com
+Subject: Re: [RFC PATCH] blk-cgroup: prevent rcu_sched detected stalls
+ warnings in blkg_destroy_all()
+Message-ID: <X75O8BNVSX3ZE86w@mtj.duckdns.org>
+References: <20201121083420.3857433-1-yukuai3@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201124132751.3747337-6-hch@lst.de>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20201121083420.3857433-1-yukuai3@huawei.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue 24-11-20 14:27:11, Christoph Hellwig wrote:
-> del_gendisk already calls fsync_bdev for every partition, no need
-> to do this twice.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+Hello,
 
-Makes sense to me. You can add:
+Thanks for the fix. A couple comments below.
 
-Reviewed-by: Jan Kara <jack@suse.cz>
+On Sat, Nov 21, 2020 at 04:34:20PM +0800, Yu Kuai wrote:
+> +#define BLKG_DESTROY_BATH 4096
 
-								Honza
+I think you meant BLKG_DESTROY_BATCH.
 
-> ---
->  drivers/block/mtip32xx/mtip32xx.c | 15 ---------------
->  drivers/block/mtip32xx/mtip32xx.h |  2 --
->  2 files changed, 17 deletions(-)
-> 
-> diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
-> index 153e2cdecb4d40..53ac59d19ae530 100644
-> --- a/drivers/block/mtip32xx/mtip32xx.c
-> +++ b/drivers/block/mtip32xx/mtip32xx.c
-> @@ -3687,7 +3687,6 @@ static int mtip_block_initialize(struct driver_data *dd)
->  	/* Enable the block device and add it to /dev */
->  	device_add_disk(&dd->pdev->dev, dd->disk, NULL);
+>  static void blkg_destroy_all(struct request_queue *q)
+>  {
+>  	struct blkcg_gq *blkg, *n;
+> +	int count = BLKG_DESTROY_BATH;
+
+But might as well just write 4096 here.
+
+>  	spin_lock_irq(&q->queue_lock);
+>  	list_for_each_entry_safe(blkg, n, &q->blkg_list, q_node) {
+>  		struct blkcg *blkcg = blkg->blkcg;
 >  
-> -	dd->bdev = bdget_disk(dd->disk, 0);
->  	/*
->  	 * Now that the disk is active, initialize any sysfs attributes
->  	 * managed by the protocol layer.
-> @@ -3721,9 +3720,6 @@ static int mtip_block_initialize(struct driver_data *dd)
->  	return rv;
->  
->  kthread_run_error:
-> -	bdput(dd->bdev);
-> -	dd->bdev = NULL;
-> -
->  	/* Delete our gendisk. This also removes the device from /dev */
->  	del_gendisk(dd->disk);
->  
-> @@ -3804,14 +3800,6 @@ static int mtip_block_remove(struct driver_data *dd)
->  	blk_mq_tagset_busy_iter(&dd->tags, mtip_no_dev_cleanup, dd);
->  	blk_mq_unquiesce_queue(dd->queue);
->  
-> -	/*
-> -	 * Delete our gendisk structure. This also removes the device
-> -	 * from /dev
-> -	 */
-> -	if (dd->bdev) {
-> -		bdput(dd->bdev);
-> -		dd->bdev = NULL;
-> -	}
->  	if (dd->disk) {
->  		if (test_bit(MTIP_DDF_INIT_DONE_BIT, &dd->dd_flag))
->  			del_gendisk(dd->disk);
-> @@ -4206,9 +4194,6 @@ static void mtip_pci_remove(struct pci_dev *pdev)
->  	} while (atomic_read(&dd->irq_workers_active) != 0 &&
->  		time_before(jiffies, to));
->  
-> -	if (!dd->sr)
-> -		fsync_bdev(dd->bdev);
-> -
->  	if (atomic_read(&dd->irq_workers_active) != 0) {
->  		dev_warn(&dd->pdev->dev,
->  			"Completion workers still active!\n");
-> diff --git a/drivers/block/mtip32xx/mtip32xx.h b/drivers/block/mtip32xx/mtip32xx.h
-> index e22a7f0523bf30..88f4206310e4c8 100644
-> --- a/drivers/block/mtip32xx/mtip32xx.h
-> +++ b/drivers/block/mtip32xx/mtip32xx.h
-> @@ -463,8 +463,6 @@ struct driver_data {
->  
->  	int isr_binding;
->  
-> -	struct block_device *bdev;
-> -
->  	struct list_head online_list; /* linkage for online list */
->  
->  	struct list_head remove_list; /* linkage for removing list */
-> -- 
-> 2.29.2
-> 
+> +		/*
+> +		 * If the list is too long, the loop can took a long time,
+> +		 * thus relese the lock for a while when a batch of blkcg
+> +		 * were destroyed.
+> +		 */
+> +		if (!(--count)) {
+> +			count = BLKG_DESTROY_BATH;
+> +			spin_unlock_irq(&q->queue_lock);
+> +			cond_resched();
+> +			spin_lock_irq(&q->queue_lock);
+
+You can't continue iteration after dropping both locks. You'd have to jump
+out of loop and start list_for_each_entry_safe() again.
+
+> +		}
+>  		spin_lock(&blkcg->lock);
+>  		blkg_destroy(blkg);
+>  		spin_unlock(&blkcg->lock);
+
+Thanks.
+
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+tejun
