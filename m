@@ -2,65 +2,162 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0AF6C56201
-	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 07:48:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1B0CC56201
+	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 08:05:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0B11120B80
-	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 07:48:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="suODfAFj"
+	by mail.kernel.org (Postfix) with ESMTP id 881FF206E0
+	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 08:05:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726985AbgKYHsv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 Nov 2020 02:48:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34166 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726654AbgKYHsv (ORCPT
+        id S1726788AbgKYIFU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 Nov 2020 03:05:20 -0500
+Received: from out30-43.freemail.mail.aliyun.com ([115.124.30.43]:51616 "EHLO
+        out30-43.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726317AbgKYIFU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Nov 2020 02:48:51 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B887C0613D4
-        for <linux-block@vger.kernel.org>; Tue, 24 Nov 2020 23:48:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=V27jXFGxlNUv/4KmUVO00yN387mJK9NJLiZmy8l7klk=; b=suODfAFjlqAAP/vWE1d/bdKPpT
-        +yJXHXQqg1T6CzOsKP1sHyqKb31PZYSKim6XLR7EWM4ya2azAej+spSooDdJEb6EJgt0eHUYoYUIw
-        7INTmugBfqMuu2MRn3TFPRNryRk/lbP+vVDofr6IWjy6V1GLuHMe4U8YLdCQewPEiaAy5mJSYIyID
-        kfsDDn9gIOTtS4hUwcZXar/sy740RmGpsuojS+tqVFNsLt9w7bDxDWQaBy9t8opGYmSZ1nsGjuySZ
-        4gScbQWvqmp+WBAYOGg1XvEksovMdEUWE333GvZOCPxPyCoOyTiQRBi219eYh0OeWlklT8QC7qF2v
-        Ehs9bVQA==;
-Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1khpXf-0003NB-UT; Wed, 25 Nov 2020 07:48:43 +0000
-Date:   Wed, 25 Nov 2020 07:48:43 +0000
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jeffle Xu <jefflexu@linux.alibaba.com>, axboe@kernel.dk,
-        linux-block@vger.kernel.org, joseph.qi@linux.alibaba.com,
-        hch@infradead.org
+        Wed, 25 Nov 2020 03:05:20 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04394;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=5;SR=0;TI=SMTPD_---0UGUMsn2_1606291510;
+Received: from admindeMacBook-Pro-2.local(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0UGUMsn2_1606291510)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Wed, 25 Nov 2020 16:05:11 +0800
 Subject: Re: [PATCH v6] block: disable iopoll for split bio
-Message-ID: <20201125074843.GA12180@infradead.org>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        joseph.qi@linux.alibaba.com, hch@infradead.org
 References: <20201125064147.25389-1-jefflexu@linux.alibaba.com>
  <20201125071944.GA24725@T590>
+From:   JeffleXu <jefflexu@linux.alibaba.com>
+Message-ID: <f8f52efa-a99e-5fbb-dd92-597a13fd4a2f@linux.alibaba.com>
+Date:   Wed, 25 Nov 2020 16:05:10 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 In-Reply-To: <20201125071944.GA24725@T590>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 25, 2020 at 03:19:44PM +0800, Ming Lei wrote:
+
+
+On 11/25/20 3:19 PM, Ming Lei wrote:
+> On Wed, Nov 25, 2020 at 02:41:47PM +0800, Jeffle Xu wrote:
+>> iopoll is initially for small size, latency sensitive IO. It doesn't
+>> work well for big IO, especially when it needs to be split to multiple
+>> bios. In this case, the returned cookie of __submit_bio_noacct_mq() is
+>> indeed the cookie of the last split bio. The completion of *this* last
+>> split bio done by iopoll doesn't mean the whole original bio has
+>> completed. Callers of iopoll still need to wait for completion of other
+>> split bios.
+>>
+>> Besides bio splitting may cause more trouble for iopoll which isn't
+>> supposed to be used in case of big IO.
+>>
+>> iopoll for split bio may cause potential race if CPU migration happens
+>> during bio submission. Since the returned cookie is that of the last
+>> split bio, polling on the corresponding hardware queue doesn't help
+>> complete other split bios, if these split bios are enqueued into
+>> different hardware queues. Since interrupts are disabled for polling
+>> queues, the completion of these other split bios depends on timeout
+>> mechanism, thus causing a potential hang.
+>>
+>> iopoll for split bio may also cause hang for sync polling. Currently
+>> both the blkdev and iomap-based fs (ext4/xfs, etc) support sync polling
+>> in direct IO routine. These routines will submit bio without REQ_NOWAIT
+>> flag set, and then start sync polling in current process context. The
+>> process may hang in blk_mq_get_tag() if the submitted bio has to be
+>> split into multiple bios and can rapidly exhaust the queue depth. The
+>> process are waiting for the completion of the previously allocated
+>> requests, which should be reaped by the following polling, and thus
+>> causing a deadlock.
+>>
+>> To avoid these subtle trouble described above, just disable iopoll for
+>> split bio.
+>>
+>> Suggested-by: Ming Lei <ming.lei@redhat.com>
+>> Signed-off-by: Jeffle Xu <jefflexu@linux.alibaba.com>
+>> Reviewed-by: Christoph Hellwig <hch@lst.de>
+>> ---
+>>  block/bio.c               |  2 ++
+>>  block/blk-merge.c         | 12 ++++++++++++
+>>  block/blk-mq.c            |  3 +++
+>>  include/linux/blk_types.h |  1 +
+>>  4 files changed, 18 insertions(+)
+>>
+>> diff --git a/block/bio.c b/block/bio.c
+>> index fa01bef35bb1..7f7ddc22a30d 100644
+>> --- a/block/bio.c
+>> +++ b/block/bio.c
+>> @@ -684,6 +684,8 @@ void __bio_clone_fast(struct bio *bio, struct bio *bio_src)
+>>  	bio_set_flag(bio, BIO_CLONED);
+>>  	if (bio_flagged(bio_src, BIO_THROTTLED))
+>>  		bio_set_flag(bio, BIO_THROTTLED);
+>> +	if (bio_flagged(bio_src, BIO_SPLIT))
+>> +		bio_set_flag(bio, BIO_SPLIT);
+>>  	bio->bi_opf = bio_src->bi_opf;
+>>  	bio->bi_ioprio = bio_src->bi_ioprio;
+>>  	bio->bi_write_hint = bio_src->bi_write_hint;
+>> diff --git a/block/blk-merge.c b/block/blk-merge.c
+>> index bcf5e4580603..a2890cebf99f 100644
+>> --- a/block/blk-merge.c
+>> +++ b/block/blk-merge.c
+>> @@ -279,6 +279,18 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
+>>  	return NULL;
+>>  split:
+>>  	*segs = nsegs;
+>> +
+>> +	/*
+>> +	 * Bio splitting may cause subtle trouble such as hang when doing sync
+>> +	 * iopoll in direct IO routine. Given performance gain of iopoll for
+>> +	 * big IO can be trival, disable iopoll when split needed. We need
+>> +	 * BIO_SPLIT to identify bios need this workaround. Since currently
+>> +	 * only normal IO under mq routine may suffer this issue, BIO_SPLIT is
+>> +	 * only marked here.
+>> +	 */
+>> +	bio->bi_opf &= ~REQ_HIPRI;
+>> +	bio_set_flag(bio, BIO_SPLIT);
+>> +
+>>  	return bio_split(bio, sectors, GFP_NOIO, bs);
+>>  }
+>>  
+>> diff --git a/block/blk-mq.c b/block/blk-mq.c
+>> index 55bcee5dc032..ce1f3628e4c2 100644
+>> --- a/block/blk-mq.c
+>> +++ b/block/blk-mq.c
+>> @@ -2265,6 +2265,9 @@ blk_qc_t blk_mq_submit_bio(struct bio *bio)
+>>  		blk_mq_sched_insert_request(rq, false, true, true);
+>>  	}
+>>  
+>> +	if (bio_flagged(bio, BIO_SPLIT))
+>> +		return BLK_QC_T_NONE;
+>> +
+> 
 > Not sure the new bio flag is really required for this case, just wondering
 > why not take the following simple way? BTW we are really going to run
 > out of bio flag.
 > 
+
+Please consider the following case:
+
+One big bio got split into two split bios. At the first call of
+blk_mq_submit_bio(), the input @bio (actually the original big bio)
+indeed gets split. The split bio gets enqueued to hw queue and the
+returned cookie is BLK_QC_T_NONE, while the remained bio gets buffered
+in bio_list. So far so good.
+
+Then when calling blk_mq_submit_bio() the second time, the input @bio is
+indeed the remained bio. At this time, it will not get split and you
+will get a *valid* cookie. And since the cookie of last split bio will
+actually overrides the previous cookie, you will get a *valid* cookie as
+a result.
+
+
 > diff --git a/block/blk-mq.c b/block/blk-mq.c
 > index 55bcee5dc032..1139b1efd712 100644
 > --- a/block/blk-mq.c
@@ -84,7 +181,11 @@ On Wed, Nov 25, 2020 at 03:19:44PM +0800, Ming Lei wrote:
 >  	return cookie;
 >  queue_exit:
 >  	blk_queue_exit(q);
+> 
+> Thanks,
+> Ming
+> 
 
-Yeah, this looks simpler and more obvious, and it also catches the
-bounce buffering case (not that polling + bounce buffering should ever
-happen).
+-- 
+Thanks,
+Jeffle
