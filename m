@@ -2,120 +2,206 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69B16C5519F
-	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 12:33:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE2CFC5519F
+	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 12:38:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 070F0206E5
-	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 12:33:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m8eiXGIf"
+	by mail.kernel.org (Postfix) with ESMTP id 50C2B206E5
+	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 12:38:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728046AbgKYMdU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 Nov 2020 07:33:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50036 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725616AbgKYMdT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Nov 2020 07:33:19 -0500
-Received: from mail-qt1-x843.google.com (mail-qt1-x843.google.com [IPv6:2607:f8b0:4864:20::843])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BD2AC0613D4;
-        Wed, 25 Nov 2020 04:33:12 -0800 (PST)
-Received: by mail-qt1-x843.google.com with SMTP id f93so1404627qtb.10;
-        Wed, 25 Nov 2020 04:33:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=H3aqrBY6oYhCd62SVodU601+HB4mzl3pG4lUcfT04Cg=;
-        b=m8eiXGIffxTQcl9qWmpoUZgBsSzJBJL+g8a+25Jt5FKxrq5reTIQJIvOqHam06ytUT
-         +AVBi6gElJoegN0PJweNe4OCeUoDzFODyFHPyIln49wZ5mShP7YmWW3JcvzSHisvU3RY
-         HvY920z0TDVKvZHVGUl0hW04u6KPVUTYgkRsiSfEQ5wXOQlIapC1e1DPv6ahx8onYMVI
-         RK3uA/nnhPE9+aELC01Cnp4okGEgdmF1asc72P2GBtujVywjnmfE22z+BSjYMM6mL8Q6
-         c9LsElOYkPJODDqa7BlptGqmUGWMtnSAY3T7eNQCvLF8h3PLrE397W3APYrR+NuKSx2g
-         3d/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=H3aqrBY6oYhCd62SVodU601+HB4mzl3pG4lUcfT04Cg=;
-        b=BI6cbfed42i6bo1We2KRaaxHDJcLlfR+Kq+bl+Zi/Cv78i/NipGuewMcSUpFM/LQNL
-         VDd2JOybOQCYBCBmvBet2vzdL9GOpZZZyR10oTWfdBBi/7RH+74xqxg8MZnDncShXrlv
-         W2tDXjBYLey79nFLZFyVl+iX6Eb9pfkglT4AwDSi6hfUbyIKJ/lioK+p6fY1yEDKIMEf
-         xCFFfItOywsDbxaQ4mypXJtcaHvNX7D/tQlROXorXffDEo92P+cu/Cpj8Vax+YrwBKpq
-         tzpsG538/GEVcvwvi7eT74l/GInS/UITBVLJGievB+giAhSMHewABpRLNT7uoG/FO+nG
-         8I6w==
-X-Gm-Message-State: AOAM53125sVVZcShwwr2oMioNmWX8beh4eFXVaA763HLqqUZ2lkfmNEd
-        whV9Ko0GcDBZU9jedmW9A84=
-X-Google-Smtp-Source: ABdhPJzocuRXVD+bPmrqSjVXD61c/mr1QuassCJZAWcu3BRdBXPc1L3HjKV+b5/kdsWDa9hsVQr+qg==
-X-Received: by 2002:ac8:7a87:: with SMTP id x7mr2792856qtr.253.1606307591437;
-        Wed, 25 Nov 2020 04:33:11 -0800 (PST)
-Received: from localhost (dhcp-6c-ae-f6-dc-d8-61.cpe.echoes.net. [72.28.8.195])
-        by smtp.gmail.com with ESMTPSA id a123sm2264134qkc.52.2020.11.25.04.33.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Nov 2020 04:33:10 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Wed, 25 Nov 2020 07:32:48 -0500
-From:   Tejun Heo <tj@kernel.org>
-To:     Yu Kuai <yukuai3@huawei.com>
-Cc:     axboe@kernel.dk, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com, zhangxiaoxu5@huawei.com, houtao1@huawei.com
-Subject: Re: [RFC PATCH] blk-cgroup: prevent rcu_sched detected stalls
- warnings in blkg_destroy_all()
-Message-ID: <X75O8BNVSX3ZE86w@mtj.duckdns.org>
-References: <20201121083420.3857433-1-yukuai3@huawei.com>
+        id S1729118AbgKYMhw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 Nov 2020 07:37:52 -0500
+Received: from mx2.suse.de ([195.135.220.15]:42972 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726654AbgKYMhw (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 25 Nov 2020 07:37:52 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id C45A3AC22;
+        Wed, 25 Nov 2020 12:37:50 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 557991E130F; Wed, 25 Nov 2020 13:37:50 +0100 (CET)
+Date:   Wed, 25 Nov 2020 13:37:50 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Coly Li <colyli@suse.de>, Mike Snitzer <snitzer@redhat.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jan Kara <jack@suse.cz>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        dm-devel@redhat.com, Richard Weinberger <richard@nod.at>,
+        Jan Kara <jack@suse.com>, linux-block@vger.kernel.org,
+        xen-devel@lists.xenproject.org, linux-bcache@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: Re: [PATCH 06/45] zram: remove the claim mechanism
+Message-ID: <20201125123750.GJ16944@quack2.suse.cz>
+References: <20201124132751.3747337-1-hch@lst.de>
+ <20201124132751.3747337-7-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201121083420.3857433-1-yukuai3@huawei.com>
+In-Reply-To: <20201124132751.3747337-7-hch@lst.de>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+On Tue 24-11-20 14:27:12, Christoph Hellwig wrote:
+> The zram claim mechanism was added to ensure no new opens come in
+> during teardown.  But the proper way to archive that is to call
+					  ^^^ achieve
 
-Thanks for the fix. A couple comments below.
+> del_gendisk first, which takes care of all that.  Once del_gendisk
+> is called in the right place, the reset side can also be simplified
+> as no I/O can be outstanding on a block device that is not open.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-On Sat, Nov 21, 2020 at 04:34:20PM +0800, Yu Kuai wrote:
-> +#define BLKG_DESTROY_BATH 4096
+Otherwise I didn't find anything obviously wrong with the patch but I don't
+feel confident enough with zram to really give you my reviewed-by on this
+one.
 
-I think you meant BLKG_DESTROY_BATCH.
+								Honza
 
->  static void blkg_destroy_all(struct request_queue *q)
+> ---
+>  drivers/block/zram/zram_drv.c | 72 ++++++++---------------------------
+>  1 file changed, 15 insertions(+), 57 deletions(-)
+> 
+> diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+> index 6d15d51cee2b7e..2e6d75ec1afddb 100644
+> --- a/drivers/block/zram/zram_drv.c
+> +++ b/drivers/block/zram/zram_drv.c
+> @@ -1756,64 +1756,33 @@ static ssize_t disksize_store(struct device *dev,
+>  static ssize_t reset_store(struct device *dev,
+>  		struct device_attribute *attr, const char *buf, size_t len)
 >  {
->  	struct blkcg_gq *blkg, *n;
-> +	int count = BLKG_DESTROY_BATH;
-
-But might as well just write 4096 here.
-
->  	spin_lock_irq(&q->queue_lock);
->  	list_for_each_entry_safe(blkg, n, &q->blkg_list, q_node) {
->  		struct blkcg *blkcg = blkg->blkcg;
+> -	int ret;
+> -	unsigned short do_reset;
+> -	struct zram *zram;
+> +	struct zram *zram = dev_to_zram(dev);
+>  	struct block_device *bdev;
+> +	unsigned short do_reset;
+> +	int ret = 0;
 >  
-> +		/*
-> +		 * If the list is too long, the loop can took a long time,
-> +		 * thus relese the lock for a while when a batch of blkcg
-> +		 * were destroyed.
-> +		 */
-> +		if (!(--count)) {
-> +			count = BLKG_DESTROY_BATH;
-> +			spin_unlock_irq(&q->queue_lock);
-> +			cond_resched();
-> +			spin_lock_irq(&q->queue_lock);
-
-You can't continue iteration after dropping both locks. You'd have to jump
-out of loop and start list_for_each_entry_safe() again.
-
+>  	ret = kstrtou16(buf, 10, &do_reset);
+>  	if (ret)
+>  		return ret;
+> -
+>  	if (!do_reset)
+>  		return -EINVAL;
+>  
+> -	zram = dev_to_zram(dev);
+>  	bdev = bdget_disk(zram->disk, 0);
+>  	if (!bdev)
+>  		return -ENOMEM;
+>  
+>  	mutex_lock(&bdev->bd_mutex);
+> -	/* Do not reset an active device or claimed device */
+> -	if (bdev->bd_openers || zram->claim) {
+> -		mutex_unlock(&bdev->bd_mutex);
+> -		bdput(bdev);
+> -		return -EBUSY;
+> -	}
+> -
+> -	/* From now on, anyone can't open /dev/zram[0-9] */
+> -	zram->claim = true;
+> +	if (bdev->bd_openers)
+> +		ret = -EBUSY;
+> +	else
+> +		zram_reset_device(zram);
+>  	mutex_unlock(&bdev->bd_mutex);
+> -
+> -	/* Make sure all the pending I/O are finished */
+> -	fsync_bdev(bdev);
+> -	zram_reset_device(zram);
+>  	bdput(bdev);
+>  
+> -	mutex_lock(&bdev->bd_mutex);
+> -	zram->claim = false;
+> -	mutex_unlock(&bdev->bd_mutex);
+> -
+> -	return len;
+> -}
+> -
+> -static int zram_open(struct block_device *bdev, fmode_t mode)
+> -{
+> -	int ret = 0;
+> -	struct zram *zram;
+> -
+> -	WARN_ON(!mutex_is_locked(&bdev->bd_mutex));
+> -
+> -	zram = bdev->bd_disk->private_data;
+> -	/* zram was claimed to reset so open request fails */
+> -	if (zram->claim)
+> -		ret = -EBUSY;
+> -
+> -	return ret;
+> +	return ret ? ret : len;
+>  }
+>  
+>  static const struct block_device_operations zram_devops = {
+> -	.open = zram_open,
+>  	.submit_bio = zram_submit_bio,
+>  	.swap_slot_free_notify = zram_slot_free_notify,
+>  	.rw_page = zram_rw_page,
+> @@ -1821,7 +1790,6 @@ static const struct block_device_operations zram_devops = {
+>  };
+>  
+>  static const struct block_device_operations zram_wb_devops = {
+> -	.open = zram_open,
+>  	.submit_bio = zram_submit_bio,
+>  	.swap_slot_free_notify = zram_slot_free_notify,
+>  	.owner = THIS_MODULE
+> @@ -1974,32 +1942,22 @@ static int zram_add(void)
+>  
+>  static int zram_remove(struct zram *zram)
+>  {
+> -	struct block_device *bdev;
+> -
+> -	bdev = bdget_disk(zram->disk, 0);
+> -	if (!bdev)
+> -		return -ENOMEM;
+> +	struct block_device *bdev = bdget_disk(zram->disk, 0);
+>  
+> -	mutex_lock(&bdev->bd_mutex);
+> -	if (bdev->bd_openers || zram->claim) {
+> -		mutex_unlock(&bdev->bd_mutex);
+> +	if (bdev) {
+> +		if (bdev->bd_openers) {
+> +			bdput(bdev);
+> +			return -EBUSY;
 > +		}
->  		spin_lock(&blkcg->lock);
->  		blkg_destroy(blkg);
->  		spin_unlock(&blkcg->lock);
-
-Thanks.
-
+>  		bdput(bdev);
+> -		return -EBUSY;
+>  	}
+>  
+> -	zram->claim = true;
+> -	mutex_unlock(&bdev->bd_mutex);
+> -
+> +	del_gendisk(zram->disk);
+>  	zram_debugfs_unregister(zram);
+> -
+> -	/* Make sure all the pending I/O are finished */
+> -	fsync_bdev(bdev);
+>  	zram_reset_device(zram);
+> -	bdput(bdev);
+>  
+>  	pr_info("Removed device: %s\n", zram->disk->disk_name);
+>  
+> -	del_gendisk(zram->disk);
+>  	blk_cleanup_queue(zram->disk->queue);
+>  	put_disk(zram->disk);
+>  	kfree(zram);
+> -- 
+> 2.29.2
+> 
 -- 
-tejun
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
