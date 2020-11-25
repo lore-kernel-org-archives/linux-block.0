@@ -2,109 +2,157 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62A89C5519F
-	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 12:53:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23C01C5519F
+	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 13:02:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 065D6206E5
-	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 12:53:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h7OFb4cE"
+	by mail.kernel.org (Postfix) with ESMTP id C4BE1206F7
+	for <linux-block@archiver.kernel.org>; Wed, 25 Nov 2020 13:02:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729240AbgKYMxg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 Nov 2020 07:53:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53182 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728944AbgKYMxf (ORCPT
+        id S1729477AbgKYNB5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 Nov 2020 08:01:57 -0500
+Received: from 4.mo52.mail-out.ovh.net ([178.33.43.201]:47219 "EHLO
+        4.mo52.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729441AbgKYNB5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Nov 2020 07:53:35 -0500
-Received: from mail-qv1-xf42.google.com (mail-qv1-xf42.google.com [IPv6:2607:f8b0:4864:20::f42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7672C0613D4;
-        Wed, 25 Nov 2020 04:53:35 -0800 (PST)
-Received: by mail-qv1-xf42.google.com with SMTP id y11so829300qvu.10;
-        Wed, 25 Nov 2020 04:53:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=2X0u1zymrYQOExBICa76gdQ48XGpkWMEvIhEcoogarU=;
-        b=h7OFb4cEn3IpHhhmZsFcA2eih4hE1UpgsipaoC3FI2JkDg6aKHoI1bASA8i3rOFMzB
-         RrPBAUJWAS+C7jH6bfxUekTUIfftfA/e2mf7MGBFHctQIlbpHuum4v/Oqwi80+CZszaP
-         /36qAXSlJkmebZWFvlGQgg6buFqwe0ePfG2VJqk58y8bOoqNsEfLyzR6+ckzM8sFCWK1
-         5C6rU+hO/4CCwKSLu/gQCovGnIz7UBzovijPSThu1Whb77PECc/SsguTi2Ep2+/+assZ
-         l35vCvidV9OAgmqAyO7q1fdcOJmw/JI4UC0M5Rs73SylB8xrhqAyTVZUaGSUgTLmWqZO
-         mIOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=2X0u1zymrYQOExBICa76gdQ48XGpkWMEvIhEcoogarU=;
-        b=Q8nNzOc67AacoCs59kaKaxgRcAqIzG1ZwHYIaQ9WIbtDIIyFGaMXrG12VvJ3JR72L7
-         E/HyT7oguG+KVn0pwWT17AZ/vtihNexcFCaN+7B/JXKGnit+84unBDQjHJ8p6dFFlfmM
-         AG7X+xZncjrgmqfDU9lx81FP+grVY/czchAhg5iyIJcYXQRY7auecOHqny6LZ/tzk9oy
-         GsfMsOAtyKR5T5lqA9/w4pcp7Dik2pZsF1ETu7Ro8j+6qBjR2S0GKGY2XJy7bDBqKBpv
-         MzJHwzVOfPu7bzwEeh/FmlE9e2cDYU2cY0KlWuP/cLqo411PVrLtWh+j57pSPF+r4Y3D
-         YFnA==
-X-Gm-Message-State: AOAM530B5rXB9+JI+5vhnsA4ZFD+wnzw+v2sl8VXxNjV7qrPP4oO2CBc
-        vgy8+0yA0DIp42iTpArTaM0=
-X-Google-Smtp-Source: ABdhPJwotE2y9hQoQS9N1nGwrTGSUxiAQCHyd9CM4dgXKm89kDF1OzE9AXingzDvopSqKtJjo1rc8A==
-X-Received: by 2002:ad4:43ca:: with SMTP id o10mr3368150qvs.25.1606308814790;
-        Wed, 25 Nov 2020 04:53:34 -0800 (PST)
-Received: from localhost (dhcp-6c-ae-f6-dc-d8-61.cpe.echoes.net. [72.28.8.195])
-        by smtp.gmail.com with ESMTPSA id b3sm2131612qte.85.2020.11.25.04.53.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Nov 2020 04:53:34 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Wed, 25 Nov 2020 07:53:12 -0500
-From:   Tejun Heo <tj@kernel.org>
-To:     "yukuai (C)" <yukuai3@huawei.com>
-Cc:     axboe@kernel.dk, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com, zhangxiaoxu5@huawei.com, houtao1@huawei.com
-Subject: Re: [RFC PATCH] blk-cgroup: prevent rcu_sched detected stalls
- warnings in blkg_destroy_all()
-Message-ID: <X75TuKMuO2Ru+rVt@mtj.duckdns.org>
-References: <20201121083420.3857433-1-yukuai3@huawei.com>
- <X75O8BNVSX3ZE86w@mtj.duckdns.org>
- <a24c48a3-6f17-98ac-47ad-770dd7e775ec@huawei.com>
+        Wed, 25 Nov 2020 08:01:57 -0500
+X-Greylist: delayed 974 seconds by postgrey-1.27 at vger.kernel.org; Wed, 25 Nov 2020 08:01:56 EST
+Received: from mxplan5.mail.ovh.net (unknown [10.108.16.164])
+        by mo52.mail-out.ovh.net (Postfix) with ESMTPS id 35B1B21BD52;
+        Wed, 25 Nov 2020 13:45:40 +0100 (CET)
+Received: from kaod.org (37.59.142.100) by DAG8EX1.mxp5.local (172.16.2.71)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Wed, 25 Nov
+ 2020 13:45:39 +0100
+Authentication-Results: garm.ovh; auth=pass (GARM-100R003764d7788-e883-4b91-8c12-09b64416a181,
+                    13817E1CA0648EB9EE095497159C33290D197662) smtp.auth=groug@kaod.org
+Date:   Wed, 25 Nov 2020 13:45:38 +0100
+From:   Greg Kurz <groug@kaod.org>
+To:     Laurent Vivier <lvivier@redhat.com>
+CC:     <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        "Paul Mackerras" <paulus@samba.org>, <linux-pci@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Marc Zyngier <maz@kernel.org>, <linuxppc-dev@lists.ozlabs.org>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Michael Ellerman <mpe@ellerman.id.au>
+Subject: Re: [PATCH v2 1/2] genirq: add an irq_create_mapping_affinity()
+ function
+Message-ID: <20201125134538.71895275@bahia.lan>
+In-Reply-To: <20201125111657.1141295-2-lvivier@redhat.com>
+References: <20201125111657.1141295-1-lvivier@redhat.com>
+        <20201125111657.1141295-2-lvivier@redhat.com>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a24c48a3-6f17-98ac-47ad-770dd7e775ec@huawei.com>
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [37.59.142.100]
+X-ClientProxiedBy: DAG5EX2.mxp5.local (172.16.2.42) To DAG8EX1.mxp5.local
+ (172.16.2.71)
+X-Ovh-Tracer-GUID: d00713c1-4f18-4b54-a786-baae8bb63fee
+X-Ovh-Tracer-Id: 5905345013404899832
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedrudehtddggeehucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfhisehtjeeftdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeetgffffffggfekgeffteekhffhueelffdvhedvgfdthfeiudetvddulefgveevteenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddruddttdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepmhhpvgesvghllhgvrhhmrghnrdhiugdrrghu
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+On Wed, 25 Nov 2020 12:16:56 +0100
+Laurent Vivier <lvivier@redhat.com> wrote:
 
-On Wed, Nov 25, 2020 at 08:49:19PM +0800, yukuai (C) wrote:
-> > You can't continue iteration after dropping both locks. You'd have to jump
-> > out of loop and start list_for_each_entry_safe() again.
+> This function adds an affinity parameter to irq_create_mapping().
+> This parameter is needed to pass it to irq_domain_alloc_descs().
 > 
-> Thanks for your review, it's right. On the other hand
-> blkcg_activate_policy() and blkcg_deactivate_policy() might have the
-> same issue. My idea is that inserting a bookmark to the list, and
-> restard from here.
-
-For destruction, as we're destroying the list anyway, we don't need to
-insert bookmark and start over from the beginning. For [de]activate policy,
-we might need something fancier or change locking so that we can sleep while
-iterating. However, policy [de]activations are a lot less of a problem as
-they aren't operations which can happen commonly.
-
-> By the way, I found that blk_throtl_update_limit_valid() is called from
-> throtl_pd_offline(). If CONFIG_BLK_DEV_THROTTLING_LOW is off, lower
-> limit will always be zero, therefor a lot of time will be wasted to
-> iterate descendants to find a nonzero lower limit.
+> irq_create_mapping() is a wrapper around irq_create_mapping_affinity()
+> to pass NULL for the affinity parameter.
 > 
-> Do you think it's ok to do such modification:
+> No functional change.
+> 
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+> ---
 
-Yeah, sure. Looks fine to me.
+Reviewed-by: Greg Kurz <groug@kaod.org>
 
-Thanks.
+>  include/linux/irqdomain.h | 12 ++++++++++--
+>  kernel/irq/irqdomain.c    | 13 ++++++++-----
+>  2 files changed, 18 insertions(+), 7 deletions(-)
+> 
+> diff --git a/include/linux/irqdomain.h b/include/linux/irqdomain.h
+> index 71535e87109f..ea5a337e0f8b 100644
+> --- a/include/linux/irqdomain.h
+> +++ b/include/linux/irqdomain.h
+> @@ -384,11 +384,19 @@ extern void irq_domain_associate_many(struct irq_domain *domain,
+>  extern void irq_domain_disassociate(struct irq_domain *domain,
+>  				    unsigned int irq);
+>  
+> -extern unsigned int irq_create_mapping(struct irq_domain *host,
+> -				       irq_hw_number_t hwirq);
+> +extern unsigned int irq_create_mapping_affinity(struct irq_domain *host,
+> +				      irq_hw_number_t hwirq,
+> +				      const struct irq_affinity_desc *affinity);
+>  extern unsigned int irq_create_fwspec_mapping(struct irq_fwspec *fwspec);
+>  extern void irq_dispose_mapping(unsigned int virq);
+>  
+> +static inline unsigned int irq_create_mapping(struct irq_domain *host,
+> +					      irq_hw_number_t hwirq)
+> +{
+> +	return irq_create_mapping_affinity(host, hwirq, NULL);
+> +}
+> +
+> +
+>  /**
+>   * irq_linear_revmap() - Find a linux irq from a hw irq number.
+>   * @domain: domain owning this hardware interrupt
+> diff --git a/kernel/irq/irqdomain.c b/kernel/irq/irqdomain.c
+> index cf8b374b892d..e4ca69608f3b 100644
+> --- a/kernel/irq/irqdomain.c
+> +++ b/kernel/irq/irqdomain.c
+> @@ -624,17 +624,19 @@ unsigned int irq_create_direct_mapping(struct irq_domain *domain)
+>  EXPORT_SYMBOL_GPL(irq_create_direct_mapping);
+>  
+>  /**
+> - * irq_create_mapping() - Map a hardware interrupt into linux irq space
+> + * irq_create_mapping_affinity() - Map a hardware interrupt into linux irq space
+>   * @domain: domain owning this hardware interrupt or NULL for default domain
+>   * @hwirq: hardware irq number in that domain space
+> + * @affinity: irq affinity
+>   *
+>   * Only one mapping per hardware interrupt is permitted. Returns a linux
+>   * irq number.
+>   * If the sense/trigger is to be specified, set_irq_type() should be called
+>   * on the number returned from that call.
+>   */
+> -unsigned int irq_create_mapping(struct irq_domain *domain,
+> -				irq_hw_number_t hwirq)
+> +unsigned int irq_create_mapping_affinity(struct irq_domain *domain,
+> +				       irq_hw_number_t hwirq,
+> +				       const struct irq_affinity_desc *affinity)
+>  {
+>  	struct device_node *of_node;
+>  	int virq;
+> @@ -660,7 +662,8 @@ unsigned int irq_create_mapping(struct irq_domain *domain,
+>  	}
+>  
+>  	/* Allocate a virtual interrupt number */
+> -	virq = irq_domain_alloc_descs(-1, 1, hwirq, of_node_to_nid(of_node), NULL);
+> +	virq = irq_domain_alloc_descs(-1, 1, hwirq, of_node_to_nid(of_node),
+> +				      affinity);
+>  	if (virq <= 0) {
+>  		pr_debug("-> virq allocation failed\n");
+>  		return 0;
+> @@ -676,7 +679,7 @@ unsigned int irq_create_mapping(struct irq_domain *domain,
+>  
+>  	return virq;
+>  }
+> -EXPORT_SYMBOL_GPL(irq_create_mapping);
+> +EXPORT_SYMBOL_GPL(irq_create_mapping_affinity);
+>  
+>  /**
+>   * irq_create_strict_mappings() - Map a range of hw irqs to fixed linux irqs
 
--- 
-tejun
