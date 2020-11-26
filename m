@@ -2,84 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A61E8C56202
-	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 03:15:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 607D2C56202
+	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 03:22:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4221821534
-	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 03:15:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E84C420578
+	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 03:22:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b="caJVE16k"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733278AbgKZDPY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 Nov 2020 22:15:24 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:8592 "EHLO
-        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1733273AbgKZDPY (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Nov 2020 22:15:24 -0500
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.58])
-        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4ChNCy41p1zLthD;
-        Thu, 26 Nov 2020 11:14:54 +0800 (CST)
-Received: from huawei.com (10.175.127.227) by DGGEMS414-HUB.china.huawei.com
- (10.3.19.214) with Microsoft SMTP Server id 14.3.487.0; Thu, 26 Nov 2020
- 11:15:12 +0800
-From:   Yu Kuai <yukuai3@huawei.com>
-To:     <tj@kernel.org>, <axboe@kernel.dk>
-CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <yukuai3@huawei.com>,
-        <yi.zhang@huawei.com>, <zhangxiaoxu5@huawei.com>
-Subject: [PATCH] blk-throttle: don't check whether or not lower limit is valid if CONFIG_BLK_DEV_THROTTLING_LOW is off
-Date:   Thu, 26 Nov 2020 11:18:34 +0800
-Message-ID: <20201126031834.40807-1-yukuai3@huawei.com>
-X-Mailer: git-send-email 2.25.4
+        id S1731405AbgKZDW1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 Nov 2020 22:22:27 -0500
+Received: from bilbo.ozlabs.org ([203.11.71.1]:34813 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731106AbgKZDW1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 25 Nov 2020 22:22:27 -0500
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4ChNNd275Sz9sRK;
+        Thu, 26 Nov 2020 14:22:25 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ellerman.id.au;
+        s=201909; t=1606360945;
+        bh=yX9WEAmDETJStycvdfhm5xjpOuROvlTMfef+2IZNRzo=;
+        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+        b=caJVE16kPD5T5w1YfQUtCJ82yfv3OPIrIBflantGq+tUNWi4NV9lzL0hp86igcHKG
+         mXPBYm3z7KHBmNWucFw+VsUhHCkMEqGu2N1EdLYgGS6NR3XCkYW4MgLPnau1sEugOe
+         h2fgo+qYSD4ewJKcXYHIicyXCuFVCHwKdVbSXcclkwcOtrVtozBz0lSB8trFWngWrA
+         G3t/eSVPnoZLQNKdAuVGXVvGIVEEEMau9zw0h8aghk5BF1O7ODUOW4kPAMBREPWVaC
+         V9GH2Ksr94sZw80vcKoxstOyv43ZsrkdJw+jcPbV3Dk0PJMo/V28gCgnHKak8k8pgB
+         OEFipznFGoqQg==
+From:   Michael Ellerman <mpe@ellerman.id.au>
+To:     Marc Zyngier <maz@kernel.org>, Laurent Vivier <lvivier@redhat.com>
+Cc:     Denis Kirjanov <kda@linux-powerpc.org>,
+        linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        Paul Mackerras <paulus@samba.org>, Greg Kurz <groug@kaod.org>,
+        linuxppc-dev@lists.ozlabs.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        linux-block@vger.kernel.org, "Michael S . Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH v3 2/2] powerpc/pseries: pass MSI affinity to irq_create_mapping()
+In-Reply-To: <5419d1790c9ea0d9d7791ae887794285@kernel.org>
+References: <20201125150932.1150619-1-lvivier@redhat.com> <20201125150932.1150619-3-lvivier@redhat.com> <CAOJe8K1Q7sGf67bdj-2Mthkj4XNR4fOSskV1dyh62AdzefhpAQ@mail.gmail.com> <7184880b-0351-ae18-d2e1-fab7b79fc864@redhat.com> <5419d1790c9ea0d9d7791ae887794285@kernel.org>
+Date:   Thu, 26 Nov 2020 14:22:24 +1100
+Message-ID: <87360wztsf.fsf@mpe.ellerman.id.au>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.127.227]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-blk_throtl_update_limit_valid() will search for descendants to see if
-'LIMIT_LOW' of bps/iops and READ/WRITE is nonzero. However, they're always
-zero if CONFIG_BLK_DEV_THROTTLING_LOW is not set, furthermore, a lot of
-time will be wasted to iterate descendants.
+Marc Zyngier <maz@kernel.org> writes:
+> On 2020-11-25 16:24, Laurent Vivier wrote:
+>> On 25/11/2020 17:05, Denis Kirjanov wrote:
+>>> On 11/25/20, Laurent Vivier <lvivier@redhat.com> wrote:
+>>>> With virtio multiqueue, normally each queue IRQ is mapped to a CPU.
+>>>> 
+>>>> But since commit 0d9f0a52c8b9f ("virtio_scsi: use virtio IRQ 
+>>>> affinity")
+>>>> this is broken on pseries.
+>>> 
+>>> Please add "Fixes" tag.
+>> 
+>> In fact, the code in commit 0d9f0a52c8b9f is correct.
+>> 
+>> The problem is with MSI/X irq affinity and pseries. So this patch
+>> fixes more than virtio_scsi. I put this information because this
+>> commit allows to clearly show the problem. Perhaps I should remove
+>> this line in fact?
+>
+> This patch does not fix virtio_scsi at all, which as you noticed, is
+> correct. It really fixes the PPC MSI setup, which is starting to show
+> its age. So getting rid of the reference seems like the right thing to 
+> do.
 
-Thus do nothing in blk_throtl_update_limit_valid() in such situation.
+It's still useful to refer to that commit if the code worked prior to
+that commit. But you should make it clearer that 0d9f0a52c8b9f wasn't in
+error, it just exposed an existing shortcoming of the arch code.
 
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- block/blk-throttle.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index b771c4299982..d52cac9f3a7c 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -587,6 +587,7 @@ static void throtl_pd_online(struct blkg_policy_data *pd)
- 	tg_update_has_rules(tg);
- }
- 
-+#ifdef CONFIG_BLK_DEV_THROTTLING_LOW
- static void blk_throtl_update_limit_valid(struct throtl_data *td)
- {
- 	struct cgroup_subsys_state *pos_css;
-@@ -607,6 +608,11 @@ static void blk_throtl_update_limit_valid(struct throtl_data *td)
- 
- 	td->limit_valid[LIMIT_LOW] = low_valid;
- }
-+#else
-+static inline void blk_throtl_update_limit_valid(struct throtl_data *td)
-+{
-+}
-+#endif
- 
- static void throtl_upgrade_state(struct throtl_data *td);
- static void throtl_pd_offline(struct blkg_policy_data *pd)
--- 
-2.25.4
-
+cheers
