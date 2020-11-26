@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F737C83021
-	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 13:07:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98EAAC8301F
+	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 13:07:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 211F6221F1
-	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 13:07:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 54F0221D7E
+	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 13:07:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="frQf5+o7"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="jDIIQC7J"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389552AbgKZNG6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 26 Nov 2020 08:06:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53034 "EHLO
+        id S2389907AbgKZNHC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 26 Nov 2020 08:07:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53058 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389877AbgKZNG4 (ORCPT
+        with ESMTP id S2389900AbgKZNHB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Nov 2020 08:06:56 -0500
+        Thu, 26 Nov 2020 08:07:01 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B117C0613D4;
-        Thu, 26 Nov 2020 05:06:56 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BE0FC0613D4;
+        Thu, 26 Nov 2020 05:07:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=qOmzpRMb4vEzGwba4P3m5gENBKcm1ZKj8N5Pylgvbms=; b=frQf5+o7/NEEwvyZN+t2Km5Ptl
-        NbZc0zYkcrH+IirsiacpBTVbLlfEA1hzVC3a1JMUpYfnRBaxbcnseEGspGlij5gGLt/b1dXtWHRnW
-        j7Nwk+zMr1rHM001tS7jauuj3xz4Ff7g5hqe72Jm8GhyTteC9Epan9fy6PzkAQHF3YoAGeCsN0JEb
-        Vrp/UQrhUUKz3ZV4E1mpp5iyaIB3UfSxRhD9jTjfaSnJ+dPweTGrMJUxgZ7eV3Ksy18x0da98PCml
-        3Wc0i0cpZBIwV780R1d+Ru6O+O+5N8Q0luFoj6zjTKcB+1kxHPewVhpv7sGiBRxlZBhTNS/mwFo0W
-        vCkZ+Qkw==;
+        bh=QGxJ1HD+iQwtllhLyJ4Xwx8w1+7WhF9jztK6ZcNRFkk=; b=jDIIQC7Jb1yVnQy4L2lbIMWIJZ
+        bkckbo8WQyWwVDPc+oXpbNS3IMqCar6g729W2G3rceyXGMuytugZEPLpY3E0W+1/C/ydprBZY1Pi4
+        Avw+fjNfUIXsJrY1Xep71WWWPqeVQso9FdoA6NHhS2z65+CydnqxYdvL2XTMsv8RQx87o9dIt9YOq
+        gRhOyKNn79SNkzIspyPDK9q7PYIVQDXOROMz1lbl+d8g18TGgfKIK4jbzo4ArDcTsez2FmtGtax8t
+        B1bdw31Zt0/8OgVAgLcXcd9stt7E2b7mN719CecQnYMHOHtVE+XiOquYOk/3OHr0STY9A71GKer+M
+        Z/mCFTNA==;
 Received: from [2001:4bb8:18c:1dd6:27b8:b8a1:c13e:ceb1] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kiGyy-0003xt-Re; Thu, 26 Nov 2020 13:06:45 +0000
+        id 1kiGz5-0003zr-C3; Thu, 26 Nov 2020 13:06:52 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
@@ -49,9 +49,9 @@ Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
         linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
         linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
         linux-mm@kvack.org
-Subject: [PATCH 08/44] dm: simplify flush_bio initialization in __send_empty_flush
-Date:   Thu, 26 Nov 2020 14:03:46 +0100
-Message-Id: <20201126130422.92945-9-hch@lst.de>
+Subject: [PATCH 13/44] block: use disk_part_iter_exit in disk_part_iter_next
+Date:   Thu, 26 Nov 2020 14:03:51 +0100
+Message-Id: <20201126130422.92945-14-hch@lst.de>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201126130422.92945-1-hch@lst.de>
 References: <20201126130422.92945-1-hch@lst.de>
@@ -62,42 +62,32 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We don't really need the struct block_device to initialize a bio.  So
-switch from using bio_set_dev to manually setting up bi_disk (bi_partno
-will always be zero and has been cleared by bio_init already).
+Call disk_part_iter_exit in disk_part_iter_next instead of duplicating
+the functionality.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
-Acked-by: Mike Snitzer <snitzer@redhat.com>
+Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Reviewed-by: Jan Kara <jack@suse.cz>
+Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Acked-by: Tejun Heo <tj@kernel.org>
 ---
- drivers/md/dm.c | 12 +++---------
- 1 file changed, 3 insertions(+), 9 deletions(-)
+ block/genhd.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index 50541d336c719b..ab0a8335f098d9 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -1422,18 +1422,12 @@ static int __send_empty_flush(struct clone_info *ci)
- 	 */
- 	bio_init(&flush_bio, NULL, 0);
- 	flush_bio.bi_opf = REQ_OP_WRITE | REQ_PREFLUSH | REQ_SYNC;
-+	flush_bio.bi_disk = ci->io->md->disk;
-+	bio_associate_blkg(&flush_bio);
-+
- 	ci->bio = &flush_bio;
- 	ci->sector_count = 0;
+diff --git a/block/genhd.c b/block/genhd.c
+index 4e039524f92b8f..0bd9c41dd4cb69 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -227,8 +227,7 @@ struct hd_struct *disk_part_iter_next(struct disk_part_iter *piter)
+ 	int inc, end;
  
--	/*
--	 * Empty flush uses a statically initialized bio, as the base for
--	 * cloning.  However, blkg association requires that a bdev is
--	 * associated with a gendisk, which doesn't happen until the bdev is
--	 * opened.  So, blkg association is done at issue time of the flush
--	 * rather than when the device is created in alloc_dev().
--	 */
--	bio_set_dev(ci->bio, ci->io->md->bdev);
--
- 	BUG_ON(bio_has_data(ci->bio));
- 	while ((ti = dm_table_get_target(ci->map, target_nr++)))
- 		__send_duplicate_bios(ci, ti, ti->num_flush_bios, NULL);
+ 	/* put the last partition */
+-	disk_put_part(piter->part);
+-	piter->part = NULL;
++	disk_part_iter_exit(piter);
+ 
+ 	/* get part_tbl */
+ 	rcu_read_lock();
 -- 
 2.29.2
 
