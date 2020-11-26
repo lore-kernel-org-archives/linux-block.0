@@ -2,412 +2,193 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCD59C63697
-	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 17:02:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D16A3C63798
+	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 17:03:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 90ECD21D81
-	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 17:02:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 89CAF2145D
+	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 17:03:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391608AbgKZRBd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 26 Nov 2020 12:01:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33312 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2391607AbgKZRBd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Nov 2020 12:01:33 -0500
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17130C0617A7
-        for <linux-block@vger.kernel.org>; Thu, 26 Nov 2020 09:01:33 -0800 (PST)
-Received: from pty.hi.pengutronix.de ([2001:67c:670:100:1d::c5])
-        by metis.ext.pengutronix.de with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1kiKcr-0001Kk-AC; Thu, 26 Nov 2020 18:00:09 +0100
-Received: from ukl by pty.hi.pengutronix.de with local (Exim 4.89)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1kiKch-0002s0-J8; Thu, 26 Nov 2020 17:59:59 +0100
-From:   =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= 
-        <u.kleine-koenig@pengutronix.de>
-To:     Geoff Levand <geoff@infradead.org>,
-        Jaroslav Kysela <perex@perex.cz>,
-        Takashi Iwai <tiwai@suse.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Jens Axboe <axboe@kernel.dk>, Jim Paris <jim@jtan.com>,
-        Arnd Bergmann <arnd@arndb.de>,
+        id S2391604AbgKZRDR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 26 Nov 2020 12:03:17 -0500
+Received: from mx2.suse.de ([195.135.220.15]:37940 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2391568AbgKZRDR (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 26 Nov 2020 12:03:17 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id BDDFCACC4;
+        Thu, 26 Nov 2020 17:03:15 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 30EB01E10D0; Thu, 26 Nov 2020 18:03:15 +0100 (CET)
+Date:   Thu, 26 Nov 2020 18:03:15 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        Josef Bacik <josef@toxicpanda.com>, Coly Li <colyli@suse.de>,
+        Mike Snitzer <snitzer@redhat.com>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
-Cc:     Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        linuxppc-dev@lists.ozlabs.org, alsa-devel@alsa-project.org,
-        linux-block@vger.kernel.org, netdev@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-usb@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, linux-fbdev@vger.kernel.org
-Subject: [PATCH 2/2] powerpc/ps3: make system bus's remove and shutdown callbacks return void
-Date:   Thu, 26 Nov 2020 17:59:50 +0100
-Message-Id: <20201126165950.2554997-2-u.kleine-koenig@pengutronix.de>
-X-Mailer: git-send-email 2.29.2
-In-Reply-To: <20201126165950.2554997-1-u.kleine-koenig@pengutronix.de>
-References: <20201126165950.2554997-1-u.kleine-koenig@pengutronix.de>
+        Jan Kara <jack@suse.cz>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        dm-devel@redhat.com, Jan Kara <jack@suse.com>,
+        linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: Re: [PATCH 35/44] block: move the policy field to struct block_device
+Message-ID: <20201126170315.GU422@quack2.suse.cz>
+References: <20201126130422.92945-1-hch@lst.de>
+ <20201126130422.92945-36-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::c5
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-block@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201126130422.92945-36-hch@lst.de>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The driver core ignores the return value of struct device_driver::remove
-because there is only little that can be done. For the shutdown callback
-it's ps3_system_bus_shutdown() which ignores the return value.
+On Thu 26-11-20 14:04:13, Christoph Hellwig wrote:
+> Move the policy field to struct block_device and rename it to the
+> more descriptive bd_read_only.  Also turn the field into a bool as it
+> is used as such.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-To simplify the quest to make struct device_driver::remove return void,
-let struct ps3_system_bus_driver::remove return void, too. All users
-already unconditionally return 0, this commit makes it obvious that
-returning an error code is a bad idea and ensures future users behave
-accordingly.
+Looks good. You can add:
 
-Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
----
- arch/powerpc/include/asm/ps3.h               |  4 ++--
- arch/powerpc/platforms/ps3/system-bus.c      |  5 ++---
- drivers/block/ps3disk.c                      |  3 +--
- drivers/block/ps3vram.c                      |  3 +--
- drivers/char/ps3flash.c                      |  3 +--
- drivers/net/ethernet/toshiba/ps3_gelic_net.c |  3 +--
- drivers/ps3/ps3-lpm.c                        |  3 +--
- drivers/ps3/ps3-vuart.c                      | 10 ++++------
- drivers/scsi/ps3rom.c                        |  3 +--
- drivers/usb/host/ehci-ps3.c                  |  4 +---
- drivers/usb/host/ohci-ps3.c                  |  4 +---
- drivers/video/fbdev/ps3fb.c                  |  4 +---
- sound/ppc/snd_ps3.c                          |  3 +--
- 13 files changed, 18 insertions(+), 34 deletions(-)
+Reviewed-by: Jan Kara <jack@suse.cz>
 
-diff --git a/arch/powerpc/include/asm/ps3.h b/arch/powerpc/include/asm/ps3.h
-index cb89e4bf55ce..e646c7f218bc 100644
---- a/arch/powerpc/include/asm/ps3.h
-+++ b/arch/powerpc/include/asm/ps3.h
-@@ -378,8 +378,8 @@ struct ps3_system_bus_driver {
- 	enum ps3_match_sub_id match_sub_id;
- 	struct device_driver core;
- 	int (*probe)(struct ps3_system_bus_device *);
--	int (*remove)(struct ps3_system_bus_device *);
--	int (*shutdown)(struct ps3_system_bus_device *);
-+	void (*remove)(struct ps3_system_bus_device *);
-+	void (*shutdown)(struct ps3_system_bus_device *);
- /*	int (*suspend)(struct ps3_system_bus_device *, pm_message_t); */
- /*	int (*resume)(struct ps3_system_bus_device *); */
- };
-diff --git a/arch/powerpc/platforms/ps3/system-bus.c b/arch/powerpc/platforms/ps3/system-bus.c
-index c62aaa29a9d5..b431f41c6cb5 100644
---- a/arch/powerpc/platforms/ps3/system-bus.c
-+++ b/arch/powerpc/platforms/ps3/system-bus.c
-@@ -382,7 +382,6 @@ static int ps3_system_bus_probe(struct device *_dev)
- 
- static int ps3_system_bus_remove(struct device *_dev)
- {
--	int result = 0;
- 	struct ps3_system_bus_device *dev = ps3_dev_to_system_bus_dev(_dev);
- 	struct ps3_system_bus_driver *drv;
- 
-@@ -393,13 +392,13 @@ static int ps3_system_bus_remove(struct device *_dev)
- 	BUG_ON(!drv);
- 
- 	if (drv->remove)
--		result = drv->remove(dev);
-+		drv->remove(dev);
- 	else
- 		dev_dbg(&dev->core, "%s:%d %s: no remove method\n",
- 			__func__, __LINE__, drv->core.name);
- 
- 	pr_debug(" <- %s:%d: %s\n", __func__, __LINE__, dev_name(&dev->core));
--	return result;
-+	return 0;
- }
- 
- static void ps3_system_bus_shutdown(struct device *_dev)
-diff --git a/drivers/block/ps3disk.c b/drivers/block/ps3disk.c
-index 7b55811c2a81..ba3ece56cbb3 100644
---- a/drivers/block/ps3disk.c
-+++ b/drivers/block/ps3disk.c
-@@ -507,7 +507,7 @@ static int ps3disk_probe(struct ps3_system_bus_device *_dev)
- 	return error;
- }
- 
--static int ps3disk_remove(struct ps3_system_bus_device *_dev)
-+static void ps3disk_remove(struct ps3_system_bus_device *_dev)
- {
- 	struct ps3_storage_device *dev = to_ps3_storage_device(&_dev->core);
- 	struct ps3disk_private *priv = ps3_system_bus_get_drvdata(&dev->sbd);
-@@ -526,7 +526,6 @@ static int ps3disk_remove(struct ps3_system_bus_device *_dev)
- 	kfree(dev->bounce_buf);
- 	kfree(priv);
- 	ps3_system_bus_set_drvdata(_dev, NULL);
--	return 0;
- }
- 
- static struct ps3_system_bus_driver ps3disk = {
-diff --git a/drivers/block/ps3vram.c b/drivers/block/ps3vram.c
-index 1088798c8dd0..b71d28372ef3 100644
---- a/drivers/block/ps3vram.c
-+++ b/drivers/block/ps3vram.c
-@@ -797,7 +797,7 @@ static int ps3vram_probe(struct ps3_system_bus_device *dev)
- 	return error;
- }
- 
--static int ps3vram_remove(struct ps3_system_bus_device *dev)
-+static void ps3vram_remove(struct ps3_system_bus_device *dev)
- {
- 	struct ps3vram_priv *priv = ps3_system_bus_get_drvdata(dev);
- 
-@@ -817,7 +817,6 @@ static int ps3vram_remove(struct ps3_system_bus_device *dev)
- 	free_pages((unsigned long) priv->xdr_buf, get_order(XDR_BUF_SIZE));
- 	kfree(priv);
- 	ps3_system_bus_set_drvdata(dev, NULL);
--	return 0;
- }
- 
- static struct ps3_system_bus_driver ps3vram = {
-diff --git a/drivers/char/ps3flash.c b/drivers/char/ps3flash.c
-index 1a07fee33f66..23871cde41fb 100644
---- a/drivers/char/ps3flash.c
-+++ b/drivers/char/ps3flash.c
-@@ -403,7 +403,7 @@ static int ps3flash_probe(struct ps3_system_bus_device *_dev)
- 	return error;
- }
- 
--static int ps3flash_remove(struct ps3_system_bus_device *_dev)
-+static void ps3flash_remove(struct ps3_system_bus_device *_dev)
- {
- 	struct ps3_storage_device *dev = to_ps3_storage_device(&_dev->core);
- 
-@@ -413,7 +413,6 @@ static int ps3flash_remove(struct ps3_system_bus_device *_dev)
- 	kfree(ps3_system_bus_get_drvdata(&dev->sbd));
- 	ps3_system_bus_set_drvdata(&dev->sbd, NULL);
- 	ps3flash_dev = NULL;
--	return 0;
- }
- 
- 
-diff --git a/drivers/net/ethernet/toshiba/ps3_gelic_net.c b/drivers/net/ethernet/toshiba/ps3_gelic_net.c
-index d9a5722f561b..3d1fc8d2ca66 100644
---- a/drivers/net/ethernet/toshiba/ps3_gelic_net.c
-+++ b/drivers/net/ethernet/toshiba/ps3_gelic_net.c
-@@ -1791,7 +1791,7 @@ static int ps3_gelic_driver_probe(struct ps3_system_bus_device *dev)
-  * ps3_gelic_driver_remove - remove a device from the control of this driver
-  */
- 
--static int ps3_gelic_driver_remove(struct ps3_system_bus_device *dev)
-+static void ps3_gelic_driver_remove(struct ps3_system_bus_device *dev)
- {
- 	struct gelic_card *card = ps3_system_bus_get_drvdata(dev);
- 	struct net_device *netdev0;
-@@ -1840,7 +1840,6 @@ static int ps3_gelic_driver_remove(struct ps3_system_bus_device *dev)
- 	ps3_close_hv_device(dev);
- 
- 	pr_debug("%s: done\n", __func__);
--	return 0;
- }
- 
- static struct ps3_system_bus_driver ps3_gelic_driver = {
-diff --git a/drivers/ps3/ps3-lpm.c b/drivers/ps3/ps3-lpm.c
-index e54aa2d82f50..65512b6cc6fd 100644
---- a/drivers/ps3/ps3-lpm.c
-+++ b/drivers/ps3/ps3-lpm.c
-@@ -1196,7 +1196,7 @@ static int ps3_lpm_probe(struct ps3_system_bus_device *dev)
- 	return 0;
- }
- 
--static int ps3_lpm_remove(struct ps3_system_bus_device *dev)
-+static void ps3_lpm_remove(struct ps3_system_bus_device *dev)
- {
- 	dev_dbg(&dev->core, " -> %s:%u:\n", __func__, __LINE__);
- 
-@@ -1206,7 +1206,6 @@ static int ps3_lpm_remove(struct ps3_system_bus_device *dev)
- 	lpm_priv = NULL;
- 
- 	dev_info(&dev->core, " <- %s:%u:\n", __func__, __LINE__);
--	return 0;
- }
- 
- static struct ps3_system_bus_driver ps3_lpm_driver = {
-diff --git a/drivers/ps3/ps3-vuart.c b/drivers/ps3/ps3-vuart.c
-index 4ed131eaff51..e34ae6a442c7 100644
---- a/drivers/ps3/ps3-vuart.c
-+++ b/drivers/ps3/ps3-vuart.c
-@@ -1102,7 +1102,7 @@ static int ps3_vuart_cleanup(struct ps3_system_bus_device *dev)
-  * device can no longer be used.
-  */
- 
--static int ps3_vuart_remove(struct ps3_system_bus_device *dev)
-+static void ps3_vuart_remove(struct ps3_system_bus_device *dev)
- {
- 	struct ps3_vuart_port_priv *priv = to_port_priv(dev);
- 	struct ps3_vuart_port_driver *drv;
-@@ -1118,7 +1118,7 @@ static int ps3_vuart_remove(struct ps3_system_bus_device *dev)
- 		dev_dbg(&dev->core, "%s:%d: no driver bound\n", __func__,
- 			__LINE__);
- 		mutex_unlock(&vuart_bus_priv.probe_mutex);
--		return 0;
-+		return;
- 	}
- 
- 	drv = ps3_system_bus_dev_to_vuart_drv(dev);
-@@ -1141,7 +1141,6 @@ static int ps3_vuart_remove(struct ps3_system_bus_device *dev)
- 
- 	dev_dbg(&dev->core, " <- %s:%d\n", __func__, __LINE__);
- 	mutex_unlock(&vuart_bus_priv.probe_mutex);
--	return 0;
- }
- 
- /**
-@@ -1154,7 +1153,7 @@ static int ps3_vuart_remove(struct ps3_system_bus_device *dev)
-  * sequence.
-  */
- 
--static int ps3_vuart_shutdown(struct ps3_system_bus_device *dev)
-+static void ps3_vuart_shutdown(struct ps3_system_bus_device *dev)
- {
- 	struct ps3_vuart_port_driver *drv;
- 
-@@ -1169,7 +1168,7 @@ static int ps3_vuart_shutdown(struct ps3_system_bus_device *dev)
- 		dev_dbg(&dev->core, "%s:%d: no driver bound\n", __func__,
- 			__LINE__);
- 		mutex_unlock(&vuart_bus_priv.probe_mutex);
--		return 0;
-+		return;
- 	}
- 
- 	drv = ps3_system_bus_dev_to_vuart_drv(dev);
-@@ -1193,7 +1192,6 @@ static int ps3_vuart_shutdown(struct ps3_system_bus_device *dev)
- 	dev_dbg(&dev->core, " <- %s:%d\n", __func__, __LINE__);
- 
- 	mutex_unlock(&vuart_bus_priv.probe_mutex);
--	return 0;
- }
- 
- static int __init ps3_vuart_bus_init(void)
-diff --git a/drivers/scsi/ps3rom.c b/drivers/scsi/ps3rom.c
-index f75c0b5cd587..ccb5771f1cb7 100644
---- a/drivers/scsi/ps3rom.c
-+++ b/drivers/scsi/ps3rom.c
-@@ -402,7 +402,7 @@ static int ps3rom_probe(struct ps3_system_bus_device *_dev)
- 	return error;
- }
- 
--static int ps3rom_remove(struct ps3_system_bus_device *_dev)
-+static void ps3rom_remove(struct ps3_system_bus_device *_dev)
- {
- 	struct ps3_storage_device *dev = to_ps3_storage_device(&_dev->core);
- 	struct Scsi_Host *host = ps3_system_bus_get_drvdata(&dev->sbd);
-@@ -412,7 +412,6 @@ static int ps3rom_remove(struct ps3_system_bus_device *_dev)
- 	scsi_host_put(host);
- 	ps3_system_bus_set_drvdata(&dev->sbd, NULL);
- 	kfree(dev->bounce_buf);
--	return 0;
- }
- 
- static struct ps3_system_bus_driver ps3rom = {
-diff --git a/drivers/usb/host/ehci-ps3.c b/drivers/usb/host/ehci-ps3.c
-index fb52133c3557..98568b046a1a 100644
---- a/drivers/usb/host/ehci-ps3.c
-+++ b/drivers/usb/host/ehci-ps3.c
-@@ -200,7 +200,7 @@ static int ps3_ehci_probe(struct ps3_system_bus_device *dev)
- 	return result;
- }
- 
--static int ps3_ehci_remove(struct ps3_system_bus_device *dev)
-+static void ps3_ehci_remove(struct ps3_system_bus_device *dev)
- {
- 	unsigned int tmp;
- 	struct usb_hcd *hcd = ps3_system_bus_get_drvdata(dev);
-@@ -227,8 +227,6 @@ static int ps3_ehci_remove(struct ps3_system_bus_device *dev)
- 
- 	ps3_dma_region_free(dev->d_region);
- 	ps3_close_hv_device(dev);
--
--	return 0;
- }
- 
- static int __init ps3_ehci_driver_register(struct ps3_system_bus_driver *drv)
-diff --git a/drivers/usb/host/ohci-ps3.c b/drivers/usb/host/ohci-ps3.c
-index f77cd6af0ccf..4f5af929c3e4 100644
---- a/drivers/usb/host/ohci-ps3.c
-+++ b/drivers/usb/host/ohci-ps3.c
-@@ -184,7 +184,7 @@ static int ps3_ohci_probe(struct ps3_system_bus_device *dev)
- 	return result;
- }
- 
--static int ps3_ohci_remove(struct ps3_system_bus_device *dev)
-+static void ps3_ohci_remove(struct ps3_system_bus_device *dev)
- {
- 	unsigned int tmp;
- 	struct usb_hcd *hcd = ps3_system_bus_get_drvdata(dev);
-@@ -212,8 +212,6 @@ static int ps3_ohci_remove(struct ps3_system_bus_device *dev)
- 
- 	ps3_dma_region_free(dev->d_region);
- 	ps3_close_hv_device(dev);
--
--	return 0;
- }
- 
- static int __init ps3_ohci_driver_register(struct ps3_system_bus_driver *drv)
-diff --git a/drivers/video/fbdev/ps3fb.c b/drivers/video/fbdev/ps3fb.c
-index 203c254f8f6c..2fe08b67eda7 100644
---- a/drivers/video/fbdev/ps3fb.c
-+++ b/drivers/video/fbdev/ps3fb.c
-@@ -1208,7 +1208,7 @@ static int ps3fb_probe(struct ps3_system_bus_device *dev)
- 	return retval;
- }
- 
--static int ps3fb_shutdown(struct ps3_system_bus_device *dev)
-+static void ps3fb_shutdown(struct ps3_system_bus_device *dev)
- {
- 	struct fb_info *info = ps3_system_bus_get_drvdata(dev);
- 	u64 xdr_lpar = ps3_mm_phys_to_lpar(__pa(ps3fb_videomemory.address));
-@@ -1241,8 +1241,6 @@ static int ps3fb_shutdown(struct ps3_system_bus_device *dev)
- 	lv1_gpu_memory_free(ps3fb.memory_handle);
- 	ps3_close_hv_device(dev);
- 	dev_dbg(&dev->core, " <- %s:%d\n", __func__, __LINE__);
--
--	return 0;
- }
- 
- static struct ps3_system_bus_driver ps3fb_driver = {
-diff --git a/sound/ppc/snd_ps3.c b/sound/ppc/snd_ps3.c
-index 6ab796a5d936..8e44fa5d4dc7 100644
---- a/sound/ppc/snd_ps3.c
-+++ b/sound/ppc/snd_ps3.c
-@@ -1049,7 +1049,7 @@ static int snd_ps3_driver_probe(struct ps3_system_bus_device *dev)
- }; /* snd_ps3_probe */
- 
- /* called when module removal */
--static int snd_ps3_driver_remove(struct ps3_system_bus_device *dev)
-+static void snd_ps3_driver_remove(struct ps3_system_bus_device *dev)
- {
- 	int ret;
- 	pr_info("%s:start id=%d\n", __func__,  dev->match_id);
-@@ -1075,7 +1075,6 @@ static int snd_ps3_driver_remove(struct ps3_system_bus_device *dev)
- 	lv1_gpu_device_unmap(2);
- 	ps3_close_hv_device(dev);
- 	pr_info("%s:end id=%d\n", __func__, dev->match_id);
--	return 0;
- } /* snd_ps3_remove */
- 
- static struct ps3_system_bus_driver snd_ps3_bus_driver_info = {
+								Honza
+
+> ---
+>  block/blk-core.c          | 2 +-
+>  block/genhd.c             | 8 ++++----
+>  block/ioctl.c             | 2 +-
+>  block/partitions/core.c   | 4 ++--
+>  include/linux/blk_types.h | 1 +
+>  include/linux/genhd.h     | 4 ++--
+>  6 files changed, 11 insertions(+), 10 deletions(-)
+> 
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index 9121390be97a76..d64ffcb6f9ae5d 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -696,7 +696,7 @@ static inline bool bio_check_ro(struct bio *bio, struct hd_struct *part)
+>  {
+>  	const int op = bio_op(bio);
+>  
+> -	if (part->policy && op_is_write(op)) {
+> +	if (part->bdev->bd_read_only && op_is_write(op)) {
+>  		char b[BDEVNAME_SIZE];
+>  
+>  		if (op_is_flush(bio->bi_opf) && !bio_sectors(bio))
+> diff --git a/block/genhd.c b/block/genhd.c
+> index 0371558ccde14c..ae312ccc6dd7c0 100644
+> --- a/block/genhd.c
+> +++ b/block/genhd.c
+> @@ -1679,14 +1679,14 @@ void set_disk_ro(struct gendisk *disk, int flag)
+>  	struct disk_part_iter piter;
+>  	struct hd_struct *part;
+>  
+> -	if (disk->part0.policy != flag) {
+> +	if (disk->part0.bdev->bd_read_only != flag) {
+>  		set_disk_ro_uevent(disk, flag);
+> -		disk->part0.policy = flag;
+> +		disk->part0.bdev->bd_read_only = flag;
+>  	}
+>  
+>  	disk_part_iter_init(&piter, disk, DISK_PITER_INCL_EMPTY);
+>  	while ((part = disk_part_iter_next(&piter)))
+> -		part->policy = flag;
+> +		part->bdev->bd_read_only = flag;
+>  	disk_part_iter_exit(&piter);
+>  }
+>  
+> @@ -1696,7 +1696,7 @@ int bdev_read_only(struct block_device *bdev)
+>  {
+>  	if (!bdev)
+>  		return 0;
+> -	return bdev->bd_part->policy;
+> +	return bdev->bd_read_only;
+>  }
+>  
+>  EXPORT_SYMBOL(bdev_read_only);
+> diff --git a/block/ioctl.c b/block/ioctl.c
+> index a6d8171221c7dc..d61d652078f41c 100644
+> --- a/block/ioctl.c
+> +++ b/block/ioctl.c
+> @@ -345,7 +345,7 @@ static int blkdev_roset(struct block_device *bdev, fmode_t mode,
+>  		if (ret)
+>  			return ret;
+>  	}
+> -	bdev->bd_part->policy = n;
+> +	bdev->bd_read_only = n;
+>  	return 0;
+>  }
+>  
+> diff --git a/block/partitions/core.c b/block/partitions/core.c
+> index d1093adf2570e2..f397ec9922bd6e 100644
+> --- a/block/partitions/core.c
+> +++ b/block/partitions/core.c
+> @@ -199,7 +199,7 @@ static ssize_t part_ro_show(struct device *dev,
+>  			    struct device_attribute *attr, char *buf)
+>  {
+>  	struct hd_struct *p = dev_to_part(dev);
+> -	return sprintf(buf, "%d\n", p->policy ? 1 : 0);
+> +	return sprintf(buf, "%d\n", p->bdev->bd_read_only);
+>  }
+>  
+>  static ssize_t part_alignment_offset_show(struct device *dev,
+> @@ -420,7 +420,7 @@ static struct hd_struct *add_partition(struct gendisk *disk, int partno,
+>  	bdev->bd_start_sect = start;
+>  	bdev_set_nr_sectors(bdev, len);
+>  	p->partno = partno;
+> -	p->policy = get_disk_ro(disk);
+> +	bdev->bd_read_only = get_disk_ro(disk);
+>  
+>  	if (info) {
+>  		err = -ENOMEM;
+> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+> index b237f1e4081405..758cf71c9aa2a6 100644
+> --- a/include/linux/blk_types.h
+> +++ b/include/linux/blk_types.h
+> @@ -23,6 +23,7 @@ struct block_device {
+>  	sector_t		bd_start_sect;
+>  	struct disk_stats __percpu *bd_stats;
+>  	unsigned long		bd_stamp;
+> +	bool			bd_read_only;	/* read-only policy */
+>  	dev_t			bd_dev;
+>  	int			bd_openers;
+>  	struct inode *		bd_inode;	/* will die */
+> diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+> index 349cf6403ccddc..dcbf9ef7610ea6 100644
+> --- a/include/linux/genhd.h
+> +++ b/include/linux/genhd.h
+> @@ -55,7 +55,7 @@ struct hd_struct {
+>  
+>  	struct block_device *bdev;
+>  	struct device __dev;
+> -	int policy, partno;
+> +	int partno;
+>  	struct rcu_work rcu_work;
+>  };
+>  
+> @@ -278,7 +278,7 @@ extern void set_disk_ro(struct gendisk *disk, int flag);
+>  
+>  static inline int get_disk_ro(struct gendisk *disk)
+>  {
+> -	return disk->part0.policy;
+> +	return disk->part0.bdev->bd_read_only;
+>  }
+>  
+>  extern void disk_block_events(struct gendisk *disk);
+> -- 
+> 2.29.2
+> 
 -- 
-2.29.2
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
