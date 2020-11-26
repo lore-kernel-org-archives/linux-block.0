@@ -2,106 +2,106 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D52CBC64E75
-	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 15:02:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 453F7C63697
+	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 15:05:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 90F1320B80
-	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 15:02:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0684921D1A
+	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 15:05:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391174AbgKZPCX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 26 Nov 2020 10:02:23 -0500
-Received: from alexa-out.qualcomm.com ([129.46.98.28]:56776 "EHLO
-        alexa-out.qualcomm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390811AbgKZPCW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Nov 2020 10:02:22 -0500
-Received: from ironmsg09-lv.qualcomm.com ([10.47.202.153])
-  by alexa-out.qualcomm.com with ESMTP; 26 Nov 2020 07:02:22 -0800
-X-QCInternal: smtphost
-Received: from ironmsg01-blr.qualcomm.com ([10.86.208.130])
-  by ironmsg09-lv.qualcomm.com with ESMTP/TLS/AES256-SHA; 26 Nov 2020 07:02:20 -0800
-X-QCInternal: smtphost
-Received: from hydcbspbld03.qualcomm.com ([10.242.221.48])
-  by ironmsg01-blr.qualcomm.com with ESMTP; 26 Nov 2020 20:32:09 +0530
-Received: by hydcbspbld03.qualcomm.com (Postfix, from userid 2304101)
-        id EE1C021110; Thu, 26 Nov 2020 20:32:07 +0530 (IST)
-From:   Pradeep P V K <ppvk@codeaurora.org>
-To:     axboe@kernel.dk, linux-block@vger.kernel.org
-Cc:     stummala@codeaurora.org, linux-kernel@vger.kernel.org,
-        Pradeep P V K <ppvk@codeaurora.org>
-Subject: [PATCH V1] block: Fix use-after-free while iterating over requests
-Date:   Thu, 26 Nov 2020 20:32:05 +0530
-Message-Id: <1606402925-24420-1-git-send-email-ppvk@codeaurora.org>
-X-Mailer: git-send-email 2.7.4
+        id S2391270AbgKZPFi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 26 Nov 2020 10:05:38 -0500
+Received: from mx2.suse.de ([195.135.220.15]:36374 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2389884AbgKZPFi (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 26 Nov 2020 10:05:38 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 3A9DEACE0;
+        Thu, 26 Nov 2020 15:05:37 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id C51F51E10D0; Thu, 26 Nov 2020 16:05:36 +0100 (CET)
+Date:   Thu, 26 Nov 2020 16:05:36 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        Josef Bacik <josef@toxicpanda.com>, Coly Li <colyli@suse.de>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jan Kara <jack@suse.cz>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        dm-devel@redhat.com, Jan Kara <jack@suse.com>,
+        linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: Re: [PATCH 21/44] block: move bdput() to the callers of __blkdev_get
+Message-ID: <20201126150536.GH422@quack2.suse.cz>
+References: <20201126130422.92945-1-hch@lst.de>
+ <20201126130422.92945-22-hch@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201126130422.92945-22-hch@lst.de>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Observes below crash while accessing (use-after-free) request queue
-member of struct request.
+On Thu 26-11-20 14:03:59, Christoph Hellwig wrote:
+> This will allow for a more symmetric calling convention going forward.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-191.784789:   <2> Unable to handle kernel paging request at virtual
-address ffffff81429a4440
-...
-191.786174:   <2> CPU: 3 PID: 213 Comm: kworker/3:1H Tainted: G S
-O      5.4.61-qgki-debug-ge45de39 #1
-...
-191.786226:   <2> Workqueue: kblockd blk_mq_timeout_work
-191.786242:   <2> pstate: 20c00005 (nzCv daif +PAN +UAO)
-191.786261:   <2> pc : bt_for_each+0x114/0x1a4
-191.786274:   <2> lr : bt_for_each+0xe0/0x1a4
-...
-191.786494:   <2> Call trace:
-191.786507:   <2>  bt_for_each+0x114/0x1a4
-191.786519:   <2>  blk_mq_queue_tag_busy_iter+0x60/0xd4
-191.786532:   <2>  blk_mq_timeout_work+0x54/0xe8
-191.786549:   <2>  process_one_work+0x2cc/0x568
-191.786562:   <2>  worker_thread+0x28c/0x518
-191.786577:   <2>  kthread+0x160/0x170
-191.786594:   <2>  ret_from_fork+0x10/0x18
-191.786615:   <2> Code: 0b080148 f9404929 f8685921 b4fffe01 (f9400028)
-191.786630:   <2> ---[ end trace 0f1f51d79ab3f955 ]---
-191.786643:   <2> Kernel panic - not syncing: Fatal exception
+Looks good to me. You can add:
 
-Fix this by updating the freed request with NULL.
-This could avoid accessing the already free request from other
-contexts while iterating over the requests.
+Reviewed-by: Jan Kara <jack@suse.cz>
 
-Signed-off-by: Pradeep P V K <ppvk@codeaurora.org>
----
- block/blk-mq.c | 1 +
- block/blk-mq.h | 1 +
- 2 files changed, 2 insertions(+)
+								Honza
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 55bcee5..9996cb1 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -492,6 +492,7 @@ static void __blk_mq_free_request(struct request *rq)
- 
- 	blk_crypto_free_request(rq);
- 	blk_pm_mark_last_busy(rq);
-+	hctx->tags->rqs[rq->tag] = NULL;
- 	rq->mq_hctx = NULL;
- 	if (rq->tag != BLK_MQ_NO_TAG)
- 		blk_mq_put_tag(hctx->tags, ctx, rq->tag);
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index a52703c..8747bf1 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -224,6 +224,7 @@ static inline int __blk_mq_active_requests(struct blk_mq_hw_ctx *hctx)
- static inline void __blk_mq_put_driver_tag(struct blk_mq_hw_ctx *hctx,
- 					   struct request *rq)
- {
-+	hctx->tags->rqs[rq->tag] = NULL;
- 	blk_mq_put_tag(hctx->tags, rq->mq_ctx, rq->tag);
- 	rq->tag = BLK_MQ_NO_TAG;
- 
+> ---
+>  fs/block_dev.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
+> 
+> diff --git a/fs/block_dev.c b/fs/block_dev.c
+> index 86a61a2141f642..d0783c55a0ce65 100644
+> --- a/fs/block_dev.c
+> +++ b/fs/block_dev.c
+> @@ -1458,6 +1458,7 @@ static int __blkdev_get(struct block_device *bdev, struct gendisk *disk,
+>  			if (!(disk->flags & GENHD_FL_UP) ||
+>  			    !bdev->bd_part || !bdev->bd_part->nr_sects) {
+>  				__blkdev_put(whole, mode, 1);
+> +				bdput(whole);
+>  				ret = -ENXIO;
+>  				goto out_clear;
+>  			}
+> @@ -1740,9 +1741,10 @@ static void __blkdev_put(struct block_device *bdev, fmode_t mode, int for_part)
+>  			disk->fops->release(disk, mode);
+>  	}
+>  	mutex_unlock(&bdev->bd_mutex);
+> -	bdput(bdev);
+> -	if (victim)
+> +	if (victim) {
+>  		__blkdev_put(victim, mode, 1);
+> +		bdput(victim);
+> +	}
+>  }
+>  
+>  void blkdev_put(struct block_device *bdev, fmode_t mode)
+> @@ -1792,6 +1794,7 @@ void blkdev_put(struct block_device *bdev, fmode_t mode)
+>  	mutex_unlock(&bdev->bd_mutex);
+>  
+>  	__blkdev_put(bdev, mode, 0);
+> +	bdput(bdev);
+>  	put_disk_and_module(disk);
+>  }
+>  EXPORT_SYMBOL(blkdev_put);
+> -- 
+> 2.29.2
+> 
 -- 
-2.7.4
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
