@@ -7,59 +7,59 @@ X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F00BBC56202
-	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 02:42:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 473BDC56201
+	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 02:42:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9B07020B1F
-	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 02:42:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DF2C0207BC
+	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 02:42:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="aw0OXOY+"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="C9NGNvY4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733007AbgKZCmI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 Nov 2020 21:42:08 -0500
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:45567 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732947AbgKZCmH (ORCPT
+        id S1732733AbgKZCm0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 Nov 2020 21:42:26 -0500
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:20535 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730809AbgKZCm0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Nov 2020 21:42:07 -0500
+        Wed, 25 Nov 2020 21:42:26 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1606358527; x=1637894527;
+  t=1606358545; x=1637894545;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=5Iw7w/DZLZaDG8VLkQP5pskn7Zl3Ct/yjTxMj+mxhCQ=;
-  b=aw0OXOY+o6o5AU6i07lYZhOA8/o/yQW60P1t1jo9IIUOet+P1No+VHQC
-   QfVKWswci9ACeUeEzqDaickCDUX/Umu16y6a1kxYd/5oLUwM5iqCh1VRc
-   w5VAqgEY5J/QuXPI8lEF0BRGVKymaxiKEcSarvNUPMDCf9WSitNgGEMki
-   WH+Um64duZzn3Ye8yvkQEt4yShUQpRtjMlKue3xKY5AgLwSd8oNfX9YsQ
-   KeFObQ8C3OdvhjhIAbDrU1BXlikNZ9gpucm7jPGVTIkCzItKVTyLptjKC
-   OEl908fH5YUXJ7uMmbMKjsPr1l3Z9b/iMAn4AT3x1vnSKcR6jWKeSPfYo
+  bh=qeI8OkQ2C+8qF4W8aVLYYaL1+taXca5eouvg6P6Gos4=;
+  b=C9NGNvY4oxAOqneMofUiMq1U9I6IQtrXvP9iN0ijY9XWC8/ixHXw/wzC
+   hQqo28JZ+K+kBcxe6VMR9tPW4PXcWoA+gLGpEGUAnVPDoPn16QWv2VTck
+   0MGBfKa1OOXT2nJt3+eD6VO6vxTMHAxb4rLkGpCGYumQBeU/XoSEqwj6x
+   fIe6G3zRkHfU0JG/wRbr58IbJAaz297Ye8PqYGnqWHvc3EG/rHioNFQB5
+   VkBhcJaNwPr6OjF8OuSa6cuyF3nu1I+qtXy7Rt3+xpCtFsV3G8m2BT+ak
+   8aQraRnN9yq+WmwzL5ry91ZM9V+S4JUJk666VxfpaT8GQ55EXoK1ETl3P
    g==;
-IronPort-SDR: lCEqps9FanX2TrF2s+gSVhOD7LZHYdeTu5LJlCu8VrVVrQ3iHn677h9IcolzD12featiu67fu+
- WV7UlL/x5EtfgOY9O6o4D50IGgS2RA/DBTIyA6rpYQIrFGjcEgYU4TCxPPAGeQz/EFCXkceV9d
- myx9d3hszkG4lXhvEwkhN4jT20Qerbet/kTa/bt37Vvac2msqYLajdG5U4mbNIF2IVld5DY4/T
- 9o0Y6AGLFVH8B1UxMX7YH70L95i2QZ5ibUxWcDgcEkZTVyTwn0AsNeTPSaaODeoPM3yvS8IC7k
- eDw=
+IronPort-SDR: q2UqC5cQ3xDHhO12p+14N+GxzOyF1rsDDt25fD6s4kmDad4u2X14j/Rl4xnHawNiTOQ8BSp3sI
+ 7/IOfHLVWcJbEn+f9mIPj015KeIqXimsaQiAkoLn+yLWB+XoYYcCgzVxjpVONoCv++CapFX7eV
+ kJ79Qk5DzH3jkoXFnhu8ba1t4Mauc4rvhJBmIrc+vEvUS3AlAiRSE9u35kBXGJDfyl0i15CrZJ
+ bkBbXrdpL373wYRgL4+vSnacGgsdgh+K2DnJalqlLkfEeAWMaWdJNFWwZjbu1rgBbKKrwFvVdx
+ FF8=
 X-IronPort-AV: E=Sophos;i="5.78,370,1599494400"; 
-   d="scan'208";a="153586948"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 26 Nov 2020 10:42:07 +0800
-IronPort-SDR: KVSIO1TS52XX/8e0Cs/F/UDgdptx3lxVdaO3KvIMUp6nzOeNtE5yfeibXwsSa/K/bBBGuVJx4A
- NtFI4ltrMZ9T7DHww1bpGzoai9OXMHGYM=
+   d="scan'208";a="157983172"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 26 Nov 2020 10:42:25 +0800
+IronPort-SDR: /unS0tfmQLgVGbpAkBDKfNn2JHtTfqOKwMUlqgGPbavBawHTUJIK0PrpLUmc7+6q36YwpXJORt
+ ZPqNPSuPBc51p+kF6G7CjoCV4j9hDO7WU=
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2020 18:26:29 -0800
-IronPort-SDR: OT+ipo9IUtxLKQzFh1Yo+PY1jKiSNkSqbQL8MrcRG0FJM8iIsfre24ixAEpDApW2GE+fu8X2+1
- 8sVkgdza+FfA==
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2020 18:28:07 -0800
+IronPort-SDR: /qUJeynUYlB2tGsiF3eBwSQA1RSvV7doTJnStkhrjI95IQtpqlEChvvEj3rYMPFM5RSRvHvUXK
+ lx5jkLdKAkhQ==
 WDCIronportException: Internal
 Received: from vm.labspan.wdc.com (HELO vm.sc.wdc.com) ([10.6.137.102])
-  by uls-op-cesaip02.wdc.com with ESMTP; 25 Nov 2020 18:42:07 -0800
+  by uls-op-cesaip02.wdc.com with ESMTP; 25 Nov 2020 18:42:25 -0800
 From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 To:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
 Cc:     sagi@grimberg.me, hch@lst.de,
         Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [PATCH 8/9] nvmet: add zns bdev config support
-Date:   Wed, 25 Nov 2020 18:40:42 -0800
-Message-Id: <20201126024043.3392-9-chaitanya.kulkarni@wdc.com>
+Subject: [PATCH 9/9] nvmet: add ZNS based I/O cmds handlers
+Date:   Wed, 25 Nov 2020 18:40:43 -0800
+Message-Id: <20201126024043.3392-10-chaitanya.kulkarni@wdc.com>
 X-Mailer: git-send-email 2.22.1
 In-Reply-To: <20201126024043.3392-1-chaitanya.kulkarni@wdc.com>
 References: <20201126024043.3392-1-chaitanya.kulkarni@wdc.com>
@@ -69,31 +69,76 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-For zbd based bdev backend we need to override the ns->blksize_shift
-with the physical block size instead of using the logical block size
-so that SMR drives will not result in an error.
-
-Update the nvmet_bdev_ns_enable() to reflect that.
+Add zone-mgmt-send, zone-mgmt-recv and zone-zppend handlers for the
+bdev backend so that it can support zbd.
 
 Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 ---
- drivers/nvme/target/io-cmd-bdev.c | 3 +++
- 1 file changed, 3 insertions(+)
+ drivers/nvme/target/Makefile      | 3 +--
+ drivers/nvme/target/io-cmd-bdev.c | 9 +++++++++
+ drivers/nvme/target/zns.c         | 6 +++---
+ 3 files changed, 13 insertions(+), 5 deletions(-)
 
+diff --git a/drivers/nvme/target/Makefile b/drivers/nvme/target/Makefile
+index bc147ff2df5d..15307b1cc713 100644
+--- a/drivers/nvme/target/Makefile
++++ b/drivers/nvme/target/Makefile
+@@ -10,9 +10,8 @@ obj-$(CONFIG_NVME_TARGET_FCLOOP)	+= nvme-fcloop.o
+ obj-$(CONFIG_NVME_TARGET_TCP)		+= nvmet-tcp.o
+ 
+ nvmet-y		+= core.o configfs.o admin-cmd.o fabrics-cmd.o \
+-			discovery.o io-cmd-file.o io-cmd-bdev.o
++		   zns.o discovery.o io-cmd-file.o io-cmd-bdev.o
+ nvmet-$(CONFIG_NVME_TARGET_PASSTHRU)	+= passthru.o
+-nvmet-$(CONFIG_BLK_DEV_ZONED)		+= zns.o
+ 
+ nvme-loop-y	+= loop.o
+ nvmet-rdma-y	+= rdma.o
 diff --git a/drivers/nvme/target/io-cmd-bdev.c b/drivers/nvme/target/io-cmd-bdev.c
-index 125dde3f410e..f8a500983abd 100644
+index f8a500983abd..4fcc8374b857 100644
 --- a/drivers/nvme/target/io-cmd-bdev.c
 +++ b/drivers/nvme/target/io-cmd-bdev.c
-@@ -86,6 +86,9 @@ int nvmet_bdev_ns_enable(struct nvmet_ns *ns)
- 	if (IS_ENABLED(CONFIG_BLK_DEV_INTEGRITY_T10))
- 		nvmet_bdev_ns_enable_integrity(ns);
- 
-+	if (bdev_is_zoned(ns->bdev) && !nvmet_bdev_zns_config(ns))
-+		return -EINVAL;
-+
- 	return 0;
+@@ -453,6 +453,15 @@ u16 nvmet_bdev_parse_io_cmd(struct nvmet_req *req)
+ 	case nvme_cmd_write_zeroes:
+ 		req->execute = nvmet_bdev_execute_write_zeroes;
+ 		return 0;
++	case nvme_cmd_zone_append:
++		req->execute = nvmet_bdev_execute_zone_append;
++		return 0;
++	case nvme_cmd_zone_mgmt_recv:
++		req->execute = nvmet_bdev_execute_zone_mgmt_recv;
++		return 0;
++	case nvme_cmd_zone_mgmt_send:
++		req->execute = nvmet_bdev_execute_zone_mgmt_send;
++		return 0;
+ 	default:
+ 		pr_err("unhandled cmd %d on qid %d\n", cmd->common.opcode,
+ 		       req->sq->qid);
+diff --git a/drivers/nvme/target/zns.c b/drivers/nvme/target/zns.c
+index 8ea6641a55e3..efd11d7a6f96 100644
+--- a/drivers/nvme/target/zns.c
++++ b/drivers/nvme/target/zns.c
+@@ -361,17 +361,17 @@ void nvmet_bdev_execute_zone_append(struct nvmet_req *req)
  }
  
+ #else  /* CONFIG_BLK_DEV_ZONED */
+-static void nvmet_execute_identify_cns_cs_ctrl(struct nvmet_req *req)
++void nvmet_execute_identify_cns_cs_ctrl(struct nvmet_req *req)
+ {
+ }
+-static void nvmet_execute_identify_cns_cs_ns(struct nvmet_req *req)
++void nvmet_execute_identify_cns_cs_ns(struct nvmet_req *req)
+ {
+ }
+ u16 nvmet_process_zns_cis(struct nvmet_req *req, off_t *off)
+ {
+ 	return 0;
+ }
+-static bool nvmet_bdev_zns_config(struct nvmet_ns *ns)
++bool nvmet_bdev_zns_config(struct nvmet_ns *ns)
+ {
+ 	return false;
+ }
 -- 
 2.22.1
 
