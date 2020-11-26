@@ -7,59 +7,59 @@ X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AFAFC56201
-	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 02:41:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1BE4C56202
+	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 02:41:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EB177206C0
-	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 02:41:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 80DBC207BC
+	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 02:41:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="RLsKpijx"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="AbymjKwb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732814AbgKZCls (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 Nov 2020 21:41:48 -0500
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:32166 "EHLO
-        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732808AbgKZCls (ORCPT
+        id S1732885AbgKZCl4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 Nov 2020 21:41:56 -0500
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:45550 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732808AbgKZCl4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Nov 2020 21:41:48 -0500
+        Wed, 25 Nov 2020 21:41:56 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1606358507; x=1637894507;
+  t=1606358516; x=1637894516;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=m/bvl+lK7ll6HRYiQ0kG1ndR5SFePuzrxfzuz5g9atQ=;
-  b=RLsKpijxeoWaCjPEJqwuwUcZWiNLLreRm42sdMgesQ0xmNRo1J5PejFu
-   tSlwJp4l2n6LEXpojuK2BFaLga2EmBR7WPr5eGA6Q2R8O2ntD6YreL1HH
-   7Pglrb4kecQkyKnYhZ6yDfgkqsebhZgUF+CLdpkag9CsIv1do08Fslbyg
-   Z4pePU1DnvVKvdVaGem6dyVZc01hv3nZgfOjgD+Lzx0JQMXWYiTnjqaGB
-   yG3k791lL6xT1OBuV9Esi7E594p+jiaURQU4iSnqfGkm2rpzKcxTrZj/u
-   K8nsCaWgZj4HTDLsLgo5C7oWXUoqLFDnElKKY0t1gggHvsSbcb+id3UBK
-   w==;
-IronPort-SDR: atUXOjgOc+XeNH3a4uwaT8W47/4Od4jlUYNSTs1zdl/stiqECLDfFUTsfGS+jzHboUVl68Ixy+
- NgupnI//zLtKVCcQ+qxXrNSx0tvMs0bIQm7Tqq4d7lnEDEUNUuSTXCfdb02Mj8il2eKJ5S2Nt7
- 9LlgokzPveQISz6DoYmQLrHn87o/aKvQi6YrSsz7XjyiIZAnyt56mTPLAtlLNYu2GLy3uv+kvi
- 0Nz70g0RLeE50fNumYcxx176//ouZFCCYrr9wef3GkQaG4nmdVxODIDTqjY2aHSm5kWpIbc85l
- GZg=
+  bh=hUhzJ651cVoNvniIQeg3wff/FCoz1DE77FDFCSJt0Zk=;
+  b=AbymjKwbriq99Wl5+l3BtZxFiC5rdvEl1/51whE2+r2BFhQp9pfjClop
+   pXdOdP2Uv4O+P5IvhpTrVe2iMAtPTTSlcggugWxsA2Lt6APuwJFbaLQf/
+   obK3VW3vIEa2P5McV9XFDPZcRtJsZwr8g2etuQZurBVmz/y/bSALXyxGI
+   Rl0N90rBLcw4CEfjPjJ/1KIq1Lao4v7Z1EQoDzKj1ibqEGPzX/rzjRt/R
+   S8RK8GhPg3xVCgOhMJq2T7FDQtJM9rp8UHd5WRZIIvgYXtAlVrpS2UOC9
+   xWoGPvbkc+N++upAVsljkGEun7T5dOilnO9garjLq1nJO8lWbtG23ZKQq
+   A==;
+IronPort-SDR: 4ZyCK2pCEC3NuGoZq4GDMfasXQaAjrT26tbqjD7pQM6AHxOTYacSsqApYJD8ZqcxrBD7oCjnU6
+ EKEr7/MW2eR0uSPDemthjIDFHpUT9a2rY0WfZKM9Xg/jsmcLiDZOrPCiTi7dk19kTEJZiphakS
+ 8vccOaB+UiX0zgl5zWuPG+E2OR3tL45qv37KmVP+8U0iFvl18x3Yc0+G6Zo7RR8vP+EqmuLBR2
+ nYqOqqFlX5Awytm53RbtDsPEYFVgvLNNUIY+QmPyRXbS24+ZH7YA7m889rvotJAaHSuV3TJdT1
+ DGM=
 X-IronPort-AV: E=Sophos;i="5.78,370,1599494400"; 
-   d="scan'208";a="153445815"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 26 Nov 2020 10:41:47 +0800
-IronPort-SDR: GPqklYS4MhXPtuFScMcMrlLheJHOKS+ztswqH/HCKAIeUS4KASJ3mjXqDAgTDzPTCW+AaYmyyn
- C+a6BD9zgnGmAdaq6sANjDXFZE8tg9Vog=
+   d="scan'208";a="153586939"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 26 Nov 2020 10:41:56 +0800
+IronPort-SDR: Cpz6QEw6r6NLt9JC8Q93CW12ac8EfdCpijyexasu0m3+a3zj0L+uWNV6HYMZlq1g6jiEWt4CeD
+ CYH2C4Mx2fC6ZlaX4mZslSZZqyW4lydxM=
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2020 18:27:29 -0800
-IronPort-SDR: +iWkemWLEus9/qEDz+arSjP994rS0injMOm4Whacc+3WhZcSMUYFyUUIhPFKqwO10GgcjboJCV
- 6FfkLyZHkgLQ==
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2020 18:26:18 -0800
+IronPort-SDR: OQvfIqn9EiwcYC7awggW4nUlJ1jJ8l8UvELmdegT05BX7QVx4OJyNRt0t/Ln3dOxKG4z0K6RKU
+ OXzggKKmNl7Q==
 WDCIronportException: Internal
 Received: from vm.labspan.wdc.com (HELO vm.sc.wdc.com) ([10.6.137.102])
-  by uls-op-cesaip02.wdc.com with ESMTP; 25 Nov 2020 18:41:47 -0800
+  by uls-op-cesaip02.wdc.com with ESMTP; 25 Nov 2020 18:41:55 -0800
 From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 To:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
 Cc:     sagi@grimberg.me, hch@lst.de,
         Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [PATCH 6/9] nvmet: add cns-cs-ns in id-ctrl for ZNS bdev
-Date:   Wed, 25 Nov 2020 18:40:40 -0800
-Message-Id: <20201126024043.3392-7-chaitanya.kulkarni@wdc.com>
+Subject: [PATCH 7/9] nvmet: add zns cmd effects to support zbdev
+Date:   Wed, 25 Nov 2020 18:40:41 -0800
+Message-Id: <20201126024043.3392-8-chaitanya.kulkarni@wdc.com>
 X-Mailer: git-send-email 2.22.1
 In-Reply-To: <20201126024043.3392-1-chaitanya.kulkarni@wdc.com>
 References: <20201126024043.3392-1-chaitanya.kulkarni@wdc.com>
@@ -69,30 +69,27 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Update the nvmet_execute_identify() such that it can now handle
-NVME_ID_CNS_CS_NS when identify.cis is set to ZNS. This allows
-host to identify the ns with ZNS capabilities.
+Update the target side command effects logs with support for
+ZNS commands for zbdev.
 
 Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 ---
- drivers/nvme/target/admin-cmd.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ drivers/nvme/target/admin-cmd.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/drivers/nvme/target/admin-cmd.c b/drivers/nvme/target/admin-cmd.c
-index e7d2b96cda6b..cd368cbe3855 100644
+index cd368cbe3855..0099275951da 100644
 --- a/drivers/nvme/target/admin-cmd.c
 +++ b/drivers/nvme/target/admin-cmd.c
-@@ -648,6 +648,10 @@ static void nvmet_execute_identify(struct nvmet_req *req)
- 	switch (req->cmd->identify.cns) {
- 	case NVME_ID_CNS_NS:
- 		return nvmet_execute_identify_ns(req);
-+	case NVME_ID_CNS_CS_NS:
-+		if (req->cmd->identify.csi == NVME_CSI_ZNS)
-+			return nvmet_execute_identify_cns_cs_ns(req);
-+		break;
- 	case NVME_ID_CNS_CTRL:
- 		return nvmet_execute_identify_ctrl(req);
- 	case NVME_ID_CNS_CS_CTRL:
+@@ -191,6 +191,8 @@ static void nvmet_execute_get_log_cmd_effects_ns(struct nvmet_req *req)
+ 	log->iocs[nvme_cmd_dsm]			= cpu_to_le32(1 << 0);
+ 	log->iocs[nvme_cmd_write_zeroes]	= cpu_to_le32(1 << 0);
+ 
++	nvmet_zns_add_cmd_effects(log);
++
+ 	status = nvmet_copy_to_sgl(req, 0, log, sizeof(*log));
+ 
+ 	kfree(log);
 -- 
 2.22.1
 
