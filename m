@@ -7,65 +7,67 @@ X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A389C64E7A
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CA94C63777
 	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 10:47:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 302B320DD4
-	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 10:47:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9D60C20DD4
+	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 10:47:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="CnWoSEng"
+	dkim=pass (2048-bit key) header.d=cloud.ionos.com header.i=@cloud.ionos.com header.b="YsQprvax"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388342AbgKZKrb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S2388347AbgKZKrb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Thu, 26 Nov 2020 05:47:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59722 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59716 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388340AbgKZKra (ORCPT
+        with ESMTP id S2388341AbgKZKr2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Nov 2020 05:47:30 -0500
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D64A5C0613D4
-        for <linux-block@vger.kernel.org>; Thu, 26 Nov 2020 02:47:29 -0800 (PST)
-Received: by mail-ed1-x52c.google.com with SMTP id y4so1776276edy.5
-        for <linux-block@vger.kernel.org>; Thu, 26 Nov 2020 02:47:29 -0800 (PST)
+        Thu, 26 Nov 2020 05:47:28 -0500
+Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1049CC061A04
+        for <linux-block@vger.kernel.org>; Thu, 26 Nov 2020 02:47:28 -0800 (PST)
+Received: by mail-ed1-x52e.google.com with SMTP id cq7so1781061edb.4
+        for <linux-block@vger.kernel.org>; Thu, 26 Nov 2020 02:47:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=cloud.ionos.com; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=X8yu13oIh/JXch52+JZCHnrSj26jPVrm5ONB1ko1hmI=;
-        b=CnWoSEngNJgDdzaaG4hLtojTeGeo/LNkJ6HhOvHH7dd2xUmOUxcuw8dsptvfWLGDdN
-         d0tyitpMpSZyzOOQm4L+bb7q54i5Nd5xc8/+qbfu5vMbfJhrCQf6dSz+4wKvQCZrkAtb
-         2WZQkYv+/bwd0WvZC7ztw1kQR7mp7ghIOXJ90+UGmGcijusMvd61MNMfqrGjjkhuwr6E
-         91T/e/h3rCNB86PbJWNmOQbjUMjAU+g5fsC2I9qAgyQ89KoVaZZEVOYQcTPdpZblmyCc
-         evytewJEgi1UfqpunNWqLsCw+xlyM35smdPH7qBngo7Om6fW8brdtElFbImlPfdBssLD
-         9b0g==
+        bh=K4l2Xqa78nl3oR6VwhQJgJaGGROL4T6jCJNlZ9gmwMo=;
+        b=YsQprvaxw13SmjJexNHzbTRRUYnFqy5roaSWRaF1Sct3CIs09LIO6qF8rA/f0RfsKm
+         wKcqVrw5c4EZFI/WrQd8i8hqEmnOEIBKDj54A+pWrWpC2KuIJNVmrtsD05k9zRgDxiy3
+         mFQJBjbp3cXM72XKuIF8EzL6ytE++S+P7L5rFNeMo56BjeaaK+ULUQWAaxx3Vd1qVdWX
+         3XHO/+wxBDPt3acl5BMG5o1zlmFs+EOGTYhSSeypHpoe+fCyXgbiZND/v6+mhaI4gA1K
+         2wXjxEbMtr1CqyQm3347BQTibeB1GGtHRTi28A85bCIsWdWCAbzdFfZK6jI4gr3vO9sX
+         SHnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=X8yu13oIh/JXch52+JZCHnrSj26jPVrm5ONB1ko1hmI=;
-        b=FZV1ZGF/R6rR42LRRowwKVJ3+AyOyWXOypRNeeqglqSUBW2/SRJ9u9F95fJJ2ndZmk
-         YNQoemxdR/qCpeZoZnjG1M0+T1nKv47HGbVyk9JXuILzErqxuKwqK544e7hnYAj6xZ4S
-         wC1/OXNfa8q2lrwgDfxVrksjcJq7+oB4Z4zhtmMmjkPdpZERzmPZ5z5ShdwcvlEo80wC
-         xhHg6QvS87Q+vFd1ISUeEeo2WPOBWZheFv7DxJpi9ZqiaDiFDuG0NHiCS1zOzBtCQefR
-         5iVH4/D7xJFq1elWCKhfN7Iqa+1gHoSnij/74x4+u6dqW4kuN9GK+8FTWddMK2h1I51l
-         +ybw==
-X-Gm-Message-State: AOAM533nayBbfmjntOaUKU9GTyuDU1t16I4oTXsjrdPap60S2uJcKtX/
-        HEAcZViO/iBmCpEKmJ4xJyuu4UKmX8LgWA==
-X-Google-Smtp-Source: ABdhPJwuFBL2g1I02Q62kidqcObfxhPUEeEohUJHmcwE2kWifTRNBp1Qmu5ZoP5+LlHcLq072AACvg==
-X-Received: by 2002:a50:f30f:: with SMTP id p15mr1984602edm.4.1606387648435;
-        Thu, 26 Nov 2020 02:47:28 -0800 (PST)
+        bh=K4l2Xqa78nl3oR6VwhQJgJaGGROL4T6jCJNlZ9gmwMo=;
+        b=gFR4K42/09RdBHtchIqK0mcqstZuGDKr56LEsn/Gs8UaQ/FmNAyAfF3HNoH57PSKYc
+         WTb2+NLHHWjI3uKhAd/fXZnYAXlSCy7thgjGvt3i5n+QnX20O0SHaMM5VUxr2P+tegGJ
+         KnV3g7SLYb7sNl6SFNw6AOcIj+NxSDE3SFbzjElv30jpiyIM2keg7Ue+SbA301SzJ76X
+         fjsR1WH5sizLnVpUJu1OuJwSUBzI7tOugPXDrgVZ0kMNVEsA1TfTvWDGXtu+XIG7fRMT
+         tTiHEUz2iKjpnTOr5na2OdYLnb8Cq2m7nrDCUtm3JDihDg4uivvb+Hyj6L/HeHPR+NhE
+         sAXA==
+X-Gm-Message-State: AOAM5304xReTUUZcCm9zGOfFcZuBIaJqxhdOsUrilvTgSjJ5oULqk6Wr
+        XRVaFxMjPfLx1N+PpZdL0frd7wQILQeW/w==
+X-Google-Smtp-Source: ABdhPJzs4COBh7IKll7uR58uJBngUFAxQWSDYvrsmjMWQdv4xbgTlO3aPUpH87lLRB6jZPi6Bk7iWg==
+X-Received: by 2002:a50:e8c7:: with SMTP id l7mr1948772edn.356.1606387646564;
+        Thu, 26 Nov 2020 02:47:26 -0800 (PST)
 Received: from jwang-Latitude-5491.fritz.box ([2001:16b8:4961:8400:6960:35a2:747a:e0ad])
-        by smtp.gmail.com with ESMTPSA id f19sm2910053edm.70.2020.11.26.02.47.27
+        by smtp.gmail.com with ESMTPSA id f19sm2910053edm.70.2020.11.26.02.47.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Nov 2020 02:47:28 -0800 (PST)
+        Thu, 26 Nov 2020 02:47:26 -0800 (PST)
 From:   Jack Wang <jinpu.wang@cloud.ionos.com>
 To:     linux-block@vger.kernel.org
 Cc:     axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
         bvanassche@acm.org, danil.kipnis@cloud.ionos.com,
-        Gioh Kim <gi-oh.kim@cloud.ionos.com>
-Subject: [PATCH for-next 4/8] Documentation/ABI/rnbd-clt: session name is appended to the device path
-Date:   Thu, 26 Nov 2020 11:47:19 +0100
-Message-Id: <20201126104723.150674-5-jinpu.wang@cloud.ionos.com>
+        Guoqing Jiang <guoqing.jiang@cloud.ionos.com>,
+        Gioh Kim <gi-oh.kim@cloud.ionos.com>,
+        Md Haris Iqbal <haris.iqbal@cloud.ionos.com>
+Subject: [PATCH for-next 2/8] block/rnbd-clt: support mapping two devices with the same name from different servers
+Date:   Thu, 26 Nov 2020 11:47:17 +0100
+Message-Id: <20201126104723.150674-3-jinpu.wang@cloud.ionos.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20201126104723.150674-1-jinpu.wang@cloud.ionos.com>
 References: <20201126104723.150674-1-jinpu.wang@cloud.ionos.com>
@@ -75,49 +77,102 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Gioh Kim <gi-oh.kim@cloud.ionos.com>
+From: Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
 
-When mapping a device,
-/sys/devices/virtual/rnbd-client/ctl/devices/<device_id> was created.
-But we found out that it had a problem when mapping the same file
-on different servers. So we append the session name after the
-device_id as below.
-/sys/devices/virtual/rnbd-client/ctl/devices/<device_id>@<session_name>
+Previously, we can't map same device name from different sessions
+due to the limitation of sysfs naming mechanism.
 
+root@clt2:~# ls -l /sys/class/rnbd-client/ctl/devices/
+total 0
+lrwxrwxrwx 1 root 0 Sep  2 16:31 !dev!nullb1 -> ../../../block/rnbd0
+
+We only use the device name in above, which caused device with
+the same name can't be mapped from another server. To address
+the issue, the sessname is appended to the node to differentiate
+where the device comes from.
+
+Also, we need to check if the pathname is existed in a specific
+session instead of search it in global sess_list.
+
+Signed-off-by: Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
 Signed-off-by: Gioh Kim <gi-oh.kim@cloud.ionos.com>
+Reviewed-by: Md Haris Iqbal <haris.iqbal@cloud.ionos.com>
 Signed-off-by: Jack Wang <jinpu.wang@cloud.ionos.com>
 ---
- Documentation/ABI/testing/sysfs-class-rnbd-client | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ drivers/block/rnbd/rnbd-clt-sysfs.c |  4 ++++
+ drivers/block/rnbd/rnbd-clt.c       | 13 ++++++++-----
+ 2 files changed, 12 insertions(+), 5 deletions(-)
 
-diff --git a/Documentation/ABI/testing/sysfs-class-rnbd-client b/Documentation/ABI/testing/sysfs-class-rnbd-client
-index ca3267b81886..2aa05b3e348e 100644
---- a/Documentation/ABI/testing/sysfs-class-rnbd-client
-+++ b/Documentation/ABI/testing/sysfs-class-rnbd-client
-@@ -95,12 +95,12 @@ Description:	Expected format is the following::
- 		---------------------------------
+diff --git a/drivers/block/rnbd/rnbd-clt-sysfs.c b/drivers/block/rnbd/rnbd-clt-sysfs.c
+index e7b41ec7cd6a..5d3c3c80dab4 100644
+--- a/drivers/block/rnbd/rnbd-clt-sysfs.c
++++ b/drivers/block/rnbd/rnbd-clt-sysfs.c
+@@ -480,6 +480,10 @@ static int rnbd_clt_get_path_name(struct rnbd_clt_dev *dev, char *buf,
+ 	if (ret >= len)
+ 		return -ENAMETOOLONG;
  
- 		After mapping, the device file can be found by:
--		o  The symlink /sys/class/rnbd-client/ctl/devices/<device_id>
-+		o  The symlink /sys/class/rnbd-client/ctl/devices/<device_id>@<session_name>
- 		points to /sys/block/<dev-name>. The last part of the symlink destination
- 		is the same as the device name.  By extracting the last part of the
- 		path the path to the device /dev/<dev-name> can be build.
++	ret = snprintf(buf, len, "%s@%s", buf, dev->sess->sessname);
++	if (ret >= len)
++		return -ENAMETOOLONG;
++
+ 	return 0;
+ }
  
--		* /dev/block/$(cat /sys/class/rnbd-client/ctl/devices/<device_id>/dev)
-+		* /dev/block/$(cat /sys/class/rnbd-client/ctl/devices/<device_id>@<session_name>/dev)
+diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.c
+index edefa0761a81..1bb495e50931 100644
+--- a/drivers/block/rnbd/rnbd-clt.c
++++ b/drivers/block/rnbd/rnbd-clt.c
+@@ -1410,13 +1410,16 @@ static struct rnbd_clt_dev *init_dev(struct rnbd_clt_session *sess,
+ 	return ERR_PTR(ret);
+ }
  
- 		How to find the <device_id> of the device is described on the next
- 		section.
-@@ -110,7 +110,7 @@ Date:		Feb 2020
- KernelVersion:	5.7
- Contact:	Jack Wang <jinpu.wang@cloud.ionos.com> Danil Kipnis <danil.kipnis@cloud.ionos.com>
- Description:	For each device mapped on the client a new symbolic link is created as
--		/sys/class/rnbd-client/ctl/devices/<device_id>, which points
-+		/sys/class/rnbd-client/ctl/devices/<device_id>@<session_name>, which points
- 		to the block device created by rnbd (/sys/block/rnbd<N>/).
- 		The <device_id> of each device is created as follows:
+-static bool __exists_dev(const char *pathname)
++static bool __exists_dev(const char *pathname, const char *sessname)
+ {
+ 	struct rnbd_clt_session *sess;
+ 	struct rnbd_clt_dev *dev;
+ 	bool found = false;
  
+ 	list_for_each_entry(sess, &sess_list, list) {
++		if (sessname && strncmp(sess->sessname, sessname,
++					sizeof(sess->sessname)))
++			continue;
+ 		mutex_lock(&sess->lock);
+ 		list_for_each_entry(dev, &sess->devs_list, list) {
+ 			if (!strncmp(dev->pathname, pathname,
+@@ -1433,12 +1436,12 @@ static bool __exists_dev(const char *pathname)
+ 	return found;
+ }
+ 
+-static bool exists_devpath(const char *pathname)
++static bool exists_devpath(const char *pathname, const char *sessname)
+ {
+ 	bool found;
+ 
+ 	mutex_lock(&sess_lock);
+-	found = __exists_dev(pathname);
++	found = __exists_dev(pathname, sessname);
+ 	mutex_unlock(&sess_lock);
+ 
+ 	return found;
+@@ -1451,7 +1454,7 @@ static bool insert_dev_if_not_exists_devpath(const char *pathname,
+ 	bool found;
+ 
+ 	mutex_lock(&sess_lock);
+-	found = __exists_dev(pathname);
++	found = __exists_dev(pathname, sess->sessname);
+ 	if (!found) {
+ 		mutex_lock(&sess->lock);
+ 		list_add_tail(&dev->list, &sess->devs_list);
+@@ -1481,7 +1484,7 @@ struct rnbd_clt_dev *rnbd_clt_map_device(const char *sessname,
+ 	struct rnbd_clt_dev *dev;
+ 	int ret;
+ 
+-	if (exists_devpath(pathname))
++	if (unlikely(exists_devpath(pathname, sessname)))
+ 		return ERR_PTR(-EEXIST);
+ 
+ 	sess = find_and_get_or_create_sess(sessname, paths, path_cnt, port_nr);
 -- 
 2.25.1
 
