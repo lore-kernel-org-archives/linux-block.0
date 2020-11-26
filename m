@@ -2,112 +2,71 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46159C56201
-	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 03:22:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20209C63798
+	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 03:53:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DC3F120578
-	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 03:22:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b="MJHv2k+G"
+	by mail.kernel.org (Postfix) with ESMTP id B95D821741
+	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 03:53:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733296AbgKZDWz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 Nov 2020 22:22:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47628 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731106AbgKZDWz (ORCPT
+        id S2387515AbgKZDxf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 Nov 2020 22:53:35 -0500
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:44553 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730187AbgKZDxf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Nov 2020 22:22:55 -0500
-Received: from ozlabs.org (ozlabs.org [IPv6:2401:3900:2:1::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D32A9C0613D4;
-        Wed, 25 Nov 2020 19:22:54 -0800 (PST)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4ChNP64Xkcz9sVH;
-        Thu, 26 Nov 2020 14:22:50 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ellerman.id.au;
-        s=201909; t=1606360970;
-        bh=VD5TisT5ZeXiMTVV+mDfjwYZ697RK3H5XI2Uko5WKkQ=;
-        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-        b=MJHv2k+GKeIIexh6flzGS3pN64+Ne0G3xu1HEQevZlgqQAYfBoy6718zQWX00aK6k
-         +VKWdlRnCxwm9B1iUBocNkhxMSi7ZSTovQiwl/GD4NfNZpE1Mg6ntG0Lc1WrYo5/79
-         AWMeJ9mSdvIRqmbHCouDkIny1coi3HxENAksR+LmNkUoI2w8bKKQv+EX41YgCnoDJ9
-         0RMWQsRAcP3PeCyg4fzzcJeMAukIJXu549Ea3ttEjdngP6X5CDFnNSo/BK4rUoW/Ix
-         BPLOtEkITCp7TLQeWV21hmOfeGNGtLRZFwQT9y45O1BPX0bzhk4nany0UxTgeSbA/Y
-         qRMypA7QEjKNA==
-From:   Michael Ellerman <mpe@ellerman.id.au>
-To:     Laurent Vivier <lvivier@redhat.com>, linux-kernel@vger.kernel.org
-Cc:     linux-pci@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Paul Mackerras <paulus@samba.org>, Greg Kurz <groug@kaod.org>,
-        linuxppc-dev@lists.ozlabs.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        linux-block@vger.kernel.org,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Laurent Vivier <lvivier@redhat.com>
-Subject: Re: [PATCH v3 2/2] powerpc/pseries: pass MSI affinity to irq_create_mapping()
-In-Reply-To: <20201125150932.1150619-3-lvivier@redhat.com>
-References: <20201125150932.1150619-1-lvivier@redhat.com> <20201125150932.1150619-3-lvivier@redhat.com>
-Date:   Thu, 26 Nov 2020 14:22:49 +1100
-Message-ID: <87zh34yf7a.fsf@mpe.ellerman.id.au>
+        Wed, 25 Nov 2020 22:53:35 -0500
+Received: by mail-pg1-f193.google.com with SMTP id t3so548882pgi.11
+        for <linux-block@vger.kernel.org>; Wed, 25 Nov 2020 19:53:35 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ldTIy2CMGfYkBOWCGfd3sYGKZiM6s+iN2m8B8BP3BS8=;
+        b=UNZvF/TK/vdBvHRmN5WEqgTPfo8d891D5pxJJkV6Jhn+nnM2yo5Pv7JRkWyWJV5Nv9
+         hP7yTNXceO8StTIE/0HfBqJMAimm+IaASc0hsmuervaNRr9Wn1ZywxSvN7xwUvqBmhRZ
+         SatmpuzsCEeKcmIld0LoiTjmYLQ2w9P/YUKPbVmyxhNzefRAUYJ5vGmXOf25EfEnQtpV
+         IeAsydudV4yhK8R1mEvLZzVZ4uMi+UcqH79HDONYsArGNbcwRdGgWGax4cRtSJlV7yRt
+         6AqYcK2o+ipl4egDvkzen0JNaox4Xw0R7pKUKSdUD3COpsuRBbQ5AYdHddDmqhvZkcC1
+         edeQ==
+X-Gm-Message-State: AOAM530T8/knbZgaPsspHhD8VXtnjssldbV14BBEqkVRfFZnVB9uZJjQ
+        lXt0JqhzdPRYlGRNqGGY0GE=
+X-Google-Smtp-Source: ABdhPJyLA8XaNr/oTGB+7Naxqoreg0cWy9hfHrFFYWJKW+OQl8EfKOp//2Tgn8Vd8XiU+o1q//rlpw==
+X-Received: by 2002:a17:90b:19d2:: with SMTP id nm18mr1310355pjb.159.1606362814679;
+        Wed, 25 Nov 2020 19:53:34 -0800 (PST)
+Received: from [192.168.3.218] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
+        by smtp.gmail.com with ESMTPSA id r14sm3242673pfc.121.2020.11.25.19.53.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 25 Nov 2020 19:53:33 -0800 (PST)
+Subject: Re: [PATCH V2 blktests 1/5] tests/srp/rc: update the ib_srpt module
+ name
+To:     Yi Zhang <yi.zhang@redhat.com>, osandov@osandov.com
+Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        sagi@grimberg.me
+References: <20201125073205.8788-1-yi.zhang@redhat.com>
+ <20201125073205.8788-2-yi.zhang@redhat.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <75116622-4d05-f889-e55c-f253e67988d6@acm.org>
+Date:   Wed, 25 Nov 2020 19:53:31 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.3
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20201125073205.8788-2-yi.zhang@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Laurent Vivier <lvivier@redhat.com> writes:
-> With virtio multiqueue, normally each queue IRQ is mapped to a CPU.
->
-> But since commit 0d9f0a52c8b9f ("virtio_scsi: use virtio IRQ affinity")
-> this is broken on pseries.
->
-> The affinity is correctly computed in msi_desc but this is not applied
-> to the system IRQs.
->
-> It appears the affinity is correctly passed to rtas_setup_msi_irqs() but
-> lost at this point and never passed to irq_domain_alloc_descs()
-> (see commit 06ee6d571f0e ("genirq: Add affinity hint to irq allocation"))
-> because irq_create_mapping() doesn't take an affinity parameter.
->
-> As the previous patch has added the affinity parameter to
-> irq_create_mapping() we can forward the affinity from rtas_setup_msi_irqs()
-> to irq_domain_alloc_descs().
->
-> With this change, the virtqueues are correctly dispatched between the CPUs
-> on pseries.
->
-> BugId: https://bugzilla.redhat.com/show_bug.cgi?id=1702939
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-> Reviewed-by: Greg Kurz <groug@kaod.org>
-> ---
->  arch/powerpc/platforms/pseries/msi.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+On 11/24/20 11:32 PM, Yi Zhang wrote:
+> Fix the ib_srpt module insmod failure as the module in some distros are
+> end with .xz, like bellow on fedora:
+> /lib/modules/$(uname -r)/kernel/drivers/infiniband/ulp/srpt/ib_srpt.ko.xz
 
-Acked-by: Michael Ellerman <mpe@ellerman.id.au>
-
-cheers
-
-> diff --git a/arch/powerpc/platforms/pseries/msi.c b/arch/powerpc/platforms/pseries/msi.c
-> index 133f6adcb39c..b3ac2455faad 100644
-> --- a/arch/powerpc/platforms/pseries/msi.c
-> +++ b/arch/powerpc/platforms/pseries/msi.c
-> @@ -458,7 +458,8 @@ static int rtas_setup_msi_irqs(struct pci_dev *pdev, int nvec_in, int type)
->  			return hwirq;
->  		}
->  
-> -		virq = irq_create_mapping(NULL, hwirq);
-> +		virq = irq_create_mapping_affinity(NULL, hwirq,
-> +						   entry->affinity);
->  
->  		if (!virq) {
->  			pr_debug("rtas_msi: Failed mapping hwirq %d\n", hwirq);
-> -- 
-> 2.28.0
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
