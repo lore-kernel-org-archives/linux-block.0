@@ -2,143 +2,121 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 473BDC56201
-	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 02:42:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23957C56201
+	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 02:47:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DF2C0207BC
-	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 02:42:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8830121534
+	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 02:47:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="C9NGNvY4"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c9NH8Gjq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732733AbgKZCm0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 Nov 2020 21:42:26 -0500
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:20535 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730809AbgKZCm0 (ORCPT
+        id S1729472AbgKZCrP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 Nov 2020 21:47:15 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31519 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729649AbgKZCrP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Nov 2020 21:42:26 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1606358545; x=1637894545;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=qeI8OkQ2C+8qF4W8aVLYYaL1+taXca5eouvg6P6Gos4=;
-  b=C9NGNvY4oxAOqneMofUiMq1U9I6IQtrXvP9iN0ijY9XWC8/ixHXw/wzC
-   hQqo28JZ+K+kBcxe6VMR9tPW4PXcWoA+gLGpEGUAnVPDoPn16QWv2VTck
-   0MGBfKa1OOXT2nJt3+eD6VO6vxTMHAxb4rLkGpCGYumQBeU/XoSEqwj6x
-   fIe6G3zRkHfU0JG/wRbr58IbJAaz297Ye8PqYGnqWHvc3EG/rHioNFQB5
-   VkBhcJaNwPr6OjF8OuSa6cuyF3nu1I+qtXy7Rt3+xpCtFsV3G8m2BT+ak
-   8aQraRnN9yq+WmwzL5ry91ZM9V+S4JUJk666VxfpaT8GQ55EXoK1ETl3P
-   g==;
-IronPort-SDR: q2UqC5cQ3xDHhO12p+14N+GxzOyF1rsDDt25fD6s4kmDad4u2X14j/Rl4xnHawNiTOQ8BSp3sI
- 7/IOfHLVWcJbEn+f9mIPj015KeIqXimsaQiAkoLn+yLWB+XoYYcCgzVxjpVONoCv++CapFX7eV
- kJ79Qk5DzH3jkoXFnhu8ba1t4Mauc4rvhJBmIrc+vEvUS3AlAiRSE9u35kBXGJDfyl0i15CrZJ
- bkBbXrdpL373wYRgL4+vSnacGgsdgh+K2DnJalqlLkfEeAWMaWdJNFWwZjbu1rgBbKKrwFvVdx
- FF8=
-X-IronPort-AV: E=Sophos;i="5.78,370,1599494400"; 
-   d="scan'208";a="157983172"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 26 Nov 2020 10:42:25 +0800
-IronPort-SDR: /unS0tfmQLgVGbpAkBDKfNn2JHtTfqOKwMUlqgGPbavBawHTUJIK0PrpLUmc7+6q36YwpXJORt
- ZPqNPSuPBc51p+kF6G7CjoCV4j9hDO7WU=
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2020 18:28:07 -0800
-IronPort-SDR: /qUJeynUYlB2tGsiF3eBwSQA1RSvV7doTJnStkhrjI95IQtpqlEChvvEj3rYMPFM5RSRvHvUXK
- lx5jkLdKAkhQ==
-WDCIronportException: Internal
-Received: from vm.labspan.wdc.com (HELO vm.sc.wdc.com) ([10.6.137.102])
-  by uls-op-cesaip02.wdc.com with ESMTP; 25 Nov 2020 18:42:25 -0800
-From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-To:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Cc:     sagi@grimberg.me, hch@lst.de,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [PATCH 9/9] nvmet: add ZNS based I/O cmds handlers
-Date:   Wed, 25 Nov 2020 18:40:43 -0800
-Message-Id: <20201126024043.3392-10-chaitanya.kulkarni@wdc.com>
-X-Mailer: git-send-email 2.22.1
-In-Reply-To: <20201126024043.3392-1-chaitanya.kulkarni@wdc.com>
-References: <20201126024043.3392-1-chaitanya.kulkarni@wdc.com>
+        Wed, 25 Nov 2020 21:47:15 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1606358833;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=4sR99PB2o0qcECDBVCtOM3GDdGKKTrzR/ArpxanzOp0=;
+        b=c9NH8GjqK61/HLvsy9oHS7MRoXxa6OGeahuV/EiescGOR4EfcHNnrP1bwcISoawl4oD+jS
+        DEKfleX6Il5kQvl/hjdlVg8TNvY003eiaGBlgbpn0bcGSekeEEAddZRqZFQcA2vq19KjYg
+        zRWRki8A0DUxXHtKINuxTJBMHBlnvO4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-465-QyPpSyXXPkycPD4IlZNo3w-1; Wed, 25 Nov 2020 21:47:11 -0500
+X-MC-Unique: QyPpSyXXPkycPD4IlZNo3w-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 789C71005E5B;
+        Thu, 26 Nov 2020 02:47:10 +0000 (UTC)
+Received: from T590 (ovpn-13-94.pek2.redhat.com [10.72.13.94])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 49C3510023B2;
+        Thu, 26 Nov 2020 02:47:02 +0000 (UTC)
+Date:   Thu, 26 Nov 2020 10:46:58 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Pavel Begunkov <asml.silence@gmail.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Omar Sandoval <osandov@osandov.com>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 2/4] sbitmap: remove swap_lock
+Message-ID: <20201126024658.GA42718@T590>
+References: <cover.1606058975.git.asml.silence@gmail.com>
+ <488177c02dccda60c5e8af2e53156c42b7f1acc0.1606058975.git.asml.silence@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <488177c02dccda60c5e8af2e53156c42b7f1acc0.1606058975.git.asml.silence@gmail.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add zone-mgmt-send, zone-mgmt-recv and zone-zppend handlers for the
-bdev backend so that it can support zbd.
+On Sun, Nov 22, 2020 at 03:35:46PM +0000, Pavel Begunkov wrote:
+> map->swap_lock protects map->cleared from concurrent modification,
+> however sbitmap_deferred_clear() is already atomically drains it, so
+> it's guaranteed to not loose bits on concurrent
+> sbitmap_deferred_clear().
+> 
+> A one threaded tag heavy test on top of nullbk showed ~1.5% t-put
+> increase, and 3% -> 1% cycle reduction of sbitmap_get() according to perf.
+> 
+> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+> ---
+>  include/linux/sbitmap.h |  5 -----
+>  lib/sbitmap.c           | 14 +++-----------
+>  2 files changed, 3 insertions(+), 16 deletions(-)
+> 
+> diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
+> index e40d019c3d9d..74cc6384715e 100644
+> --- a/include/linux/sbitmap.h
+> +++ b/include/linux/sbitmap.h
+> @@ -32,11 +32,6 @@ struct sbitmap_word {
+>  	 * @cleared: word holding cleared bits
+>  	 */
+>  	unsigned long cleared ____cacheline_aligned_in_smp;
+> -
+> -	/**
+> -	 * @swap_lock: Held while swapping word <-> cleared
+> -	 */
+> -	spinlock_t swap_lock;
+>  } ____cacheline_aligned_in_smp;
+>  
+>  /**
+> diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+> index c1c8a4e69325..4fd877048ba8 100644
+> --- a/lib/sbitmap.c
+> +++ b/lib/sbitmap.c
+> @@ -15,13 +15,9 @@
+>  static inline bool sbitmap_deferred_clear(struct sbitmap_word *map)
+>  {
+>  	unsigned long mask, val;
+> -	bool ret = false;
+> -	unsigned long flags;
+>  
+> -	spin_lock_irqsave(&map->swap_lock, flags);
+> -
+> -	if (!map->cleared)
+> -		goto out_unlock;
+> +	if (!READ_ONCE(map->cleared))
+> +		return false;
 
-Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
----
- drivers/nvme/target/Makefile      | 3 +--
- drivers/nvme/target/io-cmd-bdev.c | 9 +++++++++
- drivers/nvme/target/zns.c         | 6 +++---
- 3 files changed, 13 insertions(+), 5 deletions(-)
+This way might break sbitmap_find_bit_in_index()/sbitmap_get_shallow().
+Currently if sbitmap_deferred_clear() returns false, it means nothing
+can be allocated from this word. With this patch, even though 'false'
+is returned, free bits still might be available because another
+sbitmap_deferred_clear() can be run concurrently.
 
-diff --git a/drivers/nvme/target/Makefile b/drivers/nvme/target/Makefile
-index bc147ff2df5d..15307b1cc713 100644
---- a/drivers/nvme/target/Makefile
-+++ b/drivers/nvme/target/Makefile
-@@ -10,9 +10,8 @@ obj-$(CONFIG_NVME_TARGET_FCLOOP)	+= nvme-fcloop.o
- obj-$(CONFIG_NVME_TARGET_TCP)		+= nvmet-tcp.o
- 
- nvmet-y		+= core.o configfs.o admin-cmd.o fabrics-cmd.o \
--			discovery.o io-cmd-file.o io-cmd-bdev.o
-+		   zns.o discovery.o io-cmd-file.o io-cmd-bdev.o
- nvmet-$(CONFIG_NVME_TARGET_PASSTHRU)	+= passthru.o
--nvmet-$(CONFIG_BLK_DEV_ZONED)		+= zns.o
- 
- nvme-loop-y	+= loop.o
- nvmet-rdma-y	+= rdma.o
-diff --git a/drivers/nvme/target/io-cmd-bdev.c b/drivers/nvme/target/io-cmd-bdev.c
-index f8a500983abd..4fcc8374b857 100644
---- a/drivers/nvme/target/io-cmd-bdev.c
-+++ b/drivers/nvme/target/io-cmd-bdev.c
-@@ -453,6 +453,15 @@ u16 nvmet_bdev_parse_io_cmd(struct nvmet_req *req)
- 	case nvme_cmd_write_zeroes:
- 		req->execute = nvmet_bdev_execute_write_zeroes;
- 		return 0;
-+	case nvme_cmd_zone_append:
-+		req->execute = nvmet_bdev_execute_zone_append;
-+		return 0;
-+	case nvme_cmd_zone_mgmt_recv:
-+		req->execute = nvmet_bdev_execute_zone_mgmt_recv;
-+		return 0;
-+	case nvme_cmd_zone_mgmt_send:
-+		req->execute = nvmet_bdev_execute_zone_mgmt_send;
-+		return 0;
- 	default:
- 		pr_err("unhandled cmd %d on qid %d\n", cmd->common.opcode,
- 		       req->sq->qid);
-diff --git a/drivers/nvme/target/zns.c b/drivers/nvme/target/zns.c
-index 8ea6641a55e3..efd11d7a6f96 100644
---- a/drivers/nvme/target/zns.c
-+++ b/drivers/nvme/target/zns.c
-@@ -361,17 +361,17 @@ void nvmet_bdev_execute_zone_append(struct nvmet_req *req)
- }
- 
- #else  /* CONFIG_BLK_DEV_ZONED */
--static void nvmet_execute_identify_cns_cs_ctrl(struct nvmet_req *req)
-+void nvmet_execute_identify_cns_cs_ctrl(struct nvmet_req *req)
- {
- }
--static void nvmet_execute_identify_cns_cs_ns(struct nvmet_req *req)
-+void nvmet_execute_identify_cns_cs_ns(struct nvmet_req *req)
- {
- }
- u16 nvmet_process_zns_cis(struct nvmet_req *req, off_t *off)
- {
- 	return 0;
- }
--static bool nvmet_bdev_zns_config(struct nvmet_ns *ns)
-+bool nvmet_bdev_zns_config(struct nvmet_ns *ns)
- {
- 	return false;
- }
--- 
-2.22.1
+Thanks,
+Ming
 
