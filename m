@@ -4,40 +4,40 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD334C64E7C
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A5FAC83016
 	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 13:07:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7D7E821D7E
+	by mail.kernel.org (Postfix) with ESMTP id 453A421D46
 	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 13:07:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ZWV6LH7G"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="uN61mQej"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389891AbgKZNG6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 26 Nov 2020 08:06:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53040 "EHLO
+        id S2389883AbgKZNG4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 26 Nov 2020 08:06:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53024 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389873AbgKZNG5 (ORCPT
+        with ESMTP id S2389877AbgKZNGx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Nov 2020 08:06:57 -0500
+        Thu, 26 Nov 2020 08:06:53 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CD5FC0617A7;
-        Thu, 26 Nov 2020 05:06:57 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E517C0617A7;
+        Thu, 26 Nov 2020 05:06:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=1+4fu59prkKRojykQDqvT3W9Bijlh50O/kXwJOb/aME=; b=ZWV6LH7GEdGqHLvLjkur8QuLUx
-        6DTPcwjuwJwmTtqZBu17E9jYrMVvxknLW/h+G1f1+n7ZI3yB9ZIeIDK3oJkM2YeI7jAGd6/2dQ+EN
-        o2hfHA9TQoFx8zvOjztvNVjPx8GWsFxbIJ2lME0gDljvC6aMUkmfZkzZ2SzYY0POT+9s5Jca+rlHS
-        TEqycrmW8t5TROrwUU1cPNQzGaOHm+WRr+1fhUPIPUd9mr1Su4PKLUCx3jKFiq1zOUOsViqGD1OEm
-        Ldun6cMM/WOhBDyiLooximthVpA4fFxT3jvk9QO7EJKAzSi5eeqgmzN1UBtCj90T8twk1411PaHhx
-        naQFEDJg==;
+        bh=+3Kb0CPHjQKc56gAmIDHWkQuyu6q4iSqt8pD+2xghiw=; b=uN61mQejGeXhV5FPb/d19U9Y+u
+        9E3n3bnvILuXyqNkw0ApTVh1F6eBkqYWzyj9E8SBSFzqzBseWKO18KNgZaLVGeJfPJVXXVadSdiFs
+        DaE8MWHXtxnV4eqtuEGudkSzVR0AaSDdvx3drCaFQrMVvRnTrmBKNDD305FuxMlujTGdjwVmg+qmx
+        VJ4zoA80XvSM8tD9XTcWP2rCsGS9ijD/1+QuAEcKpGK80Kp1/k4RtDMCfBTfCmnBda4BNczBb06qo
+        q2uJXC+OeS9L1MVBcd8mnPQwr3qRcdeQE1Hf0g0CQZQrnU5dEENmkbH+yYp8ls2p6ggd0vflpriKY
+        45hPEOJw==;
 Received: from [2001:4bb8:18c:1dd6:27b8:b8a1:c13e:ceb1] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kiGz1-0003yN-95; Thu, 26 Nov 2020 13:06:47 +0000
+        id 1kiGyv-0003wd-3V; Thu, 26 Nov 2020 13:06:41 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
@@ -49,9 +49,9 @@ Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
         linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
         linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
         linux-mm@kvack.org
-Subject: [PATCH 10/44] block: remove a duplicate __disk_get_part prototype
-Date:   Thu, 26 Nov 2020 14:03:48 +0100
-Message-Id: <20201126130422.92945-11-hch@lst.de>
+Subject: [PATCH 05/44] mtip32xx: remove the call to fsync_bdev on removal
+Date:   Thu, 26 Nov 2020 14:03:43 +0100
+Message-Id: <20201126130422.92945-6-hch@lst.de>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201126130422.92945-1-hch@lst.de>
 References: <20201126130422.92945-1-hch@lst.de>
@@ -62,27 +62,76 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Acked-by: Tejun Heo <tj@kernel.org>
-Reviewed-by: Jan Kara <jack@suse.cz>
-Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
----
- include/linux/genhd.h | 1 -
- 1 file changed, 1 deletion(-)
+del_gendisk already calls fsync_bdev for every partition, no need
+to do this twice.
 
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index 46553d6d602563..22f5b9fd96f8bf 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -250,7 +250,6 @@ static inline dev_t part_devt(struct hd_struct *part)
- 	return part_to_dev(part)->devt;
- }
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Jan Kara <jack@suse.cz>
+---
+ drivers/block/mtip32xx/mtip32xx.c | 15 ---------------
+ drivers/block/mtip32xx/mtip32xx.h |  2 --
+ 2 files changed, 17 deletions(-)
+
+diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
+index 153e2cdecb4d40..53ac59d19ae530 100644
+--- a/drivers/block/mtip32xx/mtip32xx.c
++++ b/drivers/block/mtip32xx/mtip32xx.c
+@@ -3687,7 +3687,6 @@ static int mtip_block_initialize(struct driver_data *dd)
+ 	/* Enable the block device and add it to /dev */
+ 	device_add_disk(&dd->pdev->dev, dd->disk, NULL);
  
--extern struct hd_struct *__disk_get_part(struct gendisk *disk, int partno);
- extern struct hd_struct *disk_get_part(struct gendisk *disk, int partno);
+-	dd->bdev = bdget_disk(dd->disk, 0);
+ 	/*
+ 	 * Now that the disk is active, initialize any sysfs attributes
+ 	 * managed by the protocol layer.
+@@ -3721,9 +3720,6 @@ static int mtip_block_initialize(struct driver_data *dd)
+ 	return rv;
  
- static inline void disk_put_part(struct hd_struct *part)
+ kthread_run_error:
+-	bdput(dd->bdev);
+-	dd->bdev = NULL;
+-
+ 	/* Delete our gendisk. This also removes the device from /dev */
+ 	del_gendisk(dd->disk);
+ 
+@@ -3804,14 +3800,6 @@ static int mtip_block_remove(struct driver_data *dd)
+ 	blk_mq_tagset_busy_iter(&dd->tags, mtip_no_dev_cleanup, dd);
+ 	blk_mq_unquiesce_queue(dd->queue);
+ 
+-	/*
+-	 * Delete our gendisk structure. This also removes the device
+-	 * from /dev
+-	 */
+-	if (dd->bdev) {
+-		bdput(dd->bdev);
+-		dd->bdev = NULL;
+-	}
+ 	if (dd->disk) {
+ 		if (test_bit(MTIP_DDF_INIT_DONE_BIT, &dd->dd_flag))
+ 			del_gendisk(dd->disk);
+@@ -4206,9 +4194,6 @@ static void mtip_pci_remove(struct pci_dev *pdev)
+ 	} while (atomic_read(&dd->irq_workers_active) != 0 &&
+ 		time_before(jiffies, to));
+ 
+-	if (!dd->sr)
+-		fsync_bdev(dd->bdev);
+-
+ 	if (atomic_read(&dd->irq_workers_active) != 0) {
+ 		dev_warn(&dd->pdev->dev,
+ 			"Completion workers still active!\n");
+diff --git a/drivers/block/mtip32xx/mtip32xx.h b/drivers/block/mtip32xx/mtip32xx.h
+index e22a7f0523bf30..88f4206310e4c8 100644
+--- a/drivers/block/mtip32xx/mtip32xx.h
++++ b/drivers/block/mtip32xx/mtip32xx.h
+@@ -463,8 +463,6 @@ struct driver_data {
+ 
+ 	int isr_binding;
+ 
+-	struct block_device *bdev;
+-
+ 	struct list_head online_list; /* linkage for online list */
+ 
+ 	struct list_head remove_list; /* linkage for removing list */
 -- 
 2.29.2
 
