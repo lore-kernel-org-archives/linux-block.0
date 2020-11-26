@@ -2,87 +2,96 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 045D5C63777
-	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 03:59:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05BBBC56202
+	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 06:16:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A6E3F21741
-	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 03:59:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9471520770
+	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 06:16:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aYusROjX"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730727AbgKZD7h (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 Nov 2020 22:59:37 -0500
-Received: from mail-pf1-f181.google.com ([209.85.210.181]:40913 "EHLO
-        mail-pf1-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730187AbgKZD7h (ORCPT
+        id S2387851AbgKZGQ2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 26 Nov 2020 01:16:28 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:25580 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1732249AbgKZGQ2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 Nov 2020 22:59:37 -0500
-Received: by mail-pf1-f181.google.com with SMTP id b6so439518pfp.7
-        for <linux-block@vger.kernel.org>; Wed, 25 Nov 2020 19:59:37 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=5yglJxjwYOkl0rNuyQ29ZKEbLkJAv4ilYSu4c1LwI5M=;
-        b=hPK8cMxG5v4TfNPwNnFhEo5rAr3WD5RLY7H+199Wd+7IAZnP9OCUTrhvFnz03t0DvC
-         qg8/i+OO6/xKL3mr1YI3ZaiD4KeCbRurLFhiXk6dEWC7kQpmc+9qkeQdTJEjCNdKkQm8
-         aUz5ftu4+/f0Ln/riiah1AnXaPtj/giqGOMvoD9YjP0zzY920Y1u0rniuJeLdUl2WMLA
-         qG9UoyPpn8gxcmrWesgc/LvcYvbYPV8d7xXk/zw7dsU9NYehpQsJjAaoj3K9o3f8qfXw
-         2mgxs0DNDEWYYO9n4b3jYG0E88XP9Sad2ZTypsrP+KGU8TmnxvFJmv146al/2WsKx4Gb
-         V+qA==
-X-Gm-Message-State: AOAM532aFbwSIGXsQmtHnywgK/MitDOPU1wkrJRQWPcZP3s6JQtxDmDS
-        QaGGLfwORyWqIiDYdj0lvTk=
-X-Google-Smtp-Source: ABdhPJxpgwOGNcDQAEnCwGBJTqqjuuhBy4zFzcRG7KVa+kViVTwxo0EVr9fizGOA4Osvddcx9MtNHw==
-X-Received: by 2002:a17:90a:f994:: with SMTP id cq20mr1280074pjb.62.1606363177065;
-        Wed, 25 Nov 2020 19:59:37 -0800 (PST)
-Received: from [192.168.3.218] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
-        by smtp.gmail.com with ESMTPSA id v18sm3019913pfn.35.2020.11.25.19.59.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 25 Nov 2020 19:59:36 -0800 (PST)
+        Thu, 26 Nov 2020 01:16:28 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1606371387;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=opxi3+VknEuLnVn5NroXrsP9PLuEVvPNB505Ha74F2s=;
+        b=aYusROjXx0GUp9ZjTw+plBpEowOxPp7mVsLQJK0cG70nXmLCr8tv9bIiJLS0kLAZe44ynw
+        L/89VJLprYtV6UmmCHqs/+rSAyfbujAd1qWjcYOjThFYU+k5HR0zUsYwx34Jz+ociW5zrr
+        CkeXM4J7JC3UXeFH2piQUl01tZE+elI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-460-jhog46PbOmmLzZNNaQPcNA-1; Thu, 26 Nov 2020 01:16:25 -0500
+X-MC-Unique: jhog46PbOmmLzZNNaQPcNA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C238110066FB;
+        Thu, 26 Nov 2020 06:16:23 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-12-67.pek2.redhat.com [10.72.12.67])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id C650960636;
+        Thu, 26 Nov 2020 06:16:21 +0000 (UTC)
 Subject: Re: [PATCH V2 blktests 3/5] nvmeof-mp/012, srp/012: fix the scheduler
  list
-To:     Yi Zhang <yi.zhang@redhat.com>, osandov@osandov.com
+To:     Bart Van Assche <bvanassche@acm.org>, osandov@osandov.com
 Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
         sagi@grimberg.me
 References: <20201125073205.8788-1-yi.zhang@redhat.com>
  <20201125073205.8788-4-yi.zhang@redhat.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <7fb6260a-4e3d-f023-7471-266188771f39@acm.org>
-Date:   Wed, 25 Nov 2020 19:59:34 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.3
+ <7fb6260a-4e3d-f023-7471-266188771f39@acm.org>
+From:   Yi Zhang <yi.zhang@redhat.com>
+Message-ID: <86f0b36c-b484-ee4e-26cd-d5dde35a46eb@redhat.com>
+Date:   Thu, 26 Nov 2020 14:16:18 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <20201125073205.8788-4-yi.zhang@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <7fb6260a-4e3d-f023-7471-266188771f39@acm.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/24/20 11:32 PM, Yi Zhang wrote:
-> +# Get block dev scheduler list
-> +get_scheduler_list() {
-> +	local b=$1 p
-> +	p=/sys/block/"$b"/queue/scheduler
-> +	if [ -e "$p" ]; then
-> +		scheds=$(sed 's/[][]//g' /sys/block/"$b"/queue/scheduler)
-> +		echo "$scheds"
-> +	else
-> +		return 1
-> +	fi
-> +}
 
-Can the echo statement and the 'scheds' assignment be left out? This is
-what I have in mind:
 
-	sed 's/[][]//g' /sys/block/"$b"/queue/scheduler
+On 11/26/20 11:59 AM, Bart Van Assche wrote:
+> On 11/24/20 11:32 PM, Yi Zhang wrote:
+>> +# Get block dev scheduler list
+>> +get_scheduler_list() {
+>> +	local b=$1 p
+>> +	p=/sys/block/"$b"/queue/scheduler
+>> +	if [ -e "$p" ]; then
+>> +		scheds=$(sed 's/[][]//g' /sys/block/"$b"/queue/scheduler)
+>> +		echo "$scheds"
+>> +	else
+>> +		return 1
+>> +	fi
+>> +}
+> Can the echo statement and the 'scheds' assignment be left out? This is
+> what I have in mind:
+Sure, will update with V3.
 
-Otherwise this patch looks good to me.
+> 	sed 's/[][]//g' /sys/block/"$b"/queue/scheduler
+>
+> Otherwise this patch looks good to me.
+>
+> Thanks,
+>
+> Bart.
+>
 
-Thanks,
-
-Bart.
