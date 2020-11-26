@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08EF6C64E90
-	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 13:07:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81FF3C63697
+	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 13:07:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9CFCE221F1
-	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 13:07:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4688D21D7E
+	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 13:07:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="WipNHSiT"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="VzUQYe4P"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389895AbgKZNG6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 26 Nov 2020 08:06:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53042 "EHLO
+        id S2389900AbgKZNHF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 26 Nov 2020 08:07:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53070 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388748AbgKZNG5 (ORCPT
+        with ESMTP id S2389756AbgKZNHF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Nov 2020 08:06:57 -0500
+        Thu, 26 Nov 2020 08:07:05 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CE7FC0613D4;
-        Thu, 26 Nov 2020 05:06:57 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DCC3C0613D4;
+        Thu, 26 Nov 2020 05:07:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=qLuO7hD0TG0p9aylN+kHqBJxf5z3v4FVxxZ2M17hRmY=; b=WipNHSiTxaCf/i02olOf7S3b9k
-        7tumqyBklwAOPoXqVFvK7+2BEqr7y+sx5mtON0mAzzW3MNkz4zrs+oOdvLTnVFxaaiMonNJfLIy8Q
-        mg8VT4WS4Ip5pd4gfxLpdNLWZoV6OX52On+8eE2jJEIcq7Cp7fEZVK3+QcKPIzI836DMs1oSmZ5mn
-        CI/Pdisi9YSbIPpv0OjyO44mtEppEv4VK/NnydCG5MxTm7rW/g9HPg4FdYgn79eOrdDjUnC2veigu
-        rt+xk0G2+KPdni2kRxB8tq3rtjl7wPFlb2kyTIaT/RrtRyhEAMkAYShxe7iJog3pPC+knYv7531E4
-        QzH7l/gQ==;
+        bh=cCnViX+7xYhlWEzFMVB617+yZ+N1oSjUspGr9itxVFQ=; b=VzUQYe4PCSUVBLjyrp4E9LCtQJ
+        XWkIY4HP4CkDFngCBsYLu53aQQmNRsKryD/8/xId8wZEza5fOchC/fad7N9a4c+Ha/D9sFEms7488
+        vkQLzYPfbMTG05cyhFSEunx8YiD3qGcvShoR4Bx52A+/X0uCfLp9LnYvQFHOYY8MIxPs9eFjRpDxD
+        mIW+cwivF+3AuHdm2iQ8pArJ1hwFCl40zEDaCcYrKEAULepbkyCd0rxu6DxVGTXiNb/v7L9hkggQy
+        hkAdpKbQPAaKr0ezNuxpGLVioHZJ2rdtKUOz24YVjFqt2ucmLwf2R95JzwyXHHvyBaNJznmIfXECV
+        ivBrU1cg==;
 Received: from [2001:4bb8:18c:1dd6:27b8:b8a1:c13e:ceb1] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kiGyz-0003y8-VM; Thu, 26 Nov 2020 13:06:46 +0000
+        id 1kiGz7-00040B-5z; Thu, 26 Nov 2020 13:06:53 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
@@ -49,9 +49,9 @@ Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
         linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
         linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
         linux-mm@kvack.org
-Subject: [PATCH 09/44] dm: remove the block_device reference in struct mapped_device
-Date:   Thu, 26 Nov 2020 14:03:47 +0100
-Message-Id: <20201126130422.92945-10-hch@lst.de>
+Subject: [PATCH 14/44] block: use put_device in put_disk
+Date:   Thu, 26 Nov 2020 14:03:52 +0100
+Message-Id: <20201126130422.92945-15-hch@lst.de>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201126130422.92945-1-hch@lst.de>
 References: <20201126130422.92945-1-hch@lst.de>
@@ -62,93 +62,30 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Get rid of the long-lasting struct block_device reference in
-struct mapped_device.  The only remaining user is the freeze code,
-where we can trivially look up the block device at freeze time
-and release the reference at thaw time.
+Use put_device to put the device instead of poking into the internals
+and using kobject_put.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
-Acked-by: Mike Snitzer <snitzer@redhat.com>
+Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Reviewed-by: Jan Kara <jack@suse.cz>
+Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Acked-by: Tejun Heo <tj@kernel.org>
 ---
- drivers/md/dm-core.h |  2 --
- drivers/md/dm.c      | 25 ++++++++++++++-----------
- 2 files changed, 14 insertions(+), 13 deletions(-)
+ block/genhd.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/md/dm-core.h b/drivers/md/dm-core.h
-index aace147effcacb..086d293c2b036c 100644
---- a/drivers/md/dm-core.h
-+++ b/drivers/md/dm-core.h
-@@ -102,8 +102,6 @@ struct mapped_device {
- 	/* kobject and completion */
- 	struct dm_kobject_holder kobj_holder;
- 
--	struct block_device *bdev;
--
- 	struct dm_stats stats;
- 
- 	/* for blk-mq request-based DM support */
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index ab0a8335f098d9..48051db006f30c 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -1744,11 +1744,6 @@ static void cleanup_mapped_device(struct mapped_device *md)
- 
- 	cleanup_srcu_struct(&md->io_barrier);
- 
--	if (md->bdev) {
--		bdput(md->bdev);
--		md->bdev = NULL;
--	}
--
- 	mutex_destroy(&md->suspend_lock);
- 	mutex_destroy(&md->type_lock);
- 	mutex_destroy(&md->table_devices_lock);
-@@ -1840,10 +1835,6 @@ static struct mapped_device *alloc_dev(int minor)
- 	if (!md->wq)
- 		goto bad;
- 
--	md->bdev = bdget_disk(md->disk, 0);
--	if (!md->bdev)
--		goto bad;
--
- 	dm_stats_init(&md->stats);
- 
- 	/* Populate the mapping, nobody knows we exist yet */
-@@ -2384,11 +2375,16 @@ struct dm_table *dm_swap_table(struct mapped_device *md, struct dm_table *table)
-  */
- static int lock_fs(struct mapped_device *md)
+diff --git a/block/genhd.c b/block/genhd.c
+index 0bd9c41dd4cb69..f46e89226fdf91 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -1803,7 +1803,7 @@ EXPORT_SYMBOL(__alloc_disk_node);
+ void put_disk(struct gendisk *disk)
  {
-+	struct block_device *bdev;
- 	int r;
- 
- 	WARN_ON(test_bit(DMF_FROZEN, &md->flags));
- 
--	r = freeze_bdev(md->bdev);
-+	bdev = bdget_disk(md->disk, 0);
-+	if (!bdev)
-+		return -ENOMEM;
-+	r = freeze_bdev(bdev);
-+	bdput(bdev);
- 	if (!r)
- 		set_bit(DMF_FROZEN, &md->flags);
- 	return r;
-@@ -2396,9 +2392,16 @@ static int lock_fs(struct mapped_device *md)
- 
- static void unlock_fs(struct mapped_device *md)
- {
-+	struct block_device *bdev;
-+
- 	if (!test_bit(DMF_FROZEN, &md->flags))
- 		return;
--	thaw_bdev(md->bdev);
-+
-+	bdev = bdget_disk(md->disk, 0);
-+	if (!bdev)
-+		return;
-+	thaw_bdev(bdev);
-+	bdput(bdev);
- 	clear_bit(DMF_FROZEN, &md->flags);
+ 	if (disk)
+-		kobject_put(&disk_to_dev(disk)->kobj);
++		put_device(disk_to_dev(disk));
  }
+ EXPORT_SYMBOL(put_disk);
  
 -- 
 2.29.2
