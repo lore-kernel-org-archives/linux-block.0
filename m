@@ -2,208 +2,129 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99414C63798
-	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 16:18:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCA6FC56202
+	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 16:28:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3F5E921D40
-	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 16:18:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UrXDoUgT"
+	by mail.kernel.org (Postfix) with ESMTP id AB38E21D40
+	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 16:28:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391533AbgKZQSa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 26 Nov 2020 11:18:30 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34626 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2391361AbgKZQSa (ORCPT
+        id S2391476AbgKZQ1u (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 26 Nov 2020 11:27:50 -0500
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:45976 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2391309AbgKZQ1t (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Nov 2020 11:18:30 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1606407508;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=IL7sPB68gF1YeWIUFuBJ//YIBDjI3bDL6qHHKubt/Z0=;
-        b=UrXDoUgTxqj1WRS8neld6HV6fanuCB2c0WlpqmfwON3ejDu/FMVt0X7ml3vyqXOkPXTaHP
-        iyzjRcaEhT909GCHvuy4UukfBBVO3DDHbtx6yRTBEFxNxYSd2Xp6GyufOqP8gIVepFFwdR
-        sF5812evLGCZkSl+1M/68FsLiI2eGX4=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-133-jw_PQnswOCKj3Ng8We6Ckw-1; Thu, 26 Nov 2020 11:18:26 -0500
-X-MC-Unique: jw_PQnswOCKj3Ng8We6Ckw-1
-Received: by mail-qt1-f199.google.com with SMTP id f33so1508879qtb.1
-        for <linux-block@vger.kernel.org>; Thu, 26 Nov 2020 08:18:26 -0800 (PST)
+        Thu, 26 Nov 2020 11:27:49 -0500
+Received: by mail-pg1-f196.google.com with SMTP id 62so2068001pgg.12;
+        Thu, 26 Nov 2020 08:27:49 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=IL7sPB68gF1YeWIUFuBJ//YIBDjI3bDL6qHHKubt/Z0=;
-        b=YQHZJJLIMnO4dkHX6WT6Nyb7vlws9cK50+4yIugggJb4UE6vOJYqmEcCQyEQ0hTZ8W
-         IkQYUME8gLykYLPErCQVQ+nPKzXmAOdO63jbLprqYVGmMfNUIEraDP5Fk2jfVZVzib07
-         NZ7DyCLRLMlPQVW9H+AWFgp82ElrK9u1vI4eTbKI0ypLq6jDByxEV0a/DOi7MrRInpYG
-         0DVafNJngGiIYEqgLZBTCL/XZt08308oggQfgmfXEGkrUmLZ2m6hl37/LFDi0Vohtq0W
-         G7diMemXVMC5N+iGWGcQYAMjmo9hrFkrjb3kGn6S/0PkW4cuco8c2CN4sHwMqEn64oG4
-         QEhw==
-X-Gm-Message-State: AOAM532R8RKy7CUkLjIKG14oLut33fChu6ndN2BeMy9Ge6ZnnPS7Mle5
-        FkDzkEcpfVJ+M3QAoXzizuqaML+Vutz3jLNq4o2lCssr1WbM3k5w2YSCIzhBD7ApEBc5EcAlLzi
-        M3EJI2qliBOUFvn01ExHWre92E2Wi+qoXlGwWpew=
-X-Received: by 2002:ac8:4311:: with SMTP id z17mr3773723qtm.90.1606407505975;
-        Thu, 26 Nov 2020 08:18:25 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzCU4CKAolN2PpaYdMoKCHma/+NC3lHjkQkQkRPTWC20j3rANbYTTy+FG9V7n634RRlgf0kcsxPjR4LO+NB5fA=
-X-Received: by 2002:a37:ac8:: with SMTP id 191mr3793888qkk.381.1606407504531;
- Thu, 26 Nov 2020 08:18:24 -0800 (PST)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=fapffKzj5pJupvS4Tasqmky7DVQH81Xk12pbcyyGjoQ=;
+        b=JFj6hZgE65v1ahuwEQHoMmZ4M37s+4+ph9zfuXVfmdewscNFKXSjWlD5VfUOGPtHFp
+         XCcEmG58guiDDDor5t59cMfLaplyHxUnfaRabxgws95ieRXif5/70UBOfFTZEVy85S6T
+         5TZj8d26ubTvoavaPPHjzQN4q7eda9pE5eoRwK2eeCIlreOPqaFgRG/JgMqU5kI1XNS1
+         CHX8uYYAEV+m0Em0mUq/RDm0V45N/P+UeLoOh/YbuKHfj/R9Th2mScOLiMqDAAaXwlpp
+         CnUGG/Na+5E6efyHpc4o1QSEvZX9lUZ7pMDk7T7rMk0fsUTkWKAyhbxqlH4voOk9GjJg
+         nt6g==
+X-Gm-Message-State: AOAM530EEc3bJQ/Fpjj+5A0zasIUspXsttXcoPyzInzJ0QvlX/E2B3sR
+        icATDmWOhrvTgb84p845XyENay/LCf8=
+X-Google-Smtp-Source: ABdhPJx5OzU1RlFxOEdmQV/MP1XUQLo0Hq7A3nnM/02sUsGEsZyR4dnZAuvdjSzYx7FteoaehjK4vw==
+X-Received: by 2002:a63:4950:: with SMTP id y16mr2165485pgk.415.1606408068393;
+        Thu, 26 Nov 2020 08:27:48 -0800 (PST)
+Received: from [192.168.3.218] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
+        by smtp.gmail.com with ESMTPSA id s30sm5012324pgl.39.2020.11.26.08.27.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 26 Nov 2020 08:27:47 -0800 (PST)
+Subject: Re: [PATCH V1] block: Fix use-after-free while iterating over
+ requests
+To:     Pradeep P V K <ppvk@codeaurora.org>, axboe@kernel.dk,
+        linux-block@vger.kernel.org
+Cc:     stummala@codeaurora.org, linux-kernel@vger.kernel.org
+References: <1606402925-24420-1-git-send-email-ppvk@codeaurora.org>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <c94fcada-7f6d-a1e3-4c88-d225af1a676e@acm.org>
+Date:   Thu, 26 Nov 2020 08:27:45 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.0
 MIME-Version: 1.0
-References: <cover.1605896059.git.gustavoars@kernel.org> <20201120105344.4345c14e@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
- <202011201129.B13FDB3C@keescook> <20201120115142.292999b2@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
- <202011220816.8B6591A@keescook> <9b57fd4914b46f38d54087d75e072d6e947cb56d.camel@HansenPartnership.com>
- <CANiq72nZrHWTA4_Msg6MP9snTyenC6-eGfD27CyfNSu7QoVZbw@mail.gmail.com>
- <1c7d7fde126bc0acf825766de64bf2f9b888f216.camel@HansenPartnership.com>
- <CANiq72m22Jb5_+62NnwX8xds2iUdWDMAqD8PZw9cuxdHd95W0A@mail.gmail.com>
- <fc45750b6d0277c401015b7aa11e16cd15f32ab2.camel@HansenPartnership.com>
- <CANiq72k5tpDoDPmJ0ZWc1DGqm+81Gi-uEENAtvEs9v3SZcx6_Q@mail.gmail.com>
- <4993259d01a0064f8bb22770503490f9252f3659.camel@HansenPartnership.com>
- <CANiq72kqO=bYMJnFS2uYRpgWATJ=uXxZuNUsTXT+3aLtrpnzvQ@mail.gmail.com>
- <44005bde-f6d4-5eaa-39b8-1a5efeedb2d3@gmail.com> <CANiq72nobq=ptWK-qWxU91JHqkKhMcRtJNnw2XJd5-vSJWZd8Q@mail.gmail.com>
- <CAMuHMdV5kOakvZJMWLxbpigFPS+Xuw6DVYsWCWZy7wGsv3idcw@mail.gmail.com>
-In-Reply-To: <CAMuHMdV5kOakvZJMWLxbpigFPS+Xuw6DVYsWCWZy7wGsv3idcw@mail.gmail.com>
-From:   Karol Herbst <kherbst@redhat.com>
-Date:   Thu, 26 Nov 2020 17:18:13 +0100
-Message-ID: <CACO55tsBj3gLECoMWtViDitd7fVTnW+Cp0LVmqYkR=QFBJkEmQ@mail.gmail.com>
-Subject: Re: [PATCH 000/141] Fix fall-through warnings for Clang
-To:     Geert Uytterhoeven <geert@linux-m68k.org>
-Cc:     Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
-        ALSA Development Mailing List <alsa-devel@alsa-project.org>,
-        bridge@lists.linux-foundation.org,
-        target-devel <target-devel@vger.kernel.org>,
-        linux-iio@vger.kernel.org,
-        linux-wireless <linux-wireless@vger.kernel.org>,
-        Linux MMC List <linux-mmc@vger.kernel.org>,
-        Linux Fbdev development list <linux-fbdev@vger.kernel.org>,
-        dri-devel <dri-devel@lists.freedesktop.org>,
-        virtualization@lists.linux-foundation.org,
-        James Bottomley <James.Bottomley@hansenpartnership.com>,
-        linux-ide@vger.kernel.org, dm-devel@redhat.com,
-        keyrings@vger.kernel.org,
-        MTD Maling List <linux-mtd@lists.infradead.org>,
-        GR-everest-linux-l2@marvell.com, wcn36xx@lists.infradead.org,
-        linux-i3c@lists.infradead.org,
-        linux1394-devel@lists.sourceforge.net,
-        linux-afs@lists.infradead.org,
-        Lars Ellenberg <drbd-dev@lists.linbit.com>,
-        driverdevel <devel@driverdev.osuosl.org>,
-        linux-cifs@vger.kernel.org, rds-devel@oss.oracle.com,
-        scsi <linux-scsi@vger.kernel.org>,
-        ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
-        linux-rdma <linux-rdma@vger.kernel.org>,
-        oss-drivers@netronome.com, linux-atm-general@lists.sourceforge.net,
-        ceph-devel <ceph-devel@vger.kernel.org>,
-        amd-gfx list <amd-gfx@lists.freedesktop.org>,
-        linux-stm32@st-md-mailman.stormreply.com, cluster-devel@redhat.com,
-        usb-storage@lists.one-eyed-alien.net, coreteam@netfilter.org,
-        intel-wired-lan@lists.osuosl.org,
-        linux-input <linux-input@vger.kernel.org>,
-        Miguel Ojeda <ojeda@kernel.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Ext4 Developers List <linux-ext4@vger.kernel.org>,
-        NetFilter <netfilter-devel@vger.kernel.org>,
-        Linux Media Mailing List <linux-media@vger.kernel.org>,
-        Kees Cook <keescook@chromium.org>, selinux@vger.kernel.org,
-        linux-arm-msm <linux-arm-msm@vger.kernel.org>,
-        Intel Graphics Development <intel-gfx@lists.freedesktop.org>,
-        linux-sctp@vger.kernel.org, reiserfs-devel@vger.kernel.org,
-        linux-geode@lists.infradead.org, linux-block@vger.kernel.org,
-        "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
-        op-tee@lists.trustedfirmware.org,
-        linux-mediatek@lists.infradead.org, xen-devel@lists.xenproject.org,
-        Nouveau Dev <nouveau@lists.freedesktop.org>,
-        linux-hams@vger.kernel.org,
-        Nathan Chancellor <natechancellor@gmail.com>,
-        linux-can@vger.kernel.org,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-hwmon@vger.kernel.org,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Linux Watchdog Mailing List <linux-watchdog@vger.kernel.org>,
-        GR-Linux-NIC-Dev@marvell.com, Linux-MM <linux-mm@kvack.org>,
-        Network Development <netdev@vger.kernel.org>,
-        linux-decnet-user@lists.sourceforge.net,
-        samba-technical@lists.samba.org,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
-        Edward Cree <ecree.xilinx@gmail.com>,
-        linux-security-module <linux-security-module@vger.kernel.org>,
-        USB list <linux-usb@vger.kernel.org>,
-        tipc-discussion@lists.sourceforge.net,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        patches@opensource.cirrus.com, Joe Perches <joe@perches.com>,
-        linux-integrity <linux-integrity@vger.kernel.org>,
-        "open list:NFS, SUNRPC, AND..." <linux-nfs@vger.kernel.org>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        linux-hardening@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <1606402925-24420-1-git-send-email-ppvk@codeaurora.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Nov 26, 2020 at 4:28 PM Geert Uytterhoeven <geert@linux-m68k.org> wrote:
->
-> Hi Miguel,
->
-> On Thu, Nov 26, 2020 at 3:54 PM Miguel Ojeda
-> <miguel.ojeda.sandonis@gmail.com> wrote:
-> > On Wed, Nov 25, 2020 at 11:44 PM Edward Cree <ecree.xilinx@gmail.com> wrote:
-> > > To make the intent clear, you have to first be certain that you
-> > >  understand the intent; otherwise by adding either a break or a
-> > >  fallthrough to suppress the warning you are just destroying the
-> > >  information that "the intent of this code is unknown".
-> >
-> > If you don't know what the intent of your own code is, then you
-> > *already* have a problem in your hands.
->
-> The maintainer is not necessarily the owner/author of the code, and
-> thus may not know the intent of the code.
->
-> > > or does it flag up code
-> > >  that can be mindlessly "fixed" (in which case the warning is
-> > >  worthless)?  Proponents in this thread seem to be trying to
-> > >  have it both ways.
-> >
-> > A warning is not worthless just because you can mindlessly fix it.
-> > There are many counterexamples, e.g. many
-> > checkpatch/lint/lang-format/indentation warnings, functional ones like
-> > the `if (a = b)` warning...
->
-> BTW, you cannot mindlessly fix the latter, as you cannot know if
-> "(a == b)" or "((a = b))" was intended, without understanding the code
-> (and the (possibly unavailable) data sheet, and the hardware, ...).
->
+On 11/26/20 7:02 AM, Pradeep P V K wrote:
+> Observes below crash while accessing (use-after-free) request queue
+> member of struct request.
+> 
+> 191.784789:   <2> Unable to handle kernel paging request at virtual
+> address ffffff81429a4440
+> ...
+> 191.786174:   <2> CPU: 3 PID: 213 Comm: kworker/3:1H Tainted: G S
+> O      5.4.61-qgki-debug-ge45de39 #1
+> ...
+> 191.786226:   <2> Workqueue: kblockd blk_mq_timeout_work
+> 191.786242:   <2> pstate: 20c00005 (nzCv daif +PAN +UAO)
+> 191.786261:   <2> pc : bt_for_each+0x114/0x1a4
+> 191.786274:   <2> lr : bt_for_each+0xe0/0x1a4
+> ...
+> 191.786494:   <2> Call trace:
+> 191.786507:   <2>  bt_for_each+0x114/0x1a4
+> 191.786519:   <2>  blk_mq_queue_tag_busy_iter+0x60/0xd4
+> 191.786532:   <2>  blk_mq_timeout_work+0x54/0xe8
+> 191.786549:   <2>  process_one_work+0x2cc/0x568
+> 191.786562:   <2>  worker_thread+0x28c/0x518
+> 191.786577:   <2>  kthread+0x160/0x170
+> 191.786594:   <2>  ret_from_fork+0x10/0x18
+> 191.786615:   <2> Code: 0b080148 f9404929 f8685921 b4fffe01 (f9400028)
+> 191.786630:   <2> ---[ end trace 0f1f51d79ab3f955 ]---
+> 191.786643:   <2> Kernel panic - not syncing: Fatal exception
+> 
+> Fix this by updating the freed request with NULL.
+> This could avoid accessing the already free request from other
+> contexts while iterating over the requests.
+> 
+> Signed-off-by: Pradeep P V K <ppvk@codeaurora.org>
+> ---
+>  block/blk-mq.c | 1 +
+>  block/blk-mq.h | 1 +
+>  2 files changed, 2 insertions(+)
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 55bcee5..9996cb1 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -492,6 +492,7 @@ static void __blk_mq_free_request(struct request *rq)
+>  
+>  	blk_crypto_free_request(rq);
+>  	blk_pm_mark_last_busy(rq);
+> +	hctx->tags->rqs[rq->tag] = NULL;
+>  	rq->mq_hctx = NULL;
+>  	if (rq->tag != BLK_MQ_NO_TAG)
+>  		blk_mq_put_tag(hctx->tags, ctx, rq->tag);
+> diff --git a/block/blk-mq.h b/block/blk-mq.h
+> index a52703c..8747bf1 100644
+> --- a/block/blk-mq.h
+> +++ b/block/blk-mq.h
+> @@ -224,6 +224,7 @@ static inline int __blk_mq_active_requests(struct blk_mq_hw_ctx *hctx)
+>  static inline void __blk_mq_put_driver_tag(struct blk_mq_hw_ctx *hctx,
+>  					   struct request *rq)
+>  {
+> +	hctx->tags->rqs[rq->tag] = NULL;
+>  	blk_mq_put_tag(hctx->tags, rq->mq_ctx, rq->tag);
+>  	rq->tag = BLK_MQ_NO_TAG;  
 
-to allow assignments in if statements was clearly a mistake and if you
-need outside information to understand the code, your code is the
-issue already.
+Is this perhaps a block driver bug instead of a block layer core bug? If
+this would be a block layer core bug, it would have been reported before.
 
-> P.S. So far I've stayed out of this thread, as I like it if the compiler
->      flags possible mistakes.  After all I was the one fixing new
->      "may be used uninitialized" warnings thrown up by gcc-4.1, until
->      (a bit later than) support for that compiler was removed...
->
-> Gr{oetje,eeting}s,
->
->                         Geert
->
-> --
-> Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
->
-> In personal conversations with technical people, I call myself a hacker. But
-> when I'm talking to journalists I just say "programmer" or something like that.
->                                 -- Linus Torvalds
-> _______________________________________________
-> dri-devel mailing list
-> dri-devel@lists.freedesktop.org
-> https://lists.freedesktop.org/mailman/listinfo/dri-devel
->
-
+Bart.
