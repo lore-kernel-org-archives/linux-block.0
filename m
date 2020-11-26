@@ -4,94 +4,158 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F4094C56202
-	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 16:31:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FD1EC64E7A
+	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 16:33:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BCC22221E2
-	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 16:31:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E1837221EB
+	for <linux-block@archiver.kernel.org>; Thu, 26 Nov 2020 16:33:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390011AbgKZQbb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 26 Nov 2020 11:31:31 -0500
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:46896 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730181AbgKZQba (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Nov 2020 11:31:30 -0500
-Received: by mail-pl1-f196.google.com with SMTP id f5so1352770plj.13
-        for <linux-block@vger.kernel.org>; Thu, 26 Nov 2020 08:31:30 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=sAd42amj9f2C4mx3yl4ovRpJPs9IZ4Qy5bcEqP84rIE=;
-        b=e4tLgKC4AemA3Sa0dyEYPBMjMUjqQP7sF/5oY8DXXQm4O4+wGFy7Ny8PJR/anErmrq
-         fJP6fy4o4058vYiHIamCxRn1h59pvlhChbUl9u1Gd5B22FQrmZbi6lbAm9g6RYErZPPY
-         2KLs8lU0WFDV1kbRpaHB/bYRtFWS2zAeJAGNiFBCAD7DO7FcXUZxPO2/t4IPpmNTOitf
-         pdIwFf3TCs0ZYTGO4isLvww061GQqou3RUWxYtuBv9+DnWRDfAQ3Dx9LXKGWwnMWB2zN
-         wvj6f4YLMuV8eWETir/T5BdQ3Pk6DnNVmQgLH707y1WnzZ6nLN5hTKXZ+ozamemOzqnd
-         Hebw==
-X-Gm-Message-State: AOAM531ukRHS3H1l3AS678fJRL/KlsWOCUEsw/IPTrYcQgONbmcsmLDh
-        tbtbBQVQGBXM+jpXdZ3ElY0=
-X-Google-Smtp-Source: ABdhPJwvA6zWhWW27udzLt0xEIbgV08WY9y94+8iULd9Hs3laDqPTrcBYmuYz6EM5F9CHTBg9JTVxw==
-X-Received: by 2002:a17:902:9a4c:b029:d6:a250:ab9f with SMTP id x12-20020a1709029a4cb02900d6a250ab9fmr3389313plv.20.1606408290007;
-        Thu, 26 Nov 2020 08:31:30 -0800 (PST)
-Received: from [192.168.3.218] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
-        by smtp.gmail.com with ESMTPSA id h70sm5273090pfe.49.2020.11.26.08.31.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 26 Nov 2020 08:31:29 -0800 (PST)
-Subject: Re: [PATCH V3 blktests 5/5] common/multipath-over-rdma: allow to set
- use_siw
-To:     Yi Zhang <yi.zhang@redhat.com>, osandov@osandov.com
-Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        sagi@grimberg.me
-References: <20201126083532.27509-1-yi.zhang@redhat.com>
- <20201126083532.27509-6-yi.zhang@redhat.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <86b955bf-6714-0739-3601-d290db8cf04e@acm.org>
-Date:   Thu, 26 Nov 2020 08:31:27 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.0
+        id S2391347AbgKZQdo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 26 Nov 2020 11:33:44 -0500
+Received: from mx2.suse.de ([195.135.220.15]:44026 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730181AbgKZQdo (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 26 Nov 2020 11:33:44 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 40B53ACC4;
+        Thu, 26 Nov 2020 16:33:42 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id A9A321E10D0; Thu, 26 Nov 2020 17:33:41 +0100 (CET)
+Date:   Thu, 26 Nov 2020 17:33:41 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        Josef Bacik <josef@toxicpanda.com>, Coly Li <colyli@suse.de>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jan Kara <jack@suse.cz>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        dm-devel@redhat.com, Jan Kara <jack@suse.com>,
+        linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: Re: [PATCH 24/44] block: simplify bdev/disk lookup in blkdev_get
+Message-ID: <20201126163341.GL422@quack2.suse.cz>
+References: <20201126130422.92945-1-hch@lst.de>
+ <20201126130422.92945-25-hch@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <20201126083532.27509-6-yi.zhang@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201126130422.92945-25-hch@lst.de>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/26/20 12:35 AM, Yi Zhang wrote:
-> With this change, we can change to use siw for nvme-rdma/nvmeof-mp/srp
-> testing from cmdline:
+On Thu 26-11-20 14:04:02, Christoph Hellwig wrote:
+> To simplify block device lookup and a few other upcoming areas, make sure
+> that we always have a struct block_device available for each disk and
+> each partition, and only find existing block devices in bdget.  The only
+> downside of this is that each device and partition uses a little more
+> memory.  The upside will be that a lot of code can be simplified.
 > 
-> $ use_siw=1 nvme-trtype=rdma ./check nvme/
-> $ use_siw=1 ./check nvmeof-mp/
-> $ use_siw=1 ./check srp/
+> With that all we need to look up the block device is to lookup the inode
+> and do a few sanity checks on the gendisk, instead of the separate lookup
+> for the gendisk.  For blk-cgroup which wants to access a gendisk without
+> opening it, a new blkdev_{get,put}_no_open low-level interface is added
+> to replace the previous get_gendisk use.
 > 
-> Signed-off-by: Yi Zhang <yi.zhang@redhat.com>
-> ---
->  common/multipath-over-rdma | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Note that the change to look up block device directly instead of the two
+> step lookup using struct gendisk causes a subtile change in behavior:
+> accessing a non-existing partition on an existing block device can now
+> cause a call to request_module.  That call is harmless, and in practice
+> no recent system will access these nodes as they aren't created by udev
+> and static /dev/ setups are unusual.
 > 
-> diff --git a/common/multipath-over-rdma b/common/multipath-over-rdma
-> index ba6fa0d..b12dec3 100644
-> --- a/common/multipath-over-rdma
-> +++ b/common/multipath-over-rdma
-> @@ -12,7 +12,7 @@ filesystem_type=ext4
->  fio_aux_path=/tmp/fio-state-files
->  memtotal=$(sed -n 's/^MemTotal:[[:blank:]]*\([0-9]*\)[[:blank:]]*kB$/\1/p' /proc/meminfo)
->  max_ramdisk_size=$((1<<25))
-> -use_siw=
-> +use_siw=${use_siw:-""}
->  ramdisk_size=$((memtotal*(1024/16)))  # in bytes
->  if [ $ramdisk_size -gt $max_ramdisk_size ]; then
->  	ramdisk_size=$max_ramdisk_size
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+I still found some smaller issues (see below) but overall this looks sane
+and also simpler to review due to patch refactoring so thanks for that!
 
+> @@ -1384,7 +1376,7 @@ static int __blkdev_get(struct block_device *bdev, struct gendisk *disk,
+>  			struct block_device *whole = bdget_disk(disk, 0);
+>  
+>  			mutex_lock_nested(&whole->bd_mutex, 1);
+> -			ret = __blkdev_get(whole, disk, 0, mode);
+> +			ret = __blkdev_get(whole, mode);
+>  			if (ret) {
+>  				mutex_unlock(&whole->bd_mutex);
+>  				bdput(whole);
+> @@ -1394,9 +1386,8 @@ static int __blkdev_get(struct block_device *bdev, struct gendisk *disk,
+>  			mutex_unlock(&whole->bd_mutex);
+>  
+>  			bdev->bd_contains = whole;
+> -			bdev->bd_part = disk_get_part(disk, partno);
+> -			if (!(disk->flags & GENHD_FL_UP) ||
+> -			    !bdev->bd_part || !bdev->bd_part->nr_sects) {
+> +			bdev->bd_part = disk_get_part(disk, bdev->bd_partno);
+> +			if (!bdev->bd_part || !bdev->bd_part->nr_sects) {
 
+AFAICT it is still possible that we see !(disk->flags & GENHD_FL_UP) here,
+isn't it? Is it safe to remove because the nr_sects check is already
+equivalent to it? Or something else?
 
+>  				__blkdev_put(whole, mode, 1);
+>  				bdput(whole);
+>  				ret = -ENXIO;
+> @@ -1426,12 +1417,51 @@ static int __blkdev_get(struct block_device *bdev, struct gendisk *disk,
+>  
+>   out_clear:
+>  	disk_put_part(bdev->bd_part);
+> -	bdev->bd_disk = NULL;
+>  	bdev->bd_part = NULL;
+>  	bdev->bd_contains = NULL;
+>  	return ret;
+>  }
+>  
+> +struct block_device *blkdev_get_no_open(dev_t dev)
+> +{
+> +	struct block_device *bdev = bdget(dev);
+> +	struct gendisk *disk;
+
+I think bdget() above needs to be already under bdev_lookup_sem. Otherwise
+disk_to_dev(bdev->bd_disk)->kobj below is a potential use-after-free.
+
+> +
+> +	down_read(&bdev_lookup_sem);
+> +	if (!bdev) {
+> +		up_read(&bdev_lookup_sem);
+> +		blk_request_module(dev);
+> +		down_read(&bdev_lookup_sem);
+> +
+> +		bdev = bdget(dev);
+> +		if (!bdev)
+> +			return NULL;
+
+Here you return with bdev_lookup_sem held.
+
+> +	}
+> +
+> +	disk = bdev->bd_disk;
+> +	if (!kobject_get_unless_zero(&disk_to_dev(disk)->kobj))
+> +		goto bdput;
+> +	if ((disk->flags & (GENHD_FL_UP | GENHD_FL_HIDDEN)) != GENHD_FL_UP)
+> +		goto bdput;
+
+I think here you need to jump to put_disk.
+
+> +	if (!try_module_get(bdev->bd_disk->fops->owner))
+> +		goto put_disk;
+> +	up_read(&bdev_lookup_sem);
+> +	return bdev;
+> +put_disk:
+> +	put_disk(disk);
+> +bdput:
+> +	bdput(bdev);
+> +	up_read(&bdev_lookup_sem);
+> +	return NULL;
+> +}
+
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
