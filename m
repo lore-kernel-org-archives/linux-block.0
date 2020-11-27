@@ -2,110 +2,75 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF5C8C64E7B
-	for <linux-block@archiver.kernel.org>; Fri, 27 Nov 2020 08:40:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D191C71155
+	for <linux-block@archiver.kernel.org>; Fri, 27 Nov 2020 09:41:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7D8AC221FD
-	for <linux-block@archiver.kernel.org>; Fri, 27 Nov 2020 08:40:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F40C121973
+	for <linux-block@archiver.kernel.org>; Fri, 27 Nov 2020 09:41:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729245AbgK0IkS convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 27 Nov 2020 03:40:18 -0500
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:46372 "EHLO
-        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728285AbgK0IkQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 Nov 2020 03:40:16 -0500
-Received: by mail-ot1-f67.google.com with SMTP id z23so365706oti.13;
-        Fri, 27 Nov 2020 00:40:15 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=/D+lVsFpiig9p8Mfv+F/WnI4wKF69UpUHln9lDG06g4=;
-        b=OvGI2LLkQRzeWnjXwcv4a9BF3RX71atfnHf/Y5PY6fvbrzqqEX7jcrwCldbQv9GLpy
-         D8zvGJGvQkfVFIk5XZZL9N94Cp6BH74eATxdOFbkuFKEWK5MO2m1bbD8Bx/fA1oKbu0s
-         YxNyj4Nc0HH/UMiLlq+7Zb0jlNPKltRbw5EVUXX+KWwtvy7bX2HfLLUegeqtGhAy5BMB
-         uhMFch4Mt8DBUbE8QdRRnOqFJurxqXlEFvwNCleXo6mv+FoAv0R7tEppFQTRBrBAuu7Z
-         GrkK3JfGSBgSfVkYuWbCEag4jO9Lo3QQLVN9o4D/mEfP22YxAussd4m460Shl8n1PwqJ
-         qwYA==
-X-Gm-Message-State: AOAM530sxVPmbTv/r6BVfnK9waIhzZDBNLhgE8HwNbMHY41PfivqOp4e
-        m3r+YB4S/MLDqydQ9bbxBwEI8Qe59Y0sqHqM0Y4=
-X-Google-Smtp-Source: ABdhPJy2I/IdfAm6V2ydZbwLB9NPNLYo9PucEpxX/NL/qzuCx8bfpYwJU7BhpITpgvBGwlFRBVNr8EmnqamS0CIYUsg=
-X-Received: by 2002:a9d:686:: with SMTP id 6mr4709371otx.107.1606466415531;
- Fri, 27 Nov 2020 00:40:15 -0800 (PST)
-MIME-Version: 1.0
-References: <20201126165950.2554997-1-u.kleine-koenig@pengutronix.de> <20201126165950.2554997-2-u.kleine-koenig@pengutronix.de>
-In-Reply-To: <20201126165950.2554997-2-u.kleine-koenig@pengutronix.de>
-From:   Geert Uytterhoeven <geert@linux-m68k.org>
-Date:   Fri, 27 Nov 2020 09:40:04 +0100
-Message-ID: <CAMuHMdW4J0xA6T4AWqZdo1go1kxWqVSSo5JXQpUAM4yWEpDdOw@mail.gmail.com>
-Subject: Re: [PATCH 2/2] powerpc/ps3: make system bus's remove and shutdown
- callbacks return void
-To:     =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= 
-        <u.kleine-koenig@pengutronix.de>
-Cc:     Geoff Levand <geoff@infradead.org>,
-        Jaroslav Kysela <perex@perex.cz>,
-        Takashi Iwai <tiwai@suse.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Jens Axboe <axboe@kernel.dk>, Jim Paris <jim@jtan.com>,
-        Arnd Bergmann <arnd@arndb.de>,
+        id S1729016AbgK0JlO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 27 Nov 2020 04:41:14 -0500
+Received: from verein.lst.de ([213.95.11.211]:37031 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728177AbgK0JlO (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 27 Nov 2020 04:41:14 -0500
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id D046C68B05; Fri, 27 Nov 2020 10:41:09 +0100 (CET)
+Date:   Fri, 27 Nov 2020 10:41:09 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jan Kara <jack@suse.cz>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
+        Coly Li <colyli@suse.de>, Mike Snitzer <snitzer@redhat.com>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        ALSA Development Mailing List <alsa-devel@alsa-project.org>,
-        linux-block@vger.kernel.org, netdev <netdev@vger.kernel.org>,
-        scsi <linux-scsi@vger.kernel.org>,
-        USB list <linux-usb@vger.kernel.org>,
-        DRI Development <dri-devel@lists.freedesktop.org>,
-        Linux Fbdev development list <linux-fbdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        dm-devel@redhat.com, Jan Kara <jack@suse.com>,
+        linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, Chao Yu <yuchao0@huawei.com>
+Subject: Re: [PATCH 29/44] block: remove the nr_sects field in struct
+ hd_struct
+Message-ID: <20201127094109.GB14976@lst.de>
+References: <20201126130422.92945-1-hch@lst.de> <20201126130422.92945-30-hch@lst.de> <20201126165036.GO422@quack2.suse.cz> <20201126175208.GA24843@lst.de> <20201126180408.GB422@quack2.suse.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201126180408.GB422@quack2.suse.cz>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Uwe,
+On Thu, Nov 26, 2020 at 07:04:08PM +0100, Jan Kara wrote:
+> On Thu 26-11-20 18:52:08, Christoph Hellwig wrote:
+> > On Thu, Nov 26, 2020 at 05:50:36PM +0100, Jan Kara wrote:
+> > > > +	if (size == capacity ||
+> > > > +	    (disk->flags & (GENHD_FL_UP | GENHD_FL_HIDDEN)) != GENHD_FL_UP)
+> > > > +		return false;
+> > > > +	pr_info("%s: detected capacity change from %lld to %lld\n",
+> > > > +		disk->disk_name, size, capacity);
+> > > > +	kobject_uevent_env(&disk_to_dev(disk)->kobj, KOBJ_CHANGE, envp);
+> > > 
+> > > I think we don't want to generate resize event for changes from / to 0...
+> > 
+> > Didn't you ask for that in the last round?
+> 
+> I've asked for the message - which you've added :). But the udev event was
+> correct in the previous version IMHO...
 
-On Thu, Nov 26, 2020 at 6:03 PM Uwe Kleine-König
-<u.kleine-koenig@pengutronix.de> wrote:
-> The driver core ignores the return value of struct device_driver::remove
-> because there is only little that can be done. For the shutdown callback
-> it's ps3_system_bus_shutdown() which ignores the return value.
->
-> To simplify the quest to make struct device_driver::remove return void,
-> let struct ps3_system_bus_driver::remove return void, too. All users
-> already unconditionally return 0, this commit makes it obvious that
-> returning an error code is a bad idea and ensures future users behave
-> accordingly.
->
-> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+Note that this version only prints if the gendisk is up.  So any initial
+setup does not see a message.  I think that is a better indicator than
+checking for 0.  Especially as say a remotely triggered change to 0
+is an even worth printing, and except for DRBD all drivers did print
+the message.
 
-Thanks for your patch!
-
-Reviewed-by: Geert Uytterhoeven <geert@linux-m68k.org>
-
-Note that the same can be done for ps3_vuart_port_driver.remove().
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
--- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+> 
+> 								Honza
+> -- 
+> Jan Kara <jack@suse.com>
+> SUSE Labs, CR
+---end quoted text---
