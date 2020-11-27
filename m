@@ -2,132 +2,110 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B547C63697
-	for <linux-block@archiver.kernel.org>; Fri, 27 Nov 2020 02:41:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEEF9C6379D
+	for <linux-block@archiver.kernel.org>; Fri, 27 Nov 2020 08:36:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3D418208CA
-	for <linux-block@archiver.kernel.org>; Fri, 27 Nov 2020 02:41:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hJ07LBPK"
+	by mail.kernel.org (Postfix) with ESMTP id 80CD622226
+	for <linux-block@archiver.kernel.org>; Fri, 27 Nov 2020 08:36:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392238AbgK0ClJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 26 Nov 2020 21:41:09 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24931 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2392216AbgK0ClJ (ORCPT
+        id S1728560AbgK0Ifw convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 27 Nov 2020 03:35:52 -0500
+Received: from mail-ot1-f66.google.com ([209.85.210.66]:37585 "EHLO
+        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728017AbgK0Ifv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 Nov 2020 21:41:09 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1606444867;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=CGuxrkK2iZdB4UEGYj2iQ4NnbaMBbMY85hcPMYR8MBQ=;
-        b=hJ07LBPK6aOMffsSjpk9yNfN2rJ5yqivomKTC6wLsq0yGTDqAXtvAk34j3ics8Rl6SJrR9
-        sPQ5R/aTXogA5wylVerANw4aFt9YHMmIgpWdOcMsO5ZNrPJvatQLqIwz8nXGsWC+hwiFzw
-        4lONryBFrIs6mxBj1n+eXBOyzrw+tos=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-361-kITHRiolM6uqfv8pokK3Vw-1; Thu, 26 Nov 2020 21:41:04 -0500
-X-MC-Unique: kITHRiolM6uqfv8pokK3Vw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AE3738049C3;
-        Fri, 27 Nov 2020 02:41:03 +0000 (UTC)
-Received: from T590 (ovpn-12-114.pek2.redhat.com [10.72.12.114])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1B52B1001281;
-        Fri, 27 Nov 2020 02:40:56 +0000 (UTC)
-Date:   Fri, 27 Nov 2020 10:40:52 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Daniel Wagner <dwagner@suse.de>
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] blk-mq: Make running from the wrong CPU less scary
-Message-ID: <20201127024052.GB126383@T590>
-References: <20201126095152.19151-1-dwagner@suse.de>
+        Fri, 27 Nov 2020 03:35:51 -0500
+Received: by mail-ot1-f66.google.com with SMTP id l36so4045127ota.4;
+        Fri, 27 Nov 2020 00:35:51 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=xh1hHzZVurhLLa9A5bjYyJ5OP5iFGRKbQx8AzvX3xN4=;
+        b=TrbmmJKaYiHM47lTPaVZ/ifjGAlxFFdjyozKu13tvPrqyATJDuVBo+QeeExGVx+2qL
+         U2pUW6r4wk1GpyzRDF91JSkT+Ty7mNFx0za9PXM4rnaa2JsyATNY0bm3bVgN1L/jAajd
+         Pkp4OYnY/oAIE+Ozy0Q5Q+EhQC7Grt6kmo8AxfaxddRgd+gOitHnXQLup79bnDBPjazC
+         4NYwNffpJLf3YrzJukKq5+vwgV1BM+ikrlG1bg09jz8nJC1yjMeTG+KW3rETQKDDhBC5
+         BsJlnfcCwPRmzFe2HfswIVEwJdhyUDHcmaydnlfzPCnyNfS38lTeBRFJU58p7Igw29iR
+         yMjw==
+X-Gm-Message-State: AOAM5323sr9QAacPDNVaHzmhsCT4u7AAj+hSEX26s7UFEomEHSW3XmAy
+        w1QsRDy9uo8Xz+LqGey41Du9n5/yWv19tQzw9cc=
+X-Google-Smtp-Source: ABdhPJxi+ycxEsm5KsGHfXpYVjf0qoqXVdSm5mG1czf/VSu3Ar1g/6kPH+lbgaSp8/Ea4xlpW0yThv8dOVha3z28GvM=
+X-Received: by 2002:a05:6830:210a:: with SMTP id i10mr4949297otc.145.1606466150802;
+ Fri, 27 Nov 2020 00:35:50 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201126095152.19151-1-dwagner@suse.de>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+References: <20201126165950.2554997-1-u.kleine-koenig@pengutronix.de>
+In-Reply-To: <20201126165950.2554997-1-u.kleine-koenig@pengutronix.de>
+From:   Geert Uytterhoeven <geert@linux-m68k.org>
+Date:   Fri, 27 Nov 2020 09:35:39 +0100
+Message-ID: <CAMuHMdUbfT7ax4BhjMT_DBweab8TDm5e=xMv5f61t9QpQJt1mw@mail.gmail.com>
+Subject: Re: [PATCH 1/2] ALSA: ppc: drop if block with always false condition
+To:     =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= 
+        <u.kleine-koenig@pengutronix.de>
+Cc:     Geoff Levand <geoff@infradead.org>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Takashi Iwai <tiwai@suse.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Jens Axboe <axboe@kernel.dk>, Jim Paris <jim@jtan.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Alan Stern <stern@rowland.harvard.edu>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        ALSA Development Mailing List <alsa-devel@alsa-project.org>,
+        linux-block@vger.kernel.org, netdev <netdev@vger.kernel.org>,
+        scsi <linux-scsi@vger.kernel.org>,
+        USB list <linux-usb@vger.kernel.org>,
+        DRI Development <dri-devel@lists.freedesktop.org>,
+        Linux Fbdev development list <linux-fbdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Nov 26, 2020 at 10:51:52AM +0100, Daniel Wagner wrote:
-> The current warning looks aweful like a proper crash. This is
-> confusing. There is not much information to gained from the stack
-> trace anyway, let's drop it.
-> 
-> While at it print the cpumask as there might be additial helpful
-> information when debugging the sitation.
-> 
-> Signed-off-by: Daniel Wagner <dwagner@suse.de>
-> ---
-> Hi,
-> 
-> We got a report from a customer because he was concerned about the log
-> entries. As it turns out, it fooled me too to be honest. What do you
-> think about making it a bit less look-a-like a kernel oops?
-> 
-> 
->  smpboot: Booting Node 0 Processor 12 APIC 0x26                                                
-> WARNING, didn't collect load info for all cpus, balancing is broken                            
->  run queue from wrong CPU 0, hctx active                                                       
->  CPU: 0 PID: 42300 Comm: kworker/13:2H Kdump: loaded Tainted: G           OE  X    5.3.18-109.$
->  Hardware name: IBM System x3650 M5 -[5462AC1]-/00KG915, BIOS -[TCE144J-3.11]- 12/03/2019      
->  Workqueue: kblockd blk_mq_run_work_fn                                                         
->  Call Trace:                                                                                   
->   dump_stack+0x66/0x8b                                                                         
->   __blk_mq_run_hw_queue+0xee/0x100                                                             
->   process_one_work+0x1f4/0x3e0                                                                 
->   worker_thread+0x2d/0x3e0                                                                     
->   ? process_one_work+0x3e0/0x3e0                                                               
->   kthread+0x10d/0x130                                                                          
->   ? kthread_park+0xa0/0xa0                                                                     
->   ret_from_fork+0x35/0x40                                                                      
->  run queue from wrong CPU 0, hctx active                                                       
->  CPU: 0 PID: 42300 Comm: kworker/13:2H Kdump: loaded Tainted: G           OE  X    5.3.18-109.$
->  Hardware name: IBM System x3650 M5 -[5462AC1]-/00KG915, BIOS -[TCE144J-3.11]- 12/03/2019      
->  Workqueue: kblockd blk_mq_run_work_fn    
-> 
-> 
-> Thanks,
-> Daniel
-> 
->  block/blk-mq.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 55bcee5dc032..0427b719d9c4 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -1514,10 +1514,8 @@ static void __blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx)
->  	 */
->  	if (!cpumask_test_cpu(raw_smp_processor_id(), hctx->cpumask) &&
->  		cpu_online(hctx->next_cpu)) {
-> -		printk(KERN_WARNING "run queue from wrong CPU %d, hctx %s\n",
-> -			raw_smp_processor_id(),
-> -			cpumask_empty(hctx->cpumask) ? "inactive": "active");
-> -		dump_stack();
-> +		printk(KERN_WARNING "run queue from wrong CPU %d, hctx %*pbl\n",
-> +			raw_smp_processor_id(), cpumask_pr_args(hctx->cpumask));
->  	}
+Hi Uwe,
 
-Now we have guaranteed that no any requests originated from one hctx exists
-when this hctx is going to offline, which is strong enough for killing the check.
+On Thu, Nov 26, 2020 at 6:03 PM Uwe Kleine-König
+<u.kleine-koenig@pengutronix.de> wrote:
+> The remove callback is only called for devices that were probed
+> successfully before. As the matching probe function cannot complete
+> without error if dev->match_id != PS3_MATCH_ID_SOUND, we don't have to
+> check this here.
+>
+> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
 
-The reason why such warning is triggered is that wq's cpu hot unplug is
-handled before blk-mq's handling.
+Thanks for your patch!
 
-I'd suggest to kill the whole branch in the fast path.
+Reviewed-by: Geert Uytterhoeven <geert@linux-m68k.org>
 
-Thanks,
-Ming
+Note that there are similar checks in snd_ps3_driver_probe(), which
+can be removed, too:
 
+        if (WARN_ON(!firmware_has_feature(FW_FEATURE_PS3_LV1)))
+                return -ENODEV;
+        if (WARN_ON(dev->match_id != PS3_MATCH_ID_SOUND))
+                return -ENODEV;
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+-- 
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
