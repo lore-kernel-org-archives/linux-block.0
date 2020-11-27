@@ -2,75 +2,137 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D191C71155
-	for <linux-block@archiver.kernel.org>; Fri, 27 Nov 2020 09:41:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29066C2D0E4
+	for <linux-block@archiver.kernel.org>; Fri, 27 Nov 2020 09:47:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F40C121973
-	for <linux-block@archiver.kernel.org>; Fri, 27 Nov 2020 09:41:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BF66222201
+	for <linux-block@archiver.kernel.org>; Fri, 27 Nov 2020 09:47:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729016AbgK0JlO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 27 Nov 2020 04:41:14 -0500
-Received: from verein.lst.de ([213.95.11.211]:37031 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728177AbgK0JlO (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 Nov 2020 04:41:14 -0500
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id D046C68B05; Fri, 27 Nov 2020 10:41:09 +0100 (CET)
-Date:   Fri, 27 Nov 2020 10:41:09 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jan Kara <jack@suse.cz>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
-        Coly Li <colyli@suse.de>, Mike Snitzer <snitzer@redhat.com>,
+        id S1725985AbgK0JrL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 27 Nov 2020 04:47:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46120 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725889AbgK0JrK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 27 Nov 2020 04:47:10 -0500
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 758B4C0613D1
+        for <linux-block@vger.kernel.org>; Fri, 27 Nov 2020 01:47:10 -0800 (PST)
+Received: from pty.hi.pengutronix.de ([2001:67c:670:100:1d::c5])
+        by metis.ext.pengutronix.de with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1kiaKC-0005UC-C7; Fri, 27 Nov 2020 10:45:56 +0100
+Received: from ukl by pty.hi.pengutronix.de with local (Exim 4.89)
+        (envelope-from <ukl@pengutronix.de>)
+        id 1kiaK4-0002Ad-OH; Fri, 27 Nov 2020 10:45:48 +0100
+Date:   Fri, 27 Nov 2020 10:45:47 +0100
+From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+To:     Geert Uytterhoeven <geert@linux-m68k.org>
+Cc:     Geoff Levand <geoff@infradead.org>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Takashi Iwai <tiwai@suse.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Jens Axboe <axboe@kernel.dk>, Jim Paris <jim@jtan.com>,
+        Arnd Bergmann <arnd@arndb.de>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        dm-devel@redhat.com, Jan Kara <jack@suse.com>,
-        linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, Chao Yu <yuchao0@huawei.com>
-Subject: Re: [PATCH 29/44] block: remove the nr_sects field in struct
- hd_struct
-Message-ID: <20201127094109.GB14976@lst.de>
-References: <20201126130422.92945-1-hch@lst.de> <20201126130422.92945-30-hch@lst.de> <20201126165036.GO422@quack2.suse.cz> <20201126175208.GA24843@lst.de> <20201126180408.GB422@quack2.suse.cz>
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Alan Stern <stern@rowland.harvard.edu>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        ALSA Development Mailing List <alsa-devel@alsa-project.org>,
+        linux-block@vger.kernel.org, netdev <netdev@vger.kernel.org>,
+        scsi <linux-scsi@vger.kernel.org>,
+        USB list <linux-usb@vger.kernel.org>,
+        DRI Development <dri-devel@lists.freedesktop.org>,
+        Linux Fbdev development list <linux-fbdev@vger.kernel.org>
+Subject: Re: [PATCH 1/2] ALSA: ppc: drop if block with always false condition
+Message-ID: <20201127094547.4zcyeycfrriitkqx@pengutronix.de>
+References: <20201126165950.2554997-1-u.kleine-koenig@pengutronix.de>
+ <CAMuHMdUbfT7ax4BhjMT_DBweab8TDm5e=xMv5f61t9QpQJt1mw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="taccm5e5wyznne4d"
 Content-Disposition: inline
-In-Reply-To: <20201126180408.GB422@quack2.suse.cz>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <CAMuHMdUbfT7ax4BhjMT_DBweab8TDm5e=xMv5f61t9QpQJt1mw@mail.gmail.com>
+X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::c5
+X-SA-Exim-Mail-From: ukl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-block@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Nov 26, 2020 at 07:04:08PM +0100, Jan Kara wrote:
-> On Thu 26-11-20 18:52:08, Christoph Hellwig wrote:
-> > On Thu, Nov 26, 2020 at 05:50:36PM +0100, Jan Kara wrote:
-> > > > +	if (size == capacity ||
-> > > > +	    (disk->flags & (GENHD_FL_UP | GENHD_FL_HIDDEN)) != GENHD_FL_UP)
-> > > > +		return false;
-> > > > +	pr_info("%s: detected capacity change from %lld to %lld\n",
-> > > > +		disk->disk_name, size, capacity);
-> > > > +	kobject_uevent_env(&disk_to_dev(disk)->kobj, KOBJ_CHANGE, envp);
-> > > 
-> > > I think we don't want to generate resize event for changes from / to 0...
-> > 
-> > Didn't you ask for that in the last round?
-> 
-> I've asked for the message - which you've added :). But the udev event was
-> correct in the previous version IMHO...
 
-Note that this version only prints if the gendisk is up.  So any initial
-setup does not see a message.  I think that is a better indicator than
-checking for 0.  Especially as say a remotely triggered change to 0
-is an even worth printing, and except for DRBD all drivers did print
-the message.
+--taccm5e5wyznne4d
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> 
-> 								Honza
-> -- 
-> Jan Kara <jack@suse.com>
-> SUSE Labs, CR
----end quoted text---
+On Fri, Nov 27, 2020 at 09:35:39AM +0100, Geert Uytterhoeven wrote:
+> Hi Uwe,
+>=20
+> On Thu, Nov 26, 2020 at 6:03 PM Uwe Kleine-K=F6nig
+> <u.kleine-koenig@pengutronix.de> wrote:
+> > The remove callback is only called for devices that were probed
+> > successfully before. As the matching probe function cannot complete
+> > without error if dev->match_id !=3D PS3_MATCH_ID_SOUND, we don't have to
+> > check this here.
+> >
+> > Signed-off-by: Uwe Kleine-K=F6nig <u.kleine-koenig@pengutronix.de>
+>=20
+> Thanks for your patch!
+>=20
+> Reviewed-by: Geert Uytterhoeven <geert@linux-m68k.org>
+>=20
+> Note that there are similar checks in snd_ps3_driver_probe(), which
+> can be removed, too:
+>=20
+>         if (WARN_ON(!firmware_has_feature(FW_FEATURE_PS3_LV1)))
+>                 return -ENODEV;
+>         if (WARN_ON(dev->match_id !=3D PS3_MATCH_ID_SOUND))
+>                 return -ENODEV;
+
+I had to invest some brain cycles here. For the first:
+
+Assuming firmware_has_feature(FW_FEATURE_PS3_LV1) always returns the
+same value, snd_ps3_driver_probe is only used after this check succeeds
+because the driver is registered only after this check in
+snd_ps3_init().
+
+The second is superflous because ps3_system_bus_match() yields false if
+this doesn't match the driver's match_id.
+
+Best regards
+Uwe
+
+--=20
+Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
+Industrial Linux Solutions                 | https://www.pengutronix.de/ |
+
+--taccm5e5wyznne4d
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAl/AyscACgkQwfwUeK3K
+7AmVbAf/fRHKZiIEMqPckqCjNor4UCILZvO1NJYHzctpPGBT8dETRjBW1ZmWu6MS
+qxv4y7aGSfc8pP5G0LU1rJJYOf7x8PpHEbm5uNM1UOIxzSIniALG7VIeoFIBrGoQ
+QuMcTv73n6ypzsNu87ynqrILEVYNrubD+Sb6B2xZEfPbIcvvwKfUvr8+lBEkabHX
+LbBbYbLL/ivRvUFm/YKvY3vcnTTAj88lURLp6V8EPT+8/TDr7Bfuy5LyjFsKAYsq
+QXNTBRLT8unlG99XvN4urWFVs9NMPKKWgV/e14LGumeL+mM8EQi+UPCnMTPOErWb
+F4a+SZgp6g00Syvd8mJVlWUKEkQUOg==
+=P7Le
+-----END PGP SIGNATURE-----
+
+--taccm5e5wyznne4d--
