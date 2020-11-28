@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DA5BC8303B
-	for <linux-block@archiver.kernel.org>; Sat, 28 Nov 2020 22:12:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0C11C83039
+	for <linux-block@archiver.kernel.org>; Sat, 28 Nov 2020 22:12:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 28E67221FF
-	for <linux-block@archiver.kernel.org>; Sat, 28 Nov 2020 22:12:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BDED0221FF
+	for <linux-block@archiver.kernel.org>; Sat, 28 Nov 2020 22:12:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="NketMA/q"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="NWuCZWpZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389465AbgK1VuB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S2389476AbgK1VuB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Sat, 28 Nov 2020 16:50:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40798 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40796 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730632AbgK1Sm7 (ORCPT
+        with ESMTP id S1730617AbgK1Sm7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Sat, 28 Nov 2020 13:42:59 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE33DC025487;
-        Sat, 28 Nov 2020 08:16:00 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB336C025776;
+        Sat, 28 Nov 2020 08:15:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=58eRvABQ9wcBaVUecn4OAyBZ+Jv++aJOLsdqKdGeutg=; b=NketMA/qS9o3GPr2SbKJRQmdNq
-        pAtkMDydyPF3ecFOIsS4NbLEEDFNmefQuMBkQit3GpjJKLRxXm8pnvFD3NCyW3+kflIhNBh8C8DQe
-        xjLrMJaAC6hNsYGzFNl9IuapwYcRhReMChdfv7HMgFZ83JP5Vvy0UlYixykYMDKlwKmewLdOSSqz5
-        mWwZTizFMMlajZWalQr1vYwESDdaWv1WfnpDRlFB9bw8SHbYfmfCPt9+0qfRcmknoOqPtopPUzHDS
-        q+yt+4ZSx0spCtDL7PPF2dD49DtamtSjr+HzjaHpeftqqv6Le/xaG5EzHCP3xl2FTNzfXoAZ1vx6x
-        o5IaGSkA==;
+        bh=+3Kb0CPHjQKc56gAmIDHWkQuyu6q4iSqt8pD+2xghiw=; b=NWuCZWpZkrvgLplfmVswy3Z9iU
+        Gbq+ff+tC7Xm0TpJ5K01ClLtFReFOp8xV9e196339L+AZdKvTPKGMTuN5BWQzq0aHtTZ2H8B+9GWC
+        5y3ZCYVW41RWGEMIl6hYafwuqahk+KQP9eC9UKSyAj2IwiAQigBPqOYUtmcQIzNVs2GvmdN9WPqjt
+        tL6XMs8XxCtiWa6oB2qkH74zMTP0g4ClF2wmv+YfXrsvFoSip7/Md1z138i1lhmW7947eaMHrDkdW
+        EiBdT4BGOauaophCJsnCigDnZ19tH8IXupcEJXnl3ROsy7NpBWuTBVaoGv32/EwzyTpHSpnaPDXM8
+        FCf+SoHw==;
 Received: from [2001:4bb8:18c:1dd6:48f3:741a:602e:7fdd] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kj2t2-0000Iy-4Q; Sat, 28 Nov 2020 16:15:49 +0000
+        id 1kj2sY-0000D0-Px; Sat, 28 Nov 2020 16:15:19 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
@@ -49,9 +49,9 @@ Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
         linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
         linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
         linux-mm@kvack.org
-Subject: [PATCH 22/45] block: move bdput() to the callers of __blkdev_get
-Date:   Sat, 28 Nov 2020 17:14:47 +0100
-Message-Id: <20201128161510.347752-23-hch@lst.de>
+Subject: [PATCH 05/45] mtip32xx: remove the call to fsync_bdev on removal
+Date:   Sat, 28 Nov 2020 17:14:30 +0100
+Message-Id: <20201128161510.347752-6-hch@lst.de>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201128161510.347752-1-hch@lst.de>
 References: <20201128161510.347752-1-hch@lst.de>
@@ -62,47 +62,76 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This will allow for a more symmetric calling convention going forward.
+del_gendisk already calls fsync_bdev for every partition, no need
+to do this twice.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Jan Kara <jack@suse.cz>
 ---
- fs/block_dev.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ drivers/block/mtip32xx/mtip32xx.c | 15 ---------------
+ drivers/block/mtip32xx/mtip32xx.h |  2 --
+ 2 files changed, 17 deletions(-)
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 0c533ac92e2492..a2d5050c97ee08 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -1462,6 +1462,7 @@ static int __blkdev_get(struct block_device *bdev, struct gendisk *disk,
- 			if (!(disk->flags & GENHD_FL_UP) ||
- 			    !bdev->bd_part || !bdev->bd_part->nr_sects) {
- 				__blkdev_put(whole, mode, 1);
-+				bdput(whole);
- 				ret = -ENXIO;
- 				goto out_clear;
- 			}
-@@ -1744,9 +1745,10 @@ static void __blkdev_put(struct block_device *bdev, fmode_t mode, int for_part)
- 			disk->fops->release(disk, mode);
- 	}
- 	mutex_unlock(&bdev->bd_mutex);
--	bdput(bdev);
--	if (victim)
-+	if (victim) {
- 		__blkdev_put(victim, mode, 1);
-+		bdput(victim);
-+	}
- }
+diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
+index 153e2cdecb4d40..53ac59d19ae530 100644
+--- a/drivers/block/mtip32xx/mtip32xx.c
++++ b/drivers/block/mtip32xx/mtip32xx.c
+@@ -3687,7 +3687,6 @@ static int mtip_block_initialize(struct driver_data *dd)
+ 	/* Enable the block device and add it to /dev */
+ 	device_add_disk(&dd->pdev->dev, dd->disk, NULL);
  
- void blkdev_put(struct block_device *bdev, fmode_t mode)
-@@ -1796,6 +1798,7 @@ void blkdev_put(struct block_device *bdev, fmode_t mode)
- 	mutex_unlock(&bdev->bd_mutex);
+-	dd->bdev = bdget_disk(dd->disk, 0);
+ 	/*
+ 	 * Now that the disk is active, initialize any sysfs attributes
+ 	 * managed by the protocol layer.
+@@ -3721,9 +3720,6 @@ static int mtip_block_initialize(struct driver_data *dd)
+ 	return rv;
  
- 	__blkdev_put(bdev, mode, 0);
-+	bdput(bdev);
- 	put_disk_and_module(disk);
- }
- EXPORT_SYMBOL(blkdev_put);
+ kthread_run_error:
+-	bdput(dd->bdev);
+-	dd->bdev = NULL;
+-
+ 	/* Delete our gendisk. This also removes the device from /dev */
+ 	del_gendisk(dd->disk);
+ 
+@@ -3804,14 +3800,6 @@ static int mtip_block_remove(struct driver_data *dd)
+ 	blk_mq_tagset_busy_iter(&dd->tags, mtip_no_dev_cleanup, dd);
+ 	blk_mq_unquiesce_queue(dd->queue);
+ 
+-	/*
+-	 * Delete our gendisk structure. This also removes the device
+-	 * from /dev
+-	 */
+-	if (dd->bdev) {
+-		bdput(dd->bdev);
+-		dd->bdev = NULL;
+-	}
+ 	if (dd->disk) {
+ 		if (test_bit(MTIP_DDF_INIT_DONE_BIT, &dd->dd_flag))
+ 			del_gendisk(dd->disk);
+@@ -4206,9 +4194,6 @@ static void mtip_pci_remove(struct pci_dev *pdev)
+ 	} while (atomic_read(&dd->irq_workers_active) != 0 &&
+ 		time_before(jiffies, to));
+ 
+-	if (!dd->sr)
+-		fsync_bdev(dd->bdev);
+-
+ 	if (atomic_read(&dd->irq_workers_active) != 0) {
+ 		dev_warn(&dd->pdev->dev,
+ 			"Completion workers still active!\n");
+diff --git a/drivers/block/mtip32xx/mtip32xx.h b/drivers/block/mtip32xx/mtip32xx.h
+index e22a7f0523bf30..88f4206310e4c8 100644
+--- a/drivers/block/mtip32xx/mtip32xx.h
++++ b/drivers/block/mtip32xx/mtip32xx.h
+@@ -463,8 +463,6 @@ struct driver_data {
+ 
+ 	int isr_binding;
+ 
+-	struct block_device *bdev;
+-
+ 	struct list_head online_list; /* linkage for online list */
+ 
+ 	struct list_head remove_list; /* linkage for removing list */
 -- 
 2.29.2
 
