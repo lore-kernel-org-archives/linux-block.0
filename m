@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B27EC83020
-	for <linux-block@archiver.kernel.org>; Sat, 28 Nov 2020 22:12:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 725DCC63798
+	for <linux-block@archiver.kernel.org>; Sat, 28 Nov 2020 22:12:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 676A62224B
-	for <linux-block@archiver.kernel.org>; Sat, 28 Nov 2020 22:12:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3E01222252
+	for <linux-block@archiver.kernel.org>; Sat, 28 Nov 2020 22:12:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="shpiisUA"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="OD2tKoBY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389576AbgK1VuD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 28 Nov 2020 16:50:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41212 "EHLO
+        id S2389637AbgK1VuE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 28 Nov 2020 16:50:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41214 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731100AbgK1Sry (ORCPT
+        with ESMTP id S1731129AbgK1Sry (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Sat, 28 Nov 2020 13:47:54 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DADFC02577D;
-        Sat, 28 Nov 2020 08:15:36 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EE96C02548E;
+        Sat, 28 Nov 2020 08:16:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=2uWDeQgsBeIc9r8ohTt9OrV40AdHP0SZhV+7+E52opA=; b=shpiisUAhts82WFLQNhdzcv7gf
-        cVXdTqnjKFz6zzbQfWDVeyUWw5ZitA4C1KMpmS00s5jdL1Tl5dH/EJAgvASHZak5i+LPVhjxY70m9
-        hWE2iHpA6jngvi/UzdCraCOzf6O2BGU5xGNAzeAVONtlffl2qaRwK677uBtkU+NRx/fx6Y+8YnogM
-        hEuHXUziGVxxk6pZ5ZKe6tSPOYqqoLGuyOo3PQuS/pzr9RxgfNVrjR5q+7/M/xgtcITAbcfpLu0jJ
-        Yla6VRt48cUuPRK/EfdZ/nz0mD+7eNkKyZmm0XBWVj5T4VdNG7s6tYmt/d2n+b0Mat81gCz7MOBq6
-        Euy92KgA==;
+        bh=6IeFZ7Uy1DrTY5BQeLQW1xD1ZXA1ZVFBmMwhjYs91c8=; b=OD2tKoBYgG+uVtFPZskR+VCfm6
+        Dn1cDNzPYU2IFPF7UFNrmWzFfssUxw/T5V10mv/YAX6prclF9SMQoF0dwbAqxrIxZtYavvNn63LHF
+        dwWFmTULY5nOu/3qJ5F/8QijjB9pHmYvJQEtPpFVzpRqPD2FCrTJLcCw+jgmoF01ta39QLHeaHTKI
+        WQcC8eZAJVI+hWRryL/UBzWTfiRDb1djDySZ/i1z3YbKAAjg7aXmA94oUJeNVLVzXtt1ObrBAbE6F
+        BWD5a9V8AmTbf9mafWd9EuFXxazbtbwbXFUt9AdYpOLDhF1c1XhHD6lMLfEEonkIBN5HjshCv2iug
+        W/lTMuJg==;
 Received: from [2001:4bb8:18c:1dd6:48f3:741a:602e:7fdd] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kj2sd-0000DU-6A; Sat, 28 Nov 2020 16:15:23 +0000
+        id 1kj2tG-0000Ma-DB; Sat, 28 Nov 2020 16:16:03 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
@@ -49,9 +49,9 @@ Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
         linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
         linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
         linux-mm@kvack.org
-Subject: [PATCH 07/45] loop: do not call set_blocksize
-Date:   Sat, 28 Nov 2020 17:14:32 +0100
-Message-Id: <20201128161510.347752-8-hch@lst.de>
+Subject: [PATCH 29/45] block: initialize struct block_device in bdev_alloc
+Date:   Sat, 28 Nov 2020 17:14:54 +0100
+Message-Id: <20201128161510.347752-30-hch@lst.de>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201128161510.347752-1-hch@lst.de>
 References: <20201128161510.347752-1-hch@lst.de>
@@ -62,29 +62,63 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-set_blocksize is used by file systems to use their preferred buffer cache
-block size.  Block drivers should not set it.
+Don't play tricks with slab constructors as bdev structures tends to not
+get reused very much, and this makes the code a lot less error prone.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Jan Kara <jack@suse.cz>
+Acked-by: Tejun Heo <tj@kernel.org>
 ---
- drivers/block/loop.c | 3 ---
- 1 file changed, 3 deletions(-)
+ fs/block_dev.c | 22 +++++++++-------------
+ 1 file changed, 9 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 9a27d4f1c08aac..b42c728620c9e4 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1164,9 +1164,6 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
- 	size = get_loop_size(lo, file);
- 	loop_set_size(lo, size);
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 0569f5ebeb6fd0..a5b6955a841f18 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -784,20 +784,11 @@ static void bdev_free_inode(struct inode *inode)
+ 	kmem_cache_free(bdev_cachep, BDEV_I(inode));
+ }
  
--	set_blocksize(bdev, S_ISBLK(inode->i_mode) ?
--		      block_size(inode->i_bdev) : PAGE_SIZE);
--
- 	lo->lo_state = Lo_bound;
- 	if (part_shift)
- 		lo->lo_flags |= LO_FLAGS_PARTSCAN;
+-static void init_once(void *foo)
++static void init_once(void *data)
+ {
+-	struct bdev_inode *ei = (struct bdev_inode *) foo;
+-	struct block_device *bdev = &ei->bdev;
++	struct bdev_inode *ei = data;
+ 
+-	memset(bdev, 0, sizeof(*bdev));
+-	mutex_init(&bdev->bd_mutex);
+-#ifdef CONFIG_SYSFS
+-	INIT_LIST_HEAD(&bdev->bd_holder_disks);
+-#endif
+-	bdev->bd_bdi = &noop_backing_dev_info;
+ 	inode_init_once(&ei->vfs_inode);
+-	/* Initialize mutex for freeze. */
+-	mutex_init(&bdev->bd_fsfreeze_mutex);
+ }
+ 
+ static void bdev_evict_inode(struct inode *inode)
+@@ -873,12 +864,17 @@ struct block_device *bdev_alloc(struct gendisk *disk, u8 partno)
+ 	mapping_set_gfp_mask(&inode->i_data, GFP_USER);
+ 
+ 	bdev = I_BDEV(inode);
++	memset(bdev, 0, sizeof(*bdev));
++	mutex_init(&bdev->bd_mutex);
++	mutex_init(&bdev->bd_fsfreeze_mutex);
+ 	spin_lock_init(&bdev->bd_size_lock);
+ 	bdev->bd_disk = disk;
+ 	bdev->bd_partno = partno;
+-	bdev->bd_super = NULL;
+ 	bdev->bd_inode = inode;
+-	bdev->bd_part_count = 0;
++	bdev->bd_bdi = &noop_backing_dev_info;
++#ifdef CONFIG_SYSFS
++	INIT_LIST_HEAD(&bdev->bd_holder_disks);
++#endif
+ 	return bdev;
+ }
+ 
 -- 
 2.29.2
 
