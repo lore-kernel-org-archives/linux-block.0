@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15C28C8302F
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AA4BC83030
 	for <linux-block@archiver.kernel.org>; Sat, 28 Nov 2020 22:12:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D422422257
-	for <linux-block@archiver.kernel.org>; Sat, 28 Nov 2020 22:12:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 40B312224C
+	for <linux-block@archiver.kernel.org>; Sat, 28 Nov 2020 22:12:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="eJs+iBkC"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="IRB8hjpF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389509AbgK1VuB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S2389504AbgK1VuB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Sat, 28 Nov 2020 16:50:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41226 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730891AbgK1Spj (ORCPT
+        with ESMTP id S1730609AbgK1Sm7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 28 Nov 2020 13:45:39 -0500
+        Sat, 28 Nov 2020 13:42:59 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D54B8C025781;
-        Sat, 28 Nov 2020 08:15:29 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB7BEC02577E;
+        Sat, 28 Nov 2020 08:15:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=0Ujl5N8juKc7YdWeiKXE35ZfCBKXX17oNrNBcAKARdM=; b=eJs+iBkCcXmuCXezMNfXNybbPN
-        MnNoU2ZU/lFD+6CHva9FNik4J5OzMMvZeuv5JB1oR3zQptYicrH9fu702ftSZbP6oXKb7PiJFV94X
-        UcE52O6uDK7omj3vVh+DislaFi2U84WSs1R0qoq7rUxujhyur81VoVmgr3aRj57emoG2ZPGfU5SfO
-        MHsCxOqNF3W4S5NgfWG3iXjJEwBocS+uY5XI0zdsC4DWvPWUzTrzncOh+H3YaUrEdTOfxhOtZ4QTM
-        B2rVkhtKzHEotmcEBI7twOnKiJEmNqOmDh/mSMRsTXHDxNnNwD/0yhYCtqZvQy27P8orJCFvmlvho
-        LCQtAJig==;
+        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
+        Content-Type:Content-ID:Content-Description;
+        bh=qOmzpRMb4vEzGwba4P3m5gENBKcm1ZKj8N5Pylgvbms=; b=IRB8hjpF/ywVtkPyjbqecQa7lq
+        RssKcyx2Ok0vmgR1h3eaUGnGWMBY3poXzElQI/dHQOwjcnJrS3u4SJECUZJ+IQ7AhTmWuRnzHDIh0
+        xnqQmSjjOdj7zKjMMmLGkvdhJLKymWsD3UOCxFnSw2Bv4VRAybQPIXVR+GZMs3dGc1+tlIWSlaj2e
+        CpygcyrJP06LduiqjIS76IiB7B52RCce8WijP8xmYk0pcNCvs5viJUD4Dban0JeHr25yImXluOmVq
+        4AqbV9WpcTe0tO3jNOuocp5V3JlkJIA2hTFOctikEisfiaM37Vw8g3P1KJR0KzhbJ+gjMX/TDtJnZ
+        JnmKOF1w==;
 Received: from [2001:4bb8:18c:1dd6:48f3:741a:602e:7fdd] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kj2sS-0000BF-3K; Sat, 28 Nov 2020 16:15:12 +0000
+        id 1kj2se-0000Dq-Ja; Sat, 28 Nov 2020 16:15:24 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
@@ -49,10 +49,12 @@ Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
         linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
         linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
         linux-mm@kvack.org
-Subject: merge struct block_device and struct hd_struct v4
-Date:   Sat, 28 Nov 2020 17:14:25 +0100
-Message-Id: <20201128161510.347752-1-hch@lst.de>
+Subject: [PATCH 08/45] dm: simplify flush_bio initialization in __send_empty_flush
+Date:   Sat, 28 Nov 2020 17:14:33 +0100
+Message-Id: <20201128161510.347752-9-hch@lst.de>
 X-Mailer: git-send-email 2.29.2
+In-Reply-To: <20201128161510.347752-1-hch@lst.de>
+References: <20201128161510.347752-1-hch@lst.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
@@ -60,55 +62,42 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
+We don't really need the struct block_device to initialize a bio.  So
+switch from using bio_set_dev to manually setting up bi_disk (bi_partno
+will always be zero and has been cleared by bio_init already).
 
-this series cleans up our main per-device node data structure by merging
-the block_device and hd_struct data structures that have the same scope,
-but different life times.  The main effect (besides removing lots of
-code) is that instead of having two device sizes that need complex
-synchronization there is just one now.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Acked-by: Mike Snitzer <snitzer@redhat.com>
+---
+ drivers/md/dm.c | 12 +++---------
+ 1 file changed, 3 insertions(+), 9 deletions(-)
 
-Note that this now includes the previous "misc cleanups" series as I had
-to fix up a thing in there with the changed patch ordering.
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 50541d336c719b..ab0a8335f098d9 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -1422,18 +1422,12 @@ static int __send_empty_flush(struct clone_info *ci)
+ 	 */
+ 	bio_init(&flush_bio, NULL, 0);
+ 	flush_bio.bi_opf = REQ_OP_WRITE | REQ_PREFLUSH | REQ_SYNC;
++	flush_bio.bi_disk = ci->io->md->disk;
++	bio_associate_blkg(&flush_bio);
++
+ 	ci->bio = &flush_bio;
+ 	ci->sector_count = 0;
+ 
+-	/*
+-	 * Empty flush uses a statically initialized bio, as the base for
+-	 * cloning.  However, blkg association requires that a bdev is
+-	 * associated with a gendisk, which doesn't happen until the bdev is
+-	 * opened.  So, blkg association is done at issue time of the flush
+-	 * rather than when the device is created in alloc_dev().
+-	 */
+-	bio_set_dev(ci->bio, ci->io->md->bdev);
+-
+ 	BUG_ON(bio_has_data(ci->bio));
+ 	while ((ti = dm_table_get_target(ci->map, target_nr++)))
+ 		__send_duplicate_bios(ci, ti, ti->num_flush_bios, NULL);
+-- 
+2.29.2
 
-The first patch already is in 5.10-rc, but not in for-5.11/block
-
-A git tree is available here:
-
-    git://git.infradead.org/users/hch/block.git bdev-lookup
-
-Gitweb:
-
-    http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/bdev-lookup
-
-Changes since v3:
- - extend hold time of bdev_lookup_sem
- - use igrab bdget to make bdget_disk and disk_part_iter* safe
- - fix some error handling labels
- - remove a superflous cast
- - various comment fixups
-
-Changes since v2:
- - keep a reference to the whole device bdev from each partition bdev
-   to simplify blkdev_get
- - drop a stale commen in freeze_bdev
- - fix an incorrect hunk that ignored error in thaw_bdev
- - add back a missing call to mapping_set_gfp_mask
- - misc typo fixes, comment and commit log improvements
- - keep using a global lock to synchronize gendisk lookup
- - do not call ->open for blk-cgroup configuration updates
- - drop a zram cleanup patch
-
-Changes since v1:
- - spelling fixes
- - fix error unwinding in __alloc_disk_node
- - use bdev_is_partition in a few more places
- - don't send the RESIZE=1 uevent for hidden gendisks
- - rename __bdget_disk to disk_find_part
- - drop a bcache patch
- - some patch reordering
- - add more refactoring
- - use rcu protection to prevent racing with a disk going away
-   in blkdev_get
- - split up some of the big patches into many small ones
- - clean up the freeze_bdev interface
