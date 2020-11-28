@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10F4FC71156
-	for <linux-block@archiver.kernel.org>; Sat, 28 Nov 2020 22:12:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 108C0C83014
+	for <linux-block@archiver.kernel.org>; Sat, 28 Nov 2020 22:12:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DB13C221FD
-	for <linux-block@archiver.kernel.org>; Sat, 28 Nov 2020 22:12:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D689121534
+	for <linux-block@archiver.kernel.org>; Sat, 28 Nov 2020 22:12:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="mnDJefE5"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="moX275hE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389553AbgK1VuC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S2389527AbgK1VuC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Sat, 28 Nov 2020 16:50:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41208 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41224 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730836AbgK1Spj (ORCPT
+        with ESMTP id S1730869AbgK1Spj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Sat, 28 Nov 2020 13:45:39 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26AE7C025482;
-        Sat, 28 Nov 2020 08:15:51 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF424C025492;
+        Sat, 28 Nov 2020 08:16:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=aXV3aDcarMWm87S3K48qh326Jqh2T5iEz0okUiuykIU=; b=mnDJefE5ahlSIoE5urgBKySUIU
-        uEPnl4x1lcSNMxaHfc9Ks85/A9bo2wCHhP4dN+YIeObfQgQwOzXlrHncvaxkUpDWBghClWDwXPUvM
-        93fk/ibotGYTNi7/wsYCQFGtvoG9xZFesfX3WOe3IhjPcq/fxsiuSyhSkaFEGmD9wUdu2blFiWIer
-        Vh8aIiXiMJB9Pyr/5lbQdP9erEVm9FZZPn5Qi1dFSZeDrNTddRfgOyf56jOWNAPQytejd6XoBYzbA
-        xLehRf0mtTRdDlSJUqD+hM9eU6WfglKqH9fRCo2LqBXinPHL9vq000qd4I1rM4JDpKAS9aZOHCeLF
-        1UN8nJhw==;
+        bh=UgVkmALFIWqry4eWbGmtJ4BhyI76zNGGn8dFufuva+w=; b=moX275hEfmihvK/a0gTQdhR7z4
+        gJzZ+ci4w16CBgiGtMT63fBnbgOW11p29112pT3MPhnLylSmzfD4jIdMPMMM/30t8stpKk3mp9OeU
+        vcWPwPLlOW2z4VkZAMkJfTaZsEE+QkNcHy4xJfWNROasa4ELKV88z5lG0D9Ss0hLxKv+w4UmhzffG
+        +wtv0OLHxOA9nVaonaPNNXhm1b04McORQ1WvR3A5W0rPy1J52qUAk9TYCSTkbalcFxNKgqPk3m64F
+        6V+HxIERI5U5m/VrkjkF0splOFLMG94gLVSra7IfU3sEsMHdfMiLto3pLZ1M1g6oIPVg/TuK1OGXH
+        jW8w56rw==;
 Received: from [2001:4bb8:18c:1dd6:48f3:741a:602e:7fdd] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kj2st-0000GO-Cm; Sat, 28 Nov 2020 16:15:39 +0000
+        id 1kj2tN-0000Ok-Vg; Sat, 28 Nov 2020 16:16:10 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
@@ -49,9 +49,9 @@ Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
         linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
         linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
         linux-mm@kvack.org
-Subject: [PATCH 17/45] init: refactor name_to_dev_t
-Date:   Sat, 28 Nov 2020 17:14:42 +0100
-Message-Id: <20201128161510.347752-18-hch@lst.de>
+Subject: [PATCH 33/45] block: move the partition_meta_info to struct block_device
+Date:   Sat, 28 Nov 2020 17:14:58 +0100
+Message-Id: <20201128161510.347752-34-hch@lst.de>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201128161510.347752-1-hch@lst.de>
 References: <20201128161510.347752-1-hch@lst.de>
@@ -62,256 +62,160 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Split each case into a self-contained helper, and move the block
-dependent code entirely under the pre-existing #ifdef CONFIG_BLOCK.
-This allows to remove the blk_lookup_devt stub in genhd.h.
+Move the partition_meta_info to struct block_device in preparation for
+killing struct hd_struct.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Reviewed-by: Jan Kara <jack@suse.cz>
-Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Acked-by: Tejun Heo <tj@kernel.org>
 ---
- include/linux/genhd.h |   7 +-
- init/do_mounts.c      | 183 +++++++++++++++++++++---------------------
- 2 files changed, 91 insertions(+), 99 deletions(-)
+ block/blk.h               |  1 -
+ block/genhd.c             |  3 ++-
+ block/partitions/core.c   | 18 +++++++-----------
+ fs/block_dev.c            |  1 +
+ include/linux/blk_types.h |  2 ++
+ include/linux/genhd.h     |  1 -
+ init/do_mounts.c          |  7 ++++---
+ 7 files changed, 16 insertions(+), 17 deletions(-)
 
+diff --git a/block/blk.h b/block/blk.h
+index 3f801f6e86f8a1..0bd4b58bcbaf77 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -381,7 +381,6 @@ static inline void hd_struct_put(struct hd_struct *part)
+ 
+ static inline void hd_free_part(struct hd_struct *part)
+ {
+-	kfree(part->info);
+ 	bdput(part->bdev);
+ 	percpu_ref_exit(&part->ref);
+ }
+diff --git a/block/genhd.c b/block/genhd.c
+index 7bb45382658385..fe202a12eec096 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -1002,7 +1002,8 @@ void __init printk_all_partitions(void)
+ 			       bdevt_str(part_devt(part), devt_buf),
+ 			       bdev_nr_sectors(part->bdev) >> 1,
+ 			       disk_name(disk, part->partno, name_buf),
+-			       part->info ? part->info->uuid : "");
++			       part->bdev->bd_meta_info ?
++					part->bdev->bd_meta_info->uuid : "");
+ 			if (is_part0) {
+ 				if (dev->parent && dev->parent->driver)
+ 					printk(" driver: %s\n",
+diff --git a/block/partitions/core.c b/block/partitions/core.c
+index 460a745812c6d4..07df9ff554627f 100644
+--- a/block/partitions/core.c
++++ b/block/partitions/core.c
+@@ -275,8 +275,9 @@ static int part_uevent(struct device *dev, struct kobj_uevent_env *env)
+ 	struct hd_struct *part = dev_to_part(dev);
+ 
+ 	add_uevent_var(env, "PARTN=%u", part->partno);
+-	if (part->info && part->info->volname[0])
+-		add_uevent_var(env, "PARTNAME=%s", part->info->volname);
++	if (part->bdev->bd_meta_info && part->bdev->bd_meta_info->volname[0])
++		add_uevent_var(env, "PARTNAME=%s",
++			       part->bdev->bd_meta_info->volname);
+ 	return 0;
+ }
+ 
+@@ -422,13 +423,10 @@ static struct hd_struct *add_partition(struct gendisk *disk, int partno,
+ 	p->policy = get_disk_ro(disk);
+ 
+ 	if (info) {
+-		struct partition_meta_info *pinfo;
+-
+-		pinfo = kzalloc_node(sizeof(*pinfo), GFP_KERNEL, disk->node_id);
+-		if (!pinfo)
++		err = -ENOMEM;
++		bdev->bd_meta_info = kmemdup(info, sizeof(*info), GFP_KERNEL);
++		if (!bdev->bd_meta_info)
+ 			goto out_bdput;
+-		memcpy(pinfo, info, sizeof(*info));
+-		p->info = pinfo;
+ 	}
+ 
+ 	dname = dev_name(ddev);
+@@ -444,7 +442,7 @@ static struct hd_struct *add_partition(struct gendisk *disk, int partno,
+ 
+ 	err = blk_alloc_devt(p, &devt);
+ 	if (err)
+-		goto out_free_info;
++		goto out_bdput;
+ 	pdev->devt = devt;
+ 
+ 	/* delay uevent until 'holders' subdir is created */
+@@ -481,8 +479,6 @@ static struct hd_struct *add_partition(struct gendisk *disk, int partno,
+ 		kobject_uevent(&pdev->kobj, KOBJ_ADD);
+ 	return p;
+ 
+-out_free_info:
+-	kfree(p->info);
+ out_bdput:
+ 	bdput(bdev);
+ out_free:
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 0832c7830f3a10..0770f654b09cdf 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -785,6 +785,7 @@ static void bdev_free_inode(struct inode *inode)
+ 	struct block_device *bdev = I_BDEV(inode);
+ 
+ 	free_percpu(bdev->bd_stats);
++	kfree(bdev->bd_meta_info);
+ 
+ 	kmem_cache_free(bdev_cachep, BDEV_I(inode));
+ }
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index a690008f60cd92..2f8ede04e5a94c 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -49,6 +49,8 @@ struct block_device {
+ 	/* Mutex for freeze */
+ 	struct mutex		bd_fsfreeze_mutex;
+ 	struct super_block	*bd_fsfreeze_sb;
++
++	struct partition_meta_info *bd_meta_info;
+ } __randomize_layout;
+ 
+ #define bdev_whole(_bdev) \
 diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index 22f5b9fd96f8bf..ca5e356084c353 100644
+index 50d27f5d38e2af..30d7076155b4d2 100644
 --- a/include/linux/genhd.h
 +++ b/include/linux/genhd.h
-@@ -388,18 +388,13 @@ static inline void bd_unlink_disk_holder(struct block_device *bdev,
- }
- #endif /* CONFIG_SYSFS */
- 
-+dev_t blk_lookup_devt(const char *name, int partno);
- #ifdef CONFIG_BLOCK
- void printk_all_partitions(void);
--dev_t blk_lookup_devt(const char *name, int partno);
- #else /* CONFIG_BLOCK */
- static inline void printk_all_partitions(void)
- {
- }
--static inline dev_t blk_lookup_devt(const char *name, int partno)
--{
--	dev_t devt = MKDEV(0, 0);
--	return devt;
--}
- #endif /* CONFIG_BLOCK */
- 
- #endif /* _LINUX_GENHD_H */
+@@ -57,7 +57,6 @@ struct hd_struct {
+ 	struct device __dev;
+ 	struct kobject *holder_dir;
+ 	int policy, partno;
+-	struct partition_meta_info *info;
+ #ifdef CONFIG_FAIL_MAKE_REQUEST
+ 	int make_it_fail;
+ #endif
 diff --git a/init/do_mounts.c b/init/do_mounts.c
-index b5f9604d0c98a2..aef2f24461c7f1 100644
+index 5879edf083b318..368ccb71850126 100644
 --- a/init/do_mounts.c
 +++ b/init/do_mounts.c
-@@ -90,7 +90,6 @@ static int match_dev_by_uuid(struct device *dev, const void *data)
- 	return 0;
+@@ -79,8 +79,8 @@ static int match_dev_by_uuid(struct device *dev, const void *data)
+ 	const struct uuidcmp *cmp = data;
+ 	struct hd_struct *part = dev_to_part(dev);
+ 
+-	if (!part->info ||
+-	    strncasecmp(cmp->uuid, part->info->uuid, cmp->len))
++	if (!part->bdev->bd_meta_info ||
++	    strncasecmp(cmp->uuid, part->bdev->bd_meta_info->uuid, cmp->len))
+ 		return 0;
+ 	return 1;
  }
+@@ -169,7 +169,8 @@ static int match_dev_by_label(struct device *dev, const void *data)
+ 	const char *label = data;
+ 	struct hd_struct *part = dev_to_part(dev);
  
--
- /**
-  * devt_from_partuuid - looks up the dev_t of a partition by its UUID
-  * @uuid_str:	char array containing ascii UUID
-@@ -186,7 +185,83 @@ static int match_dev_by_label(struct device *dev, const void *data)
- 
- 	return 0;
+-	if (!part->info || strcmp(label, part->info->volname))
++	if (!part->bdev->bd_meta_info ||
++	    strcmp(label, part->bdev->bd_meta_info->volname))
+ 		return 0;
+ 	return 1;
  }
--#endif
-+
-+static dev_t devt_from_partlabel(const char *label)
-+{
-+	struct device *dev;
-+	dev_t devt = 0;
-+
-+	dev = class_find_device(&block_class, NULL, label, &match_dev_by_label);
-+	if (dev) {
-+		devt = dev->devt;
-+		put_device(dev);
-+	}
-+
-+	return devt;
-+}
-+
-+static dev_t devt_from_devname(const char *name)
-+{
-+	dev_t devt = 0;
-+	int part;
-+	char s[32];
-+	char *p;
-+
-+	if (strlen(name) > 31)
-+		return 0;
-+	strcpy(s, name);
-+	for (p = s; *p; p++) {
-+		if (*p == '/')
-+			*p = '!';
-+	}
-+
-+	devt = blk_lookup_devt(s, 0);
-+	if (devt)
-+		return devt;
-+
-+	/*
-+	 * Try non-existent, but valid partition, which may only exist after
-+	 * opening the device, like partitioned md devices.
-+	 */
-+	while (p > s && isdigit(p[-1]))
-+		p--;
-+	if (p == s || !*p || *p == '0')
-+		return 0;
-+
-+	/* try disk name without <part number> */
-+	part = simple_strtoul(p, NULL, 10);
-+	*p = '\0';
-+	devt = blk_lookup_devt(s, part);
-+	if (devt)
-+		return devt;
-+
-+	/* try disk name without p<part number> */
-+	if (p < s + 2 || !isdigit(p[-2]) || p[-1] != 'p')
-+		return 0;
-+	p[-1] = '\0';
-+	return blk_lookup_devt(s, part);
-+}
-+#endif /* CONFIG_BLOCK */
-+
-+static dev_t devt_from_devnum(const char *name)
-+{
-+	unsigned maj, min, offset;
-+	dev_t devt = 0;
-+	char *p, dummy;
-+
-+	if (sscanf(name, "%u:%u%c", &maj, &min, &dummy) == 2 ||
-+	    sscanf(name, "%u:%u:%u:%c", &maj, &min, &offset, &dummy) == 3) {
-+		devt = MKDEV(maj, min);
-+		if (maj != MAJOR(devt) || min != MINOR(devt))
-+			return 0;
-+	} else {
-+		devt = new_decode_dev(simple_strtoul(name, &p, 16));
-+		if (*p)
-+			return 0;
-+	}
-+
-+	return devt;
-+}
- 
- /*
-  *	Convert a name into device number.  We accept the following variants:
-@@ -218,101 +293,23 @@ static int match_dev_by_label(struct device *dev, const void *data)
-  *	name contains slashes, the device name has them replaced with
-  *	bangs.
-  */
--
- dev_t name_to_dev_t(const char *name)
- {
--	char s[32];
--	char *p;
--	dev_t res = 0;
--	int part;
--
-+	if (strcmp(name, "/dev/nfs") == 0)
-+		return Root_NFS;
-+	if (strcmp(name, "/dev/cifs") == 0)
-+		return Root_CIFS;
-+	if (strcmp(name, "/dev/ram") == 0)
-+		return Root_RAM0;
- #ifdef CONFIG_BLOCK
--	if (strncmp(name, "PARTUUID=", 9) == 0) {
--		name += 9;
--		res = devt_from_partuuid(name);
--		if (!res)
--			goto fail;
--		goto done;
--	} else if (strncmp(name, "PARTLABEL=", 10) == 0) {
--		struct device *dev;
--
--		dev = class_find_device(&block_class, NULL, name + 10,
--					&match_dev_by_label);
--		if (!dev)
--			goto fail;
--
--		res = dev->devt;
--		put_device(dev);
--		goto done;
--	}
-+	if (strncmp(name, "PARTUUID=", 9) == 0)
-+		return devt_from_partuuid(name + 9);
-+	if (strncmp(name, "PARTLABEL=", 10) == 0)
-+		return devt_from_partlabel(name + 10);
-+	if (strncmp(name, "/dev/", 5) == 0)
-+		return devt_from_devname(name + 5);
- #endif
--
--	if (strncmp(name, "/dev/", 5) != 0) {
--		unsigned maj, min, offset;
--		char dummy;
--
--		if ((sscanf(name, "%u:%u%c", &maj, &min, &dummy) == 2) ||
--		    (sscanf(name, "%u:%u:%u:%c", &maj, &min, &offset, &dummy) == 3)) {
--			res = MKDEV(maj, min);
--			if (maj != MAJOR(res) || min != MINOR(res))
--				goto fail;
--		} else {
--			res = new_decode_dev(simple_strtoul(name, &p, 16));
--			if (*p)
--				goto fail;
--		}
--		goto done;
--	}
--
--	name += 5;
--	res = Root_NFS;
--	if (strcmp(name, "nfs") == 0)
--		goto done;
--	res = Root_CIFS;
--	if (strcmp(name, "cifs") == 0)
--		goto done;
--	res = Root_RAM0;
--	if (strcmp(name, "ram") == 0)
--		goto done;
--
--	if (strlen(name) > 31)
--		goto fail;
--	strcpy(s, name);
--	for (p = s; *p; p++)
--		if (*p == '/')
--			*p = '!';
--	res = blk_lookup_devt(s, 0);
--	if (res)
--		goto done;
--
--	/*
--	 * try non-existent, but valid partition, which may only exist
--	 * after revalidating the disk, like partitioned md devices
--	 */
--	while (p > s && isdigit(p[-1]))
--		p--;
--	if (p == s || !*p || *p == '0')
--		goto fail;
--
--	/* try disk name without <part number> */
--	part = simple_strtoul(p, NULL, 10);
--	*p = '\0';
--	res = blk_lookup_devt(s, part);
--	if (res)
--		goto done;
--
--	/* try disk name without p<part number> */
--	if (p < s + 2 || !isdigit(p[-2]) || p[-1] != 'p')
--		goto fail;
--	p[-1] = '\0';
--	res = blk_lookup_devt(s, part);
--	if (res)
--		goto done;
--
--fail:
--	return 0;
--done:
--	return res;
-+	return devt_from_devnum(name);
- }
- EXPORT_SYMBOL_GPL(name_to_dev_t);
- 
 -- 
 2.29.2
 
