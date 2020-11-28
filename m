@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3485AC8301E
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEEEBC83021
 	for <linux-block@archiver.kernel.org>; Sat, 28 Nov 2020 22:12:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E765B22250
-	for <linux-block@archiver.kernel.org>; Sat, 28 Nov 2020 22:12:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8EC772224D
+	for <linux-block@archiver.kernel.org>; Sat, 28 Nov 2020 22:12:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="l9I7x+zf"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="YCL5FH8M"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730628AbgK1VuD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S2389571AbgK1VuD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Sat, 28 Nov 2020 16:50:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41210 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41212 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731094AbgK1Sry (ORCPT
+        with ESMTP id S1730837AbgK1Spj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 28 Nov 2020 13:47:54 -0500
+        Sat, 28 Nov 2020 13:45:39 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4912FC025488;
-        Sat, 28 Nov 2020 08:16:02 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 289A2C025483;
+        Sat, 28 Nov 2020 08:15:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=FsZkmK6a2hs6E6Z9B6tfmRfHQ191hKagU9+KV6WFNtM=; b=l9I7x+zfyYy3M2QfALdSBmMsHC
-        /hZdHYin491tNVgPie7TBuJZzFyo091g3Z3RoFGD6dlAE+OUKJOtb7eRUIU4RB/bNzQl4e4qsssKH
-        Ao1PN+wyfDizhgsZX2jn2PgmKF9CeOZGNuJziuLNr2ZLA/VbsOzHk4Cduo3Xe0xf/bEgEzGdZDClJ
-        Ww+iO61t7F+pb2DRHDUPgaNeC9ZnPNxxmBB0rcLkfM8WGXapvAc4DpS34CnYnE+qOSSsQ3wMCWVaq
-        gjRsfGbqT1SOQKUSbjLatxILGDXHnAsZgc+oh4AoexldboXuOdV5X8KWrVeCTXA5s77Y1BrobRQf6
-        FDKVcGXA==;
+        bh=vZ+otfYsHp/5sXLwka7CjsX7ANnZwDehRGIR4ErlsRo=; b=YCL5FH8MEXmod6g3jd1iMhvYAp
+        r+bAbhViZpySQ0LZ/4JWGmSi9cw+X5fkO6HG9IeN5Nviz2tqj2MtFnQUpczX1hjQln47u+pCl1W/o
+        r8Wl7DeAHeHOTcBCxvqF6ux0ARYgITzWcjIlR1flsFzf6uYZ2HKWMcU9FIYUDN5XdFlefe0Pkq9rD
+        V5IPZryzeFJg416Ba+u4n1dnP/CQ6nTtjDsG7DTRYjJAi/4zyRJgYFOH+udtU0EKVQlAvrcXzv+Pw
+        +Gpp8a8dnYj2O0GN5CbPdwHF5rbNpeCR9b6Ggu7ZoPyWMrWOn3wIODIRZGPtaNnoPm/zh1C80d+5c
+        vJn6pwGA==;
 Received: from [2001:4bb8:18c:1dd6:48f3:741a:602e:7fdd] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kj2t4-0000Jl-6t; Sat, 28 Nov 2020 16:15:50 +0000
+        id 1kj2sy-0000Hf-23; Sat, 28 Nov 2020 16:15:44 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
@@ -49,9 +49,9 @@ Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
         linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
         linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
         linux-mm@kvack.org
-Subject: [PATCH 23/45] block: opencode devcgroup_inode_permission
-Date:   Sat, 28 Nov 2020 17:14:48 +0100
-Message-Id: <20201128161510.347752-24-hch@lst.de>
+Subject: [PATCH 20/45] block: refactor __blkdev_put
+Date:   Sat, 28 Nov 2020 17:14:45 +0100
+Message-Id: <20201128161510.347752-21-hch@lst.de>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201128161510.347752-1-hch@lst.de>
 References: <20201128161510.347752-1-hch@lst.de>
@@ -62,40 +62,51 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Just call devcgroup_check_permission to avoid various superflous checks
-and a double conversion of the access flags.
+Reorder the code to have one big section for the last close, and to use
+bdev_is_partition.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
-Acked-by: Tejun Heo <tj@kernel.org>
+Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Reviewed-by: Jan Kara <jack@suse.cz>
+Acked-by: Tejun Heo <tj@kernel.org>
 ---
- fs/block_dev.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+ fs/block_dev.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/fs/block_dev.c b/fs/block_dev.c
-index a2d5050c97ee08..2b8c0586314fe2 100644
+index 962fabe8a67b83..6016777b648336 100644
 --- a/fs/block_dev.c
 +++ b/fs/block_dev.c
-@@ -1520,15 +1520,13 @@ static int blkdev_get(struct block_device *bdev, fmode_t mode, void *holder)
- 	struct block_device *claiming;
- 	bool unblock_events = true;
- 	struct gendisk *disk;
--	int perm = 0;
- 	int partno;
- 	int ret;
+@@ -1742,22 +1742,22 @@ static void __blkdev_put(struct block_device *bdev, fmode_t mode, int for_part)
+ 		WARN_ON_ONCE(bdev->bd_holders);
+ 		sync_blockdev(bdev);
+ 		kill_bdev(bdev);
+-
+ 		bdev_write_inode(bdev);
+-	}
+-	if (bdev->bd_contains == bdev) {
+-		if (disk->fops->release)
++
++		if (!bdev_is_partition(bdev) && disk->fops->release)
+ 			disk->fops->release(disk, mode);
+-	}
+-	if (!bdev->bd_openers) {
++
+ 		disk_put_part(bdev->bd_part);
+ 		bdev->bd_part = NULL;
+ 		bdev->bd_disk = NULL;
+-		if (bdev != bdev->bd_contains)
++		if (bdev_is_partition(bdev))
+ 			victim = bdev->bd_contains;
+ 		bdev->bd_contains = NULL;
  
--	if (mode & FMODE_READ)
--		perm |= MAY_READ;
--	if (mode & FMODE_WRITE)
--		perm |= MAY_WRITE;
--	ret = devcgroup_inode_permission(bdev->bd_inode, perm);
-+	ret = devcgroup_check_permission(DEVCG_DEV_BLOCK,
-+			imajor(bdev->bd_inode), iminor(bdev->bd_inode),
-+			((mode & FMODE_READ) ? DEVCG_ACC_READ : 0) |
-+			((mode & FMODE_WRITE) ? DEVCG_ACC_WRITE : 0));
- 	if (ret)
- 		goto bdput;
- 
+ 		put_disk_and_module(disk);
++	} else {
++		if (!bdev_is_partition(bdev) && disk->fops->release)
++			disk->fops->release(disk, mode);
+ 	}
+ 	mutex_unlock(&bdev->bd_mutex);
+ 	bdput(bdev);
 -- 
 2.29.2
 
