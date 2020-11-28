@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7280C64E7B
-	for <linux-block@archiver.kernel.org>; Sat, 28 Nov 2020 22:12:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01897C63777
+	for <linux-block@archiver.kernel.org>; Sat, 28 Nov 2020 22:12:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A17002222C
-	for <linux-block@archiver.kernel.org>; Sat, 28 Nov 2020 22:12:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B7FD22222C
+	for <linux-block@archiver.kernel.org>; Sat, 28 Nov 2020 22:12:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="vsx0WZEw"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="W7MOprYk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730380AbgK1VuD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 28 Nov 2020 16:50:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41224 "EHLO
+        id S2389646AbgK1VuE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 28 Nov 2020 16:50:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731167AbgK1Sry (ORCPT
+        with ESMTP id S1731114AbgK1Sry (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Sat, 28 Nov 2020 13:47:54 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F26DC02548B;
-        Sat, 28 Nov 2020 08:16:08 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 341ACC02577A;
+        Sat, 28 Nov 2020 08:15:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=K01xNfFHzht/rq8NSn+Zw6AHoRB4qp/pQaqe4QHP8t0=; b=vsx0WZEws8MFM4xfSdb6fsjPw/
-        P05zNRSsVMutf1+uzU2JmG1CUKxhZ3Oit2XqbilL7kjet9nVx108gAUCcNoIOw3Q3WO9EGo7ZIDwZ
-        Ydd9Wp0ECrsRwEg6G6/OBpinArdY00QIa44ZPAUf1O05JRmCIxsgp/BNKyIvvqBZQ67dIJ/huAUS6
-        r3uXW5U/sp3m8s8kLzkyP8HpsAEpDIdsTnF420C51Pt9j3PcaCHcLji0ZYxRQlwhX8TyZTTIgsXHb
-        CgyZt/YZZe76Kykf32O/iDm+06GiBNPAKyCHDPmvnTMkB2L1XT39EUfqYRRJq1qi8GBO8Mid+zFsW
-        8DyhT5eQ==;
+        bh=LHJmkHODqlXSa/pyLKReLuMH6HJK9XCLelMjPaHX1TM=; b=W7MOprYk1uLQtFCrlyZ60Zcqf+
+        adjqZsT9rt/ia4Ln8BixiMhS9otWzFedyy5xLlP1GrNkr9JgBHeRQqcTCm7mxPhrMYBrmQ8BR1mi7
+        Oisk/EODqsG1LGN3e/G9veB/Nb73Qp1Ro9/3bf0XR6OnI+3qrPe3VIZfA7Uzcg2yukjRhCWIzsSOf
+        AC4Z2GgAZHsYo9FFO+cQkGCByXAB/sCOXSql2H+6jEVMLiiNJ/QzgpQLk/x8GPn82etSyKciggV+u
+        qiGnNBevycSdUJWhk97VkaV4O2955FQP5mcE+2YTLKlzwzjoZFmVJfA2sW6GPgyCVw8XxxsEvjDhI
+        743hpvaw==;
 Received: from [2001:4bb8:18c:1dd6:48f3:741a:602e:7fdd] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kj2tA-0000L7-0P; Sat, 28 Nov 2020 16:15:56 +0000
+        id 1kj2sX-0000Cp-F8; Sat, 28 Nov 2020 16:15:17 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
@@ -48,10 +48,10 @@ Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
         dm-devel@redhat.com, Jan Kara <jack@suse.com>,
         linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
         linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: [PATCH 26/45] block: remove ->bd_contains
-Date:   Sat, 28 Nov 2020 17:14:51 +0100
-Message-Id: <20201128161510.347752-27-hch@lst.de>
+        linux-mm@kvack.org, Chao Yu <yuchao0@huawei.com>
+Subject: [PATCH 04/45] fs: simplify freeze_bdev/thaw_bdev
+Date:   Sat, 28 Nov 2020 17:14:29 +0100
+Message-Id: <20201128161510.347752-5-hch@lst.de>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201128161510.347752-1-hch@lst.de>
 References: <20201128161510.347752-1-hch@lst.de>
@@ -62,162 +62,258 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Now that each hd_struct has a reference to the corresponding
-block_device, there is no need for the bd_contains pointer.  Add
-a bdev_whole() helper to look up the whole device block_device
-struture instead.
+Store the frozen superblock in struct block_device to avoid the awkward
+interface that can return a sb only used a cookie, an ERR_PTR or NULL.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Reviewed-by: Jan Kara <jack@suse.cz>
-Acked-by: Tejun Heo <tj@kernel.org>
+Acked-by: Chao Yu <yuchao0@huawei.com>		[f2fs]
 ---
- drivers/block/loop.c      |  2 +-
- drivers/scsi/scsicam.c    |  2 +-
- fs/block_dev.c            | 22 ++++++++--------------
- include/linux/blk_types.h |  4 +++-
- 4 files changed, 13 insertions(+), 17 deletions(-)
+ drivers/md/dm-core.h      |  5 -----
+ drivers/md/dm.c           | 20 ++++++--------------
+ fs/block_dev.c            | 37 +++++++++++++++----------------------
+ fs/buffer.c               |  2 +-
+ fs/ext4/ioctl.c           |  2 +-
+ fs/f2fs/file.c            | 14 +++++---------
+ fs/xfs/xfs_fsops.c        |  7 ++-----
+ include/linux/blk_types.h |  1 +
+ include/linux/blkdev.h    |  4 ++--
+ 9 files changed, 33 insertions(+), 59 deletions(-)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 26c7aafba7c5f8..c0df88b3300c41 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1088,7 +1088,7 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
- 	 * here to avoid changing device under exclusive owner.
+diff --git a/drivers/md/dm-core.h b/drivers/md/dm-core.h
+index d522093cb39dda..aace147effcacb 100644
+--- a/drivers/md/dm-core.h
++++ b/drivers/md/dm-core.h
+@@ -96,11 +96,6 @@ struct mapped_device {
  	 */
- 	if (!(mode & FMODE_EXCL)) {
--		claimed_bdev = bdev->bd_contains;
-+		claimed_bdev = bdev_whole(bdev);
- 		error = bd_prepare_to_claim(bdev, claimed_bdev, loop_configure);
- 		if (error)
- 			goto out_putf;
-diff --git a/drivers/scsi/scsicam.c b/drivers/scsi/scsicam.c
-index 682cf08ab04153..f1553a453616fd 100644
---- a/drivers/scsi/scsicam.c
-+++ b/drivers/scsi/scsicam.c
-@@ -32,7 +32,7 @@
-  */
- unsigned char *scsi_bios_ptable(struct block_device *dev)
- {
--	struct address_space *mapping = dev->bd_contains->bd_inode->i_mapping;
-+	struct address_space *mapping = bdev_whole(dev)->bd_inode->i_mapping;
- 	unsigned char *res = NULL;
- 	struct page *page;
+ 	struct workqueue_struct *wq;
  
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index b350ed3af83bad..94baee369d26e5 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -119,7 +119,7 @@ int truncate_bdev_range(struct block_device *bdev, fmode_t mode,
- 	 * under live filesystem.
- 	 */
- 	if (!(mode & FMODE_EXCL)) {
--		claimed_bdev = bdev->bd_contains;
-+		claimed_bdev = bdev_whole(bdev);
- 		err = bd_prepare_to_claim(bdev, claimed_bdev,
- 					  truncate_bdev_range);
- 		if (err)
-@@ -880,7 +880,6 @@ struct block_device *bdev_alloc(struct gendisk *disk, u8 partno)
- 	spin_lock_init(&bdev->bd_size_lock);
- 	bdev->bd_disk = disk;
- 	bdev->bd_partno = partno;
--	bdev->bd_contains = NULL;
- 	bdev->bd_super = NULL;
- 	bdev->bd_inode = inode;
- 	bdev->bd_part_count = 0;
-@@ -1347,9 +1346,7 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode)
- 	int ret;
- 
- 	if (!bdev->bd_openers) {
--		bdev->bd_contains = bdev;
+-	/*
+-	 * freeze/thaw support require holding onto a super block
+-	 */
+-	struct super_block *frozen_sb;
 -
--		if (!bdev->bd_partno) {
-+		if (!bdev_is_partition(bdev)) {
- 			ret = -ENXIO;
- 			bdev->bd_part = disk_get_part(disk, 0);
- 			if (!bdev->bd_part)
-@@ -1389,7 +1386,6 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode)
- 			whole->bd_part_count++;
- 			mutex_unlock(&whole->bd_mutex);
+ 	/* forced geometry settings */
+ 	struct hd_geometry geometry;
  
--			bdev->bd_contains = whole;
- 			bdev->bd_part = disk_get_part(disk, bdev->bd_partno);
- 			if (!(disk->flags & GENHD_FL_UP) ||
- 			    !bdev->bd_part || !bdev->bd_part->nr_sects) {
-@@ -1405,7 +1401,7 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode)
- 		if (bdev->bd_bdi == &noop_backing_dev_info)
- 			bdev->bd_bdi = bdi_get(disk->queue->backing_dev_info);
- 	} else {
--		if (bdev->bd_contains == bdev) {
-+		if (!bdev_is_partition(bdev)) {
- 			ret = 0;
- 			if (bdev->bd_disk->fops->open)
- 				ret = bdev->bd_disk->fops->open(bdev, mode);
-@@ -1423,7 +1419,6 @@ static int __blkdev_get(struct block_device *bdev, fmode_t mode)
-  out_clear:
- 	disk_put_part(bdev->bd_part);
- 	bdev->bd_part = NULL;
--	bdev->bd_contains = NULL;
- 	return ret;
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 54739f1b579bc8..50541d336c719b 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -2392,27 +2392,19 @@ static int lock_fs(struct mapped_device *md)
+ {
+ 	int r;
+ 
+-	WARN_ON(md->frozen_sb);
++	WARN_ON(test_bit(DMF_FROZEN, &md->flags));
+ 
+-	md->frozen_sb = freeze_bdev(md->bdev);
+-	if (IS_ERR(md->frozen_sb)) {
+-		r = PTR_ERR(md->frozen_sb);
+-		md->frozen_sb = NULL;
+-		return r;
+-	}
+-
+-	set_bit(DMF_FROZEN, &md->flags);
+-
+-	return 0;
++	r = freeze_bdev(md->bdev);
++	if (!r)
++		set_bit(DMF_FROZEN, &md->flags);
++	return r;
  }
  
-@@ -1670,8 +1665,7 @@ static void __blkdev_put(struct block_device *bdev, fmode_t mode, int for_part)
- 		disk_put_part(bdev->bd_part);
- 		bdev->bd_part = NULL;
- 		if (bdev_is_partition(bdev))
--			victim = bdev->bd_contains;
--		bdev->bd_contains = NULL;
-+			victim = bdev_whole(bdev);
- 	} else {
- 		if (!bdev_is_partition(bdev) && disk->fops->release)
- 			disk->fops->release(disk, mode);
-@@ -1690,6 +1684,7 @@ void blkdev_put(struct block_device *bdev, fmode_t mode)
- 	mutex_lock(&bdev->bd_mutex);
+ static void unlock_fs(struct mapped_device *md)
+ {
+ 	if (!test_bit(DMF_FROZEN, &md->flags))
+ 		return;
+-
+-	thaw_bdev(md->bdev, md->frozen_sb);
+-	md->frozen_sb = NULL;
++	thaw_bdev(md->bdev);
+ 	clear_bit(DMF_FROZEN, &md->flags);
+ }
  
- 	if (mode & FMODE_EXCL) {
-+		struct block_device *whole = bdev_whole(bdev);
- 		bool bdev_free;
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index d8664f5c1ff669..33c29106c98907 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -548,55 +548,47 @@ EXPORT_SYMBOL(fsync_bdev);
+  * count down in thaw_bdev(). When it becomes 0, thaw_bdev() will unfreeze
+  * actually.
+  */
+-struct super_block *freeze_bdev(struct block_device *bdev)
++int freeze_bdev(struct block_device *bdev)
+ {
+ 	struct super_block *sb;
+ 	int error = 0;
  
- 		/*
-@@ -1700,13 +1695,12 @@ void blkdev_put(struct block_device *bdev, fmode_t mode)
- 		spin_lock(&bdev_lock);
+ 	mutex_lock(&bdev->bd_fsfreeze_mutex);
+-	if (++bdev->bd_fsfreeze_count > 1) {
+-		/*
+-		 * We don't even need to grab a reference - the first call
+-		 * to freeze_bdev grab an active reference and only the last
+-		 * thaw_bdev drops it.
+-		 */
+-		sb = get_super(bdev);
+-		if (sb)
+-			drop_super(sb);
+-		mutex_unlock(&bdev->bd_fsfreeze_mutex);
+-		return sb;
+-	}
++	if (++bdev->bd_fsfreeze_count > 1)
++		goto done;
  
- 		WARN_ON_ONCE(--bdev->bd_holders < 0);
--		WARN_ON_ONCE(--bdev->bd_contains->bd_holders < 0);
-+		WARN_ON_ONCE(--whole->bd_holders < 0);
+ 	sb = get_active_super(bdev);
+ 	if (!sb)
+-		goto out;
++		goto sync;
+ 	if (sb->s_op->freeze_super)
+ 		error = sb->s_op->freeze_super(sb);
+ 	else
+ 		error = freeze_super(sb);
++	deactivate_super(sb);
++
+ 	if (error) {
+-		deactivate_super(sb);
+ 		bdev->bd_fsfreeze_count--;
+-		mutex_unlock(&bdev->bd_fsfreeze_mutex);
+-		return ERR_PTR(error);
++		goto done;
+ 	}
+-	deactivate_super(sb);
+- out:
++	bdev->bd_fsfreeze_sb = sb;
++
++sync:
+ 	sync_blockdev(bdev);
++done:
+ 	mutex_unlock(&bdev->bd_fsfreeze_mutex);
+-	return sb;	/* thaw_bdev releases s->s_umount */
++	return error;
+ }
+ EXPORT_SYMBOL(freeze_bdev);
  
--		/* bd_contains might point to self, check in a separate step */
- 		if ((bdev_free = !bdev->bd_holders))
- 			bdev->bd_holder = NULL;
--		if (!bdev->bd_contains->bd_holders)
--			bdev->bd_contains->bd_holder = NULL;
-+		if (!whole->bd_holders)
-+			whole->bd_holder = NULL;
+ /**
+  * thaw_bdev  -- unlock filesystem
+  * @bdev:	blockdevice to unlock
+- * @sb:		associated superblock
+  *
+  * Unlocks the filesystem and marks it writeable again after freeze_bdev().
+  */
+-int thaw_bdev(struct block_device *bdev, struct super_block *sb)
++int thaw_bdev(struct block_device *bdev)
+ {
++	struct super_block *sb;
+ 	int error = -EINVAL;
  
- 		spin_unlock(&bdev_lock);
+ 	mutex_lock(&bdev->bd_fsfreeze_mutex);
+@@ -607,6 +599,7 @@ int thaw_bdev(struct block_device *bdev, struct super_block *sb)
+ 	if (--bdev->bd_fsfreeze_count > 0)
+ 		goto out;
  
++	sb = bdev->bd_fsfreeze_sb;
+ 	if (!sb)
+ 		goto out;
+ 
+diff --git a/fs/buffer.c b/fs/buffer.c
+index 23f645657488ba..a7595ada9400ff 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -523,7 +523,7 @@ static int osync_buffers_list(spinlock_t *lock, struct list_head *list)
+ 
+ void emergency_thaw_bdev(struct super_block *sb)
+ {
+-	while (sb->s_bdev && !thaw_bdev(sb->s_bdev, sb))
++	while (sb->s_bdev && !thaw_bdev(sb->s_bdev))
+ 		printk(KERN_WARNING "Emergency Thaw on %pg\n", sb->s_bdev);
+ }
+ 
+diff --git a/fs/ext4/ioctl.c b/fs/ext4/ioctl.c
+index f0381876a7e5b0..524e134324475e 100644
+--- a/fs/ext4/ioctl.c
++++ b/fs/ext4/ioctl.c
+@@ -624,7 +624,7 @@ static int ext4_shutdown(struct super_block *sb, unsigned long arg)
+ 	case EXT4_GOING_FLAGS_DEFAULT:
+ 		freeze_bdev(sb->s_bdev);
+ 		set_bit(EXT4_FLAGS_SHUTDOWN, &sbi->s_ext4_flags);
+-		thaw_bdev(sb->s_bdev, sb);
++		thaw_bdev(sb->s_bdev);
+ 		break;
+ 	case EXT4_GOING_FLAGS_LOGFLUSH:
+ 		set_bit(EXT4_FLAGS_SHUTDOWN, &sbi->s_ext4_flags);
+diff --git a/fs/f2fs/file.c b/fs/f2fs/file.c
+index ee861c6d9ff026..a9fc482a0e60a5 100644
+--- a/fs/f2fs/file.c
++++ b/fs/f2fs/file.c
+@@ -2230,16 +2230,12 @@ static int f2fs_ioc_shutdown(struct file *filp, unsigned long arg)
+ 
+ 	switch (in) {
+ 	case F2FS_GOING_DOWN_FULLSYNC:
+-		sb = freeze_bdev(sb->s_bdev);
+-		if (IS_ERR(sb)) {
+-			ret = PTR_ERR(sb);
++		ret = freeze_bdev(sb->s_bdev);
++		if (ret)
+ 			goto out;
+-		}
+-		if (sb) {
+-			f2fs_stop_checkpoint(sbi, false);
+-			set_sbi_flag(sbi, SBI_IS_SHUTDOWN);
+-			thaw_bdev(sb->s_bdev, sb);
+-		}
++		f2fs_stop_checkpoint(sbi, false);
++		set_sbi_flag(sbi, SBI_IS_SHUTDOWN);
++		thaw_bdev(sb->s_bdev);
+ 		break;
+ 	case F2FS_GOING_DOWN_METASYNC:
+ 		/* do checkpoint only */
+diff --git a/fs/xfs/xfs_fsops.c b/fs/xfs/xfs_fsops.c
+index ef1d5bb88b93ab..b7c5783a031c69 100644
+--- a/fs/xfs/xfs_fsops.c
++++ b/fs/xfs/xfs_fsops.c
+@@ -433,13 +433,10 @@ xfs_fs_goingdown(
+ {
+ 	switch (inflags) {
+ 	case XFS_FSOP_GOING_FLAGS_DEFAULT: {
+-		struct super_block *sb = freeze_bdev(mp->m_super->s_bdev);
+-
+-		if (sb && !IS_ERR(sb)) {
++		if (!freeze_bdev(mp->m_super->s_bdev)) {
+ 			xfs_force_shutdown(mp, SHUTDOWN_FORCE_UMOUNT);
+-			thaw_bdev(sb->s_bdev, sb);
++			thaw_bdev(mp->m_super->s_bdev);
+ 		}
+-
+ 		break;
+ 	}
+ 	case XFS_FSOP_GOING_FLAGS_LOGFLUSH:
 diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 9698f459cc65c9..2e0a9bd9688d28 100644
+index d9b69bbde5cc54..ebfb4e7c1fd125 100644
 --- a/include/linux/blk_types.h
 +++ b/include/linux/blk_types.h
-@@ -32,7 +32,6 @@ struct block_device {
- #ifdef CONFIG_SYSFS
- 	struct list_head	bd_holder_disks;
- #endif
--	struct block_device *	bd_contains;
- 	u8			bd_partno;
- 	struct hd_struct *	bd_part;
- 	/* number of times partitions within this device have been opened. */
-@@ -49,6 +48,9 @@ struct block_device {
- 	struct super_block	*bd_fsfreeze_sb;
+@@ -46,6 +46,7 @@ struct block_device {
+ 	int			bd_fsfreeze_count;
+ 	/* Mutex for freeze */
+ 	struct mutex		bd_fsfreeze_mutex;
++	struct super_block	*bd_fsfreeze_sb;
  } __randomize_layout;
  
-+#define bdev_whole(_bdev) \
-+	((_bdev)->bd_disk->part0.bdev)
-+
- #define bdev_kobj(_bdev) \
- 	(&part_to_dev((_bdev)->bd_part)->kobj)
+ /*
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 05b346a68c2eee..12810a19edebc4 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -2020,7 +2020,7 @@ static inline int sync_blockdev(struct block_device *bdev)
+ #endif
+ int fsync_bdev(struct block_device *bdev);
  
+-struct super_block *freeze_bdev(struct block_device *bdev);
+-int thaw_bdev(struct block_device *bdev, struct super_block *sb);
++int freeze_bdev(struct block_device *bdev);
++int thaw_bdev(struct block_device *bdev);
+ 
+ #endif /* _LINUX_BLKDEV_H */
 -- 
 2.29.2
 
