@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E84DC64E8A
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93C22C64E90
 	for <linux-block@archiver.kernel.org>; Sat, 28 Nov 2020 22:09:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1995720706
+	by mail.kernel.org (Postfix) with ESMTP id 62EA521534
 	for <linux-block@archiver.kernel.org>; Sat, 28 Nov 2020 22:09:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Pzr1nja0"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="IF4S4kPs"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389810AbgK1VuG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1730506AbgK1VuG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Sat, 28 Nov 2020 16:50:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41218 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731306AbgK1SuJ (ORCPT
+        with ESMTP id S1726361AbgK1SuJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Sat, 28 Nov 2020 13:50:09 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF163C025494;
-        Sat, 28 Nov 2020 08:20:45 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B10A9C025571;
+        Sat, 28 Nov 2020 08:15:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=coxIlFm7FcSMnYoHU+VRJv+WNmt8/1D9LTOeQ77ktrM=; b=Pzr1nja0AE7hr3st3239LMciL+
-        t4cyDfRDhOoe4r2y8ZHb353ytAggEVHWwAwi/ZlnPjwj4FL+gDM++fXMGZbMJNrErgC7xreA8ubIe
-        ceCoaJD5BcQz7KRYF1fwdUolUqwKhaTZAO8tB3TvKD3Yp1N3xfqnVjlPD6uwDIYM2QOB44Rj8gn+n
-        EHMQLrTzqM15pCHqLBb00ZtS2/NcYv2/JFTbpYE6g+tsqYbNRtSLkHbi5geaHiRxp6qLHtPYPBxWC
-        r1TuNrOW/6dxw2cgc4pat3wfudMxZQP/Ycjz7oXXMs7Gy3Dsf627oC3lTm9xA9kIw1k1vXGUsvUad
-        Env84xzQ==;
-Received: from 089144198196.atnat0007.highway.a1.net ([89.144.198.196] helo=localhost)
+        bh=bNo1hf7PfDOKYspt1zBlnNXnA2O9e+2HajFAIfk9hrw=; b=IF4S4kPse/Khbpzm2iJYZOb5//
+        AebOxo6dHKchkTnMRRirIcjeliUTt5bCFZUYwfEMlPQgswO+q8DQZlTf9KLLxiJKY0zUKP0bn304s
+        BH0EqqzknDZovzUVwE34x04IYgUMie3qdBceYJVlsVESyvYsavEFm1+gqFxk1/Wtkj6kCUanwVb0s
+        0Y+/ww4K6X/nAZoT2DCBnQknB+03pcnzjwI1Bo8oWetLBcbcaf9hoB9WrPRNq3KwE+bjB45lnbnWe
+        waBhlw4cyWzbD/pd+co9cxBUHAVmNKdRusCQfcLw1siS3uzbB90vaHbUO9ccGU5oNO+E2kNCgJFiV
+        xfOF4eAA==;
+Received: from [2001:4bb8:18c:1dd6:48f3:741a:602e:7fdd] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kj2xe-0000jX-Sg; Sat, 28 Nov 2020 16:20:35 +0000
+        id 1kj2sf-0000E1-TK; Sat, 28 Nov 2020 16:15:26 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
@@ -48,10 +48,10 @@ Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
         dm-devel@redhat.com, Jan Kara <jack@suse.com>,
         linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
         linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: [PATCH 35/45] block: move make_it_fail to struct block_device
-Date:   Sat, 28 Nov 2020 17:15:00 +0100
-Message-Id: <20201128161510.347752-36-hch@lst.de>
+        linux-mm@kvack.org, Hannes Reinecke <hare@suse.de>
+Subject: [PATCH 09/45] dm: remove the block_device reference in struct mapped_device
+Date:   Sat, 28 Nov 2020 17:14:34 +0100
+Message-Id: <20201128161510.347752-10-hch@lst.de>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201128161510.347752-1-hch@lst.de>
 References: <20201128161510.347752-1-hch@lst.de>
@@ -62,81 +62,94 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Move the make_it_fail flag to struct block_device an turn it into a bool
-in preparation of killing struct hd_struct.
+Get rid of the long-lasting struct block_device reference in
+struct mapped_device.  The only remaining user is the freeze code,
+where we can trivially look up the block device at freeze time
+and release the reference at thaw time.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Jan Kara <jack@suse.cz>
+Reviewed-by: Hannes Reinecke <hare@suse.de>
+Acked-by: Mike Snitzer <snitzer@redhat.com>
 ---
- block/blk-core.c          | 3 ++-
- block/genhd.c             | 4 ++--
- include/linux/blk_types.h | 3 +++
- include/linux/genhd.h     | 3 ---
- 4 files changed, 7 insertions(+), 6 deletions(-)
+ drivers/md/dm-core.h |  2 --
+ drivers/md/dm.c      | 25 ++++++++++++++-----------
+ 2 files changed, 14 insertions(+), 13 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 9a3793d5ce38d4..9121390be97a76 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -668,7 +668,8 @@ __setup("fail_make_request=", setup_fail_make_request);
+diff --git a/drivers/md/dm-core.h b/drivers/md/dm-core.h
+index aace147effcacb..086d293c2b036c 100644
+--- a/drivers/md/dm-core.h
++++ b/drivers/md/dm-core.h
+@@ -102,8 +102,6 @@ struct mapped_device {
+ 	/* kobject and completion */
+ 	struct dm_kobject_holder kobj_holder;
  
- static bool should_fail_request(struct hd_struct *part, unsigned int bytes)
+-	struct block_device *bdev;
+-
+ 	struct dm_stats stats;
+ 
+ 	/* for blk-mq request-based DM support */
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index ab0a8335f098d9..48051db006f30c 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -1744,11 +1744,6 @@ static void cleanup_mapped_device(struct mapped_device *md)
+ 
+ 	cleanup_srcu_struct(&md->io_barrier);
+ 
+-	if (md->bdev) {
+-		bdput(md->bdev);
+-		md->bdev = NULL;
+-	}
+-
+ 	mutex_destroy(&md->suspend_lock);
+ 	mutex_destroy(&md->type_lock);
+ 	mutex_destroy(&md->table_devices_lock);
+@@ -1840,10 +1835,6 @@ static struct mapped_device *alloc_dev(int minor)
+ 	if (!md->wq)
+ 		goto bad;
+ 
+-	md->bdev = bdget_disk(md->disk, 0);
+-	if (!md->bdev)
+-		goto bad;
+-
+ 	dm_stats_init(&md->stats);
+ 
+ 	/* Populate the mapping, nobody knows we exist yet */
+@@ -2384,11 +2375,16 @@ struct dm_table *dm_swap_table(struct mapped_device *md, struct dm_table *table)
+  */
+ static int lock_fs(struct mapped_device *md)
  {
--	return part->make_it_fail && should_fail(&fail_make_request, bytes);
-+	return part->bdev->bd_make_it_fail &&
-+		should_fail(&fail_make_request, bytes);
- }
++	struct block_device *bdev;
+ 	int r;
  
- static int __init fail_make_request_debugfs(void)
-diff --git a/block/genhd.c b/block/genhd.c
-index a964e7532fedd5..0371558ccde14c 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -1284,7 +1284,7 @@ ssize_t part_fail_show(struct device *dev,
+ 	WARN_ON(test_bit(DMF_FROZEN, &md->flags));
+ 
+-	r = freeze_bdev(md->bdev);
++	bdev = bdget_disk(md->disk, 0);
++	if (!bdev)
++		return -ENOMEM;
++	r = freeze_bdev(bdev);
++	bdput(bdev);
+ 	if (!r)
+ 		set_bit(DMF_FROZEN, &md->flags);
+ 	return r;
+@@ -2396,9 +2392,16 @@ static int lock_fs(struct mapped_device *md)
+ 
+ static void unlock_fs(struct mapped_device *md)
  {
- 	struct hd_struct *p = dev_to_part(dev);
- 
--	return sprintf(buf, "%d\n", p->make_it_fail);
-+	return sprintf(buf, "%d\n", p->bdev->bd_make_it_fail);
++	struct block_device *bdev;
++
+ 	if (!test_bit(DMF_FROZEN, &md->flags))
+ 		return;
+-	thaw_bdev(md->bdev);
++
++	bdev = bdget_disk(md->disk, 0);
++	if (!bdev)
++		return;
++	thaw_bdev(bdev);
++	bdput(bdev);
+ 	clear_bit(DMF_FROZEN, &md->flags);
  }
- 
- ssize_t part_fail_store(struct device *dev,
-@@ -1295,7 +1295,7 @@ ssize_t part_fail_store(struct device *dev,
- 	int i;
- 
- 	if (count > 0 && sscanf(buf, "%d", &i) > 0)
--		p->make_it_fail = (i == 0) ? 0 : 1;
-+		p->pdev->bd_make_it_fail = (i == 0) ? 0 : 1;
- 
- 	return count;
- }
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index c0591e52d7d7ce..b237f1e4081405 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -52,6 +52,9 @@ struct block_device {
- 	struct super_block	*bd_fsfreeze_sb;
- 
- 	struct partition_meta_info *bd_meta_info;
-+#ifdef CONFIG_FAIL_MAKE_REQUEST
-+	bool			bd_make_it_fail;
-+#endif
- } __randomize_layout;
- 
- #define bdev_whole(_bdev) \
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index b4a5c05593b99c..349cf6403ccddc 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -56,9 +56,6 @@ struct hd_struct {
- 	struct block_device *bdev;
- 	struct device __dev;
- 	int policy, partno;
--#ifdef CONFIG_FAIL_MAKE_REQUEST
--	int make_it_fail;
--#endif
- 	struct rcu_work rcu_work;
- };
  
 -- 
 2.29.2
