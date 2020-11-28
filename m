@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD4F5C8301A
-	for <linux-block@archiver.kernel.org>; Sat, 28 Nov 2020 22:09:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57554C64E7D
+	for <linux-block@archiver.kernel.org>; Sat, 28 Nov 2020 22:09:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7CA9322240
-	for <linux-block@archiver.kernel.org>; Sat, 28 Nov 2020 22:09:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 21E4E20706
+	for <linux-block@archiver.kernel.org>; Sat, 28 Nov 2020 22:09:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="jmRRoEvN"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="VOMDwJ6m"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387694AbgK1VuI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 28 Nov 2020 16:50:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41208 "EHLO
+        id S2389794AbgK1VuG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 28 Nov 2020 16:50:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41648 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730459AbgK1SuJ (ORCPT
+        with ESMTP id S1731267AbgK1SsT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 28 Nov 2020 13:50:09 -0500
+        Sat, 28 Nov 2020 13:48:19 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F22DCC025778;
-        Sat, 28 Nov 2020 08:15:29 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4618C025574;
+        Sat, 28 Nov 2020 08:15:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=Lt23dvr/EePId5z235Ac/5RuSuqAjNhom33xSrBSmHc=; b=jmRRoEvNgWLNCiJ+xEmxIoLzRQ
-        0x+66Fb7MZmgLhKP7YNithpUEcXj+nnQY8QUlmr5Ho31w5UmK9SgxL3n8aQfsedsezQKnP7OVlqle
-        INIymBX4RzptltKBOVlkW2MCCeteSb7mtVmWxyAvSSG9DNY2bqfKTPnPfX/ph5T41aIYqYL9f365s
-        eHryEqbqcvpA4Ee07VuIlVCSuSXHtF280exwHYFNEMZvnJLzLId2c1D+ySFdVGwjwheUSem33Za1W
-        vVqurkqFSK0h83kjpeonarUgTGkwnHE0gb4KxHmD45keiTbNur1Kb5U9KTidX6TpMQAwYdt/UHQkb
-        4X/wR2kg==;
+        bh=ezjilsSH8ObapSsADjLvqjKrHIaWiv9rmImRaL6mVJ4=; b=VOMDwJ6mGHuyFm/ZuBd47dPe9v
+        1WXzFtUIuWXHDDhs0wGJ1fMEPCuh2ndKYhKTL35PEwQCDgiWi1Uppx858sofUOW3j0SFalxkrC8zY
+        4ExXLWm6p1etINA27P9JHRYa0KD4KUvcIzy+/1BE2vjzVktZ42lXDbFxrP9+8yWPkmVqMAIA2QL0l
+        C4nF5nR4KaJU5kevAEE8SII1eowPyVCJyJMBDWGsYfVTKF8AYfxSSgQMIiConOV3BGX5behm+kmyM
+        W8dqI87lRZtoq2uE3HZ6aEeEmImUfSsa/NCRHwezwGmQJH+Xe5r2b/EU9hRiadWK8cSDtKWBq3K0e
+        lGkSQEfg==;
 Received: from [2001:4bb8:18c:1dd6:48f3:741a:602e:7fdd] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kj2sU-0000Bt-Ql; Sat, 28 Nov 2020 16:15:15 +0000
+        id 1kj2sl-0000F8-UZ; Sat, 28 Nov 2020 16:15:32 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
@@ -49,10 +49,10 @@ Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
         linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
         linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
         linux-mm@kvack.org, Hannes Reinecke <hare@suse.de>,
-        Matthew Wilcox <willy@infradead.org>
-Subject: [PATCH 02/45] filemap: consistently use ->f_mapping over ->i_mapping
-Date:   Sat, 28 Nov 2020 17:14:27 +0100
-Message-Id: <20201128161510.347752-3-hch@lst.de>
+        David Sterba <dsterba@suse.com>
+Subject: [PATCH 12/45] block: add a bdev_kobj helper
+Date:   Sat, 28 Nov 2020 17:14:37 +0100
+Message-Id: <20201128161510.347752-13-hch@lst.de>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201128161510.347752-1-hch@lst.de>
 References: <20201128161510.347752-1-hch@lst.de>
@@ -63,70 +63,157 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use file->f_mapping in all remaining places that have a struct file
-available to properly handle the case where inode->i_mapping !=
-file_inode(file)->i_mapping.
+Add a little helper to find the kobject for a struct block_device.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Reviewed-by: Jan Kara <jack@suse.cz>
 Reviewed-by: Hannes Reinecke <hare@suse.de>
-Reviewed-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Acked-by: Tejun Heo <tj@kernel.org>
+Acked-by: Coly Li <colyli@suse.de>		[bcache]
+Acked-by: David Sterba <dsterba@suse.com>	[btrfs]
 ---
- mm/filemap.c | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
+ drivers/md/bcache/super.c |  7 ++-----
+ drivers/md/md.c           |  4 +---
+ fs/block_dev.c            |  6 +++---
+ fs/btrfs/sysfs.c          | 15 +++------------
+ include/linux/blk_types.h |  3 +++
+ 5 files changed, 12 insertions(+), 23 deletions(-)
 
-diff --git a/mm/filemap.c b/mm/filemap.c
-index d5e7c2029d16b4..4f583489aa3c2a 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -2886,14 +2886,14 @@ EXPORT_SYMBOL(filemap_map_pages);
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 46a00134a36ae1..a6a5e21e4fd136 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -1447,8 +1447,7 @@ static int register_bdev(struct cache_sb *sb, struct cache_sb_disk *sb_disk,
+ 		goto err;
  
- vm_fault_t filemap_page_mkwrite(struct vm_fault *vmf)
- {
-+	struct address_space *mapping = vmf->vma->vm_file->f_mapping;
- 	struct page *page = vmf->page;
--	struct inode *inode = file_inode(vmf->vma->vm_file);
- 	vm_fault_t ret = VM_FAULT_LOCKED;
+ 	err = "error creating kobject";
+-	if (kobject_add(&dc->disk.kobj, &part_to_dev(bdev->bd_part)->kobj,
+-			"bcache"))
++	if (kobject_add(&dc->disk.kobj, bdev_kobj(bdev), "bcache"))
+ 		goto err;
+ 	if (bch_cache_accounting_add_kobjs(&dc->accounting, &dc->disk.kobj))
+ 		goto err;
+@@ -2342,9 +2341,7 @@ static int register_cache(struct cache_sb *sb, struct cache_sb_disk *sb_disk,
+ 		goto err;
+ 	}
  
--	sb_start_pagefault(inode->i_sb);
-+	sb_start_pagefault(mapping->host->i_sb);
- 	file_update_time(vmf->vma->vm_file);
- 	lock_page(page);
--	if (page->mapping != inode->i_mapping) {
-+	if (page->mapping != mapping) {
- 		unlock_page(page);
- 		ret = VM_FAULT_NOPAGE;
+-	if (kobject_add(&ca->kobj,
+-			&part_to_dev(bdev->bd_part)->kobj,
+-			"bcache")) {
++	if (kobject_add(&ca->kobj, bdev_kobj(bdev), "bcache")) {
+ 		err = "error calling kobject_add";
+ 		ret = -ENOMEM;
  		goto out;
-@@ -2906,7 +2906,7 @@ vm_fault_t filemap_page_mkwrite(struct vm_fault *vmf)
- 	set_page_dirty(page);
- 	wait_for_stable_page(page);
- out:
--	sb_end_pagefault(inode->i_sb);
-+	sb_end_pagefault(mapping->host->i_sb);
- 	return ret;
- }
- 
-@@ -3149,10 +3149,9 @@ void dio_warn_stale_pagecache(struct file *filp)
+diff --git a/drivers/md/md.c b/drivers/md/md.c
+index b2edf5e0f965b5..7ce6047c856ea2 100644
+--- a/drivers/md/md.c
++++ b/drivers/md/md.c
+@@ -2414,7 +2414,6 @@ EXPORT_SYMBOL(md_integrity_add_rdev);
+ static int bind_rdev_to_array(struct md_rdev *rdev, struct mddev *mddev)
  {
- 	static DEFINE_RATELIMIT_STATE(_rs, 86400 * HZ, DEFAULT_RATELIMIT_BURST);
- 	char pathname[128];
--	struct inode *inode = file_inode(filp);
- 	char *path;
+ 	char b[BDEVNAME_SIZE];
+-	struct kobject *ko;
+ 	int err;
  
--	errseq_set(&inode->i_mapping->wb_err, -EIO);
-+	errseq_set(&filp->f_mapping->wb_err, -EIO);
- 	if (__ratelimit(&_rs)) {
- 		path = file_path(filp, pathname, sizeof(pathname));
- 		if (IS_ERR(path))
-@@ -3179,7 +3178,7 @@ generic_file_direct_write(struct kiocb *iocb, struct iov_iter *from)
+ 	/* prevent duplicates */
+@@ -2477,9 +2476,8 @@ static int bind_rdev_to_array(struct md_rdev *rdev, struct mddev *mddev)
+ 	if ((err = kobject_add(&rdev->kobj, &mddev->kobj, "dev-%s", b)))
+ 		goto fail;
  
- 	if (iocb->ki_flags & IOCB_NOWAIT) {
- 		/* If there are pages to writeback, return */
--		if (filemap_range_has_page(inode->i_mapping, pos,
-+		if (filemap_range_has_page(file->f_mapping, pos,
- 					   pos + write_len - 1))
- 			return -EAGAIN;
- 	} else {
+-	ko = &part_to_dev(rdev->bdev->bd_part)->kobj;
+ 	/* failure here is OK */
+-	err = sysfs_create_link(&rdev->kobj, ko, "block");
++	err = sysfs_create_link(&rdev->kobj, bdev_kobj(rdev->bdev), "block");
+ 	rdev->sysfs_state = sysfs_get_dirent_safe(rdev->kobj.sd, "state");
+ 	rdev->sysfs_unack_badblocks =
+ 		sysfs_get_dirent_safe(rdev->kobj.sd, "unacknowledged_bad_blocks");
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 33c29106c98907..c5755150c6be62 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -1242,7 +1242,7 @@ int bd_link_disk_holder(struct block_device *bdev, struct gendisk *disk)
+ 	holder->disk = disk;
+ 	holder->refcnt = 1;
+ 
+-	ret = add_symlink(disk->slave_dir, &part_to_dev(bdev->bd_part)->kobj);
++	ret = add_symlink(disk->slave_dir, bdev_kobj(bdev));
+ 	if (ret)
+ 		goto out_free;
+ 
+@@ -1259,7 +1259,7 @@ int bd_link_disk_holder(struct block_device *bdev, struct gendisk *disk)
+ 	goto out_unlock;
+ 
+ out_del:
+-	del_symlink(disk->slave_dir, &part_to_dev(bdev->bd_part)->kobj);
++	del_symlink(disk->slave_dir, bdev_kobj(bdev));
+ out_free:
+ 	kfree(holder);
+ out_unlock:
+@@ -1287,7 +1287,7 @@ void bd_unlink_disk_holder(struct block_device *bdev, struct gendisk *disk)
+ 	holder = bd_find_holder_disk(bdev, disk);
+ 
+ 	if (!WARN_ON_ONCE(holder == NULL) && !--holder->refcnt) {
+-		del_symlink(disk->slave_dir, &part_to_dev(bdev->bd_part)->kobj);
++		del_symlink(disk->slave_dir, bdev_kobj(bdev));
+ 		del_symlink(bdev->bd_part->holder_dir,
+ 			    &disk_to_dev(disk)->kobj);
+ 		kobject_put(bdev->bd_part->holder_dir);
+diff --git a/fs/btrfs/sysfs.c b/fs/btrfs/sysfs.c
+index 279d9262b676d4..24b6c6dc69000a 100644
+--- a/fs/btrfs/sysfs.c
++++ b/fs/btrfs/sysfs.c
+@@ -1232,8 +1232,6 @@ int btrfs_sysfs_add_space_info_type(struct btrfs_fs_info *fs_info,
+ 
+ void btrfs_sysfs_remove_device(struct btrfs_device *device)
+ {
+-	struct hd_struct *disk;
+-	struct kobject *disk_kobj;
+ 	struct kobject *devices_kobj;
+ 
+ 	/*
+@@ -1243,11 +1241,8 @@ void btrfs_sysfs_remove_device(struct btrfs_device *device)
+ 	devices_kobj = device->fs_info->fs_devices->devices_kobj;
+ 	ASSERT(devices_kobj);
+ 
+-	if (device->bdev) {
+-		disk = device->bdev->bd_part;
+-		disk_kobj = &part_to_dev(disk)->kobj;
+-		sysfs_remove_link(devices_kobj, disk_kobj->name);
+-	}
++	if (device->bdev)
++		sysfs_remove_link(devices_kobj, bdev_kobj(device->bdev)->name);
+ 
+ 	if (device->devid_kobj.state_initialized) {
+ 		kobject_del(&device->devid_kobj);
+@@ -1353,11 +1348,7 @@ int btrfs_sysfs_add_device(struct btrfs_device *device)
+ 	nofs_flag = memalloc_nofs_save();
+ 
+ 	if (device->bdev) {
+-		struct hd_struct *disk;
+-		struct kobject *disk_kobj;
+-
+-		disk = device->bdev->bd_part;
+-		disk_kobj = &part_to_dev(disk)->kobj;
++		struct kobject *disk_kobj = bdev_kobj(device->bdev);
+ 
+ 		ret = sysfs_create_link(devices_kobj, disk_kobj, disk_kobj->name);
+ 		if (ret) {
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index ebfb4e7c1fd125..9698f459cc65c9 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -49,6 +49,9 @@ struct block_device {
+ 	struct super_block	*bd_fsfreeze_sb;
+ } __randomize_layout;
+ 
++#define bdev_kobj(_bdev) \
++	(&part_to_dev((_bdev)->bd_part)->kobj)
++
+ /*
+  * Block error status values.  See block/blk-core:blk_errors for the details.
+  * Alpha cannot write a byte atomically, so we need to use 32-bit value.
 -- 
 2.29.2
 
