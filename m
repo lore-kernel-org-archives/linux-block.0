@@ -4,40 +4,40 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9733EC83013
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A383C83011
 	for <linux-block@archiver.kernel.org>; Sun, 29 Nov 2020 18:21:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 590DD2085B
+	by mail.kernel.org (Postfix) with ESMTP id 2E099207FF
 	for <linux-block@archiver.kernel.org>; Sun, 29 Nov 2020 18:21:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="RNnJn233"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="VhMuTeEi"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726470AbgK2SU5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 29 Nov 2020 13:20:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59576 "EHLO
+        id S1728075AbgK2SU4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 29 Nov 2020 13:20:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726309AbgK2SUn (ORCPT
+        with ESMTP id S1726470AbgK2SUo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 29 Nov 2020 13:20:43 -0500
+        Sun, 29 Nov 2020 13:20:44 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BD30C0613D3;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1363C0613D4;
         Sun, 29 Nov 2020 10:20:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=hYHfVN063JQbHTCkfynZwru10h0kXGt47OKm344U7QI=; b=RNnJn233VIIM9mljzx/z0CfeHt
-        G7ucCDhvMQpp00m0IO2uRh5AJu7x3w8f94ZW0gJhL5j+HD6tI3vatePjdc8aLbpOL/IqpoqN1OnGZ
-        ZgZSqoVRQwzLwXKt9OCHUOfTzJkrzh4sH4SXAQcpxYEXU9jnpY/rKKtPZOVBdmelGJM4hjpxcMR+y
-        773cKGqomZoQ/OD98M3I78XxAVdwQr6ebe33IX7CEok3fS3su5N5pGTcOasso+SEeE05Hxq/BLNIR
-        XoyprCr5vtKtyPsk6uBYkfKDvUE84CfGXn+CUzhfUJIvZmn4bdsG6SrOmIjMdSV3KupxxPT2G2j1D
-        zubdPLiw==;
+        bh=EefFTETwdjTT2tc3Kw8m+h2v6iqXbIBFBB9JSH+56hw=; b=VhMuTeEiiHBfSw5NdViDL8pIQr
+        9XMfTGxzE7EnRGvgfYGgWYUd3SCyDJV5ANGHvXRV04PgLjsXbYj2iHd02HVI2HqIyBAT9JLTe1t9f
+        +2oJdvttHYxKfaFQIukm/IdW2FZ6u3m5hI2JQ5TvrF0e3Tj1LR0G0AOJNg22ZbDbs+EfOpbRjYdX+
+        FgSpC9vHtZZJw43RiPa/scGhW29vvo4bbDsh7oKnDYX9DojEX7la2eQe637f45Iwlq3ThoXPusS5u
+        XdgP16IwMB4q170Qtgwc90cLhYb9ixdGM4UUEaeckoOBvGRBAvWCqPaV1T1XgMyXVVknzbf30aGTs
+        NIy2OjVg==;
 Received: from [2001:4bb8:18c:1dd6:f89e:6884:c966:3d6c] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kjRIW-00078O-W2; Sun, 29 Nov 2020 18:19:46 +0000
+        id 1kjRIU-00078D-8U; Sun, 29 Nov 2020 18:19:43 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     "Martin K . Petersen" <martin.petersen@oracle.com>,
@@ -48,9 +48,9 @@ Cc:     "Martin K . Petersen" <martin.petersen@oracle.com>,
         Dongsheng Yang <dongsheng.yang@easystack.cn>,
         ceph-devel@vger.kernel.org, dm-devel@redhat.com,
         linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: [PATCH 4/4] dm: use bdev_read_only to check if a device is read-only
-Date:   Sun, 29 Nov 2020 19:19:26 +0100
-Message-Id: <20201129181926.897775-5-hch@lst.de>
+Subject: [PATCH 3/4] nvme: allow revalidate to set a namespace read-only
+Date:   Sun, 29 Nov 2020 19:19:25 +0100
+Message-Id: <20201129181926.897775-4-hch@lst.de>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201129181926.897775-1-hch@lst.de>
 References: <20201129181926.897775-1-hch@lst.de>
@@ -61,41 +61,29 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-dm-thin and dm-cache also work on partitions, so use the proper
-interface to check if the device is read-only.
+Unconditionally call set_disk_ro now that it only updates the hardware
+state.  This allows to properly set up the Linux devices read-only when
+the controller turns a previously writable namespace read-only.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/md/dm-cache-metadata.c | 2 +-
- drivers/md/dm-thin-metadata.c  | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ drivers/nvme/host/core.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/drivers/md/dm-cache-metadata.c b/drivers/md/dm-cache-metadata.c
-index af6d4f898e4c1d..89a73204dbf47f 100644
---- a/drivers/md/dm-cache-metadata.c
-+++ b/drivers/md/dm-cache-metadata.c
-@@ -449,7 +449,7 @@ static int __check_incompat_features(struct cache_disk_superblock *disk_super,
- 	/*
- 	 * Check for read-only metadata to skip the following RDWR checks.
- 	 */
--	if (get_disk_ro(cmd->bdev->bd_disk))
-+	if (bdev_read_only(cmd->bdev))
- 		return 0;
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index bc89e8659c403f..2442f43a1a5624 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -2047,8 +2047,7 @@ static void nvme_update_disk_info(struct gendisk *disk,
+ 	nvme_config_discard(disk, ns);
+ 	nvme_config_write_zeroes(disk, ns);
  
- 	features = le32_to_cpu(disk_super->compat_ro_flags) & ~DM_CACHE_FEATURE_COMPAT_RO_SUPP;
-diff --git a/drivers/md/dm-thin-metadata.c b/drivers/md/dm-thin-metadata.c
-index 6ebb2127f3e2e0..e75b20480e460e 100644
---- a/drivers/md/dm-thin-metadata.c
-+++ b/drivers/md/dm-thin-metadata.c
-@@ -636,7 +636,7 @@ static int __check_incompat_features(struct thin_disk_superblock *disk_super,
- 	/*
- 	 * Check for read-only metadata to skip the following RDWR checks.
- 	 */
--	if (get_disk_ro(pmd->bdev->bd_disk))
-+	if (bdev_read_only(pmd->bdev))
- 		return 0;
+-	if (id->nsattr & NVME_NS_ATTR_RO)
+-		set_disk_ro(disk, true);
++	set_disk_ro(disk, id->nsattr & NVME_NS_ATTR_RO);
+ }
  
- 	features = le32_to_cpu(disk_super->compat_ro_flags) & ~THIN_FEATURE_COMPAT_RO_SUPP;
+ static inline bool nvme_first_scan(struct gendisk *disk)
 -- 
 2.29.2
 
