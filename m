@@ -2,42 +2,42 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F22FC3E8C5
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E78DCC64E8A
 	for <linux-block@archiver.kernel.org>; Sun, 29 Nov 2020 18:21:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EE839207FF
-	for <linux-block@archiver.kernel.org>; Sun, 29 Nov 2020 18:21:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 97494221EB
+	for <linux-block@archiver.kernel.org>; Sun, 29 Nov 2020 18:21:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="DpSxjcar"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="J0xbwQ+A"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726961AbgK2SUo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1727739AbgK2SUo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Sun, 29 Nov 2020 13:20:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59572 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59574 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725830AbgK2SUn (ORCPT
+        with ESMTP id S1725882AbgK2SUn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Sun, 29 Nov 2020 13:20:43 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 605DCC0613D2;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59B5CC0613CF;
         Sun, 29 Nov 2020 10:20:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=ypeh1zE2tu7hsEqcA0sH6qIw67kFS0gBrOEt2wlFIlY=; b=DpSxjcarlaVANu+UwuqeFP67Ao
-        HA6bQP8B1rQCvKXnAFP6urgjwhVQVO8dI0anxbgMKWn5MHnEBlTFSHilfXT2LBqDCYAjBFpSelhBW
-        Ayg0yKTDclpVssVKVKf8i734cyTkDZ/OX9pR62Oc6Vs3HEN+LYROZC3IE2jkBcTOUkAhWqmi4ePGo
-        p9lxIo2GDIU2LmhxuHlFxtW1iCLAOuF0N/kcay3jOP8uYzp3oa9ZP1pyjYHrvvzUYwo8WXeTnadhd
-        6jtwic1kx7QAqR1Zfj1YS0l+V+4oNVPLmR46rhlB7g7tzm8UoYDN5LWrKyssB//1XRQIIgAePN0sY
-        oYEX2GLA==;
+        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=qBRhvARBbEpJSd0Ov2jhrf+2eiK0Ps4WvsnESinAIOA=; b=J0xbwQ+AZIdA4pOmO61IxJEmsb
+        v/zKchTU+og2KXjyj1UatA6rvsgVzDzPlBTMVM2Kp7d2suehkxXuG9SIkwnIZ2IcRsNKucXDHaier
+        6opmQz+HQvM9wxTbSTlQQR/JBN8vdr1E+Ya6ne1T1b6dvxrRASmvt1A0AFbFjC7zIfPiow4ssUZVb
+        GogYVxBh5mT49CiexJRFYSbUdEMem1LfzQBor9ORiaRc/QfcjFyke35cOt4OqYutJEbqTIo0/v4Mc
+        18ATFPYzOr1Z9Tw0eHZ+OmdfRIB5zGGSQMxqrGfDzCz/90gvA15ZpiKpwdBtsIJJVGqgP/TABm21T
+        k40jR2Mw==;
 Received: from [2001:4bb8:18c:1dd6:f89e:6884:c966:3d6c] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kjRIR-000780-Rb; Sun, 29 Nov 2020 18:19:41 +0000
+        id 1kjRIJ-00077F-BY; Sun, 29 Nov 2020 18:19:33 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     "Martin K . Petersen" <martin.petersen@oracle.com>,
@@ -48,12 +48,10 @@ Cc:     "Martin K . Petersen" <martin.petersen@oracle.com>,
         Dongsheng Yang <dongsheng.yang@easystack.cn>,
         ceph-devel@vger.kernel.org, dm-devel@redhat.com,
         linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: [PATCH 2/4] rbd: remove the ->set_read_only method
-Date:   Sun, 29 Nov 2020 19:19:24 +0100
-Message-Id: <20201129181926.897775-3-hch@lst.de>
+Subject: split hard read-only vs read-only policy v2
+Date:   Sun, 29 Nov 2020 19:19:22 +0100
+Message-Id: <20201129181926.897775-1-hch@lst.de>
 X-Mailer: git-send-email 2.29.2
-In-Reply-To: <20201129181926.897775-1-hch@lst.de>
-References: <20201129181926.897775-1-hch@lst.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
@@ -61,48 +59,27 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Now that the hardware read-only state can't be changed by the BLKROSET
-ioctl, the code in this method is not required anymore.
+Hi Jens,
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/block/rbd.c | 19 -------------------
- 1 file changed, 19 deletions(-)
+this series resurrects a patch from Martin to properly split the flag
+indicating a disk has been set read-only by the hardware vs the userspace
+policy set through the BLKROSET ioctl.
 
-diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
-index 2ed79b09439a82..2c64ca15ca079f 100644
---- a/drivers/block/rbd.c
-+++ b/drivers/block/rbd.c
-@@ -692,29 +692,10 @@ static void rbd_release(struct gendisk *disk, fmode_t mode)
- 	put_device(&rbd_dev->dev);
- }
- 
--static int rbd_set_read_only(struct block_device *bdev, bool ro)
--{
--	struct rbd_device *rbd_dev = bdev->bd_disk->private_data;
--
--	/*
--	 * Both images mapped read-only and snapshots can't be marked
--	 * read-write.
--	 */
--	if (!ro) {
--		if (rbd_is_ro(rbd_dev))
--			return -EROFS;
--
--		rbd_assert(!rbd_is_snap(rbd_dev));
--	}
--
--	return 0;
--}
--
- static const struct block_device_operations rbd_bd_ops = {
- 	.owner			= THIS_MODULE,
- 	.open			= rbd_open,
- 	.release		= rbd_release,
--	.set_read_only		= rbd_set_read_only,
- };
- 
- /*
--- 
-2.29.2
+This series is based on top of the
 
+   "merge struct block_device and struct hd_struct v4"
+
+series and won't apply to mainline or Jens' for-5.11 tree.
+
+A git tree is available here:
+
+    git://git.infradead.org/users/hch/block.git block-hard-ro
+
+Gitweb:
+
+    http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/block-hard-ro
+
+
+Changes since v1:
+ - don't propagate the policy flag from the whole disk to partitions
+ - rebased on top of the merge block_device and hd_struct series
