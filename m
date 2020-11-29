@@ -2,126 +2,107 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A4B2C3E8C5
-	for <linux-block@archiver.kernel.org>; Sun, 29 Nov 2020 17:34:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F22FC3E8C5
+	for <linux-block@archiver.kernel.org>; Sun, 29 Nov 2020 18:21:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 01BA42085B
-	for <linux-block@archiver.kernel.org>; Sun, 29 Nov 2020 17:34:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EE839207FF
+	for <linux-block@archiver.kernel.org>; Sun, 29 Nov 2020 18:21:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="DpSxjcar"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727894AbgK2ReG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 29 Nov 2020 12:34:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52426 "EHLO
+        id S1726961AbgK2SUo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 29 Nov 2020 13:20:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59572 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725830AbgK2ReG (ORCPT
+        with ESMTP id S1725830AbgK2SUn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 29 Nov 2020 12:34:06 -0500
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 091D3C0613D2
-        for <linux-block@vger.kernel.org>; Sun, 29 Nov 2020 09:33:26 -0800 (PST)
-Received: from pty.hi.pengutronix.de ([2001:67c:670:100:1d::c5])
-        by metis.ext.pengutronix.de with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1kjQYS-0006zE-4U; Sun, 29 Nov 2020 18:32:08 +0100
-Received: from ukl by pty.hi.pengutronix.de with local (Exim 4.89)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1kjQYH-0003Mg-0E; Sun, 29 Nov 2020 18:31:57 +0100
-Date:   Sun, 29 Nov 2020 18:31:53 +0100
-From:   Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To:     Takashi Iwai <tiwai@suse.de>, Michael Ellerman <mpe@ellerman.id.au>
-Cc:     Geoff Levand <geoff@infradead.org>,
-        Jaroslav Kysela <perex@perex.cz>,
-        Takashi Iwai <tiwai@suse.com>, Jens Axboe <axboe@kernel.dk>,
-        Jim Paris <jim@jtan.com>, Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        linuxppc-dev@lists.ozlabs.org, alsa-devel@alsa-project.org,
-        linux-block@vger.kernel.org, netdev@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-usb@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, linux-fbdev@vger.kernel.org
-Subject: Re: [PATCH 2/2] powerpc/ps3: make system bus's remove and shutdown
- callbacks return void
-Message-ID: <20201129173153.jbt3epcxnasbemir@pengutronix.de>
-References: <20201126165950.2554997-1-u.kleine-koenig@pengutronix.de>
- <20201126165950.2554997-2-u.kleine-koenig@pengutronix.de>
- <s5hv9dphnoh.wl-tiwai@suse.de>
+        Sun, 29 Nov 2020 13:20:43 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 605DCC0613D2;
+        Sun, 29 Nov 2020 10:20:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
+        Content-Type:Content-ID:Content-Description;
+        bh=ypeh1zE2tu7hsEqcA0sH6qIw67kFS0gBrOEt2wlFIlY=; b=DpSxjcarlaVANu+UwuqeFP67Ao
+        HA6bQP8B1rQCvKXnAFP6urgjwhVQVO8dI0anxbgMKWn5MHnEBlTFSHilfXT2LBqDCYAjBFpSelhBW
+        Ayg0yKTDclpVssVKVKf8i734cyTkDZ/OX9pR62Oc6Vs3HEN+LYROZC3IE2jkBcTOUkAhWqmi4ePGo
+        p9lxIo2GDIU2LmhxuHlFxtW1iCLAOuF0N/kcay3jOP8uYzp3oa9ZP1pyjYHrvvzUYwo8WXeTnadhd
+        6jtwic1kx7QAqR1Zfj1YS0l+V+4oNVPLmR46rhlB7g7tzm8UoYDN5LWrKyssB//1XRQIIgAePN0sY
+        oYEX2GLA==;
+Received: from [2001:4bb8:18c:1dd6:f89e:6884:c966:3d6c] (helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kjRIR-000780-Rb; Sun, 29 Nov 2020 18:19:41 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Oleksii Kurochko <olkuroch@cisco.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Dongsheng Yang <dongsheng.yang@easystack.cn>,
+        ceph-devel@vger.kernel.org, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Subject: [PATCH 2/4] rbd: remove the ->set_read_only method
+Date:   Sun, 29 Nov 2020 19:19:24 +0100
+Message-Id: <20201129181926.897775-3-hch@lst.de>
+X-Mailer: git-send-email 2.29.2
+In-Reply-To: <20201129181926.897775-1-hch@lst.de>
+References: <20201129181926.897775-1-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="q5fwi2prasbljs5f"
-Content-Disposition: inline
-In-Reply-To: <s5hv9dphnoh.wl-tiwai@suse.de>
-X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::c5
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-block@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Now that the hardware read-only state can't be changed by the BLKROSET
+ioctl, the code in this method is not required anymore.
 
---q5fwi2prasbljs5f
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/block/rbd.c | 19 -------------------
+ 1 file changed, 19 deletions(-)
 
-Hello Michael,
+diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
+index 2ed79b09439a82..2c64ca15ca079f 100644
+--- a/drivers/block/rbd.c
++++ b/drivers/block/rbd.c
+@@ -692,29 +692,10 @@ static void rbd_release(struct gendisk *disk, fmode_t mode)
+ 	put_device(&rbd_dev->dev);
+ }
+ 
+-static int rbd_set_read_only(struct block_device *bdev, bool ro)
+-{
+-	struct rbd_device *rbd_dev = bdev->bd_disk->private_data;
+-
+-	/*
+-	 * Both images mapped read-only and snapshots can't be marked
+-	 * read-write.
+-	 */
+-	if (!ro) {
+-		if (rbd_is_ro(rbd_dev))
+-			return -EROFS;
+-
+-		rbd_assert(!rbd_is_snap(rbd_dev));
+-	}
+-
+-	return 0;
+-}
+-
+ static const struct block_device_operations rbd_bd_ops = {
+ 	.owner			= THIS_MODULE,
+ 	.open			= rbd_open,
+ 	.release		= rbd_release,
+-	.set_read_only		= rbd_set_read_only,
+ };
+ 
+ /*
+-- 
+2.29.2
 
-On Sat, Nov 28, 2020 at 09:48:30AM +0100, Takashi Iwai wrote:
-> On Thu, 26 Nov 2020 17:59:50 +0100,
-> Uwe Kleine-K=F6nig wrote:
-> >=20
-> > The driver core ignores the return value of struct device_driver::remove
-> > because there is only little that can be done. For the shutdown callback
-> > it's ps3_system_bus_shutdown() which ignores the return value.
-> >=20
-> > To simplify the quest to make struct device_driver::remove return void,
-> > let struct ps3_system_bus_driver::remove return void, too. All users
-> > already unconditionally return 0, this commit makes it obvious that
-> > returning an error code is a bad idea and ensures future users behave
-> > accordingly.
-> >=20
-> > Signed-off-by: Uwe Kleine-K=F6nig <u.kleine-koenig@pengutronix.de>
->=20
-> For the sound bit:
-> Acked-by: Takashi Iwai <tiwai@suse.de>
-
-assuming that you are the one who will apply this patch: Note that it
-depends on patch 1 that Takashi already applied to his tree. So you
-either have to wait untils patch 1 appears in some tree that you merge
-before applying, or you have to take patch 1, too. (With Takashi
-optinally dropping it then.)
-
-Best regards
-Uwe
-
---=20
-Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
-Industrial Linux Solutions                 | https://www.pengutronix.de/ |
-
---q5fwi2prasbljs5f
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAl/D2wYACgkQwfwUeK3K
-7AmmxQf+IiMtqhw/kONuYhwVAdprYhlgZyY9iZSe5xHA/6/1zNmBbfhPRm6PfStb
-RRMTewx97J4joVbCv7OhlZBsoA7lnpUKJD05Qt7eXIEMdnuscbTx8YZr/z94s9/Y
-/ElFT8e2Wx6crnEbjWeFcYVTLkGgf1pnUhpFmTq4LwQqqV5lQWUu6JMnS8THMhay
-RCwTJR+P84Nw4wv39uvWN4LFmuDeM5hjnPjoEFBbnAeUtQr62AAh7itX8pTNEyZp
-t6M09QdoxpJWDPe/vRxYZSZdsuE+vXsCuMWH5Kyo0hodOX9m6JpOhsPm/YiaCK5B
-IW1LSeEeHe9uPQSACw7mkNft9x6Zfg==
-=TO3P
------END PGP SIGNATURE-----
-
---q5fwi2prasbljs5f--
