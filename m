@@ -2,96 +2,72 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C8EFC64E7B
-	for <linux-block@archiver.kernel.org>; Mon, 30 Nov 2020 15:18:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CF9DC64E8A
+	for <linux-block@archiver.kernel.org>; Mon, 30 Nov 2020 17:06:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B97B720719
-	for <linux-block@archiver.kernel.org>; Mon, 30 Nov 2020 15:18:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 95DC22074A
+	for <linux-block@archiver.kernel.org>; Mon, 30 Nov 2020 17:06:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="v71CKSQj"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725987AbgK3PSY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Nov 2020 10:18:24 -0500
-Received: from mx2.suse.de ([195.135.220.15]:59114 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725849AbgK3PSX (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Nov 2020 10:18:23 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 62EECAB63;
-        Mon, 30 Nov 2020 15:17:42 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id CC8061E131B; Mon, 30 Nov 2020 16:17:41 +0100 (CET)
-Date:   Mon, 30 Nov 2020 16:17:41 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
-        Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
-        Coly Li <colyli@suse.de>, Mike Snitzer <snitzer@redhat.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        dm-devel@redhat.com, Jan Kara <jack@suse.com>,
-        linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, Chao Yu <yuchao0@huawei.com>
-Subject: Re: [PATCH 30/45] block: remove the nr_sects field in struct
- hd_struct
-Message-ID: <20201130151741.GN11250@quack2.suse.cz>
-References: <20201128161510.347752-1-hch@lst.de>
- <20201128161510.347752-31-hch@lst.de>
- <20201130094421.GD11250@quack2.suse.cz>
- <20201130145150.GA24694@lst.de>
+        id S1727900AbgK3RGb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Nov 2020 12:06:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43866 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725955AbgK3RGb (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 30 Nov 2020 12:06:31 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 744E5C0613CF
+        for <linux-block@vger.kernel.org>; Mon, 30 Nov 2020 09:05:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=29ua36AlWUH6HMjlPo210LX/N/71WtOaxe4/BvMwAd4=; b=v71CKSQj10qFQuhPfPBdRLL8P/
+        hbC6teQWp8w4h3GIeRXzXiRdDSouoPALACj0gLY0usTDn0z1cmgqeum0gwy8qRB3C5D0GDfqajHq6
+        g5Pptw2zQU7cgsT68+krqWCmfncl9jrZeJxE3YkBz4IZ04w/nEVNXeHyt8V9ZaGy/fHEQl41ARMyo
+        NLg82ioMGNVY03iDz3hWf6pQYn1uF3uiJKs1a/0uig3Iw6dPNQKfmWqQPXRtBvZQGj35ZHUE2Hcr6
+        sEHhPuf69Y0tYhWoBH8iRLVwOV18m/kWPvhRRpoyTTJdGjwg2JexWe3OBagkP1X72A0gM57pxLzm+
+        vFjP267g==;
+Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kjmcW-0002k4-Ld; Mon, 30 Nov 2020 17:05:48 +0000
+Date:   Mon, 30 Nov 2020 17:05:48 +0000
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jeffle Xu <jefflexu@linux.alibaba.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        joseph.qi@linux.alibaba.com
+Subject: Re: [PATCH] block: fix inflight statistics of part0
+Message-ID: <20201130170548.GA10078@infradead.org>
+References: <20201126094833.61309-1-jefflexu@linux.alibaba.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201130145150.GA24694@lst.de>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20201126094833.61309-1-jefflexu@linux.alibaba.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon 30-11-20 15:51:50, Christoph Hellwig wrote:
-> On Mon, Nov 30, 2020 at 10:44:21AM +0100, Jan Kara wrote:
-> > I know I'm like a broken record about this but I still don't understand
-> > here... I'd expect the new code to be:
-> > 
-> > 	if (size == capacity ||
-> > 	    (disk->flags & (GENHD_FL_UP | GENHD_FL_HIDDEN)) != GENHD_FL_UP)
-> > 		return false;
-> > 	pr_info("%s: detected capacity change from %lld to %lld\n",
-> > 		disk->disk_name, size, capacity);
-> > +	if (!capacity || !size)
-> > +		return false;
-> > 	kobject_uevent_env(&disk_to_dev(disk)->kobj, KOBJ_CHANGE, envp);
-> > 	return true;
-> > 
-> > At least that would be equivalent to the original functionality of
-> > set_capacity_and_notify(). And if you indeed intend to change when
-> > "RESIZE=1" events are sent, then I'd expect an explanation in the changelog
-> > why this cannot break userspace (I remember we've already broken some udev
-> > rules in the past by generating unexpected events and we had to revert
-> > those changes in the partition code so I'm more careful now). The rest of
-> > the patch looks good to me.
+On Thu, Nov 26, 2020 at 05:48:33PM +0800, Jeffle Xu wrote:
+> The inflight of partition 0 doesn't include inflight IOs to all
+> sub-partitions, since currently mq calculates inflight of specific
+> partition by simply camparing the value of the partition pointer.
 > 
-> I explained that I think the GENHD_FL_UP is the more useful one here in
-> reply to your last comment.   If the size changes to or from 0 during
-> runtime we probably do want an event.
+> Thus the following case is possible:
+> 
+> $ cat /sys/block/vda/inflight
+> ?? ?? ?? ??0 ?? ?? ?? ??0
+> $ cat /sys/block/vda/vda1/inflight
+> ?? ?? ?? ??0 ?? ?? ??128
+> 
+> Partition 0 should be specially handled since it represents the whole
+> disk.
 
-Ah, right, sorry, I missed that. And I agree that it might make sense for
-changes to / from zero during runtime to send notification. But it still
-seems as a thin ice with potential to breakage to me.
-
-> But I'll add your hunk for now and we can discuss this separately.
-
-OK, thanks. With that hunk feel free to add:
-
-Reviewed-by: Jan Kara <jack@suse.cz>
-
-								Honza
-
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+I'm not sure and can see arguments for either side.  In doubt we should
+stick to historic behavior, can you check what old kernels (especially
+before blk-mq) did?
