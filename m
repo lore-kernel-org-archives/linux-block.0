@@ -2,164 +2,225 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 813D6C83012
-	for <linux-block@archiver.kernel.org>; Mon, 30 Nov 2020 14:58:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE946C71156
+	for <linux-block@archiver.kernel.org>; Mon, 30 Nov 2020 14:59:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3C35720719
-	for <linux-block@archiver.kernel.org>; Mon, 30 Nov 2020 14:58:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8213E206D8
+	for <linux-block@archiver.kernel.org>; Mon, 30 Nov 2020 14:59:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=purdue0.onmicrosoft.com header.i=@purdue0.onmicrosoft.com header.b="H5GOQMuG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727820AbgK3O6o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Nov 2020 09:58:44 -0500
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:34653 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727771AbgK3O6o (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Nov 2020 09:58:44 -0500
-Received: by mail-pl1-f193.google.com with SMTP id l11so6628296plt.1;
-        Mon, 30 Nov 2020 06:58:29 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=bmLCPYbeyHv0cOZ0Whz0ZC7+nNqmDxPfNcgMvcMFqAA=;
-        b=TiYi2Bafr9m8pMsuMYYurmvSt+IB+fm/aopyi/VpTiW6IMdJAnq0P+4CliMT9fnbTK
-         bjNlWEt7yL5ornoYiWTg1GLoVHSRt9zxR1csXhdU4hbe4V/lfNxH3k86fK1V3M7ufKsm
-         y3230kYhFOg0452TKec23SjZxcjar5E56BCHsNlg4IHVsXQK5667yN+VVnFb5Rs2u0u4
-         GeDdv/de+QS29dLEH/09JzZ8SYy1Qj74m9yvLELTiRkj+W8dxYBtTu/ejMWoNBnOsN6J
-         /FYArAOTtxlKNiagE2DepRbOVLNVYj7fepjQ5O64Q2nJZEPXAVl6HnXlFoF/MARUmkFe
-         dOoQ==
-X-Gm-Message-State: AOAM530i/xE3dYjcGMEGrI4ZTcg4TUSvBr5rVS6iOWxx19tYpAueBgGs
-        KbHkyn2eK6x6CfJObQVxPLo=
-X-Google-Smtp-Source: ABdhPJziBW/dCj4uXjRbNOAMWAoeSDGX96uG0HDLwLe3Azqbe82/ZeOMXkbbZTBn8QdJLI83LQIJcg==
-X-Received: by 2002:a17:90a:7087:: with SMTP id g7mr20485177pjk.200.1606748283435;
-        Mon, 30 Nov 2020 06:58:03 -0800 (PST)
-Received: from [192.168.3.218] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
-        by smtp.gmail.com with ESMTPSA id x21sm14195050pfc.151.2020.11.30.06.58.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Nov 2020 06:58:02 -0800 (PST)
-Subject: Re: [PATCH V1] block: Fix use-after-free while iterating over
- requests
-To:     Hannes Reinecke <hare@suse.de>, John Garry <john.garry@huawei.com>,
-        Pradeep P V K <ppvk@codeaurora.org>, axboe@kernel.dk,
-        linux-block@vger.kernel.org
-Cc:     stummala@codeaurora.org, linux-kernel@vger.kernel.org,
-        Ming Lei <ming.lei@redhat.com>
-References: <1606402925-24420-1-git-send-email-ppvk@codeaurora.org>
- <c94fcada-7f6d-a1e3-4c88-d225af1a676e@acm.org>
- <693ea723-aa9e-1166-8a19-a7787f724969@huawei.com>
- <0c925db8-e481-5f21-b0fe-f691142b0437@suse.de>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <5c3ac5af-ed81-11e4-fee3-f92175f14daf@acm.org>
-Date:   Mon, 30 Nov 2020 06:58:00 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.0
-MIME-Version: 1.0
-In-Reply-To: <0c925db8-e481-5f21-b0fe-f691142b0437@suse.de>
-Content-Type: text/plain; charset=utf-8
+        id S1726986AbgK3O7S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Nov 2020 09:59:18 -0500
+Received: from mail-bn8nam11on2120.outbound.protection.outlook.com ([40.107.236.120]:17505
+        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725897AbgK3O7R (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 30 Nov 2020 09:59:17 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=nCdTkDYi6UNBK6z9Le4Sjurpz6uMaxtZmrVpanEvvRthBDu8mI9r1F+7X2jCOfScUFY3Gsnvyp1j4vUYOqoy6qR2OtrzI7iBjQFKIXuyXKqqbWPjO4KfT3kBWPNaRSUEPUzrnDjEIKAGxeUQFB+aHlQZgMsNlXP3mg+SOUtwK2OKLMKl5JaBT2XApG8LqfuoAyJgqAI7MCpcxO0h8bHTSZa3Sxau9hMS32LbTEWyh82zZkfm8FrYC4hwVDmf519rqDW/GMnnzLUtCSQEehpFWcUjx1jIfzJgezL5GfzuNWUyKWjnpoAm61O6BxCGg/tWmVQVqfsV/YvIvIgN6Zac3A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=usxqXyGMjQ/fCKbTVplbb25CYFelVwJuWP3F5pbab10=;
+ b=MA6ogA/bBRnZfZA1C2IenkY2o9d1OBiWbOgE+guI3ytrBBodzHLRRCCBzY3GeHSPcL26pG2S5lnA0vouOMKDm3oCzeJX9TI8RV63BizSkB2otbQ0tdCTYFeCYd1bc+IF54FBTHT1T4tBBGFC3kqAK6xmZH3JUZKhZ1oySrLu1vxBcT41ag9N/zxGfablif3CADN24Kq6GxcExmgkpaRM56ZRyOfp7eEvpr2lvl51KZpIR3ZghYBPzROABd2X4kDxoya+UItxGK80hWGa3/WY8HPKZ5ms8CjvU4mypBCPStX/bSfvYMOhA/lYZjpmPKPysUnMXEb/Qp90usLKNiVveA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=purdue.edu; dmarc=pass action=none header.from=purdue.edu;
+ dkim=pass header.d=purdue.edu; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=purdue0.onmicrosoft.com; s=selector2-purdue0-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=usxqXyGMjQ/fCKbTVplbb25CYFelVwJuWP3F5pbab10=;
+ b=H5GOQMuGs13bwn4MNjVJftiVXb/fvCKqjp++t03s15LYcQyBq9zC/t8okW5JJM0iMNis1po5cDG8LiGtcQjmKtIub3Hfr6E/ZutIQpJ6tytthE1P6mV8sl99AbnS+TJHsJDjZoZCrvAppfE1lQ3smS30eakZuySyZOD81I2Kkhs=
+Received: from CH2PR22MB2056.namprd22.prod.outlook.com (2603:10b6:610:5d::11)
+ by CH2PR22MB2006.namprd22.prod.outlook.com (2603:10b6:610:83::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3611.25; Mon, 30 Nov
+ 2020 14:58:29 +0000
+Received: from CH2PR22MB2056.namprd22.prod.outlook.com
+ ([fe80::1922:c660:f2f4:50fa]) by CH2PR22MB2056.namprd22.prod.outlook.com
+ ([fe80::1922:c660:f2f4:50fa%7]) with mapi id 15.20.3611.031; Mon, 30 Nov 2020
+ 14:58:29 +0000
+From:   "Gong, Sishuai" <sishuai@purdue.edu>
+To:     "axboe@kernel.dk" <axboe@kernel.dk>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>
+Subject: [Race] data race between blkdev_ioctl() and generic_fadvise()
+Thread-Topic: [Race] data race between blkdev_ioctl() and generic_fadvise()
+Thread-Index: AQHWxylDhf3y7x6sF0qHSBkQW0hI3g==
+Date:   Mon, 30 Nov 2020 14:58:29 +0000
+Message-ID: <7F866A14-69D1-4F05-B521-05212A3F7ED7@purdue.edu>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: kernel.dk; dkim=none (message not signed)
+ header.d=none;kernel.dk; dmarc=none action=none header.from=purdue.edu;
+x-originating-ip: [66.253.158.157]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: e226530f-ccf5-4378-cf48-08d895406603
+x-ms-traffictypediagnostic: CH2PR22MB2006:
+x-microsoft-antispam-prvs: <CH2PR22MB20062EBD70F19A006DA3431EDFF50@CH2PR22MB2006.namprd22.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: yJ5AvxIMVxK3UKBiP/U5jecLGLig5dhQndCQhh2lpxHKPKL2z2Bgmf+7+AxJgvCJnPSCBu3te/Vqf2z431+vciv6dtomAjZ4XtxpXd3YwvcnLzqscoqlC+/rb8Dc8EMJJgzgvQBypqor3RuBrmgrBrMFqhWSratULUj83NGmvPtWvLQVjYWfwLl+zgGV95C8tI0FGU0ra86Pcls7F9U4O6ftchGaHFeUc3ZavPfeplz4Q9Y58q2KM/bT3exidaHNC69trnrXU7t5UdaaXwjWzAW3CFdTJcgS8UNu0A4wzExzI+TcvwHaKPFhzME9uS6k0meTVOrDOZ8A+UyBPb2g0Mp+KqIFWGVuIvCNdWpnt5TSzAN0jEC7r6JzWBxzi2+6
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR22MB2056.namprd22.prod.outlook.com;PTR:;CAT:NONE;SFS:(39860400002)(366004)(136003)(396003)(346002)(376002)(76116006)(66446008)(478600001)(64756008)(66556008)(66946007)(33656002)(75432002)(6916009)(6506007)(5660300002)(8676002)(8936002)(66476007)(26005)(186003)(2616005)(4326008)(6486002)(36756003)(71200400001)(2906002)(316002)(54906003)(786003)(86362001)(83380400001)(6512007)(41533002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: =?us-ascii?Q?Y6kjYNTll01wabKLT/t1aS8NWHYSlpooWYyoMzFe+HFVD27TfNQMBXERohN/?=
+ =?us-ascii?Q?vDDayTVtXCFH315JWH8Sv3M9tmG+U4fn7Y1l3XxEgugpEzcanQEsS9IofW7r?=
+ =?us-ascii?Q?0V7Suue29oogDHVYeJ6y9A4VqBE30HwKNJ6HAv8BFL4TSrfPIhiSx3IbuYgr?=
+ =?us-ascii?Q?mjWe7gqUsFoOioWwsDiQVppsYIyeQVCyBhP6roD7XeYnd8Oha+m0g1vm+rr1?=
+ =?us-ascii?Q?ozH9lSwmQt8fgoPCN6XsgrJZgBxs0AXmhxLidyZfvnwjJolcfKmSg+nZpjIx?=
+ =?us-ascii?Q?eMIyTN6HNcm71ALGUlvYkngFrLYEmVyvc6E+YdN5rJNdf2epKg5srslsUXWl?=
+ =?us-ascii?Q?t1s+zbJSW8Ani77R2G0BEyIbLSSlp1CqJiMh/0zkdWG1hsqci4BarP+rsaWh?=
+ =?us-ascii?Q?/GjXiBISq/HScrF08LUpi6MDC8xAI2Kt9V4OvNPEJs8JmNK+nTgdF94lMY7O?=
+ =?us-ascii?Q?Ueba4gOg68FWrCLGpqsOg1m28rISJFERSX3yqwnnY97+VbttMegKakskkS7A?=
+ =?us-ascii?Q?2eUeQkZ3A2VoDwgv3KgX7Pkn9PqrXdjjsYzns74xTm4aIVzViNGBmMEbNuxm?=
+ =?us-ascii?Q?pxkFyuyRoy3d3vTPNI7CF++FF7I5PkxEuDDSrXCWSXa9csamatleYIA2HRor?=
+ =?us-ascii?Q?oaQPaHdU2gN0y2kfvLM7dPS0YTdAWbi4cc2mnqojdXOFzWGVU05feykf38Rk?=
+ =?us-ascii?Q?yasslnL+ee0hmcwnWYB7mDvQ2G4ApNPOnioiii0l225zROffsbP17okympBZ?=
+ =?us-ascii?Q?wqcLCoIBaNSCMJ8hFIU0AcLIstMFtOo6Nbcv5gr+/hUpB2HnA1pW/4tzZuB9?=
+ =?us-ascii?Q?iPy1gY38a6t2JnFIq9dGBbXV7O9qptU0wdql0b2Uy4QXHTjzU0sJ3JLgAXqP?=
+ =?us-ascii?Q?IwiKgz9TVLjwwhWU84SHH+V0fr+7Mr3uMuH2uBiw0MEQiK5Svg3387vmyZpC?=
+ =?us-ascii?Q?P+VLAKgVP+59o5xDOoa+NbVoStWDp4XOH0k0Ymc2QWw6O2pA4/H6pAjlJMN0?=
+ =?us-ascii?Q?dSKJ?=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <6880775AE241594D9BFE5CEEC7046F58@namprd22.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: purdue.edu
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CH2PR22MB2056.namprd22.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e226530f-ccf5-4378-cf48-08d895406603
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Nov 2020 14:58:29.3632
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 4130bd39-7c53-419c-b1e5-8758d6d63f21
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: zm++pYQUQWz57wmhPJSpvTF1hmnSwZYYj0Xrl59Wt5pe/46Ck/XeaastfZHYXFh+EuiyDRlVIWf+j2JKj+R5sQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR22MB2006
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/29/20 11:04 PM, Hannes Reinecke wrote:
-> On 11/26/20 5:49 PM, John Garry wrote:
->> On 26/11/2020 16:27, Bart Van Assche wrote:
->>> On 11/26/20 7:02 AM, Pradeep P V K wrote:
->>>> Observes below crash while accessing (use-after-free) request queue
->>>> member of struct request.
->>>>
->>>> 191.784789:   <2> Unable to handle kernel paging request at virtual
->>>> address ffffff81429a4440
->>>> ...
->>>> 191.786174:   <2> CPU: 3 PID: 213 Comm: kworker/3:1H Tainted: G S
->>>> O      5.4.61-qgki-debug-ge45de39 #1
->>>> ...
->>>> 191.786226:   <2> Workqueue: kblockd blk_mq_timeout_work
->>>> 191.786242:   <2> pstate: 20c00005 (nzCv daif +PAN +UAO)
->>>> 191.786261:   <2> pc : bt_for_each+0x114/0x1a4
->>>> 191.786274:   <2> lr : bt_for_each+0xe0/0x1a4
->>>> ...
->>>> 191.786494:   <2> Call trace:
->>>> 191.786507:   <2>  bt_for_each+0x114/0x1a4
->>>> 191.786519:   <2>  blk_mq_queue_tag_busy_iter+0x60/0xd4
->>>> 191.786532:   <2>  blk_mq_timeout_work+0x54/0xe8
->>>> 191.786549:   <2>  process_one_work+0x2cc/0x568
->>>> 191.786562:   <2>  worker_thread+0x28c/0x518
->>>> 191.786577:   <2>  kthread+0x160/0x170
->>>> 191.786594:   <2>  ret_from_fork+0x10/0x18
->>>> 191.786615:   <2> Code: 0b080148 f9404929 f8685921 b4fffe01 (f9400028)
->>>> 191.786630:   <2> ---[ end trace 0f1f51d79ab3f955 ]---
->>>> 191.786643:   <2> Kernel panic - not syncing: Fatal exception
->>>>
->>>> Fix this by updating the freed request with NULL.
->>>> This could avoid accessing the already free request from other
->>>> contexts while iterating over the requests.
->>>>
->>>> Signed-off-by: Pradeep P V K <ppvk@codeaurora.org>
->>>> ---
->>>>   block/blk-mq.c | 1 +
->>>>   block/blk-mq.h | 1 +
->>>>   2 files changed, 2 insertions(+)
->>>>
->>>> diff --git a/block/blk-mq.c b/block/blk-mq.c
->>>> index 55bcee5..9996cb1 100644
->>>> --- a/block/blk-mq.c
->>>> +++ b/block/blk-mq.c
->>>> @@ -492,6 +492,7 @@ static void __blk_mq_free_request(struct request
->>>> *rq)
->>>>       blk_crypto_free_request(rq);
->>>>       blk_pm_mark_last_busy(rq);
->>>> +    hctx->tags->rqs[rq->tag] = NULL;
->>>>       rq->mq_hctx = NULL;
->>>>       if (rq->tag != BLK_MQ_NO_TAG)
->>>>           blk_mq_put_tag(hctx->tags, ctx, rq->tag);
->>>> diff --git a/block/blk-mq.h b/block/blk-mq.h
->>>> index a52703c..8747bf1 100644
->>>> --- a/block/blk-mq.h
->>>> +++ b/block/blk-mq.h
->>>> @@ -224,6 +224,7 @@ static inline int
->>>> __blk_mq_active_requests(struct blk_mq_hw_ctx *hctx)
->>>>   static inline void __blk_mq_put_driver_tag(struct blk_mq_hw_ctx
->>>> *hctx,
->>>>                          struct request *rq)
->>>>   {
->>>> +    hctx->tags->rqs[rq->tag] = NULL;
->>>>       blk_mq_put_tag(hctx->tags, rq->mq_ctx, rq->tag);
->>>>       rq->tag = BLK_MQ_NO_TAG;
->>>
->>> Is this perhaps a block driver bug instead of a block layer core bug? If
->>> this would be a block layer core bug, it would have been reported
->>> before.
->>
->> Isn't this the same issue which as been reported many times:
->>
->> https://lore.kernel.org/linux-block/20200820180335.3109216-1-ming.lei@redhat.com/
->>
->>
->> https://lore.kernel.org/linux-block/8376443a-ec1b-0cef-8244-ed584b96fa96@huawei.com/
->>
->>
->> But I never saw a crash, just kasan report.
->>
-> And if that above were a concern, I would have thought one would need to
-> use a WRITE_ONCE() here; otherwise we might have a race condition where
-> other CPUs still see the old value, no?
+Hi,
 
-Hi Hannes,
+We found a data race in linux kernel 5.3.11 that we are able to reproduce i=
+n x86 under specific interleavings. Currently, we are not sure about the co=
+nsequence of this race so we would like to confirm with the community if th=
+is is a harmful bug.
 
-Freeing tag->rqs and tags->static_rqs with kfree_rcu() is probably a
-better solution than clearing request pointers. Even when using
-WRITE_ONCE() to clear tag pointers, it is still possible that another
-thread read the tag pointer before the WRITE_ONCE() and uses it after
-the WRITE_ONCE() has finished.
+------------------------------------------
+Writer site
+
+ /tmp/tmp.B7zb7od2zE-5.3.11/extract/linux-5.3.11/block/ioctl.c:573
+        553      case BLKPBSZGET: /* get block device physical block size *=
+/
+        554          return put_uint(arg, bdev_physical_block_size(bdev));
+        555      case BLKIOMIN:
+        556          return put_uint(arg, bdev_io_min(bdev));
+        557      case BLKIOOPT:
+        558          return put_uint(arg, bdev_io_opt(bdev));
+        559      case BLKALIGNOFF:
+        560          return put_int(arg, bdev_alignment_offset(bdev));
+        561      case BLKDISCARDZEROES:
+        562          return put_uint(arg, 0);
+        563      case BLKSECTGET:
+        564          max_sectors =3D min_t(unsigned int, USHRT_MAX,
+        565                      queue_max_sectors(bdev_get_queue(bdev)));
+        566          return put_ushort(arg, max_sectors);
+        567      case BLKROTATIONAL:
+        568          return put_ushort(arg, !blk_queue_nonrot(bdev_get_queu=
+e(bdev)));
+        569      case BLKRASET:
+        570      case BLKFRASET:
+        571          if(!capable(CAP_SYS_ADMIN))
+        572              return -EACCES;
+ =3D=3D>    573          bdev->bd_bdi->ra_pages =3D (arg * 512) / PAGE_SIZE=
+;
+        574          return 0;
+        575      case BLKBSZSET:
+        576          return blkdev_bszset(bdev, mode, argp);
+        577      case BLKPG:
+        578          return blkpg_ioctl(bdev, argp);
+        579      case BLKRRPART:
+        580          return blkdev_reread_part(bdev);
+        581      case BLKGETSIZE:
+        582          size =3D i_size_read(bdev->bd_inode);
+        583          if ((size >> 9) > ~0UL)
+        584              return -EFBIG;
+        585          return put_ulong(arg, size >> 9);
+        586      case BLKGETSIZE64:
+        587          return put_u64(arg, i_size_read(bdev->bd_inode));
+        588      case BLKTRACESTART:
+        589      case BLKTRACESTOP:
+        590      case BLKTRACESETUP:
+        591      case BLKTRACETEARDOWN:
+        592          return blk_trace_ioctl(bdev, cmd, argp);
+        593      case IOC_PR_REGISTER:
+
+------------------------------------------
+Reader site
+/tmp/tmp.B7zb7od2zE-5.3.11/extract/linux-5.3.11/mm/fadvise.c:79
+         66      /*
+         67       * Careful about overflows. Len =3D=3D 0 means "as much as=
+ possible".  Use
+         68       * unsigned math because signed overflows are undefined an=
+d UBSan
+         69       * complains.
+         70       */
+         71      endbyte =3D (u64)offset + (u64)len;
+         72      if (!len || endbyte < len)
+         73          endbyte =3D -1;
+         74      else
+         75          endbyte--;      /* inclusive */
+         76
+         77      switch (advice) {
+         78      case POSIX_FADV_NORMAL:
+ =3D=3D>     79          file->f_ra.ra_pages =3D bdi->ra_pages;
+         80          spin_lock(&file->f_lock);
+         81          file->f_mode &=3D ~FMODE_RANDOM;
+         82          spin_unlock(&file->f_lock);
+         83          break;
+         84      case POSIX_FADV_RANDOM:
+         85          spin_lock(&file->f_lock);
+         86          file->f_mode |=3D FMODE_RANDOM;
+         87          spin_unlock(&file->f_lock);
+         88          break;
+         89      case POSIX_FADV_SEQUENTIAL:
+         90          file->f_ra.ra_pages =3D bdi->ra_pages * 2;
+         91          spin_lock(&file->f_lock);
+         92          file->f_mode &=3D ~FMODE_RANDOM;
+         93          spin_unlock(&file->f_lock);
+         94          break;
+         95      case POSIX_FADV_WILLNEED:
+         96          /* First and last PARTIAL page! */
+         97          start_index =3D offset >> PAGE_SHIFT;
+         98          end_index =3D endbyte >> PAGE_SHIFT;
+
+
+
+------------------------------------------
+Writer calling trace
+
+- ksys_ioctl
+-- do_vfs_ioctl
+--- vfs_ioctl
+---- blkdev_ioctl
+
+------------------------------------------
+Reader calling trace
+- ksys_fadvise64_64
+-- vfs_fadvise
+--- generic_fadvise
+
+
 
 Thanks,
+Sishuai
 
-Bart.
