@@ -2,171 +2,749 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-20.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB1F8C63777
-	for <linux-block@archiver.kernel.org>; Mon, 30 Nov 2020 19:43:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C323FC64E7B
+	for <linux-block@archiver.kernel.org>; Mon, 30 Nov 2020 20:20:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ADA6D2076E
-	for <linux-block@archiver.kernel.org>; Mon, 30 Nov 2020 19:43:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 36D5E20870
+	for <linux-block@archiver.kernel.org>; Mon, 30 Nov 2020 20:20:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c9k7hwQF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728901AbgK3Tnl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Nov 2020 14:43:41 -0500
-Received: from mail-1.ca.inter.net ([208.85.220.69]:59373 "EHLO
-        mail-1.ca.inter.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727942AbgK3Tnk (ORCPT
+        id S1730061AbgK3UUT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Nov 2020 15:20:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45980 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729128AbgK3UUT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Nov 2020 14:43:40 -0500
-Received: from localhost (offload-3.ca.inter.net [208.85.220.70])
-        by mail-1.ca.inter.net (Postfix) with ESMTP id 582CE2EAB4E;
-        Mon, 30 Nov 2020 14:42:59 -0500 (EST)
-Received: from mail-1.ca.inter.net ([208.85.220.69])
-        by localhost (offload-3.ca.inter.net [208.85.220.70]) (amavisd-new, port 10024)
-        with ESMTP id Xpjzrty-J49n; Mon, 30 Nov 2020 14:32:40 -0500 (EST)
-Received: from [192.168.48.23] (host-104-157-204-209.dyn.295.ca [104.157.204.209])
-        (using TLSv1 with cipher DHE-RSA-AES128-SHA (128/128 bits))
-        (No client certificate requested)
-        (Authenticated sender: dgilbert@interlog.com)
-        by mail-1.ca.inter.net (Postfix) with ESMTPSA id B47E72EAB43;
-        Mon, 30 Nov 2020 14:42:58 -0500 (EST)
-Reply-To: dgilbert@interlog.com
-Subject: Re: [PATCH v1 3/3] scsi_debug: iouring iopoll support
-To:     Kashyap Desai <kashyap.desai@broadcom.com>,
-        linux-scsi@vger.kernel.org
-Cc:     linux-block@vger.kernel.org
-References: <20201015133721.63476-1-kashyap.desai@broadcom.com>
- <56c55fed-3034-9fbf-b089-a07e74d9b05b@interlog.com>
- <1d8b5c319efd67aadd411632ee519295@mail.gmail.com>
-From:   Douglas Gilbert <dgilbert@interlog.com>
-Message-ID: <290fc0c0-924e-7b05-d6d7-6af8aeaf855e@interlog.com>
-Date:   Mon, 30 Nov 2020 14:42:57 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Mon, 30 Nov 2020 15:20:19 -0500
+Received: from mail-qk1-x744.google.com (mail-qk1-x744.google.com [IPv6:2607:f8b0:4864:20::744])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13EE2C0613D2;
+        Mon, 30 Nov 2020 12:19:39 -0800 (PST)
+Received: by mail-qk1-x744.google.com with SMTP id h20so12166183qkk.4;
+        Mon, 30 Nov 2020 12:19:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=POIQtCk2n7qVpZqvUvffKc/xeFea6qD4kcEhPfRZBlQ=;
+        b=c9k7hwQF3PP4U0k9sqZYh1Hzk2bn3xEl4k/ppklPjYf7MYDfyifEQKk6qqpI0q9z39
+         MJKAWvZ0BNhDcAIjG8awBhAcTEBlaHkBrpVleskJzgwS0oN52d0xz67wN8tkT9Fys2BP
+         6qOGlT/IEAjOooQ19exzxsPOKojy+88PAOfKlhTUL7q+UBfxVxs3HiP2C7xqB0lWlVQf
+         gmsEAkOUAcc1e/hTzakk9155JFV7geZEJFpCLNQ0fJnjg3AsH/anlnUpQLFSS8+GXkP2
+         9qAVK2cuKONItY9ESJrm89GEEBizlz0pfhYvKL44ms48ZuP1xlDpjKLBjMOzvdK10dSO
+         gVyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=POIQtCk2n7qVpZqvUvffKc/xeFea6qD4kcEhPfRZBlQ=;
+        b=YjJANPbT8f3IjecdUeaz/9ZOgfPuELgS2RQ2/eal7DAEAvTAoLtn9ub/ip96XYUTPE
+         7noY/FD9PVhkH2y+jY/R2/SYWdzIMQzEdPeHmqXbmN+IvX9FxTXvued5g1FpL/0maiSr
+         7pI/La07QqmMquaEgA5YyH4BhK2Wq6y4+Fesopl5OxGvuWbqk3uWnui8WDKFXV86ETpW
+         rG1Se041lqO/6dFj0WwFSvI7cX4OvPxZJvyAK/Tn8H+6mVvRrkpJJbKOP8CY5UgvdKUl
+         69emhY4bTeKAafVaYvTu3KD0zEsngcSr1ABxVdFEoZUhUdqjrA4KTirBR/XvWQUfsoY9
+         4ZnQ==
+X-Gm-Message-State: AOAM530SDsYKjFwUU/Mm2u90yx2DZrvYxMxWSMgqLit85rC+niFJXcwJ
+        cW9h2NKN8mEEcaWqZzQMBuJ82vHXzB5w
+X-Google-Smtp-Source: ABdhPJzZY/bJS0t+cCTU1c8sNbvAVMx8SyvCQl/EFsU5Y5fhzuZUtn1ZbbhsHY5r7QzVevS5SbzqJQ==
+X-Received: by 2002:a37:cd6:: with SMTP id 205mr25249600qkm.249.1606767577989;
+        Mon, 30 Nov 2020 12:19:37 -0800 (PST)
+Received: from localhost.localdomain ([68.175.153.174])
+        by smtp.gmail.com with ESMTPSA id u22sm16489849qkk.51.2020.11.30.12.19.35
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 30 Nov 2020 12:19:37 -0800 (PST)
+From:   Rachit Agarwal <rach4x0r@gmail.com>
+To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
+Cc:     Rachit Agarwal <ragarwal@cornell.edu>, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Keith Busch <kbusch@kernel.org>,
+        Ming Lei <ming.lei@redhat.com>,
+        Jaehyun Hwang <jaehyun.hwang@cornell.edu>,
+        Qizhe Cai <qc228@cornell.edu>,
+        Midhul Vuppalapati <mvv25@cornell.edu>,
+        Sagi Grimberg <sagi@lightbitslabs.com>,
+        Shrijeet Mukherjee <shrijeet@gmail.com>,
+        David Ahern <dsahern@gmail.com>
+Subject: [PATCH v2] iosched: Add i10 I/O Scheduler
+Date:   Mon, 30 Nov 2020 15:19:27 -0500
+Message-Id: <20201130201927.84846-1-rach4x0r@gmail.com>
+X-Mailer: git-send-email 2.15.2 (Apple Git-101.1)
 MIME-Version: 1.0
-In-Reply-To: <1d8b5c319efd67aadd411632ee519295@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-CA
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-11-30 4:06 a.m., Kashyap Desai wrote:
->>
->> On 2020-10-15 9:37 a.m., Kashyap Desai wrote:
->>> Add support of iouring iopoll interface in scsi_debug.
->>> This feature requires shared hosttag support in kernel and driver.
->>
->> I am continuing to test this patch. There is one fix shown inline below
->> plus a
->> question near the end.
-> 
-> Hi Doug,  I have created add-on patch which includes all your comment. I am
-> also able to see the issue you reported and below patch fix it.
-> I will hold V2 revision of the series and I will wait for your Review-by and
-> Tested-by Tag.
-> 
-> diff --git a/drivers/scsi/scsi_debug.c b/drivers/scsi/scsi_debug.c
-> index 4d9cc6af588c..fb328253086d 100644
-> --- a/drivers/scsi/scsi_debug.c
-> +++ b/drivers/scsi/scsi_debug.c
-> @@ -5675,6 +5675,7 @@ MODULE_PARM_DESC(opt_xferlen_exp, "optimal transfer
-> length granularity exponent
->   MODULE_PARM_DESC(opts, "1->noise, 2->medium_err, 4->timeout,
-> 8->recovered_err... (def=0)");
->   MODULE_PARM_DESC(per_host_store, "If set, next positive add_host will get
-> new store (def=0)");
->   MODULE_PARM_DESC(physblk_exp, "physical block exponent (def=0)");
-> +MODULE_PARM_DESC(poll_queues, "support for iouring iopoll queues (1 to
-> max(submit_queues - 1)");
->   MODULE_PARM_DESC(ptype, "SCSI peripheral type(def=0[disk])");
->   MODULE_PARM_DESC(random, "If set, uniformly randomize command duration
-> between 0 and delay_in_ns");
->   MODULE_PARM_DESC(removable, "claim to have removable media (def=0)");
-> @@ -5683,7 +5684,6 @@ MODULE_PARM_DESC(sector_size, "logical block size in
-> bytes (def=512)");
->   MODULE_PARM_DESC(statistics, "collect statistics on commands, queues
-> (def=0)");
->   MODULE_PARM_DESC(strict, "stricter checks: reserved field in cdb (def=0)");
->   MODULE_PARM_DESC(submit_queues, "support for block multi-queue (def=1)");
-> -MODULE_PARM_DESC(poll_queues, "support for iouring iopoll queues");
->   MODULE_PARM_DESC(tur_ms_to_ready, "TEST UNIT READY millisecs before initial
-> good status (def=0)");
->   MODULE_PARM_DESC(unmap_alignment, "lowest aligned thin provisioning lba
-> (def=0)");
->   MODULE_PARM_DESC(unmap_granularity, "thin provisioning granularity in
-> blocks (def=1)");
-> @@ -7199,7 +7199,7 @@ static int sdebug_blk_mq_poll(struct Scsi_Host *shost,
-> unsigned int queue_num)
->          do {
->                  spin_lock_irqsave(&sqp->qc_lock, iflags);
->                  qc_idx = find_first_bit(sqp->in_use_bm, sdebug_max_queue);
-> -               if (unlikely((qc_idx < 0) || (qc_idx >= SDEBUG_CANQUEUE)))
-> +               if (unlikely((qc_idx < 0) || (qc_idx >= sdebug_max_queue)))
->                          goto out;
-> 
->                  sqcp = &sqp->qc_arr[qc_idx];
-> @@ -7477,10 +7477,17 @@ static int sdebug_driver_probe(struct device *dev)
->                  hpnt->host_tagset = 1;
-> 
->          /* poll queues are possible for nr_hw_queues > 1 */
-> -       if (hpnt->nr_hw_queues == 1)
-> +       if (hpnt->nr_hw_queues == 1 || (poll_queues < 1)) {
-> +               pr_warn("%s: trim poll_queues to 0. poll_q/nr_hw = (%d/%d)
-> \n",
-> +                        my_name, poll_queues, hpnt->nr_hw_queues);
->                  poll_queues = 0;
-> +       }
-> 
-> -       /* poll queues  */
-> +       /*
-> +        * Poll queues don't need interrupts, but we need at least one I/O
-> queue
-> +        * left over for non-polled I/O.
-> +        * If condition not met, trim poll_queues to 1 (just for
-> simplicity).
-> +        */
->          if (poll_queues >= submit_queues) {
->                  pr_warn("%s: trim poll_queues to 1\n", my_name);
->                  poll_queues = 1;
-> 
->
+From: Rachit Agarwal <ragarwal@cornell.edu>
 
-Kashyap,
-I struggled with this patch, first the line wrap, then the last two
-patch segments not applying. Could you send me the scsi_debug.c file
-attached to an email?
+Hi All,
 
->>> +	do {
->>> +		spin_lock_irqsave(&sqp->qc_lock, iflags);
->>> +		qc_idx = find_first_bit(sqp->in_use_bm, sdebug_max_queue);
->>> +		if (unlikely((qc_idx < 0) || (qc_idx >= SDEBUG_CANQUEUE)))
->>
->> The above line IMO needs to be:
->> 		if (unlikely((qc_idx < 0) || (qc_idx >= sdebug_max_queue)))
->>
->> If not, when sdebug_max_queue < SDEBUG_CANQUEUE and there is no
->> request waiting then "scp is NULL, ..." is reported suggesting there is an
->> error.
-> 
-> BTW -  Is below piece of code at sdebug_q_cmd_complete() requires similar
-> change ?
-> Use sdebug_max_queue instead of SDEBUG_CANQUEUE
->          if (unlikely((qc_idx < 0) || (qc_idx >= SDEBUG_CANQUEUE))) {
->                  pr_err("wild qc_idx=%d\n", qc_idx);
->                  return;
->          }
+I/O batching is beneficial for optimizing IOPS and throughput for various
+applications. For instance, several kernel block drivers would benefit from
+batching, including mmc [1] and tcp-based storage drivers like nvme-tcp [2,3].
+While we have support for batching dispatch [4], we need an I/O scheduler to
+efficiently enable batching. Such a scheduler is particularly interesting for
+disaggregated (remote) storage, where the access latency of disaggregated remote
+storage may be higher than local storage access; thus, batching can significantly
+help in amortizing the remote access latency while increasing the throughput.
 
-Yes, I need to look at this. sdebug_max_queue is initialized to
-SDEBUG_CANQUEUE but then can be overridden by the invocation line parameters.
-Several arrays in structures are sized by SDEBUG_CANQUEUE which will
-remain. But most SDEBUG_CANQUEUE uses inside driver functions can probably
-be replaced by sdebug_max_queue when I confirm that it is safe. Since
-sdebug_max_queue <= SDEBUG_CANQUEUE and the fields in between should
-always be zero, the current situation just leads to wasted cycles.
+This patch introduces the i10 I/O scheduler, which performs batching per hctx in
+terms of #requests, #bytes, and timeouts (at microseconds granularity). i10 starts
+dispatching only when #requests or #bytes is larger than a threshold or when a timer
+expires. After that, batching dispatch [3] would happen, allowing batching at device
+drivers along with "bd->last" and ".commit_rqs".
 
-Doug Gilbert
+The i10 I/O scheduler builds upon recent work on [6]. We have tested the i10 I/O
+scheduler with nvme-tcp optimizaitons [2,3] and batching dispatch [4], varying number
+of cores, varying read/write ratios, and varying request sizes, and with NVMe SSD and
+RAM block device. For remote NVMe SSDs, the i10 I/O scheduler achieves ~60% improvements
+in terms of IOPS per core over "noop" I/O scheduler, while trading off latency at lower loads.
+These results are available at [5], and many additional results are presented in [6].
+
+While other schedulers may also batch I/O (e.g., mq-deadline), the optimization target
+in the i10 I/O scheduler is throughput maximization. Hence there is no latency target
+nor a need for a global tracking context, so a new scheduler is needed rather than
+to build this functionality to an existing scheduler.
+
+We have default values for batching thresholds (e.g., 16 for #requests, 64KB for #bytes,
+and 50us for timeout). These default values are based on sensitivity tests in [6].
+For many workloads, especially those with low loads, the default values of i10 scheduler
+may not provide the optimal operating point on the latency-throughput curve. To that end,
+the scheduler adaptively sets the batch size depending on number of outstanding requests
+and the triggering of timeouts, as measured in the block layer. Much work needs to be done
+to design better adaptation algorithms, especially when the loads are neither too high
+nor too low. This constitutes interesting future work. In addition, for our future work, we
+plan to extend the scheduler to support isolation in multi-tenant
+deployments (to simultaneously achieve low tail latency for latency-sensitive applications
+and high throughput for throughput-bound applications).
+
+References
+[1] https://lore.kernel.org/linux-block/cover.1587888520.git.baolin.wang7@gmail.com/T/#mc48a8fb6069843827458f5fea722e1179d32af2a
+[2] https://git.infradead.org/nvme.git/commit/122e5b9f3d370ae11e1502d14ff5c7ea9b144a76
+[3] https://git.infradead.org/nvme.git/commit/86f0348ace1510d7ac25124b096fb88a6ab45270
+[4] https://lore.kernel.org/linux-block/20200630102501.2238972-1-ming.lei@redhat.com/
+[5] https://github.com/i10-kernel/upstream-linux/blob/master/i10-evaluation.pdf
+[6] https://www.usenix.org/conference/nsdi20/presentation/hwang
+
+v2:
+	- rebase it onto the master branch
+	- add an adaptive mode for adjusting batch-size according to workloads
+	- update the link of the evaluation report [5]
+
+Signed-off-by: Jaehyun Hwang <jaehyun.hwang@cornell.edu>
+Signed-off-by: Qizhe Cai <qc228@cornell.edu>
+Signed-off-by: Midhul Vuppalapati <mvv25@cornell.edu>
+Signed-off-by: Rachit Agarwal <ragarwal@cornell.edu>
+Signed-off-by: Sagi Grimberg <sagi@lightbitslabs.com>
+---
+ Documentation/block/i10-iosched.rst |  79 ++++++
+ block/Kconfig.iosched               |   8 +
+ block/Makefile                      |   1 +
+ block/i10-iosched.c                 | 471 ++++++++++++++++++++++++++++++++++++
+ 4 files changed, 559 insertions(+)
+ create mode 100644 Documentation/block/i10-iosched.rst
+ create mode 100644 block/i10-iosched.c
+
+diff --git a/Documentation/block/i10-iosched.rst b/Documentation/block/i10-iosched.rst
+new file mode 100644
+index 0000000..661b5d5
+--- /dev/null
++++ b/Documentation/block/i10-iosched.rst
+@@ -0,0 +1,79 @@
++==========================
++i10 I/O scheduler overview
++==========================
++
++I/O batching is beneficial for optimizing IOPS and throughput for various
++applications. For instance, several kernel block drivers would benefit from
++batching, including mmc [1] and tcp-based storage drivers like nvme-tcp [2,3].
++While we have support for batching dispatch [4], we need an I/O scheduler to
++efficiently enable batching. Such a scheduler is particularly interesting for
++disaggregated (remote) storage, where the access latency of disaggregated remote
++storage may be higher than local storage access; thus, batching can significantly
++help in amortizing the remote access latency while increasing the throughput.
++
++This patch introduces the i10 I/O scheduler, which performs batching per hctx in
++terms of #requests, #bytes, and timeouts (at microseconds granularity). i10 starts
++dispatching only when #requests or #bytes is larger than a threshold or when a timer
++expires. After that, batching dispatch [3] would happen, allowing batching at device
++drivers along with "bd->last" and ".commit_rqs".
++
++The i10 I/O scheduler builds upon recent work on [6]. We have tested the i10 I/O
++scheduler with nvme-tcp optimizaitons [2,3] and batching dispatch [4], varying number
++of cores, varying read/write ratios, and varying request sizes, and with NVMe SSD and
++RAM block device. For remote NVMe SSDs, the i10 I/O scheduler achieves ~60% improvements
++in terms of IOPS per core over "noop" I/O scheduler, while trading off latency at lower loads.
++These results are available at [5], and many additional results are presented in [6].
++
++While other schedulers may also batch I/O (e.g., mq-deadline), the optimization target
++in the i10 I/O scheduler is throughput maximization. Hence there is no latency target
++nor a need for a global tracking context, so a new scheduler is needed rather than
++to build this functionality to an existing scheduler.
++
++We have default values for batching thresholds (e.g., 16 for #requests, 64KB for #bytes,
++and 50us for timeout). These default values are based on sensitivity tests in [6].
++For many workloads, especially those with low loads, the default values of i10 scheduler
++may not provide the optimal operating point on the latency-throughput curve. To that end,
++the scheduler adaptively sets the batch size depending on number of outstanding requests
++and the triggering of timeouts, as measured in the block layer. Much work needs to be done
++to design better adaptation algorithms, especially when the loads are neither too high
++nor too low. This constitutes interesting future work. In addition, for our future work, we
++plan to extend the scheduler to support isolation in multi-tenant deployments
++(to simultaneously achieve low tail latency for latency-sensitive applications and high
++throughput for throughput-bound applications).
++
++References
++[1] https://lore.kernel.org/linux-block/cover.1587888520.git.baolin.wang7@gmail.com/T/#mc48a8fb6069843827458f5fea722e1179d32af2a
++[2] https://git.infradead.org/nvme.git/commit/122e5b9f3d370ae11e1502d14ff5c7ea9b144a76
++[3] https://git.infradead.org/nvme.git/commit/86f0348ace1510d7ac25124b096fb88a6ab45270
++[4] https://lore.kernel.org/linux-block/20200630102501.2238972-1-ming.lei@redhat.com/
++[5] https://github.com/i10-kernel/upstream-linux/blob/master/i10-evaluation.pdf
++[6] https://www.usenix.org/conference/nsdi20/presentation/hwang
++
++==========================
++i10 I/O scheduler tunables
++==========================
++
++The three tunables for batching are the number of requests for
++reads/writes, the number of bytes for writes, and a timeout value.
++In the non-adaptive mode, i10 uses these values for batching requests.
++In the adaptive mode, i10 adjusts batch-size according to workloads.
++
++batch_nr
++--------
++Number of requests for batching read/write requests
++Default: 16
++
++batch_bytes
++-----------
++Number of bytes for batching write requests
++Default: 65536 (bytes)
++
++batch_timeout
++-------------
++Timeout value for batching (in microseconds)
++Default: 50 (us)
++
++batch_adaptive
++--------------
++Use the adaptive mode for adjusting batch-size
++Default: 1 (enabled)
+diff --git a/block/Kconfig.iosched b/block/Kconfig.iosched
+index 2f2158e..5b3623b 100644
+--- a/block/Kconfig.iosched
++++ b/block/Kconfig.iosched
+@@ -44,6 +44,14 @@ config BFQ_CGROUP_DEBUG
+ 	Enable some debugging help. Currently it exports additional stat
+ 	files in a cgroup which can be useful for debugging.
+ 
++config MQ_IOSCHED_I10
++	tristate "i10 I/O scheduler"
++	default y
++	help
++	  The i10 I/O Scheduler supports batching at BLK-MQ.
++	  Any device driver that benefits from batching
++	  (e.g., NVMe-over-TCP) can use this scheduler.
++
+ endmenu
+ 
+ endif
+diff --git a/block/Makefile b/block/Makefile
+index 8d841f5..27e0789 100644
+--- a/block/Makefile
++++ b/block/Makefile
+@@ -21,6 +21,7 @@ obj-$(CONFIG_BLK_CGROUP_IOLATENCY)	+= blk-iolatency.o
+ obj-$(CONFIG_BLK_CGROUP_IOCOST)	+= blk-iocost.o
+ obj-$(CONFIG_MQ_IOSCHED_DEADLINE)	+= mq-deadline.o
+ obj-$(CONFIG_MQ_IOSCHED_KYBER)	+= kyber-iosched.o
++obj-$(CONFIG_MQ_IOSCHED_I10)    += i10-iosched.o
+ bfq-y				:= bfq-iosched.o bfq-wf2q.o bfq-cgroup.o
+ obj-$(CONFIG_IOSCHED_BFQ)	+= bfq.o
+ 
+diff --git a/block/i10-iosched.c b/block/i10-iosched.c
+new file mode 100644
+index 0000000..f14ae3fc
+--- /dev/null
++++ b/block/i10-iosched.c
+@@ -0,0 +1,471 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * The i10 I/O Scheduler - supports batching at blk-mq.
++ *	The main use case is disaggregated storage access
++ *	using NVMe-over-Fabric (e.g., NVMe-over-TCP device driver).
++ *
++ * An early version of the idea is described and evaluated in
++ * "TCP ≈ RDMA: CPU-efficient Remote Storage Access with i10",
++ * USENIX NSDI 2020.
++ *
++ * Copyright (C) 2020 Cornell University
++ *	Jaehyun Hwang <jaehyun.hwang@cornell.edu>
++ *	Qizhe Cai <qc228@cornell.edu>
++ *	Midhul Vuppalapati <mvv25@cornell.edu%>
++ *	Rachit Agarwal <ragarwal@cornell.edu>
++ */
++
++#include <linux/kernel.h>
++#include <linux/blkdev.h>
++#include <linux/blk-mq.h>
++#include <linux/elevator.h>
++#include <linux/module.h>
++#include <linux/sbitmap.h>
++
++#include "blk.h"
++#include "blk-mq.h"
++#include "blk-mq-debugfs.h"
++#include "blk-mq-sched.h"
++#include "blk-mq-tag.h"
++
++/* Default batch size in number of requests */
++#define I10_DEF_BATCH_NR	16
++/* Default batch size in bytes (for write requests) */
++#define I10_DEF_BATCH_BYTES	65536
++/* Default timeout value for batching (us units) */
++#define I10_DEF_BATCH_TIMEOUT	50
++
++enum i10_state {
++	/* Batching state:
++	 * Do not run dispatching until we have
++	 * a certain amount of requests or a timer expires.
++	 */
++	I10_STATE_BATCH,
++
++	/* Dispatching state:
++	 * Run dispatching until all requests in the
++	 * scheduler's hctx ihq are dispatched.
++	 */
++	I10_STATE_DISPATCH,
++};
++
++struct i10_queue_data {
++	struct request_queue *q;
++
++	unsigned int	def_batch_nr;
++	unsigned int	def_batch_bytes;
++	unsigned int	def_batch_timeout;
++	unsigned int	def_batch_adaptive;
++};
++
++struct i10_hctx_queue {
++	spinlock_t		lock;
++	struct list_head	rq_list;
++
++	struct blk_mq_hw_ctx	*hctx;
++
++	unsigned int	batch_nr;
++	unsigned int	batch_bytes;
++	unsigned int	batch_timeout;
++
++	unsigned int	qlen_nr;
++	unsigned int	qlen_bytes;
++
++	unsigned int	active_nr;
++	int		timeout_count;
++
++	struct hrtimer	dispatch_timer;
++	enum i10_state	state;
++};
++
++static struct i10_queue_data *i10_queue_data_alloc(struct request_queue *q)
++{
++	struct i10_queue_data *iqd;
++
++	iqd = kzalloc_node(sizeof(*iqd), GFP_KERNEL, q->node);
++	if (!iqd)
++		return ERR_PTR(-ENOMEM);
++
++	iqd->q = q;
++	iqd->def_batch_nr = I10_DEF_BATCH_NR;
++	iqd->def_batch_bytes = I10_DEF_BATCH_BYTES;
++	iqd->def_batch_timeout = I10_DEF_BATCH_TIMEOUT;
++	iqd->def_batch_adaptive = 1;
++
++	return iqd;
++}
++
++static int i10_init_sched(struct request_queue *q, struct elevator_type *e)
++{
++	struct i10_queue_data *iqd;
++	struct elevator_queue *eq;
++
++	eq = elevator_alloc(q, e);
++	if (!eq)
++		return -ENOMEM;
++
++	iqd = i10_queue_data_alloc(q);
++	if (IS_ERR(iqd)) {
++		kobject_put(&eq->kobj);
++		return PTR_ERR(iqd);
++	}
++
++	blk_stat_enable_accounting(q);
++
++	eq->elevator_data = iqd;
++	q->elevator = eq;
++
++	return 0;
++}
++
++static void i10_exit_sched(struct elevator_queue *e)
++{
++	struct i10_queue_data *iqd = e->elevator_data;
++
++	kfree(iqd);
++}
++
++static void i10_hctx_adaptive_batch_size(struct blk_mq_hw_ctx *hctx,
++		bool timeout)
++{
++	struct i10_queue_data *iqd = hctx->queue->elevator->elevator_data;
++	struct i10_hctx_queue *ihq = hctx->sched_data;
++	unsigned int cur_nr = ihq->batch_nr;
++
++	if (!iqd->def_batch_adaptive) {
++		if (ihq->batch_nr)
++			ihq->batch_nr = 0;
++		return;
++	}
++
++	if (!ihq->batch_nr)
++		ihq->batch_nr = iqd->def_batch_nr;
++
++	if (timeout && ihq->timeout_count > 1) {
++		ihq->batch_nr = max(ihq->batch_nr >> 1, 1U);
++		ihq->timeout_count = 0;
++	}
++	else if (!timeout && ihq->batch_nr < ihq->active_nr)
++		ihq->batch_nr = min(ihq->batch_nr + 1,
++					iqd->def_batch_nr);
++}
++
++enum hrtimer_restart i10_hctx_timeout_handler(struct hrtimer *timer)
++{
++	struct i10_hctx_queue *ihq =
++		container_of(timer, struct i10_hctx_queue,
++			dispatch_timer);
++
++	ihq->state = I10_STATE_DISPATCH;
++	ihq->timeout_count++;
++	i10_hctx_adaptive_batch_size(ihq->hctx, true);
++	blk_mq_run_hw_queue(ihq->hctx, true);
++
++	return HRTIMER_NORESTART;
++}
++
++static void i10_hctx_queue_reset(struct i10_hctx_queue *ihq)
++{
++	ihq->qlen_nr = 0;
++	ihq->qlen_bytes = 0;
++	ihq->state = I10_STATE_BATCH;
++}
++
++static int i10_init_hctx(struct blk_mq_hw_ctx *hctx, unsigned int hctx_idx)
++{
++	struct i10_hctx_queue *ihq;
++
++	ihq = kzalloc_node(sizeof(*ihq), GFP_KERNEL, hctx->numa_node);
++	if (!ihq)
++		return -ENOMEM;
++
++	spin_lock_init(&ihq->lock);
++	INIT_LIST_HEAD(&ihq->rq_list);
++
++	ihq->hctx = hctx;
++	ihq->batch_nr = 0;
++	ihq->batch_bytes = 0;
++	ihq->batch_timeout = 0;
++	ihq->active_nr = 0;
++	ihq->timeout_count = 0;
++
++	hrtimer_init(&ihq->dispatch_timer,
++		CLOCK_MONOTONIC, HRTIMER_MODE_REL);
++	ihq->dispatch_timer.function = &i10_hctx_timeout_handler;
++
++	i10_hctx_queue_reset(ihq);
++
++	hctx->sched_data = ihq;
++
++	return 0;
++}
++
++static void i10_exit_hctx(struct blk_mq_hw_ctx *hctx, unsigned int hctx_idx)
++{
++	struct i10_hctx_queue *ihq = hctx->sched_data;
++
++	hrtimer_cancel(&ihq->dispatch_timer);
++	kfree(hctx->sched_data);
++}
++
++static bool i10_hctx_bio_merge(struct blk_mq_hw_ctx *hctx, struct bio *bio,
++		unsigned int nr_segs)
++{
++	struct i10_hctx_queue *ihq = hctx->sched_data;
++	struct list_head *rq_list = &ihq->rq_list;
++	bool merged;
++
++	spin_lock(&ihq->lock);
++	merged = blk_bio_list_merge(hctx->queue, rq_list, bio, nr_segs);
++	spin_unlock(&ihq->lock);
++
++	if (merged && bio_data_dir(bio) == WRITE)
++		ihq->qlen_bytes += bio->bi_iter.bi_size;
++
++	return merged;
++}
++
++/*
++ * The batch size can be adjusted dynamically on a per-hctx basis.
++ * Use per-hctx variables in that case.
++ */
++static inline unsigned int i10_hctx_batch_nr(struct blk_mq_hw_ctx *hctx)
++{
++	struct i10_queue_data *iqd = hctx->queue->elevator->elevator_data;
++	struct i10_hctx_queue *ihq = hctx->sched_data;
++
++	return ihq->batch_nr ?
++		ihq->batch_nr : iqd->def_batch_nr;
++}
++
++static inline unsigned int i10_hctx_batch_bytes(struct blk_mq_hw_ctx *hctx)
++{
++	struct i10_queue_data *iqd = hctx->queue->elevator->elevator_data;
++	struct i10_hctx_queue *ihq = hctx->sched_data;
++
++	return ihq->batch_bytes ?
++		ihq->batch_bytes : iqd->def_batch_bytes;
++}
++
++static inline unsigned int i10_hctx_batch_timeout(struct blk_mq_hw_ctx *hctx)
++{
++	struct i10_queue_data *iqd = hctx->queue->elevator->elevator_data;
++	struct i10_hctx_queue *ihq = hctx->sched_data;
++
++	return ihq->batch_timeout ?
++		ihq->batch_timeout : iqd->def_batch_timeout;
++}
++
++static void i10_hctx_insert_update(struct i10_hctx_queue *ihq,
++				struct request *rq)
++{
++	if (rq_data_dir(rq) == WRITE)
++		ihq->qlen_bytes += blk_rq_bytes(rq);
++	ihq->qlen_nr++;
++}
++
++static void i10_hctx_insert_requests(struct blk_mq_hw_ctx *hctx,
++				struct list_head *rq_list, bool at_head)
++{
++	struct i10_hctx_queue *ihq = hctx->sched_data;
++	struct request *rq, *next;
++
++	list_for_each_entry_safe(rq, next, rq_list, queuelist) {
++		struct list_head *head = &ihq->rq_list;
++
++		spin_lock(&ihq->lock);
++		if (at_head)
++			list_move(&rq->queuelist, head);
++		else
++			list_move_tail(&rq->queuelist, head);
++		i10_hctx_insert_update(ihq, rq);
++		blk_mq_sched_request_inserted(rq);
++		spin_unlock(&ihq->lock);
++	}
++
++	/* Start a new timer */
++	if (ihq->state == I10_STATE_BATCH &&
++	   !hrtimer_active(&ihq->dispatch_timer))
++		hrtimer_start(&ihq->dispatch_timer,
++			ns_to_ktime(i10_hctx_batch_timeout(hctx)
++				* NSEC_PER_USEC),
++			HRTIMER_MODE_REL);
++}
++
++static struct request *i10_hctx_dispatch_request(struct blk_mq_hw_ctx *hctx)
++{
++	struct i10_hctx_queue *ihq = hctx->sched_data;
++	struct request *rq;
++
++	spin_lock(&ihq->lock);
++	rq = list_first_entry_or_null(&ihq->rq_list,
++				struct request, queuelist);
++	if (rq) {
++		list_del_init(&rq->queuelist);
++		ihq->active_nr++;
++	}
++	else {
++		i10_hctx_queue_reset(ihq);
++		i10_hctx_adaptive_batch_size(hctx, false);
++	}
++	spin_unlock(&ihq->lock);
++
++	return rq;
++}
++
++static void i10_hctx_completed_request(struct request *rq, u64 now)
++{
++	struct i10_hctx_queue *ihq = rq->mq_hctx->sched_data;
++
++	if (ihq->active_nr)
++		ihq->active_nr--;
++}
++
++static inline bool i10_hctx_dispatch_now(struct blk_mq_hw_ctx *hctx)
++{
++	struct i10_hctx_queue *ihq = hctx->sched_data;
++
++	return (ihq->qlen_nr >= i10_hctx_batch_nr(hctx)) ||
++		(ihq->qlen_bytes >= i10_hctx_batch_bytes(hctx));
++}
++
++/*
++ * Return true if we are in the dispatching state.
++ */
++static bool i10_hctx_has_work(struct blk_mq_hw_ctx *hctx)
++{
++	struct i10_hctx_queue *ihq = hctx->sched_data;
++
++	if (ihq->state == I10_STATE_BATCH) {
++		if (i10_hctx_dispatch_now(hctx)) {
++			ihq->state = I10_STATE_DISPATCH;
++			ihq->timeout_count = 0;
++			if (hrtimer_active(&ihq->dispatch_timer))
++				hrtimer_cancel(&ihq->dispatch_timer);
++		}
++	}
++
++	return (ihq->state == I10_STATE_DISPATCH);
++}
++
++#define I10_DEF_BATCH_SHOW_STORE(name)					\
++static ssize_t i10_def_batch_##name##_show(struct elevator_queue *e,	\
++				char *page)				\
++{									\
++	struct i10_queue_data *iqd = e->elevator_data;			\
++									\
++	return sprintf(page, "%u\n", iqd->def_batch_##name);		\
++}									\
++									\
++static ssize_t i10_def_batch_##name##_store(struct elevator_queue *e,	\
++			const char *page, size_t count)			\
++{									\
++	struct i10_queue_data *iqd = e->elevator_data;			\
++	unsigned long long value;					\
++	int ret;							\
++									\
++	ret = kstrtoull(page, 10, &value);				\
++	if (ret)							\
++		return ret;						\
++									\
++	iqd->def_batch_##name = value;					\
++									\
++	return count;							\
++}
++I10_DEF_BATCH_SHOW_STORE(nr);
++I10_DEF_BATCH_SHOW_STORE(bytes);
++I10_DEF_BATCH_SHOW_STORE(timeout);
++I10_DEF_BATCH_SHOW_STORE(adaptive);
++#undef I10_DEF_BATCH_SHOW_STORE
++
++#define I10_SCHED_ATTR(name)	\
++	__ATTR(batch_##name, 0644, i10_def_batch_##name##_show, i10_def_batch_##name##_store)
++static struct elv_fs_entry i10_sched_attrs[] = {
++	I10_SCHED_ATTR(nr),
++	I10_SCHED_ATTR(bytes),
++	I10_SCHED_ATTR(timeout),
++	I10_SCHED_ATTR(adaptive),
++	__ATTR_NULL
++};
++#undef I10_SCHED_ATTR
++
++#ifdef CONFIG_BLK_DEBUG_FS
++#define I10_DEBUGFS_SHOW(name)	\
++static int i10_hctx_batch_##name##_show(void *data, struct seq_file *m)	\
++{									\
++	struct blk_mq_hw_ctx *hctx = data;				\
++	struct i10_hctx_queue *ihq = hctx->sched_data;			\
++									\
++	seq_printf(m, "%u\n", ihq->batch_##name);			\
++	return 0;							\
++}									\
++									\
++static int i10_hctx_qlen_##name##_show(void *data, struct seq_file *m)	\
++{									\
++	struct blk_mq_hw_ctx *hctx = data;				\
++	struct i10_hctx_queue *ihq = hctx->sched_data;			\
++									\
++	seq_printf(m, "%u\n", ihq->qlen_##name);			\
++	return 0;							\
++}
++I10_DEBUGFS_SHOW(nr);
++I10_DEBUGFS_SHOW(bytes);
++#undef I10_DEBUGFS_SHOW
++
++static int i10_hctx_state_show(void *data, struct seq_file *m)
++{
++	struct blk_mq_hw_ctx *hctx = data;
++	struct i10_hctx_queue *ihq = hctx->sched_data;
++
++	seq_printf(m, "%d\n", ihq->state);
++	return 0;
++}
++
++#define I10_HCTX_QUEUE_ATTR(name)					\
++	{"batch_" #name, 0400, i10_hctx_batch_##name##_show},		\
++	{"qlen_" #name, 0400, i10_hctx_qlen_##name##_show}
++static const struct blk_mq_debugfs_attr i10_hctx_debugfs_attrs[] = {
++	I10_HCTX_QUEUE_ATTR(nr),
++	I10_HCTX_QUEUE_ATTR(bytes),
++	{"state", 0400, i10_hctx_state_show},
++	{},
++};
++#undef I10_HCTX_QUEUE_ATTR
++#endif
++
++static struct elevator_type i10_sched = {
++	.ops = {
++		.init_sched = i10_init_sched,
++		.exit_sched = i10_exit_sched,
++		.init_hctx = i10_init_hctx,
++		.exit_hctx = i10_exit_hctx,
++		.bio_merge = i10_hctx_bio_merge,
++		.insert_requests = i10_hctx_insert_requests,
++		.dispatch_request = i10_hctx_dispatch_request,
++		.completed_request = i10_hctx_completed_request,
++		.has_work = i10_hctx_has_work,
++	},
++#ifdef CONFIG_BLK_DEBUG_FS
++	.hctx_debugfs_attrs = i10_hctx_debugfs_attrs,
++#endif
++	.elevator_attrs = i10_sched_attrs,
++	.elevator_name = "i10",
++	.elevator_owner = THIS_MODULE,
++};
++
++static int __init i10_init(void)
++{
++	return elv_register(&i10_sched);
++}
++
++static void __exit i10_exit(void)
++{
++	elv_unregister(&i10_sched);
++}
++
++module_init(i10_init);
++module_exit(i10_exit);
++
++MODULE_AUTHOR("Jaehyun Hwang, Qizhe Cai, Midhul Vuppalapati, Rachit Agarwal");
++MODULE_LICENSE("GPLv2");
++MODULE_DESCRIPTION("i10 I/O scheduler");
+-- 
+2.7.4
 
