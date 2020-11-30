@@ -2,28 +2,65 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B151C63777
-	for <linux-block@archiver.kernel.org>; Mon, 30 Nov 2020 17:20:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48CCAC64E7B
+	for <linux-block@archiver.kernel.org>; Mon, 30 Nov 2020 17:52:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DD9882076E
-	for <linux-block@archiver.kernel.org>; Mon, 30 Nov 2020 17:19:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0CF8A207F7
+	for <linux-block@archiver.kernel.org>; Mon, 30 Nov 2020 17:52:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="uHFgX+4A"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387449AbgK3RT7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Nov 2020 12:19:59 -0500
-Received: from verein.lst.de ([213.95.11.211]:45207 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387446AbgK3RT7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Nov 2020 12:19:59 -0500
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id AD3D56736F; Mon, 30 Nov 2020 18:19:15 +0100 (CET)
-Date:   Mon, 30 Nov 2020 18:19:15 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
+        id S2387641AbgK3Rwh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Nov 2020 12:52:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51020 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387411AbgK3Rwg (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 30 Nov 2020 12:52:36 -0500
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9914C0613D3
+        for <linux-block@vger.kernel.org>; Mon, 30 Nov 2020 09:51:56 -0800 (PST)
+Received: by mail-pf1-x435.google.com with SMTP id 131so10877226pfb.9
+        for <linux-block@vger.kernel.org>; Mon, 30 Nov 2020 09:51:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=zGnnwAdYWjtdhwju8NcFhzJcpMrWjZbZM1FQN8kVDHg=;
+        b=uHFgX+4AVkQgx7faklPk/rXQ2t3jemQG+USPU79z1ylyowIu+ubayCfcNDVRC61F46
+         uOUat2OPBdrNV3C5cxDEKe++AihqW2dfiUMqAR9SSzg0pWNoXwmF7ToC19r922VtbWfr
+         GnZWjiz7MwL36CuNP5a8PBDGbSSHjoQJPhU96VUc/2DTZ+eLKM46XkcINUXSEgzoNRVJ
+         B4aqmPEpPNtUoWXOmsYcqMofGY6tX4m12lDRyTKN8UmgHif1BP6ersB+G7h3Dqe1BMla
+         /i9GORlNNRTQ9/OCndNw/5vShhAGl68QelubQRXFJANa6CdOvdZreY4YnK+uQ2CRP4+S
+         bZWg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=zGnnwAdYWjtdhwju8NcFhzJcpMrWjZbZM1FQN8kVDHg=;
+        b=cRVULsO74TpuGRazatrX09ZTs9A/XoHCln/f8BhAIvfnce3Jmeo6KLdD9Px8DD51Vb
+         Zfpox71UlZddOSOW0YO/CfmObzi2g3l7Y9e9uXginS06YM3/4NkFQEMBC7Q6xNfteVME
+         K149pN1e/FHMx9jM/d6g5UWC1ckFlnzFYnV99clL0XgvKBcKQprqVZoHzwJ4dLIuytM/
+         t3Fp2QZRPPCeTJhhPf1B4xht2azLfr5Lps9nHO33lnPzP1vIYwWmedAi2xfMRZpxkAbY
+         6nl4hHA90pS1bm7x/CEcoBtibcA5sUkgDKu2nObg3m7NzIuG5mCNlVKWcZOdGITnVUXN
+         HdOg==
+X-Gm-Message-State: AOAM532jklbVaraBIm5nCL+wvyuMyClLeSs1s0Bz4A+1ygMP3BQ+/MHx
+        ok252YLmKU6iVCdHaSkoOTXFAw==
+X-Google-Smtp-Source: ABdhPJwMTZsLj5SnQFza8cXET/WnIEE6pVW7Y7fE9/cYA5ZaExgItRAY6sgUO5JUjmSVf3YBKD1+nQ==
+X-Received: by 2002:a62:ed01:0:b029:19a:a667:9925 with SMTP id u1-20020a62ed010000b029019aa6679925mr17651943pfh.35.1606758716075;
+        Mon, 30 Nov 2020 09:51:56 -0800 (PST)
+Received: from [192.168.1.134] ([66.219.217.173])
+        by smtp.gmail.com with ESMTPSA id w18sm17681748pfi.216.2020.11.30.09.51.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 30 Nov 2020 09:51:55 -0800 (PST)
+Subject: Re: merge struct block_device and struct hd_struct v4
+To:     Christoph Hellwig <hch@lst.de>
 Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
         Coly Li <colyli@suse.de>, Mike Snitzer <snitzer@redhat.com>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -33,29 +70,40 @@ Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
         linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
         linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
         linux-mm@kvack.org
-Subject: Re: merge struct block_device and struct hd_struct v4
-Message-ID: <20201130171915.GA1499@lst.de>
 References: <20201128161510.347752-1-hch@lst.de>
+ <20201130171915.GA1499@lst.de>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <e67ffb20-ce91-a3a7-e1f7-6fd32334abc4@kernel.dk>
+Date:   Mon, 30 Nov 2020 10:51:53 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201128161510.347752-1-hch@lst.de>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20201130171915.GA1499@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Nov 28, 2020 at 05:14:25PM +0100, Christoph Hellwig wrote:
-> A git tree is available here:
+On 11/30/20 10:19 AM, Christoph Hellwig wrote:
+> On Sat, Nov 28, 2020 at 05:14:25PM +0100, Christoph Hellwig wrote:
+>> A git tree is available here:
+>>
+>>     git://git.infradead.org/users/hch/block.git bdev-lookup
+>>
+>> Gitweb:
+>>
+>>     http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/bdev-lookup
 > 
->     git://git.infradead.org/users/hch/block.git bdev-lookup
+> I've updated the git tree with the set_capacity_and_notify change
+> suggested by Jan, a commit log typo fix and the Reviewed-by tags.
 > 
-> Gitweb:
-> 
->     http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/bdev-lookup
+> Jens, can you take a look and potentially merge the branch?  That would
+> really help with some of the pending work.
 
-I've updated the git tree with the set_capacity_and_notify change
-suggested by Jan, a commit log typo fix and the Reviewed-by tags.
+Done, queued up for 5.11.
 
-Jens, can you take a look and potentially merge the branch?  That would
-really help with some of the pending work.
+-- 
+Jens Axboe
+
