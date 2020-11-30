@@ -2,225 +2,118 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE946C71156
-	for <linux-block@archiver.kernel.org>; Mon, 30 Nov 2020 14:59:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B0ABC71156
+	for <linux-block@archiver.kernel.org>; Mon, 30 Nov 2020 15:04:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8213E206D8
-	for <linux-block@archiver.kernel.org>; Mon, 30 Nov 2020 14:59:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=purdue0.onmicrosoft.com header.i=@purdue0.onmicrosoft.com header.b="H5GOQMuG"
+	by mail.kernel.org (Postfix) with ESMTP id 0DB59206D8
+	for <linux-block@archiver.kernel.org>; Mon, 30 Nov 2020 15:04:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726986AbgK3O7S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Nov 2020 09:59:18 -0500
-Received: from mail-bn8nam11on2120.outbound.protection.outlook.com ([40.107.236.120]:17505
-        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725897AbgK3O7R (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Nov 2020 09:59:17 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nCdTkDYi6UNBK6z9Le4Sjurpz6uMaxtZmrVpanEvvRthBDu8mI9r1F+7X2jCOfScUFY3Gsnvyp1j4vUYOqoy6qR2OtrzI7iBjQFKIXuyXKqqbWPjO4KfT3kBWPNaRSUEPUzrnDjEIKAGxeUQFB+aHlQZgMsNlXP3mg+SOUtwK2OKLMKl5JaBT2XApG8LqfuoAyJgqAI7MCpcxO0h8bHTSZa3Sxau9hMS32LbTEWyh82zZkfm8FrYC4hwVDmf519rqDW/GMnnzLUtCSQEehpFWcUjx1jIfzJgezL5GfzuNWUyKWjnpoAm61O6BxCGg/tWmVQVqfsV/YvIvIgN6Zac3A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=usxqXyGMjQ/fCKbTVplbb25CYFelVwJuWP3F5pbab10=;
- b=MA6ogA/bBRnZfZA1C2IenkY2o9d1OBiWbOgE+guI3ytrBBodzHLRRCCBzY3GeHSPcL26pG2S5lnA0vouOMKDm3oCzeJX9TI8RV63BizSkB2otbQ0tdCTYFeCYd1bc+IF54FBTHT1T4tBBGFC3kqAK6xmZH3JUZKhZ1oySrLu1vxBcT41ag9N/zxGfablif3CADN24Kq6GxcExmgkpaRM56ZRyOfp7eEvpr2lvl51KZpIR3ZghYBPzROABd2X4kDxoya+UItxGK80hWGa3/WY8HPKZ5ms8CjvU4mypBCPStX/bSfvYMOhA/lYZjpmPKPysUnMXEb/Qp90usLKNiVveA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=purdue.edu; dmarc=pass action=none header.from=purdue.edu;
- dkim=pass header.d=purdue.edu; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=purdue0.onmicrosoft.com; s=selector2-purdue0-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=usxqXyGMjQ/fCKbTVplbb25CYFelVwJuWP3F5pbab10=;
- b=H5GOQMuGs13bwn4MNjVJftiVXb/fvCKqjp++t03s15LYcQyBq9zC/t8okW5JJM0iMNis1po5cDG8LiGtcQjmKtIub3Hfr6E/ZutIQpJ6tytthE1P6mV8sl99AbnS+TJHsJDjZoZCrvAppfE1lQ3smS30eakZuySyZOD81I2Kkhs=
-Received: from CH2PR22MB2056.namprd22.prod.outlook.com (2603:10b6:610:5d::11)
- by CH2PR22MB2006.namprd22.prod.outlook.com (2603:10b6:610:83::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3611.25; Mon, 30 Nov
- 2020 14:58:29 +0000
-Received: from CH2PR22MB2056.namprd22.prod.outlook.com
- ([fe80::1922:c660:f2f4:50fa]) by CH2PR22MB2056.namprd22.prod.outlook.com
- ([fe80::1922:c660:f2f4:50fa%7]) with mapi id 15.20.3611.031; Mon, 30 Nov 2020
- 14:58:29 +0000
-From:   "Gong, Sishuai" <sishuai@purdue.edu>
-To:     "axboe@kernel.dk" <axboe@kernel.dk>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>
-Subject: [Race] data race between blkdev_ioctl() and generic_fadvise()
-Thread-Topic: [Race] data race between blkdev_ioctl() and generic_fadvise()
-Thread-Index: AQHWxylDhf3y7x6sF0qHSBkQW0hI3g==
-Date:   Mon, 30 Nov 2020 14:58:29 +0000
-Message-ID: <7F866A14-69D1-4F05-B521-05212A3F7ED7@purdue.edu>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: kernel.dk; dkim=none (message not signed)
- header.d=none;kernel.dk; dmarc=none action=none header.from=purdue.edu;
-x-originating-ip: [66.253.158.157]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: e226530f-ccf5-4378-cf48-08d895406603
-x-ms-traffictypediagnostic: CH2PR22MB2006:
-x-microsoft-antispam-prvs: <CH2PR22MB20062EBD70F19A006DA3431EDFF50@CH2PR22MB2006.namprd22.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: yJ5AvxIMVxK3UKBiP/U5jecLGLig5dhQndCQhh2lpxHKPKL2z2Bgmf+7+AxJgvCJnPSCBu3te/Vqf2z431+vciv6dtomAjZ4XtxpXd3YwvcnLzqscoqlC+/rb8Dc8EMJJgzgvQBypqor3RuBrmgrBrMFqhWSratULUj83NGmvPtWvLQVjYWfwLl+zgGV95C8tI0FGU0ra86Pcls7F9U4O6ftchGaHFeUc3ZavPfeplz4Q9Y58q2KM/bT3exidaHNC69trnrXU7t5UdaaXwjWzAW3CFdTJcgS8UNu0A4wzExzI+TcvwHaKPFhzME9uS6k0meTVOrDOZ8A+UyBPb2g0Mp+KqIFWGVuIvCNdWpnt5TSzAN0jEC7r6JzWBxzi2+6
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR22MB2056.namprd22.prod.outlook.com;PTR:;CAT:NONE;SFS:(39860400002)(366004)(136003)(396003)(346002)(376002)(76116006)(66446008)(478600001)(64756008)(66556008)(66946007)(33656002)(75432002)(6916009)(6506007)(5660300002)(8676002)(8936002)(66476007)(26005)(186003)(2616005)(4326008)(6486002)(36756003)(71200400001)(2906002)(316002)(54906003)(786003)(86362001)(83380400001)(6512007)(41533002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: =?us-ascii?Q?Y6kjYNTll01wabKLT/t1aS8NWHYSlpooWYyoMzFe+HFVD27TfNQMBXERohN/?=
- =?us-ascii?Q?vDDayTVtXCFH315JWH8Sv3M9tmG+U4fn7Y1l3XxEgugpEzcanQEsS9IofW7r?=
- =?us-ascii?Q?0V7Suue29oogDHVYeJ6y9A4VqBE30HwKNJ6HAv8BFL4TSrfPIhiSx3IbuYgr?=
- =?us-ascii?Q?mjWe7gqUsFoOioWwsDiQVppsYIyeQVCyBhP6roD7XeYnd8Oha+m0g1vm+rr1?=
- =?us-ascii?Q?ozH9lSwmQt8fgoPCN6XsgrJZgBxs0AXmhxLidyZfvnwjJolcfKmSg+nZpjIx?=
- =?us-ascii?Q?eMIyTN6HNcm71ALGUlvYkngFrLYEmVyvc6E+YdN5rJNdf2epKg5srslsUXWl?=
- =?us-ascii?Q?t1s+zbJSW8Ani77R2G0BEyIbLSSlp1CqJiMh/0zkdWG1hsqci4BarP+rsaWh?=
- =?us-ascii?Q?/GjXiBISq/HScrF08LUpi6MDC8xAI2Kt9V4OvNPEJs8JmNK+nTgdF94lMY7O?=
- =?us-ascii?Q?Ueba4gOg68FWrCLGpqsOg1m28rISJFERSX3yqwnnY97+VbttMegKakskkS7A?=
- =?us-ascii?Q?2eUeQkZ3A2VoDwgv3KgX7Pkn9PqrXdjjsYzns74xTm4aIVzViNGBmMEbNuxm?=
- =?us-ascii?Q?pxkFyuyRoy3d3vTPNI7CF++FF7I5PkxEuDDSrXCWSXa9csamatleYIA2HRor?=
- =?us-ascii?Q?oaQPaHdU2gN0y2kfvLM7dPS0YTdAWbi4cc2mnqojdXOFzWGVU05feykf38Rk?=
- =?us-ascii?Q?yasslnL+ee0hmcwnWYB7mDvQ2G4ApNPOnioiii0l225zROffsbP17okympBZ?=
- =?us-ascii?Q?wqcLCoIBaNSCMJ8hFIU0AcLIstMFtOo6Nbcv5gr+/hUpB2HnA1pW/4tzZuB9?=
- =?us-ascii?Q?iPy1gY38a6t2JnFIq9dGBbXV7O9qptU0wdql0b2Uy4QXHTjzU0sJ3JLgAXqP?=
- =?us-ascii?Q?IwiKgz9TVLjwwhWU84SHH+V0fr+7Mr3uMuH2uBiw0MEQiK5Svg3387vmyZpC?=
- =?us-ascii?Q?P+VLAKgVP+59o5xDOoa+NbVoStWDp4XOH0k0Ymc2QWw6O2pA4/H6pAjlJMN0?=
- =?us-ascii?Q?dSKJ?=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <6880775AE241594D9BFE5CEEC7046F58@namprd22.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+        id S1727809AbgK3PEW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Nov 2020 10:04:22 -0500
+Received: from mail-pf1-f178.google.com ([209.85.210.178]:36703 "EHLO
+        mail-pf1-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726463AbgK3PEW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 30 Nov 2020 10:04:22 -0500
+Received: by mail-pf1-f178.google.com with SMTP id n137so10581530pfd.3;
+        Mon, 30 Nov 2020 07:04:07 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=REuaHRfQ6lUG1VyVz+GPAZs3F/7wD140xnooNLXR5Sw=;
+        b=IG5vSop5SYM29ZYx4guPqVzy50yBky7ChZPhvkUbinAAR6kCl8EIEXtaEOFDm9Qd2P
+         JfdHoj/8rg2LbWfNDFvXYGkr+9Kb+7dbXSEDO4XWIRMhwiS/gcaU1br51BL5ttiY23l9
+         M18NvzVAZtd61HJ294YcKr6iVMRcZC8ua9cByVNSHL0CXA6JM1h66l7cFyhEGTfkKBZS
+         64EWetBbSW7k/ssKXihnXz923Yx2SlcTzZolCzkG5XSPGyLkW6xVr5vuHoFg7LqZNbDM
+         6Kq7ghXKZTQePToLVOO+n15vsQcp4D3eYuLD/xoD91dmrfhC7UWagIQfETnAjD98upob
+         eeBg==
+X-Gm-Message-State: AOAM5302QrJZ+U1es0+9AF2+qJO+T8Izk/re+jQgahtQ6AzYrXclnRUH
+        UB9lpkju3yVY0On6ql/1KSpR+G94Ol0=
+X-Google-Smtp-Source: ABdhPJyTLUMgD8w3mPOroVZojndK/fgA4n3GeoDnK4bzdtlLt7OPW0EwtlqRmv8bD3Gix2iNSHxK8g==
+X-Received: by 2002:a05:6a00:13a4:b029:18b:cfc9:1ea1 with SMTP id t36-20020a056a0013a4b029018bcfc91ea1mr19006753pfg.25.1606748621579;
+        Mon, 30 Nov 2020 07:03:41 -0800 (PST)
+Received: from [192.168.3.218] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
+        by smtp.gmail.com with ESMTPSA id b5sm22962185pjg.28.2020.11.30.07.03.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 30 Nov 2020 07:03:33 -0800 (PST)
+Subject: Re: [RFC] blk-mq/scsi: deadlock found on usb driver
+To:     Yufen Yu <yuyufen@huawei.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        linux-scsi@vger.kernel.org
+Cc:     john.garry@huawei.com, "axboe@kernel.dk" <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Ming Lei <ming.lei@redhat.com>, osandov@fb.com,
+        wubo40@huawei.com, yanaijie <yanaijie@huawei.com>
+References: <d6266f2e-9cc7-d222-dedd-15a1a0a6571f@huawei.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <c52d3938-920a-3618-269f-4eee129a96e8@acm.org>
+Date:   Mon, 30 Nov 2020 07:03:16 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.0
 MIME-Version: 1.0
-X-OriginatorOrg: purdue.edu
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CH2PR22MB2056.namprd22.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e226530f-ccf5-4378-cf48-08d895406603
-X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Nov 2020 14:58:29.3632
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 4130bd39-7c53-419c-b1e5-8758d6d63f21
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: zm++pYQUQWz57wmhPJSpvTF1hmnSwZYYj0Xrl59Wt5pe/46Ck/XeaastfZHYXFh+EuiyDRlVIWf+j2JKj+R5sQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR22MB2006
+In-Reply-To: <d6266f2e-9cc7-d222-dedd-15a1a0a6571f@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+On 11/29/20 11:23 PM, Yufen Yu wrote:
+>   We reported IO stuck on a scsi usb driver recently and any IO issued
+> to the device cannot return. The usb driver just have **one** driver tag
+> and  **two** sched tag. After debugging, we found there is a deadlock
+> race as following:
+> 
+> cpu0(scsi_eh)       cpu1                          cpu2
+>                     get sched tag(internal_tag=0)
+>                     get driver tag(tag=0)
+>                                                   get sched
+> tag(internal_tag=1)
+>                                                   wait for driver tag
+> scsi_error_handler try issue io
+> wait for sched tag
+>                     try to dispatch the request
+>                     wait for setting shost state as SHOST_RUNNING
+> //scsi_host_set_state(shost, SHOST_RUNNING)
+> 
+> The scsi_eh thread stack as following:
+> PID: 945745  TASK: ffff950a8f2f0000  CPU: 42  COMMAND: "scsi_eh_15"
+>   [ffffbbee8d5b3ce0] __schedule at ffffffffa506ebac
+>   [ffffbbee8d5b3d00] sbitmap_get at ffffffffa4c4684f
+>   [ffffbbee8d5b3d48] schedule at ffffffffa506f208
+>   [ffffbbee8d5b3d50] io_schedule at ffffffffa506f5d2
+>   [ffffbbee8d5b3d60] blk_mq_get_tag at ffffffffa4bf5277
+>   [ffffbbee8d5b3d88] autoremove_wake_function at ffffffffa48ffe40
+>   [ffffbbee8d5b3db8] autoremove_wake_function at ffffffffa48ffe40
+>   [ffffbbee8d5b3e08] blk_mq_get_request at ffffffffa4bef14c
+>   [ffffbbee8d5b3e20] eh_lock_door_done at ffffffffa4da5580
+>   [ffffbbee8d5b3e38] blk_mq_alloc_request at ffffffffa4bef494
+>   [ffffbbee8d5b3e80] blk_get_request at ffffffffa4be5042
+>   [ffffbbee8d5b3e98] scsi_error_handler at ffffffffa4da8670
+>   [ffffbbee8d5b3ea0] __schedule at ffffffffa506ebb4
+>   [ffffbbee8d5b3f08] scsi_error_handler at ffffffffa4da8430
+>   [ffffbbee8d5b3f10] kthread at ffffffffa48d6d7d
+>   [ffffbbee8d5b3f20] kthread at ffffffffa48d6c70
+>   [ffffbbee8d5b3f50] ret_from_fork at ffffffffa520023f
+> 
+> Since there are no more available sched tag and driver tag. All of
+> threads will wait forever. We found the bug on 4.18 kernel, but the
+> latest kernel code also have the problem.
+> 
+> I don't have good idea about how to fix the bug. So, any suggestions are
+> welcome.
 
-We found a data race in linux kernel 5.3.11 that we are able to reproduce i=
-n x86 under specific interleavings. Currently, we are not sure about the co=
-nsequence of this race so we would like to confirm with the community if th=
-is is a harmful bug.
-
-------------------------------------------
-Writer site
-
- /tmp/tmp.B7zb7od2zE-5.3.11/extract/linux-5.3.11/block/ioctl.c:573
-        553      case BLKPBSZGET: /* get block device physical block size *=
-/
-        554          return put_uint(arg, bdev_physical_block_size(bdev));
-        555      case BLKIOMIN:
-        556          return put_uint(arg, bdev_io_min(bdev));
-        557      case BLKIOOPT:
-        558          return put_uint(arg, bdev_io_opt(bdev));
-        559      case BLKALIGNOFF:
-        560          return put_int(arg, bdev_alignment_offset(bdev));
-        561      case BLKDISCARDZEROES:
-        562          return put_uint(arg, 0);
-        563      case BLKSECTGET:
-        564          max_sectors =3D min_t(unsigned int, USHRT_MAX,
-        565                      queue_max_sectors(bdev_get_queue(bdev)));
-        566          return put_ushort(arg, max_sectors);
-        567      case BLKROTATIONAL:
-        568          return put_ushort(arg, !blk_queue_nonrot(bdev_get_queu=
-e(bdev)));
-        569      case BLKRASET:
-        570      case BLKFRASET:
-        571          if(!capable(CAP_SYS_ADMIN))
-        572              return -EACCES;
- =3D=3D>    573          bdev->bd_bdi->ra_pages =3D (arg * 512) / PAGE_SIZE=
-;
-        574          return 0;
-        575      case BLKBSZSET:
-        576          return blkdev_bszset(bdev, mode, argp);
-        577      case BLKPG:
-        578          return blkpg_ioctl(bdev, argp);
-        579      case BLKRRPART:
-        580          return blkdev_reread_part(bdev);
-        581      case BLKGETSIZE:
-        582          size =3D i_size_read(bdev->bd_inode);
-        583          if ((size >> 9) > ~0UL)
-        584              return -EFBIG;
-        585          return put_ulong(arg, size >> 9);
-        586      case BLKGETSIZE64:
-        587          return put_u64(arg, i_size_read(bdev->bd_inode));
-        588      case BLKTRACESTART:
-        589      case BLKTRACESTOP:
-        590      case BLKTRACESETUP:
-        591      case BLKTRACETEARDOWN:
-        592          return blk_trace_ioctl(bdev, cmd, argp);
-        593      case IOC_PR_REGISTER:
-
-------------------------------------------
-Reader site
-/tmp/tmp.B7zb7od2zE-5.3.11/extract/linux-5.3.11/mm/fadvise.c:79
-         66      /*
-         67       * Careful about overflows. Len =3D=3D 0 means "as much as=
- possible".  Use
-         68       * unsigned math because signed overflows are undefined an=
-d UBSan
-         69       * complains.
-         70       */
-         71      endbyte =3D (u64)offset + (u64)len;
-         72      if (!len || endbyte < len)
-         73          endbyte =3D -1;
-         74      else
-         75          endbyte--;      /* inclusive */
-         76
-         77      switch (advice) {
-         78      case POSIX_FADV_NORMAL:
- =3D=3D>     79          file->f_ra.ra_pages =3D bdi->ra_pages;
-         80          spin_lock(&file->f_lock);
-         81          file->f_mode &=3D ~FMODE_RANDOM;
-         82          spin_unlock(&file->f_lock);
-         83          break;
-         84      case POSIX_FADV_RANDOM:
-         85          spin_lock(&file->f_lock);
-         86          file->f_mode |=3D FMODE_RANDOM;
-         87          spin_unlock(&file->f_lock);
-         88          break;
-         89      case POSIX_FADV_SEQUENTIAL:
-         90          file->f_ra.ra_pages =3D bdi->ra_pages * 2;
-         91          spin_lock(&file->f_lock);
-         92          file->f_mode &=3D ~FMODE_RANDOM;
-         93          spin_unlock(&file->f_lock);
-         94          break;
-         95      case POSIX_FADV_WILLNEED:
-         96          /* First and last PARTIAL page! */
-         97          start_index =3D offset >> PAGE_SHIFT;
-         98          end_index =3D endbyte >> PAGE_SHIFT;
-
-
-
-------------------------------------------
-Writer calling trace
-
-- ksys_ioctl
--- do_vfs_ioctl
---- vfs_ioctl
----- blkdev_ioctl
-
-------------------------------------------
-Reader calling trace
-- ksys_fadvise64_64
--- vfs_fadvise
---- generic_fadvise
-
-
+Please take a look at
+https://lore.kernel.org/linux-scsi/20201130024615.29171-6-bvanassche@acm.org/T/#u.
 
 Thanks,
-Sishuai
+
+Bart.
 
