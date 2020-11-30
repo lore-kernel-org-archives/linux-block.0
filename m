@@ -2,91 +2,429 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F249C64E7B
-	for <linux-block@archiver.kernel.org>; Mon, 30 Nov 2020 18:11:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43FA8C64E7B
+	for <linux-block@archiver.kernel.org>; Mon, 30 Nov 2020 18:11:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9ADBD207F7
-	for <linux-block@archiver.kernel.org>; Mon, 30 Nov 2020 18:11:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 00822207F7
+	for <linux-block@archiver.kernel.org>; Mon, 30 Nov 2020 18:11:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="X79HjfLz"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="PPuo2qmV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729325AbgK3SLB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Nov 2020 13:11:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54028 "EHLO
+        id S1729382AbgK3SLm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Nov 2020 13:11:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54150 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727952AbgK3SLB (ORCPT
+        with ESMTP id S1727154AbgK3SLm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Nov 2020 13:11:01 -0500
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9ED5EC0613CF
-        for <linux-block@vger.kernel.org>; Mon, 30 Nov 2020 10:10:15 -0800 (PST)
-Received: by mail-pf1-x42f.google.com with SMTP id 131so10914704pfb.9
-        for <linux-block@vger.kernel.org>; Mon, 30 Nov 2020 10:10:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=JfjXD662manSUYpiP1JHUSzxo/pxTsLkc9sAPIYNsuI=;
-        b=X79HjfLzljA+0Z27ZuzPIdUYlvtzP24/jRs07S1yBlgCMuvo49QylUAckwZg1pPtIj
-         bY2LIMf6iYBYSllo2QqRE/KKFwuSB+JiJh1SnpMk7sWk2ztcpxvwcuf+OUjUW/ZoNEjt
-         0TzmvLsz4TD0325LPk9LQNHKfcgbPoewgdSgeVQtSFoWckP6AO1FPT/ZDGpXekg6muAN
-         galyM2iZi8IniMmKe0L8FEm3hG/e2y7c4qNLyWboSA6vnBpWRUbV0Rb/jsNML8l4ORrp
-         jCI/Mz/nTieD0slwqHCSyWVrYl1GORYnZByamdTE1VHf2jmnCqsTVXHFPjwfAMP2u/tr
-         W3hw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=JfjXD662manSUYpiP1JHUSzxo/pxTsLkc9sAPIYNsuI=;
-        b=b9Zz8SjRG3UBzDA69lwARiP2dtYW1EH/3Cao9i0HoeWIKgpkJyunlvxxOhRF8fxHod
-         okwyXmpq6EF/Pw4mZ/DaUbQSZ/ycHbGqnLij/IaZQcTIDsLincXr59ZwvQTUsdMuXq0n
-         q1vaO+2P0/oQ47UGoo61ej91ymoXLAFepFS38QJH1cOp72FiaLv9fKDGKgYO9eyEdscx
-         wIbC3KQA2w++JRnXdrnzJGhwEWtGeS7i8pc4pWi5U9h8ukHjEPLLe0D349Y5FH/zuveQ
-         /HpZHeVOvVwIsAR6MYQuxqvY6uvoFPt4htIY2KC09PIgAG8tUKuN0XRW/Uytnt1PIyFd
-         6utA==
-X-Gm-Message-State: AOAM531CERLihZsA6edulwH7pCbcLssy5unipDollf3/C2en2tKi6nzV
-        VBpVxvyRRI1TiHK8U/1o5jE7Sg==
-X-Google-Smtp-Source: ABdhPJxh3Uowu7JH4UdkTNftlk54k603Bv/jaftSe1FU3Lsss96e05qjowDMM/Ug6HmqnFOsblmqKA==
-X-Received: by 2002:a62:2ac2:0:b029:18c:25ff:d68 with SMTP id q185-20020a622ac20000b029018c25ff0d68mr20455201pfq.64.1606759815084;
-        Mon, 30 Nov 2020 10:10:15 -0800 (PST)
-Received: from [192.168.1.134] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id 184sm17681065pfc.28.2020.11.30.10.10.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Nov 2020 10:10:14 -0800 (PST)
-Subject: Re: [PATCH] block: wbt: Remove unnecessary invoking of
- wbt_update_limits in wbt_init
-To:     chenlei0x@gmail.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     Lei Chen <lennychen@tencent.com>
-References: <1606702852-14157-1-git-send-email-lennychen@tencent.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <5cbc949d-5703-90e2-fe0b-809b1b76bb08@kernel.dk>
-Date:   Mon, 30 Nov 2020 11:10:13 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Mon, 30 Nov 2020 13:11:42 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 823D0C0613D2;
+        Mon, 30 Nov 2020 10:11:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
+        Content-Type:Content-ID:Content-Description;
+        bh=R+zzLdYfKZFmJ36yLKNtpCZ9PINkATWvA4dyjIcnWFM=; b=PPuo2qmVcjPQdsoH9RsaGnoTpr
+        RLpBILWYSmwb32KJcipwmMDPkU+lg7H/pYit/9nT84/HkhNMhc+KrEZ8svXyRFykwQvcAArOM7jD3
+        PfGOKi5ZAfpl352M7K28KCbcS0W7mdDU1JqCuRgTcmWCqixAVJ/0pt276xS0UmD5UJzm0S1aKkjXM
+        AhvC5zEwQgMLmPTq0L+4W3LMQMioVuMVhjUZSvVUqU+wKz3qf1ABNPZdHezeSiVUkqD0qDjtBWWpw
+        Dnmt/CPzIx0Xtnwpn295u5g/V8S8ROtK1EPhSyBO7JZdpEe8BhbkAGHw10fQeEcEN2uuLMEjzNnCH
+        F9Tkq+nw==;
+Received: from 089144198196.atnat0007.highway.a1.net ([89.144.198.196] helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kjnda-00079A-78; Mon, 30 Nov 2020 18:10:59 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
+        linux-raid@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: [PATCH 5/5] block: remove the request_queue to argument request based tracepoints
+Date:   Mon, 30 Nov 2020 18:58:54 +0100
+Message-Id: <20201130175854.982460-6-hch@lst.de>
+X-Mailer: git-send-email 2.29.2
+In-Reply-To: <20201130175854.982460-1-hch@lst.de>
+References: <20201130175854.982460-1-hch@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <1606702852-14157-1-git-send-email-lennychen@tencent.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/29/20 7:20 PM, chenlei0x@gmail.com wrote:
-> From: Lei Chen <lennychen@tencent.com>
-> 
-> It's unnecessary to call wbt_update_limits explicitly within wbt_init,
-> because it will be called in the following function wbt_queue_depth_changed.
+The request_queue can trivially be derived from the request.
 
-Applied, thanks.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/blk-merge.c            |  2 +-
+ block/blk-mq-sched.c         |  2 +-
+ block/blk-mq.c               |  8 +++----
+ drivers/md/dm-rq.c           |  2 +-
+ drivers/s390/scsi/zfcp_fsf.c |  3 +--
+ include/linux/blktrace_api.h |  5 ++--
+ include/trace/events/block.h | 30 ++++++++++--------------
+ kernel/trace/blktrace.c      | 44 ++++++++++++++----------------------
+ 8 files changed, 39 insertions(+), 57 deletions(-)
 
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 4071daa88a5eaf..7497d86fff3834 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -799,7 +799,7 @@ static struct request *attempt_merge(struct request_queue *q,
+ 	 */
+ 	blk_account_io_merge_request(next);
+ 
+-	trace_block_rq_merge(q, next);
++	trace_block_rq_merge(next);
+ 
+ 	/*
+ 	 * ownership of bio passed from next to req, return 'next' for
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index d1eafe2c045caa..deff4e826e234d 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -386,7 +386,7 @@ EXPORT_SYMBOL_GPL(blk_mq_sched_try_insert_merge);
+ 
+ void blk_mq_sched_request_inserted(struct request *rq)
+ {
+-	trace_block_rq_insert(rq->q, rq);
++	trace_block_rq_insert(rq);
+ }
+ EXPORT_SYMBOL_GPL(blk_mq_sched_request_inserted);
+ 
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 13636458f32f1c..bb669b415a387e 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -732,7 +732,7 @@ void blk_mq_start_request(struct request *rq)
+ {
+ 	struct request_queue *q = rq->q;
+ 
+-	trace_block_rq_issue(q, rq);
++	trace_block_rq_issue(rq);
+ 
+ 	if (test_bit(QUEUE_FLAG_STATS, &q->queue_flags)) {
+ 		rq->io_start_time_ns = ktime_get_ns();
+@@ -759,7 +759,7 @@ static void __blk_mq_requeue_request(struct request *rq)
+ 
+ 	blk_mq_put_driver_tag(rq);
+ 
+-	trace_block_rq_requeue(q, rq);
++	trace_block_rq_requeue(rq);
+ 	rq_qos_requeue(q, rq);
+ 
+ 	if (blk_mq_request_started(rq)) {
+@@ -1820,7 +1820,7 @@ static inline void __blk_mq_insert_req_list(struct blk_mq_hw_ctx *hctx,
+ 
+ 	lockdep_assert_held(&ctx->lock);
+ 
+-	trace_block_rq_insert(hctx->queue, rq);
++	trace_block_rq_insert(rq);
+ 
+ 	if (at_head)
+ 		list_add(&rq->queuelist, &ctx->rq_lists[type]);
+@@ -1877,7 +1877,7 @@ void blk_mq_insert_requests(struct blk_mq_hw_ctx *hctx, struct blk_mq_ctx *ctx,
+ 	 */
+ 	list_for_each_entry(rq, list, queuelist) {
+ 		BUG_ON(rq->mq_ctx != ctx);
+-		trace_block_rq_insert(hctx->queue, rq);
++		trace_block_rq_insert(rq);
+ 	}
+ 
+ 	spin_lock(&ctx->lock);
+diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
+index 729a72ec30ccae..13b4385f4d5a92 100644
+--- a/drivers/md/dm-rq.c
++++ b/drivers/md/dm-rq.c
+@@ -397,7 +397,7 @@ static int map_request(struct dm_rq_target_io *tio)
+ 		}
+ 
+ 		/* The target has remapped the I/O so dispatch it */
+-		trace_block_rq_remap(clone->q, clone, disk_devt(dm_disk(md)),
++		trace_block_rq_remap(clone, disk_devt(dm_disk(md)),
+ 				     blk_rq_pos(rq));
+ 		ret = dm_dispatch_clone_request(clone, rq);
+ 		if (ret == BLK_STS_RESOURCE || ret == BLK_STS_DEV_RESOURCE) {
+diff --git a/drivers/s390/scsi/zfcp_fsf.c b/drivers/s390/scsi/zfcp_fsf.c
+index 6cb963a0677714..37d450f4695281 100644
+--- a/drivers/s390/scsi/zfcp_fsf.c
++++ b/drivers/s390/scsi/zfcp_fsf.c
+@@ -2359,8 +2359,7 @@ static void zfcp_fsf_req_trace(struct zfcp_fsf_req *req, struct scsi_cmnd *scsi)
+ 		}
+ 	}
+ 
+-	blk_add_driver_data(scsi->request->q, scsi->request, &blktrc,
+-			    sizeof(blktrc));
++	blk_add_driver_data(scsi->request, &blktrc, sizeof(blktrc));
+ }
+ 
+ /**
+diff --git a/include/linux/blktrace_api.h b/include/linux/blktrace_api.h
+index 3b6ff5902edce6..05556573b896a2 100644
+--- a/include/linux/blktrace_api.h
++++ b/include/linux/blktrace_api.h
+@@ -75,8 +75,7 @@ static inline bool blk_trace_note_message_enabled(struct request_queue *q)
+ 	return ret;
+ }
+ 
+-extern void blk_add_driver_data(struct request_queue *q, struct request *rq,
+-				void *data, size_t len);
++extern void blk_add_driver_data(struct request *rq, void *data, size_t len);
+ extern int blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
+ 			   struct block_device *bdev,
+ 			   char __user *arg);
+@@ -90,7 +89,7 @@ extern struct attribute_group blk_trace_attr_group;
+ #else /* !CONFIG_BLK_DEV_IO_TRACE */
+ # define blk_trace_ioctl(bdev, cmd, arg)		(-ENOTTY)
+ # define blk_trace_shutdown(q)				do { } while (0)
+-# define blk_add_driver_data(q, rq, data, len)		do {} while (0)
++# define blk_add_driver_data(rq, data, len)		do {} while (0)
+ # define blk_trace_setup(q, name, dev, bdev, arg)	(-ENOTTY)
+ # define blk_trace_startstop(q, start)			(-ENOTTY)
+ # define blk_trace_remove(q)				(-ENOTTY)
+diff --git a/include/trace/events/block.h b/include/trace/events/block.h
+index 8fb89574d8677f..0d782663a005dc 100644
+--- a/include/trace/events/block.h
++++ b/include/trace/events/block.h
+@@ -64,7 +64,6 @@ DEFINE_EVENT(block_buffer, block_dirty_buffer,
+ 
+ /**
+  * block_rq_requeue - place block IO request back on a queue
+- * @q: queue holding operation
+  * @rq: block IO operation request
+  *
+  * The block operation request @rq is being placed back into queue
+@@ -73,9 +72,9 @@ DEFINE_EVENT(block_buffer, block_dirty_buffer,
+  */
+ TRACE_EVENT(block_rq_requeue,
+ 
+-	TP_PROTO(struct request_queue *q, struct request *rq),
++	TP_PROTO(struct request *rq),
+ 
+-	TP_ARGS(q, rq),
++	TP_ARGS(rq),
+ 
+ 	TP_STRUCT__entry(
+ 		__field(  dev_t,	dev			)
+@@ -147,9 +146,9 @@ TRACE_EVENT(block_rq_complete,
+ 
+ DECLARE_EVENT_CLASS(block_rq,
+ 
+-	TP_PROTO(struct request_queue *q, struct request *rq),
++	TP_PROTO(struct request *rq),
+ 
+-	TP_ARGS(q, rq),
++	TP_ARGS(rq),
+ 
+ 	TP_STRUCT__entry(
+ 		__field(  dev_t,	dev			)
+@@ -181,7 +180,6 @@ DECLARE_EVENT_CLASS(block_rq,
+ 
+ /**
+  * block_rq_insert - insert block operation request into queue
+- * @q: target queue
+  * @rq: block IO operation request
+  *
+  * Called immediately before block operation request @rq is inserted
+@@ -191,14 +189,13 @@ DECLARE_EVENT_CLASS(block_rq,
+  */
+ DEFINE_EVENT(block_rq, block_rq_insert,
+ 
+-	TP_PROTO(struct request_queue *q, struct request *rq),
++	TP_PROTO(struct request *rq),
+ 
+-	TP_ARGS(q, rq)
++	TP_ARGS(rq)
+ );
+ 
+ /**
+  * block_rq_issue - issue pending block IO request operation to device driver
+- * @q: queue holding operation
+  * @rq: block IO operation operation request
+  *
+  * Called when block operation request @rq from queue @q is sent to a
+@@ -206,14 +203,13 @@ DEFINE_EVENT(block_rq, block_rq_insert,
+  */
+ DEFINE_EVENT(block_rq, block_rq_issue,
+ 
+-	TP_PROTO(struct request_queue *q, struct request *rq),
++	TP_PROTO(struct request *rq),
+ 
+-	TP_ARGS(q, rq)
++	TP_ARGS(rq)
+ );
+ 
+ /**
+  * block_rq_merge - merge request with another one in the elevator
+- * @q: queue holding operation
+  * @rq: block IO operation operation request
+  *
+  * Called when block operation request @rq from queue @q is merged to another
+@@ -221,9 +217,9 @@ DEFINE_EVENT(block_rq, block_rq_issue,
+  */
+ DEFINE_EVENT(block_rq, block_rq_merge,
+ 
+-	TP_PROTO(struct request_queue *q, struct request *rq),
++	TP_PROTO(struct request *rq),
+ 
+-	TP_ARGS(q, rq)
++	TP_ARGS(rq)
+ );
+ 
+ /**
+@@ -491,7 +487,6 @@ TRACE_EVENT(block_bio_remap,
+ 
+ /**
+  * block_rq_remap - map request for a block operation request
+- * @q: queue holding the operation
+  * @rq: block IO operation request
+  * @dev: device for the operation
+  * @from: original sector for the operation
+@@ -502,10 +497,9 @@ TRACE_EVENT(block_bio_remap,
+  */
+ TRACE_EVENT(block_rq_remap,
+ 
+-	TP_PROTO(struct request_queue *q, struct request *rq, dev_t dev,
+-		 sector_t from),
++	TP_PROTO(struct request *rq, dev_t dev, sector_t from),
+ 
+-	TP_ARGS(q, rq, dev, from),
++	TP_ARGS(rq, dev, from),
+ 
+ 	TP_STRUCT__entry(
+ 		__field( dev_t,		dev		)
+diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+index 405637144a0389..7839a78205c243 100644
+--- a/kernel/trace/blktrace.c
++++ b/kernel/trace/blktrace.c
+@@ -795,12 +795,12 @@ static u64 blk_trace_bio_get_cgid(struct request_queue *q, struct bio *bio)
+ #endif
+ 
+ static u64
+-blk_trace_request_get_cgid(struct request_queue *q, struct request *rq)
++blk_trace_request_get_cgid(struct request *rq)
+ {
+ 	if (!rq->bio)
+ 		return 0;
+ 	/* Use the first bio */
+-	return blk_trace_bio_get_cgid(q, rq->bio);
++	return blk_trace_bio_get_cgid(rq->q, rq->bio);
+ }
+ 
+ /*
+@@ -841,40 +841,35 @@ static void blk_add_trace_rq(struct request *rq, int error,
+ 	rcu_read_unlock();
+ }
+ 
+-static void blk_add_trace_rq_insert(void *ignore,
+-				    struct request_queue *q, struct request *rq)
++static void blk_add_trace_rq_insert(void *ignore, struct request *rq)
+ {
+ 	blk_add_trace_rq(rq, 0, blk_rq_bytes(rq), BLK_TA_INSERT,
+-			 blk_trace_request_get_cgid(q, rq));
++			 blk_trace_request_get_cgid(rq));
+ }
+ 
+-static void blk_add_trace_rq_issue(void *ignore,
+-				   struct request_queue *q, struct request *rq)
++static void blk_add_trace_rq_issue(void *ignore, struct request *rq)
+ {
+ 	blk_add_trace_rq(rq, 0, blk_rq_bytes(rq), BLK_TA_ISSUE,
+-			 blk_trace_request_get_cgid(q, rq));
++			 blk_trace_request_get_cgid(rq));
+ }
+ 
+-static void blk_add_trace_rq_merge(void *ignore,
+-				   struct request_queue *q, struct request *rq)
++static void blk_add_trace_rq_merge(void *ignore, struct request *rq)
+ {
+ 	blk_add_trace_rq(rq, 0, blk_rq_bytes(rq), BLK_TA_BACKMERGE,
+-			 blk_trace_request_get_cgid(q, rq));
++			 blk_trace_request_get_cgid(rq));
+ }
+ 
+-static void blk_add_trace_rq_requeue(void *ignore,
+-				     struct request_queue *q,
+-				     struct request *rq)
++static void blk_add_trace_rq_requeue(void *ignore, struct request *rq)
+ {
+ 	blk_add_trace_rq(rq, 0, blk_rq_bytes(rq), BLK_TA_REQUEUE,
+-			 blk_trace_request_get_cgid(q, rq));
++			 blk_trace_request_get_cgid(rq));
+ }
+ 
+ static void blk_add_trace_rq_complete(void *ignore, struct request *rq,
+ 			int error, unsigned int nr_bytes)
+ {
+ 	blk_add_trace_rq(rq, error, nr_bytes, BLK_TA_COMPLETE,
+-			 blk_trace_request_get_cgid(rq->q, rq));
++			 blk_trace_request_get_cgid(rq));
+ }
+ 
+ /**
+@@ -1037,16 +1032,14 @@ static void blk_add_trace_bio_remap(void *ignore, struct bio *bio, dev_t dev,
+  *     Add a trace for that action.
+  *
+  **/
+-static void blk_add_trace_rq_remap(void *ignore,
+-				   struct request_queue *q,
+-				   struct request *rq, dev_t dev,
++static void blk_add_trace_rq_remap(void *ignore, struct request *rq, dev_t dev,
+ 				   sector_t from)
+ {
+ 	struct blk_trace *bt;
+ 	struct blk_io_trace_remap r;
+ 
+ 	rcu_read_lock();
+-	bt = rcu_dereference(q->blk_trace);
++	bt = rcu_dereference(rq->q->blk_trace);
+ 	if (likely(!bt)) {
+ 		rcu_read_unlock();
+ 		return;
+@@ -1058,13 +1051,12 @@ static void blk_add_trace_rq_remap(void *ignore,
+ 
+ 	__blk_add_trace(bt, blk_rq_pos(rq), blk_rq_bytes(rq),
+ 			rq_data_dir(rq), 0, BLK_TA_REMAP, 0,
+-			sizeof(r), &r, blk_trace_request_get_cgid(q, rq));
++			sizeof(r), &r, blk_trace_request_get_cgid(rq));
+ 	rcu_read_unlock();
+ }
+ 
+ /**
+  * blk_add_driver_data - Add binary message with driver-specific data
+- * @q:		queue the io is for
+  * @rq:		io request
+  * @data:	driver-specific data
+  * @len:	length of driver-specific data
+@@ -1073,14 +1065,12 @@ static void blk_add_trace_rq_remap(void *ignore,
+  *     Some drivers might want to write driver-specific data per request.
+  *
+  **/
+-void blk_add_driver_data(struct request_queue *q,
+-			 struct request *rq,
+-			 void *data, size_t len)
++void blk_add_driver_data(struct request *rq, void *data, size_t len)
+ {
+ 	struct blk_trace *bt;
+ 
+ 	rcu_read_lock();
+-	bt = rcu_dereference(q->blk_trace);
++	bt = rcu_dereference(rq->q->blk_trace);
+ 	if (likely(!bt)) {
+ 		rcu_read_unlock();
+ 		return;
+@@ -1088,7 +1078,7 @@ void blk_add_driver_data(struct request_queue *q,
+ 
+ 	__blk_add_trace(bt, blk_rq_trace_sector(rq), blk_rq_bytes(rq), 0, 0,
+ 				BLK_TA_DRV_DATA, 0, len, data,
+-				blk_trace_request_get_cgid(q, rq));
++				blk_trace_request_get_cgid(rq));
+ 	rcu_read_unlock();
+ }
+ EXPORT_SYMBOL_GPL(blk_add_driver_data);
 -- 
-Jens Axboe
+2.29.2
 
