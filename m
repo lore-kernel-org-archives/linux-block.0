@@ -7,42 +7,41 @@ X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED144C5519F
-	for <linux-block@archiver.kernel.org>; Mon, 30 Nov 2020 07:53:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57C68C83013
+	for <linux-block@archiver.kernel.org>; Mon, 30 Nov 2020 07:56:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AD0FB20709
-	for <linux-block@archiver.kernel.org>; Mon, 30 Nov 2020 07:53:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0630620857
+	for <linux-block@archiver.kernel.org>; Mon, 30 Nov 2020 07:56:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727699AbgK3Hwl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Nov 2020 02:52:41 -0500
-Received: from mx2.suse.de ([195.135.220.15]:34190 "EHLO mx2.suse.de"
+        id S1726298AbgK3H4h (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Nov 2020 02:56:37 -0500
+Received: from mx2.suse.de ([195.135.220.15]:37856 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726762AbgK3Hwl (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Nov 2020 02:52:41 -0500
+        id S1725965AbgK3H4h (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 30 Nov 2020 02:56:37 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 2190FAC8F;
-        Mon, 30 Nov 2020 07:52:00 +0000 (UTC)
-Subject: Re: [PATCH 45/45] block: stop using bdget_disk for partition 0
+        by mx2.suse.de (Postfix) with ESMTP id CF14DAD09;
+        Mon, 30 Nov 2020 07:55:55 +0000 (UTC)
+Subject: Re: [PATCH 1/4] block: add a hard-readonly flag to struct gendisk
 To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
-        Coly Li <colyli@suse.de>, Mike Snitzer <snitzer@redhat.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jan Kara <jack@suse.cz>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        dm-devel@redhat.com, Jan Kara <jack@suse.com>,
-        linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org
-References: <20201128161510.347752-1-hch@lst.de>
- <20201128161510.347752-46-hch@lst.de>
+Cc:     "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Oleksii Kurochko <olkuroch@cisco.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Dongsheng Yang <dongsheng.yang@easystack.cn>,
+        ceph-devel@vger.kernel.org, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+References: <20201129181926.897775-1-hch@lst.de>
+ <20201129181926.897775-2-hch@lst.de>
 From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <6ee4669e-69c1-eb41-c37e-3794d3207e3a@suse.de>
-Date:   Mon, 30 Nov 2020 08:51:59 +0100
+Message-ID: <d28dc6f5-bae1-ddfa-8874-9c22235a69f3@suse.de>
+Date:   Mon, 30 Nov 2020 08:55:54 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.4.0
 MIME-Version: 1.0
-In-Reply-To: <20201128161510.347752-46-hch@lst.de>
+In-Reply-To: <20201129181926.897775-2-hch@lst.de>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -50,21 +49,46 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/28/20 5:15 PM, Christoph Hellwig wrote:
-> We can just dereference the point in struct gendisk instead.  Also
-> remove the now unused export.
+On 11/29/20 7:19 PM, Christoph Hellwig wrote:
+> Commit 20bd1d026aac ("scsi: sd: Keep disk read-only when re-reading
+> partition") addressed a long-standing problem with user read-only
+> policy being overridden as a result of a device-initiated revalidate.
+> The commit has since been reverted due to a regression that left some
+> USB devices read-only indefinitely.
 > 
+> To fix the underlying problems with revalidate we need to keep track
+> of hardware state and user policy separately.
+> 
+> The gendisk has been updated to reflect the current hardware state set
+> by the device driver. This is done to allow returning the device to
+> the hardware state once the user clears the BLKROSET flag.
+> 
+> The resulting semantics are as follows:
+> 
+>   - If BLKROSET is used to set a whole-disk device read-only, any
+>     partitions will end up in a read-only state until the user
+>     explicitly clears the flag.
+> 
+>   - If BLKROSET sets a given partition read-only, that partition will
+>     remain read-only even if the underlying storage stack initiates a
+>     revalidate. However, the BLKRRPART ioctl will cause the partition
+>     table to be dropped and any user policy on partitions will be lost.
+> 
+>   - If BLKROSET has not been set, both the whole disk device and any
+>     partitions will reflect the current write-protect state of the
+>     underlying device.
+> 
+> Based on a patch from Martin K. Petersen <martin.petersen@oracle.com>.
+> 
+> Reported-by: Oleksii Kurochko <olkuroch@cisco.com>
+> Bugzilla: https://bugzilla.kernel.org/show_bug.cgi?id=201221
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Jan Kara <jack@suse.cz>
 > ---
->   block/genhd.c                   |  1 -
->   drivers/block/nbd.c             |  4 +---
->   drivers/block/xen-blkfront.c    | 20 +++++---------------
->   drivers/block/zram/zram_drv.c   | 14 ++------------
->   drivers/md/dm.c                 | 16 ++--------------
->   drivers/s390/block/dasd_ioctl.c |  5 ++---
->   fs/block_dev.c                  |  2 +-
->   7 files changed, 13 insertions(+), 49 deletions(-)
+>   block/blk-core.c        |  2 +-
+>   block/genhd.c           | 34 +++++++++++++++++++---------------
+>   block/partitions/core.c |  3 +--
+>   include/linux/genhd.h   |  6 ++++--
+>   4 files changed, 25 insertions(+), 20 deletions(-)
 > 
 Reviewed-by: Hannes Reinecke <hare@suse.de>
 
