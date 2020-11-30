@@ -2,147 +2,262 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A31B4C64E7B
-	for <linux-block@archiver.kernel.org>; Mon, 30 Nov 2020 14:53:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26E79C64E8A
+	for <linux-block@archiver.kernel.org>; Mon, 30 Nov 2020 14:55:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4151720725
-	for <linux-block@archiver.kernel.org>; Mon, 30 Nov 2020 14:53:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="o632RruB";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="ovmX92k8"
+	by mail.kernel.org (Postfix) with ESMTP id D4C5120719
+	for <linux-block@archiver.kernel.org>; Mon, 30 Nov 2020 14:55:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727356AbgK3Oxl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Nov 2020 09:53:41 -0500
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:6698 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726213AbgK3Oxk (ORCPT
+        id S1726770AbgK3OzY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Nov 2020 09:55:24 -0500
+Received: from frasgout.his.huawei.com ([185.176.79.56]:2178 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726514AbgK3OzY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Nov 2020 09:53:40 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1606748020; x=1638284020;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=i73cQScyOXtQNhKCgBM0j0yco6YrKjuowVHgFUDbKic=;
-  b=o632RruBwTThScu0E6Mq6hXh+fv4jkPJ1lxkc3iVN1PIlsx9upVNC3dh
-   FM4qVkmxcIzvOC+Ngn+6FfBt0t9fU4qNHS6B+bEvZU8syOANRh699ARQv
-   qcGt/qA9F07r4Spwi/nzmjMKpOVI+RcvUUiy3U1FnsY0JWKSwS4EuTbyV
-   ReEtyNbh+ozA2CHfM6AKyfHeGGZET+SK2OYufo37Zvlk0/oMqIk/Op2Vt
-   /2LXnaiwef8bIL8omNt/5w4wKhckQ9h/ZFvx3imtg6xThzFBdRMoYBZQH
-   YXyqpxp55NLa14lIcVkALKjtLy3ra5ZdEcXx76q7JnRxqc9hksqXa8EX3
-   A==;
-IronPort-SDR: FnHzlgx2YoQZHs8ddqBxeUk7QRvOTn00f2y3oWw8CIZfcnlgna2xWlY5cfl/Kn8K2fkm9F2Mne
- cJ342k2ooYe2D9XRAuye0RJRxfdm9mmZ4BgeOLxFMwe2Sc2tRBeAo0qcDFv3hEgmIIPYhFKN8C
- 43iI2d+kjEZm0FaKF5N9wDdgL795AlNFIHHwltqkP5HIWpH4L7gzxFyIB2Fs3ZjZyq4DerViBU
- BHrv7MueD3/5GGBthYq0SfxbxqcZ2WhFPxQym9Q5pgs4WM00r5suRY8qc/UrOiwfoZFp2YvhyN
- Ogo=
-X-IronPort-AV: E=Sophos;i="5.78,381,1599494400"; 
-   d="scan'208";a="155018471"
-Received: from mail-sn1nam04lp2059.outbound.protection.outlook.com (HELO NAM04-SN1-obe.outbound.protection.outlook.com) ([104.47.44.59])
-  by ob1.hgst.iphmx.com with ESMTP; 30 Nov 2020 22:52:34 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KN2u02cetZV3twosDHedAXKlVX7QaKTYZy49emQGRFT6In/PuTPPCBZjPoiIhDkSUnIgsOMXQ3FV7yBzUzlITDTuDpbYfXgLIS3iar1nBUSwwbi6ZdkRWROIGmZYN7+FEKwdKDCzZ81Y8SeX4eVKhirMJdXkSDivz7wd5G6NjJgONslTNSoTomO6GlDXTcVUXjVkb++fJU52LVZj/ztBspTqrlSx/Y4309sOjmNlZbHVKMnVN1rMLgMvOJyb6Oyx6kbKqCDHUo/wDJ+UNVgtglRVeNrII8En1/Xk7BZSP4HU7A9vPSUU1t/3unO2IqNZktnLmL+4C1y9xnZG3UWWoQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=i73cQScyOXtQNhKCgBM0j0yco6YrKjuowVHgFUDbKic=;
- b=ciexDgL8wnK1bANdR1fvrO9+j7UyxJKL9HAsbwIAshvmtWsFtgH50H7MrbPY+L+ZvynyfKkccalIoWyEyMLTa0k5ErIJ0iBKXS4ebqKoOYIRYCwcIeJ3DQykrZn5lnE5yzwOl+WiPei4dQzOjsoqahRqFIGku6dqczFTXmc44V9NcRYuqv+w8yzlOsXfjiFSeL1+kS2EkZObU6fibz+FzLXcUnC9QnVygS4sQ4hazglCt9sPQAJR+PGMEdcLCSFS63HPLdqM4TZR17xgVugU/LrrVbf+CZhuBdsknPmBJ5mrfn7V8rP0V2Wev58ZeATmAP9OsLwWjVxjfMuT3tyCfw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=i73cQScyOXtQNhKCgBM0j0yco6YrKjuowVHgFUDbKic=;
- b=ovmX92k8Kky7+MY//6l26w0lpuAfwqiI+/u9WbzkeEHr6twYwyKPVg3nT438s2UhL+EA2+N2RX4vintYJYsORDlZYd9RC96+9lL7FCoGazG2gsJZSayEFX/L+4FiESE9QS2okrT3f6Rv7tz7hFgkbvPb28S1QRN+42HfvVB/01Q=
-Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
- (2603:10b6:803:47::21) by SN6PR04MB4927.namprd04.prod.outlook.com
- (2603:10b6:805:93::26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3611.25; Mon, 30 Nov
- 2020 14:52:30 +0000
-Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
- ([fe80::65d7:592a:32d4:9f98]) by SN4PR0401MB3598.namprd04.prod.outlook.com
- ([fe80::65d7:592a:32d4:9f98%7]) with mapi id 15.20.3589.030; Mon, 30 Nov 2020
- 14:52:30 +0000
-From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-CC:     Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
-        Coly Li <colyli@suse.de>, Mike Snitzer <snitzer@redhat.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jan Kara <jack@suse.cz>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        Jan Kara <jack@suse.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-bcache@vger.kernel.org" <linux-bcache@vger.kernel.org>,
-        "linux-mtd@lists.infradead.org" <linux-mtd@lists.infradead.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>
-Subject: Re: [PATCH 16/45] block: switch bdgrab to use igrab
-Thread-Topic: [PATCH 16/45] block: switch bdgrab to use igrab
-Thread-Index: AQHWxaG7mCeKo37kOkm/uk6ftU/pPA==
-Date:   Mon, 30 Nov 2020 14:52:30 +0000
-Message-ID: <SN4PR0401MB35984402FF62259631F178A09BF50@SN4PR0401MB3598.namprd04.prod.outlook.com>
-References: <20201128161510.347752-1-hch@lst.de>
- <20201128161510.347752-17-hch@lst.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: lst.de; dkim=none (message not signed)
- header.d=none;lst.de; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [2001:a62:155d:1001:2c26:fc00:7c60:29b]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 669144bf-890b-4421-c399-08d8953f901f
-x-ms-traffictypediagnostic: SN6PR04MB4927:
-x-microsoft-antispam-prvs: <SN6PR04MB4927E44374573975A0CB3FC89BF50@SN6PR04MB4927.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:1728;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: ofyRCdhfnZWlX3fZSfsHkfvfeLrxaRoVaVTYTvg3WsmHhLF/vHoS3Q1Xk4RvUDYq3yq11f5850vA0SWIbF8OJyDl3pXqcbc77cBOODA0bxhCtCVX6+WPam9hDB+1k47Y4DLS0BAitdaHPT3aNoCl7hkzLnjzc+MnM9/4VPZWxJvLGbUI2H/bMDcttJnOiAR2FIxFFGrYgtkQESgLFuilE03zN1c6YtBShsSzJQJnrfhj7PiYNPZD5BR368u11o99eeMPPayhc0dp97ysPbZyzzQ4tz64/nAU9mEF9/tAeR6XnCnhFcAwJFqss8y+L2themWYmSR8Fux1uuOj756mmw==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN4PR0401MB3598.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(376002)(136003)(366004)(39860400002)(396003)(4270600006)(8676002)(2906002)(4326008)(5660300002)(6506007)(558084003)(8936002)(186003)(76116006)(86362001)(91956017)(55016002)(33656002)(9686003)(7696005)(52536014)(19618925003)(66556008)(64756008)(66946007)(54906003)(71200400001)(316002)(110136005)(66446008)(478600001)(66476007)(7416002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: =?us-ascii?Q?y2DzVk9PF4LHvHeFuTJBnxcd96WXbu0Uzab+SjAlkrHx1h7flDepdFB5AMaK?=
- =?us-ascii?Q?VFUCk5ZwSipScRyNkDffYfQ/34dsWmkYzfEiqBfdkhmRT4+HtH8wLXFtfH6U?=
- =?us-ascii?Q?mm1/4i23xhFvXv07sJDp59MpkSd3uiUUgGgJlEh7W5SYRhq0PMC1GSSeIiQb?=
- =?us-ascii?Q?waqDFfKx8cUD6KPonzG+ULY8b27RiPwLbg/G7rSzbxQIeVBtV3LNhsf0Ni8s?=
- =?us-ascii?Q?rBJl3AH7fNpPKT9XRJ9ynTUslivf+cK4m56xH0zo/FxGQ47pzSXCdNGElXK1?=
- =?us-ascii?Q?u2DAa8YKIFT2lWXyOXl4SGSuoZ5S+ZMeHBMQtJtbUtEA/ojDAGhQDrsQTxAN?=
- =?us-ascii?Q?BOTT2eOF4fA9+FdKbAVKWu1WPbPzDUyL2MJgcMsv6STWbybkT73mGtutrBR3?=
- =?us-ascii?Q?4OvM5RxRqkiIpP7c7ufU7Kvl3TrCSsb+0pPo3o681JrGQchpnNC6iozXzowE?=
- =?us-ascii?Q?9NxnlpdHPaNPxEWs4ojTAU6lNjux28U7K0GLv8SvLow3sGMpmxiHXbBI/sgI?=
- =?us-ascii?Q?pl30gdhXO/9UAJLk+bIkzdGJwFrhHt27AItAmYSJJL//R8MX+ilpGAKcMGIR?=
- =?us-ascii?Q?FfI3GgyvGgxzJZ06yDjA/8epfUNtq0ZiIsGGiYSeVzJNL++XIM3zkTIM+zLq?=
- =?us-ascii?Q?7kbU53RSN6cRMVc4kKivy4qJaXkuX5uCU3NTT+gI0XwaxEiAAlbmY2+61ukE?=
- =?us-ascii?Q?I57Ea2HXYCPRE2YvcZTTHK0tNIzba7T1s7ge/bar0qqWqHzcMqzropiQC5rj?=
- =?us-ascii?Q?V3+WthI6MHNZFdMdnuexhbdGnCpMCM2mOYD/lU/p+F7ktV+IM6zYOBHwaZEk?=
- =?us-ascii?Q?uIDasbzchVZTx+hxXm+CHsHXYfhJOj1rBVocjjBkzmpCO9dRmLBwNIYrGIuk?=
- =?us-ascii?Q?MAuPpHxc55lmnKoyrArglPiIXk0VNf30DT7rj3s2FIi+a3+u0I5k+cwq5BzG?=
- =?us-ascii?Q?sh/KqM50N7INgJnGmDbfdCmwl19H1gj4ghI0qKaiLs7hwyhqU/yTNwp9uqkY?=
- =?us-ascii?Q?4vOds73o0tHx4Vh2g5HhurjIKb07trejk9OyAo0cJtFRhFswH69aFmZG7IPR?=
- =?us-ascii?Q?bOFIFnTB?=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Mon, 30 Nov 2020 09:55:24 -0500
+Received: from fraeml708-chm.china.huawei.com (unknown [172.18.147.226])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Cl7VD4LYpz67KcS;
+        Mon, 30 Nov 2020 22:51:48 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml708-chm.china.huawei.com (10.206.15.36) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Mon, 30 Nov 2020 15:54:40 +0100
+Received: from [10.47.3.199] (10.47.3.199) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1913.5; Mon, 30 Nov
+ 2020 14:54:38 +0000
+Subject: Re: [PATCH V1] block: Fix use-after-free while iterating over
+ requests
+To:     Hannes Reinecke <hare@suse.de>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Pradeep P V K <ppvk@codeaurora.org>, <axboe@kernel.dk>,
+        <linux-block@vger.kernel.org>
+CC:     <stummala@codeaurora.org>, <linux-kernel@vger.kernel.org>,
+        Ming Lei <ming.lei@redhat.com>,
+        Kashyap Desai <kashyap.desai@broadcom.com>
+References: <1606402925-24420-1-git-send-email-ppvk@codeaurora.org>
+ <c94fcada-7f6d-a1e3-4c88-d225af1a676e@acm.org>
+ <693ea723-aa9e-1166-8a19-a7787f724969@huawei.com>
+ <0c925db8-e481-5f21-b0fe-f691142b0437@suse.de>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <de707ecc-b34c-93d4-522e-79632eaa9d8a@huawei.com>
+Date:   Mon, 30 Nov 2020 14:54:13 +0000
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN4PR0401MB3598.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 669144bf-890b-4421-c399-08d8953f901f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Nov 2020 14:52:30.5774
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: vBCTSjwnFG0YCjVi+xMBBfMlLOrnn+Bc4HWWQ4nL7n0gLLjDpaYZl+xEtTsKglrJ2pIelydu6/P0vAuVaEyolqSdx27yF01EEM2M7ErckrA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR04MB4927
+In-Reply-To: <0c925db8-e481-5f21-b0fe-f691142b0437@suse.de>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.47.3.199]
+X-ClientProxiedBy: lhreml704-chm.china.huawei.com (10.201.108.53) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>=0A=
+On 30/11/2020 07:04, Hannes Reinecke wrote:
+> On 11/26/20 5:49 PM, John Garry wrote:
+>> On 26/11/2020 16:27, Bart Van Assche wrote:
+>>> On 11/26/20 7:02 AM, Pradeep P V K wrote:
+>>>> Observes below crash while accessing (use-after-free) request queue
+>>>> member of struct request.
+>>>>
+>>>> 191.784789:   <2> Unable to handle kernel paging request at virtual
+>>>> address ffffff81429a4440
+>>>> ...
+>>>> 191.786174:   <2> CPU: 3 PID: 213 Comm: kworker/3:1H Tainted: G S
+>>>> O      5.4.61-qgki-debug-ge45de39 #1
+>>>> ...
+>>>> 191.786226:   <2> Workqueue: kblockd blk_mq_timeout_work
+>>>> 191.786242:   <2> pstate: 20c00005 (nzCv daif +PAN +UAO)
+>>>> 191.786261:   <2> pc : bt_for_each+0x114/0x1a4
+>>>> 191.786274:   <2> lr : bt_for_each+0xe0/0x1a4
+>>>> ...
+>>>> 191.786494:   <2> Call trace:
+>>>> 191.786507:   <2>  bt_for_each+0x114/0x1a4
+>>>> 191.786519:   <2>  blk_mq_queue_tag_busy_iter+0x60/0xd4
+>>>> 191.786532:   <2>  blk_mq_timeout_work+0x54/0xe8
+>>>> 191.786549:   <2>  process_one_work+0x2cc/0x568
+>>>> 191.786562:   <2>  worker_thread+0x28c/0x518
+>>>> 191.786577:   <2>  kthread+0x160/0x170
+>>>> 191.786594:   <2>  ret_from_fork+0x10/0x18
+>>>> 191.786615:   <2> Code: 0b080148 f9404929 f8685921 b4fffe01 (f9400028)
+>>>> 191.786630:   <2> ---[ end trace 0f1f51d79ab3f955 ]---
+>>>> 191.786643:   <2> Kernel panic - not syncing: Fatal exception
+>>>>
+>>>> Fix this by updating the freed request with NULL.
+>>>> This could avoid accessing the already free request from other
+>>>> contexts while iterating over the requests.
+>>>>
+>>>> Signed-off-by: Pradeep P V K <ppvk@codeaurora.org>
+>>>> ---
+>>>>   block/blk-mq.c | 1 +
+>>>>   block/blk-mq.h | 1 +
+>>>>   2 files changed, 2 insertions(+)
+>>>>
+>>>> diff --git a/block/blk-mq.c b/block/blk-mq.c
+>>>> index 55bcee5..9996cb1 100644
+>>>> --- a/block/blk-mq.c
+>>>> +++ b/block/blk-mq.c
+>>>> @@ -492,6 +492,7 @@ static void __blk_mq_free_request(struct request 
+>>>> *rq)
+>>>>       blk_crypto_free_request(rq);
+>>>>       blk_pm_mark_last_busy(rq);
+>>>> +    hctx->tags->rqs[rq->tag] = NULL;
+>>>>       rq->mq_hctx = NULL;
+>>>>       if (rq->tag != BLK_MQ_NO_TAG)
+>>>>           blk_mq_put_tag(hctx->tags, ctx, rq->tag);
+>>>> diff --git a/block/blk-mq.h b/block/blk-mq.h
+>>>> index a52703c..8747bf1 100644
+>>>> --- a/block/blk-mq.h
+>>>> +++ b/block/blk-mq.h
+>>>> @@ -224,6 +224,7 @@ static inline int 
+>>>> __blk_mq_active_requests(struct blk_mq_hw_ctx *hctx)
+>>>>   static inline void __blk_mq_put_driver_tag(struct blk_mq_hw_ctx 
+>>>> *hctx,
+>>>>                          struct request *rq)
+>>>>   {
+>>>> +    hctx->tags->rqs[rq->tag] = NULL;
+>>>>       blk_mq_put_tag(hctx->tags, rq->mq_ctx, rq->tag);
+>>>>       rq->tag = BLK_MQ_NO_TAG;
+>>>
+>>> Is this perhaps a block driver bug instead of a block layer core bug? If
+>>> this would be a block layer core bug, it would have been reported 
+>>> before.
+>>
+>> Isn't this the same issue which as been reported many times:
+>>
+>> https://lore.kernel.org/linux-block/20200820180335.3109216-1-ming.lei@redhat.com/ 
+>>
+>>
+>> https://lore.kernel.org/linux-block/8376443a-ec1b-0cef-8244-ed584b96fa96@huawei.com/ 
+>>
+>>
+>> But I never saw a crash, just kasan report.
+>>
+> And if that above were a concern, I would have thought one would need to 
+> use a WRITE_ONCE() here; otherwise we might have a race condition where 
+> other CPUs still see the old value, no?
+ From further looking at the history here, Kashyap tried the same 
+approach and preference was to not add anything to the fast path:
+
+https://lore.kernel.org/linux-block/04e2f9e8-79fa-f1cb-ab23-4a15bf3f64cc@kernel.dk/
+
+I had another solution for this which clears any references when we free 
+the sched tags, but never posted as it looked a bit crazy and I was 
+busy, below.
+
+---->8------
+
+
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index a19cdf159b75..240804617683 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -608,7 +608,7 @@ static void blk_mq_sched_free_tags(struct 
+blk_mq_tag_set *set,
+  				   unsigned int hctx_idx)
+  {
+  	if (hctx->sched_tags) {
+-		blk_mq_free_rqs(set, hctx->sched_tags, hctx_idx);
++		blk_mq_free_rqs(set, hctx->sched_tags, hctx_idx, NULL);
+  		blk_mq_free_rq_map(hctx->sched_tags);
+  		hctx->sched_tags = NULL;
+  	}
+@@ -711,10 +711,9 @@ void blk_mq_sched_free_requests(struct 
+request_queue *q)
+  {
+  	struct blk_mq_hw_ctx *hctx;
+  	int i;
+
+  	queue_for_each_hw_ctx(q, hctx, i) {
+-		if (hctx->sched_tags)
+-			blk_mq_free_rqs(q->tag_set, hctx->sched_tags, i);
++			blk_mq_free_rqs(q->tag_set, hctx->sched_tags, i, hctx->tags);
+  	}
+  }
+
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index 32d82e23b095..9622cef0c38d 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -515,7 +515,7 @@ int blk_mq_tag_update_depth(struct blk_mq_hw_ctx *hctx,
+  			return -ENOMEM;
+  		}
+
+-		blk_mq_free_rqs(set, *tagsptr, hctx->queue_num);
++		blk_mq_free_rqs(set, *tagsptr, hctx->queue_num, NULL);
+  		blk_mq_free_rq_map(*tagsptr);
+  		*tagsptr = new;
+  	} else {
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 0015a1892153..6ff815ceae34 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2256,12 +2256,12 @@ blk_qc_t blk_mq_submit_bio(struct bio *bio)
+  EXPORT_SYMBOL_GPL(blk_mq_submit_bio); /* only for request based dm */
+
+  void blk_mq_free_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
+-		     unsigned int hctx_idx)
++		     unsigned int hctx_idx, struct blk_mq_tags *references)
+  {
+  	struct page *page;
+
+  	if (tags->rqs && set->ops->exit_request) {
+-		int i;
++		int i, j;
+
+  		for (i = 0; i < tags->nr_tags; i++) {
+  			struct request *rq = tags->static_rqs[i];
+@@ -2269,6 +2269,12 @@ void blk_mq_free_rqs(struct blk_mq_tag_set *set, 
+struct blk_mq_tags *tags,
+  			if (!rq)
+  				continue;
+  			set->ops->exit_request(set, rq, hctx_idx);
++			for (j = 0; references && j < references->nr_tags; j++) {
++				struct request *old = cmpxchg(&references->rqs[j], rq, 0);
++			}
+  			tags->static_rqs[i] = NULL;
+  		}
+  	}
+@@ -2425,7 +2431,7 @@ int blk_mq_alloc_rqs(struct blk_mq_tag_set *set, 
+struct blk_mq_tags *tags,
+  	return 0;
+
+  fail:
+-	blk_mq_free_rqs(set, tags, hctx_idx);
++	blk_mq_free_rqs(set, tags, hctx_idx, NULL);
+  	return -ENOMEM;
+  }
+
+@@ -2755,7 +2761,7 @@ static void blk_mq_free_map_and_requests(struct 
+blk_mq_tag_set *set,
+  					 unsigned int hctx_idx)
+  {
+  	if (set->tags && set->tags[hctx_idx]) {
+-		blk_mq_free_rqs(set, set->tags[hctx_idx], hctx_idx);
++		blk_mq_free_rqs(set, set->tags[hctx_idx], hctx_idx, NULL);
+  		blk_mq_free_rq_map(set->tags[hctx_idx]);
+  		set->tags[hctx_idx] = NULL;
+  	}
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 863a2f3346d4..bee8c5de600b 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -52,7 +52,7 @@ struct request *blk_mq_dequeue_from_ctx(struct 
+blk_mq_hw_ctx *hctx,
+   * Internal helpers for allocating/freeing the request map
+   */
+  void blk_mq_free_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
+-		     unsigned int hctx_idx);
++		     unsigned int hctx_idx, struct blk_mq_tags *references);
+  void blk_mq_free_rq_map(struct blk_mq_tags *tags);
+  struct blk_mq_tags *blk_mq_alloc_rq_map(struct blk_mq_tag_set *set,
+  					unsigned int hctx_idx,
