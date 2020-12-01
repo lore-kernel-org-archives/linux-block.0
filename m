@@ -2,99 +2,88 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61EEEC64E7A
-	for <linux-block@archiver.kernel.org>; Tue,  1 Dec 2020 13:23:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9C1FC64E7B
+	for <linux-block@archiver.kernel.org>; Tue,  1 Dec 2020 13:33:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0B98A207FF
-	for <linux-block@archiver.kernel.org>; Tue,  1 Dec 2020 13:23:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 50EEE2084C
+	for <linux-block@archiver.kernel.org>; Tue,  1 Dec 2020 13:33:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="omjzs4OI"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="sLO9WQNR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387477AbgLANXY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Dec 2020 08:23:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35736 "EHLO
+        id S2387646AbgLANdK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Dec 2020 08:33:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37238 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387439AbgLANXY (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Dec 2020 08:23:24 -0500
-Received: from mail-ej1-x644.google.com (mail-ej1-x644.google.com [IPv6:2a00:1450:4864:20::644])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBB3CC0613CF;
-        Tue,  1 Dec 2020 05:22:43 -0800 (PST)
-Received: by mail-ej1-x644.google.com with SMTP id lt17so4069712ejb.3;
-        Tue, 01 Dec 2020 05:22:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=uADe8pIjhPSuCRhZ6wL+nTegabcP2vd7po21w3/KsKc=;
-        b=omjzs4OIh0H0sHYUNmwiXYUGGpzCAAS6J/sItDiufcNI3jka57fonKBcXPHYZ7EC3w
-         AqLZcIzbTeNVW0c2I3+JFfvc8LbaA+N3OSA5kU5bLEsXHk7ey8xXeITb4y8BDGmkSuEX
-         hnhkY9dSxfZLgLIQnczOR5S5HMKm+X7Jv0afzHvs4nlyr69ybrpO7EVWh6s6RZgB6Mkn
-         lYmSW2uOOaAeRQOm0KA1q31X9cNYK3/WEn63GNDPTPmca1DLBuO2Blex+UBkVzSy+0K6
-         4Qu2amZVXcEhnwiECDLa3n03Q3H8ZM/P0xJKQl1pedcKaAHTPsyAzDhlUOPYREoTmZhq
-         HEXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=uADe8pIjhPSuCRhZ6wL+nTegabcP2vd7po21w3/KsKc=;
-        b=He2rSKGBQeFPu0KqEoMcq2WddMQV9p2cfLqkjK8DzIkwPpadwUhXRsPyHKAdVAwKAB
-         plkcwt2NuixdrpLmgCqMvUvcTU+GNehHaVzUZDL3ktF2ztHAl8Gud063KvVmpZyOdZjq
-         yOXAYnTyKAh6RiL1OTt/fcl9ztjm6nvEX7p4Fl0k6LD2R5A7Lnn7FlgVB1BXfia7Wmmy
-         BeGtEfMWUVce2K5dNL6rPj0Ll0W1/qqGfi7Kfe3+7ekHHWsYkC+RmUGpZBnf6akb0g8L
-         Wefo9e7xDBQorurw7Q3E73ASbAYO0fnFKtTWD7Sl5WbutgNHEzvO3krcEkPw3lNbStPC
-         6Frw==
-X-Gm-Message-State: AOAM533vzThRWXU0145afIoblfXijkrlesvBCKzQnRvVVZqrNXjaD1rD
-        oGy4+ILG0lRlRHPcBl6dYEJwuyAKOm2MLMIkTPU=
-X-Google-Smtp-Source: ABdhPJz0oX8n58WEDpkBVOtEEmsqhZFkHTca/aDr4LQ7oluH4avRguTL/Swrpq6KXGmBFui3PPL0bTwu0E0hx+11DBY=
-X-Received: by 2002:a17:906:68d1:: with SMTP id y17mr2997597ejr.447.1606828962469;
- Tue, 01 Dec 2020 05:22:42 -0800 (PST)
+        with ESMTP id S2387578AbgLANdK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Dec 2020 08:33:10 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAFDDC0613CF;
+        Tue,  1 Dec 2020 05:32:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=WA6TfbbvUNqISwb7mJNnzkxcYfFvk82PnVZUq8rvLNg=; b=sLO9WQNR9aNvAwV3blNs0aAJUm
+        kqf8laWJmRyiHAD6P6lXn4TeU610XOrdR7DqG6qx23czsVAv7lyxLX7hLOexNIOzQFfvxPQHTLLhX
+        C4l15ZS4r4mPQtpRztFw7kAQdZ391dT89RY/RkATJZP64oAf/JGFz9CqtU76wz8tf/7v1ABDmiqVp
+        DbgnBMs9PiFaB0xnrbuka2BmqRHKST6x169zl/IVUE92w+jZ+VdxLeIKyk/s2jc1vR7VGomZIWCFF
+        MPDtJnHHu8fCNvSKeHN0kl8New9n9bxImcT6yki2WR0LyYY18ksqPAZ9+DrmnOeT41X47BLLoyt9D
+        MG+4s2Zg==;
+Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kk5la-0000BI-8w; Tue, 01 Dec 2020 13:32:26 +0000
+Date:   Tue, 1 Dec 2020 13:32:26 +0000
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Pavel Begunkov <asml.silence@gmail.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Johannes Weiner <hannes@cmpxchg.org>
+Subject: Re: [PATCH] block: add bio_iov_iter_nvecs for figuring out nr_vecs
+Message-ID: <20201201133226.GA26472@infradead.org>
+References: <20201201120652.487077-1-ming.lei@redhat.com>
+ <20201201125251.GA11935@casper.infradead.org>
+ <20201201125936.GA25111@infradead.org>
+ <fdbfe981-0251-9641-6ed8-db034c0f0148@gmail.com>
 MIME-Version: 1.0
-References: <20201201053949.143175-1-selvakuma.s1@samsung.com>
- <CGME20201201054057epcas5p1d5bd2813146d2cb57eb66b7cedce1f63@epcas5p1.samsung.com>
- <20201201053949.143175-2-selvakuma.s1@samsung.com> <942255077c7caf5a2b1983570e30c3bf06410f62.camel@mail.ru>
-In-Reply-To: <942255077c7caf5a2b1983570e30c3bf06410f62.camel@mail.ru>
-From:   Selva Jove <selvajove@gmail.com>
-Date:   Tue, 1 Dec 2020 18:52:28 +0530
-Message-ID: <CAHqX9vantopwsTYLNh92uaVaP_vOsbB0O-XgMSEjdKUsRk=gFQ@mail.gmail.com>
-Subject: Re: [RFC PATCH 1/2] block: add simple copy support
-To:     Aleksei Marov <alekseymmm@mail.ru>
-Cc:     SelvaKumar S <selvakuma.s1@samsung.com>,
-        linux-nvme@lists.infradead.org, kbusch@kernel.org, axboe@kernel.dk,
-        Damien Le Moal <damien.lemoal@wdc.com>, hch@lst.de,
-        sagi@grimberg.me, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, nj.shetty@samsung.com,
-        joshi.k@samsung.com, javier.gonz@samsung.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fdbfe981-0251-9641-6ed8-db034c0f0148@gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Thanks for reporting the memory leak. Will add a fix.
+On Tue, Dec 01, 2020 at 01:17:49PM +0000, Pavel Begunkov wrote:
+> I was thinking about memcpy bvec instead of iterating as a first step,
+> and then try to reuse passed in bvec.
+> 
+> A thing that doesn't play nice with that is setting BIO_WORKINGSET in
+> __bio_add_page(), which requires to iterate all pages anyway. I have no
+> clue what it is, so rather to ask if we can optimise it out somehow?
+> Apart from pre-computing for specific cases...
+> 
+> E.g. can pages of a single bvec segment be both in and out of a working
+> set? (i.e. PageWorkingset(page)).
 
-On Tue, Dec 1, 2020 at 3:58 PM Aleksei Marov <alekseymmm@mail.ru> wrote:
->
-> On Tue, 2020-12-01 at 11:09 +0530, SelvaKumar S wrote:
-> > +     ret = __blkdev_issue_copy(bdev, dest, nr_srcs, rlist, gfp_mask, flags,
-> > +                     &bio);
-> > +     if (!ret && bio) {
-> > +             ret = submit_bio_wait(bio);
-> > +             if (ret == -EOPNOTSUPP)
-> > +                     ret = 0;
-> > +
-> > +             kfree(page_address(bio_first_bvec_all(bio)->bv_page) +
-> > +                             bio_first_bvec_all(bio)->bv_offset);
-> > +             bio_put(bio);
-> > +     }
-> > +
-> > +     return ret;
-> > +}
-> I think  there is an issue here that if bio_add_page  returns error in
-> __blkdev_issue_copy then ret is -ENOMEM and we never do bio_put for bio
-> allocated in  __blkdev_issue_copy so it is small memory leak.
->
->
+Adding Johannes for the PageWorkingset logic, which keeps confusing me
+everytime I look at it.  I think it is intended to deal with pages
+being swapped out and in, and doesn't make much sense to look at in
+any form for direct I/O, but as said I'm rather confused by this code.
+
+If PageWorkingset is a non-issue we should be able to just point the
+bio at the biovec array.  I think that be done by allocating the bio
+with nr_iovecs == 0, and then just updating >bi_io_vec and ->bi_vcnt
+using a little helper like this:
+
+static inline void bio_assign_bvec(struct bio *bio, struct bio_vec *bvecs,
+		unsigned short nr_bvecs)
+{
+	WARN_ON_ONCE(BVEC_POOL_IDX(bio) != 0);
+	bio->bi_io_vec = bvecs;
+	bio->bi_vcnt = nr_bvecs;
+}
