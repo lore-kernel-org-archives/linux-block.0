@@ -2,86 +2,123 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C86FC64E7A
-	for <linux-block@archiver.kernel.org>; Tue,  1 Dec 2020 12:53:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49552C64E7B
+	for <linux-block@archiver.kernel.org>; Tue,  1 Dec 2020 12:57:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2837A2084C
-	for <linux-block@archiver.kernel.org>; Tue,  1 Dec 2020 12:53:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C55C32084C
+	for <linux-block@archiver.kernel.org>; Tue,  1 Dec 2020 12:57:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="lPsff/K7"
+	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="iObn40qE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727355AbgLAMxg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Dec 2020 07:53:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59336 "EHLO
+        id S1726832AbgLAM45 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Dec 2020 07:56:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59860 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726988AbgLAMxf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Dec 2020 07:53:35 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B74EDC0613CF;
-        Tue,  1 Dec 2020 04:52:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=/x/BlGz9wsyeKt9EH9JP9Ms34VbCwEASozEkM1sVSX4=; b=lPsff/K7OVPirotdLNK1OSP1s/
-        PAkE5qpR7HxRTYXDVx+gkFw787/AeWtM50F9uqMGnpf0FanqvA+chj0FDNeDzzbUXTGqaSMS7gUm6
-        /AQo4k7+gstFcxSulWHnxlHX42J/VEgcid4aPuzvnoqthgKskgUjc29hBI+0ySW5MDdj5j/bruPuj
-        dd82hX88lJoWWYIsab/f5uCFAlaUf3olllL4SaA635xzhiKNWwbJOOhUSwe8cKfMDXVxAzzoUYsOi
-        Y85bDHdYhLHgj2xUpHb23F71DuzMp7TFkf5Wsrbd9MKdsPHBtVfwu9qRV65Y6Zp+GG/SSSCZz0Tui
-        dF9LUQ/w==;
-Received: from willy by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kk59I-0006Bb-04; Tue, 01 Dec 2020 12:52:52 +0000
-Date:   Tue, 1 Dec 2020 12:52:51 +0000
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH] block: add bio_iov_iter_nvecs for figuring out nr_vecs
-Message-ID: <20201201125251.GA11935@casper.infradead.org>
-References: <20201201120652.487077-1-ming.lei@redhat.com>
+        with ESMTP id S1726166AbgLAM44 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Dec 2020 07:56:56 -0500
+Received: from mail-ed1-x542.google.com (mail-ed1-x542.google.com [IPv6:2a00:1450:4864:20::542])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58B5AC0613D6
+        for <linux-block@vger.kernel.org>; Tue,  1 Dec 2020 04:56:16 -0800 (PST)
+Received: by mail-ed1-x542.google.com with SMTP id l5so3035805edq.11
+        for <linux-block@vger.kernel.org>; Tue, 01 Dec 2020 04:56:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=javigon-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=jlx5ljuoha5y8gLnWfck0WODBeR/256Mld210jR/EFk=;
+        b=iObn40qEZn/sKbA/Df7xy7osUqamwET0bD7BELJ4D/9DcGiJAzNR77nwvw3DLx/xHF
+         Zi8peOOCGzmtzsi1IxevIGJopixNEBqIV1Mb/BrccYSSxeG4T6zcOPZvVo0f+w+FU/oN
+         EMMOitKOCQ8O9dpg74HUJ1iwby6Wo4zi2hp1reqRymWTJdIVJgrw1aK/b6iIhx5A9NKn
+         8cQuGckD0Coo+WSs2q1I0VUXCcC1OyQQArCJAjSuy/TGNAnoRwjiNbR/ftOko3GYSGWu
+         7ZbvJ9G9Yn2UUhPCbqzs/RSnIrJ4Y5za0mCQJ6FwEZTZRnyhZD23vFua18QAOo2D0KcL
+         J+pA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=jlx5ljuoha5y8gLnWfck0WODBeR/256Mld210jR/EFk=;
+        b=nPyubk2lUCq7C+muw11BosCaPW+C1RTfRMIjzr+jr/HVsgEFhvPlp4olyzbtBqT2co
+         D46g2+3mxLA80OoxqHpYHLr+DjIdsOreZaeW7D8Qw0pkGaA9xdn8n9FqTM1zlfCzaLw5
+         KyQT+IXTsSl2zoKsWJe7Pg5M7AjtwWQFP8p4BOgYXu9e5iescqgOPQc5PneTXaqZ3dBA
+         9JpLTauVG1YiCtDga+Cjom/uC0pR2UwQd3qtxUN4FaS9jOFU1PoC+xUp90T6KecNxFWa
+         p6ec7KIZS+4hvMiL03G6slw5blP4MqeRNfX8rZnVkI70zvGWEUg7IPQEZqa1YwMrz0c9
+         +exw==
+X-Gm-Message-State: AOAM5303v4me9vCo/XA8SN9uX0t1x9ZXmNy6+0MhDcvPQdP+xdvC5vLF
+        iycKoMI51uRYTtNoo9Ao31VRfA==
+X-Google-Smtp-Source: ABdhPJzMggpJFAnW8X/NAlgFZv92Xj0V7ijaNdIE7uJuNFXybN+5B+NYTEVUqe5xyZDelYWo627zEg==
+X-Received: by 2002:a50:e8c4:: with SMTP id l4mr2936307edn.105.1606827375048;
+        Tue, 01 Dec 2020 04:56:15 -0800 (PST)
+Received: from ch-wrk-javier.localdomain (5.186.124.214.cgn.fibianet.dk. [5.186.124.214])
+        by smtp.gmail.com with ESMTPSA id be6sm796864edb.29.2020.12.01.04.56.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Dec 2020 04:56:14 -0800 (PST)
+From:   javier@javigon.com
+X-Google-Original-From: javier.gonz@samsung.com
+To:     linux-nvme@lists.infradead.org
+Cc:     linux-block@vger.kernel.org, hch@lst.de, kbusch@kernel.org,
+        sagi@grimberg.me,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier.gonz@samsung.com>
+Subject: [PATCH 1/4] nvme: remove unnecessary return values
+Date:   Tue,  1 Dec 2020 13:56:07 +0100
+Message-Id: <20201201125610.17138-2-javier.gonz@samsung.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20201201125610.17138-1-javier.gonz@samsung.com>
+References: <20201201125610.17138-1-javier.gonz@samsung.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201201120652.487077-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Dec 01, 2020 at 08:06:52PM +0800, Ming Lei wrote:
-> Pavel reported that iov_iter_npages is a bit heavy in case of bvec
-> iter.
-> 
-> Turns out it isn't necessary to iterate every page in the bvec iter,
-> and we call iov_iter_npages() just for figuring out how many bio
-> vecs need to be allocated. And we can simply map each vector in bvec iter
-> to bio's vec, so just return iter->nr_segs from bio_iov_iter_nvecs() for
-> bvec iter.
-> 
-> Also rename local variable 'nr_pages' as 'nr_vecs' which exactly matches its
-> real usage.
-> 
-> This patch is based on Mathew's post:
-> 
-> https://lore.kernel.org/linux-block/20201120123931.GN29991@casper.infradead.org/
+From: Javier González <javier.gonz@samsung.com>
 
-But the only reason we want to know 'nr_vecs' is so we can allocate a
-BIO which has that many vecs, right?  But we then don't actually use the
-vecs in the bio because we use the ones already present in the iter.
-That was why I had it return 1, not nr_vecs.
+Cleanup unnecessary ret values that are not checked or used in
+nvme_alloc_ns().
 
-Did I miss something?
+Signed-off-by: Javier González <javier.gonz@samsung.com>
+---
+ drivers/nvme/host/core.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
-> +static inline int bio_iov_iter_nvecs(const struct iov_iter *i, int maxvecs)
-> +{
-> +	if (!iov_iter_count(i))
-> +		return 0;
-> +	if (iov_iter_is_bvec(i))
-> +               return min_t(int, maxvecs, i->nr_segs);
-> +	return iov_iter_npages(i, maxvecs);
-> +}
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 170745d4a34b..a965a8d28ba0 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -3831,7 +3831,7 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid,
+ 	struct gendisk *disk;
+ 	struct nvme_id_ns *id;
+ 	char disk_name[DISK_NAME_LEN];
+-	int node = ctrl->numa_node, flags = GENHD_FL_EXT_DEVT, ret;
++	int node = ctrl->numa_node, flags = GENHD_FL_EXT_DEVT;
+ 
+ 	if (nvme_identify_ns(ctrl, nsid, ids, &id))
+ 		return;
+@@ -3855,8 +3855,7 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid,
+ 	ns->ctrl = ctrl;
+ 	kref_init(&ns->kref);
+ 
+-	ret = nvme_init_ns_head(ns, nsid, ids, id->nmic & NVME_NS_NMIC_SHARED);
+-	if (ret)
++	if (nvme_init_ns_head(ns, nsid, ids, id->nmic & NVME_NS_NMIC_SHARED))
+ 		goto out_free_queue;
+ 	nvme_set_disk_name(disk_name, ns, ctrl, &flags);
+ 
+@@ -3875,8 +3874,7 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid,
+ 		goto out_put_disk;
+ 
+ 	if ((ctrl->quirks & NVME_QUIRK_LIGHTNVM) && id->vs[0] == 0x1) {
+-		ret = nvme_nvm_register(ns, disk_name, node);
+-		if (ret) {
++		if (nvme_nvm_register(ns, disk_name, node)) {
+ 			dev_warn(ctrl->device, "LightNVM init failure\n");
+ 			goto out_put_disk;
+ 		}
+-- 
+2.17.1
+
