@@ -2,82 +2,81 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DACDC63777
-	for <linux-block@archiver.kernel.org>; Tue,  1 Dec 2020 02:14:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86AA6C64E90
+	for <linux-block@archiver.kernel.org>; Tue,  1 Dec 2020 02:20:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9B1D620857
-	for <linux-block@archiver.kernel.org>; Tue,  1 Dec 2020 02:14:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0524820809
+	for <linux-block@archiver.kernel.org>; Tue,  1 Dec 2020 02:20:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="KygHQ33T";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="mDumvB6d"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="R3h0ygRm";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="ITCont+p"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727108AbgLACOp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Nov 2020 21:14:45 -0500
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:17510 "EHLO
-        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726986AbgLACOo (ORCPT
+        id S1726498AbgLACUv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Nov 2020 21:20:51 -0500
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:24223 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726366AbgLACUu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Nov 2020 21:14:44 -0500
+        Mon, 30 Nov 2020 21:20:50 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1606788883; x=1638324883;
+  t=1606789250; x=1638325250;
   h=from:to:subject:date:message-id:references:
    content-transfer-encoding:mime-version;
-  bh=tfCp1rpDCS2jSblH3oGtjlzh+qoFoeYOI0mLwS2Bog4=;
-  b=KygHQ33T/SX5097U3vnnjJoUKCZGLG3xdf7tUOWVT9MH7/IkbjLNr1Mz
-   q7McNBjgu3JIwyuJ3IwmKy53+ia+92p+IssatjO033zLZiU87fnb0X+kE
-   s4M6wjX9PEer8ixs4uer06oR29lNYwBFleon7d0h5w4BCUpjF6G9LTUHv
-   Z66XUzJP3YwoIj3tM0sc5rZHLr0x3WeuDlDQuSbX4KsprY2z/LFXvXgQj
-   0g2MB2kOT8oZKzGcx5sZ9WvkNuMHxp+pnBUWjJ9MsVsOV149unslG25lR
-   smtIYD0T3TBlG9ueQQvQu8GKFqoodVutxPhw185OTbA3QrnvStwJ1+QzQ
-   A==;
-IronPort-SDR: kgM5Sz2Xitw4nJKd+QNrjmdJqfGj3maHa0z0R2rBZTdLlbXdJBxnhhFIlqnrDyC7m+o8Heg1OM
- +izo5rJ1mqVqRZwCphEdtO+v5OepfAtRtW1cf2JQN1lm3+iJ7G+9qRxhYAPO/L1ySLmCtVYo+T
- L/Lq0vhi0YDvrtnLpBGPgBrluHXuYJ/H7jRngf3xA6XOuMBNa26/AB3c/sotjvsXYzqbmsn28M
- OWfBUszpU9si+AR5JogdfdBxZzZ+AAUujFfm+j5iuYcLrYHbHwqjQa2Mej7pYsPqK7NHiCmkyg
- KPo=
+  bh=8u22uwBocfrm6tbVxO2ERMqv5yLKxOb/4Rhm4lfXyrM=;
+  b=R3h0ygRm1KUVW1G3xb5+PF2x5NVtq9PW8mxd0fZj5N4bgcntF1+SBzWV
+   8zSj+4jxRA48u5hHzoBhw5jcQc5ftNPgU/VTo50kARGEqaEgHxHnjuqoQ
+   0vLbWtWyu2BbQEz1JvX8bWcbcfOrFEhbgNpAblUKcRl5DKoEy6gUkVaDA
+   LLotzgGIa7WEgdPM6R4KJAj4bLQsZKk+qXRzoibUkZck9qzT1Q+fjJgxx
+   DEbLLaUJmLPVQ90F5iii75H4J2PWdeIZ/rZxe6ykyhbUpl8Ve0s7bZliq
+   yJIBu+esKskRjwQkHkK5q1BLMFXb2q9LgoFw20cf35+7aCmlw1JoZTnOA
+   g==;
+IronPort-SDR: srHWuvpSDHjsZT+D2qHuJLWd7Hv1WY+0ojUz/+i7HQJqhNAp4r4jpxTl/JTJO09FwkzxJWcpVj
+ tRP+1q1ksOD7kIbBpGfG6VRXuNiSVn59U1V4m1fbF/M+VSqP/YiBUotB0S/njyUOmL1mHcCnw4
+ z1jMpf976R1dhKj8vlhmuyCI4VoIRvuMlXSCjq9Akft2yteJZvu3UHzPTZs7I38IzY7GXTI+L9
+ NsPnkjOFO/Usyk6B+hzOiTgIfEe51ObNydMCBXyJ0dyJVTwmubKf8wENPkbfFHj+OVqEE9UTJI
+ vwQ=
 X-IronPort-AV: E=Sophos;i="5.78,382,1599494400"; 
-   d="scan'208";a="153806356"
-Received: from mail-dm6nam10lp2107.outbound.protection.outlook.com (HELO NAM10-DM6-obe.outbound.protection.outlook.com) ([104.47.58.107])
-  by ob1.hgst.iphmx.com with ESMTP; 01 Dec 2020 10:13:38 +0800
+   d="scan'208";a="158338584"
+Received: from mail-dm6nam10lp2105.outbound.protection.outlook.com (HELO NAM10-DM6-obe.outbound.protection.outlook.com) ([104.47.58.105])
+  by ob1.hgst.iphmx.com with ESMTP; 01 Dec 2020 10:19:44 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GRry5v/RsaoaP4mLI8p8MKtLDWe5TJefMEaY30i7jSFu6GMe6kMmr/t4JQQEcFtMW2XtWrjO/+qPymLwt7urB6nFWIT4XG9NXXqXBNA/D6Lytq75ku57U4nxHTm9wSqLbyLUbHnyA42zu2+HWtKBovbtrcztjz0cNqqcVfADHY3o6SF4+C3ER/wjY2auQFhwMnle74IKKIyV0AXPvfZJEvbH5/31ikCcSicGpPRkDZKru1dy+QAiENPHIckH4wnziGG313zAPxGgC9+HB2bQED6hifLEq/7dK1jiq9Bsbau3aI8sKOXpxRAbvAOaBtGJXVp33CccPRgOjkRQRS3Ulg==
+ b=jbXxk8QhGPRasaQKsV8p1kKlmBDVL6mH64LUj6DVZ66zENzJiFgZiFtHZZAXG5awGNCOC8llsN4wyaVHBmVvsZExj7YHxQw2fXqopyr1yzYwTmGb0X4UDkP7Cc6xLoHQrY4t983kvYJ1gT6KzpxTw/OL7oHbU8bDhwc9f0rQ0rbsz6RlVY4+vY9UwbOHJtKCz2POZCsR83jLTPOhHnjqp3dvsl1dIWFFXQjay65Bg0ZOTTfBbojcYidVfK/9IjwcJiBJLjTBO5h444QsW51gYUmRgANPjKAEdAKth9hQl0Cp5ug7NYioMovGn1xKISPfFslXuyfqZJKZ6kZrC10RfA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TGYWZr65iExI+N8hLTWp0jgaoaXD7h84JKtONRefkjc=;
- b=VFu+ZCSsxOvuIUWFWtzy3LB9oPm5v8n69ttJo3lrPe3t1SQVgsbdBjFb+IWK9QGNUfrRzp7VOXhw8qDREABBQYtkkxqfWU+/bR3Z01zKh3+tsiLEw/83YENR/9EcU3avxE/R9/x8lvFL67NL0aWde3bavkEIUWtR6Dt+N5IM4SUQmW8aqvfeGqn5UV8wGcQT61u1eF4/IrJsDJY+8hrc+zp9X6oFolc9yynYYTWybIifzmfpbLpxJFP7FpPeNbPNjnUB6LCfAJvpMEr1RPyA6rHWUslsD47jHx/dKwFjWAnT3N8rXhwCIRzBBQdEiofxLBNIUfn6euiIMfkvbt/YGg==
+ bh=eXGYOCDs8yjdLawA+FGV/xkn7i2x2FgzR3ZMQgrHoL0=;
+ b=mQ7cQtHaInzZ533JHGNxyXg8yHO8lbH/AnVl1Ag3x1/DxT1M/vtnH0IBz2CD9QZc2A3qjalo8uFrAk9BcobgQUewSWxM1kYju20BaPrnR5KwoL+Q/W88EbuxRMxmfm9PHtDsOUqXcCEpoNRGBLkvKCuwg8UWKwrscxNdB1LQsBGAsJ6QdjzdRRs2tjxEKmi2USlXFWGUfmZ+HAYA2ekIOL1bYAVUybY8M0UDw1Xke8L9ToCXrXhRUo6Huc+ZfQv7dJo0WGKHj9Cm1GigtplfLH2fTRTfTxyedvA39o3bOEuDuG6189w0jfImcklG9yJ0qdE6swgWYC/QU0oEMaA/Dw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
  header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TGYWZr65iExI+N8hLTWp0jgaoaXD7h84JKtONRefkjc=;
- b=mDumvB6dK/kj5Xn22rTFsXh4jLhA3VqjsoCve/uwK5x8lT54PswCmMxllzST6ey23KNXCVPbqldQUzRWoAPnCD6jsCDdshYwRiSdg7UL2+fkPInNITa5TxT9hQlL9NJ9Q1q3tQPrwShKgzeid1WQ6u+ysAmpyE8r7QW1zOg7HYE=
+ bh=eXGYOCDs8yjdLawA+FGV/xkn7i2x2FgzR3ZMQgrHoL0=;
+ b=ITCont+pTBc0DbtMPImvmwE5QE9yU3EZZtWIb7WKYvVzKwBcJVFfOgbNqEjMAlD+pX7DZFMIbqDNP8FgcIdfDWj1cPKBzdauHmU4902LofI62qskhr9ThC6PhrZkh2zVwPGVFCDBL4gxW3Ao+fjWKMN+sUA0mEpl2joKe8qKo8s=
 Received: from CH2PR04MB6522.namprd04.prod.outlook.com (2603:10b6:610:34::19)
- by CH2PR04MB7125.namprd04.prod.outlook.com (2603:10b6:610:a3::21) with
+ by CH2PR04MB7015.namprd04.prod.outlook.com (2603:10b6:610:95::12) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3611.22; Tue, 1 Dec
- 2020 02:13:37 +0000
+ 2020 02:19:42 +0000
 Received: from CH2PR04MB6522.namprd04.prod.outlook.com
  ([fe80::897c:a04b:4eb0:640a]) by CH2PR04MB6522.namprd04.prod.outlook.com
  ([fe80::897c:a04b:4eb0:640a%7]) with mapi id 15.20.3589.022; Tue, 1 Dec 2020
- 02:13:37 +0000
+ 02:19:42 +0000
 From:   Damien Le Moal <Damien.LeMoal@wdc.com>
 To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH v2] block: Improve blk_revalidate_disk_zones() checks
-Thread-Topic: [PATCH v2] block: Improve blk_revalidate_disk_zones() checks
-Thread-Index: AQHWt/1VclFb/HqtsE6qBg5aXhh4vA==
-Date:   Tue, 1 Dec 2020 02:13:37 +0000
-Message-ID: <CH2PR04MB652241B5608023E0DD0A7B13E7F40@CH2PR04MB6522.namprd04.prod.outlook.com>
-References: <20201111073606.767757-1-damien.lemoal@wdc.com>
+Subject: Re: [PATCH v4 0/9] null_blk fixes, improvements and cleanup
+Thread-Topic: [PATCH v4 0/9] null_blk fixes, improvements and cleanup
+Thread-Index: AQHWvuCE62oitkQP2EGTL15SsbBFhw==
+Date:   Tue, 1 Dec 2020 02:19:42 +0000
+Message-ID: <CH2PR04MB65222B3A9EC649456A362450E7F40@CH2PR04MB6522.namprd04.prod.outlook.com>
+References: <20201120015519.276820-1-damien.lemoal@wdc.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -87,33 +86,33 @@ authentication-results: vger.kernel.org; dkim=none (message not signed)
 x-originating-ip: [129.253.182.59]
 x-ms-publictraffictype: Email
 x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 18e205f8-1580-40da-9df6-08d8959eb6c2
-x-ms-traffictypediagnostic: CH2PR04MB7125:
-x-microsoft-antispam-prvs: <CH2PR04MB71259053B5680B2303225199E7F40@CH2PR04MB7125.namprd04.prod.outlook.com>
+x-ms-office365-filtering-correlation-id: 506d089e-c7dc-462b-03d0-08d8959f9081
+x-ms-traffictypediagnostic: CH2PR04MB7015:
+x-microsoft-antispam-prvs: <CH2PR04MB701587241211F3D8F93A5D45E7F40@CH2PR04MB7015.namprd04.prod.outlook.com>
 wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:2201;
+x-ms-oob-tlc-oobclassifiers: OLM:404;
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: OG59MUHeYq59Pi+ULIgqEXVNZ0UMoDGWU/jenQ0bjtP7HFrm5W+XUpjEr+uEXfyxuIedovxOF/oiIvcS+rIKhgowX5Ik3pWBfXPRmaJCwXJZTwKQppNTeTdPn7LuonuJGvYiCy4kilju1UZoL2OM3g5jsfXdX6S4fa6ugQ8880cA+PYIuaQsjNEHI5Z42lJBMujfvREqStrU4TnQVHWYtftwPN+h0/bj+oQFhF9ZhTjmW5esH+kKD3jOUplMxWgqNOAxXSTtrZ2Ym5fZPBaUnMijKBySlEpJ5Bs4jnq/88jjOUVaU5/T+39MTIXdGouz
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR04MB6522.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(39860400002)(366004)(136003)(376002)(346002)(316002)(6506007)(8676002)(53546011)(8936002)(26005)(186003)(33656002)(7696005)(2906002)(83380400001)(91956017)(66446008)(66476007)(66556008)(9686003)(55016002)(71200400001)(66946007)(478600001)(76116006)(64756008)(86362001)(110136005)(5660300002)(52536014);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: =?us-ascii?Q?71ntd8E90vkIXBvktMGSXYVqoMPkVhm9PWWvNcZmIeZi5b0iYnGCRXwXn2Eo?=
- =?us-ascii?Q?GtzkgvtjfkTCIyL/Z4gzUdJtL9m8WkHrc7Yt5Wgucnv8vWFf2RRumL+NyrCS?=
- =?us-ascii?Q?kE6TBSwu436aGkTAP2W6n3JPqCrT6+5xvzx0W3uFCKeTozGA/Djtff/YiMv8?=
- =?us-ascii?Q?er9FVsEjuwK6fbOmSj/fD3dlVcQHQ50HCp0OkpX51Ls/Iktpk/NEOx433LBv?=
- =?us-ascii?Q?q6Fsrax8mdhvQXCUEfzFP+hegpserme+PbB9E8gaOyfwP2V9iNAZRlKPq51e?=
- =?us-ascii?Q?YVRScMFxDzjC6eBO+KCTdnl0RTQ0aZO3pabbDf+1as0oUu68O5AXatD/h36g?=
- =?us-ascii?Q?UMVRYGdBR2dhwec/GVd/SqRlQlnxGImo8FjfFvcITrDp0POB/5Xl/0NagN2W?=
- =?us-ascii?Q?WHPTLKxBm8/xlIuyOu10HiSo/b9Bk1tOynlb0+37o5vnDe5ow7RvtmvtfbC3?=
- =?us-ascii?Q?50kZNLoityeV/Xt50rytxx4/AWZEpMzDlqqflp9vfsT9ac0LlXxFoFMOjyNr?=
- =?us-ascii?Q?7qL8ZqOx7RD1AphEjM4p6RSpecueKC3mbsq8tTZMiHR3DdhkNJ+6Eez192OS?=
- =?us-ascii?Q?BBjT+MHXt58vZ5Fx8B35vlxnDD2mZYfzakOMjfaUnLGFI5LEA30734ZzEWRI?=
- =?us-ascii?Q?y0TsN4GcSC4OGoE3leMCQOjquEMdQIjGJx5k2mLlK9GQh3s6Lmps7l67oy0l?=
- =?us-ascii?Q?HYbby8MT4ThgPaP4KG3liVRefSXzhft2RIIy5m6Fg3kHqV6NP1BE5sw3gCPr?=
- =?us-ascii?Q?kTi0GCp3130wtimJH8zUukQBy7ADtE/vBfnpAh8Z/mEdkiYIIvgl6um/+u4L?=
- =?us-ascii?Q?bC5JobfwsP8yuAX6mebN7h5Z83vYaqcC3MAyVUK3Oy/ZVwm/Rn16kuB0dgEf?=
- =?us-ascii?Q?/pvlQf7FrdXkgHGs5ODUrWFMGR5+Oa4niLPRAmVnvt0xYocgTdxrIO7DF75L?=
- =?us-ascii?Q?0hHdlgsWVbsQKUSzTDe5KXKzLlgS9NeddUn+YT3wyoFwvExLU1xf+fhF8DdT?=
- =?us-ascii?Q?I8N/?=
+x-microsoft-antispam-message-info: ypBCaqCnXhGA3UHIY3FYrJIbf3ra1i26lcEqRKZgHPpz5r7PXXue8w3wDv6MW1diJF8LpN2zIlG8JoTQkCdP1CLbq0dzwsCENBQJ9jEsJR1+FkI4vGQA50R3rBODoZfFjjMp13x+6YIARPIlmgOhN7+XerOmIGRfw42olI2RYSa1D2aw3v3ROxupV7/AkdMS9N+EvqzWnsLODvYVwjkVGjLJNWIc394UnCecCsDcXw/hdTOMNBjPG0wGNY/Dplwn1vbaS0bkqxvT4/cL+b9M7sopaMOQQDODMNmnKBfQfARryk3SiX6FlF+E5r+av60n
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR04MB6522.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(136003)(346002)(376002)(396003)(366004)(53546011)(55016002)(316002)(9686003)(8936002)(8676002)(110136005)(26005)(2906002)(6506007)(186003)(66476007)(66556008)(66446008)(83380400001)(64756008)(7696005)(91956017)(71200400001)(33656002)(86362001)(478600001)(5660300002)(76116006)(66946007)(52536014);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: =?us-ascii?Q?IR2WbnwH9o/pRqmMoM/Y1PvP4gjn5u2R2ghhQ6vebOJLg40kmpSF8ttniYec?=
+ =?us-ascii?Q?BhcwO5MKF4xGzb/FNVo9oXsHomXW0dwV4AbAZsZoCyBVPU9/G5Ami+vlH3vn?=
+ =?us-ascii?Q?6ZOEOD9j4q9LLzWDHZcnxtQLo/ahDLcCLsoh933PQpN5OyWerfIxfSNVpKEY?=
+ =?us-ascii?Q?mUYsMxHf/SNMHzb1e7y7YCy42ugbcOxA2YlTRldPdyLMiG2cNOXBF6ROdneX?=
+ =?us-ascii?Q?rc5c5gU428+Tc+1b0GKMLcga79l/k5S9BJWJlcjQ48393F30YS5Qj4GhfMm/?=
+ =?us-ascii?Q?z+2cFj7vLfptHGuZRlHtIAmNnptk7SU4pfttABSwHH7xgnPtcvaDUEHq9H/x?=
+ =?us-ascii?Q?8LbPUQwU6NswH8qyd+izrUMD63JAlVrGb/D7MMhY6WQDr/srYV6QBx0o628W?=
+ =?us-ascii?Q?3O0olqR2cEtgQXH1v7Of7vE7TKAnvFtjAcNlwbmo6iKNFjaCRzjaomAgvTjh?=
+ =?us-ascii?Q?+TuFjDOhgu3wBO0X+Dd4YQyNaz/rR8SSCPKpj1ydS042eDFYiDTocjtkPpvl?=
+ =?us-ascii?Q?8CyFRGr/6Ne+xEzLATdObK4wBiY+/p/DoEL5QINYcjoiGvMlKpLKrsKvNVCB?=
+ =?us-ascii?Q?PlDLyaaeOTHsdbRcH2Z5cyvGLZBHvx5C7MDv2V3AxV5kI077TCjhb0d2ZL/+?=
+ =?us-ascii?Q?sb/GTP7XpQbZIS2givFBpwnydEGT5MDCq+Oow3JO3h4+ETVR2w2GUgs2WPr4?=
+ =?us-ascii?Q?xMnlLzk+bRsY/eKBsJMsviLwo1VeqcrxIjOn89GKWIvwotLDYO9dATpWLde+?=
+ =?us-ascii?Q?OX1GlMHRESteWt3UR7944m2QqQKq3nIMJ/GO4QcUmXbteVLXFGc+8ZqAwP8Z?=
+ =?us-ascii?Q?Rf018Fm5fTKEQaMU/L9ENpXqCxYaRHC/r9pad4mcdKhS0+PCCeueUMC6MzXQ?=
+ =?us-ascii?Q?G8+E9FXO81qSrK9wwRL2328GwWeFb9kn2iloSS4XRJSHZMnzAmDKW/DNDVQ9?=
+ =?us-ascii?Q?VPSksVq1pPKp3OEHEejqUdHxrpzgVRdVZRusklx43hOXf7ZXEb4BeEnnjU9D?=
+ =?us-ascii?Q?1KtZ?=
 x-ms-exchange-transport-forked: True
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
@@ -121,84 +120,103 @@ MIME-Version: 1.0
 X-OriginatorOrg: wdc.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: CH2PR04MB6522.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 18e205f8-1580-40da-9df6-08d8959eb6c2
-X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Dec 2020 02:13:37.5707
+X-MS-Exchange-CrossTenant-Network-Message-Id: 506d089e-c7dc-462b-03d0-08d8959f9081
+X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Dec 2020 02:19:42.8274
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: zSA7xm/4TYAwnbIpnFqg9IkIFd0PCEq82YNYtjHVyRc4EkdtSv+Jfu4UCxEKv5P2Z9+kGAM5S4fdLtMHS3fA2w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR04MB7125
+X-MS-Exchange-CrossTenant-userprincipalname: XRi9Vz+ZTcO5xhzh2eBeMzEiGcz3IUdFpehSwPfgWIBwpmu7t7VhdNhXXLAEj6+YkKDyBDhYQbDONaEt2eX2WA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR04MB7015
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020/11/11 16:36, Damien Le Moal wrote:=0A=
-> Improves the checks on the zones of a zoned block device done in=0A=
-> blk_revalidate_disk_zones() by making sure that the device report_zones=
-=0A=
-> method did report at least one zone and that the zones reported exactly=
-=0A=
-> cover the entire disk capacity, that is, that there are no missing zones=
-=0A=
-> at the end of the disk sector range.=0A=
+On 2020/11/20 10:57, Damien Le Moal wrote:=0A=
+> Jens,=0A=
 > =0A=
-> Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>=0A=
-> ---=0A=
-> Changes from V1:=0A=
-> * Add checks on the number of zones reported=0A=
-> * Check the reported zone coverage only if zones are successfully=0A=
->   reported=0A=
-> * Reword the commit message=0A=
+> This series provides fixes and improvements for null_blk.=0A=
 > =0A=
->  block/blk-zoned.c | 16 +++++++++++++++-=0A=
->  1 file changed, 15 insertions(+), 1 deletion(-)=0A=
+> The first two patches are bug fixes which likely should go into 5.10.=0A=
+> The first patch fixes a problem with zone initialization when the=0A=
+> device capacity is not a multiple of the zone size and the second=0A=
+> patch fixes zone append handling.=0A=
 > =0A=
-> diff --git a/block/blk-zoned.c b/block/blk-zoned.c=0A=
-> index 6817a673e5ce..7a68b6e4300c 100644=0A=
-> --- a/block/blk-zoned.c=0A=
-> +++ b/block/blk-zoned.c=0A=
-> @@ -508,15 +508,29 @@ int blk_revalidate_disk_zones(struct gendisk *disk,=
+> The following patches are improvements and cleanups:=0A=
+> * Patch 3 makes sure that the device max_sectors limit is aligned to the=
 =0A=
->  	noio_flag =3D memalloc_noio_save();=0A=
->  	ret =3D disk->fops->report_zones(disk, 0, UINT_MAX,=0A=
->  				       blk_revalidate_zone_cb, &args);=0A=
-> +	if (!ret) {=0A=
-> +		pr_warn("%s: No zones reported\n", disk->disk_name);=0A=
-> +		ret =3D -ENODEV;=0A=
-> +	}=0A=
->  	memalloc_noio_restore(noio_flag);=0A=
->  =0A=
-> +	/*=0A=
-> +	 * If zones where reported, make sure that the entire disk capacity=0A=
-> +	 * has been checked.=0A=
-> +	 */=0A=
-> +	if (ret > 0 && args.sector !=3D get_capacity(disk)) {=0A=
-> +		pr_warn("%s: Missing zones from sector %llu\n",=0A=
-> +			disk->disk_name, args.sector);=0A=
-> +		ret =3D -ENODEV;=0A=
-> +	}=0A=
-> +=0A=
->  	/*=0A=
->  	 * Install the new bitmaps and update nr_zones only once the queue is=
+>   block size.=0A=
+> * Patch 4 improves zone locking overall, and especially the memory=0A=
+>   backing disabled case by introducing a spinlock array to implement a=0A=
+>   per zone lock in place of a global lock. With this patch, write=0A=
+>   performance remains mostly unchanged, but read performance with a=0A=
+>   multi-queue setup more than double from 1.3 MIOPS to 3.3 MIOPS (4K=0A=
+>   random reads to zones with fio zonemode=3Dzbd).=0A=
+> * Patch 5 improves implicit zone close=0A=
+> * Patch 6 and 7 cleanup discard handling code and use that code to free=
 =0A=
->  	 * stopped and all I/Os are completed (i.e. a scheduler is not=0A=
->  	 * referencing the bitmaps).=0A=
->  	 */=0A=
->  	blk_mq_freeze_queue(q);=0A=
-> -	if (ret >=3D 0) {=0A=
-> +	if (ret > 0) {=0A=
->  		blk_queue_chunk_sectors(q, args.zone_sectors);=0A=
->  		q->nr_zones =3D args.nr_zones;=0A=
->  		swap(q->seq_zones_wlock, args.seq_zones_wlock);=0A=
+>   the memory backing a zone that is being reset.=0A=
+> * Patch 8 adds the max_sectors configuration option to allow changing=0A=
+>   the max_sectors/max_hw_sectors of the device.=0A=
+> * Finally, patch 9 moves nullblk into its own directory under=0A=
+>   drivers/block/null_blk/=0A=
+> =0A=
+> Comments are as always welcome.=0A=
+> =0A=
+> Changes from v3:=0A=
+> * Use inline function for zone res lock instead of macro as suggested by=
+=0A=
+>   Christoph.=0A=
+> * Added Reviewed-by tags=0A=
+> =0A=
+> Changes from v2:=0A=
+> * Make patch 3 a generic blk-settings fix=0A=
+> * Reworked patch 4 zone locking as suggested by Christoph=0A=
+> * Small change in patch 6 as suggested by Christoph=0A=
+> =0A=
+> Changes from v1:=0A=
+> * Added patch 2, 3 and 8.=0A=
+> * Fix the last patch as suggested by Bart (file names under=0A=
+>   driver/block/null_blk/)=0A=
+> * Reworded patch 1 commit message to more correctly describe the=0A=
+>   problem.=0A=
+> =0A=
+> Damien Le Moal (9):=0A=
+>   null_blk: Fix zone size initialization=0A=
+>   null_blk: Fail zone append to conventional zones=0A=
+>   block: Align max_hw_sectors to logical blocksize=0A=
+>   null_blk: improve zone locking=0A=
+>   null_blk: Improve implicit zone close=0A=
+>   null_blk: cleanup discard handling=0A=
+>   null_blk: discard zones on reset=0A=
+>   null_blk: Allow controlling max_hw_sectors limit=0A=
+>   null_blk: Move driver into its own directory=0A=
+> =0A=
+>  block/blk-settings.c                          |  23 +-=0A=
+>  drivers/block/Kconfig                         |   8 +-=0A=
+>  drivers/block/Makefile                        |   7 +-=0A=
+>  drivers/block/null_blk/Kconfig                |  12 +=0A=
+>  drivers/block/null_blk/Makefile               |  11 +=0A=
+>  .../{null_blk_main.c =3D> null_blk/main.c}      |  63 ++--=0A=
+>  drivers/block/{ =3D> null_blk}/null_blk.h       |  32 +-=0A=
+>  .../{null_blk_trace.c =3D> null_blk/trace.c}    |   2 +-=0A=
+>  .../{null_blk_trace.h =3D> null_blk/trace.h}    |   2 +-=0A=
+>  .../{null_blk_zoned.c =3D> null_blk/zoned.c}    | 333 +++++++++++-------=
+=0A=
+>  10 files changed, 317 insertions(+), 176 deletions(-)=0A=
+>  create mode 100644 drivers/block/null_blk/Kconfig=0A=
+>  create mode 100644 drivers/block/null_blk/Makefile=0A=
+>  rename drivers/block/{null_blk_main.c =3D> null_blk/main.c} (97%)=0A=
+>  rename drivers/block/{ =3D> null_blk}/null_blk.h (83%)=0A=
+>  rename drivers/block/{null_blk_trace.c =3D> null_blk/trace.c} (93%)=0A=
+>  rename drivers/block/{null_blk_trace.h =3D> null_blk/trace.h} (97%)=0A=
+>  rename drivers/block/{null_blk_zoned.c =3D> null_blk/zoned.c} (68%)=0A=
 > =0A=
 =0A=
 Jens,=0A=
 =0A=
-I did not see this patch queued up in your tree.=0A=
-Could you consider it please ?=0A=
+Could you consider this series please ?=0A=
 =0A=
-Thanks !=0A=
 =0A=
 -- =0A=
 Damien Le Moal=0A=
