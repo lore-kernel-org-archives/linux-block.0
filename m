@@ -2,109 +2,176 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 650D7C64E8A
-	for <linux-block@archiver.kernel.org>; Tue,  1 Dec 2020 08:22:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32F04C64E7A
+	for <linux-block@archiver.kernel.org>; Tue,  1 Dec 2020 09:50:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 081F8206E3
-	for <linux-block@archiver.kernel.org>; Tue,  1 Dec 2020 08:22:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="0ugfFVtm"
+	by mail.kernel.org (Postfix) with ESMTP id D76C120705
+	for <linux-block@archiver.kernel.org>; Tue,  1 Dec 2020 09:50:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728661AbgLAIWH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Dec 2020 03:22:07 -0500
-Received: from mail.kernel.org ([198.145.29.99]:47644 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727192AbgLAIWH (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 1 Dec 2020 03:22:07 -0500
-Received: from embeddedor (187-162-31-110.static.axtel.net [187.162.31.110])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 94ECB20659;
-        Tue,  1 Dec 2020 08:21:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1606810884;
-        bh=xHTFstOj6O/KMLPWIJ9livXkeh5E3cNJZoMEX1ICbl0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=0ugfFVtmDEFz3qweRxNJGIbdlhHbJEbe+SPrGbc9I44gM+O6I2rVgrcZagGiPQlJe
-         qDa/e9cJY/n7rREFFqWQI6CYR7sTmaWJfiub5J4ReXH3L76qQfPF0XWoTZ+/KCqBa1
-         43uSa/AsDxhQJOFTJrlenu8ULt+S2HlexiyIiZjk=
-Date:   Tue, 1 Dec 2020 02:20:47 -0600
-From:   "Gustavo A. R. Silva" <gustavoars@kernel.org>
-To:     "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     linux-kernel@vger.kernel.org, alsa-devel@alsa-project.org,
-        amd-gfx@lists.freedesktop.org, bridge@lists.linux-foundation.org,
-        ceph-devel@vger.kernel.org, cluster-devel@redhat.com,
-        coreteam@netfilter.org, devel@driverdev.osuosl.org,
-        dm-devel@redhat.com, drbd-dev@tron.linbit.com,
-        dri-devel@lists.freedesktop.org, GR-everest-linux-l2@marvell.com,
-        GR-Linux-NIC-Dev@marvell.com, intel-gfx@lists.freedesktop.org,
-        intel-wired-lan@lists.osuosl.org, keyrings@vger.kernel.org,
-        linux1394-devel@lists.sourceforge.net, linux-acpi@vger.kernel.org,
-        linux-afs@lists.infradead.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-arm-msm@vger.kernel.org,
-        linux-atm-general@lists.sourceforge.net,
-        linux-block@vger.kernel.org, linux-can@vger.kernel.org,
-        linux-cifs@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-decnet-user@lists.sourceforge.net,
-        linux-ext4@vger.kernel.org, linux-fbdev@vger.kernel.org,
-        linux-geode@lists.infradead.org, linux-gpio@vger.kernel.org,
-        linux-hams@vger.kernel.org, linux-hwmon@vger.kernel.org,
-        linux-i3c@lists.infradead.org, linux-ide@vger.kernel.org,
-        linux-iio@vger.kernel.org, linux-input@vger.kernel.org,
-        linux-integrity@vger.kernel.org,
-        linux-mediatek@lists.infradead.org, linux-media@vger.kernel.org,
-        linux-mmc@vger.kernel.org, linux-mm@kvack.org,
-        linux-mtd@lists.infradead.org, linux-nfs@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-sctp@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-usb@vger.kernel.org, linux-watchdog@vger.kernel.org,
-        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-        netfilter-devel@vger.kernel.org, nouveau@lists.freedesktop.org,
-        op-tee@lists.trustedfirmware.org, oss-drivers@netronome.com,
-        patches@opensource.cirrus.com, rds-devel@oss.oracle.com,
-        reiserfs-devel@vger.kernel.org, samba-technical@lists.samba.org,
-        selinux@vger.kernel.org, target-devel@vger.kernel.org,
-        tipc-discussion@lists.sourceforge.net,
-        usb-storage@lists.one-eyed-alien.net,
-        virtualization@lists.linux-foundation.org,
-        wcn36xx@lists.infradead.org, x86@kernel.org,
-        xen-devel@lists.xenproject.org, linux-hardening@vger.kernel.org,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Nathan Chancellor <natechancellor@gmail.com>,
-        Miguel Ojeda <ojeda@kernel.org>, Joe Perches <joe@perches.com>,
-        Kees Cook <keescook@chromium.org>
-Subject: Re: [PATCH 000/141] Fix fall-through warnings for Clang
-Message-ID: <20201201082047.GA11832@embeddedor>
-References: <cover.1605896059.git.gustavoars@kernel.org>
- <yq1h7p6gjkk.fsf@ca-mkp.ca.oracle.com>
+        id S1728896AbgLAJul (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Dec 2020 04:50:41 -0500
+Received: from frasgout.his.huawei.com ([185.176.79.56]:2182 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728482AbgLAJul (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Dec 2020 04:50:41 -0500
+Received: from fraeml742-chm.china.huawei.com (unknown [172.18.147.207])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Clchr4P69z67KCf;
+        Tue,  1 Dec 2020 17:47:40 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml742-chm.china.huawei.com (10.206.15.223) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Tue, 1 Dec 2020 10:49:59 +0100
+Received: from [10.47.7.145] (10.47.7.145) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1913.5; Tue, 1 Dec 2020
+ 09:49:58 +0000
+Subject: Re: [PATCH v1 1/3] add io_uring with IOPOLL support in scsi layer
+To:     Kashyap Desai <kashyap.desai@broadcom.com>,
+        <linux-scsi@vger.kernel.org>
+CC:     Sumit Saxena <sumit.saxena@broadcom.com>,
+        Chandrakanth Patil <chandrakanth.patil@broadcom.com>,
+        <linux-block@vger.kernel.org>
+References: <20201015133633.61836-1-kashyap.desai@broadcom.com>
+ <0531d781-38ed-0098-d5b8-727a3e143dde@huawei.com>
+ <ba2f9cb923dc61e523e4ae41db615f9b@mail.gmail.com>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <f6652a11-95e9-3dec-658c-df7a2a4ffa6b@huawei.com>
+Date:   Tue, 1 Dec 2020 09:49:32 +0000
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <yq1h7p6gjkk.fsf@ca-mkp.ca.oracle.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <ba2f9cb923dc61e523e4ae41db615f9b@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.47.7.145]
+X-ClientProxiedBy: lhreml725-chm.china.huawei.com (10.201.108.76) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Dec 01, 2020 at 12:52:27AM -0500, Martin K. Petersen wrote:
-> 
-> Gustavo,
-> 
-> > This series aims to fix almost all remaining fall-through warnings in
-> > order to enable -Wimplicit-fallthrough for Clang.
-> 
-> Applied 20-22,54,120-124 to 5.11/scsi-staging, thanks.
+On 30/11/2020 07:41, Kashyap Desai wrote:
+>>> diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c index
+>>> 72b12102f777..5a3c383a2bb3 100644
+>>> --- a/drivers/scsi/scsi_lib.c
+>>> +++ b/drivers/scsi/scsi_lib.c
+>>> @@ -1766,6 +1766,19 @@ static void scsi_mq_exit_request(struct
+>> blk_mq_tag_set *set, struct request *rq,
+>>>    			       cmd->sense_buffer);
+>>>    }
+>>>
+>>> +
+>>> +static int scsi_mq_poll(struct blk_mq_hw_ctx *hctx) {
+>>> +	struct request_queue *q = hctx->queue;
+>>> +	struct scsi_device *sdev = q->queuedata;
+>>> +	struct Scsi_Host *shost = sdev->host;
+>> could we separately set hctx->driver_data = shost or similar for a quicker
+>> lookup? I don't see hctx->driver_data set for SCSI currently.
+>> Going through the scsi_device looks strange - I know that it is done in
+>> scsi_commit_rqs.
+> John - I have included your comments. Below is add-on patch which handles
+> all your comment except one.
+> Below is just compiled (not tested patch). Please let me know if you like to
+> handle "scsi_init_hctx" in this patch or shall we do it as a separate patch
+> (out of this patch series.) ?
 
-Awesome! :)
+It might be better as a separate patch if you also change 
+scsi_commit_rqs() to use hctx->driver_data, which you are currently not 
+doing (or showing here).
 
-Thanks, Martin.
---
-Gustavo
+> 
+> 
+> --- a/drivers/scsi/scsi_lib.c
+> +++ b/drivers/scsi/scsi_lib.c
+> @@ -1769,9 +1769,7 @@ static void scsi_mq_exit_request(struct blk_mq_tag_set
+> *set, struct request *rq,
+> 
+>   static int scsi_mq_poll(struct blk_mq_hw_ctx *hctx)
+>   {
+> -       struct request_queue *q = hctx->queue;
+> -       struct scsi_device *sdev = q->queuedata;
+> -       struct Scsi_Host *shost = sdev->host;
+> +       struct Scsi_Host *shost = hctx->driver_data;
+> 
+>          if (shost->hostt->mq_poll)
+>                  return shost->hostt->mq_poll(shost, hctx->queue_num);
+> @@ -1779,6 +1777,14 @@ static int scsi_mq_poll(struct blk_mq_hw_ctx *hctx)
+>          return 0;
+>   }
+> 
+> +static int scsi_init_hctx(struct blk_mq_hw_ctx *hctx, void *data,
+> +                         unsigned int hctx_idx)
+> +{
+> +       struct Scsi_Host *shost = data;
+> +       hctx->driver_data = shost;
+> +       return 0;
+> +}
+> +
+>   static int scsi_map_queues(struct blk_mq_tag_set *set)
+>   {
+>          struct Scsi_Host *shost = container_of(set, struct Scsi_Host,
+> tag_set);
+> @@ -1846,6 +1852,7 @@ static const struct blk_mq_ops scsi_mq_ops_no_commit =
+> {
+>          .cleanup_rq     = scsi_cleanup_rq,
+>          .busy           = scsi_mq_lld_busy,
+>          .map_queues     = scsi_map_queues,
+> +       .init_hctx      = scsi_init_hctx,
+>          .poll           = scsi_mq_poll,
+>   };
+> 
+> @@ -1875,6 +1882,7 @@ static const struct blk_mq_ops scsi_mq_ops = {
+>          .cleanup_rq     = scsi_cleanup_rq,
+>          .busy           = scsi_mq_lld_busy,
+>          .map_queues     = scsi_map_queues,
+> +       .init_hctx      = scsi_init_hctx,
+>          .poll           = scsi_mq_poll,
+>   };
+> 
+> diff --git a/include/scsi/scsi_cmnd.h b/include/scsi/scsi_cmnd.h
+> index 5844374a85b1..cc30df96f5f7 100644
+> --- a/include/scsi/scsi_cmnd.h
+> +++ b/include/scsi/scsi_cmnd.h
+> @@ -9,8 +9,8 @@
+>   #include <linux/types.h>
+>   #include <linux/timer.h>
+>   #include <linux/scatterlist.h>
+> -#include <scsi/scsi_host.h>
+>   #include <scsi/scsi_device.h>
+> +#include <scsi/scsi_host.h>
+>   #include <scsi/scsi_request.h>
+> 
+>   struct Scsi_Host;
+> diff --git a/include/scsi/scsi_host.h b/include/scsi/scsi_host.h
+> index 905ee6b00c55..a0cda0f66b84 100644
+> --- a/include/scsi/scsi_host.h
+> +++ b/include/scsi/scsi_host.h
+> @@ -274,7 +274,7 @@ struct scsi_host_template {
+>           * SCSI interface of blk_poll - poll for IO completions.
+>           * Possible interface only if scsi LLD expose multiple h/w queues.
+>           *
+> -        * Return values: Number of completed entries found.
+> +        * Return value: Number of completed entries found.
+>           *
+>           * Status: OPTIONAL
+>           */
+> 
+>>> +
+>>> +	if (shost->hostt->mq_poll)
+>> to avoid this check, could we reject if .mq_poll is not set and
+>> HCTX_TYPE_POLL is?
+> Is this urgent or shall we improve later ? I am not able to figure out how
+> you want to manage this ? Can you explain little bit ?
+
+I don't think that it will make much overhead difference, so ok to omit 
+for now if more trouble than it's worth to implement.
+
+Thanks,
+John
