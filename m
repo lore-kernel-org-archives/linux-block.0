@@ -2,139 +2,174 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F585C64E7B
-	for <linux-block@archiver.kernel.org>; Tue,  1 Dec 2020 11:49:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F52AC64E7B
+	for <linux-block@archiver.kernel.org>; Tue,  1 Dec 2020 12:03:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 33BAC2080A
-	for <linux-block@archiver.kernel.org>; Tue,  1 Dec 2020 11:49:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DEED72080A
+	for <linux-block@archiver.kernel.org>; Tue,  1 Dec 2020 12:03:11 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="jtYjvh+X"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727023AbgLALtx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Dec 2020 06:49:53 -0500
-Received: from frasgout.his.huawei.com ([185.176.79.56]:2183 "EHLO
-        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725893AbgLALtx (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Dec 2020 06:49:53 -0500
-Received: from fraeml738-chm.china.huawei.com (unknown [172.18.147.206])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4ClgLM5PFFz67D41;
-        Tue,  1 Dec 2020 19:46:51 +0800 (CST)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- fraeml738-chm.china.huawei.com (10.206.15.219) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2106.2; Tue, 1 Dec 2020 12:49:10 +0100
-Received: from [10.47.7.145] (10.47.7.145) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1913.5; Tue, 1 Dec 2020
- 11:49:09 +0000
-Subject: Re: [bug report] Hang on sync after dd
-To:     Kashyap Desai <kashyap.desai@broadcom.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Sumit Saxena <sumit.saxena@broadcom.com>,
-        Bart Van Assche <bvanassche@acm.org>
-CC:     chenxiang <chenxiang66@hisilicon.com>,
-        <linux-scsi@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        Ewan Milne <emilne@redhat.com>, Long Li <longli@microsoft.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>
-References: <2847d0e1-ccb1-7be6-2456-274e41ea981b@huawei.com>
- <6cd6f97324474f88a0a748e218c8dddf@mail.gmail.com>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <3c82dc5d-0095-cd10-4094-477a4a7535ec@huawei.com>
-Date:   Tue, 1 Dec 2020 11:48:43 +0000
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
+        id S1728560AbgLAMDL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Dec 2020 07:03:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51382 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728377AbgLAMDL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Dec 2020 07:03:11 -0500
+Received: from mail-ej1-x642.google.com (mail-ej1-x642.google.com [IPv6:2a00:1450:4864:20::642])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADD9DC0613CF
+        for <linux-block@vger.kernel.org>; Tue,  1 Dec 2020 04:02:30 -0800 (PST)
+Received: by mail-ej1-x642.google.com with SMTP id x16so3562030ejj.7
+        for <linux-block@vger.kernel.org>; Tue, 01 Dec 2020 04:02:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=javigon-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=EbprAHFEFknQH4Iq10/TiEWO6fTer6yZcPxsleBmY2s=;
+        b=jtYjvh+X/Ag+OJbXIIsb6JUhMJ2y1Cla7SkJSpuj4bffaZo0bKNFbA7lJUvZzT6Z/E
+         8VK94GfSJb91fW+McTCWvZJvP5slAEzC+KGVfal+yuj5DD1XPlVEEaF2cCKCq1o/rc8N
+         51hVaXK/ZzwTSyEeLZhua+XKI+BadxyMhyITSAWmyzo+LYIbsEjVime/uQNphZjbvuCL
+         rguNAxWn4R94H4Xa1iI5zivWGgDUh4bzDtwHEFDY7xDxqpyFCXLSqn7ROVBSGmXuJscL
+         tkX1y9hep9wnx4fTCT6vQJchIgHMGq8iAN7FwCbwpk+xzybnXeZBlHAMIGCSXjvYNS0+
+         sGfQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=EbprAHFEFknQH4Iq10/TiEWO6fTer6yZcPxsleBmY2s=;
+        b=jXaJBexlsgmE8pdXcRMa8FBfEVHHMj2pMgUsFVD0OXfyBcE7qCw5TjMM4+QBpZO+cx
+         pfhgddkCq9NKboUPcd210X8jRlqZI5QdLgfCaDketk5O/MAH+gKPyZ6CkEGAyGV/9VP3
+         hkWSbDh44+84V2woZhf0uL7WxycGKh0rUYcl+b1TTkb2Ok+zFl1/5gzHmwYK9dEBcHET
+         nrdQnpK1kzM6rrC04w/BbPNhxmwHMZ7gn/BBswwazz0QQwh4em7QqN++LG7daNI+Jz4P
+         Tl7ygvkdG+ZuE+SRmy69x4i5+SXMbJ2LXH/lHwxe7xS8qcfolfr0+dUDk3k/mslF3ShZ
+         sVOg==
+X-Gm-Message-State: AOAM533dHvGGUToKy5KbM3+e9YhhnhQZySMB7F4y+A13Td/R5sl0n91n
+        Vvu1kw9BuRfu9ukhzluMDyOULNDNqZY212J9ijk=
+X-Google-Smtp-Source: ABdhPJwI4S8ymod1OhWiHTBf1ZYrl9NH1LNDNe/YmIOe+SEfOAizYwtAjLv9uOPn7ZjSYGGqcimHVw==
+X-Received: by 2002:a17:907:d01:: with SMTP id gn1mr2666119ejc.357.1606824149084;
+        Tue, 01 Dec 2020 04:02:29 -0800 (PST)
+Received: from ch-wrk-javier.localdomain (5.186.124.214.cgn.fibianet.dk. [5.186.124.214])
+        by smtp.gmail.com with ESMTPSA id u1sm709040edf.65.2020.12.01.04.02.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Dec 2020 04:02:27 -0800 (PST)
+From:   javier@javigon.com
+X-Google-Original-From: javier.gonz@samsung.com
+To:     linux-nvme@lists.infradead.org
+Cc:     linux-block@vger.kernel.org, hch@lst.de, kbusch@kernel.org,
+        sagi@grimberg.me, axboe@kernel.dk, joshi.k@samsung.com,
+        k.jensen@samsung.com, Niklas.Cassel@wdc.com,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier.gonz@samsung.com>
+Subject: [V5] nvme: enable ro namespace for ZNS without append
+Date:   Tue,  1 Dec 2020 13:02:21 +0100
+Message-Id: <20201201120221.29279-1-javier.gonz@samsung.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-In-Reply-To: <6cd6f97324474f88a0a748e218c8dddf@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.47.7.145]
-X-ClientProxiedBy: lhreml725-chm.china.huawei.com (10.201.108.76) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Kashyap,
+From: Javier González <javier.gonz@samsung.com>
 
-> John - I tested V4 version "scsi: core: Only re-run queue in
-> scsi_end_request() if device queue is busy" on MR controller.
-> I used different reduced device queue depth (1 to 16). I can try the exact
-> same test case with MR controller.
-> 
+Allow ZNS NVMe SSDs to present a read-only namespace when append is not
+supported, instead of rejecting the namespace directly.
 
-Thanks, I still can't recreate to help debug...
+This allows (i) the namespace to be used in read-only mode, which is not
+a problem as the append command only affects the write path, and (ii) to
+use standard management tools such as nvme-cli to choose a different
+format or firmware slot that is compatible with the Linux zoned block
+device.
 
->>
->>
->> Block debugfs info is as follows:
->>
->> estuary:/sys/kernel/debug/block/sda/hctx8$ cat active cpu101/ cpu96/
->> cpu99/ dispatch_busy io_poll sched_tags tags busy cpu102/ cpu97/ ctx_map
->> dispatched queued sched_tags_bitmap tags_bitmap cpu100/ cpu103/ cpu98/
->> dispatch flags run state type estuary:/sys/kernel/debug/block/sda/hctx8$
->> cat
->> cpu cpu100/ cpu101/ cpu102/ cpu103/ cpu96/ cpu97/ cpu98/ cpu99/
->> estuary:/sys/kernel/debug/block/sda/hctx8$ cat cpu cpu100/ cpu101/
->> cpu102/ cpu103/ cpu96/ cpu97/ cpu98/ cpu99/
->> estuary:/sys/kernel/debug/block/sda/hctx8$ cat cpu96/ completed
->> default_rq_list dispatched merged poll_rq_list read_rq_list
->> estuary:/sys/kernel/debug/block/sda/hctx8$ cat cpu96/dispatched
->> 0 0
->> estuary:/sys/kernel/debug/block/sda/hctx8$ cat cpu97/dispatched
->> 0 0
->> estuary:/sys/kernel/debug/block/sda/hctx8$ cat cpu98/dispatched
->> 0 0
->> estuary:/sys/kernel/debug/block/sda/hctx8$ cat cpu99/dispatched
->> 0 0
->> estuary:/sys/kernel/debug/block/sda/hctx8$ cat cpu100/dispatched
->> 3 0
->> estuary:/sys/kernel/debug/block/sda/hctx8$ cat cpu100/completed
->> 2 0
->> estuary:/sys/kernel/debug/block/sda/hctx8$
->> estuary:/sys/kernel/debug/block/sda/hctx8$
->> estuary:/sys/kernel/debug/block/sda/hctx8$ cat state SCHED_RESTART
-> 
-> When I tested V3 "scsi: core: Only re-run queue in scsi_end_request() if
-> device queue  is busy". I noticed the similar hang and that was fixed in V4
-> (final patch).
-> Let me try on MR controller one more time. Hctx state SCHED_RESTART
-> indicates that someone should kicked-off h/w queue but it was missed. It may
-> be possible that
-> When you revert " scsi: core: Only re-run queue in scsi_end_request() if
-> device queue  is busy", actual race condition windows narrows and it may be
-> actually existing hidden issue.
+This patch includes comments from Christoph, Niklas and Keith that
+applied to a different approach setting capacity to 0
+  https://www.spinics.net/lists/linux-block/msg60747.html
 
-So do you know how would changing to single hctx (by checking out to 
-commit before we enable hot_tagset in the driver) would affect this? 
-Apparently this also "solves" the issue.
+The reminder of the original patch will be submitted separately.
 
-> 
-> 
->> estuary:/sys/kernel/debug/block/sda/hctx8$ ls active cpu101 cpu96 cpu99
->> dispatch_busy io_poll sched_tags tags busy cpu102 cpu97 ctx_map
->> dispatched queued sched_tags_bitmap tags_bitmap
->> cpu100 cpu103 cpu98 dispatch flags run state type
->> estuary:/sys/kernel/debug/block/sda/hctx8$ cat dispatch 000000007abb596e
->> {.op=FLUSH, .cmd_flags=PREFLUSH,
->> .rq_flags=FLUSH_SEQ|MQ_INFLIGHT|DONTPREP, .state=idle, .tag=21,
->> .internal_tag=-1, .cmd=opcode=0x35 35 00 00 00 00 00 00 00 00 00,
->> .retries=0, .result = 0x0, .flags=TAGGED|INITIALIZED|3, .timeout=60.000,
-> 
-> If this issue is reproducible, can you check pending commands. Is there any
-> pattern in pending command ?
+Changes since V4:
+  - Revert re-reading effects to page. Wait for patches from Christoph
+    on RO flag refactoring that allow to clear the flags.
 
-chenxiang, please assist in checking this.
+Changes since V3:
+  - Force re-reading effects log page (from Keith)
+  - Pending proper refresh of RO flag - dependency on patch from
+    Christoph
 
-> 
->> allocated 2208.876 s ago} estuary:/sys/kernel/debug/block/sda/hctx8$
->>
->>
->> On cpu100, it seems completed is less than number dispatched.
+Changes since V2:
+  - Fix small conflict with a queued patch from Sagi (from Christoph)
+  - Fix indentation (from Niklas)
+  - Refresh effects log page to account for FW changes (from Keith)
 
-Cheers,
-John
+Changes since V1:
+  - Change logic to use NVME_NS_ATTR_RO (from Christoph)
+  - Set max_zone_append egen in RO. This allows the device to be
+    properly revalidated and enables user-space tools such as blkzone to
+    be used when interacting with this zoned device.
+
+Signed-off-by: Javier González <javier.gonz@samsung.com>
+---
+ drivers/nvme/host/core.c |  2 +-
+ drivers/nvme/host/nvme.h |  1 +
+ drivers/nvme/host/zns.c  | 14 +++++++++-----
+ 3 files changed, 11 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index f42ed266bd7f..49ba21e89467 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -2113,7 +2113,7 @@ static void nvme_update_disk_info(struct gendisk *disk,
+ 	nvme_config_discard(disk, ns);
+ 	nvme_config_write_zeroes(disk, ns);
+ 
+-	if (id->nsattr & NVME_NS_ATTR_RO)
++	if (id->nsattr & NVME_NS_ATTR_RO || test_bit(NVME_NS_FORCE_RO, &ns->flags))
+ 		set_disk_ro(disk, true);
+ }
+ 
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index ae017f727798..bfcedfa4b057 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -452,6 +452,7 @@ struct nvme_ns {
+ #define NVME_NS_REMOVING	0
+ #define NVME_NS_DEAD     	1
+ #define NVME_NS_ANA_PENDING	2
++#define NVME_NS_FORCE_RO	3
+ 
+ 	struct nvme_fault_inject fault_inject;
+ 
+diff --git a/drivers/nvme/host/zns.c b/drivers/nvme/host/zns.c
+index 67e87e9f306f..c2b557452483 100644
+--- a/drivers/nvme/host/zns.c
++++ b/drivers/nvme/host/zns.c
+@@ -55,12 +55,16 @@ int nvme_update_zone_info(struct nvme_ns *ns, unsigned lbaf)
+ 	int status;
+ 
+ 	/* Driver requires zone append support */
+-	if (!(le32_to_cpu(log->iocs[nvme_cmd_zone_append]) &
+-			NVME_CMD_EFFECTS_CSUPP)) {
++	if ((le32_to_cpu(log->iocs[nvme_cmd_zone_append]) & NVME_CMD_EFFECTS_CSUPP)) {
++		if (test_and_clear_bit(NVME_NS_FORCE_RO, &ns->flags))
++			dev_warn(ns->ctrl->device,
++				 "append supported for zoned namespace:%d. Remove read-only mode\n",
++				 ns->head->ns_id);
++	} else {
++		set_bit(NVME_NS_FORCE_RO, &ns->flags);
+ 		dev_warn(ns->ctrl->device,
+-			"append not supported for zoned namespace:%d\n",
+-			ns->head->ns_id);
+-		return -EINVAL;
++			 "append not supported for zoned namespace:%d. Forcing to read-only mode\n",
++			 ns->head->ns_id);
+ 	}
+ 
+ 	/* Lazily query controller append limit for the first zoned namespace */
+-- 
+2.17.1
+
