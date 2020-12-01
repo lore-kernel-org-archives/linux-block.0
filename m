@@ -7,59 +7,59 @@ X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EA56C64E8A
-	for <linux-block@archiver.kernel.org>; Tue,  1 Dec 2020 04:16:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B72DC64E8A
+	for <linux-block@archiver.kernel.org>; Tue,  1 Dec 2020 04:16:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A79A4206C1
-	for <linux-block@archiver.kernel.org>; Tue,  1 Dec 2020 04:16:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B2FC0206C1
+	for <linux-block@archiver.kernel.org>; Tue,  1 Dec 2020 04:16:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="L8th+e4Z"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="FO0ia798"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728066AbgLAEQZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 Nov 2020 23:16:25 -0500
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:21474 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728039AbgLAEQZ (ORCPT
+        id S1728074AbgLAEQd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 Nov 2020 23:16:33 -0500
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:54620 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728039AbgLAEQc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 Nov 2020 23:16:25 -0500
+        Mon, 30 Nov 2020 23:16:32 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1606796184; x=1638332184;
+  t=1606796192; x=1638332192;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=hUhzJ651cVoNvniIQeg3wff/FCoz1DE77FDFCSJt0Zk=;
-  b=L8th+e4ZXzJS1i3QJZPgxvVb3a1I/DCHS5izxrMsXxGFOD31UhQiAD6F
-   wxrXilTG0+xwcEmTsIdG3EUUDW2pW8WXgJwu2F2MCO6n1g0Q7rPPPqElR
-   F3NCB1Z3ybp1d22d1Yvb5M4dMkQP/JxMM3kARo6viLR7QfvWZMWIVwb3j
-   voGBsTsNNlIkj0MnIHBluf0eNZMk51GVWYAxElt4t4Xe1KE0fkSMlCL1W
-   kJe6YTvctO9DJAatBYKkfgGNqMqD2RIxOpIDcL1onm/GgtjkNTZieoDes
-   4UUwm3Z7y0PyTdKOcEknkB7xjmW6VTzSVVHJHofzKcgGClsZEFIc1Cebe
-   Q==;
-IronPort-SDR: 53w5cCa5sRJK5NzY39J9XwRunGhqO2IzhJYQD7pM4YprOVRVTLjdUpt3Oryd+IhDv1rrOreVy/
- RDSWiS/V4JGkV9wM5CbWE1LfHmfvrRq7XAsd2WhymNxzXn0wErqcsRJqhgx+diEYPi9OCKuVdk
- NPfZQ75XUgzgZI1uibUCdwoqI3D01987/C6y8Eqi5WZTLsnfXAp8vTBzHKdkzFWqd30a3JAJmu
- Pa8APl0w2gq1NwHyE6HQcSf8F8p/72pLvf56DIiXpfxD+6SxlG0Gqm8bbwlyUsMW57+s/8iex9
- LTo=
+  bh=KZvesihZxqvpooUM98Q5I5u1Gk/h9BuWE3/slZ8Ndhs=;
+  b=FO0ia7980e+O4hWlx1QkVEwHXZzAXnh/yPQSWsnRI3U3RM0SJpXqE4E+
+   y2Rf443k/TDXjuNrofxP5+8VYqkWuVq+kOa7mA+nkGAO+05uJwk2dS4Rw
+   YhN5CzuwCr5u2yBAZTM92XOkY+27mXPQOYpvnmc+QXdmULJEQvJhp4uBO
+   v1dZGFqP6QmtRMKPASj3ykUFTuzSc/LegMek0VIgZ55lSPkQjhIFUYohh
+   KpJz4gfqD5xgLOhhW/pQ1VQkBHIJQhXD4CmLK9rv4dj9OdI21Dl7mw+GW
+   jcCk6Ei3BAwhTn2gIsN8w9CwZx1PhWEwmonRdIsVGNwpZOhsSSDeiiAUN
+   g==;
+IronPort-SDR: IqOdSwI2y53EnAuBNek2++oNTfqz0NxhbUbTXAvfmO4cIdwRQibTSX/QhoDEZeyjI9/aqD3Jfo
+ +kdHC3wCpggsMYo0BxvYMRSiJrdR2vpvv+w465K9Yjq8PWM2PCB3cG9V7vBu9Wflmz4IZD0dWP
+ +fS5lL0VYnqp7GqEEo1DCj/0sJsZ0XIy8BACUh1topRvo5ws+kILvNaRA4ovVGcxcTdr0feo9f
+ UIdTz7GTzP4yrn01FXa//YQ7zeaY5jUDKARJgNlbTt0AHaXKGLQJFjUMsW52EnXBsM9Gl7GKID
+ jXM=
 X-IronPort-AV: E=Sophos;i="5.78,383,1599494400"; 
-   d="scan'208";a="264005915"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 01 Dec 2020 12:15:19 +0800
-IronPort-SDR: UqEen0blP2gIFgKZV2ap2uXdX9PGwE1wqVWGaNt0kUgL5gLBIkiojg/OpVbDdudGBahNChkCXA
- 4EPKc5QvVbSnufeRo3hNBCtH6OyEKhxuA=
+   d="scan'208";a="155078210"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 01 Dec 2020 12:15:36 +0800
+IronPort-SDR: fko7w8PeT46ja1Gw2XY8+lt7ii93zy4mZCKRF/vJ76nBniheEwVRtI9f/T1vTlojWDpO+MePAm
+ 1BvZyd3In2c1xHpqlMqrrFQBlmmpRTpD0=
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2020 20:00:55 -0800
-IronPort-SDR: //xZ+qNsQRcAGeKCluZYuo0aHD1Fp1gdnJAggnvul6GPdSwObZMVXcGJymVr1bni4SUp1y9Rwi
- 3XYh8f/KljCg==
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2020 19:59:48 -0800
+IronPort-SDR: nb5WqBJEDzev6Bbho0xCLsxDriknavT5buwPk4zbaeOYOwmzpRPRosFSFyiFKBwhO1T1zPIUrW
+ ACs1nuPZch+g==
 WDCIronportException: Internal
 Received: from vm.labspan.wdc.com (HELO vm.sc.wdc.com) ([10.6.137.102])
-  by uls-op-cesaip01.wdc.com with ESMTP; 30 Nov 2020 20:15:19 -0800
+  by uls-op-cesaip01.wdc.com with ESMTP; 30 Nov 2020 20:15:36 -0800
 From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 To:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
 Cc:     sagi@grimberg.me, hch@lst.de, damien.lemoal@wdc.com,
         Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [PATCH V3 7/9] nvmet: add zns cmd effects to support zbdev
-Date:   Mon, 30 Nov 2020 20:14:14 -0800
-Message-Id: <20201201041416.16293-8-chaitanya.kulkarni@wdc.com>
+Subject: [PATCH V3 9/9] nvmet: add ZNS based I/O cmds handlers
+Date:   Mon, 30 Nov 2020 20:14:16 -0800
+Message-Id: <20201201041416.16293-10-chaitanya.kulkarni@wdc.com>
 X-Mailer: git-send-email 2.22.1
 In-Reply-To: <20201201041416.16293-1-chaitanya.kulkarni@wdc.com>
 References: <20201201041416.16293-1-chaitanya.kulkarni@wdc.com>
@@ -69,27 +69,34 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Update the target side command effects logs with support for
-ZNS commands for zbdev.
+Add zone-mgmt-send, zone-mgmt-recv and zone-zppend handlers for the
+bdev backend so that it can support zbd.
 
 Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 ---
- drivers/nvme/target/admin-cmd.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/nvme/target/io-cmd-bdev.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/drivers/nvme/target/admin-cmd.c b/drivers/nvme/target/admin-cmd.c
-index cd368cbe3855..0099275951da 100644
---- a/drivers/nvme/target/admin-cmd.c
-+++ b/drivers/nvme/target/admin-cmd.c
-@@ -191,6 +191,8 @@ static void nvmet_execute_get_log_cmd_effects_ns(struct nvmet_req *req)
- 	log->iocs[nvme_cmd_dsm]			= cpu_to_le32(1 << 0);
- 	log->iocs[nvme_cmd_write_zeroes]	= cpu_to_le32(1 << 0);
- 
-+	nvmet_zns_add_cmd_effects(log);
-+
- 	status = nvmet_copy_to_sgl(req, 0, log, sizeof(*log));
- 
- 	kfree(log);
+diff --git a/drivers/nvme/target/io-cmd-bdev.c b/drivers/nvme/target/io-cmd-bdev.c
+index e1f6d59dd341..25dcd0544d5d 100644
+--- a/drivers/nvme/target/io-cmd-bdev.c
++++ b/drivers/nvme/target/io-cmd-bdev.c
+@@ -453,6 +453,15 @@ u16 nvmet_bdev_parse_io_cmd(struct nvmet_req *req)
+ 	case nvme_cmd_write_zeroes:
+ 		req->execute = nvmet_bdev_execute_write_zeroes;
+ 		return 0;
++	case nvme_cmd_zone_append:
++		req->execute = nvmet_bdev_execute_zone_append;
++		return 0;
++	case nvme_cmd_zone_mgmt_recv:
++		req->execute = nvmet_bdev_execute_zone_mgmt_recv;
++		return 0;
++	case nvme_cmd_zone_mgmt_send:
++		req->execute = nvmet_bdev_execute_zone_mgmt_send;
++		return 0;
+ 	default:
+ 		pr_err("unhandled cmd %d on qid %d\n", cmd->common.opcode,
+ 		       req->sq->qid);
 -- 
 2.22.1
 
