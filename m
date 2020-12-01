@@ -2,228 +2,92 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58801C64E7B
-	for <linux-block@archiver.kernel.org>; Tue,  1 Dec 2020 10:28:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A14EC64E7B
+	for <linux-block@archiver.kernel.org>; Tue,  1 Dec 2020 10:30:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CEDBB20770
-	for <linux-block@archiver.kernel.org>; Tue,  1 Dec 2020 10:28:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C18392084C
+	for <linux-block@archiver.kernel.org>; Tue,  1 Dec 2020 10:30:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="G4XYesoC"
+	dkim=pass (1024-bit key) header.d=mail.ru header.i=@mail.ru header.b="pQ+IOV+b";
+	dkim=pass (1024-bit key) header.d=mail.ru header.i=@mail.ru header.b="W2pM13a9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729738AbgLAK1e (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Dec 2020 05:27:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35992 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726134AbgLAK1d (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Dec 2020 05:27:33 -0500
-Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A576C0613D2
-        for <linux-block@vger.kernel.org>; Tue,  1 Dec 2020 02:26:53 -0800 (PST)
-Received: by mail-qt1-x82f.google.com with SMTP id f15so684221qto.13
-        for <linux-block@vger.kernel.org>; Tue, 01 Dec 2020 02:26:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google;
-        h=from:references:in-reply-to:mime-version:thread-index:date
-         :message-id:subject:to:cc;
-        bh=86xf1lLy7q1F3peS3p2N2eYQY4DbrpOuXpFlmRIJkUA=;
-        b=G4XYesoCAeJiHCuimxThU1Yht+sq9GQXkmtzgevb4F9KHifDDBVkuvix71eL2OORnI
-         AJybEEXawNvQn0Jky20NBDTgTpIcotGVopQnlHL1Drbq57ysaGpvhLb4WZocrnh738Rr
-         PFi0zZR1FLKR75FAvMPaJ/h8qijQVdd3dj6Sk=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:references:in-reply-to:mime-version
-         :thread-index:date:message-id:subject:to:cc;
-        bh=86xf1lLy7q1F3peS3p2N2eYQY4DbrpOuXpFlmRIJkUA=;
-        b=KORGjiSLU4nWa+k+atuwi4o1QCG3cw4r7rJp8pMOOGyiL8tB3KZ+2jmjquw6kaTdKL
-         xSHj6yfobK7CZSfMwus2JE01oeQuu3ue6kG7aMHuJCOVxRWxiCBn5Lp1tFzKGfy87gTA
-         ESN4lp4fw/kOD3qf4GQGb3ZTUw3fQvkz25y3g/d3gxEVra10Bbtz/bD1sOMapQglfyT1
-         +7vseHSnDV8ZlTw1OjDoL7iUqnJQN+KW4YxnInR1/ZtTbvOcWKdeljjT5CAQY2lFs/0D
-         R/gPSP04pv3pI6IHX/msCgjmjN6DqJP5qkKKZwEiAAPR7hxllJIPCy8oOGfIW3UZTxif
-         6M2Q==
-X-Gm-Message-State: AOAM5310Rr3BhyFZoHiPqIP8soe9dXr5DFYqJCY7Cl8/mwdlAySpSnAp
-        CtSj+f9mOtQgm5X1DwiWOdq4+GNYr9YWRYtkUAoCQQ==
-X-Google-Smtp-Source: ABdhPJx/eK3kaxXybCCDbemkS5QCDknx3+6eTbvxrOQaqdPOFuAMAsKYB2tbpj61XpDtM4QTX9QsswcWLsG83hwKO0Q=
-X-Received: by 2002:ac8:67da:: with SMTP id r26mr1981528qtp.101.1606818412623;
- Tue, 01 Dec 2020 02:26:52 -0800 (PST)
-From:   Kashyap Desai <kashyap.desai@broadcom.com>
-References: <2847d0e1-ccb1-7be6-2456-274e41ea981b@huawei.com>
-In-Reply-To: <2847d0e1-ccb1-7be6-2456-274e41ea981b@huawei.com>
+        id S1729861AbgLAKaS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Dec 2020 05:30:18 -0500
+Received: from fallback22.m.smailru.net ([94.100.176.132]:53266 "EHLO
+        fallback22.mail.ru" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726962AbgLAKaR (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Dec 2020 05:30:17 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mail.ru; s=mail3;
+        h=Content-Transfer-Encoding:MIME-Version:Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID; bh=l1N6XIAne+McdY3ijU+uuVLe1pgShwCc1+08lGmsRLI=;
+        b=pQ+IOV+bVQ/rrrycnu5oR2JZ6PtMc6LMM7THJ4sd4mtEX/uteaWrP+AoYWm63PfQOSoqXfclGRoTWZyny6EUvVJJ6XwkDggDxi1uC82mQAqRzLY9GQhqDCUGfmk57L7XuGEpymJLg1T8DcB9B+lTUfW2j1s4SQRdr0mM805pCtI=;
+Received: from [10.161.64.40] (port=46076 helo=smtp32.i.mail.ru)
+        by fallback22.m.smailru.net with esmtp (envelope-from <alekseymmm@mail.ru>)
+        id 1kk2uW-00038h-0c; Tue, 01 Dec 2020 13:29:28 +0300
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mail.ru; s=mail3;
+        h=Content-Transfer-Encoding:MIME-Version:Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:From:Subject:Content-Type:Content-Transfer-Encoding:To:Cc; bh=l1N6XIAne+McdY3ijU+uuVLe1pgShwCc1+08lGmsRLI=;
+        b=W2pM13a9w6mXURaDovfJjgjfMBXZvXeE1n7RwEn6cP/WCk63Bmx+swFPfOWeP6KQwuZaIgoixxKDk7thT1n7C+WdxBaDXVllKt6Aff3GXrN2NaqfLlU35qSOLkZgsOEemPTF69HwbV5b1N7lVp34D7RXMkAgSTpinp55AHwMzTQ=;
+Received: by smtp32.i.mail.ru with esmtpa (envelope-from <alekseymmm@mail.ru>)
+        id 1kk2tk-00016e-7J; Tue, 01 Dec 2020 13:28:41 +0300
+Message-ID: <942255077c7caf5a2b1983570e30c3bf06410f62.camel@mail.ru>
+Subject: Re: [RFC PATCH 1/2] block: add simple copy support
+From:   Aleksei Marov <alekseymmm@mail.ru>
+To:     SelvaKumar S <selvakuma.s1@samsung.com>,
+        linux-nvme@lists.infradead.org
+Cc:     kbusch@kernel.org, axboe@kernel.dk, damien.lemoal@wdc.com,
+        hch@lst.de, sagi@grimberg.me, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, selvajove@gmail.com,
+        nj.shetty@samsung.com, joshi.k@samsung.com, javier.gonz@samsung.com
+Date:   Tue, 01 Dec 2020 13:28:38 +0300
+In-Reply-To: <20201201053949.143175-2-selvakuma.s1@samsung.com>
+References: <20201201053949.143175-1-selvakuma.s1@samsung.com>
+         <CGME20201201054057epcas5p1d5bd2813146d2cb57eb66b7cedce1f63@epcas5p1.samsung.com>
+         <20201201053949.143175-2-selvakuma.s1@samsung.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-1.fc32) 
 MIME-Version: 1.0
-X-Mailer: Microsoft Outlook 15.0
-Thread-Index: AQCu1iWdKqdBukxlHXC3erINxxwMWawx6Xzw
-Date:   Tue, 1 Dec 2020 15:56:50 +0530
-Message-ID: <6cd6f97324474f88a0a748e218c8dddf@mail.gmail.com>
-Subject: RE: [bug report] Hang on sync after dd
-To:     John Garry <john.garry@huawei.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Sumit Saxena <sumit.saxena@broadcom.com>,
-        Bart Van Assche <bvanassche@acm.org>
-Cc:     chenxiang <chenxiang66@hisilicon.com>, linux-scsi@vger.kernel.org,
-        linux-block@vger.kernel.org, Ewan Milne <emilne@redhat.com>,
-        Long Li <longli@microsoft.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-        boundary="000000000000b863b505b5649005"
+Content-Transfer-Encoding: 7bit
+X-7564579A: 646B95376F6C166E
+X-77F55803: 4F1203BC0FB41BD999A8EEC2DADA0D07E1BF0C4D8F2165D6BFD1794E82424750182A05F5380850409BE7A150ED1B00F1C022DD71FCE058B8DEFA2C7AF8D1056E373E27A7D4B55752
+X-7FA49CB5: FF5795518A3D127A4AD6D5ED66289B5278DA827A17800CE782A779A89F7D69B2C2099A533E45F2D0395957E7521B51C2CFCAF695D4D8E9FCEA1F7E6F0F101C6778DA827A17800CE742D9BD90C58D50E0EA1F7E6F0F101C674E70A05D1297E1BBC6CDE5D1141D2B1C5EB6B0088F9EF39078F613C64E7469982E703C04DF1DF8D69FA2833FD35BB23D9E625A9149C048EE9ECD01F8117BC8BEA471835C12D1D9774AD6D5ED66289B524E70A05D1297E1BBF6B57BC7E64490611E7FA7ABCAF51C92176DF2183F8FC7C0D9442B0B5983000E8941B15DA834481F9449624AB7ADAF37CEDA8D6C8C3B0531D8FC6C240DEA76428AA50765F7900637C5678F1FF88595B3D81D268191BDAD3DBD4B6F7A4D31EC0B7A15B7713DBEF166D81D268191BDAD3D78DA827A17800CE79C97E770BC796042EC76A7562686271EEC990983EF5C032935872C767BF85DA29E625A9149C048EE3F735096452955E3837C4FEFBD1860714AD6D5ED66289B524E70A05D1297E1BB35872C767BF85DA227C277FBC8AE2E8BFF03D3B3299F339D75ECD9A6C639B01B4E70A05D1297E1BBC6867C52282FAC85D9B7C4F32B44FF57285124B2A10EEC6C00306258E7E6ABB4E4A6367B16DE6309
+X-C1DE0DAB: 0D63561A33F958A58B4D0912B3BC9DA9F1391F1CF3B19E0472EB6FD1610E9A0AD59269BC5F550898D99A6476B3ADF6B47008B74DF8BB9EF7333BD3B22AA88B938A852937E12ACA75D299BBC8C521FD19410CA545F18667F91A7EA1CDA0B5A7A0
+X-C8649E89: 4E36BF7865823D7055A7F0CF078B5EC41E2768949EA6ADD8C54C4338DDBD92B00AAD22493C4BF0A8888A14071D875BB2D42BBAD9C943210154E7D1AE445192D9
+X-D57D3AED: 3ZO7eAau8CL7WIMRKs4sN3D3tLDjz0dLbV79QFUyzQ2Ujvy7cMT6pYYqY16iZVKkSc3dCLJ7zSJH7+u4VD18S7Vl4ZUrpaVfd2+vE6kuoey4m4VkSEu530nj6fImhcD4MUrOEAnl0W826KZ9Q+tr5ycPtXkTV4k65bRjmOUUP8cvGozZ33TWg5HZplvhhXbhDGzqmQDTd6OAevLeAnq3Ra9uf7zvY2zzsIhlcp/Y7m53TZgf2aB4JOg4gkr2biojEErOympIxBEhQUaV/Z7rJg==
+X-Mailru-Sender: 8261CADE3D3FA0B4BDFD1058942BD7EABDEAF675FBD1B593B904FB4FE118C5F7AF19E46FE0E80F3EFEDCCAD94ABAB60078274A4A9E9E44FD4301F6103F424F867A458BE9B16E12C867EA787935ED9F1B
+X-Mras: Ok
+X-7564579A: 646B95376F6C166E
+X-77F55803: 6242723A09DB00B4C75C13076030B660F9FE9BAB5EC06FB6E4B1D0E349C464D1049FFFDB7839CE9E4A81DFF69BA5960E053F9CF25DDEF827B20617EB19EE00A32522173ACA7C4B4C
+X-7FA49CB5: 0D63561A33F958A5FA959485E634EF1517ECE837C175CD85ED5283E8350AA61C8941B15DA834481FA18204E546F3947CEDCF5861DED71B2F389733CBF5DBD5E9C8A9BA7A39EFB7666BA297DBC24807EA117882F44604297287769387670735200AC5B80A05675ACD28451B159A507268D2E47CDBA5A96583E46DA31BAFFCCC396E0066C2D8992A164AD6D5ED66289B5278DA827A17800CE7815562577FBA2886D32BA5DBAC0009BE395957E7521B51C20B4866841D68ED3567F23339F89546C55F5C1EE8F4F765FC8A0925CD2C14BB9D75ECD9A6C639B01BBD4B6F7A4D31EC0BC0CAF46E325F83A522CA9DD8327EE4930A3850AC1BE2E7354163C681A99F5D66C4224003CC836476C0CAF46E325F83A50BF2EBBBDD9D6B0F8DB212830C5B42F72623479134186CDE6BA297DBC24807EABDAD6C7F3747799A
+X-C1DE0DAB: 0D63561A33F958A5FA959485E634EF1517ECE837C175CD8595361F0EB0C6F225D59269BC5F550898D99A6476B3ADF6B4886A5961035A09600383DAD389E261318FB05168BE4CE3AF
+X-D57D3AED: 3ZO7eAau8CL7WIMRKs4sN3D3tLDjz0dLbV79QFUyzQ2Ujvy7cMT6pYYqY16iZVKkSc3dCLJ7zSJH7+u4VD18S7Vl4ZUrpaVfd2+vE6kuoey4m4VkSEu530nj6fImhcD4MUrOEAnl0W826KZ9Q+tr5ycPtXkTV4k65bRjmOUUP8cvGozZ33TWg5HZplvhhXbhDGzqmQDTd6OAevLeAnq3Ra9uf7zvY2zzsIhlcp/Y7m53TZgf2aB4JOg4gkr2biojEErOympIxBGt3PMtEqUcdQ==
+X-Mailru-MI: 800
+X-Mailru-Sender: A5480F10D64C9005ECC5D0D0AB7E92B54B8FBEC32BC10F8EA19F082A37C6EB6F15C3726575FFF916BA06D6758C6957D0C77752E0C033A69EE9C7C6BE7440F28B4CF838113C6AC4B43453F38A29522196
+X-Mras: Ok
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---000000000000b863b505b5649005
-Content-Type: text/plain; charset="UTF-8"
-
-> @Kashyap, have you guys tested megaraid sas much for this?
-
-John - I tested V4 version "scsi: core: Only re-run queue in
-scsi_end_request() if device queue is busy" on MR controller.
-I used different reduced device queue depth (1 to 16). I can try the exact
-same test case with MR controller.
-
->
-> Thanks,
-> John
->
->
-> Block debugfs info is as follows:
->
-> estuary:/sys/kernel/debug/block/sda/hctx8$ cat active cpu101/ cpu96/
-> cpu99/ dispatch_busy io_poll sched_tags tags busy cpu102/ cpu97/ ctx_map
-> dispatched queued sched_tags_bitmap tags_bitmap cpu100/ cpu103/ cpu98/
-> dispatch flags run state type estuary:/sys/kernel/debug/block/sda/hctx8$
-> cat
-> cpu cpu100/ cpu101/ cpu102/ cpu103/ cpu96/ cpu97/ cpu98/ cpu99/
-> estuary:/sys/kernel/debug/block/sda/hctx8$ cat cpu cpu100/ cpu101/
-> cpu102/ cpu103/ cpu96/ cpu97/ cpu98/ cpu99/
-> estuary:/sys/kernel/debug/block/sda/hctx8$ cat cpu96/ completed
-> default_rq_list dispatched merged poll_rq_list read_rq_list
-> estuary:/sys/kernel/debug/block/sda/hctx8$ cat cpu96/dispatched
-> 0 0
-> estuary:/sys/kernel/debug/block/sda/hctx8$ cat cpu97/dispatched
-> 0 0
-> estuary:/sys/kernel/debug/block/sda/hctx8$ cat cpu98/dispatched
-> 0 0
-> estuary:/sys/kernel/debug/block/sda/hctx8$ cat cpu99/dispatched
-> 0 0
-> estuary:/sys/kernel/debug/block/sda/hctx8$ cat cpu100/dispatched
-> 3 0
-> estuary:/sys/kernel/debug/block/sda/hctx8$ cat cpu100/completed
-> 2 0
-> estuary:/sys/kernel/debug/block/sda/hctx8$
-> estuary:/sys/kernel/debug/block/sda/hctx8$
-> estuary:/sys/kernel/debug/block/sda/hctx8$ cat state SCHED_RESTART
-
-When I tested V3 "scsi: core: Only re-run queue in scsi_end_request() if
-device queue  is busy". I noticed the similar hang and that was fixed in V4
-(final patch).
-Let me try on MR controller one more time. Hctx state SCHED_RESTART
-indicates that someone should kicked-off h/w queue but it was missed. It may
-be possible that
-When you revert " scsi: core: Only re-run queue in scsi_end_request() if
-device queue  is busy", actual race condition windows narrows and it may be
-actually existing hidden issue.
+On Tue, 2020-12-01 at 11:09 +0530, SelvaKumar S wrote:
+> +	ret = __blkdev_issue_copy(bdev, dest, nr_srcs, rlist, gfp_mask, flags,
+> +			&bio);
+> +	if (!ret && bio) {
+> +		ret = submit_bio_wait(bio);
+> +		if (ret == -EOPNOTSUPP)
+> +			ret = 0;
+> +
+> +		kfree(page_address(bio_first_bvec_all(bio)->bv_page) +
+> +				bio_first_bvec_all(bio)->bv_offset);
+> +		bio_put(bio);
+> +	}
+> +
+> +	return ret;
+> +}
+I think  there is an issue here that if bio_add_page  returns error in
+__blkdev_issue_copy then ret is -ENOMEM and we never do bio_put for bio
+allocated in  __blkdev_issue_copy so it is small memory leak.
 
 
-> estuary:/sys/kernel/debug/block/sda/hctx8$ ls active cpu101 cpu96 cpu99
-> dispatch_busy io_poll sched_tags tags busy cpu102 cpu97 ctx_map
-> dispatched queued sched_tags_bitmap tags_bitmap
-> cpu100 cpu103 cpu98 dispatch flags run state type
-> estuary:/sys/kernel/debug/block/sda/hctx8$ cat dispatch 000000007abb596e
-> {.op=FLUSH, .cmd_flags=PREFLUSH,
-> .rq_flags=FLUSH_SEQ|MQ_INFLIGHT|DONTPREP, .state=idle, .tag=21,
-> .internal_tag=-1, .cmd=opcode=0x35 35 00 00 00 00 00 00 00 00 00,
-> .retries=0, .result = 0x0, .flags=TAGGED|INITIALIZED|3, .timeout=60.000,
-
-If this issue is reproducible, can you check pending commands. Is there any
-pattern in pending command ?
-
-> allocated 2208.876 s ago} estuary:/sys/kernel/debug/block/sda/hctx8$
->
->
-> On cpu100, it seems completed is less than number dispatched.
-
---000000000000b863b505b5649005
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-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
-yfWKfxJx8FcWmsjkSlrwDu+oVuDUa2wqeKBU12HQ4JAVd+LOb5edsbbFQxgGHu+MPuc/1hl9kTkC
-AwEAAaOCAdEwggHNMA4GA1UdDwEB/wQEAwIFoDCBngYIKwYBBQUHAQEEgZEwgY4wTQYIKwYBBQUH
-MAKGQWh0dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5jb20vY2FjZXJ0L2dzcGVyc29uYWxzaWduMnNo
-YTJnM29jc3AuY3J0MD0GCCsGAQUFBzABhjFodHRwOi8vb2NzcDIuZ2xvYmFsc2lnbi5jb20vZ3Nw
-ZXJzb25hbHNpZ24yc2hhMmczME0GA1UdIARGMEQwQgYKKwYBBAGgMgEoCjA0MDIGCCsGAQUFBwIB
-FiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzAJBgNVHRMEAjAAMEQGA1Ud
-HwQ9MDswOaA3oDWGM2h0dHA6Ly9jcmwuZ2xvYmFsc2lnbi5jb20vZ3NwZXJzb25hbHNpZ24yc2hh
-MmczLmNybDAlBgNVHREEHjAcgRprYXNoeWFwLmRlc2FpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAK
-BggrBgEFBQcDBDAfBgNVHSMEGDAWgBRpcoJiMWeVRIV3kYDEBDZJnXsLYTAdBgNVHQ4EFgQU4dX1
-Yg4eoWXbqyPW/N1ZD/LPIWcwDQYJKoZIhvcNAQELBQADggEBABBuHYKGUwHIhCjd3LieJwKVuJNr
-YohEnZzCoNaOj33/j5thiA4cZehCh6SgrIlFBIktLD7jW9Dwl88Gfcy+RrVa7XK5Hyqwr1JlCVsW
-pNj4hlSJMNNqxNSqrKaD1cR4/oZVPFVnJJYlB01cLVjGMzta9x27e6XEtseo2s7aoPS2l82koMr7
-8S/v9LyyP4X2aRTWOg9RG8D/13rLxFAApfYvCrf0quIUBWw2BXlq3+e3r7pU7j40d6P04VV3Zxws
-M+LbYxcXFT2gXvoYd2Ms8zsLrhO2M6pMzeNGWk2HWTof9s7EEHDjis/MRlbYSNaohV23IUzNlBw7
-1FmvvW5GKK0xggJvMIICawIBATBtMF0xCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWdu
-IG52LXNhMTMwMQYDVQQDEypHbG9iYWxTaWduIFBlcnNvbmFsU2lnbiAyIENBIC0gU0hBMjU2IC0g
-RzMCDDSdoX7GqonhoE7TszANBglghkgBZQMEAgEFAKCB1DAvBgkqhkiG9w0BCQQxIgQgY24pjB/D
-I53q81YAksVmO8q0jvtlJpRa2lG5xQPA40swGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkq
-hkiG9w0BCQUxDxcNMjAxMjAxMTAyNjUyWjBpBgkqhkiG9w0BCQ8xXDBaMAsGCWCGSAFlAwQBKjAL
-BglghkgBZQMEARYwCwYJYIZIAWUDBAECMAoGCCqGSIb3DQMHMAsGCSqGSIb3DQEBCjALBgkqhkiG
-9w0BAQcwCwYJYIZIAWUDBAIBMA0GCSqGSIb3DQEBAQUABIIBABxB8hx1MyKQZjYQLNkrBcCFw2cP
-OfjCLsTab00u8KuE1m9THldiPl3fyyRou13TrCof/FKD6MrR9ci1w3q8DiageqkVGBUuljEEs6ne
-rcf5KALotyaTiccX56TzBPEbMGHKRI52nVUM9dp9t/pdR/OCjW2M2NeZT8gC64e/+h+FVLu6dRBf
-82qSBFnl5BTuD1kqhQyjIqcRPnHiILkF3WsIQrlgBE373+tVYh2j9slHiSdKwNSnpyYk2BZgh8t8
-ZjBeV7/GQ3HRZkD5ss9e59VGMCcUtfmy2L7+jxY1jGo9QJkc1yfEuT6GfDfMG63V+Su+7Ku4UImy
-s5uU69FNF6M=
---000000000000b863b505b5649005--
