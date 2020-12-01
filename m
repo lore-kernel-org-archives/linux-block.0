@@ -2,157 +2,153 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NAME_EMAIL_DIFF,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F832C64E7B
-	for <linux-block@archiver.kernel.org>; Tue,  1 Dec 2020 12:21:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCF01C64E7A
+	for <linux-block@archiver.kernel.org>; Tue,  1 Dec 2020 12:36:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1AD7C20679
-	for <linux-block@archiver.kernel.org>; Tue,  1 Dec 2020 12:21:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 45CA8206E3
+	for <linux-block@archiver.kernel.org>; Tue,  1 Dec 2020 12:36:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="ZarehDfL"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OFYOQsto"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730798AbgLAMV3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Dec 2020 07:21:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54366 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727891AbgLAMV2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Dec 2020 07:21:28 -0500
-Received: from mail-ej1-x644.google.com (mail-ej1-x644.google.com [IPv6:2a00:1450:4864:20::644])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FE1AC0613CF
-        for <linux-block@vger.kernel.org>; Tue,  1 Dec 2020 04:20:48 -0800 (PST)
-Received: by mail-ej1-x644.google.com with SMTP id m19so3635311ejj.11
-        for <linux-block@vger.kernel.org>; Tue, 01 Dec 2020 04:20:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=javigon-com.20150623.gappssmtp.com; s=20150623;
-        h=from:date:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Fylyeg8K1HpI44gu+W/L892Ds6J+IK7AhpMNFOVv+J4=;
-        b=ZarehDfLGLuZIgZ9KVRUc8zhWI+nVIaXbdHqpn+5I5NYAxT6Y9Fx3RG+PF5/sJKVHQ
-         SXLIiN8zMhVi/mTH4sk08wMbADvUUj8Bs0Cwk88y7NH3bofWHvMh/qYT94Cfg1HbJbwG
-         dI69UONK53SWeHXM9AkmrdGVASkP32SdJuq5R4U9xv0KDxjolW3G8xZMkUMbKnYb6aQe
-         uLDickDX31cWCyYHdfGziOYdT3qKhuDcr7u2b+Pzc2qI394qvCnJqQDPWlEEfsOSmSEt
-         L/4X9+ow3z00vG8RwWqoiAk24MipdSh/VntaxXj7b/1Y66bCnb6rA1bukhYkVOpOPV7d
-         P2fQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:date:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Fylyeg8K1HpI44gu+W/L892Ds6J+IK7AhpMNFOVv+J4=;
-        b=svNSFNjRucbO1RGfjUqCi9JfUlc82wSoYSDYsFShmMsIn4KuyYj8/fp3cGX50+Lw5o
-         yOh1aocsDAbj348AIu/lecsFjC3Xjvp6qhs7OT6atGQsEbP+LVpQdPXEWs/UdwcKFNEs
-         efKG8EKpwp//zNDmxN+lSdRUj8rBf+Ims6/IJ+FiS1WxxMtJHxL2A32ajawwOVstR3Tr
-         a17jpnt9Djj2mWlanHUUNYWCrA8nT5Ct7F2iWEzUQWht0E9Ei9i1piRmUUKtdHxZHCgd
-         z/6FVNT//GDRZ24Cy/hxeSYFZIiUoMCPa/wj3J1T7A/Iaq4ukMTic819OspaSbIpBZ2g
-         vhNw==
-X-Gm-Message-State: AOAM532ZRreNxmLf2IIrG+TsNDXCNpz8lvrC7aB8X7xJrUj4L5YBg5uC
-        uf4rhBV028veGenqT9LsdPs5TQ==
-X-Google-Smtp-Source: ABdhPJyA6bpW98mfTIiD5151P4PptIAHrybHgwuhzzmuU72gxHomFLdeJrIMEsjvEi8IuWtDJ6C0aA==
-X-Received: by 2002:a17:907:d1f:: with SMTP id gn31mr2862738ejc.192.1606825244314;
-        Tue, 01 Dec 2020 04:20:44 -0800 (PST)
-Received: from localhost (5.186.124.214.cgn.fibianet.dk. [5.186.124.214])
-        by smtp.gmail.com with ESMTPSA id d6sm746777ejy.114.2020.12.01.04.20.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Dec 2020 04:20:43 -0800 (PST)
-From:   "javier.gonz@samsung.com" <javier@javigon.com>
-X-Google-Original-From: "javier.gonz@samsung.com" <javier.gonz@samsung.com>
-Date:   Tue, 1 Dec 2020 13:20:42 +0100
-To:     Damien Le Moal <Damien.LeMoal@wdc.com>
-Cc:     SelvaKumar S <selvakuma.s1@samsung.com>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "kbusch@kernel.org" <kbusch@kernel.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>, "hch@lst.de" <hch@lst.de>,
-        "sagi@grimberg.me" <sagi@grimberg.me>,
+        id S1727956AbgLAMgG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Dec 2020 07:36:06 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57180 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726619AbgLAMgG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 1 Dec 2020 07:36:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1606826079;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ygashNSvgOjNlyFvBI6Y6mG7IWxUtdVgm6VePqlDt9k=;
+        b=OFYOQstoIGqv1wljPNseRhpgTGoOxbhxkmbDgfbTDHyY6GwgJ4bxr89cx3aVzNA1AuS0iR
+        y6nIGlDy1wvJRuZ7SZOQaoAaqK0RkKJ7NAnpMx5wBeB8YNLmW0dsw0fjKogcILPRHGPNGz
+        tC/5AzrEtLKbgvHD8X2zXdrdlY7hUGU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-385-yDmy_c3vNVeRB7_5jLfTFQ-1; Tue, 01 Dec 2020 07:34:37 -0500
+X-MC-Unique: yDmy_c3vNVeRB7_5jLfTFQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1CA1B101DF8F;
+        Tue,  1 Dec 2020 12:34:17 +0000 (UTC)
+Received: from T590 (ovpn-12-90.pek2.redhat.com [10.72.12.90])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8A1105D6AB;
+        Tue,  1 Dec 2020 12:34:11 +0000 (UTC)
+Date:   Tue, 1 Dec 2020 20:34:07 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     John Garry <john.garry@huawei.com>
+Cc:     Hannes Reinecke <hare@suse.com>,
+        Sumit Saxena <sumit.saxena@broadcom.com>,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        chenxiang <chenxiang66@hisilicon.com>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "selvajove@gmail.com" <selvajove@gmail.com>,
-        "nj.shetty@samsung.com" <nj.shetty@samsung.com>,
-        "joshi.k@samsung.com" <joshi.k@samsung.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        device-mapper development <dm-devel@redhat.com>
-Subject: Re: [RFC PATCH 0/2] add simple copy support
-Message-ID: <20201201122042.xvkdtyjuhb76nntp@MacBook-Pro.localdomain>
-References: <CGME20201201054049epcas5p2e0118abda14aaf8d8bdcfb543bc330fc@epcas5p2.samsung.com>
- <20201201053949.143175-1-selvakuma.s1@samsung.com>
- <CH2PR04MB652240A4A23F89B26118FD66E7F40@CH2PR04MB6522.namprd04.prod.outlook.com>
+        Ewan Milne <emilne@redhat.com>, Long Li <longli@microsoft.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>
+Subject: Re: [bug report] Hang on sync after dd
+Message-ID: <20201201123407.GA487145@T590>
+References: <2847d0e1-ccb1-7be6-2456-274e41ea981b@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CH2PR04MB652240A4A23F89B26118FD66E7F40@CH2PR04MB6522.namprd04.prod.outlook.com>
+In-Reply-To: <2847d0e1-ccb1-7be6-2456-274e41ea981b@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 01.12.2020 11:22, Damien Le Moal wrote:
->+ Mike and DM list
->
->On 2020/12/01 16:12, SelvaKumar S wrote:
->> This patchset tries to add support for TP4065a ("Simple Copy Command"),
->> v2020.05.04 ("Ratified")
->>
->> The Specification can be found in following link.
->> https://nvmexpress.org/wp-content/uploads/NVM-Express-1.4-Ratified-TPs-1.zip
->>
->> This is an RFC. Looking forward for any feedbacks or other alternate
->> designs for plumbing simple copy to IO stack.
->>
->> Simple copy command is a copy offloading operation and is  used to copy
->> multiple contiguous ranges (source_ranges) of LBA's to a single destination
->> LBA within the device reducing traffic between host and device.
->>
->> This implementation accepts destination, no of sources and arrays of
->> source ranges from application and attach it as payload to the bio and
->> submits to the device.
->>
->> Following limits are added to queue limits and are exposed in sysfs
->> to userspace
->> 	- *max_copy_sectors* limits the sum of all source_range length
->> 	- *max_copy_nr_ranges* limits the number of source ranges
->> 	- *max_copy_range_sectors* limit the maximum number of sectors
->> 		that can constitute a single source range.
->
->This is interesting. I think there are several possible use in the kernel in
->various components: FS (btrfs rebalance, f2fs GC, liklely others) and DM at the
->very least.
+On Mon, Nov 30, 2020 at 11:22:33AM +0000, John Garry wrote:
+> Hi all,
+> 
+> Some guys internally upgraded to v5.10-rcX and start to see a hang after dd
+> + sync for a large file:
+> - mount /dev/sda1 (ext4 filesystem) to directory /mnt;
+> - run "if=/dev/zero of=test1 bs=1M count=2000" on directory /mnt;
+> - run "sync"
+> 
+> and get:
+> 
+> [  367.912761] INFO: task jbd2/sdb1-8:3602 blocked for more than 120
+> seconds.
+> [  367.919618]       Not tainted 5.10.0-rc1-109488-g32ded76956b6 #948
+> [  367.925776] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
+> disables this message.
+> [  367.933579] task:jbd2/sdb1-8     state:D stack:    0 pid: 3602
+> ppid:     2 flags:0x00000028
+> [  367.941901] Call trace:
+> [  367.944351] __switch_to+0xb8/0x168
+> [  367.947840] __schedule+0x30c/0x670
+> [  367.951326] schedule+0x70/0x108
+> [  367.954550] io_schedule+0x1c/0xe8
+> [  367.957948] bit_wait_io+0x18/0x68
+> [  367.961346] __wait_on_bit+0x78/0xf0
+> [  367.964919] out_of_line_wait_on_bit+0x8c/0xb0
+> [  367.969356] __wait_on_buffer+0x30/0x40
+> [  367.973188] jbd2_journal_commit_transaction+0x1370/0x1958
+> [  367.978661] kjournald2+0xcc/0x260
+> [  367.982061] kthread+0x150/0x158
+> [  367.985288] ret_from_fork+0x10/0x34
+> [  367.988860] INFO: task sync:3823 blocked for more than 120 seconds.
+> [  367.995102]       Not tainted 5.10.0-rc1-109488-g32ded76956b6 #948
+> [  368.001265] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
+> disables this message.
+> [  368.009067] task:sync            state:D stack:    0 pid: 3823 ppid:
+> 3450 flags:0x00000009
+> [  368.017397] Call trace:
+> [  368.019841] __switch_to+0xb8/0x168
+> [  368.023320] __schedule+0x30c/0x670
+> [  368.026804] schedule+0x70/0x108
+> [  368.030025] jbd2_log_wait_commit+0xbc/0x158
+> [  368.034290] ext4_sync_fs+0x188/0x1c8
+> [  368.037947] sync_fs_one_sb+0x30/0x40
+> [  368.041606] iterate_supers+0x9c/0x138
+> [  368.045350] ksys_sync+0x64/0xc0
+> [  368.048569] __arm64_sys_sync+0x10/0x20
+> [  368.052398] el0_svc_common.constprop.3+0x68/0x170
+> [  368.057177] do_el0_svc+0x24/0x90
+> [  368.060482] el0_sync_handler+0x118/0x168
+> [  368.064478]  el0_sync+0x158/0x180
+> 
+> The issue was reported here originally:
+> https://lore.kernel.org/linux-ext4/4d18326e-9ca2-d0cb-7cb8-cb56981280da@hisilicon.com/
+> 
+> But it looks like issue related to recent work for SCSI MQ.
+> 
+> They can only create with hisi_sas v3 hw. I could not create with megaraid
+> sas on the same dev platform or hisi_sas on a similar dev board.
+> 
+> Reverting "scsi: core: Only re-run queue in scsi_end_request() if device
+> queue is busy" seems solve the issue. Also, checking out to patch prior to
+> "scsi: hisi_sas: Switch v3 hw to MQ" seems to not have the issue.
 
-Totally agree. We have more patches for simple copy, among others work
-on F2FS that leverages for GC. We wanted to start with a simple patchset
-enabling IOCTL to be an easy to review start. The rest of the patches
-will come.
+If the issue can be reproduced, you may try the following patch:
+
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 60c7a7d74852..f95bd0e5006e 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -602,6 +602,9 @@ static bool scsi_end_request(struct request *req, blk_status_t error,
+ 
+        __blk_mq_end_request(req, error);
+ 
++       if (unlikely(req->end_io))
++               smp_mb();
++
+        scsi_run_queue_async(sdev);
+ 
+        percpu_ref_put(&q->q_usage_counter);
 
 
->However, your patches add support only for NVMe devices that have native support
->for simple copy, leaving all other block devices out. That seriously limits the
->use cases and also does not make this solution attractive since any use of it
->would need to be conditional on the underlying drive capabilities. That means
->more code for the file systems or device mapper developers and maintainers, not
->less.
-
-Makes sense.
-
->
->To avoid this, I would suggest that this code be extended to add emulation for
->drives that do not implement simple copy natively. This would allow this
->interface to work on any block device, including SAS & SATA HDDs and RAID arrays.
->
->The emulation part of this copy service could I think be based on dm-kcopyd. See
->include/linux/dm-kcopyd.h for the interface. The current dm-kcopyd interface
->takes one source and multiple destination, the reverse of simple copy. But it
->would be fairly straightforward to also allow multiple sources and one
->destination. Simple copy native support would accelerate this case, everything
->else using the regular BIO read+write interface. Moving dm-kcopyd from DM
->infrastructure into the block layer as a set a generic block device sector copy
->service would allow its use in more places. And SCSI XCOPY could also be
->integrated in there as a different drive native support command.
-
-Let us look into this. It makes sense.
-
-It seems fair to start support bottom up from NVMe and then extend to
-block layer and F2FS (potentially others). At this stage, we were
-assuming that all the work that people like Martin, Bart and other have
-been doing through the years on XCOPY could be integrated. Emulation can
-be a part of this.
-
-How can we move forward to do this in stages?
+Thanks, 
+Ming
 
