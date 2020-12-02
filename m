@@ -2,175 +2,237 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-23.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3BB0C64E7C
-	for <linux-block@archiver.kernel.org>; Wed,  2 Dec 2020 04:18:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDBEBC64E7C
+	for <linux-block@archiver.kernel.org>; Wed,  2 Dec 2020 05:05:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 85006221FB
-	for <linux-block@archiver.kernel.org>; Wed,  2 Dec 2020 04:18:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 89BA5221FE
+	for <linux-block@archiver.kernel.org>; Wed,  2 Dec 2020 05:05:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727590AbgLBESY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Dec 2020 23:18:24 -0500
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:46434 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727005AbgLBESY (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Dec 2020 23:18:24 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1606882703; x=1638418703;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=ke7xjwN/Qeqg7QfxZDnKzn9/w2R5beS8O54Onoykmf8=;
-  b=m7pc1iPULGS8f9jJ9GqCOKRETQaUO+YhYrI7Bbw9oD70XbIb8c4KIpE/
-   0jHRF4ZMNve9UuxDcRE2UYmOd6IzOX257Ypnhkko2QahZiOV1Bx0REL+u
-   jfKSfL0gxPAihZQguumm15P2/ms6pde/8zGN9VmvBfTBlvPP0jgh9/RgC
-   L47Z4N/HGBdkjVBo7WfnRh15phArWDiTMWTU8V0W+2ubKzVHUbbRL52du
-   PjYTz3HCD0yxc2HTQhne4yR1+JkSEGBwKZDfgKGno+ytU22Eh2A58W8f8
-   /8Re8XifIjYgX65mVPTmEHWmuwARYoqQHZ1LsSoGjR6l1tUi3L2bp3qA7
-   w==;
-IronPort-SDR: OisK1dzPkRYHpVs3O3i011uEzF1GIhqj5Gl1ngcPMKX0wNeyHIwrnEqj6lB0DEKNkR+/MdFBIA
- dlzG8/qaw8dZVvzGguIixvgDt/C4tgHKBAEgBtHM5Kkh80AACfG7jMTGpfzwWb/ABQSnjbAEYi
- vzijVh2TFs0SQWuXjOQ1Q/Hc+XUsnUPORi8zn1M7dpJ4aH9o7SSg09UO7Yh7WcoKntMUqPpUWS
- A5dVm5ajzJggJaCf7bziY+gbf6Ev54VCtEjT8uPNGYRCSyjunF/akg7kzo3or8cxUj1COHQozw
- U4k=
-X-IronPort-AV: E=Sophos;i="5.78,385,1599494400"; 
-   d="scan'208";a="154053684"
-Received: from mail-mw2nam12lp2044.outbound.protection.outlook.com (HELO NAM12-MW2-obe.outbound.protection.outlook.com) ([104.47.66.44])
-  by ob1.hgst.iphmx.com with ESMTP; 02 Dec 2020 12:17:17 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mfUDN2CZ27zECFkF16haOEROpCfslrEYiWZkO82fnJs6xy5k/pPsel1fhTFCwo7UXTYUx07Z+z0rYZN+LdSRlLQ5c514VZJg9Jnwak5YyDGVMnDeiasXRU5KC/400B68bjsj/Mu/6cMTUsMCLkQaMFjT9lIOizqKB/vF9DA4oQFbqBySyqwxAzAObr+QNk+Mp+YxMRDulgGt4iA9wqhIuJuFVFI7QvpxWAyY0eI2HoVyko34aY37rU9UhmAxuJIOXw8x+rKREsoYdH0i5ZLrIIjH/Ge82X1gwheC53E16HO138Rs+vYf87iI+ZjvELt47iEQ/bPwBrHEYZXZhK2qAw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=AIBesZqvcYlspZ1AOj1sjvbCBjFUTt9K+BDA1qracZg=;
- b=TKAlznwoT7nCj7UZCYd8TnX/8i3WATduVusFbqs6ulD9HDTAtqn2sD0XfbhgRXd5BVK3Tgs3g/KKkG5a0ZvzYELVg41nO5S3RTmTxR/el6b3Ft7Z5o7IMp2YCLXm9lTG49Sr5REH0AEHgKmb2co6bW/C8RSa3QxQFgGnKWGePR6PR4EVjUxJZdl/WjNVDLB+aNidcuYaaD/cw30FJtXaliqMLPn0nb47sfTHWWeVLQp/nOASpTxKL1PhGWjv2BCwVaX1Eds6htsSL2jwZh/dD/r+/h3W4376pH7lFJtY5KOfYmytq+xEXDwzbbEj372mBY5wZMHj430lANFDCYVaTw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=AIBesZqvcYlspZ1AOj1sjvbCBjFUTt9K+BDA1qracZg=;
- b=W9NSyPnIGUbdnR+UAD1VbJZAoCiMaMwV3ReQBrGMdw57W1/WhQL4EsRTN2erDkXuCM8pzNvlG6tZTRnW6KXDLj+ANTf3td/ViwkWtz3wteug7rLT1Dp2uq7JM+jlFHHBsm0yAQFOUPv1l4YFsCFB+sGQf0DEARWBUiunTST0H7k=
-Received: from CH2PR04MB6522.namprd04.prod.outlook.com (2603:10b6:610:34::19)
- by CH2PR04MB7128.namprd04.prod.outlook.com (2603:10b6:610:9a::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3611.22; Wed, 2 Dec
- 2020 04:17:17 +0000
-Received: from CH2PR04MB6522.namprd04.prod.outlook.com
- ([fe80::897c:a04b:4eb0:640a]) by CH2PR04MB6522.namprd04.prod.outlook.com
- ([fe80::897c:a04b:4eb0:640a%7]) with mapi id 15.20.3589.022; Wed, 2 Dec 2020
- 04:17:17 +0000
-From:   Damien Le Moal <Damien.LeMoal@wdc.com>
-To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-CC:     "sagi@grimberg.me" <sagi@grimberg.me>, "hch@lst.de" <hch@lst.de>
-Subject: Re: [PATCH V3 0/9] nvmet: add ZBD backend support
-Thread-Topic: [PATCH V3 0/9] nvmet: add ZBD backend support
-Thread-Index: AQHWx5hxyX5y33697USsRw2vyDa0aA==
-Date:   Wed, 2 Dec 2020 04:17:16 +0000
-Message-ID: <CH2PR04MB6522AD27DCACDEBC04EF6A00E7F30@CH2PR04MB6522.namprd04.prod.outlook.com>
-References: <20201201041416.16293-1-chaitanya.kulkarni@wdc.com>
- <CH2PR04MB6522A2943EFDF118FEBA264EE7F40@CH2PR04MB6522.namprd04.prod.outlook.com>
- <BYAPR04MB49651C09824B2C82E44DB79C86F40@BYAPR04MB4965.namprd04.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: wdc.com; dkim=none (message not signed)
- header.d=none;wdc.com; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [2400:2411:43c0:6000:18de:edc1:5ede:e698]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 20fe59c0-7125-442a-6bf6-08d896792777
-x-ms-traffictypediagnostic: CH2PR04MB7128:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <CH2PR04MB71287BF9F677854813C1A2DAE7F30@CH2PR04MB7128.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:6790;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: XHGif+v6a1FvOrovTfWJV0u6WGphreXw6ANs7J3cEp9FSKFvFmwlia2o7l6mPXcgItebtbApTWBIO6jTbUMj49ndU9FxGsyw65ZZLSeuXl38EockdNYe6+PRZOvjvnVsZvis098j+X4kaUYlakPybsQmRt2sq+cSYs6qefiupMKOT6djWRsN8g72Olvuk0DgUwADwkcFLWfixTM55rWzw9vfNleghucXs/G3zjD3MEyTGHhkatWKR9Gw8x2rwIevgGJqQbjU1Jno8G2P+k6C0ZwmyCx1UiLmJYV5tFIEt/GYE9d0n2jXhIJ6dLWNKWeC
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR04MB6522.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(39860400002)(396003)(376002)(366004)(346002)(33656002)(52536014)(8676002)(8936002)(83380400001)(91956017)(5660300002)(71200400001)(76116006)(86362001)(66446008)(66476007)(66556008)(66946007)(478600001)(2906002)(6506007)(55016002)(316002)(110136005)(53546011)(9686003)(4326008)(7696005)(64756008)(186003)(54906003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: =?us-ascii?Q?Q4Yi+0Y075A5bLodlhTf1z0Geswsyqi3P7DFGBkG7/qgaCTZvorhkuGwgxmK?=
- =?us-ascii?Q?DdsTMG0sFdmKm8wDl4ib7caj3AQ/jZG90qL+dSaU5g0c6o9qmw4rZLXeU8EE?=
- =?us-ascii?Q?PhF0+RBLAgb9lQEkLj3fyzjjhNp7QHbKOh3jwRmbGHV7P705dIvMcpocp5Wc?=
- =?us-ascii?Q?nz1p3w4gcVBNYu1Bfx3efqadAmKWrQQ8Endx6ErFQ5yluO8KNLd5/3OGtu1G?=
- =?us-ascii?Q?aBAbrCukIo5PBWkx6dATDQVfMFtb6rt6lEocSihzPY0uAzpbKQnz5mrh+2xA?=
- =?us-ascii?Q?+iYvMqIMUcY/BaWBsiE9LZ1ZB0UzIprEl5cG9msptEnlsUNXsvdtYoOnlJS/?=
- =?us-ascii?Q?abfRRlp3hYQ0bwyWbPZNQL/3Q5Q6cwvbXpqNBWN/R9/Ekl3gvF0dtDAd756R?=
- =?us-ascii?Q?1BKiRW/6wIxxMXity6ZlVFSA19nhXNpDOklpHr9XowICGoid6MR81ZcS2SOZ?=
- =?us-ascii?Q?IxlJwcv0csYH/2BA0evNIGJw4tMiUHl0ZbcWmrz/g+ggTHKy9wFXkS/1bbi5?=
- =?us-ascii?Q?fw/fkLsyqIypSjF4XD1t1/Lg8Jfkx4dJuQc3QVinUTeeDlXjHn8pbLlHlCgV?=
- =?us-ascii?Q?dB0OPfEQTG75Z4/niC8ZYtSiLxk6OZtHn1NoJWRnna3ImQcFnfyXZk3esQlu?=
- =?us-ascii?Q?HFi0AFDGLUKdxXycKWi89SRUtfjaun2mBb2mkjUjEjvNxL/3dPBZB+vM6MU1?=
- =?us-ascii?Q?sR+GgmWax90x1s2aGfc38GxL04hmYk0PIR7ygGF1r9DD3oQ4pjankvhxu0OC?=
- =?us-ascii?Q?FXu5XlJV5EtDq/z7PyIU/Jcxtj1C1Wt4qzcJ7a7jwyaMy4VDYSrccT26S4wb?=
- =?us-ascii?Q?RhX214aTQ5f3J5gO8ZyyWkGly7XpN0L6IXB+oEIejSSjycq8JURTodNU1F3S?=
- =?us-ascii?Q?B5WiSpBtYvWsQ7qugf6uZtB7tNEaJBcVbl7+mWbmlur9BPFo5sH4B9xctgv7?=
- =?us-ascii?Q?k2xkEZGUlOKfYanUeXcybRWehcmQ76c94Q/J94MG9yx9PxT2u8IEcb5nHImc?=
- =?us-ascii?Q?n5ERQY8B5pqC61hEeku92zteIEc1HV2vu+pRtH25d28IflgEkCiNYkWANL7n?=
- =?us-ascii?Q?PTcZoGU+?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S1726133AbgLBFFX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Dec 2020 00:05:23 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55188 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726121AbgLBFFX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 2 Dec 2020 00:05:23 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1606885435;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=arkWar9alkKDb9JAyKTvWcAV4YdGbG4IrRy5idwEoqs=;
+        b=ctrJ5eFCsaI+CL9YYqjZQ+TPPXDM0MRoHwtDz4Mv0LUhAGbaKsXZH8pz/UMAPZ4T6GTV7t
+        QaAS0YOPSXI/Ope0MIEO4Rx1LdkPWIVBEbLhXBGfOXEES10vHYIZ4tPA+b1YUg3rCCRRoz
+        cFUKgclWXKmc72s9zjl5nnY7nOEpwv0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-497-62TtsnliM3azptK5P6DE9Q-1; Wed, 02 Dec 2020 00:03:49 -0500
+X-MC-Unique: 62TtsnliM3azptK5P6DE9Q-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 43873107AFA9;
+        Wed,  2 Dec 2020 05:03:48 +0000 (UTC)
+Received: from localhost (unknown [10.18.25.174])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id DC31D1346F;
+        Wed,  2 Dec 2020 05:03:44 +0000 (UTC)
+Date:   Wed, 2 Dec 2020 00:03:44 -0500
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     JeffleXu <jefflexu@linux.alibaba.com>
+Cc:     dm-devel@redhat.com, joseph.qi@linux.alibaba.com,
+        linux-block@vger.kernel.org
+Subject: Re: dm: use gcd() to fix chunk_sectors limit stacking
+Message-ID: <20201202050343.GA20535@redhat.com>
+References: <20201201160709.31748-1-snitzer@redhat.com>
+ <20201202033855.60882-1-jefflexu@linux.alibaba.com>
+ <20201202033855.60882-2-jefflexu@linux.alibaba.com>
+ <feb19a02-5ece-505f-e905-86dc84cdb204@linux.alibaba.com>
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CH2PR04MB6522.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 20fe59c0-7125-442a-6bf6-08d896792777
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Dec 2020 04:17:16.8838
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 8o38lKuONtv6Tb5xWmhtqVQt/htfUm7D3kTbFfrn4wrVjMWx/1DMTgWASIEkK+cm/NE+LsT2Du1L9Y1S8Ab7/A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR04MB7128
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <feb19a02-5ece-505f-e905-86dc84cdb204@linux.alibaba.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020/12/02 7:34, Chaitanya Kulkarni wrote:=0A=
-> On 11/30/20 22:47, Damien Le Moal wrote:=0A=
->> This passes for me:=0A=
->>=0A=
->> ./zonefs-tests.sh -t 0012 /dev/nullb0=0A=
->> Gathering information on /dev/nullb0...=0A=
->> zonefs-tests on /dev/nullb0:=0A=
->>   4 zones (0 conventional zones, 4 sequential zones)=0A=
->>   524288 512B sectors zone size (256 MiB)=0A=
->>   1 max open zones=0A=
->> Running tests=0A=
->>   Test 0012:  mkzonefs (invalid device)                            ... P=
-ASS=0A=
->>=0A=
->> 1 / 1 tests passed=0A=
->>=0A=
->> This test create a a regular nullb device and tries mkzonefs on it, whic=
-h should=0A=
->> fail since the block device is not zoned. In your case, it looks like th=
-e test=0A=
->> endup using an existing zoned nullb device, which should not happen (nul=
-lb4 and=0A=
->> nullb5). How many nullb devices do you have on that system ?=0A=
-> =0A=
-> True, my test script creates random number nvmet namespaces and nullblk=
-=0A=
-> devices.=0A=
-> =0A=
-> I think testcase is reading the wrong device, let me finish the V4 with=
-=0A=
-> removing=0A=
-> =0A=
-> bio checks as per your comments and I'll look into this.=0A=
-=0A=
-I pushed in zonefs test fix for this. Please try again, it should pass now.=
-=0A=
-=0A=
-=0A=
--- =0A=
-Damien Le Moal=0A=
-Western Digital Research=0A=
+What you've done here is fairly chaotic/disruptive:
+1) you emailed a patch out that isn't needed or ideal, I dealt already
+   staged a DM fix in linux-next for 5.10-rcX, see:
+   https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git/commit/?h=dm-5.10-rcX&id=f28de262ddf09b635095bdeaf0e07ff507b3c41b
+2) you replied to your patch and started referencing snippets of this
+   other patch's header (now staged for 5.10-rcX via Jens' block tree):
+   https://git.kernel.dk/cgit/linux-block/commit/?h=block-5.10&id=7e7986f9d3ba69a7375a41080a1f8c8012cb0923
+   - why not reply to _that_ patch in response something stated in it?
+3) you started telling me, and others on these lists, why you think I
+   used lcm_not_zero().
+   - reality is I wanted gcd() behavior, I just didn't reason through
+     the math to know it.. it was a stupid oversight on my part.  Not
+     designed with precision.
+4) Why not check with me before you craft a patch like others reported
+   the problem to you? I know it logical to follow the chain of
+   implications based on one commit and see where else there might be
+   gaps but... it is strange to just pickup someone else's work like
+   that.
+
+All just _seems_ weird and overdone. This isn't the kind of help I
+need. That said, I _do_ appreciate you looking at making blk IO polling
+work with bio-based (and DM's bio splitting in particular), but the
+lack of importance you put on DM's splitting below makes me concerned.
+
+On Tue, Dec 01 2020 at 10:57pm -0500,
+JeffleXu <jefflexu@linux.alibaba.com> wrote:
+
+> Actually in terms of this issue, I think the dilemma here is that,
+> @chunk_sectors of dm device is mainly from two source.
+> 
+> One is that from the underlying devices, which is calculated into one
+> composed one in blk_stack_limits().
+> 
+> > commit 22ada802ede8 ("block: use lcm_not_zero() when stacking
+> > chunk_sectors") broke chunk_sectors limit stacking. chunk_sectors must
+> > reflect the most limited of all devices in the IO stack.
+> > 
+> > Otherwise malformed IO may result. E.g.: prior to this fix,
+> > ->chunk_sectors = lcm_not_zero(8, 128) would result in
+> > blk_max_size_offset() splitting IO at 128 sectors rather than the
+> > required more restrictive 8 sectors.
+> 
+> For this part, technically I can't agree that 'chunk_sectors must
+> reflect the most limited of all devices in the IO stack'. Even if the dm
+> device advertises chunk_sectors of 128K when the limits of two
+> underlying devices are 8K and 128K, and thus splitting is not done in dm
+> device phase, the underlying devices will split by themselves.
+
+DM targets themselves _do_ require their own splitting.  You cannot just
+assume all IO that passes through DM targets doesn't need to be properly
+sized on entry.  Sure underlying devices will do their own splitting,
+but those splits are based on their requirements.  DM targets have their
+own IO size limits too.  Each layer needs to enforce and respect the
+constraints of its layer while also factoring in those of the underlying
+devices.
+
+> > @@ -547,7 +547,10 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
+> >  
+> >  	t->io_min = max(t->io_min, b->io_min);
+> >  	t->io_opt = lcm_not_zero(t->io_opt, b->io_opt);
+> > -	t->chunk_sectors = lcm_not_zero(t->chunk_sectors, b->chunk_sectors);
+> > +
+> > +	/* Set non-power-of-2 compatible chunk_sectors boundary */
+> > +	if (b->chunk_sectors)
+> > +		t->chunk_sectors = gcd(t->chunk_sectors, b->chunk_sectors);
+> 
+> This may introduces a regression.
+
+Regression relative to what?  5.10 was the regression point.  The commit
+header you pasted into your reply clearly conveys that commit
+22ada802ede8 caused the regression.  It makes no sense to try to create
+some other regression point.  You cannot have both from a single commit
+in the most recent Linux 5.10 release.
+
+And so I have no idea why you think that restoring DM's _required_
+splitting constraints is somehow a regression.
+
+> Suppose the @chunk_sectors limits of
+> two underlying devices are 8K and 128K, then @chunk_sectors of dm device
+> is 8K after the fix. So even when a 128K sized bio is actually
+> redirecting to the underlying device with 128K @chunk_sectors limit,
+> this 128K sized bio will actually split into 16 split bios, each 8K
+> sized。Obviously it is excessive split. And I think this is actually why
+> lcm_not_zero(a, b) is used originally.
+
+No.  Not excessive splitting, required splitting.  And as I explained in
+point 2) above, avoiding "excessive splits" isn't why lcm_not_zero() was
+improperly used to stack chunk_sectors.
+
+Some DM targets really do require the IO be split on specific boundaries
+-- however inconvenient for the underlying layers that DM splitting
+might be.
+
+> The other one source is dm device itself. DM device can set @max_io_len
+> through ->io_hint(), and then set @chunk_sectors from @max_io_len.
+
+ti->max_io_len should always be set in the DM target's .ctr
+
+DM core takes care of applying max_io_len to chunk_sectors since 5.10,
+you should know that given your patch is meant to fix commit
+882ec4e609c1
+
+And for 5.11 I've staged a change to have it impose max_io_len in terms
+of ->max_sectors too, see:
+https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git/commit/?h=dm-5.11&id=41dcb8f21a86edbe409b2bef9bb1df4cb9d66858
+
+One thing I clearly need to do moving forward is: always post my changes
+to dm-devel; just so someone like yourself can follow along via email
+client.  I just assumed others who care about DM changes also track the
+linux-dm.git tree's branches.  Clearly not the best assumption or
+practice on my part.
+
+> This part is actually where 'chunk_sectors must reflect the most limited
+> of all devices in the IO stack' is true, and we have to apply the most
+> strict limitation here. This is actually what the following patch does.
+
+There is a very consistent and deliberate way that device limits must be
+handled, sometimes I too have missteps but that doesn't change the fact
+that there is a deliberate evenness to how limits are stacked.
+blk_stack_limits() needs to be the authority on how these limits stack
+up.  So all DM's limits stacking wraps calls to it.  My fix, shared in
+point 1) above, restores that design pattern by _not_ having DM
+duplicate a subset of how blk_stack_limits() does its stacking.
+
+Mike
+
+> On 12/2/20 11:38 AM, Jeffle Xu wrote:
+> > As it said in commit 7e7986f9d3ba ("block: use gcd() to fix
+> > chunk_sectors limit stacking"), chunk_sectors should reflect the most
+> > limited of all devices in the IO stack.
+> > 
+> > The previous commit only fixes block/blk-settings.c:blk_stack_limits(),
+> > while leaving dm.c:dm_calculate_queue_limits() unfixed.
+> > 
+> > Fixes: 882ec4e609c1 ("dm table: stack 'chunk_sectors' limit to account for target-specific splitting")
+> > cc: stable@vger.kernel.org
+> > Reported-by: John Dorminy <jdorminy@redhat.com>
+> > Reported-by: Bruce Johnston <bjohnsto@redhat.com>
+> > Signed-off-by: Jeffle Xu <jefflexu@linux.alibaba.com>
+> > ---
+> >  drivers/md/dm-table.c | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
+> > index ce543b761be7..dcc0a27355d7 100644
+> > --- a/drivers/md/dm-table.c
+> > +++ b/drivers/md/dm-table.c
+> > @@ -22,6 +22,7 @@
+> >  #include <linux/blk-mq.h>
+> >  #include <linux/mount.h>
+> >  #include <linux/dax.h>
+> > +#include <linux/gcd.h>
+> >  
+> >  #define DM_MSG_PREFIX "table"
+> >  
+> > @@ -1457,7 +1458,7 @@ int dm_calculate_queue_limits(struct dm_table *table,
+> >  
+> >  		/* Stack chunk_sectors if target-specific splitting is required */
+> >  		if (ti->max_io_len)
+> > -			ti_limits.chunk_sectors = lcm_not_zero(ti->max_io_len,
+> > +			ti_limits.chunk_sectors = gcd(ti->max_io_len,
+> >  							       ti_limits.chunk_sectors);
+> >  		/* Set I/O hints portion of queue limits */
+> >  		if (ti->type->io_hints)
+> > 
+> 
+> -- 
+> Thanks,
+> Jeffle
+> 
+
