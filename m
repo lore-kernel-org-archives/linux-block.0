@@ -2,139 +2,78 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1064C71155
-	for <linux-block@archiver.kernel.org>; Wed,  2 Dec 2020 18:05:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87620C71155
+	for <linux-block@archiver.kernel.org>; Wed,  2 Dec 2020 19:06:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 601C122203
-	for <linux-block@archiver.kernel.org>; Wed,  2 Dec 2020 18:05:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 208BB22250
+	for <linux-block@archiver.kernel.org>; Wed,  2 Dec 2020 19:06:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728843AbgLBSFv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Dec 2020 13:05:51 -0500
-Received: from a2.mail.mailgun.net ([198.61.254.61]:24805 "EHLO
-        a2.mail.mailgun.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726283AbgLBSFv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Dec 2020 13:05:51 -0500
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1606932332; h=Content-Transfer-Encoding: Content-Type:
- MIME-Version: Message-ID: Date: Subject: In-Reply-To: References: To:
- From: Sender; bh=/TlMS5OJ20jyahV9MX4hb/PKbCiV3kGHQzaJ1zuJzzQ=; b=F0mjt3bycmA+RE5R3waCaHirRQcysMlqV01HAaWXyA5a6bO+tu92QGXX4vxU2G8PISjk5lHp
- vdFEFGT+lDHmv9oporQHWWIdfNO0eLcQwACOn5w9YBJ+mYJlSoiEcMXLKadj7DLXSyhDw0fX
- OdstwOnacENuVZKbL0lxMrg072w=
-X-Mailgun-Sending-Ip: 198.61.254.61
-X-Mailgun-Sid: WyI0MmE5NyIsICJsaW51eC1ibG9ja0B2Z2VyLmtlcm5lbC5vcmciLCAiYmU5ZTRhIl0=
-Received: from smtp.codeaurora.org
- (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
- smtp-out-n06.prod.us-east-1.postgun.com with SMTP id
- 5fc7d75e7edc97d061ea2ca9 (version=TLS1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Wed, 02 Dec 2020 18:05:18
- GMT
-Sender: rsiddoji=codeaurora.org@mg.codeaurora.org
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id 7974AC43460; Wed,  2 Dec 2020 18:05:17 +0000 (UTC)
-Received: from rsiddoji1 (unknown [123.201.165.6])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        (Authenticated sender: rsiddoji)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id C2CABC433ED;
-        Wed,  2 Dec 2020 18:05:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org C2CABC433ED
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=fail smtp.mailfrom=rsiddoji@codeaurora.org
-From:   "Ravi Kumar Siddojigari" <rsiddoji@codeaurora.org>
-To:     <linux-block@vger.kernel.org>, <dm-devel@redhat.com>
-References: 
-In-Reply-To: 
-Subject: RE: [PATCH] dm verity: correcting logic used with corrupted_errs counter
-Date:   Wed, 2 Dec 2020 23:35:11 +0530
-Organization: The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,\na Linux Foundation Collaborative Project
-Message-ID: <000001d6c8d5$b03e7200$10bb5600$@codeaurora.org>
+        id S1731067AbgLBTF7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Dec 2020 14:05:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57616 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731065AbgLBTF7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Dec 2020 14:05:59 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3E46C0613D4
+        for <linux-block@vger.kernel.org>; Wed,  2 Dec 2020 11:05:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=B5cODg3H+9V/Jixb9chLqjaBrP7CJZa7OtKmTzcFpkQ=; b=BIi5qi2wD3ql3tecsmCCLWVmO4
+        qe3BFeqU0HbMI/HQ9uDCDD1tlcZ0JxG0wa32MuG4AeHNE3xyDvwqtrgedxMs9ObwdT+b5+xqUjcJT
+        VZSGlPxUEjTNS5I0ZXSpcx4M/V6rVGoEIgsPosjgTepqXwaLrRsFbtrgRssLIN+XaluHdqNfI0c9d
+        Hu/+eU3kiTIR+eAzMuOedMAulgYWvFgEWAdKU9NDhRL8bKFlwmZff5w311gnAcZdbVuatdRmUyfrZ
+        v7JZiomtwT1PJLk307b96jv5rSdAeiZ48PP5IqSnlsowxdFo4tU3Lr6NwEQSf1f+a74QgzgV3bfeK
+        BXfr71WA==;
+Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kkXRD-0005Rs-EU; Wed, 02 Dec 2020 19:05:15 +0000
+Date:   Wed, 2 Dec 2020 19:05:15 +0000
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        JeffleXu <jefflexu@linux.alibaba.com>,
+        joseph.qi@linux.alibaba.com, linux-block@vger.kernel.org
+Subject: Re: [PATCH v2] block: fix inflight statistics of part0
+Message-ID: <20201202190515.GA19811@infradead.org>
+References: <20201202111145.36000-1-jefflexu@linux.alibaba.com>
+ <4317c6c9-886f-c921-70c1-ccc12ba6ae79@linux.alibaba.com>
+ <20201202112050.GA2201@infradead.org>
+ <699798e0-6b38-105f-aacc-938f3ecd6ce4@kernel.dk>
 MIME-Version: 1.0
-Content-Type: text/plain;
-        charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Thread-Index: AQH+wGaSVHC4B8VH2eGDagahwX5nL6mUKdpA
-Content-Language: en-us
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <699798e0-6b38-105f-aacc-938f3ecd6ce4@kernel.dk>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Sorry,  Resending the patch for comments with  dm-devel added .
+On Wed, Dec 02, 2020 at 09:48:03AM -0700, Jens Axboe wrote:
+> On 12/2/20 4:20 AM, Christoph Hellwig wrote:
+> > On Wed, Dec 02, 2020 at 07:17:55PM +0800, JeffleXu wrote:
+> >>> Fixes: bf0ddaba65dd ("blk-mq: fix sysfs inflight counter")
+> >>> Fixes: f299b7c7a9de ("blk-mq: provide internal in-flight variant")
+> >>> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> >>> Signed-off-by: Jeffle Xu <jefflexu@linux.alibaba.com>
+> >>> ---
+> >>> v2: update the commit log, adding 'Fixes' tag
+> >>
+> >> Forgot to add 'stable' tag.
+> > 
+> > The fixes tags take care of that automatically.
+> > 
+> > Note that this patch will cause a merge conflict with my work in
+> > linux-next, but the resolution is pretty trivial.
+> 
+> Might be better to handle on the stable side, and just apply this to
+> 5.11. It's not a new regression.
 
------Original Message-----
-From: Ravi Kumar Siddojigari <rsiddoji@codeaurora.org> 
-Sent: Friday, November 20, 2020 6:37 PM
-To: 'linux-block@vger.kernel.org' <linux-block@vger.kernel.org>
-Cc: 'dm-devel@redhat.com' <dm-devel@redhat.com>
-Subject: RE: [PATCH] dm verity: correcting logic used with corrupted_errs
-counter
-
-One more question  :
-	Current code has DM_VERITY_MAX_CORRUPTED_ERRS  set to 100  can we
-reduce this ? or is there any  data that made us to keep this 100 ?
-Regards,
-Ravi
-
------Original Message-----
-From: Ravi Kumar Siddojigari <rsiddoji@codeaurora.org> 
-Sent: Wednesday, November 18, 2020 6:17 PM
-To: 'linux-block@vger.kernel.org' <linux-block@vger.kernel.org>
-Subject: [PATCH] dm verity: correcting logic used with corrupted_errs
-counter
-
-In verity_handle_err we see that the "corrupted_errs"  is never going to be
-more than one as the code will fall through "out" label and hit
-panic/kernel_restart on the first error  which is not as expected.. 
-Following patch will make sure that corrupted_errs are incremented and only
-panic/kernel_restart once it reached DM_VERITY_MAX_CORRUPTED_ERRS.
-
-Signed-off-by: Ravi Kumar Siddojigari <rsiddoji@codeaurora.org>
----
- drivers/md/dm-verity-target.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/md/dm-verity-target.c b/drivers/md/dm-verity-target.c
-index f74982dcbea0..d86900a2a8d7 100644
---- a/drivers/md/dm-verity-target.c
-+++ b/drivers/md/dm-verity-target.c
-@@ -221,8 +221,10 @@ static int verity_handle_err(struct dm_verity *v, enum
-verity_block_type type,
- 	/* Corruption should be visible in device status in all modes */
- 	v->hash_failed = 1;
- 
--	if (v->corrupted_errs >= DM_VERITY_MAX_CORRUPTED_ERRS)
-+	if (v->corrupted_errs >= DM_VERITY_MAX_CORRUPTED_ERRS) {
-+		DMERR("%s: reached maximum errors", v->data_dev->name);
- 		goto out;
-+	}
- 
- 	v->corrupted_errs++;
- 
-@@ -240,13 +242,13 @@ static int verity_handle_err(struct dm_verity *v, enum
-verity_block_type type,
- 	DMERR_LIMIT("%s: %s block %llu is corrupted", v->data_dev->name,
- 		    type_str, block);
- 
--	if (v->corrupted_errs == DM_VERITY_MAX_CORRUPTED_ERRS)
--		DMERR("%s: reached maximum errors", v->data_dev->name);
- 
- 	snprintf(verity_env, DM_VERITY_ENV_LENGTH, "%s=%d,%llu",
- 		DM_VERITY_ENV_VAR_NAME, type, block);
- 
- 	kobject_uevent_env(&disk_to_dev(dm_disk(md))->kobj, KOBJ_CHANGE,
-envp);
-+	/* DM_VERITY_MAX_CORRUPTED_ERRS limit not reached yet */
-+		return 0;
- 
- out:
- 	if (v->mode == DM_VERITY_MODE_LOGGING)
---
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a
-Linux Foundation Collaborative Project
-
-
+If you apply it to for-5.11/block it won't compile.  It'll need a quick
+s/partno/bd_partno/ there.
