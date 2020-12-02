@@ -2,74 +2,90 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3173CC71155
-	for <linux-block@archiver.kernel.org>; Wed,  2 Dec 2020 19:09:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D863C64E7C
+	for <linux-block@archiver.kernel.org>; Wed,  2 Dec 2020 19:12:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D3F9422254
-	for <linux-block@archiver.kernel.org>; Wed,  2 Dec 2020 19:09:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 09483206A4
+	for <linux-block@archiver.kernel.org>; Wed,  2 Dec 2020 19:12:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387902AbgLBTIs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Dec 2020 14:08:48 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58544 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726082AbgLBTIs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 2 Dec 2020 14:08:48 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1606936042;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=GyPnByql6hDKb++n9qwMPEM+6fVfKn8Oppnc5Ohl5K0=;
-        b=ExQHEADEp/3hX7aENhdplJkPlru5PGz0iOwUgGfqOKlCrYQKvOhjLfEWfMZrRDEWes6suz
-        oKy2Zf7WqUrx2COi8CSF8OopLAIYku4EEuR10wQkudSUOKZ4pS2NkdKbWk0DksDgDzdOMW
-        HnYgQeeurUiNcfb+tlTSh4btAPJrY9Q=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-543-OCx1hdEmPci61uW7KC8THA-1; Wed, 02 Dec 2020 14:07:16 -0500
-X-MC-Unique: OCx1hdEmPci61uW7KC8THA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C49CB8145E6;
-        Wed,  2 Dec 2020 19:07:14 +0000 (UTC)
-Received: from ovpn-66-132.rdu2.redhat.com (unknown [10.10.67.132])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3E4836060F;
-        Wed,  2 Dec 2020 19:07:08 +0000 (UTC)
-Message-ID: <b70f46b855858a28b0e77ee7efbb2dbffbb56490.camel@redhat.com>
-Subject: Re: [PATCH 0/3] blk-mq/nvme-loop: use nvme-loop's lock class for
- addressing lockdep false positive warning
-From:   Qian Cai <qcai@redhat.com>
-To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        Christoph Hellwig <hch@lst.de>
-Cc:     Sumit Saxena <sumit.saxena@broadcom.com>,
-        John Garry <john.garry@huawei.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.de>
-Date:   Wed, 02 Dec 2020 14:07:08 -0500
-In-Reply-To: <20201130023606.GC230145@T590>
-References: <20201112075526.947079-1-ming.lei@redhat.com>
-         <20201130023606.GC230145@T590>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+        id S2387990AbgLBTLv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Dec 2020 14:11:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58536 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387739AbgLBTLu (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Dec 2020 14:11:50 -0500
+Received: from mail-qk1-x744.google.com (mail-qk1-x744.google.com [IPv6:2607:f8b0:4864:20::744])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A50EDC0613CF;
+        Wed,  2 Dec 2020 11:11:10 -0800 (PST)
+Received: by mail-qk1-x744.google.com with SMTP id z188so2318816qke.9;
+        Wed, 02 Dec 2020 11:11:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=v5D6PtLHVVQdV/ubjkOzdJ2GbL8TD6flP6rlB6RAW04=;
+        b=cuyop+6GEYsJfkfCvrlT56PR6leruYXY5xPg4Fdmi14/OZPEhEcIUgeCsS0pTNj7Eh
+         jzkIP1A/NrdAr19D53DRdBUsnOAOhlNewUybMARKFcP77devwmFS1CqYYaN7HC4m0lgi
+         DFbVKFSeopvdwV5JccZt++HutFbOhhiVtFp3yMOsECMbScMuv1/v1XE6VDoPwzjAowuL
+         75XHn4iGJsiobXi24yrPTzCNOk/Mzrp+2cWJ1wW0OBGhuX7sTcpU6W/a++z4rZypJnV5
+         xWMyeP1DfqXvkJB4MZcZsY3WyzipNR0PEe7As0InJw/dJbEJ4S8+5F1Az9sEW9b7Vrnl
+         Cwcw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=v5D6PtLHVVQdV/ubjkOzdJ2GbL8TD6flP6rlB6RAW04=;
+        b=SWKH8gIAhDKovQ1+rWQaagnHk19acKM0NS1KfMjdhsqWczFJuv7bFIbeaR8GQu6okS
+         qP2JseA0HKZLnaepv/qbxF0Rth24RyJTaatznHQHP1Qg8bi+KHDQg9l9G0MnIpxPlt0p
+         ifC+f0j4OhgO1dOTlVl/UCuRacWKdneaS0bM9IARbvVuK4+38o/V8LWQPU7dHSEOaho6
+         8bMGwM5tnKPPP/0kgpqRRzo+mVH47AuAd0wd3NUxsgMibQa9ohHqYg3KEMRncdfl59+z
+         kO7CBn2LPqG3s6CDq1qfaFAoxeaNR7mXwdBqdnp9SI0U2bD2o2ht9hwhjGNS6QZcZRSB
+         +53Q==
+X-Gm-Message-State: AOAM530q9igWMPpqf3YpPPYMvqrdcqNl0qUvdv9u/abjjQ4Os8+TjJDN
+        qPtXzgDC6yamOpaPOK8p03A=
+X-Google-Smtp-Source: ABdhPJx6BRmRG4jxLpniauDUiQDUhRNB10J7uytRnFSA19h8R3Y8QAwNfA1bUo95Ef1gyghUhGvgKQ==
+X-Received: by 2002:a37:9c82:: with SMTP id f124mr4221666qke.314.1606936269763;
+        Wed, 02 Dec 2020 11:11:09 -0800 (PST)
+Received: from localhost ([2620:10d:c091:480::1:8dbd])
+        by smtp.gmail.com with ESMTPSA id b4sm1765150qtb.33.2020.12.02.11.11.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Dec 2020 11:11:09 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Wed, 2 Dec 2020 14:10:41 -0500
+From:   Tejun Heo <tj@kernel.org>
+To:     Yu Kuai <yukuai3@huawei.com>
+Cc:     axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com, zhangxiaoxu5@huawei.com
+Subject: Re: [PATCH] blk-throttle: don't check whether or not lower limit is
+ valid if CONFIG_BLK_DEV_THROTTLING_LOW is off
+Message-ID: <X8fmsbgvajlCvvLD@mtj.duckdns.org>
+References: <20201126031834.40807-1-yukuai3@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201126031834.40807-1-yukuai3@huawei.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 2020-11-30 at 10:36 +0800, Ming Lei wrote:
-> Any chance to take a look? And this issue has been reported several
-> times in RH internal test.
+On Thu, Nov 26, 2020 at 11:18:34AM +0800, Yu Kuai wrote:
+> blk_throtl_update_limit_valid() will search for descendants to see if
+> 'LIMIT_LOW' of bps/iops and READ/WRITE is nonzero. However, they're always
+> zero if CONFIG_BLK_DEV_THROTTLING_LOW is not set, furthermore, a lot of
+> time will be wasted to iterate descendants.
+> 
+> Thus do nothing in blk_throtl_update_limit_valid() in such situation.
+> 
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 
-I suppose that you will need to rebase as it does not apply cleanly on today's
-linux-next.
+Acked-by: Tejun Heo <tj@kernel.org>
 
+Thanks.
+
+-- 
+tejun
