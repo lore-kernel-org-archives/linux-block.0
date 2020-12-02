@@ -2,73 +2,73 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FA38C71156
-	for <linux-block@archiver.kernel.org>; Wed,  2 Dec 2020 15:58:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8422CC64E7C
+	for <linux-block@archiver.kernel.org>; Wed,  2 Dec 2020 16:48:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 09CBE206A5
-	for <linux-block@archiver.kernel.org>; Wed,  2 Dec 2020 15:58:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 294D522240
+	for <linux-block@archiver.kernel.org>; Wed,  2 Dec 2020 16:48:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728663AbgLBP6O (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Dec 2020 10:58:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56332 "EHLO
+        id S1730645AbgLBQsC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Dec 2020 11:48:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35836 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726935AbgLBP6O (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Dec 2020 10:58:14 -0500
-Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48DE3C0617A6
-        for <linux-block@vger.kernel.org>; Wed,  2 Dec 2020 07:57:34 -0800 (PST)
-Received: by mail-io1-xd32.google.com with SMTP id n14so2376609iom.10
-        for <linux-block@vger.kernel.org>; Wed, 02 Dec 2020 07:57:34 -0800 (PST)
+        with ESMTP id S1728654AbgLBQsC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Dec 2020 11:48:02 -0500
+Received: from mail-io1-xd41.google.com (mail-io1-xd41.google.com [IPv6:2607:f8b0:4864:20::d41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 031EDC0613D4
+        for <linux-block@vger.kernel.org>; Wed,  2 Dec 2020 08:47:22 -0800 (PST)
+Received: by mail-io1-xd41.google.com with SMTP id 81so881841ioc.13
+        for <linux-block@vger.kernel.org>; Wed, 02 Dec 2020 08:47:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=EwUegCCtoiOqTe1WLKSG6GoeoAUOBpqMnMBopVd31OY=;
-        b=UGvmlcyL3xZCL1YHN7IiOFmWmNcWCVYLeuhrb4G5XUMX7PxER6ke/+TeIIJReHdHto
-         ppF0VQt7Hjf74qZQwhmQBcq6ngbvD9RqivH8w+vtrqQn1URXfu4nvq6TclF3lZftclNo
-         Oybd1poZd4mpZspF1FW0v84RdbNfA38O9f29vqXHi+YplT+5eOciwrawljGN9O2ZZCfW
-         tVx077PVhxumJmN8BKoWqByWpikUxJEH13XvbLdAQEZMwolvPtx1hlQTSeEOVQVh6/TT
-         Wyq5Js7VRav2L7RlJ5cPjVyCqyvbSM3fzREG8Mbnro9B5uCknoe4eAP279UF7pS74GM3
-         gRpA==
+        bh=zol2C3x1MpOzz1E0I2X0Xu9pD3c1eo4ablGKhHx2Q/I=;
+        b=VJFF5u1RtTw3H5fA71XF341hMq/B6fNG0U1xvRXi2kaT9e/euqApxIa2nUwXI/oXvY
+         usq/E/FGZY60zISjUJTdfL706RMojTGZ04BICGBlU5cygX4VtQTwmwvcyLaJpwzrkL5l
+         wwzSlR2h6ROnVfTObdeTLnrrbWEdbCBvPXDRDxU9r01JCyT3Y/KkWPKHFKkVoVQpInNf
+         AyADh0fIgDl7iT82TQ1tH6RxIYCmm5N8/xb8qrl3DFA18Iwy4O2QCunhpZTtDjdPWKj/
+         odWE/E4Q/vMdtlToAh9+G2NFhSgIzy7n78oHYPJQhfkQ05pGRpgRdNInWULIDqsD5TE7
+         pYig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=EwUegCCtoiOqTe1WLKSG6GoeoAUOBpqMnMBopVd31OY=;
-        b=omvDRoOFLK7ZhSNsBotFOlMMQs9TBWD6WONkXdMnY5GYlqb/23z5suyooWECHqzWo3
-         GRpeaQhx6bgjKtPxduuAoSmwOw9tjhWs0Km4lxtNSoqnTe8GCbI1qQ+C59Ac4nIBS9kQ
-         E9qlLJiK7Pq2mo72QJhtFOIebJiI0gw9z5polc+PG25JGlgAk2BG4JfjcIqPbOmdp/fP
-         lgnD55DfHHCXageYxI25Qy+G0wMG6QqRPA6RlMo4kR46T4EhDMAlv5UtLgtUPXTi9q7o
-         +C8pFJuJj+agVuh6kHNKwbM2F+JhAqgULrbEh+0hLhUxSZ9vECyI2p0eenq6ewYSxAX1
-         3xbw==
-X-Gm-Message-State: AOAM5333FuRNEHZ7w5XomYIRFoF3jrxlQk3tZ/tJ3+wA7sTqcyHHXt/d
-        gHadRMU/UhqDZVmK7/xBYJFbJaMdJYGkvA==
-X-Google-Smtp-Source: ABdhPJyDnO9kCE403mrZkpxn7VBVAx3kwrYK+p5fJ/mss9JvuJJbMnlKq5O9HoHvb/189cEv+JzP3A==
-X-Received: by 2002:a05:6602:2c8f:: with SMTP id i15mr2547840iow.66.1606924653601;
-        Wed, 02 Dec 2020 07:57:33 -0800 (PST)
+        bh=zol2C3x1MpOzz1E0I2X0Xu9pD3c1eo4ablGKhHx2Q/I=;
+        b=b4XqNZavMZXUv7UNogUnXskrCBjT6pWEodPi04yJFoqC43ABsfnv9v7GEuxtU7v30v
+         P3Ewc1EZo3FrV3hwqZPBamLrXtPLcaZi3cVv5Ym2jLuf+Ut40qUoS6VB1ol8DDtHA3dx
+         ONz2wdA9AjWoEi7kVFaniuaJdlNNM5piXGa67XeWq5TwfzAzwAKo+2qt+wBHjdgRmb7P
+         Rdlw3MhWA/nD0hovdcNzwJRXXyQNlCOuf+SSHA6shAajIhP2wRCBj/4XoGeIpJBNjC/C
+         /rIz3n2vhHuqXFVr9ePFkHhd9tvnon5g2jAJ24wxx5ubM33fvwcMR8T25c6cGdUB8HnF
+         lWHg==
+X-Gm-Message-State: AOAM532Za/zAXPWmyPwygNjeTIhkJhNpWYG4eMto++6fez0pdykm1UYw
+        hGfxkA3TuZnvHxY0LCE3eWWgYw==
+X-Google-Smtp-Source: ABdhPJwQVQshzqxeUQpTotwdP0W1jY0nkGx2oNjGdNM4H2mmoQSDhDPPVxwcg7vOg+16ZJQWIG8RjQ==
+X-Received: by 2002:a05:6602:3303:: with SMTP id b3mr2677562ioz.179.1606927641308;
+        Wed, 02 Dec 2020 08:47:21 -0800 (PST)
 Received: from [192.168.1.30] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id b12sm1272034ilc.21.2020.12.02.07.57.32
+        by smtp.gmail.com with ESMTPSA id r10sm818002ilo.34.2020.12.02.08.47.20
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 02 Dec 2020 07:57:33 -0800 (PST)
-Subject: Re: [GIT PULL] first round of nvme updates for 5.11
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
-        Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org
-References: <20201202132549.GA2060796@infradead.org>
+        Wed, 02 Dec 2020 08:47:20 -0800 (PST)
+Subject: Re: [PATCH 0/2] optimise bvec/bio iteration
+To:     Pavel Begunkov <asml.silence@gmail.com>,
+        linux-block@vger.kernel.org
+Cc:     Ming Lei <ming.lei@redhat.com>,
+        Christoph Hellwig <hch@infradead.org>
+References: <cover.1606240077.git.asml.silence@gmail.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <4cbeda1b-dbb1-1743-7843-1cb04891f00d@kernel.dk>
-Date:   Wed, 2 Dec 2020 08:57:32 -0700
+Message-ID: <a315f9c2-e574-a5df-83c4-a70fed604e01@kernel.dk>
+Date:   Wed, 2 Dec 2020 09:47:20 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20201202132549.GA2060796@infradead.org>
+In-Reply-To: <cover.1606240077.git.asml.silence@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -76,10 +76,18 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/2/20 6:25 AM, Christoph Hellwig wrote:
-> git://git.infradead.org/nvme.git tags/nvme-5.11-20201202
+On 11/24/20 10:58 AM, Pavel Begunkov wrote:
+> This adds simpler versions of bvec_iter_advance() and bio_advance_iter()
+> (i.e. *_single()), that are faster but work with the restriction that
+> @bytes shouldn't be more than available in the current bvec segment.
+> 
+> That covers most of bvec/bio iteration/foreach, that are massively
+> inlined, and thus also nicely shrinks binary.
+> 
+> Others non core-block users might be updated on case by case basis
+> (if applicable) after the change is merged.
 
-Pulled, thanks.
+Applied, thanks.
 
 -- 
 Jens Axboe
