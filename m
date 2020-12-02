@@ -2,58 +2,88 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3374C64E8A
-	for <linux-block@archiver.kernel.org>; Wed,  2 Dec 2020 15:03:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B748C83012
+	for <linux-block@archiver.kernel.org>; Wed,  2 Dec 2020 15:13:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 842AA22256
-	for <linux-block@archiver.kernel.org>; Wed,  2 Dec 2020 15:03:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1B9AD20B1F
+	for <linux-block@archiver.kernel.org>; Wed,  2 Dec 2020 15:13:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730386AbgLBPDB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Dec 2020 10:03:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47790 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727753AbgLBPDA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Dec 2020 10:03:00 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80C6CC0617A7;
-        Wed,  2 Dec 2020 07:02:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=l2WBiCb5duYJRA9nKpihqrJOH1Qjg6utSrFiu8qAdtc=; b=Yo/K0qSiyVTQyb2ULngB6Dhf+Y
-        Dy9/LE1mbGP5WbS6xxfBdTipfKB023hD1bSWHSdksLma8eeKaH9nmtAiVrxdDtw2XD2QuF70ETOde
-        5xGlIAV/jSDMiMnVWCfqvsQa8Pk8js2JOMOOB+1xmyvqouF51gDg+JP99LlpQyr1z/I/OZcS5dQqS
-        IiuT1n6gQaEuXTI2WVuq4LD4w+8pXkliKwXNarXZaAN5gFYdEVqYsttYBzO7tPcqEWP9WDJCrwYRN
-        3y9ZUw/Rzyc31NQAWsRinKTygJcWc5RMA72c69FpctNhg3ePg9xPnudj7mqkQ+j91kJYiYfEN7RYq
-        PC3qgZ0A==;
-Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kkTe5-0006V0-K0; Wed, 02 Dec 2020 15:02:17 +0000
-Date:   Wed, 2 Dec 2020 15:02:17 +0000
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Matthew Wilcox <willy@infradead.org>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH] block: add bio_iov_iter_nvecs for figuring out nr_vecs
-Message-ID: <20201202150217.GA23632@infradead.org>
-References: <20201201120652.487077-1-ming.lei@redhat.com>
+        id S1728300AbgLBPMr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Dec 2020 10:12:47 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:35977 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727116AbgLBPMq (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 2 Dec 2020 10:12:46 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1606921880;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=BI29tL8haMOOy0hp46ljwCMGR3G48eRovDB8MadITvs=;
+        b=Tanx0uce/dSE/N8PQ5f0mWNWppEo7igVg1qXZoPL4HByWAMQP3J/jCFasNIkZ1pDHJ3PTt
+        t1Yg6MHsxPZHt/5zlVByF8SFDLg6fxaxv95j4vvRr66p7srfZOb5SrbMM4jROZ/UcBTgob
+        q9aUriw+2II4yQL53uqIpxG6EI9aZRU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-518-nlBjB5GxPkG3Og55m4gtcQ-1; Wed, 02 Dec 2020 10:11:18 -0500
+X-MC-Unique: nlBjB5GxPkG3Og55m4gtcQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A5F5B805BE8;
+        Wed,  2 Dec 2020 15:11:17 +0000 (UTC)
+Received: from localhost (unknown [10.18.25.174])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8CC246086F;
+        Wed,  2 Dec 2020 15:11:13 +0000 (UTC)
+Date:   Wed, 2 Dec 2020 10:11:12 -0500
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     JeffleXu <jefflexu@linux.alibaba.com>
+Cc:     dm-devel@redhat.com, joseph.qi@linux.alibaba.com,
+        linux-block@vger.kernel.org
+Subject: Re: dm: use gcd() to fix chunk_sectors limit stacking
+Message-ID: <20201202151112.GD20535@redhat.com>
+References: <20201201160709.31748-1-snitzer@redhat.com>
+ <20201202033855.60882-1-jefflexu@linux.alibaba.com>
+ <20201202033855.60882-2-jefflexu@linux.alibaba.com>
+ <feb19a02-5ece-505f-e905-86dc84cdb204@linux.alibaba.com>
+ <20201202050343.GA20535@redhat.com>
+ <7326607a-b687-3989-dee7-cf469ab37ac4@linux.alibaba.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201201120652.487077-1-ming.lei@redhat.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <7326607a-b687-3989-dee7-cf469ab37ac4@linux.alibaba.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Looks good,
+On Wed, Dec 02 2020 at  2:10am -0500,
+JeffleXu <jefflexu@linux.alibaba.com> wrote:
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+> 
+> 
+> On 12/2/20 1:03 PM, Mike Snitzer wrote:
+> > What you've done here is fairly chaotic/disruptive:
+> > 1) you emailed a patch out that isn't needed or ideal, I dealt already
+> >    staged a DM fix in linux-next for 5.10-rcX, see:
+> >    https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git/commit/?h=dm-5.10-rcX&id=f28de262ddf09b635095bdeaf0e07ff507b3c41b
+> 
+> Then ti->type->io_hints() is still bypassed when type->iterate_devices()
+> not defined?
+
+Yes, the stacking of limits really is tightly coupled to device-based
+influence.  Hypothetically some DM target that doesn't remap to any data
+devices may want to override limits... in practice there isn't a need
+for this.  If that changes we can take action to accommodate it.. but I'm
+definitely not interested in modifying DM core in this area when there
+isn't a demonstrated need.
+
+Mike
+
