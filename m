@@ -2,252 +2,89 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55640C6369E
-	for <linux-block@archiver.kernel.org>; Wed,  2 Dec 2020 22:53:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8033DC64E7B
+	for <linux-block@archiver.kernel.org>; Wed,  2 Dec 2020 22:55:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 094EA221F7
-	for <linux-block@archiver.kernel.org>; Wed,  2 Dec 2020 22:53:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4F9C322201
+	for <linux-block@archiver.kernel.org>; Wed,  2 Dec 2020 22:55:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726267AbgLBWxh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Dec 2020 17:53:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36488 "EHLO
+        id S2387822AbgLBWzb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Dec 2020 17:55:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36756 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726955AbgLBWxh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Dec 2020 17:53:37 -0500
-Received: from mail-pj1-x1041.google.com (mail-pj1-x1041.google.com [IPv6:2607:f8b0:4864:20::1041])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6282C061A4B
-        for <linux-block@vger.kernel.org>; Wed,  2 Dec 2020 14:52:56 -0800 (PST)
-Received: by mail-pj1-x1041.google.com with SMTP id hk16so4340pjb.4
-        for <linux-block@vger.kernel.org>; Wed, 02 Dec 2020 14:52:56 -0800 (PST)
+        with ESMTP id S2387806AbgLBWza (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Dec 2020 17:55:30 -0500
+Received: from mail-qk1-x744.google.com (mail-qk1-x744.google.com [IPv6:2607:f8b0:4864:20::744])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 824CCC061A04;
+        Wed,  2 Dec 2020 14:55:15 -0800 (PST)
+Received: by mail-qk1-x744.google.com with SMTP id q5so374531qkc.12;
+        Wed, 02 Dec 2020 14:55:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=w13vKkQO9QCP0aR5R9Nv4FOw9sZU+DjLBFqmX3t26s8=;
-        b=rxIMvrsLz416YTkoh8oP0XwIZGWM+lG9YJHHqWJFZPAJfdeUMvP8RjKlfZq98Rtmoj
-         51XR5TMkAuVUmfbpRWeUYX2kReToKwMJxeCDaQAD4wb5BBQ0YDsOsp2MZViotWu9SI0X
-         WYaing/GdzvYBEdsc7YEhc1/eVjqn58Lq2HNaKlwDFLykzFGKRaBJifz1RKFCWORX67N
-         QqpxoNgr1sMlhz0EOwRyFVFgilPv7b58VK8xZ9L1w6ZREg/iO+rECdVjZ+SPYpk3mtv5
-         n5AWnXd9VZw9D/DC4Ps2r8qIYENdVpJpYlEEmCS8ymJK3QZlqa5Q0FD0/c2TZbobCLnq
-         GdGQ==
+        bh=VtlFvmaklvcZDGrLlSAgQhu+0H7bK0zCUEpwXYO6ZPg=;
+        b=D14l/wshUGZCLD3wWiZIT1JCNTY3aTqIyxCfKL/K3/xKFQ9erOkl9v3qtrxneBa5Aj
+         RD5YmRyHnCGWKeVe7R66GWndaA83nwR69amIWlSzzwPMtpY/CG0RHaMQPQibbjf3+aRl
+         P9ZexYmwx3SuVFl1qgnYiib52TykSz0S/OggqcAzcYEXv0EW5kwUZcOsoyhoevDv+EKA
+         qFNTlmOu4GOHodHSx/GJhj7eX8CEc6H4AK0F04VVwF8pUVk8HVvXbydSSCVBPu6qGyEb
+         JMDPne/YXTYckXWutVnMWbeU4ypJDfG38/syck4HZkHvvn005LL5LwGlf9hkP3qmNpNo
+         2i7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=w13vKkQO9QCP0aR5R9Nv4FOw9sZU+DjLBFqmX3t26s8=;
-        b=MOH3m24RNfaV5kV1l2GmP55KQrwVO8fEjxZQMYOl9HeKKw0vB7gNTsYNBa/u98/a3E
-         Y5fndepa/lvV4+KDQo9bT/DmZVvjpBwL1e4G1BHNiGLFz6N8FYaSBDLbOQI+Wz9o1VvJ
-         gVZAYdpSft2egTiHYtwhb/SmxL+USpuqIgd+P/FGOuiHydZ2vREOPwZ6R47JfS1Tj9mM
-         8ocIVTGI6jG6preGf3dBC5Ly4wuJ9WpPpTbqj8EBqU/ggFxr3P/E0TVi04MxRrlthOkb
-         drN+rLoIvzdsYT+qxfbTbMap4NPurKpitoCzeJha5jLqt70kxYqUqRh41msrF36vgpXp
-         U8Rg==
-X-Gm-Message-State: AOAM53262E8thwZePwzBvULTSoUdtLA50+KnXdhvGtB+WJckwt0WRg9h
-        KYpsqxm99y2oB0Ylnjosw3tfBg==
-X-Google-Smtp-Source: ABdhPJxMYQCCb1zJfnzSpLJeB756gwkPBF5cUE4tVCqByyJoHNiQ65qHwLsKgJXa31l+PERlBN+Reg==
-X-Received: by 2002:a17:902:9307:b029:d9:d097:fd6c with SMTP id bc7-20020a1709029307b02900d9d097fd6cmr302473plb.10.1606949576165;
-        Wed, 02 Dec 2020 14:52:56 -0800 (PST)
-Received: from google.com (154.137.233.35.bc.googleusercontent.com. [35.233.137.154])
-        by smtp.gmail.com with ESMTPSA id z22sm119458pfn.153.2020.12.02.14.52.55
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=VtlFvmaklvcZDGrLlSAgQhu+0H7bK0zCUEpwXYO6ZPg=;
+        b=DMh/GVxaSBa6XieWsW1nXsJGTPuIA6HpRITQZ4YUb7uYZnOTB2lugKTOfFB42BqFt0
+         DODoqkZts1h9nlFl7dzH4oPuCoLj/3rRL00OgHNtOcliaWwkKydD7gQ6QyPQcfqVuf0k
+         rLbTtV2EJ/eGBGstwgc05ce0ct2honwY9KgO07wXLt1xsCyoKGxPI1MhgchjT1aV662M
+         SCwETbdcCqL/NuWT0gc7P22Y3lae/FeWkH9zCWaR4aWzeY0pqIoy/6cZjOdXY3Arzu/h
+         u1Dkg7oVqBl7lBUoougVX09NsbZEXhciCwbKRqyIO7w0/ICv/Smbba/xSmTWl9wXpHLC
+         VfNA==
+X-Gm-Message-State: AOAM5336Gzakzv1yVQ+EAcY51Zb5fUYRB3WxwuAwkdkIjCGPzn5jnsMw
+        a7aa2surTnp/flQQCR9iAsU=
+X-Google-Smtp-Source: ABdhPJzxbVxALs+v4IXK2QlV8LBTGqeZrxGS7JYABGudWsaxBMX2uEOJyie3dRa7pXdUAfhwcyfqDw==
+X-Received: by 2002:a37:8c06:: with SMTP id o6mr63663qkd.382.1606949714715;
+        Wed, 02 Dec 2020 14:55:14 -0800 (PST)
+Received: from localhost ([2620:10d:c091:480::1:ec0f])
+        by smtp.gmail.com with ESMTPSA id r14sm452404qte.27.2020.12.02.14.55.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Dec 2020 14:52:55 -0800 (PST)
-Date:   Wed, 2 Dec 2020 22:52:51 +0000
-From:   Satya Tangirala <satyat@google.com>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     "Theodore Y . Ts'o" <tytso@mit.edu>,
-        Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        linux-kernel@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-xfs@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-ext4@vger.kernel.org
-Subject: Re: [PATCH v7 1/8] block: ensure bios are not split in middle of
- crypto data unit
-Message-ID: <X8gaw4ouQQFd9unN@google.com>
-References: <20201117140708.1068688-1-satyat@google.com>
- <20201117140708.1068688-2-satyat@google.com>
- <X7RdS2cINwFkl/MN@sol.localdomain>
- <20201118003815.GA1155188@google.com>
- <X77W05O8Pl8t0gPi@sol.localdomain>
+        Wed, 02 Dec 2020 14:55:13 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Wed, 2 Dec 2020 17:54:45 -0500
+From:   Tejun Heo <tj@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Coly Li <colyli@suse.de>,
+        Song Liu <song@kernel.org>, dm-devel@redhat.com,
+        linux-bcache@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH 3/9] block: store a block_device pointer in struct bio
+Message-ID: <X8gbNeczmbhF8ZEW@mtj.duckdns.org>
+References: <20201201165424.2030647-1-hch@lst.de>
+ <20201201165424.2030647-4-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <X77W05O8Pl8t0gPi@sol.localdomain>
+In-Reply-To: <20201201165424.2030647-4-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 25, 2020 at 02:12:35PM -0800, Eric Biggers wrote:
-> On Wed, Nov 18, 2020 at 12:38:15AM +0000, Satya Tangirala wrote:
-> > > > +/**
-> > > > + * update_aligned_sectors_and_segs() - Ensures that *@aligned_sectors is aligned
-> > > > + *				       to @bio_sectors_alignment, and that
-> > > > + *				       *@aligned_segs is the value of nsegs
-> > > > + *				       when sectors reached/first exceeded that
-> > > > + *				       value of *@aligned_sectors.
-> > > > + *
-> > > > + * @nsegs: [in] The current number of segs
-> > > > + * @sectors: [in] The current number of sectors
-> > > > + * @aligned_segs: [in,out] The number of segments that make up @aligned_sectors
-> > > > + * @aligned_sectors: [in,out] The largest number of sectors <= @sectors that is
-> > > > + *		     aligned to @sectors
-> > > > + * @bio_sectors_alignment: [in] The alignment requirement for the number of
-> > > > + *			  sectors
-> > > > + *
-> > > > + * Updates *@aligned_sectors to the largest number <= @sectors that is also a
-> > > > + * multiple of @bio_sectors_alignment. This is done by updating *@aligned_sectors
-> > > > + * whenever @sectors is at least @bio_sectors_alignment more than
-> > > > + * *@aligned_sectors, since that means we can increment *@aligned_sectors while
-> > > > + * still keeping it aligned to @bio_sectors_alignment and also keeping it <=
-> > > > + * @sectors. *@aligned_segs is updated to the value of nsegs when @sectors first
-> > > > + * reaches/exceeds any value that causes *@aligned_sectors to be updated.
-> > > > + */
-> > > > +static inline void update_aligned_sectors_and_segs(const unsigned int nsegs,
-> > > > +						   const unsigned int sectors,
-> > > > +						   unsigned int *aligned_segs,
-> > > > +				unsigned int *aligned_sectors,
-> > > > +				const unsigned int bio_sectors_alignment)
-> > > > +{
-> > > > +	if (sectors - *aligned_sectors < bio_sectors_alignment)
-> > > > +		return;
-> > > > +	*aligned_sectors = round_down(sectors, bio_sectors_alignment);
-> > > > +	*aligned_segs = nsegs;
-> > > > +}
-> > > > +
-> > > >  /**
-> > > >   * bvec_split_segs - verify whether or not a bvec should be split in the middle
-> > > >   * @q:        [in] request queue associated with the bio associated with @bv
-> > > > @@ -195,9 +232,12 @@ static inline unsigned get_max_segment_size(const struct request_queue *q,
-> > > >   * the block driver.
-> > > >   */
-> > > >  static bool bvec_split_segs(const struct request_queue *q,
-> > > > -			    const struct bio_vec *bv, unsigned *nsegs,
-> > > > -			    unsigned *sectors, unsigned max_segs,
-> > > > -			    unsigned max_sectors)
-> > > > +			    const struct bio_vec *bv, unsigned int *nsegs,
-> > > > +			    unsigned int *sectors, unsigned int *aligned_segs,
-> > > > +			    unsigned int *aligned_sectors,
-> > > > +			    unsigned int bio_sectors_alignment,
-> > > > +			    unsigned int max_segs,
-> > > > +			    unsigned int max_sectors)
-> > > >  {
-> > > >  	unsigned max_len = (min(max_sectors, UINT_MAX >> 9) - *sectors) << 9;
-> > > >  	unsigned len = min(bv->bv_len, max_len);
-> > > > @@ -211,6 +251,11 @@ static bool bvec_split_segs(const struct request_queue *q,
-> > > >  
-> > > >  		(*nsegs)++;
-> > > >  		total_len += seg_size;
-> > > > +		update_aligned_sectors_and_segs(*nsegs,
-> > > > +						*sectors + (total_len >> 9),
-> > > > +						aligned_segs,
-> > > > +						aligned_sectors,
-> > > > +						bio_sectors_alignment);
-> > > >  		len -= seg_size;
-> > > >  
-> > > >  		if ((bv->bv_offset + total_len) & queue_virt_boundary(q))
-> > > > @@ -235,6 +280,8 @@ static bool bvec_split_segs(const struct request_queue *q,
-> > > >   * following is guaranteed for the cloned bio:
-> > > >   * - That it has at most get_max_io_size(@q, @bio) sectors.
-> > > >   * - That it has at most queue_max_segments(@q) segments.
-> > > > + * - That the number of sectors in the returned bio is aligned to
-> > > > + *   blk_crypto_bio_sectors_alignment(@bio)
-> > > >   *
-> > > >   * Except for discard requests the cloned bio will point at the bi_io_vec of
-> > > >   * the original bio. It is the responsibility of the caller to ensure that the
-> > > > @@ -252,6 +299,9 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
-> > > >  	unsigned nsegs = 0, sectors = 0;
-> > > >  	const unsigned max_sectors = get_max_io_size(q, bio);
-> > > >  	const unsigned max_segs = queue_max_segments(q);
-> > > > +	const unsigned int bio_sectors_alignment =
-> > > > +					blk_crypto_bio_sectors_alignment(bio);
-> > > > +	unsigned int aligned_segs = 0, aligned_sectors = 0;
-> > > >  
-> > > >  	bio_for_each_bvec(bv, bio, iter) {
-> > > >  		/*
-> > > > @@ -266,8 +316,14 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
-> > > >  		    bv.bv_offset + bv.bv_len <= PAGE_SIZE) {
-> > > >  			nsegs++;
-> > > >  			sectors += bv.bv_len >> 9;
-> > > > -		} else if (bvec_split_segs(q, &bv, &nsegs, &sectors, max_segs,
-> > > > -					 max_sectors)) {
-> > > > +			update_aligned_sectors_and_segs(nsegs, sectors,
-> > > > +							&aligned_segs,
-> > > > +							&aligned_sectors,
-> > > > +							bio_sectors_alignment);
-> > > > +		} else if (bvec_split_segs(q, &bv, &nsegs, &sectors,
-> > > > +					   &aligned_segs, &aligned_sectors,
-> > > > +					   bio_sectors_alignment, max_segs,
-> > > > +					   max_sectors)) {
-> > > >  			goto split;
-> > > >  		}
-> > > >  
-> > > > @@ -275,11 +331,24 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
-> > > >  		bvprvp = &bvprv;
-> > > >  	}
-> > > >  
-> > > > +	/*
-> > > > +	 * The input bio's number of sectors is assumed to be aligned to
-> > > > +	 * bio_sectors_alignment. If that's the case, then this function should
-> > > > +	 * ensure that aligned_segs == nsegs and aligned_sectors == sectors if
-> > > > +	 * the bio is not going to be split.
-> > > > +	 */
-> > > > +	WARN_ON(aligned_segs != nsegs || aligned_sectors != sectors);
-> > > >  	*segs = nsegs;
-> > > >  	return NULL;
-> > > >  split:
-> > > > -	*segs = nsegs;
-> > > > -	return bio_split(bio, sectors, GFP_NOIO, bs);
-> > > > +	*segs = aligned_segs;
-> > > > +	if (WARN_ON(aligned_sectors == 0))
-> > > > +		goto err;
-> > > > +	return bio_split(bio, aligned_sectors, GFP_NOIO, bs);
-> > > > +err:
-> > > > +	bio->bi_status = BLK_STS_IOERR;
-> > > > +	bio_endio(bio);
-> > > > +	return bio;
-> > > >  }
-> > > 
-> > > This part is pretty complex.  Are you sure it's needed?  How was alignment to
-> > > logical_block_size ensured before?
-> > > 
-> > Afaict, alignment to logical_block_size (lbs) is done by assuming that
-> > bv->bv_len is always lbs aligned (among other things). Is that not the
-> > case?
+On Tue, Dec 01, 2020 at 05:54:18PM +0100, Christoph Hellwig wrote:
+> Replace the gendisk pointer in struct bio with a pointer to the newly
+> improved struct block device.  From that the gendisk can be trivially
+> accessed with an extra indirection, but it also allows to directly
+> look up all information related to partition remapping.
 > 
-> I believe that's the case; bvecs are logical_block_size aligned.
-> 
-> So the new thing (with data_unit_size > logical_block_size) is that
-> bvec boundaries aren't necessarily valid split points anymore.
-> 
-> > 
-> > If it is the case, that's what we're trying to avoid with this patch (we
-> > want to be able to submit bios that have 2 bvecs that together make up a
-> > single crypto data unit, for example). And this is complex because
-> > multiple segments could "add up" to make up a single crypto data unit,
-> > but this function's job is to limit both the number of segments *and*
-> > the number of sectors - so when ensuring that the number of sectors is
-> > aligned to crypto data unit size, we also want the smallest number of
-> > segments that can make up that aligned number of sectors.
-> 
-> Does the number of physical segments that is calculated have to be exact, or
-> could it be a slight overestimate?  If the purpose of the calculation is just to
-> size scatterlists and to avoid exceeding the hardware limit on the number of
-> physical segments (and at a quick glance that seems to be the purpose, though I
-> didn't look at everything), it seems that a slight overestimate would be okay.
-> 
-> If so, couldn't the number of sectors could simply be rounded down to
-> blk_crypto_bio_sectors_alignment(bio) when blk_bio_segment_split() actually
-> calls bio_split()?  That would be much simpler; why doesn't that work?
-> 
-I was assuming we'd prefer the better bound, but yeah it would be much
-simpler if an overestimate was alright.
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-I'll look through the users of that estimate to try to gauge better
-whether overestimating is ok to do (although if someone can already
-authoritatively say that it's ok/not ok to overestimate, that would be
-awesome too :)).
-> - Eric
+Acked-by: Tejun Heo <tj@kernel.org>
+
+Thanks.
+
+-- 
+tejun
