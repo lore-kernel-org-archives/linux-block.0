@@ -2,189 +2,69 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82F94C64E7C
-	for <linux-block@archiver.kernel.org>; Wed,  2 Dec 2020 07:28:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73DA5C83012
+	for <linux-block@archiver.kernel.org>; Wed,  2 Dec 2020 08:02:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1EF4D22206
-	for <linux-block@archiver.kernel.org>; Wed,  2 Dec 2020 07:28:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3A4C620872
+	for <linux-block@archiver.kernel.org>; Wed,  2 Dec 2020 08:02:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727473AbgLBH2E (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Dec 2020 02:28:04 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:38080 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727692AbgLBH2E (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 2 Dec 2020 02:28:04 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1606893997;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=PwCPU60DXflfS942FUkd7UeqYbp/zoV7x3lzYrQBE8E=;
-        b=Gi/+JauavGlTaJa1mrcCNx60GvkpeAun2RzuEh5sZgwKge6rMEtABWw5CakrG6wSBR404j
-        O7D5EZesbUCzXeTsc8rzW93uCtUgaUaZm45WB7D8nLZ5suxlvnw+4buYXuMShHP58f1O2y
-        Wz43Vf9sP+AkRn28xZFbevLSVpqLnGw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-428-n_E3LvS5MUCTP-CRA5gvdQ-1; Wed, 02 Dec 2020 02:26:33 -0500
-X-MC-Unique: n_E3LvS5MUCTP-CRA5gvdQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B0A61100ED07;
-        Wed,  2 Dec 2020 07:26:31 +0000 (UTC)
-Received: from T590 (ovpn-13-72.pek2.redhat.com [10.72.13.72])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A952C60BFA;
-        Wed,  2 Dec 2020 07:26:23 +0000 (UTC)
-Date:   Wed, 2 Dec 2020 15:26:19 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     "chenxiang (M)" <chenxiang66@hisilicon.com>
-Cc:     John Garry <john.garry@huawei.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Sumit Saxena <sumit.saxena@broadcom.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Ewan Milne <emilne@redhat.com>, Long Li <longli@microsoft.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>
-Subject: Re: [bug report] Hang on sync after dd
-Message-ID: <20201202072619.GA511454@T590>
-References: <2847d0e1-ccb1-7be6-2456-274e41ea981b@huawei.com>
- <20201201123407.GA487145@T590>
- <f30358a5-c930-3363-86fc-9e21639d0874@hisilicon.com>
- <20201202032237.GC494805@T590>
- <8cb5cd8e-5a48-dc36-879c-37950e6228c8@hisilicon.com>
+        id S1728881AbgLBICp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Dec 2020 03:02:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39222 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726148AbgLBICp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Dec 2020 03:02:45 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F19E4C0613D6;
+        Wed,  2 Dec 2020 00:02:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=JxHJ+R1ANKJAKDX7Q5cnIeQ+a5TaYs4+Cc88jWe2k9s=; b=c9k1aD0OLPfTXdBQrxt57cNjL8
+        JdCu7Oxex7K9BuyIUI/4kk7GDWSCe8Lriqi4P19KJSVnhFfCrP2qHPaWw69iV/tmZSFa9z3pZW329
+        qh2KwxIkmmU4x39LQtGX80mIcOOXdW4WQOb4dVV/29GPlKe07V3haC/oQICikBouhvVJSZPFPVmpr
+        1HPS2lk8ZakzkOYtMcTmJha6DBZHhV2qqUqBLhIuHhl00m1UqWI2q79i3LHgwlx6eS05khe100BfI
+        2K5QvaqjPWbv6YzPY2lUaazyy3CnASkyyoi5vBzS0b4wCjPUzIGRP5Eezixo3aYJMXrcxZc8kDM6r
+        r5mI/lXA==;
+Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kkN5M-0004AZ-RV; Wed, 02 Dec 2020 08:02:00 +0000
+Date:   Wed, 2 Dec 2020 08:02:00 +0000
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, Johannes Weiner <hannes@cmpxchg.org>
+Subject: Re: [PATCH] block: add bio_iov_iter_nvecs for figuring out nr_vecs
+Message-ID: <20201202080200.GA15726@infradead.org>
+References: <20201201120652.487077-1-ming.lei@redhat.com>
+ <20201201125251.GA11935@casper.infradead.org>
+ <20201201125936.GA25111@infradead.org>
+ <fdbfe981-0251-9641-6ed8-db034c0f0148@gmail.com>
+ <20201201133226.GA26472@infradead.org>
+ <6cbce034-b8c9-35d5-e805-f5ed0c169e2a@gmail.com>
+ <20201201134542.GA2888@infradead.org>
+ <20201202021021.GB494805@T590>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <8cb5cd8e-5a48-dc36-879c-37950e6228c8@hisilicon.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <20201202021021.GB494805@T590>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Dec 02, 2020 at 02:22:10PM +0800, chenxiang (M) wrote:
+On Wed, Dec 02, 2020 at 10:10:21AM +0800, Ming Lei wrote:
+> > Yes, this will need a careful audit, I'm not too sure offhand.  For the
+> > io_uring case which is sortof the fast path the caller won't free them
+> > unless we allow the buffer unregistration to race with I/O.
 > 
-> 
-> 在 2020/12/2 11:22, Ming Lei 写道:
-> > On Wed, Dec 02, 2020 at 09:44:48AM +0800, chenxiang (M) wrote:
-> > > 
-> > > 在 2020/12/1 20:34, Ming Lei 写道:
-> > > > On Mon, Nov 30, 2020 at 11:22:33AM +0000, John Garry wrote:
-> > > > > Hi all,
-> > > > > 
-> > > > > Some guys internally upgraded to v5.10-rcX and start to see a hang after dd
-> > > > > + sync for a large file:
-> > > > > - mount /dev/sda1 (ext4 filesystem) to directory /mnt;
-> > > > > - run "if=/dev/zero of=test1 bs=1M count=2000" on directory /mnt;
-> > > > > - run "sync"
-> > > > > 
-> > > > > and get:
-> > > > > 
-> > > > > [  367.912761] INFO: task jbd2/sdb1-8:3602 blocked for more than 120
-> > > > > seconds.
-> > > > > [  367.919618]       Not tainted 5.10.0-rc1-109488-g32ded76956b6 #948
-> > > > > [  367.925776] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
-> > > > > disables this message.
-> > > > > [  367.933579] task:jbd2/sdb1-8     state:D stack:    0 pid: 3602
-> > > > > ppid:     2 flags:0x00000028
-> > > > > [  367.941901] Call trace:
-> > > > > [  367.944351] __switch_to+0xb8/0x168
-> > > > > [  367.947840] __schedule+0x30c/0x670
-> > > > > [  367.951326] schedule+0x70/0x108
-> > > > > [  367.954550] io_schedule+0x1c/0xe8
-> > > > > [  367.957948] bit_wait_io+0x18/0x68
-> > > > > [  367.961346] __wait_on_bit+0x78/0xf0
-> > > > > [  367.964919] out_of_line_wait_on_bit+0x8c/0xb0
-> > > > > [  367.969356] __wait_on_buffer+0x30/0x40
-> > > > > [  367.973188] jbd2_journal_commit_transaction+0x1370/0x1958
-> > > > > [  367.978661] kjournald2+0xcc/0x260
-> > > > > [  367.982061] kthread+0x150/0x158
-> > > > > [  367.985288] ret_from_fork+0x10/0x34
-> > > > > [  367.988860] INFO: task sync:3823 blocked for more than 120 seconds.
-> > > > > [  367.995102]       Not tainted 5.10.0-rc1-109488-g32ded76956b6 #948
-> > > > > [  368.001265] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
-> > > > > disables this message.
-> > > > > [  368.009067] task:sync            state:D stack:    0 pid: 3823 ppid:
-> > > > > 3450 flags:0x00000009
-> > > > > [  368.017397] Call trace:
-> > > > > [  368.019841] __switch_to+0xb8/0x168
-> > > > > [  368.023320] __schedule+0x30c/0x670
-> > > > > [  368.026804] schedule+0x70/0x108
-> > > > > [  368.030025] jbd2_log_wait_commit+0xbc/0x158
-> > > > > [  368.034290] ext4_sync_fs+0x188/0x1c8
-> > > > > [  368.037947] sync_fs_one_sb+0x30/0x40
-> > > > > [  368.041606] iterate_supers+0x9c/0x138
-> > > > > [  368.045350] ksys_sync+0x64/0xc0
-> > > > > [  368.048569] __arm64_sys_sync+0x10/0x20
-> > > > > [  368.052398] el0_svc_common.constprop.3+0x68/0x170
-> > > > > [  368.057177] do_el0_svc+0x24/0x90
-> > > > > [  368.060482] el0_sync_handler+0x118/0x168
-> > > > > [  368.064478]  el0_sync+0x158/0x180
-> > > > > 
-> > > > > The issue was reported here originally:
-> > > > > https://lore.kernel.org/linux-ext4/4d18326e-9ca2-d0cb-7cb8-cb56981280da@hisilicon.com/
-> > > > > 
-> > > > > But it looks like issue related to recent work for SCSI MQ.
-> > > > > 
-> > > > > They can only create with hisi_sas v3 hw. I could not create with megaraid
-> > > > > sas on the same dev platform or hisi_sas on a similar dev board.
-> > > > > 
-> > > > > Reverting "scsi: core: Only re-run queue in scsi_end_request() if device
-> > > > > queue is busy" seems solve the issue. Also, checking out to patch prior to
-> > > > > "scsi: hisi_sas: Switch v3 hw to MQ" seems to not have the issue.
-> > > > If the issue can be reproduced, you may try the following patch:
-> > > I tried the change, and the issue is still.
-> > > We find that the number of completed IO is less than dispatched, but from
-> > > sysfs of block device (such as /sys/devices/pci0000:74/0000:74:02.0/host0/port-0:0/end_device-0:0/target0:0:0/0:0:0:0/block/sda/sda1/inflight),
-> > > 
-> > > the number of inflight is 0.
-> > Hello chenxiang,
-> > 
-> > Can you collect the debugfs log via the following commands after the io
-> > hang is triggered?
-> > 
-> > 1) debugfs log:
-> > 
-> >          (cd /sys/kernel/debug/block/sda && find . -type f -exec grep -aH . {} \;)
-> > 
-> > 2) scsi sysfs info:
-> > 
-> >          (cd /sys/block/sda/device && find . -type f -exec grep -aH . {} \;)
-> > 
-> > Suppose the disk is /dev/sda.
-> 
-> The issue occurs on /dev/sdb1, and those logs are as follows (please notice
-> that i add the change you provide):
+> Loop's aio usage is fine, just found fd_execute_rw_aio() isn't good.
 
-Hello chenxiang,
-
-Please try the following patch:
-
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 60c7a7d74852..03c6d0620bfd 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -1703,8 +1703,7 @@ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
- 		break;
- 	case BLK_STS_RESOURCE:
- 	case BLK_STS_ZONE_RESOURCE:
--		if (atomic_read(&sdev->device_busy) ||
--		    scsi_device_blocked(sdev))
-+		if (scsi_device_blocked(sdev))
- 			ret = BLK_STS_DEV_RESOURCE;
- 		break;
- 	default:
-
-
-Thanks,
-Ming
-
+Yes.  But that one is trivial to fix.
