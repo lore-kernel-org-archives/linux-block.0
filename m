@@ -2,69 +2,67 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-14.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46DB0C64E7B
-	for <linux-block@archiver.kernel.org>; Wed,  2 Dec 2020 13:54:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08675C83017
+	for <linux-block@archiver.kernel.org>; Wed,  2 Dec 2020 14:10:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D672B21D7A
-	for <linux-block@archiver.kernel.org>; Wed,  2 Dec 2020 13:54:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B1E83221EB
+	for <linux-block@archiver.kernel.org>; Wed,  2 Dec 2020 14:10:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727787AbgLBNyQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Dec 2020 08:54:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37128 "EHLO
+        id S1726734AbgLBOKj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Dec 2020 09:10:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39686 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727407AbgLBNyP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Dec 2020 08:54:15 -0500
-Received: from mail-wm1-x343.google.com (mail-wm1-x343.google.com [IPv6:2a00:1450:4864:20::343])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08197C0613D4
-        for <linux-block@vger.kernel.org>; Wed,  2 Dec 2020 05:53:35 -0800 (PST)
-Received: by mail-wm1-x343.google.com with SMTP id a3so8187726wmb.5
-        for <linux-block@vger.kernel.org>; Wed, 02 Dec 2020 05:53:34 -0800 (PST)
+        with ESMTP id S1726249AbgLBOKi (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Dec 2020 09:10:38 -0500
+Received: from mail-wm1-x342.google.com (mail-wm1-x342.google.com [IPv6:2a00:1450:4864:20::342])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25664C0613CF;
+        Wed,  2 Dec 2020 06:09:58 -0800 (PST)
+Received: by mail-wm1-x342.google.com with SMTP id x22so7459003wmc.5;
+        Wed, 02 Dec 2020 06:09:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=subject:from:to:cc:references:autocrypt:message-id:date:user-agent
+        h=to:cc:references:from:autocrypt:subject:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=8amRbSLEK07eBFPJ+bfAAHYTpk08fkuCAFnTAgu16AM=;
-        b=nFf5H4h161DrciTk+m1NAcbgLpZGmMEF0K1MwG4vHnguFj7l6ly6gRkj05MqrZIw8Q
-         u2QwRKxVjTIsvJtuFpNPEx0nv0Z5nVzfU06Lv0Gg3+YBLqvNdJuN7o0fv4iUWigyTq8c
-         ivmpWSfekKghqVC09FoDaXb9CnOy+LpYpdnYyVUgaXHmHdwU1jqXeONR16KMiXJTvtnk
-         mYLO2v7TXVTu/VRR8VBx34Og5xSfUFi60/kLrDz5T7T+ediX2ugwm38tF1vCXmYpNk0P
-         nFtQKURNT4aUo94eW4lLln0R6yT1XE0X/HJzvZJ2inVMkA3tRypKo4josa97wIsOwIL9
-         7C5w==
+        bh=NDiO2ZUtXk3y3/a6Dk/0pOzEdTkPQOGZm1WNp3qLocc=;
+        b=YreIDD28QdYwmPJgkQ544U3rmm23mOKeHhddTPJTgky/pRfxwfdxpesQrIcooQmtnE
+         /vYsQ8diHWpaZXce8zI7nnj2srjNZDZfIT8ZL2f9AYR9zbjnmPkElX3cc8bLVd0Y8PPj
+         v7cUGt8hQwUSHr6PUFgmoSjUd4hirCt3m14luvw3Xu3Z3LJ0W518QjWJk1E+wcZ9MQaD
+         bN02SYT3BHB2ajuLH567Fxaa7Pb+PPav9fTKAYpY5VMW1YUd+ZYwHEeNnoc3hQIE4d96
+         y0pA7i0rrbYGbVGpKIuNjHvnCEh+F7RGu6VNnp7G43Xk63bJTZqUM3iEu46y6MGr7Uqh
+         zN5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:from:to:cc:references:autocrypt
+        h=x-gm-message-state:to:cc:references:from:autocrypt:subject
          :message-id:date:user-agent:mime-version:in-reply-to
          :content-language:content-transfer-encoding;
-        bh=8amRbSLEK07eBFPJ+bfAAHYTpk08fkuCAFnTAgu16AM=;
-        b=SHbSKY+qBZn/ctuMISXMEMMH1f5uHRfhREKgPiD2FNG0tthHhQQZjJWG00v8TKgC1Q
-         ykpMlT29xWHVSvnPERgC938llkIGS0jH7P5dNKmiXaPYBxXRUTa0K/GFNbEtWfduFHQu
-         o5Pv0iVuKgl8o/889dT0qJRLYYLE8TAqzBu84XuJruh3AvLZOedmaZ+wD5nKWSpiMmpD
-         yoA7wQd6YI9z9A6zpjUJpqOl/JrdgFZxUMVr5b/iB6pw95Un0+an1+OZ/WVBusGnh5fq
-         oayweNXz1iBMGuLH9beWptxIGhK+nCRYH4TvbjVGpKpU0xKyTIsgdljNtjdtwk/SlFGZ
-         g0/w==
-X-Gm-Message-State: AOAM530n/eXGjsamcTRFxL3105cu4wIMgKQi5ef8uLV5mhlSW8yizSse
-        9uKhuKKR1Zvs6qRMbXGiCM0=
-X-Google-Smtp-Source: ABdhPJwj6zhHQcwT7yZEPmJXqSDIK7RmpT0sl4uq/D1+w7nqEYH6cTxBNR/rx1ltkAZOPmTLqf9D8A==
-X-Received: by 2002:a05:600c:220b:: with SMTP id z11mr3311448wml.64.1606917213795;
-        Wed, 02 Dec 2020 05:53:33 -0800 (PST)
-Received: from [192.168.1.144] (host109-152-100-189.range109-152.btcentralplus.com. [109.152.100.189])
-        by smtp.gmail.com with ESMTPSA id 90sm2342513wrl.60.2020.12.02.05.53.33
+        bh=NDiO2ZUtXk3y3/a6Dk/0pOzEdTkPQOGZm1WNp3qLocc=;
+        b=U8ovvquHQQlfodFSww9lu/P06vVt1IusWTc1UeImFuSCXL9Ve+IvdD6QKz3j6pmzMO
+         DbsM8c/nYVDvW8xR3y8j6od6B8nUv9z5UDIv0nioT+WnPkhb2I2Ab9UbTUybrke1TlOP
+         zpdkr6vm+x1Pg9HVUtAcp85sfUZRX8BNAYCtuy57hF8r4qnDsKyqXPVpkK9QLGMwc7fv
+         irffloI+Ah+foHKkzdKhFeKhv7KvwNE453gkDWIDimOIvdjwmOcGI1CVLMloPi+KOUo8
+         ecTRPr9++erjfGPweAYgo9cThLVtrbtLIQsohq0KLUJDJ1Ky3tK1T//aGl0E4Um7L5BZ
+         Nhnw==
+X-Gm-Message-State: AOAM533w255Yvd0PdxYUPdiAPJCSNR1rWkv9Cja6UEFPDN5BzzLX3daa
+        LOSX2UA4bfv6o2jLqanHEQeioLPCfWzwLg==
+X-Google-Smtp-Source: ABdhPJws28PAvhwclNWWMrwh2quCqPyOo0q9PjW5ftfckEouDFUuMGoM3IDw1eTVtpIrp6NF4eGOGQ==
+X-Received: by 2002:a1c:a749:: with SMTP id q70mr3316690wme.120.1606918196622;
+        Wed, 02 Dec 2020 06:09:56 -0800 (PST)
+Received: from [192.168.1.144] (host109-152-100-135.range109-152.btcentralplus.com. [109.152.100.135])
+        by smtp.gmail.com with ESMTPSA id p4sm2279888wrm.51.2020.12.02.06.09.55
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 02 Dec 2020 05:53:33 -0800 (PST)
-Subject: Re: [PATCH 2/2] bio: optimise bvec iteration
+        Wed, 02 Dec 2020 06:09:55 -0800 (PST)
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Matthew Wilcox <willy@infradead.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        linux-fsdevel@vger.kernel.org
+References: <20201201120652.487077-1-ming.lei@redhat.com>
 From:   Pavel Begunkov <asml.silence@gmail.com>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Ming Lei <ming.lei@redhat.com>
-References: <cover.1606240077.git.asml.silence@gmail.com>
- <e1acd31d91a1e9501a5420d6ac1488a4412a0353.1606240077.git.asml.silence@gmail.com>
- <20201126100227.GB949@infradead.org>
- <fac832fe-45a2-5630-55a2-3684e434f998@gmail.com>
 Autocrypt: addr=asml.silence@gmail.com; prefer-encrypt=mutual; keydata=
  mQINBFmKBOQBEAC76ZFxLAKpDw0bKQ8CEiYJRGn8MHTUhURL02/7n1t0HkKQx2K1fCXClbps
  bdwSHrhOWdW61pmfMbDYbTj6ZvGRvhoLWfGkzujB2wjNcbNTXIoOzJEGISHaPf6E2IQx1ik9
@@ -108,50 +106,79 @@ Autocrypt: addr=asml.silence@gmail.com; prefer-encrypt=mutual; keydata=
  UVMKkOCdFhutRmYp0mbv2e87IK4erwNHQRkHUkzbsuym8RVpAZbLzLPIYK/J3RTErL6Z99N2
  m3J6pjwSJY/zNwuFPs9zGEnRO4g0BUbwGdbuvDzaq6/3OJLKohr5eLXNU3JkT+3HezydWm3W
  OPhauth7W0db74Qd49HXK0xe/aPrK+Cp+kU1HRactyNtF8jZQbhMCC8vMGukZtWaAwpjWiiH bA==
-Message-ID: <521781a4-fb18-e9bd-76ae-8cd3a46680ec@gmail.com>
-Date:   Wed, 2 Dec 2020 13:50:19 +0000
+Subject: Re: [PATCH] block: add bio_iov_iter_nvecs for figuring out nr_vecs
+Message-ID: <71e6e2d6-fc9a-cb4a-f547-9693410dff59@gmail.com>
+Date:   Wed, 2 Dec 2020 14:06:41 +0000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.0
 MIME-Version: 1.0
-In-Reply-To: <fac832fe-45a2-5630-55a2-3684e434f998@gmail.com>
+In-Reply-To: <20201201120652.487077-1-ming.lei@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 26/11/2020 12:32, Pavel Begunkov wrote:
-> On 26/11/2020 10:02, Christoph Hellwig wrote:
->> On Tue, Nov 24, 2020 at 05:58:13PM +0000, Pavel Begunkov wrote:
->>> __bio_for_each_bvec(), __bio_for_each_segment() and bio_copy_data_iter()
->>> fall under conditions of bvec_iter_advance_single(), which is a faster
->>> and slimmer version of bvec_iter_advance(). Add
->>> bio_advance_iter_single() and convert them.
->>
->> Are you sure about bio_advance_iter()?  That API looks like it might
+On 01/12/2020 12:06, Ming Lei wrote:
+> Pavel reported that iov_iter_npages is a bit heavy in case of bvec
+> iter.
 > 
-> Both those listed bio_for_each*() pass bvl.bv_len, which is truncated to
-> current segment by bio_iter_iovec() (i.e. bvec_iter_bvec) or
-> mp_bvec_iter_bvec().
+> Turns out it isn't necessary to iterate every page in the bvec iter,
+> and we call iov_iter_npages() just for figuring out how many bio
+> vecs need to be allocated. And we can simply map each vector in bvec iter
+> to bio's vec, so just return iter->nr_segs from bio_iov_iter_nvecs() for
+> bvec iter.
+
+Looks good to me. Except for using BIO_MAX_PAGES for number of vecs, it's
+even cleaner because it adds pages constrained by number of vecs, not pages,
+with all side effects like skipping __blkdev_direct_IO_simple() for many
+page 1-segment bvecs.
+
+One nit below.
+
+Reviewed-by: Pavel Begunkov <asml.silence@gmail.com>
+
 > 
-> And just to note that I didn't change bio_advance_iter() but added a
-> new function.
-
-> There is always space for stupid mistakes, but I'm sure. What makes you
-> to think opposite? I may have missed it.
-
-Christoph, any doubts left?
-
->> not always be limited to a single segment, and might at least need a
->> WARN_ON_ONCE to make sure it is not abused.
+> Also rename local variable 'nr_pages' as 'nr_vecs' which exactly matches its
+> real usage.
 > 
-> I thought twice about converting other places as you commented before,
-> and it looks saner to not do that exactly for that reason. I prefer
-> to leave *_single() versions for rare but high impact cases like
-> for_each()s.
-> And as it's contained I decided to not add overhead on WARN_ONCE(),
-> e.g. with inlining and w/o string dedup it grows .data section much.
+> This patch is based on Mathew's post:
+> 
+> https://lore.kernel.org/linux-block/20201120123931.GN29991@casper.infradead.org/
+> 
+> Cc: Matthew Wilcox <willy@infradead.org>
+> Cc: Pavel Begunkov <asml.silence@gmail.com>
+> Cc: Christoph Hellwig <hch@infradead.org>
+> Cc: linux-fsdevel@vger.kernel.org
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  fs/block_dev.c       | 30 +++++++++++++++---------------
+>  fs/iomap/direct-io.c | 14 +++++++-------
+>  include/linux/bio.h  | 10 ++++++++++
+>  3 files changed, 32 insertions(+), 22 deletions(-)
+> 
+[...]
+> diff --git a/include/linux/bio.h b/include/linux/bio.h
+> index ecf67108f091..b985857ce9d1 100644
+> --- a/include/linux/bio.h
+> +++ b/include/linux/bio.h
+> @@ -10,6 +10,7 @@
+[...]
+>  
+> +static inline int bio_iov_iter_nvecs(const struct iov_iter *i, int maxvecs)
+> +{
+> +	if (!iov_iter_count(i))
+> +		return 0;
+> +	if (iov_iter_is_bvec(i))
+> +               return min_t(int, maxvecs, i->nr_segs);
+
+spaces instead of tabs
+
+> +	return iov_iter_npages(i, maxvecs);
+> +}
+> +
+>  #endif /* __LINUX_BIO_H */
 > 
 
 -- 
