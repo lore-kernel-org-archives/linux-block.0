@@ -2,179 +2,89 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C4B4C4361A
-	for <linux-block@archiver.kernel.org>; Thu,  3 Dec 2020 19:10:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1DB7C4361B
+	for <linux-block@archiver.kernel.org>; Thu,  3 Dec 2020 19:46:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B57DC221E7
-	for <linux-block@archiver.kernel.org>; Thu,  3 Dec 2020 19:10:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5C154221F5
+	for <linux-block@archiver.kernel.org>; Thu,  3 Dec 2020 19:46:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729049AbgLCTKA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Dec 2020 14:10:00 -0500
-Received: from mail-1.ca.inter.net ([208.85.220.69]:60176 "EHLO
-        mail-1.ca.inter.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727374AbgLCTJ7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Dec 2020 14:09:59 -0500
-Received: from localhost (offload-3.ca.inter.net [208.85.220.70])
-        by mail-1.ca.inter.net (Postfix) with ESMTP id 48F7A2EA21C;
-        Thu,  3 Dec 2020 14:09:18 -0500 (EST)
-Received: from mail-1.ca.inter.net ([208.85.220.69])
-        by localhost (offload-3.ca.inter.net [208.85.220.70]) (amavisd-new, port 10024)
-        with ESMTP id vaotILf9rNDk; Thu,  3 Dec 2020 13:58:47 -0500 (EST)
-Received: from [192.168.48.23] (host-104-157-204-209.dyn.295.ca [104.157.204.209])
-        (using TLSv1 with cipher DHE-RSA-AES128-SHA (128/128 bits))
-        (No client certificate requested)
-        (Authenticated sender: dgilbert@interlog.com)
-        by mail-1.ca.inter.net (Postfix) with ESMTPSA id 8D6922EA01A;
-        Thu,  3 Dec 2020 14:09:17 -0500 (EST)
-Reply-To: dgilbert@interlog.com
-Subject: Re: [PATCH v2 3/4] scsi_debug : iouring iopoll support
-To:     Kashyap Desai <kashyap.desai@broadcom.com>,
-        linux-scsi@vger.kernel.org
-Cc:     linux-block@vger.kernel.org
-References: <20201203034100.29716-1-kashyap.desai@broadcom.com>
- <20201203034100.29716-4-kashyap.desai@broadcom.com>
-From:   Douglas Gilbert <dgilbert@interlog.com>
-Message-ID: <97ab044f-7426-6182-f3c3-cfd179637009@interlog.com>
-Date:   Thu, 3 Dec 2020 14:09:17 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1726635AbgLCTqR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Dec 2020 14:46:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32892 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725987AbgLCTqR (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Dec 2020 14:46:17 -0500
+Received: from mail-qv1-xf41.google.com (mail-qv1-xf41.google.com [IPv6:2607:f8b0:4864:20::f41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5048DC061A4E;
+        Thu,  3 Dec 2020 11:45:31 -0800 (PST)
+Received: by mail-qv1-xf41.google.com with SMTP id 62so1568186qva.11;
+        Thu, 03 Dec 2020 11:45:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=ehh149i/IiSP0EMQTmZOg7uX3bioxkynO8akD/sHgj8=;
+        b=CmLPn6KmoU33TvoLljS2Ptl8gE/IBx2ifRyDnnmlIwRxpmI7u1T6lTVKjq1utJfD9E
+         6hPkw1jh4Ej84puF3aKMpM85/NWTbOeNvr6EUu3jxlEY1LczoxoKnLRCxmy8JxPyqqZU
+         IwmtnN4H2xP2GyYViKR6FqMGeTB+pgnZlTbY/KFbpVe6e0TbkTpZBiENWy4uqUueKFbK
+         Kn3+wP17yizUe0J+ei6+zURASDsnjOtdQpXw01AVypmnWNEXLOL91RekN0AKEzwkCo5M
+         CiOJV34WipxPejam62iA3SowjGKd3VwiXItbYG/9xJUkyxvBKOLJxPH/anS9DGLWYk8O
+         ATCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=ehh149i/IiSP0EMQTmZOg7uX3bioxkynO8akD/sHgj8=;
+        b=q5avyALLJt4j/mNrr4SvIhiAUQbIAgnLzpQcRSyF4wKcN9xHyEHQp5d880CHjYx8lo
+         JKl0xgPcpLz+wq4PDANg41bna4b5/OKau1cU4raZ5acBVNz1L4NaNV490ZvyXgiCcyNh
+         /KIlu8zLjWPJPqFMQqtHzQPeJA+yiAwHu4PmnUSuGxyQwpzhNvTCilOv6kBnFfduaoi9
+         zeqQRQFFlkGpOlGKvr0qkuWZHvOHdprftDJmhO5Tvcv53/a5p3uAGxn/VJ+4xy0dRuES
+         bS0vfdbk2U6GRTr6LyHBFQLTVJM/njxtipSkXJ8kwdU7/Ddb/3luGDI7dtakwtfZcNzb
+         1qTQ==
+X-Gm-Message-State: AOAM532N2yxKhndICqp8pVVKg6c4RpuMWQcCawnmVhHYzaMkOLU+uy8E
+        AwMZJLcwEUC42qFapahx5kI=
+X-Google-Smtp-Source: ABdhPJyqNbQdpf8vfSyIW2twgYfE2j/5PIsFbMCutpC4UJ5dQcGXqBdFTLKHA+kJQ681qsA75i7wBg==
+X-Received: by 2002:a0c:aed4:: with SMTP id n20mr645079qvd.16.1607024730368;
+        Thu, 03 Dec 2020 11:45:30 -0800 (PST)
+Received: from localhost ([2620:10d:c091:480::1:6aeb])
+        by smtp.gmail.com with ESMTPSA id z81sm2152679qkb.116.2020.12.03.11.45.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Dec 2020 11:45:29 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Thu, 3 Dec 2020 14:45:02 -0500
+From:   Tejun Heo <tj@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-s390@vger.kernel.org, Damien Le Moal <damien.lemoal@wdc.com>,
+        Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH 1/5] block: remove the unused block_sleeprq tracepoint
+Message-ID: <X8lAPgNyC8Aldfrn@mtj.duckdns.org>
+References: <20201203162139.2110977-1-hch@lst.de>
+ <20201203162139.2110977-2-hch@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <20201203034100.29716-4-kashyap.desai@broadcom.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-CA
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201203162139.2110977-2-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-See my comment further down.
-
-On 2020-12-02 10:40 p.m., Kashyap Desai wrote:
-> Add support of iouring iopoll interface in scsi_debug.
-> This feature requires shared hosttag support in kernel and driver.
+On Thu, Dec 03, 2020 at 05:21:35PM +0100, Christoph Hellwig wrote:
+> The block_sleeprq tracepoint was only used by the legacy request code.
+> Remove it now that the legacy request code is gone.
 > 
-> Signed-off-by: Kashyap Desai <kashyap.desai@broadcom.com>
-> Acked-by: Douglas Gilbert <dgilbert@interlog.com>
-> Tested-by: Douglas Gilbert <dgilbert@interlog.com>
-> 
-> Cc: dgilbert@interlog.com
-> Cc: linux-block@vger.kernel.org
-> ---
->   drivers/scsi/scsi_debug.c | 130 ++++++++++++++++++++++++++++++++++++++
->   1 file changed, 130 insertions(+)
-> 
-> diff --git a/drivers/scsi/scsi_debug.c b/drivers/scsi/scsi_debug.c
-> index 24c0f7ec0351..4ced913f2b39 100644
-> --- a/drivers/scsi/scsi_debug.c
-> +++ b/drivers/scsi/scsi_debug.c
-> @@ -829,6 +829,7 @@ static int sdeb_zbc_max_open = DEF_ZBC_MAX_OPEN_ZONES;
->   static int sdeb_zbc_nr_conv = DEF_ZBC_NR_CONV_ZONES;
->   
->   static int submit_queues = DEF_SUBMIT_QUEUES;  /* > 1 for multi-queue (mq) */
-> +static int poll_queues; /* iouring iopoll interface.*/
->   static struct sdebug_queue *sdebug_q_arr;  /* ptr to array of submit queues */
->   
->   static DEFINE_RWLOCK(atomic_rw);
-> @@ -5432,6 +5433,14 @@ static int schedule_resp(struct scsi_cmnd *cmnd, struct sdebug_dev_info *devip,
->   	cmnd->host_scribble = (unsigned char *)sqcp;
->   	sd_dp = sqcp->sd_dp;
->   	spin_unlock_irqrestore(&sqp->qc_lock, iflags);
-> +
-> +	/* Do not complete IO from default completion path.
-> +	 * Let it to be on queue.
-> +	 * Completion should happen from mq_poll interface.
-> +	 */
-> +	if ((sqp - sdebug_q_arr) >= (submit_queues - poll_queues))
-> +		return 0;
-> +
->   	if (!sd_dp) {
->   		sd_dp = kzalloc(sizeof(*sd_dp), GFP_ATOMIC);
->   		if (!sd_dp) {
-> @@ -5615,6 +5624,7 @@ module_param_named(sector_size, sdebug_sector_size, int, S_IRUGO);
->   module_param_named(statistics, sdebug_statistics, bool, S_IRUGO | S_IWUSR);
->   module_param_named(strict, sdebug_strict, bool, S_IRUGO | S_IWUSR);
->   module_param_named(submit_queues, submit_queues, int, S_IRUGO);
-> +module_param_named(poll_queues, poll_queues, int, S_IRUGO);
->   module_param_named(tur_ms_to_ready, sdeb_tur_ms_to_ready, int, S_IRUGO);
->   module_param_named(unmap_alignment, sdebug_unmap_alignment, int, S_IRUGO);
->   module_param_named(unmap_granularity, sdebug_unmap_granularity, int, S_IRUGO);
-> @@ -5677,6 +5687,7 @@ MODULE_PARM_DESC(opt_xferlen_exp, "optimal transfer length granularity exponent
->   MODULE_PARM_DESC(opts, "1->noise, 2->medium_err, 4->timeout, 8->recovered_err... (def=0)");
->   MODULE_PARM_DESC(per_host_store, "If set, next positive add_host will get new store (def=0)");
->   MODULE_PARM_DESC(physblk_exp, "physical block exponent (def=0)");
-> +MODULE_PARM_DESC(poll_queues, "support for iouring iopoll queues (1 to max(submit_queues - 1)");
->   MODULE_PARM_DESC(ptype, "SCSI peripheral type(def=0[disk])");
->   MODULE_PARM_DESC(random, "If set, uniformly randomize command duration between 0 and delay_in_ns");
->   MODULE_PARM_DESC(removable, "claim to have removable media (def=0)");
-> @@ -7200,6 +7211,104 @@ static int resp_not_ready(struct scsi_cmnd *scp, struct sdebug_dev_info *devip)
->   	return check_condition_result;
->   }
->   
-> +static int sdebug_map_queues(struct Scsi_Host *shost)
-> +{
-> +	int i, qoff;
-> +
-> +	if (shost->nr_hw_queues == 1)
-> +		return 0;
-> +
-> +	for (i = 0, qoff = 0; i < HCTX_MAX_TYPES; i++) {
-> +		struct blk_mq_queue_map *map = &shost->tag_set.map[i];
-> +
-> +		map->nr_queues  = 0;
-> +
-> +		if (i == HCTX_TYPE_DEFAULT)
-> +			map->nr_queues = submit_queues - poll_queues;
-> +		else if (i == HCTX_TYPE_POLL)
-> +			map->nr_queues = poll_queues;
-> +
-> +		if (!map->nr_queues) {
-> +			BUG_ON(i == HCTX_TYPE_DEFAULT);
-> +			continue;
-> +		}
-> +
-> +		map->queue_offset = qoff;
-> +		blk_mq_map_queues(map);
-> +
-> +		qoff += map->nr_queues;
-> +	}
-> +
-> +	return 0;
-> +
-> +}
-> +
-> +static int sdebug_blk_mq_poll(struct Scsi_Host *shost, unsigned int queue_num)
-> +{
-> +	int qc_idx;
-> +	int retiring = 0;
-> +	unsigned long iflags;
-> +	struct sdebug_queue *sqp;
-> +	struct sdebug_queued_cmd *sqcp;
-> +	struct scsi_cmnd *scp;
-> +	struct sdebug_dev_info *devip;
-> +	int num_entries = 0;
-> +
-> +	sqp = sdebug_q_arr + queue_num;
-> +
-> +	do {
-> +		spin_lock_irqsave(&sqp->qc_lock, iflags);
-> +		qc_idx = find_first_bit(sqp->in_use_bm, sdebug_max_queue);
-> +		if (unlikely((qc_idx < 0) || (qc_idx >= sdebug_max_queue)))
-> +			goto out;
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>
+> Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-If you are rolling this patchset again, perhaps you could change the "if"
-above to:
-		if (likely(qc_idx >= sdebug_max_queue))
+Acked-by: Tejun Heo <tj@kernel.org>
 
-since find_first_bit() returns unsigned long. Also, if we are polling,
-unless the storage is extremely fast, we should see find_first_bit()
-not finding any bits set most of the time. In that case it will return 
-sdebug_max_queue, so flag it as (more) likely. That should also indicate
-to someone reading the code that the "goto out" in this case is _not_
-an error path and may well be the fast path.
+Thanks.
 
-Doug Gilbert
+-- 
+tejun
