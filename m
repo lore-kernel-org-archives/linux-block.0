@@ -2,114 +2,146 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-23.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8641C433FE
-	for <linux-block@archiver.kernel.org>; Thu,  3 Dec 2020 21:35:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEC10C4361A
+	for <linux-block@archiver.kernel.org>; Thu,  3 Dec 2020 22:14:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 88299222F9
-	for <linux-block@archiver.kernel.org>; Thu,  3 Dec 2020 21:35:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5197D2220F
+	for <linux-block@archiver.kernel.org>; Thu,  3 Dec 2020 22:14:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729350AbgLCVes (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Dec 2020 16:34:48 -0500
-Received: from youngberry.canonical.com ([91.189.89.112]:38827 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727842AbgLCVes (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Dec 2020 16:34:48 -0500
-Received: from mail-qv1-f72.google.com ([209.85.219.72])
-        by youngberry.canonical.com with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.86_2)
-        (envelope-from <mfo@canonical.com>)
-        id 1kkwEo-0002v3-6c
-        for linux-block@vger.kernel.org; Thu, 03 Dec 2020 21:34:06 +0000
-Received: by mail-qv1-f72.google.com with SMTP id n5so2805502qvt.14
-        for <linux-block@vger.kernel.org>; Thu, 03 Dec 2020 13:34:06 -0800 (PST)
+        id S1726602AbgLCWOQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Dec 2020 17:14:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55922 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725885AbgLCWOP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Dec 2020 17:14:15 -0500
+Received: from mail-ua1-x942.google.com (mail-ua1-x942.google.com [IPv6:2607:f8b0:4864:20::942])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3BC2C061A4F
+        for <linux-block@vger.kernel.org>; Thu,  3 Dec 2020 14:13:35 -0800 (PST)
+Received: by mail-ua1-x942.google.com with SMTP id x13so1216101uar.4
+        for <linux-block@vger.kernel.org>; Thu, 03 Dec 2020 14:13:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=KPxLDK2m3t3rbdEsv04AbgR9S3xVqD3vwyaV/8maCC4=;
+        b=jx8h0ibXuK5mC+q5Jz5dvyMzbpp+OA974bweeH+4sROdy8QOX7PK7gAekr0nKthGl4
+         cRjmPpEWFaZYPM9q71D1TrwUI3839gPHa40FhqWXd0I+7sLA4+EtsEsLzxoMDDDPBSy7
+         IHOZIytaibCqhTL5FWf8ZcmAxR77IRO3CyOFNJo7FaS8KxJm7KiA4PCwNnwA+NrkQVlu
+         gtsRyHAbqsi5XGBhThmDh4Wop/LDq7LAHSucmBw3/NAalpeuCAUYeTRnhUApZA8Gito0
+         Fkna4gSLw6vC2KY5tCzUb4jbmIqV/rNwLpb+OlrrQh2CI2HQtMzkqPGheZoCMYJyiy+S
+         7c/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=mUOyZmA8+0ywNKV9ZTvHmJjS1Ao4eELDO8pVI2BEuKg=;
-        b=HyiD9Pvv45m742Y5eAN2zMG5WwYRV9zPISK7u85Qx+TVoosv2mQdu+zfO3AGijG1Uw
-         dlPMP1F2Gkks/fhWPW4d5i2740vof0J97wvgCxkR3M4NiEeyaY0hlzH4a1LeuVEknmap
-         bf9+odQBewkhDNyN8ZbQs07xPynlFYN0YRSs40z1RuvifjQfkz/6wFIIqbx2upjZzQCX
-         FCsdqFVz3Ga8FzB4SPVJx29m9GTnUTZcU9ldHiXJhBBrkQdoSg7Ebd5TNtStTVeqrTUk
-         xpwKhgf1aXnqONBb4GSU1cp0q8L0fOzrdzqButYjUwiUPw8j62k9GiJvHzl90nCEVZx2
-         mMxQ==
-X-Gm-Message-State: AOAM531Mby7oyYgcig0YhfE2xltHtOeczA7/aBxH6sA86CJG9dOUwbWc
-        wp1DwGmcwBFAQgSXA3KHOxMdjVS55OtuiYsNkmyUXEZ3shUa8pQ6f7K1ouZaT4OmUH1I1+C0GbF
-        pQ3cewk2FshlP+efUGyZxx5clT476CHgIaPjt1ttn
-X-Received: by 2002:a05:622a:cf:: with SMTP id p15mr5388132qtw.168.1607031245114;
-        Thu, 03 Dec 2020 13:34:05 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyAiD4J4J1rlZhh1mAaJ1kJkQr5hFv1WpUxFIQf5hlZMmlrR9+9ufHPSjqnxAzXN9N4+MeOmg==
-X-Received: by 2002:a05:622a:cf:: with SMTP id p15mr5388117qtw.168.1607031244926;
-        Thu, 03 Dec 2020 13:34:04 -0800 (PST)
-Received: from localhost.localdomain ([201.82.34.122])
-        by smtp.gmail.com with ESMTPSA id h16sm2786046qko.135.2020.12.03.13.34.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Dec 2020 13:34:04 -0800 (PST)
-From:   Mauricio Faria de Oliveira <mfo@canonical.com>
-To:     mfo@canonical.com, eric.desrochers@canonical.com,
-        linux-block@vger.kernel.org
-Cc:     Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH] loop: disable write cache in __loop_clr_fd()
-Date:   Thu,  3 Dec 2020 18:34:00 -0300
-Message-Id: <20201203213400.84340-1-mfo@canonical.com>
-X-Mailer: git-send-email 2.27.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=KPxLDK2m3t3rbdEsv04AbgR9S3xVqD3vwyaV/8maCC4=;
+        b=OZfoT229T6w8vbqtmaMRsbugFAoNtVKtd/KEUrVFzk6W+epag6jFV/fGgSt2fR2mUN
+         tCfcLTueBwARNez4/2dAbG1icUSGF3MV0tBwzgCICDExGTuu+Puk/dwJM1Kk6htUiGg8
+         d2SxcEZXyGc1709du3+YKC207Y+44G6agxQwFOmEiwUINH7w3LeWb2M4YKExs61hVdo8
+         MIJLeNythC4CE2HbKMfe/eHu0L0+nsBhPCKc63ZgsdfkmylzKfpm+LOVB+3D5P+2/zt0
+         IZ9ZuENh1rUiYtZ8LaCjHm7OuXEAFZkvWD22WVRlqBwWxYrWA+UmqhL+17ncnyAcsoTO
+         dyDQ==
+X-Gm-Message-State: AOAM530QySdlJKtpyZ4wZEo3KbpRqsFF4fM/FbDT5OBtFE/igejbgfnu
+        D+wng2LPCQy3XsVOvTE3icGYtG9rh9GPI8I+1odrJg==
+X-Google-Smtp-Source: ABdhPJyzSP1fKwgvfT8Xm6ntUvZx+Fw3PJ26xCx+ecjHbcR9thZbQiP7LX27J+zTqg20SfVqUdUJxAo0/qJts8Fm1uk=
+X-Received: by 2002:ab0:310:: with SMTP id 16mr1106249uat.33.1607033614516;
+ Thu, 03 Dec 2020 14:13:34 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <000001d6c8d5$b03e7200$10bb5600$@codeaurora.org>
+In-Reply-To: <000001d6c8d5$b03e7200$10bb5600$@codeaurora.org>
+From:   Sami Tolvanen <samitolvanen@google.com>
+Date:   Thu, 3 Dec 2020 14:13:23 -0800
+Message-ID: <CABCJKueYF95fvdJHCuK2JwY1jpTuM4T2ynMvqa8iUp-rvqYhZA@mail.gmail.com>
+Subject: Re: [dm-devel] [PATCH] dm verity: correcting logic used with
+ corrupted_errs counter
+To:     Ravi Kumar Siddojigari <rsiddoji@codeaurora.org>
+Cc:     linux-block@vger.kernel.org,
+        device-mapper development <dm-devel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-A detached loop device can hit an I/O error on fsync() if it was
-previously associated/attached.
+On Thu, Dec 3, 2020 at 8:18 AM Ravi Kumar Siddojigari
+<rsiddoji@codeaurora.org> wrote:
+>
+> Sorry,  Resending the patch for comments with  dm-devel added .
+>
+> -----Original Message-----
+> From: Ravi Kumar Siddojigari <rsiddoji@codeaurora.org>
+> Sent: Friday, November 20, 2020 6:37 PM
+> To: 'linux-block@vger.kernel.org' <linux-block@vger.kernel.org>
+> Cc: 'dm-devel@redhat.com' <dm-devel@redhat.com>
+> Subject: RE: [PATCH] dm verity: correcting logic used with corrupted_errs
+> counter
+>
+> One more question  :
+>         Current code has DM_VERITY_MAX_CORRUPTED_ERRS  set to 100  can we
+> reduce this ? or is there any  data that made us to keep this 100 ?
+> Regards,
+> Ravi
+>
+> -----Original Message-----
+> From: Ravi Kumar Siddojigari <rsiddoji@codeaurora.org>
+> Sent: Wednesday, November 18, 2020 6:17 PM
+> To: 'linux-block@vger.kernel.org' <linux-block@vger.kernel.org>
+> Subject: [PATCH] dm verity: correcting logic used with corrupted_errs
+> counter
+>
+> In verity_handle_err we see that the "corrupted_errs"  is never going to be
+> more than one as the code will fall through "out" label and hit
+> panic/kernel_restart on the first error  which is not as expected..
+> Following patch will make sure that corrupted_errs are incremented and only
+> panic/kernel_restart once it reached DM_VERITY_MAX_CORRUPTED_ERRS.
+>
+> Signed-off-by: Ravi Kumar Siddojigari <rsiddoji@codeaurora.org>
+> ---
+>  drivers/md/dm-verity-target.c | 8 +++++---
+>  1 file changed, 5 insertions(+), 3 deletions(-)
+>
+> diff --git a/drivers/md/dm-verity-target.c b/drivers/md/dm-verity-target.c
+> index f74982dcbea0..d86900a2a8d7 100644
+> --- a/drivers/md/dm-verity-target.c
+> +++ b/drivers/md/dm-verity-target.c
+> @@ -221,8 +221,10 @@ static int verity_handle_err(struct dm_verity *v, enum
+> verity_block_type type,
+>         /* Corruption should be visible in device status in all modes */
+>         v->hash_failed = 1;
+>
+> -       if (v->corrupted_errs >= DM_VERITY_MAX_CORRUPTED_ERRS)
+> +       if (v->corrupted_errs >= DM_VERITY_MAX_CORRUPTED_ERRS) {
+> +               DMERR("%s: reached maximum errors", v->data_dev->name);
+>                 goto out;
+> +       }
+>
+>         v->corrupted_errs++;
+>
+> @@ -240,13 +242,13 @@ static int verity_handle_err(struct dm_verity *v, enum
+> verity_block_type type,
+>         DMERR_LIMIT("%s: %s block %llu is corrupted", v->data_dev->name,
+>                     type_str, block);
+>
+> -       if (v->corrupted_errs == DM_VERITY_MAX_CORRUPTED_ERRS)
+> -               DMERR("%s: reached maximum errors", v->data_dev->name);
+>
+>         snprintf(verity_env, DM_VERITY_ENV_LENGTH, "%s=%d,%llu",
+>                 DM_VERITY_ENV_VAR_NAME, type, block);
+>
+>         kobject_uevent_env(&disk_to_dev(dm_disk(md))->kobj, KOBJ_CHANGE,
+> envp);
+> +       /* DM_VERITY_MAX_CORRUPTED_ERRS limit not reached yet */
+> +               return 0;
 
-This happens because the write cache is enabled in loop_configure()
-in the attach path, but not disabled anywhere in the detach path.
+No. This would allow invalid blocks to be returned to userspace when
+dm-verity is NOT in logging mode, which is unacceptable.
+DM_VERITY_MAX_CORRUPTED_ERRS is only used to limit the number of error
+messages printed out, we cannot let the first N corrupt blocks to just
+slip through.
 
-So, disable write cache in the detach path.
-
-Before:
-
-  # losetup /dev/loop7 disk.img
-  # losetup -d /dev/loop7
-  # strace -e fsync parted -s /dev/loop7 unit s print 2>&1 | grep fsync
-  fsync(3)                                = -1 EIO (Input/output error)
-  Warning: Error fsyncing/closing /dev/loop7: Input/output error
-  [   34.696133] blk_update_request: I/O error, dev loop7, sector 0 op
-  0x1:(WRITE) flags 0x800 phys_seg 0 prio class 0
-
-After:
-
-  # losetup /dev/loop7 disk.img
-  # losetup -d /dev/loop7
-  # strace -e fsync parted -s /dev/loop7 unit s print 2>&1 | grep fsync
-  fsync(3)                                = 0
-
-Signed-off-by: Mauricio Faria de Oliveira <mfo@canonical.com>
-Co-developed-by: Eric Desrochers <eric.desrochers@canonical.com>
-Signed-off-by: Eric Desrochers <eric.desrochers@canonical.com>
----
- drivers/block/loop.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index a58084c2ed7c..0e23ab151667 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1223,6 +1223,9 @@ static int __loop_clr_fd(struct loop_device *lo, bool release)
- 		goto out_unlock;
- 	}
- 
-+	if (!(lo->lo_flags & LO_FLAGS_READ_ONLY) && filp->f_op->fsync)
-+		blk_queue_write_cache(lo->lo_queue, false, false);
-+
- 	/* freeze request queue during the transition */
- 	blk_mq_freeze_queue(lo->lo_queue);
- 
--- 
-2.25.1
-
+Sami
