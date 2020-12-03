@@ -2,204 +2,91 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F402C63777
-	for <linux-block@archiver.kernel.org>; Thu,  3 Dec 2020 07:29:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71771C71156
+	for <linux-block@archiver.kernel.org>; Thu,  3 Dec 2020 08:24:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 165CF20BED
-	for <linux-block@archiver.kernel.org>; Thu,  3 Dec 2020 07:29:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0A44C21527
+	for <linux-block@archiver.kernel.org>; Thu,  3 Dec 2020 08:24:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388142AbgLCH31 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Dec 2020 02:29:27 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:39766 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2388115AbgLCH31 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 3 Dec 2020 02:29:27 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1606980480;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=r1k4wx0RVXIRwAtoYOZLIrYpm5gPE+9hi+XUm0sx93I=;
-        b=G8GUc54ZxazTBdF5eVPLYVldtPpgoaWj2Nn6M/u2KtdguFCJEz62iaWm1q3ujLPW6YZ1vN
-        PDrF174UtzLDsUkyxdRIQKyXabC9GY7YSHXndZvW7KnyyyIHp2cjF6jgfh2OrfSOGP1StO
-        +ARTSIWQ5EMD3RSTZJ+8mpAAdxqzHjc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-266-uHFmrJhsO8Oz1uKrVuIbbQ-1; Thu, 03 Dec 2020 02:27:56 -0500
-X-MC-Unique: uHFmrJhsO8Oz1uKrVuIbbQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B82B51009456;
-        Thu,  3 Dec 2020 07:27:54 +0000 (UTC)
-Received: from T590 (ovpn-13-173.pek2.redhat.com [10.72.13.173])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 60B0D60BF1;
-        Thu,  3 Dec 2020 07:27:46 +0000 (UTC)
-Date:   Thu, 3 Dec 2020 15:27:38 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        Alan Stern <stern@rowland.harvard.edu>,
-        Can Guo <cang@codeaurora.org>,
-        Stanley Chu <stanley.chu@mediatek.com>,
-        "Rafael J . Wysocki" <rafael.j.wysocki@intel.com>
-Subject: Re: [PATCH v4 5/9] scsi: Do not wait for a request in
- scsi_eh_lock_door()
-Message-ID: <20201203072738.GB633702@T590>
-References: <20201130024615.29171-1-bvanassche@acm.org>
- <20201130024615.29171-6-bvanassche@acm.org>
- <bdadfbcd-76c4-4658-0b36-b7666fa1dc7b@suse.de>
- <6e5fbc73-881e-69c7-54ce-381b8b695b3c@acm.org>
- <b56cf3af-940f-62ed-2a79-eb80599e2f44@suse.de>
+        id S2387627AbgLCIXw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Dec 2020 03:23:52 -0500
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:38582 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388358AbgLCIXw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Dec 2020 03:23:52 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1606983831; x=1638519831;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Ym0msQcCQz8CHDU2NA4LS7VhzhBvoY2+z+2Z2YL0Hj8=;
+  b=CkcBvrrXQhsTfMK4MYVf39zDAu52bDU+C87e/4WHg8N2BGOrtGYe2iaQ
+   Jg5rkzqOpW+sAsRnqtUHOnGBir4Us3D0Levad1gnFmfNPxQmk93gExcDB
+   EfaXx+CBb/3mF6/cGsMt/8zj6GqXgdZZoeOFBvFWcrDwTtfniJ9YuNN1+
+   9W7idwx1/U4KyNZgfai/Mb+DI1mFmEzhyZwoKfzN/ZcZoYMKQzkpConjJ
+   SDB85+zz+ZcFDQA2qv0nmc0yrigdCpe+J4gVRlRhQWQCru9pIF07Xia8l
+   remNW8ulhjk+IJlO0w5UA4mARJTmFYNH+r7g6J/YgEWcOgY+2QiPMoPRR
+   g==;
+IronPort-SDR: fJrlrWm8BoDlxl3nOpvkDyZUd64sx+PiN1Fzf4E7KBzLGIIbub0/vNC60TuM6WulgJI+2gtpHu
+ ZD7NE+ZR0/GO/NKgn4HsrDq1ys2i0/nuhflYbpndeAgaaifXQ3mplYGiJP8iYLv9SMLK+QuwuT
+ HPJp+mqF2yM5NtfCZq2KHoFUjqhtENSo3g/Mopy+FLGjvqWeNYEqEP1Gu3jR/w7P0f9fpxEtqn
+ 5GyX/XmusH3EoS7+lEQ2JJjxvJF9LEpUVnsbldrqbhNW/s4Wowp+9Hmfuvtcjx4c8enuE9tNzh
+ slk=
+X-IronPort-AV: E=Sophos;i="5.78,389,1599494400"; 
+   d="scan'208";a="154306297"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 03 Dec 2020 16:22:46 +0800
+IronPort-SDR: MKX2kaxwZZdXVMJggzOVgqjapqEJtp0tjvGIcpomU5XJ5M4XX0vsZibcMhYiVPS7aunzVIk+kz
+ 5/s72+KXLmKmsgAZBB+bXoWz9k79d64hM=
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Dec 2020 00:06:56 -0800
+IronPort-SDR: diPN4n6rjCUXaeBY+9CBgvKYLfwIlS/LVQdZH8XHc20i5RjCPyi9fJ2Bb2VAtKc/YG8IeHXKgk
+ kfZZtqQZyW7Q==
+WDCIronportException: Internal
+Received: from shindev.dhcp.fujisawa.hgst.com ([10.149.52.189])
+  by uls-op-cesaip01.wdc.com with ESMTP; 03 Dec 2020 00:22:45 -0800
+From:   Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To:     linux-block@vger.kernel.org, Omar Sandoval <osandov@fb.com>
+Cc:     Omar Sandoval <osandov@osandov.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests 0/2] Support max_open_zones and max_active_zones
+Date:   Thu,  3 Dec 2020 17:22:42 +0900
+Message-Id: <20201203082244.268632-1-shinichiro.kawasaki@wdc.com>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <b56cf3af-940f-62ed-2a79-eb80599e2f44@suse.de>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Dec 03, 2020 at 08:18:57AM +0100, Hannes Reinecke wrote:
-> On 12/3/20 6:10 AM, Bart Van Assche wrote:
-> > On 12/1/20 11:06 PM, Hannes Reinecke wrote:
-> > > On 11/30/20 3:46 AM, Bart Van Assche wrote:
-> > > > diff --git a/drivers/scsi/scsi_error.c b/drivers/scsi/scsi_error.c
-> > > > index d94449188270..6de6e1bf3dcb 100644
-> > > > --- a/drivers/scsi/scsi_error.c
-> > > > +++ b/drivers/scsi/scsi_error.c
-> > > > @@ -1993,7 +1993,12 @@ static void scsi_eh_lock_door(struct
-> > > > scsi_device *sdev)
-> > > >        struct request *req;
-> > > >        struct scsi_request *rq;
-> > > >    -    req = blk_get_request(sdev->request_queue, REQ_OP_SCSI_IN, 0);
-> > > > +    /*
-> > > > +     * It is not guaranteed that a request is available nor that
-> > > > +     * sdev->request_queue is unfrozen. Hence the BLK_MQ_REQ_NOWAIT
-> > > > below.
-> > > > +     */
-> > > > +    req = blk_get_request(sdev->request_queue, REQ_OP_SCSI_IN,
-> > > > +                  BLK_MQ_REQ_NOWAIT);
-> > > >        if (IS_ERR(req))
-> > > >            return;
-> > > >        rq = scsi_req(req);
-> > > > 
-> > > 
-> > > Well ... had been thinking about that one, too.
-> > > The idea of this function is that prior to SCSI EH the device was locked
-> > > via scsi_set_medium_removal(). And during SCSI EH the device might have
-> > > become unlocked, so we need to lock it again.
-> > > However, scsi_set_medium_removal() not only issues the
-> > > PREVENT_ALLOW_MEDIUM_REMOVAL command, but also sets the 'locked' flag
-> > > based on the result.
-> > > So if we fail to get a request here, shouldn't we unset the 'locked'
-> > > flag, too?
-> > 
-> > Probably not. My interpretation of the 'locked' flag is that it
-> > represents the door state before error handling began. The following
-> > code in the SCSI error handler restores the door state after a bus reset:
-> > 
-> > 	if (scsi_device_online(sdev) && sdev->was_reset && sdev->locked) {
-> > 		scsi_eh_lock_door(sdev);
-> > 		sdev->was_reset = 0;
-> > 	}
-> > 
-> > > And what does happen if we fail here? There is no return value, hence
-> > > SCSI EH might run to completion, and the system will continue
-> > > with an unlocked door ...
-> > > Not sure if that's a good idea.
-> > 
-> > How about applying the following patch on top of patch 5/9?
-> > 
-> > diff --git a/drivers/scsi/scsi_error.c b/drivers/scsi/scsi_error.c
-> > index 6de6e1bf3dcb..feac7262e40e 100644
-> > --- a/drivers/scsi/scsi_error.c
-> > +++ b/drivers/scsi/scsi_error.c
-> > @@ -1988,7 +1988,7 @@ static void eh_lock_door_done(struct request *req, blk_status_t status)
-> >    * 	We queue up an asynchronous "ALLOW MEDIUM REMOVAL" request on the
-> >    * 	head of the devices request queue, and continue.
-> >    */
-> > -static void scsi_eh_lock_door(struct scsi_device *sdev)
-> > +static int scsi_eh_lock_door(struct scsi_device *sdev)
-> >   {
-> >   	struct request *req;
-> >   	struct scsi_request *rq;
-> > @@ -2000,7 +2000,7 @@ static void scsi_eh_lock_door(struct scsi_device *sdev)
-> >   	req = blk_get_request(sdev->request_queue, REQ_OP_SCSI_IN,
-> >   			      BLK_MQ_REQ_NOWAIT);
-> >   	if (IS_ERR(req))
-> > -		return;
-> > +		return PTR_ERR(req);
-> >   	rq = scsi_req(req);
-> > 
-> >   	rq->cmd[0] = ALLOW_MEDIUM_REMOVAL;
-> > @@ -2016,6 +2016,7 @@ static void scsi_eh_lock_door(struct scsi_device *sdev)
-> >   	rq->retries = 5;
-> > 
-> >   	blk_execute_rq_nowait(req->q, NULL, req, 1, eh_lock_door_done);
-> > +	return 0;
-> >   }
-> > 
-> >   /**
-> > @@ -2037,8 +2038,8 @@ static void scsi_restart_operations(struct Scsi_Host *shost)
-> >   	 * is no point trying to lock the door of an off-line device.
-> >   	 */
-> >   	shost_for_each_device(sdev, shost) {
-> > -		if (scsi_device_online(sdev) && sdev->was_reset && sdev->locked) {
-> > -			scsi_eh_lock_door(sdev);
-> > +		if (scsi_device_online(sdev) && sdev->was_reset &&
-> > +		    sdev->locked && scsi_eh_lock_door(sdev) == 0) {
-> >   			sdev->was_reset = 0;
-> >   		}
-> >   	}
-> > 
-> I probably didn't make myself clear.
-> As per SBC (in this case, sbc3r36) the effects of
-> PREVENT_ALLOW_MEDIUM_REMOVAL are being reset by a successfull LUN Reset,
-> Hard Reset, Power/On Reset, or an I_T Nexus loss. Which incidentally maps
-> nicely onto SCSI EH, so after a successful SCSI EH the door will be unlocked
-> (which is why we need to call scsi_eh_lock_door()).
-> In the SCSI midlayer this state is being reflected by the 'locked' flag.
-> Now, if scsi_eh_lock_door() is _not_ being executed due to a
-> blk_get_request() failure, the device remains unlocked, and as such the
-> 'locked' flag would need to be _unset_.
-> 
-> So I was thinking more along these lines:
-> 
-> @@ -2030,7 +2037,8 @@ static void scsi_restart_operations(struct Scsi_Host
-> *shost)
->          */
->         shost_for_each_device(sdev, shost) {
->                 if (scsi_device_online(sdev) && sdev->was_reset &&
-> sdev->locked) {
-> -                       scsi_eh_lock_door(sdev);
-> +                       if (scsi_eh_lock_door(sdev) < 0)
-> +                               sdev->locked = 0;
+Linux kernel 5.9 introduced new sysfs attributes max_active_zones and
+max_open_zones for zoned block devices. Blktests already handles
+max_active_zones. However, max_open_zones handling is missing. Also,
+zbd/005 lacks support for the two attributes.
 
-BTW, scsi_eh_lock_door() returns void, and it can't be sync because
-there may not be any driver tag available. Even though it is available,
-the host state isn't running yet, so the command can't be queued to LLD
-yet.
+This patch series fills the missing attributes handling. The first patch
+modifies the helper function for max_active_zones to support both
+max_active_zones and max_open_zones. The second patch modifies zbd/005 to
+handle the attributes.
 
-Maybe the above lines should be put after host state is updated to
-RUNNING.
+Shin'ichiro Kawasaki (2):
+  common/rc: Check both max_active_zones and max_open_zones
+  zbd/005: Provide max_active/open_zones limit to fio command
 
-Also changing to NOWAIT can't avoid the issue completely, what if 'none'
-is used?
+ common/rc       | 21 +++++++++++++++++----
+ tests/block/004 |  2 +-
+ tests/zbd/003   |  6 +++---
+ tests/zbd/005   | 13 ++++++++-----
+ 4 files changed, 29 insertions(+), 13 deletions(-)
 
-
-Thanks,
-Ming
+-- 
+2.28.0
 
