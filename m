@@ -2,353 +2,170 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.6 required=3.0 tests=BAYES_00,DATE_IN_PAST_06_12,
-	DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,
+X-Spam-Status: No, score=-14.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MIME_HEADER_CTYPE_ONLY,SPF_HELO_NONE,SPF_PASS,
-	T_TVD_MIME_NO_HEADERS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ACF2C63777
-	for <linux-block@archiver.kernel.org>; Thu,  3 Dec 2020 11:42:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CADBC64E8A
+	for <linux-block@archiver.kernel.org>; Thu,  3 Dec 2020 12:10:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 19A41208FE
-	for <linux-block@archiver.kernel.org>; Thu,  3 Dec 2020 11:42:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 00C8122201
+	for <linux-block@archiver.kernel.org>; Thu,  3 Dec 2020 12:10:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727757AbgLCLmh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Dec 2020 06:42:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42410 "EHLO
+        id S2388092AbgLCMKS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Dec 2020 07:10:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46656 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726868AbgLCLmg (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Dec 2020 06:42:36 -0500
-Received: from mail-pl1-x642.google.com (mail-pl1-x642.google.com [IPv6:2607:f8b0:4864:20::642])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46006C061A53
-        for <linux-block@vger.kernel.org>; Thu,  3 Dec 2020 03:41:23 -0800 (PST)
-Received: by mail-pl1-x642.google.com with SMTP id p6so1003244plo.6
-        for <linux-block@vger.kernel.org>; Thu, 03 Dec 2020 03:41:23 -0800 (PST)
+        with ESMTP id S2387983AbgLCMKR (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Dec 2020 07:10:17 -0500
+Received: from mail-wr1-x441.google.com (mail-wr1-x441.google.com [IPv6:2a00:1450:4864:20::441])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A58B3C061A4F
+        for <linux-block@vger.kernel.org>; Thu,  3 Dec 2020 04:09:36 -0800 (PST)
+Received: by mail-wr1-x441.google.com with SMTP id r3so1648097wrt.2
+        for <linux-block@vger.kernel.org>; Thu, 03 Dec 2020 04:09:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=jJedXQWafgRQL/SLYe6xkIOCocBpjIAkLR/o9uOxgSg=;
-        b=SZ+yh9uzJnq7asw6ZmoQOkSF0bVy2453jpKjt4UNJ9zJ1X2h4JnWCQ+IM9uYu0DT3M
-         oXEYH+gm6OSupGcgeYK1tWamKbn+DYWH05ZS/IBJkmRTI3N6LvP4mn+jvuOcZ/+Y7Rsf
-         Ns0zjBU/3gWnk15N3VFCdDu4F+tUmKbqTXRUI=
+        d=gmail.com; s=20161025;
+        h=to:cc:references:from:autocrypt:subject:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=OCau6oXg+hbo5fJT9AdjUS3+erlq6n4fyJwsTvZG488=;
+        b=uiL2W88i7rChbgRLAeb+6raRQpm10s5reG5LChrKJ2jntK0mwXqD6+dTvv8ls+YkXd
+         +DXeGMIQygZH1U7TVK+p5a8NDTivjf3EkYFXZkSGBYq195cn/kuUwAcPl2eeRAepqXgs
+         ERmrNsJAwB4nwyiCYe7yi9Rc6V8FYl4QpDKjKmQRHwdbJTL1uIS1ygaCPMOkYdX0BhTg
+         8M9OKhsDnawIhxwYxBVio7HzhNBmsWSAIxsNEl1PmGzh/HR1RHM76ktTMfToz8GMzKzN
+         66dmCnjDh2v6VBek/+PcsyKUF6RQ/msEZCvtz1RJ79TTNtDqoxUQoPfCheKGNDT2iWlA
+         0HwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=jJedXQWafgRQL/SLYe6xkIOCocBpjIAkLR/o9uOxgSg=;
-        b=CNpo0OPZuMFvymtfSPFzMN6/XWH/R70/AX6p3TIpXuJNJ80KV8ikU6m/CaLd6MKuCa
-         K0D+2izH/hTGwhi5CWQq7hhUWfXFa5NInPngjJLFKxJ5KXG/QYp6pjl6i2r160sZPxKQ
-         RUVN1SyIY4k9M734GpNV2r3s1DpmJzqyt7gp7eNufoNpA6A6SH9gy1R6IsHPNNbU/pW1
-         Ls7ZY4faw/+VWgZXeyyDZuyo3yi+EmXPRITQ0uTJkMIGKzIpI3KBHYq1cBbq1oVMGuLr
-         WRG+yHjvDaVjmWoRGeCF/6yVkvfq1JxW9rQopVy7K9gixaXaE+ElQvyn/+6bxhY1Sca+
-         l4mA==
-X-Gm-Message-State: AOAM531T7E1ijK4lUC/blHvLV70pXbFhclHK1a91SnsT6WyqxeCduqCN
-        N7g6UU+B36JIkSRbw56OdMdWmCAUwFA4uXSX
-X-Google-Smtp-Source: ABdhPJz4KjXToOS5kl+jwiyMsSUYYs7dGK34+SvS+Dhz6eGWpmll5QaE7MHi6tH97e+sgjG9K6fjTw==
-X-Received: by 2002:a17:90a:5b10:: with SMTP id o16mr2675878pji.235.1606995682708;
-        Thu, 03 Dec 2020 03:41:22 -0800 (PST)
-Received: from drv-bst-rhel8.dhcp.broadcom.net ([192.19.234.250])
-        by smtp.gmail.com with ESMTPSA id cl23sm1310331pjb.23.2020.12.03.03.41.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Dec 2020 03:41:22 -0800 (PST)
-From:   Kashyap Desai <kashyap.desai@broadcom.com>
-To:     linux-scsi@vger.kernel.org
-Cc:     Kashyap Desai <kashyap.desai@broadcom.com>, dgilbert@interlog.com,
-        linux-block@vger.kernel.org
-Subject: [PATCH v2 3/4] scsi_debug : iouring iopoll support
-Date:   Thu,  3 Dec 2020 09:10:59 +0530
-Message-Id: <20201203034100.29716-4-kashyap.desai@broadcom.com>
-X-Mailer: git-send-email 2.18.1
-In-Reply-To: <20201203034100.29716-1-kashyap.desai@broadcom.com>
-References: <20201203034100.29716-1-kashyap.desai@broadcom.com>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-        boundary="000000000000d87ba105b58dd6a2"
+        h=x-gm-message-state:to:cc:references:from:autocrypt:subject
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=OCau6oXg+hbo5fJT9AdjUS3+erlq6n4fyJwsTvZG488=;
+        b=AV889DzQF2tzb/Od3Qh9AWQ8iL64U7W6001SoHIwnvH3d1I1hhbjRpjy1UId5MZ3bb
+         CpyBIe2+PB9w1l57MRkutOjhl1LU8d8d3Ud6s9MX8fj4ngyXIJPASGGKmXPWmgOsx2Qf
+         YqrtUMRgJXtugPTkU5L0+vTxf7GHzejhs9I21luh9TiwTl96xcnI3J0faTUv+bxoZa4h
+         llRiYBcRCryJgCXfl3G3IBl/BGI0bV1WhG2MJOkf+PxCKWj6trqDYRNUIBDtSJIUeCqf
+         VtpwI47TS3GNIJVQpf9q6SL4lArVbJWP0eRnIttARvOMSKBok2jt4Qhe77ZC+DhQuE/y
+         Js8w==
+X-Gm-Message-State: AOAM5321mNE8/NvSClmiuyV+adVWo1XqwDTObdJJ7Ex8XghxKrGBMCd1
+        ltxZkBETIeN6SU1/8ufYiY5UwHNqeD9Wlw==
+X-Google-Smtp-Source: ABdhPJwC6WxUgn3RISx1+sadw/1e6iqShf3xCvHf0BGMwYZF1xkkvtgMsVbrNkHfW8bmveRytolaKg==
+X-Received: by 2002:adf:ea47:: with SMTP id j7mr3378241wrn.126.1606997375089;
+        Thu, 03 Dec 2020 04:09:35 -0800 (PST)
+Received: from [192.168.1.59] (host109-152-100-189.range109-152.btcentralplus.com. [109.152.100.189])
+        by smtp.gmail.com with ESMTPSA id u23sm1255994wmc.32.2020.12.03.04.09.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 03 Dec 2020 04:09:34 -0800 (PST)
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+References: <cover.1606699505.git.asml.silence@gmail.com>
+ <beee275f48a98e42f073ee63221e9610fc9470b5.1606699505.git.asml.silence@gmail.com>
+ <20201203064931.GB629758@T590>
+From:   Pavel Begunkov <asml.silence@gmail.com>
+Autocrypt: addr=asml.silence@gmail.com; prefer-encrypt=mutual; keydata=
+ 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 bA==
+Subject: Re: [PATCH 1/3] blk-mq: use right tag offset after wait
+Message-ID: <0997fd49-5d8c-375f-14be-d2d19b3cd8ee@gmail.com>
+Date:   Thu, 3 Dec 2020 12:06:20 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
+MIME-Version: 1.0
+In-Reply-To: <20201203064931.GB629758@T590>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---000000000000d87ba105b58dd6a2
+On 03/12/2020 06:49, Ming Lei wrote:
+> On Mon, Nov 30, 2020 at 01:36:25AM +0000, Pavel Begunkov wrote:
+>> blk_mq_get_tag() selects tag_offset in the beginning and doesn't update
+>> it even though the tag set it may have changed hw queue during waiting.
+>>
+>> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+>> ---
+>>  block/blk-mq-tag.c | 7 +++++--
+>>  1 file changed, 5 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+>> index 9c92053e704d..dbbf11edf9a6 100644
+>> --- a/block/blk-mq-tag.c
+>> +++ b/block/blk-mq-tag.c
+>> @@ -101,10 +101,8 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
+>>  			return BLK_MQ_NO_TAG;
+>>  		}
+>>  		bt = tags->breserved_tags;
+>> -		tag_offset = 0;
+>>  	} else {
+>>  		bt = tags->bitmap_tags;
+>> -		tag_offset = tags->nr_reserved_tags;
+>>  	}
+>>  
+>>  	tag = __blk_mq_get_tag(data, bt);
+>> @@ -167,6 +165,11 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
+>>  	sbitmap_finish_wait(bt, ws, &wait);
+>>  
+>>  found_tag:
+>> +	if (data->flags & BLK_MQ_REQ_RESERVED)
+>> +		tag_offset = 0;
+>> +	else
+>> +		tag_offset = tags->nr_reserved_tags;
+>> +
+> 
+> So far, the tag offset is tag-set wide, and 'tag_offset' is same for all tags,
+> looks no need to add the extra check.
 
-Add support of iouring iopoll interface in scsi_debug.
-This feature requires shared hosttag support in kernel and driver.
+Thanks for clearing that. I still think that's a good thing to do as more
+apparent to me and shouldn't be slower -- it unconditionally stores offset
+on-stack, even for no-wait path (gcc 9.2). With it's optimised more like
 
-Signed-off-by: Kashyap Desai <kashyap.desai@broadcom.com>
-Acked-by: Douglas Gilbert <dgilbert@interlog.com>
-Tested-by: Douglas Gilbert <dgilbert@interlog.com>
+if (!(data->flags & BLK_MQ_REQ_RESERVED))
+	tag += tags->nr_reserved_tags;
 
-Cc: dgilbert@interlog.com
-Cc: linux-block@vger.kernel.org
----
- drivers/scsi/scsi_debug.c | 130 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 130 insertions(+)
+I like assembly a bit more, but not like that matters much.
 
-diff --git a/drivers/scsi/scsi_debug.c b/drivers/scsi/scsi_debug.c
-index 24c0f7ec0351..4ced913f2b39 100644
---- a/drivers/scsi/scsi_debug.c
-+++ b/drivers/scsi/scsi_debug.c
-@@ -829,6 +829,7 @@ static int sdeb_zbc_max_open = DEF_ZBC_MAX_OPEN_ZONES;
- static int sdeb_zbc_nr_conv = DEF_ZBC_NR_CONV_ZONES;
- 
- static int submit_queues = DEF_SUBMIT_QUEUES;  /* > 1 for multi-queue (mq) */
-+static int poll_queues; /* iouring iopoll interface.*/
- static struct sdebug_queue *sdebug_q_arr;  /* ptr to array of submit queues */
- 
- static DEFINE_RWLOCK(atomic_rw);
-@@ -5432,6 +5433,14 @@ static int schedule_resp(struct scsi_cmnd *cmnd, struct sdebug_dev_info *devip,
- 	cmnd->host_scribble = (unsigned char *)sqcp;
- 	sd_dp = sqcp->sd_dp;
- 	spin_unlock_irqrestore(&sqp->qc_lock, iflags);
-+
-+	/* Do not complete IO from default completion path.
-+	 * Let it to be on queue.
-+	 * Completion should happen from mq_poll interface.
-+	 */
-+	if ((sqp - sdebug_q_arr) >= (submit_queues - poll_queues))
-+		return 0;
-+
- 	if (!sd_dp) {
- 		sd_dp = kzalloc(sizeof(*sd_dp), GFP_ATOMIC);
- 		if (!sd_dp) {
-@@ -5615,6 +5624,7 @@ module_param_named(sector_size, sdebug_sector_size, int, S_IRUGO);
- module_param_named(statistics, sdebug_statistics, bool, S_IRUGO | S_IWUSR);
- module_param_named(strict, sdebug_strict, bool, S_IRUGO | S_IWUSR);
- module_param_named(submit_queues, submit_queues, int, S_IRUGO);
-+module_param_named(poll_queues, poll_queues, int, S_IRUGO);
- module_param_named(tur_ms_to_ready, sdeb_tur_ms_to_ready, int, S_IRUGO);
- module_param_named(unmap_alignment, sdebug_unmap_alignment, int, S_IRUGO);
- module_param_named(unmap_granularity, sdebug_unmap_granularity, int, S_IRUGO);
-@@ -5677,6 +5687,7 @@ MODULE_PARM_DESC(opt_xferlen_exp, "optimal transfer length granularity exponent
- MODULE_PARM_DESC(opts, "1->noise, 2->medium_err, 4->timeout, 8->recovered_err... (def=0)");
- MODULE_PARM_DESC(per_host_store, "If set, next positive add_host will get new store (def=0)");
- MODULE_PARM_DESC(physblk_exp, "physical block exponent (def=0)");
-+MODULE_PARM_DESC(poll_queues, "support for iouring iopoll queues (1 to max(submit_queues - 1)");
- MODULE_PARM_DESC(ptype, "SCSI peripheral type(def=0[disk])");
- MODULE_PARM_DESC(random, "If set, uniformly randomize command duration between 0 and delay_in_ns");
- MODULE_PARM_DESC(removable, "claim to have removable media (def=0)");
-@@ -7200,6 +7211,104 @@ static int resp_not_ready(struct scsi_cmnd *scp, struct sdebug_dev_info *devip)
- 	return check_condition_result;
- }
- 
-+static int sdebug_map_queues(struct Scsi_Host *shost)
-+{
-+	int i, qoff;
-+
-+	if (shost->nr_hw_queues == 1)
-+		return 0;
-+
-+	for (i = 0, qoff = 0; i < HCTX_MAX_TYPES; i++) {
-+		struct blk_mq_queue_map *map = &shost->tag_set.map[i];
-+
-+		map->nr_queues  = 0;
-+
-+		if (i == HCTX_TYPE_DEFAULT)
-+			map->nr_queues = submit_queues - poll_queues;
-+		else if (i == HCTX_TYPE_POLL)
-+			map->nr_queues = poll_queues;
-+
-+		if (!map->nr_queues) {
-+			BUG_ON(i == HCTX_TYPE_DEFAULT);
-+			continue;
-+		}
-+
-+		map->queue_offset = qoff;
-+		blk_mq_map_queues(map);
-+
-+		qoff += map->nr_queues;
-+	}
-+
-+	return 0;
-+
-+}
-+
-+static int sdebug_blk_mq_poll(struct Scsi_Host *shost, unsigned int queue_num)
-+{
-+	int qc_idx;
-+	int retiring = 0;
-+	unsigned long iflags;
-+	struct sdebug_queue *sqp;
-+	struct sdebug_queued_cmd *sqcp;
-+	struct scsi_cmnd *scp;
-+	struct sdebug_dev_info *devip;
-+	int num_entries = 0;
-+
-+	sqp = sdebug_q_arr + queue_num;
-+
-+	do {
-+		spin_lock_irqsave(&sqp->qc_lock, iflags);
-+		qc_idx = find_first_bit(sqp->in_use_bm, sdebug_max_queue);
-+		if (unlikely((qc_idx < 0) || (qc_idx >= sdebug_max_queue)))
-+			goto out;
-+
-+		sqcp = &sqp->qc_arr[qc_idx];
-+		scp = sqcp->a_cmnd;
-+		if (unlikely(scp == NULL)) {
-+			pr_err("scp is NULL, queue_num=%d, qc_idx=%d from %s\n",
-+			       queue_num, qc_idx, __func__);
-+			goto out;
-+		}
-+		devip = (struct sdebug_dev_info *)scp->device->hostdata;
-+		if (likely(devip))
-+			atomic_dec(&devip->num_in_q);
-+		else
-+			pr_err("devip=NULL from %s\n", __func__);
-+		if (unlikely(atomic_read(&retired_max_queue) > 0))
-+			retiring = 1;
-+
-+		sqcp->a_cmnd = NULL;
-+		if (unlikely(!test_and_clear_bit(qc_idx, sqp->in_use_bm))) {
-+			pr_err("Unexpected completion sqp %p queue_num=%d qc_idx=%d from %s\n",
-+				sqp, queue_num, qc_idx, __func__);
-+			goto out;
-+		}
-+
-+		if (unlikely(retiring)) {	/* user has reduced max_queue */
-+			int k, retval;
-+
-+			retval = atomic_read(&retired_max_queue);
-+			if (qc_idx >= retval) {
-+				pr_err("index %d too large\n", retval);
-+				goto out;
-+			}
-+			k = find_last_bit(sqp->in_use_bm, retval);
-+			if ((k < sdebug_max_queue) || (k == retval))
-+				atomic_set(&retired_max_queue, 0);
-+			else
-+				atomic_set(&retired_max_queue, k + 1);
-+		}
-+		spin_unlock_irqrestore(&sqp->qc_lock, iflags);
-+		scp->scsi_done(scp); /* callback to mid level */
-+		num_entries++;
-+	} while (1);
-+
-+out:
-+	spin_unlock_irqrestore(&sqp->qc_lock, iflags);
-+	return num_entries;
-+}
-+
-+
- static int scsi_debug_queuecommand(struct Scsi_Host *shost,
- 				   struct scsi_cmnd *scp)
- {
-@@ -7379,6 +7488,8 @@ static struct scsi_host_template sdebug_driver_template = {
- 	.ioctl =		scsi_debug_ioctl,
- 	.queuecommand =		scsi_debug_queuecommand,
- 	.change_queue_depth =	sdebug_change_qdepth,
-+	.map_queues =		sdebug_map_queues,
-+	.mq_poll =		sdebug_blk_mq_poll,
- 	.eh_abort_handler =	scsi_debug_abort,
- 	.eh_device_reset_handler = scsi_debug_device_reset,
- 	.eh_target_reset_handler = scsi_debug_target_reset,
-@@ -7426,6 +7537,25 @@ static int sdebug_driver_probe(struct device *dev)
- 	if (sdebug_host_max_queue)
- 		hpnt->host_tagset = 1;
- 
-+	/* poll queues are possible for nr_hw_queues > 1 */
-+	if (hpnt->nr_hw_queues == 1 || (poll_queues < 1)) {
-+		pr_warn("%s: trim poll_queues to 0. poll_q/nr_hw = (%d/%d)\n",
-+			 my_name, poll_queues, hpnt->nr_hw_queues);
-+		poll_queues = 0;
-+	}
-+
-+	/*
-+	 * Poll queues don't need interrupts, but we need at least one I/O queue
-+	 * left over for non-polled I/O.
-+	 * If condition not met, trim poll_queues to 1 (just for simplicity).
-+	 */
-+	if (poll_queues >= submit_queues) {
-+		pr_warn("%s: trim poll_queues to 1\n", my_name);
-+		poll_queues = 1;
-+	}
-+	if (poll_queues)
-+		hpnt->nr_maps = 3;
-+
- 	sdbg_host->shost = hpnt;
- 	*((struct sdebug_host_info **)hpnt->hostdata) = sdbg_host;
- 	if ((hpnt->this_id >= 0) && (sdebug_num_tgts > hpnt->this_id))
 -- 
-2.18.1
-
-
---000000000000d87ba105b58dd6a2
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-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
-yfWKfxJx8FcWmsjkSlrwDu+oVuDUa2wqeKBU12HQ4JAVd+LOb5edsbbFQxgGHu+MPuc/1hl9kTkC
-AwEAAaOCAdEwggHNMA4GA1UdDwEB/wQEAwIFoDCBngYIKwYBBQUHAQEEgZEwgY4wTQYIKwYBBQUH
-MAKGQWh0dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5jb20vY2FjZXJ0L2dzcGVyc29uYWxzaWduMnNo
-YTJnM29jc3AuY3J0MD0GCCsGAQUFBzABhjFodHRwOi8vb2NzcDIuZ2xvYmFsc2lnbi5jb20vZ3Nw
-ZXJzb25hbHNpZ24yc2hhMmczME0GA1UdIARGMEQwQgYKKwYBBAGgMgEoCjA0MDIGCCsGAQUFBwIB
-FiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzAJBgNVHRMEAjAAMEQGA1Ud
-HwQ9MDswOaA3oDWGM2h0dHA6Ly9jcmwuZ2xvYmFsc2lnbi5jb20vZ3NwZXJzb25hbHNpZ24yc2hh
-MmczLmNybDAlBgNVHREEHjAcgRprYXNoeWFwLmRlc2FpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAK
-BggrBgEFBQcDBDAfBgNVHSMEGDAWgBRpcoJiMWeVRIV3kYDEBDZJnXsLYTAdBgNVHQ4EFgQU4dX1
-Yg4eoWXbqyPW/N1ZD/LPIWcwDQYJKoZIhvcNAQELBQADggEBABBuHYKGUwHIhCjd3LieJwKVuJNr
-YohEnZzCoNaOj33/j5thiA4cZehCh6SgrIlFBIktLD7jW9Dwl88Gfcy+RrVa7XK5Hyqwr1JlCVsW
-pNj4hlSJMNNqxNSqrKaD1cR4/oZVPFVnJJYlB01cLVjGMzta9x27e6XEtseo2s7aoPS2l82koMr7
-8S/v9LyyP4X2aRTWOg9RG8D/13rLxFAApfYvCrf0quIUBWw2BXlq3+e3r7pU7j40d6P04VV3Zxws
-M+LbYxcXFT2gXvoYd2Ms8zsLrhO2M6pMzeNGWk2HWTof9s7EEHDjis/MRlbYSNaohV23IUzNlBw7
-1FmvvW5GKK0xggJvMIICawIBATBtMF0xCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWdu
-IG52LXNhMTMwMQYDVQQDEypHbG9iYWxTaWduIFBlcnNvbmFsU2lnbiAyIENBIC0gU0hBMjU2IC0g
-RzMCDDSdoX7GqonhoE7TszANBglghkgBZQMEAgEFAKCB1DAvBgkqhkiG9w0BCQQxIgQgSiFSNAMS
-m/S8/g7n5pAj+/uXKgvCyE2bEwiVnllHSzcwGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkq
-hkiG9w0BCQUxDxcNMjAxMjAzMTE0MTIzWjBpBgkqhkiG9w0BCQ8xXDBaMAsGCWCGSAFlAwQBKjAL
-BglghkgBZQMEARYwCwYJYIZIAWUDBAECMAoGCCqGSIb3DQMHMAsGCSqGSIb3DQEBCjALBgkqhkiG
-9w0BAQcwCwYJYIZIAWUDBAIBMA0GCSqGSIb3DQEBAQUABIIBACfun8xcKVIC1K2CYZWDRbhWrdPq
-V9KZ3SFwEGBE9o41Q12NBHdl2A4xdXxEnNYE+2tVtB1kc78d4rCQZodBN7UxBtJabZdTA7XkRmdh
-ejpez9ESGjBjAbxoIX0+VQumVQVHTvqvu1m6foaFMZ0hFkV5et3TBq76YuN3hxhjxYhtyxPTMHPz
-ebw6U/dFbtmhoR/0VkTvC9Vfe0ASHdz/agHZXKlPAS2ku0uF70mbVGCps0ayfZaLea84xYj6GSmQ
-duN8dUMo7bSkAbv6kCuADgpdIByj6yfqDKeVoL+X3B0nXxV+nAPCezfx9P209HG4b1lbMVMuOKL/
-yO/9cuwwVsE=
---000000000000d87ba105b58dd6a2--
+Pavel Begunkov
