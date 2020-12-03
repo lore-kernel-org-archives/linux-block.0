@@ -4,91 +4,120 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B39BC64E7C
-	for <linux-block@archiver.kernel.org>; Thu,  3 Dec 2020 03:28:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84025C63777
+	for <linux-block@archiver.kernel.org>; Thu,  3 Dec 2020 04:08:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D9078221FB
-	for <linux-block@archiver.kernel.org>; Thu,  3 Dec 2020 03:28:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 39D6721D91
+	for <linux-block@archiver.kernel.org>; Thu,  3 Dec 2020 04:08:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729648AbgLCD16 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Dec 2020 22:27:58 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:42343 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726201AbgLCD16 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 2 Dec 2020 22:27:58 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1606965991;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=GSCMWeunoUkckNWAVsBNgrPayok2tfQ8SIhYBHX0vuA=;
-        b=TX3p09kXZEKjnoiB1V71t1z4C+8ScJggX3iqHF11DvOpkkcSfg4u/S4XLihPlsW0NROyg1
-        Tc8SLX3Zwv5TcV/qm4OLCnktANs4WKculp1MspxO7T+n6rQwUZJn4yGo4gLST8U87Mu7S5
-        HiTm+8CnxXr0y6nVFqlxEsMnmTjf/VI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-342-7W3sj6-_PwSKdBRWx9zGDQ-1; Wed, 02 Dec 2020 22:26:30 -0500
-X-MC-Unique: 7W3sj6-_PwSKdBRWx9zGDQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 37B5EC280;
-        Thu,  3 Dec 2020 03:26:29 +0000 (UTC)
-Received: from T590 (ovpn-12-87.pek2.redhat.com [10.72.12.87])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8BD8C5C1B4;
-        Thu,  3 Dec 2020 03:26:13 +0000 (UTC)
-Date:   Thu, 3 Dec 2020 11:26:08 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Mike Snitzer <snitzer@redhat.com>
-Cc:     axboe@kernel.dk, martin.petersen@oracle.com,
-        linux-block@vger.kernel.org, dm-devel@redhat.com,
-        jdorminy@redhat.com, bjohnsto@redhat.com
-Subject: Re: [PATCH v2] block: use gcd() to fix chunk_sectors limit stacking
-Message-ID: <20201203032608.GD540033@T590>
-References: <20201130171805.77712-1-snitzer@redhat.com>
- <20201201160709.31748-1-snitzer@redhat.com>
+        id S1727846AbgLCEHt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Dec 2020 23:07:49 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:51510 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726071AbgLCEHr (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Dec 2020 23:07:47 -0500
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0B3457vJ020751;
+        Thu, 3 Dec 2020 04:06:45 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : message-id : references : date : in-reply-to : mime-version :
+ content-type; s=corp-2020-01-29;
+ bh=Oww/8iFoOsE1zM3fFYoD3Oq4k1GA5uwflIdMRTl3mec=;
+ b=fyla7Dqb2gXhO/cJjdl0yvSvOSu/pagItggvc1t2wSrUk/mP4xAnnh/0IhPPdR0aHoKe
+ Ibni9NreZWk+zLuvcfCa9UZ9Td3PC0ZwRbDIBKx8hDDmtU9MxPotY8+daPljUXKy/0TM
+ UaOQPNmirWNqgXI/lKF57lDeYMpkYIdC9w88WBiGgcCTHLSP4D3eZsEqh8M5orT9vFU+
+ 3J+CzrRyLqjh/Qe6oMbo3xP/R5oKlGlWp/1tjaNn3Ip0RGIGJw0oiZMFx543Fsil29AS
+ pWLwKI7X8Uhs9ddrmZs4/E2NU7HFDKup2QFJ/eT8YkX9R/GtWlIEP+mjI/J6T8uSiuIw rQ== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by aserp2120.oracle.com with ESMTP id 353egkuqqv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Thu, 03 Dec 2020 04:06:45 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0B340D7O085693;
+        Thu, 3 Dec 2020 04:04:44 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by aserp3020.oracle.com with ESMTP id 3540f19ag8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 03 Dec 2020 04:04:44 +0000
+Received: from abhmp0006.oracle.com (abhmp0006.oracle.com [141.146.116.12])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0B344aX8004987;
+        Thu, 3 Dec 2020 04:04:38 GMT
+Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 02 Dec 2020 20:04:36 -0800
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Oleksii Kurochko <olkuroch@cisco.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Dongsheng Yang <dongsheng.yang@easystack.cn>,
+        ceph-devel@vger.kernel.org, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Subject: Re: [PATCH 1/4] block: add a hard-readonly flag to struct gendisk
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <yq17dpza6nz.fsf@ca-mkp.ca.oracle.com>
+References: <20201129181926.897775-1-hch@lst.de>
+        <20201129181926.897775-2-hch@lst.de>
+Date:   Wed, 02 Dec 2020 23:04:33 -0500
+In-Reply-To: <20201129181926.897775-2-hch@lst.de> (Christoph Hellwig's message
+        of "Sun, 29 Nov 2020 19:19:23 +0100")
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201201160709.31748-1-snitzer@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9823 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 malwarescore=0 phishscore=0
+ suspectscore=1 bulkscore=0 spamscore=0 adultscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2012030021
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9823 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 bulkscore=0 suspectscore=1
+ phishscore=0 mlxlogscore=999 lowpriorityscore=0 malwarescore=0
+ priorityscore=1501 spamscore=0 impostorscore=0 clxscore=1011 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2012030022
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Dec 01, 2020 at 11:07:09AM -0500, Mike Snitzer wrote:
-> commit 22ada802ede8 ("block: use lcm_not_zero() when stacking
-> chunk_sectors") broke chunk_sectors limit stacking. chunk_sectors must
-> reflect the most limited of all devices in the IO stack.
-> 
-> Otherwise malformed IO may result. E.g.: prior to this fix,
-> ->chunk_sectors = lcm_not_zero(8, 128) would result in
-> blk_max_size_offset() splitting IO at 128 sectors rather than the
-> required more restrictive 8 sectors.
 
-What is the user-visible result of splitting IO at 128 sectors?
+Hi Christoph!
 
-I understand it isn't related with correctness, because the underlying
-queue can split by its own chunk_sectors limit further. So is the issue
-too many further-splitting on queue with chunk_sectors 8? then CPU
-utilization is increased? Or other issue?
+>  - If BLKROSET is used to set a whole-disk device read-only, any
+>    partitions will end up in a read-only state until the user
+>    explicitly clears the flag.
 
-> 
-> And since commit 07d098e6bbad ("block: allow 'chunk_sectors' to be
-> non-power-of-2") care must be taken to properly stack chunk_sectors to
-> be compatible with the possibility that a non-power-of-2 chunk_sectors
-> may be stacked. This is why gcd() is used instead of reverting back
-> to using min_not_zero().
+This no longer appears to be the case with your tweak.
 
-I guess gcd() won't be better because gcd(a,b) is <= max(a, b), so bio
-size is decreased much with gcd(a, b), and IO performance should be affected.
-Maybe worse than min_not_zero(a, b) which is often > gcd(a, b).
+It's very common for database folks to twiddle the read-only state of
+block devices and partitions. I know that our users will find it very
+counter-intuitive that setting /dev/sda read-only won't prevent writes
+to /dev/sda1.
 
+>  int bdev_read_only(struct block_device *bdev)
+>  {
+>  	if (!bdev)
+>  		return 0;
+> -	return bdev->bd_read_only;
+> +	return bdev->bd_read_only ||
+> +		test_bit(GD_READ_ONLY, &bdev->bd_disk->state);
+>  }
 
-Thanks,
-Ming
+I suggest doing bd->bd_read_only || get_disk_ro(...) here. That does
+take part0 into account.
 
+>  static inline int get_disk_ro(struct gendisk *disk)
+>  {
+> -	return disk->part0->bd_read_only;
+> +	return disk->part0->bd_read_only ||
+> +		test_bit(GD_READ_ONLY, &disk->state);
+>  }
+>  
+>  extern void disk_block_events(struct gendisk *disk);
+
+-- 
+Martin K. Petersen	Oracle Linux Engineering
