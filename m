@@ -2,102 +2,144 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6308EC4361B
-	for <linux-block@archiver.kernel.org>; Thu,  3 Dec 2020 17:51:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D1F7C4361A
+	for <linux-block@archiver.kernel.org>; Thu,  3 Dec 2020 17:58:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 00982207B2
-	for <linux-block@archiver.kernel.org>; Thu,  3 Dec 2020 17:51:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B256E207A2
+	for <linux-block@archiver.kernel.org>; Thu,  3 Dec 2020 17:58:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727498AbgLCRuy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Dec 2020 12:50:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43178 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731126AbgLCRux (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Dec 2020 12:50:53 -0500
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7C96C061A4E
-        for <linux-block@vger.kernel.org>; Thu,  3 Dec 2020 09:50:06 -0800 (PST)
-Received: by mail-pj1-x102a.google.com with SMTP id m5so1545640pjv.5
-        for <linux-block@vger.kernel.org>; Thu, 03 Dec 2020 09:50:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=ppnO25OuYQ/1IjELB2kgBioJi4rv6POx6IlxQIXXNpk=;
-        b=HOHj6ayscVe3ZO0DpYfNEMtrxcPpXBfSBduTRP26eJAi9qWeDaEaqvnlWyD1tkgsNn
-         WHf/c+iph12AtDq5ZPiB0xBf7vpVwaQ+d4FmzkhPANMYu7p/pjev/8GYudVFNTVY2ars
-         R0psmS9bdHBmvimevhcc3vnoNApM2yiWbbZqFciw03VA6B2hsct4V9O85JtoFFYiWG/+
-         CQ1HnSZiPPrui+eqkQEZ//rCuCzBXtD68Sm5lSes2CW89A6EAEjmGkSAk95oQI7exFis
-         skTuSOtL2uFNQ/9INU1C2swi0XB4WpYbH2P6PwK4LjQvHJAXEczMh6WIpsHUAxlFLy2R
-         hq0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=ppnO25OuYQ/1IjELB2kgBioJi4rv6POx6IlxQIXXNpk=;
-        b=kSJipE63BTqfXjhSQmD3X7BUjQ6Yme8Z8ZdV9ePnOVjtS+NmngqMW+07GpPJ9RcMsT
-         z+9F2ztEtERHKiCGgeAmR0A2iAspfA4kc+mYaJS1s5KYADa9N3p6kmOG91UWIGAwHzZ0
-         aK4+NQ9UC64OmB1RneDbFYofwILmtSvyGDCS+DIe+oJzGVl53jT8bbNOxG8N8qwMf7gA
-         VFiJpEjT24V8y893RHTL34ihrTswDlb/IIUI2l85IEDw9Q1JM2kKjSjvSo11r5OxVWne
-         kiHkTGWeYKYHlgKFyBQ7iBRHb+tRelGTYcfJmv4zuXeo13qEY901QQEN6zPf7k6Vw4zo
-         icmQ==
-X-Gm-Message-State: AOAM533coaZGSta8XPdDAdXXbA2KNKQ4S6z5QFR/pHNbup1zyTUZicKZ
-        /QfiP6OFOkmQxMsdUM2FHLxeDA==
-X-Google-Smtp-Source: ABdhPJxllA5bbSYrFdTd4toUUA9bg5VaxzP3LGpwUAiBmd2AiI89u7amTYs88FKICVUaW8O+Hlmcgw==
-X-Received: by 2002:a17:90a:7e0f:: with SMTP id i15mr230116pjl.93.1607017806270;
-        Thu, 03 Dec 2020 09:50:06 -0800 (PST)
-Received: from [192.168.1.134] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id e66sm2251101pfe.165.2020.12.03.09.50.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 03 Dec 2020 09:50:05 -0800 (PST)
-Subject: Re: [iov_iter] 9bd0e337c6: will-it-scale.per_process_ops -4.8%
- regression
-To:     Linus Torvalds <torvalds@linux-foundation.org>,
-        kernel test robot <oliver.sang@intel.com>
-Cc:     David Howells <dhowells@redhat.com>, lkp@lists.01.org,
-        kernel test robot <lkp@intel.com>,
-        "Huang, Ying" <ying.huang@intel.com>,
-        Feng Tang <feng.tang@intel.com>, zhengjun.xing@intel.com,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-References: <160596801020.154728.15935034745159191564.stgit@warthog.procyon.org.uk>
- <20201203064536.GE27350@xsang-OptiPlex-9020>
- <CAHk-=wif1iGLiqcsx1YdLS4tN01JuH-MV_oem0duHqskhDTY9A@mail.gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <8124ce0d-c934-0771-5e34-cf5ea030fc08@kernel.dk>
-Date:   Thu, 3 Dec 2020 10:50:03 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1729343AbgLCR6i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Dec 2020 12:58:38 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:41140 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726670AbgLCR6h (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 3 Dec 2020 12:58:37 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1607018230;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=gWp36VufSubdlmAvb6F/9rBQn5CM1OS7g9pplIoqYFw=;
+        b=OFv+DjjAh7r+KI6jXNLUwDwrtS38XPGxPG8r7LFdaRVT7fmiB6mtm98hixvgQC9UBRJqyB
+        DA8rvbPr1TCav1J5dQSzBdxYdW1uTAqjQ1AIwornYhF13nHpga4SoNo9vDeCoResR1iuk7
+        AmqrgH9XRdhSdfKk9aExl4aHkParXGQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-62-usm6uAdLOj-E2Ore2JG19w-1; Thu, 03 Dec 2020 12:57:08 -0500
+X-MC-Unique: usm6uAdLOj-E2Ore2JG19w-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5700C107ACE3;
+        Thu,  3 Dec 2020 17:57:07 +0000 (UTC)
+Received: from localhost (unknown [10.18.25.174])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7016460854;
+        Thu,  3 Dec 2020 17:56:58 +0000 (UTC)
+Date:   Thu, 3 Dec 2020 12:56:57 -0500
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Keith Busch <kbusch@kernel.org>
+Cc:     Ming Lei <ming.lei@redhat.com>, axboe@kernel.dk,
+        martin.petersen@oracle.com, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, jdorminy@redhat.com, bjohnsto@redhat.com
+Subject: Re: [PATCH v2] block: use gcd() to fix chunk_sectors limit stacking
+Message-ID: <20201203175657.GA29623@redhat.com>
+References: <20201130171805.77712-1-snitzer@redhat.com>
+ <20201201160709.31748-1-snitzer@redhat.com>
+ <20201203032608.GD540033@T590>
+ <20201203143359.GA29261@redhat.com>
+ <20201203162738.GA3404013@dhcp-10-100-145-180.wdc.com>
 MIME-Version: 1.0
-In-Reply-To: <CAHk-=wif1iGLiqcsx1YdLS4tN01JuH-MV_oem0duHqskhDTY9A@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201203162738.GA3404013@dhcp-10-100-145-180.wdc.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/3/20 10:47 AM, Linus Torvalds wrote:
-> On Wed, Dec 2, 2020 at 10:31 PM kernel test robot <oliver.sang@intel.com> wrote:
->>
->> FYI, we noticed a -4.8% regression of will-it-scale.per_process_ops due to commit:
+On Thu, Dec 03 2020 at 11:27am -0500,
+Keith Busch <kbusch@kernel.org> wrote:
+
+> On Thu, Dec 03, 2020 at 09:33:59AM -0500, Mike Snitzer wrote:
+> > On Wed, Dec 02 2020 at 10:26pm -0500,
+> > Ming Lei <ming.lei@redhat.com> wrote:
+> > 
+> > > I understand it isn't related with correctness, because the underlying
+> > > queue can split by its own chunk_sectors limit further. So is the issue
+> > > too many further-splitting on queue with chunk_sectors 8? then CPU
+> > > utilization is increased? Or other issue?
+> > 
+> > No, this is all about correctness.
+> > 
+> > Seems you're confining the definition of the possible stacking so that
+> > the top-level device isn't allowed to have its own hard requirements on
+> > IO sizes it sends to its internal implementation.  Just because the
+> > underlying device can split further doesn't mean that the top-level
+> > virtual driver can service larger IO sizes (not if the chunk_sectors
+> > stacking throws away the hint the virtual driver provided because it
+> > used lcm_not_zero).
 > 
-> Ok, I guess that's bigger than expected, but the profile data does
-> show how bad the indirect branches are.
+> I may be missing something obvious here, but if the lower layers split
+> to their desired boundary already, why does this limit need to stack?
 
-It's also in the same range (3-6%) as the microbenchmarks I ran and posted.
-So at least there's correlation there too.
+The problematic scenario is when the topmost layer, or layers, are the
+more constrained.  _That_ is why the top-level's chunk_sectors limit
+cannot be relaxed.
 
--- 
-Jens Axboe
+For example (in extreme where chunk_sectors is stacked via gcd):
+dm VDO target (chunk_sectors=4K)
+on dm-thin (ideally chunk_sectors=1280K, reality chunk_sectors=128K)
+on 10+2 RAID6 (chunk_sectors=128K, io_opt=1280K)
+on raid members (chunk_sectors=0)
+
+Results in the following bottom up blk_stack_limits() stacking:
+gcd(128K, 0) = 128K -> but MD just sets chunk_sectors, no stacking is done afaik
+gcd(1280K, 128K) = 128K -> this one hurts dm-thin, needless splitting
+gcd(4K, 128K) = 4K -> vdo _must_ receive 4K IOs, hurts but "this is the way" ;)
+
+So this is one extreme that shows stacking chunk_sectors is _not_
+helpful (if the resulting chunk_sectors were actually used as basis for
+splitting).  Better for each layer to just impose its own chunk_sectors
+without concern for the layers below.
+
+Think I'd be fine with block core removing the chunk_sectors stacking
+from blk_stack_limits()...
+(and as you see below, I've been forced to revert to _not_ using stacked
+chunk_sectors based splitting in DM)
+
+> Won't it also work if each layer sets their desired chunk_sectors
+> without considering their lower layers? The commit that initially
+> stacked chunk_sectors doesn't provide any explanation.
+
+Yes, I think it would work.  The current stacking doesn't have the
+luxury of knowing which layer a blk_stack_limits() maps too.  BUT within
+a layer chunk_sectors really does need to be compatible/symbiotic.  So
+it is unfortunately all or nothing as you build up the stack.
+
+And that all-or-nothing stacking of chunk_sectors is why I've now (just
+last night, based on further review by jdorminy) had to punt on using
+stacked chunk_sectors and revert DM back to doing its own fine-grained
+(and varied) splitting on a per DM target basis, see:
+https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git/commit/?h=dm-5.10-rcX&id=6bb38bcc33bf3093c08bd1b71e4f20c82bb60dd1
+
+Kind of depressing that I went so far down the rabbit hole, of wanting
+to lean on block core, that I lost sight of an important "tenet of DM":
+
++         * Does the target need to split IO even further?
++         * - varied (per target) IO splitting is a tenet of DM; this
++         *   explains why stacked chunk_sectors based splitting via
++         *   blk_max_size_offset() isn't possible here.
+
+And it is because of this that DM is forced to lean on human creation of
+an optimal IO stack.. which is prone to human error when a particular
+thinp "blocksize" is selected, etc.
+
+Mike
 
