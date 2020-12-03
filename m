@@ -3,42 +3,45 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEA3FC6369E
-	for <linux-block@archiver.kernel.org>; Thu,  3 Dec 2020 01:47:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4587C64E8A
+	for <linux-block@archiver.kernel.org>; Thu,  3 Dec 2020 01:49:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 91A9120C56
-	for <linux-block@archiver.kernel.org>; Thu,  3 Dec 2020 01:47:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6D86C20B80
+	for <linux-block@archiver.kernel.org>; Thu,  3 Dec 2020 01:49:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727711AbgLCBrj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Dec 2020 20:47:39 -0500
-Received: from out30-56.freemail.mail.aliyun.com ([115.124.30.56]:41732 "EHLO
-        out30-56.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727026AbgLCBri (ORCPT
+        id S1726479AbgLCBtN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Dec 2020 20:49:13 -0500
+Received: from out30-42.freemail.mail.aliyun.com ([115.124.30.42]:34710 "EHLO
+        out30-42.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726312AbgLCBtN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 2 Dec 2020 20:47:38 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04395;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=4;SR=0;TI=SMTPD_---0UHMt5k4_1606960015;
-Received: from admindeMacBook-Pro-2.local(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0UHMt5k4_1606960015)
+        Wed, 2 Dec 2020 20:49:13 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R771e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04395;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=4;SR=0;TI=SMTPD_---0UHMcpTK_1606960110;
+Received: from admindeMacBook-Pro-2.local(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0UHMcpTK_1606960110)
           by smtp.aliyun-inc.com(127.0.0.1);
-          Thu, 03 Dec 2020 09:46:56 +0800
-Subject: Re: [PATCH v2] block: fix inflight statistics of part0
-To:     Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>
-Cc:     joseph.qi@linux.alibaba.com, linux-block@vger.kernel.org
-References: <20201202111145.36000-1-jefflexu@linux.alibaba.com>
- <4317c6c9-886f-c921-70c1-ccc12ba6ae79@linux.alibaba.com>
- <20201202112050.GA2201@infradead.org>
- <699798e0-6b38-105f-aacc-938f3ecd6ce4@kernel.dk>
- <20201202190515.GA19811@infradead.org>
+          Thu, 03 Dec 2020 09:48:31 +0800
+Subject: Re: [dm-devel] dm: use gcd() to fix chunk_sectors limit stacking
+To:     Mike Snitzer <snitzer@redhat.com>
+Cc:     linux-block@vger.kernel.org, joseph.qi@linux.alibaba.com,
+        dm-devel@redhat.com
+References: <20201201160709.31748-1-snitzer@redhat.com>
+ <20201202033855.60882-1-jefflexu@linux.alibaba.com>
+ <20201202033855.60882-2-jefflexu@linux.alibaba.com>
+ <feb19a02-5ece-505f-e905-86dc84cdb204@linux.alibaba.com>
+ <20201202050343.GA20535@redhat.com>
+ <7326607a-b687-3989-dee7-cf469ab37ac4@linux.alibaba.com>
+ <20201202151112.GD20535@redhat.com>
 From:   JeffleXu <jefflexu@linux.alibaba.com>
-Message-ID: <a0142c31-6ef3-a35c-f4cb-34dbf98a1194@linux.alibaba.com>
-Date:   Thu, 3 Dec 2020 09:46:55 +0800
+Message-ID: <353a132b-1430-60b0-3f17-979af1b8dd22@linux.alibaba.com>
+Date:   Thu, 3 Dec 2020 09:48:30 +0800
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
  Gecko/20100101 Thunderbird/78.5.0
 MIME-Version: 1.0
-In-Reply-To: <20201202190515.GA19811@infradead.org>
+In-Reply-To: <20201202151112.GD20535@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -48,32 +51,29 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 
 
-On 12/3/20 3:05 AM, Christoph Hellwig wrote:
-> On Wed, Dec 02, 2020 at 09:48:03AM -0700, Jens Axboe wrote:
->> On 12/2/20 4:20 AM, Christoph Hellwig wrote:
->>> On Wed, Dec 02, 2020 at 07:17:55PM +0800, JeffleXu wrote:
->>>>> Fixes: bf0ddaba65dd ("blk-mq: fix sysfs inflight counter")
->>>>> Fixes: f299b7c7a9de ("blk-mq: provide internal in-flight variant")
->>>>> Reviewed-by: Christoph Hellwig <hch@lst.de>
->>>>> Signed-off-by: Jeffle Xu <jefflexu@linux.alibaba.com>
->>>>> ---
->>>>> v2: update the commit log, adding 'Fixes' tag
->>>>
->>>> Forgot to add 'stable' tag.
->>>
->>> The fixes tags take care of that automatically.
->>>
->>> Note that this patch will cause a merge conflict with my work in
->>> linux-next, but the resolution is pretty trivial.
+On 12/2/20 11:11 PM, Mike Snitzer wrote:
+> On Wed, Dec 02 2020 at  2:10am -0500,
+> JeffleXu <jefflexu@linux.alibaba.com> wrote:
+> 
 >>
->> Might be better to handle on the stable side, and just apply this to
->> 5.11. It's not a new regression.
+>>
+>> On 12/2/20 1:03 PM, Mike Snitzer wrote:
+>>> What you've done here is fairly chaotic/disruptive:
+>>> 1) you emailed a patch out that isn't needed or ideal, I dealt already
+>>>    staged a DM fix in linux-next for 5.10-rcX, see:
+>>>    https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git/commit/?h=dm-5.10-rcX&id=f28de262ddf09b635095bdeaf0e07ff507b3c41b
+>>
+>> Then ti->type->io_hints() is still bypassed when type->iterate_devices()
+>> not defined?
 > 
-> If you apply it to for-5.11/block it won't compile.  It'll need a quick
-> s/partno/bd_partno/ there.
-> 
+> Yes, the stacking of limits really is tightly coupled to device-based
+> influence.  Hypothetically some DM target that doesn't remap to any data
+> devices may want to override limits... in practice there isn't a need
+> for this.  If that changes we can take action to accommodate it.. but I'm
+> definitely not interested in modifying DM core in this area when there
+> isn't a demonstrated need.
 
-Fine. I will resend a new version later on the code base of for-5.11/block.
+Thanks.
 
 -- 
 Thanks,
