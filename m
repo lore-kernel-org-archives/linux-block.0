@@ -2,144 +2,179 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D1F7C4361A
-	for <linux-block@archiver.kernel.org>; Thu,  3 Dec 2020 17:58:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C4B4C4361A
+	for <linux-block@archiver.kernel.org>; Thu,  3 Dec 2020 19:10:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B256E207A2
-	for <linux-block@archiver.kernel.org>; Thu,  3 Dec 2020 17:58:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B57DC221E7
+	for <linux-block@archiver.kernel.org>; Thu,  3 Dec 2020 19:10:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729343AbgLCR6i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Dec 2020 12:58:38 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:41140 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726670AbgLCR6h (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 3 Dec 2020 12:58:37 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607018230;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=gWp36VufSubdlmAvb6F/9rBQn5CM1OS7g9pplIoqYFw=;
-        b=OFv+DjjAh7r+KI6jXNLUwDwrtS38XPGxPG8r7LFdaRVT7fmiB6mtm98hixvgQC9UBRJqyB
-        DA8rvbPr1TCav1J5dQSzBdxYdW1uTAqjQ1AIwornYhF13nHpga4SoNo9vDeCoResR1iuk7
-        AmqrgH9XRdhSdfKk9aExl4aHkParXGQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-62-usm6uAdLOj-E2Ore2JG19w-1; Thu, 03 Dec 2020 12:57:08 -0500
-X-MC-Unique: usm6uAdLOj-E2Ore2JG19w-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S1729049AbgLCTKA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Dec 2020 14:10:00 -0500
+Received: from mail-1.ca.inter.net ([208.85.220.69]:60176 "EHLO
+        mail-1.ca.inter.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727374AbgLCTJ7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Dec 2020 14:09:59 -0500
+Received: from localhost (offload-3.ca.inter.net [208.85.220.70])
+        by mail-1.ca.inter.net (Postfix) with ESMTP id 48F7A2EA21C;
+        Thu,  3 Dec 2020 14:09:18 -0500 (EST)
+Received: from mail-1.ca.inter.net ([208.85.220.69])
+        by localhost (offload-3.ca.inter.net [208.85.220.70]) (amavisd-new, port 10024)
+        with ESMTP id vaotILf9rNDk; Thu,  3 Dec 2020 13:58:47 -0500 (EST)
+Received: from [192.168.48.23] (host-104-157-204-209.dyn.295.ca [104.157.204.209])
+        (using TLSv1 with cipher DHE-RSA-AES128-SHA (128/128 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5700C107ACE3;
-        Thu,  3 Dec 2020 17:57:07 +0000 (UTC)
-Received: from localhost (unknown [10.18.25.174])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7016460854;
-        Thu,  3 Dec 2020 17:56:58 +0000 (UTC)
-Date:   Thu, 3 Dec 2020 12:56:57 -0500
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     Ming Lei <ming.lei@redhat.com>, axboe@kernel.dk,
-        martin.petersen@oracle.com, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, jdorminy@redhat.com, bjohnsto@redhat.com
-Subject: Re: [PATCH v2] block: use gcd() to fix chunk_sectors limit stacking
-Message-ID: <20201203175657.GA29623@redhat.com>
-References: <20201130171805.77712-1-snitzer@redhat.com>
- <20201201160709.31748-1-snitzer@redhat.com>
- <20201203032608.GD540033@T590>
- <20201203143359.GA29261@redhat.com>
- <20201203162738.GA3404013@dhcp-10-100-145-180.wdc.com>
+        (Authenticated sender: dgilbert@interlog.com)
+        by mail-1.ca.inter.net (Postfix) with ESMTPSA id 8D6922EA01A;
+        Thu,  3 Dec 2020 14:09:17 -0500 (EST)
+Reply-To: dgilbert@interlog.com
+Subject: Re: [PATCH v2 3/4] scsi_debug : iouring iopoll support
+To:     Kashyap Desai <kashyap.desai@broadcom.com>,
+        linux-scsi@vger.kernel.org
+Cc:     linux-block@vger.kernel.org
+References: <20201203034100.29716-1-kashyap.desai@broadcom.com>
+ <20201203034100.29716-4-kashyap.desai@broadcom.com>
+From:   Douglas Gilbert <dgilbert@interlog.com>
+Message-ID: <97ab044f-7426-6182-f3c3-cfd179637009@interlog.com>
+Date:   Thu, 3 Dec 2020 14:09:17 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201203162738.GA3404013@dhcp-10-100-145-180.wdc.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20201203034100.29716-4-kashyap.desai@broadcom.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-CA
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Dec 03 2020 at 11:27am -0500,
-Keith Busch <kbusch@kernel.org> wrote:
+See my comment further down.
 
-> On Thu, Dec 03, 2020 at 09:33:59AM -0500, Mike Snitzer wrote:
-> > On Wed, Dec 02 2020 at 10:26pm -0500,
-> > Ming Lei <ming.lei@redhat.com> wrote:
-> > 
-> > > I understand it isn't related with correctness, because the underlying
-> > > queue can split by its own chunk_sectors limit further. So is the issue
-> > > too many further-splitting on queue with chunk_sectors 8? then CPU
-> > > utilization is increased? Or other issue?
-> > 
-> > No, this is all about correctness.
-> > 
-> > Seems you're confining the definition of the possible stacking so that
-> > the top-level device isn't allowed to have its own hard requirements on
-> > IO sizes it sends to its internal implementation.  Just because the
-> > underlying device can split further doesn't mean that the top-level
-> > virtual driver can service larger IO sizes (not if the chunk_sectors
-> > stacking throws away the hint the virtual driver provided because it
-> > used lcm_not_zero).
+On 2020-12-02 10:40 p.m., Kashyap Desai wrote:
+> Add support of iouring iopoll interface in scsi_debug.
+> This feature requires shared hosttag support in kernel and driver.
 > 
-> I may be missing something obvious here, but if the lower layers split
-> to their desired boundary already, why does this limit need to stack?
+> Signed-off-by: Kashyap Desai <kashyap.desai@broadcom.com>
+> Acked-by: Douglas Gilbert <dgilbert@interlog.com>
+> Tested-by: Douglas Gilbert <dgilbert@interlog.com>
+> 
+> Cc: dgilbert@interlog.com
+> Cc: linux-block@vger.kernel.org
+> ---
+>   drivers/scsi/scsi_debug.c | 130 ++++++++++++++++++++++++++++++++++++++
+>   1 file changed, 130 insertions(+)
+> 
+> diff --git a/drivers/scsi/scsi_debug.c b/drivers/scsi/scsi_debug.c
+> index 24c0f7ec0351..4ced913f2b39 100644
+> --- a/drivers/scsi/scsi_debug.c
+> +++ b/drivers/scsi/scsi_debug.c
+> @@ -829,6 +829,7 @@ static int sdeb_zbc_max_open = DEF_ZBC_MAX_OPEN_ZONES;
+>   static int sdeb_zbc_nr_conv = DEF_ZBC_NR_CONV_ZONES;
+>   
+>   static int submit_queues = DEF_SUBMIT_QUEUES;  /* > 1 for multi-queue (mq) */
+> +static int poll_queues; /* iouring iopoll interface.*/
+>   static struct sdebug_queue *sdebug_q_arr;  /* ptr to array of submit queues */
+>   
+>   static DEFINE_RWLOCK(atomic_rw);
+> @@ -5432,6 +5433,14 @@ static int schedule_resp(struct scsi_cmnd *cmnd, struct sdebug_dev_info *devip,
+>   	cmnd->host_scribble = (unsigned char *)sqcp;
+>   	sd_dp = sqcp->sd_dp;
+>   	spin_unlock_irqrestore(&sqp->qc_lock, iflags);
+> +
+> +	/* Do not complete IO from default completion path.
+> +	 * Let it to be on queue.
+> +	 * Completion should happen from mq_poll interface.
+> +	 */
+> +	if ((sqp - sdebug_q_arr) >= (submit_queues - poll_queues))
+> +		return 0;
+> +
+>   	if (!sd_dp) {
+>   		sd_dp = kzalloc(sizeof(*sd_dp), GFP_ATOMIC);
+>   		if (!sd_dp) {
+> @@ -5615,6 +5624,7 @@ module_param_named(sector_size, sdebug_sector_size, int, S_IRUGO);
+>   module_param_named(statistics, sdebug_statistics, bool, S_IRUGO | S_IWUSR);
+>   module_param_named(strict, sdebug_strict, bool, S_IRUGO | S_IWUSR);
+>   module_param_named(submit_queues, submit_queues, int, S_IRUGO);
+> +module_param_named(poll_queues, poll_queues, int, S_IRUGO);
+>   module_param_named(tur_ms_to_ready, sdeb_tur_ms_to_ready, int, S_IRUGO);
+>   module_param_named(unmap_alignment, sdebug_unmap_alignment, int, S_IRUGO);
+>   module_param_named(unmap_granularity, sdebug_unmap_granularity, int, S_IRUGO);
+> @@ -5677,6 +5687,7 @@ MODULE_PARM_DESC(opt_xferlen_exp, "optimal transfer length granularity exponent
+>   MODULE_PARM_DESC(opts, "1->noise, 2->medium_err, 4->timeout, 8->recovered_err... (def=0)");
+>   MODULE_PARM_DESC(per_host_store, "If set, next positive add_host will get new store (def=0)");
+>   MODULE_PARM_DESC(physblk_exp, "physical block exponent (def=0)");
+> +MODULE_PARM_DESC(poll_queues, "support for iouring iopoll queues (1 to max(submit_queues - 1)");
+>   MODULE_PARM_DESC(ptype, "SCSI peripheral type(def=0[disk])");
+>   MODULE_PARM_DESC(random, "If set, uniformly randomize command duration between 0 and delay_in_ns");
+>   MODULE_PARM_DESC(removable, "claim to have removable media (def=0)");
+> @@ -7200,6 +7211,104 @@ static int resp_not_ready(struct scsi_cmnd *scp, struct sdebug_dev_info *devip)
+>   	return check_condition_result;
+>   }
+>   
+> +static int sdebug_map_queues(struct Scsi_Host *shost)
+> +{
+> +	int i, qoff;
+> +
+> +	if (shost->nr_hw_queues == 1)
+> +		return 0;
+> +
+> +	for (i = 0, qoff = 0; i < HCTX_MAX_TYPES; i++) {
+> +		struct blk_mq_queue_map *map = &shost->tag_set.map[i];
+> +
+> +		map->nr_queues  = 0;
+> +
+> +		if (i == HCTX_TYPE_DEFAULT)
+> +			map->nr_queues = submit_queues - poll_queues;
+> +		else if (i == HCTX_TYPE_POLL)
+> +			map->nr_queues = poll_queues;
+> +
+> +		if (!map->nr_queues) {
+> +			BUG_ON(i == HCTX_TYPE_DEFAULT);
+> +			continue;
+> +		}
+> +
+> +		map->queue_offset = qoff;
+> +		blk_mq_map_queues(map);
+> +
+> +		qoff += map->nr_queues;
+> +	}
+> +
+> +	return 0;
+> +
+> +}
+> +
+> +static int sdebug_blk_mq_poll(struct Scsi_Host *shost, unsigned int queue_num)
+> +{
+> +	int qc_idx;
+> +	int retiring = 0;
+> +	unsigned long iflags;
+> +	struct sdebug_queue *sqp;
+> +	struct sdebug_queued_cmd *sqcp;
+> +	struct scsi_cmnd *scp;
+> +	struct sdebug_dev_info *devip;
+> +	int num_entries = 0;
+> +
+> +	sqp = sdebug_q_arr + queue_num;
+> +
+> +	do {
+> +		spin_lock_irqsave(&sqp->qc_lock, iflags);
+> +		qc_idx = find_first_bit(sqp->in_use_bm, sdebug_max_queue);
+> +		if (unlikely((qc_idx < 0) || (qc_idx >= sdebug_max_queue)))
+> +			goto out;
 
-The problematic scenario is when the topmost layer, or layers, are the
-more constrained.  _That_ is why the top-level's chunk_sectors limit
-cannot be relaxed.
+If you are rolling this patchset again, perhaps you could change the "if"
+above to:
+		if (likely(qc_idx >= sdebug_max_queue))
 
-For example (in extreme where chunk_sectors is stacked via gcd):
-dm VDO target (chunk_sectors=4K)
-on dm-thin (ideally chunk_sectors=1280K, reality chunk_sectors=128K)
-on 10+2 RAID6 (chunk_sectors=128K, io_opt=1280K)
-on raid members (chunk_sectors=0)
+since find_first_bit() returns unsigned long. Also, if we are polling,
+unless the storage is extremely fast, we should see find_first_bit()
+not finding any bits set most of the time. In that case it will return 
+sdebug_max_queue, so flag it as (more) likely. That should also indicate
+to someone reading the code that the "goto out" in this case is _not_
+an error path and may well be the fast path.
 
-Results in the following bottom up blk_stack_limits() stacking:
-gcd(128K, 0) = 128K -> but MD just sets chunk_sectors, no stacking is done afaik
-gcd(1280K, 128K) = 128K -> this one hurts dm-thin, needless splitting
-gcd(4K, 128K) = 4K -> vdo _must_ receive 4K IOs, hurts but "this is the way" ;)
-
-So this is one extreme that shows stacking chunk_sectors is _not_
-helpful (if the resulting chunk_sectors were actually used as basis for
-splitting).  Better for each layer to just impose its own chunk_sectors
-without concern for the layers below.
-
-Think I'd be fine with block core removing the chunk_sectors stacking
-from blk_stack_limits()...
-(and as you see below, I've been forced to revert to _not_ using stacked
-chunk_sectors based splitting in DM)
-
-> Won't it also work if each layer sets their desired chunk_sectors
-> without considering their lower layers? The commit that initially
-> stacked chunk_sectors doesn't provide any explanation.
-
-Yes, I think it would work.  The current stacking doesn't have the
-luxury of knowing which layer a blk_stack_limits() maps too.  BUT within
-a layer chunk_sectors really does need to be compatible/symbiotic.  So
-it is unfortunately all or nothing as you build up the stack.
-
-And that all-or-nothing stacking of chunk_sectors is why I've now (just
-last night, based on further review by jdorminy) had to punt on using
-stacked chunk_sectors and revert DM back to doing its own fine-grained
-(and varied) splitting on a per DM target basis, see:
-https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git/commit/?h=dm-5.10-rcX&id=6bb38bcc33bf3093c08bd1b71e4f20c82bb60dd1
-
-Kind of depressing that I went so far down the rabbit hole, of wanting
-to lean on block core, that I lost sight of an important "tenet of DM":
-
-+         * Does the target need to split IO even further?
-+         * - varied (per target) IO splitting is a tenet of DM; this
-+         *   explains why stacked chunk_sectors based splitting via
-+         *   blk_max_size_offset() isn't possible here.
-
-And it is because of this that DM is forced to lean on human creation of
-an optimal IO stack.. which is prone to human error when a particular
-thinp "blocksize" is selected, etc.
-
-Mike
-
+Doug Gilbert
