@@ -2,88 +2,83 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A616C71155
-	for <linux-block@archiver.kernel.org>; Wed,  2 Dec 2020 23:23:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57594C6369E
+	for <linux-block@archiver.kernel.org>; Thu,  3 Dec 2020 00:52:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EBCA9206F9
-	for <linux-block@archiver.kernel.org>; Wed,  2 Dec 2020 23:23:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EE205221F7
+	for <linux-block@archiver.kernel.org>; Thu,  3 Dec 2020 00:52:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726504AbgLBXXR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Dec 2020 18:23:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41106 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726253AbgLBXXQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Dec 2020 18:23:16 -0500
-Received: from mail-qk1-x742.google.com (mail-qk1-x742.google.com [IPv6:2607:f8b0:4864:20::742])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8134BC0613D6;
-        Wed,  2 Dec 2020 15:22:36 -0800 (PST)
-Received: by mail-qk1-x742.google.com with SMTP id i199so480949qke.5;
-        Wed, 02 Dec 2020 15:22:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=b+r2FYviV6fq0hR9F0gW+ANicng0tQNzePfUHujQp90=;
-        b=P4MsC5oSelvswwlD88opOomNLvCflYz+xry1oFqYxeJx/Mp7cr2KEy3NHd5VvEgC+n
-         7o5o0HRpZDL1sKFDszG2ulzSShaXZQfjNqTbUtncCnXQu4tVofeui1X2ubgWDVTeIl8M
-         4l+fnDRne2vFi/RHBtqgTus9RKoQQiWg4RBuOI3PhDg4HZaxesm1/jwzSD85EztYodir
-         43nwOpD4qCcc6butM1ftEH/AB9PWq6cA0cCS6kzXZmyN+CTuFfUKG32auJdwehkEX+5A
-         BqatsRB3tp+NbDY7Ux2QH2geoDmveT3PP3JLj4XBEUqRI18vW4P7yrvHZeJxNvOXnLJG
-         HvDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=b+r2FYviV6fq0hR9F0gW+ANicng0tQNzePfUHujQp90=;
-        b=L2lFm41N2u3GKSQdJl8+HCGQIRkw8hkXnB34eixi6AbbHDhTfhcxPh8DDnLZOGPrKl
-         j75Cm9k3Lgf7jE/hcJ+CsFFCLYJlTxZL627UA2CZ+IIT8K0Hcd19z57OhdGOggSfLFE8
-         JR9eHOUWlLM8RskIzX+/piInTsTPvycgPKkBnPfoPPIP1bcdke+lAF1MvwNBVVSxBkzD
-         Fy0ZNV4qlAWyW0tWHu/6o16uLcJZ/qixT9Q6RNaqz59CizHg14GbSJQzB5EEk+C1PPW+
-         nfn1mqlAAWZLEtDuaT/0U1ZWMjFt98IZCqRq2pPwcENhVCMalOW7JiAoncJ+dmbvp0B/
-         U4VA==
-X-Gm-Message-State: AOAM532ptLRRgJVo9yBoXXwHz3sU2BnilOTmwXCB/h8vD6hI0lhv3AYB
-        H0aI4ZSmb8nbBDM4fJQKgmo=
-X-Google-Smtp-Source: ABdhPJyg0LHfRF85QBVE1aNbA5meOz/wKZPBz7cbhnhS5PHEqBCsQVBc6aBImcA/HPpiZ4RRhxFhxQ==
-X-Received: by 2002:a37:2c82:: with SMTP id s124mr200575qkh.130.1606951355454;
-        Wed, 02 Dec 2020 15:22:35 -0800 (PST)
-Received: from localhost ([2620:10d:c091:480::1:ec0f])
-        by smtp.gmail.com with ESMTPSA id h125sm169910qkc.36.2020.12.02.15.22.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Dec 2020 15:22:34 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Wed, 2 Dec 2020 18:22:06 -0500
-From:   Tejun Heo <tj@kernel.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Coly Li <colyli@suse.de>,
-        Song Liu <song@kernel.org>, dm-devel@redhat.com,
-        linux-bcache@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH 9/9] block: use an xarray for disk->part_tbl
-Message-ID: <X8ghnnEfBZWG+nLr@mtj.duckdns.org>
-References: <20201201165424.2030647-1-hch@lst.de>
- <20201201165424.2030647-10-hch@lst.de>
+        id S1726264AbgLCAwT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Dec 2020 19:52:19 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:40251 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725916AbgLCAwT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 2 Dec 2020 19:52:19 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1606956653;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=DRUzegjIlcBkY7wWtZr/BEsqwEEPB0u0Zdc6QykZL38=;
+        b=ZY/Tw2sm/GbgxC/bt58EWihBnaKJ09eIe33zNUs/flu0olWD25sjE/5hOvE1ogqGCKz24/
+        I68Uecxqn6zP9V2487TYWk28kzqynN4Fz8Nx/l1Ns+fnS1dlQqFGvOFCJDHKB7CirpmHb5
+        OqbhihSoGbx4LYh2AXSKEYy4XhBNyEg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-468-14TkWJ0XPBeI6k_Y0kducA-1; Wed, 02 Dec 2020 19:50:49 -0500
+X-MC-Unique: 14TkWJ0XPBeI6k_Y0kducA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0A2E518C8C00;
+        Thu,  3 Dec 2020 00:50:48 +0000 (UTC)
+Received: from T590 (ovpn-12-87.pek2.redhat.com [10.72.12.87])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id C712F5C1B4;
+        Thu,  3 Dec 2020 00:50:39 +0000 (UTC)
+Date:   Thu, 3 Dec 2020 08:50:35 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Qian Cai <qcai@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
+        Sumit Saxena <sumit.saxena@broadcom.com>,
+        John Garry <john.garry@huawei.com>,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH 0/3] blk-mq/nvme-loop: use nvme-loop's lock class for
+ addressing lockdep false positive warning
+Message-ID: <20201203005035.GA540033@T590>
+References: <20201112075526.947079-1-ming.lei@redhat.com>
+ <20201130023606.GC230145@T590>
+ <b70f46b855858a28b0e77ee7efbb2dbffbb56490.camel@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201201165424.2030647-10-hch@lst.de>
+In-Reply-To: <b70f46b855858a28b0e77ee7efbb2dbffbb56490.camel@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Dec 01, 2020 at 05:54:24PM +0100, Christoph Hellwig wrote:
-> Now that no fast path lookups in the partition table are left, there is
-> no point in micro-optimizing the data structure for it.  Just use a bog
-> standard xarray.
+On Wed, Dec 02, 2020 at 02:07:08PM -0500, Qian Cai wrote:
+> On Mon, 2020-11-30 at 10:36 +0800, Ming Lei wrote:
+> > Any chance to take a look? And this issue has been reported several
+> > times in RH internal test.
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> I suppose that you will need to rebase as it does not apply cleanly on today's
+> linux-next.
+> 
 
-Acked-by: Tejun Heo <tj@kernel.org>
+I just apply the three patches against for-5.11/block, and they can be
+done cleanly.
 
-Thanks!
 
--- 
-tejun
+Thanks,
+Ming
+
