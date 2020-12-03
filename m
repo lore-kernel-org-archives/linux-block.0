@@ -7,40 +7,39 @@ X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71E26C63777
-	for <linux-block@archiver.kernel.org>; Thu,  3 Dec 2020 06:45:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86933C63777
+	for <linux-block@archiver.kernel.org>; Thu,  3 Dec 2020 06:47:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 160EC206F9
-	for <linux-block@archiver.kernel.org>; Thu,  3 Dec 2020 06:45:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2FC0120758
+	for <linux-block@archiver.kernel.org>; Thu,  3 Dec 2020 06:47:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727415AbgLCGpL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Dec 2020 01:45:11 -0500
-Received: from mx2.suse.de ([195.135.220.15]:48700 "EHLO mx2.suse.de"
+        id S1729680AbgLCGr0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Dec 2020 01:47:26 -0500
+Received: from mx2.suse.de ([195.135.220.15]:49536 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726226AbgLCGpL (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 3 Dec 2020 01:45:11 -0500
+        id S1728515AbgLCGr0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 3 Dec 2020 01:47:26 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id C73FEABE9;
-        Thu,  3 Dec 2020 06:44:29 +0000 (UTC)
-Subject: Re: [PATCH V2 3/3] Revert "block: Fix a lockdep complaint triggered
- by request queue flushing"
+        by mx2.suse.de (Postfix) with ESMTP id 08FABAD6B;
+        Thu,  3 Dec 2020 06:46:44 +0000 (UTC)
+Subject: Re: [PATCH V2 1/2] block: add bio_iov_iter_nvecs for figuring out
+ nr_vecs
 To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org,
-        Kashyap Desai <kashyap.desai@broadcom.com>,
-        Qian Cai <cai@redhat.com>, Christoph Hellwig <hch@lst.de>,
-        Sumit Saxena <sumit.saxena@broadcom.com>,
-        John Garry <john.garry@huawei.com>,
-        Bart Van Assche <bvanassche@acm.org>
-References: <20201203012638.543321-1-ming.lei@redhat.com>
- <20201203012638.543321-4-ming.lei@redhat.com>
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        linux-fsdevel@vger.kernel.org
+References: <20201203022940.616610-1-ming.lei@redhat.com>
+ <20201203022940.616610-2-ming.lei@redhat.com>
 From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <000de78f-a0b5-bec9-9b1c-7032dd930ac4@suse.de>
-Date:   Thu, 3 Dec 2020 07:44:29 +0100
+Message-ID: <c071e58e-c78f-b0b9-1369-b84e39d6e317@suse.de>
+Date:   Thu, 3 Dec 2020 07:46:43 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.4.0
 MIME-Version: 1.0
-In-Reply-To: <20201203012638.543321-4-ming.lei@redhat.com>
+In-Reply-To: <20201203022940.616610-2-ming.lei@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -48,30 +47,30 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/3/20 2:26 AM, Ming Lei wrote:
-> This reverts commit b3c6a59975415bde29cfd76ff1ab008edbf614a9.
+On 12/3/20 3:29 AM, Ming Lei wrote:
+> Pavel reported that iov_iter_npages is a bit heavy in case of bvec
+> iter.
 > 
-> Now we can avoid nvme-loop lockdep warning of 'lockdep possible recursive locking'
-> by nvme-loop's lock class, no need to apply dynamically allocated lock class key,
-> so revert commit b3c6a5997541("block: Fix a lockdep complaint triggered by request
-> queue flushing").
+> Turns out it isn't necessary to iterate every page in the bvec iter,
+> and we call iov_iter_npages() just for figuring out how many bio
+> vecs need to be allocated. And we can simply map each vector in bvec iter
+> to bio's vec, so just return iter->nr_segs from bio_iov_iter_nvecs() for
+> bvec iter.
 > 
-> This way fixes horrible SCSI probe delay issue on megaraid_sas, and it is reported
-> the whole probe may take more than half an hour.
+> This patch is based on Mathew's post:
 > 
-> Tested-by: Kashyap Desai <kashyap.desai@broadcom.com>
-> Reported-by: Qian Cai <cai@redhat.com>
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Cc: Sumit Saxena <sumit.saxena@broadcom.com>
-> Cc: John Garry <john.garry@huawei.com>
-> Cc: Kashyap Desai <kashyap.desai@broadcom.com>
-> Cc: Bart Van Assche <bvanassche@acm.org>
-> Cc: Hannes Reinecke <hare@suse.de>
+> https://lore.kernel.org/linux-block/20201120123931.GN29991@casper.infradead.org/
+> 
+> Reviewed-by: Pavel Begunkov <asml.silence@gmail.com>
+> Reviewed-by: Christoph Hellwig <hch@infradead.org>
+> Cc: Matthew Wilcox <willy@infradead.org>
+> Cc: linux-fsdevel@vger.kernel.org
 > Signed-off-by: Ming Lei <ming.lei@redhat.com>
 > ---
->   block/blk-flush.c | 5 -----
->   block/blk.h       | 1 -
->   2 files changed, 6 deletions(-)
+>   fs/block_dev.c       |  4 ++--
+>   fs/iomap/direct-io.c |  4 ++--
+>   include/linux/bio.h  | 10 ++++++++++
+>   3 files changed, 14 insertions(+), 4 deletions(-)
 > 
 Reviewed-by: Hannes Reinecke <hare@suse.de>
 
