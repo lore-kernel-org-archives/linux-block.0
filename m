@@ -2,161 +2,91 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-12.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57D75C6369E
-	for <linux-block@archiver.kernel.org>; Thu,  3 Dec 2020 00:57:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6B26C6369E
+	for <linux-block@archiver.kernel.org>; Thu,  3 Dec 2020 01:25:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EE5A3221FD
-	for <linux-block@archiver.kernel.org>; Thu,  3 Dec 2020 00:57:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4EF1D221FB
+	for <linux-block@archiver.kernel.org>; Thu,  3 Dec 2020 01:25:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728306AbgLCA4x (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Dec 2020 19:56:53 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:25890 "EHLO
+        id S1726701AbgLCBZj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Dec 2020 20:25:39 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26894 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727847AbgLCA4w (ORCPT
+        by vger.kernel.org with ESMTP id S1725959AbgLCBZj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 2 Dec 2020 19:56:52 -0500
+        Wed, 2 Dec 2020 20:25:39 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1606956926;
+        s=mimecast20190719; t=1606958652;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=u6jjHOQzTA8Sd3JCKVBROP9JIJ2GaIP3pAhLVVnfILY=;
-        b=KcQI2Id6CVi7stZ8gxOkZlpWM+Mnt2/NNmPUuL6S439jWIKmidmlOMqWYqkYXm3LvTN+V/
-        WEktNZEV6rmVWAB6FaR9avU6Vq8kENCsk6FXEw0nNIlzMuh7LTyGOlxbzR78lHnnFA88Bd
-        cx/rBRuXk2stGLsHOsd6RqbyeI6gckE=
+        bh=BnB6KEGreP4BJbO64pikkiDEYWis3mZbnxN7CY98rMw=;
+        b=AL/caAwr9EGuHGXM8H8sPstox2edtWGM62uGHfVCL3oPvOcf05b6giBI6w1UirOGvnboVa
+        on9hikbmnGX62qQJ3KxedNSwiAN5r0Ai5mRPWRL3NFSA3eN/NaAxFyDhv4iz7Oyh5kVlVe
+        gLX4odNnncwBQ+gd4olKZQiL8X0HvHY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-16-aAsKkszZP4K7l5CGxIlTdA-1; Wed, 02 Dec 2020 19:55:22 -0500
-X-MC-Unique: aAsKkszZP4K7l5CGxIlTdA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-521-Dtml8vCjOzaToCuTRuXPMw-1; Wed, 02 Dec 2020 20:24:08 -0500
+X-MC-Unique: Dtml8vCjOzaToCuTRuXPMw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9272B107B45E;
-        Thu,  3 Dec 2020 00:55:20 +0000 (UTC)
-Received: from T590 (ovpn-12-87.pek2.redhat.com [10.72.12.87])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9ED7F60855;
-        Thu,  3 Dec 2020 00:55:10 +0000 (UTC)
-Date:   Thu, 3 Dec 2020 08:55:05 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     John Garry <john.garry@huawei.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, hch@lst.de, hare@suse.de,
-        ppvk@codeaurora.org, bvanassche@acm.org, kashyap.desai@broadcom.com
-Subject: Re: [RFC PATCH] blk-mq: Clean up references when freeing rqs
-Message-ID: <20201203005505.GB540033@T590>
-References: <1606827738-238646-1-git-send-email-john.garry@huawei.com>
- <20201202033134.GD494805@T590>
- <aaf77015-3039-6b04-3417-d376e3467444@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aaf77015-3039-6b04-3417-d376e3467444@huawei.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8D932805BF1;
+        Thu,  3 Dec 2020 01:24:06 +0000 (UTC)
+Received: from ovpn-66-132.rdu2.redhat.com (unknown [10.10.67.132])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 123AC60BFA;
+        Thu,  3 Dec 2020 01:23:59 +0000 (UTC)
+Message-ID: <c34804b3a4db1701fab9e03078ce75a69d9b446e.camel@redhat.com>
+Subject: Re: [PATCH 0/3] blk-mq/nvme-loop: use nvme-loop's lock class for
+ addressing lockdep false positive warning
+From:   Qian Cai <qcai@redhat.com>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
+        Sumit Saxena <sumit.saxena@broadcom.com>,
+        John Garry <john.garry@huawei.com>,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.de>
+Date:   Wed, 02 Dec 2020 20:23:58 -0500
+In-Reply-To: <20201203005035.GA540033@T590>
+References: <20201112075526.947079-1-ming.lei@redhat.com>
+         <20201130023606.GC230145@T590>
+         <b70f46b855858a28b0e77ee7efbb2dbffbb56490.camel@redhat.com>
+         <20201203005035.GA540033@T590>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Dec 02, 2020 at 11:18:31AM +0000, John Garry wrote:
-> On 02/12/2020 03:31, Ming Lei wrote:
-> > On Tue, Dec 01, 2020 at 09:02:18PM +0800, John Garry wrote:
-> > > It has been reported many times that a use-after-free can be intermittently
-> > > found when iterating busy requests:
-> > > 
-> > > - https://lore.kernel.org/linux-block/8376443a-ec1b-0cef-8244-ed584b96fa96@huawei.com/
-> > > - https://lore.kernel.org/linux-block/5c3ac5af-ed81-11e4-fee3-f92175f14daf@acm.org/T/#m6c1ac11540522716f645d004e2a5a13c9f218908
-> > > - https://lore.kernel.org/linux-block/04e2f9e8-79fa-f1cb-ab23-4a15bf3f64cc@kernel.dk/
-> > > 
-> > > The issue is that when we switch scheduler or change queue nr_requests,
-> > > the driver tagset may keep references to the stale requests.
-> > > 
-> > > As a solution, clean up any references to those requests in the driver
-> > > tagset when freeing. This is done with a cmpxchg to make safe any race
-> > > with setting the driver tagset request from another queue.
-> > > 
-> > > Signed-off-by: John Garry <john.garry@huawei.com>
-> > > --
-> > > Set as RFC as I need to test more. And not sure on solution method, as
-> > > Bart had another idea.
-> > > 
-> > > diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-> > > index d1eafe2c045c..9b042c7036b3 100644
-> > > --- a/block/blk-mq-sched.c
-> > > +++ b/block/blk-mq-sched.c
-> > > @@ -621,7 +621,7 @@ void blk_mq_sched_free_requests(struct request_queue *q)
-> > >   	queue_for_each_hw_ctx(q, hctx, i) {
-> > >   		if (hctx->sched_tags)
-> > > -			blk_mq_free_rqs(q->tag_set, hctx->sched_tags, i);
-> > > +			blk_mq_free_rqs_ext(q->tag_set, hctx->sched_tags, i, hctx->tags);
-> > >   	}
-> > >   }
-> > > diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-> > > index 9c92053e704d..562db72e7d79 100644
-> > > --- a/block/blk-mq-tag.c
-> > > +++ b/block/blk-mq-tag.c
-> > > @@ -576,7 +576,7 @@ int blk_mq_tag_update_depth(struct blk_mq_hw_ctx *hctx,
-> > >   			return -ENOMEM;
-> > >   		}
-> > > -		blk_mq_free_rqs(set, *tagsptr, hctx->queue_num);
-> > > +		blk_mq_free_rqs_ext(set, *tagsptr, hctx->queue_num, hctx->tags);
-> > >   		blk_mq_free_rq_map(*tagsptr, flags);
-> > >   		*tagsptr = new;
-> > >   	} else {
-> > > diff --git a/block/blk-mq.c b/block/blk-mq.c
-> > > index 55bcee5dc032..f3aad695cd25 100644
-> > > --- a/block/blk-mq.c
-> > > +++ b/block/blk-mq.c
-> > > @@ -2271,8 +2271,8 @@ blk_qc_t blk_mq_submit_bio(struct bio *bio)
-> > >   	return BLK_QC_T_NONE;
-> > >   }
-> > > -void blk_mq_free_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
-> > > -		     unsigned int hctx_idx)
-> > > +void blk_mq_free_rqs_ext(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
-> > > +		     unsigned int hctx_idx, struct blk_mq_tags *references)
-> > >   {
-> > >   	struct page *page;
-> > > @@ -2281,10 +2281,13 @@ void blk_mq_free_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
-> > >   		for (i = 0; i < tags->nr_tags; i++) {
-> > >   			struct request *rq = tags->static_rqs[i];
-> > > +			int j;
-> > >   			if (!rq)
-> > >   				continue;
-> > >   			set->ops->exit_request(set, rq, hctx_idx);
-> > > +			for (j = 0; references && j < references->nr_tags; j++)
-> > > +				cmpxchg(&references->rqs[j], rq, 0);
+On Thu, 2020-12-03 at 08:50 +0800, Ming Lei wrote:
+> On Wed, Dec 02, 2020 at 02:07:08PM -0500, Qian Cai wrote:
+> > On Mon, 2020-11-30 at 10:36 +0800, Ming Lei wrote:
+> > > Any chance to take a look? And this issue has been reported several
+> > > times in RH internal test.
 > > 
-> > Seems you didn't address the comment in the following link:
-> > 
-> > 	https://lore.kernel.org/linux-block/10331543-9e45-ae63-8cdb-17e5a2a3b7ef@huawei.com/
-> > 
-> > The request to be freed may still be refered in another path, such as blk_mq_queue_tag_busy_iter
-> > or blk_mq_tagset_busy_iter(), and cmpxchg() doesn't drain/wait for other refers.
+> > I suppose that you will need to rebase as it does not apply cleanly on
+> > today's
+> > linux-next.
 > > 
 > 
-> Hi Ming,
-> 
-> Yeah, so I said that was another problem which you mentioned there, which
-> I'm not addressing, but I don't think that I'm making thing worse here.
+> I just apply the three patches against for-5.11/block, and they can be
+> done cleanly.
 
-The thing is that this patch does not fix the issue completely.
+Ah, sorry. It was a bit whitespace damages on my end. This did really fix the
+megasas_raid boot hang here. Since 103fbf8e4020 ("scsi: megaraid_sas: Added
+support for shared host tagset for cpuhotplug") is now in the mainline, it
+probably makes sense to merge this patchset for v5.10 as well to avoid breakage.
+Anyway,
 
-> 
-> So AFAICS, the blk-mq/sched code doesn't wait for any "readers" to be
-> finished, such as those running blk_mq_queue_tag_busy_iter or
-> blk_mq_tagset_busy_iter() in another context.
-> 
-> So how about the idea of introducing some synchronization primitive, such as
-> semaphore, which those "readers" must grab and release at start and end (of
-> iter), to ensure the requests are not freed during the iteration?
-
-It looks good, however devil is in details, please make into patch for
-review.
-
-
-thanks,
-Ming
+Tested-by: Qian Cai <qcai@redhat.com>
 
