@@ -2,77 +2,139 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60A48C83014
-	for <linux-block@archiver.kernel.org>; Thu,  3 Dec 2020 06:41:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59DD9C64E7B
+	for <linux-block@archiver.kernel.org>; Thu,  3 Dec 2020 06:43:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1C4772225A
-	for <linux-block@archiver.kernel.org>; Thu,  3 Dec 2020 06:41:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0C57620709
+	for <linux-block@archiver.kernel.org>; Thu,  3 Dec 2020 06:43:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728185AbgLCGlh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Dec 2020 01:41:37 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35911 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728618AbgLCGlg (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 3 Dec 2020 01:41:36 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1606977610;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=4a+ZpQmjLgoV6jCwYnyDxtAMBa2ORCm8AqUKIqPXkLU=;
-        b=IbWS/Y+FHwJAIKQxGclTpyTBRprPNhg3rvhu5M7qtoJMvjCSJ6rwhiqK5tUoCHAKUxFYTE
-        ZJVAseDph2OYnxBNq5fp84seo26/gBjnHTnl/rkVF5aOssxjSDXJ9R0FIiNEa+m62aq81G
-        EDOP5MSYjekJBZ0v2ac/F+M5rAsxesA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-95-jcc9ZzulNrKGkc15zcOW0Q-1; Thu, 03 Dec 2020 01:40:06 -0500
-X-MC-Unique: jcc9ZzulNrKGkc15zcOW0Q-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BB5018030D5;
-        Thu,  3 Dec 2020 06:40:04 +0000 (UTC)
-Received: from T590 (ovpn-13-173.pek2.redhat.com [10.72.13.173])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id C920C1A890;
-        Thu,  3 Dec 2020 06:39:51 +0000 (UTC)
-Date:   Thu, 3 Dec 2020 14:39:41 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        Coly Li <colyli@suse.de>, Song Liu <song@kernel.org>,
-        dm-devel@redhat.com, linux-bcache@vger.kernel.org,
-        linux-raid@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH 3/9] block: store a block_device pointer in struct bio
-Message-ID: <20201203063941.GA629758@T590>
-References: <20201201165424.2030647-1-hch@lst.de>
- <20201201165424.2030647-4-hch@lst.de>
+        id S1727278AbgLCGnh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Dec 2020 01:43:37 -0500
+Received: from mx2.suse.de ([195.135.220.15]:48430 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726685AbgLCGnh (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 3 Dec 2020 01:43:37 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 660BFAC55;
+        Thu,  3 Dec 2020 06:42:55 +0000 (UTC)
+Subject: Re: [PATCH V2 1/3] blk-mq: add new API of
+ blk_mq_hctx_set_fq_lock_class
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
+        Qian Cai <cai@redhat.com>,
+        Sumit Saxena <sumit.saxena@broadcom.com>,
+        John Garry <john.garry@huawei.com>,
+        Bart Van Assche <bvanassche@acm.org>
+References: <20201203012638.543321-1-ming.lei@redhat.com>
+ <20201203012638.543321-2-ming.lei@redhat.com>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <997e071a-bc6b-3a8a-6784-66324e9ff09e@suse.de>
+Date:   Thu, 3 Dec 2020 07:42:54 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201201165424.2030647-4-hch@lst.de>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <20201203012638.543321-2-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Dec 01, 2020 at 05:54:18PM +0100, Christoph Hellwig wrote:
-> Replace the gendisk pointer in struct bio with a pointer to the newly
-> improved struct block device.  From that the gendisk can be trivially
-> accessed with an extra indirection, but it also allows to directly
-> look up all information related to partition remapping.
+On 12/3/20 2:26 AM, Ming Lei wrote:
+> flush_end_io() may be called recursively from some driver, such as
+> nvme-loop, so lockdep may complain 'possible recursive locking'.
+> Commit b3c6a5997541("block: Fix a lockdep complaint triggered by
+> request queue flushing") tried to address this issue by assigning
+> dynamically allocated per-flush-queue lock class. This solution
+> adds synchronize_rcu() for each hctx's release handler, and causes
+> horrible SCSI MQ probe delay(more than half an hour on megaraid sas).
+> 
+> Add new API of blk_mq_hctx_set_fq_lock_class() for these drivers, so
+> we just need to use driver specific lock class for avoiding the
+> lockdep warning of 'possible recursive locking'.
+> 
+> Tested-by: Kashyap Desai <kashyap.desai@broadcom.com>
+> Reported-by: Qian Cai <cai@redhat.com>
+> Cc: Sumit Saxena <sumit.saxena@broadcom.com>
+> Cc: John Garry <john.garry@huawei.com>
+> Cc: Kashyap Desai <kashyap.desai@broadcom.com>
+> Cc: Bart Van Assche <bvanassche@acm.org>
+> Cc: Hannes Reinecke <hare@suse.de>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>   block/blk-flush.c      | 25 +++++++++++++++++++++++++
+>   include/linux/blk-mq.h |  3 +++
+>   2 files changed, 28 insertions(+)
+> 
+> diff --git a/block/blk-flush.c b/block/blk-flush.c
+> index 9507dcdd5881..bf51588762d8 100644
+> --- a/block/blk-flush.c
+> +++ b/block/blk-flush.c
+> @@ -490,3 +490,28 @@ void blk_free_flush_queue(struct blk_flush_queue *fq)
+>   	kfree(fq->flush_rq);
+>   	kfree(fq);
+>   }
+> +
+> +/*
+> + * Allow driver to set its own lock class to fq->mq_flush_lock for
+> + * avoiding lockdep complaint.
+> + *
+> + * flush_end_io() may be called recursively from some driver, such as
+> + * nvme-loop, so lockdep may complain 'possible recursive locking' because
+> + * all 'struct blk_flush_queue' instance share same mq_flush_lock lock class
+> + * key. We need to assign different lock class for these driver's
+> + * fq->mq_flush_lock for avoiding the lockdep warning.
+> + *
+> + * Use dynamically allocated lock class key for each 'blk_flush_queue'
+> + * instance is over-kill, and more worse it introduces horrible boot delay
+> + * issue because synchronize_rcu() is implied in lockdep_unregister_key which
+> + * is called for each hctx release. SCSI probing may synchronously create and
+> + * destroy lots of MQ request_queues for non-existent devices, and some robot
+> + * test kernel always enable lockdep option. It is observed that more than half
+> + * an hour is taken during SCSI MQ probe with per-fq lock class.
+> + */
+> +void blk_mq_hctx_set_fq_lock_class(struct blk_mq_hw_ctx *hctx,
+> +		struct lock_class_key *key)
+> +{
+> +	lockdep_set_class(&hctx->fq->mq_flush_lock, key);
+> +}
+> +EXPORT_SYMBOL_GPL(blk_mq_hctx_set_fq_lock_class);
+> diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+> index 794b2a33a2c3..5f639240760e 100644
+> --- a/include/linux/blk-mq.h
+> +++ b/include/linux/blk-mq.h
+> @@ -5,6 +5,7 @@
+>   #include <linux/blkdev.h>
+>   #include <linux/sbitmap.h>
+>   #include <linux/srcu.h>
+> +#include <linux/lockdep.h>
+>   
+>   struct blk_mq_tags;
+>   struct blk_flush_queue;
+> @@ -594,5 +595,7 @@ static inline void blk_mq_cleanup_rq(struct request *rq)
+>   }
+>   
+>   blk_qc_t blk_mq_submit_bio(struct bio *bio);
+> +void blk_mq_hctx_set_fq_lock_class(struct blk_mq_hw_ctx *hctx,
+> +		struct lock_class_key *key);
+>   
+>   #endif
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-The extra indirection is often done in fast path, so just wondering why
-you don't consider to embed gendisk into block_device? Then the extra
-indirection can be avoided.
+Cheers,
 
-
-Thanks,
-Ming
-
+Hannes
+-- 
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
