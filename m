@@ -2,137 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10CBDC433FE
-	for <linux-block@archiver.kernel.org>; Fri,  4 Dec 2020 02:12:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60BE5C4361A
+	for <linux-block@archiver.kernel.org>; Fri,  4 Dec 2020 02:43:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9977522510
-	for <linux-block@archiver.kernel.org>; Fri,  4 Dec 2020 02:12:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 226A9207D1
+	for <linux-block@archiver.kernel.org>; Fri,  4 Dec 2020 02:43:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726188AbgLDCMv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Dec 2020 21:12:51 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:47377 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726028AbgLDCMu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 3 Dec 2020 21:12:50 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607047882;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=y+Y5SOT/Fm6t4WhsfMMpJn6h4GekiuBK2ae7q3GDvl8=;
-        b=dGV9XnaQi2v1XFitYEefGJ+M6w1osXEAzdxz0K+gXX9JVfLRD+jpCOew7kLb2Y00mlIaFw
-        rBt7aq0Ty2/N4O52j3flBM6tqBYcedRH6s37CHbZ/O00YtHGYBEYdHO2Cl7Rz3J6UvDNs8
-        tnSGY4r5qGqlUdLZUz9DR3T5oI1vreo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-510-I24cw4I6NYKrJRyQKzX54Q-1; Thu, 03 Dec 2020 21:11:19 -0500
-X-MC-Unique: I24cw4I6NYKrJRyQKzX54Q-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C3706100C600;
-        Fri,  4 Dec 2020 02:11:17 +0000 (UTC)
-Received: from localhost (unknown [10.18.25.174])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id EDB4160854;
-        Fri,  4 Dec 2020 02:11:09 +0000 (UTC)
-Date:   Thu, 3 Dec 2020 21:11:08 -0500
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Ming Lei <ming.lei@redhat.com>, hare@suse.de
-Cc:     Keith Busch <kbusch@kernel.org>, axboe@kernel.dk,
-        martin.petersen@oracle.com, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, jdorminy@redhat.com, bjohnsto@redhat.com
-Subject: Re: [PATCH v2] block: use gcd() to fix chunk_sectors limit stacking
-Message-ID: <20201204021108.GB32150@redhat.com>
-References: <20201130171805.77712-1-snitzer@redhat.com>
- <20201201160709.31748-1-snitzer@redhat.com>
- <20201203032608.GD540033@T590>
- <20201203143359.GA29261@redhat.com>
- <20201203162738.GA3404013@dhcp-10-100-145-180.wdc.com>
- <20201204014535.GC661914@T590>
+        id S1726061AbgLDCnn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Dec 2020 21:43:43 -0500
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:58736 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725960AbgLDCnm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Dec 2020 21:43:42 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1607049822; x=1638585822;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=dMbXIo35yB3tGZnfQHWQ/0tYXzfasVmCu3g/hmWAsR8=;
+  b=jeSqUOkLbKmH7a7ntqG2rl0VhpXZVPh6vpq+WwxxghCrDvvHyvaxYNVz
+   XEOSkuKpDedlToSCwl1q077QvUU6fBfPPZzx3QNxyNP/YYK1lJCKR8B1m
+   N9/m/Tzvzz0vf0fKpfR/Utv2nZkm4pGO2Z9Rdf8cIXiyKrzQ4w/C8tgIf
+   zXAIAFQHKnGQ1KrynAAK5Nz1ZlVPZCgtBsRvO1S7HKlbJzSB2kHZZVhhv
+   CDhF2QzaLWH2ciXhPMd6ZlohWCbhg2BekuRpVK4r2UR8lDm8rizZjW/T5
+   5M50YBevfT5KHAd1TYzjv8M4s5fRYqB6c0As6SkD6Miqfzqh2KhyZWRwH
+   g==;
+IronPort-SDR: QGq+tEDDRFdXqRvpcJUfFVwQ5xxPUCBV7QmQwMdGJ7U7NEq6+NHtCI2g3NDGIoQwwSBc5T6Myl
+ abuZZOx9bDFMi5L7jy6Ugd+lEgokn/Syrs/+RSGbnM1cVyDjg6D/PLD8j6e6mvYlzdSHXcz1ug
+ uIQ+Nktn9wImiuj/9l+OKZuLJNCFAIg50ieqfxeHHvqS6nUOU4cwqyiyKo4fE5GSH05bWh3TI4
+ osiZtSaRaZgZwZ/ZJulmLlDjfmgNWg7z3cYfIF8dH8TczwF5C7BIDwWvDcr/C4OI2pefsssBFK
+ Fyw=
+X-IronPort-AV: E=Sophos;i="5.78,391,1599494400"; 
+   d="scan'208";a="264546962"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 04 Dec 2020 10:42:36 +0800
+IronPort-SDR: nXd9hSxOHYwIppn35rotAZjnRtzjF0MSsROgqwBbnk/phvx76FUNeaGFqBGVrJefzxVp3nHfz2
+ +JoIRZqrWcm3+XrizwvHZlQxXzN7ynt6E=
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Dec 2020 18:28:09 -0800
+IronPort-SDR: HkjqcvL2CkcQ9NIKY1I03CRhrQGBKfUIOmNuI7iVXTMFMJ3cyZdSYeWadZF940G6kxXPiuJXbE
+ e2irB4By0DMA==
+WDCIronportException: Internal
+Received: from shindev.dhcp.fujisawa.hgst.com ([10.149.52.189])
+  by uls-op-cesaip01.wdc.com with ESMTP; 03 Dec 2020 18:42:35 -0800
+From:   Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To:     linux-block@vger.kernel.org, Omar Sandoval <osandov@fb.com>
+Cc:     Omar Sandoval <osandov@osandov.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests v2 0/2] Support max_open_zones and max_active_zones
+Date:   Fri,  4 Dec 2020 11:42:33 +0900
+Message-Id: <20201204024235.273924-1-shinichiro.kawasaki@wdc.com>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201204014535.GC661914@T590>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Dec 03 2020 at  8:45pm -0500,
-Ming Lei <ming.lei@redhat.com> wrote:
+Linux kernel 5.9 introduced new sysfs attributes max_active_zones and
+max_open_zones for zoned block devices. Blktests already handles
+max_active_zones. However, max_open_zones handling is missing. Also,
+zbd/005 lacks support for the two attributes.
 
-> On Thu, Dec 03, 2020 at 08:27:38AM -0800, Keith Busch wrote:
-> > On Thu, Dec 03, 2020 at 09:33:59AM -0500, Mike Snitzer wrote:
-> > > On Wed, Dec 02 2020 at 10:26pm -0500,
-> > > Ming Lei <ming.lei@redhat.com> wrote:
-> > > 
-> > > > I understand it isn't related with correctness, because the underlying
-> > > > queue can split by its own chunk_sectors limit further. So is the issue
-> > > > too many further-splitting on queue with chunk_sectors 8? then CPU
-> > > > utilization is increased? Or other issue?
-> > > 
-> > > No, this is all about correctness.
-> > > 
-> > > Seems you're confining the definition of the possible stacking so that
-> > > the top-level device isn't allowed to have its own hard requirements on
-> > > IO sizes it sends to its internal implementation.  Just because the
-> > > underlying device can split further doesn't mean that the top-level
-> > > virtual driver can service larger IO sizes (not if the chunk_sectors
-> > > stacking throws away the hint the virtual driver provided because it
-> > > used lcm_not_zero).
-> > 
-> > I may be missing something obvious here, but if the lower layers split
-> > to their desired boundary already, why does this limit need to stack?
-> > Won't it also work if each layer sets their desired chunk_sectors
-> > without considering their lower layers? The commit that initially
-> > stacked chunk_sectors doesn't provide any explanation.
-> 
-> There could be several reasons:
-> 
-> 1) some limits have to be stacking, such as logical block size, because
-> lower layering may not handle un-aligned IO
-> 
-> 2) performance reason, if every limits are stacked on topmost layer, in
-> theory IO just needs to be splitted in top layer, and not need to be
-> splitted further from all lower layer at all. But there should be exceptions
-> in unusual case, such as, lowering queue's limit changed after the stacking
-> limits are setup.
-> 
-> 3) history reason, bio splitting is much younger than stacking queue
-> limits.
-> 
-> Maybe others?
+This patch series fills the missing attributes handling. The first patch
+modifies the helper function for max_active_zones to support both
+max_active_zones and max_open_zones. The second patch modifies zbd/005 to
+handle the attributes.
 
-Hannes didn't actually justify why he added chunk_sectors to
-blk_stack_limits:
+Changes from v1:
+* Reflected comments on the list
+* Added Reviewed-by tags
 
-commit 987b3b26eb7b19960160505faf9b2f50ae77e14d
-Author: Hannes Reinecke <hare@suse.de>
-Date:   Tue Oct 18 15:40:31 2016 +0900
+Shin'ichiro Kawasaki (2):
+  common/rc: Check both max_active_zones and max_open_zones
+  zbd/005: Provide max_active/open_zones limit to fio command
 
-    block: update chunk_sectors in blk_stack_limits()
+ common/rc       | 19 ++++++++++++++++---
+ tests/block/004 |  2 +-
+ tests/zbd/003   |  6 +++---
+ tests/zbd/005   | 13 ++++++++-----
+ 4 files changed, 28 insertions(+), 12 deletions(-)
 
-    Signed-off-by: Hannes Reinecke <hare@suse.com>
-    Signed-off-by: Damien Le Moal <damien.lemoal@hgst.com>
-    Reviewed-by: Christoph Hellwig <hch@lst.de>
-    Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-    Reviewed-by: Shaun Tancheff <shaun.tancheff@seagate.com>
-    Tested-by: Shaun Tancheff <shaun.tancheff@seagate.com>
-    Signed-off-by: Jens Axboe <axboe@fb.com>
-
-Likely felt it needed for zoned or NVMe devices.. dunno.
-
-But given how we now have a model where block core, or DM core, will
-split as needed I don't think normalizing chunk_sectors (to the degree
-full use of blk_stack_limits does) and than using it as basis for
-splitting makes a lot of sense.
-
-Mike
+-- 
+2.28.0
 
