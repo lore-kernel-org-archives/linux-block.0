@@ -2,90 +2,71 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC2F6C4361A
-	for <linux-block@archiver.kernel.org>; Fri,  4 Dec 2020 11:53:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 704BCC4361A
+	for <linux-block@archiver.kernel.org>; Fri,  4 Dec 2020 12:49:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6835822A84
-	for <linux-block@archiver.kernel.org>; Fri,  4 Dec 2020 11:53:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 34D6022519
+	for <linux-block@archiver.kernel.org>; Fri,  4 Dec 2020 12:49:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728484AbgLDLxW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Dec 2020 06:53:22 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:37760 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725999AbgLDLxW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 4 Dec 2020 06:53:22 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607082716;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=d6DMcyImwNW8/yN8tZ5x35hfAGMlLSWgGVlroAI+zwE=;
-        b=E2IZOOlnDQE97t8rlO+o7dxIzR8FMbJTTzvsKciJEtjmVCkGk3mocnCTm4frJEhzkspoJt
-        Ci0clQTyn9tTY04JVVbtMTkWZzS8AkKHC3qlWyNiE5pz8xuaIuP1sTEp+nrq0L9etb/TmL
-        GwJeIJjugQ6iAeNmLjqF1j3VQIoY3Hs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-274-leC3jpfvOhWjVCqCD3DNVA-1; Fri, 04 Dec 2020 06:51:54 -0500
-X-MC-Unique: leC3jpfvOhWjVCqCD3DNVA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2558618C8C00;
-        Fri,  4 Dec 2020 11:51:52 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-116-67.rdu2.redhat.com [10.10.116.67])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A484210016F5;
-        Fri,  4 Dec 2020 11:51:49 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <20201203064536.GE27350@xsang-OptiPlex-9020>
-References: <20201203064536.GE27350@xsang-OptiPlex-9020>
-To:     kernel test robot <oliver.sang@intel.com>
-Cc:     dhowells@redhat.com, lkp@lists.01.org, lkp@intel.com,
-        ying.huang@intel.com, feng.tang@intel.com, zhengjun.xing@intel.com,
+        id S1726988AbgLDMte (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Dec 2020 07:49:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50034 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726477AbgLDMte (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Dec 2020 07:49:34 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23AEBC0613D1;
+        Fri,  4 Dec 2020 04:48:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=QCYDsdbruYLlGkC4FCVFrlrnab6XBVhVO98ZM7UlAeM=; b=iDpcfU9unXpujJhUoJor4SQ/fw
+        fs3m7PurZ3py8EF7VgF2NqwfBc2xkLCpj9ISLLqdpAIeCkwvMHHyfgVA04sWOHaYphWdGVB8igVZ5
+        EZYGT1b2NpiXN/OTJ1z8Nj8tUqbC+8fMaY11gREd4DahE/TwcjzkA5J0ve1m8zwnENEyfzAhoVtXa
+        QaKuyeuDSmBR8tcep/2KY7prljtRs4FzQHhaVbU42ZvmUF0Kw/M5J2ayrdJslw4OI4oqRKFn5aLLz
+        mvTi+NUE0xRvGKdHaTCMPTISsTtUC5unpHifuY40Eit58zZhMMcY/Up7/M13jDQ1KKQxyn0PjzjFw
+        NHQAtw3A==;
+Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1klAW1-0002KE-N5; Fri, 04 Dec 2020 12:48:49 +0000
+Date:   Fri, 4 Dec 2020 12:48:49 +0000
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Johannes Weiner <hannes@cmpxchg.org>
+Cc:     Christoph Hellwig <hch@infradead.org>,
         Pavel Begunkov <asml.silence@gmail.com>,
         Matthew Wilcox <willy@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [iov_iter] 9bd0e337c6: will-it-scale.per_process_ops -4.8% regression
+        Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH] block: add bio_iov_iter_nvecs for figuring out nr_vecs
+Message-ID: <20201204124849.GA8768@infradead.org>
+References: <20201201120652.487077-1-ming.lei@redhat.com>
+ <20201201125251.GA11935@casper.infradead.org>
+ <20201201125936.GA25111@infradead.org>
+ <fdbfe981-0251-9641-6ed8-db034c0f0148@gmail.com>
+ <20201201133226.GA26472@infradead.org>
+ <20201203223607.GB53708@cmpxchg.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <98293.1607082708.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Fri, 04 Dec 2020 11:51:48 +0000
-Message-ID: <98294.1607082708@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201203223607.GB53708@cmpxchg.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-kernel test robot <oliver.sang@intel.com> wrote:
+On Thu, Dec 03, 2020 at 05:36:07PM -0500, Johannes Weiner wrote:
+> Correct, it's only interesting for pages under LRU management - page
+> cache and swap pages. It should not matter for direct IO.
+> 
+> The VM uses the page flag to tell the difference between cold faults
+> (empty cache startup e.g.), and thrashing pages which are being read
+> back not long after they have been reclaimed. This influences reclaim
+> behavior, but can also indicate a general lack of memory.
 
-> FYI, we noticed a -4.8% regression of will-it-scale.per_process_ops due =
-to commit:
-> =
-
-> =
-
-> commit: 9bd0e337c633aed3e8ec3c7397b7ae0b8436f163 ("[PATCH 01/29] iov_ite=
-r: Switch to using a table of operations")
-
-Out of interest, would it be possible for you to run this on the tail of t=
-he
-series on the same hardware?
-
-Thanks,
-David
-
+I really wonder if we should move setting the flag out of bio_add_page
+and into the writeback code, as it will do the wrong things for
+non-writeback I/O, that is direct I/O or its in-kernel equivalents.
