@@ -2,144 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB7F1C1B0D9
-	for <linux-block@archiver.kernel.org>; Fri,  4 Dec 2020 16:49:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99E11C0018C
+	for <linux-block@archiver.kernel.org>; Fri,  4 Dec 2020 16:51:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8F0B3229C9
-	for <linux-block@archiver.kernel.org>; Fri,  4 Dec 2020 16:49:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7482A22AAF
+	for <linux-block@archiver.kernel.org>; Fri,  4 Dec 2020 16:51:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388205AbgLDQtt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Dec 2020 11:49:49 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:51828 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2387952AbgLDQtt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 4 Dec 2020 11:49:49 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607100501;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=73m+KJ0HRIRsozVJo8fE+/vehD0NPYPNmHifBwELEI4=;
-        b=RtITRYYQSe9QUiIK4Mk6zgOh7o59otMf1bgvoB2VAJ2cwqM2e2LWkNz5yAbrJadyIpT5CY
-        /XH14oWQ07UAnwaR3z95c+8EYbwuFuRNSAZqYeFFc80uh9Lc/BijejrW11p9HPa6/82pc7
-        eisv2A8uqDrSLKq26gOQJuQzbmoTtc4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-560-0gbKLN_9O2-MNqIU-Yj70Q-1; Fri, 04 Dec 2020 11:48:19 -0500
-X-MC-Unique: 0gbKLN_9O2-MNqIU-Yj70Q-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B6F46107ACE6;
-        Fri,  4 Dec 2020 16:48:18 +0000 (UTC)
-Received: from localhost (unknown [10.18.25.174])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 45E125D9DC;
-        Fri,  4 Dec 2020 16:47:59 +0000 (UTC)
-Date:   Fri, 4 Dec 2020 11:47:59 -0500
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     axboe@kernel.dk, martin.petersen@oracle.com,
-        linux-block@vger.kernel.org, dm-devel@redhat.com,
-        jdorminy@redhat.com, bjohnsto@redhat.com
-Subject: Re: [PATCH v2] block: use gcd() to fix chunk_sectors limit stacking
-Message-ID: <20201204164759.GA2761@redhat.com>
-References: <20201130171805.77712-1-snitzer@redhat.com>
- <20201201160709.31748-1-snitzer@redhat.com>
- <20201203032608.GD540033@T590>
- <20201203143359.GA29261@redhat.com>
- <20201204011243.GB661914@T590>
- <20201204020343.GA32150@redhat.com>
- <20201204035924.GD661914@T590>
+        id S1730931AbgLDQv2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Dec 2020 11:51:28 -0500
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:35824 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729617AbgLDQv2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Dec 2020 11:51:28 -0500
+Received: by mail-pf1-f195.google.com with SMTP id c79so4113211pfc.2;
+        Fri, 04 Dec 2020 08:51:13 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=tKNG89IP0eWAuFAmQbkXENZV9Tbmi4dU4MxDvBA7mFI=;
+        b=OfUNSUs5OxS2as7eBxQdTZXATgCM9VvgbpYwrkxk2Ok51AW9WU1Dbem2i14dSOaPVU
+         Ki0X7/cmuq87VlyBZlHKNOmxHZZYKN15nhhfDpitfcgPJQcGiMT10fAOy1Oco9oUBgbV
+         V1O4qdZq2ef0bLDSrWfbE0TQXia8Hgr6K+M/o3zDGs+GruFatt+3yiVgmPnAB0NEu99F
+         BVMgw9+uF5D6eqNxSvIxwJ+axyCz0VPqLy7VTwhuoEf9yeN6m4cYUBMKtVmlphd01GD4
+         0VBRMTWv++TkWjO5aifejOmxMd9RVZJQFbXBCZfIZUH0Z3rmvfBLF6hxpqVfSFFGmVdO
+         iDTw==
+X-Gm-Message-State: AOAM531ogFjfZAO+LBBfTAcRjuRGJxEuRp2sqnEdobUR25fYvMJrdKbv
+        QMicZtvKn76CAK9nBz+xeIo=
+X-Google-Smtp-Source: ABdhPJyVjoClBTZulB9nZ/rWWhlx2xF6FBwXReB+wzB03dYuTytWT/YAJkp7loPNHUyzV5nqAtAYEg==
+X-Received: by 2002:a63:4:: with SMTP id 4mr8059058pga.443.1607100647637;
+        Fri, 04 Dec 2020 08:50:47 -0800 (PST)
+Received: from [192.168.3.218] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
+        by smtp.gmail.com with ESMTPSA id w2sm2687796pjb.22.2020.12.04.08.50.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 04 Dec 2020 08:50:46 -0800 (PST)
+Subject: Re: [PATCH v4 5/9] scsi: Do not wait for a request in
+ scsi_eh_lock_door()
+To:     Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.de>
+Cc:     "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        Alan Stern <stern@rowland.harvard.edu>,
+        Can Guo <cang@codeaurora.org>,
+        Stanley Chu <stanley.chu@mediatek.com>,
+        "Rafael J . Wysocki" <rafael.j.wysocki@intel.com>
+References: <20201130024615.29171-1-bvanassche@acm.org>
+ <20201130024615.29171-6-bvanassche@acm.org>
+ <bdadfbcd-76c4-4658-0b36-b7666fa1dc7b@suse.de>
+ <6e5fbc73-881e-69c7-54ce-381b8b695b3c@acm.org>
+ <b56cf3af-940f-62ed-2a79-eb80599e2f44@suse.de> <20201203072738.GB633702@T590>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <32732e89-e425-2b71-4564-35e243f170bc@acm.org>
+Date:   Fri, 4 Dec 2020 08:50:44 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201204035924.GD661914@T590>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20201203072738.GB633702@T590>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Dec 03 2020 at 10:59pm -0500,
-Ming Lei <ming.lei@redhat.com> wrote:
-
-> On Thu, Dec 03, 2020 at 09:03:43PM -0500, Mike Snitzer wrote:
-> > On Thu, Dec 03 2020 at  8:12pm -0500,
-> > Ming Lei <ming.lei@redhat.com> wrote:
-> > 
-> > > On Thu, Dec 03, 2020 at 09:33:59AM -0500, Mike Snitzer wrote:
-> > > > On Wed, Dec 02 2020 at 10:26pm -0500,
-> > > > Ming Lei <ming.lei@redhat.com> wrote:
-> > > > 
-> > > > > On Tue, Dec 01, 2020 at 11:07:09AM -0500, Mike Snitzer wrote:
-> > > > > > commit 22ada802ede8 ("block: use lcm_not_zero() when stacking
-> > > > > > chunk_sectors") broke chunk_sectors limit stacking. chunk_sectors must
-> > > > > > reflect the most limited of all devices in the IO stack.
-> > > > > > 
-> > > > > > Otherwise malformed IO may result. E.g.: prior to this fix,
-> > > > > > ->chunk_sectors = lcm_not_zero(8, 128) would result in
-> > > > > > blk_max_size_offset() splitting IO at 128 sectors rather than the
-> > > > > > required more restrictive 8 sectors.
-> > > > > 
-> > > > > What is the user-visible result of splitting IO at 128 sectors?
-> > > > 
-> > > > The VDO dm target fails because it requires IO it receives to be split
-> > > > as it advertised (8 sectors).
-> > > 
-> > > OK, looks VDO's chunk_sector limit is one hard constraint, even though it
-> > > is one DM device, so I guess you are talking about DM over VDO?
-> > > 
-> > > Another reason should be that VDO doesn't use blk_queue_split(), otherwise it
-> > > won't be a trouble, right?
-> > > 
-> > > Frankly speaking, if the stacking driver/device has its own hard queue limit
-> > > like normal hardware drive, the driver should be responsible for the splitting.
-> > 
-> > DM core does the splitting for VDO (just like any other DM target).
-> > In 5.9 I updated DM to use chunk_sectors, use blk_stack_limits()
-> > stacking of it, and also use blk_max_size_offset().
-> > 
-> > But all that block core code has shown itself to be too rigid for DM.  I
-> > tried to force the issue by stacking DM targets' ti->max_io_len with
-> > chunk_sectors.  But really I'd need to be able to pass in the per-target
-> > max_io_len to blk_max_size_offset() to salvage using it.
-> > 
-> > Stacking chunk_sectors seems ill-conceived.  One size-fits-all splitting
-> > is too rigid.
+On 12/2/20 11:27 PM, Ming Lei wrote:
+> BTW, scsi_eh_lock_door() returns void, and it can't be sync because
+> there may not be any driver tag available. Even though it is available,
+> the host state isn't running yet, so the command can't be queued to LLD
+> yet.
 > 
-> DM/VDO knows exactly it is one hard chunk_sectors limit, and DM shouldn't play
-> the stacking trick on VDO's chunk_sectors limit, should it?
+> Maybe the above lines should be put after host state is updated to
+> RUNNING.
+> 
+> Also changing to NOWAIT can't avoid the issue completely, what if 'none'
+> is used?
 
-Feel like I already answered this in detail but... correct, DM cannot
-and should not use stacked chunk_sectors as basis for splitting.
+Hi Ming,
 
-Up until 5.9, where I changed DM core to set and then use chunk_sectors
-for splitting via blk_max_size_offset(), DM only used its own per-target
-ti->max_io_len in drivers/md/dm.c:max_io_len().
+I am considering to drop this patch since the latest version of the SPI
+DV patch no longer introduces a new blk_mq_freeze_queue() call in the
+SPI DV code. In other words, any potential issues with
+scsi_eh_lock_door() are existing issues and are not made worse by my
+patch series.
 
-But I reverted back to DM's pre-5.9 splitting in this stable@ fix that
-I'll be sending to Linus today for 5.10-rcX:
-https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git/commit/?h=dm-5.10-rcX&id=6bb38bcc33bf3093c08bd1b71e4f20c82bb60dd1
+Thanks,
 
-DM is now back to pre-5.9 behavior where it doesn't even consider
-chunk_sectors for splitting (NOTE: dm-zoned sets ti->max_io_len though
-so it is effectively achieves the same boundary splits via max_io_len).
-
-With that baseline established, what I'm now saying is: if DM, the most
-common limits stacking consumer, cannot benefit from stacked
-chunk_sectors then what stacked device does benefit?  Could be block
-core's stacked chunk_sectors based splitting is good enough for others,
-just not yet seeing how.  Feels like it predates blk_queue_split() and
-the stacking of chunk_sectors could/should be removed now.
-
-All said, I'm fine with leaving stacked chunk_sectors for others to care
-about... think I've raised enough awareness on this topic now ;)
-
-Mike
-
+Bart.
