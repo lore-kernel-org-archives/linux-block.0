@@ -3,110 +3,97 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5471DC19437
-	for <linux-block@archiver.kernel.org>; Fri,  4 Dec 2020 15:49:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E849DC433FE
+	for <linux-block@archiver.kernel.org>; Fri,  4 Dec 2020 16:42:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2986A22C97
-	for <linux-block@archiver.kernel.org>; Fri,  4 Dec 2020 15:49:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C087322AAF
+	for <linux-block@archiver.kernel.org>; Fri,  4 Dec 2020 16:42:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730899AbgLDPtm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Dec 2020 10:49:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49788 "EHLO
+        id S1730124AbgLDQmK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Dec 2020 11:42:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57986 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730549AbgLDPtl (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Dec 2020 10:49:41 -0500
-Received: from mail-qv1-xf33.google.com (mail-qv1-xf33.google.com [IPv6:2607:f8b0:4864:20::f33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03AA8C061A53
-        for <linux-block@vger.kernel.org>; Fri,  4 Dec 2020 07:48:56 -0800 (PST)
-Received: by mail-qv1-xf33.google.com with SMTP id q7so2937136qvt.12
-        for <linux-block@vger.kernel.org>; Fri, 04 Dec 2020 07:48:55 -0800 (PST)
+        with ESMTP id S1729840AbgLDQmK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Dec 2020 11:42:10 -0500
+Received: from mail-il1-x144.google.com (mail-il1-x144.google.com [IPv6:2607:f8b0:4864:20::144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD769C061A53
+        for <linux-block@vger.kernel.org>; Fri,  4 Dec 2020 08:41:29 -0800 (PST)
+Received: by mail-il1-x144.google.com with SMTP id 2so2639598ilg.9
+        for <linux-block@vger.kernel.org>; Fri, 04 Dec 2020 08:41:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=toxicpanda-com.20150623.gappssmtp.com; s=20150623;
-        h=to:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=PA56DtQ3U6OS3ADt3JtiQH9iJ5okRT03tMtGP16RXIA=;
-        b=p4AZo33WMTXTpz74XuTaQCvr8JjiLn7ypdk62+VPzm5BdMKt9igpjZmiV4Ts4qi6+J
-         SKGTsVwNJHxvNy9D43S5RpkEjJtwvyjUcFbtGl6g7qLXlUFpBTsSCxXpBePSHE5OPbfm
-         mksQaolb9sXzm7+22TDrXsouNjPDrgzfQk55cGZ8dcksUDtecVBuIrV/rL0rDS4FIXGa
-         CvPH8RXGjKym1lMM679nc6sYC/ea1CzYYsrPdIStasXpT1d5deVX/6/ey0wtHLMxDXaU
-         REoOC8e2HrqtsbjM8fzvA/EMqQSINaRo0nL6ofS1dQc6bP4Jew/L1eiqWwgkD+J/NGRS
-         Uo0g==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=bbjLPiru3Bmbs8YC5o6bnScdwwI8le+IHLdqyI3HFzc=;
+        b=utp9pnAlDvIB30UPOeFQ15UL0n4xyvLz8w+XabOab/MmjSxNW8ec4ciKrB7EF90dOK
+         kzXjHGizoxz+Ji+UKTrGrckESghLE3SV8doEcWWFzIvBdveu/zk2P7IqPDyOK9SUfotm
+         QmH/KInv8OnDTr/HGtj/2lCIVdcUnjEI4SXtCRk2zh60xo7u9VXFQ5/Iv+fKUc876sXF
+         r7i001rzNg8scNRWHK9ID2bwf/5Tf2pyiD6+kuixxcgOODbejsaZ8yTV+02nY/KRt2id
+         rdZ5lRMLwCOvzsrZBBVf3XSNC5LaA1sJCFhaPRDXinpdR1J1kpNY0kAsKMkmDDjt3JUJ
+         cnLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=PA56DtQ3U6OS3ADt3JtiQH9iJ5okRT03tMtGP16RXIA=;
-        b=Fu+3PE8uHoYQWxpyfXY/movIpbipgVxFrOY/KR99BkBUDPz9U0d/qjODIPxN4ffNVP
-         Q728hiMVIT/cTUe5aQLM6x5ZWpHdUYE2MMyp9fPSeGdBrXutqyJck1A0sfnmv/1KyO8d
-         xeiXvRKPU9PHt8li/BbriqNE/99JWHz3te95O9l/RSlvlY15V6TROTcpZevzGmVHsT1w
-         MtJ48Q3f57nkv4WfNMjYP20nqZRpuspcyD1PeHkQ7Yd60ZNXkjPRLS81Rl13FVUsVgJd
-         VgMcfukGS4fyhStU2TjHcSgNN7Si6oCH0mrMpfrks5glf1mAENPuUXX+JVlnGauu+rwU
-         OSpw==
-X-Gm-Message-State: AOAM530BFSYR1gBJ/+rvR8CNOM6hHCgckehsZVaHyzu+cP01XIW9oWi/
-        HjIfBZvGE/3aQYLhMPR/CdGPnw==
-X-Google-Smtp-Source: ABdhPJxnvGuh1h4AicIp2Z2Ob074CL8yAHW4/pb+/Ip6VIx5jqWNzkUvWI0x5L/Pf3ERPP+MY/J4+Q==
-X-Received: by 2002:a0c:e18f:: with SMTP id p15mr6149469qvl.12.1607096935114;
-        Fri, 04 Dec 2020 07:48:55 -0800 (PST)
-Received: from [192.168.1.45] (cpe-174-109-172-136.nc.res.rr.com. [174.109.172.136])
-        by smtp.gmail.com with ESMTPSA id y1sm5586436qky.63.2020.12.04.07.48.53
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=bbjLPiru3Bmbs8YC5o6bnScdwwI8le+IHLdqyI3HFzc=;
+        b=i/D2/u7QqSHS4I52L29/lRD6GBiYRnmSyNg+prz7842OMKJpkDIbh8tw4rc1MbQMgM
+         7MaCmh3LC5yew0wtY2CTRvPOrMrUYjMGwPRtR0w9cSk3aPxHd5er6pfSc8ZTPolkSl/5
+         6e9IHHJzD12l6Aiobzyj26ZADJRzsVaOZTCSMopeX9iH9RRWK6Jiws4Pw2/ziSaJ5FVA
+         WSTcLNC1dTqO6JVyb3Id2WiW4Nr7nyWILVgmBWwA/gygjOSpyfgEdPSmIHUuFdesYggp
+         m8O42+Q+UQpr8q64McW/LaYhbSS8Q7G+8Bg3x8mz1aoKKNjj+8fE60cFwM7IY5IHZB6P
+         uU2Q==
+X-Gm-Message-State: AOAM530cqwA9hD6oAiMw8DLNpL3+slgp0HpyWi+oZtYVcVp2ivJqxA4/
+        TvgKL23KkRZERSFatSxiYuq6Gw==
+X-Google-Smtp-Source: ABdhPJzOFoOAq1T8LecabplxdCelUAVtxQ9B1uzy/pcjO2/T2ddZGPg5ONZb4vrY4yFvR5VplkoYuw==
+X-Received: by 2002:a92:d68d:: with SMTP id p13mr7495902iln.27.1607100089238;
+        Fri, 04 Dec 2020 08:41:29 -0800 (PST)
+Received: from [192.168.1.30] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id q14sm1946982ils.79.2020.12.04.08.41.28
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Dec 2020 07:48:54 -0800 (PST)
-To:     Btrfs BTRFS <linux-btrfs@vger.kernel.org>,
-        "linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
-        "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "linux-nvme@vger.kernel.org" <linux-nvme@vger.kernel.org>
-From:   Josef Bacik <josef@toxicpanda.com>
-Subject: [LSFMMBPF 2021] A status update
-Message-ID: <fd5264ac-c84d-e1d4-01e2-62b9c05af892@toxicpanda.com>
-Date:   Fri, 4 Dec 2020 10:48:53 -0500
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.5.1
+        Fri, 04 Dec 2020 08:41:28 -0800 (PST)
+Subject: Re: [PATCH for-next 0/8] update for rnbd
+To:     Jack Wang <jinpu.wang@cloud.ionos.com>, linux-block@vger.kernel.org
+Cc:     hch@infradead.org, sagi@grimberg.me, bvanassche@acm.org,
+        danil.kipnis@cloud.ionos.com
+References: <20201126104723.150674-1-jinpu.wang@cloud.ionos.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <0c4ab46b-1a36-d2ab-88b2-089af1173ddd@kernel.dk>
+Date:   Fri, 4 Dec 2020 09:41:27 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20201126104723.150674-1-jinpu.wang@cloud.ionos.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+On 11/26/20 3:47 AM, Jack Wang wrote:
+> Hi Jens,
+> 
+> Please consider to include following changes to next merge window.
+> 
+> Bugfix:
+> - fix memleak when kobject_init_and_add fails.
+> 
+> features:
+> - rnbd-clt to support mapping two devices with same name from
+> different servers, and documentation
+> - rnbd-srv: force_close devices from one client and documentation.
+> 
+> misc:
+> - rnbd-clt: make path parameter optional
+> - rnbd-clt: dynamically alloc buffer to reduce memory footprint.
 
-We on the program committee hope everybody has been able to stay safe and 
-healthy during this challenging time, and look forward to being able to see all 
-of you in person again when it is safe.
+Applied, thanks.
 
-The current plans for LSFMMBPF 2021 are to schedule an in person conference in 
-H2 (after June) of 2021.  The tentative plan is to use the same hotel that we 
-had planned to use for 2020, as we still have contracts with them.  However 
-clearly that is not set in stone.  The Linux Foundation has done a wonderful job 
-of working with us to formulate a plan and figure out the logistics that will 
-work the best for everybody, I really can't thank them enough for their help.
+-- 
+Jens Axboe
 
-Once we have a finalized date we will redo the CFP emails, probably coming out 
-March time frame.  If you have any questions or concerns please feel free to 
-respond to this email, or email me or any of the other PC members privately and 
-we will do our best to answer your questions.  Rest assured the general timing 
-of the conference is going to take into account the wide variety of schedules 
-that we are dealing with, and we will do our best to come up with something that 
-works for as many as people as possible.
-
-We hope that you and your families continue to stay safe and health.  Thank you 
-on behalf of the program committee:
-
-	Josef Bacik (Filesystems)
-	Amir Goldstein (Filesystems)
-	Martin K. Petersen (Storage)
-	Omar Sandoval (Storage)
-	Michal Hocko (MM)
-	Dan Williams (MM)
-	Alexei Starovoitov (BPF)
-	Daniel Borkmann (BPF)
