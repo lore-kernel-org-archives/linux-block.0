@@ -2,95 +2,74 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D28EC433FE
-	for <linux-block@archiver.kernel.org>; Fri,  4 Dec 2020 09:01:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81CD8C433FE
+	for <linux-block@archiver.kernel.org>; Fri,  4 Dec 2020 09:28:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 308252255F
-	for <linux-block@archiver.kernel.org>; Fri,  4 Dec 2020 09:01:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 32527225AB
+	for <linux-block@archiver.kernel.org>; Fri,  4 Dec 2020 09:28:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727875AbgLDJBz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Dec 2020 04:01:55 -0500
-Received: from frasgout.his.huawei.com ([185.176.79.56]:2203 "EHLO
-        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726394AbgLDJBz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Dec 2020 04:01:55 -0500
-Received: from fraeml745-chm.china.huawei.com (unknown [172.18.147.206])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4CnRSK1ndKz67LVb;
-        Fri,  4 Dec 2020 16:58:09 +0800 (CST)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- fraeml745-chm.china.huawei.com (10.206.15.226) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2106.2; Fri, 4 Dec 2020 10:01:12 +0100
-Received: from [10.47.5.251] (10.47.5.251) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1913.5; Fri, 4 Dec 2020
- 09:01:12 +0000
-Subject: Re: [PATCH v2 4/4] scsi: set shost as hctx driver_data
-To:     Kashyap Desai <kashyap.desai@broadcom.com>,
-        <linux-scsi@vger.kernel.org>, <linux-block@vger.kernel.org>
-References: <20201203034100.29716-1-kashyap.desai@broadcom.com>
- <20201203034100.29716-5-kashyap.desai@broadcom.com>
- <3ee6826b-e010-8874-0447-da8e9b1e8971@huawei.com>
- <5d8d57aa81706e44b4e7a25dae606f39@mail.gmail.com>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <b1a4565b-ac96-be2e-499a-a2caac10cec2@huawei.com>
-Date:   Fri, 4 Dec 2020 09:00:42 +0000
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
+        id S1728542AbgLDJ20 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Dec 2020 04:28:26 -0500
+Received: from verein.lst.de ([213.95.11.211]:33890 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728337AbgLDJ20 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 4 Dec 2020 04:28:26 -0500
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id C436E6736F; Fri,  4 Dec 2020 10:27:42 +0100 (CET)
+Date:   Fri, 4 Dec 2020 10:27:42 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "sagi@grimberg.me" <sagi@grimberg.me>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+Subject: Re: [PATCH V4 2/9] nvmet: add ZNS support for bdev-ns
+Message-ID: <20201204092742.GA8955@lst.de>
+References: <20201202062227.9826-1-chaitanya.kulkarni@wdc.com> <20201202062227.9826-3-chaitanya.kulkarni@wdc.com> <20201202090715.GA2952@lst.de> <BYAPR04MB4965E50D3DCEFE4A0970631286F10@BYAPR04MB4965.namprd04.prod.outlook.com>
 MIME-Version: 1.0
-In-Reply-To: <5d8d57aa81706e44b4e7a25dae606f39@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.47.5.251]
-X-ClientProxiedBy: lhreml754-chm.china.huawei.com (10.201.108.204) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BYAPR04MB4965E50D3DCEFE4A0970631286F10@BYAPR04MB4965.namprd04.prod.outlook.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 03/12/2020 13:30, Kashyap Desai wrote:
->> -----Original Message-----
->> From: John Garry [mailto:john.garry@huawei.com]
->> Sent: Thursday, December 3, 2020 6:57 PM
->> To: Kashyap Desai <kashyap.desai@broadcom.com>; linux-
->> scsi@vger.kernel.org; linux-block@vger.kernel.org
->> Subject: Re: [PATCH v2 4/4] scsi: set shost as hctx driver_data
->>
->> On 03/12/2020 03:41, Kashyap Desai wrote:
->>> hctx->driver_data is not set for SCSI currently.
->>> Separately set hctx->driver_data = shost.
->>
->> nit: this looks ok to me, but I would have made as an earlier patch so
->> that you
->> don't add code and then remove it:
+On Fri, Dec 04, 2020 at 03:13:40AM +0000, Chaitanya Kulkarni wrote:
+> >> +	if (!bdev_is_zoned(nvmet_bdev(req)))
+> >> +		return NVME_SC_SUCCESS;
+> >> +
+> >> +	return nvmet_copy_ns_identifier(req, NVME_NIDT_CSI, NVME_NIDT_CSI_LEN,
+> >> +					&nvme_cis_zns, off);
+> >> +}
+> > This looks weird.  We can want to support the command set identifier in
+> > general, so this should go into common code, and just look up the command
+> > set identifier in the nvmet_ns structure.
 > 
-> I added later - Just in case someone report issue in " scsi_commit_rqs" due
-> to this patch, we can revert back easily.
-> I tested scsi_mq_poll but not scsi_commit_rqs part.
+> ZNS is the only user for this, so I've added to the zns code. I'll move to
 > 
+> admin-cmd.
 
-We should be a bit more confident in the patch :)
+CSI is a generic feature, ZNS is just the first thing that requires it.
 
-anyway,
-
-Reviewed-by: John Garry <john.garry@huawei.com>
-
+> > This will change the limit when a new namespaces is added.  I think we need
+> > to just pick the value of the first namespaces and refuse adding a new
+> > one if the limit is lower to not completely break hosts.
 > 
->>
->>   >   static int scsi_mq_poll(struct blk_mq_hw_ctx *hctx)
->>   >   {
->>   > -	struct request_queue *q = hctx->queue;
->>   > -	struct scsi_device *sdev = q->queuedata;
->>   > -	struct Scsi_Host *shost = sdev->host;
->>
->> Thanks,
->> John
->>
+> But that will force users to add ns with highest zasl first no matter what.
+> 
+> Isn't there should be a way to update the host with async event
+> 
+> so that host can refresh the ctrl->zasl when ns addition async notification
+> 
+> is generated ?
 
+I'd rather not go too dynamic and change capabilities down dynamically.
+I think that will cause all kinds of fun problems with I/Os already
+queue up in the block layer while the limit changes.
