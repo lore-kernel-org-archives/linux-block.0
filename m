@@ -2,231 +2,233 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2780C433FE
-	for <linux-block@archiver.kernel.org>; Fri,  4 Dec 2020 11:26:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CC61C193FE
+	for <linux-block@archiver.kernel.org>; Fri,  4 Dec 2020 11:48:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8564F22581
-	for <linux-block@archiver.kernel.org>; Fri,  4 Dec 2020 11:26:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 156D822A84
+	for <linux-block@archiver.kernel.org>; Fri,  4 Dec 2020 11:48:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726014AbgLDL0X (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Dec 2020 06:26:23 -0500
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:56513 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725999AbgLDL0X (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Dec 2020 06:26:23 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1607081181; x=1638617181;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=lyweAXYJEUD3vcj9hAsIGOhjob3wm0WUZuyfC7HYKvU=;
-  b=Sw/9Fumol5dixkfoPbbl7tqgDGgHduf/Szf9cj8OGYfQ5gSMp/4aiSYi
-   E3++BhmhmdelOwwVpOYl0ADMk+ydYw2VvZzeJmhL0lL89MVQZnvELcvaw
-   aPQRKHeZCKs/iRCuo+pcKA9WdTGsIDCS4CXsLUTffRTAohxkzj/eE2er7
-   YkCWiabVUWK+AsZduoovO1XqlQ8l7Q1YZ/G4RwqPY8m6qp5wOPKw12aRG
-   3KsyRSlXgVroVN5e2nbRg6agUdLr7gMlMM22f4a+xGQHG0by8CqZZ6cjX
-   cIDdMK36YIziX1L9RS/7RA0wPc99hKXQTeTN4g3e3WMXJJI0e57+Qo3Jz
-   g==;
-IronPort-SDR: 8jaZBTanwCqy4mEbB/a3zGKcpVqfVH5bx6iG7Wq8QNK38OkBXLE7PCqQH2q3cT5HdQ8wDbUBNU
- KYm5fgTABi/muPEBYSpuEy4JdcSlcctHDNTV5gvcoj+codlgCJWN6TbODBcU7N768yUXrZY363
- IlgCEcK+J1Okid47UdncuWv157VXUU0Qj5YSaZbEw759vwsVNGXq/DxqWCG8DGiKnjCzdrEQGy
- olZRLhHFJ6UDPaE9X9Hv+e9qm/xCYixUZs7wbeZGghhNcUXfi5hDm/J7R1TFkyhSej136qe2NN
- dko=
-X-IronPort-AV: E=Sophos;i="5.78,392,1599494400"; 
-   d="scan'208";a="264579782"
-Received: from mail-dm6nam12lp2171.outbound.protection.outlook.com (HELO NAM12-DM6-obe.outbound.protection.outlook.com) ([104.47.59.171])
-  by ob1.hgst.iphmx.com with ESMTP; 04 Dec 2020 19:25:15 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=geXXzXWeY556CY90qL5D9svChhq4fncvFICd/KIS7DSytuDN5QOrv30zEpbggbZZEtb0DpApqSmIjY3/3EP5EOjg/MbkDSr0HJVxWsQV85wtF3ltxHJFPSholvC9nKIc1a8H8Rmjl4lpWUs4N8fGvMEUEBT/LjKQIlYMrWImElDs8D7UOj5+vWXtXiikDcoeQiVy2G83SY2T10Fprj2wrq147yI0Fk4ZQr0HL8yVMB/evDCXZqZ7YUquJnGLj1ywXOUaTkOsk5q1xjtGKhYxHMoFgoLUuEBKLXMX/1VdvKSF4d8yqQre76NeoWD02VbITB9SzqUefoHQZ7T9+4LVMA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FLjFZ/Sovl/XIRW8xFXzc036bfFKtqTTJbIJQJzq964=;
- b=D3UGDfhIwIQlkWbIEwRs1Jbp711OvB0tDRkAkL5CP9AcX+m3Vp399QszTC7QtSSipVpNy0vDg+v8SFrT3tOnjKOrmUDrRTTOAPpWX+JLwt+z5pqaxKHhJlVG+jQWw/ZuYzEm2shE4DuzDJcTYXbhaVh7+795mMOKtS0fCYcY7wwct3A9si5bh1Jiz3E4l8L04LdLUMxxlsm303pVhgDuao2IH506zGNAIsYjbkSRqI+PEs1Eaf+KvlhwZqCNY2AFx+rdFsx24/5ILuj4mB32VNMhcLztw3Owc4fXA0dbNpCdVJKRsXNVrKhyIJvxhBCYHQRObPeNCO3eiqz/WyhkeA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
+        id S1730045AbgLDLsI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Dec 2020 06:48:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40666 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728300AbgLDLsI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Dec 2020 06:48:08 -0500
+Received: from mail-wr1-x443.google.com (mail-wr1-x443.google.com [IPv6:2a00:1450:4864:20::443])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFB9EC0613D1;
+        Fri,  4 Dec 2020 03:47:27 -0800 (PST)
+Received: by mail-wr1-x443.google.com with SMTP id g14so4999505wrm.13;
+        Fri, 04 Dec 2020 03:47:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FLjFZ/Sovl/XIRW8xFXzc036bfFKtqTTJbIJQJzq964=;
- b=B6PlkWfTRENhICR95eme4CCbfOfsLZF16d3AC94zl5OKc5xyuFt2QRO6m0B2t3ktA6ahOk+JgQ3dwXDzP98hCmlmw84nbCOE6xE7EqXYcEzL9s6QK5i44YBte9xpoyNmakMsuKtOoxBqYOGLjiu/Si+6s3biZA2mlhiwuNyiw3I=
-Received: from CH2PR04MB6522.namprd04.prod.outlook.com (2603:10b6:610:34::19)
- by CH2PR04MB6773.namprd04.prod.outlook.com (2603:10b6:610:95::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3632.17; Fri, 4 Dec
- 2020 11:25:12 +0000
-Received: from CH2PR04MB6522.namprd04.prod.outlook.com
- ([fe80::897c:a04b:4eb0:640a]) by CH2PR04MB6522.namprd04.prod.outlook.com
- ([fe80::897c:a04b:4eb0:640a%7]) with mapi id 15.20.3589.022; Fri, 4 Dec 2020
- 11:25:12 +0000
-From:   Damien Le Moal <Damien.LeMoal@wdc.com>
-To:     SelvaKumar S <selvakuma.s1@samsung.com>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-CC:     "kbusch@kernel.org" <kbusch@kernel.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>, "hch@lst.de" <hch@lst.de>,
-        "sagi@grimberg.me" <sagi@grimberg.me>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "snitzer@redhat.com" <snitzer@redhat.com>,
-        "selvajove@gmail.com" <selvajove@gmail.com>,
-        "nj.shetty@samsung.com" <nj.shetty@samsung.com>,
-        "joshi.k@samsung.com" <joshi.k@samsung.com>,
-        "javier.gonz@samsung.com" <javier.gonz@samsung.com>
-Subject: Re: [RFC PATCH v2 0/2] add simple copy support
-Thread-Topic: [RFC PATCH v2 0/2] add simple copy support
-Thread-Index: AQHWyiztcinYLb1afkCNvyh+SmI/oQ==
-Date:   Fri, 4 Dec 2020 11:25:12 +0000
-Message-ID: <CH2PR04MB6522F1188557C829285ED5E8E7F10@CH2PR04MB6522.namprd04.prod.outlook.com>
-References: <CGME20201204094719epcas5p23b3c41223897de3840f92ae3c229cda5@epcas5p2.samsung.com>
- <20201204094659.12732-1-selvakuma.s1@samsung.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: samsung.com; dkim=none (message not signed)
- header.d=none;samsung.com; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [2400:2411:43c0:6000:5458:21bf:70ee:2847]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 365128f2-0c71-4214-0ced-08d8984743f0
-x-ms-traffictypediagnostic: CH2PR04MB6773:
-x-microsoft-antispam-prvs: <CH2PR04MB67733E8C5C03A26F94B188CAE7F10@CH2PR04MB6773.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: +i/280XiUrz7Lug2VI/UQ+rhTgH1eLdX9qrNyq1fcLfhCZggU92eS0kB6ASkXtijmebkc3PNPPnE+sIg0dtcCCYiq2MKn9kwKSgUH2Uee6vTMjScMWvP2lyalQjCepP5Rok4+nN1ucC3h8LqCLkwFklV0YFGgXvQRPecREAH359iJcxi35MdE8HkVS0+nkE1oFBX9T/6WJAxjsbNrU7lBPxC0JGwYw0DOVOD1nPkIQ3ImEZls2yrNBKmWKgJx0HsQvyGAWeVPrruHeP4QswAvMp8HoJ36/GR7nmM0DqMORXtIeFdBoW0rvQqTZB/nDL4g5j1henZGBdsoBCyXdkUnRnMi6UUxxp6nXqDDFo36k9y//MQSC7q9VIUXMs+PNC8kzwipMW7Rah/bnrajR440XBcb1jn2b2UXcvKICjqiA8ej6LEzzwKSvi+eRgDMoGuivJ2mout2R3onzjYtMzmpFx4XRnAF/flD+gBK0AYGks=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR04MB6522.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(396003)(346002)(376002)(39860400002)(136003)(110136005)(2906002)(8676002)(6506007)(5660300002)(53546011)(33656002)(478600001)(86362001)(66446008)(52536014)(64756008)(7696005)(71200400001)(966005)(66556008)(76116006)(66946007)(91956017)(4326008)(83380400001)(66476007)(316002)(186003)(7416002)(55016002)(8936002)(54906003)(9686003)(43620500001)(15398625002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: =?us-ascii?Q?92oygtK7aS1igR7/5a/PDTPjAOGjsxYnwK4lz63sUia+HVGkJKDPgLjoKpTC?=
- =?us-ascii?Q?QO4JRkvSoiGxMlQcLIK9ym0x49gBki3hOpTADA56lSDhmGByu0fc1jag5tcv?=
- =?us-ascii?Q?BcFQd627ZxQPcIr9kMBkCk/vId217knnM4aftMJDrbnBFfAKtnMlMdFlPbyy?=
- =?us-ascii?Q?I9DxhQ4BQCROiRnRjqlr5iNXdTKwOAybqfMgkLywEOV+WFY8RMH3XTJltRUg?=
- =?us-ascii?Q?3hRsq96zY6uRoxQ/VxvB8+umlKVhZHOtYYvqHutwol2u0ow25XeicMUqo8sc?=
- =?us-ascii?Q?qm1R0Jcp8a0Ved4Fb6dx7WwbyA8uUf6Pdc2eMjikLC5N1qvZQT9EeE5mvhCE?=
- =?us-ascii?Q?XEPj6fqUDDROb8ca+eVnnMtDeCpxOme43zW+j6uKpblYcv34Z51OZAzwhP1f?=
- =?us-ascii?Q?2Kn2YUIZ/3V6i2DZOLITA6iXIk3YOpSQVVDOqLT+hgPtH8cAYV63rsxS708w?=
- =?us-ascii?Q?Irg/Fnq40ojNUDYMrNdO4W1m2P/tfrciCJcWEZ5VxXysfAxMO/RslBei42iv?=
- =?us-ascii?Q?wGOX5qJSO/gJiKPZ49ID4uvlAF7j5Sfjox6G9+cbB5T9jLH9ghEpriYH2qEh?=
- =?us-ascii?Q?yRj6mKgDuIC+soJ5zWvqJvQMT5bTg7vaO0kALYhvQmNJDsk8Y+mnYVQXOj6C?=
- =?us-ascii?Q?qLXY1RSi8N4wqMjCT506twF0saiJ9TFhU0wUr6IDqSOJOzLjzTE3ElglPVAl?=
- =?us-ascii?Q?HJBPcKjPfqz4iq9510Ibb8ykQxldKtInr2M+SBAq2INlZgV1rxVgZj5Pxuyp?=
- =?us-ascii?Q?ya9S3wqQt14hIaelj1V1y+MhCbnFNzh35bcJiCUArato/kyiZmHGjXtGjMTU?=
- =?us-ascii?Q?wYL5ivbeG5MrWL9XmqRZF5b4sm7ZF870eLlLDoPFOvCbGBo1eLWce7utEcSu?=
- =?us-ascii?Q?3CFt/Jivk/Y2U92zc3WAPz90yYjWX2ik/OBgZKLfRkqDuDRj+ket32iqcWv9?=
- =?us-ascii?Q?ZTh/DbJHyofohEUuJFqnDftHHVBjuKj4rh5x4X2rY166GoKJTP8l9NACA66o?=
- =?us-ascii?Q?4BFiHPbxtxRsUqMitxUc+umreS80gSv9yZ/UGoLrcX5XPfK6S3doq3ipoAEJ?=
- =?us-ascii?Q?8QvN5Wuk?=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        d=gmail.com; s=20161025;
+        h=to:cc:references:from:autocrypt:subject:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=UclILjREAUdtSCUnNunr1tBo79Qe+ptgrQIOw+TFsoM=;
+        b=IZJp/928EbYWlLCdaAxmvn43bZP4sYw40tYOrIOI3CdMqabuLncFThj9ZskC2xlqTw
+         /h93HBKSWW7KGlwkf6DYp2F2ykACszeUDxs3PKy2AvcoZGJZHddxeEhDjWUlSKs1wski
+         fvNf/3c8IkhFUjNZHYQ9rRNC7+PaySvoNusa5+LfGsc7Lyxd3oL6vXRnirHJUmGwAh+6
+         3mMnqm7NRHbI39/5+z+sfO9dYuqQsPf/gV3mDCaOR/jo/iVdVkZaASOtTITixwFTNVpP
+         qyFGNTL2qQIRHtRyxOEHDYYBs2IyKN7oFBbEmJdwBfdEAXCNi5agy1lMaIoJLr4o+JOX
+         oY6w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:cc:references:from:autocrypt:subject
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=UclILjREAUdtSCUnNunr1tBo79Qe+ptgrQIOw+TFsoM=;
+        b=kW+szsF0qfBE7TB9mlicZV4OLn4epWFXdeW0dRA+X2sbsAdTxmEg6qtZ1BOcD5DBqy
+         Ik5kFHmPwld0l/6ww5I7B/UfpuTbni4mZBDkG5IFznmEcKj2d6xNbtBl55/XG8DTRi1W
+         /JFY/xFqRzEsQWNPO6wYPkIBNh6xJIWNjcNKxM99u9GeFdXC/goxRipL/NAxqiWB0SxM
+         VQgmB5Pw+c1j3PA+4Gjc/lTeYs825s/r7xJpYpUaKwhp/v62ZuUAJQvZFmpGuhnQJhTM
+         IcAJddTYJXEEeuVeDet/FEojNbIqijvrOOESrdX2eaQxK5RrmJMd9BTu0tzfYm0L/qEl
+         LrCg==
+X-Gm-Message-State: AOAM532e3jg2KpnszCiYndnpnJ5XWfFPBiBkaKKJGOV2c3wfqBwqbFa1
+        SF6hrz4HrqmwZMPpJjH/etvZ+cLqKNZUreI/
+X-Google-Smtp-Source: ABdhPJw+zzAIT76+0aIQMwoRW4rYVeC9sXvMQvmUnFTeVJ7Z6HxCwbu3zAQSqY3c9tPaFvyRoRFv1w==
+X-Received: by 2002:a5d:5146:: with SMTP id u6mr4762003wrt.66.1607082446373;
+        Fri, 04 Dec 2020 03:47:26 -0800 (PST)
+Received: from [192.168.1.118] (host109-152-100-189.range109-152.btcentralplus.com. [109.152.100.189])
+        by smtp.gmail.com with ESMTPSA id h20sm2742058wmb.29.2020.12.04.03.47.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 04 Dec 2020 03:47:25 -0800 (PST)
+To:     Hao Xu <haoxu@linux.alibaba.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@infradead.org>
+Cc:     "Darrick J. Wong" <darrick.wong@oracle.com>,
+        linux-fsdevel@vger.kernel.org,
+        Jeffle Xu <jefflexu@linux.alibaba.com>,
+        Konstantin Khlebnikov <khlebnikov@yandex-team.ru>,
+        Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org,
+        Joseph Qi <joseph.qi@linux.alibaba.com>,
+        linux-block@vger.kernel.org
+References: <1607075096-94235-1-git-send-email-haoxu@linux.alibaba.com>
+From:   Pavel Begunkov <asml.silence@gmail.com>
+Autocrypt: addr=asml.silence@gmail.com; prefer-encrypt=mutual; keydata=
+ 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 bA==
+Subject: Re: [PATCH v3 RESEND] iomap: set REQ_NOWAIT according to IOCB_NOWAIT
+ in Direct IO
+Message-ID: <e1faa714-7cb5-977f-1a87-5244adebe90d@gmail.com>
+Date:   Fri, 4 Dec 2020 11:44:10 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CH2PR04MB6522.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 365128f2-0c71-4214-0ced-08d8984743f0
-X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Dec 2020 11:25:12.1655
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: JyxWB2Oe3jjtYFH1Ut9EdnYdm1bmjcp5idVZeopuDqXjNy6AFjBfCcQHpLXzjjG5f4LmVEqa0MI+YVUXAQCUrA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR04MB6773
+In-Reply-To: <1607075096-94235-1-git-send-email-haoxu@linux.alibaba.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020/12/04 20:02, SelvaKumar S wrote:=0A=
-> This patchset tries to add support for TP4065a ("Simple Copy Command"),=
-=0A=
-> v2020.05.04 ("Ratified")=0A=
-> =0A=
-> The Specification can be found in following link.=0A=
-> https://nvmexpress.org/wp-content/uploads/NVM-Express-1.4-Ratified-TPs-1.=
-zip=0A=
-> =0A=
-> This is an RFC. Looking forward for any feedbacks or other alternate=0A=
-> designs for plumbing simple copy to IO stack.=0A=
-> =0A=
-> Simple copy command is a copy offloading operation and is  used to copy=
-=0A=
-> multiple contiguous ranges (source_ranges) of LBA's to a single destinati=
-on=0A=
-> LBA within the device reducing traffic between host and device.=0A=
-> =0A=
-> This implementation accepts destination, no of sources and arrays of=0A=
-> source ranges from application and attach it as payload to the bio and=0A=
-> submits to the device.=0A=
-> =0A=
-> Following limits are added to queue limits and are exposed in sysfs=0A=
-> to userspace=0A=
-> 	- *max_copy_sectors* limits the sum of all source_range length=0A=
-> 	- *max_copy_nr_ranges* limits the number of source ranges=0A=
-> 	- *max_copy_range_sectors* limit the maximum number of sectors=0A=
-> 		that can constitute a single source range.=0A=
-=0A=
-Same comment as before. I think this is a good start, but for this to be re=
-ally=0A=
-useful to users and kernel components alike, this really needs copy emulati=
-on=0A=
-for drives that do not have a native copy feature, similarly to what write =
-zeros=0A=
-handling for instance: if the drive does not have a copy command (simple co=
-py=0A=
-for NVMe or XCOPY for scsi), then the block layer should issue read/write=
-=0A=
-commands to seamlessly execute the copy. Otherwise, this will only serve a =
-small=0A=
-niche for users and will not be optimal for FS and DM drivers that could be=
-=0A=
-simplified with a generic block layer copy functionality.=0A=
-=0A=
-This is my 10 cents though, others may differ about this.=0A=
-=0A=
-> =0A=
-> Changes from v1:=0A=
-> =0A=
-> 1. Fix memory leak in __blkdev_issue_copy=0A=
-> 2. Unmark blk_check_copy inline=0A=
-> 3. Fix line break in blk_check_copy_eod=0A=
-> 4. Remove p checks and made code more readable=0A=
-> 5. Don't use bio_set_op_attrs and remove op and set=0A=
->    bi_opf directly=0A=
-> 6. Use struct_size to calculate total_size=0A=
-> 7. Fix partition remap of copy destination=0A=
-> 8. Remove mcl,mssrl,msrc from nvme_ns=0A=
-> 9. Initialize copy queue limits to 0 in nvme_config_copy=0A=
-> 10. Remove return in QUEUE_FLAG_COPY check=0A=
-> 11. Remove unused OCFS=0A=
-> =0A=
-> SelvaKumar S (2):=0A=
->   block: add simple copy support=0A=
->   nvme: add simple copy support=0A=
-> =0A=
->  block/blk-core.c          |  94 ++++++++++++++++++++++++++---=0A=
->  block/blk-lib.c           | 123 ++++++++++++++++++++++++++++++++++++++=
-=0A=
->  block/blk-merge.c         |   2 +=0A=
->  block/blk-settings.c      |  11 ++++=0A=
->  block/blk-sysfs.c         |  23 +++++++=0A=
->  block/blk-zoned.c         |   1 +=0A=
->  block/bounce.c            |   1 +=0A=
->  block/ioctl.c             |  43 +++++++++++++=0A=
->  drivers/nvme/host/core.c  |  87 +++++++++++++++++++++++++++=0A=
->  include/linux/bio.h       |   1 +=0A=
->  include/linux/blk_types.h |  15 +++++=0A=
->  include/linux/blkdev.h    |  15 +++++=0A=
->  include/linux/nvme.h      |  43 ++++++++++++-=0A=
->  include/uapi/linux/fs.h   |  13 ++++=0A=
->  14 files changed, 461 insertions(+), 11 deletions(-)=0A=
-> =0A=
-=0A=
-=0A=
--- =0A=
-Damien Le Moal=0A=
-Western Digital Research=0A=
+On 04/12/2020 09:44, Hao Xu wrote:
+> Currently, IOCB_NOWAIT is ignored in Direct IO, REQ_NOWAIT is only set
+> when IOCB_HIPRI is set. But REQ_NOWAIT should be set as well when
+> IOCB_NOWAIT is set.
+
+I believe Jens took my patch fixing that for blkdev_direct_IO*()
+(but not iomap) a while ago.
+
+BTW, even though get_maintainer.pl doesn't think so, AFAIK
+fs/block_dev.c is managed by linux-block@vger.kernel.org. Please CC it
+next time.
+
+> Suggested-by: Jeffle Xu <jefflexu@linux.alibaba.com>
+> Signed-off-by: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
+> Signed-off-by: Hao Xu <haoxu@linux.alibaba.com>
+> ---
+> 
+> Hi all,
+> I tested fio io_uring direct read for a file on ext4 filesystem on a
+> nvme ssd. I found that IOCB_NOWAIT is ignored in iomap layer, which
+> means REQ_NOWAIT is not set in bio->bi_opf. This makes nowait IO a
+> normal IO. Since I'm new to iomap and block layer, I sincerely ask
+> yours opinions in case I misunderstand the code which is very likely
+> to happen.:)
+> The example I use: io_uring direct randread, the first try is with
+> IOCB_NOWAIT but not IOCB_HIPRI, the IOCB_NOWAIT is ignored in block
+> layer which I think is not the designed behaviour.
+> 
+> I found that Konstantin found this issue before in May
+> 2020 (https://www.spinics.net/lists/linux-block/msg53275.html), here add
+> his signature, add Jeffle's as well since he gave me some help.
+> 
+> v1->v2:
+> * add same logic in __blkdev_direct_IO_simple()
+> v2->v3:
+> * add same logic in do_blockdev_direct_IO()
+> 
+>  fs/block_dev.c       | 7 +++++++
+>  fs/direct-io.c       | 6 ++++--
+>  fs/iomap/direct-io.c | 3 +++
+>  3 files changed, 14 insertions(+), 2 deletions(-)
+> 
+> diff --git a/fs/block_dev.c b/fs/block_dev.c
+> index 9e84b1928b94..ca6f365c2f14 100644
+> --- a/fs/block_dev.c
+> +++ b/fs/block_dev.c
+> @@ -263,6 +263,10 @@ static void blkdev_bio_end_io_simple(struct bio *bio)
+>  		bio.bi_opf = dio_bio_write_op(iocb);
+>  		task_io_account_write(ret);
+>  	}
+> +
+> +	if (iocb->ki_flags & IOCB_NOWAIT)
+> +		bio.bi_opf |= REQ_NOWAIT;
+> +
+>  	if (iocb->ki_flags & IOCB_HIPRI)
+>  		bio_set_polled(&bio, iocb);
+>  
+> @@ -417,6 +421,9 @@ static void blkdev_bio_end_io(struct bio *bio)
+>  			task_io_account_write(bio->bi_iter.bi_size);
+>  		}
+>  
+> +		if (iocb->ki_flags & IOCB_NOWAIT)
+> +			bio->bi_opf |= REQ_NOWAIT;
+> +
+>  		dio->size += bio->bi_iter.bi_size;
+>  		pos += bio->bi_iter.bi_size;
+>  
+> diff --git a/fs/direct-io.c b/fs/direct-io.c
+> index d53fa92a1ab6..b221ed351c1c 100644
+> --- a/fs/direct-io.c
+> +++ b/fs/direct-io.c
+> @@ -1206,11 +1206,13 @@ static inline int drop_refcount(struct dio *dio)
+>  	if (iov_iter_rw(iter) == WRITE) {
+>  		dio->op = REQ_OP_WRITE;
+>  		dio->op_flags = REQ_SYNC | REQ_IDLE;
+> -		if (iocb->ki_flags & IOCB_NOWAIT)
+> -			dio->op_flags |= REQ_NOWAIT;
+>  	} else {
+>  		dio->op = REQ_OP_READ;
+>  	}
+> +
+> +	if (iocb->ki_flags & IOCB_NOWAIT)
+> +		dio->op_flags |= REQ_NOWAIT;
+> +
+>  	if (iocb->ki_flags & IOCB_HIPRI)
+>  		dio->op_flags |= REQ_HIPRI;
+>  
+> diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
+> index 933f234d5bec..2e897688ed6d 100644
+> --- a/fs/iomap/direct-io.c
+> +++ b/fs/iomap/direct-io.c
+> @@ -64,6 +64,9 @@ static void iomap_dio_submit_bio(struct iomap_dio *dio, struct iomap *iomap,
+>  {
+>  	atomic_inc(&dio->ref);
+>  
+> +	if (dio->iocb->ki_flags & IOCB_NOWAIT)
+> +		bio->bi_opf |= REQ_NOWAIT;
+> +
+>  	if (dio->iocb->ki_flags & IOCB_HIPRI)
+>  		bio_set_polled(bio, dio->iocb);
+>  
+> 
+
+-- 
+Pavel Begunkov
