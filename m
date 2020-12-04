@@ -2,71 +2,98 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 704BCC4361A
-	for <linux-block@archiver.kernel.org>; Fri,  4 Dec 2020 12:49:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AB6CC4167B
+	for <linux-block@archiver.kernel.org>; Fri,  4 Dec 2020 14:41:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 34D6022519
-	for <linux-block@archiver.kernel.org>; Fri,  4 Dec 2020 12:49:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2C59922B3B
+	for <linux-block@archiver.kernel.org>; Fri,  4 Dec 2020 14:41:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726988AbgLDMte (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Dec 2020 07:49:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50034 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726477AbgLDMte (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Dec 2020 07:49:34 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23AEBC0613D1;
-        Fri,  4 Dec 2020 04:48:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=QCYDsdbruYLlGkC4FCVFrlrnab6XBVhVO98ZM7UlAeM=; b=iDpcfU9unXpujJhUoJor4SQ/fw
-        fs3m7PurZ3py8EF7VgF2NqwfBc2xkLCpj9ISLLqdpAIeCkwvMHHyfgVA04sWOHaYphWdGVB8igVZ5
-        EZYGT1b2NpiXN/OTJ1z8Nj8tUqbC+8fMaY11gREd4DahE/TwcjzkA5J0ve1m8zwnENEyfzAhoVtXa
-        QaKuyeuDSmBR8tcep/2KY7prljtRs4FzQHhaVbU42ZvmUF0Kw/M5J2ayrdJslw4OI4oqRKFn5aLLz
-        mvTi+NUE0xRvGKdHaTCMPTISsTtUC5unpHifuY40Eit58zZhMMcY/Up7/M13jDQ1KKQxyn0PjzjFw
-        NHQAtw3A==;
-Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1klAW1-0002KE-N5; Fri, 04 Dec 2020 12:48:49 +0000
-Date:   Fri, 4 Dec 2020 12:48:49 +0000
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Johannes Weiner <hannes@cmpxchg.org>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH] block: add bio_iov_iter_nvecs for figuring out nr_vecs
-Message-ID: <20201204124849.GA8768@infradead.org>
-References: <20201201120652.487077-1-ming.lei@redhat.com>
- <20201201125251.GA11935@casper.infradead.org>
- <20201201125936.GA25111@infradead.org>
- <fdbfe981-0251-9641-6ed8-db034c0f0148@gmail.com>
- <20201201133226.GA26472@infradead.org>
- <20201203223607.GB53708@cmpxchg.org>
+        id S1730358AbgLDOkv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Dec 2020 09:40:51 -0500
+Received: from mail.kernel.org ([198.145.29.99]:56214 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726438AbgLDOkv (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 4 Dec 2020 09:40:51 -0500
+Date:   Fri, 4 Dec 2020 23:40:03 +0900
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1607092810;
+        bh=uvtPoUqekE4ysrPkcwN2m2pvmLXmJsPsKTH0pCoQOwU=;
+        h=From:To:Cc:Subject:References:In-Reply-To:From;
+        b=I7lh3BQP018ZryVSybF2HF+vDP9xIgie2+3oUbLevvAPt1bI5uCSFT3O857/mw6tH
+         2dAaMkiSlJXFlsnh7E0zL6i1ElPKE7r97FFgtt6lG/FG7sgDmFmSvksH0gtqds8JXZ
+         euyKyTB+IFz5FZVtcc5dVttsZdsYwdKPCl9uNPPLPWjGb6fLqdwH+pLhxMwvIbUEUU
+         z1BaIEGceWAPgxjSoh8MfssdXWvYRWhotdB6/h+0AkWnbw/4Qhf4XxNZ+6czkvqrIK
+         4tpPwkUiWg/9BcaCRZXxvJjLDifRCK+bJJWSL3x6AuAEW5DzAaRTdAjKcR6ixo9jAi
+         klEnMtskQGb3w==
+From:   Keith Busch <kbusch@kernel.org>
+To:     Damien Le Moal <Damien.LeMoal@wdc.com>
+Cc:     SelvaKumar S <selvakuma.s1@samsung.com>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>, "hch@lst.de" <hch@lst.de>,
+        "sagi@grimberg.me" <sagi@grimberg.me>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "snitzer@redhat.com" <snitzer@redhat.com>,
+        "selvajove@gmail.com" <selvajove@gmail.com>,
+        "nj.shetty@samsung.com" <nj.shetty@samsung.com>,
+        "joshi.k@samsung.com" <joshi.k@samsung.com>,
+        "javier.gonz@samsung.com" <javier.gonz@samsung.com>
+Subject: Re: [RFC PATCH v2 0/2] add simple copy support
+Message-ID: <20201204144003.GA8868@redsun51.ssa.fujisawa.hgst.com>
+References: <CGME20201204094719epcas5p23b3c41223897de3840f92ae3c229cda5@epcas5p2.samsung.com>
+ <20201204094659.12732-1-selvakuma.s1@samsung.com>
+ <CH2PR04MB6522F1188557C829285ED5E8E7F10@CH2PR04MB6522.namprd04.prod.outlook.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201203223607.GB53708@cmpxchg.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <CH2PR04MB6522F1188557C829285ED5E8E7F10@CH2PR04MB6522.namprd04.prod.outlook.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Dec 03, 2020 at 05:36:07PM -0500, Johannes Weiner wrote:
-> Correct, it's only interesting for pages under LRU management - page
-> cache and swap pages. It should not matter for direct IO.
+On Fri, Dec 04, 2020 at 11:25:12AM +0000, Damien Le Moal wrote:
+> On 2020/12/04 20:02, SelvaKumar S wrote:
+> > This patchset tries to add support for TP4065a ("Simple Copy Command"),
+> > v2020.05.04 ("Ratified")
+> > 
+> > The Specification can be found in following link.
+> > https://nvmexpress.org/wp-content/uploads/NVM-Express-1.4-Ratified-TPs-1.zip
+> > 
+> > This is an RFC. Looking forward for any feedbacks or other alternate
+> > designs for plumbing simple copy to IO stack.
+> > 
+> > Simple copy command is a copy offloading operation and is  used to copy
+> > multiple contiguous ranges (source_ranges) of LBA's to a single destination
+> > LBA within the device reducing traffic between host and device.
+> > 
+> > This implementation accepts destination, no of sources and arrays of
+> > source ranges from application and attach it as payload to the bio and
+> > submits to the device.
+> > 
+> > Following limits are added to queue limits and are exposed in sysfs
+> > to userspace
+> > 	- *max_copy_sectors* limits the sum of all source_range length
+> > 	- *max_copy_nr_ranges* limits the number of source ranges
+> > 	- *max_copy_range_sectors* limit the maximum number of sectors
+> > 		that can constitute a single source range.
 > 
-> The VM uses the page flag to tell the difference between cold faults
-> (empty cache startup e.g.), and thrashing pages which are being read
-> back not long after they have been reclaimed. This influences reclaim
-> behavior, but can also indicate a general lack of memory.
+> Same comment as before. I think this is a good start, but for this to be really
+> useful to users and kernel components alike, this really needs copy emulation
+> for drives that do not have a native copy feature, similarly to what write zeros
+> handling for instance: if the drive does not have a copy command (simple copy
+> for NVMe or XCOPY for scsi), then the block layer should issue read/write
+> commands to seamlessly execute the copy. Otherwise, this will only serve a small
+> niche for users and will not be optimal for FS and DM drivers that could be
+> simplified with a generic block layer copy functionality.
+> 
+> This is my 10 cents though, others may differ about this.
 
-I really wonder if we should move setting the flag out of bio_add_page
-and into the writeback code, as it will do the wrong things for
-non-writeback I/O, that is direct I/O or its in-kernel equivalents.
+Yes, I agree that copy emulation support should be included with the
+hardware enabled solution.
