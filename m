@@ -2,98 +2,89 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AB6CC4167B
-	for <linux-block@archiver.kernel.org>; Fri,  4 Dec 2020 14:41:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AD61C4361A
+	for <linux-block@archiver.kernel.org>; Fri,  4 Dec 2020 15:22:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2C59922B3B
-	for <linux-block@archiver.kernel.org>; Fri,  4 Dec 2020 14:41:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 20CB622B47
+	for <linux-block@archiver.kernel.org>; Fri,  4 Dec 2020 15:22:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730358AbgLDOkv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Dec 2020 09:40:51 -0500
-Received: from mail.kernel.org ([198.145.29.99]:56214 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726438AbgLDOkv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 4 Dec 2020 09:40:51 -0500
-Date:   Fri, 4 Dec 2020 23:40:03 +0900
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1607092810;
-        bh=uvtPoUqekE4ysrPkcwN2m2pvmLXmJsPsKTH0pCoQOwU=;
-        h=From:To:Cc:Subject:References:In-Reply-To:From;
-        b=I7lh3BQP018ZryVSybF2HF+vDP9xIgie2+3oUbLevvAPt1bI5uCSFT3O857/mw6tH
-         2dAaMkiSlJXFlsnh7E0zL6i1ElPKE7r97FFgtt6lG/FG7sgDmFmSvksH0gtqds8JXZ
-         euyKyTB+IFz5FZVtcc5dVttsZdsYwdKPCl9uNPPLPWjGb6fLqdwH+pLhxMwvIbUEUU
-         z1BaIEGceWAPgxjSoh8MfssdXWvYRWhotdB6/h+0AkWnbw/4Qhf4XxNZ+6czkvqrIK
-         4tpPwkUiWg/9BcaCRZXxvJjLDifRCK+bJJWSL3x6AuAEW5DzAaRTdAjKcR6ixo9jAi
-         klEnMtskQGb3w==
-From:   Keith Busch <kbusch@kernel.org>
-To:     Damien Le Moal <Damien.LeMoal@wdc.com>
-Cc:     SelvaKumar S <selvakuma.s1@samsung.com>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>, "hch@lst.de" <hch@lst.de>,
-        "sagi@grimberg.me" <sagi@grimberg.me>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "snitzer@redhat.com" <snitzer@redhat.com>,
-        "selvajove@gmail.com" <selvajove@gmail.com>,
-        "nj.shetty@samsung.com" <nj.shetty@samsung.com>,
-        "joshi.k@samsung.com" <joshi.k@samsung.com>,
-        "javier.gonz@samsung.com" <javier.gonz@samsung.com>
-Subject: Re: [RFC PATCH v2 0/2] add simple copy support
-Message-ID: <20201204144003.GA8868@redsun51.ssa.fujisawa.hgst.com>
-References: <CGME20201204094719epcas5p23b3c41223897de3840f92ae3c229cda5@epcas5p2.samsung.com>
- <20201204094659.12732-1-selvakuma.s1@samsung.com>
- <CH2PR04MB6522F1188557C829285ED5E8E7F10@CH2PR04MB6522.namprd04.prod.outlook.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CH2PR04MB6522F1188557C829285ED5E8E7F10@CH2PR04MB6522.namprd04.prod.outlook.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+        id S1730337AbgLDPV4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Dec 2020 10:21:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45492 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728708AbgLDPV4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Dec 2020 10:21:56 -0500
+Received: from mail-pj1-x1041.google.com (mail-pj1-x1041.google.com [IPv6:2607:f8b0:4864:20::1041])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1FCFC0613D1;
+        Fri,  4 Dec 2020 07:21:15 -0800 (PST)
+Received: by mail-pj1-x1041.google.com with SMTP id l23so3330390pjg.1;
+        Fri, 04 Dec 2020 07:21:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=nQyESLQvhW6QjC9n3RaFvyayxvhMqs/AWY4nVz29xxI=;
+        b=sEX/oiSW0zN0q6FZMbp/Gf/nlmsHyKYz1IL2bkw6dXSAcX4mO+CJkgr7QSqRyL2w44
+         +75ksjHBAcBU3TM0fltlyskA+LoXVvT8xiSOrgptPuySrdArA0Clfr6OHt5cD0xO+8ox
+         IXMvxQXc3qH5yjBkQq0vDeYAByuIRuoJlGvs72xJVs8D3aU2YyTn3A381njO6MVG5QY2
+         gdq+wGGBnupSu3nXLWm7Ek4nDZiAxtz64ipHpU3r7Akvr+5g8chwgmCXhowy4lAGWeWa
+         A4ZuYZ17KdeMxugBBZfnWcDb3aflX80IDpiGrP1xptQRAqpEaOlcUokBKCfMAChlZ/Hb
+         Riyg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=nQyESLQvhW6QjC9n3RaFvyayxvhMqs/AWY4nVz29xxI=;
+        b=PeI3tPS5K7RPgaAUfEg+XrY1tMAO0m2pZiZeexxFnKLHp8LRPSdZi67dQouw7DTEHS
+         jcn5EiU2qi1pP78i9St+QDEtkmUNpmyndyXgNo84TiwixiTsd58lXF3xeevES/QCseEK
+         GHw3xevIe4PN8/J9lyr52dtCgrUh3svb5qIhm++2tpK6Y5KWxFaKGSRm42M+bWBtT0Jv
+         m6MfOqt2bVpXGBc5hFv/VBRU2UrKVepVcHkHt+crcMgOPgBsAmNRPSGdX3dETfK1ZBV3
+         XqSHKmL3AklyHlYpXz04jlZrFrEcQjcethhWoG3UtqHqiIRllF7/6avj+MWNFIlVKxeD
+         Y83g==
+X-Gm-Message-State: AOAM533s/hmgnf6RW2a7DxlEUdWjnlUyFg9O/JZ13PJ4O7kUu2sGkw8q
+        N+g7LfF9x5M3/94G4QXTHfsbDgHajwDBhQ==
+X-Google-Smtp-Source: ABdhPJwPBVBXnxlFrFzzDTD1WUwGMpE8SY8r26T2xiQL1jvVX4XWc4DxeMLiXrsFd3lYoBNe+iz1+g==
+X-Received: by 2002:a17:902:c104:b029:da:5206:8b9b with SMTP id 4-20020a170902c104b02900da52068b9bmr4394150pli.46.1607095275212;
+        Fri, 04 Dec 2020 07:21:15 -0800 (PST)
+Received: from localhost.localdomain ([211.108.35.36])
+        by smtp.gmail.com with ESMTPSA id d20sm2407286pjz.3.2020.12.04.07.21.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Dec 2020 07:21:14 -0800 (PST)
+From:   Minwoo Im <minwoo.im.dev@gmail.com>
+To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Jens Axboe <axboe@kernel.dk>, Minwoo Im <minwoo.im.dev@gmail.com>
+Subject: [PATCH 0/3] blk-mq: trivial helper and fixes comments
+Date:   Sat,  5 Dec 2020 00:20:52 +0900
+Message-Id: <20201204152055.31605-1-minwoo.im.dev@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Dec 04, 2020 at 11:25:12AM +0000, Damien Le Moal wrote:
-> On 2020/12/04 20:02, SelvaKumar S wrote:
-> > This patchset tries to add support for TP4065a ("Simple Copy Command"),
-> > v2020.05.04 ("Ratified")
-> > 
-> > The Specification can be found in following link.
-> > https://nvmexpress.org/wp-content/uploads/NVM-Express-1.4-Ratified-TPs-1.zip
-> > 
-> > This is an RFC. Looking forward for any feedbacks or other alternate
-> > designs for plumbing simple copy to IO stack.
-> > 
-> > Simple copy command is a copy offloading operation and is  used to copy
-> > multiple contiguous ranges (source_ranges) of LBA's to a single destination
-> > LBA within the device reducing traffic between host and device.
-> > 
-> > This implementation accepts destination, no of sources and arrays of
-> > source ranges from application and attach it as payload to the bio and
-> > submits to the device.
-> > 
-> > Following limits are added to queue limits and are exposed in sysfs
-> > to userspace
-> > 	- *max_copy_sectors* limits the sum of all source_range length
-> > 	- *max_copy_nr_ranges* limits the number of source ranges
-> > 	- *max_copy_range_sectors* limit the maximum number of sectors
-> > 		that can constitute a single source range.
-> 
-> Same comment as before. I think this is a good start, but for this to be really
-> useful to users and kernel components alike, this really needs copy emulation
-> for drives that do not have a native copy feature, similarly to what write zeros
-> handling for instance: if the drive does not have a copy command (simple copy
-> for NVMe or XCOPY for scsi), then the block layer should issue read/write
-> commands to seamlessly execute the copy. Otherwise, this will only serve a small
-> niche for users and will not be optimal for FS and DM drivers that could be
-> simplified with a generic block layer copy functionality.
-> 
-> This is my 10 cents though, others may differ about this.
+Hello,
 
-Yes, I agree that copy emulation support should be included with the
-hardware enabled solution.
+This patch set contains:
+  - Introduce a helper to allocate tagset tags for the first time
+    without 'realloc' keyword that used to be taken.
+  - Fixes for comments need to be updated.
+
+Please have a look.
+
+Thanks,
+
+
+Minwoo Im (3):
+  blk-mq: add helper allocating tagset->tags
+  blk-mq: update arg in comment of blk_mq_map_queue
+  blk-mq: fix msec comment from micro to milli seconds
+
+ block/blk-mq.c | 14 ++++++++++----
+ block/blk-mq.h |  2 +-
+ 2 files changed, 11 insertions(+), 5 deletions(-)
+
+-- 
+2.17.1
+
