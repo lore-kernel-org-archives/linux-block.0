@@ -2,232 +2,129 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FCDEC433FE
-	for <linux-block@archiver.kernel.org>; Fri,  4 Dec 2020 17:51:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E6FAC4361B
+	for <linux-block@archiver.kernel.org>; Fri,  4 Dec 2020 18:52:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0027722B43
-	for <linux-block@archiver.kernel.org>; Fri,  4 Dec 2020 17:51:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DAC5C22CA0
+	for <linux-block@archiver.kernel.org>; Fri,  4 Dec 2020 18:52:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727355AbgLDRuq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Dec 2020 12:50:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40428 "EHLO
+        id S2387691AbgLDSwP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Dec 2020 13:52:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727319AbgLDRup (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Dec 2020 12:50:45 -0500
-Received: from mail-qt1-x842.google.com (mail-qt1-x842.google.com [IPv6:2607:f8b0:4864:20::842])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACDD9C0613D1
-        for <linux-block@vger.kernel.org>; Fri,  4 Dec 2020 09:49:59 -0800 (PST)
-Received: by mail-qt1-x842.google.com with SMTP id 7so4535279qtp.1
-        for <linux-block@vger.kernel.org>; Fri, 04 Dec 2020 09:49:59 -0800 (PST)
+        with ESMTP id S2387659AbgLDSwP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Dec 2020 13:52:15 -0500
+Received: from mail-ej1-x644.google.com (mail-ej1-x644.google.com [IPv6:2a00:1450:4864:20::644])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39026C061A52
+        for <linux-block@vger.kernel.org>; Fri,  4 Dec 2020 10:51:29 -0800 (PST)
+Received: by mail-ej1-x644.google.com with SMTP id x16so10145837ejj.7
+        for <linux-block@vger.kernel.org>; Fri, 04 Dec 2020 10:51:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=oitHTfBdVphAOM+mbFAdZYptH/VPFC/0n1/PDOfj93Y=;
-        b=bU06vPFMvZ7t9hOOJ7Nz421crCqHeJJ4ht8Zo6kDWVPVovU7N45JNzPmS2w/fB2OlB
-         ccyP/oQVnd5fCugGFh1NTiLoFd4uMvIK4H1L75mk0S2aLZRwwMTqGAwwxmhOB8U8vXUX
-         fgqmfhD9RlOhPkvpcyDxt+es5X6hi1hLPioyX5eIumT7y0LMqMpq0i7v/32TWh88Hs82
-         SdyOkAJEdevJJ1h/e04TFH/sNgUs1kS3S7WBSTDFW1GsKYMyGztZKD1N+1XcyLBGnM/M
-         tDh+3feznjS1tHZVBFkNj0Amh1o4J4UmWOJce/WauASMjBFLBmwkBLdyMZZspqpP3WUP
-         Xyug==
+        d=linaro.org; s=google;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=i6PGv4ZUKAWV06uB1yhL9icgz9mN5bj5ndLK9GnWxk4=;
+        b=ci93SS+CG6n0v7E4m7ULxrSPf6CyS56AlDA1CA3gLog8XB8KPLFjtY02DPCC+YmAP4
+         NTSvdsS5QxuDfGgi/5R8/BPFPR4lAhDEO8xVX1Bls2UNztuEGA8hKBEvArcbZdlCdJ2A
+         1cKBeXmpgNxN0zSk6K6LfBaBlwFOKHTjylz9QYfMs6H8yzKiS7yeBQHbV1Ag3fb5XReo
+         s8+XEqToy4hKB79jSxoqC6b2K1M0P+1wHgJQhJ0VfscYwQO1UyRrGjYV5rkjGpGs+3l3
+         SZoQGRluKFL7En+aVsfL2tne9XZnX12h/In1vr7/vOHoZLoST6je8O+GsYsV7c5FzIwB
+         5FZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=oitHTfBdVphAOM+mbFAdZYptH/VPFC/0n1/PDOfj93Y=;
-        b=MNW5KbHF4csb7So5cXpZC7cthI/dlBmsqsbmxapd/epn0l68crvnOcDak5RZjTa7Xb
-         BaLbLkFmzEMTNBI48ZCoPUNhCLFc+zMTuyuYsYNXnF1I9iu7N9rA5FhieqQ/JhRWE1qC
-         6/RyJaGkNcS4KWUe1eHzvxO4ueyoyE//x4vEexrl+hL2oczuRbUC70SIbRzedOkN8Y99
-         +gODpmC+54F75+hG+UjeGBY4czFVlWCt4c8Q3KQ1bzVr5/qyYy802hGrqW4TXS4mhi2E
-         xkqdTQaI8IOuISShpgjgO5bU+nBJuQGYl8hVgQ/DUVsOu8wDSpv2B3rhbaLX90rwW9ry
-         yVWQ==
-X-Gm-Message-State: AOAM5306RytZsIPYKnl1Jth7orVtS90n3AWdEy0c16Sh6QxvlL2Vf63Z
-        PK/jVUxwx2am2TLx/X9yKEU=
-X-Google-Smtp-Source: ABdhPJyPbVuo1ABXSDkwor+v9nZkKMGg0Vz3OqeqMWB2otHrjLqpPIPjyf/Ul5xGTD7DxsuPvyJ5ig==
-X-Received: by 2002:ac8:7395:: with SMTP id t21mr10555669qtp.358.1607104198922;
-        Fri, 04 Dec 2020 09:49:58 -0800 (PST)
-Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
-        by smtp.gmail.com with ESMTPSA id r18sm5554061qtp.89.2020.12.04.09.49.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Dec 2020 09:49:58 -0800 (PST)
-Sender: Mike Snitzer <snitzer@gmail.com>
-Date:   Fri, 4 Dec 2020 12:49:57 -0500
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Ming Lei <ming.lei@redhat.com>, axboe@kernel.dk
-Cc:     martin.petersen@oracle.com, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, jdorminy@redhat.com, bjohnsto@redhat.com
-Subject: Re: [RFC PATCH] dm: fix IO splitting [was: Re: [PATCH v2] block: use
- gcd() to fix chunk_sectors limit stacking]
-Message-ID: <20201204174957.GA61818@lobo>
-References: <20201130171805.77712-1-snitzer@redhat.com>
- <20201201160709.31748-1-snitzer@redhat.com>
- <20201203032608.GD540033@T590>
- <20201203143359.GA29261@redhat.com>
- <20201204011243.GB661914@T590>
- <20201204020343.GA32150@redhat.com>
- <20201204035924.GD661914@T590>
- <20201204164759.GA2761@redhat.com>
- <20201204173238.GA59222@lobo>
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=i6PGv4ZUKAWV06uB1yhL9icgz9mN5bj5ndLK9GnWxk4=;
+        b=idIqFx5FX+vbeWnNxg/i7d+D4fYZRCanL6Fcor9JSihCOI5u2sk39t5V4JicB/E0ew
+         v4XGuNFoVMAbtt0xKBZ3x8MYlQFalWoVa8sqqQGdZlRGsu7GE8AaZe57l0eCavcj8NLj
+         P3W+W+0MaXZwSdwsj2egkBY1tT5WtO1gtE+egOcaVACmYGHE24ycsrtFI/PnZVKKFd0H
+         ifHNddGaEaNseJ6qD19oaKLshur2vDBaF1zm42qClzy0nPMdb8XIF7yH7t6nA25mVe8p
+         w4HeCAComj3+OvKo8G28vCoSf8zgmAsmqzGbVEdbLrNT07hug/FiNr15AI7Tbzk8x05p
+         Oycg==
+X-Gm-Message-State: AOAM531ecZJLXYt0aKINs9UlaUm2zcA7UZwvlQ3GxYpuqVo9IhnDB/hB
+        90oB9+GamVKzAHfCrsRHxSOcNb3S7dfqJTWwOlP9REXOsUBexGSm
+X-Google-Smtp-Source: ABdhPJwYRfoc/E4oLYnRcv+D4dfKVOGaL668JMsf1AKzUeQ8rQO0PcEq3B1noPj2MzArOpC8sYGsrjVD7IMkxypyHA4=
+X-Received: by 2002:a17:906:2ec3:: with SMTP id s3mr8195458eji.133.1607107887772;
+ Fri, 04 Dec 2020 10:51:27 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201204173238.GA59222@lobo>
+From:   Naresh Kamboju <naresh.kamboju@linaro.org>
+Date:   Sat, 5 Dec 2020 00:21:16 +0530
+Message-ID: <CA+G9fYvGeHv-iPy2J3tdYGfr1A7ZuUrZystuQ9tDxV7vbP8iPg@mail.gmail.com>
+Subject: BUG: KCSAN: data-race in dec_zone_page_state / write_cache_pages
+To:     linux-mm <linux-mm@kvack.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        kasan-dev <kasan-dev@googlegroups.com>, rcu@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, lkft-triage@lists.linaro.org
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Marco Elver <elver@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Dec 04 2020 at 12:32P -0500,
-Mike Snitzer <snitzer@redhat.com> wrote:
+LKFT started testing KCSAN enabled kernel from the linux next tree.
+Here we have found BUG: KCSAN: data-race in dec_zone_page_state /
+write_cache_pages
 
-> On Fri, Dec 04 2020 at 11:47P -0500,
-> Mike Snitzer <snitzer@redhat.com> wrote:
-> 
-> > On Thu, Dec 03 2020 at 10:59pm -0500,
-> > Ming Lei <ming.lei@redhat.com> wrote:
-> > 
-> > > On Thu, Dec 03, 2020 at 09:03:43PM -0500, Mike Snitzer wrote:
-> > > > Stacking chunk_sectors seems ill-conceived.  One size-fits-all splitting
-> > > > is too rigid.
-> > > 
-> > > DM/VDO knows exactly it is one hard chunk_sectors limit, and DM shouldn't play
-> > > the stacking trick on VDO's chunk_sectors limit, should it?
-> > 
-> > Feel like I already answered this in detail but... correct, DM cannot
-> > and should not use stacked chunk_sectors as basis for splitting.
-> > 
-> > Up until 5.9, where I changed DM core to set and then use chunk_sectors
-> > for splitting via blk_max_size_offset(), DM only used its own per-target
-> > ti->max_io_len in drivers/md/dm.c:max_io_len().
-> > 
-> > But I reverted back to DM's pre-5.9 splitting in this stable@ fix that
-> > I'll be sending to Linus today for 5.10-rcX:
-> > https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git/commit/?h=dm-5.10-rcX&id=6bb38bcc33bf3093c08bd1b71e4f20c82bb60dd1
-> > 
-> > DM is now back to pre-5.9 behavior where it doesn't even consider
-> > chunk_sectors for splitting (NOTE: dm-zoned sets ti->max_io_len though
-> > so it is effectively achieves the same boundary splits via max_io_len).
-> 
-> Last question for all, I'd be fine with the following fix instead of
-> the above referenced commit 6bb38bcc33. It'd allow DM to continue to
-> use blk_max_size_offset(), any opinions?
-> 
-> From: Mike Snitzer <snitzer@redhat.com>
-> Date: Fri, 4 Dec 2020 12:03:25 -0500
-> Subject: [RFC PATCH] dm: fix IO splitting
-> 
-> FIXME: add proper header
-> Add chunk_sectors override to blk_max_size_offset().
-> 
-> Signed-off-by: Mike Snitzer <snitzer@redhat.com>
-> ---
->  block/blk-merge.c      |  2 +-
->  drivers/md/dm-table.c  |  5 -----
->  drivers/md/dm.c        | 19 +++++++++++--------
->  include/linux/blkdev.h |  9 +++++----
->  4 files changed, 17 insertions(+), 18 deletions(-)
-> 
-> diff --git a/block/blk-merge.c b/block/blk-merge.c
-> index bcf5e4580603..97b7c2821565 100644
-> --- a/block/blk-merge.c
-> +++ b/block/blk-merge.c
-> @@ -144,7 +144,7 @@ static struct bio *blk_bio_write_same_split(struct request_queue *q,
->  static inline unsigned get_max_io_size(struct request_queue *q,
->  				       struct bio *bio)
->  {
-> -	unsigned sectors = blk_max_size_offset(q, bio->bi_iter.bi_sector);
-> +	unsigned sectors = blk_max_size_offset(q, bio->bi_iter.bi_sector, 0);
->  	unsigned max_sectors = sectors;
->  	unsigned pbs = queue_physical_block_size(q) >> SECTOR_SHIFT;
->  	unsigned lbs = queue_logical_block_size(q) >> SECTOR_SHIFT;
-> diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
-> index 2073ee8d18f4..7eeb7c4169c9 100644
-> --- a/drivers/md/dm-table.c
-> +++ b/drivers/md/dm-table.c
-> @@ -18,7 +18,6 @@
->  #include <linux/mutex.h>
->  #include <linux/delay.h>
->  #include <linux/atomic.h>
-> -#include <linux/lcm.h>
->  #include <linux/blk-mq.h>
->  #include <linux/mount.h>
->  #include <linux/dax.h>
-> @@ -1449,10 +1448,6 @@ int dm_calculate_queue_limits(struct dm_table *table,
->  			zone_sectors = ti_limits.chunk_sectors;
->  		}
->  
-> -		/* Stack chunk_sectors if target-specific splitting is required */
-> -		if (ti->max_io_len)
-> -			ti_limits.chunk_sectors = lcm_not_zero(ti->max_io_len,
-> -							       ti_limits.chunk_sectors);
->  		/* Set I/O hints portion of queue limits */
->  		if (ti->type->io_hints)
->  			ti->type->io_hints(ti, &ti_limits);
-> diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-> index 98866e725f25..f7eb3d2964f3 100644
-> --- a/drivers/md/dm.c
-> +++ b/drivers/md/dm.c
-> @@ -1039,15 +1039,18 @@ static sector_t max_io_len(struct dm_target *ti, sector_t sector)
->  	sector_t max_len;
->  
->  	/*
-> -	 * Does the target need to split even further?
-> -	 * - q->limits.chunk_sectors reflects ti->max_io_len so
-> -	 *   blk_max_size_offset() provides required splitting.
-> -	 * - blk_max_size_offset() also respects q->limits.max_sectors
-> +	 * Does the target need to split IO even further?
-> +	 * - varied (per target) IO splitting is a tenet of DM; this
-> +	 *   explains why stacked chunk_sectors based splitting via
-> +	 *   blk_max_size_offset() isn't possible here. So pass in
-> +	 *   ti->max_io_len to override stacked chunk_sectors.
->  	 */
-> -	max_len = blk_max_size_offset(ti->table->md->queue,
-> -				      target_offset);
-> -	if (len > max_len)
-> -		len = max_len;
-> +	if (ti->max_io_len) {
-> +		max_len = blk_max_size_offset(ti->table->md->queue,
-> +					      target_offset, ti->max_io_len);
-> +		if (len > max_len)
-> +			len = max_len;
-> +	}
->  
->  	return len;
->  }
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> index 639cae2c158b..f56dc5497e67 100644
-> --- a/include/linux/blkdev.h
-> +++ b/include/linux/blkdev.h
-> @@ -1073,11 +1073,12 @@ static inline unsigned int blk_queue_get_max_sectors(struct request_queue *q,
->   * file system requests.
->   */
->  static inline unsigned int blk_max_size_offset(struct request_queue *q,
-> -					       sector_t offset)
-> +					       sector_t offset,
-> +					       unsigned int chunk_sectors)
->  {
-> -	unsigned int chunk_sectors = q->limits.chunk_sectors;
-> -
-> -	if (!chunk_sectors)
-> +	if (!chunk_sectors && q->limits.chunk_sectors)
-> +		chunk_sectors = q->limits.chunk_sectors;
-> +	else
->  		return q->limits.max_sectors;
->  
->  	if (likely(is_power_of_2(chunk_sectors)))
+This report is from an x86_64 machine clang-11 linux next 20201201.
+Since we are running for the first time we do not call this regression.
 
-FYI, above blkdev.h diff missed this hunk:
+[   45.484972] BUG: KCSAN: data-race in dec_zone_page_state / write_cache_pages
+[   45.492030]
+[   45.493532] read-write (marked) to 0xffffd4e284455380 of 8 bytes by
+task 269 on cpu 0:
+[   45.501453]  write_cache_pages+0x270/0x6a0
+[   45.505560]  generic_writepages+0x63/0xa0
+[   45.509582]  blkdev_writepages+0xe/0x10
+[   45.513429]  do_writepages+0x79/0x140
+[   45.517096]  __writeback_single_inode+0x6d/0x390
+[   45.521714]  writeback_sb_inodes+0x4fd/0xbe0
+[   45.525986]  wb_writeback+0x42e/0x690
+[   45.529652]  wb_do_writeback+0x4d2/0x530
+[   45.533578]  wb_workfn+0xc8/0x4a0
+[   45.536897]  process_one_work+0x4a6/0x830
+[   45.540908]  worker_thread+0x5f7/0xaa0
+[   45.544661]  kthread+0x20b/0x220
+[   45.547893]  ret_from_fork+0x22/0x30
+[   45.551471]
+[   45.552963] read to 0xffffd4e284455380 of 8 bytes by task 499 on cpu 2:
+[   45.559576]  dec_zone_page_state+0x1d/0x140
+[   45.563764]  clear_page_dirty_for_io+0x2ab/0x3a0
+[   45.568382]  write_cache_pages+0x388/0x6a0
+[   45.572480]  generic_writepages+0x63/0xa0
+[   45.576495]  blkdev_writepages+0xe/0x10
+[   45.580334]  do_writepages+0x79/0x140
+[   45.584000]  __filemap_fdatawrite_range+0x155/0x190
+[   45.588880]  file_write_and_wait_range+0x51/0xa0
+[   45.593498]  blkdev_fsync+0x45/0x70
+[   45.596991]  __x64_sys_fsync+0xda/0x120
+[   45.600830]  do_syscall_64+0x3b/0x50
+[   45.604409]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+[   45.609460]
+[   45.610950] Reported by Kernel Concurrency Sanitizer on:
+[   45.616259] CPU: 2 PID: 499 Comm: mkfs.ext4 Not tainted
+5.10.0-rc6-next-20201201 #2
+[   45.623908] Hardware name: Supermicro SYS-5019S-ML/X11SSH-F, BIOS
+2.2 05/23/2018
 
-@@ -1101,7 +1102,7 @@ static inline unsigned int blk_rq_get_max_sectors(struct request *rq,
- 	    req_op(rq) == REQ_OP_SECURE_ERASE)
- 		return blk_queue_get_max_sectors(q, req_op(rq));
- 
--	return min(blk_max_size_offset(q, offset),
-+	return min(blk_max_size_offset(q, offset, 0),
- 			blk_queue_get_max_sectors(q, req_op(rq)));
- }
- 
+metadata:
+    git_repo: https://gitlab.com/aroxell/lkft-linux-next
+    target_arch: x86
+    toolchain: clang-11
+    git_describe: next-20201201
+    download_url: https://builds.tuxbuild.com/1l8eiWgGMi6W4aDobjAAlOleFVl/
+
+Full test log link,
+https://lkft.validation.linaro.org/scheduler/job/2002643#L1866
+
+-- 
+Linaro LKFT
+https://lkft.linaro.org
