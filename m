@@ -8,59 +8,59 @@ X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D16E7C2BB3F
-	for <linux-block@archiver.kernel.org>; Fri,  4 Dec 2020 15:22:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EC5CC4361A
+	for <linux-block@archiver.kernel.org>; Fri,  4 Dec 2020 15:22:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A270422C9C
-	for <linux-block@archiver.kernel.org>; Fri,  4 Dec 2020 15:22:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EA38022B43
+	for <linux-block@archiver.kernel.org>; Fri,  4 Dec 2020 15:22:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730518AbgLDPWH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Dec 2020 10:22:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45534 "EHLO
+        id S1730495AbgLDPWE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Dec 2020 10:22:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45520 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730493AbgLDPWH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Dec 2020 10:22:07 -0500
-Received: from mail-pg1-x541.google.com (mail-pg1-x541.google.com [IPv6:2607:f8b0:4864:20::541])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E920C061A53;
-        Fri,  4 Dec 2020 07:21:27 -0800 (PST)
-Received: by mail-pg1-x541.google.com with SMTP id n7so3708761pgg.2;
-        Fri, 04 Dec 2020 07:21:27 -0800 (PST)
+        with ESMTP id S1730493AbgLDPWD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Dec 2020 10:22:03 -0500
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C34A1C061A51;
+        Fri,  4 Dec 2020 07:21:23 -0800 (PST)
+Received: by mail-pj1-x102b.google.com with SMTP id h7so3918159pjk.1;
+        Fri, 04 Dec 2020 07:21:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=zSiFncf9bc1IksnnHanoKbYxCLnTdwlPlYIeXCQuzAo=;
-        b=NUKe7m154RACyFxE/BsYVTHsM+7z19YuU1au+5V0prlFmNfBtv35ChQeOuXhYQOYCj
-         3CI6C3YYYH+MGvrU4CJQoxjLKPPuYRH83yoXKkUz5TngBc6ExqMocojFL9lNfe6EtCb4
-         NQXG2ESRU+N6+MRDUKE738qzQyf48T+vksFsfbo6qmp8etFfjSUlM0lk2MQdIyza5T66
-         HCje7fK+NkTwTzSR8XM2FO+NO2PoEkYObT21FdKUCVpxGxSIXhwSzQ7EwedFlomQ/qe2
-         hKgPU0y26HfWMJdo6D4SMQCwRVP2J3t88rzwzFaxca2EBYIIFyfvCriCbNDWSHq0ZPoJ
-         MSpg==
+        bh=8GRsx9W76nEBQns60PeqGvsE174WKc8EGtATwU1W+Mk=;
+        b=ZRWSnWUpHR7bxPL4x8js8hAdm6O/rRmk44fJZouOiMlI2fDrcJ/RFeznLWPuvn2To8
+         Q5pHXgTK3vb8Y6fBCV1+2NA57tGJk0x+b8OJIwcpfRfTuKWtQIMW0u9L5iL92z2fx55g
+         taF5/1LGsR8eDMd3ixu+UAFYskDhQxc7oOlhZ1y4wl8nuSKoA2b6wMsvYd7+vPyFDExS
+         GXqsrZ+yXbuYyq79nxvYQCSorXbWCxs/M8DNPZaH8L97s162zClJ683mlwCCkdswrTXS
+         2hRAeoO49Ez9ogtp/+sWn7751KQs+J21U2HmSXm5t5EwEt135lCONEN3byraZFFeq8o2
+         iY1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=zSiFncf9bc1IksnnHanoKbYxCLnTdwlPlYIeXCQuzAo=;
-        b=l3Zkla0h1iHZHUgZqYP1zkeYw6TqnHRuDH8ESBOSh+PqXUsENAUM+kHvF4nXbjwnqd
-         48sGYAQXCVVKlrVJiSgGeKexHnk9V2y7r39U+ULG8EbGl7ZsBi8DL0TvjgrBceq5AE7u
-         BVBVW6uj3roEHtO6u3ZT8pjbLEhyogrP4ML4v16GpZzUK6C7MAjbZ0abD3Fd7ZFqt1wr
-         j6FReZWg+x8ddh3anpkIwwNa0eQPYtfN3NoznxGfos5kAW5b9lcsMHVk0uvrNh5sYlQT
-         87ngPrATIsWmFPPrNLYRArohDgD1KiCUa+8+LYU9PRQr1c8IT1OVTfsdWbb7O+J4q1+u
-         unkg==
-X-Gm-Message-State: AOAM530u5CDU7qqD6gv7q5Q9tl5EQRDMnD4JhwbP2ly1inkICeeh5kwj
-        ZYp+tYN2Y2nO8WRQ5OiMndKJukyyMKSMRQ==
-X-Google-Smtp-Source: ABdhPJypSxXb5nWWg6zFc4F311ljR6V39mAg0gur2Z3gKt7vFFgkNKvnCs1Fp44NFAGk3rNiuZKADQ==
-X-Received: by 2002:a63:1b42:: with SMTP id b2mr2745121pgm.401.1607095286645;
-        Fri, 04 Dec 2020 07:21:26 -0800 (PST)
+        bh=8GRsx9W76nEBQns60PeqGvsE174WKc8EGtATwU1W+Mk=;
+        b=C4Fros4YL01XlNcS1CBLweL8u8BrCmVC2LoOW9wg/gj3cF+P8vjKH8M2zYT+6VlACI
+         +vEsP5GMS9VRjZbk4muVgITge56tpTVhst4LtZePlzEqcOgqOFhkJfIvTdaZIoc1VQa0
+         V+/cZP3trCq1qXqgJnCnRDsQXYxY/dTkYkcXp7jVN4d2WSHt4VGtoY7MTLfPdtpY4S2O
+         qx6iEaMXLLx2CeQS+q6H28ysWTUnubPWzOMyLdIJSZY42SIm5rnLDF6iWsuP5yc5zPbT
+         HHjkfxBd0IjHPRyAeP7xDLZ5Q+GYFtVgVRrlfm2B5G3gUQBTJo1JueFDQ6ACeGMQ7uWE
+         t4TA==
+X-Gm-Message-State: AOAM531wU/Mebi3RoQCRUe06KC/MIBY2dKRdbxntkj/TK/Bavf5qyY+Y
+        KPWLS2h8/M9Dc0oeUYdri2qW1uzLb0gZyw==
+X-Google-Smtp-Source: ABdhPJxAAjgMASqa7LiteK08rLw7jgKDZKMXTw0cxaAcqYs/DnA/YiChnZ8/8ghAvJig9mWJ3XqYuw==
+X-Received: by 2002:a17:90b:1645:: with SMTP id il5mr4658326pjb.15.1607095283170;
+        Fri, 04 Dec 2020 07:21:23 -0800 (PST)
 Received: from localhost.localdomain ([211.108.35.36])
-        by smtp.gmail.com with ESMTPSA id d20sm2407286pjz.3.2020.12.04.07.21.24
+        by smtp.gmail.com with ESMTPSA id d20sm2407286pjz.3.2020.12.04.07.21.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Dec 2020 07:21:26 -0800 (PST)
+        Fri, 04 Dec 2020 07:21:22 -0800 (PST)
 From:   Minwoo Im <minwoo.im.dev@gmail.com>
 To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     Jens Axboe <axboe@kernel.dk>, Minwoo Im <minwoo.im.dev@gmail.com>
-Subject: [PATCH 3/3] blk-mq: fix msec comment from micro to milli seconds
-Date:   Sat,  5 Dec 2020 00:20:55 +0900
-Message-Id: <20201204152055.31605-4-minwoo.im.dev@gmail.com>
+Subject: [PATCH 2/3] blk-mq: update arg in comment of blk_mq_map_queue
+Date:   Sat,  5 Dec 2020 00:20:54 +0900
+Message-Id: <20201204152055.31605-3-minwoo.im.dev@gmail.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20201204152055.31605-1-minwoo.im.dev@gmail.com>
 References: <20201204152055.31605-1-minwoo.im.dev@gmail.com>
@@ -68,46 +68,27 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Delay to wait for queue running is milli second unit which is passed to
-delayed work via msecs_to_jiffies() which is to convert milliseconds to
-jiffies.
+Update mis-named argument description of blk_mq_map_queue().  This patch
+also updates description that argument to software queue percpu context.
 
 Signed-off-by: Minwoo Im <minwoo.im.dev@gmail.com>
 ---
- block/blk-mq.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ block/blk-mq.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 69771ba18f1f..284d103bd0e7 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1594,7 +1594,7 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
-  * __blk_mq_delay_run_hw_queue - Run (or schedule to run) a hardware queue.
-  * @hctx: Pointer to the hardware queue to run.
-  * @async: If we want to run the queue asynchronously.
-- * @msecs: Microseconds of delay to wait before running the queue.
-+ * @msecs: Milliseconds of delay to wait before running the queue.
-  *
-  * If !@async, try to run the queue now. Else, run the queue asynchronously and
-  * with a delay of @msecs.
-@@ -1623,7 +1623,7 @@ static void __blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async,
- /**
-  * blk_mq_delay_run_hw_queue - Run a hardware queue asynchronously.
-  * @hctx: Pointer to the hardware queue to run.
-- * @msecs: Microseconds of delay to wait before running the queue.
-+ * @msecs: Milliseconds of delay to wait before running the queue.
-  *
-  * Run a hardware queue asynchronously with a delay of @msecs.
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index c696515766c7..c1458d9502f1 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -99,7 +99,7 @@ static inline struct blk_mq_hw_ctx *blk_mq_map_queue_type(struct request_queue *
+  * blk_mq_map_queue() - map (cmd_flags,type) to hardware queue
+  * @q: request queue
+  * @flags: request command flags
+- * @cpu: cpu ctx
++ * @ctx: software queue cpu ctx
   */
-@@ -1687,7 +1687,7 @@ EXPORT_SYMBOL(blk_mq_run_hw_queues);
- /**
-  * blk_mq_delay_run_hw_queues - Run all hardware queues asynchronously.
-  * @q: Pointer to the request queue to run.
-- * @msecs: Microseconds of delay to wait before running the queues.
-+ * @msecs: Milliseconds of delay to wait before running the queues.
-  */
- void blk_mq_delay_run_hw_queues(struct request_queue *q, unsigned long msecs)
- {
+ static inline struct blk_mq_hw_ctx *blk_mq_map_queue(struct request_queue *q,
+ 						     unsigned int flags,
 -- 
 2.17.1
 
