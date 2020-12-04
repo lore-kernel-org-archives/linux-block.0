@@ -2,70 +2,65 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D3E4C433FE
-	for <linux-block@archiver.kernel.org>; Fri,  4 Dec 2020 08:38:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 684B5C433FE
+	for <linux-block@archiver.kernel.org>; Fri,  4 Dec 2020 08:47:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 275F522525
-	for <linux-block@archiver.kernel.org>; Fri,  4 Dec 2020 08:38:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1405E227BF
+	for <linux-block@archiver.kernel.org>; Fri,  4 Dec 2020 08:47:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728858AbgLDIib (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Dec 2020 03:38:31 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:8686 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725969AbgLDIia (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Dec 2020 03:38:30 -0500
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4CnR075y62zkl53;
-        Fri,  4 Dec 2020 16:37:11 +0800 (CST)
-Received: from compute.localdomain (10.175.112.70) by
- DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server (TLS)
- id 14.3.487.0; Fri, 4 Dec 2020 16:37:37 +0800
-From:   Zhang Changzhong <zhangchangzhong@huawei.com>
-To:     Joshua Morris <josh.h.morris@us.ibm.com>,
-        Philip Kelleher <pjk1939@linux.ibm.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Philip J Kelleher <pjk1939@linux.vnet.ibm.com>
-CC:     Zhang Changzhong <zhangchangzhong@huawei.com>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH] rsxx: fix error return code in rsxx_pci_probe()
-Date:   Fri, 4 Dec 2020 16:40:37 +0800
-Message-ID: <1607071238-33246-1-git-send-email-zhangchangzhong@huawei.com>
-X-Mailer: git-send-email 1.8.3.1
+        id S1729044AbgLDIrR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Dec 2020 03:47:17 -0500
+Received: from verein.lst.de ([213.95.11.211]:33743 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728990AbgLDIrR (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 4 Dec 2020 03:47:17 -0500
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 907636736F; Fri,  4 Dec 2020 09:46:34 +0100 (CET)
+Date:   Fri, 4 Dec 2020 09:46:34 +0100
+From:   "hch@lst.de" <hch@lst.de>
+To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+Cc:     "hch@infradead.org" <hch@infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "sagi@grimberg.me" <sagi@grimberg.me>, "hch@lst.de" <hch@lst.de>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+Subject: Re: [PATCH V4 1/9] block: allow bvec for zone append get pages
+Message-ID: <20201204084634.GA5845@lst.de>
+References: <20201202062227.9826-1-chaitanya.kulkarni@wdc.com> <20201202062227.9826-2-chaitanya.kulkarni@wdc.com> <20201202085531.GA2050258@infradead.org> <BYAPR04MB49652F70D16357D420E616AE86F10@BYAPR04MB4965.namprd04.prod.outlook.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.175.112.70]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BYAPR04MB49652F70D16357D420E616AE86F10@BYAPR04MB4965.namprd04.prod.outlook.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Fix to return a negative error code from the error handling
-case instead of 0, as done elsewhere in this function.
+On Fri, Dec 04, 2020 at 02:43:10AM +0000, Chaitanya Kulkarni wrote:
+> >> Remove the bvec check in the bio_iov_iter_get_pages() for
+> >> REQ_OP_ZONE_APPEND so that we can reuse the code and build iter from
+> >> bvec.
+> > We should do the same optimization for bvec pages that the normal path
+> > does.  That being said using bio_iov_iter_get_pages in nvmet does not
+> > 	make any sense to me whatsover.
+> >
+> Are you referring to the inline bvec ? then yes, I'll add it in next
+> version.
+> 
+> I did not understand bio_iov_iter_get_pages() comment though.
+> 
+> Reimplementing the bio loop over sg with the use of bio_add_hw_page() seems
+> 
+> repetition of the code which we already have in bio_iov_iter_get_pages().
+> 
+> 
+> Can you please explain why bio_iov_iter_get_pages() not the right way ?
 
-Fixes: a3299ab18591 ("rsxx: Individual workqueues for interruptible events.")
-Reported-by: Hulk Robot <hulkci@huawei.com>
-Signed-off-by: Zhang Changzhong <zhangchangzhong@huawei.com>
----
- drivers/block/rsxx/core.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/block/rsxx/core.c b/drivers/block/rsxx/core.c
-index 63f5498..d7e2416 100644
---- a/drivers/block/rsxx/core.c
-+++ b/drivers/block/rsxx/core.c
-@@ -869,6 +869,7 @@ static int rsxx_pci_probe(struct pci_dev *dev,
- 	card->event_wq = create_singlethread_workqueue(DRIVER_NAME"_event");
- 	if (!card->event_wq) {
- 		dev_err(CARD_TO_DEV(card), "Failed card event setup.\n");
-+		st = -ENOMEM;
- 		goto failed_event_handler;
- 	}
- 
--- 
-2.9.5
-
+bio_iov_iter_get_pages is highly inefficient for this use case, as we'll
+need to allocate two sets of bio_vecs.  It also is rather redundant as
+Zone Append should be able to just largely reuse the write path.
