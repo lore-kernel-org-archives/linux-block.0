@@ -2,63 +2,105 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-20.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00B36C4361A
-	for <linux-block@archiver.kernel.org>; Sat,  5 Dec 2020 19:23:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3CD3C4361B
+	for <linux-block@archiver.kernel.org>; Sat,  5 Dec 2020 21:44:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C17F12311B
-	for <linux-block@archiver.kernel.org>; Sat,  5 Dec 2020 19:23:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9D2FB2310E
+	for <linux-block@archiver.kernel.org>; Sat,  5 Dec 2020 21:44:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728002AbgLETWe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 5 Dec 2020 14:22:34 -0500
-Received: from mail.kernel.org ([198.145.29.99]:50900 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727924AbgLETWT (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 5 Dec 2020 14:22:19 -0500
-Subject: Re: [dm-devel] [git pull] device mapper induced block fix for 5.10-rc7
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1607196099;
-        bh=vl/ksZFlRXwC5qkUZ25jXVpIAO83WfmPACYxC4QTGjs=;
-        h=From:In-Reply-To:References:Date:To:Cc:From;
-        b=bgYzFj2ZLCebWBfpb+s7DAyNGT8/8YEqnXdiqCgJm63/2RV9RbN/TL/1nIvd9Yx35
-         wXwejhH5a2Ol9it3G7T4cnIeoihgVgbAPVGlU/QU4j2HTu7HcuAT4ExnKtul4WHLPE
-         u/jc5kdnWjMDC2HUs0Q5fRDcULe4oDr3TYiAILQjj4A0pr6qaGoh2xC/DTtwIObcGo
-         wdiBo9lklEld0llCPlLl3skNrXVrH26rVx52NmYCpxZ8UQsUAyyOd5g5v+xj3nUwXh
-         MK760xARafPn6woerY0+aqgE1pPISniTcuHBkvujQ9uS6IQBNezMTGvsnFiwEWI1Ne
-         rsvHB0kGQ7d/w==
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <20201204231225.GA4574@redhat.com>
-References: <20201204210521.GA3937@redhat.com>
-        <160711773655.16738.13830016046956700847.pr-tracker-bot@kernel.org>
-        <20201204223742.GA82260@lobo> <20201204231225.GA4574@redhat.com>
-X-PR-Tracked-List-Id: device-mapper development <dm-devel.redhat.com>
-X-PR-Tracked-Message-Id: <20201204231225.GA4574@redhat.com>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-5.10/dm-fixes-2
-X-PR-Tracked-Commit-Id: 65f33b35722952fa076811d5686bfd8a611a80fa
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 8762340561397fce0f0b41220ed9619101c870d0
-Message-Id: <160719609911.18711.171386792638793811.pr-tracker-bot@kernel.org>
-Date:   Sat, 05 Dec 2020 19:21:39 +0000
-To:     Mike Snitzer <snitzer@redhat.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-block@vger.kernel.org, axboe@kernel.dk, dm-devel@redhat.com
+        id S1726671AbgLEVoK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 5 Dec 2020 16:44:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43734 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726524AbgLEVoK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 5 Dec 2020 16:44:10 -0500
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5279CC0613CF
+        for <linux-block@vger.kernel.org>; Sat,  5 Dec 2020 13:43:24 -0800 (PST)
+Received: by mail-pf1-x435.google.com with SMTP id d2so2443137pfq.5
+        for <linux-block@vger.kernel.org>; Sat, 05 Dec 2020 13:43:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=to:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=YbLMjIQhdEsZF+sagM+1Z43StQBtcV8vHFR13ehX/JY=;
+        b=N1QZ7UaX/vI4KIsDomIdMgtPBQST/Y9c2EDHg57fyiN1Dqz5cZOrmGTVpMi8Q0v5Q/
+         bxNoDlBKwzQ48eEhTXHfWTRULa1YZGGHKbfzMgt1vDsji5hNhF+ZdyhP8ae4nSEWxcez
+         o3hhseUP/XPzZcFlUTJ3+ZNpUgZD3b2SzE/Rdk+4PPk6JOTUEImtL+1rQKJ4LIlJNH/f
+         zNLNcCv1310wKJ0D8WAbtjnXVmEnMJfUQKGzPoykSRenAn7LXMgNxLEk2bWueV3ZB+QT
+         tMj31QfWakgidMmL/YakHwNDrKKuxzWhGXd9dFn1w3duSO2K/FIXYm5F6RQVT4UAEw6D
+         4b2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=YbLMjIQhdEsZF+sagM+1Z43StQBtcV8vHFR13ehX/JY=;
+        b=uJx7dZxqpeikjXWDcBep/H3RAdDs6r2qgmvWgzZi4n1bn8T0cjRiajAxjgQwZTtMSb
+         D3gSQGIM4qe4ovxDFuVdHWypFPUIDGYQVS7DVv7SeTfrQ13PV1l0yczDllRbGdfQDYMh
+         gLKhSnl5ttVyCCy0AeN6TsFBwTvAGgyHJ058F6z/evLaTGQ0QkcQ7UiAe1pddFAGkfBj
+         Qn1JmBWpFlyeItwWwqSY1dvvKwNOwi4AdR38m+66PTk1VvvWbSlmQXpIWWu4RLKWqvxa
+         cSp14PWORiTsBzKJSw6YKaXR25Q0iMViRsKwaWNIAVPUlmabcNB/EAyI4FG+6/3BJS+x
+         VwRw==
+X-Gm-Message-State: AOAM532ombbJmV/wzsKbB+/T6I3o7mmgMHrALXBTS241wI4XE/PDZZI4
+        KwnpR+WUEdvXcXJx+FAgP+DQyQ/74o6w1w==
+X-Google-Smtp-Source: ABdhPJy3viK5R39Ulw50O9CtwGvAi8y8oqmEJx88eUqtoAXpViFY3WQxWWtUShOeZOcAh3ILjrhMFg==
+X-Received: by 2002:a63:4e4c:: with SMTP id o12mr12701769pgl.348.1607204603619;
+        Sat, 05 Dec 2020 13:43:23 -0800 (PST)
+Received: from [192.168.1.134] ([66.219.217.173])
+        by smtp.gmail.com with ESMTPSA id g33sm7947160pgm.74.2020.12.05.13.43.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 05 Dec 2020 13:43:23 -0800 (PST)
+To:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fix for 5.10-rc
+Message-ID: <cdf79314-f43e-644f-910b-f1738d728624@kernel.dk>
+Date:   Sat, 5 Dec 2020 14:43:25 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Fri, 4 Dec 2020 18:12:26 -0500:
+Hi Linus,
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-5.10/dm-fixes-2
+Single fix this time, fixing an issue with chunk_sectors and stacked
+devices.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/8762340561397fce0f0b41220ed9619101c870d0
+Please pull.
 
-Thank you!
+
+The following changes since commit 47a846536e1bf62626f1c0d8488f3718ce5f8296:
+
+  block/keyslot-manager: prevent crash when num_slots=1 (2020-11-20 11:52:52 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux-block.git tags/block-5.10-2020-12-05
+
+for you to fetch changes up to 7e7986f9d3ba69a7375a41080a1f8c8012cb0923:
+
+  block: use gcd() to fix chunk_sectors limit stacking (2020-12-01 11:02:55 -0700)
+
+----------------------------------------------------------------
+block-5.10-2020-12-05
+
+----------------------------------------------------------------
+Mike Snitzer (1):
+      block: use gcd() to fix chunk_sectors limit stacking
+
+ block/blk-settings.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Jens Axboe
+
