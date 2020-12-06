@@ -2,102 +2,110 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81A77C4167B
-	for <linux-block@archiver.kernel.org>; Sun,  6 Dec 2020 14:08:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C7CEC4361B
+	for <linux-block@archiver.kernel.org>; Sun,  6 Dec 2020 14:15:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 49D1F2313B
-	for <linux-block@archiver.kernel.org>; Sun,  6 Dec 2020 14:08:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D6EC52313C
+	for <linux-block@archiver.kernel.org>; Sun,  6 Dec 2020 14:15:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728090AbgLFOIq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 6 Dec 2020 09:08:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41808 "EHLO
+        id S1728281AbgLFOPP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 6 Dec 2020 09:15:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728058AbgLFOIq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 6 Dec 2020 09:08:46 -0500
-Received: from mail-wr1-x441.google.com (mail-wr1-x441.google.com [IPv6:2a00:1450:4864:20::441])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CB9BC0613D1
-        for <linux-block@vger.kernel.org>; Sun,  6 Dec 2020 06:08:05 -0800 (PST)
-Received: by mail-wr1-x441.google.com with SMTP id m5so483032wrx.9
-        for <linux-block@vger.kernel.org>; Sun, 06 Dec 2020 06:08:05 -0800 (PST)
+        with ESMTP id S1726757AbgLFOPP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 6 Dec 2020 09:15:15 -0500
+Received: from mail-ed1-x543.google.com (mail-ed1-x543.google.com [IPv6:2a00:1450:4864:20::543])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5861C0613D0;
+        Sun,  6 Dec 2020 06:14:34 -0800 (PST)
+Received: by mail-ed1-x543.google.com with SMTP id dk8so7998310edb.1;
+        Sun, 06 Dec 2020 06:14:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=O811b7dIBsfJ4z6gVCFgZMaE6NwPbA7DJHDA7p0gDg4=;
-        b=jqWbQQVrkM4VWmKjrTibOxltfGq7RFNuw21XKbeKYhUb9hXZhvZmeK/XJ8M96FgrUS
-         2F/KLGKO0QS1YP/p0e14LusqJRxD9XnqQekokiSdOHSA6xYAO8NnyWVgLu7ZewqOot+p
-         rP78NdG1S+Wy4dwHJ4csOYe88mRuMYD2sNjs1MoVJfVnA6Mcx3NXWtM5rmViGWtDAsyP
-         IKEJG7ssgdEDnWYVn1f1HgvjAxJwD1FQytBYA35R6buubb4sOUhwT8CBfdlC4+x3BRBo
-         +LWX8j3cQdgB3UPnBi+NgTwRyc3QOutCo7ylaitZrLnNUxwIi9TP4qDFFSEw1xKXImGA
-         TBcQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=eNOEAWekcaikssB8glzCwEs1qMsl24PtYgQQ8j4uLPA=;
+        b=CbZo57z4+74s79nVAmWVNgfudPLp6+nhTYJe96sZlmIRGMmo50jT/v07k2DkbRUSy4
+         KIcSuHxNJyOm+IBZ4LSZbgJFvzRs+34nt40gjM4m5msOtu6WYsL5mNO+gieNtBGG4pUY
+         U4oromD2SOu3D7hn87g/kzaMEjevNyrDdTqTYpV13hbXSQtDtQtXSSfN3fIKSpWD6p0L
+         yqUrkE9Zluz7at03qIFO9dg2AcPzCwwIGWITcanLg+v7Fd6Zov4fFAKQH+r0bN3QE1Tp
+         irrhwGrJjEgvgPIilzNlxqYOVyvw9ccMaqn12RjphcrP8mVKxvkFEWeRdiWqH6UXi4pP
+         d/bA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=O811b7dIBsfJ4z6gVCFgZMaE6NwPbA7DJHDA7p0gDg4=;
-        b=Px1c5SCRq1+RDu1lVpatRqNBxKqihNOL8sq5TDu9J9y9+qcHkUAzZQkqR6WS+E+sPQ
-         vYnrMuWIR1xh1eMka6NTMflnFtFngyfKd8UQGZzJDmvMwi99GnYDiPMhIXMsed/qaNTr
-         D2Dd5rNpp9Hm2oV5PwKmC8g8hsX+sH5LQ3fjiK7BiVLT7wdIfli2XGv+PF+phLW1iFbo
-         pRLKM9kHaJLhtmTurGhc6qr+b2fujods/tm9WX2ueF+BjKpuWfxgCjccybOHoewezNKH
-         0zunDxhIivcCsae9gaDIXvZUQlWoh4xiaS+TOIWNa5gZO+Irta+RCmO5Xq9aAriDLvH7
-         OX9g==
-X-Gm-Message-State: AOAM532D9IVI568fm7t1gD198GE4aVUhltE3ivmUFbsbzwBcu6pY98fA
-        A12dawtE8UiipITRMbpm4iF3AQj1IRoCHA==
-X-Google-Smtp-Source: ABdhPJz3axUZnUIwjijwY8AkGK7yEEt9Hmbpfpbs8h8NOWrRqxF2bYU8JjBnq5LC2UEdQnmr1idAaQ==
-X-Received: by 2002:a05:6000:c9:: with SMTP id q9mr820309wrx.259.1607263684360;
-        Sun, 06 Dec 2020 06:08:04 -0800 (PST)
-Received: from localhost.localdomain ([185.69.145.45])
-        by smtp.gmail.com with ESMTPSA id n123sm10608363wmn.7.2020.12.06.06.08.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 06 Dec 2020 06:08:03 -0800 (PST)
-From:   Pavel Begunkov <asml.silence@gmail.com>
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: [PATCH v3] blk-mq: skip hybrid polling if iopoll doesn't spin
-Date:   Sun,  6 Dec 2020 14:04:39 +0000
-Message-Id: <d5c7dbf6f10efa44271dcb36a178f9566fe76c19.1607263384.git.asml.silence@gmail.com>
-X-Mailer: git-send-email 2.24.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=eNOEAWekcaikssB8glzCwEs1qMsl24PtYgQQ8j4uLPA=;
+        b=Yz/j/MNguW8P00jydw7fl5bpoBs5VlfgD3ftqf2IgyW5nbkjVeZnq8Vmc8aEWbDNak
+         ptksKBgbmM4vIVp0WSfzLws+J6usoBjKhN3jYQGkabT6FRZvhChgYPHRDe1LstStjRF2
+         laPO+B48UxWdtlaFfSBfu8q+r9pqJBBVrDWN5ZnvHj6OqQY0ClPx9Sz/sv6YEYjXMhU4
+         UZ9EpTVZ0kt3VN9659p2TzqzUOiwewmULWhxVsjT9qmPtF6bNzptgILTruuJhBJXQH0h
+         jtMad5GrNicRTpow5i010yG/KSNkphwmJzVh1J1ewcLuHsu3GKj1/bpI6zLPgLqie71A
+         hrcQ==
+X-Gm-Message-State: AOAM532yw7/cYe0rH6bxoWsNdJjcg1iPUbaT8kNbW6xqHGdWPJgkTmHP
+        lIvMSCKJ553LSJd9Lsgh2xcw33gP4S/v1VzavgUThmD5
+X-Google-Smtp-Source: ABdhPJwMzwl0myNqVWFT9vOi76GZ9A3LwUs0yivTqa0T15pIy63R3eaLaR0Rm7RLAj3m8WwBQQIMm3Wu4rdRMUTXubE=
+X-Received: by 2002:aa7:d545:: with SMTP id u5mr15767814edr.113.1607264073463;
+ Sun, 06 Dec 2020 06:14:33 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20201206055332.3144-1-tom.ty89@gmail.com> <20201206055332.3144-3-tom.ty89@gmail.com>
+ <2eb8f838-0ec6-3e70-356b-8c04baba2fc4@suse.de> <CAGnHSEk0C6VNQysGiysPS1yEXwu4U8PVCaVB2RR7oEgnr4Xz=w@mail.gmail.com>
+ <4304d959-9155-3126-a858-28b338968916@suse.de>
+In-Reply-To: <4304d959-9155-3126-a858-28b338968916@suse.de>
+From:   Tom Yan <tom.ty89@gmail.com>
+Date:   Sun, 6 Dec 2020 22:14:22 +0800
+Message-ID: <CAGnHSEmMB5bfkCqyk=USHnmFr+Z1HA9UQ8whBD08K1hwvM2Scw@mail.gmail.com>
+Subject: Re: [PATCH 3/3] block: set REQ_PREFLUSH to the final bio from __blkdev_issue_zero_pages()
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If blk_poll() is not going to spin (i.e. @spin=false), it also must not
-sleep in hybrid polling, otherwise it might be pretty suprising for
-users trying to do a quick check and expecting no-wait behaviour.
+On Sun, 6 Dec 2020 at 22:05, Hannes Reinecke <hare@suse.de> wrote:
+>
+> On 12/6/20 2:32 PM, Tom Yan wrote:
+> > Why? Did you miss that it is in the condition where
+> > __blkdev_issue_zero_pages() is called (i.e. it's not WRITE SAME but
+> > WRITE). From what I gathered REQ_PREFLUSH triggers a write back cache
+> > (that is on the device; not sure about dirty pages) flush, wouldn't it
+> > be a right thing to do after we performed a series of WRITE (which is
+> > more or less purposed to get a drive wiped clean).
+> >
+>
+> But what makes 'zero_pages' special as compared to, say, WRITE_SAME?
+> One could use WRITE SAME with '0' content, arriving at pretty much the
+> same content than usine zeroout without unmapping. And neither of them
+> worries about cache flushing.
+> Nor should they, IMO.
 
-Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
----
+Because we are writing actual pages (just that they are zero and
+"shared memory" in the system) to the device, instead of triggering a
+special command (with a specific parameter)?
 
-v2: inverse invalid spin check
-v3: add comments, reword and resend
+>
+> These are 'native' block layer calls, providing abstract accesses to
+> hardware functionality. If an application wants to use them, it would be
+> the task of the application to insert a 'flush' if it deems neccessary.
+> (There _is_ blkdev_issue_flush(), after all).
 
- block/blk-mq.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+Well my argument would be the call has the purpose of "wiping" so it
+should try to "atomically" guarantee that the wiping is synced. It's
+like a complement to REQ_SYNC in the final submit_bio_wait().
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index e9799fed98c7..8d81fe0d8fbc 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -3865,9 +3865,10 @@ int blk_poll(struct request_queue *q, blk_qc_t cookie, bool spin)
- 	 * the state. Like for the other success return cases, the
- 	 * caller is responsible for checking if the IO completed. If
- 	 * the IO isn't complete, we'll get called again and will go
--	 * straight to the busy poll loop.
-+	 * straight to the busy poll loop. If specified not to spin,
-+	 * we also should not sleep.
- 	 */
--	if (blk_mq_poll_hybrid(q, hctx, cookie))
-+	if (spin && blk_mq_poll_hybrid(q, hctx, cookie))
- 		return 1;
- 
- 	hctx->poll_considered++;
--- 
-2.24.0
-
+>
+> Cheers,
+>
+> Hannes
+> --
+> Dr. Hannes Reinecke                Kernel Storage Architect
+> hare@suse.de                              +49 911 74053 688
+> SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg
+> HRB 36809 (AG N=C3=BCrnberg), Gesch=C3=A4ftsf=C3=BChrer: Felix Imend=C3=
+=B6rffer
