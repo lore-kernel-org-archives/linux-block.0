@@ -2,110 +2,138 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-17.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C7CEC4361B
-	for <linux-block@archiver.kernel.org>; Sun,  6 Dec 2020 14:15:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3552FC433FE
+	for <linux-block@archiver.kernel.org>; Sun,  6 Dec 2020 14:18:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D6EC52313C
-	for <linux-block@archiver.kernel.org>; Sun,  6 Dec 2020 14:15:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 09FE22312F
+	for <linux-block@archiver.kernel.org>; Sun,  6 Dec 2020 14:18:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728281AbgLFOPP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 6 Dec 2020 09:15:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42794 "EHLO
+        id S1728108AbgLFOS1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 6 Dec 2020 09:18:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43282 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726757AbgLFOPP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 6 Dec 2020 09:15:15 -0500
-Received: from mail-ed1-x543.google.com (mail-ed1-x543.google.com [IPv6:2a00:1450:4864:20::543])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5861C0613D0;
-        Sun,  6 Dec 2020 06:14:34 -0800 (PST)
-Received: by mail-ed1-x543.google.com with SMTP id dk8so7998310edb.1;
-        Sun, 06 Dec 2020 06:14:34 -0800 (PST)
+        with ESMTP id S1728098AbgLFOS1 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 6 Dec 2020 09:18:27 -0500
+Received: from mail-ej1-x643.google.com (mail-ej1-x643.google.com [IPv6:2a00:1450:4864:20::643])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2509C0613D0
+        for <linux-block@vger.kernel.org>; Sun,  6 Dec 2020 06:17:46 -0800 (PST)
+Received: by mail-ej1-x643.google.com with SMTP id x16so15671700ejj.7
+        for <linux-block@vger.kernel.org>; Sun, 06 Dec 2020 06:17:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=eNOEAWekcaikssB8glzCwEs1qMsl24PtYgQQ8j4uLPA=;
-        b=CbZo57z4+74s79nVAmWVNgfudPLp6+nhTYJe96sZlmIRGMmo50jT/v07k2DkbRUSy4
-         KIcSuHxNJyOm+IBZ4LSZbgJFvzRs+34nt40gjM4m5msOtu6WYsL5mNO+gieNtBGG4pUY
-         U4oromD2SOu3D7hn87g/kzaMEjevNyrDdTqTYpV13hbXSQtDtQtXSSfN3fIKSpWD6p0L
-         yqUrkE9Zluz7at03qIFO9dg2AcPzCwwIGWITcanLg+v7Fd6Zov4fFAKQH+r0bN3QE1Tp
-         irrhwGrJjEgvgPIilzNlxqYOVyvw9ccMaqn12RjphcrP8mVKxvkFEWeRdiWqH6UXi4pP
-         d/bA==
+        bh=TL0b/E5cGbJjzmn2uYQh+VzbuEtko2kRxRbzEx1ExxE=;
+        b=q0OM2jHIWWNEd/K8dQ1vPQSZmgj4wiWrBWZwhH+jDUH4tog+bammlZEND2fBZiBU1D
+         bIKIMn5lH2qOmXQ8AKAoR7LpolU+SsiKyXhtzwEfDQqIKkdlRHxQ7oOr6+gBKD3ZkA50
+         Y+QtDXi+9cjRfq4KDm0759XPa+NQrZM9pHffTxdtuhtCL2L5xalRETlvPYEL0wI6l8tH
+         5Xg/5JWwMuDp87rY8qb/awMhTFP/Y1xn6QRiSIZznRUFO9CP7q3SnB9J0hT3sFz0Ctbw
+         cO97rY7svL8VmIZwKD8pDQzrAb5KrRG3JVQ3VLNOjA0A5J5ODodHH0cV6TvMNBcwPzUx
+         AlUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=eNOEAWekcaikssB8glzCwEs1qMsl24PtYgQQ8j4uLPA=;
-        b=Yz/j/MNguW8P00jydw7fl5bpoBs5VlfgD3ftqf2IgyW5nbkjVeZnq8Vmc8aEWbDNak
-         ptksKBgbmM4vIVp0WSfzLws+J6usoBjKhN3jYQGkabT6FRZvhChgYPHRDe1LstStjRF2
-         laPO+B48UxWdtlaFfSBfu8q+r9pqJBBVrDWN5ZnvHj6OqQY0ClPx9Sz/sv6YEYjXMhU4
-         UZ9EpTVZ0kt3VN9659p2TzqzUOiwewmULWhxVsjT9qmPtF6bNzptgILTruuJhBJXQH0h
-         jtMad5GrNicRTpow5i010yG/KSNkphwmJzVh1J1ewcLuHsu3GKj1/bpI6zLPgLqie71A
-         hrcQ==
-X-Gm-Message-State: AOAM532yw7/cYe0rH6bxoWsNdJjcg1iPUbaT8kNbW6xqHGdWPJgkTmHP
-        lIvMSCKJ553LSJd9Lsgh2xcw33gP4S/v1VzavgUThmD5
-X-Google-Smtp-Source: ABdhPJwMzwl0myNqVWFT9vOi76GZ9A3LwUs0yivTqa0T15pIy63R3eaLaR0Rm7RLAj3m8WwBQQIMm3Wu4rdRMUTXubE=
-X-Received: by 2002:aa7:d545:: with SMTP id u5mr15767814edr.113.1607264073463;
- Sun, 06 Dec 2020 06:14:33 -0800 (PST)
+        bh=TL0b/E5cGbJjzmn2uYQh+VzbuEtko2kRxRbzEx1ExxE=;
+        b=DhCQLOGpUuN0+mbcHg/YejTmt+oT45IR4PVrEBwISHIIKmvHSQFo0KVeyjrfnQlPSs
+         WSASJO67x17BI+HzQdAzpm9BgWApUQYfA5l8L/kdtRrhQrB+Scr8xv/ne+2QSjnmn05S
+         x8VcnulgBv8CTMwA2kTp+E/BLhJuSIur22bCiIV89lB19opeus+KAsTpmPQigAFmn9Y/
+         no//n5NGx78+1GmdDVobMrLzggWiiWu2sv+SJEI19EKiaziaeA+MCvV7oML+jEjMIuNj
+         HCZ1K9CCdyQWVZnQFiIakWlLrCIqodwmXW8fwmcWJkLFcxO0+RaHsZ9HQXHttGWF26IL
+         pQdg==
+X-Gm-Message-State: AOAM533K21u4PF3VtWUDFx0eOgpjyZo1G9Io9ESvUruSHjBXna10Md+C
+        IL53rWdDn5jXueREXNWo0zAzNa+0TwhNPx/K1xE=
+X-Google-Smtp-Source: ABdhPJyJwGy0ArFHa4gGaXKT0MdEGkomEOzfxcRyXTsqjMzZqEglm24uG8DtQRO0kXWm9sMA3T9qqmlQBfnXji+36lY=
+X-Received: by 2002:a17:906:d930:: with SMTP id rn16mr15377070ejb.412.1607264265279;
+ Sun, 06 Dec 2020 06:17:45 -0800 (PST)
 MIME-Version: 1.0
-References: <20201206055332.3144-1-tom.ty89@gmail.com> <20201206055332.3144-3-tom.ty89@gmail.com>
- <2eb8f838-0ec6-3e70-356b-8c04baba2fc4@suse.de> <CAGnHSEk0C6VNQysGiysPS1yEXwu4U8PVCaVB2RR7oEgnr4Xz=w@mail.gmail.com>
- <4304d959-9155-3126-a858-28b338968916@suse.de>
-In-Reply-To: <4304d959-9155-3126-a858-28b338968916@suse.de>
+References: <20201206051802.1890-1-tom.ty89@gmail.com> <2bfe61a7-2dd1-9bb1-76a4-26e948493342@suse.de>
+ <CAGnHSEk6NJaX3OQg4V-7U7jJFV+b4w5oj8KyC6gNnH-8dx0v-Q@mail.gmail.com>
+In-Reply-To: <CAGnHSEk6NJaX3OQg4V-7U7jJFV+b4w5oj8KyC6gNnH-8dx0v-Q@mail.gmail.com>
 From:   Tom Yan <tom.ty89@gmail.com>
-Date:   Sun, 6 Dec 2020 22:14:22 +0800
-Message-ID: <CAGnHSEmMB5bfkCqyk=USHnmFr+Z1HA9UQ8whBD08K1hwvM2Scw@mail.gmail.com>
-Subject: Re: [PATCH 3/3] block: set REQ_PREFLUSH to the final bio from __blkdev_issue_zero_pages()
+Date:   Sun, 6 Dec 2020 22:17:34 +0800
+Message-ID: <CAGnHSEkwy8ZfJQdrfjJ1GYJD1axgDfz1jEQDXqgv2saWx3ZXDw@mail.gmail.com>
+Subject: Re: [PATCH] block: fix bio chaining in blk_next_bio()
 To:     Hannes Reinecke <hare@suse.de>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        axboe@fb.com, tom.leiming@gmail.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, 6 Dec 2020 at 22:05, Hannes Reinecke <hare@suse.de> wrote:
+Also see https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git=
+/tree/block/bio.c?h=3Dv5.10-rc6#n1384
+btw. I really think the "new as parent" is a careless typo.
+(Christoph?)
+
+On Sun, 6 Dec 2020 at 21:17, Tom Yan <tom.ty89@gmail.com> wrote:
 >
-> On 12/6/20 2:32 PM, Tom Yan wrote:
-> > Why? Did you miss that it is in the condition where
-> > __blkdev_issue_zero_pages() is called (i.e. it's not WRITE SAME but
-> > WRITE). From what I gathered REQ_PREFLUSH triggers a write back cache
-> > (that is on the device; not sure about dirty pages) flush, wouldn't it
-> > be a right thing to do after we performed a series of WRITE (which is
-> > more or less purposed to get a drive wiped clean).
+> I still don't think this sounds right.
+>
+> See the definition of bio_chain():
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/b=
+lock/bio.c?h=3Dv5.10-rc6#n344
+>
+> And in turn bio_inc_remaining():
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/i=
+nclude/linux/bio.h?h=3Dv5.10-rc6#n667
+>
+> With the current blk_next_bio(), the first bio will never even be
+> handled by bio_chain()/bio_inc_remaining()/bio_set_flag(bio,
+> BIO_CHAIN). When the first submit_bio() is called, it won't have any
+> idea that the next/new bio exists. What you said actually sounds a bit
+> like the current situation.
+>
+> On Sun, 6 Dec 2020 at 19:20, Hannes Reinecke <hare@suse.de> wrote:
 > >
->
-> But what makes 'zero_pages' special as compared to, say, WRITE_SAME?
-> One could use WRITE SAME with '0' content, arriving at pretty much the
-> same content than usine zeroout without unmapping. And neither of them
-> worries about cache flushing.
-> Nor should they, IMO.
-
-Because we are writing actual pages (just that they are zero and
-"shared memory" in the system) to the device, instead of triggering a
-special command (with a specific parameter)?
-
->
-> These are 'native' block layer calls, providing abstract accesses to
-> hardware functionality. If an application wants to use them, it would be
-> the task of the application to insert a 'flush' if it deems neccessary.
-> (There _is_ blkdev_issue_flush(), after all).
-
-Well my argument would be the call has the purpose of "wiping" so it
-should try to "atomically" guarantee that the wiping is synced. It's
-like a complement to REQ_SYNC in the final submit_bio_wait().
-
->
-> Cheers,
->
-> Hannes
-> --
-> Dr. Hannes Reinecke                Kernel Storage Architect
-> hare@suse.de                              +49 911 74053 688
-> SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg
-> HRB 36809 (AG N=C3=BCrnberg), Gesch=C3=A4ftsf=C3=BChrer: Felix Imend=C3=
+> > On 12/6/20 6:18 AM, Tom Yan wrote:
+> > > While it seems to have worked for so long, it doesn't seem right
+> > > that we set the new bio as the parent. bio_chain() seems to be used
+> > > in the other way everywhere else anyway.
+> > >
+> > > Signed-off-by: Tom Yan <tom.ty89@gmail.com>
+> > > ---
+> > >   block/blk-lib.c | 2 +-
+> > >   1 file changed, 1 insertion(+), 1 deletion(-)
+> > >
+> > > diff --git a/block/blk-lib.c b/block/blk-lib.c
+> > > index e90614fd8d6a..918deaf5c8a4 100644
+> > > --- a/block/blk-lib.c
+> > > +++ b/block/blk-lib.c
+> > > @@ -15,7 +15,7 @@ struct bio *blk_next_bio(struct bio *bio, unsigned =
+int nr_pages, gfp_t gfp)
+> > >       struct bio *new =3D bio_alloc(gfp, nr_pages);
+> > >
+> > >       if (bio) {
+> > > -             bio_chain(bio, new);
+> > > +             bio_chain(new, bio);
+> > >               submit_bio(bio);
+> > >       }
+> > >
+> > >
+> > I don't think this is correct.
+> > This code is submitting the original bio, and we _want_ to keep the
+> > newly allocated one even though the original might have been completed
+> > already. If we were setting the 'parent' to the original bio upper
+> > layers might infer that the entire request has been completed (as the
+> > original bio is now the 'parent' bio), which is patently not true.
+> >
+> > So, rather not.
+> >
+> > Cheers,
+> >
+> > Hannes
+> > --
+> > Dr. Hannes Reinecke                Kernel Storage Architect
+> > hare@suse.de                              +49 911 74053 688
+> > SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 N=C3=BCrnberg
+> > HRB 36809 (AG N=C3=BCrnberg), Gesch=C3=A4ftsf=C3=BChrer: Felix Imend=C3=
 =B6rffer
