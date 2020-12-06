@@ -8,114 +8,135 @@ X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A1B7C1B0D9
-	for <linux-block@archiver.kernel.org>; Sun,  6 Dec 2020 05:54:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC0DCC4167B
+	for <linux-block@archiver.kernel.org>; Sun,  6 Dec 2020 06:16:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 797F722DFB
-	for <linux-block@archiver.kernel.org>; Sun,  6 Dec 2020 05:54:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A80A522D2A
+	for <linux-block@archiver.kernel.org>; Sun,  6 Dec 2020 06:16:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725800AbgLFFyY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 6 Dec 2020 00:54:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50780 "EHLO
+        id S1725966AbgLFGQd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 6 Dec 2020 01:16:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725446AbgLFFyW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 6 Dec 2020 00:54:22 -0500
-Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0AC9C0613D1;
-        Sat,  5 Dec 2020 21:53:42 -0800 (PST)
-Received: by mail-pf1-x443.google.com with SMTP id s21so6770918pfu.13;
-        Sat, 05 Dec 2020 21:53:42 -0800 (PST)
+        with ESMTP id S1725867AbgLFGQb (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 6 Dec 2020 01:16:31 -0500
+Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1A16C0613D0;
+        Sat,  5 Dec 2020 22:15:45 -0800 (PST)
+Received: by mail-pg1-x533.google.com with SMTP id f17so6262673pge.6;
+        Sat, 05 Dec 2020 22:15:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=6eSXOV4bceIVLvD3mBDcQt09QEEaRRGrlPLz+3Rl92M=;
-        b=IG3XWfSq1T49jj3UASunoVAmIJPCMuPAfYCnONCc6QBpIT66IyXTx2AGgykru8QVRK
-         wfS8T/pd4LEIpVeHvGkr8NdWyTI9rgUqSsZQyRq5I4NFbGy1h/sSAP+mqFFuwFsqZxJA
-         LFk/fb6fMYvQNyngGUtOpu3AuTp2qCBGeJL0vJU9Wvg1ovpkxyIlVhS5G1Pd/oiwgPtU
-         cjja0jcqzTWNk6pqnXjHOc2Ur4dxj9/Zb2obui9P4ag/LKXv8/yy9Kll6+QNmaEaPKK1
-         zd+IRjObgrebSP3sKVtNnVm4FRYWejg5jkQPWWONm6Supze7vdjttUULh2aRHVaQ3A7h
-         voTw==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=3iY7xWUkkJgoMW+4AR8JwjKubekss48iTys3v/kd3eg=;
+        b=uAPLklUdTtDmd1EI4fXfEPcS4Sm25nW916e0AcBZ0vyuENbF5MBosqUQFQwOL/QYAe
+         VQlUgOuxa3IH6Bxk/uXpeNzO/eWXbKZehzstNV+YefL//GfIsb3QFoxJAgQxE1q71YZ5
+         21KJuThudJMkC3c/E/rAPwgitxR/u+yDLeAHLLP0nETRmlapjsuzgRQhMn2kGh5zyGSk
+         KW0GaCvclaOTqJwBGJ/FNPHBa5kL4ghjN/o9vUJgiWPwyWc1oux9tOE9Qf0ZL0lzs1ct
+         wCdC6uGqfRhUsa8OHJyf8E2v4GBBTCjYFCL8jDeN4WHHWBnRA/n4OyS++z0g1nSYsFKX
+         IbvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=6eSXOV4bceIVLvD3mBDcQt09QEEaRRGrlPLz+3Rl92M=;
-        b=L2DM9q6486YSWhIPzghV9KO57LwB5xZhrOIeDnhUUtaZc8bmSi6myUvR5bzzl+rts4
-         HspgERRnSZjLFOFGXmqdI82IXa6qJxrpfWWqngIwFFO09vi5TWPQHUGq667WkMgW87Rg
-         eneeI+pEdkP/tMDHUoa8dwHU8pVDHBWUXlpcErLQFDgdJRAQdTGJlbcOSqPAy+Sw/cho
-         ISkvrGNaYHWJt3jeBgBzm3z9NChRizkSmVUl6efhkc5mdztMR8dklXI2ty6HESJLjILq
-         jb8JKfociEcJ+PXGtQ4hsQ4g2CD+xCm4gdOS2UPpV/MXYgR8Gmp+p/M2Da/CE37kIchj
-         FOsQ==
-X-Gm-Message-State: AOAM533/QgckS8nM9iA1JQ8JJdlCsWUvd0+vi6pylSpEw1PaJc5sRx0w
-        nE1sBmA5SEc1ubecWFTuNUUHiM4EmBo=
-X-Google-Smtp-Source: ABdhPJz3emla1vmSPTrWHQS6ll66TPvn9tJSW6jaAdGOBLdyPzdBwSV4vuEgAvqF7qoAfeTBm8PUOw==
-X-Received: by 2002:a05:6a00:84a:b029:19e:4cc:dc6f with SMTP id q10-20020a056a00084ab029019e04ccdc6fmr401740pfk.33.1607234021932;
-        Sat, 05 Dec 2020 21:53:41 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=3iY7xWUkkJgoMW+4AR8JwjKubekss48iTys3v/kd3eg=;
+        b=Qvty+p72wwi37IfxHQuPfsCWjOE4thX5wbET5Lpe4bKSJCDHlODU/WWxdx5MgveVhR
+         hI3TASo7GiILNT3v5tnSESY0JErM7bYnH9GSJ2X3AVoSDpKMZpQp8kKWcUibaowRozwa
+         kQEAqidd2g66yJtYDqf+ZChHfKtYzoWetIlqMAJd32aAR+jcG9Fgt/b80R+XuR6nDicD
+         5X7+N36mroiJ1yrud4gDn0gtB3RIa8jWC9e57tFI3wMSNxXynPVfhwQoo7+mCMC2NBwE
+         +SJzbSJBLQHo97S2NyX9Af7QcpBONHVak03EPt/3xqPW0/MhYZDg8LMG7HjemykYaJ0r
+         C8Yw==
+X-Gm-Message-State: AOAM530xWefA/dPkt9ZHKN1Tx6PP70/TI1m5KXV0eHfx0A/YdWHfaoCv
+        xDslKxRhvc1qJ9Fd35BGEO+MhhfzKnE=
+X-Google-Smtp-Source: ABdhPJyLxwBKfnwMw/t8/hJx8muCnThR0g5TgM7L8uYFFgMxcUTEfa5p0Ruq+1kA2OB5BPhAe30x+Q==
+X-Received: by 2002:a62:1a47:0:b029:19b:c093:2766 with SMTP id a68-20020a621a470000b029019bc0932766mr11252370pfa.10.1607235344811;
+        Sat, 05 Dec 2020 22:15:44 -0800 (PST)
 Received: from archlinux.. ([161.81.68.216])
-        by smtp.gmail.com with ESMTPSA id a14sm4360094pfl.141.2020.12.05.21.53.40
+        by smtp.gmail.com with ESMTPSA id c205sm10110250pfc.160.2020.12.05.22.15.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 05 Dec 2020 21:53:41 -0800 (PST)
+        Sat, 05 Dec 2020 22:15:44 -0800 (PST)
 From:   Tom Yan <tom.ty89@gmail.com>
 To:     linux-block@vger.kernel.org
-Cc:     linux-scsi@vger.kernel.org, Tom Yan <tom.ty89@gmail.com>
-Subject: [PATCH 2/3] block: make __blkdev_issue_zero_pages() less confusing
-Date:   Sun,  6 Dec 2020 13:53:31 +0800
-Message-Id: <20201206055332.3144-2-tom.ty89@gmail.com>
+Cc:     linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org,
+        Tom Yan <tom.ty89@gmail.com>
+Subject: [RFC] block: avoid the unnecessary blk_bio_discard_split()
+Date:   Sun,  6 Dec 2020 14:15:37 +0800
+Message-Id: <20201206061537.3870-1-tom.ty89@gmail.com>
 X-Mailer: git-send-email 2.29.2
-In-Reply-To: <20201206055332.3144-1-tom.ty89@gmail.com>
-References: <20201206055332.3144-1-tom.ty89@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Instead of using the same check for the two layers of loops, count
-bio pages in the inner loop instead.
+It doesn't seem necessary to have the redundant layer of splitting.
+The request size will even be more consistent / aligned to the cap.
 
 Signed-off-by: Tom Yan <tom.ty89@gmail.com>
 ---
- block/blk-lib.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+ block/blk-lib.c   | 5 ++++-
+ block/blk-merge.c | 2 +-
+ block/blk.h       | 8 ++++++--
+ 3 files changed, 11 insertions(+), 4 deletions(-)
 
 diff --git a/block/blk-lib.c b/block/blk-lib.c
-index c1e9388a8fb8..354dcab760c7 100644
+index e90614fd8d6a..f606184a9050 100644
 --- a/block/blk-lib.c
 +++ b/block/blk-lib.c
-@@ -318,7 +318,7 @@ static int __blkdev_issue_zero_pages(struct block_device *bdev,
- 	struct request_queue *q = bdev_get_queue(bdev);
- 	struct bio *bio = *biop;
- 	int bi_size = 0;
--	unsigned int sz;
-+	unsigned int sz, bio_nr_pages;
+@@ -85,9 +85,12 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+ 		 *   is split in device drive, the split ones are very probably
+ 		 *   to be aligned to discard_granularity of the device's queue.
+ 		 */
+-		if (granularity_aligned_lba == sector_mapped)
++		if (granularity_aligned_lba == sector_mapped) {
+ 			req_sects = min_t(sector_t, nr_sects,
+ 					  bio_aligned_discard_max_sectors(q));
++			if (!req_sects)
++				return -EOPNOTSUPP;
++		}
+ 		else
+ 			req_sects = min_t(sector_t, nr_sects,
+ 					  granularity_aligned_lba - sector_mapped);
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index bcf5e4580603..2439216585d9 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -59,6 +59,7 @@ static inline bool req_gap_front_merge(struct request *req, struct bio *bio)
+ 	return bio_will_gap(req->q, NULL, bio, req->bio);
+ }
  
- 	if (!q)
- 		return -ENXIO;
-@@ -327,19 +327,18 @@ static int __blkdev_issue_zero_pages(struct block_device *bdev,
- 		return -EPERM;
++/* deprecated */
+ static struct bio *blk_bio_discard_split(struct request_queue *q,
+ 					 struct bio *bio,
+ 					 struct bio_set *bs,
+@@ -303,7 +304,6 @@ void __blk_queue_split(struct bio **bio, unsigned int *nr_segs)
+ 	switch (bio_op(*bio)) {
+ 	case REQ_OP_DISCARD:
+ 	case REQ_OP_SECURE_ERASE:
+-		split = blk_bio_discard_split(q, *bio, &q->bio_split, nr_segs);
+ 		break;
+ 	case REQ_OP_WRITE_ZEROES:
+ 		split = blk_bio_write_zeroes_split(q, *bio, &q->bio_split,
+diff --git a/block/blk.h b/block/blk.h
+index dfab98465db9..e7e31a8c4930 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -281,8 +281,12 @@ static inline unsigned int bio_allowed_max_sectors(struct request_queue *q)
+ static inline unsigned int bio_aligned_discard_max_sectors(
+ 					struct request_queue *q)
+ {
+-	return round_down(UINT_MAX, q->limits.discard_granularity) >>
+-			SECTOR_SHIFT;
++	unsigned int discard_max_sectors, granularity;
++	discard_max_sectors = min(q->limits.max_discard_sectors,
++				  bio_allowed_max_sectors(q));
++	/* Zero-sector (unknown) and one-sector granularities are the same.  */
++	granularity = max(q->limits.discard_granularity >> SECTOR_SHIFT, 1U)
++	return round_down(max, granularity);
+ }
  
- 	while (nr_sects != 0) {
--		bio = blk_next_bio(bio, __blkdev_sectors_to_bio_pages(nr_sects),
--				   gfp_mask);
-+		bio_nr_pages = __blkdev_sectors_to_bio_pages(nr_sects);
-+		bio = blk_next_bio(bio, bio_nr_pages, gfp_mask);
- 		bio->bi_iter.bi_sector = sector;
- 		bio_set_dev(bio, bdev);
- 		bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
- 
--		while (nr_sects != 0) {
-+		while (bio_nr_pages != 0) {
- 			sz = min((sector_t) PAGE_SIZE, nr_sects << 9);
- 			bi_size = bio_add_page(bio, ZERO_PAGE(0), sz, 0);
- 			nr_sects -= bi_size >> 9;
- 			sector += bi_size >> 9;
--			if (bi_size < sz)
--				break;
-+			bio_nr_pages--;
- 		}
- 		cond_resched();
- 	}
+ /*
 -- 
 2.29.2
 
