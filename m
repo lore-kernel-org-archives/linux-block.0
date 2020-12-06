@@ -7,34 +7,34 @@ X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA773C4361B
-	for <linux-block@archiver.kernel.org>; Sun,  6 Dec 2020 11:21:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3B89C4361B
+	for <linux-block@archiver.kernel.org>; Sun,  6 Dec 2020 11:26:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9359B22D01
-	for <linux-block@archiver.kernel.org>; Sun,  6 Dec 2020 11:21:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B314F22D2A
+	for <linux-block@archiver.kernel.org>; Sun,  6 Dec 2020 11:26:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725767AbgLFLV1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 6 Dec 2020 06:21:27 -0500
-Received: from mx2.suse.de ([195.135.220.15]:39542 "EHLO mx2.suse.de"
+        id S1726774AbgLFL0W (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 6 Dec 2020 06:26:22 -0500
+Received: from mx2.suse.de ([195.135.220.15]:40874 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725822AbgLFLV1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 6 Dec 2020 06:21:27 -0500
+        id S1725822AbgLFL0V (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 6 Dec 2020 06:26:21 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 2B436ABE9;
-        Sun,  6 Dec 2020 11:20:46 +0000 (UTC)
-Subject: Re: [PATCH] block: fix bio chaining in blk_next_bio()
-To:     Tom Yan <tom.ty89@gmail.com>, linux-block@vger.kernel.org,
-        hch@lst.de, ming.l@ssi.samsung.com, sagig@grimberg.me, axboe@fb.com
-Cc:     tom.leiming@gmail.com
-References: <20201206051802.1890-1-tom.ty89@gmail.com>
+        by mx2.suse.de (Postfix) with ESMTP id 1E5BAAB63;
+        Sun,  6 Dec 2020 11:25:40 +0000 (UTC)
+Subject: Re: [PATCH 1/3] block: try one write zeroes request before going
+ further
+To:     Tom Yan <tom.ty89@gmail.com>, linux-block@vger.kernel.org
+Cc:     linux-scsi@vger.kernel.org
+References: <20201206055332.3144-1-tom.ty89@gmail.com>
 From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <2bfe61a7-2dd1-9bb1-76a4-26e948493342@suse.de>
-Date:   Sun, 6 Dec 2020 12:20:41 +0100
+Message-ID: <7987f7f1-d608-26d0-3f2f-86a7bd7cc03d@suse.de>
+Date:   Sun, 6 Dec 2020 12:25:39 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.4.0
 MIME-Version: 1.0
-In-Reply-To: <20201206051802.1890-1-tom.ty89@gmail.com>
+In-Reply-To: <20201206055332.3144-1-tom.ty89@gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -42,38 +42,68 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/6/20 6:18 AM, Tom Yan wrote:
-> While it seems to have worked for so long, it doesn't seem right
-> that we set the new bio as the parent. bio_chain() seems to be used
-> in the other way everywhere else anyway.
+On 12/6/20 6:53 AM, Tom Yan wrote:
+> At least the SCSI disk driver is "benevolent" when it try to decide
+> whether the device actually supports write zeroes, i.e. unless the
+> device explicity report otherwise, it assumes it does at first.
+> 
+> Therefore before we pile up bios that would fail at the end, we try
+> the command/request once, as not doing so could trigger quite a
+> disaster in at least certain case. For example, the host controller
+> can be messed up entirely when one does `blkdiscard -z` a UAS drive.
 > 
 > Signed-off-by: Tom Yan <tom.ty89@gmail.com>
 > ---
->   block/blk-lib.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+>   block/blk-lib.c | 14 +++++++++++++-
+>   1 file changed, 13 insertions(+), 1 deletion(-)
 > 
 > diff --git a/block/blk-lib.c b/block/blk-lib.c
-> index e90614fd8d6a..918deaf5c8a4 100644
+> index e90614fd8d6a..c1e9388a8fb8 100644
 > --- a/block/blk-lib.c
 > +++ b/block/blk-lib.c
-> @@ -15,7 +15,7 @@ struct bio *blk_next_bio(struct bio *bio, unsigned int nr_pages, gfp_t gfp)
->   	struct bio *new = bio_alloc(gfp, nr_pages);
+> @@ -250,6 +250,7 @@ static int __blkdev_issue_write_zeroes(struct block_device *bdev,
+>   	struct bio *bio = *biop;
+>   	unsigned int max_write_zeroes_sectors;
+>   	struct request_queue *q = bdev_get_queue(bdev);
+> +	int i = 0;
 >   
->   	if (bio) {
-> -		bio_chain(bio, new);
-> +		bio_chain(new, bio);
->   		submit_bio(bio);
+>   	if (!q)
+>   		return -ENXIO;
+> @@ -264,7 +265,17 @@ static int __blkdev_issue_write_zeroes(struct block_device *bdev,
+>   		return -EOPNOTSUPP;
+>   
+>   	while (nr_sects) {
+> -		bio = blk_next_bio(bio, 0, gfp_mask);
+> +		if (i != 1) {
+> +			bio = blk_next_bio(bio, 0, gfp_mask);
+> +		} else {
+> +			submit_bio_wait(bio);
+> +			bio_put(bio);
+> +
+> +			if (bdev_write_zeroes_sectors(bdev) == 0)
+> +				return -EOPNOTSUPP;
+> +			else
+> +				bio = bio_alloc(gfp_mask, 0);
+> +		}
+>   		bio->bi_iter.bi_sector = sector;
+>   		bio_set_dev(bio, bdev);
+>   		bio->bi_opf = REQ_OP_WRITE_ZEROES;
+> @@ -280,6 +291,7 @@ static int __blkdev_issue_write_zeroes(struct block_device *bdev,
+>   			nr_sects = 0;
+>   		}
+>   		cond_resched();
+> +		i++;
 >   	}
 >   
+>   	*biop = bio;
 > 
-I don't think this is correct.
-This code is submitting the original bio, and we _want_ to keep the 
-newly allocated one even though the original might have been completed 
-already. If we were setting the 'parent' to the original bio upper 
-layers might infer that the entire request has been completed (as the 
-original bio is now the 'parent' bio), which is patently not true.
-
-So, rather not.
+We do want to keep the chain of bios intact such that end_io processing 
+will recurse back to the original end_io callback.
+As such we need to call bio_chain on the first bio, submit that 
+(possibly with submit_bio_wait()), and then decide whether we can / 
+should continue.
+With your patch we'll lose the information that indeed other bios might 
+be linked to the original one.
 
 Cheers,
 
