@@ -2,94 +2,96 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E83FC4361B
-	for <linux-block@archiver.kernel.org>; Sun,  6 Dec 2020 00:02:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76A51C4361B
+	for <linux-block@archiver.kernel.org>; Sun,  6 Dec 2020 05:19:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C44D123139
-	for <linux-block@archiver.kernel.org>; Sun,  6 Dec 2020 00:02:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3382720725
+	for <linux-block@archiver.kernel.org>; Sun,  6 Dec 2020 05:19:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727303AbgLFACl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 5 Dec 2020 19:02:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36670 "EHLO
+        id S1725804AbgLFFSw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 6 Dec 2020 00:18:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45390 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727283AbgLFACl (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 5 Dec 2020 19:02:41 -0500
-Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1C0CC0613D1
-        for <linux-block@vger.kernel.org>; Sat,  5 Dec 2020 16:01:55 -0800 (PST)
-Received: by mail-pf1-x444.google.com with SMTP id o9so6445898pfd.10
-        for <linux-block@vger.kernel.org>; Sat, 05 Dec 2020 16:01:55 -0800 (PST)
+        with ESMTP id S1725355AbgLFFSv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 6 Dec 2020 00:18:51 -0500
+Received: from mail-pg1-x543.google.com (mail-pg1-x543.google.com [IPv6:2607:f8b0:4864:20::543])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69819C0613D0
+        for <linux-block@vger.kernel.org>; Sat,  5 Dec 2020 21:18:11 -0800 (PST)
+Received: by mail-pg1-x543.google.com with SMTP id t37so6212347pga.7
+        for <linux-block@vger.kernel.org>; Sat, 05 Dec 2020 21:18:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=m6ZOlEEYAPn5D22xKU47CZXMmwT6O45WhKH57Gwas7Q=;
-        b=0ZxbUo2d5cEJjGu35LPR5RFVMu6yLLcXFKcAawJumEf8iYO4FGG42D8vdIScrKTb4Z
-         E3KdAGayeRJMGeysdDzaJ+89ci68hGVl6l+By3UODnl4xn/eJCvm5npnSw2YaU0j9x85
-         AFQ1JQD/phf0zMmCb4TAyRU5Oz0OzwK4RsKyAOPeh8F2cIIKz8ofB+LTnkhBpUSZ8iZK
-         32YE0e0/m3KKUzSxWDRqIuNGe9up70UICCeTPQCBsaNzQxemk+izNRDohFnWN8GrFHoU
-         SdAEEAQSjBUi2mZ87VAGY7hdFaZEwkevntZKGR/6Faz92k38rDn6N8OfByp3k+D9cn0B
-         ApSQ==
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=mOnqjjKtgJdSgfyT+lQ6ozq6AyZyvUn8B0LaxhTkabo=;
+        b=dYgsy2WwBythWza7qHt2VAbEFvnME+xhiXIYydmH0diTzKlHrMNZR5N+zsigt1SYAt
+         zx+gFHiNIiKxtOjbmwqYajUs9taExjH5KP0zx2KyQPklUBm6MhNO0Hcl2WooV2+tkhxD
+         kCQEgOyf1dXGHyesNu1tpfnB1wGAqSnHkRsjZbRDRJ64rdJHQzTHvJSWNBmvBJkkDx5H
+         EGf4M/fWaLtxis7+/XUv+zmsMFCcBsit+sTUei+e0/yRtuJITSOs6aCIc8ynNUDqk2z5
+         UL1qr9d1z6H/+gULCCaGItqlMfJYFxH1K18OdLQFS+Gf1haNCmanvaO3mpba6oIuWCP0
+         JekQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=m6ZOlEEYAPn5D22xKU47CZXMmwT6O45WhKH57Gwas7Q=;
-        b=hk+LAsPI8vjVG3BYFgYLgTLfw4GNUE899r9n+9SnWdOvChq72+p1LxVP3af0aMAxlH
-         5Gx+BQVeTgPqKsMnOLyOM0rhBtyVFRUDpBenhRyIolL79mAx2ZmnEv+c+EZQ3uLRntAx
-         mqL4ZD2DGdwZobv1cEchekg3mlFyNZUxYfjBjgnu+EyxC3YBg1fNO4/8DWWxqrs5pj36
-         n/GVFXL0b7MYv4VpqWUmY3RmA9LsFstNwf60s5A74JstLgcAD0WELV+KV8ZkbYm672xF
-         QHI1us7UEa1uKpcV5NhguF5SfwI7VErk47vF/M6LC+H2KBz79yxowpb8qEwxcHkOFa/j
-         IvOQ==
-X-Gm-Message-State: AOAM533Z+L+ajHGWdgAN4AW2SzDFtUDfsaIvpje7EpPlQ2zQl+gZ7UHF
-        AGB9CRP36KFTJYFYJj8ta2/kVqtYmBxPcg==
-X-Google-Smtp-Source: ABdhPJxmhbAbH6cKdUjlfDN9h/wA73T9dbE2auWUmxNgPfGQac/Y5ONV+lE+pTL48MhCgnJydrfd0Q==
-X-Received: by 2002:a62:2a81:0:b029:18c:310f:74fe with SMTP id q123-20020a622a810000b029018c310f74femr10124642pfq.50.1607212914836;
-        Sat, 05 Dec 2020 16:01:54 -0800 (PST)
-Received: from [192.168.1.134] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id y3sm6363325pjb.18.2020.12.05.16.01.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 05 Dec 2020 16:01:54 -0800 (PST)
-Subject: Re: [PATCH v4 0/9] Rework runtime suspend and SPI domain validation
-To:     "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
-References: <20201130024615.29171-1-bvanassche@acm.org>
- <yq1k0u1c6ye.fsf@ca-mkp.ca.oracle.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <8ad8e593-438f-c366-39e1-73a45045de04@kernel.dk>
-Date:   Sat, 5 Dec 2020 17:01:56 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        bh=mOnqjjKtgJdSgfyT+lQ6ozq6AyZyvUn8B0LaxhTkabo=;
+        b=ZAuPKmiAvMebH/cpg9PrNmd9GgnxY2/RS4kZToEAWRYJ3BT8hVIS/z4Nqdd6Cwrm19
+         QwbROE7M5K3g4QanR2FSR0bDZ7ZC2Ivi/zxPCCPQqvkK1d9p8PKM9qpSIlPu0Z37OaFW
+         n10NfbDb0szT+g44HOQ09TV6aOgEYD3yjpl9dQtBCZksMyhHCWYZFhwgdHOhlNPz6/Fu
+         rhOLHpinQJbd6R5RvF99qn3odwNqW66VtsWNq/5rc9Tcdk+RTN8qtRnxhYDcUPbeaR5H
+         qUP0dWZlVkDTQOH2UzhvpFrhrPK7hLJwofJJQSkCOrMhbHBMgv0r2+4Tu7BGyjrHevo6
+         rCLg==
+X-Gm-Message-State: AOAM531ZdCM4jttanxFjXTKsuMgEXkU3vZKq6VJd17ymt9/meGHp6jMR
+        O4ALhyBs7a6jL/kk/SMlOR1K3leFvC8=
+X-Google-Smtp-Source: ABdhPJwOHguN6VECD9AJNdIyZQHdU6wUbo21YHkKDWkTKhgnFRFslfI89U9o7Wvj74CCT9xYy9X69A==
+X-Received: by 2002:aa7:8045:0:b029:198:3058:b944 with SMTP id y5-20020aa780450000b02901983058b944mr10763030pfm.71.1607231890267;
+        Sat, 05 Dec 2020 21:18:10 -0800 (PST)
+Received: from archlinux.. ([161.81.68.216])
+        by smtp.gmail.com with ESMTPSA id q72sm9969090pfq.62.2020.12.05.21.18.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 05 Dec 2020 21:18:09 -0800 (PST)
+From:   Tom Yan <tom.ty89@gmail.com>
+To:     linux-block@vger.kernel.org, hch@lst.de, ming.l@ssi.samsung.com,
+        sagig@grimberg.me, axboe@fb.com
+Cc:     tom.leiming@gmail.com, Tom Yan <tom.ty89@gmail.com>
+Subject: [PATCH] block: fix bio chaining in blk_next_bio()
+Date:   Sun,  6 Dec 2020 13:18:02 +0800
+Message-Id: <20201206051802.1890-1-tom.ty89@gmail.com>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
-In-Reply-To: <yq1k0u1c6ye.fsf@ca-mkp.ca.oracle.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/1/20 6:51 PM, Martin K. Petersen wrote:
-> 
-> Jens,
-> 
-> Any objections to me picking this up?
+While it seems to have worked for so long, it doesn't seem right
+that we set the new bio as the parent. bio_chain() seems to be used
+in the other way everywhere else anyway.
 
-No, go ahead. Looks good to me, you can add:
+Signed-off-by: Tom Yan <tom.ty89@gmail.com>
+---
+ block/blk-lib.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Reviewed-by: Jens Axboe <axboe@kernel.dk>
-
-to the series.
-
+diff --git a/block/blk-lib.c b/block/blk-lib.c
+index e90614fd8d6a..918deaf5c8a4 100644
+--- a/block/blk-lib.c
++++ b/block/blk-lib.c
+@@ -15,7 +15,7 @@ struct bio *blk_next_bio(struct bio *bio, unsigned int nr_pages, gfp_t gfp)
+ 	struct bio *new = bio_alloc(gfp, nr_pages);
+ 
+ 	if (bio) {
+-		bio_chain(bio, new);
++		bio_chain(new, bio);
+ 		submit_bio(bio);
+ 	}
+ 
 -- 
-Jens Axboe
+2.29.2
 
