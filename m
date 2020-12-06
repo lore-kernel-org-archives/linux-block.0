@@ -2,141 +2,116 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-14.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC0DCC4167B
-	for <linux-block@archiver.kernel.org>; Sun,  6 Dec 2020 06:16:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4085C19425
+	for <linux-block@archiver.kernel.org>; Sun,  6 Dec 2020 10:16:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A80A522D2A
-	for <linux-block@archiver.kernel.org>; Sun,  6 Dec 2020 06:16:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B17B9230FA
+	for <linux-block@archiver.kernel.org>; Sun,  6 Dec 2020 10:16:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725966AbgLFGQd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 6 Dec 2020 01:16:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54164 "EHLO
+        id S1726076AbgLFKQ6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 6 Dec 2020 05:16:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34404 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725867AbgLFGQb (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 6 Dec 2020 01:16:31 -0500
-Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1A16C0613D0;
-        Sat,  5 Dec 2020 22:15:45 -0800 (PST)
-Received: by mail-pg1-x533.google.com with SMTP id f17so6262673pge.6;
-        Sat, 05 Dec 2020 22:15:45 -0800 (PST)
+        with ESMTP id S1725804AbgLFKQ6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 6 Dec 2020 05:16:58 -0500
+Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36296C0613D0;
+        Sun,  6 Dec 2020 02:16:12 -0800 (PST)
+Received: by mail-lf1-x12b.google.com with SMTP id u18so13762824lfd.9;
+        Sun, 06 Dec 2020 02:16:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
+        h=subject:to:cc:references:from:organization:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=3iY7xWUkkJgoMW+4AR8JwjKubekss48iTys3v/kd3eg=;
-        b=uAPLklUdTtDmd1EI4fXfEPcS4Sm25nW916e0AcBZ0vyuENbF5MBosqUQFQwOL/QYAe
-         VQlUgOuxa3IH6Bxk/uXpeNzO/eWXbKZehzstNV+YefL//GfIsb3QFoxJAgQxE1q71YZ5
-         21KJuThudJMkC3c/E/rAPwgitxR/u+yDLeAHLLP0nETRmlapjsuzgRQhMn2kGh5zyGSk
-         KW0GaCvclaOTqJwBGJ/FNPHBa5kL4ghjN/o9vUJgiWPwyWc1oux9tOE9Qf0ZL0lzs1ct
-         wCdC6uGqfRhUsa8OHJyf8E2v4GBBTCjYFCL8jDeN4WHHWBnRA/n4OyS++z0g1nSYsFKX
-         IbvQ==
+        bh=WHV07lAOVmhSmkP5MngljG1mtktpzKayNMNHBzWj6Lc=;
+        b=f38mKdf7dAAFQ1WpYRMiX1k3BkdvcSG5X0TxntQ5iKUL7I1WItPMjlum2Ayeb/hmYx
+         F1S8ImgpDUQVwofJQOx6Q0CG9H5bMEpH2ehPDUgDvyBezdxC52O0nKhJ+zinsXW4nuz0
+         Erq33WEyG2yrioEs249m2NGP2YKeF2oYODi/IPBrxi1VHP5oNKQaHlvobPDIJZM8sC8r
+         LcGI3AyMTu/gu9lHxEGJXqXaXfjt8YCbPet0Rnh0fUijjL7YVbajayzj5e3lsoEw9cWd
+         s2ZKW3kyCGWtGfekWVWr4XUSEr8YUs617mwGQvqwlVdb2kxHR3z8ttsAquigAr9mLwoT
+         +Iuw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=3iY7xWUkkJgoMW+4AR8JwjKubekss48iTys3v/kd3eg=;
-        b=Qvty+p72wwi37IfxHQuPfsCWjOE4thX5wbET5Lpe4bKSJCDHlODU/WWxdx5MgveVhR
-         hI3TASo7GiILNT3v5tnSESY0JErM7bYnH9GSJ2X3AVoSDpKMZpQp8kKWcUibaowRozwa
-         kQEAqidd2g66yJtYDqf+ZChHfKtYzoWetIlqMAJd32aAR+jcG9Fgt/b80R+XuR6nDicD
-         5X7+N36mroiJ1yrud4gDn0gtB3RIa8jWC9e57tFI3wMSNxXynPVfhwQoo7+mCMC2NBwE
-         +SJzbSJBLQHo97S2NyX9Af7QcpBONHVak03EPt/3xqPW0/MhYZDg8LMG7HjemykYaJ0r
-         C8Yw==
-X-Gm-Message-State: AOAM530xWefA/dPkt9ZHKN1Tx6PP70/TI1m5KXV0eHfx0A/YdWHfaoCv
-        xDslKxRhvc1qJ9Fd35BGEO+MhhfzKnE=
-X-Google-Smtp-Source: ABdhPJyLxwBKfnwMw/t8/hJx8muCnThR0g5TgM7L8uYFFgMxcUTEfa5p0Ruq+1kA2OB5BPhAe30x+Q==
-X-Received: by 2002:a62:1a47:0:b029:19b:c093:2766 with SMTP id a68-20020a621a470000b029019bc0932766mr11252370pfa.10.1607235344811;
-        Sat, 05 Dec 2020 22:15:44 -0800 (PST)
-Received: from archlinux.. ([161.81.68.216])
-        by smtp.gmail.com with ESMTPSA id c205sm10110250pfc.160.2020.12.05.22.15.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 05 Dec 2020 22:15:44 -0800 (PST)
-From:   Tom Yan <tom.ty89@gmail.com>
-To:     linux-block@vger.kernel.org
-Cc:     linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org,
-        Tom Yan <tom.ty89@gmail.com>
-Subject: [RFC] block: avoid the unnecessary blk_bio_discard_split()
-Date:   Sun,  6 Dec 2020 14:15:37 +0800
-Message-Id: <20201206061537.3870-1-tom.ty89@gmail.com>
-X-Mailer: git-send-email 2.29.2
+        h=x-gm-message-state:subject:to:cc:references:from:organization
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=WHV07lAOVmhSmkP5MngljG1mtktpzKayNMNHBzWj6Lc=;
+        b=fiK0ZA/qQKN/2iDMnQSo1qyr7BHsb9dbZJ0GQDHkcJfqtLEwoR+6vMMZZFa0vHWBEc
+         /+dpSQXrUhqIvklogkE1WzJy4JakwwwF4Kf1iEiTrqWEGTIBMRI50b0NFUDVm0HEADHH
+         YYoVGE0jjonJqkgk3CRgNX50q40eWiEjZKMHTAQQOqKMWWrOGiF8JmAfDT9+e6soOd2v
+         /OsqBgb6LQWxkDNIWdhepgd7FtmBZ3q3kjCOSSTzBpNuBx+4CZeLMIHBHu2gLV6Wt0ri
+         1/6MTGeV8m9w7F/Q9D0fOoEYUuBVInO+9fKN0rPDd+Z+TlSbDZ6gxw2N/ythSg9yP2bz
+         R2xg==
+X-Gm-Message-State: AOAM533fPi0Z9DYECS6IHPjvnZOxIwKnnmqrKcqy4JlH3TjeR5chnsN9
+        bHZzaULIHRlkoDlorX9wjjslepAImBk=
+X-Google-Smtp-Source: ABdhPJyATWIKiA4tyYtxbtxJZGhv50GEP/5neZh9nMFgHvQe4Q1TZRv7HUHQD1YoO8KrKXlx4/1Dqg==
+X-Received: by 2002:a05:6512:419:: with SMTP id u25mr6080248lfk.222.1607249770583;
+        Sun, 06 Dec 2020 02:16:10 -0800 (PST)
+Received: from [192.168.1.100] ([31.173.86.115])
+        by smtp.gmail.com with ESMTPSA id g8sm2460815lfb.223.2020.12.06.02.16.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 06 Dec 2020 02:16:10 -0800 (PST)
+Subject: Re: [RFC] block: avoid the unnecessary blk_bio_discard_split()
+To:     Tom Yan <tom.ty89@gmail.com>, linux-block@vger.kernel.org
+Cc:     linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org
+References: <20201206061537.3870-1-tom.ty89@gmail.com>
+From:   Sergei Shtylyov <sergei.shtylyov@gmail.com>
+Organization: Brain-dead Software
+Message-ID: <55e0b8be-a16b-9895-fde5-b325773ae0e7@gmail.com>
+Date:   Sun, 6 Dec 2020 13:16:04 +0300
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20201206061537.3870-1-tom.ty89@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-It doesn't seem necessary to have the redundant layer of splitting.
-The request size will even be more consistent / aligned to the cap.
+Hello!
 
-Signed-off-by: Tom Yan <tom.ty89@gmail.com>
----
- block/blk-lib.c   | 5 ++++-
- block/blk-merge.c | 2 +-
- block/blk.h       | 8 ++++++--
- 3 files changed, 11 insertions(+), 4 deletions(-)
+On 06.12.2020 9:15, Tom Yan wrote:
 
-diff --git a/block/blk-lib.c b/block/blk-lib.c
-index e90614fd8d6a..f606184a9050 100644
---- a/block/blk-lib.c
-+++ b/block/blk-lib.c
-@@ -85,9 +85,12 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
- 		 *   is split in device drive, the split ones are very probably
- 		 *   to be aligned to discard_granularity of the device's queue.
- 		 */
--		if (granularity_aligned_lba == sector_mapped)
-+		if (granularity_aligned_lba == sector_mapped) {
- 			req_sects = min_t(sector_t, nr_sects,
- 					  bio_aligned_discard_max_sectors(q));
-+			if (!req_sects)
-+				return -EOPNOTSUPP;
-+		}
- 		else
- 			req_sects = min_t(sector_t, nr_sects,
- 					  granularity_aligned_lba - sector_mapped);
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index bcf5e4580603..2439216585d9 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -59,6 +59,7 @@ static inline bool req_gap_front_merge(struct request *req, struct bio *bio)
- 	return bio_will_gap(req->q, NULL, bio, req->bio);
- }
- 
-+/* deprecated */
- static struct bio *blk_bio_discard_split(struct request_queue *q,
- 					 struct bio *bio,
- 					 struct bio_set *bs,
-@@ -303,7 +304,6 @@ void __blk_queue_split(struct bio **bio, unsigned int *nr_segs)
- 	switch (bio_op(*bio)) {
- 	case REQ_OP_DISCARD:
- 	case REQ_OP_SECURE_ERASE:
--		split = blk_bio_discard_split(q, *bio, &q->bio_split, nr_segs);
- 		break;
- 	case REQ_OP_WRITE_ZEROES:
- 		split = blk_bio_write_zeroes_split(q, *bio, &q->bio_split,
-diff --git a/block/blk.h b/block/blk.h
-index dfab98465db9..e7e31a8c4930 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -281,8 +281,12 @@ static inline unsigned int bio_allowed_max_sectors(struct request_queue *q)
- static inline unsigned int bio_aligned_discard_max_sectors(
- 					struct request_queue *q)
- {
--	return round_down(UINT_MAX, q->limits.discard_granularity) >>
--			SECTOR_SHIFT;
-+	unsigned int discard_max_sectors, granularity;
-+	discard_max_sectors = min(q->limits.max_discard_sectors,
-+				  bio_allowed_max_sectors(q));
-+	/* Zero-sector (unknown) and one-sector granularities are the same.  */
-+	granularity = max(q->limits.discard_granularity >> SECTOR_SHIFT, 1U)
-+	return round_down(max, granularity);
- }
- 
- /*
--- 
-2.29.2
+> It doesn't seem necessary to have the redundant layer of splitting.
+> The request size will even be more consistent / aligned to the cap.
+> 
+> Signed-off-by: Tom Yan <tom.ty89@gmail.com>
+> ---
+>   block/blk-lib.c   | 5 ++++-
+>   block/blk-merge.c | 2 +-
+>   block/blk.h       | 8 ++++++--
+>   3 files changed, 11 insertions(+), 4 deletions(-)
+> 
+> diff --git a/block/blk-lib.c b/block/blk-lib.c
+> index e90614fd8d6a..f606184a9050 100644
+> --- a/block/blk-lib.c
+> +++ b/block/blk-lib.c
+> @@ -85,9 +85,12 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+>   		 *   is split in device drive, the split ones are very probably
+>   		 *   to be aligned to discard_granularity of the device's queue.
+>   		 */
+> -		if (granularity_aligned_lba == sector_mapped)
+> +		if (granularity_aligned_lba == sector_mapped) {
+>   			req_sects = min_t(sector_t, nr_sects,
+>   					  bio_aligned_discard_max_sectors(q));
+> +			if (!req_sects)
+> +				return -EOPNOTSUPP;
+> +		}
+>   		else
 
+    Needs to be } else { according to the CodingStyle doc...
+
+>   			req_sects = min_t(sector_t, nr_sects,
+>   					  granularity_aligned_lba - sector_mapped);
+[...]
+
+MBR, Sergei
