@@ -2,108 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D4B8C4361B
-	for <linux-block@archiver.kernel.org>; Mon,  7 Dec 2020 15:03:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA144C4361B
+	for <linux-block@archiver.kernel.org>; Mon,  7 Dec 2020 15:03:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3713F236F9
-	for <linux-block@archiver.kernel.org>; Mon,  7 Dec 2020 15:03:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 73AF223715
+	for <linux-block@archiver.kernel.org>; Mon,  7 Dec 2020 15:03:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725867AbgLGPC4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Dec 2020 10:02:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45336 "EHLO
+        id S1727073AbgLGPDd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Dec 2020 10:03:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45436 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726993AbgLGPCy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Dec 2020 10:02:54 -0500
-Received: from mail-il1-x141.google.com (mail-il1-x141.google.com [IPv6:2607:f8b0:4864:20::141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7815CC06179C
-        for <linux-block@vger.kernel.org>; Mon,  7 Dec 2020 07:02:08 -0800 (PST)
-Received: by mail-il1-x141.google.com with SMTP id q1so12425844ilt.6
-        for <linux-block@vger.kernel.org>; Mon, 07 Dec 2020 07:02:08 -0800 (PST)
+        with ESMTP id S1725816AbgLGPDc (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Dec 2020 10:03:32 -0500
+Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 859E5C061793
+        for <linux-block@vger.kernel.org>; Mon,  7 Dec 2020 07:02:46 -0800 (PST)
+Received: by mail-ej1-x62c.google.com with SMTP id jx16so19884201ejb.10
+        for <linux-block@vger.kernel.org>; Mon, 07 Dec 2020 07:02:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=VybQWwbL6UvzcbCL3NCZaMBiwuEmrkek/VawgkB7ZD8=;
-        b=fPRjo0rViiLpzlSV/cYvxL+aParhvHQFHBvf5Ms3odbYIyCLW1RU9uljM8UzNMUyn/
-         x6qXvusS8124Z2GpGuWhfIO+2klnLhPWelPuwPKWJznvscHoRenj4/q71YtGqVLgbuLM
-         0lnVmK8inWjBUft0GC3f/UeHUL6GdtjaBogfs4ZbfmoKupcCvVkytR3VRPhgjs5RaekK
-         +he9AhiRM5ztashvnDeacL9gBGNU2OSaj3fHir83R5i70H+uv+b5iM8LP+j0l/ZROsny
-         Gc0Tg2b8hu1fT+TxgaDNCpv0SC/SqvuUv9zjdSYb6cYxiKmAcWz7PEqymqp9kndjzkYO
-         imrw==
+        d=cloud.ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=y5an9IpqP76fFEfITqq2IfrQNyjf5flDTbngmDsa0e0=;
+        b=b0PNzOJCtcJg4O6coaXXwXy4BPnkF0lQigfsuS/Eux90pqnc8vuLYlLzaDrAzL4nw9
+         8ur8vzz9e0suu4AP8UKavHCm2e3dUXKMAQ+Tc51lywhBH29uIOzdjn8I/YAVi4lFtrYC
+         351Alkx/e3g3OBRpwWukHX2WrZtnbdW6tfqqwu6uU+f0XBu0m7lsi1zFFihHPapOT8wF
+         Qo6gxm1kLhBuCb7sPzgKvRtuqZWVaQ5NgRQucwzG7mCRbB7yBBsgF6k5V9j39Kw8JrqL
+         HLoOu8mwLaoKlDMHrzCuS69mqtOFzCDk8s/FocrZNzZeRjzGQSfybRgb8G9Zzzvi6swq
+         ogOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=VybQWwbL6UvzcbCL3NCZaMBiwuEmrkek/VawgkB7ZD8=;
-        b=YICftjXd4J9hg5Wl1oNLJ0SCrLCxi9pSBACTko0qpvl/vZM/giuszDJ8ACs3jltthi
-         fSrTlvF0BFK8sC+dcp2XGG0vkz0Evv1zOJyRUBxHzTl/DpB1UZIcc3xtzjhJj//AVjBd
-         A8/4aOJ+qot3DaRAo7LLA363EDkZXntDdwK0YkeZCkwFrFWW1aiw0Ana0a78RbA2p2dc
-         jTWCN2gdsjbmjoIYwcxDAmn/qf8LNDVia8sFybxDwkSKjwyICQrNKfbyz71ufqnrGJW9
-         MS9uYABwwIahRiBcwGjKUmtGN2xm0c2fiSDYtxeMESI5/u4pMbupuinzoQGZrlaGVrhc
-         MzeA==
-X-Gm-Message-State: AOAM532270vhiWVP/rDNx+WKD1Oak7mh0r7kTy/+EwWes8F9VrqSe7d+
-        IZSr98rSnKc8p1kLGmUu+w8tlw==
-X-Google-Smtp-Source: ABdhPJwXyg25mmVigE/vD8BUXZ8meCAbl38W8aCMhaVRVxosrXA78kTdChRbv2nSuTpfbnQKgdP5Pw==
-X-Received: by 2002:a92:2801:: with SMTP id l1mr21564464ilf.124.1607353327887;
-        Mon, 07 Dec 2020 07:02:07 -0800 (PST)
-Received: from [192.168.1.30] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id l4sm6247280ilo.29.2020.12.07.07.02.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 07 Dec 2020 07:02:07 -0800 (PST)
-Subject: Re: [PATCH v2 0/5] Some cleanups and improvements for blk-iocost
-To:     Baolin Wang <baolin.wang@linux.alibaba.com>, tj@kernel.org
-Cc:     baolin.wang7@gmail.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <cover.1606378475.git.baolin.wang@linux.alibaba.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <e2aad8cc-2fb4-015a-30b2-ff8f2b5e6ad6@kernel.dk>
-Date:   Mon, 7 Dec 2020 08:02:06 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=y5an9IpqP76fFEfITqq2IfrQNyjf5flDTbngmDsa0e0=;
+        b=s1B5/BFlDDpjsaQaygAa4Iw8QsL19U7Ifdpg8AUqpRy2+3Lxof1EknE5NcdUgJZtGD
+         Xgad2GTsHuVSzT8H+Lw3G1b4hg4H4o/ZOBJDRP6njhp89H1MUXHxd47dEJtOkdZ2AceQ
+         G139AhXEQAiSa9L060BtniHTWvt8v4tTjof1At8pPxZwnj+MSUSmALw/gha45KR/V49v
+         U2dFsxKy8CBZpU60JZwVjH/+gP4biEg/bp+yemQx6Ckz1QVfc7XCA3+4PkrzptJLnBiw
+         WA/7LWuSbYnC6S3cSCCAWHpq/jyk9EH2RxUA+2yrmcsDdZkMmJgXBOdMFAB+2VUvdhFx
+         5/lA==
+X-Gm-Message-State: AOAM53374IOg790dPDr+0Q46YUIIcYIhrmmf1rRiFIPd94ylhGFIAiF5
+        JN97srJbyygV9KqzNvltI/XGF7tOurjRM9sBZA/Isw==
+X-Google-Smtp-Source: ABdhPJyjHAk4PRj3OIAv9j3xOZdDWo4qndoe9LdmKf3qEzqcDgfah7gXM5L/AoRSiabQqEhraV7b8RX0+RG4TP2SwEE=
+X-Received: by 2002:a17:906:9452:: with SMTP id z18mr19468443ejx.389.1607353365047;
+ Mon, 07 Dec 2020 07:02:45 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <cover.1606378475.git.baolin.wang@linux.alibaba.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20201207145446.169978-1-colin.king@canonical.com> <afd6edda-460c-8488-6e63-438053e88eac@kernel.dk>
+In-Reply-To: <afd6edda-460c-8488-6e63-438053e88eac@kernel.dk>
+From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
+Date:   Mon, 7 Dec 2020 16:02:34 +0100
+Message-ID: <CAMGffEmKW=wa3_UiJA9+SLKcB0q9WmOMThQwoe0pc9oQQ62phA@mail.gmail.com>
+Subject: Re: [PATCH][next] block/rnbd: fix a null pointer dereference on dev->blk_symlink_name
+To:     Jens Axboe <axboe@kernel.dk>, Colin King <colin.king@canonical.com>
+Cc:     Danil Kipnis <danil.kipnis@cloud.ionos.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Bart Van Assche <bvanassche@acm.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        kernel-janitors@vger.kernel.org,
+        open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/26/20 1:16 AM, Baolin Wang wrote:
-> Hi,
-> 
-> This patch set did some cleanups and improvements for blk-iocost, and
-> no big functional changes. Please help to review. Thanks.
-> 
-> Changes from v1:
->  - Add acked-by tag from Tejun.
->  - Drop 2 unnecessary patches.
->  - Move the related variable declarations inside the block together
->  with the code in patch 3.
->  - Move the commit_weights() into ioc_check_iocgs().
->  - Move more related logics of adjusting base vrate into the
->  ioc_adjust_base_vrate().
->  - Rename the new functions.
-> 
-> Baolin Wang (5):
->   blk-iocost: Fix some typos in comments
->   blk-iocost: Remove unnecessary advance declaration
->   blk-iocost: Move the usage ratio calculation to the correct place
->   blk-iocost: Factor out the active iocgs' state check into a separate
->     function
->   blk-iocost: Factor out the base vrate change into a separate function
-> 
->  block/blk-iocost.c | 251 +++++++++++++++++++++++++++++------------------------
->  1 file changed, 137 insertions(+), 114 deletions(-)
+On Mon, Dec 7, 2020 at 4:01 PM Jens Axboe <axboe@kernel.dk> wrote:
+>
+> On 12/7/20 7:54 AM, Colin King wrote:
+> > From: Colin Ian King <colin.king@canonical.com>
+> >
+> > Currently in the case where dev->blk_symlink_name fails to be allocates
+> > the error return path attempts to set an end-of-string character to
+> > the unallocated dev->blk_symlink_name causing a null pointer dereference
+> > error. Fix this by returning with an explicity ENOMEM error (which also
+> > is missing in the original code as was not initialized).
+>
+> Applied, thanks.
 
-Applied, thanks.
+Thanks Colin for the fix, and thanks Jens for taking care of this.
 
--- 
-Jens Axboe
-
+Jack Wang
