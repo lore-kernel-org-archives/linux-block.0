@@ -2,155 +2,136 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D747FC0018C
-	for <linux-block@archiver.kernel.org>; Mon,  7 Dec 2020 20:40:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF92CC1B0D8
+	for <linux-block@archiver.kernel.org>; Mon,  7 Dec 2020 22:13:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7ECAB2368A
-	for <linux-block@archiver.kernel.org>; Mon,  7 Dec 2020 20:40:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8E9ED23977
+	for <linux-block@archiver.kernel.org>; Mon,  7 Dec 2020 22:13:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725885AbgLGUkQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Dec 2020 15:40:16 -0500
-Received: from ssl.serverraum.org ([176.9.125.105]:54701 "EHLO
-        ssl.serverraum.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725814AbgLGUkQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Dec 2020 15:40:16 -0500
-Received: from ssl.serverraum.org (web.serverraum.org [172.16.0.2])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1728021AbgLGWNE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Dec 2020 17:13:04 -0500
+Received: from mail-1.ca.inter.net ([208.85.220.69]:46701 "EHLO
+        mail-1.ca.inter.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726515AbgLGWNE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Dec 2020 17:13:04 -0500
+Received: from localhost (offload-3.ca.inter.net [208.85.220.70])
+        by mail-1.ca.inter.net (Postfix) with ESMTP id 57DD82EA0BF;
+        Mon,  7 Dec 2020 17:12:22 -0500 (EST)
+Received: from mail-1.ca.inter.net ([208.85.220.69])
+        by localhost (offload-3.ca.inter.net [208.85.220.70]) (amavisd-new, port 10024)
+        with ESMTP id G7eYR5PKV6Ue; Mon,  7 Dec 2020 17:01:35 -0500 (EST)
+Received: from [192.168.48.23] (host-104-157-204-209.dyn.295.ca [104.157.204.209])
+        (using TLSv1 with cipher DHE-RSA-AES128-SHA (128/128 bits))
         (No client certificate requested)
-        by ssl.serverraum.org (Postfix) with ESMTPSA id 0BFBF22E0A;
-        Mon,  7 Dec 2020 21:39:33 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=walle.cc; s=mail2016061301;
-        t=1607373573;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=99gx2cWANtw7xbgXmiVd706Ja27zb5HI7XI/tfZcAoQ=;
-        b=VjM5ehjWW56mCDj/RZGZ6fgh1Jr0pn/PbdVw4mFG46Ad1ezv8AjKzL8eBOwATYcCgTKbkv
-        6bOVcV/fNP5Y2MzvmhHsxmycff6Xg03odmS8uOzxt5k4keXLHZQI7utj9WR6YwqB8ceGGT
-        KjAaFOJ62GuTI1gOE1WdOOTuHcSAxxM=
+        (Authenticated sender: dgilbert@interlog.com)
+        by mail-1.ca.inter.net (Postfix) with ESMTPSA id 2ED332EA040;
+        Mon,  7 Dec 2020 17:12:20 -0500 (EST)
+Reply-To: dgilbert@interlog.com
+Subject: Re: [RFC PATCH v2 0/2] add simple copy support
+To:     Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
+        SelvaKumar S <selvakuma.s1@samsung.com>
+Cc:     linux-nvme@lists.infradead.org, kbusch@kernel.org, axboe@kernel.dk,
+        damien.lemoal@wdc.com, sagi@grimberg.me,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        dm-devel@redhat.com, snitzer@redhat.com, selvajove@gmail.com,
+        nj.shetty@samsung.com, joshi.k@samsung.com,
+        javier.gonz@samsung.com,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Mikulas Patocka <mpatocka@redhat.com>,
+        linux-scsi@vger.kernel.org
+References: <CGME20201204094719epcas5p23b3c41223897de3840f92ae3c229cda5@epcas5p2.samsung.com>
+ <20201204094659.12732-1-selvakuma.s1@samsung.com>
+ <20201207141123.GC31159@lst.de>
+ <01fe46ac-16a5-d4db-f23d-07a03d3935f3@suse.de>
+From:   Douglas Gilbert <dgilbert@interlog.com>
+Message-ID: <194d7813-8c8c-85c8-e0c8-94aaab7c291e@interlog.com>
+Date:   Mon, 7 Dec 2020 17:12:19 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Mon, 07 Dec 2020 21:39:32 +0100
-From:   Michael Walle <michael@walle.cc>
-To:     "Theodore Y. Ts'o" <tytso@mit.edu>
-Cc:     linux-ext4@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: Re: discard feature, mkfs.ext4 and mmc default fallback to normal
- erase op
-In-Reply-To: <20201207183534.GA52960@mit.edu>
-References: <97c4bb65c8a3e688b191d57e9f06aa5a@walle.cc>
- <20201207183534.GA52960@mit.edu>
-User-Agent: Roundcube Webmail/1.4.9
-Message-ID: <2edcf8e344937b3c5b92a0b87ebd13bd@walle.cc>
-X-Sender: michael@walle.cc
+In-Reply-To: <01fe46ac-16a5-d4db-f23d-07a03d3935f3@suse.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-CA
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Ted,
-
-Am 2020-12-07 19:35, schrieb Theodore Y. Ts'o:
-> On Mon, Dec 07, 2020 at 04:10:27PM +0100, Michael Walle wrote:
->> Hi,
->> 
->> The problem I'm having is that I'm trying to install debian on
->> an embedded system onto an sdcard. During installation it will
->> format the target filesystem, but the "mkfs.ext4 -F /dev/mmcblk0p2"
->> takes ages.
->> 
->> What I've found out so far:
->>  - mkfs.ext4 tries to discard all blocks on the target device
->>  - with my target device being an sdcard it seems to fallback
->>    to normal erase [1], with erase_arg being set to what the card
->>    is capable of [2]
->> 
->> Now I'm trying to figure out if this behavior is intended. I guess
->> one can reduce it to "blkdiscard /dev/mmcblk0p2". Should this
->> actually fall back to normal erasing or should it return -EOPNOTSUPP?
+On 2020-12-07 9:56 a.m., Hannes Reinecke wrote:
+> On 12/7/20 3:11 PM, Christoph Hellwig wrote:
+>> So, I'm really worried about:
+>>
+>>   a) a good use case.  GC in f2fs or btrfs seem like good use cases, as
+>>      does accelating dm-kcopyd.  I agree with Damien that lifting dm-kcopyd
+>>      to common code would also be really nice.  I'm not 100% sure it should
+>>      be a requirement, but it sure would be nice to have
+>>      I don't think just adding an ioctl is enough of a use case for complex
+>>      kernel infrastructure.
+>>   b) We had a bunch of different attempts at SCSI XCOPY support form IIRC
+>>      Martin, Bart and Mikulas.  I think we need to pull them into this
+>>      discussion, and make sure whatever we do covers the SCSI needs.
+>>
+> And we shouldn't forget that the main issue which killed all previous 
+> implementations was a missing QoS guarantee.
+> It's nice to have simply copy, but if the implementation is _slower_ than doing 
+> it by hand from the OS there is very little point in even attempting to do so.
+> I can't see any provisions for that in the TPAR, leading me to the assumption 
+> that NVMe simple copy will suffer from the same issue.
 > 
-> There are three different MMC commands which are defined:
-> 
-> 1) DISCARD
-> 2) ERASE
-> 3) SECURE ERASE
-> 
-> The first two are expected to be fast, since it only involves clearing
-> some metadata fields in the Flash Translation Layer (FTL), so that the
-> LBA's in the specified range are no longer mapped to a flash page.
+> So if we can't address this I guess this attempt will fail, too.
 
-Mh, where is it specified that the erase command is fast? According
-to the Physical Layer Simplified Specification Version 8.00:
+I have been doing quite a lot of work and testing in my sg driver rewrite
+in the copy and compare area. The baselines for performance are dd and
+io_uring-cp (in liburing). There are lots of ways to improve on them. Here
+are some:
+    - the user data need never pass through the user space (could
+      mmap it out during the READ if there is a good reason). Only the
+      metadata (e.g. NVMe or SCSI commands) needs to come from the user
+      space and errors, if any, reported back to the user space.
+    - break a large copy (or compare) into segments, with each segment
+      a "comfortable" size for the OS to handle, say 256 KB
+    - there is one constraint: the READ in each segment must complete
+      before its paired WRITE can commence
+      - extra constraint for some zoned disks: WRITEs must be
+        issued in order (assuming they are applied in that order, if
+        not, need to wait until each WRITE completes)
+    - arrange for READ WRITE pair in each segment to share the same bio
+    - have multiple slots each holding a segment (i.e. a bio and
+      metadata to process a READ-WRITE pair)
+    - re-use each slot's bio for the following READ-WRITE pair
+    - issue the READs in each slot asynchronously and do an interleaved
+      (io)poll for completion. Then issue the paired WRITE
+      asynchronously
+    - the above "slot" algorithm runs in one thread, so there can be
+      multiple threads doing the same algorithm. Segment manager needs
+      to be locked (or use an atomics) so that each segment (identified
+      by its starting LBAs) is issued once and only once when the
+      next thread wants a segment to copy
 
-  The actual erase time may be quite long, and the host may issue CMD7
-  to deselect the card or perform card disconnection, as described in
-  the Block Write section, above.
-
-Honest question. Also reading "4.14 Erase Timeout Calculation" doesn't
-sound that it is fast.
-
-Also there is this comment:
-https://elixir.bootlin.com/linux/v5.9.12/source/drivers/mmc/core/core.c#L1495
-
-> The difference between "discard" and "erase" is that "discard" is a
-> hint, so the device is allowed to ignore it whenever it wants (in
-> practice, if it's busy doing a GC, or if it's busy writing back blocks
-> in its writeback cache).  "Erase" is guaranteed to work, in that after
-> an erase, a read from a specified sector MUST return all zeros, but
-> that can easily be done by redirecting a point in the FTL metadata.
-> 
-> "Secure Erase" is the one which can be slow, since it requires
-> physically zeroing all of the flash pages (although if the device is
-> self-encrypting, this in theory could also be fast if you're doing a
-> secure erase at the granularity of the device's encryption keys, so
-> all it needs to do is to regenerate the crypto key).
-> 
-> It sounds like your SD card is implementing the "erase" command in a
-> particularly non-optimal way.  If it's common, perhaps we need some
-> kind of blacklist for drivers with badly implemented erase commands.
-> As a workaround, you can run mke2fs with the command-line option "-E
-> discard=0".
-
-I've already tested that "mkfs.ext4 -E nodiscard" is fast (or works in
-the same way as before the pre-discard feature).
-
-But I wouldn't say it is a cheapo card (Toshiba Exceria). Although I
-cannot guarantee that it might be a china clone, but it looks authentic
-;)
+Running multiple threads gives diminishing or even worsening returns.
+Runtime metrics on lock contention and storage bus capacity may help
+choosing the number of threads. A simpler approach might be add more
+threads until the combined throughput increase is less than 10% say.
 
 
-> P.S.  If your SD card got "erase" wrong, I'd be a little worried about
-> what else the FTL implementation may have screwed up.  So you want to
-> under simply getting a different SD card --- especially if this is
-> something that you plan to distribute as a product to downstream
-> customers.  In general, low-end flash needs to be very carefully
-> qualified to make sure they are competently implemented if you plan to
-> deploy in large quantities.  An example of what happen if this
-> qualification process is not done:
-> 
-> https://insideevs.com/news/376037/tesla-mcu-emmc-memory-issue/
-> 
-> Tesla is currently under investigation by the National Highway Traffic
-> Safety Administration due to cheaping out on their eMMC flash
-> (probably just a few pennies per unit).  Given that customers are
-> having to pay $1500 to replace their engine controller out of warranty
-> (and the NHTSA is considering whether or not to force Tesla to eat the
-> costs, as opposed to forcing their customers to pay $$$), that's an
-> example of false economy....
+The 'compare' that I mention is based on the SCSI VERIFY(BYTCHK=1) command
+(or NVMe NVM Compare command). Using dd logic, a disk to disk compare can
+be implemented with not much more work than changing the WRITE to a VERIFY
+command. This is a different approach to the Linux cmp utility which
+READs in both sides and does a memcmp() type operation. Using ramdisks
+(from the scsi_debug driver) the compare operation (max ~ 10 GB/s) was
+actually faster than the copy (max ~ 7 GB/s). I put this down to WRITE
+operations taking a write lock over the store while the VERIFY only
+needs a read lock so many VERIFY operations can co-exist on the same
+store. Unfortunately on real SAS and NVMe SSDs that I tested the
+performance of the VERIFY and NVM Compare commands is underwhelming.
+For comparison, using scsi_debug ramdisks, dd copy throughput was
+< 1 GB/s and io_uring-cp was around 2-3 GB/s. The system was Ryzen
+3600 based.
 
-Yeah I'm aware of the Tesla eMMC wear-out problem. But I've seen this
-esp. from a user point of view. Like take our product, where the user
-can freely choose its sdcard just to then notice that the installation
-of its distribution is painfully slow. So I'm interested in 
-understanding
-the implications. Like is it really the case that the erase command can
-be assumed fast.
-
--michael
+Doug Gilbert
