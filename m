@@ -2,74 +2,85 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40BF6C433FE
-	for <linux-block@archiver.kernel.org>; Mon,  7 Dec 2020 14:55:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8A49C4167B
+	for <linux-block@archiver.kernel.org>; Mon,  7 Dec 2020 14:57:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F36DB23602
-	for <linux-block@archiver.kernel.org>; Mon,  7 Dec 2020 14:55:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 743E523619
+	for <linux-block@archiver.kernel.org>; Mon,  7 Dec 2020 14:57:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725804AbgLGOza (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Dec 2020 09:55:30 -0500
-Received: from youngberry.canonical.com ([91.189.89.112]:37469 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725772AbgLGOza (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Dec 2020 09:55:30 -0500
-Received: from 1.general.cking.uk.vpn ([10.172.193.212] helo=localhost)
-        by youngberry.canonical.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.86_2)
-        (envelope-from <colin.king@canonical.com>)
-        id 1kmHuZ-0005Ri-6i; Mon, 07 Dec 2020 14:54:47 +0000
-From:   Colin King <colin.king@canonical.com>
-To:     Danil Kipnis <danil.kipnis@cloud.ionos.com>,
-        Jack Wang <jinpu.wang@cloud.ionos.com>,
-        Jens Axboe <axboe@kernel.dk>, Jason Gunthorpe <jgg@ziepe.ca>,
+        id S1725931AbgLGO47 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Dec 2020 09:56:59 -0500
+Received: from mx2.suse.de ([195.135.220.15]:50144 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725867AbgLGO46 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 7 Dec 2020 09:56:58 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 7663EAB63;
+        Mon,  7 Dec 2020 14:56:17 +0000 (UTC)
+Subject: Re: [RFC PATCH v2 0/2] add simple copy support
+To:     Christoph Hellwig <hch@lst.de>,
+        SelvaKumar S <selvakuma.s1@samsung.com>
+Cc:     linux-nvme@lists.infradead.org, kbusch@kernel.org, axboe@kernel.dk,
+        damien.lemoal@wdc.com, sagi@grimberg.me,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        dm-devel@redhat.com, snitzer@redhat.com, selvajove@gmail.com,
+        nj.shetty@samsung.com, joshi.k@samsung.com,
+        javier.gonz@samsung.com,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
         Bart Van Assche <bvanassche@acm.org>,
-        linux-block@vger.kernel.org
-Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH][next] block/rnbd: fix a null pointer dereference on dev->blk_symlink_name
-Date:   Mon,  7 Dec 2020 14:54:46 +0000
-Message-Id: <20201207145446.169978-1-colin.king@canonical.com>
-X-Mailer: git-send-email 2.29.2
+        Mikulas Patocka <mpatocka@redhat.com>,
+        linux-scsi@vger.kernel.org
+References: <CGME20201204094719epcas5p23b3c41223897de3840f92ae3c229cda5@epcas5p2.samsung.com>
+ <20201204094659.12732-1-selvakuma.s1@samsung.com>
+ <20201207141123.GC31159@lst.de>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <01fe46ac-16a5-d4db-f23d-07a03d3935f3@suse.de>
+Date:   Mon, 7 Dec 2020 15:56:15 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20201207141123.GC31159@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Colin Ian King <colin.king@canonical.com>
+On 12/7/20 3:11 PM, Christoph Hellwig wrote:
+> So, I'm really worried about:
+> 
+>   a) a good use case.  GC in f2fs or btrfs seem like good use cases, as
+>      does accelating dm-kcopyd.  I agree with Damien that lifting dm-kcopyd
+>      to common code would also be really nice.  I'm not 100% sure it should
+>      be a requirement, but it sure would be nice to have
+>      I don't think just adding an ioctl is enough of a use case for complex
+>      kernel infrastructure.
+>   b) We had a bunch of different attempts at SCSI XCOPY support form IIRC
+>      Martin, Bart and Mikulas.  I think we need to pull them into this
+>      discussion, and make sure whatever we do covers the SCSI needs.
+> 
+And we shouldn't forget that the main issue which killed all previous 
+implementations was a missing QoS guarantee.
+It's nice to have simply copy, but if the implementation is _slower_ 
+than doing it by hand from the OS there is very little point in even 
+attempting to do so.
+I can't see any provisions for that in the TPAR, leading me to the 
+assumption that NVMe simple copy will suffer from the same issue.
 
-Currently in the case where dev->blk_symlink_name fails to be allocates
-the error return path attempts to set an end-of-string character to
-the unallocated dev->blk_symlink_name causing a null pointer dereference
-error. Fix this by returning with an explicity ENOMEM error (which also
-is missing in the original code as was not initialized).
+So if we can't address this I guess this attempt will fail, too.
 
-Addresses-Coverity: ("Dereference after null check")
-Fixes: 1eb54f8f5dd8 ("block/rnbd: client: sysfs interface functions")
-Signed-off-by: Colin Ian King <colin.king@canonical.com>
----
- drivers/block/rnbd/rnbd-clt-sysfs.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Cheers,
 
-diff --git a/drivers/block/rnbd/rnbd-clt-sysfs.c b/drivers/block/rnbd/rnbd-clt-sysfs.c
-index c3c96a567568..a7caeedeb198 100644
---- a/drivers/block/rnbd/rnbd-clt-sysfs.c
-+++ b/drivers/block/rnbd/rnbd-clt-sysfs.c
-@@ -499,7 +499,7 @@ static int rnbd_clt_add_dev_symlink(struct rnbd_clt_dev *dev)
- 	dev->blk_symlink_name = kzalloc(len, GFP_KERNEL);
- 	if (!dev->blk_symlink_name) {
- 		rnbd_clt_err(dev, "Failed to allocate memory for blk_symlink_name\n");
--		goto out_err;
-+		return -ENOMEM;
- 	}
- 
- 	ret = rnbd_clt_get_path_name(dev, dev->blk_symlink_name,
+Hannes
 -- 
-2.29.2
-
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
