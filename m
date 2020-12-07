@@ -2,136 +2,85 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF92CC1B0D8
-	for <linux-block@archiver.kernel.org>; Mon,  7 Dec 2020 22:13:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F72AC0018C
+	for <linux-block@archiver.kernel.org>; Mon,  7 Dec 2020 23:50:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8E9ED23977
-	for <linux-block@archiver.kernel.org>; Mon,  7 Dec 2020 22:13:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 50A3023A23
+	for <linux-block@archiver.kernel.org>; Mon,  7 Dec 2020 23:50:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728021AbgLGWNE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Dec 2020 17:13:04 -0500
-Received: from mail-1.ca.inter.net ([208.85.220.69]:46701 "EHLO
-        mail-1.ca.inter.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726515AbgLGWNE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Dec 2020 17:13:04 -0500
-Received: from localhost (offload-3.ca.inter.net [208.85.220.70])
-        by mail-1.ca.inter.net (Postfix) with ESMTP id 57DD82EA0BF;
-        Mon,  7 Dec 2020 17:12:22 -0500 (EST)
-Received: from mail-1.ca.inter.net ([208.85.220.69])
-        by localhost (offload-3.ca.inter.net [208.85.220.70]) (amavisd-new, port 10024)
-        with ESMTP id G7eYR5PKV6Ue; Mon,  7 Dec 2020 17:01:35 -0500 (EST)
-Received: from [192.168.48.23] (host-104-157-204-209.dyn.295.ca [104.157.204.209])
-        (using TLSv1 with cipher DHE-RSA-AES128-SHA (128/128 bits))
-        (No client certificate requested)
-        (Authenticated sender: dgilbert@interlog.com)
-        by mail-1.ca.inter.net (Postfix) with ESMTPSA id 2ED332EA040;
-        Mon,  7 Dec 2020 17:12:20 -0500 (EST)
-Reply-To: dgilbert@interlog.com
-Subject: Re: [RFC PATCH v2 0/2] add simple copy support
-To:     Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
-        SelvaKumar S <selvakuma.s1@samsung.com>
-Cc:     linux-nvme@lists.infradead.org, kbusch@kernel.org, axboe@kernel.dk,
-        damien.lemoal@wdc.com, sagi@grimberg.me,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        dm-devel@redhat.com, snitzer@redhat.com, selvajove@gmail.com,
-        nj.shetty@samsung.com, joshi.k@samsung.com,
-        javier.gonz@samsung.com,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Mikulas Patocka <mpatocka@redhat.com>,
-        linux-scsi@vger.kernel.org
-References: <CGME20201204094719epcas5p23b3c41223897de3840f92ae3c229cda5@epcas5p2.samsung.com>
- <20201204094659.12732-1-selvakuma.s1@samsung.com>
- <20201207141123.GC31159@lst.de>
- <01fe46ac-16a5-d4db-f23d-07a03d3935f3@suse.de>
-From:   Douglas Gilbert <dgilbert@interlog.com>
-Message-ID: <194d7813-8c8c-85c8-e0c8-94aaab7c291e@interlog.com>
-Date:   Mon, 7 Dec 2020 17:12:19 -0500
+        id S1727135AbgLGXt7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Dec 2020 18:49:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42950 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726481AbgLGXt7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Dec 2020 18:49:59 -0500
+Received: from mail-pf1-x443.google.com (mail-pf1-x443.google.com [IPv6:2607:f8b0:4864:20::443])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00EF0C061749
+        for <linux-block@vger.kernel.org>; Mon,  7 Dec 2020 15:49:18 -0800 (PST)
+Received: by mail-pf1-x443.google.com with SMTP id s21so12010573pfu.13
+        for <linux-block@vger.kernel.org>; Mon, 07 Dec 2020 15:49:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:references:from:message-id:date:user-agent:mime-version
+         :in-reply-to:content-language:content-transfer-encoding;
+        bh=HrXuFaSEQbpp4LXlhF5fUTHsukqRhZzVaPR/VEdvTwc=;
+        b=ATRflG+LUSPDAqqjhziQAZ/yRlFIkH1NdCWLh3h+PgURrV+sqbIybMgt8iSaixyLtQ
+         cpw4L2U8GLo+sYNhUzuZLoAF3r87tPa04Zd1lvmtKupECX2ecq9XtaRMyTIf8D9nDBjS
+         HsgqkasfmHvgt4/E7dAfL7erv1+4iXLXr2SEuJCL61+laKa+ZBr1XPTo3wEGDzV2wZZH
+         w9bK9URAzFGNBkZeH6Xj5xYXB0Q2tmBibVJmYBKWL6J+W8HAdR+HFHfHGCNiR21XSmGp
+         amoGqM8IUe7FYaBOVRMAlaXg1FWAg6QxwgltlODOwkKLqtgyC0yJRskvnWzZZvdmhaZV
+         vPvA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=HrXuFaSEQbpp4LXlhF5fUTHsukqRhZzVaPR/VEdvTwc=;
+        b=sL8SefzKibRWcroXr/p2R0BKxhIbTHt7Hp59MJJDzkRt6qML2tIVjDdxbbZBFsX08i
+         w8lb5W+zvhniKcmbwhJvS/bfsnlKVR91wmLxjB+Hl88euckitZzKeg+g7RmrzoRMMVP8
+         Hv3wfqf1/wZxwOfxJe4G6zWTdUw8iUKAbokwQdn98VjoMHMglog7K5EesxHfZ2N7vQXH
+         uq2C5SHAwfrMna81jCak/REmIFh2IrEn2JKPQu1HmnjrOUFTvartBYYfh+PdfiXsySZ7
+         0xAd8y/+dy3ReOPYF0qET2o3X5KGg1oJys+ZYKQYm4pWwuL+AYN1DWHhoZrqyVQSbbvs
+         WEHA==
+X-Gm-Message-State: AOAM531zBSX8ncZ01HG2mI6chrvl9ivAgezUpwDJOXRrnXP+LxsfAaCI
+        JU9Xu61WBtp2/vCRTQuBFkXCtdd+cBFfYQ==
+X-Google-Smtp-Source: ABdhPJyECkFeYp59Bi14lD+7mpnCnJ28cLrBZBBgOz7ZuhaZaXWpdSvXKk1G0haG9RfmXotSgxlCWQ==
+X-Received: by 2002:a63:1d60:: with SMTP id d32mr19450608pgm.343.1607384958171;
+        Mon, 07 Dec 2020 15:49:18 -0800 (PST)
+Received: from [192.168.1.134] ([66.219.217.173])
+        by smtp.gmail.com with ESMTPSA id f92sm483771pjk.54.2020.12.07.15.49.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 07 Dec 2020 15:49:17 -0800 (PST)
+Subject: Re: [PATCH v3] blk-mq: skip hybrid polling if iopoll doesn't spin
+To:     Pavel Begunkov <asml.silence@gmail.com>,
+        linux-block@vger.kernel.org
+References: <d5c7dbf6f10efa44271dcb36a178f9566fe76c19.1607263384.git.asml.silence@gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <0d83c5a5-8775-04ed-f225-f1b40c3bdafb@kernel.dk>
+Date:   Mon, 7 Dec 2020 16:49:15 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <01fe46ac-16a5-d4db-f23d-07a03d3935f3@suse.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-CA
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <d5c7dbf6f10efa44271dcb36a178f9566fe76c19.1607263384.git.asml.silence@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-12-07 9:56 a.m., Hannes Reinecke wrote:
-> On 12/7/20 3:11 PM, Christoph Hellwig wrote:
->> So, I'm really worried about:
->>
->>   a) a good use case.  GC in f2fs or btrfs seem like good use cases, as
->>      does accelating dm-kcopyd.  I agree with Damien that lifting dm-kcopyd
->>      to common code would also be really nice.  I'm not 100% sure it should
->>      be a requirement, but it sure would be nice to have
->>      I don't think just adding an ioctl is enough of a use case for complex
->>      kernel infrastructure.
->>   b) We had a bunch of different attempts at SCSI XCOPY support form IIRC
->>      Martin, Bart and Mikulas.  I think we need to pull them into this
->>      discussion, and make sure whatever we do covers the SCSI needs.
->>
-> And we shouldn't forget that the main issue which killed all previous 
-> implementations was a missing QoS guarantee.
-> It's nice to have simply copy, but if the implementation is _slower_ than doing 
-> it by hand from the OS there is very little point in even attempting to do so.
-> I can't see any provisions for that in the TPAR, leading me to the assumption 
-> that NVMe simple copy will suffer from the same issue.
-> 
-> So if we can't address this I guess this attempt will fail, too.
+On 12/6/20 7:04 AM, Pavel Begunkov wrote:
+> If blk_poll() is not going to spin (i.e. @spin=false), it also must not
+> sleep in hybrid polling, otherwise it might be pretty suprising for
+> users trying to do a quick check and expecting no-wait behaviour.
 
-I have been doing quite a lot of work and testing in my sg driver rewrite
-in the copy and compare area. The baselines for performance are dd and
-io_uring-cp (in liburing). There are lots of ways to improve on them. Here
-are some:
-    - the user data need never pass through the user space (could
-      mmap it out during the READ if there is a good reason). Only the
-      metadata (e.g. NVMe or SCSI commands) needs to come from the user
-      space and errors, if any, reported back to the user space.
-    - break a large copy (or compare) into segments, with each segment
-      a "comfortable" size for the OS to handle, say 256 KB
-    - there is one constraint: the READ in each segment must complete
-      before its paired WRITE can commence
-      - extra constraint for some zoned disks: WRITEs must be
-        issued in order (assuming they are applied in that order, if
-        not, need to wait until each WRITE completes)
-    - arrange for READ WRITE pair in each segment to share the same bio
-    - have multiple slots each holding a segment (i.e. a bio and
-      metadata to process a READ-WRITE pair)
-    - re-use each slot's bio for the following READ-WRITE pair
-    - issue the READs in each slot asynchronously and do an interleaved
-      (io)poll for completion. Then issue the paired WRITE
-      asynchronously
-    - the above "slot" algorithm runs in one thread, so there can be
-      multiple threads doing the same algorithm. Segment manager needs
-      to be locked (or use an atomics) so that each segment (identified
-      by its starting LBAs) is issued once and only once when the
-      next thread wants a segment to copy
+Applied, thanks.
 
-Running multiple threads gives diminishing or even worsening returns.
-Runtime metrics on lock contention and storage bus capacity may help
-choosing the number of threads. A simpler approach might be add more
-threads until the combined throughput increase is less than 10% say.
+-- 
+Jens Axboe
 
-
-The 'compare' that I mention is based on the SCSI VERIFY(BYTCHK=1) command
-(or NVMe NVM Compare command). Using dd logic, a disk to disk compare can
-be implemented with not much more work than changing the WRITE to a VERIFY
-command. This is a different approach to the Linux cmp utility which
-READs in both sides and does a memcmp() type operation. Using ramdisks
-(from the scsi_debug driver) the compare operation (max ~ 10 GB/s) was
-actually faster than the copy (max ~ 7 GB/s). I put this down to WRITE
-operations taking a write lock over the store while the VERIFY only
-needs a read lock so many VERIFY operations can co-exist on the same
-store. Unfortunately on real SAS and NVMe SSDs that I tested the
-performance of the VERIFY and NVM Compare commands is underwhelming.
-For comparison, using scsi_debug ramdisks, dd copy throughput was
-< 1 GB/s and io_uring-cp was around 2-3 GB/s. The system was Ryzen
-3600 based.
-
-Doug Gilbert
