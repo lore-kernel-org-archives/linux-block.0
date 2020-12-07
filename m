@@ -2,118 +2,241 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78B81C4361B
-	for <linux-block@archiver.kernel.org>; Mon,  7 Dec 2020 18:39:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 254EAC4361B
+	for <linux-block@archiver.kernel.org>; Mon,  7 Dec 2020 18:58:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4200C238D6
-	for <linux-block@archiver.kernel.org>; Mon,  7 Dec 2020 18:39:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B705B238D7
+	for <linux-block@archiver.kernel.org>; Mon,  7 Dec 2020 18:58:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725852AbgLGSi6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Dec 2020 13:38:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50744 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725822AbgLGSi6 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Dec 2020 13:38:58 -0500
-Received: from mail-io1-xd43.google.com (mail-io1-xd43.google.com [IPv6:2607:f8b0:4864:20::d43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0616AC061749
-        for <linux-block@vger.kernel.org>; Mon,  7 Dec 2020 10:38:18 -0800 (PST)
-Received: by mail-io1-xd43.google.com with SMTP id t8so14353697iov.8
-        for <linux-block@vger.kernel.org>; Mon, 07 Dec 2020 10:38:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=Ap2qxN6BOul2pmYmDW8E/QTAvkM/sjmNOpbAx5lPosQ=;
-        b=BExsAT9ruZE3CdNfziLeexgNze4CyxBizTUORsz4vOFpKRIx2hkljXvrF/6kNPduhW
-         2aEsvC1meMIU5XPzCjU9koH+Nf4zq2kifMRRV5r2Ud+m37WzlYNmjAphK2YXE/nzyfvB
-         5jn2e2zX6oUT0tISBid+70N7qoD3+DU7ADnMbduKo/UjRv3rJKy9JN7v/DgFeamrgs6Y
-         7muypf05dyju2z+pYX9SAR0cH1pxhUIF2/cvNivhrcRasDFtbo9NaPbAhUVQcdwDM6gx
-         rO74X45oKmIVequnhJDHOzS+ejjJTiveXwb+FmjfgGFNPC5FiWSRJgiIM2aHgDulX6G1
-         vtaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Ap2qxN6BOul2pmYmDW8E/QTAvkM/sjmNOpbAx5lPosQ=;
-        b=sOCTvtuZFBH8wpKGjhcyWa0eYZWJEavJxKmkrljCd4wQegel3ck/DmdJ9j3wDlxxpN
-         sRAUH+s9K6Ay9tSJ96HDE8cK3kLlE1BF8Bow+m81l2+g7ff7yfUFMY9RZpeemdSeyrJH
-         IVpsgCUd+QxJL7AJ+r3DAvHpaJEJ3ycPdWNmqBL5lu6ZtHyqydngfuFobKqJhBD0Kb79
-         wv+aT0AI9jr3xlt/knFIVsituezrRhrJ+8B4lvUnye3FXAzNtqm4DUsnXmsVG/8KTuAU
-         cq/BRPi5UaZI/WWAAQ4RPTkasZwCFF+Frhabf3BMBLF7kZgMfmoyO31NJXTkk1ij98xK
-         VUUg==
-X-Gm-Message-State: AOAM533q40w6VfPd2Ansk1DCHz6c0sUZZcnfa5RehqJv3g3dB6nYt48N
-        t0l4R9z3LKNla4FXBzFo25Q5TA==
-X-Google-Smtp-Source: ABdhPJwpvN2ezgTd+AVie4cdurNQGQgQcUTEb+sA/4B0cMp15ME5nbdlPfJHYpui3vrT9Mdc6t7nZQ==
-X-Received: by 2002:a5d:84c4:: with SMTP id z4mr20942487ior.26.1607366297332;
-        Mon, 07 Dec 2020 10:38:17 -0800 (PST)
-Received: from [192.168.1.30] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id z18sm7821377ilb.26.2020.12.07.10.38.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 07 Dec 2020 10:38:16 -0800 (PST)
-Subject: Re: [PATCH] drivers: block: save return value of
- pci_find_capability() in u8
-To:     Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-Cc:     Puranjay Mohan <puranjay12@gmail.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "bjorn@helgaas.com" <bjorn@helgaas.com>,
-        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>
-References: <20201207012600.GA2238381@bjorn-Precision-5520>
- <CH2PR04MB65228D22105F039C046096A6E7CE0@CH2PR04MB6522.namprd04.prod.outlook.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <7fa99c5f-6f0b-4cd6-7af2-db5877b1857a@kernel.dk>
-Date:   Mon, 7 Dec 2020 11:38:16 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <CH2PR04MB65228D22105F039C046096A6E7CE0@CH2PR04MB6522.namprd04.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+        id S1726278AbgLGS6G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Dec 2020 13:58:06 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20557 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725972AbgLGS6G (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 7 Dec 2020 13:58:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1607367399;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=b8sZ7kDwGGIN+Kypu8hW1xHLpa/L+swfS8k/pXhtOf4=;
+        b=Nu3NfgREytJ4mE4lxjpXVosglpi5VrzVam3nBr48TmaU8xJn0F4mEwhtVHtrUwRYdM1vms
+        SCGpccwZaTtI8bb9Z8a8KFr024RxNkFpfdb+al6r6/8VFcyetlnY6eD89mb53b910o8xmf
+        NUegthdQ9xFRqAXOpakD1Nbi+mzSLnY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-123-POBl93a7OTqc9Z1aOoBjYw-1; Mon, 07 Dec 2020 13:56:34 -0500
+X-MC-Unique: POBl93a7OTqc9Z1aOoBjYw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D66A7107ACE4;
+        Mon,  7 Dec 2020 18:56:31 +0000 (UTC)
+Received: from ovpn-66-220.rdu2.redhat.com (ovpn-66-220.rdu2.redhat.com [10.10.66.220])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2FBD65D6AB;
+        Mon,  7 Dec 2020 18:56:27 +0000 (UTC)
+Message-ID: <920899710c9e8dcce16e561c6d832e4e9c03cd73.camel@redhat.com>
+Subject: Re: store a pointer to the block_device in struct bio (again)
+From:   Qian Cai <qcai@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc:     Tejun Heo <tj@kernel.org>, Coly Li <colyli@suse.de>,
+        Song Liu <song@kernel.org>, dm-devel@redhat.com,
+        linux-bcache@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-block@vger.kernel.org,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Date:   Mon, 07 Dec 2020 13:56:26 -0500
+In-Reply-To: <20201201165424.2030647-1-hch@lst.de>
+References: <20201201165424.2030647-1-hch@lst.de>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/6/20 6:30 PM, Damien Le Moal wrote:
-> On 2020/12/07 10:26, Bjorn Helgaas wrote:
->> On Sun, Dec 06, 2020 at 11:08:14PM +0000, Chaitanya Kulkarni wrote:
->>> On 12/6/20 11:45, Puranjay Mohan wrote:
->>>> Callers of pci_find_capability should save the return value in u8.
->>>> change type of variables from int to u8 to match the specification.
->>>
->>> I did not understand this, pci_find_capability() does not return u8. 
->>>
->>> what is it that we are achieving by changing the variable type ?
->>>
->>> This patch will probably also generate type mismatch warning with
->>>
->>> certain static analyzers.
->>
->> There's a patch pending via the PCI tree to change the return type to
->> u8.  We can do one of:
->>
->>   - Ignore this.  It only changes something on the stack, so no real
->>     space saving and there's no problem assigning the u8 return value
->>     to the "int".
->>
->>   - The maintainer could ack it and I could merge it via the PCI tree
->>     so it happens in the correct order (after the interface change).
+On Tue, 2020-12-01 at 17:54 +0100, Christoph Hellwig wrote:
+> Hi Jens,
 > 
-> That works for me. But this driver changes generally go through Jens block tree.
+> this series switches back from storing the gendisk + partno to storing
+> a block_device pointer in struct bio.  The reason is two fold:  for one
+> the new struct block_device actually is always available, removing the
+> need to avoid originally.  Second the merge struct block_device is much
+> more useful than the old one, as storing it avoids the need for looking
+> up what used to be hd_struct during partition remapping and I/O
+> accounting.
 > 
-> Jens,
-> 
-> Is this OK with you if Bjorn takes the patch through the PCI tree ?
+> Note that this series depends on the posted but not merged
+> "block tracepoint cleanups" series.
 
-Yep that's fine, if that makes it easier to handle.
+Reverting this patchset on the top of today's linux-next fixed data corruptions
+everywhere, i.e.,
 
--- 
-Jens Axboe
+$ git revert --no-edit a54895fa057c..4498a8536c81
+(with a trivial conflict resolution with the commit "block: move
+blk_rq_bio_prep() to linux/blk-mq.h")
+
+.config (if ever matters and also happened on POWER9 NV):
+https://cailca.coding.net/public/linux/mm/git/files/master/x86.config
+
+== XFS failed to mount ==
+[   55.116279][ T1507] XFS (dm-0): Mounting V5 Filesystem
+[   55.144671][ T1507] XFS (dm-0): Corruption warning: Metadata has LSN (3:70242) ahead of current LSN (3:66504). Please unmount and run xfs_repair (>= v4.3) to resolve.
+[   55.159965][ T1507] XFS (dm-0): log mount/recovery failed: error -22
+[   55.288632][ T1507] XFS (dm-0): log mount failed
+
+In this case, it is not possible to mount the XFS rootfs anymore, and it can be
+repaired with "-L". However, we could lost vital files. Then, I have to re-
+install the system.
+
+systemd[1]: System cannot boot: Missing /etc/machine-id and /etc is mounted read-only.
+systemd[1]: Booting up is supported only when:
+systemd[1]: 1) /etc/machine-id exists and is populated.
+systemd[1]: 2) /etc/machine-id exists and is empty.
+systemd[1]: 3) /etc/machine-id is missing and /etc is writable.
+lvm2-activation-generator: lvmconfig failed
+systemd[1]: Failed to populate /etc with preset unit settings, ignoring: No such file or directory
+
+== systemd core dump ==
+[   46.124485][ T1028] Process 1028(systemd-coredum) has RLIMIT_CORE set to 1
+[   46.131434][ T1028] Aborting core
+[   46.143366][ T1027] systemd-cgroups (1027) used greatest stack depth: 23512 bytes left
+[   46.384430][    T1] printk: systemd: 20 output lines suppressed due to ratelimiting
+[   46.447620][    T1] traps: systemd[1] trap invalid opcode ip:7f44c485fee6 sp:7ffee96e6960 error:0 in libm-2.28.so[7f44c481a000+181000]
+[   46.492643][ T1029] traps: systemd-coredum[1029] trap invalid opcode ip:7f2f60471ee6 sp:7ffd58f76e00 error:0 in libm-2.28.so[7f2f6042c000+181000]
+[   46.505968][ T1029] Process 1029(systemd-coredum) has RLIMIT_CORE set to 1
+[   46.512900][ T1029] Aborting core
+[   46.520024][    T1] Kernel panic - not syncing: Attempted to kill init! exitcode=0x00000084
+[   46.528437][    T1] CPU: 32 PID: 1 Comm: systemd Not tainted 5.10.0-rc6-next-20201207 #1
+[   46.536581][    T1] Hardware name: HPE ProLiant DL385 Gen10/ProLiant DL385 Gen10, BIOS A40 07/10/2019
+[   46.545860][    T1] Call Trace:
+[   46.549038][    T1]  dump_stack+0x99/0xcb
+[   46.553082][    T1]  panic+0x20c/0x48b
+[   46.556860][    T1]  ? print_oops_end_marker.cold.10+0x10/0x10
+[   46.562739][    T1]  ? do_signal_stop+0x690/0x690
+[   46.567478][    T1]  ? do_exit+0x226/0x2410
+[   46.571690][    T1]  do_exit.cold.38+0x1de/0x1e5
+[   46.576346][    T1]  ? rcu_read_lock_sched_held+0xa1/0xd0
+[   46.581782][    T1]  ? rcu_read_lock_bh_held+0xb0/0xb0
+[   46.586955][    T1]  ? mm_update_next_owner+0x750/0x750
+[   46.592215][    T1]  ? get_signal+0x80f/0x1f90
+[   46.596688][    T1]  do_group_exit+0xf0/0x2e0
+[   46.601076][    T1]  get_signal+0x35a/0x1f90
+[   46.605380][    T1]  ? finish_task_switch+0x1bb/0xa80
+[   46.610468][    T1]  arch_do_signal_or_restart+0x1d8/0x690
+[   46.615993][    T1]  ? __setup_rt_frame.isra.15+0x1830/0x1830
+[   46.621781][    T1]  ? __sched_text_start+0x8/0x8
+[   46.626521][    T1]  ? asm_exc_invalid_op+0xa/0x20
+[   46.631347][    T1]  exit_to_user_mode_prepare+0xde/0x170
+[   46.636782][    T1]  irqentry_exit_to_user_mode+0x5/0x30
+[   46.642129][    T1]  asm_exc_invalid_op+0x12/0x20
+[   46.646868][    T1] RIP: 0033:0x7f44c485fee6
+[   46.651171][    T1] Code: 6d 6e 6f 70 71 72 73 74 75 76 77 78 79 7a 0a 00 41 42 43 44 45 46 47 48 49 4a 4b 4c 4d 4e 4f 50 51 52 53 54 55 56 57 58 59 5a <61> 62 63 64 65 66 67 68 6a 69 6b 6c 6d 6e 6f 70 71 72 73 74 75 76
+[   46.670757][    T1] RSP: 002b:00007ffee96e6960 EFLAGS: 00010202
+[   46.676719][    T1] RAX: 00007f44c481c780 RBX: 00007f44c4825e78 RCX: 0000000000000000
+[   46.684600][    T1] RDX: 00007ffee96e6a90 RSI: 0000000000000000 RDI: 00007f44c481c780
+[   46.692480][    T1] RBP: 00007ffee96e6a90 R08: 00007f44c85d88a8 R09: 00007f44c85d88a8
+[   46.700360][    T1] R10: 00007f44ca38e4f0 R11: 00007f44c481a000 R12: 00007f44c481c780
+[   46.708241][    T1] R13: 00007f44c4826088 R14: 00007f44c4b9b128 R15: 00007f44ca38e4f0
+[   46.716523][    T1] Kernel Offset: 0x11000000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
+[   46.728244][    T1] ---[ end Kernel panic - not syncing: Attempted to kill init! exitcode=0x00000084 ]---
+
+== git coredump == 
+# coredumpctl dump
+           PID: 1906 (git)
+           UID: 0 (root)
+           GID: 0 (root)
+        Signal: 11 (SEGV)
+     Timestamp: Mon 2020-12-07 10:10:36 EST (34s ago)
+       Boot ID: 5dd9e21b02e4487f96d2ffeed3140f22
+    Machine ID: 00f60cae470d4f54a377e935638619c5
+       Storage: /var/lib/systemd/coredump/core.git.0.5dd9e21b02e4487f96d2ffeed3140f22.1906.1607353836000000.lz4
+       Message: Process 1906 (git) of user 0 dumped core.
+                
+                Stack trace of thread 1906:
+                #0  0x00007fff845af9dc _dl_relocate_object (/usr/lib64/ld-2.28.so)
+                #1  0x00007fff845a6664 dl_main (/usr/lib64/ld-2.28.so)
+                #2  0x00007fff845c0448 _dl_sysdep_start (/usr/lib64/ld-2.28.so)
+                #3  0x00007fff845a1cbc _dl_start_final (/usr/lib64/ld-2.28.so)
+                #4  0x00007fff845a2dbc _dl_start (/usr/lib64/ld-2.28.so)
+                #5  0x00007fff845a1458 _start (/usr/lib64/ld-2.28.so)
+
+> 
+> A git tree is also available:
+> 
+>     git://git.infradead.org/users/hch/block.git bi_bdev
+> 
+> Gitweb:
+> 
+>     http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/bi_bdev
+> 
+> Diffstat:
+>  arch/m68k/emu/nfblock.c             |    2 
+>  arch/xtensa/platforms/iss/simdisk.c |    2 
+>  block/bio-integrity.c               |   18 +-
+>  block/bio.c                         |   31 +---
+>  block/blk-cgroup.c                  |    7 
+>  block/blk-core.c                    |   99 ++++++-------
+>  block/blk-crypto-fallback.c         |    2 
+>  block/blk-crypto.c                  |    2 
+>  block/blk-merge.c                   |   17 +-
+>  block/blk-mq.c                      |    2 
+>  block/blk-settings.c                |    2 
+>  block/blk-throttle.c                |    2 
+>  block/blk.h                         |    9 -
+>  block/bounce.c                      |    2 
+>  block/genhd.c                       |  261 +++-------------------------------
+> --
+>  block/partitions/core.c             |   31 ----
+>  drivers/block/brd.c                 |    8 -
+>  drivers/block/drbd/drbd_int.h       |    4 
+>  drivers/block/drbd/drbd_req.c       |    2 
+>  drivers/block/null_blk_main.c       |    2 
+>  drivers/block/pktcdvd.c             |    4 
+>  drivers/block/ps3vram.c             |    2 
+>  drivers/block/rsxx/dev.c            |    2 
+>  drivers/block/umem.c                |    2 
+>  drivers/block/zram/zram_drv.c       |    2 
+>  drivers/lightnvm/pblk-init.c        |    2 
+>  drivers/md/bcache/debug.c           |    2 
+>  drivers/md/bcache/request.c         |   39 +++--
+>  drivers/md/dm-bio-record.h          |    9 -
+>  drivers/md/dm-raid1.c               |   10 -
+>  drivers/md/dm.c                     |   14 -
+>  drivers/md/md-linear.c              |    2 
+>  drivers/md/md.c                     |   10 -
+>  drivers/md/md.h                     |    6 
+>  drivers/md/raid1.c                  |    6 
+>  drivers/md/raid10.c                 |   12 -
+>  drivers/md/raid5.c                  |    2 
+>  drivers/nvdimm/blk.c                |    4 
+>  drivers/nvdimm/btt.c                |    4 
+>  drivers/nvdimm/pmem.c               |    4 
+>  drivers/nvme/host/core.c            |    6 
+>  drivers/nvme/host/lightnvm.c        |    3 
+>  drivers/nvme/host/multipath.c       |    6 
+>  drivers/nvme/host/rdma.c            |    2 
+>  drivers/s390/block/dasd.c           |   26 ---
+>  drivers/s390/block/dcssblk.c        |    6 
+>  drivers/s390/block/xpram.c          |    2 
+>  fs/btrfs/check-integrity.c          |   10 -
+>  fs/btrfs/raid56.c                   |    7 
+>  fs/btrfs/scrub.c                    |    2 
+>  fs/direct-io.c                      |    2 
+>  fs/f2fs/data.c                      |   12 -
+>  include/linux/bio.h                 |   18 +-
+>  include/linux/blk_types.h           |    3 
+>  include/linux/blkdev.h              |   20 --
+>  include/linux/genhd.h               |   21 --
+>  kernel/trace/blktrace.c             |   16 +-
+>  mm/page_io.c                        |    2 
+>  58 files changed, 251 insertions(+), 556 deletions(-)
 
