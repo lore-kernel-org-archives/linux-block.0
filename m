@@ -2,105 +2,114 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA0E4C4361B
-	for <linux-block@archiver.kernel.org>; Mon,  7 Dec 2020 18:36:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A425C4361B
+	for <linux-block@archiver.kernel.org>; Mon,  7 Dec 2020 18:36:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 81491238A1
-	for <linux-block@archiver.kernel.org>; Mon,  7 Dec 2020 18:36:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2C7C123888
+	for <linux-block@archiver.kernel.org>; Mon,  7 Dec 2020 18:36:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726146AbgLGSgV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Dec 2020 13:36:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50346 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725917AbgLGSgV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Dec 2020 13:36:21 -0500
-Received: from mail-lf1-x143.google.com (mail-lf1-x143.google.com [IPv6:2a00:1450:4864:20::143])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27E1CC061793;
-        Mon,  7 Dec 2020 10:35:41 -0800 (PST)
-Received: by mail-lf1-x143.google.com with SMTP id d20so19472828lfe.11;
-        Mon, 07 Dec 2020 10:35:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=a+c8FgbFyhnZsbAIXp1x4Yhx9aZ6GksQZTjiRKY8hhg=;
-        b=Sbuv4FoX7hxrJeb1zerPm4TAP5KQ9wxRwwpG2ojtxqUjxaKXyx7F85InIPd8Ax9RRR
-         q66cZVz6vvX5jEyyDgKhWT+9xSsipobOXWuRI1u7VR+Rr+8ALsei8R1zhWfhfMoLpMNT
-         q1+u6Vc5XVA5V4fx5sPdpDrnYfotur42Z7W4UaoQZnATNc5X5Pe50kLfE4zGRgYvxlbA
-         rCxRdpH3fsz4IG3A+G35Wou3D1pyUEEWamS1vrAo8iPJ/BhkpITdXym2QxgyvKD4kWeB
-         8EBclvpOtLFdcVeO5Yv1ZZ34avacoI6pj7z+AOpzA/RdDMgt8zCJ8GfdNFkZ3DIzD/ov
-         YJHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=a+c8FgbFyhnZsbAIXp1x4Yhx9aZ6GksQZTjiRKY8hhg=;
-        b=ikn24ie1VT18Dk37JqCK7wD0cdqgL1dnlaXwj07xKMaiCXBAQEwPV7q+SSg+np3BOC
-         e3HDkPHIhU0zx0D0BZunv2BVp5ihMg7ZFAbJVB95vI4RtCIpewB7aaMlFGc3kCIqK4c4
-         MkQ/XYWlnyFguhlmjiFR8Ba7SRH0pekcboXq5+oVO3yFtFbptJVJ9TYJjKEfvxsp3Pvm
-         eeXDP/+D3UqJ2uiH5KuhWJzAk9SmO+5XijCMyNQ1C/OwJCRcLS/RfwXjro0avmlDDmdf
-         wRVA7z9+KpoqxZYI9H76iyFx6NqdN08lPSGT7sM+YNMx953Gw1K6uvoQJGrUVpdzTYMk
-         57rw==
-X-Gm-Message-State: AOAM531EtLM1tYldcgO6yZ0urXUiE/azCxfsCOJKs+xVb20kXHMyh3bi
-        szUyzGLd/INRbRXy9eK6huowCw35QSpryhWkCsY=
-X-Google-Smtp-Source: ABdhPJyCSWf3gpN+FzIkbhfGZ+ZsEz1U1cUcioqBsQlgg4elSKCwiAC5NggOej7Gam67jbmS/dcFO8K50n/bpOBdPJM=
-X-Received: by 2002:ac2:4831:: with SMTP id 17mr9198595lft.487.1607366139539;
- Mon, 07 Dec 2020 10:35:39 -0800 (PST)
+        id S1726162AbgLGSgY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Dec 2020 13:36:24 -0500
+Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:52085 "EHLO
+        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725917AbgLGSgY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Dec 2020 13:36:24 -0500
+Received: from callcc.thunk.org (pool-72-74-133-215.bstnma.fios.verizon.net [72.74.133.215])
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 0B7IZYOF022576
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 7 Dec 2020 13:35:35 -0500
+Received: by callcc.thunk.org (Postfix, from userid 15806)
+        id C7CFA420136; Mon,  7 Dec 2020 13:35:34 -0500 (EST)
+Date:   Mon, 7 Dec 2020 13:35:34 -0500
+From:   "Theodore Y. Ts'o" <tytso@mit.edu>
+To:     Michael Walle <michael@walle.cc>
+Cc:     linux-ext4@vger.kernel.org, linux-mmc@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: Re: discard feature, mkfs.ext4 and mmc default fallback to normal
+ erase op
+Message-ID: <20201207183534.GA52960@mit.edu>
+References: <97c4bb65c8a3e688b191d57e9f06aa5a@walle.cc>
 MIME-Version: 1.0
-References: <20201206194300.14221-1-puranjay12@gmail.com> <20201207145258.GA16899@infradead.org>
- <CANk7y0jqS+Crf4Z3k82DXh2qxn1JO9KAO_CJGrpqH6xAJYU6Qw@mail.gmail.com> <20201207180734.GC3679937@dhcp-10-100-145-180.wdc.com>
-In-Reply-To: <20201207180734.GC3679937@dhcp-10-100-145-180.wdc.com>
-From:   Puranjay Mohan <puranjay12@gmail.com>
-Date:   Tue, 8 Dec 2020 00:05:26 +0530
-Message-ID: <CANk7y0iJ+G1WxBPAGciqOvn0XvD04Ffs9py2nXP+YH2jU6UMYg@mail.gmail.com>
-Subject: Re: [PATCH] drivers: block: save return value of pci_find_capability()
- in u8
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     Christoph Hellwig <hch@infradead.org>, Damien.LeMoal@wdc.com,
-        linux-block@vger.kernel.org, Bjorn Helgaas <bjorn@helgaas.com>,
-        Linux PCI <linux-pci@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <97c4bb65c8a3e688b191d57e9f06aa5a@walle.cc>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Dec 7, 2020 at 11:37 PM Keith Busch <kbusch@kernel.org> wrote:
->
-> On Mon, Dec 07, 2020 at 11:23:03PM +0530, Puranjay Mohan wrote:
-> > On Mon, Dec 7, 2020 at 8:23 PM Christoph Hellwig <hch@infradead.org> wrote:
-> > >
-> > > Can we take a step back?  I think in general drivers should not bother
-> > > with pci_find_capability.  Both mtip32xx and skd want to find out if
-> > > the devices are PCIe devices, skd then just prints the link speed for
-> > > which we have much better helpers, mtip32xx than messes with DEVCTL
-> > > which seems actively dangerous to me.
-> >
-> > The skd driver uses pci_find_capability(skdev->pdev, PCI_CAP_ID_EXP);
-> > to check if the device is PCIe, it can use pci_is_pcie() to do that.
-> > After that it uses pci_read_config_word(skdev->pdev, pcie_reg,
-> > &pcie_lstat); to read the Link Status Register, I think
-> > it should use pcie_capability_read_word(skdev->pdev, PCI_EXP_LNKSTA,
-> > &pcie_lstat);
-> >
-> > Please let me know if the above changes are correct so I may send a patch.
->
-> You just want to print the current link speed, right? Does
-> skdev->pdev->bus->cur_bus_speed provide what you need?
+On Mon, Dec 07, 2020 at 04:10:27PM +0100, Michael Walle wrote:
+> Hi,
+> 
+> The problem I'm having is that I'm trying to install debian on
+> an embedded system onto an sdcard. During installation it will
+> format the target filesystem, but the "mkfs.ext4 -F /dev/mmcblk0p2"
+> takes ages.
+> 
+> What I've found out so far:
+>  - mkfs.ext4 tries to discard all blocks on the target device
+>  - with my target device being an sdcard it seems to fallback
+>    to normal erase [1], with erase_arg being set to what the card
+>    is capable of [2]
+> 
+> Now I'm trying to figure out if this behavior is intended. I guess
+> one can reduce it to "blkdiscard /dev/mmcblk0p2". Should this
+> actually fall back to normal erasing or should it return -EOPNOTSUPP?
 
-After discussing with Bjorn, we concluded that we don't need to print
-the speed as it is already printed by the PCI core for every device.
-PCI core calls __pcie_print_link_status() for every device, and hence
-the skd_pci_info() is redundant and can be removed?
+There are three different MMC commands which are defined:
 
+1) DISCARD
+2) ERASE
+3) SECURE ERASE
 
--- 
-Thanks and Regards
+The first two are expected to be fast, since it only involves clearing
+some metadata fields in the Flash Translation Layer (FTL), so that the
+LBA's in the specified range are no longer mapped to a flash page.
 
-Yours Truly,
+The difference between "discard" and "erase" is that "discard" is a
+hint, so the device is allowed to ignore it whenever it wants (in
+practice, if it's busy doing a GC, or if it's busy writing back blocks
+in its writeback cache).  "Erase" is guaranteed to work, in that after
+an erase, a read from a specified sector MUST return all zeros, but
+that can easily be done by redirecting a point in the FTL metadata.
 
-Puranjay Mohan
+"Secure Erase" is the one which can be slow, since it requires
+physically zeroing all of the flash pages (although if the device is
+self-encrypting, this in theory could also be fast if you're doing a
+secure erase at the granularity of the device's encryption keys, so
+all it needs to do is to regenerate the crypto key).
+
+It sounds like your SD card is implementing the "erase" command in a
+particularly non-optimal way.  If it's common, perhaps we need some
+kind of blacklist for drivers with badly implemented erase commands.
+As a workaround, you can run mke2fs with the command-line option "-E
+discard=0".
+
+Cheers,
+
+					- Ted
+
+P.S.  If your SD card got "erase" wrong, I'd be a little worried about
+what else the FTL implementation may have screwed up.  So you want to
+under simply getting a different SD card --- especially if this is
+something that you plan to distribute as a product to downstream
+customers.  In general, low-end flash needs to be very carefully
+qualified to make sure they are competently implemented if you plan to
+deploy in large quantities.  An example of what happen if this
+qualification process is not done:
+
+https://insideevs.com/news/376037/tesla-mcu-emmc-memory-issue/
+
+Tesla is currently under investigation by the National Highway Traffic
+Safety Administration due to cheaping out on their eMMC flash
+(probably just a few pennies per unit).  Given that customers are
+having to pay $1500 to replace their engine controller out of warranty
+(and the NHTSA is considering whether or not to force Tesla to eat the
+costs, as opposed to forcing their customers to pay $$$), that's an
+example of false economy....
+
