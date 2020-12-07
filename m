@@ -2,79 +2,60 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB6BFC4167B
-	for <linux-block@archiver.kernel.org>; Mon,  7 Dec 2020 16:18:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BB60C433FE
+	for <linux-block@archiver.kernel.org>; Mon,  7 Dec 2020 16:40:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6A16223788
-	for <linux-block@archiver.kernel.org>; Mon,  7 Dec 2020 16:18:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0FA3823787
+	for <linux-block@archiver.kernel.org>; Mon,  7 Dec 2020 16:40:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725917AbgLGQSL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Dec 2020 11:18:11 -0500
-Received: from imap2.colo.codethink.co.uk ([78.40.148.184]:56744 "EHLO
-        imap2.colo.codethink.co.uk" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725863AbgLGQSL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 7 Dec 2020 11:18:11 -0500
-Received: from [167.98.27.226] (helo=[172.16.102.109])
-        by imap2.colo.codethink.co.uk with esmtpsa  (Exim 4.92 #3 (Debian))
-        id 1kmJCa-0002RR-Qd; Mon, 07 Dec 2020 16:17:28 +0000
-Subject: Re: [PATCH] drivers: block: save return value of
- pci_find_capability() in u8
-To:     Bjorn Helgaas <helgaas@kernel.org>,
-        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-Cc:     Puranjay Mohan <puranjay12@gmail.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "bjorn@helgaas.com" <bjorn@helgaas.com>,
-        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>
-References: <20201207012600.GA2238381@bjorn-Precision-5520>
-From:   Ben Dooks <ben.dooks@codethink.co.uk>
-Organization: Codethink Limited.
-Message-ID: <30196321-bdb9-090a-66f1-9fbbb93772b9@codethink.co.uk>
-Date:   Mon, 7 Dec 2020 16:17:28 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.0
+        id S1727209AbgLGQka (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Dec 2020 11:40:30 -0500
+Received: from mx2.suse.de ([195.135.220.15]:55982 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726938AbgLGQka (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 7 Dec 2020 11:40:30 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 15060AD21;
+        Mon,  7 Dec 2020 16:39:49 +0000 (UTC)
+From:   Coly Li <colyli@suse.de>
+To:     axboe@kernel.dk
+Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        Coly Li <colyli@suse.de>
+Subject: [PATCH 0/1] bcache: first wave for Linux v5.11 
+Date:   Tue,  8 Dec 2020 00:39:14 +0800
+Message-Id: <20201207163915.126877-1-colyli@suse.de>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-In-Reply-To: <20201207012600.GA2238381@bjorn-Precision-5520>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 07/12/2020 01:26, Bjorn Helgaas wrote:
-> On Sun, Dec 06, 2020 at 11:08:14PM +0000, Chaitanya Kulkarni wrote:
->> On 12/6/20 11:45, Puranjay Mohan wrote:
->>> Callers of pci_find_capability should save the return value in u8.
->>> change type of variables from int to u8 to match the specification.the com
->>
->> I did not understand this, pci_find_capability() does not return u8.
->>
->> what is it that we are achieving by changing the variable type ?
->>
->> This patch will probably also generate type mismatch warning with
->>
->> certain static analyzers.
-> 
-> There's a patch pending via the PCI tree to change the return type to
-> u8.  We can do one of:
-> 
->    - Ignore this.  It only changes something on the stack, so no real
->      space saving and there's no problem assigning the u8 return value
->      to the "int".
+Hi Jens,
 
-I seem to remember some compilers would emit a sequence to constrain the
-result to a valid char, but that looks like it is fixed in gcc-9 if the
-input was also u8
+The first wave bcache change for Linux v5.11 is quite silent. Most of
+the development is not ready for this merge window. The only change in
+this submission is from Dongsheng Yang, this is his second contribution
+which catches a very implict bug and provides a fix. The patch runs on
+his environment for a while and takes effect.
+
+Please take it for v5.11. Thank you in advance.
+
+Coly Li
+---
+Dongsheng Yang (1):
+  bcache: fix race between setting bdev state to none and new write
+    request direct to backing
+
+ drivers/md/bcache/super.c     | 9 ---------
+ drivers/md/bcache/writeback.c | 9 +++++++++
+ 2 files changed, 9 insertions(+), 9 deletions(-)
 
 -- 
-Ben Dooks				http://www.codethink.co.uk/
-Senior Engineer				Codethink - Providing Genius
+2.26.2
 
-https://www.codethink.co.uk/privacy.html
