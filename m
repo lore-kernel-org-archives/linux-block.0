@@ -2,88 +2,106 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54F9EC433FE
-	for <linux-block@archiver.kernel.org>; Mon,  7 Dec 2020 13:22:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84A72C433FE
+	for <linux-block@archiver.kernel.org>; Mon,  7 Dec 2020 13:22:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2C26A23436
-	for <linux-block@archiver.kernel.org>; Mon,  7 Dec 2020 13:22:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3F88523437
+	for <linux-block@archiver.kernel.org>; Mon,  7 Dec 2020 13:22:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725939AbgLGNVz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Dec 2020 08:21:55 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:35213 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725918AbgLGNVz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 7 Dec 2020 08:21:55 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607347228;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=oUiOfk966dJJcf9pZKvx+8hjWQVZNkI78m5XaAH1pfQ=;
-        b=OdsuD1kyFTl9Uz1LmvIdp2eZ2dhFXxnOGtzyWSfLHiW4tJIty0xAesOcHVlBwGGRItt61K
-        t4YRpT+FSw8y0JTG1FUvUEjEYcGsla766FSjVAlRC0PBFbO71pbv8PlMQitvMGdBydW4Mi
-        PEJacp7dbDrB43cCFgaSVQe8bP0KGNM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-586-BN3x6tUpNwakD-FcVPDnfQ-1; Mon, 07 Dec 2020 08:20:25 -0500
-X-MC-Unique: BN3x6tUpNwakD-FcVPDnfQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E7960858180;
-        Mon,  7 Dec 2020 13:20:22 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-116-67.rdu2.redhat.com [10.10.116.67])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 32B0760CA3;
-        Mon,  7 Dec 2020 13:20:20 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <20201207131037.GA3826@xsang-OptiPlex-9020>
-References: <20201207131037.GA3826@xsang-OptiPlex-9020> <20201203064536.GE27350@xsang-OptiPlex-9020> <98294.1607082708@warthog.procyon.org.uk>
-To:     Oliver Sang <oliver.sang@intel.com>
-Cc:     dhowells@redhat.com, lkp@lists.01.org, lkp@intel.com,
-        ying.huang@intel.com, feng.tang@intel.com, zhengjun.xing@intel.com,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [iov_iter] 9bd0e337c6: will-it-scale.per_process_ops -4.8% regression
+        id S1726142AbgLGNWg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Dec 2020 08:22:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57802 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726122AbgLGNWg (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Dec 2020 08:22:36 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0842EC0613D0;
+        Mon,  7 Dec 2020 05:21:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
+        Content-Type:Content-ID:Content-Description;
+        bh=OntfCadQKLI2tRxbZ3M4pTOTrvttB/wjeTZaAsBX9H4=; b=vfN8UKGhKtdydV7tXdFPsEIL0N
+        ysal2segSXsJtcXZyTMpklS+kBY+SRezaq6DJWi78mXx5x//N+79lIBYDnL9S+zOWVYpfbi98kkJd
+        DPO/QF6+dm8AFvE/WTtXyFw5gnq70S5Dys402MzXnKTWuGnKYn5bq4r7fSj1DD4Lbv/pDqdHHvHkg
+        ugX+0kMlsObYHXDWxBdWoyMOV/YKesR/uOIgcuhIG5BjOOPs/kIw7eOlwROmKlLR8GBkl8RBCljzF
+        kf1alUu7C5pVyAovbOKmK/EJACmpGkdWw1hq1ytmV6lLV8gwEcCM33jp+Hw2zhr40K9xaMOiqlODG
+        K/O6TS0w==;
+Received: from [2001:4bb8:188:f36:4fd9:254f:b3b5:5284] (helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kmGSP-0006PT-3x; Mon, 07 Dec 2020 13:21:37 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Oleksii Kurochko <olkuroch@cisco.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Dongsheng Yang <dongsheng.yang@easystack.cn>,
+        ceph-devel@vger.kernel.org, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        Hannes Reinecke <hare@suse.de>
+Subject: [PATCH 5/6] rbd: remove the ->set_read_only method
+Date:   Mon,  7 Dec 2020 14:19:17 +0100
+Message-Id: <20201207131918.2252553-6-hch@lst.de>
+X-Mailer: git-send-email 2.29.2
+In-Reply-To: <20201207131918.2252553-1-hch@lst.de>
+References: <20201207131918.2252553-1-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <478031.1607347219.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date:   Mon, 07 Dec 2020 13:20:19 +0000
-Message-ID: <478032.1607347219@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Oliver Sang <oliver.sang@intel.com> wrote:
+Now that the hardware read-only state can't be changed by the BLKROSET
+ioctl, the code in this method is not required anymore.
 
-> > Out of interest, would it be possible for you to run this on the tail =
-of the
-> > series on the same hardware?
-> =
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Hannes Reinecke <hare@suse.de>
+---
+ drivers/block/rbd.c | 19 -------------------
+ 1 file changed, 19 deletions(-)
 
-> sorry for late. below is the result adding the tail of the series:
-> * ded69a6991fe0 (linux-review/David-Howells/RFC-iov_iter-Switch-to-using=
--an-ops-table/20201121-222344) iov_iter: Remove iterate_all_kinds() and it=
-erate_and_advance()
-
-Thanks very much for doing that!
-
-David
+diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
+index 2ed79b09439a82..2c64ca15ca079f 100644
+--- a/drivers/block/rbd.c
++++ b/drivers/block/rbd.c
+@@ -692,29 +692,10 @@ static void rbd_release(struct gendisk *disk, fmode_t mode)
+ 	put_device(&rbd_dev->dev);
+ }
+ 
+-static int rbd_set_read_only(struct block_device *bdev, bool ro)
+-{
+-	struct rbd_device *rbd_dev = bdev->bd_disk->private_data;
+-
+-	/*
+-	 * Both images mapped read-only and snapshots can't be marked
+-	 * read-write.
+-	 */
+-	if (!ro) {
+-		if (rbd_is_ro(rbd_dev))
+-			return -EROFS;
+-
+-		rbd_assert(!rbd_is_snap(rbd_dev));
+-	}
+-
+-	return 0;
+-}
+-
+ static const struct block_device_operations rbd_bd_ops = {
+ 	.owner			= THIS_MODULE,
+ 	.open			= rbd_open,
+ 	.release		= rbd_release,
+-	.set_read_only		= rbd_set_read_only,
+ };
+ 
+ /*
+-- 
+2.29.2
 
