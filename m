@@ -2,105 +2,150 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA2A5C433FE
-	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 12:58:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 949CBC4361B
+	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 13:09:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8C40823A3C
-	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 12:58:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 67FDE23AA7
+	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 13:09:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727844AbgLHM5w (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Dec 2020 07:57:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51572 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727132AbgLHM5w (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Dec 2020 07:57:52 -0500
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50DE9C061749
-        for <linux-block@vger.kernel.org>; Tue,  8 Dec 2020 04:57:12 -0800 (PST)
-Date:   Tue, 8 Dec 2020 13:57:09 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1607432230;
+        id S1726104AbgLHNJu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Dec 2020 08:09:50 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27270 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725931AbgLHNJu (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 8 Dec 2020 08:09:50 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1607432903;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=XKwBP8F64HqqEOqVbrdLVgdD7U+GBrY0UADzThR7GiU=;
-        b=wlUtUP/EKOWAo80ezYxAX6M63+C2kksjj26WPE2uHdfhW5V2RYe9sUMxJAuS2yzXfVJQtV
-        KuQHdJ+gbsxxlJVDc7MclRpnJbWUFChbWCbyLzXrtDZl3zJ/QH/cxQ2vlnHOPY1jhBxswv
-        L/nGH/F+LknEKCtv/jGPrdvbavnGAm03PUK79kHWEo0/LGkVjyL2ya1CyqiNHZ7ddbHN4h
-        ON+ppCSSbhq/f4XZn7k7HkPJh/Ue09fHeTdMVg+iNOpxJhiaS40yJ8jJQaPm3vnWqA0cCB
-        1FvWas7ipU/P5OGGMBojLqdfp5SB4KFnCHTFlOD0e+ydGopjN4ei743FhyEtKQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1607432230;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=XKwBP8F64HqqEOqVbrdLVgdD7U+GBrY0UADzThR7GiU=;
-        b=DcD218yrg0J+kU5g3H2poD5jKTmP/c7o+X79JJNxvIpSp/wKRKL3Ty2PjRNmoknX5tRb50
-        BAuE58aBCMY7qLDg==
-From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To:     Daniel Wagner <dwagner@suse.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Mike Galbraith <efault@gmx.de>,
-        Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCH 2/3] blk-mq: Always complete remote completions requests
- in softirq
-Message-ID: <20201208125709.5epgbpmqp56bf243@linutronix.de>
-References: <20201204191356.2516405-1-bigeasy@linutronix.de>
- <20201204191356.2516405-3-bigeasy@linutronix.de>
- <de7f392a-fbac-f7bc-662a-5f40dd4c0aa6@kernel.dk>
- <20201208082220.hhel5ubeh4uqrwnd@linutronix.de>
- <20201208084409.koeftbpnvesp4xtv@beryllium.lan>
- <20201208113653.awqz4zggmy37vbog@beryllium.lan>
- <20201208114936.sfe2jpmbjulcpyjk@linutronix.de>
- <20201208124148.4dxdu6dp5m3mudff@beryllium.lan>
- <20201208125224.m2xt66ladp63fa3t@linutronix.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20201208125224.m2xt66ladp63fa3t@linutronix.de>
+        bh=EHKuHbhmgYJQ9JfRsXEOl5wxu9DokPSdVH97Cc8P2Fw=;
+        b=S8yXwIj5W6FGXLOr8JArvAiiP0J5Yzt69YyyXmdDz7Rp+t3TrKKSS6FaLSGxoM7RGMpjEU
+        s6MEtCu9iOK8MvCfzdEI8+P6hs6v0SXkx3Ztiuhh0CPVCcXnaIJZ7OV5NvhMKr98r2PHAD
+        v44LZTXiMbIQFIpShYiIJsp32Xdnprk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-259-wb2SdLBENymOO0KHhm_coQ-1; Tue, 08 Dec 2020 08:08:17 -0500
+X-MC-Unique: wb2SdLBENymOO0KHhm_coQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 31A4E1934111;
+        Tue,  8 Dec 2020 13:08:15 +0000 (UTC)
+Received: from ovpn-114-102.rdu2.redhat.com (ovpn-114-102.rdu2.redhat.com [10.10.114.102])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 93EC85D6AB;
+        Tue,  8 Dec 2020 13:08:10 +0000 (UTC)
+Message-ID: <35ccbf886b1e02323eff96df480c6d5f1123023e.camel@redhat.com>
+Subject: Re: store a pointer to the block_device in struct bio (again)
+From:   Qian Cai <qcai@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        Coly Li <colyli@suse.de>, Song Liu <song@kernel.org>,
+        dm-devel@redhat.com, linux-bcache@vger.kernel.org,
+        linux-raid@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-block@vger.kernel.org,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Date:   Tue, 08 Dec 2020 08:08:10 -0500
+In-Reply-To: <20201208110403.GA22179@lst.de>
+References: <20201201165424.2030647-1-hch@lst.de>
+         <920899710c9e8dcce16e561c6d832e4e9c03cd73.camel@redhat.com>
+         <20201208110403.GA22179@lst.de>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-12-08 13:52:25 [+0100], To Daniel Wagner wrote:
-> On 2020-12-08 13:41:48 [+0100], Daniel Wagner wrote:
-> > On Tue, Dec 08, 2020 at 12:49:36PM +0100, Sebastian Andrzej Siewior wro=
-te:
-> > > On 2020-12-08 12:36:53 [+0100], Daniel Wagner wrote:
-> > > > Obvious in this configuration there are no remote completions (veri=
-fied
-> > > > it).
-> > >=20
-> > > do you complete on a remote CPU if you limit the queues to one (this =
-is
-> > > untested of course)?
-> >=20
-> > nvme0n1/ completed   11913011 remote    6718563 56.40%
-> >=20
-> > yes, but how is this relevant? I thought Jens complain was about the
-> > additional indirection via the softirq context
-> >=20
-> > -		rq->q->mq_ops->complete(rq);
-> > +	blk_mq_trigger_softirq(rq);
-> >=20
-> > and not the remote completion path. I can benchmark it out but I don't
-> > know if it's really helping in the discussion.
-=E2=80=A6 blurp
+On Tue, 2020-12-08 at 12:04 +0100, Christoph Hellwig wrote:
+> can you send me details of your device mapper setup, e.g. which targets
+> are used, are they used on top of whole device or partitions.  Do you
+> use partitions on top of the dm devices?  Are any other stacking devices
+> involved?
 
-Yes, you are right. Even cross-CPU completion for single-queue was
-already completing in softirq. So the only change is for multiqueue
-devices which you just demonstrated that it does not happen.
-Thank you!
+It is a standard RHEL8 installation using "autopart", so I don't think it uses
+any particular targets. It is just a plain LVM backed by ahci (sda2 and sdb1.
+Some other affected systems use smartpqi/NVM). The kernel has only dm-mirror
+enabled but I don't think it uses it anyway.
 
-Sebastian
+# grep -i _DM_ .config | grep -v ^#
+CONFIG_BLK_DEV_DM_BUILTIN=y
+CONFIG_DM_MIRROR=m
+CONFIG_DM_UEVENT=y
+
+# lvdisplay
+  --- Logical volume ---
+  LV Path                /dev/rhel_ibm-p9wr-10/home
+  LV Name                home
+  VG Name                rhel_ibm-p9wr-10
+  LV UUID                ETS2PI-yedc-7AJ6-NUP2-uAYD-6api-bp9nqv
+  LV Write Access        read/write
+  LV Status              available
+  # open                 1
+  LV Size                <3.57 TiB
+  Current LE             934662
+  Segments               2
+  Allocation             inherit
+  Read ahead sectors     auto
+  - currently set to     8192
+  Block device           254:2
+   
+  --- Logical volume ---
+  LV Path                /dev/rhel_ibm-p9wr-10/root
+  LV Name                root
+  VG Name                rhel_ibm-p9wr-10
+  LV UUID                ozakb8-2DWE-YBI9-4nnc-gwk8-mMuf-s3EPsB
+  LV Write Access        read/write
+  LV Status              available
+  # open                 1
+  LV Size                70.00 GiB
+  Current LE             17920
+  Segments               1
+  Allocation             inherit
+  Read ahead sectors     auto
+  - currently set to     8192
+  Block device           254:0
+
+# pvdisplay 
+  --- Physical volume ---
+  PV Name               /dev/sda2
+  VG Name               rhel_ibm-p9wr-10
+  PV Size               <1.82 TiB / not usable 4.00 MiB
+  Allocatable           yes (but full)
+  PE Size               4.00 MiB
+  Total PE              476675
+  Free PE               0
+  Allocated PE          476675
+  PV UUID               0Tv2Az-vx7S-HLPd-66Ff-tH6H-dte1-tjSZ7i
+   
+  --- Physical volume ---
+  PV Name               /dev/sdb1
+  VG Name               rhel_ibm-p9wr-10
+  PV Size               <1.82 TiB / not usable 4.00 MiB
+  Allocatable           yes (but full)
+  PE Size               4.00 MiB
+  Total PE              476931
+  Free PE               0
+  Allocated PE          476931
+  PV UUID               4LfZJN-NxbJ-39OC-VBKP-jv5P-hciK-BOdiML
+
+# lsblk 
+NAME                        MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+sda                           8:0    1  1.8T  0 disk 
+├─sda1                        8:1    1    1G  0 part /boot
+└─sda2                        8:2    1  1.8T  0 part 
+  ├─rhel_ibm--p9wr--10-root 254:0    0   70G  0 lvm  /
+  └─rhel_ibm--p9wr--10-home 254:2    0  3.6T  0 lvm  /home
+sdb                           8:16   1  1.8T  0 disk 
+└─sdb1                        8:17   1  1.8T  0 part 
+  └─rhel_ibm--p9wr--10-home 254:2    0  3.6T  0 lvm  /home
+
