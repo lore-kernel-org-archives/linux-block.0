@@ -2,131 +2,190 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,BIGNUM_EMAILS,
-	DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D073C433FE
-	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 12:16:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 913A7C4361B
+	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 12:21:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E11F02396F
-	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 12:16:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 552B523A54
+	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 12:21:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728279AbgLHMQY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Dec 2020 07:16:24 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:43348 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728536AbgLHMQY (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Dec 2020 07:16:24 -0500
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0B8C9Jjf166546;
-        Tue, 8 Dec 2020 12:15:40 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : mime-version : content-type; s=corp-2020-01-29;
- bh=7UliRlHRElbCGREYLJ0M2IuFH73D5+kCQPf6Ud1B5zg=;
- b=0NByU4WlYbyNSbz2n+uxdWTUnLzPDXCpvetnmUIfpJQLumjOiesJy+gNCck5tpgMP39O
- ZA7h+KGBNKKuGZ+k6EPjTptIwQ/szpZ9k0aQl1qqSG3eoWOxqLq4Onv0zFD9szaKVOSS
- XTtMxR7q00/FnbqbQn2T0nq/OZwiih6Ez5Xho7c/D2KnCBy3P+EKjCUaoZlgjHSIXyMW
- O5Pvhmg5XjbENLxGHKZQpL8Jp7APTj/p+I5lGAy9O1oHSLhijnCjuYhcBMOtYpEvu54Q
- lB1vrkougtw8ZnfGpHSApr6vME0Waz4WkgjA5u/U0VHVdWYSkIOxaCAyz90McHoL0R56 5Q== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by aserp2120.oracle.com with ESMTP id 35825m2eyp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Tue, 08 Dec 2020 12:15:40 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0B8CAmrM045592;
-        Tue, 8 Dec 2020 12:15:39 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by aserp3030.oracle.com with ESMTP id 358ksnfwuq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 08 Dec 2020 12:15:39 +0000
-Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0B8CFcjS010018;
-        Tue, 8 Dec 2020 12:15:38 GMT
-Received: from mwanda (/102.36.221.92)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 08 Dec 2020 04:15:37 -0800
-Date:   Tue, 8 Dec 2020 15:15:31 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     haris.iqbal@cloud.ionos.com
-Cc:     linux-block@vger.kernel.org
-Subject: [bug report] block/rnbd-clt: Dynamically alloc buffer for pathname &
- blk_symlink_name
-Message-ID: <X89uUXoVbUFMg27k@mwanda>
+        id S1729330AbgLHMV6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Dec 2020 07:21:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46026 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725803AbgLHMV6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Dec 2020 07:21:58 -0500
+Received: from mail-ej1-x642.google.com (mail-ej1-x642.google.com [IPv6:2a00:1450:4864:20::642])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7545C061749
+        for <linux-block@vger.kernel.org>; Tue,  8 Dec 2020 04:21:17 -0800 (PST)
+Received: by mail-ej1-x642.google.com with SMTP id f23so24314818ejk.2
+        for <linux-block@vger.kernel.org>; Tue, 08 Dec 2020 04:21:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=javigon-com.20150623.gappssmtp.com; s=20150623;
+        h=from:date:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=IAI5d5pS3efjsbXLYKh2mpe6utm2q/uw9y9/qssJFDE=;
+        b=SWYPVvs1v5zMXa7VMWQMNpj3ZF+7g4QlHRba+Z1qnK+/erhw4fLhgQBPaqqnnlSoDf
+         S976I6ob+lwEb5r2qXXsTcKvZsOXfm+evYsywKQr6G40vEA30YKzZhXfojwvQdkuJ3YQ
+         Av2hiGFDRCZ3sLe+aXd+MSwMXm6VDhjk3xlBYdRSeN9bzQ+QV3x2JxBxKK2bzEpR6Ou1
+         sNJg7yQohGgqCz62wGe35Kz1eyakKWEWGYWmFC+wBoM9GX/+WnNGAP3L55mqVAsu7yDV
+         fHXMp841PHLXyped1FUxxpLKDzw2rDDwOdIiz/ZrD2LfTvtDb24UwhmCztFOPPNpTmCG
+         NWuQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:date:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=IAI5d5pS3efjsbXLYKh2mpe6utm2q/uw9y9/qssJFDE=;
+        b=dj1035PF2CmPt6SBxNL0qiVmLWXEmmLUSAU98zbFfuyeY0c0JgCoHAhOWzRtPpmb7r
+         5s6tESmnXk1odBwVeD3VSghiw4pdaBKC8zTSnpPCFpr9+8QR9IujLJCbaR6HPbbochmw
+         OPoZ2TV6rhhMSe6mO5AVejUARjmUJCQ4GvaWJ15pDi5gKrNNADyKz479AN12PMJeOIDZ
+         IM6T55zOjIMlN0MR0n4k8J9inD8JJDT1arwgQs46lEr6ingO6BwjB/azo0H04xvCVGR1
+         s4kjGtE6yt/P5auDn11wT2THMtd0+NRfIEWc03hDNegf9EU9Pno/k1A+4SBg7WdbV0uq
+         RKIQ==
+X-Gm-Message-State: AOAM530m+xf8EF0TDM/yvzQi3DwGuNmjLOQ/bodZG6Uwrd3PxSRbSr2B
+        kHaRaFi33bjqrhYJwi4e3JD/vSdu7dV8oObKk11vkw==
+X-Google-Smtp-Source: ABdhPJxhL6i6yFmZQunp7bazoVScU9q+jr5k0Xgzao5BDSe6y/H+nh7mEFR+wnSA5Kolq55NeVPyBQ==
+X-Received: by 2002:a17:906:718b:: with SMTP id h11mr6669589ejk.241.1607430076628;
+        Tue, 08 Dec 2020 04:21:16 -0800 (PST)
+Received: from localhost (5.186.124.214.cgn.fibianet.dk. [5.186.124.214])
+        by smtp.gmail.com with ESMTPSA id e3sm15781214ejq.96.2020.12.08.04.21.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Dec 2020 04:21:15 -0800 (PST)
+From:   "Javier =?utf-8?B?R29uesOhbGV6?=" <javier@javigon.com>
+X-Google-Original-From: Javier =?utf-8?B?R29uesOhbGV6?= <javier.gonz@samsung.com>
+Date:   Tue, 8 Dec 2020 13:21:15 +0100
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     dgilbert@interlog.com, Christoph Hellwig <hch@lst.de>,
+        SelvaKumar S <selvakuma.s1@samsung.com>,
+        linux-nvme@lists.infradead.org, kbusch@kernel.org, axboe@kernel.dk,
+        damien.lemoal@wdc.com, sagi@grimberg.me,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        dm-devel@redhat.com, snitzer@redhat.com, selvajove@gmail.com,
+        nj.shetty@samsung.com, joshi.k@samsung.com,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Mikulas Patocka <mpatocka@redhat.com>,
+        linux-scsi@vger.kernel.org
+Subject: Re: [RFC PATCH v2 0/2] add simple copy support
+Message-ID: <20201208122115.jy7s3w2wr3ysxvkk@mpHalley>
+References: <CGME20201204094719epcas5p23b3c41223897de3840f92ae3c229cda5@epcas5p2.samsung.com>
+ <20201204094659.12732-1-selvakuma.s1@samsung.com>
+ <20201207141123.GC31159@lst.de>
+ <01fe46ac-16a5-d4db-f23d-07a03d3935f3@suse.de>
+ <194d7813-8c8c-85c8-e0c8-94aaab7c291e@interlog.com>
+ <9b2f5ab2-3358-fcce-678f-982ef79c9252@suse.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Disposition: inline
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9828 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=877 suspectscore=3
- bulkscore=0 malwarescore=0 phishscore=0 mlxscore=0 spamscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2012080078
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9828 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=3 adultscore=0 bulkscore=0
- phishscore=0 mlxlogscore=868 clxscore=1011 priorityscore=1501 mlxscore=0
- spamscore=0 lowpriorityscore=0 malwarescore=0 impostorscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2012080078
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <9b2f5ab2-3358-fcce-678f-982ef79c9252@suse.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello Md Haris Iqbal,
+On 08.12.2020 07:44, Hannes Reinecke wrote:
+>On 12/7/20 11:12 PM, Douglas Gilbert wrote:
+>>On 2020-12-07 9:56 a.m., Hannes Reinecke wrote:
+>>>On 12/7/20 3:11 PM, Christoph Hellwig wrote:
+>>>>So, I'm really worried about:
+>>>>
+>>>>  a) a good use case.  GC in f2fs or btrfs seem like good use cases, as
+>>>>     does accelating dm-kcopyd.  I agree with Damien that 
+>>>>lifting dm-kcopyd
+>>>>     to common code would also be really nice.  I'm not 100% 
+>>>>sure it should
+>>>>     be a requirement, but it sure would be nice to have
+>>>>     I don't think just adding an ioctl is enough of a use case 
+>>>>for complex
+>>>>     kernel infrastructure.
+>>>>  b) We had a bunch of different attempts at SCSI XCOPY support 
+>>>>form IIRC
+>>>>     Martin, Bart and Mikulas.  I think we need to pull them into this
+>>>>     discussion, and make sure whatever we do covers the SCSI needs.
+>>>>
+>>>And we shouldn't forget that the main issue which killed all 
+>>>previous implementations was a missing QoS guarantee.
+>>>It's nice to have simply copy, but if the implementation is 
+>>>_slower_ than doing it by hand from the OS there is very little 
+>>>point in even attempting to do so.
+>>>I can't see any provisions for that in the TPAR, leading me to the 
+>>>assumption that NVMe simple copy will suffer from the same issue.
+>>>
+>>>So if we can't address this I guess this attempt will fail, too.
+>>
+>>I have been doing quite a lot of work and testing in my sg driver rewrite
+>>in the copy and compare area. The baselines for performance are dd and
+>>io_uring-cp (in liburing). There are lots of ways to improve on them. Here
+>>are some:
+>>    - the user data need never pass through the user space (could
+>>      mmap it out during the READ if there is a good reason). Only the
+>>      metadata (e.g. NVMe or SCSI commands) needs to come from the user
+>>      space and errors, if any, reported back to the user space.
+>>    - break a large copy (or compare) into segments, with each segment
+>>      a "comfortable" size for the OS to handle, say 256 KB
+>>    - there is one constraint: the READ in each segment must complete
+>>      before its paired WRITE can commence
+>>      - extra constraint for some zoned disks: WRITEs must be
+>>        issued in order (assuming they are applied in that order, if
+>>        not, need to wait until each WRITE completes)
+>>    - arrange for READ WRITE pair in each segment to share the same bio
+>>    - have multiple slots each holding a segment (i.e. a bio and
+>>      metadata to process a READ-WRITE pair)
+>>    - re-use each slot's bio for the following READ-WRITE pair
+>>    - issue the READs in each slot asynchronously and do an interleaved
+>>      (io)poll for completion. Then issue the paired WRITE
+>>      asynchronously
+>>    - the above "slot" algorithm runs in one thread, so there can be
+>>      multiple threads doing the same algorithm. Segment manager needs
+>>      to be locked (or use an atomics) so that each segment (identified
+>>      by its starting LBAs) is issued once and only once when the
+>>      next thread wants a segment to copy
+>>
+>>Running multiple threads gives diminishing or even worsening returns.
+>>Runtime metrics on lock contention and storage bus capacity may help
+>>choosing the number of threads. A simpler approach might be add more
+>>threads until the combined throughput increase is less than 10% say.
+>>
+>>
+>>The 'compare' that I mention is based on the SCSI VERIFY(BYTCHK=1) command
+>>(or NVMe NVM Compare command). Using dd logic, a disk to disk compare can
+>>be implemented with not much more work than changing the WRITE to a VERIFY
+>>command. This is a different approach to the Linux cmp utility which
+>>READs in both sides and does a memcmp() type operation. Using ramdisks
+>>(from the scsi_debug driver) the compare operation (max ~ 10 GB/s) was
+>>actually faster than the copy (max ~ 7 GB/s). I put this down to WRITE
+>>operations taking a write lock over the store while the VERIFY only
+>>needs a read lock so many VERIFY operations can co-exist on the same
+>>store. Unfortunately on real SAS and NVMe SSDs that I tested the
+>>performance of the VERIFY and NVM Compare commands is underwhelming.
+>>For comparison, using scsi_debug ramdisks, dd copy throughput was
+>>< 1 GB/s and io_uring-cp was around 2-3 GB/s. The system was Ryzen
+>>3600 based.
+>>
+>Which is precisely my concern.
+>Simple copy might be efficient for one particular implementation, but 
+>it might be completely off the board for others.
+>But both will be claiming to support it, and us having no idea whether 
+>choosing simple copy will speed up matters or not.
+>Without having a programmatic way to figure out the speed of the 
+>implementation we have to detect the performance ourselves, like the 
+>benchmarking loop RAID5 does.
+>I was hoping to avoid that, and just ask the device/controller; but 
+>that turned out to be in vain.
 
-This is a semi-automatic email about new static checker warnings.
+I believe it makes sense to do extensive characterization to understand
+how the host and device implementation behave. However, I do not believe
+we will get far if the requirement is that any acceleration has to
+outperform the legacy path under all circumstances and implementations.
 
-The patch 64e8a6ece1a5: "block/rnbd-clt: Dynamically alloc buffer for
-pathname & blk_symlink_name" from Nov 26, 2020, leads to the
-following Smatch complaint:
+At this moment in time, this is a feature very much targeted to
+eliminating the extra read/write traffic generated by ZNS host GC.
 
-    drivers/block/rnbd/rnbd-clt-sysfs.c:525 rnbd_clt_add_dev_symlink()
-    error: uninitialized symbol 'ret'.
-
-    drivers/block/rnbd/rnbd-clt-sysfs.c:524 rnbd_clt_add_dev_symlink()
-    error: we previously assumed 'dev->blk_symlink_name' could be null (see line 500)
-
-drivers/block/rnbd/rnbd-clt-sysfs.c
-   493  static int rnbd_clt_add_dev_symlink(struct rnbd_clt_dev *dev)
-   494  {
-   495          struct kobject *gd_kobj = &disk_to_dev(dev->gd)->kobj;
-   496          int ret, len;
-   497  
-   498          len = strlen(dev->pathname) + strlen(dev->sess->sessname) + 2;
-   499		dev->blk_symlink_name = kzalloc(len, GFP_KERNEL);
-   500		if (!dev->blk_symlink_name) {
-   501			rnbd_clt_err(dev, "Failed to allocate memory for blk_symlink_name\n");
-   502			goto out_err;
-
-ret = -ENOMEM; here
-
-   503		}
-   504	
-   505		ret = rnbd_clt_get_path_name(dev, dev->blk_symlink_name,
-   506					      len);
-   507		if (ret) {
-   508			rnbd_clt_err(dev, "Failed to get /sys/block symlink path, err: %d\n",
-   509				      ret);
-   510			goto out_err;
-   511		}
-   512	
-   513		ret = sysfs_create_link(rnbd_devs_kobj, gd_kobj,
-   514					dev->blk_symlink_name);
-   515		if (ret) {
-   516			rnbd_clt_err(dev, "Creating /sys/block symlink failed, err: %d\n",
-   517				      ret);
-   518			goto out_err;
-   519		}
-   520	
-   521		return 0;
-   522	
-   523	out_err:
-   524		dev->blk_symlink_name[0] = '\0';
-                ^^^^^^^^^^^^^^^^^^^^^^^^
-This will oops if the kzalloc() fails.
-
-   525		return ret;
-   526	}
-
-regards,
-dan carpenter
+This said, we do see the value in aligning with existing efforts to
+offload copy under other use cases, so if you have a set of tests we can
+run to speak the same language, we would be happy to take them and adapt
+them to the fio extensions we have posted for testing this too.
