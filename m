@@ -2,96 +2,112 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8D4EC433FE
-	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 05:31:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42D72C4361B
+	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 06:04:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8098223A61
-	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 05:31:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D710B23A61
+	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 06:04:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725777AbgLHFbU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Dec 2020 00:31:20 -0500
-Received: from aserp2130.oracle.com ([141.146.126.79]:48806 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725766AbgLHFbU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Dec 2020 00:31:20 -0500
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0B85PHPT160169;
-        Tue, 8 Dec 2020 05:30:22 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- from : message-id : references : date : in-reply-to : mime-version :
- content-type; s=corp-2020-01-29;
- bh=RYDs4ol5IVVSDY/Fix9p9GIjOBXHFpORQWCmocH6LXM=;
- b=qcKJ4A4MCtOa6wOZg/TnoXrFYchwkJHtHAJCuwQkq2CLo6+fU8qTc5Sn+jEsKT6ZnSY7
- 2orwLneXBY/K1wADuO4Uz5UzYMdM4I0/hrsNUJPJLhCDLPditrTI+u1CL+NmZsOh1EAd
- iT+7G605y2n6+mXusw8zJtfxMK3zlMrkC2ZcYD89ae8LrmNu56pIBQPdSo1GR/JiGvqK
- NhhoFS7tOnSIYUEeKRW7yZq7/ISXEgKDeF1S6YRysfvRgk0YD+qG7DJBSMP3SiXcZC4j
- +Xn7RY7GXWVlOKFaC8A2ohKyh+OrleYA52+DeU0QsDCwye8el/OmfoiWvn9QS1N3vlPq +w== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by aserp2130.oracle.com with ESMTP id 357yqbryw7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Tue, 08 Dec 2020 05:30:22 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0B85Qble057632;
-        Tue, 8 Dec 2020 05:30:21 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by userp3020.oracle.com with ESMTP id 358kysb5g0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 08 Dec 2020 05:30:21 +0000
-Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0B85UKmS013740;
-        Tue, 8 Dec 2020 05:30:20 GMT
-Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 07 Dec 2020 21:30:19 -0800
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Oleksii Kurochko <olkuroch@cisco.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Dongsheng Yang <dongsheng.yang@easystack.cn>,
-        ceph-devel@vger.kernel.org, dm-devel@redhat.com,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCH 5/6] rbd: remove the ->set_read_only method
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <yq1h7owx3ts.fsf@ca-mkp.ca.oracle.com>
-References: <20201207131918.2252553-1-hch@lst.de>
-        <20201207131918.2252553-6-hch@lst.de>
-Date:   Tue, 08 Dec 2020 00:30:17 -0500
-In-Reply-To: <20201207131918.2252553-6-hch@lst.de> (Christoph Hellwig's
-        message of "Mon, 7 Dec 2020 14:19:17 +0100")
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9828 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 spamscore=0 mlxscore=0
- malwarescore=0 suspectscore=1 mlxlogscore=999 bulkscore=0 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2012080032
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9828 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 mlxlogscore=999
- clxscore=1015 malwarescore=0 bulkscore=0 phishscore=0 adultscore=0
- spamscore=0 priorityscore=1501 mlxscore=0 lowpriorityscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2012080032
+        id S1725820AbgLHGEP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Dec 2020 01:04:15 -0500
+Received: from mail.synology.com ([211.23.38.101]:53592 "EHLO synology.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725208AbgLHGEO (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 8 Dec 2020 01:04:14 -0500
+X-Greylist: delayed 627 seconds by postgrey-1.27 at vger.kernel.org; Tue, 08 Dec 2020 01:04:14 EST
+Received: from localhost.localdomain (unknown [10.17.210.104])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by synology.com (Postfix) with ESMTPSA id 1355ACE78176;
+        Tue,  8 Dec 2020 13:53:06 +0800 (CST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=synology.com; s=123;
+        t=1607406786; bh=99FM34qn7bv2Kafzd8rddLNVupGbZ3+KNNzGxYmOFTk=;
+        h=From:To:Cc:Subject:Date;
+        b=mK8YWqjrSPqwDidSQXs88nsmaYnRRLuq0yJikI6DfyLG5zzxzfSu0BfzcwpQ7Ci20
+         77geazfjY2Pn8dYjPRmF7nPNhtHzu8L8TdwEvC8Mt9WIB4fhnFlA+AlTvkI760/QND
+         36aAD8hzrE75mbcsJYoLQ55Ii3UmSbOBSAzXHHsg=
+From:   edwardh <edwardh@synology.com>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, s3t@synology.com,
+        Edward Hsieh <edwardh@synology.com>
+Subject: [PATCH] block: fix trace completion for chained bio
+Date:   Tue,  8 Dec 2020 13:52:11 +0800
+Message-Id: <1607406731-25553-1-git-send-email-edwardh@synology.com>
+X-Mailer: git-send-email 2.7.4
+X-Synology-MCP-Status: no
+X-Synology-Spam-Flag: no
+X-Synology-Spam-Status: score=0, required 6, WHITELIST_FROM_ADDRESS 0
+X-Synology-Virus-Status: no
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+From: Edward Hsieh <edwardh@synology.com>
 
-Christoph,
+For chained bio, trace_block_bio_complete in bio_endio is called only by
+the parent bio once upon all chained bio completed. However, the sector and
+the size for the parent bio are modified in bio_split. Therefore,
+the size of the complete events might not match the queue events.
 
-> Now that the hardware read-only state can't be changed by the BLKROSET
-> ioctl, the code in this method is not required anymore.
+The original fix of bio completion trace <fbbaf700e7b1> ("block: trace
+completion of all bios.") wants multiple complete events to correspond
+to one queue event but missed this.
 
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+md/raid5 read with bio cross chunks can reproduce this issue.
 
+To fix, move trace completion into the loop for every chained bio to call.
+
+Fixes: fbbaf700e7b1 ("block: trace completion of all bios.")
+Reviewed-by: Wade Liang <wadel@synology.com>
+Reviewed-by: BingJing Chang <bingjingc@synology.com>
+Signed-off-by: Edward Hsieh <edwardh@synology.com>
+---
+ block/bio.c | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
+
+diff --git a/block/bio.c b/block/bio.c
+index fa01bef3..d202d6b 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1411,8 +1411,7 @@ static inline bool bio_remaining_done(struct bio *bio)
+  *
+  *   bio_endio() can be called several times on a bio that has been chained
+  *   using bio_chain().  The ->bi_end_io() function will only be called the
+- *   last time.  At this point the BLK_TA_COMPLETE tracing event will be
+- *   generated if BIO_TRACE_COMPLETION is set.
++ *   last time.
+  **/
+ void bio_endio(struct bio *bio)
+ {
+@@ -1425,6 +1424,11 @@ void bio_endio(struct bio *bio)
+ 	if (bio->bi_disk)
+ 		rq_qos_done_bio(bio->bi_disk->queue, bio);
+ 
++	if (bio->bi_disk && bio_flagged(bio, BIO_TRACE_COMPLETION)) {
++		trace_block_bio_complete(bio->bi_disk->queue, bio);
++		bio_clear_flag(bio, BIO_TRACE_COMPLETION);
++	}
++
+ 	/*
+ 	 * Need to have a real endio function for chained bios, otherwise
+ 	 * various corner cases will break (like stacking block devices that
+@@ -1438,11 +1442,6 @@ void bio_endio(struct bio *bio)
+ 		goto again;
+ 	}
+ 
+-	if (bio->bi_disk && bio_flagged(bio, BIO_TRACE_COMPLETION)) {
+-		trace_block_bio_complete(bio->bi_disk->queue, bio);
+-		bio_clear_flag(bio, BIO_TRACE_COMPLETION);
+-	}
+-
+ 	blk_throtl_bio_endio(bio);
+ 	/* release cgroup info */
+ 	bio_uninit(bio);
 -- 
-Martin K. Petersen	Oracle Linux Engineering
+2.7.4
+
