@@ -2,97 +2,130 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA544C433FE
-	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 01:57:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFF0CC0018C
+	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 02:41:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9441D238EF
-	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 01:57:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7F033239ED
+	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 02:41:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726896AbgLHB54 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Dec 2020 20:57:56 -0500
-Received: from aserp2130.oracle.com ([141.146.126.79]:45180 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726880AbgLHB5z (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Dec 2020 20:57:55 -0500
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0B81tGIU156971;
-        Tue, 8 Dec 2020 01:57:05 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- from : message-id : references : date : in-reply-to : mime-version :
- content-type; s=corp-2020-01-29;
- bh=qHFBxoQXJ1tZdGK8G/rJNLMRM0SUkHEwhvJJiJqqFFI=;
- b=cC01m9XXeLOTD9YNLfOwrpMXFy6POwo6oTxPQTE/K53/NF2JKgh/HgkERJwPArEpLkTs
- vz7axsq+u0S+XUdI2vQK/idU57uMkC7YqFEXS3vYWWl5utbIF1LHCdsl+kNiAU2+Kc70
- 7wNJRwPFsQ9d06QSwjkMtrSLe7QeL4CNIBg+3GmgVyNq7+OxJakfBccZrbU44wuWAtYd
- uGL+sMzPsqVDvrOoXK7RvSzAwV/ZsWtatfOVtxabEBAPyhuyfWTmiWhbDnMBZQPvA+E4
- cM36nQ/Cq/UUd65ozIKUZyrzw+oibXtmJ973AJ0OZw1T/0sFo3/XfPs0+4V99G0MDCWe 8w== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by aserp2130.oracle.com with ESMTP id 357yqbrjwa-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Tue, 08 Dec 2020 01:57:04 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0B81sjnG016490;
-        Tue, 8 Dec 2020 01:57:04 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3030.oracle.com with ESMTP id 358ksmxd0y-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 08 Dec 2020 01:57:04 +0000
-Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0B81uvdF014130;
-        Tue, 8 Dec 2020 01:56:58 GMT
-Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 07 Dec 2020 17:56:57 -0800
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        Ming Lei <ming.lei@redhat.com>, linux-scsi@vger.kernel.org,
+        id S1727075AbgLHClr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Dec 2020 21:41:47 -0500
+Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:41626 "EHLO
+        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726418AbgLHClr (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Dec 2020 21:41:47 -0500
+Received: from callcc.thunk.org (pool-72-74-133-215.bstnma.fios.verizon.net [72.74.133.215])
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 0B82evWA024426
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 7 Dec 2020 21:40:58 -0500
+Received: by callcc.thunk.org (Postfix, from userid 15806)
+        id AAC93420136; Mon,  7 Dec 2020 21:40:57 -0500 (EST)
+Date:   Mon, 7 Dec 2020 21:40:57 -0500
+From:   "Theodore Y. Ts'o" <tytso@mit.edu>
+To:     Michael Walle <michael@walle.cc>
+Cc:     linux-ext4@vger.kernel.org, linux-mmc@vger.kernel.org,
         linux-block@vger.kernel.org
-Subject: Re: [PATCH v4 0/9] Rework runtime suspend and SPI domain validation
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <yq1o8j5ysd6.fsf@ca-mkp.ca.oracle.com>
-References: <20201130024615.29171-1-bvanassche@acm.org>
-Date:   Mon, 07 Dec 2020 20:56:55 -0500
-In-Reply-To: <20201130024615.29171-1-bvanassche@acm.org> (Bart Van Assche's
-        message of "Sun, 29 Nov 2020 18:46:06 -0800")
+Subject: Re: discard feature, mkfs.ext4 and mmc default fallback to normal
+ erase op
+Message-ID: <20201208024057.GC52960@mit.edu>
+References: <97c4bb65c8a3e688b191d57e9f06aa5a@walle.cc>
+ <20201207183534.GA52960@mit.edu>
+ <2edcf8e344937b3c5b92a0b87ebd13bd@walle.cc>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9828 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=806 suspectscore=1
- bulkscore=0 malwarescore=0 phishscore=0 mlxscore=0 spamscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2012080009
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9828 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 mlxlogscore=818
- clxscore=1015 malwarescore=0 bulkscore=0 phishscore=0 adultscore=0
- spamscore=0 priorityscore=1501 mlxscore=0 lowpriorityscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2012080009
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2edcf8e344937b3c5b92a0b87ebd13bd@walle.cc>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Mon, Dec 07, 2020 at 09:39:32PM +0100, Michael Walle wrote:
+> > There are three different MMC commands which are defined:
+> > 
+> > 1) DISCARD
+> > 2) ERASE
+> > 3) SECURE ERASE
+> > 
+> > The first two are expected to be fast, since it only involves clearing
+> > some metadata fields in the Flash Translation Layer (FTL), so that the
+> > LBA's in the specified range are no longer mapped to a flash page.
+> 
+> Mh, where is it specified that the erase command is fast? According
+> to the Physical Layer Simplified Specification Version 8.00:
+> 
+>  The actual erase time may be quite long, and the host may issue CMD7
+>  to deselect thhe card or perform card disconnection, as described in
+>  the Block Write section, above.
 
-Bart,
+I looked at the eMMC specification from JEDEC (JESD84-A44) and there,
+both the "erase" and "trim" are specified that the work is to be
+queued to be done at a time which is convenient to the controller
+(read: FTL).  This is in contrast to the "secure erase" and "secure
+trim" commands, where the erasing has to be done NOW NOW NOW for "high
+security applications".
 
-> The SCSI runtime suspend and SPI domain validation mechanisms both use
-> scsi_device_quiesce(). scsi_device_quiesce() restricts
-> blk_queue_enter() to BLK_MQ_REQ_PREEMPT requests. There is a conflict
-> between the requirements of runtime suspend and SCSI domain
-> validation: no requests must be sent to runtime suspended devices that
-> are in the state RPM_SUSPENDED while BLK_MQ_REQ_PREEMPT requests must
-> be processed during SCSI domain validation. This conflict is resolved
-> by reworking the SCSI domain validation implementation.
+The only difference between "erase" and "trim" seems to be that erahse
+has to be done in units of the "erase groups" which is typically
+larger than the "write pages" which is the granularity required by the
+trim command.  There is also a comment that when you are erasing the
+entire partition, "erase" is preferred over "trim".  (Presumably
+because it is more convenient?  The spec is not clear.)
 
-Applied to 5.11/scsi-staging except for patch #5. Appreciate all that
-work that went into this series!
+Unfortunately, the SD Card spec and the eMMC spec both read like they
+were written by a standards committee stacked by hardware engineers.
+It doesn't look like they had file system engineers in the room,
+because the distinctions between "erase" and "trim" are pretty silly,
+and not well defined.  Aside from what I wrote, the spec is remarkably
+silent about what the host OS can depend upon.
 
--- 
-Martin K. Petersen	Oracle Linux Engineering
+From the fs perspective, what we care about is whether or not the
+command is a hint or a reliable way to zero a range of sectors.  A
+command could be a hint if the device is allowed to ignore it, or if
+the values of the sector are indeterminate, or if the sectors are
+zero'ed or not could change after a power cycle.  (I've seen an
+implementation where discard would result in the LBA's being read as
+zero --- but after a power cycle, reading from the same LBA would
+return the old data again.  This is standards complaint, but it's not
+terribly useful.)
+
+Assuming that the command is reliable, the next question is whether
+the erase operation is logical or physical --- which is to say, if an
+attacker has physical access to the die, with the ability to bypass
+the FTL and directly read the flash cells, could the attack retrieve
+the data, even if it required a distructive, physical attack on the
+hardware?  A logical erase would not require that the data be erased
+or otherwise made inaccessible against an attacker who bypasses the
+FTL; a physical erase would provide security guarantees that even if
+your phone has handed over to state-sponsored attacker, that nothing
+could be extracted after a physical erase.
+
+So if I were king, those would be the three levels of discard: "hint",
+"reliable logical", and "reliable physical", as those map to real use
+cases that are of actual use to a Host.  The challenge is mapping what
+we *actually* are given by different specs, which were written by
+hardware engineers and make distinctions that are not well defined so
+that multiple implementations can be "standard compliant", but have
+completely different performance profiles, thus making life easy for
+the marketing types, and hard for the file system engineers.  :-)
+
+All I can tell you is that I know a bunch of Android system team
+members at $WORK, and the current assumptions seem to work just fine
+for the sorts of devices that are used on mobile handsets --- even
+really cheap ones that are sold in India.  At least, there are bunch
+of "cost optimized" (as well as high end) Android devices running
+ext4, and no one has complained to me about mke2fs taking a long time.
+
+I definitely agree with you that the SD Card spec seems to imply that
+other standards-compliant implementations could have the erase command
+taking minutes, and this seems to be allowable by the spec.  I would
+consider this to be a flaw in the spec, myself.  But I don't sit on
+the standards committess, and I don't write the specs.  I (and
+everyone else) just have to live with them.   Sigh....
+
+	       	    	    	      - Ted
