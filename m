@@ -2,167 +2,89 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2C79C433FE
-	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 16:53:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C47F8C4361B
+	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 17:04:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 91AB023A79
-	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 16:53:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4C87123B02
+	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 17:04:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730458AbgLHQxF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Dec 2020 11:53:05 -0500
-Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:36239 "EHLO
-        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1730439AbgLHQxE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Dec 2020 11:53:04 -0500
-Received: from callcc.thunk.org (pool-72-74-133-215.bstnma.fios.verizon.net [72.74.133.215])
-        (authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 0B8GqESk012309
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 8 Dec 2020 11:52:15 -0500
-Received: by callcc.thunk.org (Postfix, from userid 15806)
-        id 6CDE7420136; Tue,  8 Dec 2020 11:52:14 -0500 (EST)
-Date:   Tue, 8 Dec 2020 11:52:14 -0500
-From:   "Theodore Y. Ts'o" <tytso@mit.edu>
-To:     Michael Walle <michael@walle.cc>
-Cc:     Ulf Hansson <ulf.hansson@linaro.org>, linux-ext4@vger.kernel.org,
-        linux-mmc@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>
-Subject: Re: discard feature, mkfs.ext4 and mmc default fallback to normal
- erase op
-Message-ID: <20201208165214.GD52960@mit.edu>
-References: <97c4bb65c8a3e688b191d57e9f06aa5a@walle.cc>
- <20201207183534.GA52960@mit.edu>
- <2edcf8e344937b3c5b92a0b87ebd13bd@walle.cc>
- <20201208024057.GC52960@mit.edu>
- <CAPDyKFpY+M_FVXCyeg+97jAgDSqhGDTNoND8CQDMWH-e09KGKQ@mail.gmail.com>
- <d7041bbb403698ac1097f7740f364467@walle.cc>
+        id S1730458AbgLHREP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Dec 2020 12:04:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33416 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729585AbgLHREO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Dec 2020 12:04:14 -0500
+Received: from mail-pf1-x442.google.com (mail-pf1-x442.google.com [IPv6:2607:f8b0:4864:20::442])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F1CBC061793
+        for <linux-block@vger.kernel.org>; Tue,  8 Dec 2020 09:03:34 -0800 (PST)
+Received: by mail-pf1-x442.google.com with SMTP id q22so14416396pfk.12
+        for <linux-block@vger.kernel.org>; Tue, 08 Dec 2020 09:03:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=CfgGBVicSk7GapGjJxYdXwMzE2f19C21TVkhYjAESjI=;
+        b=VxcDCIHp54zX5XQ0CjWQVXOHKr2i/bzK6C8qhc0SgUrCZVMDfPN//g/8rajgQnKD4z
+         viRSSDwsRMm3/Nu31SQkOIap2WYTfiijHDE1a1EwrM1j5eyUXRQ0FIxAvZV9D9mpLeFQ
+         vEXBIuNhmrNh5i8+PcH/ZmWMrfOz2eiVgKUakRLAsX65EkcRaHjiUWNcynoCytpZYNrE
+         /horYTTBWK7ZugUCKjzANITerCHbubTDkJR+djQlp23m7LKoX/09TfI1YmsaLqVYec0p
+         LFqGV7lmbaMtGoJsa0hSkatT2pYWma6+Oz48yfrHHhl49avXk/oCaIHvkirp2YFl6ih0
+         cO5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=CfgGBVicSk7GapGjJxYdXwMzE2f19C21TVkhYjAESjI=;
+        b=OI0CzUfSL4q6ItedzIhcmml9vZ5xJmLVK0z3V8oZ6JvC7C2H13zytXvHeUA3F97MAH
+         NXjFmlEp0cJUiG+KfIcfX6OihO7hbeslGLzB8lcN69vjaiRrrQhU3kfhUqbMhS+yCL8v
+         V2iS/6IK0RDb9q6GAY2k4FalCbH4To0D00JNXOcCPOC2bG1KKtuGvMsnqiTpcUam92Gn
+         dG1DnnQBslqwMuiQC9GMyxUD4lBp6wadztEx5OwqpKzXZLXa+MeJLrv6i5mQVd0AV5Lj
+         +9LJCFCkRvQ2tlHRv82LrwzKdstgbf5cA1ex9mtQA9AzKy8e8PgT7oQTH1CIE5Yig94g
+         RCQg==
+X-Gm-Message-State: AOAM53036qcdZutyJsD6ZOoZImadFrEVDuYDnbmEJzIC8Cal72aH6oVz
+        ySZckXfkHXfjE0c0cWdl5lDvqAY0y3Vlrg==
+X-Google-Smtp-Source: ABdhPJzAsWcM0buSntsOVmRLYeUJ2glGWw7Rw5Fc+RBAOV89O/rTF3TTd77xFFsNQxQVL3hfka98qA==
+X-Received: by 2002:a63:4956:: with SMTP id y22mr23200574pgk.266.1607447013907;
+        Tue, 08 Dec 2020 09:03:33 -0800 (PST)
+Received: from ?IPv6:2620:10d:c085:21cf::130f? ([2620:10d:c090:400::5:1a3])
+        by smtp.gmail.com with ESMTPSA id gp14sm4045479pjb.6.2020.12.08.09.03.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Dec 2020 09:03:33 -0800 (PST)
+Subject: Re: [PATCH] drivers/lightnvm: fix a null-ptr-deref bug in pblk-core.c
+To:     tangzhenhao <tzh18@mails.tsinghua.edu.cn>,
+        linux-block@vger.kernel.org
+Cc:     mb@lightnvm.io
+References: <20201130072356.5378-1-tzh18@mails.tsinghua.edu.cn>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <df10ea18-bebb-16b9-b128-9bd65ec05656@kernel.dk>
+Date:   Tue, 8 Dec 2020 10:03:32 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d7041bbb403698ac1097f7740f364467@walle.cc>
+In-Reply-To: <20201130072356.5378-1-tzh18@mails.tsinghua.edu.cn>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Dec 08, 2020 at 12:26:22PM +0100, Michael Walle wrote:
-> Do we really need to map these functions? What if we don't have an
-> actual discard, but just a slow erase (I'm now assuming that erase
-> will likely be slow on sdcards)? Can't we just tell the user space
-> there is no discard? Like on a normal HDD? I really don't know the
-> implications, seems like mmc_erase() is just there for the linux
-> discard feature.
+On 11/30/20 12:23 AM, tangzhenhao wrote:
+> At line 294 in drivers/lightnvm/pblk-write.c, function pblk_gen_run_ws
+> is called with actual param GFP_ATOMIC. pblk_gen_run_ws call
+> mempool_alloc using "GFP_ATOMIC" flag, so mempool_alloc can return
+> null. So we need to check the return-val of mempool_alloc to avoid
+> null-ptr-deref bug.
 
-So the potential gotcha here is that "discard" is important for
-reducing write amplification, and thus improving the lifespan of
-devices.  (See my reference to the Tesla engine controller story
-earlier.)  So if a device doesn't have "discard" but has "erase", and
-"erase" is fast, then skipping the discard could end up significantly
-reducing the lifespan of your product, and we're back to the NHTSA
-investigating whether they should stick Tesla for the $1500 engine
-controller replacement when cards die early.
+Please line-break at 72/74 chars for future patches, I fixed this one
+up. Applied for 5.11, thanks.
 
-I guess the JEDEC spec does specify a way to query the card for how
-long an erase takes, but I don't have the knowledge about how the
-actual real-world implementations of these specs (and their many
-variants over the years) actually behave.  Can the erase times that
-they advertise actually be trusted to be accurate?  How many of them
-actually supply erase times at all, no matter what the spec says?
+-- 
+Jens Axboe
 
-> Coming from the user space side. Does mkfs.ext4 assumes its pre-discard
-> is fast? I'd think so, right? I'd presume it was intented to tell the
-> FTL of the block device, "hey these blocks are unused, you can do some
-> wear leveling with them".
-
-Yes, the assumption is that discard is fast.  Exactly how fast seems
-to vary; this is one of the reasons why there are three different ways
-to do discards on a file system after files are deleted.  One way is
-to do them after the deleted definitely won't be unwound (i.e., after
-the ext4 journal commit).  But on some devices, the discard command,
-while fast, is slow enough that this will compete with the I/O
-completion times of other read commands, thus degrading system
-performance.  So you can also execute the trim commands out of cron,
-using the fstrim command, which will run the discards in the
-background, and the system administrator can adjust when fstrim is
-executed during times wheno performance isn't critical.  (e.g., when
-the phone is on a charger in the middle of the night, or at 4am local
-time, etc.)  Finally, you can configure e2fsck to run the discards
-after the file system consistency check is done.
-
-The reason why we have to leave this up to the system administrators
-is that we have essentially no guidance from the device how slow the
-discard command might be, how it intereferes with other device
-operations, and whether the discard might be more likely ignored if
-the device is busy.  So it might be that the discard will more likely
-improve write endurance when it is done when the device is idle.  All
-of the speccs (SCSI, SATA, UFS, eMMC, SD) are remarkable unhelpful
-because performance considerations is generally consider "out of
-scope" of standards committees.  They want to leave that up to market
-forces; which is why big companies (at handset vendors, hyperscale
-cloud providers, systems integrators, etc.) have to spend as much
-money doing certification testing before deciding which products to
-buy; think of it as a full-employment act for storage engineers.  :-)
-
-But yes, mke2fs assumes that discard is sufficiently fast that it
-doing it at file system format time is extremely reasonable.  The
-bigger concern is that we can't necessarily count on discard zero'ing
-the inode table, and there are robustness reasons (especially if
-before we had metadata checksums) where it makes file system repairs
-much more robust if the inode table is zero'ed ahead of time.
-
-> I'm just about finding some SD cards and looking how they behave timing
-> wise and what they report they support (ie. erase or discard). Looks
-> like other cards are doing better. But I'd have to find out if they
-> support the discard (mine doesn't) and if they are slow too if I force
-> them to use the normal erase.
-
-The challenge is that this sort of thing gets rapidly out of date, and
-it's not just SD cards but also eMMC devices which are built into
-various embedded devices, high-end SDHC cards, etc., etc.  So doing
-this gets very expensive.
-
-That being said, both ext4 and f2fs do pre-discards as part of the
-format step, since improving write endurance is important; customers
-get cranky when their $1000 smart phones die an early death.  So an SD
-card that behaves the way yours does would probably get disqualified
-very early in the certification step if it were ever intended to be
-used in an Android handset, since pretty much all Android devices, or
-embedded devices for that matter, use either f2fs or ext4.  That's one
-of the reasons why I was a bit surprised that your device had such an
-"interesting" performance profile.  Maybe it was intended for use in
-digital cameras, and digital camerase don't issue discards?  I don't
-know....
-
-> > I agree, these are the three levels that make sense to support.
-> > 
-> > Honestly I haven't been paying enough attention to discussions for the
-> > generic block layer around discards. However, considering what you
-> > just stated above, we seem to be missing one request operation, don't
-> > we?
-
-Yes, that's true.  We only have "discard" and "secure discard".  Part
-of that is because that's the only levels which are available for
-SSD's, for which I have the same general complaint vis-a-vis standards
-committees and the general lack of usefulness for file system
-engineers.
-
-For example, pretty much everyone in the enterprise and hyperscale
-cloud world assume that low-numbered LBA's have better performance
-profiles, and are located physically at the outer diameter of HDD's,
-compared to high-number'ed LBA's.  But that's nothing which is
-specified by the standards committees, because "performance
-considerations are out of scope".  Yet we still have to engineer
-storage systems which assume this to be true, even though nothing in
-the formal specs guarantees this.  We just have to trust that anyone
-who tries to sell a HDD for which this isn't true, even if it is
-"standards complaint", is going to have a bad time, and trust that
-this is enough.  (Perhaps this is why when a certain HDD manufacturer
-tried to sell HDD's containing drive-managed SMR for the NAS market,
-without disclosing this fact to consumers, this generated a massive
-backlash....  Simply being standards compliant is not enough.)
-
-					- Ted
