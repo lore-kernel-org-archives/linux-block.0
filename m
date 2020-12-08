@@ -2,64 +2,192 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33D7AC4167B
-	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 09:26:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD0B2C4361B
+	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 09:51:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E356423A81
-	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 09:26:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6B33723A9B
+	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 09:51:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728939AbgLHJ03 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Dec 2020 04:26:29 -0500
-Received: from verein.lst.de ([213.95.11.211]:45451 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728710AbgLHJ03 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 8 Dec 2020 04:26:29 -0500
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 588796736F; Tue,  8 Dec 2020 10:25:45 +0100 (CET)
-Date:   Tue, 8 Dec 2020 10:25:45 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Oleksii Kurochko <olkuroch@cisco.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Dongsheng Yang <dongsheng.yang@easystack.cn>,
-        ceph-devel@vger.kernel.org, dm-devel@redhat.com,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: Re: [PATCH 4/6] block: propagate BLKROSET on the whole device to
- all partitions
-Message-ID: <20201208092545.GA13901@lst.de>
-References: <20201207131918.2252553-1-hch@lst.de> <20201207131918.2252553-5-hch@lst.de> <yq1y2i8x42d.fsf@ca-mkp.ca.oracle.com>
+        id S1727988AbgLHJuo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Dec 2020 04:50:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50810 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727122AbgLHJuo (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Dec 2020 04:50:44 -0500
+Received: from mail-vk1-xa30.google.com (mail-vk1-xa30.google.com [IPv6:2607:f8b0:4864:20::a30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E23A3C061749
+        for <linux-block@vger.kernel.org>; Tue,  8 Dec 2020 01:50:03 -0800 (PST)
+Received: by mail-vk1-xa30.google.com with SMTP id w190so3799103vkg.13
+        for <linux-block@vger.kernel.org>; Tue, 08 Dec 2020 01:50:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=I2kZdU6xAATA8afPjSbaUFvj53IL1FloZ2Fcg9Z0qb0=;
+        b=SbL5adQziQdh41QS9rIWevrpl3jNzf2hMWA39qV7Sr++gAmUeFcJzR4+3YHe+6yILx
+         YtOvysRrbLU1FP7a9pLUytPmGXtujjXe3bXyV7s0WdpDty84gRtTgZfyhQecMcrntVsF
+         Z4Lc2HHJOHgSZoic98FIlLGMDp6wqgM8GvwMp3G/vG1jpgzAnH/4Y3gHEb6ad+8Zym5J
+         Sy66uy7282XP8fWthAgR7ZVKE7ozfXfFH2+76CqlhX9ILWBSkBawPEXWXqHZ7FYMmRY2
+         BukxA4fnWQr5W5bO0p1KlB2dTxn8e4tBnUOk1gbxB05Vbhnx8bu2vh2i3eD1ZCZRvwaP
+         VNHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=I2kZdU6xAATA8afPjSbaUFvj53IL1FloZ2Fcg9Z0qb0=;
+        b=Bh07HtMSdvBJgdLav+GygvIbM8u8y0GtJeNAanvaCWudTtsUzeVRRDZqBLcsfvYEvp
+         U1XPZrwDcYyfYu7RWwc1vr79wCZq/LamylYgfwyrti7bVoxJKcl/jvYmUGjTVGzpmprX
+         tXqNGXiSPZoSev+a9Ax5YCyKxt7g9PrWbLi7Kr0bhkf+m3xKZdS8/+YW9M4jXruNMqc8
+         7dRqpuKJFrRgrOf3yWtwjW43TDf1FnfO4D05d0CVAckJZRK7WYBQAXbv49AFAFpwm59f
+         UUxM9KcIQgGC/Bz7OY+F0vOmPv7Izp0iDyvbWkFSlaq2+nVhyGYjZwocQfKV6bS/Ya0L
+         5Pcw==
+X-Gm-Message-State: AOAM5321O+4Nv9tCHrdYVwwhR2Ipg+o28OZ7K2akhlLhvQaKncizHm0x
+        hskrlvu5tiTu8R5lVfIjV5tYvynPs/4F8pzIaUzmyg==
+X-Google-Smtp-Source: ABdhPJz9FLrnfEq+ttBq7kxXr5aUvSnFrr/unwT7mZDLOoTpuZGVnF+AL0GuhpkR0nPFa8fJgflwL9QbL2jgEflNe7I=
+X-Received: by 2002:a1f:8f48:: with SMTP id r69mr15757760vkd.6.1607421002919;
+ Tue, 08 Dec 2020 01:50:02 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <yq1y2i8x42d.fsf@ca-mkp.ca.oracle.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+References: <97c4bb65c8a3e688b191d57e9f06aa5a@walle.cc> <20201207183534.GA52960@mit.edu>
+ <2edcf8e344937b3c5b92a0b87ebd13bd@walle.cc> <20201208024057.GC52960@mit.edu>
+In-Reply-To: <20201208024057.GC52960@mit.edu>
+From:   Ulf Hansson <ulf.hansson@linaro.org>
+Date:   Tue, 8 Dec 2020 10:49:26 +0100
+Message-ID: <CAPDyKFpY+M_FVXCyeg+97jAgDSqhGDTNoND8CQDMWH-e09KGKQ@mail.gmail.com>
+Subject: Re: discard feature, mkfs.ext4 and mmc default fallback to normal
+ erase op
+To:     "Theodore Y. Ts'o" <tytso@mit.edu>,
+        Michael Walle <michael@walle.cc>
+Cc:     linux-ext4@vger.kernel.org,
+        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Dec 08, 2020 at 12:27:41AM -0500, Martin K. Petersen wrote:
-> 
-> Christoph,
-> 
-> > The existing behavior is inconsistent in the sense that doing:
-> >
-> > permits writes. But:
-> >
-> > <something triggers revalidate>
-> >
-> > doesn't.
-> >
-> > And a subsequent:
-> 
-> Looks like the command line pieces got zapped from the commit
-> description.
+Hi Ted, Michael,
 
-Yeah.  It seems like git commit just removed them after I pasted them,
-weird.
+On Tue, 8 Dec 2020 at 03:41, Theodore Y. Ts'o <tytso@mit.edu> wrote:
+>
+> On Mon, Dec 07, 2020 at 09:39:32PM +0100, Michael Walle wrote:
+> > > There are three different MMC commands which are defined:
+> > >
+> > > 1) DISCARD
+> > > 2) ERASE
+> > > 3) SECURE ERASE
+> > >
+> > > The first two are expected to be fast, since it only involves clearing
+> > > some metadata fields in the Flash Translation Layer (FTL), so that the
+> > > LBA's in the specified range are no longer mapped to a flash page.
+> >
+> > Mh, where is it specified that the erase command is fast? According
+> > to the Physical Layer Simplified Specification Version 8.00:
+> >
+> >  The actual erase time may be quite long, and the host may issue CMD7
+> >  to deselect thhe card or perform card disconnection, as described in
+> >  the Block Write section, above.
+
+Before I go into some more detail, of course I fully agree that
+dealing with erase/discard from the eMMC/SD specifications (and other
+types of devices) point of view isn't entirely easy. :-)
+
+But I also think we can do better than currently, at least for eMMC/SD.
+
+>
+> I looked at the eMMC specification from JEDEC (JESD84-A44) and there,
+> both the "erase" and "trim" are specified that the work is to be
+> queued to be done at a time which is convenient to the controller
+> (read: FTL).  This is in contrast to the "secure erase" and "secure
+> trim" commands, where the erasing has to be done NOW NOW NOW for "high
+> security applications".
+>
+> The only difference between "erase" and "trim" seems to be that erahse
+> has to be done in units of the "erase groups" which is typically
+> larger than the "write pages" which is the granularity required by the
+> trim command.  There is also a comment that when you are erasing the
+> entire partition, "erase" is preferred over "trim".  (Presumably
+> because it is more convenient?  The spec is not clear.)
+>
+> Unfortunately, the SD Card spec and the eMMC spec both read like they
+> were written by a standards committee stacked by hardware engineers.
+> It doesn't look like they had file system engineers in the room,
+> because the distinctions between "erase" and "trim" are pretty silly,
+> and not well defined.  Aside from what I wrote, the spec is remarkably
+> silent about what the host OS can depend upon.
+
+Moreover, the specs have evolved over the years. Somehow, we need to
+map a REQ_OP_DISCARD and REQ_OP_SECURE_ERASE to the best matching
+operation that the currently inserted eMMC/SD card supports...
+
+Long time time ago, both the SD and eMMC spec introduced support for
+real discards commands, as being hints to the card without any
+guarantees of what will happen to the data from a logical or a
+physical point of view. If the card supports that, we should use it as
+the first option for REQ_OP_DISCARD. Although, what should we pick as
+the second best option, when the card doesn't support discard - that's
+when it becomes more tricky. And the similar applies for
+REQ_OP_SECURE_ERASE, or course.
+
+If you have any suggestions for how we can improve in the above
+decisions, feel free to suggest something.
+
+Another issue that most likely is causing poor performance for
+REQ_OP_DISCARD/REQ_OP_SECURE_ERASE for eMMC/SD, is that in
+mmc_queue_setup_discard() we set up the maximum discard sectors
+allowed per request and the discard granularity.
+
+To find performance bottlenecks, I would start looking at what actual
+eMMC/SD commands/args we end up mapping towards the
+REQ_OP_DISCARD/REQ_OP_SECURE_ERASE requests. Then definitely, I would
+also look at the values we end up picking as max discard sectors and
+the discard granularity.
+
+>
+> From the fs perspective, what we care about is whether or not the
+> command is a hint or a reliable way to zero a range of sectors.  A
+> command could be a hint if the device is allowed to ignore it, or if
+> the values of the sector are indeterminate, or if the sectors are
+> zero'ed or not could change after a power cycle.  (I've seen an
+> implementation where discard would result in the LBA's being read as
+> zero --- but after a power cycle, reading from the same LBA would
+> return the old data again.  This is standards complaint, but it's not
+> terribly useful.)
+
+:-)
+
+>
+> Assuming that the command is reliable, the next question is whether
+> the erase operation is logical or physical --- which is to say, if an
+> attacker has physical access to the die, with the ability to bypass
+> the FTL and directly read the flash cells, could the attack retrieve
+> the data, even if it required a distructive, physical attack on the
+> hardware?  A logical erase would not require that the data be erased
+> or otherwise made inaccessible against an attacker who bypasses the
+> FTL; a physical erase would provide security guarantees that even if
+> your phone has handed over to state-sponsored attacker, that nothing
+> could be extracted after a physical erase.
+>
+> So if I were king, those would be the three levels of discard: "hint",
+> "reliable logical", and "reliable physical", as those map to real use
+> cases that are of actual use to a Host.  The challenge is mapping what
+> we *actually* are given by different specs, which were written by
+> hardware engineers and make distinctions that are not well defined so
+> that multiple implementations can be "standard compliant", but have
+> completely different performance profiles, thus making life easy for
+> the marketing types, and hard for the file system engineers.  :-)
+
+I agree, these are the three levels that make sense to support.
+
+Honestly I haven't been paying enough attention to discussions for the
+generic block layer around discards. However, considering what you
+just stated above, we seem to be missing one request operation, don't
+we?
+
+[...]
+
+Kind regards
+Uffe
