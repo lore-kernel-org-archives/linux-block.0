@@ -6,186 +6,111 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 913A7C4361B
-	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 12:21:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6455CC4361B
+	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 12:24:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 552B523A54
-	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 12:21:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 36B2123A52
+	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 12:24:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729330AbgLHMV6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Dec 2020 07:21:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46026 "EHLO
+        id S1729503AbgLHMXb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Dec 2020 07:23:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46270 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725803AbgLHMV6 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Dec 2020 07:21:58 -0500
-Received: from mail-ej1-x642.google.com (mail-ej1-x642.google.com [IPv6:2a00:1450:4864:20::642])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7545C061749
-        for <linux-block@vger.kernel.org>; Tue,  8 Dec 2020 04:21:17 -0800 (PST)
-Received: by mail-ej1-x642.google.com with SMTP id f23so24314818ejk.2
-        for <linux-block@vger.kernel.org>; Tue, 08 Dec 2020 04:21:17 -0800 (PST)
+        with ESMTP id S1729487AbgLHMXb (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Dec 2020 07:23:31 -0500
+Received: from mail-ed1-x541.google.com (mail-ed1-x541.google.com [IPv6:2a00:1450:4864:20::541])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE08FC061793
+        for <linux-block@vger.kernel.org>; Tue,  8 Dec 2020 04:22:50 -0800 (PST)
+Received: by mail-ed1-x541.google.com with SMTP id cw27so17345739edb.5
+        for <linux-block@vger.kernel.org>; Tue, 08 Dec 2020 04:22:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=javigon-com.20150623.gappssmtp.com; s=20150623;
-        h=from:date:to:cc:subject:message-id:references:mime-version
+        h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=IAI5d5pS3efjsbXLYKh2mpe6utm2q/uw9y9/qssJFDE=;
-        b=SWYPVvs1v5zMXa7VMWQMNpj3ZF+7g4QlHRba+Z1qnK+/erhw4fLhgQBPaqqnnlSoDf
-         S976I6ob+lwEb5r2qXXsTcKvZsOXfm+evYsywKQr6G40vEA30YKzZhXfojwvQdkuJ3YQ
-         Av2hiGFDRCZ3sLe+aXd+MSwMXm6VDhjk3xlBYdRSeN9bzQ+QV3x2JxBxKK2bzEpR6Ou1
-         sNJg7yQohGgqCz62wGe35Kz1eyakKWEWGYWmFC+wBoM9GX/+WnNGAP3L55mqVAsu7yDV
-         fHXMp841PHLXyped1FUxxpLKDzw2rDDwOdIiz/ZrD2LfTvtDb24UwhmCztFOPPNpTmCG
-         NWuQ==
+        bh=mimyofEa+0whU409Dhp0a+YV5b97sukKj8gfG9Rbmic=;
+        b=O0MKn6nsnZaleEs/kNELsIh8dmH/kUILor5blbkmcjPeH/9Ep6OyKVm0KhMgD3NGd3
+         jiS2xaM6anmzo4ZJoxWWeypRd3TPX9i1pbDK1fn7CHS4MoXi73uI9bkKwiK46bx0/aYj
+         QiUgUp9GM2g/V0rTnnXbSt39JqhI5CnWjpjP7roaLEcLPuRXAYMc/oC98jZUIwDawmI9
+         TuWYO0e8QQghyUuybvSDRbNtqa5oVqU+WzjvfKefSY9LEdJhMLfaBcg69YT58rpPi73N
+         6QDuFT3wPIMhu+1PtBLD6TPuURzIfM/B6NmbuJq0Jt0I9O+0ZRmUCz9xhCfcsFBDaruc
+         p2aw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:date:to:cc:subject:message-id:references
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:content-transfer-encoding
          :in-reply-to;
-        bh=IAI5d5pS3efjsbXLYKh2mpe6utm2q/uw9y9/qssJFDE=;
-        b=dj1035PF2CmPt6SBxNL0qiVmLWXEmmLUSAU98zbFfuyeY0c0JgCoHAhOWzRtPpmb7r
-         5s6tESmnXk1odBwVeD3VSghiw4pdaBKC8zTSnpPCFpr9+8QR9IujLJCbaR6HPbbochmw
-         OPoZ2TV6rhhMSe6mO5AVejUARjmUJCQ4GvaWJ15pDi5gKrNNADyKz479AN12PMJeOIDZ
-         IM6T55zOjIMlN0MR0n4k8J9inD8JJDT1arwgQs46lEr6ingO6BwjB/azo0H04xvCVGR1
-         s4kjGtE6yt/P5auDn11wT2THMtd0+NRfIEWc03hDNegf9EU9Pno/k1A+4SBg7WdbV0uq
-         RKIQ==
-X-Gm-Message-State: AOAM530m+xf8EF0TDM/yvzQi3DwGuNmjLOQ/bodZG6Uwrd3PxSRbSr2B
-        kHaRaFi33bjqrhYJwi4e3JD/vSdu7dV8oObKk11vkw==
-X-Google-Smtp-Source: ABdhPJxhL6i6yFmZQunp7bazoVScU9q+jr5k0Xgzao5BDSe6y/H+nh7mEFR+wnSA5Kolq55NeVPyBQ==
-X-Received: by 2002:a17:906:718b:: with SMTP id h11mr6669589ejk.241.1607430076628;
-        Tue, 08 Dec 2020 04:21:16 -0800 (PST)
+        bh=mimyofEa+0whU409Dhp0a+YV5b97sukKj8gfG9Rbmic=;
+        b=Zd+XF1ym4g4BbArEA1SI1PXQUYx2UvterfFRUZeiuwqwx9PHFQFpZsKf11WY2wtxYx
+         UNkwj8ILLTZwp93AIqpu63ukKl/VYovUp6wb22mFOpTGreC50v6LZvL0ekVR1eR40uv5
+         ZqLjPGP4HL3s/Zu9N82ha/WhdtNHWDul58tn+K20miL5zwT6aQ+C0X6D5o7XxvpBVazK
+         GbfayR+iU8dFbSwYRq/WH1NwzIYtStXCHee5eI89V2S2tppmvYkYK92HWNwO5PDIhc8y
+         BFZSYJLaIIHdqw88hXDFzg8fWcbZlqNX1Eur8p+zKmbLkxbw5srLeO3Ard3tQE+0uJva
+         N/EQ==
+X-Gm-Message-State: AOAM530D13yZ8hzDqDVGhtSTcKZMXX4G2kNkxO5Ym7+f5JN7bc9hTSB4
+        BDFZ2PyINl1kEtVQGQ9VX4f6iQ==
+X-Google-Smtp-Source: ABdhPJwDxIoRMy+9VbYFQ3igoSIhbhtPBIxA8vjX9L86uM4LXFP5Wttpcb3/4YB/UuHFCIPdaYrkmA==
+X-Received: by 2002:a50:ccdb:: with SMTP id b27mr18839271edj.20.1607430169696;
+        Tue, 08 Dec 2020 04:22:49 -0800 (PST)
 Received: from localhost (5.186.124.214.cgn.fibianet.dk. [5.186.124.214])
-        by smtp.gmail.com with ESMTPSA id e3sm15781214ejq.96.2020.12.08.04.21.15
+        by smtp.gmail.com with ESMTPSA id x15sm16783915edj.91.2020.12.08.04.22.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Dec 2020 04:21:15 -0800 (PST)
-From:   "Javier =?utf-8?B?R29uesOhbGV6?=" <javier@javigon.com>
-X-Google-Original-From: Javier =?utf-8?B?R29uesOhbGV6?= <javier.gonz@samsung.com>
-Date:   Tue, 8 Dec 2020 13:21:15 +0100
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     dgilbert@interlog.com, Christoph Hellwig <hch@lst.de>,
+        Tue, 08 Dec 2020 04:22:49 -0800 (PST)
+Date:   Tue, 8 Dec 2020 13:22:48 +0100
+From:   Javier =?utf-8?B?R29uesOhbGV6?= <javier@javigon.com>
+To:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+Cc:     Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
         SelvaKumar S <selvakuma.s1@samsung.com>,
-        linux-nvme@lists.infradead.org, kbusch@kernel.org, axboe@kernel.dk,
-        damien.lemoal@wdc.com, sagi@grimberg.me,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        dm-devel@redhat.com, snitzer@redhat.com, selvajove@gmail.com,
-        nj.shetty@samsung.com, joshi.k@samsung.com,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "kbusch@kernel.org" <kbusch@kernel.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        "sagi@grimberg.me" <sagi@grimberg.me>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "snitzer@redhat.com" <snitzer@redhat.com>,
+        "selvajove@gmail.com" <selvajove@gmail.com>,
+        "nj.shetty@samsung.com" <nj.shetty@samsung.com>,
+        "joshi.k@samsung.com" <joshi.k@samsung.com>,
         "Martin K. Petersen" <martin.petersen@oracle.com>,
         Bart Van Assche <bvanassche@acm.org>,
         Mikulas Patocka <mpatocka@redhat.com>,
-        linux-scsi@vger.kernel.org
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>
 Subject: Re: [RFC PATCH v2 0/2] add simple copy support
-Message-ID: <20201208122115.jy7s3w2wr3ysxvkk@mpHalley>
+Message-ID: <20201208122248.utv7pqthmmn6uwv6@mpHalley>
 References: <CGME20201204094719epcas5p23b3c41223897de3840f92ae3c229cda5@epcas5p2.samsung.com>
  <20201204094659.12732-1-selvakuma.s1@samsung.com>
  <20201207141123.GC31159@lst.de>
  <01fe46ac-16a5-d4db-f23d-07a03d3935f3@suse.de>
- <194d7813-8c8c-85c8-e0c8-94aaab7c291e@interlog.com>
- <9b2f5ab2-3358-fcce-678f-982ef79c9252@suse.de>
+ <20201207192453.vc6clbdhz73hzs7l@mpHalley>
+ <SN4PR0401MB35988951265391511EBC8C6E9BCD0@SN4PR0401MB3598.namprd04.prod.outlook.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <9b2f5ab2-3358-fcce-678f-982ef79c9252@suse.de>
+In-Reply-To: <SN4PR0401MB35988951265391511EBC8C6E9BCD0@SN4PR0401MB3598.namprd04.prod.outlook.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 08.12.2020 07:44, Hannes Reinecke wrote:
->On 12/7/20 11:12 PM, Douglas Gilbert wrote:
->>On 2020-12-07 9:56 a.m., Hannes Reinecke wrote:
->>>On 12/7/20 3:11 PM, Christoph Hellwig wrote:
->>>>So, I'm really worried about:
->>>>
->>>>  a) a good use case.  GC in f2fs or btrfs seem like good use cases, as
->>>>     does accelating dm-kcopyd.  I agree with Damien that 
->>>>lifting dm-kcopyd
->>>>     to common code would also be really nice.  I'm not 100% 
->>>>sure it should
->>>>     be a requirement, but it sure would be nice to have
->>>>     I don't think just adding an ioctl is enough of a use case 
->>>>for complex
->>>>     kernel infrastructure.
->>>>  b) We had a bunch of different attempts at SCSI XCOPY support 
->>>>form IIRC
->>>>     Martin, Bart and Mikulas.  I think we need to pull them into this
->>>>     discussion, and make sure whatever we do covers the SCSI needs.
->>>>
->>>And we shouldn't forget that the main issue which killed all 
->>>previous implementations was a missing QoS guarantee.
->>>It's nice to have simply copy, but if the implementation is 
->>>_slower_ than doing it by hand from the OS there is very little 
->>>point in even attempting to do so.
->>>I can't see any provisions for that in the TPAR, leading me to the 
->>>assumption that NVMe simple copy will suffer from the same issue.
->>>
->>>So if we can't address this I guess this attempt will fail, too.
+On 08.12.2020 08:40, Johannes Thumshirn wrote:
+>On 07/12/2020 20:27, Javier González wrote:
+>> Good point. We can share some performance data on how Simple Copy scales
+>> in terms of bw / latency and the CPU usage. Do you have anything else in
+>> mind?
 >>
->>I have been doing quite a lot of work and testing in my sg driver rewrite
->>in the copy and compare area. The baselines for performance are dd and
->>io_uring-cp (in liburing). There are lots of ways to improve on them. Here
->>are some:
->>    - the user data need never pass through the user space (could
->>      mmap it out during the READ if there is a good reason). Only the
->>      metadata (e.g. NVMe or SCSI commands) needs to come from the user
->>      space and errors, if any, reported back to the user space.
->>    - break a large copy (or compare) into segments, with each segment
->>      a "comfortable" size for the OS to handle, say 256 KB
->>    - there is one constraint: the READ in each segment must complete
->>      before its paired WRITE can commence
->>      - extra constraint for some zoned disks: WRITEs must be
->>        issued in order (assuming they are applied in that order, if
->>        not, need to wait until each WRITE completes)
->>    - arrange for READ WRITE pair in each segment to share the same bio
->>    - have multiple slots each holding a segment (i.e. a bio and
->>      metadata to process a READ-WRITE pair)
->>    - re-use each slot's bio for the following READ-WRITE pair
->>    - issue the READs in each slot asynchronously and do an interleaved
->>      (io)poll for completion. Then issue the paired WRITE
->>      asynchronously
->>    - the above "slot" algorithm runs in one thread, so there can be
->>      multiple threads doing the same algorithm. Segment manager needs
->>      to be locked (or use an atomics) so that each segment (identified
->>      by its starting LBAs) is issued once and only once when the
->>      next thread wants a segment to copy
->>
->>Running multiple threads gives diminishing or even worsening returns.
->>Runtime metrics on lock contention and storage bus capacity may help
->>choosing the number of threads. A simpler approach might be add more
->>threads until the combined throughput increase is less than 10% say.
->>
->>
->>The 'compare' that I mention is based on the SCSI VERIFY(BYTCHK=1) command
->>(or NVMe NVM Compare command). Using dd logic, a disk to disk compare can
->>be implemented with not much more work than changing the WRITE to a VERIFY
->>command. This is a different approach to the Linux cmp utility which
->>READs in both sides and does a memcmp() type operation. Using ramdisks
->>(from the scsi_debug driver) the compare operation (max ~ 10 GB/s) was
->>actually faster than the copy (max ~ 7 GB/s). I put this down to WRITE
->>operations taking a write lock over the store while the VERIFY only
->>needs a read lock so many VERIFY operations can co-exist on the same
->>store. Unfortunately on real SAS and NVMe SSDs that I tested the
->>performance of the VERIFY and NVM Compare commands is underwhelming.
->>For comparison, using scsi_debug ramdisks, dd copy throughput was
->>< 1 GB/s and io_uring-cp was around 2-3 GB/s. The system was Ryzen
->>3600 based.
->>
->Which is precisely my concern.
->Simple copy might be efficient for one particular implementation, but 
->it might be completely off the board for others.
->But both will be claiming to support it, and us having no idea whether 
->choosing simple copy will speed up matters or not.
->Without having a programmatic way to figure out the speed of the 
->implementation we have to detect the performance ourselves, like the 
->benchmarking loop RAID5 does.
->I was hoping to avoid that, and just ask the device/controller; but 
->that turned out to be in vain.
+>
+>With an emulation in the kernel, we could make the usd "backend"
+>implementation configurable. So if the emulation is faster, users can select
+>the emulation, if the device is faster then the device.
+>
+>Kind of what the crypto and raid code do as well.
 
-I believe it makes sense to do extensive characterization to understand
-how the host and device implementation behave. However, I do not believe
-we will get far if the requirement is that any acceleration has to
-outperform the legacy path under all circumstances and implementations.
+Good idea. Are you thinking of a sysfs entry to select the backend?
+>
+>I'm really interested in this work, as BTRFS relocation/balance will have
+>potential benefits, but we need to get it right.
 
-At this moment in time, this is a feature very much targeted to
-eliminating the extra read/write traffic generated by ZNS host GC.
-
-This said, we do see the value in aligning with existing efforts to
-offload copy under other use cases, so if you have a set of tests we can
-run to speak the same language, we would be happy to take them and adapt
-them to the fio extensions we have posted for testing this too.
+Agree. We will post a V3 with emulation and addressing other comments.
+We can take it from there. If you have comments on V2, please send them
+our way and we will take them in.
