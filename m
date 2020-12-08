@@ -2,110 +2,115 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DAF8C4361B
-	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 09:58:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAFDEC4167B
+	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 10:01:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B878423A9A
-	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 09:58:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 667D123A84
+	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 10:01:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727754AbgLHJ6P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Dec 2020 04:58:15 -0500
-Received: from smtp.h3c.com ([60.191.123.56]:59037 "EHLO h3cspam01-ex.h3c.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727132AbgLHJ6P (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 8 Dec 2020 04:58:15 -0500
-X-Greylist: delayed 1244 seconds by postgrey-1.27 at vger.kernel.org; Tue, 08 Dec 2020 04:58:14 EST
-Received: from h3cspam01-ex.h3c.com (localhost [127.0.0.2] (may be forged))
-        by h3cspam01-ex.h3c.com with ESMTP id 0B87owop066652;
-        Tue, 8 Dec 2020 15:50:58 +0800 (GMT-8)
-        (envelope-from tian.xianting@h3c.com)
-Received: from DAG2EX03-BASE.srv.huawei-3com.com ([10.8.0.66])
-        by h3cspam01-ex.h3c.com with ESMTP id 0B87oVLF065626;
-        Tue, 8 Dec 2020 15:50:31 +0800 (GMT-8)
-        (envelope-from tian.xianting@h3c.com)
-Received: from localhost.localdomain (10.99.212.201) by
- DAG2EX03-BASE.srv.huawei-3com.com (10.8.0.66) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2106.2; Tue, 8 Dec 2020 15:50:34 +0800
-From:   Xianting Tian <tian.xianting@h3c.com>
-To:     <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        Xianting Tian <tian.xianting@h3c.com>
-Subject: [PATCH] blk-mq-tag: make blk_mq_tag_busy() return void
-Date:   Tue, 8 Dec 2020 15:40:02 +0800
-Message-ID: <20201208074002.31539-1-tian.xianting@h3c.com>
-X-Mailer: git-send-email 2.17.1
+        id S1728416AbgLHKBd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Dec 2020 05:01:33 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30523 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726218AbgLHKBc (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 8 Dec 2020 05:01:32 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1607421606;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=0iZqkZAphNZf99PJFIaYexFrQFdjyflH/vT614+uZb8=;
+        b=iAsDN+N3RksdiwtUTN9EXLZv4qhEadoGSKo9wWFBODFs3GrgV5VvieXAf/LTkIW7cRCtyS
+        u50n+7/AC5rrihCn9UGEB7ZudWRlsJsUoSP0HihyLbgG2aB+Bjf8YpeR7YECm1DDGa9WoO
+        vZuh6lWaWpItqbla4pQbED0phmiO++c=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-519-k_m0i4LmMCqeNxMYW764Fg-1; Tue, 08 Dec 2020 05:00:04 -0500
+X-MC-Unique: k_m0i4LmMCqeNxMYW764Fg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9573F10054FF;
+        Tue,  8 Dec 2020 09:59:59 +0000 (UTC)
+Received: from T590 (ovpn-12-237.pek2.redhat.com [10.72.12.237])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8F1AF2B394;
+        Tue,  8 Dec 2020 09:59:40 +0000 (UTC)
+Date:   Tue, 8 Dec 2020 17:59:35 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Oleksii Kurochko <olkuroch@cisco.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Dongsheng Yang <dongsheng.yang@easystack.cn>,
+        ceph-devel@vger.kernel.org, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH 1/6] dm: use bdev_read_only to check if a device is
+ read-only
+Message-ID: <20201208095935.GA1202995@T590>
+References: <20201207131918.2252553-1-hch@lst.de>
+ <20201207131918.2252553-2-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.99.212.201]
-X-ClientProxiedBy: BJSMTP01-EX.srv.huawei-3com.com (10.63.20.132) To
- DAG2EX03-BASE.srv.huawei-3com.com (10.8.0.66)
-X-DNSRBL: 
-X-MAIL: h3cspam01-ex.h3c.com 0B87oVLF065626
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201207131918.2252553-2-hch@lst.de>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-As no one cares about the return value of blk_mq_tag_busy() and
-__blk_mq_tag_busy(), so make them return void.
+On Mon, Dec 07, 2020 at 02:19:13PM +0100, Christoph Hellwig wrote:
+> dm-thin and dm-cache also work on partitions, so use the proper
+> interface to check if the device is read-only.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Hannes Reinecke <hare@suse.de>
+> ---
+>  drivers/md/dm-cache-metadata.c | 2 +-
+>  drivers/md/dm-thin-metadata.c  | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/md/dm-cache-metadata.c b/drivers/md/dm-cache-metadata.c
+> index af6d4f898e4c1d..89a73204dbf47f 100644
+> --- a/drivers/md/dm-cache-metadata.c
+> +++ b/drivers/md/dm-cache-metadata.c
+> @@ -449,7 +449,7 @@ static int __check_incompat_features(struct cache_disk_superblock *disk_super,
+>  	/*
+>  	 * Check for read-only metadata to skip the following RDWR checks.
+>  	 */
+> -	if (get_disk_ro(cmd->bdev->bd_disk))
+> +	if (bdev_read_only(cmd->bdev))
+>  		return 0;
+>  
+>  	features = le32_to_cpu(disk_super->compat_ro_flags) & ~DM_CACHE_FEATURE_COMPAT_RO_SUPP;
+> diff --git a/drivers/md/dm-thin-metadata.c b/drivers/md/dm-thin-metadata.c
+> index 6ebb2127f3e2e0..e75b20480e460e 100644
+> --- a/drivers/md/dm-thin-metadata.c
+> +++ b/drivers/md/dm-thin-metadata.c
+> @@ -636,7 +636,7 @@ static int __check_incompat_features(struct thin_disk_superblock *disk_super,
+>  	/*
+>  	 * Check for read-only metadata to skip the following RDWR checks.
+>  	 */
+> -	if (get_disk_ro(pmd->bdev->bd_disk))
+> +	if (bdev_read_only(pmd->bdev))
+>  		return 0;
+>  
+>  	features = le32_to_cpu(disk_super->compat_ro_flags) & ~THIN_FEATURE_COMPAT_RO_SUPP;
+> -- 
+> 2.29.2
+> 
 
-Signed-off-by: Xianting Tian <tian.xianting@h3c.com>
----
- block/blk-mq-tag.c | 4 ++--
- block/blk-mq-tag.h | 8 ++++----
- 2 files changed, 6 insertions(+), 6 deletions(-)
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index 9c92053e7..21ff7d156 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -21,7 +21,7 @@
-  * to get tag when first time, the other shared-tag users could reserve
-  * budget for it.
-  */
--bool __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
-+void __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
- {
- 	if (blk_mq_is_sbitmap_shared(hctx->flags)) {
- 		struct request_queue *q = hctx->queue;
-@@ -36,7 +36,7 @@ bool __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
- 			atomic_inc(&hctx->tags->active_queues);
- 	}
- 
--	return true;
-+	return;
- }
- 
- /*
-diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
-index 7d3e6b333..dd80e5a85 100644
---- a/block/blk-mq-tag.h
-+++ b/block/blk-mq-tag.h
-@@ -60,15 +60,15 @@ enum {
- 	BLK_MQ_TAG_MAX		= BLK_MQ_NO_TAG - 1,
- };
- 
--extern bool __blk_mq_tag_busy(struct blk_mq_hw_ctx *);
-+extern void __blk_mq_tag_busy(struct blk_mq_hw_ctx *);
- extern void __blk_mq_tag_idle(struct blk_mq_hw_ctx *);
- 
--static inline bool blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
-+static inline void blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
- {
- 	if (!(hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED))
--		return false;
-+		return;
- 
--	return __blk_mq_tag_busy(hctx);
-+	__blk_mq_tag_busy(hctx);
- }
- 
- static inline void blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
 -- 
-2.17.1
+Ming
 
