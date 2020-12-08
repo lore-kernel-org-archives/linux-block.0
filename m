@@ -2,65 +2,92 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA0B7C4361B
-	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 20:59:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3369FC2BB40
+	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 22:48:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B929F239FD
-	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 20:59:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0F49523B04
+	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 22:48:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729302AbgLHU70 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Dec 2020 15:59:26 -0500
-Received: from mail.kernel.org ([198.145.29.99]:52236 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729051AbgLHU70 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 8 Dec 2020 15:59:26 -0500
-Date:   Wed, 9 Dec 2020 04:03:35 +0900
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1607454221;
-        bh=L8FM559sr2mI1V2XQXd6cRw/SUcIbxs3FHy79RWrxTE=;
-        h=From:To:Cc:Subject:References:In-Reply-To:From;
-        b=mqPFzsO3ZAtKrz8wPFVBeXJWaALpK+sQlNZl72bJMa9iLYWRjbuzLOfizW2hm2/SJ
-         /GxpttTauDDzrD+AsLik6KleNnr4jHdL9tPX5msR2OWc6XMSz3/NP56qHaD7GBI96A
-         f7ZTH1H81h67nKMNI8eXpaGX7UtkNXSPhk+rpcz4N8n+Sv5Ud02zxROSs4q3vtcDkX
-         LOhDMtuumT61HLjeHsUrsGbQPVAx20DMxFieilInWQZdsVJHs94zWkNkOMlVemX8k7
-         mn1MduOAHj+/kNYum19CYda/IFmia3A8Dv6qqGTG5NYpWlWchuPffh67rbl6DbwlIW
-         uG+7uEPkZ0vBA==
-From:   Keith Busch <kbusch@kernel.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     javier@javigon.com, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, sagi@grimberg.me,
-        minwoo.im.dev@gmail.com,
-        Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier.gonz@samsung.com>
-Subject: Re: [PATCH V2] nvme: enable char device per namespace
-Message-ID: <20201208190335.GC27155@redsun51.ssa.fujisawa.hgst.com>
-References: <20201208132934.625-1-javier.gonz@samsung.com>
- <20201208142151.GA4108@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201208142151.GA4108@lst.de>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+        id S1730753AbgLHWsD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Dec 2020 17:48:03 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39671 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1730734AbgLHWsC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 8 Dec 2020 17:48:02 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1607467596;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=cMekdasT4/RuifFDN/rH2Fl3X1h1kIxQzyY1Zx8OrOI=;
+        b=XvsjqZt9o2aaK5hsqD5KRL6/p6G9z5Cg2Ni0RKYJbXt2gseyZRkSqSew9c05fEbyohIdTM
+        bkNP07N/1GB/FBFoA4/0YV5Aw56cINoOT71RuFkL79lgOV7IU1dqQXTKncuR+S/Kwh1+U/
+        mcAk3qHW/wTW/E1An9qxWIccnrFNkp0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-51-scN4ZhBWNbu9QSIXUr_WVw-1; Tue, 08 Dec 2020 17:46:33 -0500
+X-MC-Unique: scN4ZhBWNbu9QSIXUr_WVw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BB65C800D55;
+        Tue,  8 Dec 2020 22:46:32 +0000 (UTC)
+Received: from ovpn-112-111.phx2.redhat.com (ovpn-112-111.phx2.redhat.com [10.3.112.111])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 570C910016F6;
+        Tue,  8 Dec 2020 22:46:32 +0000 (UTC)
+Message-ID: <296fddc04dd70d2a608d3f9faf6bc26915ed518b.camel@redhat.com>
+Subject: Re: [PATCH 1/3] block: try one write zeroes request before going
+ further
+From:   "Ewan D. Milne" <emilne@redhat.com>
+To:     Tom Yan <tom.ty89@gmail.com>, linux-block@vger.kernel.org
+Cc:     linux-scsi@vger.kernel.org
+Date:   Tue, 08 Dec 2020 17:46:31 -0500
+In-Reply-To: <20201206055332.3144-1-tom.ty89@gmail.com>
+References: <20201206055332.3144-1-tom.ty89@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Dec 08, 2020 at 03:21:51PM +0100, Christoph Hellwig wrote:
-> > +	sprintf(cdisk_name, "nvme%dn%dc", ctrl->instance, ns->head->instance);
+On Sun, 2020-12-06 at 13:53 +0800, Tom Yan wrote:
+> At least the SCSI disk driver is "benevolent" when it try to decide
+> whether the device actually supports write zeroes, i.e. unless the
+> device explicity report otherwise, it assumes it does at first.
 > 
-> And the most important naming decision is this.  I have two issues with
-> naming still:
+> Therefore before we pile up bios that would fail at the end, we try
+> the command/request once, as not doing so could trigger quite a
+> disaster in at least certain case. For example, the host controller
+> can be messed up entirely when one does `blkdiscard -z` a UAS drive.
 > 
->  - we aready use the c for controller in the hidden disk naming.  Although
->    that is in a different position, but I think this not super intuitive.
->  - this is missing multipath support entirely, so once we want to add
->    multipath support we'll run into issues.  So maybe use something
->    based off the hidden node naming?  E.g.:
-> 
-> 	sprintf(disk_name, "nvme-generic-%dc%dn%d", ctrl->subsys->instance,
-> 		ctrl->instance, ns->head->instance);
 
-+1 for this naming suggestion.
+It's not as simple as that.  There are some SCSI devices that support
+WRITE ZEROES, but do not return the MAXIMUM WRITE SAME LENGTH in the
+block device limits VPD page.  So, some commands might work, and others
+might not.  In particular, a commonly-used hypervisor does this.
+
+The sd driver disables the use of write same if certain errors are
+returned (INVALID COMMAND w/ INVALID COMMAND OPCODE or INVALID FIELD IN
+CDB), but if you do a blkdiscard -z of an entire drive a whole lot of
+bios/requests are already queued by the time you get that.
+
+Higher level code checks to see if write zeroes is supported, and
+won't queue the requests once it is turned off, but that doesn't
+happen until a command fails.  We also check in command setup, see
+my earlier patch which deals with spurious blk_update_request errors
+if the disablement of write same gets detected there...  I explicitly
+did not try to fix that by "testing" with one bio for the reason
+Christoph mentions.
+
+-Ewan
+
+
