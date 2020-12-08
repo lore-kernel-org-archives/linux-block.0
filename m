@@ -2,90 +2,167 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F4A4C4361B
-	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 16:50:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2C79C433FE
+	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 16:53:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 36DAF23AFA
-	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 16:50:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 91AB023A79
+	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 16:53:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730001AbgLHQuC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Dec 2020 11:50:02 -0500
-Received: from mx2.suse.de ([195.135.220.15]:42522 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730398AbgLHQuC (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 8 Dec 2020 11:50:02 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id C82D5AD1E;
-        Tue,  8 Dec 2020 16:49:20 +0000 (UTC)
-Subject: Re: [PATCH 6/6] nvme: allow revalidate to set a namespace read-only
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc:     "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Oleksii Kurochko <olkuroch@cisco.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Dongsheng Yang <dongsheng.yang@easystack.cn>,
-        ceph-devel@vger.kernel.org, dm-devel@redhat.com,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        Keith Busch <kbusch@kernel.org>
-References: <20201208162829.2424563-1-hch@lst.de>
- <20201208162829.2424563-7-hch@lst.de>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <59794c03-e907-f265-2358-b2271b46ec2b@suse.de>
-Date:   Tue, 8 Dec 2020 17:49:19 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+        id S1730458AbgLHQxF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Dec 2020 11:53:05 -0500
+Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:36239 "EHLO
+        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1730439AbgLHQxE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Dec 2020 11:53:04 -0500
+Received: from callcc.thunk.org (pool-72-74-133-215.bstnma.fios.verizon.net [72.74.133.215])
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 0B8GqESk012309
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 8 Dec 2020 11:52:15 -0500
+Received: by callcc.thunk.org (Postfix, from userid 15806)
+        id 6CDE7420136; Tue,  8 Dec 2020 11:52:14 -0500 (EST)
+Date:   Tue, 8 Dec 2020 11:52:14 -0500
+From:   "Theodore Y. Ts'o" <tytso@mit.edu>
+To:     Michael Walle <michael@walle.cc>
+Cc:     Ulf Hansson <ulf.hansson@linaro.org>, linux-ext4@vger.kernel.org,
+        linux-mmc@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>
+Subject: Re: discard feature, mkfs.ext4 and mmc default fallback to normal
+ erase op
+Message-ID: <20201208165214.GD52960@mit.edu>
+References: <97c4bb65c8a3e688b191d57e9f06aa5a@walle.cc>
+ <20201207183534.GA52960@mit.edu>
+ <2edcf8e344937b3c5b92a0b87ebd13bd@walle.cc>
+ <20201208024057.GC52960@mit.edu>
+ <CAPDyKFpY+M_FVXCyeg+97jAgDSqhGDTNoND8CQDMWH-e09KGKQ@mail.gmail.com>
+ <d7041bbb403698ac1097f7740f364467@walle.cc>
 MIME-Version: 1.0
-In-Reply-To: <20201208162829.2424563-7-hch@lst.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d7041bbb403698ac1097f7740f364467@walle.cc>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/8/20 5:28 PM, Christoph Hellwig wrote:
-> Unconditionally call set_disk_ro now that it only updates the hardware
-> state.  This allows to properly set up the Linux devices read-only when
-> the controller turns a previously writable namespace read-only.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Keith Busch <kbusch@kernel.org>
-> Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-> ---
->   drivers/nvme/host/core.c | 5 ++---
->   1 file changed, 2 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-> index ce1b6151944131..3a0557ccc9fc5d 100644
-> --- a/drivers/nvme/host/core.c
-> +++ b/drivers/nvme/host/core.c
-> @@ -2114,9 +2114,8 @@ static void nvme_update_disk_info(struct gendisk *disk,
->   	nvme_config_discard(disk, ns);
->   	nvme_config_write_zeroes(disk, ns);
->   
-> -	if ((id->nsattr & NVME_NS_ATTR_RO) ||
-> -	    test_bit(NVME_NS_FORCE_RO, &ns->flags))
-> -		set_disk_ro(disk, true);
-> +	set_disk_ro(disk, (id->nsattr & NVME_NS_ATTR_RO) ||
-> +		test_bit(NVME_NS_FORCE_RO, &ns->flags));
->   }
->   
->   static inline bool nvme_first_scan(struct gendisk *disk)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+On Tue, Dec 08, 2020 at 12:26:22PM +0100, Michael Walle wrote:
+> Do we really need to map these functions? What if we don't have an
+> actual discard, but just a slow erase (I'm now assuming that erase
+> will likely be slow on sdcards)? Can't we just tell the user space
+> there is no discard? Like on a normal HDD? I really don't know the
+> implications, seems like mmc_erase() is just there for the linux
+> discard feature.
 
-Cheers,
+So the potential gotcha here is that "discard" is important for
+reducing write amplification, and thus improving the lifespan of
+devices.  (See my reference to the Tesla engine controller story
+earlier.)  So if a device doesn't have "discard" but has "erase", and
+"erase" is fast, then skipping the discard could end up significantly
+reducing the lifespan of your product, and we're back to the NHTSA
+investigating whether they should stick Tesla for the $1500 engine
+controller replacement when cards die early.
 
-Hannes
--- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
+I guess the JEDEC spec does specify a way to query the card for how
+long an erase takes, but I don't have the knowledge about how the
+actual real-world implementations of these specs (and their many
+variants over the years) actually behave.  Can the erase times that
+they advertise actually be trusted to be accurate?  How many of them
+actually supply erase times at all, no matter what the spec says?
+
+> Coming from the user space side. Does mkfs.ext4 assumes its pre-discard
+> is fast? I'd think so, right? I'd presume it was intented to tell the
+> FTL of the block device, "hey these blocks are unused, you can do some
+> wear leveling with them".
+
+Yes, the assumption is that discard is fast.  Exactly how fast seems
+to vary; this is one of the reasons why there are three different ways
+to do discards on a file system after files are deleted.  One way is
+to do them after the deleted definitely won't be unwound (i.e., after
+the ext4 journal commit).  But on some devices, the discard command,
+while fast, is slow enough that this will compete with the I/O
+completion times of other read commands, thus degrading system
+performance.  So you can also execute the trim commands out of cron,
+using the fstrim command, which will run the discards in the
+background, and the system administrator can adjust when fstrim is
+executed during times wheno performance isn't critical.  (e.g., when
+the phone is on a charger in the middle of the night, or at 4am local
+time, etc.)  Finally, you can configure e2fsck to run the discards
+after the file system consistency check is done.
+
+The reason why we have to leave this up to the system administrators
+is that we have essentially no guidance from the device how slow the
+discard command might be, how it intereferes with other device
+operations, and whether the discard might be more likely ignored if
+the device is busy.  So it might be that the discard will more likely
+improve write endurance when it is done when the device is idle.  All
+of the speccs (SCSI, SATA, UFS, eMMC, SD) are remarkable unhelpful
+because performance considerations is generally consider "out of
+scope" of standards committees.  They want to leave that up to market
+forces; which is why big companies (at handset vendors, hyperscale
+cloud providers, systems integrators, etc.) have to spend as much
+money doing certification testing before deciding which products to
+buy; think of it as a full-employment act for storage engineers.  :-)
+
+But yes, mke2fs assumes that discard is sufficiently fast that it
+doing it at file system format time is extremely reasonable.  The
+bigger concern is that we can't necessarily count on discard zero'ing
+the inode table, and there are robustness reasons (especially if
+before we had metadata checksums) where it makes file system repairs
+much more robust if the inode table is zero'ed ahead of time.
+
+> I'm just about finding some SD cards and looking how they behave timing
+> wise and what they report they support (ie. erase or discard). Looks
+> like other cards are doing better. But I'd have to find out if they
+> support the discard (mine doesn't) and if they are slow too if I force
+> them to use the normal erase.
+
+The challenge is that this sort of thing gets rapidly out of date, and
+it's not just SD cards but also eMMC devices which are built into
+various embedded devices, high-end SDHC cards, etc., etc.  So doing
+this gets very expensive.
+
+That being said, both ext4 and f2fs do pre-discards as part of the
+format step, since improving write endurance is important; customers
+get cranky when their $1000 smart phones die an early death.  So an SD
+card that behaves the way yours does would probably get disqualified
+very early in the certification step if it were ever intended to be
+used in an Android handset, since pretty much all Android devices, or
+embedded devices for that matter, use either f2fs or ext4.  That's one
+of the reasons why I was a bit surprised that your device had such an
+"interesting" performance profile.  Maybe it was intended for use in
+digital cameras, and digital camerase don't issue discards?  I don't
+know....
+
+> > I agree, these are the three levels that make sense to support.
+> > 
+> > Honestly I haven't been paying enough attention to discussions for the
+> > generic block layer around discards. However, considering what you
+> > just stated above, we seem to be missing one request operation, don't
+> > we?
+
+Yes, that's true.  We only have "discard" and "secure discard".  Part
+of that is because that's the only levels which are available for
+SSD's, for which I have the same general complaint vis-a-vis standards
+committees and the general lack of usefulness for file system
+engineers.
+
+For example, pretty much everyone in the enterprise and hyperscale
+cloud world assume that low-numbered LBA's have better performance
+profiles, and are located physically at the outer diameter of HDD's,
+compared to high-number'ed LBA's.  But that's nothing which is
+specified by the standards committees, because "performance
+considerations are out of scope".  Yet we still have to engineer
+storage systems which assume this to be true, even though nothing in
+the formal specs guarantees this.  We just have to trust that anyone
+who tries to sell a HDD for which this isn't true, even if it is
+"standards complaint", is going to have a bad time, and trust that
+this is enough.  (Perhaps this is why when a certain HDD manufacturer
+tried to sell HDD's containing drive-managed SMR for the NAS market,
+without disclosing this fact to consumers, this generated a massive
+backlash....  Simply being standards compliant is not enough.)
+
+					- Ted
