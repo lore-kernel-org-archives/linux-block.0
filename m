@@ -7,66 +7,73 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22858C4361B
-	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 03:30:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB20FC433FE
+	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 03:31:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C7FF223A5E
-	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 03:30:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 686CD23A5C
+	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 03:31:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727007AbgLHDa0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Dec 2020 22:30:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48860 "EHLO
+        id S1726380AbgLHDb2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Dec 2020 22:31:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49004 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726935AbgLHDaZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Dec 2020 22:30:25 -0500
-Received: from mail-pf1-x441.google.com (mail-pf1-x441.google.com [IPv6:2607:f8b0:4864:20::441])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A99CCC061749
-        for <linux-block@vger.kernel.org>; Mon,  7 Dec 2020 19:29:45 -0800 (PST)
-Received: by mail-pf1-x441.google.com with SMTP id f9so11936605pfc.11
-        for <linux-block@vger.kernel.org>; Mon, 07 Dec 2020 19:29:45 -0800 (PST)
+        with ESMTP id S1725995AbgLHDb2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Dec 2020 22:31:28 -0500
+Received: from mail-pl1-x643.google.com (mail-pl1-x643.google.com [IPv6:2607:f8b0:4864:20::643])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2722C061749
+        for <linux-block@vger.kernel.org>; Mon,  7 Dec 2020 19:30:42 -0800 (PST)
+Received: by mail-pl1-x643.google.com with SMTP id y8so266112plp.8
+        for <linux-block@vger.kernel.org>; Mon, 07 Dec 2020 19:30:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=/9G/C62N71eYALbTeP38z8WTx0TuJMRd5q2txQVdN4E=;
-        b=ijLRQWNQM0hih+pCqO8KYdqxe9pr+sQ552GHZtxCqnH6aw+PgMzh4D1sY7cABcjPqZ
-         yycxvRqb5bD93T8iXDFb8NGJ3Ck5Yr+2e/b8ZrfoJftZ1h5ZjYvqiTcMPugogh7AMP06
-         CCvexjhvUQ+xKQhvERIS+lifCwY4JXkTCgEzZvt3mm/movPF8WVoHbYBdmHO9LRmnCTG
-         TZwfrSey8hqyMV2tmBCZ+qhJFhjtn/iD48fmZQBRDN3x+luHCb59iyUOJlR9tUyGnGL0
-         G5GcUnN/e6Yy3/ETWj3AxSE80ew/RQFOv+QaXi1NqzXJLxNM50L/Fa2y/Ci4b71M7KT/
-         7h3g==
+        bh=XFuYMDYtSwKWNyWH6jp1aOcL3nAyWOZEAlDqHd4eq7g=;
+        b=Sc3jG1E/vxvfJFqpnp9pSqAhjIZgBkd8j9WayA+ZvsrNwabg3wrb+2rDLfXRUeNdYK
+         O8ErVucOpvF3CUJQgoYXI62yZneueSbVoUy0zsVxYTrseEfWxApd1wrtwJ8lVla41fqx
+         CHnZhkZs6KX/epOpSxdvFEpsdk5zxCJxvt7cNO5diF4sB/1kLZkLe4NZvDddrBPA2VX+
+         MYx369hWx4/AedjTPHmz/VmooVq6L0+p2a7/zdymCtMoESZx+h0ksYIa2Mx1aw+7D7nh
+         RjVK9cDhnQQzLwPurnflNd9I+Dse3vPc2uIAQuxSbHubDgvZT0CzQJYKp81kfyyhfEql
+         c2dQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=/9G/C62N71eYALbTeP38z8WTx0TuJMRd5q2txQVdN4E=;
-        b=FO/hUaXQP2F1p5ybgRUCknn7p0MA3zn8P1S2o80mEbDAFmA7FGVq6PbRfZwaUn2A02
-         rmFGVLARqxNc6nliend9ICd1FUVZEeDjXPzNdmRunbOPqRYVU4/1HI42H6324qJPd2g8
-         e6WBH2qHfm1NfxaC1kQJh8LpoIxSldJrXx+VInkfBGeao34jy3IyU2ab0s5+ii+rUfJr
-         qyYcVM+cKLHQ03XyAMIcJothTcS9vPA1uIkHC4Nz5btQrqG2eEIQAX6CxnmRfSpJHWf8
-         G9cFTr6MYad5XY6Ep+oe4srtj0kBEoRRpGfHNQQhW25WHFD53OSIRpgs/Ns5FI5iY0Ie
-         Cb1Q==
-X-Gm-Message-State: AOAM533r8ygdtkFSyB9E7ICemWERlXBoTfQzDuNf9S6HMsvdLho2v3sz
-        ElKLcpUSC3eEHvdFWbHqlIHRmS2pPgA3Fw==
-X-Google-Smtp-Source: ABdhPJxzTqmvL3HLCLxF7Em5LVoRtNbEyof+7T+RORlokcHsRo/LGy/wybIduuXI5XAKefLsMvndFA==
-X-Received: by 2002:a17:90b:e0d:: with SMTP id ge13mr2037954pjb.111.1607398185205;
-        Mon, 07 Dec 2020 19:29:45 -0800 (PST)
+        bh=XFuYMDYtSwKWNyWH6jp1aOcL3nAyWOZEAlDqHd4eq7g=;
+        b=gVXt+i1Lp7Jx4MpDQRVZxfA18wCRZsuKBGVWRtXElHB+q8hwPhJxyAIFhYDYE0wkEC
+         cxy1r6LO+dyl5sDnnZLvzX78EMCzTNw8uIZSvGnWsBFLvbueEkVVk3DcyBQiYVcWGrtH
+         WZAyGy0XTK3KB7uCZU9/uK7FG3cDy2Lmae+yXP2LOsxu0EvEQgxgnJHvvhtOQqThf+zM
+         WFAEjxM935nOIMFbpddAULyCuOfhyUfx3X0Luya7cFJb6/IeUHPp76yLMVr7kSuQrZ1n
+         B3AhyzqW3XoortlHVv7dOAl1eluqBq/0dxTspa8CxxCoAmpyR+unbblVk/4ECjkAHckT
+         uH6g==
+X-Gm-Message-State: AOAM530UvhRhlD4zEvNZoQn+bLCS+gZxBkc4ESJRL0vTYSzBV84mIR/6
+        Be5eRSqcnmSNtmef8oxy3ELSDQ==
+X-Google-Smtp-Source: ABdhPJzoSBhfFRpmcWsqhAh792nCMcqWhVUSlxJRroO3h/X3tb96uUwbgPJ8DWYh/3kJozNNV/VPkA==
+X-Received: by 2002:a17:902:8498:b029:d8:e2a0:e4e7 with SMTP id c24-20020a1709028498b02900d8e2a0e4e7mr19577284plo.49.1607398242205;
+        Mon, 07 Dec 2020 19:30:42 -0800 (PST)
 Received: from [192.168.1.134] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id d4sm855758pjz.28.2020.12.07.19.29.43
+        by smtp.gmail.com with ESMTPSA id v19sm868961pjg.50.2020.12.07.19.30.40
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 07 Dec 2020 19:29:44 -0800 (PST)
-Subject: Re: [PATCH v9] block: disable iopoll for split bio
-To:     Jeffle Xu <jefflexu@linux.alibaba.com>
-Cc:     linux-block@vger.kernel.org, joseph.qi@linux.alibaba.com
-References: <20201126091852.8588-1-jefflexu@linux.alibaba.com>
+        Mon, 07 Dec 2020 19:30:41 -0800 (PST)
+Subject: Re: [PATCH V2 0/3] blk-mq/nvme-loop: use nvme-loop's lock class for
+ addressing lockdep false positive warning
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Qian Cai <cai@redhat.com>,
+        Sumit Saxena <sumit.saxena@broadcom.com>,
+        John Garry <john.garry@huawei.com>,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hannes Reinecke <hare@suse.de>
+References: <20201203012638.543321-1-ming.lei@redhat.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <b211cec4-07fa-d647-b068-f7225963bc6c@kernel.dk>
-Date:   Mon, 7 Dec 2020 20:29:42 -0700
+Message-ID: <f6ab081f-d011-b2cd-3b98-55d623a2a83d@kernel.dk>
+Date:   Mon, 7 Dec 2020 20:30:39 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20201126091852.8588-1-jefflexu@linux.alibaba.com>
+In-Reply-To: <20201203012638.543321-1-ming.lei@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -74,40 +81,19 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/26/20 2:18 AM, Jeffle Xu wrote:
-> iopoll is initially for small size, latency sensitive IO. It doesn't
-> work well for big IO, especially when it needs to be split to multiple
-> bios. In this case, the returned cookie of __submit_bio_noacct_mq() is
-> indeed the cookie of the last split bio. The completion of *this* last
-> split bio done by iopoll doesn't mean the whole original bio has
-> completed. Callers of iopoll still need to wait for completion of other
-> split bios.
+On 12/2/20 6:26 PM, Ming Lei wrote:
+> Hi,
 > 
-> Besides bio splitting may cause more trouble for iopoll which isn't
-> supposed to be used in case of big IO.
+> Qian reported there is hang during booting when shared host tagset is
+> introduced on megaraid sas. Sumit reported the whole SCSI probe takes
+> about ~45min in his test.
 > 
-> iopoll for split bio may cause potential race if CPU migration happens
-> during bio submission. Since the returned cookie is that of the last
-> split bio, polling on the corresponding hardware queue doesn't help
-> complete other split bios, if these split bios are enqueued into
-> different hardware queues. Since interrupts are disabled for polling
-> queues, the completion of these other split bios depends on timeout
-> mechanism, thus causing a potential hang.
+> Turns out it is caused by nr_hw_queues increased, especially commit
+> b3c6a5997541("block: Fix a lockdep complaint triggered by request queue flushing")
+> adds synchronize_rcu() for each hctx's release handler.
 > 
-> iopoll for split bio may also cause hang for sync polling. Currently
-> both the blkdev and iomap-based fs (ext4/xfs, etc) support sync polling
-> in direct IO routine. These routines will submit bio without REQ_NOWAIT
-> flag set, and then start sync polling in current process context. The
-> process may hang in blk_mq_get_tag() if the submitted bio has to be
-> split into multiple bios and can rapidly exhaust the queue depth. The
-> process are waiting for the completion of the previously allocated
-> requests, which should be reaped by the following polling, and thus
-> causing a deadlock.
-> 
-> To avoid these subtle trouble described above, just disable iopoll for
-> split bio and return BLK_QC_T_NONE in this case. The side effect is that
-> non-HIPRI IO also returns BLK_QC_T_NONE now. It should be acceptable
-> since the returned cookie is never used for non-HIPRI IO.
+> Address the original lockdep false positive warning by simpler way, then
+> long scsi probe can be avoided with lockdep enabled.
 
 Applied, thanks.
 
