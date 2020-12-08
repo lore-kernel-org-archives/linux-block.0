@@ -2,150 +2,75 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 949CBC4361B
-	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 13:09:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E20C8C433FE
+	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 13:11:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 67FDE23AA7
-	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 13:09:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ADB0C23AA7
+	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 13:11:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726104AbgLHNJu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Dec 2020 08:09:50 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27270 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725931AbgLHNJu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 8 Dec 2020 08:09:50 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607432903;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=EHKuHbhmgYJQ9JfRsXEOl5wxu9DokPSdVH97Cc8P2Fw=;
-        b=S8yXwIj5W6FGXLOr8JArvAiiP0J5Yzt69YyyXmdDz7Rp+t3TrKKSS6FaLSGxoM7RGMpjEU
-        s6MEtCu9iOK8MvCfzdEI8+P6hs6v0SXkx3Ztiuhh0CPVCcXnaIJZ7OV5NvhMKr98r2PHAD
-        v44LZTXiMbIQFIpShYiIJsp32Xdnprk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-259-wb2SdLBENymOO0KHhm_coQ-1; Tue, 08 Dec 2020 08:08:17 -0500
-X-MC-Unique: wb2SdLBENymOO0KHhm_coQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 31A4E1934111;
-        Tue,  8 Dec 2020 13:08:15 +0000 (UTC)
-Received: from ovpn-114-102.rdu2.redhat.com (ovpn-114-102.rdu2.redhat.com [10.10.114.102])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 93EC85D6AB;
-        Tue,  8 Dec 2020 13:08:10 +0000 (UTC)
-Message-ID: <35ccbf886b1e02323eff96df480c6d5f1123023e.camel@redhat.com>
-Subject: Re: store a pointer to the block_device in struct bio (again)
-From:   Qian Cai <qcai@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        Coly Li <colyli@suse.de>, Song Liu <song@kernel.org>,
-        dm-devel@redhat.com, linux-bcache@vger.kernel.org,
-        linux-raid@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-block@vger.kernel.org,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Date:   Tue, 08 Dec 2020 08:08:10 -0500
-In-Reply-To: <20201208110403.GA22179@lst.de>
-References: <20201201165424.2030647-1-hch@lst.de>
-         <920899710c9e8dcce16e561c6d832e4e9c03cd73.camel@redhat.com>
-         <20201208110403.GA22179@lst.de>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+        id S1726584AbgLHNLe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Dec 2020 08:11:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53664 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726483AbgLHNLd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Dec 2020 08:11:33 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92BB1C061749
+        for <linux-block@vger.kernel.org>; Tue,  8 Dec 2020 05:10:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=nxtHzv3G9CEsPKPHZfP9UfNvs7B1c+41sN5DQUZcSLw=; b=sM+C6cWEp/UxfITu1s664UuzM/
+        KtCXekYwrglfLhLy6D/RD6L44Acm7LKZvypGQS3AWpwsDNkzWHKiQdtq09R62M8ETESngQfpRvBTl
+        M9f10LNE/OPkNJ8nZjN3D/oe7bKqi4ftmXvVz2gvLqrX8LWT2ZexyfcQZSLIsHzjajjH2HNKW+R/i
+        cGeg7cFQDXW4/ZA53vh/lll4g3Y467lCNRbPUtVJBwL2oAUCHRsf/0E11go14GF1sjSwSBUF83LTJ
+        RUb6EsqVHqnB1ado+dxtvcBCJz/EgmScMOyx9ng0DXJhTYsAAFWs8geJI4Smst8FsrEMySuz7hmvf
+        n1WzFCyA==;
+Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kmclV-0005nK-Ds; Tue, 08 Dec 2020 13:10:49 +0000
+Date:   Tue, 8 Dec 2020 13:10:49 +0000
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Daniel Wagner <dwagner@suse.de>,
+        Mike Galbraith <efault@gmx.de>,
+        Christoph Hellwig <hch@infradead.org>,
+        Sagi Grimberg <sagi@grimberg.me>
+Subject: Re: [PATCH 1/3] blk-mq: Don't complete on a remote CPU in force
+ threaded mode
+Message-ID: <20201208131049.GA22219@infradead.org>
+References: <20201204191356.2516405-1-bigeasy@linutronix.de>
+ <20201204191356.2516405-2-bigeasy@linutronix.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201204191356.2516405-2-bigeasy@linutronix.de>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 2020-12-08 at 12:04 +0100, Christoph Hellwig wrote:
-> can you send me details of your device mapper setup, e.g. which targets
-> are used, are they used on top of whole device or partitions.  Do you
-> use partitions on top of the dm devices?  Are any other stacking devices
-> involved?
+On Fri, Dec 04, 2020 at 08:13:54PM +0100, Sebastian Andrzej Siewior wrote:
+> With force threaded interrupts enabled, raising softirq from an SMP
+> function call will always result in waking the ksoftirqd thread. This is
+> not optimal given that the thread runs at SCHED_OTHER priority.
+> 
+> Completing the request in hard IRQ-context on PREEMPT_RT (which enforces
+> the force threaded mode) is bad because the completion handler may
+> acquire sleeping locks which violate the locking context.
+> 
+> Disable request completing on a remote CPU in force threaded mode.
+> 
+> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 
-It is a standard RHEL8 installation using "autopart", so I don't think it uses
-any particular targets. It is just a plain LVM backed by ahci (sda2 and sdb1.
-Some other affected systems use smartpqi/NVM). The kernel has only dm-mirror
-enabled but I don't think it uses it anyway.
+Looks good,
 
-# grep -i _DM_ .config | grep -v ^#
-CONFIG_BLK_DEV_DM_BUILTIN=y
-CONFIG_DM_MIRROR=m
-CONFIG_DM_UEVENT=y
-
-# lvdisplay
-  --- Logical volume ---
-  LV Path                /dev/rhel_ibm-p9wr-10/home
-  LV Name                home
-  VG Name                rhel_ibm-p9wr-10
-  LV UUID                ETS2PI-yedc-7AJ6-NUP2-uAYD-6api-bp9nqv
-  LV Write Access        read/write
-  LV Status              available
-  # open                 1
-  LV Size                <3.57 TiB
-  Current LE             934662
-  Segments               2
-  Allocation             inherit
-  Read ahead sectors     auto
-  - currently set to     8192
-  Block device           254:2
-   
-  --- Logical volume ---
-  LV Path                /dev/rhel_ibm-p9wr-10/root
-  LV Name                root
-  VG Name                rhel_ibm-p9wr-10
-  LV UUID                ozakb8-2DWE-YBI9-4nnc-gwk8-mMuf-s3EPsB
-  LV Write Access        read/write
-  LV Status              available
-  # open                 1
-  LV Size                70.00 GiB
-  Current LE             17920
-  Segments               1
-  Allocation             inherit
-  Read ahead sectors     auto
-  - currently set to     8192
-  Block device           254:0
-
-# pvdisplay 
-  --- Physical volume ---
-  PV Name               /dev/sda2
-  VG Name               rhel_ibm-p9wr-10
-  PV Size               <1.82 TiB / not usable 4.00 MiB
-  Allocatable           yes (but full)
-  PE Size               4.00 MiB
-  Total PE              476675
-  Free PE               0
-  Allocated PE          476675
-  PV UUID               0Tv2Az-vx7S-HLPd-66Ff-tH6H-dte1-tjSZ7i
-   
-  --- Physical volume ---
-  PV Name               /dev/sdb1
-  VG Name               rhel_ibm-p9wr-10
-  PV Size               <1.82 TiB / not usable 4.00 MiB
-  Allocatable           yes (but full)
-  PE Size               4.00 MiB
-  Total PE              476931
-  Free PE               0
-  Allocated PE          476931
-  PV UUID               4LfZJN-NxbJ-39OC-VBKP-jv5P-hciK-BOdiML
-
-# lsblk 
-NAME                        MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
-sda                           8:0    1  1.8T  0 disk 
-├─sda1                        8:1    1    1G  0 part /boot
-└─sda2                        8:2    1  1.8T  0 part 
-  ├─rhel_ibm--p9wr--10-root 254:0    0   70G  0 lvm  /
-  └─rhel_ibm--p9wr--10-home 254:2    0  3.6T  0 lvm  /home
-sdb                           8:16   1  1.8T  0 disk 
-└─sdb1                        8:17   1  1.8T  0 part 
-  └─rhel_ibm--p9wr--10-home 254:2    0  3.6T  0 lvm  /home
-
+Reviewed-by: Christoph Hellwig <hch@lst.de>
