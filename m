@@ -2,229 +2,204 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11413C4167B
-	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 11:05:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A325C4361B
+	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 11:27:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D36BC23AC6
-	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 11:05:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CDC5323A1D
+	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 11:27:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729143AbgLHLEt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Dec 2020 06:04:49 -0500
-Received: from verein.lst.de ([213.95.11.211]:45802 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727815AbgLHLEs (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 8 Dec 2020 06:04:48 -0500
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 503686736F; Tue,  8 Dec 2020 12:04:04 +0100 (CET)
-Date:   Tue, 8 Dec 2020 12:04:03 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Qian Cai <qcai@redhat.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Tejun Heo <tj@kernel.org>, Coly Li <colyli@suse.de>,
-        Song Liu <song@kernel.org>, dm-devel@redhat.com,
-        linux-bcache@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-block@vger.kernel.org,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: Re: store a pointer to the block_device in struct bio (again)
-Message-ID: <20201208110403.GA22179@lst.de>
-References: <20201201165424.2030647-1-hch@lst.de> <920899710c9e8dcce16e561c6d832e4e9c03cd73.camel@redhat.com>
+        id S1729121AbgLHL1G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Dec 2020 06:27:06 -0500
+Received: from ssl.serverraum.org ([176.9.125.105]:34537 "EHLO
+        ssl.serverraum.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728675AbgLHL1F (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Dec 2020 06:27:05 -0500
+Received: from ssl.serverraum.org (web.serverraum.org [172.16.0.2])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ssl.serverraum.org (Postfix) with ESMTPSA id 271BE22EE4;
+        Tue,  8 Dec 2020 12:26:23 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=walle.cc; s=mail2016061301;
+        t=1607426783;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=qWl+I7X6TJi78y7STr+Q0MnVYohL9QwffjUsZSPHXPA=;
+        b=Sotu8v3/HzIH7GFx2gr7/3Dh9Lmeyk4m4JL+qWxY28Lh3KMPqmz7RfOBghDZvtuKI+s1Hq
+        BvDcM6qoqaGjoxtwzDhk4n9N90dS+PnxENBByAqkWJplKlc5UumNAuPTbHkAGlsFOEa5B7
+        /eI4kJUZzckQwg0z5QZlm6Mpv7ghG1E=
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <920899710c9e8dcce16e561c6d832e4e9c03cd73.camel@redhat.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Tue, 08 Dec 2020 12:26:22 +0100
+From:   Michael Walle <michael@walle.cc>
+To:     Ulf Hansson <ulf.hansson@linaro.org>
+Cc:     "Theodore Y. Ts'o" <tytso@mit.edu>, linux-ext4@vger.kernel.org,
+        linux-mmc@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>
+Subject: Re: discard feature, mkfs.ext4 and mmc default fallback to normal
+ erase op
+In-Reply-To: <CAPDyKFpY+M_FVXCyeg+97jAgDSqhGDTNoND8CQDMWH-e09KGKQ@mail.gmail.com>
+References: <97c4bb65c8a3e688b191d57e9f06aa5a@walle.cc>
+ <20201207183534.GA52960@mit.edu> <2edcf8e344937b3c5b92a0b87ebd13bd@walle.cc>
+ <20201208024057.GC52960@mit.edu>
+ <CAPDyKFpY+M_FVXCyeg+97jAgDSqhGDTNoND8CQDMWH-e09KGKQ@mail.gmail.com>
+User-Agent: Roundcube Webmail/1.4.9
+Message-ID: <d7041bbb403698ac1097f7740f364467@walle.cc>
+X-Sender: michael@walle.cc
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Qian,
+Hi Ulf, Hi Ted,
 
-can you send me details of your device mapper setup, e.g. which targets
-are used, are they used on top of whole device or partitions.  Do you
-use partitions on top of the dm devices?  Are any other stacking devices
-involved?
+Am 2020-12-08 10:49, schrieb Ulf Hansson:
+> On Tue, 8 Dec 2020 at 03:41, Theodore Y. Ts'o <tytso@mit.edu> wrote:
+>> On Mon, Dec 07, 2020 at 09:39:32PM +0100, Michael Walle wrote:
+>> > > There are three different MMC commands which are defined:
+>> > >
+>> > > 1) DISCARD
+>> > > 2) ERASE
+>> > > 3) SECURE ERASE
+>> > >
+>> > > The first two are expected to be fast, since it only involves clearing
+>> > > some metadata fields in the Flash Translation Layer (FTL), so that the
+>> > > LBA's in the specified range are no longer mapped to a flash page.
+>> >
+>> > Mh, where is it specified that the erase command is fast? According
+>> > to the Physical Layer Simplified Specification Version 8.00:
+>> >
+>> >  The actual erase time may be quite long, and the host may issue CMD7
+>> >  to deselect thhe card or perform card disconnection, as described in
+>> >  the Block Write section, above.
+> 
+> Before I go into some more detail, of course I fully agree that
+> dealing with erase/discard from the eMMC/SD specifications (and other
+> types of devices) point of view isn't entirely easy. :-)
+> 
+> But I also think we can do better than currently, at least for eMMC/SD.
+> 
+>> 
+>> I looked at the eMMC specification from JEDEC (JESD84-A44) and there,
+>> both the "erase" and "trim" are specified that the work is to be
+>> queued to be done at a time which is convenient to the controller
+>> (read: FTL).  This is in contrast to the "secure erase" and "secure
+>> trim" commands, where the erasing has to be done NOW NOW NOW for "high
+>> security applications".
 
-On Mon, Dec 07, 2020 at 01:56:26PM -0500, Qian Cai wrote:
-> On Tue, 2020-12-01 at 17:54 +0100, Christoph Hellwig wrote:
-> > Hi Jens,
-> > 
-> > this series switches back from storing the gendisk + partno to storing
-> > a block_device pointer in struct bio.  The reason is two fold:  for one
-> > the new struct block_device actually is always available, removing the
-> > need to avoid originally.  Second the merge struct block_device is much
-> > more useful than the old one, as storing it avoids the need for looking
-> > up what used to be hd_struct during partition remapping and I/O
-> > accounting.
-> > 
-> > Note that this series depends on the posted but not merged
-> > "block tracepoint cleanups" series.
+Oh this might also be because I've cited from the wrong place, namely 
+the
+mmc_init_card() function. But what I really meant was the sd card 
+equivalent
+which should be mmc_read_ssr(). Sorry.
+
+	discard_support = UNSTUFF_BITS(resp, 313 - 288, 1);
+	card->erase_arg = (card->scr.sda_specx && discard_support) ?
+			    SD_DISCARD_ARG : SD_ERASE_ARG;
+
+>> The only difference between "erase" and "trim" seems to be that erahse
+>> has to be done in units of the "erase groups" which is typically
+>> larger than the "write pages" which is the granularity required by the
+>> trim command.  There is also a comment that when you are erasing the
+>> entire partition, "erase" is preferred over "trim".  (Presumably
+>> because it is more convenient?  The spec is not clear.)
+>> 
+>> Unfortunately, the SD Card spec and the eMMC spec both read like they
+>> were written by a standards committee stacked by hardware engineers.
+>> It doesn't look like they had file system engineers in the room,
+>> because the distinctions between "erase" and "trim" are pretty silly,
+>> and not well defined.  Aside from what I wrote, the spec is remarkably
+>> silent about what the host OS can depend upon.
 > 
-> Reverting this patchset on the top of today's linux-next fixed data corruptions
-> everywhere, i.e.,
+> Moreover, the specs have evolved over the years. Somehow, we need to
+> map a REQ_OP_DISCARD and REQ_OP_SECURE_ERASE to the best matching
+> operation that the currently inserted eMMC/SD card supports...
+
+Do we really need to map these functions? What if we don't have an
+actual discard, but just a slow erase (I'm now assuming that erase
+will likely be slow on sdcards)? Can't we just tell the user space
+there is no discard? Like on a normal HDD? I really don't know the
+implications, seems like mmc_erase() is just there for the linux
+discard feature.
+
+Coming from the user space side. Does mkfs.ext4 assumes its pre-discard
+is fast? I'd think so, right? I'd presume it was intented to tell the
+FTL of the block device, "hey these blocks are unused, you can do some
+wear leveling with them".
+
+> Long time time ago, both the SD and eMMC spec introduced support for
+> real discards commands, as being hints to the card without any
+> guarantees of what will happen to the data from a logical or a
+> physical point of view. If the card supports that, we should use it as
+> the first option for REQ_OP_DISCARD. Although, what should we pick as
+> the second best option, when the card doesn't support discard - that's
+> when it becomes more tricky. And the similar applies for
+> REQ_OP_SECURE_ERASE, or course.
 > 
-> $ git revert --no-edit a54895fa057c..4498a8536c81
-> (with a trivial conflict resolution with the commit "block: move
-> blk_rq_bio_prep() to linux/blk-mq.h")
+> If you have any suggestions for how we can improve in the above
+> decisions, feel free to suggest something.
 > 
-> .config (if ever matters and also happened on POWER9 NV):
-> https://cailca.coding.net/public/linux/mm/git/files/master/x86.config
+> Another issue that most likely is causing poor performance for
+> REQ_OP_DISCARD/REQ_OP_SECURE_ERASE for eMMC/SD, is that in
+> mmc_queue_setup_discard() we set up the maximum discard sectors
+> allowed per request and the discard granularity.
 > 
-> == XFS failed to mount ==
-> [   55.116279][ T1507] XFS (dm-0): Mounting V5 Filesystem
-> [   55.144671][ T1507] XFS (dm-0): Corruption warning: Metadata has LSN (3:70242) ahead of current LSN (3:66504). Please unmount and run xfs_repair (>= v4.3) to resolve.
-> [   55.159965][ T1507] XFS (dm-0): log mount/recovery failed: error -22
-> [   55.288632][ T1507] XFS (dm-0): log mount failed
+> To find performance bottlenecks, I would start looking at what actual
+> eMMC/SD commands/args we end up mapping towards the
+> REQ_OP_DISCARD/REQ_OP_SECURE_ERASE requests. Then definitely, I would
+> also look at the values we end up picking as max discard sectors and
+> the discard granularity.
+
+I'm just about finding some SD cards and looking how they behave timing
+wise and what they report they support (ie. erase or discard). Looks
+like other cards are doing better. But I'd have to find out if they
+support the discard (mine doesn't) and if they are slow too if I force
+them to use the normal erase.
+
+>> From the fs perspective, what we care about is whether or not the
+>> command is a hint or a reliable way to zero a range of sectors.  A
+>> command could be a hint if the device is allowed to ignore it, or if
+>> the values of the sector are indeterminate, or if the sectors are
+>> zero'ed or not could change after a power cycle.  (I've seen an
+>> implementation where discard would result in the LBA's being read as
+>> zero --- but after a power cycle, reading from the same LBA would
+>> return the old data again.  This is standards complaint, but it's not
+>> terribly useful.)
 > 
-> In this case, it is not possible to mount the XFS rootfs anymore, and it can be
-> repaired with "-L". However, we could lost vital files. Then, I have to re-
-> install the system.
+> :-)
 > 
-> systemd[1]: System cannot boot: Missing /etc/machine-id and /etc is mounted read-only.
-> systemd[1]: Booting up is supported only when:
-> systemd[1]: 1) /etc/machine-id exists and is populated.
-> systemd[1]: 2) /etc/machine-id exists and is empty.
-> systemd[1]: 3) /etc/machine-id is missing and /etc is writable.
-> lvm2-activation-generator: lvmconfig failed
-> systemd[1]: Failed to populate /etc with preset unit settings, ignoring: No such file or directory
+>> 
+>> Assuming that the command is reliable, the next question is whether
+>> the erase operation is logical or physical --- which is to say, if an
+>> attacker has physical access to the die, with the ability to bypass
+>> the FTL and directly read the flash cells, could the attack retrieve
+>> the data, even if it required a distructive, physical attack on the
+>> hardware?  A logical erase would not require that the data be erased
+>> or otherwise made inaccessible against an attacker who bypasses the
+>> FTL; a physical erase would provide security guarantees that even if
+>> your phone has handed over to state-sponsored attacker, that nothing
+>> could be extracted after a physical erase.
+>> 
+>> So if I were king, those would be the three levels of discard: "hint",
+>> "reliable logical", and "reliable physical", as those map to real use
+>> cases that are of actual use to a Host.  The challenge is mapping what
+>> we *actually* are given by different specs, which were written by
+>> hardware engineers and make distinctions that are not well defined so
+>> that multiple implementations can be "standard compliant", but have
+>> completely different performance profiles, thus making life easy for
+>> the marketing types, and hard for the file system engineers.  :-)
 > 
-> == systemd core dump ==
-> [   46.124485][ T1028] Process 1028(systemd-coredum) has RLIMIT_CORE set to 1
-> [   46.131434][ T1028] Aborting core
-> [   46.143366][ T1027] systemd-cgroups (1027) used greatest stack depth: 23512 bytes left
-> [   46.384430][    T1] printk: systemd: 20 output lines suppressed due to ratelimiting
-> [   46.447620][    T1] traps: systemd[1] trap invalid opcode ip:7f44c485fee6 sp:7ffee96e6960 error:0 in libm-2.28.so[7f44c481a000+181000]
-> [   46.492643][ T1029] traps: systemd-coredum[1029] trap invalid opcode ip:7f2f60471ee6 sp:7ffd58f76e00 error:0 in libm-2.28.so[7f2f6042c000+181000]
-> [   46.505968][ T1029] Process 1029(systemd-coredum) has RLIMIT_CORE set to 1
-> [   46.512900][ T1029] Aborting core
-> [   46.520024][    T1] Kernel panic - not syncing: Attempted to kill init! exitcode=0x00000084
-> [   46.528437][    T1] CPU: 32 PID: 1 Comm: systemd Not tainted 5.10.0-rc6-next-20201207 #1
-> [   46.536581][    T1] Hardware name: HPE ProLiant DL385 Gen10/ProLiant DL385 Gen10, BIOS A40 07/10/2019
-> [   46.545860][    T1] Call Trace:
-> [   46.549038][    T1]  dump_stack+0x99/0xcb
-> [   46.553082][    T1]  panic+0x20c/0x48b
-> [   46.556860][    T1]  ? print_oops_end_marker.cold.10+0x10/0x10
-> [   46.562739][    T1]  ? do_signal_stop+0x690/0x690
-> [   46.567478][    T1]  ? do_exit+0x226/0x2410
-> [   46.571690][    T1]  do_exit.cold.38+0x1de/0x1e5
-> [   46.576346][    T1]  ? rcu_read_lock_sched_held+0xa1/0xd0
-> [   46.581782][    T1]  ? rcu_read_lock_bh_held+0xb0/0xb0
-> [   46.586955][    T1]  ? mm_update_next_owner+0x750/0x750
-> [   46.592215][    T1]  ? get_signal+0x80f/0x1f90
-> [   46.596688][    T1]  do_group_exit+0xf0/0x2e0
-> [   46.601076][    T1]  get_signal+0x35a/0x1f90
-> [   46.605380][    T1]  ? finish_task_switch+0x1bb/0xa80
-> [   46.610468][    T1]  arch_do_signal_or_restart+0x1d8/0x690
-> [   46.615993][    T1]  ? __setup_rt_frame.isra.15+0x1830/0x1830
-> [   46.621781][    T1]  ? __sched_text_start+0x8/0x8
-> [   46.626521][    T1]  ? asm_exc_invalid_op+0xa/0x20
-> [   46.631347][    T1]  exit_to_user_mode_prepare+0xde/0x170
-> [   46.636782][    T1]  irqentry_exit_to_user_mode+0x5/0x30
-> [   46.642129][    T1]  asm_exc_invalid_op+0x12/0x20
-> [   46.646868][    T1] RIP: 0033:0x7f44c485fee6
-> [   46.651171][    T1] Code: 6d 6e 6f 70 71 72 73 74 75 76 77 78 79 7a 0a 00 41 42 43 44 45 46 47 48 49 4a 4b 4c 4d 4e 4f 50 51 52 53 54 55 56 57 58 59 5a <61> 62 63 64 65 66 67 68 6a 69 6b 6c 6d 6e 6f 70 71 72 73 74 75 76
-> [   46.670757][    T1] RSP: 002b:00007ffee96e6960 EFLAGS: 00010202
-> [   46.676719][    T1] RAX: 00007f44c481c780 RBX: 00007f44c4825e78 RCX: 0000000000000000
-> [   46.684600][    T1] RDX: 00007ffee96e6a90 RSI: 0000000000000000 RDI: 00007f44c481c780
-> [   46.692480][    T1] RBP: 00007ffee96e6a90 R08: 00007f44c85d88a8 R09: 00007f44c85d88a8
-> [   46.700360][    T1] R10: 00007f44ca38e4f0 R11: 00007f44c481a000 R12: 00007f44c481c780
-> [   46.708241][    T1] R13: 00007f44c4826088 R14: 00007f44c4b9b128 R15: 00007f44ca38e4f0
-> [   46.716523][    T1] Kernel Offset: 0x11000000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
-> [   46.728244][    T1] ---[ end Kernel panic - not syncing: Attempted to kill init! exitcode=0x00000084 ]---
+> I agree, these are the three levels that make sense to support.
 > 
-> == git coredump == 
-> # coredumpctl dump
->            PID: 1906 (git)
->            UID: 0 (root)
->            GID: 0 (root)
->         Signal: 11 (SEGV)
->      Timestamp: Mon 2020-12-07 10:10:36 EST (34s ago)
->        Boot ID: 5dd9e21b02e4487f96d2ffeed3140f22
->     Machine ID: 00f60cae470d4f54a377e935638619c5
->        Storage: /var/lib/systemd/coredump/core.git.0.5dd9e21b02e4487f96d2ffeed3140f22.1906.1607353836000000.lz4
->        Message: Process 1906 (git) of user 0 dumped core.
->                 
->                 Stack trace of thread 1906:
->                 #0  0x00007fff845af9dc _dl_relocate_object (/usr/lib64/ld-2.28.so)
->                 #1  0x00007fff845a6664 dl_main (/usr/lib64/ld-2.28.so)
->                 #2  0x00007fff845c0448 _dl_sysdep_start (/usr/lib64/ld-2.28.so)
->                 #3  0x00007fff845a1cbc _dl_start_final (/usr/lib64/ld-2.28.so)
->                 #4  0x00007fff845a2dbc _dl_start (/usr/lib64/ld-2.28.so)
->                 #5  0x00007fff845a1458 _start (/usr/lib64/ld-2.28.so)
-> 
-> > 
-> > A git tree is also available:
-> > 
-> >     git://git.infradead.org/users/hch/block.git bi_bdev
-> > 
-> > Gitweb:
-> > 
-> >     http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/bi_bdev
-> > 
-> > Diffstat:
-> >  arch/m68k/emu/nfblock.c             |    2 
-> >  arch/xtensa/platforms/iss/simdisk.c |    2 
-> >  block/bio-integrity.c               |   18 +-
-> >  block/bio.c                         |   31 +---
-> >  block/blk-cgroup.c                  |    7 
-> >  block/blk-core.c                    |   99 ++++++-------
-> >  block/blk-crypto-fallback.c         |    2 
-> >  block/blk-crypto.c                  |    2 
-> >  block/blk-merge.c                   |   17 +-
-> >  block/blk-mq.c                      |    2 
-> >  block/blk-settings.c                |    2 
-> >  block/blk-throttle.c                |    2 
-> >  block/blk.h                         |    9 -
-> >  block/bounce.c                      |    2 
-> >  block/genhd.c                       |  261 +++-------------------------------
-> > --
-> >  block/partitions/core.c             |   31 ----
-> >  drivers/block/brd.c                 |    8 -
-> >  drivers/block/drbd/drbd_int.h       |    4 
-> >  drivers/block/drbd/drbd_req.c       |    2 
-> >  drivers/block/null_blk_main.c       |    2 
-> >  drivers/block/pktcdvd.c             |    4 
-> >  drivers/block/ps3vram.c             |    2 
-> >  drivers/block/rsxx/dev.c            |    2 
-> >  drivers/block/umem.c                |    2 
-> >  drivers/block/zram/zram_drv.c       |    2 
-> >  drivers/lightnvm/pblk-init.c        |    2 
-> >  drivers/md/bcache/debug.c           |    2 
-> >  drivers/md/bcache/request.c         |   39 +++--
-> >  drivers/md/dm-bio-record.h          |    9 -
-> >  drivers/md/dm-raid1.c               |   10 -
-> >  drivers/md/dm.c                     |   14 -
-> >  drivers/md/md-linear.c              |    2 
-> >  drivers/md/md.c                     |   10 -
-> >  drivers/md/md.h                     |    6 
-> >  drivers/md/raid1.c                  |    6 
-> >  drivers/md/raid10.c                 |   12 -
-> >  drivers/md/raid5.c                  |    2 
-> >  drivers/nvdimm/blk.c                |    4 
-> >  drivers/nvdimm/btt.c                |    4 
-> >  drivers/nvdimm/pmem.c               |    4 
-> >  drivers/nvme/host/core.c            |    6 
-> >  drivers/nvme/host/lightnvm.c        |    3 
-> >  drivers/nvme/host/multipath.c       |    6 
-> >  drivers/nvme/host/rdma.c            |    2 
-> >  drivers/s390/block/dasd.c           |   26 ---
-> >  drivers/s390/block/dcssblk.c        |    6 
-> >  drivers/s390/block/xpram.c          |    2 
-> >  fs/btrfs/check-integrity.c          |   10 -
-> >  fs/btrfs/raid56.c                   |    7 
-> >  fs/btrfs/scrub.c                    |    2 
-> >  fs/direct-io.c                      |    2 
-> >  fs/f2fs/data.c                      |   12 -
-> >  include/linux/bio.h                 |   18 +-
-> >  include/linux/blk_types.h           |    3 
-> >  include/linux/blkdev.h              |   20 --
-> >  include/linux/genhd.h               |   21 --
-> >  kernel/trace/blktrace.c             |   16 +-
-> >  mm/page_io.c                        |    2 
-> >  58 files changed, 251 insertions(+), 556 deletions(-)
----end quoted text---
+> Honestly I haven't been paying enough attention to discussions for the
+> generic block layer around discards. However, considering what you
+> just stated above, we seem to be missing one request operation, don't
+> we?
+
+-michael
