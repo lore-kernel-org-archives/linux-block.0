@@ -2,76 +2,105 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95F5CC4361B
-	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 12:55:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA2A5C433FE
+	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 12:58:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4853023A84
-	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 12:55:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8C40823A3C
+	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 12:58:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727724AbgLHMzK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Dec 2020 07:55:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51152 "EHLO
+        id S1727844AbgLHM5w (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Dec 2020 07:57:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51572 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727132AbgLHMzK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Dec 2020 07:55:10 -0500
-Received: from mail-oi1-x242.google.com (mail-oi1-x242.google.com [IPv6:2607:f8b0:4864:20::242])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EC3FC061749;
-        Tue,  8 Dec 2020 04:54:30 -0800 (PST)
-Received: by mail-oi1-x242.google.com with SMTP id k2so19262170oic.13;
-        Tue, 08 Dec 2020 04:54:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=c6WYIJBR+XhsRbnD+26INvZc4Uq/faLVddDY22Y12+I=;
-        b=f2rR/A08P8HqinKm4cKRhkaeB9dxEVcdUntPs7bNhtV6QTPwb0MsyBaSdy6SSCwXSP
-         ZoZIy8Az7tfW5TL1zWbmrODkqgk5KR5dZtIj2KzdzHMx5krUfd3YaJgZXpLnXF7GPPui
-         HjpwmWhGjUTjxNIKPX6Pce8AEbpilgwG5NT+z2hlxG9DcH5BzhWkFA5xOoocZvOH2Tuw
-         a7fpwLI71DifiKNOptj+vbaxLezyrZFeOnVMnm0Abw5oy7NUarJum8yBEn1ywGCCP7EL
-         JhZq1Aqq9AyEK2zFjtzzbgCRfMx6joU8TfDGYXMvQXNKpX65O272vY4v4Hq3f7vMrtTw
-         1/Mw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=c6WYIJBR+XhsRbnD+26INvZc4Uq/faLVddDY22Y12+I=;
-        b=mWpn3QZxksMvBNIkENZuJoz9LSj/e9hdozJzyPSKZ0I2S8Y8C1EQ9hfdNq3DJFybeM
-         l8YO3bN6mY1eKGTQxIf6NpIdA+gECxknGQ9/TQBRE6qaiHjDwEFlOMkOdkPH4ws3O/Rw
-         fNjP2382HHbAVhIqeG0PWtOv5/IDGMVgHTzS7YSkW54rnGmNmcBUrWZzkXNyeThY1dAP
-         EqCH9djxhN8QsnboS7hTxCpHo8cyGrpmfG53F7kHQzQbsByxzHCglpSTe+qb3K+ZHSBl
-         cdz74ZFibkCzvjK6mtnm0UZDPn7rWz446nveNmJ5cvvQrkb62EyuWj6wgSGfVvmvuQ6u
-         vjrw==
-X-Gm-Message-State: AOAM5310o/A+3cyvry5MnrpRj1yTUvRqG/ON/UtYRY0E4tsl/iH6Q3Xg
-        iIy/lBc397LTmG6r+Qfmk8HfQ+SEnz0WODKqqJrdVej6
-X-Google-Smtp-Source: ABdhPJzWqO0H6xQo1Pa+3kwG5pzoNzdKSmz9FQ8FqZ7A9U4h+okSZLXN8+9NFz9k18BK4yVodzucg7f/MUDdZT38Td4=
-X-Received: by 2002:a05:6808:a1a:: with SMTP id n26mr2498315oij.94.1607432069805;
- Tue, 08 Dec 2020 04:54:29 -0800 (PST)
+        with ESMTP id S1727132AbgLHM5w (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Dec 2020 07:57:52 -0500
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50DE9C061749
+        for <linux-block@vger.kernel.org>; Tue,  8 Dec 2020 04:57:12 -0800 (PST)
+Date:   Tue, 8 Dec 2020 13:57:09 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1607432230;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=XKwBP8F64HqqEOqVbrdLVgdD7U+GBrY0UADzThR7GiU=;
+        b=wlUtUP/EKOWAo80ezYxAX6M63+C2kksjj26WPE2uHdfhW5V2RYe9sUMxJAuS2yzXfVJQtV
+        KuQHdJ+gbsxxlJVDc7MclRpnJbWUFChbWCbyLzXrtDZl3zJ/QH/cxQ2vlnHOPY1jhBxswv
+        L/nGH/F+LknEKCtv/jGPrdvbavnGAm03PUK79kHWEo0/LGkVjyL2ya1CyqiNHZ7ddbHN4h
+        ON+ppCSSbhq/f4XZn7k7HkPJh/Ue09fHeTdMVg+iNOpxJhiaS40yJ8jJQaPm3vnWqA0cCB
+        1FvWas7ipU/P5OGGMBojLqdfp5SB4KFnCHTFlOD0e+ydGopjN4ei743FhyEtKQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1607432230;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=XKwBP8F64HqqEOqVbrdLVgdD7U+GBrY0UADzThR7GiU=;
+        b=DcD218yrg0J+kU5g3H2poD5jKTmP/c7o+X79JJNxvIpSp/wKRKL3Ty2PjRNmoknX5tRb50
+        BAuE58aBCMY7qLDg==
+From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To:     Daniel Wagner <dwagner@suse.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Mike Galbraith <efault@gmx.de>,
+        Christoph Hellwig <hch@infradead.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH 2/3] blk-mq: Always complete remote completions requests
+ in softirq
+Message-ID: <20201208125709.5epgbpmqp56bf243@linutronix.de>
+References: <20201204191356.2516405-1-bigeasy@linutronix.de>
+ <20201204191356.2516405-3-bigeasy@linutronix.de>
+ <de7f392a-fbac-f7bc-662a-5f40dd4c0aa6@kernel.dk>
+ <20201208082220.hhel5ubeh4uqrwnd@linutronix.de>
+ <20201208084409.koeftbpnvesp4xtv@beryllium.lan>
+ <20201208113653.awqz4zggmy37vbog@beryllium.lan>
+ <20201208114936.sfe2jpmbjulcpyjk@linutronix.de>
+ <20201208124148.4dxdu6dp5m3mudff@beryllium.lan>
+ <20201208125224.m2xt66ladp63fa3t@linutronix.de>
 MIME-Version: 1.0
-References: <20201206055332.3144-1-tom.ty89@gmail.com> <20201206055332.3144-2-tom.ty89@gmail.com>
- <20201207133432.GA28592@infradead.org>
-In-Reply-To: <20201207133432.GA28592@infradead.org>
-From:   Tom Yan <tom.ty89@gmail.com>
-Date:   Tue, 8 Dec 2020 20:54:18 +0800
-Message-ID: <CAGnHSEnp86-gH5vrHFnAdk3Q+DXm_36crWsfQF-ROTt4VADWLw@mail.gmail.com>
-Subject: Re: [PATCH 2/3] block: make __blkdev_issue_zero_pages() less confusing
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20201208125224.m2xt66ladp63fa3t@linutronix.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Sure. It's only for code clarity, so definitely no "major benefit".
+On 2020-12-08 13:52:25 [+0100], To Daniel Wagner wrote:
+> On 2020-12-08 13:41:48 [+0100], Daniel Wagner wrote:
+> > On Tue, Dec 08, 2020 at 12:49:36PM +0100, Sebastian Andrzej Siewior wro=
+te:
+> > > On 2020-12-08 12:36:53 [+0100], Daniel Wagner wrote:
+> > > > Obvious in this configuration there are no remote completions (veri=
+fied
+> > > > it).
+> > >=20
+> > > do you complete on a remote CPU if you limit the queues to one (this =
+is
+> > > untested of course)?
+> >=20
+> > nvme0n1/ completed   11913011 remote    6718563 56.40%
+> >=20
+> > yes, but how is this relevant? I thought Jens complain was about the
+> > additional indirection via the softirq context
+> >=20
+> > -		rq->q->mq_ops->complete(rq);
+> > +	blk_mq_trigger_softirq(rq);
+> >=20
+> > and not the remote completion path. I can benchmark it out but I don't
+> > know if it's really helping in the discussion.
+=E2=80=A6 blurp
 
-On Mon, 7 Dec 2020 at 21:34, Christoph Hellwig <hch@infradead.org> wrote:
->
-> On Sun, Dec 06, 2020 at 01:53:31PM +0800, Tom Yan wrote:
-> > Instead of using the same check for the two layers of loops, count
-> > bio pages in the inner loop instead.
->
-> I don't really see any major benefit of one version over the other.
+Yes, you are right. Even cross-CPU completion for single-queue was
+already completing in softirq. So the only change is for multiqueue
+devices which you just demonstrated that it does not happen.
+Thank you!
+
+Sebastian
