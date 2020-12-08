@@ -2,90 +2,109 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 924C7C2BB48
-	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 16:38:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28F4EC4361B
+	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 16:44:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6344523AC8
-	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 16:38:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E2BE323A79
+	for <linux-block@archiver.kernel.org>; Tue,  8 Dec 2020 16:44:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728602AbgLHQiG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Dec 2020 11:38:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57488 "EHLO
+        id S1730452AbgLHQoE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Dec 2020 11:44:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730403AbgLHQiG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Dec 2020 11:38:06 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B57AC061794;
-        Tue,  8 Dec 2020 08:37:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=mDWnaDevg6j/LIqbxuNXDRQmS3LZ4FlK87nsZVHjQJ8=; b=JFMbcCImgU0rQUC46Gh5jSfyXr
-        R7nm/tGTSpS/6kdC5nXL0AcPvDP40nPp/xnt3K/t0jcNxJSy2Q00sNapIdBCx2b17aOaWfL2viSLb
-        47tiNb+yd8CJy2aC1M+1ZWgg+0TQiG2VyKp7kdrO9eVD0TftLKPaM1GNODR7R53T8XiaJdQlzVdse
-        sngMuhgBgn9AbqpL+X1QiU78oC1SF/J7r7DPoKLZyhopVWOMTBQL/1mCBUouLBSaa4r7jorYr9uoa
-        AxkxjKPnp82d7a6vH8VlGv8HCE+DtQGF9GPk+/kycHqR3cnS7P4KER/8iMbofhUXyiu64iqu9ITK1
-        IZNixDFg==;
-Received: from [2001:4bb8:188:f36:7a30:8a2b:aea3:231b] (helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kmfzK-0001OD-V7; Tue, 08 Dec 2020 16:37:19 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Oleksii Kurochko <olkuroch@cisco.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Dongsheng Yang <dongsheng.yang@easystack.cn>,
-        ceph-devel@vger.kernel.org, dm-devel@redhat.com,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        Keith Busch <kbusch@kernel.org>
-Subject: [PATCH 6/6] nvme: allow revalidate to set a namespace read-only
-Date:   Tue,  8 Dec 2020 17:28:29 +0100
-Message-Id: <20201208162829.2424563-7-hch@lst.de>
-X-Mailer: git-send-email 2.29.2
-In-Reply-To: <20201208162829.2424563-1-hch@lst.de>
-References: <20201208162829.2424563-1-hch@lst.de>
+        with ESMTP id S1730203AbgLHQoE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Dec 2020 11:44:04 -0500
+Received: from mail-ej1-x644.google.com (mail-ej1-x644.google.com [IPv6:2a00:1450:4864:20::644])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B46C0C06179C
+        for <linux-block@vger.kernel.org>; Tue,  8 Dec 2020 08:43:23 -0800 (PST)
+Received: by mail-ej1-x644.google.com with SMTP id g20so25528840ejb.1
+        for <linux-block@vger.kernel.org>; Tue, 08 Dec 2020 08:43:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=lightnvm-io.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:references:from:message-id:date:user-agent:mime-version
+         :in-reply-to:content-transfer-encoding:content-language;
+        bh=D8+mVv5RQD8CpwgxKVSJQQo0Mrt9GXSeIe0fUjQKEjI=;
+        b=JhygiiAMZZ8cxNN6KOPqRt5fibeTv+eKpnYOBzIRK4hGs9zW+2dDgwuK4CcJX/K1NL
+         Pddii6jc6uq1ad0tx+J25fR2jeiibn2ZPkR4w+fsbLsO5HIkPrDx0FzpK72yLqeft+p5
+         4mZT5yC37yUUFI5JmRaRdalnUtCFnGdpJ7kNcRzlephIlUeWdbE5A5O7IGdPeEwWDSRV
+         aLOERNHJtIyj0KxgLKTBlS660Gcs+/x+mjDI1LL3ElN1r8MUUrqH8rnZixuWn0hnrUrZ
+         zZj/FwaQodlLSP0+k/CNgUDsNvEOnMatdozdFQpANZ09g9rxCUmuE1CedUwAk6B3WcGW
+         S52g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=D8+mVv5RQD8CpwgxKVSJQQo0Mrt9GXSeIe0fUjQKEjI=;
+        b=GIqkUMgZ072S5TkJ9A0Hw3RQ8rGnBm5+/LIckMSCwS7YG7GGBqHehpxypgmJjOWgdH
+         RALycbu1VAOLwlDqMNY6QgDCWZzhcUIEvg3vQWb3Uxrrnt/IbBaWo8J98/J0kiphYpox
+         jJ2+3KOVQNGrMIXzyHbAdzX8XpdQyIHz0yyqDBzG4g3u35GbBmqOAOK1GfbF7tZAap1/
+         Zrfb+9S+q3iRYDYMOdgamloldK8OWuik5W9Sw8VwegzG5MLeL8t0y5unZzYfzvg2LjXn
+         6dtjQ4lJeK8rMYT3Xs2jf6QEUZ8FaVhnU+zI2HKFtOzflAQZ53IoB0Y/eWzD2C42Q2CE
+         nHTQ==
+X-Gm-Message-State: AOAM53032JkACTrwhseyXtudX25FyZVQkjQ/OqmtOYkYBKGRfRhstGdS
+        +TaEA/cUkLl+MPjVzDzGHgF+mQ==
+X-Google-Smtp-Source: ABdhPJwhueFDgAgw8uVmhQYVi+Y3Z1PNRxP2pO93LILiSMWVKWXJhuroBVKcGQvBhzsnV3j+PkxJKw==
+X-Received: by 2002:a17:906:4e53:: with SMTP id g19mr7925334ejw.454.1607445802481;
+        Tue, 08 Dec 2020 08:43:22 -0800 (PST)
+Received: from [10.0.0.6] (xb932c246.cust.hiper.dk. [185.50.194.70])
+        by smtp.gmail.com with ESMTPSA id k2sm16166403ejp.6.2020.12.08.08.43.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Dec 2020 08:43:20 -0800 (PST)
+Subject: Re: [PATCH] drivers/lightnvm: fix a null-ptr-deref bug in pblk-core.c
+To:     tangzhenhao <tzh18@mails.tsinghua.edu.cn>,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+References: <20201130072356.5378-1-tzh18@mails.tsinghua.edu.cn>
+From:   =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <53dfdf3e-56f5-3043-1b57-5507231f0e0d@lightnvm.io>
+Date:   Tue, 8 Dec 2020 17:43:20 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.3
 MIME-Version: 1.0
+In-Reply-To: <20201130072356.5378-1-tzh18@mails.tsinghua.edu.cn>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Language: en-US
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Unconditionally call set_disk_ro now that it only updates the hardware
-state.  This allows to properly set up the Linux devices read-only when
-the controller turns a previously writable namespace read-only.
+On 30/11/2020 08.23, tangzhenhao wrote:
+> At line 294 in drivers/lightnvm/pblk-write.c, function pblk_gen_run_ws is called with actual param GFP_ATOMIC. pblk_gen_run_ws call mempool_alloc using "GFP_ATOMIC" flag, so mempool_alloc can return null. So we need to check the return-val of mempool_alloc to avoid null-ptr-deref bug.
+>
+> Signed-off-by: tangzhenhao <tzh18@mails.tsinghua.edu.cn>
+> ---
+>   drivers/lightnvm/pblk-core.c | 4 ++++
+>   1 file changed, 4 insertions(+)
+>
+> diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+> index 97c68731406b..1dddba11e721 100644
+> --- a/drivers/lightnvm/pblk-core.c
+> +++ b/drivers/lightnvm/pblk-core.c
+> @@ -1869,6 +1869,10 @@ void pblk_gen_run_ws(struct pblk *pblk, struct pblk_line *line, void *priv,
+>   	struct pblk_line_ws *line_ws;
+>   
+>   	line_ws = mempool_alloc(&pblk->gen_ws_pool, gfp_mask);
+> +	if (!line_ws) {
+> +		pblk_err(pblk, "pblk: could not allocate memory\n");
+> +		return;
+> +	}
+>   
+>   	line_ws->pblk = pblk;
+>   	line_ws->line = line;
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Keith Busch <kbusch@kernel.org>
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
----
- drivers/nvme/host/core.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+Thank you, Hao. Good catch.
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index ce1b6151944131..3a0557ccc9fc5d 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -2114,9 +2114,8 @@ static void nvme_update_disk_info(struct gendisk *disk,
- 	nvme_config_discard(disk, ns);
- 	nvme_config_write_zeroes(disk, ns);
- 
--	if ((id->nsattr & NVME_NS_ATTR_RO) ||
--	    test_bit(NVME_NS_FORCE_RO, &ns->flags))
--		set_disk_ro(disk, true);
-+	set_disk_ro(disk, (id->nsattr & NVME_NS_ATTR_RO) ||
-+		test_bit(NVME_NS_FORCE_RO, &ns->flags));
- }
- 
- static inline bool nvme_first_scan(struct gendisk *disk)
--- 
-2.29.2
+Reviewed-by: Matias Bjørling <mb@lightnvm.io>
+
+Hi Jens, would you be so kind to pick this up when convenient?
+
+Thanks!
+
+Best, Matias
 
