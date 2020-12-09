@@ -2,72 +2,99 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66837C433FE
-	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 18:25:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C94EC4361B
+	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 20:47:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 341EC23BC6
-	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 18:25:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EAC4E23D1C
+	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 20:47:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733008AbgLISZs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Dec 2020 13:25:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44682 "EHLO
+        id S1729756AbgLIUry (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Dec 2020 15:47:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732999AbgLISZj (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Dec 2020 13:25:39 -0500
+        with ESMTP id S1726576AbgLIUrp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Dec 2020 15:47:45 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 960DFC061794;
-        Wed,  9 Dec 2020 10:24:59 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66F10C0613CF;
+        Wed,  9 Dec 2020 12:47:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=pcAaVjDl49Iamy5QPMGXn9DbU0vRfNVF7xcOe8VbuB4=; b=WPu8mGcvy9y+VElW9HrVYxZoIB
-        aX9/2rIN6cL9+t3qvpy2ct5WkcmU6WDT/rl64guoJfIv+o6lcxcohGcDUZ0G+lPEme3WcJcsVzv4b
-        9EdMc1siLwb9KNN89rpHojP5m8McqAyPica3DbLXi3KLYmu8oyygBSmy5Kc7VyU3CNeluTMYisgGU
-        NZUCPBzx8X/UIc18emuQUF3YReHHtRA3YurT0E091hBbJtylK7+Ix3Wljd0Kem+GcGtDeB5PLmboZ
-        RoPyz0lSSXKfuhociMcvByp+HU9DZq9lLzrdSNcGdvfIdRQsYT6h3nGyUc0dTTzjx4E3Hudc/VTVM
-        ghACqIPg==;
-Received: from willy by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kn492-0000Fn-7a; Wed, 09 Dec 2020 18:24:56 +0000
-Date:   Wed, 9 Dec 2020 18:24:56 +0000
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Pavel Begunkov <asml.silence@gmail.com>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, linux-fsdevel@vger.kernel.org,
-        io-uring@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] iov: introduce ITER_BVEC_FLAG_FIXED
-Message-ID: <20201209182456.GR7338@casper.infradead.org>
-References: <cover.1607477897.git.asml.silence@gmail.com>
- <de27dbca08f8005a303e5efd81612c9a5cdcf196.1607477897.git.asml.silence@gmail.com>
- <20201209083645.GB21968@infradead.org>
- <20201209130723.GL3579531@ZenIV.linux.org.uk>
- <b6cd4108-dbfe-5753-768f-92f55f38d6cd@gmail.com>
- <20201209175553.GA26252@infradead.org>
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=62AZlsv1U7MmdVe+7QYsPomj1JbAvEv3m2KxaRaeI1s=; b=hnZkNtmsN+Zz+Ytw6E4aGAbna1
+        50wtz8CxIexVZtnl+Am89O17KjRJbEM3ppv3yXxfAtzQ8LROIcox4JTDkfN+qe1NrO0I1pUwFq2KH
+        xE6JfRIN9CWWEF29Vo3IM/IvNSlv2Vfth/02i+Gvh/U4om04u3n4Z88dKRE6PMRLoK/06RDT3eR7K
+        u9/TMbM9mUOXR6YKj20a79N+iC6rMYv/7W79phklo/NrFwG1Y084O99Ty0D1qQLwDHPtrfr1b7nBn
+        08rVRIsZTHTUACtucWqy0mnP5uMSpBnUoFlCrcIG+8A6l9blLiv/zU2sbc8ptaTX+T3XhJ85D2Xpu
+        2qVgA+ng==;
+Received: from [2601:1c0:6280:3f0::1494] (helo=smtpauth.infradead.org)
+        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kn6MX-0000N6-Q8; Wed, 09 Dec 2020 20:47:02 +0000
+From:   Randy Dunlap <rdunlap@infradead.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Randy Dunlap <rdunlap@infradead.org>, Tejun Heo <tj@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Ley Foon Tan <ley.foon.tan@intel.com>,
+        Mark Salter <msalter@redhat.com>,
+        Aurelien Jacquiot <jacquiot.aurelien@gmail.com>,
+        linux-c6x-dev@linux-c6x.org
+Subject: [PATCH] block: blk-iocost: fix build for ARCH with missing local64.h files
+Date:   Wed,  9 Dec 2020 12:46:57 -0800
+Message-Id: <20201209204657.6676-1-rdunlap@infradead.org>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201209175553.GA26252@infradead.org>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Dec 09, 2020 at 05:55:53PM +0000, Christoph Hellwig wrote:
-> On Wed, Dec 09, 2020 at 01:37:05PM +0000, Pavel Begunkov wrote:
-> > Yeah, I had troubles to put comments around, and it's still open.
-> > 
-> > For current cases it can be bound to kiocb, e.g. "if an bvec iter passed
-> > "together" with kiocb then the vector should stay intact up to 
-> > ->ki_complete()". But that "together" is rather full of holes.
-> 
-> What about: "For bvec based iters the bvec must not be freed until the
-> I/O has completed.  For asynchronous I/O that means it must be freed
-> no earlier than from ->ki_complete."
+When building block/blk-iocost.c on arch/x6x/ or arch/nios2/, the
+build fails due to missing the <asm/local64.h> file.
 
-Perhaps for the second sentence "If the I/O is completed asynchronously,
-the bvec must not be freed before ->ki_complete() has been called"?
+Fix this by adding local64.h as a "generic-y" file in their respective
+Kbuild files, so that they will use a copy of <asm-generic/local64.h>
+instead (copied to arch/*/include/generated/local64.h by the
+build system).
+
+c6x or nios2 build error:
+../block/blk-iocost.c:183:10: fatal error: asm/local64.h: No such file or directory
+  183 | #include <asm/local64.h>
+
+Fixes: 5e124f74325d ("blk-iocost: use local[64]_t for percpu stat")
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Cc: Tejun Heo <tj@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org
+Cc: Ley Foon Tan <ley.foon.tan@intel.com>
+Cc: Mark Salter <msalter@redhat.com>
+Cc: Aurelien Jacquiot <jacquiot.aurelien@gmail.com>
+Cc: linux-c6x-dev@linux-c6x.org
+---
+ arch/c6x/include/asm/Kbuild   |    1 +
+ arch/nios2/include/asm/Kbuild |    1 +
+ 2 files changed, 2 insertions(+)
+
+--- linux-next-20201208.orig/arch/c6x/include/asm/Kbuild
++++ linux-next-20201208/arch/c6x/include/asm/Kbuild
+@@ -1,5 +1,6 @@
+ # SPDX-License-Identifier: GPL-2.0
+ generic-y += extable.h
+ generic-y += kvm_para.h
++generic-y += local64.h
+ generic-y += mcs_spinlock.h
+ generic-y += user.h
+--- linux-next-20201208.orig/arch/nios2/include/asm/Kbuild
++++ linux-next-20201208/arch/nios2/include/asm/Kbuild
+@@ -2,6 +2,7 @@
+ generic-y += cmpxchg.h
+ generic-y += extable.h
+ generic-y += kvm_para.h
++generic-y += local64.h
+ generic-y += mcs_spinlock.h
+ generic-y += spinlock.h
+ generic-y += user.h
