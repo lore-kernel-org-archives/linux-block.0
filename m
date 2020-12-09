@@ -2,213 +2,136 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28907C4361B
-	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 09:17:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5AB2C4361B
+	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 09:18:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E1367238EB
-	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 09:17:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A3FD6238EB
+	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 09:18:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728255AbgLIJRU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Dec 2020 04:17:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44596 "EHLO
+        id S1728468AbgLIJRt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Dec 2020 04:17:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44670 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727665AbgLIJRT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Dec 2020 04:17:19 -0500
-Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 772C9C0613D6
-        for <linux-block@vger.kernel.org>; Wed,  9 Dec 2020 01:16:39 -0800 (PST)
-Received: by mail-ed1-x52f.google.com with SMTP id dk8so766901edb.1
-        for <linux-block@vger.kernel.org>; Wed, 09 Dec 2020 01:16:39 -0800 (PST)
+        with ESMTP id S1728442AbgLIJRs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Dec 2020 04:17:48 -0500
+Received: from mail-ej1-x642.google.com (mail-ej1-x642.google.com [IPv6:2a00:1450:4864:20::642])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B04CC061793
+        for <linux-block@vger.kernel.org>; Wed,  9 Dec 2020 01:17:08 -0800 (PST)
+Received: by mail-ej1-x642.google.com with SMTP id n26so1057339eju.6
+        for <linux-block@vger.kernel.org>; Wed, 09 Dec 2020 01:17:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=javigon-com.20150623.gappssmtp.com; s=20150623;
         h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=udImeOyopR6lKcri/5XEEUcYqPTE+FQlxvMzQAlhsfU=;
-        b=vKk2LJLVoo/f7CceJHDSRilhBANlh+e/wINNi3QCldXHlHeXQqbabWeoOPIJg56Pie
-         /iY1I6MxINZ/+727sMSvyjb6SCu2kLXbOIRkOf6x8RXlzt6NwuE2x2yCqecCZXqf/nL5
-         mVsEQnq3CEwWGhq443jayVBtta1KjNpGNBatvm4nfZ6bNjF4Ctlk85P4UWjHxjOvmQVO
-         W+gBjwCW5hCxIm0SYc/Qgkm6Bq0XBKDjWrftKvO8TO5pRZ7e3HHj4jFVpUgmicmtnbUm
-         8AK+yMYd6k34jocVoElM1JLAQFYn4IhOZ668G67fbvTg3yrZQxApWpt80x6wMlZpnEKS
-         yCKA==
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=rhhiMX6lpyZpBTo++Wq1vgh3A63oG1sQxoZyJsc1aQg=;
+        b=P8oh5+/uu8rb5ugbhTx6O474H6hkBIwZA2qWENj5ag15EIY80CWadHdfGxQnhTAuMR
+         kbNk5JfBb6loUdVGVyaPVhWtBQ1NjpEdFVcn9tYOFB+qOgEbDjlfscYtu/qIoCbb5Chz
+         7CiywHUQ67e3O04cgul518A1o0MfGZcqFpTZZnlXt5erd32JVIX/kIoOcJ7E6df5xpPw
+         s6IYn+e1e1RXF/Z/qwRHiSnu9S2JvHXZspsCFFn7MliNwtnecrsJyM+LopbOJALx3N8D
+         G9qQkXTWUv6aPxfla3mKnk96yIxMBMESNCDYDoAhR8RSGIVe6yWfam74imuEnHfJJPwT
+         XFCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=udImeOyopR6lKcri/5XEEUcYqPTE+FQlxvMzQAlhsfU=;
-        b=I9s03oZisdbbQGlnFl4BRirUEm8s3HJpa/4GcsJGCqQd1mHVZxxBCHRHwzYszrkEgF
-         DBoAp8+EMIfud6O34q93pExjlUkC5fcVlXUoziF1TWe7xxUxFW2vgrBfxdy58VquPUKw
-         YUpcLf31u/XSJW5hqYrb3eQpHFHTzawsbmp4Wu9sXGFfbHoW//D9ObmsIQ5PY459happ
-         31YqI5IR9p8dpPovU/kUM1fjCPwnnF8N1rmA8S8ItDYZpv1IU95QfdM3OszqS97MqqOP
-         YKQiBBrZF5sqKoFGlYe/J5S9t5vhnJV1NMsJyzMSK5OXT4jYdvJVO9ypNQtQlgPZc8tf
-         3wrw==
-X-Gm-Message-State: AOAM531vsKQEdAZ8e2WK8UAjTnY9RnbKgnl/bmpWtQzW2G9OF+Mq2Y/L
-        Z294DV+68KljCZwuTv7rcfjpIg==
-X-Google-Smtp-Source: ABdhPJy0H5iRcjQAbbMA5JxnGNd1eAPAnQfg7wbllmKdUB4JqkBOK+CIIgrkHlPxfH07M/Tbwvu/gg==
-X-Received: by 2002:aa7:c7d8:: with SMTP id o24mr1127552eds.328.1607505397434;
-        Wed, 09 Dec 2020 01:16:37 -0800 (PST)
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=rhhiMX6lpyZpBTo++Wq1vgh3A63oG1sQxoZyJsc1aQg=;
+        b=lSCJhrZX3TXFtWHejJ38XJgL7r7HoSDYCrJP67pyVcbNHOlo83ceOzocByDGK+5yDj
+         8CBTvaqMFqJuai+399l7O8KQJYuuZgVvAI5qfKiiyFnBq/nEKJ7oeOG4r05YlJFkJchH
+         1x98x/+/yN+VGcuaoKoA9QUS+hbwkeawX0wIvr/wHVqCdDVXZLmz0tK3pFSw/NrdWwSR
+         3sKxUXDAgDmIHjVY+U5zw0NHtIypjIjrOu055j326AvrlJSO6fKWgGWGRoHEBl1SSlNy
+         t7IvL9cQO5ivL9UkGNmfH0BCaes2gwFSbH1kBMJCBusEZV/wj2R4csD2etwhnAFQrmXG
+         0lOQ==
+X-Gm-Message-State: AOAM531UXbq4NH92c5m0sTZ7zEL1aOEaBaMuR0aEO3fe2NPG+ib81AhH
+        d8LsxvHL5BPN6rY+ilqP6cVg9g==
+X-Google-Smtp-Source: ABdhPJxbBbOAPum4JxhLDvVO8oH4bCpyUFUBf6xuJ19RfGwEp+yksU2UBrKm/QCGpkEPA7yZYkCfcA==
+X-Received: by 2002:a17:906:a857:: with SMTP id dx23mr1242029ejb.189.1607505427041;
+        Wed, 09 Dec 2020 01:17:07 -0800 (PST)
 Received: from localhost (5.186.124.214.cgn.fibianet.dk. [5.186.124.214])
-        by smtp.gmail.com with ESMTPSA id h16sm882131eji.110.2020.12.09.01.16.36
+        by smtp.gmail.com with ESMTPSA id j20sm874968ejy.124.2020.12.09.01.17.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Dec 2020 01:16:36 -0800 (PST)
-Date:   Wed, 9 Dec 2020 10:16:36 +0100
+        Wed, 09 Dec 2020 01:17:06 -0800 (PST)
+Date:   Wed, 9 Dec 2020 10:17:05 +0100
 From:   Javier =?utf-8?B?R29uesOhbGV6?= <javier@javigon.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        kbusch@kernel.org, sagi@grimberg.me, minwoo.im.dev@gmail.com
-Subject: Re: nvme: enable char device per namespace
-Message-ID: <20201209091636.5jrexhqmjmqwyqaz@mpHalley>
-References: <20201208132934.625-1-javier.gonz@samsung.com>
- <20201208142151.GA4108@lst.de>
+To:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+Cc:     Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
+        SelvaKumar S <selvakuma.s1@samsung.com>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "kbusch@kernel.org" <kbusch@kernel.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        "sagi@grimberg.me" <sagi@grimberg.me>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "snitzer@redhat.com" <snitzer@redhat.com>,
+        "selvajove@gmail.com" <selvajove@gmail.com>,
+        "nj.shetty@samsung.com" <nj.shetty@samsung.com>,
+        "joshi.k@samsung.com" <joshi.k@samsung.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Mikulas Patocka <mpatocka@redhat.com>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>
+Subject: Re: [RFC PATCH v2 0/2] add simple copy support
+Message-ID: <20201209091705.brzbbqedavtxvhms@mpHalley>
+References: <CGME20201204094719epcas5p23b3c41223897de3840f92ae3c229cda5@epcas5p2.samsung.com>
+ <20201204094659.12732-1-selvakuma.s1@samsung.com>
+ <20201207141123.GC31159@lst.de>
+ <01fe46ac-16a5-d4db-f23d-07a03d3935f3@suse.de>
+ <20201207192453.vc6clbdhz73hzs7l@mpHalley>
+ <SN4PR0401MB35988951265391511EBC8C6E9BCD0@SN4PR0401MB3598.namprd04.prod.outlook.com>
+ <20201208122248.utv7pqthmmn6uwv6@mpHalley>
+ <SN4PR0401MB35983464199FB173FB0C29479BCD0@SN4PR0401MB3598.namprd04.prod.outlook.com>
+ <20201208131333.xoxincxcnh7iz33z@mpHalley>
+ <SN4PR0401MB3598226CD4A32F65320A47379BCD0@SN4PR0401MB3598.namprd04.prod.outlook.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20201208142151.GA4108@lst.de>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <SN4PR0401MB3598226CD4A32F65320A47379BCD0@SN4PR0401MB3598.namprd04.prod.outlook.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 08.12.2020 15:21, Christoph Hellwig wrote:
->A bunch of nitpicks (mostly naming as usual, sorry..):
-
-No worries. Thanks for taking the time.
-
->
->> +static int __nvme_ns_ioctl(struct gendisk *disk, unsigned int cmd,
->> +			   unsigned long arg)
->>  {
->
->What about nvme_disk_ioctl instead as that is what it operates on?
-
-Sure.
-
->
->> +static int nvme_ioctl(struct block_device *bdev, fmode_t mode,
->> +		      unsigned int cmd, unsigned long arg)
->> +{
->> +	return __nvme_ns_ioctl(bdev->bd_disk, cmd, arg);
->> +}
->> +
->> +static long nvme_cdev_ioctl(struct file *file, unsigned int cmd,
->> +			    unsigned long arg)
->> +{
->> +	return __nvme_ns_ioctl((struct gendisk *)file->private_data, cmd, arg);
->> +}
->
->No need for the cast.
->
->Also can we keep all the char device methods together close to the
->struct file_operations declaration?  I just prefer to keep the code
->a little grouped.
-
-Perfect.
-
->
->> -static int nvme_open(struct block_device *bdev, fmode_t mode)
->> +static int __nvme_open(struct nvme_ns *ns)
->>  {
->> -	struct nvme_ns *ns = bdev->bd_disk->private_data;
->> -
->>  #ifdef CONFIG_NVME_MULTIPATH
->>  	/* should never be called due to GENHD_FL_HIDDEN */
->>  	if (WARN_ON_ONCE(ns->head->disk))
->> @@ -1846,12 +1859,24 @@ static int nvme_open(struct block_device *bdev, fmode_t mode)
->>  	return -ENXIO;
->>  }
+On 08.12.2020 13:24, Johannes Thumshirn wrote:
+>On 08/12/2020 14:13, Javier González wrote:
+>> On 08.12.2020 12:37, Johannes Thumshirn wrote:
+>>> On 08/12/2020 13:22, Javier González wrote:
+>>>> Good idea. Are you thinking of a sysfs entry to select the backend?
+>>>
+>>> Not sure on this one, initially I thought of a sysfs file, but then
+>>> how would you do it. One "global" sysfs entry is probably a bad idea.
+>>> Having one per block device to select native vs emulation maybe? And
+>>> a good way to benchmark.
 >>
->> +static void __nvme_release(struct nvme_ns *ns)
->> +{
->> +	module_put(ns->ctrl->ops->module);
->> +	nvme_put_ns(ns);
->> +}
+>> I was thinking a per block device to target the use case where a certain
+>> implementation / workload is better one way or the other.
 >
->nvme_ns_open and nvme_ns_release?
-
-ok.
-
+>Yes something along those lines.
 >
->> +
->> +static int nvme_open(struct block_device *bdev, fmode_t mode)
->> +{
->> +	struct nvme_ns *ns = bdev->bd_disk->private_data;
->> +
->> +	return __nvme_open(ns);
->> +}
->> +
->>  static void nvme_release(struct gendisk *disk, fmode_t mode)
->>  {
->>  	struct nvme_ns *ns = disk->private_data;
+>>>
+>>> The other idea would be a benchmark loop on boot like the raid library
+>>> does.
+>>>
+>>> Then on the other hand, there might be workloads that run faster with
+>>> the emulation and some that run faster with the hardware acceleration.
+>>>
+>>> I think these points are the reason the last attempts got stuck.
 >>
->> -	module_put(ns->ctrl->ops->module);
->> -	nvme_put_ns(ns);
->> +	__nvme_release(ns);
+>> Yes. I believe that any benchmark we run would be biased in a certain
+>> way. If we can move forward with a sysfs entry and default to legacy
+>> path, we would not alter current behavior and enable NVMe copy offload
+>> (for now) for those that want to use it. We can then build on top of it.
+>>
+>> Does this sound like a reasonable approach?
+>>
 >
->No need for the local ns variable in both cases.
+>Yes this sounds like a reasonable approach to me.
 
-ok.
->
->> +static int nvme_cdev_open(struct inode *inode, struct file *file)
->> +{
->> +	struct nvme_ns *ns = container_of(inode->i_cdev, struct nvme_ns, cdev);
->> +	int ret;
->> +
->> +	ret = __nvme_open(ns);
->> +	if (!ret)
->> +		file->private_data = ns->disk;
->> +
->> +	return ret;
->
->Do we need the ->private_data assignment at all?  I think the ioctl
->handler could just grab it directly from i_cdev.
+Cool. We will add this to the V3 then.
 
-Mmmm. Good point. I'll try that.
-
->
->> +	sprintf(cdisk_name, "nvme%dn%dc", ctrl->instance, ns->head->instance);
->
->And the most important naming decision is this.  I have two issues with
->naming still:
->
-> - we aready use the c for controller in the hidden disk naming.  Although
->   that is in a different position, but I think this not super intuitive.
-> - this is missing multipath support entirely, so once we want to add
->   multipath support we'll run into issues.  So maybe use something
->   based off the hidden node naming?  E.g.:
->
->	sprintf(disk_name, "nvme-generic-%dc%dn%d", ctrl->subsys->instance,
->		ctrl->instance, ns->head->instance);
-
-Perfect. Sounds like a good compromise to still keep the original hidden
-disk. Keith is happy too, so we have a plan.
-
->> +	/* When the device does not support any of the features required by the
->> +	 * kernel (or viceversa), hide the block device. We can still rely on
->> +	 * the namespace char device for submitting IOCTLs
->> +	 */
->
->Normal kernel comment style is the opening
->
->	/*
->
->on its own line.
-
-OK.
-
->
->>  	if (nvme_update_ns_info(ns, id))
->> -		goto out_put_disk;
->> +		disk->flags |= GENHD_FL_HIDDEN;
->
->I don't think we can do this based on all the error returns.  I think
->we'll have to move the flags manipulation into nvme_update_ns_info to
->also cover the revalidate case.
-
-Ok.
-
-I am working on the multipath part. I'll send a V3 with all these
-comments and then a follow-up patch with multipath.
-
-
+Thanks Johannes!
