@@ -2,150 +2,65 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD164C433FE
-	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 06:07:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B35E2C4361B
+	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 06:51:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 79B5523B7D
-	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 06:07:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 68AAB23B7D
+	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 06:51:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727831AbgLIGHW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Dec 2020 01:07:22 -0500
-Received: from so254-31.mailgun.net ([198.61.254.31]:39681 "EHLO
-        so254-31.mailgun.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726102AbgLIGHQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Dec 2020 01:07:16 -0500
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1607494012; h=Message-ID: References: In-Reply-To: Subject:
- Cc: To: From: Date: Content-Transfer-Encoding: Content-Type:
- MIME-Version: Sender; bh=28SENODm6Im8i/+HqRgWU6yL1B/KKG507naoYpEwBs8=;
- b=Dx6xeliAtctfgDEMVr8e17A2QYzqjQ/qUQl2Y9QBPjSO3dEyrXBo7IgCS3xZCwSWZM6rTydK
- GT4Hwxtp7DqjnfHFwwhmlelQmwmjPixrHs5ER/xO2Dj5oI1oxTw78Ffv00WUEfSz8R9Fakpo
- Wy8Y2DLaSHYFsNGJ7wfKrZu+td0=
-X-Mailgun-Sending-Ip: 198.61.254.31
-X-Mailgun-Sid: WyI0MmE5NyIsICJsaW51eC1ibG9ja0B2Z2VyLmtlcm5lbC5vcmciLCAiYmU5ZTRhIl0=
-Received: from smtp.codeaurora.org
- (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
- smtp-out-n05.prod.us-east-1.postgun.com with SMTP id
- 5fd0696fc2fb7b0d2b8591b7 (version=TLS1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Wed, 09 Dec 2020 06:06:39
- GMT
-Sender: cang=codeaurora.org@mg.codeaurora.org
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id F31C1C433ED; Wed,  9 Dec 2020 06:06:38 +0000 (UTC)
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        (Authenticated sender: cang)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id CC3EAC433CA;
-        Wed,  9 Dec 2020 06:06:36 +0000 (UTC)
+        id S1728259AbgLIGvZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Dec 2020 01:51:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50380 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728171AbgLIGvZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Dec 2020 01:51:25 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CDA4C0613CF;
+        Tue,  8 Dec 2020 22:50:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=p3OfvBVBtRAqDDRF6jH5uPYTH91JIUpZ9ujYw2CtzVk=; b=g9JtDQAysQXn5mU2ddEzM0Yz5X
+        P0zL8DTzb0K6qveIRiZOvKGrPalspGEXG5XQvVJFn1HUW8Xbc82Z4Eih/aVBu92sIDrYNyKwElnMj
+        C30/WIr2b5j+YXLZhuo9wLDMX+5Rtopo8rbf+4+QlewnIsTrzzHXRIqe3Bkx3lqWfef9Ngn/NwPDI
+        Q6Z63bXV4xlz46pj18EXMDR2z6K3sr9RSj7Mnf/Nvtk9TqcX/Ef3mGgdvfxg+KmWDVNgVXOzq6sA1
+        d3p0rvFQdNOF0cyN5mPJt+B7iY+6Dkv1RqNBayBOb4fgELniBnPEWNN6ldEYGeTaZcnfoUzU/gCVQ
+        zR3SN0AA==;
+Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kmtJA-0007Oz-Ky; Wed, 09 Dec 2020 06:50:40 +0000
+Date:   Wed, 9 Dec 2020 06:50:40 +0000
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Pavel Begunkov <asml.silence@gmail.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Ming Lei <ming.lei@redhat.com>,
+        Johannes Weiner <hannes@cmpxchg.org>
+Subject: Re: [RFC 0/2] nocopy bvec for direct IO
+Message-ID: <20201209065040.GA27959@infradead.org>
+References: <cover.1607477897.git.asml.silence@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Wed, 09 Dec 2020 14:06:36 +0800
-From:   Can Guo <cang@codeaurora.org>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        Alan Stern <stern@rowland.harvard.edu>,
-        Stanley Chu <stanley.chu@mediatek.com>,
-        "Rafael J . Wysocki" <rafael.j.wysocki@intel.com>
-Subject: Re: [PATCH v5 2/8] block: Introduce BLK_MQ_REQ_PM
-In-Reply-To: <20201209052951.16136-3-bvanassche@acm.org>
-References: <20201209052951.16136-1-bvanassche@acm.org>
- <20201209052951.16136-3-bvanassche@acm.org>
-Message-ID: <f78fc7ec9f5f8c88ba298fa00c6fab49@codeaurora.org>
-X-Sender: cang@codeaurora.org
-User-Agent: Roundcube Webmail/1.3.9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cover.1607477897.git.asml.silence@gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-12-09 13:29, Bart Van Assche wrote:
-> Introduce the BLK_MQ_REQ_PM flag. This flag makes the request 
-> allocation
-> functions set RQF_PM. This is the first step towards removing
-> BLK_MQ_REQ_PREEMPT.
-> 
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Hannes Reinecke <hare@suse.de>
-> Reviewed-by: Jens Axboe <axboe@kernel.dk>
+On Wed, Dec 09, 2020 at 02:19:50AM +0000, Pavel Begunkov wrote:
+> A benchmark got me 430KIOPS vs 540KIOPS, or +25% on bare metal. And perf
+> shows that bio_iov_iter_get_pages() was taking ~20%. The test is pretty
+> silly, but still imposing. I'll redo it closer to reality for next
+> iteration, anyway need to double check some cases.
 
-Reviewed-by: Can Guo <cang@codeaurora.org>
-
-> Cc: Alan Stern <stern@rowland.harvard.edu>
-> Cc: Stanley Chu <stanley.chu@mediatek.com>
-> Cc: Ming Lei <ming.lei@redhat.com>
-> Cc: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
-> Cc: Can Guo <cang@codeaurora.org>
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-> ---
->  block/blk-core.c       | 7 ++++---
->  block/blk-mq.c         | 2 ++
->  include/linux/blk-mq.h | 2 ++
->  3 files changed, 8 insertions(+), 3 deletions(-)
-> 
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index 2db8bda43b6e..10696f9fb6ac 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -424,11 +424,11 @@ EXPORT_SYMBOL(blk_cleanup_queue);
->  /**
->   * blk_queue_enter() - try to increase q->q_usage_counter
->   * @q: request queue pointer
-> - * @flags: BLK_MQ_REQ_NOWAIT and/or BLK_MQ_REQ_PREEMPT
-> + * @flags: BLK_MQ_REQ_NOWAIT, BLK_MQ_REQ_PM and/or BLK_MQ_REQ_PREEMPT
->   */
->  int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
->  {
-> -	const bool pm = flags & BLK_MQ_REQ_PREEMPT;
-> +	const bool pm = flags & (BLK_MQ_REQ_PM | BLK_MQ_REQ_PREEMPT);
-> 
->  	while (true) {
->  		bool success = false;
-> @@ -630,7 +630,8 @@ struct request *blk_get_request(struct
-> request_queue *q, unsigned int op,
->  	struct request *req;
-> 
->  	WARN_ON_ONCE(op & REQ_NOWAIT);
-> -	WARN_ON_ONCE(flags & ~(BLK_MQ_REQ_NOWAIT | BLK_MQ_REQ_PREEMPT));
-> +	WARN_ON_ONCE(flags & ~(BLK_MQ_REQ_NOWAIT | BLK_MQ_REQ_PM |
-> +			       BLK_MQ_REQ_PREEMPT));
-> 
->  	req = blk_mq_alloc_request(q, op, flags);
->  	if (!IS_ERR(req) && q->mq_ops->initialize_rq_fn)
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 1b25ec2fe9be..b5880a1fb38d 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -292,6 +292,8 @@ static struct request *blk_mq_rq_ctx_init(struct
-> blk_mq_alloc_data *data,
->  	rq->mq_hctx = data->hctx;
->  	rq->rq_flags = 0;
->  	rq->cmd_flags = data->cmd_flags;
-> +	if (data->flags & BLK_MQ_REQ_PM)
-> +		rq->rq_flags |= RQF_PM;
->  	if (data->flags & BLK_MQ_REQ_PREEMPT)
->  		rq->rq_flags |= RQF_PREEMPT;
->  	if (blk_queue_io_stat(data->q))
-> diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-> index b23eeca4d677..c00e856c6fb1 100644
-> --- a/include/linux/blk-mq.h
-> +++ b/include/linux/blk-mq.h
-> @@ -444,6 +444,8 @@ enum {
->  	BLK_MQ_REQ_NOWAIT	= (__force blk_mq_req_flags_t)(1 << 0),
->  	/* allocate from reserved pool */
->  	BLK_MQ_REQ_RESERVED	= (__force blk_mq_req_flags_t)(1 << 1),
-> +	/* set RQF_PM */
-> +	BLK_MQ_REQ_PM		= (__force blk_mq_req_flags_t)(1 << 2),
->  	/* set RQF_PREEMPT */
->  	BLK_MQ_REQ_PREEMPT	= (__force blk_mq_req_flags_t)(1 << 3),
->  };
+That is pretty impressive.  But I only got this cover letter, not the
+actual patches..
