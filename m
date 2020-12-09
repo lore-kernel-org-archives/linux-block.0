@@ -2,74 +2,58 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF7E2C4361B
-	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 17:07:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D715DC4361B
+	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 17:52:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 78D8023C44
-	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 17:07:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9425223B51
+	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 17:52:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731993AbgLIRHK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Dec 2020 12:07:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60824 "EHLO
+        id S1728298AbgLIRwK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Dec 2020 12:52:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39532 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731151AbgLIRHK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Dec 2020 12:07:10 -0500
-Received: from ZenIV.linux.org.uk (zeniv.linux.org.uk [IPv6:2002:c35c:fd02::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8DD2C0613CF;
-        Wed,  9 Dec 2020 09:06:29 -0800 (PST)
-Received: from viro by ZenIV.linux.org.uk with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kn2v4-0006Lh-BZ; Wed, 09 Dec 2020 17:06:26 +0000
-Date:   Wed, 9 Dec 2020 17:06:26 +0000
-From:   Al Viro <viro@zeniv.linux.org.uk>
-To:     Pavel Begunkov <asml.silence@gmail.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-fsdevel@vger.kernel.org,
-        io-uring@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>,
-        Johannes Weiner <hannes@cmpxchg.org>
-Subject: Re: [RFC 0/2] nocopy bvec for direct IO
-Message-ID: <20201209170626.GO3579531@ZenIV.linux.org.uk>
-References: <cover.1607477897.git.asml.silence@gmail.com>
+        with ESMTP id S1726449AbgLIRwE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Dec 2020 12:52:04 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0989BC061793;
+        Wed,  9 Dec 2020 09:51:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=qEaW85wNUThtYmzPpVh2Uv1WGFjJCT1naEW5fc1KM9I=; b=A6ZF2C2LZqABf8J8WIch1GHoMn
+        61E7ro40d5ueErJg1gliDKEje9EgZ/yDSSbAvoa8u/JKXs3Q0wmULVpHXBCfGLRZc26qmAYG8D/Iq
+        Eo0W4JSCSw/+v1Yw58I8zTSg7RXmgGZzXyzSLwkgZLLZusJo7GF0cHEMbEoDhFkQvucyJi4PG3HNR
+        h+XEpl6giqfoL0AkVW/nn4Ykywz/Grd2EoHbX46/ux0qjqEslcOmkZVv/WluEh4MOM86Z7acSHipA
+        /FAMDMUXSE63VMb+5Rosq8f6P3MQpgeMdPhwCmXuJKsM7z2ryGQ6zl7QQGdVNyl8tibGs3TPgrXq/
+        U81iQSZw==;
+Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1kn3cX-0006hp-Ls; Wed, 09 Dec 2020 17:51:21 +0000
+Date:   Wed, 9 Dec 2020 17:51:21 +0000
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Tom Yan <tom.ty89@gmail.com>
+Cc:     Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org
+Subject: Re: [PATCH 1/3] block: try one write zeroes request before going
+ further
+Message-ID: <20201209175121.GB25719@infradead.org>
+References: <20201206055332.3144-1-tom.ty89@gmail.com>
+ <20201207133658.GC28592@infradead.org>
+ <CAGnHSEmzrJxm2RVHqP9qGfT0-5N2Zi8wdhvDz_zy-d7W0g7caQ@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cover.1607477897.git.asml.silence@gmail.com>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+In-Reply-To: <CAGnHSEmzrJxm2RVHqP9qGfT0-5N2Zi8wdhvDz_zy-d7W0g7caQ@mail.gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Dec 09, 2020 at 02:19:50AM +0000, Pavel Begunkov wrote:
-> The idea is to avoid copying, merging, etc. bvec from iterator to bio
-> in direct I/O and use the one we've already got. Hook it up for io_uring.
-> Had an eye on it for a long, and it also was brought up by Matthew
-> just recently. Let me know if I forgot or misplaced some tags.
-> 
-> A benchmark got me 430KIOPS vs 540KIOPS, or +25% on bare metal. And perf
-> shows that bio_iov_iter_get_pages() was taking ~20%. The test is pretty
-> silly, but still imposing. I'll redo it closer to reality for next
-> iteration, anyway need to double check some cases.
-> 
-> If same applied to iomap, common chunck can be moved from block_dev
-> into bio_iov_iter_get_pages(), but if there any benefit for filesystems,
-> they should explicitly opt in with ITER_BVEC_FLAG_FIXED.
+On Tue, Dec 08, 2020 at 08:48:15PM +0800, Tom Yan wrote:
+> You mean like submit_bio_wait() is a blocking operation?
 
-To reiterate what hch said - this "opt in" is wrong.  Out-of-tree
-code that does async IO on bvec-backed iov_iter, setting it up on
-its own will have to adapt, that all.
-
-iov_iter and its users are already in serious need of simplification
-and cleanups; piling more on top of that would be a bloody bad idea.
-
-Proposed semantics change for bvec-backed iov_iter makes a lot of sense,
-so let's make sure that everything in tree can live with it, document
-the change and switch to better semantics.
-
-This thing should be unconditional.  Document it in D/f/porting and
-if something out of tree complains, it's their problem - not ours.
+Yes, it blocks to wait for the I/O to complete.
