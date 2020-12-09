@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3073C4167B
-	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 08:21:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FE04C433FE
+	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 08:22:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8CD1023BAF
-	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 08:21:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1421923B97
+	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 08:22:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726281AbgLIIVh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Dec 2020 03:21:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36036 "EHLO
+        id S1725997AbgLIIWP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Dec 2020 03:22:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36136 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726231AbgLIIVg (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Dec 2020 03:21:36 -0500
-Received: from mail-ej1-x642.google.com (mail-ej1-x642.google.com [IPv6:2a00:1450:4864:20::642])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74E0EC061793
-        for <linux-block@vger.kernel.org>; Wed,  9 Dec 2020 00:20:56 -0800 (PST)
-Received: by mail-ej1-x642.google.com with SMTP id x16so831537ejj.7
-        for <linux-block@vger.kernel.org>; Wed, 09 Dec 2020 00:20:56 -0800 (PST)
+        with ESMTP id S1725816AbgLIIWP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Dec 2020 03:22:15 -0500
+Received: from mail-ej1-x644.google.com (mail-ej1-x644.google.com [IPv6:2a00:1450:4864:20::644])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 320C5C0617A6
+        for <linux-block@vger.kernel.org>; Wed,  9 Dec 2020 00:20:59 -0800 (PST)
+Received: by mail-ej1-x644.google.com with SMTP id d17so825060ejy.9
+        for <linux-block@vger.kernel.org>; Wed, 09 Dec 2020 00:20:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=cloud.ionos.com; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=fwUB98OMU5vN+dBpGv0EWnnHA2hhEx1MlU32S5W8EnI=;
-        b=Y7iAr8W9bTfDF+GBMnJgiqr+SqswugJViBgz+7cr1bw2XVu4V16CQAENB3Q7wBbAz7
-         NFYLuzpQmGxVgVPTpLW7sCypvlj+y1ybi1YYOkcbdsGzI0dCurYUI9QBhAaiInm+B1WZ
-         jPS9SKy+lxtp8nICT8rWvP7LgaONnrpP1SZvApUFW/Fv7n6YN0vRTw4IYuKZJDxoBe1J
-         l268QuEXKUzw6PgBfhoHkzyiPLN4mT8zQ/3HBGmyJ9NW9iUXO9v2Cfmc19PC0S+SpHyw
-         ZO/DOak7P3gR9PKJhF1dvoisLRhasPltTfgFUL2uXh5l5w0/tgFNq9r/oJ3f4twwF3tZ
-         VuxA==
+        bh=CA2w/lh8ZkqeTZgM/LEMkBOMEtxjc9/IiyW2kEytwok=;
+        b=IzIoKlPKjezOrSWhINuQARrCH4wL2jNfYKv1y2X9NCvQI+KEIhXKObFz+0IqsXCzda
+         LIhldRUEKuQ/F8ENOzmchr2/qqKLMtZG6Vf0ZcewZtUqC47R7ppPabcuw87NUWMGak9Y
+         KNHgWVI+nx4ikZihv+QFD1WHGK3MD4i4w7q4BH31d4NZs6ehFKyq4LzBxAHP1l+OFPK0
+         9rcZhsf2jJs9ro8HOta/7vaH2beq5Eo3EyAmx0kNp8FMY4bdOVuFKpu+eKZex1kYvOjt
+         H1SItUo4vvN3ICHYLEgX89wbiCDBCwlmGZC3tV1hHlSQ5X93mewLM4DV0F3BORVDRJO6
+         iqhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=fwUB98OMU5vN+dBpGv0EWnnHA2hhEx1MlU32S5W8EnI=;
-        b=FAOEOBdADRVwvFObgnum+eyaOjiQu7FTQ5T327SfJgtMuGmUUF9E5zRQ8RZQKEcsjQ
-         FYaVMiBDMgUxfBvp3L9r3Ui5QVI97lhyuQm7IYF/PYxhZ4ppFurCKAfEvYPnxTrl7Iwt
-         55ZWOcuOj1LUeROcLCGmygSDLMTm4ni2taWmzY2UZcXGRkVS0SLsDi6j+q6JC9vCQa4Y
-         mOAXdjAPm6eleEbImv91Wqh778jfgXMQYBKNACJbTnkIdlD+lK9aEoU2wMQKoQemgmVZ
-         JQkUdMZHqMKvU5d4XfGZWKXhRevrp7VqacCkeKxE8TmoRQR/SbGmesJ7/1a/H0jVtts+
-         RNmQ==
-X-Gm-Message-State: AOAM531fKxN3QP3wwe/TrAeoMEbfdgpghnyy/wHVi8Iqb05IDd30zB5J
-        QNZN+GPFENXei17MYz3z8up0Q9Za7qOqaA==
-X-Google-Smtp-Source: ABdhPJxmMFgDEnqtKjdXG4Wk75pBmlC+sPXVEOEbJkKy4oxIAiMat73fsjasSujS/E764NNjdbXOYQ==
-X-Received: by 2002:a17:906:60c8:: with SMTP id f8mr1085979ejk.14.1607502055098;
-        Wed, 09 Dec 2020 00:20:55 -0800 (PST)
+        bh=CA2w/lh8ZkqeTZgM/LEMkBOMEtxjc9/IiyW2kEytwok=;
+        b=Y6UOlVVHzb7r72cVJS17xY/DvwU6Uk65b7g0bGT/9pChLf++R0+JTtyi8zIB15Kq88
+         p5wZO/yQWxfE//ies44izGeyF4RZsWOOXyueS/u3njPeOVflUn3D/Dsl7OIT79+ZLn8A
+         BvfHgOQrp3E8/OTgCiPN7t5SjjzocCXg44dxsuCzkHVv+mq2DybCg+BxkXNI29URrOMs
+         siKFdQGl2OZiZth4OFL7hITS0AS54stXF6ogE2ZNDksSk9CCNfocpTxgyr9RZofDICOA
+         mWCTGV96qGaLUS14yt+EziYIchXvOFPWxt/+k2/LveeSs6NubZ6nJ+y4mMgodaesP2ZW
+         FkjQ==
+X-Gm-Message-State: AOAM531tsbiWxdDfI156UmqFlqZ7nR3sseVONdINnipEilxFNr2vPpXg
+        RYq+UAfKYbIg9YWA5ybLvWsxDCV3Dd0MfQ==
+X-Google-Smtp-Source: ABdhPJzztrAF4g2a5Zo2pZGeaqNTXNMozVoMrUZ6ZPGtYXA3vGmfKyhGf/u91ZnXoSWnUSHu4rk8rw==
+X-Received: by 2002:a17:906:2857:: with SMTP id s23mr1082751ejc.218.1607502057771;
+        Wed, 09 Dec 2020 00:20:57 -0800 (PST)
 Received: from jwang-Latitude-5491.fkb.profitbricks.net ([2001:16b8:49e0:2500:1d14:118d:b29c:98ec])
-        by smtp.gmail.com with ESMTPSA id cf17sm823225edb.16.2020.12.09.00.20.54
+        by smtp.gmail.com with ESMTPSA id cf17sm823225edb.16.2020.12.09.00.20.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Dec 2020 00:20:54 -0800 (PST)
+        Wed, 09 Dec 2020 00:20:57 -0800 (PST)
 From:   Jack Wang <jinpu.wang@cloud.ionos.com>
 To:     linux-block@vger.kernel.org
 Cc:     axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
         bvanassche@acm.org, danil.kipnis@cloud.ionos.com,
-        Md Haris Iqbal <haris.iqbal@cloud.ionos.com>
-Subject: [PATCH for-next 2/7] block/rnbd-clt: Fix possible memleak
-Date:   Wed,  9 Dec 2020 09:20:46 +0100
-Message-Id: <20201209082051.12306-3-jinpu.wang@cloud.ionos.com>
+        Gioh Kim <gi-oh.kim@cloud.ionos.com>
+Subject: [PATCH for-next 5/7] block/rnbd: Set write-back cache and fua same to the target device
+Date:   Wed,  9 Dec 2020 09:20:49 +0100
+Message-Id: <20201209082051.12306-6-jinpu.wang@cloud.ionos.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20201209082051.12306-1-jinpu.wang@cloud.ionos.com>
 References: <20201209082051.12306-1-jinpu.wang@cloud.ionos.com>
@@ -72,43 +72,140 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In error case, we do not free the memory for blk_symlink_name.
+From: Gioh Kim <gi-oh.kim@cloud.ionos.com>
 
-Do it by free the memory in error case, and set to NULL
-afterwards.
+The rnbd-client always sets the write-back cache and fua attributes
+of the rnbd device queue regardless of the target device on the server.
+That generates IO hang issue when the target device does not
+support both of write-back cacne and fua.
 
-Also fix the condition in rnbd_clt_remove_dev_symlink.
+This patch adds more fields for the cache policy and fua into the
+device opening message. The rnbd-server sends the information
+if the target device supports the write-back cache and fua
+and rnbd-client recevives it and set the device queue accordingly.
 
-Fixes: 64e8a6ece1a5 ("block/rnbd-clt: Dynamically alloc buffer for pathname & blk_symlink_name")
+Signed-off-by: Gioh Kim <gi-oh.kim@cloud.ionos.com>
+[jwang: some minor change, rename a few varables, remove unrelated comments.]
 Signed-off-by: Jack Wang <jinpu.wang@cloud.ionos.com>
-Reviewed-by: Md Haris Iqbal <haris.iqbal@cloud.ionos.com>
 ---
- drivers/block/rnbd/rnbd-clt-sysfs.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ drivers/block/rnbd/rnbd-clt.c   | 8 +++++---
+ drivers/block/rnbd/rnbd-clt.h   | 2 ++
+ drivers/block/rnbd/rnbd-proto.h | 9 ++++++++-
+ drivers/block/rnbd/rnbd-srv.c   | 9 +++++++--
+ 4 files changed, 22 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/block/rnbd/rnbd-clt-sysfs.c b/drivers/block/rnbd/rnbd-clt-sysfs.c
-index a7caeedeb198..d4aa6bfc9555 100644
---- a/drivers/block/rnbd/rnbd-clt-sysfs.c
-+++ b/drivers/block/rnbd/rnbd-clt-sysfs.c
-@@ -432,7 +432,7 @@ void rnbd_clt_remove_dev_symlink(struct rnbd_clt_dev *dev)
- 	 * i.e. rnbd_clt_unmap_dev_store() leading to a sysfs warning because
- 	 * of sysfs link already was removed already.
- 	 */
--	if (strlen(dev->blk_symlink_name) && try_module_get(THIS_MODULE)) {
-+	if (dev->blk_symlink_name && try_module_get(THIS_MODULE)) {
- 		sysfs_remove_link(rnbd_devs_kobj, dev->blk_symlink_name);
- 		kfree(dev->blk_symlink_name);
- 		module_put(THIS_MODULE);
-@@ -521,7 +521,8 @@ static int rnbd_clt_add_dev_symlink(struct rnbd_clt_dev *dev)
- 	return 0;
+diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.c
+index 9641afa17095..fe8c738a1797 100644
+--- a/drivers/block/rnbd/rnbd-clt.c
++++ b/drivers/block/rnbd/rnbd-clt.c
+@@ -88,6 +88,8 @@ static int rnbd_clt_set_dev_attr(struct rnbd_clt_dev *dev,
+ 	dev->discard_alignment	    = le32_to_cpu(rsp->discard_alignment);
+ 	dev->secure_discard	    = le16_to_cpu(rsp->secure_discard);
+ 	dev->rotational		    = rsp->rotational;
++	dev->wc 		    = !!(rsp->cache_policy & RNBD_WRITEBACK);
++	dev->fua		    = !!(rsp->cache_policy & RNBD_FUA);
  
- out_err:
--	dev->blk_symlink_name[0] = '\0';
-+	kfree(dev->blk_symlink_name);
-+	dev->blk_symlink_name = NULL ;
- 	return ret;
+ 	dev->max_hw_sectors = sess->max_io_size / SECTOR_SIZE;
+ 	dev->max_segments = BMAX_SEGMENTS;
+@@ -1305,7 +1307,7 @@ static void setup_request_queue(struct rnbd_clt_dev *dev)
+ 	blk_queue_max_segments(dev->queue, dev->max_segments);
+ 	blk_queue_io_opt(dev->queue, dev->sess->max_io_size);
+ 	blk_queue_virt_boundary(dev->queue, SZ_4K - 1);
+-	blk_queue_write_cache(dev->queue, true, true);
++	blk_queue_write_cache(dev->queue, dev->wc, dev->fua);
+ 	dev->queue->queuedata = dev;
  }
  
+@@ -1530,13 +1532,13 @@ struct rnbd_clt_dev *rnbd_clt_map_device(const char *sessname,
+ 	}
+ 
+ 	rnbd_clt_info(dev,
+-		       "map_device: Device mapped as %s (nsectors: %zu, logical_block_size: %d, physical_block_size: %d, max_write_same_sectors: %d, max_discard_sectors: %d, discard_granularity: %d, discard_alignment: %d, secure_discard: %d, max_segments: %d, max_hw_sectors: %d, rotational: %d)\n",
++		       "map_device: Device mapped as %s (nsectors: %zu, logical_block_size: %d, physical_block_size: %d, max_write_same_sectors: %d, max_discard_sectors: %d, discard_granularity: %d, discard_alignment: %d, secure_discard: %d, max_segments: %d, max_hw_sectors: %d, rotational: %d, wc: %d, fua: %d)\n",
+ 		       dev->gd->disk_name, dev->nsectors,
+ 		       dev->logical_block_size, dev->physical_block_size,
+ 		       dev->max_write_same_sectors, dev->max_discard_sectors,
+ 		       dev->discard_granularity, dev->discard_alignment,
+ 		       dev->secure_discard, dev->max_segments,
+-		       dev->max_hw_sectors, dev->rotational);
++		       dev->max_hw_sectors, dev->rotational, dev->wc, dev->fua);
+ 
+ 	mutex_unlock(&dev->lock);
+ 
+diff --git a/drivers/block/rnbd/rnbd-clt.h b/drivers/block/rnbd/rnbd-clt.h
+index b193d5904050..efd67ae286ca 100644
+--- a/drivers/block/rnbd/rnbd-clt.h
++++ b/drivers/block/rnbd/rnbd-clt.h
+@@ -112,6 +112,8 @@ struct rnbd_clt_dev {
+ 	enum rnbd_access_mode	access_mode;
+ 	bool			read_only;
+ 	bool			rotational;
++	bool			wc;
++	bool			fua;
+ 	u32			max_hw_sectors;
+ 	u32			max_write_same_sectors;
+ 	u32			max_discard_sectors;
+diff --git a/drivers/block/rnbd/rnbd-proto.h b/drivers/block/rnbd/rnbd-proto.h
+index ca166241452c..c1bc5c0fef71 100644
+--- a/drivers/block/rnbd/rnbd-proto.h
++++ b/drivers/block/rnbd/rnbd-proto.h
+@@ -108,6 +108,11 @@ struct rnbd_msg_close {
+ 	__le32		device_id;
+ };
+ 
++enum rnbd_cache_policy {
++	RNBD_FUA = 1 << 0,
++	RNBD_WRITEBACK = 1 << 1,
++};
++
+ /**
+  * struct rnbd_msg_open_rsp - response message to RNBD_MSG_OPEN
+  * @hdr:		message header
+@@ -124,6 +129,7 @@ struct rnbd_msg_close {
+  * @max_segments:	max segments hardware support in one transfer
+  * @secure_discard:	supports secure discard
+  * @rotation:		is a rotational disc?
++ * @cache_policy: 	support write-back caching or FUA?
+  */
+ struct rnbd_msg_open_rsp {
+ 	struct rnbd_msg_hdr	hdr;
+@@ -139,7 +145,8 @@ struct rnbd_msg_open_rsp {
+ 	__le16			max_segments;
+ 	__le16			secure_discard;
+ 	u8			rotational;
+-	u8			reserved[11];
++	u8			cache_policy;
++	u8			reserved[10];
+ };
+ 
+ /**
+diff --git a/drivers/block/rnbd/rnbd-srv.c b/drivers/block/rnbd/rnbd-srv.c
+index 066411cce5e2..b8e44331e494 100644
+--- a/drivers/block/rnbd/rnbd-srv.c
++++ b/drivers/block/rnbd/rnbd-srv.c
+@@ -550,6 +550,7 @@ static void rnbd_srv_fill_msg_open_rsp(struct rnbd_msg_open_rsp *rsp,
+ 					struct rnbd_srv_sess_dev *sess_dev)
+ {
+ 	struct rnbd_dev *rnbd_dev = sess_dev->rnbd_dev;
++	struct request_queue *q = bdev_get_queue(rnbd_dev->bdev);
+ 
+ 	rsp->hdr.type = cpu_to_le16(RNBD_MSG_OPEN_RSP);
+ 	rsp->device_id =
+@@ -574,8 +575,12 @@ static void rnbd_srv_fill_msg_open_rsp(struct rnbd_msg_open_rsp *rsp,
+ 		cpu_to_le32(rnbd_dev_get_discard_alignment(rnbd_dev));
+ 	rsp->secure_discard =
+ 		cpu_to_le16(rnbd_dev_get_secure_discard(rnbd_dev));
+-	rsp->rotational =
+-		!blk_queue_nonrot(bdev_get_queue(rnbd_dev->bdev));
++	rsp->rotational = !blk_queue_nonrot(q);
++	rsp->cache_policy = 0;
++	if (test_bit(QUEUE_FLAG_WC, &q->queue_flags))
++		rsp->cache_policy |= RNBD_WRITEBACK;
++	if (blk_queue_fua(q))
++		rsp->cache_policy |= RNBD_FUA;
+ }
+ 
+ static struct rnbd_srv_sess_dev *
 -- 
 2.25.1
 
