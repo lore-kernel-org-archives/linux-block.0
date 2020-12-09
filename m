@@ -7,40 +7,40 @@ X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE94AC4361B
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1687C4167B
 	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 05:31:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 79D7B23B77
+	by mail.kernel.org (Postfix) with ESMTP id 9A0F723B7E
 	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 05:31:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727673AbgLIFa4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Dec 2020 00:30:56 -0500
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:35970 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727668AbgLIFaw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Dec 2020 00:30:52 -0500
-Received: by mail-pf1-f193.google.com with SMTP id b26so280558pfi.3;
-        Tue, 08 Dec 2020 21:30:36 -0800 (PST)
+        id S1727248AbgLIFar (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Dec 2020 00:30:47 -0500
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:43385 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727648AbgLIFan (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Dec 2020 00:30:43 -0500
+Received: by mail-pl1-f196.google.com with SMTP id y10so330784plr.10;
+        Tue, 08 Dec 2020 21:30:28 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=XMPNBLC7erCmsHGfeP6BsbcItk7t2bKK4kjtfKvNqKQ=;
-        b=k4LWi682jmdJgVLlyU2wTm3E6tggMd5ZsJNsbxEtinqNcTZhjo4w4EjU6bNOMq2Yph
-         qnTeVA6XdVcYil1d6nNqkrN5usyhTsHXBy3k79qv2+ZeZiZk16dPUXZ0B8fTnAIj6eFP
-         g+1cWh0r+jeQ7H1hnrDtn0pCwn0rqNpT8T+01KEi29urLqoozBBu9qT4XmVJh6adaVB6
-         OtZ5wj86RgU2pGIJvOhcF1pv3mKZwE72ZWEZjj3p/mqdfkEP+zF9xr6nfJMRTbhCcUCc
-         aJxBAq9CVNyFondvXPgz711a7L2Dcrhpzho3XsUYrGLD1okNF1jG97vxrQQlOhnYhGFd
-         SKFw==
-X-Gm-Message-State: AOAM5318FlvHW0TZEzrjP+WqGo/Gyc11qyo5KiAAXwCrShTJlUMrhKhz
-        lzIPABRBlHEaklcjo81KejI=
-X-Google-Smtp-Source: ABdhPJzf2OMDrP87HF8jRLQfCTdwfKsLZzXPguCHpomNNcnMqzIuMSJTt2cv0SKD0KtDM4c4WuOSEw==
-X-Received: by 2002:a63:534c:: with SMTP id t12mr531888pgl.128.1607491811226;
-        Tue, 08 Dec 2020 21:30:11 -0800 (PST)
+        bh=BHwoHOMvig80TKhMF0enCCYk2D2TdkshHI6fRWVwlZw=;
+        b=XP9w+/VsEk0rJbKHKBkF+OBfrJgDjtmFEFJj3EnrPSN5q0XtHqSerB+Q+a5K6Qwrrt
+         f14qjAHmfkrlovuNlhuz0AuXaY2oQcravYZeVWuhzSDzg12SeO/8PRywTxtLnNyQLU0O
+         QGpCQRqNuTsDKJQTyqQqfowDuWE5aFYgSsMqDQSlO1mJNs1+7ISgKmcJoaufefMwOvOb
+         AzIrXp8Yaum1U5O5keBDeauGHysms89Qzbp70FD5QW72OLr01Fh+r7gpRcpSlbj4XfKA
+         HMSgXUWF8k5g+gW+LArz1GQrO8W0CH7JQexfRGosiW2UT8yKuLJTjzSLqFXRJOsYS9PI
+         QfXw==
+X-Gm-Message-State: AOAM531TVUrWi26HPlfGndLRhlBup3VZ/jSurf7dTmeM48kWVVhGVGyd
+        Ywfkjwls2g9D9p8F8PjZfz79dXwz/LE=
+X-Google-Smtp-Source: ABdhPJwdtRwo+u1GUyNNyDZw6TWPNo8HFr+jXCVil7K7eolcWEqiLd5J9E0DxTMgCUP321EJbuS0bg==
+X-Received: by 2002:a17:902:24b:b029:d6:cd52:61e3 with SMTP id 69-20020a170902024bb02900d6cd5261e3mr619537plc.2.1607491802543;
+        Tue, 08 Dec 2020 21:30:02 -0800 (PST)
 Received: from asus.hsd1.ca.comcast.net (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
-        by smtp.gmail.com with ESMTPSA id 77sm753097pfv.16.2020.12.08.21.30.09
+        by smtp.gmail.com with ESMTPSA id 77sm753097pfv.16.2020.12.08.21.30.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Dec 2020 21:30:10 -0800 (PST)
+        Tue, 08 Dec 2020 21:30:01 -0800 (PST)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     "Martin K . Petersen" <martin.petersen@oracle.com>
 Cc:     "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
@@ -49,15 +49,12 @@ Cc:     "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
         linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
         Bart Van Assche <bvanassche@acm.org>,
         Alan Stern <stern@rowland.harvard.edu>,
-        James Bottomley <James.Bottomley@HansenPartnership.com>,
-        Woody Suwalski <terraluna977@gmail.com>,
-        Can Guo <cang@codeaurora.org>,
         Stanley Chu <stanley.chu@mediatek.com>,
         "Rafael J . Wysocki" <rafael.j.wysocki@intel.com>,
-        Stan Johnson <userm57@yahoo.com>
-Subject: [PATCH v5 5/8] scsi_transport_spi: Set RQF_PM for domain validation commands
-Date:   Tue,  8 Dec 2020 21:29:48 -0800
-Message-Id: <20201209052951.16136-6-bvanassche@acm.org>
+        stable <stable@vger.kernel.org>, Can Guo <cang@codeaurora.org>
+Subject: [PATCH v5 1/8] block: Fix a race in the runtime power management code
+Date:   Tue,  8 Dec 2020 21:29:44 -0800
+Message-Id: <20201209052951.16136-2-bvanassche@acm.org>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20201209052951.16136-1-bvanassche@acm.org>
 References: <20201209052951.16136-1-bvanassche@acm.org>
@@ -67,95 +64,67 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Disable runtime power management during domain validation. Since a later
-patch removes RQF_PREEMPT, set RQF_PM for domain validation commands such
-that these are executed in the quiesced SCSI device state.
+With the current implementation the following race can happen:
+* blk_pre_runtime_suspend() calls blk_freeze_queue_start() and
+  blk_mq_unfreeze_queue().
+* blk_queue_enter() calls blk_queue_pm_only() and that function returns
+  true.
+* blk_queue_enter() calls blk_pm_request_resume() and that function does
+  not call pm_request_resume() because the queue runtime status is
+  RPM_ACTIVE.
+* blk_pre_runtime_suspend() changes the queue status into RPM_SUSPENDING.
 
+Fix this race by changing the queue runtime status into RPM_SUSPENDING
+before switching q_usage_counter to atomic mode.
+
+Acked-by: Alan Stern <stern@rowland.harvard.edu>
+Acked-by: Stanley Chu <stanley.chu@mediatek.com>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 Reviewed-by: Jens Axboe <axboe@kernel.dk>
-Cc: Alan Stern <stern@rowland.harvard.edu>
-Cc: James Bottomley <James.Bottomley@HansenPartnership.com>
-Cc: Woody Suwalski <terraluna977@gmail.com>
-Cc: Can Guo <cang@codeaurora.org>
-Cc: Stanley Chu <stanley.chu@mediatek.com>
 Cc: Ming Lei <ming.lei@redhat.com>
 Cc: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
-Cc: Stan Johnson <userm57@yahoo.com>
+Cc: stable <stable@vger.kernel.org>
+Fixes: 986d413b7c15 ("blk-mq: Enable support for runtime power management")
+Signed-off-by: Can Guo <cang@codeaurora.org>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- drivers/scsi/scsi_transport_spi.c | 27 +++++++++++++++++++--------
- 1 file changed, 19 insertions(+), 8 deletions(-)
+ block/blk-pm.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/scsi/scsi_transport_spi.c b/drivers/scsi/scsi_transport_spi.c
-index f3d5b1bbd5aa..c37dd15d16d2 100644
---- a/drivers/scsi/scsi_transport_spi.c
-+++ b/drivers/scsi/scsi_transport_spi.c
-@@ -117,12 +117,16 @@ static int spi_execute(struct scsi_device *sdev, const void *cmd,
- 		sshdr = &sshdr_tmp;
+diff --git a/block/blk-pm.c b/block/blk-pm.c
+index b85234d758f7..17bd020268d4 100644
+--- a/block/blk-pm.c
++++ b/block/blk-pm.c
+@@ -67,6 +67,10 @@ int blk_pre_runtime_suspend(struct request_queue *q)
  
- 	for(i = 0; i < DV_RETRIES; i++) {
-+		/*
-+		 * The purpose of the RQF_PM flag below is to bypass the
-+		 * SDEV_QUIESCE state.
-+		 */
- 		result = scsi_execute(sdev, cmd, dir, buffer, bufflen, sense,
- 				      sshdr, DV_TIMEOUT, /* retries */ 1,
- 				      REQ_FAILFAST_DEV |
- 				      REQ_FAILFAST_TRANSPORT |
- 				      REQ_FAILFAST_DRIVER,
--				      0, NULL);
-+				      RQF_PM, NULL);
- 		if (driver_byte(result) != DRIVER_SENSE ||
- 		    sshdr->sense_key != UNIT_ATTENTION)
- 			break;
-@@ -1005,23 +1009,26 @@ spi_dv_device(struct scsi_device *sdev)
- 	 */
- 	lock_system_sleep();
+ 	WARN_ON_ONCE(q->rpm_status != RPM_ACTIVE);
  
-+	if (scsi_autopm_get_device(sdev))
-+		goto unlock_system_sleep;
++	spin_lock_irq(&q->queue_lock);
++	q->rpm_status = RPM_SUSPENDING;
++	spin_unlock_irq(&q->queue_lock);
 +
- 	if (unlikely(spi_dv_in_progress(starget)))
--		goto unlock;
-+		goto put_autopm;
+ 	/*
+ 	 * Increase the pm_only counter before checking whether any
+ 	 * non-PM blk_queue_enter() calls are in progress to avoid that any
+@@ -89,15 +93,14 @@ int blk_pre_runtime_suspend(struct request_queue *q)
+ 	/* Switch q_usage_counter back to per-cpu mode. */
+ 	blk_mq_unfreeze_queue(q);
  
- 	if (unlikely(scsi_device_get(sdev)))
--		goto unlock;
-+		goto put_autopm;
+-	spin_lock_irq(&q->queue_lock);
+-	if (ret < 0)
++	if (ret < 0) {
++		spin_lock_irq(&q->queue_lock);
++		q->rpm_status = RPM_ACTIVE;
+ 		pm_runtime_mark_last_busy(q->dev);
+-	else
+-		q->rpm_status = RPM_SUSPENDING;
+-	spin_unlock_irq(&q->queue_lock);
++		spin_unlock_irq(&q->queue_lock);
  
- 	spi_dv_in_progress(starget) = 1;
+-	if (ret)
+ 		blk_clear_pm_only(q);
++	}
  
- 	buffer = kzalloc(len, GFP_KERNEL);
- 
- 	if (unlikely(!buffer))
--		goto out_put;
-+		goto put_sdev;
- 
- 	/* We need to verify that the actual device will quiesce; the
- 	 * later target quiesce is just a nice to have */
- 	if (unlikely(scsi_device_quiesce(sdev)))
--		goto out_free;
-+		goto free_buffer;
- 
- 	scsi_target_quiesce(starget);
- 
-@@ -1041,12 +1048,16 @@ spi_dv_device(struct scsi_device *sdev)
- 
- 	spi_initial_dv(starget) = 1;
- 
-- out_free:
-+free_buffer:
- 	kfree(buffer);
-- out_put:
-+
-+put_sdev:
- 	spi_dv_in_progress(starget) = 0;
- 	scsi_device_put(sdev);
--unlock:
-+put_autopm:
-+	scsi_autopm_put_device(sdev);
-+
-+unlock_system_sleep:
- 	unlock_system_sleep();
+ 	return ret;
  }
- EXPORT_SYMBOL(spi_dv_device);
