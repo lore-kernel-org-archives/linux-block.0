@@ -8,42 +8,43 @@ X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E398C4361B
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28235C433FE
 	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 13:09:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C839523B45
+	by mail.kernel.org (Postfix) with ESMTP id EAD7023BCD
 	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 13:09:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732179AbgLINJN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Dec 2020 08:09:13 -0500
-Received: from mx4.veeam.com ([104.41.138.86]:33940 "EHLO mx4.veeam.com"
+        id S1731965AbgLINJP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Dec 2020 08:09:15 -0500
+Received: from mx4.veeam.com ([104.41.138.86]:33956 "EHLO mx4.veeam.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731965AbgLINJD (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 9 Dec 2020 08:09:03 -0500
+        id S1729012AbgLINJE (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 9 Dec 2020 08:09:04 -0500
+X-Greylist: delayed 391 seconds by postgrey-1.27 at vger.kernel.org; Wed, 09 Dec 2020 08:09:02 EST
 Received: from mail.veeam.com (prgmbx01.amust.local [172.24.0.171])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mx4.veeam.com (Postfix) with ESMTPS id AE1BFB21AE;
-        Wed,  9 Dec 2020 16:01:48 +0300 (MSK)
+        by mx4.veeam.com (Postfix) with ESMTPS id 6573FB9A6F;
+        Wed,  9 Dec 2020 16:01:50 +0300 (MSK)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com; s=mx4;
-        t=1607518908; bh=lLQOJoAu/Swae9Mr2YfO+NjXg7KvcgY7sSBSh8vbgrc=;
+        t=1607518910; bh=/xuQD7v393TvlYTOY+wfRjPvoSZ5yMpkOEbp/g6NwMA=;
         h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-        b=aguFfSHAs4D+sJdd8mopcLSoynBgwVcc+NfMOCNt+KeQ3ZaT0mXY3TGm/3KEgMv1q
-         VXo666GYT9ICgfZQiETJBzOTK4idsnBgBeGQmSthd7oJFB1HtATuuKOoGIorQjygvT
-         7BnHPg+6/+g+68G700cxtvOJGHrch3SvERBTQArM=
+        b=X3k4xoB41/kSZCSYBbNYq0IjOh7AUDvFpa57zDh6VJM8fz49FqLwkWSiF2/8Ffj1x
+         w4zoXXYLjWdUJ6WzKMsmuIzS3223+qBUihnc74i4++8lp5sv8qs0JQ7eShx9lvhqvh
+         khVQbxOYyIKDq1iqbmDFwyBTnGSK0WB4bF7FcTw8=
 Received: from prgdevlinuxpatch01.amust.local (172.24.14.5) by
  prgmbx01.amust.local (172.24.0.171) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.721.2;
- Wed, 9 Dec 2020 14:01:47 +0100
+ Wed, 9 Dec 2020 14:01:48 +0100
 From:   Sergei Shtepa <sergei.shtepa@veeam.com>
 To:     <axboe@kernel.dk>, <johannes.thumshirn@wdc.com>,
         <koct9i@gmail.com>, <ming.lei@redhat.com>, <snitzer@redhat.com>,
         <hare@suse.de>, <josef@toxicpanda.com>, <steve@sk2.org>,
         <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>
 CC:     <pavel.tide@veeam.com>, <sergei.shtepa@veeam.com>
-Subject: [PATCH 1/3] block: blk_interposer - Block Layer Interposer
-Date:   Wed, 9 Dec 2020 16:01:49 +0300
-Message-ID: <1607518911-30692-2-git-send-email-sergei.shtepa@veeam.com>
+Subject: [PATCH 2/3] block: blk_interposer - sample
+Date:   Wed, 9 Dec 2020 16:01:50 +0300
+Message-ID: <1607518911-30692-3-git-send-email-sergei.shtepa@veeam.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1607518911-30692-1-git-send-email-sergei.shtepa@veeam.com>
 References: <1607518911-30692-1-git-send-email-sergei.shtepa@veeam.com>
@@ -59,155 +60,308 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The Block Layer Interposer (blk_interposer) allows to intercept bio.
-This allows to connect device mapper and other kernel modules to
-the block device stack on the fly.
+This sample demonstrates how to use blk_interposer.
+It show how to properly connect the interposer module to kernel,
+and perform the simplest monitoring of the number of bio.
 
-This simple hook allows to work modules that previously relied on the
-interception of the make_request_fn() function from the
-request_queue structure. This interception capability was lost in
-the v5.8.
-
-Changes:
-  * A new __submit_bio_interposed() function call is added
-    to the submit_bio_noacct(). The call is made only if the
-    interposer was connected.
-  * A new bio flag BIO_INTERPOSED can indicate that bio has
-    already been interposed or cannot be interposed.
-  * The bi_flags member of the BIO structure is expanded
-    to a 32-bit variable to accommodate the new flag.
-  * New structure blk_interposer contains the interposer
-    callback function.
 Signed-off-by: Sergei Shtepa <sergei.shtepa@veeam.com>
 ---
- block/blk-core.c          | 32 ++++++++++++++++++++++++++++++++
- include/linux/blk_types.h |  6 ++++--
- include/linux/genhd.h     | 12 +++++++++++-
- 3 files changed, 47 insertions(+), 3 deletions(-)
+ samples/blk_interposer/Makefile         |   2 +
+ samples/blk_interposer/blk-interposer.c | 276 ++++++++++++++++++++++++
+ 2 files changed, 278 insertions(+)
+ create mode 100644 samples/blk_interposer/Makefile
+ create mode 100644 samples/blk_interposer/blk-interposer.c
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 2db8bda43b6e..682b9b5a93ff 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1030,6 +1030,35 @@ static blk_qc_t __submit_bio_noacct_mq(struct bio *bio)
- 	return ret;
- }
- 
-+static blk_qc_t __submit_bio_interposed(struct bio *bio)
+diff --git a/samples/blk_interposer/Makefile b/samples/blk_interposer/Makefile
+new file mode 100644
+index 000000000000..b11aefde2b1c
+--- /dev/null
++++ b/samples/blk_interposer/Makefile
+@@ -0,0 +1,2 @@
++# SPDX-License-Identifier: GPL-2.0
++obj-$(CONFIG_SAMPLE_BLK_INTERPOSER) += blk-interposer.o
+diff --git a/samples/blk_interposer/blk-interposer.c b/samples/blk_interposer/blk-interposer.c
+new file mode 100644
+index 000000000000..92b4c1fcf8f7
+--- /dev/null
++++ b/samples/blk_interposer/blk-interposer.c
+@@ -0,0 +1,276 @@
++// SPDX-License-Identifier: GPL-2.0
++
++/*
++ * Block layer interposer allow to interpose bio requests from kernel module.
++ * This allows you to monitor requests, modify requests, add new request,
++ * or even redirect requests to another devices.
++ *
++ * This sample demonstrates how to use blk_interposer.
++ * It show how to properly connect the interposer module to kernel,
++ * and perform the simplest monitoring of the number of bio.
++ */
++
++#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
++
++#include <linux/module.h>
++#include <linux/types.h>
++#include <linux/errno.h>
++#include <linux/blkdev.h>
++#include <linux/genhd.h>
++#include <linux/blk-mq.h>
++
++int device_major = 8;
++int device_minor;
++int fmode = FMODE_READ | FMODE_WRITE;
++
++/*
++ * Each interposer must have a common part in the form of the blk_interposer structure,
++ * as well as its own unique data.
++ */
++struct my_interposer {
++	/*
++	 * Common part of block device interposer.
++	 */
++	struct blk_interposer interposer;
++	/*
++	 * Specific part for our interposer data.
++	 */
++	atomic_t counter;
++};
++
++struct my_interposer my_ip;
++
++/**
++ * blk_interposer_attach - Attach interposer to disk
++ * @disk: target disk
++ * @interposer: block device interposer
++ */
++static int blk_interposer_attach(struct gendisk *disk, struct blk_interposer *interposer)
 +{
-+	struct bio_list bio_list[2] = { };
-+	blk_qc_t ret = BLK_QC_T_NONE;
++	int ret = 0;
 +
-+	current->bio_list = bio_list;
-+	if (likely(bio_queue_enter(bio) == 0)) {
-+		struct gendisk *disk = bio->bi_disk;
++	/*
++	 * Stop disks queue processing.
++	 */
++	blk_mq_freeze_queue(disk->queue);
++	blk_mq_quiesce_queue(disk->queue);
 +
-+		bio_set_flag(bio, BIO_INTERPOSED);
-+		if (likely(blk_has_interposer(disk))) {
-+			struct blk_interposer *ip = disk->interposer;
-+
-+			ip->ip_submit_bio(ip, bio);
-+		} else
-+			/* interposer was removed */
-+			bio_list_add(&current->bio_list[0], bio);
-+
-+		blk_queue_exit(disk->queue);
++	/*
++	 * Check if the interposer is already busy.
++	 * The interposer will only connect if it is not busy.
++	 */
++	if (blk_has_interposer(disk)) {
++		pr_info("The interposer is already busy.\n");
++		ret = -EBUSY;
++		goto out;
 +	}
-+	current->bio_list = NULL;
 +
-+	/* Resubmit the remaining bios */
-+	while ((bio = bio_list_pop(&bio_list[0])))
-+		ret = submit_bio_noacct(bio);
++	/*
++	 * Attach the interposer.
++	 */
++	disk->interposer = interposer;
++	/*
++	 * And while the queue is stopped, we can do something specific for our module.
++	 */
++	pr_info("Block device interposer attached successfully.\n");
++
++out:
++	/*
++	 * Resume disks queue processing
++	 */
++	blk_mq_unquiesce_queue(disk->queue);
++	blk_mq_unfreeze_queue(disk->queue);
 +
 +	return ret;
 +}
 +
- /**
-  * submit_bio_noacct - re-submit a bio to the block device layer for I/O
-  * @bio:  The bio describing the location in memory and on the device.
-@@ -1055,6 +1084,9 @@ blk_qc_t submit_bio_noacct(struct bio *bio)
- 		return BLK_QC_T_NONE;
- 	}
- 
-+	if (blk_has_interposer(bio->bi_disk) &&
-+	    !bio_flagged(bio, BIO_INTERPOSED))
-+		return __submit_bio_interposed(bio);
- 	if (!bio->bi_disk->fops->submit_bio)
- 		return __submit_bio_noacct_mq(bio);
- 	return __submit_bio_noacct(bio);
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index d9b69bbde5cc..996b803e5aa1 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -207,7 +207,7 @@ struct bio {
- 						 * top bits REQ_OP. Use
- 						 * accessors.
- 						 */
--	unsigned short		bi_flags;	/* status, etc and bvec pool number */
-+	unsigned int		bi_flags;	/* status, etc and bvec pool number */
- 	unsigned short		bi_ioprio;
- 	unsigned short		bi_write_hint;
- 	blk_status_t		bi_status;
-@@ -284,6 +284,8 @@ enum {
- 				 * of this bio. */
- 	BIO_CGROUP_ACCT,	/* has been accounted to a cgroup */
- 	BIO_TRACKED,		/* set if bio goes through the rq_qos path */
-+	BIO_INTERPOSED,		/* bio has been interposed and can be moved to
-+				 * a different disk */
- 	BIO_FLAG_LAST
- };
- 
-@@ -302,7 +304,7 @@ enum {
-  * freed.
-  */
- #define BVEC_POOL_BITS		(3)
--#define BVEC_POOL_OFFSET	(16 - BVEC_POOL_BITS)
-+#define BVEC_POOL_OFFSET	(32 - BVEC_POOL_BITS)
- #define BVEC_POOL_IDX(bio)	((bio)->bi_flags >> BVEC_POOL_OFFSET)
- #if (1<< BVEC_POOL_BITS) < (BVEC_POOL_NR+1)
- # error "BVEC_POOL_BITS is too small"
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index 03da3f603d30..ea5fc57c3451 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -4,7 +4,7 @@
- 
- /*
-  * 	genhd.h Copyright (C) 1992 Drew Eckhardt
-- *	Generic hard disk header file by  
-+ *	Generic hard disk header file by
-  * 		Drew Eckhardt
-  *
-  *		<drew@colorado.edu>
-@@ -164,6 +164,13 @@ struct blk_integrity {
- 	unsigned char				tag_size;
- };
- 
-+struct blk_interposer;
-+typedef void (*ip_submit_bio_t) (struct blk_interposer *ip, struct bio *bio);
++/**
++ * blk_interposer_detach - Detach interposer from disk
++ * @disk: target disk
++ * @interposer: block device interposer
++ */
++static int blk_interposer_detach(struct gendisk *disk, struct blk_interposer *interposer)
++{
++	int ret = 0;
 +
-+struct blk_interposer {
-+	ip_submit_bio_t ip_submit_bio;
-+};
++	if (WARN_ON(!disk))
++		return -EINVAL;
 +
- struct gendisk {
- 	/* major, first_minor and minors are input parameters only,
- 	 * don't use directly.  Use disk_devt() and disk_max_parts().
-@@ -188,6 +195,7 @@ struct gendisk {
- 
- 	const struct block_device_operations *fops;
- 	struct request_queue *queue;
-+	struct blk_interposer *interposer;
- 	void *private_data;
- 
- 	int flags;
-@@ -409,4 +417,6 @@ static inline dev_t blk_lookup_devt(const char *name, int partno)
- }
- #endif /* CONFIG_BLOCK */
- 
-+#define blk_has_interposer(d) ((d)->interposer != NULL)
++	/*
++	 * Stop disks queue processing.
++	 */
++	blk_mq_freeze_queue(disk->queue);
++	blk_mq_quiesce_queue(disk->queue);
 +
- #endif /* _LINUX_GENHD_H */
++	/*
++	 * Check if the interposer is still available.
++	 */
++	if (!disk->interposer) {
++		pr_info("The interposer is not available.\n");
++		return -ENOENT;
++		goto out;
++	}
++	/*
++	 * Check if it is really our interposer.
++	 */
++	if (disk->interposer->ip_submit_bio != interposer->ip_submit_bio) {
++		pr_info("The interposer found is not ours.\n");
++		return -EPERM;
++		goto out;
++	}
++
++	/*
++	 * Detach interposer.
++	 */
++	disk->interposer = NULL;
++	/*
++	 * And while the queue is stopped, we can do something specific for our module.
++	 */
++	pr_info("Block device interposer detached successfully.\n");
++
++out:
++	/*
++	 * Resume disks queue processing.
++	 */
++	blk_mq_unquiesce_queue(disk->queue);
++	blk_mq_unfreeze_queue(disk->queue);
++
++	return ret;
++}
++
++/**
++ * blk_interposer_submit_bio - Interpose bio
++ * @interposer: block device interposer
++ * @bio: interposed bio
++ */
++static void blk_interposer_submit_bio(struct blk_interposer *interposer, struct bio *bio)
++{
++	struct my_interposer *ip = container_of(interposer, struct my_interposer, interposer);
++
++	atomic_inc(&ip->counter);
++	if (atomic_read(&ip->counter) < 10)
++		pr_info("%s - %d", __func__, atomic_read(&ip->counter));
++	else if (atomic_read(&ip->counter) == 10)
++		pr_info("%s the flooding of log has stopped", __func__);
++
++	/*
++	 * Here we can submit a new child bio requests before the original.
++	 * If the new bio should not be interposed, set BIO_INTERPOSED flag.
++	 */
++
++	/*
++	 * We can resubmit the original bio or just add it to the current->bio_list.
++	 * In the second case, we do not call submit_bio_checks() twice.
++	 */
++	bio_list_add(&current->bio_list[0], bio);
++
++	/*
++	 * Here we can submit a new bio requests after the original,
++	 * although I don't know how it might be useful.
++	 */
++
++	/*
++	 * All submitted bio will be just placed in the current->bio_list.
++	 * We can't wait for the bio request to complete.
++	 */
++
++	/*
++	 * The function doesn't return anything, because it can only return BLK_QC_T_NONE.
++	 */
++}
++
++static int __init blk_interposer_init(void)
++{
++	int ret = 0;
++	dev_t dev_id;
++	struct block_device *bdev;
++
++	pr_info("Loading module\n");
++
++	pr_info("Tracking device: %d:%d\n", device_major, device_minor);
++	dev_id = MKDEV(device_major, device_minor);
++
++	/*
++	 * Open block device
++	 */
++	bdev = blkdev_get_by_dev(dev_id, fmode, &my_ip);
++	if (IS_ERR(bdev)) {
++		ret = PTR_ERR(bdev);
++		pr_err("Unable to open device [%d:%d]: blkdev_get_by_dev return %d\n",
++		       MAJOR(dev_id), MINOR(dev_id), 0-ret);
++		return ret;
++	}
++
++	/*
++	 * Initialize block device interposer fields.
++	 */
++	my_ip.interposer.ip_submit_bio = blk_interposer_submit_bio;
++
++	/*
++	 * Initialize our interposer specific fields
++	 */
++	atomic_set(&my_ip.counter, 0);
++
++	/*
++	 * Attach interposer to disk
++	 */
++	ret = blk_interposer_attach(bdev->bd_disk, &my_ip.interposer);
++	if (ret)
++		pr_info("Failed to attach the block device interposer.\n");
++	/*
++	 * Close device
++	 */
++	blkdev_put(bdev, fmode);
++
++	return ret;
++}
++
++static void __exit blk_interposer_exit(void)
++{
++	int ret;
++	dev_t dev_id;
++	struct block_device *bdev;
++
++	pr_info("Unloading module\n");
++
++	dev_id = MKDEV(device_major, device_minor);
++
++	/*
++	 * Open block device
++	 */
++	bdev = blkdev_get_by_dev(dev_id, fmode, &my_ip);
++	if (IS_ERR(bdev)) {
++		ret = PTR_ERR(bdev);
++		pr_err("Unable to open device [%d:%d]: blkdev_get_by_dev return %d\n",
++		       MAJOR(dev_id), MINOR(dev_id), 0-ret);
++		return;
++	}
++
++	/*
++	 * Detach interposer from disk
++	 */
++	ret = blk_interposer_detach(bdev->bd_disk, &my_ip.interposer);
++	if (ret)
++		pr_info("Failed to detach the block device interposer.\n");
++	/*
++	 * Close device
++	 */
++	blkdev_put(bdev, fmode);
++
++	/*
++	 * The counter shows how much bio was interposed.
++	 */
++	pr_info("%d bio was interposed.\n", atomic_read(&my_ip.counter));
++}
++
++module_init(blk_interposer_init);
++module_exit(blk_interposer_exit);
++
++MODULE_DESCRIPTION("Block Layer Interposer Sample kernel module");
++MODULE_AUTHOR("Veeam Software Group GmbH");
++MODULE_LICENSE("GPL");
++
++module_param_named(device_major, device_major, int, 0644);
++MODULE_PARM_DESC(device_major, "Tracking device major number");
++module_param_named(device_minor, device_minor, int, 0644);
++MODULE_PARM_DESC(device_minor, "Tracking device minor number");
 -- 
 2.20.1
 
