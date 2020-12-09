@@ -2,153 +2,416 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B44AC433FE
-	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 12:07:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13C70C4361B
+	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 12:44:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BEFDB23B7B
-	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 12:07:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DCBB823BE0
+	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 12:44:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730402AbgLIMHi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Dec 2020 07:07:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42768 "EHLO
+        id S1731759AbgLIMoD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Dec 2020 07:44:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48340 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730385AbgLIMHh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Dec 2020 07:07:37 -0500
-Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4359DC0613D6;
-        Wed,  9 Dec 2020 04:06:57 -0800 (PST)
-Received: by mail-wm1-x32d.google.com with SMTP id y23so1415933wmi.1;
-        Wed, 09 Dec 2020 04:06:57 -0800 (PST)
+        with ESMTP id S1731740AbgLIMn7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Dec 2020 07:43:59 -0500
+Received: from mail-ed1-x543.google.com (mail-ed1-x543.google.com [IPv6:2a00:1450:4864:20::543])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E79FBC0613D6
+        for <linux-block@vger.kernel.org>; Wed,  9 Dec 2020 04:43:18 -0800 (PST)
+Received: by mail-ed1-x543.google.com with SMTP id b73so1360475edf.13
+        for <linux-block@vger.kernel.org>; Wed, 09 Dec 2020 04:43:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:autocrypt:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=tCwU4zmn0s7cAcxlqvIMqSJutP8C4okN6yr42e+Azek=;
-        b=cE8lQiZdcl7R2cfjseeOdM+vKVL503OAxMNMhxQSAEUn1YfanBIJTQIu+O0WDz9SFd
-         Xwx8hNVst2wyWHev6z90HeWpO1hoPfB4UHGnhYEEk7bVij62a57Qq8Tn3zm0fCZjpMHO
-         H2GQU/hfPbuqISW8V+b7963/fxUV/H97zrM4fosmGJHZWzR15+KCAWmOWDo2cuhQzLN3
-         UEB/V2bakFC5ehgw8Ox8yL5hg1176RBnlUhGSWLp0xZWt+pn9OzXj64vTKcoXosF0So+
-         icFbnf91Xz2yxK0+i8GOVOYkKmLA/r/XSmfHDRNL3imi5Uv2DRWl1Jf3g/0r1snFQdk2
-         +xfA==
+        d=javigon-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=sqhsxuS2emImV6XGj8F5LGT5a7h8FnexIO/q9STo0QE=;
+        b=PT8U3bHEQXPoXJ5ExamxougC0DgcAvqbQJsvB4nvxFVI2HQSv2AWnUkLjv+dneykM6
+         r9KaB13ysjtXmM8zc+YE7LLZkEKvRVygOsFWs3d3H7xQ2SRgYXtG/lwi11/dshYEJrzB
+         WCDUop7Nzq4y9fdMLT9n0h1RCf/p3vIoxVl3iQfvhHc16J8TgKSpO2GCi+hqT/l7vxB0
+         0lToG18J3h5CV6Qx3pk9wXqDwTsR1abS16nFwNlZNAE7bWHF+c/tZ8qUBScc6Bw70AUF
+         SnUIh93Vu5/9WayCCEmZwiekhVmxDiTg+BkTc2VMmc0v9Py6Tt09r5i6b3hJ9VY5nx8K
+         pMtw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=tCwU4zmn0s7cAcxlqvIMqSJutP8C4okN6yr42e+Azek=;
-        b=ZyRRdF3YylAFVForbwf8m9U8hg1g6VgHCVFR0yFxJpcx+4VencsX1M3mdvCIG9vqTJ
-         9asjZiTYxaZS1vi/KOR/LyKyBYXrxb8GAVKv8M4nU0FY6+M9qbtz7tcdQkFniaUGXHhr
-         P+5ak+3FljJAeDRv3xeYMwRUtirsr/Gg868Q2Q6/123ICk254kRhlbjRCnygKRWVTm+1
-         0rzZz/KaqTixMUmRnW2VKei9OQYdFXqZWHAQnWRfzHs/wndMsy1QMldY9AFVuvQf9Xtl
-         YSXXKvtmcEPQwz5zQ1LSKLnpoJoFAkhsmwVn6iHDy2TCBaNJYmJxoc5ScYgGdVBdnZEI
-         Wn2w==
-X-Gm-Message-State: AOAM531BvLbwGa+UjWoS+U34eHnLRl1RrGcPv1now8u438l8Am6qnHr2
-        A8zHGLPOqIRqnoqlmReNDMQ=
-X-Google-Smtp-Source: ABdhPJzPurYbriT6SxV9WKIwNBdCTkJqLXZNjh6gui+MCardfduv9Y6qrP2kBZTiA+w8vwQGm91sFg==
-X-Received: by 2002:a7b:cb82:: with SMTP id m2mr2390583wmi.75.1607515616042;
-        Wed, 09 Dec 2020 04:06:56 -0800 (PST)
-Received: from [192.168.8.121] ([85.255.233.156])
-        by smtp.gmail.com with ESMTPSA id m8sm3103010wmc.27.2020.12.09.04.06.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Dec 2020 04:06:55 -0800 (PST)
-Subject: Re: [PATCH 2/2] block: no-copy bvec for direct IO
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Matthew Wilcox <willy@infradead.org>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Ming Lei <ming.lei@redhat.com>
-References: <cover.1607477897.git.asml.silence@gmail.com>
- <51905c4fcb222e14a1d5cb676364c1b4f177f582.1607477897.git.asml.silence@gmail.com>
- <20201209084005.GC21968@infradead.org>
- <63057f61-85e5-4720-3532-1a1ba05ab41a@gmail.com>
- <20201209120531.GA9598@infradead.org>
-From:   Pavel Begunkov <asml.silence@gmail.com>
-Autocrypt: addr=asml.silence@gmail.com; prefer-encrypt=mutual; keydata=
- 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 bA==
-Message-ID: <2ec61ac5-6ef8-6d85-263e-917770292480@gmail.com>
-Date:   Wed, 9 Dec 2020 12:03:39 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=sqhsxuS2emImV6XGj8F5LGT5a7h8FnexIO/q9STo0QE=;
+        b=nHHSF1uAkzmh4Si6ZMfS1xYIKEUFwP8AaT2bBdpjjASKk+C52TswZbfvQnkvFibbzp
+         tA4jTSWi+qUiX0WwR0RC08u2fsErM5KEsjx28Asx1qD1VhWl2jFcrE0Rt68ivvDk9mre
+         pPV5OcAtNmYEZsyg+1s/9C6NJ1U7hIrKeRJXDPdKTMUVyHdFOAUb3nEgyx/XqzIw7h18
+         oIOM7ccLP5s8asMIc3lH2WHz2/Oy49ryS8eZBiv1AQy0rSsVEKjnw2ml1zyB3/LwkbAl
+         2ZJfMka/EmqJKjh0EpjZAarkvFdw6OTlBfqyKpxLmAkkkp+2u0sl1ClHfhp8P+rQU4Cf
+         HFig==
+X-Gm-Message-State: AOAM532xiftiC8CY9WCtDz6v+JV0VTce6vO/EGknx4kIud1xm0ddF8q7
+        sHEIDEx7ezZAq9GtBCy++iFCeA==
+X-Google-Smtp-Source: ABdhPJzz0KEZoG6DqaNhSTPjJ01ty8n7RfP/UOdBfD1QU1WeGhBqH1vHnJoi1GOZcwjTgpb8igyIaw==
+X-Received: by 2002:a50:b264:: with SMTP id o91mr1810340edd.7.1607517797639;
+        Wed, 09 Dec 2020 04:43:17 -0800 (PST)
+Received: from ch-wrk-javier.cnexlabs.com (5.186.124.214.cgn.fibianet.dk. [5.186.124.214])
+        by smtp.gmail.com with ESMTPSA id f8sm1546693eds.19.2020.12.09.04.43.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Dec 2020 04:43:16 -0800 (PST)
+From:   javier@javigon.com
+X-Google-Original-From: javier.gonz@samsung.com
+To:     linux-nvme@lists.infradead.org
+Cc:     linux-block@vger.kernel.org, hch@lst.de, kbusch@kernel.org,
+        sagi@grimberg.me, minwoo.im.dev@gmail.com,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier.gonz@samsung.com>
+Subject: [PATCH V3] nvme: enable char device per namespace
+Date:   Wed,  9 Dec 2020 13:43:13 +0100
+Message-Id: <20201209124313.20723-1-javier.gonz@samsung.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-In-Reply-To: <20201209120531.GA9598@infradead.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 09/12/2020 12:05, Christoph Hellwig wrote:
-> On Wed, Dec 09, 2020 at 12:01:27PM +0000, Pavel Begunkov wrote:
->> On 09/12/2020 08:40, Christoph Hellwig wrote:
->>>> +	/*
->>>> +	 * In practice groups of pages tend to be accessed/reclaimed/refaulted
->>>> +	 * together. To not go over bvec for those who didn't set BIO_WORKINGSET
->>>> +	 * approximate it by looking at the first page and inducing it to the
->>>> +	 * whole bio
->>>> +	 */
->>>> +	if (unlikely(PageWorkingset(iter->bvec->bv_page)))
->>>> +		bio_set_flag(bio, BIO_WORKINGSET);
->>>
->>> IIRC the feedback was that we do not need to deal with BIO_WORKINGSET
->>> at all for direct I/O.
->>
->> I was waiting for the conversation to unfold, i.e. for Johannes to
->> answer. BTW, would the same (skipping BIO_WORKINGSET) stand true for
->> iomap?
-> 
-> iomap direct I/O: yes.
+From: Javier González <javier.gonz@samsung.com>
 
-That one, got it
+Create a char device per NVMe namespace. This char device is always
+initialized, independently of whether the features implemented by the
+device are supported by the kernel. User-space can therefore always
+issue IOCTLs to the NVMe driver using the char device.
 
+The char device is presented as /dev/generic-nvmeXcYnZ. This naming
+scheme follows the convention of the hidden device (nvmeXcYnZ). Support
+for multipath will follow.
+
+Keith: Regarding nvme-cli support, what do you think about reporting the
+char device as existing block devices? If this is OK with you, I will
+submit patches for the filters.
+
+Changes since V2:
+  - Apply a number of naming and code structure improvements (from
+    Christoph)
+  - Use i_cdev to pull struct nvme_ns in the ioctl path instead of
+    populating file->private_data (from Christoph)
+  - Change char device and sysfs entries to /dev/generic-nvmeXcYnZ to
+    follow the hidden device naming scheme (from Christoph and Keith)
+
+Changes since V1:
+  - Remove patches 1-3 which are already picked up by Christoph
+  - Change the char device and sysfs entries to nvmeXnYc / c signals
+    char device
+  - Address Minwoo's comments on inline functions and style
+
+Signed-off-by: Javier González <javier.gonz@samsung.com>
+---
+ drivers/nvme/host/core.c | 142 ++++++++++++++++++++++++++++++++++-----
+ drivers/nvme/host/nvme.h |   8 +++
+ 2 files changed, 134 insertions(+), 16 deletions(-)
+
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 99f91efe3824..006ac8ee9c7c 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -86,7 +86,9 @@ static DEFINE_MUTEX(nvme_subsystems_lock);
+ 
+ static DEFINE_IDA(nvme_instance_ida);
+ static dev_t nvme_ctrl_base_chr_devt;
++static dev_t nvme_ns_base_chr_devt;
+ static struct class *nvme_class;
++static struct class *nvme_ns_class;
+ static struct class *nvme_subsys_class;
+ 
+ static void nvme_put_subsystem(struct nvme_subsystem *subsys);
+@@ -538,6 +540,7 @@ static void nvme_free_ns(struct kref *kref)
+ 	if (ns->ndev)
+ 		nvme_nvm_unregister(ns);
+ 
++	cdev_device_del(&ns->cdev, &ns->cdev_device);
+ 	put_disk(ns->disk);
+ 	nvme_put_ns_head(ns->head);
+ 	nvme_put_ctrl(ns->ctrl);
+@@ -1738,15 +1741,15 @@ static int nvme_handle_ctrl_ioctl(struct nvme_ns *ns, unsigned int cmd,
+ 	return ret;
+ }
+ 
+-static int nvme_ioctl(struct block_device *bdev, fmode_t mode,
+-		unsigned int cmd, unsigned long arg)
++static int nvme_disk_ioctl(struct gendisk *disk, unsigned int cmd,
++			   unsigned long arg)
+ {
+ 	struct nvme_ns_head *head = NULL;
+ 	void __user *argp = (void __user *)arg;
+ 	struct nvme_ns *ns;
+ 	int srcu_idx, ret;
+ 
+-	ns = nvme_get_ns_from_disk(bdev->bd_disk, &head, &srcu_idx);
++	ns = nvme_get_ns_from_disk(disk, &head, &srcu_idx);
+ 	if (unlikely(!ns))
+ 		return -EWOULDBLOCK;
+ 
+@@ -1783,6 +1786,12 @@ static int nvme_ioctl(struct block_device *bdev, fmode_t mode,
+ 	return ret;
+ }
+ 
++static int nvme_ioctl(struct block_device *bdev, fmode_t mode,
++		      unsigned int cmd, unsigned long arg)
++{
++	return nvme_disk_ioctl(bdev->bd_disk, cmd, arg);
++}
++
+ #ifdef CONFIG_COMPAT
+ struct nvme_user_io32 {
+ 	__u8	opcode;
+@@ -1824,10 +1833,8 @@ static int nvme_compat_ioctl(struct block_device *bdev, fmode_t mode,
+ #define nvme_compat_ioctl	NULL
+ #endif /* CONFIG_COMPAT */
+ 
+-static int nvme_open(struct block_device *bdev, fmode_t mode)
++static int nvme_ns_open(struct nvme_ns *ns)
+ {
+-	struct nvme_ns *ns = bdev->bd_disk->private_data;
+-
+ #ifdef CONFIG_NVME_MULTIPATH
+ 	/* should never be called due to GENHD_FL_HIDDEN */
+ 	if (WARN_ON_ONCE(ns->head->disk))
+@@ -1846,14 +1853,22 @@ static int nvme_open(struct block_device *bdev, fmode_t mode)
+ 	return -ENXIO;
+ }
+ 
+-static void nvme_release(struct gendisk *disk, fmode_t mode)
++static void nvme_ns_release(struct nvme_ns *ns)
+ {
+-	struct nvme_ns *ns = disk->private_data;
+-
+ 	module_put(ns->ctrl->ops->module);
+ 	nvme_put_ns(ns);
+ }
+ 
++static int nvme_open(struct block_device *bdev, fmode_t mode)
++{
++	return nvme_ns_open(bdev->bd_disk->private_data);
++}
++
++static void nvme_release(struct gendisk *disk, fmode_t mode)
++{
++	nvme_ns_release(disk->private_data);
++}
++
+ static int nvme_getgeo(struct block_device *bdev, struct hd_geometry *geo)
+ {
+ 	/* some standard values */
+@@ -2209,6 +2224,13 @@ static int nvme_update_ns_info(struct nvme_ns *ns, struct nvme_id_ns *id)
+ 	return 0;
+ 
+ out_unfreeze:
++	/*
++	 * When the device does not support any of the features required by the
++	 * kernel (or viceversa), hide the block device. We can still rely on
++	 * the namespace char device for submitting IOCTLs
++	 */
++	ns->disk->flags |= GENHD_FL_HIDDEN;
++
+ 	blk_mq_unfreeze_queue(ns->disk->queue);
+ 	return ret;
+ }
+@@ -2346,6 +2368,38 @@ static const struct block_device_operations nvme_bdev_ops = {
+ 	.pr_ops		= &nvme_pr_ops,
+ };
+ 
++static int nvme_cdev_open(struct inode *inode, struct file *file)
++{
++	struct nvme_ns *ns = container_of(inode->i_cdev, struct nvme_ns, cdev);
++
++	return nvme_ns_open(ns);
++}
++
++static int nvme_cdev_release(struct inode *inode, struct file *file)
++{
++	struct nvme_ns *ns = container_of(inode->i_cdev, struct nvme_ns, cdev);
++
++	nvme_ns_release(ns);
++	return 0;
++}
++
++static long nvme_cdev_ioctl(struct file *file, unsigned int cmd,
++			    unsigned long arg)
++{
++	struct nvme_ns *ns = container_of(file->f_inode->i_cdev,
++				struct nvme_ns, cdev);
++
++	return nvme_disk_ioctl(ns->disk, cmd, arg);
++}
++
++static const struct file_operations nvme_cdev_fops = {
++	.owner		= THIS_MODULE,
++	.open		= nvme_cdev_open,
++	.release	= nvme_cdev_release,
++	.unlocked_ioctl	= nvme_cdev_ioctl,
++	.compat_ioctl	= compat_ptr_ioctl,
++};
++
+ #ifdef CONFIG_NVME_MULTIPATH
+ static int nvme_ns_head_open(struct block_device *bdev, fmode_t mode)
+ {
+@@ -3343,6 +3397,9 @@ static inline struct nvme_ns_head *dev_to_ns_head(struct device *dev)
+ {
+ 	struct gendisk *disk = dev_to_disk(dev);
+ 
++	if (dev->class == nvme_ns_class)
++		return nvme_get_ns_from_cdev(dev)->head;
++
+ 	if (disk->fops == &nvme_bdev_ops)
+ 		return nvme_get_ns_from_dev(dev)->head;
+ 	else
+@@ -3474,6 +3531,11 @@ const struct attribute_group *nvme_ns_id_attr_groups[] = {
+ 	NULL,
+ };
+ 
++const struct attribute_group *nvme_ns_char_id_attr_groups[] = {
++	&nvme_ns_id_attr_group,
++	NULL,
++};
++
+ #define nvme_show_str_function(field)						\
+ static ssize_t  field##_show(struct device *dev,				\
+ 			    struct device_attribute *attr, char *buf)		\
+@@ -3866,6 +3928,36 @@ struct nvme_ns *nvme_find_get_ns(struct nvme_ctrl *ctrl, unsigned nsid)
+ }
+ EXPORT_SYMBOL_NS_GPL(nvme_find_get_ns, NVME_TARGET_PASSTHRU);
+ 
++static int nvme_alloc_chardev_ns(struct nvme_ctrl *ctrl, struct nvme_ns *ns)
++{
++	char cdisk_name[DISK_NAME_LEN];
++	int ret;
++
++	device_initialize(&ns->cdev_device);
++	ns->cdev_device.devt = MKDEV(MAJOR(nvme_ns_base_chr_devt),
++				     ns->head->instance);
++	ns->cdev_device.class = nvme_ns_class;
++	ns->cdev_device.parent = ctrl->device;
++	ns->cdev_device.groups = nvme_ns_char_id_attr_groups;
++	dev_set_drvdata(&ns->cdev_device, ns);
++
++	sprintf(cdisk_name, "nvme-generic-%dc%dn%d", ctrl->subsys->instance,
++		ctrl->instance, ns->head->instance);
++
++	ret = dev_set_name(&ns->cdev_device, "%s", cdisk_name);
++	if (ret)
++		return ret;
++
++	cdev_init(&ns->cdev, &nvme_cdev_fops);
++	ns->cdev.owner = ctrl->ops->module;
++
++	ret = cdev_device_add(&ns->cdev, &ns->cdev_device);
++	if (ret)
++		kfree_const(ns->cdev_device.kobj.name);
++
++	return ret;
++}
++
+ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid,
+ 		struct nvme_ns_ids *ids)
+ {
+@@ -3912,8 +4004,7 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid,
+ 	memcpy(disk->disk_name, disk_name, DISK_NAME_LEN);
+ 	ns->disk = disk;
+ 
+-	if (nvme_update_ns_info(ns, id))
+-		goto out_put_disk;
++	nvme_update_ns_info(ns, id);
+ 
+ 	if ((ctrl->quirks & NVME_QUIRK_LIGHTNVM) && id->vs[0] == 0x1) {
+ 		if (nvme_nvm_register(ns, disk_name, node)) {
+@@ -3929,9 +4020,12 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid,
+ 	nvme_get_ctrl(ctrl);
+ 
+ 	device_add_disk(ctrl->device, ns->disk, nvme_ns_id_attr_groups);
+-
+ 	nvme_mpath_add_disk(ns, id);
+ 	nvme_fault_inject_init(&ns->fault_inject, ns->disk->disk_name);
++
++	if (nvme_alloc_chardev_ns(ctrl, ns))
++		goto out_put_disk;
++
+ 	kfree(id);
+ 
+ 	return;
+@@ -4733,23 +4827,38 @@ static int __init nvme_core_init(void)
+ 	if (result < 0)
+ 		goto destroy_delete_wq;
+ 
++	result = alloc_chrdev_region(&nvme_ns_base_chr_devt, 0,
++			NVME_MINORS, "nvmec");
++	if (result < 0)
++		goto unregister_dev_chrdev;
++
+ 	nvme_class = class_create(THIS_MODULE, "nvme");
+ 	if (IS_ERR(nvme_class)) {
+ 		result = PTR_ERR(nvme_class);
+-		goto unregister_chrdev;
++		goto unregister_ns_chrdev;
+ 	}
+ 	nvme_class->dev_uevent = nvme_class_uevent;
+ 
++	nvme_ns_class = class_create(THIS_MODULE, "nvme-ns");
++	if (IS_ERR(nvme_ns_class)) {
++		result = PTR_ERR(nvme_ns_class);
++		goto destroy_dev_class;
++	}
++
+ 	nvme_subsys_class = class_create(THIS_MODULE, "nvme-subsystem");
+ 	if (IS_ERR(nvme_subsys_class)) {
+ 		result = PTR_ERR(nvme_subsys_class);
+-		goto destroy_class;
++		goto destroy_ns_class;
+ 	}
+ 	return 0;
+ 
+-destroy_class:
++destroy_ns_class:
++	class_destroy(nvme_ns_class);
++destroy_dev_class:
+ 	class_destroy(nvme_class);
+-unregister_chrdev:
++unregister_ns_chrdev:
++	unregister_chrdev_region(nvme_ns_base_chr_devt, NVME_MINORS);
++unregister_dev_chrdev:
+ 	unregister_chrdev_region(nvme_ctrl_base_chr_devt, NVME_MINORS);
+ destroy_delete_wq:
+ 	destroy_workqueue(nvme_delete_wq);
+@@ -4765,6 +4874,7 @@ static void __exit nvme_core_exit(void)
+ {
+ 	class_destroy(nvme_subsys_class);
+ 	class_destroy(nvme_class);
++	unregister_chrdev_region(nvme_ns_base_chr_devt, NVME_MINORS);
+ 	unregister_chrdev_region(nvme_ctrl_base_chr_devt, NVME_MINORS);
+ 	destroy_workqueue(nvme_delete_wq);
+ 	destroy_workqueue(nvme_reset_wq);
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index bfcedfa4b057..1dd99f207aee 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -439,6 +439,9 @@ struct nvme_ns {
+ 	struct kref kref;
+ 	struct nvme_ns_head *head;
+ 
++	struct device cdev_device;	/* char device */
++	struct cdev cdev;
++
+ 	int lba_shift;
+ 	u16 ms;
+ 	u16 sgs;
+@@ -818,6 +821,11 @@ static inline struct nvme_ns *nvme_get_ns_from_dev(struct device *dev)
+ 	return dev_to_disk(dev)->private_data;
+ }
+ 
++static inline struct nvme_ns *nvme_get_ns_from_cdev(struct device *dev)
++{
++	return dev_get_drvdata(dev);
++}
++
+ #ifdef CONFIG_NVME_HWMON
+ int nvme_hwmon_init(struct nvme_ctrl *ctrl);
+ #else
 -- 
-Pavel Begunkov
+2.17.1
+
