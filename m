@@ -2,105 +2,107 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34B25C4361B
-	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 02:56:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEF13C433FE
+	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 03:05:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EEECC23888
-	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 02:56:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 89B5B238A0
+	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 03:05:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726548AbgLIC4t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Dec 2020 21:56:49 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56031 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725871AbgLIC4t (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 8 Dec 2020 21:56:49 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607482523;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=0WZQF5SlAEi9+waVA6LQzgtvN5ftR3nM5/xd5tk5h3g=;
-        b=VFsUCELRHREyRktOKgD6uGfs+RIdQxHy+O5UUjac8bcEt5owEo45JOofcCTyYOeag9azVl
-        ogv01weuOwiSQDrkAxypnBw21/n1K2qhvKOyXfajFq4N/SswIMBmIfKCUmIezsQmb7sJl7
-        85/NhD6qpG4S6UP/f7xJxqFZtFH5cVE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-374-7xfTxa8XOY-IC20s3V-rdQ-1; Tue, 08 Dec 2020 21:55:19 -0500
-X-MC-Unique: 7xfTxa8XOY-IC20s3V-rdQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4F945107ACE3;
-        Wed,  9 Dec 2020 02:55:17 +0000 (UTC)
-Received: from T590 (ovpn-12-139.pek2.redhat.com [10.72.12.139])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B90D019725;
-        Wed,  9 Dec 2020 02:55:01 +0000 (UTC)
-Date:   Wed, 9 Dec 2020 10:54:56 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Oleksii Kurochko <olkuroch@cisco.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Ilya Dryomov <idryomov@gmail.com>,
-        Dongsheng Yang <dongsheng.yang@easystack.cn>,
-        ceph-devel@vger.kernel.org, dm-devel@redhat.com,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH 6/6] nvme: allow revalidate to set a namespace read-only
-Message-ID: <20201209025456.GF1217988@T590>
-References: <20201208162829.2424563-1-hch@lst.de>
- <20201208162829.2424563-7-hch@lst.de>
+        id S1726839AbgLIDFc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Dec 2020 22:05:32 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:54294 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725789AbgLIDFc (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Dec 2020 22:05:32 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0B933vWE013387;
+        Wed, 9 Dec 2020 03:04:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : in-reply-to : message-id : references : date : mime-version :
+ content-type; s=corp-2020-01-29;
+ bh=im6KM1TeupZ7+OOqaL16g9WQ+py93dKnhY0FXeXUVrg=;
+ b=CgT2u9G+DufvhAow7IPt573MPTsgelj/WTscwwx8qiipLPEte677SGvrA95oyHIIFtj1
+ +3aR1DPmDfiFXTj8R7jfEEoEGfhshcE9Gx3L6Uo+9pfEEoMODoRGJZT0Lcj6RhSkp4Cb
+ WIFVPvCeWshgSTiRQt7KK9u8u1zZCjvG0ImXHSnNpCGrIkXXRIuo+LM0uAL3AuMP+l3c
+ gfAF4QZAXkme6Ee3vL2DjCy2x/3J9GHF7wL6u6tyPA+OqvqYgnAX0CbRpsEILyu//66a
+ J/RvZqMLg7j+p1VGXFJgqMeh0BMS4ue9hQpCCkOzcvS02jsee+Wj38jGCf3JKgAapMr0 NA== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by userp2130.oracle.com with ESMTP id 3581mqwxu4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Wed, 09 Dec 2020 03:04:26 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0B92tiw1007609;
+        Wed, 9 Dec 2020 03:04:26 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3030.oracle.com with ESMTP id 358m4yujv1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 09 Dec 2020 03:04:26 +0000
+Received: from abhmp0019.oracle.com (abhmp0019.oracle.com [141.146.116.25])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0B934MK3021556;
+        Wed, 9 Dec 2020 03:04:22 GMT
+Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 08 Dec 2020 19:04:20 -0800
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        SelvaKumar S <selvakuma.s1@samsung.com>,
+        linux-nvme@lists.infradead.org, kbusch@kernel.org, axboe@kernel.dk,
+        damien.lemoal@wdc.com, sagi@grimberg.me,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        dm-devel@redhat.com, snitzer@redhat.com, selvajove@gmail.com,
+        nj.shetty@samsung.com, joshi.k@samsung.com,
+        javier.gonz@samsung.com,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Mikulas Patocka <mpatocka@redhat.com>,
+        linux-scsi@vger.kernel.org
+Subject: Re: [RFC PATCH v2 0/2] add simple copy support
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+In-Reply-To: <01fe46ac-16a5-d4db-f23d-07a03d3935f3@suse.de> (Hannes Reinecke's
+        message of "Mon, 7 Dec 2020 15:56:15 +0100")
+Organization: Oracle Corporation
+Message-ID: <yq1im9bsn0a.fsf@ca-mkp.ca.oracle.com>
+References: <CGME20201204094719epcas5p23b3c41223897de3840f92ae3c229cda5@epcas5p2.samsung.com>
+        <20201204094659.12732-1-selvakuma.s1@samsung.com>
+        <20201207141123.GC31159@lst.de>
+        <01fe46ac-16a5-d4db-f23d-07a03d3935f3@suse.de>
+Date:   Tue, 08 Dec 2020 22:02:35 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201208162829.2424563-7-hch@lst.de>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9829 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 spamscore=0 suspectscore=1
+ bulkscore=0 malwarescore=0 phishscore=0 adultscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2012090018
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9829 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 mlxlogscore=999
+ clxscore=1011 malwarescore=0 priorityscore=1501 adultscore=0
+ lowpriorityscore=0 phishscore=0 spamscore=0 impostorscore=0 mlxscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2012090019
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Dec 08, 2020 at 05:28:29PM +0100, Christoph Hellwig wrote:
-> Unconditionally call set_disk_ro now that it only updates the hardware
-> state.  This allows to properly set up the Linux devices read-only when
-> the controller turns a previously writable namespace read-only.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Keith Busch <kbusch@kernel.org>
-> Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-> ---
->  drivers/nvme/host/core.c | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-> index ce1b6151944131..3a0557ccc9fc5d 100644
-> --- a/drivers/nvme/host/core.c
-> +++ b/drivers/nvme/host/core.c
-> @@ -2114,9 +2114,8 @@ static void nvme_update_disk_info(struct gendisk *disk,
->  	nvme_config_discard(disk, ns);
->  	nvme_config_write_zeroes(disk, ns);
->  
-> -	if ((id->nsattr & NVME_NS_ATTR_RO) ||
-> -	    test_bit(NVME_NS_FORCE_RO, &ns->flags))
-> -		set_disk_ro(disk, true);
-> +	set_disk_ro(disk, (id->nsattr & NVME_NS_ATTR_RO) ||
-> +		test_bit(NVME_NS_FORCE_RO, &ns->flags));
->  }
->  
->  static inline bool nvme_first_scan(struct gendisk *disk)
-> -- 
-> 2.29.2
-> 
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Hannes,
+
+[Sorry I'm late to the discussion here, had a few fires going in
+addition to the end of the kernel cycle]
+
+> And we shouldn't forget that the main issue which killed all previous
+> implementations was a missing QoS guarantee.
+
+That and the fact that our arbitrary stacking situation was hard to
+resolve.
+
+The QoS guarantee was somewhat addressed by Fred in T10. But I agree we
+need some sort of toggle.
 
 -- 
-Ming
-
+Martin K. Petersen	Oracle Linux Engineering
