@@ -2,146 +2,213 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB085C19425
-	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 09:07:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28907C4361B
+	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 09:17:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A050423B79
-	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 09:07:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E1367238EB
+	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 09:17:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728509AbgLIJH3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Dec 2020 04:07:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43078 "EHLO
+        id S1728255AbgLIJRU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Dec 2020 04:17:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44596 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727339AbgLIJH3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Dec 2020 04:07:29 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5465C0613D6;
-        Wed,  9 Dec 2020 01:06:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=MNMpVWDVu1xKs8I0T0Bns+VkPimcOASCojWukxDS8ng=; b=IpPbZN2f78dxphMHqQpYHqe58S
-        vw4NwnQ+Xz59+sElzQ/B5L3eRJkdnRh6BnNVuFZ5y34CD+z1GqrWUYj06V+i7uo3q/XpaDl+cG884
-        drRT2Fl5JdUamqqF/e3c5FVm4cZdv6ufagIWq3l2FmDBRTe88w+7D76jqPZ+a/1/2aZbc/Kq3RR8b
-        AW1FVBy6gWIDlGSu1r/dQhnWUKxtmBmSBD63N8Y1uTWHiW0k+fHm0hzv4digf/kQigNWvUXpNwcCN
-        p7YE1vjhW3f9nlvBiwMKeZthCUjMehbPAaFYLfvK5cVKrRzzP+XOPQDrNS+A5UhEbrU/2s3/fcJsv
-        mt+CWOYQ==;
-Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kmvQs-00089J-7s; Wed, 09 Dec 2020 09:06:46 +0000
-Date:   Wed, 9 Dec 2020 09:06:46 +0000
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Pavel Begunkov <asml.silence@gmail.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] iov: introduce ITER_BVEC_FLAG_FIXED
-Message-ID: <20201209090646.GA28832@infradead.org>
-References: <cover.1607477897.git.asml.silence@gmail.com>
- <de27dbca08f8005a303e5efd81612c9a5cdcf196.1607477897.git.asml.silence@gmail.com>
- <20201209083645.GB21968@infradead.org>
+        with ESMTP id S1727665AbgLIJRT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Dec 2020 04:17:19 -0500
+Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 772C9C0613D6
+        for <linux-block@vger.kernel.org>; Wed,  9 Dec 2020 01:16:39 -0800 (PST)
+Received: by mail-ed1-x52f.google.com with SMTP id dk8so766901edb.1
+        for <linux-block@vger.kernel.org>; Wed, 09 Dec 2020 01:16:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=javigon-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=udImeOyopR6lKcri/5XEEUcYqPTE+FQlxvMzQAlhsfU=;
+        b=vKk2LJLVoo/f7CceJHDSRilhBANlh+e/wINNi3QCldXHlHeXQqbabWeoOPIJg56Pie
+         /iY1I6MxINZ/+727sMSvyjb6SCu2kLXbOIRkOf6x8RXlzt6NwuE2x2yCqecCZXqf/nL5
+         mVsEQnq3CEwWGhq443jayVBtta1KjNpGNBatvm4nfZ6bNjF4Ctlk85P4UWjHxjOvmQVO
+         W+gBjwCW5hCxIm0SYc/Qgkm6Bq0XBKDjWrftKvO8TO5pRZ7e3HHj4jFVpUgmicmtnbUm
+         8AK+yMYd6k34jocVoElM1JLAQFYn4IhOZ668G67fbvTg3yrZQxApWpt80x6wMlZpnEKS
+         yCKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=udImeOyopR6lKcri/5XEEUcYqPTE+FQlxvMzQAlhsfU=;
+        b=I9s03oZisdbbQGlnFl4BRirUEm8s3HJpa/4GcsJGCqQd1mHVZxxBCHRHwzYszrkEgF
+         DBoAp8+EMIfud6O34q93pExjlUkC5fcVlXUoziF1TWe7xxUxFW2vgrBfxdy58VquPUKw
+         YUpcLf31u/XSJW5hqYrb3eQpHFHTzawsbmp4Wu9sXGFfbHoW//D9ObmsIQ5PY459happ
+         31YqI5IR9p8dpPovU/kUM1fjCPwnnF8N1rmA8S8ItDYZpv1IU95QfdM3OszqS97MqqOP
+         YKQiBBrZF5sqKoFGlYe/J5S9t5vhnJV1NMsJyzMSK5OXT4jYdvJVO9ypNQtQlgPZc8tf
+         3wrw==
+X-Gm-Message-State: AOAM531vsKQEdAZ8e2WK8UAjTnY9RnbKgnl/bmpWtQzW2G9OF+Mq2Y/L
+        Z294DV+68KljCZwuTv7rcfjpIg==
+X-Google-Smtp-Source: ABdhPJy0H5iRcjQAbbMA5JxnGNd1eAPAnQfg7wbllmKdUB4JqkBOK+CIIgrkHlPxfH07M/Tbwvu/gg==
+X-Received: by 2002:aa7:c7d8:: with SMTP id o24mr1127552eds.328.1607505397434;
+        Wed, 09 Dec 2020 01:16:37 -0800 (PST)
+Received: from localhost (5.186.124.214.cgn.fibianet.dk. [5.186.124.214])
+        by smtp.gmail.com with ESMTPSA id h16sm882131eji.110.2020.12.09.01.16.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Dec 2020 01:16:36 -0800 (PST)
+Date:   Wed, 9 Dec 2020 10:16:36 +0100
+From:   Javier =?utf-8?B?R29uesOhbGV6?= <javier@javigon.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        kbusch@kernel.org, sagi@grimberg.me, minwoo.im.dev@gmail.com
+Subject: Re: nvme: enable char device per namespace
+Message-ID: <20201209091636.5jrexhqmjmqwyqaz@mpHalley>
+References: <20201208132934.625-1-javier.gonz@samsung.com>
+ <20201208142151.GA4108@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20201209083645.GB21968@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20201208142151.GA4108@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Dec 09, 2020 at 08:36:45AM +0000, Christoph Hellwig wrote:
-> This is making the iter type even more of a mess than it already is.
-> I think we at least need placeholders for 0/1 here and an explicit
-> flags namespace, preferably after the types.
-> 
-> Then again I'd much prefer if we didn't even add the flag or at best
-> just add it for a short-term transition and move everyone over to the
-> new scheme.  Otherwise the amount of different interfaces and supporting
-> code keeps exploding.
+On 08.12.2020 15:21, Christoph Hellwig wrote:
+>A bunch of nitpicks (mostly naming as usual, sorry..):
 
-Note that the only other callers that use iov_iter_bvec and asynchronous
-read/write are loop, target and nvme-target, so this should actually
-be pretty simple.  Out of these only target needs something like this
-trivial change to keep the bvec available over the duration of the I/O,
-the other two should be fine already:
+No worries. Thanks for taking the time.
 
----
-From 581a8eabbb1759e3dcfee4b1d2e419f814a8cb80 Mon Sep 17 00:00:00 2001
-From: Christoph Hellwig <hch@lst.de>
-Date: Wed, 9 Dec 2020 10:05:04 +0100
-Subject: target/file: allocate the bvec array as part of struct target_core_file_cmd
+>
+>> +static int __nvme_ns_ioctl(struct gendisk *disk, unsigned int cmd,
+>> +			   unsigned long arg)
+>>  {
+>
+>What about nvme_disk_ioctl instead as that is what it operates on?
 
-This saves one memory allocation, and ensures the bvecs aren't freed
-before the AIO completion.  This will allow the lower level code to be
-optimized so that it can avoid allocating another bvec array.
+Sure.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/target/target_core_file.c | 20 ++++++--------------
- 1 file changed, 6 insertions(+), 14 deletions(-)
+>
+>> +static int nvme_ioctl(struct block_device *bdev, fmode_t mode,
+>> +		      unsigned int cmd, unsigned long arg)
+>> +{
+>> +	return __nvme_ns_ioctl(bdev->bd_disk, cmd, arg);
+>> +}
+>> +
+>> +static long nvme_cdev_ioctl(struct file *file, unsigned int cmd,
+>> +			    unsigned long arg)
+>> +{
+>> +	return __nvme_ns_ioctl((struct gendisk *)file->private_data, cmd, arg);
+>> +}
+>
+>No need for the cast.
+>
+>Also can we keep all the char device methods together close to the
+>struct file_operations declaration?  I just prefer to keep the code
+>a little grouped.
 
-diff --git a/drivers/target/target_core_file.c b/drivers/target/target_core_file.c
-index 7143d03f0e027e..ed0c39a1f7c649 100644
---- a/drivers/target/target_core_file.c
-+++ b/drivers/target/target_core_file.c
-@@ -241,6 +241,7 @@ struct target_core_file_cmd {
- 	unsigned long	len;
- 	struct se_cmd	*cmd;
- 	struct kiocb	iocb;
-+	struct bio_vec	bvecs[];
- };
- 
- static void cmd_rw_aio_complete(struct kiocb *iocb, long ret, long ret2)
-@@ -268,29 +269,22 @@ fd_execute_rw_aio(struct se_cmd *cmd, struct scatterlist *sgl, u32 sgl_nents,
- 	struct target_core_file_cmd *aio_cmd;
- 	struct iov_iter iter = {};
- 	struct scatterlist *sg;
--	struct bio_vec *bvec;
- 	ssize_t len = 0;
- 	int ret = 0, i;
- 
--	aio_cmd = kmalloc(sizeof(struct target_core_file_cmd), GFP_KERNEL);
-+	aio_cmd = kmalloc(struct_size(aio_cmd, bvecs, sgl_nents), GFP_KERNEL);
- 	if (!aio_cmd)
- 		return TCM_LOGICAL_UNIT_COMMUNICATION_FAILURE;
- 
--	bvec = kcalloc(sgl_nents, sizeof(struct bio_vec), GFP_KERNEL);
--	if (!bvec) {
--		kfree(aio_cmd);
--		return TCM_LOGICAL_UNIT_COMMUNICATION_FAILURE;
--	}
--
- 	for_each_sg(sgl, sg, sgl_nents, i) {
--		bvec[i].bv_page = sg_page(sg);
--		bvec[i].bv_len = sg->length;
--		bvec[i].bv_offset = sg->offset;
-+		aio_cmd->bvecs[i].bv_page = sg_page(sg);
-+		aio_cmd->bvecs[i].bv_len = sg->length;
-+		aio_cmd->bvecs[i].bv_offset = sg->offset;
- 
- 		len += sg->length;
- 	}
- 
--	iov_iter_bvec(&iter, is_write, bvec, sgl_nents, len);
-+	iov_iter_bvec(&iter, is_write, aio_cmd->bvecs, sgl_nents, len);
- 
- 	aio_cmd->cmd = cmd;
- 	aio_cmd->len = len;
-@@ -307,8 +301,6 @@ fd_execute_rw_aio(struct se_cmd *cmd, struct scatterlist *sgl, u32 sgl_nents,
- 	else
- 		ret = call_read_iter(file, &aio_cmd->iocb, &iter);
- 
--	kfree(bvec);
--
- 	if (ret != -EIOCBQUEUED)
- 		cmd_rw_aio_complete(&aio_cmd->iocb, ret, 0);
- 
--- 
-2.29.2
+Perfect.
+
+>
+>> -static int nvme_open(struct block_device *bdev, fmode_t mode)
+>> +static int __nvme_open(struct nvme_ns *ns)
+>>  {
+>> -	struct nvme_ns *ns = bdev->bd_disk->private_data;
+>> -
+>>  #ifdef CONFIG_NVME_MULTIPATH
+>>  	/* should never be called due to GENHD_FL_HIDDEN */
+>>  	if (WARN_ON_ONCE(ns->head->disk))
+>> @@ -1846,12 +1859,24 @@ static int nvme_open(struct block_device *bdev, fmode_t mode)
+>>  	return -ENXIO;
+>>  }
+>>
+>> +static void __nvme_release(struct nvme_ns *ns)
+>> +{
+>> +	module_put(ns->ctrl->ops->module);
+>> +	nvme_put_ns(ns);
+>> +}
+>
+>nvme_ns_open and nvme_ns_release?
+
+ok.
+
+>
+>> +
+>> +static int nvme_open(struct block_device *bdev, fmode_t mode)
+>> +{
+>> +	struct nvme_ns *ns = bdev->bd_disk->private_data;
+>> +
+>> +	return __nvme_open(ns);
+>> +}
+>> +
+>>  static void nvme_release(struct gendisk *disk, fmode_t mode)
+>>  {
+>>  	struct nvme_ns *ns = disk->private_data;
+>>
+>> -	module_put(ns->ctrl->ops->module);
+>> -	nvme_put_ns(ns);
+>> +	__nvme_release(ns);
+>
+>No need for the local ns variable in both cases.
+
+ok.
+>
+>> +static int nvme_cdev_open(struct inode *inode, struct file *file)
+>> +{
+>> +	struct nvme_ns *ns = container_of(inode->i_cdev, struct nvme_ns, cdev);
+>> +	int ret;
+>> +
+>> +	ret = __nvme_open(ns);
+>> +	if (!ret)
+>> +		file->private_data = ns->disk;
+>> +
+>> +	return ret;
+>
+>Do we need the ->private_data assignment at all?  I think the ioctl
+>handler could just grab it directly from i_cdev.
+
+Mmmm. Good point. I'll try that.
+
+>
+>> +	sprintf(cdisk_name, "nvme%dn%dc", ctrl->instance, ns->head->instance);
+>
+>And the most important naming decision is this.  I have two issues with
+>naming still:
+>
+> - we aready use the c for controller in the hidden disk naming.  Although
+>   that is in a different position, but I think this not super intuitive.
+> - this is missing multipath support entirely, so once we want to add
+>   multipath support we'll run into issues.  So maybe use something
+>   based off the hidden node naming?  E.g.:
+>
+>	sprintf(disk_name, "nvme-generic-%dc%dn%d", ctrl->subsys->instance,
+>		ctrl->instance, ns->head->instance);
+
+Perfect. Sounds like a good compromise to still keep the original hidden
+disk. Keith is happy too, so we have a plan.
+
+>> +	/* When the device does not support any of the features required by the
+>> +	 * kernel (or viceversa), hide the block device. We can still rely on
+>> +	 * the namespace char device for submitting IOCTLs
+>> +	 */
+>
+>Normal kernel comment style is the opening
+>
+>	/*
+>
+>on its own line.
+
+OK.
+
+>
+>>  	if (nvme_update_ns_info(ns, id))
+>> -		goto out_put_disk;
+>> +		disk->flags |= GENHD_FL_HIDDEN;
+>
+>I don't think we can do this based on all the error returns.  I think
+>we'll have to move the flags manipulation into nvme_update_ns_info to
+>also cover the revalidate case.
+
+Ok.
+
+I am working on the multipath part. I'll send a V3 with all these
+comments and then a follow-up patch with multipath.
+
 
