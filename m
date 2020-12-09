@@ -2,241 +2,198 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 463C4C4361B
-	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 14:38:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A91EFC4361B
+	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 14:52:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0FD0322B2B
-	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 14:38:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 75049233EA
+	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 14:52:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730941AbgLIOhz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Dec 2020 09:37:55 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37747 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730940AbgLIOhp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 9 Dec 2020 09:37:45 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607524578;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=chEutqCMkHVfZgdbz8g77Zeq06gq54+VgeuZ4FINQQU=;
-        b=NZ4uGfW/9brMIrPIdL/kGISMsA5xKLbbpk+faal8q8h+so/RWhUeg04yYZwl1AjywMoj38
-        llfbXbCLddpZ8QMQNKsVd+TQhXq5Qm2ksSeAGtlRwWnovTZ9qTaCB9+rsTMbwXwMX3Jcvl
-        EUNGPgCnNrVsoIeeBnT/HEOSfG8HwB8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-215-lD8zSIj4OMmUmwo3BFrZWg-1; Wed, 09 Dec 2020 09:36:13 -0500
-X-MC-Unique: lD8zSIj4OMmUmwo3BFrZWg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5154B180A087;
-        Wed,  9 Dec 2020 14:36:11 +0000 (UTC)
-Received: from localhost (unknown [10.18.25.174])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8A9215275D;
-        Wed,  9 Dec 2020 14:36:07 +0000 (UTC)
-Date:   Wed, 9 Dec 2020 09:36:06 -0500
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Sergei Shtepa <sergei.shtepa@veeam.com>
-Cc:     axboe@kernel.dk, johannes.thumshirn@wdc.com, koct9i@gmail.com,
-        ming.lei@redhat.com, hare@suse.de, josef@toxicpanda.com,
-        steve@sk2.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, pavel.tide@veeam.com
-Subject: Re: [PATCH 2/3] block: blk_interposer - sample
-Message-ID: <20201209143606.GA494@redhat.com>
-References: <1607518911-30692-1-git-send-email-sergei.shtepa@veeam.com>
- <1607518911-30692-3-git-send-email-sergei.shtepa@veeam.com>
+        id S1733165AbgLIOwn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Dec 2020 09:52:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40002 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732319AbgLIOwm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Dec 2020 09:52:42 -0500
+Received: from mail-vk1-xa2a.google.com (mail-vk1-xa2a.google.com [IPv6:2607:f8b0:4864:20::a2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFC7FC061793
+        for <linux-block@vger.kernel.org>; Wed,  9 Dec 2020 06:52:01 -0800 (PST)
+Received: by mail-vk1-xa2a.google.com with SMTP id i62so391538vkb.7
+        for <linux-block@vger.kernel.org>; Wed, 09 Dec 2020 06:52:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=LdMQ4ENUJAwDKpq6YGuzjxRRhbtj63eVZUaKhU3HWx4=;
+        b=WusDzr6lbmJcpg7SlW+CJ9WoxWVL0WYU3va7KO80XJ/idS8gQKVqlgSIfTd8/l4bJI
+         +fp842fy9wDLEkWjL5UU+EM7v/1raLon67cpxhDenquRw5C6yegTwQbcHyoc873GjtM6
+         XGqOghMwHoq2UfN/n+W9l8ZmLq7y7QW09aI/vMCNkfMGd4K+XamHOzBlkE99BfT/eYrj
+         6G60MHKLL0hvHXq3xXjVQfbp6oo6DZZj1T0CGMP/NEt54DyY3AxQ1olP0wkDzZgF3+Hu
+         nZi4D61NDIbc0hsQs516L8EdT/9Si6fZ6GKuDeNWT+AkE+3l7CdKPpWH6DZnuF6iQpNA
+         nBCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=LdMQ4ENUJAwDKpq6YGuzjxRRhbtj63eVZUaKhU3HWx4=;
+        b=crwBEmx8Z6sa6AL5R1rEuJrSxzNoWaTBOu4qDuimOAQbrFMVAilXFtgp520v4klfxL
+         J7I6GYzU83gvGWqz3c3+MzWA3+AwusofJPeZ6fQp9aNpNQAHiRqghY2LDlP1ofRfEFwW
+         InRGqLv1bmik7nqDZ9PUyTVh82yzWr5Osd2HKZ86X+BdD0nJ3/hC4tMYrTaGWBuRhdPO
+         EXVA+3uLgtzDCDTDvhGrJZqdmTYqfvVTwVcU5GE7CRzRko0NAx8ZnS/YvY/7EJxJgr29
+         KyCuJYetXv+wbmcYsx1Cr30yWyzZEdH+Ff8qxFzFTuu91s6LC0t6xTQdcrvLHd+F4Gol
+         K2xQ==
+X-Gm-Message-State: AOAM533EK1PvMFziojIcsOG31cLRTZ/yLN7epytiTv/2cgXv3WalRdAC
+        aEy7UXEnN6jaV0I7IV4YxlKWQvG4gnssYy5GR8ynCFJX/OOMXIox
+X-Google-Smtp-Source: ABdhPJxLMJiclWLbEVkhdiex2z02t+bsvo4kzUXNOWOXd3kibkzblj+Jly65Bgz0STAEqM9AUer3aG4gvYdnemVe9Kw=
+X-Received: by 2002:a1f:dec2:: with SMTP id v185mr2358196vkg.8.1607525520925;
+ Wed, 09 Dec 2020 06:52:00 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1607518911-30692-3-git-send-email-sergei.shtepa@veeam.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+References: <97c4bb65c8a3e688b191d57e9f06aa5a@walle.cc> <20201207183534.GA52960@mit.edu>
+ <2edcf8e344937b3c5b92a0b87ebd13bd@walle.cc> <20201208024057.GC52960@mit.edu>
+ <CAPDyKFpY+M_FVXCyeg+97jAgDSqhGDTNoND8CQDMWH-e09KGKQ@mail.gmail.com>
+ <d7041bbb403698ac1097f7740f364467@walle.cc> <20201208165214.GD52960@mit.edu>
+In-Reply-To: <20201208165214.GD52960@mit.edu>
+From:   Ulf Hansson <ulf.hansson@linaro.org>
+Date:   Wed, 9 Dec 2020 15:51:24 +0100
+Message-ID: <CAPDyKFrpccdMyqsxTi2dotbtr3_7hL0hUjWXc5Sx52kGnrDuLw@mail.gmail.com>
+Subject: Re: discard feature, mkfs.ext4 and mmc default fallback to normal
+ erase op
+To:     "Theodore Y. Ts'o" <tytso@mit.edu>
+Cc:     Michael Walle <michael@walle.cc>, linux-ext4@vger.kernel.org,
+        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Dec 09 2020 at  8:01am -0500,
-Sergei Shtepa <sergei.shtepa@veeam.com> wrote:
+On Tue, 8 Dec 2020 at 17:52, Theodore Y. Ts'o <tytso@mit.edu> wrote:
+>
+> On Tue, Dec 08, 2020 at 12:26:22PM +0100, Michael Walle wrote:
+> > Do we really need to map these functions? What if we don't have an
+> > actual discard, but just a slow erase (I'm now assuming that erase
+> > will likely be slow on sdcards)? Can't we just tell the user space
+> > there is no discard? Like on a normal HDD? I really don't know the
+> > implications, seems like mmc_erase() is just there for the linux
+> > discard feature.
+>
+> So the potential gotcha here is that "discard" is important for
+> reducing write amplification, and thus improving the lifespan of
+> devices.  (See my reference to the Tesla engine controller story
+> earlier.)  So if a device doesn't have "discard" but has "erase", and
+> "erase" is fast, then skipping the discard could end up significantly
+> reducing the lifespan of your product, and we're back to the NHTSA
+> investigating whether they should stick Tesla for the $1500 engine
+> controller replacement when cards die early.
 
-> This sample demonstrates how to use blk_interposer.
-> It show how to properly connect the interposer module to kernel,
-> and perform the simplest monitoring of the number of bio.
-> 
-> Signed-off-by: Sergei Shtepa <sergei.shtepa@veeam.com>
-> ---
->  samples/blk_interposer/Makefile         |   2 +
->  samples/blk_interposer/blk-interposer.c | 276 ++++++++++++++++++++++++
->  2 files changed, 278 insertions(+)
->  create mode 100644 samples/blk_interposer/Makefile
->  create mode 100644 samples/blk_interposer/blk-interposer.c
-> 
-> diff --git a/samples/blk_interposer/Makefile b/samples/blk_interposer/Makefile
-> new file mode 100644
-> index 000000000000..b11aefde2b1c
-> --- /dev/null
-> +++ b/samples/blk_interposer/Makefile
-> @@ -0,0 +1,2 @@
-> +# SPDX-License-Identifier: GPL-2.0
-> +obj-$(CONFIG_SAMPLE_BLK_INTERPOSER) += blk-interposer.o
-> diff --git a/samples/blk_interposer/blk-interposer.c b/samples/blk_interposer/blk-interposer.c
-> new file mode 100644
-> index 000000000000..92b4c1fcf8f7
-> --- /dev/null
-> +++ b/samples/blk_interposer/blk-interposer.c
-> @@ -0,0 +1,276 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +
-> +/*
-> + * Block layer interposer allow to interpose bio requests from kernel module.
-> + * This allows you to monitor requests, modify requests, add new request,
-> + * or even redirect requests to another devices.
-> + *
-> + * This sample demonstrates how to use blk_interposer.
-> + * It show how to properly connect the interposer module to kernel,
-> + * and perform the simplest monitoring of the number of bio.
-> + */
-> +
-> +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-> +
-> +#include <linux/module.h>
-> +#include <linux/types.h>
-> +#include <linux/errno.h>
-> +#include <linux/blkdev.h>
-> +#include <linux/genhd.h>
-> +#include <linux/blk-mq.h>
-> +
-> +int device_major = 8;
-> +int device_minor;
-> +int fmode = FMODE_READ | FMODE_WRITE;
-> +
-> +/*
-> + * Each interposer must have a common part in the form of the blk_interposer structure,
-> + * as well as its own unique data.
-> + */
-> +struct my_interposer {
-> +	/*
-> +	 * Common part of block device interposer.
-> +	 */
-> +	struct blk_interposer interposer;
-> +	/*
-> +	 * Specific part for our interposer data.
-> +	 */
-> +	atomic_t counter;
-> +};
-> +
-> +struct my_interposer my_ip;
-> +
-> +/**
-> + * blk_interposer_attach - Attach interposer to disk
-> + * @disk: target disk
-> + * @interposer: block device interposer
-> + */
-> +static int blk_interposer_attach(struct gendisk *disk, struct blk_interposer *interposer)
-> +{
-> +	int ret = 0;
-> +
-> +	/*
-> +	 * Stop disks queue processing.
-> +	 */
-> +	blk_mq_freeze_queue(disk->queue);
-> +	blk_mq_quiesce_queue(disk->queue);
-> +
-> +	/*
-> +	 * Check if the interposer is already busy.
-> +	 * The interposer will only connect if it is not busy.
-> +	 */
-> +	if (blk_has_interposer(disk)) {
-> +		pr_info("The interposer is already busy.\n");
-> +		ret = -EBUSY;
-> +		goto out;
-> +	}
-> +
-> +	/*
-> +	 * Attach the interposer.
-> +	 */
-> +	disk->interposer = interposer;
-> +	/*
-> +	 * And while the queue is stopped, we can do something specific for our module.
-> +	 */
-> +	pr_info("Block device interposer attached successfully.\n");
-> +
-> +out:
-> +	/*
-> +	 * Resume disks queue processing
-> +	 */
-> +	blk_mq_unquiesce_queue(disk->queue);
-> +	blk_mq_unfreeze_queue(disk->queue);
-> +
-> +	return ret;
-> +}
-> +
-> +/**
-> + * blk_interposer_detach - Detach interposer from disk
-> + * @disk: target disk
-> + * @interposer: block device interposer
-> + */
-> +static int blk_interposer_detach(struct gendisk *disk, struct blk_interposer *interposer)
-> +{
-> +	int ret = 0;
-> +
-> +	if (WARN_ON(!disk))
-> +		return -EINVAL;
-> +
-> +	/*
-> +	 * Stop disks queue processing.
-> +	 */
-> +	blk_mq_freeze_queue(disk->queue);
-> +	blk_mq_quiesce_queue(disk->queue);
-> +
-> +	/*
-> +	 * Check if the interposer is still available.
-> +	 */
-> +	if (!disk->interposer) {
-> +		pr_info("The interposer is not available.\n");
-> +		return -ENOENT;
-> +		goto out;
-> +	}
-> +	/*
-> +	 * Check if it is really our interposer.
-> +	 */
-> +	if (disk->interposer->ip_submit_bio != interposer->ip_submit_bio) {
-> +		pr_info("The interposer found is not ours.\n");
-> +		return -EPERM;
-> +		goto out;
-> +	}
-> +
-> +	/*
-> +	 * Detach interposer.
-> +	 */
-> +	disk->interposer = NULL;
-> +	/*
-> +	 * And while the queue is stopped, we can do something specific for our module.
-> +	 */
-> +	pr_info("Block device interposer detached successfully.\n");
-> +
-> +out:
-> +	/*
-> +	 * Resume disks queue processing.
-> +	 */
-> +	blk_mq_unquiesce_queue(disk->queue);
-> +	blk_mq_unfreeze_queue(disk->queue);
-> +
-> +	return ret;
-> +}
+Yes, exactly. The point about wear leveling and the lifespan of the
+device are critical.
 
-This attach and detach code needs to be elevated out of samples so that
-any future consumer of blk_interposer doesn't reinvent it.  It is far
-too fundamental.
+That said, we should continue to map discard requests to legacy erase
+commands for SD cards, unless the card supports the new discard, of
+course.
 
-The way you've proposed this be merged is very much unacceptable.
+One thing I realized though, is that we should probably announce and
+implement support for secure erase (QUEUE_FLAG_SECERASE) for SD cards,
+as that seems to map well towards with the erase command.
 
-Nacked-by: Mike Snitzer <snitzer@redhat.com>
+An erase is specified in the SD spec as, after the erase the data is
+either "0" or "1", which I guess is what is expected from a
+REQ_OP_SECURE_ERASE operation?
 
+>
+> I guess the JEDEC spec does specify a way to query the card for how
+> long an erase takes, but I don't have the knowledge about how the
+> actual real-world implementations of these specs (and their many
+> variants over the years) actually behave.  Can the erase times that
+> they advertise actually be trusted to be accurate?  How many of them
+> actually supply erase times at all, no matter what the spec says?
+
+For eMMC discard commands are fast, but probably also trim commands.
+For erase I don't know.
+
+Then, whether the corresponding "erase times" that are be specified in
+the eMMC registers, I guess those always refer to the worst case
+scenario. I don't know how useful they really are in the end.
+
+In any case, we may end up with poor erase/discard performance,
+because of internal FW implementations.
+
+Although, what I think we may be able to improve, both from eMMC and
+SD point of view, is to allow more blocks per discard/erase operation.
+But honestly, I don't know how big of a problem this is, even if just
+staring at the code, gives me some ideas.
+
+>
+> > Coming from the user space side. Does mkfs.ext4 assumes its pre-discard
+> > is fast? I'd think so, right? I'd presume it was intented to tell the
+> > FTL of the block device, "hey these blocks are unused, you can do some
+> > wear leveling with them".
+>
+> Yes, the assumption is that discard is fast.  Exactly how fast seems
+> to vary; this is one of the reasons why there are three different ways
+> to do discards on a file system after files are deleted.  One way is
+> to do them after the deleted definitely won't be unwound (i.e., after
+> the ext4 journal commit).  But on some devices, the discard command,
+> while fast, is slow enough that this will compete with the I/O
+> completion times of other read commands, thus degrading system
+> performance.  So you can also execute the trim commands out of cron,
+> using the fstrim command, which will run the discards in the
+> background, and the system administrator can adjust when fstrim is
+> executed during times wheno performance isn't critical.  (e.g., when
+> the phone is on a charger in the middle of the night, or at 4am local
+> time, etc.)  Finally, you can configure e2fsck to run the discards
+> after the file system consistency check is done.
+>
+> The reason why we have to leave this up to the system administrators
+> is that we have essentially no guidance from the device how slow the
+> discard command might be, how it intereferes with other device
+> operations, and whether the discard might be more likely ignored if
+> the device is busy.  So it might be that the discard will more likely
+> improve write endurance when it is done when the device is idle.  All
+> of the speccs (SCSI, SATA, UFS, eMMC, SD) are remarkable unhelpful
+> because performance considerations is generally consider "out of
+> scope" of standards committees.  They want to leave that up to market
+> forces; which is why big companies (at handset vendors, hyperscale
+> cloud providers, systems integrators, etc.) have to spend as much
+> money doing certification testing before deciding which products to
+> buy; think of it as a full-employment act for storage engineers.  :-)
+
+A few comments related to the above.
+
+Even if the discarded blocks are flushed at some wisely selected
+point, when the device is idle, that doesn't guarantee that the
+internal garbage collection runs inside the device. In the end that
+depends on the FW implementation of the card - and I assume it's
+likely triggered based on some internal idle time and the amount of
+"garbage" there is to deal with.
+
+For both eMMC and SD cards, the specs define commands for how to
+manually control the background operations inside the cards. In
+principle, this allows us to tell the card when it's a good time to
+run garbage collection (and when not to).
+
+Both for eMMC and SD, we are not using this, yet. However, I have been
+playing with a couple of different ideas to explore this:
+
+*) Use the runtime PM framework to detect an idle period and then
+trigger background operations. The problem is, that we don't really
+know how long we will be idle, meaning that we don't know if it's
+really a wise decision to trigger the background operations in the
+end.
+
+**) Invent a new type of generic block request, as to let userspace
+trigger this.
+
+Of course, another option is also to leave this as is, thus relying on
+the internal FW of the card to act the best it can.
+
+Do you have any thoughts around this?
+
+[...]
+
+Kind regards
+Uffe
