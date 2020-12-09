@@ -2,107 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 751A2C4167B
-	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 07:37:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43EBCC4361B
+	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 07:37:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0E6C1235F7
-	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 07:37:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E421923B79
+	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 07:37:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727277AbgLIHhJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Dec 2020 02:37:09 -0500
-Received: from mx2.suse.de ([195.135.220.15]:38234 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725829AbgLIHhJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 9 Dec 2020 02:37:09 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 53CF2ACC6;
-        Wed,  9 Dec 2020 07:36:27 +0000 (UTC)
-Subject: Re: [PATCH v5 8/8] block: Do not accept any requests while suspended
-To:     Bart Van Assche <bvanassche@acm.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>
-Cc:     "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        Ming Lei <ming.lei@redhat.com>, linux-scsi@vger.kernel.org,
-        linux-block@vger.kernel.org,
-        Alan Stern <stern@rowland.harvard.edu>,
-        Can Guo <cang@codeaurora.org>,
-        Stanley Chu <stanley.chu@mediatek.com>,
-        "Rafael J . Wysocki" <rafael.j.wysocki@intel.com>,
-        Martin Kepplinger <martin.kepplinger@puri.sm>
-References: <20201209052951.16136-1-bvanassche@acm.org>
- <20201209052951.16136-9-bvanassche@acm.org>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <b257a342-0066-60a6-0bd1-801f502b6d96@suse.de>
-Date:   Wed, 9 Dec 2020 08:36:26 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+        id S1727806AbgLIHhY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Dec 2020 02:37:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57430 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725829AbgLIHhY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Dec 2020 02:37:24 -0500
+Received: from mail-ej1-x644.google.com (mail-ej1-x644.google.com [IPv6:2a00:1450:4864:20::644])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9920CC0613D6
+        for <linux-block@vger.kernel.org>; Tue,  8 Dec 2020 23:36:43 -0800 (PST)
+Received: by mail-ej1-x644.google.com with SMTP id jx16so652998ejb.10
+        for <linux-block@vger.kernel.org>; Tue, 08 Dec 2020 23:36:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloud.ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=UA44RrXj/Op8plv0v8h0D8Z4mBnynfJmnSPQ6/b9gLY=;
+        b=LZX1uYunDFgDIxR6Lnkx6UdTzZlmqfRGkqrFxy8lsqpObwm8MJXc7nZ8yo2t6r9yVL
+         n6cNFUqFLqomN1h8VuODjwheM6wXalgBw43+cUB5yk5Hp3MVofxrb5kX2YNr35HA6Oxk
+         YW+x3N7gJYx2eh30VoLL6bWDr8ohtYw7ca3yxdqYmgMKkUSPysFGoQO5ESm41c1JMmFz
+         CIWD4r/O0udeqhibEtol4wz0Gyl9uh/s0EiaF8DY3TVS3XPoCoakm86uX11JeGHEZh+0
+         GOcFuS1C1QcQNtW/9vByhTygy9OR0QqbIAJOj9yc55oZOwhWK9dZKvEb+/Y+MFfTOcYm
+         1ong==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=UA44RrXj/Op8plv0v8h0D8Z4mBnynfJmnSPQ6/b9gLY=;
+        b=e4ySXcGI+P+9p4BT7WS/kDAf2renhM3uMveAGZ199XsosZfeT1ElCnmnU36uJCc5kE
+         q5cH52ntVlPOSUY1U0M/Yvb2vNGCcFnOEnkBAdZ0mqwv5BoqQZC60xXUAv0Ho/7XCYY8
+         tRQWz2esawwGVhZMmNxdjWtir1EAgRoHfSf4ojmfuA25Cpe/5PHzhFK4sD7IgdrqJgDb
+         6GbbOMLy0dmM45WfHcVgfvyr8GKNqIDH0OUR29Fa7v2RFONF1phWtLk4KHOBDt7XJhfo
+         1Yk3u1E1tV/egArMmd6dbQypgyXWL3ATUUc4jBk6/EQG86mGnE0aHWvbz77NsuGnKtME
+         ikIg==
+X-Gm-Message-State: AOAM5301t7tMDCHnXoa3hVTXosqmHbKUQsV5qv3wLXDFm4t/hJHtodBb
+        A79P63AhgTo2NvE7RsH63v9lkASVlMpstGia9yhuMw==
+X-Google-Smtp-Source: ABdhPJy4xAuX5Q3bGZ4jdHtO3el9O1QyJABOEBrHlTFr+KeC6eOsQgQ21Wa+c4RzNjXDBBwQJLtuwWK/2Ow7dNbE0w8=
+X-Received: by 2002:a17:906:94ca:: with SMTP id d10mr942078ejy.62.1607499402342;
+ Tue, 08 Dec 2020 23:36:42 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20201209052951.16136-9-bvanassche@acm.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <X9B0IyxwbBDq+cSS@mwanda>
+In-Reply-To: <X9B0IyxwbBDq+cSS@mwanda>
+From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
+Date:   Wed, 9 Dec 2020 08:36:31 +0100
+Message-ID: <CAMGffEn6a92UDBgzkR2L6wutNBpxY_xNf3cakvbivkaGRnk_uQ@mail.gmail.com>
+Subject: Re: [PATCH] block/rnbd-clt: Fix error code in rnbd_clt_add_dev_symlink()
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     Danil Kipnis <danil.kipnis@cloud.ionos.com>,
+        Md Haris Iqbal <haris.iqbal@cloud.ionos.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Lutz Pogrell <lutz.pogrell@cloud.ionos.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        kernel-janitors@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/9/20 6:29 AM, Bart Van Assche wrote:
-> From: Alan Stern <stern@rowland.harvard.edu>
-> 
-> blk_queue_enter() accepts BLK_MQ_REQ_PM requests independent of the runtime
-> power management state. Now that SCSI domain validation no longer depends
-> on this behavior, modify the behavior of blk_queue_enter() as follows:
-> - Do not accept any requests while suspended.
-> - Only process power management requests while suspending or resuming.
-> 
-> Submitting BLK_MQ_REQ_PM requests to a device that is runtime suspended
-> causes runtime-suspended devices not to resume as they should. The request
-> which should cause a runtime resume instead gets issued directly, without
-> resuming the device first. Of course the device can't handle it properly,
-> the I/O fails, and the device remains suspended.
-> 
-> The problem is fixed by checking that the queue's runtime-PM status
-> isn't RPM_SUSPENDED before allowing a request to be issued, and
-> queuing a runtime-resume request if it is.  In particular, the inline
-> blk_pm_request_resume() routine is renamed blk_pm_resume_queue() and
-> the code is unified by merging the surrounding checks into the
-> routine.  If the queue isn't set up for runtime PM, or there currently
-> is no restriction on allowed requests, the request is allowed.
-> Likewise if the BLK_MQ_REQ_PM flag is set and the status isn't
-> RPM_SUSPENDED.  Otherwise a runtime resume is queued and the request
-> is blocked until conditions are more suitable.
-> 
-> Cc: Jens Axboe <axboe@kernel.dk>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Hannes Reinecke <hare@suse.de>
-> Cc: Can Guo <cang@codeaurora.org>
-> Cc: Stanley Chu <stanley.chu@mediatek.com>
-> Cc: Ming Lei <ming.lei@redhat.com>
-> Cc: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
-> Reported-and-tested-by: Martin Kepplinger <martin.kepplinger@puri.sm>
-> Signed-off-by: Alan Stern <stern@rowland.harvard.edu>
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-> [ bvanassche: modified commit message and removed Cc: stable because without
->    the previous patches from this series this patch would break parallel SCSI
->    domain validation + introduced queue_rpm_status() ]
-> ---
->   block/blk-core.c       |  7 ++++---
->   block/blk-pm.h         | 14 +++++++++-----
->   include/linux/blkdev.h | 12 ++++++++++++
->   3 files changed, 25 insertions(+), 8 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+Hi Dan,
 
-Cheers,
 
-Hannes
--- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
+
+On Wed, Dec 9, 2020 at 7:52 AM Dan Carpenter <dan.carpenter@oracle.com> wrote:
+>
+> The "ret" variable should be set to -ENOMEM but it returns uninitialized
+> stack data.
+>
+> Fixes: 64e8a6ece1a5 ("block/rnbd-clt: Dynamically alloc buffer for pathname & blk_symlink_name")
+> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+
+Thanks for the patch. But there is already a fix from Colin merged in
+block tree:
+https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/commit/?h=for-5.11/drivers&id=733c15bd3a944b8eeaacdddf061759b6a83dd3f4
+
+There is still other problem through with commit 64e8a6ece1a5
+("block/rnbd-clt: Dynamically alloc buffer for pathname &
+blk_symlink_name")
+
+I will send the fix today together with other changes.
+
+Regards!
+Jack
