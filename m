@@ -2,120 +2,96 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BA64C4361B
-	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 16:36:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2986FC433FE
+	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 16:47:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0C44E23A5A
-	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 16:36:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DEB6E22BE9
+	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 16:47:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729730AbgLIQgi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Dec 2020 11:36:38 -0500
-Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:51922 "EHLO
-        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1730461AbgLIQg3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Dec 2020 11:36:29 -0500
-Received: from callcc.thunk.org (pool-72-74-133-215.bstnma.fios.verizon.net [72.74.133.215])
-        (authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 0B9GZX6O005765
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 9 Dec 2020 11:35:34 -0500
-Received: by callcc.thunk.org (Postfix, from userid 15806)
-        id A87AF420136; Wed,  9 Dec 2020 11:35:33 -0500 (EST)
-Date:   Wed, 9 Dec 2020 11:35:33 -0500
-From:   "Theodore Y. Ts'o" <tytso@mit.edu>
-To:     Ulf Hansson <ulf.hansson@linaro.org>
-Cc:     Michael Walle <michael@walle.cc>, linux-ext4@vger.kernel.org,
-        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>
-Subject: Re: discard feature, mkfs.ext4 and mmc default fallback to normal
- erase op
-Message-ID: <20201209163533.GI52960@mit.edu>
-References: <97c4bb65c8a3e688b191d57e9f06aa5a@walle.cc>
- <20201207183534.GA52960@mit.edu>
- <2edcf8e344937b3c5b92a0b87ebd13bd@walle.cc>
- <20201208024057.GC52960@mit.edu>
- <CAPDyKFpY+M_FVXCyeg+97jAgDSqhGDTNoND8CQDMWH-e09KGKQ@mail.gmail.com>
- <d7041bbb403698ac1097f7740f364467@walle.cc>
- <20201208165214.GD52960@mit.edu>
- <CAPDyKFrpccdMyqsxTi2dotbtr3_7hL0hUjWXc5Sx52kGnrDuLw@mail.gmail.com>
+        id S1729544AbgLIQrS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Dec 2020 11:47:18 -0500
+Received: from aserp2130.oracle.com ([141.146.126.79]:51108 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726698AbgLIQrS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Dec 2020 11:47:18 -0500
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+        by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0B9GdMd7154126;
+        Wed, 9 Dec 2020 16:46:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : message-id : references : date : in-reply-to : mime-version :
+ content-type; s=corp-2020-01-29;
+ bh=Jn85YTus4rlmzXRn6jalP/oZELEf3DpzvOLjDSF/rI0=;
+ b=wtzzo5YG1bXLAmxMgJUGDCVQxGWU+Rq2ad4b/Pmq4HMhZumc8E9uiq30v83s10TRvf2y
+ ZiU0k2fs9WFCMgSDDAPVQ8q06rbm/xAOEUkvqt46FJPxwqmzaLN1iTb5NRARpxiDn9wg
+ 0pYe3EGX2IPc/OniWJscmi197MHG9sx0/bxYwtQPgXt5mCby9k80X+bSeNPTD7bTCFRu
+ iRq104DGFekjZmkpy09cp27uND10XM1j7dizTLSDONtNp3g72XYJEBAvKT1YB2HYF1Fe
+ Iy6oN6dqujR3DNHGnVeamrIFfBANe2lDGsxlzFUQnyn2pGKH1CQ+FbpoRffDy1U0VjNM Qg== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by aserp2130.oracle.com with ESMTP id 357yqc1932-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Wed, 09 Dec 2020 16:46:23 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0B9GewHR162343;
+        Wed, 9 Dec 2020 16:44:22 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3030.oracle.com with ESMTP id 358ksqbw5j-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 09 Dec 2020 16:44:22 +0000
+Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0B9GiIqM032606;
+        Wed, 9 Dec 2020 16:44:18 GMT
+Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 09 Dec 2020 08:44:18 -0800
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH v5 0/8] Rework runtime suspend and SPI domain validation
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <yq1y2i7q6ay.fsf@ca-mkp.ca.oracle.com>
+References: <20201209052951.16136-1-bvanassche@acm.org>
+Date:   Wed, 09 Dec 2020 11:44:13 -0500
+In-Reply-To: <20201209052951.16136-1-bvanassche@acm.org> (Bart Van Assche's
+        message of "Tue, 8 Dec 2020 21:29:43 -0800")
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAPDyKFrpccdMyqsxTi2dotbtr3_7hL0hUjWXc5Sx52kGnrDuLw@mail.gmail.com>
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9829 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=992 suspectscore=1
+ bulkscore=0 malwarescore=0 phishscore=0 mlxscore=0 spamscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2012090116
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9829 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 mlxlogscore=999
+ clxscore=1015 malwarescore=0 bulkscore=0 phishscore=0 adultscore=0
+ spamscore=0 priorityscore=1501 mlxscore=0 lowpriorityscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2012090117
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Dec 09, 2020 at 03:51:24PM +0100, Ulf Hansson wrote:
-> 
-> Even if the discarded blocks are flushed at some wisely selected
-> point, when the device is idle, that doesn't guarantee that the
-> internal garbage collection runs inside the device. In the end that
-> depends on the FW implementation of the card - and I assume it's
-> likely triggered based on some internal idle time and the amount of
-> "garbage" there is to deal with.
 
-At least from a file system perspective, I don't care when the
-internal garbage collection actually runs inside the device.  What I
-do care is that (a) a read to a discarded sector returns zero's after
-it has been discard (or the storage device needs to tell me I can't
-count on that), and (b) that eventually, for write endurance reasons,
-the garbage collection will *eventually* happen.
+Bart,
 
-If the list of erase blocks or flash pages that are not in use are
-tracked in such a way that they are actually garbage collected before
-the device actually needs free blocks, it really doesn't matter if it
-happens right away, or hours later.  (If the device is 90% free,
-because it was just formatted and we did a pre-discard at format time,
-then it could happen hours or days later.)
+> The SCSI runtime suspend and SPI domain validation mechanisms both use
+> scsi_device_quiesce(). scsi_device_quiesce() restricts
+> blk_queue_enter() to BLK_MQ_REQ_PREEMPT requests. There is a conflict
+> between the requirements of runtime suspend and SCSI domain
+> validation: no requests must be sent to runtime suspended devices that
+> are in the state RPM_SUSPENDED while BLK_MQ_REQ_PREEMPT requests must
+> be processed during SCSI domain validation. This conflict is resolved
+> by reworking the SCSI domain validation implementation.
 
-But if the device's FTL is too incompetent such that it loses track of
-which erase blocks / flash pages do need to be GC'ed, such that it
-impacts device lifetime... well then, that's sad, and it would be nice
-to find out about this without having to do an expensive,
-time-consuming certification process.  (OTOH, all the big companies
-are doing hardware certifications anyway, because you can't fully
-trust the storage vendors, and how many storage vendors are really
-going to admit, or make it easy to determine, "the FTL is so
-cost-optimized that it's cr*p"?  :-)
+Applied to 5.11/scsi-staging. Thanks for fixing up the -next issue!
 
-Having a way to tell the storage device that it would be better to
-suspend GC, or to accelerate GC, because we know the device is about
-to become much less likely to perform writes, would certainly be a
-good and useful thing to do, although I see that as mostly being
-useful for improving I/O performance, especially for low-end flash ---
-I suspect that for high-end SSD's, which are designed so that they can
-handle continuous write streams without much performance degradation,
-they have enough oomph in their internal CPU that they can do GC's in
-real-time while the device is under a continuous random write workload
-with only minimal performance impacts.
-
-> *) Use the runtime PM framework to detect an idle period and then
-> trigger background operations. The problem is, that we don't really
-> know how long we will be idle, meaning that we don't know if it's
-> really a wise decision to trigger the background operations in the
-> end.
-> 
-> **) Invent a new type of generic block request, as to let userspace
-> trigger this.
-
-I think you really want to give userspace the ability to trigger this.
-Whether it's via a generic block request, or an ioctl, I'll leave that
-to the people maintain the driver and/or block layer.  That's because
-userspace will have knowledge to things like, "the screen is off", or
-"the phone is on the wireless charger and/or the user has said, "OK,
-Google, goodnight" to trigger the night-time home automation commands.
-
-We can of course try to make some automatic determinations based on
-the runtime PM framework, but that doesn't necessarily tell us the
-likelihood that the system will become busy in the future; OTOH, maybe
-that doesn't matter, if the storage needs only a very tiny amount of
-time after it's told, "stop GC", to finish up what it's doing so it
-can respond to I/O request at full speed?
-
-						- Ted
+-- 
+Martin K. Petersen	Oracle Linux Engineering
