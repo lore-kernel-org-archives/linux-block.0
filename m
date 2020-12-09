@@ -2,136 +2,81 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5AB2C4361B
-	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 09:18:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45D6DC4361B
+	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 09:56:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A3FD6238EB
-	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 09:18:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 093A523B6B
+	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 09:56:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728468AbgLIJRt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Dec 2020 04:17:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44670 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728442AbgLIJRs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Dec 2020 04:17:48 -0500
-Received: from mail-ej1-x642.google.com (mail-ej1-x642.google.com [IPv6:2a00:1450:4864:20::642])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B04CC061793
-        for <linux-block@vger.kernel.org>; Wed,  9 Dec 2020 01:17:08 -0800 (PST)
-Received: by mail-ej1-x642.google.com with SMTP id n26so1057339eju.6
-        for <linux-block@vger.kernel.org>; Wed, 09 Dec 2020 01:17:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=javigon-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=rhhiMX6lpyZpBTo++Wq1vgh3A63oG1sQxoZyJsc1aQg=;
-        b=P8oh5+/uu8rb5ugbhTx6O474H6hkBIwZA2qWENj5ag15EIY80CWadHdfGxQnhTAuMR
-         kbNk5JfBb6loUdVGVyaPVhWtBQ1NjpEdFVcn9tYOFB+qOgEbDjlfscYtu/qIoCbb5Chz
-         7CiywHUQ67e3O04cgul518A1o0MfGZcqFpTZZnlXt5erd32JVIX/kIoOcJ7E6df5xpPw
-         s6IYn+e1e1RXF/Z/qwRHiSnu9S2JvHXZspsCFFn7MliNwtnecrsJyM+LopbOJALx3N8D
-         G9qQkXTWUv6aPxfla3mKnk96yIxMBMESNCDYDoAhR8RSGIVe6yWfam74imuEnHfJJPwT
-         XFCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=rhhiMX6lpyZpBTo++Wq1vgh3A63oG1sQxoZyJsc1aQg=;
-        b=lSCJhrZX3TXFtWHejJ38XJgL7r7HoSDYCrJP67pyVcbNHOlo83ceOzocByDGK+5yDj
-         8CBTvaqMFqJuai+399l7O8KQJYuuZgVvAI5qfKiiyFnBq/nEKJ7oeOG4r05YlJFkJchH
-         1x98x/+/yN+VGcuaoKoA9QUS+hbwkeawX0wIvr/wHVqCdDVXZLmz0tK3pFSw/NrdWwSR
-         3sKxUXDAgDmIHjVY+U5zw0NHtIypjIjrOu055j326AvrlJSO6fKWgGWGRoHEBl1SSlNy
-         t7IvL9cQO5ivL9UkGNmfH0BCaes2gwFSbH1kBMJCBusEZV/wj2R4csD2etwhnAFQrmXG
-         0lOQ==
-X-Gm-Message-State: AOAM531UXbq4NH92c5m0sTZ7zEL1aOEaBaMuR0aEO3fe2NPG+ib81AhH
-        d8LsxvHL5BPN6rY+ilqP6cVg9g==
-X-Google-Smtp-Source: ABdhPJxbBbOAPum4JxhLDvVO8oH4bCpyUFUBf6xuJ19RfGwEp+yksU2UBrKm/QCGpkEPA7yZYkCfcA==
-X-Received: by 2002:a17:906:a857:: with SMTP id dx23mr1242029ejb.189.1607505427041;
-        Wed, 09 Dec 2020 01:17:07 -0800 (PST)
-Received: from localhost (5.186.124.214.cgn.fibianet.dk. [5.186.124.214])
-        by smtp.gmail.com with ESMTPSA id j20sm874968ejy.124.2020.12.09.01.17.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Dec 2020 01:17:06 -0800 (PST)
-Date:   Wed, 9 Dec 2020 10:17:05 +0100
-From:   Javier =?utf-8?B?R29uesOhbGV6?= <javier@javigon.com>
-To:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-Cc:     Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
-        SelvaKumar S <selvakuma.s1@samsung.com>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "kbusch@kernel.org" <kbusch@kernel.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        "sagi@grimberg.me" <sagi@grimberg.me>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "snitzer@redhat.com" <snitzer@redhat.com>,
-        "selvajove@gmail.com" <selvajove@gmail.com>,
-        "nj.shetty@samsung.com" <nj.shetty@samsung.com>,
-        "joshi.k@samsung.com" <joshi.k@samsung.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Mikulas Patocka <mpatocka@redhat.com>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>
-Subject: Re: [RFC PATCH v2 0/2] add simple copy support
-Message-ID: <20201209091705.brzbbqedavtxvhms@mpHalley>
-References: <CGME20201204094719epcas5p23b3c41223897de3840f92ae3c229cda5@epcas5p2.samsung.com>
- <20201204094659.12732-1-selvakuma.s1@samsung.com>
- <20201207141123.GC31159@lst.de>
- <01fe46ac-16a5-d4db-f23d-07a03d3935f3@suse.de>
- <20201207192453.vc6clbdhz73hzs7l@mpHalley>
- <SN4PR0401MB35988951265391511EBC8C6E9BCD0@SN4PR0401MB3598.namprd04.prod.outlook.com>
- <20201208122248.utv7pqthmmn6uwv6@mpHalley>
- <SN4PR0401MB35983464199FB173FB0C29479BCD0@SN4PR0401MB3598.namprd04.prod.outlook.com>
- <20201208131333.xoxincxcnh7iz33z@mpHalley>
- <SN4PR0401MB3598226CD4A32F65320A47379BCD0@SN4PR0401MB3598.namprd04.prod.outlook.com>
+        id S1728264AbgLIJ4t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Dec 2020 04:56:49 -0500
+Received: from frasgout.his.huawei.com ([185.176.79.56]:2229 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727273AbgLIJ4t (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Dec 2020 04:56:49 -0500
+Received: from fraeml701-chm.china.huawei.com (unknown [172.18.147.201])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4CrXSS3MGBz67NqT;
+        Wed,  9 Dec 2020 17:54:00 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml701-chm.china.huawei.com (10.206.15.50) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2106.2; Wed, 9 Dec 2020 10:56:05 +0100
+Received: from [10.210.171.175] (10.210.171.175) by
+ lhreml724-chm.china.huawei.com (10.201.108.75) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Wed, 9 Dec 2020 09:56:05 +0000
+Subject: Re: [RFC PATCH] blk-mq: Clean up references when freeing rqs
+To:     Ming Lei <ming.lei@redhat.com>
+CC:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <hch@lst.de>, <hare@suse.de>,
+        <ppvk@codeaurora.org>, <bvanassche@acm.org>,
+        <kashyap.desai@broadcom.com>
+References: <1606827738-238646-1-git-send-email-john.garry@huawei.com>
+ <20201202033134.GD494805@T590>
+ <aaf77015-3039-6b04-3417-d376e3467444@huawei.com>
+ <20201203005505.GB540033@T590>
+ <fa222311-2184-0041-61ab-b3d70fb92585@huawei.com>
+ <7beb86a2-5c4b-bdc0-9fce-1b583548c6d0@huawei.com>
+ <20201209010102.GA1217988@T590>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <13327a68-6f86-96da-0c5f-5fa0be326d6f@huawei.com>
+Date:   Wed, 9 Dec 2020 09:55:30 +0000
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <SN4PR0401MB3598226CD4A32F65320A47379BCD0@SN4PR0401MB3598.namprd04.prod.outlook.com>
+In-Reply-To: <20201209010102.GA1217988@T590>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.210.171.175]
+X-ClientProxiedBy: lhreml738-chm.china.huawei.com (10.201.108.188) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 08.12.2020 13:24, Johannes Thumshirn wrote:
->On 08/12/2020 14:13, Javier González wrote:
->> On 08.12.2020 12:37, Johannes Thumshirn wrote:
->>> On 08/12/2020 13:22, Javier González wrote:
->>>> Good idea. Are you thinking of a sysfs entry to select the backend?
->>>
->>> Not sure on this one, initially I thought of a sysfs file, but then
->>> how would you do it. One "global" sysfs entry is probably a bad idea.
->>> Having one per block device to select native vs emulation maybe? And
->>> a good way to benchmark.
->>
->> I was thinking a per block device to target the use case where a certain
->> implementation / workload is better one way or the other.
->
->Yes something along those lines.
->
->>>
->>> The other idea would be a benchmark loop on boot like the raid library
->>> does.
->>>
->>> Then on the other hand, there might be workloads that run faster with
->>> the emulation and some that run faster with the hardware acceleration.
->>>
->>> I think these points are the reason the last attempts got stuck.
->>
->> Yes. I believe that any benchmark we run would be biased in a certain
->> way. If we can move forward with a sysfs entry and default to legacy
->> path, we would not alter current behavior and enable NVMe copy offload
->> (for now) for those that want to use it. We can then build on top of it.
->>
->> Does this sound like a reasonable approach?
->>
->
->Yes this sounds like a reasonable approach to me.
+On 09/12/2020 01:01, Ming Lei wrote:
+> blk_mq_queue_tag_busy_iter() can be run on another request queue just
+> between one driver tag is allocated and updating the request map, so one
+> extra request reference still can be grabbed.
+> 
+> So looks only holding one queue's usage_counter doesn't help this issue, since
+> bt_for_each() always iterates on driver tags wide.
+> 
+>> But I didn't see such a guard for blk_mq_tagset_busy_iter().
+> IMO there isn't real difference between the two iteration.
 
-Cool. We will add this to the V3 then.
+ok, I see. Let me try to recreate that one, which will prob again 
+require artificial delays added.
 
-Thanks Johannes!
+Apart from this, my concern is that we come with for a solution, but 
+it's a complicated solution and may not be accepted as this issue is not 
+seen as a problem in practice.
+
+Thanks,
+John
