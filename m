@@ -2,99 +2,96 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C94EC4361B
-	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 20:47:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7DAAC4361B
+	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 21:16:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EAC4E23D1C
-	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 20:47:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8616123B98
+	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 21:16:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729756AbgLIUry (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Dec 2020 15:47:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38512 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726576AbgLIUrp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Dec 2020 15:47:45 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66F10C0613CF;
-        Wed,  9 Dec 2020 12:47:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=62AZlsv1U7MmdVe+7QYsPomj1JbAvEv3m2KxaRaeI1s=; b=hnZkNtmsN+Zz+Ytw6E4aGAbna1
-        50wtz8CxIexVZtnl+Am89O17KjRJbEM3ppv3yXxfAtzQ8LROIcox4JTDkfN+qe1NrO0I1pUwFq2KH
-        xE6JfRIN9CWWEF29Vo3IM/IvNSlv2Vfth/02i+Gvh/U4om04u3n4Z88dKRE6PMRLoK/06RDT3eR7K
-        u9/TMbM9mUOXR6YKj20a79N+iC6rMYv/7W79phklo/NrFwG1Y084O99Ty0D1qQLwDHPtrfr1b7nBn
-        08rVRIsZTHTUACtucWqy0mnP5uMSpBnUoFlCrcIG+8A6l9blLiv/zU2sbc8ptaTX+T3XhJ85D2Xpu
-        2qVgA+ng==;
-Received: from [2601:1c0:6280:3f0::1494] (helo=smtpauth.infradead.org)
-        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kn6MX-0000N6-Q8; Wed, 09 Dec 2020 20:47:02 +0000
-From:   Randy Dunlap <rdunlap@infradead.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Randy Dunlap <rdunlap@infradead.org>, Tejun Heo <tj@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Ley Foon Tan <ley.foon.tan@intel.com>,
-        Mark Salter <msalter@redhat.com>,
-        Aurelien Jacquiot <jacquiot.aurelien@gmail.com>,
-        linux-c6x-dev@linux-c6x.org
-Subject: [PATCH] block: blk-iocost: fix build for ARCH with missing local64.h files
-Date:   Wed,  9 Dec 2020 12:46:57 -0800
-Message-Id: <20201209204657.6676-1-rdunlap@infradead.org>
-X-Mailer: git-send-email 2.26.2
+        id S2388032AbgLIVPp convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Dec 2020 16:15:45 -0500
+Received: from eu-smtp-delivery-151.mimecast.com ([185.58.86.151]:57493 "EHLO
+        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2388035AbgLIVPf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 9 Dec 2020 16:15:35 -0500
+Received: from AcuMS.aculab.com (156.67.243.126 [156.67.243.126]) (Using
+ TLS) by relay.mimecast.com with ESMTP id uk-mta-1-vL2RsGv_OTGtY0uYhYIEhw-1;
+ Wed, 09 Dec 2020 21:13:55 +0000
+X-MC-Unique: vL2RsGv_OTGtY0uYhYIEhw-1
+Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) by
+ AcuMS.aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) with Microsoft SMTP
+ Server (TLS) id 15.0.1347.2; Wed, 9 Dec 2020 21:13:54 +0000
+Received: from AcuMS.Aculab.com ([fe80::43c:695e:880f:8750]) by
+ AcuMS.aculab.com ([fe80::43c:695e:880f:8750%12]) with mapi id 15.00.1347.000;
+ Wed, 9 Dec 2020 21:13:54 +0000
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'Pavel Begunkov' <asml.silence@gmail.com>,
+        Jens Axboe <axboe@kernel.dk>
+CC:     Alexander Viro <viro@zeniv.linux.org.uk>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Matthew Wilcox <willy@infradead.org>
+Subject: RE: [PATCH 2/2] block: no-copy bvec for direct IO
+Thread-Topic: [PATCH 2/2] block: no-copy bvec for direct IO
+Thread-Index: AQHWzdK4ncolaTTBdk+ENIJV/tZKlanvQ9gw
+Date:   Wed, 9 Dec 2020 21:13:54 +0000
+Message-ID: <9e80d0f0adc84cc9995e58e2d6aad580@AcuMS.aculab.com>
+References: <cover.1607477897.git.asml.silence@gmail.com>
+ <51905c4fcb222e14a1d5cb676364c1b4f177f582.1607477897.git.asml.silence@gmail.com>
+In-Reply-To: <51905c4fcb222e14a1d5cb676364c1b4f177f582.1607477897.git.asml.silence@gmail.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Authentication-Results: relay.mimecast.com;
+        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When building block/blk-iocost.c on arch/x6x/ or arch/nios2/, the
-build fails due to missing the <asm/local64.h> file.
+From: Pavel Begunkov
+> Sent: 09 December 2020 02:20
+> 
+> The block layer spends quite a while in blkdev_direct_IO() to copy and
+> initialise bio's bvec. However, if we've already got a bvec in the input
+> iterator it might be reused in some cases, i.e. when new
+> ITER_BVEC_FLAG_FIXED flag is set. Simple tests show considerable
+> performance boost, and it also reduces memory footprint.
+...
+> @@ -398,7 +422,11 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_vecs)
+>  		bio->bi_end_io = blkdev_bio_end_io;
+>  		bio->bi_ioprio = iocb->ki_ioprio;
+> 
+> -		ret = bio_iov_iter_get_pages(bio, iter);
+> +		if (iov_iter_is_bvec(iter) && iov_iter_bvec_fixed(iter))
+> +			ret = bio_iov_fixed_bvec_get_pages(bio, iter);
+> +		else
+> +			ret = bio_iov_iter_get_pages(bio, iter);
+> +
 
-Fix this by adding local64.h as a "generic-y" file in their respective
-Kbuild files, so that they will use a copy of <asm-generic/local64.h>
-instead (copied to arch/*/include/generated/local64.h by the
-build system).
+Is it necessary to check iov_iter_is_bvec() as well as iov_iter_bvec_fixed() ?
+If so it is probably worth using & not && so the compiler stands
+a chance of generating a & (B | C) == B instead of 2 conditionals.
+(I think I saw the bits in the same field being tested.
 
-c6x or nios2 build error:
-../block/blk-iocost.c:183:10: fatal error: asm/local64.h: No such file or directory
-  183 | #include <asm/local64.h>
+	David
 
-Fixes: 5e124f74325d ("blk-iocost: use local[64]_t for percpu stat")
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-Cc: Tejun Heo <tj@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org
-Cc: Ley Foon Tan <ley.foon.tan@intel.com>
-Cc: Mark Salter <msalter@redhat.com>
-Cc: Aurelien Jacquiot <jacquiot.aurelien@gmail.com>
-Cc: linux-c6x-dev@linux-c6x.org
----
- arch/c6x/include/asm/Kbuild   |    1 +
- arch/nios2/include/asm/Kbuild |    1 +
- 2 files changed, 2 insertions(+)
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
+Registration No: 1397386 (Wales)
 
---- linux-next-20201208.orig/arch/c6x/include/asm/Kbuild
-+++ linux-next-20201208/arch/c6x/include/asm/Kbuild
-@@ -1,5 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0
- generic-y += extable.h
- generic-y += kvm_para.h
-+generic-y += local64.h
- generic-y += mcs_spinlock.h
- generic-y += user.h
---- linux-next-20201208.orig/arch/nios2/include/asm/Kbuild
-+++ linux-next-20201208/arch/nios2/include/asm/Kbuild
-@@ -2,6 +2,7 @@
- generic-y += cmpxchg.h
- generic-y += extable.h
- generic-y += kvm_para.h
-+generic-y += local64.h
- generic-y += mcs_spinlock.h
- generic-y += spinlock.h
- generic-y += user.h
