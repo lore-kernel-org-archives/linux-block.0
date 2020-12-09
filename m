@@ -7,56 +7,57 @@ X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43EBCC4361B
-	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 07:37:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91025C4361B
+	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 08:06:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E421923B79
-	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 07:37:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5672923B98
+	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 08:06:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727806AbgLIHhY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Dec 2020 02:37:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57430 "EHLO
+        id S1726212AbgLIIGe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Dec 2020 03:06:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725829AbgLIHhY (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Dec 2020 02:37:24 -0500
-Received: from mail-ej1-x644.google.com (mail-ej1-x644.google.com [IPv6:2a00:1450:4864:20::644])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9920CC0613D6
-        for <linux-block@vger.kernel.org>; Tue,  8 Dec 2020 23:36:43 -0800 (PST)
-Received: by mail-ej1-x644.google.com with SMTP id jx16so652998ejb.10
-        for <linux-block@vger.kernel.org>; Tue, 08 Dec 2020 23:36:43 -0800 (PST)
+        with ESMTP id S1726935AbgLIIGa (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Dec 2020 03:06:30 -0500
+Received: from mail-ej1-x641.google.com (mail-ej1-x641.google.com [IPv6:2a00:1450:4864:20::641])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38335C0613CF
+        for <linux-block@vger.kernel.org>; Wed,  9 Dec 2020 00:05:50 -0800 (PST)
+Received: by mail-ej1-x641.google.com with SMTP id ce23so771243ejb.8
+        for <linux-block@vger.kernel.org>; Wed, 09 Dec 2020 00:05:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=cloud.ionos.com; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=UA44RrXj/Op8plv0v8h0D8Z4mBnynfJmnSPQ6/b9gLY=;
-        b=LZX1uYunDFgDIxR6Lnkx6UdTzZlmqfRGkqrFxy8lsqpObwm8MJXc7nZ8yo2t6r9yVL
-         n6cNFUqFLqomN1h8VuODjwheM6wXalgBw43+cUB5yk5Hp3MVofxrb5kX2YNr35HA6Oxk
-         YW+x3N7gJYx2eh30VoLL6bWDr8ohtYw7ca3yxdqYmgMKkUSPysFGoQO5ESm41c1JMmFz
-         CIWD4r/O0udeqhibEtol4wz0Gyl9uh/s0EiaF8DY3TVS3XPoCoakm86uX11JeGHEZh+0
-         GOcFuS1C1QcQNtW/9vByhTygy9OR0QqbIAJOj9yc55oZOwhWK9dZKvEb+/Y+MFfTOcYm
-         1ong==
+        bh=+h4P+nIxMIn2Y17NPQM2gbJgkQrOgIbiZP/S+TvIccw=;
+        b=iK+fifgp9ztTYCWBGhchDKiH6Xk+PoA9PRfKf3MQ2gjmRv3SgwbrcO6EzTaYEdZiYa
+         HWgqerMK3ZpzmVGqKPOGJnViNSGmaExatmF4Tb3utBavWIrJ8l+6axfczdeHtXZsL5O3
+         HiIqekm7wQMFs34n5uD6nvZtTQHIX6+u1CcqxjT6Hbwiduq9hqUzCagaXE/S9t7gWVD7
+         Uep9yNb21BuT9RfYdbugersTEa/rcEX/u3Oe674CPwyO0JzR/kLblL4+T8DKioh0tvci
+         K733wJYMvuRM2K+JK8GL4k9mkvkxsvZcAe4XXfxMTgJ6/sqxArCdsrxOUN8OTOdHf4Bo
+         C1og==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=UA44RrXj/Op8plv0v8h0D8Z4mBnynfJmnSPQ6/b9gLY=;
-        b=e4ySXcGI+P+9p4BT7WS/kDAf2renhM3uMveAGZ199XsosZfeT1ElCnmnU36uJCc5kE
-         q5cH52ntVlPOSUY1U0M/Yvb2vNGCcFnOEnkBAdZ0mqwv5BoqQZC60xXUAv0Ho/7XCYY8
-         tRQWz2esawwGVhZMmNxdjWtir1EAgRoHfSf4ojmfuA25Cpe/5PHzhFK4sD7IgdrqJgDb
-         6GbbOMLy0dmM45WfHcVgfvyr8GKNqIDH0OUR29Fa7v2RFONF1phWtLk4KHOBDt7XJhfo
-         1Yk3u1E1tV/egArMmd6dbQypgyXWL3ATUUc4jBk6/EQG86mGnE0aHWvbz77NsuGnKtME
-         ikIg==
-X-Gm-Message-State: AOAM5301t7tMDCHnXoa3hVTXosqmHbKUQsV5qv3wLXDFm4t/hJHtodBb
-        A79P63AhgTo2NvE7RsH63v9lkASVlMpstGia9yhuMw==
-X-Google-Smtp-Source: ABdhPJy4xAuX5Q3bGZ4jdHtO3el9O1QyJABOEBrHlTFr+KeC6eOsQgQ21Wa+c4RzNjXDBBwQJLtuwWK/2Ow7dNbE0w8=
-X-Received: by 2002:a17:906:94ca:: with SMTP id d10mr942078ejy.62.1607499402342;
- Tue, 08 Dec 2020 23:36:42 -0800 (PST)
+        bh=+h4P+nIxMIn2Y17NPQM2gbJgkQrOgIbiZP/S+TvIccw=;
+        b=NLiVnQZHvk9O08/209gvHByJGmCQv8W5hMUHv5eKcqNEIbFnp29O4E/45vLZd1W7em
+         c9szZq2m4grx7ls4fnZ44sjAHQCQ5FTiSAr9WNDzdNGZ4qJv6clygL9iajGmcBOFt7Cg
+         F7/QP3FPvYw7FWt40Vzxx1sxbTe++WFs4uI1QzlJAqqNnFJYkZ2UhGMLV351sBai23Bk
+         Oz2xqOIikO+UDMo48w2IBC4O+Hf4Sm7CtknJWRXupUNTk4wf2bP84w1Ym9OTws4wRFNn
+         beupDOyYuRFeCFimjzbF93SKkcds36cSsukeqH47V8Lj1IsW/sWsyjyVx1fYZE01WN+v
+         F49g==
+X-Gm-Message-State: AOAM533x8hehAz3FT/cxL9Vvd3dK4TSIaLKUt6jcIkTUr+zoE58hKYXc
+        grHSRoi/dtbt50M4yhsn7ObZWF/fwFP6Al6mVUhf/A==
+X-Google-Smtp-Source: ABdhPJwV7Myf/TtvpWVIHTPvl6WzfnFktfXbV4T5cs7TAoX/XRTpUe1MdTRks785ev4S2kBQNQ02AJaJiAypkKqyIDg=
+X-Received: by 2002:a17:906:16da:: with SMTP id t26mr1017805ejd.478.1607501148992;
+ Wed, 09 Dec 2020 00:05:48 -0800 (PST)
 MIME-Version: 1.0
-References: <X9B0IyxwbBDq+cSS@mwanda>
-In-Reply-To: <X9B0IyxwbBDq+cSS@mwanda>
+References: <X9B0IyxwbBDq+cSS@mwanda> <CAMGffEn6a92UDBgzkR2L6wutNBpxY_xNf3cakvbivkaGRnk_uQ@mail.gmail.com>
+ <20201209080323.GE2767@kadam>
+In-Reply-To: <20201209080323.GE2767@kadam>
 From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Date:   Wed, 9 Dec 2020 08:36:31 +0100
-Message-ID: <CAMGffEn6a92UDBgzkR2L6wutNBpxY_xNf3cakvbivkaGRnk_uQ@mail.gmail.com>
+Date:   Wed, 9 Dec 2020 09:05:38 +0100
+Message-ID: <CAMGffE=5PJhKujzdHyP_AsujfcABxRQoCSkC6HnM+AuxxcVCmQ@mail.gmail.com>
 Subject: Re: [PATCH] block/rnbd-clt: Fix error code in rnbd_clt_add_dev_symlink()
 To:     Dan Carpenter <dan.carpenter@oracle.com>
 Cc:     Danil Kipnis <danil.kipnis@cloud.ionos.com>,
@@ -70,27 +71,40 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Dan,
-
-
-
-On Wed, Dec 9, 2020 at 7:52 AM Dan Carpenter <dan.carpenter@oracle.com> wrote:
+On Wed, Dec 9, 2020 at 9:03 AM Dan Carpenter <dan.carpenter@oracle.com> wrote:
 >
-> The "ret" variable should be set to -ENOMEM but it returns uninitialized
-> stack data.
+> On Wed, Dec 09, 2020 at 08:36:31AM +0100, Jinpu Wang wrote:
+> > Hi Dan,
+> >
+> >
+> >
+> > On Wed, Dec 9, 2020 at 7:52 AM Dan Carpenter <dan.carpenter@oracle.com> wrote:
+> > >
+> > > The "ret" variable should be set to -ENOMEM but it returns uninitialized
+> > > stack data.
+> > >
+> > > Fixes: 64e8a6ece1a5 ("block/rnbd-clt: Dynamically alloc buffer for pathname & blk_symlink_name")
+> > > Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+> >
+> > Thanks for the patch. But there is already a fix from Colin merged in
+> > block tree:
+> > https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/commit/?h=for-5.11/drivers&id=733c15bd3a944b8eeaacdddf061759b6a83dd3f4
+> >
+> > There is still other problem through with commit 64e8a6ece1a5
+> > ("block/rnbd-clt: Dynamically alloc buffer for pathname &
+> > blk_symlink_name")
+> >
+> > I will send the fix today together with other changes.
 >
-> Fixes: 64e8a6ece1a5 ("block/rnbd-clt: Dynamically alloc buffer for pathname & blk_symlink_name")
-> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
-
-Thanks for the patch. But there is already a fix from Colin merged in
-block tree:
-https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/commit/?h=for-5.11/drivers&id=733c15bd3a944b8eeaacdddf061759b6a83dd3f4
-
-There is still other problem through with commit 64e8a6ece1a5
-("block/rnbd-clt: Dynamically alloc buffer for pathname &
-blk_symlink_name")
-
-I will send the fix today together with other changes.
-
-Regards!
-Jack
+> Ah...  Haha...  Sorry about that.  We already discussed this yesterday.
+>
+> What happens is that when I write a patch, I normally save it in my
+> postponed messages until the next day.  But then I decided to not fix it
+> but instead to just report it.  Unfortunately, I forgot to delete it and
+> I also forgot about yesterday's discussion because I have the memory of
+> a gnat.  :P
+>
+> regards,
+> dan carpenter
+>
+No problem, thanks! :)
