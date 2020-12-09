@@ -2,92 +2,146 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BFC7C433FE
-	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 01:25:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3808C433FE
+	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 02:24:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1733A23B40
-	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 01:25:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9CF0F23A53
+	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 02:24:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725804AbgLIBZH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Dec 2020 20:25:07 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58449 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725791AbgLIBZH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 8 Dec 2020 20:25:07 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607477021;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Ks3Ply4N96m4k2H0dn1kKwtldUSUQfBTesh+Kzg2SfY=;
-        b=QP4Y65M2xtnSp0GawFA8xDwy/C+Ktg9Gyvi4u3RzO09gbMo7s+t/sllOvjntgJtDWt12Hv
-        0LDmiuQLCpQJ7YN+YeRzTr9G5wR9CJq/sDWUU1ijJHaBB76YsP75C1TCKlcJILk+URlMHc
-        Ah70duf0R443FCh888ztbbMoYmUzcJw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-15-8a_meGOmMGOcPRAitz_oJQ-1; Tue, 08 Dec 2020 20:23:39 -0500
-X-MC-Unique: 8a_meGOmMGOcPRAitz_oJQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 89BB41005513;
-        Wed,  9 Dec 2020 01:23:37 +0000 (UTC)
-Received: from T590 (ovpn-12-139.pek2.redhat.com [10.72.12.139])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id EEBD660BE2;
-        Wed,  9 Dec 2020 01:23:21 +0000 (UTC)
-Date:   Wed, 9 Dec 2020 09:23:17 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Oleksii Kurochko <olkuroch@cisco.com>,
-        Dongsheng Yang <dongsheng.yang@easystack.cn>,
-        linux-block@vger.kernel.org, dm-devel@redhat.com,
-        linux-nvme@lists.infradead.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Ilya Dryomov <idryomov@gmail.com>, ceph-devel@vger.kernel.org
-Subject: Re: [PATCH 4/6] block: propagate BLKROSET on the whole device to all
- partitions
-Message-ID: <20201209012317.GC1217988@T590>
-References: <20201207131918.2252553-1-hch@lst.de>
- <20201207131918.2252553-5-hch@lst.de>
- <20201208102923.GD1202995@T590>
- <20201208105927.GB21762@lst.de>
+        id S1725808AbgLICYF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Dec 2020 21:24:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37848 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725789AbgLICYE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Dec 2020 21:24:04 -0500
+Received: from mail-wr1-x443.google.com (mail-wr1-x443.google.com [IPv6:2a00:1450:4864:20::443])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 591BFC0613D6;
+        Tue,  8 Dec 2020 18:23:24 -0800 (PST)
+Received: by mail-wr1-x443.google.com with SMTP id t16so61105wra.3;
+        Tue, 08 Dec 2020 18:23:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=kEk2mz5l7WecWhgbMMZZSjIALYbOuSd6wBX0z9f5zlg=;
+        b=el+Ia+dPnlOkLmTSpK7fA3ZFd71Z12DD7TXIqNy9i3WkLpb1bqXOxd7Nm/nwbIO2YG
+         k8Yuy3f91BWVy4rlXD3vyZq8hJd3IR01DjOpNWqFsqtIYPTfAAB2tDeGDiM0sWffWlS2
+         LdqcSjuPDXENlRU130Yz+/1mjILgYKH3QUEOmMondSWpNHbIVk2wrVxdaqqCRIIVdNAl
+         o7ExEYoBCfMkS3QRWy8fazz7zsHuYdxogYyXecZ98eLiJhImVR9/E8pKrmch6sqWoyVT
+         XutPu4MuiCQspHh+puGzFHOGg9avtQg8aoyCu/wzPXqQvUkSZ7Q3mq8a3qeggIjIyM4s
+         CHJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=kEk2mz5l7WecWhgbMMZZSjIALYbOuSd6wBX0z9f5zlg=;
+        b=fns6Bm98+Oi1sGiZ8qHnX/onYHLV4bjoNPXvYBGvXSspZoxo+SmwTdkjZ9M+CRaZLp
+         blF3PlfqgEGLcWd9Niz9HX/8Mh9Vv1v7u7SXBrDFYvxVNQ8QKBE7PcF4+/yPIQeeDjN/
+         N9mHhpPqZcRyTErg7t4T+lzZVScEIJVZlO6q3lrxocULq3IuFD8aqbF3Q415NQ8Qz6za
+         /vmH3qEaO33rGbfh2XNVBG5/qPPIcrOB4IoYH4I/T9+dORWb1GeiT8DPCp9Q3A1a3jfQ
+         GRssZ4Z2C5WxnMs5kvy4F0o9khxTWGuOcoYDCjkYUos7FbR7u2tG6BQyV2gbjWgu7ya8
+         3bSA==
+X-Gm-Message-State: AOAM531vRRAAAaz2KVJC+mwACK4pBrOlP70oD8GkGJCDT4+8lxgHYBCK
+        At13GSaMskMF8AB12iirRhY=
+X-Google-Smtp-Source: ABdhPJxWrrjCcSS+xhUK643SB6maMOz8JksdzmJmtBzLyHa0WrLlvDru8TaL0VthNeK+uog0GMINug==
+X-Received: by 2002:a5d:5710:: with SMTP id a16mr46975wrv.229.1607480603120;
+        Tue, 08 Dec 2020 18:23:23 -0800 (PST)
+Received: from localhost.localdomain ([85.255.233.156])
+        by smtp.gmail.com with ESMTPSA id k64sm330606wmb.11.2020.12.08.18.23.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Dec 2020 18:23:22 -0800 (PST)
+From:   Pavel Begunkov <asml.silence@gmail.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 1/2] iov: introduce ITER_BVEC_FLAG_FIXED
+Date:   Wed,  9 Dec 2020 02:19:51 +0000
+Message-Id: <de27dbca08f8005a303e5efd81612c9a5cdcf196.1607477897.git.asml.silence@gmail.com>
+X-Mailer: git-send-email 2.24.0
+In-Reply-To: <cover.1607477897.git.asml.silence@gmail.com>
+References: <cover.1607477897.git.asml.silence@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201208105927.GB21762@lst.de>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Dec 08, 2020 at 11:59:27AM +0100, Christoph Hellwig wrote:
-> On Tue, Dec 08, 2020 at 06:29:23PM +0800, Ming Lei wrote:
-> > > -		test_bit(GD_READ_ONLY, &bdev->bd_disk->state);
-> > > +	return bdev->bd_read_only || get_disk_ro(bdev->bd_disk);
-> > >  }
-> > >  EXPORT_SYMBOL(bdev_read_only);
-> > 
-> > I think this patch should be folded into previous one, otherwise
-> > bdev_read_only(part) may return false even though ioctl(BLKROSET)
-> > has been done on the whole disk.
-> 
-> The above is the existing behavior going back back very far, and I feel
-> much more comfortable having a small self-contained patch that changes
-> this behavior.
-> 
+Add ITER_BVEC_FLAG_FIXED iov iter flag, which will allow us to reuse
+passed in bvec instead of copying it. In particular it means that
+iter->bvec won't be freed and page references are taken remain so
+until callees don't need them, including asynchronous execution.
 
-OK, then looks fine:
+Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+---
+ fs/io_uring.c       |  1 +
+ include/linux/uio.h | 14 +++++++++++---
+ 2 files changed, 12 insertions(+), 3 deletions(-)
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-
+diff --git a/fs/io_uring.c b/fs/io_uring.c
+index c536462920a3..9ff2805d0075 100644
+--- a/fs/io_uring.c
++++ b/fs/io_uring.c
+@@ -2920,6 +2920,7 @@ static ssize_t io_import_fixed(struct io_kiocb *req, int rw,
+ 		}
+ 	}
+ 
++	iter->type |= ITER_BVEC_FLAG_FIXED;
+ 	return len;
+ }
+ 
+diff --git a/include/linux/uio.h b/include/linux/uio.h
+index 72d88566694e..af626eb970cf 100644
+--- a/include/linux/uio.h
++++ b/include/linux/uio.h
+@@ -18,6 +18,8 @@ struct kvec {
+ };
+ 
+ enum iter_type {
++	ITER_BVEC_FLAG_FIXED = 2,
++
+ 	/* iter types */
+ 	ITER_IOVEC = 4,
+ 	ITER_KVEC = 8,
+@@ -29,8 +31,9 @@ enum iter_type {
+ struct iov_iter {
+ 	/*
+ 	 * Bit 0 is the read/write bit, set if we're writing.
+-	 * Bit 1 is the BVEC_FLAG_NO_REF bit, set if type is a bvec and
+-	 * the caller isn't expecting to drop a page reference when done.
++	 * Bit 1 is the BVEC_FLAG_FIXED bit, set if type is a bvec and the
++	 * caller ensures that page references and memory baking bvec won't
++	 * go away until callees finish with them.
+ 	 */
+ 	unsigned int type;
+ 	size_t iov_offset;
+@@ -52,7 +55,7 @@ struct iov_iter {
+ 
+ static inline enum iter_type iov_iter_type(const struct iov_iter *i)
+ {
+-	return i->type & ~(READ | WRITE);
++	return i->type & ~(READ | WRITE | ITER_BVEC_FLAG_FIXED);
+ }
+ 
+ static inline bool iter_is_iovec(const struct iov_iter *i)
+@@ -85,6 +88,11 @@ static inline unsigned char iov_iter_rw(const struct iov_iter *i)
+ 	return i->type & (READ | WRITE);
+ }
+ 
++static inline unsigned char iov_iter_bvec_fixed(const struct iov_iter *i)
++{
++	return i->type & ITER_BVEC_FLAG_FIXED;
++}
++
+ /*
+  * Total number of bytes covered by an iovec.
+  *
 -- 
-Ming
+2.24.0
 
