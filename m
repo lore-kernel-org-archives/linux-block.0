@@ -2,118 +2,146 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8592FC4167B
-	for <linux-block@archiver.kernel.org>; Thu, 10 Dec 2020 04:05:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D3C3C433FE
+	for <linux-block@archiver.kernel.org>; Thu, 10 Dec 2020 04:09:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 587E323BA7
-	for <linux-block@archiver.kernel.org>; Thu, 10 Dec 2020 04:05:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6603A23A02
+	for <linux-block@archiver.kernel.org>; Thu, 10 Dec 2020 04:09:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731974AbgLJEEw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Dec 2020 23:04:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49314 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731385AbgLJEEo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Dec 2020 23:04:44 -0500
-Received: from mail-ej1-x642.google.com (mail-ej1-x642.google.com [IPv6:2a00:1450:4864:20::642])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7AFFC0613D6
-        for <linux-block@vger.kernel.org>; Wed,  9 Dec 2020 20:04:03 -0800 (PST)
-Received: by mail-ej1-x642.google.com with SMTP id ga15so5378347ejb.4
-        for <linux-block@vger.kernel.org>; Wed, 09 Dec 2020 20:04:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=intel-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=aiXzNIBEdezK7LvwdToUmyEveX4RTWL1Q1rKEHzG6GY=;
-        b=V12HS7Wn+bctaIkufygbNwtKV1pkBbE9hHZV8Lf9tSE5VPt6nBit0Nb1HWPIB+8XdO
-         UwbjHDBYoCvlSOrafC5rCuQbCx1D+/3PDyFehNe398RSQzHQ1rPu9pgXYXyg3wMVKY7l
-         FuBEUYEFzcobG0z1knWel86vWiyTyuA3aX6iyNBGyPUSEugrsJ77EmD5w3Zhr4gllpgD
-         NDD0P3wO1Rjasg3bPJKXdNNtxJFUZzyODiRBozAcezwWwmKvGT1tnVg88ssqoLYPKQyE
-         vxZa8+AdNxohhjfYmcfYxPAKri7o/zxhpGNApPEe/Ugj0ylq5uh8h/HdVnA0K5L3ljWV
-         0UiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=aiXzNIBEdezK7LvwdToUmyEveX4RTWL1Q1rKEHzG6GY=;
-        b=ZxzjfhQXcbeGoxKwJ5/i6QFgUTm5ihwC2/Te+QKiEp4n8rbvvydUsYr6uizE0KIiMW
-         8XooAJikwv6BySd/ypozFIDtQjKxWH/WZRVunEP0LWvcy5cmJLM02e7EkivNESxmMXf4
-         E9QYWY9toSaPwGYoJpRz7NkmENBkwE4/Ce0wi2btCaBKiYGErjSldt36ag7QsKA/FWga
-         6IfT5l5dDePXtxhSgSWvz+Y3Lf5R8mXFrdZeMI11yZTa1gCszr183kFUoJU7bJ8CQLk5
-         hrvGqpc2BcOfbjaVb23FTBOs2JmLDgsjv/UE1SpVqrJqMHx4O6HnnckxCZ/QJzLDob5h
-         wRHg==
-X-Gm-Message-State: AOAM531kOa6kfqYLa/ak9WpXrLQAlgLsvd7qybtYzZVykC1vcEVbGoUs
-        Q9n2h1Ioz8sjh5WecCx3p2xQjTuF1j8amBHl5O/AZA==
-X-Google-Smtp-Source: ABdhPJz4kqsM2zajOVSAKgswV7LD/u9Of8EB4mcOSELuzl9N3rbE8Zn+Vb136NhMCEF83xMViBOj9nm8pJkMBp6g77Y=
-X-Received: by 2002:a17:906:518a:: with SMTP id y10mr4811157ejk.323.1607573042542;
- Wed, 09 Dec 2020 20:04:02 -0800 (PST)
+        id S1730557AbgLJEJw convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Dec 2020 23:09:52 -0500
+Received: from smtp.h3c.com ([60.191.123.56]:18606 "EHLO h3cspam01-ex.h3c.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730328AbgLJEJw (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 9 Dec 2020 23:09:52 -0500
+Received: from DAG2EX01-BASE.srv.huawei-3com.com ([10.8.0.64])
+        by h3cspam01-ex.h3c.com with ESMTP id 0BA48DCZ034913;
+        Thu, 10 Dec 2020 12:08:13 +0800 (GMT-8)
+        (envelope-from tian.xianting@h3c.com)
+Received: from DAG2EX03-BASE.srv.huawei-3com.com (10.8.0.66) by
+ DAG2EX01-BASE.srv.huawei-3com.com (10.8.0.64) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Thu, 10 Dec 2020 12:08:15 +0800
+Received: from DAG2EX03-BASE.srv.huawei-3com.com ([fe80::5d18:e01c:bbbd:c074])
+ by DAG2EX03-BASE.srv.huawei-3com.com ([fe80::5d18:e01c:bbbd:c074%7]) with
+ mapi id 15.01.2106.002; Thu, 10 Dec 2020 12:08:15 +0800
+From:   Tianxianting <tian.xianting@h3c.com>
+To:     Ming Lei <ming.lei@redhat.com>
+CC:     "axboe@kernel.dk" <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH] blk-mq-tag: make blk_mq_tag_busy() return void
+Thread-Topic: [PATCH] blk-mq-tag: make blk_mq_tag_busy() return void
+Thread-Index: AQHWzTbPLVQryLH5fkSeJ0U/VBp/EKnvMY+AgACHgrA=
+Date:   Thu, 10 Dec 2020 04:08:14 +0000
+Message-ID: <c067fbee320e4810ae599cde9680a366@h3c.com>
+References: <20201208074002.31539-1-tian.xianting@h3c.com>
+ <20201210040051.GA1377508@T590>
+In-Reply-To: <20201210040051.GA1377508@T590>
+Accept-Language: en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.99.141.128]
+x-sender-location: DAG2
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-References: <20201106170036.18713-1-logang@deltatee.com> <20201106170036.18713-5-logang@deltatee.com>
- <20201109091258.GB28918@lst.de> <4e336c7e-207b-31fa-806e-c4e8028524a5@deltatee.com>
- <CAPcyv4ifGcrdOtUt8qr7pmFhmecGHqGVre9G0RorGczCGVECQQ@mail.gmail.com> <fba1022b-1425-bb79-9af8-fe68e6f2c56e@deltatee.com>
-In-Reply-To: <fba1022b-1425-bb79-9af8-fe68e6f2c56e@deltatee.com>
-From:   Dan Williams <dan.j.williams@intel.com>
-Date:   Wed, 9 Dec 2020 20:04:00 -0800
-Message-ID: <CAPcyv4hr=kM6--OUdK+6XAAEVzENJmy-uD78yK-p62bW8vbu9g@mail.gmail.com>
-Subject: Re: [RFC PATCH 04/15] lib/scatterlist: Add flag for indicating P2PDMA
- segments in an SGL
-To:     Logan Gunthorpe <logang@deltatee.com>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        Linux PCI <linux-pci@vger.kernel.org>,
-        Linux MM <linux-mm@kvack.org>,
-        "open list:DMA MAPPING HELPERS" <iommu@lists.linux-foundation.org>,
-        Stephen Bates <sbates@raithlin.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
-        Ira Weiny <iweiny@intel.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Don Dutile <ddutile@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>
-Content-Type: text/plain; charset="UTF-8"
+X-DNSRBL: 
+X-MAIL: h3cspam01-ex.h3c.com 0BA48DCZ034913
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Dec 9, 2020 at 6:07 PM Logan Gunthorpe <logang@deltatee.com> wrote:
->
->
->
-> On 2020-12-09 6:22 p.m., Dan Williams wrote:
-> > On Mon, Nov 9, 2020 at 8:47 AM Logan Gunthorpe <logang@deltatee.com> wrote:
-> >>
-> >>
-> >>
-> >> On 2020-11-09 2:12 a.m., Christoph Hellwig wrote:
-> >>> On Fri, Nov 06, 2020 at 10:00:25AM -0700, Logan Gunthorpe wrote:
-> >>>> We make use of the top bit of the dma_length to indicate a P2PDMA
-> >>>> segment.
-> >>>
-> >>> I don't think "we" can.  There is nothing limiting the size of a SGL
-> >>> segment.
-> >>
-> >> Yes, I expected this would be the unacceptable part. Any alternative ideas?
-> >
-> > Why is the SG_P2PDMA_FLAG needed as compared to checking the SGL
-> > segment-pages for is_pci_p2pdma_page()?
->
-> Because the DMA and page segments in the SGL aren't necessarily aligned...
->
-> The IOMMU implementations can coalesce multiple pages into fewer DMA
-> address ranges, so the page pointed to by sg->page_link may not be the
-> one that corresponds to the address in sg->dma_address for a given segment.
->
-> If that makes sense -- it's not the easiest thing to explain.
+Thanks for the comments,
+So blk_mq_tag_idle() can be also simplified as below,  I will send v2 patch for reviewing.
 
-It does...
+static inline void blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
+ {
+-       if (!(hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED))
+-               return;
+-
+-       __blk_mq_tag_idle(hctx);
++       if (hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED)
++               __blk_mq_tag_idle(hctx);
+ }
 
-Did someone already grab, or did you already consider the 3rd
-available bit in page_link? AFAICS only SG_CHAIN and SG_END are
-reserved. However, if you have a CONFIG_64BIT dependency for
-user-directed p2pdma that would seem to allow SG_P2PDMA_FLAG to be
-(0x4) in page_link.
+-----Original Message-----
+From: Ming Lei [mailto:ming.lei@redhat.com] 
+Sent: Thursday, December 10, 2020 12:01 PM
+To: tianxianting (RD) <tian.xianting@h3c.com>
+Cc: axboe@kernel.dk; linux-block@vger.kernel.org; linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] blk-mq-tag: make blk_mq_tag_busy() return void
+
+On Tue, Dec 08, 2020 at 03:40:02PM +0800, Xianting Tian wrote:
+> As no one cares about the return value of blk_mq_tag_busy() and 
+> __blk_mq_tag_busy(), so make them return void.
+> 
+> Signed-off-by: Xianting Tian <tian.xianting@h3c.com>
+> ---
+>  block/blk-mq-tag.c | 4 ++--
+>  block/blk-mq-tag.h | 8 ++++----
+>  2 files changed, 6 insertions(+), 6 deletions(-)
+> 
+> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c index 
+> 9c92053e7..21ff7d156 100644
+> --- a/block/blk-mq-tag.c
+> +++ b/block/blk-mq-tag.c
+> @@ -21,7 +21,7 @@
+>   * to get tag when first time, the other shared-tag users could reserve
+>   * budget for it.
+>   */
+> -bool __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
+> +void __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
+>  {
+>  	if (blk_mq_is_sbitmap_shared(hctx->flags)) {
+>  		struct request_queue *q = hctx->queue; @@ -36,7 +36,7 @@ bool 
+> __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
+>  			atomic_inc(&hctx->tags->active_queues);
+>  	}
+>  
+> -	return true;
+> +	return;
+>  }
+>  
+>  /*
+> diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h index 
+> 7d3e6b333..dd80e5a85 100644
+> --- a/block/blk-mq-tag.h
+> +++ b/block/blk-mq-tag.h
+> @@ -60,15 +60,15 @@ enum {
+>  	BLK_MQ_TAG_MAX		= BLK_MQ_NO_TAG - 1,
+>  };
+>  
+> -extern bool __blk_mq_tag_busy(struct blk_mq_hw_ctx *);
+> +extern void __blk_mq_tag_busy(struct blk_mq_hw_ctx *);
+>  extern void __blk_mq_tag_idle(struct blk_mq_hw_ctx *);
+>  
+> -static inline bool blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
+> +static inline void blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
+>  {
+>  	if (!(hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED))
+> -		return false;
+> +		return;
+>  
+> -	return __blk_mq_tag_busy(hctx);
+> +	__blk_mq_tag_busy(hctx);
+
+The above can be simplified as:
+
+  	if (hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED)
+		__blk_mq_tag_busy(hctx);
+
+Otherwise, looks fine:
+
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+
+Thanks,
+Ming
+
