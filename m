@@ -2,129 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50C5EC433FE
-	for <linux-block@archiver.kernel.org>; Thu, 10 Dec 2020 16:45:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85C0AC433FE
+	for <linux-block@archiver.kernel.org>; Thu, 10 Dec 2020 19:41:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 11CFB23C82
-	for <linux-block@archiver.kernel.org>; Thu, 10 Dec 2020 16:45:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3083B23E1E
+	for <linux-block@archiver.kernel.org>; Thu, 10 Dec 2020 19:41:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391414AbgLJQpF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Dec 2020 11:45:05 -0500
-Received: from ale.deltatee.com ([204.191.154.188]:46608 "EHLO
-        ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731790AbgLJQpC (ORCPT
+        id S2390244AbgLJThu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Dec 2020 14:37:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60456 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390178AbgLJO2v (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Dec 2020 11:45:02 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:MIME-Version:Date:
-        Message-ID:From:References:Cc:To:content-disposition;
-        bh=NLEerKoLFowaewjPdadKIQl7nLE1s4J5rPHYICcJITQ=; b=crqyakMNfLD0XUfh6F2e3swVLx
-        mTcpouhD/gNOfYXfGn6Ra4lmr58g0DKEFh8v8XZhw7oj3+a2PAQ6gUNE4XzkizYW5DHLyF7Z962+u
-        VOgMKxoM2ZoNxRHEGrF0b8DeCOHUdreOXpoHW86yykGzbOaDPRYZrLjPGRT3Dq5Jj+ROOKFo4RVTC
-        5Qm3rUKnhRLUuRiAammvF8OZt0oHLqzqWos19uRirQOx2TCgMA9I/ZpGTKhrPR3+HiCsA9JBUukjC
-        Id/rXnpnKxi4H2NChsUtSFGKaCBNLpYj+WfkrEFTOTBeR3z3ReJdU/ek2w8kaxqIVYFLxOVpqyS+5
-        pjQzCBCg==;
-Received: from s01060023bee90a7d.cg.shawcable.net ([24.64.145.4] helo=[192.168.0.10])
-        by ale.deltatee.com with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <logang@deltatee.com>)
-        id 1knP32-000791-LR; Thu, 10 Dec 2020 09:44:09 -0700
-To:     Dan Williams <dan.j.williams@intel.com>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        Linux PCI <linux-pci@vger.kernel.org>,
-        Linux MM <linux-mm@kvack.org>,
-        "open list:DMA MAPPING HELPERS" <iommu@lists.linux-foundation.org>,
-        Stephen Bates <sbates@raithlin.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Don Dutile <ddutile@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>
-References: <20201106170036.18713-1-logang@deltatee.com>
- <20201106170036.18713-5-logang@deltatee.com> <20201109091258.GB28918@lst.de>
- <4e336c7e-207b-31fa-806e-c4e8028524a5@deltatee.com>
- <CAPcyv4ifGcrdOtUt8qr7pmFhmecGHqGVre9G0RorGczCGVECQQ@mail.gmail.com>
- <fba1022b-1425-bb79-9af8-fe68e6f2c56e@deltatee.com>
- <CAPcyv4hr=kM6--OUdK+6XAAEVzENJmy-uD78yK-p62bW8vbu9g@mail.gmail.com>
-From:   Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <7b08e6e9-eca4-0070-8444-5eb00965a0ad@deltatee.com>
-Date:   Thu, 10 Dec 2020 09:44:03 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.1
+        Thu, 10 Dec 2020 09:28:51 -0500
+Received: from mail-qk1-x742.google.com (mail-qk1-x742.google.com [IPv6:2607:f8b0:4864:20::742])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13891C0613D6;
+        Thu, 10 Dec 2020 06:28:11 -0800 (PST)
+Received: by mail-qk1-x742.google.com with SMTP id 186so4877436qkj.3;
+        Thu, 10 Dec 2020 06:28:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=5KT0oTb3mRoegGrtWGW20ktqKvohby2eKOLMVIlayEs=;
+        b=YM8R74Awf/f2e2mBYw6imzoId/7z7GeQZeO6bM6UtoFmW9mphtPH6zKtAhQsGXjliy
+         Xp7Dk5XtsJA9FR8L62hheX5yh5fqQ7kBwoo8SzJqOTcge+Ke1Zmp3jYlCXKZCPviWxxg
+         5UrKmQetxiJNfMaWBpu1e9uND0pbrrZ6PgATsXSAATFKHQcoQUK+SITRrLY0yBAaH1Nq
+         NOo0ktNQlmT6HvBGz1wATwB02gmUrBC2EX1LUpm4ZycolIejrwqvtC6o62SQGtM/zloB
+         0LKEfleAfic63sf1G6GAun9EX1gUUZPcn2+MPpRJ+o6qDkMnvsgShm5FA4czMVSXBXDj
+         93Nw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=5KT0oTb3mRoegGrtWGW20ktqKvohby2eKOLMVIlayEs=;
+        b=LfohSqvOtkQ4dDVENw9F8seTvAq0mZNBPiNKQQf0/fSNqSnMirHXAAP1fpNqbZhSbG
+         31xo0ftqmUwaWhg4f66PIdTwq8KK+ECYn0T2TtzLPxUt+4Z5TfcnobBANl58TOXIgDVL
+         6LPsx3eP1u59R2EkBFige3x5J3Z3MnlCRPO95pXgXcqonrfVDjMyqAbtHh6HVhavD6kb
+         ntXmNA9lIhnE0QDAV1UTQHan9zuqDGL1gxsgMOBDgPsU/6pUXOB9ztyPR2WAlwd0VeI5
+         NPmrxFo2EX4hj+PEzl4UQ51mpJO4f2Uq0VN+2HXF2KrsME1MyE0gKgag2fdw7wwHq74W
+         f8qA==
+X-Gm-Message-State: AOAM533VL1gzho2lVF8OqYvfuMAFoOK1mFl6lc7HcTKntMV7wCFXgCuA
+        llvg4FX2LBqJvD/VbYaIfnQ=
+X-Google-Smtp-Source: ABdhPJyuG1Np9CsPL4WeD/C+l/1mQS9Q2hc6ZCJAEX8z33MeSAFp5AjsWluY32UupWY/PjC3IE8o5Q==
+X-Received: by 2002:a05:620a:144a:: with SMTP id i10mr9470027qkl.431.1607610489803;
+        Thu, 10 Dec 2020 06:28:09 -0800 (PST)
+Received: from localhost ([2600:380:5a4a:42b3:c6ce:6e34:f826:c141])
+        by smtp.gmail.com with ESMTPSA id a20sm3042563qta.6.2020.12.10.06.28.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Dec 2020 06:28:09 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Thu, 10 Dec 2020 09:27:38 -0500
+From:   Tejun Heo <tj@kernel.org>
+To:     Baolin Wang <baolin.wang@linux.alibaba.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] blk-iocost: Add iocg idle state tracepoint
+Message-ID: <X9IwWmIgnAl8R34d@mtj.duckdns.org>
+References: <1ba7a38d5a6186b1e71432ef424c23ba1904a365.1607591591.git.baolin.wang@linux.alibaba.com>
 MIME-Version: 1.0
-In-Reply-To: <CAPcyv4hr=kM6--OUdK+6XAAEVzENJmy-uD78yK-p62bW8vbu9g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 24.64.145.4
-X-SA-Exim-Rcpt-To: daniel.vetter@ffwll.ch, willy@infradead.org, ddutile@redhat.com, jhubbard@nvidia.com, christian.koenig@amd.com, jgg@ziepe.ca, sbates@raithlin.com, iommu@lists.linux-foundation.org, linux-mm@kvack.org, linux-pci@vger.kernel.org, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, hch@lst.de, dan.j.williams@intel.com
-X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: [RFC PATCH 04/15] lib/scatterlist: Add flag for indicating P2PDMA
- segments in an SGL
-X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1ba7a38d5a6186b1e71432ef424c23ba1904a365.1607591591.git.baolin.wang@linux.alibaba.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 2020-12-09 9:04 p.m., Dan Williams wrote:
-> On Wed, Dec 9, 2020 at 6:07 PM Logan Gunthorpe <logang@deltatee.com> wrote:
->>
->>
->>
->> On 2020-12-09 6:22 p.m., Dan Williams wrote:
->>> On Mon, Nov 9, 2020 at 8:47 AM Logan Gunthorpe <logang@deltatee.com> wrote:
->>>>
->>>>
->>>>
->>>> On 2020-11-09 2:12 a.m., Christoph Hellwig wrote:
->>>>> On Fri, Nov 06, 2020 at 10:00:25AM -0700, Logan Gunthorpe wrote:
->>>>>> We make use of the top bit of the dma_length to indicate a P2PDMA
->>>>>> segment.
->>>>>
->>>>> I don't think "we" can.  There is nothing limiting the size of a SGL
->>>>> segment.
->>>>
->>>> Yes, I expected this would be the unacceptable part. Any alternative ideas?
->>>
->>> Why is the SG_P2PDMA_FLAG needed as compared to checking the SGL
->>> segment-pages for is_pci_p2pdma_page()?
->>
->> Because the DMA and page segments in the SGL aren't necessarily aligned...
->>
->> The IOMMU implementations can coalesce multiple pages into fewer DMA
->> address ranges, so the page pointed to by sg->page_link may not be the
->> one that corresponds to the address in sg->dma_address for a given segment.
->>
->> If that makes sense -- it's not the easiest thing to explain.
+On Thu, Dec 10, 2020 at 06:56:44PM +0800, Baolin Wang wrote:
+> It will be helpful to trace the iocg's whole state, including active and
+> idle state. And we can easily expand the original iocost_iocg_activate
+> trace event to support a state trace class, including active and idle
+> state tracing.
 > 
-> It does...
-> 
-> Did someone already grab, or did you already consider the 3rd
-> available bit in page_link? AFAICS only SG_CHAIN and SG_END are
-> reserved. However, if you have a CONFIG_64BIT dependency for
-> user-directed p2pdma that would seem to allow SG_P2PDMA_FLAG to be
-> (0x4) in page_link.
+> Signed-off-by: Baolin Wang <baolin.wang@linux.alibaba.com>
 
-Hmm, I half considered that, but I had came to the conclusion that given
-the mis-alignment I shouldn't be using the page side of the SGL.
-However, reconsidering now, that might actually be a reasonable option.
+Acked-by: Tejun Heo <tj@kernel.org>
 
-However, the CONFIG_64BIT dependency would have to be on all P2PDMA,
-because we'd need to replace pci_p2pdma_map_sg() in all cases. I'm not
-sure if this would be a restriction people care about.
+Thanks.
 
-Thanks,
-
-Logan
-
+-- 
+tejun
