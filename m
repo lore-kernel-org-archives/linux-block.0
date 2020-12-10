@@ -4,189 +4,628 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AB5CC433FE
-	for <linux-block@archiver.kernel.org>; Thu, 10 Dec 2020 06:28:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E72E4C4361B
+	for <linux-block@archiver.kernel.org>; Thu, 10 Dec 2020 06:28:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C59AD23C43
-	for <linux-block@archiver.kernel.org>; Thu, 10 Dec 2020 06:28:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AA26523C43
+	for <linux-block@archiver.kernel.org>; Thu, 10 Dec 2020 06:28:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727176AbgLJG2O (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Dec 2020 01:28:14 -0500
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:42441 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727030AbgLJG2O (ORCPT
+        id S1730785AbgLJG2Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Dec 2020 01:28:16 -0500
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:34321 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727030AbgLJG2Q (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Dec 2020 01:28:14 -0500
+        Thu, 10 Dec 2020 01:28:16 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1607581693; x=1639117693;
+  t=1607581695; x=1639117695;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=a3cbrc1i+f6XdSMIC94PGM/AVELFn5l85gX6A2VwJpU=;
-  b=XhqBSkqzDYBIboXDNApi14xyzMQ8MeD8TIdzrAHUeZ/LbvxioNJO09mJ
-   TWTusS9gDb1SUanVVoPTW3jIOl5Hks86YUsAH4XQe7E4QVPlO80gPH5od
-   S1GAN3Jc+v5FXS8E5sWlTW3wRrz3oMs/gzHFVLxqWRqHYDzOmYxbwjgWh
-   gt6Mu3yt8NlmcQe3gdB5aBAxezqhhjei8vyYgKSw2IvMs46fvzibdG03a
-   bA+c4uNL54aWk2dqKdwZBxSUVbZCUIfEfblyPyMas0XW7iInJzaJ6W8jr
-   xX0YkgIE9STMQU2DKZNkmAh/0f35Ob9N/K47w/agNG8yIjqJOLkmHdit1
-   w==;
-IronPort-SDR: 2c5KWxv0yMDrpg+SnSQMaOevqmIs7zyWvK9IRdiYLgh/1aUPIx4DlicApUTo+h0WgnHyeBMZJu
- HHgUSIbLY041XV4OgTzUlljv7HvCd1xmzn3zASEhXTFapuG8Kao2OaqD5sLh4tQChS3oR5h7Me
- GsawXuPzMs+4XwmtcFmejqQ4yDkgwGlbQ7/q0Gp1lg65GSrsGDCWmKFLX10yyp40m0x7PAskkh
- UQLMErvG25Ju94I0RZJxkM3h+W+WRgInjzpRfnres6maQ9JBhGWDPmjIWp7xke7O2tdqzuQ6Dg
- agM=
+  bh=vrp0qz6WYzjZalhRg4H62bhv+ZXoukxGu19uU6n7AvM=;
+  b=QGLdQr5f7+pjfzw96jZeyRRIQcWlFGWLTl+Tc6hIRmpTyoAwfzLI3vAG
+   ZT99ZW3MDYDR++3BUznwX0KH9iEIkdVsONpV7wx44Z2BfkQBYliJzxCYD
+   9K85jAVfdsU4WA4IYs28+auY6rUTzL/DkPGU992KrNLSxmP5Va39NUDQq
+   Pu2/LT633+jokHy826la1UTRI+gLbuxM4zqeK+Hjj2hdNrctXf9Z7M8wI
+   cIYNIvoelPxvzzt7MXOdI6h9wgsBO8ivOo7wu1UAHSnzG3VkTWR8x2d6n
+   GUeMtokYCNhsB+Yro1kPrAxPl64qQAfjaRS4hyX/JQjTtgUpON5fh4BUu
+   A==;
+IronPort-SDR: MiKz9pqXHhvTWqbx6ib9jmM0zcgFlztob7cH4kLhcxvMmnAGcrNCjemBRmYWhZ8uH1mQUkS6Eb
+ mrDqrCqM/fqFaEDyOW2Yt/0eYmSzUkdCAJA4O8NQgDQquwuF4ahfrkyxMMdqwL6foq/30/BYoq
+ euRHiyblb24HYgK+I120gkkJ9JyivDUydI9ocOzdj5epMxsJDyQTrEfBed66SYTEN0f8jpuz8u
+ JrCNqvahIZYUrlr3/9zPdWocx+uxOIdoTztZGJMWFhJ9rfKyH/Lw9UNU2SdeQ0JwhGUMPlJO1p
+ F2A=
 X-IronPort-AV: E=Sophos;i="5.78,407,1599494400"; 
-   d="scan'208";a="264993796"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 10 Dec 2020 14:27:07 +0800
-IronPort-SDR: JJYjuVy81chP9vCcyEwD3fTXEVa2nQFavnv2f7sAYgqTt6/4bAoKX7FGHMONvfbld6JxInSRZt
- CXPltdmr/K3tilxE6R/KceVuSkQw5+LUQ=
+   d="scan'208";a="156044717"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 10 Dec 2020 14:27:21 +0800
+IronPort-SDR: yjV44aC4I3jk1Yq49cwJO5URnjeIENMLRqkTzsi6M5BLAl14HDj6hJ6Ra9R+Z40ikIMZNpAQn1
+ CT+/Uadu2sTs9Gof0Lyzf1J3slCVMOdBg=
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2020 22:11:03 -0800
-IronPort-SDR: rMiCZkrn+/4NPj7vVwT+RPvI0fEZ6dyYykNeF4T1xLOeKY2nvVYipfkd94HXka5uI0uWGqpPYs
- g2uPOwTB5Oew==
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2020 22:12:46 -0800
+IronPort-SDR: AirZHlD367cROifcRA+Ye5ey2KFRTIpT5+oJuxEvc6uK/dDGtMtDx46t2nlD0fFn0IJhRK4rXj
+ jpSQHgQVfEYg==
 WDCIronportException: Internal
 Received: from vm.labspan.wdc.com (HELO vm.sc.wdc.com) ([10.6.137.102])
-  by uls-op-cesaip01.wdc.com with ESMTP; 09 Dec 2020 22:27:08 -0800
+  by uls-op-cesaip01.wdc.com with ESMTP; 09 Dec 2020 22:27:21 -0800
 From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 To:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
 Cc:     sagi@grimberg.me, hch@lst.de, damien.lemoal@wdc.com,
         Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [PATCH V5 3/6] nvmet: add NVM command set identifier support
-Date:   Wed,  9 Dec 2020 22:26:19 -0800
-Message-Id: <20201210062622.62053-4-chaitanya.kulkarni@wdc.com>
+Subject: [PATCH V5 4/6] nvmet: add ZBD over ZNS backend support
+Date:   Wed,  9 Dec 2020 22:26:20 -0800
+Message-Id: <20201210062622.62053-5-chaitanya.kulkarni@wdc.com>
 X-Mailer: git-send-email 2.22.1
 In-Reply-To: <20201210062622.62053-1-chaitanya.kulkarni@wdc.com>
 References: <20201210062622.62053-1-chaitanya.kulkarni@wdc.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-NVMe TP 4056 allows controller to support different command sets.
-NVMeoF target currently only supports namespaces that contain
-traditional logical blocks that may be randomly read and written. In
-some applications there is value in exposing namespaces that contain
-logical blocks that have special access rules (e.g. sequentially write
-required namespace such as Zoned Namespace (ZNS)).
+NVMe TP 4053 – Zoned Namespaces (ZNS) allows host software to
+communicate with a non-volatile memory subsystem using zones for
+NVMe protocol based controllers. NVMeOF already support the ZNS NVMe
+Protocol compliant devices on the target in the passthru mode. There
+are Generic Zoned Block Devices like  Shingled Magnetic Recording (SMR)
+HDD which are not based on the NVMe protocol.
 
-In order to support the Zoned Block Devices (ZBD) backend, controller
-needs to have support for ZNS Command Set Identifier (CSI).
+This patch adds ZNS backend to support the ZBDs for NVMeOF target.
 
-In this preparation patch we adjust the code such that it can now
-support different command sets. We update the namespace data
-structure to store the CSI value which defaults to NVME_CSI_NVM
-which represents traditional logical blocks namespace type.
+This support inculdes implementing the new command set NVME_CSI_ZNS,
+adding different command handlers for ZNS command set such as
+NVMe Identify Controller, NVMe Identify Namespace, NVMe Zone Append,
+NVMe Zone Management Send and NVMe Zone Management Receive.
 
-The CSI support is required to implement the ZBD backend over NVMe ZNS
-interface, since ZNS commands belongs to different command set than
-the default one.
+With new command set identifier we also update the target command effects
+logs to reflect the ZNS compliant commands.
 
 Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 ---
- drivers/nvme/target/admin-cmd.c | 33 ++++++++++++++++++++-------------
- drivers/nvme/target/core.c      | 13 ++++++++++++-
- drivers/nvme/target/nvmet.h     |  1 +
- 3 files changed, 33 insertions(+), 14 deletions(-)
+ drivers/nvme/target/Makefile      |   1 +
+ drivers/nvme/target/admin-cmd.c   |  26 +++
+ drivers/nvme/target/core.c        |   1 +
+ drivers/nvme/target/io-cmd-bdev.c |  33 ++-
+ drivers/nvme/target/nvmet.h       |  38 ++++
+ drivers/nvme/target/zns.c         | 327 ++++++++++++++++++++++++++++++
+ 6 files changed, 418 insertions(+), 8 deletions(-)
+ create mode 100644 drivers/nvme/target/zns.c
 
+diff --git a/drivers/nvme/target/Makefile b/drivers/nvme/target/Makefile
+index ebf91fc4c72e..9837e580fa7e 100644
+--- a/drivers/nvme/target/Makefile
++++ b/drivers/nvme/target/Makefile
+@@ -12,6 +12,7 @@ obj-$(CONFIG_NVME_TARGET_TCP)		+= nvmet-tcp.o
+ nvmet-y		+= core.o configfs.o admin-cmd.o fabrics-cmd.o \
+ 			discovery.o io-cmd-file.o io-cmd-bdev.o
+ nvmet-$(CONFIG_NVME_TARGET_PASSTHRU)	+= passthru.o
++nvmet-$(CONFIG_BLK_DEV_ZONED)		+= zns.o
+ nvme-loop-y	+= loop.o
+ nvmet-rdma-y	+= rdma.o
+ nvmet-fc-y	+= fc.o
 diff --git a/drivers/nvme/target/admin-cmd.c b/drivers/nvme/target/admin-cmd.c
-index 74620240ac47..f4c0f3aca485 100644
+index f4c0f3aca485..6f5279b15aa6 100644
 --- a/drivers/nvme/target/admin-cmd.c
 +++ b/drivers/nvme/target/admin-cmd.c
-@@ -176,19 +176,26 @@ static void nvmet_execute_get_log_cmd_effects_ns(struct nvmet_req *req)
- 	if (!log)
- 		goto out;
- 
--	log->acs[nvme_admin_get_log_page]	= cpu_to_le32(1 << 0);
--	log->acs[nvme_admin_identify]		= cpu_to_le32(1 << 0);
--	log->acs[nvme_admin_abort_cmd]		= cpu_to_le32(1 << 0);
--	log->acs[nvme_admin_set_features]	= cpu_to_le32(1 << 0);
--	log->acs[nvme_admin_get_features]	= cpu_to_le32(1 << 0);
--	log->acs[nvme_admin_async_event]	= cpu_to_le32(1 << 0);
--	log->acs[nvme_admin_keep_alive]		= cpu_to_le32(1 << 0);
--
--	log->iocs[nvme_cmd_read]		= cpu_to_le32(1 << 0);
--	log->iocs[nvme_cmd_write]		= cpu_to_le32(1 << 0);
--	log->iocs[nvme_cmd_flush]		= cpu_to_le32(1 << 0);
--	log->iocs[nvme_cmd_dsm]			= cpu_to_le32(1 << 0);
--	log->iocs[nvme_cmd_write_zeroes]	= cpu_to_le32(1 << 0);
-+	switch (req->cmd->get_log_page.csi) {
-+	case NVME_CSI_NVM:
-+		log->acs[nvme_admin_get_log_page]	= cpu_to_le32(1 << 0);
-+		log->acs[nvme_admin_identify]		= cpu_to_le32(1 << 0);
-+		log->acs[nvme_admin_abort_cmd]		= cpu_to_le32(1 << 0);
-+		log->acs[nvme_admin_set_features]	= cpu_to_le32(1 << 0);
-+		log->acs[nvme_admin_get_features]	= cpu_to_le32(1 << 0);
-+		log->acs[nvme_admin_async_event]	= cpu_to_le32(1 << 0);
-+		log->acs[nvme_admin_keep_alive]		= cpu_to_le32(1 << 0);
+@@ -192,6 +192,15 @@ static void nvmet_execute_get_log_cmd_effects_ns(struct nvmet_req *req)
+ 		log->iocs[nvme_cmd_dsm]			= cpu_to_le32(1 << 0);
+ 		log->iocs[nvme_cmd_write_zeroes]	= cpu_to_le32(1 << 0);
+ 		break;
++	case NVME_CSI_ZNS:
++		if (IS_ENABLED(CONFIG_BLK_DEV_ZONED)) {
++			u32 *iocs = log->iocs;
 +
-+		log->iocs[nvme_cmd_read]		= cpu_to_le32(1 << 0);
-+		log->iocs[nvme_cmd_write]		= cpu_to_le32(1 << 0);
-+		log->iocs[nvme_cmd_flush]		= cpu_to_le32(1 << 0);
-+		log->iocs[nvme_cmd_dsm]			= cpu_to_le32(1 << 0);
-+		log->iocs[nvme_cmd_write_zeroes]	= cpu_to_le32(1 << 0);
++			iocs[nvme_cmd_zone_append]	= cpu_to_le32(1 << 0);
++			iocs[nvme_cmd_zone_mgmt_send]	= cpu_to_le32(1 << 0);
++			iocs[nvme_cmd_zone_mgmt_recv]	= cpu_to_le32(1 << 0);
++		}
 +		break;
-+	default:
-+		status = NVME_SC_INVALID_LOG_PAGE;
-+		break;
+ 	default:
+ 		status = NVME_SC_INVALID_LOG_PAGE;
+ 		break;
+@@ -614,6 +623,7 @@ static u16 nvmet_copy_ns_identifier(struct nvmet_req *req, u8 type, u8 len,
+ 
+ static void nvmet_execute_identify_desclist(struct nvmet_req *req)
+ {
++	u16 nvme_cis_zns = NVME_CSI_ZNS;
+ 	u16 status = 0;
+ 	off_t off = 0;
+ 
+@@ -638,6 +648,14 @@ static void nvmet_execute_identify_desclist(struct nvmet_req *req)
+ 		if (status)
+ 			goto out;
+ 	}
++	if (IS_ENABLED(CONFIG_BLK_DEV_ZONED)) {
++		if (req->ns->csi == NVME_CSI_ZNS)
++			status = nvmet_copy_ns_identifier(req, NVME_NIDT_CSI,
++							  NVME_NIDT_CSI_LEN,
++							  &nvme_cis_zns, &off);
++		if (status)
++			goto out;
 +	}
  
- 	status = nvmet_copy_to_sgl(req, 0, log, sizeof(*log));
- 
+ 	if (sg_zero_buffer(req->sg, req->sg_cnt, NVME_IDENTIFY_DATA_SIZE - off,
+ 			off) != NVME_IDENTIFY_DATA_SIZE - off)
+@@ -655,8 +673,16 @@ static void nvmet_execute_identify(struct nvmet_req *req)
+ 	switch (req->cmd->identify.cns) {
+ 	case NVME_ID_CNS_NS:
+ 		return nvmet_execute_identify_ns(req);
++	case NVME_ID_CNS_CS_NS:
++		if (req->cmd->identify.csi == NVME_CSI_ZNS)
++			return nvmet_execute_identify_cns_cs_ns(req);
++		break;
+ 	case NVME_ID_CNS_CTRL:
+ 		return nvmet_execute_identify_ctrl(req);
++	case NVME_ID_CNS_CS_CTRL:
++		if (req->cmd->identify.csi == NVME_CSI_ZNS)
++			return nvmet_execute_identify_cns_cs_ctrl(req);
++		break;
+ 	case NVME_ID_CNS_NS_ACTIVE_LIST:
+ 		return nvmet_execute_identify_nslist(req);
+ 	case NVME_ID_CNS_NS_DESC_LIST:
 diff --git a/drivers/nvme/target/core.c b/drivers/nvme/target/core.c
-index 8ce4d59cc9e7..672e4009f8d6 100644
+index 672e4009f8d6..17a99c7134dc 100644
 --- a/drivers/nvme/target/core.c
 +++ b/drivers/nvme/target/core.c
-@@ -681,6 +681,7 @@ struct nvmet_ns *nvmet_ns_alloc(struct nvmet_subsys *subsys, u32 nsid)
- 
- 	uuid_gen(&ns->uuid);
- 	ns->buffered_io = false;
-+	ns->csi = NVME_CSI_NVM;
- 
- 	return ns;
+@@ -1107,6 +1107,7 @@ static inline u8 nvmet_cc_iocqes(u32 cc)
+ static inline bool nvmet_cc_css_check(u8 cc_css)
+ {
+ 	switch (cc_css <<= NVME_CC_CSS_SHIFT) {
++	case NVME_CC_CSS_CSI:
+ 	case NVME_CC_CSS_NVM:
+ 		return true;
+ 	default:
+diff --git a/drivers/nvme/target/io-cmd-bdev.c b/drivers/nvme/target/io-cmd-bdev.c
+index 23095bdfce06..6178ef643962 100644
+--- a/drivers/nvme/target/io-cmd-bdev.c
++++ b/drivers/nvme/target/io-cmd-bdev.c
+@@ -63,6 +63,14 @@ static void nvmet_bdev_ns_enable_integrity(struct nvmet_ns *ns)
+ 	}
  }
-@@ -1103,6 +1104,16 @@ static inline u8 nvmet_cc_iocqes(u32 cc)
- 	return (cc >> NVME_CC_IOCQES_SHIFT) & 0xf;
- }
  
-+static inline bool nvmet_cc_css_check(u8 cc_css)
++void nvmet_bdev_ns_disable(struct nvmet_ns *ns)
 +{
-+	switch (cc_css <<= NVME_CC_CSS_SHIFT) {
-+	case NVME_CC_CSS_NVM:
-+		return true;
-+	default:
-+		return false;
++	if (ns->bdev) {
++		blkdev_put(ns->bdev, FMODE_WRITE | FMODE_READ);
++		ns->bdev = NULL;
 +	}
 +}
 +
- static void nvmet_start_ctrl(struct nvmet_ctrl *ctrl)
+ int nvmet_bdev_ns_enable(struct nvmet_ns *ns)
  {
- 	lockdep_assert_held(&ctrl->lock);
-@@ -1111,7 +1122,7 @@ static void nvmet_start_ctrl(struct nvmet_ctrl *ctrl)
- 	    nvmet_cc_iocqes(ctrl->cc) != NVME_NVM_IOCQES ||
- 	    nvmet_cc_mps(ctrl->cc) != 0 ||
- 	    nvmet_cc_ams(ctrl->cc) != 0 ||
--	    nvmet_cc_css(ctrl->cc) != 0) {
-+	    !nvmet_cc_css_check(nvmet_cc_css(ctrl->cc))) {
- 		ctrl->csts = NVME_CSTS_CFS;
- 		return;
+ 	int ret;
+@@ -86,15 +94,15 @@ int nvmet_bdev_ns_enable(struct nvmet_ns *ns)
+ 	if (IS_ENABLED(CONFIG_BLK_DEV_INTEGRITY_T10))
+ 		nvmet_bdev_ns_enable_integrity(ns);
+ 
+-	return 0;
+-}
+-
+-void nvmet_bdev_ns_disable(struct nvmet_ns *ns)
+-{
+-	if (ns->bdev) {
+-		blkdev_put(ns->bdev, FMODE_WRITE | FMODE_READ);
+-		ns->bdev = NULL;
++	if (IS_ENABLED(CONFIG_BLK_DEV_ZONED) && bdev_is_zoned(ns->bdev)) {
++		if (!nvmet_bdev_zns_enable(ns)) {
++			nvmet_bdev_ns_disable(ns);
++			return -EINVAL;
++		}
++		ns->csi = NVME_CSI_ZNS;
  	}
++
++	return 0;
+ }
+ 
+ void nvmet_bdev_ns_revalidate(struct nvmet_ns *ns)
+@@ -448,6 +456,15 @@ u16 nvmet_bdev_parse_io_cmd(struct nvmet_req *req)
+ 	case nvme_cmd_write_zeroes:
+ 		req->execute = nvmet_bdev_execute_write_zeroes;
+ 		return 0;
++	case nvme_cmd_zone_append:
++		req->execute = nvmet_bdev_execute_zone_append;
++		return 0;
++	case nvme_cmd_zone_mgmt_recv:
++		req->execute = nvmet_bdev_execute_zone_mgmt_recv;
++		return 0;
++	case nvme_cmd_zone_mgmt_send:
++		req->execute = nvmet_bdev_execute_zone_mgmt_send;
++		return 0;
+ 	default:
+ 		pr_err("unhandled cmd %d on qid %d\n", cmd->common.opcode,
+ 		       req->sq->qid);
 diff --git a/drivers/nvme/target/nvmet.h b/drivers/nvme/target/nvmet.h
-index 4cb4cdae858c..0360594abd93 100644
+index 0360594abd93..dae6ecba6780 100644
 --- a/drivers/nvme/target/nvmet.h
 +++ b/drivers/nvme/target/nvmet.h
-@@ -81,6 +81,7 @@ struct nvmet_ns {
- 	struct pci_dev		*p2p_dev;
- 	int			pi_type;
- 	int			metadata_size;
-+	u8			csi;
+@@ -252,6 +252,10 @@ struct nvmet_subsys {
+ 	unsigned int		admin_timeout;
+ 	unsigned int		io_timeout;
+ #endif /* CONFIG_NVME_TARGET_PASSTHRU */
++
++#ifdef CONFIG_BLK_DEV_ZONED
++	u8			zasl;
++#endif /* CONFIG_BLK_DEV_ZONED */
  };
  
- static inline struct nvmet_ns *to_nvmet_ns(struct config_item *item)
+ static inline struct nvmet_subsys *to_subsys(struct config_item *item)
+@@ -614,4 +618,38 @@ static inline sector_t nvmet_lba_to_sect(struct nvmet_ns *ns, __le64 lba)
+ 	return le64_to_cpu(lba) << (ns->blksize_shift - SECTOR_SHIFT);
+ }
+ 
++#ifdef CONFIG_BLK_DEV_ZONED
++bool nvmet_bdev_zns_enable(struct nvmet_ns *ns);
++void nvmet_execute_identify_cns_cs_ctrl(struct nvmet_req *req);
++void nvmet_execute_identify_cns_cs_ns(struct nvmet_req *req);
++void nvmet_bdev_execute_zone_mgmt_recv(struct nvmet_req *req);
++void nvmet_bdev_execute_zone_mgmt_send(struct nvmet_req *req);
++void nvmet_bdev_execute_zone_append(struct nvmet_req *req);
++#else  /* CONFIG_BLK_DEV_ZONED */
++static inline bool nvmet_bdev_zns_enable(struct nvmet_ns *ns)
++{
++	return false;
++}
++static inline void
++nvmet_execute_identify_cns_cs_ctrl(struct nvmet_req *req)
++{
++}
++static inline void
++nvmet_execute_identify_cns_cs_ns(struct nvmet_req *req)
++{
++}
++static inline void
++nvmet_bdev_execute_zone_mgmt_recv(struct nvmet_req *req)
++{
++}
++static inline void
++nvmet_bdev_execute_zone_mgmt_send(struct nvmet_req *req)
++{
++}
++static inline void
++nvmet_bdev_execute_zone_append(struct nvmet_req *req)
++{
++}
++#endif /* CONFIG_BLK_DEV_ZONED */
++
+ #endif /* _NVMET_H */
+diff --git a/drivers/nvme/target/zns.c b/drivers/nvme/target/zns.c
+new file mode 100644
+index 000000000000..ae51bae996f9
+--- /dev/null
++++ b/drivers/nvme/target/zns.c
+@@ -0,0 +1,327 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * NVMe ZNS-ZBD command implementation.
++ * Copyright (c) 2020-2021 HGST, a Western Digital Company.
++ */
++#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
++#include <linux/uio.h>
++#include <linux/nvme.h>
++#include <linux/xarray.h>
++#include <linux/blkdev.h>
++#include <linux/module.h>
++#include "nvmet.h"
++
++/*
++ * We set the Memory Page Size Minimum (MPSMIN) for target controller to 0
++ * which gets added by 12 in the nvme_enable_ctrl() which results in 2^12 = 4k
++ * as page_shift value. When calculating the ZASL use shift by 12.
++ */
++#define NVMET_MPSMIN_SHIFT	12
++
++static u16 nvmet_bdev_zns_checks(struct nvmet_req *req)
++{
++	u16 status = 0;
++
++	if (!bdev_is_zoned(req->ns->bdev)) {
++		status = NVME_SC_INVALID_NS | NVME_SC_DNR;
++		goto out;
++	}
++
++	if (req->cmd->zmr.zra != NVME_ZRA_ZONE_REPORT) {
++		status = NVME_SC_INVALID_FIELD;
++		goto out;
++	}
++
++	if (req->cmd->zmr.zrasf != NVME_ZRASF_ZONE_REPORT_ALL) {
++		status = NVME_SC_INVALID_FIELD;
++		goto out;
++	}
++
++	if (req->cmd->zmr.pr != NVME_REPORT_ZONE_PARTIAL)
++		status = NVME_SC_INVALID_FIELD;
++
++out:
++	return status;
++}
++
++/*
++ *  ZNS related command implementation and helpers.
++ */
++
++static inline u8 nvmet_zasl(unsigned int zone_append_sects)
++{
++	/*
++	 * Zone Append Size Limit is the value experessed in the units
++	 * of minimum memory page size (i.e. 12) and is reported power of 2.
++	 */
++	return ilog2((zone_append_sects << 9) >> NVMET_MPSMIN_SHIFT);
++}
++
++static inline bool nvmet_zns_update_zasl(struct nvmet_ns *ns)
++{
++	struct request_queue *q = ns->bdev->bd_disk->queue;
++	u8 zasl = nvmet_zasl(queue_max_zone_append_sectors(q));
++
++	if (ns->subsys->zasl)
++		return ns->subsys->zasl < zasl ? false : true;
++
++	ns->subsys->zasl = zasl;
++	return true;
++}
++
++bool nvmet_bdev_zns_enable(struct nvmet_ns *ns)
++{
++	if (ns->bdev->bd_disk->queue->conv_zones_bitmap) {
++		pr_err("block devices with conventional zones are not supported.");
++		return false;
++	}
++
++	/*
++	 * For ZBC and ZAC devices, writes into sequential zones must be aligned
++	 * to the device physical block size. So use this value as the logical
++	 * block size to avoid errors.
++	 */
++	ns->blksize_shift = blksize_bits(bdev_physical_block_size(ns->bdev));
++
++	if (!nvmet_zns_update_zasl(ns))
++		return false;
++
++	return !(get_capacity(ns->bdev->bd_disk) &
++			(bdev_zone_sectors(ns->bdev) - 1));
++}
++
++/*
++ * ZNS related Admin and I/O command handlers.
++ */
++void nvmet_execute_identify_cns_cs_ctrl(struct nvmet_req *req)
++{
++	u8 zasl = req->sq->ctrl->subsys->zasl;
++	struct nvmet_ctrl *ctrl = req->sq->ctrl;
++	struct nvme_id_ctrl_zns *id;
++	u16 status;
++
++	id = kzalloc(sizeof(*id), GFP_KERNEL);
++	if (!id) {
++		status = NVME_SC_INTERNAL;
++		goto out;
++	}
++
++	if (ctrl->ops->get_mdts)
++		id->zasl = min_t(u8, ctrl->ops->get_mdts(ctrl), zasl);
++	else
++		id->zasl = zasl;
++
++	status = nvmet_copy_to_sgl(req, 0, id, sizeof(*id));
++
++	kfree(id);
++out:
++	nvmet_req_complete(req, status);
++}
++
++void nvmet_execute_identify_cns_cs_ns(struct nvmet_req *req)
++{
++	struct nvme_id_ns_zns *id_zns;
++	u16 status = 0;
++	u64 zsze;
++
++	if (le32_to_cpu(req->cmd->identify.nsid) == NVME_NSID_ALL) {
++		req->error_loc = offsetof(struct nvme_identify, nsid);
++		status = NVME_SC_INVALID_NS | NVME_SC_DNR;
++		goto out;
++	}
++
++	id_zns = kzalloc(sizeof(*id_zns), GFP_KERNEL);
++	if (!id_zns) {
++		status = NVME_SC_INTERNAL;
++		goto out;
++	}
++
++	req->ns = nvmet_find_namespace(req->sq->ctrl, req->cmd->identify.nsid);
++	if (!req->ns) {
++		status = NVME_SC_INTERNAL;
++		goto done;
++	}
++
++	if (!bdev_is_zoned(req->ns->bdev)) {
++		req->error_loc = offsetof(struct nvme_identify, nsid);
++		status = NVME_SC_INVALID_NS | NVME_SC_DNR;
++		goto done;
++	}
++
++	nvmet_ns_revalidate(req->ns);
++	zsze = (bdev_zone_sectors(req->ns->bdev) << 9) >>
++					req->ns->blksize_shift;
++	id_zns->lbafe[0].zsze = cpu_to_le64(zsze);
++	id_zns->mor = cpu_to_le32(bdev_max_open_zones(req->ns->bdev));
++	id_zns->mar = cpu_to_le32(bdev_max_active_zones(req->ns->bdev));
++
++done:
++	status = nvmet_copy_to_sgl(req, 0, id_zns, sizeof(*id_zns));
++	kfree(id_zns);
++out:
++	nvmet_req_complete(req, status);
++}
++
++struct nvmet_report_zone_data {
++	struct nvmet_ns *ns;
++	struct nvme_zone_report *rz;
++};
++
++static int nvmet_bdev_report_zone_cb(struct blk_zone *z, unsigned int idx,
++				     void *data)
++{
++	struct nvmet_report_zone_data *report_zone_data = data;
++	struct nvme_zone_descriptor *entries = report_zone_data->rz->entries;
++	struct nvmet_ns *ns = report_zone_data->ns;
++
++	entries[idx].zcap = cpu_to_le64(nvmet_sect_to_lba(ns, z->capacity));
++	entries[idx].zslba = cpu_to_le64(nvmet_sect_to_lba(ns, z->start));
++	entries[idx].wp = cpu_to_le64(nvmet_sect_to_lba(ns, z->wp));
++	entries[idx].za = z->reset ? 1 << 2 : 0;
++	entries[idx].zt = z->type;
++	entries[idx].zs = z->cond << 4;
++
++	return 0;
++}
++
++void nvmet_bdev_execute_zone_mgmt_recv(struct nvmet_req *req)
++{
++	sector_t sect = nvmet_lba_to_sect(req->ns, req->cmd->zmr.slba);
++	u64 bufsize = (le32_to_cpu(req->cmd->zmr.numd) + 1) << 2;
++	struct nvmet_report_zone_data data = { .ns = req->ns };
++	unsigned int nr_zones;
++	int reported_zones;
++	u16 status;
++
++	nr_zones = (bufsize - sizeof(struct nvme_zone_report)) /
++			sizeof(struct nvme_zone_descriptor);
++
++	status = nvmet_bdev_zns_checks(req);
++	if (status)
++		goto out;
++
++	data.rz = __vmalloc(bufsize, GFP_KERNEL | __GFP_NORETRY);
++	if (!data.rz) {
++		status = NVME_SC_INTERNAL;
++		goto out;
++	}
++
++	reported_zones = blkdev_report_zones(req->ns->bdev, sect, nr_zones,
++					     nvmet_bdev_report_zone_cb,
++					     &data);
++	if (reported_zones < 0) {
++		status = NVME_SC_INTERNAL;
++		goto out_free_report_zones;
++	}
++
++	data.rz->nr_zones = cpu_to_le64(reported_zones);
++
++	status = nvmet_copy_to_sgl(req, 0, data.rz, bufsize);
++
++out_free_report_zones:
++	kvfree(data.rz);
++out:
++	nvmet_req_complete(req, status);
++}
++
++void nvmet_bdev_execute_zone_mgmt_send(struct nvmet_req *req)
++{
++	sector_t sect = nvmet_lba_to_sect(req->ns, req->cmd->zms.slba);
++	sector_t nr_sect = bdev_zone_sectors(req->ns->bdev);
++	enum req_opf op = REQ_OP_LAST;
++	u16 status = NVME_SC_SUCCESS;
++	int ret;
++
++	if (req->cmd->zms.select_all)
++		nr_sect = get_capacity(req->ns->bdev->bd_disk);
++
++	switch (req->cmd->zms.zsa) {
++	case NVME_ZONE_OPEN:
++		op = REQ_OP_ZONE_OPEN;
++		break;
++	case NVME_ZONE_CLOSE:
++		op = REQ_OP_ZONE_CLOSE;
++		break;
++	case NVME_ZONE_FINISH:
++		op = REQ_OP_ZONE_FINISH;
++		break;
++	case NVME_ZONE_RESET:
++		op = REQ_OP_ZONE_RESET;
++		break;
++	default:
++		status = NVME_SC_INVALID_FIELD;
++		goto out;
++	}
++
++	ret = blkdev_zone_mgmt(req->ns->bdev, op, sect, nr_sect, GFP_KERNEL);
++	if (ret)
++		status = NVME_SC_INTERNAL;
++out:
++	nvmet_req_complete(req, status);
++}
++
++void nvmet_bdev_execute_zone_append(struct nvmet_req *req)
++{
++	sector_t sect = nvmet_lba_to_sect(req->ns, req->cmd->rw.slba);
++	struct request_queue *q = req->ns->bdev->bd_disk->queue;
++	unsigned int max_sects = queue_max_zone_append_sectors(q);
++	u16 status = NVME_SC_SUCCESS;
++	unsigned int total_len = 0;
++	struct scatterlist *sg;
++	int ret = 0, sg_cnt;
++	struct bio *bio;
++
++	if (!nvmet_check_transfer_len(req, nvmet_rw_data_len(req)))
++		return;
++
++	if (!req->sg_cnt) {
++		nvmet_req_complete(req, 0);
++		return;
++	}
++
++	if (req->transfer_len <= NVMET_MAX_INLINE_DATA_LEN) {
++		bio = &req->b.inline_bio;
++		bio_init(bio, req->inline_bvec, ARRAY_SIZE(req->inline_bvec));
++	} else {
++		bio = bio_alloc(GFP_KERNEL, req->sg_cnt);
++	}
++
++	bio_set_dev(bio, req->ns->bdev);
++	bio->bi_iter.bi_sector = sect;
++	bio->bi_opf = REQ_OP_ZONE_APPEND | REQ_SYNC | REQ_IDLE;
++	if (req->cmd->rw.control & cpu_to_le16(NVME_RW_FUA))
++		bio->bi_opf |= REQ_FUA;
++
++	for_each_sg(req->sg, sg, req->sg_cnt, sg_cnt) {
++		struct page *p = sg_page(sg);
++		unsigned int l = sg->length;
++		unsigned int o = sg->offset;
++		bool same_page = false;
++
++		ret = bio_add_hw_page(q, bio, p, l, o, max_sects, &same_page);
++		if (ret != sg->length) {
++			status = NVME_SC_INTERNAL;
++			goto out_bio_put;
++		}
++		if (same_page)
++			put_page(p);
++
++		total_len += sg->length;
++	}
++
++	if (total_len != nvmet_rw_data_len(req)) {
++		status = NVME_SC_INTERNAL | NVME_SC_DNR;
++		goto out_bio_put;
++	}
++
++	ret = submit_bio_wait(bio);
++	status = ret < 0 ? NVME_SC_INTERNAL : status;
++
++	sect += (total_len >> 9);
++	req->cqe->result.u64 = cpu_to_le64(nvmet_sect_to_lba(req->ns, sect));
++
++out_bio_put:
++	if (bio != &req->b.inline_bio)
++		bio_put(bio);
++	nvmet_req_complete(req, status);
++}
 -- 
 2.22.1
 
