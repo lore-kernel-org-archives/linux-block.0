@@ -2,47 +2,46 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3B4CC2BB48
-	for <linux-block@archiver.kernel.org>; Thu, 10 Dec 2020 16:00:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB6A9C433FE
+	for <linux-block@archiver.kernel.org>; Thu, 10 Dec 2020 16:35:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 654D123E25
-	for <linux-block@archiver.kernel.org>; Thu, 10 Dec 2020 16:00:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7817C23158
+	for <linux-block@archiver.kernel.org>; Thu, 10 Dec 2020 16:35:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2403864AbgLJQAM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Dec 2020 11:00:12 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:45564 "EHLO
+        id S1726090AbgLJQe7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Dec 2020 11:34:59 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:50333 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2403855AbgLJQAE (ORCPT
+        by vger.kernel.org with ESMTP id S2392355AbgLJQd5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Dec 2020 11:00:04 -0500
+        Thu, 10 Dec 2020 11:33:57 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607615917;
+        s=mimecast20190719; t=1607617950;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=xKjSMYSu+Z18egYl0Qu1TrUiaOZoWdBxJJgAeszoW0s=;
-        b=Q4/KIDHt4HEZsEV6aPQX1FZdUgcig8GLdSBuhhyN1FS07+ZVZKZgtq4ynBMqZVXFqS0mNU
-        68xZGINwlBknKpr+vJXHS2mS9JEPqv4H4hbH4NmipN30fieRxQ7MHTx0pVARDko6N5gN0o
-        IcU6aYKyHR228eMgU8gTtRYhJL7MYWg=
+        bh=QiBV/qdNapjkek/zOOgwmTitg3XQXA/twwALzu0loV8=;
+        b=L6vL4lz4dcHrW/3QOWOjG7o9LwjbIwL1djMcGrDzv8IXZn3+pHAGqisC9QHnubcfPoLV48
+        NdxtfZaswfoey8aAHY4j9La01ejm2nONUtb7OO3jQGSTbccVtADlB/lhw8GzGJk7W+VY9M
+        y2QptkOBUpPJM1kQDj59pHRNzZu90HI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-436-XJ-9TNLrOFOCL9NKwKRRTA-1; Thu, 10 Dec 2020 10:58:32 -0500
-X-MC-Unique: XJ-9TNLrOFOCL9NKwKRRTA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-426-CR9e77AwPGqM5Kxml6At0Q-1; Thu, 10 Dec 2020 11:32:28 -0500
+X-MC-Unique: CR9e77AwPGqM5Kxml6At0Q-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 083758049C9;
-        Thu, 10 Dec 2020 15:58:31 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B535E1966320;
+        Thu, 10 Dec 2020 16:32:26 +0000 (UTC)
 Received: from localhost (unknown [10.18.25.174])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2D19419C78;
-        Thu, 10 Dec 2020 15:58:27 +0000 (UTC)
-Date:   Thu, 10 Dec 2020 10:58:26 -0500
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 13CB25D6D3;
+        Thu, 10 Dec 2020 16:32:23 +0000 (UTC)
+Date:   Thu, 10 Dec 2020 11:32:22 -0500
 From:   Mike Snitzer <snitzer@redhat.com>
 To:     Sergei Shtepa <sergei.shtepa@veeam.com>
 Cc:     "axboe@kernel.dk" <axboe@kernel.dk>,
@@ -55,220 +54,151 @@ Cc:     "axboe@kernel.dk" <axboe@kernel.dk>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         Pavel Tide <Pavel.TIde@veeam.com>
-Subject: Re: [PATCH 2/3] block: blk_interposer - sample
-Message-ID: <20201210155826.GA10154@redhat.com>
+Subject: Re: [PATCH 0/3] block: blk_interposer - Block Layer Interposer
+Message-ID: <20201210163222.GB10239@redhat.com>
 References: <1607518911-30692-1-git-send-email-sergei.shtepa@veeam.com>
- <1607518911-30692-3-git-send-email-sergei.shtepa@veeam.com>
- <20201209143606.GA494@redhat.com>
- <20201210155405.GB31521@veeam.com>
+ <20201209135148.GA32720@redhat.com>
+ <20201210145814.GA31521@veeam.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201210155405.GB31521@veeam.com>
+In-Reply-To: <20201210145814.GA31521@veeam.com>
 User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Dec 10 2020 at 10:54am -0500,
+On Thu, Dec 10 2020 at  9:58am -0500,
 Sergei Shtepa <sergei.shtepa@veeam.com> wrote:
 
-> The 12/09/2020 17:36, Mike Snitzer wrote:
+> The 12/09/2020 16:51, Mike Snitzer wrote:
 > > On Wed, Dec 09 2020 at  8:01am -0500,
 > > Sergei Shtepa <sergei.shtepa@veeam.com> wrote:
 > > 
-> > > This sample demonstrates how to use blk_interposer.
-> > > It show how to properly connect the interposer module to kernel,
-> > > and perform the simplest monitoring of the number of bio.
+> > > Hi all.
 > > > 
-> > > Signed-off-by: Sergei Shtepa <sergei.shtepa@veeam.com>
-> > > ---
-> > >  samples/blk_interposer/Makefile         |   2 +
-> > >  samples/blk_interposer/blk-interposer.c | 276 ++++++++++++++++++++++++
-> > >  2 files changed, 278 insertions(+)
-> > >  create mode 100644 samples/blk_interposer/Makefile
-> > >  create mode 100644 samples/blk_interposer/blk-interposer.c
+> > > I try to suggest the Block Layer Interposer (blk_interposer) again.
+> > > It`s allows to intercept bio requests, remap bio to another devices
+> > > or add new bios.
 > > > 
-> > > diff --git a/samples/blk_interposer/Makefile b/samples/blk_interposer/Makefile
-> > > new file mode 100644
-> > > index 000000000000..b11aefde2b1c
-> > > --- /dev/null
-> > > +++ b/samples/blk_interposer/Makefile
-> > > @@ -0,0 +1,2 @@
-> > > +# SPDX-License-Identifier: GPL-2.0
-> > > +obj-$(CONFIG_SAMPLE_BLK_INTERPOSER) += blk-interposer.o
-> > > diff --git a/samples/blk_interposer/blk-interposer.c b/samples/blk_interposer/blk-interposer.c
-> > > new file mode 100644
-> > > index 000000000000..92b4c1fcf8f7
-> > > --- /dev/null
-> > > +++ b/samples/blk_interposer/blk-interposer.c
-> > > @@ -0,0 +1,276 @@
-> > > +// SPDX-License-Identifier: GPL-2.0
-> > > +
-> > > +/*
-> > > + * Block layer interposer allow to interpose bio requests from kernel module.
-> > > + * This allows you to monitor requests, modify requests, add new request,
-> > > + * or even redirect requests to another devices.
-> > > + *
-> > > + * This sample demonstrates how to use blk_interposer.
-> > > + * It show how to properly connect the interposer module to kernel,
-> > > + * and perform the simplest monitoring of the number of bio.
-> > > + */
-> > > +
-> > > +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-> > > +
-> > > +#include <linux/module.h>
-> > > +#include <linux/types.h>
-> > > +#include <linux/errno.h>
-> > > +#include <linux/blkdev.h>
-> > > +#include <linux/genhd.h>
-> > > +#include <linux/blk-mq.h>
-> > > +
-> > > +int device_major = 8;
-> > > +int device_minor;
-> > > +int fmode = FMODE_READ | FMODE_WRITE;
-> > > +
-> > > +/*
-> > > + * Each interposer must have a common part in the form of the blk_interposer structure,
-> > > + * as well as its own unique data.
-> > > + */
-> > > +struct my_interposer {
-> > > +	/*
-> > > +	 * Common part of block device interposer.
-> > > +	 */
-> > > +	struct blk_interposer interposer;
-> > > +	/*
-> > > +	 * Specific part for our interposer data.
-> > > +	 */
-> > > +	atomic_t counter;
-> > > +};
-> > > +
-> > > +struct my_interposer my_ip;
-> > > +
-> > > +/**
-> > > + * blk_interposer_attach - Attach interposer to disk
-> > > + * @disk: target disk
-> > > + * @interposer: block device interposer
-> > > + */
-> > > +static int blk_interposer_attach(struct gendisk *disk, struct blk_interposer *interposer)
-> > > +{
-> > > +	int ret = 0;
-> > > +
-> > > +	/*
-> > > +	 * Stop disks queue processing.
-> > > +	 */
-> > > +	blk_mq_freeze_queue(disk->queue);
-> > > +	blk_mq_quiesce_queue(disk->queue);
-> > > +
-> > > +	/*
-> > > +	 * Check if the interposer is already busy.
-> > > +	 * The interposer will only connect if it is not busy.
-> > > +	 */
-> > > +	if (blk_has_interposer(disk)) {
-> > > +		pr_info("The interposer is already busy.\n");
-> > > +		ret = -EBUSY;
-> > > +		goto out;
-> > > +	}
-> > > +
-> > > +	/*
-> > > +	 * Attach the interposer.
-> > > +	 */
-> > > +	disk->interposer = interposer;
-> > > +	/*
-> > > +	 * And while the queue is stopped, we can do something specific for our module.
-> > > +	 */
-> > > +	pr_info("Block device interposer attached successfully.\n");
-> > > +
-> > > +out:
-> > > +	/*
-> > > +	 * Resume disks queue processing
-> > > +	 */
-> > > +	blk_mq_unquiesce_queue(disk->queue);
-> > > +	blk_mq_unfreeze_queue(disk->queue);
-> > > +
-> > > +	return ret;
-> > > +}
-> > > +
-> > > +/**
-> > > + * blk_interposer_detach - Detach interposer from disk
-> > > + * @disk: target disk
-> > > + * @interposer: block device interposer
-> > > + */
-> > > +static int blk_interposer_detach(struct gendisk *disk, struct blk_interposer *interposer)
-> > > +{
-> > > +	int ret = 0;
-> > > +
-> > > +	if (WARN_ON(!disk))
-> > > +		return -EINVAL;
-> > > +
-> > > +	/*
-> > > +	 * Stop disks queue processing.
-> > > +	 */
-> > > +	blk_mq_freeze_queue(disk->queue);
-> > > +	blk_mq_quiesce_queue(disk->queue);
-> > > +
-> > > +	/*
-> > > +	 * Check if the interposer is still available.
-> > > +	 */
-> > > +	if (!disk->interposer) {
-> > > +		pr_info("The interposer is not available.\n");
-> > > +		return -ENOENT;
-> > > +		goto out;
-> > > +	}
-> > > +	/*
-> > > +	 * Check if it is really our interposer.
-> > > +	 */
-> > > +	if (disk->interposer->ip_submit_bio != interposer->ip_submit_bio) {
-> > > +		pr_info("The interposer found is not ours.\n");
-> > > +		return -EPERM;
-> > > +		goto out;
-> > > +	}
-> > > +
-> > > +	/*
-> > > +	 * Detach interposer.
-> > > +	 */
-> > > +	disk->interposer = NULL;
-> > > +	/*
-> > > +	 * And while the queue is stopped, we can do something specific for our module.
-> > > +	 */
-> > > +	pr_info("Block device interposer detached successfully.\n");
-> > > +
-> > > +out:
-> > > +	/*
-> > > +	 * Resume disks queue processing.
-> > > +	 */
-> > > +	blk_mq_unquiesce_queue(disk->queue);
-> > > +	blk_mq_unfreeze_queue(disk->queue);
-> > > +
-> > > +	return ret;
-> > > +}
+> > > Initially, blk_interposer was designed to be compatible with
+> > > device mapper. Our (my and Hannes) previous attempt to offer
+> > > blk_interposer integrated with device mapper did not receive
+> > > any comments from the dm-devel team, and without their help
+> > > I will not be able to make a full implementation. I hope later
+> > > they will have time to support blk_interposer in device mapper.
 > > 
-> > This attach and detach code needs to be elevated out of samples so that
-> > any future consumer of blk_interposer doesn't reinvent it.  It is far
-> > too fundamental.
-> > 
-> > The way you've proposed this be merged is very much unacceptable.
-> > 
-> > Nacked-by: Mike Snitzer <snitzer@redhat.com>
-> > 
-> Yes, but on the other hand, while the queue is suspended, the module can perform
-> some other actions specific to it.
+> > Excuse me?  I gave you quite a bit of early feedback!  I then went on
+> > PTO for ~10 days, when I returned last week I had to deal with fixing
+> > some 5.10 dm/block bio splitting regressions that only got resolved this
+> > past Saturday in time for 5.10-rc7.
 > 
-> And since the functions blk_mq_freeze_queue(), blk_mq_quiesce_queue(),
-> blk_mq_unquiesce_queue() and blk_mq_unfreeze_queue() are public,
-> the module creator can implement its module connection functionality regardless of
-> whether we make the functions blk_interposer_attach() and blk_interposer_detach()
-> in the kernel or not.
+> Mike,
 > 
-> I'll think about it and try to come up with a better solution.
+> I would like to clarify some points that I've made, and also try 
+> to repair the damage from the misunderstandings that I think have occured.
+> 
+> First of all, I actually meant the feedback on Hannes's patch which was
+> sent on the 19th of November:
+> https://lore.kernel.org/linux-block/20201119164924.74401-1-hare@suse.de/
+> 
+> Your feedback from the 18th of November ("[PATCH 4/4] dm_interposer - 
+> Try to use blk_interpose in dm") is very valuable, but I am not sure that
+> I am currently capable of implementing the proposed DM changes.
+> The overall architecture of DM is still not clear to me, and I am studying
+> it right now.
+> 
+> This new patch (the one that Hannes sent on the 19th of November) is also
+> compatibile with DM and should not pose any problems - the architecture is
+> the same. There are some changes that make blk_interposer simpler and better,
+> plus the sample is added.
+> 
+> > 
+> > blk_interposer was/is on my short list to review closer (Hannes' version
+> > that refined yours a bit more).. primarily to see if I could avoid the
+> > extra clone and endio hooking.
+> 
+> Glad to hear that! In order to avoid the additional copying one can only
+> change an intercepted bio, which might be dangerous.
+> 
+> > 
+> > The development window for 5.11 is past, so you pushing this without
+> > using the approach discussed (in terms of DM) doesn't help your cause.
+> > 
+> > > And my blk-snap module requires an architecture change to
+> > > support blk_interposer.
+> > > 
+> > > This time I offer it along with a sample.
+> > > Despite the fact that blk_interposer is quite simple,
+> > > there are a few non-obvious points that I would like to clarify.
+> > > 
+> > > However, I suggest the blk_interposer now so that people
+> > > could discuss it and use it in their projects as soon as possible.
+> > 
+> > So you weren't willing to put the work in on something DM oriented
+> > because you expected me to do the work for you?  And now you're looking
+> > to side-step the consensus that was built because I didn't contribute
+> > quick enough?  That's pretty messed up.
+> 
+> I just think that no one can implement integration of DM with
+> blk_interposer better than dm-devel team. I will certainly try my best,
+> but I am afraid that such efforts will only produce incongruous
+> DM patches that will be a waste of time (yours and mine).
+> 
+> > 
+> > In the time-scale that is Linux kernel development.. you've really
+> > jumped the gun and undercut my enthusiasm to work through the details.
+> > I'd rather not read into your actions more than I already have here, but
+> > I'm not liking what you've done here.  Kind of left in dismay with how
+> > you decided to go down this path without a followup note to me or others
+> > (that I'm aware of).
+> 
+> I am very sorry that I undercut your enthusiasm, but, as you rightly
+> pointed out, another development windows is closing, and my product
+> is still not able to work on newer Linux versions starting from 5.8.
+> That fact makes me particularly sad and forces me to search for different
+> means to draw some attention to blk_interposer. I've seen an RHEL 8.4
+> alpha recently, all looks very cool there but made me even more sad ...
 
-This practice of sprinkling code in samples/ subdir and getting a
-minimalist hook into the kernel (with no actual in-kernel consumer) is
-_not_ how we do things.
+Made you more sad because you don't have a working solution for upstream
+or RHEL 8.4?
 
-I'm not well-versed on the samples/ subdir nor when it came into
-existence; but it should die in a fire!
+I may have missed it in your past emails but how were you able to
+provide blk-snap support for kernels prior to 5.8?
+
+> Also I certainly remember a separate email that was sent to you on the
+> 7th of December. Maybe it should have been written in the already
+> existing thread instead.
+
+I don't see any mail from you on Dec 7... please bounce it to me if it
+was in private, or please point to the relevant list archive.
+
+> > 
+> > But I'm still willing to make blk_interposer work as we all discussed
+> > (in terms of DM).
+> 
+> I want it too. However, there is a certain difficulty with usage of DM
+> for backup copying. For instance, there is no changed block tracking (CBT)
+> and right now I don't have any clue how it could be implemented
+> considering the existing architecture. I still hope that sometime
+> in future I could be offer my blk-snap module which was specifically
+> created for backup copying purposes.
+> 
+> I apologize for causing all that confusion and mess and making you upset.
+> I hope that all of the above makes sense to you and you will not think
+> that I was slacking and tried to offload all the work to your team.
+
+My primary concern is that blk_interposer be correct from the start.  To
+validate its correctness it needs to be fully implemented and vetted in
+terms on upstream Linux kernel code.  DM can easily serve as the primary
+upstream consumer until if/when your blk-snap module is proposed for
+upstream inclusion.
+
+But short of having an actual upstream consumer of blk_interposer (not
+just samples/ code) it cannot go upstream.  Otherwise there are too many
+risks of misuse and problems in the longrun.  That and it'd be baggage
+block core would need to carry for no upstream Linux benefit.
 
 Mike
 
