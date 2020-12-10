@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F9DCC433FE
-	for <linux-block@archiver.kernel.org>; Thu, 10 Dec 2020 10:19:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09783C4361B
+	for <linux-block@archiver.kernel.org>; Thu, 10 Dec 2020 10:19:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 129C323B31
-	for <linux-block@archiver.kernel.org>; Thu, 10 Dec 2020 10:19:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B097123AC4
+	for <linux-block@archiver.kernel.org>; Thu, 10 Dec 2020 10:19:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727278AbgLJKTu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Dec 2020 05:19:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50300 "EHLO
+        id S1727647AbgLJKT4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Dec 2020 05:19:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50308 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726627AbgLJKTu (ORCPT
+        with ESMTP id S1726627AbgLJKTz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Dec 2020 05:19:50 -0500
-Received: from mail-ed1-x542.google.com (mail-ed1-x542.google.com [IPv6:2a00:1450:4864:20::542])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13A8EC0617B0
-        for <linux-block@vger.kernel.org>; Thu, 10 Dec 2020 02:18:35 -0800 (PST)
-Received: by mail-ed1-x542.google.com with SMTP id u19so4894619edx.2
-        for <linux-block@vger.kernel.org>; Thu, 10 Dec 2020 02:18:35 -0800 (PST)
+        Thu, 10 Dec 2020 05:19:55 -0500
+Received: from mail-ej1-x644.google.com (mail-ej1-x644.google.com [IPv6:2a00:1450:4864:20::644])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14004C06138C
+        for <linux-block@vger.kernel.org>; Thu, 10 Dec 2020 02:18:36 -0800 (PST)
+Received: by mail-ej1-x644.google.com with SMTP id lt17so6560408ejb.3
+        for <linux-block@vger.kernel.org>; Thu, 10 Dec 2020 02:18:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=cloud.ionos.com; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=Bm9btep6i8GK5bKs9FjOPCUMFqxmQLPOMRIVlCFPe9o=;
-        b=YlnxBXmBjWSXI9PxpvSUqrZQ/8Ld/UcuXEJuprM5xdjVPyTI7rM+YPsbI4OfwkVqoU
-         nEiMsU352SE/lIG0Q4a64MXXnrCdLg/3PZdfjPLlJrkP5iTkal+JlVpT978uQ8YZsBzw
-         ry48ElFloz1R4WAhz8fLfTh4qZWgO9lpeAfPNdWw7Y5ll03psrHvlwe/JBP0IAGxwHct
-         o2sVjZ39+pmrdZL0jxF011ym+VImgFlEiwD6liG8pB6uXt9YwJG/LBcs8RqdQ/eSf+qe
-         qWB/JqiFXyDOAEPnpD5yf404nPkm5njSE1W3FSrF+6tHehJNiZE3zwvwngpaIjBMdax+
-         sQ6A==
+        bh=Knp0gAEhpnBnofpihCTn4KOe6yD4tuQQlDjccaInD6E=;
+        b=BMz53dqpO38dB+5KPM6lYgaLtlBENivLclTqhYfZGPVwcAXjWpSPhLRoQDbUTiFipM
+         KPWjtKPZZrfRi7sM7OsPRCSGJGTOwdQK2JT10p2T0ZU/dQgTq5iSInm+FHcTspf2DmZ/
+         6dUWGuB6hR/b5fZro+7TDgDTMOqo2p6wPxbCxSbznP45u7k5kKkUgHwNTzq7usNQeyao
+         S7hJG5tRdo+xIkkvu0a0Jn7t33DcJPv5o2SOFH+3LOSr7+8TwaF9vcY9HOlKtBrXfO5Z
+         BhLtBjwnzMTkrS+ukLSR+9YMukPpYlgwDwD5q/LjobpC+dEReG9C52h+0GdmhXdpuZiI
+         /TXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=Bm9btep6i8GK5bKs9FjOPCUMFqxmQLPOMRIVlCFPe9o=;
-        b=UkZYjpHEs7WJx0i7W7Z+2RIYSHPcfRpP8Row3lAYS1jrtY+hF238kGCyu5AYCEDxxR
-         sVR4/43E9X8jXvf7EHZS3PY2ugpFn9awQsWS0NfgxCXWEueQVvTvHuj+z0+cGEA57IOg
-         aEfwBjVAFvUHgi21dQct7R52i+ZOo/4PTo0ziKm3Gulr8TUtKvqvcxbXEMCcap5gRCuJ
-         5Bvdv5OQYV9UEC0DMtgMRdGNepqVU3hl26QrtSlwgOgiyJODnRCKPJU3yfK1QQRKSoE7
-         1RkTqZnIbXBrrUmsP2k5KvNLHqRcwjB3J6YbfuHyU4WE6kLn2ao5ek+lPHzcrLYZ25nx
-         1R8w==
-X-Gm-Message-State: AOAM532xMw0ZJ4LjYeNuxYnKeJ3aZB1GQDwulQPdnv1AXBMzBdsgQdhv
-        MDOL0iteEY58SJfUaeVzXVnBKH732xyM0g==
-X-Google-Smtp-Source: ABdhPJx2YPezy5skx+0OHuZBWAnSgxNuGFMOEMLkPMvt9ArAMjt6NYWcpQNFOr9BCSBHfegzTH1Hnw==
-X-Received: by 2002:aa7:d915:: with SMTP id a21mr5939940edr.251.1607595513623;
-        Thu, 10 Dec 2020 02:18:33 -0800 (PST)
+        bh=Knp0gAEhpnBnofpihCTn4KOe6yD4tuQQlDjccaInD6E=;
+        b=SXcZrC0G/w1FWyh6Qj6ARmVtCT7nNrpk6MNwBC3wazfgZWlHkUcxejBdghibmWb3Iv
+         qc9zjSwXBEHe5ZvNwM/9X1owv0yZwN0801z//gh1JwNI8OAmq2bDmcjP4KcQ4eIdvxZ/
+         LKqHWeB0IfCBDJi/fnUzB4IcVeNyt3QoomeTOB2V9HOJlpnSweC4dwlv/OdElpako0xU
+         C9BgyFviEJ5hBRNIeEm0zu75xKdtS69osQijk1LjBqJ6mxghArppRl0nnMt90D0UZw2b
+         /j/TVllL+XENbVEd4tw/2c4cqEHaiAR2q5zhMImNJs1QXcjPgvyZbAkHKpN6PICTofzM
+         mkag==
+X-Gm-Message-State: AOAM53297vIzTX8dBo1pEpuAC2G+4l5LG2OOsv8A4Zl9YJMPW6Xv5X0a
+        zYNtnO7Q8TD3Xv5OAfb6ifrcrS4GFy0jxA==
+X-Google-Smtp-Source: ABdhPJz/1eKp2m2h0bsPcUIH2SrwJy9HCOGsp3mzgR0BIGdg2xrgA9L9xcwq461gJDxI30ckwrit5w==
+X-Received: by 2002:a17:906:369b:: with SMTP id a27mr5909682ejc.183.1607595514616;
+        Thu, 10 Dec 2020 02:18:34 -0800 (PST)
 Received: from jwang-Latitude-5491.fkb.profitbricks.net ([2001:16b8:4938:300:58f0:963a:32b2:ff05])
-        by smtp.gmail.com with ESMTPSA id s24sm3955878ejb.20.2020.12.10.02.18.32
+        by smtp.gmail.com with ESMTPSA id s24sm3955878ejb.20.2020.12.10.02.18.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Dec 2020 02:18:33 -0800 (PST)
+        Thu, 10 Dec 2020 02:18:34 -0800 (PST)
 From:   Jack Wang <jinpu.wang@cloud.ionos.com>
 To:     linux-block@vger.kernel.org
 Cc:     axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
         bvanassche@acm.org, danil.kipnis@cloud.ionos.com,
         Gioh Kim <gi-oh.kim@cloud.ionos.com>
-Subject: [PATCHv2 for-next 6/7] block/rnbd-clt: Dynamically allocate sglist for rnbd_iu
-Date:   Thu, 10 Dec 2020 11:18:25 +0100
-Message-Id: <20201210101826.29656-7-jinpu.wang@cloud.ionos.com>
+Subject: [PATCHv2 for-next 7/7] block/rnbd-clt: Does not request pdu to rtrs-clt
+Date:   Thu, 10 Dec 2020 11:18:26 +0100
+Message-Id: <20201210101826.29656-8-jinpu.wang@cloud.ionos.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20201210101826.29656-1-jinpu.wang@cloud.ionos.com>
 References: <20201210101826.29656-1-jinpu.wang@cloud.ionos.com>
@@ -75,241 +75,112 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Gioh Kim <gi-oh.kim@cloud.ionos.com>
 
-The BMAX_SEGMENT static array for scatterlist is embedded in
-rnbd_iu structure to avoid memory allocation in hot IO path.
-In many cases, we do need only several sg entries because many IOs
-have only several segments.
+Previously the rnbd client requested the rtrs to allocate rnbd_iu
+just after the rtrs_iu. So the rnbd client passes the size of
+rnbd_iu for rtrs_clt_open() and rtrs creates an array of
+rnbd_iu and rtrs_iu.
 
-This patch change rnbd_iu to check the number of segments in the request
-and allocate sglist dynamically.
+For IO handling, rnbd_iu exists after the request because we pass
+the size of rnbd_iu when setting the tag-set. Therefore we do not
+use the rnbd_iu allocated by rtrs for IO handling.
+We only use the rnbd_iu allocated by rtrs when doing session
+initialization. Almost all rnbd_iu allocated by rtrs are wasted.
 
-For io path, use sg_alloc_table_chained to allocate sg list faster.
+By this patch the rnbd client does not request rnbd_iu allocation
+to rtrs but allocate it for itself when doing session initialization.
 
-First it makes two sg entries after pdu of request.
-The sg_alloc_table_chained uses the pre-allocated sg entries
-if the number of segments of the request is less than two.
-So it reduces the number of memory allocation.
+Also remove unused rtrs_permit_to_pdu from rtrs.
 
 Signed-off-by: Gioh Kim <gi-oh.kim@cloud.ionos.com>
 Signed-off-by: Jack Wang <jinpu.wang@cloud.ionos.com>
 ---
- drivers/block/rnbd/rnbd-clt.c | 60 ++++++++++++++++++++---------------
- drivers/block/rnbd/rnbd-clt.h | 10 +++++-
- 2 files changed, 43 insertions(+), 27 deletions(-)
+ drivers/block/rnbd/rnbd-clt.c          | 17 +++++++++++++----
+ drivers/infiniband/ulp/rtrs/rtrs-clt.c |  6 ------
+ drivers/infiniband/ulp/rtrs/rtrs.h     |  7 -------
+ 3 files changed, 13 insertions(+), 17 deletions(-)
 
 diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.c
-index b5fffbdeb263..5941ff7c83a8 100644
+index 5941ff7c83a8..96e3f9fe8241 100644
 --- a/drivers/block/rnbd/rnbd-clt.c
 +++ b/drivers/block/rnbd/rnbd-clt.c
-@@ -384,6 +384,7 @@ static void rnbd_softirq_done_fn(struct request *rq)
+@@ -349,12 +349,19 @@ static struct rnbd_iu *rnbd_get_iu(struct rnbd_clt_session *sess,
  	struct rnbd_iu *iu;
+ 	struct rtrs_permit *permit;
  
- 	iu = blk_mq_rq_to_pdu(rq);
-+	sg_free_table_chained(&iu->sgt, RNBD_INLINE_SG_CNT);
- 	rnbd_put_permit(sess, iu->permit);
- 	blk_mq_end_request(rq, errno_to_blk_status(iu->errno));
- }
-@@ -477,7 +478,7 @@ static int send_msg_close(struct rnbd_clt_dev *dev, u32 device_id, bool wait)
- 	iu->buf = NULL;
- 	iu->dev = dev;
- 
--	sg_mark_end(&iu->sglist[0]);
-+	sg_alloc_table(&iu->sgt, 1, GFP_KERNEL);
- 
- 	msg.hdr.type	= cpu_to_le16(RNBD_MSG_CLOSE);
- 	msg.device_id	= cpu_to_le32(device_id);
-@@ -492,6 +493,7 @@ static int send_msg_close(struct rnbd_clt_dev *dev, u32 device_id, bool wait)
- 		err = errno;
- 	}
- 
-+	sg_free_table(&iu->sgt);
- 	rnbd_put_iu(sess, iu);
- 	return err;
- }
-@@ -564,7 +566,8 @@ static int send_msg_open(struct rnbd_clt_dev *dev, bool wait)
- 	iu->buf = rsp;
- 	iu->dev = dev;
- 
--	sg_init_one(iu->sglist, rsp, sizeof(*rsp));
-+	sg_alloc_table(&iu->sgt, 1, GFP_KERNEL);
-+	sg_init_one(iu->sgt.sgl, rsp, sizeof(*rsp));
- 
- 	msg.hdr.type	= cpu_to_le16(RNBD_MSG_OPEN);
- 	msg.access_mode	= dev->access_mode;
-@@ -572,7 +575,7 @@ static int send_msg_open(struct rnbd_clt_dev *dev, bool wait)
- 
- 	WARN_ON(!rnbd_clt_get_dev(dev));
- 	err = send_usr_msg(sess->rtrs, READ, iu,
--			   &vec, sizeof(*rsp), iu->sglist, 1,
-+			   &vec, sizeof(*rsp), iu->sgt.sgl, 1,
- 			   msg_open_conf, &errno, wait);
- 	if (err) {
- 		rnbd_clt_put_dev(dev);
-@@ -582,6 +585,7 @@ static int send_msg_open(struct rnbd_clt_dev *dev, bool wait)
- 		err = errno;
- 	}
- 
-+	sg_free_table(&iu->sgt);
- 	rnbd_put_iu(sess, iu);
- 	return err;
- }
-@@ -610,7 +614,8 @@ static int send_msg_sess_info(struct rnbd_clt_session *sess, bool wait)
- 	iu->buf = rsp;
- 	iu->sess = sess;
- 
--	sg_init_one(iu->sglist, rsp, sizeof(*rsp));
-+	sg_alloc_table(&iu->sgt, 1, GFP_KERNEL);
-+	sg_init_one(iu->sgt.sgl, rsp, sizeof(*rsp));
- 
- 	msg.hdr.type = cpu_to_le16(RNBD_MSG_SESS_INFO);
- 	msg.ver      = RNBD_PROTO_VER_MAJOR;
-@@ -626,7 +631,7 @@ static int send_msg_sess_info(struct rnbd_clt_session *sess, bool wait)
- 		goto put_iu;
- 	}
- 	err = send_usr_msg(sess->rtrs, READ, iu,
--			   &vec, sizeof(*rsp), iu->sglist, 1,
-+			   &vec, sizeof(*rsp), iu->sgt.sgl, 1,
- 			   msg_sess_info_conf, &errno, wait);
- 	if (err) {
- 		rnbd_clt_put_sess(sess);
-@@ -636,7 +641,7 @@ static int send_msg_sess_info(struct rnbd_clt_session *sess, bool wait)
- 	} else {
- 		err = errno;
- 	}
--
-+	sg_free_table(&iu->sgt);
- 	rnbd_put_iu(sess, iu);
- 	return err;
- }
-@@ -1016,11 +1021,10 @@ static int rnbd_client_xfer_request(struct rnbd_clt_dev *dev,
- 	 * See queue limits.
- 	 */
- 	if (req_op(rq) != REQ_OP_DISCARD)
--		sg_cnt = blk_rq_map_sg(dev->queue, rq, iu->sglist);
-+		sg_cnt = blk_rq_map_sg(dev->queue, rq, iu->sgt.sgl);
- 
- 	if (sg_cnt == 0)
--		/* Do not forget to mark the end */
--		sg_mark_end(&iu->sglist[0]);
-+		sg_mark_end(&iu->sgt.sgl[0]);
- 
- 	msg.hdr.type	= cpu_to_le16(RNBD_MSG_IO);
- 	msg.device_id	= cpu_to_le32(dev->device_id);
-@@ -1029,13 +1033,13 @@ static int rnbd_client_xfer_request(struct rnbd_clt_dev *dev,
- 		.iov_base = &msg,
- 		.iov_len  = sizeof(msg)
- 	};
--	size = rnbd_clt_get_sg_size(iu->sglist, sg_cnt);
-+	size = rnbd_clt_get_sg_size(iu->sgt.sgl, sg_cnt);
- 	req_ops = (struct rtrs_clt_req_ops) {
- 		.priv = iu,
- 		.conf_fn = msg_io_conf,
- 	};
- 	err = rtrs_clt_request(rq_data_dir(rq), &req_ops, rtrs, permit,
--			       &vec, 1, size, iu->sglist, sg_cnt);
-+			       &vec, 1, size, iu->sgt.sgl, sg_cnt);
- 	if (unlikely(err)) {
- 		rnbd_clt_err_rl(dev, "RTRS failed to transfer IO, err: %d\n",
- 				 err);
-@@ -1122,6 +1126,7 @@ static blk_status_t rnbd_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	struct rnbd_clt_dev *dev = rq->rq_disk->private_data;
- 	struct rnbd_iu *iu = blk_mq_rq_to_pdu(rq);
- 	int err;
-+	blk_status_t ret = BLK_STS_IOERR;
- 
- 	if (unlikely(dev->dev_state != DEV_STATE_MAPPED))
- 		return BLK_STS_IOERR;
-@@ -1133,32 +1138,35 @@ static blk_status_t rnbd_queue_rq(struct blk_mq_hw_ctx *hctx,
- 		return BLK_STS_RESOURCE;
- 	}
- 
-+	iu->sgt.sgl = iu->first_sgl;
-+	err = sg_alloc_table_chained(&iu->sgt,
-+				     /* Even-if the request has no segment,
-+				      * sglist must have one entry at least */
-+				     blk_rq_nr_phys_segments(rq) ? : 1,
-+				     iu->sgt.sgl,
-+				     RNBD_INLINE_SG_CNT);
-+	if (err) {
-+		rnbd_clt_err_rl(dev, "sg_alloc_table_chained ret=%d\n", err);
-+		rnbd_clt_dev_kick_mq_queue(dev, hctx, 10/*ms*/);
-+		rnbd_put_permit(dev->sess, iu->permit);
-+		return BLK_STS_RESOURCE;
++	iu = kzalloc(sizeof(*iu), GFP_KERNEL);
++	if (!iu) {
++		return NULL;
 +	}
 +
- 	blk_mq_start_request(rq);
- 	err = rnbd_client_xfer_request(dev, rq, iu);
- 	if (likely(err == 0))
- 		return BLK_STS_OK;
- 	if (unlikely(err == -EAGAIN || err == -ENOMEM)) {
- 		rnbd_clt_dev_kick_mq_queue(dev, hctx, 10/*ms*/);
--		rnbd_put_permit(dev->sess, iu->permit);
--		return BLK_STS_RESOURCE;
-+		ret = BLK_STS_RESOURCE;
- 	}
--
-+	sg_free_table_chained(&iu->sgt, RNBD_INLINE_SG_CNT);
- 	rnbd_put_permit(dev->sess, iu->permit);
--	return BLK_STS_IOERR;
--}
--
--static int rnbd_init_request(struct blk_mq_tag_set *set, struct request *rq,
--			      unsigned int hctx_idx, unsigned int numa_node)
--{
--	struct rnbd_iu *iu = blk_mq_rq_to_pdu(rq);
--
--	sg_init_table(iu->sglist, BMAX_SEGMENTS);
--	return 0;
-+	return ret;
+ 	permit = rnbd_get_permit(sess, con_type,
+ 				  wait ? RTRS_PERMIT_WAIT :
+ 				  RTRS_PERMIT_NOWAIT);
+-	if (unlikely(!permit))
++	if (unlikely(!permit)) {
++		kfree(iu);
+ 		return NULL;
+-	iu = rtrs_permit_to_pdu(permit);
++	}
++
+ 	iu->permit = permit;
+ 	/*
+ 	 * 1st reference is dropped after finishing sending a "user" message,
+@@ -373,8 +380,10 @@ static struct rnbd_iu *rnbd_get_iu(struct rnbd_clt_session *sess,
+ 
+ static void rnbd_put_iu(struct rnbd_clt_session *sess, struct rnbd_iu *iu)
+ {
+-	if (atomic_dec_and_test(&iu->refcount))
++	if (atomic_dec_and_test(&iu->refcount)) {
+ 		rnbd_put_permit(sess, iu->permit);
++		kfree(iu);
++	}
  }
  
- static struct blk_mq_ops rnbd_mq_ops = {
- 	.queue_rq	= rnbd_queue_rq,
--	.init_request	= rnbd_init_request,
- 	.complete	= rnbd_softirq_done_fn,
- };
+ static void rnbd_softirq_done_fn(struct request *rq)
+@@ -1218,7 +1227,7 @@ find_and_get_or_create_sess(const char *sessname,
+ 	 */
+ 	sess->rtrs = rtrs_clt_open(&rtrs_ops, sessname,
+ 				   paths, path_cnt, port_nr,
+-				   sizeof(struct rnbd_iu),
++				   0, /* Do not use pdu of rtrs */
+ 				   RECONNECT_DELAY, BMAX_SEGMENTS,
+ 				   BLK_MAX_SEGMENT_SIZE,
+ 				   MAX_RECONNECTS);
+diff --git a/drivers/infiniband/ulp/rtrs/rtrs-clt.c b/drivers/infiniband/ulp/rtrs/rtrs-clt.c
+index bcfa6258a7af..7644c3f627ca 100644
+--- a/drivers/infiniband/ulp/rtrs/rtrs-clt.c
++++ b/drivers/infiniband/ulp/rtrs/rtrs-clt.c
+@@ -157,12 +157,6 @@ void rtrs_clt_put_permit(struct rtrs_clt *clt, struct rtrs_permit *permit)
+ }
+ EXPORT_SYMBOL(rtrs_clt_put_permit);
  
-@@ -1172,7 +1180,7 @@ static int setup_mq_tags(struct rnbd_clt_session *sess)
- 	tag_set->numa_node		= NUMA_NO_NODE;
- 	tag_set->flags		= BLK_MQ_F_SHOULD_MERGE |
- 				  BLK_MQ_F_TAG_QUEUE_SHARED;
--	tag_set->cmd_size		= sizeof(struct rnbd_iu);
-+	tag_set->cmd_size	= sizeof(struct rnbd_iu) + RNBD_RDMA_SGL_SIZE;
- 	tag_set->nr_hw_queues	= num_online_cpus();
+-void *rtrs_permit_to_pdu(struct rtrs_permit *permit)
+-{
+-	return permit + 1;
+-}
+-EXPORT_SYMBOL(rtrs_permit_to_pdu);
+-
+ /**
+  * rtrs_permit_to_clt_con() - returns RDMA connection pointer by the permit
+  * @sess: client session pointer
+diff --git a/drivers/infiniband/ulp/rtrs/rtrs.h b/drivers/infiniband/ulp/rtrs/rtrs.h
+index 9af750f4d783..8738e90e715a 100644
+--- a/drivers/infiniband/ulp/rtrs/rtrs.h
++++ b/drivers/infiniband/ulp/rtrs/rtrs.h
+@@ -63,13 +63,6 @@ struct rtrs_clt *rtrs_clt_open(struct rtrs_clt_ops *ops,
  
- 	return blk_mq_alloc_tag_set(tag_set);
-diff --git a/drivers/block/rnbd/rnbd-clt.h b/drivers/block/rnbd/rnbd-clt.h
-index efd67ae286ca..537d499dad3b 100644
---- a/drivers/block/rnbd/rnbd-clt.h
-+++ b/drivers/block/rnbd/rnbd-clt.h
-@@ -44,6 +44,13 @@ struct rnbd_iu_comp {
- 	int errno;
- };
+ void rtrs_clt_close(struct rtrs_clt *sess);
  
-+#ifdef CONFIG_ARCH_NO_SG_CHAIN
-+#define RNBD_INLINE_SG_CNT 0
-+#else
-+#define RNBD_INLINE_SG_CNT 2
-+#endif
-+#define RNBD_RDMA_SGL_SIZE (sizeof(struct scatterlist) * RNBD_INLINE_SG_CNT)
-+
- struct rnbd_iu {
- 	union {
- 		struct request *rq; /* for block io */
-@@ -56,11 +63,12 @@ struct rnbd_iu {
- 		/* use to send msg associated with a sess */
- 		struct rnbd_clt_session *sess;
- 	};
--	struct scatterlist	sglist[BMAX_SEGMENTS];
-+	struct sg_table		sgt;
- 	struct work_struct	work;
- 	int			errno;
- 	struct rnbd_iu_comp	comp;
- 	atomic_t		refcount;
-+	struct scatterlist	first_sgl[]; /* must be the last one */
- };
- 
- struct rnbd_cpu_qlist {
+-/**
+- * rtrs_permit_to_pdu() - converts rtrs_permit to opaque pdu pointer
+- * @permit: RTRS permit pointer, it associates the memory allocation for future
+- *          RDMA operation.
+- */
+-void *rtrs_permit_to_pdu(struct rtrs_permit *permit);
+-
+ enum {
+ 	RTRS_PERMIT_NOWAIT = 0,
+ 	RTRS_PERMIT_WAIT   = 1,
 -- 
 2.25.1
 
