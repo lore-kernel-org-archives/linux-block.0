@@ -2,115 +2,108 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFD8EC433FE
-	for <linux-block@archiver.kernel.org>; Thu, 10 Dec 2020 10:19:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 601CEC4361B
+	for <linux-block@archiver.kernel.org>; Thu, 10 Dec 2020 10:19:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 967CD23AC4
-	for <linux-block@archiver.kernel.org>; Thu, 10 Dec 2020 10:19:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 166F723AC4
+	for <linux-block@archiver.kernel.org>; Thu, 10 Dec 2020 10:19:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729847AbgLJKTQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Dec 2020 05:19:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50188 "EHLO
+        id S1728489AbgLJKTW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Dec 2020 05:19:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726313AbgLJKTJ (ORCPT
+        with ESMTP id S1729565AbgLJKTM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Dec 2020 05:19:09 -0500
-Received: from mail-ed1-x543.google.com (mail-ed1-x543.google.com [IPv6:2a00:1450:4864:20::543])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 359CAC0613D6
-        for <linux-block@vger.kernel.org>; Thu, 10 Dec 2020 02:18:29 -0800 (PST)
-Received: by mail-ed1-x543.google.com with SMTP id v22so4879171edt.9
-        for <linux-block@vger.kernel.org>; Thu, 10 Dec 2020 02:18:29 -0800 (PST)
+        Thu, 10 Dec 2020 05:19:12 -0500
+Received: from mail-ed1-x541.google.com (mail-ed1-x541.google.com [IPv6:2a00:1450:4864:20::541])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E4EEC06179C
+        for <linux-block@vger.kernel.org>; Thu, 10 Dec 2020 02:18:32 -0800 (PST)
+Received: by mail-ed1-x541.google.com with SMTP id r5so4875222eda.12
+        for <linux-block@vger.kernel.org>; Thu, 10 Dec 2020 02:18:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=cloud.ionos.com; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=dthc2x5czv7Omf8LNqaI7gJTMFrZ7BUMJazoTpUaa1w=;
-        b=WoAwdE6xVsnbsPuZ0t6piagBiojf7yIHyT35Q/hFX41G/fx5i2zxCmdiK/aIZc+faN
-         dP95pJOE6ND5FLteKuucKvHYp+3j/1mwvAH9yVzY8EBV8kAZMt+Q78PWsMWC6boBuc76
-         0QzC4IWwUnL7aamKSnXECyCSoghzmmh/rK99ytwGx30R+hv3Q/8mwHF8lcwKKWx9c1xx
-         QQwZ3eORrbZkiunUIxKYuSGBoxPyPGet/ZceUnlx2JGDvv6MVLZvIro5xmrX/hBAlxkt
-         0CXHZhsTRquLWlaens8TIASIDc05rbsf0xiR3RkO42EGSPm45v+Y4pDMIzTrFjv3Vwre
-         XNDg==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=I1nkDS+t71lcZcyKCx1EdDkNSPvYcn8wLT9ZWpiLudM=;
+        b=RPWNMP+eTWP+4JQCgK9cGj2p75kCnnScwZcNskA6nn+FE5Tj+LiOYEzLHlEPnZgk32
+         CRhmOvzgn09XqFTBDDRX7Ye1pb/+T0WAJp0g7w/s5Z6z6ZcsfA+MJ3325eouJjrR41vU
+         2svmKzmjuxSnkWeUe8GK/txAmmNHPL4g5sNLbMR6sYgfBFQLMIgBx84IA9JlMwtgMXe2
+         C5Wg6v2X+7sqnsr5sUFmNhmKLWocWf+GD/x/wJu/qdLpd3n9EzPxc9agLqsxoAqMWIi4
+         lJu9wmIg2OPu6jqU28TsE818eAchQCFRSLS5XK4GIHUXnILCjIwqHYsWfKg4P1jbVxVR
+         LYew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=dthc2x5czv7Omf8LNqaI7gJTMFrZ7BUMJazoTpUaa1w=;
-        b=P3Kq+7JqrmcmsSDkKtBrkD52WndzQCYmrSJsCnwIbLiXqUalc6E+Ubem2o5NFHkRJT
-         YTVHxCKEgx+MoZoJXINoRdcMVmATPw1q2ZzSL2ZZWnvFZS4RR+kkEjn78gD2/NtcDw6A
-         Fsr+Z7g3RcPnlRzvsl7ezfQVkPDCa2sIhRkjEA4jkjO/8zoT1QnpFUSvF0a/k6IuBMT7
-         y8KfLqmvzmHLJ6ERxEOG5eYN2yYBrLLwdxsTeUOWEMokfsFCvndUZIOT2qizKCxU+d3D
-         kfmh9xhMWxjUcDrA3zkqx/xCDtFyE+fsz8zlpgwIRqhagPRqbmkLTFMKFxUd9n/niTh5
-         KWIQ==
-X-Gm-Message-State: AOAM532dvlEqMcRxpO5KaDqXbmCC4k5lPlsp0YtlCovWUOIlHOVqAkFD
-        cW2ZAnXphBdEsI1SbvsAZ7M1h8PkillCzQ==
-X-Google-Smtp-Source: ABdhPJx2jdRLfBye6+O6vKZDe3A7mTuOPcnKVcamLj1w5hBsWx2fZUA1atNlggtOyyLkFOnoOzNUQg==
-X-Received: by 2002:a50:e688:: with SMTP id z8mr6156322edm.129.1607595507734;
-        Thu, 10 Dec 2020 02:18:27 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=I1nkDS+t71lcZcyKCx1EdDkNSPvYcn8wLT9ZWpiLudM=;
+        b=YgZjJzf+sN9XvLDKxjIbiiO4bU7Xojhf9qfQbTJr2pK+ljrWwI6CJh8GQfXDoVYHzZ
+         CHcX2uwhE8PnldH+TxYRtb6b1mGKO2DbaB7EpVZlVzic4g0b/XzmbZ6Sl06yHuq1ozQs
+         Suj5OEgzkzzTa6Frl4sGuMP2ZtLRAlwOGgYX2JcnAdfSOEy2FrxwjBy0elhdEHStbMyF
+         5GCruxvSe9nRNdrsy0wuNJyNV64+9DvTA7gKeVS1hWYrJp3vIsZCCCsW721Js6IU6LQ/
+         j3aeFQpC9OnpmlJvMGiHSzTGdiEkd8Eq3OFVyyaqM4mADhkN7VSE281VwSY3+i6Gckdn
+         RKBQ==
+X-Gm-Message-State: AOAM532syfCVXW29MhwWwkZ21INSMhrkHlTXYgiMgtHY9q4M/zjhZEoa
+        z/EM7Uad9wU356mv4imfspXlSSJCVKkapQ==
+X-Google-Smtp-Source: ABdhPJwnQ1TRux1B6UlziLnXPzzWJZwvKYrSzLotnDqvsHV8veLu14vOvU8L2S9fQQGE2IhQqxmPaw==
+X-Received: by 2002:a05:6402:16c8:: with SMTP id r8mr5909508edx.59.1607595510758;
+        Thu, 10 Dec 2020 02:18:30 -0800 (PST)
 Received: from jwang-Latitude-5491.fkb.profitbricks.net ([2001:16b8:4938:300:58f0:963a:32b2:ff05])
-        by smtp.gmail.com with ESMTPSA id s24sm3955878ejb.20.2020.12.10.02.18.26
+        by smtp.gmail.com with ESMTPSA id s24sm3955878ejb.20.2020.12.10.02.18.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Dec 2020 02:18:27 -0800 (PST)
+        Thu, 10 Dec 2020 02:18:30 -0800 (PST)
 From:   Jack Wang <jinpu.wang@cloud.ionos.com>
 To:     linux-block@vger.kernel.org
 Cc:     axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
-        bvanassche@acm.org, danil.kipnis@cloud.ionos.com
-Subject: [PATCHv2 for-next 0/7] Misc update for rnbd
-Date:   Thu, 10 Dec 2020 11:18:19 +0100
-Message-Id: <20201210101826.29656-1-jinpu.wang@cloud.ionos.com>
+        bvanassche@acm.org, danil.kipnis@cloud.ionos.com,
+        Md Haris Iqbal <haris.iqbal@cloud.ionos.com>,
+        Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
+Subject: [PATCHv2 for-next 3/7] block/rnbd-srv: Protect dev session sysfs removal
+Date:   Thu, 10 Dec 2020 11:18:22 +0100
+Message-Id: <20201210101826.29656-4-jinpu.wang@cloud.ionos.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20201210101826.29656-1-jinpu.wang@cloud.ionos.com>
+References: <20201210101826.29656-1-jinpu.wang@cloud.ionos.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
+From: Md Haris Iqbal <haris.iqbal@cloud.ionos.com>
 
-This is the misc update for rnbd. It inlcudes:
-- 2 follow-up fixes for commit 64e8a6ece1a5 ("block/rnbd-clt: Dynamically alloc buffer for pathname & blk_symlink_name")
-  one warning, and one possible memleak.
-- one fix for race with dev session sysfs removal.
-- fix for write-back cache & FUA.
-- reduce memory footprint by allocate sglist on demand and do not request pdu
-  from rtrs-clt.
-- Typo fix.
+Since the removal of the session sysfs can also be called from the
+function destroy_sess, there is a need to protect the call from the
+function rnbd_srv_sess_dev_force_close
 
-change since v1:
-- use kstrdup as Bart suggested.
-- fix return code and leaking iu in block/rnbd-clt: Dynamically allocate sglist for rnbd_iu
+Fixes: 786998050cbc ("block/rnbd-srv: close a mapped device from server side.")
+Signed-off-by: Md Haris Iqbal <haris.iqbal@cloud.ionos.com>
+Reviewed-by: Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
+Signed-off-by: Jack Wang <jinpu.wang@cloud.ionos.com>
+---
+ drivers/block/rnbd/rnbd-srv.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-v1: https://lore.kernel.org/linux-block/20201209082051.12306-1-jinpu.wang@cloud.ionos.com/T/#md330070d0688bbc57325ce0a6b2181f39dca495c
-
-The patches are based on block/for-next.
-
-Gioh Kim (3):
-  block/rnbd: Set write-back cache and fua same to the target device
-  block/rnbd-clt: Dynamically allocate sglist for rnbd_iu
-  block/rnbd-clt: Does not request pdu to rtrs-clt
-
-Jack Wang (2):
-  block/rnbd-clt: Fix possible memleak
-  block/rnbd: Fix typos
-
-Md Haris Iqbal (2):
-  block/rnbd-clt: Get rid of warning regarding size argument in strlcpy
-  block/rnbd-srv: Protect dev session sysfs removal
-
- drivers/block/rnbd/rnbd-clt-sysfs.c    |  5 +-
- drivers/block/rnbd/rnbd-clt.c          | 94 +++++++++++++++-----------
- drivers/block/rnbd/rnbd-clt.h          | 12 +++-
- drivers/block/rnbd/rnbd-proto.h        |  9 ++-
- drivers/block/rnbd/rnbd-srv.c          | 12 +++-
- drivers/infiniband/ulp/rtrs/rtrs-clt.c |  6 --
- drivers/infiniband/ulp/rtrs/rtrs.h     |  7 --
- 7 files changed, 87 insertions(+), 58 deletions(-)
-
+diff --git a/drivers/block/rnbd/rnbd-srv.c b/drivers/block/rnbd/rnbd-srv.c
+index d1ee72ed8384..066411cce5e2 100644
+--- a/drivers/block/rnbd/rnbd-srv.c
++++ b/drivers/block/rnbd/rnbd-srv.c
+@@ -338,9 +338,10 @@ static int rnbd_srv_link_ev(struct rtrs_srv *rtrs,
+ 
+ void rnbd_srv_sess_dev_force_close(struct rnbd_srv_sess_dev *sess_dev)
+ {
++	mutex_lock(&sess_dev->sess->lock);
+ 	rnbd_srv_destroy_dev_session_sysfs(sess_dev);
++	mutex_unlock(&sess_dev->sess->lock);
+ 	sess_dev->keep_id = true;
+-
+ }
+ 
+ static int process_msg_close(struct rtrs_srv *rtrs,
 -- 
 2.25.1
 
