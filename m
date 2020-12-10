@@ -2,99 +2,70 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1B7BC4361B
-	for <linux-block@archiver.kernel.org>; Thu, 10 Dec 2020 11:01:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 766CFC4361B
+	for <linux-block@archiver.kernel.org>; Thu, 10 Dec 2020 11:31:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4972423B70
-	for <linux-block@archiver.kernel.org>; Thu, 10 Dec 2020 11:01:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3F0D023D57
+	for <linux-block@archiver.kernel.org>; Thu, 10 Dec 2020 11:31:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389257AbgLJK5k (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Dec 2020 05:57:40 -0500
-Received: from out30-130.freemail.mail.aliyun.com ([115.124.30.130]:33911 "EHLO
-        out30-130.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2389253AbgLJK5h (ORCPT
+        id S2389517AbgLJLbG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Dec 2020 06:31:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33016 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389512AbgLJLaw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Dec 2020 05:57:37 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=alimailimapcm10staff010182156082;MF=baolin.wang@linux.alibaba.com;NM=1;PH=DS;RN=5;SR=0;TI=SMTPD_---0UI8pCsw_1607597813;
-Received: from localhost(mailfrom:baolin.wang@linux.alibaba.com fp:SMTPD_---0UI8pCsw_1607597813)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Thu, 10 Dec 2020 18:56:53 +0800
-From:   Baolin Wang <baolin.wang@linux.alibaba.com>
-To:     axboe@kernel.dk, tj@kernel.org
-Cc:     baolin.wang@linux.alibaba.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 1/2] blk-iocost: Add iocg idle state tracepoint
-Date:   Thu, 10 Dec 2020 18:56:44 +0800
-Message-Id: <1ba7a38d5a6186b1e71432ef424c23ba1904a365.1607591591.git.baolin.wang@linux.alibaba.com>
-X-Mailer: git-send-email 1.8.3.1
+        Thu, 10 Dec 2020 06:30:52 -0500
+Received: from ozlabs.org (bilbo.ozlabs.org [IPv6:2401:3900:2:1::2])
+        by lindbergh.monkeyblade.net (Postfix) with UTF8SMTPS id 77BE5C0613CF;
+        Thu, 10 Dec 2020 03:30:37 -0800 (PST)
+Received: by ozlabs.org (Postfix, from userid 1034)
+        id 4CsBYJ2d3xz9shn; Thu, 10 Dec 2020 22:30:28 +1100 (AEDT)
+From:   Michael Ellerman <patch-notifications@ellerman.id.au>
+To:     Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Geoff Levand <geoff@infradead.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>, Jim Paris <jim@jtan.com>,
+        Takashi Iwai <tiwai@suse.com>,
+        Uwe =?ISO-8859-1?Q?=20Kleine-K=C3=B6nig?= 
+        <u.kleine-koenig@pengutronix.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        Alan Stern <stern@rowland.harvard.edu>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     linux-usb@vger.kernel.org, linux-fbdev@vger.kernel.org,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        dri-devel@lists.freedesktop.org, linuxppc-dev@lists.ozlabs.org,
+        linux-scsi@vger.kernel.org, Paul Mackerras <paulus@samba.org>,
+        alsa-devel@alsa-project.org, linux-block@vger.kernel.org,
+        netdev@vger.kernel.org
+In-Reply-To: <20201126165950.2554997-1-u.kleine-koenig@pengutronix.de>
+References: <20201126165950.2554997-1-u.kleine-koenig@pengutronix.de>
+Subject: Re: [PATCH 1/2] ALSA: ppc: drop if block with always false condition
+Message-Id: <160756606231.1313423.17458520968397977116.b4-ty@ellerman.id.au>
+Date:   Thu, 10 Dec 2020 22:30:28 +1100 (AEDT)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-It will be helpful to trace the iocg's whole state, including active and
-idle state. And we can easily expand the original iocost_iocg_activate
-trace event to support a state trace class, including active and idle
-state tracing.
+On Thu, 26 Nov 2020 17:59:49 +0100, Uwe Kleine-König wrote:
+> The remove callback is only called for devices that were probed
+> successfully before. As the matching probe function cannot complete
+> without error if dev->match_id != PS3_MATCH_ID_SOUND, we don't have to
+> check this here.
 
-Signed-off-by: Baolin Wang <baolin.wang@linux.alibaba.com>
----
- block/blk-iocost.c            |  3 +++
- include/trace/events/iocost.h | 16 +++++++++++++++-
- 2 files changed, 18 insertions(+), 1 deletion(-)
+Applied to powerpc/next.
 
-diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index ffa418c..ac6078a 100644
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -2185,6 +2185,9 @@ static int ioc_check_iocgs(struct ioc *ioc, struct ioc_now *now)
- 							    WEIGHT_ONE);
- 			}
- 
-+			TRACE_IOCG_PATH(iocg_idle, iocg, now,
-+					atomic64_read(&iocg->active_period),
-+					atomic64_read(&ioc->cur_period), vtime);
- 			__propagate_weights(iocg, 0, 0, false, now);
- 			list_del_init(&iocg->active_list);
- 		}
-diff --git a/include/trace/events/iocost.h b/include/trace/events/iocost.h
-index 0b68699..e282ce0 100644
---- a/include/trace/events/iocost.h
-+++ b/include/trace/events/iocost.h
-@@ -11,7 +11,7 @@
- 
- #include <linux/tracepoint.h>
- 
--TRACE_EVENT(iocost_iocg_activate,
-+DECLARE_EVENT_CLASS(iocost_iocg_state,
- 
- 	TP_PROTO(struct ioc_gq *iocg, const char *path, struct ioc_now *now,
- 		u64 last_period, u64 cur_period, u64 vtime),
-@@ -59,6 +59,20 @@
- 	)
- );
- 
-+DEFINE_EVENT(iocost_iocg_state, iocost_iocg_activate,
-+	TP_PROTO(struct ioc_gq *iocg, const char *path, struct ioc_now *now,
-+		 u64 last_period, u64 cur_period, u64 vtime),
-+
-+	TP_ARGS(iocg, path, now, last_period, cur_period, vtime)
-+);
-+
-+DEFINE_EVENT(iocost_iocg_state, iocost_iocg_idle,
-+	TP_PROTO(struct ioc_gq *iocg, const char *path, struct ioc_now *now,
-+		 u64 last_period, u64 cur_period, u64 vtime),
-+
-+	TP_ARGS(iocg, path, now, last_period, cur_period, vtime)
-+);
-+
- DECLARE_EVENT_CLASS(iocg_inuse_update,
- 
- 	TP_PROTO(struct ioc_gq *iocg, const char *path, struct ioc_now *now,
--- 
-1.8.3.1
+[1/2] ALSA: ppc: drop if block with always false condition
+      https://git.kernel.org/powerpc/c/7ff94669e7d8e50756cd57947283381ae9665759
+[2/2] powerpc/ps3: make system bus's remove and shutdown callbacks return void
+      https://git.kernel.org/powerpc/c/6d247e4d264961aa3b871290f9b11a48d5a567f2
 
+cheers
