@@ -2,96 +2,96 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7DAAC4361B
-	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 21:16:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 041EBC433FE
+	for <linux-block@archiver.kernel.org>; Thu, 10 Dec 2020 01:23:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8616123B98
-	for <linux-block@archiver.kernel.org>; Wed,  9 Dec 2020 21:16:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BB30223B45
+	for <linux-block@archiver.kernel.org>; Thu, 10 Dec 2020 01:23:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388032AbgLIVPp convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Dec 2020 16:15:45 -0500
-Received: from eu-smtp-delivery-151.mimecast.com ([185.58.86.151]:57493 "EHLO
-        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2388035AbgLIVPf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 9 Dec 2020 16:15:35 -0500
-Received: from AcuMS.aculab.com (156.67.243.126 [156.67.243.126]) (Using
- TLS) by relay.mimecast.com with ESMTP id uk-mta-1-vL2RsGv_OTGtY0uYhYIEhw-1;
- Wed, 09 Dec 2020 21:13:55 +0000
-X-MC-Unique: vL2RsGv_OTGtY0uYhYIEhw-1
-Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) by
- AcuMS.aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) with Microsoft SMTP
- Server (TLS) id 15.0.1347.2; Wed, 9 Dec 2020 21:13:54 +0000
-Received: from AcuMS.Aculab.com ([fe80::43c:695e:880f:8750]) by
- AcuMS.aculab.com ([fe80::43c:695e:880f:8750%12]) with mapi id 15.00.1347.000;
- Wed, 9 Dec 2020 21:13:54 +0000
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'Pavel Begunkov' <asml.silence@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>
-CC:     Alexander Viro <viro@zeniv.linux.org.uk>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Matthew Wilcox <willy@infradead.org>
-Subject: RE: [PATCH 2/2] block: no-copy bvec for direct IO
-Thread-Topic: [PATCH 2/2] block: no-copy bvec for direct IO
-Thread-Index: AQHWzdK4ncolaTTBdk+ENIJV/tZKlanvQ9gw
-Date:   Wed, 9 Dec 2020 21:13:54 +0000
-Message-ID: <9e80d0f0adc84cc9995e58e2d6aad580@AcuMS.aculab.com>
-References: <cover.1607477897.git.asml.silence@gmail.com>
- <51905c4fcb222e14a1d5cb676364c1b4f177f582.1607477897.git.asml.silence@gmail.com>
-In-Reply-To: <51905c4fcb222e14a1d5cb676364c1b4f177f582.1607477897.git.asml.silence@gmail.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+        id S1731790AbgLJBXD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Dec 2020 20:23:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52748 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726769AbgLJBWw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Dec 2020 20:22:52 -0500
+Received: from mail-ej1-x641.google.com (mail-ej1-x641.google.com [IPv6:2a00:1450:4864:20::641])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25637C0613D6
+        for <linux-block@vger.kernel.org>; Wed,  9 Dec 2020 17:22:12 -0800 (PST)
+Received: by mail-ej1-x641.google.com with SMTP id n26so4989592eju.6
+        for <linux-block@vger.kernel.org>; Wed, 09 Dec 2020 17:22:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=intel-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=1RvR2QPPiPyu+6Jv4jWyGokFplcRpCGGMGXA++YNtNY=;
+        b=hLlhVWiZHkRszGDN0QvNv3k5cDa7NBwZGJhnG+u6snpj/DqWm97HsIYwTJsnjvT1vM
+         lqLgTToh0Yl0+7UdLKf0OJc3R9/7th3uREf05mUHcpVQ/dGI9wmQMaG7b8tJQr7VzCU6
+         n7TG/Q+F4n+X2SsRVoAlKSheAcmCFeTxkrOIXFDWuvtQdZWTf7ANt2zcUkpZxBGmjkXa
+         wO9mFNtjhCJhXDZ9MpC+XSEcdnWG+j3g1YG8jxS+Jo15C0UFtAA2umrf/tujow1hZuMc
+         f9OtadNZ60HDDPjDjL1evB3x/w7Ymxm2RXqqrVLk5LCk3Du/muGWXQQZ7gJkcfcPQvRI
+         RABQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=1RvR2QPPiPyu+6Jv4jWyGokFplcRpCGGMGXA++YNtNY=;
+        b=mvMykfBHtrL+wVNjve7B03tambu7Tj+f6Kej54wJGKfEIIF49Rz2jP9DasTvua4pcQ
+         mYXR3Q0gaHTdu8n0ooio65u8+swSqemDkEl702Vy018EgBND0zmJ15LxwWvtzmLxhtPW
+         HxDyXeTOtb2hM03bYfxQY7Q1GCyyDpvkfG36umkIca80EWBFenOAk8bPAiPmBjOiPl1D
+         b9qguW9Xx4vJuv7vMER9fa/ZnMz83VKsaBWigtfWYZdGaYm+L/uHKRlws7JmVX0q+3XU
+         UYnTJZudWQp7HQtL+1Tyy0z3CEfMMrW8+ZRQY8RL1xGa8IE3j5msg3VXyhiHtw65Mud9
+         OE5A==
+X-Gm-Message-State: AOAM532zLTKBYKEdsQIDBR4SPGaQBVUrj+97g50pxUGAj0S+Ff7GMfDY
+        pRrQAM2FwZCpjRsgueVebfLYUROBaEUrAdj9drNx9A==
+X-Google-Smtp-Source: ABdhPJyAwcrv2J7//UeT/BRlFkXF6BfuHfPDxCDsLChk0w8jJb7pNGsjyGRaIu9jO63Jp7V2CJR6QsUNyeoJndfV6A8=
+X-Received: by 2002:a17:906:a29a:: with SMTP id i26mr4331316ejz.45.1607563330752;
+ Wed, 09 Dec 2020 17:22:10 -0800 (PST)
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
-        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+References: <20201106170036.18713-1-logang@deltatee.com> <20201106170036.18713-5-logang@deltatee.com>
+ <20201109091258.GB28918@lst.de> <4e336c7e-207b-31fa-806e-c4e8028524a5@deltatee.com>
+In-Reply-To: <4e336c7e-207b-31fa-806e-c4e8028524a5@deltatee.com>
+From:   Dan Williams <dan.j.williams@intel.com>
+Date:   Wed, 9 Dec 2020 17:22:09 -0800
+Message-ID: <CAPcyv4ifGcrdOtUt8qr7pmFhmecGHqGVre9G0RorGczCGVECQQ@mail.gmail.com>
+Subject: Re: [RFC PATCH 04/15] lib/scatterlist: Add flag for indicating P2PDMA
+ segments in an SGL
+To:     Logan Gunthorpe <logang@deltatee.com>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        Linux PCI <linux-pci@vger.kernel.org>,
+        Linux MM <linux-mm@kvack.org>,
+        "open list:DMA MAPPING HELPERS" <iommu@lists.linux-foundation.org>,
+        Stephen Bates <sbates@raithlin.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+        Ira Weiny <iweiny@intel.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Don Dutile <ddutile@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Pavel Begunkov
-> Sent: 09 December 2020 02:20
-> 
-> The block layer spends quite a while in blkdev_direct_IO() to copy and
-> initialise bio's bvec. However, if we've already got a bvec in the input
-> iterator it might be reused in some cases, i.e. when new
-> ITER_BVEC_FLAG_FIXED flag is set. Simple tests show considerable
-> performance boost, and it also reduces memory footprint.
-...
-> @@ -398,7 +422,11 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_vecs)
->  		bio->bi_end_io = blkdev_bio_end_io;
->  		bio->bi_ioprio = iocb->ki_ioprio;
-> 
-> -		ret = bio_iov_iter_get_pages(bio, iter);
-> +		if (iov_iter_is_bvec(iter) && iov_iter_bvec_fixed(iter))
-> +			ret = bio_iov_fixed_bvec_get_pages(bio, iter);
-> +		else
-> +			ret = bio_iov_iter_get_pages(bio, iter);
-> +
+On Mon, Nov 9, 2020 at 8:47 AM Logan Gunthorpe <logang@deltatee.com> wrote:
+>
+>
+>
+> On 2020-11-09 2:12 a.m., Christoph Hellwig wrote:
+> > On Fri, Nov 06, 2020 at 10:00:25AM -0700, Logan Gunthorpe wrote:
+> >> We make use of the top bit of the dma_length to indicate a P2PDMA
+> >> segment.
+> >
+> > I don't think "we" can.  There is nothing limiting the size of a SGL
+> > segment.
+>
+> Yes, I expected this would be the unacceptable part. Any alternative ideas?
 
-Is it necessary to check iov_iter_is_bvec() as well as iov_iter_bvec_fixed() ?
-If so it is probably worth using & not && so the compiler stands
-a chance of generating a & (B | C) == B instead of 2 conditionals.
-(I think I saw the bits in the same field being tested.
-
-	David
-
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-Registration No: 1397386 (Wales)
-
+Why is the SG_P2PDMA_FLAG needed as compared to checking the SGL
+segment-pages for is_pci_p2pdma_page()?
