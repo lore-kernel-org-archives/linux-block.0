@@ -2,92 +2,70 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF7CCC433FE
-	for <linux-block@archiver.kernel.org>; Fri, 11 Dec 2020 03:38:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9825FC433FE
+	for <linux-block@archiver.kernel.org>; Fri, 11 Dec 2020 07:14:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6D32623B31
-	for <linux-block@archiver.kernel.org>; Fri, 11 Dec 2020 03:38:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 628AD23B26
+	for <linux-block@archiver.kernel.org>; Fri, 11 Dec 2020 07:14:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2395157AbgLKDiQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Dec 2020 22:38:16 -0500
-Received: from mail.kernel.org ([198.145.29.99]:56206 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2390897AbgLKDiH (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Dec 2020 22:38:07 -0500
-Date:   Fri, 11 Dec 2020 12:37:19 +0900
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1607657846;
-        bh=fMWfrvE8L5lvE34El2UejN5tiskCdVYaV7wrU3SOZrI=;
-        h=From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Q+Sw9NwANz355XJp6a2ACeY2gnYiaPS0wWhY+/CStXI7p/EqG1RkdcX8G6yTNoJbW
-         JliiHqGPKqSVMM+8s7jDCvDcsM83lzaSJRV2OzHyv643I6Y7rMY7xhzVj8Ew8vihEe
-         1TDoMkpAX76w96KeaLJZQTfDET0W5V6x/fx/vQ4e6nGcABFb5j+EV53xJMIkaRC108
-         PAA5+hb2Q3CGEEQggDhQH0YOKgIIVHeRJSx1FlGE0djqUF8bTlbYNvaEm4aYI7DVSI
-         cbTgNqDfTTvdG4xzkjxdrz40Q88XQDosJ9J/4fhJioQl4ll4pM4TA7guGZ6QB//X+D
-         8WSYu6IjXLk7A==
-From:   Keith Busch <kbusch@kernel.org>
-To:     Pavel Begunkov <asml.silence@gmail.com>
-Cc:     Andres Freund <andres@anarazel.de>, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>
-Subject: Re: hybrid polling on an nvme doesn't seem to work with iodepth > 1
- on 5.10.0-rc5
-Message-ID: <20201211033719.GA6414@redsun51.ssa.fujisawa.hgst.com>
-References: <20201210205141.px7suygfrl2lhdkr@alap3.anarazel.de>
- <73c43682-10f2-0bc9-5aa5-e433abd4f3c3@gmail.com>
- <aa735173-fad1-b7d4-1c90-4fccc90c562d@gmail.com>
- <20201211011940.ouc4k3am5gg2ithp@alap3.anarazel.de>
- <de0b46d2-d053-a7a8-23e7-fc954807c70d@gmail.com>
+        id S2389900AbgLKHO0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Dec 2020 02:14:26 -0500
+Received: from out30-133.freemail.mail.aliyun.com ([115.124.30.133]:60855 "EHLO
+        out30-133.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2390203AbgLKHON (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 11 Dec 2020 02:14:13 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R531e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04426;MF=baolin.wang@linux.alibaba.com;NM=1;PH=DS;RN=4;SR=0;TI=SMTPD_---0UID7YA0_1607670809;
+Received: from 30.21.164.54(mailfrom:baolin.wang@linux.alibaba.com fp:SMTPD_---0UID7YA0_1607670809)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Fri, 11 Dec 2020 15:13:29 +0800
+Subject: Re: [PATCH 2/2] blk-iocost: Use alloc_percpu_gfp() to simplify the
+ code
+To:     Tejun Heo <tj@kernel.org>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <1ba7a38d5a6186b1e71432ef424c23ba1904a365.1607591591.git.baolin.wang@linux.alibaba.com>
+ <aa518c5b5c7185e660a1c8515c10d9513fe92132.1607591591.git.baolin.wang@linux.alibaba.com>
+ <X9Iv/MlqQI00wZRn@mtj.duckdns.org>
+From:   Baolin Wang <baolin.wang@linux.alibaba.com>
+Message-ID: <33480f8a-89a3-3ed9-6fd0-95b2944ccbdd@linux.alibaba.com>
+Date:   Fri, 11 Dec 2020 15:13:29 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <de0b46d2-d053-a7a8-23e7-fc954807c70d@gmail.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+In-Reply-To: <X9Iv/MlqQI00wZRn@mtj.duckdns.org>
+Content-Type: text/plain; charset=gbk; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Dec 11, 2020 at 01:44:38AM +0000, Pavel Begunkov wrote:
-> On 11/12/2020 01:19, Andres Freund wrote:
-> > On 2020-12-10 23:15:15 +0000, Pavel Begunkov wrote:
-> >> On 10/12/2020 23:12, Pavel Begunkov wrote:
-> >>> On 10/12/2020 20:51, Andres Freund wrote:
-> >>>> Hi,
-> >>>>
-> >>>> When using hybrid polling (i.e echo 0 >
-> >>>> /sys/block/nvme1n1/queue/io_poll_delay) I see stalls with fio when using
-> >>>> an iodepth > 1. Sometimes fio hangs, other times the performance is
-> >>>> really poor. I reproduced this with SSDs from different vendors.
-> >>>
-> >>> Can you get poll stats from debugfs while running with hybrid?
-> >>> For both iodepth=1 and 32.
-> >>
-> >> Even better if for 32 you would show it in dynamic, i.e. cat it several
-> >> times while running it.
-> > 
-> > Should read all email before responding...
-> > 
-> > This is a loop of grepping for 4k writes (only type I am doing), with 1s
-> > interval. I started it before the fio run (after one with
-> > iodepth=1). Once the iodepth 32 run finished (--timeout 10, but took
-> > 42s0, I started a --iodepth 1 run.
-> 
-> Thanks! Your mean grows to more than 30s, so it'll sleep for 15s for each
-> IO. Yep, the sleep time calculation is clearly broken for you.
-> 
-> In general the current hybrid polling doesn't work well with high QD,
-> that's because statistics it based on are not very resilient to all sorts
-> of problems. And it might be a problem I described long ago
-> 
-> https://www.spinics.net/lists/linux-block/msg61479.html
-> https://lkml.org/lkml/2019/4/30/120
+Hi Tejun,
 
-It sounds like the statistic is using the wrong criteria. It ought to
-use the average time for the next available completion for any request
-rather than the average latency of a specific IO. It might work at high
-depth if the hybrid poll knew the hctx's depth when calculating the
-sleep time, but that information doesn't appear to be readily available.
+> Hello,
+> 
+> On Thu, Dec 10, 2020 at 06:56:45PM +0800, Baolin Wang wrote:
+>> Use alloc_percpu_gfp() with __GFP_ZERO flag, which can remove
+>> some explicit initialization code.
+> 
+> __GFP_ZERO is implicit for percpu allocations and local[64]_t's initial
+> states aren't guaranteed to be all zeros on different archs.
+
+Thanks for teaching me this, at least I did not get this from the 
+local_ops Documentation before. Just out of curiosity, these local[64]_t 
+variables are also allocated from budy allocator ultimately, why they 
+can not be initialized to zeros on some ARCHs with __GFP_ZERO? Could you 
+elaborate on about this restriction? Thanks.
+
+By the way, seems the kyber-iosched has the same issue, since the 
+'struct kyber_cpu_latency' also contains an atomic_t variable.
+
+	kqd->cpu_latency = alloc_percpu_gfp(struct kyber_cpu_latency,
+					    GFP_KERNEL | __GFP_ZERO);
+	if (!kqd->cpu_latency)
+		goto err_kqd;
