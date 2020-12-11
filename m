@@ -2,141 +2,99 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5C90C433FE
-	for <linux-block@archiver.kernel.org>; Fri, 11 Dec 2020 23:31:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E632C4167B
+	for <linux-block@archiver.kernel.org>; Sat, 12 Dec 2020 01:00:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8BDA72333C
-	for <linux-block@archiver.kernel.org>; Fri, 11 Dec 2020 23:31:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3B2E623B31
+	for <linux-block@archiver.kernel.org>; Sat, 12 Dec 2020 01:00:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2403792AbgLKWm7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Dec 2020 17:42:59 -0500
-Received: from mail.kernel.org ([198.145.29.99]:58040 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2394011AbgLKWmd (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Dec 2020 17:42:33 -0500
-Date:   Fri, 11 Dec 2020 16:41:51 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1607726513;
-        bh=CzOhIDGkl3UprOKXbtfomhvXwhcIdMbufejZI4QCbOI=;
-        h=From:To:Cc:Subject:In-Reply-To:From;
-        b=ZFJCMTLuLlQz3Px+TgUwer07fyqbCEKPMDPMx2MokebsxVTi4bd6TFbvNmieUjyrM
-         jLL6OgK1ntbMJNBUZwAuDJ+jQQnym4wJyhg4xPeJys3JmxrgzNqRIHFUABE3ya8nP2
-         BjKog7nX/Z2rrH/gplwleDAlg+f8StpzCnTA2kMfyuoj/ECWj5MyGUBcq/NrO2tX+s
-         TJeRhY9q0lfujyHiAu8e3wJlCxhz3YaxTxDw1HwMSIyWxm/2fC7Dkq5dt9H89AxYkr
-         mlOcOjlaFTPnzSeKRh/DIo7+KQ7Wut12X2A9nXdYUxH/rtL2vOPUBCiDJMYkOQwUfo
-         hg/EHPU+8Mm5Q==
-From:   Bjorn Helgaas <helgaas@kernel.org>
-To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-Cc:     Puranjay Mohan <puranjay12@gmail.com>,
-        "bjorn@helgaas.com" <bjorn@helgaas.com>,
-        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] drivers: block: skd: remove skd_pci_info()
-Message-ID: <20201211224151.GA113093@bjorn-Precision-5520>
+        id S2391487AbgLKOJp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Dec 2020 09:09:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41516 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390438AbgLKOJh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 11 Dec 2020 09:09:37 -0500
+Received: from mail-ej1-x642.google.com (mail-ej1-x642.google.com [IPv6:2a00:1450:4864:20::642])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA690C0613D3
+        for <linux-block@vger.kernel.org>; Fri, 11 Dec 2020 06:08:56 -0800 (PST)
+Received: by mail-ej1-x642.google.com with SMTP id f23so12527494ejk.2
+        for <linux-block@vger.kernel.org>; Fri, 11 Dec 2020 06:08:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cmpxchg-org.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=aF3Mh+MA2q+ZpkL8xg5nd4+KjM1FTv7S2GkjkszOwBM=;
+        b=i6YXb/kx1K+ZBNheDvASX0oKCecbflSu+fyZ2fjKhwHBwFR4vTEmwXKgPT0qc764hc
+         qewaFUeRaEtQMg4y/IoQVBFWvYZgkKHgyPd0hX4njbbbc7ZIqLfu5zOpaeWkQf9WL/YY
+         gK4YXTSVzLt6ykV4YXpOlzQE2kLyT/GEE8ZicFgOtOByVhSdmNRn25qGctI7sVs67bMM
+         g71vZ5z1eKErNtAJkJsFWO6CAtctbdgFlqO3i2yYIu2B89QgS0bwMVUcc7u83MGSWI/p
+         irIp0IQm6+JQBAc2JE7Gcyj+oiIYQTctJxugvD6aHDhN70KKyCr4Vg/HLjfLLlUIbrcR
+         cO5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=aF3Mh+MA2q+ZpkL8xg5nd4+KjM1FTv7S2GkjkszOwBM=;
+        b=Ft1914ql/BMkK83OyAAULg++qwubzWVz8dPMsQ3oBRga652I9GJmIaCRqJEQIYPm6J
+         9yiROsNx2VIqpoAUF8AxwH+bGpsZua2UT1EAwsqOF+aPkhBipittpRf1L1dIlTYjFRoo
+         ScZ7u/BLJrDVOI/pYKmuGTIfZk3PDk/iqRQ4DcKddTgbG6AcyVftV6ubAwAZQSo5X52G
+         jpmFSMTS7nGYdPWom0rT6b7QvqM5YoePRZgHGLbdkHTQylfzxV5f1YN2+Ki07qLwdC3W
+         BTEl5+tefl875aQFDrZ0RBuMG/BeTgH+iL094GNyEbHFsjB5SWZTGZ04xxtp9bLEIZAV
+         zVPg==
+X-Gm-Message-State: AOAM530SkkbfLJ7Utf4LnAIfp3tQN2lgaAAvyQEXgJlPsiWV1H8lK9aw
+        eqdKVkDRvFy2l0EOcP1rUmy+qA==
+X-Google-Smtp-Source: ABdhPJyMudGT3oM0ZWZIivI28u4XfQD8nzeth0kSRM1OzeZjoSv9S67hiN2S0oEkgM7dAVinTklXtQ==
+X-Received: by 2002:a17:906:a244:: with SMTP id bi4mr11127201ejb.59.1607695735452;
+        Fri, 11 Dec 2020 06:08:55 -0800 (PST)
+Received: from localhost ([2620:10d:c093:400::5:ee7a])
+        by smtp.gmail.com with ESMTPSA id rs27sm7106637ejb.21.2020.12.11.06.08.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 11 Dec 2020 06:08:38 -0800 (PST)
+Date:   Fri, 11 Dec 2020 15:06:22 +0100
+From:   Johannes Weiner <hannes@cmpxchg.org>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Pavel Begunkov <asml.silence@gmail.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Matthew Wilcox <willy@infradead.org>
+Subject: Re: [PATCH 2/2] block: no-copy bvec for direct IO
+Message-ID: <20201211140622.GA286014@cmpxchg.org>
+References: <cover.1607477897.git.asml.silence@gmail.com>
+ <51905c4fcb222e14a1d5cb676364c1b4f177f582.1607477897.git.asml.silence@gmail.com>
+ <20201209084005.GC21968@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <BYAPR04MB496513CB49E42A3467427BF686CA0@BYAPR04MB4965.namprd04.prod.outlook.com>
+In-Reply-To: <20201209084005.GC21968@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Dec 11, 2020 at 09:50:52PM +0000, Chaitanya Kulkarni wrote:
-> On 12/11/20 08:45, Puranjay Mohan wrote:
-> > PCI core calls __pcie_print_link_status() for every device, it prints
-> > both the link width and the link speed. skd_pci_info() does the same
-> > thing again, hence it can be removed.
-> >
-> > Signed-off-by: Puranjay Mohan <puranjay12@gmail.com>
-> > ---
-> >  drivers/block/skd_main.c | 31 -------------------------------
-> >  1 file changed, 31 deletions(-)
-> >
-> > diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
-> > index a962b4551bed..da7aac5335d9 100644
-> > --- a/drivers/block/skd_main.c
-> > +++ b/drivers/block/skd_main.c
-> > @@ -3134,40 +3134,11 @@ static const struct pci_device_id skd_pci_tbl[] = {
-> >  
-> >  MODULE_DEVICE_TABLE(pci, skd_pci_tbl);
-> >  
-> > -static char *skd_pci_info(struct skd_device *skdev, char *str)
-> > -{
-> > -	int pcie_reg;
-> > -
-> > -	strcpy(str, "PCIe (");
-> > -	pcie_reg = pci_find_capability(skdev->pdev, PCI_CAP_ID_EXP);
-> > -
-> > -	if (pcie_reg) {
-> > -
-> > -		char lwstr[6];
-> > -		uint16_t pcie_lstat, lspeed, lwidth;
-> > -
-> > -		pcie_reg += 0x12;
-> > -		pci_read_config_word(skdev->pdev, pcie_reg, &pcie_lstat);
-> > -		lspeed = pcie_lstat & (0xF);
-> > -		lwidth = (pcie_lstat & 0x3F0) >> 4;
-> > -
-> > -		if (lspeed == 1)
-> > -			strcat(str, "2.5GT/s ");
-> > -		else if (lspeed == 2)
-> > -			strcat(str, "5.0GT/s ");
-> > -		else
-> > -			strcat(str, "<unknown> ");
-> The skd driver prints unknown if the speed is not "2.5GT/s" or "5.0GT/s".
-> __pcie_print_link_status()  prints "unknown" only if speed
-> value >= ARRAY_SIZE(speed_strings).
+On Wed, Dec 09, 2020 at 08:40:05AM +0000, Christoph Hellwig wrote:
+> > +	/*
+> > +	 * In practice groups of pages tend to be accessed/reclaimed/refaulted
+> > +	 * together. To not go over bvec for those who didn't set BIO_WORKINGSET
+> > +	 * approximate it by looking at the first page and inducing it to the
+> > +	 * whole bio
+> > +	 */
+> > +	if (unlikely(PageWorkingset(iter->bvec->bv_page)))
+> > +		bio_set_flag(bio, BIO_WORKINGSET);
 > 
-> If a buggy skd card returns value that is not != ("2.5GT/s" or "5.0GT/s")
-> && value < ARRAY_SIZE(speed_strings) then it will not print the unknown but
-> the value from speed string array.
-> 
-> Which breaks the current behavior. Please correct me if I'm wrong.
+> IIRC the feedback was that we do not need to deal with BIO_WORKINGSET
+> at all for direct I/O.
 
-I think you're right, but I don't think it actually *breaks* anything.
+Yes, this hunk is incorrect. We must not use this flag for direct IO.
+It's only for paging IO, when you bring in the data at page->mapping +
+page->index. Otherwise you tell the pressure accounting code that you
+are paging in a thrashing page, when really you're just reading new
+data into a page frame that happens to be hot.
 
-For skd devices that work correctly, there should be no problem, and
-if there ever were an skd device that operated at a speed greater than
-5GT/s, the PCI core would print that speed correctly instead of having
-the driver print "<unknown>".
-
-I don't think it's a good idea to have a driver artificially constrain
-the speed a device operates at.  And the existing code doesn't
-actually constrain anything; it only prints "<unknown>" if it doesn't
-recognize it.  The probe still succeeds.  I don't see much value in
-that "<unknown>".
-
-Or am I missing an actual problem this patch causes?
-
-> > -		snprintf(lwstr, sizeof(lwstr), "%dX)", lwidth);
-> > -		strcat(str, lwstr);
-> > -	}
-> > -	return str;
-> > -}
-> >  
-> >  static int skd_pci_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
-> >  {
-> >  	int i;
-> >  	int rc = 0;
-> > -	char pci_str[32];
-> >  	struct skd_device *skdev;
-> >  
-> >  	dev_dbg(&pdev->dev, "vendor=%04X device=%04x\n", pdev->vendor,
-> > @@ -3201,8 +3172,6 @@ static int skd_pci_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
-> >  		goto err_out_regions;
-> >  	}
-> >  
-> > -	skd_pci_info(skdev, pci_str);
-> > -	dev_info(&pdev->dev, "%s 64bit\n", pci_str);
-> >  
-> >  	pci_set_master(pdev);
-> >  	rc = pci_enable_pcie_error_reporting(pdev);
-> 
+(As per the other thread, bio_add_page() currently makes that same
+mistake for direct IO. I'm fixing that.)
