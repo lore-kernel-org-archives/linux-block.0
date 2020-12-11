@@ -2,122 +2,118 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71B5EC433FE
-	for <linux-block@archiver.kernel.org>; Fri, 11 Dec 2020 19:42:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3635BC433FE
+	for <linux-block@archiver.kernel.org>; Fri, 11 Dec 2020 19:50:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2C46B23D97
-	for <linux-block@archiver.kernel.org>; Fri, 11 Dec 2020 19:42:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DB8AA23ED2
+	for <linux-block@archiver.kernel.org>; Fri, 11 Dec 2020 19:50:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727522AbgLKSGC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Dec 2020 13:06:02 -0500
-Received: from mail.kernel.org ([198.145.29.99]:40802 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727741AbgLKSFk (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Dec 2020 13:05:40 -0500
-Date:   Sat, 12 Dec 2020 03:04:51 +0900
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1607709900;
-        bh=Ib27xs5IAcJ0qL2DAfNKgNMEdNLfkeQEpcKwRi5G7mA=;
-        h=From:To:Cc:Subject:References:In-Reply-To:From;
-        b=kr+OWHANq+KjPZyzOGZUSiSgISj2y2/sM3LVsR+TeJNbyhdOL5EPWLwqo3LgfIz0J
-         iZT1rjJMfVaRNo+Ll3fmlXWFWu7OFedFVeINgnAOFETfIhgwFcfhadAg7uOGxlLNcb
-         FraBSV2iiM+YEzGBDvclal9L8zJ2hwW6UbQX2eV2EluwptM99dVpO3mJ0pKVuYK6mJ
-         izig/qX+Var2q3VcIYh0RTphDxuSJX5vJmKCyB3kOcjbg+Cj7uQaFkWlJ709U4DeDK
-         2MsWIicLLhd+VS2Elg7zMfuCCn3IKTxb4Nu6EsgNsP4vHyL4gprdLYPaBB89v5g8mo
-         d2ff2xkWDbhng==
-From:   Keith Busch <kbusch@kernel.org>
-To:     SelvaKumar S <selvakuma.s1@samsung.com>
-Cc:     linux-nvme@lists.infradead.org, axboe@kernel.dk,
-        damien.lemoal@wdc.com, Johannes.Thumshirn@wdc.com, hch@lst.de,
-        sagi@grimberg.me, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
-        martin.petersen@oracle.com, bvanassche@acm.org,
-        mpatocka@redhat.com, hare@suse.de, dm-devel@redhat.com,
-        snitzer@redhat.com, selvajove@gmail.com, nj.shetty@samsung.com,
-        joshi.k@samsung.com, javier.gonz@samsung.com
-Subject: Re: [RFC PATCH v3 1/2] block: add simple copy support
-Message-ID: <20201211180451.GA9103@redsun51.ssa.fujisawa.hgst.com>
-References: <20201211135139.49232-1-selvakuma.s1@samsung.com>
- <CGME20201211135200epcas5p217eaa00b35a59b3468c198d85309fd7d@epcas5p2.samsung.com>
- <20201211135139.49232-2-selvakuma.s1@samsung.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201211135139.49232-2-selvakuma.s1@samsung.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+        id S2393670AbgLKSNc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Dec 2020 13:13:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50948 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388079AbgLKSNZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 11 Dec 2020 13:13:25 -0500
+Received: from mail-ej1-x644.google.com (mail-ej1-x644.google.com [IPv6:2a00:1450:4864:20::644])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34D58C0613D3;
+        Fri, 11 Dec 2020 10:12:45 -0800 (PST)
+Received: by mail-ej1-x644.google.com with SMTP id g20so13624085ejb.1;
+        Fri, 11 Dec 2020 10:12:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=jXNCL1l6e/6115GRYXv1hRB54orJ1B3shh8vugN/3Pw=;
+        b=qhyj3EQJNwQ/3D6OUfCWA4D2e62t7pnzDMZYS3v3pJMMV+ReNqh0iUKz6A6fsA5GT4
+         U7dcXm/JNUkQlfLn3CLN62x2t+nNurtUe6+s/lHvddDAuS3+6vKbsxpmqu8cSh3bHAl+
+         5Pg6DcPR/8eR1U3R/Q1fyswYLvoU7EiWR5XEAYdEvw5SUP+DJ/yD5Ttr9lajJ3zQt7mK
+         VZFwspepb98fxekOgZnPzFzzQ1pl9GGZO1YLqDuxLB7N6PKdCK4jL7RSeDlHBwDR/woS
+         ofbLQp/Ox2N2KiSyFR10Mzjmx5yrKH/ll0S0cMeLtrpB3XrNHQk8kQRSEFHd6wlgZZWx
+         74Rw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=jXNCL1l6e/6115GRYXv1hRB54orJ1B3shh8vugN/3Pw=;
+        b=hVqrZrHOML2ZthgSARlWDIISxSEK1qZxe7rCDNwHM2oWeUI1BHqnGavPQVBVQDm4Vg
+         S05OBFiRkhH3kLqqUvZDnM6ea1rfRKWNCmNnJoh3YBSa/JJ/IAcj2UZNLRNXC2Xx/zyy
+         XBxk1Ja2niCTDH1ca9tdkFCa0fsc2Ac8VXzJ9BxN/vObhpa4+DS1t0N/NpSihDxs4pSR
+         1AgBHsPpRGTdcZN44GtyEp/WZnFUPTk4jWIdSx7o7ncxVXp1kXPqwM/e1YgkQt89DAmQ
+         sief7m2Vb3/AF1m7GPzlozpGueb9TF9hsb0Hr6kgwVGyDmIJHzpZhLSmRe7DtKWKkzwS
+         uSNA==
+X-Gm-Message-State: AOAM530EbdSkx/kT+shu/vp3vv+nAlFdIkM9BI8LkHX8Q8Az4l3CnKRp
+        MhnXCK1/H9NWrwEmLRoSbVU=
+X-Google-Smtp-Source: ABdhPJyx+onXAuuShWmy6955djm1AEHtWv491E16bAkjwZvMrUAywnC+LKDsAlkf4s11EFqOsjOc2g==
+X-Received: by 2002:a17:906:6b88:: with SMTP id l8mr12186390ejr.482.1607710363877;
+        Fri, 11 Dec 2020 10:12:43 -0800 (PST)
+Received: from felia.fritz.box ([2001:16b8:2d8e:cf00:1134:a93b:bd3b:5cd6])
+        by smtp.gmail.com with ESMTPSA id ho12sm6914344ejc.45.2020.12.11.10.12.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 11 Dec 2020 10:12:42 -0800 (PST)
+From:   Lukas Bulwahn <lukas.bulwahn@gmail.com>
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org
+Cc:     Hannes Reinecke <hare@suse.de>, linux-kernel@vger.kernel.org,
+        clang-built-linux@googlegroups.com,
+        kernel-janitors@vger.kernel.org,
+        Lukas Bulwahn <lukas.bulwahn@gmail.com>
+Subject: [PATCH] block: drop dead assignments in loop_init()
+Date:   Fri, 11 Dec 2020 19:12:36 +0100
+Message-Id: <20201211181236.25755-1-lukas.bulwahn@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Dec 11, 2020 at 07:21:38PM +0530, SelvaKumar S wrote:
-> +int blk_copy_emulate(struct block_device *bdev, struct blk_copy_payload *payload,
-> +		gfp_t gfp_mask)
-> +{
-> +	struct request_queue *q = bdev_get_queue(bdev);
-> +	struct bio *bio;
-> +	void *buf = NULL;
-> +	int i, nr_srcs, max_range_len, ret, cur_dest, cur_size;
-> +
-> +	nr_srcs = payload->copy_range;
-> +	max_range_len = q->limits.max_copy_range_sectors << SECTOR_SHIFT;
+Commit 8410d38c2552 ("loop: use __register_blkdev to allocate devices on
+demand") simplified loop_init(); so computing the range of the block region
+is not required anymore and can be dropped.
 
-The default value for this limit is 0, and this is the function for when
-the device doesn't support copy. Are we expecting drivers to set this
-value to something else for that case?
+Drop dead assignments in loop_init().
 
-> +	cur_dest = payload->dest;
-> +	buf = kvmalloc(max_range_len, GFP_ATOMIC);
-> +	if (!buf)
-> +		return -ENOMEM;
-> +
-> +	for (i = 0; i < nr_srcs; i++) {
-> +		bio = bio_alloc(gfp_mask, 1);
-> +		bio->bi_iter.bi_sector = payload->range[i].src;
-> +		bio->bi_opf = REQ_OP_READ;
-> +		bio_set_dev(bio, bdev);
-> +
-> +		cur_size = payload->range[i].len << SECTOR_SHIFT;
-> +		ret = bio_add_page(bio, virt_to_page(buf), cur_size,
-> +						   offset_in_page(payload));
+As compilers will detect these unneeded assignments and optimize this,
+the resulting object code is identical before and after this change.
 
-'buf' is vmalloc'ed, so we don't necessarily have congituous pages. I
-think you need to allocate the bio with bio_map_kern() or something like
-that instead with that kind of memory.
+No functional change. No change in object code.
 
-> +		if (ret != cur_size) {
-> +			ret = -ENOMEM;
-> +			goto out;
-> +		}
-> +
-> +		ret = submit_bio_wait(bio);
-> +		bio_put(bio);
-> +		if (ret)
-> +			goto out;
-> +
-> +		bio = bio_alloc(gfp_mask, 1);
-> +		bio_set_dev(bio, bdev);
-> +		bio->bi_opf = REQ_OP_WRITE;
-> +		bio->bi_iter.bi_sector = cur_dest;
-> +		ret = bio_add_page(bio, virt_to_page(buf), cur_size,
-> +						   offset_in_page(payload));
-> +		if (ret != cur_size) {
-> +			ret = -ENOMEM;
-> +			goto out;
-> +		}
-> +
-> +		ret = submit_bio_wait(bio);
-> +		bio_put(bio);
-> +		if (ret)
-> +			goto out;
-> +
-> +		cur_dest += payload->range[i].len;
-> +	}
+Signed-off-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
+---
+Christoph, please ack.
 
-I think this would be a faster implementation if the reads were
-asynchronous with a payload buffer allocated specific to that read, and
-the callback can enqueue the write part. This would allow you to
-accumulate all the read data and write it in a single call. 
+Jens, please pick this minor non-urgent clean-up patch on your
+block -next tree on top of Christoph's commit above.
+
+ drivers/block/loop.c | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index d2ce1ddc192d..eed4bc5ef5c5 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -2304,7 +2304,6 @@ MODULE_ALIAS("devname:loop-control");
+ static int __init loop_init(void)
+ {
+ 	int i, nr;
+-	unsigned long range;
+ 	struct loop_device *lo;
+ 	int err;
+ 
+@@ -2343,10 +2342,8 @@ static int __init loop_init(void)
+ 	 */
+ 	if (max_loop) {
+ 		nr = max_loop;
+-		range = max_loop << part_shift;
+ 	} else {
+ 		nr = CONFIG_BLK_DEV_LOOP_MIN_COUNT;
+-		range = 1UL << MINORBITS;
+ 	}
+ 
+ 	err = misc_register(&loop_misc);
+-- 
+2.17.1
+
