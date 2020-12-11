@@ -2,120 +2,105 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-9.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 440B4C4361B
-	for <linux-block@archiver.kernel.org>; Fri, 11 Dec 2020 08:02:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 081D1C1B0D8
+	for <linux-block@archiver.kernel.org>; Fri, 11 Dec 2020 11:34:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EBA6623B85
-	for <linux-block@archiver.kernel.org>; Fri, 11 Dec 2020 08:02:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A926D23D5A
+	for <linux-block@archiver.kernel.org>; Fri, 11 Dec 2020 11:34:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390228AbgLKIBc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Dec 2020 03:01:32 -0500
-Received: from wout5-smtp.messagingengine.com ([64.147.123.21]:44511 "EHLO
-        wout5-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2389056AbgLKIBT (ORCPT
+        id S2389220AbgLKLdy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Dec 2020 06:33:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45688 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390637AbgLKLdb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Dec 2020 03:01:19 -0500
-Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
-        by mailout.west.internal (Postfix) with ESMTP id 13CCAB13;
-        Fri, 11 Dec 2020 03:00:13 -0500 (EST)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute1.internal (MEProxy); Fri, 11 Dec 2020 03:00:13 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=anarazel.de; h=
-        date:from:to:cc:subject:message-id:references:mime-version
-        :content-type:in-reply-to; s=fm3; bh=0VGgba5dLIPd6RkJxqFfoEr/KPt
-        raAd77lrySItpBT0=; b=vBWSmLzbLnMpdLjUfm8ZJMuGqwFpcp2CQEAOQmDi/gN
-        TnD1OCZnbrnKSRAyZTmd20bwtEgYFWWqJB6g/8fJu4hgJmUv6jShEggqkBLkIQ6d
-        FqZjgffkbrgZ4+BJ31lXo+quW7jw5rcLSkAUgW7WgE50hbzBPR+KTJROuGFcADJL
-        wqJfCBjaAAHQy01lqnwBEgu4jj9MEHCWcoa0I+SCQN7hQqHgjmn9YJPFF33oLI7Y
-        Pq44vhzsStO9NHi+uRkw2HlALBN9jC1VK2W/Qn24MUeHkDMHMfYXokfig6am2ngg
-        voAHnXM7nfHdMWUEPEHbbsw47QFPXTYoFnB/FLt1LoQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-type:date:from:in-reply-to
-        :message-id:mime-version:references:subject:to:x-me-proxy
-        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=0VGgba
-        5dLIPd6RkJxqFfoEr/KPtraAd77lrySItpBT0=; b=BxpM/Uhl7DKw8WhUKrU1tb
-        T+RhLlVO7CbHqVGpJYAhrTFKMCsYJ9VOMuCcFxpiI8U8M0qXYeTVv5FTfHMln7fZ
-        y2es6hds5zCYqrNWvgwaDB/nDhSS8f7EE06N+QAWkrCgAGThAFsOrVJKkDkjkbRK
-        yGRn+m/9b4DmwF+3MtQDv+g7+hNbvsxu7A4W2RmcDLyGRamfhG7EwdPkWurb4aHE
-        ccXK686/Grqu0CHTJeqvplvKg9OD9RdKShcGpSXuoObIfudrpFupj2BHuxoFCVRN
-        IODUT2zZNQ/tjPxJ+c0LQ+KZ4ZHzl8Fhzc5ktnfBj9sfuqaLWqD/cBlbfkSd7MmA
-        ==
-X-ME-Sender: <xms:DCfTX-LvKIHvp2lcTTEeMdUSxnR0Q7t_WnWYVw4gKpnD3OYHyeK7Uw>
-    <xme:DCfTX2JLQS4tGG04WU9vUKTAXmHv19N3GVBKS92FH46W6X6g4gV2gkbOf5VcFjyOS
-    hDTDelxulBv30WyQQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrudekuddguddufecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpeffhffvuffkfhggtggujgesthdtredttddtvdenucfhrhhomheptehnughr
-    vghsucfhrhgvuhhnugcuoegrnhgurhgvshesrghnrghrrgiivghlrdguvgeqnecuggftrf
-    grthhtvghrnhepkedvtdejgeeugeffveevieeftdffffdtvdeivddvtddtgeevieetfeel
-    ffeuleeunecuffhomhgrihhnpehsphhinhhitghsrdhnvghtpdhlkhhmlhdrohhrghenuc
-    fkphepieejrdduiedtrddvudejrddvhedtnecuvehluhhsthgvrhfuihiivgeptdenucfr
-    rghrrghmpehmrghilhhfrhhomheprghnughrvghssegrnhgrrhgriigvlhdruggv
-X-ME-Proxy: <xmx:DCfTX-t8P81beqJcVIb3IYMTZP1-RSXGQAN7Y8bFuxKxHgnwQhe2Ng>
-    <xmx:DCfTXza-yqUjqzfe0sMGq4rg1qA32SEaW_0s9lFnOr_J2zWSor1OtQ>
-    <xmx:DCfTX1ZFQyjWPdR5NzhqCYm2uT5NxZ82bwLCEyczKEptgNRMrJzhPg>
-    <xmx:DCfTX2AsCQ_1znRTHSpdgzpNLeHJCopuPd3EboL8ecdlmtEnbEnwTA>
-Received: from intern.anarazel.de (c-67-160-217-250.hsd1.ca.comcast.net [67.160.217.250])
-        by mail.messagingengine.com (Postfix) with ESMTPA id 28E3B24005D;
-        Fri, 11 Dec 2020 03:00:12 -0500 (EST)
-Date:   Fri, 11 Dec 2020 00:00:10 -0800
-From:   Andres Freund <andres@anarazel.de>
-To:     Pavel Begunkov <asml.silence@gmail.com>
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Subject: Re: hybrid polling on an nvme doesn't seem to work with iodepth > 1
- on 5.10.0-rc5
-Message-ID: <20201211080010.zy5baxjlxslut4b6@alap3.anarazel.de>
-References: <20201210205141.px7suygfrl2lhdkr@alap3.anarazel.de>
- <73c43682-10f2-0bc9-5aa5-e433abd4f3c3@gmail.com>
- <aa735173-fad1-b7d4-1c90-4fccc90c562d@gmail.com>
- <20201211011940.ouc4k3am5gg2ithp@alap3.anarazel.de>
- <de0b46d2-d053-a7a8-23e7-fc954807c70d@gmail.com>
+        Fri, 11 Dec 2020 06:33:31 -0500
+Received: from mail-pl1-x642.google.com (mail-pl1-x642.google.com [IPv6:2607:f8b0:4864:20::642])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B31B2C0613D6;
+        Fri, 11 Dec 2020 03:32:51 -0800 (PST)
+Received: by mail-pl1-x642.google.com with SMTP id s2so4443951plr.9;
+        Fri, 11 Dec 2020 03:32:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=BWICF8mwrTJeoR9Oo9x9XDSK1j/Izqnc/UFYRBFw/rc=;
+        b=tVwZEIX/WRoIKkoCKEs+j9YBD+oZGTrQ+l9j9L6hnAQiMHogyFxxZYUUQvw9cugbgD
+         R23stujM5wc84x0rM3oV2K7LcnV0kgP563A7mt2eWWheM+YShlL8C7ubg5xwMRykVkw3
+         sgEuxkEAibbwnYL0UsGoswFbnEhOIAuudx8tT/8uynVxbHgAJXTTI3PqwYo0+g4JKJ7v
+         64DNk3tgPqqDFqZpAeW7oweSZ/ABHuJ2cIqMLGL0KlfIeh09y4NIYT9hFzUZ5N9hSpcK
+         hRuzEdGnxKUiQkImxnJSVIlDxx9R4YzdO2033S8IjCqNR03vB+71dumFPHZHJdgvkGy3
+         YcKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=BWICF8mwrTJeoR9Oo9x9XDSK1j/Izqnc/UFYRBFw/rc=;
+        b=DytnOWSIMVQUahZR9YCF9eaTNgHi0uN4EIMuh8QZ4a1BzXAJaTlWuspNuliLj2bDzf
+         PQXs8q+yBZhJ9vjYiqiqG30AMclFjvQCRga4Dgj1UXq2xUGA4Acxx5AHpYfC6IYN9Qtq
+         pXQRgD9chuHICPs7s+dMueYF/lzSRJe4XrjfULn/IcHuYzRc1lERXK9FMSk6TrO9uamU
+         om6kl0sHhTBjS6fOgh7QNIkGAu31MRLINzk7GS5e3DTtueMEZ0Rn07h3lZptkdrDSnYT
+         oFEqoxFqOhIkY4lnF5iuyduyJ8pZcyzoavgttjZBr3T9t+te2zzJO6VOOvVCaPyA7yV1
+         Yh4A==
+X-Gm-Message-State: AOAM5309/oRHvRh2AKbdjF+RnzbpV89sweR1FODuyu6jn3UyVdR2aCa4
+        ucs/+/BTKm9OMc2T0p3wGZUfDsAXv5We8w==
+X-Google-Smtp-Source: ABdhPJwIcYTJzWTHyktVdpGBAPDPtsyyn3U31r7gB0V31U4TP1HtNJpKZZam/iNveOnuSJPRdqME/Q==
+X-Received: by 2002:a17:90a:d256:: with SMTP id o22mr8690654pjw.195.1607686371133;
+        Fri, 11 Dec 2020 03:32:51 -0800 (PST)
+Received: from localhost ([211.108.35.36])
+        by smtp.gmail.com with ESMTPSA id f24sm1809642pjj.5.2020.12.11.03.32.50
+        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 11 Dec 2020 03:32:50 -0800 (PST)
+Date:   Fri, 11 Dec 2020 20:32:48 +0900
+From:   Minwoo Im <minwoo.im.dev@gmail.com>
+To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH 0/3] blk-mq: trivial helper and fixes comments
+Message-ID: <20201211113248.GA6945@localhost.localdomain>
+References: <20201204152055.31605-1-minwoo.im.dev@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <de0b46d2-d053-a7a8-23e7-fc954807c70d@gmail.com>
+In-Reply-To: <20201204152055.31605-1-minwoo.im.dev@gmail.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
-
-On 2020-12-11 01:44:38 +0000, Pavel Begunkov wrote:
-> In general the current hybrid polling doesn't work well with high QD,
-> that's because statistics it based on are not very resilient to all sorts
-> of problems. And it might be a problem I described long ago
+On 20-12-05 00:20:52, Minwoo Im wrote:
+> Hello,
 > 
-> https://www.spinics.net/lists/linux-block/msg61479.html
-> https://lkml.org/lkml/2019/4/30/120
+> This patch set contains:
+>   - Introduce a helper to allocate tagset tags for the first time
+>     without 'realloc' keyword that used to be taken.
+>   - Fixes for comments need to be updated.
+> 
+> Please have a look.
+> 
+> Thanks,
+> 
+> 
+> Minwoo Im (3):
+>   blk-mq: add helper allocating tagset->tags
+>   blk-mq: update arg in comment of blk_mq_map_queue
+>   blk-mq: fix msec comment from micro to milli seconds
+> 
+>  block/blk-mq.c | 14 ++++++++++----
+>  block/blk-mq.h |  2 +-
+>  2 files changed, 11 insertions(+), 5 deletions(-)
+> 
+> -- 
+> 2.17.1
+> 
 
-Interesting.
+Hello,
 
+Gentle ping.
 
-> Are you interested in it just out of curiosity, or you have a good
-> use case? Modern SSDs are so fast that even with QD1 the sleep overhead
-> on sleeping getting considerable, all the more so for higher QD.
-
-It's a bit more than just idle curiosity, but not a strong need (yet). I
-was experimenting with using it for postgres WAL writes. The CPU cost of
-"classic" polling is high enough to make it not super attractive in a
-lot of cases.  Often enough the QD is just 1 for data integrity writes
-on fast drives, but there's also cases (bulk load particularly, or high
-concurrency OLTP) where having multiple IOs in flight is important.
-
-
-> Because if there is no one who really cares, then instead of adding
-> elaborated correction schemes, I'd rather put max(time, 10ms) and
-> that's it.
-
-I wonder if it's doable to just switch from hybrid polling to classic
-polling if there's more than one request in flight?
-
-Greetings,
-
-Andres Freund
+Thanks!
