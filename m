@@ -2,152 +2,134 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F73CC4361B
-	for <linux-block@archiver.kernel.org>; Fri, 11 Dec 2020 17:21:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73060C433FE
+	for <linux-block@archiver.kernel.org>; Fri, 11 Dec 2020 17:22:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3143623E1B
-	for <linux-block@archiver.kernel.org>; Fri, 11 Dec 2020 17:21:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3087823DC2
+	for <linux-block@archiver.kernel.org>; Fri, 11 Dec 2020 17:22:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2394684AbgLKQOd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Dec 2020 11:14:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60836 "EHLO
+        id S2389627AbgLKQQl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Dec 2020 11:16:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33000 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2393314AbgLKQOG (ORCPT
+        with ESMTP id S2395105AbgLKQQj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Dec 2020 11:14:06 -0500
-Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4608CC0613CF;
-        Fri, 11 Dec 2020 08:13:26 -0800 (PST)
-Received: by mail-pg1-x52a.google.com with SMTP id n7so7444696pgg.2;
-        Fri, 11 Dec 2020 08:13:26 -0800 (PST)
+        Fri, 11 Dec 2020 11:16:39 -0500
+Received: from mail-ej1-x644.google.com (mail-ej1-x644.google.com [IPv6:2a00:1450:4864:20::644])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4093BC061793
+        for <linux-block@vger.kernel.org>; Fri, 11 Dec 2020 08:15:59 -0800 (PST)
+Received: by mail-ej1-x644.google.com with SMTP id n26so13084654eju.6
+        for <linux-block@vger.kernel.org>; Fri, 11 Dec 2020 08:15:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=+VatYUp/CbzFRRkDcJgIRWVA106s7Q3bUbotDUN/Irg=;
-        b=r9jTAsRjqBVRzzeXPhcEs4Dj6N5Mc52REuHzSdt0Mmx2USOTiyS24u+vmup3m3J7tj
-         GEWmsz5zANtPTKMASQqjw4lDH3NVg8M/btQ+o1tk7jbhG7AHdnYL/XDrCW632lWSPTRv
-         RpNWFx6/Kucny4o05PCN6Zw+jFiZEXdktr2kH/WWAxYLG6wIq8TVl3JlZuKVE/yqoo2G
-         m8xzxQQNBusyuFo8wr6sc26N97PjpyfQwTWZ3fyc8SBA/3XotYOumi+ir4XIAuH9i27q
-         Wr3IQveEnrxGSyTjrcNotZ/Nn+QfPuqbwgTlpSveqFfqaomCmHBgivJMg8jnQtoffHl/
-         zzQA==
+        d=cmpxchg-org.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=WW/IgNhybzf9n43eMLzqyKuFaTrBzPIKMpnR7SzERUk=;
+        b=bYROoITLccQpGFGMZXPD6eWxSyrqAjonuDGHEXaEMRMw2U73UZPBA/Wx+3wcdLnuwE
+         gH9Z8XDcULoJPsPcibh0AIQarFEI/KJBT0PJ6EA+bHu6T8MPr31cyPmomih/kjn5jZN7
+         m8npqnDCucqxPsaatevB23b9SJj+ogwBY0rjZvp69Gjpbf+e+RzXPhh5A4eel+1sspFD
+         x7FLY4Z07Wuzs1fGnz/y/aZTwusaVyQ4LocM7f1JYm86LAB2OOTRax8ujzryu2yP2Ccz
+         ue90Kdx0V68pf/HNNRQhRhrQ8KqbaMiZn2oaZCKv9J9va1bg1TEY7vGFP2UbEtaCXYM3
+         CkEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=+VatYUp/CbzFRRkDcJgIRWVA106s7Q3bUbotDUN/Irg=;
-        b=i46Q0wH99q3c9bpk0WNfmUn9tTmrrl+gRME94Ir/dgSiNs+HMDlZrZXO7g+gyeGTkr
-         QxcndRthqQgSkirU6fmEVvGAVuLmbMT4RULbPdgwK/HjDHAdEGdT27rbPOXr58Y9F0sJ
-         MZgiUs+ZPq8zjWj+RatCMCf/ZEVN7LYaH2WGuoaNV66QZeD44pFggWXVkphu27WJ2zVn
-         M/4jmvx8Osvkmazq8uWaqtRNJ3ETBq5RG5jHzWMxm3gLfFY20plQXdUIfRUQ4L7gpP+o
-         0ml+IItM6+2acgYJK3V+15PPb0DO844NZocKqgayE1PhZhro23yx1TNr8GcOok5gjErg
-         EfQQ==
-X-Gm-Message-State: AOAM531Sh7aA9yhIjaU1aY8T50N1wkNPFqwwU5KCmC+ofVsUdqYuftiI
-        Pkf7kOVitGCuhBVg7gsExUtyFRAGyAA=
-X-Google-Smtp-Source: ABdhPJxhkIdnRpbXwuRsbMgm4Rz0tiigFIv0FQwhqZlyMcRfKSnW/cqMn4WWRCbFouvA28HzZYrqSg==
-X-Received: by 2002:a62:c505:0:b029:19d:c3fe:6d92 with SMTP id j5-20020a62c5050000b029019dc3fe6d92mr12280366pfg.47.1607703205524;
-        Fri, 11 Dec 2020 08:13:25 -0800 (PST)
-Received: from archlinux.. ([161.81.68.216])
-        by smtp.gmail.com with ESMTPSA id k21sm10498396pfu.77.2020.12.11.08.13.23
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=WW/IgNhybzf9n43eMLzqyKuFaTrBzPIKMpnR7SzERUk=;
+        b=GzTkvfVF291OAwsKanzNok249uX9qsX3eJ15CVXjjyLji9yQiE4WrinZZKX59zvNBe
+         4zxd3mqlRRx7qTYQKd/r026/oFsAsSnVjk3z3mUQApV9DKXHw9dt8zTYkXDsjqCG2WGm
+         rSQlLDkgwZTMMsJTKVy08IITrwYTCrrvLLd3X5FQuURKdprDO1FLs33YrTUmtgnVhVpG
+         QAWAu7D3zgx5RVWmZl+wyeOLPoPyGG1JYlaFyNDfOy/GEdL63eFxBGPbe1I++W6M9//K
+         Anx0ZNNU87eUsDDdsOBzfCe3WMNAoVdrgAvTb0mnX6OozjbXRkvctvqe3jwKnvFGg1xU
+         9ydg==
+X-Gm-Message-State: AOAM5306K2jOC1y8y2/+3Xc2zoY96UYu720b/Ty4mk3Hs/ryRWPcxR82
+        HNEPDpKP5RJoKk8g4KrDObHEqA==
+X-Google-Smtp-Source: ABdhPJzCbOj1KEERoOizE5nFoQrtWVhtDxa5igMqyGnmwwDfZ12nc/2x3mxL2z0PTn/ivUgMyLBp8A==
+X-Received: by 2002:a17:906:1151:: with SMTP id i17mr11899657eja.250.1607703357882;
+        Fri, 11 Dec 2020 08:15:57 -0800 (PST)
+Received: from localhost ([2620:10d:c093:400::5:ee7a])
+        by smtp.gmail.com with ESMTPSA id ga11sm7215778ejb.34.2020.12.11.08.15.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Dec 2020 08:13:24 -0800 (PST)
-From:   Tom Yan <tom.ty89@gmail.com>
-To:     linux-block@vger.kernel.org
-Cc:     linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org,
-        Tom Yan <tom.ty89@gmail.com>
-Subject: [RFC v3] block: avoid the unnecessary blk_bio_discard_split()
-Date:   Sat, 12 Dec 2020 00:13:19 +0800
-Message-Id: <20201211161319.1767-1-tom.ty89@gmail.com>
-X-Mailer: git-send-email 2.29.2
-In-Reply-To: <20201210113704.1395-1-tom.ty89@gmail.com>
-References: <20201210113704.1395-1-tom.ty89@gmail.com>
+        Fri, 11 Dec 2020 08:15:57 -0800 (PST)
+Date:   Fri, 11 Dec 2020 17:13:52 +0100
+From:   Johannes Weiner <hannes@cmpxchg.org>
+To:     Pavel Begunkov <asml.silence@gmail.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Matthew Wilcox <willy@infradead.org>
+Subject: Re: [PATCH 2/2] block: no-copy bvec for direct IO
+Message-ID: <20201211161352.GB291478@cmpxchg.org>
+References: <cover.1607477897.git.asml.silence@gmail.com>
+ <51905c4fcb222e14a1d5cb676364c1b4f177f582.1607477897.git.asml.silence@gmail.com>
+ <20201209084005.GC21968@infradead.org>
+ <20201211140622.GA286014@cmpxchg.org>
+ <2404b68a-1569-ce25-c9c4-00d7e42f9e06@gmail.com>
+ <20201211153836.GA291478@cmpxchg.org>
+ <6507b474-6f91-f99d-1dff-d7c21462813e@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6507b474-6f91-f99d-1dff-d7c21462813e@gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-It doesn't seem necessary to have the redundant layer of splitting.
-The request size will even be more consistent / aligned to the cap.
+On Fri, Dec 11, 2020 at 03:47:23PM +0000, Pavel Begunkov wrote:
+> On 11/12/2020 15:38, Johannes Weiner wrote:
+> > On Fri, Dec 11, 2020 at 02:20:11PM +0000, Pavel Begunkov wrote:
+> >> On 11/12/2020 14:06, Johannes Weiner wrote:
+> >>> On Wed, Dec 09, 2020 at 08:40:05AM +0000, Christoph Hellwig wrote:
+> >>>>> +	/*
+> >>>>> +	 * In practice groups of pages tend to be accessed/reclaimed/refaulted
+> >>>>> +	 * together. To not go over bvec for those who didn't set BIO_WORKINGSET
+> >>>>> +	 * approximate it by looking at the first page and inducing it to the
+> >>>>> +	 * whole bio
+> >>>>> +	 */
+> >>>>> +	if (unlikely(PageWorkingset(iter->bvec->bv_page)))
+> >>>>> +		bio_set_flag(bio, BIO_WORKINGSET);
+> >>>>
+> >>>> IIRC the feedback was that we do not need to deal with BIO_WORKINGSET
+> >>>> at all for direct I/O.
+> >>>
+> >>> Yes, this hunk is incorrect. We must not use this flag for direct IO.
+> >>> It's only for paging IO, when you bring in the data at page->mapping +
+> >>> page->index. Otherwise you tell the pressure accounting code that you
+> >>> are paging in a thrashing page, when really you're just reading new
+> >>> data into a page frame that happens to be hot.
+> >>>
+> >>> (As per the other thread, bio_add_page() currently makes that same
+> >>> mistake for direct IO. I'm fixing that.)
+> >>
+> >> I have that stuff fixed, it just didn't go into the RFC. That's basically
+> >> removing replacing add_page() with its version without BIO_WORKINGSET
+> 
+> I wrote something strange... Should have been "replacing add_page() in
+> those functions with a version without BIO_WORKINGSET".
 
-Signed-off-by: Tom Yan <tom.ty89@gmail.com>
----
- block/blk-lib.c   | 11 +++++++++--
- block/blk-merge.c |  2 +-
- block/blk.h       |  8 ++++++--
- 3 files changed, 16 insertions(+), 5 deletions(-)
+No worries, I understood.
 
-diff --git a/block/blk-lib.c b/block/blk-lib.c
-index e90614fd8d6a..cbf55c9f0d6f 100644
---- a/block/blk-lib.c
-+++ b/block/blk-lib.c
-@@ -85,12 +85,19 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
- 		 *   is split in device drive, the split ones are very probably
- 		 *   to be aligned to discard_granularity of the device's queue.
- 		 */
--		if (granularity_aligned_lba == sector_mapped)
-+		if (granularity_aligned_lba == sector_mapped) {
- 			req_sects = min_t(sector_t, nr_sects,
- 					  bio_aligned_discard_max_sectors(q));
--		else
-+			if (!req_sects)
-+				return -EOPNOTSUPP;
-+		} else {
- 			req_sects = min_t(sector_t, nr_sects,
- 					  granularity_aligned_lba - sector_mapped);
-+		}
-+
-+		/* Zero-sector (unknown) and one-sector granularities are the same.  */
-+		granularity = max(q->limits.discard_granularity >> SECTOR_SHIFT, 1U);
-+		req_sects = round_down(req_sects, granularity);
- 
- 		WARN_ON_ONCE((req_sects << 9) > UINT_MAX);
- 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 97b7c2821565..f4e030fe6399 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -59,6 +59,7 @@ static inline bool req_gap_front_merge(struct request *req, struct bio *bio)
- 	return bio_will_gap(req->q, NULL, bio, req->bio);
- }
- 
-+/* deprecated */
- static struct bio *blk_bio_discard_split(struct request_queue *q,
- 					 struct bio *bio,
- 					 struct bio_set *bs,
-@@ -303,7 +304,6 @@ void __blk_queue_split(struct bio **bio, unsigned int *nr_segs)
- 	switch (bio_op(*bio)) {
- 	case REQ_OP_DISCARD:
- 	case REQ_OP_SECURE_ERASE:
--		split = blk_bio_discard_split(q, *bio, &q->bio_split, nr_segs);
- 		break;
- 	case REQ_OP_WRITE_ZEROES:
- 		split = blk_bio_write_zeroes_split(q, *bio, &q->bio_split,
-diff --git a/block/blk.h b/block/blk.h
-index dfab98465db9..508371fafdf3 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -281,8 +281,12 @@ static inline unsigned int bio_allowed_max_sectors(struct request_queue *q)
- static inline unsigned int bio_aligned_discard_max_sectors(
- 					struct request_queue *q)
- {
--	return round_down(UINT_MAX, q->limits.discard_granularity) >>
--			SECTOR_SHIFT;
-+	unsigned int discard_max_sectors, granularity;
-+	discard_max_sectors = min(q->limits.max_discard_sectors,
-+				  bio_allowed_max_sectors(q));
-+	/* Zero-sector (unknown) and one-sector granularities are the same.  */
-+	granularity = max(q->limits.discard_granularity >> SECTOR_SHIFT, 1U);
-+	return round_down(discard_max_sectors, granularity);
- }
- 
- /*
--- 
-2.29.2
+> >> in bio_iov_iter_get_pages() and all __bio_iov_*_{add,get}_pages() +
+> >> fix up ./fs/direct-io.c. Should cover all direct cases if I didn't miss
+> >> some.
+> > 
+> > Ah, that's fantastic! Thanks for clarifying.
+> 
+> To keep it clear, do we go with what I have stashed (I'm planning to
+> reiterate this weekend)? or you're going to write it up yourself?
+> Just in case there is some cooler way you have in mind :)
 
+Honestly, I only wrote all my ideas down and asked for feedback
+because I wasn't super excited about any of them ;-)
+
+If your changes happen to separate the direct io path from the
+buffered io path naturally, I'm okay with it.
+
+I'd say let's go with what you already have and see whether Jens and
+Christoph like it. We can always do follow-on cleanups.
