@@ -2,134 +2,205 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73060C433FE
-	for <linux-block@archiver.kernel.org>; Fri, 11 Dec 2020 17:22:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECF67C4361B
+	for <linux-block@archiver.kernel.org>; Fri, 11 Dec 2020 17:32:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3087823DC2
-	for <linux-block@archiver.kernel.org>; Fri, 11 Dec 2020 17:22:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BED7A23E1B
+	for <linux-block@archiver.kernel.org>; Fri, 11 Dec 2020 17:32:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389627AbgLKQQl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Dec 2020 11:16:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33000 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2395105AbgLKQQj (ORCPT
+        id S2395080AbgLKQ1V (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Dec 2020 11:27:21 -0500
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:22500 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732836AbgLKQ1I (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Dec 2020 11:16:39 -0500
-Received: from mail-ej1-x644.google.com (mail-ej1-x644.google.com [IPv6:2a00:1450:4864:20::644])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4093BC061793
-        for <linux-block@vger.kernel.org>; Fri, 11 Dec 2020 08:15:59 -0800 (PST)
-Received: by mail-ej1-x644.google.com with SMTP id n26so13084654eju.6
-        for <linux-block@vger.kernel.org>; Fri, 11 Dec 2020 08:15:59 -0800 (PST)
+        Fri, 11 Dec 2020 11:27:08 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1607704183; x=1639240183;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=/0LRgM6P7Jw0ITHgnURkK9KPdHGJx3EOGYmQvmd4TBU=;
+  b=lMHEpYtNGxqYSP0nESxgiBDndejbLFYb77X7Wd7zvQTbjQnG8G4Rd27T
+   ksEgSlKnPBn7LSg/IehbtNw8PMVuGR+zJcPvgpPrIOo5kb4LZs8iFMwtd
+   P52VJr1mgLGWPMq4irGN83QHOCekajchfxlEYRFQNSN39sQxOevR1zQwJ
+   Vm8S1TdxzSurzo9wZvkZur/a4sgFwufB4Vj/j0ixC8u3mgojQwrs2wPsV
+   YaN82ubRZ0nDyGYrxHtor2mwaWK1fPkDGpFEc/96ZKBvMSIv1CEiUeO9W
+   jaNH2vcMIqUetX3oyZz/toYp+rc5jjHj/iT1B/45qKi/5PSLbFEibesS4
+   w==;
+IronPort-SDR: 3KFJbNYFL8JmzKKepNliLy4A9LmIeAaXx/Y0Xr3GF+GVUEk76BG9X0ex2Cs3RYbAPBPfcO/DAh
+ wxxtTdFc1CSFkDhMaxtJPbtzJJCJ6oo3jfEq8iYkmJcelAmE+l4sN3hTGPZZ58f+OxBik6Qyrj
+ tE3WkUkvYcDAKUVCCoz/tqmuoawmvfDmg7zvw/idgCe1UCZcCXp5RimGLiePVUAL35nOo68ksu
+ oSrZlRaWuWAQDKGdb5g5MmMgmNUStrzF348M+XHQ0YtICIyI5JbaWyVH7vyo4+Pvlm1CKHGQ9c
+ 4K8=
+X-IronPort-AV: E=Sophos;i="5.78,411,1599494400"; 
+   d="scan'208";a="258685781"
+Received: from mail-bl2nam02lp2056.outbound.protection.outlook.com (HELO NAM02-BL2-obe.outbound.protection.outlook.com) ([104.47.38.56])
+  by ob1.hgst.iphmx.com with ESMTP; 12 Dec 2020 00:28:01 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=AJJpMSdn6mH/E43AdtJz35QXgn5BNsWNoFOxgeKGKFP44pruEXKMGH/Ffrz2d6WMJF8Dplk2BT6uEClJwkI0ZFgZIJjuvGaZBX0jvkrHGb7sgEiSc4BVR5X1CrM5BSwl+MZ8gJ7UobT0VrIRFrzzlomgu8SgB+UjoCF5MvA3XD/5e8ZCW0kfAutjKK21PWUYDmpBBTJfrCOyU5DG3HDpgkDXgo42aNBAe3mZvRZOYxB5PrpZUU19YcGDJx0TlaTdmdb4B4Swj9CH4YuI0lb2ALQ0UxKxaOwB+9AdtKNMnmXFt3ItCog8kzJBkxkmRgonMf7ZWm2CNvzWAo8ijwggMA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=pU8po3KooHPk9dZPeptM1TmsRMACH+3oAr2oqpho3zA=;
+ b=aJPwqxsJphJXyXwBXrIb5Sx5PTZWCEmGogBVDTzPhhAPNM0qAyA53T3tM8uIcv4qT6F4r6NVY5oqWHIzIs7PzneJ4dzW5VrQ70zwHbCx+TLkh+2xb/aOYPh79QGaMcIz5J7ystB5oNm+IN/HB2zgA7UeMobV8Obp++HuH/s1HszZOULR60t5TLBEjS8R47Gb7BPo4AwbtwoxSvN7om6ktWuxkYckcpK9EMo2lQWNxVGK6nMdbodmfZpTNzKc2UM456yKbg/sgooBp34HCje9ugPEw/QXXaDiXxmcFE1+E1L5nTHt/G7zHxl2Pnywh7I15R+xcdQrLcoNE7QMlc1BuA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cmpxchg-org.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=WW/IgNhybzf9n43eMLzqyKuFaTrBzPIKMpnR7SzERUk=;
-        b=bYROoITLccQpGFGMZXPD6eWxSyrqAjonuDGHEXaEMRMw2U73UZPBA/Wx+3wcdLnuwE
-         gH9Z8XDcULoJPsPcibh0AIQarFEI/KJBT0PJ6EA+bHu6T8MPr31cyPmomih/kjn5jZN7
-         m8npqnDCucqxPsaatevB23b9SJj+ogwBY0rjZvp69Gjpbf+e+RzXPhh5A4eel+1sspFD
-         x7FLY4Z07Wuzs1fGnz/y/aZTwusaVyQ4LocM7f1JYm86LAB2OOTRax8ujzryu2yP2Ccz
-         ue90Kdx0V68pf/HNNRQhRhrQ8KqbaMiZn2oaZCKv9J9va1bg1TEY7vGFP2UbEtaCXYM3
-         CkEA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=WW/IgNhybzf9n43eMLzqyKuFaTrBzPIKMpnR7SzERUk=;
-        b=GzTkvfVF291OAwsKanzNok249uX9qsX3eJ15CVXjjyLji9yQiE4WrinZZKX59zvNBe
-         4zxd3mqlRRx7qTYQKd/r026/oFsAsSnVjk3z3mUQApV9DKXHw9dt8zTYkXDsjqCG2WGm
-         rSQlLDkgwZTMMsJTKVy08IITrwYTCrrvLLd3X5FQuURKdprDO1FLs33YrTUmtgnVhVpG
-         QAWAu7D3zgx5RVWmZl+wyeOLPoPyGG1JYlaFyNDfOy/GEdL63eFxBGPbe1I++W6M9//K
-         Anx0ZNNU87eUsDDdsOBzfCe3WMNAoVdrgAvTb0mnX6OozjbXRkvctvqe3jwKnvFGg1xU
-         9ydg==
-X-Gm-Message-State: AOAM5306K2jOC1y8y2/+3Xc2zoY96UYu720b/Ty4mk3Hs/ryRWPcxR82
-        HNEPDpKP5RJoKk8g4KrDObHEqA==
-X-Google-Smtp-Source: ABdhPJzCbOj1KEERoOizE5nFoQrtWVhtDxa5igMqyGnmwwDfZ12nc/2x3mxL2z0PTn/ivUgMyLBp8A==
-X-Received: by 2002:a17:906:1151:: with SMTP id i17mr11899657eja.250.1607703357882;
-        Fri, 11 Dec 2020 08:15:57 -0800 (PST)
-Received: from localhost ([2620:10d:c093:400::5:ee7a])
-        by smtp.gmail.com with ESMTPSA id ga11sm7215778ejb.34.2020.12.11.08.15.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Dec 2020 08:15:57 -0800 (PST)
-Date:   Fri, 11 Dec 2020 17:13:52 +0100
-From:   Johannes Weiner <hannes@cmpxchg.org>
-To:     Pavel Begunkov <asml.silence@gmail.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Matthew Wilcox <willy@infradead.org>
-Subject: Re: [PATCH 2/2] block: no-copy bvec for direct IO
-Message-ID: <20201211161352.GB291478@cmpxchg.org>
-References: <cover.1607477897.git.asml.silence@gmail.com>
- <51905c4fcb222e14a1d5cb676364c1b4f177f582.1607477897.git.asml.silence@gmail.com>
- <20201209084005.GC21968@infradead.org>
- <20201211140622.GA286014@cmpxchg.org>
- <2404b68a-1569-ce25-c9c4-00d7e42f9e06@gmail.com>
- <20201211153836.GA291478@cmpxchg.org>
- <6507b474-6f91-f99d-1dff-d7c21462813e@gmail.com>
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=pU8po3KooHPk9dZPeptM1TmsRMACH+3oAr2oqpho3zA=;
+ b=TmB0pZg5Lp/yhBiTBEJfNLu1/Wy6fC4iDxwz1tYUehruRv2s2TvDbLbTOBinFHNS+rGrRysFt2oT5orWBShGzznEnWEqPRgceUZ5CUyF9vvGzgqpIWsPOw+zxPLIIPJuAUQ1crHRHsAXJqkJwQD42Xh3ilizMpcUETf6As8ub20=
+Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
+ (2603:10b6:803:47::21) by SN2PR04MB2143.namprd04.prod.outlook.com
+ (2603:10b6:804:e::25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3654.12; Fri, 11 Dec
+ 2020 16:25:57 +0000
+Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
+ ([fe80::65d7:592a:32d4:9f98]) by SN4PR0401MB3598.namprd04.prod.outlook.com
+ ([fe80::65d7:592a:32d4:9f98%6]) with mapi id 15.20.3589.038; Fri, 11 Dec 2020
+ 16:25:57 +0000
+From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+To:     SelvaKumar S <selvakuma.s1@samsung.com>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+CC:     "kbusch@kernel.org" <kbusch@kernel.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        "hch@lst.de" <hch@lst.de>, "sagi@grimberg.me" <sagi@grimberg.me>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "bvanassche@acm.org" <bvanassche@acm.org>,
+        "mpatocka@redhat.com" <mpatocka@redhat.com>,
+        "hare@suse.de" <hare@suse.de>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "snitzer@redhat.com" <snitzer@redhat.com>,
+        "selvajove@gmail.com" <selvajove@gmail.com>,
+        "nj.shetty@samsung.com" <nj.shetty@samsung.com>,
+        "joshi.k@samsung.com" <joshi.k@samsung.com>,
+        "javier.gonz@samsung.com" <javier.gonz@samsung.com>
+Subject: Re: [RFC PATCH v3 1/2] block: add simple copy support
+Thread-Topic: [RFC PATCH v3 1/2] block: add simple copy support
+Thread-Index: AQHWz83y7bUu+jQhLUujuAOdfzAPcw==
+Date:   Fri, 11 Dec 2020 16:25:57 +0000
+Message-ID: <SN4PR0401MB359867B95139ACD1ACFF0E709BCA0@SN4PR0401MB3598.namprd04.prod.outlook.com>
+References: <20201211135139.49232-1-selvakuma.s1@samsung.com>
+ <CGME20201211135200epcas5p217eaa00b35a59b3468c198d85309fd7d@epcas5p2.samsung.com>
+ <20201211135139.49232-2-selvakuma.s1@samsung.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: samsung.com; dkim=none (message not signed)
+ header.d=none;samsung.com; dmarc=none action=none header.from=wdc.com;
+x-originating-ip: [129.253.240.72]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 350dcab8-f7d2-4aef-4f64-08d89df170a1
+x-ms-traffictypediagnostic: SN2PR04MB2143:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <SN2PR04MB21439BAF7E03A5EE175205B59BCA0@SN2PR04MB2143.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:6430;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 0/z9C2lKihgmLqDmO0DBr1PGZyf00HH7Ob61BT6gRF43tEFb/ZsGSQcXGJ93yhS1JWh12J6Y8WIOL1CEdH9F0Of+l6NCqGJVQj1bYipHxfltEK/1vJmSGobAboNiu/VP2FiezXjeppSwVNmHhIWM2iknZ/u6neQ6oUyADEXq++EKDqqZlV/bOpEudkP5bavTPDyWGjVVzZzU9Lf1HVe1Su9Oq9o+4UkCT3aoSUmKp47J3V+hs5HWEkn11RbvTizEVJQjWUMfpURqBdqZZp5ItHO/dHR6jKSP6HpjkSOSm45LU1hpZ8vTHoowt9jYdNCZ
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN4PR0401MB3598.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(136003)(376002)(366004)(2906002)(76116006)(66476007)(64756008)(186003)(66446008)(71200400001)(110136005)(53546011)(7416002)(33656002)(55016002)(52536014)(8676002)(66946007)(8936002)(86362001)(7696005)(83380400001)(66556008)(9686003)(4326008)(91956017)(508600001)(54906003)(26005)(6506007)(5660300002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: =?us-ascii?Q?o/8mc+OP6SxgDy2SY29553XGgMWUazCqlMZ/q7HEJN0FxceCRvbYOLZ3Tanu?=
+ =?us-ascii?Q?/A/4I8KgrP67ni/BwPHFOOA+2Wtim9bhg84QAfq1oXKfHYsMmKtQjzffjVu2?=
+ =?us-ascii?Q?lEqs1wwEBB59nFJlKHpBrAm6JBUN6GinBc2wWpi+6LLXO3M+ovivARgVctqm?=
+ =?us-ascii?Q?Tka24Jjx0EA7eULiMDgJyeizzxnYmjLggBkkoER7Gho3rfQBkny1MRDSVuUJ?=
+ =?us-ascii?Q?KtGr5658jfXz5Rse9wktl4L3gHtXpiHS3AypJKuDFjE2AHRkz54u201GtKvN?=
+ =?us-ascii?Q?uzjxkZLAn9AHU7usg89Gev2sb2sYaSGB5jsixjknObyE9EyofhrWj0wcbEud?=
+ =?us-ascii?Q?jIEm7rZO+3UqI6kLBgIRwoktzilB1ZuDsoDObX3436vLScDyu1hCLWlhzY1u?=
+ =?us-ascii?Q?EtE51lgejkbncUGvnZus718YG81NGL9ylXx1R3Lget+a9wOoiOIZMy+2sF4V?=
+ =?us-ascii?Q?KyeTLQG0Ilpz4XuO84883FURUKJBl+3u/2pT8d8nouMrNFJQFTknXsxnXv5H?=
+ =?us-ascii?Q?EAzvfpPyZXSiqUZgDXuSACA/XfSQ9LDlte73tXDEd/945NKQMC9EeQxbluP7?=
+ =?us-ascii?Q?0lp3UhWASumQMmCrsFWlzAnglQICpfBE7+JUrG5GmlH9B5yKsYA9Pi+yywlK?=
+ =?us-ascii?Q?gRJbo1Aa4icr3QB4Dt2hnxzgLggw/zXPC2YS8vS2OPROe9ggBMe+Z8/0r6DS?=
+ =?us-ascii?Q?OEjfZ+/HKaYHIBIOaI1DX9LVPchVZIJZgnV+TqN1yAqvLsxcO7mKVjB9O/4s?=
+ =?us-ascii?Q?zEBuC7dP/Rv8SZXhZERznY8HzqdeuYyPBFenWz/vmaeuzKBzWWWtYFrJSdj2?=
+ =?us-ascii?Q?rpvPkQLXc0a5NwUXlqM66MxJRBSB5OVYRhChA2ncFA55DlvVc6I1+xFUpBsI?=
+ =?us-ascii?Q?qOoRvIteb6KCNVCL25ohU1lXc+skO7wPSgA/15LS55UcQs91YaiFmNtGVNr1?=
+ =?us-ascii?Q?r9Q4o1gQxa2iDEBO/5Q8NW40wCr/uNZAA2TRdmNF+bavxG0+9r0TFVfC80Cn?=
+ =?us-ascii?Q?Wl3R?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6507b474-6f91-f99d-1dff-d7c21462813e@gmail.com>
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SN4PR0401MB3598.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 350dcab8-f7d2-4aef-4f64-08d89df170a1
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Dec 2020 16:25:57.3695
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: djyFGdR9AjKUyY8KLcZJgBfxKBS+dY9MYgddnJvK575qF22vOpzJ26qaDm+jl3oxtgEGEWDkuazNWm9hj4Faqg2nvJo7nYsgbgksG/0Yd9Q=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN2PR04MB2143
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Dec 11, 2020 at 03:47:23PM +0000, Pavel Begunkov wrote:
-> On 11/12/2020 15:38, Johannes Weiner wrote:
-> > On Fri, Dec 11, 2020 at 02:20:11PM +0000, Pavel Begunkov wrote:
-> >> On 11/12/2020 14:06, Johannes Weiner wrote:
-> >>> On Wed, Dec 09, 2020 at 08:40:05AM +0000, Christoph Hellwig wrote:
-> >>>>> +	/*
-> >>>>> +	 * In practice groups of pages tend to be accessed/reclaimed/refaulted
-> >>>>> +	 * together. To not go over bvec for those who didn't set BIO_WORKINGSET
-> >>>>> +	 * approximate it by looking at the first page and inducing it to the
-> >>>>> +	 * whole bio
-> >>>>> +	 */
-> >>>>> +	if (unlikely(PageWorkingset(iter->bvec->bv_page)))
-> >>>>> +		bio_set_flag(bio, BIO_WORKINGSET);
-> >>>>
-> >>>> IIRC the feedback was that we do not need to deal with BIO_WORKINGSET
-> >>>> at all for direct I/O.
-> >>>
-> >>> Yes, this hunk is incorrect. We must not use this flag for direct IO.
-> >>> It's only for paging IO, when you bring in the data at page->mapping +
-> >>> page->index. Otherwise you tell the pressure accounting code that you
-> >>> are paging in a thrashing page, when really you're just reading new
-> >>> data into a page frame that happens to be hot.
-> >>>
-> >>> (As per the other thread, bio_add_page() currently makes that same
-> >>> mistake for direct IO. I'm fixing that.)
-> >>
-> >> I have that stuff fixed, it just didn't go into the RFC. That's basically
-> >> removing replacing add_page() with its version without BIO_WORKINGSET
-> 
-> I wrote something strange... Should have been "replacing add_page() in
-> those functions with a version without BIO_WORKINGSET".
-
-No worries, I understood.
-
-> >> in bio_iov_iter_get_pages() and all __bio_iov_*_{add,get}_pages() +
-> >> fix up ./fs/direct-io.c. Should cover all direct cases if I didn't miss
-> >> some.
-> > 
-> > Ah, that's fantastic! Thanks for clarifying.
-> 
-> To keep it clear, do we go with what I have stashed (I'm planning to
-> reiterate this weekend)? or you're going to write it up yourself?
-> Just in case there is some cooler way you have in mind :)
-
-Honestly, I only wrote all my ideas down and asked for feedback
-because I wasn't super excited about any of them ;-)
-
-If your changes happen to separate the direct io path from the
-buffered io path naturally, I'm okay with it.
-
-I'd say let's go with what you already have and see whether Jens and
-Christoph like it. We can always do follow-on cleanups.
+On 11/12/2020 15:57, SelvaKumar S wrote:=0A=
+[...] =0A=
+> +int blk_copy_emulate(struct block_device *bdev, struct blk_copy_payload =
+*payload,=0A=
+> +		gfp_t gfp_mask)=0A=
+> +{=0A=
+> +	struct request_queue *q =3D bdev_get_queue(bdev);=0A=
+> +	struct bio *bio;=0A=
+> +	void *buf =3D NULL;=0A=
+> +	int i, nr_srcs, max_range_len, ret, cur_dest, cur_size;=0A=
+> +=0A=
+> +	nr_srcs =3D payload->copy_range;=0A=
+> +	max_range_len =3D q->limits.max_copy_range_sectors << SECTOR_SHIFT;=0A=
+> +	cur_dest =3D payload->dest;=0A=
+> +	buf =3D kvmalloc(max_range_len, GFP_ATOMIC);=0A=
+=0A=
+Why GFP_ATOMIC and not the passed in gfp_mask? Especially as this is a kvma=
+lloc()=0A=
+which has the potential to grow quite big.=0A=
+=0A=
+> +int __blkdev_issue_copy(struct block_device *bdev, sector_t dest,=0A=
+> +		sector_t nr_srcs, struct range_entry *rlist, gfp_t gfp_mask,=0A=
+> +		int flags, struct bio **biop)=0A=
+> +{=0A=
+=0A=
+[...]=0A=
+=0A=
+> +	total_size =3D struct_size(payload, range, nr_srcs);=0A=
+> +	payload =3D kmalloc(total_size, GFP_ATOMIC | __GFP_NOWARN);=0A=
+=0A=
+Same here. =0A=
+=0A=
+=0A=
+> diff --git a/block/ioctl.c b/block/ioctl.c=0A=
+> index 6b785181344f..a4a507d85e56 100644=0A=
+> --- a/block/ioctl.c=0A=
+> +++ b/block/ioctl.c=0A=
+> @@ -142,6 +142,47 @@ static int blk_ioctl_discard(struct block_device *bd=
+ev, fmode_t mode,=0A=
+>  				    GFP_KERNEL, flags);=0A=
+>  }=0A=
+>  =0A=
+> +static int blk_ioctl_copy(struct block_device *bdev, fmode_t mode,=0A=
+> +		unsigned long arg, unsigned long flags)=0A=
+> +{=0A=
+=0A=
+[...]=0A=
+=0A=
+> +=0A=
+> +	rlist =3D kmalloc_array(crange.nr_range, sizeof(*rlist),=0A=
+> +			GFP_ATOMIC | __GFP_NOWARN);=0A=
+=0A=
+And here. I think this one can even be GFP_KERNEL.=0A=
+=0A=
+ =0A=
+=0A=
