@@ -2,229 +2,216 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 818C9C433FE
-	for <linux-block@archiver.kernel.org>; Fri, 11 Dec 2020 21:50:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3901CC4361B
+	for <linux-block@archiver.kernel.org>; Fri, 11 Dec 2020 22:47:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4E55423B31
-	for <linux-block@archiver.kernel.org>; Fri, 11 Dec 2020 21:50:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0B42923C83
+	for <linux-block@archiver.kernel.org>; Fri, 11 Dec 2020 22:47:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387906AbgLKVEQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Dec 2020 16:04:16 -0500
-Received: from mail-io1-f72.google.com ([209.85.166.72]:53448 "EHLO
-        mail-io1-f72.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729581AbgLKVDw (ORCPT
+        id S2406393AbgLKVws (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Dec 2020 16:52:48 -0500
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:56528 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2393025AbgLKVwN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Dec 2020 16:03:52 -0500
-Received: by mail-io1-f72.google.com with SMTP id l20so7464950ioc.20
-        for <linux-block@vger.kernel.org>; Fri, 11 Dec 2020 13:03:36 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=/6F3RXalHgOzVu9rfB8RHBjhKhY3G02Ggw1yXVxJRB4=;
-        b=pZbN33KYKsPc+YKFsxOMMpMQhlu0AMyHwN94yJF9kPbnyJXosyqxvZcnK8cELEfmuT
-         HmeXytV2J82UDo3Pf9ZhMGR5t1/1UZYKGtAPQkkgdLgjorR3CC75Mw+sSZjecCKseDTS
-         /3rSIbbdM5IFSOtAniqiThxhuLw5NwM06GKbYDayybCuJU6KGQs56BygbvDYJKFy8bLm
-         AZ8vGFD2FEPsipytpzNPhblP0gGWryUmdbIgke9ioj/2n15WPAkDq4KPQM4OBYgun5Fl
-         ObU4so0J8rBXlxT9LNTpfwi54kjf8tvcEfmJcubQtvV9r/ja9FYW6Hcnx9TIScL026jv
-         pb+w==
-X-Gm-Message-State: AOAM530IMXsrhmRFZiGtOe2aVsTl8kPyh4QygB+UVjIZEmAIVyvE3iz6
-        26mid7+Yf2TcDfK7ev7H1cXVi1EJpfxD3EbyUSQe0e64qJwy
-X-Google-Smtp-Source: ABdhPJxqFsmtqhxHB9Xnc82nSiuKEv7r0d/7k52qSXrw+7TBiSuMDc59y7RKHpB+ZvEZhFR+/sqwAqDvs4AKwcgazrEp0m0eVpsD
+        Fri, 11 Dec 2020 16:52:13 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1607723533; x=1639259533;
+  h=from:to:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=tgJ71mbjaFfiwBso8x6Q+ZvaQudcDnf0t5I22yz3FKc=;
+  b=ogFcxJ0mUSZX9+fbl+PZfUOqSI3xkzdr8tREUugRRL/GBV5KgK7KINQL
+   /HjQC6I05f2v22JFDoZ+R4jRYcdCliFK43sIUrYSOO72NJLNkyh0iCwif
+   gorcBcOrgO3tfDVNFIQX60tkEYG/tKTi99U3kihxtQ65UwJT3hCf3s+jF
+   WO2VxyJJMTcIBgKA5hGiXHbtudY8V4QR4N1BMKvVYtqzvCtk/gJhZ7fFl
+   5Ampvx7mW1cg0ZJueT2xTf50OfSvIfetSDISoUtmXNV2AvZ3LOe3NgZ0k
+   JPuv1Gmp1YXFl93trV3ddJiyhjQ48XMxOD5HEh238qAWuDNjXkaG9alez
+   Q==;
+IronPort-SDR: CbR0Be67DWTqZciaZwLbPmd9C7A7L67LWwkMxnOL6akGezHCJKPu630plRwOXc4dF4S3P4bNMk
+ AGWeYtMkqGx91ZWUfF912r/aUx1MOJP8++t99rYvDcOfD6b8kUauBOX4vMZq84q+CpcgMoUMFB
+ SuNFs/sVCk3zh2qYsrD1xSMJ270U7Y0NNsqg+MlEC1E/xApjoS8nrgNou6do+dIooBJwt0dMia
+ apUDG+El+mQm+ztbNUYGUnGYpOPAkFIxDQMeugqbSbzZLexndqeMYW3lbnzErRohY5EJ1c+XQV
+ obg=
+X-IronPort-AV: E=Sophos;i="5.78,412,1599494400"; 
+   d="scan'208";a="159428056"
+Received: from mail-bn8nam11lp2168.outbound.protection.outlook.com (HELO NAM11-BN8-obe.outbound.protection.outlook.com) ([104.47.58.168])
+  by ob1.hgst.iphmx.com with ESMTP; 12 Dec 2020 05:50:54 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=GVYbGXKVWbPCy1dvXGBUQ7hR4wfPsVJzz7aoGYcbM89NGGq3nyOEsz6NP+/Ve/w+jfmEVOOGW+EV2NRzeHFU7+RGNzJdN+O7wnsvmo/rEDpMARArv4tXgt1GBGIUK2Qd/udxTV7kIGlWd8SLz77Gd/sb7ELUraSBtvoXZwFXiqGduUoTaeVyjNoM6BTHbJpHrPQgtgOhNqN8VN08RRM2J3sUGv7OaAZVFqzigRCN9WryAeV5PpTQW1HbRDEuV0aFX121v7m556DXJr9QBlchn9XCvpB7GuLRsNYRsPV8fzircSu6q82CDSBzpZFRZDW2s4IrGNlNu6rIhiGJBp1WQQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZpVLfmPFAMoTlGC2JvMEbIde1Ot/st+Y/fjPvtLhrIY=;
+ b=jryG2F5XEXGpjwoSUTzRtsPDlAu8+lhErqy1qdQ/18MJweC7yos2v9xdoUtRyT0Z46SMmcZKmOq5F23Stgf3+/dsoA/moIzuecRp8fcYHPmVjqKUgiTIqsvb2jctbM5g74/s+8J6N9Opub7xstcCZrDrIyKJgeuqQCfl0VryPcz+64mZbL2NLG+PCRDXebd4N7dqk9vXRpzx7McMLNO+M1ihPMwdDbMkzMnnL2vmw1O8irb6+RsOQ9e8QB0TUiHi++YDrJjqtTCLLmkBxFO/oQToR2qLUNn/pbNxNqkeTr/3YJzZRI5zSBAt697Wo/zQ9T+5x2lyDOD7dH4aHewyLg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZpVLfmPFAMoTlGC2JvMEbIde1Ot/st+Y/fjPvtLhrIY=;
+ b=hM9t5VdaPC3ZcDG3psmaT3FbWIwrBBKm/4H4VKbOwOBlCfEqb6oji32QfYcU6rNZefPXCDBvvPA+70Ko4czoxIQre6TzFfFDtpF02obsGzIe4eKI95nYUlTKJQoJjdSlwBtOd31ImEiJFSJV0mcoBFniK7ufhz822bLcY7p3sAQ=
+Received: from BYAPR04MB4965.namprd04.prod.outlook.com (2603:10b6:a03:4d::25)
+ by BYAPR04MB3958.namprd04.prod.outlook.com (2603:10b6:a02:ae::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3654.12; Fri, 11 Dec
+ 2020 21:50:53 +0000
+Received: from BYAPR04MB4965.namprd04.prod.outlook.com
+ ([fe80::99ae:ab95:7c27:99e4]) by BYAPR04MB4965.namprd04.prod.outlook.com
+ ([fe80::99ae:ab95:7c27:99e4%7]) with mapi id 15.20.3632.025; Fri, 11 Dec 2020
+ 21:50:53 +0000
+From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+To:     Puranjay Mohan <puranjay12@gmail.com>,
+        "bjorn@helgaas.com" <bjorn@helgaas.com>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] drivers: block: skd: remove skd_pci_info()
+Thread-Topic: [PATCH] drivers: block: skd: remove skd_pci_info()
+Thread-Index: AQHWz9z+X41O+6EQc0KJnRIciprIXQ==
+Date:   Fri, 11 Dec 2020 21:50:52 +0000
+Message-ID: <BYAPR04MB496513CB49E42A3467427BF686CA0@BYAPR04MB4965.namprd04.prod.outlook.com>
+References: <20201211164137.8605-1-puranjay12@gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: gmail.com; dkim=none (message not signed)
+ header.d=none;gmail.com; dmarc=none action=none header.from=wdc.com;
+x-originating-ip: [199.255.45.62]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: cc9a3a23-85fb-4267-8300-08d89e1ed4eb
+x-ms-traffictypediagnostic: BYAPR04MB3958:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <BYAPR04MB3958ACC0AD18C2558919906886CA0@BYAPR04MB3958.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:1332;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: Q121NoGuewogx/r7vEko0noTYCcdbSlO+hs9O7MKot487FeJWRNsvK1rUfvxWypFB0LxhRdQrUcx8N3d8xElYhgTS3KBga7CSxpJv2Q1WXX4XEwLuFMepyeXEnjQ9PPQfgn08qOnsfkIM6PTnQHGUHcOf+3rsMIOUuTUDF5a9YlK6nX4Z0gbA9GDDszcIM6zzGmr6mKmwwgu0k0rD/7uaz8S/U/oPUJ5ygQ3R4sVv7jHVqxcVBPco9Rik6BSh6JmPFKrIZSu0EeJnhSgl12M9KFKlQgIKGmpTkBS7p1QQMah6CRWkZBJpAistwoL2ykSBmaQNNrpben0Lp2xPzVZIA==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR04MB4965.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(346002)(376002)(136003)(76116006)(9686003)(6506007)(71200400001)(110136005)(66946007)(66446008)(8936002)(2906002)(52536014)(55016002)(5660300002)(86362001)(66476007)(53546011)(33656002)(8676002)(66556008)(64756008)(7696005)(508600001)(26005)(83380400001)(186003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: =?us-ascii?Q?YCOj0pXbYvGoH7YzI9sC/uYKDN8kJsoUgQsPZydfJHKbMtCdqSTVmadqQXo1?=
+ =?us-ascii?Q?EUfTGsf560XEvzn/AcrDZIEWuPLEuuk5bHNvbiBSqRNcGrwJyxJXjxgcSaqM?=
+ =?us-ascii?Q?EgEDpOziPT0+ha95xWjNW8iXJEru30mJnoib1R4Bq9KiTrajM8tMm93+9hyj?=
+ =?us-ascii?Q?nU+1eiy2e5s8JcyqBshmfD3Niutbl3OehwySTuDQMXHPvTfltm6uG/5tyCo2?=
+ =?us-ascii?Q?Gjc2AwznXLeKCkZ3vtrDuM16B+BL79etIqV9opmZjpIJkZsQ+AeYzMdZF/nF?=
+ =?us-ascii?Q?vBxX0i+FLyW9ga0jhN53AGMOc78n4ZhOEpYz1R3HD9WnXRbNCYRMVuXwIMeB?=
+ =?us-ascii?Q?pNXPl82mnmzXfTuMvFYdz7gO9FdYOeHF5f5bvP2z/ss/ImOAhpJOZn7wSxqH?=
+ =?us-ascii?Q?OsN9HZJYfS500D1AM8VZuaxHVxZ5Eengn/ylyBnXWTSPL+EtttF0S6q4sfS0?=
+ =?us-ascii?Q?C2cNkAD4eUmFuxnBFeNydAcbX9cQLs1DWZaWpnskMnnBFnGFbE6bd+DMiPq9?=
+ =?us-ascii?Q?Bn1uWAtJFK38yUFab+JD1T8J2UKpuGDAhiVVVowadFjTfoBBsK3MqRxTWU4c?=
+ =?us-ascii?Q?+N7wcKLf8a9GEZOs0DfBKWQjppeqRm2A2IkHs30AN5UuvWPNqGx33oPAGKmk?=
+ =?us-ascii?Q?v2sS4BqZfestfwZDOtNDfz7pxbkQWEqZCJABA5VUZyKBoMSnZq7OOUEyTRSU?=
+ =?us-ascii?Q?7jQDCETFh/Jx47xPBcdafUJw3B+OUXlY/ItDYzQBma43ouzK3hw1idqNAHmN?=
+ =?us-ascii?Q?4lMaG9PsNS6YfZvsQ2I6Efb1bCWrioTawgIuhdOHUlU+VvAkJOF5HbjusOco?=
+ =?us-ascii?Q?8BgyvDLhRqh3f96KNCPYK/+1xFBQgd2bqSXNmPNasCSvxRupPCiUlV70NMuT?=
+ =?us-ascii?Q?OvJ9Mz3qyzF1p/6UyARaOW06NlQp/W95xp1hspXZJdUExUy/P7ZpufcQYJ8v?=
+ =?us-ascii?Q?GjbRAnv3Ef0Fe1WRW3xDZxnlFBLoBp6vu7/zbhRAMaYXSGPzKfqQrQ2e7rWh?=
+ =?us-ascii?Q?2sfi?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-X-Received: by 2002:a5e:990c:: with SMTP id t12mr17387076ioj.33.1607720591516;
- Fri, 11 Dec 2020 13:03:11 -0800 (PST)
-Date:   Fri, 11 Dec 2020 13:03:11 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000c167dd05b6369e69@google.com>
-Subject: KASAN: use-after-free Read in disk_part_iter_next
-From:   syzbot <syzbot+825f0f9657d4e528046e@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR04MB4965.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: cc9a3a23-85fb-4267-8300-08d89e1ed4eb
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Dec 2020 21:50:52.9917
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: MzIK5DtNcmB7cSG0nkRJ32jg36nVt3UBe4J9/kiea4YPdqpe3gZ+UkC3Mwbv6U31W7N7BTdrIvuiJQI3/kEY5EaDV6xPkJSn89R5FWVNRdw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB3958
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
-
-syzbot found the following issue on:
-
-HEAD commit:    15ac8fdb Add linux-next specific files for 20201207
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=15d8ad37500000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=3696b8138207d24d
-dashboard link: https://syzkaller.appspot.com/bug?extid=825f0f9657d4e528046e
-compiler:       gcc (GCC) 10.1.0-syz 20200507
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1393dcbd500000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1074cf17500000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+825f0f9657d4e528046e@syzkaller.appspotmail.com
-
-==================================================================
-BUG: KASAN: use-after-free in bdev_nr_sectors include/linux/genhd.h:264 [inline]
-BUG: KASAN: use-after-free in disk_part_iter_next+0x4c7/0x560 block/genhd.c:204
-Read of size 8 at addr ffff88814080b9a8 by task syz-executor825/9848
-
-CPU: 1 PID: 9848 Comm: syz-executor825 Not tainted 5.10.0-rc6-next-20201207-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Call Trace:
- __dump_stack lib/dump_stack.c:79 [inline]
- dump_stack+0x107/0x163 lib/dump_stack.c:120
- print_address_description.constprop.0.cold+0x5b/0x2f8 mm/kasan/report.c:230
- __kasan_report mm/kasan/report.c:396 [inline]
- kasan_report.cold+0x79/0xd5 mm/kasan/report.c:413
- bdev_nr_sectors include/linux/genhd.h:264 [inline]
- disk_part_iter_next+0x4c7/0x560 block/genhd.c:204
- partition_overlaps+0x96/0x200 block/partitions/core.c:425
- bdev_add_partition+0x66/0x130 block/partitions/core.c:444
- blkpg_do_ioctl+0x2d0/0x340 block/ioctl.c:43
- blkpg_ioctl block/ioctl.c:60 [inline]
- blkdev_ioctl+0x577/0x6d0 block/ioctl.c:541
- block_ioctl+0xf9/0x140 fs/block_dev.c:1649
- vfs_ioctl fs/ioctl.c:48 [inline]
- __do_sys_ioctl fs/ioctl.c:753 [inline]
- __se_sys_ioctl fs/ioctl.c:739 [inline]
- __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:739
- do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
- entry_SYSCALL_64_after_hwframe+0x44/0xa9
-RIP: 0033:0x447ff9
-Code: dd ca fb ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 0f 83 ab ca fb ff c3 66 2e 0f 1f 84 00 00 00 00
-RSP: 002b:00007fff3c27c398 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 0000000000447ff9
-RDX: 0000000020000240 RSI: 0000000000001269 RDI: 0000000000000003
-RBP: 00000000000148cc R08: 0000000200000000 R09: 0000000200000000
-R10: 0000000000000004 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000404fc0 R14: 0000000000000000 R15: 0000000000000000
-
-Allocated by task 9811:
- kasan_save_stack+0x1b/0x40 mm/kasan/common.c:39
- kasan_set_track mm/kasan/common.c:47 [inline]
- set_alloc_info mm/kasan/common.c:405 [inline]
- ____kasan_kmalloc mm/kasan/common.c:436 [inline]
- ____kasan_kmalloc.constprop.0+0xa0/0xd0 mm/kasan/common.c:408
- kasan_slab_alloc include/linux/kasan.h:205 [inline]
- slab_post_alloc_hook mm/slab.h:518 [inline]
- slab_alloc_node mm/slub.c:2903 [inline]
- slab_alloc mm/slub.c:2911 [inline]
- kmem_cache_alloc+0x155/0x380 mm/slub.c:2916
- bdev_alloc_inode+0x18/0x40 fs/block_dev.c:777
- alloc_inode+0x61/0x230 fs/inode.c:233
- new_inode_pseudo fs/inode.c:927 [inline]
- new_inode+0x27/0x2f0 fs/inode.c:956
- bdev_alloc+0x20/0x340 fs/block_dev.c:864
- add_partition+0x1ad/0x8e0 block/partitions/core.c:345
- bdev_add_partition+0xb6/0x130 block/partitions/core.c:449
- blkpg_do_ioctl+0x2d0/0x340 block/ioctl.c:43
- blkpg_ioctl block/ioctl.c:60 [inline]
- blkdev_ioctl+0x577/0x6d0 block/ioctl.c:541
- block_ioctl+0xf9/0x140 fs/block_dev.c:1649
- vfs_ioctl fs/ioctl.c:48 [inline]
- __do_sys_ioctl fs/ioctl.c:753 [inline]
- __se_sys_ioctl fs/ioctl.c:739 [inline]
- __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:739
- do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
- entry_SYSCALL_64_after_hwframe+0x44/0xa9
-
-Freed by task 17:
- kasan_save_stack+0x1b/0x40 mm/kasan/common.c:39
- kasan_set_track+0x1c/0x30 mm/kasan/common.c:47
- kasan_set_free_info+0x20/0x30 mm/kasan/generic.c:355
- ____kasan_slab_free.part.0+0xe1/0x110 mm/kasan/common.c:366
- kasan_slab_free include/linux/kasan.h:188 [inline]
- slab_free_hook mm/slub.c:1548 [inline]
- slab_free_freelist_hook+0x82/0x1d0 mm/slub.c:1586
- slab_free mm/slub.c:3157 [inline]
- kmem_cache_free+0x82/0x360 mm/slub.c:3173
- i_callback+0x3f/0x70 fs/inode.c:222
- rcu_do_batch kernel/rcu/tree.c:2502 [inline]
- rcu_core+0x735/0x1020 kernel/rcu/tree.c:2737
- __do_softirq+0x2b7/0xa76 kernel/softirq.c:343
-
-Last potentially related work creation:
- kasan_save_stack+0x1b/0x40 mm/kasan/common.c:39
- kasan_record_aux_stack+0xdc/0x100 mm/kasan/generic.c:343
- __call_rcu kernel/rcu/tree.c:2987 [inline]
- call_rcu+0xbb/0x810 kernel/rcu/tree.c:3062
- destroy_inode+0x129/0x1b0 fs/inode.c:288
- iput_final fs/inode.c:1651 [inline]
- iput.part.0+0x41e/0x840 fs/inode.c:1677
- iput+0x58/0x70 fs/inode.c:1667
- disk_part_iter_exit block/genhd.c:232 [inline]
- disk_part_iter_next+0x9a/0x560 block/genhd.c:200
- blk_drop_partitions+0x10a/0x180 block/partitions/core.c:541
- bdev_disk_changed+0x238/0x430 fs/block_dev.c:1228
- loop_reread_partitions+0x29/0x50 drivers/block/loop.c:655
- loop_set_status+0x735/0x1040 drivers/block/loop.c:1416
- loop_set_status64 drivers/block/loop.c:1536 [inline]
- lo_ioctl+0x900/0x1720 drivers/block/loop.c:1704
- blkdev_ioctl+0x2a1/0x6d0 block/ioctl.c:576
- block_ioctl+0xf9/0x140 fs/block_dev.c:1649
- vfs_ioctl fs/ioctl.c:48 [inline]
- __do_sys_ioctl fs/ioctl.c:753 [inline]
- __se_sys_ioctl fs/ioctl.c:739 [inline]
- __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:739
- do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
- entry_SYSCALL_64_after_hwframe+0x44/0xa9
-
-Second to last potentially related work creation:
- kasan_save_stack+0x1b/0x40 mm/kasan/common.c:39
- kasan_record_aux_stack+0xdc/0x100 mm/kasan/generic.c:343
- __call_rcu kernel/rcu/tree.c:2987 [inline]
- call_rcu+0xbb/0x810 kernel/rcu/tree.c:3062
- destroy_inode+0x129/0x1b0 fs/inode.c:288
- iput_final fs/inode.c:1651 [inline]
- iput.part.0+0x41e/0x840 fs/inode.c:1677
- iput+0x58/0x70 fs/inode.c:1667
- disk_release+0x191/0x240 block/genhd.c:1212
- device_release+0x9f/0x240 drivers/base/core.c:1804
- kobject_cleanup lib/kobject.c:705 [inline]
- kobject_release lib/kobject.c:736 [inline]
- kref_put include/linux/kref.h:65 [inline]
- kobject_put+0x1c8/0x540 lib/kobject.c:753
- put_device+0x1b/0x30 drivers/base/core.c:3033
- put_disk+0x44/0x60 block/genhd.c:1414
- do_floppy_init drivers/block/floppy.c:4826 [inline]
- floppy_async_init+0x2004/0x2033 drivers/block/floppy.c:4834
- async_run_entry_fn+0xf3/0x730 kernel/async.c:123
- process_one_work+0x98d/0x1630 kernel/workqueue.c:2275
- worker_thread+0x64c/0x1120 kernel/workqueue.c:2421
- kthread+0x3b1/0x4a0 kernel/kthread.c:292
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:296
-
-The buggy address belongs to the object at ffff88814080b980
- which belongs to the cache bdev_cache of size 2808
-The buggy address is located 40 bytes inside of
- 2808-byte region [ffff88814080b980, ffff88814080c478)
-The buggy address belongs to the page:
-page:0000000095b89171 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x140808
-head:0000000095b89171 order:3 compound_mapcount:0 compound_pincount:0
-flags: 0x57ff00000010200(slab|head)
-raw: 057ff00000010200 0000000000000000 0000000100000001 ffff8880109c0b40
-raw: 0000000000000000 00000000800b000b 00000001ffffffff 0000000000000000
-page dumped because: kasan: bad access detected
-
-Memory state around the buggy address:
- ffff88814080b880: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fc
- ffff88814080b900: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
->ffff88814080b980: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                                  ^
- ffff88814080ba00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff88814080ba80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-==================================================================
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-syzbot can test patches for this issue, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+On 12/11/20 08:45, Puranjay Mohan wrote:=0A=
+> PCI core calls __pcie_print_link_status() for every device, it prints=0A=
+> both the link width and the link speed. skd_pci_info() does the same=0A=
+> thing again, hence it can be removed.=0A=
+>=0A=
+> Signed-off-by: Puranjay Mohan <puranjay12@gmail.com>=0A=
+> ---=0A=
+>  drivers/block/skd_main.c | 31 -------------------------------=0A=
+>  1 file changed, 31 deletions(-)=0A=
+>=0A=
+> diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c=0A=
+> index a962b4551bed..da7aac5335d9 100644=0A=
+> --- a/drivers/block/skd_main.c=0A=
+> +++ b/drivers/block/skd_main.c=0A=
+> @@ -3134,40 +3134,11 @@ static const struct pci_device_id skd_pci_tbl[] =
+=3D {=0A=
+>  =0A=
+>  MODULE_DEVICE_TABLE(pci, skd_pci_tbl);=0A=
+>  =0A=
+> -static char *skd_pci_info(struct skd_device *skdev, char *str)=0A=
+> -{=0A=
+> -	int pcie_reg;=0A=
+> -=0A=
+> -	strcpy(str, "PCIe (");=0A=
+> -	pcie_reg =3D pci_find_capability(skdev->pdev, PCI_CAP_ID_EXP);=0A=
+> -=0A=
+> -	if (pcie_reg) {=0A=
+> -=0A=
+> -		char lwstr[6];=0A=
+> -		uint16_t pcie_lstat, lspeed, lwidth;=0A=
+> -=0A=
+> -		pcie_reg +=3D 0x12;=0A=
+> -		pci_read_config_word(skdev->pdev, pcie_reg, &pcie_lstat);=0A=
+> -		lspeed =3D pcie_lstat & (0xF);=0A=
+> -		lwidth =3D (pcie_lstat & 0x3F0) >> 4;=0A=
+> -=0A=
+> -		if (lspeed =3D=3D 1)=0A=
+> -			strcat(str, "2.5GT/s ");=0A=
+> -		else if (lspeed =3D=3D 2)=0A=
+> -			strcat(str, "5.0GT/s ");=0A=
+> -		else=0A=
+> -			strcat(str, "<unknown> ");=0A=
+The skd driver prints unknown if the speed is not "2.5GT/s" or "5.0GT/s".=
+=0A=
+__pcie_print_link_status()  prints "unknown" only if speed=0A=
+value >=3D ARRAY_SIZE(speed_strings).=0A=
+=0A=
+If a buggy skd card returns value that is not !=3D ("2.5GT/s" or "5.0GT/s")=
+=0A=
+&& value < ARRAY_SIZE(speed_strings) then it will not print the unknown but=
+=0A=
+the value from speed string array.=0A=
+=0A=
+Which breaks the current behavior. Please correct me if I'm wrong.=0A=
+> -		snprintf(lwstr, sizeof(lwstr), "%dX)", lwidth);=0A=
+> -		strcat(str, lwstr);=0A=
+> -	}=0A=
+> -	return str;=0A=
+> -}=0A=
+>  =0A=
+>  static int skd_pci_probe(struct pci_dev *pdev, const struct pci_device_i=
+d *ent)=0A=
+>  {=0A=
+>  	int i;=0A=
+>  	int rc =3D 0;=0A=
+> -	char pci_str[32];=0A=
+>  	struct skd_device *skdev;=0A=
+>  =0A=
+>  	dev_dbg(&pdev->dev, "vendor=3D%04X device=3D%04x\n", pdev->vendor,=0A=
+> @@ -3201,8 +3172,6 @@ static int skd_pci_probe(struct pci_dev *pdev, cons=
+t struct pci_device_id *ent)=0A=
+>  		goto err_out_regions;=0A=
+>  	}=0A=
+>  =0A=
+> -	skd_pci_info(skdev, pci_str);=0A=
+> -	dev_info(&pdev->dev, "%s 64bit\n", pci_str);=0A=
+>  =0A=
+>  	pci_set_master(pdev);=0A=
+>  	rc =3D pci_enable_pcie_error_reporting(pdev);=0A=
+=0A=
