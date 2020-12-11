@@ -2,96 +2,122 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B59EFC4361B
-	for <linux-block@archiver.kernel.org>; Fri, 11 Dec 2020 19:40:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71B5EC433FE
+	for <linux-block@archiver.kernel.org>; Fri, 11 Dec 2020 19:42:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 67A7223D5A
-	for <linux-block@archiver.kernel.org>; Fri, 11 Dec 2020 19:40:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2C46B23D97
+	for <linux-block@archiver.kernel.org>; Fri, 11 Dec 2020 19:42:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391464AbgLKSE1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Dec 2020 13:04:27 -0500
-Received: from mx2.suse.de ([195.135.220.15]:45346 "EHLO mx2.suse.de"
+        id S1727522AbgLKSGC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Dec 2020 13:06:02 -0500
+Received: from mail.kernel.org ([198.145.29.99]:40802 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2390628AbgLKSET (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Dec 2020 13:04:19 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id C087DAE4A;
-        Fri, 11 Dec 2020 18:03:37 +0000 (UTC)
-Subject: Re: [PATCH 0/3] block: blk_interposer - Block Layer Interposer
-To:     Jens Axboe <axboe@kernel.dk>, Mike Snitzer <snitzer@redhat.com>,
-        Sergei Shtepa <sergei.shtepa@veeam.com>, hch@lst.de
-Cc:     "johannes.thumshirn@wdc.com" <johannes.thumshirn@wdc.com>,
-        "koct9i@gmail.com" <koct9i@gmail.com>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>,
-        "josef@toxicpanda.com" <josef@toxicpanda.com>,
-        "steve@sk2.org" <steve@sk2.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Pavel Tide <Pavel.TIde@veeam.com>, dm-devel@redhat.com
-References: <1607518911-30692-1-git-send-email-sergei.shtepa@veeam.com>
- <20201209135148.GA32720@redhat.com> <20201210145814.GA31521@veeam.com>
- <20201210163222.GB10239@redhat.com> <20201211163049.GC16168@redhat.com>
- <1ee7652e-b77f-6fa4-634c-ff6639037321@kernel.dk>
- <208edf35-ecdc-2d73-4c48-0424943a78c0@suse.de>
- <06b4a10d-5ea5-27e1-af0d-83d5c714996f@kernel.dk>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <b4f3ee74-58fd-52c8-ae60-f352758fb42a@suse.de>
-Date:   Fri, 11 Dec 2020 19:03:36 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+        id S1727741AbgLKSFk (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 11 Dec 2020 13:05:40 -0500
+Date:   Sat, 12 Dec 2020 03:04:51 +0900
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1607709900;
+        bh=Ib27xs5IAcJ0qL2DAfNKgNMEdNLfkeQEpcKwRi5G7mA=;
+        h=From:To:Cc:Subject:References:In-Reply-To:From;
+        b=kr+OWHANq+KjPZyzOGZUSiSgISj2y2/sM3LVsR+TeJNbyhdOL5EPWLwqo3LgfIz0J
+         iZT1rjJMfVaRNo+Ll3fmlXWFWu7OFedFVeINgnAOFETfIhgwFcfhadAg7uOGxlLNcb
+         FraBSV2iiM+YEzGBDvclal9L8zJ2hwW6UbQX2eV2EluwptM99dVpO3mJ0pKVuYK6mJ
+         izig/qX+Var2q3VcIYh0RTphDxuSJX5vJmKCyB3kOcjbg+Cj7uQaFkWlJ709U4DeDK
+         2MsWIicLLhd+VS2Elg7zMfuCCn3IKTxb4Nu6EsgNsP4vHyL4gprdLYPaBB89v5g8mo
+         d2ff2xkWDbhng==
+From:   Keith Busch <kbusch@kernel.org>
+To:     SelvaKumar S <selvakuma.s1@samsung.com>
+Cc:     linux-nvme@lists.infradead.org, axboe@kernel.dk,
+        damien.lemoal@wdc.com, Johannes.Thumshirn@wdc.com, hch@lst.de,
+        sagi@grimberg.me, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
+        martin.petersen@oracle.com, bvanassche@acm.org,
+        mpatocka@redhat.com, hare@suse.de, dm-devel@redhat.com,
+        snitzer@redhat.com, selvajove@gmail.com, nj.shetty@samsung.com,
+        joshi.k@samsung.com, javier.gonz@samsung.com
+Subject: Re: [RFC PATCH v3 1/2] block: add simple copy support
+Message-ID: <20201211180451.GA9103@redsun51.ssa.fujisawa.hgst.com>
+References: <20201211135139.49232-1-selvakuma.s1@samsung.com>
+ <CGME20201211135200epcas5p217eaa00b35a59b3468c198d85309fd7d@epcas5p2.samsung.com>
+ <20201211135139.49232-2-selvakuma.s1@samsung.com>
 MIME-Version: 1.0
-In-Reply-To: <06b4a10d-5ea5-27e1-af0d-83d5c714996f@kernel.dk>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201211135139.49232-2-selvakuma.s1@samsung.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/11/20 6:04 PM, Jens Axboe wrote:
-> On 12/11/20 9:56 AM, Hannes Reinecke wrote:
->> On 12/11/20 5:33 PM, Jens Axboe wrote:
->>> On 12/11/20 9:30 AM, Mike Snitzer wrote:
->>>> While I still think there needs to be a proper _upstream_ consumer of
->>>> blk_interposer as a condition of it going in.. I'll let others make the
->>>> call.
->>>
->>> That's an unequivocal rule.
->>>
->>>> As such, I'll defer to Jens, Christoph and others on whether your
->>>> minimalist blk_interposer hook is acceptable in the near-term.
->>>
->>> I don't think so, we don't do short term bandaids just to plan on
->>> ripping that out when the real functionality is there. IMHO, the dm
->>> approach is the way to go - it provides exactly the functionality that
->>> is needed in an appropriate way, instead of hacking some "interposer"
->>> into the core block layer.
->>>
->> Which is my plan, too.
->>
->> I'll be working with the Veeam folks to present a joint patchset
->> (including the DM bits) for the next round.
-> 
-> Just to be clear, core block additions for something that dm will
-> consume is obviously fine. Adding this as block layer functionality than
-> then exposes an application API for setting it up, tearing down, etc -
-> that is definitely NOT
-> 
-That was never my intention.
-Any consumers of this thing would need to be in-kernel.
-If that was your concern.
+On Fri, Dec 11, 2020 at 07:21:38PM +0530, SelvaKumar S wrote:
+> +int blk_copy_emulate(struct block_device *bdev, struct blk_copy_payload *payload,
+> +		gfp_t gfp_mask)
+> +{
+> +	struct request_queue *q = bdev_get_queue(bdev);
+> +	struct bio *bio;
+> +	void *buf = NULL;
+> +	int i, nr_srcs, max_range_len, ret, cur_dest, cur_size;
+> +
+> +	nr_srcs = payload->copy_range;
+> +	max_range_len = q->limits.max_copy_range_sectors << SECTOR_SHIFT;
 
-Cheers,
+The default value for this limit is 0, and this is the function for when
+the device doesn't support copy. Are we expecting drivers to set this
+value to something else for that case?
 
-Hannes
--- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
+> +	cur_dest = payload->dest;
+> +	buf = kvmalloc(max_range_len, GFP_ATOMIC);
+> +	if (!buf)
+> +		return -ENOMEM;
+> +
+> +	for (i = 0; i < nr_srcs; i++) {
+> +		bio = bio_alloc(gfp_mask, 1);
+> +		bio->bi_iter.bi_sector = payload->range[i].src;
+> +		bio->bi_opf = REQ_OP_READ;
+> +		bio_set_dev(bio, bdev);
+> +
+> +		cur_size = payload->range[i].len << SECTOR_SHIFT;
+> +		ret = bio_add_page(bio, virt_to_page(buf), cur_size,
+> +						   offset_in_page(payload));
+
+'buf' is vmalloc'ed, so we don't necessarily have congituous pages. I
+think you need to allocate the bio with bio_map_kern() or something like
+that instead with that kind of memory.
+
+> +		if (ret != cur_size) {
+> +			ret = -ENOMEM;
+> +			goto out;
+> +		}
+> +
+> +		ret = submit_bio_wait(bio);
+> +		bio_put(bio);
+> +		if (ret)
+> +			goto out;
+> +
+> +		bio = bio_alloc(gfp_mask, 1);
+> +		bio_set_dev(bio, bdev);
+> +		bio->bi_opf = REQ_OP_WRITE;
+> +		bio->bi_iter.bi_sector = cur_dest;
+> +		ret = bio_add_page(bio, virt_to_page(buf), cur_size,
+> +						   offset_in_page(payload));
+> +		if (ret != cur_size) {
+> +			ret = -ENOMEM;
+> +			goto out;
+> +		}
+> +
+> +		ret = submit_bio_wait(bio);
+> +		bio_put(bio);
+> +		if (ret)
+> +			goto out;
+> +
+> +		cur_dest += payload->range[i].len;
+> +	}
+
+I think this would be a faster implementation if the reads were
+asynchronous with a payload buffer allocated specific to that read, and
+the callback can enqueue the write part. This would allow you to
+accumulate all the read data and write it in a single call. 
