@@ -2,97 +2,119 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E7AFC4361B
-	for <linux-block@archiver.kernel.org>; Fri, 11 Dec 2020 02:02:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A029CC433FE
+	for <linux-block@archiver.kernel.org>; Fri, 11 Dec 2020 03:25:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 530C923E1B
-	for <linux-block@archiver.kernel.org>; Fri, 11 Dec 2020 02:02:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4D39723EB0
+	for <linux-block@archiver.kernel.org>; Fri, 11 Dec 2020 03:25:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731759AbgLKCCE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Dec 2020 21:02:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42814 "EHLO
+        id S2390164AbgLKDY4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Dec 2020 22:24:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55504 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388458AbgLKCBs (ORCPT
+        with ESMTP id S1731725AbgLKDYp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Dec 2020 21:01:48 -0500
-Received: from ZenIV.linux.org.uk (zeniv.linux.org.uk [IPv6:2002:c35c:fd02::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE5D8C0613D6;
-        Thu, 10 Dec 2020 18:01:07 -0800 (PST)
-Received: from viro by ZenIV.linux.org.uk with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1knXjw-000Sct-GJ; Fri, 11 Dec 2020 02:01:00 +0000
-Date:   Fri, 11 Dec 2020 02:01:00 +0000
-From:   Al Viro <viro@zeniv.linux.org.uk>
-To:     Pavel Begunkov <asml.silence@gmail.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Thu, 10 Dec 2020 22:24:45 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85117C0613CF;
+        Thu, 10 Dec 2020 19:24:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=h1ItAtttIP+TZIyDmZIVcshxsJoglh7D0VrSYqu3emU=; b=J79o8T0VKUAYCZym9j4xK1EfE+
+        ++ZctLDJKIjAt3C5ZBJfKlyo6p1ZNeb+OlDEmXsLX9GvJPhWy7C4JfpybCei+p+eTcBpVPy8LH5r4
+        1zs0S4ZErIZx/o+Nsy9IUDrz69upWEHwbsDjoXHd1IHdWwjphDqZ3U/XVAEgM0kI9YDIJsY5OLugE
+        e8EgYURKXkYwkFmGhvhWBgWKWGOgiX357PavvIRZ6EWBx4TxIuTy5LKP1iXJ8gcUUeRGA+72bpxCJ
+        SBaKa3mo7ZvlUfRx+rjky8FcUxoackM6+4xWYKuNkjtDn4sF8ix/JNTqCajA4Ydl+nnYFOMYamxg4
+        4Aw+Zc3A==;
+Received: from willy by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1knZ2G-00088z-AS; Fri, 11 Dec 2020 03:24:00 +0000
+Date:   Fri, 11 Dec 2020 03:24:00 +0000
+From:   Matthew Wilcox <willy@infradead.org>
+To:     David Howells <dhowells@redhat.com>
+Cc:     Pavel Begunkov <asml.silence@gmail.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] iov_iter: optimise iter type checking
-Message-ID: <20201211020100.GB107834@ZenIV.linux.org.uk>
-References: <cover.1605799583.git.asml.silence@gmail.com>
- <9bc27cb3ef6ab49b6b2ccee3db6613838aee17af.1605799583.git.asml.silence@gmail.com>
- <20201119170340.GA6179@infradead.org>
- <ce79f47e-2ec0-ba29-a991-c537a8990dee@gmail.com>
+Subject: Re: [PATCH 00/29] RFC: iov_iter: Switch to using an ops table
+Message-ID: <20201211032400.GD7338@casper.infradead.org>
+References: <160596800145.154728.7192318545120181269.stgit@warthog.procyon.org.uk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ce79f47e-2ec0-ba29-a991-c537a8990dee@gmail.com>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+In-Reply-To: <160596800145.154728.7192318545120181269.stgit@warthog.procyon.org.uk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Nov 19, 2020 at 05:12:44PM +0000, Pavel Begunkov wrote:
-> On 19/11/2020 17:03, Christoph Hellwig wrote:
-> > On Thu, Nov 19, 2020 at 03:29:43PM +0000, Pavel Begunkov wrote:
-> >> The problem here is that iov_iter_is_*() helpers check types for
-> >> equality, but all iterate_* helpers do bitwise ands. This confuses
-> >> a compiler, so even if some cases were handled separately with
-> >> iov_iter_is_*(), it can't eliminate and skip unreachable branches in
-> >> following iterate*().
-> > 
-> > I think we need to kill the iov_iter_is_* helpers, renumber to not do
-> > the pointless bitmask and just check for equality (might turn into a
-> > bunch of nice switch statements actually).
+On Sat, Nov 21, 2020 at 02:13:21PM +0000, David Howells wrote:
+> I had a go switching the iov_iter stuff away from using a type bitmask to
+> using an ops table to get rid of the if-if-if-if chains that are all over
+> the place.  After I pushed it, someone pointed me at Pavel's two patches.
 > 
-> There are uses like below though, and that would also add some overhead
-> on iov_iter_type(), so it's not apparent to me which version would be
-> cleaner/faster in the end. But yeah, we can experiment after landing
-> this patch.
-> 
-> if (type & (ITER_BVEC|ITER_KVEC))
+> I have another iterator class that I want to add - which would lengthen the
+> if-if-if-if chains.  A lot of the time, there's a conditional clause at the
+> beginning of a function that just jumps off to a type-specific handler or
+> to reject the operation for that type.  An ops table can just point to that
+> instead.
 
-There are exactly 3 such places, and all of them would've been just as well
-with case ITER_BVEC: case ITER_KVEC: ... in a switch.
+So, given the performance problem, how about turning this inside out?
 
-Hmm...  I wonder which would work better:
-
-enum iter_type {
-        ITER_IOVEC = 0,
-        ITER_KVEC = 2,
-        ITER_BVEC = 4,
-        ITER_PIPE = 6,
-        ITER_DISCARD = 8,
+struct iov_step {
+	union {
+		void *kaddr;
+		void __user *uaddr;
+	};
+	unsigned int len;
+	bool user_addr;
+	bool kmap;
+	struct page *page;
 };
-iov_iter_type(iter)	(((iter)->type) & ~1)
-iov_iter_rw(iter)	(((iter)->type) & 1)
 
-or
+bool iov_iterate(struct iov_step *step, struct iov_iter *i, size_t max)
+{
+	if (step->page)
+		kunmap(page)
+	else if (step->kmap)
+		kunmap_atomic(step->kaddr);
 
-enum iter_type {
-        ITER_IOVEC,
-        ITER_KVEC,
-        ITER_BVEC,
-        ITER_PIPE,
-        ITER_DISCARD,
-};
-iov_iter_type(iter)	(((iter)->type) & (~0U>>1))
-// callers of iov_iter_rw() are almost all comparing with explicit READ or WRITE
-iov_iter_rw(iter)	(((iter)->type) & ~(~0U>>1) ? WRITE : READ)
-with places like iov_iter_kvec() doing
-	i->type = ITER_KVEC | ((direction == WRITE) ? BIT(31) : 0);
+	if (max == 0)
+		return false;
 
-Preferences?
+	if (i->type & ITER_IOVEC) {
+		step->user_addr = true;
+		step->uaddr = i->iov.iov_base + i->iov_offset;
+		return true;
+	}
+	if (i->type & ITER_BVEC) {
+		... get the page ...
+	} else if (i->type & ITER_KVEC) {
+		... get the page ...
+	} else ...
+
+	kmap or kmap_atomic as appropriate ...
+	...set kaddr & len ...
+
+	return true;
+}
+
+size_t copy_from_iter(void *addr, size_t bytes, struct iov_iter *i)
+{
+	struct iov_step step = {};
+
+	while (iov_iterate(&step, i, bytes)) {
+		if (user_addr)
+			copy_from_user(addr, step.uaddr, step.len);
+		else
+			memcpy(addr, step.kaddr, step.len);
+		bytes -= step.len;
+	}
+}
+
