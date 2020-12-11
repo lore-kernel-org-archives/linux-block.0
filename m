@@ -2,133 +2,229 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 599B2C433FE
-	for <linux-block@archiver.kernel.org>; Fri, 11 Dec 2020 21:04:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 818C9C433FE
+	for <linux-block@archiver.kernel.org>; Fri, 11 Dec 2020 21:50:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 04D1824078
-	for <linux-block@archiver.kernel.org>; Fri, 11 Dec 2020 21:04:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4E55423B31
+	for <linux-block@archiver.kernel.org>; Fri, 11 Dec 2020 21:50:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729004AbgLKTaS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Dec 2020 14:30:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34524 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2393569AbgLKTaC (ORCPT
+        id S2387906AbgLKVEQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Dec 2020 16:04:16 -0500
+Received: from mail-io1-f72.google.com ([209.85.166.72]:53448 "EHLO
+        mail-io1-f72.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729581AbgLKVDw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Dec 2020 14:30:02 -0500
-Received: from mail-pg1-x542.google.com (mail-pg1-x542.google.com [IPv6:2607:f8b0:4864:20::542])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77005C0613D3
-        for <linux-block@vger.kernel.org>; Fri, 11 Dec 2020 11:29:22 -0800 (PST)
-Received: by mail-pg1-x542.google.com with SMTP id t37so7796974pga.7
-        for <linux-block@vger.kernel.org>; Fri, 11 Dec 2020 11:29:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=mTNRkZN78nWE7RuNU9seNWtfXw5g6UF+iM4vGdKAeyU=;
-        b=LIRRdEISSeD3UoBtyEvDd0t9+94kSskvNSMtiNkV95WfnNoeIkeFUQgjlItOHfDupc
-         Drd25/whuG1vqsZe1mkXeY1NbB7r0IcKFPnuawrwUgnOk/W/zEqHpmeWz7oj2qZTAjDH
-         RDWDUvl8cGjudLCX5vWoMmdSATJ3oekipLO+WzGWSQVL15k+z4q1d8C6q50Q+zWU+40M
-         ZZfMQ5NV7RdU53pHEKPOqTpP8O//K7XmkPHR4riSNKLRNKpuauYZ2/T7z3c33iM+PXWj
-         RJP3Pig7zWjDhGCfgY0R4oswEIYmGl8g8CtZL2WNoV4IA8pjKjla9Rp4CqxhUDz6kRLN
-         FhHA==
+        Fri, 11 Dec 2020 16:03:52 -0500
+Received: by mail-io1-f72.google.com with SMTP id l20so7464950ioc.20
+        for <linux-block@vger.kernel.org>; Fri, 11 Dec 2020 13:03:36 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=mTNRkZN78nWE7RuNU9seNWtfXw5g6UF+iM4vGdKAeyU=;
-        b=Ro/41pPs7H+45axrIJuFZ9oEok6l26cT9S5CPYTjn/bVWK7FealYM4/WHuiv3UisX3
-         U81kGbeh1RKJgA7di64nIZaPncIcEIPRRrF1XUoDJ4piZCl0OB++tFr4Haqu2rcFFTTJ
-         eQBP2v+JX/ZcZXYd/c7UUI7mXLfg5r9aGsOlxQGiMeFE8nN38ESBhGUIek3DqT+lUZRV
-         mS0xzvzwMYGCrsuEk9/Hue8EouyIIrlJj0MULsI8/DHjc4KGbcEf0z6/aHJBlmVYb7Yk
-         mb2qdJ/8vCD6jbdAYbkoUiasn0RijtFVkyOeNQFO83yX+3NiOCAhUutOctxWa/bhkECb
-         Y9Kw==
-X-Gm-Message-State: AOAM531c+0bizX9Vsub1ekYm4vyGBFfZ5qY2AXGBGrm4ogZYGbCb3eMJ
-        0mVwV0eEeLQmHcl2+t5LHf6urg==
-X-Google-Smtp-Source: ABdhPJwmp1wEwBY9KTgTJhFQ6IRL5rVvkUkKnNZznmf+8yiXr4ujsxrYARHg14X3ZryDQnr9ZtMLfw==
-X-Received: by 2002:a63:525c:: with SMTP id s28mr13527317pgl.134.1607714961862;
-        Fri, 11 Dec 2020 11:29:21 -0800 (PST)
-Received: from [192.168.1.134] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id gk4sm7832691pjb.57.2020.12.11.11.29.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 11 Dec 2020 11:29:21 -0800 (PST)
-Subject: Re: [PATCH v2] block: drop dead assignments in loop_init()
-To:     Lukas Bulwahn <lukas.bulwahn@gmail.com>,
-        Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org
-Cc:     Hannes Reinecke <hare@suse.de>, linux-kernel@vger.kernel.org,
-        clang-built-linux@googlegroups.com, kernel-janitors@vger.kernel.org
-References: <20201211184604.27646-1-lukas.bulwahn@gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <511d884a-ed95-5e9f-0fea-b859355a6c7f@kernel.dk>
-Date:   Fri, 11 Dec 2020 12:29:19 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=/6F3RXalHgOzVu9rfB8RHBjhKhY3G02Ggw1yXVxJRB4=;
+        b=pZbN33KYKsPc+YKFsxOMMpMQhlu0AMyHwN94yJF9kPbnyJXosyqxvZcnK8cELEfmuT
+         HmeXytV2J82UDo3Pf9ZhMGR5t1/1UZYKGtAPQkkgdLgjorR3CC75Mw+sSZjecCKseDTS
+         /3rSIbbdM5IFSOtAniqiThxhuLw5NwM06GKbYDayybCuJU6KGQs56BygbvDYJKFy8bLm
+         AZ8vGFD2FEPsipytpzNPhblP0gGWryUmdbIgke9ioj/2n15WPAkDq4KPQM4OBYgun5Fl
+         ObU4so0J8rBXlxT9LNTpfwi54kjf8tvcEfmJcubQtvV9r/ja9FYW6Hcnx9TIScL026jv
+         pb+w==
+X-Gm-Message-State: AOAM530IMXsrhmRFZiGtOe2aVsTl8kPyh4QygB+UVjIZEmAIVyvE3iz6
+        26mid7+Yf2TcDfK7ev7H1cXVi1EJpfxD3EbyUSQe0e64qJwy
+X-Google-Smtp-Source: ABdhPJxqFsmtqhxHB9Xnc82nSiuKEv7r0d/7k52qSXrw+7TBiSuMDc59y7RKHpB+ZvEZhFR+/sqwAqDvs4AKwcgazrEp0m0eVpsD
 MIME-Version: 1.0
-In-Reply-To: <20201211184604.27646-1-lukas.bulwahn@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a5e:990c:: with SMTP id t12mr17387076ioj.33.1607720591516;
+ Fri, 11 Dec 2020 13:03:11 -0800 (PST)
+Date:   Fri, 11 Dec 2020 13:03:11 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000c167dd05b6369e69@google.com>
+Subject: KASAN: use-after-free Read in disk_part_iter_next
+From:   syzbot <syzbot+825f0f9657d4e528046e@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/11/20 11:46 AM, Lukas Bulwahn wrote:
-> Commit 8410d38c2552 ("loop: use __register_blkdev to allocate devices on
-> demand") simplified loop_init(); so computing the range of the block region
-> is not required anymore and can be dropped.
-> 
-> Drop dead assignments in loop_init().
-> 
-> As compilers will detect these unneeded assignments and optimize this,
-> the resulting object code is identical before and after this change.
-> 
-> No functional change. No change in object code.
-> 
-> Signed-off-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
-> ---
-> v1 -> v2:
->   - replaced if block with ternary operator after Julia's style comment
-> 
-> Christoph, please ack.
-> 
-> Jens, please pick this minor non-urgent clean-up patch on your
-> block -next tree on top of Christoph's commit above.
-> 
->  drivers/block/loop.c | 9 +--------
->  1 file changed, 1 insertion(+), 8 deletions(-)
-> 
-> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-> index d2ce1ddc192d..10c7c154c114 100644
-> --- a/drivers/block/loop.c
-> +++ b/drivers/block/loop.c
-> @@ -2304,7 +2304,6 @@ MODULE_ALIAS("devname:loop-control");
->  static int __init loop_init(void)
->  {
->  	int i, nr;
-> -	unsigned long range;
->  	struct loop_device *lo;
->  	int err;
->  
-> @@ -2341,13 +2340,7 @@ static int __init loop_init(void)
->  	 * /dev/loop-control interface, or be instantiated by accessing
->  	 * a 'dead' device node.
->  	 */
-> -	if (max_loop) {
-> -		nr = max_loop;
-> -		range = max_loop << part_shift;
-> -	} else {
-> -		nr = CONFIG_BLK_DEV_LOOP_MIN_COUNT;
-> -		range = 1UL << MINORBITS;
-> -	}
-> +	nr = max_loop ? max_loop : CONFIG_BLK_DEV_LOOP_MIN_COUNT;
+Hello,
 
-I greatly prefer an if/else to ternary, it's a lot easier to read imho.
+syzbot found the following issue on:
 
--- 
-Jens Axboe
+HEAD commit:    15ac8fdb Add linux-next specific files for 20201207
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=15d8ad37500000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=3696b8138207d24d
+dashboard link: https://syzkaller.appspot.com/bug?extid=825f0f9657d4e528046e
+compiler:       gcc (GCC) 10.1.0-syz 20200507
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1393dcbd500000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1074cf17500000
 
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+825f0f9657d4e528046e@syzkaller.appspotmail.com
+
+==================================================================
+BUG: KASAN: use-after-free in bdev_nr_sectors include/linux/genhd.h:264 [inline]
+BUG: KASAN: use-after-free in disk_part_iter_next+0x4c7/0x560 block/genhd.c:204
+Read of size 8 at addr ffff88814080b9a8 by task syz-executor825/9848
+
+CPU: 1 PID: 9848 Comm: syz-executor825 Not tainted 5.10.0-rc6-next-20201207-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Call Trace:
+ __dump_stack lib/dump_stack.c:79 [inline]
+ dump_stack+0x107/0x163 lib/dump_stack.c:120
+ print_address_description.constprop.0.cold+0x5b/0x2f8 mm/kasan/report.c:230
+ __kasan_report mm/kasan/report.c:396 [inline]
+ kasan_report.cold+0x79/0xd5 mm/kasan/report.c:413
+ bdev_nr_sectors include/linux/genhd.h:264 [inline]
+ disk_part_iter_next+0x4c7/0x560 block/genhd.c:204
+ partition_overlaps+0x96/0x200 block/partitions/core.c:425
+ bdev_add_partition+0x66/0x130 block/partitions/core.c:444
+ blkpg_do_ioctl+0x2d0/0x340 block/ioctl.c:43
+ blkpg_ioctl block/ioctl.c:60 [inline]
+ blkdev_ioctl+0x577/0x6d0 block/ioctl.c:541
+ block_ioctl+0xf9/0x140 fs/block_dev.c:1649
+ vfs_ioctl fs/ioctl.c:48 [inline]
+ __do_sys_ioctl fs/ioctl.c:753 [inline]
+ __se_sys_ioctl fs/ioctl.c:739 [inline]
+ __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:739
+ do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
+ entry_SYSCALL_64_after_hwframe+0x44/0xa9
+RIP: 0033:0x447ff9
+Code: dd ca fb ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 0f 83 ab ca fb ff c3 66 2e 0f 1f 84 00 00 00 00
+RSP: 002b:00007fff3c27c398 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 0000000000447ff9
+RDX: 0000000020000240 RSI: 0000000000001269 RDI: 0000000000000003
+RBP: 00000000000148cc R08: 0000000200000000 R09: 0000000200000000
+R10: 0000000000000004 R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000404fc0 R14: 0000000000000000 R15: 0000000000000000
+
+Allocated by task 9811:
+ kasan_save_stack+0x1b/0x40 mm/kasan/common.c:39
+ kasan_set_track mm/kasan/common.c:47 [inline]
+ set_alloc_info mm/kasan/common.c:405 [inline]
+ ____kasan_kmalloc mm/kasan/common.c:436 [inline]
+ ____kasan_kmalloc.constprop.0+0xa0/0xd0 mm/kasan/common.c:408
+ kasan_slab_alloc include/linux/kasan.h:205 [inline]
+ slab_post_alloc_hook mm/slab.h:518 [inline]
+ slab_alloc_node mm/slub.c:2903 [inline]
+ slab_alloc mm/slub.c:2911 [inline]
+ kmem_cache_alloc+0x155/0x380 mm/slub.c:2916
+ bdev_alloc_inode+0x18/0x40 fs/block_dev.c:777
+ alloc_inode+0x61/0x230 fs/inode.c:233
+ new_inode_pseudo fs/inode.c:927 [inline]
+ new_inode+0x27/0x2f0 fs/inode.c:956
+ bdev_alloc+0x20/0x340 fs/block_dev.c:864
+ add_partition+0x1ad/0x8e0 block/partitions/core.c:345
+ bdev_add_partition+0xb6/0x130 block/partitions/core.c:449
+ blkpg_do_ioctl+0x2d0/0x340 block/ioctl.c:43
+ blkpg_ioctl block/ioctl.c:60 [inline]
+ blkdev_ioctl+0x577/0x6d0 block/ioctl.c:541
+ block_ioctl+0xf9/0x140 fs/block_dev.c:1649
+ vfs_ioctl fs/ioctl.c:48 [inline]
+ __do_sys_ioctl fs/ioctl.c:753 [inline]
+ __se_sys_ioctl fs/ioctl.c:739 [inline]
+ __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:739
+ do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
+ entry_SYSCALL_64_after_hwframe+0x44/0xa9
+
+Freed by task 17:
+ kasan_save_stack+0x1b/0x40 mm/kasan/common.c:39
+ kasan_set_track+0x1c/0x30 mm/kasan/common.c:47
+ kasan_set_free_info+0x20/0x30 mm/kasan/generic.c:355
+ ____kasan_slab_free.part.0+0xe1/0x110 mm/kasan/common.c:366
+ kasan_slab_free include/linux/kasan.h:188 [inline]
+ slab_free_hook mm/slub.c:1548 [inline]
+ slab_free_freelist_hook+0x82/0x1d0 mm/slub.c:1586
+ slab_free mm/slub.c:3157 [inline]
+ kmem_cache_free+0x82/0x360 mm/slub.c:3173
+ i_callback+0x3f/0x70 fs/inode.c:222
+ rcu_do_batch kernel/rcu/tree.c:2502 [inline]
+ rcu_core+0x735/0x1020 kernel/rcu/tree.c:2737
+ __do_softirq+0x2b7/0xa76 kernel/softirq.c:343
+
+Last potentially related work creation:
+ kasan_save_stack+0x1b/0x40 mm/kasan/common.c:39
+ kasan_record_aux_stack+0xdc/0x100 mm/kasan/generic.c:343
+ __call_rcu kernel/rcu/tree.c:2987 [inline]
+ call_rcu+0xbb/0x810 kernel/rcu/tree.c:3062
+ destroy_inode+0x129/0x1b0 fs/inode.c:288
+ iput_final fs/inode.c:1651 [inline]
+ iput.part.0+0x41e/0x840 fs/inode.c:1677
+ iput+0x58/0x70 fs/inode.c:1667
+ disk_part_iter_exit block/genhd.c:232 [inline]
+ disk_part_iter_next+0x9a/0x560 block/genhd.c:200
+ blk_drop_partitions+0x10a/0x180 block/partitions/core.c:541
+ bdev_disk_changed+0x238/0x430 fs/block_dev.c:1228
+ loop_reread_partitions+0x29/0x50 drivers/block/loop.c:655
+ loop_set_status+0x735/0x1040 drivers/block/loop.c:1416
+ loop_set_status64 drivers/block/loop.c:1536 [inline]
+ lo_ioctl+0x900/0x1720 drivers/block/loop.c:1704
+ blkdev_ioctl+0x2a1/0x6d0 block/ioctl.c:576
+ block_ioctl+0xf9/0x140 fs/block_dev.c:1649
+ vfs_ioctl fs/ioctl.c:48 [inline]
+ __do_sys_ioctl fs/ioctl.c:753 [inline]
+ __se_sys_ioctl fs/ioctl.c:739 [inline]
+ __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:739
+ do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
+ entry_SYSCALL_64_after_hwframe+0x44/0xa9
+
+Second to last potentially related work creation:
+ kasan_save_stack+0x1b/0x40 mm/kasan/common.c:39
+ kasan_record_aux_stack+0xdc/0x100 mm/kasan/generic.c:343
+ __call_rcu kernel/rcu/tree.c:2987 [inline]
+ call_rcu+0xbb/0x810 kernel/rcu/tree.c:3062
+ destroy_inode+0x129/0x1b0 fs/inode.c:288
+ iput_final fs/inode.c:1651 [inline]
+ iput.part.0+0x41e/0x840 fs/inode.c:1677
+ iput+0x58/0x70 fs/inode.c:1667
+ disk_release+0x191/0x240 block/genhd.c:1212
+ device_release+0x9f/0x240 drivers/base/core.c:1804
+ kobject_cleanup lib/kobject.c:705 [inline]
+ kobject_release lib/kobject.c:736 [inline]
+ kref_put include/linux/kref.h:65 [inline]
+ kobject_put+0x1c8/0x540 lib/kobject.c:753
+ put_device+0x1b/0x30 drivers/base/core.c:3033
+ put_disk+0x44/0x60 block/genhd.c:1414
+ do_floppy_init drivers/block/floppy.c:4826 [inline]
+ floppy_async_init+0x2004/0x2033 drivers/block/floppy.c:4834
+ async_run_entry_fn+0xf3/0x730 kernel/async.c:123
+ process_one_work+0x98d/0x1630 kernel/workqueue.c:2275
+ worker_thread+0x64c/0x1120 kernel/workqueue.c:2421
+ kthread+0x3b1/0x4a0 kernel/kthread.c:292
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:296
+
+The buggy address belongs to the object at ffff88814080b980
+ which belongs to the cache bdev_cache of size 2808
+The buggy address is located 40 bytes inside of
+ 2808-byte region [ffff88814080b980, ffff88814080c478)
+The buggy address belongs to the page:
+page:0000000095b89171 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x140808
+head:0000000095b89171 order:3 compound_mapcount:0 compound_pincount:0
+flags: 0x57ff00000010200(slab|head)
+raw: 057ff00000010200 0000000000000000 0000000100000001 ffff8880109c0b40
+raw: 0000000000000000 00000000800b000b 00000001ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+
+Memory state around the buggy address:
+ ffff88814080b880: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fc
+ ffff88814080b900: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+>ffff88814080b980: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                                  ^
+ ffff88814080ba00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff88814080ba80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+==================================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+syzbot can test patches for this issue, for details see:
+https://goo.gl/tpsmEJ#testing-patches
