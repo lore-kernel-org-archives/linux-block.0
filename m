@@ -2,157 +2,196 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00709C4361B
-	for <linux-block@archiver.kernel.org>; Fri, 11 Dec 2020 14:53:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74DC8C4361B
+	for <linux-block@archiver.kernel.org>; Fri, 11 Dec 2020 15:20:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A034B249A2
-	for <linux-block@archiver.kernel.org>; Fri, 11 Dec 2020 14:53:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1BC44207AA
+	for <linux-block@archiver.kernel.org>; Fri, 11 Dec 2020 15:20:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406202AbgLKOYl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Dec 2020 09:24:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43778 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2406071AbgLKOYL (ORCPT
+        id S2406369AbgLKO6R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Dec 2020 09:58:17 -0500
+Received: from mailout1.samsung.com ([203.254.224.24]:31305 "EHLO
+        mailout1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2405326AbgLKO6D (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Dec 2020 09:24:11 -0500
-Received: from mail-wm1-x342.google.com (mail-wm1-x342.google.com [IPv6:2a00:1450:4864:20::342])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7325C0613D6;
-        Fri, 11 Dec 2020 06:23:30 -0800 (PST)
-Received: by mail-wm1-x342.google.com with SMTP id g185so8755629wmf.3;
-        Fri, 11 Dec 2020 06:23:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=to:cc:references:from:autocrypt:subject:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=B1UbzRBoNF2xRidzwVWqUFo9sauVQ+nWdev5G/0Ii8k=;
-        b=II00RboARgNppCaKmmz9sWOjMMjIPAAWzKwgZuPCiWdq1QTZO/YOocIEhn3mcrWp6Y
-         C4vaD5ovWq/NlnZnSOPTPv2pRxWm9n78FQWBNf8UEPzUwx/l+hzxNN6/gdlnasf0sQYD
-         YWuBYOO07zmtZStMrFvnHjx8VM7d61AXZb2hXCaSW2nv1cNHuC0ZEhoKxF1dy9bHACSq
-         8oorg5Mui+QoYqrg8apdblHqq2V8o5Ful/vaQDv8vBs98rmu+IOTuKUkYIAxpkqpCtwk
-         mPLigGvVgY0SgWwyaw+pdM5o3rkCJz2YlMeLSw/0tNAIY+LhiFntDnjYsIFAsBuGAOQa
-         q5MA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:autocrypt:subject
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=B1UbzRBoNF2xRidzwVWqUFo9sauVQ+nWdev5G/0Ii8k=;
-        b=aVRlcF7QRPuGydahB1SCaYF7r21KAJbPfUQWY47KiW+hrxWDSwrEbAgbBhPTr7m6tW
-         7NT+DCeCX0B4PDunX9UOhztR4K6HZ0o9sq/AyRKNcx9urav3zP0uaDZHiG7umsr6JM/B
-         pMbU5bvkIbSStWVUe5jAbUuoCXN8AiLrWT6snqjMGXVWj9jTjqdmwL0AQLsD8tl8muB9
-         mvc6kBmUsFPWAzGRtF0t/vSOGAVwGLX3aEvmM/Ff0C8paFqJv0nvqsXFLJv1kNdjcVCS
-         /KhsNL+twZ3S3oZ5xKag8WvCXN5x+nq9lg10coSCKM92DaZ9ShuIA5k6z+SB0xeFMRvp
-         oTDw==
-X-Gm-Message-State: AOAM531b4gxE3pkJgiMj99jPWuTL/1lV63InvrYCfBYhiHOwj/v6aGa3
-        vaygdrt9/+24M8ok6gFbAzlTZXJumtsjaw==
-X-Google-Smtp-Source: ABdhPJz1gnjwc1B8MBAXKnPwfnB8Tdq2HRjM9Or5+/Xj9//hiJ8gDku0rH5GcKBtAE4gdt8w/KphBQ==
-X-Received: by 2002:a7b:cbd0:: with SMTP id n16mr14003472wmi.162.1607696609544;
-        Fri, 11 Dec 2020 06:23:29 -0800 (PST)
-Received: from [192.168.8.123] ([85.255.234.121])
-        by smtp.gmail.com with ESMTPSA id j9sm10330192wrm.14.2020.12.11.06.23.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 11 Dec 2020 06:23:29 -0800 (PST)
-To:     Johannes Weiner <hannes@cmpxchg.org>,
-        Christoph Hellwig <hch@infradead.org>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org,
+        Fri, 11 Dec 2020 09:58:03 -0500
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20201211145718epoutp015e5ec204c84d02837f87830d985a422b~PsWTVqQXa1163911639epoutp01P
+        for <linux-block@vger.kernel.org>; Fri, 11 Dec 2020 14:57:18 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20201211145718epoutp015e5ec204c84d02837f87830d985a422b~PsWTVqQXa1163911639epoutp01P
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1607698638;
+        bh=u5EHaj2RvOw56lEf4LMUK81fLkqGQjeLes6BsaXpzCg=;
+        h=From:To:Cc:Subject:Date:References:From;
+        b=psDvopmTZ6p+GOon7I6JCO3Etapje88YH3GE3Cpcdu0BdtqVkhatB5Wf6A/ijwNP+
+         7+dW+D50ERdamhq+G2HFwZ1/EqrOj4iYujJeXksB33MTLAm1BKBBeQPx9b+AKoUdQM
+         rSdBLs5aaIXf8VY+u+0+HhnhJN6/mFM0cKsT6pAg=
+Received: from epsmges5p2new.samsung.com (unknown [182.195.42.74]) by
+        epcas5p2.samsung.com (KnoxPortal) with ESMTP id
+        20201211145717epcas5p22608a58a5da7ce017b50fa98c9f90ec0~PsWSLZWm80483404834epcas5p2N;
+        Fri, 11 Dec 2020 14:57:17 +0000 (GMT)
+Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
+        epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        E9.00.50652.DC883DF5; Fri, 11 Dec 2020 23:57:17 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
+        20201211135154epcas5p34cd7f57fb4b13fcd50619efdc0099fa8~PrdM5ATwv0152001520epcas5p3S;
+        Fri, 11 Dec 2020 13:51:54 +0000 (GMT)
+Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20201211135154epsmtrp2af0d193a3214535a0e5e48537c9fabe8~PrdM3-diG0546605466epsmtrp2F;
+        Fri, 11 Dec 2020 13:51:54 +0000 (GMT)
+X-AuditID: b6c32a4a-6c9ff7000000c5dc-09-5fd388cd9fcb
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
+        21.71.08745.A7973DF5; Fri, 11 Dec 2020 22:51:54 +0900 (KST)
+Received: from localhost.localdomain (unknown [107.110.206.5]) by
+        epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
+        20201211135151epsmtip26a5ca344d2057143679d0988adfaddc1~PrdJ0roqu2927029270epsmtip2E;
+        Fri, 11 Dec 2020 13:51:51 +0000 (GMT)
+From:   SelvaKumar S <selvakuma.s1@samsung.com>
+To:     linux-nvme@lists.infradead.org
+Cc:     kbusch@kernel.org, axboe@kernel.dk, damien.lemoal@wdc.com,
+        Johannes.Thumshirn@wdc.com, hch@lst.de, sagi@grimberg.me,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Matthew Wilcox <willy@infradead.org>
-References: <cover.1607477897.git.asml.silence@gmail.com>
- <51905c4fcb222e14a1d5cb676364c1b4f177f582.1607477897.git.asml.silence@gmail.com>
- <20201209084005.GC21968@infradead.org> <20201211140622.GA286014@cmpxchg.org>
-From:   Pavel Begunkov <asml.silence@gmail.com>
-Autocrypt: addr=asml.silence@gmail.com; prefer-encrypt=mutual; keydata=
- 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 bA==
-Subject: Re: [PATCH 2/2] block: no-copy bvec for direct IO
-Message-ID: <2404b68a-1569-ce25-c9c4-00d7e42f9e06@gmail.com>
-Date:   Fri, 11 Dec 2020 14:20:11 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+        linux-scsi@vger.kernel.org, martin.petersen@oracle.com,
+        bvanassche@acm.org, mpatocka@redhat.com, hare@suse.de,
+        dm-devel@redhat.com, snitzer@redhat.com, selvajove@gmail.com,
+        nj.shetty@samsung.com, joshi.k@samsung.com,
+        javier.gonz@samsung.com, SelvaKumar S <selvakuma.s1@samsung.com>
+Subject: [RFC PATCH v3 0/2] add simple copy support
+Date:   Fri, 11 Dec 2020 19:21:37 +0530
+Message-Id: <20201211135139.49232-1-selvakuma.s1@samsung.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-In-Reply-To: <20201211140622.GA286014@cmpxchg.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA02SfUxTZxTG9957uS3Ezksh7G3dRtJYF1hAV9z2mrnh0CxXjctipn8sc9DM
+        KxChYgurzkXLhyIw2WAWR3F8yYaUWUZBRikgtiNEtENatKHDBiJ0OjZbBAt6RUd7Mfrf7zzn
+        Oe9zTvLyceF8iJifrshmlAp5hoQMIzqsMTFxtpOO5HWXCinUfOs7ElX4HuLoeKEfQz33qkJQ
+        d305hpqa+zF0e2yWhxaL3Rjqf/oficotNwHqcb2JHF1nSVTzyxQPlTg7SdQ48ARDZSdvYKiD
+        rcHRyOl6HBmmvQQa9zp5aHrhColOtD4Am6Jox8h22qS7xaOH3K0E7bDl0EZ9EUm3NRyjzaMa
+        kp6ZchG0t/cGSZe26wHddvUIPWt8nS7sK8E+EXwWtnEvk5H+FaNc+0FKWJr5McvL+g0eqpr+
+        l9AAfUQxCOVDaj20DGvIYhDGF1JmAGt6/8S54j6A3xawGFfMAvhksRV7NtLH1gKu0QVg39zY
+        c1eDyckLuEgqDt5sMBIBjqQkcLEljwiYcGoUh/ZH94OmCCoBnvXPgAATlBQO+K6TARZQ78PB
+        gjKci4uGlfZ5HqeHwyuVk8FH8SU9/2JVcFlI5YfCOpcHcANbYK3BRnAcAf8ZaOdxLIaz93pI
+        jtXQU1SxfI8GwFKvmuNEONy9uKTzlwJiYEvXWk5+DWoHDRiX+zI8xU4ujwpgZ/Vk0A6pNXDw
+        93c4+VXos3YtJ9FwwawLspDaA6fy88D3IFr3wjW6F67RPQ+uBbgeiJgsVWYqo3o7S6Zg1PEq
+        eaYqR5Ea/+WBTCMI/s3YbZ1gYtwXbwEYH1gA5OOSSAF7zJEsFOyVH/6aUR5IVuZkMCoLWMUn
+        JK8IJAvXvhBSqfJsZj/DZDHKZ12MHyrWYNnRCVLr1kMbN+1sDc/z5T8US9cZesM/VZzZ0jYe
+        tb90TEubau7S503xKxOGQrZWD6Ts2pHkaNGyucdFJd3VuQ2/yizpxrp6lbfZZe1Jss3vfje7
+        6cemOM9Ft/9yy7mipxPnY1QfTlQY1h8UdZTnKtw/2b4RHT66/fG+drv9XGXpmUZ7IjmvXFF7
+        esid80PGX7dXuMx3YtlJsX+3GiRFbbgw1Pd5h/XECMv8Xb7yaKXME+G5+tHcS87IPbKfnaAg
+        5Q3TKSyVbCsrk/ofXLrwsYfetqNdenfDH9idSEPd6qbEUelmLS9tuL8iUT/TiGuZMfWISL4Z
+        HqFk712b27Uq+pGEUKXJ34rFlSr5/84rHiEKBAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrCIsWRmVeSWpSXmKPExsWy7bCSvG5V5eV4gx3TlC1W3+1ns5j24Sez
+        RWv7NyaLve9ms1rsWTSJyWLl6qNMFo/vfGa3+Nt1j8ni6P+3bBaTDl1jtNh7S9vi8q45bBbz
+        lz1lt+i+voPNYvnxf0wWEzuuMlls+z2f2eLKlEXMFutev2exePD+OrvF6x8n2SzaNn5ldBDz
+        uHzF22PnrLvsHufvbWTxuHy21GPTqk42j81L6j1232xg8/j49BaLx/t9V9k8+rasYvTYfLra
+        4/MmOY/2A91MAbxRXDYpqTmZZalF+nYJXBm7//xmL9ggUTH79RuWBsZVwl2MnBwSAiYSB34v
+        YOxi5OIQEtjBKPHo1WtmiISMxNq7nWwQtrDEyn/P2SGKPjJKfLx+ggUkwSagK3FtySYwW0RA
+        SeLv+iYWkCJmgc/MEvN3tYElhAWMJeZ8+8gIYrMIqEoc/3ABbCqvgK3EqZaJUNvkJWZe+s4O
+        EReUODnzCVAvB9AgdYn184RAwsxAJc1bZzNPYOSfhaRqFkLVLCRVCxiZVzFKphYU56bnFhsW
+        GOWllusVJ+YWl+al6yXn525iBEesltYOxj2rPugdYmTiYDzEKMHBrCTCK8tyKV6INyWxsiq1
+        KD++qDQntfgQozQHi5I474Wuk/FCAumJJanZqakFqUUwWSYOTqkGJscNrl03GG9qVC3fWFCQ
+        1LD3fqfb4SPPb5core/W71M21XQTiD991yvU+3D15bhnNdE/Zia7l//KE/Zbqn3Hc/u2ZfIW
+        pmyPztwxU5kiuL7kt9kbuRWxa/JKpucqtq2etd/M+e6FWW/YIqZdmznx0+UlXw75yDXbH3vZ
+        LLGjYEHPs4YnRlKizXV/T4n4rzXty7lgkC0aqdXs9HhV7ozzJfHMb3YJv55cN6Utxrx0XzWn
+        V4+GbjzbcvVZmQI3NrUdmdhZWO/k97L2RXepnsXfR1nB2WHf3aMnXF7H5fjfyLxP9y7b6vMz
+        1+6WVC53UVp1I/ZQTfjXpX3Nyr+XN/Bs395zJJ2Bq+ZsYnv/nS5jJZbijERDLeai4kQAHK+k
+        gkcDAAA=
+X-CMS-MailID: 20201211135154epcas5p34cd7f57fb4b13fcd50619efdc0099fa8
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+X-CMS-RootMailID: 20201211135154epcas5p34cd7f57fb4b13fcd50619efdc0099fa8
+References: <CGME20201211135154epcas5p34cd7f57fb4b13fcd50619efdc0099fa8@epcas5p3.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/12/2020 14:06, Johannes Weiner wrote:
-> On Wed, Dec 09, 2020 at 08:40:05AM +0000, Christoph Hellwig wrote:
->>> +	/*
->>> +	 * In practice groups of pages tend to be accessed/reclaimed/refaulted
->>> +	 * together. To not go over bvec for those who didn't set BIO_WORKINGSET
->>> +	 * approximate it by looking at the first page and inducing it to the
->>> +	 * whole bio
->>> +	 */
->>> +	if (unlikely(PageWorkingset(iter->bvec->bv_page)))
->>> +		bio_set_flag(bio, BIO_WORKINGSET);
->>
->> IIRC the feedback was that we do not need to deal with BIO_WORKINGSET
->> at all for direct I/O.
-> 
-> Yes, this hunk is incorrect. We must not use this flag for direct IO.
-> It's only for paging IO, when you bring in the data at page->mapping +
-> page->index. Otherwise you tell the pressure accounting code that you
-> are paging in a thrashing page, when really you're just reading new
-> data into a page frame that happens to be hot.
-> 
-> (As per the other thread, bio_add_page() currently makes that same
-> mistake for direct IO. I'm fixing that.)
+This patchset tries to add support for TP4065a ("Simple Copy Command"),
+v2020.05.04 ("Ratified")
 
-I have that stuff fixed, it just didn't go into the RFC. That's basically
-removing replacing add_page() with its version without BIO_WORKINGSET
-in bio_iov_iter_get_pages() and all __bio_iov_*_{add,get}_pages() +
-fix up ./fs/direct-io.c. Should cover all direct cases if I didn't miss
-some.
+The Specification can be found in following link.
+https://nvmexpress.org/wp-content/uploads/NVM-Express-1.4-Ratified-TPs-1.zip
+
+This is an RFC. Looking forward for any feedbacks or other alternate
+designs for plumbing simple copy to IO stack.
+
+Simple copy command is a copy offloading operation and is  used to copy
+multiple contiguous ranges (source_ranges) of LBA's to a single destination
+LBA within the device reducing traffic between host and device.
+
+This implementation accepts destination, no of sources and arrays of
+source ranges from application. For devices suporting native copy
+offloading, attach the control informantion as payload to the bio and
+submits to the device. For devices without native copy support, copy
+emulation is done by reading source range into memory and writing it to
+the destination.
+
+Following limits are added to queue limits and are exposed in sysfs
+to userspace
+	- *copy_offload* controls copy_offload. set 0 to disable copy
+offload, 1 to enable native copy offloading support.
+	- *max_copy_sectors* limits the sum of all source_range length
+	- *max_copy_nr_ranges* limits the number of source ranges
+	- *max_copy_range_sectors* limit the maximum number of sectors
+		that can constitute a single source range.
+
+	max_copy_sectors = 0 indicates the device doesn't support copy
+offloading.
+
+	*copy offload* sysfs entry is configurable and can be used toggle
+between emulation and native support depending upon the usecase.
+
+Changes from v2
+
+1. Add emulation support for devices not supporting copy.
+2. Add *copy_offload* sysfs entry to enable and disable copy_offload
+	in devices supporting simple copy.
+3. Remove simple copy support for stacked devices.
+
+Changes from v1:
+
+1. Fix memory leak in __blkdev_issue_copy
+2. Unmark blk_check_copy inline
+3. Fix line break in blk_check_copy_eod
+4. Remove p checks and made code more readable
+5. Don't use bio_set_op_attrs and remove op and set
+   bi_opf directly
+6. Use struct_size to calculate total_size
+7. Fix partition remap of copy destination
+8. Remove mcl,mssrl,msrc from nvme_ns
+9. Initialize copy queue limits to 0 in nvme_config_copy
+10. Remove return in QUEUE_FLAG_COPY check
+11. Remove unused OCFS
+
+SelvaKumar S (2):
+  block: add simple copy support
+  nvme: add simple copy support
+
+ block/blk-core.c          |  94 ++++++++++++++++++--
+ block/blk-lib.c           | 182 ++++++++++++++++++++++++++++++++++++++
+ block/blk-merge.c         |   2 +
+ block/blk-settings.c      |  10 +++
+ block/blk-sysfs.c         |  50 +++++++++++
+ block/blk-zoned.c         |   1 +
+ block/bounce.c            |   1 +
+ block/ioctl.c             |  43 +++++++++
+ drivers/nvme/host/core.c  |  89 +++++++++++++++++++
+ include/linux/bio.h       |   1 +
+ include/linux/blk_types.h |  15 ++++
+ include/linux/blkdev.h    |  16 ++++
+ include/linux/nvme.h      |  43 ++++++++-
+ include/uapi/linux/fs.h   |  13 +++
+ 14 files changed, 549 insertions(+), 11 deletions(-)
 
 -- 
-Pavel Begunkov
+2.25.1
+
