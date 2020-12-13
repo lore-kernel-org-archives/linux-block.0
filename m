@@ -2,138 +2,108 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB680C4361B
-	for <linux-block@archiver.kernel.org>; Sun, 13 Dec 2020 11:41:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ED68C4361B
+	for <linux-block@archiver.kernel.org>; Sun, 13 Dec 2020 18:20:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 943D3207FB
-	for <linux-block@archiver.kernel.org>; Sun, 13 Dec 2020 11:41:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E766123123
+	for <linux-block@archiver.kernel.org>; Sun, 13 Dec 2020 18:20:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405857AbgLMLlr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 13 Dec 2020 06:41:47 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36505 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725864AbgLMLlq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 13 Dec 2020 06:41:46 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1607859620;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=EKSW/stOci0QivHUrs5dckTF2lzWIS0IG9Tjp31B46k=;
-        b=X22dFz07MuAYbppJfYxfzUmp/HsCp8EVxQSFtrbdzInp5R8zA2fokjuea4C1byHcgZz6vx
-        Vj6ENK7wQx48yJoSG/Jb/xoxhKryeSnNlSyqOrmX5cDXdAwrAGA/p+j+yqGNqdtigaRhmF
-        Ftv4u9r4tL0OKd2pwYqJEtey8aW48Zk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-97-1-1w0Sw5NFyDBwZN_yeU2w-1; Sun, 13 Dec 2020 06:40:16 -0500
-X-MC-Unique: 1-1w0Sw5NFyDBwZN_yeU2w-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6C436107ACE4;
-        Sun, 13 Dec 2020 11:40:15 +0000 (UTC)
-Received: from T590 (ovpn-12-55.pek2.redhat.com [10.72.12.55])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 23E6036FA;
-        Sun, 13 Dec 2020 11:40:06 +0000 (UTC)
-Date:   Sun, 13 Dec 2020 19:40:02 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     syzbot <syzbot+825f0f9657d4e528046e@syzkaller.appspotmail.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Subject: Re: KASAN: use-after-free Read in disk_part_iter_next
-Message-ID: <20201213114002.GA1659569@T590>
-References: <000000000000c167dd05b6369e69@google.com>
+        id S1726027AbgLMSUK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 13 Dec 2020 13:20:10 -0500
+Received: from mail.kernel.org ([198.145.29.99]:34508 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725845AbgLMSUK (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 13 Dec 2020 13:20:10 -0500
+Date:   Sun, 13 Dec 2020 10:19:27 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1607883569;
+        bh=2Ay8iwxkhb7pWruC+8K4CRD5cAg4o6Zb2YUnRMyL4OA=;
+        h=From:To:Cc:Subject:References:In-Reply-To:From;
+        b=awGh4xeTpxSVTS1o2D5YfUfSIzT58U2okQqY+2g58HryAWMtBA1FAJukpDVdFQgeD
+         vSU9zky0P30yDCSWQSLfNJlYYVXUgmjIMPXZ/EdDeaqNdpRfat894GNDTVBigO/QdM
+         qZHgXZNZJwQWu82pcLKckUm2ZDR8tBQg6ZExxBYgWxfe5OOGHnCK8GTWMbma1gF0Xd
+         GSMukYyPJ+hi4Sd2BFebKsFZQXusanIaAu8Kc7aFMykSwYCKXhsnjoe8VVPWqpVvuB
+         /wAm1dicBeT5RSVS8oVjN/2hiKEowa9lSj4dAt6EXev+t8ZkCRUAIHtzVbuTKH8egT
+         2QKYp309KIhrA==
+From:   Keith Busch <kbusch@kernel.org>
+To:     Pavel Begunkov <asml.silence@gmail.com>
+Cc:     Andres Freund <andres@anarazel.de>, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>
+Subject: Re: hybrid polling on an nvme doesn't seem to work with iodepth > 1
+ on 5.10.0-rc5
+Message-ID: <20201213181927.GA3909519@dhcp-10-100-145-180.wdc.com>
+References: <20201210205141.px7suygfrl2lhdkr@alap3.anarazel.de>
+ <73c43682-10f2-0bc9-5aa5-e433abd4f3c3@gmail.com>
+ <aa735173-fad1-b7d4-1c90-4fccc90c562d@gmail.com>
+ <20201211011940.ouc4k3am5gg2ithp@alap3.anarazel.de>
+ <de0b46d2-d053-a7a8-23e7-fc954807c70d@gmail.com>
+ <20201211033719.GA6414@redsun51.ssa.fujisawa.hgst.com>
+ <2b26eaca-d143-6951-3bed-ce29df4dd07d@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <000000000000c167dd05b6369e69@google.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <2b26eaca-d143-6951-3bed-ce29df4dd07d@gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Dec 11, 2020 at 01:03:11PM -0800, syzbot wrote:
-> Hello,
+On Fri, Dec 11, 2020 at 12:38:43PM +0000, Pavel Begunkov wrote:
+> On 11/12/2020 03:37, Keith Busch wrote:
+> > It sounds like the statistic is using the wrong criteria. It ought to
+> > use the average time for the next available completion for any request
+> > rather than the average latency of a specific IO. It might work at high
+> > depth if the hybrid poll knew the hctx's depth when calculating the
+> > sleep time, but that information doesn't appear to be readily available.
 > 
-> syzbot found the following issue on:
-> 
-> HEAD commit:    15ac8fdb Add linux-next specific files for 20201207
-> git tree:       linux-next
-> console output: https://syzkaller.appspot.com/x/log.txt?x=15d8ad37500000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=3696b8138207d24d
-> dashboard link: https://syzkaller.appspot.com/bug?extid=825f0f9657d4e528046e
-> compiler:       gcc (GCC) 10.1.0-syz 20200507
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1393dcbd500000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1074cf17500000
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+825f0f9657d4e528046e@syzkaller.appspotmail.com
-> 
-> ==================================================================
-> BUG: KASAN: use-after-free in bdev_nr_sectors include/linux/genhd.h:264 [inline]
-> BUG: KASAN: use-after-free in disk_part_iter_next+0x4c7/0x560 block/genhd.c:204
-> Read of size 8 at addr ffff88814080b9a8 by task syz-executor825/9848
-> 
-> CPU: 1 PID: 9848 Comm: syz-executor825 Not tainted 5.10.0-rc6-next-20201207-syzkaller #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-> Call Trace:
->  __dump_stack lib/dump_stack.c:79 [inline]
->  dump_stack+0x107/0x163 lib/dump_stack.c:120
->  print_address_description.constprop.0.cold+0x5b/0x2f8 mm/kasan/report.c:230
->  __kasan_report mm/kasan/report.c:396 [inline]
->  kasan_report.cold+0x79/0xd5 mm/kasan/report.c:413
->  bdev_nr_sectors include/linux/genhd.h:264 [inline]
->  disk_part_iter_next+0x4c7/0x560 block/genhd.c:204
->  partition_overlaps+0x96/0x200 block/partitions/core.c:425
->  bdev_add_partition+0x66/0x130 block/partitions/core.c:444
->  blkpg_do_ioctl+0x2d0/0x340 block/ioctl.c:43
->  blkpg_ioctl block/ioctl.c:60 [inline]
->  blkdev_ioctl+0x577/0x6d0 block/ioctl.c:541
->  block_ioctl+0xf9/0x140 fs/block_dev.c:1649
->  vfs_ioctl fs/ioctl.c:48 [inline]
->  __do_sys_ioctl fs/ioctl.c:753 [inline]
->  __se_sys_ioctl fs/ioctl.c:739 [inline]
->  __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:739
->  do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
->  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+> It polls (and so sleeps) from submission of a request to its completion,
+> not from request to request. 
 
-It should be fixed by the following patch, can you run the test with this
-patch?
+Right, but the polling thread is responsible for completing all
+requests, not just the most recent cookie. If the sleep timer uses the
+round trip of a single request when you have a high queue depth, there
+are likely to be many completions in the pipeline that aren't getting
+polled on time. This feeds back to the mean latency, pushing the sleep
+timer further out.
 
-diff --git a/block/genhd.c b/block/genhd.c
-index b84b8671e627..98d785e248dd 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -244,8 +244,7 @@ struct block_device *disk_part_iter_next(struct disk_part_iter *piter)
- 		part = rcu_dereference(ptbl->part[piter->idx]);
- 		if (!part)
- 			continue;
--		if (!bdev_nr_sectors(part) &&
--		    !(piter->flags & DISK_PITER_INCL_EMPTY) &&
-+		if (!(piter->flags & DISK_PITER_INCL_EMPTY) &&
- 		    !(piter->flags & DISK_PITER_INCL_EMPTY_PART0 &&
- 		      piter->idx == 0))
- 			continue;
-@@ -253,6 +252,12 @@ struct block_device *disk_part_iter_next(struct disk_part_iter *piter)
- 		piter->part = bdgrab(part);
- 		if (!piter->part)
- 			continue;
-+		if (!bdev_nr_sectors(part)) {
-+			bdput(piter->part);
-+			piter->part = NULL;
-+			continue;
-+		}
+> Looks like the other scheme doesn't suit well
+> when you don't have a constant-ish flow of requests, e.g. QD=1 and with
+> different latency in the userspace.
+
+The idea I'm trying to convey shouldn't affect QD1. The following patch
+seems to test "ok", but I know of at least a few scenarios where it
+falls apart...
+
+---
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index e9799fed98c7..cab2dafcd3a9 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -3727,6 +3727,7 @@ static void blk_mq_poll_stats_fn(struct blk_stat_callback *cb)
+ static unsigned long blk_mq_poll_nsecs(struct request_queue *q,
+ 				       struct request *rq)
+ {
++	struct blk_mq_hw_ctx *hctx = rq->mq_hctx;
+ 	unsigned long ret = 0;
+ 	int bucket;
+ 
+@@ -3753,6 +3754,15 @@ static unsigned long blk_mq_poll_nsecs(struct request_queue *q,
+ 	if (q->poll_stat[bucket].nr_samples)
+ 		ret = (q->poll_stat[bucket].mean + 1) / 2;
+ 
++	/*
++	 * Finding completions on the first poll indicates we're sleeping too
++	 * long and pushing the latency statistic in the wrong direction for
++	 * future sleep consideration. Poll immediately until the average time
++	 * becomes more useful.
++	 */
++	if (hctx->poll_invoked < 3 * hctx->poll_considered)
++		return 0;
 +
- 		piter->idx += inc;
- 		break;
- 	}
-
--- 
-Ming
-
+ 	return ret;
+ }
+ 
+---
