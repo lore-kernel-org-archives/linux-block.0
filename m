@@ -7,69 +7,65 @@ X-Spam-Status: No, score=-4.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 035EAC2BB40
-	for <linux-block@archiver.kernel.org>; Sun, 13 Dec 2020 22:13:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DDAEC4361B
+	for <linux-block@archiver.kernel.org>; Sun, 13 Dec 2020 22:37:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C59B4230FF
-	for <linux-block@archiver.kernel.org>; Sun, 13 Dec 2020 22:13:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BC07C207CC
+	for <linux-block@archiver.kernel.org>; Sun, 13 Dec 2020 22:37:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406401AbgLMWNI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 13 Dec 2020 17:13:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36622 "EHLO
+        id S2406767AbgLMWgo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 13 Dec 2020 17:36:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731431AbgLMWNB (ORCPT
+        with ESMTP id S1727958AbgLMWgh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 13 Dec 2020 17:13:01 -0500
+        Sun, 13 Dec 2020 17:36:37 -0500
 Received: from mail-wr1-x442.google.com (mail-wr1-x442.google.com [IPv6:2a00:1450:4864:20::442])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94385C0613CF;
-        Sun, 13 Dec 2020 14:12:20 -0800 (PST)
-Received: by mail-wr1-x442.google.com with SMTP id 91so14551787wrj.7;
-        Sun, 13 Dec 2020 14:12:20 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CBA7C0613D6;
+        Sun, 13 Dec 2020 14:35:57 -0800 (PST)
+Received: by mail-wr1-x442.google.com with SMTP id i9so14598699wrc.4;
+        Sun, 13 Dec 2020 14:35:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:autocrypt:message-id:date:user-agent
+        h=to:cc:references:from:autocrypt:subject:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=9nxrWqcqD+NfL/E6pdVeNrVlJmdS2gvVv7D8xgbY/eQ=;
-        b=dF086oKY/H0yy2SCYekpY3t0HtfeVwzk1D52EsK+0RLf/3jUCSsARG9ZujjcHMv/XR
-         IksFhDEai7bxAT180ne63PVGVMJ2IxPZllBnCOvZ6TT/UFY6RVpeJ4GqJPpvRWHoO1i2
-         Ne74Xp7a6VZkZ4FkC1ynQ3pTGGM+QriCt56G65RpMPl23xrivoMP7p53OQwubf35J2my
-         SEl9h+/qIWB+FKzywtT4aPCqWhxHSuS+nmB5aXn1gqPzoIXneMy1w82SajjjMxBLT0mF
-         5nGDMbNqdP+QlAeb46T9zBlCxOGrjPK26O4xSmujxTPIBzOfc7CRO9NEI3BNHiMhpLl9
-         maeQ==
+        bh=T/iMHlNe3EXqKdrKSSOGAg78Pv8UK8/sm1Ps+5hAae8=;
+        b=QK+uEcUR3n45dcppnC8rUI7SUt+EekvZqDXgpILUe5MQzMidUgXUdXP6v2zHyi7et7
+         goQaIJNNrV/2I3d9VJvUg6zH8xL6UGl5CevK8Xn4QzGwy7q5cPHyhG0BXMXtLb1+IHke
+         pmBO18GSzVNgq/x7Ex+ZKUCiLvPSoM8SLfHOqaN4EiYNmvd8ZRyAmX7BsMDaS+LhQRCD
+         0mTVnPddDK6nW4sfRG/4IzHu6oSJvw0DjzizGLsnRPholfMkPgyexF8zPYCvNoozF/Ct
+         9NXpcNyVEYZnh+pUR/vvtB1T0AKqAZyizff6x5Zx9LfRWHVjMxSQo9QhAzogmtTUsw5Z
+         ZL5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+        h=x-gm-message-state:to:cc:references:from:autocrypt:subject
          :message-id:date:user-agent:mime-version:in-reply-to
          :content-language:content-transfer-encoding;
-        bh=9nxrWqcqD+NfL/E6pdVeNrVlJmdS2gvVv7D8xgbY/eQ=;
-        b=mJX1MrHUoHxlJ4DKFxo3JCyvNYRRzLKGC5kbN9P6O1BzCZY4gpQBkxm2h9lLuK+qyM
-         cGTdanw4vdTSDzIWsRwaYhc+puDs27V243tjFHL8qN+H/gI7jP3iXLW+a8P9mEySHcrZ
-         TRf4hXzBswDNBbuQ7bPIEepGlp5LvesmwwcedVEMi2qIiwmC6Jy7h8dY7l8LabcXApsK
-         pRprG9zMo81i4B27zhLMho5MpZoIm43/IclMcKPTm9oAS7EBHECSpOXbJie4KYkt02zz
-         VlBhvNZRWfXbN0XfTS9Cjx+fL7WHYm+0c7PdgOBL0521mzSlvgeKd11tBKrPOhO8WQKs
-         wxUw==
-X-Gm-Message-State: AOAM531ZMW9IuFjbclvwbJXLdV/f3ftD6piWsl33x60DF73F4FrWzIDh
-        Qk3t6ZACX7Kc2KtO0yhld+1Fg6EAJ6Ju3ZjQ
-X-Google-Smtp-Source: ABdhPJyUDq/ElypTFjQP41ePoMgoMoW+nE653MComyet2+mKcZ6hmkEjnDKHEfu2VyKKSi5WyODxdw==
-X-Received: by 2002:a5d:56c3:: with SMTP id m3mr8832166wrw.419.1607897539098;
-        Sun, 13 Dec 2020 14:12:19 -0800 (PST)
+        bh=T/iMHlNe3EXqKdrKSSOGAg78Pv8UK8/sm1Ps+5hAae8=;
+        b=J4ph4u1OWb4oXiofemhKInPZ8v8qoqvEdSUcx9n9HbxadVj0tcCIxFd74aofApMrgY
+         LP4uJcIspdjSxHsHR9j4JeXce1OSK7aiW3txXmdaAvD8xAJiWYQD5UfSQUr8uG8U3pU+
+         jptYL2VAQ42C/UZObFnj7Izxl3syZ7d1Ub8oFgUoaoeN7d6DFRG397FppANddFAtsY6k
+         vGh/vsk1k3bTEhVqZZum15aF8pnkBmj2Yk1lHgUcnDXeS/hOy1vmQMbGAesuOhqEefuq
+         aQZio+Z42k6VTGCYxx754zP+SR3mIJTTqDXk6zwiQJQA4OBf13m2Lpf9oKgh+aRltzmR
+         Zjfw==
+X-Gm-Message-State: AOAM530iFOw3ZKnv+tPxYHmeNE/aCJB8XcW9hRjzZDmDCSsO9DYQbGBp
+        vARO3zF4y/dpP90AhrGa1pR5PkJo7kLtmA==
+X-Google-Smtp-Source: ABdhPJyg/gyoUQy3dn1LFAtjEiAf3m7z89efUHD5gS8vI43ipZaPHHNRS7jKvU5zRONSbr+6BukzGg==
+X-Received: by 2002:adf:a551:: with SMTP id j17mr25470714wrb.217.1607898955703;
+        Sun, 13 Dec 2020 14:35:55 -0800 (PST)
 Received: from [192.168.8.124] ([85.255.232.163])
-        by smtp.gmail.com with ESMTPSA id h9sm27378431wre.24.2020.12.13.14.12.18
+        by smtp.gmail.com with ESMTPSA id h98sm31473084wrh.69.2020.12.13.14.35.54
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 13 Dec 2020 14:12:18 -0800 (PST)
-Subject: Re: [PATCH 1/2] iov: introduce ITER_BVEC_FLAG_FIXED
-To:     Matthew Wilcox <willy@infradead.org>,
-        Christoph Hellwig <hch@infradead.org>
-Cc:     Al Viro <viro@zeniv.linux.org.uk>, Jens Axboe <axboe@kernel.dk>,
-        linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <cover.1607477897.git.asml.silence@gmail.com>
- <de27dbca08f8005a303e5efd81612c9a5cdcf196.1607477897.git.asml.silence@gmail.com>
- <20201209083645.GB21968@infradead.org>
- <20201209130723.GL3579531@ZenIV.linux.org.uk>
- <b6cd4108-dbfe-5753-768f-92f55f38d6cd@gmail.com>
- <20201209175553.GA26252@infradead.org>
- <20201209182456.GR7338@casper.infradead.org>
+        Sun, 13 Dec 2020 14:35:55 -0800 (PST)
+To:     Al Viro <viro@zeniv.linux.org.uk>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <cover.1605799583.git.asml.silence@gmail.com>
+ <9bc27cb3ef6ab49b6b2ccee3db6613838aee17af.1605799583.git.asml.silence@gmail.com>
+ <20201119170340.GA6179@infradead.org>
+ <ce79f47e-2ec0-ba29-a991-c537a8990dee@gmail.com>
+ <20201211020100.GB107834@ZenIV.linux.org.uk>
 From:   Pavel Begunkov <asml.silence@gmail.com>
 Autocrypt: addr=asml.silence@gmail.com; prefer-encrypt=mutual; keydata=
  mQINBFmKBOQBEAC76ZFxLAKpDw0bKQ8CEiYJRGn8MHTUhURL02/7n1t0HkKQx2K1fCXClbps
@@ -114,36 +110,84 @@ Autocrypt: addr=asml.silence@gmail.com; prefer-encrypt=mutual; keydata=
  UVMKkOCdFhutRmYp0mbv2e87IK4erwNHQRkHUkzbsuym8RVpAZbLzLPIYK/J3RTErL6Z99N2
  m3J6pjwSJY/zNwuFPs9zGEnRO4g0BUbwGdbuvDzaq6/3OJLKohr5eLXNU3JkT+3HezydWm3W
  OPhauth7W0db74Qd49HXK0xe/aPrK+Cp+kU1HRactyNtF8jZQbhMCC8vMGukZtWaAwpjWiiH bA==
-Message-ID: <ef3ddc2c-75ea-59aa-f27e-f974b003802e@gmail.com>
-Date:   Sun, 13 Dec 2020 22:09:00 +0000
+Subject: Re: [PATCH 2/2] iov_iter: optimise iter type checking
+Message-ID: <857a3161-fbd5-5ff8-d733-ca57923302b5@gmail.com>
+Date:   Sun, 13 Dec 2020 22:32:37 +0000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.0
 MIME-Version: 1.0
-In-Reply-To: <20201209182456.GR7338@casper.infradead.org>
+In-Reply-To: <20201211020100.GB107834@ZenIV.linux.org.uk>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 09/12/2020 18:24, Matthew Wilcox wrote:
-> On Wed, Dec 09, 2020 at 05:55:53PM +0000, Christoph Hellwig wrote:
->> On Wed, Dec 09, 2020 at 01:37:05PM +0000, Pavel Begunkov wrote:
->>> Yeah, I had troubles to put comments around, and it's still open.
+On 11/12/2020 02:01, Al Viro wrote:
+> On Thu, Nov 19, 2020 at 05:12:44PM +0000, Pavel Begunkov wrote:
+>> On 19/11/2020 17:03, Christoph Hellwig wrote:
+>>> On Thu, Nov 19, 2020 at 03:29:43PM +0000, Pavel Begunkov wrote:
+>>>> The problem here is that iov_iter_is_*() helpers check types for
+>>>> equality, but all iterate_* helpers do bitwise ands. This confuses
+>>>> a compiler, so even if some cases were handled separately with
+>>>> iov_iter_is_*(), it can't eliminate and skip unreachable branches in
+>>>> following iterate*().
 >>>
->>> For current cases it can be bound to kiocb, e.g. "if an bvec iter passed
->>> "together" with kiocb then the vector should stay intact up to 
->>> ->ki_complete()". But that "together" is rather full of holes.
+>>> I think we need to kill the iov_iter_is_* helpers, renumber to not do
+>>> the pointless bitmask and just check for equality (might turn into a
+>>> bunch of nice switch statements actually).
 >>
->> What about: "For bvec based iters the bvec must not be freed until the
->> I/O has completed.  For asynchronous I/O that means it must be freed
->> no earlier than from ->ki_complete."
+>> There are uses like below though, and that would also add some overhead
+>> on iov_iter_type(), so it's not apparent to me which version would be
+>> cleaner/faster in the end. But yeah, we can experiment after landing
+>> this patch.
+>>
+>> if (type & (ITER_BVEC|ITER_KVEC))
 > 
-> Perhaps for the second sentence "If the I/O is completed asynchronously,
-> the bvec must not be freed before ->ki_complete() has been called"?
+> There are exactly 3 such places, and all of them would've been just as well
+> with case ITER_BVEC: case ITER_KVEC: ... in a switch.
+> 
+> Hmm...  I wonder which would work better:
+> 
+> enum iter_type {
+>         ITER_IOVEC = 0,
+>         ITER_KVEC = 2,
+>         ITER_BVEC = 4,
+>         ITER_PIPE = 6,
+>         ITER_DISCARD = 8,
+> };
+> iov_iter_type(iter)	(((iter)->type) & ~1)
+> iov_iter_rw(iter)	(((iter)->type) & 1)
+> 
+> or
+> 
+> enum iter_type {
+>         ITER_IOVEC,
+>         ITER_KVEC,
+>         ITER_BVEC,
+>         ITER_PIPE,
+>         ITER_DISCARD,
+> };
+> iov_iter_type(iter)	(((iter)->type) & (~0U>>1))
+> // callers of iov_iter_rw() are almost all comparing with explicit READ or WRITE
+> iov_iter_rw(iter)	(((iter)->type) & ~(~0U>>1) ? WRITE : READ)
+> with places like iov_iter_kvec() doing
+> 	i->type = ITER_KVEC | ((direction == WRITE) ? BIT(31) : 0);
+> 
+> Preferences?
 
-Sounds good, I'll use it. Thanks!
+For the bitmask version (with this patch) we have most of
+iov_iter_type() completely optimised out. E.g. identical
+
+iov_iter_type(i) & ITER_IOVEC <=> iter->type & ITER_IOVEC
+
+It's also nice to have iov_iter_rw() to be just
+(type & 1), operations with which can be optimised in a handful of ways.
+
+Unless the compiler would be able to heavily optimise switches,
+e.g. to out-of-memory/calculation-based jump tables, that I doubt,
+I'd personally leave it be. Though, not like it should matter much.
 
 -- 
 Pavel Begunkov
