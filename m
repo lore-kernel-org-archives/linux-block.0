@@ -2,142 +2,117 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ABB1C4361B
-	for <linux-block@archiver.kernel.org>; Mon, 14 Dec 2020 15:32:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 855F2C4361B
+	for <linux-block@archiver.kernel.org>; Mon, 14 Dec 2020 16:28:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2E31C22B40
-	for <linux-block@archiver.kernel.org>; Mon, 14 Dec 2020 15:32:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3A7E521534
+	for <linux-block@archiver.kernel.org>; Mon, 14 Dec 2020 16:28:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725871AbgLNPbv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Dec 2020 10:31:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54076 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731495AbgLNP21 (ORCPT
+        id S2439874AbgLNQ21 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Dec 2020 11:28:27 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53976 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2439697AbgLNQ2W (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Dec 2020 10:28:27 -0500
-Received: from mail-pj1-x1043.google.com (mail-pj1-x1043.google.com [IPv6:2607:f8b0:4864:20::1043])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7F4CC0613D6;
-        Mon, 14 Dec 2020 07:27:46 -0800 (PST)
-Received: by mail-pj1-x1043.google.com with SMTP id hk16so6743130pjb.4;
-        Mon, 14 Dec 2020 07:27:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=zod9g0ucmYQBVnFLZZB9W/Bw5VKVjG5oSiWxDHXjy38=;
-        b=bXYK1ZSyjNXW0Qh+M9C2SfRd7r1pKszYRp26r4cxtylix/RS6bG6mpeRD/E372JTD1
-         fpf3a9iiJOOsh7SqakQ+H8POqiWMeQcZiG8AmdC4579fLMnqSZfsTnxPhfMxxOpa51RG
-         qpMDgefR5lpG1xShf/T5e4KxPLleWKU7IA4YW887h+maYDZ5D3rbuom7R5EIQcugIuJT
-         9iEKkKyT8hb+IZft0m4ruG5SFBGxdEnIYo3i5wGvHdMSyHFVIKYM2XD6LK1t8dppU9Te
-         fothtOHrTonFpS2q4LQMU/mMZ9DQKY9xzGGdlldZmSkUtx/JIaG/9cyri9dK4l8BruQm
-         3ayA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=zod9g0ucmYQBVnFLZZB9W/Bw5VKVjG5oSiWxDHXjy38=;
-        b=Kab0BzRD3svqrL0nprzClwpPVDaIg4ovkD23pNTJonIReZXyggMFuVZmKIfO5/QFio
-         67qBmQ2387+GnNmlMy4lAxNobCQeW7ISc+Vq6Zf9nKGx76BqtdTOwv2t1CdhxFgTMMwl
-         5GEgHkqkGrRNUduNIX3jlWGwS1LfLREVxD8dP7wpXzogjiVSkAnq/ZugAwexiJZ4AN1T
-         uGh19DZeG/9PH3lYcIn2oGaFUUgpe4XLXQXluf+LvXvpb1kfAaWZ7W8jw10h8aoTN1CF
-         GMMsThm3ETlQDnSvmvwGFtYFf7jh4TnzgNXxd6weiG2CjBK1H9Ob8Bc8DWEG054ik/g4
-         WdJg==
-X-Gm-Message-State: AOAM531fbWY0nddzxWQ9XeO1U3x/klSPyMAtY3ummaIO2tbgpmdYg2nQ
-        bzSXHscr/z4pYgo4B3aLAkWlkVfgmm55/3cI
-X-Google-Smtp-Source: ABdhPJwg6z41nULlj+fBpHui3mHcsEEdsSWv2Url9DdIMk0b8MqzGdSGYGJWk/tDMRfFUjVbLs5lpw==
-X-Received: by 2002:a17:902:8f94:b029:da:d168:4443 with SMTP id z20-20020a1709028f94b02900dad1684443mr22760620plo.57.1607959666413;
-        Mon, 14 Dec 2020 07:27:46 -0800 (PST)
-Received: from localhost.localdomain ([124.253.101.135])
-        by smtp.googlemail.com with ESMTPSA id y6sm19656391pjl.0.2020.12.14.07.27.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Dec 2020 07:27:45 -0800 (PST)
-From:   Puranjay Mohan <puranjay12@gmail.com>
-To:     bjorn@helgaas.com, linux-pci@vger.kernel.org,
-        Damien.LeMoal@wdc.com, axboe@kernel.dk,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Puranjay Mohan <puranjay12@gmail.com>
-Subject: [PATCH v1] drivers: block: skd: remove skd_pci_info()
-Date:   Mon, 14 Dec 2020 20:57:20 +0530
-Message-Id: <20201214152720.11922-1-puranjay12@gmail.com>
-X-Mailer: git-send-email 2.27.0
+        Mon, 14 Dec 2020 11:28:22 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1607963214;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=3bgu5oUmviCE7krtx2hLwhZvOZ7S3CVoweAA9rCSIXM=;
+        b=PpAc71rOrc06uIOko2oxPAdkjD2Wohj00/2kn3D5e3aDfbiWFXnVyhAgeBTLZBvT8WZsFd
+        aMrBC13LAYG9iQP0GYY7SAFgozoMiq2j/otAQolNyoycCfVJC77Hl1c81xYwarQrdLG4ld
+        +cCEESu99JrbszH5ARqcW0VyYRMBxBw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-187-AJFvYHPqMs65Yq98KNISGw-1; Mon, 14 Dec 2020 11:26:50 -0500
+X-MC-Unique: AJFvYHPqMs65Yq98KNISGw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 60A261014E79;
+        Mon, 14 Dec 2020 16:26:32 +0000 (UTC)
+Received: from localhost (unknown [10.18.25.174])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id ECEA87DDF8;
+        Mon, 14 Dec 2020 16:26:31 +0000 (UTC)
+Date:   Mon, 14 Dec 2020 11:26:31 -0500
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Greg KH <gregkh@linuxfoundation.org>
+Cc:     Dave Jones <davej@codemonkey.org.uk>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        axboe@kernel.dk, linux-block@vger.kernel.org, dm-devel@redhat.com
+Subject: Re: Linux 5.10
+Message-ID: <20201214162631.GA2290@redhat.com>
+References: <CAHk-=whCKhxNyKn1Arut8xUDKTwp3fWcCj_jbL5dbzkUmo45gQ@mail.gmail.com>
+ <20201214053147.GA24093@codemonkey.org.uk>
+ <X9b9ujh5T6U5+aBY@kroah.com>
+ <20201214160247.GA2090@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201214160247.GA2090@redhat.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Change the call to skd_pci_info() to pcie_print_link_status().
-pcie_print_link_status() can be used to print the link speed and
-the link width, skd_pci_info() does the same and hence it is removed.
+On Mon, Dec 14 2020 at 11:02am -0500,
+Mike Snitzer <snitzer@redhat.com> wrote:
 
-Signed-off-by: Puranjay Mohan <puranjay12@gmail.com>
----
-v1 - Add call to pcie_print_link_status()
----
- drivers/block/skd_main.c | 33 +--------------------------------
- 1 file changed, 1 insertion(+), 32 deletions(-)
+> On Mon, Dec 14 2020 at 12:52am -0500,
+> Greg KH <gregkh@linuxfoundation.org> wrote:
+> 
+> > On Mon, Dec 14, 2020 at 12:31:47AM -0500, Dave Jones wrote:
+> > > On Sun, Dec 13, 2020 at 03:03:29PM -0800, Linus Torvalds wrote:
+> > >  > Ok, here it is - 5.10 is tagged and pushed out.
+> > >  > 
+> > >  > I pretty much always wish that the last week was even calmer than it
+> > >  > was, and that's true here too. There's a fair amount of fixes in here,
+> > >  > including a few last-minute reverts for things that didn't get fixed,
+> > >  > but nothing makes me go "we need another week".
+> > > 
+> > > ...
+> > > 
+> > >  > Mike Snitzer (1):
+> > >  >       md: change mddev 'chunk_sectors' from int to unsigned
+> > > 
+> > > Seems to be broken.  This breaks mounting my raid6 partition:
+> > > 
+> > > [   87.290698] attempt to access beyond end of device
+> > >                md0: rw=4096, want=13996467328, limit=6261202944
+> > > [   87.293371] attempt to access beyond end of device
+> > >                md0: rw=4096, want=13998564480, limit=6261202944
+> > > [   87.296045] BTRFS warning (device md0): couldn't read tree root
+> > > [   87.300056] BTRFS error (device md0): open_ctree failed
+> > > 
+> > > Reverting it goes back to the -rc7 behaviour where it mounts fine.
+> > 
+> > If the developer/maintainer(s) agree, I can revert this and push out a
+> > 5.10.1, just let me know.
+> 
+> Yes, these should be reverted from 5.10 via 5.10.1:
+> 
+> e0910c8e4f87 dm raid: fix discard limits for raid1 and raid10
+> f075cfb1dc59 md: change mddev 'chunk_sectors' from int to unsigned
 
-diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
-index a962b4551bed..efd69f349043 100644
---- a/drivers/block/skd_main.c
-+++ b/drivers/block/skd_main.c
-@@ -3134,40 +3134,10 @@ static const struct pci_device_id skd_pci_tbl[] = {
- 
- MODULE_DEVICE_TABLE(pci, skd_pci_tbl);
- 
--static char *skd_pci_info(struct skd_device *skdev, char *str)
--{
--	int pcie_reg;
--
--	strcpy(str, "PCIe (");
--	pcie_reg = pci_find_capability(skdev->pdev, PCI_CAP_ID_EXP);
--
--	if (pcie_reg) {
--
--		char lwstr[6];
--		uint16_t pcie_lstat, lspeed, lwidth;
--
--		pcie_reg += 0x12;
--		pci_read_config_word(skdev->pdev, pcie_reg, &pcie_lstat);
--		lspeed = pcie_lstat & (0xF);
--		lwidth = (pcie_lstat & 0x3F0) >> 4;
--
--		if (lspeed == 1)
--			strcat(str, "2.5GT/s ");
--		else if (lspeed == 2)
--			strcat(str, "5.0GT/s ");
--		else
--			strcat(str, "<unknown> ");
--		snprintf(lwstr, sizeof(lwstr), "%dX)", lwidth);
--		strcat(str, lwstr);
--	}
--	return str;
--}
--
- static int skd_pci_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- {
- 	int i;
- 	int rc = 0;
--	char pci_str[32];
- 	struct skd_device *skdev;
- 
- 	dev_dbg(&pdev->dev, "vendor=%04X device=%04x\n", pdev->vendor,
-@@ -3201,8 +3171,7 @@ static int skd_pci_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 		goto err_out_regions;
- 	}
- 
--	skd_pci_info(skdev, pci_str);
--	dev_info(&pdev->dev, "%s 64bit\n", pci_str);
-+	pcie_print_link_status(pdev);
- 
- 	pci_set_master(pdev);
- 	rc = pci_enable_pcie_error_reporting(pdev);
--- 
-2.27.0
+Sorry, f075cfb1dc59 was my local commit id, the corresponding upstream
+commit as staged by Jens is:
+
+6ffeb1c3f82 md: change mddev 'chunk_sectors' from int to unsigned
+
+So please revert:
+6ffeb1c3f822 md: change mddev 'chunk_sectors' from int to unsigned
+and then revert:
+e0910c8e4f87 dm raid: fix discard limits for raid1 and raid10
+
+Thanks,
+Mike
 
