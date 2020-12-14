@@ -2,138 +2,227 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BD5AC2BB40
-	for <linux-block@archiver.kernel.org>; Mon, 14 Dec 2020 17:23:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71C88C3526A
+	for <linux-block@archiver.kernel.org>; Mon, 14 Dec 2020 17:38:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6317122522
-	for <linux-block@archiver.kernel.org>; Mon, 14 Dec 2020 17:23:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E6F8723124
+	for <linux-block@archiver.kernel.org>; Mon, 14 Dec 2020 17:30:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2408493AbgLNRXA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Dec 2020 12:23:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43608 "EHLO
+        id S2440474AbgLNR3o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Dec 2020 12:29:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44678 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2408460AbgLNRWz (ORCPT
+        with ESMTP id S2440472AbgLNR3i (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Dec 2020 12:22:55 -0500
-Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6D09C06179C
-        for <linux-block@vger.kernel.org>; Mon, 14 Dec 2020 09:22:01 -0800 (PST)
-Received: by mail-io1-xd32.google.com with SMTP id p187so17627055iod.4
-        for <linux-block@vger.kernel.org>; Mon, 14 Dec 2020 09:22:01 -0800 (PST)
+        Mon, 14 Dec 2020 12:29:38 -0500
+Received: from mail-wr1-x443.google.com (mail-wr1-x443.google.com [IPv6:2a00:1450:4864:20::443])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4D1DC0613D3;
+        Mon, 14 Dec 2020 09:28:57 -0800 (PST)
+Received: by mail-wr1-x443.google.com with SMTP id t16so17248281wra.3;
+        Mon, 14 Dec 2020 09:28:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
+        d=gmail.com; s=20161025;
+        h=to:cc:references:from:autocrypt:subject:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=eWhgExMN4zCprjhcDtgmjw9YARch/pKzDiQ2LLbaT/E=;
-        b=ntS0H9izzEOozE6++3J6RmbFanpPP/2BS164kd/cUdKNpxehdndHtiol5OcrBrr/W/
-         VyrGQKZApqsVmIpC4HgoWyOQFYpBU4aMAKrtHGu3pGPi7UHDWfx+1OJ5VOXwS1fnqr7z
-         uYjvo7F9GIcAMQ6BSaIybuK5IjEYs37EHmWB0jXABDW3lAgFQlN6kxwrkQo9KH8KHmgm
-         05snhCr74SjXv2O1n1hxKt8tE/XsBeFVjOXOcxdm18CqUm1xV7Q86BkkmriiLlns0cFq
-         u8f2yfHdyrzEBpdY07+I7jSgJ4P1YYzk0bC2nMtnCU9Ee3za5ptQROdrmYb39ueT+hU5
-         KENQ==
+        bh=BjqOsBm0T2267qBkF0+4Cq11tMxRrd4IKFD1JljKqow=;
+        b=ET/aMlXbQcEIoiEfeR0Kr+pg1TYXEKY+bGcA/d5eHW4EzWfkrwE+2OPRs0vrJCiG+M
+         xiR/LH0TZ4ln+TjYwY7gCGA7Y041gPnejE1GnkTaqMhkLXxlwAKTfV74eyZDXkg6QUZr
+         TM8wzFfW1PRocED7O8oX54QcAQ5aj6Hduz4Ns45uuVahfRMvZjbPOc4l3JObsVOPjUaA
+         qbeAfirCyV32JXcs+I+ekZlhcoOM1sJQWYIH9vLkE9/Ea3iOyvR9BB9ACXeteHkKT/id
+         inNCiPEwNFuXFfUFAjR6CWz76fL0HAmIh0fxjAB0ipemmRvVBs235sC2QRQ3+RNDXvY5
+         Q1Ng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=eWhgExMN4zCprjhcDtgmjw9YARch/pKzDiQ2LLbaT/E=;
-        b=S2qKNsMR1uWSvAMXEXPZt4Mte8VRjVw1ZLwPZ9NvfqnKMUH4pAs/p2guXilqgryHMN
-         lsvlQlZ7W3Y17d35vhzVeq/0gGNewJpFVM+GCsdS+fsTS/aubNG/EOBuDjK0Lt/BNhwM
-         fE3LZ981cLwFazNG2E/MmqYIh6DWaCNbrEtavgxOXaBysykyeS0mYbbIVJXzxLxT8D3w
-         0uMOb3zEJn69osvEo0WlCJuCvAKMETK525hTdHzTv9Vr4FXoZy56tOTGewg4PV0jxola
-         LFKjnNaD28fx/M0VlifBkK9Aqjl38/zAWH0ao5OHoqNV/xd+gk5JcjnJDd5Bp0W//aUh
-         yzWQ==
-X-Gm-Message-State: AOAM530DbSK2b+JWKzH7kJJm0GBeGRRkbL7IMKaUCJBPrBRGbj5m89Ic
-        y2k9wKG1sYFEe8kDwCc+3iTkrw==
-X-Google-Smtp-Source: ABdhPJzv0nDdErB58l03RvBxS0IlU1/1JVfgOa2qPsxmwVJr9H+ZQuTiasKMVqbH+kw5ob7E0FEkkA==
-X-Received: by 2002:a5e:820d:: with SMTP id l13mr32942668iom.102.1607966520897;
-        Mon, 14 Dec 2020 09:22:00 -0800 (PST)
-Received: from [192.168.1.30] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id j9sm11475152ile.59.2020.12.14.09.22.00
+        h=x-gm-message-state:to:cc:references:from:autocrypt:subject
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=BjqOsBm0T2267qBkF0+4Cq11tMxRrd4IKFD1JljKqow=;
+        b=C4MCXMiu4Rh/K52uM3HIs5vi+fVB6W7eyfchAy+eamCAtar1lrhIwU3P6RMqUsxNBK
+         5i0eHNMgTugUXA57c+hoPxJgCLkfDjQcRy8aZinLwzZWQiBlPlVq0/+jPczRTzK0s594
+         W2U72ZWoq3VKqaVLKqs3VGhKXLag5OeBIlAEbGR+ylr61B6Fjy7ee86J6tCSQZVE5wM6
+         VwZ/NOH1RtvIXrQuZO6IHGXF7a7VEcuOACV6omLo6qOl5KTES68qRv+mYvaw7xkLG10h
+         LCCwSwlgkb/u6R+OaiZjALot0yWvFjitjxgoWUQuM0pOoQK7sPqTYb6qwz2yxxyZF2vj
+         7IQw==
+X-Gm-Message-State: AOAM531yYnDnZk6IEZBZ8U6+tVOuodpLkpweKGdpFkV0zMI/0andFcMC
+        fXaQPtx/+z5AcGmqSwgtTNm0PAsdcWrpyw==
+X-Google-Smtp-Source: ABdhPJzNqF9rPRyBqXNfK6L9jUzUYGuQoSMNjHL4HIRmlS4wjwEQ6PGh2htT34PRfVqAPOigq1Nq1w==
+X-Received: by 2002:a5d:4683:: with SMTP id u3mr30474965wrq.19.1607966936140;
+        Mon, 14 Dec 2020 09:28:56 -0800 (PST)
+Received: from [192.168.8.128] ([85.255.232.163])
+        by smtp.gmail.com with ESMTPSA id h9sm31472192wre.24.2020.12.14.09.28.54
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 14 Dec 2020 09:22:00 -0800 (PST)
-Subject: Re: Linux 5.10
-To:     Mike Snitzer <snitzer@redhat.com>,
-        Greg KH <gregkh@linuxfoundation.org>
-Cc:     Dave Jones <davej@codemonkey.org.uk>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-block@vger.kernel.org, dm-devel@redhat.com
-References: <CAHk-=whCKhxNyKn1Arut8xUDKTwp3fWcCj_jbL5dbzkUmo45gQ@mail.gmail.com>
- <20201214053147.GA24093@codemonkey.org.uk> <X9b9ujh5T6U5+aBY@kroah.com>
- <20201214160247.GA2090@redhat.com> <20201214162631.GA2290@redhat.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <6522caad-bfe8-2554-2ba9-dff5856233d1@kernel.dk>
-Date:   Mon, 14 Dec 2020 10:21:59 -0700
+        Mon, 14 Dec 2020 09:28:55 -0800 (PST)
+To:     David Laight <David.Laight@ACULAB.COM>,
+        Al Viro <viro@zeniv.linux.org.uk>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <cover.1605799583.git.asml.silence@gmail.com>
+ <9bc27cb3ef6ab49b6b2ccee3db6613838aee17af.1605799583.git.asml.silence@gmail.com>
+ <20201119170340.GA6179@infradead.org>
+ <ce79f47e-2ec0-ba29-a991-c537a8990dee@gmail.com>
+ <20201211020100.GB107834@ZenIV.linux.org.uk>
+ <857a3161-fbd5-5ff8-d733-ca57923302b5@gmail.com>
+ <b0e01a4dc3fc4afeb95b7be826ff2375@AcuMS.aculab.com>
+From:   Pavel Begunkov <asml.silence@gmail.com>
+Autocrypt: addr=asml.silence@gmail.com; prefer-encrypt=mutual; keydata=
+ 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 bA==
+Subject: Re: [PATCH 2/2] iov_iter: optimise iter type checking
+Message-ID: <5b65de70-19db-4572-d122-df65191ab098@gmail.com>
+Date:   Mon, 14 Dec 2020 17:25:37 +0000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-In-Reply-To: <20201214162631.GA2290@redhat.com>
+In-Reply-To: <b0e01a4dc3fc4afeb95b7be826ff2375@AcuMS.aculab.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/14/20 9:26 AM, Mike Snitzer wrote:
-> On Mon, Dec 14 2020 at 11:02am -0500,
-> Mike Snitzer <snitzer@redhat.com> wrote:
-> 
->> On Mon, Dec 14 2020 at 12:52am -0500,
->> Greg KH <gregkh@linuxfoundation.org> wrote:
+On 14/12/2020 10:28, David Laight wrote:
+> From: Pavel Begunkov
+>> Sent: 13 December 2020 22:33
 >>
->>> On Mon, Dec 14, 2020 at 12:31:47AM -0500, Dave Jones wrote:
->>>> On Sun, Dec 13, 2020 at 03:03:29PM -0800, Linus Torvalds wrote:
->>>>  > Ok, here it is - 5.10 is tagged and pushed out.
->>>>  > 
->>>>  > I pretty much always wish that the last week was even calmer than it
->>>>  > was, and that's true here too. There's a fair amount of fixes in here,
->>>>  > including a few last-minute reverts for things that didn't get fixed,
->>>>  > but nothing makes me go "we need another week".
+>> On 11/12/2020 02:01, Al Viro wrote:
+>>> On Thu, Nov 19, 2020 at 05:12:44PM +0000, Pavel Begunkov wrote:
+>>>> On 19/11/2020 17:03, Christoph Hellwig wrote:
+>>>>> On Thu, Nov 19, 2020 at 03:29:43PM +0000, Pavel Begunkov wrote:
+>>>>>> The problem here is that iov_iter_is_*() helpers check types for
+>>>>>> equality, but all iterate_* helpers do bitwise ands. This confuses
+>>>>>> a compiler, so even if some cases were handled separately with
+>>>>>> iov_iter_is_*(), it can't eliminate and skip unreachable branches in
+>>>>>> following iterate*().
+>>>>>
+>>>>> I think we need to kill the iov_iter_is_* helpers, renumber to not do
+>>>>> the pointless bitmask and just check for equality (might turn into a
+>>>>> bunch of nice switch statements actually).
 >>>>
->>>> ...
+>>>> There are uses like below though, and that would also add some overhead
+>>>> on iov_iter_type(), so it's not apparent to me which version would be
+>>>> cleaner/faster in the end. But yeah, we can experiment after landing
+>>>> this patch.
 >>>>
->>>>  > Mike Snitzer (1):
->>>>  >       md: change mddev 'chunk_sectors' from int to unsigned
->>>>
->>>> Seems to be broken.  This breaks mounting my raid6 partition:
->>>>
->>>> [   87.290698] attempt to access beyond end of device
->>>>                md0: rw=4096, want=13996467328, limit=6261202944
->>>> [   87.293371] attempt to access beyond end of device
->>>>                md0: rw=4096, want=13998564480, limit=6261202944
->>>> [   87.296045] BTRFS warning (device md0): couldn't read tree root
->>>> [   87.300056] BTRFS error (device md0): open_ctree failed
->>>>
->>>> Reverting it goes back to the -rc7 behaviour where it mounts fine.
+>>>> if (type & (ITER_BVEC|ITER_KVEC))
 >>>
->>> If the developer/maintainer(s) agree, I can revert this and push out a
->>> 5.10.1, just let me know.
+>>> There are exactly 3 such places, and all of them would've been just as well
+>>> with case ITER_BVEC: case ITER_KVEC: ... in a switch.
+>>>
+>>> Hmm...  I wonder which would work better:
+>>>
+>>> enum iter_type {
+>>>         ITER_IOVEC = 0,
+>>>         ITER_KVEC = 2,
+>>>         ITER_BVEC = 4,
+>>>         ITER_PIPE = 6,
+>>>         ITER_DISCARD = 8,
+>>> };
+>>> iov_iter_type(iter)	(((iter)->type) & ~1)
+>>> iov_iter_rw(iter)	(((iter)->type) & 1)
+>>>
+>>> or
+>>>
+>>> enum iter_type {
+>>>         ITER_IOVEC,
+>>>         ITER_KVEC,
+>>>         ITER_BVEC,
+>>>         ITER_PIPE,
+>>>         ITER_DISCARD,
+>>> };
+>>> iov_iter_type(iter)	(((iter)->type) & (~0U>>1))
+>>> // callers of iov_iter_rw() are almost all comparing with explicit READ or WRITE
+>>> iov_iter_rw(iter)	(((iter)->type) & ~(~0U>>1) ? WRITE : READ)
+>>> with places like iov_iter_kvec() doing
+>>> 	i->type = ITER_KVEC | ((direction == WRITE) ? BIT(31) : 0);
+>>>
+>>> Preferences?
 >>
->> Yes, these should be reverted from 5.10 via 5.10.1:
+>> For the bitmask version (with this patch) we have most of
+>> iov_iter_type() completely optimised out. E.g. identical
 >>
->> e0910c8e4f87 dm raid: fix discard limits for raid1 and raid10
->> f075cfb1dc59 md: change mddev 'chunk_sectors' from int to unsigned
+>> iov_iter_type(i) & ITER_IOVEC <=> iter->type & ITER_IOVEC
+>>
+>> It's also nice to have iov_iter_rw() to be just
+>> (type & 1), operations with which can be optimised in a handful of ways.
+>>
+>> Unless the compiler would be able to heavily optimise switches,
+>> e.g. to out-of-memory/calculation-based jump tables, that I doubt,
+>> I'd personally leave it be. Though, not like it should matter much.
 > 
-> Sorry, f075cfb1dc59 was my local commit id, the corresponding upstream
-> commit as staged by Jens is:
-> 
-> 6ffeb1c3f82 md: change mddev 'chunk_sectors' from int to unsigned
-> 
-> So please revert:
-> 6ffeb1c3f822 md: change mddev 'chunk_sectors' from int to unsigned
-> and then revert:
-> e0910c8e4f87 dm raid: fix discard limits for raid1 and raid10
+> The advantage of the bit-masks is that the 'usual' options can
+> be tested for together. So the code can be (for example):
 
-Working with Song on understanding the failure case here. raid6 was
-tested prior to this being shipped. We'll be back with more soon...
+Well, you can do that for the non-bitwise case as well.
+In a simpler form but should be enough.
+
+enum { ITER_IOVEC = 1, ITER_BVEC = 2, ... }
+if (type <= ITER_BVEC) {
+	if (iovec) ...
+	if (bvec) ...
+} else { ... }
+
+
+> 	if (likely(iter->type & (ITER_IOVEC | ITER_PIPE) {
+> 		if (likely((iter->type & ITER_IOVEC)) {
+> 			... code for iovec
+> 		} else [
+> 			... code for pipe
+> 		}
+> 	} else if (iter->type & ITER_BVEC) {
+> 		... code for bvec
+> 	} else if (iter->type & ITER_KVEC) {
+> 		.. code for kvec
+> 	} else {
+> 		.. must be discard
+> 	}
 
 -- 
-Jens Axboe
-
+Pavel Begunkov
