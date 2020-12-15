@@ -2,149 +2,134 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5977AC4361B
-	for <linux-block@archiver.kernel.org>; Tue, 15 Dec 2020 12:08:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABC19C4361B
+	for <linux-block@archiver.kernel.org>; Tue, 15 Dec 2020 12:25:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 131D52220F
-	for <linux-block@archiver.kernel.org>; Tue, 15 Dec 2020 12:08:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7B1E9224D2
+	for <linux-block@archiver.kernel.org>; Tue, 15 Dec 2020 12:25:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728424AbgLOMHv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Dec 2020 07:07:51 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:34214 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727282AbgLOMHo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Dec 2020 07:07:44 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1608033977;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        id S1729248AbgLOMYU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Dec 2020 07:24:20 -0500
+Received: from mx2.suse.de ([195.135.220.15]:50546 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729435AbgLOMX5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 15 Dec 2020 07:23:57 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1608034987; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=qjDkcmbhQZPnlV3v+8AItoCkCx+DjDiN278iJThHvaE=;
-        b=Q9vSXanvz3mmDs37nuqJ7ENBQGdYRaqJVlN0+MEz1LI93ii0tXLp/mdR8WB3HNMTRFXCxJ
-        QVfcxMZGvqWROa/tzZfyyfDHMQB1FhsOmBC12fpj38mqCoD5V9i5aKNWSOG1bB+cetIF9X
-        fEVjEN5ln19iXWiPvParr+F8uEuHnPk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-16-Kzy_9hJQOE6RlqIbFNpLMQ-1; Tue, 15 Dec 2020 07:06:15 -0500
-X-MC-Unique: Kzy_9hJQOE6RlqIbFNpLMQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 051C08031FA;
-        Tue, 15 Dec 2020 12:06:14 +0000 (UTC)
-Received: from T590 (ovpn-12-182.pek2.redhat.com [10.72.12.182])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7687260861;
-        Tue, 15 Dec 2020 12:06:09 +0000 (UTC)
-Date:   Tue, 15 Dec 2020 20:06:04 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Steven Rostedt <rostedt@goodmis.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>, Ingo Molnar <mingo@redhat.com>,
-        linux-kernel@vger.kernel.org,
-        linux-rt-users <linux-rt-users@vger.kernel.org>
-Subject: Re: [PATCH] blktrace: fix 'BUG: sleeping function called from
- invalid context' in case of PREEMPT_RT
-Message-ID: <20201215120604.GB1798021@T590>
-References: <20201214022217.1754273-1-ming.lei@redhat.com>
- <20201214102422.2d84035d@gandalf.local.home>
+        bh=LVHe81L5kggyWP1RUBaaKdbh2RBhNq1dLDe245ww7OI=;
+        b=JnwID1lkt4ZofyQde3z42HCbAMxFv4+ftC7ZsaAR9kh9uWdn0kL9KUZmF3ybn/gbDjmuVb
+        BGdmWTrChwZTZkkeS1yBHee+xr55Aw19wjFkTSFIn6q7daOAQyN5VX1YFuumMJvvHGFKXx
+        YOA7nV54vj1v7JMRy8JKB/G5LGqGFGc=
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id C856EAE66;
+        Tue, 15 Dec 2020 12:23:07 +0000 (UTC)
+Date:   Tue, 15 Dec 2020 13:23:07 +0100
+From:   Michal Hocko <mhocko@suse.com>
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     Josef Bacik <josef@toxicpanda.com>,
+        Btrfs BTRFS <linux-btrfs@vger.kernel.org>,
+        "linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+        "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "linux-nvme@vger.kernel.org" <linux-nvme@vger.kernel.org>
+Subject: Re: [LSFMMBPF 2021] A status update
+Message-ID: <20201215122307.GN32193@dhcp22.suse.cz>
+References: <fd5264ac-c84d-e1d4-01e2-62b9c05af892@toxicpanda.com>
+ <20201212172957.GE2443@casper.infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201214102422.2d84035d@gandalf.local.home>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20201212172957.GE2443@casper.infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Dec 14, 2020 at 10:24:22AM -0500, Steven Rostedt wrote:
-> On Mon, 14 Dec 2020 10:22:17 +0800
-> Ming Lei <ming.lei@redhat.com> wrote:
+On Sat 12-12-20 17:29:57, Matthew Wilcox wrote:
+> On Fri, Dec 04, 2020 at 10:48:53AM -0500, Josef Bacik wrote:
+> > We on the program committee hope everybody has been able to stay safe and
+> > healthy during this challenging time, and look forward to being able to see
+> > all of you in person again when it is safe.
+> > 
+> > The current plans for LSFMMBPF 2021 are to schedule an in person conference
+> > in H2 (after June) of 2021.  The tentative plan is to use the same hotel
+> > that we had planned to use for 2020, as we still have contracts with them.
+> > However clearly that is not set in stone.  The Linux Foundation has done a
+> > wonderful job of working with us to formulate a plan and figure out the
+> > logistics that will work the best for everybody, I really can't thank them
+> > enough for their help.
 > 
-> > trace_note_tsk() is called by __blk_add_trace(), which is covered by RCU read lock.
-> > So in case of PREEMPT_RT, warning of 'BUG: sleeping function called from invalid context'
-> > will be triggered because spin lock is converted to rtmutex.
+> Thank you all for doing your best in the face of this disruption.  I
+> really appreciate all the work you're putting in, and I can't wait to
+> see you all again in person.
 > 
-> The RCU read_lock() can not be the cause of this issue, because under
-> PREEMPT_RT, rcu_read_lock() can be preempted.
+> I hosted a Zoom call yesterday on the topic of Page Folios, and uploaded
+> the video.
 
-OK, got it.
+Thanks for organizing this. I couldn't attent directly but I have
+watched the video. I think this was a useful meeting.
 
+> There was interest expressed in the call on doing a follow-up
+> call on the topic of GUP (get_user_pages and friends).  It would probably
+> also be good to have meetings on other topics.
+
+I hope I will have time to join this one.
+
+> I don't want this to be seen in any way as taking away from LSFMMBPF.
+> I see Zoom calls as an interim solution to not having face-to-face
+> meetings.
+
+Agreed!
+
+> I'd like to solicit feedback from this group on:
 > 
-> What was the full back trace of this problem?
+>  - Time of day.  There is no good time that suits everyone around
+>    the world.  With developers in basically every inhabited time zone, the
+>    call will definitely take place in the middle of somebody's night, and
+>    during somebody else's normal family time.  Publishing the recordings
+>    helps ameliorate some of this, but I feel we should shift the time
+>    around.  Having it at the same time of day helps people fit it into
+>    their schedule of other meetings (and meals), but I think the benefits
+>    of allowing more people to participate live outweighs the costs.
 
-[  284.527619] BUG: sleeping function called from invalid context at kernel/locking/rtmutex.c:968
-[  284.527626] in_atomic(): 1, irqs_disabled(): 0, pid: 6705, name: mandb
-[  284.527631] 4 locks held by mandb/6705:
-[  284.527634]  #0: ffff88853f4f2eb0 (&f->f_pos_lock){+.+.}-{0:0}, at: __fdget_pos+0xaf/0xe0
-[  284.527662]  #1: ffff8885eb814048 (&sb->s_type->i_mutex_key#13){++++}-{0:0}, at: xfs_ilock+0x17d/0x590 [xfs]
-[  284.527838]  #2: ffffffffa24d22c0 (rcu_read_lock){....}-{1:2}, at: blk_add_trace_bio+0x0/0x2f0
-[  284.527859]  #3: ffffffffa22177a0 (running_trace_lock){+.+.}-{2:2}, at: __blk_add_trace+0x9ea/0xdf0
-[  284.527877] Preemption disabled at:
-[  284.527886] [<ffffffff9f936743>] get_lock_stats+0x13/0x120
-[  284.527897] CPU: 53 PID: 6705 Comm: mandb Kdump: loaded Not tainted 4.18.0-259.rt7.24.el8.x86_64+debug #1
-[  284.527901] Hardware name: Lenovo ThinkSystem SR630 -[7X02CTO1WW]-/-[7X02CTO1WW]-, BIOS -[IVE136T-2.10]- 03/22/2019
-[  284.527904] Call Trace:
-[  284.527918]  dump_stack+0x8e/0xd0
-[  284.527934]  ? get_lock_stats+0x13/0x120
-[  284.527944]  ___might_sleep.cold.58+0x54/0x77
-[  284.527964]  rt_spin_lock+0x3e/0x120
-[  284.527969]  ? __blk_add_trace+0x9ea/0xdf0
-[  284.527980]  __blk_add_trace+0x9ea/0xdf0
-[  284.528025]  ? rcu_read_lock_sched_held+0xe0/0xe0
-[  284.528048]  blk_add_trace_bio+0x25d/0x2f0
-[  284.528074]  ? recalibrate_cpu_khz+0x10/0x10
-[  284.528094]  ? blk_add_trace_bio_frontmerge+0x20/0x20
-[  284.528107]  generic_make_request_checks+0x1471/0x1cc0
-[  284.528143]  ? blk_update_request+0x1610/0x1610
-[  284.528172]  ? iomap_readpages_actor+0x4f3/0x900
-[  284.528208]  generic_make_request+0x8e/0xa40
-[  284.528255]  ? direct_make_request+0x2b0/0x2b0
-[  284.528260]  ? iomap_readpage_actor+0xd40/0xd40
-[  284.528267]  ? iomap_readpages+0x20b/0x950
-[  284.528277]  ? bad_range+0x237/0x410
-[  284.528288]  ? trace_event_raw_event_iomap_apply+0x430/0x430
-[  284.528329]  ? submit_bio+0xcb/0x440
-[  284.528338]  submit_bio+0xcb/0x440
-[  284.528358]  ? generic_make_request+0xa40/0xa40
-[  284.528387]  ? rcu_read_lock_bh_held+0x100/0x100
-[  284.528412]  ? iomap_readpage_actor+0xd40/0xd40
-[  284.528422]  iomap_readpages+0x22f/0x950
-[  284.528442]  ? iomap_writepage+0xa0/0xa0
-[  284.528505]  read_pages+0xf8/0x600
-[  284.528535]  ? __alloc_pages_nodemask+0x80d/0xa20
-[  284.528554]  ? read_cache_pages+0x6d0/0x6d0
-[  284.528560]  ? __alloc_pages_slowpath+0x2a10/0x2a10
-[  284.528621]  __do_page_cache_readahead+0x311/0x3c0
-[  284.528663]  ? read_pages+0x600/0x600
-[  284.528712]  ondemand_readahead+0x443/0xc00
-[  284.528717]  ? page_cache_sync_readahead+0x18a/0x3f0
-[  284.528757]  generic_file_buffered_read+0xd65/0x1ee0
-[  284.528850]  ? read_cache_page_gfp+0xa0/0xa0
-[  284.529003]  ? xfs_ilock+0x17d/0x590 [xfs]
-[  284.529009]  ? get_lock_stats+0x18/0x120
-[  284.529018]  ? put_lock_stats.isra.19+0xb/0xa0
-[  284.529045]  ? lock_contended+0xa70/0xa70
-[  284.529069]  ? __down_read_trylock+0x53/0x80
-[  284.529222]  ? xfs_file_buffered_aio_read+0x146/0x4f0 [xfs]
-[  284.529381]  xfs_file_buffered_aio_read+0x151/0x4f0 [xfs]
-[  284.529534]  xfs_file_read_iter+0x2bf/0x740 [xfs]
-[  284.529545]  ? rt_mutex_slowlock_locked+0x262/0x790
-[  284.529572]  new_sync_read+0x39c/0x560
-[  284.529582]  ? mark_held_locks+0xb7/0x120
-[  284.529594]  ? do_iter_readv_writev+0x6e0/0x6e0
-[  284.529660]  ? fsnotify_first_mark+0x150/0x150
-[  284.529717]  vfs_read+0x147/0x350
-[  284.529745]  ksys_read+0xb8/0x170
-[  284.529759]  ? kernel_write+0x130/0x130
-[  284.529809]  do_syscall_64+0x13c/0x670
-[  284.529830]  entry_SYSCALL_64_after_hwframe+0x6a/0xdf
+Hard question without any good answer. You can rotate preferred timezone
+which should spread the suffering.
 
-Thanks,
-Ming
+>  - Schedule.  Friday's probably a bad day to have it, as it ends up
+>    being Saturday for some people.  It can move around the week too.
+>    Also, probably wise to not have it over Christmas as most developers
+>    have that period as family time.
 
+Yes, Friday tends to be not great. I think mid week should work better
+as the overalap 
+
+>  - Topics.  I'm sure there's no shortage of things to discuss!  I'm
+>    happy to organise meetings for people even on topics I have no direct
+>    interest in.
+
+Thanks for organizing this. I am pretty sure poeple will land on topics
+either in the call or over email.
+
+> And most urgently, when should we have the GUP meeting? On the call,
+> I suggested Friday the 8th of January, but I'm happy to set something
+> up for next week if we'd like to talk more urgently.
+
+I am unlikely to be able to join before the end of year so if you ask
+me.
+
+Thanks again and fingers crossed we can actually have a face to face
+meeting sometimes during next year.
+-- 
+Michal Hocko
+SUSE Labs
