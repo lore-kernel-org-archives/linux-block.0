@@ -2,182 +2,123 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C602C2BB48
-	for <linux-block@archiver.kernel.org>; Tue, 15 Dec 2020 06:05:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B9BBC4361B
+	for <linux-block@archiver.kernel.org>; Tue, 15 Dec 2020 06:53:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 42B60207A0
-	for <linux-block@archiver.kernel.org>; Tue, 15 Dec 2020 06:05:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 75A1222285
+	for <linux-block@archiver.kernel.org>; Tue, 15 Dec 2020 06:53:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725854AbgLOGFH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Dec 2020 01:05:07 -0500
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:56472 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726235AbgLOGFH (ORCPT
+        id S1726580AbgLOGwt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Dec 2020 01:52:49 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:53402 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726537AbgLOGwl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Dec 2020 01:05:07 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1608012307; x=1639548307;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=PPDiSY5mJQRDmFoGvUppmX0kTxns+mXyQ/4JveVI9hc=;
-  b=aBOrbAiq4o59gwNwF85zF07X/7bpELZ7hiJl72V6PgdGbCdWu7H8gWD7
-   qrlG7z1FIj2v4UAex2tSCVdgt7LAzxE9tFvqsrejRNlM8+7VKblYI202W
-   X4Beof7nc5pivRTvax4c9JwRSr/1URT208OiHcSEnOeBrEf/0CzmCEUQV
-   9NYPg9Av2CZpQeN/ZGuqgR8cAKr6CC/KGZEsixgj13tz19oL4Yp47nx5s
-   JqZt3H2FY/lCK0jn9KyjVYG8DZ8ZWMyfMHX4p5A4XD3AZ5do9sbXMziuK
-   rJkmf8ER2NBiIM+VXw3BQ3qktnAUiH2VroWStAK2zm/S9v5g2KAhbleJp
-   A==;
-IronPort-SDR: rlAKkcxywMvgl0NqTFFi7ZQu/K/SD7scigacfqxPrwhMbBW1nePhNzfgOP97Rb7EjVidMbA7eX
- HYhZ2KmWy6T6UGNqgsZpxAfFMFbE8tdSZ3OQeAWLz5OSW/cbSbzWECwgqqBkUHwOrtkXD0EFcP
- Er0VId5ZEA3PKSB59g60f9t2HGW9Un7WLYV/HfV4jrdKP9SoafjMEzT3rlUP74iREmdtlcuZ8C
- PyxYGykM8b0FWD+Hau8OxQyqqO4qr+LcH8NK8vczP+BwBvPErpIIQhm3awwTXQ3h2b3HK1hfg8
- aVY=
-X-IronPort-AV: E=Sophos;i="5.78,420,1599494400"; 
-   d="scan'208";a="265354160"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 15 Dec 2020 14:04:02 +0800
-IronPort-SDR: C4h2nAMyfewVKQ/CIhe+MRsUj+ypfO9dKnvDISMs0GmKLOPkNmOmRbBq56R+UB6hFFkCRTCoci
- A3wwdmp2qin8pVbU1Ysqyb5BA5s+8nHXo8c9R1RX0QAbWh0sCflziYVg3lTL46e14Bx83FTFpt
- 7tv5FRMcWZCsWXpSV6Ima56yvGgKJ1ryp7nlDzgIULfst9eTI0STWOIsZFkN7X0oNfYo0wSDfl
- JoymQm69ZUV9OiWIy0MV9UpKvmsJ3V08YZXaEtnAZoUI6eeAgTIDsSufhneLAcMSwXqVqVK3c8
- qU3ccpZ496c9JrtoBFP7iqR0
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Dec 2020 21:47:44 -0800
-IronPort-SDR: 0c8iRz3GQa4vDOc4N59zYYpKgspvZNwyXG4IMFQcaWcm8DPFzJz1SVYOekcQYbcLUzUCWl9aXW
- +9LW4IDEJ5LIUlV0U9JXSBa84iTK1YcVKkycDyoRhVrpiJ4/vm+4VquezoSrd1JxHNHEqy0Dpg
- nmGvzE6MEGFvo+DEMsesuVVDB6yb51Asto6v8upPNELiOxce+iVDwEEq09Y2JEB78ulL7RMN7G
- dSRM19/SkqVygfy1nsUEvqOKxA/aaTh8+CvblqSjnxFqzo16CU9mxai6D8iKppbGjQe66+siWs
- 7qk=
-WDCIronportException: Internal
-Received: from vm.labspan.wdc.com (HELO vm.sc.wdc.com) ([10.6.137.102])
-  by uls-op-cesaip02.wdc.com with ESMTP; 14 Dec 2020 22:04:02 -0800
-From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-To:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Cc:     sagi@grimberg.me, hch@lst.de, damien.lemoal@wdc.com,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [PATCH V7 5/6] nvmet: add bio get helper for different backends
-Date:   Mon, 14 Dec 2020 22:03:04 -0800
-Message-Id: <20201215060305.28141-6-chaitanya.kulkarni@wdc.com>
-X-Mailer: git-send-email 2.22.1
-In-Reply-To: <20201215060305.28141-1-chaitanya.kulkarni@wdc.com>
-References: <20201215060305.28141-1-chaitanya.kulkarni@wdc.com>
+        Tue, 15 Dec 2020 01:52:41 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0BF6is6M148114;
+        Tue, 15 Dec 2020 06:51:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2020-01-29;
+ bh=hWNv+8anIIHJLipXorRUdbi/P7w01QGEiTaQOHF82Ao=;
+ b=Y2r4yTbFIa+AB/85r4gwMctBmSkhL+nhCv+hzacMi32tDWsfpGG7sdADNUKwHfF2J/Zx
+ N+Wac28vf3iQDVNfaTcm4cp9kNIWcyuKF9z71Q3MbFc0/WeHqC4jjrSw2b1QQ20R4Ozu
+ iL9vday0zAf2n7dmlu664svMuR2+fMJhycXqFlOY023ZN6ZmNWiW/euPUF0cOptJ0haP
+ q92v3Lglj7rvgCLoJ+hQd930XLaboJtXD0fC+5DwYoK4Zr3Z72MWoq8tenFwkzov3znK
+ 9gT8mSeDpW0hQSTUBw83FIwLZ5EFuG+N+DvJW5QW0BOpKdUfGGjCqECmJGeif9csSDVZ rg== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by userp2130.oracle.com with ESMTP id 35cn9r8xk9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Tue, 15 Dec 2020 06:51:31 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0BF6e6Iq070502;
+        Tue, 15 Dec 2020 06:51:31 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by userp3030.oracle.com with ESMTP id 35d7svqjj4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 15 Dec 2020 06:51:30 +0000
+Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0BF6pROv024807;
+        Tue, 15 Dec 2020 06:51:28 GMT
+Received: from [192.168.1.10] (/180.164.31.21)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 14 Dec 2020 22:51:27 -0800
+Subject: Re: [PATCH 0/3] block: blk_interposer - Block Layer Interposer
+To:     Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Sergei Shtepa <sergei.shtepa@veeam.com>, hch@lst.de
+Cc:     "johannes.thumshirn@wdc.com" <johannes.thumshirn@wdc.com>,
+        "koct9i@gmail.com" <koct9i@gmail.com>,
+        "ming.lei@redhat.com" <ming.lei@redhat.com>,
+        "josef@toxicpanda.com" <josef@toxicpanda.com>,
+        "steve@sk2.org" <steve@sk2.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Pavel Tide <Pavel.TIde@veeam.com>, dm-devel@redhat.com
+References: <1607518911-30692-1-git-send-email-sergei.shtepa@veeam.com>
+ <20201209135148.GA32720@redhat.com> <20201210145814.GA31521@veeam.com>
+ <20201210163222.GB10239@redhat.com> <20201211163049.GC16168@redhat.com>
+ <1ee7652e-b77f-6fa4-634c-ff6639037321@kernel.dk>
+ <208edf35-ecdc-2d73-4c48-0424943a78c0@suse.de>
+From:   Bob Liu <bob.liu@oracle.com>
+Message-ID: <cdc3c792-17ac-de61-12ae-74691769fc3c@oracle.com>
+Date:   Tue, 15 Dec 2020 14:51:18 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <208edf35-ecdc-2d73-4c48-0424943a78c0@suse.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9835 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 bulkscore=0
+ mlxlogscore=999 spamscore=0 mlxscore=0 suspectscore=0 malwarescore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2012150045
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9835 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxlogscore=999
+ impostorscore=0 lowpriorityscore=0 clxscore=1011 spamscore=0
+ malwarescore=0 priorityscore=1501 phishscore=0 mlxscore=0 bulkscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2012150045
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-With the addition of the zns backend now we have three different
-backends with inline bio optimization. That leads to having
-duplicate code in for allocating or initializing the bio in all
-three backends: generic bdev, passsthru, and generic zns.
+Hi Folks,
 
-Add a helper function to reduce the duplicate code such that helper
-function accepts the bi_end_io callback which gets initialize for the
-non-inline bio_alloc() case. This is due to the special case needed for
-the passthru backend non-inline bio allocation bio_alloc() where we set
-the bio->bi_end_io = bio_put, having this parameter avoids the extra
-branch in the passthru fast path. For rest of the backends, we set the
-same bi_end_io callback for inline and non-inline cases, that is for
-generic bdev we set to nvmet_bio_done() and for generic zns we set to
-NULL.                            
+On 12/12/20 12:56 AM, Hannes Reinecke wrote:
+> On 12/11/20 5:33 PM, Jens Axboe wrote:
+>> On 12/11/20 9:30 AM, Mike Snitzer wrote:
+>>> While I still think there needs to be a proper _upstream_ consumer of
+>>> blk_interposer as a condition of it going in.. I'll let others make the
+>>> call.
+>>
+>> That's an unequivocal rule.
+>>
+>>> As such, I'll defer to Jens, Christoph and others on whether your
+>>> minimalist blk_interposer hook is acceptable in the near-term.
+>>
+>> I don't think so, we don't do short term bandaids just to plan on
+>> ripping that out when the real functionality is there. IMHO, the dm
+>> approach is the way to go - it provides exactly the functionality that
+>> is needed in an appropriate way, instead of hacking some "interposer"
+>> into the core block layer.
+>>
+> Which is my plan, too.
+> 
+> I'll be working with the Veeam folks to present a joint patchset (including the DM bits) for the next round.
+> 
 
-Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
----
- drivers/nvme/target/io-cmd-bdev.c |  7 +------
- drivers/nvme/target/nvmet.h       | 16 ++++++++++++++++
- drivers/nvme/target/passthru.c    |  8 +-------
- drivers/nvme/target/zns.c         |  8 +-------
- 4 files changed, 19 insertions(+), 20 deletions(-)
+Besides the dm approach, do you think Veeam's original requirement is a good
+use case of "block/bpf: add eBPF based block layer IO filtering"?
+https://lwn.net/ml/bpf/20200812163305.545447-1-leah.rumancik@gmail.com/
 
-diff --git a/drivers/nvme/target/io-cmd-bdev.c b/drivers/nvme/target/io-cmd-bdev.c
-index 6178ef643962..72746e29cb0d 100644
---- a/drivers/nvme/target/io-cmd-bdev.c
-+++ b/drivers/nvme/target/io-cmd-bdev.c
-@@ -266,12 +266,7 @@ static void nvmet_bdev_execute_rw(struct nvmet_req *req)
- 
- 	sector = nvmet_lba_to_sect(req->ns, req->cmd->rw.slba);
- 
--	if (req->transfer_len <= NVMET_MAX_INLINE_DATA_LEN) {
--		bio = &req->b.inline_bio;
--		bio_init(bio, req->inline_bvec, ARRAY_SIZE(req->inline_bvec));
--	} else {
--		bio = bio_alloc(GFP_KERNEL, min(sg_cnt, BIO_MAX_PAGES));
--	}
-+	bio = nvmet_req_bio_get(req, NULL);
- 	bio_set_dev(bio, req->ns->bdev);
- 	bio->bi_iter.bi_sector = sector;
- 	bio->bi_private = req;
-diff --git a/drivers/nvme/target/nvmet.h b/drivers/nvme/target/nvmet.h
-index 7361665585a2..3fc84f79cce1 100644
---- a/drivers/nvme/target/nvmet.h
-+++ b/drivers/nvme/target/nvmet.h
-@@ -652,4 +652,20 @@ nvmet_bdev_execute_zone_append(struct nvmet_req *req)
- }
- #endif /* CONFIG_BLK_DEV_ZONED */
- 
-+static inline struct bio *nvmet_req_bio_get(struct nvmet_req *req,
-+					    bio_end_io_t *bi_end_io)
-+{
-+	struct bio *bio;
-+
-+	if (req->transfer_len <= NVMET_MAX_INLINE_DATA_LEN) {
-+		bio = &req->b.inline_bio;
-+		bio_init(bio, req->inline_bvec, ARRAY_SIZE(req->inline_bvec));
-+		return bio;
-+	}
-+
-+	bio = bio_alloc(GFP_KERNEL, req->sg_cnt);
-+	bio->bi_end_io = bi_end_io;
-+	return bio;
-+}
-+
- #endif /* _NVMET_H */
-diff --git a/drivers/nvme/target/passthru.c b/drivers/nvme/target/passthru.c
-index b9776fc8f08f..54f765b566ee 100644
---- a/drivers/nvme/target/passthru.c
-+++ b/drivers/nvme/target/passthru.c
-@@ -194,13 +194,7 @@ static int nvmet_passthru_map_sg(struct nvmet_req *req, struct request *rq)
- 	if (req->sg_cnt > BIO_MAX_PAGES)
- 		return -EINVAL;
- 
--	if (req->transfer_len <= NVMET_MAX_INLINE_DATA_LEN) {
--		bio = &req->p.inline_bio;
--		bio_init(bio, req->inline_bvec, ARRAY_SIZE(req->inline_bvec));
--	} else {
--		bio = bio_alloc(GFP_KERNEL, min(req->sg_cnt, BIO_MAX_PAGES));
--		bio->bi_end_io = bio_put;
--	}
-+	bio = nvmet_req_bio_get(req, bio_put);
- 	bio->bi_opf = req_op(rq);
- 
- 	for_each_sg(req->sg, sg, req->sg_cnt, i) {
-diff --git a/drivers/nvme/target/zns.c b/drivers/nvme/target/zns.c
-index 3981baa647b2..8bafab98d076 100644
---- a/drivers/nvme/target/zns.c
-+++ b/drivers/nvme/target/zns.c
-@@ -296,13 +296,7 @@ void nvmet_bdev_execute_zone_append(struct nvmet_req *req)
- 		return;
- 	}
- 
--	if (req->transfer_len <= NVMET_MAX_INLINE_DATA_LEN) {
--		bio = &req->b.inline_bio;
--		bio_init(bio, req->inline_bvec, ARRAY_SIZE(req->inline_bvec));
--	} else {
--		bio = bio_alloc(GFP_KERNEL, req->sg_cnt);
--	}
--
-+	bio = nvmet_req_bio_get(req, NULL);
- 	bio_set_dev(bio, req->ns->bdev);
- 	bio->bi_iter.bi_sector = sect;
- 	bio->bi_opf = REQ_OP_ZONE_APPEND | REQ_SYNC | REQ_IDLE;
--- 
-2.22.1
-
+Thanks,
+Bob
