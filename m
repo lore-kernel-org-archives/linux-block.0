@@ -2,212 +2,135 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MIME_QP_LONG_LINE,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78B69C2BBCA
-	for <linux-block@archiver.kernel.org>; Wed, 16 Dec 2020 07:02:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8B71C2BBCA
+	for <linux-block@archiver.kernel.org>; Wed, 16 Dec 2020 08:01:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3FE9B23382
-	for <linux-block@archiver.kernel.org>; Wed, 16 Dec 2020 07:02:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6395C2335A
+	for <linux-block@archiver.kernel.org>; Wed, 16 Dec 2020 08:01:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725917AbgLPHCs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Dec 2020 02:02:48 -0500
-Received: from mx2.suse.de ([195.135.220.15]:36890 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725914AbgLPHCs (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Dec 2020 02:02:48 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1608102121; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=QoiSX8Hvxn2fqq9nVOof5al//6vCWiVhYQsloyKMYqs=;
-        b=V7RGybcqbrSuNn8RDRU4KdMeHTf8rCq9V4f0ei6fcelVjbMzqDSPQI0pA50/UWOoXrx9jp
-        Dj659JTp/MJB+CDr4pUHRQuU1IhYcc/ezbkf7aQjnBjueFWtuu9sv98Her4boxx4uukNu4
-        A/Sut2UcOy18cDJ3Ov9eS8Y0Hi4YgmY=
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 63288AD2B;
-        Wed, 16 Dec 2020 07:02:01 +0000 (UTC)
-Subject: Re: [PATCH 058/141] xen-blkfront: Fix fall-through warnings for Clang
-To:     "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-References: <cover.1605896059.git.gustavoars@kernel.org>
- <33057688012c34dd60315ad765ff63f070e98c0c.1605896059.git.gustavoars@kernel.org>
-From:   =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
-Message-ID: <41ed666b-739e-80c2-5714-c488b17c8500@suse.com>
-Date:   Wed, 16 Dec 2020 08:02:00 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.0
-MIME-Version: 1.0
-In-Reply-To: <33057688012c34dd60315ad765ff63f070e98c0c.1605896059.git.gustavoars@kernel.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="gvEDSSw8t26PSNBbUdz9PTbLgUC3pfy9W"
+        id S1725845AbgLPIBs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Dec 2020 03:01:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36790 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725766AbgLPIBs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 16 Dec 2020 03:01:48 -0500
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36483C0613D6
+        for <linux-block@vger.kernel.org>; Wed, 16 Dec 2020 00:01:08 -0800 (PST)
+Received: by mail-ed1-x52a.google.com with SMTP id cm17so23833868edb.4
+        for <linux-block@vger.kernel.org>; Wed, 16 Dec 2020 00:01:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=javigon-com.20150623.gappssmtp.com; s=20150623;
+        h=content-transfer-encoding:from:mime-version:subject:date:message-id
+         :references:cc:in-reply-to:to;
+        bh=TK2+rxKYqb9+AHBAgonGhFMhZ04YHGd5Yl1GOTZdM9o=;
+        b=SYUUMPDPsVX0FpTrNk7+IQ5D0elUv6IeupWe1gij/Ndb8c/V9x/Kk1a/hMZ3DSrcya
+         rTLueIbag23jVSh6DuCDci91vvwkbeVtdkzdyLBjX03sxAZSTUx326bT80TKiskoxwFf
+         /nV2JVGwnoB0AMSw/wWg9+AdkZB2VummL91t4yvsfV57cAN7QnyG3hlfCGO0DAs6tKVr
+         P2y/GLzf0n7xN3sNeLXhcm3tGn/VmVH0lwEZaP4FiDoUURwVOMaYSWBjCnX2fo2lK9PP
+         fYk5wZx7a0lgwK7ek+FVbApRO8viQvM8ygAcl7QwDISMingTpiWejO3g9nEv3szuomgl
+         dIHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:content-transfer-encoding:from:mime-version
+         :subject:date:message-id:references:cc:in-reply-to:to;
+        bh=TK2+rxKYqb9+AHBAgonGhFMhZ04YHGd5Yl1GOTZdM9o=;
+        b=iQwtx19xqVNmffk9tluYrQNWUctocmJrcZCINC6YSVet1aaX5iF3aZWcwTlm/bmVdz
+         Qvpc4YKggYb1rqRcbbyoLcl6ucPxkRvC5Yub8H3h+Al6bhRmqyB2QIOYLuOODkAWGSHs
+         T7DKb+5DzFAru6aUrGoQO77gBtaQ2j0Mq8dm7r+8qSnwJpiXyKN6JIpPExQ51+ko5Icf
+         q8i885MXUONq7cEZ0ORy9W4Q4y0rQ3kkKBkkr6vTV9w2DJLUNx4SR1AzP4/leGMmn8iC
+         dfeyqM0aAUcK55C3TvZ2VCgcD8l1Ait2fHMNgilHXGonfJ5ebVMR8eSL5DPF96+TE2WI
+         cndQ==
+X-Gm-Message-State: AOAM533lA7FOAT0e7/3c7lNb+dPjVK2mhYWktBhQj9OH+RPy/Psqb3kQ
+        GrrKa9H573mmIXeLvshVKIHaDA==
+X-Google-Smtp-Source: ABdhPJxH6A/gyCc15lrO0/OaDJzFkcSc/9sFJ1LDfOKXOwmTW6gxp6PK/MEYoX3U6VXHzJvCAUzF7Q==
+X-Received: by 2002:aa7:d2c9:: with SMTP id k9mr5614173edr.74.1608105666959;
+        Wed, 16 Dec 2020 00:01:06 -0800 (PST)
+Received: from [192.168.10.21] (5.186.124.214.cgn.fibianet.dk. [5.186.124.214])
+        by smtp.gmail.com with ESMTPSA id mb22sm801178ejb.35.2020.12.16.00.01.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 16 Dec 2020 00:01:06 -0800 (PST)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+From:   =?utf-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
+Mime-Version: 1.0 (1.0)
+Subject: Re: [PATCH V3] nvme: enable char device per namespace
+Date:   Wed, 16 Dec 2020 09:01:05 +0100
+Message-Id: <84685B9E-B4CB-4F30-AB58-DB88F117889D@javigon.com>
+References: <20201215221254.GA3915989@dhcp-10-100-145-180.wdc.com>
+Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        hch@lst.de, sagi@grimberg.me, minwoo.im.dev@gmail.com,
+        =?utf-8?Q?Javier_Gonz=C3=A1lez?= <javier.gonz@samsung.com>
+In-Reply-To: <20201215221254.GA3915989@dhcp-10-100-145-180.wdc.com>
+To:     Keith Busch <kbusch@kernel.org>
+X-Mailer: iPhone Mail (18B92)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---gvEDSSw8t26PSNBbUdz9PTbLgUC3pfy9W
-Content-Type: multipart/mixed; boundary="acehXDoNClKCL8Daxb7vBCy06W0iwoyi8";
- protected-headers="v1"
-From: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
-To: "Gustavo A. R. Silva" <gustavoars@kernel.org>,
- Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
- =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
- Boris Ostrovsky <boris.ostrovsky@oracle.com>,
- Stefano Stabellini <sstabellini@kernel.org>, Jens Axboe <axboe@kernel.dk>
-Cc: xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-Message-ID: <41ed666b-739e-80c2-5714-c488b17c8500@suse.com>
-Subject: Re: [PATCH 058/141] xen-blkfront: Fix fall-through warnings for Clang
-References: <cover.1605896059.git.gustavoars@kernel.org>
- <33057688012c34dd60315ad765ff63f070e98c0c.1605896059.git.gustavoars@kernel.org>
-In-Reply-To: <33057688012c34dd60315ad765ff63f070e98c0c.1605896059.git.gustavoars@kernel.org>
 
---acehXDoNClKCL8Daxb7vBCy06W0iwoyi8
-Content-Type: multipart/mixed;
- boundary="------------AC7D4EB44FC6ED9CCA3EFC5F"
-Content-Language: en-US
-
-This is a multi-part message in MIME format.
---------------AC7D4EB44FC6ED9CCA3EFC5F
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-
-On 20.11.20 19:32, Gustavo A. R. Silva wrote:
-> In preparation to enable -Wimplicit-fallthrough for Clang, fix a warnin=
-g
-> by explicitly adding a break statement instead of letting the code fall=
-
-> through to the next case.
+> On 15 Dec 2020, at 23.12, Keith Busch <kbusch@kernel.org> wrote:
 >=20
-> Link: https://github.com/KSPP/linux/issues/115
-> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+> =EF=BB=BFOn Tue, Dec 15, 2020 at 08:55:57PM +0100, javier@javigon.com wrot=
+e:
+>> From: Javier Gonz=C3=A1lez <javier.gonz@samsung.com>
+>>=20
+>> Create a char device per NVMe namespace. This char device is always
+>> initialized, independently of whether the features implemented by the
+>> device are supported by the kernel. User-space can therefore always
+>> issue IOCTLs to the NVMe driver using the char device.
+>>=20
+>> The char device is presented as /dev/generic-nvmeXcYnZ. This naming
+>> scheme follows the convention of the hidden device (nvmeXcYnZ). Support
+>> for multipath will follow.
+>>=20
+>> Christoph, Keith: Is this going in the right direction?
+>=20
+> I think this is looking okay, though I'm getting some weird errors and
+> warnings during boot. The first one looks like the following (I will
+> look into it too, but I wanted to get a reply out sooner).
+>=20
+> [    4.734143] sysfs: cannot create duplicate filename '/dev/char/242:1'
+> [    4.736359] CPU: 4 PID: 7 Comm: kworker/u16:0 Not tainted 5.10.0+ #172
+> [    4.740836] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS=
+ rel-1.14.0-0-g155821a1990b-prebuilt.qemu.org 04/01/2014
+> [    4.744228] Workqueue: nvme-wq nvme_scan_work [nvme_core]
+> [    4.745558] Call Trace:
+> [    4.746122]  dump_stack+0x6d/0x88
+> [    4.746834]  sysfs_warn_dup.cold+0x17/0x24
+> [    4.747656]  sysfs_do_create_link_sd.isra.0+0xb0/0xc0
+> [    4.747659]  device_add+0x604/0x7b0
+> [    4.749298]  cdev_device_add+0x46/0x70
+> [    4.753241]  ? cdev_init+0x51/0x60
+> [    4.753246]  nvme_alloc_ns+0x670/0x8a0 [nvme_core]
+> [    4.753249]  ? _cond_resched+0x15/0x30
+> [    4.753253]  nvme_validate_or_alloc_ns+0x99/0x190 [nvme_core]
+> [    4.753258]  nvme_scan_work+0x152/0x290 [nvme_core]
+> [    4.753261]  process_one_work+0x1ac/0x330
+> [    4.753262]  worker_thread+0x50/0x3a0
+> [    4.753264]  ? process_one_work+0x330/0x330
+> [    4.753265]  kthread+0xfb/0x130
+> [    4.753266]  ? kthread_park+0x90/0x90
+> [    4.753269]  ret_from_fork+0x1f/0x30
+> [    4.753272] CPU: 5 PID: 88 Comm: kworker/u16:1 Not tainted 5.10.0+ #172=
 
-Applied to: xen/tip.git for-linus-5.11
 
+Mmm. I=E2=80=99ll look into it. I don=E2=80=99t see this in the config I=E2=80=
+=99m using.=20
 
-Juergen
+>=20
+>> Keith: Regarding nvme-cli support, what do you think about reporting the
+>> char device as existing block devices? If this is OK with you, I will
+>> submit patches for the filters.
+>=20
+> I'm not sure I understand what you mean about reporting these as
+> "existing block devices". Are you talking about what's shown in the
+> 'nvme list' output?
 
---------------AC7D4EB44FC6ED9CCA3EFC5F
-Content-Type: application/pgp-keys;
- name="OpenPGP_0xB0DE9DD628BF132F.asc"
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: attachment;
- filename="OpenPGP_0xB0DE9DD628BF132F.asc"
-
------BEGIN PGP PUBLIC KEY BLOCK-----
-
-xsBNBFOMcBYBCACgGjqjoGvbEouQZw/ToiBg9W98AlM2QHV+iNHsEs7kxWhKMjrioyspZKOBy=
-cWx
-w3ie3j9uvg9EOB3aN4xiTv4qbnGiTr3oJhkB1gsb6ToJQZ8uxGq2kaV2KL9650I1SJvedYm8O=
-f8Z
-d621lSmoKOwlNClALZNew72NjJLEzTalU1OdT7/i1TXkH09XSSI8mEQ/ouNcMvIJNwQpd369y=
-9bf
-IhWUiVXEK7MlRgUG6MvIj6Y3Am/BBLUVbDa4+gmzDC9ezlZkTZG2t14zWPvxXP3FAp2pkW0xq=
-G7/
-377qptDmrk42GlSKN4z76ELnLxussxc7I2hx18NUcbP8+uty4bMxABEBAAHNHEp1ZXJnZW4gR=
-3Jv
-c3MgPGpnQHBmdXBmLm5ldD7CwHkEEwECACMFAlOMcBYCGwMHCwkIBwMCAQYVCAIJCgsEFgIDA=
-QIe
-AQIXgAAKCRCw3p3WKL8TL0KdB/93FcIZ3GCNwFU0u3EjNbNjmXBKDY4FUGNQH2lvWAUy+dnyT=
-hpw
-dtF/jQ6j9RwE8VP0+NXcYpGJDWlNb9/JmYqLiX2Q3TyevpB0CA3dbBQp0OW0fgCetToGIQrg0=
-MbD
-1C/sEOv8Mr4NAfbauXjZlvTj30H2jO0u+6WGM6nHwbh2l5O8ZiHkH32iaSTfN7Eu5RnNVUJbv=
-oPH
-Z8SlM4KWm8rG+lIkGurqqu5gu8q8ZMKdsdGC4bBxdQKDKHEFExLJK/nRPFmAuGlId1E3fe10v=
-5QL
-+qHI3EIPtyfE7i9Hz6rVwi7lWKgh7pe0ZvatAudZ+JNIlBKptb64FaiIOAWDCx1SzR9KdWVyZ=
-2Vu
-IEdyb3NzIDxqZ3Jvc3NAc3VzZS5jb20+wsB5BBMBAgAjBQJTjHCvAhsDBwsJCAcDAgEGFQgCC=
-QoL
-BBYCAwECHgECF4AACgkQsN6d1ii/Ey/HmQf/RtI7kv5A2PS4RF7HoZhPVPogNVbC4YA6lW7Dr=
-Wf0
-teC0RR3MzXfy6pJ+7KLgkqMlrAbN/8Dvjoz78X+5vhH/rDLa9BuZQlhFmvcGtCF8eR0T1v0nC=
-/nu
-AFVGy+67q2DH8As3KPu0344TBDpAvr2uYM4tSqxK4DURx5INz4ZZ0WNFHcqsfvlGJALDeE0Lh=
-ITT
-d9jLzdDad1pQSToCnLl6SBJZjDOX9QQcyUigZFtCXFst4dlsvddrxyqT1f17+2cFSdu7+ynLm=
-XBK
-7abQ3rwJY8SbRO2iRulogc5vr/RLMMlscDAiDkaFQWLoqHHOdfO9rURssHNN8WkMnQfvUewRz=
-80h
-SnVlcmdlbiBHcm9zcyA8amdyb3NzQG5vdmVsbC5jb20+wsB5BBMBAgAjBQJTjHDXAhsDBwsJC=
-AcD
-AgEGFQgCCQoLBBYCAwECHgECF4AACgkQsN6d1ii/Ey8PUQf/ehmgCI9jB9hlgexLvgOtf7PJn=
-FOX
-gMLdBQgBlVPO3/D9R8LtF9DBAFPNhlrsfIG/SqICoRCqUcJ96Pn3P7UUinFG/I0ECGF4EvTE1=
-jnD
-kfJZr6jrbjgyoZHiw/4BNwSTL9rWASyLgqlA8u1mf+c2yUwcGhgkRAd1gOwungxcwzwqgljf0=
-N51
-N5JfVRHRtyfwq/ge+YEkDGcTU6Y0sPOuj4Dyfm8fJzdfHNQsWq3PnczLVELStJNdapwPOoE+l=
-otu
-fe3AM2vAEYJ9rTz3Cki4JFUsgLkHFqGZarrPGi1eyQcXeluldO3m91NK/1xMI3/+8jbO0tsn1=
-tqS
-EUGIJi7ox80eSnVlcmdlbiBHcm9zcyA8amdyb3NzQHN1c2UuZGU+wsB5BBMBAgAjBQJTjHDrA=
-hsD
-BwsJCAcDAgEGFQgCCQoLBBYCAwECHgECF4AACgkQsN6d1ii/Ey+LhQf9GL45eU5vOowA2u5N3=
-g3O
-ZUEBmDHVVbqMtzwlmNC4k9Kx39r5s2vcFl4tXqW7g9/ViXYuiDXb0RfUpZiIUW89siKrkzmQ5=
-dM7
-wRqzgJpJwK8Bn2MIxAKArekWpiCKvBOB/Cc+3EXE78XdlxLyOi/NrmSGRIov0karw2RzMNOu5=
-D+j
-LRZQd1Sv27AR+IP3I8U4aqnhLpwhK7MEy9oCILlgZ1QZe49kpcumcZKORmzBTNh30FVKK1Evm=
-V2x
-AKDoaEOgQB4iFQLhJCdP1I5aSgM5IVFdn7v5YgEYuJYx37IoN1EblHI//x/e2AaIHpzK5h88N=
-Eaw
-QsaNRpNSrcfbFmAg987ATQRTjHAWAQgAyzH6AOODMBjgfWE9VeCgsrwH3exNAU32gLq2xvjpW=
-nHI
-s98ndPUDpnoxWQugJ6MpMncr0xSwFmHEgnSEjK/PAjppgmyc57BwKII3sV4on+gDVFJR6Y8ZR=
-wgn
-BC5mVM6JjQ5xDk8WRXljExRfUX9pNhdE5eBOZJrDRoLUmmjDtKzWaDhIg/+1Hzz93X4fCQkNV=
-bVF
-LELU9bMaLPBG/x5q4iYZ2k2ex6d47YE1ZFdMm6YBYMOljGkZKwYde5ldM9mo45mmwe0icXKLk=
-pEd
-IXKTZeKDO+Hdv1aqFuAcccTg9RXDQjmwhC3yEmrmcfl0+rPghO0Iv3OOImwTEe4co3c1mwARA=
-QAB
-wsBfBBgBAgAJBQJTjHAWAhsMAAoJELDendYovxMvQ/gH/1ha96vm4P/L+bQpJwrZ/dneZcmEw=
-Tbe
-8YFsw2V/Buv6Z4Mysln3nQK5ZadD534CF7TDVft7fC4tU4PONxF5D+/tvgkPfDAfF77zy2AH1=
-vJz
-Q1fOU8lYFpZXTXIHb+559UqvIB8AdgR3SAJGHHt4RKA0F7f5ipYBBrC6cyXJyyoprT10EMvU8=
-VGi
-wXvTyJz3fjoYsdFzpWPlJEBRMedCot60g5dmbdrZ5DWClAr0yau47zpWj3enf1tLWaqcsuylW=
-svi
-uGjKGw7KHQd3bxALOknAp4dN3QwBYCKuZ7AddY9yjynVaD5X7nF9nO5BjR/i1DG86lem3iBDX=
-zXs
-ZDn8R38=3D
-=3D2wuH
------END PGP PUBLIC KEY BLOCK-----
-
---------------AC7D4EB44FC6ED9CCA3EFC5F--
-
---acehXDoNClKCL8Daxb7vBCy06W0iwoyi8--
-
---gvEDSSw8t26PSNBbUdz9PTbLgUC3pfy9W
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature"
-
------BEGIN PGP SIGNATURE-----
-
-wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAl/ZsOgFAwAAAAAACgkQsN6d1ii/Ey+V
-Gwf7B5XLWILGCq3WNwhMi7WFHqun6smQ5tXZ/zhc3ROrAk8C8hvonGGkapDULRVea7cFex5OJeYD
-szTs2qp1NV2bACyDLl+/Z3TybRkQj8JSmehQHr3cOknMs2sBQL8aRLPNSGrYgmmyv7SKB8bJp4LG
-5A633sbbylbfBUhmPB13rncb4WI0suuGoCOHqcL+uCHLHDM/+hlbudM8cg34iMc+Sv668uXp4V1B
-L/KfVdUPT0Tp1ZY6KhXoWGCSM6PKz5dSbmGGlTzaG+tuegSgIRFTSrN4amrVU0mDqe74N5TIBh2B
-8+R4stIvl5eTFkZ91BZyivSkQMfRZyqND3aCGhd+FQ==
-=fQHh
------END PGP SIGNATURE-----
-
---gvEDSSw8t26PSNBbUdz9PTbLgUC3pfy9W--
+Exactly. Do we want the char device to be listed?=
