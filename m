@@ -7,40 +7,40 @@ X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3158C4361B
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D19EDC2BBCA
 	for <linux-block@archiver.kernel.org>; Wed, 16 Dec 2020 21:19:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8783723A61
+	by mail.kernel.org (Postfix) with ESMTP id A2E3823A63
 	for <linux-block@archiver.kernel.org>; Wed, 16 Dec 2020 21:19:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729117AbgLPVSv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1727658AbgLPVSv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Wed, 16 Dec 2020 16:18:51 -0500
-Received: from mail.kernel.org ([198.145.29.99]:58928 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:58936 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727658AbgLPVSu (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Dec 2020 16:18:50 -0500
-Subject: Re: [GIT PULL] Block changes for 5.10
+        id S1728566AbgLPVSv (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 16 Dec 2020 16:18:51 -0500
+Subject: Re: [GIT PULL] Block driver changes for 5.11
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1608153490;
-        bh=hXreBK6RachCheLveGz5Klz+3B9z0CzYcPZQQL+/XUo=;
+        bh=8vtBPh7VxNFbrDU//9/1PpH6GOLltlQWHcdt7iyYP08=;
         h=From:In-Reply-To:References:Date:To:Cc:From;
-        b=BM8lGj1eUKUJvl3Qz/6B/RKhuEN5S1OaxMdrvsIYZKzlEFEwnOz26O6EWvr81abDM
-         nb4VVwbBgZ/NCwvE1gSyMJOHwe/K91gq2zzqAbrF0xeoUnnIqQ4Ch4bg2PKIT9WFTf
-         AxrBVq4qWW/0JWOGPgeh1iLd1rhoBrG12KrSKTD+OzlbW5y5R7KMM9Eahb3gXtcMKt
-         4DBa5RIrlJj5pc316m6Xwa/KhN49Pr3fRN2An5eviBmz9kHl5ugKulMjnqNZWj9Kmy
-         +CVpl0QacONWIYb679DVDrg25kWA0KWxYpFgc+14Fi1EA39i+wnm8oqdxd2Z03YO4T
-         tsg7m+U6KLOBQ==
+        b=omIeMvmaEjo7MSMvXtBoZZq7A4WwnxSYm6jFfqkLm9kd6o7iMjQm4tDCM46Plj30g
+         LpjLG26Svpbf/keSw9XKJ2BKMjjaOndKG+fvjWlR/XrBfvk4kMJgMyocfEKCyKLSmn
+         jkMCMyM8qniICblfiOcXMjMYYPfoaCIbp09EIsqSKblGAT7Vg+HPzsBTNZS1I1Mand
+         ZcjsF2q4TzpZG2ROWmmz6gvfQ0BntsWLGdqY2/vG4Mu4kHjQY4B7FlYM5dsN3SLSrX
+         xHSRqroSmx57Iatf5wAlxtaixzvbELoDfOhVQ5p6TnhIajQeQRbU34IN4zzyqNxnby
+         LvPDUbdLrkOaA==
 From:   pr-tracker-bot@kernel.org
-In-Reply-To: <774c987e-0743-6a7b-cfa7-1c65c35931b3@kernel.dk>
-References: <774c987e-0743-6a7b-cfa7-1c65c35931b3@kernel.dk>
+In-Reply-To: <8238bb43-756b-e0dc-2484-7e1e21928c0c@kernel.dk>
+References: <8238bb43-756b-e0dc-2484-7e1e21928c0c@kernel.dk>
 X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <774c987e-0743-6a7b-cfa7-1c65c35931b3@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git tags/for-5.11/block-2020-12-14
-X-PR-Tracked-Commit-Id: fa94ba8a7b22890e6a17b39b9359e114fe18cd59
+X-PR-Tracked-Message-Id: <8238bb43-756b-e0dc-2484-7e1e21928c0c@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git tags/for-5.11/drivers-2020-12-14
+X-PR-Tracked-Commit-Id: aeb2b0b1a3da5791d3b216e71ec72db7570f3571
 X-PR-Merge-Tree: torvalds/linux.git
 X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: ac7ac4618cf25e0d5cd8eba83d5f600084b65b9a
-Message-Id: <160815349038.27795.4280091907319928338.pr-tracker-bot@kernel.org>
+X-PR-Merge-Commit-Id: 69f637c33560b02ae7313e0c142d847361cc723a
+Message-Id: <160815349067.27795.335880625354481718.pr-tracker-bot@kernel.org>
 Date:   Wed, 16 Dec 2020 21:18:10 +0000
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
@@ -49,12 +49,12 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Mon, 14 Dec 2020 08:06:21 -0700:
+The pull request you sent on Mon, 14 Dec 2020 08:30:44 -0700:
 
-> git://git.kernel.dk/linux-block.git tags/for-5.11/block-2020-12-14
+> git://git.kernel.dk/linux-block.git tags/for-5.11/drivers-2020-12-14
 
 has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/ac7ac4618cf25e0d5cd8eba83d5f600084b65b9a
+https://git.kernel.org/torvalds/c/69f637c33560b02ae7313e0c142d847361cc723a
 
 Thank you!
 
