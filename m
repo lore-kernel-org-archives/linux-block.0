@@ -2,119 +2,212 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C6DCC2BBCA
-	for <linux-block@archiver.kernel.org>; Wed, 16 Dec 2020 06:29:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78B69C2BBCA
+	for <linux-block@archiver.kernel.org>; Wed, 16 Dec 2020 07:02:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 002AB2335A
-	for <linux-block@archiver.kernel.org>; Wed, 16 Dec 2020 06:29:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3FE9B23382
+	for <linux-block@archiver.kernel.org>; Wed, 16 Dec 2020 07:02:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725905AbgLPG3O (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Dec 2020 01:29:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50720 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725812AbgLPG3O (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Dec 2020 01:29:14 -0500
-Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC1C2C0613D6
-        for <linux-block@vger.kernel.org>; Tue, 15 Dec 2020 22:28:33 -0800 (PST)
-Received: by mail-ej1-x636.google.com with SMTP id q22so13345245eja.2
-        for <linux-block@vger.kernel.org>; Tue, 15 Dec 2020 22:28:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=OUbQn9gI6Y9byE+OVB6xI/iZcBXpPFEFI+/OxjCYHSU=;
-        b=dCHyrJ9ldolqIV3vm3kKdZtj/L6zf+1aycMFo5vCfPgOrqAqvrXdvL2RDOsPm8qIcs
-         lpHgpSPNkXGCJ1iddrUjOOY8CMjtycqnFZkkyz6cUzCth37Obo/W8/pzEuFGz+thQAkb
-         BG2Ts112Z8PYQUIjjnrboZuu9bgrFp164h+pp+RHvAWh88rzdpQo+EbLeSQdVJChAOVA
-         N9lqvsvFpS0nE8UO25kBaauNDcZMgv9GvgBy54+nxdYvheMmqKQJ1ChEiu+WRP65mh9U
-         02iZQOjUI4w3jER2zBDGDteukb7IdriWYc4oI2Ut066hlALJ05hq5j1XG7Sv6viR2l/+
-         aHzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=OUbQn9gI6Y9byE+OVB6xI/iZcBXpPFEFI+/OxjCYHSU=;
-        b=KZzdMLZHUdPbanTz2YJDVzQxKNSdn4r24ZRbL488KzSVSdJluC1hjRfp3FUHVGAcTJ
-         wTZrVd4l8WhFOAsegYFqY4nFFPWFpnwbgvJSrv+Myltyqdcz/WF7oLGNxIbwiInts1TE
-         aPuYQVSgwhBUTCr7OcQRwMJOwIhxeahLGQppfy9JeAcxslAZenO8ZhMvxaa5TDAETDPJ
-         csKUIzsbVMsC1iRLes2m5K2bNCVpiYWyRMdA1BkZ2OZ7oyJWfoi9e57bYZw403f7sNXR
-         Rod6jzqVfxEgWv2KSnf9Kr5zhpjgQeThV/is3lO/Azq7ok62y7M7qitjRJ93kTaaXTJV
-         VbVA==
-X-Gm-Message-State: AOAM530pdAWie1wuP1NwkFyke+cYXMDUNZynXdKHMLBQ+8KmtJbVCREf
-        dFRF9uI4Yg8WuhJIZ3vUYXn6Qg76EoWksjwwBivH0id29Qc=
-X-Google-Smtp-Source: ABdhPJyKM7ndsuhZUkF18D7UC4RlAZySXJwF30MnRXLrk/OKhA7Ew3XAe9PdEkSCuYaKDef4JPgyzhaEbnUZHwbr4HE=
-X-Received: by 2002:a17:906:9452:: with SMTP id z18mr20915828ejx.389.1608100112305;
- Tue, 15 Dec 2020 22:28:32 -0800 (PST)
+        id S1725917AbgLPHCs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Dec 2020 02:02:48 -0500
+Received: from mx2.suse.de ([195.135.220.15]:36890 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725914AbgLPHCs (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 16 Dec 2020 02:02:48 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1608102121; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=QoiSX8Hvxn2fqq9nVOof5al//6vCWiVhYQsloyKMYqs=;
+        b=V7RGybcqbrSuNn8RDRU4KdMeHTf8rCq9V4f0ei6fcelVjbMzqDSPQI0pA50/UWOoXrx9jp
+        Dj659JTp/MJB+CDr4pUHRQuU1IhYcc/ezbkf7aQjnBjueFWtuu9sv98Her4boxx4uukNu4
+        A/Sut2UcOy18cDJ3Ov9eS8Y0Hi4YgmY=
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 63288AD2B;
+        Wed, 16 Dec 2020 07:02:01 +0000 (UTC)
+Subject: Re: [PATCH 058/141] xen-blkfront: Fix fall-through warnings for Clang
+To:     "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+References: <cover.1605896059.git.gustavoars@kernel.org>
+ <33057688012c34dd60315ad765ff63f070e98c0c.1605896059.git.gustavoars@kernel.org>
+From:   =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
+Message-ID: <41ed666b-739e-80c2-5714-c488b17c8500@suse.com>
+Date:   Wed, 16 Dec 2020 08:02:00 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.0
 MIME-Version: 1.0
-References: <20201210101826.29656-1-jinpu.wang@cloud.ionos.com>
-In-Reply-To: <20201210101826.29656-1-jinpu.wang@cloud.ionos.com>
-From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Date:   Wed, 16 Dec 2020 07:28:21 +0100
-Message-ID: <CAMGffE=F0i_HqLNQBuek76-WNe9s+iKP24SRnHkkezQBejy+DA@mail.gmail.com>
-Subject: Re: [PATCHv2 for-next 0/7] Misc update for rnbd
-To:     linux-block <linux-block@vger.kernel.org>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <33057688012c34dd60315ad765ff63f070e98c0c.1605896059.git.gustavoars@kernel.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="gvEDSSw8t26PSNBbUdz9PTbLgUC3pfy9W"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Dec 10, 2020 at 11:18 AM Jack Wang <jinpu.wang@cloud.ionos.com> wrote:
->
-> Hi Jens,
->
-> This is the misc update for rnbd. It inlcudes:
-> - 2 follow-up fixes for commit 64e8a6ece1a5 ("block/rnbd-clt: Dynamically alloc buffer for pathname & blk_symlink_name")
->   one warning, and one possible memleak.
-> - one fix for race with dev session sysfs removal.
-> - fix for write-back cache & FUA.
-> - reduce memory footprint by allocate sglist on demand and do not request pdu
->   from rtrs-clt.
-> - Typo fix.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--gvEDSSw8t26PSNBbUdz9PTbLgUC3pfy9W
+Content-Type: multipart/mixed; boundary="acehXDoNClKCL8Daxb7vBCy06W0iwoyi8";
+ protected-headers="v1"
+From: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
+To: "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+ Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+ =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
+ Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+ Stefano Stabellini <sstabellini@kernel.org>, Jens Axboe <axboe@kernel.dk>
+Cc: xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Message-ID: <41ed666b-739e-80c2-5714-c488b17c8500@suse.com>
+Subject: Re: [PATCH 058/141] xen-blkfront: Fix fall-through warnings for Clang
+References: <cover.1605896059.git.gustavoars@kernel.org>
+ <33057688012c34dd60315ad765ff63f070e98c0c.1605896059.git.gustavoars@kernel.org>
+In-Reply-To: <33057688012c34dd60315ad765ff63f070e98c0c.1605896059.git.gustavoars@kernel.org>
 
-Ping?
->
-> change since v1:
-> - use kstrdup as Bart suggested.
-> - fix return code and leaking iu in block/rnbd-clt: Dynamically allocate sglist for rnbd_iu
->
-> v1: https://lore.kernel.org/linux-block/20201209082051.12306-1-jinpu.wang@cloud.ionos.com/T/#md330070d0688bbc57325ce0a6b2181f39dca495c
->
-> The patches are based on block/for-next.
->
-> Gioh Kim (3):
->   block/rnbd: Set write-back cache and fua same to the target device
->   block/rnbd-clt: Dynamically allocate sglist for rnbd_iu
->   block/rnbd-clt: Does not request pdu to rtrs-clt
->
-> Jack Wang (2):
->   block/rnbd-clt: Fix possible memleak
->   block/rnbd: Fix typos
->
-> Md Haris Iqbal (2):
->   block/rnbd-clt: Get rid of warning regarding size argument in strlcpy
->   block/rnbd-srv: Protect dev session sysfs removal
->
->  drivers/block/rnbd/rnbd-clt-sysfs.c    |  5 +-
->  drivers/block/rnbd/rnbd-clt.c          | 94 +++++++++++++++-----------
->  drivers/block/rnbd/rnbd-clt.h          | 12 +++-
->  drivers/block/rnbd/rnbd-proto.h        |  9 ++-
->  drivers/block/rnbd/rnbd-srv.c          | 12 +++-
->  drivers/infiniband/ulp/rtrs/rtrs-clt.c |  6 --
->  drivers/infiniband/ulp/rtrs/rtrs.h     |  7 --
->  7 files changed, 87 insertions(+), 58 deletions(-)
->
-> --
-> 2.25.1
->
+--acehXDoNClKCL8Daxb7vBCy06W0iwoyi8
+Content-Type: multipart/mixed;
+ boundary="------------AC7D4EB44FC6ED9CCA3EFC5F"
+Content-Language: en-US
+
+This is a multi-part message in MIME format.
+--------------AC7D4EB44FC6ED9CCA3EFC5F
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+
+On 20.11.20 19:32, Gustavo A. R. Silva wrote:
+> In preparation to enable -Wimplicit-fallthrough for Clang, fix a warnin=
+g
+> by explicitly adding a break statement instead of letting the code fall=
+
+> through to the next case.
+>=20
+> Link: https://github.com/KSPP/linux/issues/115
+> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+
+Applied to: xen/tip.git for-linus-5.11
+
+
+Juergen
+
+--------------AC7D4EB44FC6ED9CCA3EFC5F
+Content-Type: application/pgp-keys;
+ name="OpenPGP_0xB0DE9DD628BF132F.asc"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: attachment;
+ filename="OpenPGP_0xB0DE9DD628BF132F.asc"
+
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+xsBNBFOMcBYBCACgGjqjoGvbEouQZw/ToiBg9W98AlM2QHV+iNHsEs7kxWhKMjrioyspZKOBy=
+cWx
+w3ie3j9uvg9EOB3aN4xiTv4qbnGiTr3oJhkB1gsb6ToJQZ8uxGq2kaV2KL9650I1SJvedYm8O=
+f8Z
+d621lSmoKOwlNClALZNew72NjJLEzTalU1OdT7/i1TXkH09XSSI8mEQ/ouNcMvIJNwQpd369y=
+9bf
+IhWUiVXEK7MlRgUG6MvIj6Y3Am/BBLUVbDa4+gmzDC9ezlZkTZG2t14zWPvxXP3FAp2pkW0xq=
+G7/
+377qptDmrk42GlSKN4z76ELnLxussxc7I2hx18NUcbP8+uty4bMxABEBAAHNHEp1ZXJnZW4gR=
+3Jv
+c3MgPGpnQHBmdXBmLm5ldD7CwHkEEwECACMFAlOMcBYCGwMHCwkIBwMCAQYVCAIJCgsEFgIDA=
+QIe
+AQIXgAAKCRCw3p3WKL8TL0KdB/93FcIZ3GCNwFU0u3EjNbNjmXBKDY4FUGNQH2lvWAUy+dnyT=
+hpw
+dtF/jQ6j9RwE8VP0+NXcYpGJDWlNb9/JmYqLiX2Q3TyevpB0CA3dbBQp0OW0fgCetToGIQrg0=
+MbD
+1C/sEOv8Mr4NAfbauXjZlvTj30H2jO0u+6WGM6nHwbh2l5O8ZiHkH32iaSTfN7Eu5RnNVUJbv=
+oPH
+Z8SlM4KWm8rG+lIkGurqqu5gu8q8ZMKdsdGC4bBxdQKDKHEFExLJK/nRPFmAuGlId1E3fe10v=
+5QL
++qHI3EIPtyfE7i9Hz6rVwi7lWKgh7pe0ZvatAudZ+JNIlBKptb64FaiIOAWDCx1SzR9KdWVyZ=
+2Vu
+IEdyb3NzIDxqZ3Jvc3NAc3VzZS5jb20+wsB5BBMBAgAjBQJTjHCvAhsDBwsJCAcDAgEGFQgCC=
+QoL
+BBYCAwECHgECF4AACgkQsN6d1ii/Ey/HmQf/RtI7kv5A2PS4RF7HoZhPVPogNVbC4YA6lW7Dr=
+Wf0
+teC0RR3MzXfy6pJ+7KLgkqMlrAbN/8Dvjoz78X+5vhH/rDLa9BuZQlhFmvcGtCF8eR0T1v0nC=
+/nu
+AFVGy+67q2DH8As3KPu0344TBDpAvr2uYM4tSqxK4DURx5INz4ZZ0WNFHcqsfvlGJALDeE0Lh=
+ITT
+d9jLzdDad1pQSToCnLl6SBJZjDOX9QQcyUigZFtCXFst4dlsvddrxyqT1f17+2cFSdu7+ynLm=
+XBK
+7abQ3rwJY8SbRO2iRulogc5vr/RLMMlscDAiDkaFQWLoqHHOdfO9rURssHNN8WkMnQfvUewRz=
+80h
+SnVlcmdlbiBHcm9zcyA8amdyb3NzQG5vdmVsbC5jb20+wsB5BBMBAgAjBQJTjHDXAhsDBwsJC=
+AcD
+AgEGFQgCCQoLBBYCAwECHgECF4AACgkQsN6d1ii/Ey8PUQf/ehmgCI9jB9hlgexLvgOtf7PJn=
+FOX
+gMLdBQgBlVPO3/D9R8LtF9DBAFPNhlrsfIG/SqICoRCqUcJ96Pn3P7UUinFG/I0ECGF4EvTE1=
+jnD
+kfJZr6jrbjgyoZHiw/4BNwSTL9rWASyLgqlA8u1mf+c2yUwcGhgkRAd1gOwungxcwzwqgljf0=
+N51
+N5JfVRHRtyfwq/ge+YEkDGcTU6Y0sPOuj4Dyfm8fJzdfHNQsWq3PnczLVELStJNdapwPOoE+l=
+otu
+fe3AM2vAEYJ9rTz3Cki4JFUsgLkHFqGZarrPGi1eyQcXeluldO3m91NK/1xMI3/+8jbO0tsn1=
+tqS
+EUGIJi7ox80eSnVlcmdlbiBHcm9zcyA8amdyb3NzQHN1c2UuZGU+wsB5BBMBAgAjBQJTjHDrA=
+hsD
+BwsJCAcDAgEGFQgCCQoLBBYCAwECHgECF4AACgkQsN6d1ii/Ey+LhQf9GL45eU5vOowA2u5N3=
+g3O
+ZUEBmDHVVbqMtzwlmNC4k9Kx39r5s2vcFl4tXqW7g9/ViXYuiDXb0RfUpZiIUW89siKrkzmQ5=
+dM7
+wRqzgJpJwK8Bn2MIxAKArekWpiCKvBOB/Cc+3EXE78XdlxLyOi/NrmSGRIov0karw2RzMNOu5=
+D+j
+LRZQd1Sv27AR+IP3I8U4aqnhLpwhK7MEy9oCILlgZ1QZe49kpcumcZKORmzBTNh30FVKK1Evm=
+V2x
+AKDoaEOgQB4iFQLhJCdP1I5aSgM5IVFdn7v5YgEYuJYx37IoN1EblHI//x/e2AaIHpzK5h88N=
+Eaw
+QsaNRpNSrcfbFmAg987ATQRTjHAWAQgAyzH6AOODMBjgfWE9VeCgsrwH3exNAU32gLq2xvjpW=
+nHI
+s98ndPUDpnoxWQugJ6MpMncr0xSwFmHEgnSEjK/PAjppgmyc57BwKII3sV4on+gDVFJR6Y8ZR=
+wgn
+BC5mVM6JjQ5xDk8WRXljExRfUX9pNhdE5eBOZJrDRoLUmmjDtKzWaDhIg/+1Hzz93X4fCQkNV=
+bVF
+LELU9bMaLPBG/x5q4iYZ2k2ex6d47YE1ZFdMm6YBYMOljGkZKwYde5ldM9mo45mmwe0icXKLk=
+pEd
+IXKTZeKDO+Hdv1aqFuAcccTg9RXDQjmwhC3yEmrmcfl0+rPghO0Iv3OOImwTEe4co3c1mwARA=
+QAB
+wsBfBBgBAgAJBQJTjHAWAhsMAAoJELDendYovxMvQ/gH/1ha96vm4P/L+bQpJwrZ/dneZcmEw=
+Tbe
+8YFsw2V/Buv6Z4Mysln3nQK5ZadD534CF7TDVft7fC4tU4PONxF5D+/tvgkPfDAfF77zy2AH1=
+vJz
+Q1fOU8lYFpZXTXIHb+559UqvIB8AdgR3SAJGHHt4RKA0F7f5ipYBBrC6cyXJyyoprT10EMvU8=
+VGi
+wXvTyJz3fjoYsdFzpWPlJEBRMedCot60g5dmbdrZ5DWClAr0yau47zpWj3enf1tLWaqcsuylW=
+svi
+uGjKGw7KHQd3bxALOknAp4dN3QwBYCKuZ7AddY9yjynVaD5X7nF9nO5BjR/i1DG86lem3iBDX=
+zXs
+ZDn8R38=3D
+=3D2wuH
+-----END PGP PUBLIC KEY BLOCK-----
+
+--------------AC7D4EB44FC6ED9CCA3EFC5F--
+
+--acehXDoNClKCL8Daxb7vBCy06W0iwoyi8--
+
+--gvEDSSw8t26PSNBbUdz9PTbLgUC3pfy9W
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature"
+
+-----BEGIN PGP SIGNATURE-----
+
+wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAl/ZsOgFAwAAAAAACgkQsN6d1ii/Ey+V
+Gwf7B5XLWILGCq3WNwhMi7WFHqun6smQ5tXZ/zhc3ROrAk8C8hvonGGkapDULRVea7cFex5OJeYD
+szTs2qp1NV2bACyDLl+/Z3TybRkQj8JSmehQHr3cOknMs2sBQL8aRLPNSGrYgmmyv7SKB8bJp4LG
+5A633sbbylbfBUhmPB13rncb4WI0suuGoCOHqcL+uCHLHDM/+hlbudM8cg34iMc+Sv668uXp4V1B
+L/KfVdUPT0Tp1ZY6KhXoWGCSM6PKz5dSbmGGlTzaG+tuegSgIRFTSrN4amrVU0mDqe74N5TIBh2B
+8+R4stIvl5eTFkZ91BZyivSkQMfRZyqND3aCGhd+FQ==
+=fQHh
+-----END PGP SIGNATURE-----
+
+--gvEDSSw8t26PSNBbUdz9PTbLgUC3pfy9W--
