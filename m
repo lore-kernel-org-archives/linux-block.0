@@ -2,94 +2,99 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3188FC2BBCA
-	for <linux-block@archiver.kernel.org>; Thu, 17 Dec 2020 14:57:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F649C4361B
+	for <linux-block@archiver.kernel.org>; Thu, 17 Dec 2020 15:59:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E100123976
-	for <linux-block@archiver.kernel.org>; Thu, 17 Dec 2020 14:57:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3314E23975
+	for <linux-block@archiver.kernel.org>; Thu, 17 Dec 2020 15:59:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728055AbgLQO4q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Dec 2020 09:56:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40494 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727660AbgLQO4p (ORCPT
+        id S1728160AbgLQP7y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Dec 2020 10:59:54 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60584 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727414AbgLQP7y (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Dec 2020 09:56:45 -0500
-Received: from mail-io1-xd2d.google.com (mail-io1-xd2d.google.com [IPv6:2607:f8b0:4864:20::d2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DB65C061794
-        for <linux-block@vger.kernel.org>; Thu, 17 Dec 2020 06:56:05 -0800 (PST)
-Received: by mail-io1-xd2d.google.com with SMTP id o6so14642398iob.10
-        for <linux-block@vger.kernel.org>; Thu, 17 Dec 2020 06:56:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=yQMMQRJfHmfoxJzCu4koSF5OsXDJ3Q26oRNE3NT4X98=;
-        b=lh49v0AnBoU3gkPUY1YwcxziE2KyIshv1oxK0pox9tUBjs9FYok4TuPCtyCAkB+AHL
-         7aHSFYnDZQlHTpf5l0DGn4z9b2SiYGAkgmmHh7Xpwf1lz37MFdgm2zIJMyObl/LNV1D1
-         6aXiyeL9GNS+FMXQ9sIYEg1adkvh+d529mCIGocEOo3uiX0fWeGf8MnHD7MY5a0RD/Fn
-         oDI9Ww+b4qu8QJmXsH5DQ96JWENgz6TM9iZQGmkN9y7Hb2Eyc/x6uAON7U88MacjvPRX
-         gMdpzIykit1KeDi4QDQ/TKdwh0yyacBP2jtY3OYXksLxgy9l0JiWZ18PMT8wv/PyLKoX
-         wReQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=yQMMQRJfHmfoxJzCu4koSF5OsXDJ3Q26oRNE3NT4X98=;
-        b=rEA5QdLNG5uUy/3nuhO9TqT8wXfj3ZwaIMOboa4CmKQigjI863kZanBDKq76KPFj+N
-         ln12tDnda1uxCB9MeSZW0laXUzF624jVMbQBj8OOsiGiXTxqw1spJD1DuP+WmVJ9xDjh
-         4gghmXeG512ZYQqvfT41NNBwVUhFhnuUPlMUH3YDrP7lhgLr3N9Gjh51xTmUL/z2/3A7
-         b6PK2/krBX7+WiDluDfkZvgq7VnrBqELnzdOXGk5NGWKMHTAeX+7M6jimpuyc3vJj17o
-         RKywDjWHNMqo0OLC9QaQYv84ZxdBEDpHq71AGTv+dwq00nrFQKhXMc63bu3LB8+zClxH
-         kbQA==
-X-Gm-Message-State: AOAM532HLvMel3eup/CNwWmtbfvylKE2PcO2W5bnCSlbFAad7v+4vWpj
-        VyccRbd3X5FbWMbR+A0TKzJRAiFQn392zg==
-X-Google-Smtp-Source: ABdhPJxpDKcFkxqVdPahjyRDt+cOtXnVa3b03yAOSiOuL4iYnR1H9k/WYbU59F0oLCPBLZBBgVXufg==
-X-Received: by 2002:a02:3e86:: with SMTP id s128mr48089048jas.131.1608216964967;
-        Thu, 17 Dec 2020 06:56:04 -0800 (PST)
-Received: from [192.168.1.30] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id r10sm3312303ilo.34.2020.12.17.06.56.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 17 Dec 2020 06:56:04 -0800 (PST)
-Subject: Re: [PATCH 1/2] blk-iocost: Add iocg idle state tracepoint
-To:     Baolin Wang <baolin.wang@linux.alibaba.com>, tj@kernel.org
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <1ba7a38d5a6186b1e71432ef424c23ba1904a365.1607591591.git.baolin.wang@linux.alibaba.com>
- <3aa9c1a1-5640-b60c-4fab-22ee7de40539@linux.alibaba.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <fe7435d3-a167-f7f1-54d7-d97c38453c0a@kernel.dk>
-Date:   Thu, 17 Dec 2020 07:56:03 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <3aa9c1a1-5640-b60c-4fab-22ee7de40539@linux.alibaba.com>
-Content-Type: text/plain; charset=gbk
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        Thu, 17 Dec 2020 10:59:54 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0BHFXXnf095058;
+        Thu, 17 Dec 2020 10:59:13 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id; s=pp1;
+ bh=LxuXlenOw3u38eA8cby72t9kF/x2anm6e4snxX8fuxI=;
+ b=khQkX1a2H1mAYZubhzij+NH6oJSMXeizpVtfQAV0WFa6XJAFcVkDAAaBwFjDcSyioBfD
+ 6iqHMjpulCOouXRMqk/ht0wa+KCbpFfx5jLDqmWar6owu2sWP8Iba8VOiV+1s8oeCwyR
+ IInKAqqt7CEgBirCy9xiMzw8C3rVxRkBpiOtno00C/1XqUJScnR4WauuwTzZBn3aOjc6
+ 5IeVVX+i5CtyVG6i3rBodkygRN407JYq10hcifeOHydfcfq2HQ3uQklC7SqFeZv/AKWq
+ eD9QCcd7varVbbu6Yr+bsibhbf3J7y84QO5fOHCGwaYU0AC+yZw5OrPI9M26AiFQZZyM rA== 
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 35g8mv430j-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 17 Dec 2020 10:59:13 -0500
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0BHFsWtE011180;
+        Thu, 17 Dec 2020 15:59:10 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma05fra.de.ibm.com with ESMTP id 35fmywgj0r-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 17 Dec 2020 15:59:10 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0BHFx7wH34799904
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 17 Dec 2020 15:59:07 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 941D2AE056;
+        Thu, 17 Dec 2020 15:59:07 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7F318AE04D;
+        Thu, 17 Dec 2020 15:59:07 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Thu, 17 Dec 2020 15:59:07 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 20191)
+        id 2C4A8E01DC; Thu, 17 Dec 2020 16:59:07 +0100 (CET)
+From:   Stefan Haberland <sth@linux.ibm.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Jan Hoeppner <hoeppner@linux.ibm.com>,
+        linux-s390@vger.kernel.org,
+        Heiko Carstens <heiko.carstens@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>
+Subject: [PATCH 0/4] Fix DASD control unit updates
+Date:   Thu, 17 Dec 2020 16:59:03 +0100
+Message-Id: <20201217155907.36436-1-sth@linux.ibm.com>
+X-Mailer: git-send-email 2.17.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2020-12-17_10:2020-12-15,2020-12-17 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 mlxscore=0
+ bulkscore=0 clxscore=1015 spamscore=0 malwarescore=0 phishscore=0
+ lowpriorityscore=0 mlxlogscore=999 priorityscore=1501 adultscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2012170106
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/17/20 12:57 AM, Baolin Wang wrote:
-> Hi Jens,
-> 
->> It will be helpful to trace the iocg's whole state, including active and
->> idle state. And we can easily expand the original iocost_iocg_activate
->> trace event to support a state trace class, including active and idle
->> state tracing.
->>
->> Signed-off-by: Baolin Wang <baolin.wang@linux.alibaba.com>
-> 
-> Could you pick up patch 1 which was already acked by Tejun. Thanks.
+Hi Jens,
 
-Done, thanks.
+please apply the following patches that address problems during DASD
+control unit updates.
+Thanks.
+
+Stefan Haberland (4):
+  s390/dasd: fix hanging device offline processing
+  s390/dasd: prevent inconsistent LCU device data
+  s390/dasd: fix list corruption of pavgroup group list
+  s390/dasd: fix list corruption of lcu list
+
+ drivers/s390/block/dasd_alias.c | 22 ++++++++++++++++++++--
+ 1 file changed, 20 insertions(+), 2 deletions(-)
 
 -- 
-Jens Axboe
+2.17.1
 
