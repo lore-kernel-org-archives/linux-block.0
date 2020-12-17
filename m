@@ -2,93 +2,90 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 736A0C4361B
-	for <linux-block@archiver.kernel.org>; Thu, 17 Dec 2020 13:30:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C398C4361B
+	for <linux-block@archiver.kernel.org>; Thu, 17 Dec 2020 14:40:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 43840238EF
-	for <linux-block@archiver.kernel.org>; Thu, 17 Dec 2020 13:30:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 579FA2396D
+	for <linux-block@archiver.kernel.org>; Thu, 17 Dec 2020 14:40:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727851AbgLQNaT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Dec 2020 08:30:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55202 "EHLO
+        id S1727260AbgLQOkn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Dec 2020 09:40:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37962 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725988AbgLQNaT (ORCPT
+        with ESMTP id S1726012AbgLQOkm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Dec 2020 08:30:19 -0500
-Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EAF3C061794
-        for <linux-block@vger.kernel.org>; Thu, 17 Dec 2020 05:29:39 -0800 (PST)
-Received: by mail-ed1-x533.google.com with SMTP id cm17so28656856edb.4
-        for <linux-block@vger.kernel.org>; Thu, 17 Dec 2020 05:29:39 -0800 (PST)
+        Thu, 17 Dec 2020 09:40:42 -0500
+Received: from mail-qv1-xf2b.google.com (mail-qv1-xf2b.google.com [IPv6:2607:f8b0:4864:20::f2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46E1CC061794
+        for <linux-block@vger.kernel.org>; Thu, 17 Dec 2020 06:40:02 -0800 (PST)
+Received: by mail-qv1-xf2b.google.com with SMTP id h16so8937123qvu.8
+        for <linux-block@vger.kernel.org>; Thu, 17 Dec 2020 06:40:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=javigon-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=1BSY6kpvRH25aR6tgxXyew31N03tNmdGM4l7dDerG+8=;
-        b=Ui2GhRBdHoQLhgzq3LaQMwyNM1FnyxlYOHoIV6Cz4vUequOcYmrsbCUWk1SLbJc6wt
-         qyOyT8OXH8JYRpzF82Yh98yS9xSKQzNRqUP/kDoBLwTYPqONnh6ARLxxgWYCDZxmq8DM
-         gU9QWFhqWmJdGPNmSdliiukFBHxcLGiZkUkys/TJx5LLMBBITYIHIfe+E4yB6gdmniNd
-         dEtr2n7gH/7Bg0cyujXy/x6BkY2l2kVJE6PlpjhPRjEUrVXkETVebRMwCGtb7ujIh67i
-         c+jyc9QaQaV/l9PGEGiAJn4bKpZMtClzf32X//G3cmD9CAzfFlTB8HizIdm2P9nPwmlI
-         yGkw==
+        d=toxicpanda-com.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=ogKrrKV+TtPAoHoe1fNFHNXZOViO5iz6ZfC2TYW45N8=;
+        b=Pl7wuENL1WXAOmI3oAr7e3G0ftZOy0UJnMXLzfBoNOITEZzYSlo7aERwxA/EeUKoMz
+         ti6yCuHQjAwzdyfBChT6twoLznkaOBtJc8ujEeQcajovGNu7WTg8lAIy9Z78uqz2NNxY
+         OiOV/xXpG8DPNetyLNzAEWR3RTfD/RPacp9D1TJ+Wn8NuM2vyMsMQ2oa692slXzuIGmy
+         nzUIXg6Tg/LUzkwjvQHX8mIsTJ473mj4KnDzrL/IYCXQoGKlVsJO/4tdICs6pjj1IwJz
+         r1qAs/UQDJWlepedS+oOkGCUKRrD34J/9oce1WJo+hnrsPPaoRbhlenp0mhm1F6CV4H0
+         68BA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=1BSY6kpvRH25aR6tgxXyew31N03tNmdGM4l7dDerG+8=;
-        b=fqq7aa39dms5inTBK5wqnsJXlJxZaSeAjntvMQ2GkHSpF6mye8IEjR3UyAd/pkBHD0
-         rdpz+QfePulOmy6TG/2A1Wx/6hjpc+hY+TJdHK93kWl44r2FnBq83V1nBkUWRGUiqhns
-         TDBS3u019SU7GQFk46DcsLclDcPvT/xQdShp7ENm/HJjUR5rCvB9zJE6QzjrPuizZ5+R
-         oTAiQH8AVwuIRyG/1LQJ6Zg/Ajr07ytqisg0jF6K1jOQffp8QDxAjwKh/Y298ToBT3vo
-         JaF7OZWBJcKgXctVRD90Sf0mwtiASTYM/R0U3TJECDjElA7nqSyNxEf9oDeWgpj4NrPg
-         dnpQ==
-X-Gm-Message-State: AOAM533Ek6OElvWfCqe1/Nwm6BuXuWqitHZ+ncF6A5gH95RAHTfSIDl3
-        YiWRyKLgA68dEaKzgBk6PvLGqlw5nBTvUgpsbW8=
-X-Google-Smtp-Source: ABdhPJxVeHu+AlfAuTrOx4tmtzB26fWL4M/0KwddBdphatLAru+U95pCunKDgeb625eQXQDR5CTNCA==
-X-Received: by 2002:a50:e719:: with SMTP id a25mr1287074edn.12.1608211777885;
-        Thu, 17 Dec 2020 05:29:37 -0800 (PST)
-Received: from localhost (5.186.124.214.cgn.fibianet.dk. [5.186.124.214])
-        by smtp.gmail.com with ESMTPSA id l22sm3838719ejk.14.2020.12.17.05.29.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Dec 2020 05:29:36 -0800 (PST)
-Date:   Thu, 17 Dec 2020 14:29:36 +0100
-From:   Javier =?utf-8?B?R29uesOhbGV6?= <javier@javigon.com>
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        hch@lst.de, sagi@grimberg.me, minwoo.im.dev@gmail.com
-Subject: Re: nvme: enable char device per namespace
-Message-ID: <20201217132936.3wvuguclzwll5kqu@unifi>
-References: <20201215224607.GB3915989@dhcp-10-100-145-180.wdc.com>
- <10318EDE-F4D0-4C89-B69D-3D5ACA4308C2@javigon.com>
- <20201216162631.GA77639@dhcp-10-100-145-180.wdc.com>
- <20201216174322.v2ahfdhvgix536gd@unifi>
- <20201216175311.GA31311@redsun51.ssa.fujisawa.hgst.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ogKrrKV+TtPAoHoe1fNFHNXZOViO5iz6ZfC2TYW45N8=;
+        b=qZgnQvBgvzBxbP3zDBc4nu4Np/mwO725kWgTGUuNm1NT1/tL4Op3R3eCwcWSfDr+BS
+         6i4INyXSr8yPjG4hMC4+YFrtf3vm4fLGIWI7mlZFPyoZvk/QJJ09xAVwMZdTwxj1IJZB
+         YDJVuWB7xY7tsmS7Czr78d1qYCqIYHnQGYaG1v8iqK6PU8YHnLSl68w5rW7f8+8Sdwld
+         KlqVj1uNEGSLMhuc3hrBRq7j+08dhuXI/lpPGvU4vISGBApJ5p5uLxb5MyO0EcrOBzJo
+         +V+G6uRt6svb0Y+4FH625UnpsYXA3/WkuDtkWZ1jWxlY/j72CEqaEBXLOJ+qe551Qys8
+         hOXA==
+X-Gm-Message-State: AOAM533VErB9DZlNx6HVu1FA5ove6zNR9XslSMBQqYp/uA/97Tp9KMS6
+        uskCRhSX2irqoASgEE1hFxKZcg==
+X-Google-Smtp-Source: ABdhPJyhCQrkFX8vgTpp80PgQQn0FKyq4tiJRCeZN0aCSqHYvGuPdcnGrVYPnsRFStx29qWurmvMgg==
+X-Received: by 2002:a0c:fd89:: with SMTP id p9mr22656398qvr.8.1608216001461;
+        Thu, 17 Dec 2020 06:40:01 -0800 (PST)
+Received: from [192.168.1.45] (cpe-174-109-172-136.nc.res.rr.com. [174.109.172.136])
+        by smtp.gmail.com with ESMTPSA id c28sm3248644qtv.2.2020.12.17.06.40.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 17 Dec 2020 06:40:00 -0800 (PST)
+Subject: Re: [PATCH] nbd: Respect max_part for all partition scans
+To:     Josh Triplett <josh@joshtriplett.org>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
+        linux-kernel@vger.kernel.org
+References: <86d03378210ddac44eb07ebb78c9b0f32c56fe96.1608195087.git.josh@joshtriplett.org>
+From:   Josef Bacik <josef@toxicpanda.com>
+Message-ID: <33c35aa8-b698-7141-6adb-ac0b76edf758@toxicpanda.com>
+Date:   Thu, 17 Dec 2020 09:39:59 -0500
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.5.1
 MIME-Version: 1.0
+In-Reply-To: <86d03378210ddac44eb07ebb78c9b0f32c56fe96.1608195087.git.josh@joshtriplett.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20201216175311.GA31311@redsun51.ssa.fujisawa.hgst.com>
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 17.12.2020 02:53, Keith Busch wrote:
->On Wed, Dec 16, 2020 at 06:43:22PM +0100, Javier González wrote:
->> Thanks Keith. I will send a new version today.
->>
->> Regarding nvme-cli: what are your thoughts?
->
->I was thinking we could add a column for these with the '--verbose'
->option in the namespace section.
+On 12/17/20 3:58 AM, Josh Triplett wrote:
+> The creation path of the NBD device respects max_part and only scans for
+> partitions if max_part is not 0. However, some other code paths ignore
+> max_part, and unconditionally scan for partitions. Add a check for
+> max_part on each partition scan.
+> 
+> Signed-off-by: Josh Triplett <josh@joshtriplett.org>
 
-Makes sense. I will look into it - probably on the other side of
-Christmas. Should give plenty of time since this till not be merged
-until 5.12.
+Reviewed-by: Josef Bacik <josef@toxicpanda.com>
 
-Should give me time to add multipath in a follow-up patch then.
+Thanks,
 
+Josef
