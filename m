@@ -2,74 +2,73 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1406DC4361B
-	for <linux-block@archiver.kernel.org>; Thu, 17 Dec 2020 16:59:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0142C4361B
+	for <linux-block@archiver.kernel.org>; Thu, 17 Dec 2020 17:04:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D6FF020725
-	for <linux-block@archiver.kernel.org>; Thu, 17 Dec 2020 16:59:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7C4B7233A0
+	for <linux-block@archiver.kernel.org>; Thu, 17 Dec 2020 17:04:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728680AbgLQQ72 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Dec 2020 11:59:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59508 "EHLO
+        id S1728163AbgLQREZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Dec 2020 12:04:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60266 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725468AbgLQQ72 (ORCPT
+        with ESMTP id S1726773AbgLQREY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Dec 2020 11:59:28 -0500
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91D96C0617A7
-        for <linux-block@vger.kernel.org>; Thu, 17 Dec 2020 08:58:47 -0800 (PST)
-Date:   Thu, 17 Dec 2020 17:58:44 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1608224326;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=1k/3j9L77ugdQkS0K4bHazEZxtGukoU6G0rYoFRiuu0=;
-        b=exLoQlJbuVU7kcjlHr//EHpXPe73SI4ea/cfMDI+ywNYS9eSGCRbHDEEZzYyerTAbhgkyC
-        PTQpAJNs8LajsOoPh5HGa6SuI6PKnN1B/8oWSMEf6BWtMowtgvKwoEzuanLMeAxowYzNR3
-        Dh54qboiVSZbEHfsAdrPWD+6DD7iozwp8gTMtVSpoqbXlpjuEVb1xnvS45E6UBS90daPfy
-        /puU9DhkEgIfRnFsUXjDTq93aZ//JWHkQ3yLcJSUvmjl4fIOXmqYtdHQIkNgHhyHwVo0s3
-        YiebE8yrZnoesXwCsHrcN8CBpGE+T+nZDwAZSBN906h1KTxg5owFi+kGwxmChw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1608224326;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=1k/3j9L77ugdQkS0K4bHazEZxtGukoU6G0rYoFRiuu0=;
-        b=/wAn6E/bJn1zXsHAQPjvGqjscJqZLd9oJSyO0MClUemCE4KthQo4la/OF2tZA7b1XaRw0n
-        UEqETPC7UkL9BwBQ==
-From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To:     Jens Axboe <axboe@kernel.dk>, Daniel Wagner <dwagner@suse.de>
-Cc:     Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Mike Galbraith <efault@gmx.de>,
-        Sagi Grimberg <sagi@grimberg.me>
-Subject: Re: [PATCH 2/3] blk-mq: Always complete remote completions requests
- in softirq
-Message-ID: <20201217165844.z4sikj43pf6d3c57@linutronix.de>
-References: <20201204191356.2516405-1-bigeasy@linutronix.de>
- <20201204191356.2516405-3-bigeasy@linutronix.de>
- <de7f392a-fbac-f7bc-662a-5f40dd4c0aa6@kernel.dk>
- <20201208131319.GB22219@infradead.org>
- <20201217164308.ueki3scv3oxt4uta@linutronix.de>
- <e3ca3c82-cddc-ea06-39ae-48605abc77eb@kernel.dk>
+        Thu, 17 Dec 2020 12:04:24 -0500
+Received: from mail-qv1-xf34.google.com (mail-qv1-xf34.google.com [IPv6:2607:f8b0:4864:20::f34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2187CC061794
+        for <linux-block@vger.kernel.org>; Thu, 17 Dec 2020 09:03:44 -0800 (PST)
+Received: by mail-qv1-xf34.google.com with SMTP id bd6so13592639qvb.9
+        for <linux-block@vger.kernel.org>; Thu, 17 Dec 2020 09:03:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=RdyWfkBT3FTk3WERIytnfGK9aMbq5yLUuj7iCyWMYXg=;
+        b=J+KVf2iOycImOXpfg+RG14p1t+kmuT7Ilbd/r+a3OP9zQO5k1aKT5EdN0d1gMpM8d4
+         dXQZyOTWISUgGGAV85Xt6LdLJ/9fNAnkEb3YnXWeZ/chtKxpOLCByKN4up5hl/0uYGgv
+         IwTHPCRoDI7PKere076sVaJHOT3H+zaY3JoJtt0FoYT5IHl4jr1kE73xecBSsAowKXrh
+         fi603KKeslAs7Qg6nZRQbahBVmWSda6Ytp6z1wcthCKmmTXjo6Ftf7h27pffDQ7di0tv
+         IymBx5/Jvj1fT+CwOFvyhRIpNeOij5qkaZUenxcrLuBRbP/sRSbsRnbvPMIdePJbGCui
+         bvvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=RdyWfkBT3FTk3WERIytnfGK9aMbq5yLUuj7iCyWMYXg=;
+        b=El5xsBjnxPrNDgzSvalAZagIQm3D4njbIrSwVWbni9x+1KfF7CPNGnGE89TTdtt0Ks
+         gSv2+iogFxT50VIBM/cI9+5RAExU0BPdZa9Jg2q848kmX58wI/NTf5bBAseAJIaxQafk
+         PKl7h2HvqHuhaZpCnBv9UsjULcMPabWhJciuhexmeKGv/4+yvOgD0WQwBQ0PKFgiA92C
+         qFior/0tNrOJ6nAZt4suqjuhs3xc303x9FB7O5ifWmUlD+XnDCst9eGppmImGpDoVbdC
+         k3OzfYmLLmcnr88mZTdo7bZfcOshW4ZtwzZoqAqjooz1bJuPIQHcwZ/0BRIF7WgjnW7X
+         9T9A==
+X-Gm-Message-State: AOAM531FpZveBMqUDQwonxWvqKJnjF43zYeg1j1iM2bI+Pjarii21beQ
+        jiAhfKFvy2HezXLUkiIhFxdEI41MUpH8qb596Bg=
+X-Google-Smtp-Source: ABdhPJxV2gqgXcjeDHhxDd6zzQ3k63longhxpcIHvVewknSAVmQR8Vog0kH9M+R54yEBfxOX5LcbRXJg4X/frhraarE=
+X-Received: by 2002:a0c:8b99:: with SMTP id r25mr49927880qva.0.1608224623234;
+ Thu, 17 Dec 2020 09:03:43 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <e3ca3c82-cddc-ea06-39ae-48605abc77eb@kernel.dk>
+References: <20201027045411.GA39796@192.168.3.9> <CAA70yB7bepwNPAMtxth8qJCE6sQM9vxr1A5sU8miFn3tSOSYQQ@mail.gmail.com>
+ <CAA70yB6caVcKjJOTkEZa9ZBzZAHPgYrsr9nZWDgm-tfPMLGXHQ@mail.gmail.com>
+ <20201117032756.GE56247@T590> <CAA70yB4G_1jHYRyVsf_mhHQA-_mGXzaZ6n4Bgtq9n-x1_Yz4rg@mail.gmail.com>
+ <20201117074039.GA74954@T590> <CAA70yB4c_mBxr3ftDd1omU=Piozxw2jKM0nyMmOP9P_hOYjNMQ@mail.gmail.com>
+ <CAA70yB76dWneSJvtyA=1BFSJit3jzyvBAzJQYO-UHo-KACSZ9g@mail.gmail.com>
+In-Reply-To: <CAA70yB76dWneSJvtyA=1BFSJit3jzyvBAzJQYO-UHo-KACSZ9g@mail.gmail.com>
+From:   Weiping Zhang <zwp10758@gmail.com>
+Date:   Fri, 18 Dec 2020 01:03:32 +0800
+Message-ID: <CAA70yB5-LNNacq=oYfu+73LUW89tDgKD+WYWtFGORcWKpwU9gw@mail.gmail.com>
+Subject: Re: [PATCH v5 0/2] fix inaccurate io_ticks
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Mike Snitzer <snitzer@redhat.com>,
+        mpatocka@redhat.com, linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2020-12-17 09:55:08 [-0700], Jens Axboe wrote:
-> 
-> Yeah, I think we're good at this point. I'll queue this up for 5.11.
-Thank you very much.
-Thank you Daniel for running all these tests.
-
-Sebastian
+Ping again.
