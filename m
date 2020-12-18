@@ -2,165 +2,112 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D4BCC4361B
-	for <linux-block@archiver.kernel.org>; Fri, 18 Dec 2020 10:03:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1818BC4361B
+	for <linux-block@archiver.kernel.org>; Fri, 18 Dec 2020 14:53:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 55E3423A9B
-	for <linux-block@archiver.kernel.org>; Fri, 18 Dec 2020 10:03:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DB7A823AFD
+	for <linux-block@archiver.kernel.org>; Fri, 18 Dec 2020 14:53:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732951AbgLRKCu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Dec 2020 05:02:50 -0500
-Received: from frasgout.his.huawei.com ([185.176.79.56]:2268 "EHLO
-        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728247AbgLRKCu (ORCPT
+        id S1728028AbgLROxq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Dec 2020 09:53:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35496 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727296AbgLROxp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Dec 2020 05:02:50 -0500
-Received: from fraeml734-chm.china.huawei.com (unknown [172.18.147.201])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Cy47J4pTjz67RPs;
-        Fri, 18 Dec 2020 17:58:20 +0800 (CST)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- fraeml734-chm.china.huawei.com (10.206.15.215) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2106.2; Fri, 18 Dec 2020 11:02:07 +0100
-Received: from [10.210.168.198] (10.210.168.198) by
- lhreml724-chm.china.huawei.com (10.201.108.75) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2106.2; Fri, 18 Dec 2020 10:02:06 +0000
-Subject: Re: [RFC PATCH v2 2/2] blk-mq: Lockout tagset iter when freeing rqs
-To:     Ming Lei <ming.lei@redhat.com>
-CC:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <hch@lst.de>, <hare@suse.de>,
-        <ppvk@codeaurora.org>, <bvanassche@acm.org>,
-        <kashyap.desai@broadcom.com>, <linuxarm@huawei.com>
-References: <1608203273-170555-1-git-send-email-john.garry@huawei.com>
- <1608203273-170555-3-git-send-email-john.garry@huawei.com>
- <20201218033125.GA2322803@T590>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <78ac690d-3c90-be90-1628-53422e1d928a@huawei.com>
-Date:   Fri, 18 Dec 2020 10:01:22 +0000
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
+        Fri, 18 Dec 2020 09:53:45 -0500
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 610F2C0617B0
+        for <linux-block@vger.kernel.org>; Fri, 18 Dec 2020 06:53:05 -0800 (PST)
+Received: by mail-pf1-x432.google.com with SMTP id w6so1700091pfu.1
+        for <linux-block@vger.kernel.org>; Fri, 18 Dec 2020 06:53:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=VPIWdyhhv2p0RK54BfyU00oulzKpVJG7soxRWcanAR4=;
+        b=F02KD6DaV/aPKcjLUlLPP43rCeLPtbxNuUvPp1MEYpUq0w5n17jV+1bRZEY4+qQoXA
+         AOkl7AMKS00RJBlstpvnRhWuSJiI6LZvuhcNrTnEJbcualpbtYXM1ALmw0aLoLodQXQP
+         LiaNJ2cAY4Qku6YUDXG1SYzb007BAwE0fsz4Mh1zqJ8KyiniulqNd7dPcJgjRz39re1b
+         pOl4E9gpua1SH9s13uNImMPWnYl86WXoVA2IkVdVm3CcYmroufHzRzRJZcUqsY3xxjCa
+         5fltazm7+yzzBWlmLCOf1vinzXP5Wv1iSkkL28+xei+g8fKSyBKEl42fuQ8vl6daCmrU
+         nxdQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=VPIWdyhhv2p0RK54BfyU00oulzKpVJG7soxRWcanAR4=;
+        b=T7YZdnVXW8UQbKD6HbfoYTvuQ5LzSaOR+8PEQO2kZLJI7buaTpsf+NqaJ8bHsUahtE
+         csPH49SAKZxrBaX/cVO2HWOZ1RAqgLIoImHVI/uLgNOHHwYzbwUKilBXmyMCREEVDWs4
+         t3RAE24hQrd9YiuaaXEPDJCFLMFElwBoxmowSfJVLwffp5GBNwWKehQx0xjWkewV4dbm
+         +A9wThqbVFrVzmbmwEHl0amD8LENmdXNDDKy3+f6FE4eSth6goo/xkbQJcikGrYuJXUh
+         SXH/vo5DEuOqtCuGlNKZ4OXdMFZHaetZhmkPJi0M4L+njdt11uV6zHZmhdHrClC600Zb
+         8Y7A==
+X-Gm-Message-State: AOAM532ZFRto8dwtiLFWdMLCy76m6EYVsyMXz+LUTVxfe1tuWVjQudhx
+        Gd7mcRxSc7RycHQ32OyccHOpnug5VaN/HQ==
+X-Google-Smtp-Source: ABdhPJyG3zp40pY2POLr3CI3iKSHSsS1x1yHuFri50Mu1Kdnc3J5tOOIRHoPXDTmwr6d7IrUrqfnUw==
+X-Received: by 2002:a05:6a00:1344:b029:19d:a886:f0ad with SMTP id k4-20020a056a001344b029019da886f0admr4546691pfu.81.1608303184804;
+        Fri, 18 Dec 2020 06:53:04 -0800 (PST)
+Received: from [192.168.1.134] ([66.219.217.173])
+        by smtp.gmail.com with ESMTPSA id k14sm8790624pfp.132.2020.12.18.06.53.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 18 Dec 2020 06:53:04 -0800 (PST)
+Subject: Re: [PATCH] block/rnbd: Adding name to the Contributors List
+To:     Jinpu Wang <jinpu.wang@cloud.ionos.com>
+Cc:     Danil Kipnis <danil.kipnis@cloud.ionos.com>,
+        swapnil ingle <ingleswapnil@gmail.com>,
+        linux-rdma@vger.kernel.org,
+        "open list:RNBD BLOCK DRIVERS" <linux-block@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>
+References: <1606479915-7259-1-git-send-email-ingleswapnil@gmail.com>
+ <CAHg0HuzKb0e21bo3V53zskKtk+zaJXhxkU8m4w6Q2DWoWPkU6w@mail.gmail.com>
+ <CAJCWmDdEPa23XDZ8pdStH=PgMszq4N6mHmNWtUA5Fn4THSNRmw@mail.gmail.com>
+ <CAMGffEm2LVxXJP-HseTqihcCvPeYOkCsaFHVNKXDZAYxCPzwTA@mail.gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <a36bef5e-f7e3-c29b-8e65-38dc92812850@kernel.dk>
+Date:   Fri, 18 Dec 2020 07:53:03 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20201218033125.GA2322803@T590>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <CAMGffEm2LVxXJP-HseTqihcCvPeYOkCsaFHVNKXDZAYxCPzwTA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.210.168.198]
-X-ClientProxiedBy: lhreml744-chm.china.huawei.com (10.201.108.194) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 18/12/2020 03:31, Ming Lei wrote:
->>   3 files changed, 23 insertions(+), 2 deletions(-)
+On 12/17/20 11:46 PM, Jinpu Wang wrote:
+> Hi Jens,
+> 
+> On Thu, Dec 17, 2020 at 6:44 PM swapnil ingle <ingleswapnil@gmail.com> wrote:
 >>
->> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
->> index a6df2d5df88a..853ed5b889aa 100644
->> --- a/block/blk-mq-tag.c
->> +++ b/block/blk-mq-tag.c
->> @@ -358,10 +358,19 @@ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
->>   {
->>   	int i;
->>   
->>   	for (i = 0; i < tagset->nr_hw_queues; i++) {
->> -		if (tagset->tags && tagset->tags[i])
->> -			__blk_mq_all_tag_iter(tagset->tags[i], fn, priv,
->> +		if (tagset->tags && tagset->tags[i]) {
->> +			struct blk_mq_tags *tags = tagset->tags[i];
->> +
->> +			if (!atomic_inc_not_zero(&tags->iter_usage_counter))
->> +				continue;
+>> Adding linux-rdma@vger.kernel.org
+>>
+>> On Fri, Nov 27, 2020 at 1:54 PM Danil Kipnis <danil.kipnis@cloud.ionos.com> wrote:
+>>>
+>>> On Fri, Nov 27, 2020 at 1:31 PM Swapnil Ingle <ingleswapnil@gmail.com> wrote:
+>>>>
+>>>> Adding name to the Contributors List
+>>>>
+>>>> Signed-off-by: Swapnil Ingle <ingleswapnil@gmail.com>
+>>>
+>>> Acked-by: Danil Kipnis <danil.kipnis@cloud.ionos.com>
+> Can you pick up this patch, or do you need a resend from me or Swapnil?
 
-Hi Ming,
+Just include as part of the next series of patches. Though I do question
+why we need such a contributors list to begin with, if you do git log on
+the rnbd/ directory it'd show you anyway.
 
-> When 'continue' is run, blk_mq_tagset_busy_iter()'s semantic may be
-> broken.
+I'd also suggest moving the parts of the README that makes sense into a
+proper Documentation/ file, nobody is going to find it deep in the
+kernel source tree as it is.
 
-Yeah, I did consider this, and thought that we're ok since we iter only 
-started tags here (and there would be none for the queue). But then that 
-would not work for other queues with active tags associated.
+-- 
+Jens Axboe
 
-> 
->> +
->> +			__blk_mq_all_tag_iter(tags, fn, priv,
->>   					      BT_TAG_ITER_STARTED);
->> +
->> +			atomic_dec(&tags->iter_usage_counter);
->> +		}
->>   	}
->>   }
->>   EXPORT_SYMBOL(blk_mq_tagset_busy_iter);
->> @@ -435,9 +444,14 @@ void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn *fn,
->>   		if (!blk_mq_hw_queue_mapped(hctx))
->>   			continue;
->>   
->> +		if (!atomic_inc_not_zero(&tags->iter_usage_counter))
->> +			continue;
-> Same with above comment.
-
-Right, similar to above.
-
-> 
->> +
->>   		if (tags->nr_reserved_tags)
->>   			bt_for_each(hctx, tags->breserved_tags, fn, priv, true);
->>   		bt_for_each(hctx, tags->bitmap_tags, fn, priv, false);
->> +
->> +		atomic_dec(&tags->iter_usage_counter);
->>   	}
->>   	blk_queue_exit(q);
->>   }
->> @@ -461,6 +475,8 @@ static int blk_mq_init_bitmap_tags(struct blk_mq_tags *tags,
->>   		     round_robin, node))
->>   		goto free_bitmap_tags;
->>   
->> +	atomic_set(&tags->iter_usage_counter, 1);
->> +
->>   	tags->bitmap_tags = &tags->__bitmap_tags;
->>   	tags->breserved_tags = &tags->__breserved_tags;
->>   
->> diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
->> index 7d3e6b333a4a..563019d60f05 100644
->> --- a/block/blk-mq-tag.h
->> +++ b/block/blk-mq-tag.h
->> @@ -11,6 +11,9 @@ struct blk_mq_tags {
->>   
->>   	atomic_t active_queues;
->>   
->> +	/* Only interesting for driver tags */
->> +	atomic_t	iter_usage_counter;
->> +
->>   	struct sbitmap_queue *bitmap_tags;
->>   	struct sbitmap_queue *breserved_tags;
->>   
->> diff --git a/block/blk-mq.c b/block/blk-mq.c
->> index 8465d7c5ebf0..a61279be0120 100644
->> --- a/block/blk-mq.c
->> +++ b/block/blk-mq.c
->> @@ -2315,7 +2315,9 @@ void __blk_mq_free_rqs_ext(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
->>   void blk_mq_free_rqs_ext(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
->>   		     unsigned int hctx_idx, struct blk_mq_tags *ref_tags)
->>   {
->> +	while (atomic_cmpxchg(&ref_tags->iter_usage_counter, 1, 0) != 1);
->>   	__blk_mq_free_rqs_ext(set, tags, hctx_idx, ref_tags);
->> +	atomic_set(&ref_tags->iter_usage_counter, 1);
->>   }
-> I guess it is simpler to sync the two code paths by adding mutex to 'ref_tags' and
-> holding it in both __blk_mq_free_rqs_ext() and the above two iterator helpers.
-
-But are we allowed to always sleep in the iter calling context?
-
-And that will also lockout parallel iterations, which is less than ideal.
-
-So I could look to address the issues you mention above with atomics 
-still, but maybe Bart has some better idea regarding RCU.
-
-Thanks,
-John
