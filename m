@@ -7,46 +7,46 @@ X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AF9BC4361B
-	for <linux-block@archiver.kernel.org>; Fri, 18 Dec 2020 09:32:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D4BCC4361B
+	for <linux-block@archiver.kernel.org>; Fri, 18 Dec 2020 10:03:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E7D9F23A7B
-	for <linux-block@archiver.kernel.org>; Fri, 18 Dec 2020 09:32:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 55E3423A9B
+	for <linux-block@archiver.kernel.org>; Fri, 18 Dec 2020 10:03:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730414AbgLRJcX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Dec 2020 04:32:23 -0500
-Received: from frasgout.his.huawei.com ([185.176.79.56]:2267 "EHLO
+        id S1732951AbgLRKCu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Dec 2020 05:02:50 -0500
+Received: from frasgout.his.huawei.com ([185.176.79.56]:2268 "EHLO
         frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727235AbgLRJcW (ORCPT
+        with ESMTP id S1728247AbgLRKCu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Dec 2020 04:32:22 -0500
-Received: from fraeml704-chm.china.huawei.com (unknown [172.18.147.207])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Cy3T76ds8z67RKR;
-        Fri, 18 Dec 2020 17:28:43 +0800 (CST)
+        Fri, 18 Dec 2020 05:02:50 -0500
+Received: from fraeml734-chm.china.huawei.com (unknown [172.18.147.201])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Cy47J4pTjz67RPs;
+        Fri, 18 Dec 2020 17:58:20 +0800 (CST)
 Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- fraeml704-chm.china.huawei.com (10.206.15.53) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2106.2; Fri, 18 Dec 2020 10:31:39 +0100
+ fraeml734-chm.china.huawei.com (10.206.15.215) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Fri, 18 Dec 2020 11:02:07 +0100
 Received: from [10.210.168.198] (10.210.168.198) by
  lhreml724-chm.china.huawei.com (10.201.108.75) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2106.2; Fri, 18 Dec 2020 09:31:38 +0000
+ 15.1.2106.2; Fri, 18 Dec 2020 10:02:06 +0000
 Subject: Re: [RFC PATCH v2 2/2] blk-mq: Lockout tagset iter when freeing rqs
-To:     Bart Van Assche <bvanassche@acm.org>, <axboe@kernel.dk>,
-        <ming.lei@redhat.com>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <hch@lst.de>, <hare@suse.de>, <ppvk@codeaurora.org>,
+To:     Ming Lei <ming.lei@redhat.com>
+CC:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <hch@lst.de>, <hare@suse.de>,
+        <ppvk@codeaurora.org>, <bvanassche@acm.org>,
         <kashyap.desai@broadcom.com>, <linuxarm@huawei.com>
 References: <1608203273-170555-1-git-send-email-john.garry@huawei.com>
  <1608203273-170555-3-git-send-email-john.garry@huawei.com>
- <30c16455-6d7d-39ac-b3fc-4ee38199e683@acm.org>
+ <20201218033125.GA2322803@T590>
 From:   John Garry <john.garry@huawei.com>
-Message-ID: <c1e9c7d8-e9ce-b3c5-19f5-22eb3a808c29@huawei.com>
-Date:   Fri, 18 Dec 2020 09:30:55 +0000
+Message-ID: <78ac690d-3c90-be90-1628-53422e1d928a@huawei.com>
+Date:   Fri, 18 Dec 2020 10:01:22 +0000
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.2
 MIME-Version: 1.0
-In-Reply-To: <30c16455-6d7d-39ac-b3fc-4ee38199e683@acm.org>
+In-Reply-To: <20201218033125.GA2322803@T590>
 Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -58,8 +58,9 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 18/12/2020 01:55, Bart Van Assche wrote:
-> On 12/17/20 3:07 AM, John Garry wrote:
+On 18/12/2020 03:31, Ming Lei wrote:
+>>   3 files changed, 23 insertions(+), 2 deletions(-)
+>>
 >> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
 >> index a6df2d5df88a..853ed5b889aa 100644
 >> --- a/block/blk-mq-tag.c
@@ -76,6 +77,17 @@ On 18/12/2020 01:55, Bart Van Assche wrote:
 >> +
 >> +			if (!atomic_inc_not_zero(&tags->iter_usage_counter))
 >> +				continue;
+
+Hi Ming,
+
+> When 'continue' is run, blk_mq_tagset_busy_iter()'s semantic may be
+> broken.
+
+Yeah, I did consider this, and thought that we're ok since we iter only 
+started tags here (and there would be none for the queue). But then that 
+would not work for other queues with active tags associated.
+
+> 
 >> +
 >> +			__blk_mq_all_tag_iter(tags, fn, priv,
 >>   					      BT_TAG_ITER_STARTED);
@@ -84,30 +96,71 @@ On 18/12/2020 01:55, Bart Van Assche wrote:
 >> +		}
 >>   	}
 >>   }
+>>   EXPORT_SYMBOL(blk_mq_tagset_busy_iter);
+>> @@ -435,9 +444,14 @@ void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn *fn,
+>>   		if (!blk_mq_hw_queue_mapped(hctx))
+>>   			continue;
+>>   
+>> +		if (!atomic_inc_not_zero(&tags->iter_usage_counter))
+>> +			continue;
+> Same with above comment.
+
+Right, similar to above.
+
 > 
-> Atomic operations are (a) more expensive than rcu_read_lock() /
-> rcu_read_lock() and (b) do not provide the same guarantees.
-> rcu_read_lock() has acquire semantics and rcu_read_unlock() has
-> release semantics. Regular atomic operations do not have these
-> semantics which means that the CPU is allowed to reorder certain
-> regular loads and stores against atomic operations. Additionally,
-> atomic operations are more expensive than the corresponding RCU
-> primitives. In other words, I would be much happier if this patch
-> series would use RCU instead of atomics.
-> 
+>> +
+>>   		if (tags->nr_reserved_tags)
+>>   			bt_for_each(hctx, tags->breserved_tags, fn, priv, true);
+>>   		bt_for_each(hctx, tags->bitmap_tags, fn, priv, false);
+>> +
+>> +		atomic_dec(&tags->iter_usage_counter);
+>>   	}
+>>   	blk_queue_exit(q);
+>>   }
+>> @@ -461,6 +475,8 @@ static int blk_mq_init_bitmap_tags(struct blk_mq_tags *tags,
+>>   		     round_robin, node))
+>>   		goto free_bitmap_tags;
+>>   
+>> +	atomic_set(&tags->iter_usage_counter, 1);
+>> +
+>>   	tags->bitmap_tags = &tags->__bitmap_tags;
+>>   	tags->breserved_tags = &tags->__breserved_tags;
+>>   
+>> diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
+>> index 7d3e6b333a4a..563019d60f05 100644
+>> --- a/block/blk-mq-tag.h
+>> +++ b/block/blk-mq-tag.h
+>> @@ -11,6 +11,9 @@ struct blk_mq_tags {
+>>   
+>>   	atomic_t active_queues;
+>>   
+>> +	/* Only interesting for driver tags */
+>> +	atomic_t	iter_usage_counter;
+>> +
+>>   	struct sbitmap_queue *bitmap_tags;
+>>   	struct sbitmap_queue *breserved_tags;
+>>   
+>> diff --git a/block/blk-mq.c b/block/blk-mq.c
+>> index 8465d7c5ebf0..a61279be0120 100644
+>> --- a/block/blk-mq.c
+>> +++ b/block/blk-mq.c
+>> @@ -2315,7 +2315,9 @@ void __blk_mq_free_rqs_ext(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
+>>   void blk_mq_free_rqs_ext(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
+>>   		     unsigned int hctx_idx, struct blk_mq_tags *ref_tags)
+>>   {
+>> +	while (atomic_cmpxchg(&ref_tags->iter_usage_counter, 1, 0) != 1);
+>>   	__blk_mq_free_rqs_ext(set, tags, hctx_idx, ref_tags);
+>> +	atomic_set(&ref_tags->iter_usage_counter, 1);
+>>   }
+> I guess it is simpler to sync the two code paths by adding mutex to 'ref_tags' and
+> holding it in both __blk_mq_free_rqs_ext() and the above two iterator helpers.
 
-Hi Bart,
+But are we allowed to always sleep in the iter calling context?
 
-In terms of solving the problem with RCU, can you provide more details 
-on how it would actually work?
+And that will also lockout parallel iterations, which is less than ideal.
 
-I saw that you mentioned kfree_rcu() at the following, so guess it's 
-related:
-https://lore.kernel.org/linux-block/5c3ac5af-ed81-11e4-fee3-f92175f14daf@acm.org/T/#m830071bca03af31516800c14f8cccbe63661c5db
-
-In terms of expense of atomic operations, we're just adding these 
-operations around the iter function, so I can't see much impact really 
-on fastpath.
+So I could look to address the issues you mention above with atomics 
+still, but maybe Bart has some better idea regarding RCU.
 
 Thanks,
 John
