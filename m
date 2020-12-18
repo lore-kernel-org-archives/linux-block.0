@@ -2,113 +2,170 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88A22C2BBD4
-	for <linux-block@archiver.kernel.org>; Fri, 18 Dec 2020 15:34:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BBB8C4361B
+	for <linux-block@archiver.kernel.org>; Fri, 18 Dec 2020 21:45:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 55D4723B53
-	for <linux-block@archiver.kernel.org>; Fri, 18 Dec 2020 15:34:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F178E23B7B
+	for <linux-block@archiver.kernel.org>; Fri, 18 Dec 2020 21:45:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728288AbgLRPeS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Dec 2020 10:34:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41712 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727806AbgLRPeR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Dec 2020 10:34:17 -0500
-Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C710C061282
-        for <linux-block@vger.kernel.org>; Fri, 18 Dec 2020 07:33:37 -0800 (PST)
-Received: by mail-ed1-x52d.google.com with SMTP id cw27so2775128edb.5
-        for <linux-block@vger.kernel.org>; Fri, 18 Dec 2020 07:33:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=vQLHp84/L9U/ihCT8VfX+s5+pC9qLQ5ItLSujKOjqfo=;
-        b=PSaCXVorV9N6hgWS5S2oA6nGbi2jvEosNxw2csDkCTtQwSh9dq6ZLjcNN/zQ8w62KX
-         d7DMqdLUJ3hqRA4B79yg/w0mdqtCH2aqZJ6Szpcw389A8TwD6k65+gh39HITRzkk2ekf
-         yziVZK6lwzW+4fDMkNbILlTUyMPzmMTkyOTOhzRasliNm9kV+IZBNCkxfqaecBrwV/TB
-         fIo6kuHI40S8XOlyQRH60Scl9BahJl/QBzsmrmCw2JPUpL2zP487pvTviFqeN7jnqSmr
-         qfeXMBsvccF/uQ1zeVonCgyzXzbFnqKDm3tp1prSwWIveKW7jBZFs+vh1DSk8tf9Mewv
-         FoVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=vQLHp84/L9U/ihCT8VfX+s5+pC9qLQ5ItLSujKOjqfo=;
-        b=LxCPk3jPkP+yvL462VZrPC73sSpEquDq2DC0U5gV5fmTrDCb18ohg6OmxM4vQhD+D6
-         LINd/TgLNGhmfS8XsXVd9Eu1jxhPEUTj8bkSlQ6DBvLjSmi7kcrnCc2SZC+lXxijwkvG
-         tl/VmQUMwhm8hnet4BHb02IVT7EzDuqdUqgNf/wzSNVpIg99lU032JWH6FnuQ4xKQNye
-         E4KAfcCPFcvKOjkCKDViCTxSZZ0nEG16padch92L7H+T7N/czon1M5h71H21ARv4sK7t
-         zVT8+px8xyHRVpHlBWgLPZo2nKZDU8I7WlMy3ZMnIovndJ6G1+E6t2GcO19kT8hH8TmD
-         glhA==
-X-Gm-Message-State: AOAM533gHzZKTdSBavl1/W/zlcXC6Crq50AV1GuNWO8ZYNnvm/dEV3yE
-        hCAW8/tanhqHA2SUcsQB9iLB0K3BkXB5VezWl7Y3Dw==
-X-Google-Smtp-Source: ABdhPJy7/5uKUHba6f7gwuVlwUuuX2xLgWtneNUdQVPgyORTO3atXdYK91RrwgHjFhEAr8oKn0iG2Olkp/Zn9Oe6zcE=
-X-Received: by 2002:a05:6402:a53:: with SMTP id bt19mr5029336edb.104.1608305615830;
- Fri, 18 Dec 2020 07:33:35 -0800 (PST)
-MIME-Version: 1.0
-References: <1606479915-7259-1-git-send-email-ingleswapnil@gmail.com>
- <CAHg0HuzKb0e21bo3V53zskKtk+zaJXhxkU8m4w6Q2DWoWPkU6w@mail.gmail.com>
- <CAJCWmDdEPa23XDZ8pdStH=PgMszq4N6mHmNWtUA5Fn4THSNRmw@mail.gmail.com>
- <CAMGffEm2LVxXJP-HseTqihcCvPeYOkCsaFHVNKXDZAYxCPzwTA@mail.gmail.com> <a36bef5e-f7e3-c29b-8e65-38dc92812850@kernel.dk>
-In-Reply-To: <a36bef5e-f7e3-c29b-8e65-38dc92812850@kernel.dk>
-From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
-Date:   Fri, 18 Dec 2020 16:33:25 +0100
-Message-ID: <CAMGffEk9mB=obJTtUq-xaay4XTx37OM7VQN24SLSTfcXoC-2GA@mail.gmail.com>
-Subject: Re: [PATCH] block/rnbd: Adding name to the Contributors List
+        id S1726070AbgLRVpB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Dec 2020 16:45:01 -0500
+Received: from mx2.suse.de ([195.135.220.15]:52724 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725854AbgLRVpB (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 18 Dec 2020 16:45:01 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 28CCBAD12;
+        Fri, 18 Dec 2020 21:44:20 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id B76D81E1332; Fri, 18 Dec 2020 22:44:19 +0100 (CET)
+From:   Jan Kara <jack@suse.cz>
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Danil Kipnis <danil.kipnis@cloud.ionos.com>,
-        swapnil ingle <ingleswapnil@gmail.com>,
-        linux-rdma@vger.kernel.org,
-        "open list:RNBD BLOCK DRIVERS" <linux-block@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Cc:     <linux-block@vger.kernel.org>, hare@suse.de,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
+        Jan Kara <jack@suse.cz>
+Subject: [PATCH 2/2] blk-mq: Improve performance of non-mq IO schedulers with multiple HW queues
+Date:   Fri, 18 Dec 2020 22:44:12 +0100
+Message-Id: <20201218214412.1543-3-jack@suse.cz>
+X-Mailer: git-send-email 2.16.4
+In-Reply-To: <20201218214412.1543-1-jack@suse.cz>
+References: <20201218214412.1543-1-jack@suse.cz>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, Jens
-On Fri, Dec 18, 2020 at 3:53 PM Jens Axboe <axboe@kernel.dk> wrote:
->
-> On 12/17/20 11:46 PM, Jinpu Wang wrote:
-> > Hi Jens,
-> >
-> > On Thu, Dec 17, 2020 at 6:44 PM swapnil ingle <ingleswapnil@gmail.com> wrote:
-> >>
-> >> Adding linux-rdma@vger.kernel.org
-> >>
-> >> On Fri, Nov 27, 2020 at 1:54 PM Danil Kipnis <danil.kipnis@cloud.ionos.com> wrote:
-> >>>
-> >>> On Fri, Nov 27, 2020 at 1:31 PM Swapnil Ingle <ingleswapnil@gmail.com> wrote:
-> >>>>
-> >>>> Adding name to the Contributors List
-> >>>>
-> >>>> Signed-off-by: Swapnil Ingle <ingleswapnil@gmail.com>
-> >>>
-> >>> Acked-by: Danil Kipnis <danil.kipnis@cloud.ionos.com>
-> > Can you pick up this patch, or do you need a resend from me or Swapnil?
->
-> Just include as part of the next series of patches. Though I do question
-> why we need such a contributors list to begin with, if you do git log on
-> the rnbd/ directory it'd show you anyway.
-Thanks for the suggestion, we will include it as part of next series.
-The initial reason to have such contributors list was to give credit
-to people who worked on
-the project in the past, Swapnil's name was missed.
->
-> I'd also suggest moving the parts of the README that makes sense into a
-> proper Documentation/ file, nobody is going to find it deep in the
-> kernel source tree as it is.
-Sounds good, will do it.
->
-> --
-> Jens Axboe
->
-Thanks
-Jack
+Currently when non-mq aware IO scheduler (BFQ, mq-deadline) is used for
+a queue with multiple HW queues, the performance it rather bad. The
+problem is that these IO schedulers use queue-wide locking and their
+dispatch function does not respect the hctx it is passed in and returns
+any request it finds appropriate. Thus locality of request access is
+broken and dispatch from multiple CPUs just contends on IO scheduler
+locks. For these IO schedulers there's little point in dispatching from
+multiple CPUs. Instead dispatch always only from a single CPU to limit
+contention.
+
+Below is a comparison of dbench runs on XFS filesystem where the storage
+is a raid card with 64 HW queues and to it attached a single rotating
+disk. BFQ is used as IO scheduler:
+
+      clients           MQ                     SQ             MQ-Patched
+Amean 1      39.12 (0.00%)       43.29 * -10.67%*       36.09 *   7.74%*
+Amean 2     128.58 (0.00%)      101.30 *  21.22%*       96.14 *  25.23%*
+Amean 4     577.42 (0.00%)      494.47 *  14.37%*      508.49 *  11.94%*
+Amean 8     610.95 (0.00%)      363.86 *  40.44%*      362.12 *  40.73%*
+Amean 16    391.78 (0.00%)      261.49 *  33.25%*      282.94 *  27.78%*
+Amean 32    324.64 (0.00%)      267.71 *  17.54%*      233.00 *  28.23%*
+Amean 64    295.04 (0.00%)      253.02 *  14.24%*      242.37 *  17.85%*
+Amean 512 10281.61 (0.00%)    10211.16 *   0.69%*    10447.53 *  -1.61%*
+
+Numbers are times so lower is better. MQ is stock 5.10-rc6 kernel. SQ is
+the same kernel with megaraid_sas.host_tagset_enable=0 so that the card
+advertises just a single HW queue. MQ-Patched is a kernel with this
+patch applied.
+
+You can see multiple hardware queues heavily hurt performance in
+combination with BFQ. The patch restores the performance.
+
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ block/blk-mq.c           | 37 +++++++++++++++++++++++++++++++++++++
+ block/kyber-iosched.c    |  1 +
+ include/linux/elevator.h |  2 ++
+ 3 files changed, 40 insertions(+)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 57d0461f2be5..6d80054c231b 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1663,6 +1663,31 @@ void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
+ }
+ EXPORT_SYMBOL(blk_mq_run_hw_queue);
+ 
++static struct blk_mq_hw_ctx *blk_mq_sq_iosched_hctx(struct request_queue *q)
++{
++	struct elevator_queue *e = q->elevator;
++	struct blk_mq_hw_ctx *hctx;
++
++	/*
++	 * The queue has multiple hardware queues but uses IO scheduler that
++	 * does not respect hardware queues when dispatching? This is not a
++	 * great setup but it can be sensible when we have a single rotational
++	 * disk behind a raid card. Just don't bother with multiple HW queues
++	 * and dispatch from hctx for the current CPU since running multiple
++	 * queues just causes lock contention inside the scheduler and
++	 * pointless cache bouncing because the hctx is not respected by the IO
++	 * scheduler's dispatch function anyway.
++	 */
++	if (q->nr_hw_queues > 1 && e && e->type->ops.dispatch_request &&
++	    !(e->type->elevator_features & ELEVATOR_F_MQ_AWARE)) {
++		hctx = blk_mq_map_queue_type(q, HCTX_TYPE_DEFAULT,
++					     raw_smp_processor_id());
++		if (!blk_mq_hctx_stopped(hctx))
++			return hctx;
++	}
++	return NULL;
++}
++
+ /**
+  * blk_mq_run_hw_queues - Run all hardware queues in a request queue.
+  * @q: Pointer to the request queue to run.
+@@ -1673,6 +1698,12 @@ void blk_mq_run_hw_queues(struct request_queue *q, bool async)
+ 	struct blk_mq_hw_ctx *hctx;
+ 	int i;
+ 
++	hctx = blk_mq_sq_iosched_hctx(q);
++	if (hctx) {
++		blk_mq_run_hw_queue(hctx, async);
++		return;
++	}
++
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+ 		if (blk_mq_hctx_stopped(hctx))
+ 			continue;
+@@ -1692,6 +1723,12 @@ void blk_mq_delay_run_hw_queues(struct request_queue *q, unsigned long msecs)
+ 	struct blk_mq_hw_ctx *hctx;
+ 	int i;
+ 
++	hctx = blk_mq_sq_iosched_hctx(q);
++	if (hctx) {
++		blk_mq_delay_run_hw_queue(hctx, msecs);
++		return;
++	}
++
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+ 		if (blk_mq_hctx_stopped(hctx))
+ 			continue;
+diff --git a/block/kyber-iosched.c b/block/kyber-iosched.c
+index dc89199bc8c6..c25c41d0d061 100644
+--- a/block/kyber-iosched.c
++++ b/block/kyber-iosched.c
+@@ -1029,6 +1029,7 @@ static struct elevator_type kyber_sched = {
+ #endif
+ 	.elevator_attrs = kyber_sched_attrs,
+ 	.elevator_name = "kyber",
++	.elevator_features = ELEVATOR_F_MQ_AWARE,
+ 	.elevator_owner = THIS_MODULE,
+ };
+ 
+diff --git a/include/linux/elevator.h b/include/linux/elevator.h
+index bacc40a0bdf3..1fe8e105b83b 100644
+--- a/include/linux/elevator.h
++++ b/include/linux/elevator.h
+@@ -172,6 +172,8 @@ extern struct request *elv_rb_find(struct rb_root *, sector_t);
+ 
+ /* Supports zoned block devices sequential write constraint */
+ #define ELEVATOR_F_ZBD_SEQ_WRITE	(1U << 0)
++/* Supports scheduling on multiple hardware queues */
++#define ELEVATOR_F_MQ_AWARE		(1U << 1)
+ 
+ #endif /* CONFIG_BLOCK */
+ #endif
+-- 
+2.16.4
+
