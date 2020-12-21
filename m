@@ -2,170 +2,153 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3539C433E6
-	for <linux-block@archiver.kernel.org>; Mon, 21 Dec 2020 11:04:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A39BDC433DB
+	for <linux-block@archiver.kernel.org>; Mon, 21 Dec 2020 12:08:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8AF7B20757
-	for <linux-block@archiver.kernel.org>; Mon, 21 Dec 2020 11:04:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 558EF20663
+	for <linux-block@archiver.kernel.org>; Mon, 21 Dec 2020 12:08:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726553AbgLULEq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Dec 2020 06:04:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38946 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726526AbgLULEp (ORCPT
+        id S1726173AbgLUMIE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Dec 2020 07:08:04 -0500
+Received: from frasgout.his.huawei.com ([185.176.79.56]:2275 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725942AbgLUMID (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Dec 2020 06:04:45 -0500
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74FAEC061285;
-        Mon, 21 Dec 2020 03:04:05 -0800 (PST)
-Received: by mail-pf1-x42f.google.com with SMTP id c79so6271239pfc.2;
-        Mon, 21 Dec 2020 03:04:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=m4RXLnH7YBILbODpuDyfo9E1AOFVv93WhdclcHi3eRM=;
-        b=mA4rkZ2mW5ilVtJlHTLxyUJbz4DtMizPCLvCnvGrHm7XoPsPZE3HcUISa+DINhe1cX
-         VnYcPtgRrVmlD6iNUktCM9CvhFg9hFAd2+NL7spFpNLgaisQkXQoLUa7nGIHVPR+fLpN
-         2I17vlr0JuScYxcSiGi7rInpQQyijOiIzaxI1+JQAQKmHHDxFUhD5SvuVRafD4MnaZjZ
-         t+INoEhNht+H8bbDqe5ZGkOUwFQsAaOgVpDusW+3UvbbW2dXhteuIdvNxb1BJcVLbT9p
-         vjMw8oeCMmbo4M6zu3eUhnpqj05Y8DMRrEtXs18/xyx62faIELK50YvCt56IRRchkFkj
-         VxRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=m4RXLnH7YBILbODpuDyfo9E1AOFVv93WhdclcHi3eRM=;
-        b=WnlMOqHLZ6C8jQ/pOjT4lqV2GNqdcfx9quoEABklUrqcSSCn+aw7PEngGsrClxGlyE
-         ZBVbak6RBHqWJyKBSlBGJiPV1o7GJHwUok1PJ9ynWv9sCt1e0y83UNAnl4DelNoT24uf
-         FYbiwIXJ3ca2kXrdB4VedY1v9QoWX/8fNXjLpDPn2ScQAutXJlS8lIdi/OEuSR6mXFW+
-         QReYFc3G8Jr3n2SrbDt561Axe/QVVVkMq2vwE2GMHFqQVRFl/ejAbbvbF1uDtCeqHEMc
-         a31rRtMXCavPiG9axJJNnt6fz0ukIqotocxWoifX/E9MnN5MKAeZja0xH78nzo1wkqfk
-         mTGw==
-X-Gm-Message-State: AOAM530IWm/qifT1tRWRUQ3yPAzGcP28SI47LkmPF4nn/ZZziZHCoCCR
-        DmCTHPuJnDIOx9bdqEfM2TjcKqEz6Y5fOw==
-X-Google-Smtp-Source: ABdhPJxfsK/TKyeT0KVqf2ULDbwG5cq5edfGnp7+WRd1iwL7NlFlagqlJMZ9LY5DQLObCcAUtGM3gQ==
-X-Received: by 2002:a62:1ccb:0:b029:1ad:8138:dc42 with SMTP id c194-20020a621ccb0000b02901ad8138dc42mr6727056pfc.0.1608548645079;
-        Mon, 21 Dec 2020 03:04:05 -0800 (PST)
-Received: from localhost ([103.248.31.152])
-        by smtp.gmail.com with ESMTPSA id 84sm16889194pfy.9.2020.12.21.03.04.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Dec 2020 03:04:04 -0800 (PST)
-Date:   Mon, 21 Dec 2020 16:33:56 +0530
-From:   'Amey Narkhede' <ameynarkhede03@gmail.com>
-To:     David Laight <David.Laight@aculab.com>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] block: aoe: replace use of __constant_htons to htons
-Message-ID: <20201221110356.6x2h2ip6o3hlwztd@archlinux>
-References: <20201220164625.94105-1-ameynarkhede03@gmail.com>
- <d708db73308747feb0484287a09c443e@AcuMS.aculab.com>
- <20201220202019.j7x64yahapgilr7u@archlinux>
- <c5df63bdc5a94ebdac9505a64f2cece5@AcuMS.aculab.com>
+        Mon, 21 Dec 2020 07:08:03 -0500
+Received: from fraeml738-chm.china.huawei.com (unknown [172.18.147.206])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Czyp12pKHz67Qrw;
+        Mon, 21 Dec 2020 20:04:57 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml738-chm.china.huawei.com (10.206.15.219) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Mon, 21 Dec 2020 13:07:21 +0100
+Received: from [10.210.168.224] (10.210.168.224) by
+ lhreml724-chm.china.huawei.com (10.201.108.75) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Mon, 21 Dec 2020 12:07:20 +0000
+Subject: Re: [RFC PATCH v2 2/2] blk-mq: Lockout tagset iter when freeing rqs
+To:     Bart Van Assche <bvanassche@acm.org>, <axboe@kernel.dk>,
+        <ming.lei@redhat.com>
+CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <hch@lst.de>, <hare@suse.de>, <ppvk@codeaurora.org>,
+        <kashyap.desai@broadcom.com>, <linuxarm@huawei.com>
+References: <1608203273-170555-1-git-send-email-john.garry@huawei.com>
+ <1608203273-170555-3-git-send-email-john.garry@huawei.com>
+ <df44b73d-6c42-87ee-3c25-b95a44712e05@acm.org>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <4d2004bb-4444-7a63-7c72-1759e3037cfd@huawei.com>
+Date:   Mon, 21 Dec 2020 12:06:35 +0000
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="pglt4qwsfzwfhuk6"
-Content-Disposition: inline
-In-Reply-To: <c5df63bdc5a94ebdac9505a64f2cece5@AcuMS.aculab.com>
+In-Reply-To: <df44b73d-6c42-87ee-3c25-b95a44712e05@acm.org>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.210.168.224]
+X-ClientProxiedBy: lhreml739-chm.china.huawei.com (10.201.108.189) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 18/12/2020 22:43, Bart Van Assche wrote:
+> On 12/17/20 3:07 AM, John Garry wrote:
+>> References to old IO sched requests are currently cleared from the
+>> tagset when freeing those requests; switching elevator or changing
+>> request queue depth is such a scenario in which this occurs.
+>>
+>> However, this does not stop the potentially racy behaviour of freeing
+>> and clearing a request reference between a tagset iterator getting a
+>> reference to a request and actually dereferencing that request.
+>>
+>> Such a use-after-free can be triggered, as follows:
+>>
+>> ==================================================================
+>> BUG: KASAN: use-after-free in bt_iter+0xa0/0x120
+>> Read of size 8 at addr ffff00108d589300 by task fio/3052
+>>
+>> CPU: 32 PID: 3052 Comm: fio Tainted: GW
+>> 5.10.0-rc4-64839-g2dcf1ee5054f #693
+>> Hardware name: Huawei Taishan 2280 /D05, BIOS Hisilicon
+>> D05 IT21 Nemo 2.0 RC0 04/18/2018
+>> Call trace:
+>> dump_backtrace+0x0/0x2d0
+>> show_stack+0x18/0x68
+>> dump_stack+0x100/0x16c
+>> print_address_description.constprop.12+0x6c/0x4e8
+>> kasan_report+0x130/0x200
+>> __asan_load8+0x9c/0xd8
+>> bt_iter+0xa0/0x120
+>> blk_mq_queue_tag_busy_iter+0x2d8/0x540
+>> blk_mq_in_flight+0x80/0xb8
+>> part_stat_show+0xd8/0x238
+>> dev_attr_show+0x44/0x90
+>> sysfs_kf_seq_show+0x128/0x1c8
+>> kernfs_seq_show+0xa0/0xb8
+>> seq_read_iter+0x1ec/0x6a0
+>> seq_read+0x1d0/0x250
+>> kernfs_fop_read+0x70/0x330
+>> vfs_read+0xe4/0x250
+>> ksys_read+0xc8/0x178
+>> __arm64_sys_read+0x44/0x58
+>> el0_svc_common.constprop.2+0xc4/0x1e8
+>> do_el0_svc+0x90/0xa0
+>> el0_sync_handler+0x128/0x178
+>> el0_sync+0x158/0x180
+>>
+>> This is found experimentally by running fio on 2x SCSI disks - 1x disk
+>> holds the root partition. Userspace is constantly triggering the tagset
+>> iter from reading the root (gen)disk partition info. And so if the IO
+>> sched is constantly changed on the other disk, eventually the UAF occurs,
+>> as described above.
+> 
+> Hi John,
 
---pglt4qwsfzwfhuk6
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Hi Bart,
 
-On 20/12/21 09:23AM, David Laight wrote:
-> From: 'Amey Narkhede' <ameynarkhede03@gmail.com>
-> > Sent: 20 December 2020 20:20
-> > To: David Laight <David.Laight@ACULAB.COM>
-> > Subject: Re: [PATCH] block: aoe: replace use of __constant_htons to htons
-> >
-> > On 20/12/20 07:35PM, David Laight wrote:
-> > > From: Amey Narkhede
-> > > > Sent: 20 December 2020 16:46
-> > > >
-> > > > The macro htons expands to __swab16 which has special
-> > > > case for constants in little endian case. In big
-> > > > endian case both __constant_htons and htons macros
-> > > > expand to the same code. So, replace __constant_htons
-> > > > with htons to get rid of the definition of __constant_htons
-> > > > completely.
-> > > >
-> > > ...
-> > > >  static struct packet_type aoe_pt __read_mostly = {
-> > > > -	.type = __constant_htons(ETH_P_AOE),
-> > > > +	.type = htons(ETH_P_AOE),
-> > > >  	.func = aoenet_rcv,
-> > >
-> > > Does this cause grief if someone is doing a COMPILE_TEST on LE?
-> > >
-> > > 	David
-> > >
-> > > -
-> > > Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-> > > Registration No: 1397386 (Wales)
-> > >
-> > I did COMPILE_TEST on my x86_64 machine and it compiled
-> > without any problems.
-> > I assume that was the point or am I missing
-> > something? I'm a beginner contributor so please
-> > let me know if there any mistakes.
->
-> It depends on exactly how the bswap functions are defined.
->
-> You can't have anything that contains a function call (or asm) for a
-> static initialiser or case label.
-> The bswap functions have used the builtin_constant() check to switch
-> between an asm block and C expression.
-> So the C expression is used for constants - so evaluated by the compiler,
-> and the asm for variables.
-> Last I looked this wasn't valid for initialisers - so the __constant_bswap()
-> exists for these cases.
->
-> Now, it might be that, on more recent gcc __builtin_bswap() is used.
-> This might be valid for constants in initialisers.
-> Whether the same is true for CLANG is another issue.
->
-> Basically it is all complex and partially historic.
->
-> So you may need to use __constant_htons() for initialisers
-> and case labels.
-> For constants in code it doesn't matter whether you use the __constant form.
-> For variables in code the __constant form is likely to generate horrid code.
->
-> FWIW you'll get more credit for finding real bugs than stylistic changes.
->
-> 	David
->
-> -
-> Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-> Registration No: 1397386 (Wales)
->
-Thanks for thee detail explanation.
-Actually I was submitting stylistic changes to get
-familiar with email and patch based workflows
+> 
+> Something is not clear to me. The above call stack includes
+> blk_mq_queue_tag_busy_iter(). That function starts with
+> percpu_ref_tryget(&q->q_usage_counter) and ends with calling
+> percpu_ref_put(&q->q_usage_counter). So it will only iterate over a tag set
+> if q->q_usage_counter is live. However, both blk_mq_update_nr_requests()
+> and elevator_switch() start with freezing the request queue.
+> blk_mq_freeze_queue() starts with killing q->q_usage_counter and waits
+> until that counter has dropped to zero. In other words,
+> blk_mq_queue_tag_busy_iter() should not iterate over a tag set while a tag
+> set is being freed or reallocated. 
 
-Amey
+Right, this is what I thought, but Ming reminded me 
+"blk_mq_queue_tag_busy_iter() can be run on another request queue just
+between one driver tag is allocated and updating the request map, so one
+extra request reference still can be grabbed."
 
---pglt4qwsfzwfhuk6
-Content-Type: application/pgp-signature; name="signature.asc"
+> Does this mean that we do not yet have
+> a full explanation about why the above call stack can be triggered?
 
------BEGIN PGP SIGNATURE-----
+We understand it, and I'll describe my experiment in detail:
+a. fio runs on 2x disks, sda (root partition disk) and sdb.
+b. for sda, userpace triggers blk_mq_queue_tag_busy_iter(), as in 
+stackframe above. Since its request queue is not frozen, it will iter 
+the busy tags.
+c. on sdb, I continuously change the IO scheduler.
 
-iQEzBAABCAAdFiEEb5tNK+B4oWmn+0Z9BBTsy/Z3yzYFAl/ggRwACgkQBBTsy/Z3
-yzYPmAgAj9feO9UUbbeCG7DTkaIBhNMpNLZKvL43vcz3WGtDjxYzYPtobHwJWPAE
-bbMcHYGtAgulWogYVNHW5YDHufc1C/0I/mvtobDOyuaVzw8dC8h8VA7kVwnZV+uZ
-2mHoEa4dQZlPjo4JcfV0OO1RGqGGO5GRQ5fke+QzELm75DIx2/1qAIUz1lXvLsMQ
-yCTOIk0Brrce1o9tRvoXzwha+c3QXVxjsQyN3K5296v01FgTkk0DOkvNl/X4lDWJ
-+rwaH0XJu8Gz5i0dGNa+gcl3IlhezAQXVq98sKMrx/0zZgBaiGZDZCRg43UWJnWD
-0SxEi4heFn70eTAh+ESp2l/FUa4lTA==
-=HrGu
------END PGP SIGNATURE-----
+So sdb request queue gets frozen as we switch IO sched, but we could 
+have this sequence of events:
+- blk_mq_queue_tag_busy_iter() on sda takes reference to a sdb request
+    - Getting a tag and updating ->rqs[] in tagset is not atomic
+- requests for sdb cleared in tagset and request memory is freed
+- blk_mq_queue_tag_busy_iter() on sda still holds reference to sdb 
+request and dereferences it -> UAF
 
---pglt4qwsfzwfhuk6--
+Hope it's clear. It is a bit unlikely, I will admit, but it still can 
+happen and UAF is never good. So please let me know if other idea to solve.
+
+Thanks,
+John
