@@ -2,76 +2,60 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F4F5C433E0
-	for <linux-block@archiver.kernel.org>; Tue, 22 Dec 2020 13:31:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E21BC433DB
+	for <linux-block@archiver.kernel.org>; Tue, 22 Dec 2020 13:31:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 19C7B23105
-	for <linux-block@archiver.kernel.org>; Tue, 22 Dec 2020 13:31:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 221272313F
+	for <linux-block@archiver.kernel.org>; Tue, 22 Dec 2020 13:31:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727418AbgLVNat (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Dec 2020 08:30:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58782 "EHLO
+        id S1727457AbgLVNbR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Dec 2020 08:31:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58812 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727416AbgLVNat (ORCPT
+        with ESMTP id S1727006AbgLVNbQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Dec 2020 08:30:49 -0500
+        Tue, 22 Dec 2020 08:31:16 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB771C0613D3
-        for <linux-block@vger.kernel.org>; Tue, 22 Dec 2020 05:30:08 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89821C0613D6;
+        Tue, 22 Dec 2020 05:31:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=YCu4csy/mxer5fYnsax39tqEZZf/yXtZRuwE+1/5VOo=; b=s+pY5r+Ho0pqUaPw5+LkDMSIH9
-        eL7pUPi7ffUrmPAnR5Wy5xhJ4QWhYx3Y3yS+5i5y4gz1pcdwN/hX8h71g4+BVj8Ml2xwlZQMLji+L
-        nn+c+t3Dn1YkmAqjJbS+mn5drbN4Lzi3b1eZJeFQGAQUJMLwlS2W6QpIF7U47Ya5BV9xC00XijAzK
-        9KQwwKg3lQLDKzECkKOSWs3EMu3kwM43mqUxTGJgujd+tSxgdMH8txfBLI5wiLffLetq2X/exlQUG
-        1crN5rp6YSllDNQes0olIxyJ+Y0B9FUn5G7UxC3hogVIaXQblEtFCs8Uy+9c7W/P8KfR2bqaXvv2p
-        /NbK1Gag==;
-Received: from [2001:4bb8:180:8063:c70:4a89:bc61:2] (helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1krhjq-0001FK-Ro; Tue, 22 Dec 2020 13:30:07 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org,
-        Stephen Rothwell <sfr@canb.auug.org.au>
-Subject: [PATCH 1/2] block: fixup the kerneldoc for bd_abort_claiming
-Date:   Tue, 22 Dec 2020 14:30:03 +0100
-Message-Id: <20201222133004.3016790-1-hch@lst.de>
-X-Mailer: git-send-email 2.29.2
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=42fzafLRxdLNbzacrFdM4qrpWHImldmnOrdNk/6ZVck=; b=iePoeRjEV0kcCjWEwPHuCUm1iq
+        DsnCh6wlOMy9pj7bxofpZcd6sMzCSd2I/GgHLbXe4+d47bGf8PoYmhaWHX4JAljs7Pmp11Q61zZry
+        uNBn6b2e9O7Ol30xD2+f25f/OKKo2EejBCMSi4aXnQWCWGJcyN7m5KeZkWhfJKK8x6qocjLrF9eK1
+        HuGXF8R0AhSu2kId/AcyD/guIzYRawRmiUACVaunqnykwQLtLbuUJiBWDZwM1zc3OyBhtUOWuhfLW
+        utOSM4ESay1lTFxwSK16xqDEiDyUT1DDFnMXTzCKwbMnLypMRHujdLLBoRjOiVAFdvst9fpmxG+0d
+        rCC+BbMA==;
+Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1krhkb-0001K5-MZ; Tue, 22 Dec 2020 13:30:53 +0000
+Date:   Tue, 22 Dec 2020 13:30:53 +0000
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jeffle Xu <jefflexu@linux.alibaba.com>
+Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        joseph.qi@linux.alibaba.com
+Subject: Re: [PATCH] block: move definition of blk_qc_t to types.h
+Message-ID: <20201222133053.GA2935@infradead.org>
+References: <20201222031154.62150-1-jefflexu@linux.alibaba.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201222031154.62150-1-jefflexu@linux.alibaba.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Remove the documentation for a removed parameter.
+> -typedef unsigned int blk_qc_t;
+>  #define BLK_QC_T_NONE		-1U
+>  #define BLK_QC_T_SHIFT		16
+>  #define BLK_QC_T_INTERNAL	(1U << 31)
 
-Fixes: 37c3fc9abb25 ("block: simplify the block device claiming interface")
-Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- fs/block_dev.c | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 9e56ee1f265230..7633e5ac0885f7 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -1056,7 +1056,6 @@ static void bd_finish_claiming(struct block_device *bdev, void *holder)
- /**
-  * bd_abort_claiming - abort claiming of a block device
-  * @bdev: block device of interest
-- * @whole: whole block device
-  * @holder: holder that has claimed @bdev
-  *
-  * Abort claiming of a block device when the exclusive open failed. This can be
--- 
-2.29.2
-
+I think we need a comment here explaining these are the values for
+blk_qc_t at least.
