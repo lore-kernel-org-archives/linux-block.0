@@ -2,164 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-22.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1519C433DB
-	for <linux-block@archiver.kernel.org>; Tue, 22 Dec 2020 15:20:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43586C433DB
+	for <linux-block@archiver.kernel.org>; Tue, 22 Dec 2020 15:43:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7F146230FC
-	for <linux-block@archiver.kernel.org>; Tue, 22 Dec 2020 15:20:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E182423105
+	for <linux-block@archiver.kernel.org>; Tue, 22 Dec 2020 15:43:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727902AbgLVPUA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Dec 2020 10:20:00 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30031 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727731AbgLVPUA (ORCPT
+        id S1727190AbgLVPnS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Dec 2020 10:43:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51064 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727019AbgLVPnS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Dec 2020 10:20:00 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1608650313;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=uGQXz7EjCUOAMril8Wws9YsLnDf1hCsIoLziBOE/WAk=;
-        b=HwYe9fCLIQl/MrJsRay94lEGBAJUInRnI3w11H4cJPWCtJdkfm1yCOXs+Qana3Cw1r6aMu
-        T4iHpzXuB9l7WWPLv+TMToTdjup7RrxSAA3ra6n2y8L2V6uwRu6QcqpYC9Gk5WntYJH4OH
-        gIEVL2swOO4MpTNrxLU3wCBVWdftIqg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-539-rPQg_BxMNyyySmkmb40NKw-1; Tue, 22 Dec 2020 10:18:28 -0500
-X-MC-Unique: rPQg_BxMNyyySmkmb40NKw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 00CB459;
-        Tue, 22 Dec 2020 15:18:26 +0000 (UTC)
-Received: from localhost (unknown [10.18.25.174])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id D7C285D6A8;
-        Tue, 22 Dec 2020 15:18:24 +0000 (UTC)
-Date:   Tue, 22 Dec 2020 10:18:24 -0500
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
-        Alasdair G Kergon <agk@redhat.com>,
-        Antonio Quartulli <a@unstable.cc>,
-        Hyeongseok Kim <hyeongseok@gmail.com>,
-        Jeffle Xu <jefflexu@linux.alibaba.com>,
-        =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@linux.microsoft.com>,
-        Mike Christie <michael.christie@oracle.com>,
-        Qinglang Miao <miaoqinglang@huawei.com>,
-        Rikard Falkeborn <rikard.falkeborn@gmail.com>,
-        Zheng Yongjun <zhengyongjun3@huawei.com>
-Subject: [git pull] device mapper changes for 5.11
-Message-ID: <20201222151823.GA17999@redhat.com>
+        Tue, 22 Dec 2020 10:43:18 -0500
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8F88C0613D3
+        for <linux-block@vger.kernel.org>; Tue, 22 Dec 2020 07:42:37 -0800 (PST)
+Received: by mail-pj1-x1029.google.com with SMTP id f14so1484314pju.4
+        for <linux-block@vger.kernel.org>; Tue, 22 Dec 2020 07:42:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=c1JssyEtbLPosJPKnrIEGV8w8nXFwiGKude6k8tPHSY=;
+        b=TQr3UG2UI0Hg4/Tc+joQ9An6R4OINqkVHL5LFWtSwg1cOBDhIhpHRR6dqbpLPoguJU
+         RI4hzOZJ/TUNCi0RSSnRtaQ3yJNNnRK8RJ9d7OQmTLuFUtv7IArHfvkLEn7dDW257/mo
+         CuEEGLIa8LMifAa3nZ5Uu24cBKLlleuKMQpz1g+B0W/iFhk2O2qSO9pnb9s0jpHrwR/4
+         3uLVCuCTP3nSqv+Hf/AzyyzdzIYFO8kG8h8cp5cs9JEwiMdp2LvZmOjGD5ZIpuDtnLgH
+         JP6RE875sepTqgmjm4sjH3LX8p7BhwbqPQAze0FmIlrPIWF21rgu+GG2w24B5cGiw/U9
+         31HQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=c1JssyEtbLPosJPKnrIEGV8w8nXFwiGKude6k8tPHSY=;
+        b=RZY3HYC+pf0mV8Hqxrk4bNFZZsO/0sb13ygZBMNKE6XG6NGlh0iv6wAI3bwJsSy/WZ
+         glUUfgT2DQC+qwfHpKgEH9bFpHtNMuvjnggJwZqftwCPpn8rxfTY/H9ht1n4QSuo1dBQ
+         9YITMHB7cbDyO82Qwlpy/zzB8pg6IpQEMmQ7v7gBZXlz8sGZ3+KlLKRIvn4GRGhVmc/m
+         YOnmmZPSmdUChOAhJ967E487Bb5QkeEMOCvYS111obuoNcQE/pzd3YTE62jK/GunV3I4
+         uh2FU9LfTEuwH6B55GBIVvGIaeXrKSukVADa7R9B+rxeImZcmc8oF17fkw+l0SO1pGSn
+         TWUA==
+X-Gm-Message-State: AOAM530C5U1o0QObTadxDMLBoPYM+z5JnySCH/TxvO5vDaR5qnzzdmj5
+        2M6vKw7LJafX9FPuDKRMsv7sWUoo8mjmKA==
+X-Google-Smtp-Source: ABdhPJz1Mc4fOB98bi9o1dG206CiL8KRSS5IB3Qdt3BsUImU1pLoZe27AySWl/a/zTsc+h9ySfBYow==
+X-Received: by 2002:a17:90a:6f01:: with SMTP id d1mr21307665pjk.155.1608651757188;
+        Tue, 22 Dec 2020 07:42:37 -0800 (PST)
+Received: from [192.168.1.134] ([66.219.217.173])
+        by smtp.gmail.com with ESMTPSA id b26sm21234754pgm.25.2020.12.22.07.42.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 22 Dec 2020 07:42:36 -0800 (PST)
+Subject: Re: small MAINTAINERS and copyright updates
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     linux-block@vger.kernel.org
+References: <20201210075544.2715861-1-hch@lst.de>
+ <20201222131620.GA30137@lst.de>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <3fb39ba0-5a79-263d-8d30-963769342da8@kernel.dk>
+Date:   Tue, 22 Dec 2020 08:42:35 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <20201222131620.GA30137@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+On 12/22/20 6:16 AM, Christoph Hellwig wrote:
+> Jens,
+> 
+> can you please still pick this up?
 
-The following changes since commit 65f33b35722952fa076811d5686bfd8a611a80fa:
+Yep, added for 5.11 pending.
 
-  block: fix incorrect branching in blk_max_size_offset() (2020-12-04 17:27:42 -0500)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-5.11/dm-changes
-
-for you to fetch changes up to b77709237e72d6467fb27bfbad163f7221ecd648:
-
-  dm cache: simplify the return expression of load_mapping() (2020-12-22 09:54:48 -0500)
-
-Please pull, thanks.
-Mike
-
-----------------------------------------------------------------
-- Add DM verity support for signature verification with 2nd keyring.
-
-- Fix DM verity to skip verity work if IO completes with error while
-  system is shutting down.
-
-- Add new DM multipath "IO affinity" path selector that maps IO
-  destined to a given path to a specific CPU based on user provided
-  mapping.
-
-- Rename DM multipath path selector source files to have "dm-ps"
-  prefix.
-
-- Add REQ_NOWAIT support to some other simple DM targets that don't
-  block in more elaborate ways waiting for IO.
-
-- Export DM crypt's kcryptd workqueue via sysfs (WQ_SYSFS).
-
-- Fix error return code in DM's target_message() if empty message is
-  received.
-
-- A handful of other small cleanups.
-
-----------------------------------------------------------------
-Antonio Quartulli (1):
-      dm ebs: avoid double unlikely() notation when using IS_ERR()
-
-Hyeongseok Kim (1):
-      dm verity: skip verity work if I/O error when system is shutting down
-
-Jeffle Xu (3):
-      dm: remove unnecessary current->bio_list check when submitting split bio
-      dm: add support for REQ_NOWAIT to various targets
-      dm crypt: export sysfs of kcryptd workqueue
-
-Mickaël Salaün (1):
-      dm verity: Add support for signature verification with 2nd keyring
-
-Mike Christie (1):
-      dm mpath: add IO affinity path selector
-
-Mike Snitzer (1):
-      dm: rename multipath path selector source files to have "dm-ps" prefix
-
-Qinglang Miao (1):
-      dm ioctl: fix error return code in target_message
-
-Rikard Falkeborn (1):
-      dm crypt: Constify static crypt_iv_operations
-
-Zheng Yongjun (1):
-      dm cache: simplify the return expression of load_mapping()
-
- Documentation/admin-guide/device-mapper/verity.rst |   7 +-
- drivers/md/Kconfig                                 |  22 +-
- drivers/md/Makefile                                |  20 +-
- drivers/md/dm-cache-target.c                       |   7 +-
- drivers/md/dm-crypt.c                              |  13 +-
- drivers/md/dm-ebs-target.c                         |   2 +-
- drivers/md/dm-ioctl.c                              |   1 +
- ...vice-time.c => dm-ps-historical-service-time.c} |   0
- drivers/md/dm-ps-io-affinity.c                     | 272 +++++++++++++++++++++
- .../md/{dm-queue-length.c => dm-ps-queue-length.c} |   0
- .../md/{dm-round-robin.c => dm-ps-round-robin.c}   |   0
- .../md/{dm-service-time.c => dm-ps-service-time.c} |   0
- drivers/md/dm-stripe.c                             |   2 +-
- drivers/md/dm-switch.c                             |   1 +
- drivers/md/dm-unstripe.c                           |   1 +
- drivers/md/dm-verity-target.c                      |  12 +-
- drivers/md/dm-verity-verify-sig.c                  |   9 +-
- drivers/md/dm-zero.c                               |   1 +
- drivers/md/dm.c                                    |   2 +-
- 19 files changed, 345 insertions(+), 27 deletions(-)
- rename drivers/md/{dm-historical-service-time.c => dm-ps-historical-service-time.c} (100%)
- create mode 100644 drivers/md/dm-ps-io-affinity.c
- rename drivers/md/{dm-queue-length.c => dm-ps-queue-length.c} (100%)
- rename drivers/md/{dm-round-robin.c => dm-ps-round-robin.c} (100%)
- rename drivers/md/{dm-service-time.c => dm-ps-service-time.c} (100%)
+-- 
+Jens Axboe
 
