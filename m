@@ -6,61 +6,115 @@ X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC3ECC433DB
-	for <linux-block@archiver.kernel.org>; Tue, 22 Dec 2020 11:13:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B75FDC433DB
+	for <linux-block@archiver.kernel.org>; Tue, 22 Dec 2020 11:16:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 90D1223124
-	for <linux-block@archiver.kernel.org>; Tue, 22 Dec 2020 11:13:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9323D22516
+	for <linux-block@archiver.kernel.org>; Tue, 22 Dec 2020 11:16:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726463AbgLVLM5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Dec 2020 06:12:57 -0500
-Received: from smtp.hosts.co.uk ([85.233.160.19]:44108 "EHLO smtp.hosts.co.uk"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726095AbgLVLM5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Dec 2020 06:12:57 -0500
-Received: from host86-149-69-253.range86-149.btcentralplus.com ([86.149.69.253] helo=[192.168.1.65])
-        by smtp.hosts.co.uk with esmtpa (Exim)
-        (envelope-from <antlists@youngman.org.uk>)
-        id 1krfaQ-000BhF-5h; Tue, 22 Dec 2020 11:12:14 +0000
-Subject: Re: [RFC PATCH] badblocks: Improvement badblocks_set() for handling
- multiple ranges
-To:     Coly Li <colyli@suse.de>, axboe@kernel.dk,
-        dan.j.williams@intel.com, vishal.l.verma@intel.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-raid@vger.kernel.org, linux-nvdimm@lists.01.org
-References: <20201203171535.67715-1-colyli@suse.de>
- <3f4bf4c4-1f1f-b1a6-5d91-2dbe02f61e67@youngman.org.uk>
- <c50e7c65-d7bf-e957-d8eb-efed6c24f089@suse.de>
-From:   antlists <antlists@youngman.org.uk>
-Message-ID: <3233b821-4674-b45a-cad4-4943401eff3d@youngman.org.uk>
-Date:   Tue, 22 Dec 2020 11:12:14 +0000
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        id S1726633AbgLVLQu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Dec 2020 06:16:50 -0500
+Received: from frasgout.his.huawei.com ([185.176.79.56]:2278 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726179AbgLVLQu (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 22 Dec 2020 06:16:50 -0500
+Received: from fraeml737-chm.china.huawei.com (unknown [172.18.147.207])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4D0Ybg20Yxz67PcC;
+        Tue, 22 Dec 2020 19:13:03 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml737-chm.china.huawei.com (10.206.15.218) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Tue, 22 Dec 2020 12:16:08 +0100
+Received: from [10.47.1.120] (10.47.1.120) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2106.2; Tue, 22 Dec
+ 2020 11:16:07 +0000
+Subject: Re: [RFC PATCH v2 2/2] blk-mq: Lockout tagset iter when freeing rqs
+To:     Bart Van Assche <bvanassche@acm.org>, <axboe@kernel.dk>,
+        <ming.lei@redhat.com>
+CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <hch@lst.de>, <hare@suse.de>, <ppvk@codeaurora.org>,
+        <kashyap.desai@broadcom.com>, <linuxarm@huawei.com>
+References: <1608203273-170555-1-git-send-email-john.garry@huawei.com>
+ <1608203273-170555-3-git-send-email-john.garry@huawei.com>
+ <df44b73d-6c42-87ee-3c25-b95a44712e05@acm.org>
+ <4d2004bb-4444-7a63-7c72-1759e3037cfd@huawei.com>
+ <31de2806-bbc1-dcc3-b9eb-ce9257420432@acm.org>
+ <b2edab2b-8af7-816d-9da2-4720d19b96f8@huawei.com>
+ <e97a0603-f9e3-1b00-4a09-c569d4f73d7b@acm.org>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <f98fd31e-89d4-523f-df70-4bd5f39ccbd5@huawei.com>
+Date:   Tue, 22 Dec 2020 11:15:20 +0000
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-In-Reply-To: <c50e7c65-d7bf-e957-d8eb-efed6c24f089@suse.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
+In-Reply-To: <e97a0603-f9e3-1b00-4a09-c569d4f73d7b@acm.org>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.47.1.120]
+X-ClientProxiedBy: lhreml716-chm.china.huawei.com (10.201.108.67) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 20/12/2020 09:46, Coly Li wrote:
-> Currently blocks/badblocks.c is used by md raid and nvdimm code, and the
-> badblocks table is irrelevant to any of these two subsystems.
-
-Good to know.
+On 22/12/2020 02:13, Bart Van Assche wrote:
+> On 12/21/20 10:47 AM, John Garry wrote:
+>> Yes, I agree, and I'm not sure what I wrote to give that impression.
+>>
+>> About "root partition", above, I'm just saying that / is mounted on a
+>> sda partition:
+>>
+>> root@ubuntu:/home/john# mount | grep sda
+>> /dev/sda2 on / type ext4 (rw,relatime,errors=remount-ro,stripe=32)
+>> /dev/sda1 on /boot/efi type vfat
+>> (rw,relatime,fmask=0077,dmask=0077,codepage=437,iocharset=iso8859-1,shortname=mixed,errors=remount-ro)
+> Hi John,
 > 
-> If there will be better code for similar or better functionality, it
-> should be cool. For me, if the reporting bug is fixed, no difference in
-> my view:-)
+
+Hi Bart, Ming,
+
+> Thanks for the clarification. I want to take back my suggestion about
+> adding rcu_read_lock() / rcu_read_unlock() in blk_mq_tagset_busy_iter()
+> since it is not allowed to sleep inside an RCU read-side critical
+> section, since blk_mq_tagset_busy_iter() is used in request timeout
+> handling and since there may be blk_mq_ops.timeout implementations that
+> sleep.
+
+Yes, that's why I was going with atomic, rather than some 
+synchronization primitive which may sleep.
+
 > 
-Hopefully that will improve the badblocks handling in md. Sounds like 
-that could in part be the problems we've been seeing.
+> Ming's suggestion to serialize blk_mq_tagset_busy_iter() and
+> blk_mq_free_rqs() looks interesting to me.
+> 
 
-If I integrate dm-integrity into md, badblocks should be mutually 
-exclusive with it, but because dm-integrity is both a performance and 
-disk-space hit, people might well not want to enable it.
+So then we could have something like this:
 
-Cheers,
-Wol
+---8<---
+
+  -435,9 +444,13 @@ void blk_mq_queue_tag_busy_iter(struct request_queue 
+*q, busy_iter_fn *fn,
+	if (!blk_mq_hw_queue_mapped(hctx))
+			continue;
+
++	while (!atomic_inc_not_zero(&tags->iter_usage_counter));
++
+	if (tags->nr_reserved_tags)
+		bt_for_each(hctx, tags->breserved_tags, fn, priv, true);
+	bt_for_each(hctx, tags->bitmap_tags, fn, priv, false);
+
++	atomic_dec(&tags->iter_usage_counter);
+}
+
+blk_queue_exit(q);
+
+--->8---
+
+And similar for blk_mq_tagset_busy_iter(). How about it?
+
+Thanks,
+John
