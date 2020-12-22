@@ -2,121 +2,103 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9A54C4332B
-	for <linux-block@archiver.kernel.org>; Tue, 22 Dec 2020 14:16:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52A90C433E9
+	for <linux-block@archiver.kernel.org>; Tue, 22 Dec 2020 14:56:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AE3E323139
-	for <linux-block@archiver.kernel.org>; Tue, 22 Dec 2020 14:16:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1A2342312E
+	for <linux-block@archiver.kernel.org>; Tue, 22 Dec 2020 14:56:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727094AbgLVOPw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Dec 2020 09:15:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37458 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726802AbgLVOPv (ORCPT
+        id S1727917AbgLVOzK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Dec 2020 09:55:10 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54803 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727801AbgLVOzI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Dec 2020 09:15:51 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B92EC0613D3;
-        Tue, 22 Dec 2020 06:15:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=IGeyzIyslymkVZrOh/vnAkBCRf5syQaFMRZEQvrriys=; b=p9GqVWfb1C0KSz9SZ5xoF5rfSz
-        rz++tDusxtSVuHNwTrRvLHlkXdWgKSF87T+mHUcLcSiXoMl+eqyzba+9gm3Tc0+YzXhKIzKvzBUz1
-        aL8g89CCgdjrRJ4J5WqlP6+8BR+y9eXBMRKR5XwNS2ua40rm7i9p5L/xlBVro3ZQ6OxaDrx/eMioJ
-        IPcnOGrhse9KpwbBREggJMmpVDW17ZRkqbEf1RvumXBgWIMxYKMdl/ntzaBjIzhWzxqY+S38GZ4Jt
-        ry9S+EQFO47DLJ9SMIPFrS5gFwxWREoRUjX2wUka0kuRN2NhFTlBKUFTiDUxleHJdLef89fFNXw7l
-        DWVzm12Q==;
-Received: from hch by casper.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1kriRR-0004QG-41; Tue, 22 Dec 2020 14:15:09 +0000
-Date:   Tue, 22 Dec 2020 14:15:09 +0000
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Pavel Begunkov <asml.silence@gmail.com>
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Jonathan Corbet <corbet@lwn.net>, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org,
-        linux-kernel@vger.kernel.org, target-devel@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: Re: [PATCH v1 6/6] block/iomap: don't copy bvec for direct IO
-Message-ID: <20201222141509.GF13079@infradead.org>
-References: <cover.1607976425.git.asml.silence@gmail.com>
- <498b34d746627e874740d8315b2924880c46dbc3.1607976425.git.asml.silence@gmail.com>
+        Tue, 22 Dec 2020 09:55:08 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1608648822;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=eqMIkvTz7uu9Y4W+7+KTuA9zT7kqeu1yghivuXElVxY=;
+        b=AnTlJ8iLzKCArnKAfgleyfDTWcgMkgxTWz7Uf13C+mc/yRf0jMUnK28rcb6Tf145ZXNp0f
+        +Ecp8CT7yJm7racLxuRoBKKWXgOfjxu9jm1BPPPhZmLrys2GLz529izkbHIMdpCVakdGyA
+        ddwX4qoGdekAu6qe96AY+xd3XMjVmVw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-165-fH06cAeYNqitoxiEO983TA-1; Tue, 22 Dec 2020 09:53:37 -0500
+X-MC-Unique: fH06cAeYNqitoxiEO983TA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 666E5800D62;
+        Tue, 22 Dec 2020 14:53:36 +0000 (UTC)
+Received: from localhost (unknown [10.18.25.174])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id C21AC5D9CC;
+        Tue, 22 Dec 2020 14:53:27 +0000 (UTC)
+Date:   Tue, 22 Dec 2020 09:53:27 -0500
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
+        dm-devel@redhat.com
+Cc:     Stephen Rothwell <sfr@canb.auug.org.au>,
+        Alasdair G Kergon <agk@redhat.com>,
+        Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: DM's filesystem lookup in dm_get_dev_t() [was: Re: linux-next:
+ manual merge of the device-mapper tree with Linus' tree]
+Message-ID: <20201222145327.GC12885@redhat.com>
+References: <20201222095056.7a5ac0a0@canb.auug.org.au>
+ <20201222131528.GA29822@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <498b34d746627e874740d8315b2924880c46dbc3.1607976425.git.asml.silence@gmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20201222131528.GA29822@lst.de>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Dec 15, 2020 at 12:20:25AM +0000, Pavel Begunkov wrote:
-> The block layer spends quite a while in blkdev_direct_IO() to copy and
-> initialise bio's bvec. However, if we've already got a bvec in the input
-> iterator it might be reused in some cases, i.e. when new
-> ITER_BVEC_FLAG_FIXED flag is set. Simple tests show considerable
-> performance boost, and it also reduces memory footprint.
+[added linux-block and dm-devel, if someone replies to this email to
+continue "proper discussion" _please_ at least drop sfr and linux-next
+from Cc]
+
+On Tue, Dec 22 2020 at  8:15am -0500,
+Christoph Hellwig <hch@lst.de> wrote:
+
+> Mike, Hannes,
 > 
-> Suggested-by: Matthew Wilcox <willy@infradead.org>
-> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-> ---
->  Documentation/filesystems/porting.rst |  9 ++++
->  block/bio.c                           | 64 +++++++++++----------------
->  include/linux/bio.h                   |  3 ++
->  3 files changed, 38 insertions(+), 38 deletions(-)
-> 
-> diff --git a/Documentation/filesystems/porting.rst b/Documentation/filesystems/porting.rst
-> index 867036aa90b8..47a622879952 100644
-> --- a/Documentation/filesystems/porting.rst
-> +++ b/Documentation/filesystems/porting.rst
-> @@ -865,3 +865,12 @@ no matter what.  Everything is handled by the caller.
->  
->  clone_private_mount() returns a longterm mount now, so the proper destructor of
->  its result is kern_unmount() or kern_unmount_array().
-> +
-> +---
-> +
-> +**mandatory**
-> +
-> +For bvec based itererators bio_iov_iter_get_pages() now doesn't copy bvecs but
-> +uses the one provided. Anyone issuing kiocb-I/O should ensure that the bvec and
-> +page references stay until I/O has completed, i.e. until ->ki_complete() has
-> +been called or returned with non -EIOCBQUEUED code.
-> diff --git a/block/bio.c b/block/bio.c
-> index 3192358c411f..f8229be24562 100644
-> --- a/block/bio.c
-> +++ b/block/bio.c
-> @@ -960,25 +960,16 @@ void bio_release_pages(struct bio *bio, bool mark_dirty)
->  }
->  EXPORT_SYMBOL_GPL(bio_release_pages);
->  
-> +static int bio_iov_bvec_set(struct bio *bio, struct iov_iter *iter)
->  {
-> +	WARN_ON_ONCE(BVEC_POOL_IDX(bio) != 0);
-> +	bio->bi_vcnt = iter->nr_segs;
-> +	bio->bi_max_vecs = iter->nr_segs;
-> +	bio->bi_io_vec = (struct bio_vec *)iter->bvec;
-> +	bio->bi_iter.bi_bvec_done = iter->iov_offset;
-> +	bio->bi_iter.bi_size = iter->count;
+> I think this patch is rather harmful.  Why does device mapper even
+> mix file system path with a dev_t and all the other weird forms
+> parsed by name_to_dev_t, which was supposed to be be for the early
+> init code where no file system is available.
 
-Nit: I find an empty liner after WARN_ON_ONCE that assert the caller
-state very helpful when reading the code.
+OK, I'll need to revisit (unless someone beats me to it) because this
+could've easily been a blind-spot for me when the dm-init code went in.
+Any dm-init specific enabling interface shouldn't be used by more
+traditional DM interfaces.  So Hannes' change might be treating symptom
+rather than the core problem (which would be better treated by factoring
+out dm-init requirements for a name_to_dev_t()-like interface?).
 
->  static inline int bio_iov_vecs_to_alloc(struct iov_iter *iter, int max_segs)
->  {
-> +	/* reuse iter->bvec */
+DM has supported passing maj:min and blockdev names on DM table lines
+forever... so we'll need to be very specific about where/why things
+regressed.
 
-Maybe add a ", see bio_iov_bvec_set for details" here?
+> Can we please kick off a proper discussion for this on the linux-block
+> list?
+
+Sure, done. But I won't drive that discussion in the near-term. I need
+to take some time off for a few weeks.
+
+In the meantime I'll drop Hannes' patch for 5.11; I'm open to an
+alternative fix that I'd pickup during 5.11-rcX.
+
+Thanks,
+Mike
+
