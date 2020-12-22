@@ -5,86 +5,86 @@ X-Spam-Level:
 X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DATE_IN_PAST_06_12,
 	DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED8E2C43381
-	for <linux-block@archiver.kernel.org>; Tue, 22 Dec 2020 07:06:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9430C432C3
+	for <linux-block@archiver.kernel.org>; Tue, 22 Dec 2020 07:06:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B5E182312D
-	for <linux-block@archiver.kernel.org>; Tue, 22 Dec 2020 07:06:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7ED012312E
+	for <linux-block@archiver.kernel.org>; Tue, 22 Dec 2020 07:06:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726256AbgLVHGe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Dec 2020 02:06:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56248 "EHLO
+        id S1726300AbgLVHGp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Dec 2020 02:06:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726123AbgLVHGd (ORCPT
+        with ESMTP id S1725850AbgLVHGp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Dec 2020 02:06:33 -0500
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DABADC0619D6
-        for <linux-block@vger.kernel.org>; Mon, 21 Dec 2020 23:05:48 -0800 (PST)
-Received: by mail-pl1-x636.google.com with SMTP id g3so6965324plp.2
-        for <linux-block@vger.kernel.org>; Mon, 21 Dec 2020 23:05:48 -0800 (PST)
+        Tue, 22 Dec 2020 02:06:45 -0500
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31D21C0611CF
+        for <linux-block@vger.kernel.org>; Mon, 21 Dec 2020 23:05:26 -0800 (PST)
+Received: by mail-pf1-x429.google.com with SMTP id f9so7907087pfc.11
+        for <linux-block@vger.kernel.org>; Mon, 21 Dec 2020 23:05:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=broadcom.com; s=google;
         h=mime-version:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=hltaeyWXmOH6gS0SwSiOWgcryp48LsCUDn5rKwAvex4=;
-        b=ZTJOxNmjrVA/G52NZPbn4EAaVwX3IlrJZEMwL5IhR+1MWu5L8vlhOE+9ORc4aMF2HV
-         glMuPrJeNoAvr8OGphOFhopGAnDZfwrZaR/gaYDAgoY0iUizvBzozO7t24PaUa+YKloR
-         u4gd60eU0wJ63NCU6WmOpCvty5REAHtQgD2eY=
+        bh=+NLfeQbYOT+MT1mOtUVLwE8Ugpo1nJhC9RRuHP9/t6Y=;
+        b=hubJ0gjR4a3QLA78227CdMvGYmC6zgaNv44l3NruQnqbb4oonp8un50s6Hk2G9+k+p
+         9SQkiYy4A4WReu7eE7lAybI7hkVpEwIzhC8Eynpws1/zF7Nu8zWUOee3FAtT5JT65zBl
+         iFZWjlDamYCubyPsK8dv7RuvqeVSChyJkpULI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:from:to:cc:subject:date:message-id
          :in-reply-to:references;
-        bh=hltaeyWXmOH6gS0SwSiOWgcryp48LsCUDn5rKwAvex4=;
-        b=FZHT8T7qvQthrC0xMXePiQz2ri/Xqr9gl5RQiNFOCLJ8IJpxCEQmE89OumdTB1wBHU
-         0dAurZ6eqY71qvm57bpmQg2Y71razqboEJ3SG0Kt7sLRUJd3+4ercf723kcs5DjlAIbR
-         VkGrNNT7kaGwMd4pUrZvYlJOy+1u86CJzbVRfX/xc17iAGKH6gMUgorRaHRdNM5ePjgW
-         ZYlE7FUkGVxlhfXUHpkCuBh/5IjWP0KAP3tP5PMgC49NfaLKbh6E0w0EPtnIBmcMgiT6
-         EBhmBAs69UY/QWUXkue62Czxk1de6LqkNpFTwqjmGujRAOVaNhPaFa8epMuJwZfOPaET
-         7Vgg==
-X-Gm-Message-State: AOAM53292hKBBzGRnWbBRs7WUQxR1H97X2YfjGM2+xMqr+rUaQKlJaVD
-        aDA0iOaYEupbl2qR1DJXU54Sg+xfeqkDg92vDIcs1ZHEXsBnECxrOYvQ3EoRfpHlbd7jxvBdJrz
-        bWzMLOqBiSMSRyMR7Q7f1ixSSeZDrRM6SyxQhxwONK2+UiFlqmoMkDthc/aQ6nK8o5BJQmkpb79
-        y+zyF95DPw1DoR
+        bh=+NLfeQbYOT+MT1mOtUVLwE8Ugpo1nJhC9RRuHP9/t6Y=;
+        b=nxQ8s9j5s93c4iDT+7oosyU1vPeIy5Vpan+kaCKZ39Tw0YMHDKmy6kM5pgfn+lN3j5
+         m7lH2VIS3EaeJ1WqzR9m6gifyqcKGMopJXO8CzDM+dNNpGvJLjFUmKoeiJaKOp/qWtKQ
+         K54poGDBvpOFyXsoVFbnmaM0or8sEjlgWNmoo+Ea10qvj8sUg32jdCwxWZJZnmfN58V+
+         NKpmctCwU7wYNVlnUygrlkTM6PF5IPhF6Y5OboYhu7mugrGp52D2wsjLpOpXTzjB3Cv9
+         Hb9q+tI8RfcyN3sZIs2XKc2Zgb3Die8mSrbO0XW1W6HlHyjHxJnHDWv3+vjVe5fkwS7/
+         vgew==
+X-Gm-Message-State: AOAM531BrsvvYMctyOK/Pg/Ji7qJi0KjDG21SiwqjOJw2dCBGlj/cZAw
+        oXSNttNfwSsDKr6qeuwyV867+P9kLraU2X2UQ7CbcjktEuLthKbUVfE7F1M26PmdvK9H+Axz3qu
+        CJv3GmojN2g1fO45j0iya000eXouX2vMlFaGzxg/vmmkWKvaXUJPbcSr2heVLTe4g4sftkz5SuA
+        aQqGGXU0IUJiCg
 MIME-Version: 1.0
-X-Google-Smtp-Source: ABdhPJwfoQalTltke74oJx7cztqkx1PQvIrPTPXzo5Pv43BgLNSj2+Vdz8UTS5agYMhDq61SklaASg==
-X-Received: by 2002:a17:90a:b395:: with SMTP id e21mr20929169pjr.197.1608620747779;
-        Mon, 21 Dec 2020 23:05:47 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwD0aF7YWOswWSg/MjSgm/Ea0GZO1zBEqaJqK3FwXYhEBO6UIxhPe6cDgNluhr3pvj6aV+BJA==
+X-Received: by 2002:aa7:8d86:0:b029:19e:cb57:2849 with SMTP id i6-20020aa78d860000b029019ecb572849mr18842062pfr.54.1608620725190;
+        Mon, 21 Dec 2020 23:05:25 -0800 (PST)
 Received: from localhost.localdomain ([192.19.234.250])
-        by smtp.gmail.com with ESMTPSA id t9sm12466082pgh.41.2020.12.21.23.05.43
+        by smtp.gmail.com with ESMTPSA id t9sm12466082pgh.41.2020.12.21.23.05.20
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 21 Dec 2020 23:05:47 -0800 (PST)
+        Mon, 21 Dec 2020 23:05:24 -0800 (PST)
 From:   Muneendra <muneendra.kumar@broadcom.com>
 To:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
         tj@kernel.org, linux-nvme@lists.infradead.org, hare@suse.de
 Cc:     jsmart2021@gmail.com, emilne@redhat.com, mkumar@redhat.com,
         pbonzini@redhat.com,
         Gaurav Srivastava <gaurav.srivastava@broadcom.com>
-Subject: [PATCH v6 12/16] lpfc: vmid: Appends the vmid in the wqe before sending
-Date:   Tue, 22 Dec 2020 05:41:54 +0530
-Message-Id: <1608595918-21954-13-git-send-email-muneendra.kumar@broadcom.com>
+Subject: [PATCH v6 07/16] lpfc: vmid: VMID params initialization
+Date:   Tue, 22 Dec 2020 05:41:49 +0530
+Message-Id: <1608595918-21954-8-git-send-email-muneendra.kumar@broadcom.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1608595918-21954-1-git-send-email-muneendra.kumar@broadcom.com>
 References: <1608595918-21954-1-git-send-email-muneendra.kumar@broadcom.com>
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-        boundary="00000000000048e73105b708344b"
+        boundary="000000000000ef322d05b70832f5"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---00000000000048e73105b708344b
+--000000000000ef322d05b70832f5
 Content-Type: text/plain; charset="US-ASCII"
 
 From: Gaurav Srivastava <gaurav.srivastava@broadcom.com>
 
-This patch adds the vmid in wqe before sending out the request.
-The type of vmid depends on the configured type and is checked before
-being appended.
+This patch initializes the VMID parameters like the type of vmid, max
+number of vmids supported and timeout value for the vmid registration
+based on the user input.
 
-Signed-off-by: Gaurav Srivastava  <gaurav.srivastava@broadcom.com>
+Signed-off-by: Gaurav Srivastava <gaurav.srivastava@broadcom.com>
 Signed-off-by: James Smart <jsmart2021@gmail.com>
 
 ---
@@ -92,7 +92,7 @@ v6:
 No change
 
 v5:
-Modified the comments
+No change
 
 v4:
 No change
@@ -103,104 +103,81 @@ No change
 v2:
 Ported the patch on top of 5.10/scsi-queue
 ---
- drivers/scsi/lpfc/lpfc_sli.c | 56 +++++++++++++++++++++++++++++++++++-
- 1 file changed, 55 insertions(+), 1 deletion(-)
+ drivers/scsi/lpfc/lpfc_attr.c | 47 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 47 insertions(+)
 
-diff --git a/drivers/scsi/lpfc/lpfc_sli.c b/drivers/scsi/lpfc/lpfc_sli.c
-index f9b6e32db618..a63371e9feaa 100644
---- a/drivers/scsi/lpfc/lpfc_sli.c
-+++ b/drivers/scsi/lpfc/lpfc_sli.c
-@@ -3856,7 +3856,7 @@ lpfc_sli_sp_handle_rspiocb(struct lpfc_hba *phba, struct lpfc_sli_ring *pring,
+diff --git a/drivers/scsi/lpfc/lpfc_attr.c b/drivers/scsi/lpfc/lpfc_attr.c
+index 4528166dee36..d8cca950fa3b 100644
+--- a/drivers/scsi/lpfc/lpfc_attr.c
++++ b/drivers/scsi/lpfc/lpfc_attr.c
+@@ -6151,6 +6151,44 @@ LPFC_ATTR_RW(enable_dpp, 1, 0, 1, "Enable Direct Packet Push");
+  */
+ LPFC_ATTR_R(enable_mi, 1, 0, 1, "Enable MI");
  
- 		if (irsp->ulpStatus) {
- 			/* Rsp ring <ringno> error: IOCB */
--			lpfc_printf_log(phba, KERN_WARNING, LOG_SLI,
-+			lpfc_printf_log(phba, KERN_ERR, LOG_SLI,
- 					"0328 Rsp Ring %d error: "
- 					"IOCB Data: "
- 					"x%x x%x x%x x%x "
-@@ -9762,6 +9762,8 @@ lpfc_sli4_iocb2wqe(struct lpfc_hba *phba, struct lpfc_iocbq *iocbq,
- 				*pcmd == ELS_CMD_RSCN_XMT ||
- 				*pcmd == ELS_CMD_FDISC ||
- 				*pcmd == ELS_CMD_LOGO ||
-+				*pcmd == ELS_CMD_QFPA ||
-+				*pcmd == ELS_CMD_UVEM ||
- 				*pcmd == ELS_CMD_PLOGI)) {
- 				bf_set(els_req64_sp, &wqe->els_req, 1);
- 				bf_set(els_req64_sid, &wqe->els_req,
-@@ -9893,6 +9895,24 @@ lpfc_sli4_iocb2wqe(struct lpfc_hba *phba, struct lpfc_iocbq *iocbq,
- 			ptr = &wqe->words[22];
- 			memcpy(ptr, fcp_cmnd, sizeof(struct fcp_cmnd));
- 		}
++/*
++ * lpfc_max_vmid: Maximum number of VMs to be tagged. This is valid only if
++ * either vmid_app_header or vmid_priority_tagging is enabled.
++ *       4 - 255  = vmid support enabled for 4-255 VMs
++ *       Value range is [4,255].
++ */
++LPFC_ATTR_RW(max_vmid, LPFC_MIN_VMID, LPFC_MIN_VMID, LPFC_MAX_VMID,
++	     "Maximum number of VMs supported");
 +
-+		/* add the VMID tags as per switch response */
-+		if (iocbq->iocb_flag & LPFC_IO_VMID) {
-+			union lpfc_wqe128 *wqe128;
++/*
++ * lpfc_vmid_inactivity_timeout: Inactivity timeout duration in hours
++ *       0  = Timeout is disabled
++ * Value range is [0,24].
++ */
++LPFC_ATTR_RW(vmid_inactivity_timeout, 4, 0, 24,
++	     "Inactivity timeout in hours");
 +
-+			if (phba->pport->vmid_priority_tagging) {
-+				bf_set(wqe_ccpe, &wqe->fcp_iwrite.wqe_com, 1);
-+				bf_set(wqe_ccp, &wqe->fcp_iwrite.wqe_com,
-+				       (iocbq->vmid_tag.cs_ctl_vmid));
-+				/* Bit 0 must be 0 */
-+			} else {
-+				wqe128 = (union lpfc_wqe128 *)wqe;
-+				bf_set(wqe_appid, &wqe->fcp_iwrite.wqe_com, 1);
-+				bf_set(wqe_wqes, &wqe128->fcp_iwrite.wqe_com,
-+				       1);
-+				wqe128->words[31] = iocbq->vmid_tag.app_id;
-+			}
-+		}
- 		break;
- 	case CMD_FCP_IREAD64_CR:
- 		/* word3 iocb=iotag wqe=payload_offset_len */
-@@ -9957,6 +9977,23 @@ lpfc_sli4_iocb2wqe(struct lpfc_hba *phba, struct lpfc_iocbq *iocbq,
- 			ptr = &wqe->words[22];
- 			memcpy(ptr, fcp_cmnd, sizeof(struct fcp_cmnd));
- 		}
++/*
++ * lpfc_vmid_app_header: Enable App Header VMID support
++ *       0  = Support is disabled (default)
++ *       1  = Support is enabled
++ * Value range is [0,1].
++ */
++LPFC_ATTR_RW(vmid_app_header, LPFC_VMID_APP_HEADER_DISABLE,
++	     LPFC_VMID_APP_HEADER_DISABLE, LPFC_VMID_APP_HEADER_ENABLE,
++	     "Enable App Header VMID support");
 +
-+		/* add the VMID tags as per switch response */
-+		if (iocbq->iocb_flag & LPFC_IO_VMID) {
-+			union lpfc_wqe128 *wqe128;
++/*
++ * lpfc_vmid_priority_tagging: Enable Priority Tagging VMID support
++ *       0  = Support is disabled (default)
++ *       1  = Support is enabled
++ * Value range is [0,1]..
++ */
++LPFC_ATTR_RW(vmid_priority_tagging, LPFC_VMID_PRIO_TAG_DISABLE,
++	     LPFC_VMID_PRIO_TAG_DISABLE,
++	     LPFC_VMID_PRIO_TAG_ALL_TARGETS,
++	     "Enable Priority Tagging VMID support");
 +
-+			if (phba->pport->vmid_priority_tagging) {
-+				bf_set(wqe_ccpe, &wqe->fcp_iread.wqe_com, 1);
-+				bf_set(wqe_ccp, &wqe->fcp_iread.wqe_com,
-+				       (iocbq->vmid_tag.cs_ctl_vmid));
-+				/* Bit 0 must be 0 */
-+			} else {
-+				wqe128 = (union lpfc_wqe128 *)wqe;
-+				bf_set(wqe_appid, &wqe->fcp_iread.wqe_com, 1);
-+				bf_set(wqe_wqes, &wqe128->fcp_iread.wqe_com, 1);
-+				wqe128->words[31] = iocbq->vmid_tag.app_id;
-+			}
-+		}
- 		break;
- 	case CMD_FCP_ICMND64_CR:
- 		/* word3 iocb=iotag wqe=payload_offset_len */
-@@ -10014,6 +10051,23 @@ lpfc_sli4_iocb2wqe(struct lpfc_hba *phba, struct lpfc_iocbq *iocbq,
- 			ptr = &wqe->words[22];
- 			memcpy(ptr, fcp_cmnd, sizeof(struct fcp_cmnd));
- 		}
-+
-+		/* add the VMID tags as per switch response */
-+		if (iocbq->iocb_flag & LPFC_IO_VMID) {
-+			union lpfc_wqe128 *wqe128;
-+
-+			if (phba->pport->vmid_priority_tagging) {
-+				bf_set(wqe_ccpe, &wqe->fcp_icmd.wqe_com, 1);
-+				bf_set(wqe_ccp, &wqe->fcp_icmd.wqe_com,
-+				       (iocbq->vmid_tag.cs_ctl_vmid));
-+				/* Bit 0 must be 0 */
-+			} else {
-+				wqe128 = (union lpfc_wqe128 *)wqe;
-+				bf_set(wqe_appid, &wqe->fcp_icmd.wqe_com, 1);
-+				bf_set(wqe_wqes, &wqe128->fcp_icmd.wqe_com, 1);
-+				wqe128->words[31] = iocbq->vmid_tag.app_id;
-+			}
-+		}
- 		break;
- 	case CMD_GEN_REQUEST64_CR:
- 		/* For this command calculate the xmit length of the
+ struct device_attribute *lpfc_hba_attrs[] = {
+ 	&dev_attr_nvme_info,
+ 	&dev_attr_scsi_stat,
+@@ -6269,6 +6307,10 @@ struct device_attribute *lpfc_hba_attrs[] = {
+ 	&dev_attr_lpfc_enable_bbcr,
+ 	&dev_attr_lpfc_enable_dpp,
+ 	&dev_attr_lpfc_enable_mi,
++	&dev_attr_lpfc_max_vmid,
++	&dev_attr_lpfc_vmid_inactivity_timeout,
++	&dev_attr_lpfc_vmid_app_header,
++	&dev_attr_lpfc_vmid_priority_tagging,
+ 	NULL,
+ };
+ 
+@@ -7328,6 +7370,11 @@ lpfc_get_cfgparam(struct lpfc_hba *phba)
+ 	lpfc_enable_hba_heartbeat_init(phba, lpfc_enable_hba_heartbeat);
+ 
+ 	lpfc_EnableXLane_init(phba, lpfc_EnableXLane);
++	/* VMID Inits */
++	lpfc_max_vmid_init(phba, lpfc_max_vmid);
++	lpfc_vmid_inactivity_timeout_init(phba, lpfc_vmid_inactivity_timeout);
++	lpfc_vmid_app_header_init(phba, lpfc_vmid_app_header);
++	lpfc_vmid_priority_tagging_init(phba, lpfc_vmid_priority_tagging);
+ 	if (phba->sli_rev != LPFC_SLI_REV4)
+ 		phba->cfg_EnableXLane = 0;
+ 	lpfc_XLanePriority_init(phba, lpfc_XLanePriority);
 -- 
 2.26.2
 
@@ -218,7 +195,7 @@ this e-mail is strictly prohibited. If you received this e-mail in error,
 please return the e-mail to the sender, delete it from your computer, and 
 destroy any printed copy of it.
 
---00000000000048e73105b708344b
+--000000000000ef322d05b70832f5
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -289,13 +266,13 @@ LbMkW5lUoTb8ycBNOKLYhNE8UEOY8jRTUtMEhzT6NJDEE+1hb3kSGfArrrF3Z8pRYiUUhcpC5GKL
 EpmWnHflnrBcah5Ozy137DGCAm8wggJrAgEBMG0wXTELMAkGA1UEBhMCQkUxGTAXBgNVBAoTEEds
 b2JhbFNpZ24gbnYtc2ExMzAxBgNVBAMTKkdsb2JhbFNpZ24gUGVyc29uYWxTaWduIDIgQ0EgLSBT
 SEEyNTYgLSBHMwIMX/krgFDQUQNyOf+1MA0GCWCGSAFlAwQCAQUAoIHUMC8GCSqGSIb3DQEJBDEi
-BCCe470slY3qEafPyt9F9RU0yOnpiiz/Z5RMRDmYnJ2fgjAYBgkqhkiG9w0BCQMxCwYJKoZIhvcN
-AQcBMBwGCSqGSIb3DQEJBTEPFw0yMDEyMjIwNzA1NDhaMGkGCSqGSIb3DQEJDzFcMFowCwYJYIZI
+BCCylLUZrgKI7Yj9EDPUzZY+0rhAnbp5OVfrBzK+pU0IRzAYBgkqhkiG9w0BCQMxCwYJKoZIhvcN
+AQcBMBwGCSqGSIb3DQEJBTEPFw0yMDEyMjIwNzA1MjVaMGkGCSqGSIb3DQEJDzFcMFowCwYJYIZI
 AWUDBAEqMAsGCWCGSAFlAwQBFjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJKoZIhvcNAQEK
-MAsGCSqGSIb3DQEBBzALBglghkgBZQMEAgEwDQYJKoZIhvcNAQEBBQAEggEArrBZowEiByEQRuTC
-Shbt7JqwisAOKB+kYk3MD9vfRpC1o4dY4N9fgq+eDSFnYP9lFubTcRbMT+SZh3QGyn53b7YUy9Fa
-Tf8pLYGzLglyz6pn+zeYFRxaGyVlekP9TloNSEpYLzqR1JY60T1GlcR2j5mMsHE0reQ0PKrD68Ty
-FP8If3wZYI+Jyj/8e7EC8QNsjnE3FizhHMVi5rje+QdOovAOk8Vc8br/nI9wMAjfbc/2Jchak2Ff
-UGVuRcMs8x8UEWq/6+1/6LTYoMzMOSJiZ9Wrek9AGrCfF5UGp/EFYp4RaEWoThOaoXatrJmfod4x
-CuaEGsQVfP8j7jZvQFCVrg==
---00000000000048e73105b708344b--
+MAsGCSqGSIb3DQEBBzALBglghkgBZQMEAgEwDQYJKoZIhvcNAQEBBQAEggEAc6dSGvLgACd5EAXZ
+a3kHwlIG2+rYVXIbMamwj1f4M7yfBOkVEGTOYkXYC7Rf4DF6/e6/cdfbk0qSegHV+OvxBjhwpmiV
+LmTnRgLarEdeqIiV3mK8L6HHk1l1B7g3Lih+TLPbiMYfE63KBPHvj8ChpNolUXzM21OVRgmxeQa7
+0KuHn3dBSo5raDO6N2hitolGrTkpgQqQIqkFaYfQq0nE+zoFBvw/adHAj/9GlTXlF7RV9eH2rzP5
+mQchHniqSf3XRieibwMryfxY5K6H/s+wVXMf9zUxLBIIrA1uRBsjPdi4gunbl7zz7WVY8A+W3a4/
+c+HVlEHS0CagTGf1gCiZsg==
+--000000000000ef322d05b70832f5--
