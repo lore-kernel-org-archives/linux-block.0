@@ -5,179 +5,124 @@ X-Spam-Level:
 X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DATE_IN_PAST_06_12,
 	DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9430C432C3
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45C86C4332E
 	for <linux-block@archiver.kernel.org>; Tue, 22 Dec 2020 07:06:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7ED012312E
+	by mail.kernel.org (Postfix) with ESMTP id 25BD92312E
 	for <linux-block@archiver.kernel.org>; Tue, 22 Dec 2020 07:06:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726300AbgLVHGp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Dec 2020 02:06:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56324 "EHLO
+        id S1726264AbgLVHGg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Dec 2020 02:06:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725850AbgLVHGp (ORCPT
+        with ESMTP id S1726123AbgLVHGf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Dec 2020 02:06:45 -0500
-Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31D21C0611CF
-        for <linux-block@vger.kernel.org>; Mon, 21 Dec 2020 23:05:26 -0800 (PST)
-Received: by mail-pf1-x429.google.com with SMTP id f9so7907087pfc.11
-        for <linux-block@vger.kernel.org>; Mon, 21 Dec 2020 23:05:26 -0800 (PST)
+        Tue, 22 Dec 2020 02:06:35 -0500
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E8CBC061285
+        for <linux-block@vger.kernel.org>; Mon, 21 Dec 2020 23:06:07 -0800 (PST)
+Received: by mail-pf1-x42e.google.com with SMTP id t8so7927335pfg.8
+        for <linux-block@vger.kernel.org>; Mon, 21 Dec 2020 23:06:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=broadcom.com; s=google;
         h=mime-version:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=+NLfeQbYOT+MT1mOtUVLwE8Ugpo1nJhC9RRuHP9/t6Y=;
-        b=hubJ0gjR4a3QLA78227CdMvGYmC6zgaNv44l3NruQnqbb4oonp8un50s6Hk2G9+k+p
-         9SQkiYy4A4WReu7eE7lAybI7hkVpEwIzhC8Eynpws1/zF7Nu8zWUOee3FAtT5JT65zBl
-         iFZWjlDamYCubyPsK8dv7RuvqeVSChyJkpULI=
+        bh=hD2siwu/ur6WEXw3toLaCRUpYXbZzDiq+jVJjQxhbPY=;
+        b=iM0jIqDeAb+hw+wug5AKTKbKJXW2FlM5qCwh7T2SBFMfg/P+j88/mb219MKeU0DSg1
+         X8hssUucNdrHFcQcpUxDszWMXpfhXd9WdPkveWIJ9PuPs9gw/2jojEN9Y0Z32VcXG/mR
+         ejhIkiMbKvtCMJ+05t7fwMmWi3irikOeTZHxw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:from:to:cc:subject:date:message-id
          :in-reply-to:references;
-        bh=+NLfeQbYOT+MT1mOtUVLwE8Ugpo1nJhC9RRuHP9/t6Y=;
-        b=nxQ8s9j5s93c4iDT+7oosyU1vPeIy5Vpan+kaCKZ39Tw0YMHDKmy6kM5pgfn+lN3j5
-         m7lH2VIS3EaeJ1WqzR9m6gifyqcKGMopJXO8CzDM+dNNpGvJLjFUmKoeiJaKOp/qWtKQ
-         K54poGDBvpOFyXsoVFbnmaM0or8sEjlgWNmoo+Ea10qvj8sUg32jdCwxWZJZnmfN58V+
-         NKpmctCwU7wYNVlnUygrlkTM6PF5IPhF6Y5OboYhu7mugrGp52D2wsjLpOpXTzjB3Cv9
-         Hb9q+tI8RfcyN3sZIs2XKc2Zgb3Die8mSrbO0XW1W6HlHyjHxJnHDWv3+vjVe5fkwS7/
-         vgew==
-X-Gm-Message-State: AOAM531BrsvvYMctyOK/Pg/Ji7qJi0KjDG21SiwqjOJw2dCBGlj/cZAw
-        oXSNttNfwSsDKr6qeuwyV867+P9kLraU2X2UQ7CbcjktEuLthKbUVfE7F1M26PmdvK9H+Axz3qu
-        CJv3GmojN2g1fO45j0iya000eXouX2vMlFaGzxg/vmmkWKvaXUJPbcSr2heVLTe4g4sftkz5SuA
-        aQqGGXU0IUJiCg
+        bh=hD2siwu/ur6WEXw3toLaCRUpYXbZzDiq+jVJjQxhbPY=;
+        b=XdIA9PfhGaxktZ+BOPrUwCgA8XjbkwM/h3d+oVlGrxP2Qqtv9+FXEsLl1IB2xOuN+r
+         lt5C+f0s4fXTL5lekog0MWEAU1YEPFYBsDRLSsgD7S4H89Gm0gsI+FKFlyEjT9h3uqdN
+         Eo3RQJWmy4uKMNyaAFmM2w3cGPCndL9rWousSl3aA4xLlUDhZZa9RCItUp6w6QwVpY17
+         hP593cDB7gIleSsiI1YeDrlS5uUYVDzWiTI9SnhmR0cemneqn3a1wBYGI4VNGKei2Nys
+         K3EoqjeczjGZmhMkbqxXRLzqS7wKkH/JVP6R1dAvQWIoVx5XsDhEQmMhaAxpbeYEPkAF
+         mIkw==
+X-Gm-Message-State: AOAM5311uYMlf29ZYc0NY+qfrzBjDeda9k1OfqPVWh+pLcs7WppeU4PJ
+        sURDDYJE6mM+EkftW0VSEuatYx4igqNT12qyo4jRYeeG2qy5tj17E4zzcbSsj5ELgYeJ+j4wwvr
+        rZ2+ihwMYZZjAkc6XFXGn0M6VDhfDZNclkJRwUqdwoQ/slPCL1trQ8/Du11/PSh2h+xzWwvDFHh
+        IDawhgsC1vqeZK
 MIME-Version: 1.0
-X-Google-Smtp-Source: ABdhPJwD0aF7YWOswWSg/MjSgm/Ea0GZO1zBEqaJqK3FwXYhEBO6UIxhPe6cDgNluhr3pvj6aV+BJA==
-X-Received: by 2002:aa7:8d86:0:b029:19e:cb57:2849 with SMTP id i6-20020aa78d860000b029019ecb572849mr18842062pfr.54.1608620725190;
-        Mon, 21 Dec 2020 23:05:25 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxJEgb9LzJO+hRw4mGVcGGwoFoOxJgQk4UwAWCeFOvckG9kVk1kDDYqo9BPM08mkBGYApLONw==
+X-Received: by 2002:a62:ddcd:0:b029:1a6:99ff:a75e with SMTP id w196-20020a62ddcd0000b02901a699ffa75emr18696477pff.42.1608620766073;
+        Mon, 21 Dec 2020 23:06:06 -0800 (PST)
 Received: from localhost.localdomain ([192.19.234.250])
-        by smtp.gmail.com with ESMTPSA id t9sm12466082pgh.41.2020.12.21.23.05.20
+        by smtp.gmail.com with ESMTPSA id t9sm12466082pgh.41.2020.12.21.23.06.01
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 21 Dec 2020 23:05:24 -0800 (PST)
+        Mon, 21 Dec 2020 23:06:05 -0800 (PST)
 From:   Muneendra <muneendra.kumar@broadcom.com>
 To:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
         tj@kernel.org, linux-nvme@lists.infradead.org, hare@suse.de
 Cc:     jsmart2021@gmail.com, emilne@redhat.com, mkumar@redhat.com,
-        pbonzini@redhat.com,
-        Gaurav Srivastava <gaurav.srivastava@broadcom.com>
-Subject: [PATCH v6 07/16] lpfc: vmid: VMID params initialization
-Date:   Tue, 22 Dec 2020 05:41:49 +0530
-Message-Id: <1608595918-21954-8-git-send-email-muneendra.kumar@broadcom.com>
+        pbonzini@redhat.com, Muneendra <muneendra.kumar@broadcom.com>
+Subject: [PATCH v6 16/16] scsi: Made changes in Kconfig to select BLK_CGROUP_FC_APPID
+Date:   Tue, 22 Dec 2020 05:41:58 +0530
+Message-Id: <1608595918-21954-17-git-send-email-muneendra.kumar@broadcom.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1608595918-21954-1-git-send-email-muneendra.kumar@broadcom.com>
 References: <1608595918-21954-1-git-send-email-muneendra.kumar@broadcom.com>
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-        boundary="000000000000ef322d05b70832f5"
+        boundary="0000000000005fccd805b70835b0"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---000000000000ef322d05b70832f5
+--0000000000005fccd805b70835b0
 Content-Type: text/plain; charset="US-ASCII"
 
-From: Gaurav Srivastava <gaurav.srivastava@broadcom.com>
+Added a new config FC_APPID to select BLK_CGROUP_FC_APPID
+which Enable support to track FC io Traffic.
 
-This patch initializes the VMID parameters like the type of vmid, max
-number of vmids supported and timeout value for the vmid registration
-based on the user input.
-
-Signed-off-by: Gaurav Srivastava <gaurav.srivastava@broadcom.com>
-Signed-off-by: James Smart <jsmart2021@gmail.com>
+Reported-by: kernel test robot <lkp@intel.com>
+Signed-off-by: Muneendra <muneendra.kumar@broadcom.com>
 
 ---
 v6:
-No change
+Modified the Kconfig comments
 
 v5:
 No change
 
 v4:
-No change
+Addressed the error reported by kernel test robot
 
 v3:
-No change
-
-v2:
-Ported the patch on top of 5.10/scsi-queue
+New patch
 ---
- drivers/scsi/lpfc/lpfc_attr.c | 47 +++++++++++++++++++++++++++++++++++
- 1 file changed, 47 insertions(+)
+ drivers/scsi/Kconfig | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/drivers/scsi/lpfc/lpfc_attr.c b/drivers/scsi/lpfc/lpfc_attr.c
-index 4528166dee36..d8cca950fa3b 100644
---- a/drivers/scsi/lpfc/lpfc_attr.c
-+++ b/drivers/scsi/lpfc/lpfc_attr.c
-@@ -6151,6 +6151,44 @@ LPFC_ATTR_RW(enable_dpp, 1, 0, 1, "Enable Direct Packet Push");
-  */
- LPFC_ATTR_R(enable_mi, 1, 0, 1, "Enable MI");
+diff --git a/drivers/scsi/Kconfig b/drivers/scsi/Kconfig
+index 701b61ec76ee..7b41fc3cb7f0 100644
+--- a/drivers/scsi/Kconfig
++++ b/drivers/scsi/Kconfig
+@@ -235,6 +235,19 @@ config SCSI_FC_ATTRS
+ 	  each attached FiberChannel device to sysfs, say Y.
+ 	  Otherwise, say N.
  
-+/*
-+ * lpfc_max_vmid: Maximum number of VMs to be tagged. This is valid only if
-+ * either vmid_app_header or vmid_priority_tagging is enabled.
-+ *       4 - 255  = vmid support enabled for 4-255 VMs
-+ *       Value range is [4,255].
-+ */
-+LPFC_ATTR_RW(max_vmid, LPFC_MIN_VMID, LPFC_MIN_VMID, LPFC_MAX_VMID,
-+	     "Maximum number of VMs supported");
++config FC_APPID
++	bool "Enable support to track FC io Traffic"
++	depends on BLOCK && BLK_CGROUP
++	depends on SCSI
++	select BLK_CGROUP_FC_APPID
++	default y
++	help
++	  If you say Y here, it enables the support to track
++	  FC I/O traffic over fabric. It enables the Fabric and the
++	  storage targets to identify, monitor, and handle FC traffic
++	  based on VM tags by inserting application specific
++	  identification into the FC frame.
 +
-+/*
-+ * lpfc_vmid_inactivity_timeout: Inactivity timeout duration in hours
-+ *       0  = Timeout is disabled
-+ * Value range is [0,24].
-+ */
-+LPFC_ATTR_RW(vmid_inactivity_timeout, 4, 0, 24,
-+	     "Inactivity timeout in hours");
-+
-+/*
-+ * lpfc_vmid_app_header: Enable App Header VMID support
-+ *       0  = Support is disabled (default)
-+ *       1  = Support is enabled
-+ * Value range is [0,1].
-+ */
-+LPFC_ATTR_RW(vmid_app_header, LPFC_VMID_APP_HEADER_DISABLE,
-+	     LPFC_VMID_APP_HEADER_DISABLE, LPFC_VMID_APP_HEADER_ENABLE,
-+	     "Enable App Header VMID support");
-+
-+/*
-+ * lpfc_vmid_priority_tagging: Enable Priority Tagging VMID support
-+ *       0  = Support is disabled (default)
-+ *       1  = Support is enabled
-+ * Value range is [0,1]..
-+ */
-+LPFC_ATTR_RW(vmid_priority_tagging, LPFC_VMID_PRIO_TAG_DISABLE,
-+	     LPFC_VMID_PRIO_TAG_DISABLE,
-+	     LPFC_VMID_PRIO_TAG_ALL_TARGETS,
-+	     "Enable Priority Tagging VMID support");
-+
- struct device_attribute *lpfc_hba_attrs[] = {
- 	&dev_attr_nvme_info,
- 	&dev_attr_scsi_stat,
-@@ -6269,6 +6307,10 @@ struct device_attribute *lpfc_hba_attrs[] = {
- 	&dev_attr_lpfc_enable_bbcr,
- 	&dev_attr_lpfc_enable_dpp,
- 	&dev_attr_lpfc_enable_mi,
-+	&dev_attr_lpfc_max_vmid,
-+	&dev_attr_lpfc_vmid_inactivity_timeout,
-+	&dev_attr_lpfc_vmid_app_header,
-+	&dev_attr_lpfc_vmid_priority_tagging,
- 	NULL,
- };
- 
-@@ -7328,6 +7370,11 @@ lpfc_get_cfgparam(struct lpfc_hba *phba)
- 	lpfc_enable_hba_heartbeat_init(phba, lpfc_enable_hba_heartbeat);
- 
- 	lpfc_EnableXLane_init(phba, lpfc_EnableXLane);
-+	/* VMID Inits */
-+	lpfc_max_vmid_init(phba, lpfc_max_vmid);
-+	lpfc_vmid_inactivity_timeout_init(phba, lpfc_vmid_inactivity_timeout);
-+	lpfc_vmid_app_header_init(phba, lpfc_vmid_app_header);
-+	lpfc_vmid_priority_tagging_init(phba, lpfc_vmid_priority_tagging);
- 	if (phba->sli_rev != LPFC_SLI_REV4)
- 		phba->cfg_EnableXLane = 0;
- 	lpfc_XLanePriority_init(phba, lpfc_XLanePriority);
+ config SCSI_ISCSI_ATTRS
+ 	tristate "iSCSI Transport Attributes"
+ 	depends on SCSI && NET
 -- 
 2.26.2
 
@@ -195,7 +140,7 @@ this e-mail is strictly prohibited. If you received this e-mail in error,
 please return the e-mail to the sender, delete it from your computer, and 
 destroy any printed copy of it.
 
---000000000000ef322d05b70832f5
+--0000000000005fccd805b70835b0
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -266,13 +211,13 @@ LbMkW5lUoTb8ycBNOKLYhNE8UEOY8jRTUtMEhzT6NJDEE+1hb3kSGfArrrF3Z8pRYiUUhcpC5GKL
 EpmWnHflnrBcah5Ozy137DGCAm8wggJrAgEBMG0wXTELMAkGA1UEBhMCQkUxGTAXBgNVBAoTEEds
 b2JhbFNpZ24gbnYtc2ExMzAxBgNVBAMTKkdsb2JhbFNpZ24gUGVyc29uYWxTaWduIDIgQ0EgLSBT
 SEEyNTYgLSBHMwIMX/krgFDQUQNyOf+1MA0GCWCGSAFlAwQCAQUAoIHUMC8GCSqGSIb3DQEJBDEi
-BCCylLUZrgKI7Yj9EDPUzZY+0rhAnbp5OVfrBzK+pU0IRzAYBgkqhkiG9w0BCQMxCwYJKoZIhvcN
-AQcBMBwGCSqGSIb3DQEJBTEPFw0yMDEyMjIwNzA1MjVaMGkGCSqGSIb3DQEJDzFcMFowCwYJYIZI
+BCAki2DKMnhgcuOO7ofORh6jUZL454KjXKcMFxVM08k5dTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcN
+AQcBMBwGCSqGSIb3DQEJBTEPFw0yMDEyMjIwNzA2MDZaMGkGCSqGSIb3DQEJDzFcMFowCwYJYIZI
 AWUDBAEqMAsGCWCGSAFlAwQBFjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJKoZIhvcNAQEK
-MAsGCSqGSIb3DQEBBzALBglghkgBZQMEAgEwDQYJKoZIhvcNAQEBBQAEggEAc6dSGvLgACd5EAXZ
-a3kHwlIG2+rYVXIbMamwj1f4M7yfBOkVEGTOYkXYC7Rf4DF6/e6/cdfbk0qSegHV+OvxBjhwpmiV
-LmTnRgLarEdeqIiV3mK8L6HHk1l1B7g3Lih+TLPbiMYfE63KBPHvj8ChpNolUXzM21OVRgmxeQa7
-0KuHn3dBSo5raDO6N2hitolGrTkpgQqQIqkFaYfQq0nE+zoFBvw/adHAj/9GlTXlF7RV9eH2rzP5
-mQchHniqSf3XRieibwMryfxY5K6H/s+wVXMf9zUxLBIIrA1uRBsjPdi4gunbl7zz7WVY8A+W3a4/
-c+HVlEHS0CagTGf1gCiZsg==
---000000000000ef322d05b70832f5--
+MAsGCSqGSIb3DQEBBzALBglghkgBZQMEAgEwDQYJKoZIhvcNAQEBBQAEggEAjLN/+Vt01ZSmBXgo
+7nkTPuNpayP/w5uwSyvkRQj0SiMpwKFTq8HqMO0+diBHqEVdg2l+5YSKEQI9hk1cPuTF1+T9bNi9
+s1J9/8So9snwTkIZwvwc4H7usBhQG+fMrP0abz2Lx/IbZHcyTmlh8JZ4osi0LgzaviKbbj+A8U31
++09EtsksshY7FQV65Q+ic9r+sqNQvd+T9jFdAqkWjVde71vyvZl8JqoSPnR46tDKS/0VZOfdNHVn
+J/3udJkIHSDunNgP5KXGEzZx1HoY93FI06aYrKIUJwkKcfNm7j0DIVzdCdqHN25fpGyLPcAGBW9O
+zGvHaFQF/ZKYg/jYpqluqA==
+--0000000000005fccd805b70835b0--
