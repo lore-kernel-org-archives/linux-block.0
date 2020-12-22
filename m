@@ -2,130 +2,85 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03A79C433DB
-	for <linux-block@archiver.kernel.org>; Tue, 22 Dec 2020 13:26:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62299C433DB
+	for <linux-block@archiver.kernel.org>; Tue, 22 Dec 2020 13:31:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B648E23133
-	for <linux-block@archiver.kernel.org>; Tue, 22 Dec 2020 13:26:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 323C223133
+	for <linux-block@archiver.kernel.org>; Tue, 22 Dec 2020 13:31:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726958AbgLVN0M (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Dec 2020 08:26:12 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:25098 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726549AbgLVN0M (ORCPT
+        id S1727160AbgLVNbB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Dec 2020 08:31:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58812 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727006AbgLVNa7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Dec 2020 08:26:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1608643485;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=L0CdssNXtolY/0xYUDMExZliyMsWlcG2nRZfwv4H7qI=;
-        b=f6eBJyT7Ok+2GeMLHBYJ9bYLdHIuD2PjBdpDHN0IYq7LCAWvJQcwVzx+N0Sfo8ohs+zXRB
-        CuwtWVhTpiHqT0ZnG6kiVjxnKdmxYFlD1evi6uBbZfL1zkJNUsx/NS6w57bBzno5SA22Z9
-        L2IgHEye1wzzvqvDSSdNONzxgSXzeuk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-278-bViHCkLyOM68OxpeBYxKSw-1; Tue, 22 Dec 2020 08:24:43 -0500
-X-MC-Unique: bViHCkLyOM68OxpeBYxKSw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E98D3107ACE6;
-        Tue, 22 Dec 2020 13:24:41 +0000 (UTC)
-Received: from T590 (ovpn-13-66.pek2.redhat.com [10.72.13.66])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id D661E5C8A7;
-        Tue, 22 Dec 2020 13:24:33 +0000 (UTC)
-Date:   Tue, 22 Dec 2020 21:24:28 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     John Garry <john.garry@huawei.com>
-Cc:     Bart Van Assche <bvanassche@acm.org>, axboe@kernel.dk,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        hch@lst.de, hare@suse.de, kashyap.desai@broadcom.com,
-        linuxarm@huawei.com
-Subject: Re: [RFC PATCH v2 2/2] blk-mq: Lockout tagset iter when freeing rqs
-Message-ID: <20201222132428.GA2938310@T590>
-References: <1608203273-170555-1-git-send-email-john.garry@huawei.com>
- <1608203273-170555-3-git-send-email-john.garry@huawei.com>
- <df44b73d-6c42-87ee-3c25-b95a44712e05@acm.org>
- <4d2004bb-4444-7a63-7c72-1759e3037cfd@huawei.com>
- <31de2806-bbc1-dcc3-b9eb-ce9257420432@acm.org>
- <b2edab2b-8af7-816d-9da2-4720d19b96f8@huawei.com>
- <e97a0603-f9e3-1b00-4a09-c569d4f73d7b@acm.org>
- <2d985fbd-7a22-6399-e214-8052604a2a65@huawei.com>
+        Tue, 22 Dec 2020 08:30:59 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86E4EC0613D6
+        for <linux-block@vger.kernel.org>; Tue, 22 Dec 2020 05:30:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
+        Content-Type:Content-ID:Content-Description;
+        bh=gipqDoV/3w9NrVhIFxS/QtPwIzE4z//qItjhh69SQIA=; b=FPtr1etZ50O+gWzo0dwrISWt2X
+        kOX6w61vYbcx0xBRQbJvifizwflC+lKWBqNAXToaB7kpx1Kix1fFlXVkScg5p9/wAojbafeu34Lyg
+        s3VSSX5fmw2DgCBFPO5t+i93rRob9cErvFswz+3kyGlUoCbEFgxRCnc037H395U7W0gx8vy8mQ1OQ
+        qhMOWh4jKudHDW2zJXNXFK/AHgeM4cZSv8n7B4PxjTfkoJzyatucNHov+Lhdqi/radI02v1lApkPI
+        j1XCMe9/EUW7U8vsNgJFo/9J0EAriKz8ZAwwkMiGNEUDqBOJkV2pnjwE8+dZ9Xrudcsb8wunUME88
+        dcv28Row==;
+Received: from [2001:4bb8:180:8063:c70:4a89:bc61:2] (helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1krhjs-0001FO-06; Tue, 22 Dec 2020 13:30:08 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org,
+        Stephen Rothwell <sfr@canb.auug.org.au>
+Subject: [PATCH 2/2] block: fixup the kerneldoc for lookup_bdev
+Date:   Tue, 22 Dec 2020 14:30:04 +0100
+Message-Id: <20201222133004.3016790-2-hch@lst.de>
+X-Mailer: git-send-email 2.29.2
+In-Reply-To: <20201222133004.3016790-1-hch@lst.de>
+References: <20201222133004.3016790-1-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2d985fbd-7a22-6399-e214-8052604a2a65@huawei.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Dec 22, 2020 at 11:22:19AM +0000, John Garry wrote:
-> Resend without ppvk@codeaurora.org, which bounces for me
-> 
-> On 22/12/2020 02:13, Bart Van Assche wrote:
-> > On 12/21/20 10:47 AM, John Garry wrote:
-> >> Yes, I agree, and I'm not sure what I wrote to give that impression.
-> >>
-> >> About "root partition", above, I'm just saying that / is mounted on a
-> >> sda partition:
-> >>
-> >> root@ubuntu:/home/john# mount | grep sda
-> >> /dev/sda2 on / type ext4 (rw,relatime,errors=remount-ro,stripe=32)
-> >> /dev/sda1 on /boot/efi type vfat
-> >> (rw,relatime,fmask=0077,dmask=0077,codepage=437,iocharset=iso8859-1,shortname=mixed,errors=remount-ro)
-> > Hi John,
-> >
-> 
-> Hi Bart, Ming,
-> 
-> > Thanks for the clarification. I want to take back my suggestion about
-> > adding rcu_read_lock() / rcu_read_unlock() in blk_mq_tagset_busy_iter()
-> > since it is not allowed to sleep inside an RCU read-side critical
-> > section, since blk_mq_tagset_busy_iter() is used in request timeout
-> > handling and since there may be blk_mq_ops.timeout implementations that
-> > sleep.
-> 
-> Yes, that's why I was going with atomic, rather than some synchronization
-> primitive which may sleep.
-> 
-> >
-> > Ming's suggestion to serialize blk_mq_tagset_busy_iter() and
-> > blk_mq_free_rqs() looks interesting to me.
-> >
-> 
-> So then we could have something like this:
-> 
-> ---8<---
-> 
->  -435,9 +444,13 @@ void blk_mq_queue_tag_busy_iter(struct request_queue *q,
-> busy_iter_fn *fn,
->     if (!blk_mq_hw_queue_mapped(hctx))
->             continue;
-> 
-> +    while (!atomic_inc_not_zero(&tags->iter_usage_counter));
-> +
->     if (tags->nr_reserved_tags)
->         bt_for_each(hctx, tags->breserved_tags, fn, priv, true);
->     bt_for_each(hctx, tags->bitmap_tags, fn, priv, false);
-> 
-> +    atomic_dec(&tags->iter_usage_counter);
-> }
+Document the new dev parameter and the changed return value convention.
 
-Then it is just one spin_lock variant, and you may have to consider
-lock validation.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
+Fixes: 4e7b5671c6a8 ("block: remove i_bdev")
+---
+ fs/block_dev.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-For example, scsi_host_busy() is called from scsi_log_completion()<-scsi_softirq_done(),
-which may be run in irq context, then dead lock can be triggered when the irq
-is fired during freeing request.
-
-thanks,
-Ming
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 7633e5ac0885f7..d6ee0bb7005538 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -1828,10 +1828,11 @@ const struct file_operations def_blk_fops = {
+ /**
+  * lookup_bdev  - lookup a struct block_device by name
+  * @pathname:	special file representing the block device
++ * @dev:	returns the dev_t for the device
+  *
+- * Get a reference to the blockdevice at @pathname in the current
+- * namespace if possible and return it.  Return ERR_PTR(error)
+- * otherwise.
++ * Find the dev_t for the block device at @pathname.  Returns 0 if there is a
++ * block device at @pathname, or a negative errno value if not.  The dev_t for
++ * the block device is placed in the variable pointed to by the @dev parameter.
+  */
+ int lookup_bdev(const char *pathname, dev_t *dev)
+ {
+-- 
+2.29.2
 
