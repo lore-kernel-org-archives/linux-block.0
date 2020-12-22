@@ -8,87 +8,89 @@ X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DATE_IN_PAST_06_12,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 909A1C4332D
-	for <linux-block@archiver.kernel.org>; Tue, 22 Dec 2020 07:06:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5C84C433E9
+	for <linux-block@archiver.kernel.org>; Tue, 22 Dec 2020 07:06:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 784A423133
-	for <linux-block@archiver.kernel.org>; Tue, 22 Dec 2020 07:06:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 94A3B23122
+	for <linux-block@archiver.kernel.org>; Tue, 22 Dec 2020 07:06:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725955AbgLVHGT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Dec 2020 02:06:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56254 "EHLO
+        id S1726261AbgLVHGe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Dec 2020 02:06:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56252 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726022AbgLVHGS (ORCPT
+        with ESMTP id S1726256AbgLVHGd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Dec 2020 02:06:18 -0500
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68FECC0611CE
-        for <linux-block@vger.kernel.org>; Mon, 21 Dec 2020 23:05:21 -0800 (PST)
-Received: by mail-pl1-x636.google.com with SMTP id x12so6939820plr.10
-        for <linux-block@vger.kernel.org>; Mon, 21 Dec 2020 23:05:21 -0800 (PST)
+        Tue, 22 Dec 2020 02:06:33 -0500
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F11E8C0619DA
+        for <linux-block@vger.kernel.org>; Mon, 21 Dec 2020 23:05:57 -0800 (PST)
+Received: by mail-pj1-x1033.google.com with SMTP id z12so832166pjn.1
+        for <linux-block@vger.kernel.org>; Mon, 21 Dec 2020 23:05:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=broadcom.com; s=google;
         h=mime-version:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=FlTioNUsfXWBrmRvnkyGXL3Uf+OgEN+kdt3RbKJ9BhE=;
-        b=GQpmC3AMyN4KYy/dak9Bw67x+3MaGlPmYffKtFP2QrCXQgb/n7kIc6Iz6q8ETGH/hI
-         GaZDPvMuvvQf2KsCJ6qAcTo91vNcxfTtS7IoPwDEUgSLl8u7fBqT41YYUSRo98H91+2J
-         9LDqZB+osqgQwBk60tM9wYrah0bFcu7ZEAuX4=
+        bh=eyMlyKAgMrAS94oxnf881elY2sQ/H+pe7530IectpWA=;
+        b=SGfDsSGLyj1Qu3N6ALqn5ienVrxJA+VS+45ltIpsJcQx303JSNPMxKPk/pCO+By1+4
+         rsvQELJUnQ2c77SOnM4a8D9hru1TepFvFEHnPbcujefAXR33DDDyirmkmYxq8+dWGXg0
+         +0IWydGa8HuHoBYqyMRcrN5G+OltJPVQs/A40=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:from:to:cc:subject:date:message-id
          :in-reply-to:references;
-        bh=FlTioNUsfXWBrmRvnkyGXL3Uf+OgEN+kdt3RbKJ9BhE=;
-        b=CmGg4K6laL/2EQVmXF4jrQslHyFO5tlDnyKYWABbdzjF209CL64mJYQL/PPbTtixzY
-         W1bYhqgAa3I1JVAr5Y7hETX4rGIhZwPcKLClarMYyQhFZRuNboVQce5GmopijrqbBZbE
-         TsJrn2yPCswubCg7bpGYD+5WTQVqbE8HUShZaK+AdZPHCjHZHEQmE2f/+3BPy85t4EQl
-         +zzvmOaltb0joD5YbH2YaK0u/VaRJYSILE3SToOqfvBrI6XQIIdaVO8WdC75OH+NGPyR
-         1Zz21vHtBXCy44JyspLEUe2CVHwpEn9wGGDjEdkaATnjzR51uY5IeQP3K99UWLMRfW3o
-         AWOQ==
-X-Gm-Message-State: AOAM530zrldQPl/yBEAQhr7maySUVJeI2w4RXBCX4UdVQaGSFWmBVYsR
-        j8J0KoCeSOqol4eGWKctE+PZcWDlq+AW2uN5CDiW2upF1JDl5JLL6gzPu9RLI1ok8PXFb0N/TtJ
-        Tse99recXtSLwfMMbmB57Z9M2PA8Cx7RVNLfDpxBjteiqvfePie+4JaEvL60v1upI3xGIY0vswh
-        BX7PUs+m3/vYFp
+        bh=eyMlyKAgMrAS94oxnf881elY2sQ/H+pe7530IectpWA=;
+        b=Af4jOQdhb3t1HkdWrjXRLYGdhy9z5MxPEcRXZH+XmRYZdjJeCcIU6JS9jmTj27O0c8
+         7GNB3s/QjSbPWVQO1LRYjOOuvidKLilyp3uF3udhPwO0B6iCsWj5dN5ikBL35yMtVPR6
+         TKgb4zzuZkt4hAf6kphacFBa5MI3V0AlYncgXl2pqNIR0quv1jBt5tk+OaFNXK1VtTYS
+         tCvTInJtqzl4x5OIO2Yr7XNnW9P10L+NrZJ71vaLrW//qEczZLgPTxDfjZkuhmUvpige
+         7uzf+Np11iooFbgQPr05K9s4kWjONJQUp9GYvXc1zNraiwWmY5LHv30olpZlFTp0tyxs
+         PGKA==
+X-Gm-Message-State: AOAM530PofsAEBpELXegZi8mnPTQ66g4dEALVlNr7XXKV1Pkx9ZGTXDG
+        habmITwMghunbSjsAXW2YDe5F8LneBe6D5ERBsjLmmyIwuDbpWohHe5UaL69NwhaR7FULeAcijm
+        L4E998Hpyeh187bXb3A96j6tGpwhc+qmrwEREP425qepqKwE9MaGSQrRrSHoSeSY8A00ixbPdsJ
+        4M7riayF2NeK5r
 MIME-Version: 1.0
-X-Google-Smtp-Source: ABdhPJzQwVziPylxTTjpryDYbkDK45ELSY+FQD5eYHgXWV8LyJa/CZOgXCtBuCyzOiF330FsknTRog==
-X-Received: by 2002:a17:902:868a:b029:da:ea50:d55f with SMTP id g10-20020a170902868ab02900daea50d55fmr20158517plo.84.1608620720469;
-        Mon, 21 Dec 2020 23:05:20 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxtEuRNLtVeHUhKz59CxIZq+x/70eZ/Y2zGhM8VOuYD2F4WyuHy20A7Lzkpf15VWlaRX2+ucA==
+X-Received: by 2002:a17:90a:8985:: with SMTP id v5mr20378406pjn.27.1608620756981;
+        Mon, 21 Dec 2020 23:05:56 -0800 (PST)
 Received: from localhost.localdomain ([192.19.234.250])
-        by smtp.gmail.com with ESMTPSA id t9sm12466082pgh.41.2020.12.21.23.05.16
+        by smtp.gmail.com with ESMTPSA id t9sm12466082pgh.41.2020.12.21.23.05.52
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 21 Dec 2020 23:05:19 -0800 (PST)
+        Mon, 21 Dec 2020 23:05:56 -0800 (PST)
 From:   Muneendra <muneendra.kumar@broadcom.com>
 To:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
         tj@kernel.org, linux-nvme@lists.infradead.org, hare@suse.de
 Cc:     jsmart2021@gmail.com, emilne@redhat.com, mkumar@redhat.com,
         pbonzini@redhat.com,
         Gaurav Srivastava <gaurav.srivastava@broadcom.com>
-Subject: [PATCH v6 06/16] lpfc: vmid: Forward declarations for APIs
-Date:   Tue, 22 Dec 2020 05:41:48 +0530
-Message-Id: <1608595918-21954-7-git-send-email-muneendra.kumar@broadcom.com>
+Subject: [PATCH v6 14/16] lpfc: vmid: Adding qfpa and vmid timeout check in worker thread
+Date:   Tue, 22 Dec 2020 05:41:56 +0530
+Message-Id: <1608595918-21954-15-git-send-email-muneendra.kumar@broadcom.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1608595918-21954-1-git-send-email-muneendra.kumar@broadcom.com>
 References: <1608595918-21954-1-git-send-email-muneendra.kumar@broadcom.com>
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-        boundary="000000000000a6a7ba05b7083243"
+        boundary="000000000000d42e0605b708342c"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---000000000000a6a7ba05b7083243
+--000000000000d42e0605b708342c
 Content-Type: text/plain; charset="US-ASCII"
 
 From: Gaurav Srivastava <gaurav.srivastava@broadcom.com>
 
-This patch contains the forward declarations of commonly used APIs which
-are used outside the scope of the file.
+This patch add the periodic check for issuing of qfpa command and vmid
+timeout in the worker thread. The inactivity timeout check is added via
+the timer function.
 
-Signed-off-by: Gaurav Srivastava <gaurav.srivastava@broadcom.com>
+Reported-by: kernel test robot <lkp@intel.com>
+Signed-off-by: Gaurav Srivastava  <gaurav.srivastava@broadcom.com>
 Signed-off-by: James Smart <jsmart2021@gmail.com>
 
 ---
 v6:
-No change
+Added Forward declarations and removed unused variable
 
 v5:
 No change
@@ -102,28 +104,77 @@ No change
 v2:
 Ported the patch on top of 5.10/scsi-queue
 ---
- drivers/scsi/lpfc/lpfc_crtn.h | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ drivers/scsi/lpfc/lpfc_hbadisc.c | 43 ++++++++++++++++++++++++++++++++
+ 1 file changed, 43 insertions(+)
 
-diff --git a/drivers/scsi/lpfc/lpfc_crtn.h b/drivers/scsi/lpfc/lpfc_crtn.h
-index f78e52a18b0b..7eb0200ecaa8 100644
---- a/drivers/scsi/lpfc/lpfc_crtn.h
-+++ b/drivers/scsi/lpfc/lpfc_crtn.h
-@@ -606,3 +606,14 @@ extern unsigned long lpfc_no_hba_reset[];
- extern union lpfc_wqe128 lpfc_iread_cmd_template;
- extern union lpfc_wqe128 lpfc_iwrite_cmd_template;
- extern union lpfc_wqe128 lpfc_icmnd_cmd_template;
+diff --git a/drivers/scsi/lpfc/lpfc_hbadisc.c b/drivers/scsi/lpfc/lpfc_hbadisc.c
+index ed2d65cfd3e3..46dad0780368 100644
+--- a/drivers/scsi/lpfc/lpfc_hbadisc.c
++++ b/drivers/scsi/lpfc/lpfc_hbadisc.c
+@@ -73,6 +73,7 @@ static void lpfc_unregister_fcfi_cmpl(struct lpfc_hba *, LPFC_MBOXQ_t *);
+ static int lpfc_fcf_inuse(struct lpfc_hba *);
+ static void lpfc_mbx_cmpl_read_sparam(struct lpfc_hba *, LPFC_MBOXQ_t *);
+ static void lpfc_check_inactive_vmid(struct lpfc_hba *phba);
++static void lpfc_check_vmid_qfpa_issue(struct lpfc_hba *phba);
+ 
+ /* The source of a terminate rport I/O is either a dev_loss_tmo
+  * event or a call to fc_remove_host.  While the rport should be
+@@ -429,6 +430,32 @@ lpfc_dev_loss_tmo_handler(struct lpfc_nodelist *ndlp)
+ 	return fcf_inuse;
+ }
+ 
++static void lpfc_check_vmid_qfpa_issue(struct lpfc_hba *phba)
++{
++	struct lpfc_vport *vport;
++	struct lpfc_vport **vports;
++	int i;
 +
-+/* vmid interface */
-+int lpfc_vmid_uvem(struct lpfc_vport *vport, struct lpfc_vmid *vmid, bool ins);
-+uint32_t lpfc_vmid_get_cs_ctl(struct lpfc_vport *vport);
-+int lpfc_vmid_cmd(struct lpfc_vport *vport,
-+		  int cmdcode, struct lpfc_vmid *vmid);
-+int lpfc_vmid_hash_fn(char *vmid, int len);
-+struct lpfc_vmid *lpfc_get_vmid_from_hastable(struct lpfc_vport *vport,
-+					      uint32_t hash, uint8_t *buf);
-+void lpfc_vmid_vport_cleanup(struct lpfc_vport *vport);
-+int lpfc_issue_els_qfpa(struct lpfc_vport *vport);
++	vports = lpfc_create_vport_work_array(phba);
++	if (!vports)
++		return;
++
++	for (i = 0; i <= phba->max_vports; i++) {
++		if ((!vports[i]) && (i == 0))
++			vport = phba->pport;
++		else
++			vport = vports[i];
++		if (!vport)
++			break;
++
++		if (vport->vmid_flag & LPFC_VMID_ISSUE_QFPA) {
++			lpfc_issue_els_qfpa(vport);
++			vport->vmid_flag &= ~LPFC_VMID_ISSUE_QFPA;
++		}
++	}
++	lpfc_destroy_vport_work_array(phba, vports);
++}
++
+ /**
+  * lpfc_sli4_post_dev_loss_tmo_handler - SLI4 post devloss timeout handler
+  * @phba: Pointer to hba context object.
+@@ -749,6 +776,22 @@ lpfc_work_done(struct lpfc_hba *phba)
+ 	if (ha_copy & HA_LATT)
+ 		lpfc_handle_latt(phba);
+ 
++	/* Handle VMID Events */
++	if (lpfc_is_vmid_enabled(phba)) {
++		if (phba->pport->work_port_events &
++		    WORKER_CHECK_VMID_ISSUE_QFPA) {
++			lpfc_check_vmid_qfpa_issue(phba);
++			phba->pport->work_port_events &=
++				~WORKER_CHECK_VMID_ISSUE_QFPA;
++		}
++		if (phba->pport->work_port_events &
++		    WORKER_CHECK_INACTIVE_VMID) {
++			lpfc_check_inactive_vmid(phba);
++			phba->pport->work_port_events &=
++			    ~WORKER_CHECK_INACTIVE_VMID;
++		}
++	}
++
+ 	/* Process SLI4 events */
+ 	if (phba->pci_dev_grp == LPFC_PCI_DEV_OC) {
+ 		if (phba->hba_flag & HBA_RRQ_ACTIVE)
 -- 
 2.26.2
 
@@ -141,7 +192,7 @@ this e-mail is strictly prohibited. If you received this e-mail in error,
 please return the e-mail to the sender, delete it from your computer, and 
 destroy any printed copy of it.
 
---000000000000a6a7ba05b7083243
+--000000000000d42e0605b708342c
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -212,13 +263,13 @@ LbMkW5lUoTb8ycBNOKLYhNE8UEOY8jRTUtMEhzT6NJDEE+1hb3kSGfArrrF3Z8pRYiUUhcpC5GKL
 EpmWnHflnrBcah5Ozy137DGCAm8wggJrAgEBMG0wXTELMAkGA1UEBhMCQkUxGTAXBgNVBAoTEEds
 b2JhbFNpZ24gbnYtc2ExMzAxBgNVBAMTKkdsb2JhbFNpZ24gUGVyc29uYWxTaWduIDIgQ0EgLSBT
 SEEyNTYgLSBHMwIMX/krgFDQUQNyOf+1MA0GCWCGSAFlAwQCAQUAoIHUMC8GCSqGSIb3DQEJBDEi
-BCAh31EFym9OFCm8ZnAwscL1ayR6UaeTYRVclDi5f3mhJzAYBgkqhkiG9w0BCQMxCwYJKoZIhvcN
-AQcBMBwGCSqGSIb3DQEJBTEPFw0yMDEyMjIwNzA1MjBaMGkGCSqGSIb3DQEJDzFcMFowCwYJYIZI
+BCBQ8lBad+B4PrIZA/kJFAGsYqkvga9Uaq7abGTA9gotQjAYBgkqhkiG9w0BCQMxCwYJKoZIhvcN
+AQcBMBwGCSqGSIb3DQEJBTEPFw0yMDEyMjIwNzA1NTdaMGkGCSqGSIb3DQEJDzFcMFowCwYJYIZI
 AWUDBAEqMAsGCWCGSAFlAwQBFjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJKoZIhvcNAQEK
-MAsGCSqGSIb3DQEBBzALBglghkgBZQMEAgEwDQYJKoZIhvcNAQEBBQAEggEAhJfQRG0pr1otKlmZ
-TlV6HqCBwOxeOD3urIqcaA/ZBP5mJls7fp5zC59P6/enD6h/gpm6mQtPznNs02+VDlOGQis3iUAA
-2tD/M3fL9zE++kGSxgFrfhCNNVMCsMTApacUkcXolF8nzFEkWT4p5zr0QZcS3vjb/cRhjYHsXOE3
-jbfJruRaf93eozyPRUYJ1TIARFZm8TmqQiUBM3mY+zt5Td3W3UjDEn8n7H/klk9rNqy8us6T3Jav
-41ewnlw6swDJTzl4iY+zSbvtYEvKz+UEYjgBLgAnidym1UGfpDeKPNH+p1zrmHTaW3oWBIBADGI8
-ASitFUQv1g3K9eTKhfZIqQ==
---000000000000a6a7ba05b7083243--
+MAsGCSqGSIb3DQEBBzALBglghkgBZQMEAgEwDQYJKoZIhvcNAQEBBQAEggEAgToYKpQDayc41p0e
+fduTgFaGClkMP1VFRBfUp/49lUlFD5Jqktitb40WLjVVV8BUyU+3Mn407/ujlSeljj4JeB8STP4J
+50khpsUG1ozaO5F2z1AzvEdvG9rfHqUAWXTMTGFCbUbSiEnsUbCZ+i3liI4IRP2QRIpCZxfkobLv
+HqoOP64JsB1Rnezpn/UiYABG8C6aVZU04BD1jY6WVG3CqvDSHMEWM3mjKZnnIgzeEFG2qkgZyAFu
+KRos6eU/gyqqYJOcHM1zV5Ywdghpok8vWn8reLZ1NiCeQd172dSDp0/AB7Wsuy6n15HI65yMALhI
++P4ULdp1jmPi9wUpXknfTw==
+--000000000000d42e0605b708342c--
