@@ -8,92 +8,91 @@ X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DATE_IN_PAST_06_12,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5C84C433E9
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED8E2C43381
 	for <linux-block@archiver.kernel.org>; Tue, 22 Dec 2020 07:06:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 94A3B23122
+	by mail.kernel.org (Postfix) with ESMTP id B5E182312D
 	for <linux-block@archiver.kernel.org>; Tue, 22 Dec 2020 07:06:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726261AbgLVHGe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1726256AbgLVHGe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Tue, 22 Dec 2020 02:06:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56252 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56248 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726256AbgLVHGd (ORCPT
+        with ESMTP id S1726123AbgLVHGd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Tue, 22 Dec 2020 02:06:33 -0500
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F11E8C0619DA
-        for <linux-block@vger.kernel.org>; Mon, 21 Dec 2020 23:05:57 -0800 (PST)
-Received: by mail-pj1-x1033.google.com with SMTP id z12so832166pjn.1
-        for <linux-block@vger.kernel.org>; Mon, 21 Dec 2020 23:05:57 -0800 (PST)
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DABADC0619D6
+        for <linux-block@vger.kernel.org>; Mon, 21 Dec 2020 23:05:48 -0800 (PST)
+Received: by mail-pl1-x636.google.com with SMTP id g3so6965324plp.2
+        for <linux-block@vger.kernel.org>; Mon, 21 Dec 2020 23:05:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=broadcom.com; s=google;
         h=mime-version:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=eyMlyKAgMrAS94oxnf881elY2sQ/H+pe7530IectpWA=;
-        b=SGfDsSGLyj1Qu3N6ALqn5ienVrxJA+VS+45ltIpsJcQx303JSNPMxKPk/pCO+By1+4
-         rsvQELJUnQ2c77SOnM4a8D9hru1TepFvFEHnPbcujefAXR33DDDyirmkmYxq8+dWGXg0
-         +0IWydGa8HuHoBYqyMRcrN5G+OltJPVQs/A40=
+        bh=hltaeyWXmOH6gS0SwSiOWgcryp48LsCUDn5rKwAvex4=;
+        b=ZTJOxNmjrVA/G52NZPbn4EAaVwX3IlrJZEMwL5IhR+1MWu5L8vlhOE+9ORc4aMF2HV
+         glMuPrJeNoAvr8OGphOFhopGAnDZfwrZaR/gaYDAgoY0iUizvBzozO7t24PaUa+YKloR
+         u4gd60eU0wJ63NCU6WmOpCvty5REAHtQgD2eY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:from:to:cc:subject:date:message-id
          :in-reply-to:references;
-        bh=eyMlyKAgMrAS94oxnf881elY2sQ/H+pe7530IectpWA=;
-        b=Af4jOQdhb3t1HkdWrjXRLYGdhy9z5MxPEcRXZH+XmRYZdjJeCcIU6JS9jmTj27O0c8
-         7GNB3s/QjSbPWVQO1LRYjOOuvidKLilyp3uF3udhPwO0B6iCsWj5dN5ikBL35yMtVPR6
-         TKgb4zzuZkt4hAf6kphacFBa5MI3V0AlYncgXl2pqNIR0quv1jBt5tk+OaFNXK1VtTYS
-         tCvTInJtqzl4x5OIO2Yr7XNnW9P10L+NrZJ71vaLrW//qEczZLgPTxDfjZkuhmUvpige
-         7uzf+Np11iooFbgQPr05K9s4kWjONJQUp9GYvXc1zNraiwWmY5LHv30olpZlFTp0tyxs
-         PGKA==
-X-Gm-Message-State: AOAM530PofsAEBpELXegZi8mnPTQ66g4dEALVlNr7XXKV1Pkx9ZGTXDG
-        habmITwMghunbSjsAXW2YDe5F8LneBe6D5ERBsjLmmyIwuDbpWohHe5UaL69NwhaR7FULeAcijm
-        L4E998Hpyeh187bXb3A96j6tGpwhc+qmrwEREP425qepqKwE9MaGSQrRrSHoSeSY8A00ixbPdsJ
-        4M7riayF2NeK5r
+        bh=hltaeyWXmOH6gS0SwSiOWgcryp48LsCUDn5rKwAvex4=;
+        b=FZHT8T7qvQthrC0xMXePiQz2ri/Xqr9gl5RQiNFOCLJ8IJpxCEQmE89OumdTB1wBHU
+         0dAurZ6eqY71qvm57bpmQg2Y71razqboEJ3SG0Kt7sLRUJd3+4ercf723kcs5DjlAIbR
+         VkGrNNT7kaGwMd4pUrZvYlJOy+1u86CJzbVRfX/xc17iAGKH6gMUgorRaHRdNM5ePjgW
+         ZYlE7FUkGVxlhfXUHpkCuBh/5IjWP0KAP3tP5PMgC49NfaLKbh6E0w0EPtnIBmcMgiT6
+         EBhmBAs69UY/QWUXkue62Czxk1de6LqkNpFTwqjmGujRAOVaNhPaFa8epMuJwZfOPaET
+         7Vgg==
+X-Gm-Message-State: AOAM53292hKBBzGRnWbBRs7WUQxR1H97X2YfjGM2+xMqr+rUaQKlJaVD
+        aDA0iOaYEupbl2qR1DJXU54Sg+xfeqkDg92vDIcs1ZHEXsBnECxrOYvQ3EoRfpHlbd7jxvBdJrz
+        bWzMLOqBiSMSRyMR7Q7f1ixSSeZDrRM6SyxQhxwONK2+UiFlqmoMkDthc/aQ6nK8o5BJQmkpb79
+        y+zyF95DPw1DoR
 MIME-Version: 1.0
-X-Google-Smtp-Source: ABdhPJxtEuRNLtVeHUhKz59CxIZq+x/70eZ/Y2zGhM8VOuYD2F4WyuHy20A7Lzkpf15VWlaRX2+ucA==
-X-Received: by 2002:a17:90a:8985:: with SMTP id v5mr20378406pjn.27.1608620756981;
-        Mon, 21 Dec 2020 23:05:56 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwfoQalTltke74oJx7cztqkx1PQvIrPTPXzo5Pv43BgLNSj2+Vdz8UTS5agYMhDq61SklaASg==
+X-Received: by 2002:a17:90a:b395:: with SMTP id e21mr20929169pjr.197.1608620747779;
+        Mon, 21 Dec 2020 23:05:47 -0800 (PST)
 Received: from localhost.localdomain ([192.19.234.250])
-        by smtp.gmail.com with ESMTPSA id t9sm12466082pgh.41.2020.12.21.23.05.52
+        by smtp.gmail.com with ESMTPSA id t9sm12466082pgh.41.2020.12.21.23.05.43
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 21 Dec 2020 23:05:56 -0800 (PST)
+        Mon, 21 Dec 2020 23:05:47 -0800 (PST)
 From:   Muneendra <muneendra.kumar@broadcom.com>
 To:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
         tj@kernel.org, linux-nvme@lists.infradead.org, hare@suse.de
 Cc:     jsmart2021@gmail.com, emilne@redhat.com, mkumar@redhat.com,
         pbonzini@redhat.com,
         Gaurav Srivastava <gaurav.srivastava@broadcom.com>
-Subject: [PATCH v6 14/16] lpfc: vmid: Adding qfpa and vmid timeout check in worker thread
-Date:   Tue, 22 Dec 2020 05:41:56 +0530
-Message-Id: <1608595918-21954-15-git-send-email-muneendra.kumar@broadcom.com>
+Subject: [PATCH v6 12/16] lpfc: vmid: Appends the vmid in the wqe before sending
+Date:   Tue, 22 Dec 2020 05:41:54 +0530
+Message-Id: <1608595918-21954-13-git-send-email-muneendra.kumar@broadcom.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1608595918-21954-1-git-send-email-muneendra.kumar@broadcom.com>
 References: <1608595918-21954-1-git-send-email-muneendra.kumar@broadcom.com>
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-        boundary="000000000000d42e0605b708342c"
+        boundary="00000000000048e73105b708344b"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---000000000000d42e0605b708342c
+--00000000000048e73105b708344b
 Content-Type: text/plain; charset="US-ASCII"
 
 From: Gaurav Srivastava <gaurav.srivastava@broadcom.com>
 
-This patch add the periodic check for issuing of qfpa command and vmid
-timeout in the worker thread. The inactivity timeout check is added via
-the timer function.
+This patch adds the vmid in wqe before sending out the request.
+The type of vmid depends on the configured type and is checked before
+being appended.
 
-Reported-by: kernel test robot <lkp@intel.com>
 Signed-off-by: Gaurav Srivastava  <gaurav.srivastava@broadcom.com>
 Signed-off-by: James Smart <jsmart2021@gmail.com>
 
 ---
 v6:
-Added Forward declarations and removed unused variable
+No change
 
 v5:
-No change
+Modified the comments
 
 v4:
 No change
@@ -104,77 +103,104 @@ No change
 v2:
 Ported the patch on top of 5.10/scsi-queue
 ---
- drivers/scsi/lpfc/lpfc_hbadisc.c | 43 ++++++++++++++++++++++++++++++++
- 1 file changed, 43 insertions(+)
+ drivers/scsi/lpfc/lpfc_sli.c | 56 +++++++++++++++++++++++++++++++++++-
+ 1 file changed, 55 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/scsi/lpfc/lpfc_hbadisc.c b/drivers/scsi/lpfc/lpfc_hbadisc.c
-index ed2d65cfd3e3..46dad0780368 100644
---- a/drivers/scsi/lpfc/lpfc_hbadisc.c
-+++ b/drivers/scsi/lpfc/lpfc_hbadisc.c
-@@ -73,6 +73,7 @@ static void lpfc_unregister_fcfi_cmpl(struct lpfc_hba *, LPFC_MBOXQ_t *);
- static int lpfc_fcf_inuse(struct lpfc_hba *);
- static void lpfc_mbx_cmpl_read_sparam(struct lpfc_hba *, LPFC_MBOXQ_t *);
- static void lpfc_check_inactive_vmid(struct lpfc_hba *phba);
-+static void lpfc_check_vmid_qfpa_issue(struct lpfc_hba *phba);
+diff --git a/drivers/scsi/lpfc/lpfc_sli.c b/drivers/scsi/lpfc/lpfc_sli.c
+index f9b6e32db618..a63371e9feaa 100644
+--- a/drivers/scsi/lpfc/lpfc_sli.c
++++ b/drivers/scsi/lpfc/lpfc_sli.c
+@@ -3856,7 +3856,7 @@ lpfc_sli_sp_handle_rspiocb(struct lpfc_hba *phba, struct lpfc_sli_ring *pring,
  
- /* The source of a terminate rport I/O is either a dev_loss_tmo
-  * event or a call to fc_remove_host.  While the rport should be
-@@ -429,6 +430,32 @@ lpfc_dev_loss_tmo_handler(struct lpfc_nodelist *ndlp)
- 	return fcf_inuse;
- }
- 
-+static void lpfc_check_vmid_qfpa_issue(struct lpfc_hba *phba)
-+{
-+	struct lpfc_vport *vport;
-+	struct lpfc_vport **vports;
-+	int i;
+ 		if (irsp->ulpStatus) {
+ 			/* Rsp ring <ringno> error: IOCB */
+-			lpfc_printf_log(phba, KERN_WARNING, LOG_SLI,
++			lpfc_printf_log(phba, KERN_ERR, LOG_SLI,
+ 					"0328 Rsp Ring %d error: "
+ 					"IOCB Data: "
+ 					"x%x x%x x%x x%x "
+@@ -9762,6 +9762,8 @@ lpfc_sli4_iocb2wqe(struct lpfc_hba *phba, struct lpfc_iocbq *iocbq,
+ 				*pcmd == ELS_CMD_RSCN_XMT ||
+ 				*pcmd == ELS_CMD_FDISC ||
+ 				*pcmd == ELS_CMD_LOGO ||
++				*pcmd == ELS_CMD_QFPA ||
++				*pcmd == ELS_CMD_UVEM ||
+ 				*pcmd == ELS_CMD_PLOGI)) {
+ 				bf_set(els_req64_sp, &wqe->els_req, 1);
+ 				bf_set(els_req64_sid, &wqe->els_req,
+@@ -9893,6 +9895,24 @@ lpfc_sli4_iocb2wqe(struct lpfc_hba *phba, struct lpfc_iocbq *iocbq,
+ 			ptr = &wqe->words[22];
+ 			memcpy(ptr, fcp_cmnd, sizeof(struct fcp_cmnd));
+ 		}
 +
-+	vports = lpfc_create_vport_work_array(phba);
-+	if (!vports)
-+		return;
++		/* add the VMID tags as per switch response */
++		if (iocbq->iocb_flag & LPFC_IO_VMID) {
++			union lpfc_wqe128 *wqe128;
 +
-+	for (i = 0; i <= phba->max_vports; i++) {
-+		if ((!vports[i]) && (i == 0))
-+			vport = phba->pport;
-+		else
-+			vport = vports[i];
-+		if (!vport)
-+			break;
-+
-+		if (vport->vmid_flag & LPFC_VMID_ISSUE_QFPA) {
-+			lpfc_issue_els_qfpa(vport);
-+			vport->vmid_flag &= ~LPFC_VMID_ISSUE_QFPA;
++			if (phba->pport->vmid_priority_tagging) {
++				bf_set(wqe_ccpe, &wqe->fcp_iwrite.wqe_com, 1);
++				bf_set(wqe_ccp, &wqe->fcp_iwrite.wqe_com,
++				       (iocbq->vmid_tag.cs_ctl_vmid));
++				/* Bit 0 must be 0 */
++			} else {
++				wqe128 = (union lpfc_wqe128 *)wqe;
++				bf_set(wqe_appid, &wqe->fcp_iwrite.wqe_com, 1);
++				bf_set(wqe_wqes, &wqe128->fcp_iwrite.wqe_com,
++				       1);
++				wqe128->words[31] = iocbq->vmid_tag.app_id;
++			}
 +		}
-+	}
-+	lpfc_destroy_vport_work_array(phba, vports);
-+}
+ 		break;
+ 	case CMD_FCP_IREAD64_CR:
+ 		/* word3 iocb=iotag wqe=payload_offset_len */
+@@ -9957,6 +9977,23 @@ lpfc_sli4_iocb2wqe(struct lpfc_hba *phba, struct lpfc_iocbq *iocbq,
+ 			ptr = &wqe->words[22];
+ 			memcpy(ptr, fcp_cmnd, sizeof(struct fcp_cmnd));
+ 		}
 +
- /**
-  * lpfc_sli4_post_dev_loss_tmo_handler - SLI4 post devloss timeout handler
-  * @phba: Pointer to hba context object.
-@@ -749,6 +776,22 @@ lpfc_work_done(struct lpfc_hba *phba)
- 	if (ha_copy & HA_LATT)
- 		lpfc_handle_latt(phba);
- 
-+	/* Handle VMID Events */
-+	if (lpfc_is_vmid_enabled(phba)) {
-+		if (phba->pport->work_port_events &
-+		    WORKER_CHECK_VMID_ISSUE_QFPA) {
-+			lpfc_check_vmid_qfpa_issue(phba);
-+			phba->pport->work_port_events &=
-+				~WORKER_CHECK_VMID_ISSUE_QFPA;
-+		}
-+		if (phba->pport->work_port_events &
-+		    WORKER_CHECK_INACTIVE_VMID) {
-+			lpfc_check_inactive_vmid(phba);
-+			phba->pport->work_port_events &=
-+			    ~WORKER_CHECK_INACTIVE_VMID;
-+		}
-+	}
++		/* add the VMID tags as per switch response */
++		if (iocbq->iocb_flag & LPFC_IO_VMID) {
++			union lpfc_wqe128 *wqe128;
 +
- 	/* Process SLI4 events */
- 	if (phba->pci_dev_grp == LPFC_PCI_DEV_OC) {
- 		if (phba->hba_flag & HBA_RRQ_ACTIVE)
++			if (phba->pport->vmid_priority_tagging) {
++				bf_set(wqe_ccpe, &wqe->fcp_iread.wqe_com, 1);
++				bf_set(wqe_ccp, &wqe->fcp_iread.wqe_com,
++				       (iocbq->vmid_tag.cs_ctl_vmid));
++				/* Bit 0 must be 0 */
++			} else {
++				wqe128 = (union lpfc_wqe128 *)wqe;
++				bf_set(wqe_appid, &wqe->fcp_iread.wqe_com, 1);
++				bf_set(wqe_wqes, &wqe128->fcp_iread.wqe_com, 1);
++				wqe128->words[31] = iocbq->vmid_tag.app_id;
++			}
++		}
+ 		break;
+ 	case CMD_FCP_ICMND64_CR:
+ 		/* word3 iocb=iotag wqe=payload_offset_len */
+@@ -10014,6 +10051,23 @@ lpfc_sli4_iocb2wqe(struct lpfc_hba *phba, struct lpfc_iocbq *iocbq,
+ 			ptr = &wqe->words[22];
+ 			memcpy(ptr, fcp_cmnd, sizeof(struct fcp_cmnd));
+ 		}
++
++		/* add the VMID tags as per switch response */
++		if (iocbq->iocb_flag & LPFC_IO_VMID) {
++			union lpfc_wqe128 *wqe128;
++
++			if (phba->pport->vmid_priority_tagging) {
++				bf_set(wqe_ccpe, &wqe->fcp_icmd.wqe_com, 1);
++				bf_set(wqe_ccp, &wqe->fcp_icmd.wqe_com,
++				       (iocbq->vmid_tag.cs_ctl_vmid));
++				/* Bit 0 must be 0 */
++			} else {
++				wqe128 = (union lpfc_wqe128 *)wqe;
++				bf_set(wqe_appid, &wqe->fcp_icmd.wqe_com, 1);
++				bf_set(wqe_wqes, &wqe128->fcp_icmd.wqe_com, 1);
++				wqe128->words[31] = iocbq->vmid_tag.app_id;
++			}
++		}
+ 		break;
+ 	case CMD_GEN_REQUEST64_CR:
+ 		/* For this command calculate the xmit length of the
 -- 
 2.26.2
 
@@ -192,7 +218,7 @@ this e-mail is strictly prohibited. If you received this e-mail in error,
 please return the e-mail to the sender, delete it from your computer, and 
 destroy any printed copy of it.
 
---000000000000d42e0605b708342c
+--00000000000048e73105b708344b
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -263,13 +289,13 @@ LbMkW5lUoTb8ycBNOKLYhNE8UEOY8jRTUtMEhzT6NJDEE+1hb3kSGfArrrF3Z8pRYiUUhcpC5GKL
 EpmWnHflnrBcah5Ozy137DGCAm8wggJrAgEBMG0wXTELMAkGA1UEBhMCQkUxGTAXBgNVBAoTEEds
 b2JhbFNpZ24gbnYtc2ExMzAxBgNVBAMTKkdsb2JhbFNpZ24gUGVyc29uYWxTaWduIDIgQ0EgLSBT
 SEEyNTYgLSBHMwIMX/krgFDQUQNyOf+1MA0GCWCGSAFlAwQCAQUAoIHUMC8GCSqGSIb3DQEJBDEi
-BCBQ8lBad+B4PrIZA/kJFAGsYqkvga9Uaq7abGTA9gotQjAYBgkqhkiG9w0BCQMxCwYJKoZIhvcN
-AQcBMBwGCSqGSIb3DQEJBTEPFw0yMDEyMjIwNzA1NTdaMGkGCSqGSIb3DQEJDzFcMFowCwYJYIZI
+BCCe470slY3qEafPyt9F9RU0yOnpiiz/Z5RMRDmYnJ2fgjAYBgkqhkiG9w0BCQMxCwYJKoZIhvcN
+AQcBMBwGCSqGSIb3DQEJBTEPFw0yMDEyMjIwNzA1NDhaMGkGCSqGSIb3DQEJDzFcMFowCwYJYIZI
 AWUDBAEqMAsGCWCGSAFlAwQBFjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJKoZIhvcNAQEK
-MAsGCSqGSIb3DQEBBzALBglghkgBZQMEAgEwDQYJKoZIhvcNAQEBBQAEggEAgToYKpQDayc41p0e
-fduTgFaGClkMP1VFRBfUp/49lUlFD5Jqktitb40WLjVVV8BUyU+3Mn407/ujlSeljj4JeB8STP4J
-50khpsUG1ozaO5F2z1AzvEdvG9rfHqUAWXTMTGFCbUbSiEnsUbCZ+i3liI4IRP2QRIpCZxfkobLv
-HqoOP64JsB1Rnezpn/UiYABG8C6aVZU04BD1jY6WVG3CqvDSHMEWM3mjKZnnIgzeEFG2qkgZyAFu
-KRos6eU/gyqqYJOcHM1zV5Ywdghpok8vWn8reLZ1NiCeQd172dSDp0/AB7Wsuy6n15HI65yMALhI
-+P4ULdp1jmPi9wUpXknfTw==
---000000000000d42e0605b708342c--
+MAsGCSqGSIb3DQEBBzALBglghkgBZQMEAgEwDQYJKoZIhvcNAQEBBQAEggEArrBZowEiByEQRuTC
+Shbt7JqwisAOKB+kYk3MD9vfRpC1o4dY4N9fgq+eDSFnYP9lFubTcRbMT+SZh3QGyn53b7YUy9Fa
+Tf8pLYGzLglyz6pn+zeYFRxaGyVlekP9TloNSEpYLzqR1JY60T1GlcR2j5mMsHE0reQ0PKrD68Ty
+FP8If3wZYI+Jyj/8e7EC8QNsjnE3FizhHMVi5rje+QdOovAOk8Vc8br/nI9wMAjfbc/2Jchak2Ff
+UGVuRcMs8x8UEWq/6+1/6LTYoMzMOSJiZ9Wrek9AGrCfF5UGp/EFYp4RaEWoThOaoXatrJmfod4x
+CuaEGsQVfP8j7jZvQFCVrg==
+--00000000000048e73105b708344b--
