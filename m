@@ -2,74 +2,111 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60899C433E0
-	for <linux-block@archiver.kernel.org>; Tue, 22 Dec 2020 17:11:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C1BDC433DB
+	for <linux-block@archiver.kernel.org>; Tue, 22 Dec 2020 17:24:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 21D072311D
-	for <linux-block@archiver.kernel.org>; Tue, 22 Dec 2020 17:11:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 269CD23137
+	for <linux-block@archiver.kernel.org>; Tue, 22 Dec 2020 17:24:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727245AbgLVRKo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Dec 2020 12:10:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36286 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726889AbgLVRKn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Dec 2020 12:10:43 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F4E7C0613D3;
-        Tue, 22 Dec 2020 09:10:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:Content-Type:
-        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-        :Reply-To:Content-ID:Content-Description;
-        bh=ik8+7drT2hf8fGhGbNu/E/uz+NLQQnAX3uaoN3mqMCM=; b=CG15D5+zJNT5EHh3IEnfMvfnwg
-        wzhOHxO4uczqFycunh9BLLQ3yhcJln2rOKai0Vs11gZIyJH3YZ76t3pwZFhVhNHyFCDvkCdcdcoHi
-        WStvQO7rbKgFPkxItDXL5jN96yu8oKxDA7y+yKgGCu18l1V5wY/hyh9trpToCzTrOSlD3PK+VdBAN
-        LcDLQFZMWVGAvzOnPEGm9V1If5QtAYZRnSm26gG3YBtkxu7BnFn60XkjTbRwy3qe/Lb6JIWCauEek
-        sfJEAP9QLxNwHJPFzfZtpTH2tND7QtLyaekekmyq4+7AUYtzDQohhWzgXrpm1OHcurD/rdKuN+15F
-        3hR6/KSA==;
-Received: from [2601:1c0:6280:3f0::64ea]
-        by casper.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1krlAd-0008BG-Cv; Tue, 22 Dec 2020 17:10:00 +0000
-Subject: Re: [PATCH v6 00/16] blkcg:Support to track FC storage blk io traffic
-To:     Muneendra <muneendra.kumar@broadcom.com>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        tj@kernel.org, linux-nvme@lists.infradead.org, hare@suse.de
-Cc:     jsmart2021@gmail.com, emilne@redhat.com, mkumar@redhat.com,
-        pbonzini@redhat.com
-References: <1608595918-21954-1-git-send-email-muneendra.kumar@broadcom.com>
-From:   Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <2780d561-c1cd-c82d-57e3-7b79db1071aa@infradead.org>
-Date:   Tue, 22 Dec 2020 09:09:54 -0800
+        id S1727406AbgLVRYx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Dec 2020 12:24:53 -0500
+Received: from mx2.suse.de ([195.135.220.15]:37108 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727384AbgLVRYx (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 22 Dec 2020 12:24:53 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 84A8AB285;
+        Tue, 22 Dec 2020 17:24:11 +0000 (UTC)
+Subject: Re: DM's filesystem lookup in dm_get_dev_t() [was: Re: linux-next:
+ manual merge of the device-mapper tree with Linus' tree]
+To:     Mike Snitzer <snitzer@redhat.com>, Christoph Hellwig <hch@lst.de>,
+        linux-block@vger.kernel.org, dm-devel@redhat.com
+Cc:     Stephen Rothwell <sfr@canb.auug.org.au>,
+        Alasdair G Kergon <agk@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+References: <20201222095056.7a5ac0a0@canb.auug.org.au>
+ <20201222131528.GA29822@lst.de> <20201222145327.GC12885@redhat.com>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <288d1c58-c0e2-9d6f-4816-48c66536fe8b@suse.de>
+Date:   Tue, 22 Dec 2020 18:24:09 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.4.0
 MIME-Version: 1.0
-In-Reply-To: <1608595918-21954-1-git-send-email-muneendra.kumar@broadcom.com>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <20201222145327.GC12885@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/21/20 4:11 PM, Muneendra wrote:
-> This Patch added a unique application identifier i.e
-> app_id  knob to  blkcg which allows identification of traffic
-> sources at an individual cgroup based Applications
-> (ex:virtual machine (VM))level in both host and
-> fabric infrastructure.
+On 12/22/20 3:53 PM, Mike Snitzer wrote:
+> [added linux-block and dm-devel, if someone replies to this email to
+> continue "proper discussion" _please_ at least drop sfr and linux-next
+> from Cc]
+> 
+> On Tue, Dec 22 2020 at  8:15am -0500,
+> Christoph Hellwig <hch@lst.de> wrote:
+> 
+>> Mike, Hannes,
+>>
+>> I think this patch is rather harmful.  Why does device mapper even
+>> mix file system path with a dev_t and all the other weird forms
+>> parsed by name_to_dev_t, which was supposed to be be for the early
+>> init code where no file system is available.
+> 
+> OK, I'll need to revisit (unless someone beats me to it) because this
+> could've easily been a blind-spot for me when the dm-init code went in.
+> Any dm-init specific enabling interface shouldn't be used by more
+> traditional DM interfaces.  So Hannes' change might be treating symptom
+> rather than the core problem (which would be better treated by factoring
+> out dm-init requirements for a name_to_dev_t()-like interface?).
+> 
+> DM has supported passing maj:min and blockdev names on DM table lines
+> forever... so we'll need to be very specific about where/why things
+> regressed.
 > 
 
-Hi,
-Can you get rid of that legalese footer message?
+Ok. The problem from my perspective is that device-mapper needs to
+a) ensure that the arbitrary string passed in with the table definition 
+refers to a valid block device
+and
+b) the block device can be opened with O_EXCL, so that device-mapper can 
+then use it.
 
+Originally (ie prior to commit 644bda6f3460) dm_get_device() just 
+converted the string to a 'dev_t' representation, and then the block 
+device itself was checked and opened in dm_get_table_device().
+'lookup_bdev' was just being used to convert the path if the string was 
+not in the canonical major:minor format, as then it was assumed that it 
+referred to a block device node, and then lookup_bdev kinda makes sense.
 
-thanks.
+However, lookup_bdev() now always recurses into the filesystem, causing 
+multipath to stall in an all-paths-down scenario.
+
+So, the real issue is the table definiton; as it also accepts a device 
+to be specified by the block device _node_ name, we need to have a way 
+of converting that into a dev_t.
+
+If lookup_bdev() is the wrong interface for that, by all means, please, 
+do tell me. I'd be happy to draft up a patch.
+
+Alternatively, if Mike says that only major:minor is the valid format 
+for a table definition we can kill that code completely. But clearly _I_ 
+cannot make the call here.
+
+Cheers,
+
+Hannes
 -- 
-~Randy
-
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
