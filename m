@@ -2,183 +2,65 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B932C433E0
-	for <linux-block@archiver.kernel.org>; Tue, 22 Dec 2020 10:25:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC3ECC433DB
+	for <linux-block@archiver.kernel.org>; Tue, 22 Dec 2020 11:13:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1073E23105
-	for <linux-block@archiver.kernel.org>; Tue, 22 Dec 2020 10:25:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 90D1223124
+	for <linux-block@archiver.kernel.org>; Tue, 22 Dec 2020 11:13:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726351AbgLVKZU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Dec 2020 05:25:20 -0500
-Received: from mx2.suse.de ([195.135.220.15]:60636 "EHLO mx2.suse.de"
+        id S1726463AbgLVLM5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Dec 2020 06:12:57 -0500
+Received: from smtp.hosts.co.uk ([85.233.160.19]:44108 "EHLO smtp.hosts.co.uk"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726123AbgLVKZT (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Dec 2020 05:25:19 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id C2FC7AEE8;
-        Tue, 22 Dec 2020 10:24:37 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 1BF1B1E1332; Tue, 22 Dec 2020 11:18:22 +0100 (CET)
-Date:   Tue, 22 Dec 2020 11:18:22 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, hare@suse.de,
-        Kashyap Desai <kashyap.desai@broadcom.com>
-Subject: Re: [PATCH 2/2] blk-mq: Improve performance of non-mq IO schedulers
- with multiple HW queues
-Message-ID: <20201222101822.GD13601@quack2.suse.cz>
-References: <20201218214412.1543-1-jack@suse.cz>
- <20201218214412.1543-3-jack@suse.cz>
- <20201219031427.GA2711539@T590>
+        id S1726095AbgLVLM5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 22 Dec 2020 06:12:57 -0500
+Received: from host86-149-69-253.range86-149.btcentralplus.com ([86.149.69.253] helo=[192.168.1.65])
+        by smtp.hosts.co.uk with esmtpa (Exim)
+        (envelope-from <antlists@youngman.org.uk>)
+        id 1krfaQ-000BhF-5h; Tue, 22 Dec 2020 11:12:14 +0000
+Subject: Re: [RFC PATCH] badblocks: Improvement badblocks_set() for handling
+ multiple ranges
+To:     Coly Li <colyli@suse.de>, axboe@kernel.dk,
+        dan.j.williams@intel.com, vishal.l.verma@intel.com
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-raid@vger.kernel.org, linux-nvdimm@lists.01.org
+References: <20201203171535.67715-1-colyli@suse.de>
+ <3f4bf4c4-1f1f-b1a6-5d91-2dbe02f61e67@youngman.org.uk>
+ <c50e7c65-d7bf-e957-d8eb-efed6c24f089@suse.de>
+From:   antlists <antlists@youngman.org.uk>
+Message-ID: <3233b821-4674-b45a-cad4-4943401eff3d@youngman.org.uk>
+Date:   Tue, 22 Dec 2020 11:12:14 +0000
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201219031427.GA2711539@T590>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <c50e7c65-d7bf-e957-d8eb-efed6c24f089@suse.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat 19-12-20 11:14:27, Ming Lei wrote:
-> On Fri, Dec 18, 2020 at 10:44:12PM +0100, Jan Kara wrote:
-> > Currently when non-mq aware IO scheduler (BFQ, mq-deadline) is used for
-> > a queue with multiple HW queues, the performance it rather bad. The
-> > problem is that these IO schedulers use queue-wide locking and their
-> > dispatch function does not respect the hctx it is passed in and returns
-> > any request it finds appropriate. Thus locality of request access is
-> > broken and dispatch from multiple CPUs just contends on IO scheduler
-> > locks. For these IO schedulers there's little point in dispatching from
-> > multiple CPUs. Instead dispatch always only from a single CPU to limit
-> > contention.
-> > 
-> > Below is a comparison of dbench runs on XFS filesystem where the storage
-> > is a raid card with 64 HW queues and to it attached a single rotating
-> > disk. BFQ is used as IO scheduler:
-> > 
-> >       clients           MQ                     SQ             MQ-Patched
-> > Amean 1      39.12 (0.00%)       43.29 * -10.67%*       36.09 *   7.74%*
-> > Amean 2     128.58 (0.00%)      101.30 *  21.22%*       96.14 *  25.23%*
-> > Amean 4     577.42 (0.00%)      494.47 *  14.37%*      508.49 *  11.94%*
-> > Amean 8     610.95 (0.00%)      363.86 *  40.44%*      362.12 *  40.73%*
-> > Amean 16    391.78 (0.00%)      261.49 *  33.25%*      282.94 *  27.78%*
-> > Amean 32    324.64 (0.00%)      267.71 *  17.54%*      233.00 *  28.23%*
-> > Amean 64    295.04 (0.00%)      253.02 *  14.24%*      242.37 *  17.85%*
-> > Amean 512 10281.61 (0.00%)    10211.16 *   0.69%*    10447.53 *  -1.61%*
-> > 
-> > Numbers are times so lower is better. MQ is stock 5.10-rc6 kernel. SQ is
-> > the same kernel with megaraid_sas.host_tagset_enable=0 so that the card
-> > advertises just a single HW queue. MQ-Patched is a kernel with this
-> > patch applied.
-> > 
-> > You can see multiple hardware queues heavily hurt performance in
-> > combination with BFQ. The patch restores the performance.
-> > 
-> > Signed-off-by: Jan Kara <jack@suse.cz>
-> > ---
-> >  block/blk-mq.c           | 37 +++++++++++++++++++++++++++++++++++++
-> >  block/kyber-iosched.c    |  1 +
-> >  include/linux/elevator.h |  2 ++
-> >  3 files changed, 40 insertions(+)
-> > 
-> > diff --git a/block/blk-mq.c b/block/blk-mq.c
-> > index 57d0461f2be5..6d80054c231b 100644
-> > --- a/block/blk-mq.c
-> > +++ b/block/blk-mq.c
-> > @@ -1663,6 +1663,31 @@ void blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async)
-> >  }
-> >  EXPORT_SYMBOL(blk_mq_run_hw_queue);
-> >  
-> > +static struct blk_mq_hw_ctx *blk_mq_sq_iosched_hctx(struct request_queue *q)
-> > +{
-> > +	struct elevator_queue *e = q->elevator;
-> > +	struct blk_mq_hw_ctx *hctx;
-> > +
-> > +	/*
-> > +	 * The queue has multiple hardware queues but uses IO scheduler that
-> > +	 * does not respect hardware queues when dispatching? This is not a
-> > +	 * great setup but it can be sensible when we have a single rotational
-> > +	 * disk behind a raid card. Just don't bother with multiple HW queues
-> > +	 * and dispatch from hctx for the current CPU since running multiple
-> > +	 * queues just causes lock contention inside the scheduler and
-> > +	 * pointless cache bouncing because the hctx is not respected by the IO
-> > +	 * scheduler's dispatch function anyway.
-> > +	 */
-> > +	if (q->nr_hw_queues > 1 && e && e->type->ops.dispatch_request &&
-> > +	    !(e->type->elevator_features & ELEVATOR_F_MQ_AWARE)) {
-> > +		hctx = blk_mq_map_queue_type(q, HCTX_TYPE_DEFAULT,
-> > +					     raw_smp_processor_id());
-> > +		if (!blk_mq_hctx_stopped(hctx))
-> > +			return hctx;
-> > +	}
-> > +	return NULL;
-> > +}
-> > +
-> >  /**
-> >   * blk_mq_run_hw_queues - Run all hardware queues in a request queue.
-> >   * @q: Pointer to the request queue to run.
-> > @@ -1673,6 +1698,12 @@ void blk_mq_run_hw_queues(struct request_queue *q, bool async)
-> >  	struct blk_mq_hw_ctx *hctx;
-> >  	int i;
-> >  
-> > +	hctx = blk_mq_sq_iosched_hctx(q);
-> > +	if (hctx) {
-> > +		blk_mq_run_hw_queue(hctx, async);
-> > +		return;
-> > +	}
-> > +
+On 20/12/2020 09:46, Coly Li wrote:
+> Currently blocks/badblocks.c is used by md raid and nvdimm code, and the
+> badblocks table is irrelevant to any of these two subsystems.
+
+Good to know.
 > 
-> This approach looks reasonable, just wondering which code path is wrt.
-> blk_mq_run_hw_queues() improvement by this patch.
+> If there will be better code for similar or better functionality, it
+> should be cool. For me, if the reporting bug is fixed, no difference in
+> my view:-)
 > 
-> Since ed5dd6a67d5e ("scsi: core: Only re-run queue in scsi_end_request() if device
-> queue is busy") is merged, blk_mq_run_hw_queues() is only called from scsi_end_request()
-> when the scsi device is busy for megaraid.
-> 
-> Another one is bfq_schedule_dispatch(), in which blk_mq_run_hw_queues()
-> is still be called, if that is the reason, maybe it is easier to optimize
-> bfq_schedule_dispatch() by avoiding to call blk_mq_run_hw_queues().
+Hopefully that will improve the badblocks handling in md. Sounds like 
+that could in part be the problems we've been seeing.
 
-That's a good question. Tracing shows that with dbench I'm seeing *lots*
-(about 23000/s) blk_mq_delay_run_hw_queues() calls, mostly from
-__blk_mq_do_dispatch_sched(). This drops to "only" about 2000 calls/s with
-my patches applied.
+If I integrate dm-integrity into md, badblocks should be mutually 
+exclusive with it, but because dm-integrity is both a performance and 
+disk-space hit, people might well not want to enable it.
 
-So it means BFQ decided not to dispatch any request (e.g. because it is
-idling for more IO from the same process) and that triggers that path in
-__blk_mq_do_dispatch_sched() that just queues the dispatch again. So blk-mq
-ends up polling BFQ rather heavily for requests it doesn't want to give out
-:). In this sense my patch just makes the real problem less severe.
-
-I've noticed that if ->has_work() returned false, we would not end up
-calling blk_mq_delay_run_hw_queues(). But for BFQ ->has_work() often
-returns true because it has requests queued but ->dispatch_request()
-doesn't dispatch anything because of other scheduling constraints. And so
-we end up calling blk_mq_delay_run_hw_queues() because if we allocated
-dispatch budget and didn't dispatch in the end, we could have blocked
-dispatch from another hctx and so now need to rerun that hctx to dispatch
-possibly queued requests.
-
-I was thinking how we could possibly improve this. One obvious possibility
-is to modify IO schedulers so that their ->has_work() does not return true
-if they later decide not to dispatch anything. However this can happen both
-to mq-deadline and BFQ and for either of them determining whether they will
-dispatch a request or not is about as expensive as dispatching it. So it
-doesn't seem very appealing for these IO schedulers to do the work twice or
-to somehow cache the request found. What seems more workable would be for
-blk_mq_put_dispatch_budget() to return whether rerunning the queue might be
-needed or not (for SCSI, which is the only subsystem using budgeting, this
-means returning whether we were currently at queue_depth) and use that
-information in __blk_mq_do_dispatch_sched(). I'll experiment with a patch I
-guess...
-
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Cheers,
+Wol
