@@ -7,30 +7,30 @@ X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63D79C433E0
-	for <linux-block@archiver.kernel.org>; Wed, 23 Dec 2020 11:27:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59E48C433E6
+	for <linux-block@archiver.kernel.org>; Wed, 23 Dec 2020 11:27:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 33BA7222F9
-	for <linux-block@archiver.kernel.org>; Wed, 23 Dec 2020 11:27:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 29DA2222F9
+	for <linux-block@archiver.kernel.org>; Wed, 23 Dec 2020 11:27:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728467AbgLWL1I (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Dec 2020 06:27:08 -0500
-Received: from out30-43.freemail.mail.aliyun.com ([115.124.30.43]:53781 "EHLO
-        out30-43.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728379AbgLWL1I (ORCPT
+        id S1728556AbgLWL1K (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Dec 2020 06:27:10 -0500
+Received: from out30-45.freemail.mail.aliyun.com ([115.124.30.45]:44203 "EHLO
+        out30-45.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728356AbgLWL1K (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Dec 2020 06:27:08 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04426;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=4;SR=0;TI=SMTPD_---0UJXV94F_1608722784;
-Received: from localhost(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0UJXV94F_1608722784)
+        Wed, 23 Dec 2020 06:27:10 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R221e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04357;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=4;SR=0;TI=SMTPD_---0UJXS7XR_1608722786;
+Received: from localhost(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0UJXS7XR_1608722786)
           by smtp.aliyun-inc.com(127.0.0.1);
-          Wed, 23 Dec 2020 19:26:24 +0800
+          Wed, 23 Dec 2020 19:26:26 +0800
 From:   Jeffle Xu <jefflexu@linux.alibaba.com>
 To:     snitzer@redhat.com
 Cc:     linux-block@vger.kernel.org, dm-devel@redhat.com,
         io-uring@vger.kernel.org
-Subject: [PATCH RFC 1/7] block: move definition of blk_qc_t to types.h
-Date:   Wed, 23 Dec 2020 19:26:18 +0800
-Message-Id: <20201223112624.78955-2-jefflexu@linux.alibaba.com>
+Subject: [PATCH RFC 5/7] dm: always return BLK_QC_T_NONE for bio-based device
+Date:   Wed, 23 Dec 2020 19:26:22 +0800
+Message-Id: <20201223112624.78955-6-jefflexu@linux.alibaba.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20201223112624.78955-1-jefflexu@linux.alibaba.com>
 References: <20201223112624.78955-1-jefflexu@linux.alibaba.com>
@@ -40,56 +40,139 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-So that kiocb.ki_cookie can be defined as blk_qc_t, which will enforce
-the encapsulation.
+Currently the returned cookie of bio-based device is not used at all.
+
+In the following patches, bio-based device will actually return a
+pointer to a specific object as the returned cookie.
 
 Signed-off-by: Jeffle Xu <jefflexu@linux.alibaba.com>
 ---
- include/linux/blk_types.h | 2 +-
- include/linux/fs.h        | 2 +-
- include/linux/types.h     | 3 +++
- 3 files changed, 5 insertions(+), 2 deletions(-)
+ drivers/md/dm.c | 26 ++++++++++----------------
+ 1 file changed, 10 insertions(+), 16 deletions(-)
 
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 866f74261b3b..2e05244fc16d 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -532,7 +532,7 @@ static inline int op_stat_group(unsigned int op)
- 	return op_is_write(op);
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 5b2f371ec4bb..03c2b867acaa 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -1252,14 +1252,13 @@ void dm_accept_partial_bio(struct bio *bio, unsigned n_sectors)
+ }
+ EXPORT_SYMBOL_GPL(dm_accept_partial_bio);
+ 
+-static blk_qc_t __map_bio(struct dm_target_io *tio)
++static void __map_bio(struct dm_target_io *tio)
+ {
+ 	int r;
+ 	sector_t sector;
+ 	struct bio *clone = &tio->clone;
+ 	struct dm_io *io = tio->io;
+ 	struct dm_target *ti = tio->ti;
+-	blk_qc_t ret = BLK_QC_T_NONE;
+ 
+ 	clone->bi_end_io = clone_endio;
+ 
+@@ -1278,7 +1277,7 @@ static blk_qc_t __map_bio(struct dm_target_io *tio)
+ 	case DM_MAPIO_REMAPPED:
+ 		/* the bio has been remapped so dispatch it */
+ 		trace_block_bio_remap(clone, bio_dev(io->orig_bio), sector);
+-		ret = submit_bio_noacct(clone);
++		submit_bio_noacct(clone);
+ 		break;
+ 	case DM_MAPIO_KILL:
+ 		free_tio(tio);
+@@ -1292,8 +1291,6 @@ static blk_qc_t __map_bio(struct dm_target_io *tio)
+ 		DMWARN("unimplemented target map return value: %d", r);
+ 		BUG();
+ 	}
+-
+-	return ret;
  }
  
--typedef unsigned int blk_qc_t;
-+/* Macros for blk_qc_t */
- #define BLK_QC_T_NONE		-1U
- #define BLK_QC_T_SHIFT		16
- #define BLK_QC_T_INTERNAL	(1U << 31)
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index ad4cf1bae586..58db714c4834 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -330,7 +330,7 @@ struct kiocb {
- 	u16			ki_hint;
- 	u16			ki_ioprio; /* See linux/ioprio.h */
- 	union {
--		unsigned int		ki_cookie; /* for ->iopoll */
-+		blk_qc_t		ki_cookie; /* for ->iopoll */
- 		struct wait_page_queue	*ki_waitq; /* for async buffered IO */
- 	};
+ static void bio_setup_sector(struct bio *bio, sector_t sector, unsigned len)
+@@ -1380,7 +1377,7 @@ static void alloc_multiple_bios(struct bio_list *blist, struct clone_info *ci,
+ 	}
+ }
  
-diff --git a/include/linux/types.h b/include/linux/types.h
-index a147977602b5..da5ca7e1bea9 100644
---- a/include/linux/types.h
-+++ b/include/linux/types.h
-@@ -125,6 +125,9 @@ typedef s64			int64_t;
- typedef u64 sector_t;
- typedef u64 blkcnt_t;
+-static blk_qc_t __clone_and_map_simple_bio(struct clone_info *ci,
++static void __clone_and_map_simple_bio(struct clone_info *ci,
+ 					   struct dm_target_io *tio, unsigned *len)
+ {
+ 	struct bio *clone = &tio->clone;
+@@ -1391,7 +1388,7 @@ static blk_qc_t __clone_and_map_simple_bio(struct clone_info *ci,
+ 	if (len)
+ 		bio_setup_sector(clone, ci->sector, *len);
  
-+/* cookie used for IO polling */
-+typedef unsigned int blk_qc_t;
-+
+-	return __map_bio(tio);
++	__map_bio(tio);
+ }
+ 
+ static void __send_duplicate_bios(struct clone_info *ci, struct dm_target *ti,
+@@ -1405,7 +1402,7 @@ static void __send_duplicate_bios(struct clone_info *ci, struct dm_target *ti,
+ 
+ 	while ((bio = bio_list_pop(&blist))) {
+ 		tio = container_of(bio, struct dm_target_io, clone);
+-		(void) __clone_and_map_simple_bio(ci, tio, len);
++		__clone_and_map_simple_bio(ci, tio, len);
+ 	}
+ }
+ 
+@@ -1450,7 +1447,7 @@ static int __clone_and_map_data_bio(struct clone_info *ci, struct dm_target *ti,
+ 		free_tio(tio);
+ 		return r;
+ 	}
+-	(void) __map_bio(tio);
++	__map_bio(tio);
+ 
+ 	return 0;
+ }
+@@ -1565,11 +1562,10 @@ static void init_clone_info(struct clone_info *ci, struct mapped_device *md,
  /*
-  * The type of an index into the pagecache.
+  * Entry point to split a bio into clones and submit them to the targets.
   */
+-static blk_qc_t __split_and_process_bio(struct mapped_device *md,
++static void __split_and_process_bio(struct mapped_device *md,
+ 					struct dm_table *map, struct bio *bio)
+ {
+ 	struct clone_info ci;
+-	blk_qc_t ret = BLK_QC_T_NONE;
+ 	int error = 0;
+ 
+ 	init_clone_info(&ci, md, map, bio);
+@@ -1613,7 +1609,7 @@ static blk_qc_t __split_and_process_bio(struct mapped_device *md,
+ 
+ 				bio_chain(b, bio);
+ 				trace_block_split(b, bio->bi_iter.bi_sector);
+-				ret = submit_bio_noacct(bio);
++				submit_bio_noacct(bio);
+ 				break;
+ 			}
+ 		}
+@@ -1621,13 +1617,11 @@ static blk_qc_t __split_and_process_bio(struct mapped_device *md,
+ 
+ 	/* drop the extra reference count */
+ 	dec_pending(ci.io, errno_to_blk_status(error));
+-	return ret;
+ }
+ 
+ static blk_qc_t dm_submit_bio(struct bio *bio)
+ {
+ 	struct mapped_device *md = bio->bi_disk->private_data;
+-	blk_qc_t ret = BLK_QC_T_NONE;
+ 	int srcu_idx;
+ 	struct dm_table *map;
+ 
+@@ -1657,10 +1651,10 @@ static blk_qc_t dm_submit_bio(struct bio *bio)
+ 	if (is_abnormal_io(bio))
+ 		blk_queue_split(&bio);
+ 
+-	ret = __split_and_process_bio(md, map, bio);
++	__split_and_process_bio(md, map, bio);
+ out:
+ 	dm_put_live_table(md, srcu_idx);
+-	return ret;
++	return BLK_QC_T_NONE;
+ }
+ 
+ /*-----------------------------------------------------------------
 -- 
 2.27.0
 
