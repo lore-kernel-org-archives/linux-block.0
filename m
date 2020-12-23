@@ -2,119 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD3CBC433E0
-	for <linux-block@archiver.kernel.org>; Wed, 23 Dec 2020 16:17:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33E0DC433DB
+	for <linux-block@archiver.kernel.org>; Wed, 23 Dec 2020 16:26:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9FF5D207A2
-	for <linux-block@archiver.kernel.org>; Wed, 23 Dec 2020 16:17:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0168022D57
+	for <linux-block@archiver.kernel.org>; Wed, 23 Dec 2020 16:26:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725988AbgLWQRd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Dec 2020 11:17:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51496 "EHLO
+        id S1728082AbgLWQ02 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Dec 2020 11:26:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52842 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725783AbgLWQRd (ORCPT
+        with ESMTP id S1726072AbgLWQ01 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Dec 2020 11:17:33 -0500
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E407C061794
-        for <linux-block@vger.kernel.org>; Wed, 23 Dec 2020 08:16:53 -0800 (PST)
-Received: by mail-pl1-x62f.google.com with SMTP id be12so9361285plb.4
-        for <linux-block@vger.kernel.org>; Wed, 23 Dec 2020 08:16:53 -0800 (PST)
+        Wed, 23 Dec 2020 11:26:27 -0500
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0BA0C06179C
+        for <linux-block@vger.kernel.org>; Wed, 23 Dec 2020 08:25:47 -0800 (PST)
+Received: by mail-pf1-x42f.google.com with SMTP id 11so10642250pfu.4
+        for <linux-block@vger.kernel.org>; Wed, 23 Dec 2020 08:25:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=R/XI3HACitxNNKdDGgHb+kOn5zfn0Owx8twC0nO/Nto=;
-        b=cHBpe0rmEcvFesYRG+RYgq5Ek8r6gHYu+8GOChXrJ0L4IehMh/gk0CXI5fRzTlgwwz
-         kGl6W6VAwAZgNAsnjqgT4j8CFE+NIQOHd4Cjl6U93RptnVVt8jJf8EUQNObUMj4Xaq/x
-         Kiwj/ehm5DEEqq6hoCxcBFhu9XRhI1jxWpH4weolyQGkBTqEEprWAzq0I7qUuuyM5v5E
-         rbJwRyvh5srP0ozWwsMd9nS0MOT/uib6hAAUgvQkQ48j40cgj0ZM464B92MCgLoxuMHP
-         05fQOCL5f4NxpwUuCf3RVA8FEd5Mz6Q6BL9DuSeRedz/UQ3jd5NTPXxUIDqkcW6CC2Q7
-         0e7A==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=FCNtsZYBFLDT8cP1bh+6isWEIlEdtCc9b+ja9RvHmTE=;
+        b=PJAYCnEwqVQvC1oI3hhQpDH9apfycos6rpUuLunhJzxN0h2SvtM51UBhsD8V4PLCBs
+         rDGxoPVyo/rA3WFHIwWoLbfD8UwmwOQE5uoZ8Ntx6YGLCvQxLxpH4boqLtWJ3zjQtmy/
+         Qky+LtpGthhFPHywz3m/yYeXLolQjIfQ1LPvDNdEYO3CInEaYPoX/5uan+00i5x4Nb3t
+         GBdGzBfkDyMGxtF6KYgByQW6j/tVziGi2ibr2qE2HIsZDaHEvckUgU/GPKjW3YQMkam6
+         1L5KuBr4lhjVVtBmVQbFg+5z9tnYgIz3x/fmlLVYtD2/Jmnqn9foprfzhbyChc+oFF4C
+         LaUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=R/XI3HACitxNNKdDGgHb+kOn5zfn0Owx8twC0nO/Nto=;
-        b=aCRq//pr/KVTTLVXuDqJjpx3nJoVBsQGVvObGU4M5Q/pa4jl0tiG/NeVg4Vfj15lqO
-         wPh6b5Mkh5Bj/ZcBJnzo8FZNMr+UXinAUOBmdvLgbBlludAUKvrdNFtd1j3fd61q7edU
-         0MINRcHCUg2qX3NrayNmIFncE+yddtq4anv46mZY1SqoePT2gAAQtYvCZo/8yHTtF1cc
-         SdEn+g1xOgfg/YbMjlFP0XyvGItLVCLXCjU1YZ6p66AjrfBqd9SycoB+458gcIiouj8T
-         H1BIAzhZaPLG96pHFg87A2D7X04mNpJJMkV7VviFshnNhWiZj+OdgSa8q2U/nvLTUpfY
-         T3PA==
-X-Gm-Message-State: AOAM533dzYE93soqarDuasfhpd0ecRwPVVrjF6FG5oX7jCEqgf5WLzxI
-        0E4HxXLVtay18aLs1R8B3tg=
-X-Google-Smtp-Source: ABdhPJzoiDr5W0ttuQgdEQzzISkxPt+rKaUM7wFPX0tNJy4ZBpORqyyZr0uMruqZcxGaDcIRdDdoJA==
-X-Received: by 2002:a17:90a:a2e:: with SMTP id o43mr382325pjo.59.1608740212687;
-        Wed, 23 Dec 2020 08:16:52 -0800 (PST)
-Received: from localhost ([211.108.35.36])
-        by smtp.gmail.com with ESMTPSA id z23sm15869038pfj.143.2020.12.23.08.16.51
-        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 23 Dec 2020 08:16:52 -0800 (PST)
-Date:   Thu, 24 Dec 2020 01:16:50 +0900
-From:   Minwoo Im <minwoo.im.dev@gmail.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@fb.com>,
-        Sagi Grimberg <sagi@grimberg.me>
-Subject: Re: [RFC] nvme: set block size during namespace validation
-Message-ID: <20201223161650.GA13354@localhost.localdomain>
-References: <20201223150136.4221-1-minwoo.im.dev@gmail.com>
- <20201223154904.GA5967@lst.de>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=FCNtsZYBFLDT8cP1bh+6isWEIlEdtCc9b+ja9RvHmTE=;
+        b=l2v3bwbdego7GvEkbbZbILNAL9ZjmEPsYGUzNk59lV6XYzaf7DHJXyCgMUhmmHUf4/
+         Rgtfb61HXKC+YFLsmzql0kjerHlCB/YD7Qmd+9pVCyvBUS18hKaEspspZ9Ba3xKwcSbu
+         9tOjyJ4OEzzTt182TtjEeetCUlonYd/uF5/WI5y0gnO8MShNBPaOu1WWFFV9vNzsdvZ6
+         HJRCvPuzGSPewjvgmrCbH6FqA47GB6TkBKAcarTyCDs2Zz1q9B9yk4ZIBUdEMPlR1zrl
+         CV+eMpa7CWA6obwTLIm2lbmTZOLokN8MJzJzRdaaKu8r5m5KlYcOtTjvyLaCl+sI2VUr
+         iGFQ==
+X-Gm-Message-State: AOAM530dPQyVKKKb+R/0pbXRrwfsJrpDo1bD4NUQQtp4C4an96NedC/f
+        9HrnrddqyF+Qtqkg+0WMGOBnMxhAnqYoEw==
+X-Google-Smtp-Source: ABdhPJwTdNDn7R/hReho8BPBuUGavwmnVredKSMtoQo4DQXNkNRCEm9L73NLyFIYuRXNHF7qiU2IuQ==
+X-Received: by 2002:a63:f512:: with SMTP id w18mr25104185pgh.154.1608740746859;
+        Wed, 23 Dec 2020 08:25:46 -0800 (PST)
+Received: from [192.168.1.134] ([66.219.217.173])
+        by smtp.gmail.com with ESMTPSA id z2sm13717758pgl.49.2020.12.23.08.25.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 23 Dec 2020 08:25:46 -0800 (PST)
+Subject: Re: [PATCH 0/2] bcache second wave patches for Linux v5.11
+To:     Coly Li <colyli@suse.de>
+Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+References: <20201223150422.3966-1-colyli@suse.de>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <566237e3-2086-e143-f9dc-c29edc6e8aba@kernel.dk>
+Date:   Wed, 23 Dec 2020 09:25:45 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
+In-Reply-To: <20201223150422.3966-1-colyli@suse.de>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20201223154904.GA5967@lst.de>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+On 12/23/20 8:04 AM, Coly Li wrote:
+> Hi Jens,
+> 
+> Here are the second wave patches for Linux v5.11. Especially the patch
+> from Yi Li is a fix of a regression in this merge window.
 
-On 20-12-23 16:49:04, Christoph Hellwig wrote:
-> set_blocksize just sets the block sise used for buffer heads and should
-> not be called by the driver.  blkdev_get updates the block size, so
-> you must already have the fd re-reading the partition table open?
-> I'm not entirely sure how we can work around this except by avoiding
-> buffer head I/O in the partition reread code.  Note that this affects
-> all block drivers where the block size could change at runtime.
+Applied, thanks.
 
-Thank you Christoph for your comment on this.
+-- 
+Jens Axboe
 
-Agreed.  BLKRRPART leads us to block_read_full_page which takes buffer
-heads for I/O.
-
-Yes, __blkdev_get() sets i_blkbits of block device inode via
-set_init_blocksize.  And Yes again as nvme-cli already opened the block
-device fd and requests the BLKRRPART with that fd.  Also, __bdev_get()
-only updates the i_blkbits(blocksize) in case bdev->bd_openers == 0 which
-is the first time to open this block device.
-
-Then, how about having NVMe driver prevent underflow case for the
-request->__data_len is smaller than the logical block size like:
-
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index ce1b61519441..030353d203bf 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -803,7 +803,11 @@ static inline blk_status_t nvme_setup_rw(struct nvme_ns *ns,
-        cmnd->rw.opcode = op;
-        cmnd->rw.nsid = cpu_to_le32(ns->head->ns_id);
-        cmnd->rw.slba = cpu_to_le64(nvme_sect_to_lba(ns, blk_rq_pos(req)));
--       cmnd->rw.length = cpu_to_le16((blk_rq_bytes(req) >> ns->lba_shift) - 1);
-+
-+       if (unlikely(blk_rq_bytes(req) < (1 << ns->lba_shift)))
-+               cmnd->rw.length = 0;
-+       else
-+               cmnd->rw.length = cpu_to_le16((blk_rq_bytes(req) >> ns->lba_shift) - 1);
- 
-        if (req_op(req) == REQ_OP_WRITE && ctrl->nr_streams)
-                nvme_assign_write_stream(ctrl, req, &control, &dsmgmt);
-
-Thanks,
