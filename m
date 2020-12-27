@@ -2,86 +2,89 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 394F6C433E0
-	for <linux-block@archiver.kernel.org>; Sun, 27 Dec 2020 11:36:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E29EC433E6
+	for <linux-block@archiver.kernel.org>; Sun, 27 Dec 2020 12:00:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ECC27217A0
-	for <linux-block@archiver.kernel.org>; Sun, 27 Dec 2020 11:36:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5E8AB22509
+	for <linux-block@archiver.kernel.org>; Sun, 27 Dec 2020 12:00:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726116AbgL0Lgn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 27 Dec 2020 06:36:43 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43660 "EHLO
+        id S1726187AbgL0MAm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 27 Dec 2020 07:00:42 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:48777 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726039AbgL0Lgm (ORCPT
+        by vger.kernel.org with ESMTP id S1726172AbgL0MAm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 27 Dec 2020 06:36:42 -0500
+        Sun, 27 Dec 2020 07:00:42 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1609068917;
+        s=mimecast20190719; t=1609070355;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=pSTOjMzwybL8O2en7wmB6uCwB+vyZM21YghPJixNIOs=;
-        b=ifwZbFKe0ntqOnKsirLrDiHep0fZoPo+ReHZ+Hzi7PyV5UOUXo5Pb86xVH0TONjJayq3vU
-        TjCEWlvHzHiOXpZorKlOx8GJicYqDu+OeQk9C9hsttGXGaA/oPq5brtf1ZI1rQEU03h9gQ
-        3xTOE3n8JPktgOaUd5T/DtenNmciRGA=
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=B77ZH4RVvlN4DS2W5XduNFHLg2L16n9zgwjAwYXRZm4=;
+        b=OUeXIOmn2hkD+lxr3Y/1Xu4t0K08etIn6aT3gK2HvFDokoBT0jMsjtKNayHkyTPFHZoqfi
+        HBK1rGvxZ33j1NAk49+CPc5BeJeyN5sK8FqSZNy92zREq/vY3wP+icWlzX0xy7TUfkgLxg
+        Ue08QfBsRn8+FpaRo6DdmCv71FpeCnY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-159-ANMGTS9bM4yH9BucwYHsnA-1; Sun, 27 Dec 2020 06:35:15 -0500
-X-MC-Unique: ANMGTS9bM4yH9BucwYHsnA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-498-4BplTBqwMaC9gom0zlk6Mg-1; Sun, 27 Dec 2020 06:59:13 -0500
+X-MC-Unique: 4BplTBqwMaC9gom0zlk6Mg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A7F3415721;
-        Sun, 27 Dec 2020 11:35:13 +0000 (UTC)
-Received: from localhost (ovpn-12-134.pek2.redhat.com [10.72.12.134])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E8284189B8;
-        Sun, 27 Dec 2020 11:35:03 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DD1EC180A08A;
+        Sun, 27 Dec 2020 11:59:11 +0000 (UTC)
+Received: from T590 (ovpn-12-134.pek2.redhat.com [10.72.12.134])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 123865D719;
+        Sun, 27 Dec 2020 11:59:03 +0000 (UTC)
+Date:   Sun, 27 Dec 2020 19:58:59 +0800
 From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        John Garry <john.garry@huawei.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>
-Subject: [PATCH] blk-mq: test QUEUE_FLAG_HCTX_ACTIVE for sbitmap_shared in hctx_may_queue
-Date:   Sun, 27 Dec 2020 19:34:58 +0800
-Message-Id: <20201227113458.3289082-1-ming.lei@redhat.com>
+To:     Yu Kuai <yukuai3@huawei.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
+        zhangxiaoxu5@huawei.com
+Subject: Re: [PATCH 1/3] blk-mq: allow hardware queue to get more tag while
+ sharing a tag set
+Message-ID: <20201227115859.GA3282759@T590>
+References: <20201226102808.2534966-1-yukuai3@huawei.com>
+ <20201226102808.2534966-2-yukuai3@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201226102808.2534966-2-yukuai3@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In case of blk_mq_is_sbitmap_shared(), we should test QUEUE_FLAG_HCTX_ACTIVE against
-q->queue_flags instead of BLK_MQ_S_TAG_ACTIVE.
+Hi Yu Kuai,
 
-So fix it.
+On Sat, Dec 26, 2020 at 06:28:06PM +0800, Yu Kuai wrote:
+> When sharing a tag set, if most disks are issuing small amount of IO, and
+> only a few is issuing a large amount of IO. Current approach is to limit
+> the max amount of tags a disk can get equally to the average of total
+> tags. Thus the few heavy load disk can't get enough tags while many tags
+> are still free in the tag set.
 
-Cc: John Garry <john.garry@huawei.com>
-Cc: Kashyap Desai <kashyap.desai@broadcom.com>
-Fixes: f1b49fdc1c64 ("blk-mq: Record active_queues_shared_sbitmap per tag_set for when using shared sbitmap")
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Yeah, current approach just allocates same share for each active queue
+which is evaluated in each timeout period.
 
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index c1458d9502f1..3616453ca28c 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -304,7 +304,7 @@ static inline bool hctx_may_queue(struct blk_mq_hw_ctx *hctx,
- 		struct request_queue *q = hctx->queue;
- 		struct blk_mq_tag_set *set = q->tag_set;
- 
--		if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &q->queue_flags))
-+		if (!test_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags))
- 			return true;
- 		users = atomic_read(&set->active_queues_shared_sbitmap);
- 	} else {
--- 
-2.28.0
+That said you are trying to improve the following case:
+- heavy IO on one or several disks, and the average share for these
+  disks become bottleneck of IO performance
+- small amount IO on other disks attached to the same host, and all IOs are
+submitted to disk in <30 second period.
+
+Just wondering if you may share the workload you are trying to optimize,
+or it is just one improvement in theory? And what is the disk(hdd, ssd
+or nvme) and host? And how many disks in your setting? And how deep the tagset
+depth is?
+
+
+Thanks, 
+Ming
 
