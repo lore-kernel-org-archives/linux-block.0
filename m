@@ -2,192 +2,303 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6EDBC433E6
-	for <linux-block@archiver.kernel.org>; Sat, 26 Dec 2020 18:03:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 485CBC433E6
+	for <linux-block@archiver.kernel.org>; Sun, 27 Dec 2020 02:46:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 97678221EF
-	for <linux-block@archiver.kernel.org>; Sat, 26 Dec 2020 18:03:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0C2632225E
+	for <linux-block@archiver.kernel.org>; Sun, 27 Dec 2020 02:46:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726280AbgLZSDl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 26 Dec 2020 13:03:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49744 "EHLO
+        id S1726130AbgL0Cpr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 26 Dec 2020 21:45:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44580 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726194AbgLZSDk (ORCPT
+        with ESMTP id S1726105AbgL0Cpq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 26 Dec 2020 13:03:40 -0500
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CC7FC061757;
-        Sat, 26 Dec 2020 10:03:00 -0800 (PST)
-Received: by mail-pj1-x102c.google.com with SMTP id b5so4230644pjl.0;
-        Sat, 26 Dec 2020 10:03:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=4Y9ogSPZ5hMKc7DdJiGJQd2mRtdieX3VWNe0j8nL7fs=;
-        b=oFzNCb19GRT8pD+LMUtLpzqB7x0DS2l3VE5mW0qt2uThPZgjTqulgHPnz85BlJkLSx
-         bs4sdbwrPDLWPSOnXUDofSnCWETl7KE2mu4/HlYuKgVftBKLo4LPZFHXGP12FbFJo1jK
-         n5LIsRKAALfaG8B+KuBrC1W/beB9FwWZwjNuNSdGGUDmSp+Lype/0IRV2ZpBh0rqIfmM
-         uyuR6xd0lHnx9RES/VR8t/Y0oYR9QBJfzqrV1Bbu9BPlkmNTNCG/Em5jEOOD04oWMrRN
-         jroJNH+Vq/FFFDv63UUMegnuKbTT2PgIoMvowhp4mcqYov+yKV4oQRqg0wYcZThXf1qW
-         nE6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=4Y9ogSPZ5hMKc7DdJiGJQd2mRtdieX3VWNe0j8nL7fs=;
-        b=e4TaFy+SkGJ8pEWT/xXiADkOFQxI4ilWa60sAKmzyNOS0vOEGFQv5t01eBnbcLHW+w
-         YBSByJHyQ+jYm+44+l1wiNYZPq2s4bUEIQTc6/emoWvzRPT/3vSdc5k3JJM6O9Hd4X0M
-         MpXnRNF/eZ4wT4+jjZgtlnCyeejEOh7bZHVpRcEin+2dNN/mfvjcxx7U9m3hqNLJbQ6r
-         3WjWSJwd4aKKgQ+0J/yVZ6LLdfwnQJ19ozScwOxpa67kwvBnyszrncWv/Xptwfkdbdnw
-         R8foOKdyl7QY5FBnwISXW+fQNkC3CqgpPO7uYwoKv7EsgvKUosbnerApXopU+jpOiK0U
-         IXBA==
-X-Gm-Message-State: AOAM531FQ938ibJo0mo2aFiSj9ZEOTsRvTqW/MonaYHkNs5Q/o+AbxcF
-        lV7cS0bztwImYx0+HAtdwSnogY/jFEt0Xw==
-X-Google-Smtp-Source: ABdhPJz1uhDLovrvbxwVJp0TqNK5JCQe3WYP09y4W3OhTDX1X//+4z1RlU16CKm+TeuGFRktfNgoIw==
-X-Received: by 2002:a17:90a:b395:: with SMTP id e21mr13617612pjr.197.1609005779506;
-        Sat, 26 Dec 2020 10:02:59 -0800 (PST)
-Received: from localhost.localdomain ([211.108.35.36])
-        by smtp.gmail.com with ESMTPSA id e24sm8467038pjt.16.2020.12.26.10.02.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 26 Dec 2020 10:02:58 -0800 (PST)
-From:   Minwoo Im <minwoo.im.dev@gmail.com>
-To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-nvme@lists.infradead.org
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@lst.de>,
-        Minwoo Im <minwoo.im.dev@gmail.com>
-Subject: [RFC] block: reject I/O in BLKRRPART if block size changed
-Date:   Sun, 27 Dec 2020 03:02:32 +0900
-Message-Id: <20201226180232.12276-1-minwoo.im.dev@gmail.com>
-X-Mailer: git-send-email 2.17.1
+        Sat, 26 Dec 2020 21:45:46 -0500
+Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53DF0C0613ED;
+        Sat, 26 Dec 2020 18:45:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=merlin.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=nJoVIgJhKkmXydQo5rC30H4hVdYUU0JvjjaZLerNb2k=; b=vPkRrKoFmkchE3qxkJYzQNxW+g
+        EcOZuSgy1FPMqBOUbAs8xpu3r9sOkRqnf/Z8MPYDOZMk35AkFu8i6yilyknNbpq4Jus0tFyFsla95
+        Fc/7nve0BGx0YmZfcZbgnhs24zNv/1rTkt8DL6aWsPxGkQoLO+cxC7gJr6zv57dcwhnhJ5V6wZp2N
+        6u8Qv4gFp3sgQkWgszpqNSE3SxfDIOKkY7d7K3nK7oNRwlm7PBJXXdhPuI9PXUUu70mViz76V5gRt
+        +f+MCCPAwWiUzzAU+IXWheudQGysTloc7/DprRtrZxbzgUjpTafpueRnHh1eDGhSNnyRI/SpQWWGX
+        oBqMK0WA==;
+Received: from [2601:1c0:6280:3f0::64ea] (helo=smtpauth.infradead.org)
+        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1ktM3D-0005zl-13; Sun, 27 Dec 2020 02:44:55 +0000
+From:   Randy Dunlap <rdunlap@infradead.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Randy Dunlap <rdunlap@infradead.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Ley Foon Tan <ley.foon.tan@intel.com>,
+        Mark Salter <msalter@redhat.com>,
+        Aurelien Jacquiot <jacquiot.aurelien@gmail.com>,
+        linux-c6x-dev@linux-c6x.org, Peter Zijlstra <peterz@infradead.org>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>
+Subject: [PATCH v2] local64.h: make <asm/local64.h> mandatory
+Date:   Sat, 26 Dec 2020 18:44:46 -0800
+Message-Id: <20201227024446.17018-1-rdunlap@infradead.org>
+X-Mailer: git-send-email 2.26.2
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Background:
-  Let's say we have 2 LBA format for 4096B and 512B LBA size for a
-NVMe namespace.  Assume that current LBA format is 4096B and in case
-we convert namespace to 512B and 4096B back again:
+Make <asm-generic/local64.h> mandatory in include/asm-generic/Kbuild
+and remove all arch/*/include/asm/local64.h arch-specific files since
+they only #include <asm-generic/local64.h>.
 
-  nvme format /dev/nvme0n1 --lbaf=1 --force  # to 512B LBA
-  nvme format /dev/nvme0n1 --lbaf=0 --force  # to 4096B LBA
+This fixes build errors on arch/c6x/ and arch/nios2/ for
+block/blk-iocost.c.
 
-  Then we can see the following errors during the BLKRRPART ioctl from
-the nvme-cli format subcommand:
+Build-tested on 21 of 25 arch-es. (tools problems on the others)
 
-  [   10.771740] blk_update_request: operation not supported error, dev nvme0n1, sector 0 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 0
-  [   10.780262] Buffer I/O error on dev nvme0n1, logical block 0, async page read
-  ...
+Yes, we could even rename <asm-generic/local64.h> to
+<linux/local64.h> and change all #includes to use
+<linux/local64.h> instead.
 
-  Also, we can see the Read commands followed by the Format command due
-to BLKRRPART ioctl with Number of LBAs to 65535(0xffff) which is
-under-flowed because the request for the Read commands are coming with
-512B and this is because it's playing around with i_blkbits from the
-block_device inode which needs to be avoided as [1].
-
-  kworker/0:1H-56      [000] ....   913.456922: nvme_setup_cmd: nvme0: disk=nvme0n1, qid=1, cmdid=216, nsid=1, flags=0x0, meta=0x0, cmd=(nvme_cmd_read slba=0, len=65535, ctrl=0x0, dsmgmt=0, reftag=0)
-  ksoftirqd/0-9       [000] .Ns.   916.566351: nvme_complete_rq: nvme0: disk=nvme0n1, qid=1, cmdid=216, res=0x0, retries=0, flags=0x0, status=0x4002
-  ...
-
-  Before we have commit 5ff9f19231a0 ("block: simplify
-set_init_blocksize"), block size used to be bumped up to the
-4K(PAGE_SIZE) in this example and we have not seen these errors.  But
-with this patch, we have to make sure that bdev->bd_inode->i_blkbits to
-make sure that BLKRRPART ioctl pass proper request length based on the
-changed logical block size.
-
-Description:
-  As the previous discussion [1], this patch introduced a gendisk flag
-to indicate that block size has been changed in the runtime.  This flag
-is set when logical block size is changed in the runtime with sector
-capacity itself.  It will be cleared when the file descriptor for the
-block devie is opened again which means __blkdev_get() updates the block
-size via set_init_blocksize().
-  This patch rejects I/O from the path of add_partitions() and
-application should open the file descriptor again to update the block
-size of the block device inode.
-
-[1] https://lore.kernel.org/linux-nvme/20201223183143.GB13354@localhost.localdomain/T/#t
-
-Signed-off-by: Minwoo Im <minwoo.im.dev@gmail.com>
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Suggested-by: Christoph Hellwig <hch@infradead.org>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org
+Cc: Ley Foon Tan <ley.foon.tan@intel.com>
+Cc: Mark Salter <msalter@redhat.com>
+Cc: Aurelien Jacquiot <jacquiot.aurelien@gmail.com>
+Cc: linux-c6x-dev@linux-c6x.org
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: Masahiro Yamada <masahiroy@kernel.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>
 ---
- block/genhd.c           |  3 +++
- block/partitions/core.c | 11 +++++++++++
- fs/block_dev.c          |  6 ++++++
- include/linux/genhd.h   |  1 +
- 4 files changed, 21 insertions(+)
+Would some $maintainer please plan to apply/merge this.
 
-diff --git a/block/genhd.c b/block/genhd.c
-index b84b8671e627..1f64907fac3d 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -79,6 +79,9 @@ bool set_capacity_and_notify(struct gendisk *disk, sector_t size)
- 	 */
- 	if (!capacity || !size)
- 		return false;
-+
-+	disk->flags |= GENHD_FL_BLOCK_SIZE_CHANGED;
-+
- 	kobject_uevent_env(&disk_to_dev(disk)->kobj, KOBJ_CHANGE, envp);
- 	return true;
- }
-diff --git a/block/partitions/core.c b/block/partitions/core.c
-index deca253583bd..7dfcda96be9e 100644
---- a/block/partitions/core.c
-+++ b/block/partitions/core.c
-@@ -617,6 +617,17 @@ int blk_add_partitions(struct gendisk *disk, struct block_device *bdev)
- 	if (!disk_part_scan_enabled(disk))
- 		return 0;
- 
-+	/*
-+	 * Reject to check partition information if block size has been changed
-+	 * in the runtime.  If block size of a block device has been changed,
-+	 * the file descriptor should be opened agian to update the blkbits.
-+	 */
-+	if (disk->flags & GENHD_FL_BLOCK_SIZE_CHANGED) {
-+		pr_warn("%s: rejecting checking partition. fd should be opened again.\n",
-+				disk->disk_name);
-+		return -EBADFD;
-+	}
-+
- 	state = check_partition(disk, bdev);
- 	if (!state)
- 		return 0;
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 9e56ee1f2652..813361ad77c1 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -132,6 +132,12 @@ EXPORT_SYMBOL(truncate_bdev_range);
- static void set_init_blocksize(struct block_device *bdev)
- {
- 	bdev->bd_inode->i_blkbits = blksize_bits(bdev_logical_block_size(bdev));
-+
-+	/*
-+	 * Allow I/O commands for this block device.  We can say that this
-+	 * block device has been set to a proper block size.
-+	 */
-+	bdev->bd_disk->flags &= ~GENHD_FL_BLOCK_SIZE_CHANGED;
- }
- 
- int set_blocksize(struct block_device *bdev, int size)
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index 809aaa32d53c..0e0e24917003 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -103,6 +103,7 @@ struct partition_meta_info {
- #define GENHD_FL_BLOCK_EVENTS_ON_EXCL_WRITE	0x0100
- #define GENHD_FL_NO_PART_SCAN			0x0200
- #define GENHD_FL_HIDDEN				0x0400
-+#define GENHD_FL_BLOCK_SIZE_CHANGED		0x0800
- 
- enum {
- 	DISK_EVENT_MEDIA_CHANGE			= 1 << 0, /* media changed */
--- 
-2.17.1
+v2: instead of making local64.h a generic-y header file and adding it
+to the missing arch/ header locations, make it a mandotory-y header file
+and remove it from most arch/ header locations. (Christoph)
 
+ arch/alpha/include/asm/local64.h   |    1 -
+ arch/arc/include/asm/Kbuild        |    1 -
+ arch/arm/include/asm/Kbuild        |    1 -
+ arch/arm64/include/asm/Kbuild      |    1 -
+ arch/csky/include/asm/Kbuild       |    1 -
+ arch/h8300/include/asm/Kbuild      |    1 -
+ arch/hexagon/include/asm/Kbuild    |    1 -
+ arch/ia64/include/asm/local64.h    |    1 -
+ arch/m68k/include/asm/Kbuild       |    1 -
+ arch/microblaze/include/asm/Kbuild |    1 -
+ arch/mips/include/asm/Kbuild       |    1 -
+ arch/nds32/include/asm/Kbuild      |    1 -
+ arch/openrisc/include/asm/Kbuild   |    1 -
+ arch/parisc/include/asm/Kbuild     |    1 -
+ arch/powerpc/include/asm/Kbuild    |    1 -
+ arch/riscv/include/asm/Kbuild      |    1 -
+ arch/s390/include/asm/Kbuild       |    1 -
+ arch/sh/include/asm/Kbuild         |    1 -
+ arch/sparc/include/asm/Kbuild      |    1 -
+ arch/x86/include/asm/local64.h     |    1 -
+ arch/xtensa/include/asm/Kbuild     |    1 -
+ include/asm-generic/Kbuild         |    1 +
+ 22 files changed, 1 insertion(+), 21 deletions(-)
+
+--- linux-next-20201209.orig/include/asm-generic/Kbuild
++++ linux-next-20201209/include/asm-generic/Kbuild
+@@ -34,6 +34,7 @@ mandatory-y += kmap_size.h
+ mandatory-y += kprobes.h
+ mandatory-y += linkage.h
+ mandatory-y += local.h
++mandatory-y += local64.h
+ mandatory-y += mm-arch-hooks.h
+ mandatory-y += mmiowb.h
+ mandatory-y += mmu.h
+--- linux-next-20201209.orig/arch/arc/include/asm/Kbuild
++++ linux-next-20201209/arch/arc/include/asm/Kbuild
+@@ -1,7 +1,6 @@
+ # SPDX-License-Identifier: GPL-2.0
+ generic-y += extable.h
+ generic-y += kvm_para.h
+-generic-y += local64.h
+ generic-y += mcs_spinlock.h
+ generic-y += parport.h
+ generic-y += user.h
+--- linux-next-20201209.orig/arch/arm64/include/asm/Kbuild
++++ linux-next-20201209/arch/arm64/include/asm/Kbuild
+@@ -1,6 +1,5 @@
+ # SPDX-License-Identifier: GPL-2.0
+ generic-y += early_ioremap.h
+-generic-y += local64.h
+ generic-y += mcs_spinlock.h
+ generic-y += qrwlock.h
+ generic-y += qspinlock.h
+--- linux-next-20201209.orig/arch/arm/include/asm/Kbuild
++++ linux-next-20201209/arch/arm/include/asm/Kbuild
+@@ -2,7 +2,6 @@
+ generic-y += early_ioremap.h
+ generic-y += extable.h
+ generic-y += flat.h
+-generic-y += local64.h
+ generic-y += parport.h
+ 
+ generated-y += mach-types.h
+--- linux-next-20201209.orig/arch/csky/include/asm/Kbuild
++++ linux-next-20201209/arch/csky/include/asm/Kbuild
+@@ -2,7 +2,6 @@
+ generic-y += asm-offsets.h
+ generic-y += gpio.h
+ generic-y += kvm_para.h
+-generic-y += local64.h
+ generic-y += mcs_spinlock.h
+ generic-y += qrwlock.h
+ generic-y += qspinlock.h
+--- linux-next-20201209.orig/arch/h8300/include/asm/Kbuild
++++ linux-next-20201209/arch/h8300/include/asm/Kbuild
+@@ -2,7 +2,6 @@
+ generic-y += asm-offsets.h
+ generic-y += extable.h
+ generic-y += kvm_para.h
+-generic-y += local64.h
+ generic-y += mcs_spinlock.h
+ generic-y += parport.h
+ generic-y += spinlock.h
+--- linux-next-20201209.orig/arch/hexagon/include/asm/Kbuild
++++ linux-next-20201209/arch/hexagon/include/asm/Kbuild
+@@ -2,5 +2,4 @@
+ generic-y += extable.h
+ generic-y += iomap.h
+ generic-y += kvm_para.h
+-generic-y += local64.h
+ generic-y += mcs_spinlock.h
+--- linux-next-20201209.orig/arch/m68k/include/asm/Kbuild
++++ linux-next-20201209/arch/m68k/include/asm/Kbuild
+@@ -2,6 +2,5 @@
+ generated-y += syscall_table.h
+ generic-y += extable.h
+ generic-y += kvm_para.h
+-generic-y += local64.h
+ generic-y += mcs_spinlock.h
+ generic-y += spinlock.h
+--- linux-next-20201209.orig/arch/microblaze/include/asm/Kbuild
++++ linux-next-20201209/arch/microblaze/include/asm/Kbuild
+@@ -2,7 +2,6 @@
+ generated-y += syscall_table.h
+ generic-y += extable.h
+ generic-y += kvm_para.h
+-generic-y += local64.h
+ generic-y += mcs_spinlock.h
+ generic-y += parport.h
+ generic-y += syscalls.h
+--- linux-next-20201209.orig/arch/mips/include/asm/Kbuild
++++ linux-next-20201209/arch/mips/include/asm/Kbuild
+@@ -6,7 +6,6 @@ generated-y += syscall_table_64_n64.h
+ generated-y += syscall_table_64_o32.h
+ generic-y += export.h
+ generic-y += kvm_para.h
+-generic-y += local64.h
+ generic-y += mcs_spinlock.h
+ generic-y += parport.h
+ generic-y += qrwlock.h
+--- linux-next-20201209.orig/arch/nds32/include/asm/Kbuild
++++ linux-next-20201209/arch/nds32/include/asm/Kbuild
+@@ -4,6 +4,5 @@ generic-y += cmpxchg.h
+ generic-y += export.h
+ generic-y += gpio.h
+ generic-y += kvm_para.h
+-generic-y += local64.h
+ generic-y += parport.h
+ generic-y += user.h
+--- linux-next-20201209.orig/arch/openrisc/include/asm/Kbuild
++++ linux-next-20201209/arch/openrisc/include/asm/Kbuild
+@@ -1,7 +1,6 @@
+ # SPDX-License-Identifier: GPL-2.0
+ generic-y += extable.h
+ generic-y += kvm_para.h
+-generic-y += local64.h
+ generic-y += mcs_spinlock.h
+ generic-y += qspinlock_types.h
+ generic-y += qspinlock.h
+--- linux-next-20201209.orig/arch/parisc/include/asm/Kbuild
++++ linux-next-20201209/arch/parisc/include/asm/Kbuild
+@@ -3,6 +3,5 @@ generated-y += syscall_table_32.h
+ generated-y += syscall_table_64.h
+ generated-y += syscall_table_c32.h
+ generic-y += kvm_para.h
+-generic-y += local64.h
+ generic-y += mcs_spinlock.h
+ generic-y += user.h
+--- linux-next-20201209.orig/arch/powerpc/include/asm/Kbuild
++++ linux-next-20201209/arch/powerpc/include/asm/Kbuild
+@@ -5,7 +5,6 @@ generated-y += syscall_table_c32.h
+ generated-y += syscall_table_spu.h
+ generic-y += export.h
+ generic-y += kvm_types.h
+-generic-y += local64.h
+ generic-y += mcs_spinlock.h
+ generic-y += qrwlock.h
+ generic-y += vtime.h
+--- linux-next-20201209.orig/arch/riscv/include/asm/Kbuild
++++ linux-next-20201209/arch/riscv/include/asm/Kbuild
+@@ -3,6 +3,5 @@ generic-y += early_ioremap.h
+ generic-y += extable.h
+ generic-y += flat.h
+ generic-y += kvm_para.h
+-generic-y += local64.h
+ generic-y += user.h
+ generic-y += vmlinux.lds.h
+--- linux-next-20201209.orig/arch/s390/include/asm/Kbuild
++++ linux-next-20201209/arch/s390/include/asm/Kbuild
+@@ -7,5 +7,4 @@ generated-y += unistd_nr.h
+ generic-y += asm-offsets.h
+ generic-y += export.h
+ generic-y += kvm_types.h
+-generic-y += local64.h
+ generic-y += mcs_spinlock.h
+--- linux-next-20201209.orig/arch/sh/include/asm/Kbuild
++++ linux-next-20201209/arch/sh/include/asm/Kbuild
+@@ -1,6 +1,5 @@
+ # SPDX-License-Identifier: GPL-2.0
+ generated-y += syscall_table.h
+ generic-y += kvm_para.h
+-generic-y += local64.h
+ generic-y += mcs_spinlock.h
+ generic-y += parport.h
+--- linux-next-20201209.orig/arch/sparc/include/asm/Kbuild
++++ linux-next-20201209/arch/sparc/include/asm/Kbuild
+@@ -6,5 +6,4 @@ generated-y += syscall_table_64.h
+ generated-y += syscall_table_c32.h
+ generic-y += export.h
+ generic-y += kvm_para.h
+-generic-y += local64.h
+ generic-y += mcs_spinlock.h
+--- linux-next-20201209.orig/arch/xtensa/include/asm/Kbuild
++++ linux-next-20201209/arch/xtensa/include/asm/Kbuild
+@@ -2,7 +2,6 @@
+ generated-y += syscall_table.h
+ generic-y += extable.h
+ generic-y += kvm_para.h
+-generic-y += local64.h
+ generic-y += mcs_spinlock.h
+ generic-y += param.h
+ generic-y += qrwlock.h
+--- linux-next-20201209.orig/arch/alpha/include/asm/local64.h
++++ /dev/null
+@@ -1 +0,0 @@
+-#include <asm-generic/local64.h>
+--- linux-next-20201209.orig/arch/ia64/include/asm/local64.h
++++ /dev/null
+@@ -1 +0,0 @@
+-#include <asm-generic/local64.h>
+--- linux-next-20201209.orig/arch/x86/include/asm/local64.h
++++ /dev/null
+@@ -1 +0,0 @@
+-#include <asm-generic/local64.h>
