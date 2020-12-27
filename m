@@ -2,48 +2,56 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C495C433DB
-	for <linux-block@archiver.kernel.org>; Sun, 27 Dec 2020 13:05:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ED06C433E0
+	for <linux-block@archiver.kernel.org>; Sun, 27 Dec 2020 15:21:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 69D95208A9
-	for <linux-block@archiver.kernel.org>; Sun, 27 Dec 2020 13:05:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 435742250F
+	for <linux-block@archiver.kernel.org>; Sun, 27 Dec 2020 15:21:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726103AbgL0NEl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 27 Dec 2020 08:04:41 -0500
-Received: from mail-ot1-f48.google.com ([209.85.210.48]:43117 "EHLO
-        mail-ot1-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726075AbgL0NEk (ORCPT
+        id S1726194AbgL0PVL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 27 Dec 2020 10:21:11 -0500
+Received: from condef-03.nifty.com ([202.248.20.68]:57363 "EHLO
+        condef-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726182AbgL0PVL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 27 Dec 2020 08:04:40 -0500
-Received: by mail-ot1-f48.google.com with SMTP id q25so7035788otn.10;
-        Sun, 27 Dec 2020 05:04:24 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=p7JIIREUedsXBU8wLe1N6dw8SI/CrmaQePow+ITP9G8=;
-        b=qFGzb/OP7lAUMo8AU1aCBA851dvztC4EpPlLuHXj2HlQcMIbW7xdvYipS+kkzlhHyR
-         WcB84Ke7EFWgNINmeQeJ8TrIc06SXCH/cA/Ku7Nx3rfSWgbhclsGq/i4M1cytFXKzRxu
-         GYxI27mtCE1KaIu9vg5E/h8g94xMm1Uejq0sFqALWivNOSYV+YE0a4p1NzvQoZVlYCbg
-         201/StPxnmq4dnVAFRhmywgU9oingKsPa3LYehQCQ8RSHGZTiAAL5aopYn5d2F2Ooslm
-         X5iLDnRvjS4AcIhqW7lPi2KrPMGEMfXUtKyTOXdy8tKPcfLrYsemnfuT9gUvfSagy0VA
-         M/mw==
-X-Gm-Message-State: AOAM531UmkkC+ftaVjBlJC0fDeX1mcrzmWCJAlhZBHKR7tLa0dbB0C0o
-        Ys9UV3obiNq0LfLI5SvkBPZNqpU4wqWA4dFOaC8=
-X-Google-Smtp-Source: ABdhPJwhBwVR4dp2wAEuCBFuwKkQ9+Ag50alAD06AqBEGeNgh0HB4FdsfvFAMdOppCdXknzUKSscPbotlahSx8zpZ6k=
-X-Received: by 2002:a05:6830:210a:: with SMTP id i10mr30331904otc.145.1609074238537;
- Sun, 27 Dec 2020 05:03:58 -0800 (PST)
+        Sun, 27 Dec 2020 10:21:11 -0500
+X-Greylist: delayed 364 seconds by postgrey-1.27 at vger.kernel.org; Sun, 27 Dec 2020 10:21:10 EST
+Received: from conssluserg-04.nifty.com ([10.126.8.83])by condef-03.nifty.com with ESMTP id 0BRFBaiC014355
+        for <linux-block@vger.kernel.org>; Mon, 28 Dec 2020 00:11:36 +0900
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47]) (authenticated)
+        by conssluserg-04.nifty.com with ESMTP id 0BRFAYUr000847;
+        Mon, 28 Dec 2020 00:10:35 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-04.nifty.com 0BRFAYUr000847
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1609081835;
+        bh=do2zu1OH3hpkggNQ8T4D67CVIMzmt11X3sAFNqs/IFY=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=flrnmYMMuYxSO7Lc1pzO3Th4cQMYI1Gfkmz+craqIEUlxTTU9BHSMFW4cr5DCqBW5
+         IRvlqiauRIIkHVb8ZjuksR6Eniu1pgVoSMPYu7tl5npHP9GpiYA8h4pc7dGry/jwGD
+         lN5n/cR9aWluxEA1vbG7NiRuOvust5L1PKkM8E5Xvr83LttKbS1/FsE2EWywYokEyX
+         S9/nrBxCgZbHKqx/pfDkND4QBGYdyfZYJO5eGgCbqZ7sP+gt+0FYisPl1lvviY3DNN
+         acag9hLTsZmY1Hnr7//WdXooduCc7pfVu2Ka+gUMhfKXkFIY3q6ML9mBTP0g/2ktXm
+         8aS9It6YJZRQw==
+X-Nifty-SrcIP: [209.85.216.47]
+Received: by mail-pj1-f47.google.com with SMTP id iq13so4653564pjb.3;
+        Sun, 27 Dec 2020 07:10:35 -0800 (PST)
+X-Gm-Message-State: AOAM531XodXABfvJPsSgzRO4MoeDC5C2Jam/ppGAEJosoEm12qU30V49
+        plVkvWxatq05p1u9YDV6qjGXiaUWhbwTN8X8zlA=
+X-Google-Smtp-Source: ABdhPJybusihigpLBnrUv9y6gvoFYtFIiM+rxEASqAd/cn7oU9r0c3OQ5/nDEpbtMOnajgUOP1Y7+akYAdtINprWsTE=
+X-Received: by 2002:a17:902:b415:b029:dc:42b1:9b26 with SMTP id
+ x21-20020a170902b415b02900dc42b19b26mr26106771plr.71.1609081834110; Sun, 27
+ Dec 2020 07:10:34 -0800 (PST)
 MIME-Version: 1.0
 References: <20201227024446.17018-1-rdunlap@infradead.org>
 In-Reply-To: <20201227024446.17018-1-rdunlap@infradead.org>
-From:   Geert Uytterhoeven <geert@linux-m68k.org>
-Date:   Sun, 27 Dec 2020 14:03:47 +0100
-Message-ID: <CAMuHMdVJ4v7w1+TT0BEqz_x2UXbKcnjXikKucpgEtXU3h63rwQ@mail.gmail.com>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Mon, 28 Dec 2020 00:09:57 +0900
+X-Gmail-Original-Message-ID: <CAK7LNATYt8E6NnzytPLCLb46uMJWQ0ykQOiixKVbdNQPDr8iXw@mail.gmail.com>
+Message-ID: <CAK7LNATYt8E6NnzytPLCLb46uMJWQ0ykQOiixKVbdNQPDr8iXw@mail.gmail.com>
 Subject: Re: [PATCH v2] local64.h: make <asm/local64.h> mandatory
 To:     Randy Dunlap <rdunlap@infradead.org>
 Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
@@ -53,17 +61,13 @@ Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         Mark Salter <msalter@redhat.com>,
         Aurelien Jacquiot <jacquiot.aurelien@gmail.com>,
         linux-c6x-dev@linux-c6x.org, Peter Zijlstra <peterz@infradead.org>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Arnd Bergmann <arnd@arndb.de>
+        Andrew Morton <akpm@linux-foundation.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-CC Arnd
-
-On Sun, Dec 27, 2020 at 3:48 AM Randy Dunlap <rdunlap@infradead.org> wrote:
+On Sun, Dec 27, 2020 at 11:45 AM Randy Dunlap <rdunlap@infradead.org> wrote:
 >
 > Make <asm-generic/local64.h> mandatory in include/asm-generic/Kbuild
 > and remove all arch/*/include/asm/local64.h arch-specific files since
@@ -88,6 +92,12 @@ On Sun, Dec 27, 2020 at 3:48 AM Randy Dunlap <rdunlap@infradead.org> wrote:
 > Cc: linux-c6x-dev@linux-c6x.org
 > Cc: Peter Zijlstra <peterz@infradead.org>
 > Cc: Masahiro Yamada <masahiroy@kernel.org>
+
+Reviewed-by: Masahiro Yamada <masahiroy@kernel.org>
+
+
+
+
 > Cc: Andrew Morton <akpm@linux-foundation.org>
 > ---
 > Would some $maintainer please plan to apply/merge this.
@@ -96,217 +106,6 @@ On Sun, Dec 27, 2020 at 3:48 AM Randy Dunlap <rdunlap@infradead.org> wrote:
 > to the missing arch/ header locations, make it a mandotory-y header file
 > and remove it from most arch/ header locations. (Christoph)
 >
->  arch/alpha/include/asm/local64.h   |    1 -
->  arch/arc/include/asm/Kbuild        |    1 -
->  arch/arm/include/asm/Kbuild        |    1 -
->  arch/arm64/include/asm/Kbuild      |    1 -
->  arch/csky/include/asm/Kbuild       |    1 -
->  arch/h8300/include/asm/Kbuild      |    1 -
->  arch/hexagon/include/asm/Kbuild    |    1 -
->  arch/ia64/include/asm/local64.h    |    1 -
->  arch/m68k/include/asm/Kbuild       |    1 -
->  arch/microblaze/include/asm/Kbuild |    1 -
->  arch/mips/include/asm/Kbuild       |    1 -
->  arch/nds32/include/asm/Kbuild      |    1 -
->  arch/openrisc/include/asm/Kbuild   |    1 -
->  arch/parisc/include/asm/Kbuild     |    1 -
->  arch/powerpc/include/asm/Kbuild    |    1 -
->  arch/riscv/include/asm/Kbuild      |    1 -
->  arch/s390/include/asm/Kbuild       |    1 -
->  arch/sh/include/asm/Kbuild         |    1 -
->  arch/sparc/include/asm/Kbuild      |    1 -
->  arch/x86/include/asm/local64.h     |    1 -
->  arch/xtensa/include/asm/Kbuild     |    1 -
->  include/asm-generic/Kbuild         |    1 +
->  22 files changed, 1 insertion(+), 21 deletions(-)
->
-> --- linux-next-20201209.orig/include/asm-generic/Kbuild
-> +++ linux-next-20201209/include/asm-generic/Kbuild
-> @@ -34,6 +34,7 @@ mandatory-y += kmap_size.h
->  mandatory-y += kprobes.h
->  mandatory-y += linkage.h
->  mandatory-y += local.h
-> +mandatory-y += local64.h
->  mandatory-y += mm-arch-hooks.h
->  mandatory-y += mmiowb.h
->  mandatory-y += mmu.h
-> --- linux-next-20201209.orig/arch/arc/include/asm/Kbuild
-> +++ linux-next-20201209/arch/arc/include/asm/Kbuild
-> @@ -1,7 +1,6 @@
->  # SPDX-License-Identifier: GPL-2.0
->  generic-y += extable.h
->  generic-y += kvm_para.h
-> -generic-y += local64.h
->  generic-y += mcs_spinlock.h
->  generic-y += parport.h
->  generic-y += user.h
-> --- linux-next-20201209.orig/arch/arm64/include/asm/Kbuild
-> +++ linux-next-20201209/arch/arm64/include/asm/Kbuild
-> @@ -1,6 +1,5 @@
->  # SPDX-License-Identifier: GPL-2.0
->  generic-y += early_ioremap.h
-> -generic-y += local64.h
->  generic-y += mcs_spinlock.h
->  generic-y += qrwlock.h
->  generic-y += qspinlock.h
-> --- linux-next-20201209.orig/arch/arm/include/asm/Kbuild
-> +++ linux-next-20201209/arch/arm/include/asm/Kbuild
-> @@ -2,7 +2,6 @@
->  generic-y += early_ioremap.h
->  generic-y += extable.h
->  generic-y += flat.h
-> -generic-y += local64.h
->  generic-y += parport.h
->
->  generated-y += mach-types.h
-> --- linux-next-20201209.orig/arch/csky/include/asm/Kbuild
-> +++ linux-next-20201209/arch/csky/include/asm/Kbuild
-> @@ -2,7 +2,6 @@
->  generic-y += asm-offsets.h
->  generic-y += gpio.h
->  generic-y += kvm_para.h
-> -generic-y += local64.h
->  generic-y += mcs_spinlock.h
->  generic-y += qrwlock.h
->  generic-y += qspinlock.h
-> --- linux-next-20201209.orig/arch/h8300/include/asm/Kbuild
-> +++ linux-next-20201209/arch/h8300/include/asm/Kbuild
-> @@ -2,7 +2,6 @@
->  generic-y += asm-offsets.h
->  generic-y += extable.h
->  generic-y += kvm_para.h
-> -generic-y += local64.h
->  generic-y += mcs_spinlock.h
->  generic-y += parport.h
->  generic-y += spinlock.h
-> --- linux-next-20201209.orig/arch/hexagon/include/asm/Kbuild
-> +++ linux-next-20201209/arch/hexagon/include/asm/Kbuild
-> @@ -2,5 +2,4 @@
->  generic-y += extable.h
->  generic-y += iomap.h
->  generic-y += kvm_para.h
-> -generic-y += local64.h
->  generic-y += mcs_spinlock.h
-> --- linux-next-20201209.orig/arch/m68k/include/asm/Kbuild
-> +++ linux-next-20201209/arch/m68k/include/asm/Kbuild
-> @@ -2,6 +2,5 @@
->  generated-y += syscall_table.h
->  generic-y += extable.h
->  generic-y += kvm_para.h
-> -generic-y += local64.h
->  generic-y += mcs_spinlock.h
->  generic-y += spinlock.h
-> --- linux-next-20201209.orig/arch/microblaze/include/asm/Kbuild
-> +++ linux-next-20201209/arch/microblaze/include/asm/Kbuild
-> @@ -2,7 +2,6 @@
->  generated-y += syscall_table.h
->  generic-y += extable.h
->  generic-y += kvm_para.h
-> -generic-y += local64.h
->  generic-y += mcs_spinlock.h
->  generic-y += parport.h
->  generic-y += syscalls.h
-> --- linux-next-20201209.orig/arch/mips/include/asm/Kbuild
-> +++ linux-next-20201209/arch/mips/include/asm/Kbuild
-> @@ -6,7 +6,6 @@ generated-y += syscall_table_64_n64.h
->  generated-y += syscall_table_64_o32.h
->  generic-y += export.h
->  generic-y += kvm_para.h
-> -generic-y += local64.h
->  generic-y += mcs_spinlock.h
->  generic-y += parport.h
->  generic-y += qrwlock.h
-> --- linux-next-20201209.orig/arch/nds32/include/asm/Kbuild
-> +++ linux-next-20201209/arch/nds32/include/asm/Kbuild
-> @@ -4,6 +4,5 @@ generic-y += cmpxchg.h
->  generic-y += export.h
->  generic-y += gpio.h
->  generic-y += kvm_para.h
-> -generic-y += local64.h
->  generic-y += parport.h
->  generic-y += user.h
-> --- linux-next-20201209.orig/arch/openrisc/include/asm/Kbuild
-> +++ linux-next-20201209/arch/openrisc/include/asm/Kbuild
-> @@ -1,7 +1,6 @@
->  # SPDX-License-Identifier: GPL-2.0
->  generic-y += extable.h
->  generic-y += kvm_para.h
-> -generic-y += local64.h
->  generic-y += mcs_spinlock.h
->  generic-y += qspinlock_types.h
->  generic-y += qspinlock.h
-> --- linux-next-20201209.orig/arch/parisc/include/asm/Kbuild
-> +++ linux-next-20201209/arch/parisc/include/asm/Kbuild
-> @@ -3,6 +3,5 @@ generated-y += syscall_table_32.h
->  generated-y += syscall_table_64.h
->  generated-y += syscall_table_c32.h
->  generic-y += kvm_para.h
-> -generic-y += local64.h
->  generic-y += mcs_spinlock.h
->  generic-y += user.h
-> --- linux-next-20201209.orig/arch/powerpc/include/asm/Kbuild
-> +++ linux-next-20201209/arch/powerpc/include/asm/Kbuild
-> @@ -5,7 +5,6 @@ generated-y += syscall_table_c32.h
->  generated-y += syscall_table_spu.h
->  generic-y += export.h
->  generic-y += kvm_types.h
-> -generic-y += local64.h
->  generic-y += mcs_spinlock.h
->  generic-y += qrwlock.h
->  generic-y += vtime.h
-> --- linux-next-20201209.orig/arch/riscv/include/asm/Kbuild
-> +++ linux-next-20201209/arch/riscv/include/asm/Kbuild
-> @@ -3,6 +3,5 @@ generic-y += early_ioremap.h
->  generic-y += extable.h
->  generic-y += flat.h
->  generic-y += kvm_para.h
-> -generic-y += local64.h
->  generic-y += user.h
->  generic-y += vmlinux.lds.h
-> --- linux-next-20201209.orig/arch/s390/include/asm/Kbuild
-> +++ linux-next-20201209/arch/s390/include/asm/Kbuild
-> @@ -7,5 +7,4 @@ generated-y += unistd_nr.h
->  generic-y += asm-offsets.h
->  generic-y += export.h
->  generic-y += kvm_types.h
-> -generic-y += local64.h
->  generic-y += mcs_spinlock.h
-> --- linux-next-20201209.orig/arch/sh/include/asm/Kbuild
-> +++ linux-next-20201209/arch/sh/include/asm/Kbuild
-> @@ -1,6 +1,5 @@
->  # SPDX-License-Identifier: GPL-2.0
->  generated-y += syscall_table.h
->  generic-y += kvm_para.h
-> -generic-y += local64.h
->  generic-y += mcs_spinlock.h
->  generic-y += parport.h
-> --- linux-next-20201209.orig/arch/sparc/include/asm/Kbuild
-> +++ linux-next-20201209/arch/sparc/include/asm/Kbuild
-> @@ -6,5 +6,4 @@ generated-y += syscall_table_64.h
->  generated-y += syscall_table_c32.h
->  generic-y += export.h
->  generic-y += kvm_para.h
-> -generic-y += local64.h
->  generic-y += mcs_spinlock.h
-> --- linux-next-20201209.orig/arch/xtensa/include/asm/Kbuild
-> +++ linux-next-20201209/arch/xtensa/include/asm/Kbuild
-> @@ -2,7 +2,6 @@
->  generated-y += syscall_table.h
->  generic-y += extable.h
->  generic-y += kvm_para.h
-> -generic-y += local64.h
->  generic-y += mcs_spinlock.h
->  generic-y += param.h
->  generic-y += qrwlock.h
-> --- linux-next-20201209.orig/arch/alpha/include/asm/local64.h
-> +++ /dev/null
-> @@ -1 +0,0 @@
-> -#include <asm-generic/local64.h>
-> --- linux-next-20201209.orig/arch/ia64/include/asm/local64.h
-> +++ /dev/null
-> @@ -1 +0,0 @@
-> -#include <asm-generic/local64.h>
-> --- linux-next-20201209.orig/arch/x86/include/asm/local64.h
-> +++ /dev/null
-> @@ -1 +0,0 @@
-> -#include <asm-generic/local64.h>
+-- 
+Best Regards
+Masahiro Yamada
