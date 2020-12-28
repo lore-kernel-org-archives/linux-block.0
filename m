@@ -2,67 +2,111 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A80DC433DB
-	for <linux-block@archiver.kernel.org>; Mon, 28 Dec 2020 23:38:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21166C433E6
+	for <linux-block@archiver.kernel.org>; Tue, 29 Dec 2020 00:01:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EF7F920757
-	for <linux-block@archiver.kernel.org>; Mon, 28 Dec 2020 23:37:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D0F9D21D79
+	for <linux-block@archiver.kernel.org>; Tue, 29 Dec 2020 00:01:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727755AbgL1Xho (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Dec 2020 18:37:44 -0500
-Received: from mail.kernel.org ([198.145.29.99]:37276 "EHLO mail.kernel.org"
+        id S1729742AbgL2AAR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Dec 2020 19:00:17 -0500
+Received: from smtp.infotech.no ([82.134.31.41]:59799 "EHLO smtp.infotech.no"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727731AbgL1Xho (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Dec 2020 18:37:44 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPS id B27FD20829;
-        Mon, 28 Dec 2020 23:37:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1609198623;
-        bh=ENY5NG2jFZADVA5Akp/4eqfuekd+83Kw9dy419Dh8Cc=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=tapiVphRzt64jcto0FSQeQ4xhkLwsLnurBDdJN4iGGEWlnLuX6YlzuO9oI/H/9+6e
-         SY79rlxkGkGKL2ascpTfC3qtIFWTWZZAtmaYkeU/EtjzuqTiQuR7jquCM0Ujo+82XC
-         SdyNh9PyxTa7bFUuIPcs/ywZUG+zebUI5fLVw91FZaHdNIpO9wr05IAsbOnGEU3Rsd
-         cl78wxMNc3EDknGuaLfhHNdq8RoMtGs1/PGa/8zIZgRiIzo+6aBcC1gmxZlQaPPoj0
-         w6JTdPTYBZRhCN9mMute411SfX6EFWwSne3StTl7GNpQhIg35/uqQ9mv/64F8V6seO
-         76bZesiTzjFUA==
-Subject: Re: [git pull] device mapper fix for 5.11-rc2
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <20201228212757.GA26267@redhat.com>
-References: <20201228212757.GA26267@redhat.com>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20201228212757.GA26267@redhat.com>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-5.11/dm-fix
-X-PR-Tracked-Commit-Id: 48b0777cd93dbd800d3966b6f5c34714aad5c203
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: dea8dcf2a9fa8cc540136a6cd885c3beece16ec3
-Message-Id: <160919862358.31803.16883567741598465631.pr-tracker-bot@kernel.org>
-Date:   Mon, 28 Dec 2020 23:37:03 +0000
-To:     Mike Snitzer <snitzer@redhat.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        dm-devel@redhat.com, linux-block@vger.kernel.org,
-        Alasdair G Kergon <agk@redhat.com>,
-        Jeffle Xu <jefflexu@linux.alibaba.com>,
-        Milan Broz <gmazyland@gmail.com>,
-        Ignat Korchagin <ignat@cloudflare.com>
+        id S1729004AbgL2AAR (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 28 Dec 2020 19:00:17 -0500
+Received: from localhost (localhost [127.0.0.1])
+        by smtp.infotech.no (Postfix) with ESMTP id 34DD4204271;
+        Tue, 29 Dec 2020 00:50:06 +0100 (CET)
+X-Virus-Scanned: by amavisd-new-2.6.6 (20110518) (Debian) at infotech.no
+Received: from smtp.infotech.no ([127.0.0.1])
+        by localhost (smtp.infotech.no [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id JvVK8k-3kqyi; Tue, 29 Dec 2020 00:49:59 +0100 (CET)
+Received: from xtwo70.bingwo.ca (host-104-157-204-209.dyn.295.ca [104.157.204.209])
+        by smtp.infotech.no (Postfix) with ESMTPA id 47D3C204193;
+        Tue, 29 Dec 2020 00:49:58 +0100 (CET)
+From:   Douglas Gilbert <dgilbert@interlog.com>
+To:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        target-devel@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     martin.petersen@oracle.com, jejb@linux.vnet.ibm.com,
+        bostroesser@gmail.com, bvanassche@acm.org, ddiss@suse.de
+Subject: [PATCH v5 0/4] scatterlist: add new capabilities
+Date:   Mon, 28 Dec 2020 18:49:51 -0500
+Message-Id: <20201228234955.190858-1-dgilbert@interlog.com>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Mon, 28 Dec 2020 16:27:58 -0500:
+Scatter-gather lists (sgl_s) are frequently used as data carriers in
+the block layer. For example the SCSI and NVMe subsystems interchange
+data with the block layer using sgl_s. The sgl API is declared in
+<linux/scatterlist.h>
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-5.11/dm-fix
+The author has extended these transient sgl use cases to a store (i.e.
+a ramdisk) in the scsi_debug driver. Other new potential uses of sgl_s
+could be for the target subsystem. When this extra step is taken, the
+need to copy between sgl_s becomes apparent. The patchset adds
+sgl_copy_sgl(), sgl_compare_sgl() and sgl_memset().
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/dea8dcf2a9fa8cc540136a6cd885c3beece16ec3
+The existing sgl_alloc_order() function can be seen as a replacement
+for vmalloc() for large, long-term allocations.  For what seems like
+no good reason, sgl_alloc_order() currently restricts its total
+allocation to less than or equal to 4 GiB. vmalloc() has no such
+restriction.
 
-Thank you!
+Changes since v3 [posted 20201105]:
+  - rebase on lk 5.11.0-rc2
+
+Changes since v3 [posted 20201019]:
+  - re-instate check on integer overflow of nent calculation in
+    sgl_alloc_order(). Do it in such a way as to not limit the
+    overall sgl size to 4  GiB
+  - introduce sgl_compare_sgl_idx() helper function that, if
+    requested and if a miscompare is detected, will yield the byte
+    index of the first miscompare.
+  - add Reviewed-by tags from Bodo Stroesser
+  - rebase on lk 5.10.0-rc2 [was on lk 5.9.0]
+
+Changes since v2 [posted 20201018]:
+  - remove unneeded lines from sgl_memset() definition.
+  - change sg_zero_buffer() to call sgl_memset() as the former
+    is a subset.
+
+Changes since v1 [posted 20201016]:
+  - Bodo Stroesser pointed out a problem with the nesting of
+    kmap_atomic() [called via sg_miter_next()] and kunmap_atomic()
+    calls [called via sg_miter_stop()] and proposed a solution that
+    simplifies the previous code.
+
+  - the new implementation of the three functions has shorter periods
+    when pre-emption is disabled (but has more them). This should
+    make operations on large sgl_s more pre-emption "friendly" with
+    a relatively small performance hit.
+
+  - sgl_memset return type changed from void to size_t and is the
+    number of bytes actually (over)written. That number is needed
+    anyway internally so may as well return it as it may be useful to
+    the caller.
+
+This patchset is against lk 5.10.0-rc2
+
+Douglas Gilbert (4):
+  sgl_alloc_order: remove 4 GiB limit, sgl_free() warning
+  scatterlist: add sgl_copy_sgl() function
+  scatterlist: add sgl_compare_sgl() function
+  scatterlist: add sgl_memset()
+
+ include/linux/scatterlist.h |  16 +++
+ lib/scatterlist.c           | 244 +++++++++++++++++++++++++++++++++---
+ 2 files changed, 243 insertions(+), 17 deletions(-)
 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+2.25.1
+
