@@ -2,66 +2,88 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.9 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EF75C433E0
-	for <linux-block@archiver.kernel.org>; Mon, 28 Dec 2020 09:04:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F3A2C433E9
+	for <linux-block@archiver.kernel.org>; Mon, 28 Dec 2020 15:45:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1C24320781
-	for <linux-block@archiver.kernel.org>; Mon, 28 Dec 2020 09:04:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5A93522472
+	for <linux-block@archiver.kernel.org>; Mon, 28 Dec 2020 15:45:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726555AbgL1JDq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Dec 2020 04:03:46 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:9652 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726509AbgL1JDq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Dec 2020 04:03:46 -0500
-Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.60])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4D4BPx464xz15ksV;
-        Mon, 28 Dec 2020 17:02:13 +0800 (CST)
-Received: from [10.174.177.185] (10.174.177.185) by
- DGGEMS402-HUB.china.huawei.com (10.3.19.202) with Microsoft SMTP Server id
- 14.3.498.0; Mon, 28 Dec 2020 17:02:51 +0800
-Subject: Re: [PATCH 1/3] blk-mq: allow hardware queue to get more tag while
- sharing a tag set
-To:     Ming Lei <ming.lei@redhat.com>
-CC:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>,
-        <zhangxiaoxu5@huawei.com>
-References: <20201226102808.2534966-1-yukuai3@huawei.com>
- <20201226102808.2534966-2-yukuai3@huawei.com> <20201227115859.GA3282759@T590>
- <04c39621-0c4a-e593-5545-c4bd274c5fc2@huawei.com>
- <20201228082835.GB3304670@T590>
-From:   "yukuai (C)" <yukuai3@huawei.com>
-Message-ID: <fce32e47-0e7d-39fa-611f-31ac0b422ba5@huawei.com>
-Date:   Mon, 28 Dec 2020 17:02:50 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S2405845AbgL1PpW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Dec 2020 10:45:22 -0500
+Received: from m12-18.163.com ([220.181.12.18]:33143 "EHLO m12-18.163.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2404685AbgL1PpU (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 28 Dec 2020 10:45:20 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+        s=s110527; h=Date:From:Subject:Message-ID:MIME-Version; bh=mCK3T
+        3HIeKSj/rHeq3FOKCdx0pS1aXsThj/p4jnQzPI=; b=Sa3L00uYaG4P5JIN4QmGk
+        L+DYUDuVuSPH5ikYzxj9M2pIjPzHJ4cSg7L6FvyGk5zGJ/MCwQX6i6wxAbDwsixD
+        UhKrvNsKbo963BCGD7r5q2njgksQ/WsCFwrFRF35b57FYr5ixtIvQchohDTy3mIH
+        iNKOJOfQkitk1rReiqco8Y=
+Received: from localhost (unknown [101.86.213.121])
+        by smtp14 (Coremail) with SMTP id EsCowABXAhED+elfmhLSMA--.24651S2;
+        Mon, 28 Dec 2020 23:25:55 +0800 (CST)
+Date:   Mon, 28 Dec 2020 23:25:55 +0800
+From:   Hui Su <sh_def@163.com>
+To:     kernel test robot <oliver.sang@intel.com>,
+        LKML <linux-kernel@vger.kernel.org>, lkp@lists.01.org,
+        axboe@kernel.dk, linux-block@vger.kernel.org, sh_def@163.com
+Subject: Re: [blokc/blk]  d828aefa7a: xfstests.xfs.372.fail
+Message-ID: <20201228152555.GA1185658@ubuntu-A520I-AC>
+References: <20201223054317.GA1518010@ubuntu-A520I-AC>
+ <20201226113133.GC11697@xsang-OptiPlex-9020>
 MIME-Version: 1.0
-In-Reply-To: <20201228082835.GB3304670@T590>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.177.185]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201226113133.GC11697@xsang-OptiPlex-9020>
+X-CM-TRANSID: EsCowABXAhED+elfmhLSMA--.24651S2
+X-Coremail-Antispam: 1Uf129KBjvdXoW7Gw4fWF4ktF4UXr1DGF43GFg_yoWkKrgE9F
+        W5tr1kKan5JF4ayws3Kr1avasIkayDJrWFqa1rt3yDZFn3JayrAanxCF90qas7G3yrWr9F
+        va15A3saq3W2vjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUvcSsGvfC2KfnxnUUI43ZEXa7sRXXo7JUUUUU==
+X-Originating-IP: [101.86.213.121]
+X-CM-SenderInfo: xvkbvvri6rljoofrz/xtbBDgMJX1rbLvbm2gAAs+
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi
+On Sat, Dec 26, 2020 at 07:31:33PM +0800, kernel test robot wrote:
+> 
+> Greeting,
+> 
+> FYI, we noticed the following commit (built with gcc-9):
+> 
+> commit: d828aefa7a1bdf7fbc5073fdb66da9bfb1264c21 ("[PATCH v2] blokc/blk-merge: remove the next_bvec label in __blk_bios_map_sg()")
+> url: https://github.com/0day-ci/linux/commits/Hui-Su/blokc-blk-merge-remove-the-next_bvec-label-in-__blk_bios_map_sg/20201223-202618
+> base: https://git.kernel.org/cgit/linux/kernel/git/axboe/linux-block.git for-next
+> 
+> in testcase: xfstests
+> version: xfstests-x86_64-d41dcbd-1_20201218
+> with following parameters:
+> 
+> 	disk: 4HDD
+> 	fs: xfs
+> 	test: xfs-reflink-18
+> 	ucode: 0x21
+> 
+> test-description: xfstests is a regression test suite for xfs and other files ystems.
+> test-url: git://git.kernel.org/pub/scm/fs/xfs/xfstests-dev.git
+> 
+> 
+> on test machine: 4 threads Intel(R) Core(TM) i3-3220 CPU @ 3.30GHz with 8G memory
+> 
+> caused below changes (please refer to attached dmesg/kmsg for entire log/backtrace):
+> 
+> 
+> 
+> 
+> If you fix the issue, kindly add following tag
+> Reported-by: kernel test robot <oliver.sang@intel.com>
 
-On 2020/12/28 16:28, Ming Lei wrote:
-> Another candidate solution may be to always return true from hctx_may_queue()
-> for this kind of queue because queue_depth has provided fair allocation for
-> each LUN, and looks not necessary to do that again.
+Thanks, i will take a look at it.
 
-If always return true from hctx_may_queue() in this case, for example,
-we set queue_depth to 128(if can't, the biggger, the better) for all
-disks, and test with numjobs=64. The result should be one disk with high
-iops, and the rest very low. So I think it's better to ensure the max
-tags a disk can get in this case.
-
-Thanks!
-Yu Kuai
