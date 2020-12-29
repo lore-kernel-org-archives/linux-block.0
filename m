@@ -7,56 +7,56 @@ X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 302CFC433E0
-	for <linux-block@archiver.kernel.org>; Tue, 29 Dec 2020 00:46:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AC4DC433DB
+	for <linux-block@archiver.kernel.org>; Tue, 29 Dec 2020 00:46:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EF1CB22227
-	for <linux-block@archiver.kernel.org>; Tue, 29 Dec 2020 00:46:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3078A2222A
+	for <linux-block@archiver.kernel.org>; Tue, 29 Dec 2020 00:46:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729594AbgL2AqW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Dec 2020 19:46:22 -0500
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:59439 "EHLO
+        id S1730553AbgL2Aqr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Dec 2020 19:46:47 -0500
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:59532 "EHLO
         esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727830AbgL2AqW (ORCPT
+        with ESMTP id S1729452AbgL2Aqr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Dec 2020 19:46:22 -0500
+        Mon, 28 Dec 2020 19:46:47 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1609202782; x=1640738782;
+  t=1609202807; x=1640738807;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=ezL6V6NMqQIWE2QVha8BmyK8DY1N7+/8nwnAW62YYlo=;
-  b=pYc5dokmJzRqybzCXejWyM2A8a0sqW3bDRtiG61PuapQCCTuT5z3w/fD
-   oXCuL6jwum6iMBXrcRYLSTErARpYcPc5pdAbOPUY/LN7Rc5eTqZOX4cv0
-   75LZnoFwS2W9lxIvA/P3KiXAJlghh9LEYQcczHEoXuk3DUmKGEqt0YA2C
-   WsST4qcbpFQgJWP4YTYiKcdmkCanif9Vc4+pJpB/+5+eZ5t7sVqVXda+W
-   I5q7r/r7xwvHHdLBAUrDm3FFpmHySwaPp73YtSW0X7/QWvgCHkmxqqwAR
-   iUT5QPeLm7IhE+sk8JaiudnXv6HW3Dc9chDPS4faPUM4az4uSL4q+HOlg
-   g==;
-IronPort-SDR: qTwLAzZXUsG6sB3KALzqlvHGKJ74RUqHByvNlLvg7PL2saKUmChSvUtEjGYF56sr0GJJBtiMYc
- qLUgFCt0iDPrIBqQKl6acL8/ZySsdgEnDF1jujMvXmssaAL1lIGaiZHHrinhI8hbO3LGCRfHkk
- UkvrBeJmqfOWCoCL+E7A8/sYVLW9zLa/OB4TrolZ/XFXtEiICtlay3QW2HRqjEQHTzrJ7L31y9
- pk++eoAwb1SPLHlAPsAdzEFGBCsEumuLWLRVF7jvG0c8+STnZScLvo2Io639BIu7A30YLYxsnx
- v58=
+  bh=Ha6RmPM/35Zv5cAGmjxa4wGXp9l404hBv7VLHtjEUjQ=;
+  b=IVdsOMerrT+Qgy8OP4dp95L6t10kpAROZsXgdJSNVtGNGf0HrEUtn5P2
+   i8zTqASPPaHXtRUYNPySpspVv+pyvfvEOefKwlcD8w1u1bhQ/4BdjKtd0
+   s4Jb4Wvvfz+RU66PQyzDN/AGqY1bgqcF1TRNxeREekZw6XXoM2wjWcYYS
+   be9GpviF27NBrUmJAe0ByJorrmmUpR8RimGN6zu8/kkEzcIKseKZOzKRh
+   IXh3Jei14CAgPOZ4TebuScvsUGm8zUdFOSRgogFTXLoXUeiXnfNVBVgY7
+   vKOG4FNrbZ0ZVrmSIlMTKsEaWFMy7dJlOXAb5HlWk2mAOnNyHJTxe5Oc5
+   Q==;
+IronPort-SDR: BNYjDQ/HdvEAqWk1opow53D1Pyr9dhUdwCbWlcq8QzSxSOZQoEOZmFLS4NzwdFVMcTS4v6ELHv
+ 2NABLzv+Do3kH9jsN+yQxTyKUV2ERFizPpu98NpO4tb4StQp1PpaI6pa1fQgHjwoE60lsdg7k7
+ cs9z6oKqhoytKcFTTq1MLGfhQmla4m4Syo0ONCczX7FnLTwch85ftq8epMfWEInax7upsx+o5x
+ ZGlZeavtOEmJ93XrGOLgRnJTEWuTM4VQlmqT/kfxrmpNF6M9EwqjL9PnUD1pF++LeLLnuA6i1O
+ x28=
 X-IronPort-AV: E=Sophos;i="5.78,456,1599494400"; 
-   d="scan'208";a="156192851"
+   d="scan'208";a="156192857"
 Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 29 Dec 2020 08:44:37 +0800
-IronPort-SDR: Jtgk4xggTmENZPvnbuI7vd+jzyRlrNiEB/0iplmV1QrbSgd1VJ5O0/VGhTW32+3Kv9PPX6N/cl
- Qqn7L5yZhXz7jfldWjQ0WnsG06EkBK+8gNq9tUq5YajxOxna7OfZhUipVjd1v2jNKlo+xsrfLF
- FDIQ2aGdBX8UjsqRQxzFY/ytVD1knxRQe0gQXPM2D1akkZjo3k0Vi/uUGXpskDiUQaR2TeKjoo
- mmTT47EYXSoseWc12rWIr/fe0W8m2q1nvmB2qprFzWsis5WFgf6t1y3T8xOVOBIQH+8RQ6/bhA
- l5xNcWiJI+2Bbghsjg7Rnrf9
+  by ob1.hgst.iphmx.com with ESMTP; 29 Dec 2020 08:44:38 +0800
+IronPort-SDR: 6wyMmAOcb5pgFnw+LCJCRizGNDXxydWl44Elo4asZOnjHUBpVN6fGOKefQ091Q2PR52CotbfrD
+ eBWrb71d87UHwowMkf46VdFpElDn4SR4ffSXIWJBWj3xWxt1SiFo+CSTRmtHZsapd3HIz09G3L
+ cMxYByMZbRVxk2ZQo5lYk+ej1IJPUZF+Yjh06+Q1U4UWw9JbnRWb7ErVv67QTBRmtGZoSWSAcu
+ 9p+U8QpqgBLiInGDfgxl5m5bfojsMaauO+pBbkVmNYvOYcZi5P3lJY2pyqFLRPIG7oVxXLVYPm
+ OlI+RZapHRoMvRhhSl/zKW1I
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Dec 2020 16:29:40 -0800
-IronPort-SDR: 1Ti+oaVHmw+W+nGgackVSCDnja8seKkV24ZUrlyYl2pvL0EJ4ZhUF0WoQwYrS2JNvXKhXSsqXy
- 9E1OOXvpWgJzopRPgzkOmueSMvU8bFSJizV46i7LmuBW/K2+Iv5R+3AbWujRNSQBGwMmoMOC1y
- 4LkqjhC5cViAPBXGRdjl99+Ny2eNxsF+J8GcMfMrLESJx0dS8xHc1xro0tbRd8VW1jnXlZD6cH
- eTPngfOLRpIf9sJ8Dg68Q1aUH8u0KZ3O5RJ4V1fP2Zx63x2mwztqczXDAloTceLKMKFvwCckgG
- UVY=
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Dec 2020 16:29:41 -0800
+IronPort-SDR: v8I26ngK5czgaiEIan3hzGycI2GX5/42BHKbt2cfjOJmrBu225Vb9K1saMbN0kdnvhd4K3rjDp
+ ZYotpZ5bufZe70JHfM2CFwyjbEOMg3Gny6ZjyfLhbY6fu5dOlHi02GMHLGMMg+cWynYIdEcWFG
+ sfZWLTxiGe2lWAj7RW8d1NqLvikQJwV7UoyIJS6fyKY4c47od5+65DoN59+VUVuhR7mI/l7KZu
+ r/gMynqqVc19tyuerMB10uITMbIsaY32SIep4MJuGd6XQwFedy4K1gD58TgBl+XMpD5IW5i8uu
+ NBM=
 WDCIronportException: Internal
 Received: from shindev.dhcp.fujisawa.hgst.com ([10.149.52.189])
-  by uls-op-cesaip02.wdc.com with ESMTP; 28 Dec 2020 16:44:36 -0800
+  by uls-op-cesaip02.wdc.com with ESMTP; 28 Dec 2020 16:44:38 -0800
 From:   Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 To:     linux-block@vger.kernel.org, Omar Sandoval <osandov@fb.com>
 Cc:     Omar Sandoval <osandov@osandov.com>,
@@ -64,9 +64,9 @@ Cc:     Omar Sandoval <osandov@osandov.com>,
         Johannes Thumshirn <johannes.thumshirn@wdc.com>,
         Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
         Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [PATCH blktests v3 1/2] common/rc: Check both max_active_zones and max_open_zones
-Date:   Tue, 29 Dec 2020 09:44:33 +0900
-Message-Id: <20201229004434.927644-2-shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests v3 2/2] zbd/005: Provide max_active/open_zones limit to fio command
+Date:   Tue, 29 Dec 2020 09:44:34 +0900
+Message-Id: <20201229004434.927644-3-shinichiro.kawasaki@wdc.com>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20201229004434.927644-1-shinichiro.kawasaki@wdc.com>
 References: <20201229004434.927644-1-shinichiro.kawasaki@wdc.com>
@@ -76,95 +76,60 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Linux kernel 5.9 introduced new sysfs attributes max_active_zones and
-max_open_zones for zoned block devices. Max_open_zones is the limit of
-number of zones in open status. Max_active_zones is the limit of number
-of zones in open or closed status. Currently, the helper function
-_test_dev_max_active_zones() checks only max_active_zones, but it is not
-enough. When the device has max_open_zones, check for max_active_zones
-can not avoid the errors for write operations.
+When test target zoned block devices have max_open_zones or
+max_active_zones limit, high queue depth sequential write in the test
+case zbd/005 may result in parallel writes to number of zones beyond the
+limit. This causes I/O errors.
 
-To avoid the error, improve the function _test_dev_max_active_zones() to
-check the limits both. Rename it to _test_dev_max_open_active_zones().
-When one of the limits is available for the test target device, return
-it. If both limits are available, return smaller limit.
+To avoid the errors, specify the limit to fio command in the test case.
 
-Also modify block/004 and zbd/003 to call the renamed helper function
-and update comment description.
-
-Fixes: e6981bb2d9ce ("common/rc: Add _test_dev_max_active_zones() helper function")
 Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 ---
- common/rc       | 19 ++++++++++++++++---
- tests/block/004 |  2 +-
- tests/zbd/003   |  6 +++---
- 3 files changed, 20 insertions(+), 7 deletions(-)
+ tests/zbd/005 | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
 
-diff --git a/common/rc b/common/rc
-index d396fb5..a837542 100644
---- a/common/rc
-+++ b/common/rc
-@@ -280,11 +280,24 @@ _test_dev_is_partition() {
- 	[[ -n ${TEST_DEV_PART_SYSFS} ]]
- }
- 
--_test_dev_max_active_zones() {
-+# Return max open zones or max active zones of the test target device.
-+# If the device has both, return smaller value.
-+_test_dev_max_open_active_zones() {
-+	local -i moz=0
-+	local -i maz=0
-+
-+	if [[ -r "${TEST_DEV_SYSFS}/queue/max_open_zones" ]]; then
-+		moz=$(_test_dev_queue_get max_open_zones)
-+	fi
-+
- 	if [[ -r "${TEST_DEV_SYSFS}/queue/max_active_zones" ]]; then
--		_test_dev_queue_get max_active_zones
-+		maz=$(_test_dev_queue_get max_active_zones)
-+	fi
-+
-+	if ((!moz)) || ((maz && maz < moz)); then
-+		echo "${maz}"
- 	else
--		echo 0
-+		echo "${moz}"
- 	fi
- }
- 
-diff --git a/tests/block/004 b/tests/block/004
-index 6eff6ce..a7cec95 100755
---- a/tests/block/004
-+++ b/tests/block/004
-@@ -26,7 +26,7 @@ test_device() {
- 	if _test_dev_is_zoned; then
- 		_test_dev_queue_set scheduler deadline
- 		opts+=("--direct=1" "--zonemode=zbd")
--		opts+=("--max_open_zones=$(_test_dev_max_active_zones)")
-+		opts+=("--max_open_zones=$(_test_dev_max_open_active_zones)")
- 	fi
- 
- 	FIO_PERF_FIELDS=("write iops")
-diff --git a/tests/zbd/003 b/tests/zbd/003
-index 1e92e81..7f4fa2c 100755
---- a/tests/zbd/003
-+++ b/tests/zbd/003
-@@ -30,10 +30,10 @@ test_device() {
+diff --git a/tests/zbd/005 b/tests/zbd/005
+index 1e8962c..a7fb175 100755
+--- a/tests/zbd/005
++++ b/tests/zbd/005
+@@ -28,7 +28,8 @@ cleanup_fallback_device() {
+ test_device() {
+ 	local -i zone_idx
+ 	local -i offset
+-	local zbdmode=""
++	local -i moaz
++	local -a zbdmode=()
  
  	echo "Running ${TEST_NAME}"
  
--	# When the test device has max_active_zone limit, reset all zones. This
--	# ensures the write operations in this test case do not open zones
-+	# When the test device has max_open/active_zones limit, reset all zones.
-+	# This ensures the write operations in this test case do not open zones
- 	# beyond the limit.
--	(($(_test_dev_max_active_zones))) && blkzone reset "${TEST_DEV}"
-+	(($(_test_dev_max_open_active_zones))) && blkzone reset "${TEST_DEV}"
+@@ -36,11 +37,13 @@ test_device() {
  
- 	# Get physical block size as dd block size to meet zoned block device
- 	# requirement
+ 	zone_idx=$(_find_first_sequential_zone) || return $?
+ 	offset=$((ZONE_STARTS[zone_idx] * 512))
++	moaz=$(_test_dev_max_open_active_zones)
+ 
+ 	# If the test target zone has smaller zone capacity than zone size,
+-	# enable zonemode=zbd to have fio handle the zone capacity limit.
+-	if ((ZONE_CAPS[zone_idx] != ZONE_LENGTHS[zone_idx])); then
+-		zbdmode="--zonemode=zbd"
++	# or if the test target device has max open/active zones limit, enable
++	# zonemode=zbd and specify the limit to handle the zone restrictions.
++	if ((ZONE_CAPS[zone_idx] != ZONE_LENGTHS[zone_idx])) || ((moaz)); then
++		zbdmode=("--zonemode=zbd" "--max_open_zones=${moaz}")
+ 	fi
+ 
+ 	blkzone reset -o "${ZONE_STARTS[zone_idx]}" "${TEST_DEV}"
+@@ -51,7 +54,7 @@ test_device() {
+ 	FIO_PERF_FIELDS=("write io" "write iops")
+ 	_fio_perf --filename="${TEST_DEV}" --name zbdwo --rw=write --direct=1 \
+ 		  --ioengine=libaio --iodepth=128 --bs=256k \
+-		  --offset="${offset}" ${zbdmode}
++		  --offset="${offset}" "${zbdmode[@]}"
+ 
+ 	_put_blkzone_report
+ 
 -- 
 2.28.0
 
