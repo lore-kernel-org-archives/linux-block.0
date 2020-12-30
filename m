@@ -2,145 +2,243 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-20.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E87A2C43381
-	for <linux-block@archiver.kernel.org>; Wed, 30 Dec 2020 06:29:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3FCEC433E0
+	for <linux-block@archiver.kernel.org>; Wed, 30 Dec 2020 09:52:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ADA5A207B0
-	for <linux-block@archiver.kernel.org>; Wed, 30 Dec 2020 06:29:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B3A7F2085B
+	for <linux-block@archiver.kernel.org>; Wed, 30 Dec 2020 09:52:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726518AbgL3G32 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Dec 2020 01:29:28 -0500
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:33821 "EHLO
-        out1-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726388AbgL3G31 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Dec 2020 01:29:27 -0500
-Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
-        by mailout.nyi.internal (Postfix) with ESMTP id 13D615C019C;
-        Wed, 30 Dec 2020 01:28:21 -0500 (EST)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute1.internal (MEProxy); Wed, 30 Dec 2020 01:28:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=anarazel.de; h=
-        date:from:to:cc:subject:message-id:mime-version:content-type; s=
-        fm3; bh=PSUMEHHqwnwguq8Haku3EVH3D6D0Gt/lLRo2eiPEe0o=; b=fuKuekFK
-        cF/8jEQv8NF5on28Z871ZPMKXLp+ZXcLLu00fvBCjDnv+n/SJgFe2pd++vniJBxN
-        2QbtNDtahBPPIl8ryDxc7k9awzhvSdGTWSQWs6e62+WegeTbBnvAQErBVA/wf5jq
-        DxsdL3mT0ltj/WlNIaGzYQI/jO099rWzu9V1iR1LFYOy6fgqXV5TaeevVvn27+bg
-        Q9g1R8TYrB7xflo8vt2rapZmN3KnNI6pW/DpXqV2XfmhYKQWw/3jE90qnRqg22JA
-        QEjNPcss//4wista67VxEt6pozqoLobosAceSABieftnichlpGKb9HGpqOEdl1DW
-        W8ei38apZc272Q==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-type:date:from:message-id
-        :mime-version:subject:to:x-me-proxy:x-me-proxy:x-me-sender
-        :x-me-sender:x-sasl-enc; s=fm1; bh=PSUMEHHqwnwguq8Haku3EVH3D6D0G
-        t/lLRo2eiPEe0o=; b=I0OlXwWsmBDeTTNcPsdFVhAeIK8NN0j1UauJbqrmf5KzC
-        2gKECnphBp2jXNv0fIntsuLc4u5N9AaHc5YxghWhJSSaRhvZI8CE2GwacAOCMMyW
-        FBlE2+slketILpz9psOgdWdcb54ox5iwJGajIMuXS1fvTowD4xRmm0u1gA5Z01Se
-        CgItG60tKAuKQdfxmyjipL4EemHjzp7Ii5kqE/HssD+ZNqG1LCAtAer7CVbFbdXi
-        K2/PfXU0Db+KNw/MQ1jjQDgKdpWPQFQrzYH/H1sf3RIHXjPkiS3mxi5dlUxj+a6D
-        VkDBpEeECSvt01mh76q5mV+hAauJSIZ/kxsL3sXIA==
-X-ME-Sender: <xms:BB7sXxUnK5Zzf5wujRTYGtL9qYIQu69ib7Ub8gVVBTulW_DJYRkrHA>
-    <xme:BB7sXxmezjpN-rVBTABnCSEETb4qC0GxjRX2UllR9P1RHXFcL-ebjX4XN7hhkjy3b
-    1kJR9v-mzsIDYFv7A>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrvddvvddgleekucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucenucfjughrpeffhffvuffkgggtugesthdtredttd
-    dtvdenucfhrhhomheptehnughrvghsucfhrhgvuhhnugcuoegrnhgurhgvshesrghnrghr
-    rgiivghlrdguvgeqnecuggftrfgrthhtvghrnhepiedvieelgeeuuedtfeduhfefteehhf
-    evvdeljeetgfeugfdtledtudetvdehkeffnecukfhppeeijedrudeitddrvddujedrvdeh
-    tdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrnh
-    gurhgvshesrghnrghrrgiivghlrdguvg
-X-ME-Proxy: <xmx:BB7sX9YecBCwvVMo-tZAhFK20KMo4cnymrxtmhZxEKaGuaGtAoHLaw>
-    <xmx:BB7sX0XRnAFwaurnjiZqrk3TGQQczic3lbksC6CgRmp0B4NQqbKqDg>
-    <xmx:BB7sX7ncqJEqlX3apBiIi8z1kPRPmN891tR-c_37jzMc8FOp-bICpg>
-    <xmx:BR7sXzvggNA85j3J6J4ZjUuROXnuPAgoiVGcsUlHHNVSs9spzz8KGg>
-Received: from intern.anarazel.de (c-67-160-217-250.hsd1.ca.comcast.net [67.160.217.250])
-        by mail.messagingengine.com (Postfix) with ESMTPA id B79F824005C;
-        Wed, 30 Dec 2020 01:28:20 -0500 (EST)
-Date:   Tue, 29 Dec 2020 22:28:19 -0800
-From:   Andres Freund <andres@anarazel.de>
-To:     linux-fsdevel@vger.kernel.org
-Cc:     linux-xfs@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: fallocate(FALLOC_FL_ZERO_RANGE_BUT_REALLY) to avoid unwritten
- extents?
-Message-ID: <20201230062819.yinrrp6uwfegsqo3@alap3.anarazel.de>
+        id S1726292AbgL3JwN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Dec 2020 04:52:13 -0500
+Received: from mail.synology.com ([211.23.38.101]:44132 "EHLO synology.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726214AbgL3JwM (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 30 Dec 2020 04:52:12 -0500
+Received: from [10.17.32.105] (unknown [10.17.32.105])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by synology.com (Postfix) with ESMTPSA id 0D98FCE781AC;
+        Wed, 30 Dec 2020 17:51:30 +0800 (CST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=synology.com; s=123;
+        t=1609321890; bh=vNptn2H0DY5msg+Jmf9MApzufS1tfR+Wzw6M03URVDM=;
+        h=Subject:To:Cc:References:From:Date:In-Reply-To;
+        b=WaS1fCmXW3GABEjBHDDZAvXpas8qYUjxGtskKY6dRbl+xyzakmZQR72vXDBpQJgSt
+         tFgNWYSw6R19+JRbIhFpvvy6ZQ+0tfdqflpGWSPYtwJ1TSiQD9Cn/qIgCHSD2rPlKI
+         +oXlFM53Ec3IFunX1eiCSpuGXSv/3xZ6/qBMvAHI=
+Subject: Re: [PATCH 1/4] block: introduce submit_bio_noacct_add_head
+To:     John Stoffel <john@stoffel.org>
+Cc:     axboe@kernel.dk, agk@redhat.com, snitzer@redhat.com,
+        dm-devel@redhat.com, song@kernel.org, linux-block@vger.kernel.org,
+        linux-raid@vger.kernel.org
+References: <1609233522-25837-1-git-send-email-dannyshih@synology.com>
+ <1609233522-25837-2-git-send-email-dannyshih@synology.com>
+ <24555.49943.411197.147225@quad.stoffel.home>
+From:   Danny Shih <dannyshih@synology.com>
+Message-ID: <abac671f-91f2-ca4e-7f77-8bb5da85a4cc@synology.com>
+Date:   Wed, 30 Dec 2020 17:51:29 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+In-Reply-To: <24555.49943.411197.147225@quad.stoffel.home>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Synology-MCP-Status: no
+X-Synology-Spam-Flag: no
+X-Synology-Spam-Status: score=0, required 6, WHITELIST_FROM_ADDRESS 0
+X-Synology-Virus-Status: no
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+Hi, John,
 
-For things like database journals using fallocate(0) is not sufficient,
-as writing into the the pre-allocated data with O_DIRECT | O_DSYNC
-writes requires the unwritten extents to be converted, which in turn
-requires journal operations.
-
-The performance difference in a journalling workload (lots of
-sequential, low-iodepth, often small, writes) is quite remarkable. Even
-on quite fast devices:
-
-    andres@awork3:/mnt/t3$ grep /mnt/t3 /proc/mounts
-    /dev/nvme1n1 /mnt/t3 xfs rw,relatime,attr2,inode64,logbufs=8,logbsize=32k,noquota 0 0
-
-    andres@awork3:/mnt/t3$ fallocate -l $((1024*1024*1024)) test_file
-
-    andres@awork3:/mnt/t3$ dd if=/dev/zero of=test_file bs=4096 conv=notrunc iflag=count_bytes count=$((1024*1024*1024)) oflag=direct,dsync
-    262144+0 records in
-    262144+0 records out
-    1073741824 bytes (1.1 GB, 1.0 GiB) copied, 117.587 s, 9.1 MB/s
-
-    andres@awork3:/mnt/t3$ dd if=/dev/zero of=test_file bs=4096 conv=notrunc iflag=count_bytes count=$((1024*1024*1024)) oflag=direct,dsync
-    262144+0 records in
-    262144+0 records out
-    1073741824 bytes (1.1 GB, 1.0 GiB) copied, 3.69125 s, 291 MB/s
-
-    andres@awork3:/mnt/t3$ fallocate -z -l $((1024*1024*1024)) test_file
-
-    andres@awork3:/mnt/t3$ dd if=/dev/zero of=test_file bs=4096 conv=notrunc iflag=count_bytes count=$((1024*1024*1024)) oflag=direct,dsync
-    z262144+0 records in
-    262144+0 records out
-    1073741824 bytes (1.1 GB, 1.0 GiB) copied, 109.398 s, 9.8 MB/s
-
-    andres@awork3:/mnt/t3$ dd if=/dev/zero of=test_file bs=4096 conv=notrunc iflag=count_bytes count=$((1024*1024*1024)) oflag=direct,dsync
-    262144+0 records in
-    262144+0 records out
-    1073741824 bytes (1.1 GB, 1.0 GiB) copied, 3.76166 s, 285 MB/s
+Thank you for taking the time to write a review.
 
 
-The way around that, from a database's perspective, is obviously to just
-overwrite the file "manually" after fallocate()ing it, utilizing larger
-writes, and then to recycle the file.
+John Stoffel <john@stoffel.org> writes:
+>>>>>> "dannyshih" == dannyshih  <dannyshih@synology.com> writes:
+> dannyshih> From: Danny Shih <dannyshih@synology.com>
+> dannyshih> Porvide a way for stacking block device to re-submit the bio
+> dannyshih> which sholud be handled firstly.
+>
+> You're spelling needs to be fixed in these messages.
 
 
-But that's a fair bit of unnecessary IO from userspace, and it's IO that
-the kernel can do more efficiently on a number of types of block
-devices, e.g. by utilizing write-zeroes.
+Sorry for so many spelling errors.
+
+The message should be
+
+"Provide a way for stacking block device to re-submit
+
+the bio which should be handled first."
+
+I will fix it.
 
 
-Which brings me to $subject:
+> dannyshih> Signed-off-by: Danny Shih <dannyshih@synology.com>
+> dannyshih> Reviewed-by: Allen Peng <allenpeng@synology.com>
+> dannyshih> Reviewed-by: Alex Wu <alexwu@synology.com>
+> dannyshih> ---
+> dannyshih>  block/blk-core.c       | 44 +++++++++++++++++++++++++++++++++-----------
+> dannyshih>  include/linux/blkdev.h |  1 +
+> dannyshih>  2 files changed, 34 insertions(+), 11 deletions(-)
+>
+> dannyshih> diff --git a/block/blk-core.c b/block/blk-core.c
+> dannyshih> index 96e5fcd..693dc83 100644
+> dannyshih> --- a/block/blk-core.c
+> dannyshih> +++ b/block/blk-core.c
+> dannyshih> @@ -1031,16 +1031,7 @@ static blk_qc_t __submit_bio_noacct_mq(struct bio *bio)
+> dannyshih>  	return ret;
+> dannyshih>  }
+>   
+> dannyshih> -/**
+> dannyshih> - * submit_bio_noacct - re-submit a bio to the block device layer for I/O
+> dannyshih> - * @bio:  The bio describing the location in memory and on the device.
+> dannyshih> - *
+> dannyshih> - * This is a version of submit_bio() that shall only be used for I/O that is
+> dannyshih> - * resubmitted to lower level drivers by stacking block drivers.  All file
+> dannyshih> - * systems and other upper level users of the block layer should use
+> dannyshih> - * submit_bio() instead.
+> dannyshih> - */
+> dannyshih> -blk_qc_t submit_bio_noacct(struct bio *bio)
+> dannyshih> +static blk_qc_t do_submit_bio_noacct(struct bio *bio, bool add_head)
+> dannyshih>  {
+> dannyshih>  	if (!submit_bio_checks(bio))
+> dannyshih>  		return BLK_QC_T_NONE;
+> dannyshih> @@ -1052,7 +1043,10 @@ blk_qc_t submit_bio_noacct(struct bio *bio)
+> dannyshih>  	 * it is active, and then process them after it returned.
+> dannyshih>  	 */
+> dannyshih>  	if (current->bio_list) {
+> dannyshih> -		bio_list_add(&current->bio_list[0], bio);
+> dannyshih> +		if (add_head)
+> dannyshih> +			bio_list_add_head(&current->bio_list[0], bio);
+> dannyshih> +		else
+> dannyshih> +			bio_list_add(&current->bio_list[0], bio);
+> dannyshih>  		return BLK_QC_T_NONE;
+> dannyshih>  	}
+>   
+> dannyshih> @@ -1060,9 +1054,37 @@ blk_qc_t submit_bio_noacct(struct bio *bio)
+> dannyshih>  		return __submit_bio_noacct_mq(bio);
+> dannyshih>  	return __submit_bio_noacct(bio);
+> dannyshih>  }
+> dannyshih> +
+> dannyshih> +/**
+> dannyshih> + * submit_bio_noacct - re-submit a bio to the block device layer for I/O
+> dannyshih> + * @bio:  The bio describing the location in memory and on the device.
+> dannyshih> + *
+> dannyshih> + * This is a version of submit_bio() that shall only be used for I/O that is
+> dannyshih> + * resubmitted to lower level drivers by stacking block drivers.  All file
+> dannyshih> + * systems and other upper level users of the block layer should use
+> dannyshih> + * submit_bio() instead.
+> dannyshih> + */
+> dannyshih> +blk_qc_t submit_bio_noacct(struct bio *bio)
+> dannyshih> +{
+> dannyshih> +	return do_submit_bio_noacct(bio, false);
+> dannyshih> +}
+> dannyshih>  EXPORT_SYMBOL(submit_bio_noacct);
+>
+> So why is it named "submit_bio_noacct" when it's supposed to be only
+> used by layers submitting to lower level drivers.  How can this be
+> figured out by drivers automatically, so the writed doesn't have to
+> know about this?
 
-Would it make sense to add a variant of FALLOC_FL_ZERO_RANGE that
-doesn't convert extents into unwritten extents, but instead uses
-blkdev_issue_zeroout() if supported?  Mostly interested in xfs/ext4
-myself, but ...
 
-Doing so as a variant of FALLOC_FL_ZERO_RANGE seems to make the most
-sense, as that'd work reasonably efficiently to initialize newly
-allocated space as well as for zeroing out previously used file space.
+There is no logical change while using submit_bio_noacct() after my 
+patch. So I didn't change
+
+the name and the documentation of submit_bio_noacct().
 
 
-As blkdev_issue_zeroout() already has a fallback path it seems this
-should be doable without too much concern for which devices have write
-zeroes, and which do not?
+>   
+> dannyshih>  /**
+> dannyshih> + * submit_bio_noacct - re-submit a bio, which needs to be handle firstly,
+> dannyshih> + *                     to the block device layer for I/O
+> dannyshih> + * @bio:  The bio describing the location in memory and on the device.
+> dannyshih> + *
+> dannyshih> + * alternative submit_bio_noacct() which add bio to the head of
+> dannyshih> + * current->bio_list.
+> dannyshih> + */
+>
+> Firstly isn't proper english.  Maybe something like:
+>
+> submit_bio_noacct - re-submit a bio which needs to be handled first
+> because <reasons> to the block device layer for I/O
+>
+> But the name still sucks, and the *reason* the bio needs to be handled
+> differently isn't well explained.
 
-Greetings,
 
-Andres Freund
+Sorry for the grammar mistake. And I wrote the wrong function name here.
+
+It should be replaced by submit_bio_noacct_add_head.
+
+
+About the function name, the name of submit_bio_noacct_add_head()
+
+is trying to let drivers know that this is just an alternative version of
+
+submit_bio_noacct(). The only difference is that this function adds bio to
+
+the head of current->bio_list, and submit_bio_noacct() adds it to the tail.
+
+
+About the documentation, what if I change it like:
+
+
+"submit_bio_noacct_add_head - re-submit a bio which needs to
+
+be handled first to the block device layer for I/O, because it has
+
+sequential relevance with the bio handling in current ->submit_bio.
+
+
+Alternative submit_bio_noacct() adds bio to the head of
+
+current->bio_list. To keep bio sequence, this function is used
+
+when a block device splits bio and re-submits the remainder back
+
+to itself. This makes sure that the re-submitted bio will be handle
+
+just after the split part of the original bio."
+
+
+Thanks for your suggestion.
+
+
+> dannyshih> +blk_qc_t submit_bio_noacct_add_head(struct bio *bio)
+> dannyshih> +{
+> dannyshih> +	return do_submit_bio_noacct(bio, true);
+> dannyshih> +}
+> dannyshih> +EXPORT_SYMBOL(submit_bio_noacct_add_head);
+> dannyshih> +
+> dannyshih> +/**
+> dannyshih>   * submit_bio - submit a bio to the block device layer for I/O
+> dannyshih>   * @bio: The &struct bio which describes the I/O
+> dannyshih>   *
+> dannyshih> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> dannyshih> index 070de09..b0080d0 100644
+> dannyshih> --- a/include/linux/blkdev.h
+> dannyshih> +++ b/include/linux/blkdev.h
+> dannyshih> @@ -905,6 +905,7 @@ static inline void rq_flush_dcache_pages(struct request *rq)
+> dannyshih>  extern int blk_register_queue(struct gendisk *disk);
+> dannyshih>  extern void blk_unregister_queue(struct gendisk *disk);
+> dannyshih>  blk_qc_t submit_bio_noacct(struct bio *bio);
+> dannyshih> +blk_qc_t submit_bio_noacct_add_head(struct bio *bio);
+> dannyshih>  extern void blk_rq_init(struct request_queue *q, struct request *rq);
+> dannyshih>  extern void blk_put_request(struct request *);
+> dannyshih>  extern struct request *blk_get_request(struct request_queue *, unsigned int op,
+> dannyshih> --
+> dannyshih> 2.7.4
+
+Best Regards,
+
+Danny Shih
+
+
