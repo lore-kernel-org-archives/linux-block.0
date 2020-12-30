@@ -2,63 +2,131 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8B9CC433E0
-	for <linux-block@archiver.kernel.org>; Wed, 30 Dec 2020 11:36:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F2E2C433E6
+	for <linux-block@archiver.kernel.org>; Wed, 30 Dec 2020 14:06:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9F6CE2220B
-	for <linux-block@archiver.kernel.org>; Wed, 30 Dec 2020 11:36:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2CB6E22242
+	for <linux-block@archiver.kernel.org>; Wed, 30 Dec 2020 14:06:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726670AbgL3Lg2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Dec 2020 06:36:28 -0500
-Received: from smtp.hosts.co.uk ([85.233.160.19]:8692 "EHLO smtp.hosts.co.uk"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726586AbgL3Lg2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Dec 2020 06:36:28 -0500
-Received: from host86-158-105-41.range86-158.btcentralplus.com ([86.158.105.41] helo=[192.168.1.65])
-        by smtp.hosts.co.uk with esmtpa (Exim)
-        (envelope-from <antlists@youngman.org.uk>)
-        id 1kuZla-0001U5-DV; Wed, 30 Dec 2020 11:35:46 +0000
-Subject: Re: [PATCH 1/4] block: introduce submit_bio_noacct_add_head
-To:     John Stoffel <john@stoffel.org>, dannyshih <dannyshih@synology.com>
-Cc:     axboe@kernel.dk, agk@redhat.com, snitzer@redhat.com,
-        dm-devel@redhat.com, song@kernel.org, linux-block@vger.kernel.org,
-        linux-raid@vger.kernel.org
-References: <1609233522-25837-1-git-send-email-dannyshih@synology.com>
- <1609233522-25837-2-git-send-email-dannyshih@synology.com>
- <24555.49943.411197.147225@quad.stoffel.home>
-From:   antlists <antlists@youngman.org.uk>
-Message-ID: <d841085f-5fd7-bd5c-a40b-fbb953c80598@youngman.org.uk>
-Date:   Wed, 30 Dec 2020 11:35:45 +0000
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        id S1726628AbgL3OFs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Dec 2020 09:05:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49736 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726230AbgL3OFs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 30 Dec 2020 09:05:48 -0500
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4371CC061799;
+        Wed, 30 Dec 2020 06:05:08 -0800 (PST)
+Received: by mail-pf1-x430.google.com with SMTP id h186so9759147pfe.0;
+        Wed, 30 Dec 2020 06:05:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=RznXSw7qxQXCa6AGnGmmtVifZFqLdwppqr0oE+H73IQ=;
+        b=FiNo6uDsC8Fr0nL/oPoVOKzAGkk6h4ZY8XO2eOKKH32+LjhNXcma4jGLFZ50yQ2SJA
+         e289avFGuWNFUkBP0NfwaUTY5lhlENek0BSSTXQ2hXFNECXxCajrTLj0yOOPsM+SNqLO
+         QzC9j4//1IeOtOgsWgdLrDNZsWStVYdAcj6opbdYQykMWfwNozG1w8J/nfOdR4pmP8LW
+         56C0fU6c1QyCSLwjAE8TrQtsrtrsQo32DpQzetO4y7Z16ZMCJ8iaMHfAQnBxKt6RyrBa
+         +3f5BAihLHMb0mQCnxKX40ttERxcmdRUqd2zIxvS7d5xYT+KExPqDPux1dowkveOuxI1
+         kudA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=RznXSw7qxQXCa6AGnGmmtVifZFqLdwppqr0oE+H73IQ=;
+        b=MVptWGhZ4hDSsYioOYDfl4oYmjTHSUD8VDTWqP4aT+8nOxDE14tSvRFw9R/jGEa/Am
+         EdSTYZQThH29RfrqlDTdM6JGnsPG3rk493JaIGHl++cGm0gRrRNSUWqz5N2TbGSY/P/q
+         qsqlq6hWTF/qa1wL+8KD0AEAJzMlqt8+n0KQKyZ+YIeK4wDhxc0C1m85dJ/z/wAuoBxv
+         uGMyzmY4p50eqCykp+gMFKYI0sR8fr1quP2K5j23v/I0+8tIKyxcesUFHz8qvEwXUUnc
+         kI/A+djdQkDNlt1f1iYda58R7wVKW1zrClo4bUBwMgj7O9ku/N+UexOVuF77agSZ3XtW
+         UAtQ==
+X-Gm-Message-State: AOAM5303D0oGGfVsCHeJYJyJlUhE5bNm6gmNw0Kyj28X8Tdkev2coK3F
+        KJ9J+UUwfCNzm+XZHu3uyrL0qnk/PeWNIQ==
+X-Google-Smtp-Source: ABdhPJw8xRASTcrtl2r8MBKh8DGsaJWaLP8WYraJJ3sYSTpRzFpO8y4QbnJFKUNPqe8cPlCRiXdfqw==
+X-Received: by 2002:a63:da58:: with SMTP id l24mr52102176pgj.178.1609337107580;
+        Wed, 30 Dec 2020 06:05:07 -0800 (PST)
+Received: from localhost ([211.108.35.36])
+        by smtp.gmail.com with ESMTPSA id b1sm7087859pjh.54.2020.12.30.06.05.06
+        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
+        Wed, 30 Dec 2020 06:05:07 -0800 (PST)
+Date:   Wed, 30 Dec 2020 23:05:04 +0900
+From:   Minwoo Im <minwoo.im.dev@gmail.com>
+To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-nvme@lists.infradead.org
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [RFC] block: reject I/O in BLKRRPART if block size changed
+Message-ID: <20201230140504.GB7917@localhost.localdomain>
+References: <20201226180232.12276-1-minwoo.im.dev@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <24555.49943.411197.147225@quad.stoffel.home>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20201226180232.12276-1-minwoo.im.dev@gmail.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 30/12/2020 00:00, John Stoffel wrote:
-> dannyshih> From: Danny Shih<dannyshih@synology.com>
-> dannyshih> Porvide a way for stacking block device to re-submit the bio
-> dannyshih> which sholud be handled firstly.
+On 20-12-27 03:02:32, Minwoo Im wrote:
+> Background:
+>   Let's say we have 2 LBA format for 4096B and 512B LBA size for a
+> NVMe namespace.  Assume that current LBA format is 4096B and in case
+> we convert namespace to 512B and 4096B back again:
 > 
-> You're spelling needs to be fixed in these messages.
+>   nvme format /dev/nvme0n1 --lbaf=1 --force  # to 512B LBA
+>   nvme format /dev/nvme0n1 --lbaf=0 --force  # to 4096B LBA
+> 
+>   Then we can see the following errors during the BLKRRPART ioctl from
+> the nvme-cli format subcommand:
+> 
+>   [   10.771740] blk_update_request: operation not supported error, dev nvme0n1, sector 0 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 0
+>   [   10.780262] Buffer I/O error on dev nvme0n1, logical block 0, async page read
+>   ...
+> 
+>   Also, we can see the Read commands followed by the Format command due
+> to BLKRRPART ioctl with Number of LBAs to 65535(0xffff) which is
+> under-flowed because the request for the Read commands are coming with
+> 512B and this is because it's playing around with i_blkbits from the
+> block_device inode which needs to be avoided as [1].
+> 
+>   kworker/0:1H-56      [000] ....   913.456922: nvme_setup_cmd: nvme0: disk=nvme0n1, qid=1, cmdid=216, nsid=1, flags=0x0, meta=0x0, cmd=(nvme_cmd_read slba=0, len=65535, ctrl=0x0, dsmgmt=0, reftag=0)
+>   ksoftirqd/0-9       [000] .Ns.   916.566351: nvme_complete_rq: nvme0: disk=nvme0n1, qid=1, cmdid=216, res=0x0, retries=0, flags=0x0, status=0x4002
+>   ...
+> 
+>   Before we have commit 5ff9f19231a0 ("block: simplify
+> set_init_blocksize"), block size used to be bumped up to the
+> 4K(PAGE_SIZE) in this example and we have not seen these errors.  But
+> with this patch, we have to make sure that bdev->bd_inode->i_blkbits to
+> make sure that BLKRRPART ioctl pass proper request length based on the
+> changed logical block size.
+> 
+> Description:
+>   As the previous discussion [1], this patch introduced a gendisk flag
+> to indicate that block size has been changed in the runtime.  This flag
+> is set when logical block size is changed in the runtime with sector
+> capacity itself.  It will be cleared when the file descriptor for the
+> block devie is opened again which means __blkdev_get() updates the block
+> size via set_init_blocksize().
+>   This patch rejects I/O from the path of add_partitions() and
+> application should open the file descriptor again to update the block
+> size of the block device inode.
+> 
+> [1] https://lore.kernel.org/linux-nvme/20201223183143.GB13354@localhost.localdomain/T/#t
+> 
+> Signed-off-by: Minwoo Im <minwoo.im.dev@gmail.com>
 
-   ^^^^^^
+Hello,
 
-It is traditional, when correcting someone else's spelling, to make one 
-of your own ... :-)
+Sorry for the noises here.  Please ignore this patch.  Will try to
+prepare a new one for this issue.
 
-Sorry, but if we're being pedantic for furriners, it behoves us to be 
-correct ourselves :-)
-
-Cheers,
-Wol
+Thanks,
