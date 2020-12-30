@@ -2,131 +2,207 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F2E2C433E6
-	for <linux-block@archiver.kernel.org>; Wed, 30 Dec 2020 14:06:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A018C433E6
+	for <linux-block@archiver.kernel.org>; Wed, 30 Dec 2020 16:02:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2CB6E22242
-	for <linux-block@archiver.kernel.org>; Wed, 30 Dec 2020 14:06:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F377B221F8
+	for <linux-block@archiver.kernel.org>; Wed, 30 Dec 2020 16:02:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726628AbgL3OFs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Dec 2020 09:05:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49736 "EHLO
+        id S1726305AbgL3QCQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Dec 2020 11:02:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39376 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726230AbgL3OFs (ORCPT
+        with ESMTP id S1726161AbgL3QCQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Dec 2020 09:05:48 -0500
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4371CC061799;
-        Wed, 30 Dec 2020 06:05:08 -0800 (PST)
-Received: by mail-pf1-x430.google.com with SMTP id h186so9759147pfe.0;
-        Wed, 30 Dec 2020 06:05:08 -0800 (PST)
+        Wed, 30 Dec 2020 11:02:16 -0500
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA8F5C061799;
+        Wed, 30 Dec 2020 08:01:35 -0800 (PST)
+Received: by mail-pj1-x102d.google.com with SMTP id lb18so3572046pjb.5;
+        Wed, 30 Dec 2020 08:01:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=RznXSw7qxQXCa6AGnGmmtVifZFqLdwppqr0oE+H73IQ=;
-        b=FiNo6uDsC8Fr0nL/oPoVOKzAGkk6h4ZY8XO2eOKKH32+LjhNXcma4jGLFZ50yQ2SJA
-         e289avFGuWNFUkBP0NfwaUTY5lhlENek0BSSTXQ2hXFNECXxCajrTLj0yOOPsM+SNqLO
-         QzC9j4//1IeOtOgsWgdLrDNZsWStVYdAcj6opbdYQykMWfwNozG1w8J/nfOdR4pmP8LW
-         56C0fU6c1QyCSLwjAE8TrQtsrtrsQo32DpQzetO4y7Z16ZMCJ8iaMHfAQnBxKt6RyrBa
-         +3f5BAihLHMb0mQCnxKX40ttERxcmdRUqd2zIxvS7d5xYT+KExPqDPux1dowkveOuxI1
-         kudA==
+        h=from:to:cc:subject:date:message-id;
+        bh=VLdvPWDa7LCErUP/uLe8+ItMhW4ZRtvNz7er1dEOMvM=;
+        b=lLCnPptM7LYsfNHKsi/3Pbh0EnF+AbW96IKA4yofZcicmevcklJIGRv11R1QNBPMO6
+         Rvs+Xw/Z+7E35G5/31rf9GP6V+22E05yFSmlAqzRxcHVvIF7/20XZC6AxalH9IqmDuUo
+         b+M5Ta+QiiS2dvNaibFOsSRAnyqn+SIgqelekK9lhDaQZ2QqU8OEFK06dLnfHksTUX4t
+         7Ul9AURhKoCIdGhlNT2GvjZKYnZdbyAU5eLv1ljSERz1jH2kazlLXY7bdJDHKB9XS2Ag
+         g8owlA9dZG0QknWFhondp4HIN1u/CHDqlbsYwZMjgg3fdqmcI2n/Itmvkk7Ht51FJ6zs
+         PFNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=RznXSw7qxQXCa6AGnGmmtVifZFqLdwppqr0oE+H73IQ=;
-        b=MVptWGhZ4hDSsYioOYDfl4oYmjTHSUD8VDTWqP4aT+8nOxDE14tSvRFw9R/jGEa/Am
-         EdSTYZQThH29RfrqlDTdM6JGnsPG3rk493JaIGHl++cGm0gRrRNSUWqz5N2TbGSY/P/q
-         qsqlq6hWTF/qa1wL+8KD0AEAJzMlqt8+n0KQKyZ+YIeK4wDhxc0C1m85dJ/z/wAuoBxv
-         uGMyzmY4p50eqCykp+gMFKYI0sR8fr1quP2K5j23v/I0+8tIKyxcesUFHz8qvEwXUUnc
-         kI/A+djdQkDNlt1f1iYda58R7wVKW1zrClo4bUBwMgj7O9ku/N+UexOVuF77agSZ3XtW
-         UAtQ==
-X-Gm-Message-State: AOAM5303D0oGGfVsCHeJYJyJlUhE5bNm6gmNw0Kyj28X8Tdkev2coK3F
-        KJ9J+UUwfCNzm+XZHu3uyrL0qnk/PeWNIQ==
-X-Google-Smtp-Source: ABdhPJw8xRASTcrtl2r8MBKh8DGsaJWaLP8WYraJJ3sYSTpRzFpO8y4QbnJFKUNPqe8cPlCRiXdfqw==
-X-Received: by 2002:a63:da58:: with SMTP id l24mr52102176pgj.178.1609337107580;
-        Wed, 30 Dec 2020 06:05:07 -0800 (PST)
-Received: from localhost ([211.108.35.36])
-        by smtp.gmail.com with ESMTPSA id b1sm7087859pjh.54.2020.12.30.06.05.06
-        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 30 Dec 2020 06:05:07 -0800 (PST)
-Date:   Wed, 30 Dec 2020 23:05:04 +0900
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=VLdvPWDa7LCErUP/uLe8+ItMhW4ZRtvNz7er1dEOMvM=;
+        b=ePOpxIi4bjYo2oT5+QON0RBzJJgy2noUfSSsHBE17TwXY0V2IARrZXjRVWkqbUjRQ8
+         xaEU7Z9HTpKQ2lPHrUbLRVL5naNZIFeEzDyQXX+cgQzFPNSlQvjpIEG1yDIGmcjVuPQ8
+         kMGdrRpvGZOIzo0zVLXCkE5yFeFlzfEdMXx94odnJVEpEJhUopUkXx7oxF/wsoC2k12C
+         1TJ7NoksMETdduUy5qMyzdoRzPowPZ9wmo3ekGZlsBKKs2gxNgXZB+6y2xG2nBwU3O5q
+         1mPN/GuMlxi3ITEJE99R3Co5QFpiRRvVo71F77KiCNc6S87u2zDutbBfmYvFwt+Dkolf
+         KulQ==
+X-Gm-Message-State: AOAM533A7sVAN+mKSuRGgOhJTR5SS8m6s3xPDilDik4V/3IdyChydnUg
+        XaGbm3GqzjFEFEkx4h3m8wKDIvaOu5YIyQ==
+X-Google-Smtp-Source: ABdhPJwWElenlBNj0qZFmQEZkHC+eKVHm2nrmbRXHXtpWV0VWeSuGOfqx+yCAXwynQ+lEBK6LcZ/bg==
+X-Received: by 2002:a17:90b:1202:: with SMTP id gl2mr9429539pjb.123.1609344094804;
+        Wed, 30 Dec 2020 08:01:34 -0800 (PST)
+Received: from localhost.localdomain ([211.108.35.36])
+        by smtp.gmail.com with ESMTPSA id y8sm7590524pji.55.2020.12.30.08.01.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 30 Dec 2020 08:01:34 -0800 (PST)
 From:   Minwoo Im <minwoo.im.dev@gmail.com>
 To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-nvme@lists.infradead.org
+        linux-fsdevel@vger.kernel.org
 Cc:     Jens Axboe <axboe@kernel.dk>,
         Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [RFC] block: reject I/O in BLKRRPART if block size changed
-Message-ID: <20201230140504.GB7917@localhost.localdomain>
-References: <20201226180232.12276-1-minwoo.im.dev@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20201226180232.12276-1-minwoo.im.dev@gmail.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+        Christoph Hellwig <hch@lst.de>,
+        Minwoo Im <minwoo.im.dev@gmail.com>
+Subject: [RFC V2] block: reject I/O for same fd if block size changed
+Date:   Thu, 31 Dec 2020 01:01:29 +0900
+Message-Id: <20201230160129.23731-1-minwoo.im.dev@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 20-12-27 03:02:32, Minwoo Im wrote:
-> Background:
->   Let's say we have 2 LBA format for 4096B and 512B LBA size for a
-> NVMe namespace.  Assume that current LBA format is 4096B and in case
-> we convert namespace to 512B and 4096B back again:
-> 
->   nvme format /dev/nvme0n1 --lbaf=1 --force  # to 512B LBA
->   nvme format /dev/nvme0n1 --lbaf=0 --force  # to 4096B LBA
-> 
->   Then we can see the following errors during the BLKRRPART ioctl from
-> the nvme-cli format subcommand:
-> 
->   [   10.771740] blk_update_request: operation not supported error, dev nvme0n1, sector 0 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 0
->   [   10.780262] Buffer I/O error on dev nvme0n1, logical block 0, async page read
->   ...
-> 
->   Also, we can see the Read commands followed by the Format command due
-> to BLKRRPART ioctl with Number of LBAs to 65535(0xffff) which is
-> under-flowed because the request for the Read commands are coming with
-> 512B and this is because it's playing around with i_blkbits from the
-> block_device inode which needs to be avoided as [1].
-> 
->   kworker/0:1H-56      [000] ....   913.456922: nvme_setup_cmd: nvme0: disk=nvme0n1, qid=1, cmdid=216, nsid=1, flags=0x0, meta=0x0, cmd=(nvme_cmd_read slba=0, len=65535, ctrl=0x0, dsmgmt=0, reftag=0)
->   ksoftirqd/0-9       [000] .Ns.   916.566351: nvme_complete_rq: nvme0: disk=nvme0n1, qid=1, cmdid=216, res=0x0, retries=0, flags=0x0, status=0x4002
->   ...
-> 
->   Before we have commit 5ff9f19231a0 ("block: simplify
-> set_init_blocksize"), block size used to be bumped up to the
-> 4K(PAGE_SIZE) in this example and we have not seen these errors.  But
-> with this patch, we have to make sure that bdev->bd_inode->i_blkbits to
-> make sure that BLKRRPART ioctl pass proper request length based on the
-> changed logical block size.
-> 
-> Description:
->   As the previous discussion [1], this patch introduced a gendisk flag
-> to indicate that block size has been changed in the runtime.  This flag
-> is set when logical block size is changed in the runtime with sector
-> capacity itself.  It will be cleared when the file descriptor for the
-> block devie is opened again which means __blkdev_get() updates the block
-> size via set_init_blocksize().
->   This patch rejects I/O from the path of add_partitions() and
-> application should open the file descriptor again to update the block
-> size of the block device inode.
-> 
-> [1] https://lore.kernel.org/linux-nvme/20201223183143.GB13354@localhost.localdomain/T/#t
-> 
-> Signed-off-by: Minwoo Im <minwoo.im.dev@gmail.com>
+Let's say, for example of NVMe device, Format command to change out
+LBA format to another logical block size and BLKRRPART to re-read
+partition information with a same file descriptor like:
 
-Hello,
+	fd = open("/dev/nvme0n1", O_RDONLY);
 
-Sorry for the noises here.  Please ignore this patch.  Will try to
-prepare a new one for this issue.
+	nvme_format(fd, ...);
+	if (ioctl(fd, BLKRRPART) < 0)
+		..
 
-Thanks,
+In this case, ioctl causes invalid Read operations which are triggered
+by buffer_head I/O path to re-read partition information.  This is
+because it's still playing around with i_blksize and i_blkbits.  So,
+512 -> 4096 -> 512 logical block size changes will cause an under-flowed
+length of Read operations.
+
+Case for NVMe:
+  (LBAF 1 512B, LBAF 0 4K logical block size)
+
+  nvme format /dev/nvme0n1 --lbaf=1 --force  # to 512B LBA
+  nvme format /dev/nvme0n1 --lbaf=0 --force  # to 4096B LBA
+
+[dmesg-snip]
+  [   10.771740] blk_update_request: operation not supported error, dev nvme0n1, sector 0 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 0
+  [   10.780262] Buffer I/O error on dev nvme0n1, logical block 0, async page read
+
+[event-snip]
+  kworker/0:1H-56      [000] ....   913.456922: nvme_setup_cmd: nvme0: disk=nvme0n1, qid=1, cmdid=216, nsid=1, flags=0x0, meta=0x0, cmd=(nvme_cmd_read slba=0, len=65535, ctrl=0x0, dsmgmt=0, reftag=0)
+   ksoftirqd/0-9       [000] .Ns.   916.566351: nvme_complete_rq: nvme0: disk=nvme0n1, qid=1, cmdid=216, res=0x0, retries=0, flags=0x0, status=0x4002
+
+As the previous discussion [1], this patch introduced a gendisk flag
+to indicate that block size has been changed in the runtime.  This flag
+is set when logical block size is changed in the runtime in the block
+layer.  It will be cleared when the file descriptor for the
+block devie is opened again through __blkdev_get() which updates the block
+size via set_init_blocksize().
+
+This patch rejects I/O from the path of add_partitions() to avoid
+issuing invalid Read operations to device.  It also sets a flag to
+gendisk in blk_queue_logical_block_size to minimize caller-side updates.
+
+[1] https://lore.kernel.org/linux-nvme/20201223183143.GB13354@localhost.localdomain/T/#t
+
+Signed-off-by: Minwoo Im <minwoo.im.dev@gmail.com>
+---
+ block/blk-settings.c    |  7 +++++++
+ block/genhd.c           |  1 +
+ block/partitions/core.c | 11 +++++++++++
+ fs/block_dev.c          |  6 ++++++
+ include/linux/genhd.h   |  1 +
+ 5 files changed, 26 insertions(+)
+
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index 43990b1d148b..205822ffcaef 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -328,6 +328,13 @@ EXPORT_SYMBOL(blk_queue_max_segment_size);
+ void blk_queue_logical_block_size(struct request_queue *q, unsigned int size)
+ {
+ 	struct queue_limits *limits = &q->limits;
++	struct block_device *bdev;
++
++	if (q->backing_dev_info && q->backing_dev_info->owner &&
++			limits->logical_block_size != size) {
++		bdev = blkdev_get_no_open(q->backing_dev_info->owner->devt);
++		bdev->bd_disk->flags |= GENHD_FL_BLOCK_SIZE_CHANGED;
++	}
+ 
+ 	limits->logical_block_size = size;
+ 
+diff --git a/block/genhd.c b/block/genhd.c
+index 73faec438e49..c3a73cba7c88 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -81,6 +81,7 @@ bool set_capacity_and_notify(struct gendisk *disk, sector_t size)
+ 	 */
+ 	if (!capacity || !size)
+ 		return false;
++
+ 	kobject_uevent_env(&disk_to_dev(disk)->kobj, KOBJ_CHANGE, envp);
+ 	return true;
+ }
+diff --git a/block/partitions/core.c b/block/partitions/core.c
+index e7d776db803b..5a0330c1b6f9 100644
+--- a/block/partitions/core.c
++++ b/block/partitions/core.c
+@@ -618,6 +618,17 @@ int blk_add_partitions(struct gendisk *disk, struct block_device *bdev)
+ 	if (!disk_part_scan_enabled(disk))
+ 		return 0;
+ 
++	/*
++	 * Reject to check partition information if block size has been changed
++	 * in the runtime.  If block size of a block device has been changed,
++	 * the file descriptor should be opened agian to update the blkbits.
++	 */
++	if (disk->flags & GENHD_FL_BLOCK_SIZE_CHANGED) {
++		pr_warn("%s: rejecting checking partition. fd should be opened again.\n",
++				disk->disk_name);
++		return -EBADFD;
++	}
++
+ 	state = check_partition(disk, bdev);
+ 	if (!state)
+ 		return 0;
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 9293045e128c..c996de3d6084 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -131,6 +131,12 @@ EXPORT_SYMBOL(truncate_bdev_range);
+ static void set_init_blocksize(struct block_device *bdev)
+ {
+ 	bdev->bd_inode->i_blkbits = blksize_bits(bdev_logical_block_size(bdev));
++
++	/*
++	 * Allow I/O commands for this block device.  We can say that this
++	 * block device has been set to a proper block size.
++	 */
++	bdev->bd_disk->flags &= ~GENHD_FL_BLOCK_SIZE_CHANGED;
+ }
+ 
+ int set_blocksize(struct block_device *bdev, int size)
+diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+index 809aaa32d53c..0e0e24917003 100644
+--- a/include/linux/genhd.h
++++ b/include/linux/genhd.h
+@@ -103,6 +103,7 @@ struct partition_meta_info {
+ #define GENHD_FL_BLOCK_EVENTS_ON_EXCL_WRITE	0x0100
+ #define GENHD_FL_NO_PART_SCAN			0x0200
+ #define GENHD_FL_HIDDEN				0x0400
++#define GENHD_FL_BLOCK_SIZE_CHANGED		0x0800
+ 
+ enum {
+ 	DISK_EVENT_MEDIA_CHANGE			= 1 << 0, /* media changed */
+-- 
+2.17.1
+
