@@ -2,63 +2,110 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41BBCC433DB
-	for <linux-block@archiver.kernel.org>; Fri,  1 Jan 2021 21:26:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CCA9C433DB
+	for <linux-block@archiver.kernel.org>; Sat,  2 Jan 2021 05:14:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1049420795
-	for <linux-block@archiver.kernel.org>; Fri,  1 Jan 2021 21:26:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4E5F9205CA
+	for <linux-block@archiver.kernel.org>; Sat,  2 Jan 2021 05:14:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727354AbhAAV0T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 1 Jan 2021 16:26:19 -0500
-Received: from mail.kernel.org ([198.145.29.99]:54308 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727199AbhAAV0S (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 1 Jan 2021 16:26:18 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPS id 62FE720795;
-        Fri,  1 Jan 2021 21:25:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1609536338;
-        bh=fl3Dx9jlFlAQbMyug5I/XpEGUHXtjloT7vetVGUJerE=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=Y6ZTmuXZsl//AczYbRa7datGgFqnsWGQGUXxipEro2YFNQ6aAXnOHSJCUYSoxaczC
-         D72tR9eDuagrE/RpJpCNOUTJjaNFs+UGmdpTVtuV3CpQIbHBcl3F5XbmqY3w9roivJ
-         cawTU6rM40DWL+5u20kYy2nTUzpUPEnBGUFsZ6Cfy2kikq9QFyMjfpadwQdPo8loi2
-         5WEJiqYfvWvaPCgkpWtQJ6JwpaD6KN5qiQR8kEqdUfNZu8eSGlVe8Em99bxkRWafkY
-         L+8vJwgRgKkDyYSw0EmPbtu0balydFlqpHKNvL8riY8Rixcpe3OAB5O7doOHy3hJ36
-         GxaP+JN98UXzw==
-Subject: Re: [GIT PULL] Block fixes for 5.11-rc
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <a063a4f6-47d8-8058-cbd3-daad2fab75d8@kernel.dk>
-References: <a063a4f6-47d8-8058-cbd3-daad2fab75d8@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <a063a4f6-47d8-8058-cbd3-daad2fab75d8@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git tags/block-5.11-2021-01-01
-X-PR-Tracked-Commit-Id: dc30432605bbbd486dfede3852ea4d42c40a84b4
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 8b4805c68ae348b36a24a4c4b5c869c8971ab0c2
-Message-Id: <160953633836.8778.8840656884079290791.pr-tracker-bot@kernel.org>
-Date:   Fri, 01 Jan 2021 21:25:38 +0000
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        id S1726306AbhABFOn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 2 Jan 2021 00:14:43 -0500
+Received: from bhuna.collabora.co.uk ([46.235.227.227]:43174 "EHLO
+        bhuna.collabora.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725981AbhABFOn (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 2 Jan 2021 00:14:43 -0500
+Received: from localhost (unknown [IPv6:2804:431:c7f4:46f8:ae05:b936:9029:cd4b])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        (Authenticated sender: krisman)
+        by bhuna.collabora.co.uk (Postfix) with ESMTPSA id C034B1F45010;
+        Sat,  2 Jan 2021 05:14:00 +0000 (GMT)
+From:   Gabriel Krisman Bertazi <krisman@collabora.com>
+To:     Mauricio Faria de Oliveira <mfo@canonical.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Subject: Re: [PATCH] loop: fix I/O error on fsync() in detached loop devices
+Organization: Collabora
+References: <20201231162845.1853347-1-mfo@canonical.com>
+Date:   Sat, 02 Jan 2021 02:13:53 -0300
+In-Reply-To: <20201231162845.1853347-1-mfo@canonical.com> (Mauricio Faria de
+        Oliveira's message of "Thu, 31 Dec 2020 13:28:45 -0300")
+Message-ID: <87k0sv6hv2.fsf@collabora.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+MIME-Version: 1.0
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Fri, 1 Jan 2021 08:00:46 -0700:
+Mauricio Faria de Oliveira <mfo@canonical.com> writes:
 
-> git://git.kernel.dk/linux-block.git tags/block-5.11-2021-01-01
+> There's an I/O error on fsync() in a detached loop device
+> if it has been previously attached.
+>
+> The issue is write cache is enabled in the attach path in
+> loop_configure() but it isn't disabled in the detach path;
+> thus it remains enabled in the block device regardless of
+> whether it is attached or not.
+>
+> Now fsync() can get an I/O request that will just be failed
+> later in loop_queue_rq() as device's state is not 'Lo_bound'.
+>
+> So, disable write cache in the detach path.
+>
+> Test-case:
+>
+>     # DEV=/dev/loop7
+>
+>     # IMG=/tmp/image
+>     # truncate --size 1M $IMG
+>
+>     # losetup $DEV $IMG
+>     # losetup -d $DEV
+>
+> Before:
+>
+>     # strace -e fsync parted -s $DEV print 2>&1 | grep fsync
+>     fsync(3)                                = -1 EIO (Input/output error)
+>     Warning: Error fsyncing/closing /dev/loop7: Input/output error
+>     [  982.529929] blk_update_request: I/O error, dev loop7, sector 0 op 0x1:(WRITE) flags 0x800 phys_seg 0 prio class 0
+>
+> After:
+>
+>     # strace -e fsync parted -s $DEV print 2>&1 | grep fsync
+>     fsync(3)                                = 0
+>
+> Signed-off-by: Mauricio Faria de Oliveira <mfo@canonical.com>
+> Co-developed-by: Eric Desrochers <eric.desrochers@canonical.com>
+> Signed-off-by: Eric Desrochers <eric.desrochers@canonical.com>
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/8b4805c68ae348b36a24a4c4b5c869c8971ab0c2
+This sign-off chain is not sorted correctly.  See Documentation/process/submitting-patches.rst.
 
-Thank you!
+Other than that, I think the fix makes sense.
+
+Tested-by: Gabriel Krisman Bertazi <krisman@collabora.com>
+
+> ---
+>  drivers/block/loop.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index e5ff328f0917..49517482e061 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -1212,6 +1212,9 @@ static int __loop_clr_fd(struct loop_device *lo, bool release)
+>  		goto out_unlock;
+>  	}
+>  
+> +	if (!(lo->lo_flags & LO_FLAGS_READ_ONLY) && filp->f_op->fsync)
+> +		blk_queue_write_cache(lo->lo_queue, false, false);
+> +
+>  	/* freeze request queue during the transition */
+>  	blk_mq_freeze_queue(lo->lo_queue);
 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Gabriel Krisman Bertazi
