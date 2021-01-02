@@ -2,92 +2,112 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A56A4C433DB
-	for <linux-block@archiver.kernel.org>; Sat,  2 Jan 2021 07:13:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A9E4C43381
+	for <linux-block@archiver.kernel.org>; Sat,  2 Jan 2021 07:13:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 650EF21E92
+	by mail.kernel.org (Postfix) with ESMTP id DB77922248
 	for <linux-block@archiver.kernel.org>; Sat,  2 Jan 2021 07:13:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726329AbhABHNK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 2 Jan 2021 02:13:10 -0500
-Received: from mx2.suse.de ([195.135.220.15]:47580 "EHLO mx2.suse.de"
+        id S1726492AbhABHNQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 2 Jan 2021 02:13:16 -0500
+Received: from mx2.suse.de ([195.135.220.15]:47604 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726080AbhABHNK (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 2 Jan 2021 02:13:10 -0500
+        id S1726080AbhABHNO (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 2 Jan 2021 02:13:14 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 5567DAD29;
-        Sat,  2 Jan 2021 07:12:28 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id C70E8AD4E;
+        Sat,  2 Jan 2021 07:12:32 +0000 (UTC)
 From:   Coly Li <colyli@suse.de>
 To:     linux-bcache@vger.kernel.org
-Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [PATCH 0/4] bcache: improve large bucket size on-disk layout 
-Date:   Sat,  2 Jan 2021 15:12:19 +0800
-Message-Id: <20210102071223.58303-1-colyli@suse.de>
+Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
+        stable@vger.kernel.org
+Subject: [PATCH 2/4] bcache: check unsupported feature sets for bcache register
+Date:   Sat,  2 Jan 2021 15:12:21 +0800
+Message-Id: <20210102071223.58303-3-colyli@suse.de>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20210102071223.58303-1-colyli@suse.de>
+References: <20210102071223.58303-1-colyli@suse.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Current large bucket (size >16MB) layout is a preparation for the future
-zoned cache device, by which the cache device bucket can be aligned to
-zone size and boundary of the zoned SSD.
+This patch adds the check for features which is incompatible for
+current supported feature sets.
 
-Commit ffa470327572 ("bcache: add bucket_size_hi into struct
-cache_sb_disk for large bucket") extends bucket size from 16MB to 1TB,
-but this change is problematic and can be improved,
-- The bucket size is always power-of-2 value, it is unnecessary to add
-  extra member in struct cache_sb_disk to store the real size value.
-  Just using existing bucket_size to store the order of power-of-2 value
-  is enough.
-- The added bucket_size_hi is behind d[SB_JOURNAL_BUCKETS] in struct
-  cache_sb_disk, which breaks a very implicit restriction from macro
-  csum_set(). This restriction requires member d[] must be the last
-  member in data structure to calculate the checksum.
+Now if the bcache device created by bcache-tools has features that
+current kernel doesn't support, read_super() will fail with error
+messoage. E.g. if an unsupported incompatible feature detected,
+bcache register will fail with dmesg "bcache: register_bcache() error :
+Unsupported incompatible feature found".
 
-This series is to improve the above issue from bcache kernel code. The
-basic ideas of this series are,
-- Add BCH_FEATURE_INCOMPAT_LOG_LARGE_BUCKET_SIZE incompat feature bit.
-  When it is set, for bucket size >16MB, bucket_size stores the order
-  of power-of-2 bucket size value. Then no extra space introduced and
-  csum_set() has all data to calculate super block checksum.
-- Rename struct cache_sb_disk's bucket_size_hi to obso_bucket_size_hi,
-  and rename the incompat feature bit BCH_FEATURE_INCOMPAT_LARGE_BUCKET
-  to BCH_FEATURE_INCOMPAT_OBSO_LARGE_BUCKET, to indicate they are not
-  used anymore and obsoleted.
-- If a cache device was created for bucket size >16MB with obsoleted
-  layout, bcache driver will print error message for the obsoleted
-  layout and all following attached bcache device will be read-only. If
-  there is dirty data on cache device, after the writeback accomplished
-  the cache device can be re-created with new bucket_size usage by the
-  latest bcache-tools.
-
-Because the btree node usage is not optimized, I doubt there is people
-really uses bucket size >16MB at this moment, except me. But this is
-something needs to be improved and better as soon as possible.
-
-Coly Li
+Fixes: d721a43ff69c ("bcache: increase super block version for cache device and backing device")
+Fixes: ffa470327572 ("bcache: add bucket_size_hi into struct cache_sb_disk for large bucket")
+Signed-off-by: Coly Li <colyli@suse.de>
+Cc: stable@vger.kernel.org # 5.9+
 ---
-Coly Li (4):
-  bcache: fix typo from SUUP to SUPP in features.h
-  bcache: check unsupported feature sets for bcache register
-  bcache: introduce BCH_FEATURE_INCOMPAT_LOG_LARGE_BUCKET_SIZE for large
-    bucket
-  bcache: set bcache device into read-only mode for
-    BCH_FEATURE_INCOMPAT_OBSO_LARGE_BUCKET
+ drivers/md/bcache/features.h | 15 +++++++++++++++
+ drivers/md/bcache/super.c    | 14 ++++++++++++++
+ 2 files changed, 29 insertions(+)
 
- drivers/md/bcache/features.c |  2 +-
- drivers/md/bcache/features.h | 30 +++++++++++++++++----
- drivers/md/bcache/super.c    | 51 +++++++++++++++++++++++++++++++++---
- include/uapi/linux/bcache.h  |  2 +-
- 4 files changed, 75 insertions(+), 10 deletions(-)
-
+diff --git a/drivers/md/bcache/features.h b/drivers/md/bcache/features.h
+index 32c5bbda2f0d..e73724c2b49b 100644
+--- a/drivers/md/bcache/features.h
++++ b/drivers/md/bcache/features.h
+@@ -79,6 +79,21 @@ static inline void bch_clear_feature_##name(struct cache_sb *sb) \
+ 
+ BCH_FEATURE_INCOMPAT_FUNCS(large_bucket, LARGE_BUCKET);
+ 
++static inline bool bch_has_unknown_compat_features(struct cache_sb *sb)
++{
++	return ((sb->feature_compat & ~BCH_FEATURE_COMPAT_SUPP) != 0);
++}
++
++static inline bool bch_has_unknown_ro_compat_features(struct cache_sb *sb)
++{
++	return ((sb->feature_ro_compat & ~BCH_FEATURE_RO_COMPAT_SUPP) != 0);
++}
++
++static inline bool bch_has_unknown_incompat_features(struct cache_sb *sb)
++{
++	return ((sb->feature_incompat & ~BCH_FEATURE_INCOMPAT_SUPP) != 0);
++}
++
+ int bch_print_cache_set_feature_compat(struct cache_set *c, char *buf, int size);
+ int bch_print_cache_set_feature_ro_compat(struct cache_set *c, char *buf, int size);
+ int bch_print_cache_set_feature_incompat(struct cache_set *c, char *buf, int size);
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index a4752ac410dc..1804df5c866b 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -228,6 +228,20 @@ static const char *read_super(struct cache_sb *sb, struct block_device *bdev,
+ 		sb->feature_compat = le64_to_cpu(s->feature_compat);
+ 		sb->feature_incompat = le64_to_cpu(s->feature_incompat);
+ 		sb->feature_ro_compat = le64_to_cpu(s->feature_ro_compat);
++
++		/* Check incompatible features */
++		err = "Unsupported compatible feature found";
++		if (bch_has_unknown_compat_features(sb))
++			goto err;
++
++		err = "Unsupported read-only compatible feature found";
++		if (bch_has_unknown_ro_compat_features(sb))
++			goto err;
++
++		err = "Unsupported incompatible feature found";
++		if (bch_has_unknown_incompat_features(sb))
++			goto err;
++
+ 		err = read_super_common(sb, bdev, s);
+ 		if (err)
+ 			goto err;
 -- 
 2.26.2
 
