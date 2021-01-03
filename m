@@ -2,78 +2,91 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22EC5C433E0
-	for <linux-block@archiver.kernel.org>; Sun,  3 Jan 2021 21:44:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83C49C433DB
+	for <linux-block@archiver.kernel.org>; Sun,  3 Jan 2021 21:55:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EBC6620B1F
-	for <linux-block@archiver.kernel.org>; Sun,  3 Jan 2021 21:44:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4C22E207FB
+	for <linux-block@archiver.kernel.org>; Sun,  3 Jan 2021 21:55:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727438AbhACVoA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 3 Jan 2021 16:44:00 -0500
-Received: from mail.kernel.org ([198.145.29.99]:37802 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726008AbhACVoA (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 3 Jan 2021 16:44:00 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id B9AF82080D;
-        Sun,  3 Jan 2021 21:43:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1609710200;
-        bh=YeBj9IQIk+SIKS4WfjRddkPmK6uabnxfal+qub13XX0=;
-        h=From:To:Cc:Subject:Date:From;
-        b=ALAth+78bCwcRUryP0kiZ6r51b8PJduYmwCkvWX1bNqkQLQ808MCE77/gSq1Chdm8
-         57YxPpcqlXhWqWLDryb+ZNtL9rjZuHvKxn5JJNw0YZaV7CTRfDWvpP9zcDe8JnpetO
-         ev0Cin8YbeOBsRHqVk2oLLrqyIweX6svvQbGh2KTmhPd0c5i/Y6AfxEL7HG/aaRcNj
-         vzyRMcpwvFXztRuArXkxKTi+DlSJhBuVIkhvTgCHasPJfLxn5VhwHIHgZm8jJjEzdo
-         SDbbvi5t621sB4MuzDinsx6UBuTkzZJiHMk35mNaVn5hxOO3pNmQJ3WEsNleQhI2oD
-         dRf7lP4BHtmIA==
-From:   Arnd Bergmann <arnd@kernel.org>
-To:     Matias Bjorling <mb@lightnvm.io>, Jens Axboe <axboe@fb.com>,
-        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias@cnexlabs.com>,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <jg@lightnvm.io>
-Cc:     Arnd Bergmann <arnd@arndb.de>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] lightnvm: select CONFIG_CRC32
-Date:   Sun,  3 Jan 2021 22:43:09 +0100
-Message-Id: <20210103214316.1997006-1-arnd@kernel.org>
-X-Mailer: git-send-email 2.29.2
+        id S1727005AbhACVzk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 3 Jan 2021 16:55:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47498 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726834AbhACVzj (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 3 Jan 2021 16:55:39 -0500
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75D38C061573
+        for <linux-block@vger.kernel.org>; Sun,  3 Jan 2021 13:54:59 -0800 (PST)
+Received: by mail-pj1-x102c.google.com with SMTP id b5so9181464pjl.0
+        for <linux-block@vger.kernel.org>; Sun, 03 Jan 2021 13:54:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=q5mLi1qo1IvniJ/lg8x05dulOHxR+g5L4Otl0FpGxeo=;
+        b=Zm8cFyx61w8VNooVwux4OSVgWoFC0L/VNSpg6N1plJYyty6xvPZ79xT0Ecv45mJaBy
+         +504YGPF72+1F1WVKMEZQVjca2IH1mHBibyF/6StM90cm2JpKWQm4mTWSrft9r3+uErB
+         AWEQ3C8+6DHBSCDm8LFwhz/xmnSp1kWqe86pggGssGKTsmjnHMO0260U7Mu1Jk2PQBs7
+         5LdpBCT43X5XTCHNL5dHhYiyWawjjEGDiqURwJMIsKMlQcRpa+sEpN+NNs3tCXlYavFI
+         Szvw9JlZZLVQZyh6Yi8jhvUlAF+b89Yn8xE0suJaMy8HaMEgS+prj4VtMBKXkjOzTyD7
+         tD0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=q5mLi1qo1IvniJ/lg8x05dulOHxR+g5L4Otl0FpGxeo=;
+        b=bTn+opJMIitakc+Y5vlpFrcPFEX25UtIBJzd44Gs4LtLMYAsnpm/HJNjJpPs9C+UZC
+         yOt60BfJPZ7WpOdCEQmsnvD8x7hzLuAf4maInm9lb8vKCND0o7MWl51ZNmlj239zY4jm
+         tlcf6LjKNtYNkSnJqViM2pzMYGmY2XsqXeMwFF/WtdxEHRlAgkbkTW2bazjYFJ+/gBIO
+         JPnj60E6/jS6tsXacfDiCHwKGy8eQSPlyGiky2tNYUFPgMWxvBGsO3uhYPLJyB93Wjrn
+         IdcpPdpj2uiE5UEawRUGGy8UKe35lpkvK8Wt0jWIcqKcMTxF1zEhdopQlpSqx+mFEuiN
+         cryg==
+X-Gm-Message-State: AOAM533aQ/mpMMSoMT25ANBWg9SUf8aNOLsmfgRvHp+mj5iZgLIkbj3v
+        iKXa8qAFzM5EXR3uACfJlUpgFhd7TJz/ug==
+X-Google-Smtp-Source: ABdhPJyPlNxLHz9ZxDwdqXdCeF/3G7Y3n+hEdqmWtcg/tF1iQwG/dO9760WCBt4a2+gWDHEfnnM+Bg==
+X-Received: by 2002:a17:902:c104:b029:da:5206:8b9b with SMTP id 4-20020a170902c104b02900da52068b9bmr69469586pli.46.1609710899060;
+        Sun, 03 Jan 2021 13:54:59 -0800 (PST)
+Received: from [192.168.1.134] ([66.219.217.173])
+        by smtp.gmail.com with ESMTPSA id 32sm45045920pgq.80.2021.01.03.13.54.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 03 Jan 2021 13:54:58 -0800 (PST)
+Subject: Re: [PATCH] block: rsxx: select CONFIG_CRC32
+To:     Arnd Bergmann <arnd@kernel.org>,
+        Philip J Kelleher <pjk1939@linux.vnet.ibm.com>
+Cc:     Arnd Bergmann <arnd@arndb.de>, Hannes Reinecke <hare@suse.de>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20210103214254.1996764-1-arnd@kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <27333956-47ad-4f5b-56de-6b2214b75d0b@kernel.dk>
+Date:   Sun, 3 Jan 2021 14:54:57 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210103214254.1996764-1-arnd@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Arnd Bergmann <arnd@arndb.de>
+On 1/3/21 2:42 PM, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
+> 
+> Without crc32, the driver fails to link:
+> 
+> arm-linux-gnueabi-ld: drivers/block/rsxx/config.o: in function `rsxx_load_config':
+> config.c:(.text+0x124): undefined reference to `crc32_le'
 
-Without CRC32 support, this fails to link:
+Applied, thanks.
 
-arm-linux-gnueabi-ld: drivers/lightnvm/pblk-init.o: in function `pblk_init':
-pblk-init.c:(.text+0x2654): undefined reference to `crc32_le'
-arm-linux-gnueabi-ld: drivers/lightnvm/pblk-init.o: in function `pblk_exit':
-pblk-init.c:(.text+0x2a7c): undefined reference to `crc32_le'
-
-Fixes: a4bd217b4326 ("lightnvm: physical block device (pblk) target")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- drivers/lightnvm/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/lightnvm/Kconfig b/drivers/lightnvm/Kconfig
-index 8f39f9ba5c80..4c2ce210c123 100644
---- a/drivers/lightnvm/Kconfig
-+++ b/drivers/lightnvm/Kconfig
-@@ -19,6 +19,7 @@ if NVM
- 
- config NVM_PBLK
- 	tristate "Physical Block Device Open-Channel SSD target"
-+	select CRC32
- 	help
- 	  Allows an open-channel SSD to be exposed as a block device to the
- 	  host. The target assumes the device exposes raw flash and must be
 -- 
-2.29.2
+Jens Axboe
 
