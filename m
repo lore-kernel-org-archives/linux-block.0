@@ -2,105 +2,109 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40EADC433E6
-	for <linux-block@archiver.kernel.org>; Mon,  4 Jan 2021 15:49:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B342C433E6
+	for <linux-block@archiver.kernel.org>; Mon,  4 Jan 2021 15:50:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 10B6920735
-	for <linux-block@archiver.kernel.org>; Mon,  4 Jan 2021 15:49:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 45D5A2242A
+	for <linux-block@archiver.kernel.org>; Mon,  4 Jan 2021 15:50:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727442AbhADPtp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Jan 2021 10:49:45 -0500
-Received: from mail.kernel.org ([198.145.29.99]:33894 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727391AbhADPtp (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 4 Jan 2021 10:49:45 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 5C7452245C;
-        Mon,  4 Jan 2021 15:49:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1609775344;
-        bh=DDZiFQjgBagC83hsc5nY6Bb6Qby4XeHxkTeVloPqZpE=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=nPi8BB28PMPqD8H82FQrBA9sORa5t997Ak9Fe5ZT2ZbT8dkr/6DEn16IU/hBXNT7K
-         AAjoQpEZgH7WM++Fm5dtG7u+VD3WGnHaZ4FAWxFNIwhj70L27G/tB/N2jt+DItBdJW
-         T07iwwUAZ8xA0n1vwdUHl+mr9IzwaXU4CBnsTaeKdqd0SP8VVpTybixb77/N6Sdi6Z
-         UqYnb5gGQtPDQbvrUu3bUAzEU8C0clgvOa3tt49YT7eruOmWQIFWwD6FJZ4nfBSDyx
-         HSoW1uk9c3WDu/ZZK+Pe8/homGkS1HCmdicHDPdZgaRbkrRWCM0DWCmgJzjWb44rHt
-         v02VzyyTaStBg==
-Date:   Mon, 4 Jan 2021 07:49:02 -0800
-From:   Keith Busch <kbusch@kernel.org>
+        id S1727008AbhADPui (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Jan 2021 10:50:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44252 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726579AbhADPuh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Jan 2021 10:50:37 -0500
+Received: from mail-io1-xd29.google.com (mail-io1-xd29.google.com [IPv6:2607:f8b0:4864:20::d29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D7A0C061794
+        for <linux-block@vger.kernel.org>; Mon,  4 Jan 2021 07:49:57 -0800 (PST)
+Received: by mail-io1-xd29.google.com with SMTP id i18so25397043ioa.1
+        for <linux-block@vger.kernel.org>; Mon, 04 Jan 2021 07:49:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=7bOrj5NFbfU1iaPecOwGPerPa2nhKULyJEWIuFehYmw=;
+        b=xyZIk+992U8/YXmiwIKamGonVEXvXbHSCAMUo+TIB36irYZ9fZFs5iY1sQKpnAVbsE
+         YNB3/N29ZZH2n4v15khcuxwBYStdLNKFSBRQrDY1IUAAgtGJRGC4P/DRCuQSdvH3BcgG
+         Zi0Bx10TWb/CovJBVsqVjHltBmTrWs8l/VxN6++WpWzXEQl+iRJC35AzNG4si5FExg/H
+         A7bVVo/nvA9mo2vwgMPR6a5XYwum2Gu3BfAZ4b4RGqs2aCl7ksQ0SqLKcoV/EKSzfxGf
+         C8s//xHCYHJSHNZccQfU9eofVI+4D32Esw5YOMh/ow7FTdia7sq7hekwCOJ7nvx1W3Kq
+         mYcQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=7bOrj5NFbfU1iaPecOwGPerPa2nhKULyJEWIuFehYmw=;
+        b=Dxe300h3PjWKezJ9bcCQvmy/ZldxYfVx7tgL5LXuggTUlBfSNSOlhP+IZ8jcl6GXdA
+         2e95C2lCab8RBTcai25FjymRlILfq8P8L87Rgh6ROHXz4AUJTIDfM1D/tfC62rOG/r+w
+         8rMUnsrCIqQLrVcT+cv9zskp+gK7OGdbA90OWVbYI71BDmXebTgdBw3JKZMHEfQrwuZC
+         NHmdFqmI5w8vxbYueBUtNc0LLQ9Z9RvflTk4hLuDp0BZOTDbVmJcJ6qUwxGXOcM+qwYF
+         GJHI7vrrcibzI32kQLz3Elb+htqjZ9Mi9fbuaSayXGgzeYECKdJLArqijIXeVQHZcffX
+         L5ow==
+X-Gm-Message-State: AOAM530jFFy6j/imtGIQDOrObN40zSBeplczygj2bxhH06THRFC2/G7s
+        EI8sA1RxXNHJbDwkY+kluf/vMCVhFu6QWA==
+X-Google-Smtp-Source: ABdhPJz0n4DYoHU2SCcDw+S/KYN5yNM5cn1fLfnR7yNSdUYKzuQE3GWviiI8df9AuLHzmLNJaI7ZJA==
+X-Received: by 2002:a02:c7d1:: with SMTP id s17mr63236024jao.142.1609775396680;
+        Mon, 04 Jan 2021 07:49:56 -0800 (PST)
+Received: from [192.168.1.30] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id t21sm43961096ild.86.2021.01.04.07.49.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 04 Jan 2021 07:49:56 -0800 (PST)
+Subject: Re: [PATCH 6/6] block: Add n64 cart driver
 To:     Lauri Kasanen <cand@gmx.com>
 Cc:     linux-mips@vger.kernel.org, tsbogend@alpha.franken.de,
-        axboe@kernel.dk, linux-block@vger.kernel.org
-Subject: Re: [PATCH 6/6] block: Add n64 cart driver
-Message-ID: <20210104154902.GA1024941@dhcp-10-100-145-180.wdc.com>
+        linux-block@vger.kernel.org
 References: <20210104155031.9b4e39ff48a6d7accc93461d@gmx.com>
+ <944dd5af-c5d0-b37c-29ca-0213ea6081db@kernel.dk>
+ <20210104174348.cda010a3af0ec3d989732b37@gmx.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <db1936b0-a1ab-41b3-be09-ec301ea7ebc3@kernel.dk>
+Date:   Mon, 4 Jan 2021 08:49:55 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210104155031.9b4e39ff48a6d7accc93461d@gmx.com>
+In-Reply-To: <20210104174348.cda010a3af0ec3d989732b37@gmx.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jan 04, 2021 at 03:50:31PM +0200, Lauri Kasanen wrote:
-> block folks: rest of the series is on linux-mips. Being a mips-specific driver,
-> not sure which tree it should go to.
+On 1/4/21 8:43 AM, Lauri Kasanen wrote:
+> On Mon, 4 Jan 2021 08:40:10 -0700
+> Jens Axboe <axboe@kernel.dk> wrote:
+> 
+>> On 1/4/21 6:50 AM, Lauri Kasanen wrote:
+>>> Signed-off-by: Lauri Kasanen <cand@gmx.com>
+>>> ---
+>>>  drivers/block/Kconfig   |   6 ++
+>>>  drivers/block/Makefile  |   1 +
+>>>  drivers/block/n64cart.c | 203 ++++++++++++++++++++++++++++++++++++++++++++++++
+>>>  3 files changed, 210 insertions(+)
+>>>  create mode 100644 drivers/block/n64cart.c
+>>>
+>>> block folks: rest of the series is on linux-mips. Being a
+>>> mips-specific driver, not sure which tree it should go to.
+>>
+>> It should definitely get reviewed first. One easy question - there's no
+>> commit message in this one. It's a new driver, it should include some
+>> documentation on what it is, etc.
+> 
+> It's already had one (rfc) round on linux-mips. Or do you mean by
+> others (who?)
 
-Probably through mips.
- 
-> +static void n64cart_wait_dma(void)
-> +{
-> +	while (n64cart_read_reg(PI_STATUS_REG) &
-> +		(PI_STATUS_DMA_BUSY | PI_STATUS_IO_BUSY))
-> +		;
-> +}
+I mean the actual block driver from the block point of view. From
+a quick look, looks like there's no irq or anything, so it's
+strictly polled mode? Probably would make sense to push this out
+of the app path then, by using BLK_MQ_F_BLOCKING.
 
-These sorts of loops generally call cpu_relax().
+-- 
+Jens Axboe
 
-> +static blk_status_t get_seg(struct request *req)
-> +{
-> +	u32 bstart = blk_rq_pos(req) * 512;
-> +	u32 len = blk_rq_cur_bytes(req);
-> +	void *dst = bio_data(req->bio);
-> +
-> +	if (bstart + len > size || rq_data_dir(req) == WRITE)
-> +		return BLK_STS_IOERR;
-
-If you don't support writes (is that limitation temporary?), then you
-can prevent such operations from reaching the driver by setting the
-"disk" to read-only during initialization with set_disk_ro(disk, true).
-
-> +static blk_status_t n64cart_queue_rq(struct blk_mq_hw_ctx *hctx,
-> +				     const struct blk_mq_queue_data *bd)
-> +{
-> +	unsigned long flags;
-> +	struct request *req = bd->rq;
-> +	blk_status_t err;
-> +
-> +	blk_mq_start_request(req);
-> +
-> +	spin_lock_irqsave(&n64cart_lock, flags);
-
-The .queue_rq() isn't called from an interrupts disabled context, so
-there should be no need to save the flags. And since you're not taking
-this lock from an interrupt context anywhere else, I don't think you
-need to use the spin_lock_irq() variant either.
-
-But since you just want to single-thread all IO, you could get that by
-setting your tagset queue_depth to 1 and remove the spinlock entirely.
-
-> +static int __init n64cart_init(void)
-> +{
-> +	int err;
-> +
-> +	if (!start || !size) {
-> +		pr_err("n64cart: start and size not specified\n");
-> +		return -ENODEV;
-> +	}
-
-Just curious, is it not possible to discover these values from the
-installed cart? Requiring module parameters seems a bit fragile.
