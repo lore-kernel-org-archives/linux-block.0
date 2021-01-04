@@ -2,66 +2,86 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76ABBC43381
-	for <linux-block@archiver.kernel.org>; Mon,  4 Jan 2021 16:22:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5911EC433DB
+	for <linux-block@archiver.kernel.org>; Mon,  4 Jan 2021 16:27:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 45C25221F9
-	for <linux-block@archiver.kernel.org>; Mon,  4 Jan 2021 16:22:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1EDA322473
+	for <linux-block@archiver.kernel.org>; Mon,  4 Jan 2021 16:27:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727998AbhADQW3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Jan 2021 11:22:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49190 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727886AbhADQW2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Jan 2021 11:22:28 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77E90C061574;
-        Mon,  4 Jan 2021 08:21:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=l2WBiCb5duYJRA9nKpihqrJOH1Qjg6utSrFiu8qAdtc=; b=c0jpPOEqnvAg3akTI36JpIt9xU
-        3Ekb+xZLKcCXAuP6aX6X9X8OGfhEZ17fGCaGMIef9SYWHAdGFc3uo+vlM9b1aXhF2iUKc3eoM/+dB
-        IQGe6jvfoR/G8XoGFUMvlRk4jRdegFaYaE6jx2RsUzv3k6nJKLUfpQHggy8F8pB0AZd+3mRagBkmm
-        m3WCbGkk0X4L0vgPqIe18hM7QT3VbjVhhWEDpUWZER/+kUzQkuZsCNMWKvmvJtTLy6zB8vkGFhGvM
-        MziqpdCXp1G/luzbgryf1rW4esI1mIB1/QXusWuiHmvToORh0ubs8CpGH8homiD0Ul2EDf3i99GBY
-        fTjSWP2g==;
-Received: from hch by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1kwSbF-000I7h-7f; Mon, 04 Jan 2021 16:20:54 +0000
-Date:   Mon, 4 Jan 2021 16:20:53 +0000
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Pavel Begunkov <asml.silence@gmail.com>
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Jonathan Corbet <corbet@lwn.net>, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org,
-        linux-kernel@vger.kernel.org, target-devel@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: Re: [PATCH v2 7/7] bio: don't copy bvec for direct IO
-Message-ID: <20210104162053.GC68600@infradead.org>
-References: <cover.1609461359.git.asml.silence@gmail.com>
- <29ed343fa15eb4139f8ab9104d3f9b16fe025dfd.1609461359.git.asml.silence@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <29ed343fa15eb4139f8ab9104d3f9b16fe025dfd.1609461359.git.asml.silence@gmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+        id S1727769AbhADQ1S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Jan 2021 11:27:18 -0500
+Received: from mout.gmx.net ([212.227.15.15]:33961 "EHLO mout.gmx.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727522AbhADQ1R (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 4 Jan 2021 11:27:17 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
+        s=badeba3b8450; t=1609777542;
+        bh=CDNGOwP9TM0DOdFMPBqhwZowdR/yhxNQD6C84wLQ38k=;
+        h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
+        b=inhErgRjHXQK/4P+7c/qqGK1VUS4HzH5rR+IAmYBzPzMWcAO2FbOH8xDTjZZmeH7N
+         CDGwS7cb/srL65WGEX9kWu+3Pjf9zI7IYpWhGBEPzTZe7AUUVehuYqr3aYID4Qv9gB
+         PR/+3jp4YbR7KphSdsmEuNjI7356vNtW/+p+2D/M=
+X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
+Received: from Valinor ([82.128.181.212]) by mail.gmx.com (mrgmx004
+ [212.227.17.184]) with ESMTPSA (Nemesis) id 1N5VDE-1juFLz47b8-0171CA; Mon, 04
+ Jan 2021 17:25:42 +0100
+Date:   Mon, 4 Jan 2021 18:27:20 +0200
+From:   Lauri Kasanen <cand@gmx.com>
+To:     Keith Busch <kbusch@kernel.org>
+Cc:     linux-mips@vger.kernel.org, tsbogend@alpha.franken.de,
+        axboe@kernel.dk, linux-block@vger.kernel.org
+Subject: Re: [PATCH 6/6] block: Add n64 cart driver
+Message-Id: <20210104182720.48a9d74b2b55f5978735eaba@gmx.com>
+In-Reply-To: <20210104161332.GC1024941@dhcp-10-100-145-180.wdc.com>
+References: <20210104155031.9b4e39ff48a6d7accc93461d@gmx.com>
+        <20210104154902.GA1024941@dhcp-10-100-145-180.wdc.com>
+        <20210104180115.b1d5438cd4ee21efcd557976@gmx.com>
+        <20210104161332.GC1024941@dhcp-10-100-145-180.wdc.com>
+X-Mailer: Sylpheed 3.5.0 (GTK+ 2.18.6; x86_64-unknown-linux-gnu)
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:GBEgToGuOetdmPOqcMXXTrtguJGwqqP5HvVUXAifGdSFTAgX5J1
+ WE9gwxZnR3BCIhB6UIovGCaiVZCRWuLrisEcVL/8yZq8eAPFqSB8rqJB9GGUns0o5YkydGu
+ 30JmKFGoqFi28zlGhzu1V1yN4+jJObKT2jODAEXPR7gkQCIEpeOO/VloY3qG397AEqVgSzu
+ Ov+LFNG+Dpwcgse92E2BQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:IZ+ISEV9vQw=:Uo9fu+0nJRmDK8sSo/N/lb
+ dd4R9MyDwsZ3FOkUHPQyDY/Xi4ndH53occxwj9utEbLStWdkk3cjTmKUtqWJNgRzgcBMGAQqS
+ jwAjKikeXWpgmaDOeTEK7qNNyYH75XTP1R8jCB47uWp0a1KZU41xjKhHRxqCS0AQ02IR5X1cM
+ 97YzjO2uPP+vFQiGWGCrGvKXrjlzdxzn1T624aO+uzEvkcGNO+81hD11caWKSz5mbHO6VIr+L
+ Zi+WmXCOosx57J0PDw0FkTUXyuHn1t3PdpI9SUZVR8VKgELeqWthjhNeb4k84beAq8H0yv1fe
+ oGDCLxIWd1Vxj8gVcxaPCGraGISdLI0PjSLSQ0GOjAJz+sOa2JqLDnLemkkHfXxK14qOOun93
+ yt/Zny5UQwelW+xqPxX20JBsnW8h5PbTF+WEXslBCgNieT0aqYjbQN7FhqHZLJ55OeugEIXNN
+ Pbb7/snuYb+hPrfjNwyjajcVSXr/u8CD54qEGz3zq3+l/wFLeCtWIeGx285tF/upTpKkmo+3r
+ kmszNwOza6A6+ewOyZKggsXbvG+JBMAFSnOFBfjYn6FiDLXT13ZhP8bf3qynXaopAv6AQqgeq
+ W8lIZernx7s99Ue0F+wfHlFeiqSiyvz12jHy4rTFUO6WGbfmfmZ/tEAR0TX4WdT6uCapC9kFh
+ 3klgFzMHZnOwahn48VU9x00MP/91caqBDpVBALZeokvJSRPHBMaXdvwRo4l8AqhZM1KL49niT
+ DOHjb+H0Y7w3JIQPdkYDWa/KIOZjn1Tzm7mGZnVwIe3SjOwnQGQlDdo3lD767gzUO1A6UoAR+
+ Zcu8mw1Aeqlf7IMyRYrj82UMWJzFoKR99KE8iqVz249AUrCsdTKC1nJ22JxwcvvwlYd/ncDEs
+ 5lT3eMdcEMwx/DibS7wA==
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Looks good,
+On Mon, 4 Jan 2021 08:13:32 -0800
+Keith Busch <kbusch@kernel.org> wrote:
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+> > The media is read-only (but not runtime removable).
+>
+> It's been a while, but I could swear we can save state on these carts.
+> If so, it sounds like that must be separate from the media this driver
+> is accessing, so is that capability provided through a different driver?
+
+Saving uses a separate mechanism, and there are several depending on
+what type of cart it is (no saves, flash, eeprom, or sram). If the cart
+has no save possibility, there is an optional memory card attached to
+the joypad controller.
+
+Currently there is no driver for any of these.
+
+- Lauri
