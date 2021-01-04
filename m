@@ -2,116 +2,55 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A0ECC433E0
-	for <linux-block@archiver.kernel.org>; Mon,  4 Jan 2021 07:42:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 878E0C43381
+	for <linux-block@archiver.kernel.org>; Mon,  4 Jan 2021 08:45:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E6FB420782
-	for <linux-block@archiver.kernel.org>; Mon,  4 Jan 2021 07:42:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5C2D1207BC
+	for <linux-block@archiver.kernel.org>; Mon,  4 Jan 2021 08:45:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726531AbhADHmu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Jan 2021 02:42:50 -0500
-Received: from mx2.suse.de ([195.135.220.15]:41284 "EHLO mx2.suse.de"
+        id S1726704AbhADIpA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Jan 2021 03:45:00 -0500
+Received: from verein.lst.de ([213.95.11.211]:56898 "EHLO verein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726520AbhADHmu (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 4 Jan 2021 02:42:50 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 839DCB291;
-        Mon,  4 Jan 2021 07:41:38 +0000 (UTC)
-From:   Coly Li <colyli@suse.de>
-To:     axboe@kernel.dk
-Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        Coly Li <colyli@suse.de>
-Subject: [PATCH 5/5] bcache: set bcache device into read-only mode for BCH_FEATURE_INCOMPAT_OBSO_LARGE_BUCKET
-Date:   Mon,  4 Jan 2021 15:41:22 +0800
-Message-Id: <20210104074122.19759-6-colyli@suse.de>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20210104074122.19759-1-colyli@suse.de>
-References: <20210104074122.19759-1-colyli@suse.de>
+        id S1726686AbhADIo7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 4 Jan 2021 03:44:59 -0500
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id BB49C6736F; Mon,  4 Jan 2021 09:44:15 +0100 (CET)
+Date:   Mon, 4 Jan 2021 09:44:15 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-kernel@vger.kernel.org,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH] fs/buffer: try to submit writeback bio in unit of page
+Message-ID: <20210104084415.GA28741@lst.de>
+References: <20201230000815.3448707-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201230000815.3448707-1-ming.lei@redhat.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If BCH_FEATURE_INCOMPAT_OBSO_LARGE_BUCKET is set in incompat feature
-set, it means the cache device is created with obsoleted layout with
-obso_bucket_site_hi. Now bcache does not support this feature bit, a new
-BCH_FEATURE_INCOMPAT_LOG_LARGE_BUCKET_SIZE incompat feature bit is added
-for a better layout to support large bucket size.
+On Wed, Dec 30, 2020 at 08:08:15AM +0800, Ming Lei wrote:
+> It is observed that __block_write_full_page() always submit bio with size of block size,
+> which is often 512 bytes.
+> 
+> In case of sequential IO, or >=4k BS random/seq writeback IO, most of times IO
+> represented by all buffer_head in each page can be done in single bio. It is actually
+> done in single request IO by block layer's plug merge too.
+> 
+> So check if IO represented by buffer_head can be merged to single page
+> IO, if yes, just submit single bio instead of submitting one bio for each buffer_head.
 
-For the legacy compatibility purpose, if a cache device created with
-obsoleted BCH_FEATURE_INCOMPAT_OBSO_LARGE_BUCKET feature bit, all bcache
-devices attached to this cache set should be set to read-only. Then the
-dirty data can be written back to backing device before re-create the
-cache device with BCH_FEATURE_INCOMPAT_LOG_LARGE_BUCKET_SIZE feature bit
-by the latest bcache-tools.
-
-This patch checks BCH_FEATURE_INCOMPAT_OBSO_LARGE_BUCKET feature bit
-when running a cache set and attach a bcache device to the cache set. If
-this bit is set,
-- When run a cache set, print an error kernel message to indicate all
-  following attached bcache device will be read-only.
-- When attach a bcache device, print an error kernel message to indicate
-  the attached bcache device will be read-only, and ask users to update
-  to latest bcache-tools.
-
-Such change is only for cache device whose bucket size >= 32MB, this is
-for the zoned SSD and almost nobody uses such large bucket size at this
-moment. If you don't explicit set a large bucket size for a zoned SSD,
-such change is totally transparent to your bcache device.
-
-Fixes: ffa470327572 ("bcache: add bucket_size_hi into struct cache_sb_disk for large bucket")
-Signed-off-by: Coly Li <colyli@suse.de>
----
- drivers/md/bcache/super.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
-
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 3999641f1775..2047a9cccdb5 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -1332,6 +1332,12 @@ int bch_cached_dev_attach(struct cached_dev *dc, struct cache_set *c,
- 	bcache_device_link(&dc->disk, c, "bdev");
- 	atomic_inc(&c->attached_dev_nr);
- 
-+	if (bch_has_feature_obso_large_bucket(&(c->cache->sb))) {
-+		pr_err("The obsoleted large bucket layout is unsupported, set the bcache device into read-only\n");
-+		pr_err("Please update to the latest bcache-tools to create the cache device\n");
-+		set_disk_ro(dc->disk.disk, 1);
-+	}
-+
- 	/* Allow the writeback thread to proceed */
- 	up_write(&dc->writeback_lock);
- 
-@@ -1554,6 +1560,12 @@ static int flash_dev_run(struct cache_set *c, struct uuid_entry *u)
- 
- 	bcache_device_link(d, c, "volume");
- 
-+	if (bch_has_feature_obso_large_bucket(&c->cache->sb)) {
-+		pr_err("The obsoleted large bucket layout is unsupported, set the bcache device into read-only\n");
-+		pr_err("Please update to the latest bcache-tools to create the cache device\n");
-+		set_disk_ro(d->disk, 1);
-+	}
-+
- 	return 0;
- err:
- 	kobject_put(&d->kobj);
-@@ -2113,6 +2125,9 @@ static int run_cache_set(struct cache_set *c)
- 	c->cache->sb.last_mount = (u32)ktime_get_real_seconds();
- 	bcache_write_super(c);
- 
-+	if (bch_has_feature_obso_large_bucket(&c->cache->sb))
-+		pr_err("Detect obsoleted large bucket layout, all attached bcache device will be read-only\n");
-+
- 	list_for_each_entry_safe(dc, t, &uncached_devices, list)
- 		bch_cached_dev_attach(dc, c, NULL);
- 
--- 
-2.26.2
-
+There is some very weird formatting in here.  From a very quick look
+the changes look sensible, but I wonder if we should spend so much
+time optimizing the legacy buffer_head I/O path, rather than switching
+callers to saner helpers.
