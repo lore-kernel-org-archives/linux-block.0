@@ -2,87 +2,92 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77E4EC433E6
-	for <linux-block@archiver.kernel.org>; Mon,  4 Jan 2021 09:26:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C2F7C433DB
+	for <linux-block@archiver.kernel.org>; Mon,  4 Jan 2021 10:43:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4671621D79
-	for <linux-block@archiver.kernel.org>; Mon,  4 Jan 2021 09:26:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 71D0B21E92
+	for <linux-block@archiver.kernel.org>; Mon,  4 Jan 2021 10:43:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726969AbhADJ0W (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Jan 2021 04:26:22 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42765 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726618AbhADJ0V (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 4 Jan 2021 04:26:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1609752294;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=1DfRNv/JemPKRiSjvewhQQD9XRV8pm7xARBhqGfFCAQ=;
-        b=JRTD6Yz5JG6EzMj1pEZ8SUf5VIsD2HjguNRtcm1ID3F3JMBcZE0bQJ9KiufTTmKsu0QvgM
-        1oJA+NwRqxkVTg/fb6CVssi2jlAYCwYddziW0pQqIT6YYeLa9GYqx3AbIbmjj3Me2uWs80
-        x0QBF5vZgv4/uVI8ejiFh6OB/AWS4lI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-449-b_BmQ3-NM1iLbMLIAXTs5w-1; Mon, 04 Jan 2021 04:24:39 -0500
-X-MC-Unique: b_BmQ3-NM1iLbMLIAXTs5w-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B5CADB8110;
-        Mon,  4 Jan 2021 09:24:37 +0000 (UTC)
-Received: from T590 (ovpn-12-200.pek2.redhat.com [10.72.12.200])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9B0116F99F;
-        Mon,  4 Jan 2021 09:24:31 +0000 (UTC)
-Date:   Mon, 4 Jan 2021 17:24:25 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-kernel@vger.kernel.org,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH] fs/buffer: try to submit writeback bio in unit of page
-Message-ID: <20210104092425.GA3587310@T590>
-References: <20201230000815.3448707-1-ming.lei@redhat.com>
- <20210104084415.GA28741@lst.de>
+        id S1726563AbhADKnS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Jan 2021 05:43:18 -0500
+Received: from frasgout.his.huawei.com ([185.176.79.56]:2285 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726330AbhADKnS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Jan 2021 05:43:18 -0500
+Received: from fraeml735-chm.china.huawei.com (unknown [172.18.147.200])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4D8XFM5Fs9z67Xns;
+        Mon,  4 Jan 2021 18:39:51 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml735-chm.china.huawei.com (10.206.15.216) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Mon, 4 Jan 2021 11:42:36 +0100
+Received: from [10.47.2.42] (10.47.2.42) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2106.2; Mon, 4 Jan 2021
+ 10:42:35 +0000
+Subject: Re: [PATCH] blk-mq: test QUEUE_FLAG_HCTX_ACTIVE for sbitmap_shared in
+ hctx_may_queue
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>,
+        Kashyap Desai <kashyap.desai@broadcom.com>
+References: <20201227113458.3289082-1-ming.lei@redhat.com>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <f8def27f-6709-143f-9864-8bc76e4ee052@huawei.com>
+Date:   Mon, 4 Jan 2021 10:41:36 +0000
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210104084415.GA28741@lst.de>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20201227113458.3289082-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.47.2.42]
+X-ClientProxiedBy: lhreml719-chm.china.huawei.com (10.201.108.70) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jan 04, 2021 at 09:44:15AM +0100, Christoph Hellwig wrote:
-> On Wed, Dec 30, 2020 at 08:08:15AM +0800, Ming Lei wrote:
-> > It is observed that __block_write_full_page() always submit bio with size of block size,
-> > which is often 512 bytes.
-> > 
-> > In case of sequential IO, or >=4k BS random/seq writeback IO, most of times IO
-> > represented by all buffer_head in each page can be done in single bio. It is actually
-> > done in single request IO by block layer's plug merge too.
-> > 
-> > So check if IO represented by buffer_head can be merged to single page
-> > IO, if yes, just submit single bio instead of submitting one bio for each buffer_head.
+On 27/12/2020 11:34, Ming Lei wrote:
+> In case of blk_mq_is_sbitmap_shared(), we should test QUEUE_FLAG_HCTX_ACTIVE against
+> q->queue_flags instead of BLK_MQ_S_TAG_ACTIVE.
 > 
-> There is some very weird formatting in here.  From a very quick look
-> the changes look sensible, but I wonder if we should spend so much
-> time optimizing the legacy buffer_head I/O path, rather than switching
-> callers to saner helpers.
+> So fix it.
+> 
+> Cc: John Garry <john.garry@huawei.com>
+> Cc: Kashyap Desai <kashyap.desai@broadcom.com>
+> Fixes: f1b49fdc1c64 ("blk-mq: Record active_queues_shared_sbitmap per tag_set for when using shared sbitmap")
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
 
-It may take long to convert fs code into iomap, and I understand fs/block_dev.c
-can't be converted to iomap until all FS removes buffer_head, correct me
-if it is wrong.
+Reviewed-by: John Garry <john.garry@huawei.com>
 
+> ---
+>   block/blk-mq.h | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/block/blk-mq.h b/block/blk-mq.h
+> index c1458d9502f1..3616453ca28c 100644
+> --- a/block/blk-mq.h
+> +++ b/block/blk-mq.h
+> @@ -304,7 +304,7 @@ static inline bool hctx_may_queue(struct blk_mq_hw_ctx *hctx,
+>   		struct request_queue *q = hctx->queue;
+>   		struct blk_mq_tag_set *set = q->tag_set;
+>   
+> -		if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &q->queue_flags))
+> +		if (!test_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags))
 
-Thanks,
-Ming
+I wonder how this ever worked properly, as BLK_MQ_S_TAG_ACTIVE is bit 
+index 1, and for q->queue_flags that means QUEUE_FLAG_DYING bit, which I 
+figure is not set normally..
+
+>   			return true;
+>   		users = atomic_read(&set->active_queues_shared_sbitmap);
+>   	} else {
+> 
 
