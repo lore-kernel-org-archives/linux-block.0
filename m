@@ -2,114 +2,82 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+X-Spam-Status: No, score=-6.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 173C4C43381
-	for <linux-block@archiver.kernel.org>; Mon,  4 Jan 2021 16:09:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DF06C4332E
+	for <linux-block@archiver.kernel.org>; Mon,  4 Jan 2021 16:14:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DE29120578
-	for <linux-block@archiver.kernel.org>; Mon,  4 Jan 2021 16:09:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DCA5D221F1
+	for <linux-block@archiver.kernel.org>; Mon,  4 Jan 2021 16:14:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728533AbhADQBQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Jan 2021 11:01:16 -0500
-Received: from mout.gmx.net ([212.227.17.22]:39545 "EHLO mout.gmx.net"
+        id S1729978AbhADQOP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Jan 2021 11:14:15 -0500
+Received: from mail.kernel.org ([198.145.29.99]:46798 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728511AbhADQBN (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 4 Jan 2021 11:01:13 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
-        s=badeba3b8450; t=1609775978;
-        bh=8dYzMDBKUF2sybRjESev4F3J9T3mj+pyYPcEcjGHCf0=;
-        h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
-        b=kELxTBswtIVyJ+/QfJtofwtpyWUkgh8sQIcONLr0RSeHwA6LsLkGeCeeczzzLhW2/
-         WnhYIt3QoGXS8+S91ti8EUirg6RcSQJ/eFB4lv/Sbm+YIoEDuQWgZ7rLeSgmgLXMYo
-         KVcaFpOjTsyHMXOtp2aLLx/UCyvh51NexF9NSUzs=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from Valinor ([82.128.181.212]) by mail.gmx.com (mrgmx104
- [212.227.17.174]) with ESMTPSA (Nemesis) id 1MNKhm-1kc9AJ3B18-00Omz7; Mon, 04
- Jan 2021 16:59:37 +0100
-Date:   Mon, 4 Jan 2021 18:01:15 +0200
-From:   Lauri Kasanen <cand@gmx.com>
-To:     Keith Busch <kbusch@kernel.org>
+        id S1728925AbhADQOP (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 4 Jan 2021 11:14:15 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 32F1720769;
+        Mon,  4 Jan 2021 16:13:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1609776814;
+        bh=0O9cgiszsmkiPH9qvSUIsnGC/DBt3cGbj3zvOhZUmDo=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=tANr90w6w60WttQdlgNU1JUmMcPtHwX1Ry8UVpDJNbIlsmAREuB13X+UxeyAEeR+0
+         nn1UPLvOMvjBXh2DXwkYh/62C/MtTf29TSVkzBH1+dMNxUHOHVaB0D6/G2mevFFg3a
+         g5WYTQCtrdU5iguFrTWzk736xkIjL3/X59BdsPryRiacAMeGOX9ZDQH6D0IhxtVMwc
+         yyxyMg4k65dFO/xwOVWnFpkLNjiREaX+UPqgIeuA8Cjzxl9oyqam91X5r7UDY5wN3v
+         pUUYWOpPeJ7wnwD93QNvSgwsfOFiM/gl+gdDPKvLGH1PVTTV+hdV65YrXEUFBJOiRh
+         QRW8/+uG9Hc0w==
+Date:   Mon, 4 Jan 2021 08:13:32 -0800
+From:   Keith Busch <kbusch@kernel.org>
+To:     Lauri Kasanen <cand@gmx.com>
 Cc:     linux-mips@vger.kernel.org, tsbogend@alpha.franken.de,
         axboe@kernel.dk, linux-block@vger.kernel.org
 Subject: Re: [PATCH 6/6] block: Add n64 cart driver
-Message-Id: <20210104180115.b1d5438cd4ee21efcd557976@gmx.com>
-In-Reply-To: <20210104154902.GA1024941@dhcp-10-100-145-180.wdc.com>
+Message-ID: <20210104161332.GC1024941@dhcp-10-100-145-180.wdc.com>
 References: <20210104155031.9b4e39ff48a6d7accc93461d@gmx.com>
-        <20210104154902.GA1024941@dhcp-10-100-145-180.wdc.com>
-X-Mailer: Sylpheed 3.5.0 (GTK+ 2.18.6; x86_64-unknown-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:6uClOfvhWTGJ72YP4IUDfeJ1Nt2MWOpuMIY8iNkoeeUNdt/xJYF
- a+RuIY4ryesoovh6UA69IdknEeTEs/V6r4IpqXMG5w7dj5ujOjEmojwzgrWulg3q9RDfAyP
- Edcvyg3QfcinkNwaNucBPvycXSFsR8dKQm3eg18dRCObIlvqJhXTM/fzZrGl7BMqFNNG7b5
- q5leAjr5k03tZQ06L4eBA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:8TcCjfE8g28=:MzQilyLcksyyXW8U9Ia++S
- fV2njqadX7eiT3kJQS2nI+lGkFrxkxl38HrNhJlitJWSl6gqu5gyL25tRMPoyEYDfUMUTZvFw
- SnKoIV3c6wiLwsw3j7Wz2N4b1k2R28/7kSjhxp9J78A6J3lqpW5cdaqf+GqXMce8ejJnjTyR7
- WGacmzXlzbdcqB58YL2xQ2Aas2+3jKIAN6dkvXOQ6/OLX0SHG+UXmBd/5GDNcRg70IZVElNVx
- 4rcjIQLIjUg8Xncd4w61/RNq00xP8iLFRm5+aKWRHVbb5fMmztmfTKvpFouWzmqgy51VGeG4r
- SjXwbuIbzH+qBTFqMjQvjQEhVY2NmTVBMCKptita7SKIUjlYRXZxgMXnYH/3y0jQkGOec7nbT
- 5FccdWdBnUeniu49YWzbqB9gpPR0OdwkOa12tz6X7yipXEwq1k0WEbFnZ22tOw1nKT4eytAHe
- Rwzrt11xgWtBJJuWFIItNok6UUlb7Vo1LUG9yenlbAC42wKO70qbH6UQCDfNNnRF6WJIGCNnS
- 2CR7W1xG5n9pzAdSQJcHpCSvwTnVgHLt+U1yY3/VFMDkQ2fTTMvrjGha4p7c4FwiuJ/7+EzKP
- UgCCDNl4GZ31BnoMdtc/DaB7tvrUg2akoe8445khTIkpwo2OTRSgDRInomF/olbDAt5C0amxV
- Xn+est2kYdsOHukG7+7Ax2oRaakLZ0iodokWLMLZ1bQfi1E27+aSsObzCnnL3Tz+howpf2gVG
- sENRy+V+5SLPSIIBUMzY3PQb7pTdFZfVLXpzqbnC4mrz9Qd2jgefaRkKIDI0MR6Y+7B9mVhGy
- 5Wy24Q5qCCItHVax8kyp0GKRXUTz+AilEWpMiLjaI0bTKTUM9qNpPSCH7LX4wnLlPDHNAGRbO
- wgtZWxhdz+bP+WmTZAvQ==
+ <20210104154902.GA1024941@dhcp-10-100-145-180.wdc.com>
+ <20210104180115.b1d5438cd4ee21efcd557976@gmx.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210104180115.b1d5438cd4ee21efcd557976@gmx.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 4 Jan 2021 07:49:02 -0800
-Keith Busch <kbusch@kernel.org> wrote:
+On Mon, Jan 04, 2021 at 06:01:15PM +0200, Lauri Kasanen wrote:
+> On Mon, 4 Jan 2021 07:49:02 -0800
+> Keith Busch <kbusch@kernel.org> wrote:
+> 
+> > On Mon, Jan 04, 2021 at 03:50:31PM +0200, Lauri Kasanen wrote:
+> > > block folks: rest of the series is on linux-mips. Being a mips-specific driver,
+> > > not sure which tree it should go to.
+> >
+> > Probably through mips.
+> 
+> Thanks.
 
-> On Mon, Jan 04, 2021 at 03:50:31PM +0200, Lauri Kasanen wrote:
-> > block folks: rest of the series is on linux-mips. Being a mips-specifi=
-c driver,
-> > not sure which tree it should go to.
->
-> Probably through mips.
+To be more clear, the initial commit probably makes since to go through
+mips once the series is ready, but new block drivers do need to be sent
+to linux-block for the appropriate acks and reviews first.
+ 
+> > > +static blk_status_t get_seg(struct request *req)
+> > > +{ > > > +	u32 bstart = blk_rq_pos(req) * 512;
+> > > +	u32 len = blk_rq_cur_bytes(req);
+> > > +	void *dst = bio_data(req->bio);
+> > > +
+> > > +	if (bstart + len > size || rq_data_dir(req) == WRITE)
+> > > +		return BLK_STS_IOERR;
+> >
+> > If you don't support writes (is that limitation temporary?), then you
+> > can prevent such operations from reaching the driver by setting the
+> > "disk" to read-only during initialization with set_disk_ro(disk, true).
+> 
+> The media is read-only (but not runtime removable).
 
-Thanks.
-
-> > +static blk_status_t get_seg(struct request *req)
-> > +{
-> > +	u32 bstart =3D blk_rq_pos(req) * 512;
-> > +	u32 len =3D blk_rq_cur_bytes(req);
-> > +	void *dst =3D bio_data(req->bio);
-> > +
-> > +	if (bstart + len > size || rq_data_dir(req) =3D=3D WRITE)
-> > +		return BLK_STS_IOERR;
->
-> If you don't support writes (is that limitation temporary?), then you
-> can prevent such operations from reaching the driver by setting the
-> "disk" to read-only during initialization with set_disk_ro(disk, true).
-
-The media is read-only (but not runtime removable).
-
-> > +static int __init n64cart_init(void)
-> > +{
-> > +	int err;
-> > +
-> > +	if (!start || !size) {
-> > +		pr_err("n64cart: start and size not specified\n");
-> > +		return -ENODEV;
-> > +	}
->
-> Just curious, is it not possible to discover these values from the
-> installed cart? Requiring module parameters seems a bit fragile.
-
-No, it's not possible. Even the cart's size is not discoverable, and
-where the disk image starts and how long it is could only be scanned if
-you knew in advance what FS what used, etc. There is no FS on the cart
-itself, it's just raw data.
-
-The bootloader embeds these values into itself when it's built.
-
-- Lauri
+It's been a while, but I could swear we can save state on these carts.
+If so, it sounds like that must be separate from the media this driver
+is accessing, so is that capability provided through a different driver?
