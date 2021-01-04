@@ -2,93 +2,111 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2B5BC433E0
-	for <linux-block@archiver.kernel.org>; Mon,  4 Jan 2021 15:57:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E272C4321A
+	for <linux-block@archiver.kernel.org>; Mon,  4 Jan 2021 16:09:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8A81B2250F
-	for <linux-block@archiver.kernel.org>; Mon,  4 Jan 2021 15:57:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 24A37205CA
+	for <linux-block@archiver.kernel.org>; Mon,  4 Jan 2021 16:09:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727798AbhADP4y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Jan 2021 10:56:54 -0500
-Received: from mout.gmx.net ([212.227.17.20]:48979 "EHLO mout.gmx.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727608AbhADP4y (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 4 Jan 2021 10:56:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
-        s=badeba3b8450; t=1609775721;
-        bh=8NEdpocCLqWu8a3zbI69ejxOfUQa2RG9d9K1rq/1J7A=;
-        h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
-        b=W8TKWXt4mu4rbGIV4KLEC/JU6DQatHce47WJw9Ttm8r+WS/E48fH+8MsUFAfKrsQa
-         iI/jlGGu60CWft5V5Ad9onA8uw72OenD6IUH7VEWLBxcqV+x2HtxkvY1HJ96vlJyCj
-         5HNfPoBLJe+CBPYUxWCvABlXaOsYvnyEr/3Yxgj8=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from Valinor ([82.128.181.212]) by mail.gmx.com (mrgmx105
- [212.227.17.174]) with ESMTPSA (Nemesis) id 1MV67y-1kWdqR1dBe-00SAEf; Mon, 04
- Jan 2021 16:55:21 +0100
-Date:   Mon, 4 Jan 2021 17:56:59 +0200
-From:   Lauri Kasanen <cand@gmx.com>
-To:     Jens Axboe <axboe@kernel.dk>
+        id S1729629AbhADQIx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Jan 2021 11:08:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47096 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729626AbhADQIw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Jan 2021 11:08:52 -0500
+Received: from mail-io1-xd36.google.com (mail-io1-xd36.google.com [IPv6:2607:f8b0:4864:20::d36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CA10C0617A4
+        for <linux-block@vger.kernel.org>; Mon,  4 Jan 2021 08:07:44 -0800 (PST)
+Received: by mail-io1-xd36.google.com with SMTP id m23so25507402ioy.2
+        for <linux-block@vger.kernel.org>; Mon, 04 Jan 2021 08:07:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=DIri2XXuTuc/m2XlLdT/KNcOjAYDYr/u4Sxse0H2Kl4=;
+        b=EtSLpCxyCa9mX4njTy9tN1inLzBWcZRTsaAfLHreJX80QiWPGSyjGzC9/KBmR/za7l
+         6HTuZOgc92nXGOU2w6dkz68Oanialk0IrZRz0RFdah9O9LXaq9IkbF9bkss60lNU9OWd
+         DnaIe1Oj1SFO4nBWSI2vZGzCJir6kuYR+kDKZRVrqnyEc23rw9eNCxy3dmMQIJEPiWdH
+         emgDWPKo2jCeTGo4jsSShJvVu+uAJ009LyiJp+uxo/FUe75rkymqhnLHXTrk3uZ8NEDP
+         6JaqWRG92b07CUruKzBunvKfuuB4cHQ3rkfTTVVxTpN89cUCRH7QFYpHFtQLaOKyatJ/
+         6EQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=DIri2XXuTuc/m2XlLdT/KNcOjAYDYr/u4Sxse0H2Kl4=;
+        b=ECE8lS0b9Hi6iHGGH0Nxo1MkFV4idxXa30vd6Sm2THkZm7glcGgxH767ZSn2sEtO4g
+         +wRrxk0TB9JzoBRiH6P9FW4yWQRJqOIslzwEk/LaRsu4EhBP4difKOUner49H1hg0CO+
+         MV/bOKLzk4/BiFaYR9OYSn4MAsqxQCkvK4Z/ETZcZmOV5Bd9c0OoBElr+LFDIwrvYlaA
+         BTBvU+ZRUdNajI6+pANX4AtuyWo1sPFGvNmqJe77A76796FMStH/lV45+jk8O3sXAFeV
+         5NNM+ySo0VGbnf00fZfNNIaEePth4DWGOZ7nHczFb3+fcq022ofjLO93/4mhJMGdX+Hp
+         mERw==
+X-Gm-Message-State: AOAM531KQjvMBLlazP4RJWtYJ+8O/iHC3HaQBQIJkytkNpbfNurl5O+1
+        KnnwVNENuHEGzmXpsgtVFLKLtveq10D0fA==
+X-Google-Smtp-Source: ABdhPJxZ0J6nqQhzs312zRgHP5/YfjX+evmqJZfeOntmoP7v7n24ZKXUkAXjA4gfg9uIkrhSXs3l5Q==
+X-Received: by 2002:a02:b60a:: with SMTP id h10mr61721133jam.99.1609776463552;
+        Mon, 04 Jan 2021 08:07:43 -0800 (PST)
+Received: from [192.168.1.30] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id e28sm22649117iov.38.2021.01.04.08.07.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 04 Jan 2021 08:07:43 -0800 (PST)
+Subject: Re: [PATCH 6/6] block: Add n64 cart driver
+To:     Lauri Kasanen <cand@gmx.com>
 Cc:     linux-mips@vger.kernel.org, tsbogend@alpha.franken.de,
         linux-block@vger.kernel.org
-Subject: Re: [PATCH 6/6] block: Add n64 cart driver
-Message-Id: <20210104175659.f5433d55d8e41b3c8b620894@gmx.com>
-In-Reply-To: <db1936b0-a1ab-41b3-be09-ec301ea7ebc3@kernel.dk>
 References: <20210104155031.9b4e39ff48a6d7accc93461d@gmx.com>
-        <944dd5af-c5d0-b37c-29ca-0213ea6081db@kernel.dk>
-        <20210104174348.cda010a3af0ec3d989732b37@gmx.com>
-        <db1936b0-a1ab-41b3-be09-ec301ea7ebc3@kernel.dk>
-X-Mailer: Sylpheed 3.5.0 (GTK+ 2.18.6; x86_64-unknown-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:3cUFM11+xIOsWHgU9xBN/+reAhgw4yCf1tkxisO4e1K1GZpLocm
- xMJboZWTfkCI7+wbX9qnpY9xbKXp4MWDbSppVe6CYHy93rqgt9i5gZ+lzgyGxK6UrBcKzmT
- cN4421ayY599nwWUAQci7mtz0oMcwdmuTSjKQ2uGQomIJHMHonWra16+JR0I4CsOFlMwfM0
- /2xAIZUPSBF371lDSupuQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:wvMzhEPuJNI=:44iBeErXwDarRHzJ81DYrH
- xLlrcjTvZE3YrxnZGjIokk78rX9Glo/iQGHepaDMXkkuvypcn5sY65TvlScDHveSO7ZJVl2wr
- Y2qXV07AULBcGPj2QmS63fedmGGAqlIGHHQWeX/xgf6J6ki1CmOGuicvgWGbw6ZMj+/tHD688
- 4Iwx4fxuvBdeJY5Fr2deyHrJoRCV+Ca7crrcibm4D1Ga1In2W6IJfh1q/d3L5gGHo38IOa1t7
- dvtkQAcB6EgK+WvI+LFpxppAxu//hskIndtIDzRpoepW9gyinSmc3uiVpOizFfNaGfWeClLu0
- XXlerI4UdUMSksW5yjnLgcm6J/PJ9SMuU6Lg4fy34zf9RJxa+rvw+ZfJDqLB8bX0PHLOOhlHT
- nKmWWL0/ds7bZmIsqX0O48GuvcvMQO8A3rK7VWf2RKUILB0lo9hdD+3Ngz6hAPKU/auruoD1+
- BlPxOmmc+gNyydn0xeH/NQnvA0Nz3T+dj86Ivahb920hwDj4sKkLYcuGedKpLlFnjM7y2gPQS
- gnR6Yz8+WiWfKycw6W5giUGds/kQJEJavGbh1mzuTUyaOawYEoGFWI586p8d4xQF9sNYRiHiV
- FWP6rz6ZRr0woXRJkT3ZlUJZ3uyfkBldFfIW0UckfLYqP82dwLFIAXqo8PBek/Yj21iZdNZID
- kUWp507YqCdEKp6b4TInZtsbF6ohal13rwgqcXXbLsGzh60KxOMSptLkf6GOUXFJkuE8bVkMO
- h3Hd3xBrpMF2ZlyOgkgHdLxFFU2A3s70fcg5JgSOK0Yatxfs1nAQi3fNyz9D9+iJbIltlQveg
- xNlU/G+wY2+rh8YCBEJ8q59RM8VB2odarg3ukv5bJwMG6PMkswtbsLeysdOaIDE1hRjUtQ/e5
- nwG+pm7TcovFWLduzNlA==
+ <944dd5af-c5d0-b37c-29ca-0213ea6081db@kernel.dk>
+ <20210104174348.cda010a3af0ec3d989732b37@gmx.com>
+ <db1936b0-a1ab-41b3-be09-ec301ea7ebc3@kernel.dk>
+ <20210104175659.f5433d55d8e41b3c8b620894@gmx.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <0aced2a8-067b-1741-9a50-7c039241e3ce@kernel.dk>
+Date:   Mon, 4 Jan 2021 09:07:42 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+MIME-Version: 1.0
+In-Reply-To: <20210104175659.f5433d55d8e41b3c8b620894@gmx.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 4 Jan 2021 08:49:55 -0700
-Jens Axboe <axboe@kernel.dk> wrote:
+On 1/4/21 8:56 AM, Lauri Kasanen wrote:
+> On Mon, 4 Jan 2021 08:49:55 -0700
+> Jens Axboe <axboe@kernel.dk> wrote:
+> 
+>> On 1/4/21 8:43 AM, Lauri Kasanen wrote:
+>>> On Mon, 4 Jan 2021 08:40:10 -0700
+>>> Jens Axboe <axboe@kernel.dk> wrote:
+>>>> It should definitely get reviewed first. One easy question - there's no
+>>>> commit message in this one. It's a new driver, it should include some
+>>>> documentation on what it is, etc.
+>>>
+>>> It's already had one (rfc) round on linux-mips. Or do you mean by
+>>> others (who?)
+>>
+>> I mean the actual block driver from the block point of view. From
+>> a quick look, looks like there's no irq or anything, so it's
+>> strictly polled mode? Probably would make sense to push this out
+>> of the app path then, by using BLK_MQ_F_BLOCKING.
+> 
+> It's very unclear to me what that flag does. I read all the docs
+> available, but nothing made it clear (same applies for almost all
+> BLK_MQ_*).
 
-> On 1/4/21 8:43 AM, Lauri Kasanen wrote:
-> > On Mon, 4 Jan 2021 08:40:10 -0700
-> > Jens Axboe <axboe@kernel.dk> wrote:
-> >> It should definitely get reviewed first. One easy question - there's =
-no
-> >> commit message in this one. It's a new driver, it should include some
-> >> documentation on what it is, etc.
-> >
-> > It's already had one (rfc) round on linux-mips. Or do you mean by
-> > others (who?)
->
-> I mean the actual block driver from the block point of view. From
-> a quick look, looks like there's no irq or anything, so it's
-> strictly polled mode? Probably would make sense to push this out
-> of the app path then, by using BLK_MQ_F_BLOCKING.
+It pushes the actual processing to a helper thread instead of doing
+it inline on submit. Generally used if the driver needs to block
+to submit IO, as per the name, but also useful for really slow
+hardware like this one.
 
-It's very unclear to me what that flag does. I read all the docs
-available, but nothing made it clear (same applies for almost all
-BLK_MQ_*).
+-- 
+Jens Axboe
 
-- Lauri
