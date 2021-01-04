@@ -6,104 +6,99 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE663C433DB
-	for <linux-block@archiver.kernel.org>; Mon,  4 Jan 2021 23:19:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01901C433DB
+	for <linux-block@archiver.kernel.org>; Mon,  4 Jan 2021 23:22:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AF25D2253D
-	for <linux-block@archiver.kernel.org>; Mon,  4 Jan 2021 23:19:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B844D2255F
+	for <linux-block@archiver.kernel.org>; Mon,  4 Jan 2021 23:22:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727284AbhADXTu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Jan 2021 18:19:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56892 "EHLO
+        id S1726475AbhADXWB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Jan 2021 18:22:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57198 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727234AbhADXTu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Jan 2021 18:19:50 -0500
-Received: from mail-il1-x134.google.com (mail-il1-x134.google.com [IPv6:2607:f8b0:4864:20::134])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD5BCC061574
-        for <linux-block@vger.kernel.org>; Mon,  4 Jan 2021 15:19:09 -0800 (PST)
-Received: by mail-il1-x134.google.com with SMTP id k8so26932102ilr.4
-        for <linux-block@vger.kernel.org>; Mon, 04 Jan 2021 15:19:09 -0800 (PST)
+        with ESMTP id S1726289AbhADXWA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Jan 2021 18:22:00 -0500
+Received: from mail-vs1-xe2d.google.com (mail-vs1-xe2d.google.com [IPv6:2607:f8b0:4864:20::e2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51AB4C061794
+        for <linux-block@vger.kernel.org>; Mon,  4 Jan 2021 15:21:45 -0800 (PST)
+Received: by mail-vs1-xe2d.google.com with SMTP id b23so15406104vsp.9
+        for <linux-block@vger.kernel.org>; Mon, 04 Jan 2021 15:21:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=osandov-com.20150623.gappssmtp.com; s=20150623;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=PX8oIefqvj4m1fhpk9Yk9JUCrGXiZ2uLTZFm+izHPPY=;
-        b=0rt7rPP+kKHC1piUsixUzA//djUz0Ithh88VD2BqrZD21S5ZvvNYxTKvWe7eWbxwG4
-         F2fWxaYLPM5AcTR5BBH+bqNrqzbbTJJ0vakcjrH3hu0iaQ0DVz2SR1NTLIq3LvZPD0zk
-         YJxYGyDYT3nqZ2vfeQ9Khbzr3ytKz0jN52BDJu2rTZaHSjANuv6DI18MyAzmYhQn6RFZ
-         uBoIZLA4Cac1Q93CkOvjbGaJXNUOqbL39679ocg9FIUaF3lrQ1N6AvIGk2idRZKxBifR
-         qviEwVkZxLHVyyM9RE8PKVkWCxdEj86tN8TJE6XwWs5zb0mkMQ1D7d0dwixNMvtRb5gS
-         n5DQ==
+        bh=EVvjl8FPHaSAgzlwZ8FX4Brn/IkTBmXnnCWWjce03KI=;
+        b=bCEoldXf+rgnBgH5gRZhIgmP4UtKc7PsXRo+y07x+fBOL2XUjqKg8VZ1rDPJtevHFA
+         LSwFIywtbjvGJ6zOdeKpqljJHAISyk0E2038udeT2ss/rcAsKSrn44Se5Z93S89uBxHd
+         EI9QLcfZWsebkjhagb60u8A4/RBSyZtZ5mUATmATrEX5mk2PbfXP36CZRN5ffxQlNIZy
+         c5y/0UTM+LNwWhX2F9/SUOLjRPY2HsdgoEQVW1vp2T9pHQUh2Hjv2xhi7XUwlx6D9sWB
+         0oDiVwfXcKljrbgqoVFbRwJoWTcJiD7C8vOiQaLpz/AAQGEolbTMVbR/Vp/y1PV7g0BI
+         F4zw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=PX8oIefqvj4m1fhpk9Yk9JUCrGXiZ2uLTZFm+izHPPY=;
-        b=V8/kVcYBNYcfqPKC2qpPVV05n2BDToqJ2BUqbuLdzX24S+5r/Pidr0qvTFd60gWGn0
-         iK0bfQrxYVHB4fQKW3AyksBXCt/yo+S5o6OYv2HsvcyLWjy21EslYvjKxjwVw6Si3JLH
-         oUTxOYPhZm1oxPa6vtXGcZay2jzK1XgiKduNLjC3+KhzX6ZVIklzAQP4Tzv9EZt27jS5
-         JfLB3OMLZnjxH88SnvaTjoeGxIU8+MWivXHKWHkAobKBBdeIgHa6LAWycIBWzJlq7joW
-         /AMT6RBhVDTPFP0FXxEH5tdXQPA63MTmRq7i2qY0ZZxmJSuLZjlg2T8ooYEi1XMkE6WB
-         whqQ==
-X-Gm-Message-State: AOAM53039s4vv2gZoyxTnIoGvzPapubwSTAQFEJqEdf/QUKn0fresLXj
-        DsW1hWye0PZlu2xMcGyH0ea4teqjq/OEMA==
-X-Google-Smtp-Source: ABdhPJwBqdvld0GKkrUPUR1ElNVtH9R3UVxLEQyURWe2sbn/u9CTfRcc9RmOazFvzHaE2TgZVBzW1A==
-X-Received: by 2002:a65:6450:: with SMTP id s16mr47468761pgv.71.1609800487145;
-        Mon, 04 Jan 2021 14:48:07 -0800 (PST)
+        bh=EVvjl8FPHaSAgzlwZ8FX4Brn/IkTBmXnnCWWjce03KI=;
+        b=WDr0fx4OpWalCJknnzPNclI3jGu3alF6pc6nc0C4wy7hL0CR1DbL9RO57S8NJcKHSi
+         qNyWR/ISe5ZSQ3EpolSsFHjrm2DruVPPbqPYw/o67uzCNrjFcieLEf/c6yb27I8Ow4uS
+         5gO7OgAPwQASzr2JHKgsUAqR1wUVQO0e7Juj3NSXZooPXNN+xyJ4YdUGfn6+0ncgdKJr
+         WHbnQYZQFHL8qzc0CDVTPU16n2lFvwdcqCAATkcwjNDrVn3alkNhlpsoTSPDVThGoWB6
+         NlaDepsHfiQGrSxh99gxfHZGx9YedIqMFEnhuexsZ+emz7VcJCfgUNveHfTSNxvSzIol
+         E1fg==
+X-Gm-Message-State: AOAM531KGWziSnUvdOs1HTuLsnV9prG4juL51Y3F3VQuwAOZiaDJ17X+
+        pp+delQ6BhTV/rG8DMHxsn715Y8YRDEB6Q==
+X-Google-Smtp-Source: ABdhPJyIWryZI/2VEPq41I2TdTwAw0QGxrPFUu9ddmFBWHTz8pUedEe4WTR9djRG9xZygAcSIkIWww==
+X-Received: by 2002:a17:902:fe17:b029:da:799a:8bfd with SMTP id g23-20020a170902fe17b02900da799a8bfdmr74508182plj.10.1609801103888;
+        Mon, 04 Jan 2021 14:58:23 -0800 (PST)
 Received: from relinquished.localdomain ([2620:10d:c090:400::5:a87e])
-        by smtp.gmail.com with ESMTPSA id n28sm56139005pfq.61.2021.01.04.14.48.05
+        by smtp.gmail.com with ESMTPSA id d4sm54877555pfo.127.2021.01.04.14.58.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Jan 2021 14:48:05 -0800 (PST)
-Date:   Mon, 4 Jan 2021 14:48:04 -0800
+        Mon, 04 Jan 2021 14:58:22 -0800 (PST)
+Date:   Mon, 4 Jan 2021 14:58:21 -0800
 From:   Omar Sandoval <osandov@osandov.com>
-To:     Yi Zhang <yi.zhang@redhat.com>
-Cc:     bvanassche@acm.org, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org, sagi@grimberg.me
-Subject: Re: [PATCH V3 blktests 0/5] nvmeof-mp/srp/nvme-rdma misc fix and
- enhancement
-Message-ID: <X/ObJB4Ixh8gplT7@relinquished.localdomain>
-References: <20201126083532.27509-1-yi.zhang@redhat.com>
+To:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc:     linux-block@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+Subject: Re: [PATCH blktests v3 0/2] Support max_open_zones and
+ max_active_zones
+Message-ID: <X/OdjdrazFmYHV2T@relinquished.localdomain>
+References: <20201229004434.927644-1-shinichiro.kawasaki@wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201126083532.27509-1-yi.zhang@redhat.com>
+In-Reply-To: <20201229004434.927644-1-shinichiro.kawasaki@wdc.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Nov 26, 2020 at 04:35:27PM +0800, Yi Zhang wrote:
-> Hi
+On Tue, Dec 29, 2020 at 09:44:32AM +0900, Shin'ichiro Kawasaki wrote:
+> Linux kernel 5.9 introduced new sysfs attributes max_active_zones and
+> max_open_zones for zoned block devices. Blktests already handles
+> max_active_zones. However, max_open_zones handling is missing. Also,
+> zbd/005 lacks support for the two attributes.
 > 
-> This patch series addressed some failures when I run nvmeof-mp/srp
-> test and also add suport to use siw for nvme-rdma/nvmeof-mp/srp  testing
-> from cmdline, like this:
+> This patch series fills the missing attributes handling. The first patch
+> modifies the helper function for max_active_zones to support both
+> max_active_zones and max_open_zones. The second patch modifies zbd/005 to
+> handle the attributes.
 > 
-> $ use_siw=1 nvme-trtype=rdma ./check nvme
-> $ use_siw=1 ./check nvmeof-mp
-> $ use_siw-1 ./check srp
+> Changes from v2:
+> * Added Reviewed-by tags
 > 
-> V3:
-> Use sed to output the scheduler from sysfs directly in patch 3
+> Changes from v1:
+> * Reflected comments on the list
+> * Added Reviewed-by tags
 > 
-> V2:
-> Update the ib_srpt module path in patch 1, avoid to use ls
-> Update the SKIP_REASON in patch 2
-> Introduce get_scheduler_list, fix nvmeof-mp/012 and srp/012 in patch 3
-> Typo fix in patch 4
+> Shin'ichiro Kawasaki (2):
+>   common/rc: Check both max_active_zones and max_open_zones
+>   zbd/005: Provide max_active/open_zones limit to fio command
 > 
-> Yi Zhang (5):
->   tests/srp/rc: update the ib_srpt module name
->   tests/nvmeof-mp/rc: run nvmeof-mp tests if we set multipath=N
->   nvmeof-mp/012, srp/012: fix the scheduler list
->   common/rc: _have_iproute2 fix for "ip -V" change
->   common/multipath-over-rdma: allow to set use_siw
-> 
->  common/multipath-over-rdma | 13 ++++++++++++-
->  common/rc                  |  2 +-
->  tests/nvmeof-mp/012        | 10 ++++++----
->  tests/nvmeof-mp/rc         |  8 +++++---
->  tests/srp/012              | 10 ++++++----
->  tests/srp/rc               |  4 ++--
->  6 files changed, 32 insertions(+), 15 deletions(-)
+>  common/rc       | 19 ++++++++++++++++---
+>  tests/block/004 |  2 +-
+>  tests/zbd/003   |  6 +++---
+>  tests/zbd/005   | 13 ++++++++-----
+>  4 files changed, 28 insertions(+), 12 deletions(-)
 
-Applied, thanks!
+Thanks, applied.
