@@ -2,224 +2,131 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9E2AC433E6
-	for <linux-block@archiver.kernel.org>; Tue,  5 Jan 2021 13:28:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 347D0C433E0
+	for <linux-block@archiver.kernel.org>; Tue,  5 Jan 2021 13:55:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C191D229C5
-	for <linux-block@archiver.kernel.org>; Tue,  5 Jan 2021 13:28:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F338822AAE
+	for <linux-block@archiver.kernel.org>; Tue,  5 Jan 2021 13:55:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728591AbhAEN26 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 5 Jan 2021 08:28:58 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51649 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727146AbhAEN26 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 5 Jan 2021 08:28:58 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1609853251;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=AuJdJsTyCFlQnRguqyE12Pcn4kKOYDILhxDjEZQeYnM=;
-        b=fRmYpGfqDkxqv/MHb35kxTXaf13bzNKEsf26igXsFvZJ6s0v58aqsokrib0iF/YzLqqGLQ
-        9UoQlVcJTmIXklTz86NZG58TuNoKyLRhAjtYTBLe3wQfdOB78ltlWBOTcMIfwfI3frnc4z
-        79pMEPF4DvIAvUHiOL4LXfV+qKYKYug=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-181-MsXiY_ljOQi7HEXjF9cZsA-1; Tue, 05 Jan 2021 08:27:28 -0500
-X-MC-Unique: MsXiY_ljOQi7HEXjF9cZsA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1267EA0CBE;
-        Tue,  5 Jan 2021 13:27:27 +0000 (UTC)
-Received: from localhost (ovpn-12-37.pek2.redhat.com [10.72.12.37])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1A91D1002382;
-        Tue,  5 Jan 2021 13:27:21 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
+        id S1729285AbhAENzI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 5 Jan 2021 08:55:08 -0500
+Received: from youngberry.canonical.com ([91.189.89.112]:57470 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728983AbhAENzI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Jan 2021 08:55:08 -0500
+Received: from mail-qk1-f198.google.com ([209.85.222.198])
+        by youngberry.canonical.com with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.86_2)
+        (envelope-from <mfo@canonical.com>)
+        id 1kwmn3-0000mw-Dj
+        for linux-block@vger.kernel.org; Tue, 05 Jan 2021 13:54:25 +0000
+Received: by mail-qk1-f198.google.com with SMTP id p13so25617083qki.14
+        for <linux-block@vger.kernel.org>; Tue, 05 Jan 2021 05:54:25 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=e6bkVcoH66dTJHKJaimaUfYJ4BpIDTUExJd9+x2x7P4=;
+        b=nimOYznLsAs0NXRf18Z0wVSDbCf13dCJmevRWpvEOsvU2+jg41DI/+7yVfPIpab3dT
+         E0T2XOFCWvpDrY/qTtFKvhvJxD3s4OvMY4CckiAqXwjqLU3Jckp/A29N9ggWelCLoHYw
+         uBRvWQ+t6gNOG1/l/rh9EE4ky8M5QSZ32Y6dgzCYYw2U4g7ohHi2DzWCVyjUMWHAV8u1
+         rjz6Pu+FXyWbvgujqtidM+WsLjvBSefHq4aJljRqWCb2f2fYPbR3aiTGB9qhZ4R70tBf
+         dvsCeB/Z1qY19cQNFfpR26oPV2vA3qyOwrnpyqEdn0c/ibZNXqqw//zasSLZG3zplhcI
+         os0Q==
+X-Gm-Message-State: AOAM5311BgmEAcjSs7eM5VozmTa8KdtLmPQ2o/I2ag/YzCxR2dfACBXS
+        uSaIhfpc7qTvfdY28noKNQR1WYXpNv+FJMCFX/B/Vvl9lfFRgJtfKeIHFdROKNHmqt180rNLUaL
+        L2MFygVMT3jFeRNjS/4q5BsCUf1osVlmW/DGDSSD1
+X-Received: by 2002:a37:4116:: with SMTP id o22mr59422152qka.236.1609854864142;
+        Tue, 05 Jan 2021 05:54:24 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxzDrCN01MAvxktaM9U7etfK+SeoYWuLSizINEg2QENAoBT1ZkgNSkoFQxdAnmm8brcx7zCnQ==
+X-Received: by 2002:a37:4116:: with SMTP id o22mr59422141qka.236.1609854863954;
+        Tue, 05 Jan 2021 05:54:23 -0800 (PST)
+Received: from localhost.localdomain ([201.82.34.122])
+        by smtp.gmail.com with ESMTPSA id b78sm34209011qkg.29.2021.01.05.05.54.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Jan 2021 05:54:23 -0800 (PST)
+From:   Mauricio Faria de Oliveira <mfo@canonical.com>
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: [RFC PATCH] fs: block_dev: compute nr_vecs hint for improving writeback bvecs allocation
-Date:   Tue,  5 Jan 2021 21:26:47 +0800
-Message-Id: <20210105132647.3818503-1-ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org,
+        Gabriel Krisman Bertazi <krisman@collabora.com>,
+        Eric Desrochers <eric.desrochers@canonical.com>
+Subject: [PATCH v2] loop: fix I/O error on fsync() in detached loop devices
+Date:   Tue,  5 Jan 2021 10:54:19 -0300
+Message-Id: <20210105135419.68715-1-mfo@canonical.com>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Writeback code always allocates bio with max allowed bvecs(BIO_MAX_PAGES)
-since it is hard to know in advance how many pages will be written in
-single bio. And BIO_MAX_PAGES bvecs takes one 4K page.
+There's an I/O error on fsync() in a detached loop device
+if it has been previously attached.
 
-On the other hand, for workloads of random IO, most of writeback bios just
-uses <= 4 bvecs; for workloads of sequential IO, attributes to multipage
-bvec, quite a lot of pages are contiguous because of space/time locality
-for pages in sequential IO workloads, then either nr_bvecs is small enough
-or size of bio is very big. So in reality, it is quite often to see most
-of writeback bios just uses <=4 bvecs, which can be allocated inline. This
-can be observed in normal tests(kernel build, git clone kernel, dbench,
-...)
+The issue is write cache is enabled in the attach path in
+loop_configure() but it isn't disabled in the detach path;
+thus it remains enabled in the block device regardless of
+whether it is attached or not.
 
-So improve bvec allocation by using Exponential Weighted Moving Average(
-EWMA) to compute nr_bvecs hint for writeback bio. With this simple
-approach, it is observed[1] that most of writeback bios just need <=4
-nr_bvecs in normal workloads, then bvecs can be allocated inline with bio
-together, meantime one extra 4k allocation is avoided.
+Now fsync() can get an I/O request that will just be failed
+later in loop_queue_rq() as device's state is not 'Lo_bound'.
 
-[1] bpftrace script for observing writeback .bi_max_vcnt & .bi_vcnt
-histogram
-http://people.redhat.com/minlei/tests/tools/wb_vcnt.bt
+So, disable write cache in the detach path.
 
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>
-Cc: Darrick J. Wong <darrick.wong@oracle.com>
-Cc: linux-xfs@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Test-case:
+
+    # DEV=/dev/loop7
+
+    # IMG=/tmp/image
+    # truncate --size 1M $IMG
+
+    # losetup $DEV $IMG
+    # losetup -d $DEV
+
+Before:
+
+    # strace -e fsync parted -s $DEV print 2>&1 | grep fsync
+    fsync(3)                                = -1 EIO (Input/output error)
+    Warning: Error fsyncing/closing /dev/loop7: Input/output error
+    [  982.529929] blk_update_request: I/O error, dev loop7, sector 0 op 0x1:(WRITE) flags 0x800 phys_seg 0 prio class 0
+
+After:
+
+    # strace -e fsync parted -s $DEV print 2>&1 | grep fsync
+    fsync(3)                                = 0
+
+Co-developed-by: Eric Desrochers <eric.desrochers@canonical.com>
+Signed-off-by: Eric Desrochers <eric.desrochers@canonical.com>
+Signed-off-by: Mauricio Faria de Oliveira <mfo@canonical.com>
+Tested-by: Gabriel Krisman Bertazi <krisman@collabora.com>
 ---
- fs/block_dev.c            |  1 +
- fs/iomap/buffered-io.c    | 13 +++++++++----
- include/linux/bio.h       |  2 --
- include/linux/blk_types.h | 31 +++++++++++++++++++++++++++++++
- 4 files changed, 41 insertions(+), 6 deletions(-)
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 3e5b02f6606c..0490f16a96db 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -880,6 +880,7 @@ struct block_device *bdev_alloc(struct gendisk *disk, u8 partno)
- #ifdef CONFIG_SYSFS
- 	INIT_LIST_HEAD(&bdev->bd_holder_disks);
- #endif
-+	bdev->bd_wb_nr_vecs_hint = BIO_MAX_PAGES / 2;
- 	bdev->bd_stats = alloc_percpu(struct disk_stats);
- 	if (!bdev->bd_stats) {
- 		iput(inode);
-diff --git a/fs/iomap/buffered-io.c b/fs/iomap/buffered-io.c
-index 16a1e82e3aeb..1e031af182db 100644
---- a/fs/iomap/buffered-io.c
-+++ b/fs/iomap/buffered-io.c
-@@ -1210,6 +1210,7 @@ iomap_submit_ioend(struct iomap_writepage_ctx *wpc, struct iomap_ioend *ioend,
- 		return error;
+v2:
+- Fix ordering of Co-developed-by:/Signed-off-by: tags. (thanks, Krisman)
+- Add Tested-by: tag. (likewise.)
+
+ drivers/block/loop.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index e5ff328f0917..49517482e061 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1212,6 +1212,9 @@ static int __loop_clr_fd(struct loop_device *lo, bool release)
+ 		goto out_unlock;
  	}
  
-+	bdev_update_wb_nr_vecs_hint(wpc->iomap.bdev, ioend->io_bio);
- 	submit_bio(ioend->io_bio);
- 	return 0;
- }
-@@ -1221,7 +1222,8 @@ iomap_alloc_ioend(struct inode *inode, struct iomap_writepage_ctx *wpc,
- 	struct iomap_ioend *ioend;
- 	struct bio *bio;
- 
--	bio = bio_alloc_bioset(GFP_NOFS, BIO_MAX_PAGES, &iomap_ioend_bioset);
-+	bio = bio_alloc_bioset(GFP_NOFS, bdev_wb_nr_vecs_hint(wpc->iomap.bdev),
-+			&iomap_ioend_bioset);
- 	bio_set_dev(bio, wpc->iomap.bdev);
- 	bio->bi_iter.bi_sector = sector;
- 	bio->bi_opf = REQ_OP_WRITE | wbc_to_write_flags(wbc);
-@@ -1248,11 +1250,13 @@ iomap_alloc_ioend(struct inode *inode, struct iomap_writepage_ctx *wpc,
-  * traversal in iomap_finish_ioend().
-  */
- static struct bio *
--iomap_chain_bio(struct bio *prev)
-+iomap_chain_bio(struct bio *prev, struct block_device *bdev)
- {
- 	struct bio *new;
- 
--	new = bio_alloc(GFP_NOFS, BIO_MAX_PAGES);
-+	bdev_update_wb_nr_vecs_hint(bdev, prev);
++	if (!(lo->lo_flags & LO_FLAGS_READ_ONLY) && filp->f_op->fsync)
++		blk_queue_write_cache(lo->lo_queue, false, false);
 +
-+	new = bio_alloc(GFP_NOFS, bdev_wb_nr_vecs_hint(bdev));
- 	bio_copy_dev(new, prev);/* also copies over blkcg information */
- 	new->bi_iter.bi_sector = bio_end_sector(prev);
- 	new->bi_opf = prev->bi_opf;
-@@ -1308,7 +1312,8 @@ iomap_add_to_ioend(struct inode *inode, loff_t offset, struct page *page,
- 	if (!merged) {
- 		if (bio_full(wpc->ioend->io_bio, len)) {
- 			wpc->ioend->io_bio =
--				iomap_chain_bio(wpc->ioend->io_bio);
-+				iomap_chain_bio(wpc->ioend->io_bio,
-+						wpc->iomap.bdev);
- 		}
- 		bio_add_page(wpc->ioend->io_bio, page, len, poff);
- 	}
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 70914dd6a70d..ad0cd1a2abbe 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -19,8 +19,6 @@
- #define BIO_BUG_ON
- #endif
+ 	/* freeze request queue during the transition */
+ 	blk_mq_freeze_queue(lo->lo_queue);
  
--#define BIO_MAX_PAGES		256
--
- #define bio_prio(bio)			(bio)->bi_ioprio
- #define bio_set_prio(bio, prio)		((bio)->bi_ioprio = prio)
- 
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 866f74261b3b..078e212f5e1f 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -24,6 +24,7 @@ struct block_device {
- 	sector_t		bd_start_sect;
- 	struct disk_stats __percpu *bd_stats;
- 	unsigned long		bd_stamp;
-+	unsigned short		bd_wb_nr_vecs_hint;
- 	bool			bd_read_only;	/* read-only policy */
- 	dev_t			bd_dev;
- 	int			bd_openers;
-@@ -307,6 +308,8 @@ enum {
- 	BIO_FLAG_LAST
- };
- 
-+#define BIO_MAX_PAGES		256
-+
- /* See BVEC_POOL_OFFSET below before adding new flags */
- 
- /*
-@@ -565,4 +568,32 @@ struct blk_rq_stat {
- 	u64 batch;
- };
- 
-+/* called before submitting writeback bios */
-+static inline void bdev_update_wb_nr_vecs_hint(struct block_device *bdev,
-+		struct bio *bio)
-+{
-+	unsigned short nr_vecs;
-+
-+	if (!bdev)
-+		return;
-+
-+	nr_vecs = bdev->bd_wb_nr_vecs_hint;
-+	/*
-+	 * If this bio is full, double current nr_vecs_hint for fast convergence.
-+	 * Otherwise use Exponential Weighted Moving Average to figure out the
-+	 * hint
-+	 */
-+	if (bio->bi_vcnt >= bio->bi_max_vecs)
-+		nr_vecs *= 2;
-+	else
-+		nr_vecs = (nr_vecs * 3 + bio->bi_vcnt + 3) / 4;
-+
-+	bdev->bd_wb_nr_vecs_hint = clamp_val(nr_vecs, 1, BIO_MAX_PAGES);
-+}
-+
-+static inline unsigned short bdev_wb_nr_vecs_hint(struct block_device *bdev)
-+{
-+	return bdev->bd_wb_nr_vecs_hint;
-+}
-+
- #endif /* __LINUX_BLK_TYPES_H */
 -- 
-2.28.0
+2.27.0
 
