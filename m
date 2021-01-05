@@ -2,110 +2,143 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-19.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4E6BC433DB
-	for <linux-block@archiver.kernel.org>; Tue,  5 Jan 2021 01:05:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9AE5C4332E
+	for <linux-block@archiver.kernel.org>; Tue,  5 Jan 2021 01:06:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 767EE2253A
-	for <linux-block@archiver.kernel.org>; Tue,  5 Jan 2021 01:05:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9A1A422573
+	for <linux-block@archiver.kernel.org>; Tue,  5 Jan 2021 01:06:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728391AbhAEBFl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Jan 2021 20:05:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45240 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728576AbhAEBFk (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Jan 2021 20:05:40 -0500
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2391C061574;
-        Mon,  4 Jan 2021 17:04:59 -0800 (PST)
-Received: by mail-pj1-x1031.google.com with SMTP id n3so546449pjm.1;
-        Mon, 04 Jan 2021 17:04:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=1QNZU8co2AlXE0pm+2h1Yk0qrF1L4Gr1a0n9AALm2WI=;
-        b=GzlACI2zcTqvhcInD1FctS9DMxGJUvSirWYap4iPn/ptH3pHIedcKVKGNDFLYs4qzs
-         aLVHvpLzXdHkSaNu05fqxtXGd7h2QvC8WZfXy6ZeYJfWZdZs/UWRhUpjClpdg7B/+36f
-         l2+g6Mr6Eyq3WE2pWvms2F300gFYkg8y/ehqYI1//KESqLgG/mMo24jQW6TzUvCC1Og4
-         PzHG1zZjjdE1NQ4r3Atg/KmVeFTOlMlQ5jE94aD/ePNJpv8HXcbUrKQDzDqvuMQ3OyKr
-         sIx9XTgObQFtr2bXmvnozVjhM6MRVlW/e4joBuHOvL/FZLvIbCc7xwKQKp5/pLs+bPbM
-         wxsg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=1QNZU8co2AlXE0pm+2h1Yk0qrF1L4Gr1a0n9AALm2WI=;
-        b=f8TtGkdkOeQMgcdQ4wDVUHul+6mlKaQk6X2UXIcY/UTpDBhaJ4kiOez5jYpN5Oy1Gs
-         sg7mFOvMc7UuV3DMf9A9ej4pJMA8CK5R2UazULR74ZLnPEZDEq1+pcnv5ffRUq2S9sKL
-         K6YQILG9DoaZ68iazDFLWUYpNTItexNQscKbuBwvhJWS3YyckeM6pM7QpnBtDlZ/femj
-         GWljVv3LF7cHc6z7BZcGh1p7NCFM71BYwA6vD8B0ngQmRZLUrowsNhJnAZSYx7rlcjAa
-         kvpRhBZlMVidlMycO6uASMDeKawtZWvtGO4rJg0mOeL20DAZiUWEUnPVPHymlCT3EZ2i
-         ZPCg==
-X-Gm-Message-State: AOAM53354CrsBs53ZQQk4Iz1/U/JLK2bwc8oPrOzkHW8ddJQf9fjUVKg
-        qc8CrsZZBcLAnmiBCrDzy92xFshPf5E=
-X-Google-Smtp-Source: ABdhPJxD1Vsxt83d4M4eleUDaXcH86bZP59+mQP+nnFOwm81dTJGipUq68VFfx3PsaYC/gjZ3lLJKw==
-X-Received: by 2002:a17:90a:6809:: with SMTP id p9mr1490882pjj.112.1609808699244;
-        Mon, 04 Jan 2021 17:04:59 -0800 (PST)
-Received: from localhost ([211.108.35.36])
-        by smtp.gmail.com with ESMTPSA id t206sm52578539pgb.84.2021.01.04.17.04.58
-        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
-        Mon, 04 Jan 2021 17:04:58 -0800 (PST)
-Date:   Tue, 5 Jan 2021 10:04:56 +0900
-From:   Minwoo Im <minwoo.im.dev@gmail.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-Subject: Re: [RFC PATCH V3 1/1] block: reject I/O for same fd if block size
- changed
-Message-ID: <20210105010456.GA6454@localhost.localdomain>
-References: <20210104130659.22511-1-minwoo.im.dev@gmail.com>
- <20210104130659.22511-2-minwoo.im.dev@gmail.com>
- <20210104171108.GA27235@lst.de>
- <20210104171141.GB27235@lst.de>
+        id S1728113AbhAEBAl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Jan 2021 20:00:41 -0500
+Received: from mail.kernel.org ([198.145.29.99]:39224 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728080AbhAEBAk (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 4 Jan 2021 20:00:40 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 1C35622597;
+        Tue,  5 Jan 2021 00:59:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1609808367;
+        bh=0dOcWsGh9Z/V+w6PU/Ju3OjRV+n9m9dtFHHPjcms3l4=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=UpvGE2Oom9D6rcDWbzDAqlIlyRHZcwDZRjYF5/eD2kS78z6kZUFRgjBn3D9WlvtV3
+         yTXGFLJI/Sd1vq+IYgH6AMR3ehOW9mZ+nwUVj5s4pp10srj7hGpnChtac7yiFBJo4o
+         ujZCofGLP+2Db2DAccq+uNaN0hyCpS8TyuKX+sSsj5ddZpq0BiRvNIzjseL0wUGAeK
+         17B9UQoFea6geE2q1QsjKljK7a8KXUQyr8KMnbRQsTNWXGBiYLySEFLaK29N5GoLuz
+         PBKY643BqmhVMuCY3x3bZx3pTNY0v7e/R0neVsgvR+OfeazKZYK2P7z22cM4zRNDmK
+         1PGZ8QEOmE8hA==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Bart Van Assche <bvanassche@acm.org>,
+        Alan Stern <stern@rowland.harvard.edu>,
+        Stanley Chu <stanley.chu@mediatek.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        "Rafael J . Wysocki" <rafael.j.wysocki@intel.com>,
+        Can Guo <cang@codeaurora.org>, Christoph Hellwig <hch@lst.de>,
+        Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-mediatek@lists.infradead.org
+Subject: [PATCH AUTOSEL 5.10 08/17] scsi: block: Introduce BLK_MQ_REQ_PM
+Date:   Mon,  4 Jan 2021 19:59:06 -0500
+Message-Id: <20210105005915.3954208-8-sashal@kernel.org>
+X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20210105005915.3954208-1-sashal@kernel.org>
+References: <20210105005915.3954208-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20210104171141.GB27235@lst.de>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello Christoph,
+From: Bart Van Assche <bvanassche@acm.org>
 
-Thanks for your review.
+[ Upstream commit 0854bcdcdec26aecdc92c303816f349ee1fba2bc ]
 
-On 21-01-04 18:11:41, Christoph Hellwig wrote:
-> On Mon, Jan 04, 2021 at 06:11:08PM +0100, Christoph Hellwig wrote:
-> > On Mon, Jan 04, 2021 at 10:06:59PM +0900, Minwoo Im wrote:
-> > > +	if (q->backing_dev_info && q->backing_dev_info->owner &&
-> > > +			limits->logical_block_size != size) {
-> > > +		bdev = blkdev_get_no_open(q->backing_dev_info->owner->devt);
-> > > +		bdev->bd_disk->flags |= GENHD_FL_BLOCK_SIZE_CHANGED;
-> > > +		blkdev_put_no_open(bdev);
-> > > +	}
-> > 
-> > We really need the backpointer from the queue to the gendisk I've wanted
-> > to add for a while.  Can we at least restrict this to a live gendisk?
+Introduce the BLK_MQ_REQ_PM flag. This flag makes the request allocation
+functions set RQF_PM. This is the first step towards removing
+BLK_MQ_REQ_PREEMPT.
 
-It was a point that I really would like to ask by RFC whether we can
-have backpointer to the gendisk from the request_queue.  And I'd like to
-have it to simplify this routine and for future usages also.
+Link: https://lore.kernel.org/r/20201209052951.16136-3-bvanassche@acm.org
+Cc: Alan Stern <stern@rowland.harvard.edu>
+Cc: Stanley Chu <stanley.chu@mediatek.com>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+Cc: Can Guo <cang@codeaurora.org>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Hannes Reinecke <hare@suse.de>
+Reviewed-by: Jens Axboe <axboe@kernel.dk>
+Reviewed-by: Can Guo <cang@codeaurora.org>
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ block/blk-core.c       | 7 ++++---
+ block/blk-mq.c         | 2 ++
+ include/linux/blk-mq.h | 2 ++
+ 3 files changed, 8 insertions(+), 3 deletions(-)
 
-I will restrict this one by checking GENHD_FL_UP flag from the gendisk
-for the next patch.
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 2db8bda43b6e6..10696f9fb6ac6 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -424,11 +424,11 @@ EXPORT_SYMBOL(blk_cleanup_queue);
+ /**
+  * blk_queue_enter() - try to increase q->q_usage_counter
+  * @q: request queue pointer
+- * @flags: BLK_MQ_REQ_NOWAIT and/or BLK_MQ_REQ_PREEMPT
++ * @flags: BLK_MQ_REQ_NOWAIT, BLK_MQ_REQ_PM and/or BLK_MQ_REQ_PREEMPT
+  */
+ int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
+ {
+-	const bool pm = flags & BLK_MQ_REQ_PREEMPT;
++	const bool pm = flags & (BLK_MQ_REQ_PM | BLK_MQ_REQ_PREEMPT);
+ 
+ 	while (true) {
+ 		bool success = false;
+@@ -630,7 +630,8 @@ struct request *blk_get_request(struct request_queue *q, unsigned int op,
+ 	struct request *req;
+ 
+ 	WARN_ON_ONCE(op & REQ_NOWAIT);
+-	WARN_ON_ONCE(flags & ~(BLK_MQ_REQ_NOWAIT | BLK_MQ_REQ_PREEMPT));
++	WARN_ON_ONCE(flags & ~(BLK_MQ_REQ_NOWAIT | BLK_MQ_REQ_PM |
++			       BLK_MQ_REQ_PREEMPT));
+ 
+ 	req = blk_mq_alloc_request(q, op, flags);
+ 	if (!IS_ERR(req) && q->mq_ops->initialize_rq_fn)
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 55bcee5dc0320..0072ffa50b46e 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -292,6 +292,8 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
+ 	rq->mq_hctx = data->hctx;
+ 	rq->rq_flags = 0;
+ 	rq->cmd_flags = data->cmd_flags;
++	if (data->flags & BLK_MQ_REQ_PM)
++		rq->rq_flags |= RQF_PM;
+ 	if (data->flags & BLK_MQ_REQ_PREEMPT)
+ 		rq->rq_flags |= RQF_PREEMPT;
+ 	if (blk_queue_io_stat(data->q))
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 794b2a33a2c36..c9ecfd8b03381 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -446,6 +446,8 @@ enum {
+ 	BLK_MQ_REQ_NOWAIT	= (__force blk_mq_req_flags_t)(1 << 0),
+ 	/* allocate from reserved pool */
+ 	BLK_MQ_REQ_RESERVED	= (__force blk_mq_req_flags_t)(1 << 1),
++	/* set RQF_PM */
++	BLK_MQ_REQ_PM		= (__force blk_mq_req_flags_t)(1 << 2),
+ 	/* set RQF_PREEMPT */
+ 	BLK_MQ_REQ_PREEMPT	= (__force blk_mq_req_flags_t)(1 << 3),
+ };
+-- 
+2.27.0
 
-> 
-> Alternatively we could make this request_queue QUEUE* flag for now.
-
-As this patch rejects I/O from the block layer partition code, can we
-have this flag in gendisk rather than request_queue ?
-
-Thanks,
