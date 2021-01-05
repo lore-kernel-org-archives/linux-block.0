@@ -2,109 +2,127 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B68CAC433E0
-	for <linux-block@archiver.kernel.org>; Tue,  5 Jan 2021 10:13:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAA78C433DB
+	for <linux-block@archiver.kernel.org>; Tue,  5 Jan 2021 11:20:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 719FB229C7
-	for <linux-block@archiver.kernel.org>; Tue,  5 Jan 2021 10:13:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ADAEB229C7
+	for <linux-block@archiver.kernel.org>; Tue,  5 Jan 2021 11:20:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728504AbhAEKMs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 5 Jan 2021 05:12:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44944 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728074AbhAEKMr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Jan 2021 05:12:47 -0500
-Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E418C061793;
-        Tue,  5 Jan 2021 02:12:07 -0800 (PST)
-Received: by mail-pg1-x52a.google.com with SMTP id n10so20971009pgl.10;
-        Tue, 05 Jan 2021 02:12:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=s6MIg1by4xxMrWniV9WmT7wL3vQp0SC+5JFNaInbk7g=;
-        b=IxQVrP0of1IbChhiAKviNyE6d95TPLiOq/QqK6rbSqrFX7ayK0s3nAK8E15gNzxosg
-         UXIE0C+4AEIg6kX5YcT11cbMYHb85nt/rFFyuGsBoMsO7K7AIxdeKxjSG2XWDoVxjUkh
-         nfHCiLo1b8w6lkajAx1UKSdmzGFAW+MFHrm3YqTOUrJiNPKV2IFj7ktlKzOwK9QvMFhj
-         iHGWoIRSaJ/wX1PqyMcgjF/U6xTQ3Fdfg9FJva0QQ2erzWvkjvVSV7uzv8rT6eNKz9mk
-         WVpcnhhaRUyHj34Z0QlUHuGK9lQ2RDAS6FxWt9Obin96Z3DGdbZ9ZYTi18kHOtPWOwZi
-         DDcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=s6MIg1by4xxMrWniV9WmT7wL3vQp0SC+5JFNaInbk7g=;
-        b=AiP3WXRTlO3wNZWdpVOr0gPRI1WuM5cTCTetP/z5DQ6AnStz/mE3QGOfTKdn9YIELn
-         kZlFpKemEv0X/Nw13n3q5tgl1BH8pCXxeJy54+TGTVXyp6puZMlCDgqs05oulT4G6G2j
-         q5vot3+L98/8DMzOhiGs+DZ1eGsjWH2cX/wlEiF7iZxZaITYBWUkjorBUWt7MZU0ovkp
-         ojHIP88ssxIk9Eh4HN+C7rJOPx3zK0jpcq/74qcUHKd438ErCT0rrIUSoabpddmEKpr3
-         id6GTiPTGjeze+4n5Ab5kAgP4r/bhwcpu1Zjaz1i2/fYp1wXa6Q8zzIx806q27Z3Eg6J
-         831w==
-X-Gm-Message-State: AOAM531cVAQdSFM9XdjbJ/c8YKpWKUPS+ryASZidU1YbfzkzttJbGqzS
-        hhi8kgIzhtrvF2oSV9mO32dVOOU2Svk=
-X-Google-Smtp-Source: ABdhPJzMmTATlj4o28EQdMzNkIFfTFD63ya/GZyNscl6IKKhdhsYxo35yHvASuXrlDytfK5JCFtvrQ==
-X-Received: by 2002:a05:6a00:22ce:b029:197:9168:80fb with SMTP id f14-20020a056a0022ceb0290197916880fbmr48483416pfj.38.1609841527168;
-        Tue, 05 Jan 2021 02:12:07 -0800 (PST)
-Received: from localhost ([211.108.35.36])
-        by smtp.gmail.com with ESMTPSA id u12sm57403310pfh.98.2021.01.05.02.12.05
-        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 05 Jan 2021 02:12:06 -0800 (PST)
-Date:   Tue, 5 Jan 2021 19:12:02 +0900
-From:   Minwoo Im <minwoo.im.dev@gmail.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-Subject: Re: [RFC PATCH V3 1/1] block: reject I/O for same fd if block size
- changed
-Message-ID: <20210105101202.GA9970@localhost.localdomain>
-References: <20210104130659.22511-1-minwoo.im.dev@gmail.com>
- <20210104130659.22511-2-minwoo.im.dev@gmail.com>
- <20210104171108.GA27235@lst.de>
- <20210104171141.GB27235@lst.de>
- <20210105010456.GA6454@localhost.localdomain>
- <20210105075009.GA30039@lst.de>
+        id S1728006AbhAELUb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 5 Jan 2021 06:20:31 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31172 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727764AbhAELUa (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 5 Jan 2021 06:20:30 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1609845544;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=AOkwDPySrsBlNm8mdpoP6CMF0OFslXu57YAYdkM5BfA=;
+        b=EKUV7wt7wEvdREpwgL28IF7zp9q9vO4w5era5/JQ9cKSGr8XQXtR0751EhD5AhiU3HLBY2
+        3/koxMa2OvkA4qWJccOG6v9X/oddjpR7nc3fpXMqMabzky50rRVhYZxkCHjTSRR2/wndKp
+        ObkX8n0Ihvj2ML2qyBeQIZSCfH6z8LA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-415-CzWQa-DkMP-K4WDBKnD3YA-1; Tue, 05 Jan 2021 06:19:02 -0500
+X-MC-Unique: CzWQa-DkMP-K4WDBKnD3YA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 25C39801B1D;
+        Tue,  5 Jan 2021 11:19:01 +0000 (UTC)
+Received: from T590 (ovpn-13-9.pek2.redhat.com [10.72.13.9])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id C02BE71D53;
+        Tue,  5 Jan 2021 11:18:54 +0000 (UTC)
+Date:   Tue, 5 Jan 2021 19:18:50 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     John Garry <john.garry@huawei.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Kashyap Desai <kashyap.desai@broadcom.com>
+Subject: Re: [PATCH] blk-mq: test QUEUE_FLAG_HCTX_ACTIVE for sbitmap_shared
+ in hctx_may_queue
+Message-ID: <20210105111850.GB3619109@T590>
+References: <20201227113458.3289082-1-ming.lei@redhat.com>
+ <f8def27f-6709-143f-9864-8bc76e4ee052@huawei.com>
+ <20210105022017.GA3594357@T590>
+ <bcbe4b32-a819-8423-1849-e9a7db7fcde8@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210105075009.GA30039@lst.de>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+In-Reply-To: <bcbe4b32-a819-8423-1849-e9a7db7fcde8@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
-
-On 21-01-05 08:50:09, Christoph Hellwig wrote:
-> On Tue, Jan 05, 2021 at 10:04:56AM +0900, Minwoo Im wrote:
-> > It was a point that I really would like to ask by RFC whether we can
-> > have backpointer to the gendisk from the request_queue.  And I'd like to
-> > have it to simplify this routine and for future usages also.
-> 
-> I think it is the right thing to do, at least mid-term, although I
-> don't want to enforce the burden on you right now.
-> 
-> > I will restrict this one by checking GENHD_FL_UP flag from the gendisk
-> > for the next patch.
-> > 
+On Tue, Jan 05, 2021 at 10:04:58AM +0000, John Garry wrote:
+> On 05/01/2021 02:20, Ming Lei wrote:
+> > On Mon, Jan 04, 2021 at 10:41:36AM +0000, John Garry wrote:
+> > > On 27/12/2020 11:34, Ming Lei wrote:
+> > > > In case of blk_mq_is_sbitmap_shared(), we should test QUEUE_FLAG_HCTX_ACTIVE against
+> > > > q->queue_flags instead of BLK_MQ_S_TAG_ACTIVE.
+> > > > 
+> > > > So fix it.
+> > > > 
+> > > > Cc: John Garry<john.garry@huawei.com>
+> > > > Cc: Kashyap Desai<kashyap.desai@broadcom.com>
+> > > > Fixes: f1b49fdc1c64 ("blk-mq: Record active_queues_shared_sbitmap per tag_set for when using shared sbitmap")
+> > > > Signed-off-by: Ming Lei<ming.lei@redhat.com>
+> > > Reviewed-by: John Garry<john.garry@huawei.com>
 > > > 
-> > > Alternatively we could make this request_queue QUEUE* flag for now.
-> > 
-> > As this patch rejects I/O from the block layer partition code, can we
-> > have this flag in gendisk rather than request_queue ?
+> > > > ---
+> > > >    block/blk-mq.h | 2 +-
+> > > >    1 file changed, 1 insertion(+), 1 deletion(-)
+> > > > 
+> > > > diff --git a/block/blk-mq.h b/block/blk-mq.h
+> > > > index c1458d9502f1..3616453ca28c 100644
+> > > > --- a/block/blk-mq.h
+> > > > +++ b/block/blk-mq.h
+> > > > @@ -304,7 +304,7 @@ static inline bool hctx_may_queue(struct blk_mq_hw_ctx *hctx,
+> > > >    		struct request_queue *q = hctx->queue;
+> > > >    		struct blk_mq_tag_set *set = q->tag_set;
+> > > > -		if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &q->queue_flags))
+> > > > +		if (!test_bit(QUEUE_FLAG_HCTX_ACTIVE, &q->queue_flags))
+> > > I wonder how this ever worked properly, as BLK_MQ_S_TAG_ACTIVE is bit index
+> > > 1, and for q->queue_flags that means QUEUE_FLAG_DYING bit, which I figure is
+> > > not set normally..
+> > It always return true, and might just take a bit more CPU especially the tag queue
+> > depth of magsas_raid and hisi_sas_v3 is quite high.
 > 
-> For now we can as the request_queue is required.  I have some plans to
-> clean up this area, but just using a request_queue flag for now is
-> probably the simplest, even if it means more work for me later.
+> Hi Ming,
+> 
+> Right, but we actually tested by hacking the host tag queue depth to be
+> lower such that we should have tag contention, here is an extract from the
+> original series cover letter for my results:
+> 
+> Tag depth 		4000 (default)		260**
+> 
+> Baseline (v5.9-rc1):
+> none sched:		2094K IOPS		513K
+> mq-deadline sched:	2145K IOPS		1336K
+> 
+> Final, host_tagset=0 in LLDD *, ***:
+> none sched:		2120K IOPS		550K
+> mq-deadline sched:	2121K IOPS		1309K
+> 
+> Final ***:
+> none sched:		2132K IOPS		1185		
+> mq-deadline sched:	2145K IOPS		2097	
+> 
+> Maybe my test did not expose the issue. Kashyap also tested this and
+> reported the original issue such that we needed this feature, so I'm
+> confused.
 
-Please let me prepare the next quick fix for this issue with request_queue
-flag.
+How many LUNs are involved in above test with 260 depth?
 
-Thanks!
+
+Thanks,
+Ming
+
