@@ -2,144 +2,102 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 136ECC433DB
-	for <linux-block@archiver.kernel.org>; Tue,  5 Jan 2021 17:38:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7462C433DB
+	for <linux-block@archiver.kernel.org>; Tue,  5 Jan 2021 18:34:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C81FF22D01
-	for <linux-block@archiver.kernel.org>; Tue,  5 Jan 2021 17:38:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BC85822D5B
+	for <linux-block@archiver.kernel.org>; Tue,  5 Jan 2021 18:34:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730236AbhAERiu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 5 Jan 2021 12:38:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58514 "EHLO
+        id S1728799AbhAESea (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 5 Jan 2021 13:34:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38944 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726151AbhAERit (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Jan 2021 12:38:49 -0500
-Received: from mail-qk1-x734.google.com (mail-qk1-x734.google.com [IPv6:2607:f8b0:4864:20::734])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54817C061574;
-        Tue,  5 Jan 2021 09:38:09 -0800 (PST)
-Received: by mail-qk1-x734.google.com with SMTP id f26so68087qka.0;
-        Tue, 05 Jan 2021 09:38:09 -0800 (PST)
+        with ESMTP id S1726703AbhAESe3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Jan 2021 13:34:29 -0500
+Received: from mail-io1-xd2b.google.com (mail-io1-xd2b.google.com [IPv6:2607:f8b0:4864:20::d2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07250C061795
+        for <linux-block@vger.kernel.org>; Tue,  5 Jan 2021 10:33:42 -0800 (PST)
+Received: by mail-io1-xd2b.google.com with SMTP id y5so279127iow.5
+        for <linux-block@vger.kernel.org>; Tue, 05 Jan 2021 10:33:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition;
-        bh=bOiN/zd9h/CaIEMnPVzsFlx2JDr/hQqa7NqLbxPttmg=;
-        b=A6Yuo3om6XcBhTEO/4ecawxwdtaAZUgoobIbMueTX0iyKN5I3/eZSh8b2H/H9cDex2
-         DNgxYkpPOWU6ZWJyxvtFUYQYV25ZSDCFg4ocuHiarOztqojoRL1GML2sjQp4H95hu3Pe
-         JKCFNqc0/UEQHIAEIeopDEVKMj93Viv8k5GQV24uR80o2JheusvN5HxBJkIH5gyu7Un6
-         4vGn1EADmSXg+xHSlCuFCWDK9RiNFdrbVkB8oGgwyGKWMBQCaJ6EQRs2cpUK3NEmAv4i
-         GnVoLS83odSpWLkHzklUVWxOTzE2p8AJFt4IkDWuatBTYKVfIwIkuRwTeBD/gNG2UXo6
-         LuIA==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=ohK/WOqK+ZvrSsmSNelyPVjobCoSndTH+kRVqdgfQck=;
+        b=yFCzBAb7pcp52jJAYR4+TvKZCaWguAg151R8BOkItBOboa6Pf0MRWIgKlY+/3q/RwU
+         NaNtTOJF12GlyfeIA8Tannb+uK9ysgMco/LBIu6Pa2ewNKmF8GDiWiyDvkDjwevtgxL0
+         89J9KzDXPBmE6AlYfvFZCo4z2KBGTpX27GVlXrw5RAtqyN1m5CyAgzpVIRJbKF5Gukq/
+         Q8XKu8zQfKg82GlbE398/jw4vzYt5R5BjtqzGh657vTt0beXCVCA1irAGTwLs9EDMjPx
+         qo3J3/OHKFnJ+Webs96VpJJAW/XcVVWuITnQts46kGPxLL1ewl8oYp6GYef2SMA5C1Yn
+         ZIhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :mime-version:content-disposition;
-        bh=bOiN/zd9h/CaIEMnPVzsFlx2JDr/hQqa7NqLbxPttmg=;
-        b=JhfciZ0Tm1U5OHLcb9KAB2b1eyWr5yhrSbWlmqZa8oTZ0e5pXu6L1wAHD2yQlMZUMd
-         x7NPTmk104huhsLQEY0AwK9vrcOGkM5uQGN24p8n/3jIhO5Pr+H/9x3euIcM15FHwMuw
-         S8JS/Nh1GXbAl9zS7IUvl3ongY2ClA1UT7qRAEiDy7649IYFdnGMru5xtbUrHAUCYEoS
-         dGBjVJ/O1VyvRBe8ZiTeAOPY3yCLpjBf2WlzPtaX3ppZr6z6Xn6GXJ5jeIu9jKuRypV7
-         4h2PiUdQII+Nls1qYxIBjK+jXoHK18Eb2S2vN50IrS7ykZCBy98vuz+iKZOKBgWKYgiH
-         gbBg==
-X-Gm-Message-State: AOAM532AevaWbPTUrKjMhNXdH4KtN6qna3CoYAceM5G2D4GflcmidXz2
-        JT68mdgjMZLitvT2O+jb6DY=
-X-Google-Smtp-Source: ABdhPJxZbLW5+IqyTbJnmEYdb0Rs+IQXH6gYL3AtynWZc0f8HuPaG/1JNjiasYeCf8JWMsrsXHGU4Q==
-X-Received: by 2002:a05:620a:1398:: with SMTP id k24mr574456qki.109.1609868288305;
-        Tue, 05 Jan 2021 09:38:08 -0800 (PST)
-Received: from localhost ([2620:10d:c091:480::1:ce7b])
-        by smtp.gmail.com with ESMTPSA id x3sm264757qtd.56.2021.01.05.09.38.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Jan 2021 09:38:07 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Tue, 5 Jan 2021 12:37:23 -0500
-From:   Tejun Heo <tj@kernel.org>
-To:     Jens Axboe <axboe@kernel.dk>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ohK/WOqK+ZvrSsmSNelyPVjobCoSndTH+kRVqdgfQck=;
+        b=CjFk55ZkMINROyEvnb9r8d84BczBopjfdH+ZSVKJthQ5NsseFr/yS4NUjoI67F+B2W
+         fPuV89WhpErlNcfBOwQlru4H8e/Ytc/cN+h1+QANZVHoAZJnaBdV0ARsT7RvQSb8gWuF
+         /lJT9jxqgjgn8G2GlVJ8IoEahql/c8m/xygZPcvuk986Sddy5MI4Yl8ukbMI7sIK6mNJ
+         MGvKDUapI348r+bc9ptjjpWVtwUKZiRVA+5/KlPPv3ct44nvRZCmW+faZnvxWERzcHyV
+         CswPtBJg/4HHyAmlxi5uHTNeQ2EI4ZWA1OVjowpDW1Z0/lFcqNkCLY6qKjsnPHwMHvr+
+         1yeQ==
+X-Gm-Message-State: AOAM533/zGvNKchUbpceJTxmEsDPJjd+zez3UWtD2+3iZn6bJ3Vfx4kE
+        /W3H/77vzl2UAUvb/Z30ytZGYw==
+X-Google-Smtp-Source: ABdhPJynQj+KbiQlm8OW7/RioJnW+WO3zmXsSb7EeUZc0qpMBxJeSrW8/w/niA/KEHG5WU6Kh7tH6A==
+X-Received: by 2002:a02:7650:: with SMTP id z77mr826755jab.134.1609871622178;
+        Tue, 05 Jan 2021 10:33:42 -0800 (PST)
+Received: from [192.168.1.30] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id p13sm37856iod.54.2021.01.05.10.33.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 05 Jan 2021 10:33:41 -0800 (PST)
+Subject: Re: blk-iocost: fix NULL iocg deref from racing against
+ initialization
+To:     Tejun Heo <tj@kernel.org>
 Cc:     linux-block@vger.kernel.org, cgroups@vger.kernel.org, bsd@fb.com,
         kernel-team@fb.com
-Subject: blk-iocost: fix NULL iocg deref from racing against initialization
-Message-ID: <X/Sj014x+U8ubiFT@mtj.duckdns.org>
+References: <X/Sj014x+U8ubiFT@mtj.duckdns.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <a7723952-93f2-d719-29df-c7e25691cf38@kernel.dk>
+Date:   Tue, 5 Jan 2021 11:33:40 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+In-Reply-To: <X/Sj014x+U8ubiFT@mtj.duckdns.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When initializing iocost for a queue, its rqos should be registered before
-the blkcg policy is activated to allow policy data initiailization to lookup
-the associated ioc. This unfortunately means that the rqos methods can be
-called on bios before iocgs are attached to all existing blkgs.
+On 1/5/21 10:37 AM, Tejun Heo wrote:
+> When initializing iocost for a queue, its rqos should be registered before
+> the blkcg policy is activated to allow policy data initiailization to lookup
+> the associated ioc. This unfortunately means that the rqos methods can be
+> called on bios before iocgs are attached to all existing blkgs.
+> 
+> While the race is theoretically possible on ioc_rqos_throttle(), it mostly
+> happened in ioc_rqos_merge() due to the difference in how they lookup ioc.
+> The former determines it from the passed in @rqos and then bails before
+> dereferencing iocg if the looked up ioc is disabled, which most likely is
+> the case if initialization is still in progress. The latter looked up ioc by
+> dereferencing the possibly NULL iocg making it a lot more prone to actually
+> triggering the bug.
+> 
+> * Make ioc_rqos_merge() use the same method as ioc_rqos_throttle() to look
+>   up ioc for consistency.
+> 
+> * Make ioc_rqos_throttle() and ioc_rqos_merge() test for NULL iocg before
+>   dereferencing it.
 
-While the race is theoretically possible on ioc_rqos_throttle(), it mostly
-happened in ioc_rqos_merge() due to the difference in how they lookup ioc.
-The former determines it from the passed in @rqos and then bails before
-dereferencing iocg if the looked up ioc is disabled, which most likely is
-the case if initialization is still in progress. The latter looked up ioc by
-dereferencing the possibly NULL iocg making it a lot more prone to actually
-triggering the bug.
+Applied, thanks.
 
-* Make ioc_rqos_merge() use the same method as ioc_rqos_throttle() to look
-  up ioc for consistency.
+-- 
+Jens Axboe
 
-* Make ioc_rqos_throttle() and ioc_rqos_merge() test for NULL iocg before
-  dereferencing it.
-
-* Explain the danger of NULL iocgs in blk_iocost_init().
-
-Signed-off-by: Tejun Heo <tj@kernel.org>
-Reported-by: Jonathan Lemon <bsd@fb.com>
-Cc: stable@vger.kernel.org # v5.4+
----
- block/blk-iocost.c |   16 +++++++++++-----
- 1 file changed, 11 insertions(+), 5 deletions(-)
-
-diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index ac6078a349394..98d656bdb42b7 100644
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -2551,8 +2551,8 @@ static void ioc_rqos_throttle(struct rq_qos *rqos, struct bio *bio)
- 	bool use_debt, ioc_locked;
- 	unsigned long flags;
- 
--	/* bypass IOs if disabled or for root cgroup */
--	if (!ioc->enabled || !iocg->level)
-+	/* bypass IOs if disabled, still initializing, or for root cgroup */
-+	if (!ioc->enabled || !iocg || !iocg->level)
- 		return;
- 
- 	/* calculate the absolute vtime cost */
-@@ -2679,14 +2679,14 @@ static void ioc_rqos_merge(struct rq_qos *rqos, struct request *rq,
- 			   struct bio *bio)
- {
- 	struct ioc_gq *iocg = blkg_to_iocg(bio->bi_blkg);
--	struct ioc *ioc = iocg->ioc;
-+	struct ioc *ioc = rqos_to_ioc(rqos);
- 	sector_t bio_end = bio_end_sector(bio);
- 	struct ioc_now now;
- 	u64 vtime, abs_cost, cost;
- 	unsigned long flags;
- 
--	/* bypass if disabled or for root cgroup */
--	if (!ioc->enabled || !iocg->level)
-+	/* bypass if disabled, still initializing, or for root cgroup */
-+	if (!ioc->enabled || !iocg || !iocg->level)
- 		return;
- 
- 	abs_cost = calc_vtime_cost(bio, iocg, true);
-@@ -2863,6 +2863,12 @@ static int blk_iocost_init(struct request_queue *q)
- 	ioc_refresh_params(ioc, true);
- 	spin_unlock_irq(&ioc->lock);
- 
-+	/*
-+	 * rqos must be added before activation to allow iocg_pd_init() to
-+	 * lookup the ioc from q. This means that the rqos methods may get
-+	 * called before policy activation completion, can't assume that the
-+	 * target bio has an iocg associated and need to test for NULL iocg.
-+	 */
- 	rq_qos_add(q, rqos);
- 	ret = blkcg_activate_policy(q, &blkcg_policy_iocost);
- 	if (ret) {
