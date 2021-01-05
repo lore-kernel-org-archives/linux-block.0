@@ -2,95 +2,62 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44431C433DB
-	for <linux-block@archiver.kernel.org>; Tue,  5 Jan 2021 07:20:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77E98C433E9
+	for <linux-block@archiver.kernel.org>; Tue,  5 Jan 2021 07:51:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 01382224F9
-	for <linux-block@archiver.kernel.org>; Tue,  5 Jan 2021 07:20:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 44AC3227C3
+	for <linux-block@archiver.kernel.org>; Tue,  5 Jan 2021 07:51:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726133AbhAEHUr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 5 Jan 2021 02:20:47 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:9672 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725894AbhAEHUr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Jan 2021 02:20:47 -0500
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.60])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4D93l34T5hz15pCL;
-        Tue,  5 Jan 2021 15:18:55 +0800 (CST)
-Received: from huawei.com (10.29.88.127) by DGGEMS413-HUB.china.huawei.com
- (10.3.19.213) with Microsoft SMTP Server id 14.3.498.0; Tue, 5 Jan 2021
- 15:19:40 +0800
-From:   Chao Leng <lengchao@huawei.com>
-To:     <linux-nvme@lists.infradead.org>
-CC:     <kbusch@kernel.org>, <axboe@fb.com>, <hch@lst.de>,
-        <sagi@grimberg.me>, <lengchao@huawei.com>,
-        <linux-block@vger.kernel.org>, <axboe@kernel.dk>
-Subject: [PATCH 6/6] nvme-fc: avoid IO error and repeated request completion
-Date:   Tue, 5 Jan 2021 15:19:36 +0800
-Message-ID: <20210105071936.25097-7-lengchao@huawei.com>
-X-Mailer: git-send-email 2.16.4
-In-Reply-To: <20210105071936.25097-1-lengchao@huawei.com>
-References: <20210105071936.25097-1-lengchao@huawei.com>
+        id S1726251AbhAEHuy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 5 Jan 2021 02:50:54 -0500
+Received: from verein.lst.de ([213.95.11.211]:60398 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725766AbhAEHuy (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 5 Jan 2021 02:50:54 -0500
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id CE7D168BEB; Tue,  5 Jan 2021 08:50:10 +0100 (CET)
+Date:   Tue, 5 Jan 2021 08:50:09 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Minwoo Im <minwoo.im.dev@gmail.com>
+Cc:     Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+Subject: Re: [RFC PATCH V3 1/1] block: reject I/O for same fd if block size
+ changed
+Message-ID: <20210105075009.GA30039@lst.de>
+References: <20210104130659.22511-1-minwoo.im.dev@gmail.com> <20210104130659.22511-2-minwoo.im.dev@gmail.com> <20210104171108.GA27235@lst.de> <20210104171141.GB27235@lst.de> <20210105010456.GA6454@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.29.88.127]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210105010456.GA6454@localhost.localdomain>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When a request is queued failed, blk_status_t is directly returned
-to the blk-mq. If blk_status_t is not BLK_STS_RESOURCE,
-BLK_STS_DEV_RESOURCE, BLK_STS_ZONE_RESOURCE, blk-mq call
-blk_mq_end_request to complete the request with BLK_STS_IOERR.
-In two scenarios, the request should be retried and may succeed.
-First, if work with nvme multipath, the request may be retried
-successfully in another path, because the error is probably related to
-the path. Second, if work without multipath software, the request may
-be retried successfully after error recovery.
-If the request is completed with BLK_STS_IOERR in blk_mq_dispatch_rq_list.
-The state of request may be changed to MQ_RQ_IN_FLIGHT. If free the
-request asynchronously such as in nvme_submit_user_cmd, in extreme
-scenario the request will be repeated freed in tear down.
-If a non-resource error occurs when queue_rq, should directly call
-nvme_complete_rq to complete request and set the state of request to
-MQ_RQ_COMPLETE. nvme_complete_rq will decide to retry, fail over or end
-the request.
+On Tue, Jan 05, 2021 at 10:04:56AM +0900, Minwoo Im wrote:
+> It was a point that I really would like to ask by RFC whether we can
+> have backpointer to the gendisk from the request_queue.  And I'd like to
+> have it to simplify this routine and for future usages also.
 
-Signed-off-by: Chao Leng <lengchao@huawei.com>
----
- drivers/nvme/host/fc.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+I think it is the right thing to do, at least mid-term, although I
+don't want to enforce the burden on you right now.
 
-diff --git a/drivers/nvme/host/fc.c b/drivers/nvme/host/fc.c
-index 38373a0e86ef..f6a5758ef1ea 100644
---- a/drivers/nvme/host/fc.c
-+++ b/drivers/nvme/host/fc.c
-@@ -2761,7 +2761,7 @@ nvme_fc_queue_rq(struct blk_mq_hw_ctx *hctx,
- 
- 	ret = nvme_setup_cmd(ns, rq, sqe);
- 	if (ret)
--		return ret;
-+		goto fail;
- 
- 	/*
- 	 * nvme core doesn't quite treat the rq opaquely. Commands such
-@@ -2781,7 +2781,9 @@ nvme_fc_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	}
- 
- 
--	return nvme_fc_start_fcp_op(ctrl, queue, op, data_len, io_dir);
-+	ret = nvme_fc_start_fcp_op(ctrl, queue, op, data_len, io_dir);
-+fail:
-+	return nvme_try_complete_failed_req(rq, ret);
- }
- 
- static void
--- 
-2.16.4
+> I will restrict this one by checking GENHD_FL_UP flag from the gendisk
+> for the next patch.
+> 
+> > 
+> > Alternatively we could make this request_queue QUEUE* flag for now.
+> 
+> As this patch rejects I/O from the block layer partition code, can we
+> have this flag in gendisk rather than request_queue ?
 
+For now we can as the request_queue is required.  I have some plans to
+clean up this area, but just using a request_queue flag for now is
+probably the simplest, even if it means more work for me later.
