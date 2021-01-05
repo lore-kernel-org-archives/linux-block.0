@@ -7,32 +7,32 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE704C433E6
-	for <linux-block@archiver.kernel.org>; Tue,  5 Jan 2021 07:20:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7573AC433DB
+	for <linux-block@archiver.kernel.org>; Tue,  5 Jan 2021 07:20:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A3007225AB
-	for <linux-block@archiver.kernel.org>; Tue,  5 Jan 2021 07:20:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 31AE4224F9
+	for <linux-block@archiver.kernel.org>; Tue,  5 Jan 2021 07:20:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726029AbhAEHUd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 5 Jan 2021 02:20:33 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:9673 "EHLO
+        id S1726109AbhAEHUm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 5 Jan 2021 02:20:42 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:9714 "EHLO
         szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725778AbhAEHUc (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Jan 2021 02:20:32 -0500
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.60])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4D93l34Btlz15nlh;
-        Tue,  5 Jan 2021 15:18:55 +0800 (CST)
+        with ESMTP id S1725948AbhAEHUm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Jan 2021 02:20:42 -0500
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.58])
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4D93kn1BDXzl10F;
+        Tue,  5 Jan 2021 15:18:41 +0800 (CST)
 Received: from huawei.com (10.29.88.127) by DGGEMS413-HUB.china.huawei.com
  (10.3.19.213) with Microsoft SMTP Server id 14.3.498.0; Tue, 5 Jan 2021
- 15:19:39 +0800
+ 15:19:38 +0800
 From:   Chao Leng <lengchao@huawei.com>
 To:     <linux-nvme@lists.infradead.org>
 CC:     <kbusch@kernel.org>, <axboe@fb.com>, <hch@lst.de>,
         <sagi@grimberg.me>, <lengchao@huawei.com>,
         <linux-block@vger.kernel.org>, <axboe@kernel.dk>
-Subject: [PATCH 4/6] nvme-rdma: avoid IO error and repeated request completion
-Date:   Tue, 5 Jan 2021 15:19:34 +0800
-Message-ID: <20210105071936.25097-5-lengchao@huawei.com>
+Subject: [PATCH 3/6] nvme-fabrics: avoid repeated request completion for nvmf_fail_nonready_command
+Date:   Tue, 5 Jan 2021 15:19:33 +0800
+Message-ID: <20210105071936.25097-4-lengchao@huawei.com>
 X-Mailer: git-send-email 2.16.4
 In-Reply-To: <20210105071936.25097-1-lengchao@huawei.com>
 References: <20210105071936.25097-1-lengchao@huawei.com>
@@ -44,42 +44,35 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When a request is queued failed, blk_status_t is directly returned
-to the blk-mq. If blk_status_t is not BLK_STS_RESOURCE,
-BLK_STS_DEV_RESOURCE, BLK_STS_ZONE_RESOURCE, blk-mq call
-blk_mq_end_request to complete the request with BLK_STS_IOERR.
-In two scenarios, the request should be retried and may succeed.
-First, if work with nvme multipath, the request may be retried
-successfully in another path, because the error is probably related to
-the path. Second, if work without multipath software, the request may
-be retried successfully after error recovery.
-If the request is complete with BLK_STS_IOERR in blk_mq_dispatch_rq_list.
-The state of request may be changed to MQ_RQ_IN_FLIGHT. If free the
-request asynchronously such as in nvme_submit_user_cmd, in extreme
-scenario the request will be repeated freed in tear down.
-If a non-resource error occurs in queue_rq, should directly call
-nvme_complete_rq to complete request and set the state of request to
-MQ_RQ_COMPLETE. nvme_complete_rq will decide to retry, fail over or end
-the request.
+The request may be completed with NVME_SC_HOST_PATH_ERROR in
+nvmf_fail_nonready_command. The state of request will be changed to
+MQ_RQ_IN_FLIGHT before call nvme_complete_rq. If free the request
+asynchronously such as in nvme_submit_user_cmd, in extreme scenario
+the request will be repeated freed in tear down.
+Nvmf_fail_nonready_command do not need calling blk_mq_start_request
+before complete the request. Nvmf_fail_nonready_command should set
+the state of request to MQ_RQ_COMPLETE before complete the request.
 
 Signed-off-by: Chao Leng <lengchao@huawei.com>
 ---
- drivers/nvme/host/rdma.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/nvme/host/fabrics.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
-index df9f6f4549f1..4a89bf44ecdc 100644
---- a/drivers/nvme/host/rdma.c
-+++ b/drivers/nvme/host/rdma.c
-@@ -2093,7 +2093,7 @@ static blk_status_t nvme_rdma_queue_rq(struct blk_mq_hw_ctx *hctx,
- unmap_qe:
- 	ib_dma_unmap_single(dev, req->sqe.dma, sizeof(struct nvme_command),
- 			    DMA_TO_DEVICE);
--	return ret;
-+	return nvme_try_complete_failed_req(rq, ret);
- }
+diff --git a/drivers/nvme/host/fabrics.c b/drivers/nvme/host/fabrics.c
+index 72ac00173500..874e4320e214 100644
+--- a/drivers/nvme/host/fabrics.c
++++ b/drivers/nvme/host/fabrics.c
+@@ -553,9 +553,7 @@ blk_status_t nvmf_fail_nonready_command(struct nvme_ctrl *ctrl,
+ 	    !blk_noretry_request(rq) && !(rq->cmd_flags & REQ_NVME_MPATH))
+ 		return BLK_STS_RESOURCE;
  
- static int nvme_rdma_poll(struct blk_mq_hw_ctx *hctx)
+-	nvme_req(rq)->status = NVME_SC_HOST_PATH_ERROR;
+-	blk_mq_start_request(rq);
+-	nvme_complete_rq(rq);
++	nvme_complete_failed_req(rq);
+ 	return BLK_STS_OK;
+ }
+ EXPORT_SYMBOL_GPL(nvmf_fail_nonready_command);
 -- 
 2.16.4
 
