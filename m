@@ -2,97 +2,144 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11E79C433DB
-	for <linux-block@archiver.kernel.org>; Tue,  5 Jan 2021 16:30:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 136ECC433DB
+	for <linux-block@archiver.kernel.org>; Tue,  5 Jan 2021 17:38:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DB55022CA2
-	for <linux-block@archiver.kernel.org>; Tue,  5 Jan 2021 16:30:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C81FF22D01
+	for <linux-block@archiver.kernel.org>; Tue,  5 Jan 2021 17:38:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726827AbhAEQ36 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 5 Jan 2021 11:29:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47140 "EHLO
+        id S1730236AbhAERiu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 5 Jan 2021 12:38:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58514 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726655AbhAEQ36 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Jan 2021 11:29:58 -0500
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CF7BC061574
-        for <linux-block@vger.kernel.org>; Tue,  5 Jan 2021 08:29:18 -0800 (PST)
-Received: by mail-pj1-x102f.google.com with SMTP id z12so1992612pjn.1
-        for <linux-block@vger.kernel.org>; Tue, 05 Jan 2021 08:29:18 -0800 (PST)
+        with ESMTP id S1726151AbhAERit (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Jan 2021 12:38:49 -0500
+Received: from mail-qk1-x734.google.com (mail-qk1-x734.google.com [IPv6:2607:f8b0:4864:20::734])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54817C061574;
+        Tue,  5 Jan 2021 09:38:09 -0800 (PST)
+Received: by mail-qk1-x734.google.com with SMTP id f26so68087qka.0;
+        Tue, 05 Jan 2021 09:38:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=egnuumYuFUsVrh1OKb+w7xeuF5QF74aK46OUpKNfCeU=;
-        b=iSnBqORTDlr9loFiInx6uGDt27BdpuVflPrhE3Z+MNDQ2T6P3hHi9UM2tWlJb1QyWf
-         bBz0z7rW9X/6ID39PzEav6kl+ikBklrwqUFpn+OvbH2he34+0R1/VE3YspqNd3ivO1C1
-         2zcwx5pTb9pBSdix07iBCY+8jyDT7si/nzUI6tww6PTv66pCeXGoPsra/DCMf7gkOiy5
-         UZkunIQogBVG7RAGXKjnbJ5oy5ncV2LPjTUZDryap6aML9hrlENJCFhZw3JZnqLmMmvz
-         ihp3QF+Ny7slELu35jy94Xlkrfflz022FHDy37ybC3uMuI6hCna2FHbo4ENmHEewFh5K
-         vjEg==
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition;
+        bh=bOiN/zd9h/CaIEMnPVzsFlx2JDr/hQqa7NqLbxPttmg=;
+        b=A6Yuo3om6XcBhTEO/4ecawxwdtaAZUgoobIbMueTX0iyKN5I3/eZSh8b2H/H9cDex2
+         DNgxYkpPOWU6ZWJyxvtFUYQYV25ZSDCFg4ocuHiarOztqojoRL1GML2sjQp4H95hu3Pe
+         JKCFNqc0/UEQHIAEIeopDEVKMj93Viv8k5GQV24uR80o2JheusvN5HxBJkIH5gyu7Un6
+         4vGn1EADmSXg+xHSlCuFCWDK9RiNFdrbVkB8oGgwyGKWMBQCaJ6EQRs2cpUK3NEmAv4i
+         GnVoLS83odSpWLkHzklUVWxOTzE2p8AJFt4IkDWuatBTYKVfIwIkuRwTeBD/gNG2UXo6
+         LuIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=egnuumYuFUsVrh1OKb+w7xeuF5QF74aK46OUpKNfCeU=;
-        b=icKbgrbTZWBkvQB1N5EaaxSMdJzYt3AlG26km+QLGW5vcEJS+1XFxliylZe35REJ2j
-         7ld5l7tytlrX6sEnNKpSmgfpR4sfvIlyQAdhzxrwP1W0ouRRQB7eiBPpUK9oJdDukLKv
-         W4r9XGbPXUE8RMMAzmZUtN67ogtFKMl36c/U/moPJGOLa5ydBAFpcG5MTwHhqXp/wkCc
-         dDrUGrU53QVC6xYXy8DgJJd3J66cSKOdiRTn2FWppLTa5MwbaOEUR7a74vh7yPlYZPPd
-         uupP05nO7MbbpweeLW1U3ErZNE32NnLcGashyb9d6s70Gt+3MAav73Cd9fc2/B3ssIOJ
-         QUjw==
-X-Gm-Message-State: AOAM5326xZdRgMgKqtKq3BV0TAE+/aks4EMx0rYDR7jfweyiOTe/ZIlB
-        Oai9qNyKkm1o6vazsALen3OsKw==
-X-Google-Smtp-Source: ABdhPJx+IMIS6bPbXSyNDfdt20g5dgWHGZqRcaVLrYgGB6MHOE3alKRz3S/CPUkx2pDy0Tyq9VGCsw==
-X-Received: by 2002:a17:902:8e82:b029:dc:3182:e0b7 with SMTP id bg2-20020a1709028e82b02900dc3182e0b7mr70821plb.78.1609864157518;
-        Tue, 05 Jan 2021 08:29:17 -0800 (PST)
-Received: from ?IPv6:2620:10d:c085:21c1::1298? ([2620:10d:c090:400::5:c43e])
-        by smtp.gmail.com with ESMTPSA id h17sm113335pfo.220.2021.01.05.08.29.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 05 Jan 2021 08:29:16 -0800 (PST)
-Subject: Re: [PATCH] bfq: Fix computation of shallow depth
-To:     Jan Kara <jack@suse.cz>
-Cc:     linux-block@vger.kernel.org,
-        Paolo Valente <paolo.valente@linaro.org>
-References: <20201210094433.25491-1-jack@suse.cz>
- <20210105162141.GA28898@quack2.suse.cz>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <238318dd-9103-e4e4-d591-ef7212b86a48@kernel.dk>
-Date:   Tue, 5 Jan 2021 09:29:15 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :mime-version:content-disposition;
+        bh=bOiN/zd9h/CaIEMnPVzsFlx2JDr/hQqa7NqLbxPttmg=;
+        b=JhfciZ0Tm1U5OHLcb9KAB2b1eyWr5yhrSbWlmqZa8oTZ0e5pXu6L1wAHD2yQlMZUMd
+         x7NPTmk104huhsLQEY0AwK9vrcOGkM5uQGN24p8n/3jIhO5Pr+H/9x3euIcM15FHwMuw
+         S8JS/Nh1GXbAl9zS7IUvl3ongY2ClA1UT7qRAEiDy7649IYFdnGMru5xtbUrHAUCYEoS
+         dGBjVJ/O1VyvRBe8ZiTeAOPY3yCLpjBf2WlzPtaX3ppZr6z6Xn6GXJ5jeIu9jKuRypV7
+         4h2PiUdQII+Nls1qYxIBjK+jXoHK18Eb2S2vN50IrS7ykZCBy98vuz+iKZOKBgWKYgiH
+         gbBg==
+X-Gm-Message-State: AOAM532AevaWbPTUrKjMhNXdH4KtN6qna3CoYAceM5G2D4GflcmidXz2
+        JT68mdgjMZLitvT2O+jb6DY=
+X-Google-Smtp-Source: ABdhPJxZbLW5+IqyTbJnmEYdb0Rs+IQXH6gYL3AtynWZc0f8HuPaG/1JNjiasYeCf8JWMsrsXHGU4Q==
+X-Received: by 2002:a05:620a:1398:: with SMTP id k24mr574456qki.109.1609868288305;
+        Tue, 05 Jan 2021 09:38:08 -0800 (PST)
+Received: from localhost ([2620:10d:c091:480::1:ce7b])
+        by smtp.gmail.com with ESMTPSA id x3sm264757qtd.56.2021.01.05.09.38.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Jan 2021 09:38:07 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Tue, 5 Jan 2021 12:37:23 -0500
+From:   Tejun Heo <tj@kernel.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, cgroups@vger.kernel.org, bsd@fb.com,
+        kernel-team@fb.com
+Subject: blk-iocost: fix NULL iocg deref from racing against initialization
+Message-ID: <X/Sj014x+U8ubiFT@mtj.duckdns.org>
 MIME-Version: 1.0
-In-Reply-To: <20210105162141.GA28898@quack2.suse.cz>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/5/21 9:21 AM, Jan Kara wrote:
-> On Thu 10-12-20 10:44:33, Jan Kara wrote:
->> BFQ computes number of tags it allows to be allocated for each request type
->> based on tag bitmap. However it uses 1 << bitmap.shift as number of
->> available tags which is wrong. 'shift' is just an internal bitmap value
->> containing logarithm of how many bits bitmap uses in each bitmap word.
->> Thus number of tags allowed for some request types can be far to low.
->> Use proper bitmap.depth which has the number of tags instead.
->>
->> Signed-off-by: Jan Kara <jack@suse.cz>
-> 
-> Ping Jens? I think it has fallen through the cracks?
+When initializing iocost for a queue, its rqos should be registered before
+the blkcg policy is activated to allow policy data initiailization to lookup
+the associated ioc. This unfortunately means that the rqos methods can be
+called on bios before iocgs are attached to all existing blkgs.
 
-More like waiting for Paolo to take a look. Don't mind taking it, and
-I'll do that now, but I do expect him to review any BFQ patches being
-sent out.
+While the race is theoretically possible on ioc_rqos_throttle(), it mostly
+happened in ioc_rqos_merge() due to the difference in how they lookup ioc.
+The former determines it from the passed in @rqos and then bails before
+dereferencing iocg if the looked up ioc is disabled, which most likely is
+the case if initialization is still in progress. The latter looked up ioc by
+dereferencing the possibly NULL iocg making it a lot more prone to actually
+triggering the bug.
 
--- 
-Jens Axboe
+* Make ioc_rqos_merge() use the same method as ioc_rqos_throttle() to look
+  up ioc for consistency.
 
+* Make ioc_rqos_throttle() and ioc_rqos_merge() test for NULL iocg before
+  dereferencing it.
+
+* Explain the danger of NULL iocgs in blk_iocost_init().
+
+Signed-off-by: Tejun Heo <tj@kernel.org>
+Reported-by: Jonathan Lemon <bsd@fb.com>
+Cc: stable@vger.kernel.org # v5.4+
+---
+ block/blk-iocost.c |   16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
+
+diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+index ac6078a349394..98d656bdb42b7 100644
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -2551,8 +2551,8 @@ static void ioc_rqos_throttle(struct rq_qos *rqos, struct bio *bio)
+ 	bool use_debt, ioc_locked;
+ 	unsigned long flags;
+ 
+-	/* bypass IOs if disabled or for root cgroup */
+-	if (!ioc->enabled || !iocg->level)
++	/* bypass IOs if disabled, still initializing, or for root cgroup */
++	if (!ioc->enabled || !iocg || !iocg->level)
+ 		return;
+ 
+ 	/* calculate the absolute vtime cost */
+@@ -2679,14 +2679,14 @@ static void ioc_rqos_merge(struct rq_qos *rqos, struct request *rq,
+ 			   struct bio *bio)
+ {
+ 	struct ioc_gq *iocg = blkg_to_iocg(bio->bi_blkg);
+-	struct ioc *ioc = iocg->ioc;
++	struct ioc *ioc = rqos_to_ioc(rqos);
+ 	sector_t bio_end = bio_end_sector(bio);
+ 	struct ioc_now now;
+ 	u64 vtime, abs_cost, cost;
+ 	unsigned long flags;
+ 
+-	/* bypass if disabled or for root cgroup */
+-	if (!ioc->enabled || !iocg->level)
++	/* bypass if disabled, still initializing, or for root cgroup */
++	if (!ioc->enabled || !iocg || !iocg->level)
+ 		return;
+ 
+ 	abs_cost = calc_vtime_cost(bio, iocg, true);
+@@ -2863,6 +2863,12 @@ static int blk_iocost_init(struct request_queue *q)
+ 	ioc_refresh_params(ioc, true);
+ 	spin_unlock_irq(&ioc->lock);
+ 
++	/*
++	 * rqos must be added before activation to allow iocg_pd_init() to
++	 * lookup the ioc from q. This means that the rqos methods may get
++	 * called before policy activation completion, can't assume that the
++	 * target bio has an iocg associated and need to test for NULL iocg.
++	 */
+ 	rq_qos_add(q, rqos);
+ 	ret = blkcg_activate_policy(q, &blkcg_policy_iocost);
+ 	if (ret) {
