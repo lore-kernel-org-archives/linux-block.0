@@ -5,251 +5,221 @@ X-Spam-Level:
 X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BD05C433E6
-	for <linux-block@archiver.kernel.org>; Tue,  5 Jan 2021 12:46:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9E2AC433E6
+	for <linux-block@archiver.kernel.org>; Tue,  5 Jan 2021 13:28:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 68AA2229F0
-	for <linux-block@archiver.kernel.org>; Tue,  5 Jan 2021 12:46:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C191D229C5
+	for <linux-block@archiver.kernel.org>; Tue,  5 Jan 2021 13:28:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729367AbhAEMqU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 5 Jan 2021 07:46:20 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:43127 "EHLO
+        id S1728591AbhAEN26 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 5 Jan 2021 08:28:58 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51649 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729268AbhAEMqT (ORCPT
+        by vger.kernel.org with ESMTP id S1727146AbhAEN26 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 5 Jan 2021 07:46:19 -0500
+        Tue, 5 Jan 2021 08:28:58 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1609850692;
+        s=mimecast20190719; t=1609853251;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=agO6BYZemNkLWVbGRmMmpwdINpe6sn2yq73em0ndDn4=;
-        b=cmfnRzsu1QMopJRreZXyNjLA/cPUrGnT1YWxBmcuwROnpF4lDMvcBMYFi+lILRFIx+LevZ
-        DfyHZMeZ3n1rHPBUCa++kC+s+ht6zgcEhMh+5fuAgWJFCt0c5hEfaBXE+sG7vx2PodDhCf
-        pMFECw8BoFyxWG9brLunTFbHI0Y9Ouw=
+         content-transfer-encoding:content-transfer-encoding;
+        bh=AuJdJsTyCFlQnRguqyE12Pcn4kKOYDILhxDjEZQeYnM=;
+        b=fRmYpGfqDkxqv/MHb35kxTXaf13bzNKEsf26igXsFvZJ6s0v58aqsokrib0iF/YzLqqGLQ
+        9UoQlVcJTmIXklTz86NZG58TuNoKyLRhAjtYTBLe3wQfdOB78ltlWBOTcMIfwfI3frnc4z
+        79pMEPF4DvIAvUHiOL4LXfV+qKYKYug=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-4-dCV6KwIJN86S9bbnoN2ykA-1; Tue, 05 Jan 2021 07:42:22 -0500
-X-MC-Unique: dCV6KwIJN86S9bbnoN2ykA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-181-MsXiY_ljOQi7HEXjF9cZsA-1; Tue, 05 Jan 2021 08:27:28 -0500
+X-MC-Unique: MsXiY_ljOQi7HEXjF9cZsA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 353A4BBF07;
-        Tue,  5 Jan 2021 12:42:21 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1267EA0CBE;
+        Tue,  5 Jan 2021 13:27:27 +0000 (UTC)
 Received: from localhost (ovpn-12-37.pek2.redhat.com [10.72.12.37])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A639F5D6CF;
-        Tue,  5 Jan 2021 12:42:17 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1A91D1002382;
+        Tue,  5 Jan 2021 13:27:21 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2 1/6] block: manage bio slab cache by xarray
-Date:   Tue,  5 Jan 2021 20:41:58 +0800
-Message-Id: <20210105124203.3726599-2-ming.lei@redhat.com>
-In-Reply-To: <20210105124203.3726599-1-ming.lei@redhat.com>
-References: <20210105124203.3726599-1-ming.lei@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: [RFC PATCH] fs: block_dev: compute nr_vecs hint for improving writeback bvecs allocation
+Date:   Tue,  5 Jan 2021 21:26:47 +0800
+Message-Id: <20210105132647.3818503-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Managing bio slab cache via xarray by using slab cache size as xarray
-index, and storing 'struct bio_slab' instance into xarray.
+Writeback code always allocates bio with max allowed bvecs(BIO_MAX_PAGES)
+since it is hard to know in advance how many pages will be written in
+single bio. And BIO_MAX_PAGES bvecs takes one 4K page.
 
-So code is simplified a lot, meantime it becomes more readable than before.
+On the other hand, for workloads of random IO, most of writeback bios just
+uses <= 4 bvecs; for workloads of sequential IO, attributes to multipage
+bvec, quite a lot of pages are contiguous because of space/time locality
+for pages in sequential IO workloads, then either nr_bvecs is small enough
+or size of bio is very big. So in reality, it is quite often to see most
+of writeback bios just uses <=4 bvecs, which can be allocated inline. This
+can be observed in normal tests(kernel build, git clone kernel, dbench,
+...)
 
+So improve bvec allocation by using Exponential Weighted Moving Average(
+EWMA) to compute nr_bvecs hint for writeback bio. With this simple
+approach, it is observed[1] that most of writeback bios just need <=4
+nr_bvecs in normal workloads, then bvecs can be allocated inline with bio
+together, meantime one extra 4k allocation is avoided.
+
+[1] bpftrace script for observing writeback .bi_max_vcnt & .bi_vcnt
+histogram
+http://people.redhat.com/minlei/tests/tools/wb_vcnt.bt
+
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>
+Cc: Darrick J. Wong <darrick.wong@oracle.com>
+Cc: linux-xfs@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/bio.c | 114 ++++++++++++++++++++++------------------------------
- 1 file changed, 48 insertions(+), 66 deletions(-)
+ fs/block_dev.c            |  1 +
+ fs/iomap/buffered-io.c    | 13 +++++++++----
+ include/linux/bio.h       |  2 --
+ include/linux/blk_types.h | 31 +++++++++++++++++++++++++++++++
+ 4 files changed, 41 insertions(+), 6 deletions(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index 1f2cc1fbe283..f72d4783f6c5 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -19,6 +19,7 @@
- #include <linux/highmem.h>
- #include <linux/sched/sysctl.h>
- #include <linux/blk-crypto.h>
-+#include <linux/xarray.h>
- 
- #include <trace/events/block.h>
- #include "blk.h"
-@@ -58,89 +59,80 @@ struct bio_slab {
- 	char name[8];
- };
- static DEFINE_MUTEX(bio_slab_lock);
--static struct bio_slab *bio_slabs;
--static unsigned int bio_slab_nr, bio_slab_max;
-+static DEFINE_XARRAY(bio_slabs);
- 
--static struct kmem_cache *bio_find_or_create_slab(unsigned int extra_size)
-+static struct bio_slab *create_bio_slab(unsigned int size)
- {
--	unsigned int sz = sizeof(struct bio) + extra_size;
--	struct kmem_cache *slab = NULL;
--	struct bio_slab *bslab, *new_bio_slabs;
--	unsigned int new_bio_slab_max;
--	unsigned int i, entry = -1;
-+	struct bio_slab *bslab = kzalloc(sizeof(*bslab), GFP_KERNEL);
- 
--	mutex_lock(&bio_slab_lock);
--
--	i = 0;
--	while (i < bio_slab_nr) {
--		bslab = &bio_slabs[i];
-+	if (!bslab)
-+		return NULL;
- 
--		if (!bslab->slab && entry == -1)
--			entry = i;
--		else if (bslab->slab_size == sz) {
--			slab = bslab->slab;
--			bslab->slab_ref++;
--			break;
--		}
--		i++;
-+	snprintf(bslab->name, sizeof(bslab->name), "bio-%d", size);
-+	bslab->slab = kmem_cache_create(bslab->name, size,
-+			ARCH_KMALLOC_MINALIGN, SLAB_HWCACHE_ALIGN, NULL);
-+	if (!bslab->slab) {
-+		kfree(bslab);
-+		return NULL;
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 3e5b02f6606c..0490f16a96db 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -880,6 +880,7 @@ struct block_device *bdev_alloc(struct gendisk *disk, u8 partno)
+ #ifdef CONFIG_SYSFS
+ 	INIT_LIST_HEAD(&bdev->bd_holder_disks);
+ #endif
++	bdev->bd_wb_nr_vecs_hint = BIO_MAX_PAGES / 2;
+ 	bdev->bd_stats = alloc_percpu(struct disk_stats);
+ 	if (!bdev->bd_stats) {
+ 		iput(inode);
+diff --git a/fs/iomap/buffered-io.c b/fs/iomap/buffered-io.c
+index 16a1e82e3aeb..1e031af182db 100644
+--- a/fs/iomap/buffered-io.c
++++ b/fs/iomap/buffered-io.c
+@@ -1210,6 +1210,7 @@ iomap_submit_ioend(struct iomap_writepage_ctx *wpc, struct iomap_ioend *ioend,
+ 		return error;
  	}
  
--	if (slab)
--		goto out_unlock;
--
--	if (bio_slab_nr == bio_slab_max && entry == -1) {
--		new_bio_slab_max = bio_slab_max << 1;
--		new_bio_slabs = krealloc(bio_slabs,
--					 new_bio_slab_max * sizeof(struct bio_slab),
--					 GFP_KERNEL);
--		if (!new_bio_slabs)
--			goto out_unlock;
--		bio_slab_max = new_bio_slab_max;
--		bio_slabs = new_bio_slabs;
-+	bslab->slab_ref = 1;
-+	bslab->slab_size = size;
-+
-+	if (xa_err(xa_store(&bio_slabs, size, bslab, GFP_KERNEL))) {
-+		kmem_cache_destroy(bslab->slab);
-+		kfree(bslab);
-+		return NULL;
- 	}
--	if (entry == -1)
--		entry = bio_slab_nr++;
-+	return bslab;
-+}
- 
--	bslab = &bio_slabs[entry];
-+static inline unsigned int bs_bio_slab_size(struct bio_set *bs)
-+{
-+	return bs->front_pad + sizeof(struct bio) +
-+		BIO_INLINE_VECS * sizeof(struct bio_vec);
-+}
- 
--	snprintf(bslab->name, sizeof(bslab->name), "bio-%d", entry);
--	slab = kmem_cache_create(bslab->name, sz, ARCH_KMALLOC_MINALIGN,
--				 SLAB_HWCACHE_ALIGN, NULL);
--	if (!slab)
--		goto out_unlock;
-+static struct kmem_cache *bio_find_or_create_slab(struct bio_set *bs)
-+{
-+	unsigned int size = bs_bio_slab_size(bs);
-+	struct bio_slab *bslab;
- 
--	bslab->slab = slab;
--	bslab->slab_ref = 1;
--	bslab->slab_size = sz;
--out_unlock:
-+	mutex_lock(&bio_slab_lock);
-+	bslab = xa_load(&bio_slabs, size);
-+	if (bslab)
-+		bslab->slab_ref++;
-+	else
-+		bslab = create_bio_slab(size);
- 	mutex_unlock(&bio_slab_lock);
--	return slab;
-+
-+	if (bslab)
-+		return bslab->slab;
-+	return NULL;
++	bdev_update_wb_nr_vecs_hint(wpc->iomap.bdev, ioend->io_bio);
+ 	submit_bio(ioend->io_bio);
+ 	return 0;
  }
+@@ -1221,7 +1222,8 @@ iomap_alloc_ioend(struct inode *inode, struct iomap_writepage_ctx *wpc,
+ 	struct iomap_ioend *ioend;
+ 	struct bio *bio;
  
- static void bio_put_slab(struct bio_set *bs)
+-	bio = bio_alloc_bioset(GFP_NOFS, BIO_MAX_PAGES, &iomap_ioend_bioset);
++	bio = bio_alloc_bioset(GFP_NOFS, bdev_wb_nr_vecs_hint(wpc->iomap.bdev),
++			&iomap_ioend_bioset);
+ 	bio_set_dev(bio, wpc->iomap.bdev);
+ 	bio->bi_iter.bi_sector = sector;
+ 	bio->bi_opf = REQ_OP_WRITE | wbc_to_write_flags(wbc);
+@@ -1248,11 +1250,13 @@ iomap_alloc_ioend(struct inode *inode, struct iomap_writepage_ctx *wpc,
+  * traversal in iomap_finish_ioend().
+  */
+ static struct bio *
+-iomap_chain_bio(struct bio *prev)
++iomap_chain_bio(struct bio *prev, struct block_device *bdev)
  {
- 	struct bio_slab *bslab = NULL;
--	unsigned int i;
-+	unsigned int slab_size = bs_bio_slab_size(bs);
+ 	struct bio *new;
  
- 	mutex_lock(&bio_slab_lock);
- 
--	for (i = 0; i < bio_slab_nr; i++) {
--		if (bs->bio_slab == bio_slabs[i].slab) {
--			bslab = &bio_slabs[i];
--			break;
--		}
--	}
--
-+	bslab = xa_load(&bio_slabs, slab_size);
- 	if (WARN(!bslab, KERN_ERR "bio: unable to find slab!\n"))
- 		goto out;
- 
-+	WARN_ON_ONCE(bslab->slab != bs->bio_slab);
+-	new = bio_alloc(GFP_NOFS, BIO_MAX_PAGES);
++	bdev_update_wb_nr_vecs_hint(bdev, prev);
 +
- 	WARN_ON(!bslab->slab_ref);
++	new = bio_alloc(GFP_NOFS, bdev_wb_nr_vecs_hint(bdev));
+ 	bio_copy_dev(new, prev);/* also copies over blkcg information */
+ 	new->bi_iter.bi_sector = bio_end_sector(prev);
+ 	new->bi_opf = prev->bi_opf;
+@@ -1308,7 +1312,8 @@ iomap_add_to_ioend(struct inode *inode, loff_t offset, struct page *page,
+ 	if (!merged) {
+ 		if (bio_full(wpc->ioend->io_bio, len)) {
+ 			wpc->ioend->io_bio =
+-				iomap_chain_bio(wpc->ioend->io_bio);
++				iomap_chain_bio(wpc->ioend->io_bio,
++						wpc->iomap.bdev);
+ 		}
+ 		bio_add_page(wpc->ioend->io_bio, page, len, poff);
+ 	}
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 70914dd6a70d..ad0cd1a2abbe 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -19,8 +19,6 @@
+ #define BIO_BUG_ON
+ #endif
  
- 	if (--bslab->slab_ref)
- 		goto out;
+-#define BIO_MAX_PAGES		256
+-
+ #define bio_prio(bio)			(bio)->bi_ioprio
+ #define bio_set_prio(bio, prio)		((bio)->bi_ioprio = prio)
  
-+	xa_erase(&bio_slabs, slab_size);
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 866f74261b3b..078e212f5e1f 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -24,6 +24,7 @@ struct block_device {
+ 	sector_t		bd_start_sect;
+ 	struct disk_stats __percpu *bd_stats;
+ 	unsigned long		bd_stamp;
++	unsigned short		bd_wb_nr_vecs_hint;
+ 	bool			bd_read_only;	/* read-only policy */
+ 	dev_t			bd_dev;
+ 	int			bd_openers;
+@@ -307,6 +308,8 @@ enum {
+ 	BIO_FLAG_LAST
+ };
+ 
++#define BIO_MAX_PAGES		256
 +
- 	kmem_cache_destroy(bslab->slab);
--	bslab->slab = NULL;
-+	kfree(bslab);
+ /* See BVEC_POOL_OFFSET below before adding new flags */
  
- out:
- 	mutex_unlock(&bio_slab_lock);
-@@ -1579,15 +1571,13 @@ int bioset_init(struct bio_set *bs,
- 		unsigned int front_pad,
- 		int flags)
- {
--	unsigned int back_pad = BIO_INLINE_VECS * sizeof(struct bio_vec);
--
- 	bs->front_pad = front_pad;
+ /*
+@@ -565,4 +568,32 @@ struct blk_rq_stat {
+ 	u64 batch;
+ };
  
- 	spin_lock_init(&bs->rescue_lock);
- 	bio_list_init(&bs->rescue_list);
- 	INIT_WORK(&bs->rescue_work, bio_alloc_rescue);
- 
--	bs->bio_slab = bio_find_or_create_slab(front_pad + back_pad);
-+	bs->bio_slab = bio_find_or_create_slab(bs);
- 	if (!bs->bio_slab)
- 		return -ENOMEM;
- 
-@@ -1651,16 +1641,8 @@ static void __init biovec_init_slabs(void)
- 
- static int __init init_bio(void)
- {
--	bio_slab_max = 2;
--	bio_slab_nr = 0;
--	bio_slabs = kcalloc(bio_slab_max, sizeof(struct bio_slab),
--			    GFP_KERNEL);
--
- 	BUILD_BUG_ON(BIO_FLAG_LAST > BVEC_POOL_OFFSET);
- 
--	if (!bio_slabs)
--		panic("bio: can't allocate bios\n");
--
- 	bio_integrity_init();
- 	biovec_init_slabs();
- 
++/* called before submitting writeback bios */
++static inline void bdev_update_wb_nr_vecs_hint(struct block_device *bdev,
++		struct bio *bio)
++{
++	unsigned short nr_vecs;
++
++	if (!bdev)
++		return;
++
++	nr_vecs = bdev->bd_wb_nr_vecs_hint;
++	/*
++	 * If this bio is full, double current nr_vecs_hint for fast convergence.
++	 * Otherwise use Exponential Weighted Moving Average to figure out the
++	 * hint
++	 */
++	if (bio->bi_vcnt >= bio->bi_max_vecs)
++		nr_vecs *= 2;
++	else
++		nr_vecs = (nr_vecs * 3 + bio->bi_vcnt + 3) / 4;
++
++	bdev->bd_wb_nr_vecs_hint = clamp_val(nr_vecs, 1, BIO_MAX_PAGES);
++}
++
++static inline unsigned short bdev_wb_nr_vecs_hint(struct block_device *bdev)
++{
++	return bdev->bd_wb_nr_vecs_hint;
++}
++
+ #endif /* __LINUX_BLK_TYPES_H */
 -- 
 2.28.0
 
