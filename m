@@ -2,87 +2,110 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6152EC433E6
-	for <linux-block@archiver.kernel.org>; Mon,  4 Jan 2021 23:26:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4E6BC433DB
+	for <linux-block@archiver.kernel.org>; Tue,  5 Jan 2021 01:05:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2D65A20789
-	for <linux-block@archiver.kernel.org>; Mon,  4 Jan 2021 23:26:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 767EE2253A
+	for <linux-block@archiver.kernel.org>; Tue,  5 Jan 2021 01:05:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727599AbhADX0l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Jan 2021 18:26:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57992 "EHLO
+        id S1728391AbhAEBFl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Jan 2021 20:05:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45240 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727230AbhADX0l (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Jan 2021 18:26:41 -0500
-Received: from mail-vs1-xe2c.google.com (mail-vs1-xe2c.google.com [IPv6:2607:f8b0:4864:20::e2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13B0FC061793
-        for <linux-block@vger.kernel.org>; Mon,  4 Jan 2021 15:26:01 -0800 (PST)
-Received: by mail-vs1-xe2c.google.com with SMTP id x4so15439358vsp.7
-        for <linux-block@vger.kernel.org>; Mon, 04 Jan 2021 15:26:01 -0800 (PST)
+        with ESMTP id S1728576AbhAEBFk (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Jan 2021 20:05:40 -0500
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2391C061574;
+        Mon,  4 Jan 2021 17:04:59 -0800 (PST)
+Received: by mail-pj1-x1031.google.com with SMTP id n3so546449pjm.1;
+        Mon, 04 Jan 2021 17:04:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=osandov-com.20150623.gappssmtp.com; s=20150623;
+        d=gmail.com; s=20161025;
         h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=dy/ye9TiZq4lJL+DRiv0coXwbLy9CL2mFPnMwzQ1evU=;
-        b=xZsX41vdh4MTnX4NEOraHQryWgWAryobfLPE6U7R/raSJ9S7oRBdssxZQgmd5IpNAS
-         QJA4vdNG7bpoRfNInzKyE4jg1DCVWuwNdTmfsY6EIU1hh507/FhODmI7C3RLp2B6SbC8
-         kMhAFIZFNhAwwG6yeLlEPWet5DKyel3gdK6Srq3oImPNOz65IGuQ1SNIrnvVHfTgFxlC
-         5Kc8KX3It0N1lmouPaAEGcW7co7veBTcAn5FXXvrCR5o3s8MCoSwFuwUWGoNpz70LbqA
-         2Eaa4bLyQqycca6xom+OXoU1nPnncSYIACVHaJeCG+VH1pdgNoYDIiMPbaQR3xeZtxTX
-         jpYw==
+         :content-disposition:in-reply-to:user-agent;
+        bh=1QNZU8co2AlXE0pm+2h1Yk0qrF1L4Gr1a0n9AALm2WI=;
+        b=GzlACI2zcTqvhcInD1FctS9DMxGJUvSirWYap4iPn/ptH3pHIedcKVKGNDFLYs4qzs
+         aLVHvpLzXdHkSaNu05fqxtXGd7h2QvC8WZfXy6ZeYJfWZdZs/UWRhUpjClpdg7B/+36f
+         l2+g6Mr6Eyq3WE2pWvms2F300gFYkg8y/ehqYI1//KESqLgG/mMo24jQW6TzUvCC1Og4
+         PzHG1zZjjdE1NQ4r3Atg/KmVeFTOlMlQ5jE94aD/ePNJpv8HXcbUrKQDzDqvuMQ3OyKr
+         sIx9XTgObQFtr2bXmvnozVjhM6MRVlW/e4joBuHOvL/FZLvIbCc7xwKQKp5/pLs+bPbM
+         wxsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=dy/ye9TiZq4lJL+DRiv0coXwbLy9CL2mFPnMwzQ1evU=;
-        b=Esh+eijHpsL0qi6Qnajt4XuT4B8WjdpfRyypTGHM73CROvDIaBTbVZg5v3LnVGgslU
-         /QrYXub4r5tr66lAOVwkGRoO+a7nnPRfC56vQzE/6TJQEsH7ufOeOESZq/r21cPCYKbK
-         YCojZ1kqTNbrKXFJXDUQOhcDXW/amNcuC+2O2+ZCxvGJVcDa/2av04P5r+6x/wByal4E
-         bhUdG8RhVT0ASJTN2eSPl9Qeo5z4ZwvmAp3VDOQM4rRN0SBo5iIIieBUdL3NN3Py1uME
-         STjcJF3GZlurCq4yVwrqME6/hDLWOasdB+qMVSE2fX38xjPwC491aHTzHK0GCvTRwSAS
-         o60Q==
-X-Gm-Message-State: AOAM530ktQ2Hbke3CEhyW66ETVGHhIav+sUlQnItqmwGP+QK9KCDrgvJ
-        O/29tE8I3LdJCa2eMgvsSdU+WvoBEevTkQ==
-X-Google-Smtp-Source: ABdhPJwCjZfBylHNuClr2EUiMdnE5kwEKsZt+hJJksptRoDedShViaIIB2BPfNx9h5t5fRVkcLfTkg==
-X-Received: by 2002:a17:902:e9d2:b029:db:d4f6:b581 with SMTP id 18-20020a170902e9d2b02900dbd4f6b581mr50833390plk.34.1609800941423;
-        Mon, 04 Jan 2021 14:55:41 -0800 (PST)
-Received: from relinquished.localdomain ([2620:10d:c090:400::5:a87e])
-        by smtp.gmail.com with ESMTPSA id b22sm55965229pfo.163.2021.01.04.14.55.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Jan 2021 14:55:40 -0800 (PST)
-Date:   Mon, 4 Jan 2021 14:55:39 -0800
-From:   Omar Sandoval <osandov@osandov.com>
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     linux-block@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
-        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: Re: [PATCH] common/rc: confirm pcie hotplug capabilities
-Message-ID: <X/Oc6xVfE+ioo9ZD@relinquished.localdomain>
-References: <20201125154952.2871261-1-kbusch@kernel.org>
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=1QNZU8co2AlXE0pm+2h1Yk0qrF1L4Gr1a0n9AALm2WI=;
+        b=f8TtGkdkOeQMgcdQ4wDVUHul+6mlKaQk6X2UXIcY/UTpDBhaJ4kiOez5jYpN5Oy1Gs
+         sg7mFOvMc7UuV3DMf9A9ej4pJMA8CK5R2UazULR74ZLnPEZDEq1+pcnv5ffRUq2S9sKL
+         K6YQILG9DoaZ68iazDFLWUYpNTItexNQscKbuBwvhJWS3YyckeM6pM7QpnBtDlZ/femj
+         GWljVv3LF7cHc6z7BZcGh1p7NCFM71BYwA6vD8B0ngQmRZLUrowsNhJnAZSYx7rlcjAa
+         kvpRhBZlMVidlMycO6uASMDeKawtZWvtGO4rJg0mOeL20DAZiUWEUnPVPHymlCT3EZ2i
+         ZPCg==
+X-Gm-Message-State: AOAM53354CrsBs53ZQQk4Iz1/U/JLK2bwc8oPrOzkHW8ddJQf9fjUVKg
+        qc8CrsZZBcLAnmiBCrDzy92xFshPf5E=
+X-Google-Smtp-Source: ABdhPJxD1Vsxt83d4M4eleUDaXcH86bZP59+mQP+nnFOwm81dTJGipUq68VFfx3PsaYC/gjZ3lLJKw==
+X-Received: by 2002:a17:90a:6809:: with SMTP id p9mr1490882pjj.112.1609808699244;
+        Mon, 04 Jan 2021 17:04:59 -0800 (PST)
+Received: from localhost ([211.108.35.36])
+        by smtp.gmail.com with ESMTPSA id t206sm52578539pgb.84.2021.01.04.17.04.58
+        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
+        Mon, 04 Jan 2021 17:04:58 -0800 (PST)
+Date:   Tue, 5 Jan 2021 10:04:56 +0900
+From:   Minwoo Im <minwoo.im.dev@gmail.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+Subject: Re: [RFC PATCH V3 1/1] block: reject I/O for same fd if block size
+ changed
+Message-ID: <20210105010456.GA6454@localhost.localdomain>
+References: <20210104130659.22511-1-minwoo.im.dev@gmail.com>
+ <20210104130659.22511-2-minwoo.im.dev@gmail.com>
+ <20210104171108.GA27235@lst.de>
+ <20210104171141.GB27235@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20201125154952.2871261-1-kbusch@kernel.org>
+In-Reply-To: <20210104171141.GB27235@lst.de>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 25, 2020 at 07:49:52AM -0800, Keith Busch wrote:
-> It turns out some PCIe slots report hotplug surprise but are not hotplug
-> capable. Despite the contridiction, the spec seems to allow that.
-> 
-> The linux pciehp driver needs hotplug capable to bind to the slot, and
-> the block/019 test requires hotplug surprise to handle the unannounced
-> link-down. Verify both bits in the slot capabilities register are set.
-> 
-> Reported-by: Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-> Signed-off-by: Keith Busch <kbusch@kernel.org>
-> ---
->  common/rc | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+Hello Christoph,
 
-Thanks, applied.
+Thanks for your review.
+
+On 21-01-04 18:11:41, Christoph Hellwig wrote:
+> On Mon, Jan 04, 2021 at 06:11:08PM +0100, Christoph Hellwig wrote:
+> > On Mon, Jan 04, 2021 at 10:06:59PM +0900, Minwoo Im wrote:
+> > > +	if (q->backing_dev_info && q->backing_dev_info->owner &&
+> > > +			limits->logical_block_size != size) {
+> > > +		bdev = blkdev_get_no_open(q->backing_dev_info->owner->devt);
+> > > +		bdev->bd_disk->flags |= GENHD_FL_BLOCK_SIZE_CHANGED;
+> > > +		blkdev_put_no_open(bdev);
+> > > +	}
+> > 
+> > We really need the backpointer from the queue to the gendisk I've wanted
+> > to add for a while.  Can we at least restrict this to a live gendisk?
+
+It was a point that I really would like to ask by RFC whether we can
+have backpointer to the gendisk from the request_queue.  And I'd like to
+have it to simplify this routine and for future usages also.
+
+I will restrict this one by checking GENHD_FL_UP flag from the gendisk
+for the next patch.
+
+> 
+> Alternatively we could make this request_queue QUEUE* flag for now.
+
+As this patch rejects I/O from the block layer partition code, can we
+have this flag in gendisk rather than request_queue ?
+
+Thanks,
