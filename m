@@ -2,214 +2,91 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F7FFC433E0
-	for <linux-block@archiver.kernel.org>; Wed,  6 Jan 2021 11:22:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF4D1C433E0
+	for <linux-block@archiver.kernel.org>; Wed,  6 Jan 2021 11:40:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E6A6622B45
-	for <linux-block@archiver.kernel.org>; Wed,  6 Jan 2021 11:22:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 99FAF23104
+	for <linux-block@archiver.kernel.org>; Wed,  6 Jan 2021 11:40:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726216AbhAFLWU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 Jan 2021 06:22:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56018 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725941AbhAFLWU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Jan 2021 06:22:20 -0500
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00F03C061357;
-        Wed,  6 Jan 2021 03:21:40 -0800 (PST)
-Received: by mail-pl1-x629.google.com with SMTP id be12so1399444plb.4;
-        Wed, 06 Jan 2021 03:21:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=sBzg1tgz32alZ9aHN5cWbJFQtT8AE3oR3feRMm8uqb4=;
-        b=rjUpIwXgwYBgFL6Td5HV5IAazmyCdHJboKVsfEUitilMhFN/NXj7J/s95LuzqsPxzg
-         mKUU+dZLeQ20rfLAsjmiykuWQgDLoSAGMF0hegflMVAZb969oU3wGQq4enI58Q/0kHjS
-         onJsKaCajoacR2bHituttW/WT1g9UdQtPkTBg5AnwMoOrtFFu8PhZhcXBFogvNH9DFQ1
-         km6i2zArd0HdC2fbLZKb66fZwDDVc/7qA24G9JG9yKY7qBuhUyzdz0cVo0yDULb3/hXV
-         uzWLNqtOHTUqj2phpaVYzOorPg/t/zjllZlKvyEy25YEROsyB1QI1xVX2TsVmyXSwL4U
-         s6jA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=sBzg1tgz32alZ9aHN5cWbJFQtT8AE3oR3feRMm8uqb4=;
-        b=jimJYDaqHzrkt+Uqqn13uUSjqMtInl3fNTzEEr1hNHhnQAh9patZg1y+rIslj3RR27
-         UBA1h91LVf/eE5hu07Bmo7ko0yg/znrMk2vmwfy49gcztN+2ov97YwoAasfnYXP/DKQf
-         Lzdclxdr0VpMLE8aNGH3ZBn3oui3lYQLQnRdmIakDYbZToktxYoFncOJdYfxTD6tTdLw
-         95dZVAr5U62R1vZbUy2+ssmb61zeF8lMxA7xqd01T9OkIoQ2KtDXI1K09FtqKf6zXtS7
-         whiaghe5ljDGXVDnUpVwmjZ4j20jbbb/XPAicJJUeo+/vPEUAh5koN3IMNagET0KZ9Gu
-         y+6Q==
-X-Gm-Message-State: AOAM53011H+KKmzUYUucM8jvBHEG1sXe8UJ5buC78peA1esi9vlNMaqw
-        FBzcx8RgiT09mtPemmxTSaL9y9I/psk=
-X-Google-Smtp-Source: ABdhPJw4ST2D9x6/ZeVz3GrOo9MUhYRwl/+5EAAwFeZdBDP66B9tfiu4w6gyGPcQWDtm7VkldWw7YA==
-X-Received: by 2002:a17:902:b588:b029:db:e1d8:1492 with SMTP id a8-20020a170902b588b02900dbe1d81492mr3983485pls.80.1609932099576;
-        Wed, 06 Jan 2021 03:21:39 -0800 (PST)
-Received: from VM-0-6-centos.localdomain ([119.28.90.140])
-        by smtp.gmail.com with ESMTPSA id p9sm2373767pfq.109.2021.01.06.03.21.38
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 06 Jan 2021 03:21:39 -0800 (PST)
-From:   Chunguang Xu <brookxu.cn@gmail.com>
-X-Google-Original-From: Chunguang Xu <brookxu@tencent.com>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] block: introduce for_each_rq_qos macro
-Date:   Wed,  6 Jan 2021 19:20:56 +0800
-Message-Id: <1609932056-26990-1-git-send-email-brookxu@tencent.com>
-X-Mailer: git-send-email 1.8.3.1
+        id S1726452AbhAFLkH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 Jan 2021 06:40:07 -0500
+Received: from frasgout.his.huawei.com ([185.176.79.56]:2296 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726258AbhAFLkH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Jan 2021 06:40:07 -0500
+Received: from fraeml713-chm.china.huawei.com (unknown [172.18.147.201])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4D9nNy6sn1z67Xxf;
+        Wed,  6 Jan 2021 19:35:46 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml713-chm.china.huawei.com (10.206.15.32) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Wed, 6 Jan 2021 12:39:25 +0100
+Received: from [10.210.170.66] (10.210.170.66) by
+ lhreml724-chm.china.huawei.com (10.201.108.75) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Wed, 6 Jan 2021 11:39:24 +0000
+From:   John Garry <john.garry@huawei.com>
+Subject: Re: [PATCH] blk-mq: test QUEUE_FLAG_HCTX_ACTIVE for sbitmap_shared in
+ hctx_may_queue
+To:     Ming Lei <ming.lei@redhat.com>,
+        Kashyap Desai <kashyap.desai@broadcom.com>
+CC:     Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>
+References: <20201227113458.3289082-1-ming.lei@redhat.com>
+ <f8def27f-6709-143f-9864-8bc76e4ee052@huawei.com>
+ <20210105022017.GA3594357@T590>
+ <bcbe4b32-a819-8423-1849-e9a7db7fcde8@huawei.com>
+ <20210105111850.GB3619109@T590>
+ <c4aa932f-6ede-ab58-0d66-a7d4a61010ff@huawei.com>
+ <20210106012839.GA3821988@T590>
+Message-ID: <5430c277-92ab-b24d-6479-2e8c16b0c667@huawei.com>
+Date:   Wed, 6 Jan 2021 11:38:22 +0000
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
+MIME-Version: 1.0
+In-Reply-To: <20210106012839.GA3821988@T590>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.210.170.66]
+X-ClientProxiedBy: lhreml718-chm.china.huawei.com (10.201.108.69) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Chunguang Xu <brookxu@tencent.com>
+On 06/01/2021 01:28, Ming Lei wrote:
+>>> How many LUNs are involved in above test with 260 depth?
+>> For me, there was 12 SAS SSDs; for convenience here is the cover letter with
+>> details:
+>> https://lore.kernel.org/linux-block/1597850436-116171-1-git-send-email-john.garry@huawei.com/
+>>
+>> IIRC, for megaraid sas, Kashyap used many more LUNs for testing (64) and
+>> high fio depth (128) but did not reduce .can_queue, topic originally raised
+>> here:
+>> https://lore.kernel.org/linux-block/29f8062c1fccace73c45252073232917@mail.gmail.com/
+> OK, in both tests, nr_luns are big enough wrt. 260 depth. Maybe that is
+> why very low IOPS is observed in 'Final(hosttag=1)' with 260 depth.
+> 
+> I'd suggest to run your previous test again after applying this patch,
+> and see if difference can be observed.
 
-Compared to direct pointer traversal, introducing a macro
-will make the code more concise. But the introduction of
-macros will make rq_qos_xxx() produce a redundant judgment,
-usually this may not be a big problem.
+Hi Ming,
 
-Signed-off-by: Chunguang Xu <brookxu@tencent.com>
----
- block/blk-rq-qos.c | 45 ++++++++++++++++++---------------------------
- block/blk-rq-qos.h | 11 +++++++++--
- 2 files changed, 27 insertions(+), 29 deletions(-)
+I tested and didn't see a noticeable difference with the fix when using 
+the reducing tag queue depth. I got ~500K IOPs with tag queue depth of 
+260, as opposed to 2M with full tag queue depth. However I was doubtful 
+on this test method before. Regardless, your change and this feature 
+still look proper.
 
-diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
-index 6564606..2c21a49 100644
---- a/block/blk-rq-qos.c
-+++ b/block/blk-rq-qos.c
-@@ -31,83 +31,74 @@ bool rq_wait_inc_below(struct rq_wait *rq_wait, unsigned int limit)
- 
- void __rq_qos_cleanup(struct rq_qos *rqos, struct bio *bio)
- {
--	do {
-+	for_each_rq_qos(rqos) {
- 		if (rqos->ops->cleanup)
- 			rqos->ops->cleanup(rqos, bio);
--		rqos = rqos->next;
--	} while (rqos);
-+	}
- }
- 
- void __rq_qos_done(struct rq_qos *rqos, struct request *rq)
- {
--	do {
-+	for_each_rq_qos(rqos) {
- 		if (rqos->ops->done)
- 			rqos->ops->done(rqos, rq);
--		rqos = rqos->next;
--	} while (rqos);
-+	}
- }
- 
- void __rq_qos_issue(struct rq_qos *rqos, struct request *rq)
- {
--	do {
-+	for_each_rq_qos(rqos) {
- 		if (rqos->ops->issue)
- 			rqos->ops->issue(rqos, rq);
--		rqos = rqos->next;
--	} while (rqos);
-+	}
- }
- 
- void __rq_qos_requeue(struct rq_qos *rqos, struct request *rq)
- {
--	do {
-+	for_each_rq_qos(rqos) {
- 		if (rqos->ops->requeue)
- 			rqos->ops->requeue(rqos, rq);
--		rqos = rqos->next;
--	} while (rqos);
-+	}
- }
- 
- void __rq_qos_throttle(struct rq_qos *rqos, struct bio *bio)
- {
--	do {
-+	for_each_rq_qos(rqos) {
- 		if (rqos->ops->throttle)
- 			rqos->ops->throttle(rqos, bio);
--		rqos = rqos->next;
--	} while (rqos);
-+	}
- }
- 
- void __rq_qos_track(struct rq_qos *rqos, struct request *rq, struct bio *bio)
- {
--	do {
-+	for_each_rq_qos(rqos) {
- 		if (rqos->ops->track)
- 			rqos->ops->track(rqos, rq, bio);
--		rqos = rqos->next;
--	} while (rqos);
-+	}
- }
- 
- void __rq_qos_merge(struct rq_qos *rqos, struct request *rq, struct bio *bio)
- {
--	do {
-+	for_each_rq_qos(rqos) {
- 		if (rqos->ops->merge)
- 			rqos->ops->merge(rqos, rq, bio);
--		rqos = rqos->next;
--	} while (rqos);
-+	}
- }
- 
- void __rq_qos_done_bio(struct rq_qos *rqos, struct bio *bio)
- {
--	do {
-+	for_each_rq_qos(rqos) {
- 		if (rqos->ops->done_bio)
- 			rqos->ops->done_bio(rqos, bio);
--		rqos = rqos->next;
--	} while (rqos);
-+	}
- }
- 
- void __rq_qos_queue_depth_changed(struct rq_qos *rqos)
- {
--	do {
-+	for_each_rq_qos(rqos) {
- 		if (rqos->ops->queue_depth_changed)
- 			rqos->ops->queue_depth_changed(rqos);
--		rqos = rqos->next;
--	} while (rqos);
-+	}
- }
- 
- /*
-diff --git a/block/blk-rq-qos.h b/block/blk-rq-qos.h
-index 2bc43e9..bfa72a5 100644
---- a/block/blk-rq-qos.h
-+++ b/block/blk-rq-qos.h
-@@ -57,11 +57,18 @@ struct rq_depth {
- 	unsigned int default_depth;
- };
- 
-+/*
-+ * for_each_rq_qos() allows you to iterate on each rqos
-+ */
-+#define for_each_rq_qos(rqos) \
-+	for (; rqos; rqos = rqos->next)
-+
- static inline struct rq_qos *rq_qos_id(struct request_queue *q,
- 				       enum rq_qos_id id)
- {
--	struct rq_qos *rqos;
--	for (rqos = q->rq_qos; rqos; rqos = rqos->next) {
-+	struct rq_qos *rqos = q->rq_qos;
-+
-+	for_each_rq_qos(rqos) {
- 		if (rqos->id == id)
- 			break;
- 	}
--- 
-1.8.3.1
+@Kashyap, it would be great if you guys could test this also on that 
+same setup you described previously:
 
+https://lore.kernel.org/linux-block/29f8062c1fccace73c45252073232917@mail.gmail.com/
+
+Thanks,
+John
