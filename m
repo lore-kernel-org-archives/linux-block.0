@@ -2,84 +2,51 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6E24C433E9
-	for <linux-block@archiver.kernel.org>; Wed,  6 Jan 2021 09:29:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A0C7C433E9
+	for <linux-block@archiver.kernel.org>; Wed,  6 Jan 2021 10:25:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6F39723102
-	for <linux-block@archiver.kernel.org>; Wed,  6 Jan 2021 09:29:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 454932311B
+	for <linux-block@archiver.kernel.org>; Wed,  6 Jan 2021 10:25:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726512AbhAFJ3t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 Jan 2021 04:29:49 -0500
-Received: from ozlabs.ru ([107.174.27.60]:48286 "EHLO ozlabs.ru"
+        id S1726422AbhAFKZR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 Jan 2021 05:25:17 -0500
+Received: from mx2.suse.de ([195.135.220.15]:54026 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726249AbhAFJ3s (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 6 Jan 2021 04:29:48 -0500
-Received: from fstn1-p1.ozlabs.ibm.com (localhost [IPv6:::1])
-        by ozlabs.ru (Postfix) with ESMTP id 6AD7CAE80203;
-        Wed,  6 Jan 2021 04:29:03 -0500 (EST)
-From:   Alexey Kardashevskiy <aik@ozlabs.ru>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Alexey Kardashevskiy <aik@ozlabs.ru>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hannes Reinecke <hare@suse.de>, Jan Kara <jack@suse.cz>,
-        Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [RFC PATCH kernel] block: initialize block_device::bd_bdi for bdev_cache
-Date:   Wed,  6 Jan 2021 20:29:00 +1100
-Message-Id: <20210106092900.26595-1-aik@ozlabs.ru>
-X-Mailer: git-send-email 2.17.1
+        id S1726051AbhAFKZQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 6 Jan 2021 05:25:16 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 10DE7AD29;
+        Wed,  6 Jan 2021 10:24:35 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id C3E3B1E0812; Wed,  6 Jan 2021 11:24:34 +0100 (CET)
+From:   Jan Kara <jack@suse.cz>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     <linux-block@vger.kernel.org>, Ming Lei <ming.lei@redhat.com>,
+        Jan Kara <jack@suse.cz>
+Subject: [PATCH 0/2 v2] blk-mq: Improve performance of non-mq IO schedulers with multiple HW queues
+Date:   Wed,  6 Jan 2021 11:24:26 +0100
+Message-Id: <20210106102428.551-1-jack@suse.cz>
+X-Mailer: git-send-email 2.26.2
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This is a workaround to fix a null derefence crash:
+Hello!
 
-[c00000000b01f840] c00000000b01f880 (unreliable)
-[c00000000b01f880] c000000000769a3c bdev_evict_inode+0x21c/0x370
-[c00000000b01f8c0] c00000000070bacc evict+0x11c/0x230
-[c00000000b01f900] c00000000070c138 iput+0x2a8/0x4a0
-[c00000000b01f970] c0000000006ff030 dentry_unlink_inode+0x220/0x250
-[c00000000b01f9b0] c0000000007001c0 __dentry_kill+0x190/0x320
-[c00000000b01fa00] c000000000701fb8 dput+0x5e8/0x860
-[c00000000b01fa80] c000000000705848 shrink_dcache_for_umount+0x58/0x100
-[c00000000b01fb00] c0000000006cf864 generic_shutdown_super+0x54/0x200
-[c00000000b01fb80] c0000000006cfd48 kill_anon_super+0x38/0x60
-[c00000000b01fbc0] c0000000006d12cc deactivate_locked_super+0xbc/0x110
-[c00000000b01fbf0] c0000000006d13bc deactivate_super+0x9c/0xc0
-[c00000000b01fc20] c00000000071a340 cleanup_mnt+0x1b0/0x250
-[c00000000b01fc80] c000000000278fa8 task_work_run+0xf8/0x180
-[c00000000b01fcd0] c00000000002b4ac do_notify_resume+0x4dc/0x5d0
-[c00000000b01fda0] c00000000004ba0c syscall_exit_prepare+0x28c/0x370
-[c00000000b01fe10] c00000000000e06c system_call_common+0xfc/0x27c
---- Exception: c00 (System Call) at 0000000010034890
+This patch series aims to fix a regression we've noticed on our test grid when
+support for multiple HW queues in megaraid_sas driver was added during the 5.10
+cycle (103fbf8e4020 scsi: megaraid_sas: Added support for shared host tagset
+for cpuhotplug). The commit was reverted in the end for other reasons but I
+believe the fundamental problem still exists for any other similar setup. The
+problem manifests when the storage card supports multiple hardware queues
+however storage behind it is slow (single rotating disk in our case) and so
+using IO scheduler such as BFQ is desirable. See the second patch for details.
 
-Is this fixed properly already somewhere? Thanks,
-
-Fixes: e6cb53827ed6 ("block: initialize struct block_device in bdev_alloc")
----
- fs/block_dev.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 3e5b02f6606c..86fdc28d565e 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -792,8 +792,10 @@ static void bdev_free_inode(struct inode *inode)
- static void init_once(void *data)
- {
- 	struct bdev_inode *ei = data;
-+	struct block_device *bdev = &ei->bdev;
- 
- 	inode_init_once(&ei->vfs_inode);
-+	bdev->bd_bdi = &noop_backing_dev_info;
- }
- 
- static void bdev_evict_inode(struct inode *inode)
--- 
-2.17.1
-
+								Honza
