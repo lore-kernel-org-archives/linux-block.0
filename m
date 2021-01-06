@@ -2,150 +2,118 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C453EC4332D
-	for <linux-block@archiver.kernel.org>; Wed,  6 Jan 2021 10:25:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5FB3C433E0
+	for <linux-block@archiver.kernel.org>; Wed,  6 Jan 2021 10:42:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9AD5C2310D
-	for <linux-block@archiver.kernel.org>; Wed,  6 Jan 2021 10:25:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5EB9B2310F
+	for <linux-block@archiver.kernel.org>; Wed,  6 Jan 2021 10:42:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726436AbhAFKZS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 Jan 2021 05:25:18 -0500
-Received: from mx2.suse.de ([195.135.220.15]:54028 "EHLO mx2.suse.de"
+        id S1726063AbhAFKlt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 Jan 2021 05:41:49 -0500
+Received: from mx2.suse.de ([195.135.220.15]:33850 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726405AbhAFKZQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 6 Jan 2021 05:25:16 -0500
+        id S1725868AbhAFKls (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 6 Jan 2021 05:41:48 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 1153DB7A7;
-        Wed,  6 Jan 2021 10:24:35 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id C29DDACAF;
+        Wed,  6 Jan 2021 10:41:06 +0000 (UTC)
 Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id C5B5F1E0802; Wed,  6 Jan 2021 11:24:34 +0100 (CET)
+        id 78CB61E0812; Wed,  6 Jan 2021 11:41:06 +0100 (CET)
+Date:   Wed, 6 Jan 2021 11:41:06 +0100
 From:   Jan Kara <jack@suse.cz>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     <linux-block@vger.kernel.org>, Ming Lei <ming.lei@redhat.com>,
-        Jan Kara <jack@suse.cz>
-Subject: [PATCH 1/2] Revert "blk-mq, elevator: Count requests per hctx to improve performance"
-Date:   Wed,  6 Jan 2021 11:24:27 +0100
-Message-Id: <20210106102428.551-2-jack@suse.cz>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20210106102428.551-1-jack@suse.cz>
-References: <20210106102428.551-1-jack@suse.cz>
+To:     Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hannes Reinecke <hare@suse.de>, Jan Kara <jack@suse.cz>,
+        Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH kernel] block: initialize block_device::bd_bdi for
+ bdev_cache
+Message-ID: <20210106104106.GA29271@quack2.suse.cz>
+References: <20210106092900.26595-1-aik@ozlabs.ru>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210106092900.26595-1-aik@ozlabs.ru>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This reverts commit b445547ec1bbd3e7bf4b1c142550942f70527d95.
+On Wed 06-01-21 20:29:00, Alexey Kardashevskiy wrote:
+> This is a workaround to fix a null derefence crash:
+> 
+> [c00000000b01f840] c00000000b01f880 (unreliable)
+> [c00000000b01f880] c000000000769a3c bdev_evict_inode+0x21c/0x370
+> [c00000000b01f8c0] c00000000070bacc evict+0x11c/0x230
+> [c00000000b01f900] c00000000070c138 iput+0x2a8/0x4a0
+> [c00000000b01f970] c0000000006ff030 dentry_unlink_inode+0x220/0x250
+> [c00000000b01f9b0] c0000000007001c0 __dentry_kill+0x190/0x320
+> [c00000000b01fa00] c000000000701fb8 dput+0x5e8/0x860
+> [c00000000b01fa80] c000000000705848 shrink_dcache_for_umount+0x58/0x100
+> [c00000000b01fb00] c0000000006cf864 generic_shutdown_super+0x54/0x200
+> [c00000000b01fb80] c0000000006cfd48 kill_anon_super+0x38/0x60
+> [c00000000b01fbc0] c0000000006d12cc deactivate_locked_super+0xbc/0x110
+> [c00000000b01fbf0] c0000000006d13bc deactivate_super+0x9c/0xc0
+> [c00000000b01fc20] c00000000071a340 cleanup_mnt+0x1b0/0x250
+> [c00000000b01fc80] c000000000278fa8 task_work_run+0xf8/0x180
+> [c00000000b01fcd0] c00000000002b4ac do_notify_resume+0x4dc/0x5d0
+> [c00000000b01fda0] c00000000004ba0c syscall_exit_prepare+0x28c/0x370
+> [c00000000b01fe10] c00000000000e06c system_call_common+0xfc/0x27c
+> --- Exception: c00 (System Call) at 0000000010034890
+> 
+> Is this fixed properly already somewhere? Thanks,
+> 
+> Fixes: e6cb53827ed6 ("block: initialize struct block_device in bdev_alloc")
 
-Since both mq-deadline and BFQ completely ignore hctx they are passed to
-their dispatch function and dispatch whatever request they deem fit
-checking whether any request for a particular hctx is queued is just
-pointless since we'll very likely get a request from a different hctx
-anyway. In the following commit we'll deal with lock contention in these
-IO schedulers in presence of multiple HW queues in a different way.
+I don't think it's fixed anywhere and I've seen the syzbot report and I was
+wondering how this can happen when bdev_alloc() initializes bdev->bd_bdi
+and it also wasn't clear to me whether bd_bdi is really the only field that
+is problematic - if we can get to bdev_evict_inode() without going through
+bdev_alloc(), we are probably missing initialization of other fields in
+that place as well...
 
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- block/bfq-iosched.c    | 5 -----
- block/blk-mq.c         | 1 -
- block/mq-deadline.c    | 6 ------
- include/linux/blk-mq.h | 4 ----
- 4 files changed, 16 deletions(-)
+But now I've realized that probably the inode is a root inode for bdev
+superblock which is allocated by VFS through new_inode() and thus doesn't
+undergo the initialization in bdev_alloc(). And AFAICT the root inode on
+bdev superblock can get only to bdev_evict_inode() and bdev_free_inode().
+Looking at bdev_evict_inode() the only thing that's used there from struct
+block_device is really bd_bdi. bdev_free_inode() will also access
+bdev->bd_stats and bdev->bd_meta_info. So we need to at least initialize
+these to NULL as well. IMO the most logical place for all these
+initializations is in bdev_alloc_inode()...
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 9e81d1052091..a99dfaa75a8c 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -4640,9 +4640,6 @@ static bool bfq_has_work(struct blk_mq_hw_ctx *hctx)
- {
- 	struct bfq_data *bfqd = hctx->queue->elevator->elevator_data;
- 
--	if (!atomic_read(&hctx->elevator_queued))
--		return false;
--
- 	/*
- 	 * Avoiding lock: a race on bfqd->busy_queues should cause at
- 	 * most a call to dispatch for nothing
-@@ -5557,7 +5554,6 @@ static void bfq_insert_requests(struct blk_mq_hw_ctx *hctx,
- 		rq = list_first_entry(list, struct request, queuelist);
- 		list_del_init(&rq->queuelist);
- 		bfq_insert_request(hctx, rq, at_head);
--		atomic_inc(&hctx->elevator_queued);
- 	}
- }
- 
-@@ -5925,7 +5921,6 @@ static void bfq_finish_requeue_request(struct request *rq)
- 
- 		bfq_completed_request(bfqq, bfqd);
- 		bfq_finish_requeue_request_body(bfqq);
--		atomic_dec(&rq->mq_hctx->elevator_queued);
- 
- 		spin_unlock_irqrestore(&bfqd->lock, flags);
- 	} else {
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index f285a9123a8b..57f3482b2c26 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2653,7 +2653,6 @@ blk_mq_alloc_hctx(struct request_queue *q, struct blk_mq_tag_set *set,
- 		goto free_hctx;
- 
- 	atomic_set(&hctx->nr_active, 0);
--	atomic_set(&hctx->elevator_queued, 0);
- 	if (node == NUMA_NO_NODE)
- 		node = set->numa_node;
- 	hctx->numa_node = node;
-diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-index 800ac902809b..b57470e154c8 100644
---- a/block/mq-deadline.c
-+++ b/block/mq-deadline.c
-@@ -386,8 +386,6 @@ static struct request *dd_dispatch_request(struct blk_mq_hw_ctx *hctx)
- 	spin_lock(&dd->lock);
- 	rq = __dd_dispatch_request(dd);
- 	spin_unlock(&dd->lock);
--	if (rq)
--		atomic_dec(&rq->mq_hctx->elevator_queued);
- 
- 	return rq;
- }
-@@ -535,7 +533,6 @@ static void dd_insert_requests(struct blk_mq_hw_ctx *hctx,
- 		rq = list_first_entry(list, struct request, queuelist);
- 		list_del_init(&rq->queuelist);
- 		dd_insert_request(hctx, rq, at_head);
--		atomic_inc(&hctx->elevator_queued);
- 	}
- 	spin_unlock(&dd->lock);
- }
-@@ -582,9 +579,6 @@ static bool dd_has_work(struct blk_mq_hw_ctx *hctx)
- {
- 	struct deadline_data *dd = hctx->queue->elevator->elevator_data;
- 
--	if (!atomic_read(&hctx->elevator_queued))
--		return false;
--
- 	return !list_empty_careful(&dd->dispatch) ||
- 		!list_empty_careful(&dd->fifo_list[0]) ||
- 		!list_empty_careful(&dd->fifo_list[1]);
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index d705b174d346..b4b9604bbfd7 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -140,10 +140,6 @@ struct blk_mq_hw_ctx {
- 	 * shared across request queues.
- 	 */
- 	atomic_t		nr_active;
--	/**
--	 * @elevator_queued: Number of queued requests on hctx.
--	 */
--	atomic_t                elevator_queued;
- 
- 	/** @cpuhp_online: List to store request if CPU is going to die */
- 	struct hlist_node	cpuhp_online;
+								Honza
+
+> ---
+>  fs/block_dev.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/fs/block_dev.c b/fs/block_dev.c
+> index 3e5b02f6606c..86fdc28d565e 100644
+> --- a/fs/block_dev.c
+> +++ b/fs/block_dev.c
+> @@ -792,8 +792,10 @@ static void bdev_free_inode(struct inode *inode)
+>  static void init_once(void *data)
+>  {
+>  	struct bdev_inode *ei = data;
+> +	struct block_device *bdev = &ei->bdev;
+>  
+>  	inode_init_once(&ei->vfs_inode);
+> +	bdev->bd_bdi = &noop_backing_dev_info;
+>  }
+>  
+>  static void bdev_evict_inode(struct inode *inode)
+> -- 
+> 2.17.1
+> 
 -- 
-2.26.2
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
