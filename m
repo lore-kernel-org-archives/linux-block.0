@@ -2,94 +2,179 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DATE_IN_PAST_06_12,
+	DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0476BC433E0
-	for <linux-block@archiver.kernel.org>; Thu,  7 Jan 2021 03:32:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FC27C433DB
+	for <linux-block@archiver.kernel.org>; Thu,  7 Jan 2021 05:02:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BB4B922D01
-	for <linux-block@archiver.kernel.org>; Thu,  7 Jan 2021 03:32:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EB54520709
+	for <linux-block@archiver.kernel.org>; Thu,  7 Jan 2021 05:02:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726829AbhAGDcw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 Jan 2021 22:32:52 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:9963 "EHLO
-        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726641AbhAGDcw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Jan 2021 22:32:52 -0500
-Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.59])
-        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4DBBbM0ddHzj3T3;
-        Thu,  7 Jan 2021 11:31:11 +0800 (CST)
-Received: from huawei.com (10.29.88.127) by DGGEMS403-HUB.china.huawei.com
- (10.3.19.203) with Microsoft SMTP Server id 14.3.498.0; Thu, 7 Jan 2021
- 11:31:51 +0800
-From:   Chao Leng <lengchao@huawei.com>
-To:     <linux-nvme@lists.infradead.org>
-CC:     <kbusch@kernel.org>, <axboe@fb.com>, <hch@lst.de>,
-        <sagi@grimberg.me>, <linux-block@vger.kernel.org>,
-        <axboe@kernel.dk>
-Subject: [PATCH v2 2/6] nvme-core: introduce complete failed request
-Date:   Thu, 7 Jan 2021 11:31:45 +0800
-Message-ID: <20210107033149.15701-3-lengchao@huawei.com>
-X-Mailer: git-send-email 2.16.4
-In-Reply-To: <20210107033149.15701-1-lengchao@huawei.com>
-References: <20210107033149.15701-1-lengchao@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.29.88.127]
-X-CFilter-Loop: Reflected
+        id S1725983AbhAGFCa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 7 Jan 2021 00:02:30 -0500
+Received: from relay.smtp-ext.broadcom.com ([192.19.221.30]:53686 "EHLO
+        relay.smtp-ext.broadcom.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725970AbhAGFCa (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 7 Jan 2021 00:02:30 -0500
+Received: from localhost.localdomain (unknown [10.157.2.20])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by relay.smtp-ext.broadcom.com (Postfix) with ESMTPS id 1A17982D14;
+        Wed,  6 Jan 2021 20:53:27 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 relay.smtp-ext.broadcom.com 1A17982D14
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=broadcom.com;
+        s=dkimrelay; t=1609995207;
+        bh=7uAtI9QJ0ZsNStpVUS7YAzmJXbQtkikwyXbaqZhYOB0=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=cPpyZdwHQ8aOgg6h37RDdeQhiwPLI+lovSThR6Srxv9IWC7XoLy0wecK1G7rinFuL
+         hDtZXeaj+X/2pbvv1NCKzl9lwhQYVz4Q3hAmKgEWr4nqd1wP/wXiVgJvLpo2vx9LGa
+         mSOQ3MPDEMpjWyJh8RFDmjt1gys4aEZBKde1RMCc=
+From:   Muneendra <muneendra.kumar@broadcom.com>
+To:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        tj@kernel.org, linux-nvme@lists.infradead.org, hare@suse.de
+Cc:     jsmart2021@gmail.com, emilne@redhat.com, mkumar@redhat.com,
+        Gaurav Srivastava <gaurav.srivastava@broadcom.com>
+Subject: [PATCH v7 12/16] lpfc: vmid: Appends the vmid in the wqe before sending
+Date:   Thu,  7 Jan 2021 03:30:26 +0530
+Message-Id: <1609970430-19084-13-git-send-email-muneendra.kumar@broadcom.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1609970430-19084-1-git-send-email-muneendra.kumar@broadcom.com>
+References: <1609970430-19084-1-git-send-email-muneendra.kumar@broadcom.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When a request is queued failed, if the fail status is not
-BLK_STS_RESOURCE, BLK_STS_DEV_RESOURCE, BLK_STS_ZONE_RESOURCE,
-the request is need to complete with nvme_complete_rq in queue_rq.
-So introduce nvme_try_complete_failed_req.
-The request is needed to complete with NVME_SC_HOST_PATH_ERROR in
-nvmf_fail_nonready_command and queue_rq.
-So introduce nvme_complete_failed_req.
-For details, see the subsequent patches.
+From: Gaurav Srivastava <gaurav.srivastava@broadcom.com>
 
-Signed-off-by: Chao Leng <lengchao@huawei.com>
+This patch adds the vmid in wqe before sending out the request.
+The type of vmid depends on the configured type and is checked before
+being appended.
+
+Signed-off-by: Gaurav Srivastava  <gaurav.srivastava@broadcom.com>
+Signed-off-by: James Smart <jsmart2021@gmail.com>
+
 ---
- drivers/nvme/host/nvme.h | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+v7:
+No change
 
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index bfcedfa4b057..fc4eefdfbb34 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -649,6 +649,27 @@ void nvme_put_ns_from_disk(struct nvme_ns_head *head, int idx);
- extern const struct attribute_group *nvme_ns_id_attr_groups[];
- extern const struct block_device_operations nvme_ns_head_ops;
+v6:
+No change
+
+v5:
+Modified the comments
+
+v4:
+No change
+
+v3:
+No change
+
+v2:
+Ported the patch on top of 5.10/scsi-queue
+---
+ drivers/scsi/lpfc/lpfc_sli.c | 56 +++++++++++++++++++++++++++++++++++-
+ 1 file changed, 55 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/scsi/lpfc/lpfc_sli.c b/drivers/scsi/lpfc/lpfc_sli.c
+index f9b6e32db618..a63371e9feaa 100644
+--- a/drivers/scsi/lpfc/lpfc_sli.c
++++ b/drivers/scsi/lpfc/lpfc_sli.c
+@@ -3856,7 +3856,7 @@ lpfc_sli_sp_handle_rspiocb(struct lpfc_hba *phba, struct lpfc_sli_ring *pring,
  
-+static inline void nvme_complete_failed_req(struct request *req)
-+{
-+	nvme_req(req)->status = NVME_SC_HOST_PATH_ERROR;
-+	blk_mq_set_request_complete(req);
-+	nvme_complete_rq(req);
-+}
+ 		if (irsp->ulpStatus) {
+ 			/* Rsp ring <ringno> error: IOCB */
+-			lpfc_printf_log(phba, KERN_WARNING, LOG_SLI,
++			lpfc_printf_log(phba, KERN_ERR, LOG_SLI,
+ 					"0328 Rsp Ring %d error: "
+ 					"IOCB Data: "
+ 					"x%x x%x x%x x%x "
+@@ -9762,6 +9762,8 @@ lpfc_sli4_iocb2wqe(struct lpfc_hba *phba, struct lpfc_iocbq *iocbq,
+ 				*pcmd == ELS_CMD_RSCN_XMT ||
+ 				*pcmd == ELS_CMD_FDISC ||
+ 				*pcmd == ELS_CMD_LOGO ||
++				*pcmd == ELS_CMD_QFPA ||
++				*pcmd == ELS_CMD_UVEM ||
+ 				*pcmd == ELS_CMD_PLOGI)) {
+ 				bf_set(els_req64_sp, &wqe->els_req, 1);
+ 				bf_set(els_req64_sid, &wqe->els_req,
+@@ -9893,6 +9895,24 @@ lpfc_sli4_iocb2wqe(struct lpfc_hba *phba, struct lpfc_iocbq *iocbq,
+ 			ptr = &wqe->words[22];
+ 			memcpy(ptr, fcp_cmnd, sizeof(struct fcp_cmnd));
+ 		}
 +
-+static inline blk_status_t nvme_try_complete_failed_req(struct request *req,
-+							blk_status_t ret)
-+{
-+	switch (ret) {
-+	case BLK_STS_RESOURCE:
-+	case BLK_STS_DEV_RESOURCE:
-+	case BLK_STS_ZONE_RESOURCE:
-+		return ret;
-+	default:
-+		nvme_complete_failed_req(req);
-+		return BLK_STS_OK;
-+	}
-+}
++		/* add the VMID tags as per switch response */
++		if (iocbq->iocb_flag & LPFC_IO_VMID) {
++			union lpfc_wqe128 *wqe128;
 +
- #ifdef CONFIG_NVME_MULTIPATH
- static inline bool nvme_ctrl_use_ana(struct nvme_ctrl *ctrl)
- {
++			if (phba->pport->vmid_priority_tagging) {
++				bf_set(wqe_ccpe, &wqe->fcp_iwrite.wqe_com, 1);
++				bf_set(wqe_ccp, &wqe->fcp_iwrite.wqe_com,
++				       (iocbq->vmid_tag.cs_ctl_vmid));
++				/* Bit 0 must be 0 */
++			} else {
++				wqe128 = (union lpfc_wqe128 *)wqe;
++				bf_set(wqe_appid, &wqe->fcp_iwrite.wqe_com, 1);
++				bf_set(wqe_wqes, &wqe128->fcp_iwrite.wqe_com,
++				       1);
++				wqe128->words[31] = iocbq->vmid_tag.app_id;
++			}
++		}
+ 		break;
+ 	case CMD_FCP_IREAD64_CR:
+ 		/* word3 iocb=iotag wqe=payload_offset_len */
+@@ -9957,6 +9977,23 @@ lpfc_sli4_iocb2wqe(struct lpfc_hba *phba, struct lpfc_iocbq *iocbq,
+ 			ptr = &wqe->words[22];
+ 			memcpy(ptr, fcp_cmnd, sizeof(struct fcp_cmnd));
+ 		}
++
++		/* add the VMID tags as per switch response */
++		if (iocbq->iocb_flag & LPFC_IO_VMID) {
++			union lpfc_wqe128 *wqe128;
++
++			if (phba->pport->vmid_priority_tagging) {
++				bf_set(wqe_ccpe, &wqe->fcp_iread.wqe_com, 1);
++				bf_set(wqe_ccp, &wqe->fcp_iread.wqe_com,
++				       (iocbq->vmid_tag.cs_ctl_vmid));
++				/* Bit 0 must be 0 */
++			} else {
++				wqe128 = (union lpfc_wqe128 *)wqe;
++				bf_set(wqe_appid, &wqe->fcp_iread.wqe_com, 1);
++				bf_set(wqe_wqes, &wqe128->fcp_iread.wqe_com, 1);
++				wqe128->words[31] = iocbq->vmid_tag.app_id;
++			}
++		}
+ 		break;
+ 	case CMD_FCP_ICMND64_CR:
+ 		/* word3 iocb=iotag wqe=payload_offset_len */
+@@ -10014,6 +10051,23 @@ lpfc_sli4_iocb2wqe(struct lpfc_hba *phba, struct lpfc_iocbq *iocbq,
+ 			ptr = &wqe->words[22];
+ 			memcpy(ptr, fcp_cmnd, sizeof(struct fcp_cmnd));
+ 		}
++
++		/* add the VMID tags as per switch response */
++		if (iocbq->iocb_flag & LPFC_IO_VMID) {
++			union lpfc_wqe128 *wqe128;
++
++			if (phba->pport->vmid_priority_tagging) {
++				bf_set(wqe_ccpe, &wqe->fcp_icmd.wqe_com, 1);
++				bf_set(wqe_ccp, &wqe->fcp_icmd.wqe_com,
++				       (iocbq->vmid_tag.cs_ctl_vmid));
++				/* Bit 0 must be 0 */
++			} else {
++				wqe128 = (union lpfc_wqe128 *)wqe;
++				bf_set(wqe_appid, &wqe->fcp_icmd.wqe_com, 1);
++				bf_set(wqe_wqes, &wqe128->fcp_icmd.wqe_com, 1);
++				wqe128->words[31] = iocbq->vmid_tag.app_id;
++			}
++		}
+ 		break;
+ 	case CMD_GEN_REQUEST64_CR:
+ 		/* For this command calculate the xmit length of the
 -- 
-2.16.4
+2.26.2
 
