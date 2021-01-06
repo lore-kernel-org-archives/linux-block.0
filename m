@@ -2,118 +2,214 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5FB3C433E0
-	for <linux-block@archiver.kernel.org>; Wed,  6 Jan 2021 10:42:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F7FFC433E0
+	for <linux-block@archiver.kernel.org>; Wed,  6 Jan 2021 11:22:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5EB9B2310F
-	for <linux-block@archiver.kernel.org>; Wed,  6 Jan 2021 10:42:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E6A6622B45
+	for <linux-block@archiver.kernel.org>; Wed,  6 Jan 2021 11:22:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726063AbhAFKlt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 Jan 2021 05:41:49 -0500
-Received: from mx2.suse.de ([195.135.220.15]:33850 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725868AbhAFKls (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 6 Jan 2021 05:41:48 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id C29DDACAF;
-        Wed,  6 Jan 2021 10:41:06 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 78CB61E0812; Wed,  6 Jan 2021 11:41:06 +0100 (CET)
-Date:   Wed, 6 Jan 2021 11:41:06 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hannes Reinecke <hare@suse.de>, Jan Kara <jack@suse.cz>,
-        Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH kernel] block: initialize block_device::bd_bdi for
- bdev_cache
-Message-ID: <20210106104106.GA29271@quack2.suse.cz>
-References: <20210106092900.26595-1-aik@ozlabs.ru>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210106092900.26595-1-aik@ozlabs.ru>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        id S1726216AbhAFLWU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 Jan 2021 06:22:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56018 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725941AbhAFLWU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Jan 2021 06:22:20 -0500
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00F03C061357;
+        Wed,  6 Jan 2021 03:21:40 -0800 (PST)
+Received: by mail-pl1-x629.google.com with SMTP id be12so1399444plb.4;
+        Wed, 06 Jan 2021 03:21:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=sBzg1tgz32alZ9aHN5cWbJFQtT8AE3oR3feRMm8uqb4=;
+        b=rjUpIwXgwYBgFL6Td5HV5IAazmyCdHJboKVsfEUitilMhFN/NXj7J/s95LuzqsPxzg
+         mKUU+dZLeQ20rfLAsjmiykuWQgDLoSAGMF0hegflMVAZb969oU3wGQq4enI58Q/0kHjS
+         onJsKaCajoacR2bHituttW/WT1g9UdQtPkTBg5AnwMoOrtFFu8PhZhcXBFogvNH9DFQ1
+         km6i2zArd0HdC2fbLZKb66fZwDDVc/7qA24G9JG9yKY7qBuhUyzdz0cVo0yDULb3/hXV
+         uzWLNqtOHTUqj2phpaVYzOorPg/t/zjllZlKvyEy25YEROsyB1QI1xVX2TsVmyXSwL4U
+         s6jA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=sBzg1tgz32alZ9aHN5cWbJFQtT8AE3oR3feRMm8uqb4=;
+        b=jimJYDaqHzrkt+Uqqn13uUSjqMtInl3fNTzEEr1hNHhnQAh9patZg1y+rIslj3RR27
+         UBA1h91LVf/eE5hu07Bmo7ko0yg/znrMk2vmwfy49gcztN+2ov97YwoAasfnYXP/DKQf
+         Lzdclxdr0VpMLE8aNGH3ZBn3oui3lYQLQnRdmIakDYbZToktxYoFncOJdYfxTD6tTdLw
+         95dZVAr5U62R1vZbUy2+ssmb61zeF8lMxA7xqd01T9OkIoQ2KtDXI1K09FtqKf6zXtS7
+         whiaghe5ljDGXVDnUpVwmjZ4j20jbbb/XPAicJJUeo+/vPEUAh5koN3IMNagET0KZ9Gu
+         y+6Q==
+X-Gm-Message-State: AOAM53011H+KKmzUYUucM8jvBHEG1sXe8UJ5buC78peA1esi9vlNMaqw
+        FBzcx8RgiT09mtPemmxTSaL9y9I/psk=
+X-Google-Smtp-Source: ABdhPJw4ST2D9x6/ZeVz3GrOo9MUhYRwl/+5EAAwFeZdBDP66B9tfiu4w6gyGPcQWDtm7VkldWw7YA==
+X-Received: by 2002:a17:902:b588:b029:db:e1d8:1492 with SMTP id a8-20020a170902b588b02900dbe1d81492mr3983485pls.80.1609932099576;
+        Wed, 06 Jan 2021 03:21:39 -0800 (PST)
+Received: from VM-0-6-centos.localdomain ([119.28.90.140])
+        by smtp.gmail.com with ESMTPSA id p9sm2373767pfq.109.2021.01.06.03.21.38
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 06 Jan 2021 03:21:39 -0800 (PST)
+From:   Chunguang Xu <brookxu.cn@gmail.com>
+X-Google-Original-From: Chunguang Xu <brookxu@tencent.com>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] block: introduce for_each_rq_qos macro
+Date:   Wed,  6 Jan 2021 19:20:56 +0800
+Message-Id: <1609932056-26990-1-git-send-email-brookxu@tencent.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed 06-01-21 20:29:00, Alexey Kardashevskiy wrote:
-> This is a workaround to fix a null derefence crash:
-> 
-> [c00000000b01f840] c00000000b01f880 (unreliable)
-> [c00000000b01f880] c000000000769a3c bdev_evict_inode+0x21c/0x370
-> [c00000000b01f8c0] c00000000070bacc evict+0x11c/0x230
-> [c00000000b01f900] c00000000070c138 iput+0x2a8/0x4a0
-> [c00000000b01f970] c0000000006ff030 dentry_unlink_inode+0x220/0x250
-> [c00000000b01f9b0] c0000000007001c0 __dentry_kill+0x190/0x320
-> [c00000000b01fa00] c000000000701fb8 dput+0x5e8/0x860
-> [c00000000b01fa80] c000000000705848 shrink_dcache_for_umount+0x58/0x100
-> [c00000000b01fb00] c0000000006cf864 generic_shutdown_super+0x54/0x200
-> [c00000000b01fb80] c0000000006cfd48 kill_anon_super+0x38/0x60
-> [c00000000b01fbc0] c0000000006d12cc deactivate_locked_super+0xbc/0x110
-> [c00000000b01fbf0] c0000000006d13bc deactivate_super+0x9c/0xc0
-> [c00000000b01fc20] c00000000071a340 cleanup_mnt+0x1b0/0x250
-> [c00000000b01fc80] c000000000278fa8 task_work_run+0xf8/0x180
-> [c00000000b01fcd0] c00000000002b4ac do_notify_resume+0x4dc/0x5d0
-> [c00000000b01fda0] c00000000004ba0c syscall_exit_prepare+0x28c/0x370
-> [c00000000b01fe10] c00000000000e06c system_call_common+0xfc/0x27c
-> --- Exception: c00 (System Call) at 0000000010034890
-> 
-> Is this fixed properly already somewhere? Thanks,
-> 
-> Fixes: e6cb53827ed6 ("block: initialize struct block_device in bdev_alloc")
+From: Chunguang Xu <brookxu@tencent.com>
 
-I don't think it's fixed anywhere and I've seen the syzbot report and I was
-wondering how this can happen when bdev_alloc() initializes bdev->bd_bdi
-and it also wasn't clear to me whether bd_bdi is really the only field that
-is problematic - if we can get to bdev_evict_inode() without going through
-bdev_alloc(), we are probably missing initialization of other fields in
-that place as well...
+Compared to direct pointer traversal, introducing a macro
+will make the code more concise. But the introduction of
+macros will make rq_qos_xxx() produce a redundant judgment,
+usually this may not be a big problem.
 
-But now I've realized that probably the inode is a root inode for bdev
-superblock which is allocated by VFS through new_inode() and thus doesn't
-undergo the initialization in bdev_alloc(). And AFAICT the root inode on
-bdev superblock can get only to bdev_evict_inode() and bdev_free_inode().
-Looking at bdev_evict_inode() the only thing that's used there from struct
-block_device is really bd_bdi. bdev_free_inode() will also access
-bdev->bd_stats and bdev->bd_meta_info. So we need to at least initialize
-these to NULL as well. IMO the most logical place for all these
-initializations is in bdev_alloc_inode()...
+Signed-off-by: Chunguang Xu <brookxu@tencent.com>
+---
+ block/blk-rq-qos.c | 45 ++++++++++++++++++---------------------------
+ block/blk-rq-qos.h | 11 +++++++++--
+ 2 files changed, 27 insertions(+), 29 deletions(-)
 
-								Honza
-
-> ---
->  fs/block_dev.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/fs/block_dev.c b/fs/block_dev.c
-> index 3e5b02f6606c..86fdc28d565e 100644
-> --- a/fs/block_dev.c
-> +++ b/fs/block_dev.c
-> @@ -792,8 +792,10 @@ static void bdev_free_inode(struct inode *inode)
->  static void init_once(void *data)
->  {
->  	struct bdev_inode *ei = data;
-> +	struct block_device *bdev = &ei->bdev;
->  
->  	inode_init_once(&ei->vfs_inode);
-> +	bdev->bd_bdi = &noop_backing_dev_info;
->  }
->  
->  static void bdev_evict_inode(struct inode *inode)
-> -- 
-> 2.17.1
-> 
+diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
+index 6564606..2c21a49 100644
+--- a/block/blk-rq-qos.c
++++ b/block/blk-rq-qos.c
+@@ -31,83 +31,74 @@ bool rq_wait_inc_below(struct rq_wait *rq_wait, unsigned int limit)
+ 
+ void __rq_qos_cleanup(struct rq_qos *rqos, struct bio *bio)
+ {
+-	do {
++	for_each_rq_qos(rqos) {
+ 		if (rqos->ops->cleanup)
+ 			rqos->ops->cleanup(rqos, bio);
+-		rqos = rqos->next;
+-	} while (rqos);
++	}
+ }
+ 
+ void __rq_qos_done(struct rq_qos *rqos, struct request *rq)
+ {
+-	do {
++	for_each_rq_qos(rqos) {
+ 		if (rqos->ops->done)
+ 			rqos->ops->done(rqos, rq);
+-		rqos = rqos->next;
+-	} while (rqos);
++	}
+ }
+ 
+ void __rq_qos_issue(struct rq_qos *rqos, struct request *rq)
+ {
+-	do {
++	for_each_rq_qos(rqos) {
+ 		if (rqos->ops->issue)
+ 			rqos->ops->issue(rqos, rq);
+-		rqos = rqos->next;
+-	} while (rqos);
++	}
+ }
+ 
+ void __rq_qos_requeue(struct rq_qos *rqos, struct request *rq)
+ {
+-	do {
++	for_each_rq_qos(rqos) {
+ 		if (rqos->ops->requeue)
+ 			rqos->ops->requeue(rqos, rq);
+-		rqos = rqos->next;
+-	} while (rqos);
++	}
+ }
+ 
+ void __rq_qos_throttle(struct rq_qos *rqos, struct bio *bio)
+ {
+-	do {
++	for_each_rq_qos(rqos) {
+ 		if (rqos->ops->throttle)
+ 			rqos->ops->throttle(rqos, bio);
+-		rqos = rqos->next;
+-	} while (rqos);
++	}
+ }
+ 
+ void __rq_qos_track(struct rq_qos *rqos, struct request *rq, struct bio *bio)
+ {
+-	do {
++	for_each_rq_qos(rqos) {
+ 		if (rqos->ops->track)
+ 			rqos->ops->track(rqos, rq, bio);
+-		rqos = rqos->next;
+-	} while (rqos);
++	}
+ }
+ 
+ void __rq_qos_merge(struct rq_qos *rqos, struct request *rq, struct bio *bio)
+ {
+-	do {
++	for_each_rq_qos(rqos) {
+ 		if (rqos->ops->merge)
+ 			rqos->ops->merge(rqos, rq, bio);
+-		rqos = rqos->next;
+-	} while (rqos);
++	}
+ }
+ 
+ void __rq_qos_done_bio(struct rq_qos *rqos, struct bio *bio)
+ {
+-	do {
++	for_each_rq_qos(rqos) {
+ 		if (rqos->ops->done_bio)
+ 			rqos->ops->done_bio(rqos, bio);
+-		rqos = rqos->next;
+-	} while (rqos);
++	}
+ }
+ 
+ void __rq_qos_queue_depth_changed(struct rq_qos *rqos)
+ {
+-	do {
++	for_each_rq_qos(rqos) {
+ 		if (rqos->ops->queue_depth_changed)
+ 			rqos->ops->queue_depth_changed(rqos);
+-		rqos = rqos->next;
+-	} while (rqos);
++	}
+ }
+ 
+ /*
+diff --git a/block/blk-rq-qos.h b/block/blk-rq-qos.h
+index 2bc43e9..bfa72a5 100644
+--- a/block/blk-rq-qos.h
++++ b/block/blk-rq-qos.h
+@@ -57,11 +57,18 @@ struct rq_depth {
+ 	unsigned int default_depth;
+ };
+ 
++/*
++ * for_each_rq_qos() allows you to iterate on each rqos
++ */
++#define for_each_rq_qos(rqos) \
++	for (; rqos; rqos = rqos->next)
++
+ static inline struct rq_qos *rq_qos_id(struct request_queue *q,
+ 				       enum rq_qos_id id)
+ {
+-	struct rq_qos *rqos;
+-	for (rqos = q->rq_qos; rqos; rqos = rqos->next) {
++	struct rq_qos *rqos = q->rq_qos;
++
++	for_each_rq_qos(rqos) {
+ 		if (rqos->id == id)
+ 			break;
+ 	}
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+1.8.3.1
+
