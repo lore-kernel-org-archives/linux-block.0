@@ -8,40 +8,40 @@ X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DATE_IN_PAST_06_12,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFD4FC433E0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C68A8C433DB
 	for <linux-block@archiver.kernel.org>; Thu,  7 Jan 2021 05:03:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CFBCF20702
+	by mail.kernel.org (Postfix) with ESMTP id 9FDCB20702
 	for <linux-block@archiver.kernel.org>; Thu,  7 Jan 2021 05:03:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726467AbhAGFDf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1726456AbhAGFDf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Thu, 7 Jan 2021 00:03:35 -0500
-Received: from relay.smtp-ext.broadcom.com ([192.19.221.30]:53880 "EHLO
+Received: from relay.smtp-ext.broadcom.com ([192.19.221.30]:53870 "EHLO
         relay.smtp-ext.broadcom.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726099AbhAGFDf (ORCPT
+        by vger.kernel.org with ESMTP id S1725893AbhAGFDe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 7 Jan 2021 00:03:35 -0500
+        Thu, 7 Jan 2021 00:03:34 -0500
 Received: from localhost.localdomain (unknown [10.157.2.20])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by relay.smtp-ext.broadcom.com (Postfix) with ESMTPS id C40FC82D16;
-        Wed,  6 Jan 2021 20:53:27 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 relay.smtp-ext.broadcom.com C40FC82D16
+        by relay.smtp-ext.broadcom.com (Postfix) with ESMTPS id E714E82CF7;
+        Wed,  6 Jan 2021 20:53:20 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 relay.smtp-ext.broadcom.com E714E82CF7
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=broadcom.com;
-        s=dkimrelay; t=1609995208;
-        bh=M9o2dEyi5XbOwuV8RlMNYhCQOjiuFjQkfRZupRSx/PA=;
+        s=dkimrelay; t=1609995201;
+        bh=IY5AZBkAuG4FpPodP70+HurCIDI/lH6gVwDnfMqfS9s=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=owguzd0BH/DGf+1o67G6RW0GMOM+dOhi8oblDQu/Y+xJY+jwtO3hcV2bTv2xXYo90
-         S5YtRjzRfR6/cm5UnzS7LhmyPVuZiSHuW1RJInb8wfXxjBcnpMYBA03fJ6aTKqM4Ei
-         CE7KgFZVta+aiwtXwLSTRdlHYFZRQOTu1RjToPQM=
+        b=F88VrBKA1qYd11uacauQQlrsyxdjzgoE8KcHpB8aZu6vR/RxGvNvnbbxVsSvmxxop
+         Be2RQTCAQ9fTicUDAacc96DyBOvHIxJYkeEU0wUBD0Ag9/9So1lyq+iQFYD4X6f/L1
+         FhFWdTpg3pUXq3lbG9mjrXFYos5TprmfZif6EIQs=
 From:   Muneendra <muneendra.kumar@broadcom.com>
 To:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
         tj@kernel.org, linux-nvme@lists.infradead.org, hare@suse.de
 Cc:     jsmart2021@gmail.com, emilne@redhat.com, mkumar@redhat.com,
-        Gaurav Srivastava <gaurav.srivastava@broadcom.com>
-Subject: [PATCH v7 13/16] lpfc: vmid: Timeout implementation for vmid
-Date:   Thu,  7 Jan 2021 03:30:27 +0530
-Message-Id: <1609970430-19084-14-git-send-email-muneendra.kumar@broadcom.com>
+        Muneendra <muneendra.kumar@broadcom.com>
+Subject: [PATCH v7 03/16] nvme: Added a newsysfs attribute appid_store
+Date:   Thu,  7 Jan 2021 03:30:17 +0530
+Message-Id: <1609970430-19084-4-git-send-email-muneendra.kumar@broadcom.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1609970430-19084-1-git-send-email-muneendra.kumar@broadcom.com>
 References: <1609970430-19084-1-git-send-email-muneendra.kumar@broadcom.com>
@@ -49,224 +49,141 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Gaurav Srivastava <gaurav.srivastava@broadcom.com>
+Added a new sysfs attribute appid_store under
+/sys/class/fc/fc_udev_device/*
 
-This patch implements the timeout functionality for the vmid. After the
-set time period of inactivity, the vmid is deregistered from the switch.
+With this new interface the user can set the application identfier
+in  the blkcg associted with cgroup id.
 
-Reported-by: kernel test robot <lkp@intel.com>
-Signed-off-by: Gaurav Srivastava  <gaurav.srivastava@broadcom.com>
-Signed-off-by: James Smart <jsmart2021@gmail.com>
+Once the application identifer has set with this interface it allows
+identification of traffic sources at an individual cgroup based
+Applications (ex:virtual machine (VM))level in both host and
+fabric infrastructure(FC).
+
+Below is the interface provided to set the app_id
+
+echo "<cgroupid>:<appid>" >> /sys/class/fc/fc_udev_device/appid_store
+echo "457E:100000109b521d27" >> /sys/class/fc/fc_udev_device/appid_store
+
+Signed-off-by: Muneendra <muneendra.kumar@broadcom.com>
 
 ---
 v7:
 No change
 
 v6:
-Added Forward declarations
+No change
 
 v5:
-No change
+Replaced APPID_LEN with FC_APPID_LEN
 
 v4:
 No change
 
 v3:
-No change
+Replaced blkcg_set_app_identifier function with blkcg_set_fc_appid
 
 v2:
-Ported the patch on top of 5.10/scsi-queue
+New Patch
 ---
- drivers/scsi/lpfc/lpfc_hbadisc.c | 110 +++++++++++++++++++++++++++++++
- drivers/scsi/lpfc/lpfc_init.c    |  40 +++++++++++
- 2 files changed, 150 insertions(+)
+ drivers/nvme/host/fc.c | 73 +++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 72 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/scsi/lpfc/lpfc_hbadisc.c b/drivers/scsi/lpfc/lpfc_hbadisc.c
-index 2b6b5fc671fe..ed2d65cfd3e3 100644
---- a/drivers/scsi/lpfc/lpfc_hbadisc.c
-+++ b/drivers/scsi/lpfc/lpfc_hbadisc.c
-@@ -72,6 +72,7 @@ static void lpfc_disc_flush_list(struct lpfc_vport *vport);
- static void lpfc_unregister_fcfi_cmpl(struct lpfc_hba *, LPFC_MBOXQ_t *);
- static int lpfc_fcf_inuse(struct lpfc_hba *);
- static void lpfc_mbx_cmpl_read_sparam(struct lpfc_hba *, LPFC_MBOXQ_t *);
-+static void lpfc_check_inactive_vmid(struct lpfc_hba *phba);
+diff --git a/drivers/nvme/host/fc.c b/drivers/nvme/host/fc.c
+index 3c002bdcace3..ed689ba773b1 100644
+--- a/drivers/nvme/host/fc.c
++++ b/drivers/nvme/host/fc.c
+@@ -9,7 +9,7 @@
+ #include <uapi/scsi/fc/fc_els.h>
+ #include <linux/delay.h>
+ #include <linux/overflow.h>
+-
++#include <linux/blk-cgroup.h>
+ #include "nvme.h"
+ #include "fabrics.h"
+ #include <linux/nvme-fc-driver.h>
+@@ -3821,10 +3821,81 @@ static ssize_t nvme_fc_nvme_discovery_store(struct device *dev,
  
- /* The source of a terminate rport I/O is either a dev_loss_tmo
-  * event or a call to fc_remove_host.  While the rport should be
-@@ -229,6 +230,115 @@ lpfc_dev_loss_tmo_callbk(struct fc_rport *rport)
- 	return;
+ 	return count;
  }
- 
-+/**
-+ * lpfc_check_inactive_vmid_one - VMID inactivity checker for a vport
-+ * @vport: Pointer to vport context object.
-+ *
-+ * This function checks for idle vmid entries related to a particular vport. If
-+ * found unused/idle, it frees them accordingly.
-+ **/
-+static void lpfc_check_inactive_vmid_one(struct lpfc_vport *vport)
++
++/*parse the Cgroup id from a buf and returns the length of cgrpid*/
++static int fc_parse_cgrpid(const char *buf, u64 *id)
 +{
-+	u16 i, keep;
-+	u32 difftime = 0, r;
-+	u64 *lta;
-+	int cpu;
++	char cgrp_id[16+1];
++	int cgrpid_len, j;
 +
-+	write_lock(&vport->vmid_lock);
-+
-+	if (!vport->cur_vmid_cnt)
-+		goto out;
-+
-+	/* iterate through the table */
-+	for (i = 0; i < LPFC_VMID_HASH_SIZE; ++i) {
-+		if (vport->hash_table[i] && (vport->hash_table[i]->flag &
-+					     LPFC_VMID_REGISTERED)) {
-+			/* check if the particular vmid is in use */
-+			/* for all available per cpu variable */
-+			for_each_possible_cpu(cpu) {
-+				/* if last access time is less than timeout */
-+				lta = per_cpu_ptr(
-+					vport->hash_table[i]->last_io_time,
-+					cpu);
-+				if (!lta)
-+					continue;
-+				difftime = (jiffies) - (*lta);
-+				if ((vport->vmid_inactivity_timeout *
-+				     JIFFIES_PER_HR) > difftime) {
-+					keep = 1;
-+					break;
-+				}
-+			}
-+
-+			/* if none of the cpus have been used by the vm, */
-+			/*  remove the entry if already registered */
-+			if (!keep) {
-+				/* mark the entry for deregistration */
-+				vport->hash_table[i]->flag =
-+					LPFC_VMID_DE_REGISTER;
-+				write_unlock(&vport->vmid_lock);
-+				if (vport->vmid_priority_tagging)
-+					r = lpfc_vmid_uvem(vport,
-+							   vport->hash_table[i],
-+							   false);
-+				else
-+					r = lpfc_vmid_cmd(vport,
-+							  SLI_CTAS_DAPP_IDENT,
-+							  vport->hash_table[i]);
-+
-+				/* decrement number of active vms and mark */
-+				/* entry in slot as free */
-+				write_lock(&vport->vmid_lock);
-+				if (!r) {
-+					struct lpfc_vmid *ht =
-+							vport->hash_table[i];
-+					vport->cur_vmid_cnt--;
-+					ht->flag = LPFC_VMID_SLOT_FREE;
-+					free_percpu(ht->last_io_time);
-+					ht->last_io_time = NULL;
-+					vport->hash_table[i] = NULL;
-+				}
-+			}
-+		}
-+		keep = 0;
-+	}
-+ out:
-+	write_unlock(&vport->vmid_lock);
-+}
-+
-+/**
-+ * lpfc_check_inactive_vmid - VMID inactivity checker
-+ * @phba: Pointer to hba context object.
-+ *
-+ * This function is called from the worker thread to determine if an entry in
-+ * the vmid table can be released since there was no IO activity seen from that
-+ * particular VM for the specified time. When this happens, the entry in the
-+ * table is released and also the resources on the switch cleared.
-+ **/
-+
-+static void lpfc_check_inactive_vmid(struct lpfc_hba *phba)
-+{
-+	struct lpfc_vport *vport;
-+	struct lpfc_vport **vports;
-+	int i;
-+
-+	vports = lpfc_create_vport_work_array(phba);
-+	if (!vports)
-+		return;
-+
-+	for (i = 0; i <= phba->max_vports; i++) {
-+		if ((!vports[i]) && (i == 0))
-+			vport = phba->pport;
-+		else
-+			vport = vports[i];
-+		if (!vport)
++	memset(cgrp_id, 0x0, sizeof(cgrp_id));
++	for (cgrpid_len = 0, j = 0; cgrpid_len < 17; cgrpid_len++) {
++		if (buf[cgrpid_len] != ':')
++			cgrp_id[cgrpid_len] = buf[cgrpid_len];
++		else {
++			j = 1;
 +			break;
-+
-+		lpfc_check_inactive_vmid_one(vport);
++		}
 +	}
-+	lpfc_destroy_vport_work_array(phba, vports);
++	if (!j)
++		return -EINVAL;
++	if (kstrtou64(cgrp_id, 16, id) < 0)
++		return -EINVAL;
++	return cgrpid_len;
 +}
 +
- /**
-  * lpfc_dev_loss_tmo_handler - Remote node devloss timeout handler
-  * @ndlp: Pointer to remote node object.
-diff --git a/drivers/scsi/lpfc/lpfc_init.c b/drivers/scsi/lpfc/lpfc_init.c
-index dea423bc1293..800164390879 100644
---- a/drivers/scsi/lpfc/lpfc_init.c
-+++ b/drivers/scsi/lpfc/lpfc_init.c
-@@ -4812,6 +4812,42 @@ lpfc_sli4_fcf_redisc_wait_tmo(struct timer_list *t)
- 	lpfc_worker_wake_up(phba);
- }
- 
-+/**
-+ * lpfc_vmid_poll - VMID timeout detection
-+ * @ptr: Map to lpfc_hba data structure pointer.
-+ *
-+ * This routine is invoked when there is no IO on by a VM for the specified
-+ * amount of time. When this situation is detected, the VMID has to be
-+ * deregistered from the switch and all the local resources freed. The VMID
-+ * will be reassigned to the VM once the IO begins.
-+ **/
-+static void
-+lpfc_vmid_poll(struct timer_list *t)
++/*
++ * fc_update_appid :parses and updates the appid in the blkcg associated with
++ * cgroupid.
++ * @buf: buf contains both cgrpid and appid info
++ * @count: size of the buffer
++ */
++static int fc_update_appid(const char *buf, size_t count)
 +{
-+	struct lpfc_hba *phba = from_timer(phba, t, inactive_vmid_poll);
-+	u32 wake_up = 0;
++	u64 cgrp_id;
++	int appid_len = 0;
++	int cgrpid_len = 0;
++	char app_id[FC_APPID_LEN];
++	int ret = 0;
 +
-+	/* check if there is a need to issue QFPA */
-+	if (phba->pport->vmid_priority_tagging) {
-+		wake_up = 1;
-+		phba->pport->work_port_events |= WORKER_CHECK_VMID_ISSUE_QFPA;
-+	}
++	if (buf[count-1] == '\n')
++		count--;
 +
-+	/* Is the vmid inactivity timer enabled */
-+	if (phba->pport->vmid_inactivity_timeout ||
-+	    phba->pport->load_flag & FC_DEREGISTER_ALL_APP_ID) {
-+		wake_up = 1;
-+		phba->pport->work_port_events |= WORKER_CHECK_INACTIVE_VMID;
-+	}
++	if ((count > (16+1+FC_APPID_LEN)) || (!strchr(buf, ':')))
++		return -EINVAL;
 +
-+	if (wake_up)
-+		lpfc_worker_wake_up(phba);
++	cgrpid_len = fc_parse_cgrpid(buf, &cgrp_id);
++	if (cgrpid_len < 0)
++		return -EINVAL;
++	/*appid len is count - cgrpid_len -1 (: + \n) */
++	appid_len = count - cgrpid_len - 1;
++	if (appid_len > FC_APPID_LEN)
++		return -EINVAL;
 +
-+	/* restart the timer for the next iteration */
-+	mod_timer(&phba->inactive_vmid_poll, jiffies + msecs_to_jiffies(1000 *
-+							LPFC_VMID_TIMER));
++	memset(app_id, 0x0, sizeof(app_id));
++	memcpy(app_id, &buf[cgrpid_len+1], appid_len);
++	ret = blkcg_set_fc_appid(app_id, cgrp_id, sizeof(app_id));
++	if (ret < 0)
++		return ret;
++	return count;
 +}
 +
- /**
-  * lpfc_sli4_parse_latt_fault - Parse sli4 link-attention link fault code
-  * @phba: pointer to lpfc hba data structure.
-@@ -6658,6 +6694,10 @@ lpfc_sli4_driver_resource_setup(struct lpfc_hba *phba)
- 	phba->hbqs[LPFC_ELS_HBQ].hbq_alloc_buffer = lpfc_sli4_rb_alloc;
- 	phba->hbqs[LPFC_ELS_HBQ].hbq_free_buffer = lpfc_sli4_rb_free;
- 
-+	/* for VMID idle timeout if VMID is enabled */
-+	if (lpfc_is_vmid_enabled(phba))
-+		timer_setup(&phba->inactive_vmid_poll, lpfc_vmid_poll, 0);
++static ssize_t fc_appid_store(struct device *dev,
++		struct device_attribute *attr, const char *buf, size_t count)
++{
++	int ret  = 0;
 +
- 	/*
- 	 * Initialize the SLI Layer to run with lpfc SLI4 HBAs.
- 	 */
++	ret = fc_update_appid(buf, count);
++	if (ret < 0)
++		return -EINVAL;
++	return count;
++}
+ static DEVICE_ATTR(nvme_discovery, 0200, NULL, nvme_fc_nvme_discovery_store);
++static DEVICE_ATTR(appid_store, 0200, NULL, fc_appid_store);
+ 
+ static struct attribute *nvme_fc_attrs[] = {
+ 	&dev_attr_nvme_discovery.attr,
++	&dev_attr_appid_store.attr,
+ 	NULL
+ };
+ 
 -- 
 2.26.2
 
