@@ -6,104 +6,128 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FB64C433DB
-	for <linux-block@archiver.kernel.org>; Wed,  6 Jan 2021 22:22:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37822C433DB
+	for <linux-block@archiver.kernel.org>; Wed,  6 Jan 2021 22:52:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1C6072313E
-	for <linux-block@archiver.kernel.org>; Wed,  6 Jan 2021 22:22:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0E8F52332A
+	for <linux-block@archiver.kernel.org>; Wed,  6 Jan 2021 22:52:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726688AbhAFWV5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 Jan 2021 17:21:57 -0500
-Received: from mail106.syd.optusnet.com.au ([211.29.132.42]:34521 "EHLO
-        mail106.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726488AbhAFWV5 (ORCPT
+        id S1727098AbhAFWwu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 Jan 2021 17:52:50 -0500
+Received: from mail107.syd.optusnet.com.au ([211.29.132.53]:57278 "EHLO
+        mail107.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726463AbhAFWwt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 6 Jan 2021 17:21:57 -0500
+        Wed, 6 Jan 2021 17:52:49 -0500
 Received: from dread.disaster.area (pa49-179-167-107.pa.nsw.optusnet.com.au [49.179.167.107])
-        by mail106.syd.optusnet.com.au (Postfix) with ESMTPS id BE3D476AF41;
-        Thu,  7 Jan 2021 09:21:12 +1100 (AEDT)
+        by mail107.syd.optusnet.com.au (Postfix) with ESMTPS id BA583E49CED;
+        Thu,  7 Jan 2021 09:52:02 +1100 (AEDT)
 Received: from dave by dread.disaster.area with local (Exim 4.92.3)
         (envelope-from <david@fromorbit.com>)
-        id 1kxHB1-003m7x-Iw; Thu, 07 Jan 2021 09:21:11 +1100
-Date:   Thu, 7 Jan 2021 09:21:11 +1100
+        id 1kxHer-003ma6-W2; Thu, 07 Jan 2021 09:52:02 +1100
+Date:   Thu, 7 Jan 2021 09:52:01 +1100
 From:   Dave Chinner <david@fromorbit.com>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [RFC PATCH] fs: block_dev: compute nr_vecs hint for improving
- writeback bvecs allocation
-Message-ID: <20210106222111.GE331610@dread.disaster.area>
-References: <20210105132647.3818503-1-ming.lei@redhat.com>
- <20210105183938.GA3878@lst.de>
- <20210106084548.GA3845805@T590>
+To:     Andres Freund <andres@anarazel.de>
+Cc:     linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: fallocate(FALLOC_FL_ZERO_RANGE_BUT_REALLY) to avoid unwritten
+ extents?
+Message-ID: <20210106225201.GF331610@dread.disaster.area>
+References: <20201230062819.yinrrp6uwfegsqo3@alap3.anarazel.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210106084548.GA3845805@T590>
+In-Reply-To: <20201230062819.yinrrp6uwfegsqo3@alap3.anarazel.de>
 X-Optus-CM-Score: 0
 X-Optus-CM-Analysis: v=2.3 cv=F8MpiZpN c=1 sm=1 tr=0 cx=a_idp_d
         a=+wqVUQIkAh0lLYI+QRsciw==:117 a=+wqVUQIkAh0lLYI+QRsciw==:17
         a=kj9zAlcOel0A:10 a=EmqxpYm9HcoA:10 a=7-415B0cAAAA:8
-        a=dbeGUg55DdRa2WVwu8kA:9 a=CjuIK1q_8ugA:10 a=igBNqPyMv6gA:10
-        a=biEYGPWJfzWAr4FL6Ov7:22
+        a=gSSnLTXk-G5GmvmscTwA:9 a=CjuIK1q_8ugA:10 a=biEYGPWJfzWAr4FL6Ov7:22
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jan 06, 2021 at 04:45:48PM +0800, Ming Lei wrote:
-> On Tue, Jan 05, 2021 at 07:39:38PM +0100, Christoph Hellwig wrote:
-> > At least for iomap I think this is the wrong approach.  Between the
-> > iomap and writeback_control we know the maximum size of the writeback
-> > request and can just use that.
+On Tue, Dec 29, 2020 at 10:28:19PM -0800, Andres Freund wrote:
+> Hi,
 > 
-> I think writeback_control can tell us nothing about max pages in single
-> bio:
-
-By definition, the iomap tells us exactly how big the IO is going to
-be. i.e. an iomap spans a single contiguous range that we are going
-to issue IO on. Hence we can use that to size the bio exactly
-right for direct IO.
-
-> - wbc->nr_to_write controls how many pages to writeback, this pages
->   usually don't belong to same bio. Also this number is often much
->   bigger than BIO_MAX_PAGES.
+> For things like database journals using fallocate(0) is not sufficient,
+> as writing into the the pre-allocated data with O_DIRECT | O_DSYNC
+> writes requires the unwritten extents to be converted, which in turn
+> requires journal operations.
 > 
-> - wbc->range_start/range_end is similar too, which is often much more
->   bigger than BIO_MAX_PAGES.
+> The performance difference in a journalling workload (lots of
+> sequential, low-iodepth, often small, writes) is quite remarkable. Even
+> on quite fast devices:
 > 
-> Also page/blocks_in_page can be mapped to different extent too, which is
-> only available when wpc->ops->map_blocks() is returned,
+>     andres@awork3:/mnt/t3$ grep /mnt/t3 /proc/mounts
+>     /dev/nvme1n1 /mnt/t3 xfs rw,relatime,attr2,inode64,logbufs=8,logbsize=32k,noquota 0 0
+> 
+>     andres@awork3:/mnt/t3$ fallocate -l $((1024*1024*1024)) test_file
+> 
+>     andres@awork3:/mnt/t3$ dd if=/dev/zero of=test_file bs=4096 conv=notrunc iflag=count_bytes count=$((1024*1024*1024)) oflag=direct,dsync
+>     262144+0 records in
+>     262144+0 records out
+>     1073741824 bytes (1.1 GB, 1.0 GiB) copied, 117.587 s, 9.1 MB/s
+> 
+>     andres@awork3:/mnt/t3$ dd if=/dev/zero of=test_file bs=4096 conv=notrunc iflag=count_bytes count=$((1024*1024*1024)) oflag=direct,dsync
+>     262144+0 records in
+>     262144+0 records out
+>     1073741824 bytes (1.1 GB, 1.0 GiB) copied, 3.69125 s, 291 MB/s
+> 
+>     andres@awork3:/mnt/t3$ fallocate -z -l $((1024*1024*1024)) test_file
+> 
+>     andres@awork3:/mnt/t3$ dd if=/dev/zero of=test_file bs=4096 conv=notrunc iflag=count_bytes count=$((1024*1024*1024)) oflag=direct,dsync
+>     z262144+0 records in
+>     262144+0 records out
+>     1073741824 bytes (1.1 GB, 1.0 GiB) copied, 109.398 s, 9.8 MB/s
+> 
+>     andres@awork3:/mnt/t3$ dd if=/dev/zero of=test_file bs=4096 conv=notrunc iflag=count_bytes count=$((1024*1024*1024)) oflag=direct,dsync
+>     262144+0 records in
+>     262144+0 records out
+>     1073741824 bytes (1.1 GB, 1.0 GiB) copied, 3.76166 s, 285 MB/s
+> 
+> 
+> The way around that, from a database's perspective, is obviously to just
+> overwrite the file "manually" after fallocate()ing it, utilizing larger
+> writes, and then to recycle the file.
+> 
+> 
+> But that's a fair bit of unnecessary IO from userspace, and it's IO that
+> the kernel can do more efficiently on a number of types of block
+> devices, e.g. by utilizing write-zeroes.
+> 
+> 
+> Which brings me to $subject:
+> 
+> Would it make sense to add a variant of FALLOC_FL_ZERO_RANGE that
+> doesn't convert extents into unwritten extents, but instead uses
+> blkdev_issue_zeroout() if supported?  Mostly interested in xfs/ext4
+> myself, but ...
 
-We only allocate the bio -after- calling ->map_blocks() to obtain
-the iomap for the given writeback range request. Hence we
-already know how large the BIO could be before we allocate it.
+We have explicit requests from users (think initialising large VM
+images) that FALLOC_FL_ZERO_RANGE must never fall back to writing
+zeroes manually.
 
-> which looks not
-> different with mpage_writepages(), in which bio is allocated with
-> BIO_MAX_PAGES vecs too.
+Because those users want us to guarantee that FALLOC_FL_ZERO_RANGE
+is *always* going to be faster than writing a large range of zeroes.
 
-__mpage_writepage() only maps a page at a time, so it can't tell
-ahead of time how big the bio is going to need to be as it doesn't
-return/cache a contiguous extent range. So it's actually very
-different to the iomap writeback code, and effectively does require
-a BIO_MAX_PAGES vecs allocation all the time...
+They also want FALLOC_FL_ZERO_RANGE to fail if it can't zero the
+range by metadata manipulation and would need to write zeros,
+because then they can make the choice on how to initialise the
+device (e.g. at runtime, via on-demand ZERO_RANGE calls, by writing
+zeroes to pad partial blocks, etc). That bird has already flown,
+so we can't really do that retrospectively, but we really don't want
+to make life worse for these users.
 
-> Or you mean we can use iomap->length for this purpose? But iomap->length
-> still is still too big in case of xfs.
+IOWs, while you might want FALLOC_FL_ZERO_RANGE to explicitly write
+zeros, we have users who explicitly don't want it to do this.
 
-if we are doing small random writeback into large extents (i.e.
-iomap->length is large), then it is trivial to detect that we are
-doing random writes rather than sequential writes by checking if the
-current page is sequential to the last sector in the current bio.
-We already do this non-sequential IO checking to determine if a new
-bio needs to be allocated in iomap_can_add_to_ioend(), and we also
-know how large the current contiguous range mapped into the current
-bio chain is (ioend->io_size). Hence we've got everything we need to
-determine whether we should do a large or small bio vec allocation
-in the iomap writeback path...
+Perhaps we should add want FALLOC_FL_CONVERT_RANGE, which tells the
+filesystem to convert an unwritten range of zeros to a written range
+by manually writing zeros. i.e. you do FALLOC_FL_ZERO_RANGE to zero
+the range and fill holes using metadata manipulation, followed by
+FALLOC_FL_WRITE_RANGE to then convert the "metadata zeros" to real
+written zeros.
 
 Cheers,
 
