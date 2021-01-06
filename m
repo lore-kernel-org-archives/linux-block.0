@@ -3,135 +3,191 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37822C433DB
-	for <linux-block@archiver.kernel.org>; Wed,  6 Jan 2021 22:52:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F9C0C433E0
+	for <linux-block@archiver.kernel.org>; Wed,  6 Jan 2021 23:34:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0E8F52332A
-	for <linux-block@archiver.kernel.org>; Wed,  6 Jan 2021 22:52:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 24DD823123
+	for <linux-block@archiver.kernel.org>; Wed,  6 Jan 2021 23:34:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727098AbhAFWwu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 Jan 2021 17:52:50 -0500
-Received: from mail107.syd.optusnet.com.au ([211.29.132.53]:57278 "EHLO
-        mail107.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726463AbhAFWwt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 6 Jan 2021 17:52:49 -0500
-Received: from dread.disaster.area (pa49-179-167-107.pa.nsw.optusnet.com.au [49.179.167.107])
-        by mail107.syd.optusnet.com.au (Postfix) with ESMTPS id BA583E49CED;
-        Thu,  7 Jan 2021 09:52:02 +1100 (AEDT)
-Received: from dave by dread.disaster.area with local (Exim 4.92.3)
-        (envelope-from <david@fromorbit.com>)
-        id 1kxHer-003ma6-W2; Thu, 07 Jan 2021 09:52:02 +1100
-Date:   Thu, 7 Jan 2021 09:52:01 +1100
-From:   Dave Chinner <david@fromorbit.com>
-To:     Andres Freund <andres@anarazel.de>
-Cc:     linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: fallocate(FALLOC_FL_ZERO_RANGE_BUT_REALLY) to avoid unwritten
- extents?
-Message-ID: <20210106225201.GF331610@dread.disaster.area>
-References: <20201230062819.yinrrp6uwfegsqo3@alap3.anarazel.de>
+        id S1727183AbhAFXep (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 Jan 2021 18:34:45 -0500
+Received: from youngberry.canonical.com ([91.189.89.112]:51011 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727047AbhAFXep (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Jan 2021 18:34:45 -0500
+Received: from mail-wr1-f69.google.com ([209.85.221.69])
+        by youngberry.canonical.com with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.86_2)
+        (envelope-from <mauricio.oliveira@canonical.com>)
+        id 1kxIJW-0002Np-MF
+        for linux-block@vger.kernel.org; Wed, 06 Jan 2021 23:34:02 +0000
+Received: by mail-wr1-f69.google.com with SMTP id n11so1812309wro.7
+        for <linux-block@vger.kernel.org>; Wed, 06 Jan 2021 15:34:02 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=O8Hxh8M+9xeHON8o4qCfxi3CCWfqrju16jW9+glO6+M=;
+        b=nmgl9Czk1JrhpaSkvEXk/nd+T9kUvjwtca7K8ggAiGsUcNpYPU6xMuT75y0O7D/9Kh
+         CGhSbWmp6GtvfhdkNZ99DzpxOOOIChCqL6PRHs+unS/CVeZN6gJf/dexM4XiGZxp3Pig
+         5SCF6nCPW38YUcyNibUc/lLRSl07zxFLws01hh8OTW8xfkaEjngzJR64FOesMSgJuMa/
+         tQiNa0Iikqu1xsRPokEFPVmL3QDth+Lnh3PHM8U9sixzwRPzuGOharPL4tNZuyXxDUrG
+         iue4VdSA+7rsNHUV+U5jY+1isnf4+duxQ+kaJFoVgQsplyw1QZtt8/ITClCylBZSgkyt
+         eQWw==
+X-Gm-Message-State: AOAM530R1l0zMZxZ4d0dU4qhLDtIMGljn8pNHA8JmsOh8op0os3EQLCW
+        9sNrE/+rmwLoADBqaNRJyYiqn61ykDrNdOz0Nr9qYjZGRyqHPgfddo+WbnAs/WsfRUX3L1rwiwR
+        BiqvEVVTE+taxwHPPRKZ/3jmc8YzkVeyj4On05hmpZHEAWKvs8G8gFN5D
+X-Received: by 2002:a05:600c:21c7:: with SMTP id x7mr5449635wmj.75.1609976042128;
+        Wed, 06 Jan 2021 15:34:02 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyxn3EGx7+iXTWyLWoOG0HkDq0cfterpIm38Da94NB+JazKwS0OArXNwHUzcYBS1JxkjxgN4oTwfHWjGsjwkgk=
+X-Received: by 2002:a05:600c:21c7:: with SMTP id x7mr5449624wmj.75.1609976041918;
+ Wed, 06 Jan 2021 15:34:01 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201230062819.yinrrp6uwfegsqo3@alap3.anarazel.de>
-X-Optus-CM-Score: 0
-X-Optus-CM-Analysis: v=2.3 cv=F8MpiZpN c=1 sm=1 tr=0 cx=a_idp_d
-        a=+wqVUQIkAh0lLYI+QRsciw==:117 a=+wqVUQIkAh0lLYI+QRsciw==:17
-        a=kj9zAlcOel0A:10 a=EmqxpYm9HcoA:10 a=7-415B0cAAAA:8
-        a=gSSnLTXk-G5GmvmscTwA:9 a=CjuIK1q_8ugA:10 a=biEYGPWJfzWAr4FL6Ov7:22
+References: <20210105135419.68715-1-mfo@canonical.com> <20210106090758.GB3845805@T590>
+In-Reply-To: <20210106090758.GB3845805@T590>
+From:   Mauricio Faria de Oliveira <mfo@canonical.com>
+Date:   Wed, 6 Jan 2021 20:33:50 -0300
+Message-ID: <CAO9xwp0ad6Hs2AJOLKUn-oVSp+kwHKM67saxdwv0JsrSza+C7Q@mail.gmail.com>
+Subject: Re: [PATCH v2] loop: fix I/O error on fsync() in detached loop devices
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Gabriel Krisman Bertazi <krisman@collabora.com>,
+        Eric Desrochers <eric.desrochers@canonical.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Dec 29, 2020 at 10:28:19PM -0800, Andres Freund wrote:
-> Hi,
-> 
-> For things like database journals using fallocate(0) is not sufficient,
-> as writing into the the pre-allocated data with O_DIRECT | O_DSYNC
-> writes requires the unwritten extents to be converted, which in turn
-> requires journal operations.
-> 
-> The performance difference in a journalling workload (lots of
-> sequential, low-iodepth, often small, writes) is quite remarkable. Even
-> on quite fast devices:
-> 
->     andres@awork3:/mnt/t3$ grep /mnt/t3 /proc/mounts
->     /dev/nvme1n1 /mnt/t3 xfs rw,relatime,attr2,inode64,logbufs=8,logbsize=32k,noquota 0 0
-> 
->     andres@awork3:/mnt/t3$ fallocate -l $((1024*1024*1024)) test_file
-> 
->     andres@awork3:/mnt/t3$ dd if=/dev/zero of=test_file bs=4096 conv=notrunc iflag=count_bytes count=$((1024*1024*1024)) oflag=direct,dsync
->     262144+0 records in
->     262144+0 records out
->     1073741824 bytes (1.1 GB, 1.0 GiB) copied, 117.587 s, 9.1 MB/s
-> 
->     andres@awork3:/mnt/t3$ dd if=/dev/zero of=test_file bs=4096 conv=notrunc iflag=count_bytes count=$((1024*1024*1024)) oflag=direct,dsync
->     262144+0 records in
->     262144+0 records out
->     1073741824 bytes (1.1 GB, 1.0 GiB) copied, 3.69125 s, 291 MB/s
-> 
->     andres@awork3:/mnt/t3$ fallocate -z -l $((1024*1024*1024)) test_file
-> 
->     andres@awork3:/mnt/t3$ dd if=/dev/zero of=test_file bs=4096 conv=notrunc iflag=count_bytes count=$((1024*1024*1024)) oflag=direct,dsync
->     z262144+0 records in
->     262144+0 records out
->     1073741824 bytes (1.1 GB, 1.0 GiB) copied, 109.398 s, 9.8 MB/s
-> 
->     andres@awork3:/mnt/t3$ dd if=/dev/zero of=test_file bs=4096 conv=notrunc iflag=count_bytes count=$((1024*1024*1024)) oflag=direct,dsync
->     262144+0 records in
->     262144+0 records out
->     1073741824 bytes (1.1 GB, 1.0 GiB) copied, 3.76166 s, 285 MB/s
-> 
-> 
-> The way around that, from a database's perspective, is obviously to just
-> overwrite the file "manually" after fallocate()ing it, utilizing larger
-> writes, and then to recycle the file.
-> 
-> 
-> But that's a fair bit of unnecessary IO from userspace, and it's IO that
-> the kernel can do more efficiently on a number of types of block
-> devices, e.g. by utilizing write-zeroes.
-> 
-> 
-> Which brings me to $subject:
-> 
-> Would it make sense to add a variant of FALLOC_FL_ZERO_RANGE that
-> doesn't convert extents into unwritten extents, but instead uses
-> blkdev_issue_zeroout() if supported?  Mostly interested in xfs/ext4
-> myself, but ...
+On Wed, Jan 6, 2021 at 6:08 AM Ming Lei <ming.lei@redhat.com> wrote:
+>
+> On Tue, Jan 05, 2021 at 10:54:19AM -0300, Mauricio Faria de Oliveira wrote:
+> > There's an I/O error on fsync() in a detached loop device
+> > if it has been previously attached.
+> >
+> > The issue is write cache is enabled in the attach path in
+> > loop_configure() but it isn't disabled in the detach path;
+> > thus it remains enabled in the block device regardless of
+> > whether it is attached or not.
+> >
+> > Now fsync() can get an I/O request that will just be failed
+> > later in loop_queue_rq() as device's state is not 'Lo_bound'.
+> >
+> > So, disable write cache in the detach path.
+> >
+> > Test-case:
+> >
+> >     # DEV=/dev/loop7
+> >
+> >     # IMG=/tmp/image
+> >     # truncate --size 1M $IMG
+> >
+> >     # losetup $DEV $IMG
+> >     # losetup -d $DEV
+> >
+> > Before:
+> >
+> >     # strace -e fsync parted -s $DEV print 2>&1 | grep fsync
+> >     fsync(3)                                = -1 EIO (Input/output error)
+> >     Warning: Error fsyncing/closing /dev/loop7: Input/output error
+> >     [  982.529929] blk_update_request: I/O error, dev loop7, sector 0 op 0x1:(WRITE) flags 0x800 phys_seg 0 prio class 0
+> >
+> > After:
+> >
+> >     # strace -e fsync parted -s $DEV print 2>&1 | grep fsync
+> >     fsync(3)                                = 0
+>
+> But IO on detached loop should have been failed, right? The magic is
+> that submit_bio_checks() filters FLUSH request for queues which doesn't
+> support writeback cache, and always fake a normal completion.
+>
 
-We have explicit requests from users (think initialising large VM
-images) that FALLOC_FL_ZERO_RANGE must never fall back to writing
-zeroes manually.
+Hey Ming, thanks for taking a look at this.
 
-Because those users want us to guarantee that FALLOC_FL_ZERO_RANGE
-is *always* going to be faster than writing a large range of zeroes.
+Well, it depends -- currently read() works (without I/O errors) and
+write() fails (ENOSPC).
+Example tests are provided below.
 
-They also want FALLOC_FL_ZERO_RANGE to fail if it can't zero the
-range by metadata manipulation and would need to write zeros,
-because then they can make the choice on how to initialise the
-device (e.g. at runtime, via on-demand ZERO_RANGE calls, by writing
-zeroes to pad partial blocks, etc). That bird has already flown,
-so we can't really do that retrospectively, but we really don't want
-to make life worse for these users.
+And that's consistent before and after attach/detach; so, I thought
+fsync() should follow.
 
-IOWs, while you might want FALLOC_FL_ZERO_RANGE to explicitly write
-zeros, we have users who explicitly don't want it to do this.
+> I understand that the issue is that user becomes confused with this observation
+> because no such failure if they run 'parted -s /dev/loop0 print' on one detached
+> loop disk if it is never attached.
+>
 
-Perhaps we should add want FALLOC_FL_CONVERT_RANGE, which tells the
-filesystem to convert an unwritten range of zeros to a written range
-by manually writing zeros. i.e. you do FALLOC_FL_ZERO_RANGE to zero
-the range and fill holes using metadata manipulation, followed by
-FALLOC_FL_WRITE_RANGE to then convert the "metadata zeros" to real
-written zeros.
+That is indeed one of the issues. There's also a monitoring/alerting
+perspective that
+would benefit; e.g., sosreport runs parted, it's run on data
+collection for support cases.
+Now, that I/O error message is thrown in the logs, and some mon/alert
+tools might not
+yet have filters to ignore (detached) loop devices, and alert. It'd be
+nice to deflect that.
 
-Cheers,
+It's not a common issue, to be honest; but the consistency point
+seemed fair to me,
+as essentially the current code doesn't deinitialize something it
+previously initialized,
+and the block device is left running with that enabled regardless.
 
-Dave.
+cheers,
+
+Setup:
+
+    # DEV=/dev/loop7
+    # IMG=/tmp/image
+    # truncate --size 1M $IMG
+
+Before attach/detach:
+
+    # dd if=$DEV of=/dev/null
+    0+0 records in
+    0+0 records out
+    0 bytes copied, 0.00011206 s, 0.0 kB/s
+
+    # echo $?
+    0
+
+    # dd if=/dev/zero of=$DEV
+    dd: writing to '/dev/loop7': No space left on device
+    1+0 records in
+    0+0 records out
+    0 bytes copied, 0.000229225 s, 0.0 kB/s
+
+    # echo $?
+    1
+
+After attach/detach: (same)
+
+    # losetup $DEV $IMG
+    # losetup -d $DEV
+
+    # dd if=$DEV of=/dev/null
+    0+0 records in
+    0+0 records out
+    0 bytes copied, 0.000102131 s, 0.0 kB/s
+
+    # echo $?
+    0
+
+    # dd if=/dev/zero of=$DEV
+    dd: writing to '/dev/loop7': No space left on device
+    1+0 records in
+    0+0 records out
+    0 bytes copied, 0.000259658 s, 0.0 kB/s
+
+    # echo $?
+    1
+
+
+>
+> Thanks,
+> Ming
+>
+
+
 -- 
-Dave Chinner
-david@fromorbit.com
+Mauricio Faria de Oliveira
