@@ -2,122 +2,167 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E53B7C433E6
-	for <linux-block@archiver.kernel.org>; Wed,  6 Jan 2021 23:41:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E22D8C433E0
+	for <linux-block@archiver.kernel.org>; Wed,  6 Jan 2021 23:59:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B789423332
-	for <linux-block@archiver.kernel.org>; Wed,  6 Jan 2021 23:41:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9F97A23118
+	for <linux-block@archiver.kernel.org>; Wed,  6 Jan 2021 23:59:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727241AbhAFXlS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 Jan 2021 18:41:18 -0500
-Received: from wout2-smtp.messagingengine.com ([64.147.123.25]:60437 "EHLO
-        wout2-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726918AbhAFXlS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 6 Jan 2021 18:41:18 -0500
-Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
-        by mailout.west.internal (Postfix) with ESMTP id D05FD14B3;
-        Wed,  6 Jan 2021 18:40:11 -0500 (EST)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute1.internal (MEProxy); Wed, 06 Jan 2021 18:40:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=anarazel.de; h=
-        date:from:to:cc:subject:message-id:references:mime-version
-        :content-type:in-reply-to; s=fm3; bh=n5SmyEUKkQ7qERAis2ZaaktUbKh
-        4cYFmBEpwHyqlAFw=; b=kHvX0HT4JwMXX9ZXBdMY6+ppwTMBzcFa/noS3E7R7LA
-        rIEt2BYOivw6sm3TvMXh+/Su+B8gBZMuZnASFMWzh8CmH22/QobA/cdaNoM0Nvz2
-        WrR6kioaEU8vWLJpvk1bSddNc5adfWk25W+pia9dEfAofzNmZQTl+ySh+Ck6w9Gx
-        yqYPkUzKIIBfB+C2M1V02ttRPH5RqstR2MkR/JQ6lqFkHVf/hCvOOy6aMou4GqAx
-        zXq4kUC5/dqidzy7OVa1GmUV5mjLIkNTm2PigQXdL2HhN1nYLNNSM2kAKE6c0qpW
-        mZKNSgMOQiEHpKRHthNbgzv/MnMFsTgRS0O1oIvziXw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-type:date:from:in-reply-to
-        :message-id:mime-version:references:subject:to:x-me-proxy
-        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=n5SmyE
-        UKkQ7qERAis2ZaaktUbKh4cYFmBEpwHyqlAFw=; b=iv1IZft2dhtPMs6a0ZYLDL
-        KhOC4nlPgNHnErGjdxhRWfrhWZOdvDZEM/YDFhWN4kcj74JcIH/LDiHSnkj7QZNg
-        lMo5531yhZtV5wMdF0IyZSlif3ag33JCBPd4PlVTh7Piy6wgR2O7rCMzygyHYA1z
-        YM3d4ZTjFMaONAvrHVAtyRXicMBy9fw7T0E/X79MpoIKUBdl+JTVr7KNwL1Rng9e
-        Vof3W1Z9xZPj18gBRFU/4xqIFotwytro4qstNBfbeK4DFgORHNIgs/sPIBso3fz1
-        jtPIF7CQGePsQ+TuSHhmY/ENvb6iRA+y9K4AjMiJuk7iojg6egRUe0L+5RpZ90/g
-        ==
-X-ME-Sender: <xms:W0r2X7rAzlVuas5cUtL18mZ-thcn0GqvAcKmmjA4KHAiZIdYcy0MmQ>
-    <xme:W0r2X1pHnYnne3KwsaKtu4-BrJk368hozS6Hr-sodAWp7UJr5N0n-ENiR0dGIU1sB
-    mTTgml4X-Y4NqR80g>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrvdegtddgkedvucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucenucfjughrpeffhffvuffkfhggtggujgesthdtre
-    dttddtvdenucfhrhhomheptehnughrvghsucfhrhgvuhhnugcuoegrnhgurhgvshesrghn
-    rghrrgiivghlrdguvgeqnecuggftrfgrthhtvghrnhepudekhfekleeugeevteehleffff
-    ejgeelueduleeffeeutdelffeujeffhfeuffdunecukfhppeeijedrudeitddrvddujedr
-    vdehtdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    grnhgurhgvshesrghnrghrrgiivghlrdguvg
-X-ME-Proxy: <xmx:W0r2X4OVarAF5pkNoPPJfRSaKF5prZowNUhVQG6WJGIWmkZpOwSoGg>
-    <xmx:W0r2X-7GXJMCO4u9msmbvbJKdY_jGVTuQiWjtFKEa-aVt85jmGtlGw>
-    <xmx:W0r2X65L5hxClFtPVZ103Zx5xJkzd12sxACuzjbgQFCgyvjKHyYzbA>
-    <xmx:W0r2X6HgoYGoUrWSu2CJ90EB_9XCqawa8ZPs2GkQxj1xI593B3ASnw>
-Received: from intern.anarazel.de (c-67-160-217-250.hsd1.ca.comcast.net [67.160.217.250])
-        by mail.messagingengine.com (Postfix) with ESMTPA id 0EE18240064;
-        Wed,  6 Jan 2021 18:40:11 -0500 (EST)
-Date:   Wed, 6 Jan 2021 15:40:09 -0800
-From:   Andres Freund <andres@anarazel.de>
-To:     Dave Chinner <david@fromorbit.com>
-Cc:     linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: fallocate(FALLOC_FL_ZERO_RANGE_BUT_REALLY) to avoid unwritten
- extents?
-Message-ID: <20210106234009.b6gbzl7bjm2evxj6@alap3.anarazel.de>
-References: <20201230062819.yinrrp6uwfegsqo3@alap3.anarazel.de>
- <20210106225201.GF331610@dread.disaster.area>
+        id S1727590AbhAFX72 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 Jan 2021 18:59:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33274 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726789AbhAFX71 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Jan 2021 18:59:27 -0500
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DBB7C06136B
+        for <linux-block@vger.kernel.org>; Wed,  6 Jan 2021 15:58:47 -0800 (PST)
+Received: by mail-pj1-x1031.google.com with SMTP id m5so2476649pjv.5
+        for <linux-block@vger.kernel.org>; Wed, 06 Jan 2021 15:58:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=nHM/zNarT82wu+x4lgAdGC2mHx8Guijmtu+f0YBziZs=;
+        b=NA3F+XKmnhNi6kzCESfIdsxKS2uZOsStA6v3UFprwRKw/OhFhOWV573G2OwOoRXJ9G
+         jpkX1PlTe24W+T6jmj/B9TdYvsqrmput3qZCO1iiRFiYVl8Nq5JykFYmHdH7fIBlGNO9
+         CjocitqQhG0jlGmIOTyGy0VGw5YZXa0E2JaYi54EB7YUp+23q3wIVe/ioL3JnNDIXwMW
+         0tLRdb8hjdQgj4wze3oBgV1PFShLjU29t90MrOXd5ZFilZTglcaLd7kxppWvJXysCH8b
+         CB9pxhKFB7fm4Sue3R5jjV3cX9ZHnG2ftbIES6aCsKS/kx9wrVNWV088nQ8W8BXgVKsT
+         hGgw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=nHM/zNarT82wu+x4lgAdGC2mHx8Guijmtu+f0YBziZs=;
+        b=CXDyw93Z71fEHdzvtZg7bp6fZsYk7Wmjo/a+4KDfJZsrwO7ZVpIGsmQae4gN1bwXN7
+         Fuc71IJriJKgQKsY676/9PZE8RzFgh4sBCfZExCfCOivAqA6OzVCyZdtIE/vE3Y5EbO6
+         3GHP9PUuXis36i19xhvJ1MJraSqKsoOotF8hvC/PuCotgliCKfcl16GJc0NqBMWSPU+Y
+         PPKVugounsArlKk6uNDGCdfezEaRlXcczuhbPKnWtzvafzY56DW5tSeHIwNhOMy0eTPd
+         SxEZXYg5xcNCoA8tzJNuUeY+cBqSOZ55ctSnjYnepPmq0F6hHltPy6YcYyuMY1sAUY7l
+         VQlg==
+X-Gm-Message-State: AOAM530ToyMv8XycM3xLbw3jZ2jKS7ZG7f/kA9l13UoocbUignXLHMk2
+        DJ9ecVnaQOUpW+b8orLFjuy3tw==
+X-Google-Smtp-Source: ABdhPJwv5izWk5XM30g9rPSPMdovHLcTpT0DO/uurwnBAYjc/lVBVQTLqZutGbJkbfaM5c98RBK3cQ==
+X-Received: by 2002:a17:90a:1706:: with SMTP id z6mr1080632pjd.0.1609977526924;
+        Wed, 06 Jan 2021 15:58:46 -0800 (PST)
+Received: from [192.168.10.153] (124-171-107-241.dyn.iinet.net.au. [124.171.107.241])
+        by smtp.gmail.com with UTF8SMTPSA id d6sm3384801pfo.199.2021.01.06.15.58.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 06 Jan 2021 15:58:46 -0800 (PST)
+Message-ID: <5e6716a6-0314-8360-4fb6-5c959022a24c@ozlabs.ru>
+Date:   Thu, 7 Jan 2021 10:58:39 +1100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210106225201.GF331610@dread.disaster.area>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:85.0) Gecko/20100101
+ Thunderbird/85.0
+Subject: Re: [RFC PATCH kernel] block: initialize block_device::bd_bdi for
+ bdev_cache
+Content-Language: en-US
+To:     Jan Kara <jack@suse.cz>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>,
+        Tejun Heo <tj@kernel.org>, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20210106092900.26595-1-aik@ozlabs.ru>
+ <20210106104106.GA29271@quack2.suse.cz>
+From:   Alexey Kardashevskiy <aik@ozlabs.ru>
+In-Reply-To: <20210106104106.GA29271@quack2.suse.cz>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
 
-On 2021-01-07 09:52:01 +1100, Dave Chinner wrote:
-> On Tue, Dec 29, 2020 at 10:28:19PM -0800, Andres Freund wrote:
-> > Which brings me to $subject:
-> > 
-> > Would it make sense to add a variant of FALLOC_FL_ZERO_RANGE that
-> > doesn't convert extents into unwritten extents, but instead uses
-> > blkdev_issue_zeroout() if supported?  Mostly interested in xfs/ext4
-> > myself, but ...
+
+On 06/01/2021 21:41, Jan Kara wrote:
+> On Wed 06-01-21 20:29:00, Alexey Kardashevskiy wrote:
+>> This is a workaround to fix a null derefence crash:
+>>
+>> [c00000000b01f840] c00000000b01f880 (unreliable)
+>> [c00000000b01f880] c000000000769a3c bdev_evict_inode+0x21c/0x370
+>> [c00000000b01f8c0] c00000000070bacc evict+0x11c/0x230
+>> [c00000000b01f900] c00000000070c138 iput+0x2a8/0x4a0
+>> [c00000000b01f970] c0000000006ff030 dentry_unlink_inode+0x220/0x250
+>> [c00000000b01f9b0] c0000000007001c0 __dentry_kill+0x190/0x320
+>> [c00000000b01fa00] c000000000701fb8 dput+0x5e8/0x860
+>> [c00000000b01fa80] c000000000705848 shrink_dcache_for_umount+0x58/0x100
+>> [c00000000b01fb00] c0000000006cf864 generic_shutdown_super+0x54/0x200
+>> [c00000000b01fb80] c0000000006cfd48 kill_anon_super+0x38/0x60
+>> [c00000000b01fbc0] c0000000006d12cc deactivate_locked_super+0xbc/0x110
+>> [c00000000b01fbf0] c0000000006d13bc deactivate_super+0x9c/0xc0
+>> [c00000000b01fc20] c00000000071a340 cleanup_mnt+0x1b0/0x250
+>> [c00000000b01fc80] c000000000278fa8 task_work_run+0xf8/0x180
+>> [c00000000b01fcd0] c00000000002b4ac do_notify_resume+0x4dc/0x5d0
+>> [c00000000b01fda0] c00000000004ba0c syscall_exit_prepare+0x28c/0x370
+>> [c00000000b01fe10] c00000000000e06c system_call_common+0xfc/0x27c
+>> --- Exception: c00 (System Call) at 0000000010034890
+>>
+>> Is this fixed properly already somewhere? Thanks,
+>>
+>> Fixes: e6cb53827ed6 ("block: initialize struct block_device in bdev_alloc")
 > 
-> We have explicit requests from users (think initialising large VM
-> images) that FALLOC_FL_ZERO_RANGE must never fall back to writing
-> zeroes manually.
+> I don't think it's fixed anywhere and I've seen the syzbot report and I was
+> wondering how this can happen when bdev_alloc() initializes bdev->bd_bdi
+> and it also wasn't clear to me whether bd_bdi is really the only field that
+> is problematic - if we can get to bdev_evict_inode() without going through
+> bdev_alloc(), we are probably missing initialization of other fields in
+> that place as well...
+> 
+> But now I've realized that probably the inode is a root inode for bdev
+> superblock which is allocated by VFS through new_inode() and thus doesn't
+> undergo the initialization in bdev_alloc(). 
 
-That behaviour makes a lot of sense for quite a few use cases - I wasn't
-trying to make it sound like it should not be available. Nor that
-FALLOC_FL_ZERO_RANGE should behave differently.
+yup, this is the case.
+
+> And AFAICT the root inode on
+> bdev superblock can get only to bdev_evict_inode() and bdev_free_inode().
+> Looking at bdev_evict_inode() the only thing that's used there from struct
+> block_device is really bd_bdi. bdev_free_inode() will also access
+> bdev->bd_stats and bdev->bd_meta_info. So we need to at least initialize
+> these to NULL as well.
+
+These are all NULL.
+
+> IMO the most logical place for all these
+> initializations is in bdev_alloc_inode()...
 
 
-> IOWs, while you might want FALLOC_FL_ZERO_RANGE to explicitly write
-> zeros, we have users who explicitly don't want it to do this.
+This works. We can also check for NULL where it crashes. But I do not 
+know the code to make an informed decision...
 
-Right - which is why I was asking for a variant of FALLOC_FL_ZERO_RANGE
-(jokingly named FALLOC_FL_ZERO_RANGE_BUT_REALLY in the subject), rather
-than changing the behaviour.
+> 
+> 								Honza
+> 
+>> ---
+>>   fs/block_dev.c | 2 ++
+>>   1 file changed, 2 insertions(+)
+>>
+>> diff --git a/fs/block_dev.c b/fs/block_dev.c
+>> index 3e5b02f6606c..86fdc28d565e 100644
+>> --- a/fs/block_dev.c
+>> +++ b/fs/block_dev.c
+>> @@ -792,8 +792,10 @@ static void bdev_free_inode(struct inode *inode)
+>>   static void init_once(void *data)
+>>   {
+>>   	struct bdev_inode *ei = data;
+>> +	struct block_device *bdev = &ei->bdev;
+>>   
+>>   	inode_init_once(&ei->vfs_inode);
+>> +	bdev->bd_bdi = &noop_backing_dev_info;
+>>   }
+>>   
+>>   static void bdev_evict_inode(struct inode *inode)
+>> -- 
+>> 2.17.1
+>>
 
-
-> Perhaps we should add want FALLOC_FL_CONVERT_RANGE, which tells the
-> filesystem to convert an unwritten range of zeros to a written range
-> by manually writing zeros. i.e. you do FALLOC_FL_ZERO_RANGE to zero
-> the range and fill holes using metadata manipulation, followed by
-> FALLOC_FL_WRITE_RANGE to then convert the "metadata zeros" to real
-> written zeros.
-
-Yep, something like that would do the trick. Perhaps
-FALLOC_FL_MATERIALIZE_RANGE?
-
-Greetings,
-
-Andres Freund
+-- 
+Alexey
