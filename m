@@ -2,124 +2,112 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C766C43381
-	for <linux-block@archiver.kernel.org>; Wed,  6 Jan 2021 17:02:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FB64C433DB
+	for <linux-block@archiver.kernel.org>; Wed,  6 Jan 2021 22:22:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2507123125
-	for <linux-block@archiver.kernel.org>; Wed,  6 Jan 2021 17:02:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1C6072313E
+	for <linux-block@archiver.kernel.org>; Wed,  6 Jan 2021 22:22:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727860AbhAFRCx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 Jan 2021 12:02:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52666 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727846AbhAFRCx (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Jan 2021 12:02:53 -0500
-Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2819C06135B
-        for <linux-block@vger.kernel.org>; Wed,  6 Jan 2021 09:02:08 -0800 (PST)
-Received: by mail-wm1-x335.google.com with SMTP id y23so3222680wmi.1
-        for <linux-block@vger.kernel.org>; Wed, 06 Jan 2021 09:02:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=dTM16oNjf1fQfacfYh3azRUgkJmTA+T6DCqoFqB6YUA=;
-        b=p6nFONWdSNXniDfEKw6pKY2xnIcJqy7lXmtl8gWoWYSCDSLkcOB54qmKiNwXBFa309
-         xui5R7h7YupVD00BHXltqjRx5yGIlftkOX9f4el/kVPat01JpKiSN5b0coCBRR3xDj0S
-         9T2iA993YF9hawwBUyWZYGZSQSFsQ9Ew3OPgiBMqnxiQfAtJa39mIFFdJYvMbSrrCyiM
-         VZfgYwm/Zzri2Qg2fsaccuv2pDnaR6dRC/TfoP0bJTjF57XksTCSo/TveRR4NfnDTGig
-         XRxZdXKdTNh3SPEx/QzPzezM/PlGziKEn2efUbMvPM/9vyr7iKWqQTSd3ds/73rAexwh
-         ZGcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=dTM16oNjf1fQfacfYh3azRUgkJmTA+T6DCqoFqB6YUA=;
-        b=pORsDkiKYVl/ooeitkWC5zfrRd9TmaurFsh1ImYCuSIqJrofk5mKhl5GrqYRlaTgZV
-         xsMDKq21+FKIiLJje0SJunY0ZseQwdaxwuyf0rdRTiciHV8M1AME1XiljVj3nNlmAQTY
-         wVz8ZIniuSW3gFLYQY16Y3w29dJqO3nlkBBAmIRgzKTEQPXmR8NEDIo6dTRuK3LuuABF
-         KlSDON88I2Ac2G7f2Z6hbpppSLw8XjHP8U351cGyUqcHJD2STHdw31MHv487qcPAP711
-         /ley6FaDCATXr4jDiowBnty78+khtbXP7KuSsGy4xkF/ETptYf4xkE8x5CdbotfKPgsf
-         KC7g==
-X-Gm-Message-State: AOAM531DVygg0f/CYrKLIUZUSm9erD0QjEvyWNaGuatM03KJHdDfNqIy
-        JTetg75C3LQzOwM3eXsPEfFS+KlchwqA1qHU
-X-Google-Smtp-Source: ABdhPJwOFE29pWovBjwRJAc3d+KmZVWpdo30imaC3mCxlFOyaQnL/y/j0L/sLUvs+nyP7fzMsL4YBQ==
-X-Received: by 2002:a1c:151:: with SMTP id 78mr4598477wmb.24.1609952527546;
-        Wed, 06 Jan 2021 09:02:07 -0800 (PST)
-Received: from [192.168.0.13] ([83.216.184.132])
-        by smtp.gmail.com with ESMTPSA id f9sm4255927wrw.81.2021.01.06.09.02.05
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 06 Jan 2021 09:02:06 -0800 (PST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH] bfq: Fix computation of shallow depth
-From:   Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <238318dd-9103-e4e4-d591-ef7212b86a48@kernel.dk>
-Date:   Wed, 6 Jan 2021 18:02:03 +0100
-Cc:     Jan Kara <jack@suse.cz>, linux-block <linux-block@vger.kernel.org>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <78A91DC0-0DC9-41EE-909D-341082CE4DA5@linaro.org>
-References: <20201210094433.25491-1-jack@suse.cz>
- <20210105162141.GA28898@quack2.suse.cz>
- <238318dd-9103-e4e4-d591-ef7212b86a48@kernel.dk>
-To:     Jens Axboe <axboe@kernel.dk>
-X-Mailer: Apple Mail (2.3445.104.11)
+        id S1726688AbhAFWV5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 Jan 2021 17:21:57 -0500
+Received: from mail106.syd.optusnet.com.au ([211.29.132.42]:34521 "EHLO
+        mail106.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726488AbhAFWV5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 6 Jan 2021 17:21:57 -0500
+Received: from dread.disaster.area (pa49-179-167-107.pa.nsw.optusnet.com.au [49.179.167.107])
+        by mail106.syd.optusnet.com.au (Postfix) with ESMTPS id BE3D476AF41;
+        Thu,  7 Jan 2021 09:21:12 +1100 (AEDT)
+Received: from dave by dread.disaster.area with local (Exim 4.92.3)
+        (envelope-from <david@fromorbit.com>)
+        id 1kxHB1-003m7x-Iw; Thu, 07 Jan 2021 09:21:11 +1100
+Date:   Thu, 7 Jan 2021 09:21:11 +1100
+From:   Dave Chinner <david@fromorbit.com>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [RFC PATCH] fs: block_dev: compute nr_vecs hint for improving
+ writeback bvecs allocation
+Message-ID: <20210106222111.GE331610@dread.disaster.area>
+References: <20210105132647.3818503-1-ming.lei@redhat.com>
+ <20210105183938.GA3878@lst.de>
+ <20210106084548.GA3845805@T590>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210106084548.GA3845805@T590>
+X-Optus-CM-Score: 0
+X-Optus-CM-Analysis: v=2.3 cv=F8MpiZpN c=1 sm=1 tr=0 cx=a_idp_d
+        a=+wqVUQIkAh0lLYI+QRsciw==:117 a=+wqVUQIkAh0lLYI+QRsciw==:17
+        a=kj9zAlcOel0A:10 a=EmqxpYm9HcoA:10 a=7-415B0cAAAA:8
+        a=dbeGUg55DdRa2WVwu8kA:9 a=CjuIK1q_8ugA:10 a=igBNqPyMv6gA:10
+        a=biEYGPWJfzWAr4FL6Ov7:22
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Wed, Jan 06, 2021 at 04:45:48PM +0800, Ming Lei wrote:
+> On Tue, Jan 05, 2021 at 07:39:38PM +0100, Christoph Hellwig wrote:
+> > At least for iomap I think this is the wrong approach.  Between the
+> > iomap and writeback_control we know the maximum size of the writeback
+> > request and can just use that.
+> 
+> I think writeback_control can tell us nothing about max pages in single
+> bio:
 
+By definition, the iomap tells us exactly how big the IO is going to
+be. i.e. an iomap spans a single contiguous range that we are going
+to issue IO on. Hence we can use that to size the bio exactly
+right for direct IO.
 
-> Il giorno 5 gen 2021, alle ore 17:29, Jens Axboe <axboe@kernel.dk> ha =
-scritto:
->=20
-> On 1/5/21 9:21 AM, Jan Kara wrote:
->> On Thu 10-12-20 10:44:33, Jan Kara wrote:
->>> BFQ computes number of tags it allows to be allocated for each =
-request type
->>> based on tag bitmap. However it uses 1 << bitmap.shift as number of
->>> available tags which is wrong. 'shift' is just an internal bitmap =
-value
->>> containing logarithm of how many bits bitmap uses in each bitmap =
-word.
->>> Thus number of tags allowed for some request types can be far to =
-low.
->>> Use proper bitmap.depth which has the number of tags instead.
->>>=20
->>> Signed-off-by: Jan Kara <jack@suse.cz>
->>=20
->> Ping Jens? I think it has fallen through the cracks?
->=20
-> More like waiting for Paolo to take a look. Don't mind taking it, and
-> I'll do that now, but I do expect him to review any BFQ patches being
-> sent out.
->=20
+> - wbc->nr_to_write controls how many pages to writeback, this pages
+>   usually don't belong to same bio. Also this number is often much
+>   bigger than BIO_MAX_PAGES.
+> 
+> - wbc->range_start/range_end is similar too, which is often much more
+>   bigger than BIO_MAX_PAGES.
+> 
+> Also page/blocks_in_page can be mapped to different extent too, which is
+> only available when wpc->ops->map_blocks() is returned,
 
-Sorry for the delay Jan.  As you know, my priority is currently to
-finalize the patches I have developed with your help; and
-unfortunately I'm way behind.  This is delaying also my review
-activity.
+We only allocate the bio -after- calling ->map_blocks() to obtain
+the iomap for the given writeback range request. Hence we
+already know how large the BIO could be before we allocate it.
 
-As for your proposal, I remember I found the right parameter rather
-empirically.  In particular, I seem to remember that the bitmap.depth
-parameter did not contain the value I needed, i.e, it did not
-contain the total number of tags.  But maybe something has changed in
-the meantime.  At any rate, if bitmap.depth does contain that value,
-then your replacement is ok.
+> which looks not
+> different with mpage_writepages(), in which bio is allocated with
+> BIO_MAX_PAGES vecs too.
 
-If your replacement is ok, then I guess you may want to also fix the
-comments above the changes you propose.
+__mpage_writepage() only maps a page at a time, so it can't tell
+ahead of time how big the bio is going to need to be as it doesn't
+return/cache a contiguous extent range. So it's actually very
+different to the iomap writeback code, and effectively does require
+a BIO_MAX_PAGES vecs allocation all the time...
 
-Thanks,
-Paolo
+> Or you mean we can use iomap->length for this purpose? But iomap->length
+> still is still too big in case of xfs.
 
-> --=20
-> Jens Axboe
->=20
+if we are doing small random writeback into large extents (i.e.
+iomap->length is large), then it is trivial to detect that we are
+doing random writes rather than sequential writes by checking if the
+current page is sequential to the last sector in the current bio.
+We already do this non-sequential IO checking to determine if a new
+bio needs to be allocated in iomap_can_add_to_ioend(), and we also
+know how large the current contiguous range mapped into the current
+bio chain is (ioend->io_size). Hence we've got everything we need to
+determine whether we should do a large or small bio vec allocation
+in the iomap writeback path...
 
+Cheers,
+
+Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
