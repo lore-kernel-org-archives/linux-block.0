@@ -2,167 +2,175 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E22D8C433E0
-	for <linux-block@archiver.kernel.org>; Wed,  6 Jan 2021 23:59:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C307C433E0
+	for <linux-block@archiver.kernel.org>; Thu,  7 Jan 2021 01:15:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9F97A23118
-	for <linux-block@archiver.kernel.org>; Wed,  6 Jan 2021 23:59:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0C03D23120
+	for <linux-block@archiver.kernel.org>; Thu,  7 Jan 2021 01:15:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727590AbhAFX72 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 Jan 2021 18:59:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33274 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726789AbhAFX71 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Jan 2021 18:59:27 -0500
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DBB7C06136B
-        for <linux-block@vger.kernel.org>; Wed,  6 Jan 2021 15:58:47 -0800 (PST)
-Received: by mail-pj1-x1031.google.com with SMTP id m5so2476649pjv.5
-        for <linux-block@vger.kernel.org>; Wed, 06 Jan 2021 15:58:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=nHM/zNarT82wu+x4lgAdGC2mHx8Guijmtu+f0YBziZs=;
-        b=NA3F+XKmnhNi6kzCESfIdsxKS2uZOsStA6v3UFprwRKw/OhFhOWV573G2OwOoRXJ9G
-         jpkX1PlTe24W+T6jmj/B9TdYvsqrmput3qZCO1iiRFiYVl8Nq5JykFYmHdH7fIBlGNO9
-         CjocitqQhG0jlGmIOTyGy0VGw5YZXa0E2JaYi54EB7YUp+23q3wIVe/ioL3JnNDIXwMW
-         0tLRdb8hjdQgj4wze3oBgV1PFShLjU29t90MrOXd5ZFilZTglcaLd7kxppWvJXysCH8b
-         CB9pxhKFB7fm4Sue3R5jjV3cX9ZHnG2ftbIES6aCsKS/kx9wrVNWV088nQ8W8BXgVKsT
-         hGgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=nHM/zNarT82wu+x4lgAdGC2mHx8Guijmtu+f0YBziZs=;
-        b=CXDyw93Z71fEHdzvtZg7bp6fZsYk7Wmjo/a+4KDfJZsrwO7ZVpIGsmQae4gN1bwXN7
-         Fuc71IJriJKgQKsY676/9PZE8RzFgh4sBCfZExCfCOivAqA6OzVCyZdtIE/vE3Y5EbO6
-         3GHP9PUuXis36i19xhvJ1MJraSqKsoOotF8hvC/PuCotgliCKfcl16GJc0NqBMWSPU+Y
-         PPKVugounsArlKk6uNDGCdfezEaRlXcczuhbPKnWtzvafzY56DW5tSeHIwNhOMy0eTPd
-         SxEZXYg5xcNCoA8tzJNuUeY+cBqSOZ55ctSnjYnepPmq0F6hHltPy6YcYyuMY1sAUY7l
-         VQlg==
-X-Gm-Message-State: AOAM530ToyMv8XycM3xLbw3jZ2jKS7ZG7f/kA9l13UoocbUignXLHMk2
-        DJ9ecVnaQOUpW+b8orLFjuy3tw==
-X-Google-Smtp-Source: ABdhPJwv5izWk5XM30g9rPSPMdovHLcTpT0DO/uurwnBAYjc/lVBVQTLqZutGbJkbfaM5c98RBK3cQ==
-X-Received: by 2002:a17:90a:1706:: with SMTP id z6mr1080632pjd.0.1609977526924;
-        Wed, 06 Jan 2021 15:58:46 -0800 (PST)
-Received: from [192.168.10.153] (124-171-107-241.dyn.iinet.net.au. [124.171.107.241])
-        by smtp.gmail.com with UTF8SMTPSA id d6sm3384801pfo.199.2021.01.06.15.58.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 Jan 2021 15:58:46 -0800 (PST)
-Message-ID: <5e6716a6-0314-8360-4fb6-5c959022a24c@ozlabs.ru>
-Date:   Thu, 7 Jan 2021 10:58:39 +1100
+        id S1726149AbhAGBPj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 Jan 2021 20:15:39 -0500
+Received: from out30-44.freemail.mail.aliyun.com ([115.124.30.44]:55981 "EHLO
+        out30-44.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725789AbhAGBPi (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 6 Jan 2021 20:15:38 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04423;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=4;SR=0;TI=SMTPD_---0UKxLUP3_1609982093;
+Received: from admindeMacBook-Pro-2.local(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0UKxLUP3_1609982093)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Thu, 07 Jan 2021 09:14:54 +0800
+Subject: Re: [dm-devel] [PATCH RFC 0/7] dm: add support of iopoll
+From:   JeffleXu <jefflexu@linux.alibaba.com>
+To:     snitzer@redhat.com
+Cc:     linux-block@vger.kernel.org, dm-devel@redhat.com,
+        io-uring@vger.kernel.org
+References: <20201223112624.78955-1-jefflexu@linux.alibaba.com>
+Message-ID: <568720e6-b574-eba4-cdf6-6c41c8901772@linux.alibaba.com>
+Date:   Thu, 7 Jan 2021 09:14:53 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.6.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:85.0) Gecko/20100101
- Thunderbird/85.0
-Subject: Re: [RFC PATCH kernel] block: initialize block_device::bd_bdi for
- bdev_cache
+In-Reply-To: <20201223112624.78955-1-jefflexu@linux.alibaba.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-To:     Jan Kara <jack@suse.cz>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>,
-        Tejun Heo <tj@kernel.org>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210106092900.26595-1-aik@ozlabs.ru>
- <20210106104106.GA29271@quack2.suse.cz>
-From:   Alexey Kardashevskiy <aik@ozlabs.ru>
-In-Reply-To: <20210106104106.GA29271@quack2.suse.cz>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi Mike,
+
+Would you please give some suggestions on this series?
 
 
-On 06/01/2021 21:41, Jan Kara wrote:
-> On Wed 06-01-21 20:29:00, Alexey Kardashevskiy wrote:
->> This is a workaround to fix a null derefence crash:
->>
->> [c00000000b01f840] c00000000b01f880 (unreliable)
->> [c00000000b01f880] c000000000769a3c bdev_evict_inode+0x21c/0x370
->> [c00000000b01f8c0] c00000000070bacc evict+0x11c/0x230
->> [c00000000b01f900] c00000000070c138 iput+0x2a8/0x4a0
->> [c00000000b01f970] c0000000006ff030 dentry_unlink_inode+0x220/0x250
->> [c00000000b01f9b0] c0000000007001c0 __dentry_kill+0x190/0x320
->> [c00000000b01fa00] c000000000701fb8 dput+0x5e8/0x860
->> [c00000000b01fa80] c000000000705848 shrink_dcache_for_umount+0x58/0x100
->> [c00000000b01fb00] c0000000006cf864 generic_shutdown_super+0x54/0x200
->> [c00000000b01fb80] c0000000006cfd48 kill_anon_super+0x38/0x60
->> [c00000000b01fbc0] c0000000006d12cc deactivate_locked_super+0xbc/0x110
->> [c00000000b01fbf0] c0000000006d13bc deactivate_super+0x9c/0xc0
->> [c00000000b01fc20] c00000000071a340 cleanup_mnt+0x1b0/0x250
->> [c00000000b01fc80] c000000000278fa8 task_work_run+0xf8/0x180
->> [c00000000b01fcd0] c00000000002b4ac do_notify_resume+0x4dc/0x5d0
->> [c00000000b01fda0] c00000000004ba0c syscall_exit_prepare+0x28c/0x370
->> [c00000000b01fe10] c00000000000e06c system_call_common+0xfc/0x27c
->> --- Exception: c00 (System Call) at 0000000010034890
->>
->> Is this fixed properly already somewhere? Thanks,
->>
->> Fixes: e6cb53827ed6 ("block: initialize struct block_device in bdev_alloc")
+Thanks,
+Jeffle
+
+On 12/23/20 7:26 PM, Jeffle Xu wrote:
+> This patch set adds support of iopoll for dm devices.
 > 
-> I don't think it's fixed anywhere and I've seen the syzbot report and I was
-> wondering how this can happen when bdev_alloc() initializes bdev->bd_bdi
-> and it also wasn't clear to me whether bd_bdi is really the only field that
-> is problematic - if we can get to bdev_evict_inode() without going through
-> bdev_alloc(), we are probably missing initialization of other fields in
-> that place as well...
+> Several months ago, I also sent a patch set adding support of iopoll
+> for dm devices [1]. The old patch set implement this by polling all
+> polling mode hardware queues of all underlying target devices
+> unconditionally, no matter which hardware queue the bio is enqueued
+> into.
 > 
-> But now I've realized that probably the inode is a root inode for bdev
-> superblock which is allocated by VFS through new_inode() and thus doesn't
-> undergo the initialization in bdev_alloc(). 
-
-yup, this is the case.
-
-> And AFAICT the root inode on
-> bdev superblock can get only to bdev_evict_inode() and bdev_free_inode().
-> Looking at bdev_evict_inode() the only thing that's used there from struct
-> block_device is really bd_bdi. bdev_free_inode() will also access
-> bdev->bd_stats and bdev->bd_meta_info. So we need to at least initialize
-> these to NULL as well.
-
-These are all NULL.
-
-> IMO the most logical place for all these
-> initializations is in bdev_alloc_inode()...
-
-
-This works. We can also check for NULL where it crashes. But I do not 
-know the code to make an informed decision...
-
+> Ming Lei pointed out that this implementation may have performance
+> issue. Mike Snitzer also discussed and helpt a lot on the design
+> issue. At that time, we agreed that this feature should be
+> implemented on the basis of split-bio tracking, since the bio to the
+> dm device could be split into multiple split bios to the underlying
+> target devices.
 > 
-> 								Honza
+> This patch set actually implement the split-bio tracking part.
+> Regrettably this implementation is quite coarse and original. Quite
+> code refactoring is introduced to the block core, since device mapper
+> also calls methods provided by block core to split bios. The new
+> fields are directly added into 'struct bio' structure. So this is
+> just an RFC version and there may be quite a lot design issues be
+> fronted on. I just implement a version quickly and would like to share
+> with you my thoughts and problems at hand.
 > 
->> ---
->>   fs/block_dev.c | 2 ++
->>   1 file changed, 2 insertions(+)
->>
->> diff --git a/fs/block_dev.c b/fs/block_dev.c
->> index 3e5b02f6606c..86fdc28d565e 100644
->> --- a/fs/block_dev.c
->> +++ b/fs/block_dev.c
->> @@ -792,8 +792,10 @@ static void bdev_free_inode(struct inode *inode)
->>   static void init_once(void *data)
->>   {
->>   	struct bdev_inode *ei = data;
->> +	struct block_device *bdev = &ei->bdev;
->>   
->>   	inode_init_once(&ei->vfs_inode);
->> +	bdev->bd_bdi = &noop_backing_dev_info;
->>   }
->>   
->>   static void bdev_evict_inode(struct inode *inode)
->> -- 
->> 2.17.1
->>
+> This implementation works but has poor performance. Awkwardly the
+> performance of direct 8k randread decreases ~20% on a 8k-striped
+> dm-stripe device.
+> 
+> The first 5 patches prepare the introduction of iopoll for dm device.
+> Patch 6 is the core part and implements a mechanism of tracking split
+> bios for bio-based device. Patch 7 just enables this feature.
+> 
+> [1] https://patchwork.kernel.org/project/linux-block/cover/20201020065420.124885-1-jefflexu@linux.alibaba.com/
+> 
+> 
+> [Design Notes]
+> 
+> - recursive way or non-recursive way?
+> 
+> The core of the split-bio tracking mechanism is that, a list is
+> maintained in the top bio (the original bio submitted to the dm
+> device), which is actually used to maintain all valid cookies of all
+> split bios.
+> 
+> This is actually a non-recursive way to implement the tracking
+> mechanism. On the contrary, the recursive way is that, maintain the
+> split bios at each dm layer. DM device can be build into a device
+> stack. For example, considering the following device stack,
+> 
+> ```
+>             dm0(bio 0)
+> dm1(bio 1)             dm2(bio 2)
+> nvme0(bio 3)           nvme1(bio 4)
+> 
+> ```
+> 
+> The non-recursive way is that bio 3/4 are directly maintained as a
+> list beneath bio 0. The recursive way is that, bio 3 is maintained
+> as a list beneath bio 1 and bio 4 is maintained as a list beneath
+> bio 2, while bio 1/2 are maintained as a list beneath bio 0.
+> 
+> The reason why I choose the non-recursive way is that, we need call
+> blk_bio_poll() or something recursively if it's implemented in the
+> recursive way, and I worry this would consume up the stack space if
+> the device stack is too deep. After all bio_list is used to prevent
+> the dm device using up stack space when submitting bio. 
+> 
+> 
+> - why embed new fields into struct bio directly?
+> 
+> Mike Snitzer had ever suggested that the newly added fields could be
+> integrated into the clone bio allocated by dm subsystem through
+> bio_set. There're 3 reasons why I directly embed these fields into
+> struct bio:
+> 
+> 1. The implementation difference of DM and MD
+> DM subsystem indeed allocate clone bio itself, in which case we could
+> allocate extra per-bio space for specific usage. However MD subsystem
+> doesn't allocate extra clone bio, and just uses the bio structure
+> originally submitted to MD device as the bio structure submitted to
+> the underlying target device. (At least raid0 works in this way.)
+> 
+> 2. In the previously mentioned non-recursive way of iopoll, a list
+> containing all valid cookies should be maintained. For convenience, I
+> just put this list in the top bio (the original bio structure
+> submitted to the dm device). This original bio structure is allocated
+> by the upper layer, e.g. filesystem, and is out of control of DM
+> subsystem. (Of course we could resolve this problem technically, e.g.,
+> put these newlly added fields into the corresponding dm_io structure
+> of the top bio.)
+> 
+> 3. As a quick implementation, I just put these fields into struct bio
+> directly. Obviously more design issues need to be considered when it
+> comes into the formal version.
+> 
+> 
+> Jeffle Xu (7):
+>   block: move definition of blk_qc_t to types.h
+>   block: add helper function fetching gendisk from queue
+>   block: add iopoll method for non-mq device
+>   block: define blk_qc_t as uintptr_t
+>   dm: always return BLK_QC_T_NONE for bio-based device
+>   block: track cookies of split bios for bio-based device
+>   dm: add support for IO polling
+> 
+>  block/bio.c                  |   8 ++
+>  block/blk-core.c             | 163 ++++++++++++++++++++++++++++++++++-
+>  block/blk-mq.c               |  70 ++-------------
+>  drivers/md/dm-table.c        |  28 ++++++
+>  drivers/md/dm.c              |  27 +++---
+>  include/linux/blk-mq.h       |   3 +
+>  include/linux/blk_types.h    |  41 ++++++++-
+>  include/linux/blkdev.h       |   3 +
+>  include/linux/fs.h           |   2 +-
+>  include/linux/types.h        |   3 +
+>  include/trace/events/kyber.h |   6 +-
+>  11 files changed, 270 insertions(+), 84 deletions(-)
+> 
 
 -- 
-Alexey
+Thanks,
+Jeffle
