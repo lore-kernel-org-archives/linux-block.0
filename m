@@ -2,104 +2,132 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F4D2C433E0
-	for <linux-block@archiver.kernel.org>; Thu,  7 Jan 2021 12:09:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5960CC43381
+	for <linux-block@archiver.kernel.org>; Thu,  7 Jan 2021 17:45:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D171423358
-	for <linux-block@archiver.kernel.org>; Thu,  7 Jan 2021 12:09:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3BCB0233FD
+	for <linux-block@archiver.kernel.org>; Thu,  7 Jan 2021 17:45:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725974AbhAGMIr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 7 Jan 2021 07:08:47 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:26778 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725835AbhAGMIq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 7 Jan 2021 07:08:46 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610021240;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=NJa8qx6gYzbEB00ZM6yjGefsfTJDQemlWtjIpm1BNYE=;
-        b=bWYZL1E4WhZfxBra+hQT9FQxJ1AQNalaTP15Yg4CMDaZRJDMigWOcz1TBAgZHS5327PDeM
-        ixjTl/LXizHfwLxz4qntG7j3864Dcn66G/b5MXkVffKOrBHua+sA9bPEBfS+dWkcQgkVwS
-        ouTNWqcspm7jnmq/hjhAYFh+VFhB5yY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-288-mp6Bnoi1Mi-Gj2uLtJnYIg-1; Thu, 07 Jan 2021 07:07:19 -0500
-X-MC-Unique: mp6Bnoi1Mi-Gj2uLtJnYIg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 155E4107ACE4;
-        Thu,  7 Jan 2021 12:07:18 +0000 (UTC)
-Received: from T590 (ovpn-12-95.pek2.redhat.com [10.72.12.95])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id E036D60916;
-        Thu,  7 Jan 2021 12:06:54 +0000 (UTC)
-Date:   Thu, 7 Jan 2021 20:06:47 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jan Kara <jack@suse.cz>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [PATCH 2/2] blk-mq: Improve performance of non-mq IO schedulers
- with multiple HW queues
-Message-ID: <20210107120647.GA3915822@T590>
-References: <20210106102428.551-1-jack@suse.cz>
- <20210106102428.551-3-jack@suse.cz>
- <20210107061918.GA3897511@T590>
- <20210107111815.GB12990@quack2.suse.cz>
+        id S1728687AbhAGRoy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 7 Jan 2021 12:44:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58572 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726438AbhAGRox (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Jan 2021 12:44:53 -0500
+Received: from mail-qk1-x730.google.com (mail-qk1-x730.google.com [IPv6:2607:f8b0:4864:20::730])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45882C0612F6
+        for <linux-block@vger.kernel.org>; Thu,  7 Jan 2021 09:44:13 -0800 (PST)
+Received: by mail-qk1-x730.google.com with SMTP id 143so6121236qke.10
+        for <linux-block@vger.kernel.org>; Thu, 07 Jan 2021 09:44:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=lHNm8uDmPy3iG7VP+rZSrjxlKRFNIPZy9iz2Yh/Sa+s=;
+        b=DilJRgOjUGCkNxVbxqaEZR1cwZNNstBr627PIcTB9nAkNhFIAEdj2KP9O/SRdV1mTy
+         fwsNq4eEp0F+MGgRKtNUHxsis3IsLDldIIGRF9oAp4kxNykVi2lUkquJNA3T8hZ8Y0S5
+         BKEOlaehVFxfM/tqZ4q+TczmHy6izyRHS5wE/oLZtnlcdKbSvT5M8372+4oNafqS+J0c
+         VbyMm00QdGgQ9hCdLJqY2hsPbrzaX+gJDeCGl6JjEHQE3ivIvZX2YeuEZjhb55hhBsEw
+         O4EbR0zCO3kQRe/EiyZJNsaQLjfohF5vzinPCUFyJHNbCPwwG/MbuMJNcQcpI4/Yia9h
+         tn2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=lHNm8uDmPy3iG7VP+rZSrjxlKRFNIPZy9iz2Yh/Sa+s=;
+        b=IWUwJHJkBmSDLl1ctQ0lA9GV0uLN7AbLvdAA7PJ5S8PVK5bnPCSt78d33Ur7gkltY6
+         idw4TdXTbXb2ERcXW8mk0PddrSR3e5A6Ck/IGzClhc1onKbUhfj7rFkCqVsxqRRxU9Ct
+         7MJEVzQootHWLzipQdPJ4i9OuLmOnxJaLiC5sqsD6OCDlNk5t33nvNycDhAcEAf2MOd5
+         OsIVTTdkCpGQmW7cWh7u5OWNwdqdJ4vkktXQBobTSoAk5PEN9V6Vqha7I4aOoRsaO/ME
+         sufnYPbXnZe8G9CjBNQPFmACAN1kO4/47AnSY+qi8DAzebkjB1JtgOogeoxMgovOmJJt
+         zJwA==
+X-Gm-Message-State: AOAM531QW5it11C3zKEbXhDvQ1dGQZYIsybbuSiABjmkGNytWpJEmguz
+        sbOXeHHYhuRm6H78SVWI58m+Ug==
+X-Google-Smtp-Source: ABdhPJwTdp1mFNmZjd/uTThSUu3tREo6Dtb4VkwqpGpv7ZYVPfWDxnJ3YoPDIOWbz+jR2KjGnUR+yw==
+X-Received: by 2002:a05:620a:9d7:: with SMTP id y23mr10176247qky.181.1610041452516;
+        Thu, 07 Jan 2021 09:44:12 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-162-115-133.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.115.133])
+        by smtp.gmail.com with ESMTPSA id b12sm3053989qtj.12.2021.01.07.09.44.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Jan 2021 09:44:11 -0800 (PST)
+Received: from jgg by mlx with local (Exim 4.94)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1kxZKU-003lqO-Rg; Thu, 07 Jan 2021 13:44:10 -0400
+Date:   Thu, 7 Jan 2021 13:44:10 -0400
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Douglas Gilbert <dgilbert@interlog.com>
+Cc:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        target-devel@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-kernel@vger.kernel.org, martin.petersen@oracle.com,
+        jejb@linux.vnet.ibm.com, bostroesser@gmail.com, bvanassche@acm.org,
+        ddiss@suse.de
+Subject: Re: [PATCH v5 1/4] sgl_alloc_order: remove 4 GiB limit, sgl_free()
+ warning
+Message-ID: <20210107174410.GB504133@ziepe.ca>
+References: <20201228234955.190858-1-dgilbert@interlog.com>
+ <20201228234955.190858-2-dgilbert@interlog.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210107111815.GB12990@quack2.suse.cz>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20201228234955.190858-2-dgilbert@interlog.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jan 07, 2021 at 12:18:15PM +0100, Jan Kara wrote:
-> On Thu 07-01-21 14:19:18, Ming Lei wrote:
-> > On Wed, Jan 06, 2021 at 11:24:28AM +0100, Jan Kara wrote:
-> > > +/* Check if there are requests queued in hctx lists. */
-> > > +static bool blk_mq_hctx_has_queued_rq(struct blk_mq_hw_ctx *hctx)
-> > > +{
-> > > +	return !list_empty_careful(&hctx->dispatch) ||
-> > > +		sbitmap_any_bit_set(&hctx->ctx_map);
-> > > +}
-> > > +
-> > 
-> > blk_mq_hctx_mark_pending() is only called in case of none scheduler, so
-> > looks not necessary to check hctx->ctx_map in blk_mq_hctx_has_queued_rq()
-> > which is supposed to be used when real io scheduler is attached to MQ queue.
-> 
-> Yes, I know. I just wanted to make the code less fragile... In particular I
-> was somewhat uneasy that we'd rely on the implicit behavior that
-> blk_mq_get_sqsched_hctx() can return non-NULL only if sbitmap_any_bit_set()
-> is not needed. But maybe we could structure the code like:
+On Mon, Dec 28, 2020 at 06:49:52PM -0500, Douglas Gilbert wrote:
+> diff --git a/lib/scatterlist.c b/lib/scatterlist.c
+> index a59778946404..4986545beef9 100644
+> +++ b/lib/scatterlist.c
+> @@ -554,13 +554,15 @@ EXPORT_SYMBOL(sg_alloc_table_from_pages);
+>  #ifdef CONFIG_SGL_ALLOC
+>  
+>  /**
+> - * sgl_alloc_order - allocate a scatterlist and its pages
+> + * sgl_alloc_order - allocate a scatterlist with equally sized elements
+>   * @length: Length in bytes of the scatterlist. Must be at least one
+> - * @order: Second argument for alloc_pages()
+> + * @order: Second argument for alloc_pages(). Each sgl element size will
+> + *	   be (PAGE_SIZE*2^order) bytes
+>   * @chainable: Whether or not to allocate an extra element in the scatterlist
+> - *	for scatterlist chaining purposes
+> + *	       for scatterlist chaining purposes
+>   * @gfp: Memory allocation flags
+> - * @nent_p: [out] Number of entries in the scatterlist that have pages
+> + * @nent_p: [out] Number of entries in the scatterlist that have pages.
+> + *		  Ignored if NULL is given.
+>   *
+>   * Returns: A pointer to an initialized scatterlist or %NULL upon failure.
+>   */
+> @@ -574,8 +576,8 @@ struct scatterlist *sgl_alloc_order(unsigned long long length,
+>  	u32 elem_len;
+>  
+>  	nent = round_up(length, PAGE_SIZE << order) >> (PAGE_SHIFT + order);
+> -	/* Check for integer overflow */
+> -	if (length > (nent << (PAGE_SHIFT + order)))
+> +	/* Integer overflow if:  length > nent*2^(PAGE_SHIFT+order) */
+> +	if (ilog2(length) > ilog2(nent) + PAGE_SHIFT + order)
+>  		return NULL;
+>  	nalloc = nent;
+>  	if (chainable) {
 
-BTW, I mentioned the point because sbitmap_any_bit_set(hctx->ctx_map) may take
-some CPU cycle in case that nr_cpu_ids is big.
+This is a little bit too tortured now, how about this:
 
-> 
-> 	sq_hctx = NULL;
-> 	if (blk_mq_has_sqsched(q))
-> 		sq_hctx = blk_mq_get_sq_hctx(q);
-> 	queue_for_each_hw_ctx(q, hctx, i) {
-> 		...
-> 		if (!sq_hctx || sq_hctx == hctx ||
-> 		    !list_empty_careful(&hctx->dispatch))
-> 			... run ...
-> 	}
-> 
-> Because then it is kind of obvious that sq_hctx is set only if there's IO
-> scheduler for the queue and thus ctx_map is unused. What do you think?
+	if (length >> (PAGE_SHIFT + order) >= UINT_MAX)
+		return NULL;
+	nent = length >> (PAGE_SHIFT + order);
+	if (length & ((1ULL << (PAGE_SHIFT + order)) - 1))
+		nent++;
 
-IMO, the above is more readable and efficient.
+	if (chainable) {
+		if (check_add_overflow(nent, 1, &nalloc))
+			return NULL;
+	}
+	else
+		nalloc = nent;
 
-Thanks,
-Ming
-
+Jason
