@@ -2,159 +2,107 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-20.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A671CC433E0
-	for <linux-block@archiver.kernel.org>; Fri,  8 Jan 2021 21:01:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95CAAC433DB
+	for <linux-block@archiver.kernel.org>; Sat,  9 Jan 2021 04:15:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 705CC23AC2
-	for <linux-block@archiver.kernel.org>; Fri,  8 Jan 2021 21:01:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5183823A69
+	for <linux-block@archiver.kernel.org>; Sat,  9 Jan 2021 04:15:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729636AbhAHVBE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Jan 2021 16:01:04 -0500
-Received: from mail106.syd.optusnet.com.au ([211.29.132.42]:60828 "EHLO
-        mail106.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728511AbhAHVBD (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 8 Jan 2021 16:01:03 -0500
-Received: from dread.disaster.area (pa49-179-167-107.pa.nsw.optusnet.com.au [49.179.167.107])
-        by mail106.syd.optusnet.com.au (Postfix) with ESMTPS id 3438676566F;
-        Sat,  9 Jan 2021 08:00:17 +1100 (AEDT)
-Received: from dave by dread.disaster.area with local (Exim 4.92.3)
-        (envelope-from <david@fromorbit.com>)
-        id 1kxyrp-004RRw-51; Sat, 09 Jan 2021 08:00:17 +1100
-Date:   Sat, 9 Jan 2021 08:00:17 +1100
-From:   Dave Chinner <david@fromorbit.com>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [RFC PATCH] fs: block_dev: compute nr_vecs hint for improving
- writeback bvecs allocation
-Message-ID: <20210108210017.GK331610@dread.disaster.area>
-References: <20210105132647.3818503-1-ming.lei@redhat.com>
- <20210105183938.GA3878@lst.de>
- <20210106084548.GA3845805@T590>
- <20210106222111.GE331610@dread.disaster.area>
- <20210108075922.GB3982620@T590>
+        id S1725970AbhAIEPo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Jan 2021 23:15:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55888 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725861AbhAIEPn (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Jan 2021 23:15:43 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78DCCC061573
+        for <linux-block@vger.kernel.org>; Fri,  8 Jan 2021 20:15:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Type:MIME-Version:Message-ID:
+        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=ZjYLRPMvHaT9Jek8mcD0b2kBL6w1IQg5zbFqtKQ8NdQ=; b=vYe0tl/oadyBwcF9GOeXoXFBIP
+        xmN7hOZyyOUdfqiC9IbXSvgSdxQ8xNu63QsTwwFNBHZXSbmile/SfgilunIT/FT9jIoaHq1R+UmUg
+        fXpT7Iy/6BhaePm1Q68lxn64o0h1fKPh0WsGrcD/RLJ85WumaAIRq4YEzFN+i9UbpEPHb7Rs9ytGG
+        alNzO3uKg7WA68AwkUcuzFXmi7XULxdMufBdeaaLl9aDq3N0paypiFZk+pTLXSjGqU+MkVh/wOXfS
+        aVtF6GOAkjWkRwKEnDESOm+baQ003321LyqmUNRm7q5xt5JJJyO553oJsUrt7PD8zTVef+tI8AGaN
+        k+ShU4HA==;
+Received: from 213-225-33-181.nat.highway.a1.net ([213.225.33.181] helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
+        id 1kxZLK-000HxI-LA; Thu, 07 Jan 2021 17:45:27 +0000
+Date:   Thu, 7 Jan 2021 18:42:51 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
+        Sagi Grimberg <sagi@grimberg.me>,
+        linux-nvme@lists.infradead.org
+Subject: [GIT PULL] nvme fixes for 5.11
+Message-ID: <X/dIG7478C6ahGvo@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210108075922.GB3982620@T590>
-X-Optus-CM-Score: 0
-X-Optus-CM-Analysis: v=2.3 cv=F8MpiZpN c=1 sm=1 tr=0 cx=a_idp_d
-        a=+wqVUQIkAh0lLYI+QRsciw==:117 a=+wqVUQIkAh0lLYI+QRsciw==:17
-        a=kj9zAlcOel0A:10 a=EmqxpYm9HcoA:10 a=7-415B0cAAAA:8
-        a=0TDAt5E3tB6VCO8953IA:9 a=qZgZfBh61L_KZ1-l:21 a=JzxU2LrYxQ7o857g:21
-        a=CjuIK1q_8ugA:10 a=biEYGPWJfzWAr4FL6Ov7:22
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jan 08, 2021 at 03:59:22PM +0800, Ming Lei wrote:
-> On Thu, Jan 07, 2021 at 09:21:11AM +1100, Dave Chinner wrote:
-> > On Wed, Jan 06, 2021 at 04:45:48PM +0800, Ming Lei wrote:
-> > > On Tue, Jan 05, 2021 at 07:39:38PM +0100, Christoph Hellwig wrote:
-> > > > At least for iomap I think this is the wrong approach.  Between the
-> > > > iomap and writeback_control we know the maximum size of the writeback
-> > > > request and can just use that.
-> > > 
-> > > I think writeback_control can tell us nothing about max pages in single
-> > > bio:
-> > 
-> > By definition, the iomap tells us exactly how big the IO is going to
-> > be. i.e. an iomap spans a single contiguous range that we are going
-> > to issue IO on. Hence we can use that to size the bio exactly
-> > right for direct IO.
-> 
-> When I trace wpc->iomap.length in iomap_add_to_ioend() on the following fio
-> randwrite/write, the length is 1GB most of times, maybe because it is
-> one fresh XFS.
+The following changes since commit aebf5db917055b38f4945ed6d621d9f07a44ff30:
 
-Yes, that's exactly what I said it would do.
+  block: fix use-after-free in disk_part_iter_next (2021-01-05 11:35:17 -0700)
 
-> Another reason is that pages in the range may be contiguous physically,
-> so lots of pages may share one single bvec.
+are available in the Git repository at:
 
-The iomap layer does not care about this, and there's no way this
-can be detected ahead of time, anyway, because we are only passed a
-single page at a time. When we get large pages from the page cache,
-we'll still only get one page at a time, but we'll get physically
-contiguous pages and so it will still be a 1 page : 1 bvec
-relationship at the iomap layer.
+  git://git.infradead.org/nvme.git tags/nvme-5.11-2021-01-07
 
-> > > - wbc->nr_to_write controls how many pages to writeback, this pages
-> > >   usually don't belong to same bio. Also this number is often much
-> > >   bigger than BIO_MAX_PAGES.
-> > > 
-> > > - wbc->range_start/range_end is similar too, which is often much more
-> > >   bigger than BIO_MAX_PAGES.
-> > > 
-> > > Also page/blocks_in_page can be mapped to different extent too, which is
-> > > only available when wpc->ops->map_blocks() is returned,
-> > 
-> > We only allocate the bio -after- calling ->map_blocks() to obtain
-> > the iomap for the given writeback range request. Hence we
-> > already know how large the BIO could be before we allocate it.
-> > 
-> > > which looks not
-> > > different with mpage_writepages(), in which bio is allocated with
-> > > BIO_MAX_PAGES vecs too.
-> > 
-> > __mpage_writepage() only maps a page at a time, so it can't tell
-> > ahead of time how big the bio is going to need to be as it doesn't
-> > return/cache a contiguous extent range. So it's actually very
-> > different to the iomap writeback code, and effectively does require
-> > a BIO_MAX_PAGES vecs allocation all the time...
-> > 
-> > > Or you mean we can use iomap->length for this purpose? But iomap->length
-> > > still is still too big in case of xfs.
-> > 
-> > if we are doing small random writeback into large extents (i.e.
-> > iomap->length is large), then it is trivial to detect that we are
-> > doing random writes rather than sequential writes by checking if the
-> > current page is sequential to the last sector in the current bio.
-> > We already do this non-sequential IO checking to determine if a new
-> > bio needs to be allocated in iomap_can_add_to_ioend(), and we also
-> > know how large the current contiguous range mapped into the current
-> > bio chain is (ioend->io_size). Hence we've got everything we need to
-> > determine whether we should do a large or small bio vec allocation
-> > in the iomap writeback path...
-> 
-> page->index should tell us if the workload is random or sequential, however
-> still not easy to decide how many pages there will be in the next bio
-> when iomap->length is large.
+for you to fetch changes up to 2b59787a223b79228fed9ade1bf6936194ddb8cd:
 
-page->index doesn't tell us anything about what type of IO is being
-done - it just tells us where in the file we need to map to find the
-physical block we need to write it to. OTOH, the iomap writeback
-context contains all the information about current IO being build -
-offset, size, current bio, etc - and the page->index gets compared
-against the state in the iomap writepage context.
+  nvme: remove the unused status argument from nvme_trace_bio_complete (2021-01-06 10:30:37 +0100)
 
-So, if the wpc->iomap.length is large, current page->index does not
-map sequentially to the end of wpc->ioend->io_bio (or
-wpc->io_end->io_offset + wpc->ioend->io_size) and
-wpc->io_end->io_size == page_size(page) for the currently held bio,
-then we are clearly doing random single page writeback into a large
-allocated extent. Hence in that case we can do small bvec
-allocations for the new bio.
+----------------------------------------------------------------
+nvme updates for 5.11:
 
-Sure, the first bio in a ->writepages invocation doesn't have this
-information, so we've going to have to assume BIO_MAX_PAGES for the
-first bio. But for every bio after that in the ->writepages
-invocation we have the state of the previous contiguous writeback
-range held in the wpc structure and can use that info to optimise
-the thousands of random single pages that are written after then
-first one...
+ - fix a race in the nvme-tcp send code (Sagi Grimberg)
+ - fix a list corruption in an nvme-rdma error path (Israel Rukshin)
+ - avoid a possible double fetch in nvme-pci (Lalithambika Krishnakumar)
+ - add the susystem NQN quirk for a Samsung driver (Gopal Tiwari)
+ - fix two compiler warnings in nvme-fcloop (James Smart)
+ - don't call sleeping functions from irq context in nvme-fc (James Smart)
+ - remove an unused argument (Max Gurtovoy)
+ - remove unused exports (Minwoo Im)
 
-Cheers,
+----------------------------------------------------------------
+Gopal Tiwari (1):
+      nvme-pci: mark Samsung PM1725a as IGNORE_DEV_SUBNQN
 
-Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+Israel Rukshin (1):
+      nvmet-rdma: Fix list_del corruption on queue establishment failure
+
+James Smart (2):
+      nvme-fc: avoid calling _nvme_fc_abort_outstanding_ios from interrupt context
+      nvme-fcloop: Fix sscanf type and list_first_entry_or_null warnings
+
+Lalithambika Krishnakumar (1):
+      nvme: avoid possible double fetch in handling CQE
+
+Max Gurtovoy (1):
+      nvme: remove the unused status argument from nvme_trace_bio_complete
+
+Minwoo Im (1):
+      nvme: unexport functions with no external caller
+
+Sagi Grimberg (1):
+      nvme-tcp: Fix possible race of io_work and direct send
+
+ drivers/nvme/host/core.c     |  8 +++-----
+ drivers/nvme/host/fc.c       | 15 ++++++++++++++-
+ drivers/nvme/host/nvme.h     |  9 ++-------
+ drivers/nvme/host/pci.c      | 10 ++++++----
+ drivers/nvme/host/tcp.c      | 12 +++++++++++-
+ drivers/nvme/target/fcloop.c |  7 ++++---
+ drivers/nvme/target/rdma.c   | 10 ++++++++++
+ 7 files changed, 50 insertions(+), 21 deletions(-)
