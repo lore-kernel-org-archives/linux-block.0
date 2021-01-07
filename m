@@ -2,140 +2,91 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3E12C433E0
-	for <linux-block@archiver.kernel.org>; Thu,  7 Jan 2021 18:18:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67B2CC433DB
+	for <linux-block@archiver.kernel.org>; Thu,  7 Jan 2021 18:22:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A795C233CF
-	for <linux-block@archiver.kernel.org>; Thu,  7 Jan 2021 18:18:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 167AB207C8
+	for <linux-block@archiver.kernel.org>; Thu,  7 Jan 2021 18:22:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729292AbhAGSSX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 7 Jan 2021 13:18:23 -0500
-Received: from youngberry.canonical.com ([91.189.89.112]:49871 "EHLO
+        id S1729082AbhAGSVw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 7 Jan 2021 13:21:52 -0500
+Received: from youngberry.canonical.com ([91.189.89.112]:49937 "EHLO
         youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726386AbhAGSSW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Jan 2021 13:18:22 -0500
-Received: from mail-qk1-f199.google.com ([209.85.222.199])
+        with ESMTP id S1727058AbhAGSVw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Jan 2021 13:21:52 -0500
+Received: from mail-wr1-f71.google.com ([209.85.221.71])
         by youngberry.canonical.com with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
         (Exim 4.86_2)
-        (envelope-from <mfo@canonical.com>)
-        id 1kxZqu-00078J-55
-        for linux-block@vger.kernel.org; Thu, 07 Jan 2021 18:17:40 +0000
-Received: by mail-qk1-f199.google.com with SMTP id x74so6876745qkb.12
-        for <linux-block@vger.kernel.org>; Thu, 07 Jan 2021 10:17:40 -0800 (PST)
+        (envelope-from <mauricio.oliveira@canonical.com>)
+        id 1kxZuH-0007Ne-Qe
+        for linux-block@vger.kernel.org; Thu, 07 Jan 2021 18:21:09 +0000
+Received: by mail-wr1-f71.google.com with SMTP id o12so2963339wrq.13
+        for <linux-block@vger.kernel.org>; Thu, 07 Jan 2021 10:21:09 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=I3X+scLEAwHcaQ88K7i7jawAfpaYGB5qjnrY9nAEImY=;
-        b=TmHyRFY7Hmz5sAoNW6xina0AjxZNnKzkbJi5JyEJy6Xc0mi+4BcoE+FDESa02kaQhZ
-         eVDUZcxVAr9XDwytkT59NFFE9Z3K2bvtTFcbs2KynKIyYW/vcR/YKvw9DoQ3oaRTpSww
-         MlHM5R23gUQbhiJ/qIOA++8/ifcKkCtm4RSiqf0JFuB378qd5Qd4/BIXsIm1NNPPmNfa
-         o3yMKYmOky+tlqAsZOMe9ps3aSlV520kpCbGpGJ9s9u15r5eZB/dYLmj2aSD7qkkCdTk
-         WpDl2lEnbf5bUsrFF2Bq56pYg4A+W1zfecKt4zjNvZ5eCOuPtVeik+nbE1HFqbxc8Q7R
-         kfnA==
-X-Gm-Message-State: AOAM5330tdcCVuUxQR6S1o4RhrrdboERdSd/ukEmB8oUgIXv7pHVNXhi
-        MsNWvMnFon1rrPu1f3+IU7DAhdqsB3EAq5bNqJ5w+ZheWbT0n6GLbZDY63DzfwKH05mOmHpmwCu
-        DeGKXumrdFE9AiO44uPecN01nxVygOiSyNoxwnZx8
-X-Received: by 2002:a05:622a:30e:: with SMTP id q14mr9812129qtw.77.1610043459081;
-        Thu, 07 Jan 2021 10:17:39 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJw7zlnfaZ0ddOx2kBrn4YOzsWrdkIU1OsIRfmP+K3r0udmp2Fhg5iDCceNCs0+/+/0k4WbAqA==
-X-Received: by 2002:a05:622a:30e:: with SMTP id q14mr9812112qtw.77.1610043458878;
-        Thu, 07 Jan 2021 10:17:38 -0800 (PST)
-Received: from localhost.localdomain ([201.82.34.122])
-        by smtp.gmail.com with ESMTPSA id z78sm3633361qkb.0.2021.01.07.10.17.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Jan 2021 10:17:38 -0800 (PST)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=1yH8XJ+SsEmCmR1IemBhmlBy8uJA25p1sUW8hvVstic=;
+        b=Lzz0hTQ9hMILZ8IBFJw2sEjZ2uKvpzwOrf2/y2kCxphg7H6X3+0cENYQEvtl7wlfmp
+         zNaHf6qUpUs0xcz7PIBiDxlgg2b+Om/r33O3NKJJ9d+d04mSXnUZdXet8KKPvoVSa8Yr
+         ZfB/ZBR9NCNZo4JNsj8SaNAwhtr1z1gJVHMyV/VMufITDfLB3zxNdRgLuKCM6POZeNqS
+         dX7hfu+kIjSvL2KrPVcO9ZX1rcuRqlt5IoL1cAG8NnJAENAmZrglkb+OUUacreXScbI1
+         /K0hzxbiVaRAZb2m/OVmPyVVpIafC6o6Flm2NlA4HkDri2chj2x8KTUeGmuP8lj8Qfcz
+         sXZQ==
+X-Gm-Message-State: AOAM531JiRQRS1YmYXn39uOPzl5zQI+DqwcT1HgfVJb/rimvfAEOXtAI
+        jMVQ9uoq6thVPYZAT0oDL1UnrK0aU2XtWPcmCAlXadUU+hSeQTu3jFDguG8KjNw5rmygxqij1pQ
+        cHNuzAXGyAtbt+nv7T1CQrK4B8SZ3WvMaOZNcJoliMh03mS/kNnO8oTt+
+X-Received: by 2002:a1c:dc87:: with SMTP id t129mr9044714wmg.52.1610043669536;
+        Thu, 07 Jan 2021 10:21:09 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJz3c0mezv6YeA6BCMZ6z8n9194LaLFGX/ijTyEcry16Ek01hDA0K0VLFO5nuFasrESVg34HYsJbl4rvYNDEDHk=
+X-Received: by 2002:a1c:dc87:: with SMTP id t129mr9044701wmg.52.1610043669240;
+ Thu, 07 Jan 2021 10:21:09 -0800 (PST)
+MIME-Version: 1.0
+References: <20210105135419.68715-1-mfo@canonical.com> <20210106090758.GB3845805@T590>
+ <CAO9xwp0ad6Hs2AJOLKUn-oVSp+kwHKM67saxdwv0JsrSza+C7Q@mail.gmail.com> <20210107071055.GA3900112@T590>
+In-Reply-To: <20210107071055.GA3900112@T590>
 From:   Mauricio Faria de Oliveira <mfo@canonical.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
+Date:   Thu, 7 Jan 2021 15:20:58 -0300
+Message-ID: <CAO9xwp2pOQSuD21ec6qR=_n-Zh=VbjWB4b=+_7FyC1Bpw4gjpw@mail.gmail.com>
+Subject: Re: [PATCH v2] loop: fix I/O error on fsync() in detached loop devices
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         Gabriel Krisman Bertazi <krisman@collabora.com>,
         Eric Desrochers <eric.desrochers@canonical.com>
-Subject: [PATCH v3] loop: fix I/O error on fsync() in detached loop devices
-Date:   Thu,  7 Jan 2021 15:17:34 -0300
-Message-Id: <20210107181734.128296-1-mfo@canonical.com>
-X-Mailer: git-send-email 2.27.0
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-There's an I/O error on fsync() in a detached loop device
-if it has been previously attached.
+On Thu, Jan 7, 2021 at 4:11 AM Ming Lei <ming.lei@redhat.com> wrote:
+[snip]
+> OK, looks it is fine to disable writeback cache in __loop_clr_fd().
+>
+> BTW, just wondering why don't you disable WC unconditionally in
+> __loop_clr_fd() or clear it in the following way because WC can be
+> changed via sysfs?
+>
+>         if (test_bit(QUEUE_FLAG_WC, &q->queue_flags))
+>                 blk_queue_write_cache(q, false, false);
+>
 
-The issue is write cache is enabled in the attach path in
-loop_configure() but it isn't disabled in the detach path;
-thus it remains enabled in the block device regardless of
-whether it is attached or not.
+Nice catch. Fixed that in v3.
 
-Now fsync() can get an I/O request that will just be failed
-later in loop_queue_rq() as device's state is not 'Lo_bound'.
+That was actually a bug, where a read-only loop device (losetup -r)
+that had write cache enabled via sysfs while attached, would not
+disable it, since it was checking only for the read-only bits, thus
+still suffering from the original issue.
 
-So, disable write cache in the detach path.
+Thanks,
 
-Do so based on the queue flag, not the loop device flag for
-read-only (used to enable) as the queue flag can be changed
-via sysfs even on read-only loop devices (e.g., losetup -r.)
+> Thanks,
+> Ming
+>
 
-Test-case:
 
-    # DEV=/dev/loop7
-
-    # IMG=/tmp/image
-    # truncate --size 1M $IMG
-
-    # losetup $DEV $IMG
-    # losetup -d $DEV
-
-Before:
-
-    # strace -e fsync parted -s $DEV print 2>&1 | grep fsync
-    fsync(3)                                = -1 EIO (Input/output error)
-    Warning: Error fsyncing/closing /dev/loop7: Input/output error
-    [  982.529929] blk_update_request: I/O error, dev loop7, sector 0 op 0x1:(WRITE) flags 0x800 phys_seg 0 prio class 0
-
-After:
-
-    # strace -e fsync parted -s $DEV print 2>&1 | grep fsync
-    fsync(3)                                = 0
-
-Co-developed-by: Eric Desrochers <eric.desrochers@canonical.com>
-Signed-off-by: Eric Desrochers <eric.desrochers@canonical.com>
-Signed-off-by: Mauricio Faria de Oliveira <mfo@canonical.com>
-Tested-by: Gabriel Krisman Bertazi <krisman@collabora.com>
----
- drivers/block/loop.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-v3:
-- Disable write cache based on QUEUE_FLAG_WC, not just
-  !LO_FLAGS_READ_ONLY, as the former can be enabled in
-  sysfs even for LO_FLAGS_READ_ONLY, thus not disabled
-  later. Mention that in commit message. (thanks, Ming)
-v2:
-- Fix ordering of Co-developed-by:/Signed-off-by: tags.
-  (thanks, Krisman)
-- Add Tested-by: tag. (likewise.)
-
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index e5ff328f0917..e94a11dbb5bd 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1212,6 +1212,9 @@ static int __loop_clr_fd(struct loop_device *lo, bool release)
- 		goto out_unlock;
- 	}
- 
-+	if (test_bit(QUEUE_FLAG_WC, &lo->lo_queue->queue_flags))
-+		blk_queue_write_cache(lo->lo_queue, false, false);
-+
- 	/* freeze request queue during the transition */
- 	blk_mq_freeze_queue(lo->lo_queue);
- 
 -- 
-2.27.0
-
+Mauricio Faria de Oliveira
