@@ -2,91 +2,124 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67B2CC433DB
-	for <linux-block@archiver.kernel.org>; Thu,  7 Jan 2021 18:22:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A6ACC433E9
+	for <linux-block@archiver.kernel.org>; Thu,  7 Jan 2021 19:06:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 167AB207C8
-	for <linux-block@archiver.kernel.org>; Thu,  7 Jan 2021 18:22:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 16DAF23442
+	for <linux-block@archiver.kernel.org>; Thu,  7 Jan 2021 19:06:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729082AbhAGSVw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 7 Jan 2021 13:21:52 -0500
-Received: from youngberry.canonical.com ([91.189.89.112]:49937 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727058AbhAGSVw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Jan 2021 13:21:52 -0500
-Received: from mail-wr1-f71.google.com ([209.85.221.71])
-        by youngberry.canonical.com with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.86_2)
-        (envelope-from <mauricio.oliveira@canonical.com>)
-        id 1kxZuH-0007Ne-Qe
-        for linux-block@vger.kernel.org; Thu, 07 Jan 2021 18:21:09 +0000
-Received: by mail-wr1-f71.google.com with SMTP id o12so2963339wrq.13
-        for <linux-block@vger.kernel.org>; Thu, 07 Jan 2021 10:21:09 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=1yH8XJ+SsEmCmR1IemBhmlBy8uJA25p1sUW8hvVstic=;
-        b=Lzz0hTQ9hMILZ8IBFJw2sEjZ2uKvpzwOrf2/y2kCxphg7H6X3+0cENYQEvtl7wlfmp
-         zNaHf6qUpUs0xcz7PIBiDxlgg2b+Om/r33O3NKJJ9d+d04mSXnUZdXet8KKPvoVSa8Yr
-         ZfB/ZBR9NCNZo4JNsj8SaNAwhtr1z1gJVHMyV/VMufITDfLB3zxNdRgLuKCM6POZeNqS
-         dX7hfu+kIjSvL2KrPVcO9ZX1rcuRqlt5IoL1cAG8NnJAENAmZrglkb+OUUacreXScbI1
-         /K0hzxbiVaRAZb2m/OVmPyVVpIafC6o6Flm2NlA4HkDri2chj2x8KTUeGmuP8lj8Qfcz
-         sXZQ==
-X-Gm-Message-State: AOAM531JiRQRS1YmYXn39uOPzl5zQI+DqwcT1HgfVJb/rimvfAEOXtAI
-        jMVQ9uoq6thVPYZAT0oDL1UnrK0aU2XtWPcmCAlXadUU+hSeQTu3jFDguG8KjNw5rmygxqij1pQ
-        cHNuzAXGyAtbt+nv7T1CQrK4B8SZ3WvMaOZNcJoliMh03mS/kNnO8oTt+
-X-Received: by 2002:a1c:dc87:: with SMTP id t129mr9044714wmg.52.1610043669536;
-        Thu, 07 Jan 2021 10:21:09 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJz3c0mezv6YeA6BCMZ6z8n9194LaLFGX/ijTyEcry16Ek01hDA0K0VLFO5nuFasrESVg34HYsJbl4rvYNDEDHk=
-X-Received: by 2002:a1c:dc87:: with SMTP id t129mr9044701wmg.52.1610043669240;
- Thu, 07 Jan 2021 10:21:09 -0800 (PST)
+        id S1729243AbhAGTF7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 7 Jan 2021 14:05:59 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:41619 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726600AbhAGTF6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 7 Jan 2021 14:05:58 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1610046272;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=K5vzrkToFEu51YnZZlMXR5lsFFTx+s92dDruyBqosAg=;
+        b=EucXfYJrg8TYUUWr75cdBfpOdJ33vbMzHHbh43tAOH1zzq214g7lbrRHROC+nGRryf+eTX
+        nEm/xy0i34QvlAqI1XPOT/h7cCGAdTqyoYWR16rGmc2Nu5OWWf60LnT5B2Csm5v4jlLl1b
+        EB58gpLJ9T7JD7y2dPnhfvVRkyaxWmM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-298-AMo8fFAVOw-XAxQewpoJrw-1; Thu, 07 Jan 2021 14:04:30 -0500
+X-MC-Unique: AMo8fFAVOw-XAxQewpoJrw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 001E01800D42;
+        Thu,  7 Jan 2021 19:04:29 +0000 (UTC)
+Received: from localhost (unknown [10.18.25.174])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id E5CF26268F;
+        Thu,  7 Jan 2021 19:04:25 +0000 (UTC)
+Date:   Thu, 7 Jan 2021 14:04:24 -0500
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Jeffle Xu <jefflexu@linux.alibaba.com>
+Cc:     linux-block@vger.kernel.org, dm-devel@redhat.com,
+        io-uring@vger.kernel.org
+Subject: Re: [PATCH RFC 1/7] block: move definition of blk_qc_t to types.h
+Message-ID: <20210107190424.GA21239@redhat.com>
+References: <20201223112624.78955-1-jefflexu@linux.alibaba.com>
+ <20201223112624.78955-2-jefflexu@linux.alibaba.com>
 MIME-Version: 1.0
-References: <20210105135419.68715-1-mfo@canonical.com> <20210106090758.GB3845805@T590>
- <CAO9xwp0ad6Hs2AJOLKUn-oVSp+kwHKM67saxdwv0JsrSza+C7Q@mail.gmail.com> <20210107071055.GA3900112@T590>
-In-Reply-To: <20210107071055.GA3900112@T590>
-From:   Mauricio Faria de Oliveira <mfo@canonical.com>
-Date:   Thu, 7 Jan 2021 15:20:58 -0300
-Message-ID: <CAO9xwp2pOQSuD21ec6qR=_n-Zh=VbjWB4b=+_7FyC1Bpw4gjpw@mail.gmail.com>
-Subject: Re: [PATCH v2] loop: fix I/O error on fsync() in detached loop devices
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Gabriel Krisman Bertazi <krisman@collabora.com>,
-        Eric Desrochers <eric.desrochers@canonical.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201223112624.78955-2-jefflexu@linux.alibaba.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jan 7, 2021 at 4:11 AM Ming Lei <ming.lei@redhat.com> wrote:
-[snip]
-> OK, looks it is fine to disable writeback cache in __loop_clr_fd().
->
-> BTW, just wondering why don't you disable WC unconditionally in
-> __loop_clr_fd() or clear it in the following way because WC can be
-> changed via sysfs?
->
->         if (test_bit(QUEUE_FLAG_WC, &q->queue_flags))
->                 blk_queue_write_cache(q, false, false);
->
+On Wed, Dec 23 2020 at  6:26am -0500,
+Jeffle Xu <jefflexu@linux.alibaba.com> wrote:
 
-Nice catch. Fixed that in v3.
+> So that kiocb.ki_cookie can be defined as blk_qc_t, which will enforce
+> the encapsulation.
+> 
+> Signed-off-by: Jeffle Xu <jefflexu@linux.alibaba.com>
+> ---
+>  include/linux/blk_types.h | 2 +-
+>  include/linux/fs.h        | 2 +-
+>  include/linux/types.h     | 3 +++
+>  3 files changed, 5 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+> index 866f74261b3b..2e05244fc16d 100644
+> --- a/include/linux/blk_types.h
+> +++ b/include/linux/blk_types.h
+> @@ -532,7 +532,7 @@ static inline int op_stat_group(unsigned int op)
+>  	return op_is_write(op);
+>  }
+>  
+> -typedef unsigned int blk_qc_t;
+> +/* Macros for blk_qc_t */
+>  #define BLK_QC_T_NONE		-1U
+>  #define BLK_QC_T_SHIFT		16
+>  #define BLK_QC_T_INTERNAL	(1U << 31)
+> diff --git a/include/linux/fs.h b/include/linux/fs.h
+> index ad4cf1bae586..58db714c4834 100644
+> --- a/include/linux/fs.h
+> +++ b/include/linux/fs.h
+> @@ -330,7 +330,7 @@ struct kiocb {
+>  	u16			ki_hint;
+>  	u16			ki_ioprio; /* See linux/ioprio.h */
+>  	union {
+> -		unsigned int		ki_cookie; /* for ->iopoll */
+> +		blk_qc_t		ki_cookie; /* for ->iopoll */
+>  		struct wait_page_queue	*ki_waitq; /* for async buffered IO */
+>  	};
+>  
+> diff --git a/include/linux/types.h b/include/linux/types.h
+> index a147977602b5..da5ca7e1bea9 100644
+> --- a/include/linux/types.h
+> +++ b/include/linux/types.h
+> @@ -125,6 +125,9 @@ typedef s64			int64_t;
+>  typedef u64 sector_t;
+>  typedef u64 blkcnt_t;
+>  
+> +/* cookie used for IO polling */
+> +typedef unsigned int blk_qc_t;
+> +
+>  /*
+>   * The type of an index into the pagecache.
+>   */
+> -- 
+> 2.27.0
+> 
 
-That was actually a bug, where a read-only loop device (losetup -r)
-that had write cache enabled via sysfs while attached, would not
-disable it, since it was checking only for the read-only bits, thus
-still suffering from the original issue.
+Unfortunate that you cannot just include blk_types.h in fs.h; but
+vma_is_dax() ruins that for us since commit baabda2614245 ("mm: always
+enable thp for dax mappings").
 
-Thanks,
+Reviewed-by: Mike Snitzer <snitzer@redhat.com>
 
-> Thanks,
-> Ming
->
-
-
--- 
-Mauricio Faria de Oliveira
