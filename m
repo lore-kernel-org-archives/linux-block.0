@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FBA3C433E6
-	for <linux-block@archiver.kernel.org>; Fri,  8 Jan 2021 14:37:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A752C4332D
+	for <linux-block@archiver.kernel.org>; Fri,  8 Jan 2021 14:38:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3FCE523884
-	for <linux-block@archiver.kernel.org>; Fri,  8 Jan 2021 14:37:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3FC8B23884
+	for <linux-block@archiver.kernel.org>; Fri,  8 Jan 2021 14:38:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727176AbhAHOhX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Jan 2021 09:37:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55992 "EHLO
+        id S1727494AbhAHOh6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Jan 2021 09:37:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56092 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726935AbhAHOhU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Jan 2021 09:37:20 -0500
-Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B69A8C0612FD
-        for <linux-block@vger.kernel.org>; Fri,  8 Jan 2021 06:36:39 -0800 (PST)
-Received: by mail-ej1-x632.google.com with SMTP id ga15so14825292ejb.4
-        for <linux-block@vger.kernel.org>; Fri, 08 Jan 2021 06:36:39 -0800 (PST)
+        with ESMTP id S1726748AbhAHOh5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Jan 2021 09:37:57 -0500
+Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 692CEC0612FF
+        for <linux-block@vger.kernel.org>; Fri,  8 Jan 2021 06:36:41 -0800 (PST)
+Received: by mail-ed1-x530.google.com with SMTP id u19so11451711edx.2
+        for <linux-block@vger.kernel.org>; Fri, 08 Jan 2021 06:36:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=cloud.ionos.com; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=xDFpQWrHMsuKz/nh26/noW6aHuNV8mbI1uQD9qPo1DM=;
-        b=FDhELJkw7kpTs1Too27M1GbjuEU6VA8MqoDNV6jlYAL0RrNIYmqMlkHCdWJVzldtDO
-         3fTDAbyLUrs91J900Nk35cI2RZVbk/XcdrJ3lxPfQzWWk3sf4i65wfdvd+yDZgcI7QRn
-         Laj1r4OH2T0Mo32K8RnzQrLN2u54L7MzNmCblvh7RT9hL6gcRSbe2S4qJQTmWWtNedKb
-         6m17NTcrnRNSn2j6QJPUFt3BUmmemDNrkOTj/KGYcJJd1McQu5NeSEvuOBKo+6ggmKtR
-         C1Nkh6r9jMIqykWuyQfX+jI2jnpij6RcNJ0rIh/CJ0nEVYNmdSZrxOAWY9BUSqJVoRUB
-         2NBQ==
+        bh=ScMrBuTqjTl8319DDqHcMUIBD1FsCL0Z6pG3bPYJIM4=;
+        b=H7A4uGKBnPTa7bvvSnMq0Jt7V5kVZC/xTLbWWQzKDgMLJSXQqVKt7sXR1j973lyYkV
+         OtQj49+RUzyS4i7VBPhEpgV5AMy6HT+7lkTadhZ1r+706jrfSR0kdTvncTDteo50trpZ
+         5PAnYsYm9O7MannRIMDUW9+z34ZwXQGKsMmzjDFHLOsgHDV5Pm2/DN2gnZKokVaANUT9
+         WJKiZwvlsCmuz8EYg2yXncGnVG/EsFyz3EV9VAbYYsxZMzZXF6bL0n35AaXqnBkjcPGW
+         mom0VEaQj1Aqzi0B/ZFvZLghVREBwOSsgWlZQtB6i4B94hIhRwhj10KD5X8Prd8Lin83
+         EyJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=xDFpQWrHMsuKz/nh26/noW6aHuNV8mbI1uQD9qPo1DM=;
-        b=TH/ryDQSGh1VH8AsiOKx4Ld3a5m7bnnJDtTd2M4C5+WL5KSv435xYfQx5YHtuz0VRn
-         92FY6+WUekIpJQ6fuD92EmHO9KxcyxxOO13t3k18GNQ4Csp3OossUbm1n6H78Y32BDAh
-         Zkt466tIg3rpn+lEYn7bDT9ut8bZeaBbrPTn3dM7iMK/0Jp3SM/KEzE3Rd4aqz7xvZPj
-         y87fwAnvcHRG+SMM1UhBhU6CyQU7Kg45o6XsHFRYkumr5LWrEkoc26YP3siIdao49c2c
-         MnbaQ55YTvNp/DajOgnKU9a5XNiIS93zdtzuPLTd07eI//psylDqlr6IFERscZxPxcHe
-         oQ5g==
-X-Gm-Message-State: AOAM532BKD7wogClu6Wi1DvUHL6EXGSPbmj26LJvjW/pSZJXk48KruBr
-        doBclXR/qJiqMTpmC41C/0poUJl/8IEHPQ==
-X-Google-Smtp-Source: ABdhPJxciLNzvQWim5KMMvqRtG2gwMHveOv/3jfMUXZyAYTJnF3QD6mFEhV5y48fOClONWl3o69ZZQ==
-X-Received: by 2002:a17:906:3a0d:: with SMTP id z13mr2806615eje.2.1610116598220;
-        Fri, 08 Jan 2021 06:36:38 -0800 (PST)
+        bh=ScMrBuTqjTl8319DDqHcMUIBD1FsCL0Z6pG3bPYJIM4=;
+        b=VxF0uBLPxK92MeBqDg/6lN49H9bnjzD6Zr5xq+BBlEgcRDQKrHqIG6XXrvM2RNjNCS
+         TV0uQ+pzWbk/Ldd/gRDCDIdBLuZDqupl/lcyNMPGrq60CKj2KiDD9F2Rto4tpuGkK9CI
+         p5wvTdYBXkhOGpPSZKJaEHiYEjXv8b7oxQ33do/jhZmrc6KB1QyPXOl0iChSUFgzWLsL
+         DSWTaeJMm6cqRu24vOOJEv1VNYiUMACFEU6SDxVSi17xMFyWA44NgBb394/DuRXrJK2X
+         faxwiKM7m1s5k0kFBy1zhvxCwQSDlMPE7mbFx8V3F0Lc1XEljk23pYP1dWPysqxBg1bQ
+         VAIg==
+X-Gm-Message-State: AOAM532qOxnieuVey1B7tvy9RDRR1aBwmDXV5hs52w2WlXkqhra3iW4K
+        3RbVyfkqksGCaPOHjIWLg8T7YfgPiki/1A==
+X-Google-Smtp-Source: ABdhPJz+Vb7nmsHRmskf7mb3upTeTt8wbLoY7+LjVjje+rEqNONSgjuvL2ZTD5AbrJkjoFBCHrn8Ow==
+X-Received: by 2002:aa7:c58a:: with SMTP id g10mr5409627edq.315.1610116600052;
+        Fri, 08 Jan 2021 06:36:40 -0800 (PST)
 Received: from jwang-Latitude-5491.fkb.profitbricks.net ([2001:16b8:4906:c200:31ac:50df:cd1f:f7fc])
-        by smtp.gmail.com with ESMTPSA id e25sm3858698edq.24.2021.01.08.06.36.37
+        by smtp.gmail.com with ESMTPSA id e25sm3858698edq.24.2021.01.08.06.36.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Jan 2021 06:36:37 -0800 (PST)
+        Fri, 08 Jan 2021 06:36:39 -0800 (PST)
 From:   Jack Wang <jinpu.wang@cloud.ionos.com>
 To:     linux-block@vger.kernel.org
 Cc:     axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
         bvanassche@acm.org, danil.kipnis@cloud.ionos.com,
-        Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
-Subject: [PATCH for-rc 3/5] block/rnbd-clt: Fix sg table use after free
-Date:   Fri,  8 Jan 2021 15:36:32 +0100
-Message-Id: <20210108143634.175394-4-jinpu.wang@cloud.ionos.com>
+        Gioh Kim <gi-oh.kim@cloud.ionos.com>
+Subject: [PATCH for-rc 5/5] block/rnbd-clt: avoid module unload race with close confirmation
+Date:   Fri,  8 Jan 2021 15:36:34 +0100
+Message-Id: <20210108143634.175394-6-jinpu.wang@cloud.ionos.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210108143634.175394-1-jinpu.wang@cloud.ionos.com>
 References: <20210108143634.175394-1-jinpu.wang@cloud.ionos.com>
@@ -72,167 +72,56 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
+We had kernel panic, it is caused by unload module and last
+close confirmation.
 
-Since dynamically allocate sglist is used for rnbd_iu, we can't free sg
-table after send_usr_msg since the callback function (cqe.done) could
-still access the sglist.
+call trace:
+[1196029.743127]  free_sess+0x15/0x50 [rtrs_client]
+[1196029.743128]  rtrs_clt_close+0x4c/0x70 [rtrs_client]
+[1196029.743129]  ? rnbd_clt_unmap_device+0x1b0/0x1b0 [rnbd_client]
+[1196029.743130]  close_rtrs+0x25/0x50 [rnbd_client]
+[1196029.743131]  rnbd_client_exit+0x93/0xb99 [rnbd_client]
+[1196029.743132]  __x64_sys_delete_module+0x190/0x260
 
-Otherwise KASAN reports UAF issue:
+And in the crashdump confirmation kworker is also running.
+PID: 6943   TASK: ffff9e2ac8098000  CPU: 4   COMMAND: "kworker/4:2"
+ #0 [ffffb206cf337c30] __schedule at ffffffff9f93f891
+ #1 [ffffb206cf337cc8] schedule at ffffffff9f93fe98
+ #2 [ffffb206cf337cd0] schedule_timeout at ffffffff9f943938
+ #3 [ffffb206cf337d50] wait_for_completion at ffffffff9f9410a7
+ #4 [ffffb206cf337da0] __flush_work at ffffffff9f08ce0e
+ #5 [ffffb206cf337e20] rtrs_clt_close_conns at ffffffffc0d5f668 [rtrs_client]
+ #6 [ffffb206cf337e48] rtrs_clt_close at ffffffffc0d5f801 [rtrs_client]
+ #7 [ffffb206cf337e68] close_rtrs at ffffffffc0d26255 [rnbd_client]
+ #8 [ffffb206cf337e78] free_sess at ffffffffc0d262ad [rnbd_client]
+ #9 [ffffb206cf337e88] rnbd_clt_put_dev at ffffffffc0d266a7 [rnbd_client]
 
-[ 4856.600257] BUG: KASAN: use-after-free in dma_direct_unmap_sg+0x53/0x290
-[ 4856.600772] Read of size 4 at addr ffff888206af3a98 by task swapper/1/0
+The problem is both code path try to close same session, which lead to
+panic.
 
-[ 4856.601729] CPU: 1 PID: 0 Comm: swapper/1 Kdump: loaded Tainted: G        W         5.10.0-pserver #5.10.0-1+feature+linux+next+20201214.1025+0910d71
-[ 4856.601748] Hardware name: Supermicro Super Server/X11DDW-L, BIOS 3.3 02/21/2020
-[ 4856.601766] Call Trace:
-[ 4856.601785]  <IRQ>
-[ 4856.601822]  dump_stack+0x99/0xcb
-[ 4856.601856]  ? dma_direct_unmap_sg+0x53/0x290
-[ 4856.601888]  print_address_description.constprop.7+0x1e/0x230
-[ 4856.601913]  ? freeze_kernel_threads+0x73/0x73
-[ 4856.601965]  ? mark_held_locks+0x29/0xa0
-[ 4856.602019]  ? dma_direct_unmap_sg+0x53/0x290
-[ 4856.602039]  ? dma_direct_unmap_sg+0x53/0x290
-[ 4856.602079]  kasan_report.cold.9+0x37/0x7c
-[ 4856.602188]  ? mlx5_ib_post_recv+0x430/0x520 [mlx5_ib]
-[ 4856.602209]  ? dma_direct_unmap_sg+0x53/0x290
-[ 4856.602256]  dma_direct_unmap_sg+0x53/0x290
-[ 4856.602366]  complete_rdma_req+0x188/0x4b0 [rtrs_client]
-[ 4856.602451]  ? rtrs_clt_close+0x80/0x80 [rtrs_client]
-[ 4856.602535]  ? mlx5_ib_poll_cq+0x48b/0x16e0 [mlx5_ib]
-[ 4856.602589]  ? radix_tree_insert+0x3a0/0x3a0
-[ 4856.602610]  ? do_raw_spin_lock+0x119/0x1d0
-[ 4856.602647]  ? rwlock_bug.part.1+0x60/0x60
-[ 4856.602740]  rtrs_clt_rdma_done+0x3f7/0x670 [rtrs_client]
-[ 4856.602804]  ? rtrs_clt_rdma_cm_handler+0xda0/0xda0 [rtrs_client]
-[ 4856.602857]  ? check_flags.part.31+0x6c/0x1f0
-[ 4856.602927]  ? rcu_read_lock_sched_held+0xaf/0xe0
-[ 4856.602963]  ? rcu_read_lock_bh_held+0xc0/0xc0
-[ 4856.603137]  __ib_process_cq+0x10a/0x350 [ib_core]
-[ 4856.603309]  ib_poll_handler+0x41/0x1c0 [ib_core]
-[ 4856.603358]  irq_poll_softirq+0xe6/0x280
-[ 4856.603392]  ? lockdep_hardirqs_on_prepare+0x111/0x210
-[ 4856.603446]  __do_softirq+0x10d/0x646
-[ 4856.603540]  asm_call_irq_on_stack+0x12/0x20
-[ 4856.603563]  </IRQ>
+To fix it, just skip the sess if the refcount already drop to 0.
 
-[ 4856.605096] Allocated by task 8914:
-[ 4856.605510]  kasan_save_stack+0x19/0x40
-[ 4856.605532]  __kasan_kmalloc.constprop.7+0xc1/0xd0
-[ 4856.605552]  __kmalloc+0x155/0x320
-[ 4856.605574]  __sg_alloc_table+0x155/0x1c0
-[ 4856.605594]  sg_alloc_table+0x1f/0x50
-[ 4856.605620]  send_msg_sess_info+0x119/0x2e0 [rnbd_client]
-[ 4856.605646]  remap_devs+0x71/0x210 [rnbd_client]
-[ 4856.605676]  init_sess+0xad8/0xe10 [rtrs_client]
-[ 4856.605706]  rtrs_clt_reconnect_work+0xd6/0x170 [rtrs_client]
-[ 4856.605728]  process_one_work+0x521/0xa90
-[ 4856.605748]  worker_thread+0x65/0x5b0
-[ 4856.605769]  kthread+0x1f2/0x210
-[ 4856.605789]  ret_from_fork+0x22/0x30
-
-[ 4856.606159] Freed by task 8914:
-[ 4856.606559]  kasan_save_stack+0x19/0x40
-[ 4856.606580]  kasan_set_track+0x1c/0x30
-[ 4856.606601]  kasan_set_free_info+0x1b/0x30
-[ 4856.606622]  __kasan_slab_free+0x108/0x150
-[ 4856.606642]  slab_free_freelist_hook+0x64/0x190
-[ 4856.606661]  kfree+0xe2/0x650
-[ 4856.606681]  __sg_free_table+0xa4/0x100
-[ 4856.606707]  send_msg_sess_info+0x1d6/0x2e0 [rnbd_client]
-[ 4856.606733]  remap_devs+0x71/0x210 [rnbd_client]
-[ 4856.606763]  init_sess+0xad8/0xe10 [rtrs_client]
-[ 4856.606792]  rtrs_clt_reconnect_work+0xd6/0x170 [rtrs_client]
-[ 4856.606813]  process_one_work+0x521/0xa90
-[ 4856.606833]  worker_thread+0x65/0x5b0
-[ 4856.606853]  kthread+0x1f2/0x210
-[ 4856.606872]  ret_from_fork+0x22/0x30
-
-The solution is to free iu's sgtable after the iu is not used anymore.
-And also move sg_alloc_table into rnbd_get_iu accordingly.
-
-Fixes: 5a1328d0c3a7 ("block/rnbd-clt: Dynamically allocate sglist for rnbd_iu")
-Signed-off-by: Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
+Fixes: f7a7a5c228d4 ("block/rnbd: client: main functionality")
 Signed-off-by: Jack Wang <jinpu.wang@cloud.ionos.com>
+Reviewed-by: Gioh Kim <gi-oh.kim@cloud.ionos.com>
 ---
- drivers/block/rnbd/rnbd-clt.c | 15 +++++++--------
- 1 file changed, 7 insertions(+), 8 deletions(-)
+ drivers/block/rnbd/rnbd-clt.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.c
-index 9165e70bee0c..c696c3a937d7 100644
+index c696c3a937d7..7bdd26229c70 100644
 --- a/drivers/block/rnbd/rnbd-clt.c
 +++ b/drivers/block/rnbd/rnbd-clt.c
-@@ -375,12 +375,19 @@ static struct rnbd_iu *rnbd_get_iu(struct rnbd_clt_session *sess,
- 	init_waitqueue_head(&iu->comp.wait);
- 	iu->comp.errno = INT_MAX;
+@@ -1697,7 +1697,8 @@ static void rnbd_destroy_sessions(void)
+ 	 */
  
-+	if (sg_alloc_table(&iu->sgt, 1, GFP_KERNEL)) {
-+		rnbd_put_permit(sess, permit);
-+		kfree(iu);
-+		return NULL;
-+	}
-+
- 	return iu;
- }
- 
- static void rnbd_put_iu(struct rnbd_clt_session *sess, struct rnbd_iu *iu)
- {
- 	if (atomic_dec_and_test(&iu->refcount)) {
-+		sg_free_table(&iu->sgt);
- 		rnbd_put_permit(sess, iu->permit);
- 		kfree(iu);
- 	}
-@@ -487,8 +494,6 @@ static int send_msg_close(struct rnbd_clt_dev *dev, u32 device_id, bool wait)
- 	iu->buf = NULL;
- 	iu->dev = dev;
- 
--	sg_alloc_table(&iu->sgt, 1, GFP_KERNEL);
--
- 	msg.hdr.type	= cpu_to_le16(RNBD_MSG_CLOSE);
- 	msg.device_id	= cpu_to_le32(device_id);
- 
-@@ -502,7 +507,6 @@ static int send_msg_close(struct rnbd_clt_dev *dev, u32 device_id, bool wait)
- 		err = errno;
- 	}
- 
--	sg_free_table(&iu->sgt);
- 	rnbd_put_iu(sess, iu);
- 	return err;
- }
-@@ -575,7 +579,6 @@ static int send_msg_open(struct rnbd_clt_dev *dev, bool wait)
- 	iu->buf = rsp;
- 	iu->dev = dev;
- 
--	sg_alloc_table(&iu->sgt, 1, GFP_KERNEL);
- 	sg_init_one(iu->sgt.sgl, rsp, sizeof(*rsp));
- 
- 	msg.hdr.type	= cpu_to_le16(RNBD_MSG_OPEN);
-@@ -594,7 +597,6 @@ static int send_msg_open(struct rnbd_clt_dev *dev, bool wait)
- 		err = errno;
- 	}
- 
--	sg_free_table(&iu->sgt);
- 	rnbd_put_iu(sess, iu);
- 	return err;
- }
-@@ -622,8 +624,6 @@ static int send_msg_sess_info(struct rnbd_clt_session *sess, bool wait)
- 
- 	iu->buf = rsp;
- 	iu->sess = sess;
--
--	sg_alloc_table(&iu->sgt, 1, GFP_KERNEL);
- 	sg_init_one(iu->sgt.sgl, rsp, sizeof(*rsp));
- 
- 	msg.hdr.type = cpu_to_le16(RNBD_MSG_SESS_INFO);
-@@ -650,7 +650,6 @@ static int send_msg_sess_info(struct rnbd_clt_session *sess, bool wait)
- 	} else {
- 		err = errno;
- 	}
--	sg_free_table(&iu->sgt);
- 	rnbd_put_iu(sess, iu);
- 	return err;
- }
+ 	list_for_each_entry_safe(sess, sn, &sess_list, list) {
+-		WARN_ON(!rnbd_clt_get_sess(sess));
++		if (!rnbd_clt_get_sess(sess))
++			continue;
+ 		close_rtrs(sess);
+ 		list_for_each_entry_safe(dev, tn, &sess->devs_list, list) {
+ 			/*
 -- 
 2.25.1
 
