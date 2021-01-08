@@ -2,68 +2,141 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C584C433E6
-	for <linux-block@archiver.kernel.org>; Fri,  8 Jan 2021 09:00:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 774FDC433E9
+	for <linux-block@archiver.kernel.org>; Fri,  8 Jan 2021 11:51:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CD45222B2E
-	for <linux-block@archiver.kernel.org>; Fri,  8 Jan 2021 09:00:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2FC84239E7
+	for <linux-block@archiver.kernel.org>; Fri,  8 Jan 2021 11:51:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727824AbhAHJAf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Jan 2021 04:00:35 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:10042 "EHLO
-        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726120AbhAHJAf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Jan 2021 04:00:35 -0500
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.59])
-        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4DBxq35wSqzj5NX;
-        Fri,  8 Jan 2021 16:58:55 +0800 (CST)
-Received: from localhost.localdomain (10.69.192.58) by
- DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
- 14.3.498.0; Fri, 8 Jan 2021 16:59:45 +0800
-From:   John Garry <john.garry@huawei.com>
-To:     <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        John Garry <john.garry@huawei.com>
-Subject: [PATCH] blk-mq-debugfs: Add decode for BLK_MQ_F_TAG_HCTX_SHARED
-Date:   Fri, 8 Jan 2021 16:55:37 +0800
-Message-ID: <1610096137-187414-1-git-send-email-john.garry@huawei.com>
-X-Mailer: git-send-email 2.8.1
+        id S1726688AbhAHLvJ convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Jan 2021 06:51:09 -0500
+Received: from eu-smtp-delivery-151.mimecast.com ([185.58.86.151]:37356 "EHLO
+        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726720AbhAHLvH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 8 Jan 2021 06:51:07 -0500
+Received: from AcuMS.aculab.com (156.67.243.126 [156.67.243.126]) (Using
+ TLS) by relay.mimecast.com with ESMTP id
+ uk-mta-227-JrkSGbMLN9-FUY2lxHNdvQ-1; Fri, 08 Jan 2021 11:49:28 +0000
+X-MC-Unique: JrkSGbMLN9-FUY2lxHNdvQ-1
+Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) by
+ AcuMS.aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) with Microsoft SMTP
+ Server (TLS) id 15.0.1347.2; Fri, 8 Jan 2021 11:49:27 +0000
+Received: from AcuMS.Aculab.com ([fe80::43c:695e:880f:8750]) by
+ AcuMS.aculab.com ([fe80::43c:695e:880f:8750%12]) with mapi id 15.00.1347.000;
+ Fri, 8 Jan 2021 11:49:27 +0000
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'Christoph Hellwig' <hch@lst.de>,
+        Alexander Viro <viro@zeniv.linux.org.uk>
+CC:     Andrew Morton <akpm@linux-foundation.org>,
+        Jens Axboe <axboe@kernel.dk>, Arnd Bergmann <arnd@arndb.de>,
+        David Howells <dhowells@redhat.com>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
+        "linux-parisc@vger.kernel.org" <linux-parisc@vger.kernel.org>,
+        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "sparclinux@vger.kernel.org" <sparclinux@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-aio@kvack.org" <linux-aio@kvack.org>,
+        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
+        "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
+        "linux-security-module@vger.kernel.org" 
+        <linux-security-module@vger.kernel.org>
+Subject: RE: [PATCH 05/11] iov_iter: merge the compat case into
+ rw_copy_check_uvector
+Thread-Topic: [PATCH 05/11] iov_iter: merge the compat case into
+ rw_copy_check_uvector
+Thread-Index: AQHWkCRUvpDO9SBAlU68E+WeFLSma6oeR04A
+Date:   Fri, 8 Jan 2021 11:49:27 +0000
+Message-ID: <7167a94511a84f30b18733d56007a7a5@AcuMS.aculab.com>
+References: <20200921143434.707844-1-hch@lst.de>
+ <20200921143434.707844-6-hch@lst.de>
+In-Reply-To: <20200921143434.707844-6-hch@lst.de>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.69.192.58]
-X-CFilter-Loop: Reflected
+Authentication-Results: relay.mimecast.com;
+        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Showing the hctx flags for when BLK_MQ_F_TAG_HCTX_SHARED is set gives
-something like:
+From: Christoph Hellwig <hch@lst.de>
+> Sent: 21 September 2020 15:34
+> 
+> Stop duplicating the iovec verify code, and instead add add a
+> __import_iovec helper that does the whole verify and import, but takes
+> a bool compat to decided on the native or compat layout.  This also
+> ends up massively simplifying the calling conventions.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  lib/iov_iter.c | 195 ++++++++++++++++++-------------------------------
+>  1 file changed, 70 insertions(+), 125 deletions(-)
+> 
+> diff --git a/lib/iov_iter.c b/lib/iov_iter.c
+> index a64867501a7483..8bfa47b63d39aa 100644
+> --- a/lib/iov_iter.c
+> +++ b/lib/iov_iter.c
+> @@ -10,6 +10,7 @@
+>  #include <net/checksum.h>
+>  #include <linux/scatterlist.h>
+>  #include <linux/instrumented.h>
+> +#include <linux/compat.h>
+> 
+>  #define PIPE_PARANOIA /* for now */
+> 
+> @@ -1650,43 +1651,76 @@ const void *dup_iter(struct iov_iter *new, struct iov_iter *old, gfp_t flags)
+>  }
+>  EXPORT_SYMBOL(dup_iter);
+> 
+> -static ssize_t rw_copy_check_uvector(int type,
+> -		const struct iovec __user *uvector, unsigned long nr_segs,
+> -		unsigned long fast_segs, struct iovec *fast_pointer,
+> -		struct iovec **ret_pointer)
+> +static int compat_copy_iovecs_from_user(struct iovec *iov,
+> +		const struct iovec __user *uvector, unsigned long nr_segs)
+> +{
+> +	const struct compat_iovec __user *uiov =
+> +		(const struct compat_iovec __user *)uvector;
+> +	unsigned long i;
+> +	int ret = -EFAULT;
+> +
+> +	if (!user_access_begin(uvector, nr_segs * sizeof(*uvector)))
+> +		return -EFAULT;
 
-root@debian:/home/john# more /sys/kernel/debug/block/sda/hctx0/flags
-alloc_policy=FIFO SHOULD_MERGE|TAG_QUEUE_SHARED|3
+I little bit late, but the above isn't quite right.
+It should be sizeof(*iouv) - the length is double what it should be.
 
-Add the decoding for that flag.
+Not that access_ok() can fail for compat addresses
+and the extra length won't matter for architectures that
+need the address/length to open an address hole into userspace.
 
-Fixes: 32bc15afed04b ("blk-mq: Facilitate a shared sbitmap per tagset")
-Signed-off-by: John Garry <john.garry@huawei.com>
+	David
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 3094542e12ae..ea4ab98e6b25 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -245,6 +245,7 @@ static const char *const hctx_flag_name[] = {
- 	HCTX_FLAG_NAME(BLOCKING),
- 	HCTX_FLAG_NAME(NO_SCHED),
- 	HCTX_FLAG_NAME(STACKING),
-+	HCTX_FLAG_NAME(TAG_HCTX_SHARED),
- };
- #undef HCTX_FLAG_NAME
- 
--- 
-2.26.2
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
+Registration No: 1397386 (Wales)
 
