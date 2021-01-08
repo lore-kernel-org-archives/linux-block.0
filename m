@@ -2,126 +2,92 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A752C4332D
-	for <linux-block@archiver.kernel.org>; Fri,  8 Jan 2021 14:38:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECF64C433E0
+	for <linux-block@archiver.kernel.org>; Fri,  8 Jan 2021 15:20:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3FC8B23884
-	for <linux-block@archiver.kernel.org>; Fri,  8 Jan 2021 14:38:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A568A238EC
+	for <linux-block@archiver.kernel.org>; Fri,  8 Jan 2021 15:20:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727494AbhAHOh6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Jan 2021 09:37:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56092 "EHLO
+        id S1727378AbhAHPUO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Jan 2021 10:20:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34492 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726748AbhAHOh5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Jan 2021 09:37:57 -0500
-Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 692CEC0612FF
-        for <linux-block@vger.kernel.org>; Fri,  8 Jan 2021 06:36:41 -0800 (PST)
-Received: by mail-ed1-x530.google.com with SMTP id u19so11451711edx.2
-        for <linux-block@vger.kernel.org>; Fri, 08 Jan 2021 06:36:41 -0800 (PST)
+        with ESMTP id S1725806AbhAHPUO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Jan 2021 10:20:14 -0500
+Received: from mail-io1-xd35.google.com (mail-io1-xd35.google.com [IPv6:2607:f8b0:4864:20::d35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F5FBC061380
+        for <linux-block@vger.kernel.org>; Fri,  8 Jan 2021 07:19:34 -0800 (PST)
+Received: by mail-io1-xd35.google.com with SMTP id d9so10101099iob.6
+        for <linux-block@vger.kernel.org>; Fri, 08 Jan 2021 07:19:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=ScMrBuTqjTl8319DDqHcMUIBD1FsCL0Z6pG3bPYJIM4=;
-        b=H7A4uGKBnPTa7bvvSnMq0Jt7V5kVZC/xTLbWWQzKDgMLJSXQqVKt7sXR1j973lyYkV
-         OtQj49+RUzyS4i7VBPhEpgV5AMy6HT+7lkTadhZ1r+706jrfSR0kdTvncTDteo50trpZ
-         5PAnYsYm9O7MannRIMDUW9+z34ZwXQGKsMmzjDFHLOsgHDV5Pm2/DN2gnZKokVaANUT9
-         WJKiZwvlsCmuz8EYg2yXncGnVG/EsFyz3EV9VAbYYsxZMzZXF6bL0n35AaXqnBkjcPGW
-         mom0VEaQj1Aqzi0B/ZFvZLghVREBwOSsgWlZQtB6i4B94hIhRwhj10KD5X8Prd8Lin83
-         EyJw==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=KwAKpjuTRQjD2W8PHLf+qTr766IBNvmBAEHG/aZKYXU=;
+        b=lVTZHMy4zD/ToP7nAMspl/gbuDj5rCphyXMFPBUBi1LJvBiFy59zhyIpLM55QP6ZlG
+         TuffFnSe8ruZ5fv4ogjroqD29ggY+JTml8tJgr2exM0JiCC3xj2WmMOmoNmWtYdYf/bt
+         m+iGEZRQdcj7mC3enJt40UQ4u9LM+jsCEgeT6tBS/1Bx3GCPjLGNQVKbdUdhvfwBIcos
+         s+VIa9eTSFkG2ZF9hzoggH78icRD8knqirmg8C+qrbXao7qRs09zMw5EpUKj7eAGrnPD
+         NpNQBIq56o+7gZtgV7rTSfwW/RJDy/DSH1RAn6IkAFAcAZFV8W5gM1D0GnMqupcaJMfk
+         O2wQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=ScMrBuTqjTl8319DDqHcMUIBD1FsCL0Z6pG3bPYJIM4=;
-        b=VxF0uBLPxK92MeBqDg/6lN49H9bnjzD6Zr5xq+BBlEgcRDQKrHqIG6XXrvM2RNjNCS
-         TV0uQ+pzWbk/Ldd/gRDCDIdBLuZDqupl/lcyNMPGrq60CKj2KiDD9F2Rto4tpuGkK9CI
-         p5wvTdYBXkhOGpPSZKJaEHiYEjXv8b7oxQ33do/jhZmrc6KB1QyPXOl0iChSUFgzWLsL
-         DSWTaeJMm6cqRu24vOOJEv1VNYiUMACFEU6SDxVSi17xMFyWA44NgBb394/DuRXrJK2X
-         faxwiKM7m1s5k0kFBy1zhvxCwQSDlMPE7mbFx8V3F0Lc1XEljk23pYP1dWPysqxBg1bQ
-         VAIg==
-X-Gm-Message-State: AOAM532qOxnieuVey1B7tvy9RDRR1aBwmDXV5hs52w2WlXkqhra3iW4K
-        3RbVyfkqksGCaPOHjIWLg8T7YfgPiki/1A==
-X-Google-Smtp-Source: ABdhPJz+Vb7nmsHRmskf7mb3upTeTt8wbLoY7+LjVjje+rEqNONSgjuvL2ZTD5AbrJkjoFBCHrn8Ow==
-X-Received: by 2002:aa7:c58a:: with SMTP id g10mr5409627edq.315.1610116600052;
-        Fri, 08 Jan 2021 06:36:40 -0800 (PST)
-Received: from jwang-Latitude-5491.fkb.profitbricks.net ([2001:16b8:4906:c200:31ac:50df:cd1f:f7fc])
-        by smtp.gmail.com with ESMTPSA id e25sm3858698edq.24.2021.01.08.06.36.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Jan 2021 06:36:39 -0800 (PST)
-From:   Jack Wang <jinpu.wang@cloud.ionos.com>
-To:     linux-block@vger.kernel.org
-Cc:     axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
-        bvanassche@acm.org, danil.kipnis@cloud.ionos.com,
-        Gioh Kim <gi-oh.kim@cloud.ionos.com>
-Subject: [PATCH for-rc 5/5] block/rnbd-clt: avoid module unload race with close confirmation
-Date:   Fri,  8 Jan 2021 15:36:34 +0100
-Message-Id: <20210108143634.175394-6-jinpu.wang@cloud.ionos.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20210108143634.175394-1-jinpu.wang@cloud.ionos.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=KwAKpjuTRQjD2W8PHLf+qTr766IBNvmBAEHG/aZKYXU=;
+        b=PVRhwpbq5PS7nFieaA5qZcYdPxDEyvgOjTY9MGRETvrZk3AoYt/XauB/bK67lmIl8p
+         bbKdGzoWH1hcZ/QCjHBJQL17MnfLcbFOD8DP8n493K5SQ730MDART+X7HDRYUGSqJClI
+         ZpJ4OocGTdxs/t9WhlNz8mWXi9kPH6JH3NkcjU6siZRSbWRhoeikfFhq5sNGGU1HPb3V
+         LTfM7iq/S2fysYVTQiEFqh3NiUNBo3YsdSQRO42gLuv7652y2/rWTJYqN9C+g7tTpuBk
+         TJXg9yBAyCgb1RDJMsITF/7Yu0mQblNkKlm6NqRHj8sP0bPQvOvXBq8i+VCKEm9HWzma
+         r7FQ==
+X-Gm-Message-State: AOAM5315TPotMUFALAYc8glMZGyAx4aSfbmc6QwBFc/F0bSY1DtqV6Dd
+        xHyWuO7cMMEz0H/T3BAKx0iGKQ==
+X-Google-Smtp-Source: ABdhPJwyWJ0Fw+dIW4lupntZP+cmiyi0gzhTw5/DtZHN1mVhao1YDekb/0W1HOa4XgVPZKetaNW3sQ==
+X-Received: by 2002:a6b:8ec9:: with SMTP id q192mr5923705iod.28.1610119173536;
+        Fri, 08 Jan 2021 07:19:33 -0800 (PST)
+Received: from [192.168.1.30] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id p25sm5760956ioj.21.2021.01.08.07.19.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 08 Jan 2021 07:19:32 -0800 (PST)
+Subject: Re: [PATCH for-rc 0/5] some bugfix for rnbd
+To:     Jack Wang <jinpu.wang@cloud.ionos.com>, linux-block@vger.kernel.org
+Cc:     hch@infradead.org, sagi@grimberg.me, bvanassche@acm.org,
+        danil.kipnis@cloud.ionos.com
 References: <20210108143634.175394-1-jinpu.wang@cloud.ionos.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <b5f95d21-042f-1aec-14f4-09ad86474096@kernel.dk>
+Date:   Fri, 8 Jan 2021 08:19:32 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210108143634.175394-1-jinpu.wang@cloud.ionos.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We had kernel panic, it is caused by unload module and last
-close confirmation.
+On 1/8/21 7:36 AM, Jack Wang wrote:
+> Hi Jens,
+> 
+> Please consider to inlcude follow bugfix for rc:
+> - fix one compile error reported by ltp (me)
+> - fix UAF for sg table (guoqing)
+> - fix UAF in rnbd_srv_sess_dev_force_close (me)
+> - fix module unload race with close callback. (me)
+> - credit for Swapnil's contribution (swapnil).
 
-call trace:
-[1196029.743127]  free_sess+0x15/0x50 [rtrs_client]
-[1196029.743128]  rtrs_clt_close+0x4c/0x70 [rtrs_client]
-[1196029.743129]  ? rnbd_clt_unmap_device+0x1b0/0x1b0 [rnbd_client]
-[1196029.743130]  close_rtrs+0x25/0x50 [rnbd_client]
-[1196029.743131]  rnbd_client_exit+0x93/0xb99 [rnbd_client]
-[1196029.743132]  __x64_sys_delete_module+0x190/0x260
+Applied, thanks.
 
-And in the crashdump confirmation kworker is also running.
-PID: 6943   TASK: ffff9e2ac8098000  CPU: 4   COMMAND: "kworker/4:2"
- #0 [ffffb206cf337c30] __schedule at ffffffff9f93f891
- #1 [ffffb206cf337cc8] schedule at ffffffff9f93fe98
- #2 [ffffb206cf337cd0] schedule_timeout at ffffffff9f943938
- #3 [ffffb206cf337d50] wait_for_completion at ffffffff9f9410a7
- #4 [ffffb206cf337da0] __flush_work at ffffffff9f08ce0e
- #5 [ffffb206cf337e20] rtrs_clt_close_conns at ffffffffc0d5f668 [rtrs_client]
- #6 [ffffb206cf337e48] rtrs_clt_close at ffffffffc0d5f801 [rtrs_client]
- #7 [ffffb206cf337e68] close_rtrs at ffffffffc0d26255 [rnbd_client]
- #8 [ffffb206cf337e78] free_sess at ffffffffc0d262ad [rnbd_client]
- #9 [ffffb206cf337e88] rnbd_clt_put_dev at ffffffffc0d266a7 [rnbd_client]
 
-The problem is both code path try to close same session, which lead to
-panic.
-
-To fix it, just skip the sess if the refcount already drop to 0.
-
-Fixes: f7a7a5c228d4 ("block/rnbd: client: main functionality")
-Signed-off-by: Jack Wang <jinpu.wang@cloud.ionos.com>
-Reviewed-by: Gioh Kim <gi-oh.kim@cloud.ionos.com>
----
- drivers/block/rnbd/rnbd-clt.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.c
-index c696c3a937d7..7bdd26229c70 100644
---- a/drivers/block/rnbd/rnbd-clt.c
-+++ b/drivers/block/rnbd/rnbd-clt.c
-@@ -1697,7 +1697,8 @@ static void rnbd_destroy_sessions(void)
- 	 */
- 
- 	list_for_each_entry_safe(sess, sn, &sess_list, list) {
--		WARN_ON(!rnbd_clt_get_sess(sess));
-+		if (!rnbd_clt_get_sess(sess))
-+			continue;
- 		close_rtrs(sess);
- 		list_for_each_entry_safe(dev, tn, &sess->devs_list, list) {
- 			/*
 -- 
-2.25.1
+Jens Axboe
 
