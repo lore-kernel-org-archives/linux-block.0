@@ -6,125 +6,151 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BEA7C433E6
-	for <linux-block@archiver.kernel.org>; Fri,  8 Jan 2021 20:33:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A671CC433E0
+	for <linux-block@archiver.kernel.org>; Fri,  8 Jan 2021 21:01:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CC6DF23AC1
-	for <linux-block@archiver.kernel.org>; Fri,  8 Jan 2021 20:33:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 705CC23AC2
+	for <linux-block@archiver.kernel.org>; Fri,  8 Jan 2021 21:01:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729271AbhAHUd1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Jan 2021 15:33:27 -0500
-Received: from mail106.syd.optusnet.com.au ([211.29.132.42]:53169 "EHLO
+        id S1729636AbhAHVBE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Jan 2021 16:01:04 -0500
+Received: from mail106.syd.optusnet.com.au ([211.29.132.42]:60828 "EHLO
         mail106.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729251AbhAHUd1 (ORCPT
+        by vger.kernel.org with ESMTP id S1728511AbhAHVBD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 8 Jan 2021 15:33:27 -0500
+        Fri, 8 Jan 2021 16:01:03 -0500
 Received: from dread.disaster.area (pa49-179-167-107.pa.nsw.optusnet.com.au [49.179.167.107])
-        by mail106.syd.optusnet.com.au (Postfix) with ESMTPS id EFAD17655CD;
-        Sat,  9 Jan 2021 07:32:43 +1100 (AEDT)
+        by mail106.syd.optusnet.com.au (Postfix) with ESMTPS id 3438676566F;
+        Sat,  9 Jan 2021 08:00:17 +1100 (AEDT)
 Received: from dave by dread.disaster.area with local (Exim 4.92.3)
         (envelope-from <david@fromorbit.com>)
-        id 1kxyR7-004R24-RS; Sat, 09 Jan 2021 07:32:41 +1100
-Date:   Sat, 9 Jan 2021 07:32:41 +1100
+        id 1kxyrp-004RRw-51; Sat, 09 Jan 2021 08:00:17 +1100
+Date:   Sat, 9 Jan 2021 08:00:17 +1100
 From:   Dave Chinner <david@fromorbit.com>
-To:     Andres Freund <andres@anarazel.de>
-Cc:     linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: fallocate(FALLOC_FL_ZERO_RANGE_BUT_REALLY) to avoid unwritten
- extents?
-Message-ID: <20210108203241.GI331610@dread.disaster.area>
-References: <20201230062819.yinrrp6uwfegsqo3@alap3.anarazel.de>
- <20210106225201.GF331610@dread.disaster.area>
- <20210106234009.b6gbzl7bjm2evxj6@alap3.anarazel.de>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [RFC PATCH] fs: block_dev: compute nr_vecs hint for improving
+ writeback bvecs allocation
+Message-ID: <20210108210017.GK331610@dread.disaster.area>
+References: <20210105132647.3818503-1-ming.lei@redhat.com>
+ <20210105183938.GA3878@lst.de>
+ <20210106084548.GA3845805@T590>
+ <20210106222111.GE331610@dread.disaster.area>
+ <20210108075922.GB3982620@T590>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210106234009.b6gbzl7bjm2evxj6@alap3.anarazel.de>
+In-Reply-To: <20210108075922.GB3982620@T590>
 X-Optus-CM-Score: 0
-X-Optus-CM-Analysis: v=2.3 cv=Ubgvt5aN c=1 sm=1 tr=0 cx=a_idp_d
+X-Optus-CM-Analysis: v=2.3 cv=F8MpiZpN c=1 sm=1 tr=0 cx=a_idp_d
         a=+wqVUQIkAh0lLYI+QRsciw==:117 a=+wqVUQIkAh0lLYI+QRsciw==:17
         a=kj9zAlcOel0A:10 a=EmqxpYm9HcoA:10 a=7-415B0cAAAA:8
-        a=wut9VHP1pO6yiD9O2Z4A:9 a=CjuIK1q_8ugA:10 a=biEYGPWJfzWAr4FL6Ov7:22
+        a=0TDAt5E3tB6VCO8953IA:9 a=qZgZfBh61L_KZ1-l:21 a=JzxU2LrYxQ7o857g:21
+        a=CjuIK1q_8ugA:10 a=biEYGPWJfzWAr4FL6Ov7:22
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jan 06, 2021 at 03:40:09PM -0800, Andres Freund wrote:
-> Hi,
-> 
-> On 2021-01-07 09:52:01 +1100, Dave Chinner wrote:
-> > On Tue, Dec 29, 2020 at 10:28:19PM -0800, Andres Freund wrote:
-> > > Which brings me to $subject:
+On Fri, Jan 08, 2021 at 03:59:22PM +0800, Ming Lei wrote:
+> On Thu, Jan 07, 2021 at 09:21:11AM +1100, Dave Chinner wrote:
+> > On Wed, Jan 06, 2021 at 04:45:48PM +0800, Ming Lei wrote:
+> > > On Tue, Jan 05, 2021 at 07:39:38PM +0100, Christoph Hellwig wrote:
+> > > > At least for iomap I think this is the wrong approach.  Between the
+> > > > iomap and writeback_control we know the maximum size of the writeback
+> > > > request and can just use that.
 > > > 
-> > > Would it make sense to add a variant of FALLOC_FL_ZERO_RANGE that
-> > > doesn't convert extents into unwritten extents, but instead uses
-> > > blkdev_issue_zeroout() if supported?  Mostly interested in xfs/ext4
-> > > myself, but ...
+> > > I think writeback_control can tell us nothing about max pages in single
+> > > bio:
 > > 
-> > We have explicit requests from users (think initialising large VM
-> > images) that FALLOC_FL_ZERO_RANGE must never fall back to writing
-> > zeroes manually.
+> > By definition, the iomap tells us exactly how big the IO is going to
+> > be. i.e. an iomap spans a single contiguous range that we are going
+> > to issue IO on. Hence we can use that to size the bio exactly
+> > right for direct IO.
 > 
-> That behaviour makes a lot of sense for quite a few use cases - I wasn't
-> trying to make it sound like it should not be available. Nor that
-> FALLOC_FL_ZERO_RANGE should behave differently.
-> 
-> 
-> > IOWs, while you might want FALLOC_FL_ZERO_RANGE to explicitly write
-> > zeros, we have users who explicitly don't want it to do this.
-> 
-> Right - which is why I was asking for a variant of FALLOC_FL_ZERO_RANGE
-> (jokingly named FALLOC_FL_ZERO_RANGE_BUT_REALLY in the subject), rather
-> than changing the behaviour.
-> 
-> 
-> > Perhaps we should add want FALLOC_FL_CONVERT_RANGE, which tells the
-> > filesystem to convert an unwritten range of zeros to a written range
-> > by manually writing zeros. i.e. you do FALLOC_FL_ZERO_RANGE to zero
-> > the range and fill holes using metadata manipulation, followed by
-> > FALLOC_FL_WRITE_RANGE to then convert the "metadata zeros" to real
-> > written zeros.
-> 
-> Yep, something like that would do the trick. Perhaps
-> FALLOC_FL_MATERIALIZE_RANGE?
+> When I trace wpc->iomap.length in iomap_add_to_ioend() on the following fio
+> randwrite/write, the length is 1GB most of times, maybe because it is
+> one fresh XFS.
 
-[ FWIW, I really dislike the "RANGE" part of fallocate flag names.
-It's redundant (fallocate always operates on a range!) and just
-makes names unnecessarily longer. ]
+Yes, that's exactly what I said it would do.
 
-I used "convert range" as the name explicitly because it has
-specific meaning for extent space manipulation. i.e. we "convert"
-extents from one state to another. "write range" is also has
-explicit meaning, in that it will convert extents from unwritten to
-written data.
+> Another reason is that pages in the range may be contiguous physically,
+> so lots of pages may share one single bvec.
 
-In comparison, "materialise" is something undefined, and could be
-easily thought to take something ephemeral (such as a hole) and turn
-it into something real (an allocated extent). We wouldn't want this
-operation to allocate space, so I think "materialise" is just too
-much magic to encoding into an API for an explicit, well defined
-state change.
+The iomap layer does not care about this, and there's no way this
+can be detected ahead of time, anyway, because we are only passed a
+single page at a time. When we get large pages from the page cache,
+we'll still only get one page at a time, but we'll get physically
+contiguous pages and so it will still be a 1 page : 1 bvec
+relationship at the iomap layer.
 
-We also have people asking for ZERO_RANGE to just flip existing
-extents from written to unwritten (rather than the punch/preallocate
-we do now). This is also a "convert" operation, just in the other
-direction (from data to zeros rather than from zeros to data).
+> > > - wbc->nr_to_write controls how many pages to writeback, this pages
+> > >   usually don't belong to same bio. Also this number is often much
+> > >   bigger than BIO_MAX_PAGES.
+> > > 
+> > > - wbc->range_start/range_end is similar too, which is often much more
+> > >   bigger than BIO_MAX_PAGES.
+> > > 
+> > > Also page/blocks_in_page can be mapped to different extent too, which is
+> > > only available when wpc->ops->map_blocks() is returned,
+> > 
+> > We only allocate the bio -after- calling ->map_blocks() to obtain
+> > the iomap for the given writeback range request. Hence we
+> > already know how large the BIO could be before we allocate it.
+> > 
+> > > which looks not
+> > > different with mpage_writepages(), in which bio is allocated with
+> > > BIO_MAX_PAGES vecs too.
+> > 
+> > __mpage_writepage() only maps a page at a time, so it can't tell
+> > ahead of time how big the bio is going to need to be as it doesn't
+> > return/cache a contiguous extent range. So it's actually very
+> > different to the iomap writeback code, and effectively does require
+> > a BIO_MAX_PAGES vecs allocation all the time...
+> > 
+> > > Or you mean we can use iomap->length for this purpose? But iomap->length
+> > > still is still too big in case of xfs.
+> > 
+> > if we are doing small random writeback into large extents (i.e.
+> > iomap->length is large), then it is trivial to detect that we are
+> > doing random writes rather than sequential writes by checking if the
+> > current page is sequential to the last sector in the current bio.
+> > We already do this non-sequential IO checking to determine if a new
+> > bio needs to be allocated in iomap_can_add_to_ioend(), and we also
+> > know how large the current contiguous range mapped into the current
+> > bio chain is (ioend->io_size). Hence we've got everything we need to
+> > determine whether we should do a large or small bio vec allocation
+> > in the iomap writeback path...
+> 
+> page->index should tell us if the workload is random or sequential, however
+> still not easy to decide how many pages there will be in the next bio
+> when iomap->length is large.
 
-The observation I'm making here is that these "convert" oeprations
-will both makes SEEK_HOLE/SEEK_DATA behave differently for the
-underlying data. preallocated space is considered a HOLE, written
-zeros are considered DATA. So we do expose the ability to check that
-a "convert" operation has actually changed the state of the
-underlying extents in either direction...
+page->index doesn't tell us anything about what type of IO is being
+done - it just tells us where in the file we need to map to find the
+physical block we need to write it to. OTOH, the iomap writeback
+context contains all the information about current IO being build -
+offset, size, current bio, etc - and the page->index gets compared
+against the state in the iomap writepage context.
 
-CONVERT_TO_DATA/CONVERT_TO_ZERO as an operational pair whose
-behaviour is visible and easily testable via SEEK_HOLE/SEEK_DATA
-makes a lot more sense to me. Also defining them to fail fast if
-unwritten extents are not supported by the filesystem (i.e. they
-should -never- physically write anything) would also allow
-applications to fall back to ZERO_RANGE on filesystems that don't
-support unwritten extents to explicitly write zeros if
-CONVERT_TO_ZERO fails....
+So, if the wpc->iomap.length is large, current page->index does not
+map sequentially to the end of wpc->ioend->io_bio (or
+wpc->io_end->io_offset + wpc->ioend->io_size) and
+wpc->io_end->io_size == page_size(page) for the currently held bio,
+then we are clearly doing random single page writeback into a large
+allocated extent. Hence in that case we can do small bvec
+allocations for the new bio.
+
+Sure, the first bio in a ->writepages invocation doesn't have this
+information, so we've going to have to assume BIO_MAX_PAGES for the
+first bio. But for every bio after that in the ->writepages
+invocation we have the state of the previous contiguous writeback
+range held in the wpc structure and can use that info to optimise
+the thousands of random single pages that are written after then
+first one...
 
 Cheers,
 
