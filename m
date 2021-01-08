@@ -7,67 +7,66 @@ X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECF64C433E0
-	for <linux-block@archiver.kernel.org>; Fri,  8 Jan 2021 15:20:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60D82C433DB
+	for <linux-block@archiver.kernel.org>; Fri,  8 Jan 2021 15:21:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A568A238EC
-	for <linux-block@archiver.kernel.org>; Fri,  8 Jan 2021 15:20:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 13412239EB
+	for <linux-block@archiver.kernel.org>; Fri,  8 Jan 2021 15:21:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727378AbhAHPUO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Jan 2021 10:20:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34492 "EHLO
+        id S1727118AbhAHPVV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Jan 2021 10:21:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725806AbhAHPUO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Jan 2021 10:20:14 -0500
-Received: from mail-io1-xd35.google.com (mail-io1-xd35.google.com [IPv6:2607:f8b0:4864:20::d35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F5FBC061380
-        for <linux-block@vger.kernel.org>; Fri,  8 Jan 2021 07:19:34 -0800 (PST)
-Received: by mail-io1-xd35.google.com with SMTP id d9so10101099iob.6
-        for <linux-block@vger.kernel.org>; Fri, 08 Jan 2021 07:19:34 -0800 (PST)
+        with ESMTP id S1725806AbhAHPVT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Jan 2021 10:21:19 -0500
+Received: from mail-il1-x132.google.com (mail-il1-x132.google.com [IPv6:2607:f8b0:4864:20::132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08F5CC061380
+        for <linux-block@vger.kernel.org>; Fri,  8 Jan 2021 07:20:39 -0800 (PST)
+Received: by mail-il1-x132.google.com with SMTP id x15so10644834ilq.1
+        for <linux-block@vger.kernel.org>; Fri, 08 Jan 2021 07:20:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=KwAKpjuTRQjD2W8PHLf+qTr766IBNvmBAEHG/aZKYXU=;
-        b=lVTZHMy4zD/ToP7nAMspl/gbuDj5rCphyXMFPBUBi1LJvBiFy59zhyIpLM55QP6ZlG
-         TuffFnSe8ruZ5fv4ogjroqD29ggY+JTml8tJgr2exM0JiCC3xj2WmMOmoNmWtYdYf/bt
-         m+iGEZRQdcj7mC3enJt40UQ4u9LM+jsCEgeT6tBS/1Bx3GCPjLGNQVKbdUdhvfwBIcos
-         s+VIa9eTSFkG2ZF9hzoggH78icRD8knqirmg8C+qrbXao7qRs09zMw5EpUKj7eAGrnPD
-         NpNQBIq56o+7gZtgV7rTSfwW/RJDy/DSH1RAn6IkAFAcAZFV8W5gM1D0GnMqupcaJMfk
-         O2wQ==
+        bh=8zCsmPDJQdJDnkQKZejQHJWw0dwAHVEo5bCx7sWw+Us=;
+        b=f3/KYLt/J0hCYtwNhNQq+jNhIOIWqktI64HygeRj75qq1fPnhgIkN6NSbXBwf3AFJV
+         dpswdSOXhnqXsIrqnRhxjdPs/6B9KDV9xd/HUsY7RwiPnV9CYPDuannIRoPOfnDzmipr
+         xeOl3gqtigloxFfCU2BiU5hWGcYKkMWMudttgRY1ZHmUSaZMy+ChjbBMY1DDQNlRbSOl
+         N0VymzHgJ7JTmAoklloysMoGESJ+v24My6ef/zOHq7MtfKWgC6AVFaaIVpuoeFes3Lnj
+         DLyhgGlXd/7LXcRJhZGRkVD9s3J6a5ix56LXsx6k4roNiMHZOp6WA911hlGnYtpbAv6f
+         dgZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=KwAKpjuTRQjD2W8PHLf+qTr766IBNvmBAEHG/aZKYXU=;
-        b=PVRhwpbq5PS7nFieaA5qZcYdPxDEyvgOjTY9MGRETvrZk3AoYt/XauB/bK67lmIl8p
-         bbKdGzoWH1hcZ/QCjHBJQL17MnfLcbFOD8DP8n493K5SQ730MDART+X7HDRYUGSqJClI
-         ZpJ4OocGTdxs/t9WhlNz8mWXi9kPH6JH3NkcjU6siZRSbWRhoeikfFhq5sNGGU1HPb3V
-         LTfM7iq/S2fysYVTQiEFqh3NiUNBo3YsdSQRO42gLuv7652y2/rWTJYqN9C+g7tTpuBk
-         TJXg9yBAyCgb1RDJMsITF/7Yu0mQblNkKlm6NqRHj8sP0bPQvOvXBq8i+VCKEm9HWzma
-         r7FQ==
-X-Gm-Message-State: AOAM5315TPotMUFALAYc8glMZGyAx4aSfbmc6QwBFc/F0bSY1DtqV6Dd
-        xHyWuO7cMMEz0H/T3BAKx0iGKQ==
-X-Google-Smtp-Source: ABdhPJwyWJ0Fw+dIW4lupntZP+cmiyi0gzhTw5/DtZHN1mVhao1YDekb/0W1HOa4XgVPZKetaNW3sQ==
-X-Received: by 2002:a6b:8ec9:: with SMTP id q192mr5923705iod.28.1610119173536;
-        Fri, 08 Jan 2021 07:19:33 -0800 (PST)
+        bh=8zCsmPDJQdJDnkQKZejQHJWw0dwAHVEo5bCx7sWw+Us=;
+        b=aSoVwSd2E9eninfxerWAmzXcZz9MtA7laOptu89r1ds2AGKOI6RnI/VTWXxRXgtVyi
+         JHFxRWoTRz3zcWquNMENrfADrJtbujB59ruSsaIF0daSJWwoyFCyMb3hgfPKfogjsJOJ
+         vIGLEW5rWdW+bdMmGRZyO7WUyk+0hsDUaFfQVfOgUXymWRIRnLcNqT6WLnGgY3Gkni/H
+         Is1WaWOubvsMSRNy/viSUpY3qrnu8Ago3bqxsElsnVDTXuc49HDwAH7R0Ch52LzzSViJ
+         WdcTbUE5JUte/cGa3pUTC/AT0kf/FnmoSPcI7ogu8PJ+8okFJmwzfs97yNcz+0cZ0Zyn
+         6OuQ==
+X-Gm-Message-State: AOAM5317RenCBnEXvRGd+N1OuVWDEtotnQJADQJl9TJ5OFs/T7nUwO8E
+        f/UtVcCAACslijDP+In95DZIoQ==
+X-Google-Smtp-Source: ABdhPJwLHghE+FJPmb5oqFCSqhecGE7My9bkts6MyHEwGH3AtUS5gKdtSmwdByWeukzwHGaxC9YDhA==
+X-Received: by 2002:a92:d84a:: with SMTP id h10mr4088593ilq.77.1610119238421;
+        Fri, 08 Jan 2021 07:20:38 -0800 (PST)
 Received: from [192.168.1.30] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id p25sm5760956ioj.21.2021.01.08.07.19.32
+        by smtp.gmail.com with ESMTPSA id d1sm5364829ioh.3.2021.01.08.07.20.37
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 08 Jan 2021 07:19:32 -0800 (PST)
-Subject: Re: [PATCH for-rc 0/5] some bugfix for rnbd
-To:     Jack Wang <jinpu.wang@cloud.ionos.com>, linux-block@vger.kernel.org
-Cc:     hch@infradead.org, sagi@grimberg.me, bvanassche@acm.org,
-        danil.kipnis@cloud.ionos.com
-References: <20210108143634.175394-1-jinpu.wang@cloud.ionos.com>
+        Fri, 08 Jan 2021 07:20:37 -0800 (PST)
+Subject: Re: [PATCH] blk-mq-debugfs: Add decode for BLK_MQ_F_TAG_HCTX_SHARED
+To:     John Garry <john.garry@huawei.com>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1610096137-187414-1-git-send-email-john.garry@huawei.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <b5f95d21-042f-1aec-14f4-09ad86474096@kernel.dk>
-Date:   Fri, 8 Jan 2021 08:19:32 -0700
+Message-ID: <d0fa03b0-55b3-c4aa-6a8f-ac8b9afd6d13@kernel.dk>
+Date:   Fri, 8 Jan 2021 08:20:37 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210108143634.175394-1-jinpu.wang@cloud.ionos.com>
+In-Reply-To: <1610096137-187414-1-git-send-email-john.garry@huawei.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -75,18 +74,14 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/8/21 7:36 AM, Jack Wang wrote:
-> Hi Jens,
+On 1/8/21 1:55 AM, John Garry wrote:
+> Showing the hctx flags for when BLK_MQ_F_TAG_HCTX_SHARED is set gives
+> something like:
 > 
-> Please consider to inlcude follow bugfix for rc:
-> - fix one compile error reported by ltp (me)
-> - fix UAF for sg table (guoqing)
-> - fix UAF in rnbd_srv_sess_dev_force_close (me)
-> - fix module unload race with close callback. (me)
-> - credit for Swapnil's contribution (swapnil).
+> root@debian:/home/john# more /sys/kernel/debug/block/sda/hctx0/flags
+> alloc_policy=FIFO SHOULD_MERGE|TAG_QUEUE_SHARED|3
 
 Applied, thanks.
-
 
 -- 
 Jens Axboe
