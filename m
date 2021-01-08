@@ -2,331 +2,133 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AD83C433DB
-	for <linux-block@archiver.kernel.org>; Fri,  8 Jan 2021 17:34:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BEA7C433E6
+	for <linux-block@archiver.kernel.org>; Fri,  8 Jan 2021 20:33:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DC99623A5D
-	for <linux-block@archiver.kernel.org>; Fri,  8 Jan 2021 17:34:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CC6DF23AC1
+	for <linux-block@archiver.kernel.org>; Fri,  8 Jan 2021 20:33:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727429AbhAHReG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Jan 2021 12:34:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55322 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726251AbhAHReF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Jan 2021 12:34:05 -0500
-Received: from mail-qk1-x736.google.com (mail-qk1-x736.google.com [IPv6:2607:f8b0:4864:20::736])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58189C061380;
-        Fri,  8 Jan 2021 09:33:25 -0800 (PST)
-Received: by mail-qk1-x736.google.com with SMTP id 186so9140039qkj.3;
-        Fri, 08 Jan 2021 09:33:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=niCrEzZ4Zwb/AmCjiCKG8IO1Lknv6I/uxlNpmIn2B8s=;
-        b=DN6FtqFmdJSv1e5zhuWoA5rG+8u6H1/zKFWSfbNt4tCa3d8gtVCbZHd18qMLkwb0wW
-         IBEjBnKXJ3rhpjgytBcESlREG9rlzxD7Vt1AlAcaz700oL1fAGMMm1H2mfusBJA+CS/9
-         PDRFupmGOdQzngWVFI2t5m73/tfggV3amJfWc2OGtVGVc7IH64ySQ++yVkWxtSvhrJqc
-         K51znLV8kdsidWUt5wbOwuTBjaFoGy4Vb5Eio8JukeRUSha5eVlJQg3gRWs11OzfDuJP
-         /x4WdoJ0/3fC76JFimvoJG9aXyy8n0l3isPgp852TmOUnZz6g3jORz4H0pgGyEUrGq58
-         1zhw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=niCrEzZ4Zwb/AmCjiCKG8IO1Lknv6I/uxlNpmIn2B8s=;
-        b=E3LsefDSBCfPQHWBtfPTS1bkvmrAmRAIu+z0ee7yjNw6Ldi3O8gF1knR+QVJyhQ6YV
-         GOEtQFvS5KcwU7jSqZ8iY6kwv7F4mEcVb7SrhYCbheGkcpCYUYr/HafsCZso3w4U7YRh
-         EXEYw3BiC8mH9ObPXCcYN0xT5ziSewdsvpJQHHwAgav+oXwbbQ1EFqBU3vC2mtz8govD
-         lFFBu6SjYYyJ0TI8nillapVWYtdbh5W9nfIZlIv9EU0DG3o9V9voT85DmwxSb9B5AKWg
-         LlxLlTttomO0K7NyoaDXJ6IFIG7aov1cB79EOfrsvgtHqbYnNJh378Dr3mE4Xv8/mbdd
-         J8dQ==
-X-Gm-Message-State: AOAM530eypdGmOWr8UpOvvZPVLBWFxB/5UH4C2awmWnj4L4IPmZ+FBlT
-        nWiueQqJhuP3hfshB0O3b+I=
-X-Google-Smtp-Source: ABdhPJxj7c8wIBkEzVGUVgEwDiWQq0r77+LRdemzPoh7f3yF2CAg0W6rbK0iizbA9aGmN+YqKTJvhw==
-X-Received: by 2002:ae9:ed41:: with SMTP id c62mr4855441qkg.111.1610127202932;
-        Fri, 08 Jan 2021 09:33:22 -0800 (PST)
-Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
-        by smtp.gmail.com with ESMTPSA id m64sm5145000qkb.90.2021.01.08.09.33.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Jan 2021 09:33:21 -0800 (PST)
-Sender: Mike Snitzer <snitzer@gmail.com>
-Date:   Fri, 8 Jan 2021 12:33:20 -0500
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     JeffleXu <jefflexu@linux.alibaba.com>
-Cc:     linux-block@vger.kernel.org, dm-devel@redhat.com,
-        io-uring@vger.kernel.org
-Subject: Re: [PATCH RFC 3/7] block: add iopoll method for non-mq device
-Message-ID: <20210108173320.GA6584@lobo>
-References: <20201223112624.78955-1-jefflexu@linux.alibaba.com>
- <20201223112624.78955-4-jefflexu@linux.alibaba.com>
- <20210107214758.GC21239@redhat.com>
- <b081f3bd-fc6f-f7c1-80eb-c8380fc8e8b9@linux.alibaba.com>
+        id S1729271AbhAHUd1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Jan 2021 15:33:27 -0500
+Received: from mail106.syd.optusnet.com.au ([211.29.132.42]:53169 "EHLO
+        mail106.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729251AbhAHUd1 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 8 Jan 2021 15:33:27 -0500
+Received: from dread.disaster.area (pa49-179-167-107.pa.nsw.optusnet.com.au [49.179.167.107])
+        by mail106.syd.optusnet.com.au (Postfix) with ESMTPS id EFAD17655CD;
+        Sat,  9 Jan 2021 07:32:43 +1100 (AEDT)
+Received: from dave by dread.disaster.area with local (Exim 4.92.3)
+        (envelope-from <david@fromorbit.com>)
+        id 1kxyR7-004R24-RS; Sat, 09 Jan 2021 07:32:41 +1100
+Date:   Sat, 9 Jan 2021 07:32:41 +1100
+From:   Dave Chinner <david@fromorbit.com>
+To:     Andres Freund <andres@anarazel.de>
+Cc:     linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: fallocate(FALLOC_FL_ZERO_RANGE_BUT_REALLY) to avoid unwritten
+ extents?
+Message-ID: <20210108203241.GI331610@dread.disaster.area>
+References: <20201230062819.yinrrp6uwfegsqo3@alap3.anarazel.de>
+ <20210106225201.GF331610@dread.disaster.area>
+ <20210106234009.b6gbzl7bjm2evxj6@alap3.anarazel.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b081f3bd-fc6f-f7c1-80eb-c8380fc8e8b9@linux.alibaba.com>
+In-Reply-To: <20210106234009.b6gbzl7bjm2evxj6@alap3.anarazel.de>
+X-Optus-CM-Score: 0
+X-Optus-CM-Analysis: v=2.3 cv=Ubgvt5aN c=1 sm=1 tr=0 cx=a_idp_d
+        a=+wqVUQIkAh0lLYI+QRsciw==:117 a=+wqVUQIkAh0lLYI+QRsciw==:17
+        a=kj9zAlcOel0A:10 a=EmqxpYm9HcoA:10 a=7-415B0cAAAA:8
+        a=wut9VHP1pO6yiD9O2Z4A:9 a=CjuIK1q_8ugA:10 a=biEYGPWJfzWAr4FL6Ov7:22
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jan 07 2021 at 10:24pm -0500,
-JeffleXu <jefflexu@linux.alibaba.com> wrote:
-
+On Wed, Jan 06, 2021 at 03:40:09PM -0800, Andres Freund wrote:
+> Hi,
+> 
+> On 2021-01-07 09:52:01 +1100, Dave Chinner wrote:
+> > On Tue, Dec 29, 2020 at 10:28:19PM -0800, Andres Freund wrote:
+> > > Which brings me to $subject:
+> > > 
+> > > Would it make sense to add a variant of FALLOC_FL_ZERO_RANGE that
+> > > doesn't convert extents into unwritten extents, but instead uses
+> > > blkdev_issue_zeroout() if supported?  Mostly interested in xfs/ext4
+> > > myself, but ...
+> > 
+> > We have explicit requests from users (think initialising large VM
+> > images) that FALLOC_FL_ZERO_RANGE must never fall back to writing
+> > zeroes manually.
+> 
+> That behaviour makes a lot of sense for quite a few use cases - I wasn't
+> trying to make it sound like it should not be available. Nor that
+> FALLOC_FL_ZERO_RANGE should behave differently.
 > 
 > 
-> On 1/8/21 5:47 AM, Mike Snitzer wrote:
-> > On Wed, Dec 23 2020 at  6:26am -0500,
-> > Jeffle Xu <jefflexu@linux.alibaba.com> wrote:
-> > 
-> >> ->poll_fn is introduced in commit ea435e1b9392 ("block: add a poll_fn
-> >> callback to struct request_queue") for supporting non-mq queues such as
-> >> nvme multipath, but removed in commit 529262d56dbe ("block: remove
-> >> ->poll_fn").
-> >>
-> >> To add support of IO polling for non-mq device, this method need to be
-> >> back. Since commit c62b37d96b6e ("block: move ->make_request_fn to
-> >> struct block_device_operations") has moved all callbacks into struct
-> >> block_device_operations in gendisk, we also add the new method named
-> >> ->iopoll in block_device_operations.
-> > 
-> > Please update patch subject and header to:
-> > 
-> > block: add iopoll method to support bio-based IO polling
-> > 
-> > ->poll_fn was introduced in commit ea435e1b9392 ("block: add a poll_fn
-> > callback to struct request_queue") to support bio-based queues such as
-> > nvme multipath, but was later removed in commit 529262d56dbe ("block:
-> > remove ->poll_fn").
-> > 
-> > Given commit c62b37d96b6e ("block: move ->make_request_fn to struct
-> > block_device_operations") restore the possibility of bio-based IO
-> > polling support by adding an ->iopoll method to gendisk->fops.
-> > Elevate bulk of blk_mq_poll() implementation to blk_poll() and reduce
-> > blk_mq_poll() to blk-mq specific code that is called from blk_poll().
-> > 
-> >> Signed-off-by: Jeffle Xu <jefflexu@linux.alibaba.com>
-> >> ---
-> >>  block/blk-core.c       | 79 ++++++++++++++++++++++++++++++++++++++++++
-> >>  block/blk-mq.c         | 70 +++++--------------------------------
-> >>  include/linux/blk-mq.h |  3 ++
-> >>  include/linux/blkdev.h |  1 +
-> >>  4 files changed, 92 insertions(+), 61 deletions(-)
-> >>
-> >> diff --git a/block/blk-core.c b/block/blk-core.c
-> >> index 96e5fcd7f071..2f5c51ce32e3 100644
-> >> --- a/block/blk-core.c
-> >> +++ b/block/blk-core.c
-> >> @@ -1131,6 +1131,85 @@ blk_qc_t submit_bio(struct bio *bio)
-> >>  }
-> >>  EXPORT_SYMBOL(submit_bio);
-> >>  
-> >> +static bool blk_poll_hybrid(struct request_queue *q, blk_qc_t cookie)
-> >> +{
-> >> +	struct blk_mq_hw_ctx *hctx;
-> >> +
-> >> +	/* TODO: bio-based device doesn't support hybrid poll. */
-> >> +	if (!queue_is_mq(q))
-> >> +		return false;
-> >> +
-> >> +	hctx = q->queue_hw_ctx[blk_qc_t_to_queue_num(cookie)];
-> >> +	if (blk_mq_poll_hybrid(q, hctx, cookie))
-> >> +		return true;
-> >> +
-> >> +	hctx->poll_considered++;
-> >> +	return false;
-> >> +}
-> > 
-> > I don't see where you ever backfill bio-based hybrid support (in
-> > the following patches in this series, so it is lingering TODO).
+> > IOWs, while you might want FALLOC_FL_ZERO_RANGE to explicitly write
+> > zeros, we have users who explicitly don't want it to do this.
 > 
-> Yes the hybrid polling is not implemented and thus bypassed for
-> bio-based device currently.
+> Right - which is why I was asking for a variant of FALLOC_FL_ZERO_RANGE
+> (jokingly named FALLOC_FL_ZERO_RANGE_BUT_REALLY in the subject), rather
+> than changing the behaviour.
 > 
-> > 
-> >> +
-> >> +/**
-> >> + * blk_poll - poll for IO completions
-> >> + * @q:  the queue
-> >> + * @cookie: cookie passed back at IO submission time
-> >> + * @spin: whether to spin for completions
-> >> + *
-> >> + * Description:
-> >> + *    Poll for completions on the passed in queue. Returns number of
-> >> + *    completed entries found. If @spin is true, then blk_poll will continue
-> >> + *    looping until at least one completion is found, unless the task is
-> >> + *    otherwise marked running (or we need to reschedule).
-> >> + */
-> >> +int blk_poll(struct request_queue *q, blk_qc_t cookie, bool spin)
-> >> +{
-> >> +	long state;
-> >> +
-> >> +	if (!blk_qc_t_valid(cookie) ||
-> >> +	    !test_bit(QUEUE_FLAG_POLL, &q->queue_flags))
-> >> +		return 0;
-> >> +
-> >> +	if (current->plug)
-> >> +		blk_flush_plug_list(current->plug, false);
-> >> +
-> >> +	/*
-> >> +	 * If we sleep, have the caller restart the poll loop to reset
-> >> +	 * the state. Like for the other success return cases, the
-> >> +	 * caller is responsible for checking if the IO completed. If
-> >> +	 * the IO isn't complete, we'll get called again and will go
-> >> +	 * straight to the busy poll loop. If specified not to spin,
-> >> +	 * we also should not sleep.
-> >> +	 */
-> >> +	if (spin && blk_poll_hybrid(q, cookie))
-> >> +		return 1;
-> >> +
-> >> +	state = current->state;
-> >> +	do {
-> >> +		int ret;
-> >> +		struct gendisk *disk = queue_to_disk(q);
-> >> +
-> >> +		if (disk->fops->iopoll)
-> >> +			ret = disk->fops->iopoll(q, cookie);
-> >> +		else
-> >> +			ret = blk_mq_poll(q, cookie);
 > 
-> The original code is indeed buggy. For bio-based device, ->iopoll() may
-> not be implemented while QUEUE_FLAG_POLL flag is still set, in which
-> case blk_mq_poll() will be called for this bio-based device.
+> > Perhaps we should add want FALLOC_FL_CONVERT_RANGE, which tells the
+> > filesystem to convert an unwritten range of zeros to a written range
+> > by manually writing zeros. i.e. you do FALLOC_FL_ZERO_RANGE to zero
+> > the range and fill holes using metadata manipulation, followed by
+> > FALLOC_FL_WRITE_RANGE to then convert the "metadata zeros" to real
+> > written zeros.
+> 
+> Yep, something like that would do the trick. Perhaps
+> FALLOC_FL_MATERIALIZE_RANGE?
 
-Yes, here is the patch I created to capture my suggestions.  Provided it
-looks good to you, please fold it into patch 3 when you rebase for
-posting a v2 of your patchset:
+[ FWIW, I really dislike the "RANGE" part of fallocate flag names.
+It's redundant (fallocate always operates on a range!) and just
+makes names unnecessarily longer. ]
 
-From: Mike Snitzer <snitzer@redhat.com>
-Date: Thu, 7 Jan 2021 20:45:17 -0500
-Subject: [PATCH] fixup patch 3
+I used "convert range" as the name explicitly because it has
+specific meaning for extent space manipulation. i.e. we "convert"
+extents from one state to another. "write range" is also has
+explicit meaning, in that it will convert extents from unwritten to
+written data.
 
----
- block/blk-core.c       | 51 +++++++++++++++++++++-----------------------------
- block/blk-mq.c         |  6 ++----
- include/linux/blk-mq.h |  3 ++-
- 3 files changed, 25 insertions(+), 35 deletions(-)
+In comparison, "materialise" is something undefined, and could be
+easily thought to take something ephemeral (such as a hole) and turn
+it into something real (an allocated extent). We wouldn't want this
+operation to allocate space, so I think "materialise" is just too
+much magic to encoding into an API for an explicit, well defined
+state change.
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index e6671f6ce1a4..44f62dc0fa9f 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1212,22 +1212,6 @@ int blk_bio_poll(struct request_queue *q, blk_qc_t cookie)
- }
- EXPORT_SYMBOL(blk_bio_poll);
- 
--static bool blk_poll_hybrid(struct request_queue *q, blk_qc_t cookie)
--{
--	struct blk_mq_hw_ctx *hctx;
--
--	/* TODO: bio-based device doesn't support hybrid poll. */
--	if (!queue_is_mq(q))
--		return false;
--
--	hctx = q->queue_hw_ctx[blk_qc_t_to_queue_num(cookie)];
--	if (blk_mq_poll_hybrid(q, hctx, cookie))
--		return true;
--
--	hctx->poll_considered++;
--	return false;
--}
--
- /**
-  * blk_poll - poll for IO completions
-  * @q:  the queue
-@@ -1243,6 +1227,8 @@ static bool blk_poll_hybrid(struct request_queue *q, blk_qc_t cookie)
- int blk_poll(struct request_queue *q, blk_qc_t cookie, bool spin)
- {
- 	long state;
-+	struct blk_mq_hw_ctx *hctx = NULL;
-+	struct gendisk *disk = NULL;
- 
- 	if (!blk_qc_t_valid(cookie) ||
- 	    !test_bit(QUEUE_FLAG_POLL, &q->queue_flags))
-@@ -1251,26 +1237,31 @@ int blk_poll(struct request_queue *q, blk_qc_t cookie, bool spin)
- 	if (current->plug)
- 		blk_flush_plug_list(current->plug, false);
- 
--	/*
--	 * If we sleep, have the caller restart the poll loop to reset
--	 * the state. Like for the other success return cases, the
--	 * caller is responsible for checking if the IO completed. If
--	 * the IO isn't complete, we'll get called again and will go
--	 * straight to the busy poll loop. If specified not to spin,
--	 * we also should not sleep.
--	 */
--	if (spin && blk_poll_hybrid(q, cookie))
--		return 1;
-+	if (queue_is_mq(q)) {
-+		/*
-+		 * If we sleep, have the caller restart the poll loop to reset
-+		 * the state. Like for the other success return cases, the
-+		 * caller is responsible for checking if the IO completed. If
-+		 * the IO isn't complete, we'll get called again and will go
-+		 * straight to the busy poll loop. If specified not to spin,
-+		 * we also should not sleep.
-+		 */
-+		hctx = q->queue_hw_ctx[blk_qc_t_to_queue_num(cookie)];
-+		if (spin && blk_mq_poll_hybrid(q, hctx, cookie))
-+			return 1;
-+		hctx->poll_considered++;
-+	} else
-+		disk = queue_to_disk(q);
- 
- 	state = current->state;
- 	do {
- 		int ret;
--		struct gendisk *disk = queue_to_disk(q);
- 
--		if (disk->fops->iopoll)
-+		if (hctx)
-+			ret = blk_mq_poll(q, hctx, cookie);
-+		else if (disk->fops->iopoll)
- 			ret = disk->fops->iopoll(q, cookie);
--		else
--			ret = blk_mq_poll(q, cookie);
-+
- 		if (ret > 0) {
- 			__set_current_state(TASK_RUNNING);
- 			return ret;
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index fcb44604f806..90d8dead1da5 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -3826,12 +3826,10 @@ bool blk_mq_poll_hybrid(struct request_queue *q,
- 	return blk_mq_poll_hybrid_sleep(q, rq);
- }
- 
--int blk_mq_poll(struct request_queue *q, blk_qc_t cookie)
-+int blk_mq_poll(struct request_queue *q,
-+		struct blk_mq_hw_ctx *hctx, blk_qc_t cookie)
- {
- 	int ret;
--	struct blk_mq_hw_ctx *hctx;
--
--	hctx = q->queue_hw_ctx[blk_qc_t_to_queue_num(cookie)];
- 
- 	hctx->poll_invoked++;
- 	ret = q->mq_ops->poll(hctx);
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 2f3742207df5..b95f2ffa866f 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -607,7 +607,8 @@ static inline void blk_rq_bio_prep(struct request *rq, struct bio *bio,
- }
- 
- blk_qc_t blk_mq_submit_bio(struct bio *bio);
--int blk_mq_poll(struct request_queue *q, blk_qc_t cookie);
-+int blk_mq_poll(struct request_queue *q,
-+		struct blk_mq_hw_ctx *hctx, blk_qc_t cookie);
- bool blk_mq_poll_hybrid(struct request_queue *q,
- 		struct blk_mq_hw_ctx *hctx, blk_qc_t cookie);
- void blk_mq_hctx_set_fq_lock_class(struct blk_mq_hw_ctx *hctx,
+We also have people asking for ZERO_RANGE to just flip existing
+extents from written to unwritten (rather than the punch/preallocate
+we do now). This is also a "convert" operation, just in the other
+direction (from data to zeros rather than from zeros to data).
+
+The observation I'm making here is that these "convert" oeprations
+will both makes SEEK_HOLE/SEEK_DATA behave differently for the
+underlying data. preallocated space is considered a HOLE, written
+zeros are considered DATA. So we do expose the ability to check that
+a "convert" operation has actually changed the state of the
+underlying extents in either direction...
+
+CONVERT_TO_DATA/CONVERT_TO_ZERO as an operational pair whose
+behaviour is visible and easily testable via SEEK_HOLE/SEEK_DATA
+makes a lot more sense to me. Also defining them to fail fast if
+unwritten extents are not supported by the filesystem (i.e. they
+should -never- physically write anything) would also allow
+applications to fall back to ZERO_RANGE on filesystems that don't
+support unwritten extents to explicitly write zeros if
+CONVERT_TO_ZERO fails....
+
+Cheers,
+
+Dave.
 -- 
-2.15.0
-
+Dave Chinner
+david@fromorbit.com
