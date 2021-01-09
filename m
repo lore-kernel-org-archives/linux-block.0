@@ -2,45 +2,52 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLACK,USER_AGENT_GIT
+X-Spam-Status: No, score=-11.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D85BC433DB
-	for <linux-block@archiver.kernel.org>; Sat,  9 Jan 2021 04:15:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1F13C433DB
+	for <linux-block@archiver.kernel.org>; Sat,  9 Jan 2021 10:46:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 26B5823A69
-	for <linux-block@archiver.kernel.org>; Sat,  9 Jan 2021 04:15:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 96AFB23A23
+	for <linux-block@archiver.kernel.org>; Sat,  9 Jan 2021 10:46:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726077AbhAIEPy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Jan 2021 23:15:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55930 "EHLO
+        id S1726370AbhAIKqF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 9 Jan 2021 05:46:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54102 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725861AbhAIEPy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Jan 2021 23:15:54 -0500
+        with ESMTP id S1725956AbhAIKqF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 9 Jan 2021 05:46:05 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64A85C061574
-        for <linux-block@vger.kernel.org>; Fri,  8 Jan 2021 20:15:14 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB729C06179F;
+        Sat,  9 Jan 2021 02:45:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
         Content-Description:In-Reply-To:References;
-        bh=bMDL66xrafPJWzUH+tkGex9APQxbaqYWSL/B03SVy1I=; b=sBP5gIEcEJn/g92z7mCbPvyiS5
-        tRBl6BBB+V63EdTZMkbbYppTul+IHsCYu9rPVYzjy+mFf8EFzucs1pwEWOTWw269s2ka5cSft+mw6
-        G006RQbVPAzIlbLMwqsuAVSFzqLc1XSnASb7wl9lAUAoM9l2AdBwae8PSHXSHRtySHCCJOfdYCoLo
-        2xWbIDM4qBo2fXdSCUyyl4hVNvJXtmNSx2dvfVADFv116Ey0/3G17bGuLOuL2jZDBY8fobkx1rcEI
-        4INs39Hdn+PMOqQVh3sKt4C+gDoPAr3eLYaCuo9XiXqbm5glaD55Z6srUetMDSuvrkoKvrf7kkPL6
-        wAPagbKQ==;
-Received: from 213-225-33-181.nat.highway.a1.net ([213.225.33.181] helo=localhost)
+        bh=tk49uTd1GaXg7LbiRUxBP5Y/ceJT7HmrtRb4yzgC7VM=; b=Pg0QCTprj3/gbzelxrFki8OKj3
+        +1KRU/Nvl8KvRv1cRa6jV1b87TP7hT9wT+rmYRS0ALSC2FVJGxkby4m0L8jwOBdI0Z57pl4ZK9huz
+        6lwWRBN4y+iMGQ8NPbLohmuDminW5XLUOZvs+8iclVzwwyuoHsnuV0vLx8tVpnd6ExipYnMIwm208
+        HbliFdEi/oNTTllpE41yZZ5QnORtVJeqEU4vQlfvQeMXMjdqVovkX6uNeHG/p/6qksS2eHpWjcOFR
+        9d6W2dTRXWiZmb0YIm+H9RGjOUgE/NYdoXQQ8/M2Hrq92n8Sm4xapVnNUSV9vKpC6+AKx+H99kpka
+        l0HNGRbw==;
+Received: from [2001:4bb8:19b:e528:4197:a20:99de:e7b0] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
-        id 1kxaBQ-000Kes-EE; Thu, 07 Jan 2021 18:40:05 +0000
+        id 1kyBhv-000Sux-9b; Sat, 09 Jan 2021 10:43:12 +0000
 From:   Christoph Hellwig <hch@lst.de>
-To:     axboe@kernel.dk
-Cc:     aik@ozlabs.ru, linux-block@vger.kernel.org, jack@suse.cz
-Subject: [PATCH] block: pre-initialize struct block_device in bdev_alloc_inode
-Date:   Thu,  7 Jan 2021 19:36:40 +0100
-Message-Id: <20210107183640.849336-1-hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Oleksii Kurochko <olkuroch@cisco.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Dongsheng Yang <dongsheng.yang@easystack.cn>,
+        ceph-devel@vger.kernel.org, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Subject: split hard read-only vs read-only policy v3 (resend)
+Date:   Sat,  9 Jan 2021 11:42:48 +0100
+Message-Id: <20210109104254.1077093-1-hch@lst.de>
 X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -49,50 +56,35 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-bdev_evict_inode and bdev_free_inode are also called for the root inode
-of bdevfs, for which bdev_alloc is never called.  Move the zeroing o
-f struct block_device and the initialization of the bd_bdi field into
-bdev_alloc_inode to make sure they are initialized for the root inode
-as well.
+Hi Jens,
 
-Fixes: e6cb53827ed6 ("block: initialize struct block_device in bdev_alloc")
-Reported-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- fs/block_dev.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+this series resurrects a patch from Martin to properly split the flag
+indicating a disk has been set read-only by the hardware vs the userspace
+policy set through the BLKROSET ioctl.
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 3e5b02f6606c42..b79ddda11ee317 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -774,8 +774,11 @@ static struct kmem_cache * bdev_cachep __read_mostly;
- static struct inode *bdev_alloc_inode(struct super_block *sb)
- {
- 	struct bdev_inode *ei = kmem_cache_alloc(bdev_cachep, GFP_KERNEL);
-+
- 	if (!ei)
- 		return NULL;
-+	memset(&ei->bdev, 0, sizeof(ei->bdev));
-+	ei->bdev.bd_bdi = &noop_backing_dev_info;
- 	return &ei->vfs_inode;
- }
- 
-@@ -869,14 +872,12 @@ struct block_device *bdev_alloc(struct gendisk *disk, u8 partno)
- 	mapping_set_gfp_mask(&inode->i_data, GFP_USER);
- 
- 	bdev = I_BDEV(inode);
--	memset(bdev, 0, sizeof(*bdev));
- 	mutex_init(&bdev->bd_mutex);
- 	mutex_init(&bdev->bd_fsfreeze_mutex);
- 	spin_lock_init(&bdev->bd_size_lock);
- 	bdev->bd_disk = disk;
- 	bdev->bd_partno = partno;
- 	bdev->bd_inode = inode;
--	bdev->bd_bdi = &noop_backing_dev_info;
- #ifdef CONFIG_SYSFS
- 	INIT_LIST_HEAD(&bdev->bd_holder_disks);
- #endif
--- 
-2.29.2
+Note that the last patch only applies to for-next and not to
+for-5.11/block.  I can hold it back for the first NVMe pull request after
+Linus pulled the block tree.
 
+A git tree is available here:
+
+    git://git.infradead.org/users/hch/block.git block-hard-ro
+
+Gitweb:
+
+    http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/block-hard-ro
+
+Changes since v3:
+ - rebased to the latest block tree
+ - indent commit log lines starting with a "#" to make sure git commit
+   doesn't eat them
+
+Changes since v2:
+ - fix a few typos
+ - add a patch to propagate the read-only status from the whole device to
+   partitions
+ - add a patch to remove a pointless check from bdev_read_only
+
+Changes since v1:
+ - don't propagate the policy flag from the whole disk to partitions
+ - rebased on top of the merge block_device and hd_struct series
