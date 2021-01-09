@@ -2,234 +2,98 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B82AC432C3
-	for <linux-block@archiver.kernel.org>; Sat,  9 Jan 2021 16:08:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F3B5C433DB
+	for <linux-block@archiver.kernel.org>; Sat,  9 Jan 2021 16:22:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 227A523A04
-	for <linux-block@archiver.kernel.org>; Sat,  9 Jan 2021 16:08:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BD5E723A23
+	for <linux-block@archiver.kernel.org>; Sat,  9 Jan 2021 16:22:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726985AbhAIQIL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 9 Jan 2021 11:08:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38062 "EHLO
+        id S1726001AbhAIQWB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 9 Jan 2021 11:22:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726913AbhAIQII (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 9 Jan 2021 11:08:08 -0500
-Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1482C0617A7;
-        Sat,  9 Jan 2021 08:06:55 -0800 (PST)
-Received: by mail-wm1-x329.google.com with SMTP id e25so11051015wme.0;
-        Sat, 09 Jan 2021 08:06:55 -0800 (PST)
+        with ESMTP id S1725970AbhAIQWB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 9 Jan 2021 11:22:01 -0500
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AB22C06179F
+        for <linux-block@vger.kernel.org>; Sat,  9 Jan 2021 08:21:21 -0800 (PST)
+Received: by mail-pf1-x42e.google.com with SMTP id m6so2682903pfk.1
+        for <linux-block@vger.kernel.org>; Sat, 09 Jan 2021 08:21:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=yD8zYkali7maLviDx2WTi8i72ihDIWnJKSJbAu6xfJ0=;
-        b=Ts4OoM5bqISNbtmG5sPDsmpk3BTHhh/QjboJ9FjJbTRW6os44a6JWrPaQeIq9a4gzB
-         ytPoZ/GW+c8ZRLyy3+gy3UFzrpFfiklRK34zsaVHar6VPLoh+t6didLQ79On2YaXPI61
-         pJYMvy+biZXWpv873DXVw0VcAA4BWzd8gzcFFTJKXfdRrqQ5DS5I/WBs9CIv7jzQeFMI
-         Hq3iECPsMcVtJgXRMv4wn1o2Hlj3wnnkuWosFYpHehQe35KojPpv+ALObFOb9wY8RLyx
-         lHcnE4uGyPIaA5yYJvbSruf6mQkaPTFCw8BRrqy91Lzpf7zZilpiDzluyMd0xwOv21xY
-         uFYw==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=mjEHFalIIEItGJAOPep0ageUbDkcTaW2RlpMs/tn1ZE=;
+        b=Dw5sp9jpqgebmGbrxGSfEFBvMpxjqcNy1O3GssH1G7FxTXI6Z7fYUWgJHpndqM78Zs
+         cmX3eNMjkuN6Zv/dc+Lzp2OojCG6OR+qzGHjwn3Kwhx3QDjALJtb5p7Dc4V5XY1HXGcs
+         b2+niC0j9ZySQI+Jq0BdtB0xOWr12deerievSs3o8v+n/ra5ZuYqMcLalOwVWn25O4Ej
+         5KV7dlRD3n+qepPb1dbeFQZd0Z5m+hCr/rrYW7xn7BmWC2TDAaokd0jQWLxVPstiYape
+         o/oevbAwX81gGPMaVLpqMDoLY5A/RMrsthM93aFwzOapqmGRxnhVo6oMbTa5A/Eo7mQo
+         F1DQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=yD8zYkali7maLviDx2WTi8i72ihDIWnJKSJbAu6xfJ0=;
-        b=oeBGYqW+EAhOqFqgxPFX6WJCGqHZ+JDX1EsheS3j67f4MhBWYTIiiTY9KB5CDWa/QG
-         X+tXP0vw+Jncwg8KrXpIyQnb4lt5YS+30VHVVA883M0jTkIx1ylyXFndEK92PXxam2mq
-         sCQazQVcFUsJ9XgJ0vNrCpwmdleYMqeMHpiR1PAYODWze1ntqKMj8qGR8DnRuDBvmueD
-         h+1WEhQUDR/P0eYGfBRM/7rMEMAwPgvy77c/dnRVcR/3RSuMOAv+efWW3nuxMJABSosr
-         Jo9i+rJIFBmAbkkGea5ZPEDIjrkHS3mQQRyyHOhdCFY6PxTDvlsK4cR7sao3APTZcicS
-         hjSQ==
-X-Gm-Message-State: AOAM53204fXKCtpTwPObRcJPb2FH/gWzxkmLYwDz8CGiVqwcdkYXJbfX
-        P8dhy1JfCBMUi8UkTmutV+aBbiqLyusg13AY
-X-Google-Smtp-Source: ABdhPJyDJ7ivMuFntSJFW5N+/HuavTp+fJKVSfLb/Mv/WA3X5yhkivHrCndukCuTwkfjMzb7+EAADg==
-X-Received: by 2002:a1c:1d1:: with SMTP id 200mr7900279wmb.98.1610208414381;
-        Sat, 09 Jan 2021 08:06:54 -0800 (PST)
-Received: from localhost.localdomain ([185.69.144.125])
-        by smtp.gmail.com with ESMTPSA id j9sm17403866wrm.14.2021.01.09.08.06.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 09 Jan 2021 08:06:53 -0800 (PST)
-From:   Pavel Begunkov <asml.silence@gmail.com>
-To:     linux-block@vger.kernel.org
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Jonathan Corbet <corbet@lwn.net>, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org,
-        linux-kernel@vger.kernel.org, target-devel@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-doc@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH v3 7/7] bio: don't copy bvec for direct IO
-Date:   Sat,  9 Jan 2021 16:03:03 +0000
-Message-Id: <69fef253b37fc44dd28c43398715e27cee5e0fe0.1610170479.git.asml.silence@gmail.com>
-X-Mailer: git-send-email 2.24.0
-In-Reply-To: <cover.1610170479.git.asml.silence@gmail.com>
-References: <cover.1610170479.git.asml.silence@gmail.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=mjEHFalIIEItGJAOPep0ageUbDkcTaW2RlpMs/tn1ZE=;
+        b=hUTDHsW8nzEAPoWy/TeAmvgpGUstvmxWauABw8jjiM0Akni+f8TidEHrxfXR8T4Gr6
+         BCNK+zdO4O/hrFQ6gsRdPSGGXdXKI3EfKCNnUHk/eYBxwu/dgTwFIbAnNBXhZQFf2bpt
+         RQTycoKlKl673y5CGAW8roXK4XEiX9pX5kBe2RWSO1w4nsUp1y1XBnzE8HE/UmdEZ7K3
+         HaPI/3z+xWmxNL4pTd4vVu4hPX5BVDM/q+4fqSvMnCe4Iagx+5s6KJGNzLmV4dK9hHzr
+         NT87AUfXXt1vbVSWfiuON3aQujRR5TeqEqcxHPrcFTIzbGA8XhAPKiO0dBmOLHi09gLm
+         MAiw==
+X-Gm-Message-State: AOAM5331m+/WN69SngURhYLow4l6ZfjgZCdV0Js+MuzJmBpkMw5xUSvs
+        igTagsDdDQSLwbsBZV6rOWr9QVVwyKtLUw==
+X-Google-Smtp-Source: ABdhPJzKxybHaIoZNUzJxMOrJ/5glxC1qKgRvZCORlG+LCtkFdRMtoAr0uIQFWRsxQg2SRp717+eZw==
+X-Received: by 2002:aa7:9357:0:b029:1a5:43da:b90d with SMTP id 23-20020aa793570000b02901a543dab90dmr8987669pfn.54.1610209280254;
+        Sat, 09 Jan 2021 08:21:20 -0800 (PST)
+Received: from [192.168.1.134] ([66.219.217.173])
+        by smtp.gmail.com with ESMTPSA id 6sm13403529pgo.17.2021.01.09.08.21.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 09 Jan 2021 08:21:19 -0800 (PST)
+Subject: Re: [PATCH 0/5] bcache patches for Linux v5.11-rc3
+To:     Coly Li <colyli@suse.de>
+Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+References: <20210104074122.19759-1-colyli@suse.de>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <32e3eec4-9371-cb5e-5fc7-0cd46dc6b5af@kernel.dk>
+Date:   Sat, 9 Jan 2021 09:21:20 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210104074122.19759-1-colyli@suse.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The block layer spends quite a while in blkdev_direct_IO() to copy and
-initialise bio's bvec. However, if we've already got a bvec in the input
-iterator it might be reused in some cases, i.e. when new
-ITER_BVEC_FLAG_FIXED flag is set. Simple tests show considerable
-performance boost, and it also reduces memory footprint.
+On 1/4/21 12:41 AM, Coly Li wrote:
+> Hi Jens,
+> 
+> This series is not planned but necessary. The four patches from me fix
+> a bcache super block layout issue which was introduced in 5.9 when large
+> bucket (32MB-1TB size for zoned device) feature firstly introduced.
+> 
+> Previous code has problem on space consumption and checksum calculation.
+> These four patches improve and fix the problems with on-disk format
+> consistency. Although now almost no one (except me) uses the large
+> bucket code now, it should be good to have the fix as soon as possible.
+> 
+> This series also has a patch from Yi Li which avoid a redundant value
+> assignment in a two-level loop. It is cool if we may have it in 5.11.
+> 
+> User space bcache-tools are updated for the above kernel changes too.
+> Please take them for 5.11-rc3.
 
-Suggested-by: Matthew Wilcox <willy@infradead.org>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
----
- Documentation/filesystems/porting.rst |  9 ++++
- block/bio.c                           | 67 ++++++++++++---------------
- include/linux/bio.h                   |  5 +-
- 3 files changed, 42 insertions(+), 39 deletions(-)
+Applied, thanks.
 
-diff --git a/Documentation/filesystems/porting.rst b/Documentation/filesystems/porting.rst
-index c722d94f29ea..1f8cf8e10b34 100644
---- a/Documentation/filesystems/porting.rst
-+++ b/Documentation/filesystems/porting.rst
-@@ -872,3 +872,12 @@ its result is kern_unmount() or kern_unmount_array().
- 
- zero-length bvec segments are disallowed, they must be filtered out before
- passed on to an iterator.
-+
-+---
-+
-+**mandatory**
-+
-+For bvec based itererators bio_iov_iter_get_pages() now doesn't copy bvecs but
-+uses the one provided. Anyone issuing kiocb-I/O should ensure that the bvec and
-+page references stay until I/O has completed, i.e. until ->ki_complete() has
-+been called or returned with non -EIOCBQUEUED code.
-diff --git a/block/bio.c b/block/bio.c
-index 9f26984af643..6f031a04b59a 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -960,21 +960,17 @@ void bio_release_pages(struct bio *bio, bool mark_dirty)
- }
- EXPORT_SYMBOL_GPL(bio_release_pages);
- 
--static int __bio_iov_bvec_add_pages(struct bio *bio, struct iov_iter *iter)
-+static int bio_iov_bvec_set(struct bio *bio, struct iov_iter *iter)
- {
--	const struct bio_vec *bv = iter->bvec;
--	unsigned int len;
--	size_t size;
--
--	if (WARN_ON_ONCE(iter->iov_offset > bv->bv_len))
--		return -EINVAL;
--
--	len = min_t(size_t, bv->bv_len - iter->iov_offset, iter->count);
--	size = bio_add_page(bio, bv->bv_page, len,
--				bv->bv_offset + iter->iov_offset);
--	if (unlikely(size != len))
--		return -EINVAL;
--	iov_iter_advance(iter, size);
-+	WARN_ON_ONCE(BVEC_POOL_IDX(bio) != 0);
-+
-+	bio->bi_vcnt = iter->nr_segs;
-+	bio->bi_max_vecs = iter->nr_segs;
-+	bio->bi_io_vec = (struct bio_vec *)iter->bvec;
-+	bio->bi_iter.bi_bvec_done = iter->iov_offset;
-+	bio->bi_iter.bi_size = iter->count;
-+
-+	iov_iter_advance(iter, iter->count);
- 	return 0;
- }
- 
-@@ -1088,12 +1084,12 @@ static int __bio_iov_append_get_pages(struct bio *bio, struct iov_iter *iter)
-  * This takes either an iterator pointing to user memory, or one pointing to
-  * kernel pages (BVEC iterator). If we're adding user pages, we pin them and
-  * map them into the kernel. On IO completion, the caller should put those
-- * pages. If we're adding kernel pages, and the caller told us it's safe to
-- * do so, we just have to add the pages to the bio directly. We don't grab an
-- * extra reference to those pages (the user should already have that), and we
-- * don't put the page on IO completion. The caller needs to check if the bio is
-- * flagged BIO_NO_PAGE_REF on IO completion. If it isn't, then pages should be
-- * released.
-+ * pages. For bvec based iterators bio_iov_iter_get_pages() uses the provided
-+ * bvecs rather than copying them. Hence anyone issuing kiocb based IO needs
-+ * to ensure the bvecs and pages stay referenced until the submitted I/O is
-+ * completed by a call to ->ki_complete() or returns with an error other than
-+ * -EIOCBQUEUED. The caller needs to check if the bio is flagged BIO_NO_PAGE_REF
-+ * on IO completion. If it isn't, then pages should be released.
-  *
-  * The function tries, but does not guarantee, to pin as many pages as
-  * fit into the bio, or are requested in @iter, whatever is smaller. If
-@@ -1105,27 +1101,22 @@ static int __bio_iov_append_get_pages(struct bio *bio, struct iov_iter *iter)
-  */
- int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- {
--	const bool is_bvec = iov_iter_is_bvec(iter);
--	int ret;
--
--	if (WARN_ON_ONCE(bio->bi_vcnt))
--		return -EINVAL;
-+	int ret = 0;
- 
--	do {
--		if (bio_op(bio) == REQ_OP_ZONE_APPEND) {
--			if (WARN_ON_ONCE(is_bvec))
--				return -EINVAL;
--			ret = __bio_iov_append_get_pages(bio, iter);
--		} else {
--			if (is_bvec)
--				ret = __bio_iov_bvec_add_pages(bio, iter);
-+	if (iov_iter_is_bvec(iter)) {
-+		if (WARN_ON_ONCE(bio_op(bio) == REQ_OP_ZONE_APPEND))
-+			return -EINVAL;
-+		bio_iov_bvec_set(bio, iter);
-+		bio_set_flag(bio, BIO_NO_PAGE_REF);
-+		return 0;
-+	} else {
-+		do {
-+			if (bio_op(bio) == REQ_OP_ZONE_APPEND)
-+				ret = __bio_iov_append_get_pages(bio, iter);
- 			else
- 				ret = __bio_iov_iter_get_pages(bio, iter);
--		}
--	} while (!ret && iov_iter_count(iter) && !bio_full(bio, 0));
--
--	if (is_bvec)
--		bio_set_flag(bio, BIO_NO_PAGE_REF);
-+		} while (!ret && iov_iter_count(iter) && !bio_full(bio, 0));
-+	}
- 
- 	/* don't account direct I/O as memory stall */
- 	bio_clear_flag(bio, BIO_WORKINGSET);
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index d8f9077c43ef..1d30572a8c53 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -444,10 +444,13 @@ static inline void bio_wouldblock_error(struct bio *bio)
- 
- /*
-  * Calculate number of bvec segments that should be allocated to fit data
-- * pointed by @iter.
-+ * pointed by @iter. If @iter is backed by bvec it's going to be reused
-+ * instead of allocating a new one.
-  */
- static inline int bio_iov_vecs_to_alloc(struct iov_iter *iter, int max_segs)
- {
-+	if (iov_iter_is_bvec(iter))
-+		return 0;
- 	return iov_iter_npages(iter, max_segs);
- }
- 
 -- 
-2.24.0
+Jens Axboe
 
