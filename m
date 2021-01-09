@@ -2,95 +2,94 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D223C433E6
-	for <linux-block@archiver.kernel.org>; Sat,  9 Jan 2021 15:02:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E95DBC433E0
+	for <linux-block@archiver.kernel.org>; Sat,  9 Jan 2021 15:56:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5E6462388E
-	for <linux-block@archiver.kernel.org>; Sat,  9 Jan 2021 15:02:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B02A623A7F
+	for <linux-block@archiver.kernel.org>; Sat,  9 Jan 2021 15:56:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726267AbhAIPCt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 9 Jan 2021 10:02:49 -0500
-Received: from mx2.suse.de ([195.135.220.15]:60802 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726189AbhAIPCt (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 9 Jan 2021 10:02:49 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id C4C08AAF1;
-        Sat,  9 Jan 2021 15:02:07 +0000 (UTC)
-Subject: Re: [PATCH 0/5] bcache patches for Linux v5.11-rc3
-To:     axboe@kernel.dk
-Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-References: <20210104074122.19759-1-colyli@suse.de>
-From:   Coly Li <colyli@suse.de>
-Message-ID: <0ec90bb3-aa7b-431c-eed2-557cb15f9d06@suse.de>
-Date:   Sat, 9 Jan 2021 23:02:05 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:78.0)
- Gecko/20100101 Thunderbird/78.6.0
+        id S1726293AbhAIP4B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 9 Jan 2021 10:56:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35440 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725872AbhAIP4A (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 9 Jan 2021 10:56:00 -0500
+Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEF9CC06179F;
+        Sat,  9 Jan 2021 07:55:19 -0800 (PST)
+Received: by mail-wm1-x334.google.com with SMTP id g185so11002882wmf.3;
+        Sat, 09 Jan 2021 07:55:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=j8STdSgjj6xHtdroJXzvV/+CmMSDy9uhx89zUkl0AAc=;
+        b=cRpXTD96vs3MdnSGTa27Xv+AIxUuYhFyOwWDj+WwNvnk5LCMe5AZDH4wYDrjaGiEce
+         nxJFB/I+n3W5agVDHZ3Z7z0llGXn7E1ivl9RKFL9NWxkRvp6cd/LcXAMW4r3GfN7GnFG
+         mh0fZucprQReiWQwrjbD1YjlPgCvEwn6w1i8iU3En2G5wE4P5FGXp0vvlaR/xRB97AfV
+         t0wHCGemXlPjhadEJvIR9sFphP1SC/KcoMZAppNY3Z3MqXVG4wWBKBn61fmcK4LwRbtG
+         TTkNNCLh7S9LOjhHHtuvmNrDguGebveLf24vJXTwlA1MfYnw4XDt/MNBFWEhi6GTshD5
+         V6wg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=j8STdSgjj6xHtdroJXzvV/+CmMSDy9uhx89zUkl0AAc=;
+        b=AVDdPZ5lQhNufgCwPp9chY9JT9xBJFHBEqRiKe1fwqWOoo+A85MO60YvnWwgUB8gXQ
+         HpmbA/hMha1zfoNboGkKdnHMRecoberGdvle67HjQ5UIN4RY4hUOl8exTeh+t75fpDO2
+         YLbjLt1DNTEMrpJMpEH8qOlYGa20DcQyOGs1kk70grY1D8OYYMNbc5mTueEutn0hBxM0
+         SOMrZyxr/zTZKPlD96deRfJSnAd8/a0OH1Yuf9vEJn6QhctsxG3A0ZEOWSTCKKc9mwOI
+         wpvy9/QNc8za+M9hGRDpMJTIozk0JVCl9DhcUODVWbm1my0/4i2ALxG2yeJF5NmbxWu5
+         Eefw==
+X-Gm-Message-State: AOAM533I0rFdheQwBwWRDYIcst/YPZgPNI7/2uE0tCt5mzPP0Fx7JjwK
+        2G1BfwO91MTpBVonpQeR8rZOOy94INrPRw==
+X-Google-Smtp-Source: ABdhPJwnH0NKNkhe/qju/0QkhNCh99e/OkwsfGdbhjqJQ0o+hdvBm1FFhRPa0L3J/GuUZ/hMuINf3g==
+X-Received: by 2002:a1c:790f:: with SMTP id l15mr7798475wme.188.1610207718749;
+        Sat, 09 Jan 2021 07:55:18 -0800 (PST)
+Received: from localhost.localdomain ([185.69.144.125])
+        by smtp.gmail.com with ESMTPSA id l8sm16605266wmf.35.2021.01.09.07.55.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 09 Jan 2021 07:55:18 -0800 (PST)
+From:   Pavel Begunkov <asml.silence@gmail.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] loop: devirtualise ki_complete call
+Date:   Sat,  9 Jan 2021 15:51:38 +0000
+Message-Id: <5e84ffb95a722c510674a319d9223a1add42ef14.1610207408.git.asml.silence@gmail.com>
+X-Mailer: git-send-email 2.24.0
 MIME-Version: 1.0
-In-Reply-To: <20210104074122.19759-1-colyli@suse.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/4/21 3:41 PM, Coly Li wrote:
-> Hi Jens,
-> 
-> This series is not planned but necessary. The four patches from me fix
-> a bcache super block layout issue which was introduced in 5.9 when large
-> bucket (32MB-1TB size for zoned device) feature firstly introduced.
-> 
-> Previous code has problem on space consumption and checksum calculation.
-> These four patches improve and fix the problems with on-disk format
-> consistency. Although now almost no one (except me) uses the large
-> bucket code now, it should be good to have the fix as soon as possible.
-> 
-> This series also has a patch from Yi Li which avoid a redundant value
-> assignment in a two-level loop. It is cool if we may have it in 5.11.
-> 
-> User space bcache-tools are updated for the above kernel changes too.
-> Please take them for 5.11-rc3.
-> 
+lo_rw_aio() knows what iocb.ki_complete it set, so instead of an
+expensive indirect call it can call lo_rw_aio_complete() directly.
 
-Hi Jens,
+Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+---
+ drivers/block/loop.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Could you please to take this series for rc3?
-
-Thanks in advance.
-
-
-Coly Li
-
-
-
-> ---
-> 
-> 
-> Coly Li (4):
->   bcache: fix typo from SUUP to SUPP in features.h
->   bcache: check unsupported feature sets for bcache register
->   bcache: introduce BCH_FEATURE_INCOMPAT_LOG_LARGE_BUCKET_SIZE for large
->     bucket
->   bcache: set bcache device into read-only mode for
->     BCH_FEATURE_INCOMPAT_OBSO_LARGE_BUCKET
-> 
-> Yi Li (1):
->   bcache: set pdev_set_uuid before scond loop iteration
-> 
->  drivers/md/bcache/features.c |  2 +-
->  drivers/md/bcache/features.h | 30 ++++++++++++++++----
->  drivers/md/bcache/super.c    | 53 +++++++++++++++++++++++++++++++++---
->  include/uapi/linux/bcache.h  |  2 +-
->  4 files changed, 76 insertions(+), 11 deletions(-)
-> 
-
-
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index e5ff328f0917..113d87f3b194 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -588,7 +588,7 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+ 	kthread_associate_blkcg(NULL);
+ 
+ 	if (ret != -EIOCBQUEUED)
+-		cmd->iocb.ki_complete(&cmd->iocb, ret, 0);
++		lo_rw_aio_complete(&cmd->iocb, ret, 0);
+ 	return 0;
+ }
+ 
+-- 
+2.24.0
 
