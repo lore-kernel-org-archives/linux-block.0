@@ -2,125 +2,123 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 387E5C433DB
-	for <linux-block@archiver.kernel.org>; Sat,  9 Jan 2021 23:01:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EFCCC433E0
+	for <linux-block@archiver.kernel.org>; Sun, 10 Jan 2021 09:21:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 02A0E23975
-	for <linux-block@archiver.kernel.org>; Sat,  9 Jan 2021 23:01:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 087E823B16
+	for <linux-block@archiver.kernel.org>; Sun, 10 Jan 2021 09:21:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726386AbhAIXBY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 9 Jan 2021 18:01:24 -0500
-Received: from mail-1.ca.inter.net ([208.85.220.69]:60552 "EHLO
-        mail-1.ca.inter.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726281AbhAIXBY (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 9 Jan 2021 18:01:24 -0500
-Received: from localhost (offload-3.ca.inter.net [208.85.220.70])
-        by mail-1.ca.inter.net (Postfix) with ESMTP id 9D28D2EA01D;
-        Sat,  9 Jan 2021 18:00:42 -0500 (EST)
-Received: from mail-1.ca.inter.net ([208.85.220.69])
-        by localhost (offload-3.ca.inter.net [208.85.220.70]) (amavisd-new, port 10024)
-        with ESMTP id RP9EYr1UqlHY; Sat,  9 Jan 2021 17:47:42 -0500 (EST)
-Received: from [192.168.48.23] (host-104-157-204-209.dyn.295.ca [104.157.204.209])
-        (using TLSv1 with cipher DHE-RSA-AES128-SHA (128/128 bits))
-        (No client certificate requested)
-        (Authenticated sender: dgilbert@interlog.com)
-        by mail-1.ca.inter.net (Postfix) with ESMTPSA id 1599B2EA0BD;
-        Sat,  9 Jan 2021 18:00:42 -0500 (EST)
-Reply-To: dgilbert@interlog.com
-Subject: Re: [PATCH v5 4/4] scatterlist: add sgl_memset()
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        target-devel@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-kernel@vger.kernel.org, martin.petersen@oracle.com,
-        jejb@linux.vnet.ibm.com, bostroesser@gmail.com, bvanassche@acm.org,
-        ddiss@suse.de
-References: <20201228234955.190858-1-dgilbert@interlog.com>
- <20201228234955.190858-5-dgilbert@interlog.com>
- <20210107174629.GC504133@ziepe.ca>
-From:   Douglas Gilbert <dgilbert@interlog.com>
-Message-ID: <9b727a9a-eb58-ab20-f42b-aa9c9e90a49a@interlog.com>
-Date:   Sat, 9 Jan 2021 18:00:41 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <20210107174629.GC504133@ziepe.ca>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-CA
+        id S1725985AbhAJJVH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 10 Jan 2021 04:21:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60194 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725807AbhAJJVF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 10 Jan 2021 04:21:05 -0500
+Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A4E9C061786
+        for <linux-block@vger.kernel.org>; Sun, 10 Jan 2021 01:20:24 -0800 (PST)
+Received: by mail-wr1-x432.google.com with SMTP id 91so13223890wrj.7
+        for <linux-block@vger.kernel.org>; Sun, 10 Jan 2021 01:20:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=yXJgaZ30bCNx0d/Nlv7SzE2CGcAUZbD7YijRwA9pDuc=;
+        b=KcG/JlQ1+2kflGk/GLZne91f+IwXGVmTDbqrofWVm0guNBr0W5phMkp6tYvgwNnZkv
+         rl/hmn/Lh+msvNs8XA4hJNsceTeFkhyz+e7IIH84kj2llNqvFJ2gbTcV3U4BPHfJxi1M
+         JJAuo1R0MYAWyFpbcChXP+LS0XEwIffYeRFZ+NGxJ+RFlVcWXo4gRDOo+2np3jpaeab2
+         9Wr7a2sSb6J0JZqZ6EMIm0A5mf40OU6ifMUGQgULcw+tPrEt+WqvP3sMtad/JQyj3yR0
+         aSrYPQ80pePZ0yjmaHWN9Xsy9pZSfUXYnBKkiqg0wxFxTmi0WzbFa1JaYfPsZQlD33Fz
+         W4jQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=yXJgaZ30bCNx0d/Nlv7SzE2CGcAUZbD7YijRwA9pDuc=;
+        b=FkQwaxFESzXM+auOUSVNY3kIqSkRvkZrJZNVhLlrU+bygFm385wbPgw0tjgOSxl7XR
+         wXOdk8axo850vdvsv2rvQkRP3jVrKijgPVsmbE8h2Nv5j+igjSA9BhEAdQgj/8T9+a8P
+         ePLlWuuYj/BWGPXZKv/wQnV0zzrSwCi95UMdHMvx1Q98TFdzDePQsFTcxT3nuLU7TXUa
+         cpuaCXQIb8WR51qj+HAKikMjcS2KqrcLgfj1+ba6pGiMorvUNg7NY6ADshdboB3shAEs
+         fUoEhYbjJ6yPfDTscCn4TMAkq4gbVJ+a6Urgmr3Y6HScbft+SkNXJJ9Ti+eLqOY9rgcK
+         zDQA==
+X-Gm-Message-State: AOAM530O6Bj9PLWVJVFMkesY4Tz8mpk9rvHoURisZtN2uYeHLmYou7O1
+        KzMMvXEJozh3UGYCHDGO5fQ/8v1bwBN+gnX/
+X-Google-Smtp-Source: ABdhPJz+wMrHI1zxHOuLW3hqAjg1B0eK25hoV9yGmUvQVlBdNW6AsiNPbo/m2jj7gzHm9p39vHvgBA==
+X-Received: by 2002:adf:eb87:: with SMTP id t7mr11268569wrn.316.1610270421575;
+        Sun, 10 Jan 2021 01:20:21 -0800 (PST)
+Received: from [192.168.0.13] ([83.216.184.132])
+        by smtp.gmail.com with ESMTPSA id f77sm17485617wmf.42.2021.01.10.01.20.20
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Sun, 10 Jan 2021 01:20:21 -0800 (PST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: [PATCH 2/2] bfq: Allow short_ttime queues to have waker
+From:   Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <20200409170915.30570-3-jack@suse.cz>
+Date:   Sun, 10 Jan 2021 10:20:19 +0100
+Cc:     linux-block@vger.kernel.org, Andreas Herrmann <aherrmann@suse.com>
 Content-Transfer-Encoding: 7bit
+Message-Id: <9F84671F-5B43-46A8-8D92-FE30F6023F94@linaro.org>
+References: <20200409170915.30570-1-jack@suse.cz>
+ <20200409170915.30570-3-jack@suse.cz>
+To:     Jan Kara <jack@suse.cz>
+X-Mailer: Apple Mail (2.3445.104.11)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2021-01-07 12:46 p.m., Jason Gunthorpe wrote:
-> On Mon, Dec 28, 2020 at 06:49:55PM -0500, Douglas Gilbert wrote:
->> The existing sg_zero_buffer() function is a bit restrictive. For
->> example protection information (PI) blocks are usually initialized
->> to 0xff bytes. As its name suggests sgl_memset() is modelled on
->> memset(). One difference is the type of the val argument which is
->> u8 rather than int. Plus it returns the number of bytes (over)written.
->>
->> Change implementation of sg_zero_buffer() to call this new function.
->>
->> Reviewed-by: Bodo Stroesser <bostroesser@gmail.com>
->> Signed-off-by: Douglas Gilbert <dgilbert@interlog.com>
->>   include/linux/scatterlist.h |  3 ++
->>   lib/scatterlist.c           | 65 +++++++++++++++++++++++++------------
->>   2 files changed, 48 insertions(+), 20 deletions(-)
->>
->> diff --git a/include/linux/scatterlist.h b/include/linux/scatterlist.h
->> index 71be65f9ebb5..70d3f1f73df1 100644
->> +++ b/include/linux/scatterlist.h
->> @@ -333,6 +333,9 @@ bool sgl_compare_sgl_idx(struct scatterlist *x_sgl, unsigned int x_nents, off_t
->>   			 struct scatterlist *y_sgl, unsigned int y_nents, off_t y_skip,
->>   			 size_t n_bytes, size_t *miscompare_idx);
->>   
->> +size_t sgl_memset(struct scatterlist *sgl, unsigned int nents, off_t skip,
->> +		  u8 val, size_t n_bytes);
->> +
->>   /*
->>    * Maximum number of entries that will be allocated in one piece, if
->>    * a list larger than this is required then chaining will be utilized.
->> diff --git a/lib/scatterlist.c b/lib/scatterlist.c
->> index 9332365e7eb6..f06614a880c8 100644
->> +++ b/lib/scatterlist.c
->> @@ -1038,26 +1038,7 @@ EXPORT_SYMBOL(sg_pcopy_to_buffer);
->>   size_t sg_zero_buffer(struct scatterlist *sgl, unsigned int nents,
->>   		       size_t buflen, off_t skip)
->>   {
->> -	unsigned int offset = 0;
->> -	struct sg_mapping_iter miter;
->> -	unsigned int sg_flags = SG_MITER_ATOMIC | SG_MITER_TO_SG;
->> -
->> -	sg_miter_start(&miter, sgl, nents, sg_flags);
->> -
->> -	if (!sg_miter_skip(&miter, skip))
->> -		return false;
->> -
->> -	while (offset < buflen && sg_miter_next(&miter)) {
->> -		unsigned int len;
->> -
->> -		len = min(miter.length, buflen - offset);
->> -		memset(miter.addr, 0, len);
->> -
->> -		offset += len;
->> -	}
->> -
->> -	sg_miter_stop(&miter);
->> -	return offset;
->> +	return sgl_memset(sgl, nents, skip, 0, buflen);
->>   }
->>   EXPORT_SYMBOL(sg_zero_buffer);
+
+
+> Il giorno 9 apr 2020, alle ore 19:09, Jan Kara <jack@suse.cz> ha scritto:
 > 
-> May as well make this one liner a static inline in the header. Just
-> rename this function to sgl_memset so the diff is clearer
+> Currently queues that have average think time shorter than slice_idle
+> cannot have waker. However this requirement is too strict. E.g. dbench
+> process always submits a one or two IOs (which is enough to pull its
+> average think time below slice_idle) and then blocks waiting for jbd2
+> thread to commit a transaction. Due to idling logic jbd2 thread is
+> often forced to wait for dbench's idle timer to trigger to be able to
+> submit its IO and this severely delays the overall benchmark progress.
+> 
+> E.g. on my test machine current dbench single-thread throughput is ~80
+> MB/s, with this patch it is ~200 MB/s.
+> 
 
-Yes, fine. I can roll a new version.
+Hi Jan,
+I've modified this logic a little bit (in patches that I'm going to
+submit).  And I don't see your boost in my tests.  So it's difficult
+for me to validate this change.  If ok for you, you could test it on
+top of the patches that I'll submit.  If you see a boost, and (as I
+expect) I won't see any regression, this improvement is very welcome
+for me.
 
-Doug Gilbert
+Thanks,
+Paolo
 
+> Signed-off-by: Jan Kara <jack@suse.cz>
+> ---
+> block/bfq-iosched.c | 1 -
+> 1 file changed, 1 deletion(-)
+> 
+> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+> index 18f85d474c9c..416473ba80c8 100644
+> --- a/block/bfq-iosched.c
+> +++ b/block/bfq-iosched.c
+> @@ -1928,7 +1928,6 @@ static void bfq_add_request(struct request *rq)
+> 		 * I/O-plugging interval for bfqq.
+> 		 */
+> 		if (bfqd->last_completed_rq_bfqq &&
+> -		    !bfq_bfqq_has_short_ttime(bfqq) &&
+> 		    ktime_get_ns() - bfqd->last_completion <
+> 		    200 * NSEC_PER_USEC) {
+> 			if (bfqd->last_completed_rq_bfqq != bfqq &&
+> -- 
+> 2.16.4
+> 
 
