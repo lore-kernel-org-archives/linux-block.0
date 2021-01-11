@@ -7,96 +7,82 @@ X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85F44C433DB
-	for <linux-block@archiver.kernel.org>; Mon, 11 Jan 2021 03:08:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15ABBC433E6
+	for <linux-block@archiver.kernel.org>; Mon, 11 Jan 2021 03:08:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4E2B1224B8
+	by mail.kernel.org (Postfix) with ESMTP id D6BFB224BD
 	for <linux-block@archiver.kernel.org>; Mon, 11 Jan 2021 03:08:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726720AbhAKDIK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1726766AbhAKDIK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Sun, 10 Jan 2021 22:08:10 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47936 "EHLO
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:52340 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726625AbhAKDII (ORCPT
+        by vger.kernel.org with ESMTP id S1726626AbhAKDIK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 10 Jan 2021 22:08:08 -0500
+        Sun, 10 Jan 2021 22:08:10 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610334402;
+        s=mimecast20190719; t=1610334404;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=KOHxdfOHs06LTIDjtmlBiJmm7Y/Tz8Nenrxf6H6MFj4=;
-        b=DQFhG85TT4Vk4q6gH703wuphkmJ8DKLYiT/2y7qQKkBvLi2AhQmH9ZsT7girHFT/tBeKfJ
-        kliYvXVtfyWp8zcQdLMbxYOSNBXAaDNpYBYUUUW37f6j5BaIIrukw48c2FNuIdCcAxH5hf
-        R1g7gxXXI0NF0gpFgaInERbV/IxQ+Ic=
+        bh=Uy+q9x/LhT5LmxfrDWoXPnKFI8e993HQ2GG56/x1S54=;
+        b=MIKI+MyCqIezBVYePR0F1A+xOyiygG30AGVtPQLtPJmwt41xQ2Cm5HfDwGsX++W85cETYc
+        16C0th5gNm8f7/f8V9FT8++orkZ/wtyj9oVm7VUih4N4aPpEkIBG2aNqVNyCItFukGpgM8
+        xjHzSOsBPAododuORO/SgjUl+rr287g=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-261-Pp4Iw1J8NdqabK740cXMRg-1; Sun, 10 Jan 2021 22:06:39 -0500
-X-MC-Unique: Pp4Iw1J8NdqabK740cXMRg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+ us-mta-144-jehQohl1PVCNUoXejYQrzg-1; Sun, 10 Jan 2021 22:06:42 -0500
+X-MC-Unique: jehQohl1PVCNUoXejYQrzg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0771B801817;
-        Mon, 11 Jan 2021 03:06:38 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4FDBD107ACE6;
+        Mon, 11 Jan 2021 03:06:41 +0000 (UTC)
 Received: from localhost (ovpn-12-180.pek2.redhat.com [10.72.12.180])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9478E74440;
-        Mon, 11 Jan 2021 03:06:33 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9ED766EF50;
+        Mon, 11 Jan 2021 03:06:40 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V3 5/6] block: move three bvec helpers declaration into private helper
-Date:   Mon, 11 Jan 2021 11:05:56 +0800
-Message-Id: <20210111030557.4154161-6-ming.lei@redhat.com>
+        Ming Lei <ming.lei@redhat.com>, linux-bcache@vger.kernel.org,
+        Coly Li <colyli@suse.de>
+Subject: [PATCH V3 6/6] bcache: don't pass BIOSET_NEED_BVECS for the 'bio_set' embedded in 'cache_set'
+Date:   Mon, 11 Jan 2021 11:05:57 +0800
+Message-Id: <20210111030557.4154161-7-ming.lei@redhat.com>
 In-Reply-To: <20210111030557.4154161-1-ming.lei@redhat.com>
 References: <20210111030557.4154161-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-bvec_alloc(), bvec_free() and bvec_nr_vecs() are only used inside block
-layer core functions, no need to declare them in public header.
+This bioset is just for allocating bio only from bio_next_split, and it
+needn't bvecs, so remove the flag.
 
+Cc: linux-bcache@vger.kernel.org
+Cc: Coly Li <colyli@suse.de>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk.h         | 4 ++++
- include/linux/bio.h | 3 ---
- 2 files changed, 4 insertions(+), 3 deletions(-)
+ drivers/md/bcache/super.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/blk.h b/block/blk.h
-index 7550364c326c..a21a35c4a3e4 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -55,6 +55,10 @@ void blk_free_flush_queue(struct blk_flush_queue *q);
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index a4752ac410dc..4102e47f43e1 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -1897,7 +1897,7 @@ struct cache_set *bch_cache_set_alloc(struct cache_sb *sb)
+ 		goto err;
  
- void blk_freeze_queue(struct request_queue *q);
+ 	if (bioset_init(&c->bio_split, 4, offsetof(struct bbio, bio),
+-			BIOSET_NEED_BVECS|BIOSET_NEED_RESCUER))
++			BIOSET_NEED_RESCUER))
+ 		goto err;
  
-+struct bio_vec *bvec_alloc(gfp_t, int, unsigned long *, mempool_t *);
-+void bvec_free(mempool_t *, struct bio_vec *, unsigned int);
-+unsigned int bvec_nr_vecs(unsigned short idx);
-+
- static inline bool biovec_phys_mergeable(struct request_queue *q,
- 		struct bio_vec *vec1, struct bio_vec *vec2)
- {
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index f606eb1e556f..70914dd6a70d 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -478,9 +478,6 @@ static inline void zero_fill_bio(struct bio *bio)
- 	zero_fill_bio_iter(bio, bio->bi_iter);
- }
- 
--extern struct bio_vec *bvec_alloc(gfp_t, int, unsigned long *, mempool_t *);
--extern void bvec_free(mempool_t *, struct bio_vec *, unsigned int);
--extern unsigned int bvec_nr_vecs(unsigned short idx);
- extern const char *bio_devname(struct bio *bio, char *buffer);
- 
- #define bio_set_dev(bio, bdev) 			\
+ 	c->uuids = alloc_meta_bucket_pages(GFP_KERNEL, sb);
 -- 
 2.28.0
 
