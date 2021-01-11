@@ -4,63 +4,65 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 511CEC433DB
-	for <linux-block@archiver.kernel.org>; Mon, 11 Jan 2021 04:40:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBBE5C433E6
+	for <linux-block@archiver.kernel.org>; Mon, 11 Jan 2021 04:43:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 283C7225AC
-	for <linux-block@archiver.kernel.org>; Mon, 11 Jan 2021 04:40:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AA509229C4
+	for <linux-block@archiver.kernel.org>; Mon, 11 Jan 2021 04:43:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726564AbhAKEj6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 10 Jan 2021 23:39:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52458 "EHLO
+        id S1727130AbhAKEnU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 10 Jan 2021 23:43:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53168 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726494AbhAKEj6 (ORCPT
+        with ESMTP id S1725831AbhAKEnT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 10 Jan 2021 23:39:58 -0500
-Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B22B7C061786
-        for <linux-block@vger.kernel.org>; Sun, 10 Jan 2021 20:39:17 -0800 (PST)
-Received: by mail-wr1-x433.google.com with SMTP id r3so14984592wrt.2
-        for <linux-block@vger.kernel.org>; Sun, 10 Jan 2021 20:39:17 -0800 (PST)
+        Sun, 10 Jan 2021 23:43:19 -0500
+Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A258C061794
+        for <linux-block@vger.kernel.org>; Sun, 10 Jan 2021 20:42:39 -0800 (PST)
+Received: by mail-wm1-x32d.google.com with SMTP id y23so13773426wmi.1
+        for <linux-block@vger.kernel.org>; Sun, 10 Jan 2021 20:42:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=to:cc:references:from:autocrypt:subject:message-id:date:user-agent
+        h=subject:to:cc:references:from:autocrypt:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=tAFK/IpLV+WvAB95qjgQarDtyUqui990OlL1R4rVIJg=;
-        b=q3rtYm5XzpQsBCuy85P4lHr+Kxs7D8Mx/rFx2zYC1PPXMVDhGB+KszcaRTafgYKHJE
-         71f3Ii1jocnZRiiLAjy4nwl/OYJdee5AQPjYjEKenBx83SDHZhyONQAoubWPAxf2knw7
-         /ob/O9w5jIMg87AHdPMrA+xp2C7GQzgl/jgtzij6LJpppfyAsHtP12Mq9U9vkZAUdR1g
-         CD6HOS0asgZHC0to0HnYbfjoOajavo57LArMJQ54EiAVedVicp/deaMZLLofmohifE5p
-         ZLbNfrY81yDzpPUTjcxOgdDeeDjVohuZosi3OgUOBxeDdOy9orCEQzot6cmksmIKsOhI
-         lvXw==
+        bh=jvUs4D1It5HUJiN9desNsRbL2weIz3yRevXzkPRQirc=;
+        b=PgUojlmeQk0eD3MUEvzllxpNDpOl1dop6U85329fY/rRDN1CgsG29hXqgC9tMYI8+B
+         6FiHzJvFKUBKLWa/QJdewbdLa2O3A4eDiI0/01dD84DqE6pJIytG3WOsZDQAHcKR+gRh
+         +WVwtJ6spKBaBEs05DYdEoGP7C6Pr7SdQNXY/T3vzRWsVPFX9vrM6SdEJFQXU9CSB8kT
+         /IVgpwpc09clIXdnBzUL1Io3DDKzH/ADDW2zNKTXsFXha+RSg8A7wQhf+/uo6Lr1kTM/
+         tp/AWqWwqwWaIgT2baexEfUVcxi5YuGZTW6eHTMYslfLuvL1Uz/HOy2iUxr96MZiT0bD
+         bdvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:references:from:autocrypt:subject
+        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
          :message-id:date:user-agent:mime-version:in-reply-to
          :content-language:content-transfer-encoding;
-        bh=tAFK/IpLV+WvAB95qjgQarDtyUqui990OlL1R4rVIJg=;
-        b=Qc1StkAOED2nmy0gkRx/9O/pNih93mKqOQNLauH9hFKFpusSy/ihWOQk5q0nXPU+Dv
-         Poqg6Z3ZA/6wRJEz8FVTvE+h5IyHc+X6Hj+sNC6hci3Ta20vmhSS5s67xRTYBJwa+Yr7
-         cQoy499B2W9tYtSfP1O+Zf3DKVMVsB2jGLo5jOoWeUZbQsOQlUEfyfZSq4pxPFiDZ+m+
-         sQoWNhk2FCTHqdb5VkMQyo1HKQ/ajih3uSNsHSGBIKqns4NEMuZemrI1s5DA7ZaMXd//
-         tIqpJQRUyDdI2UA+M1dniJvXnLol8eQMLx6/YUR+KEoMPyvTGcmVNxQCRlRY9J1EyWXj
-         rQbQ==
-X-Gm-Message-State: AOAM530shSX2mBxbZqzI1p/B7jmIcCqejv3Qtsk8BYP1YDn1QyX2V5wS
-        SbhaZK8DNtB0l+hTHPYf9Dk=
-X-Google-Smtp-Source: ABdhPJwYnbKTfZ4L8aLvbjiOjKonJPWoKm2oPiC0Ve0nFIUCDNjSJyWl9+ukZJUuQH5BkjwkzqPfMQ==
-X-Received: by 2002:adf:94c7:: with SMTP id 65mr13978928wrr.423.1610339956405;
-        Sun, 10 Jan 2021 20:39:16 -0800 (PST)
+        bh=jvUs4D1It5HUJiN9desNsRbL2weIz3yRevXzkPRQirc=;
+        b=KsxXnDoRf00M1e5ErkE2X+04kpnetEAgEXgMHXkTU8C2BRsbbmHf8/oaj3QJ5bQWVK
+         i2kxXC3xZ28R9tjMQKVqQinlIrquw3V/O3OCNxmnYUD6QXHVWf7V4DqF76Yw7yW1S/Rv
+         aOAiOEEwqsUyC1XHXwoe99w8AFtX2fAN7l2bIKmLkv1WvGiQ5wxadoD5hLCPrdmtb7vj
+         2pEcbynRrg5Kx/hR7igBcM2CWxGrx0rVLyQ4GC5owURLLlyImK+oQZRMDUtcZLxPL72U
+         BBfzof/qCM8oLpdd62xlQfMH82MpyMpuiuZwZBC3ZaRKh0uNEENIK6y7KMQP6o1qwUzD
+         kJUg==
+X-Gm-Message-State: AOAM530GHeUKgYGyZxYupc00c7EgBA6JpOnac30VjLCsXZsccAYjCExh
+        KbsxFc7Lh06FLE1981zgISmggij4XLE=
+X-Google-Smtp-Source: ABdhPJzl3u7AXsCYd22iRnSmn+fIavCF0ZT55I+llDrCZDYvEC/MPwpo/O8vqj8f/kvNtSjVQYWwGw==
+X-Received: by 2002:a1c:6208:: with SMTP id w8mr12949497wmb.96.1610340157948;
+        Sun, 10 Jan 2021 20:42:37 -0800 (PST)
 Received: from [192.168.8.119] ([85.255.237.6])
-        by smtp.gmail.com with ESMTPSA id r82sm21137227wma.18.2021.01.10.20.39.15
+        by smtp.gmail.com with ESMTPSA id y11sm20046936wmi.0.2021.01.10.20.42.37
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 10 Jan 2021 20:39:16 -0800 (PST)
+        Sun, 10 Jan 2021 20:42:37 -0800 (PST)
+Subject: Re: [PATCH V3 1/6] block: manage bio slab cache by xarray
 To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
 References: <20210111030557.4154161-1-ming.lei@redhat.com>
+ <20210111030557.4154161-2-ming.lei@redhat.com>
 From:   Pavel Begunkov <asml.silence@gmail.com>
 Autocrypt: addr=asml.silence@gmail.com; prefer-encrypt=mutual; keydata=
  mQINBFmKBOQBEAC76ZFxLAKpDw0bKQ8CEiYJRGn8MHTUhURL02/7n1t0HkKQx2K1fCXClbps
@@ -105,55 +107,30 @@ Autocrypt: addr=asml.silence@gmail.com; prefer-encrypt=mutual; keydata=
  UVMKkOCdFhutRmYp0mbv2e87IK4erwNHQRkHUkzbsuym8RVpAZbLzLPIYK/J3RTErL6Z99N2
  m3J6pjwSJY/zNwuFPs9zGEnRO4g0BUbwGdbuvDzaq6/3OJLKohr5eLXNU3JkT+3HezydWm3W
  OPhauth7W0db74Qd49HXK0xe/aPrK+Cp+kU1HRactyNtF8jZQbhMCC8vMGukZtWaAwpjWiiH bA==
-Subject: Re: [PATCH V3 0/6] block: improvement on bioset & bvec allocation
-Message-ID: <1a7824b1-4f85-7851-28f5-9b3e58547f7a@gmail.com>
-Date:   Mon, 11 Jan 2021 04:35:43 +0000
+Message-ID: <531f35df-97df-3a3d-b4c6-820b4f66fa37@gmail.com>
+Date:   Mon, 11 Jan 2021 04:39:04 +0000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.0
 MIME-Version: 1.0
-In-Reply-To: <20210111030557.4154161-1-ming.lei@redhat.com>
+In-Reply-To: <20210111030557.4154161-2-ming.lei@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 11/01/2021 03:05, Ming Lei wrote:
-> Hello Jens,
+> Managing bio slab cache via xarray by using slab cache size as xarray
+> index, and storing 'struct bio_slab' instance into xarray.
 > 
-> All are bioset / bvec improvement, and most of them are quite
-> straightforward.
+> So code is simplified a lot, meantime it becomes more readable than before.
+> 
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
 
-That's cool. As mentioned before, removing inline bvecs brings
-struct blkdev_dio from 3 cachelines to 2. And together with no-copy
-bvec we can do that shrinking for all bvec based requests.
-
-> 
-> V3:
-> 	- share two line code via goto with one label, only patch 1 is
-> 	  changed
-> 
-> V2:
-> 	- patch style change, most is in patch 1
-> 	- commit log change
-> 
-> Ming Lei (6):
->   block: manage bio slab cache by xarray
->   block: don't pass BIOSET_NEED_BVECS for q->bio_split
->   block: don't allocate inline bvecs if this bioset needn't bvecs
->   block: set .bi_max_vecs as actual allocated vector number
->   block: move three bvec helpers declaration into private helper
->   bcache: don't pass BIOSET_NEED_BVECS for the 'bio_set' embedded in
->     'cache_set'
-> 
->  block/bio.c               | 122 +++++++++++++++++---------------------
->  block/blk-core.c          |   2 +-
->  block/blk.h               |   4 ++
->  drivers/md/bcache/super.c |   2 +-
->  include/linux/bio.h       |   4 +-
->  5 files changed, 61 insertions(+), 73 deletions(-)
-> 
+Reviewed-by: Pavel Begunkov <asml.silence@gmail.com>
+Tested-by: Pavel Begunkov <asml.silence@gmail.com>
 
 -- 
 Pavel Begunkov
