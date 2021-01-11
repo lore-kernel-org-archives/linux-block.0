@@ -7,250 +7,78 @@ X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA319C433E0
-	for <linux-block@archiver.kernel.org>; Mon, 11 Jan 2021 03:07:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC1C5C433E0
+	for <linux-block@archiver.kernel.org>; Mon, 11 Jan 2021 03:07:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AA108224B8
-	for <linux-block@archiver.kernel.org>; Mon, 11 Jan 2021 03:07:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 64761224B8
+	for <linux-block@archiver.kernel.org>; Mon, 11 Jan 2021 03:07:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726151AbhAKDHp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 10 Jan 2021 22:07:45 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26132 "EHLO
+        id S1726325AbhAKDHu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 10 Jan 2021 22:07:50 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:39119 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725919AbhAKDHp (ORCPT
+        by vger.kernel.org with ESMTP id S1726176AbhAKDHt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 10 Jan 2021 22:07:45 -0500
+        Sun, 10 Jan 2021 22:07:49 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610334379;
+        s=mimecast20190719; t=1610334383;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=uFKZLI9xsn5WTK9Kp9T3Iy4s1uJ/xarPveBJFOXlwwo=;
-        b=OM9fmx2BPpiBBZSMm5LNeF9mnSv+54YSxXXkY5qyEB9801NAmYbeB5a53sGuOIzsoFY3t3
-        HSD7e5RpRXx8d2X+YHNO7KztoX47DGkdVFdRwBB9JSHF0jyrfJUTtuu1FcU674gLcq9vdj
-        GkXb/T4SZO9p/VQfj1VdtSfEXYbHg0w=
+        bh=E5K5X/RaZpT+CgPadRJDATcqPMVFDQG1b7rxg/tR3lQ=;
+        b=WUe2tikYvqSU3RuyOmxC+01JP6cDALBrXvs1n1VbUJHh6OgkbPTyb/PoS9w/xsXNvfbLqD
+        cog+NqUkYMGsOlU/Rz2B5Zk/KfWaUb34clXImhKyGBJnDk4NmuAmZXKHrzwC+cCOZqEp3s
+        UEWtTCGuqe2ntReTyfdISREtmSiHlbg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-487-_yLtWAhuOkuovjvZppWvpQ-1; Sun, 10 Jan 2021 22:06:16 -0500
-X-MC-Unique: _yLtWAhuOkuovjvZppWvpQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+ us-mta-540-DCnL898NPt-LIyf10y0QYw-1; Sun, 10 Jan 2021 22:06:22 -0500
+X-MC-Unique: DCnL898NPt-LIyf10y0QYw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 460BA800D53;
-        Mon, 11 Jan 2021 03:06:15 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2B82E59;
+        Mon, 11 Jan 2021 03:06:21 +0000 (UTC)
 Received: from localhost (ovpn-12-180.pek2.redhat.com [10.72.12.180])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4719274448;
-        Mon, 11 Jan 2021 03:06:09 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id AE6381349A;
+        Mon, 11 Jan 2021 03:06:17 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V3 1/6] block: manage bio slab cache by xarray
-Date:   Mon, 11 Jan 2021 11:05:52 +0800
-Message-Id: <20210111030557.4154161-2-ming.lei@redhat.com>
+Subject: [PATCH V3 2/6] block: don't pass BIOSET_NEED_BVECS for q->bio_split
+Date:   Mon, 11 Jan 2021 11:05:53 +0800
+Message-Id: <20210111030557.4154161-3-ming.lei@redhat.com>
 In-Reply-To: <20210111030557.4154161-1-ming.lei@redhat.com>
 References: <20210111030557.4154161-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Managing bio slab cache via xarray by using slab cache size as xarray
-index, and storing 'struct bio_slab' instance into xarray.
-
-So code is simplified a lot, meantime it becomes more readable than before.
+q->bio_split is only used by bio_split() for fast cloning bio, and no
+need to allocate bvecs, so remove this flag.
 
 Reviewed-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/bio.c | 116 ++++++++++++++++++++++------------------------------
- 1 file changed, 49 insertions(+), 67 deletions(-)
+ block/blk-core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index 1f2cc1fbe283..cfa0e9db30e0 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -19,6 +19,7 @@
- #include <linux/highmem.h>
- #include <linux/sched/sysctl.h>
- #include <linux/blk-crypto.h>
-+#include <linux/xarray.h>
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 7663a9b94b80..00d415be74e6 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -531,7 +531,7 @@ struct request_queue *blk_alloc_queue(int node_id)
+ 	if (q->id < 0)
+ 		goto fail_q;
  
- #include <trace/events/block.h>
- #include "blk.h"
-@@ -58,89 +59,80 @@ struct bio_slab {
- 	char name[8];
- };
- static DEFINE_MUTEX(bio_slab_lock);
--static struct bio_slab *bio_slabs;
--static unsigned int bio_slab_nr, bio_slab_max;
-+static DEFINE_XARRAY(bio_slabs);
- 
--static struct kmem_cache *bio_find_or_create_slab(unsigned int extra_size)
-+static struct bio_slab *create_bio_slab(unsigned int size)
- {
--	unsigned int sz = sizeof(struct bio) + extra_size;
--	struct kmem_cache *slab = NULL;
--	struct bio_slab *bslab, *new_bio_slabs;
--	unsigned int new_bio_slab_max;
--	unsigned int i, entry = -1;
-+	struct bio_slab *bslab = kzalloc(sizeof(*bslab), GFP_KERNEL);
- 
--	mutex_lock(&bio_slab_lock);
-+	if (!bslab)
-+		return NULL;
- 
--	i = 0;
--	while (i < bio_slab_nr) {
--		bslab = &bio_slabs[i];
-+	snprintf(bslab->name, sizeof(bslab->name), "bio-%d", size);
-+	bslab->slab = kmem_cache_create(bslab->name, size,
-+			ARCH_KMALLOC_MINALIGN, SLAB_HWCACHE_ALIGN, NULL);
-+	if (!bslab->slab)
-+		goto fail_alloc_slab;
- 
--		if (!bslab->slab && entry == -1)
--			entry = i;
--		else if (bslab->slab_size == sz) {
--			slab = bslab->slab;
--			bslab->slab_ref++;
--			break;
--		}
--		i++;
--	}
-+	bslab->slab_ref = 1;
-+	bslab->slab_size = size;
- 
--	if (slab)
--		goto out_unlock;
--
--	if (bio_slab_nr == bio_slab_max && entry == -1) {
--		new_bio_slab_max = bio_slab_max << 1;
--		new_bio_slabs = krealloc(bio_slabs,
--					 new_bio_slab_max * sizeof(struct bio_slab),
--					 GFP_KERNEL);
--		if (!new_bio_slabs)
--			goto out_unlock;
--		bio_slab_max = new_bio_slab_max;
--		bio_slabs = new_bio_slabs;
--	}
--	if (entry == -1)
--		entry = bio_slab_nr++;
-+	if (!xa_err(xa_store(&bio_slabs, size, bslab, GFP_KERNEL)))
-+		return bslab;
- 
--	bslab = &bio_slabs[entry];
-+	kmem_cache_destroy(bslab->slab);
- 
--	snprintf(bslab->name, sizeof(bslab->name), "bio-%d", entry);
--	slab = kmem_cache_create(bslab->name, sz, ARCH_KMALLOC_MINALIGN,
--				 SLAB_HWCACHE_ALIGN, NULL);
--	if (!slab)
--		goto out_unlock;
-+fail_alloc_slab:
-+	kfree(bslab);
-+	return NULL;
-+}
- 
--	bslab->slab = slab;
--	bslab->slab_ref = 1;
--	bslab->slab_size = sz;
--out_unlock:
-+static inline unsigned int bs_bio_slab_size(struct bio_set *bs)
-+{
-+	return bs->front_pad + sizeof(struct bio) +
-+		BIO_INLINE_VECS * sizeof(struct bio_vec);
-+}
-+
-+static struct kmem_cache *bio_find_or_create_slab(struct bio_set *bs)
-+{
-+	unsigned int size = bs_bio_slab_size(bs);
-+	struct bio_slab *bslab;
-+
-+	mutex_lock(&bio_slab_lock);
-+	bslab = xa_load(&bio_slabs, size);
-+	if (bslab)
-+		bslab->slab_ref++;
-+	else
-+		bslab = create_bio_slab(size);
- 	mutex_unlock(&bio_slab_lock);
--	return slab;
-+
-+	if (bslab)
-+		return bslab->slab;
-+	return NULL;
- }
- 
- static void bio_put_slab(struct bio_set *bs)
- {
- 	struct bio_slab *bslab = NULL;
--	unsigned int i;
-+	unsigned int slab_size = bs_bio_slab_size(bs);
- 
- 	mutex_lock(&bio_slab_lock);
- 
--	for (i = 0; i < bio_slab_nr; i++) {
--		if (bs->bio_slab == bio_slabs[i].slab) {
--			bslab = &bio_slabs[i];
--			break;
--		}
--	}
--
-+	bslab = xa_load(&bio_slabs, slab_size);
- 	if (WARN(!bslab, KERN_ERR "bio: unable to find slab!\n"))
- 		goto out;
- 
-+	WARN_ON_ONCE(bslab->slab != bs->bio_slab);
-+
- 	WARN_ON(!bslab->slab_ref);
- 
- 	if (--bslab->slab_ref)
- 		goto out;
- 
-+	xa_erase(&bio_slabs, slab_size);
-+
- 	kmem_cache_destroy(bslab->slab);
--	bslab->slab = NULL;
-+	kfree(bslab);
- 
- out:
- 	mutex_unlock(&bio_slab_lock);
-@@ -1579,15 +1571,13 @@ int bioset_init(struct bio_set *bs,
- 		unsigned int front_pad,
- 		int flags)
- {
--	unsigned int back_pad = BIO_INLINE_VECS * sizeof(struct bio_vec);
--
- 	bs->front_pad = front_pad;
- 
- 	spin_lock_init(&bs->rescue_lock);
- 	bio_list_init(&bs->rescue_list);
- 	INIT_WORK(&bs->rescue_work, bio_alloc_rescue);
- 
--	bs->bio_slab = bio_find_or_create_slab(front_pad + back_pad);
-+	bs->bio_slab = bio_find_or_create_slab(bs);
- 	if (!bs->bio_slab)
- 		return -ENOMEM;
- 
-@@ -1651,16 +1641,8 @@ static void __init biovec_init_slabs(void)
- 
- static int __init init_bio(void)
- {
--	bio_slab_max = 2;
--	bio_slab_nr = 0;
--	bio_slabs = kcalloc(bio_slab_max, sizeof(struct bio_slab),
--			    GFP_KERNEL);
--
- 	BUILD_BUG_ON(BIO_FLAG_LAST > BVEC_POOL_OFFSET);
- 
--	if (!bio_slabs)
--		panic("bio: can't allocate bios\n");
--
- 	bio_integrity_init();
- 	biovec_init_slabs();
+-	ret = bioset_init(&q->bio_split, BIO_POOL_SIZE, 0, BIOSET_NEED_BVECS);
++	ret = bioset_init(&q->bio_split, BIO_POOL_SIZE, 0, 0);
+ 	if (ret)
+ 		goto fail_id;
  
 -- 
 2.28.0
