@@ -2,150 +2,119 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 525D7C433E0
-	for <linux-block@archiver.kernel.org>; Sun, 10 Jan 2021 21:59:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 286C4C433DB
+	for <linux-block@archiver.kernel.org>; Mon, 11 Jan 2021 02:50:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1504D224D2
-	for <linux-block@archiver.kernel.org>; Sun, 10 Jan 2021 21:59:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EA0FE224D3
+	for <linux-block@archiver.kernel.org>; Mon, 11 Jan 2021 02:50:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726504AbhAJV7g (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 10 Jan 2021 16:59:36 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31301 "EHLO
+        id S1727146AbhAKCuY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 10 Jan 2021 21:50:24 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51908 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726418AbhAJV7g (ORCPT
+        by vger.kernel.org with ESMTP id S1727132AbhAKCuY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 10 Jan 2021 16:59:36 -0500
+        Sun, 10 Jan 2021 21:50:24 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610315889;
+        s=mimecast20190719; t=1610333338;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=3eVTM/WNkAqgnImqOE9gVZKZvkeANNt1RNH+SQOg+Dg=;
-        b=JzfB34Qu4C+iJjfFvPHiNSlc+cVLFWbLakT6RIKqbH6tuNR9mZgMKdZxAR3rHOFyoBHo53
-        t3h8QWbfwvHsNIQuE8ye5TaHy1O6/rjLWAWUGlE+dDRclSKFnUsGgaxTAlfeEWKqXeudWf
-        SmlCPyr/3mcrU51qaO5PBka9QAOY3xU=
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
- [209.85.166.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-213-l2s42KyhNVugGoaGAhe3pg-1; Sun, 10 Jan 2021 16:58:07 -0500
-X-MC-Unique: l2s42KyhNVugGoaGAhe3pg-1
-Received: by mail-il1-f198.google.com with SMTP id e10so15596698ils.5
-        for <linux-block@vger.kernel.org>; Sun, 10 Jan 2021 13:58:07 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=3eVTM/WNkAqgnImqOE9gVZKZvkeANNt1RNH+SQOg+Dg=;
-        b=NJ/gI3SZ2sA15X54BQfI4oovT71mxXl5+GCB7WNIQzyuy84gJNSaOe49HpStE9NMGv
-         evyQwdEGHoBNATBPT8dWfrH0nbAZAADJUY7iuwOjCvOYcuIP9mFR6DmqbBH5+DpQGRrn
-         BAZnh8Pnpadx5rahk7by5+SzNPLyiC2Us6i0bEj0LCF8HBxTJod4CuU+1K0OrTyb45PE
-         wF8+b+aOFYqpvqjlCjAnQR32lhd64iZCHJVs3wIVa+WMAl1GDAl4V4IGjI0XvkMWUffT
-         KFu3GWinZomGUgqWlWVZ5x6ajBkpI3uwofDYYeFLSNKDaPiqlIeQWfLNPQ2MfcMCxIbz
-         AZFw==
-X-Gm-Message-State: AOAM531Ywlq1quWo9iEP/lPNCGv2nlSK3ma8UDGW1PF3w/c2jpA8FUYk
-        aOeBcpDNIsstbpbqzQc/I/DMd1MlPPNDwLrAI0EmMLIeVcckCEnX9kPAZuEQnbUo4Za06IHFjZH
-        D57p8su3SGZiU/3Fo5QGKqy4=
-X-Received: by 2002:a6b:3bc3:: with SMTP id i186mr12800073ioa.192.1610315886933;
-        Sun, 10 Jan 2021 13:58:06 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyhXHAmjJbP70famD48l8MmAZeIccDPOkMoTViCj28iRQ6f8vgQrbgucsrH02pgV72MBdd4cQ==
-X-Received: by 2002:a6b:3bc3:: with SMTP id i186mr12800067ioa.192.1610315886747;
-        Sun, 10 Jan 2021 13:58:06 -0800 (PST)
-Received: from trix.remote.csb (075-142-250-213.res.spectrum.com. [75.142.250.213])
-        by smtp.gmail.com with ESMTPSA id e19sm10014698ioh.15.2021.01.10.13.58.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 10 Jan 2021 13:58:06 -0800 (PST)
-From:   trix@redhat.com
-To:     danil.kipnis@cloud.ionos.com, jinpu.wang@cloud.ionos.com,
-        axboe@kernel.dk, natechancellor@gmail.com, ndesaulniers@google.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        clang-built-linux@googlegroups.com, Tom Rix <trix@redhat.com>
-Subject: [PATCH] block/rnbd-clt: improve find_or_create_sess() return check
-Date:   Sun, 10 Jan 2021 13:57:26 -0800
-Message-Id: <20210110215726.861269-1-trix@redhat.com>
-X-Mailer: git-send-email 2.27.0
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=yjguCijslXAGWOXFjKVOGOP7FungpwsXWLGY8oK5Jm0=;
+        b=YNpAa7mL9UfbkU3kYwcoePeNddhm5qgP+SYr3At0wUpluLGhCeVOrb/0+CHaEv+tYZRbOt
+        WA4yZ9zwUYE8RFqhNV2TsWDIf1WCIoP+iDTNLE6YQ7z1mDVwNNlxMIDahK12/4bGKKzzQf
+        uX3iG4siP/SDqeg0wrecEPT0RjdV87w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-181-tJVw7DbHPtK0V-YSLLxZtg-1; Sun, 10 Jan 2021 21:48:54 -0500
+X-MC-Unique: tJVw7DbHPtK0V-YSLLxZtg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6F608800D53;
+        Mon, 11 Jan 2021 02:48:51 +0000 (UTC)
+Received: from T590 (ovpn-12-180.pek2.redhat.com [10.72.12.180])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 74CBA19D9D;
+        Mon, 11 Jan 2021 02:48:40 +0000 (UTC)
+Date:   Mon, 11 Jan 2021 10:48:35 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Pavel Begunkov <asml.silence@gmail.com>
+Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Jonathan Corbet <corbet@lwn.net>, linux-xfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, io-uring@vger.kernel.org,
+        linux-kernel@vger.kernel.org, target-devel@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-doc@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH v3 1/7] splice: don't generate zero-len segement bvecs
+Message-ID: <20210111024835.GB4147870@T590>
+References: <cover.1610170479.git.asml.silence@gmail.com>
+ <bfaeb54c88f0c962461b75c6493103e11bb0b17b.1610170479.git.asml.silence@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <bfaeb54c88f0c962461b75c6493103e11bb0b17b.1610170479.git.asml.silence@gmail.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Tom Rix <trix@redhat.com>
+On Sat, Jan 09, 2021 at 04:02:57PM +0000, Pavel Begunkov wrote:
+> iter_file_splice_write() may spawn bvec segments with zero-length. In
+> preparation for prohibiting them, filter out by hand at splice level.
+> 
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+> ---
+>  fs/splice.c | 9 ++++++---
+>  1 file changed, 6 insertions(+), 3 deletions(-)
+> 
+> diff --git a/fs/splice.c b/fs/splice.c
+> index 866d5c2367b2..474fb8b5562a 100644
+> --- a/fs/splice.c
+> +++ b/fs/splice.c
+> @@ -662,12 +662,14 @@ iter_file_splice_write(struct pipe_inode_info *pipe, struct file *out,
+>  
+>  		/* build the vector */
+>  		left = sd.total_len;
+> -		for (n = 0; !pipe_empty(head, tail) && left && n < nbufs; tail++, n++) {
+> +		for (n = 0; !pipe_empty(head, tail) && left && n < nbufs; tail++) {
+>  			struct pipe_buffer *buf = &pipe->bufs[tail & mask];
+>  			size_t this_len = buf->len;
+>  
+> -			if (this_len > left)
+> -				this_len = left;
+> +			/* zero-length bvecs are not supported, skip them */
+> +			if (!this_len)
+> +				continue;
+> +			this_len = min(this_len, left);
+>  
+>  			ret = pipe_buf_confirm(pipe, buf);
+>  			if (unlikely(ret)) {
+> @@ -680,6 +682,7 @@ iter_file_splice_write(struct pipe_inode_info *pipe, struct file *out,
+>  			array[n].bv_len = this_len;
+>  			array[n].bv_offset = buf->offset;
+>  			left -= this_len;
+> +			n++;
+>  		}
+>  
+>  		iov_iter_bvec(&from, WRITE, array, n, sd.total_len - left);
+> -- 
+> 2.24.0
+> 
 
-clang static analysis reports this problem
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-rnbd-clt.c:1212:11: warning: Branch condition evaluates to a
-  garbage value
-        else if (!first)
-                 ^~~~~~
-
-This is triggered in the find_and_get_or_create_sess() call
-because the variable first is not initialized and the
-earlier check is specifically for
-
-	if (sess == ERR_PTR(-ENOMEM))
-
-This is false positive.
-
-But the if-check can be reduced by initializing first to
-false and then returning if the call to find_or_creat_sess()
-does not set it to true.  When it remains false, either
-sess will be valid or not.  The not case is caught by
-find_and_get_or_create_sess()'s caller rnbd_clt_map_device()
-
-	sess = find_and_get_or_create_sess(...);
-	if (IS_ERR(sess))
-		return ERR_CAST(sess);
-
-Since find_and_get_or_create_sess() initializes first to false
-setting it in find_or_create_sess() is not needed.
-
-Signed-off-by: Tom Rix <trix@redhat.com>
----
- drivers/block/rnbd/rnbd-clt.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.c
-index 96e3f9fe8241..251f747cf10d 100644
---- a/drivers/block/rnbd/rnbd-clt.c
-+++ b/drivers/block/rnbd/rnbd-clt.c
-@@ -919,6 +919,7 @@ static struct rnbd_clt_session *__find_and_get_sess(const char *sessname)
- 	return NULL;
- }
- 
-+/* caller is responsible for initializing 'first' to false */
- static struct
- rnbd_clt_session *find_or_create_sess(const char *sessname, bool *first)
- {
-@@ -934,8 +935,7 @@ rnbd_clt_session *find_or_create_sess(const char *sessname, bool *first)
- 		}
- 		list_add(&sess->list, &sess_list);
- 		*first = true;
--	} else
--		*first = false;
-+	}
- 	mutex_unlock(&sess_lock);
- 
- 	return sess;
-@@ -1203,13 +1203,11 @@ find_and_get_or_create_sess(const char *sessname,
- 	struct rnbd_clt_session *sess;
- 	struct rtrs_attrs attrs;
- 	int err;
--	bool first;
-+	bool first = false;
- 	struct rtrs_clt_ops rtrs_ops;
- 
- 	sess = find_or_create_sess(sessname, &first);
--	if (sess == ERR_PTR(-ENOMEM))
--		return ERR_PTR(-ENOMEM);
--	else if (!first)
-+	if (!first)
- 		return sess;
- 
- 	if (!path_cnt) {
 -- 
-2.27.0
+Ming
 
