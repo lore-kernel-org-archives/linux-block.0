@@ -2,125 +2,153 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A36E4C433E0
-	for <linux-block@archiver.kernel.org>; Mon, 11 Jan 2021 06:58:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00D7FC433DB
+	for <linux-block@archiver.kernel.org>; Mon, 11 Jan 2021 06:58:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6DD2C22516
+	by mail.kernel.org (Postfix) with ESMTP id B855522A85
 	for <linux-block@archiver.kernel.org>; Mon, 11 Jan 2021 06:58:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727471AbhAKG5v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 Jan 2021 01:57:51 -0500
-Received: from mx2.suse.de ([195.135.220.15]:34508 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725536AbhAKG5v (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Jan 2021 01:57:51 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 7EE35AB3E;
-        Mon, 11 Jan 2021 06:57:10 +0000 (UTC)
-Subject: Re: [PATCH V3 1/6] block: manage bio slab cache by xarray
-To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
-References: <20210111030557.4154161-1-ming.lei@redhat.com>
- <20210111030557.4154161-2-ming.lei@redhat.com>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <27b9d901-51d4-2974-bb9d-3d0c4b2d8230@suse.de>
-Date:   Mon, 11 Jan 2021 07:57:09 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+        id S1727519AbhAKG57 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 Jan 2021 01:57:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53592 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727505AbhAKG56 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 11 Jan 2021 01:57:58 -0500
+Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29055C061794
+        for <linux-block@vger.kernel.org>; Sun, 10 Jan 2021 22:57:18 -0800 (PST)
+Received: by mail-ej1-x62a.google.com with SMTP id w1so23064400ejf.11
+        for <linux-block@vger.kernel.org>; Sun, 10 Jan 2021 22:57:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloud.ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=+lyh1ppXIwVihU1vaSfQka7MGwNTcAyGaSNwcJGbRT4=;
+        b=BQBzzfbH/m620+N7MJFkTRbdXbHw1MUrP0quVj3E0xdU1n2clxvwAGEiwraS10+8wv
+         5YhjkZ3NlYaWjnaKX9eaU0oJjf87JLch1FudPerJMgAB7/qykhrg7meIlOpAS3GcWIv0
+         FTHEDoNm/NR1NEbXDTo97QP4rm2/9SUSbQ5aEg/Sk44HEVGROyg3gteWKUGXJPuBSTga
+         h1fvzfhtXT3hFNbeCb1DJf7GWqmDCYnxJZknrJn7yfWvsk1Dteqr8oQnR9HkIZlDZQyV
+         ztqmSCP7kNR3rhoRWY2IVpXhkK5UxH2D2x9s9J64edPJWJySO1SKjzVGlxafdTuHJz+z
+         ciqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=+lyh1ppXIwVihU1vaSfQka7MGwNTcAyGaSNwcJGbRT4=;
+        b=H0Fr93A6KFicvDTVsrcPV4ffUDEoyst1JyOg915GBgvPR9zVkVvfYfnnMhKSZgx3lj
+         FyMnQpXKuR/Z2L/7NAOeEFA2+5sgv12pXxCyGf0GWZOo2zAUHFA40WfpiCqt/HAYdoHm
+         o5Os61KVF1GQN9iUXdueEHFrx8KWfzpALcE2v4f/Jx8wbnOtmaM/5GlJrc6SBdxJRs88
+         KmawQuA1NP62qoSx/janMdiTjvm5m7pf+wDUlMPXSIzHbkIhnZzfwNHtyGb5n98G3CiZ
+         JmPnaUzJa+FBlAVd6MoA1NEM/o5RasE40VcDZyoV415evh/QDBnUtDDjMKx4FtLd1Q78
+         oqJw==
+X-Gm-Message-State: AOAM530hTpxaTqd8TRWKPsFgzsyeIUgAABwGMKChNNLDjADejJrDynuB
+        tITUf9qA0zM1y+WL1bzk2qYMZc1PecyK34UFF5TqpCTHzwg=
+X-Google-Smtp-Source: ABdhPJxcnwOKJW+7PaRjv13AJnR4ZY6ZtOFxqa2IamjgxWQFkIE/NHsiwfD6EjJH5ZqQEQnEASWUNRA8l4hbVsBzU6s=
+X-Received: by 2002:a17:907:4243:: with SMTP id np3mr9714493ejb.212.1610348235838;
+ Sun, 10 Jan 2021 22:57:15 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20210111030557.4154161-2-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20210110215726.861269-1-trix@redhat.com>
+In-Reply-To: <20210110215726.861269-1-trix@redhat.com>
+From:   Jinpu Wang <jinpu.wang@cloud.ionos.com>
+Date:   Mon, 11 Jan 2021 07:57:05 +0100
+Message-ID: <CAMGffEnM0qD68x8bA17gWcqM-PkzveX+E02t-ircy68ses0rGw@mail.gmail.com>
+Subject: Re: [PATCH] block/rnbd-clt: improve find_or_create_sess() return check
+To:     Tom Rix <trix@redhat.com>,
+        Nathan Chancellor <natechancellor@gmail.com>
+Cc:     Danil Kipnis <danil.kipnis@cloud.ionos.com>,
+        Jens Axboe <axboe@kernel.dk>, ndesaulniers@google.com,
+        linux-block <linux-block@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        clang-built-linux@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/11/21 4:05 AM, Ming Lei wrote:
-> Managing bio slab cache via xarray by using slab cache size as xarray
-> index, and storing 'struct bio_slab' instance into xarray.
-> 
-> So code is simplified a lot, meantime it becomes more readable than before.
-> 
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+On Sun, Jan 10, 2021 at 10:58 PM <trix@redhat.com> wrote:
+>
+> From: Tom Rix <trix@redhat.com>
+>
+> clang static analysis reports this problem
+>
+> rnbd-clt.c:1212:11: warning: Branch condition evaluates to a
+>   garbage value
+>         else if (!first)
+>                  ^~~~~~
+>
+> This is triggered in the find_and_get_or_create_sess() call
+> because the variable first is not initialized and the
+> earlier check is specifically for
+>
+>         if (sess == ERR_PTR(-ENOMEM))
+>
+> This is false positive.
+>
+> But the if-check can be reduced by initializing first to
+> false and then returning if the call to find_or_creat_sess()
+> does not set it to true.  When it remains false, either
+> sess will be valid or not.  The not case is caught by
+> find_and_get_or_create_sess()'s caller rnbd_clt_map_device()
+>
+>         sess = find_and_get_or_create_sess(...);
+>         if (IS_ERR(sess))
+>                 return ERR_CAST(sess);
+>
+> Since find_and_get_or_create_sess() initializes first to false
+> setting it in find_or_create_sess() is not needed.
+>
+> Signed-off-by: Tom Rix <trix@redhat.com>
+Less LOC is better :)
+Acked-by: Jack Wang <jinpu.wang@cloud.ionos.com>
+Thanks Tom and Nathan!
 > ---
->   block/bio.c | 116 ++++++++++++++++++++++------------------------------
->   1 file changed, 49 insertions(+), 67 deletions(-)
-> 
-> diff --git a/block/bio.c b/block/bio.c
-> index 1f2cc1fbe283..cfa0e9db30e0 100644
-> --- a/block/bio.c
-> +++ b/block/bio.c
-> @@ -19,6 +19,7 @@
->   #include <linux/highmem.h>
->   #include <linux/sched/sysctl.h>
->   #include <linux/blk-crypto.h>
-> +#include <linux/xarray.h>
->   
->   #include <trace/events/block.h>
->   #include "blk.h"
-> @@ -58,89 +59,80 @@ struct bio_slab {
->   	char name[8];
->   };
->   static DEFINE_MUTEX(bio_slab_lock);
-> -static struct bio_slab *bio_slabs;
-> -static unsigned int bio_slab_nr, bio_slab_max;
-> +static DEFINE_XARRAY(bio_slabs);
->   
-> -static struct kmem_cache *bio_find_or_create_slab(unsigned int extra_size)
-> +static struct bio_slab *create_bio_slab(unsigned int size)
->   {
-> -	unsigned int sz = sizeof(struct bio) + extra_size;
-> -	struct kmem_cache *slab = NULL;
-> -	struct bio_slab *bslab, *new_bio_slabs;
-> -	unsigned int new_bio_slab_max;
-> -	unsigned int i, entry = -1;
-> +	struct bio_slab *bslab = kzalloc(sizeof(*bslab), GFP_KERNEL);
->   
-> -	mutex_lock(&bio_slab_lock);
-> +	if (!bslab)
-> +		return NULL;
->   
-> -	i = 0;
-> -	while (i < bio_slab_nr) {
-> -		bslab = &bio_slabs[i];
-> +	snprintf(bslab->name, sizeof(bslab->name), "bio-%d", size);
-> +	bslab->slab = kmem_cache_create(bslab->name, size,
-> +			ARCH_KMALLOC_MINALIGN, SLAB_HWCACHE_ALIGN, NULL);
-> +	if (!bslab->slab)
-> +		goto fail_alloc_slab;
->   
-> -		if (!bslab->slab && entry == -1)
-> -			entry = i;
-> -		else if (bslab->slab_size == sz) {
-> -			slab = bslab->slab;
-> -			bslab->slab_ref++;
-> -			break;
-> -		}
-> -		i++;
-> -	}
-> +	bslab->slab_ref = 1;
-> +	bslab->slab_size = size;
->   
-
-Why don't you use a kref here?
-
-Otherwise:
-
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
+>  drivers/block/rnbd/rnbd-clt.c | 10 ++++------
+>  1 file changed, 4 insertions(+), 6 deletions(-)
+>
+> diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.c
+> index 96e3f9fe8241..251f747cf10d 100644
+> --- a/drivers/block/rnbd/rnbd-clt.c
+> +++ b/drivers/block/rnbd/rnbd-clt.c
+> @@ -919,6 +919,7 @@ static struct rnbd_clt_session *__find_and_get_sess(const char *sessname)
+>         return NULL;
+>  }
+>
+> +/* caller is responsible for initializing 'first' to false */
+>  static struct
+>  rnbd_clt_session *find_or_create_sess(const char *sessname, bool *first)
+>  {
+> @@ -934,8 +935,7 @@ rnbd_clt_session *find_or_create_sess(const char *sessname, bool *first)
+>                 }
+>                 list_add(&sess->list, &sess_list);
+>                 *first = true;
+> -       } else
+> -               *first = false;
+> +       }
+>         mutex_unlock(&sess_lock);
+>
+>         return sess;
+> @@ -1203,13 +1203,11 @@ find_and_get_or_create_sess(const char *sessname,
+>         struct rnbd_clt_session *sess;
+>         struct rtrs_attrs attrs;
+>         int err;
+> -       bool first;
+> +       bool first = false;
+>         struct rtrs_clt_ops rtrs_ops;
+>
+>         sess = find_or_create_sess(sessname, &first);
+> -       if (sess == ERR_PTR(-ENOMEM))
+> -               return ERR_PTR(-ENOMEM);
+> -       else if (!first)
+> +       if (!first)
+>                 return sess;
+>
+>         if (!path_cnt) {
+> --
+> 2.27.0
+>
