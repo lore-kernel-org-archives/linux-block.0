@@ -8,62 +8,62 @@ X-Spam-Status: No, score=-14.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0F04C433E6
-	for <linux-block@archiver.kernel.org>; Mon, 11 Jan 2021 04:45:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45E6EC433E0
+	for <linux-block@archiver.kernel.org>; Mon, 11 Jan 2021 04:45:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8F036229CA
-	for <linux-block@archiver.kernel.org>; Mon, 11 Jan 2021 04:45:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 104EA225A9
+	for <linux-block@archiver.kernel.org>; Mon, 11 Jan 2021 04:45:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727158AbhAKEp0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 10 Jan 2021 23:45:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53622 "EHLO
+        id S1726672AbhAKEp4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 10 Jan 2021 23:45:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53736 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726176AbhAKEpZ (ORCPT
+        with ESMTP id S1726652AbhAKEp4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 10 Jan 2021 23:45:25 -0500
-Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 557AFC061786
-        for <linux-block@vger.kernel.org>; Sun, 10 Jan 2021 20:44:45 -0800 (PST)
-Received: by mail-wr1-x433.google.com with SMTP id t16so14995531wra.3
-        for <linux-block@vger.kernel.org>; Sun, 10 Jan 2021 20:44:45 -0800 (PST)
+        Sun, 10 Jan 2021 23:45:56 -0500
+Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9657C061794
+        for <linux-block@vger.kernel.org>; Sun, 10 Jan 2021 20:45:15 -0800 (PST)
+Received: by mail-wm1-x32b.google.com with SMTP id g185so13772367wmf.3
+        for <linux-block@vger.kernel.org>; Sun, 10 Jan 2021 20:45:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=subject:to:cc:references:from:autocrypt:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=oRZCwGRE2bMs28Kxq4vB2fy60cZKdCQGCcGin5wVC+E=;
-        b=CtHDO7KIuGEUh3RRUL1YsQ8kltopEba5oEWxz02YdCdY2wNNI3HcvWmJES/283dLq9
-         LOnOlSlBnFEYiDGw/CjAaKHIlSPxfHVcWUFAsiJMFo2qJm7TSJNqlzfbqS7lR5LH8abb
-         tOsEVpxbp1nYgLdDEuLeX8wrEimQjliZtGf85EeqwBER7gpNnmTahmsQk5a8rgxB3fa4
-         iDl5dIzS1szF7Ivg8MT4ofZQ7JVq4Rbe4GZBlax6XusKYN2+IyOWKaPja99gT1cHgxBR
-         NPLd1DZVCx9byp9kL4t6VoQwmReRwssaeK2BXVruvFkIBnbmUDIiZyZke73NdULyG63+
-         y92w==
+        bh=wFOQhYf4KY0iQ0wXgWJplDGuOa9qNeREhz6BlaWfJAw=;
+        b=chKI19xMHmt1QEO4mHjzAkDO+8EcutUJBmQsQqdUJrGeUjm1SccGY2VtnpsRGyenFx
+         TpzEPTm7KpkCwL1fwQHS4vwxkbL1L3GDHs0ejILnCXqmlJ4siDQ9eMxY2AFJVHPO0CqK
+         2FKFb7BPiuVGPASMoGVO9ZGJxaCN/CXLcXb2Vk8yRL7+6Ca7HvfRtU3MqyJkGl+nrQOa
+         i1OjLdA2o1QGEPsaIsm3FVVC/2u54cW7k7Je7n6NfhN9u56dM73/TnKM/JImzrj7PzC6
+         LAWn6e0YBNI/tdyQ2i5442tu9gTPhicI4i6yKMjMM+2nYBnKlPGrwEWkQvIsWNnPBl4I
+         bVpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:autocrypt
          :message-id:date:user-agent:mime-version:in-reply-to
          :content-language:content-transfer-encoding;
-        bh=oRZCwGRE2bMs28Kxq4vB2fy60cZKdCQGCcGin5wVC+E=;
-        b=c63avVZrJ/WiDyzTzL8cF5/1GNVWKULC5IvUap67t+/g3aiI8a0LECrlDaZM6yyl72
-         ULEL2CEwlqvi2Tq1hGy1Zlt4wrpYtvIvJXDbaCPdgcf3pMvK9gMXOOQqBDuRAQUdylE6
-         aaOQxkHh5buJJpzNCLvMcFyGvST0WUxAM7uOb1KXrn7jUBL1iV3rofly5p+PoPUQ2D42
-         desWRN+utxkSBkYFKaqWyGO2vzqsCmgSTu/U9ZXHh6omoX00eFpKCEhF53lbwhH3B877
-         kj6hEVmczBjfZbRlQScGv/4nxQ4rDAr3dPtpzRjzm6+I5vsOQU02Y8McjCvFNDbXj6Hu
-         aCSA==
-X-Gm-Message-State: AOAM530cMD9E0Vn5kA4jj7MljBGHdjj5x4Kan7ZTU1tUjbUHcyKcsyak
-        3kbRvx2mMgz37OaiHYDMXf4=
-X-Google-Smtp-Source: ABdhPJxSvrPI0CW/DNn/Zxwd7RtejfA8fISB1qG5xRuEn5HrUgmmtToXFk5Y5YEExbiPBsZIf7+E2Q==
-X-Received: by 2002:a5d:6944:: with SMTP id r4mr14207664wrw.134.1610340284200;
-        Sun, 10 Jan 2021 20:44:44 -0800 (PST)
+        bh=wFOQhYf4KY0iQ0wXgWJplDGuOa9qNeREhz6BlaWfJAw=;
+        b=AMsuTQtvGMKFNmhjweTCPlsKRV+4yFAzlU7EDSTaIqGIJNDiSnlfXdtkEr9RlGce1j
+         /iSRY7tT06SrQLeMmQe+sECClrEnujn3noLqRG5lidH3oL7KN7A6W4pcDERboitQ3fEp
+         8ZWHXlJFjqT9NKC+62Jp8GU6FRM7bXZh2rJXfoEZYBOnawu2UH56KwjkzfkGQAAH7wdD
+         ejOGnCuTLgxEU1I+93AJBn9b2sXa5tJTjeWg4Q2y3R/5QaOPRIdvQqFEznD0PZbq8S4l
+         k7uqb3mswXRYVgk4pwAOGbX6ACLttog48vSueFbfBVwL5JkZoaZWY1+wSXXPyT1/l8nW
+         y+2Q==
+X-Gm-Message-State: AOAM532t0Y1BG7UXhleFF9xc0FjrWp7tcBxDizXdQkCNlczDNCk3wOmI
+        njimvpgGKCARz5OK5zhevVZAqs52eh4=
+X-Google-Smtp-Source: ABdhPJzUrkBb8HnejGY/T738mYFuemjsfNGQB46siXNXqTus3C8GYsmNqu1TETa11M4qvCnJB4ugHA==
+X-Received: by 2002:a1c:6208:: with SMTP id w8mr12955082wmb.96.1610340314783;
+        Sun, 10 Jan 2021 20:45:14 -0800 (PST)
 Received: from [192.168.8.119] ([85.255.237.6])
-        by smtp.gmail.com with ESMTPSA id g5sm23049714wro.60.2021.01.10.20.44.43
+        by smtp.gmail.com with ESMTPSA id k18sm26071171wrd.45.2021.01.10.20.45.13
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 10 Jan 2021 20:44:43 -0800 (PST)
-Subject: Re: [PATCH V3 2/6] block: don't pass BIOSET_NEED_BVECS for
- q->bio_split
+        Sun, 10 Jan 2021 20:45:14 -0800 (PST)
+Subject: Re: [PATCH V3 3/6] block: don't allocate inline bvecs if this bioset
+ needn't bvecs
 To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
 References: <20210111030557.4154161-1-ming.lei@redhat.com>
- <20210111030557.4154161-3-ming.lei@redhat.com>
+ <20210111030557.4154161-4-ming.lei@redhat.com>
 From:   Pavel Begunkov <asml.silence@gmail.com>
 Autocrypt: addr=asml.silence@gmail.com; prefer-encrypt=mutual; keydata=
  mQINBFmKBOQBEAC76ZFxLAKpDw0bKQ8CEiYJRGn8MHTUhURL02/7n1t0HkKQx2K1fCXClbps
@@ -108,12 +108,12 @@ Autocrypt: addr=asml.silence@gmail.com; prefer-encrypt=mutual; keydata=
  UVMKkOCdFhutRmYp0mbv2e87IK4erwNHQRkHUkzbsuym8RVpAZbLzLPIYK/J3RTErL6Z99N2
  m3J6pjwSJY/zNwuFPs9zGEnRO4g0BUbwGdbuvDzaq6/3OJLKohr5eLXNU3JkT+3HezydWm3W
  OPhauth7W0db74Qd49HXK0xe/aPrK+Cp+kU1HRactyNtF8jZQbhMCC8vMGukZtWaAwpjWiiH bA==
-Message-ID: <4d3593be-8bc8-07bc-632d-94a643f7815d@gmail.com>
-Date:   Mon, 11 Jan 2021 04:41:10 +0000
+Message-ID: <269c3677-88c2-9e3a-45d2-438edd03a82b@gmail.com>
+Date:   Mon, 11 Jan 2021 04:41:41 +0000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.0
 MIME-Version: 1.0
-In-Reply-To: <20210111030557.4154161-3-ming.lei@redhat.com>
+In-Reply-To: <20210111030557.4154161-4-ming.lei@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -122,8 +122,8 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 11/01/2021 03:05, Ming Lei wrote:
-> q->bio_split is only used by bio_split() for fast cloning bio, and no
-> need to allocate bvecs, so remove this flag.
+> The inline bvecs won't be used if user needn't bvecs by not passing
+> BIOSET_NEED_BVECS, so don't allocate bvecs in this situation.
 > 
 > Reviewed-by: Christoph Hellwig <hch@lst.de>
 > Signed-off-by: Ming Lei <ming.lei@redhat.com>
@@ -132,22 +132,47 @@ Reviewed-by: Pavel Begunkov <asml.silence@gmail.com>
 Tested-by: Pavel Begunkov <asml.silence@gmail.com>
 
 > ---
->  block/blk-core.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  block/bio.c         | 7 +++++--
+>  include/linux/bio.h | 1 +
+>  2 files changed, 6 insertions(+), 2 deletions(-)
 > 
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index 7663a9b94b80..00d415be74e6 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -531,7 +531,7 @@ struct request_queue *blk_alloc_queue(int node_id)
->  	if (q->id < 0)
->  		goto fail_q;
+> diff --git a/block/bio.c b/block/bio.c
+> index cfa0e9db30e0..496aa5938f79 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -89,8 +89,7 @@ static struct bio_slab *create_bio_slab(unsigned int size)
 >  
-> -	ret = bioset_init(&q->bio_split, BIO_POOL_SIZE, 0, BIOSET_NEED_BVECS);
-> +	ret = bioset_init(&q->bio_split, BIO_POOL_SIZE, 0, 0);
->  	if (ret)
->  		goto fail_id;
+>  static inline unsigned int bs_bio_slab_size(struct bio_set *bs)
+>  {
+> -	return bs->front_pad + sizeof(struct bio) +
+> -		BIO_INLINE_VECS * sizeof(struct bio_vec);
+> +	return bs->front_pad + sizeof(struct bio) + bs->back_pad;
+>  }
 >  
+>  static struct kmem_cache *bio_find_or_create_slab(struct bio_set *bs)
+> @@ -1572,6 +1571,10 @@ int bioset_init(struct bio_set *bs,
+>  		int flags)
+>  {
+>  	bs->front_pad = front_pad;
+> +	if (flags & BIOSET_NEED_BVECS)
+> +		bs->back_pad = BIO_INLINE_VECS * sizeof(struct bio_vec);
+> +	else
+> +		bs->back_pad = 0;
+>  
+>  	spin_lock_init(&bs->rescue_lock);
+>  	bio_list_init(&bs->rescue_list);
+> diff --git a/include/linux/bio.h b/include/linux/bio.h
+> index 1edda614f7ce..f606eb1e556f 100644
+> --- a/include/linux/bio.h
+> +++ b/include/linux/bio.h
+> @@ -703,6 +703,7 @@ struct bio_set {
+>  	mempool_t bvec_integrity_pool;
+>  #endif
+>  
+> +	unsigned int back_pad;
+>  	/*
+>  	 * Deadlock avoidance for stacking block drivers: see comments in
+>  	 * bio_alloc_bioset() for details
 > 
 
 -- 
