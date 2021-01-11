@@ -8,62 +8,62 @@ X-Spam-Status: No, score=-14.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8ABB4C433DB
-	for <linux-block@archiver.kernel.org>; Mon, 11 Jan 2021 04:46:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78F99C433DB
+	for <linux-block@archiver.kernel.org>; Mon, 11 Jan 2021 04:47:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 55764225A9
-	for <linux-block@archiver.kernel.org>; Mon, 11 Jan 2021 04:46:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 47958225AC
+	for <linux-block@archiver.kernel.org>; Mon, 11 Jan 2021 04:47:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727092AbhAKEqe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 10 Jan 2021 23:46:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53866 "EHLO
+        id S1727130AbhAKErB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 10 Jan 2021 23:47:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53966 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727055AbhAKEqd (ORCPT
+        with ESMTP id S1726573AbhAKErA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 10 Jan 2021 23:46:33 -0500
-Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FEA0C061786
-        for <linux-block@vger.kernel.org>; Sun, 10 Jan 2021 20:45:52 -0800 (PST)
-Received: by mail-wr1-x42e.google.com with SMTP id w5so14928766wrm.11
-        for <linux-block@vger.kernel.org>; Sun, 10 Jan 2021 20:45:52 -0800 (PST)
+        Sun, 10 Jan 2021 23:47:00 -0500
+Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C6CBC061794
+        for <linux-block@vger.kernel.org>; Sun, 10 Jan 2021 20:46:20 -0800 (PST)
+Received: by mail-wm1-x331.google.com with SMTP id q75so13787771wme.2
+        for <linux-block@vger.kernel.org>; Sun, 10 Jan 2021 20:46:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=subject:to:cc:references:from:autocrypt:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=1PZDvJ3uwAZHTlasEgvnaiDQiOtLOC+u61gmTuJsmkI=;
-        b=XCAbnEnlbMsdn+xCPK5V46TvVpcGlg2oW9MHP5dmkez6yhOHMoRh1smImPY8H4I1TL
-         QumZUrVMfHayEpnUeinUmD6wDzIKFTf42GhJFG1h/Vd3yAwIpkBrNP1iX/dsuVFSluj1
-         2xguWJ14OFBB5kkRt63gAxCAcgAA72JSSERvu2LHPV2YAg/Hjfm6tYUv4ehBI5iW9ckn
-         JUxcZeudUNMwQHgC/jH+Udj340+x7mF1osI3jPxpOiXq0dks7ySCtzpy2LrXgN9zYeWz
-         k8SEERA3NVvTTrKQ9DWnC7G6eqHpkjchidzPDbkKeKZcN5yQZD09RDX+c2foOA59XokF
-         spEg==
+        bh=bMC425b0EXVS+7b+sWk9MJNLAJeOqw5l/hhwQF7C9u0=;
+        b=owO/3wdrZkZHQOvSZOvWm2TYf/TBxuQFEqQPw3ACQ4bHNu4zdruuHKLLdNY+rAdjIp
+         IZvZ+Ad9gLtWzfLhBFAuFN/2Gfp/YhRI137XOFTiAhnsQcfA3aDJFIGvuidmc2ZkOXhn
+         t5BgBoKXLhv93JgctP2+/KLA1ACn49AArU2aigsV8bOdE+h3AUqSALDtBEz4qqTbYLUc
+         UndtSsP1lzOAOgzpFVnfY5S5VjPtlaodyWN2Cwv6oxQp5wbR9Gw33n7QG1atEGrLnopE
+         n3QAX/om6YBAq9YntPDHDWdqb6Bt8bUwz5L10/5Hf40jLcPMzOBDVLDqFYuQdGenuHFL
+         pbRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:autocrypt
          :message-id:date:user-agent:mime-version:in-reply-to
          :content-language:content-transfer-encoding;
-        bh=1PZDvJ3uwAZHTlasEgvnaiDQiOtLOC+u61gmTuJsmkI=;
-        b=pX5hGKCk1hrtn5SjCT2C9Pk/tZyRmTo5hDSCaJi7R7RvpJC36JkOQ1uLxUkVnx8aVE
-         lPFFDgkn+FHSGhCf2UDA0RIYZdHgrurTOnhaXf0W9wWcT3u8DziHXjn/jP+vHkk5Gb/6
-         s4ZUAI9iNz4Jkq/01Rp4D/ZUC89awmOmWGY7MRIkazRVcX9e3RRa4pelLcj9H9ZbHjnO
-         paVf+DXNrmvmurSoOdPrTNI1+eiCoyKto1HmoRr09HbAdC5LKQXpmMTbbqgqfDTIajxc
-         UZ+ZGGTm1O4ai5aJ1t3+5B3FbkV9On3cpmzp1D4NTbfs8HIvY/quMCnyEU64plN2BjTy
-         ehnw==
-X-Gm-Message-State: AOAM5319jzGXqRN9Gu8cTRH8W2K50N+4uGhzXqJezhzsXTRQfAmwxtUx
-        x+z5js7qBvmvXtPDuaAmzE0=
-X-Google-Smtp-Source: ABdhPJzjeB1MH2p4GGp+TOuUZtB8XFluTjI83W89z7vGtvPVOAIVdTvOlK8CLTvGU3g0w76wP79B5Q==
-X-Received: by 2002:adf:80ae:: with SMTP id 43mr14517909wrl.50.1610340351340;
-        Sun, 10 Jan 2021 20:45:51 -0800 (PST)
+        bh=bMC425b0EXVS+7b+sWk9MJNLAJeOqw5l/hhwQF7C9u0=;
+        b=cMN0xKWFVX/+F5W3ffM8DrGOKYerEVrxM8Z2Lap8Z6CWdV9wd+jK+4li3kW+vz4qn8
+         ZI7O2VW2zpz8IL/OscXcA52Ai9DwNnfGX1Qm63tifLS3KPsRkkfJ0lveOoyuSx3xjuZ5
+         MFOhc5qLWTlSixvHD9Rhdy4iF/9HbS00MOR1hJVNZh3RKrGSI9ajz/bSk3OENbQrg4G1
+         ozZB+tcOCuffY1os6DmFjh9ZSl1Aqylgbwo1AIC/NCXplFq76W15V1WRaun5pDBLHsNi
+         Y3nNXAm4LC4XLDg2t/nSdrHrMhtHLAYYXxcmFYhGjonVqIOiBvZZGQsEstDiYGKfJOIt
+         vUCw==
+X-Gm-Message-State: AOAM532FM5C6cOt+HfeCnh5OIaNTwbrDhRY8KU+4QvwK3uv88y47uDhA
+        fAhM9vN0WCbQt33n5LwS+wY=
+X-Google-Smtp-Source: ABdhPJw6ABZ2IlvVe+E+45ZniwIBlAdLv4Mh6aaM9uE8EkEPYZrjO4PrwCFb4TPnJfaWLUMv8r7TJQ==
+X-Received: by 2002:a1c:9e86:: with SMTP id h128mr13213014wme.171.1610340378904;
+        Sun, 10 Jan 2021 20:46:18 -0800 (PST)
 Received: from [192.168.8.119] ([85.255.237.6])
-        by smtp.gmail.com with ESMTPSA id s20sm19499853wmj.46.2021.01.10.20.45.50
+        by smtp.gmail.com with ESMTPSA id n16sm22662494wrj.26.2021.01.10.20.46.18
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 10 Jan 2021 20:45:50 -0800 (PST)
-Subject: Re: [PATCH V3 4/6] block: set .bi_max_vecs as actual allocated vector
- number
+        Sun, 10 Jan 2021 20:46:18 -0800 (PST)
+Subject: Re: [PATCH V3 5/6] block: move three bvec helpers declaration into
+ private helper
 To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
 References: <20210111030557.4154161-1-ming.lei@redhat.com>
- <20210111030557.4154161-5-ming.lei@redhat.com>
+ <20210111030557.4154161-6-ming.lei@redhat.com>
 From:   Pavel Begunkov <asml.silence@gmail.com>
 Autocrypt: addr=asml.silence@gmail.com; prefer-encrypt=mutual; keydata=
  mQINBFmKBOQBEAC76ZFxLAKpDw0bKQ8CEiYJRGn8MHTUhURL02/7n1t0HkKQx2K1fCXClbps
@@ -108,12 +108,12 @@ Autocrypt: addr=asml.silence@gmail.com; prefer-encrypt=mutual; keydata=
  UVMKkOCdFhutRmYp0mbv2e87IK4erwNHQRkHUkzbsuym8RVpAZbLzLPIYK/J3RTErL6Z99N2
  m3J6pjwSJY/zNwuFPs9zGEnRO4g0BUbwGdbuvDzaq6/3OJLKohr5eLXNU3JkT+3HezydWm3W
  OPhauth7W0db74Qd49HXK0xe/aPrK+Cp+kU1HRactyNtF8jZQbhMCC8vMGukZtWaAwpjWiiH bA==
-Message-ID: <d49622d2-d78e-2f81-e1ce-d0f16fbeea66@gmail.com>
-Date:   Mon, 11 Jan 2021 04:42:18 +0000
+Message-ID: <8d8eb758-072c-4f98-4cda-65a26aa3eaec@gmail.com>
+Date:   Mon, 11 Jan 2021 04:42:45 +0000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.3.0
 MIME-Version: 1.0
-In-Reply-To: <20210111030557.4154161-5-ming.lei@redhat.com>
+In-Reply-To: <20210111030557.4154161-6-ming.lei@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -122,10 +122,8 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 11/01/2021 03:05, Ming Lei wrote:
-> bvec_alloc() may allocate more bio vectors than requested, so set
-> .bi_max_vecs as actual allocated vector number, instead of the requested
-> number. This way can help fs build bigger bio because new bio often won't
-> be allocated until the current one becomes full.
+> bvec_alloc(), bvec_free() and bvec_nr_vecs() are only used inside block
+> layer core functions, no need to declare them in public header.
 > 
 > Reviewed-by: Christoph Hellwig <hch@lst.de>
 > Signed-off-by: Ming Lei <ming.lei@redhat.com>
@@ -133,28 +131,39 @@ On 11/01/2021 03:05, Ming Lei wrote:
 Reviewed-by: Pavel Begunkov <asml.silence@gmail.com>
 
 > ---
->  block/bio.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+>  block/blk.h         | 4 ++++
+>  include/linux/bio.h | 3 ---
+>  2 files changed, 4 insertions(+), 3 deletions(-)
 > 
-> diff --git a/block/bio.c b/block/bio.c
-> index 496aa5938f79..37e3f2d9df99 100644
-> --- a/block/bio.c
-> +++ b/block/bio.c
-> @@ -505,12 +505,13 @@ struct bio *bio_alloc_bioset(gfp_t gfp_mask, unsigned int nr_iovecs,
->  			goto err_free;
+> diff --git a/block/blk.h b/block/blk.h
+> index 7550364c326c..a21a35c4a3e4 100644
+> --- a/block/blk.h
+> +++ b/block/blk.h
+> @@ -55,6 +55,10 @@ void blk_free_flush_queue(struct blk_flush_queue *q);
 >  
->  		bio->bi_flags |= idx << BVEC_POOL_OFFSET;
-> +		bio->bi_max_vecs = bvec_nr_vecs(idx);
->  	} else if (nr_iovecs) {
->  		bvl = bio->bi_inline_vecs;
-> +		bio->bi_max_vecs = inline_vecs;
->  	}
+>  void blk_freeze_queue(struct request_queue *q);
 >  
->  	bio->bi_pool = bs;
-> -	bio->bi_max_vecs = nr_iovecs;
->  	bio->bi_io_vec = bvl;
->  	return bio;
+> +struct bio_vec *bvec_alloc(gfp_t, int, unsigned long *, mempool_t *);
+> +void bvec_free(mempool_t *, struct bio_vec *, unsigned int);
+> +unsigned int bvec_nr_vecs(unsigned short idx);
+> +
+>  static inline bool biovec_phys_mergeable(struct request_queue *q,
+>  		struct bio_vec *vec1, struct bio_vec *vec2)
+>  {
+> diff --git a/include/linux/bio.h b/include/linux/bio.h
+> index f606eb1e556f..70914dd6a70d 100644
+> --- a/include/linux/bio.h
+> +++ b/include/linux/bio.h
+> @@ -478,9 +478,6 @@ static inline void zero_fill_bio(struct bio *bio)
+>  	zero_fill_bio_iter(bio, bio->bi_iter);
+>  }
 >  
+> -extern struct bio_vec *bvec_alloc(gfp_t, int, unsigned long *, mempool_t *);
+> -extern void bvec_free(mempool_t *, struct bio_vec *, unsigned int);
+> -extern unsigned int bvec_nr_vecs(unsigned short idx);
+>  extern const char *bio_devname(struct bio *bio, char *buffer);
+>  
+>  #define bio_set_dev(bio, bdev) 			\
 > 
 
 -- 
