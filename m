@@ -2,87 +2,79 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15ABBC433E6
-	for <linux-block@archiver.kernel.org>; Mon, 11 Jan 2021 03:08:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B9CDC433DB
+	for <linux-block@archiver.kernel.org>; Mon, 11 Jan 2021 03:55:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D6BFB224BD
-	for <linux-block@archiver.kernel.org>; Mon, 11 Jan 2021 03:08:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C9BB22245C
+	for <linux-block@archiver.kernel.org>; Mon, 11 Jan 2021 03:55:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726766AbhAKDIK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 10 Jan 2021 22:08:10 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:52340 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726626AbhAKDIK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 10 Jan 2021 22:08:10 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610334404;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Uy+q9x/LhT5LmxfrDWoXPnKFI8e993HQ2GG56/x1S54=;
-        b=MIKI+MyCqIezBVYePR0F1A+xOyiygG30AGVtPQLtPJmwt41xQ2Cm5HfDwGsX++W85cETYc
-        16C0th5gNm8f7/f8V9FT8++orkZ/wtyj9oVm7VUih4N4aPpEkIBG2aNqVNyCItFukGpgM8
-        xjHzSOsBPAododuORO/SgjUl+rr287g=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-144-jehQohl1PVCNUoXejYQrzg-1; Sun, 10 Jan 2021 22:06:42 -0500
-X-MC-Unique: jehQohl1PVCNUoXejYQrzg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4FDBD107ACE6;
-        Mon, 11 Jan 2021 03:06:41 +0000 (UTC)
-Received: from localhost (ovpn-12-180.pek2.redhat.com [10.72.12.180])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9ED766EF50;
-        Mon, 11 Jan 2021 03:06:40 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
+        id S1726564AbhAKDzN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 10 Jan 2021 22:55:13 -0500
+Received: from mx2.suse.de ([195.135.220.15]:60164 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725991AbhAKDzN (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 10 Jan 2021 22:55:13 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 522AEAB3E;
+        Mon, 11 Jan 2021 03:54:31 +0000 (UTC)
+Subject: Re: [PATCH V3 6/6] bcache: don't pass BIOSET_NEED_BVECS for the
+ 'bio_set' embedded in 'cache_set'
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Ming Lei <ming.lei@redhat.com>, linux-bcache@vger.kernel.org,
-        Coly Li <colyli@suse.de>
-Subject: [PATCH V3 6/6] bcache: don't pass BIOSET_NEED_BVECS for the 'bio_set' embedded in 'cache_set'
-Date:   Mon, 11 Jan 2021 11:05:57 +0800
-Message-Id: <20210111030557.4154161-7-ming.lei@redhat.com>
-In-Reply-To: <20210111030557.4154161-1-ming.lei@redhat.com>
+        linux-bcache@vger.kernel.org
 References: <20210111030557.4154161-1-ming.lei@redhat.com>
+ <20210111030557.4154161-7-ming.lei@redhat.com>
+From:   Coly Li <colyli@suse.de>
+Message-ID: <127486de-a058-1cfd-a53a-a33a1a63a750@suse.de>
+Date:   Mon, 11 Jan 2021 11:54:28 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:78.0)
+ Gecko/20100101 Thunderbird/78.6.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20210111030557.4154161-7-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This bioset is just for allocating bio only from bio_next_split, and it
-needn't bvecs, so remove the flag.
+On 1/11/21 11:05 AM, Ming Lei wrote:
+> This bioset is just for allocating bio only from bio_next_split, and it
+> needn't bvecs, so remove the flag.
+> 
+> Cc: linux-bcache@vger.kernel.org
+> Cc: Coly Li <colyli@suse.de>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
 
-Cc: linux-bcache@vger.kernel.org
-Cc: Coly Li <colyli@suse.de>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/md/bcache/super.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Acked-by: Coly Li <colyli@suse.de>
 
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index a4752ac410dc..4102e47f43e1 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -1897,7 +1897,7 @@ struct cache_set *bch_cache_set_alloc(struct cache_sb *sb)
- 		goto err;
- 
- 	if (bioset_init(&c->bio_split, 4, offsetof(struct bbio, bio),
--			BIOSET_NEED_BVECS|BIOSET_NEED_RESCUER))
-+			BIOSET_NEED_RESCUER))
- 		goto err;
- 
- 	c->uuids = alloc_meta_bucket_pages(GFP_KERNEL, sb);
--- 
-2.28.0
+Thanks.
+
+Coly Li
+
+> ---
+>  drivers/md/bcache/super.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+> index a4752ac410dc..4102e47f43e1 100644
+> --- a/drivers/md/bcache/super.c
+> +++ b/drivers/md/bcache/super.c
+> @@ -1897,7 +1897,7 @@ struct cache_set *bch_cache_set_alloc(struct cache_sb *sb)
+>  		goto err;
+>  
+>  	if (bioset_init(&c->bio_split, 4, offsetof(struct bbio, bio),
+> -			BIOSET_NEED_BVECS|BIOSET_NEED_RESCUER))
+> +			BIOSET_NEED_RESCUER))
+>  		goto err;
+>  
+>  	c->uuids = alloc_meta_bucket_pages(GFP_KERNEL, sb);
+> 
 
