@@ -7,104 +7,87 @@ X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6ECD0C433DB
-	for <linux-block@archiver.kernel.org>; Mon, 11 Jan 2021 03:07:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E352C433E0
+	for <linux-block@archiver.kernel.org>; Mon, 11 Jan 2021 03:08:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3AA8E224B8
-	for <linux-block@archiver.kernel.org>; Mon, 11 Jan 2021 03:07:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5759A224B8
+	for <linux-block@archiver.kernel.org>; Mon, 11 Jan 2021 03:08:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726362AbhAKDH4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 10 Jan 2021 22:07:56 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60174 "EHLO
+        id S1726419AbhAKDIA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 10 Jan 2021 22:08:00 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37194 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725919AbhAKDHz (ORCPT
+        by vger.kernel.org with ESMTP id S1725919AbhAKDH7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 10 Jan 2021 22:07:55 -0500
+        Sun, 10 Jan 2021 22:07:59 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1610334389;
+        s=mimecast20190719; t=1610334393;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=vHOBHxHTT8odiwZMIFYYgPzaTLCILFsgpEbmQgSsyfA=;
-        b=Y5a2UQssgu9S/nKM0Ky9FXX+obkVFo/o99rQGvmSTWov8S4pxSTabmelcmnt0JZ88Y5L/O
-        cH4qpx5IRKmKZKliDP82o7K0xcjug2IV4PNpcpVnUyHZkWBryWl/A5dQRLo2UwSrt9hQrt
-        xElqeOnI7ca+eiAL43nxoVntO/WieYA=
+        bh=/MBzSgwf0LNOhHOwxx62z4urBuJuGkAD6hDiQ/z/tuI=;
+        b=PPYT8RWcf6Q7IuM8TUVrK8kRBAyEuPBj8mVrdQMLzlJvMRXRxAC+k1nSZNaoVatgcmU0PF
+        mtUMOqCkJsqSsPmeLUQ+eCu/ds2E8MHFWFbRRwQB+5sFH9tgtj7Lv8reskK0knKzjMfOk5
+        7GasBL5OvkC+FEQEmuQeiy6uCc2NMAY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-589-2sJpQe6KOhm7NTIjDrF7rg-1; Sun, 10 Jan 2021 22:06:25 -0500
-X-MC-Unique: 2sJpQe6KOhm7NTIjDrF7rg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-361-YeXz0X4bPheEh8braN9oDQ-1; Sun, 10 Jan 2021 22:06:31 -0500
+X-MC-Unique: YeXz0X4bPheEh8braN9oDQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9879B801817;
-        Mon, 11 Jan 2021 03:06:24 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D311A1966320;
+        Mon, 11 Jan 2021 03:06:30 +0000 (UTC)
 Received: from localhost (ovpn-12-180.pek2.redhat.com [10.72.12.180])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BE3751349A;
-        Mon, 11 Jan 2021 03:06:23 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 890556EF4B;
+        Mon, 11 Jan 2021 03:06:26 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V3 3/6] block: don't allocate inline bvecs if this bioset needn't bvecs
-Date:   Mon, 11 Jan 2021 11:05:54 +0800
-Message-Id: <20210111030557.4154161-4-ming.lei@redhat.com>
+Subject: [PATCH V3 4/6] block: set .bi_max_vecs as actual allocated vector number
+Date:   Mon, 11 Jan 2021 11:05:55 +0800
+Message-Id: <20210111030557.4154161-5-ming.lei@redhat.com>
 In-Reply-To: <20210111030557.4154161-1-ming.lei@redhat.com>
 References: <20210111030557.4154161-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The inline bvecs won't be used if user needn't bvecs by not passing
-BIOSET_NEED_BVECS, so don't allocate bvecs in this situation.
+bvec_alloc() may allocate more bio vectors than requested, so set
+.bi_max_vecs as actual allocated vector number, instead of the requested
+number. This way can help fs build bigger bio because new bio often won't
+be allocated until the current one becomes full.
 
 Reviewed-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/bio.c         | 7 +++++--
- include/linux/bio.h | 1 +
- 2 files changed, 6 insertions(+), 2 deletions(-)
+ block/bio.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/block/bio.c b/block/bio.c
-index cfa0e9db30e0..496aa5938f79 100644
+index 496aa5938f79..37e3f2d9df99 100644
 --- a/block/bio.c
 +++ b/block/bio.c
-@@ -89,8 +89,7 @@ static struct bio_slab *create_bio_slab(unsigned int size)
+@@ -505,12 +505,13 @@ struct bio *bio_alloc_bioset(gfp_t gfp_mask, unsigned int nr_iovecs,
+ 			goto err_free;
  
- static inline unsigned int bs_bio_slab_size(struct bio_set *bs)
- {
--	return bs->front_pad + sizeof(struct bio) +
--		BIO_INLINE_VECS * sizeof(struct bio_vec);
-+	return bs->front_pad + sizeof(struct bio) + bs->back_pad;
- }
+ 		bio->bi_flags |= idx << BVEC_POOL_OFFSET;
++		bio->bi_max_vecs = bvec_nr_vecs(idx);
+ 	} else if (nr_iovecs) {
+ 		bvl = bio->bi_inline_vecs;
++		bio->bi_max_vecs = inline_vecs;
+ 	}
  
- static struct kmem_cache *bio_find_or_create_slab(struct bio_set *bs)
-@@ -1572,6 +1571,10 @@ int bioset_init(struct bio_set *bs,
- 		int flags)
- {
- 	bs->front_pad = front_pad;
-+	if (flags & BIOSET_NEED_BVECS)
-+		bs->back_pad = BIO_INLINE_VECS * sizeof(struct bio_vec);
-+	else
-+		bs->back_pad = 0;
+ 	bio->bi_pool = bs;
+-	bio->bi_max_vecs = nr_iovecs;
+ 	bio->bi_io_vec = bvl;
+ 	return bio;
  
- 	spin_lock_init(&bs->rescue_lock);
- 	bio_list_init(&bs->rescue_list);
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 1edda614f7ce..f606eb1e556f 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -703,6 +703,7 @@ struct bio_set {
- 	mempool_t bvec_integrity_pool;
- #endif
- 
-+	unsigned int back_pad;
- 	/*
- 	 * Deadlock avoidance for stacking block drivers: see comments in
- 	 * bio_alloc_bioset() for details
 -- 
 2.28.0
 
