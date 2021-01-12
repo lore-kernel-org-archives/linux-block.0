@@ -2,98 +2,106 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84182C433DB
-	for <linux-block@archiver.kernel.org>; Tue, 12 Jan 2021 15:31:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94A07C433E0
+	for <linux-block@archiver.kernel.org>; Tue, 12 Jan 2021 15:35:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 351A623132
-	for <linux-block@archiver.kernel.org>; Tue, 12 Jan 2021 15:31:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4D73C23131
+	for <linux-block@archiver.kernel.org>; Tue, 12 Jan 2021 15:35:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391181AbhALPaq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Jan 2021 10:30:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49994 "EHLO
+        id S2389223AbhALPev (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Jan 2021 10:34:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50896 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388929AbhALPap (ORCPT
+        with ESMTP id S1726113AbhALPev (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Jan 2021 10:30:45 -0500
-Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9167C061786
-        for <linux-block@vger.kernel.org>; Tue, 12 Jan 2021 07:30:04 -0800 (PST)
-Received: by mail-pg1-x536.google.com with SMTP id 30so1668311pgr.6
-        for <linux-block@vger.kernel.org>; Tue, 12 Jan 2021 07:30:04 -0800 (PST)
+        Tue, 12 Jan 2021 10:34:51 -0500
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA041C061786;
+        Tue, 12 Jan 2021 07:34:33 -0800 (PST)
+Received: by mail-pf1-x42e.google.com with SMTP id m6so1591917pfm.6;
+        Tue, 12 Jan 2021 07:34:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=smartx-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=q9nbRvwo7ac2ToiSLQSsfVzaqM5k2WvPOWvIf0XdbxA=;
-        b=eM5ISxhZoCLEIGOwGetHhmmIPqAc56Qu0T8jpNBgasOwpZuIpmVYO1/o3tQF4L9TKf
-         PejjotnzCIeDiOadl/7mp0/mC4naBqEeKjLSAzq5CTe1HEta0/k6DAgbZpr0ddwHvYjx
-         RCwO2mO/OA5GlYOkH5WGg8YkIbbUkxNQU+Sf/cYW0ZU5v6l3MAE6skyV/bTzVg8VU8RA
-         IrT6VB+p7d7pbhgNTurKa9uVbUFHYRWTk/0JApYylURP8jRNRkqAzj4R9ch+9Ka6qRFx
-         rYQnfF1EQeWZ7hPFp5epVqs5O7SaKqxwdQkqgELzSs1Kyh9xI2kP0HhRCYL/i2gwucjK
-         ZbiQ==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=RVuECvNPbIKct0vhZG5VyO5CR6uluO/0d3yC7WXia4s=;
+        b=HI6KrNCZhlvK/P2qwujoTxU0dyNl5pO+ERhl880VC3ZVmWHdnc12/FRplsiLALoLpQ
+         DhGkfCuPNcyLdO0o+BV8mBdHOR67to4FsoCHW6mGidBLSNyQzRnsFuYcUjddoWc8qp/X
+         mSm2U5ogYTCfHrAAVhJa95mYde/LzrjP3GVho/e/KE7qR4b6G3VEQTCpYJg320TBX4ZR
+         kIL04T8+LYWtMVWqjZXR39BkJH9/W8V0LT7uitSCHmMMCupW1KyRIe1zdfZ+m4Aoz7ja
+         FjIrb0pPeAR9vv546OQDXz3ZZKBl5Vo6MAE+wCn7LQdfyyTryBzJ5zHaj6pWD06JJDkj
+         9NUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=q9nbRvwo7ac2ToiSLQSsfVzaqM5k2WvPOWvIf0XdbxA=;
-        b=BvVm9uUd7UGAUf5hm0XQFDBBcvYA4hsg+qn2d6RER3hQJtlO02+6dULf5rHv5rfcJN
-         OHyTmdLRYFMre24XO4Rw62kKlqWfw2vlhMvxz14sS4PtPeVEuKD2YxtmtTFfaMEawVaD
-         y0CFiMzdUhcbHQmszUpUCdlXphsFaXbtuQeVh8YdS5D4v7MZOA7+1DUxGvwm704wfOOM
-         sv3uTipYOZzacEOFho08fOxvQA4oiJVe8KcEJLTfRDwVUwLV3/iDH/0tqaI4QMTZ+P28
-         XooWlKUYRj13xpYMonI+H5DW3ID3KGwy8b7JI2w2yjC9y/CcZsOpFDJSSKY2WHy0MJ5B
-         VsLw==
-X-Gm-Message-State: AOAM533CC3nptMNpbCnl6TY65OnllXzUP3zBJSEH4S4kQVbyG2OvXtBh
-        R93cJeTaGViBZdSHR+f2HLyMMQ==
-X-Google-Smtp-Source: ABdhPJyALuNVv1wvI+DDRekgkGo8NXfLozpA9HiGJxZ7KWqh/VVuh24KQ5EaDmvO2ic4y/u1/3k/Fg==
-X-Received: by 2002:a63:3ec9:: with SMTP id l192mr5316862pga.104.1610465403297;
-        Tue, 12 Jan 2021 07:30:03 -0800 (PST)
-Received: from localhost.localdomain (ec2-18-163-103-0.ap-east-1.compute.amazonaws.com. [18.163.103.0])
-        by smtp.gmail.com with ESMTPSA id n1sm3486878pfu.28.2021.01.12.07.30.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Jan 2021 07:30:02 -0800 (PST)
-From:   Li Feng <fengli@smartx.com>
-To:     Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org (open list:BLOCK LAYER),
-        linux-kernel@vger.kernel.org (open list)
-Cc:     lifeng1519@gmail.com, Li Feng <fengli@smartx.com>
-Subject: [PATCH] blk: avoid divide-by-zero with zero granularity
-Date:   Tue, 12 Jan 2021 23:29:51 +0800
-Message-Id: <20210112152951.154024-1-fengli@smartx.com>
-X-Mailer: git-send-email 2.29.2
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=RVuECvNPbIKct0vhZG5VyO5CR6uluO/0d3yC7WXia4s=;
+        b=eOXSDRx+jA4ejXpqWmGtPEPFpzCGGHwI0/1LwIR7IRiXCqB/DlYLj1ah7XxSSSY/7W
+         2DRbzYRIYwonmjQV3cA5xSQyxaKYAgTS+Z+xGnEj4elEi2A6uqdv4pVUYsbzNarcrlsP
+         kFtAs7syo7eMo4bH5xnyq5nGtcD2azqfG6o7syN/GrBHZF9cDBcDrqttRe9R5VhjyA+K
+         Um+KvvZsYI9lKAn8ilxdXVEsdP6eOVNei34kVSu+ZBJkARWrySyQkQzvc7JqLw4r0zSx
+         iwL8wSodxI/gZik3HJOrHipsXaHp71Ap5qozVED358vIQ1/Rl438wWNjkdqb5Mcp38W5
+         Gz2w==
+X-Gm-Message-State: AOAM530IQ2GQD2GHFE+NqRHVuljEaId1OdXp940pQKBF9YrOwAHekJm6
+        HnOnlTW5nLqi9M5QEg4N9bgsQ2jbXW2DbLMvByg=
+X-Google-Smtp-Source: ABdhPJyfFCMrM1pHAKnzaAFF1beFe+dz5Z6vWGzaTwLXdBSrj4ozRSeA8/h3TjrVLExyI3jqCackj2GYCzNhAtd+6yo=
+X-Received: by 2002:a65:48cb:: with SMTP id o11mr5198353pgs.121.1610465673155;
+ Tue, 12 Jan 2021 07:34:33 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20210112152951.154024-1-fengli@smartx.com>
+In-Reply-To: <20210112152951.154024-1-fengli@smartx.com>
+From:   Feng Li <lifeng1519@gmail.com>
+Date:   Tue, 12 Jan 2021 23:34:06 +0800
+Message-ID: <CAEK8JBD68oTcuV+Cf-S1Vv-n6nyr5UM_zWA5iJFHP=UvQ14AZg@mail.gmail.com>
+Subject: Re: [PATCH] blk: avoid divide-by-zero with zero granularity
+To:     Li Feng <fengli@smartx.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If the physical_block_size and io_min is less than a sector, the
-'granularity >> SECTOR_SHIFT' will be zero.
+I'm sorry, ignore this one.
 
-Signed-off-by: Li Feng <fengli@smartx.com>
----
- include/linux/blkdev.h | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index f94ee3089e01..4d029e95adb4 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1485,6 +1485,10 @@ static inline int queue_alignment_offset(const struct request_queue *q)
- static inline int queue_limit_alignment_offset(struct queue_limits *lim, sector_t sector)
- {
- 	unsigned int granularity = max(lim->physical_block_size, lim->io_min);
-+	granularity = granularity >> SECTOR_SHIFT;
-+	if (!granularity)
-+		return 0;
-+
- 	unsigned int alignment = sector_div(sector, granularity >> SECTOR_SHIFT)
- 		<< SECTOR_SHIFT;
- 
--- 
-2.29.2
-
+Li Feng <fengli@smartx.com> =E4=BA=8E2021=E5=B9=B41=E6=9C=8812=E6=97=A5=E5=
+=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=8811:30=E5=86=99=E9=81=93=EF=BC=9A
+>
+> If the physical_block_size and io_min is less than a sector, the
+> 'granularity >> SECTOR_SHIFT' will be zero.
+>
+> Signed-off-by: Li Feng <fengli@smartx.com>
+> ---
+>  include/linux/blkdev.h | 4 ++++
+>  1 file changed, 4 insertions(+)
+>
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index f94ee3089e01..4d029e95adb4 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -1485,6 +1485,10 @@ static inline int queue_alignment_offset(const str=
+uct request_queue *q)
+>  static inline int queue_limit_alignment_offset(struct queue_limits *lim,=
+ sector_t sector)
+>  {
+>         unsigned int granularity =3D max(lim->physical_block_size, lim->i=
+o_min);
+> +       granularity =3D granularity >> SECTOR_SHIFT;
+> +       if (!granularity)
+> +               return 0;
+> +
+>         unsigned int alignment =3D sector_div(sector, granularity >> SECT=
+OR_SHIFT)
+>                 << SECTOR_SHIFT;
+>
+> --
+> 2.29.2
+>
