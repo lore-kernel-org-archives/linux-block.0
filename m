@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF771C433DB
-	for <linux-block@archiver.kernel.org>; Tue, 12 Jan 2021 04:28:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12E6DC433E0
+	for <linux-block@archiver.kernel.org>; Tue, 12 Jan 2021 04:28:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BBE7122D05
-	for <linux-block@archiver.kernel.org>; Tue, 12 Jan 2021 04:28:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DED3E22D06
+	for <linux-block@archiver.kernel.org>; Tue, 12 Jan 2021 04:28:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730413AbhALE2f (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 Jan 2021 23:28:35 -0500
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:60620 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730406AbhALE2f (ORCPT
+        id S1730427AbhALE2g (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 Jan 2021 23:28:36 -0500
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:42623 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730406AbhALE2g (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Jan 2021 23:28:35 -0500
+        Mon, 11 Jan 2021 23:28:36 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
   t=1610425715; x=1641961715;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=b7JlLdLhTEJHSJkJ2Ot7J3cXNRNUJqtnFvAN4lx8PoE=;
-  b=dE3uWV6TSdd+FCFGvPPTuNkW3Z/IfxTgnXuFxXAflsKzAvpLr5WV3J1g
-   /GNEBCvf5vIh17dQoV1Iqbrev51nrKaeKJf/IJa/nVMTpeCp/1Cp/Q/iV
-   nN1eFZ4NLgxECigg3GmXT1GnsO2B9KeUlp6uJmcJdoBUc3iYGzrEau9SK
-   pm6EIQf893zeqFWWes5wV8Q+1ELZQvCLFE/Qz0osxwiB0TSTwovvycNap
-   OHx21MOnGh+JyON5InRtCUbCo0ecfzG2BoNJQmxf0rktoN64BeQpR5K/3
-   VeBXoQsEDK9z/8yJVyVPsQCqCbAq7JlXVOe99GEXgfSdDg79wLCxLz/qn
-   Q==;
-IronPort-SDR: VOIw82T3DeXshPYcAmQGoE7TOSLrJKmxJWPEeEnmIV8gCN3h2MbwALdAABsv5QrWsQ8GT7nf9A
- lLVL37k1nSYy9VITc7hssC7DTp/2sZy4AwruTA4yeTmxMQtaMV9UaUJ4CNFluoxMigQa4PyoYu
- s61dRh5z9uQdlD/XEyhKnc+1ejuX3rWrjMXFIiS+1kiKr+0WmrqfyqQx5syt2HQafvMdXUj/rK
- S3cd+9p0fqK6kvQI/W2pTJv8VLowOCI+LG28QuQZwNV0xzTp336iORIhRHlIO0lOiT91+IMLN/
- 05g=
+  bh=mkVK7yH9lL1rJQMlF1XEDeT3WD/vS4iMg1KelSLXgKo=;
+  b=R0EGhMKhW3P6cvw1JGyEOZEcec//OypYzSVTMcCccjdDU0ZXeDGrhM9F
+   IbwYF7FhGYp5QAsZyd0fT7x7NsRniOZYx+ZhpDmS9anHw1GMVWVorgvwq
+   +2dZJAVFjll7ktTPEhNQ+au6KN/hf+tsjqb32xEfpM+ZYzLTb6jAyl7ed
+   nt57dSoK1z07Gy2X0rI3EGn9xKMQVJI5fNGqeVizyAGXCekMEpLYFDoM8
+   GuJeZgpWtb49bY1ApLvUZ+7H+7h20C7vRUPhTFeObaMeb20DIT7g/90TM
+   8raIZm1g+J5UBwibF+bBPjYj76JDrQJIWuFbMUXmYiIDci3vYVdWFky1N
+   A==;
+IronPort-SDR: 5b9MU5Q5q4rrz/a5qBsumGFuOsJnPkbMhtUq9d69WzXsEKW0DJLqCwRO/aMHWZerMnpNYcqIFe
+ YCNlXyy62DLe1XIkSaqb4ghjZnccbuovWHEwLph9G31UoBz79/w1THCgiq5ISzXueoNBK2cIHz
+ DTzVu2nCNfHJK5wAGJ5ouCeHvctpBtCEaMzPFwcbnzZsEdWlwcjdvfkgDnGvxel0s8l5dO2b+d
+ W5ffLJ4g0KSwuVGuqxe7b4Pj/Ei7Wcb5uwAalunqw6aqAdWNMna+WB9Diy6j8btM3sB46a4rch
+ dSQ=
 X-IronPort-AV: E=Sophos;i="5.79,340,1602518400"; 
-   d="scan'208";a="158381152"
+   d="scan'208";a="267504904"
 Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 12 Jan 2021 12:27:29 +0800
-IronPort-SDR: Ns/zCeppbo4+D88zZtNZL9vGwZjbBmgSyMhJPdWRXrKvxQkw2J1PYGZoobGuAuLl5weY0hNvVr
- aR/JJAUpU6bTihXun+bvWkMYJuUqfDxLrysv4xfsk/iMdmExsegm70Vc9UFP9KlLq3Ti/QLA+/
- KnaXGeei7yhyX0dnh7YV8jhvF7L4ln6QcIUEINx64dwB2OHrCR373jyYalzjY0nLmvRRKMEhSc
- zxLbfRozZqMHDVCx5Il7HrSWZD1u3POi+e+4pXuKLSXqSlfWkOhOeAN2D8HAstxSxOdk6xqMjD
- iLhj7PwTWiPphKLUbJgNXYXZ
+  by ob1.hgst.iphmx.com with ESMTP; 12 Jan 2021 12:27:50 +0800
+IronPort-SDR: ijmTf2tYNr+QorbWdBKDMdGmCEuUTIC1pRqsjZfCo4Vkt5x5cY6wXuKzMurQBTLEEcCKlNK+BB
+ bX6PGo5KdIzaZ/jVnFosdsa8jD6S6D13B5pitIksrU+oopvfzJvrmihTCFfqoeuk0dAPGxoNwD
+ May6qqtyWCdHJ3Co/EA7y34tVr4y0a5uQGpQLsP5cUNKjaqKqby/Xr+OTOrvIrp61CRbr/XfE7
+ brNmYA7rUiz/XwCs8FF071veIuMrdPiJeSNm0aTnkuVu4J4t01UgJd41BskhT8ZFOQEKCV2DUy
+ y1EBTGU0Q6h5Kiar8Im9fpqu
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jan 2021 20:10:22 -0800
-IronPort-SDR: o/sg1RlO55nBZvuaf2UOWUKg+CwrJQNyX5ExWX1SiQ1CQgy3BqgOm1LU6PVb42JWsHrs1QDrz3
- J4uJFV4zVQf6HISX5Eyak8w1215IcPdF0qV6tiyMi7rmneB27b5IacvY31BmKRQmfMifwJdI6O
- ilxFN4yx2Lcch6etVa3iripRW7bx1OkyKCMAqN0sVauyJcMtAb19GNvzUQFF7IAq+s35HG8MzY
- OyGtGIawg02tKIBBBAuIliFJgPfrBuIYFc4kVsoQYs7Xf1YHt4zwOXnUpOZml5byXfy6e9HCE5
- GNM=
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jan 2021 20:10:44 -0800
+IronPort-SDR: 7tCkuG4QOhKS272Hg88kxZohCM1ZnvsSJQI7gWspgz0AH+5wZl3u7NrxobRGnuMs04fmuGPvvU
+ Segbqb1mC8uBV6gsLous42UXP4pdxVrse2TnqzuC203ErZ+gJrsLKPbs5JGkXultFjFrYfkOhn
+ vejhVy8M6c0F7LiEa1V9VHr3YF9qPGsCo4XDuXD4Lderd3Xi7BUaSBvEGo2c3c4UKesnThw57q
+ uGhDxWSWqNetmDy6ZBG8hH4tS83izbk1HT00rhjFrIddDWIYFoAzxLz9XE65s8HuB4NKXfLFR1
+ EEs=
 WDCIronportException: Internal
 Received: from vm.labspan.wdc.com (HELO vm.sc.wdc.com) ([10.6.137.102])
-  by uls-op-cesaip02.wdc.com with ESMTP; 11 Jan 2021 20:27:29 -0800
+  by uls-op-cesaip02.wdc.com with ESMTP; 11 Jan 2021 20:27:50 -0800
 From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 To:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
 Cc:     hch@lst.de, sagi@grimberg.me, damien.lemoal@wdc.com,
         Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [PATCH V9 6/9] nvmet: add bio init helper for different backends
-Date:   Mon, 11 Jan 2021 20:26:20 -0800
-Message-Id: <20210112042623.6316-7-chaitanya.kulkarni@wdc.com>
+Subject: [PATCH V9 8/9] nvmet: add common I/O length check helper
+Date:   Mon, 11 Jan 2021 20:26:22 -0800
+Message-Id: <20210112042623.6316-9-chaitanya.kulkarni@wdc.com>
 X-Mailer: git-send-email 2.22.1
 In-Reply-To: <20210112042623.6316-1-chaitanya.kulkarni@wdc.com>
 References: <20210112042623.6316-1-chaitanya.kulkarni@wdc.com>
@@ -73,81 +73,106 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-With the addition of the zns backend now we have two different backends
-with the same bio initialization code. That leads to having duplicate
-code in two backends: generic bdev and generic zns.
+With the addition of zns backend now we have three different backends
+with which checks for the nvmet request's transfer len and nvmet
+request's sg_cnt. That leads to having duplicate code in for three
+backends: generic bdev, file and generic zns.
 
-Add a helper function to reduce the duplicate code such that helper
-function initializes the various bio initialization parameters such as
-bio block device, op flags, sector, end io callback, and private member,
+Add a helper function to avoid the duplicate code and update the
+respective backends.
 
 Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 ---
- drivers/nvme/target/io-cmd-bdev.c |  6 +-----
- drivers/nvme/target/nvmet.h       | 11 +++++++++++
- drivers/nvme/target/zns.c         |  6 +++---
- 3 files changed, 15 insertions(+), 8 deletions(-)
+ drivers/nvme/target/io-cmd-bdev.c |  8 +-------
+ drivers/nvme/target/io-cmd-file.c |  7 +------
+ drivers/nvme/target/nvmet.h       | 14 ++++++++++++++
+ drivers/nvme/target/zns.c         |  7 +------
+ 4 files changed, 17 insertions(+), 19 deletions(-)
 
 diff --git a/drivers/nvme/target/io-cmd-bdev.c b/drivers/nvme/target/io-cmd-bdev.c
-index 72746e29cb0d..b1fb0bb1f39f 100644
+index 562c2dd9c08c..c23a719513b0 100644
 --- a/drivers/nvme/target/io-cmd-bdev.c
 +++ b/drivers/nvme/target/io-cmd-bdev.c
-@@ -267,11 +267,7 @@ static void nvmet_bdev_execute_rw(struct nvmet_req *req)
- 	sector = nvmet_lba_to_sect(req->ns, req->cmd->rw.slba);
+@@ -240,16 +240,10 @@ static void nvmet_bdev_execute_rw(struct nvmet_req *req)
+ 	int op, i, rc;
+ 	struct sg_mapping_iter prot_miter;
+ 	unsigned int iter_flags;
+-	unsigned int total_len = nvmet_rw_data_len(req) + req->metadata_len;
  
- 	bio = nvmet_req_bio_get(req, NULL);
--	bio_set_dev(bio, req->ns->bdev);
--	bio->bi_iter.bi_sector = sector;
--	bio->bi_private = req;
--	bio->bi_end_io = nvmet_bio_done;
--	bio->bi_opf = op;
-+	nvmet_bio_init(bio, req->ns->bdev, op, sector, req, nvmet_bio_done);
+-	if (!nvmet_check_transfer_len(req, total_len))
++	if (!nvmet_continue_io(req, nvmet_rw_data_len(req) + req->metadata_len))
+ 		return;
  
- 	blk_start_plug(&plug);
- 	if (req->metadata_len)
+-	if (!req->sg_cnt) {
+-		nvmet_req_complete(req, 0);
+-		return;
+-	}
+-
+ 	if (req->cmd->rw.opcode == nvme_cmd_write) {
+ 		op = REQ_OP_WRITE | REQ_SYNC | REQ_IDLE;
+ 		if (req->cmd->rw.control & cpu_to_le16(NVME_RW_FUA))
+diff --git a/drivers/nvme/target/io-cmd-file.c b/drivers/nvme/target/io-cmd-file.c
+index 0abbefd9925e..e7caff221b7b 100644
+--- a/drivers/nvme/target/io-cmd-file.c
++++ b/drivers/nvme/target/io-cmd-file.c
+@@ -241,14 +241,9 @@ static void nvmet_file_execute_rw(struct nvmet_req *req)
+ {
+ 	ssize_t nr_bvec = req->sg_cnt;
+ 
+-	if (!nvmet_check_transfer_len(req, nvmet_rw_data_len(req)))
++	if (!nvmet_continue_io(req, nvmet_rw_data_len(req)))
+ 		return;
+ 
+-	if (!req->sg_cnt || !nr_bvec) {
+-		nvmet_req_complete(req, 0);
+-		return;
+-	}
+-
+ 	if (nr_bvec > NVMET_MAX_INLINE_BIOVEC)
+ 		req->f.bvec = kmalloc_array(nr_bvec, sizeof(struct bio_vec),
+ 				GFP_KERNEL);
 diff --git a/drivers/nvme/target/nvmet.h b/drivers/nvme/target/nvmet.h
-index 3fc84f79cce1..1ec9e1b35c67 100644
+index 93ebc9ae3fe4..f4f9d622df0d 100644
 --- a/drivers/nvme/target/nvmet.h
 +++ b/drivers/nvme/target/nvmet.h
-@@ -668,4 +668,15 @@ static inline struct bio *nvmet_req_bio_get(struct nvmet_req *req,
- 	return bio;
+@@ -685,4 +685,18 @@ static inline void nvmet_req_bio_put(struct nvmet_req *req, struct bio *bio)
+ 		bio_put(bio);
  }
  
-+static inline void nvmet_bio_init(struct bio *bio, struct block_device *bdev,
-+				  unsigned int op, sector_t sect, void *private,
-+				  bio_end_io_t *bi_end_io)
++static inline bool nvmet_continue_io(struct nvmet_req *req,
++				     unsigned int total_len)
 +{
-+	bio_set_dev(bio, bdev);
-+	bio->bi_opf = op;
-+	bio->bi_iter.bi_sector = sect;
-+	bio->bi_private = private;
-+	bio->bi_end_io = bi_end_io;
++	if (!nvmet_check_transfer_len(req, total_len))
++		return false;
++
++	if (!req->sg_cnt) {
++		nvmet_req_complete(req, 0);
++		return false;
++	}
++
++	return true;
 +}
 +
  #endif /* _NVMET_H */
 diff --git a/drivers/nvme/target/zns.c b/drivers/nvme/target/zns.c
-index c32e93a3c7e1..92213bed0006 100644
+index bba1d6957b6a..149bc8ce7010 100644
 --- a/drivers/nvme/target/zns.c
 +++ b/drivers/nvme/target/zns.c
-@@ -281,6 +281,7 @@ void nvmet_bdev_execute_zone_append(struct nvmet_req *req)
- {
- 	sector_t sect = nvmet_lba_to_sect(req->ns, req->cmd->rw.slba);
- 	struct request_queue *q = req->ns->bdev->bd_disk->queue;
-+	unsigned int op = REQ_OP_ZONE_APPEND | REQ_SYNC | REQ_IDLE;
- 	unsigned int max_sects = queue_max_zone_append_sectors(q);
- 	u16 status = NVME_SC_SUCCESS;
- 	unsigned int total_len = 0;
-@@ -297,9 +298,8 @@ void nvmet_bdev_execute_zone_append(struct nvmet_req *req)
- 	}
+@@ -289,14 +289,9 @@ void nvmet_bdev_execute_zone_append(struct nvmet_req *req)
+ 	int ret = 0, sg_cnt;
+ 	struct bio *bio;
  
+-	if (!nvmet_check_transfer_len(req, nvmet_rw_data_len(req)))
++	if (!nvmet_continue_io(req, nvmet_rw_data_len(req)))
+ 		return;
+ 
+-	if (!req->sg_cnt) {
+-		nvmet_req_complete(req, 0);
+-		return;
+-	}
+-
  	bio = nvmet_req_bio_get(req, NULL);
--	bio_set_dev(bio, req->ns->bdev);
--	bio->bi_iter.bi_sector = sect;
--	bio->bi_opf = REQ_OP_ZONE_APPEND | REQ_SYNC | REQ_IDLE;
-+	nvmet_bio_init(bio, req->ns->bdev, op, sect, NULL, NULL);
-+
- 	if (req->cmd->rw.control & cpu_to_le16(NVME_RW_FUA))
- 		bio->bi_opf |= REQ_FUA;
+ 	nvmet_bio_init(bio, req->ns->bdev, op, sect, NULL, NULL);
  
 -- 
 2.22.1
