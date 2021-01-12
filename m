@@ -2,103 +2,98 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13CEDC43219
-	for <linux-block@archiver.kernel.org>; Tue, 12 Jan 2021 13:10:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84182C433DB
+	for <linux-block@archiver.kernel.org>; Tue, 12 Jan 2021 15:31:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D79252311E
-	for <linux-block@archiver.kernel.org>; Tue, 12 Jan 2021 13:10:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 351A623132
+	for <linux-block@archiver.kernel.org>; Tue, 12 Jan 2021 15:31:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404696AbhALM6H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Jan 2021 07:58:07 -0500
-Received: from mail.kernel.org ([198.145.29.99]:54696 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2404586AbhALM6G (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Jan 2021 07:58:06 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 7046823127;
-        Tue, 12 Jan 2021 12:57:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1610456228;
-        bh=/TpIWJHKIKeo3ag1s8Vm+eQe+JfpDBJA6BfFKVg4ZZY=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=b2I0OCNQ1QJQZSg+tB8nWfI276xIKDV4I7oDPARzNc7oWnuMbAe8mGhKZmw+PlNjb
-         AZyR4gbGrKDBbfoRB1mYPOFvqIv+4tryZMkpp89LSEgrM/vdMDPKph6VSUeMNI2h5s
-         KRkmLkChRXBxoVqyP0HxuzRir/Ut35rfYpBc5e6oSAh4b3g5RQoL0/fZdei/hZIOEg
-         8S4sCPG6vXfnM5I2n1As1ODSjidvdYLCGc6SJG2aGpxzFTjJO8k2yTpFPg09SP+qZS
-         yfHIsCtLvXUqyYA89jjtKkGPliOzLfcEzcbEz1OxNUxc8yFoj0cVbcpwv6X0jVobXZ
-         +6xgbzU+4aVaA==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
-        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 17/28] bfq: Fix computation of shallow depth
-Date:   Tue, 12 Jan 2021 07:56:33 -0500
-Message-Id: <20210112125645.70739-17-sashal@kernel.org>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20210112125645.70739-1-sashal@kernel.org>
-References: <20210112125645.70739-1-sashal@kernel.org>
+        id S2391181AbhALPaq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Jan 2021 10:30:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49994 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388929AbhALPap (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 12 Jan 2021 10:30:45 -0500
+Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9167C061786
+        for <linux-block@vger.kernel.org>; Tue, 12 Jan 2021 07:30:04 -0800 (PST)
+Received: by mail-pg1-x536.google.com with SMTP id 30so1668311pgr.6
+        for <linux-block@vger.kernel.org>; Tue, 12 Jan 2021 07:30:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=smartx-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=q9nbRvwo7ac2ToiSLQSsfVzaqM5k2WvPOWvIf0XdbxA=;
+        b=eM5ISxhZoCLEIGOwGetHhmmIPqAc56Qu0T8jpNBgasOwpZuIpmVYO1/o3tQF4L9TKf
+         PejjotnzCIeDiOadl/7mp0/mC4naBqEeKjLSAzq5CTe1HEta0/k6DAgbZpr0ddwHvYjx
+         RCwO2mO/OA5GlYOkH5WGg8YkIbbUkxNQU+Sf/cYW0ZU5v6l3MAE6skyV/bTzVg8VU8RA
+         IrT6VB+p7d7pbhgNTurKa9uVbUFHYRWTk/0JApYylURP8jRNRkqAzj4R9ch+9Ka6qRFx
+         rYQnfF1EQeWZ7hPFp5epVqs5O7SaKqxwdQkqgELzSs1Kyh9xI2kP0HhRCYL/i2gwucjK
+         ZbiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=q9nbRvwo7ac2ToiSLQSsfVzaqM5k2WvPOWvIf0XdbxA=;
+        b=BvVm9uUd7UGAUf5hm0XQFDBBcvYA4hsg+qn2d6RER3hQJtlO02+6dULf5rHv5rfcJN
+         OHyTmdLRYFMre24XO4Rw62kKlqWfw2vlhMvxz14sS4PtPeVEuKD2YxtmtTFfaMEawVaD
+         y0CFiMzdUhcbHQmszUpUCdlXphsFaXbtuQeVh8YdS5D4v7MZOA7+1DUxGvwm704wfOOM
+         sv3uTipYOZzacEOFho08fOxvQA4oiJVe8KcEJLTfRDwVUwLV3/iDH/0tqaI4QMTZ+P28
+         XooWlKUYRj13xpYMonI+H5DW3ID3KGwy8b7JI2w2yjC9y/CcZsOpFDJSSKY2WHy0MJ5B
+         VsLw==
+X-Gm-Message-State: AOAM533CC3nptMNpbCnl6TY65OnllXzUP3zBJSEH4S4kQVbyG2OvXtBh
+        R93cJeTaGViBZdSHR+f2HLyMMQ==
+X-Google-Smtp-Source: ABdhPJyALuNVv1wvI+DDRekgkGo8NXfLozpA9HiGJxZ7KWqh/VVuh24KQ5EaDmvO2ic4y/u1/3k/Fg==
+X-Received: by 2002:a63:3ec9:: with SMTP id l192mr5316862pga.104.1610465403297;
+        Tue, 12 Jan 2021 07:30:03 -0800 (PST)
+Received: from localhost.localdomain (ec2-18-163-103-0.ap-east-1.compute.amazonaws.com. [18.163.103.0])
+        by smtp.gmail.com with ESMTPSA id n1sm3486878pfu.28.2021.01.12.07.30.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Jan 2021 07:30:02 -0800 (PST)
+From:   Li Feng <fengli@smartx.com>
+To:     Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org (open list:BLOCK LAYER),
+        linux-kernel@vger.kernel.org (open list)
+Cc:     lifeng1519@gmail.com, Li Feng <fengli@smartx.com>
+Subject: [PATCH] blk: avoid divide-by-zero with zero granularity
+Date:   Tue, 12 Jan 2021 23:29:51 +0800
+Message-Id: <20210112152951.154024-1-fengli@smartx.com>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Jan Kara <jack@suse.cz>
+If the physical_block_size and io_min is less than a sector, the
+'granularity >> SECTOR_SHIFT' will be zero.
 
-[ Upstream commit 6d4d273588378c65915acaf7b2ee74e9dd9c130a ]
-
-BFQ computes number of tags it allows to be allocated for each request type
-based on tag bitmap. However it uses 1 << bitmap.shift as number of
-available tags which is wrong. 'shift' is just an internal bitmap value
-containing logarithm of how many bits bitmap uses in each bitmap word.
-Thus number of tags allowed for some request types can be far to low.
-Use proper bitmap.depth which has the number of tags instead.
-
-Signed-off-by: Jan Kara <jack@suse.cz>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+Signed-off-by: Li Feng <fengli@smartx.com>
 ---
- block/bfq-iosched.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ include/linux/blkdev.h | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index ba32adaeefdd0..7d19aae015aeb 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -6320,13 +6320,13 @@ static unsigned int bfq_update_depths(struct bfq_data *bfqd,
- 	 * limit 'something'.
- 	 */
- 	/* no more than 50% of tags for async I/O */
--	bfqd->word_depths[0][0] = max((1U << bt->sb.shift) >> 1, 1U);
-+	bfqd->word_depths[0][0] = max(bt->sb.depth >> 1, 1U);
- 	/*
- 	 * no more than 75% of tags for sync writes (25% extra tags
- 	 * w.r.t. async I/O, to prevent async I/O from starving sync
- 	 * writes)
- 	 */
--	bfqd->word_depths[0][1] = max(((1U << bt->sb.shift) * 3) >> 2, 1U);
-+	bfqd->word_depths[0][1] = max((bt->sb.depth * 3) >> 2, 1U);
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index f94ee3089e01..4d029e95adb4 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1485,6 +1485,10 @@ static inline int queue_alignment_offset(const struct request_queue *q)
+ static inline int queue_limit_alignment_offset(struct queue_limits *lim, sector_t sector)
+ {
+ 	unsigned int granularity = max(lim->physical_block_size, lim->io_min);
++	granularity = granularity >> SECTOR_SHIFT;
++	if (!granularity)
++		return 0;
++
+ 	unsigned int alignment = sector_div(sector, granularity >> SECTOR_SHIFT)
+ 		<< SECTOR_SHIFT;
  
- 	/*
- 	 * In-word depths in case some bfq_queue is being weight-
-@@ -6336,9 +6336,9 @@ static unsigned int bfq_update_depths(struct bfq_data *bfqd,
- 	 * shortage.
- 	 */
- 	/* no more than ~18% of tags for async I/O */
--	bfqd->word_depths[1][0] = max(((1U << bt->sb.shift) * 3) >> 4, 1U);
-+	bfqd->word_depths[1][0] = max((bt->sb.depth * 3) >> 4, 1U);
- 	/* no more than ~37% of tags for sync writes (~20% extra tags) */
--	bfqd->word_depths[1][1] = max(((1U << bt->sb.shift) * 6) >> 4, 1U);
-+	bfqd->word_depths[1][1] = max((bt->sb.depth * 6) >> 4, 1U);
- 
- 	for (i = 0; i < 2; i++)
- 		for (j = 0; j < 2; j++)
 -- 
-2.27.0
+2.29.2
 
