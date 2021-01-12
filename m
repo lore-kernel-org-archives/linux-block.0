@@ -2,92 +2,80 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1BF9C433DB
-	for <linux-block@archiver.kernel.org>; Tue, 12 Jan 2021 18:42:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20955C433E6
+	for <linux-block@archiver.kernel.org>; Tue, 12 Jan 2021 18:44:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9231422C9F
-	for <linux-block@archiver.kernel.org>; Tue, 12 Jan 2021 18:42:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C35C822AAF
+	for <linux-block@archiver.kernel.org>; Tue, 12 Jan 2021 18:44:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406212AbhALSlw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Jan 2021 13:41:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35102 "EHLO
+        id S2392191AbhALSof (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Jan 2021 13:44:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35694 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2406210AbhALSlv (ORCPT
+        with ESMTP id S1728814AbhALSoe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Jan 2021 13:41:51 -0500
-Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EB0FC061794
-        for <linux-block@vger.kernel.org>; Tue, 12 Jan 2021 10:41:11 -0800 (PST)
-Received: by mail-wm1-x32f.google.com with SMTP id y187so3092889wmd.3
-        for <linux-block@vger.kernel.org>; Tue, 12 Jan 2021 10:41:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=javigon-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=w4WSdwQHCuBBoHOg1WZaw9qfXJ+QY/Ppef3OSGAHOA0=;
-        b=bq5JZKKAb79n+BSBUQXdU7UHQaRL9LdBEp8Lrl3CMJwWYj4p6msErVgfZI2jlCo48l
-         Nim0IOZsK85nZb3Ygo8maY5FcB33ysVBhhjswfjElQSR3PyemFQ6e7/1n+CvBI5kZTDv
-         ngm4pEDjeJSZV9k9KWMYK/6JM7ir4JGZ2Gv5NRJpbd9Q6QqstyZT2cKjJqSrjl/ad6lg
-         itTXC/fODp1VoqPkQN1vJy2Rl4LyNaly7vga3zJOjmFH8dSVv+36hwekdRMjW4g+ljVA
-         Wc4tK6fSIUimhMerYa/y6v35BRwL42uAhKEi3Cc4CPT2QlbImEsJPo9LbeIKut1/Oj8P
-         Loew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=w4WSdwQHCuBBoHOg1WZaw9qfXJ+QY/Ppef3OSGAHOA0=;
-        b=l7jyPaTAh6eCxXqatficq2n1coswsEVKo78jW3OTOw3iZ0uSllks2bUDTmfwtvptZm
-         WGW4icTyL78MDjjOKvlrczofjo/DqVsxwIPFhl6uILgszJR20QGU2+mcuobGYjFsLH7y
-         YtcJbCIrXF1Elc21iBHsbqFyPRimvn29YitAWuy9kWbX/H53BKBvJnDFYh+ltFB/Yk2r
-         W7Ouy4PtL7ceQPLT195nqlgEucOs6W1WZRO52m93h3x0RZVmzP86W+xK9H8eiRsns2lx
-         xE+3hhg/9vC+vBtetZ/TlR9HPSSySUEAdw2dG6GHV92tKq1jXR//g1tJtHvUUuMsdnXQ
-         +s4A==
-X-Gm-Message-State: AOAM532UFaoG7avf5YiNe2DHAhjcBMu55Lb2xt88Qy5LGon1vYHRc7Ta
-        YUmkksDxH1GEE0NLKWsfBikIUA==
-X-Google-Smtp-Source: ABdhPJxx3J9+uNlXGEKW8tNS+zV8I7UkvHkJu286t4sUVejfG/Cl77KRY7Ay8SlrhUnSXmtUxQdGIA==
-X-Received: by 2002:a1c:4843:: with SMTP id v64mr586660wma.186.1610476870119;
-        Tue, 12 Jan 2021 10:41:10 -0800 (PST)
-Received: from localhost (5.186.124.214.cgn.fibianet.dk. [5.186.124.214])
-        by smtp.gmail.com with ESMTPSA id v11sm6125820wrt.25.2021.01.12.10.41.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Jan 2021 10:41:09 -0800 (PST)
-Date:   Tue, 12 Jan 2021 19:41:08 +0100
-From:   Javier =?utf-8?B?R29uesOhbGV6?= <javier@javigon.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Minwoo Im <minwoo.im.dev@gmail.com>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        kbusch@kernel.org, sagi@grimberg.me
-Subject: Re: nvme: enable char device per namespace
-Message-ID: <20210112184108.x42fhpdtfn2a24wz@unifi>
-References: <CGME20201216181838eucas1p15c687e5d1319d3fa581990e6cca73295@eucas1p1.samsung.com>
- <20201216181828.21040-1-javier.gonz@samsung.com>
- <20210111185347.oqqzdmoglg3lzo5y@mpHalley.localdomain>
- <20210112092207.GA4888@localhost.localdomain>
- <20210112183055.u3y34tfxh4d5aeue@unifi>
- <20210112183303.GA5050@lst.de>
+        Tue, 12 Jan 2021 13:44:34 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EFA3C061575;
+        Tue, 12 Jan 2021 10:43:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=ouV8q9+PTUftcxRx8suqz3Pt46rr9u55Qwc5eoB9EWs=; b=a9dsEmwcFBYk5KRd9MJAYDC+L7
+        kBhJ/E8w/SrixuwI3x8Q6AzWMA97H4rS7B7Vx5Bqv+RdBP5W5BB+2w2Ti0pVGVeARU2HoOK9o8HtL
+        rPOnLEMTPIa+mvC0l0dzhX0JO9V6uhFsb9zSLwUH2An7Gi4rAcfzVwLADxbbVEszGkO+INTmu4EWU
+        /n/gRDU3VhIks8huG8Ji5mzSdu2a7ln2WZhw5J3voZWL/clq01ND2FaXGnedzQf+tj3HbYsfqvP5z
+        6sXxTQXAgTe9nTEu9j4StkGpFZAThX496OlhESHYBwPKg1btB99j/GWBRlweul51W8nNYd2NYfGtg
+        NkKi5Lnw==;
+Received: from hch by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
+        id 1kzOdn-005CNS-OA; Tue, 12 Jan 2021 18:43:44 +0000
+Date:   Tue, 12 Jan 2021 18:43:39 +0000
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Andreas Dilger <adilger@dilger.ca>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Avi Kivity <avi@scylladb.com>,
+        Andres Freund <andres@anarazel.de>,
+        "Darrick J. Wong" <darrick.wong@oracle.com>,
+        linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: fallocate(FALLOC_FL_ZERO_RANGE_BUT_REALLY) to avoid unwritten
+ extents?
+Message-ID: <20210112184339.GA1238746@infradead.org>
+References: <20201230062819.yinrrp6uwfegsqo3@alap3.anarazel.de>
+ <20210104181958.GE6908@magnolia>
+ <20210104191058.sryksqjnjjnn5raa@alap3.anarazel.de>
+ <f6f75f11-5d5b-ae63-d584-4b6f09ff401e@scylladb.com>
+ <20210112181600.GA1228497@infradead.org>
+ <C8811877-48A9-4199-9F28-20F5B071AE36@dilger.ca>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210112183303.GA5050@lst.de>
+In-Reply-To: <C8811877-48A9-4199-9F28-20F5B071AE36@dilger.ca>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12.01.2021 19:33, Christoph Hellwig wrote:
->On Tue, Jan 12, 2021 at 07:30:55PM +0100, Javier González wrote:
->> I have not implemented multipath support, but it should definitely not
->> crash like this. I'll rebase to 5.11 and test.
->>
->> Christoph: Is it OK to send this without multipath or should I just send
->> all together?
->
->We're not in a rush at the moment, so I'd prefer working multipath
->support if you can spare a few cycles.
+On Tue, Jan 12, 2021 at 11:39:58AM -0700, Andreas Dilger wrote:
+> > XFS already has a XFS_IOC_ALLOCSP64 that is defined to actually
+> > allocate written extents.  It does not currently use
+> > blkdev_issue_zeroout, but could be changed pretty trivially to do so.
+> > 
+> >> But note it will need to be plumbed down to md and dm to be generally
+> >> useful.
+> > 
+> > DM and MD already support mddev_check_write_zeroes, at least for the
+> > usual targets.
+> 
+> Similarly, ext4 also has EXT4_GET_BLOCKS_CREATE_ZERO that can allocate zero
+> filled extents rather than unwritten extents (without clobbering existing
+> data like FALLOC_FL_ZERO_RANGE does), and just needs a flag from fallocate()
+> to trigger it.  This is plumbed down to blkdev_issue_zeroout() as well.
 
-Sure. I'll work on that and submit all under the same patchset.
+XFS_IOC_ALLOCSP64 actually is an ioctl that has been around since 1995
+on IRIX (as an fcntl).
