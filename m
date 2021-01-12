@@ -2,74 +2,78 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98E6AC433E6
-	for <linux-block@archiver.kernel.org>; Tue, 12 Jan 2021 18:52:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB35EC43332
+	for <linux-block@archiver.kernel.org>; Tue, 12 Jan 2021 21:41:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5298623121
-	for <linux-block@archiver.kernel.org>; Tue, 12 Jan 2021 18:52:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BEFBA23122
+	for <linux-block@archiver.kernel.org>; Tue, 12 Jan 2021 21:41:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406063AbhALSvw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Jan 2021 13:51:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37276 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390101AbhALSvv (ORCPT
+        id S2389246AbhALVlv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Jan 2021 16:41:51 -0500
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:39415 "EHLO
+        out3-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1731253AbhALVhl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Jan 2021 13:51:51 -0500
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99D3BC061795
-        for <linux-block@vger.kernel.org>; Tue, 12 Jan 2021 10:51:11 -0800 (PST)
-Received: by mail-pl1-x62d.google.com with SMTP id t6so1905114plq.1
-        for <linux-block@vger.kernel.org>; Tue, 12 Jan 2021 10:51:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dilger-ca.20150623.gappssmtp.com; s=20150623;
-        h=from:message-id:mime-version:subject:date:in-reply-to:cc:to
-         :references;
-        bh=jwDUMG4BDwtkjKCfx8pA65u580qvrwCaIPtk3Y8ItLQ=;
-        b=D1Rngjrb3LUnyMG8JdR20Ets0jZss6q7ARfCNDySerYlxXsb87TyHJM9jDKcUNYqTe
-         I9rlrRVqxoeNOhcT6rRhbdKU7hoXBIBHlgwigOdY+Hp4q0JtNOCocy3vyCRWyHIK+DbW
-         sI5yvoeGlHvSpXQ96g4FNHAMAd02kwXRkO9E7CfQHR1gjRyqleWPkQiE+viGiTuA2DXE
-         /eDf7QRtrqUN+DYPG7NeUKKQR1kv+9KWC1qdYAFpPEpWHOdI/wt5WDM4FDuZSSAx7HWh
-         Dr02UExOlhOJoA5r+j7aoBFbtZPQWl/tkPBRAl9WVKvja3ZMgsQctlYekYvRMxVVZBaK
-         S7Iw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:message-id:mime-version:subject:date
-         :in-reply-to:cc:to:references;
-        bh=jwDUMG4BDwtkjKCfx8pA65u580qvrwCaIPtk3Y8ItLQ=;
-        b=uG32cOKzrOq+TPwSFxifFGNyjwXYRa40q5BiVwPiv3o07aVoTbTj0E9U60u0xKqZoz
-         eUFHg1tEpNKu40WGgh609ShGyJNiDRqvo/sH+FrrWFsMFtse+pY8910aJGm2fctCP/Av
-         njMQpRNjGE8ZW5xILfYybbbBOIEYgXUDQbbhzLMSUDHSTThb1UxfrvT23b8kJWOopLZI
-         7jPNmgYNQBgHDR1bT+56IGA0JZANEQVH6WbiS1kratnH6v/GPlDnyDjGQCL0EnEuc6FA
-         BAymO3x+UgIf57G74OZ6yZuAbpSxukirj7t04UvBBVkIw3cEJnQGu0JII+auotmm0+2L
-         +1sQ==
-X-Gm-Message-State: AOAM531sthDHrT2niBu02ts+tgEZrRXsAlfKLr+M2UG/bT0XBC1kTQVR
-        600hyenOlMMvK+pcWmaccwIzNJPmB7cpfGlU
-X-Google-Smtp-Source: ABdhPJwUVpeMz64khBbzgbJo42H3YjSS8MRHzeXxb+inQgHD+G5+FrutcdGHJ0yvdM6BUHca3/LrFg==
-X-Received: by 2002:a17:90a:c396:: with SMTP id h22mr564062pjt.84.1610477470988;
-        Tue, 12 Jan 2021 10:51:10 -0800 (PST)
-Received: from cabot.adilger.int (S01061cabc081bf83.cg.shawcable.net. [70.77.221.9])
-        by smtp.gmail.com with ESMTPSA id b125sm3896128pfg.165.2021.01.12.10.51.09
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 12 Jan 2021 10:51:10 -0800 (PST)
-From:   Andreas Dilger <adilger@dilger.ca>
-Message-Id: <1C33DEE4-8BE9-4BF3-A589-E11532382B36@dilger.ca>
-Content-Type: multipart/signed;
- boundary="Apple-Mail=_B1E9DB15-6634-4823-95B4-E91F40111E15";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+        Tue, 12 Jan 2021 16:37:41 -0500
+Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
+        by mailout.nyi.internal (Postfix) with ESMTP id DBAF05C01E9;
+        Tue, 12 Jan 2021 16:36:34 -0500 (EST)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute1.internal (MEProxy); Tue, 12 Jan 2021 16:36:34 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=anarazel.de; h=
+        date:from:to:cc:subject:message-id:references:mime-version
+        :content-type:in-reply-to; s=fm3; bh=Uu763oWbJWYmCwQoS+PcRoadjyh
+        lnHhoTiLxUdxm918=; b=lA1UaPCB1gWTWf+CMmIhzQfwi07esA2tt1zqzzodlg3
+        1DOfvxgxJs47H/L2kbNrjbxYwxUycZjD5pC7GLx4bajbs0oQV9xGEJ4xVwh9oenI
+        Xvl58bvx4YsJWa/sPXBDRgYdsa+y2+2YPhVVSkmBe4TwdCrgaSFs2KY/8IPtG/vy
+        bBSbnHvdvrKT4mLTMXFAfBpjkP3+d929VKh5DQJdBXeOSkpAfzE48SyfJWzm6Bpc
+        ClqAerYQlJxPRg24/pOdD0vqk1S8z+GJClvM6cLPFC2NeqXnI7o3lomWltj6511F
+        rU+X90I+tX03QZhRsYlUXtFwyWQaFj1STj/whlkpCOQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-type:date:from:in-reply-to
+        :message-id:mime-version:references:subject:to:x-me-proxy
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=Uu763o
+        WbJWYmCwQoS+PcRoadjyhlnHhoTiLxUdxm918=; b=mJekN6kYB/JUjM5fT8ncZj
+        icaWeg+u9/5jX8VSNvMm/OtLvvrSkGG0Dffi5Xva5hf6s+0pMf6jjPjL4QSvSLSn
+        OeuNPk4xJZbi2i8A71zKguK8S7Usq9QD2lCzl5P8pr8kltctTcldXDAdkAYmMG8e
+        2ckyTfAZWekbL0Wq8xi+75zZnBotz40xlOzkIlm9+Um84jkChIy4dByKtwEKRj/J
+        mKrSVuI9hsFNcgk0hemjQUo0m62U2gMDS3v9opTMsKtqZkuJxOHdXzUqsEqo9jG8
+        dP720/zNhy1lAjIDNMhoNyATHv7VVehxZw0jgLQhS2JES4NNpeRCerxUc+hVquQA
+        ==
+X-ME-Sender: <xms:Yhb-X2DmtHXLrer6DIdB-u1vl1gglLVg1jOWQvApQ2ALJ5PHky9ZAQ>
+    <xme:Yhb-Xwhzdo0brwwBkFlP9JwHbxksgfw5K-oRr17rR34cm9IQo-sZr8Z8j1063l-Xv
+    kquJiGdttLiLSuuvQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedukedrtddtgdduudelucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvffukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpeetnhgurhgv
+    shcuhfhrvghunhguuceorghnughrvghssegrnhgrrhgriigvlhdruggvqeenucggtffrrg
+    htthgvrhhnpedukefhkeelueegveetheelffffjeegleeuudelfeefuedtleffueejfffh
+    ueffudenucfkphepieejrdduiedtrddvudejrddvhedtnecuvehluhhsthgvrhfuihiivg
+    eptdenucfrrghrrghmpehmrghilhhfrhhomheprghnughrvghssegrnhgrrhgriigvlhdr
+    uggv
+X-ME-Proxy: <xmx:Yhb-X5mCiJnfgBVpqLWfzux-iGGonByxB9KjAbWyDZGvei-yuq5KJg>
+    <xmx:Yhb-X0x9ZFwH5BmVOVTz_WVsyYZBUMCdZJGl480V6HzI0kkTn6UC-g>
+    <xmx:Yhb-X7Rlr0UYUgMPY9OkBQbDx18ZlFTB3gmgpajoWCeRPhkoPwgoJw>
+    <xmx:Yhb-X8IsQVdVYdQcHf33Snrrc1I3YuwjpTNgtTcM9HM6li37YBsPZQ>
+Received: from intern.anarazel.de (c-67-160-217-250.hsd1.ca.comcast.net [67.160.217.250])
+        by mail.messagingengine.com (Postfix) with ESMTPA id 7D3831080057;
+        Tue, 12 Jan 2021 16:36:34 -0500 (EST)
+Date:   Tue, 12 Jan 2021 13:36:33 -0800
+From:   Andres Freund <andres@anarazel.de>
+To:     "Darrick J. Wong" <darrick.wong@oracle.com>
+Cc:     Andreas Dilger <adilger@dilger.ca>,
+        Christoph Hellwig <hch@infradead.org>,
+        Avi Kivity <avi@scylladb.com>, linux-fsdevel@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-block@vger.kernel.org
 Subject: Re: fallocate(FALLOC_FL_ZERO_RANGE_BUT_REALLY) to avoid unwritten
  extents?
-Date:   Tue, 12 Jan 2021 11:51:07 -0700
-In-Reply-To: <20210112184339.GA1238746@infradead.org>
-Cc:     Avi Kivity <avi@scylladb.com>, Andres Freund <andres@anarazel.de>,
-        "Darrick J. Wong" <darrick.wong@oracle.com>,
-        linux-fsdevel@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-block@vger.kernel.org
-To:     Christoph Hellwig <hch@infradead.org>
+Message-ID: <20210112213633.fb4tjlgvo6tznfr4@alap3.anarazel.de>
 References: <20201230062819.yinrrp6uwfegsqo3@alap3.anarazel.de>
  <20210104181958.GE6908@magnolia>
  <20210104191058.sryksqjnjjnn5raa@alap3.anarazel.de>
@@ -77,88 +81,29 @@ References: <20201230062819.yinrrp6uwfegsqo3@alap3.anarazel.de>
  <20210112181600.GA1228497@infradead.org>
  <C8811877-48A9-4199-9F28-20F5B071AE36@dilger.ca>
  <20210112184339.GA1238746@infradead.org>
-X-Mailer: Apple Mail (2.3273)
+ <1C33DEE4-8BE9-4BF3-A589-E11532382B36@dilger.ca>
+ <20210112211445.GC1164248@magnolia>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210112211445.GC1164248@magnolia>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi,
 
---Apple-Mail=_B1E9DB15-6634-4823-95B4-E91F40111E15
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=us-ascii
+On 2021-01-12 13:14:45 -0800, Darrick J. Wong wrote:
+> ALLOCSP64 can only allocate pre-zeroed blocks as part of extending EOF,
+> whereas a new FZERO flag means that we can pre-zero an arbitrary range
+> of bytes in a file.  I don't know if Avi or Andres' usecases demand that
+> kind of flexibilty but I know I'd rather go for the more powerful
+> interface.
 
-On Jan 12, 2021, at 11:43 AM, Christoph Hellwig <hch@infradead.org> =
-wrote:
->=20
-> On Tue, Jan 12, 2021 at 11:39:58AM -0700, Andreas Dilger wrote:
->>> XFS already has a XFS_IOC_ALLOCSP64 that is defined to actually
->>> allocate written extents.  It does not currently use
->>> blkdev_issue_zeroout, but could be changed pretty trivially to do =
-so.
->>>=20
->>>> But note it will need to be plumbed down to md and dm to be =
-generally
->>>> useful.
->>>=20
->>> DM and MD already support mddev_check_write_zeroes, at least for the
->>> usual targets.
->>=20
->> Similarly, ext4 also has EXT4_GET_BLOCKS_CREATE_ZERO that can =
-allocate zero
->> filled extents rather than unwritten extents (without clobbering =
-existing
->> data like FALLOC_FL_ZERO_RANGE does), and just needs a flag from =
-fallocate()
->> to trigger it.  This is plumbed down to blkdev_issue_zeroout() as =
-well.
->=20
-> XFS_IOC_ALLOCSP64 actually is an ioctl that has been around since 1995
-> on IRIX (as an fcntl).
+Postgres/I don't at the moment have a need to allocate "written" zeroed
+space anywhere but EOF. I can see some potential uses for more flexible
+pre-zeroing in the future though, but not very near term.
 
-I'm not against adding XFS_IOC_ALLOCSP64 to ext4, if applications are =
-actually
-using that.
+Greetings,
 
-It also makes sense to me that there also be an fallocate() mode for =
-allocating
-zeroed blocks (which was the original request), since fallocate() is =
-already
-doing very similar things and is the central interface for managing =
-block
-allocation instead of having a filesystem-specific ioctl() to do this.
-
-Cheers, Andreas
-
-
-
-
-
-
---Apple-Mail=_B1E9DB15-6634-4823-95B4-E91F40111E15
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP
-
------BEGIN PGP SIGNATURE-----
-Comment: GPGTools - http://gpgtools.org
-
-iQIzBAEBCAAdFiEEDb73u6ZejP5ZMprvcqXauRfMH+AFAl/975wACgkQcqXauRfM
-H+BruxAAmI4YBd36T8vUfDYrZnmu8DwDgBzYxTkN75N3juxfevosnpWgH8yGGXPA
-QD1k+mG0jPlidO1J766sBdGV8CHL4Q2ZYfiUA2C8z9yTfgi2uDcXmhYmG7rQWQcV
-tHZ3PcgW/u5TKpvicrtQKbdXt2teZPjUvIaR7B/6vr5SE+4gR/BsdmfdNKp4mCBQ
-0KWJyGXrTOeUwg+Ezaq6xPCRh4+2ToUcUA6ryKn3nIvBZ7ppuDSpTrix+ZZLLE/H
-++xbZWfCmIcZIrHR7rSitYV/CYZASMPffmFNJo76PYGLJ5l8HYU5GBI/rZ/VbjSd
-b6eO34V4+7DyEzgPv+iMX3G+BlHxUTJrNmKCuPlpbEtj6rPMkN3AUhfsKq0pqseW
-sSxECwRhNz27c4AfYOr13PVhPLRTMoaMhSWuRxpNGOssqYVBP1W184eOSPV3M6lh
-hEFsR7fopFWACc2jyp8XFWpvnDr3ScVRcVyzUB9FO6/AyaftvfugPhBH5j+X9pb1
-SkBIofHYYEYZDeMcnr4TjcMKrT5Pyc7oYR4wHjr1a52Aa0qUk+e3szxzK8zxa4uT
-qZLf7hmB1E2elCyZ67QoLcV4uYGVcpL4oVYMMzIzHixM0mRNadMQHDoEvT80Nmmq
-3Blf2NjzZh1l8GYzLA6GCFrtlZMkmzopFNNhbUnfOH7w6V8Dfr0=
-=eOkz
------END PGP SIGNATURE-----
-
---Apple-Mail=_B1E9DB15-6634-4823-95B4-E91F40111E15--
+Andres Freund
