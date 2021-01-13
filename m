@@ -2,78 +2,151 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F671C433E0
-	for <linux-block@archiver.kernel.org>; Wed, 13 Jan 2021 13:26:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 983A8C4332E
+	for <linux-block@archiver.kernel.org>; Wed, 13 Jan 2021 14:35:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D3B80221F1
-	for <linux-block@archiver.kernel.org>; Wed, 13 Jan 2021 13:25:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 675AF23433
+	for <linux-block@archiver.kernel.org>; Wed, 13 Jan 2021 14:35:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725924AbhAMNZo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Jan 2021 08:25:44 -0500
-Received: from mx2.suse.de ([195.135.220.15]:35150 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725613AbhAMNZo (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Jan 2021 08:25:44 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id C45C6AC24;
-        Wed, 13 Jan 2021 13:25:02 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 78A651E0872; Wed, 13 Jan 2021 14:25:02 +0100 (CET)
-Date:   Wed, 13 Jan 2021 14:25:02 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     Paolo Valente <paolo.valente@linaro.org>
-Cc:     Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org,
-        Andreas Herrmann <aherrmann@suse.com>
-Subject: Re: [PATCH 2/2] bfq: Allow short_ttime queues to have waker
-Message-ID: <20210113132502.GF6854@quack2.suse.cz>
-References: <20200409170915.30570-1-jack@suse.cz>
- <20200409170915.30570-3-jack@suse.cz>
- <9F84671F-5B43-46A8-8D92-FE30F6023F94@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9F84671F-5B43-46A8-8D92-FE30F6023F94@linaro.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        id S1726834AbhAMOfd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Jan 2021 09:35:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38206 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725747AbhAMOfc (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 13 Jan 2021 09:35:32 -0500
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA81CC061786;
+        Wed, 13 Jan 2021 06:34:51 -0800 (PST)
+Received: by mail-pf1-x429.google.com with SMTP id h10so1317002pfo.9;
+        Wed, 13 Jan 2021 06:34:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=wuAPPQU+6X7mitOsqG1eiFMYozHtMEmetO9yEuL4FC0=;
+        b=spHGxxzehb1XCEntTkAOMPbuWQEKAplQnBPaN6t1Ia3kDOUcWlbCT6q3Md8t2m1iAo
+         clyDJfL0Y9CORWRnXl+LqXbr8VE6jvbOi23/jIKWOENQoVogaJW7qHaJOvbIPACDaLAE
+         mDQz1o6lnuY5GgrcWkxJK5Uq//4gwPwEklHRQACTZEShXuKnzu2Fbc+AtD12sHKDocl0
+         y/5wabM+bu5gRfmM9lps7OJhiwdfefToE5D1KhuYo9O9KCRfbo3/JbXF5rUJ30r5DLCo
+         KG0vahtvADy7PRw2S9B7r+I88yEM5z5gH1EJYxt/Ih74WDNaKyBg+tlSZWp8yUHoAN9y
+         bt+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=wuAPPQU+6X7mitOsqG1eiFMYozHtMEmetO9yEuL4FC0=;
+        b=Cqwyx6uTSp5Elo7ROB1su3yudiAsdm7cfUGzugCAbwIc9Lzg+UdhV8ybNQcxiw9bOU
+         HQWXers/VYPkf5euFH/u6Um6xvtuyYwBjFf9S5ELEtD+aHwo9h7j8jHUR5pv9f8Yztqp
+         j6tnolC7IjLt6UlF0sYCMnShiaxQgvy+EXoFlz9OuSkhH461Oz2CQtf0ij186So86CgG
+         oyW7ifLrQyRWYHj5EYJ2h9T8gTs7OS2S9KBcJPCVu8LYL8ujj8LXJBhIKJpoaaJHjZJl
+         rID8Jf9YKk+ejfTqjKGsaSXJjVuVM22PAAA0cpk1tEuTLCeuvUWxbLIE/F3zNxUNe9DM
+         s/2A==
+X-Gm-Message-State: AOAM531W1QV0mZI4z/c5dRHd/pDjHoUDs3ibVA3CE6FpRAz2xQ80RpFM
+        UTDXA3f+bbEJSSNE0e1tpcRsJWUFE6PDxA==
+X-Google-Smtp-Source: ABdhPJwZLSbTDb+DnYUit6x3YH5fJ+SKF5iLK7fBcGoJ7NjP418/fl/X/bjQwvz1RVZdEmXLbVUOEQ==
+X-Received: by 2002:a63:f010:: with SMTP id k16mr2366648pgh.28.1610548491261;
+        Wed, 13 Jan 2021 06:34:51 -0800 (PST)
+Received: from localhost.localdomain ([211.108.35.36])
+        by smtp.gmail.com with ESMTPSA id c5sm3248265pjo.4.2021.01.13.06.34.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Jan 2021 06:34:50 -0800 (PST)
+From:   Minwoo Im <minwoo.im.dev@gmail.com>
+To:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-fsdevel@vger.kernel.org
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@lst.de>,
+        Minwoo Im <minwoo.im.dev@gmail.com>
+Subject: [PATCH V5 0/1] block: fix I/O errors in BLKRRPART
+Date:   Wed, 13 Jan 2021 23:34:31 +0900
+Message-Id: <20210113143432.426-1-minwoo.im.dev@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun 10-01-21 10:20:19, Paolo Valente wrote:
-> 
-> 
-> > Il giorno 9 apr 2020, alle ore 19:09, Jan Kara <jack@suse.cz> ha scritto:
-> > 
-> > Currently queues that have average think time shorter than slice_idle
-> > cannot have waker. However this requirement is too strict. E.g. dbench
-> > process always submits a one or two IOs (which is enough to pull its
-> > average think time below slice_idle) and then blocks waiting for jbd2
-> > thread to commit a transaction. Due to idling logic jbd2 thread is
-> > often forced to wait for dbench's idle timer to trigger to be able to
-> > submit its IO and this severely delays the overall benchmark progress.
-> > 
-> > E.g. on my test machine current dbench single-thread throughput is ~80
-> > MB/s, with this patch it is ~200 MB/s.
-> > 
-> 
-> Hi Jan,
-> I've modified this logic a little bit (in patches that I'm going to
-> submit).  And I don't see your boost in my tests.  So it's difficult
-> for me to validate this change.  If ok for you, you could test it on
-> top of the patches that I'll submit.  If you see a boost, and (as I
-> expect) I won't see any regression, this improvement is very welcome
-> for me.
+Hello,
 
-As I wrote in the cover letter, I'm not really convinced that patch
-conceptually makes sence. What you later implemented should be definitely a
-more sophisticated approach to the problem. So I'd just discard this patch.
+  This patch fixes I/O errors during BLKRRPART ioctl() behavior right
+after format operation that changed logical block size of the block
+device with a same file descriptor opened.
 
-								Honza
+Testcase:
+
+  The following testcase is a case of NVMe namespace with the following
+conditions:
+
+  - Current LBA format is lbaf=0 (512 bytes logical block size)
+  - LBA Format(lbaf=1) has 4096 bytes logical block size
+
+  # Format block device logical block size 512B to 4096B                                                                                                                                                                                                                                                                                                                                       
+  nvme format /dev/nvme0n1 --lbaf=1 --force
+
+  This will cause I/O errors because BLKRRPART ioctl() happened right after
+the format command with same file descriptor opened in application
+(e.g., nvme-cli) like:
+
+  fd = open("/dev/nvme0n1", O_RDONLY);
+
+  nvme_format(fd, ...);
+  if (ioctl(fd, BLKRRPART) < 0)
+        ...
+
+Errors:
+
+  We can see the Read command with Number of LBA(NLB) 0xffff(65535) which
+was under-flowed because BLKRRPART operation requested request size based
+on i_blkbits of the block device which is 9 via buffer_head.
+
+  [dmesg-snip]
+    [   10.771740] blk_update_request: operation not supported error, dev nvme0n1, sector 0 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 0
+    [   10.780262] Buffer I/O error on dev nvme0n1, logical block 0, async page read
+
+  [event-snip]
+    kworker/0:1H-56      [000] ....   913.456922: nvme_setup_cmd: nvme0: disk=nvme0n1, qid=1, cmdid=216, nsid=1, flags=0x0, meta=0x0, cmd=(nvme_cmd_read slba=0, len=65535, ctrl=0x0, dsmgmt=0, reftag=0)
+     ksoftirqd/0-9       [000] .Ns.   916.566351: nvme_complete_rq: nvme0: disk=nvme0n1, qid=1, cmdid=216, res=0x0, retries=0, flags=0x0, status=0x4002
+
+  The patch below fixes the I/O errors by rejecting I/O requests from the
+block layer with setting a flag to request_queue until the file descriptor
+re-opened to be updated by __blkdev_get().  This is based on the previous
+discussion [1].
+
+Since V4:
+  - Rebased on block-5.11.
+  - Added Reviewed-by Tag from Christoph.
+
+Since V3(RFC):
+  - Move flag from gendisk to request_queue for future clean-ups.
+    (Christoph, [3])
+
+Since V2(RFC):
+  - Cover letter with testcase and error logs attached. Removed un-related
+    changes: empty line. (Chaitanya, [2])
+  - Put blkdev with blkdev_put_no_open().
+
+Since V1(RFC):
+  - Updated patch to reject I/O rather than updating i_blkbits of the
+    block device's inode directly from driver. (Christoph, [1])
+
+[1] https://lore.kernel.org/linux-nvme/20201223183143.GB13354@localhost.localdomain/T/#t
+[2] https://lore.kernel.org/linux-nvme/20201230140504.GB7917@localhost.localdomain/T/#t
+[3] https://lore.kernel.org/linux-block/20210105101202.GA9970@localhost.localdomain/T/#u
+
+Thanks,
+
+Minwoo Im (1):
+  block: reject I/O for same fd if block size changed
+
+ block/blk-settings.c    |  3 +++
+ block/partitions/core.c | 12 ++++++++++++
+ fs/block_dev.c          |  8 ++++++++
+ include/linux/blkdev.h  |  1 +
+ 4 files changed, 24 insertions(+)
 
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+2.17.1
+
