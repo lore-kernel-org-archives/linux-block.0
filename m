@@ -2,245 +2,184 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CDBAC433E0
-	for <linux-block@archiver.kernel.org>; Wed, 13 Jan 2021 04:02:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73A50C433E0
+	for <linux-block@archiver.kernel.org>; Wed, 13 Jan 2021 04:18:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DF57B2312E
-	for <linux-block@archiver.kernel.org>; Wed, 13 Jan 2021 04:02:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1F26F23133
+	for <linux-block@archiver.kernel.org>; Wed, 13 Jan 2021 04:18:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726589AbhAMECe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Jan 2021 23:02:34 -0500
-Received: from mailout4.samsung.com ([203.254.224.34]:10797 "EHLO
-        mailout4.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726579AbhAMECc (ORCPT
+        id S1726125AbhAMER6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Jan 2021 23:17:58 -0500
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:65307 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725957AbhAMER6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Jan 2021 23:02:32 -0500
-Received: from epcas1p4.samsung.com (unknown [182.195.41.48])
-        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20210113040150epoutp0450b82d9e750b938160e696faf1803808~Zrsa4_fwV1403514035epoutp04U
-        for <linux-block@vger.kernel.org>; Wed, 13 Jan 2021 04:01:50 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20210113040150epoutp0450b82d9e750b938160e696faf1803808~Zrsa4_fwV1403514035epoutp04U
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1610510510;
-        bh=VIxUrzTKhnvccK/onLUwZD5UiGdrKREn4EwdF+BvVsE=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=cSFKafnrHk4CbJ7dDKCOnRLSO+oaK/Iy4kIYGjaC7mdhUoZYBq5eGyxjVJWJE60+j
-         ZfWuksIrKhoPb1YdWAcOzbwa8milpxi645K+sKhfVIL3CgamDEWSG3jRpywEYcHrbw
-         Iy3RIIeqAdzBpR1vdUTbN68XsG2dnokgTKw0N3r4=
-Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
-        epcas1p2.samsung.com (KnoxPortal) with ESMTP id
-        20210113040148epcas1p2bcf737fc903dec87166c92277ce74e28~ZrsZRZcNs1933319333epcas1p2V;
-        Wed, 13 Jan 2021 04:01:48 +0000 (GMT)
-Received: from epsmges1p1.samsung.com (unknown [182.195.40.164]) by
-        epsnrtp4.localdomain (Postfix) with ESMTP id 4DFtzv1MBnz4x9Q5; Wed, 13 Jan
-        2021 04:01:47 +0000 (GMT)
-Received: from epcas1p3.samsung.com ( [182.195.41.47]) by
-        epsmges1p1.samsung.com (Symantec Messaging Gateway) with SMTP id
-        DE.99.02418.BA07EFF5; Wed, 13 Jan 2021 13:01:47 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-        epcas1p2.samsung.com (KnoxPortal) with ESMTPA id
-        20210113040146epcas1p230596c7c3760471dca442d1f7ce4dc55~ZrsXZaHkl1710017100epcas1p2p;
-        Wed, 13 Jan 2021 04:01:46 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
-        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20210113040146epsmtrp29ce2847c5beead1becfd772b427467c6~ZrsXYW4KU1299012990epsmtrp2M;
-        Wed, 13 Jan 2021 04:01:46 +0000 (GMT)
-X-AuditID: b6c32a35-c23ff70000010972-46-5ffe70ab143e
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        4A.B3.13470.AA07EFF5; Wed, 13 Jan 2021 13:01:46 +0900 (KST)
-Received: from localhost.localdomain (unknown [10.253.99.105]) by
-        epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-        20210113040146epsmtip23fae37dc9881f478a8d7d7049c8e0535~ZrsXKOAYS3256232562epsmtip2C;
-        Wed, 13 Jan 2021 04:01:46 +0000 (GMT)
-From:   Changheun Lee <nanich.lee@samsung.com>
-To:     damien.lemoal@wdc.com
-Cc:     Johannes.Thumshirn@wdc.com, axboe@kernel.dk,
-        jisoo2146.oh@samsung.com, junho89.kim@samsung.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        mj0123.lee@samsung.com, nanich.lee@samsung.com,
-        seunghwan.hyun@samsung.com, sookwan7.kim@samsung.com,
-        tj@kernel.org, yt0928.kim@samsung.com, woosung2.lee@samsung.com
-Subject: Re: Re: [PATCH] bio: limit bio max size.
-Date:   Wed, 13 Jan 2021 12:46:37 +0900
-Message-Id: <20210113034637.1382-1-nanich.lee@samsung.com>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <CH2PR04MB65225EDDA7069CCD47A459A5E7A90@CH2PR04MB6522.namprd04.prod.outlook.com>
+        Tue, 12 Jan 2021 23:17:58 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1610511477; x=1642047477;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=+k09t0bD/PijyhvnYyDuMixGOBz6d3hs6k71sNw5NGE=;
+  b=hcCRaI5bObQcPOQEyhtoIpBbTTEQBwANKHD+1dQvtFlbq4J9m8TTRA0D
+   CjFjWrCythWPpWt0nie/QAmVrCB/2ikV2bmnfGsZiOVHLYDzB9Ped1+nN
+   QbnKaIS4xESwql8nEg3lqeK3l5i6OPwt0pLnM8mOVodJD4D92bhqH4RWv
+   yBjnVZJh/lbQDgfvsmFH/vugak7lw6Qwb+lme7v1xuKABYMxYAqBsuBXw
+   PZ5hlL/Iz8WM5usT/f2dlcARVCUXk7IxE5b2a/bo7qdSRFpjuOlnxSUbq
+   f9qXvqi0lb9O9r9juk/Sghh9uiC/bPklqg5inYMzG94GOPvOXZHKQayVy
+   A==;
+IronPort-SDR: iPNILWbO2NN5lgDE2DS+ZLSUiOVmJsRbI3YOwUOpCIoRLMPlLyTxHbPeE2/DYcqx6htJruCJcu
+ Wn4vt1px5GsY4dnlF3xqbyVzSilePX26HtmZQOUAwI2RVY24K4uxCXIvnM++Z+IMFGDcg8FhGu
+ BLqpDnSA/gsFxdfFN/0c1QrCSX7BN5fZnRm+bGDpfIzD0FfFdIMo+veXTC4CwNfvy8e6+V/s5M
+ hNkDV1oja0wFQndieCO3825etnOJmR+AGgamWUVFpCyA4mqSGNzYEfHgzLGCPqRnYULbd6SVLL
+ ME4=
+X-IronPort-AV: E=Sophos;i="5.79,343,1602518400"; 
+   d="scan'208";a="267606044"
+Received: from mail-mw2nam10lp2102.outbound.protection.outlook.com (HELO NAM10-MW2-obe.outbound.protection.outlook.com) ([104.47.55.102])
+  by ob1.hgst.iphmx.com with ESMTP; 13 Jan 2021 12:16:52 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=hYyfbtD8u3QBp2OfnyQ8pdWres7GyMWEh/WeKWzE7CL3AeMbKWMfCEmYa+kMUlC9X5SSoC+m+7LbhyTAew0OR77lN5JAOgEFWyMKLHNcZs2g1YvSQtMj/ZGLEjLa0g34KyOfblxvwsWZPXzat8G+4v1m+5idEFhrSmO06O+rf+lL0RUoI8a28Lmx3fRLKYZ0Ks9f12DfIVDOSG2XSY9f1j1hxwvWy1hnUE2ZJMMR5EbR2SpBP8QAz/GnQsF7RJgecCqkrHw2clqmzPU/TPvndrdhx/1UwN+TRjlaiURX82v+06nWT74GVy269SgSkd+iK//kkmAt9Tl1n6WYDenfjA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9aav66NQi/DWK12whZJruaJv3xluGbxjHZREyRBlG4c=;
+ b=J1wdXWeK16GtyhmB9qS2WXi9kk1s/rz7xjljfqJs6II65MCEZasiPD1HBcIHFKKs1K9bLQygDYArEIk3fkrkBLIQVxif0j5FNGiC1gDOGoqKrTHHDsvOpm5F1L5yArTSdhkB7+xhjM3hyNJ7wK2UY7QMtbYP4h7sgRFiMG0NzxSVS2mvZwPcSSdqjTKuLqLKUAnyQT3Q+L8GJkPVUWwajJMbyGKIVVZ/dCCSGyqqPng7dyQ9dr2oUPbvfuD+bLdjrXrXXOH0x4RJVgsWKHD9EKvbBjs122IIWrzBsIDu7/LHojI5x7EkiXMCpmMXL6u8lXj/JHJdd7iH9rq63/QDsQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9aav66NQi/DWK12whZJruaJv3xluGbxjHZREyRBlG4c=;
+ b=HbF6fxdpZczC9qfybSsKgrOlhol1O8U6TA8sXQSvAlqtuIni6+y073CPYgAgVkJ2GyrDfUBQu8sK3BEharEt5b89HYcekRCbFlCeLUKAH4SRollpkYJl53v+BbydkQY+gl1C1CX4h8k/ZobTWB5v6AS6ur7furO+ZvDsQzDkSMs=
+Received: from BYAPR04MB4965.namprd04.prod.outlook.com (2603:10b6:a03:4d::25)
+ by BY5PR04MB6884.namprd04.prod.outlook.com (2603:10b6:a03:222::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3763.9; Wed, 13 Jan
+ 2021 04:16:51 +0000
+Received: from BYAPR04MB4965.namprd04.prod.outlook.com
+ ([fe80::716c:4e0c:c6d1:298a]) by BYAPR04MB4965.namprd04.prod.outlook.com
+ ([fe80::716c:4e0c:c6d1:298a%6]) with mapi id 15.20.3742.012; Wed, 13 Jan 2021
+ 04:16:51 +0000
+From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+To:     Christoph Hellwig <hch@lst.de>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "sagi@grimberg.me" <sagi@grimberg.me>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>
+Subject: Re: [PATCH V9 3/9] nvmet: add NVM command set identifier support
+Thread-Topic: [PATCH V9 3/9] nvmet: add NVM command set identifier support
+Thread-Index: AQHW6JssIxRWomQxKUmbANEjg1SeZw==
+Date:   Wed, 13 Jan 2021 04:16:51 +0000
+Message-ID: <BYAPR04MB4965017878A807316A0A1BBA86A90@BYAPR04MB4965.namprd04.prod.outlook.com>
+References: <20210112042623.6316-1-chaitanya.kulkarni@wdc.com>
+ <20210112042623.6316-4-chaitanya.kulkarni@wdc.com>
+ <20210112072715.GB24155@lst.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: lst.de; dkim=none (message not signed)
+ header.d=none;lst.de; dmarc=none action=none header.from=wdc.com;
+x-originating-ip: [199.255.45.62]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 1ee048f2-71af-4c5b-8ac7-08d8b77a0d91
+x-ms-traffictypediagnostic: BY5PR04MB6884:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <BY5PR04MB6884FB5033F4711C3FF6284D86A90@BY5PR04MB6884.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:7691;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: JygwEaPzFRsqfhpMqCo40i5MwYMOGOa1qFlHv0pwZ4q9zrFEg0CA79zS2lnmD4QGUur9PzVgcxtkhFFdOBs/dPeAsnn7q+fGfhrBRj8OlPiX4A9kBO6jiRCLxvpWaCFoUyGvNJeUno7/A7n9WyFEEWEvRs7kX9JdHqMgMTpMZvBH1GqZ1F9vNuoVPd7nAyid/p9ae4ryVl9Yj6nfScbbw452fEt+DRIDYKCSpXum9uViwdALfjGShRym/g/wqAeytEaqFBMkLwZhnuSuUkXXGhHWgTg6R3GsWvlKKMkejlrt/f8eRjwzIA/z+WT3H+aYX2HXLFek+bAj+gTcxJpwQN/jIfqf3CoRzAKvrmouwgEZk3QR+L067rRWCCW8x3D8ymA7r1OX0gOPueJWV2x8cA==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR04MB4965.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(39860400002)(136003)(366004)(396003)(346002)(5660300002)(66946007)(66556008)(33656002)(66446008)(186003)(76116006)(4326008)(6916009)(6506007)(53546011)(2906002)(64756008)(83380400001)(66476007)(9686003)(71200400001)(316002)(7696005)(478600001)(55016002)(54906003)(26005)(8936002)(8676002)(86362001)(52536014);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: =?us-ascii?Q?OXotQB/jqAyg6XSPUpmvHYXPxDl/dPS6WtGGmnhry/LD7xAiWDrRWMi+/1Aa?=
+ =?us-ascii?Q?yOr/36hRslnAhDfY0LVhtCaGb+Gop9hvQY4xvCIusgtRn/fHd5CE/Lv24o3i?=
+ =?us-ascii?Q?eqnBeUlMGr10e56GjwQRVVSsUslXoS4waAlXWmUh5PExJj7bqXiKUlV6Eot8?=
+ =?us-ascii?Q?Cc0mI0bNIyQVvQUzgJywC/1dE83GydYENRHdPbGwZibZsfrqez8Uz91Fv5Hn?=
+ =?us-ascii?Q?JOyX6ySOwG6UDZggubJ8fMH+zvCokUtITwf+rnhQSC6LQYbFMkavYVxIVqEp?=
+ =?us-ascii?Q?pnPv9xQvqzjA0ilYIXze88JOd2YHCkVzE5xM8R7gLiP5Y9SQhoDzDqz4br0l?=
+ =?us-ascii?Q?7V5FLPMwGhbFMsXEdRcRcrVuBqL/qiyYu3djjTXKLG+xW8jmXPDat7MZal0i?=
+ =?us-ascii?Q?SceoMcDKPt3vzPaU9DVVdJ/N0s6MM8jXilj96yUmjWSx16Qr82YbcCy6JHD7?=
+ =?us-ascii?Q?Niowg23NuPwh2IvdoIKl7G0P0gExJaaXmkdldgGLrAd3FwOC2Lo9rRtdznMa?=
+ =?us-ascii?Q?MXYYazupKIzmyjoXswF2+MqjTuKuA2e9XNGIYZsyFQ6K35gYAECzHd8Ci761?=
+ =?us-ascii?Q?QuOnF2/EjkzBe/o9EmL5nHJB/f/85cYE+UmggvWfBO9e9O2ItGHhZxFXO8yU?=
+ =?us-ascii?Q?nfHVfHfMfW3q3GL/kJkXsXi0K8r8DZaHVgg99lHOuqzWOaD1/f/adFJOozC0?=
+ =?us-ascii?Q?QzOzulLigFu4wcMrAEvPODQ6P2UKD0eoo4tGQNiZO4UMhPtBShPxjMpoA9W3?=
+ =?us-ascii?Q?hXJnPyRJHp1GQRZ+WywoqXphDNwnGof9J/ypJtIQ56FhlYpWlp8DTtD8JnLA?=
+ =?us-ascii?Q?frAiglVQTr8WfSEhHiGOZdOoLuOUvsmxwR3eHsDEq7ZFtEBg0WlBIfCg7cK1?=
+ =?us-ascii?Q?GY4mdThkvr0w7KbC9bQkfB8Lz2c/f1bYgyccfkoO8hokw2hiqNBvXr5Q7YUs?=
+ =?us-ascii?Q?Mdid+7uUWfXUV4FFT7vafTa9aCz6RCbjIgL+lvMGYi71iIk075nHPodw0g4q?=
+ =?us-ascii?Q?DKY5?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrNJsWRmVeSWpSXmKPExsWy7bCmvu7qgn/xBneWs1msvtvPZtHa/o3J
-        oudJE6vF3657TBZfHxZb7L2lbXF51xw2i+mb5zBbXLt/ht3i3MlPrBbzHjtY/Fp+lNHi1I7J
-        zBbr9/5kc+DzuHy21GPTqk42j74tqxg9Pm+S82g/0M0UwBqVY5ORmpiSWqSQmpecn5KZl26r
-        5B0c7xxvamZgqGtoaWGupJCXmJtqq+TiE6DrlpkDdKWSQlliTilQKCCxuFhJ386mKL+0JFUh
-        I7+4xFYptSAlp8DQoECvODG3uDQvXS85P9fK0MDAyBSoMiEn4+XcTUwFM9Urem5NZ25g3Cbf
-        xcjJISFgIvHvzBkmEFtIYAejxNp9HhD2J0aJbVclIOxvjBLTu21g6h9dec7WxcgFFN/LKDHz
-        wmpmiKLPjBKX12qC2GwCOhJ9b2+xgdgiApISp15+AWtgFjjHJPFizT0WkISwgKHE+eP7wYpY
-        BFQlbi0+ywpi8wpYSbzru8QEsU1e4mnvcqAFHBycArESdzdFQpQISpyc+QRsDDNQSfPW2cwg
-        8yUEZnJIPH3Rww7R6yKxY/8uZghbWOLV8S1QcSmJz+/2skE0dDNKNLfNZ4RwJjBKLHm+DGqz
-        scSnz58ZQTYzC2hKrN+lDxFWlNj5ey4jxGY+iXdfe1hBSiQEeCU62oQgSlQkzrTcZ4bZ9Xzt
-        TqiJHhIvrp5jh4TcBkaJv3++sk5gVJiF5KFZSB6ahbB5ASPzKkax1ILi3PTUYsMCQ+QI3sQI
-        TrVapjsYJ779oHeIkYmD8RCjBAezkghvUfffeCHelMTKqtSi/Pii0pzU4kOMpsDQnsgsJZqc
-        D0z2eSXxhqZGxsbGFiZm5mamxkrivEkGD+KFBNITS1KzU1MLUotg+pg4OKUamFSCxO5zRF4P
-        ChNXc5e31izIyzwfdWdB35/nuW/svb1sf7FIn1v5NXFCY9Lr6bkGJQ8Lp79NaF+g0pC+enJb
-        0fK7MbHrJ0QdemvD5Wbx9r3X/yOp/WpLIw637pryRnlliuKEs3ZPy23qeHOWVaSoveSr73ew
-        jHP8+WDrh2vB2fxy/zYyRec+8t3I8Lr1YvjHZ8Hbi0XvOZccfJliVqN10aLZv7fgm4beIZ32
-        hD62A+9/hW2/eOtSwsu1C5bEiylM7vq6NYrD7oHeL53Qz9GVLra3i7+Hnd9S0PnpW5bqBqV4
-        zp8NNZuefoqbdfHBPMmDE6SrU8L3/z/HP7sj6ewxl2f1c39bvdJcOlXr/JwFZ5VYijMSDbWY
-        i4oTAX54FDM+BAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrKLMWRmVeSWpSXmKPExsWy7bCSvO6qgn/xBjvWS1usvtvPZtHa/o3J
-        oudJE6vF3657TBZfHxZb7L2lbXF51xw2i+mb5zBbXLt/ht3i3MlPrBbzHjtY/Fp+lNHi1I7J
-        zBbr9/5kc+DzuHy21GPTqk42j74tqxg9Pm+S82g/0M0UwBrFZZOSmpNZllqkb5fAlfFy7iam
-        gpnqFT23pjM3MG6T72Lk5JAQMJF4dOU5WxcjF4eQwG5GiVVX3rFAJKQkjp94y9rFyAFkC0sc
-        PlwMUfORUeL2vzNsIDVsAjoSfW9vgdkiApISp15+ARvELHCHSWJR501mkISwgKHE+eP7wYpY
-        BFQlbi0+ywpi8wpYSbzru8QEsUxe4mnvcmaQZZwCsRJ3N0WChIUEYiS+r5rCDlEuKHFy5hOw
-        25iBypu3zmaewCgwC0lqFpLUAkamVYySqQXFuem5xYYFhnmp5XrFibnFpXnpesn5uZsYwTGh
-        pbmDcfuqD3qHGJk4GA8xSnAwK4nwFnX/jRfiTUmsrEotyo8vKs1JLT7EKM3BoiTOe6HrZLyQ
-        QHpiSWp2ampBahFMlomDU6qBSZdZe/tySfc242ylbfkT/HgvyyY1iHy/4JUo9Wft4yjJt9Mu
-        K0+fODXw2KtDRqfU12Xqrl4t7Ch9esqm2XePz7WsNuewnpQXx1diOlU64Nwy1orcC9d/L7NK
-        YS1T3ZwpLue81jjEt9A1vML0PFvqvCfhTCJNoSqpgUWfOxqKWI45VuRmz9DQ80ljVDi7bklE
-        ywWdz5x7t8a/OhL21LqOZ9Xiky/X8F9/ektf6aJH3nFF90Y256Cbi4JUc8pjZq6bNP+JvMuO
-        FSpW0kqmf/d9SInc4Rut6F8wed7yEgsfkxi+401qrvKV+8NMVWovadl5m/+6zaRR8uyImLfX
-        7rLF/rkz+5yEvkyQlLBesFuJpTgj0VCLuag4EQDvCtIe+AIAAA==
-X-CMS-MailID: 20210113040146epcas1p230596c7c3760471dca442d1f7ce4dc55
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: SVC_REQ_APPROVE
-CMS-TYPE: 101P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20210113040146epcas1p230596c7c3760471dca442d1f7ce4dc55
-References: <CH2PR04MB65225EDDA7069CCD47A459A5E7A90@CH2PR04MB6522.namprd04.prod.outlook.com>
-        <CGME20210113040146epcas1p230596c7c3760471dca442d1f7ce4dc55@epcas1p2.samsung.com>
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR04MB4965.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1ee048f2-71af-4c5b-8ac7-08d8b77a0d91
+X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Jan 2021 04:16:51.3287
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 07gPyh3WWI2GlNisDwdc8gL/4xI012/p0y1QJUNQNjq3EHLVX9SiJaGua3isF0v8bUjPOTQx0IJaYtbknTRa5VSs8MZnNU9O9N9aI4ENoVs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR04MB6884
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
->On 2021/01/12 21:14, Changheun Lee wrote:
->>> On 2021/01/12 17:52, Changheun Lee wrote:
->>>> From: "Changheun Lee" <nanich.lee@samsung.com>
->>>>
->>>> bio size can grow up to 4GB when muli-page bvec is enabled.
->>>> but sometimes it would lead to inefficient behaviors.
->>>> in case of large chunk direct I/O, - 64MB chunk read in user space -
->>>> all pages for 64MB would be merged to a bio structure if memory address is
->>>> continued phsycally. it makes some delay to submit until merge complete.
->>>> bio max size should be limited as a proper size.
->>>
->>> But merging physically contiguous pages into the same bvec + later automatic bio
->>> split on submit should give you better throughput for large IOs compared to
->>> having to issue a bio chain of smaller BIOs that are arbitrarily sized and will
->>> likely need splitting anyway (because of DMA boundaries etc).
->>>
->>> Do you have a specific case where you see higher performance with this patch
->>> applied ? On Intel, BIO_MAX_SIZE would be 1MB... That is arbitrary and too small
->>> considering that many hardware can execute larger IOs than that.
->>>
->> 
->> When I tested 32MB chunk read with O_DIRECT in android, all pages of 32MB
->> is merged into a bio structure.
->> And elapsed time to merge complete was about 2ms.
->> It means first bio-submit is after 2ms.
->> If bio size is limited with 1MB with this patch, first bio-submit is about
->> 100us by bio_full operation.
->
->bio_submit() will split the large BIO case into multiple requests while the
->small BIO case will likely result one or two requests only. That likely explain
->the time difference here. However, for the large case, the 2ms will issue ALL
->requests needed for processing the entire 32MB user IO while the 1MB bio case
->will need 32 different bio_submit() calls. So what is the actual total latency
->difference for the entire 32MB user IO ? That is I think what needs to be
->compared here.
->
->Also, what is your device max_sectors_kb and max queue depth ?
->
-
-32MB total latency is about 19ms including merge time without this patch.
-But with this patch, total latency is about 17ms including merge time too.
-Actually 32MB read time from device is same - about 16.7ms - in driver layer.
-No need to hold more I/O than max_sectors_kb during bio merge.
-My device is UFS. and max_sectors_kb is 1MB, queue depth is 32.
-
->> It's not large delay and can't be observed with low speed device.
->> But it's needed to reduce merge delay for high speed device.
->> I improved 512MB sequential read performance from 1900MB/s to 2000MB/s
->> with this patch on android platform.
->> As you said, 1MB might be small for some device.
->> But method is needed to re-size, or select the bio max size.
->
->At the very least, I think that such limit should not be arbitrary as your patch
->proposes but rely on the device characteristics (e.g.
->max_hw_sectors_kb/max_sectors_kb and queue depth).
->
-
-I agree with your opinion, I thought same as your idea. For that, deep research
-is needed, proper timing to set and bio structure modification, etc ...
-Current is simple patch for default bio max size.
-Before applying of multipage bvec, bio max size was 1MB in kernel 4.x by BIO_MAX_PAGES.
-So I think 1MB bio max size is reasonable as a default.
-
->> 
->>>
->>>>
->>>> Signed-off-by: Changheun Lee <nanich.lee@samsung.com>
->>>> ---
->>>>  block/bio.c         | 2 +-
->>>>  include/linux/bio.h | 3 ++-
->>>>  2 files changed, 3 insertions(+), 2 deletions(-)
->>>>
->>>> diff --git a/block/bio.c b/block/bio.c
->>>> index 1f2cc1fbe283..dbe14d675f28 100644
->>>> --- a/block/bio.c
->>>> +++ b/block/bio.c
->>>> @@ -877,7 +877,7 @@ bool __bio_try_merge_page(struct bio *bio, struct page *page,
->>>>  		struct bio_vec *bv = &bio->bi_io_vec[bio->bi_vcnt - 1];
->>>>  
->>>>  		if (page_is_mergeable(bv, page, len, off, same_page)) {
->>>> -			if (bio->bi_iter.bi_size > UINT_MAX - len) {
->>>> +			if (bio->bi_iter.bi_size > BIO_MAX_SIZE - len) {
->>>>  				*same_page = false;
->>>>  				return false;
->>>>  			}
->>>> diff --git a/include/linux/bio.h b/include/linux/bio.h
->>>> index 1edda614f7ce..0f49b354b1f6 100644
->>>> --- a/include/linux/bio.h
->>>> +++ b/include/linux/bio.h
->>>> @@ -20,6 +20,7 @@
->>>>  #endif
->>>>  
->>>>  #define BIO_MAX_PAGES		256
->>>> +#define BIO_MAX_SIZE		(BIO_MAX_PAGES * PAGE_SIZE)
->>>>  
->>>>  #define bio_prio(bio)			(bio)->bi_ioprio
->>>>  #define bio_set_prio(bio, prio)		((bio)->bi_ioprio = prio)
->>>> @@ -113,7 +114,7 @@ static inline bool bio_full(struct bio *bio, unsigned len)
->>>>  	if (bio->bi_vcnt >= bio->bi_max_vecs)
->>>>  		return true;
->>>>  
->>>> -	if (bio->bi_iter.bi_size > UINT_MAX - len)
->>>> +	if (bio->bi_iter.bi_size > BIO_MAX_SIZE - len)
->>>>  		return true;
->>>>  
->>>>  	return false;
->>>>
->>>
->>>
->>> -- 
->>> Damien Le Moal
->>> Western Digital Research
->> 
->
->
->-- 
->Damien Le Moal
->Western Digital Research
->
-
----
-Changheun Lee
-Samsung Electronics
-
+On 1/11/21 23:27, Christoph Hellwig wrote:=0A=
+> The Command Set Identifier has no "NVM" in its name.=0A=
+>=0A=
+>=0A=
+>> +static inline bool nvmet_cc_css_check(u8 cc_css)=0A=
+>> +{=0A=
+>> +	switch (cc_css <<=3D NVME_CC_CSS_SHIFT) {=0A=
+>> +	case NVME_CC_CSS_NVM:=0A=
+>> +		return true;=0A=
+>> +	default:=0A=
+>> +		return false;=0A=
+>> +	}=0A=
+>> +}=0A=
+> This hunk looks misplaced, it isn't very useful on its own, but=0A=
+> should go together with the multiple command set support.=0A=
+>=0A=
+We advertise the support for command sets supported in=0A=
+nvmet_init_cap() -> ctrl->cap =3D (1ULL << 37). This results in=0A=
+nvme_enable_ctrl() setting the ctrl->ctrl_config -> NVME_CC_CSS_NVM.=0A=
+In current code in nvmet_start_ctrl() ->  nvmet_cc_css(ctrl->cc) !=3D 0=0A=
+checks if value is not =3D 0 but doesn't use the macro used by the host.=0A=
+Above function does that also makes it helper that we use in the next=0A=
+patch where cc_css value is !=3D 0 but NVME_CC_CSS_CSI with=0A=
+ctrl->cap set to 1ULL << 43.=0A=
+=0A=
+With code flow in [1] above function is needed to make sure css value=0A=
+matches the value set by the host using the same macro in=0A=
+nvme_enable_ctrl() NVME_CC_CSS_NVM. Otherwise patch looks incomplete=0A=
+and adding check for the CSS NVM with CSS_CSI looks mixing up things=0A=
+to me.=0A=
+=0A=
+Are you okay with that ?=0A=
+=0A=
+[1]=0A=
+nvme_enable_ctrl()=0A=
+ ctrl->ops->reg_write32(ctrl, NVME_REG_CC, ctrl->ctrl_config)=0A=
+  nvmf_reg_write32()=0A=
+   nvmet_parse_fabrics_cmd()=0A=
+    nvmet_execute_prop_set()=0A=
+     nvmet_update_ctrl()=0A=
+      new cc !=3D old cc =3D=3D true -> nvmet_start_ctrl()=0A=
+       nvmet_cc_css_check(ctrl->css)=0A=
+        Check if host has set the for controller config NVME_CC_CSS_NVM=0A=
+        as we are supporting default CSS_NVM which ctrl needs to set=0A=
+        irrespective of other CC_CSS values.=0A=
+      =0A=
+ =0A=
+=0A=
+=0A=
