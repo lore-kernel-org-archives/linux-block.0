@@ -2,370 +2,324 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 160B1C433E0
-	for <linux-block@archiver.kernel.org>; Wed, 13 Jan 2021 05:54:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47482C43381
+	for <linux-block@archiver.kernel.org>; Wed, 13 Jan 2021 06:55:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AF3CC23125
-	for <linux-block@archiver.kernel.org>; Wed, 13 Jan 2021 05:54:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0536E22D58
+	for <linux-block@archiver.kernel.org>; Wed, 13 Jan 2021 06:55:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726239AbhAMFyb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Jan 2021 00:54:31 -0500
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:49429 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726113AbhAMFya (ORCPT
+        id S1726262AbhAMGzb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Jan 2021 01:55:31 -0500
+Received: from mailout1.samsung.com ([203.254.224.24]:31450 "EHLO
+        mailout1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726253AbhAMGzb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Jan 2021 00:54:30 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1610517270; x=1642053270;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=jkqFbtFlFgAdN6sKoSe5w/pkCC18udg4WHCbRBmqwUA=;
-  b=B3n+UJ0/838M9fEo5zF04grzmmpWBYjMTOokqAgIu36Y1geZFztp2UPd
-   Xga5CRfbyXbyMr7k5ZeK4xSyis4A9ibeaOogHpwJnIGZ36HtPhktPaLBM
-   6bO9Kgvxb2se/jeK2mVUiGtoQdFFKe3b4zq6M1HFhk2hnoPh1HHr2bNGY
-   FVIn5ZaIf4XqO0wiAcKxMDkKoctYeq6KG+vcAIRgWJgCOOb0QPzzHR5XP
-   QGfsSB3M9AP7ci1yOz3bU8b2fa0ey9lkyBBzlvj5FoWsaPsoZc81b99y7
-   LCN03K9pQHgAkFHtsMd4NzSoh7mixjAUFnJ/gagEl+RV5k56tq5xKjQnO
-   g==;
-IronPort-SDR: l5SVX+tPhKE23raR8Jrw9w8futWM42yX4bTerTvrQFigRY6pnrO8ZhpVAUICF3bogg+Wt4cy78
- TnGOTTwBGZRmCuUK6cz6jpv9fRKRInFvxxZoR2ot9+m7mlZKG4iiO528sVu2XcDKdmpbX15Yb/
- uOJklyr6AChf4bcvJ3WmDrT2rdnHxT+z3ai22xwNcwJS4+TZ8MfOdxaqRw+NVet5JPkaRhM879
- Lv3pSoaceQB41sCZSwpfNvBdkfRcHxcqTHVXFXVeLlbgE2zemiDZLf0BX7js58ZRC8bN7xVgvz
- dZU=
-X-IronPort-AV: E=Sophos;i="5.79,343,1602518400"; 
-   d="scan'208";a="158482579"
-Received: from mail-sn1nam02lp2059.outbound.protection.outlook.com (HELO NAM02-SN1-obe.outbound.protection.outlook.com) ([104.47.36.59])
-  by ob1.hgst.iphmx.com with ESMTP; 13 Jan 2021 13:53:24 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OjTN9OqVlfTE9F4fENLp2+Zd6WS7i/7tIIU8hD7qKWzyJGZcY/LsytO1Jbo6Abtr72kdXx1DxQdPFAFOiZLzH0sTpJRhn/7TjuUt9332LkkkDCF2ldMnaxkOJioclgwSlkARI0qYea0Ht/FdKjUiFmhhAApyvHLOGDBkbncmoFDqQgZMoJSwG0lyhAVLO+UPE+o1MFgDobSXxl4Q5L3aBW61aGWcE85PF0o7IOD3BIIkQvDsDB3RZsgzAw6VrnVI0OKh9pskBBWvy27b2YQsubMdD1CVFijwFCOlU4nZSKV4ZFKjKLP4B1R296342xgXb7US5p681nRtvRJEiiAdMw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Tbt92DQZAVhGP0zEP0lRUSh1yCLjCHU2zQROKr42RBY=;
- b=Gv+TvTvLjRD3IQxod0TcG0dBDnMM7Fmi2AFKDj3aTcIkQgX8T3b6zYT0l96DCTSOCugmRwtbMz9etiChbFH2e3tVUJxQNOw5LoDrzzL30TQUclpLaqGbru+l/B+oxxzY9JT00yTrw0YEx3yjes57zU0jPDcZCuuf5jb4fOBhOBUcGTRxjWxRx/DXYjTcuTDp3WAqIDJ44YTHzH7iv1oCVtxMcHxU5v5uPIpIjbrIm/R68kXJQPmFDWJpZK28EI0jBUgodphw8+xvmXiS7Xmr8kFW4d7jmzH8jC2xNfwc1LfB7LeN9f6OgXn08M87E43oo82tMDMmXJgG954+YQOTgw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Tbt92DQZAVhGP0zEP0lRUSh1yCLjCHU2zQROKr42RBY=;
- b=vm5+dRnvLHinMD2SQdOw+UOct5tiSRkmuUsM5B1X8jHbJf3PNqrjy3Q3NP3wx6TfX/smFmwplxZnAHEFijLv4Rd7JakS0DPsbWZkMZG4C+WIBHje6U4GHFwnTYKBTcxcvRb73vXyi2g2lKoqoEnVjZxxAhxXLXNHaIYTlsnItr8=
-Received: from CH2PR04MB6522.namprd04.prod.outlook.com (2603:10b6:610:34::19)
- by CH2PR04MB6645.namprd04.prod.outlook.com (2603:10b6:610:92::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3763.10; Wed, 13 Jan
- 2021 05:53:21 +0000
-Received: from CH2PR04MB6522.namprd04.prod.outlook.com
- ([fe80::897c:a04b:4eb0:640a]) by CH2PR04MB6522.namprd04.prod.outlook.com
- ([fe80::897c:a04b:4eb0:640a%8]) with mapi id 15.20.3742.012; Wed, 13 Jan 2021
- 05:53:21 +0000
-From:   Damien Le Moal <Damien.LeMoal@wdc.com>
-To:     Changheun Lee <nanich.lee@samsung.com>
-CC:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "jisoo2146.oh@samsung.com" <jisoo2146.oh@samsung.com>,
-        "junho89.kim@samsung.com" <junho89.kim@samsung.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "mj0123.lee@samsung.com" <mj0123.lee@samsung.com>,
-        "seunghwan.hyun@samsung.com" <seunghwan.hyun@samsung.com>,
-        "sookwan7.kim@samsung.com" <sookwan7.kim@samsung.com>,
-        "tj@kernel.org" <tj@kernel.org>,
-        "yt0928.kim@samsung.com" <yt0928.kim@samsung.com>,
-        "woosung2.lee@samsung.com" <woosung2.lee@samsung.com>
-Subject: Re: [PATCH] bio: limit bio max size.
-Thread-Topic: [PATCH] bio: limit bio max size.
-Thread-Index: AQHW6XBl+2obOSh/hUezqTwOunqlOg==
-Date:   Wed, 13 Jan 2021 05:53:21 +0000
-Message-ID: <CH2PR04MB6522091DE371F5EB7EE98200E7A90@CH2PR04MB6522.namprd04.prod.outlook.com>
-References: <CH2PR04MB65225EDDA7069CCD47A459A5E7A90@CH2PR04MB6522.namprd04.prod.outlook.com>
- <CGME20210113040146epcas1p230596c7c3760471dca442d1f7ce4dc55@epcas1p2.samsung.com>
- <20210113034637.1382-1-nanich.lee@samsung.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: samsung.com; dkim=none (message not signed)
- header.d=none;samsung.com; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [2400:2411:43c0:6000:e53d:bea0:4863:19b6]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: d0057f6c-036a-4313-7613-08d8b7878893
-x-ms-traffictypediagnostic: CH2PR04MB6645:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <CH2PR04MB6645691857ACCB29D8C7C671E7A90@CH2PR04MB6645.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:6430;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 6PM/cW047ZRI+SCymPTDWmxWyXDQpanbZhYg8keYj8CxKqyFSrC6EFGvsK9wlqNecvoZxVNCTPFhr2Z6nz58eqdRXX/BhCievP/A6STtXU3wGaffAs+W0p8UqMcoOYgQgs8B6o+0i5WwlA3xliDQcIPQW0rrkSKA0RqCLz+7EzCsvT2Mnri2TwbYd1LxlEpqSCUU1dod7lmz8ea/AdXWOO7IpLvvj0bWgesJKZ5AIoUClt88JLPccWzhoMSWKeDRYQTwCzMbiFM++HKBIK93bVkz5bdV8/oJ3UqDc+vbiVHGS5FR0RHi7Kix2lDQ6PGhwLfuQ6+HD2CepeULL918+LIMdCfe0HdX7MWuq9sUeTNrVEkY5oxdZ2nGgQeM7Vb0+mt+FlXMhCTCaMGTWFUtIg==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR04MB6522.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(396003)(346002)(366004)(376002)(39860400002)(6916009)(7416002)(186003)(8936002)(83380400001)(53546011)(2906002)(9686003)(8676002)(55016002)(4326008)(478600001)(7696005)(54906003)(71200400001)(316002)(33656002)(66946007)(6506007)(91956017)(76116006)(66476007)(66556008)(64756008)(66446008)(86362001)(52536014)(5660300002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: =?us-ascii?Q?WEhWhDKgBwPOI1Rxr2qK3cB8tKCbWRDzebZrDikYBm7BJNXkWaZVPWOpZyLw?=
- =?us-ascii?Q?cwz+Z2nI8HaEE/SK1KqyQMo/smwkNni5NGdzSWxki7FPyMCV7CH+ln2MnVsO?=
- =?us-ascii?Q?g/KbVHTYNqBr9zAEoouYhJK8y5FcELXHp0We8PwkNxSrNAZFRt3a9/8GqEru?=
- =?us-ascii?Q?OUdSB8E+EsXxR6AZv4xgOm3aS2t9miZBU84rFnrI0dNt4wqww1/lTEgkzL2g?=
- =?us-ascii?Q?B81a18ehP2EJo30iml7RooB0SFgpqe7dgWqFirxycZud1V0ltnk62nQM2878?=
- =?us-ascii?Q?k/n58tTCyPDkro/IRNFmRr42xey5jubD+fbzE1xf+cxnD2mkeNhiFOJpEFdr?=
- =?us-ascii?Q?lJTNNOabZK8fR35BR8j9ckPZAn8ILxxlK1OmDXlVWwQ12YOu+CEThXuLRXPS?=
- =?us-ascii?Q?DF+9l+Wq04h0t4deECsBKYp2dsJvopz5l/L3mnAg6znSXzi+ChREjL/KWcpc?=
- =?us-ascii?Q?1NbZv8fCtUhWZyk6/Ale/7Zm+YNa1oIXabbLl93TZ4XP3tK51RozuObD7dCr?=
- =?us-ascii?Q?CI9xJJ8Umn8psyeQJP9bwRNm4HMimrRccMqwizTVY8lw186t9+kZHnIsLpJu?=
- =?us-ascii?Q?NsnzWkACnHAigfHF2wrzlHOp4Q3LUl+ftfvrsZmPkxkiOGGYfJ7Xua0KDjVZ?=
- =?us-ascii?Q?Hsz38LOSdncw6l+L36LB6D3lGWzVOuPQMI03biPJgdD1oa7WMtWY+XIRSyfJ?=
- =?us-ascii?Q?EQwi+oKf5xhoUFL3YSonZtcJLWm7PjZ0iNTl9p2liixJoV5PaXGmLmcfvb+h?=
- =?us-ascii?Q?gdS8kS/8A5k8kWVdSvlEMF9J26Upxm/LauRzDd6RiXEh9Kra7f0bg6cibfiH?=
- =?us-ascii?Q?hGeEIKKXrmqJsx7U52Ov+JcMzcircfSglw/oExlvo0csTkfcalgQTZXpd8rq?=
- =?us-ascii?Q?+wZia1A9VdOsJQWBUlC1ewVSaaq3gQ0SFrUCNV5wNfuyK/c5myJ89ZPRwlD7?=
- =?us-ascii?Q?repGVBnYOU36kSmo3kQ5ypV4+X6ulWToi2Ma4IuUVqpeRzXy+LMcgmHXNS9Q?=
- =?us-ascii?Q?tP/A+WEasK977mFAZYGQTgFvUJ/1bDMbMqwlN9SA1d0wJWo8IrQjCRWTYcMM?=
- =?us-ascii?Q?GNujr/oK?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Wed, 13 Jan 2021 01:55:31 -0500
+Received: from epcas1p3.samsung.com (unknown [182.195.41.47])
+        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20210113065447epoutp01d9ad050b429e0e862977a6436b3cc420~ZuDbUBd7H2140421404epoutp01k
+        for <linux-block@vger.kernel.org>; Wed, 13 Jan 2021 06:54:47 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20210113065447epoutp01d9ad050b429e0e862977a6436b3cc420~ZuDbUBd7H2140421404epoutp01k
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1610520887;
+        bh=zWXBIIAXQJNXur5seyEPbGyVF5FgrOOYhvfIEgU2lFA=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=qX7Ibx0wGd8aE0IUPQ6PeBnQmYbBsVrZDrVhkniz3Ceeo5ID2YzkfNmlz5Q8fvNZ6
+         sJmYpKneVyeswB1gHKFIxvbZxkX/tqTRPX0Y+NrqCdSI8m2DhsEBmoQqnubyZUkjwn
+         lG8j5fALlkEF0//hpdpVhEPyQXIVA5DmTQuoa0BE=
+Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
+        epcas1p3.samsung.com (KnoxPortal) with ESMTP id
+        20210113065446epcas1p3ff93c64b760fcb09c2fe9cb9cc40d5b5~ZuDauUu3H0235302353epcas1p3V;
+        Wed, 13 Jan 2021 06:54:46 +0000 (GMT)
+Received: from epsmges1p2.samsung.com (unknown [182.195.40.164]) by
+        epsnrtp3.localdomain (Postfix) with ESMTP id 4DFyqT0B3Vz4x9Q3; Wed, 13 Jan
+        2021 06:54:45 +0000 (GMT)
+Received: from epcas1p2.samsung.com ( [182.195.41.46]) by
+        epsmges1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
+        7E.53.63458.4399EFF5; Wed, 13 Jan 2021 15:54:44 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas1p4.samsung.com (KnoxPortal) with ESMTPA id
+        20210113065444epcas1p4b8ee3edb314a06b1a9f92fd0e38ca856~ZuDYXozSv1980219802epcas1p4Q;
+        Wed, 13 Jan 2021 06:54:44 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20210113065444epsmtrp2ebf5f8b6db6f2379a06111de2f1d7113~ZuDYWwmXB2869128691epsmtrp2N;
+        Wed, 13 Jan 2021 06:54:44 +0000 (GMT)
+X-AuditID: b6c32a36-6c9ff7000000f7e2-27-5ffe9934fbc0
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        A4.0F.13470.4399EFF5; Wed, 13 Jan 2021 15:54:44 +0900 (KST)
+Received: from localhost.localdomain (unknown [10.253.99.105]) by
+        epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+        20210113065444epsmtip10130def02eda1c35f866b5b203a49c47~ZuDYKuFJI0749307493epsmtip1U;
+        Wed, 13 Jan 2021 06:54:44 +0000 (GMT)
+From:   Changheun Lee <nanich.lee@samsung.com>
+To:     damien.lemoal@wdc.com
+Cc:     Johannes.Thumshirn@wdc.com, axboe@kernel.dk,
+        jisoo2146.oh@samsung.com, junho89.kim@samsung.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        mj0123.lee@samsung.com, nanich.lee@samsung.com,
+        seunghwan.hyun@samsung.com, sookwan7.kim@samsung.com,
+        tj@kernel.org, woosung2.lee@samsung.com, yt0928.kim@samsung.com
+Subject: Re: Re: [PATCH] bio: limit bio max size.
+Date:   Wed, 13 Jan 2021 15:39:36 +0900
+Message-Id: <20210113063936.4189-1-nanich.lee@samsung.com>
+X-Mailer: git-send-email 2.28.0
+In-Reply-To: <CH2PR04MB6522091DE371F5EB7EE98200E7A90@CH2PR04MB6522.namprd04.prod.outlook.com>
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CH2PR04MB6522.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d0057f6c-036a-4313-7613-08d8b7878893
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Jan 2021 05:53:21.1085
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: YRknsuizfvELHbdV6w33Q8hIcF7DkgtqEyaZGVB2Eac0QYUyusbX/+h10WKlMouizHyXjBH836fthn/MFHh7ZQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR04MB6645
+Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrHJsWRmVeSWpSXmKPExsWy7bCmnq7JzH/xBm/mWFisvtvPZtHa/o3J
+        oudJE6vF3657TBZfHxZb7L2lbXF51xw2i+mb5zBbXLt/ht3i3MlPrBbzHjtY/Fp+lNHi1I7J
+        zBbr9/5kc+DzuHy21GPTqk42j74tqxg9Pm+S82g/0M0UwBqVY5ORmpiSWqSQmpecn5KZl26r
+        5B0c7xxvamZgqGtoaWGupJCXmJtqq+TiE6DrlpkDdKWSQlliTilQKCCxuFhJ386mKL+0JFUh
+        I7+4xFYptSAlp8DQoECvODG3uDQvXS85P9fK0MDAyBSoMiEnY+qK9ywF9+0qXpz6y9rAuNuo
+        i5GTQ0LAROJF20Y2EFtIYAejxNSrXl2MXED2J0aJN/tuMUM43xglnvY3M8F0POz8yAjRsZdR
+        4vAHqKLPjBLnXjawgiTYBHQk+t7eAhsrIiApcerlFzaQImaBc0wSR9c/ASsSFjCUOH98P1gR
+        i4CqxP9XK5lBbF4BK4mn29rYIbbJSzztXQ4W5xSIlZiyYB8rRI2gxMmZT1hAbGagmuats8Gu
+        kBCYySHRfXg5G0Szi8S9/UdZIGxhiVfHt0ANlZL4/G4vG0RDN6NEc9t8RghnAqPEkufLoB41
+        lvj0+TNQggNohabE+l36EGFFiZ2/5zJCbOaTePe1hxWkREKAV6KjTQiiREXiTMt9Zphdz9fu
+        hJroITFnzQVWSHBtYJRYveoI4wRGhVlIHpqF5KFZCJsXMDKvYhRLLSjOTU8tNiwwQo7jTYzg
+        hKtltoNx0tsPeocYmTgYDzFKcDArifAWdf+NF+JNSaysSi3Kjy8qzUktPsRoCgzuicxSosn5
+        wJSfVxJvaGpkbGxsYWJmbmZqrCTOm2jwIF5IID2xJDU7NbUgtQimj4mDU6qBqT9h3aP62C8l
+        sle6AxY1hDIq5eo6prkwz2X8L++dxTvxjM7l2Ywbl8RO1ZX7l8wQ+D/3wo41cUzL7r07l6/6
+        yu9en8MyJhFlxcTaKxtdH57e6vv4ov38p+L2vE/cYgUmTlpxfuVywV8SBxZeZprAr/ZzUfnH
+        L28/SRmrSjycleU2/2TaTVGueVkOW2+JGrIXuYQfji9q01r4Jri7RNkq7NKnJIXiK2d91yYk
+        Gb6sECifxL/fUj479xfjHP+iH3GuPXuYZXsi/998dsnq94Ta1dOUOqd7vfaoFN/5OFh5buPx
+        e8HLT7ZLWDzUCbFctXX9Em+Jd6lSTm+n/8vuPO8asv2mZOGh7YvPCZ7YMCF7phJLcUaioRZz
+        UXEiADVwi3tBBAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrKLMWRmVeSWpSXmKPExsWy7bCSnK7JzH/xBru3cVisvtvPZtHa/o3J
+        oudJE6vF3657TBZfHxZb7L2lbXF51xw2i+mb5zBbXLt/ht3i3MlPrBbzHjtY/Fp+lNHi1I7J
+        zBbr9/5kc+DzuHy21GPTqk42j74tqxg9Pm+S82g/0M0UwBrFZZOSmpNZllqkb5fAlTF1xXuW
+        gvt2FS9O/WVtYNxt1MXIySEhYCLxsPMjYxcjF4eQwG5GieuPTrNDJKQkjp94y9rFyAFkC0sc
+        PlwMEhYS+MgocaYpA8RmE9CR6Ht7iw3EFhGQlDj18gsbyBxmgTtMEhsmrmMFSQgLGEqcP74f
+        rIhFQFXi/6uVzCA2r4CVxNNtbVC75CWe9i4Hi3MKxEpMWbCPFWJZjMTOvZtZIeoFJU7OfMIC
+        YjMD1Tdvnc08gVFgFpLULCSpBYxMqxglUwuKc9Nziw0LDPNSy/WKE3OLS/PS9ZLzczcxgmNC
+        S3MH4/ZVH/QOMTJxMB5ilOBgVhLhLer+Gy/Em5JYWZValB9fVJqTWnyIUZqDRUmc90LXyXgh
+        gfTEktTs1NSC1CKYLBMHp1QD04SrYdnfMmznHYlcoCP9zUVToN3wwganpuY6heYSA6PYMP2O
+        7jzd9LTX55/NstnxaKKd+UtmZyO7/s6y7YHBV31Dpav+N/f5fnp3i/vb1wnu3fpzqj8bzmLn
+        zBfaaLhhb99ZtaupRanTElMN55jxGP5JaplhLpB0eV6uVLWJc0Tyww9vw5atKmn+mdGwqtdy
+        Q7/79baiWaKlGRn9p69pfNq7Yl5Y+4slU/X7hUPla0sNOQp4tq64t0Lg+wGBpvxVi8QaNOSV
+        3HPm9RzWEikQczsbm/Rid1qNXN/rds/iwp9soudWTWdu+zPbtenMzi8i97a/MN980Tfxmdmi
+        k/1WZrpuy36dOOj8Y9eqpn1KLMUZiYZazEXFiQCnu7V6+AIAAA==
+X-CMS-MailID: 20210113065444epcas1p4b8ee3edb314a06b1a9f92fd0e38ca856
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: SVC_REQ_APPROVE
+CMS-TYPE: 101P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20210113065444epcas1p4b8ee3edb314a06b1a9f92fd0e38ca856
+References: <CH2PR04MB6522091DE371F5EB7EE98200E7A90@CH2PR04MB6522.namprd04.prod.outlook.com>
+        <CGME20210113065444epcas1p4b8ee3edb314a06b1a9f92fd0e38ca856@epcas1p4.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2021/01/13 13:01, Changheun Lee wrote:=0A=
->> On 2021/01/12 21:14, Changheun Lee wrote:=0A=
->>>> On 2021/01/12 17:52, Changheun Lee wrote:=0A=
->>>>> From: "Changheun Lee" <nanich.lee@samsung.com>=0A=
->>>>>=0A=
->>>>> bio size can grow up to 4GB when muli-page bvec is enabled.=0A=
->>>>> but sometimes it would lead to inefficient behaviors.=0A=
->>>>> in case of large chunk direct I/O, - 64MB chunk read in user space -=
-=0A=
->>>>> all pages for 64MB would be merged to a bio structure if memory addre=
-ss is=0A=
->>>>> continued phsycally. it makes some delay to submit until merge comple=
-te.=0A=
->>>>> bio max size should be limited as a proper size.=0A=
->>>>=0A=
->>>> But merging physically contiguous pages into the same bvec + later aut=
-omatic bio=0A=
->>>> split on submit should give you better throughput for large IOs compar=
-ed to=0A=
->>>> having to issue a bio chain of smaller BIOs that are arbitrarily sized=
- and will=0A=
->>>> likely need splitting anyway (because of DMA boundaries etc).=0A=
->>>>=0A=
->>>> Do you have a specific case where you see higher performance with this=
- patch=0A=
->>>> applied ? On Intel, BIO_MAX_SIZE would be 1MB... That is arbitrary and=
- too small=0A=
->>>> considering that many hardware can execute larger IOs than that.=0A=
->>>>=0A=
->>>=0A=
->>> When I tested 32MB chunk read with O_DIRECT in android, all pages of 32=
-MB=0A=
->>> is merged into a bio structure.=0A=
->>> And elapsed time to merge complete was about 2ms.=0A=
->>> It means first bio-submit is after 2ms.=0A=
->>> If bio size is limited with 1MB with this patch, first bio-submit is ab=
-out=0A=
->>> 100us by bio_full operation.=0A=
->>=0A=
->> bio_submit() will split the large BIO case into multiple requests while =
-the=0A=
->> small BIO case will likely result one or two requests only. That likely =
-explain=0A=
->> the time difference here. However, for the large case, the 2ms will issu=
-e ALL=0A=
->> requests needed for processing the entire 32MB user IO while the 1MB bio=
- case=0A=
->> will need 32 different bio_submit() calls. So what is the actual total l=
-atency=0A=
->> difference for the entire 32MB user IO ? That is I think what needs to b=
-e=0A=
->> compared here.=0A=
->>=0A=
->> Also, what is your device max_sectors_kb and max queue depth ?=0A=
->>=0A=
-> =0A=
-> 32MB total latency is about 19ms including merge time without this patch.=
-=0A=
-> But with this patch, total latency is about 17ms including merge time too=
-.=0A=
-> Actually 32MB read time from device is same - about 16.7ms - in driver la=
-yer.=0A=
-> No need to hold more I/O than max_sectors_kb during bio merge.=0A=
-> My device is UFS. and max_sectors_kb is 1MB, queue depth is 32.=0A=
-=0A=
-This may be due to the CPU being slow: it takes time to build the 32MB BIO,=
-=0A=
-during which the device is idling. With the 1MB BIO limit, the first BIO hi=
-ts=0A=
-the drive much more quickly, reducing idle time of the device and leading t=
-o=0A=
-higher throughput. But there are 31 more BIOs to build and issue after the =
-first=0A=
-one... That does create a pipeline of requests keeping the device busy, but=
- that=0A=
-also likely keeps your CPU a lot more busy building these additional BIOs.=
-=0A=
-Overall, do you see a difference in CPU load for the 32MB BIO case vs the 1=
-MB=0A=
-max BIO case ? Any increase in CPU load with the lower BIO size limit ?=0A=
-=0A=
-> =0A=
->>> It's not large delay and can't be observed with low speed device.=0A=
->>> But it's needed to reduce merge delay for high speed device.=0A=
->>> I improved 512MB sequential read performance from 1900MB/s to 2000MB/s=
-=0A=
->>> with this patch on android platform.=0A=
->>> As you said, 1MB might be small for some device.=0A=
->>> But method is needed to re-size, or select the bio max size.=0A=
->>=0A=
->> At the very least, I think that such limit should not be arbitrary as yo=
-ur patch=0A=
->> proposes but rely on the device characteristics (e.g.=0A=
->> max_hw_sectors_kb/max_sectors_kb and queue depth).=0A=
->>=0A=
-> =0A=
-> I agree with your opinion, I thought same as your idea. For that, deep re=
-search=0A=
-> is needed, proper timing to set and bio structure modification, etc ...=
-=0A=
-=0A=
-Why would you need any BIO structure modifications ? Your patch is on the r=
-ight=0A=
-track if limiting the BIO size is the right solution (I am not still comple=
-tely=0A=
-convinced). E.g., the code:=0A=
-=0A=
-	if (page_is_mergeable(bv, page, len, off, same_page)) {=0A=
-		if (bio->bi_iter.bi_size > BIO_MAX_SIZE - len) {=0A=
-			*same_page =3D false;=0A=
-			return false;=0A=
-	}=0A=
-=0A=
-could just become:=0A=
-=0A=
-	if (page_is_mergeable(bv, page, len, off, same_page)) {=0A=
-		if (bio->bi_iter.bi_size > bio_max_size(bio) - len) {=0A=
-			*same_page =3D false;=0A=
-			return false;=0A=
-	}=0A=
-=0A=
-With bio_max_size() being something like:=0A=
-=0A=
-static inline size_t bio_max_size(struct bio *bio)=0A=
-{=0A=
-	sector_t max_sectors =3D blk_queue_get_max_sectors(bio->bi_disk->queue,=0A=
-						         bio_op(bio));=0A=
-=0A=
-	return max_sectors << SECTOR_SHIFT;=0A=
-}=0A=
-=0A=
-Note that this is not super efficient as a BIO maximum size depends on the =
-BIO=0A=
-offset too (its start sector). So writing something similar to=0A=
-blk_rq_get_max_sectors() would probably be better.=0A=
-=0A=
-> Current is simple patch for default bio max size.=0A=
-> Before applying of multipage bvec, bio max size was 1MB in kernel 4.x by =
-BIO_MAX_PAGES.=0A=
-> So I think 1MB bio max size is reasonable as a default.=0A=
-=0A=
-max_sectors_kb is always defined for any block device so I do not think the=
-re is=0A=
-a need for any arbitrary default value.=0A=
-=0A=
-Since such optimization likely very much depend on the speed of the system =
-CPU=0A=
-and of the storage device used, it may be a good idea to have this configur=
-able=0A=
-through sysfs. That is, bio_max_size() simply returns UINT_MAX leading to n=
-o=0A=
-change from the current behavior if the optimization is disabled (default) =
-and=0A=
-max_sectors_kb if it is enabled.=0A=
-=0A=
-> =0A=
->>>=0A=
->>>>=0A=
->>>>>=0A=
->>>>> Signed-off-by: Changheun Lee <nanich.lee@samsung.com>=0A=
->>>>> ---=0A=
->>>>>  block/bio.c         | 2 +-=0A=
->>>>>  include/linux/bio.h | 3 ++-=0A=
->>>>>  2 files changed, 3 insertions(+), 2 deletions(-)=0A=
->>>>>=0A=
->>>>> diff --git a/block/bio.c b/block/bio.c=0A=
->>>>> index 1f2cc1fbe283..dbe14d675f28 100644=0A=
->>>>> --- a/block/bio.c=0A=
->>>>> +++ b/block/bio.c=0A=
->>>>> @@ -877,7 +877,7 @@ bool __bio_try_merge_page(struct bio *bio, struct=
- page *page,=0A=
->>>>>  		struct bio_vec *bv =3D &bio->bi_io_vec[bio->bi_vcnt - 1];=0A=
->>>>>  =0A=
->>>>>  		if (page_is_mergeable(bv, page, len, off, same_page)) {=0A=
->>>>> -			if (bio->bi_iter.bi_size > UINT_MAX - len) {=0A=
->>>>> +			if (bio->bi_iter.bi_size > BIO_MAX_SIZE - len) {=0A=
->>>>>  				*same_page =3D false;=0A=
->>>>>  				return false;=0A=
->>>>>  			}=0A=
->>>>> diff --git a/include/linux/bio.h b/include/linux/bio.h=0A=
->>>>> index 1edda614f7ce..0f49b354b1f6 100644=0A=
->>>>> --- a/include/linux/bio.h=0A=
->>>>> +++ b/include/linux/bio.h=0A=
->>>>> @@ -20,6 +20,7 @@=0A=
->>>>>  #endif=0A=
->>>>>  =0A=
->>>>>  #define BIO_MAX_PAGES		256=0A=
->>>>> +#define BIO_MAX_SIZE		(BIO_MAX_PAGES * PAGE_SIZE)=0A=
->>>>>  =0A=
->>>>>  #define bio_prio(bio)			(bio)->bi_ioprio=0A=
->>>>>  #define bio_set_prio(bio, prio)		((bio)->bi_ioprio =3D prio)=0A=
->>>>> @@ -113,7 +114,7 @@ static inline bool bio_full(struct bio *bio, unsi=
-gned len)=0A=
->>>>>  	if (bio->bi_vcnt >=3D bio->bi_max_vecs)=0A=
->>>>>  		return true;=0A=
->>>>>  =0A=
->>>>> -	if (bio->bi_iter.bi_size > UINT_MAX - len)=0A=
->>>>> +	if (bio->bi_iter.bi_size > BIO_MAX_SIZE - len)=0A=
->>>>>  		return true;=0A=
->>>>>  =0A=
->>>>>  	return false;=0A=
->>>>>=0A=
->>>>=0A=
->>>>=0A=
->>>> -- =0A=
->>>> Damien Le Moal=0A=
->>>> Western Digital Research=0A=
->>>=0A=
->>=0A=
->>=0A=
->> -- =0A=
->> Damien Le Moal=0A=
->> Western Digital Research=0A=
->>=0A=
-> =0A=
-> ---=0A=
-> Changheun Lee=0A=
-> Samsung Electronics=0A=
-> =0A=
-> =0A=
-=0A=
-=0A=
--- =0A=
-Damien Le Moal=0A=
-Western Digital Research=0A=
+>On 2021/01/13 13:01, Changheun Lee wrote:
+>>> On 2021/01/12 21:14, Changheun Lee wrote:
+>>>>> On 2021/01/12 17:52, Changheun Lee wrote:
+>>>>>> From: "Changheun Lee" <nanich.lee@samsung.com>
+>>>>>>
+>>>>>> bio size can grow up to 4GB when muli-page bvec is enabled.
+>>>>>> but sometimes it would lead to inefficient behaviors.
+>>>>>> in case of large chunk direct I/O, - 64MB chunk read in user space -
+>>>>>> all pages for 64MB would be merged to a bio structure if memory address is
+>>>>>> continued phsycally. it makes some delay to submit until merge complete.
+>>>>>> bio max size should be limited as a proper size.
+>>>>>
+>>>>> But merging physically contiguous pages into the same bvec + later automatic bio
+>>>>> split on submit should give you better throughput for large IOs compared to
+>>>>> having to issue a bio chain of smaller BIOs that are arbitrarily sized and will
+>>>>> likely need splitting anyway (because of DMA boundaries etc).
+>>>>>
+>>>>> Do you have a specific case where you see higher performance with this patch
+>>>>> applied ? On Intel, BIO_MAX_SIZE would be 1MB... That is arbitrary and too small
+>>>>> considering that many hardware can execute larger IOs than that.
+>>>>>
+>>>>
+>>>> When I tested 32MB chunk read with O_DIRECT in android, all pages of 32MB
+>>>> is merged into a bio structure.
+>>>> And elapsed time to merge complete was about 2ms.
+>>>> It means first bio-submit is after 2ms.
+>>>> If bio size is limited with 1MB with this patch, first bio-submit is about
+>>>> 100us by bio_full operation.
+>>>
+>>> bio_submit() will split the large BIO case into multiple requests while the
+>>> small BIO case will likely result one or two requests only. That likely explain
+>>> the time difference here. However, for the large case, the 2ms will issue ALL
+>>> requests needed for processing the entire 32MB user IO while the 1MB bio case
+>>> will need 32 different bio_submit() calls. So what is the actual total latency
+>>> difference for the entire 32MB user IO ? That is I think what needs to be
+>>> compared here.
+>>>
+>>> Also, what is your device max_sectors_kb and max queue depth ?
+>>>
+>> 
+>> 32MB total latency is about 19ms including merge time without this patch.
+>> But with this patch, total latency is about 17ms including merge time too.
+>> Actually 32MB read time from device is same - about 16.7ms - in driver layer.
+>> No need to hold more I/O than max_sectors_kb during bio merge.
+>> My device is UFS. and max_sectors_kb is 1MB, queue depth is 32.
+>
+>This may be due to the CPU being slow: it takes time to build the 32MB BIO,
+>during which the device is idling. With the 1MB BIO limit, the first BIO hits
+>the drive much more quickly, reducing idle time of the device and leading to
+>higher throughput. But there are 31 more BIOs to build and issue after the first
+>one... That does create a pipeline of requests keeping the device busy, but that
+>also likely keeps your CPU a lot more busy building these additional BIOs.
+>Overall, do you see a difference in CPU load for the 32MB BIO case vs the 1MB
+>max BIO case ? Any increase in CPU load with the lower BIO size limit ?
+>
+
+CPU load is more than 32MB bio size. Because bio_sumbit progress is doing in parallel.
+But I tested it same CPU operation frequency, So there are no difference of CPU speed.
+Logically, bio max size is 4GB now. it's not realistic I know, but 4GB merge to a bio
+will takes much time even if CPU works fast.
+This is why I think bio max size should be limited.
+
+>> 
+>>>> It's not large delay and can't be observed with low speed device.
+>>>> But it's needed to reduce merge delay for high speed device.
+>>>> I improved 512MB sequential read performance from 1900MB/s to 2000MB/s
+>>>> with this patch on android platform.
+>>>> As you said, 1MB might be small for some device.
+>>>> But method is needed to re-size, or select the bio max size.
+>>>
+>>> At the very least, I think that such limit should not be arbitrary as your patch
+>>> proposes but rely on the device characteristics (e.g.
+>>> max_hw_sectors_kb/max_sectors_kb and queue depth).
+>>>
+>> 
+>> I agree with your opinion, I thought same as your idea. For that, deep research
+>> is needed, proper timing to set and bio structure modification, etc ...
+>
+>Why would you need any BIO structure modifications ? Your patch is on the right
+>track if limiting the BIO size is the right solution (I am not still completely
+>convinced). E.g., the code:
+>
+>if (page_is_mergeable(bv, page, len, off, same_page)) {
+>if (bio->bi_iter.bi_size > BIO_MAX_SIZE - len) {
+>*same_page = false;
+>return false;
+>}
+>
+>could just become:
+>
+>if (page_is_mergeable(bv, page, len, off, same_page)) {
+>if (bio->bi_iter.bi_size > bio_max_size(bio) - len) {
+>*same_page = false;
+>return false;
+>}
+>
+>With bio_max_size() being something like:
+>
+>static inline size_t bio_max_size(struct bio *bio)
+>{
+>sector_t max_sectors = blk_queue_get_max_sectors(bio->bi_disk->queue,
+>bio_op(bio));
+>
+>return max_sectors << SECTOR_SHIFT;
+>}
+>
+>Note that this is not super efficient as a BIO maximum size depends on the BIO
+>offset too (its start sector). So writing something similar to
+>blk_rq_get_max_sectors() would probably be better.
+
+Good suggestion. :)
+
+>
+>> Current is simple patch for default bio max size.
+>> Before applying of multipage bvec, bio max size was 1MB in kernel 4.x by BIO_MAX_PAGES.
+>> So I think 1MB bio max size is reasonable as a default.
+>
+>max_sectors_kb is always defined for any block device so I do not think there is
+>a need for any arbitrary default value.
+>
+>Since such optimization likely very much depend on the speed of the system CPU
+>and of the storage device used, it may be a good idea to have this configurable
+>through sysfs. That is, bio_max_size() simply returns UINT_MAX leading to no
+>change from the current behavior if the optimization is disabled (default) and
+>max_sectors_kb if it is enabled.
+>
+
+OK, I agree with you. It will be best for all now.
+I'll try to make this.
+
+>> 
+>>>>
+>>>>>
+>>>>>>
+>>>>>> Signed-off-by: Changheun Lee <nanich.lee@samsung.com>
+>>>>>> ---
+>>>>>>  block/bio.c         | 2 +-
+>>>>>>  include/linux/bio.h | 3 ++-
+>>>>>>  2 files changed, 3 insertions(+), 2 deletions(-)
+>>>>>>
+>>>>>> diff --git a/block/bio.c b/block/bio.c
+>>>>>> index 1f2cc1fbe283..dbe14d675f28 100644
+>>>>>> --- a/block/bio.c
+>>>>>> +++ b/block/bio.c
+>>>>>> @@ -877,7 +877,7 @@ bool __bio_try_merge_page(struct bio *bio, struct page *page,
+>>>>>>  		struct bio_vec *bv = &bio->bi_io_vec[bio->bi_vcnt - 1];
+>>>>>>  
+>>>>>>  		if (page_is_mergeable(bv, page, len, off, same_page)) {
+>>>>>> -			if (bio->bi_iter.bi_size > UINT_MAX - len) {
+>>>>>> +			if (bio->bi_iter.bi_size > BIO_MAX_SIZE - len) {
+>>>>>>  				*same_page = false;
+>>>>>>  				return false;
+>>>>>>  			}
+>>>>>> diff --git a/include/linux/bio.h b/include/linux/bio.h
+>>>>>> index 1edda614f7ce..0f49b354b1f6 100644
+>>>>>> --- a/include/linux/bio.h
+>>>>>> +++ b/include/linux/bio.h
+>>>>>> @@ -20,6 +20,7 @@
+>>>>>>  #endif
+>>>>>>  
+>>>>>>  #define BIO_MAX_PAGES		256
+>>>>>> +#define BIO_MAX_SIZE		(BIO_MAX_PAGES * PAGE_SIZE)
+>>>>>>  
+>>>>>>  #define bio_prio(bio)			(bio)->bi_ioprio
+>>>>>>  #define bio_set_prio(bio, prio)		((bio)->bi_ioprio = prio)
+>>>>>> @@ -113,7 +114,7 @@ static inline bool bio_full(struct bio *bio, unsigned len)
+>>>>>>  	if (bio->bi_vcnt >= bio->bi_max_vecs)
+>>>>>>  		return true;
+>>>>>>  
+>>>>>> -	if (bio->bi_iter.bi_size > UINT_MAX - len)
+>>>>>> +	if (bio->bi_iter.bi_size > BIO_MAX_SIZE - len)
+>>>>>>  		return true;
+>>>>>>  
+>>>>>>  	return false;
+>>>>>>
+>>>>>
+>>>>>
+>>>>> -- 
+>>>>> Damien Le Moal
+>>>>> Western Digital Research
+>>>>
+>>>
+>>>
+>>> -- 
+>>> Damien Le Moal
+>>> Western Digital Research
+>>>
+>> 
+>> ---
+>> Changheun Lee
+>> Samsung Electronics
+>> 
+>> 
+>
+>
+>-- 
+>Damien Le Moal
+>Western Digital Research
+>
+
+---
+Changheun Lee
+Samsung Electronics
+
