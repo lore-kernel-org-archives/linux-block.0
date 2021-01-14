@@ -5,58 +5,58 @@ X-Spam-Level:
 X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37092C433E0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D44FAC4332D
 	for <linux-block@archiver.kernel.org>; Thu, 14 Jan 2021 11:58:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D934B23A40
-	for <linux-block@archiver.kernel.org>; Thu, 14 Jan 2021 11:58:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 99E882310E
+	for <linux-block@archiver.kernel.org>; Thu, 14 Jan 2021 11:58:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727809AbhANL6W (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Jan 2021 06:58:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60534 "EHLO
+        id S1728772AbhANL63 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Jan 2021 06:58:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60554 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726008AbhANL6W (ORCPT
+        with ESMTP id S1728761AbhANL62 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Jan 2021 06:58:22 -0500
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0A14C061575;
-        Thu, 14 Jan 2021 03:57:41 -0800 (PST)
-Received: by mail-pj1-x102d.google.com with SMTP id b5so3065068pjk.2;
-        Thu, 14 Jan 2021 03:57:41 -0800 (PST)
+        Thu, 14 Jan 2021 06:58:28 -0500
+Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8010DC061757;
+        Thu, 14 Jan 2021 03:57:47 -0800 (PST)
+Received: by mail-pg1-x532.google.com with SMTP id p18so3612253pgm.11;
+        Thu, 14 Jan 2021 03:57:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=aE8Gpce0dusI5ufIrjvwfjO/RPhWK1H8CVWXZPRQ1bg=;
-        b=ePQFrPvQmQWHau9JTuzYSKkg2wRECTDCJLUujoltBw3cIcB+ShZZQblwreb7cJXj7M
-         MmD76EmvTK0GgvEJr+/KA1HyI1Gu/5dbg9d1o1ZAZxkIfQ2nIPexZxe0pmsx0LcJ8I7A
-         9tc+l2b0teCDELNU2kQThm1GfwDuD/UUyjSQKwZcQvYVKyg8ExJ9rQckQwh6bRfKBBvZ
-         8NZpdW3vQHU2bCNPMBtaYjhupqfoBekRmxxg+AIdvOwnSQyYv+faeiL84i/88JvIp5Gv
-         eRbNdQhI5hlmL0pC3sZ7dPmO0Egx5P+g7F2bFscNhqnmLZUr1AzalFvMTbVkF2rxU8nj
-         SYug==
+        bh=tcZE8BRAv/NJVfB5M18fw0NCIqwov/ZYMzn1kuA4UBY=;
+        b=VNTOAti0MWyEZzCYS4lan3mExDIRYFRkmh5EWl3SLsnfp06oVI7rScejhpigUxS4rI
+         rEKsDsOuFriN066twd2Nrs9Wv0MYT+EKh3ybqUEf0V4BeGXFQEs3pw73HsvofJ1NlE9d
+         PliYu9UA0vrPX38xaUJSR4NaLw7LpyaAuQDti1y32RdjsYRs3OMj5332r4KR5AHlQQjK
+         1ZMwJeYZh+ljp2Bj8IEfPo65J2lgig9iUBu3t2/gk8csxRKL874VJ72cTkr8xsGYeJ55
+         NC20GMW6aKqZIfSphAn+yA1f7FRS18ONaowNIwaojOdJsIC1vDhFavWNAI2XOxqQXso7
+         dcwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=aE8Gpce0dusI5ufIrjvwfjO/RPhWK1H8CVWXZPRQ1bg=;
-        b=FZS2W+1JFvj/+pvjEU8wUvPDX1qf6m8rDSVHoIWkIzdprUYL+QmdrWA6OBeDC0hwOC
-         s8qJTcaNfs/5RogO9+QHIrP1Unvy/XYcYWCB5Adqap96ruYA+7gbbEkCt2d0z8TjASLd
-         hEUqGviaqKZS1OKRXcFzwSFeDUDCn9xuCcYzBOaQuGPmL9vLLms8cy+01jp93ky15fS4
-         +S1urBgKSzTNL1BqlsqPeCVg6Rqk9Gmu+SqiLLhkPL+wBS5QXINFNt8kofB3JfnWkS2o
-         HaANz0jiJD2AZ+g9ZWB5d4neSx8kFXtHyZOmaVHX/Wc34gbcZNyLWKvzXw2+Y6lRqFEo
-         CrSQ==
-X-Gm-Message-State: AOAM531Oe/YS/JvDGWcS38P305raw2dTN362zDjPOYfVKc6DvX5nW2B7
-        a4rFTmyDsEETnKVR1rSA/I8=
-X-Google-Smtp-Source: ABdhPJy7kieV/fIXINVZvKUSOp+Z8ie1D+czt4R7bDu8iDW2M+2z8f1vy89JJQ9yFavgV8iP/hWimA==
-X-Received: by 2002:a17:90a:5303:: with SMTP id x3mr4755040pjh.54.1610625461297;
-        Thu, 14 Jan 2021 03:57:41 -0800 (PST)
+        bh=tcZE8BRAv/NJVfB5M18fw0NCIqwov/ZYMzn1kuA4UBY=;
+        b=Cgac7ppbtb4KQjNJd3p2uBFjOHCPu3Klnu9ZWRyc6KLuQ6V7B9jVpDwra6MjYFuw88
+         BHEywc2fhzFr/t5BQVqgt2+b7lMTn+IOEYRZ8uExo0hjY+otDHyQOLLx2tPzvwN2fij0
+         JrXRzWUpoeSiPkTOObssdhWH74+WbHj1TasDLYriGzCnrINzsZEDyH4Y63gzqG1z8mzi
+         SX94wOPhpfxvBBLGlWwYiZoG7CUJCqmfmM11iOdGB3kqC6Taul/hTXVL2mYzqgKStV5t
+         Ea1N9oFmJekdZAT5rhK7Drudodk9blmpYV1JRXWWF1lapdzuMxCiTPlnS4Soz/544KiX
+         OYFA==
+X-Gm-Message-State: AOAM5306iL9bgQS5XXwwr2yRvGwmLfUfiE3iBR5VnCzkBiAGSNv2l8Yz
+        dNvOeWoabl3WqSELCKO5+aI=
+X-Google-Smtp-Source: ABdhPJzJ4Q6s3S1My5Bqh+pXNgNLR75+S7Aw69Tio7wJkf74lSkcGqaHNCSVvWzYz16ZoggW9EsBZA==
+X-Received: by 2002:a65:689a:: with SMTP id e26mr7191253pgt.413.1610625467131;
+        Thu, 14 Jan 2021 03:57:47 -0800 (PST)
 Received: from varodek.localdomain ([223.190.37.127])
-        by smtp.gmail.com with ESMTPSA id t4sm5107914pfe.212.2021.01.14.03.57.36
+        by smtp.gmail.com with ESMTPSA id t4sm5107914pfe.212.2021.01.14.03.57.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Jan 2021 03:57:40 -0800 (PST)
+        Thu, 14 Jan 2021 03:57:46 -0800 (PST)
 From:   Vaibhav Gupta <vaibhavgupta40@gmail.com>
 To:     Bjorn Helgaas <helgaas@kernel.org>,
         Bjorn Helgaas <bhelgaas@google.com>,
@@ -69,10 +69,11 @@ To:     Bjorn Helgaas <helgaas@kernel.org>,
 Cc:     Vaibhav Gupta <vaibhavgupta40@gmail.com>,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-kernel-mentees@lists.linuxfoundation.org,
-        Shuah Khan <skhan@linuxfoundation.org>
-Subject: [PATCH v4 2/3] rsxx: use generic power management
-Date:   Thu, 14 Jan 2021 17:24:22 +0530
-Message-Id: <20210114115423.52414-3-vaibhavgupta40@gmail.com>
+        Shuah Khan <skhan@linuxfoundation.org>,
+        Damien Le Moal <damien.lemoal@wdc.com>
+Subject: [PATCH v4 3/3] skd: use generic power management
+Date:   Thu, 14 Jan 2021 17:24:23 +0530
+Message-Id: <20210114115423.52414-4-vaibhavgupta40@gmail.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20210114115423.52414-1-vaibhavgupta40@gmail.com>
 References: <20200722083335.50068-1-vaibhavgupta40@gmail.com>
@@ -95,47 +96,103 @@ the generic framework PCI Core takes care of the necessary operations,
 and drivers are required to do only device-specific jobs.
 
 Signed-off-by: Vaibhav Gupta <vaibhavgupta40@gmail.com>
+Tested-by: Damien Le Moal <damien.lemoal@wdc.com>
 ---
- drivers/block/rsxx/core.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ drivers/block/skd_main.c | 30 ++++++++----------------------
+ 1 file changed, 8 insertions(+), 22 deletions(-)
 
-diff --git a/drivers/block/rsxx/core.c b/drivers/block/rsxx/core.c
-index 63f549889f87..937ad8a28e85 100644
---- a/drivers/block/rsxx/core.c
-+++ b/drivers/block/rsxx/core.c
-@@ -1032,12 +1032,15 @@ static void rsxx_pci_remove(struct pci_dev *dev)
- 	kfree(card);
+diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
+index a962b4551bed..8194b58525e2 100644
+--- a/drivers/block/skd_main.c
++++ b/drivers/block/skd_main.c
+@@ -3317,10 +3317,11 @@ static void skd_pci_remove(struct pci_dev *pdev)
+ 	return;
  }
  
--static int rsxx_pci_suspend(struct pci_dev *dev, pm_message_t state)
-+static int __maybe_unused rsxx_pci_suspend(
-+	__attribute__((unused)) struct device *dev)
+-static int skd_pci_suspend(struct pci_dev *pdev, pm_message_t state)
++static int __maybe_unused skd_pci_suspend(struct device *dev)
  {
- 	/* We don't support suspend at this time. */
- 	return -ENOSYS;
+ 	int i;
+ 	struct skd_device *skdev;
++	struct pci_dev *pdev = to_pci_dev(dev);
+ 
+ 	skdev = pci_get_drvdata(pdev);
+ 	if (!skdev) {
+@@ -3339,18 +3340,15 @@ static int skd_pci_suspend(struct pci_dev *pdev, pm_message_t state)
+ 	if (skdev->pcie_error_reporting_is_enabled)
+ 		pci_disable_pcie_error_reporting(pdev);
+ 
+-	pci_release_regions(pdev);
+-	pci_save_state(pdev);
+-	pci_disable_device(pdev);
+-	pci_set_power_state(pdev, pci_choose_state(pdev, state));
+ 	return 0;
  }
  
-+#define rsxx_pci_resume NULL
-+
- static void rsxx_pci_shutdown(struct pci_dev *dev)
+-static int skd_pci_resume(struct pci_dev *pdev)
++static int __maybe_unused skd_pci_resume(struct device *dev)
  {
- 	struct rsxx_cardinfo *card = pci_get_drvdata(dev);
-@@ -1073,12 +1076,14 @@ static const struct pci_device_id rsxx_pci_ids[] = {
+ 	int i;
+ 	int rc = 0;
+ 	struct skd_device *skdev;
++	struct pci_dev *pdev = to_pci_dev(dev);
  
- MODULE_DEVICE_TABLE(pci, rsxx_pci_ids);
+ 	skdev = pci_get_drvdata(pdev);
+ 	if (!skdev) {
+@@ -3358,16 +3356,8 @@ static int skd_pci_resume(struct pci_dev *pdev)
+ 		return -1;
+ 	}
  
-+static SIMPLE_DEV_PM_OPS(rsxx_pci_pm_ops, rsxx_pci_suspend, rsxx_pci_resume);
+-	pci_set_power_state(pdev, PCI_D0);
+-	pci_enable_wake(pdev, PCI_D0, 0);
+-	pci_restore_state(pdev);
++	device_wakeup_disable(dev);
+ 
+-	rc = pci_enable_device(pdev);
+-	if (rc)
+-		return rc;
+-	rc = pci_request_regions(pdev, DRV_NAME);
+-	if (rc)
+-		goto err_out;
+ 	rc = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64));
+ 	if (rc)
+ 		rc = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32));
+@@ -3376,7 +3366,6 @@ static int skd_pci_resume(struct pci_dev *pdev)
+ 		goto err_out_regions;
+ 	}
+ 
+-	pci_set_master(pdev);
+ 	rc = pci_enable_pcie_error_reporting(pdev);
+ 	if (rc) {
+ 		dev_err(&pdev->dev,
+@@ -3429,10 +3418,6 @@ static int skd_pci_resume(struct pci_dev *pdev)
+ 		pci_disable_pcie_error_reporting(pdev);
+ 
+ err_out_regions:
+-	pci_release_regions(pdev);
+-
+-err_out:
+-	pci_disable_device(pdev);
+ 	return rc;
+ }
+ 
+@@ -3452,13 +3437,14 @@ static void skd_pci_shutdown(struct pci_dev *pdev)
+ 	skd_stop_device(skdev);
+ }
+ 
++static SIMPLE_DEV_PM_OPS(skd_pci_pm_ops, skd_pci_suspend, skd_pci_resume);
 +
- static struct pci_driver rsxx_pci_driver = {
- 	.name		= DRIVER_NAME,
- 	.id_table	= rsxx_pci_ids,
- 	.probe		= rsxx_pci_probe,
- 	.remove		= rsxx_pci_remove,
--	.suspend	= rsxx_pci_suspend,
-+	.driver.pm	= &rsxx_pci_pm_ops,
- 	.shutdown	= rsxx_pci_shutdown,
- 	.err_handler    = &rsxx_err_handler,
+ static struct pci_driver skd_driver = {
+ 	.name		= DRV_NAME,
+ 	.id_table	= skd_pci_tbl,
+ 	.probe		= skd_pci_probe,
+ 	.remove		= skd_pci_remove,
+-	.suspend	= skd_pci_suspend,
+-	.resume		= skd_pci_resume,
++	.driver.pm	= &skd_pci_pm_ops,
+ 	.shutdown	= skd_pci_shutdown,
  };
+ 
 -- 
 2.30.0
 
