@@ -8,61 +8,62 @@ X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA701C4332D
-	for <linux-block@archiver.kernel.org>; Thu, 14 Jan 2021 15:48:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15FD0C433E0
+	for <linux-block@archiver.kernel.org>; Thu, 14 Jan 2021 15:49:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 872D923B46
-	for <linux-block@archiver.kernel.org>; Thu, 14 Jan 2021 15:48:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C905F23B2F
+	for <linux-block@archiver.kernel.org>; Thu, 14 Jan 2021 15:49:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729519AbhANPsg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Jan 2021 10:48:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53774 "EHLO
+        id S1729444AbhANPsX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Jan 2021 10:48:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53690 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729517AbhANPsg (ORCPT
+        with ESMTP id S1729434AbhANPsR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Jan 2021 10:48:36 -0500
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E47FC06179C
-        for <linux-block@vger.kernel.org>; Thu, 14 Jan 2021 07:47:42 -0800 (PST)
-Received: by mail-pl1-x64a.google.com with SMTP id bg11so3437828plb.16
-        for <linux-block@vger.kernel.org>; Thu, 14 Jan 2021 07:47:42 -0800 (PST)
+        Thu, 14 Jan 2021 10:48:17 -0500
+Received: from mail-qt1-x849.google.com (mail-qt1-x849.google.com [IPv6:2607:f8b0:4864:20::849])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 373F1C061794
+        for <linux-block@vger.kernel.org>; Thu, 14 Jan 2021 07:47:32 -0800 (PST)
+Received: by mail-qt1-x849.google.com with SMTP id h18so4818446qtr.2
+        for <linux-block@vger.kernel.org>; Thu, 14 Jan 2021 07:47:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:in-reply-to:message-id:mime-version:references:subject
          :from:to:cc;
-        bh=/1PpEbZ5u6Fy77mPqfkLa/nkoU52/tGMEHsbdtWepW4=;
-        b=K1hogn8H0AcWLbJ1RB0i9mk+1WZxhfVKnMp1bl0mzoSc3owq6JLTq4RswfCdqIijZ7
-         JOzl88lRYNXKHVEqn4ckkcT00dOCrFa1oaYNf6+uk5mksiFgViBomI+LuT7trMVxIKL3
-         lA678wJO8a0w1YSBmHzgp35CrsaWRmz6iMZi/86cpDalD7nwnhvoGZa1RXWpkXylT0p8
-         W8jajLGIfymIxuhZGGvlyB1V/J7d8pb1EchKb+Sgioprp+tRoh1SoBzMGGCYc+ln3yGx
-         C0Ld5Xjh/k9F/QNGfldfQiivtqAjGp3Rkr/xLdXihH7H0MAa2Oa5GnvdC7RFwVZyt+Wh
-         yeVw==
+        bh=rQiteVCxoBWutnawrqGu3qFkhS4PTdd43xyBddh3/+Y=;
+        b=HFuO8i9XZqAgUTRptYDPtYA3XeZBkEp5/BGbnCK98kkXOi73ZiYZsNR2HMGW7zfetj
+         TNbjcYrV6P/OnqiTGR4PCAkMhFrvIXAaAc+8iUWpAaqkhhMRXTKU6rMrrT7gKVykBcjA
+         JhgfelXllBeTBMqv7tzSNRl0FWZRxnUOUjWW23v8sFEafJiarXHpZAoK4uLWbngn6Lnh
+         Klj51v8gvOZnGr0mSQGYKOtwNT96OdmPYzEpVzKSVGEAF3W/bsUiSZlo3uvR8vhukMfV
+         ryggZc58z4s4V1uCEB3Z9VonV9THRje3A09PaFjpA1UGraofATL0PmYbCy5BhTOf1NBu
+         fz0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=/1PpEbZ5u6Fy77mPqfkLa/nkoU52/tGMEHsbdtWepW4=;
-        b=lEjQa6WJ0u5fClpGTbQSYXQGrLOkn3AxBMK0xnUDb7QMt7U8u+qTOFwotOc9o1l9c+
-         G6devld9E49oPJK1k7NXySW7zbV0QdJTevWQaBfep95JbzIzVYymNZEX3Dix2TRaf15D
-         7TLv3F/Z5sl+MFdRp/Qcs1cUhvRFfuw4ClXDzKHfJZJts1SjcgUIKueFJ0G/jZ8xu89p
-         wuslecDntM8uU1zdCeEyBgeo81BdmerrEXY+6HcinkenSeYTM69SknzUc5oynQYELmML
-         wrI1/iQjyQCXCbNwhhIVgCGIYHhKQ0CM8TdhkuHTJw4bosX7/5pt8HBKsxT24/8MVIJg
-         ACZQ==
-X-Gm-Message-State: AOAM531FtMa/RcmrqkD1USDBDg4I5tu11kE/MbrWt4M721tfAbpSr1hs
-        lyfOANRg4rxSLedtXXbc3pob1s/B1W/LXrEWcRjuOE+KBfI+Ult05IQnnnMV/b7R/blE7nqlcrT
-        kf/M8847Mn/Zz+zMa1VnihOjI4gzZFVUaWvKMpRaXHTdhdgDrPjia4+wBRaRnNdVsXaTN
-X-Google-Smtp-Source: ABdhPJxvZfMl2YEge75XAxbNvz3zndXJD7I49Liu1RV4ESXrtxeeROuRAuEe7qcF1uQihpPtTzG7Lg/KyvY=
+        bh=rQiteVCxoBWutnawrqGu3qFkhS4PTdd43xyBddh3/+Y=;
+        b=Llzr8dMIqPavVFEw4aVVLQ2eYsUqxAmEhRRyVB2djk/RWQ+5jLcDU8QiYEuKfK0SU/
+         OeEeSzX0lRTecv2BTTRYz2jK/U9WyxTwwCEyWv6FI+3wHc5Uu1ls6I+yK8jhPzZzt6+R
+         AuFUh0j8sqNbstSgPWzWZd7aaA4/OgQLiJKvAemD4KvATEn+FlqR9qM4doKzdpj1uFp4
+         9CjcUTiujAMQrWvT2t4fvQqCMtkWZKYQy5hLkhgtWtwZejSOs1CEr8H8SG1uqzotSbzD
+         QeV/GO/zwErxs6kHQaFzxyQoiH2KMHlHIbL6a10qirrxVxN1Zi6ohS+IqCVUV5CI8hcY
+         RdKg==
+X-Gm-Message-State: AOAM532ftgVo7vrB7eeldq3iZCRVaH3t+Z34UFQQcARaeAs9GlV1CQBI
+        lRatzEcLMBftTEOlR0vz6nXKDgJjpmLW6w5xEEgnZ6q7FttDIJuTggsDEuYqubuBTUARJMS5MyZ
+        +L0UQx/mTQW/AbIc1lY5huHIRD9LRFQ2a3Pv9dM4r17/09RzBv7AcpQYt0HXHUuAELKo4
+X-Google-Smtp-Source: ABdhPJwrcaTLhhnNcxZsQ6jw7FyV0YKxvrm6mEVXy8dUFIzzPwJaDWzSLOLinvMc3mhnHCwcoMBhT2PSqcM=
 Sender: "satyat via sendgmr" <satyat@satyaprateek.c.googlers.com>
 X-Received: from satyaprateek.c.googlers.com ([fda3:e722:ac3:10:24:72f4:c0a8:1092])
- (user=satyat job=sendgmr) by 2002:a17:90b:ec2:: with SMTP id
- gz2mr5519727pjb.143.1610639261504; Thu, 14 Jan 2021 07:47:41 -0800 (PST)
-Date:   Thu, 14 Jan 2021 15:47:22 +0000
+ (user=satyat job=sendgmr) by 2002:ad4:452f:: with SMTP id l15mr7697781qvu.49.1610639251249;
+ Thu, 14 Jan 2021 07:47:31 -0800 (PST)
+Date:   Thu, 14 Jan 2021 15:47:17 +0000
 In-Reply-To: <20210114154723.2495814-1-satyat@google.com>
-Message-Id: <20210114154723.2495814-7-satyat@google.com>
+Message-Id: <20210114154723.2495814-2-satyat@google.com>
 Mime-Version: 1.0
 References: <20210114154723.2495814-1-satyat@google.com>
 X-Mailer: git-send-email 2.30.0.284.gd98b1dd5eaa7-goog
-Subject: [PATCH 6/7] block: add WARN() in bio_split() for sector alignment
+Subject: [PATCH 1/7] block: make blk_bio_segment_split() able to fail and
+ return error
 From:   Satya Tangirala <satyat@google.com>
 To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     Jens Axboe <axboe@kernel.dk>, Eric Biggers <ebiggers@google.com>,
@@ -72,27 +73,373 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The number of sectors passed to bio_split() should be aligned to
-blk_crypto_bio_sectors_alignment(). All callers have been updated to ensure
-this, so add a WARN() if the number of sectors is not aligned.
+Till now, blk_bio_segment_split() always succeeded and returned a split
+bio if necessary. Instead, allow it to return an error code to indicate
+errors (and pass a pointer to the split bio as an argument instead).
+
+blk_bio_segment_split() is only called by __blk_queue_split(), which has
+been updated to return the error code from blk_bio_segment_split().
+
+This patch also updates all callers of __blk_queue_split() and
+blk_queue_split() to handle any error returned by those functions.
+
+blk_bio_segment_split() needs to be able to fail because future patches
+will ensure that the size of the split bio is aligned to the data unit
+size of the bio crypt context of the bio (if it exists). It's possible
+that the largest aligned size that satisfies all the requirements of
+blk_bio_segment_split() is 0, at which point we need error out.
 
 Signed-off-by: Satya Tangirala <satyat@google.com>
 ---
- block/bio.c | 1 +
- 1 file changed, 1 insertion(+)
+ block/blk-merge.c             | 36 +++++++++++++++++++++++++----------
+ block/blk-mq.c                |  5 ++++-
+ block/blk.h                   |  2 +-
+ drivers/block/drbd/drbd_req.c |  5 ++++-
+ drivers/block/pktcdvd.c       |  3 ++-
+ drivers/block/ps3vram.c       |  5 ++++-
+ drivers/block/rsxx/dev.c      |  3 ++-
+ drivers/block/umem.c          |  5 ++++-
+ drivers/lightnvm/pblk-init.c  | 13 ++++++++++---
+ drivers/md/dm.c               |  8 ++++++--
+ drivers/md/md.c               |  5 ++++-
+ drivers/nvme/host/multipath.c |  5 ++++-
+ drivers/s390/block/dcssblk.c  |  3 ++-
+ drivers/s390/block/xpram.c    |  3 ++-
+ include/linux/blkdev.h        |  2 +-
+ 15 files changed, 76 insertions(+), 27 deletions(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index 1f2cc1fbe283..c5f577ee6b8d 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1472,6 +1472,7 @@ struct bio *bio_split(struct bio *bio, int sectors,
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 808768f6b174..a23a91e12e24 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -229,6 +229,7 @@ static bool bvec_split_segs(const struct request_queue *q,
+  * @bio:  [in] bio to be split
+  * @bs:	  [in] bio set to allocate the clone from
+  * @segs: [out] number of segments in the bio with the first half of the sectors
++ * @split: [out] The split bio, if @bio is split
+  *
+  * Clone @bio, update the bi_iter of the clone to represent the first sectors
+  * of @bio and update @bio->bi_iter to represent the remaining sectors. The
+@@ -241,11 +242,14 @@ static bool bvec_split_segs(const struct request_queue *q,
+  * original bio is not freed before the cloned bio. The caller is also
+  * responsible for ensuring that @bs is only destroyed after processing of the
+  * split bio has finished.
++ *
++ * Return: 0 on success, negative on error
+  */
+-static struct bio *blk_bio_segment_split(struct request_queue *q,
+-					 struct bio *bio,
+-					 struct bio_set *bs,
+-					 unsigned *segs)
++static int blk_bio_segment_split(struct request_queue *q,
++				 struct bio *bio,
++				 struct bio_set *bs,
++				 unsigned *segs,
++				 struct bio **split)
+ {
+ 	struct bio_vec bv, bvprv, *bvprvp = NULL;
+ 	struct bvec_iter iter;
+@@ -276,7 +280,8 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
+ 	}
  
- 	BUG_ON(sectors <= 0);
- 	BUG_ON(sectors >= bio_sectors(bio));
-+	WARN_ON(!IS_ALIGNED(sectors, blk_crypto_bio_sectors_alignment(bio)));
+ 	*segs = nsegs;
+-	return NULL;
++	*split = NULL;
++	return 0;
+ split:
+ 	*segs = nsegs;
  
- 	/* Zone append commands cannot be split */
- 	if (WARN_ON_ONCE(bio_op(bio) == REQ_OP_ZONE_APPEND))
+@@ -287,7 +292,8 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
+ 	 */
+ 	bio->bi_opf &= ~REQ_HIPRI;
+ 
+-	return bio_split(bio, sectors, GFP_NOIO, bs);
++	*split = bio_split(bio, sectors, GFP_NOIO, bs);
++	return 0;
+ }
+ 
+ /**
+@@ -302,11 +308,14 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
+  * the responsibility of the caller to ensure that
+  * @bio->bi_disk->queue->bio_split is only released after processing of the
+  * split bio has finished.
++ *
++ * Return: 0 on succes, negative on error
+  */
+-void __blk_queue_split(struct bio **bio, unsigned int *nr_segs)
++int __blk_queue_split(struct bio **bio, unsigned int *nr_segs)
+ {
+ 	struct request_queue *q = (*bio)->bi_disk->queue;
+ 	struct bio *split = NULL;
++	int err;
+ 
+ 	switch (bio_op(*bio)) {
+ 	case REQ_OP_DISCARD:
+@@ -337,7 +346,10 @@ void __blk_queue_split(struct bio **bio, unsigned int *nr_segs)
+ 			*nr_segs = 1;
+ 			break;
+ 		}
+-		split = blk_bio_segment_split(q, *bio, &q->bio_split, nr_segs);
++		err = blk_bio_segment_split(q, *bio, &q->bio_split, nr_segs,
++					    &split);
++		if (err)
++			return err;
+ 		break;
+ 	}
+ 
+@@ -350,6 +362,8 @@ void __blk_queue_split(struct bio **bio, unsigned int *nr_segs)
+ 		submit_bio_noacct(*bio);
+ 		*bio = split;
+ 	}
++
++	return 0;
+ }
+ 
+ /**
+@@ -361,12 +375,14 @@ void __blk_queue_split(struct bio **bio, unsigned int *nr_segs)
+  * a new bio from @bio->bi_disk->queue->bio_split, it is the responsibility of
+  * the caller to ensure that @bio->bi_disk->queue->bio_split is only released
+  * after processing of the split bio has finished.
++ *
++ * Return: 0 on success, negative on error
+  */
+-void blk_queue_split(struct bio **bio)
++int blk_queue_split(struct bio **bio)
+ {
+ 	unsigned int nr_segs;
+ 
+-	__blk_queue_split(bio, &nr_segs);
++	return __blk_queue_split(bio, &nr_segs);
+ }
+ EXPORT_SYMBOL(blk_queue_split);
+ 
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index f285a9123a8b..43fe5be6bbb7 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2143,7 +2143,10 @@ blk_qc_t blk_mq_submit_bio(struct bio *bio)
+ 	bool hipri;
+ 
+ 	blk_queue_bounce(q, &bio);
+-	__blk_queue_split(&bio, &nr_segs);
++	if (__blk_queue_split(&bio, &nr_segs)) {
++		bio_io_error(bio);
++		goto queue_exit;
++	}
+ 
+ 	if (!bio_integrity_prep(bio))
+ 		goto queue_exit;
+diff --git a/block/blk.h b/block/blk.h
+index 7550364c326c..22096c8272cb 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -218,7 +218,7 @@ ssize_t part_timeout_show(struct device *, struct device_attribute *, char *);
+ ssize_t part_timeout_store(struct device *, struct device_attribute *,
+ 				const char *, size_t);
+ 
+-void __blk_queue_split(struct bio **bio, unsigned int *nr_segs);
++int __blk_queue_split(struct bio **bio, unsigned int *nr_segs);
+ int ll_back_merge_fn(struct request *req, struct bio *bio,
+ 		unsigned int nr_segs);
+ int blk_attempt_req_merge(struct request_queue *q, struct request *rq,
+diff --git a/drivers/block/drbd/drbd_req.c b/drivers/block/drbd/drbd_req.c
+index 330f851cb8f0..1baaaad22bff 100644
+--- a/drivers/block/drbd/drbd_req.c
++++ b/drivers/block/drbd/drbd_req.c
+@@ -1598,7 +1598,10 @@ blk_qc_t drbd_submit_bio(struct bio *bio)
+ 	struct drbd_device *device = bio->bi_disk->private_data;
+ 	unsigned long start_jif;
+ 
+-	blk_queue_split(&bio);
++	if (blk_queue_split(&bio)) {
++		bio_io_error(bio);
++		return BLK_QC_T_NONE;
++	}
+ 
+ 	start_jif = jiffies;
+ 
+diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
+index b8bb8ec7538d..702f7e5564ff 100644
+--- a/drivers/block/pktcdvd.c
++++ b/drivers/block/pktcdvd.c
+@@ -2372,7 +2372,8 @@ static blk_qc_t pkt_submit_bio(struct bio *bio)
+ 	char b[BDEVNAME_SIZE];
+ 	struct bio *split;
+ 
+-	blk_queue_split(&bio);
++	if (blk_queue_split(&bio))
++		goto end_io;
+ 
+ 	pd = bio->bi_disk->queue->queuedata;
+ 	if (!pd) {
+diff --git a/drivers/block/ps3vram.c b/drivers/block/ps3vram.c
+index b71d28372ef3..772e0c3e7036 100644
+--- a/drivers/block/ps3vram.c
++++ b/drivers/block/ps3vram.c
+@@ -587,7 +587,10 @@ static blk_qc_t ps3vram_submit_bio(struct bio *bio)
+ 
+ 	dev_dbg(&dev->core, "%s\n", __func__);
+ 
+-	blk_queue_split(&bio);
++	if (blk_queue_split(&bio)) {
++		bio_io_error(bio);
++		return BLK_QC_T_NONE;
++	}
+ 
+ 	spin_lock_irq(&priv->lock);
+ 	busy = !bio_list_empty(&priv->list);
+diff --git a/drivers/block/rsxx/dev.c b/drivers/block/rsxx/dev.c
+index edacefff6e35..e9d3538a2625 100644
+--- a/drivers/block/rsxx/dev.c
++++ b/drivers/block/rsxx/dev.c
+@@ -126,7 +126,8 @@ static blk_qc_t rsxx_submit_bio(struct bio *bio)
+ 	struct rsxx_bio_meta *bio_meta;
+ 	blk_status_t st = BLK_STS_IOERR;
+ 
+-	blk_queue_split(&bio);
++	if (blk_queue_split(&bio))
++		goto req_err;
+ 
+ 	might_sleep();
+ 
+diff --git a/drivers/block/umem.c b/drivers/block/umem.c
+index 2b95d7b33b91..ac1e8a0750a9 100644
+--- a/drivers/block/umem.c
++++ b/drivers/block/umem.c
+@@ -527,7 +527,10 @@ static blk_qc_t mm_submit_bio(struct bio *bio)
+ 		 (unsigned long long)bio->bi_iter.bi_sector,
+ 		 bio->bi_iter.bi_size);
+ 
+-	blk_queue_split(&bio);
++	if (blk_queue_split(&bio)) {
++		bio_io_error(bio);
++		return BLK_QC_T_NONE;
++	}
+ 
+ 	spin_lock_irq(&card->lock);
+ 	*card->biotail = bio;
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index b6246f73895c..42873e04edf4 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -63,15 +63,22 @@ static blk_qc_t pblk_submit_bio(struct bio *bio)
+ 	 * constraint. Writes can be of arbitrary size.
+ 	 */
+ 	if (bio_data_dir(bio) == READ) {
+-		blk_queue_split(&bio);
++		if (blk_queue_split(&bio)) {
++			bio_io_error(bio);
++			return BLK_QC_T_NONE;
++		}
+ 		pblk_submit_read(pblk, bio);
+ 	} else {
+ 		/* Prevent deadlock in the case of a modest LUN configuration
+ 		 * and large user I/Os. Unless stalled, the rate limiter
+ 		 * leaves at least 256KB available for user I/O.
+ 		 */
+-		if (pblk_get_secs(bio) > pblk_rl_max_io(&pblk->rl))
+-			blk_queue_split(&bio);
++		if (pblk_get_secs(bio) > pblk_rl_max_io(&pblk->rl)) {
++			if (blk_queue_split(&bio)) {
++				bio_io_error(bio);
++				return BLK_QC_T_NONE;
++			}
++		}
+ 
+ 		pblk_write_to_cache(pblk, bio, PBLK_IOTYPE_USER);
+ 	}
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index b3c3c8b4cb42..f304cb017176 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -1654,8 +1654,12 @@ static blk_qc_t dm_submit_bio(struct bio *bio)
+ 	 * Use blk_queue_split() for abnormal IO (e.g. discard, writesame, etc)
+ 	 * otherwise associated queue_limits won't be imposed.
+ 	 */
+-	if (is_abnormal_io(bio))
+-		blk_queue_split(&bio);
++	if (is_abnormal_io(bio)) {
++		if (blk_queue_split(&bio)) {
++			bio_io_error(bio);
++			goto out;
++		}
++	}
+ 
+ 	ret = __split_and_process_bio(md, map, bio);
+ out:
+diff --git a/drivers/md/md.c b/drivers/md/md.c
+index ca409428b4fc..66c9cc95d14d 100644
+--- a/drivers/md/md.c
++++ b/drivers/md/md.c
+@@ -498,7 +498,10 @@ static blk_qc_t md_submit_bio(struct bio *bio)
+ 		return BLK_QC_T_NONE;
+ 	}
+ 
+-	blk_queue_split(&bio);
++	if (blk_queue_split(&bio)) {
++		bio_io_error(bio);
++		return BLK_QC_T_NONE;
++	}
+ 
+ 	if (mddev->ro == 1 && unlikely(rw == WRITE)) {
+ 		if (bio_sectors(bio) != 0)
+diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
+index 9ac762b28811..34874dc5258f 100644
+--- a/drivers/nvme/host/multipath.c
++++ b/drivers/nvme/host/multipath.c
+@@ -307,7 +307,10 @@ blk_qc_t nvme_ns_head_submit_bio(struct bio *bio)
+ 	 * different queue via blk_steal_bios(), so we need to use the bio_split
+ 	 * pool from the original queue to allocate the bvecs from.
+ 	 */
+-	blk_queue_split(&bio);
++	if (blk_queue_split(&bio)) {
++		bio_io_error(bio);
++		return ret;
++	}
+ 
+ 	srcu_idx = srcu_read_lock(&head->srcu);
+ 	ns = nvme_find_path(head);
+diff --git a/drivers/s390/block/dcssblk.c b/drivers/s390/block/dcssblk.c
+index 299e77ec2c41..33904f527f62 100644
+--- a/drivers/s390/block/dcssblk.c
++++ b/drivers/s390/block/dcssblk.c
+@@ -876,7 +876,8 @@ dcssblk_submit_bio(struct bio *bio)
+ 	unsigned long source_addr;
+ 	unsigned long bytes_done;
+ 
+-	blk_queue_split(&bio);
++	if (blk_queue_split(&bio))
++		goto fail;
+ 
+ 	bytes_done = 0;
+ 	dev_info = bio->bi_disk->private_data;
+diff --git a/drivers/s390/block/xpram.c b/drivers/s390/block/xpram.c
+index c2536f7767b3..6f2f772e81e8 100644
+--- a/drivers/s390/block/xpram.c
++++ b/drivers/s390/block/xpram.c
+@@ -191,7 +191,8 @@ static blk_qc_t xpram_submit_bio(struct bio *bio)
+ 	unsigned long page_addr;
+ 	unsigned long bytes;
+ 
+-	blk_queue_split(&bio);
++	if (blk_queue_split(&bio))
++		goto fail;
+ 
+ 	if ((bio->bi_iter.bi_sector & 7) != 0 ||
+ 	    (bio->bi_iter.bi_size & 4095) != 0)
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index f94ee3089e01..b4b44d7262e5 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -926,7 +926,7 @@ extern void blk_rq_unprep_clone(struct request *rq);
+ extern blk_status_t blk_insert_cloned_request(struct request_queue *q,
+ 				     struct request *rq);
+ extern int blk_rq_append_bio(struct request *rq, struct bio **bio);
+-extern void blk_queue_split(struct bio **);
++extern int blk_queue_split(struct bio **);
+ extern int scsi_verify_blk_ioctl(struct block_device *, unsigned int);
+ extern int scsi_cmd_blk_ioctl(struct block_device *, fmode_t,
+ 			      unsigned int, void __user *);
 -- 
 2.30.0.284.gd98b1dd5eaa7-goog
 
