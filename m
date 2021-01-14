@@ -2,214 +2,181 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01228C4332B
-	for <linux-block@archiver.kernel.org>; Thu, 14 Jan 2021 11:58:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65C5CC433DB
+	for <linux-block@archiver.kernel.org>; Thu, 14 Jan 2021 12:19:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C6E0723A40
-	for <linux-block@archiver.kernel.org>; Thu, 14 Jan 2021 11:58:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2343723A52
+	for <linux-block@archiver.kernel.org>; Thu, 14 Jan 2021 12:19:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728729AbhANL60 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Jan 2021 06:58:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60510 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727210AbhANL6W (ORCPT
+        id S1728085AbhANMSx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Jan 2021 07:18:53 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:10657 "EHLO
+        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727255AbhANMSx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Jan 2021 06:58:22 -0500
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AC55C061574;
-        Thu, 14 Jan 2021 03:57:36 -0800 (PST)
-Received: by mail-pj1-x1033.google.com with SMTP id cq1so2952983pjb.4;
-        Thu, 14 Jan 2021 03:57:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=6pH8Qxja5JY4RQXz/fkwX0dken3Vg7X5Veu7c4FYNmA=;
-        b=UKi4NOssNVNwkZ0FzElGxaGgRmlq5ovk60o5FGxtMhkP40IbkQYMtIdQPpWoeitkXl
-         OD8v7lok8Xi/o7Lo6tfB1D0AjTC+h3XEbGt/8Ij7nPMJ9Z7bEz8Vg2VOa/W1m+PK0bPp
-         xY/39qd3kn+xZf3u1jy5aHYr7KgBZmThDXXKry5aFQYmn0ycEkaWksqjYRjU20JliWPP
-         V5StqLPPIZz1d1Yo72yQntlHRcgHfrarDHDrTEBOwNbXOq1DoLHz4QENX0s544i1LKTj
-         garTsBcn9nn+/cSGd9hPSSs5IYI9p3haj+BjUs3f86ycFawK3r8VRXCFH1VpLRxJlqj8
-         RFXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=6pH8Qxja5JY4RQXz/fkwX0dken3Vg7X5Veu7c4FYNmA=;
-        b=K+yV6AixTKRESp4N/ch9UcbXIMWeuAISMC2sNxmmRcPGIVRW92QkCYfRXpGBn5zuAx
-         brm96WTYG8BpQ64DB22fZxPJd1pAMHmdvyYObu/aT3M1alRG1nWYP+Sr9RhBLf1djdDp
-         YiApz0Pou+6YHs+K6Ube7se48+meNoD11oUw8veFTjqp+mGSiF8WHMe6FtP/gwxEaaer
-         476OxQ5i1CkwInFKlGu5F92cuFvYVXxsujvYvomkkTiMR17cL41IyJd/YaAJKsWQ2ihv
-         ptXjVhYlwk1wc5YJjVPlDxdbtDJb6ar5fbEpKGd5SFAomHhGUbd21r+P2WFHjuqaE0tt
-         yDAw==
-X-Gm-Message-State: AOAM533fzPBBXWiquB5FWAxGdyUHxsCAotqbRmMOUssU6dSF7c1Q1aUY
-        KBeOmoYy6z0mziLi4dDmt3mn581aYqZqWw==
-X-Google-Smtp-Source: ABdhPJxCpXBKb3/Uavxt5C15oYfIxFZBDW4HK3SX575IoyKeOtuzcbDphn/g91Qu0uFfDxV8Fe2NfQ==
-X-Received: by 2002:a17:90b:94b:: with SMTP id dw11mr4670586pjb.12.1610625455705;
-        Thu, 14 Jan 2021 03:57:35 -0800 (PST)
-Received: from varodek.localdomain ([223.190.37.127])
-        by smtp.gmail.com with ESMTPSA id t4sm5107914pfe.212.2021.01.14.03.57.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Jan 2021 03:57:35 -0800 (PST)
-From:   Vaibhav Gupta <vaibhavgupta40@gmail.com>
-To:     Bjorn Helgaas <helgaas@kernel.org>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Bjorn Helgaas <bjorn@helgaas.com>,
-        Vaibhav Gupta <vaibhav.varodek@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Joshua Morris <josh.h.morris@us.ibm.com>,
-        Philip Kelleher <pjk1939@linux.ibm.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>
-Cc:     Vaibhav Gupta <vaibhavgupta40@gmail.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kernel-mentees@lists.linuxfoundation.org,
-        Shuah Khan <skhan@linuxfoundation.org>
-Subject: [PATCH v4 1/3] mtip32xx: use generic power management
-Date:   Thu, 14 Jan 2021 17:24:21 +0530
-Message-Id: <20210114115423.52414-2-vaibhavgupta40@gmail.com>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20210114115423.52414-1-vaibhavgupta40@gmail.com>
-References: <20200722083335.50068-1-vaibhavgupta40@gmail.com>
- <20210114115423.52414-1-vaibhavgupta40@gmail.com>
+        Thu, 14 Jan 2021 07:18:53 -0500
+Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.58])
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4DGjx012GHz15t0F;
+        Thu, 14 Jan 2021 20:17:08 +0800 (CST)
+Received: from huawei.com (10.175.127.227) by DGGEMS404-HUB.china.huawei.com
+ (10.3.19.204) with Microsoft SMTP Server id 14.3.498.0; Thu, 14 Jan 2021
+ 20:18:03 +0800
+From:   Yu Kuai <yukuai3@huawei.com>
+To:     <tj@kernel.org>, <axboe@kernel.dk>, <paolo.valente@linaro.org>
+CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <yukuai3@huawei.com>,
+        <yi.zhang@huawei.com>
+Subject: [PATCH] bfq: don't check active group if bfq.weight is not changed
+Date:   Thu, 14 Jan 2021 20:24:26 +0800
+Message-ID: <20210114122426.603813-1-yukuai3@huawei.com>
+X-Mailer: git-send-email 2.25.4
+In-Reply-To: <b4163392-0462-ff6f-b958-1f96f33d69e6@huawei.com>
+References: <b4163392-0462-ff6f-b958-1f96f33d69e6@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.127.227]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Drivers using legacy power management .suspen()/.resume() callbacks
-have to manage PCI states and device's PM states themselves. They also
-need to take care of standard configuration registers.
+Now the group scheduling in BFQ depends on the check of active group,
+but in most cases group scheduling is not used and the checking
+of active group will cause bfq_asymmetric_scenario() and its caller
+bfq_better_to_idle() to always return true, so the throughput
+will be impacted if the workload doesn't need idle (e.g. random rw)
 
-Switch to generic power management framework using a single
-"struct dev_pm_ops" variable to take the unnecessary load from the driver.
-This also avoids the need for the driver to directly call most of the PCI
-helper functions and device power state control functions, as through
-the generic framework PCI Core takes care of the necessary operations,
-and drivers are required to do only device-specific jobs.
+To fix that, adding check in bfq_io_set_weight_legacy() and
+bfq_pd_init() to check whether or not group scheduling is used
+(a non-default weight is used). If not, there is no need
+to check active group.
 
-Signed-off-by: Vaibhav Gupta <vaibhavgupta40@gmail.com>
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 ---
- drivers/block/mtip32xx/mtip32xx.c | 54 +++++++------------------------
- 1 file changed, 12 insertions(+), 42 deletions(-)
+ block/bfq-cgroup.c  | 14 ++++++++++++--
+ block/bfq-iosched.c |  8 +++-----
+ block/bfq-iosched.h | 19 +++++++++++++++++++
+ 3 files changed, 34 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
-index 53ac59d19ae5..de1ac3366b97 100644
---- a/drivers/block/mtip32xx/mtip32xx.c
-+++ b/drivers/block/mtip32xx/mtip32xx.c
-@@ -4232,14 +4232,13 @@ static void mtip_pci_remove(struct pci_dev *pdev)
-  *	0  Success
-  *	<0 Error
-  */
--static int mtip_pci_suspend(struct pci_dev *pdev, pm_message_t mesg)
-+static int __maybe_unused mtip_pci_suspend(struct device *dev)
- {
- 	int rv = 0;
--	struct driver_data *dd = pci_get_drvdata(pdev);
-+	struct driver_data *dd = dev_get_drvdata(dev);
- 
- 	if (!dd) {
--		dev_err(&pdev->dev,
--			"Driver private datastructure is NULL\n");
-+		dev_err(dev, "Driver private datastructure is NULL\n");
- 		return -EFAULT;
- 	}
- 
-@@ -4247,21 +4246,8 @@ static int mtip_pci_suspend(struct pci_dev *pdev, pm_message_t mesg)
- 
- 	/* Disable ports & interrupts then send standby immediate */
- 	rv = mtip_block_suspend(dd);
--	if (rv < 0) {
--		dev_err(&pdev->dev,
--			"Failed to suspend controller\n");
--		return rv;
--	}
--
--	/*
--	 * Save the pci config space to pdev structure &
--	 * disable the device
--	 */
--	pci_save_state(pdev);
--	pci_disable_device(pdev);
--
--	/* Move to Low power state*/
--	pci_set_power_state(pdev, PCI_D3hot);
-+	if (rv < 0)
-+		dev_err(dev, "Failed to suspend controller\n");
- 
- 	return rv;
+diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
+index b791e2041e49..b4ac42c4bd9f 100644
+--- a/block/bfq-cgroup.c
++++ b/block/bfq-cgroup.c
+@@ -505,12 +505,18 @@ static struct blkcg_policy_data *bfq_cpd_alloc(gfp_t gfp)
+ 	return &bgd->pd;
  }
-@@ -4273,42 +4259,25 @@ static int mtip_pci_suspend(struct pci_dev *pdev, pm_message_t mesg)
-  *      0  Success
-  *      <0 Error
-  */
--static int mtip_pci_resume(struct pci_dev *pdev)
-+static int __maybe_unused mtip_pci_resume(struct device *dev)
- {
- 	int rv = 0;
- 	struct driver_data *dd;
  
--	dd = pci_get_drvdata(pdev);
-+	dd = dev_get_drvdata(dev);
- 	if (!dd) {
--		dev_err(&pdev->dev,
--			"Driver private datastructure is NULL\n");
-+		dev_err(dev, "Driver private datastructure is NULL\n");
- 		return -EFAULT;
- 	}
- 
--	/* Move the device to active State */
--	pci_set_power_state(pdev, PCI_D0);
--
--	/* Restore PCI configuration space */
--	pci_restore_state(pdev);
--
--	/* Enable the PCI device*/
--	rv = pcim_enable_device(pdev);
--	if (rv < 0) {
--		dev_err(&pdev->dev,
--			"Failed to enable card during resume\n");
--		goto err;
--	}
--	pci_set_master(pdev);
--
- 	/*
- 	 * Calls hbaReset, initPort, & startPort function
- 	 * then enables interrupts
- 	 */
- 	rv = mtip_block_resume(dd);
- 	if (rv < 0)
--		dev_err(&pdev->dev, "Unable to resume\n");
-+		dev_err(dev, "Unable to resume\n");
- 
--err:
- 	clear_bit(MTIP_DDF_RESUME_BIT, &dd->dd_flag);
- 
- 	return rv;
-@@ -4339,14 +4308,15 @@ static const struct pci_device_id mtip_pci_tbl[] = {
- 	{ 0 }
- };
- 
-+static SIMPLE_DEV_PM_OPS(mtip_pci_pm_ops, mtip_pci_suspend, mtip_pci_resume);
++static inline int bfq_dft_weight(void)
++{
++	return cgroup_subsys_on_dfl(io_cgrp_subsys) ?
++	       CGROUP_WEIGHT_DFL : BFQ_WEIGHT_LEGACY_DFL;
 +
- /* Structure that describes the PCI driver functions. */
- static struct pci_driver mtip_pci_driver = {
- 	.name			= MTIP_DRV_NAME,
- 	.id_table		= mtip_pci_tbl,
- 	.probe			= mtip_pci_probe,
- 	.remove			= mtip_pci_remove,
--	.suspend		= mtip_pci_suspend,
--	.resume			= mtip_pci_resume,
-+	.driver.pm		= &mtip_pci_pm_ops,
- 	.shutdown		= mtip_pci_shutdown,
- };
++}
++
+ static void bfq_cpd_init(struct blkcg_policy_data *cpd)
+ {
+ 	struct bfq_group_data *d = cpd_to_bfqgd(cpd);
  
+-	d->weight = cgroup_subsys_on_dfl(io_cgrp_subsys) ?
+-		CGROUP_WEIGHT_DFL : BFQ_WEIGHT_LEGACY_DFL;
++	d->weight = bfq_dft_weight();
+ }
+ 
+ static void bfq_cpd_free(struct blkcg_policy_data *cpd)
+@@ -554,6 +560,9 @@ static void bfq_pd_init(struct blkg_policy_data *pd)
+ 	bfqg->bfqd = bfqd;
+ 	bfqg->active_entities = 0;
+ 	bfqg->rq_pos_tree = RB_ROOT;
++
++	if (entity->new_weight != bfq_dft_weight())
++		bfqd_enable_active_group_check(bfqd);
+ }
+ 
+ static void bfq_pd_free(struct blkg_policy_data *pd)
+@@ -1013,6 +1022,7 @@ static void bfq_group_set_weight(struct bfq_group *bfqg, u64 weight, u64 dev_wei
+ 		 */
+ 		smp_wmb();
+ 		bfqg->entity.prio_changed = 1;
++		bfqd_enable_active_group_check(bfqg->bfqd);
+ 	}
+ }
+ 
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 9e4eb0fc1c16..1b695de1df95 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -699,11 +699,8 @@ static bool bfq_asymmetric_scenario(struct bfq_data *bfqd,
+ 		(bfqd->busy_queues[0] && bfqd->busy_queues[2]) ||
+ 		(bfqd->busy_queues[1] && bfqd->busy_queues[2]);
+ 
+-	return varied_queue_weights || multiple_classes_busy
+-#ifdef CONFIG_BFQ_GROUP_IOSCHED
+-	       || bfqd->num_groups_with_pending_reqs > 0
+-#endif
+-		;
++	return varied_queue_weights || multiple_classes_busy ||
++	       bfqd_has_active_group(bfqd);
+ }
+ 
+ /*
+@@ -6472,6 +6469,7 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_type *e)
+ 
+ 	bfqd->queue_weights_tree = RB_ROOT_CACHED;
+ 	bfqd->num_groups_with_pending_reqs = 0;
++	bfqd->check_active_group = false;
+ 
+ 	INIT_LIST_HEAD(&bfqd->active_list);
+ 	INIT_LIST_HEAD(&bfqd->idle_list);
+diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+index 703895224562..216509013012 100644
+--- a/block/bfq-iosched.h
++++ b/block/bfq-iosched.h
+@@ -524,6 +524,8 @@ struct bfq_data {
+ 
+ 	/* true if the device is non rotational and performs queueing */
+ 	bool nonrot_with_queueing;
++	/* true if need to check num_groups_with_pending_reqs */
++	bool check_active_group;
+ 
+ 	/*
+ 	 * Maximum number of requests in driver in the last
+@@ -1066,6 +1068,17 @@ static inline void bfq_pid_to_str(int pid, char *str, int len)
+ }
+ 
+ #ifdef CONFIG_BFQ_GROUP_IOSCHED
++static inline void bfqd_enable_active_group_check(struct bfq_data *bfqd)
++{
++	cmpxchg_relaxed(&bfqd->check_active_group, false, true);
++}
++
++static inline bool bfqd_has_active_group(struct bfq_data *bfqd)
++{
++	return bfqd->check_active_group &&
++	       bfqd->num_groups_with_pending_reqs > 0;
++}
++
+ struct bfq_group *bfqq_group(struct bfq_queue *bfqq);
+ 
+ #define bfq_log_bfqq(bfqd, bfqq, fmt, args...)	do {			\
+@@ -1085,6 +1098,12 @@ struct bfq_group *bfqq_group(struct bfq_queue *bfqq);
+ } while (0)
+ 
+ #else /* CONFIG_BFQ_GROUP_IOSCHED */
++static inline void bfqd_enable_active_group_check(struct bfq_data *bfqd) {}
++
++static inline bool bfqd_has_active_group(struct bfq_data *bfqd)
++{
++	return false;
++}
+ 
+ #define bfq_log_bfqq(bfqd, bfqq, fmt, args...) do {	\
+ 	char pid_str[MAX_PID_STR_LENGTH];	\
 -- 
-2.30.0
+2.25.4
 
