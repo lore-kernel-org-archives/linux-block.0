@@ -2,107 +2,324 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 059D3C433DB
-	for <linux-block@archiver.kernel.org>; Thu, 14 Jan 2021 06:56:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A334AC43381
+	for <linux-block@archiver.kernel.org>; Thu, 14 Jan 2021 09:17:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A36FA2396F
-	for <linux-block@archiver.kernel.org>; Thu, 14 Jan 2021 06:56:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7826123A01
+	for <linux-block@archiver.kernel.org>; Thu, 14 Jan 2021 09:17:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726089AbhANG4F (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Jan 2021 01:56:05 -0500
-Received: from szxga02-in.huawei.com ([45.249.212.188]:2943 "EHLO
-        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726039AbhANG4F (ORCPT
+        id S1727543AbhANJRP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Jan 2021 04:17:15 -0500
+Received: from out30-131.freemail.mail.aliyun.com ([115.124.30.131]:51902 "EHLO
+        out30-131.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726478AbhANJRN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Jan 2021 01:56:05 -0500
-Received: from DGGEMM401-HUB.china.huawei.com (unknown [172.30.72.57])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4DGZmX45pzz5Fm4;
-        Thu, 14 Jan 2021 14:54:20 +0800 (CST)
-Received: from dggema772-chm.china.huawei.com (10.1.198.214) by
- DGGEMM401-HUB.china.huawei.com (10.3.20.209) with Microsoft SMTP Server (TLS)
- id 14.3.498.0; Thu, 14 Jan 2021 14:55:22 +0800
-Received: from [10.169.42.93] (10.169.42.93) by dggema772-chm.china.huawei.com
- (10.1.198.214) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1913.5; Thu, 14
- Jan 2021 14:55:21 +0800
-Subject: Re: [PATCH v2 4/6] nvme-rdma: avoid IO error and repeated request
- completion
-To:     Sagi Grimberg <sagi@grimberg.me>, <linux-nvme@lists.infradead.org>
-CC:     <kbusch@kernel.org>, <axboe@fb.com>, <hch@lst.de>,
-        <linux-block@vger.kernel.org>, <axboe@kernel.dk>
-References: <20210107033149.15701-1-lengchao@huawei.com>
- <20210107033149.15701-5-lengchao@huawei.com>
- <07e41b4f-914a-11e8-5638-e2d6408feb3f@grimberg.me>
-From:   Chao Leng <lengchao@huawei.com>
-Message-ID: <7b12be41-0fcd-5a22-0e01-8cd4ac9cde5b@huawei.com>
-Date:   Thu, 14 Jan 2021 14:55:21 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        Thu, 14 Jan 2021 04:17:13 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04426;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=4;SR=0;TI=SMTPD_---0ULhhF75_1610615776;
+Received: from admindeMacBook-Pro-2.local(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0ULhhF75_1610615776)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Thu, 14 Jan 2021 17:16:17 +0800
+Subject: Re: [dm-devel] [PATCH RFC 6/7] block: track cookies of split bios for
+ bio-based device
+To:     Mike Snitzer <snitzer@redhat.com>
+Cc:     linux-block@vger.kernel.org, dm-devel@redhat.com,
+        io-uring@vger.kernel.org
+References: <20201223112624.78955-1-jefflexu@linux.alibaba.com>
+ <20201223112624.78955-7-jefflexu@linux.alibaba.com>
+ <20210107221825.GF21239@redhat.com>
+ <97ec2025-4937-b476-4f15-446cc304e799@linux.alibaba.com>
+ <20210108172635.GA29915@redhat.com>
+ <16ba3a63-86f5-1acd-c129-767540186689@linux.alibaba.com>
+ <20210112161320.GA13931@redhat.com>
+From:   JeffleXu <jefflexu@linux.alibaba.com>
+Message-ID: <56e1f2a2-9300-e3c8-4013-9d371385a082@linux.alibaba.com>
+Date:   Thu, 14 Jan 2021 17:16:16 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.6.0
 MIME-Version: 1.0
-In-Reply-To: <07e41b4f-914a-11e8-5638-e2d6408feb3f@grimberg.me>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <20210112161320.GA13931@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.169.42.93]
-X-ClientProxiedBy: dggeme718-chm.china.huawei.com (10.1.199.114) To
- dggema772-chm.china.huawei.com (10.1.198.214)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
 
-On 2021/1/14 8:19, Sagi Grimberg wrote:
+On 1/13/21 12:13 AM, Mike Snitzer wrote:
+> On Tue, Jan 12 2021 at 12:46am -0500,
+> JeffleXu <jefflexu@linux.alibaba.com> wrote:
 > 
->> When a request is queued failed, blk_status_t is directly returned
->> to the blk-mq. If blk_status_t is not BLK_STS_RESOURCE,
->> BLK_STS_DEV_RESOURCE, BLK_STS_ZONE_RESOURCE, blk-mq call
->> blk_mq_end_request to complete the request with BLK_STS_IOERR.
->> In two scenarios, the request should be retried and may succeed.
->> First, if work with nvme multipath, the request may be retried
->> successfully in another path, because the error is probably related to
->> the path. Second, if work without multipath software, the request may
->> be retried successfully after error recovery.
->> If the request is complete with BLK_STS_IOERR in blk_mq_dispatch_rq_list.
->> The state of request may be changed to MQ_RQ_IN_FLIGHT. If free the
->> request asynchronously such as in nvme_submit_user_cmd, in extreme
->> scenario the request will be repeated freed in tear down.
->> If a non-resource error occurs in queue_rq, should directly call
->> nvme_complete_rq to complete request and set the state of request to
->> MQ_RQ_COMPLETE. nvme_complete_rq will decide to retry, fail over or end
->> the request.
 >>
->> Signed-off-by: Chao Leng <lengchao@huawei.com>
->> ---
->>   drivers/nvme/host/rdma.c | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
 >>
->> diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
->> index df9f6f4549f1..4a89bf44ecdc 100644
->> --- a/drivers/nvme/host/rdma.c
->> +++ b/drivers/nvme/host/rdma.c
->> @@ -2093,7 +2093,7 @@ static blk_status_t nvme_rdma_queue_rq(struct blk_mq_hw_ctx *hctx,
->>   unmap_qe:
->>       ib_dma_unmap_single(dev, req->sqe.dma, sizeof(struct nvme_command),
->>                   DMA_TO_DEVICE);
->> -    return ret;
->> +    return nvme_try_complete_failed_req(rq, ret);
+>> On 1/9/21 1:26 AM, Mike Snitzer wrote:
+>>> On Thu, Jan 07 2021 at 10:08pm -0500,
+>>> JeffleXu <jefflexu@linux.alibaba.com> wrote:
+>>>
+>>>> Thanks for reviewing.
+>>>>
+>>>>
+>>>> On 1/8/21 6:18 AM, Mike Snitzer wrote:
+>>>>> On Wed, Dec 23 2020 at  6:26am -0500,
+>>>>> Jeffle Xu <jefflexu@linux.alibaba.com> wrote:
+>>>>>
+>>>>>> This is actuaaly the core when supporting iopoll for bio-based device.
+>>>>>>
+>>>>>> A list is maintained in the top bio (the original bio submitted to dm
+>>>>>> device), which is used to maintain all valid cookies of split bios. The
+>>>>>> IO polling routine will actually iterate this list and poll on
+>>>>>> corresponding hardware queues of the underlying mq devices.
+>>>>>>
+>>>>>> Signed-off-by: Jeffle Xu <jefflexu@linux.alibaba.com>
+>>>>>
+>>>>> Like I said in response to patch 4 in this series: please fold patch 4
+>>>>> into this patch and _really_ improve this patch header.
+>>>>>
+>>>>> In particular, the (ab)use of bio_inc_remaining() needs be documented in
+>>>>> this patch header very well.
+>>>>>
+>>>>> But its use could easily be why you're seeing a performance hit (coupled
+>>>>> with the extra spinlock locking and list management used).  Just added
+>>>>> latency and contention across CPUs.
+>>>>
+>>>> Indeed bio_inc_remaining() is abused here and the code seems quite hacky
+>>>> here.
+>>>>
+>>>> Actually I'm regarding implementing the split bio tracking mechanism in
+>>>> a recursive way you had ever suggested. That is, the split bios could be
+>>>> maintained in an array, which is allocated with 'struct dm_io'. This way
+>>>> the overhead of spinlock protecting the &root->bi_plist may be omitted
+>>>> here. Also the lifetime management may be simplified somehow. But the
+>>>> block core needs to fetch the per-bio private data now, just like what
+>>>> you had ever suggested before.
+>>>>
+>>>> How do you think, Mike?
+>>>
+>>> Yes, using per-bio-data is a requirement (we cannot bloat 'struct bio').
+>>
+>> Agreed. Then MD will need some refactor to support IO polling, if
+>> possible, since just like I mentioned in patch 0 before, MD doesn't
+>> allocate extra clone bio, and just re-uses the original bio structure.
+>>
+>>
+>>>
+>>> As for using an array, how would you index the array?  
+>>
+>> The 'array' here is not an array of 'struct blk_mq_hw_ctx *' maintained
+>> in struct dm_table as you mentioned. Actually what I mean is to maintain
+>> an array of struct dm_poll_data (or something like that, e.g. just
+>> struct blk_mq_hw_ctx *) in per-bio private data. The size of the array
+>> just equals the number of the target devices.
+>>
+>> For example, for the following device stack,
+>>
+>>>>
+>>>> Suppose we have the following device stack hierarchy, that is, dm0 is
+>>>> stacked on dm1, while dm1 is stacked on nvme0 and nvme1.
+>>>>
+>>>>     dm0
+>>>>     dm1
+>>>> nvme0  nvme1
+>>>>
+>>>>
+>>>> Then the bio graph is like:
+>>>>
+>>>>
+>>>>                                    +------------+
+>>>>                                    |bio0(to dm0)|
+>>>>                                    +------------+
+>>>>                                          ^
+>>>>                                          | orig_bio
+>>>>                                    +--------------------+
+>>>>                                    |struct dm_io A      |
+>>>> +--------------------+ bi_private  ----------------------
+>>>> |bio3(to dm1)        |------------>|bio1(to dm1)        |
+>>>> +--------------------+             +--------------------+
+>>>>         ^                                ^
+>>>>         | ->orig_bio                     | ->orig_bio
+>>>> +--------------------+             +--------------------+
+>>>> |struct dm_io        |             |struct dm_io B      |
+>>>> ----------------------             ----------------------
+>>>> |bio2(to nvme0)      |             |bio4(to nvme1)      |
+>>>> +--------------------+             +--------------------+
+>>>>
+>>
+>> An array of struct blk_mq_hw_ctx * is maintained in struct dm_io B.
+>>
+>>
+>> struct blk_mq_hw_ctx * hctxs[2];
+>>
+>> The array size is two since dm1 maps to two target devices (i.e. nvme0
+>> and nvme1). Then hctxs[0] points to the hw queue of nvme0, while
+>> hctxs[1] points to the hw queue of nvme1.
 > 
-> I don't understand this. There are errors that may not be related to
-> anything that is pathing related (sw bug, memory leak, mapping error,
-> etc, etc) why should we return this one-shot error?
-Although fail over retry is not required, if we return the error to
-blk-mq, a low probability crash may happen. because blk-mq do not set
-the state of request to MQ_RQ_COMPLETE before complete the request,
-the request may be freed asynchronously such as in nvme_submit_user_cmd.
-If race with error recovery, request double completion may happens.
+> Both nvme0 and nvme1 may have multiple hctxs.  Not sure why you're
+> thinking there is just one per device?
+> 
+>>
+>>
+>> This mechanism supports arbitrary device stacking. Similarly, an array
+>> of struct blk_mq_hw_ctx * is maintained in struct dm_io A. The array
+>> size is one since dm0 only maps to one target device (i.e. dm1). In this
+>> case, hctx[0] points to the struct dm_io of the next level, i.e. struct
+>> dm_io B.
+>>
+>>
+>> But I'm afraid the implementation of this style may be more complex.
+> 
+> We are running the risk of talking in circles about this design...
 
-So we can not return the error to blk-mq if the blk_status_t is not
-BLK_STS_RESOURCE, BLK_STS_DEV_RESOURCE, BLK_STS_ZONE_RESOURCE.
-> .
+Sorry for the inconvenience. I have started working on the next version,
+but I do want to clarify some design issues first.
+
+> 
+> 
+>>>> struct node {
+>>>>     struct blk_mq_hw_ctx *hctx;
+>>>>     blk_qc_t cookie;
+>>>> };
+>>>
+>>> Needs a better name, think I had 'struct dm_poll_data'
+>>
+>> Sure, the name here is just for example.
+>>
+>>
+>>>  
+>>>> Actually currently the tracking objects are all allocated with 'struct
+>>>> bio', then the lifetime management of the tracking objects is actually
+>>>> equivalent to lifetime management of bio. Since the returned cookie is
+>>>> actually a pointer to the bio, the refcount of this bio must be
+>>>> incremented, since we release a reference to this bio through the
+>>>> returned cookie, in which case the abuse of the refcount trick seems
+>>>> unavoidable? Unless we allocate the tracking object individually, then
+>>>> the returned cookie is actually pointing to the tracking object, and the
+>>>> refcount is individually maintained for the tracking object.
+>>>
+>>> The refcounting and lifetime of the per-bio-data should all work as is.
+>>> Would hope you can avoid extra bio_inc_remaining().. that infratsructure
+>>> is way too tightly coupled to bio_chain()'ing, etc.
+>>>
+>>> The challenge you have is the array that would point at these various
+>>> per-bio-data needs to be rooted somewhere (you put it in the topmost
+>>> original bio with the current patchset).  But why not manage that as
+>>> part of 'struct mapped_device'?  It'd need proper management at DM table
+>>> reload boundaries and such but it seems like the most logical place to
+>>> put the array.  But again, this array needs to be dynamic.. so thinking
+>>> further, maybe a better model would be to have a fixed array in 'struct
+>>> dm_table' for each hctx associated with a blk_mq _data_ device directly
+>>> used/managed by that dm_table?
+>>
+
+Confusion also stated in the following comment. How 'struct
+dm_poll_data' could be involved with 'struct dm_table' or 'struct
+mapped_device'. In the current patchset, every bio need to maintain one
+list to track all its 'struct dm_poll_data' structures. Then how to
+maintain this per-bio information in one single 'struct dm_table' or
+'struct mapped_device'?
+
+
+>> It seems that you are referring 'array' here as an array of 'struct
+>> blk_mq_hw_ctx *'? Such as
+>>
+>> struct dm_table {
+>>     ...
+>>     struct blk_mq_hw_ctx *hctxs[];
+>> };
+>>
+>> Certainly with this we can replace the original 'struct blk_mq_hw_ctx *'
+>> pointer in 'struct dm_poll_data' with the index into this array, such as
+>>
+>> struct dm_poll_data {
+>>      int hctx_index; /* index into dm_table->hctxs[] */
+>>      blk_qc_t cookie;
+>> };
+> 
+> You seized on my mentioning blk-mq's array of hctx too literally.  I was
+> illustrating that blk-mq's cookie is converted to an index into that
+> array.
+> 
+> But for this DM bio-polling application we'd need to map the blk-mq
+> returned cookie to a request_queue.  Hence the original 2 members of
+> dm_poll_data needing to be 'struct request_queue *' and blk_qc_t.
+> 
+>> But I'm doubted if this makes much sense. The core difficulty here is
+>> maintaining a list (or dynamic sized array) to track all split bios.
+>> With the array of 'struct blk_mq_hw_ctx *' maintained in struct
+>> dm_table, we still need some **per-bio** structure (e.g., &bio->bi_plist
+>> in current patch set) to track these split bios.
+> 
+> One primary goal of all of this design is to achieve bio-polling cleanly
+> (without extra locking, without block core data structure bloat, etc).
+> I know you share that goal.  But we need to nail down the core data
+> structures and what needs tracking at scale and then associate them with
+> DM's associated objects with consideration for object lifetime.
+> 
+> My suggestion was to anchor your core data structures (e.g. 'struct
+> dm_poll_data' array, etc) to 'struct dm_table'.  I suggested that
+> because the dm_table is what dm_get_device()s each underlying _data_
+> device (a subset of all devices in a dm_table, as iterated through
+> .iterate_devices).  But a DM 'struct mapped_device' has 2 potential
+> dm_tables, active and inactive slots, that would imply some complexity
+> in handing off any outstanding bio's associated 'struct dm_poll_data'
+> array on DM table reload.
+
+1) If 'struct dm_poll_data' resides in per-bio-data, then how do you
+**link** or **associate** all the 'struct dm_poll_data' structures from
+one original bio? Do we link them by the internal relationship between
+bio/dm_io/dm_target_io, or some other auxiliary data structure?
+
+2) I get confused how 'struct dm_poll_data' could be involved with
+'struct dm_table'. Is there an array of 'struct dm_poll_data' or 'struct
+dm_poll_data *' maintained in 'struct dm_table'? If this is the case,
+then the size of the array may be incredible large, or expanded/shrank
+frequently, since one dm_table could correspond to millions bios.
+
+
+
+> 
+> Anyway, you seem to be gravitating to a more simplistic approach of a
+> single array of 'struct dm_poll_data' for each DM device (regardless of
+> how arbitrarily deep that DM device stack is, the topmost DM device
+> would accumulate the list of 'struct dm_poll_data'?).
+
+I'm open to this. At least you don't need to care the lifetime of other
+disparate 'struct dm_poll_data's, if all 'struct dm_poll_data's are
+accumulated in one (e.g., the topmost) place.
+
+
+> 
+> I'm now questioning the need for any high-level data structure to track
+> all N of the 'struct dm_poll_data' that may result from a given bio (as
+> it is split to multiple blk-mq hctxs across multiple blk-mq devices).
+> Each 'struct dm_poll_data', that will be returned to block core and
+> stored in struct kiocb's ki_cookie, would have an object lifetime that
+> matches the original DM bio clone's per-bio-data that the 'struct
+> dm_poll_data' was part of; then we just need to cast that ki_cookie's
+> blk_qc_t as 'struct dm_poll_data' and call blk_poll().
+> 
+> The hardest part is to ensure that all the disparate 'struct
+> dm_poll_data' (and associated clone bios) aren't free'd until the
+> _original_ bio completes.  That would create quite some back-pressure
+> with more potential to exhaust system resources -- because then the
+> cataylst for dropping reference counts on these clone bios would then
+> need to be tied to the blk_bio_poll() interface... which feels "wrong"
+> (e.g. it ushers in the (ab)use of bio_inc_remaining you had in your most
+> recent patchset).
+> 
+> All said, maybe post a v2 that takes the incremental steps of:
+> 1) using DM per-bio-data for 'struct dm_poll_data'
+> 2) simplify blk_bio_poll() to call into DM to translate provided
+>    blk_qc_t (from struct kiocb's ki_cookie) to request_queue and
+>    blk_qc_t.
+>    - this eliminates any need for extra list processing
+> 3) keep your (ab)use of bio_inc_remaining() to allow for exploring this 
+
+-- 
+Thanks,
+Jeffle
