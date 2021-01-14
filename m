@@ -2,337 +2,103 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00CF8C433DB
-	for <linux-block@archiver.kernel.org>; Wed, 13 Jan 2021 15:15:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAD06C433DB
+	for <linux-block@archiver.kernel.org>; Thu, 14 Jan 2021 00:32:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A17E12339F
-	for <linux-block@archiver.kernel.org>; Wed, 13 Jan 2021 15:15:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 737DC23343
+	for <linux-block@archiver.kernel.org>; Thu, 14 Jan 2021 00:32:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727172AbhAMPPI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Jan 2021 10:15:08 -0500
-Received: from mout.gmx.net ([212.227.17.20]:45289 "EHLO mout.gmx.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726531AbhAMPPG (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Jan 2021 10:15:06 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
-        s=badeba3b8450; t=1610550810;
-        bh=h04l1+sWPKPAwhjVSAZUr5CU46wuJzYkH3K+JynbfOM=;
-        h=X-UI-Sender-Class:Date:From:To:Cc:Subject;
-        b=cphnYPpFTCFu0NbkmAaowLeNV6hQ2vsDZkMqbVzio94z6seVbzeSzYk5T/Eo6Mj5a
-         UZ8quHor+BQoodmUGuf1Hsqhd8Ucg8hAkyejAtA0189iMe0ddRa/q3jdLcU1QlyAuD
-         g3g9wTPSkaiyhz5QuAvyjUTtZ7Nb0cBaBF2AEBFg=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from Valinor ([82.203.161.65]) by mail.gmx.com (mrgmx105
- [212.227.17.174]) with ESMTPSA (Nemesis) id 1MLiCu-1kiAzB2u5w-00HgPM; Wed, 13
- Jan 2021 16:13:29 +0100
-Date:   Wed, 13 Jan 2021 17:13:59 +0200
-From:   Lauri Kasanen <cand@gmx.com>
-To:     linux-mips@vger.kernel.org
-Cc:     tsbogend@alpha.franken.de, axboe@kernel.dk,
-        linux-block@vger.kernel.org, Keith Busch <kbusch@kernel.org>
-Subject: [PATCH 6/6 v6] block: Add n64 cart driver
-Message-Id: <20210113171359.489f6a94ecbaa9244f10e26e@gmx.com>
-X-Mailer: Sylpheed 3.5.0 (GTK+ 2.18.6; x86_64-unknown-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:HftX1ENzjFmWj4iceLdAhmGTnD0GerpMr/W7B9mdG3287f5cR4T
- PsnblnEFVT3LD434gyqpjpL8E/+VDbe6tucSRCwyQwFkxxP6wsPT8egvh9xOEHQ5RIRIsou
- QKzl8zlnR3fU7iGMOG/eWtmNLceAbebmxhh0nd3zMM2TgH+LInY+wGPMNFYjROuT534Sj/x
- FbUXS1l7pwqXMrYZbYNaw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:/eQoRQHhqwU=:jSrTbdtCLSG6uiSz6kHQgR
- TjQL2GY60BWwr804hzmnhJ+3r+sB9q5IGsi+jcb11KU8clCfCegNpEr1AQn4zgcGLRZ3gQjKz
- aNYorXMdsRTlZacTU4XokDf6eUC+c5FI3Yaoo0w/wcZ207uVysm2TlTCoqbb1JULZyDGuYQlC
- A9+RBpz6LSfjBBt9zlie45AdpGlbc4H38DJpXpSsGQuW5xbTxdzbBhAhpTmOQC6vV9dq95fFX
- c2kNfBvngRYKgqEHrGYf8TXOAPCymkxGgWKpK9cRaOnXd3UMupSHmY+rjzYfOkACZxEK2SxYT
- lQVkAR8chu8rTdA7SO25NTHQ7oogCmFrJ7kzOWAO6gj/2o4Uon1UYeAGHLJh/Arjom7BEDju2
- uCgcVODq7RT6vIA2TS8wxgqpI3rRIu7nrMAeyQ0cD7KzFkdzSjuxeLBOCJ3ApRvMWjGiSZfIY
- ZzGnSEcJoGCyqhZCEY1jixJQOPdFIhhNl+yP4RB/f5n1ZZDhX6LzqHi/SmIh0HM1eUtSGKszZ
- 9v72jvSXsoMbR/Hyut/lk7PCnLIEftxfG8kfr5Hj7fv25apk0vl9+XNQZdNKWxvN07ZGMoS0x
- /y18ShvHcjl0fo2JGKcFk3E4pBIC+1lgV/przQ8CMHdry+mkMDUTkQzUl3mQkawuYhzdsrD/W
- ZfvkxifgmLOYOpPO/VZUSZbOcMi24KMBaVZlr8lH856oVeahUy3BPDXKiy7UM0l1YhKBxKS2X
- 3rh3kUvcRhJ/xWHNcu50KGPAN17Oj1Wr2AemXkqhvkSgnJ1DeHPYzSpaVuynfbGwQzvhzMVIq
- rjqBwHf98jDBj/WZ3bN+pe6AdZU3YW+sTIf07KrNMN9Scy8fLd6CkrCJDQ3LRNg3oCpOLP4kE
- 7RsLGcvDWTv7qOtY1wHA==
+        id S1729888AbhANAbw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Jan 2021 19:31:52 -0500
+Received: from mail-ej1-f54.google.com ([209.85.218.54]:43873 "EHLO
+        mail-ej1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729880AbhANAab (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 13 Jan 2021 19:30:31 -0500
+Received: by mail-ej1-f54.google.com with SMTP id jx16so5684891ejb.10
+        for <linux-block@vger.kernel.org>; Wed, 13 Jan 2021 16:30:14 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=QKyQAKUG74ERfhNn7PLJoK1vBWNcwgfr7UQBcd/3CAY=;
+        b=Q/r0t4H1IK8DQNUomfrBNz/ugEos85j6h7g9eOUDsQ00b2wM/RkzkG7D8Gu3Hjxm+i
+         rgOlbtc+0Uvs+8vjpi+CC9aPn8adtM7ciCtLIZzHtr+eptIMN9QYNkAGzm3V1Na+1PFX
+         m7eampgzN9eT8EvMcEGJByT9beuNj7ZZLa1g0qPr9CkZZ16yfre4JMXWNLDSoZtSYWQ4
+         974GDRNsfkSm1yEy0+z9C40/QsZetDmxLhmqe4svN3fI2a2/Aowj4AkPbeIHwMXE2rjG
+         QeF4he3raui+9VWDR5sOsiuur4nyzB4lRNHxfpIEyLeTd62VoTHMxSyuvuKF/2ddaeQZ
+         nOxQ==
+X-Gm-Message-State: AOAM531k7WSubVFFrDx9MqlsqOAJ75Y3G8YIQ4SOM97EkIvgiyGt3/gJ
+        oTVRt8sXkRXkmr5QthDMr3Lg9O2Sg1w=
+X-Google-Smtp-Source: ABdhPJzxrhFpOBtsKJZ4rbU+zKE/yi0qjhtXrcnLSfbOSfEjClVRzjHS0tCL8T5ekeYRPwJlH1HWlQ==
+X-Received: by 2002:a5d:5146:: with SMTP id u6mr5053555wrt.46.1610583590598;
+        Wed, 13 Jan 2021 16:19:50 -0800 (PST)
+Received: from ?IPv6:2601:647:4802:9070:e70c:620a:4d8a:b988? ([2601:647:4802:9070:e70c:620a:4d8a:b988])
+        by smtp.gmail.com with ESMTPSA id s3sm4848530wmc.44.2021.01.13.16.19.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 13 Jan 2021 16:19:50 -0800 (PST)
+Subject: Re: [PATCH v2 4/6] nvme-rdma: avoid IO error and repeated request
+ completion
+To:     Chao Leng <lengchao@huawei.com>, linux-nvme@lists.infradead.org
+Cc:     kbusch@kernel.org, axboe@fb.com, hch@lst.de,
+        linux-block@vger.kernel.org, axboe@kernel.dk
+References: <20210107033149.15701-1-lengchao@huawei.com>
+ <20210107033149.15701-5-lengchao@huawei.com>
+From:   Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <07e41b4f-914a-11e8-5638-e2d6408feb3f@grimberg.me>
+Date:   Wed, 13 Jan 2021 16:19:47 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+MIME-Version: 1.0
+In-Reply-To: <20210107033149.15701-5-lengchao@huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This adds support for the Nintendo 64 console's carts.
-Carts are a read-only media ranging from 8mb to 64mb.
 
-Only one cart can be connected at once, and switching
-it requires a reboot.
+> When a request is queued failed, blk_status_t is directly returned
+> to the blk-mq. If blk_status_t is not BLK_STS_RESOURCE,
+> BLK_STS_DEV_RESOURCE, BLK_STS_ZONE_RESOURCE, blk-mq call
+> blk_mq_end_request to complete the request with BLK_STS_IOERR.
+> In two scenarios, the request should be retried and may succeed.
+> First, if work with nvme multipath, the request may be retried
+> successfully in another path, because the error is probably related to
+> the path. Second, if work without multipath software, the request may
+> be retried successfully after error recovery.
+> If the request is complete with BLK_STS_IOERR in blk_mq_dispatch_rq_list.
+> The state of request may be changed to MQ_RQ_IN_FLIGHT. If free the
+> request asynchronously such as in nvme_submit_user_cmd, in extreme
+> scenario the request will be repeated freed in tear down.
+> If a non-resource error occurs in queue_rq, should directly call
+> nvme_complete_rq to complete request and set the state of request to
+> MQ_RQ_COMPLETE. nvme_complete_rq will decide to retry, fail over or end
+> the request.
+> 
+> Signed-off-by: Chao Leng <lengchao@huawei.com>
+> ---
+>   drivers/nvme/host/rdma.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
+> index df9f6f4549f1..4a89bf44ecdc 100644
+> --- a/drivers/nvme/host/rdma.c
+> +++ b/drivers/nvme/host/rdma.c
+> @@ -2093,7 +2093,7 @@ static blk_status_t nvme_rdma_queue_rq(struct blk_mq_hw_ctx *hctx,
+>   unmap_qe:
+>   	ib_dma_unmap_single(dev, req->sqe.dma, sizeof(struct nvme_command),
+>   			    DMA_TO_DEVICE);
+> -	return ret;
+> +	return nvme_try_complete_failed_req(rq, ret);
 
-No module support to save RAM, as the target has 8mb RAM.
-
-Signed-off-by: Lauri Kasanen <cand@gmx.com>
-=2D--
- drivers/block/Kconfig   |   6 ++
- drivers/block/Makefile  |   1 +
- drivers/block/n64cart.c | 217 +++++++++++++++++++++++++++++++++++++++++++=
-+++++
- 3 files changed, 224 insertions(+)
- create mode 100644 drivers/block/n64cart.c
-
-diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
-index ecceaaa..924d768 100644
-=2D-- a/drivers/block/Kconfig
-+++ b/drivers/block/Kconfig
-@@ -72,6 +72,12 @@ config AMIGA_Z2RAM
- 	  To compile this driver as a module, choose M here: the
- 	  module will be called z2ram.
-
-+config N64CART
-+	bool "N64 cart support"
-+	depends on MACH_NINTENDO64
-+	help
-+	  Support for the N64 cart.
-+
- config CDROM
- 	tristate
- 	select BLK_SCSI_REQUEST
-diff --git a/drivers/block/Makefile b/drivers/block/Makefile
-index e1f6311..b9642cf 100644
-=2D-- a/drivers/block/Makefile
-+++ b/drivers/block/Makefile
-@@ -17,6 +17,7 @@ obj-$(CONFIG_PS3_DISK)		+=3D ps3disk.o
- obj-$(CONFIG_PS3_VRAM)		+=3D ps3vram.o
- obj-$(CONFIG_ATARI_FLOPPY)	+=3D ataflop.o
- obj-$(CONFIG_AMIGA_Z2RAM)	+=3D z2ram.o
-+obj-$(CONFIG_N64CART)		+=3D n64cart.o
- obj-$(CONFIG_BLK_DEV_RAM)	+=3D brd.o
- obj-$(CONFIG_BLK_DEV_LOOP)	+=3D loop.o
- obj-$(CONFIG_XILINX_SYSACE)	+=3D xsysace.o
-diff --git a/drivers/block/n64cart.c b/drivers/block/n64cart.c
-new file mode 100644
-index 0000000..f8c17b0
-=2D-- /dev/null
-+++ b/drivers/block/n64cart.c
-@@ -0,0 +1,217 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Support for the N64 cart.
-+ *
-+ * Copyright (c) 2021 Lauri Kasanen
-+ */
-+
-+#include <linux/bitops.h>
-+#include <linux/blk-mq.h>
-+#include <linux/dma-mapping.h>
-+#include <linux/init.h>
-+#include <linux/major.h>
-+#include <linux/module.h>
-+#include <linux/platform_device.h>
-+
-+MODULE_AUTHOR("Lauri Kasanen <cand@gmx.com>");
-+MODULE_DESCRIPTION("Driver for the N64 cart");
-+MODULE_LICENSE("GPL");
-+
-+#define BUFSIZE (64 * 1024)
-+
-+static unsigned int start, size;
-+static int major;
-+static struct request_queue *queue;
-+static struct blk_mq_tag_set tag_set;
-+static struct gendisk *disk;
-+
-+static void *buf;
-+static dma_addr_t dma_addr;
-+
-+static u32 __iomem *reg_base;
-+
-+#define PI_DRAM_REG 0
-+#define PI_CART_REG 1
-+#define PI_READ_REG 2
-+#define PI_WRITE_REG 3
-+#define PI_STATUS_REG 4
-+
-+#define PI_STATUS_DMA_BUSY (1 << 0)
-+#define PI_STATUS_IO_BUSY (1 << 1)
-+
-+static void n64cart_write_reg(const u8 reg, const u32 value)
-+{
-+	writel(value, reg_base + reg);
-+}
-+
-+static u32 n64cart_read_reg(const u8 reg)
-+{
-+	return readl(reg_base + reg);
-+}
-+
-+static void n64cart_wait_dma(void)
-+{
-+	while (n64cart_read_reg(PI_STATUS_REG) &
-+		(PI_STATUS_DMA_BUSY | PI_STATUS_IO_BUSY))
-+		cpu_relax();
-+}
-+
-+static blk_status_t get_seg(struct request *req)
-+{
-+	u32 bstart =3D blk_rq_pos(req) * 512;
-+	u32 len =3D blk_rq_cur_bytes(req);
-+	void *dst =3D bio_data(req->bio);
-+
-+	if (bstart + len > size)
-+		return BLK_STS_IOERR;
-+
-+	bstart +=3D start;
-+
-+	while (len) {
-+		const u32 curlen =3D len < BUFSIZE ? len : BUFSIZE;
-+
-+		dma_cache_inv((unsigned long) buf, curlen);
-+
-+		n64cart_wait_dma();
-+
-+		barrier();
-+		n64cart_write_reg(PI_DRAM_REG, dma_addr);
-+		barrier();
-+		n64cart_write_reg(PI_CART_REG, (bstart | 0x10000000) & 0x1FFFFFFF);
-+		barrier();
-+		n64cart_write_reg(PI_WRITE_REG, curlen - 1);
-+		barrier();
-+
-+		n64cart_wait_dma();
-+
-+		memcpy(dst, buf, curlen);
-+
-+		len -=3D curlen;
-+		dst +=3D curlen;
-+		bstart +=3D curlen;
-+	}
-+
-+	return BLK_STS_OK;
-+}
-+
-+static blk_status_t n64cart_queue_rq(struct blk_mq_hw_ctx *hctx,
-+				     const struct blk_mq_queue_data *bd)
-+{
-+	struct request *req =3D bd->rq;
-+	blk_status_t err;
-+
-+	blk_mq_start_request(req);
-+
-+	do {
-+		err =3D get_seg(req);
-+	} while (blk_update_request(req, err, blk_rq_cur_bytes(req)));
-+
-+	blk_mq_end_request(req, BLK_STS_OK);
-+	return BLK_STS_OK;
-+}
-+
-+static const struct blk_mq_ops n64cart_mq_ops =3D {
-+	.queue_rq =3D n64cart_queue_rq,
-+};
-+
-+static const struct block_device_operations n64cart_fops =3D {
-+	.owner		=3D THIS_MODULE,
-+};
-+
-+/*
-+ * The target device is embedded and RAM-constrained. We save RAM
-+ * by initializing in __init code that gets dropped late in boot.
-+ * For the same reason there is no module or unloading support.
-+ */
-+static int __init n64cart_probe(struct platform_device *pdev)
-+{
-+	struct resource *res;
-+	unsigned long len;
-+	int err;
-+
-+	if (!start || !size) {
-+		pr_err("n64cart: start and size not specified\n");
-+		return -ENODEV;
-+	}
-+
-+	if (size & 4095) {
-+		pr_err("n64cart: size must be a multiple of 4K\n");
-+		return -ENODEV;
-+	}
-+
-+	major =3D register_blkdev(0, "n64cart");
-+	if (major <=3D 0) {
-+		pr_err("n64cart: unable to get major number\n");
-+		return -EBUSY;
-+	}
-+
-+	queue =3D blk_mq_init_sq_queue(&tag_set, &n64cart_mq_ops, 1,
-+				     BLK_MQ_F_SHOULD_MERGE | BLK_MQ_F_BLOCKING);
-+	if (IS_ERR(queue)) {
-+		err =3D PTR_ERR(queue);
-+		goto fail_reg;
-+	}
-+
-+	buf =3D kmalloc(BUFSIZE, GFP_DMA | GFP_KERNEL);
-+	if (!buf) {
-+		err =3D -ENOMEM;
-+		goto fail_queue;
-+	}
-+	dma_addr =3D virt_to_phys(buf);
-+
-+	disk =3D alloc_disk(1);
-+	if (!disk) {
-+		err =3D -ENOMEM;
-+		goto fail_dma;
-+	}
-+
-+	res =3D platform_get_resource(pdev, IORESOURCE_MEM, 0);
-+	len =3D res->end - res->start + 1;
-+	reg_base =3D ioremap(res->start, len);
-+
-+	disk->major =3D major;
-+	disk->first_minor =3D 0;
-+	disk->queue =3D queue;
-+	disk->flags =3D GENHD_FL_NO_PART_SCAN;
-+	disk->fops =3D &n64cart_fops;
-+	strcpy(disk->disk_name, "n64cart");
-+
-+	set_capacity(disk, size / 512);
-+	set_disk_ro(disk, 1);
-+
-+	blk_queue_flag_set(QUEUE_FLAG_NONROT, queue);
-+	blk_queue_physical_block_size(queue, 4096);
-+	blk_queue_logical_block_size(queue, 4096);
-+
-+	add_disk(disk);
-+
-+	pr_info("n64cart: %u kb disk\n", size / 1024);
-+
-+	return 0;
-+fail_dma:
-+	kfree(buf);
-+fail_queue:
-+	blk_cleanup_queue(queue);
-+fail_reg:
-+	unregister_blkdev(major, "n64cart");
-+	return err;
-+}
-+
-+static struct platform_driver n64cart_driver =3D {
-+	.driver =3D {
-+		.name =3D "n64cart",
-+	},
-+};
-+
-+static int __init n64cart_init(void)
-+{
-+	return platform_driver_probe(&n64cart_driver, n64cart_probe);
-+}
-+
-+module_param(start, uint, 0);
-+MODULE_PARM_DESC(start, "Start address of the cart block data");
-+
-+module_param(size, uint, 0);
-+MODULE_PARM_DESC(size, "Size of the cart block data, in bytes");
-+
-+module_init(n64cart_init);
-=2D-
-2.6.2
-
+I don't understand this. There are errors that may not be related to
+anything that is pathing related (sw bug, memory leak, mapping error,
+etc, etc) why should we return this one-shot error?
