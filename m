@@ -2,341 +2,136 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+X-Spam-Status: No, score=-22.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60C08C4332D
-	for <linux-block@archiver.kernel.org>; Fri, 15 Jan 2021 11:38:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35158C433DB
+	for <linux-block@archiver.kernel.org>; Fri, 15 Jan 2021 23:45:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2DE4023358
-	for <linux-block@archiver.kernel.org>; Fri, 15 Jan 2021 11:38:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F1E2023A5E
+	for <linux-block@archiver.kernel.org>; Fri, 15 Jan 2021 23:45:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728336AbhAOLhz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Jan 2021 06:37:55 -0500
-Received: from mout.gmx.net ([212.227.17.20]:46213 "EHLO mout.gmx.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726918AbhAOLhy (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Jan 2021 06:37:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
-        s=badeba3b8450; t=1610710578;
-        bh=6/R+MOPQf+TvFBrzGya2wMdpyErzbvc4ip6wJAtA1qk=;
-        h=X-UI-Sender-Class:Date:From:To:Cc:Subject;
-        b=Ry3Gq0ZUaC2BIMgYbKi2Wu0V2xsphgQy9e2gFTr6sZMTrcJYT7KkRDBOahJ8QQjh0
-         nt+yJyE/TTFOmPJbaz6uI7N1jYfBHvi3PxZ1KBasUtDHjrrcARRyYuud2IlJU4Ls3m
-         npKsWEyOXxRRsQjqpcu02TZICoxShvMcDcCSgWuo=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from Valinor ([82.203.161.65]) by mail.gmx.com (mrgmx105
- [212.227.17.174]) with ESMTPSA (Nemesis) id 1MvsEx-1lsc102ls7-00syWy; Fri, 15
- Jan 2021 12:36:17 +0100
-Date:   Fri, 15 Jan 2021 13:35:59 +0200
-From:   Lauri Kasanen <cand@gmx.com>
-To:     linux-mips@vger.kernel.org
-Cc:     tsbogend@alpha.franken.de, axboe@kernel.dk,
-        linux-block@vger.kernel.org, Keith Busch <kbusch@kernel.org>
-Subject: [PATCH 3/3 v7] block: Add n64 cart driver
-Message-Id: <20210115133559.84b2997dc326c277c4d91503@gmx.com>
-X-Mailer: Sylpheed 3.5.0 (GTK+ 2.18.6; x86_64-unknown-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:ELM/U8DGftx+Y1TkG0B8k2n8mJVB718kbZbQv8COJJrrfjGlRWH
- z8jq1zAspSi6y2LFh5wWok9/LQCMqRbZsdwyvYtDDBSPT2lJiSW0C8oy3Mqs14gX2u5mTas
- GP97g4vLDtdotEO2/wqTfhvFgqm6PWGRDIRAcqrSJWpG13VS7QfwDJRSrFUiNhv16zDYGO/
- P3EuoZeflondktEkN3YiQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:hTHrhDxLB1Q=:1bYuyTiv30TVB2bgWsBPl6
- pYeBndfMcWMf8o+klE3NyXKK1V7eEzuNYVPyGjgGpD4a03rZbtKEZRMW5PY9fsBMvqPfKoqhZ
- XtzpnxU66KWtdhiN8KfQ+Tym48qEW4mFtmE+DFZVmaHvaaeN/ZCk0TA87J8904rEK3fBHya5a
- fuVy5Gx/uAWrguEq1vFeFZw3ibGMt2DuCtnrOONER1zB+SseUYSjC8eKcjoiwgskTI04DnZdO
- 12Qon6lCl1HGESjphykPE7Z3s9P9fW18EV1fwSR9kkNZ99G1wp/koJigtDW2u6tZe3MyaZnlo
- GP9RnndkLAW8mzrKDUQaGrVX0m3HQ0eXNrWvmFlWZqBxuCUx0N4vT1JAKO/zao3vsMYf5/e34
- gOZJRVxrBkgkYpFsGrik0z+FMzCw2Bw2soU78x0/mduKRO6DKhFSyl4VXGUA1pU98Hx4wxc9n
- 5ubKU3LYzfW++ok68kJJ15Kyl0UC0KYlB6w9KsSApUFiZnP65esUbE42oU1G5I7e2HAmejxz/
- bOeIJChXqqKBGfwHuwizVZveIDxmfLrUmRgc8ShheabgC9cPHW4298i4uBrx77n39nEOZJ1G0
- Zr3Y+nvCKJojESmxi4biZ/7RK/8EReT1vPS1pMM9r+0UMOkoQ37WV1w/gFGJNzqqMIk4Qq64e
- xuXa68nlHyf6gWXF9Lkr6/oqi2ASXH2m+eVgq54Pjp9bUYpyquX3NFLRgYhKwL69SIr3yfKHG
- uempujEpwSYX3kG3T+MwJfT53oGD0ZwbUPYK74GoP92eRzLUfLsEGSHDBHnNgD898bQL5+eCZ
- avosWcYMVCG33QLXDboy+NiI5h4FVWV2ZeEVSfPQIDZxdY38kmHie0m2I1eg2qslZ5Ez1VahX
- iYRW/hczU363UvM6MdDQ==
+        id S1728919AbhAOXpY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Jan 2021 18:45:24 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42849 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726607AbhAOXpY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 15 Jan 2021 18:45:24 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1610754237;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=sztDEIT7Qou2qZs+NWtY5/x6eSQzoXLIB+h40Dhyt4E=;
+        b=JqzFYhZ1BWNkD8/R4x4XIS4LO2edcJ2L+LDXDnogbwuN0rmBDinLT+ATRt2yAON+ZKC+Gk
+        2d1EoftOY5ai5JdqA1sPgkkkCav/LiGRCCoZcKeSdItWz1Ck0dZgF+1dI1qAJa6953qlHG
+        WJ8XC2vG76KTYrJaVShGELhgDvUpSEE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-277-Cg_cGCfHPTuDts8OU42Vag-1; Fri, 15 Jan 2021 18:43:53 -0500
+X-MC-Unique: Cg_cGCfHPTuDts8OU42Vag-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B5037E745;
+        Fri, 15 Jan 2021 23:43:51 +0000 (UTC)
+Received: from localhost (unknown [10.18.25.174])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 794DF60BF3;
+        Fri, 15 Jan 2021 23:43:48 +0000 (UTC)
+Date:   Fri, 15 Jan 2021 18:43:47 -0500
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
+        Alasdair G Kergon <agk@redhat.com>,
+        Akilesh Kailash <akailash@google.com>,
+        Anthony Iliopoulos <ailiop@suse.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Ignat Korchagin <ignat@cloudflare.com>,
+        Mikulas Patocka <mpatocka@redhat.com>
+Subject: [git pull] device mapper fixes for 5.11-rc4
+Message-ID: <20210115234347.GA1931@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This adds support for the Nintendo 64 console's carts.
-Carts are a read-only media ranging from 8mb to 64mb.
+Hi Linus,
 
-Only one cart can be connected at once, and switching
-it requires a reboot.
+The following changes since commit e71ba9452f0b5b2e8dc8aa5445198cd9214a6a62:
 
-No module support to save RAM, as the target has 8mb RAM.
+  Linux 5.11-rc2 (2021-01-03 15:55:30 -0800)
 
-Signed-off-by: Lauri Kasanen <cand@gmx.com>
-=2D--
+are available in the Git repository at:
 
-v7:
-use devm_platform_ioremap_resource
+  git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-5.11/dm-fixes-1
 
- drivers/block/Kconfig   |   6 ++
- drivers/block/Makefile  |   1 +
- drivers/block/n64cart.c | 217 +++++++++++++++++++++++++++++++++++++++++++=
-+++++
- 3 files changed, 224 insertions(+)
- create mode 100644 drivers/block/n64cart.c
+for you to fetch changes up to c87a95dc28b1431c7e77e2c0c983cf37698089d2:
 
-diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
-index ecceaaa..924d768 100644
-=2D-- a/drivers/block/Kconfig
-+++ b/drivers/block/Kconfig
-@@ -72,6 +72,12 @@ config AMIGA_Z2RAM
- 	  To compile this driver as a module, choose M here: the
- 	  module will be called z2ram.
+  dm crypt: defer decryption to a tasklet if interrupts disabled
+  (2021-01-14 09:54:37 -0500)
 
-+config N64CART
-+	bool "N64 cart support"
-+	depends on MACH_NINTENDO64
-+	help
-+	  Support for the N64 cart.
-+
- config CDROM
- 	tristate
- 	select BLK_SCSI_REQUEST
-diff --git a/drivers/block/Makefile b/drivers/block/Makefile
-index e1f6311..b9642cf 100644
-=2D-- a/drivers/block/Makefile
-+++ b/drivers/block/Makefile
-@@ -17,6 +17,7 @@ obj-$(CONFIG_PS3_DISK)		+=3D ps3disk.o
- obj-$(CONFIG_PS3_VRAM)		+=3D ps3vram.o
- obj-$(CONFIG_ATARI_FLOPPY)	+=3D ataflop.o
- obj-$(CONFIG_AMIGA_Z2RAM)	+=3D z2ram.o
-+obj-$(CONFIG_N64CART)		+=3D n64cart.o
- obj-$(CONFIG_BLK_DEV_RAM)	+=3D brd.o
- obj-$(CONFIG_BLK_DEV_LOOP)	+=3D loop.o
- obj-$(CONFIG_XILINX_SYSACE)	+=3D xsysace.o
-diff --git a/drivers/block/n64cart.c b/drivers/block/n64cart.c
-new file mode 100644
-index 0000000..a0c1f1e
-=2D-- /dev/null
-+++ b/drivers/block/n64cart.c
-@@ -0,0 +1,217 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Support for the N64 cart.
-+ *
-+ * Copyright (c) 2021 Lauri Kasanen
-+ */
-+
-+#include <linux/bitops.h>
-+#include <linux/blk-mq.h>
-+#include <linux/dma-mapping.h>
-+#include <linux/init.h>
-+#include <linux/major.h>
-+#include <linux/module.h>
-+#include <linux/platform_device.h>
-+
-+MODULE_AUTHOR("Lauri Kasanen <cand@gmx.com>");
-+MODULE_DESCRIPTION("Driver for the N64 cart");
-+MODULE_LICENSE("GPL");
-+
-+#define BUFSIZE (64 * 1024)
-+
-+static unsigned int start, size;
-+static int major;
-+static struct request_queue *queue;
-+static struct blk_mq_tag_set tag_set;
-+static struct gendisk *disk;
-+
-+static void *buf;
-+static dma_addr_t dma_addr;
-+
-+static u32 __iomem *reg_base;
-+
-+#define PI_DRAM_REG 0
-+#define PI_CART_REG 1
-+#define PI_READ_REG 2
-+#define PI_WRITE_REG 3
-+#define PI_STATUS_REG 4
-+
-+#define PI_STATUS_DMA_BUSY (1 << 0)
-+#define PI_STATUS_IO_BUSY (1 << 1)
-+
-+static void n64cart_write_reg(const u8 reg, const u32 value)
-+{
-+	writel(value, reg_base + reg);
-+}
-+
-+static u32 n64cart_read_reg(const u8 reg)
-+{
-+	return readl(reg_base + reg);
-+}
-+
-+static void n64cart_wait_dma(void)
-+{
-+	while (n64cart_read_reg(PI_STATUS_REG) &
-+		(PI_STATUS_DMA_BUSY | PI_STATUS_IO_BUSY))
-+		cpu_relax();
-+}
-+
-+static blk_status_t get_seg(struct request *req)
-+{
-+	u32 bstart =3D blk_rq_pos(req) * 512;
-+	u32 len =3D blk_rq_cur_bytes(req);
-+	void *dst =3D bio_data(req->bio);
-+
-+	if (bstart + len > size)
-+		return BLK_STS_IOERR;
-+
-+	bstart +=3D start;
-+
-+	while (len) {
-+		const u32 curlen =3D len < BUFSIZE ? len : BUFSIZE;
-+
-+		dma_cache_inv((unsigned long) buf, curlen);
-+
-+		n64cart_wait_dma();
-+
-+		barrier();
-+		n64cart_write_reg(PI_DRAM_REG, dma_addr);
-+		barrier();
-+		n64cart_write_reg(PI_CART_REG, (bstart | 0x10000000) & 0x1FFFFFFF);
-+		barrier();
-+		n64cart_write_reg(PI_WRITE_REG, curlen - 1);
-+		barrier();
-+
-+		n64cart_wait_dma();
-+
-+		memcpy(dst, buf, curlen);
-+
-+		len -=3D curlen;
-+		dst +=3D curlen;
-+		bstart +=3D curlen;
-+	}
-+
-+	return BLK_STS_OK;
-+}
-+
-+static blk_status_t n64cart_queue_rq(struct blk_mq_hw_ctx *hctx,
-+				     const struct blk_mq_queue_data *bd)
-+{
-+	struct request *req =3D bd->rq;
-+	blk_status_t err;
-+
-+	blk_mq_start_request(req);
-+
-+	do {
-+		err =3D get_seg(req);
-+	} while (blk_update_request(req, err, blk_rq_cur_bytes(req)));
-+
-+	blk_mq_end_request(req, BLK_STS_OK);
-+	return BLK_STS_OK;
-+}
-+
-+static const struct blk_mq_ops n64cart_mq_ops =3D {
-+	.queue_rq =3D n64cart_queue_rq,
-+};
-+
-+static const struct block_device_operations n64cart_fops =3D {
-+	.owner		=3D THIS_MODULE,
-+};
-+
-+/*
-+ * The target device is embedded and RAM-constrained. We save RAM
-+ * by initializing in __init code that gets dropped late in boot.
-+ * For the same reason there is no module or unloading support.
-+ */
-+static int __init n64cart_probe(struct platform_device *pdev)
-+{
-+	int err;
-+
-+	if (!start || !size) {
-+		pr_err("n64cart: start and size not specified\n");
-+		return -ENODEV;
-+	}
-+
-+	if (size & 4095) {
-+		pr_err("n64cart: size must be a multiple of 4K\n");
-+		return -ENODEV;
-+	}
-+
-+	major =3D register_blkdev(0, "n64cart");
-+	if (major <=3D 0) {
-+		pr_err("n64cart: unable to get major number\n");
-+		return -EBUSY;
-+	}
-+
-+	queue =3D blk_mq_init_sq_queue(&tag_set, &n64cart_mq_ops, 1,
-+				     BLK_MQ_F_SHOULD_MERGE | BLK_MQ_F_BLOCKING);
-+	if (IS_ERR(queue)) {
-+		err =3D PTR_ERR(queue);
-+		goto fail_reg;
-+	}
-+
-+	buf =3D kmalloc(BUFSIZE, GFP_DMA | GFP_KERNEL);
-+	if (!buf) {
-+		err =3D -ENOMEM;
-+		goto fail_queue;
-+	}
-+	dma_addr =3D virt_to_phys(buf);
-+
-+	reg_base =3D devm_platform_ioremap_resource(pdev, 0);
-+	if (!reg_base) {
-+		err =3D -EINVAL;
-+		goto fail_dma;
-+	}
-+
-+	disk =3D alloc_disk(1);
-+	if (!disk) {
-+		err =3D -ENOMEM;
-+		goto fail_dma;
-+	}
-+
-+	disk->major =3D major;
-+	disk->first_minor =3D 0;
-+	disk->queue =3D queue;
-+	disk->flags =3D GENHD_FL_NO_PART_SCAN;
-+	disk->fops =3D &n64cart_fops;
-+	strcpy(disk->disk_name, "n64cart");
-+
-+	set_capacity(disk, size / 512);
-+	set_disk_ro(disk, 1);
-+
-+	blk_queue_flag_set(QUEUE_FLAG_NONROT, queue);
-+	blk_queue_physical_block_size(queue, 4096);
-+	blk_queue_logical_block_size(queue, 4096);
-+
-+	add_disk(disk);
-+
-+	pr_info("n64cart: %u kb disk\n", size / 1024);
-+
-+	return 0;
-+fail_dma:
-+	kfree(buf);
-+fail_queue:
-+	blk_cleanup_queue(queue);
-+fail_reg:
-+	unregister_blkdev(major, "n64cart");
-+	return err;
-+}
-+
-+static struct platform_driver n64cart_driver =3D {
-+	.driver =3D {
-+		.name =3D "n64cart",
-+	},
-+};
-+
-+static int __init n64cart_init(void)
-+{
-+	return platform_driver_probe(&n64cart_driver, n64cart_probe);
-+}
-+
-+module_param(start, uint, 0);
-+MODULE_PARM_DESC(start, "Start address of the cart block data");
-+
-+module_param(size, uint, 0);
-+MODULE_PARM_DESC(size, "Size of the cart block data, in bytes");
-+
-+module_init(n64cart_init);
-=2D-
-2.6.2
+Please pull, thanks.
+Mike
+
+----------------------------------------------------------------
+- Fix DM-raid's raid1 discard limits so discards work.
+
+- Select missing Kconfig dependencies for DM integrity and zoned
+  targets.
+
+- 4 fixes for DM crypt target's support to optionally bypass
+  kcryptd workqueues.
+
+- Fix DM snapshot merge supports missing data flushes before
+  committing metadata.
+
+- Fix DM integrity data device flushing when external metadata is
+  used.
+
+- Fix DM integrity's maximum number of supported constructor arguments
+  that user can request when creating an integrity device.
+
+- Eliminate DM core ioctl logging noise when an ioctl is issued
+  without required CAP_SYS_RAWIO permission.
+
+----------------------------------------------------------------
+Akilesh Kailash (1):
+      dm snapshot: flush merged data before committing metadata
+
+Anthony Iliopoulos (1):
+      dm integrity: select CRYPTO_SKCIPHER
+
+Arnd Bergmann (1):
+      dm zoned: select CONFIG_CRC32
+
+Ignat Korchagin (4):
+      dm crypt: do not wait for backlogged crypto request completion in softirq
+      dm crypt: use GFP_ATOMIC when allocating crypto requests from softirq
+      dm crypt: do not call bio_endio() from the dm-crypt tasklet
+      dm crypt: defer decryption to a tasklet if interrupts disabled
+
+Mike Snitzer (2):
+      dm raid: fix discard limits for raid1
+      dm: eliminate potential source of excessive kernel log noise
+
+Mikulas Patocka (2):
+      dm integrity: fix flush with external metadata device
+      dm integrity: fix the maximum number of arguments
+
+ drivers/md/Kconfig        |   2 +
+ drivers/md/dm-bufio.c     |   6 ++
+ drivers/md/dm-crypt.c     | 170 +++++++++++++++++++++++++++++++++++++++++-----
+ drivers/md/dm-integrity.c |  62 +++++++++++++----
+ drivers/md/dm-raid.c      |   6 +-
+ drivers/md/dm-snap.c      |  24 +++++++
+ drivers/md/dm.c           |   2 +-
+ include/linux/dm-bufio.h  |   1 +
+ 8 files changed, 239 insertions(+), 34 deletions(-)
 
