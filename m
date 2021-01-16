@@ -2,67 +2,120 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-20.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3E65C433E0
-	for <linux-block@archiver.kernel.org>; Sat, 16 Jan 2021 11:07:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B451DC433E0
+	for <linux-block@archiver.kernel.org>; Sat, 16 Jan 2021 18:13:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6AD7B22DFA
-	for <linux-block@archiver.kernel.org>; Sat, 16 Jan 2021 11:07:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 79EB92255F
+	for <linux-block@archiver.kernel.org>; Sat, 16 Jan 2021 18:13:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726506AbhAPLGx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 16 Jan 2021 06:06:53 -0500
-Received: from spam.zju.edu.cn ([61.164.42.155]:13292 "EHLO zju.edu.cn"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725895AbhAPLGx (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 16 Jan 2021 06:06:53 -0500
-Received: by ajax-webmail-mail-app4 (Coremail) ; Sat, 16 Jan 2021 19:05:46
- +0800 (GMT+08:00)
-X-Originating-IP: [10.192.85.18]
-Date:   Sat, 16 Jan 2021 19:05:46 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From:   dinghao.liu@zju.edu.cn
-To:     "Chaitanya Kulkarni" <Chaitanya.Kulkarni@wdc.com>
-Cc:     "kjlu@umn.edu" <kjlu@umn.edu>, "Jens Axboe" <axboe@kernel.dk>,
-        "Hannes Reinecke" <hare@suse.de>, "Jan Kara" <jack@suse.cz>,
-        "Johannes Thumshirn" <Johannes.Thumshirn@wdc.com>,
-        "Ming Lei" <ming.lei@redhat.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: Re: [PATCH] block: Fix an error handling in add_partition
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version XT5.0.13 build 20200917(3e19599d)
- Copyright (c) 2002-2021 www.mailtech.cn zju.edu.cn
-In-Reply-To: <BYAPR04MB4965E41A9C690FA11883469A86A60@BYAPR04MB4965.namprd04.prod.outlook.com>
-References: <20210116072802.21940-1-dinghao.liu@zju.edu.cn>
- <BYAPR04MB4965E41A9C690FA11883469A86A60@BYAPR04MB4965.namprd04.prod.outlook.com>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+        id S1727925AbhAPSNr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 16 Jan 2021 13:13:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52702 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727857AbhAPSNq (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 16 Jan 2021 13:13:46 -0500
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67455C061573
+        for <linux-block@vger.kernel.org>; Sat, 16 Jan 2021 10:13:06 -0800 (PST)
+Received: by mail-pg1-x52f.google.com with SMTP id 15so8230299pgx.7
+        for <linux-block@vger.kernel.org>; Sat, 16 Jan 2021 10:13:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=to:cc:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=Eq+zx9MxmPa4AKIZDZ3v9xIKvQgbky5+QsDMHEM7b+U=;
+        b=Jh6ka+go++ldfRaOgt5xAtWh3H3SuMw8e+rU8IqizKcZaL3q3OViTiwK393gHxXT0K
+         adlu84wNjGi9It6PfmmtfqOHP6Jnl7FaI+UUX1j74S51EpoSucatRe1w6TF2JgW9M2Lu
+         GV08y84AdaaDFUh6uGxZqD3Yyyd0K6ZCUSW2X85Cbt8nO8VlovZOik4AajXMo7EYnYzK
+         erUKL7NT9CrQRbuQ+KDOOdGvl4X0Fhh2eIXcwKMaJPEgxqFFATsxLe3UDTVbWglmYXnq
+         bkZQYuXE+rt55ax3Fd9YsVo4ZKGIXeYQXFmEEm4PLiwjIAqI4H7SkrRMY5mwhO8jTXGH
+         Dy8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=Eq+zx9MxmPa4AKIZDZ3v9xIKvQgbky5+QsDMHEM7b+U=;
+        b=tdw0dODf1mpaWjOpQnoVaV3Vxy9E/5AzQsqN6FJAbRGgm4fPGpxdFtBsOSkeV1qtoh
+         EkZ/WgrAWlIGBpAqDT+6ojwMPIQlQKB+fyOcCsSIfRUCVZbjUwTiiQgUKlrdgh1zepI7
+         Q/eKbanbS97kLb9Qz+3zOmV4/XuHMb5EwlCpj2sTfKEgzA0NFwkns15fNvOz9uXRg666
+         +ajGIbWv8xw/BpzD9FEHuySXBEyBwDdPZsqczbmHSLLC1W3oLFZTv93M50gy7aXT77fX
+         Ex58HFpthLvD7jX4Hp+q5digeEnQ8/D6EvskJeYuoEBBlZAOEUqnq5fbXKUig56WWydR
+         q2EA==
+X-Gm-Message-State: AOAM531+aGKqTQxaBYNHuUr+QZ8xLvQd81gWWxY8FQGdtiCjKS6yAmZl
+        CEtgTFhO5h3oz678qjD0WubFeIr/XI+Z3w==
+X-Google-Smtp-Source: ABdhPJyPmuSsY3E/zLpumiAH98/3075zWaA2NMWRLwbEA7NsKPZvtkzFCB1gjlsf6sLlc3HwMTYFMg==
+X-Received: by 2002:a65:4785:: with SMTP id e5mr18889557pgs.0.1610820785659;
+        Sat, 16 Jan 2021 10:13:05 -0800 (PST)
+Received: from [192.168.4.41] (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
+        by smtp.gmail.com with ESMTPSA id x6sm11679378pfq.57.2021.01.16.10.13.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 16 Jan 2021 10:13:05 -0800 (PST)
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 5.11-rc4
+Message-ID: <95bd6ed5-4851-bd56-f528-d6aebe55bfba@kernel.dk>
+Date:   Sat, 16 Jan 2021 11:13:03 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Message-ID: <767024ca.436d9.1770adf5c69.Coremail.dinghao.liu@zju.edu.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID: cS_KCgBXfICKyAJgHFZ_AA--.24129W
-X-CM-SenderInfo: qrrzjiaqtzq6lmxovvfxof0/1tbiAgMHBlZdtSAnLAABsU
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VW5Jw
-        CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-        daVFxhVjvjDU=
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-PiBPbiAxLzE1LzIxIDExOjM0IFBNLCBEaW5naGFvIExpdSB3cm90ZToKPiA+IE9uY2Ugd2UgaGF2
-ZSBjYWxsZWQgZGV2aWNlX2luaXRpYWxpemUoKSwgd2Ugc2hvdWxkCj4gPiB1c2UgcHV0X2Rldmlj
-ZSgpIHRvIGdpdmUgdXAgdGhlIHJlZmVyZW5jZSBvbiBlcnJvciwKPiA+IGp1c3QgbGlrZSB3aGF0
-IHdlIGhhdmUgZG9uZSBvbiBmYWlsdXJlIG9mIGRldmljZV9hZGQoKS4KPiA+Cj4gPiBTaWduZWQt
-b2ZmLWJ5OiBEaW5naGFvIExpdSA8ZGluZ2hhby5saXVAemp1LmVkdS5jbj4KPiBQbGVhc2UgY29u
-c2lkZXIgaGF2aW5nIGZvbGxvd2luZyBjb21taXQgbWVzc2FnZSwgc2luY2UgYWJvdmUKPiBjb21t
-aXQgbWVzc2FnZSBpcyBsb29raW5nIG9kZCBmcm9tIHdoYXQgd2UgaGF2ZSBpbiB0aGUgdHJlZSA6
-LQo+IAo+IAo+IE9uY2Ugd2UgaGF2ZSBjYWxsZWQgZGV2aWNlX2luaXRpYWxpemUoKSwgd2Ugc2hv
-dWxkIHVzZSBwdXRfZGV2aWNlKCkgdG8KPiBnaXZlIHVwIHRoZSByZWZlcmVuY2Ugb24gZXJyb3Is
-IGp1c3QgbGlrZSB3aGF0IHdlIGhhdmUgZG9uZSBvbiBmYWlsdXJlCj4gb2YgZGV2aWNlX2FkZCgp
-Lgo+IAoKVGhhbmtzIGZvciB0aGlzIHN1Z2dlc3Rpb24hCiAKPiAKPiBBbHNvIGhhdmUgeW91IHRl
-c3RlZCB0aGlzIHBhdGNoIHdpdGggdGhlIHdpdGggZ2VuZXJhdGluZyBhcHByb3ByaWF0ZSBlcnJv
-ciA/Cj4gCgpObywgdGhpcyBwcm9ibGVtIGlzIGZvdW5kIHRocm91Z2ggY29tcGFyaW5nIGV4aXN0
-aW5nIHNvdXJjZSBjb2RlLiAKClJlZ2FyZHMsCkRpbmdoYW8=
+Hi Linus,
+
+Just an nvme pull request via Christoph:
+
+- don't initialize hwmon for discover controllers (Sagi Grimberg)
+- fix iov_iter handling in nvme-tcp (Sagi Grimberg)
+- fix a preempt warning in nvme-tcp (Sagi Grimberg)
+- fix a possible NULL pointer dereference in nvme (Israel Rukshin)
+
+Please pull!
+
+
+The following changes since commit 5342fd4255021ef0c4ce7be52eea1c4ebda11c63:
+
+  bcache: set bcache device into read-only mode for BCH_FEATURE_INCOMPAT_OBSO_LARGE_BUCKET (2021-01-09 09:21:03 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux-block.git tags/block-5.11-2021-01-16
+
+for you to fetch changes up to b4f664252f51e119e9403ef84b6e9ff36d119510:
+
+  Merge tag 'nvme-5.11-2021-01-14' of git://git.infradead.org/nvme into block-5.11 (2021-01-14 15:17:33 -0700)
+
+----------------------------------------------------------------
+block-5.11-2021-01-16
+
+----------------------------------------------------------------
+Israel Rukshin (1):
+      nvmet-rdma: Fix NULL deref when setting pi_enable and traddr INADDR_ANY
+
+Jens Axboe (1):
+      Merge tag 'nvme-5.11-2021-01-14' of git://git.infradead.org/nvme into block-5.11
+
+Sagi Grimberg (3):
+      nvme-tcp: Fix warning with CONFIG_DEBUG_PREEMPT
+      nvme-tcp: fix possible data corruption with bio merges
+      nvme: don't intialize hwmon for discovery controllers
+
+ drivers/nvme/host/core.c   | 11 ++++++++---
+ drivers/nvme/host/tcp.c    |  4 ++--
+ drivers/nvme/target/rdma.c | 16 ++++++++--------
+ 3 files changed, 18 insertions(+), 13 deletions(-)
+
+-- 
+Jens Axboe
+
