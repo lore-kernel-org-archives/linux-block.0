@@ -2,136 +2,67 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 410AEC433E0
-	for <linux-block@archiver.kernel.org>; Sat, 16 Jan 2021 10:46:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3E65C433E0
+	for <linux-block@archiver.kernel.org>; Sat, 16 Jan 2021 11:07:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 15CFB205CB
-	for <linux-block@archiver.kernel.org>; Sat, 16 Jan 2021 10:46:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6AD7B22DFA
+	for <linux-block@archiver.kernel.org>; Sat, 16 Jan 2021 11:07:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726661AbhAPKqf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 16 Jan 2021 05:46:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42738 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726210AbhAPKqe (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sat, 16 Jan 2021 05:46:34 -0500
-Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D9ADC061757
-        for <linux-block@vger.kernel.org>; Sat, 16 Jan 2021 02:45:54 -0800 (PST)
-Received: by mail-wm1-x32f.google.com with SMTP id k10so9474268wmi.3
-        for <linux-block@vger.kernel.org>; Sat, 16 Jan 2021 02:45:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=2jwSQz6bJhpxXlgpJkDfzKgw0g8RlHkHOBK/+dYUf+s=;
-        b=cnByPiYxKz6i0F6DQJ24mXU/uIXpa9aLS5f3tdws0elQ+RP7dC6gCImK6W27Dgnp2M
-         HwlVglFJ1fQfN8p/4UTG4nNaablXMYVkBh2chHr7TWpjuAr+e2V/xSRlTGGbA9CQVR/D
-         /rEMT2SnpgHbTA0njh/QUUg6kW0UD1kbTCuczHajNN5H5giYFjfdrXkUzFBB2W73M+ml
-         BybE14XzHL8xPmnyOUp2YAltyPrqgdFshog4QU/6F50/xDh6ZhYV9WS3G9Z9g7w5T1Eo
-         Te8IT2ei0r5e9NjQmXBn13iqYlZGB5l2ZOgSJDJBvDUY9uYcsncBOi9v4KcbSRPRwdV5
-         +hyQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=2jwSQz6bJhpxXlgpJkDfzKgw0g8RlHkHOBK/+dYUf+s=;
-        b=DF6IsSgFWKH8XX9a1fSjvwhkPBVFaRZugkte32TF2tYf3yimu+7WufPR2E0olGG92q
-         /QmAxpGXe6JGg3A6p2pJsZt1epAI+uoUlEhff8zktCiPqgss1+LYqVXqV5HBcy7Gc3FL
-         g0kWi1fw03JDAKspJ/V94KaWhOHUDgNS2dBTVCiDb+1ObVT3W44VezfNSVfhfDYPDQ74
-         rZwTcLjPBarRORGQUuw1FwLqGEoM9ZFCQqJM1MzGmAbsTbK/ZwFapx55RY3ZThj9KxoB
-         t/MQYPH0P+NA+urKVQFk4Ob4bVEvCfE5ISs5X7cuam10iSV9sY02H+w5jeTJqvK+xUnF
-         kObA==
-X-Gm-Message-State: AOAM532V1zPb0k9xHEXoADS22rjT+/UTte7e8bsAaQ/7sEMBKFOiS5UK
-        /2EqBaq/oxjiJdwV5Cf3LD3R+YHUAmGK7noN
-X-Google-Smtp-Source: ABdhPJwZ1t2bCay/8UxZltJ439a5aoUqTDRYC0InUKcf+uAqAerZMYfvqWCLVPxwVLKiVyh6U3tx9Q==
-X-Received: by 2002:a7b:c00a:: with SMTP id c10mr5909996wmb.66.1610793953162;
-        Sat, 16 Jan 2021 02:45:53 -0800 (PST)
-Received: from [192.168.0.13] ([83.216.184.132])
-        by smtp.gmail.com with ESMTPSA id s19sm16536937wrf.72.2021.01.16.02.45.51
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 16 Jan 2021 02:45:52 -0800 (PST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: question about relative control for sync io using bfq
-From:   Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <d2ea385c-1b19-002e-665a-6bfd23ff1c6e@huawei.com>
-Date:   Sat, 16 Jan 2021 11:45:49 +0100
-Cc:     Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
-        hch@lst.de, linux-block@vger.kernel.org,
-        chenzhou <chenzhou10@huawei.com>,
-        "houtao (A)" <houtao1@huawei.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <D064AB48-7CFA-4A93-9136-D2702FC6B77B@linaro.org>
-References: <b4163392-0462-ff6f-b958-1f96f33d69e6@huawei.com>
- <d2ea385c-1b19-002e-665a-6bfd23ff1c6e@huawei.com>
-To:     "yukuai (C)" <yukuai3@huawei.com>
-X-Mailer: Apple Mail (2.3445.104.11)
+        id S1726506AbhAPLGx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 16 Jan 2021 06:06:53 -0500
+Received: from spam.zju.edu.cn ([61.164.42.155]:13292 "EHLO zju.edu.cn"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725895AbhAPLGx (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 16 Jan 2021 06:06:53 -0500
+Received: by ajax-webmail-mail-app4 (Coremail) ; Sat, 16 Jan 2021 19:05:46
+ +0800 (GMT+08:00)
+X-Originating-IP: [10.192.85.18]
+Date:   Sat, 16 Jan 2021 19:05:46 +0800 (GMT+08:00)
+X-CM-HeaderCharset: UTF-8
+From:   dinghao.liu@zju.edu.cn
+To:     "Chaitanya Kulkarni" <Chaitanya.Kulkarni@wdc.com>
+Cc:     "kjlu@umn.edu" <kjlu@umn.edu>, "Jens Axboe" <axboe@kernel.dk>,
+        "Hannes Reinecke" <hare@suse.de>, "Jan Kara" <jack@suse.cz>,
+        "Johannes Thumshirn" <Johannes.Thumshirn@wdc.com>,
+        "Ming Lei" <ming.lei@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: Re: [PATCH] block: Fix an error handling in add_partition
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version XT5.0.13 build 20200917(3e19599d)
+ Copyright (c) 2002-2021 www.mailtech.cn zju.edu.cn
+In-Reply-To: <BYAPR04MB4965E41A9C690FA11883469A86A60@BYAPR04MB4965.namprd04.prod.outlook.com>
+References: <20210116072802.21940-1-dinghao.liu@zju.edu.cn>
+ <BYAPR04MB4965E41A9C690FA11883469A86A60@BYAPR04MB4965.namprd04.prod.outlook.com>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
+MIME-Version: 1.0
+Message-ID: <767024ca.436d9.1770adf5c69.Coremail.dinghao.liu@zju.edu.cn>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID: cS_KCgBXfICKyAJgHFZ_AA--.24129W
+X-CM-SenderInfo: qrrzjiaqtzq6lmxovvfxof0/1tbiAgMHBlZdtSAnLAABsU
+X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VW5Jw
+        CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
+        daVFxhVjvjDU=
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, give me a few days, unfortunately my time is very limited.
-
-Thanks for reporting this interesting problem,
-Paolo
-
-> Il giorno 16 gen 2021, alle ore 09:59, yukuai (C) <yukuai3@huawei.com> =
-ha scritto:
->=20
-> ping...
->=20
-> On 2021/01/11 21:15, yukuai (C) wrote:
->> Hi,
->> We found a performance problem:
->> kernel version: 5.10
->> disk: ssd
->> scheduler: bfq
->> arch: arm64 / x86_64
->> test param: direct=3D1, ioengine=3Dpsync, bs=3D4k, rw=3Drandread, =
-numjobs=3D32
->> We are using 32 threads here, test results showed that iops is equal
->> to single thread.
->> After digging into the problem, I found root cause of the problem is =
-strange:
->> bfq_add_request
->>  bfq_bfqq_handle_idle_busy_switch
->>   bfq_add_bfqq_busy
->>    bfq_activate_bfq
->>     bfq_activate_requeue_entity
->>      __bfq_activate_requeue_entity
->>       __bfq_activate_entity
->>        if (!bfq_entity_to_bfqq(entity))
->>         if (!entity->in_groups_with_pending_reqs)
->>          entity->in_groups_with_pending_reqs =3D true;
->>          bfqd->num_groups_with_pending_reqs++
->> If test process is not in root cgroup, num_groups_with_pending_reqs =
-will
->> be increased after request was instered to bfq.
->> bfq_select_queue
->>  bfq_better_to_idle
->>   idling_needed_for_service_guarantees
->>    bfq_asymmetric_scenario
->>     return varied_queue_weights || multiple_classes_busy || =
-bfqd->num_groups_with_pending_reqs > 0
->> After issuing IO to driver, num_groups_with_pending_reqs is ensured =
-to
->> be nonzero, thus bfq won't expire the queue. This is the root cause =
-of
->> degradating to single-process performance.
->> One the other hand, if I set slice_idle to zero, bfq_better_to_idle =
-will
->> return false early, and the problem will disapear. However, relative
->> control will be inactive.
->> My question is that, is this a known flaw for bfq? If not, as cfq =
-don't
->> have such problem, is there a suitable solution?
->> Thanks!
->> Yu Kuai
->> such problem,
-
+PiBPbiAxLzE1LzIxIDExOjM0IFBNLCBEaW5naGFvIExpdSB3cm90ZToKPiA+IE9uY2Ugd2UgaGF2
+ZSBjYWxsZWQgZGV2aWNlX2luaXRpYWxpemUoKSwgd2Ugc2hvdWxkCj4gPiB1c2UgcHV0X2Rldmlj
+ZSgpIHRvIGdpdmUgdXAgdGhlIHJlZmVyZW5jZSBvbiBlcnJvciwKPiA+IGp1c3QgbGlrZSB3aGF0
+IHdlIGhhdmUgZG9uZSBvbiBmYWlsdXJlIG9mIGRldmljZV9hZGQoKS4KPiA+Cj4gPiBTaWduZWQt
+b2ZmLWJ5OiBEaW5naGFvIExpdSA8ZGluZ2hhby5saXVAemp1LmVkdS5jbj4KPiBQbGVhc2UgY29u
+c2lkZXIgaGF2aW5nIGZvbGxvd2luZyBjb21taXQgbWVzc2FnZSwgc2luY2UgYWJvdmUKPiBjb21t
+aXQgbWVzc2FnZSBpcyBsb29raW5nIG9kZCBmcm9tIHdoYXQgd2UgaGF2ZSBpbiB0aGUgdHJlZSA6
+LQo+IAo+IAo+IE9uY2Ugd2UgaGF2ZSBjYWxsZWQgZGV2aWNlX2luaXRpYWxpemUoKSwgd2Ugc2hv
+dWxkIHVzZSBwdXRfZGV2aWNlKCkgdG8KPiBnaXZlIHVwIHRoZSByZWZlcmVuY2Ugb24gZXJyb3Is
+IGp1c3QgbGlrZSB3aGF0IHdlIGhhdmUgZG9uZSBvbiBmYWlsdXJlCj4gb2YgZGV2aWNlX2FkZCgp
+Lgo+IAoKVGhhbmtzIGZvciB0aGlzIHN1Z2dlc3Rpb24hCiAKPiAKPiBBbHNvIGhhdmUgeW91IHRl
+c3RlZCB0aGlzIHBhdGNoIHdpdGggdGhlIHdpdGggZ2VuZXJhdGluZyBhcHByb3ByaWF0ZSBlcnJv
+ciA/Cj4gCgpObywgdGhpcyBwcm9ibGVtIGlzIGZvdW5kIHRocm91Z2ggY29tcGFyaW5nIGV4aXN0
+aW5nIHNvdXJjZSBjb2RlLiAKClJlZ2FyZHMsCkRpbmdoYW8=
