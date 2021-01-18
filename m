@@ -2,118 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46368C433DB
-	for <linux-block@archiver.kernel.org>; Mon, 18 Jan 2021 16:38:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71FB9C433E9
+	for <linux-block@archiver.kernel.org>; Mon, 18 Jan 2021 16:56:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 11262206F7
-	for <linux-block@archiver.kernel.org>; Mon, 18 Jan 2021 16:38:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2C48D22C9C
+	for <linux-block@archiver.kernel.org>; Mon, 18 Jan 2021 16:56:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406656AbhARQbU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Jan 2021 11:31:20 -0500
-Received: from smtp.infotech.no ([82.134.31.41]:45726 "EHLO smtp.infotech.no"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2406723AbhARQbH (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Jan 2021 11:31:07 -0500
-Received: from localhost (localhost [127.0.0.1])
-        by smtp.infotech.no (Postfix) with ESMTP id 114222042B4;
-        Mon, 18 Jan 2021 17:30:22 +0100 (CET)
-X-Virus-Scanned: by amavisd-new-2.6.6 (20110518) (Debian) at infotech.no
-Received: from smtp.infotech.no ([127.0.0.1])
-        by localhost (smtp.infotech.no [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id fP6VqsNWXjil; Mon, 18 Jan 2021 17:30:14 +0100 (CET)
-Received: from xtwo70.bingwo.ca (host-104-157-204-209.dyn.295.ca [104.157.204.209])
-        by smtp.infotech.no (Postfix) with ESMTPA id E1CBB20416A;
-        Mon, 18 Jan 2021 17:30:10 +0100 (CET)
-From:   Douglas Gilbert <dgilbert@interlog.com>
-To:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        target-devel@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     martin.petersen@oracle.com, jejb@linux.vnet.ibm.com,
-        bostroesser@gmail.com, ddiss@suse.de, bvanassche@acm.org,
-        jgg@ziepe.ca
-Subject: [PATCH v6 0/4] scatterlist: add new capabilities
-Date:   Mon, 18 Jan 2021 11:30:02 -0500
-Message-Id: <20210118163006.61659-1-dgilbert@interlog.com>
-X-Mailer: git-send-email 2.25.1
+        id S2406814AbhARQ4d (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Jan 2021 11:56:33 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:29872 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2406686AbhARQ4H (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 18 Jan 2021 11:56:07 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 10IGkVkE181376;
+        Mon, 18 Jan 2021 11:55:23 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-type :
+ content-transfer-encoding; s=pp1;
+ bh=hk34UoxOyBwQiYV34H1q1JWasFY6VfbPK6tXKro7lFc=;
+ b=Hqq61nCDShSJ5kwnM/EszwmFv32yh1sNfjo2hVKs1qL//EpRUjnHDADH4veBBlcdAsQ+
+ pCeKzjaoKc7QOieE3td4rUX7TO8/7MYGoDEWiQDPnLyomvo9HSDaiwlpjgjZWnB+af+u
+ YyyqYgqSaUWsO5HXyGcbLSLztMqUjSwLwdJ0EYwMpSLkjgKSWDluZ+Yw3kRlK5Qmmf1N
+ Vb8d75inQQqB8gqHy32v9pg//K+Hi/+mEEA9UbZhUo9uWHBiFbVSiFqQWiwMkxG6qURd
+ /EUbIq07p6zNYjvu7ahCoBnV5FJOLHogTBReaXiR+L49paxWonKShtaurtP2j0rTQV6+ Ww== 
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 365e530646-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 18 Jan 2021 11:55:23 -0500
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 10IGrWNg019141;
+        Mon, 18 Jan 2021 16:55:21 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma02fra.de.ibm.com with ESMTP id 36454vrw3g-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 18 Jan 2021 16:55:21 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 10IGtIor42664266
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 18 Jan 2021 16:55:19 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CB27AA405B;
+        Mon, 18 Jan 2021 16:55:18 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B73D8A405C;
+        Mon, 18 Jan 2021 16:55:18 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Mon, 18 Jan 2021 16:55:18 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 20191)
+        id 674D2E02A3; Mon, 18 Jan 2021 17:55:18 +0100 (CET)
+From:   Stefan Haberland <sth@linux.ibm.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Jan Hoeppner <hoeppner@linux.ibm.com>,
+        linux-s390@vger.kernel.org,
+        Heiko Carstens <heiko.carstens@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>
+Subject: [PATCH 0/1] s390/dasd: fix kobject removal
+Date:   Mon, 18 Jan 2021 17:55:17 +0100
+Message-Id: <20210118165518.14578-1-sth@linux.ibm.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.343,18.0.737
+ definitions=2021-01-18_13:2021-01-18,2021-01-18 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ priorityscore=1501 mlxlogscore=657 mlxscore=0 bulkscore=0 spamscore=0
+ impostorscore=0 lowpriorityscore=0 clxscore=1015 phishscore=0 adultscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2101180095
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Scatter-gather lists (sgl_s) are frequently used as data carriers in
-the block layer. For example the SCSI and NVMe subsystems interchange
-data with the block layer using sgl_s. The sgl API is declared in
-<linux/scatterlist.h>
+Hi Jens,
 
-The author has extended these transient sgl use cases to a store (i.e.
-a ramdisk) in the scsi_debug driver. Other new potential uses of sgl_s
-could be for the target subsystem. When this extra step is taken, the
-need to copy between sgl_s becomes apparent. The patchset adds
-sgl_copy_sgl(), sgl_compare_sgl() and sgl_memset().
+please apply the following patch that fixes inconsistent kobject removal.
 
-The existing sgl_alloc_order() function can be seen as a replacement
-for vmalloc() for large, long-term allocations.  For what seems like
-no good reason, sgl_alloc_order() currently restricts its total
-allocation to less than or equal to 4 GiB. vmalloc() has no such
-restriction.
+Jan Höppner (1):
+  s390/dasd: Fix inconsistent kobject removal
 
-Changes since v5 [posted 20201228]:
-  - incorporate review requests from Jason Gunthorpe
-  - replace integer overflow detection code in sgl_alloc_order()
-    with a pre-condition statement
-  - rebase on lk 5.11.0-rc4
-
-Changes since v4 [posted 20201105]:
-  - rebase on lk 5.10.0-rc2
-
-Changes since v3 [posted 20201019]:
-  - re-instate check on integer overflow of nent calculation in
-    sgl_alloc_order(). Do it in such a way as to not limit the
-    overall sgl size to 4  GiB
-  - introduce sgl_compare_sgl_idx() helper function that, if
-    requested and if a miscompare is detected, will yield the byte
-    index of the first miscompare.
-  - add Reviewed-by tags from Bodo Stroesser
-  - rebase on lk 5.10.0-rc2 [was on lk 5.9.0]
-
-Changes since v2 [posted 20201018]:
-  - remove unneeded lines from sgl_memset() definition.
-  - change sg_zero_buffer() to call sgl_memset() as the former
-    is a subset.
-
-Changes since v1 [posted 20201016]:
-  - Bodo Stroesser pointed out a problem with the nesting of
-    kmap_atomic() [called via sg_miter_next()] and kunmap_atomic()
-    calls [called via sg_miter_stop()] and proposed a solution that
-    simplifies the previous code.
-
-  - the new implementation of the three functions has shorter periods
-    when pre-emption is disabled (but has more them). This should
-    make operations on large sgl_s more pre-emption "friendly" with
-    a relatively small performance hit.
-
-  - sgl_memset return type changed from void to size_t and is the
-    number of bytes actually (over)written. That number is needed
-    anyway internally so may as well return it as it may be useful to
-    the caller.
-
-This patchset is against lk 5.11.0-rc4
-
-Douglas Gilbert (4):
-  sgl_alloc_order: remove 4 GiB limit, sgl_free() warning
-  scatterlist: add sgl_copy_sgl() function
-  scatterlist: add sgl_compare_sgl() function
-  scatterlist: add sgl_memset()
-
- include/linux/scatterlist.h |  33 ++++-
- lib/scatterlist.c           | 253 +++++++++++++++++++++++++++++++-----
- 2 files changed, 253 insertions(+), 33 deletions(-)
+ drivers/s390/block/dasd_devmap.c | 20 ++++++++++++++------
+ drivers/s390/block/dasd_eckd.c   |  3 ++-
+ drivers/s390/block/dasd_int.h    |  2 +-
+ 3 files changed, 17 insertions(+), 8 deletions(-)
 
 -- 
-2.25.1
+2.17.1
 
