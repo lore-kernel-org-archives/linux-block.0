@@ -2,103 +2,62 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D39FC433DB
-	for <linux-block@archiver.kernel.org>; Mon, 18 Jan 2021 18:30:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 290FFC433E0
+	for <linux-block@archiver.kernel.org>; Mon, 18 Jan 2021 18:32:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1376722CA1
-	for <linux-block@archiver.kernel.org>; Mon, 18 Jan 2021 18:30:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E06B822CA2
+	for <linux-block@archiver.kernel.org>; Mon, 18 Jan 2021 18:32:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2436818AbhARSaG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Jan 2021 13:30:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49470 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2436759AbhARS3h (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Jan 2021 13:29:37 -0500
-Received: from mail-qk1-x736.google.com (mail-qk1-x736.google.com [IPv6:2607:f8b0:4864:20::736])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70C31C061575
-        for <linux-block@vger.kernel.org>; Mon, 18 Jan 2021 10:28:56 -0800 (PST)
-Received: by mail-qk1-x736.google.com with SMTP id p14so19537275qke.6
-        for <linux-block@vger.kernel.org>; Mon, 18 Jan 2021 10:28:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=V6OfwHc1CUnuze+sIKYDwiSSMcP1Mnt94yrNdzONXMc=;
-        b=I70gxMCGa6VXFTdCUVqIrxDoriChErMWEhWVmnDCztvFEV9K/n3ElBkgmgrtpg1BjL
-         JCXkgxdsL9K9xEv/0cEKuSXqiuiK5Zk061N68H4RaQ/56J+SpmBKSe2uRjtgWjwu3Ec2
-         NX5qA1+NkpWXw70tjWcvipfP7S9DA4dn6/H9GgFqdazctTtrzJX/fPCeqUHTo0gTwJrl
-         82xJGfkL9mF0QqRezQdtrPfNLCQiTjrXcwyRcZ80pnlFank7cK6kcJoxYmfKzIbst7lK
-         bXFmYGu0MlcKlzYwaIe7d3MvE0MsWb4ucMN22I1k2+G6PbJMn+J79JLr8bQ/Z26005lm
-         dhIA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=V6OfwHc1CUnuze+sIKYDwiSSMcP1Mnt94yrNdzONXMc=;
-        b=Gk+Kx8qrBvXnvRMmL2USiNOdSVp7NYwVdyD2pOsOmUeLytCoDgjC2Xtg5HxOHgV7X4
-         Y7kv8saQQzUhxshak7yfdGbr7toeY7Zm7Vsul2RvUAvjqVakJl3rlDvW+NnPLlgFC594
-         XrxgjVYhtN6+PudUqWz1i6m8CqxMqq9F/DU+5fmVxoasdYVqwq4Hc9iRJEFfP4L8Ibzl
-         qk365ljpEbq31ZWzDq/XOhKNuDoGLoBujJ64cn96YHmeYny/vn3De7EW8wVP0aiyr0HR
-         ilPcOoMZU9jK392Ps0hdB1TNQ7X6L0o6j9cZG6qGD6eu4RgNrQGUd2pCXXSf5tUsqgT/
-         /ddw==
-X-Gm-Message-State: AOAM533meos+ntyZZkWu2bQSjCHjkXzdVSyEeez8xcXOkwjngH7W9fRg
-        lK1TxZYtv7+Pe0CvkL3bpmKJ3Q==
-X-Google-Smtp-Source: ABdhPJyoVuq3nY/icnfkE0mrabkzzFBuuTfwE9NxFbO6a8QayKjQV5IZB1bxXI2yG/S0i+cPYI2Vfw==
-X-Received: by 2002:a37:6846:: with SMTP id d67mr840329qkc.219.1610994535549;
-        Mon, 18 Jan 2021 10:28:55 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-162-115-133.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.115.133])
-        by smtp.gmail.com with ESMTPSA id u5sm11368459qka.86.2021.01.18.10.28.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Jan 2021 10:28:54 -0800 (PST)
-Received: from jgg by mlx with local (Exim 4.94)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1l1ZGo-0031bp-7D; Mon, 18 Jan 2021 14:28:54 -0400
-Date:   Mon, 18 Jan 2021 14:28:54 -0400
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Douglas Gilbert <dgilbert@interlog.com>
-Cc:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        target-devel@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-kernel@vger.kernel.org, martin.petersen@oracle.com,
-        jejb@linux.vnet.ibm.com, bostroesser@gmail.com, ddiss@suse.de,
-        bvanassche@acm.org
-Subject: Re: [PATCH v6 1/4] sgl_alloc_order: remove 4 GiB limit, sgl_free()
- warning
-Message-ID: <20210118182854.GJ4605@ziepe.ca>
-References: <20210118163006.61659-1-dgilbert@interlog.com>
- <20210118163006.61659-2-dgilbert@interlog.com>
+        id S2407559AbhARScA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Jan 2021 13:32:00 -0500
+Received: from verein.lst.de ([213.95.11.211]:49184 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2407624AbhARSb4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 18 Jan 2021 13:31:56 -0500
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 2D5DF6736F; Mon, 18 Jan 2021 19:31:13 +0100 (CET)
+Date:   Mon, 18 Jan 2021 19:31:13 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
+        'Jens Axboe ' <axboe@kernel.dk>,
+        linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH] block: Add bio_limit
+Message-ID: <20210118183113.GA11473@lst.de>
+References: <20210114194706.1905866-1-willy@infradead.org> <20210118181338.GA11002@lst.de> <20210118181712.GC2260413@casper.infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210118163006.61659-2-dgilbert@interlog.com>
+In-Reply-To: <20210118181712.GC2260413@casper.infradead.org>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jan 18, 2021 at 11:30:03AM -0500, Douglas Gilbert wrote:
+On Mon, Jan 18, 2021 at 06:17:12PM +0000, Matthew Wilcox wrote:
+> On Mon, Jan 18, 2021 at 07:13:38PM +0100, Christoph Hellwig wrote:
+> > On Thu, Jan 14, 2021 at 07:47:06PM +0000, Matthew Wilcox (Oracle) wrote:
+> > > It's often inconvenient to use BIO_MAX_PAGES due to min() requiring the
+> > > sign to be the same.  Introduce bio_limit() and change BIO_MAX_PAGES to
+> > > be unsigned to make it easier for the users.
+> > > 
+> > > Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+> > 
+> > I like the helper, but I'm not too happy with the naming.  Why not
+> > something like bio_guess_nr_segs() or similar?
+> 
+> This feels like it's a comment on an entirely different patch, like this one:
+> 
+> https://git.infradead.org/users/willy/pagecache.git/commitdiff/fe9841debe24e15100359acadd0b561bbb2dceb1
+> 
+> bio_limit() doesn't guess anything, it just clamps the argument to
+> BIO_MAX_PAGES (which is itself misnamed; it's BIO_MAX_SEGS now)
 
-> After several flawed attempts to detect overflow, take the fastest
-> route by stating as a pre-condition that the 'order' function argument
-> cannot exceed 16 (2^16 * 4k = 256 MiB).
-
-That doesn't help, the point of the overflow check is similar to
-overflow checks in kcalloc: to prevent the routine from allocating
-less memory than the caller might assume.
-
-For instance ipr_store_update_fw() uses request_firmware() (which is
-controlled by userspace) to drive the length argument to
-sgl_alloc_order(). If userpace gives too large a value this will
-corrupt kernel memory.
-
-So this math:
-
-  	nent = round_up(length, PAGE_SIZE << order) >> (PAGE_SHIFT + order);
-
-Needs to be checked, add a precondition to order does not help. I
-already proposed a straightforward algorithm you can use.
-
-Jason
+No, it was for thi patch.  Yes, it divides and clamps.  Which is sort of
+a guess as often we might need less of them.  That being said I'm not
+very fond of my suggestion either, but limit sounds wrong as well.
