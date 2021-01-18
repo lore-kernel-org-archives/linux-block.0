@@ -2,88 +2,156 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAFEAC433E0
-	for <linux-block@archiver.kernel.org>; Sun, 17 Jan 2021 08:57:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33A8AC433E6
+	for <linux-block@archiver.kernel.org>; Mon, 18 Jan 2021 00:51:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 84FD4206D6
-	for <linux-block@archiver.kernel.org>; Sun, 17 Jan 2021 08:57:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F3D5022510
+	for <linux-block@archiver.kernel.org>; Mon, 18 Jan 2021 00:51:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728289AbhAQI50 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 17 Jan 2021 03:57:26 -0500
-Received: from mail.zju.edu.cn ([61.164.42.155]:13910 "EHLO zju.edu.cn"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728275AbhAQIyu (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 17 Jan 2021 03:54:50 -0500
-Received: from localhost.localdomain (unknown [10.192.85.18])
-        by mail-app2 (Coremail) with SMTP id by_KCgA3Hoka+wNgLCeUAA--.34965S4;
-        Sun, 17 Jan 2021 16:53:51 +0800 (CST)
-From:   Dinghao Liu <dinghao.liu@zju.edu.cn>
-To:     dinghao.liu@zju.edu.cn, kjlu@umn.edu
-Cc:     Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
-        Hannes Reinecke <hare@suse.de>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] [v3] block: Fix an error handling in add_partition
-Date:   Sun, 17 Jan 2021 16:53:42 +0800
-Message-Id: <20210117085346.25095-1-dinghao.liu@zju.edu.cn>
-X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID: by_KCgA3Hoka+wNgLCeUAA--.34965S4
-X-Coremail-Antispam: 1UD129KBjvdXoW7JFy7AFyfGr13Zr17Jr1DKFg_yoW3trc_J3
-        Wvvr109r18AryI9rn0kF4rtr1rtw1FqF40kF4xtFnrXayavayDur92gryIkr9xWayUury3
-        XF45Xw45AFs7CjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUbsxFc2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3wAFIxvE14AK
-        wVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20x
-        vE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4UJVWxJr1l84ACjcxK6I8E
-        87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c
-        8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JrI_
-        JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwI
-        xGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij
-        64vIr41l42xK82IY6x8ErcxFaVAv8VW8uw4UJr1UMxC20s026xCaFVCjc4AY6r1j6r4UMI
-        8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AK
-        xVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI
-        8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Zr0_Wr1UMIIF0xvEx4A2
-        jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0x
-        ZFpf9x0JUZYFZUUUUU=
-X-CM-SenderInfo: qrrzjiaqtzq6lmxovvfxof0/1tbiAgYIBlZdtSBAWAABsN
+        id S1729456AbhARAvD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 17 Jan 2021 19:51:03 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28484 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728889AbhARAvC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 17 Jan 2021 19:51:02 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1610930976;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=uKTPKkbWKKs43FHOAwrPXpvzuXlilYeVA6FEjLjxVBY=;
+        b=Vub+bTDw+eYBjzeG9uQhUZ1Ip53bnlqfWEsUEl4fD6UWQ/6KfsjB4y+gI4lTSibIbyQwQw
+        roZ1BE3iCLW68rkt4wSpHEPc7Rs3QAVn4FT8FqAEF8Hd3UWOH+OuLqRyB1kcFToYNS+KcV
+        FTAP1owfIsGn9vm7SNkdktA+9RZq1DI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-538-ksY0qSjlNzmAllCrH1juTg-1; Sun, 17 Jan 2021 19:49:32 -0500
+X-MC-Unique: ksY0qSjlNzmAllCrH1juTg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B04A759;
+        Mon, 18 Jan 2021 00:49:30 +0000 (UTC)
+Received: from localhost (ovpn-12-73.pek2.redhat.com [10.72.12.73])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 03E6C60BE2;
+        Mon, 18 Jan 2021 00:49:26 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-scsi@vger.kernel.org
+Cc:     Ming Lei <ming.lei@redhat.com>, Omar Sandoval <osandov@fb.com>,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
+        Sumanesh Samanta <sumanesh.samanta@broadcom.com>,
+        "Ewan D . Milne" <emilne@redhat.com>,
+        Hannes Reinecke <hare@suse.de>
+Subject: [PATCH V6 00/13] blk-mq/scsi: tracking device queue depth via sbitmap
+Date:   Mon, 18 Jan 2021 08:49:08 +0800
+Message-Id: <20210118004921.202545-1-ming.lei@redhat.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Once we have called device_initialize(), we should use put_device() to
-give up the reference on error, just like what we have done on failure
-of device_add().
+Hi,
 
-Signed-off-by: Dinghao Liu <dinghao.liu@zju.edu.cn>
----
+scsi uses one global atomic variable to track queue depth for each
+LUN/request queue. This way can't scale well when there is lots of CPU
+cores and the disk is very fast. Broadcom guys has complained that their
+high end HBA can't reach top performance because .device_busy is
+operated in IO path.
 
-Changelog:
+Replace the atomic variable sdev->device_busy with sbitmap for
+tracking scsi device queue depth.
 
-v2: - Refine commit message.
+Test on scsi_debug shows this way improve IOPS > 20%. Meantime
+the IOPS difference is just ~1% compared with bypassing .device_busy
+on scsi_debug via patches[1]
 
-v3: - Add '[v3]' to the title.
----
- block/partitions/core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+The 1st 6 patches moves percpu allocation hint into sbitmap, since
+the improvement by doing percpu allocation hint on sbitmap is observable.
+Meantime export helpers for SCSI.
 
-diff --git a/block/partitions/core.c b/block/partitions/core.c
-index e7d776db803b..23460cee9de5 100644
---- a/block/partitions/core.c
-+++ b/block/partitions/core.c
-@@ -384,7 +384,7 @@ static struct block_device *add_partition(struct gendisk *disk, int partno,
- 
- 	err = blk_alloc_devt(bdev, &devt);
- 	if (err)
--		goto out_bdput;
-+		goto out_put;
- 	pdev->devt = devt;
- 
- 	/* delay uevent until 'holders' subdir is created */
+Patch 7 and 8 prepares for the conversion by returning budget token
+from .get_budget callback, meantime passes the budget token to driver
+via 'struct blk_mq_queue_data' in .queue_rq().
+
+The last four patches changes SCSI for switching to track device queue
+depth via sbitmap.
+
+The patchset have been tested by Broadcom, and obvious performance boost
+can be observed on megaraid_sas.
+
+V6:
+	- rebase on for-5.12/block
+
+V5:
+	- add comment on sbitmap_weight()
+	- add patch 'megaraid_sas: v2 replace sdev_busy with local counter'
+	  for fixing build failure
+
+V4:
+	- limit max sdev->queue_depth as max(1024, shost->can_queue)
+	- simplify code for moving per-cpu allocation hint into sbitmap
+
+V3:
+	- rebase on both for-5.10/block and 5.10/scsi-queue.
+
+V2:
+	- fix one build failure
+
+
+Kashyap Desai (1):
+  megaraid_sas: v2 replace sdev_busy with local counter
+
+Ming Lei (12):
+  sbitmap: remove sbitmap_clear_bit_unlock
+  sbitmap: maintain allocation round_robin in sbitmap
+  sbitmap: add helpers for updating allocation hint
+  sbitmap: move allocation hint into sbitmap
+  sbitmap: export sbitmap_weight
+  sbitmap: add helper of sbitmap_calculate_shift
+  blk-mq: add callbacks for storing & retrieving budget token
+  blk-mq: return budget token from .get_budget callback
+  scsi: put hot fields of scsi_host_template into one cacheline
+  scsi: add scsi_device_busy() to read sdev->device_busy
+  scsi: make sure sdev->queue_depth is <= max(shost->can_queue, 1024)
+  scsi: replace sdev->device_busy with sbitmap
+
+ block/blk-mq-sched.c                        |  17 +-
+ block/blk-mq.c                              |  38 ++--
+ block/blk-mq.h                              |  25 ++-
+ block/kyber-iosched.c                       |   3 +-
+ drivers/message/fusion/mptsas.c             |   2 +-
+ drivers/scsi/megaraid/megaraid_sas.h        |   2 +
+ drivers/scsi/megaraid/megaraid_sas_fusion.c |  44 +++-
+ drivers/scsi/mpt3sas/mpt3sas_scsih.c        |   2 +-
+ drivers/scsi/scsi.c                         |  13 ++
+ drivers/scsi/scsi_lib.c                     |  67 ++++---
+ drivers/scsi/scsi_priv.h                    |   3 +
+ drivers/scsi/scsi_scan.c                    |  23 ++-
+ drivers/scsi/scsi_sysfs.c                   |   4 +-
+ drivers/scsi/sg.c                           |   2 +-
+ include/linux/blk-mq.h                      |  13 +-
+ include/linux/sbitmap.h                     |  85 +++++---
+ include/scsi/scsi_cmnd.h                    |   2 +
+ include/scsi/scsi_device.h                  |   8 +-
+ include/scsi/scsi_host.h                    |  72 ++++---
+ lib/sbitmap.c                               | 210 +++++++++++---------
+ 20 files changed, 426 insertions(+), 209 deletions(-)
+
+Cc: Omar Sandoval <osandov@fb.com>
+Cc: Kashyap Desai <kashyap.desai@broadcom.com>
+Cc: Sumanesh Samanta <sumanesh.samanta@broadcom.com>
+Cc: Ewan D. Milne <emilne@redhat.com>
+Cc: Hannes Reinecke <hare@suse.de>
 -- 
-2.17.1
+2.28.0
 
