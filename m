@@ -2,79 +2,165 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCA28C4361A
-	for <linux-block@archiver.kernel.org>; Tue, 19 Jan 2021 18:28:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64CFFC18E5B
+	for <linux-block@archiver.kernel.org>; Tue, 19 Jan 2021 18:28:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8F48023139
-	for <linux-block@archiver.kernel.org>; Tue, 19 Jan 2021 18:28:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 420EF20706
+	for <linux-block@archiver.kernel.org>; Tue, 19 Jan 2021 18:28:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390276AbhASQyK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 Jan 2021 11:54:10 -0500
-Received: from m12-15.163.com ([220.181.12.15]:57949 "EHLO m12-15.163.com"
+        id S2389938AbhASRLK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Jan 2021 12:11:10 -0500
+Received: from smtp.infotech.no ([82.134.31.41]:59504 "EHLO smtp.infotech.no"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389631AbhASQx4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Jan 2021 11:53:56 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-        s=s110527; h=From:Subject:Date:Message-Id; bh=0U+pRaymnbrvdWHk/1
-        qG3LeFSFiwut3uSGl7JwDYbSk=; b=jUowwnWQtrrXZDWheB3aV/2xyj4pLVhArt
-        vh7u+ywDzl5GbizMOMjxDe9LvPtRGqshlOvEaQIbzqOLALSAyFRVBDPNap59uL+/
-        pOx+OMZdvhJ/lb26B7iPcDLBUnksUCEJJXR7fkGDbefAA5vW0g0xBgzIIxQZiY0R
-        d9sIBJYoY=
-Received: from localhost.localdomain (unknown [119.3.119.20])
-        by smtp11 (Coremail) with SMTP id D8CowADHzH2J0QZg3sXTAA--.28998S4;
-        Tue, 19 Jan 2021 20:33:17 +0800 (CST)
-From:   Pan Bian <bianpan2016@163.com>
-To:     FUJITA Tomonori <fujita.tomonori@lab.ntt.co.jp>,
-        Jens Axboe <axboe@kernel.dk>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Pan Bian <bianpan2016@163.com>
-Subject: [PATCH 1/1] bsg: free the request before return error code
-Date:   Tue, 19 Jan 2021 04:33:11 -0800
-Message-Id: <20210119123311.108137-1-bianpan2016@163.com>
-X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID: D8CowADHzH2J0QZg3sXTAA--.28998S4
-X-Coremail-Antispam: 1Uf129KBjvdXoWrZFWDCFW5Gr1UJFWrAryDAwb_yoWxtFb_GF
-        yUKFs7JrZ5Cr45ursFva45t3WIkF1UGF4Iyw18tF9Fq345JasrJw1Ivwn8XF9xWFWUW3sx
-        G3WxX34fAFnayjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IU57CztUUUUU==
-X-Originating-IP: [119.3.119.20]
-X-CM-SenderInfo: held01tdqsiiqw6rljoofrz/xtbBZA0fclQHMCpPDgAAsM
+        id S2389552AbhASRKt (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 19 Jan 2021 12:10:49 -0500
+Received: from localhost (localhost [127.0.0.1])
+        by smtp.infotech.no (Postfix) with ESMTP id 32E9B2042B2;
+        Tue, 19 Jan 2021 18:09:37 +0100 (CET)
+X-Virus-Scanned: by amavisd-new-2.6.6 (20110518) (Debian) at infotech.no
+Received: from smtp.infotech.no ([127.0.0.1])
+        by localhost (smtp.infotech.no [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id IQ6qjm-zJqzh; Tue, 19 Jan 2021 18:09:34 +0100 (CET)
+Received: from xtwo70.bingwo.ca (host-104-157-204-209.dyn.295.ca [104.157.204.209])
+        by smtp.infotech.no (Postfix) with ESMTPA id 6080A2041AC;
+        Tue, 19 Jan 2021 18:09:33 +0100 (CET)
+From:   Douglas Gilbert <dgilbert@interlog.com>
+To:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        target-devel@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     martin.petersen@oracle.com, jejb@linux.vnet.ibm.com,
+        bostroesser@gmail.com, ddiss@suse.de, bvanassche@acm.org
+Subject: [PATCH 1/3] scatterlist: add sgl_copy_sgl() function
+Date:   Tue, 19 Jan 2021 12:09:26 -0500
+Message-Id: <20210119170928.79805-2-dgilbert@interlog.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20210119170928.79805-1-dgilbert@interlog.com>
+References: <20210119170928.79805-1-dgilbert@interlog.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Free the request rq before returning error code.
+Both the SCSI and NVMe subsystems receive user data from the block
+layer in scatterlist_s (aka scatter gather lists (sgl) which are
+often arrays). If drivers in those subsystems represent storage
+(e.g. a ramdisk) or cache "hot" user data then they may also
+choose to use scatterlist_s. Currently there are no sgl to sgl
+operations in the kernel. Start with a sgl to sgl copy. Stops
+when the first of the number of requested bytes to copy, or the
+source sgl, or the destination sgl is exhausted. So the
+destination sgl will _not_ grow.
 
-Fixes: 972248e9111e ("scsi: bsg-lib: handle bidi requests without block layer help")
-Signed-off-by: Pan Bian <bianpan2016@163.com>
+Reviewed-by: Bodo Stroesser <bostroesser@gmail.com>
+Signed-off-by: Douglas Gilbert <dgilbert@interlog.com>
 ---
- block/bsg.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ include/linux/scatterlist.h |  4 ++
+ lib/scatterlist.c           | 74 +++++++++++++++++++++++++++++++++++++
+ 2 files changed, 78 insertions(+)
 
-diff --git a/block/bsg.c b/block/bsg.c
-index d7bae94b64d9..3d78e843a83f 100644
---- a/block/bsg.c
-+++ b/block/bsg.c
-@@ -157,8 +157,10 @@ static int bsg_sg_io(struct request_queue *q, fmode_t mode, void __user *uarg)
- 		return PTR_ERR(rq);
+diff --git a/include/linux/scatterlist.h b/include/linux/scatterlist.h
+index 6f70572b2938..22111ee21383 100644
+--- a/include/linux/scatterlist.h
++++ b/include/linux/scatterlist.h
+@@ -320,6 +320,10 @@ size_t sg_pcopy_to_buffer(struct scatterlist *sgl, unsigned int nents,
+ size_t sg_zero_buffer(struct scatterlist *sgl, unsigned int nents,
+ 		       size_t buflen, off_t skip);
  
- 	ret = q->bsg_dev.ops->fill_hdr(rq, &hdr, mode);
--	if (ret)
-+	if (ret) {
-+		blk_put_request(rq);
- 		return ret;
++size_t sgl_copy_sgl(struct scatterlist *d_sgl, unsigned int d_nents, off_t d_skip,
++		    struct scatterlist *s_sgl, unsigned int s_nents, off_t s_skip,
++		    size_t n_bytes);
++
+ /*
+  * Maximum number of entries that will be allocated in one piece, if
+  * a list larger than this is required then chaining will be utilized.
+diff --git a/lib/scatterlist.c b/lib/scatterlist.c
+index a59778946404..782bcfe72c60 100644
+--- a/lib/scatterlist.c
++++ b/lib/scatterlist.c
+@@ -1058,3 +1058,77 @@ size_t sg_zero_buffer(struct scatterlist *sgl, unsigned int nents,
+ 	return offset;
+ }
+ EXPORT_SYMBOL(sg_zero_buffer);
++
++/**
++ * sgl_copy_sgl - Copy over a destination sgl from a source sgl
++ * @d_sgl:		 Destination sgl
++ * @d_nents:		 Number of SG entries in destination sgl
++ * @d_skip:		 Number of bytes to skip in destination before starting
++ * @s_sgl:		 Source sgl
++ * @s_nents:		 Number of SG entries in source sgl
++ * @s_skip:		 Number of bytes to skip in source before starting
++ * @n_bytes:		 The (maximum) number of bytes to copy
++ *
++ * Returns:
++ *   The number of copied bytes.
++ *
++ * Notes:
++ *   Destination arguments appear before the source arguments, as with memcpy().
++ *
++ *   Stops copying if either d_sgl, s_sgl or n_bytes is exhausted.
++ *
++ *   Since memcpy() is used, overlapping copies (where d_sgl and s_sgl belong
++ *   to the same sgl and the copy regions overlap) are not supported.
++ *
++ *   Large copies are broken into copy segments whose sizes may vary. Those
++ *   copy segment sizes are chosen by the min3() statement in the code below.
++ *   Since SG_MITER_ATOMIC is used for both sides, each copy segment is started
++ *   with kmap_atomic() [in sg_miter_next()] and completed with kunmap_atomic()
++ *   [in sg_miter_stop()]. This means pre-emption is inhibited for relatively
++ *   short periods even in very large copies.
++ *
++ *   If d_skip is large, potentially spanning multiple d_nents then some
++ *   integer arithmetic to adjust d_sgl may improve performance. For example
++ *   if d_sgl is built using sgl_alloc_order(chainable=false) then the sgl
++ *   will be an array with equally sized segments facilitating that
++ *   arithmetic. The suggestion applies to s_skip, s_sgl and s_nents as well.
++ *
++ **/
++size_t sgl_copy_sgl(struct scatterlist *d_sgl, unsigned int d_nents, off_t d_skip,
++		    struct scatterlist *s_sgl, unsigned int s_nents, off_t s_skip,
++		    size_t n_bytes)
++{
++	size_t len;
++	size_t offset = 0;
++	struct sg_mapping_iter d_iter, s_iter;
++
++	if (n_bytes == 0)
++		return 0;
++	sg_miter_start(&s_iter, s_sgl, s_nents, SG_MITER_ATOMIC | SG_MITER_FROM_SG);
++	sg_miter_start(&d_iter, d_sgl, d_nents, SG_MITER_ATOMIC | SG_MITER_TO_SG);
++	if (!sg_miter_skip(&s_iter, s_skip))
++		goto fini;
++	if (!sg_miter_skip(&d_iter, d_skip))
++		goto fini;
++
++	while (offset < n_bytes) {
++		if (!sg_miter_next(&s_iter))
++			break;
++		if (!sg_miter_next(&d_iter))
++			break;
++		len = min3(d_iter.length, s_iter.length, n_bytes - offset);
++
++		memcpy(d_iter.addr, s_iter.addr, len);
++		offset += len;
++		/* LIFO order (stop d_iter before s_iter) needed with SG_MITER_ATOMIC */
++		d_iter.consumed = len;
++		sg_miter_stop(&d_iter);
++		s_iter.consumed = len;
++		sg_miter_stop(&s_iter);
 +	}
- 
- 	rq->timeout = msecs_to_jiffies(hdr.timeout);
- 	if (!rq->timeout)
++fini:
++	sg_miter_stop(&d_iter);
++	sg_miter_stop(&s_iter);
++	return offset;
++}
++EXPORT_SYMBOL(sgl_copy_sgl);
 -- 
-2.17.1
-
+2.25.1
 
