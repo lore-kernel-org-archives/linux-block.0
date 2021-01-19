@@ -2,101 +2,203 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65F22C433E0
-	for <linux-block@archiver.kernel.org>; Tue, 19 Jan 2021 14:40:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63DF6C433DB
+	for <linux-block@archiver.kernel.org>; Tue, 19 Jan 2021 14:43:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2E07A20DD4
-	for <linux-block@archiver.kernel.org>; Tue, 19 Jan 2021 14:40:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 262C020DD4
+	for <linux-block@archiver.kernel.org>; Tue, 19 Jan 2021 14:43:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391208AbhASOju (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 Jan 2021 09:39:50 -0500
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:36901 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730106AbhASJls (ORCPT
+        id S2388842AbhASOkX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Jan 2021 09:40:23 -0500
+Received: from esa4.hc3370-68.iphmx.com ([216.71.155.144]:20132 "EHLO
+        esa4.hc3370-68.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390432AbhASKWz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Jan 2021 04:41:48 -0500
+        Tue, 19 Jan 2021 05:22:55 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1611049807; x=1642585807;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=gf41tJSgK06B/Ga4VjMMXYqoISVLe/c4wgOY899USOM=;
-  b=Xpuq4YwKBhK5mr0FVX5LURtse2AOw3sn8fUWeqbn5pPxmLcAxZMfAATg
-   xKN//XibR7FdYmfJoL/IPI9S+j1cgGi2OwuH1sCpgTVU6uE+JzQSjnuPe
-   4fDsTs3Jej7EG/iNiMUDnv3eZMlIah4rWabT9Eh78dt6IJfa2ypSt4Yed
-   kY3LHLvngZPIQFVl1t0yzYwjX8PYbZpYIwJjUvp0qXy3qZ4eJDOD74vCw
-   pHQthRzrL7Wd06rkSGlDL+DzufA8t/z8itDg7NP1WN2+ZE3fqXE6vdVPC
-   xefrvzJD5aMjYw0MOVP1XLNYRqscZMMooZzrPN+k21XKBg2K5d/QleNCR
-   A==;
-IronPort-SDR: hezkYgGg1unwe+41YcWGJ0rTblGMJ5Jch6EJPah6sK75B2RCvbBJMhiLkqQvG4T7DpKAu5RvgP
- kyaa16wiOeZus09sIzoE8u8Tw2Hto6CSLMXZwS6tx4H56E0YACBteOJYM4rqoMDrBIdikUBDC2
- plpTy6qND9zGP8V9EGIGyrwMM9sgR01AjzafaYfqOMBHB45XWvW4S+K//Z5XC40yA0vHnPo8T9
- Ta+KEWxz2136YSxxoxEuxnE1LPmwdwnhktphYE4suOqC86qzAXkqaLoo0XpwlvDL1N3Bjw5fP2
- eD8=
-X-IronPort-AV: E=Sophos;i="5.79,358,1602518400"; 
-   d="scan'208";a="261745164"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 19 Jan 2021 17:45:51 +0800
-IronPort-SDR: kMv+UtXFqylEi1HE1pNur+CS2ezi3pWNrJIPs0rtD39PH/DfK8zEqfnWVHqGZv0cR1YhFoYwOU
- thzqqGO7SWjC0I51j4jg8Y7yvDNLkBq5hsmkxWxPLIvsVvOPWTlDxkRAGgImE67QXMilTS98+n
- O9tk3gp0UEc8ZJdoCymcEX0IFYwmPtfKc15pyl/9WkoE/iz69T6jomR50j2zzv0MAeWHnqVX/0
- gPo0hYZz+wihms38OpvjSYEbgobp9v6K0RzgrTCYdiHZ8qDd3J+igJ97fcYbo3PPnyWmIeG5UL
- LTXxaZmAhm7OiSB9yFqhKxM4
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jan 2021 01:23:35 -0800
-IronPort-SDR: xIDxcBheQlgXo7ZUms0qQyLNEdYsboFRp17WDB1JXkkAD5fs5ESUVcU4h96k9BkShlr32PIxbs
- l226qLi3nmQe3bW2biWVEIPPGXS2ZYuoVI1F5c/wKVkDi0zU3N8fC27qygcSi65qFOZ4AMeq+h
- O+K/2xEn4j3JtFLfpmqcvrWBbaEwogH76ACSBKaKqkN7GP/N0BfxpqjaHXIcLOUbNxMlJRM5oG
- CNRDB6n26SxqQgcHgEa/kUaF+2b993sMM5CFQKdZBdrVSZr2ZVn8Ix8o+F8vQVvDMfNsJHnVY1
- vm0=
-WDCIronportException: Internal
-Received: from washi.fujisawa.hgst.com ([10.149.53.254])
-  by uls-op-cesaip02.wdc.com with ESMTP; 19 Jan 2021 01:38:57 -0800
-From:   Damien Le Moal <damien.lemoal@wdc.com>
-To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Cc:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [PATCH v2 2/2] block: document zone_append_max_bytes attribute
-Date:   Tue, 19 Jan 2021 18:38:55 +0900
-Message-Id: <20210119093855.1633232-3-damien.lemoal@wdc.com>
-X-Mailer: git-send-email 2.29.2
-In-Reply-To: <20210119093855.1633232-1-damien.lemoal@wdc.com>
-References: <20210119093855.1633232-1-damien.lemoal@wdc.com>
-MIME-Version: 1.0
+  d=citrix.com; s=securemail; t=1611051774;
+  h=date:from:to:cc:subject:message-id:references:
+   content-transfer-encoding:in-reply-to:mime-version;
+  bh=UFn2COXuBHxblLRGoZBsxxh6zIy1E1Z4KkjjEeYPCRs=;
+  b=cCImYnxNrb/au5p9qn4nTJkDtxXUdFkO2fta++FAThR59T+rDN9p8AzI
+   gD9iF3b5z/u9vcBFb5In/KQZDOm40WQt3ZBqqWyt9qzUy566uim05fiAw
+   Mjt9vJk9JJW2pXk4/KX0qDWsZKewFKxU90QPBD3W1r4U0q/Jxt699n4nr
+   4=;
+Authentication-Results: esa4.hc3370-68.iphmx.com; dkim=pass (signature verified) header.i=@citrix.onmicrosoft.com
+IronPort-SDR: UF7WhgJgjWLU9lGOyA3tr2U4FskkHg1LRT2LTcBI2t8idR4pP4NOOu74oP8M8ZqwGlGYxFXXLK
+ 9LpwqsILAKrivRJyQdM+z+E2aYd4JSd5LQtUZ7GT6N5kU6zQ0++iUGTbGhHq9lXphEW+6CY2/e
+ akixllOzaaE2GYV2iDNO3uXvx5Mn8rr+TzqpXlbp9ZxSXYhNuedGixSLaZGSD5JYTx3sigQD0H
+ O+5HRwH5jq6YhDhI15RWTDK50G9quYjnbzwFBzpcIAJZQax9/Tgyl+x1czgk8aaYI3tlcaHRBy
+ ffQ=
+X-SBRS: 5.2
+X-MesageID: 36650108
+X-Ironport-Server: esa4.hc3370-68.iphmx.com
+X-Remote-IP: 162.221.156.83
+X-Policy: $RELAYED
+X-IronPort-AV: E=Sophos;i="5.79,358,1602561600"; 
+   d="scan'208";a="36650108"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Rx2qv89ObsXUVHxHuCpF06QAbyTzkNzxZcZGD5Lnw854gm+PaVHkuHKntc3aQR0J2fGzpsYB8+/SkfliPKh1s5Mvv9KRv9bh7VtPXf0T1og/OljE3hCakCulUkjVuv8AkhnaUeywOWJv7k1Vc0D3mQR8/2hYsvaVTc7HHhFTqMJYLyXfcD0hzu9gnlWTencZcskzJWPgLuPNGUftbxE+hry8irqAZOeZW9PPK1O2hOeUU0HAGsOLUnp0tZwBzFSWWw55mkf3fN1I9B9Ygz/DkgE9T450WyfGmCusVLRBo1pZkI+4oSFlf/1R5DcmnD161B0FOCvQO75a/G7qTEnmOw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=HFDSjVH+Td1ailRqBHdNwccecEOujYQNjO/T5gnFcuA=;
+ b=FBFYmTkcqC76WPyz1HbSGlGTICeONN8o5QXoH/eckczuCZK0pEt5FXvRZS4aaKrA3H1TUlycNWf069diPf6gbxxSYr+COtrhUoibF3r1B/39LXDboaRE+pAlBJhln6e+1kFAWzt4fv03l+pGenuMT9YoOovpvcNxZBZeH6MxmDsVwjHtA2zX841BROMhxSrXNf4V+1w4UV3nS9KraXRZkKQ60uu8VxyH7dmJrL0em8z+EiG0+sJJvGTB7CuNWzu+3FWejIiaZTa4Iz1mkszJsPRQO/NrKb+sKGG8Ra2vbOKmYDO6GTr8jSPKyHzQrINQUfyb6/0K4guIFko34Wm5DA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=citrix.com; dmarc=pass action=none header.from=citrix.com;
+ dkim=pass header.d=citrix.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=citrix.onmicrosoft.com; s=selector2-citrix-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=HFDSjVH+Td1ailRqBHdNwccecEOujYQNjO/T5gnFcuA=;
+ b=LcqvNk7YtJBlO6YDEx3oCPrOSUIIxVqUxXmjfdj5C6gd93yMVusUzIrXZAivzn5S96KrOi1LNdMPvmt729TMl/hozlhK07Z7zjfI9efBAAgmyEAMOPURd0Srbj4N9+71DoGhWUFP8l3ByCkmUXDpH/CYwk91hWKv/0z3C/5+syE=
+Date:   Tue, 19 Jan 2021 11:21:39 +0100
+From:   Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>
+To:     =?utf-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
+CC:     <linux-kernel@vger.kernel.org>,
+        Arthur Borsboom <arthurborsboom@gmail.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>, <xen-devel@lists.xenproject.org>,
+        <linux-block@vger.kernel.org>
+Subject: Re: [PATCH] xen-blkfront: don't make discard-alignment mandatory
+Message-ID: <20210119102139.4zzfb2heytfsetmg@Air-de-Roger>
+References: <20210118151528.81668-1-roger.pau@citrix.com>
+ <7cef385d-efe3-2661-bee2-9d21f159a5fb@suse.com>
+ <20210119100651.afyccratx6ha52kc@Air-de-Roger>
+ <20969962-331d-50d9-dc65-772b564ab1c6@suse.com>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20969962-331d-50d9-dc65-772b564ab1c6@suse.com>
+X-ClientProxiedBy: AM5PR0502CA0005.eurprd05.prod.outlook.com
+ (2603:10a6:203:91::15) To DS7PR03MB5608.namprd03.prod.outlook.com
+ (2603:10b6:5:2c9::18)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: fe5124b2-3780-43b4-6d17-08d8bc64053d
+X-MS-TrafficTypeDiagnostic: DM5PR03MB2556:
+X-Microsoft-Antispam-PRVS: <DM5PR03MB2556C192659398F86176CE838FA30@DM5PR03MB2556.namprd03.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:1051;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: C4mAq4zmzSLZ9qjAv3eZdlGG2pPLq5I4rosWhzIzjbXJ3sB28IsHvJsy7BHOfrCtVcO32WW52nJGbpk+xAEU66Uf5HGWpD1F3KTm5fGQ7Ae2bC78A4IoO5ZxY6niSjCP/Y8hCua3PHN5rRkHdTF3unV7P2eSY/6t+ZbF37PfQuT1K6OWmBjbbAYgWCwAC3ci2qDYV77czwH9oe/NeTMEaDM3DCmFrgmuq1VKk5JHRgJH0zNRwPkTAH7gK5sAN8wrcQ0d1lYE7um/P58u5sfqKNB7XgG/FWQUr0gUzEHsemQroQkl2IOHIP0WoJKCjCoCnnltVpS5YFAfUoEPPYBsonbxeWb/QLAMJwk+X8k9fTJGmG9tLTM7lxbEWfQqIOiMR6vjFsg7xjpV/pS1IFHAfQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR03MB5608.namprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(7916004)(346002)(376002)(136003)(366004)(39860400002)(396003)(9686003)(5660300002)(1076003)(66574015)(66946007)(2906002)(6916009)(86362001)(6486002)(316002)(54906003)(83380400001)(478600001)(85182001)(53546011)(6496006)(26005)(8936002)(33716001)(66556008)(16526019)(956004)(186003)(8676002)(6666004)(4326008)(66476007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?NTVla2NiQWxnYmZiY0VNbWhQYXpUR3h6SHZnN0J2QjhPTGs1dVNqNkxoY0x4?=
+ =?utf-8?B?ckhaTTIzdUxIbWtPVUVlMktGcW0zS0JYWVJubFhZb2MyeUxIVHprRWpNaW1U?=
+ =?utf-8?B?TnFaL1NkbjVKdUp4T0hvZ01VWnVSanJOUEFZV2JSd1VIYzN3OVpRSkw1Nzg3?=
+ =?utf-8?B?QmFkdFNBOVIwVU1pVnZjcjZnVVBHd09TNzB3Rll0MHM2U1RtdC9Ya01EYTFV?=
+ =?utf-8?B?U0V0SThLQ3lPSE5mbzRnWjhrM1kzd2NEbHBNeDVnM0Y0WFhvTGV0U0JYNEZl?=
+ =?utf-8?B?M3c5WVM0dldJcnpuSnVKWDdMWXl3WVNXR0U0Sm5CWHQvY0RINVVvRHlyQ2FV?=
+ =?utf-8?B?SzVOYmxjYjBZb2pKczF0VFhmNTZjSkdWc2RCZ2M4aUFlU2swL0RUcUttdVhV?=
+ =?utf-8?B?NnBub2RZOS9MK2FmbnR6aTBHbUE3L28rY3VnY1RZdWIraWw0Z2NLUGdsZ1px?=
+ =?utf-8?B?S2kwWk1Kb1FocTMvbzVQdFBmYjRKZ1NqQUYwbi9SQndnK1kwNzZsWHh0MWo1?=
+ =?utf-8?B?ZVVLemVKc3pONlVBMzJrSndMY0poQnNUaHRNSXgzbFRhVkd3WWlxTUpOclpC?=
+ =?utf-8?B?N1ZGRDI3ZDU4UjRjZ0poUUVXSUh4Z3h2QjZFcVU5ME16NUtJMzNkSEhjOEFt?=
+ =?utf-8?B?Y2tuYlJiRm5OUDRiWHdTYkppZjFOVm5NYXprNmhzTkp4ZHZmM2gxSFc0bi8w?=
+ =?utf-8?B?bVZPeWJWQkRJRVAzUHA3NVNJMSs2Y3VtZWZSN0NtTjFJeXNMNURUOE92WXRZ?=
+ =?utf-8?B?bkxES3lDRG13ME90Ylk2QWpFNkZtVldBTjk2Vk4yWTlFc2pqMFB0eS8rWUF6?=
+ =?utf-8?B?N2ZKQysreEkrRGRpWGNYTVE1Vy9uaDVtRnVDeGlaM0RKNXdaNlRVeG41Z3RF?=
+ =?utf-8?B?UXVCVUR6a0J0VXd6ZWpVaVFMa3ZmUmNEUlVsZ0VXZk1kWnp5NHBYdUhIcVZr?=
+ =?utf-8?B?ekZVL3QwbEJlTEd3bjJPaGpDTGFwdkdRT2FDa1NIdm5VOEFqUll4VEhxUDls?=
+ =?utf-8?B?Tk9WSGdvOEluR0M1bVlzSXV2eGRjanhaOTdTZloyNXYrVG1sYzdsNnJJbWsy?=
+ =?utf-8?B?TmRwdWVKcUQ3QUphcm5zcXZhZDZxb2lSS1ViaVNaRXVDU3k5MS9SaTBZNS9S?=
+ =?utf-8?B?bDlMT1U2Y0pBUzdMb3NFcmNzZzhycE5jdzhHNGZmZ1VoWjVwcnVnNXAxaVI1?=
+ =?utf-8?B?TzkyK2hHd0JUMnZEMkx1Q2M3SnZzdGx3UStZQUZXRFhIKzJUMkdBd0FseVZq?=
+ =?utf-8?B?eEdUcytKVXM5NTliMm9BY3dpNUpMNDJCMm5hQTZzS3JNWDNqV3Q4Q2s4cU51?=
+ =?utf-8?Q?yB/oMm4jzN06h2ckLlmMoHQlo9g/UkmbeR?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: fe5124b2-3780-43b4-6d17-08d8bc64053d
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR03MB5608.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jan 2021 10:21:44.5131
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 335836de-42ef-43a2-b145-348c2ee9ca5b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1z/0kPgFywujPE9eeO7psHJUYh27LQiKKp79zaKRvfdmRvMEdI5nT5sv9GM/7w9iaKElBhfM4DLupKryRK6Guw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR03MB2556
+X-OriginatorOrg: citrix.com
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The description of the zone_append_max_bytes sysfs queue attribute is
-missing from Documentation/block/queue-sysfs.rst. Add it.
+On Tue, Jan 19, 2021 at 11:11:26AM +0100, Jürgen Groß wrote:
+> On 19.01.21 11:06, Roger Pau Monné wrote:
+> > On Tue, Jan 19, 2021 at 08:43:01AM +0100, Jürgen Groß wrote:
+> > > On 18.01.21 16:15, Roger Pau Monne wrote:
+> > > > Don't require the discard-alignment xenstore node to be present in
+> > > > order to correctly setup the feature. This can happen with versions of
+> > > > QEMU that only write the discard-granularity but not the
+> > > > discard-alignment node.
+> > > > 
+> > > > Assume discard-alignment is 0 if not present. While there also fix the
+> > > > logic to not enable the discard feature if discard-granularity is not
+> > > > present.
+> > > > 
+> > > > Reported-by: Arthur Borsboom <arthurborsboom@gmail.com>
+> > > > Signed-off-by: Roger Pau Monné <roger.pau@citrix.com>
+> > > > ---
+> > > > Cc: Boris Ostrovsky <boris.ostrovsky@oracle.com>
+> > > > Cc: Juergen Gross <jgross@suse.com>
+> > > > Cc: Stefano Stabellini <sstabellini@kernel.org>
+> > > > Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+> > > > Cc: "Roger Pau Monné" <roger.pau@citrix.com>
+> > > > Cc: Jens Axboe <axboe@kernel.dk>
+> > > > Cc: xen-devel@lists.xenproject.org
+> > > > Cc: linux-block@vger.kernel.org
+> > > > Cc: Arthur Borsboom <arthurborsboom@gmail.com>
+> > > > ---
+> > > >    drivers/block/xen-blkfront.c | 25 +++++++++++++------------
+> > > >    1 file changed, 13 insertions(+), 12 deletions(-)
+> > > > 
+> > > > diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
+> > > > index 5265975b3fba..5a93f7cc2939 100644
+> > > > --- a/drivers/block/xen-blkfront.c
+> > > > +++ b/drivers/block/xen-blkfront.c
+> > > > @@ -2179,22 +2179,23 @@ static void blkfront_closing(struct blkfront_info *info)
+> > > >    static void blkfront_setup_discard(struct blkfront_info *info)
+> > > >    {
+> > > > -	int err;
+> > > > -	unsigned int discard_granularity;
+> > > > -	unsigned int discard_alignment;
+> > > > +	unsigned int discard_granularity = 0;
+> > > > +	unsigned int discard_alignment = 0;
+> > > > +	unsigned int discard_secure = 0;
+> > > > -	info->feature_discard = 1;
+> > > > -	err = xenbus_gather(XBT_NIL, info->xbdev->otherend,
+> > > > +	xenbus_gather(XBT_NIL, info->xbdev->otherend,
+> > > >    		"discard-granularity", "%u", &discard_granularity,
+> > > >    		"discard-alignment", "%u", &discard_alignment,
+> > > > +		"discard-secure", "%u", &discard_secure,
+> > > >    		NULL);
+> > > 
+> > > This would mean that "discard-secure" will be evaluated only if the
+> > > other two items are set in Xenstore. From blkif.h I can't see this is
+> > > required, and your patch is modifying today's behavior in this regard.
+> > > 
+> > > You might want to have three xenbus_read_unsigned() calls instead.
+> > 
+> > You are right, discard-secure should be fetched regardless of whether
+> > discard-alignment exists.
+> > 
+> > I can fetch discard-granularity and discard-alignment using
+> > xenbus_gather and keep discard-secure using xenbus_read_unsigned. Let
+> > me send a new version.
+> 
+> I'm still not convinced this is correct. blkif.h doesn't mention that
+> discard-alignment will be valid only with discard-granularity being
+> present.
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
----
- Documentation/block/queue-sysfs.rst | 6 ++++++
- 1 file changed, 6 insertions(+)
+No, in fact I think I need to rework this a little further. Just
+having feature-discard = 1 should enable the discard functionality, by
+setting discard-granularity = physical block size and
+discard-alignment = 0.
 
-diff --git a/Documentation/block/queue-sysfs.rst b/Documentation/block/queue-sysfs.rst
-index c8bf8bc3c03a..4dc7f0d499a8 100644
---- a/Documentation/block/queue-sysfs.rst
-+++ b/Documentation/block/queue-sysfs.rst
-@@ -261,6 +261,12 @@ For block drivers that support REQ_OP_WRITE_ZEROES, the maximum number of
- bytes that can be zeroed at once. The value 0 means that REQ_OP_WRITE_ZEROES
- is not supported.
- 
-+zone_append_max_bytes (RO)
-+--------------------------
-+This is the maximum number of bytes that can be written to a sequential
-+zone of a zoned block device using a zone append write operation
-+(REQ_OP_ZONE_APPEND). This value is always 0 for regular block devices.
-+
- zoned (RO)
- ----------
- This indicates if the device is a zoned block device and the zone model of the
--- 
-2.29.2
-
+Roger.
