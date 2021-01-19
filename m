@@ -2,190 +2,257 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C071EC433E0
-	for <linux-block@archiver.kernel.org>; Tue, 19 Jan 2021 14:46:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DC2AC433DB
+	for <linux-block@archiver.kernel.org>; Tue, 19 Jan 2021 14:48:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 957C921D1B
-	for <linux-block@archiver.kernel.org>; Tue, 19 Jan 2021 14:46:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 52E5E2168B
+	for <linux-block@archiver.kernel.org>; Tue, 19 Jan 2021 14:48:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389994AbhASOkM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 Jan 2021 09:40:12 -0500
-Received: from esa5.hc3370-68.iphmx.com ([216.71.155.168]:17785 "EHLO
-        esa5.hc3370-68.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390066AbhASKTj (ORCPT
+        id S2389541AbhASOjQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Jan 2021 09:39:16 -0500
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:36726 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725771AbhASJlW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Jan 2021 05:19:39 -0500
+        Tue, 19 Jan 2021 04:41:22 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=citrix.com; s=securemail; t=1611051578;
-  h=date:from:to:cc:subject:message-id:references:
-   content-transfer-encoding:in-reply-to:mime-version;
-  bh=/bjQxp8HUntoGdxdqO1JnJG/djS2EtEng8HELIQA1cw=;
-  b=POTZJBQ1PDiureUo3/ZfHG/+w0BnmkW3gxBrQh+Dn4qCz3YAoOtbfgCU
-   9d6+YiK/mWSTrrTf+LuUFTxR4DlBXosgr+S4Q4sVt3Unhr2XJ6ifHYay5
-   KaN8w8mURbY5GMlQWixq8/OLHTMEnmUEZYaZHqyGD7sIv6MiOrLNuQIsQ
-   4=;
-Authentication-Results: esa5.hc3370-68.iphmx.com; dkim=pass (signature verified) header.i=@citrix.onmicrosoft.com
-IronPort-SDR: C22xdEYPtmlMTywRWCzJWkbz4H34HboZFqMQZaLRBHJU6B7XaruOD7Pm60y4S+1oNspAVig0y6
- 4MJvJ520QTu85q9CcpmDZEn61DPRyYV6QEQ9kl9r/AdnokSiP0Ezv+GKLvKF/p8k4f+1Uj2429
- wvQn/3YspDHrG8U+AP1GeqWYvezAOJt4EKbptRwESiPn24yDG2PndQjtvUK14tlLssweM58yuy
- uHcJQeHsdsb/s1Ua/41cFU+nwxMRXwJgBWBHi2t0kgwQQ4EsaLf6kMB1mww/W4LVm8LjXBIo8g
- lH8=
-X-SBRS: 5.2
-X-MesageID: 35341747
-X-Ironport-Server: esa5.hc3370-68.iphmx.com
-X-Remote-IP: 162.221.156.83
-X-Policy: $RELAYED
-X-IronPort-AV: E=Sophos;i="5.79,358,1602561600"; 
-   d="scan'208";a="35341747"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JI0XUotUQaEZValQfSFcb7Pn0oDqqMixD51pQEdPNBKF+XTimHLUqfd8V0KyN6iVp+f7JBBtToTh9o19wCgs2IWVO3xm4HaWa9MqHAfW4pirSFEljHWmyHA+bEGi8qPEecOENrIkAF4fACwvRKXGV7gAsnGvoC3auLNt4GUI4vdcQmUiQthEdTHUqyY1+KA6fT+haAGv45XJbrI3bwItuV4e/C6gP2ke7SerFTRr4Ywz1tfJE339kmYsnFyaOYklyq3rKi+iAnOjn0vMwABiu9gMR2khuowr9jvpYvxC2EVwk9U5hXgqicxdY/igATjhQYpqMuDqh2AoGYjWK5KIaA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lc8cFj7Eh/9trtedhQvRmKRka4ZR+13SpzisBpzDx6g=;
- b=eA1mhZfzWE7o1o3NHmurcOJWH2WeXXG7d5n6LyH3ZpGM2WDll2x9DqQX+Yu/nupsvmVAVZVof2xNwRC9W4dH6Mb0svDh7L3VsP86nu6u2SPb2f79f/mwOwAVgYmzG+pU7e6WgMj5hZnuFWG4wEFVDktS3+hUBjUPIAPm7xkm9Bs+Tyy83vTO8Ol7N1fGHUsgFsjjiHFZ4plaQ+e/U6RXsjlY/C/AB9ZBGzdmMC7O3kWHmRzpBG37oIjqu+6x40cbyFpoZlMhyJffzRNGUJ5X9xb1s1xPwXfT51UkE7IOeQcs+QoXvj8bYQtn/DZ0oro28dYHvEUhzQg4W4Xsci1ZzQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=citrix.com; dmarc=pass action=none header.from=citrix.com;
- dkim=pass header.d=citrix.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=citrix.onmicrosoft.com; s=selector2-citrix-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lc8cFj7Eh/9trtedhQvRmKRka4ZR+13SpzisBpzDx6g=;
- b=iWiaRucQYYKQ8iONu+Ww4h5bq2rrjQmjJsNIoREKszM3g8ddBkv6xRohECn2jjETxf80QdHoqFJ/2Wa0A/+Dp59T8s6qxJDV8aKJQGUXS7hnM0KYEE2nfYtASYtfXLRMBwWJkWipGIIu3Jc6dgJoihDnJ57tN96p28i6waOScM8=
-Date:   Tue, 19 Jan 2021 11:06:51 +0100
-From:   Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>
-To:     =?utf-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
-CC:     <linux-kernel@vger.kernel.org>,
-        Arthur Borsboom <arthurborsboom@gmail.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Jens Axboe <axboe@kernel.dk>, <xen-devel@lists.xenproject.org>,
-        <linux-block@vger.kernel.org>
-Subject: Re: [PATCH] xen-blkfront: don't make discard-alignment mandatory
-Message-ID: <20210119100651.afyccratx6ha52kc@Air-de-Roger>
-References: <20210118151528.81668-1-roger.pau@citrix.com>
- <7cef385d-efe3-2661-bee2-9d21f159a5fb@suse.com>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <7cef385d-efe3-2661-bee2-9d21f159a5fb@suse.com>
-X-ClientProxiedBy: AM6P194CA0083.EURP194.PROD.OUTLOOK.COM
- (2603:10a6:209:8f::24) To DS7PR03MB5608.namprd03.prod.outlook.com
- (2603:10b6:5:2c9::18)
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1611049769; x=1642585769;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=y6dOEwqLpl0B2L45bIDXFCcME1XrSfA+Q8mO9kbSPHc=;
+  b=gDkfrG7ahHw8KmVsyTeIPsgP2R6h1hVRE5AFBdx2J2LSaQK3sXHj2gpZ
+   DfrrLG56fZZgrwj4qUc8R6nRE5D8LotAqgM/QWiHPo7XnEi0z/65ezt+w
+   erTYYxQOL06Ppw4VL7g3Iu/iTeEw9kw8BJM04YmqiqFFJrP7Ygv7P/I10
+   dETLGljsItWxvsZcraUc3O5+c1CtWIluXglHHENyjPjFfyIyy7Rzfr2v5
+   I23MhUHyybHwg+B5/GCZrM8rjfl5CJo7vgMQxp9aR6LRznnj3uCd2+Zsb
+   RP6zeF16rfhNo1dqwoW6Czo0JHYr9wFNr6BLcH5J0b/8CX1PfcKe2vFFR
+   Q==;
+IronPort-SDR: zTByC7BIThlntQYJm3Qzdl7DbKqFTlIZOCZ4tzCbKWKbjsKT/51ga1SR8a3CqEFA707G2tNre/
+ ISfoU6kotVn62F3AntEZLVtfdvYEMdSuN1L2Jr9MGOwYdXyhlCWWz/+T1hiKWnLgcwB53ZfeBV
+ Zd5Xj/tAkCxkZCFMo1ikuLb/M2QT8IQlycrQt4Tx6JRKgoy7vLq9nWnGdjy/xBYA0SI++efFAk
+ 40RS53CpqkwkDss9e+rseADAO0JRDxRVVu1gPOALRHeA7IgdbYplrYXrWFl6JYjAJDU8RSKTTe
+ QeE=
+X-IronPort-AV: E=Sophos;i="5.79,358,1602518400"; 
+   d="scan'208";a="261745163"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 19 Jan 2021 17:45:50 +0800
+IronPort-SDR: HnpRZwGCisi7JSHvFJMkkUK7P8t8pgPkmXJTk2rEw12dd0o4vH8mB0N/TNrGCvomTiNszmRst4
+ Kh4JrdD/H4hhZRkhjBuMNBywbxPDfG1AyMSDvkNdfb68BkTwlsGyJD6f9tB3yaJ0+MSOqdI4ie
+ FkaR+Z42EyfIhS9h96v5ncNGB1AoVFX32ZUKJFYp6YfI1jELSaPbqLr7Ve7F6x3Lxv9/7a0jWb
+ 3gjyjroTEN5+Bd7HBV3bAt6y/m1KqYvn8ulZdAejTcn+m4nFb0H6Qpl6jUVr+0zNTVYVx8coTQ
+ GSQuwok4ykcsTovf9zdGGgae
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jan 2021 01:23:34 -0800
+IronPort-SDR: 79N2C0ZoAd+Zxs0uDr+yZ4vdd5KapVnQ8vdbXp+UcwS2zZpatDr9F6m2kTio+J18lHmhPxQy+6
+ uA3mMfEcD/pOd50k58A08UU5338TTFOqgsqKAg9Y88ZWFcPng7iAZ9OoULV7KULuyEeQzkdnSO
+ Ysdunngd5ryYGaJvskLw7WzMe5XQR8mCgmgZk4+meFtU46kxFlyt9mgLy5dU8ibVsiia8T0Otd
+ Z18OO4dq8IbPXVckOMN1/gjHaFCjRTNu31Obl5uP1pMjOhCMajxIU/3TzBNsupGY/TRnQnugWw
+ Wpk=
+WDCIronportException: Internal
+Received: from washi.fujisawa.hgst.com ([10.149.53.254])
+  by uls-op-cesaip02.wdc.com with ESMTP; 19 Jan 2021 01:38:56 -0800
+From:   Damien Le Moal <damien.lemoal@wdc.com>
+To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Cc:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Subject: [PATCH v2 1/2] block: introduce zone_write_granularity limit
+Date:   Tue, 19 Jan 2021 18:38:54 +0900
+Message-Id: <20210119093855.1633232-2-damien.lemoal@wdc.com>
+X-Mailer: git-send-email 2.29.2
+In-Reply-To: <20210119093855.1633232-1-damien.lemoal@wdc.com>
+References: <20210119093855.1633232-1-damien.lemoal@wdc.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 0d9fe86e-2153-4dab-5323-08d8bc61f596
-X-MS-TrafficTypeDiagnostic: DM6PR03MB3481:
-X-Microsoft-Antispam-PRVS: <DM6PR03MB3481398789CAF19A303019478FA30@DM6PR03MB3481.namprd03.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1751;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: tJqjiTTFz2G0fHOM331E2sz92CaSn0KOqmYR7mHRZVSwNp7baqZhNObdvWnSZnioDVWi7vy6pIE2T+QYufPfGSKSzT/zeB+F/MCdln7Jlc8LxWjj4G8GcsEUpt4PtDt8IuzyX+9Vj5Q79FcUxkJy/45i5Bq5oqYS3uIinkMnun3LPelyo1BzDKQ8vLuYNYegahXrPd25VCFv9edmalAZBXydbnyp6WLT6BGT6vYQ1+EJIYDHEj/G/7O8RGk0pFMnwI0ZNrjTS0/DGuUV2Ev9aH5DDW3csu5foUn6Oj8FOqleWygI71QVm7PPX8lVSsFO7LB3RkTaOT8yAs6UIeimX/jYwfDoUns/c/00Xc7VkUeb5FwB4kH7XDcP6D1/hUItS17efeQ62UfOE99HJCLC4DU/bgVpzbl00lF447F3kH1Gi4pyWCLgbxqDzikqWXpp5D7QgW1q+AHq/9jC1g1PWbzKAH4J2v8YpsvZ9MWhkOk5o0NQG5zPCYvTFQV7MP6v/YlFEx3j8bg+CSyRoDLLrg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR03MB5608.namprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(7916004)(376002)(396003)(136003)(39860400002)(366004)(346002)(8936002)(66574015)(26005)(6666004)(6486002)(956004)(9686003)(33716001)(66476007)(66556008)(186003)(16526019)(66946007)(85182001)(4326008)(53546011)(316002)(54906003)(1076003)(83380400001)(86362001)(478600001)(2906002)(5660300002)(6496006)(6916009)(8676002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?elhpREVUS1NyMUZEQnJRVGVvT0FBNUZLSlRnd2RNSjV5ZW5GaGVrdWQvWG9t?=
- =?utf-8?B?aGU3WW5OREhUSGh5VVhUL2tSUWhXSzc4TzMyd0EzczdOZ1VoYmNXSVVCNGdG?=
- =?utf-8?B?SjJtNnQ2endKaHc4TExYTmpsU3J4Ri9GOHR2M2phU01EV1JKU3BWODZVVDh5?=
- =?utf-8?B?T1Q4N1l1emo4VG1tckNObEsza0Jwc0ZCL3lDemhpYWxoODNFS2RONW1oM1RE?=
- =?utf-8?B?blJVVEtmVmV0VmZYcE5kcnM2QjBYQ1RnTEJWY0tEdFd1MnBQS0M0UHEzRk1U?=
- =?utf-8?B?QVo0V3MwY20zR2JzeElUOGN2c0lwcjhKQ29NZHlFR09Wckc3QThYbVJ4cWxB?=
- =?utf-8?B?bHRyU25rbTl5QVRRUHluRTJYMkovc0RwVU93V2sxNWRmeVIzUDBVLzFQQ09w?=
- =?utf-8?B?VjYzWEtLRTQxUGdlS0pzdVFHd0hySkVVOExVVzhhMHkrdTIxdXA5alhSdEZR?=
- =?utf-8?B?ODBpVlAybXI1Qm1WMEJIblBnRTBlK0ZDTDVaamNGQWtMMW4wUjVsUnBhTUVr?=
- =?utf-8?B?c0lyZkdXeitOaCs1WUFhcGI2Ukk1ZVhRc2RnQTNWQkR6b1FncG9GSWlBOTls?=
- =?utf-8?B?YjNZUFJWSHZnKzNDMWN6aWR5em9JdktEYjg5SWtJRElXc2txcEJhTTJFV3Fw?=
- =?utf-8?B?UzVzNXVqQmFvMllzUlBkdGpHWEwvL0l5T1B2S01WYVkvS3lLUXZkaWZzNlpM?=
- =?utf-8?B?amRGQXpWZXJVa2pIOUlTZnZUY0txeFRqblUyYi9OK1A3MU1HNXJ5TVNreEJZ?=
- =?utf-8?B?emhCM1A5Wk1abHI3TmlKMVNKMUQ2S2RhUHhzaG9tYy9ZM1N6eTRtMk5XSzZI?=
- =?utf-8?B?TWdTUEFyUG1zaXRKVDR1UTBmUnhDeURHRjIzdnh3VkpPVEUwQVJRZFo5VXIw?=
- =?utf-8?B?QkhBYURZUnFjUUZHOUE1WjFWVlIrdDFvWU0xRU0xdnlFMVRWK29UNmErcSti?=
- =?utf-8?B?YXRIVXdNa0VMQmlpcXNnY0ZmNTVId2QzaTM0WWI0WUNGZHhQaVoxNEFtRTdU?=
- =?utf-8?B?VE1udllEQldxVHJiZk1RSFFCR1BaYXdHMTNScVh3VjVSalpMclh4ZGwvL1B2?=
- =?utf-8?B?ZEhqeGRURVdPTEtjT0V4bk9TUnRMWHE4eTEvUWtrcEZNTWNoV2phRTd3YlA1?=
- =?utf-8?B?aFNlWEE2SVdwVFpLcXQ1ZjVPODNtKzFZdmtPMGhpVkJlSk45SUYwRjF2c2Jm?=
- =?utf-8?B?UDhBSXNNb1g3bmpPNWxzanJyS3ZIZXhrRGlmYmVQVSt2Ky9lSmdUZy9UOW9y?=
- =?utf-8?B?QzQ5TzNqTThYamVRcXVaV2lOSTZGTEdOamR0V2dpTmlpS0cwa1JiSEtpY2lS?=
- =?utf-8?Q?wG2Awy1W0yUG+WIAEgaPdOu40dEpyaFILN?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0d9fe86e-2153-4dab-5323-08d8bc61f596
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR03MB5608.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jan 2021 10:06:59.3702
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 335836de-42ef-43a2-b145-348c2ee9ca5b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: f8qqa/7EX7wQyTYcrPspb2by8JpoSuBv6VmbpZLyKsQ8aj/DNjxJ+Ki2szPywdVVfICW1UeCuGX+CkEzyWJx0Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR03MB3481
-X-OriginatorOrg: citrix.com
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jan 19, 2021 at 08:43:01AM +0100, Jürgen Groß wrote:
-> On 18.01.21 16:15, Roger Pau Monne wrote:
-> > Don't require the discard-alignment xenstore node to be present in
-> > order to correctly setup the feature. This can happen with versions of
-> > QEMU that only write the discard-granularity but not the
-> > discard-alignment node.
-> > 
-> > Assume discard-alignment is 0 if not present. While there also fix the
-> > logic to not enable the discard feature if discard-granularity is not
-> > present.
-> > 
-> > Reported-by: Arthur Borsboom <arthurborsboom@gmail.com>
-> > Signed-off-by: Roger Pau Monné <roger.pau@citrix.com>
-> > ---
-> > Cc: Boris Ostrovsky <boris.ostrovsky@oracle.com>
-> > Cc: Juergen Gross <jgross@suse.com>
-> > Cc: Stefano Stabellini <sstabellini@kernel.org>
-> > Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-> > Cc: "Roger Pau Monné" <roger.pau@citrix.com>
-> > Cc: Jens Axboe <axboe@kernel.dk>
-> > Cc: xen-devel@lists.xenproject.org
-> > Cc: linux-block@vger.kernel.org
-> > Cc: Arthur Borsboom <arthurborsboom@gmail.com>
-> > ---
-> >   drivers/block/xen-blkfront.c | 25 +++++++++++++------------
-> >   1 file changed, 13 insertions(+), 12 deletions(-)
-> > 
-> > diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
-> > index 5265975b3fba..5a93f7cc2939 100644
-> > --- a/drivers/block/xen-blkfront.c
-> > +++ b/drivers/block/xen-blkfront.c
-> > @@ -2179,22 +2179,23 @@ static void blkfront_closing(struct blkfront_info *info)
-> >   static void blkfront_setup_discard(struct blkfront_info *info)
-> >   {
-> > -	int err;
-> > -	unsigned int discard_granularity;
-> > -	unsigned int discard_alignment;
-> > +	unsigned int discard_granularity = 0;
-> > +	unsigned int discard_alignment = 0;
-> > +	unsigned int discard_secure = 0;
-> > -	info->feature_discard = 1;
-> > -	err = xenbus_gather(XBT_NIL, info->xbdev->otherend,
-> > +	xenbus_gather(XBT_NIL, info->xbdev->otherend,
-> >   		"discard-granularity", "%u", &discard_granularity,
-> >   		"discard-alignment", "%u", &discard_alignment,
-> > +		"discard-secure", "%u", &discard_secure,
-> >   		NULL);
-> 
-> This would mean that "discard-secure" will be evaluated only if the
-> other two items are set in Xenstore. From blkif.h I can't see this is
-> required, and your patch is modifying today's behavior in this regard.
-> 
-> You might want to have three xenbus_read_unsigned() calls instead.
+Per ZBC and ZAC specifications, host-managed SMR hard-disks mandate that
+all writes into sequential write required zones be aligned to the device
+physical block size. However, NVMe ZNS does not have this constraint and
+allows write operations into sequential zones to be logical block size
+aligned. This inconsistency does not help with portability of software
+across device types.
+To solve this, introduce the zone_write_granularity queue limit to
+indicate the alignment constraint, in bytes, of write operations into
+zones of a zoned block device. This new limit is exported as a
+read-only sysfs queue attribute and the helper
+blk_queue_zone_write_granularity() introduced for drivers to set this
+limit. The scsi disk driver is modified to use this helper to set
+host-managed SMR disk zone write granularity to the disk physical block
+size. The nvme driver zns support use this helper to set the new limit
+to the logical block size of the zoned namespace.
 
-You are right, discard-secure should be fetched regardless of whether
-discard-alignment exists.
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+---
+ Documentation/block/queue-sysfs.rst |  7 +++++++
+ block/blk-settings.c                | 28 ++++++++++++++++++++++++++++
+ block/blk-sysfs.c                   |  7 +++++++
+ drivers/nvme/host/zns.c             |  1 +
+ drivers/scsi/sd_zbc.c               | 10 ++++++++++
+ include/linux/blkdev.h              |  3 +++
+ 6 files changed, 56 insertions(+)
 
-I can fetch discard-granularity and discard-alignment using
-xenbus_gather and keep discard-secure using xenbus_read_unsigned. Let
-me send a new version.
+diff --git a/Documentation/block/queue-sysfs.rst b/Documentation/block/queue-sysfs.rst
+index 2638d3446b79..c8bf8bc3c03a 100644
+--- a/Documentation/block/queue-sysfs.rst
++++ b/Documentation/block/queue-sysfs.rst
+@@ -273,4 +273,11 @@ devices are described in the ZBC (Zoned Block Commands) and ZAC
+ do not support zone commands, they will be treated as regular block devices
+ and zoned will report "none".
+ 
++zone_write_granularity (RO)
++---------------------------
++This indicates the alignment constraint, in bytes, for write operations in
++sequential zones of zoned block devices (devices with a zoned attributed
++that reports "host-managed" or "host-aware"). This value is always 0 for
++regular block devices.
++
+ Jens Axboe <jens.axboe@oracle.com>, February 2009
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index 43990b1d148b..6be6ed9485e3 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -60,6 +60,7 @@ void blk_set_default_limits(struct queue_limits *lim)
+ 	lim->io_opt = 0;
+ 	lim->misaligned = 0;
+ 	lim->zoned = BLK_ZONED_NONE;
++	lim->zone_write_granularity = 0;
+ }
+ EXPORT_SYMBOL(blk_set_default_limits);
+ 
+@@ -366,6 +367,31 @@ void blk_queue_physical_block_size(struct request_queue *q, unsigned int size)
+ }
+ EXPORT_SYMBOL(blk_queue_physical_block_size);
+ 
++/**
++ * blk_queue_zone_write_granularity - set zone write granularity for the queue
++ * @q:  the request queue for the zoned device
++ * @size:  the zone write granularity size, in bytes
++ *
++ * Description:
++ *   This should be set to the lowest possible size allowing to write in
++ *   sequential zones of a zoned block device.
++ */
++void blk_queue_zone_write_granularity(struct request_queue *q,
++				      unsigned int size)
++{
++	if (WARN_ON(!blk_queue_is_zoned(q)))
++		return;
++
++	q->limits.zone_write_granularity = size;
++
++	if (q->limits.zone_write_granularity < q->limits.logical_block_size)
++		q->limits.zone_write_granularity = q->limits.logical_block_size;
++
++	if (q->limits.zone_write_granularity < q->limits.io_min)
++		q->limits.zone_write_granularity = q->limits.io_min;
++}
++EXPORT_SYMBOL_GPL(blk_queue_zone_write_granularity);
++
+ /**
+  * blk_queue_alignment_offset - set physical block alignment offset
+  * @q:	the request queue for the device
+@@ -631,6 +657,8 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
+ 			t->discard_granularity;
+ 	}
+ 
++	t->zone_write_granularity = max(t->zone_write_granularity,
++					b->zone_write_granularity);
+ 	t->zoned = max(t->zoned, b->zoned);
+ 	return ret;
+ }
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index b513f1683af0..7ea3dd4d876b 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -219,6 +219,11 @@ static ssize_t queue_write_zeroes_max_show(struct request_queue *q, char *page)
+ 		(unsigned long long)q->limits.max_write_zeroes_sectors << 9);
+ }
+ 
++static ssize_t queue_zone_write_granularity_show(struct request_queue *q, char *page)
++{
++	return queue_var_show(q->limits.zone_write_granularity, page);
++}
++
+ static ssize_t queue_zone_append_max_show(struct request_queue *q, char *page)
+ {
+ 	unsigned long long max_sectors = q->limits.max_zone_append_sectors;
+@@ -585,6 +590,7 @@ QUEUE_RO_ENTRY(queue_discard_zeroes_data, "discard_zeroes_data");
+ QUEUE_RO_ENTRY(queue_write_same_max, "write_same_max_bytes");
+ QUEUE_RO_ENTRY(queue_write_zeroes_max, "write_zeroes_max_bytes");
+ QUEUE_RO_ENTRY(queue_zone_append_max, "zone_append_max_bytes");
++QUEUE_RO_ENTRY(queue_zone_write_granularity, "zone_write_granularity");
+ 
+ QUEUE_RO_ENTRY(queue_zoned, "zoned");
+ QUEUE_RO_ENTRY(queue_nr_zones, "nr_zones");
+@@ -639,6 +645,7 @@ static struct attribute *queue_attrs[] = {
+ 	&queue_write_same_max_entry.attr,
+ 	&queue_write_zeroes_max_entry.attr,
+ 	&queue_zone_append_max_entry.attr,
++	&queue_zone_write_granularity_entry.attr,
+ 	&queue_nonrot_entry.attr,
+ 	&queue_zoned_entry.attr,
+ 	&queue_nr_zones_entry.attr,
+diff --git a/drivers/nvme/host/zns.c b/drivers/nvme/host/zns.c
+index 1dfe9a3500e3..f25311ccd996 100644
+--- a/drivers/nvme/host/zns.c
++++ b/drivers/nvme/host/zns.c
+@@ -113,6 +113,7 @@ int nvme_update_zone_info(struct nvme_ns *ns, unsigned lbaf)
+ 	blk_queue_flag_set(QUEUE_FLAG_ZONE_RESETALL, q);
+ 	blk_queue_max_open_zones(q, le32_to_cpu(id->mor) + 1);
+ 	blk_queue_max_active_zones(q, le32_to_cpu(id->mar) + 1);
++	blk_queue_zone_write_granularity(q, q->limits.logical_block_size);
+ free_data:
+ 	kfree(id);
+ 	return status;
+diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
+index cf07b7f93579..41d602f7e62e 100644
+--- a/drivers/scsi/sd_zbc.c
++++ b/drivers/scsi/sd_zbc.c
+@@ -789,6 +789,16 @@ int sd_zbc_read_zones(struct scsi_disk *sdkp, unsigned char *buf)
+ 	blk_queue_max_active_zones(q, 0);
+ 	nr_zones = round_up(sdkp->capacity, zone_blocks) >> ilog2(zone_blocks);
+ 
++	/*
++	 * Per ZBC and ZAC specifications, writes in sequential write required
++	 * zones of host-managed devices must be aligned to the device physical
++	 * block size.
++	 */
++	if (blk_queue_zoned_model(q) == BLK_ZONED_HM)
++		blk_queue_zone_write_granularity(q, sdkp->physical_block_size);
++	else
++		blk_queue_zone_write_granularity(q, sdkp->device->sector_size);
++
+ 	/* READ16/WRITE16 is mandatory for ZBC disks */
+ 	sdkp->device->use_16_for_rw = 1;
+ 	sdkp->device->use_10_for_rw = 0;
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index f94ee3089e01..011b3d2cd273 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -337,6 +337,7 @@ struct queue_limits {
+ 	unsigned int		max_zone_append_sectors;
+ 	unsigned int		discard_granularity;
+ 	unsigned int		discard_alignment;
++	unsigned int		zone_write_granularity;
+ 
+ 	unsigned short		max_segments;
+ 	unsigned short		max_integrity_segments;
+@@ -1161,6 +1162,8 @@ extern void blk_queue_logical_block_size(struct request_queue *, unsigned int);
+ extern void blk_queue_max_zone_append_sectors(struct request_queue *q,
+ 		unsigned int max_zone_append_sectors);
+ extern void blk_queue_physical_block_size(struct request_queue *, unsigned int);
++void blk_queue_zone_write_granularity(struct request_queue *q,
++				      unsigned int size);
+ extern void blk_queue_alignment_offset(struct request_queue *q,
+ 				       unsigned int alignment);
+ void blk_queue_update_readahead(struct request_queue *q);
+-- 
+2.29.2
 
-Thanks, Roger.
