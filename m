@@ -2,61 +2,61 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1260C433DB
-	for <linux-block@archiver.kernel.org>; Tue, 19 Jan 2021 05:14:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59EC1C43381
+	for <linux-block@archiver.kernel.org>; Tue, 19 Jan 2021 05:14:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 94D61205CB
-	for <linux-block@archiver.kernel.org>; Tue, 19 Jan 2021 05:14:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 168E5206A3
+	for <linux-block@archiver.kernel.org>; Tue, 19 Jan 2021 05:14:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388497AbhASFKn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 Jan 2021 00:10:43 -0500
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:34502 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389640AbhASFHk (ORCPT
+        id S2389690AbhASFM3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Jan 2021 00:12:29 -0500
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:51811 "EHLO
+        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389393AbhASFLc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Jan 2021 00:07:40 -0500
+        Tue, 19 Jan 2021 00:11:32 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1611032860; x=1642568860;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=2EwAg85Rl2+jMe62nRnS8RL98bOCXmnfO5riJrV6i0c=;
-  b=GjcXuKIfE7oPUJJM/Wi2vVnUpYud2gKvIpltIXHVNrAg3RsXPu43SSpM
-   wIW3+AVU6/Swl0XW8ZahSdWTuFz45x0PRFdfyO6jSRBESB3FGqMrqsV51
-   LqkiqQ6Mgcp5WA0fCSeOO9AkjTdUCbrZXnNCSfz2UwQChlBG1Ttqr5VHX
-   GXRzXfm92QORv96J/4QuRWF+9tkr+pcO4FELeyKPoafSsntR2wTSd/PaH
-   Iw7sQzoXv+E9E2JN2DSUUWOHaWKDpdqLHfZz17GiunoEXJigP+2IH4ZKA
-   x4hjKdDD2Xj6pDfIKfk4mM4S2sDepgL7SmTMUx4dUWt2yBgJNl9B9ln3F
-   w==;
-IronPort-SDR: 7F9V8E2gCFx1ENrckraC/aOPabyshxzdGR1mhufNzVCSB1ZQqnbgSiAulHQ+fQrQf0VUfZp2RQ
- lD9qauiuxEBB9PMtkyVUCtlbRRvbja4mqWOP92mvguWXYPFPRt0ywXlzt4nwaxSEuykNRTLHwY
- 46Oyg2LmyN3IKgagwVvK4ScZzXbnceF3nrKIl0BsSg9m7EerKdRxhTPeeLR437E7+7EOo/WM3N
- rxvlmtGFm6UcYsU0Qk1//34mDVQN7IyG+xRcn7TqkyNt+L1lv3J+Us9C6/ANlf4U03PgJBiMf4
- 7rY=
+  t=1611033092; x=1642569092;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=qoLn2/rcoIe5Xy1n1hC3Lt6hQmgoOhAQmKsRVXN2pPE=;
+  b=KoF7KWQBPdGWGHFA65SbXnOdhUqaL3slSuZod9pGPHFjUfmAVD3NmS6n
+   1uK3cMo1BqS00wSrxw2aD3H9f0zIM42pQ3HipI80wM84BXnFnxw5T0Jfn
+   m4ZF+36CRCeTfIt8NdlOyGC65OZ2V6p48gNQnNFS16SZLrhLtifUx0Rst
+   lugCPmT/XxFnTV3vyLfVSSmaRuUNiArPc6WJqi2cbHEK8Fumq+xVBwSjs
+   6MoCesfjkTIhEith4mGQMaJzrHDuCevd+8mazJ8Bd0hhbubgTDjUbO2AM
+   4boDZHIMJgwNmKAUzzHWL6ntFOvAwhTWIuQmXGpctLUvvKGFHNjDI/P4/
+   g==;
+IronPort-SDR: Sc1cagcp05wNi2gPdQB66ZrsusaAKJdzIDe8CzUtmgYSVeCWffOGB4WamBfNMqdybt8inn5CFE
+ 4c4eaVNL/mxAhB4VNOta4avTywzNn1LZHVlhQjwF+r5TtB/utQTB/kD+QlEOH3BdF18S1Nb4WS
+ YWHMv0vZxi1o0bBsjOLaEru9HdlhdWPIWW8QMHhuTvPa7TwtfzyPWgSszh1c4DZrUZqOGggoKg
+ Jsxg/mlpDBbAS2i0FBx23xPliBUIcVqCj1c4YNtIomXUOeisByIUhducn7/0CbpMmvHpMnBj9h
+ 7Vs=
 X-IronPort-AV: E=Sophos;i="5.79,357,1602518400"; 
-   d="scan'208";a="268080837"
+   d="scan'208";a="157763964"
 Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 19 Jan 2021 13:06:34 +0800
-IronPort-SDR: nICJNTCp5DZTCdEW+BDS8Z2snIrYrlMGiOG+8k41nZ+toTeWOlVhexX9dHTlwiqlcEC7mJSKUG
- Iy/fc+BGI7Gq8Tc8eNWRNodotuWudKLMuHWvPgvyglmYCy3CVY5v6y+KCctMt1KQr1t/A5vu6G
- EU8YQ12jfB7JSDNqLnc6qhTKltQXkH+QIkeCJgH1ExuBNJ/LLJLVkSZoi6pcXoZsChyTgxhzzc
- M/7G2USRTjBZjdX6m3rZ7UDS60bVW6YpGRy6Hay6Zi1n8mTtRVmKMccQ45eAk1w07M3Ya+tZ9I
- WeterqNf9O4H/xA4G74z3xOk
+  by ob1.hgst.iphmx.com with ESMTP; 19 Jan 2021 13:09:06 +0800
+IronPort-SDR: l0fGcm/mOaOvrk3ufBaX+Z/JgvxI9YqtJPwTy7GsQJFIw+iHk2No+n9cg2xF3/o1kj41JtgFoy
+ KgqJ5FUZvI7zi5KU/Y1P55lf9RcNzP0Ipuh5OQYWlzhIQdbSkO+NBnXNTFsREg+DOVFKYwVPE3
+ 673Y2brb4YkMXNlnLa3fTxM/hxCJrtRJtqk7KclrfCGAQS632iQYaCXGQWK3FDUqqdKyQa3hHL
+ 85lBTtP5HoxeeunvXyGizhknf6hV66hPA/ZmJXnnLBOF781krzjsvPFwrSAt4qSmMt0kosYvZz
+ wVJ5mlUHv3PO8nmWRIAhnwu7
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jan 2021 20:49:09 -0800
-IronPort-SDR: w8TQaHPmOf4afpFLhHFiHm4s9YBVvwz1nCheCJ4OBOH8yQ2UY0NC3Tt/JdFHF9KkeR+DlxZGUH
- e7bQB+02ddXqKaR8b/7v1Y7wXKviC9dKqJTPF9aSTC9cHooTn06sxWBBnh6ybRkpJPiq1eaXml
- Li9XSEIsEl1dTBAvxWyxQKBso9dBp+WZiRKxmJUsbAqs+G/qtiWTWXlVZWjYoZKV0OKSYwZfdM
- WxDGvor0MhqHOPvWCUI9b0h4sFeSeNraJk/cdT+mEYZtqS1ubVV2lyl7ZqDz6u2Z/jCzzw/RkG
- Jdo=
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jan 2021 20:51:42 -0800
+IronPort-SDR: YTx2sPI+S6B3s0zwLxmE9JLYYaAYYdsBlTi/QBtBxd/WH8egWo/s2t318EELWraWDHn4aYbSz+
+ GTI/c0RV1f+ot/Yyog9omiJsfpSR5vK5KT4IJoKlPtJElbAfKckX/OVaF06ki+8DfWwezcFUha
+ cQceDg9EfnRtvtgEBcHMkJqbMz+Hf9lDezVT3gRBkt4FXtAK8F0+3Jw8Dlu3r3MJXdxsm4oEy7
+ lej+XAjPd2ZdZGUr333NTWzmm/vXM3I7gj6chGIMLH1v36uCSVr35WYHxwt+NXTGuosML8y4Lr
+ Cxg=
 WDCIronportException: Internal
 Received: from vm.labspan.wdc.com (HELO vm.sc.wdc.com) ([10.6.137.102])
-  by uls-op-cesaip02.wdc.com with ESMTP; 18 Jan 2021 21:06:34 -0800
+  by uls-op-cesaip02.wdc.com with ESMTP; 18 Jan 2021 21:09:06 -0800
 From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 To:     linux-block@vger.kernel.org, linux-xfs@vger.kernel.org,
         linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -78,112 +78,40 @@ Cc:     jfs-discussion@lists.sourceforge.net, dm-devel@redhat.com,
         osandov@fb.com, bvanassche@acm.org, gustavo@embeddedor.com,
         asml.silence@gmail.com, jefflexu@linux.alibaba.com,
         Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [RFC PATCH 00/37] block: introduce bio_init_fields()
-Date:   Mon, 18 Jan 2021 21:05:54 -0800
-Message-Id: <20210119050631.57073-1-chaitanya.kulkarni@wdc.com>
+Subject: [RFC PATCH 21/37] dm-bufio: use bio_init_fields
+Date:   Mon, 18 Jan 2021 21:06:15 -0800
+Message-Id: <20210119050631.57073-22-chaitanya.kulkarni@wdc.com>
 X-Mailer: git-send-email 2.22.1
+In-Reply-To: <20210119050631.57073-1-chaitanya.kulkarni@wdc.com>
+References: <20210119050631.57073-1-chaitanya.kulkarni@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=y
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+---
+ drivers/md/dm-bufio.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-This is a *compile only RFC* which adds a generic helper to initialize
-the various fields of the bio that is repeated all the places in
-file-systems, block layer, and drivers.
-
-The new helper allows callers to initialize various members such as
-bdev, sector, private, end io callback, io priority, and write hints.
-
-The objective of this RFC is to only start a discussion, this it not 
-completely tested at all.                                                                                                            
-Following diff shows code level benefits of this helper :-
- 38 files changed, 124 insertions(+), 236 deletions(-)
-
--ck
-
-Chaitanya Kulkarni (37):
-  block: introduce bio_init_fields() helper
-  fs: use bio_init_fields in block_dev
-  btrfs: use bio_init_fields in disk-io
-  btrfs: use bio_init_fields in volumes
-  ext4: use bio_init_fields in page_io
-  gfs2: use bio_init_fields in lops
-  gfs2: use bio_init_fields in meta_io
-  gfs2: use bio_init_fields in ops_fstype
-  iomap: use bio_init_fields in buffered-io
-  iomap: use bio_init_fields in direct-io
-  jfs: use bio_init_fields in logmgr
-  zonefs: use bio_init_fields in append
-  drdb: use bio_init_fields in actlog
-  drdb: use bio_init_fields in bitmap
-  drdb: use bio_init_fields in receiver
-  floppy: use bio_init_fields
-  pktcdvd: use bio_init_fields
-  bcache: use bio_init_fields in journal
-  bcache: use bio_init_fields in super
-  bcache: use bio_init_fields in writeback
-  dm-bufio: use bio_init_fields
-  dm-crypt: use bio_init_fields
-  dm-zoned: use bio_init_fields metadata
-  dm-zoned: use bio_init_fields target
-  dm-zoned: use bio_init_fields
-  dm log writes: use bio_init_fields
-  nvmet: use bio_init_fields in bdev-ns
-  target: use bio_init_fields in iblock
-  btrfs: use bio_init_fields in scrub
-  fs: use bio_init_fields in buffer
-  eros: use bio_init_fields in data
-  eros: use bio_init_fields in zdata
-  jfs: use bio_init_fields in metadata
-  nfs: use bio_init_fields in blocklayout
-  ocfs: use bio_init_fields in heartbeat
-  xfs: use bio_init_fields in xfs_buf
-  xfs: use bio_init_fields in xfs_log
-
- block/blk-lib.c                     | 13 +++++--------
- drivers/block/drbd/drbd_actlog.c    |  5 +----
- drivers/block/drbd/drbd_bitmap.c    |  5 +----
- drivers/block/drbd/drbd_receiver.c  | 11 +++--------
- drivers/block/floppy.c              |  5 +----
- drivers/block/pktcdvd.c             | 12 ++++--------
- drivers/md/bcache/journal.c         | 21 ++++++++-------------
- drivers/md/bcache/super.c           | 19 +++++--------------
- drivers/md/bcache/writeback.c       | 14 ++++++--------
- drivers/md/dm-bufio.c               |  5 +----
- drivers/md/dm-crypt.c               |  4 +---
- drivers/md/dm-log-writes.c          | 21 ++++++---------------
- drivers/md/dm-zoned-metadata.c      | 15 +++++----------
- drivers/md/dm-zoned-target.c        |  9 +++------
- drivers/md/md.c                     |  6 ++----
- drivers/nvme/target/io-cmd-bdev.c   |  4 +---
- drivers/target/target_core_iblock.c | 11 +++--------
- fs/block_dev.c                      | 17 +++++------------
- fs/btrfs/disk-io.c                  | 11 ++++-------
- fs/btrfs/scrub.c                    |  6 ++----
- fs/btrfs/volumes.c                  |  4 +---
- fs/buffer.c                         |  7 ++-----
- fs/erofs/data.c                     |  6 ++----
- fs/erofs/zdata.c                    |  9 +++------
- fs/ext4/page-io.c                   |  6 ++----
- fs/gfs2/lops.c                      |  6 ++----
- fs/gfs2/meta_io.c                   |  5 ++---
- fs/gfs2/ops_fstype.c                |  7 ++-----
- fs/iomap/buffered-io.c              |  5 ++---
- fs/iomap/direct-io.c                | 15 +++++----------
- fs/jfs/jfs_logmgr.c                 | 16 ++++------------
- fs/jfs/jfs_metapage.c               | 16 +++++++---------
- fs/nfs/blocklayout/blocklayout.c    |  8 ++------
- fs/ocfs2/cluster/heartbeat.c        |  4 +---
- fs/xfs/xfs_buf.c                    |  6 ++----
- fs/xfs/xfs_log.c                    |  6 ++----
- fs/zonefs/super.c                   |  7 +++----
- include/linux/bio.h                 | 13 +++++++++++++
- 38 files changed, 124 insertions(+), 236 deletions(-)
-
+diff --git a/drivers/md/dm-bufio.c b/drivers/md/dm-bufio.c
+index 9c1a86bde658..1295e7e33e06 100644
+--- a/drivers/md/dm-bufio.c
++++ b/drivers/md/dm-bufio.c
+@@ -633,11 +633,8 @@ static void use_bio(struct dm_buffer *b, int rw, sector_t sector,
+ 		return;
+ 	}
+ 
+-	bio->bi_iter.bi_sector = sector;
+-	bio_set_dev(bio, b->c->bdev);
+ 	bio_set_op_attrs(bio, rw, 0);
+-	bio->bi_end_io = bio_complete;
+-	bio->bi_private = b;
++	bio_init_fields(bio, b->c->bdev, sector, b, bio_complete, 0, 0);
+ 
+ 	ptr = (char *)b->data + offset;
+ 	len = n_sectors << SECTOR_SHIFT;
 -- 
 2.22.1
 
