@@ -2,142 +2,164 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD520C43381
-	for <linux-block@archiver.kernel.org>; Tue, 19 Jan 2021 18:28:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D02F1C10F04
+	for <linux-block@archiver.kernel.org>; Tue, 19 Jan 2021 18:28:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 88FBE20776
-	for <linux-block@archiver.kernel.org>; Tue, 19 Jan 2021 18:28:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AC64F22DD3
+	for <linux-block@archiver.kernel.org>; Tue, 19 Jan 2021 18:28:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390133AbhASRNz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 Jan 2021 12:13:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59754 "EHLO
+        id S1730806AbhASR0E (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Jan 2021 12:26:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2391060AbhASRNh (ORCPT
+        with ESMTP id S2390855AbhASRZc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Jan 2021 12:13:37 -0500
-Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E954AC061575
-        for <linux-block@vger.kernel.org>; Tue, 19 Jan 2021 09:12:56 -0800 (PST)
-Received: by mail-ej1-x635.google.com with SMTP id ke15so21885653ejc.12
-        for <linux-block@vger.kernel.org>; Tue, 19 Jan 2021 09:12:56 -0800 (PST)
+        Tue, 19 Jan 2021 12:25:32 -0500
+Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE67BC061573;
+        Tue, 19 Jan 2021 09:24:51 -0800 (PST)
+Received: by mail-ej1-x632.google.com with SMTP id g3so10244155ejb.6;
+        Tue, 19 Jan 2021 09:24:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=soleen.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=UJPK5CKb0wcUY0ytM1Iv21srZ4iUx0Yma6nHEQVa5Nk=;
-        b=h3j+E4fVWvZlVGfFRLrwMN4TLzWzH0l9C3vPGAnBTk96EoS+ZreRLQfvvbyap2PvFA
-         efDFcP1MQZx6YwPhKcyihjAe7a5Urh0q0CtLSp9SIAjwqYt3SuPt1uMlkrnmhxGDJ+Cg
-         imLzrR7Di6uGNcviJTaKQdgzLRGftRy7P77FiuD2X5OeHhDdeJSFi4nbTpXT4C9IaVmZ
-         a9SrMnkAGScIvLYxB/82cu3JjNu8XbDzMyPB2hUczjooRoVqHvmBqF2pmGDwIkKmpX62
-         FO0HYz+Yfhn8abK7d1N17ZKfoWGnsaTO9FGex1wwWuvKMqTMr871DXeLJFTMWZvCkG79
-         h6jw==
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=Qy8mcYDslRubqQMPczlIvoAYWYvQDOq96eQu0PafMfE=;
+        b=eYfwUxhXfHaIuxuNwRrS8kQvPBRik+2A3J6NIRPhdjdSewQ2FD4YP6cz0CzJ/dRyni
+         3Nl8SNvf0ZfUSIH8M8bHbgPvVZvfOZh0F1olxQfRGqmUlZJvT4CTvQ1IDetZNfnsywLS
+         YTJObCiYFz8qs4JmrJZDJYx5rTXYoq16cu9z8PGpv1+jUY7yoMBmJNHhjOqw0/673aU1
+         yQvFUpoKeMzBAzJWh6m+uMLYfNoqwWB9COa2EkQvGd1kF5yH+8MjCmiKVDLrMSlI80B3
+         Tp0X5UjNbZ7UilcKIoJ4Si85g+Hc0vOra2v3AuTTGdKTsvo2eg2Qd2ujYfLeZdBrFosQ
+         BYmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=UJPK5CKb0wcUY0ytM1Iv21srZ4iUx0Yma6nHEQVa5Nk=;
-        b=Fc/N4Q5t/Yd40bxQJnwIzVYEDDv/i4Np95BSMEjDYNGlqvSdgxAXt17O84dWk3IS3A
-         df/caqdnIKDFshaZqkYNDxxGy/FBTinQsB0zYOmrj4apWr0SgnJmi2jHjWuRchRcY3JP
-         yjNNAa28vSQaOjXiLQ0Xyk5/j9cTw7pK3gEQYerc3VUMORSi+UJcjNRJbTll6+9pwgVS
-         Tif/NDR4fORz1S97cAITgoIGyz/iCBkbrFso0rPs7RKMWNgSf52ox6OE3J7IIVvvz+e9
-         zPjEGbVyomSaHIm9fnj0QdjFmvStZGj3Xh5H4KGvpmUmN26kgLcYzKDKqsqdyOm+vuMT
-         pZAw==
-X-Gm-Message-State: AOAM533G7brpFhjIlRipJueVE5C9RQfnuMlLyyVp3HWAz5LC04COXRaT
-        gSjNxGhaHN08TyqLuC29OYzkWW6EN6DOiJk+U1xMLNNQJKc=
-X-Google-Smtp-Source: ABdhPJwlzs3mKH5XCXsK5FB3ODrtX3QjgRCccS62xO+tJGzz36TaQLR4fAUYzxIwg5scnxQvlf7jbpFXYYVNhyAFOIw=
-X-Received: by 2002:a17:907:1b27:: with SMTP id mp39mr3580960ejc.519.1611076375571;
- Tue, 19 Jan 2021 09:12:55 -0800 (PST)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Qy8mcYDslRubqQMPczlIvoAYWYvQDOq96eQu0PafMfE=;
+        b=Za0i2LrP7pnw2SHBT7m8MKwhmTaRnIwXstgAzRFjlDT/NB8+Coat7Yymuym6CI2NPS
+         l9nzXgq0IVtetQQ9InLpAK9S2viTxi5aGgK2NY4+z0Sgbcuf2yBEcGlEDqk+4NwtAaM/
+         +dofHkd9tlVqy06APZJ4oOxzElrmsMThYSGa7zySIa188Zbpe0fSSxbJxu6+Dqxp1HS4
+         2eUWyKVAl8ZUG3lQkOWjZ61CnfP+Ea7ZvgGohu7lOzUCVodog+lbfjoccei80TaaMRdo
+         qHGFQJIRLOFBldCxuI6Z5RVm39Ht/W/FQ/0++6rsdMr6E2/uJTxZ8Qy+K3jo5WQTqSuX
+         LWTw==
+X-Gm-Message-State: AOAM533bnQrhnWaaCcrtUPiUTIBd7C2ckmn/A24uCNg+4n0riS8qjZyf
+        Q9DtaAKJUsl/1xJoSz4DZTA=
+X-Google-Smtp-Source: ABdhPJwIemtsVHlkxlk8JB7ypAMSs0GcJ4fX03fAf9hgs661+3MwI0c+/ccJWxE9OP0oPSEYjCWTVQ==
+X-Received: by 2002:a17:906:dfce:: with SMTP id jt14mr2794501ejc.435.1611077090638;
+        Tue, 19 Jan 2021 09:24:50 -0800 (PST)
+Received: from [192.168.178.40] (ipbcc06d06.dynamic.kabel-deutschland.de. [188.192.109.6])
+        by smtp.gmail.com with ESMTPSA id s19sm13021962edx.7.2021.01.19.09.24.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 19 Jan 2021 09:24:50 -0800 (PST)
+Subject: Re: [PATCH v6 1/4] sgl_alloc_order: remove 4 GiB limit, sgl_free()
+ warning
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     Douglas Gilbert <dgilbert@interlog.com>,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        target-devel@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-kernel@vger.kernel.org, martin.petersen@oracle.com,
+        jejb@linux.vnet.ibm.com, ddiss@suse.de, bvanassche@acm.org
+References: <20210118163006.61659-1-dgilbert@interlog.com>
+ <20210118163006.61659-2-dgilbert@interlog.com>
+ <20210118182854.GJ4605@ziepe.ca>
+ <59707b66-0b6c-b397-82fe-5ad6a6f99ba1@interlog.com>
+ <20210118202431.GO4605@ziepe.ca>
+ <7f443666-b210-6f99-7b50-6c26d87fa7ca@gmail.com>
+ <20210118234818.GP4605@ziepe.ca>
+From:   Bodo Stroesser <bostroesser@gmail.com>
+Message-ID: <6faed1e2-13bc-68ba-7726-91924cf21b66@gmail.com>
+Date:   Tue, 19 Jan 2021 18:24:49 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <20200723211748.13139-1-pasha.tatashin@soleen.com>
-In-Reply-To: <20200723211748.13139-1-pasha.tatashin@soleen.com>
-From:   Pavel Tatashin <pasha.tatashin@soleen.com>
-Date:   Tue, 19 Jan 2021 12:12:19 -0500
-Message-ID: <CA+CK2bDg-sPzUe2pUsXTxx8+vykyaL+Mr3J2OZELtmU2b_pmBg@mail.gmail.com>
-Subject: Re: [PATCH v2 0/1] scale loop device lock
-To:     Pavel Tatashin <pasha.tatashin@soleen.com>,
-        Tyler Hicks <tyhicks@linux.microsoft.com>, axboe@kernel.dk,
-        linux-block@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20210118234818.GP4605@ziepe.ca>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jul 23, 2020 at 5:17 PM Pavel Tatashin
-<pasha.tatashin@soleen.com> wrote:
+On 19.01.21 00:48, Jason Gunthorpe wrote:
+> On Mon, Jan 18, 2021 at 10:22:56PM +0100, Bodo Stroesser wrote:
+>> On 18.01.21 21:24, Jason Gunthorpe wrote:
+>>> On Mon, Jan 18, 2021 at 03:08:51PM -0500, Douglas Gilbert wrote:
+>>>> On 2021-01-18 1:28 p.m., Jason Gunthorpe wrote:
+>>>>> On Mon, Jan 18, 2021 at 11:30:03AM -0500, Douglas Gilbert wrote:
+>>>>>
+>>>>>> After several flawed attempts to detect overflow, take the fastest
+>>>>>> route by stating as a pre-condition that the 'order' function argument
+>>>>>> cannot exceed 16 (2^16 * 4k = 256 MiB).
+>>>>>
+>>>>> That doesn't help, the point of the overflow check is similar to
+>>>>> overflow checks in kcalloc: to prevent the routine from allocating
+>>>>> less memory than the caller might assume.
+>>>>>
+>>>>> For instance ipr_store_update_fw() uses request_firmware() (which is
+>>>>> controlled by userspace) to drive the length argument to
+>>>>> sgl_alloc_order(). If userpace gives too large a value this will
+>>>>> corrupt kernel memory.
+>>>>>
+>>>>> So this math:
+>>>>>
+>>>>>      	nent = round_up(length, PAGE_SIZE << order) >> (PAGE_SHIFT + order);
+>>>>
+>>>> But that check itself overflows if order is too large (e.g. 65).
+>>>
+>>> I don't reall care about order. It is always controlled by the kernel
+>>> and it is fine to just require it be low enough to not
+>>> overflow. length is the data under userspace control so math on it
+>>> must be checked for overflow.
+>>>
+>>>> Also note there is another pre-condition statement in that function's
+>>>> definition, namely that length cannot be 0.
+>>>
+>>> I don't see callers checking for that either, if it is true length 0
+>>> can't be allowed it should be blocked in the function
+>>>
+>>> Jason
+>>>
+>>
+>> A already said, I also think there should be a check for length or
+>> rather nent overflow.
+>>
+>> I like the easy to understand check in your proposed code:
+>>
+>> 	if (length >> (PAGE_SHIFT + order) >= UINT_MAX)
+>> 		return NULL;
+>>
+>>
+>> But I don't understand, why you open-coded the nent calculation:
+>>
+>> 	nent = length >> (PAGE_SHIFT + order);
+>> 	if (length & ((1ULL << (PAGE_SHIFT + order)) - 1))
+>> 		nent++;
+> 
+> It is necessary to properly check for overflow, because the easy to
+> understand check doesn't prove that round_up will work, only that >>
+> results in something that fits in an int and that +1 won't overflow
+> the int.
+> 
+>> Wouldn't it be better to keep the original line instead:
+>>
+>> 	nent = round_up(length, PAGE_SIZE << order) >> (PAGE_SHIFT + order);
+> 
+> This can overflow inside the round_up
 
-It has been half a year, and no activity on this patch. Can it be applied?
+I had a second look into math.h, but I don't find any reason why 
+round_up could overflow. Can you give a hint please?
 
-Thanks,
-Pasha
+Regarding the overflow checks: would it be a good idea to not check
+length >> (PAGE_SHIFT + order) in the beginning, but check nalloc
+immediately before the kmalloc_array() as the only overrun check:
 
->
-> Changelog
-> v2: Addressed Tyler Hicks comments
->         - added mutex_destroy()
->         - comment in lo_open()
->         - added lock around lo_disk in
->
->
-> ===
->
-> In our environment we are using systemd portable containers in
-> squashfs formats, convert them into loop device, and mount.
->
-> NAME                      MAJ:MIN RM   SIZE RO TYPE  MOUNTPOINT
-> loop5                       7:5    0  76.4M  0 loop
-> `-BaseImageM1908          252:3    0  76.4M  1 crypt /BaseImageM1908
-> loop6                       7:6    0    20K  0 loop
-> `-test_launchperf20       252:17   0   1.3M  1 crypt /app/test_launchperf20
-> loop7                       7:7    0    20K  0 loop
-> `-test_launchperf18       252:4    0   1.5M  1 crypt /app/test_launchperf18
-> loop8                       7:8    0     8K  0 loop
-> `-test_launchperf8        252:25   0    28K  1 crypt app/test_launchperf8
-> loop9                       7:9    0   376K  0 loop
-> `-test_launchperf14       252:29   0  45.7M  1 crypt /app/test_launchperf14
-> loop10                      7:10   0    16K  0 loop
-> `-test_launchperf4        252:11   0   968K  1 crypt app/test_launchperf4
-> loop11                      7:11   0   1.2M  0 loop
-> `-test_launchperf17       252:26   0 150.4M  1 crypt /app/test_launchperf17
-> loop12                      7:12   0    36K  0 loop
-> `-test_launchperf19       252:13   0   3.3M  1 crypt /app/test_launchperf19
-> loop13                      7:13   0     8K  0 loop
-> ...
->
-> We have over 50 loop devices which are mounted  during boot.
->
-> We observed contentions around loop_ctl_mutex.
->
-> The sample contentions stacks:
->
-> Contention 1:
-> __blkdev_get()
->    bdev->bd_disk->fops->open()
->       lo_open()
->          mutex_lock_killable(&loop_ctl_mutex); <- contention
->
-> Contention 2:
-> __blkdev_put()
->    disk->fops->release()
->       lo_release()
->          mutex_lock(&loop_ctl_mutex); <- contention
->
-> With total time waiting for loop_ctl_mutex ~18.8s during boot (across 8
-> CPUs) on our machine (69 loop devices): 2.35s per CPU.
->
-> Scaling this lock eliminates this contention entirely, and improves the boot
-> performance by 2s on our machine.
->
-> Pavel Tatashin (1):
->   loop: scale loop device by introducing per device lock
->
->  drivers/block/loop.c | 99 ++++++++++++++++++++++++++------------------
->  drivers/block/loop.h |  1 +
->  2 files changed, 59 insertions(+), 41 deletions(-)
->
-> --
-> 2.25.1
->
+	if ((unsigned long long)nalloc << (PAGE_SHIFT + order) < length)
+		return NULL;
+
+-Bodo
