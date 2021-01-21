@@ -8,60 +8,61 @@ X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67BB3C4332B
-	for <linux-block@archiver.kernel.org>; Thu, 21 Jan 2021 23:25:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7729EC433DB
+	for <linux-block@archiver.kernel.org>; Thu, 21 Jan 2021 23:25:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 22EA323A5E
-	for <linux-block@archiver.kernel.org>; Thu, 21 Jan 2021 23:25:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2C6FF2087E
+	for <linux-block@archiver.kernel.org>; Thu, 21 Jan 2021 23:25:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726205AbhAUXZH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Jan 2021 18:25:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50758 "EHLO
+        id S1726187AbhAUXZP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Jan 2021 18:25:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50766 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726222AbhAUXGb (ORCPT
+        with ESMTP id S1726182AbhAUXG0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Jan 2021 18:06:31 -0500
-Received: from mail-qv1-xf4a.google.com (mail-qv1-xf4a.google.com [IPv6:2607:f8b0:4864:20::f4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 557C3C0611BD
-        for <linux-block@vger.kernel.org>; Thu, 21 Jan 2021 15:03:53 -0800 (PST)
-Received: by mail-qv1-xf4a.google.com with SMTP id f7so2549872qvr.4
-        for <linux-block@vger.kernel.org>; Thu, 21 Jan 2021 15:03:53 -0800 (PST)
+        Thu, 21 Jan 2021 18:06:26 -0500
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD354C0611C0
+        for <linux-block@vger.kernel.org>; Thu, 21 Jan 2021 15:03:51 -0800 (PST)
+Received: by mail-pj1-x104a.google.com with SMTP id t10so2697417pjw.4
+        for <linux-block@vger.kernel.org>; Thu, 21 Jan 2021 15:03:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:in-reply-to:message-id:mime-version:references:subject
          :from:to:cc;
-        bh=rQjj2/WzWm3qCtm3ibhFIzAxq8pwrDZXF1QHOMz3o4g=;
-        b=OQwGeNkLyENvgqmLiHvbP7CSYH33j6r4RtJwGizSN8nWtM8Bd2dSMW/aHoyzXkcIXQ
-         SFQAzk5HLMFt5kaGzlRUPtwP9Cbhd/ympkQ6qOFzAlI2PxYcVQ0gf5Y41UoQBpok/ssF
-         pdjthPoUH3UPaE0tH2FUI6ZXptBS76fptbASUd5oFKbwFtVjL+37a5dGq3QxI8snd6w2
-         /ZXit2IQfvc79GmSw0sHRQPGpRCCqCtWa32wqwXTBD9Q5oUnteXCjDPx8vA++4qRAB8/
-         5eOStHbSSsuYUP+zC61cZOHerpgOL2Kh/UfZQ+22Z1w+MhDwLjcekAl9wXkg40ZZM1zP
-         yyiQ==
+        bh=9aiKVbqQYlPIThgTQ82dzvRvheXuBHM9UbbX1NZZwXQ=;
+        b=PDwCDzUeRrtiDbzP8R+ZzFNkDbG94q487W93Pzf3+343mIFOYQTDkuNfSKH3Njmgwk
+         Y1YPBbC6QmPRr4Alpg0Kx5Fm+v1IdyCTm0Yg+e6vqeauAts8m3c9NJ8uXTDII+85pRDd
+         2zUYu2cZLlMKY7g0UyvFFR98CJuJd0CliHcYVfg1y0sE3TBQVxqi4Mn51kTipxxQG9lG
+         SAQqsDMxW+8p4X4CfWdq2yc9jdOF0n7jVQ9JmayBBNV1rw54mgpTduxHdebVkhVQO2xM
+         HGr4GC96GJ5HXmQ+RoPWclxW98DPjcCU93GdDJbQ7hQnKT4gdwYR/sa5P6nZIJsn4WW3
+         1bXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=rQjj2/WzWm3qCtm3ibhFIzAxq8pwrDZXF1QHOMz3o4g=;
-        b=Mk+6UUcJAV+8cvdsYH1/tnHucV4h0o1NHdUVT3bOFHg6hglO0DQkTn+SGxXd8d0NI6
-         CQPg0wALa8qjnie2YVBE7mVexrg+vPXGpalvAcigc758NRqCR2j/QwPFiGB0MYM1nSAG
-         /wCpmxpFeOAt47qo5cLu9NTpIrk61DN6FTW+0tsReo3G2knz3Bvv73g+zn2Ilb5fB0GZ
-         eXPsJ4u83KQEKUKzLi5XoYnaUPgyB+WA2ZcR81NstSecpqC122x0ByYZwP4ehlN6YFx9
-         NFH6foqegbI9AbTHYCWWvQO41MAlWgdwvxAtuO17SsHuRFiYmS7kT+5zOQiibdLg1o+7
-         +BUQ==
-X-Gm-Message-State: AOAM532IguZO46+ezBfTUynfvnQtb+3Vwl9hNU9+7ty0mFNuL6ZU3bL9
-        rs9LQvWg7I4z+RsE7r/EtAaxHKfvCig=
-X-Google-Smtp-Source: ABdhPJzBS4n+vW6iQYRenoIZnviw813XxH38zeCsNFuDUBoahsAaZ41A78g1uNGV7RY2FFPhiAQAyieotuA=
+        bh=9aiKVbqQYlPIThgTQ82dzvRvheXuBHM9UbbX1NZZwXQ=;
+        b=TRLqSXG2/bxww2EUQr83QtjMrGGOlfqaPTdklbA8k2aXWAmaU5jVXq6HPsWMM/ORsg
+         kIG14Y+SgtIyg0v5K+NaofYa72ChiIEOPl48IfpuRW/IQl7e3w84eMWzhDCgf/8moQMo
+         Us0bfkd8ovg+OpS1e3W8JHIK90cCx57GRXBDCeZKPViekCcIbni6yIwYJ3LfE5DcAdqZ
+         ZYTi0yS8J1qFjCYMVWjkYLcuhhg9nkfkhpXyL4oUUy6/Hw+dEhcXQ9QxV96q9T2ch9Cj
+         gN9RluHB6mdukr/B/0f0isj5aLuWsE1cHTAWgHPqek2BvrHMgo3LSpAaRI1se+1zNeIH
+         SGUg==
+X-Gm-Message-State: AOAM533wvAM1yx+5F/rT2vSzf7uUGn6Dg4v0eHRodfDNaJ+wZTJuaKSt
+        fr9rfJppyHRKDsR5LIztYsGD36D1J0Y=
+X-Google-Smtp-Source: ABdhPJwXyycuFLMhL7lKL1NWCjYBJKBgLzmFW+8+TaABQDqzzJuvNirg4GTlA554HwKIFpRGe7RJFJ2TUyQ=
 Sender: "satyat via sendgmr" <satyat@satyaprateek.c.googlers.com>
 X-Received: from satyaprateek.c.googlers.com ([fda3:e722:ac3:10:24:72f4:c0a8:1092])
- (user=satyat job=sendgmr) by 2002:a0c:a692:: with SMTP id t18mr2037203qva.18.1611270232543;
- Thu, 21 Jan 2021 15:03:52 -0800 (PST)
-Date:   Thu, 21 Jan 2021 23:03:35 +0000
+ (user=satyat job=sendgmr) by 2002:a62:37c7:0:b029:1aa:22ea:537d with SMTP id
+ e190-20020a6237c70000b02901aa22ea537dmr1803778pfa.56.1611270230981; Thu, 21
+ Jan 2021 15:03:50 -0800 (PST)
+Date:   Thu, 21 Jan 2021 23:03:34 +0000
 In-Reply-To: <20210121230336.1373726-1-satyat@google.com>
-Message-Id: <20210121230336.1373726-8-satyat@google.com>
+Message-Id: <20210121230336.1373726-7-satyat@google.com>
 Mime-Version: 1.0
 References: <20210121230336.1373726-1-satyat@google.com>
 X-Mailer: git-send-email 2.30.0.280.ga3ce27912f-goog
-Subject: [PATCH v8 7/8] f2fs: support direct I/O with fscrypt using blk-crypto
+Subject: [PATCH v8 6/8] ext4: support direct I/O with fscrypt using blk-crypto
 From:   Satya Tangirala <satyat@google.com>
 To:     "Theodore Y . Ts'o" <tytso@mit.edu>,
         Jaegeuk Kim <jaegeuk@kernel.org>,
@@ -80,7 +81,7 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-Wire up f2fs with fscrypt direct I/O support. direct I/O with fscrypt is
+Wire up ext4 with fscrypt direct I/O support. Direct I/O with fscrypt is
 only supported through blk-crypto (i.e. CONFIG_BLK_INLINE_ENCRYPTION must
 have been enabled, the 'inlinecrypt' mount option must have been specified,
 and either hardware inline encryption support must be present or
@@ -89,31 +90,76 @@ direct I/O on encrypted files is only supported when the *length* of the
 I/O is aligned to the filesystem block size (which is *not* necessarily the
 same as the block device's block size).
 
+fscrypt_limit_io_blocks() is called before setting up the iomap to ensure
+that the blocks of each bio that iomap will submit will have contiguous
+DUNs. Note that fscrypt_limit_io_blocks() is normally a no-op, as normally
+the DUNs simply increment along with the logical blocks. But it's needed
+to handle an edge case in one of the fscrypt IV generation methods.
+
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 Co-developed-by: Satya Tangirala <satyat@google.com>
 Signed-off-by: Satya Tangirala <satyat@google.com>
-Acked-by: Jaegeuk Kim <jaegeuk@kernel.org>
+Reviewed-by: Jaegeuk Kim <jaegeuk@kernel.org>
+Acked-by: Theodore Ts'o <tytso@mit.edu>
 ---
- fs/f2fs/f2fs.h | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ fs/ext4/file.c  | 10 ++++++----
+ fs/ext4/inode.c |  7 +++++++
+ 2 files changed, 13 insertions(+), 4 deletions(-)
 
-diff --git a/fs/f2fs/f2fs.h b/fs/f2fs/f2fs.h
-index bb11759191dc..5130423a13e7 100644
---- a/fs/f2fs/f2fs.h
-+++ b/fs/f2fs/f2fs.h
-@@ -4091,7 +4091,11 @@ static inline bool f2fs_force_buffered_io(struct inode *inode,
- 	struct f2fs_sb_info *sbi = F2FS_I_SB(inode);
- 	int rw = iov_iter_rw(iter);
+diff --git a/fs/ext4/file.c b/fs/ext4/file.c
+index 349b27f0dda0..77681ba5e6cc 100644
+--- a/fs/ext4/file.c
++++ b/fs/ext4/file.c
+@@ -36,9 +36,11 @@
+ #include "acl.h"
+ #include "truncate.h"
  
--	if (f2fs_post_read_required(inode))
+-static bool ext4_dio_supported(struct inode *inode)
++static bool ext4_dio_supported(struct kiocb *iocb, struct iov_iter *iter)
+ {
+-	if (IS_ENABLED(CONFIG_FS_ENCRYPTION) && IS_ENCRYPTED(inode))
++	struct inode *inode = file_inode(iocb->ki_filp);
++
 +	if (!fscrypt_dio_supported(iocb, iter))
-+		return true;
-+	if (fsverity_active(inode))
-+		return true;
-+	if (f2fs_compressed_file(inode))
- 		return true;
- 	if (f2fs_is_multi_device(sbi))
- 		return true;
+ 		return false;
+ 	if (fsverity_active(inode))
+ 		return false;
+@@ -61,7 +63,7 @@ static ssize_t ext4_dio_read_iter(struct kiocb *iocb, struct iov_iter *to)
+ 		inode_lock_shared(inode);
+ 	}
+ 
+-	if (!ext4_dio_supported(inode)) {
++	if (!ext4_dio_supported(iocb, to)) {
+ 		inode_unlock_shared(inode);
+ 		/*
+ 		 * Fallback to buffered I/O if the operation being performed on
+@@ -495,7 +497,7 @@ static ssize_t ext4_dio_write_iter(struct kiocb *iocb, struct iov_iter *from)
+ 	}
+ 
+ 	/* Fallback to buffered I/O if the inode does not support direct I/O. */
+-	if (!ext4_dio_supported(inode)) {
++	if (!ext4_dio_supported(iocb, from)) {
+ 		if (ilock_shared)
+ 			inode_unlock_shared(inode);
+ 		else
+diff --git a/fs/ext4/inode.c b/fs/ext4/inode.c
+index c173c8405856..e5407699ce92 100644
+--- a/fs/ext4/inode.c
++++ b/fs/ext4/inode.c
+@@ -3482,6 +3482,13 @@ static int ext4_iomap_begin(struct inode *inode, loff_t offset, loff_t length,
+ 	if (ret < 0)
+ 		return ret;
+ out:
++	/*
++	 * When inline encryption is enabled, sometimes I/O to an encrypted file
++	 * has to be broken up to guarantee DUN contiguity. Handle this by
++	 * limiting the length of the mapping returned.
++	 */
++	map.m_len = fscrypt_limit_io_blocks(inode, map.m_lblk, map.m_len);
++
+ 	ext4_set_iomap(inode, iomap, &map, offset, length);
+ 
+ 	return 0;
 -- 
 2.30.0.280.ga3ce27912f-goog
 
