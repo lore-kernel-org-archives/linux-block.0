@@ -2,119 +2,91 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77A46C43381
-	for <linux-block@archiver.kernel.org>; Thu, 21 Jan 2021 14:50:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BA32C433DB
+	for <linux-block@archiver.kernel.org>; Thu, 21 Jan 2021 15:10:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 32E67238A1
-	for <linux-block@archiver.kernel.org>; Thu, 21 Jan 2021 14:50:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 10462238E3
+	for <linux-block@archiver.kernel.org>; Thu, 21 Jan 2021 15:10:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729209AbhAUOuf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Jan 2021 09:50:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54846 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731142AbhAUOkl (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Jan 2021 09:40:41 -0500
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41732C08EB24
-        for <linux-block@vger.kernel.org>; Thu, 21 Jan 2021 06:29:26 -0800 (PST)
-Received: by mail-ej1-x62c.google.com with SMTP id kg20so2390524ejc.4
-        for <linux-block@vger.kernel.org>; Thu, 21 Jan 2021 06:29:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=from:to:cc:subject:date:message-id;
-        bh=6d+dhFnF8O5Dji9MI3uQGCEsi3R81Xte/6yH406EepA=;
-        b=iAMU6N4iZaZA9+7UD8H8MnQtQ2Cpe3YeQRtcdIAvDIMVUVH+8jruJobsWtbta2pu9/
-         TS8Em6eCbSnkRLg6QmIFMfSZ5NJiLC+P0inASmZ1ck5hcL92XvnYfrUlOIh5NEockg3M
-         sngnJTujgRmBntErYNkPTd0lC5Q5BMFqfS/xZ+2i8/20XXJh1hncFJ8r/5F4dE4HO8vc
-         msi5NMvm1FcfSz2eZTGnR8q8mysXQrGwM4CEPaKERmRRfWMj9G4a+EFmcV5fQkZvfVMO
-         B83i0efToxwbo6fT4gVOFQj0cp9m8jld4Df7IpwukDPFpkDLwdoGd2XTiQfnKp9lWEKD
-         guUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=6d+dhFnF8O5Dji9MI3uQGCEsi3R81Xte/6yH406EepA=;
-        b=NQbcQeYkhp7gew6AvJrQ18Ooe/ayO838oUWfhEP/QrGgTT1R4ZerE0+dDwjwGAqOx1
-         9n0NiUUC3kLCgofqiMdDucOi+xk75w6Eeui9mB+4rB0iTsjVU6KvmTTZHlqADTsKRGfY
-         8Oce02EQC/AbrVz5tOq2qznwt3QpH0MVg2FflAfy1xNCL0Q+roEtsqe/CFdnqALzeFBn
-         kHLlpie0+6z0vCq9Kcht+X9yicU9JDpeMDYBfwk3qfewaCTmlRT6hVpNhEA1qZi/0rCX
-         FHeiE9J3pBFqD0ipDz2FZkM6c31ymonSncSU/xgW4bM73FbMnVcoPJBUiRvihUNj8J9G
-         foog==
-X-Gm-Message-State: AOAM5312GZIH3eoQGAd23R63/YWM/7XHVO18G5fKLi9eJxiLdZIWyFxk
-        fEVX2s26lqtX2HXVvMF+q2fU0g==
-X-Google-Smtp-Source: ABdhPJxCDi5bLwTWjg3Cogi17XLUs88z2mnzLi3uB5dGCnmO1AkoP5tvuP3B7w2NbRmf5F5CDrtLTw==
-X-Received: by 2002:a17:906:95cf:: with SMTP id n15mr9672034ejy.178.1611239364997;
-        Thu, 21 Jan 2021 06:29:24 -0800 (PST)
-Received: from ls00508.pb.local ([2001:1438:4010:2540:481b:68e3:af3e:e933])
-        by smtp.gmail.com with ESMTPSA id gt18sm2263684ejb.104.2021.01.21.06.29.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Jan 2021 06:29:24 -0800 (PST)
-From:   Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, target-devel@vger.kernel.org,
-        linux-scsi@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-ide@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-nfs@vger.kernel.org,
-        Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
-Subject: [PATCH 0/2] remove unused argument from blk_execute_rq_nowait and blk_execute_rq
-Date:   Thu, 21 Jan 2021 15:29:03 +0100
-Message-Id: <20210121142905.13089-1-guoqing.jiang@cloud.ionos.com>
-X-Mailer: git-send-email 2.17.1
+        id S1732485AbhAUPKI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Jan 2021 10:10:08 -0500
+Received: from mail.kernel.org ([198.145.29.99]:39804 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1732421AbhAUPGq (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 21 Jan 2021 10:06:46 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 712DC235FF;
+        Thu, 21 Jan 2021 15:05:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1611241556;
+        bh=qRBq4u7IBFJWAXc+l6+Z4BWGpd3fk5F9IR1G/OirCzw=;
+        h=Date:From:To:cc:Subject:In-Reply-To:References:From;
+        b=uWwiMQ8WxDMfmMeAE+vYHFkePF5KTk6uBeasfNO/dnCJ7nvQE0ZBnK78g/OkrtQES
+         gVP8X9klIuBGtZDmQOXMrLFqMh7ELL7k+IeSomNgF6Kcfyv6doEdJUrhs+iOIVpDTH
+         i1GaGf4AUQa8zDlDuOFnugysBdrKExBWhI5CASF1r2mxORZWaPaP8vIZuE6/j0jfqg
+         JNl1y/cL69uo0eVohMe3AQJp4yYs34Cj2ZrR356csQzmiJWZrcRMxEvtt6kpAT+La9
+         H/PFRYZrN6hpe4jXhjuYKWSXNvbmYclNg6SM/5MIo/wKchuW2idSUsWZk/qtEa2/BH
+         XLMvIUG4nI5aA==
+Date:   Thu, 21 Jan 2021 16:05:52 +0100 (CET)
+From:   Jiri Kosina <jikos@kernel.org>
+To:     Denis Efremov <efremov@linux.com>
+cc:     Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, Wim Osterholt <wim@djo.tudelft.nl>
+Subject: Re: [PATCH RESEND] floppy: fix open(O_ACCMODE) for ioctl-only open
+In-Reply-To: <e503292b-5f51-eac5-771f-e35991d1084c@linux.com>
+Message-ID: <nycvar.YFH.7.76.2101211603590.5622@cbobk.fhfr.pm>
+References: <20160610230255.GA27770@djo.tudelft.nl> <alpine.LNX.2.00.1606131414420.6874@cbobk.fhfr.pm> <20160614184308.GA6188@djo.tudelft.nl> <alpine.LNX.2.00.1606150906320.6874@cbobk.fhfr.pm> <20160615132040.GZ14480@ZenIV.linux.org.uk>
+ <alpine.LNX.2.00.1606151610420.6874@cbobk.fhfr.pm> <20160615224722.GA9545@djo.tudelft.nl> <alpine.LNX.2.00.1606160946000.6874@cbobk.fhfr.pm> <alpine.LNX.2.00.1606301317290.6874@cbobk.fhfr.pm> <9c713fa8-9da1-47b5-0d5d-92f4cd13493a@kernel.dk>
+ <nycvar.YFH.7.76.2101191649190.5622@cbobk.fhfr.pm> <5cb57175-7f0b-5536-925d-337241bcda93@linux.com> <nycvar.YFH.7.76.2101211122290.5622@cbobk.fhfr.pm> <nycvar.YFH.7.76.2101211543230.5622@cbobk.fhfr.pm> <e503292b-5f51-eac5-771f-e35991d1084c@linux.com>
+User-Agent: Alpine 2.21 (LSU 202 2017-01-01)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
+On Thu, 21 Jan 2021, Denis Efremov wrote:
 
-This series remove unused 'q' from blk_execute_rq_nowait and blk_execute_rq.
-Also update the comment for blk_execute_rq_nowait.
+> > From: Jiri Kosina <jkosina@suse.cz>
+> > Subject: [PATCH v2] floppy: reintroduce O_NDELAY fix
+> > 
+> > Originally fixed in 09954bad4 ("floppy: refactor open() flags handling")
+> > then reverted for unknown reason in f2791e7eadf437 instead of taking
+> > the open(O_ACCMODE) for ioctl-only open fix, which had the changelog below
+> > 
+> > ====
+> > Commit 09954bad4 ("floppy: refactor open() flags handling"), as a
+> > side-effect, causes open(/dev/fdX, O_ACCMODE) to fail. It turns out that
+> > this is being used setfdprm userspace for ioctl-only open().
+> > 
+> > Reintroduce back the original behavior wrt !(FMODE_READ|FMODE_WRITE)
+> > modes, while still keeping the original O_NDELAY bug fixed.
+> > 
+> > Cc: stable@vger.kernel.org # v4.5+
+> 
+> Are you sure that it's not worth to backport it to LTS v4.4? Because 
+> f2791e7ead is just a revert and 09954bad4 is not presented in v4.4 I'm 
+> not sure what fixes tag is better to use in this case.
+
+You are right; I'll drop the '4.5+' indicator and will backport it once/if 
+it hits Linus' tree.
+
+> > +	if (mode & (FMODE_READ|FMODE_WRITE)) {
+> > +		UDRS->last_checked = 0;
+> 
+> UDRS will still break the compilation here.
+
+Doh, forgot to refresh before sending, sorry for the noise.
+I'll send the final version once I get confirmation from the reporter that 
+it's fixing the issue properly, add his Reported-by: etc.
 
 Thanks,
-Guoqing
-
-Guoqing Jiang (2):
-  block: remove unnecessary argument from blk_execute_rq_nowait
-  block: remove unnecessary argument from blk_execute_rq
-
- block/blk-exec.c                   | 13 +++++--------
- block/bsg.c                        |  2 +-
- block/scsi_ioctl.c                 |  6 +++---
- drivers/block/mtip32xx/mtip32xx.c  |  2 +-
- drivers/block/paride/pd.c          |  2 +-
- drivers/block/pktcdvd.c            |  2 +-
- drivers/block/sx8.c                |  4 ++--
- drivers/block/virtio_blk.c         |  2 +-
- drivers/cdrom/cdrom.c              |  2 +-
- drivers/ide/ide-atapi.c            |  2 +-
- drivers/ide/ide-cd.c               |  2 +-
- drivers/ide/ide-cd_ioctl.c         |  2 +-
- drivers/ide/ide-devsets.c          |  2 +-
- drivers/ide/ide-disk.c             |  2 +-
- drivers/ide/ide-ioctls.c           |  4 ++--
- drivers/ide/ide-park.c             |  2 +-
- drivers/ide/ide-pm.c               |  4 ++--
- drivers/ide/ide-tape.c             |  2 +-
- drivers/ide/ide-taskfile.c         |  2 +-
- drivers/mmc/core/block.c           | 10 +++++-----
- drivers/nvme/host/core.c           |  8 ++++----
- drivers/nvme/host/lightnvm.c       |  4 ++--
- drivers/nvme/host/pci.c            |  4 ++--
- drivers/nvme/target/passthru.c     |  2 +-
- drivers/scsi/scsi_error.c          |  2 +-
- drivers/scsi/scsi_lib.c            |  2 +-
- drivers/scsi/sg.c                  |  3 +--
- drivers/scsi/st.c                  |  2 +-
- drivers/target/target_core_pscsi.c |  3 +--
- fs/nfsd/blocklayout.c              |  2 +-
- include/linux/blkdev.h             |  5 ++---
- 31 files changed, 50 insertions(+), 56 deletions(-)
 
 -- 
-2.17.1
+Jiri Kosina
+SUSE Labs
 
