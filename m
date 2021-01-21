@@ -2,90 +2,115 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E070C433E0
-	for <linux-block@archiver.kernel.org>; Thu, 21 Jan 2021 12:49:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEEB9C433DB
+	for <linux-block@archiver.kernel.org>; Thu, 21 Jan 2021 12:52:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 07F2323A1D
-	for <linux-block@archiver.kernel.org>; Thu, 21 Jan 2021 12:49:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B6AD223A01
+	for <linux-block@archiver.kernel.org>; Thu, 21 Jan 2021 12:52:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728556AbhAUMso (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Jan 2021 07:48:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58638 "EHLO
+        id S1731386AbhAUMwN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Jan 2021 07:52:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731450AbhAUMs0 (ORCPT
+        with ESMTP id S1731516AbhAUMwI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Jan 2021 07:48:26 -0500
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EA90C061575
-        for <linux-block@vger.kernel.org>; Thu, 21 Jan 2021 04:47:46 -0800 (PST)
-Received: by mail-pl1-x62f.google.com with SMTP id g3so1247537plp.2
-        for <linux-block@vger.kernel.org>; Thu, 21 Jan 2021 04:47:46 -0800 (PST)
+        Thu, 21 Jan 2021 07:52:08 -0500
+Received: from mail-vs1-xe32.google.com (mail-vs1-xe32.google.com [IPv6:2607:f8b0:4864:20::e32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC361C061575
+        for <linux-block@vger.kernel.org>; Thu, 21 Jan 2021 04:51:26 -0800 (PST)
+Received: by mail-vs1-xe32.google.com with SMTP id f22so943814vsk.11
+        for <linux-block@vger.kernel.org>; Thu, 21 Jan 2021 04:51:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=pchBZ7HrMs8fZphopy3YDMD9Pzv91Q8ikc/LwQCGD9A=;
-        b=Qo7/tKnFyoY63WscJuG87dCR0YHTLw4CuGfhNpL027Ij1ktidD14qE1r0pPniXYlsK
-         2gCnCtdtvfrEx2OCmB2KG48Pu4wjmh2X7jxjUYI1nqYqtjk0/Q0A+xjDA8ynIYzV+5PA
-         gEp6wH5Xa6gzI3P7E4KOBBF+8QhSFkgqhk3UgubMDoH2F9tObgSjI4HDNjBCHkRVSb7V
-         /FYzj8b5ah+97R5TGGlkxVIhPt+lcBEQppuxkeymQVlNofcjLlQLE4vzZyPaNDLBF5Gi
-         q6Hh2KNuOy6alvDcQ6vVJGpg1+SlGXmJIjiKGJXMgRONl0F+EI4Bnmt4WhkTaFvquZp+
-         e7vw==
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=+zgnPGBkKt9kNKpgkGKnTC5rjq2geX+vqa9xRmEBMwE=;
+        b=pXQCwGgMppqPSadWf53sSTB0HUmmPCYaaT27dxXo7mM1QOKRn7Ho9YEtX7n+bUep+n
+         z/011Z9xbyhRk26aIrHf5DNOc0yTk5d7IPR/s/96L8IjtLsEuerl7S92wXCZbAQNuy4k
+         EuKgxgBcZv9uzl3mZYkabID7w+j5Y3pjWn6ExJjKC4yg0ZYmmSKqI6FbP0urJH0LQeDX
+         m21f14gaOrIGd6s/gs6DHaToFyEAYrMbUf5G8ASEfOeQC+X20Abu7ithv9soBQDBBPjA
+         zhqu8n8pF5g922LMEvLaoBZyOiGbwVyNFVposjtbUZAhrA3PQmQVXO1BrBVCFJkiFZKQ
+         2KVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=pchBZ7HrMs8fZphopy3YDMD9Pzv91Q8ikc/LwQCGD9A=;
-        b=RFuSnSR7ueqiA/tDH4iLKVfUkfBMIeHPs65it6/9/rlikPZspkOmdgBTtmaLrNe6p5
-         heciZBst+zuy4Oah7P88zL4z3lkj4fFXlVFEUItMLJ+ljcjAcoYgexNpInxMcuxm/i7P
-         btjVK9rEv7TgDH+HWtfbx76nMOjORAxPBaJsahvvhnLc2i6Ts6uBDIpq8+FQQJNOeKO3
-         4FrJQ+kLsMUUbizynYlnhtgwKKoQHXO45ksSqmZREjxClJl/a+wKn2sOMAc1L8I6neSX
-         HjSEl/jbe37qxHJix8XXHgRUx5qALIiFIvoBYFwmxeMD6JdBIRu8X/XkraFZ1BdONQ8j
-         +pdA==
-X-Gm-Message-State: AOAM533YuCYBMpXCgQhjmix7+a3W00kf3DDdfCmzQ7gausuWknKo9BhK
-        UfGhvKG76K6n91AnmTt37kfSsA==
-X-Google-Smtp-Source: ABdhPJzQPMUrZphrYzYVhVNMuufMyE+goiPwMAGTU/u0GeF2CpcRzIxMclsebqO1hVr+1hVPj+HEtw==
-X-Received: by 2002:a17:90b:11d4:: with SMTP id gv20mr11776619pjb.116.1611233265990;
-        Thu, 21 Jan 2021 04:47:45 -0800 (PST)
-Received: from [192.168.4.41] (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
-        by smtp.gmail.com with ESMTPSA id e17sm5889996pjh.39.2021.01.21.04.47.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Jan 2021 04:47:45 -0800 (PST)
-Subject: Re: [PATCH] lightnvm: fix memory leak when submit fails
-To:     Pan Bian <bianpan2016@163.com>, Matias Bjorling <mb@lightnvm.io>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210121072202.120810-1-bianpan2016@163.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <55045608-01cb-d5af-682b-5a213944e33d@kernel.dk>
-Date:   Thu, 21 Jan 2021 05:47:43 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=+zgnPGBkKt9kNKpgkGKnTC5rjq2geX+vqa9xRmEBMwE=;
+        b=q6EcKgNq+Z+3zJG0dyhq367EY8pZ9Ify2wh8jWvUFGmBtw2O1amFBlDWMUY+PW4ArJ
+         LwhcwibiK5oQL51CMn9gOicA+PFPFkJ0RZS+8gTMDVfNdTK/WL3uJTJtPVjd5NOiShAY
+         z+hzChztqDjE6BlaQp5WiHedL46DvXk/5dD7rn9LbbzZZC7qnzBO4u1msvZsGBNN5/Yp
+         SnQqElK7Ad7nh99ipCb2HUCbEgcEhIpvgvGM2zTpmgDzjxwpE7LrKNKSGd9GsLBRnA2g
+         wgtUZP+ggSihUQcpmFp8IlAMH6rAF0vaK7sH5xFgH5iChg1fVBpICBreHKZy2d+5dpGT
+         C8FQ==
+X-Gm-Message-State: AOAM533C4k+bzemoF5Y5WBNU/y8dQVZKiaDdyK73cb/nZ06Jt9LJcwSB
+        KApuPSZWOjTo/n2i0NsD11ALcLqqQYfXZxl7LMfhQg==
+X-Google-Smtp-Source: ABdhPJySvUa1/ex7Gl2xWrraA+wD1lwy8FCAEtg9Bs8gkWN/0ze3SAxy8QOvi3C2ZJ6pjBGSHu7s/n5K+eisF3off/0=
+X-Received: by 2002:a67:7f41:: with SMTP id a62mr9523888vsd.55.1611233486132;
+ Thu, 21 Jan 2021 04:51:26 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20210121072202.120810-1-bianpan2016@163.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20210121082155.111333-1-ebiggers@kernel.org>
+In-Reply-To: <20210121082155.111333-1-ebiggers@kernel.org>
+From:   Ulf Hansson <ulf.hansson@linaro.org>
+Date:   Thu, 21 Jan 2021 13:50:49 +0100
+Message-ID: <CAPDyKFrLn_4Csxc6BeRR0-zY+_RQuNqNSF9SmKk3Bx2WFJJ_Ag@mail.gmail.com>
+Subject: Re: [PATCH 0/2] Resource-managed blk_ksm_init()
+To:     Eric Biggers <ebiggers@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc:     linux-block <linux-block@vger.kernel.org>,
+        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+        linux-scsi <linux-scsi@vger.kernel.org>,
+        Satya Tangirala <satyat@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/21/21 12:22 AM, Pan Bian wrote:
-> The allocated page is not released if error occurs in
-> nvm_submit_io_sync_raw(). __free_page() is moved ealier to avoid
-> possible memory leak issue.
++ Jens, Martin, James
 
-Applied, thanks.
 
-General question for Matias - is lightnvm maintained anymore at all, or
-should we remove it? The project seems dead from my pov, and I don't
-even remember anyone even reviewing fixes from other people.
+On Thu, 21 Jan 2021 at 09:23, Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> This patchset adds a resource-managed variant of blk_ksm_init() so that
+> drivers don't have to worry about calling blk_ksm_destroy().
+>
+> This was suggested during review of my patchset which adds eMMC inline
+> encryption support
+> (https://lkml.kernel.org/linux-mmc/20210104184542.4616-1-ebiggers@kernel.org/T/#u).
+> That patchset proposes a second caller of blk_ksm_init().  But it can
+> instead use the resource-managed variant, as can the UFS driver.
+>
+> My preference is that patch #1 be taken through the MMC tree together
+> with my MMC patchset, so that we don't have to wait an extra cycle for
+> the MMC changes.  Patch #2 can then go in later.
 
--- 
-Jens Axboe
+Sure, I can pick patch #1 through my mmc tree, but need an ack from
+Jens to do it. Or whatever he prefers.
 
+Another solution is to host immutable branches (if needed), so they
+can be shared between our tree's, that works for me as well.
+
+>
+> Eric Biggers (2):
+>   block/keyslot-manager: introduce devm_blk_ksm_init()
+>   scsi: ufs: use devm_blk_ksm_init()
+>
+>  Documentation/block/inline-encryption.rst | 12 +++++-----
+>  block/keyslot-manager.c                   | 29 +++++++++++++++++++++++
+>  drivers/scsi/ufs/ufshcd-crypto.c          |  9 ++-----
+>  drivers/scsi/ufs/ufshcd-crypto.h          |  5 ----
+>  drivers/scsi/ufs/ufshcd.c                 |  1 -
+>  include/linux/keyslot-manager.h           |  3 +++
+>  6 files changed, 40 insertions(+), 19 deletions(-)
+>
+> --
+> 2.30.0
+>
+
+Kind regards
+Uffe
