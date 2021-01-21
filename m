@@ -2,470 +2,346 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23609C433E0
-	for <linux-block@archiver.kernel.org>; Thu, 21 Jan 2021 11:41:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76E3AC433DB
+	for <linux-block@archiver.kernel.org>; Thu, 21 Jan 2021 12:12:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AE1652222B
-	for <linux-block@archiver.kernel.org>; Thu, 21 Jan 2021 11:41:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2803D2065C
+	for <linux-block@archiver.kernel.org>; Thu, 21 Jan 2021 12:12:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726282AbhAULkc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Jan 2021 06:40:32 -0500
-Received: from mailout4.samsung.com ([203.254.224.34]:43596 "EHLO
-        mailout4.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730685AbhAULk0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Jan 2021 06:40:26 -0500
-Received: from epcas1p2.samsung.com (unknown [182.195.41.46])
-        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20210121113931epoutp04662c0fc61897def28889a57c2b6d0dbb~cPGUnxarZ2088920889epoutp04H
-        for <linux-block@vger.kernel.org>; Thu, 21 Jan 2021 11:39:31 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20210121113931epoutp04662c0fc61897def28889a57c2b6d0dbb~cPGUnxarZ2088920889epoutp04H
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1611229171;
-        bh=xjsaCtkvJnwpBORibxMFzr9mrFt7A7Jl3lQs0qUkz74=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=SA4rHnOz2AHsTDQgPcgiZpJjKQrqi3g8Y/rPWYCreArQuiIeRQEErqMIVwqa5QU7E
-         Dc2GHq6AjeiMFuby7wtnglaEIZw1ATNS9AwnsS8m2TWCHuyR2k8EQ3E09XaeI9kF2P
-         4ymWUSDwk2W1ga1NYoNGRY9l5XoiRpHOJblfD3Zo=
-Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
-        epcas1p2.samsung.com (KnoxPortal) with ESMTP id
-        20210121113930epcas1p2af7ddc9578527173515dffd80ee96631~cPGTky9770600906009epcas1p2B;
-        Thu, 21 Jan 2021 11:39:30 +0000 (GMT)
-Received: from epsmges1p2.samsung.com (unknown [182.195.40.160]) by
-        epsnrtp4.localdomain (Postfix) with ESMTP id 4DM0mK3KPYz4x9Q2; Thu, 21 Jan
-        2021 11:39:29 +0000 (GMT)
-Received: from epcas1p1.samsung.com ( [182.195.41.45]) by
-        epsmges1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
-        E4.05.63458.1F769006; Thu, 21 Jan 2021 20:39:29 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-        epcas1p1.samsung.com (KnoxPortal) with ESMTPA id
-        20210121113928epcas1p13c9dd6d1322979a977f24ded689b38de~cPGRdeGRz0675106751epcas1p1Z;
-        Thu, 21 Jan 2021 11:39:28 +0000 (GMT)
-Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
-        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20210121113928epsmtrp2aa0d3e15b4c3e5b5d6565417b864e05f~cPGRcWYAf1777017770epsmtrp2J;
-        Thu, 21 Jan 2021 11:39:28 +0000 (GMT)
-X-AuditID: b6c32a36-6c9ff7000000f7e2-f2-600967f1241a
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
-        E5.A4.08745.0F769006; Thu, 21 Jan 2021 20:39:28 +0900 (KST)
-Received: from localhost.localdomain (unknown [10.253.99.105]) by
-        epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-        20210121113928epsmtip2a63968e34a88abec2ca6764a4d7ae590~cPGRMLNSh2137021370epsmtip2n;
-        Thu, 21 Jan 2021 11:39:28 +0000 (GMT)
-From:   Changheun Lee <nanich.lee@samsung.com>
-To:     damien.lemoal@wdc.com
-Cc:     Johannes.Thumshirn@wdc.com, asml.silence@gmail.com,
-        axboe@kernel.dk, jisoo2146.oh@samsung.com, junho89.kim@samsung.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        ming.lei@redhat.com, mj0123.lee@samsung.com,
-        nanich.lee@samsung.com, osandov@fb.com, patchwork-bot@kernel.org,
-        seunghwan.hyun@samsung.com, sookwan7.kim@samsung.com,
-        tj@kernel.org, tom.leiming@gmail.com, woosung2.lee@samsung.com,
-        yt0928.kim@samsung.com
-Subject: Re: [PATCH v2] bio: limit bio max size 
-Date:   Thu, 21 Jan 2021 20:24:08 +0900
-Message-Id: <20210121112408.31039-1-nanich.lee@samsung.com>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <7e3d12129d488a45e6117e311e38d41d276b1549.camel@wdc.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrGJsWRmVeSWpSXmKPExsWy7bCmru7HdM4Eg44JghZzVm1jtFh9t5/N
-        orX9G5NFz5MmVou/XfeYLL4+LLbYe0vb4vKuOWwWhyY3M1lM3zyH2eLa/TPsFofvXWWxeLhk
-        IrPFuZOfWC3mPXaw+LX8KKPF+x/X2S1O7ZjMbLF+7082B2GPic3v2D12zrrL7nH5bKnHplWd
-        bB7v911l8+jbsorR4/MmOY/2A91MARxROTYZqYkpqUUKqXnJ+SmZeem2St7B8c7xpmYGhrqG
-        lhbmSgp5ibmptkouPgG6bpk5QN8oKZQl5pQChQISi4uV9O1sivJLS1IVMvKLS2yVUgtScgoM
-        DQr0ihNzi0vz0vWS83OtDA0MjEyBKhNyMi5+O81acDWxoqX7IEsD4w+XLkZODgkBE4mP/16z
-        dzFycQgJ7GCUeLxwLTOE84lRYsKc04wgVUICnxkl5i5U7mLkAOuY+lISomYXo8T+cx2MEA5Q
-        zc+HM9lAGtgEdCT63t4Cs0UEJCVOvfzCBlLELLCPWeLTlmesIAlhAQOJhk9PwIpYBFQllt5/
-        CLaNV8BaYs7MSYwQ98lLPO1dzgxicwq4Sny71AVVIyhxcuYTFhCbGaimeetssLMlBK5wSJz9
-        Mhmq2UXi0PNbrBC2sMSr41vYIWwpic/v9rJBNHQzSjS3zWeEcCYwSix5vowJospY4tPnz4wg
-        TzMLaEqs36UPEVaU2Pl7LiPEZj6Jd197WCHhwivR0SYEUaIicablPjPMrudrd0JN9JBYOr8D
-        Gr4zGCXOHn/OOIFRYRaSh2YheWgWwuYFjMyrGMVSC4pz01OLDQuMkON4EyM4gWuZ7WCc9PaD
-        3iFGJg7GQ4wSHMxKIryPLDkShHhTEiurUovy44tKc1KLDzGaAoN7IrOUaHI+MIfklcQbmhoZ
-        GxtbmJiZm5kaK4nzJho8iBcSSE8sSc1OTS1ILYLpY+LglGpgYthmqaWfwJI48X9wGsv1a3N/
-        VscIs6QUVLTs/Je5IHzFwo2y/wICO/s8ZX+n8+3JrxH7Hv4p4uLy58HdmlK54cWxTCUxj9JT
-        Ag43TprHZ+rvqnigIjry+Hb1nep71tawVW+4v7fvxr2G/KqmxFPr97gnmVznWmv8RcbRJ0Ui
-        SIVlyvnZTkaLFR6mGtgb7dYw/uMsdJDh3lOhbGnrsPC5ro3XTeQ49pv9Ov5Vj/PM38l7bS1f
-        PboX/v/pM3+ZB7xVIYFXig/p6xptmmmy8rGg3d5zN76fcbxdZLJS2qO2SiVpEk9qSblGr8Gj
-        n+EuLNOLnHSullblqdcvM7E74rR0Us3Kd1ZvPv9tLK2NdVJiKc5INNRiLipOBABDsE+uaQQA
-        AA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFuphkeLIzCtJLcpLzFFi42LZdlhJXvdDOmeCwc3lwhZzVm1jtFh9t5/N
-        orX9G5NFz5MmVou/XfeYLL4+LLbYe0vb4vKuOWwWhyY3M1lM3zyH2eLa/TPsFofvXWWxeLhk
-        IrPFuZOfWC3mPXaw+LX8KKPF+x/X2S1O7ZjMbLF+7082B2GPic3v2D12zrrL7nH5bKnHplWd
-        bB7v911l8+jbsorR4/MmOY/2A91MARxRXDYpqTmZZalF+nYJXBkXv51mLbiaWNHSfZClgfGH
-        SxcjB4eEgInE1JeSXYxcHEICOxgllm7tZO9i5ASKS0kcP/GWFaJGWOLw4WKImo+MEo0dz5lA
-        atgEdCT63t5iA7FFBCQlTr38wgZSxCxwhVli88eZjCAJYQEDiYZPT8CKWARUJZbefwgW5xWw
-        lpgzcxIjxDJ5iae9y5lBbE4BV4lvl7oYQRYLCbhInJiWBlEuKHFy5hMWEJsZqLx562zmCYwC
-        s5CkZiFJLWBkWsUomVpQnJueW2xYYJSXWq5XnJhbXJqXrpecn7uJERxhWlo7GPes+qB3iJGJ
-        g/EQowQHs5II7yNLjgQh3pTEyqrUovz4otKc1OJDjNIcLErivBe6TsYLCaQnlqRmp6YWpBbB
-        ZJk4OKUamAqTPLRYHm0PXM29ylJVWsrAXk+iriXB9KRPo2G46wdnzXI7KXbDIwtqXm5/ciZF
-        LLti74Urv/T+as2xtxTfaJqboma1qThwue3sgk3OJr//Xa9NO8eruHL6+cVzhK/2+2VXHnyp
-        dTE4sFL2M4+qSPSCIwXsHiEfl/Xfu3Yud+a22RYvVk551ZGpqTNF7OqHXTV/A33V+V8UPw7f
-        sjn+hjBTsvkrdt4036TWOxIT5yvOKo/41v/g1Bu5WX8mi0b+Lch98IW11EY2YdfNVXXuc3+d
-        4Pm6ZuW2aRWcm+qLby5Pbl39o8rl4n8dj/0uW+t3XFhi4+9S2fpl2s7TezO1W/h0q+UOzEyM
-        f5xqzCvvr8RSnJFoqMVcVJwIAABwuu4fAwAA
-X-CMS-MailID: 20210121113928epcas1p13c9dd6d1322979a977f24ded689b38de
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: SVC_REQ_APPROVE
-CMS-TYPE: 101P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20210121113928epcas1p13c9dd6d1322979a977f24ded689b38de
-References: <7e3d12129d488a45e6117e311e38d41d276b1549.camel@wdc.com>
-        <CGME20210121113928epcas1p13c9dd6d1322979a977f24ded689b38de@epcas1p1.samsung.com>
+        id S1729292AbhAULDy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Jan 2021 06:03:54 -0500
+Received: from mout.gmx.net ([212.227.15.15]:50777 "EHLO mout.gmx.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729451AbhAULDN (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 21 Jan 2021 06:03:13 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
+        s=badeba3b8450; t=1611226829;
+        bh=yyD+yHb8ROzIVw/+7DCijTouXGHlJyiM+PtS7yehFQ8=;
+        h=X-UI-Sender-Class:Date:From:To:Cc:Subject;
+        b=YpKUPFMS6g9Oprefu8E6O5+RGwkdA1XYzaJacx79GleAp1pfQNAgWPh3zOAyBZk+I
+         jD4majveibR2mx0NdX0mqYgbA7HcdlGs+d/2snuutLQyJPBkwNbx+rrgqoRmG51aFk
+         bLmkTslMo4mNwRssB+WIA4npHS2s7YUdBZ+rK+PU=
+X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
+Received: from Valinor ([82.203.161.65]) by mail.gmx.net (mrgmx004
+ [212.227.17.184]) with ESMTPSA (Nemesis) id 1N0X8o-1lysx70N64-00wYAY; Thu, 21
+ Jan 2021 12:00:29 +0100
+Date:   Thu, 21 Jan 2021 13:02:05 +0200
+From:   Lauri Kasanen <cand@gmx.com>
+To:     linux-mips@vger.kernel.org
+Cc:     tsbogend@alpha.franken.de, axboe@kernel.dk,
+        linux-block@vger.kernel.org, Keith Busch <kbusch@kernel.org>,
+        Christoph Hellwig <hch@infradead.org>
+Subject: [PATCH v8] block: Add n64 cart driver
+Message-Id: <20210121130205.d2810df601bd00536195c87b@gmx.com>
+X-Mailer: Sylpheed 3.5.0 (GTK+ 2.18.6; x86_64-unknown-linux-gnu)
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:dK4pWWs/8zrPhYho9M/sbF9yqRr0tEpYgxF/5wQQ6wbVNSCNZnt
+ duahY4I7J8ZY9V0MQkGvnMxnYXncqJuBChygKRp1vxM2AfpGsSWU64FgaYao6dkexOnMaq0
+ RIAG02GsMTgouJQgYIwaZE3OmmkKElyJrpnATcTDjP/W8PlwXKY4cNXE9MQbodaV0wAlF0j
+ nycc1rmZwfIDg28dcUU2w==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:DXfiFztYFKg=:tKHwv9DH2N4tlpkZOymXUa
+ /7j31pUYcRhUhbekSLExyIpocmjBIwlnHHIZ9lRw2NfSY7ASYIyLJBOZSxmBNnAE5mvBdndTB
+ QyT+X4LNOYJv485QHXxQDwlM7A7E4eDpl8CvQzaO44aUgFwoE9Bh5lWrWv6xCW0ARPTFX8wzJ
+ 2OVw7huHsDIxLaGuPtxBg9+7IH5GkwPr3ZHkOlU3CH1rnRMnyDMFDFYaQE/v0oRTet1s3wPkA
+ ETeGseAZFQSZFOlIFktNTqcoUEJRL2BhuxXgFehFvneQgA1K8C3hPU/bv8ZdVYmt2hT8YFLgf
+ GqB4POHGU0ASEFop+krRhhqtZPYvNMY01bMaiecG7PtipQIuH8BL0upMw0hJ9/MMZCaJnFDjT
+ jjxil0/qGOwOeW1tx+uXvyQYkboFgIJTLD6mCDKtx/W+7ExgOcRwLa49lxQT3TiaiWx2+KW0H
+ U5FECGws6ggBnmkwukczWgnpU0ajzDQ3R8NE1xOZnStqgEadeArs1JP/uB6wY9TqogiTRqnSI
+ MNRR2rL/glVg00V4d8OvWnho0eH0FJ6fPMMAOwV9nUlkw+yyF1A/5+a1h7h4rbcMty30iNIq4
+ +DNFXPEa8UYAmWlO6RipR4c6CcPyJQ6xZBHBsLSR+eRE+w9sruwKgSj8GPiD3NJsgbJt6rVG/
+ gZZWd+OQ9ijwf1PQQ9QcgaqNnlCkpmFkCGgC2/tua5ESo7FeBiYNRf1Cltv/GCI+aZhACMh98
+ 6ve3dPuWOV8bOqoe04kJpQfDiqk6x8HFgRj09/lNSftxPVRtN4J4YUBTWS8eO9MJqXbPVS6Zq
+ hqxEe048ALoLoLHaHgzSyFPWcdDxpcZpNeEkGJKA+XJGURzOhJ2dECOnQrMrkdfIDxjfVsQnJ
+ mZAj7cKg3nIPRUHRPnIA==
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> On Thu, 2021-01-21 at 18:36 +0900, Changheun Lee wrote:
-> > > Please drop the "." at the end of the patch title.
-> > > 
-> > > > bio size can grow up to 4GB when muli-page bvec is enabled.
-> > > > but sometimes it would lead to inefficient behaviors.
-> > > > in case of large chunk direct I/O, - 32MB chunk read in user space -
-> > > > all pages for 32MB would be merged to a bio structure if memory address
-> > > > is
-> > > > continued phsycally. it makes some delay to submit until merge complete.
-> > > 
-> > > s/if memory address is continued phsycally/if the pages physical addresses
-> > > are
-> > > contiguous/
-> > > 
-> > > > bio max size should be limited as a proper size.
-> > > 
-> > > s/as/to/
-> > 
-> > Thank you for advice. :)
-> > 
-> > > 
-> > > > 
-> > > > When 32MB chunk read with direct I/O option is coming from userspace,
-> > > > kernel behavior is below now. it's timeline.
-> > > > 
-> > > >  | bio merge for 32MB. total 8,192 pages are merged.
-> > > >  | total elapsed time is over 2ms.
-> > > >  |------------------ ... ----------------------->|
-> > > >                                                  | 8,192 pages merged a
-> > > > bio.
-> > > >                                                  | at this time, first
-> > > > bio submit is done.
-> > > >                                                  | 1 bio is split to 32
-> > > > read request and issue.
-> > > >                                                  |--------------->
-> > > >                                                   |--------------->
-> > > >                                                    |--------------->
-> > > >                                                               ......
-> > > >                                                                    |-----
-> > > > ---------->
-> > > >                                                                     |----
-> > > > ----------->|
-> > > >                           total 19ms elapsed to complete 32MB read done
-> > > > from device. |
-> > > > 
-> > > > If bio max size is limited with 1MB, behavior is changed below.
-> > > > 
-> > > >  | bio merge for 1MB. 256 pages are merged for each bio.
-> > > >  | total 32 bio will be made.
-> > > >  | total elapsed time is over 2ms. it's same.
-> > > >  | but, first bio submit timing is fast. about 100us.
-> > > >  |--->|--->|--->|---> ... -->|--->|--->|--->|--->|
-> > > >       | 256 pages merged a bio.
-> > > >       | at this time, first bio submit is done.
-> > > >       | and 1 read request is issued for 1 bio.
-> > > >       |--------------->
-> > > >            |--------------->
-> > > >                 |--------------->
-> > > >                                       ......
-> > > >                                                  |--------------->
-> > > >                                                   |--------------->|
-> > > >         total 17ms elapsed to complete 32MB read done from device. |
-> > > > 
-> > > > As a result, read request issue timing is faster if bio max size is
-> > > > limited.
-> > > > Current kernel behavior with multipage bvec, super large bio can be
-> > > > created.
-> > > > And it lead to delay first I/O request issue.
-> > > > 
-> > > > Signed-off-by: Changheun Lee <nanich.lee@samsung.com>
-> > > > 
-> > > > ---
-> > > >  block/bio.c               | 17 ++++++++++++++++-
-> > > >  include/linux/bio.h       | 13 +++----------
-> > > >  include/linux/blk_types.h |  1 +
-> > > >  3 files changed, 20 insertions(+), 11 deletions(-)
-> > > > 
-> > > > diff --git a/block/bio.c b/block/bio.c
-> > > > index 1f2cc1fbe283..027503c2e2e7 100644
-> > > > --- a/block/bio.c
-> > > > +++ b/block/bio.c
-> > > > @@ -284,9 +284,24 @@ void bio_init(struct bio *bio, struct bio_vec
-> > > > *table,
-> > > >  
-> > > >  	bio->bi_io_vec = table;
-> > > >  	bio->bi_max_vecs = max_vecs;
-> > > > +	bio->bi_max_size = UINT_MAX;
-> > > >  }
-> > > >  EXPORT_SYMBOL(bio_init);
-> > > >  
-> > > > +void bio_set_dev(struct bio *bio, struct block_device *bdev)
-> > > > +{
-> > > > +	if (bio->bi_disk != bdev->bd_disk)
-> > > > +		bio_clear_flag(bio, BIO_THROTTLED);
-> > > > +
-> > > > +	bio->bi_disk = bdev->bd_disk;
-> > > > +	bio->bi_partno = bdev->bd_partno;
-> > > > +	bio->bi_max_size = blk_queue_get_max_sectors(bio->bi_disk-
-> > > > >queue,
-> > > > +			bio_op(bio)) << SECTOR_SHIFT;
-> > > > +
-> > > > +	bio_associate_blkg(bio);
-> > > > +}
-> > > > +EXPORT_SYMBOL(bio_set_dev);
-> > > > +
-> > > >  /**
-> > > >   * bio_reset - reinitialize a bio
-> > > >   * @bio:	bio to reset
-> > > > @@ -877,7 +892,7 @@ bool __bio_try_merge_page(struct bio *bio, struct
-> > > > page *page,
-> > > >  		struct bio_vec *bv = &bio->bi_io_vec[bio->bi_vcnt - 1];
-> > > >  
-> > > >  		if (page_is_mergeable(bv, page, len, off, same_page)) {
-> > > > -			if (bio->bi_iter.bi_size > UINT_MAX - len) {
-> > > > +			if (bio->bi_iter.bi_size > bio->bi_max_size -
-> > > > len)
-> > > >  				*same_page = false;
-> > > >  				return false;
-> > > >  			}
-> > > > diff --git a/include/linux/bio.h b/include/linux/bio.h
-> > > > index 1edda614f7ce..b9803e80c259 100644
-> > > > --- a/include/linux/bio.h
-> > > > +++ b/include/linux/bio.h
-> > > > @@ -113,7 +113,7 @@ static inline bool bio_full(struct bio *bio, unsigned
-> > > > len)
-> > > >  	if (bio->bi_vcnt >= bio->bi_max_vecs)
-> > > >  		return true;
-> > > >  
-> > > > -	if (bio->bi_iter.bi_size > UINT_MAX - len)
-> > > > +	if (bio->bi_iter.bi_size > bio->bi_max_size - len)
-> > > >  		return true;
-> > > >  
-> > > >  	return false;
-> > > > @@ -482,20 +482,13 @@ extern struct bio_vec *bvec_alloc(gfp_t, int,
-> > > > unsigned long *, mempool_t *);
-> > > >  extern void bvec_free(mempool_t *, struct bio_vec *, unsigned int);
-> > > >  extern unsigned int bvec_nr_vecs(unsigned short idx);
-> > > >  extern const char *bio_devname(struct bio *bio, char *buffer);
-> > > > -
-> > > > -#define bio_set_dev(bio, bdev) 			\
-> > > > -do {						\
-> > > > -	if ((bio)->bi_disk != (bdev)->bd_disk)	\
-> > > > -		bio_clear_flag(bio, BIO_THROTTLED);\
-> > > > -	(bio)->bi_disk = (bdev)->bd_disk;	\
-> > > > -	(bio)->bi_partno = (bdev)->bd_partno;	\
-> > > > -	bio_associate_blkg(bio);		\
-> > > > -} while (0)
-> > > > +extern void bio_set_dev(struct bio *bio, struct block_device *bdev);
-> > > >  
-> > > >  #define bio_copy_dev(dst, src)			\
-> > > >  do {						\
-> > > >  	(dst)->bi_disk = (src)->bi_disk;	\
-> > > >  	(dst)->bi_partno = (src)->bi_partno;	\
-> > > > +	(dst)->bi_max_size = (src)->bi_max_size;\
-> > > >  	bio_clone_blkg_association(dst, src);	\
-> > > >  } while (0)
-> > > >  
-> > > > diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-> > > > index 866f74261b3b..e5dd5b7d8fc1 100644
-> > > > --- a/include/linux/blk_types.h
-> > > > +++ b/include/linux/blk_types.h
-> > > > @@ -270,6 +270,7 @@ struct bio {
-> > > >  	 */
-> > > >  
-> > > >  	unsigned short		bi_max_vecs;	/* max bvl_vecs we can
-> > > > hold */
-> > > > +	unsigned int		bi_max_size;	/* max data size we can
-> > > > hold */
-> > > >  
-> > > >  	atomic_t		__bi_cnt;	/* pin count */
-> > > 
-> > > This modification comes at the cost of increasing the bio structure size to
-> > > simply tell the block layer "do not delay BIO splitting"...
-> > > 
-> > > I think there is a much simpler approach. What about:
-> > > 
-> > > 1) Use a request queue flag to indicate "limit BIO size"
-> > > 2) modify __bio_try_merge_page() to look at that flag to disallow page
-> > > merging
-> > > if the bio size exceeds blk_queue_get_max_sectors(), or more ideally a
-> > > version
-> > > of it that takes into account the bio start sector.
-> > > 3) Set the "limit bio size" queue flag in the driver of the device that
-> > > benefit
-> > > from this change. Eventually, that could also be controlled through sysfs.
-> > > 
-> > > With such change, you will get the same result without having to increase
-> > > the
-> > > BIO structure size.
-> > 
-> > I have a qustion.
-> > Is adding new variable in bio not possible?
-> 
-> It is possible, but since it is a critical kernel resource used a lot, keeping
-> it as small as possible for performance reasons is strongly desired. So if
-> there is a coding scheme that can avoid increasing struct bio size, it should
-> be explored first and discarded only with very good reasons.
+This adds support for the Nintendo 64 console's carts.
+Carts are a read-only media ranging from 8mb to 64mb.
 
-I see your point.
-I agree with you. it's important thing. :)
+Only one cart can be connected at once, and switching
+it requires a reboot.
 
-> 
-> > Additional check for every page merge like as below is inefficient I think.
-> 
-> For the general case of devices that do not care about limiting the bio size
-> (like now), this will add one boolean evaluation (queue flag test). That's it.
-> For your case, sure you now have 2 boolean evals instead of one. But that must
-> be put in perspective with the cost of increasing the bio size.
-> 
-> > 
-> > bool __bio_try_merge_page(struct bio *bio, struct page *page,
-> > 		unsigned int len, unsigned int off, bool *same_page)
-> > {
-> > 	...
-> > 		if (page_is_mergeable(bv, page, len, off, same_page)) {
-> > 			if (bio->bi_iter.bi_size > UINT_MAX - len) {
-> > 				*same_page = false;
-> > 				return false;
-> > 			}
-> > 
-> > +			if (blk_queue_limit_bio_max_size(bio) &&
-> > +			   (bio->bi_iter.bi_size >
-> > blk_queue_get_bio_max_size(bio) - len)) {
-> > +				*same_page = false;
-> > +				return false;
-> > +			}
-> > 
-> > 			bv->bv_len += len;
-> > 			bio->bi_iter.bi_size += len;
-> > 			return true;
-> > 		}
-> > 	...
-> > }
-> > 
-> > 
-> > static inline bool bio_full(struct bio *bio, unsigned len)
-> > {
-> > 	...
-> > 	if (bio->bi_iter.bi_size > UINT_MAX - len)
-> > 		return true;
-> > 
-> > +	if (blk_queue_limit_bio_max_size(bio) &&
-> > +	   (bio->bi_iter.bi_size > blk_queue_get_bio_max_size(bio) - len))
-> > +		return true;
-> > 	...
-> > }
-> > 
-> > 
-> > Page merge is CPU-bound job as you said.
-> > How about below with adding of bi_max_size in bio?
-> 
-> I am not a fan of adding a bio field for using it only in one place.
-> This is only my opinion. I will let others comment about this, but personnally
-> I would rather do something like this:
-> 
-> #define blk_queue_limit_bio_merge_size(q) \
-> test_bit(QUEUE_FLAG_LIMIT_MERGE, &(q)->queue_flags)
-> 
-> static inline unsigned int bio_max_merge_size(struct bio *bio)
-> {
-> struct request_queue *q = bio->bi_disk->queue;
-> 
-> if (blk_queue_limit_bio_merge_size(q))
-> return blk_queue_get_max_sectors(q, bio_op(bio))
-> << SECTOR_SHIFT;
-> return UINT_MAX;
-> }
-> 
-> and use that helper in __bio_try_merge_page(), e.g.:
-> 
-> if (bio->bi_iter.bi_size > bio_max_merge_size(bio) - len) {
-> *same_page = false;
-> return false;
-> }
-> 
-> No need to change the bio struct.
-> 
-> If you measure performance with and without this change on nullblk, you can
-> verify if it has any impact for regular devices. And for your use case, that
-> should give you the same performance.
-> 
+No module support to save RAM, as the target has 8mb RAM.
 
-OK. I'll wait others comment too for a few days.
-I'll prepare v3 patch as you like if there are no feedback. :)
-v2 patch has a compile error already by my misstyping. :(
+Signed-off-by: Lauri Kasanen <cand@gmx.com>
+=2D--
+ drivers/block/Kconfig   |   6 ++
+ drivers/block/Makefile  |   1 +
+ drivers/block/n64cart.c | 211 +++++++++++++++++++++++++++++++++++++++++++=
++++++
+ 3 files changed, 218 insertions(+)
+ create mode 100644 drivers/block/n64cart.c
 
-> > 
-> > bool __bio_try_merge_page(struct bio *bio, struct page *page,
-> > 		unsigned int len, unsigned int off, bool *same_page)
-> > {
-> > 	...
-> > 		if (page_is_mergeable(bv, page, len, off, same_page)) {
-> > -			if (bio->bi_iter.bi_size > UINT_MAX - len) {
-> > +			if (bio->bi_iter.bi_size > bio->bi_max_size - len) {
-> > 				*same_page = false;
-> > 				return false;
-> > 			}
-> > 
-> > 			bv->bv_len += len;
-> > 			bio->bi_iter.bi_size += len;
-> > 			return true;
-> > 		}
-> > 	...
-> > }
-> > 
-> > 
-> > static inline bool bio_full(struct bio *bio, unsigned len)
-> > {
-> > 	...
-> > -	if (bio->bi_iter.bi_size > UINT_MAX - len)
-> > +	if (bio->bi_iter.bi_size > bio->bi_max_size - len)
-> > 		return true;
-> > 	...
-> > }
-> > 
-> > +void bio_set_dev(struct bio *bio, struct block_device *bdev)
-> > +{
-> > +	if (bio->bi_disk != bdev->bd_disk)
-> > +		bio_clear_flag(bio, BIO_THROTTLED);
-> > +
-> > +	bio->bi_disk = bdev->bd_disk;
-> > +	bio->bi_partno = bdev->bd_partno;
-> > +	if (blk_queue_limit_bio_max_size(bio))
-> > +		bio->bi_max_size = blk_queue_get_bio_max_size(bio);
-> > +
-> > +	bio_associate_blkg(bio);
-> > +}
-> > +EXPORT_SYMBOL(bio_set_dev);
-> > 
-> > > -- 
-> > > Damien Le Moal
-> > > Western Digital Research
-> > 
-> > ---
-> > Changheun Lee
-> > Samsung Electronics
-> 
-> -- 
-> Damien Le Moal
-> Western Digital
-> 
+v8:
+SZ_64K
+remove barriers
+add defines for block domain constants
+__blk_mq_end_request
+remove register_blkdev via GENHD_FL_EXT_DEVT
+dma_alloc_noncoherent, sync
 
----
-Changheun Lee
-Samsung Electronics
+The driver patches don't depend on each other, so no point in
+keeping them in a series anymore.
+
+I don't understand the bio setup sufficiently to do a
+conversion to it. Skipping that for now.
+
+diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
+index ecceaaa..924d768 100644
+=2D-- a/drivers/block/Kconfig
++++ b/drivers/block/Kconfig
+@@ -72,6 +72,12 @@ config AMIGA_Z2RAM
+ 	  To compile this driver as a module, choose M here: the
+ 	  module will be called z2ram.
+
++config N64CART
++	bool "N64 cart support"
++	depends on MACH_NINTENDO64
++	help
++	  Support for the N64 cart.
++
+ config CDROM
+ 	tristate
+ 	select BLK_SCSI_REQUEST
+diff --git a/drivers/block/Makefile b/drivers/block/Makefile
+index e1f6311..b9642cf 100644
+=2D-- a/drivers/block/Makefile
++++ b/drivers/block/Makefile
+@@ -17,6 +17,7 @@ obj-$(CONFIG_PS3_DISK)		+=3D ps3disk.o
+ obj-$(CONFIG_PS3_VRAM)		+=3D ps3vram.o
+ obj-$(CONFIG_ATARI_FLOPPY)	+=3D ataflop.o
+ obj-$(CONFIG_AMIGA_Z2RAM)	+=3D z2ram.o
++obj-$(CONFIG_N64CART)		+=3D n64cart.o
+ obj-$(CONFIG_BLK_DEV_RAM)	+=3D brd.o
+ obj-$(CONFIG_BLK_DEV_LOOP)	+=3D loop.o
+ obj-$(CONFIG_XILINX_SYSACE)	+=3D xsysace.o
+diff --git a/drivers/block/n64cart.c b/drivers/block/n64cart.c
+new file mode 100644
+index 0000000..bf6f072
+=2D-- /dev/null
++++ b/drivers/block/n64cart.c
+@@ -0,0 +1,211 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Support for the N64 cart.
++ *
++ * Copyright (c) 2021 Lauri Kasanen
++ */
++
++#include <linux/bitops.h>
++#include <linux/blk-mq.h>
++#include <linux/dma-mapping.h>
++#include <linux/init.h>
++#include <linux/module.h>
++#include <linux/platform_device.h>
++
++MODULE_AUTHOR("Lauri Kasanen <cand@gmx.com>");
++MODULE_DESCRIPTION("Driver for the N64 cart");
++MODULE_LICENSE("GPL");
++
++#define BUFSIZE SZ_64K
++
++static unsigned int start, size;
++static struct request_queue *queue;
++static struct blk_mq_tag_set tag_set;
++static struct gendisk *disk;
++
++static void *buf;
++static dma_addr_t dma_addr;
++
++static u32 __iomem *reg_base;
++
++#define PI_DRAM_REG 0
++#define PI_CART_REG 1
++#define PI_READ_REG 2
++#define PI_WRITE_REG 3
++#define PI_STATUS_REG 4
++
++#define PI_STATUS_DMA_BUSY (1 << 0)
++#define PI_STATUS_IO_BUSY (1 << 1)
++
++#define CART_DOMAIN 0x10000000
++#define CART_MAX 0x1FFFFFFF
++
++static void n64cart_write_reg(const u8 reg, const u32 value)
++{
++	writel(value, reg_base + reg);
++}
++
++static u32 n64cart_read_reg(const u8 reg)
++{
++	return readl(reg_base + reg);
++}
++
++static void n64cart_wait_dma(void)
++{
++	while (n64cart_read_reg(PI_STATUS_REG) &
++		(PI_STATUS_DMA_BUSY | PI_STATUS_IO_BUSY))
++		cpu_relax();
++}
++
++static blk_status_t get_seg(struct request *req)
++{
++	u32 bstart =3D blk_rq_pos(req) * 512;
++	u32 len =3D blk_rq_cur_bytes(req);
++	void *dst =3D bio_data(req->bio);
++
++	if (bstart + len > size)
++		return BLK_STS_IOERR;
++
++	bstart +=3D start;
++
++	while (len) {
++		const u32 curlen =3D len < BUFSIZE ? len : BUFSIZE;
++
++		dma_sync_single_for_device(disk_to_dev(disk), dma_addr,
++					   BUFSIZE, DMA_FROM_DEVICE);
++
++		n64cart_wait_dma();
++
++		n64cart_write_reg(PI_DRAM_REG, dma_addr);
++		n64cart_write_reg(PI_CART_REG,
++				  (bstart | CART_DOMAIN) & CART_MAX);
++		n64cart_write_reg(PI_WRITE_REG, curlen - 1);
++
++		n64cart_wait_dma();
++
++		dma_sync_single_for_cpu(disk_to_dev(disk), dma_addr,
++					BUFSIZE, DMA_FROM_DEVICE);
++
++		memcpy(dst, buf, curlen);
++
++		len -=3D curlen;
++		dst +=3D curlen;
++		bstart +=3D curlen;
++	}
++
++	return BLK_STS_OK;
++}
++
++static blk_status_t n64cart_queue_rq(struct blk_mq_hw_ctx *hctx,
++				     const struct blk_mq_queue_data *bd)
++{
++	struct request *req =3D bd->rq;
++	blk_status_t err;
++
++	blk_mq_start_request(req);
++
++	do {
++		err =3D get_seg(req);
++	} while (blk_update_request(req, err, blk_rq_cur_bytes(req)));
++
++	__blk_mq_end_request(req, BLK_STS_OK);
++	return BLK_STS_OK;
++}
++
++static const struct blk_mq_ops n64cart_mq_ops =3D {
++	.queue_rq =3D n64cart_queue_rq,
++};
++
++static const struct block_device_operations n64cart_fops =3D {
++	.owner		=3D THIS_MODULE,
++};
++
++/*
++ * The target device is embedded and RAM-constrained. We save RAM
++ * by initializing in __init code that gets dropped late in boot.
++ * For the same reason there is no module or unloading support.
++ */
++static int __init n64cart_probe(struct platform_device *pdev)
++{
++	int err;
++
++	if (!start || !size) {
++		pr_err("n64cart: start and size not specified\n");
++		return -ENODEV;
++	}
++
++	if (size & 4095) {
++		pr_err("n64cart: size must be a multiple of 4K\n");
++		return -ENODEV;
++	}
++
++	queue =3D blk_mq_init_sq_queue(&tag_set, &n64cart_mq_ops, 1,
++				     BLK_MQ_F_SHOULD_MERGE | BLK_MQ_F_BLOCKING);
++	if (IS_ERR(queue)) {
++		return PTR_ERR(queue);
++	}
++
++	buf =3D dma_alloc_noncoherent(&pdev->dev, BUFSIZE, &dma_addr,
++				    DMA_FROM_DEVICE, GFP_KERNEL);
++	if (!buf) {
++		err =3D -ENOMEM;
++		goto fail_queue;
++	}
++
++	reg_base =3D devm_platform_ioremap_resource(pdev, 0);
++	if (!reg_base) {
++		err =3D -EINVAL;
++		goto fail_dma;
++	}
++
++	disk =3D alloc_disk(0);
++	if (!disk) {
++		err =3D -ENOMEM;
++		goto fail_dma;
++	}
++
++	disk->first_minor =3D 0;
++	disk->queue =3D queue;
++	disk->flags =3D GENHD_FL_NO_PART_SCAN | GENHD_FL_EXT_DEVT;
++	disk->fops =3D &n64cart_fops;
++	strcpy(disk->disk_name, "n64cart");
++
++	set_capacity(disk, size / 512);
++	set_disk_ro(disk, 1);
++
++	blk_queue_flag_set(QUEUE_FLAG_NONROT, queue);
++	blk_queue_physical_block_size(queue, 4096);
++	blk_queue_logical_block_size(queue, 4096);
++
++	add_disk(disk);
++
++	pr_info("n64cart: %u kb disk\n", size / 1024);
++
++	return 0;
++fail_dma:
++	dma_free_noncoherent(&pdev->dev, BUFSIZE, buf, dma_addr,
++			     DMA_FROM_DEVICE);
++fail_queue:
++	blk_cleanup_queue(queue);
++
++	return err;
++}
++
++static struct platform_driver n64cart_driver =3D {
++	.driver =3D {
++		.name =3D "n64cart",
++	},
++};
++
++static int __init n64cart_init(void)
++{
++	return platform_driver_probe(&n64cart_driver, n64cart_probe);
++}
++
++module_param(start, uint, 0);
++MODULE_PARM_DESC(start, "Start address of the cart block data");
++
++module_param(size, uint, 0);
++MODULE_PARM_DESC(size, "Size of the cart block data, in bytes");
++
++module_init(n64cart_init);
+=2D-
+2.6.2
 
