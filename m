@@ -2,132 +2,203 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-21.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
+	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1A6BC433E0
-	for <linux-block@archiver.kernel.org>; Thu, 21 Jan 2021 20:16:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62442C433DB
+	for <linux-block@archiver.kernel.org>; Thu, 21 Jan 2021 23:04:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 15F1923A5F
-	for <linux-block@archiver.kernel.org>; Thu, 21 Jan 2021 20:16:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1958923A3A
+	for <linux-block@archiver.kernel.org>; Thu, 21 Jan 2021 23:04:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727093AbhAUUQh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Jan 2021 15:16:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42518 "EHLO
+        id S1725878AbhAUXEb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Jan 2021 18:04:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50570 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726239AbhAUUPS (ORCPT
+        with ESMTP id S1725764AbhAUXE1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Jan 2021 15:15:18 -0500
-Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56B04C06174A
-        for <linux-block@vger.kernel.org>; Thu, 21 Jan 2021 12:14:38 -0800 (PST)
-Received: by mail-lf1-x12f.google.com with SMTP id v67so4368610lfa.0
-        for <linux-block@vger.kernel.org>; Thu, 21 Jan 2021 12:14:38 -0800 (PST)
+        Thu, 21 Jan 2021 18:04:27 -0500
+Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA825C0613D6
+        for <linux-block@vger.kernel.org>; Thu, 21 Jan 2021 15:03:40 -0800 (PST)
+Received: by mail-qk1-x749.google.com with SMTP id p21so2753286qke.6
+        for <linux-block@vger.kernel.org>; Thu, 21 Jan 2021 15:03:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=lightnvm-io.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=23k0OdaqlMZR9+StYgacjZCVa/NASCQobMyVqdEPt5Q=;
-        b=lSHnSE5X+q1rYx4ppmRXr3net5bl/nTH8aN1CcgXwORRMr/2lpSA/UeSWsXOqA7bFF
-         7ROMB6R/o4xwf5lPEyhU+WH60c9u+oc7qAEclPGqRhsF25b+jpTLqKVr/B9skXK4/PXn
-         Gxk7kRJpPp1eA0FynqetuE8Cghm3NPQcpYQY4rzT6J2qmRl6fwZNLdvwhA848pOZe4fP
-         ACW7lfR8HSLsgsngXoChqe/6SV2ji7vllOzA870xCjDfCkmhFn5IXsBk1LJzpgJ2Rn7l
-         DauV4tWiWD+XA8GxuBx6eMIRMO6NsQ9U533LN9tTTqoIH3hKoxCAT1YGSu5v8MUOGSEI
-         s2QA==
+        d=google.com; s=20161025;
+        h=sender:date:message-id:mime-version:subject:from:to:cc;
+        bh=a86C6J2KAGK7N8gUuXwqncIpGvzm+wukETDy7ToYVa4=;
+        b=KEMt5GTLgB0F309NJ/ui9d0wbtXY4Ffss7tcitx4GSvL1eI92Um9URMa1KANG05fa0
+         dGOGUizaeQuZP45yQNN1mwXHpoQ2ga4p6mQ2OSu+G6FP10NkEVjxX0v3pkY07cEpYbo1
+         1jS28VTJSRoOgzn9XCUORVbCqccHajlNmMdwm3zIloJEx8q03KemuwG+iQvN17z1ciag
+         2TsJ6dVRI3QxFldm74zyost/zy86a8f84h+wVu0DKP8jeu9CbX0JZDhktdWNYxxOrsLE
+         IL0hye+W51IPiYxGrtf4yrCRqjq03ACkItiXwBfTiVrVb7XRmsDRhYYLvQ/Pq4WHXolm
+         K/cQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=23k0OdaqlMZR9+StYgacjZCVa/NASCQobMyVqdEPt5Q=;
-        b=d5AtyPgv6tNoNAQ+I49zfxPLaq+XUC66HRUFK1y/KtY2reI9j99kK4aAOzYjIaW7/C
-         IEwmTPEttdLSJvuiCggXFDMBV/49WAbh65VfvDtxWoLSLxKQcQP261YXfzSGLir4j8WN
-         Rz7bmRsIpxT3S4/rqOIXr/TsMM6RiF+tk6HXdB0x6+O3Pn+wLRItfPoyUsvMDSgBznAn
-         2Y1tTkL7XMhzvIb1WDRbvB0Eo9vs2ijVDhr/ExpHBadiECU92KiNEQ9uKXzl3Ye+nJxO
-         CUNKNUrZAdH3V7ntabsgVAzaFrOq9As2nVajrFTyvTDgd2/Upw2Oik1Tk8YicfU1FzZ1
-         tonw==
-X-Gm-Message-State: AOAM533lpCPPsyEVzaC63vDCns4qj29B/ur4G8OwH0L8qE14LxE7OsS3
-        MO9WO5w+Jc3FALT70A1evYdBMH5SEe0l5A==
-X-Google-Smtp-Source: ABdhPJyQ4UpfgRAEZf2+f0lKSZGJt2sN8lAcx8Q7HdK8mUi5r+ZFCsFtrVhP2rwA4lhMjlLuXK7CvA==
-X-Received: by 2002:ac2:4d0f:: with SMTP id r15mr431437lfi.587.1611260076807;
-        Thu, 21 Jan 2021 12:14:36 -0800 (PST)
-Received: from [10.0.0.6] (xb932c246.cust.hiper.dk. [185.50.194.70])
-        by smtp.gmail.com with ESMTPSA id t2sm94750lfk.28.2021.01.21.12.14.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Jan 2021 12:14:36 -0800 (PST)
-Subject: Re: [PATCH] lightnvm: fix memory leak when submit fails
-To:     Heiner Litz <hlitz@ucsc.edu>
-Cc:     Jens Axboe <axboe@kernel.dk>, Pan Bian <bianpan2016@163.com>,
-        linux-block@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-References: <20210121072202.120810-1-bianpan2016@163.com>
- <55045608-01cb-d5af-682b-5a213944e33d@kernel.dk>
- <474055ad-978a-4da5-d7f0-e2dc862b781c@lightnvm.io>
- <CAJbgVnWxmwfmdgk-e290kcMfhUNAjP9uO2k45rx7R=x8jBdJcw@mail.gmail.com>
- <59a735f0-9fef-5e6d-f7eb-851e14a2883e@lightnvm.io>
- <CAJbgVnW40qrYBdsM6dC5uhDFZJJDc9kwvCWtK24Rg5GWCHpb2g@mail.gmail.com>
-From:   =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
-Message-ID: <586510be-5a56-5e99-6ee6-ee20031f166b@lightnvm.io>
-Date:   Thu, 21 Jan 2021 21:14:35 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.1
-MIME-Version: 1.0
-In-Reply-To: <CAJbgVnW40qrYBdsM6dC5uhDFZJJDc9kwvCWtK24Rg5GWCHpb2g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+        h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
+         :to:cc;
+        bh=a86C6J2KAGK7N8gUuXwqncIpGvzm+wukETDy7ToYVa4=;
+        b=sg3jwDepXx9XqliNteguliejvDWYrxIO6874odmWF3syDtXxE1ShwinAE/SjlnJm7g
+         tKMuOD2ea0PhrcMVZjBAElWgZiKXOm1RST/8GjFZ/o/dkmcY5wdSvo9EQAYDU+8PJELH
+         v9m1921JXcVAdi2AOK1jX/5aqLuMTtIMt23i4jbP/br5lK4gICz3y1ZcSMcAOwMM4Oy6
+         xzc/8tmJoQJ6yiAQbVL1RJxa1Cv4Epvrn+KMY9ot0ewhhHSsn1IAwVAEun/krVjj6p1x
+         vrUr/S3BWmsMyNQ9ufZyybrWKhk7BUAhQQwIpEI6rzNwl1btu1hEtKvEWaLFKWGsir4H
+         Ht3w==
+X-Gm-Message-State: AOAM533I1wCex7N+9I7os9RlF+l+ieqnk70TlO7RzEaIlCLdyfVEfx6B
+        eaFfaVW9Nbl2vLB9nmyeRJkrE8XDJN8=
+X-Google-Smtp-Source: ABdhPJxWxaz7w6s2m6FBn5/tpe7d7n0Ntq7IDWS5vtwLqnUB2fZpoE5VgKC3P+2iYBpAUdhnybwb2HfbgUE=
+Sender: "satyat via sendgmr" <satyat@satyaprateek.c.googlers.com>
+X-Received: from satyaprateek.c.googlers.com ([fda3:e722:ac3:10:24:72f4:c0a8:1092])
+ (user=satyat job=sendgmr) by 2002:a05:6214:4e2:: with SMTP id
+ cl2mr1744643qvb.27.1611270219738; Thu, 21 Jan 2021 15:03:39 -0800 (PST)
+Date:   Thu, 21 Jan 2021 23:03:28 +0000
+Message-Id: <20210121230336.1373726-1-satyat@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.30.0.280.ga3ce27912f-goog
+Subject: [PATCH v8 0/8] add support for direct I/O with fscrypt using blk-crypto
+From:   Satya Tangirala <satyat@google.com>
+To:     "Theodore Y . Ts'o" <tytso@mit.edu>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Eric Biggers <ebiggers@kernel.org>, Chao Yu <chao@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>
+Cc:     linux-kernel@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-xfs@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-ext4@vger.kernel.org,
+        Satya Tangirala <satyat@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 21/01/2021 20.49, Heiner Litz wrote:
-> there are a couple more, but again I would understand if those are
-> deemed not important enough to keep it.
->
-> device emulation of (non-ZNS) SSD block device
+This patch series adds support for direct I/O with fscrypt using
+blk-crypto.
 
-That'll soon be available. We will be open-sourcing a new device mapper 
-(dm-zap), which implements an indirection layer that enables ZNS SSDs to 
-be exposed as a conventional block device.
+Till now, the blk-crypto-fallback expected the offset and length of each
+bvec in a bio to be aligned to the crypto data unit size. This in turn
+would mean that any user buffer used to read/write encrypted data using the
+blk-crypto framework would need to be aligned to the crypto data unit size.
+Patch 1 enables blk-crypto-fallback to work without this requirement. It
+also relaxes the alignment requirement that blk-crypto checks for - now,
+blk-crypto only requires that the length of the I/O is aligned to the
+crypto data unit size. This allows direct I/O support introduced in the
+later patches in this series to require extra alignment restrictions on
+user buffers.
 
-> die control: yes endurance groups would help but I am not aware of any
-> vendor supporting it
-It is out there. Although, is this still important in 2021? OCSSD was 
-made back in the days where media program/erase suspend wasn't commonly 
-available and SSD controller were more simple. With today's media and 
-SSD controllers, it is hard to compete without leaving media throughput 
-on the table. If needed, splitting a drive into a few partitions should 
-be sufficient for many many types of workloads.
-> finer-grained control: 1000's of open blocks vs. a handful of
-> concurrently open zones
+Patch 2 relaxes the alignment check that blk-crypto performs on bios.
+blk-crypto would check that the offset and length of each bvec in a bio is
+aligned to the data unit size, since the blk-crypto-fallback required it.
+As this is no longer the case, blk-crypto now only checks that the total
+length of the bio is data unit size aligned.
 
-It is dependent on the implementation - ZNS SSDs also supports 1000's of 
-open zones.
+Patch 3 adds two functions to fscrypt that need to be called to determine
+if direct I/O is supported for a request.
 
-Wrt to available OCSSD hardware - there isn't, to my knowledge, proper 
-implementations available, where media reliability is taken into account.
+Patches 4 and 5 modify direct-io and iomap respectively to set bio crypt
+contexts on bios when appropriate by calling into fscrypt.
 
-Generally for the OCSSD hardware implementations, their UBER is 
-extremely low, and as such RAID or similar schemes must be implemented 
-on the host. pblk does not implement this, so at best, one should not 
-store data if one wants to get it back at some point. It also makes for 
-an unfair SSD comparison, as there is much more to an SSD than what 
-OCSSD + pblk implements. At worst, it'll lead to false understanding of 
-the challenges of making SSDs, and at best, work can be used as the 
-foundation for doing an actual SSD implementation.
+Patches 6 and 7 allow ext4 and f2fs direct I/O to support fscrypt without
+falling back to buffered I/O.
 
-> OOB area: helpful for L2P recovery
+Patch 8 updates the fscrypt documentation for direct I/O support.
+The documentation now notes the required conditions for inline encryption
+and direct I/O on encrypted files.
 
-It is known as LBA metadata in NVMe. It is commonly available in many of 
-today's SSD.
+This patch series was tested by running xfstests with test_dummy_encryption
+with and without the 'inlinecrypt' mount option, and there were no
+meaningful regressions. Without any modification, xfstests skip any
+direct I/O test when using ext4/encrypt and f2fs/encrypt, so I modified
+xfstests not to skip those tests.
 
-I understand your point that there is a lot of flexibility, but my 
-counter point is that there isn't anything in OCSSD, that is not 
-implementable or commonly available using today's NVMe concepts. 
-Furthermore, the known OCSSD research platforms can easily be updated to 
-expose the OCSSD characteristics through standardized NVMe concepts. 
-That would probably make for a good research paper.
+Among those tests, generic/465 fails with ext4/encrypt because a bio ends
+up being split in the middle of a crypto data unit.  Patch 1 from v7 (which
+has been sent out as a separate patch series) fixes this.
 
+Note that the blk-crypto-fallback changes (Patch 1 in v8 in this series)
+were also tested through xfstests by using this series along with the patch
+series that ensures bios aren't split in the middle of a data unit (Patch 1
+from v7) - Some tests (such as generic/465 again) result in bvecs that
+don't contain a complete data unit (so a data unit is split across multiple
+bvecs), and only pass with this patch.
+
+Changes v7 => v8:
+ - Patch 1 from v7 (which ensured that bios aren't split in the middle of
+   a data unit) has been sent out in a separate patch series, as it's
+   required even without this patch series. That patch series can now
+   be found at
+   https://lore.kernel.org/linux-block/20210114154723.2495814-1-satyat@google.com/
+ - Patch 2 from v7 has been split into 2 patches (Patch 1 and 2 in v8).
+ - Update docs
+
+Changes v6 => v7:
+ - add patches 1 and 2 to allow blk-crypto to work with user buffers not
+   aligned to crypto data unit size, so that direct I/O doesn't require
+   that alignment either.
+ - some cleanups
+
+Changes v5 => v6:
+ - fix bug with fscrypt_limit_io_blocks() and make it ready for 64 bit
+   block numbers.
+ - remove Reviewed-by for Patch 1 due to significant changes from when
+   the Reviewed-by was given.
+
+Changes v4 => v5:
+ - replace fscrypt_limit_io_pages() with fscrypt_limit_io_block(), which
+   is now called by individual filesystems (currently only ext4) instead
+   of the iomap code. This new function serves the same end purpose as
+   the one it replaces (ensuring that DUNs within a bio are contiguous)
+   but operates purely with blocks instead of with pages.
+ - make iomap_dio_zero() set bio_crypt_ctx's again, instead of just a
+   WARN_ON() since some folks prefer that instead.
+ - add Reviewed-by's
+
+Changes v3 => v4:
+ - Fix bug in iomap_dio_bio_actor() where fscrypt_limit_io_pages() was
+   being called too early (thanks Eric!)
+ - Improve comments and fix formatting in documentation
+ - iomap_dio_zero() is only called to zero out partial blocks, but
+   direct I/O is only supported on encrypted files when I/O is
+   blocksize aligned, so it doesn't need to set encryption contexts on
+   bios. Replace setting the encryption context with a WARN_ON(). (Eric)
+
+Changes v2 => v3:
+ - add changelog to coverletter
+
+Changes v1 => v2:
+ - Fix bug in f2fs caused by replacing f2fs_post_read_required() with
+   !fscrypt_dio_supported() since the latter doesn't check for
+   compressed inodes unlike the former.
+ - Add patches 6 and 7 for fscrypt documentation
+ - cleanups and comments
+
+Eric Biggers (5):
+  fscrypt: add functions for direct I/O support
+  direct-io: add support for fscrypt using blk-crypto
+  iomap: support direct I/O with fscrypt using blk-crypto
+  ext4: support direct I/O with fscrypt using blk-crypto
+  f2fs: support direct I/O with fscrypt using blk-crypto
+
+Satya Tangirala (3):
+  block: blk-crypto-fallback: handle data unit split across multiple
+    bvecs
+  block: blk-crypto: relax alignment requirements for bvecs in bios
+  fscrypt: update documentation for direct I/O support
+
+ Documentation/filesystems/fscrypt.rst |  21 ++-
+ block/blk-crypto-fallback.c           | 203 ++++++++++++++++++++------
+ block/blk-crypto.c                    |  19 +--
+ fs/crypto/crypto.c                    |   8 +
+ fs/crypto/inline_crypt.c              |  74 ++++++++++
+ fs/direct-io.c                        |  15 +-
+ fs/ext4/file.c                        |  10 +-
+ fs/ext4/inode.c                       |   7 +
+ fs/f2fs/f2fs.h                        |   6 +-
+ fs/iomap/direct-io.c                  |   6 +
+ include/linux/fscrypt.h               |  18 +++
+ 11 files changed, 315 insertions(+), 72 deletions(-)
+
+-- 
+2.30.0.280.ga3ce27912f-goog
 
