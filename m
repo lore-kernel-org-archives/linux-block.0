@@ -8,60 +8,60 @@ X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B0AFC43381
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67BB3C4332B
 	for <linux-block@archiver.kernel.org>; Thu, 21 Jan 2021 23:25:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EEDC420769
-	for <linux-block@archiver.kernel.org>; Thu, 21 Jan 2021 23:25:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 22EA323A5E
+	for <linux-block@archiver.kernel.org>; Thu, 21 Jan 2021 23:25:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726212AbhAUXZI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Jan 2021 18:25:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50764 "EHLO
+        id S1726205AbhAUXZH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Jan 2021 18:25:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50758 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726230AbhAUXGb (ORCPT
+        with ESMTP id S1726222AbhAUXGb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Thu, 21 Jan 2021 18:06:31 -0500
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 304DBC061A27
-        for <linux-block@vger.kernel.org>; Thu, 21 Jan 2021 15:03:55 -0800 (PST)
-Received: by mail-yb1-xb49.google.com with SMTP id f127so981519ybf.12
-        for <linux-block@vger.kernel.org>; Thu, 21 Jan 2021 15:03:55 -0800 (PST)
+Received: from mail-qv1-xf4a.google.com (mail-qv1-xf4a.google.com [IPv6:2607:f8b0:4864:20::f4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 557C3C0611BD
+        for <linux-block@vger.kernel.org>; Thu, 21 Jan 2021 15:03:53 -0800 (PST)
+Received: by mail-qv1-xf4a.google.com with SMTP id f7so2549872qvr.4
+        for <linux-block@vger.kernel.org>; Thu, 21 Jan 2021 15:03:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:in-reply-to:message-id:mime-version:references:subject
          :from:to:cc;
-        bh=CZMyGWlKFZQTRektdrF/slvssAIzMQGtBohXi2xlJZo=;
-        b=rrCQEqKVW1ZDhW4+xC0fjbzkbeY/JM71fiwBKXHsmFH4bwE2GxtDFk+U88/SUhdZrf
-         m7wzzh7s3pqKnNjd10foCZJDNdK/vkuuRpPD69ujIVZe3eifyns8biUA8hZoFwPNKnDb
-         Ba3v3G79vllZnXC34ggan7U2sUksnH545H+f+6bih9NuBbW12SjTSwsWplttdtVyg536
-         GP0pN9LaqdE82PHlByUSvgve2pSMZuoQ6XfZu6yXARBBw+19h3asuK13j5tmK1ncQkcY
-         r6k+aHDCwUHG8X/Lo9Rh9plI3yOEJxIzYYGPgdsvlhvIGQPysaEunA99fEdDpORoP0Ww
-         T1lg==
+        bh=rQjj2/WzWm3qCtm3ibhFIzAxq8pwrDZXF1QHOMz3o4g=;
+        b=OQwGeNkLyENvgqmLiHvbP7CSYH33j6r4RtJwGizSN8nWtM8Bd2dSMW/aHoyzXkcIXQ
+         SFQAzk5HLMFt5kaGzlRUPtwP9Cbhd/ympkQ6qOFzAlI2PxYcVQ0gf5Y41UoQBpok/ssF
+         pdjthPoUH3UPaE0tH2FUI6ZXptBS76fptbASUd5oFKbwFtVjL+37a5dGq3QxI8snd6w2
+         /ZXit2IQfvc79GmSw0sHRQPGpRCCqCtWa32wqwXTBD9Q5oUnteXCjDPx8vA++4qRAB8/
+         5eOStHbSSsuYUP+zC61cZOHerpgOL2Kh/UfZQ+22Z1w+MhDwLjcekAl9wXkg40ZZM1zP
+         yyiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=CZMyGWlKFZQTRektdrF/slvssAIzMQGtBohXi2xlJZo=;
-        b=rI9PV0QQ9eHHcDmiS1c50hKBOGKbE7/hNBvYefiw7Zo+txc720PvUygNdyYlUSnpcj
-         9uRaGYAnq7tmGwN2HK1tmabMs/5FE4hMEG5BDkXhoNrqkCWhwpaZZ/oXWhR/YMxCnLBL
-         H6Cfi0SADT2ZOW7Nzk3G9hESx2TEiIIdphDG2+ghkb7RdXPO5zGvkhqVwEVfYSceAORT
-         BAwIzJHxhrk7R0ipwh/0QxqlWQ8cHqSZUcnTOMMzlgMqzq7fmXujTn3bJtJZh0XI3i/1
-         GhtBf+d/fvrGDkpfwLCBSdBtmRSZ3lUV3rdvWXh2RhraOBDfWpuWBElU1pPoEOzYYDSz
-         KAQQ==
-X-Gm-Message-State: AOAM532c4uzu0FviLAmwneJYRBPqGh5goKNJu6NJPu5Zac7JR8gd8EVn
-        YasbbOiKjwOmf5ZWtitYrqGH2VY7ge4=
-X-Google-Smtp-Source: ABdhPJwB0G5OeVzx657WHRwvKU6JZee+AtLxAL7APPuuacdYF8k9c5jXPavHspxiawBp2gvtwJK1mN7H78c=
+        bh=rQjj2/WzWm3qCtm3ibhFIzAxq8pwrDZXF1QHOMz3o4g=;
+        b=Mk+6UUcJAV+8cvdsYH1/tnHucV4h0o1NHdUVT3bOFHg6hglO0DQkTn+SGxXd8d0NI6
+         CQPg0wALa8qjnie2YVBE7mVexrg+vPXGpalvAcigc758NRqCR2j/QwPFiGB0MYM1nSAG
+         /wCpmxpFeOAt47qo5cLu9NTpIrk61DN6FTW+0tsReo3G2knz3Bvv73g+zn2Ilb5fB0GZ
+         eXPsJ4u83KQEKUKzLi5XoYnaUPgyB+WA2ZcR81NstSecpqC122x0ByYZwP4ehlN6YFx9
+         NFH6foqegbI9AbTHYCWWvQO41MAlWgdwvxAtuO17SsHuRFiYmS7kT+5zOQiibdLg1o+7
+         +BUQ==
+X-Gm-Message-State: AOAM532IguZO46+ezBfTUynfvnQtb+3Vwl9hNU9+7ty0mFNuL6ZU3bL9
+        rs9LQvWg7I4z+RsE7r/EtAaxHKfvCig=
+X-Google-Smtp-Source: ABdhPJzBS4n+vW6iQYRenoIZnviw813XxH38zeCsNFuDUBoahsAaZ41A78g1uNGV7RY2FFPhiAQAyieotuA=
 Sender: "satyat via sendgmr" <satyat@satyaprateek.c.googlers.com>
 X-Received: from satyaprateek.c.googlers.com ([fda3:e722:ac3:10:24:72f4:c0a8:1092])
- (user=satyat job=sendgmr) by 2002:a25:61c2:: with SMTP id v185mr2563181ybb.378.1611270234438;
- Thu, 21 Jan 2021 15:03:54 -0800 (PST)
-Date:   Thu, 21 Jan 2021 23:03:36 +0000
+ (user=satyat job=sendgmr) by 2002:a0c:a692:: with SMTP id t18mr2037203qva.18.1611270232543;
+ Thu, 21 Jan 2021 15:03:52 -0800 (PST)
+Date:   Thu, 21 Jan 2021 23:03:35 +0000
 In-Reply-To: <20210121230336.1373726-1-satyat@google.com>
-Message-Id: <20210121230336.1373726-9-satyat@google.com>
+Message-Id: <20210121230336.1373726-8-satyat@google.com>
 Mime-Version: 1.0
 References: <20210121230336.1373726-1-satyat@google.com>
 X-Mailer: git-send-email 2.30.0.280.ga3ce27912f-goog
-Subject: [PATCH v8 8/8] fscrypt: update documentation for direct I/O support
+Subject: [PATCH v8 7/8] f2fs: support direct I/O with fscrypt using blk-crypto
 From:   Satya Tangirala <satyat@google.com>
 To:     "Theodore Y . Ts'o" <tytso@mit.edu>,
         Jaegeuk Kim <jaegeuk@kernel.org>,
@@ -71,62 +71,49 @@ To:     "Theodore Y . Ts'o" <tytso@mit.edu>,
 Cc:     linux-kernel@vger.kernel.org, linux-fscrypt@vger.kernel.org,
         linux-f2fs-devel@lists.sourceforge.net, linux-xfs@vger.kernel.org,
         linux-block@vger.kernel.org, linux-ext4@vger.kernel.org,
-        Satya Tangirala <satyat@google.com>,
-        Eric Biggers <ebiggers@google.com>
+        Eric Biggers <ebiggers@google.com>,
+        Satya Tangirala <satyat@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Update fscrypt documentation to reflect the addition of direct I/O support
-and document the necessary conditions for direct I/O on encrypted files.
+From: Eric Biggers <ebiggers@google.com>
 
+Wire up f2fs with fscrypt direct I/O support. direct I/O with fscrypt is
+only supported through blk-crypto (i.e. CONFIG_BLK_INLINE_ENCRYPTION must
+have been enabled, the 'inlinecrypt' mount option must have been specified,
+and either hardware inline encryption support must be present or
+CONFIG_BLK_INLINE_ENCYRPTION_FALLBACK must have been enabled). Further,
+direct I/O on encrypted files is only supported when the *length* of the
+I/O is aligned to the filesystem block size (which is *not* necessarily the
+same as the block device's block size).
+
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+Co-developed-by: Satya Tangirala <satyat@google.com>
 Signed-off-by: Satya Tangirala <satyat@google.com>
-Reviewed-by: Eric Biggers <ebiggers@google.com>
-Reviewed-by: Jaegeuk Kim <jaegeuk@kernel.org>
+Acked-by: Jaegeuk Kim <jaegeuk@kernel.org>
 ---
- Documentation/filesystems/fscrypt.rst | 21 +++++++++++++++++++--
- 1 file changed, 19 insertions(+), 2 deletions(-)
+ fs/f2fs/f2fs.h | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/Documentation/filesystems/fscrypt.rst b/Documentation/filesystems/fscrypt.rst
-index 44b67ebd6e40..c0c1747fa2fb 100644
---- a/Documentation/filesystems/fscrypt.rst
-+++ b/Documentation/filesystems/fscrypt.rst
-@@ -1047,8 +1047,10 @@ astute users may notice some differences in behavior:
-   may be used to overwrite the source files but isn't guaranteed to be
-   effective on all filesystems and storage devices.
+diff --git a/fs/f2fs/f2fs.h b/fs/f2fs/f2fs.h
+index bb11759191dc..5130423a13e7 100644
+--- a/fs/f2fs/f2fs.h
++++ b/fs/f2fs/f2fs.h
+@@ -4091,7 +4091,11 @@ static inline bool f2fs_force_buffered_io(struct inode *inode,
+ 	struct f2fs_sb_info *sbi = F2FS_I_SB(inode);
+ 	int rw = iov_iter_rw(iter);
  
--- Direct I/O is not supported on encrypted files.  Attempts to use
--  direct I/O on such files will fall back to buffered I/O.
-+- Direct I/O is supported on encrypted files only under some
-+  circumstances (see `Direct I/O support`_ for details). When these
-+  circumstances are not met, attempts to use direct I/O on encrypted
-+  files will fall back to buffered I/O.
- 
- - The fallocate operations FALLOC_FL_COLLAPSE_RANGE and
-   FALLOC_FL_INSERT_RANGE are not supported on encrypted files and will
-@@ -1121,6 +1123,21 @@ It is not currently possible to backup and restore encrypted files
- without the encryption key.  This would require special APIs which
- have not yet been implemented.
- 
-+Direct I/O support
-+==================
-+
-+Direct I/O on encrypted files is supported through blk-crypto. In
-+particular, this means the kernel must have CONFIG_BLK_INLINE_ENCRYPTION
-+enabled, the filesystem must have had the 'inlinecrypt' mount option
-+specified, and either hardware inline encryption must be present, or
-+CONFIG_BLK_INLINE_ENCRYPTION_FALLBACK must have been enabled. Further,
-+the starting position in the file and the length of any I/O must be aligned
-+to the filesystem block size (*not* necessarily the same as the block
-+device's block size). If any of these conditions isn't met, attempts to do
-+direct I/O on an encrypted file will fall back to buffered I/O. However,
-+there aren't any additional requirements on user buffer alignment (apart
-+from those already present when using direct I/O on unencrypted files).
-+
- Encryption policy enforcement
- =============================
- 
+-	if (f2fs_post_read_required(inode))
++	if (!fscrypt_dio_supported(iocb, iter))
++		return true;
++	if (fsverity_active(inode))
++		return true;
++	if (f2fs_compressed_file(inode))
+ 		return true;
+ 	if (f2fs_is_multi_device(sbi))
+ 		return true;
 -- 
 2.30.0.280.ga3ce27912f-goog
 
