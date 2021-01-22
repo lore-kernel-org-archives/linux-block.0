@@ -2,89 +2,96 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0C01C433E0
-	for <linux-block@archiver.kernel.org>; Fri, 22 Jan 2021 04:43:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 706CAC433DB
+	for <linux-block@archiver.kernel.org>; Fri, 22 Jan 2021 07:37:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8C439238D7
-	for <linux-block@archiver.kernel.org>; Fri, 22 Jan 2021 04:43:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 46E9322DBF
+	for <linux-block@archiver.kernel.org>; Fri, 22 Jan 2021 07:37:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726652AbhAVEnn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Jan 2021 23:43:43 -0500
-Received: from mail-pj1-f48.google.com ([209.85.216.48]:35751 "EHLO
-        mail-pj1-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726634AbhAVEnm (ORCPT
+        id S1727074AbhAVHhz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Jan 2021 02:37:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47914 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726810AbhAVHhw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Jan 2021 23:43:42 -0500
-Received: by mail-pj1-f48.google.com with SMTP id b5so3073536pjl.0
-        for <linux-block@vger.kernel.org>; Thu, 21 Jan 2021 20:43:27 -0800 (PST)
+        Fri, 22 Jan 2021 02:37:52 -0500
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 150CCC0613D6
+        for <linux-block@vger.kernel.org>; Thu, 21 Jan 2021 23:37:12 -0800 (PST)
+Received: by mail-pf1-x42a.google.com with SMTP id w18so3164621pfu.9
+        for <linux-block@vger.kernel.org>; Thu, 21 Jan 2021 23:37:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloud.ionos.com; s=google;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=xnObBx7qCVcq4Xmng0HzOiOYW//hrsobDgYRbXW2qoA=;
+        b=dfhsrZgi1qJDI2m/ilO0UZ7ihv26w0btzlf1zmTicpi6ZJPqGMSAzlb7G4wGiF0FW3
+         Gijmj6YCtu3PwTEsxPDNKVLwzNJfoZ+kzsARJbaXfKhjIPk0hIdEI6k7+iABd3J0Ge6o
+         E21BaI1DVfxYzhQmtffSyiTWTX0ggTKcY1OLoksddvORRrvfQMQGbsphmp1xU/IKzC+G
+         sD/zie7QvCQK1vih68EwWOxT3P4AOnndd/VBNtbw7iZsbzo+OPZQFBdc76x6uF8HLA4t
+         egiWvXKCvt0EJ4zf4Nru3997s4IFCMrrcBcXNTQ8OpxxqBRXA3kIBOHmAEsIKhM9WxEA
+         fFbw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=QLFXY8tdiigAj+EhvoY8oqr1lpb8jqzHnycFCWyS6ww=;
-        b=htx7R1+TrrpB1vtuR06K4h3vcbha/iAgAY61pPsCEzBY51B/ecV43NzEszZMDAaqaY
-         3yfwypXdA/23fHqSRnB8wXEc7M8XgodZOCPgMSMfQy7SknYLgsl9i0jC/cdIYgfpWw7c
-         wyHt6aHy/ZIK1vWguXeDx7yydTQuee4+UwCriXX/atY80986vyQAXvFKdAVVa4WMg9kj
-         HvKhiOJE9D2kmNWRtUEENthJyml/m43RN7IARoxZJv/0YV9bT9v+rxq1T6fNmAO6HLy0
-         Ltv75umJ/spFK/w5Mg/QYYQBds+kO+rh1jIvzYpcNL1AwDL3XgBfgUk6nVoNqZDItytd
-         q+tg==
-X-Gm-Message-State: AOAM533d8bS1+j7eOZP5YTg3+NwtIM+8p9Wpc3kmpv/P3NQoNffYqfIH
-        eEs7qS5xIm5nM0iw6bzskQ8=
-X-Google-Smtp-Source: ABdhPJyoZ7yQ02Gnfthcb2XB2slcV2xQSwskEtLxsXiTteHarLBwUoj8X4o/uNY2AyLApnsCT0q+9A==
-X-Received: by 2002:a17:902:7881:b029:df:de74:e333 with SMTP id q1-20020a1709027881b02900dfde74e333mr539489pll.34.1611290581456;
-        Thu, 21 Jan 2021 20:43:01 -0800 (PST)
-Received: from ?IPv6:2601:647:4000:d7:ca83:1207:86f7:dfa? ([2601:647:4000:d7:ca83:1207:86f7:dfa])
-        by smtp.gmail.com with ESMTPSA id b18sm7299405pfi.173.2021.01.21.20.42.59
+        bh=xnObBx7qCVcq4Xmng0HzOiOYW//hrsobDgYRbXW2qoA=;
+        b=WH4obvHzNdZFSX121DJoiWLqLAWJIdO6RC68D5rzkVzG4gH25jS1w4gcS/IaOf1goc
+         9hbZZ6R+j3tfwEd8y9QUkHB25cNV7HE687NsFfJlUiwOy+x3deMM+6XzZnzNadc2bnw7
+         Ny900JsRML08VONXK4Z77OOWBMpxyLmP9BkPNbvI7fR0Vl4DJY8UrY9o6l8m2FSwrVuu
+         8CosKWmZEtp/OsK4u3s3uXIgQJinY7ftc0SEvYoVKb3sd+quIeN+LA18WVSkEKcMvLom
+         I4H9BKrA1VRdf3dOSPPHdtYdTeVmcnx8WROIfkQYLiBrVbbESvb8KRTFjEeoN9Kh8WFX
+         08uw==
+X-Gm-Message-State: AOAM533sVXrRIS214WBRX+d/Sn3hf/EU+8Pb/IZq7Hcovhz44yDGHOpK
+        /PSmH9LZQ8smhOdtVgph28UgSQ==
+X-Google-Smtp-Source: ABdhPJwPLaEjEPKwC34UrAC2gsulKg3s4j7+J97bZTNNIKaoZ/lJu48wNw2Iwm4BkDrJnbbca6y71A==
+X-Received: by 2002:a63:1f18:: with SMTP id f24mr3506723pgf.133.1611301030526;
+        Thu, 21 Jan 2021 23:37:10 -0800 (PST)
+Received: from [10.8.0.116] ([196.245.9.36])
+        by smtp.gmail.com with ESMTPSA id fh7sm7835085pjb.43.2021.01.21.23.37.01
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Jan 2021 20:43:00 -0800 (PST)
-Subject: Re: [PATCH blktests] rdma: Use rdma link instead of
- /sys/class/infiniband/*/parent
-To:     Yi Zhang <yi.zhang@redhat.com>, Omar Sandoval <osandov@fb.com>
-Cc:     linux-block@vger.kernel.org, Jason Gunthorpe <jgg@nvidia.com>
-References: <20210121035954.7245-1-bvanassche@acm.org>
- <be50e09c-393d-2ee1-1128-1149baac0da2@redhat.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <96108378-b0b9-8be9-4f4e-e26a78a2ba9f@acm.org>
-Date:   Thu, 21 Jan 2021 20:42:58 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+        Thu, 21 Jan 2021 23:37:09 -0800 (PST)
+Subject: Re: [PATCH 1/2] block: remove unnecessary argument from
+ blk_execute_rq_nowait
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        target-devel@vger.kernel.org, linux-scsi@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-ide@vger.kernel.org, linux-mmc@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-nfs@vger.kernel.org
+References: <20210121142905.13089-1-guoqing.jiang@cloud.ionos.com>
+ <20210121142905.13089-2-guoqing.jiang@cloud.ionos.com>
+ <20210121170257.GA4120717@infradead.org>
+From:   Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
+Message-ID: <b87591b9-e598-6436-d41f-80cc56640549@cloud.ionos.com>
+Date:   Fri, 22 Jan 2021 08:36:45 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <be50e09c-393d-2ee1-1128-1149baac0da2@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20210121170257.GA4120717@infradead.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/20/21 10:58 PM, Yi Zhang wrote:
-> On 1/21/21 11:59 AM, Bart Van Assche wrote:
->>   rdma_network_interfaces() {
->> -    (
->> -        cd /sys/class/net &&
->> -            for i in *; do
->> -                [ -e "$i" ] || continue
->> -                # Skip IPoIB (ARPHRD_INFINIBAND) network
->> -                # interfaces.
->> -                [ "$(<"$i"/type)" = 32 ] && continue
->> -                [ -L "$i/device" ] || continue
->> -                d=$(readlink "$i/device" 2>/dev/null)
->> -                if [ -n "$d" ] && is_rdma_device "$i/$d"; then
->> -                    echo "$i"
->> -                fi
->> -            done
->> -    )
->> +    rdma link show | sed -n 's,^link[[:blank:]]*\([^/]*\)/.*,\1,p' |
->> sort -u
->
-> We should list the network interface here(like eno1), rxe/siw interfaces
-> will not work for function get_ipv4_addr
 
-Thanks for the feedback. I will fix this and repost this patch.
 
-Bart.
+On 1/21/21 18:02, Christoph Hellwig wrote:
+> On Thu, Jan 21, 2021 at 03:29:04PM +0100, Guoqing Jiang wrote:
+>> The 'q' is not used since commit a1ce35fa4985 ("block: remove dead
+>> elevator code"), also update the comment of the function.
+> 
+> And more importantly it never really was needed to start with given
+> that we can triviall derive it from struct request.
+
+Thanks Christoph, will add the above to header and send new version.
+
+Guoqing
