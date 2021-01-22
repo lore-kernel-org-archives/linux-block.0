@@ -2,86 +2,335 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E863CC433E0
-	for <linux-block@archiver.kernel.org>; Fri, 22 Jan 2021 23:08:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95F2BC433E0
+	for <linux-block@archiver.kernel.org>; Fri, 22 Jan 2021 23:17:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A778B23B52
-	for <linux-block@archiver.kernel.org>; Fri, 22 Jan 2021 23:08:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5540E23B17
+	for <linux-block@archiver.kernel.org>; Fri, 22 Jan 2021 23:17:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728199AbhAVXIn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Jan 2021 18:08:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34328 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730787AbhAVTju (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Jan 2021 14:39:50 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C039DC061786;
-        Fri, 22 Jan 2021 11:39:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=fJjrLTchpZuvDRdgUaJrEMQ1tsdbXe3AFrBHowtkRTE=; b=IqrLDNur1JkaUgBRhjlM73OSmu
-        b6lCABj2VbpFJ32JmgrlgxU2CyUXiR6VLkTwP4UIxHqo3BYloo1ehCVFe/hfI0x3EXeRaoeahtGLQ
-        INgelaOuYKfJf1jePi8BKJNBtE7TvnfpZVkuS+ey7Tf4YejyqNcE1uNaAkIKreKDpgKoLo+UC1ppO
-        KMFM0MjV55nhjXlBXaiNm9HYEOytCROcdHY7DtAe+VIG2ynUaRyW0QT/TsXZTTscxNoB/0dcVVZ40
-        H//J7uN4RblWtwH2XhJcnYhUd4IAMjerKJUUUgSqsuj5pMP76Sf7eSLOglzBMIAUxGC2ZK+wyvRz/
-        TQ9nZmpg==;
-Received: from hch by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1l32GG-0018wl-ED; Fri, 22 Jan 2021 19:38:26 +0000
-Date:   Fri, 22 Jan 2021 19:38:24 +0000
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Lauri Kasanen <cand@gmx.com>
-Cc:     linux-mips@vger.kernel.org, tsbogend@alpha.franken.de,
-        axboe@kernel.dk, linux-block@vger.kernel.org,
-        Keith Busch <kbusch@kernel.org>,
+        id S1728151AbhAVXRL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Jan 2021 18:17:11 -0500
+Received: from mout.gmx.net ([212.227.17.21]:60447 "EHLO mout.gmx.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728512AbhAVTfG (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 22 Jan 2021 14:35:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
+        s=badeba3b8450; t=1611343926;
+        bh=U3lkMM71Iy1wCy7no+CQo7p8zFw8Xj0w/nEAOLHAws0=;
+        h=X-UI-Sender-Class:Date:From:To:Cc:Subject;
+        b=OUmm5ZI04rufW8AFMDGY/0jPz+10vE7Y1R0O9Q5qGzxNwDtQ5XNirDjiwj9q6f+73
+         TR3cQCL5p/H2iDSoHs5unCSEHGN+s0D0lnWretBbfAC8HHOzvHX7pzatiPs8ybqxbo
+         q8PLuU2HeNTmRImrOIVCxirYgMvcsPqvFq3YBwcA=
+X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
+Received: from Valinor ([82.203.161.65]) by mail.gmx.net (mrgmx105
+ [212.227.17.174]) with ESMTPSA (Nemesis) id 1M72oB-1l5WbB0UZj-008ZyW; Fri, 22
+ Jan 2021 20:32:06 +0100
+Date:   Fri, 22 Jan 2021 21:33:46 +0200
+From:   Lauri Kasanen <cand@gmx.com>
+To:     linux-mips@vger.kernel.org
+Cc:     tsbogend@alpha.franken.de, axboe@kernel.dk,
+        linux-block@vger.kernel.org, Keith Busch <kbusch@kernel.org>,
         Christoph Hellwig <hch@infradead.org>
-Subject: Re: [PATCH v10] block: Add n64 cart driver
-Message-ID: <20210122193824.GA271343@infradead.org>
-References: <20210122213346.774020bb9393ebded17e7412@gmx.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210122213346.774020bb9393ebded17e7412@gmx.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Subject: [PATCH v10] block: Add n64 cart driver
+Message-Id: <20210122213346.774020bb9393ebded17e7412@gmx.com>
+X-Mailer: Sylpheed 3.5.0 (GTK+ 2.18.6; x86_64-unknown-linux-gnu)
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:c1bAfQ8dClaNyvNivuD7YfmcQQJcQwy5e6Cw1j/N7GPpm5bNucB
+ 9EBbPfooDFrzuK/Cv49lPiiSQ4BPN84RBdf9iunLd80Kd715lJ6Ft24Yn3zctVR3QNoucal
+ lCRYohumG2hE4NbnFB1n6ZRXQ8WQYexOVWp+TGACu2HwAyzHGP3gnwnWz43knsZkjnIupcd
+ GdPDBRVlCe7jUlw6CZ+CA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:u4hsz9vqCOY=:TEL/wSC2qOrJQrVbFas4Lt
+ 9K6ANQM8v7HE53WsTMLIiuDQ4wbRRrTHPIJbn3+iX8vPAUB0xZ0oBY1IBkdj5MPHtsllFiPLq
+ jo25QEM3ZAwxO89cjMYRl3iwFzg5rQYC7VKhz/sSArbOaaxIlunZFfcLBOsVRPuBUjRqVjyiV
+ wD0ym+VSM9Wk9wASV15eQlJWjEDgkvf99hNAePc0nNMA0O2ppsTjdRQbIISuBfzNdQz1CwS0O
+ 4PPTEJUd85sqdpnuofPEdmqs6zcZfraWJsxQzzJzm77599hEbZuwboxFs8JUdYuHsvMjJTrNM
+ KrKGE0WX2YLUWwlYMsfFi025VhRZgkQMuEirWQUlCH0hF8jtiq3RTZxHjf9UK6Qmhq2uCkxk+
+ rnDt2qQLHlmbZRnNaoN2MsAkn9jjsSnVGWRIzcXXSbSNGBtG7yrywW65iy3QH2sDd07Lt486r
+ B4sGZNL6XXNe8ca2s4m8mwHPU3jj09qCpf8Us7kfj5WqYAnlgsE9Lj8VrEEhrBGp3JhRm6Qsi
+ nL1cXT9z+N51lfe2JzPhu2+UlLfp45VcFLNT5fWb7lOnV3Z7QtEJ4omm0Y8fvmfszg/RrDiCR
+ B+4cJWwdEoVrpjptt86pKg3PRt3njUqClFAG5rMpbzrGqwosGI8jBxKxJgLSeVfm5KEHArY63
+ puI52FJx5bf0GOmq1opzFYShvn+azOG1BmwpoMD3DaUOXyQxm/pdkEAtev452sVGTr+m+YlU7
+ C8CfxafcCJKB3i5zlSCvId+yb2XsJ6I24N7yat0qFDuYHD4T/y6BAV+RdMHRLEY/728QjWny0
+ p0kQ5oKmONmU084or+ESnj+5+DkEdlgzuHiJWmcELMZFdx/tHRKgHrTCrIcz+mqmzVxo75vGU
+ 544bxMxdmFk96m5XDrAA==
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> +static int n64cart_do_bvec(struct device *dev, struct bio_vec *bv,
-> +			   unsigned int len, unsigned int off,
-> +			   u32 pos)
+This adds support for the Nintendo 64 console's carts. Carts are a
+read-only media ranging from 8mb to 64mb.
 
-I think this should either return bool or a blk_status_t instead
-of the int with 1/0 values.
+Only one cart can be connected at once, and switching it requires a
+reboot.
 
-> +	if (bio_end_sector(bio) > get_capacity(bio->bi_disk))
-> +		goto io_error;
+No module support to save RAM, as the target has 8mb RAM.
 
-This check is already performed by the block layer.  I have a series
-pending that removes it from the few drivers that duplicate it.
+Signed-off-by: Lauri Kasanen <cand@gmx.com>
+=2D--
+ drivers/block/Kconfig   |   6 ++
+ drivers/block/Makefile  |   1 +
+ drivers/block/n64cart.c | 198 +++++++++++++++++++++++++++++++++++++++++++=
++++++
+ 3 files changed, 205 insertions(+)
+ create mode 100644 drivers/block/n64cart.c
 
-> +
-> +	bio_for_each_segment(bvec, bio, iter) {
-> +		unsigned int len = bvec.bv_len;
-> +		int err;
-> +
-> +		/* Alignment check */
-> +		WARN_ON_ONCE((bvec.bv_offset & (MIN_ALIGNMENT - 1)) ||
-> +				(len & (MIN_ALIGNMENT - 1)));
-> +
-> +		err = n64cart_do_bvec(dev, &bvec, len,
-> +				      bvec.bv_offset, pos);
-> +		if (err)
-> +			goto io_error;
-> +		pos += len;
+v10:
+convert to bio
+DMA directly to the bio buffer
 
-Nit: I'd just pass the bvec to n64cart_do_bvec, calculate pos there
-locally each time, and also move the WARN_ON_ONCE into the helper.
+v9:
+cosmetics
+min_t
 
-No real need for the len local variable either.
+v8:
+SZ_64K
+remove barriers
+add defines for block domain constants
+__blk_mq_end_request
+remove register_blkdev via GENHD_FL_EXT_DEVT
+dma_alloc_noncoherent, sync
+
+diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
+index ecceaaa..924d768 100644
+=2D-- a/drivers/block/Kconfig
++++ b/drivers/block/Kconfig
+@@ -72,6 +72,12 @@ config AMIGA_Z2RAM
+ 	  To compile this driver as a module, choose M here: the
+ 	  module will be called z2ram.
+
++config N64CART
++	bool "N64 cart support"
++	depends on MACH_NINTENDO64
++	help
++	  Support for the N64 cart.
++
+ config CDROM
+ 	tristate
+ 	select BLK_SCSI_REQUEST
+diff --git a/drivers/block/Makefile b/drivers/block/Makefile
+index e1f6311..b9642cf 100644
+=2D-- a/drivers/block/Makefile
++++ b/drivers/block/Makefile
+@@ -17,6 +17,7 @@ obj-$(CONFIG_PS3_DISK)		+=3D ps3disk.o
+ obj-$(CONFIG_PS3_VRAM)		+=3D ps3vram.o
+ obj-$(CONFIG_ATARI_FLOPPY)	+=3D ataflop.o
+ obj-$(CONFIG_AMIGA_Z2RAM)	+=3D z2ram.o
++obj-$(CONFIG_N64CART)		+=3D n64cart.o
+ obj-$(CONFIG_BLK_DEV_RAM)	+=3D brd.o
+ obj-$(CONFIG_BLK_DEV_LOOP)	+=3D loop.o
+ obj-$(CONFIG_XILINX_SYSACE)	+=3D xsysace.o
+diff --git a/drivers/block/n64cart.c b/drivers/block/n64cart.c
+new file mode 100644
+index 0000000..db80fe5
+=2D-- /dev/null
++++ b/drivers/block/n64cart.c
+@@ -0,0 +1,198 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Support for the N64 cart.
++ *
++ * Copyright (c) 2021 Lauri Kasanen
++ */
++
++#include <linux/bitops.h>
++#include <linux/blkdev.h>
++#include <linux/dma-mapping.h>
++#include <linux/init.h>
++#include <linux/module.h>
++#include <linux/platform_device.h>
++
++MODULE_AUTHOR("Lauri Kasanen <cand@gmx.com>");
++MODULE_DESCRIPTION("Driver for the N64 cart");
++MODULE_LICENSE("GPL");
++
++static unsigned int start, size;
++static u32 __iomem *reg_base;
++static struct device *dev;
++
++#define PI_DRAM_REG		0
++#define PI_CART_REG		1
++#define PI_READ_REG		2
++#define PI_WRITE_REG		3
++#define PI_STATUS_REG		4
++
++#define PI_STATUS_DMA_BUSY	(1 << 0)
++#define PI_STATUS_IO_BUSY	(1 << 1)
++
++#define CART_DOMAIN		0x10000000
++#define CART_MAX		0x1FFFFFFF
++
++#define MIN_ALIGNMENT		8
++
++static void n64cart_write_reg(const u8 reg, const u32 value)
++{
++	writel(value, reg_base + reg);
++}
++
++static u32 n64cart_read_reg(const u8 reg)
++{
++	return readl(reg_base + reg);
++}
++
++static void n64cart_wait_dma(void)
++{
++	while (n64cart_read_reg(PI_STATUS_REG) &
++		(PI_STATUS_DMA_BUSY | PI_STATUS_IO_BUSY))
++		cpu_relax();
++}
++
++/*
++ * Process a single bvec of a bio.
++ */
++static int n64cart_do_bvec(struct device *dev, struct bio_vec *bv,
++			   unsigned int len, unsigned int off,
++			   u32 pos)
++{
++	dma_addr_t dma_addr;
++	const u32 bstart =3D pos + start;
++
++	dma_addr =3D dma_map_bvec(dev, bv, DMA_FROM_DEVICE, 0);
++	if (dma_mapping_error(dev, dma_addr))
++		return 1;
++
++	n64cart_wait_dma();
++
++	n64cart_write_reg(PI_DRAM_REG, dma_addr + off);
++	n64cart_write_reg(PI_CART_REG, (bstart | CART_DOMAIN) & CART_MAX);
++	n64cart_write_reg(PI_WRITE_REG, len - 1);
++
++	n64cart_wait_dma();
++
++	dma_unmap_page(dev, dma_addr, len, DMA_FROM_DEVICE);
++	return 0;
++}
++
++static blk_qc_t n64cart_submit_bio(struct bio *bio)
++{
++	struct bio_vec bvec;
++	u32 pos;
++	struct bvec_iter iter;
++
++	pos =3D bio->bi_iter.bi_sector << SECTOR_SHIFT;
++	if (bio_end_sector(bio) > get_capacity(bio->bi_disk))
++		goto io_error;
++
++	bio_for_each_segment(bvec, bio, iter) {
++		unsigned int len =3D bvec.bv_len;
++		int err;
++
++		/* Alignment check */
++		WARN_ON_ONCE((bvec.bv_offset & (MIN_ALIGNMENT - 1)) ||
++				(len & (MIN_ALIGNMENT - 1)));
++
++		err =3D n64cart_do_bvec(dev, &bvec, len,
++				      bvec.bv_offset, pos);
++		if (err)
++			goto io_error;
++		pos +=3D len;
++	}
++
++	bio_endio(bio);
++	return BLK_QC_T_NONE;
++io_error:
++	bio_io_error(bio);
++	return BLK_QC_T_NONE;
++}
++
++static const struct block_device_operations n64cart_fops =3D {
++	.owner		=3D THIS_MODULE,
++	.submit_bio	=3D n64cart_submit_bio,
++};
++
++/*
++ * The target device is embedded and RAM-constrained. We save RAM
++ * by initializing in __init code that gets dropped late in boot.
++ * For the same reason there is no module or unloading support.
++ */
++static int __init n64cart_probe(struct platform_device *pdev)
++{
++	int err;
++	struct request_queue *queue;
++	struct gendisk *disk;
++
++	if (!start || !size) {
++		pr_err("n64cart: start and size not specified\n");
++		return -ENODEV;
++	}
++
++	if (size & 4095) {
++		pr_err("n64cart: size must be a multiple of 4K\n");
++		return -ENODEV;
++	}
++
++	queue =3D blk_alloc_queue(NUMA_NO_NODE);
++	if (!queue) {
++		return -ENOMEM;
++	}
++
++	reg_base =3D devm_platform_ioremap_resource(pdev, 0);
++	if (!reg_base) {
++		err =3D -EINVAL;
++		goto fail_queue;
++	}
++
++	disk =3D alloc_disk(0);
++	if (!disk) {
++		err =3D -ENOMEM;
++		goto fail_queue;
++	}
++
++	dev =3D &pdev->dev;
++
++	disk->first_minor =3D 0;
++	disk->queue =3D queue;
++	disk->flags =3D GENHD_FL_NO_PART_SCAN | GENHD_FL_EXT_DEVT;
++	disk->fops =3D &n64cart_fops;
++	strcpy(disk->disk_name, "n64cart");
++
++	set_capacity(disk, size / 512);
++	set_disk_ro(disk, 1);
++
++	blk_queue_flag_set(QUEUE_FLAG_NONROT, queue);
++	blk_queue_physical_block_size(queue, 4096);
++	blk_queue_logical_block_size(queue, 4096);
++
++	add_disk(disk);
++
++	pr_info("n64cart: %u kb disk\n", size / 1024);
++
++	return 0;
++fail_queue:
++	blk_cleanup_queue(queue);
++
++	return err;
++}
++
++static struct platform_driver n64cart_driver =3D {
++	.driver =3D {
++		.name =3D "n64cart",
++	},
++};
++
++static int __init n64cart_init(void)
++{
++	return platform_driver_probe(&n64cart_driver, n64cart_probe);
++}
++
++module_param(start, uint, 0);
++MODULE_PARM_DESC(start, "Start address of the cart block data");
++
++module_param(size, uint, 0);
++MODULE_PARM_DESC(size, "Size of the cart block data, in bytes");
++
++module_init(n64cart_init);
+=2D-
+2.6.2
+
