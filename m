@@ -2,96 +2,111 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 706CAC433DB
-	for <linux-block@archiver.kernel.org>; Fri, 22 Jan 2021 07:37:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DEECC433DB
+	for <linux-block@archiver.kernel.org>; Fri, 22 Jan 2021 08:01:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 46E9322DBF
-	for <linux-block@archiver.kernel.org>; Fri, 22 Jan 2021 07:37:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2D17B230F9
+	for <linux-block@archiver.kernel.org>; Fri, 22 Jan 2021 08:01:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727074AbhAVHhz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Jan 2021 02:37:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47914 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726810AbhAVHhw (ORCPT
+        id S1726798AbhAVIBX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Jan 2021 03:01:23 -0500
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:38095 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726586AbhAVIBW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Jan 2021 02:37:52 -0500
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 150CCC0613D6
-        for <linux-block@vger.kernel.org>; Thu, 21 Jan 2021 23:37:12 -0800 (PST)
-Received: by mail-pf1-x42a.google.com with SMTP id w18so3164621pfu.9
-        for <linux-block@vger.kernel.org>; Thu, 21 Jan 2021 23:37:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=xnObBx7qCVcq4Xmng0HzOiOYW//hrsobDgYRbXW2qoA=;
-        b=dfhsrZgi1qJDI2m/ilO0UZ7ihv26w0btzlf1zmTicpi6ZJPqGMSAzlb7G4wGiF0FW3
-         Gijmj6YCtu3PwTEsxPDNKVLwzNJfoZ+kzsARJbaXfKhjIPk0hIdEI6k7+iABd3J0Ge6o
-         E21BaI1DVfxYzhQmtffSyiTWTX0ggTKcY1OLoksddvORRrvfQMQGbsphmp1xU/IKzC+G
-         sD/zie7QvCQK1vih68EwWOxT3P4AOnndd/VBNtbw7iZsbzo+OPZQFBdc76x6uF8HLA4t
-         egiWvXKCvt0EJ4zf4Nru3997s4IFCMrrcBcXNTQ8OpxxqBRXA3kIBOHmAEsIKhM9WxEA
-         fFbw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=xnObBx7qCVcq4Xmng0HzOiOYW//hrsobDgYRbXW2qoA=;
-        b=WH4obvHzNdZFSX121DJoiWLqLAWJIdO6RC68D5rzkVzG4gH25jS1w4gcS/IaOf1goc
-         9hbZZ6R+j3tfwEd8y9QUkHB25cNV7HE687NsFfJlUiwOy+x3deMM+6XzZnzNadc2bnw7
-         Ny900JsRML08VONXK4Z77OOWBMpxyLmP9BkPNbvI7fR0Vl4DJY8UrY9o6l8m2FSwrVuu
-         8CosKWmZEtp/OsK4u3s3uXIgQJinY7ftc0SEvYoVKb3sd+quIeN+LA18WVSkEKcMvLom
-         I4H9BKrA1VRdf3dOSPPHdtYdTeVmcnx8WROIfkQYLiBrVbbESvb8KRTFjEeoN9Kh8WFX
-         08uw==
-X-Gm-Message-State: AOAM533sVXrRIS214WBRX+d/Sn3hf/EU+8Pb/IZq7Hcovhz44yDGHOpK
-        /PSmH9LZQ8smhOdtVgph28UgSQ==
-X-Google-Smtp-Source: ABdhPJwPLaEjEPKwC34UrAC2gsulKg3s4j7+J97bZTNNIKaoZ/lJu48wNw2Iwm4BkDrJnbbca6y71A==
-X-Received: by 2002:a63:1f18:: with SMTP id f24mr3506723pgf.133.1611301030526;
-        Thu, 21 Jan 2021 23:37:10 -0800 (PST)
-Received: from [10.8.0.116] ([196.245.9.36])
-        by smtp.gmail.com with ESMTPSA id fh7sm7835085pjb.43.2021.01.21.23.37.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Jan 2021 23:37:09 -0800 (PST)
-Subject: Re: [PATCH 1/2] block: remove unnecessary argument from
- blk_execute_rq_nowait
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        target-devel@vger.kernel.org, linux-scsi@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-ide@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-nfs@vger.kernel.org
-References: <20210121142905.13089-1-guoqing.jiang@cloud.ionos.com>
- <20210121142905.13089-2-guoqing.jiang@cloud.ionos.com>
- <20210121170257.GA4120717@infradead.org>
-From:   Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
-Message-ID: <b87591b9-e598-6436-d41f-80cc56640549@cloud.ionos.com>
-Date:   Fri, 22 Jan 2021 08:36:45 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Fri, 22 Jan 2021 03:01:22 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1611302481; x=1642838481;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=PmVFNnNLJHQcXQX+aWcelrjVOu18j6MRMWuoMHf07yY=;
+  b=V/CllaN3z8EKXgnbYd+w2053pgxusLCiQIESx20lTPNPHdD8RSSIzB4L
+   j5KTuKQ5BGENnFvwL0u8KPC4l+1nGSi96vBPWZglwXD7lQ7BXMJP9pBYP
+   DrM/p8ykTCZB8a47OkLldrXNmUtVMBy5X21JKsXwYAf8m5QoSlJzpASSa
+   jCz/21MyKVGqHPlKKzTXSEu9fDr39FvaHiNqZvzp/GypqRqL36Fw3TJRl
+   8z1CxKHIKNVTI5/68GfHNZsqHzn+V9Nc9xZWbiaFaBrySzFwxSozBYFYn
+   4nYLdfdYcw4i8R17ansuByy7jOxib3oyK40wlmOtYyyWclc8JkjgQgqle
+   w==;
+IronPort-SDR: PyC+Vc/pfAuSdEXhpGo2W6rnvoMoM7kXJpjfsV2sSzxEmI1UgQvxXhMfe4Y8bQRainFSAs7RZV
+ HOJcoHhlSsP6a7RnjejFIMnNBU3siIOJ8rdQQW2LORO+h7oaxJrP9dGXB0ex5tOqGjHhn4CmOp
+ d6NKoacrRneVtCIXmX+XAwV2Lw6LoJIRU1LA2Z9iPZjilo2eWgz/8YaqVVf9W8R74igninY/7w
+ 0D3j511pSzjUZIMSrTP7uJ2PvugAARYBZV35vbpiaVfHR4g+2K947fIiWcRne3HljJ3aVFtP2w
+ ELI=
+X-IronPort-AV: E=Sophos;i="5.79,366,1602518400"; 
+   d="scan'208";a="268398845"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 22 Jan 2021 16:00:16 +0800
+IronPort-SDR: MUoE9E5CMP6B4jqyDN1oL8QowvX/eTs3/sU+yF+safPycLnssqGhMKKcXCrBN3u5TnXgsWfOnc
+ v4fQgZVRq0ZOuANTAZyqN3Jn41y6qKMfeblVM3jq5D8A1gTM4A/zRsn59o+4k5PWbvPVtM+QzY
+ fxogOvJ6n661Mtv3hGqMxMk0BhZvChl15c3Oi9O4WISUFddwkkQ2Sko1JfdgZMWko+xdGLtbaV
+ IuA+STOezmcnsB4gUJbXFiVAe7UkLRaSH6Qj77s1EV5rmPLwFAcP68DaLiehi7D+nLClqhroG8
+ 5Rsk0hm73uJN9r+uQd8NAH0y
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jan 2021 23:42:48 -0800
+IronPort-SDR: OP5cUK2NUW3b77Blf3/vL6Fa+7tkZzRXFXJ8NxCdQe/t5TA6TtLdbibkiWl1C84OTKM1PuxciQ
+ FD/sjaOzroCgxqSSGbjBczMvYdhizP4XhkQWAIPT5ZddfRqBcWPOavSjZUWmWt3EdyV2C+U+/Z
+ vdx4lg4k2FYV35AcFD7jhYP80TyrFJKSFIj6vCt0E91SaWoGiPZ7+8Uk4kBooBe8XBjZ5KFrHI
+ 5BmDITzvZ4NGLOkTwPWzuSKaZ6CcR7unwxs5lYMpcDfbhmn1mP3ZWvBEzVbIX82+wuCUdAW7KF
+ BM4=
+WDCIronportException: Internal
+Received: from washi.fujisawa.hgst.com ([10.149.53.254])
+  by uls-op-cesaip01.wdc.com with ESMTP; 22 Jan 2021 00:00:15 -0800
+From:   Damien Le Moal <damien.lemoal@wdc.com>
+To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Cc:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
+        Keith Busch <keith.busch@wdc.com>
+Subject: [PATCH v3 0/3] block: add zone write granularity limit
+Date:   Fri, 22 Jan 2021 17:00:11 +0900
+Message-Id: <20210122080014.174391-1-damien.lemoal@wdc.com>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
-In-Reply-To: <20210121170257.GA4120717@infradead.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+The first patch in this series introduces the zone write granularity
+queue limit to indicate the alignment constraint for write operations
+into sequential zones of zoned block devices.
 
+The second patch fixes adds the missing documentation for
+zone_append_max_bytes to the sysfs block documentation.
 
-On 1/21/21 18:02, Christoph Hellwig wrote:
-> On Thu, Jan 21, 2021 at 03:29:04PM +0100, Guoqing Jiang wrote:
->> The 'q' is not used since commit a1ce35fa4985 ("block: remove dead
->> elevator code"), also update the comment of the function.
-> 
-> And more importantly it never really was needed to start with given
-> that we can triviall derive it from struct request.
+The third patch switch zonefs to use this new limit as the file block
+size instead of using the physical block size.
 
-Thanks Christoph, will add the above to header and send new version.
+Changes from v2:
+* Added patch 3 for zonefs
+* Addressed Christoph's comments on patch 1 and added the limit
+  initialization for zoned nullblk
 
-Guoqing
+Changes from v1:
+* Fixed typo in patch 2
+
+Damien Le Moal (3):
+  block: introduce zone_write_granularity limit
+  block: document zone_append_max_bytes attribute
+  zonefs: use zone write granularity as block size
+
+ Documentation/block/queue-sysfs.rst | 13 ++++++++++
+ block/blk-settings.c                | 39 +++++++++++++++++++++++++----
+ block/blk-sysfs.c                   |  8 ++++++
+ drivers/block/null_blk/zoned.c      |  1 +
+ drivers/nvme/host/zns.c             |  1 +
+ drivers/scsi/sd_zbc.c               | 10 ++++++++
+ fs/zonefs/super.c                   |  9 +++----
+ include/linux/blkdev.h              | 15 +++++++++++
+ 8 files changed, 86 insertions(+), 10 deletions(-)
+
+-- 
+2.29.2
+
