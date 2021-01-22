@@ -2,113 +2,106 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	URIBL_RED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C720BC433DB
-	for <linux-block@archiver.kernel.org>; Fri, 22 Jan 2021 09:58:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 140E1C433DB
+	for <linux-block@archiver.kernel.org>; Fri, 22 Jan 2021 10:01:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 81335235E4
-	for <linux-block@archiver.kernel.org>; Fri, 22 Jan 2021 09:58:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D262A2376F
+	for <linux-block@archiver.kernel.org>; Fri, 22 Jan 2021 10:01:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727237AbhAVJ56 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Jan 2021 04:57:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49972 "EHLO
+        id S1727718AbhAVKB0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Jan 2021 05:01:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50728 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727476AbhAVJ5k (ORCPT
+        with ESMTP id S1727759AbhAVKBD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Jan 2021 04:57:40 -0500
-Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B0C3C061786
-        for <linux-block@vger.kernel.org>; Fri, 22 Jan 2021 01:56:57 -0800 (PST)
-Received: by mail-ed1-x52d.google.com with SMTP id f1so5801606edr.12
-        for <linux-block@vger.kernel.org>; Fri, 22 Jan 2021 01:56:57 -0800 (PST)
+        Fri, 22 Jan 2021 05:01:03 -0500
+Received: from mail-vs1-xe2b.google.com (mail-vs1-xe2b.google.com [IPv6:2607:f8b0:4864:20::e2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9EB6C061794
+        for <linux-block@vger.kernel.org>; Fri, 22 Jan 2021 01:50:56 -0800 (PST)
+Received: by mail-vs1-xe2b.google.com with SMTP id p20so2675039vsq.7
+        for <linux-block@vger.kernel.org>; Fri, 22 Jan 2021 01:50:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=4IJ+nSeDZs+PTsuKQgs86D7D1ddxmo7h5PHArJlGH4w=;
-        b=fxg4jJe35txF+f4y2ZZ31LbCXvkwGjhjsMnnECzPSVTwkI44sKC/580vlYOo2u6oEY
-         uGsCGwiICbAHU2abpbudx5sHgGQUUL7IHmhKvnv/3hFqcPEB3FOIwccVZI7gPgw487B5
-         blin9hHYWmhaT+ARqcHlEkFquIzY2qs+mjWXCwB/H5VbPOf40lzqTiczA/VOWDvgc5Mu
-         C2WsJqp5LpRVZsDaPVtGJlOTvLdO7l2HcS7wL9k51rbFKpZiXh20exf00vmmtMiTzShY
-         D1o3EVcGc0j7J5SDGmef63IbxJCk61Tv5Wyh+YAZIi8jFe/l56eitgAPHmr7URARidYP
-         GYyQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=HqmXNnhOvww/se+uqGpbG2r6Wj6LjG3RtqIoCGkH17k=;
+        b=Bqt3b8b7kp2zQsjWv07hRffU5ZdsKDvLLb7CTBAQdsqsw2qRHDDv257TenVn8PQ0eh
+         7Faa1tfN668wJ7fnNrENLH7AoZ+Yz7eIgCNhVFIajtS786Ovqkv97Wr+V6k7E2k62MxY
+         +zFfZILJZPCMb2mgb5PIp7UG3mhyPOfuQoIscUoL7KcMmyArbnUdaC0O1T1v40yAIWCH
+         kb3Y/uHtCaFYyztgZ4c9IexZUktiJQ8TjmoyT1uO1aGHIVI3c5zzudaDyrdeK9RYpTX9
+         cIrmQQoHomR+23NhDIIBOqW/csi0rItWAjz9B7IdKkogQi35H0szd9iVKvGtnr3lgOid
+         vpug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=4IJ+nSeDZs+PTsuKQgs86D7D1ddxmo7h5PHArJlGH4w=;
-        b=J/uSSrNTQSh1JuAA4Br6DlNirEKwV92AHZDlhkzzo5R2PgumKaVqVCz1kKFvpSDmyS
-         apTn4r0LidbqLZzyTZ4u9ozLlBkYBLv9e1KyZC8wdrE/iAkibXOpl74G4LRKHId6DB5s
-         zsLa+hwaQXjuplqPxURSPyCxFkJdTYG97PbtipTjuni4/g+Fk8PNZjF9/OzRe/8Oy94y
-         TRe7SegxmKLZxyfzLs0bOM5pwu9n3uE7GJGLPKJYI7Fb8S78jsw0/g+cqpq73omUthDZ
-         I3hYky0yMzz/EQ9gCKPTi6LdBkkiGn4bFAqcLPLS+pJb76MFT2ENcuyWlsii9VKdiLjI
-         53lw==
-X-Gm-Message-State: AOAM532u5ZdQl0AozaWPnIR+8bAplGaCy1maLQm+YXXtA1BV9s77bHR/
-        WA499RYqyJ5NOaH1jkHtZuY+3A==
-X-Google-Smtp-Source: ABdhPJzDwLFvj3q+rfSW+Z0LN6FtPhpFzluKdhpyMy/8rsL9/OuQdnSbHvYFaJ3IRvhgYkr7xUeNBQ==
-X-Received: by 2002:aa7:d511:: with SMTP id y17mr2631337edq.112.1611309416063;
-        Fri, 22 Jan 2021 01:56:56 -0800 (PST)
-Received: from [192.168.0.13] ([83.216.184.132])
-        by smtp.gmail.com with ESMTPSA id lv13sm4039513ejb.55.2021.01.22.01.56.55
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 22 Jan 2021 01:56:55 -0800 (PST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH] bfq: don't duplicate code for different paths
-From:   Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <20201225130016.20485-1-huhai@tj.kylinos.cn>
-Date:   Fri, 22 Jan 2021 10:56:54 +0100
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <3B8B93BA-AAA5-4D11-8521-E26DD553034C@linaro.org>
-References: <20201225130016.20485-1-huhai@tj.kylinos.cn>
-To:     huhai <huhai@tj.kylinos.cn>
-X-Mailer: Apple Mail (2.3445.104.11)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=HqmXNnhOvww/se+uqGpbG2r6Wj6LjG3RtqIoCGkH17k=;
+        b=N7AZEYEsH1hT5DRgCLCBTBZwf4oIhCBzHme6SFtb9bDx0gC0jUwqLUsaedwxgY3fjm
+         /c+eTCHB/sVkpSHpXTyHa10NVCG52sADhDk3MGjns8jnrQNOro9czPKGKDUk1kGkjqUK
+         Dhh1D2DoUxxQSDeqvwwme5+6gHTAP4r/tEd/iEYZxk7DLTSVo8g0kQIL4WPF+e0BD0/n
+         FZjPujlSk9rhnt9dTepzpRn932fmChGBKPJke6J2QYB8N6+Nipw2I/yQicbJjxOFx1kR
+         GEL131MB+pMHWel0SYOb8A3hh3TWRifiIg5Vkro7/fXkA2HJZJqD1YFJikUYVh4wvpTc
+         Glig==
+X-Gm-Message-State: AOAM531YpyeHAjjR0UoZIhSXD3gbqLM3ErSGAi821CD114RBirVFJyZD
+        i+By/yaofaFKTt/ssDqajJE1AugglvS66dgDujQk7A==
+X-Google-Smtp-Source: ABdhPJzQkvbtXPAnaOXaJNiT2RO7BkT9eaJIQxnmfKyCTkaPtmRekmQxRuUvkDQuHQpmYuEkgvFe4kOJ3FrZfm16N6Y=
+X-Received: by 2002:a67:f997:: with SMTP id b23mr235525vsq.34.1611309056136;
+ Fri, 22 Jan 2021 01:50:56 -0800 (PST)
+MIME-Version: 1.0
+References: <20210122092824.20971-1-guoqing.jiang@cloud.ionos.com> <20210122092824.20971-3-guoqing.jiang@cloud.ionos.com>
+In-Reply-To: <20210122092824.20971-3-guoqing.jiang@cloud.ionos.com>
+From:   Ulf Hansson <ulf.hansson@linaro.org>
+Date:   Fri, 22 Jan 2021 10:50:20 +0100
+Message-ID: <CAPDyKFoPL4drfh3efKXyhXLp6Ce+j=oHwNd9VnVP4aaKQ0zmDQ@mail.gmail.com>
+Subject: Re: [PATCH V2 2/2] block: remove unnecessary argument from blk_execute_rq
+To:     Guoqing Jiang <guoqing.jiang@cloud.ionos.com>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@infradead.org>, linux-nfs@vger.kernel.org,
+        linux-scsi <linux-scsi@vger.kernel.org>,
+        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+        linux-nvme@lists.infradead.org,
+        virtualization@lists.linux-foundation.org,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-ide@vger.kernel.org, target-devel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Fri, 22 Jan 2021 at 10:28, Guoqing Jiang
+<guoqing.jiang@cloud.ionos.com> wrote:
+>
+> We can remove 'q' from blk_execute_rq as well after the previous change
+> in blk_execute_rq_nowait.
+>
+> And more importantly it never really was needed to start with given
+> that we can trivial derive it from struct request.
+>
+> Cc: linux-scsi@vger.kernel.org
+> Cc: virtualization@lists.linux-foundation.org
+> Cc: linux-ide@vger.kernel.org
+> Cc: linux-mmc@vger.kernel.org
+> Cc: linux-nvme@lists.infradead.org
+> Cc: linux-nfs@vger.kernel.org
+> Signed-off-by: Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
 
+[...]
 
-> Il giorno 25 dic 2020, alle ore 14:00, huhai <huhai@tj.kylinos.cn> ha =
-scritto:
->=20
-> As we can see, returns parent_sched_may_change whether
-> sd->next_in_service changes or not, so remove this judgment.
->=20
+>  drivers/mmc/core/block.c          | 10 +++++-----
 
-Thank you very much for spotting this mistake!
+[...]
 
-Acked-by: Paolo Valente <paolo.valente@linaro.org>
+From mmc point of view, please add:
 
-> Signed-off-by: huhai <huhai@tj.kylinos.cn>
-> ---
-> block/bfq-wf2q.c | 3 ---
-> 1 file changed, 3 deletions(-)
->=20
-> diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
-> index 26776bdbdf36..070e34a7feb1 100644
-> --- a/block/bfq-wf2q.c
-> +++ b/block/bfq-wf2q.c
-> @@ -137,9 +137,6 @@ static bool bfq_update_next_in_service(struct =
-bfq_sched_data *sd,
->=20
-> 	sd->next_in_service =3D next_in_service;
->=20
-> -	if (!next_in_service)
-> -		return parent_sched_may_change;
-> -
-> 	return parent_sched_may_change;
-> }
->=20
-> --=20
-> 2.20.1
->=20
->=20
->=20
+Acked-by: Ulf Hansson <ulf.hansson@linaro.org>
 
+At the moment I don't think this will conflict with any changes to
+mmc, but if that happens let's sort it then...
+
+Kind regards
+Uffe
