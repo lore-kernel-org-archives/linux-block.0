@@ -2,53 +2,54 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDC3BC433DB
-	for <linux-block@archiver.kernel.org>; Fri, 22 Jan 2021 01:48:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E1F2C433E6
+	for <linux-block@archiver.kernel.org>; Fri, 22 Jan 2021 01:51:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 95F9022B43
-	for <linux-block@archiver.kernel.org>; Fri, 22 Jan 2021 01:48:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E5E26238D7
+	for <linux-block@archiver.kernel.org>; Fri, 22 Jan 2021 01:51:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726574AbhAVBsy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Jan 2021 20:48:54 -0500
-Received: from szxga01-in.huawei.com ([45.249.212.187]:4146 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726402AbhAVBsr (ORCPT
+        id S1726550AbhAVBvA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Jan 2021 20:51:00 -0500
+Received: from szxga02-in.huawei.com ([45.249.212.188]:2985 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726305AbhAVBu7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Jan 2021 20:48:47 -0500
-Received: from DGGEMM406-HUB.china.huawei.com (unknown [172.30.72.55])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4DMMZH3x9lzXtNt;
-        Fri, 22 Jan 2021 09:47:03 +0800 (CST)
+        Thu, 21 Jan 2021 20:50:59 -0500
+Received: from DGGEMM401-HUB.china.huawei.com (unknown [172.30.72.55])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4DMMcq65NyzR65r;
+        Fri, 22 Jan 2021 09:49:15 +0800 (CST)
 Received: from dggema772-chm.china.huawei.com (10.1.198.214) by
- DGGEMM406-HUB.china.huawei.com (10.3.20.214) with Microsoft SMTP Server (TLS)
- id 14.3.498.0; Fri, 22 Jan 2021 09:48:04 +0800
+ DGGEMM401-HUB.china.huawei.com (10.3.20.209) with Microsoft SMTP Server (TLS)
+ id 14.3.498.0; Fri, 22 Jan 2021 09:50:17 +0800
 Received: from [10.169.42.93] (10.169.42.93) by dggema772-chm.china.huawei.com
  (10.1.198.214) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1913.5; Fri, 22
- Jan 2021 09:48:03 +0800
+ Jan 2021 09:50:16 +0800
 Subject: Re: [PATCH v3 3/5] nvme-fabrics: avoid double request completion for
  nvmf_fail_nonready_command
-To:     Hannes Reinecke <hare@suse.de>, <linux-nvme@lists.infradead.org>
-CC:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        <sagi@grimberg.me>, <axboe@fb.com>, <kbusch@kernel.org>,
-        <hch@lst.de>
+To:     Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>
+CC:     <axboe@kernel.dk>, <axboe@fb.com>, <sagi@grimberg.me>,
+        <linux-nvme@lists.infradead.org>, <linux-block@vger.kernel.org>,
+        <kbusch@kernel.org>
 References: <20210121070330.19701-1-lengchao@huawei.com>
  <20210121070330.19701-4-lengchao@huawei.com>
  <fda1fdb8-8a9d-2e95-4d08-8d8ee1df450d@suse.de>
+ <20210121090012.GA27342@lst.de>
+ <467a43b0-82cc-69b7-460a-413ddc8cf574@suse.de>
 From:   Chao Leng <lengchao@huawei.com>
-Message-ID: <a100b5dd-d38b-3158-d000-b84920a4e274@huawei.com>
-Date:   Fri, 22 Jan 2021 09:48:03 +0800
+Message-ID: <3bcd337b-3ab3-03ab-f9e6-a461cd8ee127@huawei.com>
+Date:   Fri, 22 Jan 2021 09:50:16 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <fda1fdb8-8a9d-2e95-4d08-8d8ee1df450d@suse.de>
+In-Reply-To: <467a43b0-82cc-69b7-460a-413ddc8cf574@suse.de>
 Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-Originating-IP: [10.169.42.93]
 X-ClientProxiedBy: dggeme719-chm.china.huawei.com (10.1.199.115) To
  dggema772-chm.china.huawei.com (10.1.198.214)
@@ -59,60 +60,41 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 
 
-On 2021/1/21 16:58, Hannes Reinecke wrote:
-> On 1/21/21 8:03 AM, Chao Leng wrote:
->> When reconnect, the request may be completed with NVME_SC_HOST_PATH_ERROR
->> in nvmf_fail_nonready_command. The state of request will be changed to
->> MQ_RQ_IN_FLIGHT before call nvme_complete_rq. If free the request
->> asynchronously such as in nvme_submit_user_cmd, in extreme scenario
->> the request may be completed again in tear down process.
->> nvmf_fail_nonready_command do not need calling blk_mq_start_request
->> before complete the request. nvmf_fail_nonready_command should set
->> the state of request to MQ_RQ_COMPLETE before complete the request.
+On 2021/1/21 17:27, Hannes Reinecke wrote:
+> On 1/21/21 10:00 AM, Christoph Hellwig wrote:
+>> On Thu, Jan 21, 2021 at 09:58:37AM +0100, Hannes Reinecke wrote:
+>>> On 1/21/21 8:03 AM, Chao Leng wrote:
+>>>> When reconnect, the request may be completed with NVME_SC_HOST_PATH_ERROR
+>>>> in nvmf_fail_nonready_command. The state of request will be changed to
+>>>> MQ_RQ_IN_FLIGHT before call nvme_complete_rq. If free the request
+>>>> asynchronously such as in nvme_submit_user_cmd, in extreme scenario
+>>>> the request may be completed again in tear down process.
+>>>> nvmf_fail_nonready_command do not need calling blk_mq_start_request
+>>>> before complete the request. nvmf_fail_nonready_command should set
+>>>> the state of request to MQ_RQ_COMPLETE before complete the request.
+>>>>
+>>>
+>>> So what you are saying is that there is a race condition between
+>>> blk_mq_start_request()
+>>> and
+>>> nvme_complete_request()
 >>
-> 
-> So what you are saying is that there is a race condition between
-> blk_mq_start_request()
-> and
-> nvme_complete_request()
-Yes. The race is:
-process1:error recovery->tear down->quiesce queue(wait dispatch done)
-process2:dispatch->queue_rq->nvmf_fail_nonready_command->
-     nvme_complete_rq(if the request is freed asynchronously, wake
-	nvme_submit_user_cmd( for example) but have no chance to run).
-process1:continue ->cancle suspend request, check the state is not
-     MQ_RQ_IDLE and MQ_RQ_COMPLETE, complete(free) the request.
-process3: nvme_submit_user_cmd now has chance to run, and the free the
-     request again.
-Test Injection Method: inject a msleep before call blk_mq_free_request
-in nvme_submit_user_cmd.
-> 
->> Signed-off-by: Chao Leng <lengchao@huawei.com>
->> ---
->>   drivers/nvme/host/fabrics.c | 4 +---
->>   1 file changed, 1 insertion(+), 3 deletions(-)
+>> Between those to a teardown that cancels all requests can come in.
 >>
->> diff --git a/drivers/nvme/host/fabrics.c b/drivers/nvme/host/fabrics.c
->> index 72ac00173500..874e4320e214 100644
->> --- a/drivers/nvme/host/fabrics.c
->> +++ b/drivers/nvme/host/fabrics.c
->> @@ -553,9 +553,7 @@ blk_status_t nvmf_fail_nonready_command(struct nvme_ctrl *ctrl,
->>           !blk_noretry_request(rq) && !(rq->cmd_flags & REQ_NVME_MPATH))
->>           return BLK_STS_RESOURCE;
->> -    nvme_req(rq)->status = NVME_SC_HOST_PATH_ERROR;
->> -    blk_mq_start_request(rq);
->> -    nvme_complete_rq(rq);
->> +    nvme_complete_failed_req(rq);
->>       return BLK_STS_OK;
->>   }
->>   EXPORT_SYMBOL_GPL(nvmf_fail_nonready_command);
->> I'd rather have 'nvme_complete_failed_req()' accept the status as 
-> argument, like
+> Doesn't nvme_complete_request() insulate against a double completion?
+nvme_complete_request can not insulate against double completion.
+Setting the state of request to MQ_RQ_COMPLETE avoid double completion.
+tear down(nvme_cancel_request) check the state of the request, if the
+state is MQ_RQ_COMPLETE, it will skip completion.
+> I seem to remember we've gone through great lengths ensuring that.
 > 
-> nvme_complete_failed_request(rq, NVME_SC_HOST_PATH_ERROR)
+> And if this is just about setting the correct error code on completion I'd really prefer to stick with the current code. Moving that into a helper is fine, but I'd rather not introduce our own code modifying request state.
 > 
-> that way it's obvious what is happening, and the status isn't hidden in the function.
-Ok, good idea. Thank you for your suggestion.
+> If there really is a race condition this feels like a more generic problem; calling blk_mq_start_request() followed by blk_mq_end_request() is a quite common pattern, and from my impression the recommended way.
+> So if there is an issue it would need to be addressed for all drivers, not just some nvme-specific way.
+Currently, it is not safe for nvme. The probability is very low.
+I am not sure whether similar occurs in other scenarios.
+> Plus I'd like to have Jens' opinion here.
 > 
 > Cheers,
 > 
