@@ -2,100 +2,162 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E1F2C433E6
-	for <linux-block@archiver.kernel.org>; Fri, 22 Jan 2021 01:51:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2B80C433E0
+	for <linux-block@archiver.kernel.org>; Fri, 22 Jan 2021 02:35:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E5E26238D7
-	for <linux-block@archiver.kernel.org>; Fri, 22 Jan 2021 01:51:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7F52E23136
+	for <linux-block@archiver.kernel.org>; Fri, 22 Jan 2021 02:35:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726550AbhAVBvA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Jan 2021 20:51:00 -0500
-Received: from szxga02-in.huawei.com ([45.249.212.188]:2985 "EHLO
-        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726305AbhAVBu7 (ORCPT
+        id S1726352AbhAVCfR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Jan 2021 21:35:17 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51312 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726672AbhAVCfR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Jan 2021 20:50:59 -0500
-Received: from DGGEMM401-HUB.china.huawei.com (unknown [172.30.72.55])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4DMMcq65NyzR65r;
-        Fri, 22 Jan 2021 09:49:15 +0800 (CST)
-Received: from dggema772-chm.china.huawei.com (10.1.198.214) by
- DGGEMM401-HUB.china.huawei.com (10.3.20.209) with Microsoft SMTP Server (TLS)
- id 14.3.498.0; Fri, 22 Jan 2021 09:50:17 +0800
-Received: from [10.169.42.93] (10.169.42.93) by dggema772-chm.china.huawei.com
- (10.1.198.214) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1913.5; Fri, 22
- Jan 2021 09:50:16 +0800
-Subject: Re: [PATCH v3 3/5] nvme-fabrics: avoid double request completion for
- nvmf_fail_nonready_command
-To:     Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>
-CC:     <axboe@kernel.dk>, <axboe@fb.com>, <sagi@grimberg.me>,
-        <linux-nvme@lists.infradead.org>, <linux-block@vger.kernel.org>,
-        <kbusch@kernel.org>
-References: <20210121070330.19701-1-lengchao@huawei.com>
- <20210121070330.19701-4-lengchao@huawei.com>
- <fda1fdb8-8a9d-2e95-4d08-8d8ee1df450d@suse.de>
- <20210121090012.GA27342@lst.de>
- <467a43b0-82cc-69b7-460a-413ddc8cf574@suse.de>
-From:   Chao Leng <lengchao@huawei.com>
-Message-ID: <3bcd337b-3ab3-03ab-f9e6-a461cd8ee127@huawei.com>
-Date:   Fri, 22 Jan 2021 09:50:16 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        Thu, 21 Jan 2021 21:35:17 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1611282830;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=AK8/+WAkHEmBBUzI5Rc2+mDPruMDE1s/6HCXBksY5DM=;
+        b=P2X456ySqY788gWuIrtY+W4dNAH1W6b7nA5FIOAMzvc1Ul+2NWHteZeF7PLz1q9DcvKMhm
+        O3AmRi5gTDZkJdk96aCfOmdAw+O02HXrIZZTQpxz0oXsLzzLc85aY+wRsny6RrBLk6CJK4
+        dYIUNVZMQ4tj9zEV1vBmGr5gHIqkUFE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-289-iTIOkRoLP6mKsLWHE5zoHw-1; Thu, 21 Jan 2021 21:33:46 -0500
+X-MC-Unique: iTIOkRoLP6mKsLWHE5zoHw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B316F8144E5;
+        Fri, 22 Jan 2021 02:33:44 +0000 (UTC)
+Received: from localhost (ovpn-13-11.pek2.redhat.com [10.72.13.11])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 72BAF61F55;
+        Fri, 22 Jan 2021 02:33:40 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-scsi@vger.kernel.org
+Cc:     Ming Lei <ming.lei@redhat.com>, Omar Sandoval <osandov@fb.com>,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
+        Sumanesh Samanta <sumanesh.samanta@broadcom.com>,
+        "Ewan D . Milne" <emilne@redhat.com>,
+        Hannes Reinecke <hare@suse.de>
+Subject: [PATCH V7 00/13] blk-mq/scsi: tracking device queue depth via sbitmap
+Date:   Fri, 22 Jan 2021 10:33:04 +0800
+Message-Id: <20210122023317.687987-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <467a43b0-82cc-69b7-460a-413ddc8cf574@suse.de>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.169.42.93]
-X-ClientProxiedBy: dggeme719-chm.china.huawei.com (10.1.199.115) To
- dggema772-chm.china.huawei.com (10.1.198.214)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi,
+
+scsi uses one global atomic variable to track queue depth for each
+LUN/request queue. This way can't scale well when there is lots of CPU
+cores and the disk is very fast. Broadcom guys has complained that their
+high end HBA can't reach top performance because .device_busy is
+operated in IO path.
+
+Replace the atomic variable sdev->device_busy with sbitmap for
+tracking scsi device queue depth.
+
+Test on scsi_debug shows this way improve IOPS > 20%. Meantime
+the IOPS difference is just ~1% compared with bypassing .device_busy
+on scsi_debug via patches[1]
+
+The 1st 6 patches moves percpu allocation hint into sbitmap, since
+the improvement by doing percpu allocation hint on sbitmap is observable.
+Meantime export helpers for SCSI.
+
+Patch 7 and 8 prepares for the conversion by returning budget token
+from .get_budget callback, meantime passes the budget token to driver
+via 'struct blk_mq_queue_data' in .queue_rq().
+
+The last four patches changes SCSI for switching to track device queue
+depth via sbitmap.
+
+The patchset have been tested by Broadcom, and obvious performance boost
+can be observed on megaraid_sas.
+
+V7:
+	- fix build failure on drivers/vhost/scsi.c, only patch 2 & 4 are
+	  changed
+
+V6:
+	- rebase on for-5.12/block
+
+V5:
+	- add comment on sbitmap_weight()
+	- add patch 'megaraid_sas: v2 replace sdev_busy with local counter'
+	  for fixing build failure
+
+V4:
+	- limit max sdev->queue_depth as max(1024, shost->can_queue)
+	- simplify code for moving per-cpu allocation hint into sbitmap
+
+V3:
+	- rebase on both for-5.10/block and 5.10/scsi-queue.
+
+V2:
+	- fix one build failure
 
 
-On 2021/1/21 17:27, Hannes Reinecke wrote:
-> On 1/21/21 10:00 AM, Christoph Hellwig wrote:
->> On Thu, Jan 21, 2021 at 09:58:37AM +0100, Hannes Reinecke wrote:
->>> On 1/21/21 8:03 AM, Chao Leng wrote:
->>>> When reconnect, the request may be completed with NVME_SC_HOST_PATH_ERROR
->>>> in nvmf_fail_nonready_command. The state of request will be changed to
->>>> MQ_RQ_IN_FLIGHT before call nvme_complete_rq. If free the request
->>>> asynchronously such as in nvme_submit_user_cmd, in extreme scenario
->>>> the request may be completed again in tear down process.
->>>> nvmf_fail_nonready_command do not need calling blk_mq_start_request
->>>> before complete the request. nvmf_fail_nonready_command should set
->>>> the state of request to MQ_RQ_COMPLETE before complete the request.
->>>>
->>>
->>> So what you are saying is that there is a race condition between
->>> blk_mq_start_request()
->>> and
->>> nvme_complete_request()
->>
->> Between those to a teardown that cancels all requests can come in.
->>
-> Doesn't nvme_complete_request() insulate against a double completion?
-nvme_complete_request can not insulate against double completion.
-Setting the state of request to MQ_RQ_COMPLETE avoid double completion.
-tear down(nvme_cancel_request) check the state of the request, if the
-state is MQ_RQ_COMPLETE, it will skip completion.
-> I seem to remember we've gone through great lengths ensuring that.
-> 
-> And if this is just about setting the correct error code on completion I'd really prefer to stick with the current code. Moving that into a helper is fine, but I'd rather not introduce our own code modifying request state.
-> 
-> If there really is a race condition this feels like a more generic problem; calling blk_mq_start_request() followed by blk_mq_end_request() is a quite common pattern, and from my impression the recommended way.
-> So if there is an issue it would need to be addressed for all drivers, not just some nvme-specific way.
-Currently, it is not safe for nvme. The probability is very low.
-I am not sure whether similar occurs in other scenarios.
-> Plus I'd like to have Jens' opinion here.
-> 
-> Cheers,
-> 
-> Hannes
+Kashyap Desai (1):
+  megaraid_sas: v2 replace sdev_busy with local counter
+
+Ming Lei (12):
+  sbitmap: remove sbitmap_clear_bit_unlock
+  sbitmap: maintain allocation round_robin in sbitmap
+  sbitmap: add helpers for updating allocation hint
+  sbitmap: move allocation hint into sbitmap
+  sbitmap: export sbitmap_weight
+  sbitmap: add helper of sbitmap_calculate_shift
+  blk-mq: add callbacks for storing & retrieving budget token
+  blk-mq: return budget token from .get_budget callback
+  scsi: put hot fields of scsi_host_template into one cacheline
+  scsi: add scsi_device_busy() to read sdev->device_busy
+  scsi: make sure sdev->queue_depth is <= max(shost->can_queue, 1024)
+  scsi: replace sdev->device_busy with sbitmap
+
+ block/blk-mq-sched.c                        |  17 +-
+ block/blk-mq.c                              |  38 ++--
+ block/blk-mq.h                              |  25 ++-
+ block/kyber-iosched.c                       |   3 +-
+ drivers/message/fusion/mptsas.c             |   2 +-
+ drivers/scsi/megaraid/megaraid_sas.h        |   2 +
+ drivers/scsi/megaraid/megaraid_sas_fusion.c |  48 ++++-
+ drivers/scsi/mpt3sas/mpt3sas_scsih.c        |   2 +-
+ drivers/scsi/scsi.c                         |  13 ++
+ drivers/scsi/scsi_lib.c                     |  67 ++++---
+ drivers/scsi/scsi_priv.h                    |   3 +
+ drivers/scsi/scsi_scan.c                    |  23 ++-
+ drivers/scsi/scsi_sysfs.c                   |   4 +-
+ drivers/scsi/sg.c                           |   2 +-
+ drivers/vhost/scsi.c                        |   4 +-
+ include/linux/blk-mq.h                      |  13 +-
+ include/linux/sbitmap.h                     |  85 +++++---
+ include/scsi/scsi_cmnd.h                    |   2 +
+ include/scsi/scsi_device.h                  |   8 +-
+ include/scsi/scsi_host.h                    |  72 ++++---
+ lib/sbitmap.c                               | 210 +++++++++++---------
+ 21 files changed, 428 insertions(+), 215 deletions(-)
+
+Cc: Omar Sandoval <osandov@fb.com>
+Cc: Kashyap Desai <kashyap.desai@broadcom.com>
+Cc: Sumanesh Samanta <sumanesh.samanta@broadcom.com>
+Cc: Ewan D. Milne <emilne@redhat.com>
+Cc: Hannes Reinecke <hare@suse.de>
+
+-- 
+2.28.0
+
