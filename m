@@ -2,160 +2,221 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	PDS_BAD_THREAD_QP_64,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC313C433E6
-	for <linux-block@archiver.kernel.org>; Fri, 22 Jan 2021 03:32:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 005FBC433E0
+	for <linux-block@archiver.kernel.org>; Fri, 22 Jan 2021 03:47:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6A6C023888
-	for <linux-block@archiver.kernel.org>; Fri, 22 Jan 2021 03:32:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A2D4F23899
+	for <linux-block@archiver.kernel.org>; Fri, 22 Jan 2021 03:47:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726398AbhAVDc2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Jan 2021 22:32:28 -0500
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:28858 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726030AbhAVDcU (ORCPT
+        id S1726035AbhAVDrk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Jan 2021 22:47:40 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:20276 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726160AbhAVDrg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Jan 2021 22:32:20 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1611286340; x=1642822340;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=oleS2d9S80vR9pNcreZNeHd+Wy1LbAEFklM1Bt0150U=;
-  b=AZp6IKD7pmfC0A6p7LtQFXfISrT5xm07SS8vqwgpcVjlJmkKaf7Dy2oi
-   aXBrmS3LtkZJKQeFSIU0+hlNWtPQO7QAMzKr9c725inM8LpjZAgJzJaoP
-   mQ8rnNToxpSJFGhlJnDeRw7k6BhFDBvgps5dzIOeNqDF8gtODglvq24fQ
-   VyKDRpDHdHvf/YL60nyRHjzLaGtncBZBiKRSslCjc69Nzc6xy5kk/ChUE
-   rUFpuIMxcKQ10hhc19fOWiaVLUqldQFfGsKqVQrML3XMjTs0aIuif2IrY
-   9PLOoPfzftTk7ZbDNTF2Dh7YxnHg3PbAhz4SI6yPwgXYN3fq3wnWfODMm
-   g==;
-IronPort-SDR: IBIwFGN/erSoGPPvkINdcLKQmwKsG9UrmuNSalFr0eiVLRWlAKkqHOp1aUHF105uu1nRIfchgg
- MhWZ12WntOcZzH3uaqCu9TeJP+4+SmIc6w81riyELD+X7CM6VFJadF3yRf+993HridEZuzwhjH
- sK2H3GUJXoLSxS7FiSQA98KNC7D89Xb1pTS2yespaBvK3PNvycmaqsd3Myxd2av7O+nbi3sOP9
- jH3IHmm7sKqzeunD2zS0QQ2MoTBIpJ6tdg1LFS+lpapgoeJieLR0qAlTtKV2L07k8SsXdR2S4o
- +zs=
-X-IronPort-AV: E=Sophos;i="5.79,365,1602518400"; 
-   d="scan'208";a="268382877"
-Received: from mail-bn3nam04lp2055.outbound.protection.outlook.com (HELO NAM04-BN3-obe.outbound.protection.outlook.com) ([104.47.46.55])
-  by ob1.hgst.iphmx.com with ESMTP; 22 Jan 2021 11:31:07 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LOEy15UmQANezoc9oZrw4xTnmoHGLLsBo89G/LzXq5kua6/bS2nJasT5gZiDqU7KjkzO4YlUPoEhasM30DftUsoZQA9fY1dG3SSsYQ0Kvd0JQ8dSSKOsAAKOK9Wc6OMoB+JcsNt+qekINb/1NFmfLg75xA0bnWAStkEfDcd8hDIthE9/P6wzEcR+5+3lQfTFYh5OerwtY71IpruZiHTEvN0w8XncpG6Arvj08cmPHWZp6AFUM0rO9T1its1MhrsvEeaRXV5bdVd4gp71zh8fFcg8N3l0Qj8hOHxmULbXmh4rtF/MBsishT/N/b94v6MTfFvcD8vZD5+s8WlU6IURzg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=T9mo6xtr0mHYlLng64EdcMMJS62hh+ZMqJWsUuoRV7Y=;
- b=LbTCXJX2C5ErS3ACGZ/+q+1Q8tPvILUXammKBPU1NWsUduLSIPqtyMNJ7tymEOKJUMAe6dmBU1QRa6zgnxwlqS2qhRdk6wwlrA5BXygcSCpdau7Ibbr9JBd/cjd3362hQnTXlO7NpqhN74zJJJMjSZeVhKbzfU5YCzRSBkcJm1Dv90qxtQ4J3mP6mQT1NS72O3Nm29IeyQOynC4RSWPHrnhBZ517x32iQO8sInUGzEZnNNx8BAs3q43faSfF65VLu/xBPxqj+tcPaA4uQdxC+CTxPTquz3aHYy5yyRXvSdJCPk+O4aOv9VOr9QilTNLAqpLS9vJKto3T0BdnPgFNFQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=T9mo6xtr0mHYlLng64EdcMMJS62hh+ZMqJWsUuoRV7Y=;
- b=Uw4krnzCkiye5l3mDLo/sA1xFjR559Pt2qYkJ0q1msGjVjdImegh2lPR4MgeYyVV5VYzp2cuG4GAmoJBt1vv5ZrI5aisgSv6GwxnDeRgJ3ilDZyg+RzRcFwOGf0ouykgw58nzIzdHjpq9OCSb0KCpsm35NXJ9y4KLK8LNWLshDs=
-Received: from BYAPR04MB4965.namprd04.prod.outlook.com (2603:10b6:a03:4d::25)
- by SJ0PR04MB7693.namprd04.prod.outlook.com (2603:10b6:a03:32b::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3763.10; Fri, 22 Jan
- 2021 03:31:06 +0000
-Received: from BYAPR04MB4965.namprd04.prod.outlook.com
- ([fe80::716c:4e0c:c6d1:298a]) by BYAPR04MB4965.namprd04.prod.outlook.com
- ([fe80::716c:4e0c:c6d1:298a%6]) with mapi id 15.20.3742.014; Fri, 22 Jan 2021
- 03:31:06 +0000
-From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-To:     Lauri Kasanen <cand@gmx.com>,
-        "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>
-CC:     "tsbogend@alpha.franken.de" <tsbogend@alpha.franken.de>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Keith Busch <kbusch@kernel.org>,
-        "hch@infradead.org" <hch@infradead.org>
-Subject: Re: [PATCH v8] block: Add n64 cart driver
-Thread-Topic: [PATCH v8] block: Add n64 cart driver
-Thread-Index: AQHW7+7j81o2oc19D0iSKgHpidQYvA==
-Date:   Fri, 22 Jan 2021 03:31:06 +0000
-Message-ID: <BYAPR04MB496518897B33A294F2292EC286A00@BYAPR04MB4965.namprd04.prod.outlook.com>
-References: <20210121130205.d2810df601bd00536195c87b@gmx.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: gmx.com; dkim=none (message not signed)
- header.d=none;gmx.com; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [2600:1700:31ee:290:475:2d41:83ae:3ed5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 12ace6a8-5c32-40d5-83e0-08d8be86275e
-x-ms-traffictypediagnostic: SJ0PR04MB7693:
-x-ld-processed: b61c8803-16f3-4c35-9b17-6f65f441df86,ExtAddr
-x-microsoft-antispam-prvs: <SJ0PR04MB7693A579901092967C3ABE6586A00@SJ0PR04MB7693.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:525;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: i6f+D1nDrr4Dwt0P00HJHbaurz8jFwind7wO9MvaFzhLVLrcHaNwqC66JYsvLyVgXpzrFx4UCOpuulbBaW0YJP3wXqJtJ8eov+AgJ+AHzcvl4GiCH2q6hXL9ka5JyP6N0Eb7s/sJmwn65UZhY1kDAe9YsWDLVaeIOf1Oc1E7pGFGTLHqzX4XxCVn2fz3XTYWlsAcXJa9YBTDcwlCnOeC/k7Rzl9ZUHGgCqdk3fA40JtKF39qURXVChvGr+OLX5XL34uZwE7lw8w5u8AcMkPDEapXlzWdT6SP7lhqKu1twPv25SGm9VDfYhYxNTqduTEHq16UmAm5XsLTH6FAShGywQn5eRs+plrX5VG/XtYi5j/ROYpiQ3iYLFDnajT/q1CEY01nUnCJ19b5qf567w3Yhw==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR04MB4965.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(396003)(366004)(39860400002)(376002)(346002)(8936002)(6506007)(52536014)(33656002)(2906002)(55016002)(8676002)(76116006)(110136005)(5660300002)(53546011)(186003)(316002)(7696005)(86362001)(71200400001)(4744005)(66556008)(66476007)(478600001)(66946007)(54906003)(4326008)(66446008)(64756008)(9686003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: =?us-ascii?Q?fiX+AWafahNBqNTo5fSfcgLfvikAKgd7Ak1HxrkYYwxObItf7BFr7uT7IaSp?=
- =?us-ascii?Q?Je2K9Oxj9ZmjbUrMupG3CL9ahEHTYnjDV9Rdnz8kxxX8C+0bwrsd4enJ1XXK?=
- =?us-ascii?Q?9Zp3j0P0yU6w91JYAHWCGWLHgl5AGjmxKcFWmN0Qim53UExTQE1r9CxyF52P?=
- =?us-ascii?Q?T4lsVec1RlpdzcNBOsO4rNA8caJnFYpxw1+HeQrYqRDcfquZ5ngYiZf9THMM?=
- =?us-ascii?Q?XLHWv37BD9/7JdsZ+H4i/EeBfcBzeneZeYNxDPHPzl4/8DGxzDjiRQ6XOxXZ?=
- =?us-ascii?Q?HM4nXXG7fJ4FBQjoMpEQPs1Okb67mwbY4QyL2k+0og2UXepM/cQTlCQ4Gi7l?=
- =?us-ascii?Q?N1LY3qOl1ROf3853C0iriRgi3kjCnDwti0KpWN3QrR6AEC3S7Wpuk1B3PB3U?=
- =?us-ascii?Q?7sq39tPeAFmeYrOvL6mkNgl9nQxWObTrIDaNN1lIRRmPpmjUf1MCQn6wV4++?=
- =?us-ascii?Q?jOYw7UJ1c6yqFTG0A44m+Wjz0cnCab2nbVm2kWKQr81acfILkoPXxFwb0FYP?=
- =?us-ascii?Q?F/VoDuACAIiOVB2a/zBckmskM6tjME5d84ZdJdPuKJfYX95EnhJ5nLETaz73?=
- =?us-ascii?Q?ByKk6wIQUNRxqjhhUjoRieG5L6jFJDklHCc3cNdkgLFaJpSjhEXDuJje5HaO?=
- =?us-ascii?Q?xuYHP3qtQrqOjrMp9QSJoi/HvYENfrUJ2p41u/pMyWxj5YNpVjX/EQK3v8ke?=
- =?us-ascii?Q?2IV7b0DwBLks5fgOGtmZ3Axh9W/HhtPCBL/6abHfZLU9//SBtfqOyLuPpnOX?=
- =?us-ascii?Q?mELz6pgx8m1yPURs7a6hQ811cIRk1ze65DNgVT9MF6NhH4K7Ie8WUWPY0NmP?=
- =?us-ascii?Q?DERRsX9PpikM4tVj9hUzdGl5IhRsL4IHl+hWoT2lGi3yX09vL/oW6d5vFat1?=
- =?us-ascii?Q?jBXhmOKPZdI6RC7G00lwJIa7sdrHVUJwEtjmladptsvuwagW7sOVcI6D1FyA?=
- =?us-ascii?Q?kF8schfoYgC85B0aBVNfvb6Yv4Le2dsukfx9qD1mf+P6JefNo0jlJ+UQhN5n?=
- =?us-ascii?Q?uVN49vWuTew//L14W2QbVBRxkI+q4IC7w1RzEPSarBfmMmU9fXWOs2no8luY?=
- =?us-ascii?Q?j/qQwNeD?=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Thu, 21 Jan 2021 22:47:36 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1611287168;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=EJZXLJK0hCUS1Rd2sy1TEx3934IszRbfzHGeQ+DiU4w=;
+        b=SLE3m7hsHXkPNGX0Iv7pynUh2ToXoi6ySed1zqu5LnvDf+3vV6s1acuQ8c+cWEpP9oZlaf
+        q59aGO9gcO4Q6HXyIRzy15QJ4bjhKH3AJUhlz+UQ48TeFzst6gXbCuZaC8XSAaSZmIiaRH
+        hSV6R9ezfW4H4TyX2LvRa0baj4J3nsw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-332-NxeNyzXzPHm8VbG_FgrgnQ-1; Thu, 21 Jan 2021 22:46:06 -0500
+X-MC-Unique: NxeNyzXzPHm8VbG_FgrgnQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 96B15180A092;
+        Fri, 22 Jan 2021 03:46:04 +0000 (UTC)
+Received: from T590 (ovpn-13-11.pek2.redhat.com [10.72.13.11])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id E57BB6267F;
+        Fri, 22 Jan 2021 03:45:52 +0000 (UTC)
+Date:   Fri, 22 Jan 2021 11:45:47 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Changheun Lee <nanich.lee@samsung.com>
+Cc:     Johannes.Thumshirn@wdc.com, axboe@kernel.dk, damien.lemoal@wdc.com,
+        asml.silence@gmail.com, patchwork-bot@kernel.org, osandov@fb.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        tj@kernel.org, tom.leiming@gmail.com, jisoo2146.oh@samsung.com,
+        junho89.kim@samsung.com, mj0123.lee@samsung.com,
+        seunghwan.hyun@samsung.com, sookwan7.kim@samsung.com,
+        woosung2.lee@samsung.com, yt0928.kim@samsung.com
+Subject: Re: [PATCH v2] bio: limit bio max size.
+Message-ID: <20210122034547.GC509982@T590>
+References: <CGME20210121011324epcas1p3a213069e873fd324a7ce3188558f0782@epcas1p3.samsung.com>
+ <20210121005803.26052-1-nanich.lee@samsung.com>
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR04MB4965.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 12ace6a8-5c32-40d5-83e0-08d8be86275e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Jan 2021 03:31:06.7053
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: uC711sjRNgW/5HWUKVQ/xvM7oR2RLUtQyTpDcc4901VDhVws/oE2nRKA2FwquP80H++qQIoe4a2PCzmY8gbun+ZAR1f1duyEiqrhg1jGQ10=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR04MB7693
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210121005803.26052-1-nanich.lee@samsung.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/21/21 4:13 AM, Lauri Kasanen wrote:=0A=
-> +=0A=
-> +#define PI_DRAM_REG 0=0A=
-> +#define PI_CART_REG 1=0A=
-> +#define PI_READ_REG 2=0A=
-> +#define PI_WRITE_REG 3=0A=
-> +#define PI_STATUS_REG 4=0A=
-> +=0A=
-> +#define PI_STATUS_DMA_BUSY (1 << 0)=0A=
-> +#define PI_STATUS_IO_BUSY (1 << 1)=0A=
-> +=0A=
-> +#define CART_DOMAIN 0x10000000=0A=
-> +#define CART_MAX 0x1FFFFFFF=0A=
-=0A=
-I'd align macro definitions with tabs :-=0A=
-=0A=
-#define PI_STATUS_DMA_BUSY      (1 << 0)=0A=
-#define PI_STATUS_IO_BUSY       (1 << 1)=0A=
-=0A=
-#define CART_DOMAIN             0x10000000=0A=
-#define CART_MAX                0x1FFFFFFF=0A=
-=0A=
+On Thu, Jan 21, 2021 at 09:58:03AM +0900, Changheun Lee wrote:
+> bio size can grow up to 4GB when muli-page bvec is enabled.
+> but sometimes it would lead to inefficient behaviors.
+> in case of large chunk direct I/O, - 32MB chunk read in user space -
+> all pages for 32MB would be merged to a bio structure if memory address is
+> continued phsycally. it makes some delay to submit until merge complete.
+> bio max size should be limited as a proper size.
+> 
+> When 32MB chunk read with direct I/O option is coming from userspace,
+> kernel behavior is below now. it's timeline.
+
+IMO, the issue should only exist on sync direct IO and writeback.
+Not sure if writeback cares this small delay because user data
+has been written to page cache already.
+
+Wrt. your big direct IO case, as I suggested, you may reduce the
+submission delay a lot by applying THP.
+
+Or you can just hardcode the limit in case of sync dio.
+
+> 
+>  | bio merge for 32MB. total 8,192 pages are merged.
+>  | total elapsed time is over 2ms.
+>  |------------------ ... ----------------------->|
+>                                                  | 8,192 pages merged a bio.
+>                                                  | at this time, first bio submit is done.
+>                                                  | 1 bio is split to 32 read request and issue.
+>                                                  |--------------->
+>                                                   |--------------->
+>                                                    |--------------->
+>                                                               ......
+>                                                                    |--------------->
+>                                                                     |--------------->|
+>                           total 19ms elapsed to complete 32MB read done from device. |
+> 
+> If bio max size is limited with 1MB, behavior is changed below.
+> 
+>  | bio merge for 1MB. 256 pages are merged for each bio.
+>  | total 32 bio will be made.
+>  | total elapsed time is over 2ms. it's same.
+>  | but, first bio submit timing is fast. about 100us.
+>  |--->|--->|--->|---> ... -->|--->|--->|--->|--->|
+>       | 256 pages merged a bio.
+>       | at this time, first bio submit is done.
+>       | and 1 read request is issued for 1 bio.
+>       |--------------->
+>            |--------------->
+>                 |--------------->
+>                                       ......
+>                                                  |--------------->
+>                                                   |--------------->|
+>         total 17ms elapsed to complete 32MB read done from device. |
+> 
+> As a result, read request issue timing is faster if bio max size is limited.
+> Current kernel behavior with multipage bvec, super large bio can be created.
+> And it lead to delay first I/O request issue.
+> 
+> Signed-off-by: Changheun Lee <nanich.lee@samsung.com>
+> 
+> ---
+>  block/bio.c               | 17 ++++++++++++++++-
+>  include/linux/bio.h       | 13 +++----------
+>  include/linux/blk_types.h |  1 +
+>  3 files changed, 20 insertions(+), 11 deletions(-)
+> 
+> diff --git a/block/bio.c b/block/bio.c
+> index 1f2cc1fbe283..027503c2e2e7 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -284,9 +284,24 @@ void bio_init(struct bio *bio, struct bio_vec *table,
+>  
+>  	bio->bi_io_vec = table;
+>  	bio->bi_max_vecs = max_vecs;
+> +	bio->bi_max_size = UINT_MAX;
+>  }
+>  EXPORT_SYMBOL(bio_init);
+>  
+> +void bio_set_dev(struct bio *bio, struct block_device *bdev)
+> +{
+> +	if (bio->bi_disk != bdev->bd_disk)
+> +		bio_clear_flag(bio, BIO_THROTTLED);
+> +
+> +	bio->bi_disk = bdev->bd_disk;
+> +	bio->bi_partno = bdev->bd_partno;
+> +	bio->bi_max_size = blk_queue_get_max_sectors(bio->bi_disk->queue,
+> +			bio_op(bio)) << SECTOR_SHIFT;
+> +
+> +	bio_associate_blkg(bio);
+> +}
+> +EXPORT_SYMBOL(bio_set_dev);
+> +
+>  /**
+>   * bio_reset - reinitialize a bio
+>   * @bio:	bio to reset
+> @@ -877,7 +892,7 @@ bool __bio_try_merge_page(struct bio *bio, struct page *page,
+>  		struct bio_vec *bv = &bio->bi_io_vec[bio->bi_vcnt - 1];
+>  
+>  		if (page_is_mergeable(bv, page, len, off, same_page)) {
+> -			if (bio->bi_iter.bi_size > UINT_MAX - len) {
+> +			if (bio->bi_iter.bi_size > bio->bi_max_size - len)
+>  				*same_page = false;
+>  				return false;
+>  			}
+> diff --git a/include/linux/bio.h b/include/linux/bio.h
+> index 1edda614f7ce..b9803e80c259 100644
+> --- a/include/linux/bio.h
+> +++ b/include/linux/bio.h
+> @@ -113,7 +113,7 @@ static inline bool bio_full(struct bio *bio, unsigned len)
+>  	if (bio->bi_vcnt >= bio->bi_max_vecs)
+>  		return true;
+>  
+> -	if (bio->bi_iter.bi_size > UINT_MAX - len)
+> +	if (bio->bi_iter.bi_size > bio->bi_max_size - len)
+>  		return true;
+>  
+>  	return false;
+> @@ -482,20 +482,13 @@ extern struct bio_vec *bvec_alloc(gfp_t, int, unsigned long *, mempool_t *);
+>  extern void bvec_free(mempool_t *, struct bio_vec *, unsigned int);
+>  extern unsigned int bvec_nr_vecs(unsigned short idx);
+>  extern const char *bio_devname(struct bio *bio, char *buffer);
+> -
+> -#define bio_set_dev(bio, bdev) 			\
+> -do {						\
+> -	if ((bio)->bi_disk != (bdev)->bd_disk)	\
+> -		bio_clear_flag(bio, BIO_THROTTLED);\
+> -	(bio)->bi_disk = (bdev)->bd_disk;	\
+> -	(bio)->bi_partno = (bdev)->bd_partno;	\
+> -	bio_associate_blkg(bio);		\
+> -} while (0)
+> +extern void bio_set_dev(struct bio *bio, struct block_device *bdev);
+>  
+>  #define bio_copy_dev(dst, src)			\
+>  do {						\
+>  	(dst)->bi_disk = (src)->bi_disk;	\
+>  	(dst)->bi_partno = (src)->bi_partno;	\
+> +	(dst)->bi_max_size = (src)->bi_max_size;\
+>  	bio_clone_blkg_association(dst, src);	\
+>  } while (0)
+>  
+> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+> index 866f74261b3b..e5dd5b7d8fc1 100644
+> --- a/include/linux/blk_types.h
+> +++ b/include/linux/blk_types.h
+> @@ -270,6 +270,7 @@ struct bio {
+>  	 */
+>  
+>  	unsigned short		bi_max_vecs;	/* max bvl_vecs we can hold */
+> +	unsigned int		bi_max_size;	/* max data size we can hold */
+
+People don't like to extend bio which can be fit in two cachelines
+exactly, and adding one 'int' will make it cross 3 cache lines.
+
+
+Thanks,
+Ming
+
