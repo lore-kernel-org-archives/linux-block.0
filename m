@@ -2,207 +2,246 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	PDS_BAD_THREAD_QP_64,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3FF2C433E0
-	for <linux-block@archiver.kernel.org>; Fri, 22 Jan 2021 09:00:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 436A7C433DB
+	for <linux-block@archiver.kernel.org>; Fri, 22 Jan 2021 09:49:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5965D236F9
-	for <linux-block@archiver.kernel.org>; Fri, 22 Jan 2021 09:00:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ECD14239D4
+	for <linux-block@archiver.kernel.org>; Fri, 22 Jan 2021 09:49:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727069AbhAVI6k (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Jan 2021 03:58:40 -0500
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:51780 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727227AbhAVI6H (ORCPT
+        id S1727031AbhAVJtS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Jan 2021 04:49:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47692 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727621AbhAVJrL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Jan 2021 03:58:07 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1611306031; x=1642842031;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=IFxvEl9TLmT2BFaSwUhWlPrjBx5NqzUmZU0VXJe+qSI=;
-  b=AffAdhR5gv6tPOmB9BzDW4U1UoeQZN2zh6yD3uJzvFUR2nPEVYJ2a8ha
-   La7qPcQvAdn/nNXWrmqpVi4lVAt/91f+qcKb8BLQhk3SgP2e3JxV3RKu6
-   Ybc1KM9Y5ERVg5tzquoBDzAgLXtsJHzAv4jyrlwiGuQaeFNqr0spHZSNP
-   pYGcmvhjLxc5PohfKFz7Vir4nIGSEm3a7YebgQz9FKpgmJLRrfEto3C0x
-   Z1rWbv3YXsXzBsT/VEU9rXs+4hwM1oSPxFJ5NpY31RAob6bTEXivjIXc0
-   rmKE3/DGdVxrWVRdb/3r1V7xegm+6OCRzq8+7aIkwGOst1L5WA+kRYLPA
-   A==;
-IronPort-SDR: 0qgNYKdgm60UO4A1p2gyzNFTFPZZlq2WIju4QKV1dyGdGCIKlhjimh859IVQ9OIb6bKG+r5zia
- +jn2f3oPD2LYoauS2tfN+mQZBnlSshwZDdzIKQKg6ILEJezPXc+voqvXB37biWEHZY2rlZrUeP
- ezHY6ZxmvPxLkkd79Iq2wHzhSSfvv5Jh0M8TmLjYCvu8ukUvV0mkzCNjI015n/TzQjZRmwFfNZ
- JCu8nQ6sEPkkhns1JPoD8VCuWc/uhKH6qr/nJJUmxnv3Kaw1cPEXKH5rmN32PIf0lISmIpXTu8
- u44=
-X-IronPort-AV: E=Sophos;i="5.79,366,1602518400"; 
-   d="scan'208";a="262053553"
-Received: from mail-mw2nam12lp2040.outbound.protection.outlook.com (HELO NAM12-MW2-obe.outbound.protection.outlook.com) ([104.47.66.40])
-  by ob1.hgst.iphmx.com with ESMTP; 22 Jan 2021 16:58:50 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TvRgjWYbbFDV9vr1eS5LB/+m+D3uBhrk027SuoHPlVEG7U/EKhJJVyL+36rAP4/okVt6L7G09G88jcHNZVXKaApu0IzJJCdShugkEazafH6tcBkB1j6xaWCgXw2v0Klp44lr0S5+63G/BbFCIrY4BjL7WjlnVILgqt619hICk20EVUI9wxbNqU+xKll+MgLSyXlPxSNDvMjSr3iL6q72++TYsRQDy3+NR5pFFVDc5a9+7AGmCjHSKTGBoqyixCfDiQfXM7IsaOH3W+xxaXfwGXarzA2lPhHLMRB8VVzP2o6PIx+i9fL+bs9kVeZzL6/RpmCNvt59vZdedH8Xetj+IA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OuhjnCL6MgLz245xyJvZ6LjD7YH9HZFRpPyCSQrNZa8=;
- b=GWVh5/TqVKqwd/Lpc8Vsu+jU8WE/bKXhsSZWtTaxhVrQ3rZo9APQo52f5HMIPYfX8tY7TQ/XQd3OKp/Bb1gDACg2JQnCDzH8pO7wh6cSnKM1ipFfwXcbYprSXGKfgYvpRACoxdSGJPQZuiOcKykgwkmKAzhpsYb2sKCb3i8voQOJKucKUfdMqS1exkHCIEP1PQjgcIZ1w8GaIEW6ylmR7SAo8TFdh/IPe7loEFIereWlR3QZQvNbJPHfJLaAzK00pET7xr+n4l+zkinsSk3+V5WiC2je+Q3oUN6e+xoG003B3Vpp6RVZazHRwjwvg0uCGla9hRQfVzgEa1zv/b2sOg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
+        Fri, 22 Jan 2021 04:47:11 -0500
+Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A58DC06174A
+        for <linux-block@vger.kernel.org>; Fri, 22 Jan 2021 01:46:25 -0800 (PST)
+Received: by mail-ed1-x535.google.com with SMTP id f1so5771574edr.12
+        for <linux-block@vger.kernel.org>; Fri, 22 Jan 2021 01:46:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OuhjnCL6MgLz245xyJvZ6LjD7YH9HZFRpPyCSQrNZa8=;
- b=tZaeHPVf6UcKhMytnkn6qI6eFWzJ69nPuMMg0uhLfvVNklRj5Zna6z+W0ahHmdiKdDVNLN/UYaqaGoTBv4UVjnTZ2ORIgur7CpmYuCT3SJ5lCuOeVunfdyNN27jHIa/my1UHq2E/+9Ny7FC530AazrwRscbV6PFxq/2FVdxRlNM=
-Received: from BL0PR04MB6514.namprd04.prod.outlook.com (2603:10b6:208:1ca::23)
- by BL0PR04MB4532.namprd04.prod.outlook.com (2603:10b6:208:4f::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3763.9; Fri, 22 Jan
- 2021 08:56:59 +0000
-Received: from BL0PR04MB6514.namprd04.prod.outlook.com
- ([fe80::b880:19d5:c7fe:329d]) by BL0PR04MB6514.namprd04.prod.outlook.com
- ([fe80::b880:19d5:c7fe:329d%8]) with mapi id 15.20.3763.014; Fri, 22 Jan 2021
- 08:56:59 +0000
-From:   Damien Le Moal <Damien.LeMoal@wdc.com>
-To:     Christoph Hellwig <hch@lst.de>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        Keith Busch <Keith.Busch@wdc.com>
-Subject: Re: [PATCH v3 1/3] block: introduce zone_write_granularity limit
-Thread-Topic: [PATCH v3 1/3] block: introduce zone_write_granularity limit
-Thread-Index: AQHW8JU6qVihsq4M3UKmhepNN6tFNQ==
-Date:   Fri, 22 Jan 2021 08:56:58 +0000
-Message-ID: <BL0PR04MB6514A2655635DFF482E4252BE7A00@BL0PR04MB6514.namprd04.prod.outlook.com>
-References: <20210122080014.174391-1-damien.lemoal@wdc.com>
- <20210122080014.174391-2-damien.lemoal@wdc.com>
- <20210122084209.GA15710@lst.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: lst.de; dkim=none (message not signed)
- header.d=none;lst.de; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [2400:2411:43c0:6000:2db5:5c10:5640:816d]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: ad02ac0b-f326-4889-53c4-08d8beb3ad70
-x-ms-traffictypediagnostic: BL0PR04MB4532:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <BL0PR04MB4532975D80C502B05F5F3C1CE7A00@BL0PR04MB4532.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: d0MtYDS6WAHBw72Ty33K6iA/7aD4bbAoATvuXSLZldSmu7BDRpV/vURNoPjSRaLSVnyu41FmsiiNQkZv6s69ypDaPyUKXfO96Rjsmb99Q3BJf5e6FANIlcqe0+EJSs//vUEmFH6ZVLqR6mpzbhzqZUAIuPaYFLCadH6ojw0V89gVUSEJmuzzAyU/W0yNR5Bgl3e2TBBcataGkL53Ogpnmego70+OdG3g1L5t0TFFzZmD9YEkUCgF1oEf31nt+rQwZTrMk/lRPDJKBbhbhiDyGyQtSbi3KuUW2KTjDxoLPSNxuRVD0x5PFrdYWBjjyUtTCZn0KDX0CjE7+cJ/XM/QUO6+lHNmB5XgfkySTBQAvqQL3VUq6OlFkDh37+jSbb1IOD/kqyt0iqiuYFbOP3bRTA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR04MB6514.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(136003)(39860400002)(376002)(346002)(366004)(8936002)(66946007)(52536014)(64756008)(8676002)(91956017)(33656002)(6916009)(76116006)(478600001)(7696005)(66446008)(6506007)(316002)(86362001)(4326008)(71200400001)(55016002)(66556008)(9686003)(53546011)(54906003)(5660300002)(2906002)(186003)(66476007)(83380400001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: =?us-ascii?Q?J8jcNiexa2LEgn5M0zrNxw1Jge6JnP4ZA/1kOmV6bHPlU1ywDRKYNbCXIDSt?=
- =?us-ascii?Q?Z6BzWFKYdMPHAbypSjBURt+2YR24tOHvE4DqeyELhQwI5HYgS8NltXL1kplg?=
- =?us-ascii?Q?7kjgo77WDFi803XktGBsHMi243TbIpAyWWcOrYoSyGs/0dwTNgyfvWtcjDWE?=
- =?us-ascii?Q?UeHKrchFDbVnrAhNtfBBkJaESrxgkZDdOCdoBIh5tu7wG3w+YYfT0ZrPK8PP?=
- =?us-ascii?Q?GlfS0ModkWtDyDhY/v15+eT/VBToNW4FzcLQvqfTJyezBBwC9v6EUpH9q2Gq?=
- =?us-ascii?Q?tv9mMtDzcV01Qj92Sh4hWA5ci2351bnrF9mvJIraUWN0jwYTZc5r90apM/af?=
- =?us-ascii?Q?Xy31sz/rNgIaolfIWTEB+VRSAx4yGDYj9gkY6cjwZ95OPNX0eDdL8f2OxaxX?=
- =?us-ascii?Q?hwYvCg+IulQSS8hJXLGSx5J0DghR1fTepVYHnd3MBMC1DRCpoZKkoj+pfbBB?=
- =?us-ascii?Q?DB/eH8kjKO8I2BzsfwXh2MAL7Dik9pGUZEtdqJpY+SOBH0aU2/VnQ2miSc5O?=
- =?us-ascii?Q?vcsyItZ07Ty72jx6krmAwEo7WEWsxs2kgD20+wDwfmcMPaXcL+FRReGqe+1N?=
- =?us-ascii?Q?KSfPCp9vLTz/962W1wAmfdpEFQF1wX49zzlG1Zy46WYcNa4wBH6iXAyJzokj?=
- =?us-ascii?Q?btHk7lhZVF00hx8idpgZeT2s+o+74PijM0hWEb8ezlOMVLSZEQOvOc+MsoCH?=
- =?us-ascii?Q?0hAtFnbxoAe7dmpdPtQ+ZFPLbACi9RVMxVr+I0a34wqUR6VwqDf/E9Wz9Bz7?=
- =?us-ascii?Q?6sqO0c84uJvDFlL2qfsZK1f4WDRfUYPuDwyQbkPLf/HiRvzZ4CUv0Bvz911v?=
- =?us-ascii?Q?WC1kMCr/z375BTN4mMzobxLkCB69uzO1+YrI1s1DPq6+EzFFivkx3vcgJweF?=
- =?us-ascii?Q?dd8VqZMBLIoSTbdoY1spiTZh21pBgNbBeHquAo07+FlT08MHGOsOyjWRrK7d?=
- =?us-ascii?Q?ce7b4j5aXL/Sq04lITKXpZwQoaPuKXiaDY0RKTgCz7Y8OPMU3IHg03K/KE4C?=
- =?us-ascii?Q?HPgAar/pwr5ad9GmHTEIiEIAC+EjLMM7C0Sq5IDdkQ2vdNJRrNiCYZxskCZq?=
- =?us-ascii?Q?HBx1K99o9YZpU1HG8IZxB/8Kcj9VwVfqyY3vnbupc9t5ZgaswTvXgmfzawli?=
- =?us-ascii?Q?4yfHJ8YIfdlRxUwSXqzQCwFgylYjDuD5wQ=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
+        d=linaro.org; s=google;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=HjgV2PK/NA+pQ8cTfpiwH9HQAhJSvB08Q16GX5X3zfA=;
+        b=by/sVS1It0deAY0BLbNdRSfPNB6zDWFTbe0d/GdsR736L2aLnyAHGJLh2YDDme2PwY
+         IWjGWmZfSUUJLx6x33cWmVGFnaFF8NdjEAfl3KulaX2BZ6y3QGSQcriBcwdMDhfNavwo
+         YVTiU3HsaaYUWTPrisnsQVlILY7rOMNv1FfKeLhjI21QRn1vMPkF/cRjIeagRCAuOIR5
+         C/JtUyOq5gyX3gWEnOupLVZXJKYP/gpyr+w68gBGVbnm7m2zVamsEGQAPJWlwPqVVUFT
+         iaGgCxf3xXGQwjd3c9Msmm9RPa3aa2nRk6IwK1oDfhJnTaXBBhlqSAwf0kmmh5AvxPH7
+         kghA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=HjgV2PK/NA+pQ8cTfpiwH9HQAhJSvB08Q16GX5X3zfA=;
+        b=fcjUcJ/7BfepS/I1QNxnUlI4hGgeea0Du9kEFG8pGTX7ORnVuP07CyydEyyCguXlKG
+         YP/xIpvK9+jAq6x20rVy3KpKOK4wCnB2MF9cQlWztyWaqm9BriRdDjkwkG13hfS0zJMJ
+         /VkW7dirIu//gv4B8psuGZGfU56BWSFrtHbstwjaE1l4Dpj9PYOJd0gBrnzUBC/gxfBE
+         HacFQ1CyN2QPLv5TwliBpnvRf3yNQLYQkxGUP+qob9EWqmajStR3EqrQD6eB8IHFWj/H
+         rCoyjBG0im5wUNEG2ysAPtxLCeZCbYLxlzGREmUcUw5+uU5ViCzx0IjnjOfGqQFa9J71
+         3hiQ==
+X-Gm-Message-State: AOAM533MQjuObgS7x8T5O/BKLd/EgF6nlFGVmC+XPjbKDiLdpIxZR99L
+        KmFn8nq7qNWS9Lc1JdJPt82Mr4+6y3RR9g==
+X-Google-Smtp-Source: ABdhPJyWPYjrXePNQsgVj7nkGHRu9jiSq5tWZ5YgAF1jy2Q67EKJiWmPbctdCsS4INcXQ2grqJBmKA==
+X-Received: by 2002:a05:6402:402:: with SMTP id q2mr2595315edv.116.1611308783863;
+        Fri, 22 Jan 2021 01:46:23 -0800 (PST)
+Received: from [192.168.0.13] ([83.216.184.132])
+        by smtp.gmail.com with ESMTPSA id gt18sm3960119ejb.104.2021.01.22.01.46.22
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 22 Jan 2021 01:46:23 -0800 (PST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: [PATCH] bfq: don't check active group if bfq.weight is not
+ changed
+From:   Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <20210114122426.603813-1-yukuai3@huawei.com>
+Date:   Fri, 22 Jan 2021 10:46:21 +0100
+Cc:     Tejun Heo <tj@kernel.org>, axboe@kernel.dk,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com
 Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR04MB6514.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ad02ac0b-f326-4889-53c4-08d8beb3ad70
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Jan 2021 08:56:59.0003
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: bwTW7X8E57r4GDU7H7EhasSa9YQR827nFHqg2PUqyj4vuL+65a9gjQus85/0d6Z89tIj2qgX4gdIMv1BkiSrEA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR04MB4532
+Message-Id: <44BDF727-92DA-4678-A026-A1CF53A655BF@linaro.org>
+References: <b4163392-0462-ff6f-b958-1f96f33d69e6@huawei.com>
+ <20210114122426.603813-1-yukuai3@huawei.com>
+To:     Yu Kuai <yukuai3@huawei.com>
+X-Mailer: Apple Mail (2.3445.104.11)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2021/01/22 17:42, Christoph Hellwig wrote:=0A=
->> @@ -864,18 +891,20 @@ void blk_queue_set_zoned(struct gendisk *disk, enu=
-m blk_zoned_model model)=0A=
->>  		 * partitions and zoned block device support is enabled, else=0A=
->>  		 * we do nothing special as far as the block layer is concerned.=0A=
->>  		 */=0A=
->> -		if (!IS_ENABLED(CONFIG_BLK_DEV_ZONED) ||=0A=
->> -		    disk_has_partitions(disk))=0A=
->> -			model =3D BLK_ZONED_NONE;=0A=
->> -		break;=0A=
->> +		if (IS_ENABLED(CONFIG_BLK_DEV_ZONED) &&=0A=
->> +		    !disk_has_partitions(disk))=0A=
->> +			break;=0A=
->> +		model =3D BLK_ZONED_NONE;=0A=
->> +		fallthrough;=0A=
->>  	case BLK_ZONED_NONE:=0A=
->>  	default:=0A=
->>  		if (WARN_ON_ONCE(model !=3D BLK_ZONED_NONE))=0A=
->>  			model =3D BLK_ZONED_NONE;=0A=
->> +		q->limits.zone_write_granularity =3D 0;=0A=
->>  		break;=0A=
->>  	}=0A=
->>  =0A=
->> -	disk->queue->limits.zoned =3D model;=0A=
->> +	q->limits.zoned =3D model;=0A=
->>  }=0A=
-> =0A=
-> This looks a little strange.  If we special case zoned vs not zoned=0A=
-> here anyway, why not set the zone_write_granularity to the logical=0A=
-> block size here by default.=0A=
-=0A=
-The convention is zone_write_granularity =3D=3D 0 for the BLK_ZONED_NONE ca=
-se. Hence=0A=
-the reset here if we force the zoned model to none for HA drives. This way,=
- this=0A=
-does not create a special case for HA drives used as regular disks.=0A=
-=0A=
-Of note is that there is something a little weird in the sd_zbc.c code that=
-=0A=
-needs fixing: blk_queue_set_zoned() is called before sd_zbc_read_zones() is=
-=0A=
-executed and that function will check the zones of an HA drive and set the =
-queue=0A=
-nr_zones and max zone append sectors, even if blk_queue_set_zoned() set the=
-=0A=
-zoned model to none due to partitions. That makes the BLK_ZONED_NONE case o=
-f HA=0A=
-drives a little weird since zone information is visible and correct but the=
-=0A=
-model says "none". As long as users separate zoned vs not-zoned cases by lo=
-oking=0A=
-at the zoned model, this does not create any problem, but that is not prett=
-y.=0A=
-=0A=
-Will send a separate patch to clean that up and have something consistent w=
-ith=0A=
-regular disks for this special HA case. The above blk_queue_set_zoned() fun=
-ction=0A=
-can be used to cleanup the zones information for an HA drive that is used a=
-s a=0A=
-regular disk (nr_zones, zone append sectors and zone bitmaps).=0A=
-=0A=
-=0A=
--- =0A=
-Damien Le Moal=0A=
-Western Digital Research=0A=
+
+
+> Il giorno 14 gen 2021, alle ore 13:24, Yu Kuai <yukuai3@huawei.com> ha =
+scritto:
+>=20
+> Now the group scheduling in BFQ depends on the check of active group,
+> but in most cases group scheduling is not used and the checking
+> of active group will cause bfq_asymmetric_scenario() and its caller
+> bfq_better_to_idle() to always return true, so the throughput
+> will be impacted if the workload doesn't need idle (e.g. random rw)
+>=20
+> To fix that, adding check in bfq_io_set_weight_legacy() and
+> bfq_pd_init() to check whether or not group scheduling is used
+> (a non-default weight is used). If not, there is no need
+> to check active group.
+>=20
+
+Hi,
+I do like the goal you want to attain.  Still, I see a problem with
+your proposal.  Consider two groups, say A and B.  Suppose that both
+have the same, default weight.  Yet, group A generates large I/O
+requests, while group B generates small requests.  With your change,
+idling would not be performed.  This would cause group A to steal
+bandwidth to group B, in proportion to how large its requests are
+compared with those of group B.
+
+As a possible solution, maybe we would need also a varied_rq_size
+flag, similar to the varied_weights flag?
+
+Thoughts?
+
+Thanks for your contribution,
+Paolo
+
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> ---
+> block/bfq-cgroup.c  | 14 ++++++++++++--
+> block/bfq-iosched.c |  8 +++-----
+> block/bfq-iosched.h | 19 +++++++++++++++++++
+> 3 files changed, 34 insertions(+), 7 deletions(-)
+>=20
+> diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
+> index b791e2041e49..b4ac42c4bd9f 100644
+> --- a/block/bfq-cgroup.c
+> +++ b/block/bfq-cgroup.c
+> @@ -505,12 +505,18 @@ static struct blkcg_policy_data =
+*bfq_cpd_alloc(gfp_t gfp)
+> 	return &bgd->pd;
+> }
+>=20
+> +static inline int bfq_dft_weight(void)
+> +{
+> +	return cgroup_subsys_on_dfl(io_cgrp_subsys) ?
+> +	       CGROUP_WEIGHT_DFL : BFQ_WEIGHT_LEGACY_DFL;
+> +
+> +}
+> +
+> static void bfq_cpd_init(struct blkcg_policy_data *cpd)
+> {
+> 	struct bfq_group_data *d =3D cpd_to_bfqgd(cpd);
+>=20
+> -	d->weight =3D cgroup_subsys_on_dfl(io_cgrp_subsys) ?
+> -		CGROUP_WEIGHT_DFL : BFQ_WEIGHT_LEGACY_DFL;
+> +	d->weight =3D bfq_dft_weight();
+> }
+>=20
+> static void bfq_cpd_free(struct blkcg_policy_data *cpd)
+> @@ -554,6 +560,9 @@ static void bfq_pd_init(struct blkg_policy_data =
+*pd)
+> 	bfqg->bfqd =3D bfqd;
+> 	bfqg->active_entities =3D 0;
+> 	bfqg->rq_pos_tree =3D RB_ROOT;
+> +
+> +	if (entity->new_weight !=3D bfq_dft_weight())
+> +		bfqd_enable_active_group_check(bfqd);
+> }
+>=20
+> static void bfq_pd_free(struct blkg_policy_data *pd)
+> @@ -1013,6 +1022,7 @@ static void bfq_group_set_weight(struct =
+bfq_group *bfqg, u64 weight, u64 dev_wei
+> 		 */
+> 		smp_wmb();
+> 		bfqg->entity.prio_changed =3D 1;
+> +		bfqd_enable_active_group_check(bfqg->bfqd);
+> 	}
+> }
+>=20
+> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+> index 9e4eb0fc1c16..1b695de1df95 100644
+> --- a/block/bfq-iosched.c
+> +++ b/block/bfq-iosched.c
+> @@ -699,11 +699,8 @@ static bool bfq_asymmetric_scenario(struct =
+bfq_data *bfqd,
+> 		(bfqd->busy_queues[0] && bfqd->busy_queues[2]) ||
+> 		(bfqd->busy_queues[1] && bfqd->busy_queues[2]);
+>=20
+> -	return varied_queue_weights || multiple_classes_busy
+> -#ifdef CONFIG_BFQ_GROUP_IOSCHED
+> -	       || bfqd->num_groups_with_pending_reqs > 0
+> -#endif
+> -		;
+> +	return varied_queue_weights || multiple_classes_busy ||
+> +	       bfqd_has_active_group(bfqd);
+> }
+>=20
+> /*
+> @@ -6472,6 +6469,7 @@ static int bfq_init_queue(struct request_queue =
+*q, struct elevator_type *e)
+>=20
+> 	bfqd->queue_weights_tree =3D RB_ROOT_CACHED;
+> 	bfqd->num_groups_with_pending_reqs =3D 0;
+> +	bfqd->check_active_group =3D false;
+>=20
+> 	INIT_LIST_HEAD(&bfqd->active_list);
+> 	INIT_LIST_HEAD(&bfqd->idle_list);
+> diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+> index 703895224562..216509013012 100644
+> --- a/block/bfq-iosched.h
+> +++ b/block/bfq-iosched.h
+> @@ -524,6 +524,8 @@ struct bfq_data {
+>=20
+> 	/* true if the device is non rotational and performs queueing */
+> 	bool nonrot_with_queueing;
+> +	/* true if need to check num_groups_with_pending_reqs */
+> +	bool check_active_group;
+>=20
+> 	/*
+> 	 * Maximum number of requests in driver in the last
+> @@ -1066,6 +1068,17 @@ static inline void bfq_pid_to_str(int pid, char =
+*str, int len)
+> }
+>=20
+> #ifdef CONFIG_BFQ_GROUP_IOSCHED
+> +static inline void bfqd_enable_active_group_check(struct bfq_data =
+*bfqd)
+> +{
+> +	cmpxchg_relaxed(&bfqd->check_active_group, false, true);
+> +}
+> +
+> +static inline bool bfqd_has_active_group(struct bfq_data *bfqd)
+> +{
+> +	return bfqd->check_active_group &&
+> +	       bfqd->num_groups_with_pending_reqs > 0;
+> +}
+> +
+> struct bfq_group *bfqq_group(struct bfq_queue *bfqq);
+>=20
+> #define bfq_log_bfqq(bfqd, bfqq, fmt, args...)	do {			=
+\
+> @@ -1085,6 +1098,12 @@ struct bfq_group *bfqq_group(struct bfq_queue =
+*bfqq);
+> } while (0)
+>=20
+> #else /* CONFIG_BFQ_GROUP_IOSCHED */
+> +static inline void bfqd_enable_active_group_check(struct bfq_data =
+*bfqd) {}
+> +
+> +static inline bool bfqd_has_active_group(struct bfq_data *bfqd)
+> +{
+> +	return false;
+> +}
+>=20
+> #define bfq_log_bfqq(bfqd, bfqq, fmt, args...) do {	\
+> 	char pid_str[MAX_PID_STR_LENGTH];	\
+> --=20
+> 2.25.4
+>=20
+
