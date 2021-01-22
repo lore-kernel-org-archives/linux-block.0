@@ -5,43 +5,43 @@ X-Spam-Level:
 X-Spam-Status: No, score=-15.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BCBEC433E0
-	for <linux-block@archiver.kernel.org>; Fri, 22 Jan 2021 02:36:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11632C433E0
+	for <linux-block@archiver.kernel.org>; Fri, 22 Jan 2021 02:37:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 129B322DFA
-	for <linux-block@archiver.kernel.org>; Fri, 22 Jan 2021 02:36:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D436323136
+	for <linux-block@archiver.kernel.org>; Fri, 22 Jan 2021 02:37:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726778AbhAVCgn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Jan 2021 21:36:43 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28541 "EHLO
+        id S1726740AbhAVCgM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Jan 2021 21:36:12 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52292 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726755AbhAVCg0 (ORCPT
+        by vger.kernel.org with ESMTP id S1726736AbhAVCgJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Jan 2021 21:36:26 -0500
+        Thu, 21 Jan 2021 21:36:09 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611282897;
+        s=mimecast20190719; t=1611282881;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=7VKhJfIFoh0TZZ+KZUD5fapfBP8dm6W6Te/0eXrqd1M=;
-        b=ECBBEZKHSH2pdQbYYwdplGqgktZl766SVrmWsS6pR5OuMDb596mjt7YGWxZhxTA1dDAV0J
-        Tt+sjnz9LKkdgPkvCmJMIMcU4NV+GPMwKfzjsAPQBIx0uCzcaHh9iqJ+0sQEQVKvRcrGYG
-        Hg0zWfet3V4OYIla7hA5WwfgQ6T3G2A=
+        bh=zkIevDnYqr620nQeuKQX0w6mRZz1bgEDSAnonpo3wpk=;
+        b=gSMJXqd2zxLWE4X2+OePruyp+SP6A9Du2tniVeZ8rZMKgaHNw9zpdYnm2BXgyHd36mI5fU
+        8EkbfIssr69lcvRdylVF2TWLlDGiEe9MnmECPXkqpogObNiHkN9Ya01uh5kdVfqJvcdArz
+        DNPjNjpj0RyiLKzTfHUtGgBkeFOVCVc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-40-CDqwqnNDPs6cw8Xv8tYc0g-1; Thu, 21 Jan 2021 21:34:53 -0500
-X-MC-Unique: CDqwqnNDPs6cw8Xv8tYc0g-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-229-uZDv0p7nMIKaVh84mMgdnQ-1; Thu, 21 Jan 2021 21:34:37 -0500
+X-MC-Unique: uZDv0p7nMIKaVh84mMgdnQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BC8EA107ACE3;
-        Fri, 22 Jan 2021 02:34:51 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0F989806662;
+        Fri, 22 Jan 2021 02:34:36 +0000 (UTC)
 Received: from localhost (ovpn-13-11.pek2.redhat.com [10.72.13.11])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D295E60855;
-        Fri, 22 Jan 2021 02:34:47 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5320619C59;
+        Fri, 22 Jan 2021 02:34:32 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
@@ -51,20 +51,28 @@ Cc:     Ming Lei <ming.lei@redhat.com>, Omar Sandoval <osandov@fb.com>,
         Sumanesh Samanta <sumanesh.samanta@broadcom.com>,
         "Ewan D . Milne" <emilne@redhat.com>,
         Hannes Reinecke <hare@suse.de>
-Subject: [PATCH V7 11/13] scsi: add scsi_device_busy() to read sdev->device_busy
-Date:   Fri, 22 Jan 2021 10:33:15 +0800
-Message-Id: <20210122023317.687987-12-ming.lei@redhat.com>
+Subject: [PATCH V7 08/13] blk-mq: return budget token from .get_budget callback
+Date:   Fri, 22 Jan 2021 10:33:12 +0800
+Message-Id: <20210122023317.687987-9-ming.lei@redhat.com>
 In-Reply-To: <20210122023317.687987-1-ming.lei@redhat.com>
 References: <20210122023317.687987-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add scsi_device_busy() for drivers, so that we can prepare for tracking
-device queue depth via sbitmap_queue.
+SCSI uses one global atomic variable to track queue depth for each
+LUN/request queue.
+
+This way doesn't scale well when there is lots of CPU cores and the
+disk is very fast. It has been observed that IOPS is affected a lot
+by tracking queue depth via sdev->device_busy in IO path.
+
+Return budget token from .get_budget callback, and the budget token
+can be passed to driver, so that we can replace the atomic variable
+with sbitmap_queue, then the scale issue can be fixed.
 
 Cc: Omar Sandoval <osandov@fb.com>
 Cc: Kashyap Desai <kashyap.desai@broadcom.com>
@@ -74,104 +82,313 @@ Reviewed-by: Hannes Reinecke <hare@suse.de>
 Tested-by: Sumanesh Samanta <sumanesh.samanta@broadcom.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/message/fusion/mptsas.c      | 2 +-
- drivers/scsi/mpt3sas/mpt3sas_scsih.c | 2 +-
- drivers/scsi/scsi_lib.c              | 4 ++--
- drivers/scsi/scsi_sysfs.c            | 2 +-
- drivers/scsi/sg.c                    | 2 +-
- include/scsi/scsi_device.h           | 5 +++++
- 6 files changed, 11 insertions(+), 6 deletions(-)
+ block/blk-mq-sched.c    | 17 +++++++++++++----
+ block/blk-mq.c          | 36 +++++++++++++++++++++++++-----------
+ block/blk-mq.h          | 25 +++++++++++++++++++++----
+ drivers/scsi/scsi_lib.c | 16 +++++++++++-----
+ include/linux/blk-mq.h  |  4 ++--
+ 5 files changed, 72 insertions(+), 26 deletions(-)
 
-diff --git a/drivers/message/fusion/mptsas.c b/drivers/message/fusion/mptsas.c
-index 5eb0b3361e4e..85aa5788826b 100644
---- a/drivers/message/fusion/mptsas.c
-+++ b/drivers/message/fusion/mptsas.c
-@@ -3781,7 +3781,7 @@ mptsas_send_link_status_event(struct fw_event_work *fw_event)
- 						printk(MYIOC_s_DEBUG_FMT
- 						"SDEV OUTSTANDING CMDS"
- 						"%d\n", ioc->name,
--						atomic_read(&sdev->device_busy)));
-+						scsi_device_busy(sdev)));
- 				}
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index deff4e826e23..962b801b8fb2 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -131,6 +131,7 @@ static int __blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
  
- 			}
-diff --git a/drivers/scsi/mpt3sas/mpt3sas_scsih.c b/drivers/scsi/mpt3sas/mpt3sas_scsih.c
-index c8b09a81834d..784ad7105d1b 100644
---- a/drivers/scsi/mpt3sas/mpt3sas_scsih.c
-+++ b/drivers/scsi/mpt3sas/mpt3sas_scsih.c
-@@ -3415,7 +3415,7 @@ scsih_dev_reset(struct scsi_cmnd *scmd)
- 		MPI2_SCSITASKMGMT_TASKTYPE_LOGICAL_UNIT_RESET, 0, 0,
- 		tr_timeout, tr_method);
- 	/* Check for busy commands after reset */
--	if (r == SUCCESS && atomic_read(&scmd->device->device_busy))
-+	if (r == SUCCESS && scsi_device_busy(scmd->device))
- 		r = FAILED;
-  out:
- 	sdev_printk(KERN_INFO, scmd->device, "device reset: %s scmd(0x%p)\n",
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 08a9534a9bb4..3e52ae8180dd 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -385,7 +385,7 @@ static void scsi_single_lun_run(struct scsi_device *current_sdev)
+ 	do {
+ 		struct request *rq;
++		int budget_token;
  
- static inline bool scsi_device_is_busy(struct scsi_device *sdev)
+ 		if (e->type->ops.has_work && !e->type->ops.has_work(hctx))
+ 			break;
+@@ -140,12 +141,13 @@ static int __blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+ 			break;
+ 		}
+ 
+-		if (!blk_mq_get_dispatch_budget(q))
++		budget_token = blk_mq_get_dispatch_budget(q);
++		if (budget_token < 0)
+ 			break;
+ 
+ 		rq = e->type->ops.dispatch_request(hctx);
+ 		if (!rq) {
+-			blk_mq_put_dispatch_budget(q);
++			blk_mq_put_dispatch_budget(q, budget_token);
+ 			/*
+ 			 * We're releasing without dispatching. Holding the
+ 			 * budget could have blocked any "hctx"s with the
+@@ -157,6 +159,8 @@ static int __blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+ 			break;
+ 		}
+ 
++		blk_mq_set_rq_budget_token(rq, budget_token);
++
+ 		/*
+ 		 * Now this rq owns the budget which has to be released
+ 		 * if this rq won't be queued to driver via .queue_rq()
+@@ -230,6 +234,8 @@ static int blk_mq_do_dispatch_ctx(struct blk_mq_hw_ctx *hctx)
+ 	struct request *rq;
+ 
+ 	do {
++		int budget_token;
++
+ 		if (!list_empty_careful(&hctx->dispatch)) {
+ 			ret = -EAGAIN;
+ 			break;
+@@ -238,12 +244,13 @@ static int blk_mq_do_dispatch_ctx(struct blk_mq_hw_ctx *hctx)
+ 		if (!sbitmap_any_bit_set(&hctx->ctx_map))
+ 			break;
+ 
+-		if (!blk_mq_get_dispatch_budget(q))
++		budget_token = blk_mq_get_dispatch_budget(q);
++		if (budget_token < 0)
+ 			break;
+ 
+ 		rq = blk_mq_dequeue_from_ctx(hctx, ctx);
+ 		if (!rq) {
+-			blk_mq_put_dispatch_budget(q);
++			blk_mq_put_dispatch_budget(q, budget_token);
+ 			/*
+ 			 * We're releasing without dispatching. Holding the
+ 			 * budget could have blocked any "hctx"s with the
+@@ -255,6 +262,8 @@ static int blk_mq_do_dispatch_ctx(struct blk_mq_hw_ctx *hctx)
+ 			break;
+ 		}
+ 
++		blk_mq_set_rq_budget_token(rq, budget_token);
++
+ 		/*
+ 		 * Now this rq owns the budget which has to be released
+ 		 * if this rq won't be queued to driver via .queue_rq()
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index ef1a9f2003a0..4747066c54de 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1304,10 +1304,15 @@ static enum prep_dispatch blk_mq_prep_dispatch_rq(struct request *rq,
+ 						  bool need_budget)
  {
--	if (atomic_read(&sdev->device_busy) >= sdev->queue_depth)
-+	if (scsi_device_busy(sdev) >= sdev->queue_depth)
- 		return true;
- 	if (atomic_read(&sdev->device_blocked) > 0)
- 		return true;
-@@ -1638,7 +1638,7 @@ static int scsi_mq_get_budget(struct request_queue *q)
- 	 * the .restarts flag, and the request queue will be run for handling
- 	 * this request, see scsi_end_request().
- 	 */
--	if (unlikely(atomic_read(&sdev->device_busy) == 0 &&
-+	if (unlikely(scsi_device_busy(sdev) == 0 &&
- 				!scsi_device_blocked(sdev)))
- 		blk_mq_delay_run_hw_queues(sdev->request_queue, SCSI_QUEUE_DELAY);
- 	return -1;
-diff --git a/drivers/scsi/scsi_sysfs.c b/drivers/scsi/scsi_sysfs.c
-index b6378c8ca783..0840e44140de 100644
---- a/drivers/scsi/scsi_sysfs.c
-+++ b/drivers/scsi/scsi_sysfs.c
-@@ -670,7 +670,7 @@ sdev_show_device_busy(struct device *dev, struct device_attribute *attr,
- 		char *buf)
- {
- 	struct scsi_device *sdev = to_scsi_device(dev);
--	return snprintf(buf, 20, "%d\n", atomic_read(&sdev->device_busy));
-+	return snprintf(buf, 20, "%d\n", scsi_device_busy(sdev));
- }
- static DEVICE_ATTR(device_busy, S_IRUGO, sdev_show_device_busy, NULL);
+ 	struct blk_mq_hw_ctx *hctx = rq->mq_hctx;
++	int budget_token = -1;
  
-diff --git a/drivers/scsi/sg.c b/drivers/scsi/sg.c
-index bfa8d77322d7..4fa2fbb2c833 100644
---- a/drivers/scsi/sg.c
-+++ b/drivers/scsi/sg.c
-@@ -2504,7 +2504,7 @@ static int sg_proc_seq_show_dev(struct seq_file *s, void *v)
- 			      scsidp->id, scsidp->lun, (int) scsidp->type,
- 			      1,
- 			      (int) scsidp->queue_depth,
--			      (int) atomic_read(&scsidp->device_busy),
-+			      (int) scsi_device_busy(scsidp),
- 			      (int) scsi_device_online(scsidp));
+-	if (need_budget && !blk_mq_get_dispatch_budget(rq->q)) {
+-		blk_mq_put_driver_tag(rq);
+-		return PREP_DISPATCH_NO_BUDGET;
++	if (need_budget) {
++		budget_token = blk_mq_get_dispatch_budget(rq->q);
++		if (budget_token < 0) {
++			blk_mq_put_driver_tag(rq);
++			return PREP_DISPATCH_NO_BUDGET;
++		}
++		blk_mq_set_rq_budget_token(rq, budget_token);
  	}
- 	read_unlock_irqrestore(&sg_index_lock, iflags);
-diff --git a/include/scsi/scsi_device.h b/include/scsi/scsi_device.h
-index 1a5c9a3df6d6..dd0b9f690a26 100644
---- a/include/scsi/scsi_device.h
-+++ b/include/scsi/scsi_device.h
-@@ -590,6 +590,11 @@ static inline int scsi_device_supports_vpd(struct scsi_device *sdev)
- 	return 0;
+ 
+ 	if (!blk_mq_get_driver_tag(rq)) {
+@@ -1324,7 +1329,7 @@ static enum prep_dispatch blk_mq_prep_dispatch_rq(struct request *rq,
+ 			 * together during handling partial dispatch
+ 			 */
+ 			if (need_budget)
+-				blk_mq_put_dispatch_budget(rq->q);
++				blk_mq_put_dispatch_budget(rq->q, budget_token);
+ 			return PREP_DISPATCH_NO_TAG;
+ 		}
+ 	}
+@@ -1334,12 +1339,16 @@ static enum prep_dispatch blk_mq_prep_dispatch_rq(struct request *rq,
+ 
+ /* release all allocated budgets before calling to blk_mq_dispatch_rq_list */
+ static void blk_mq_release_budgets(struct request_queue *q,
+-		unsigned int nr_budgets)
++		struct list_head *list)
+ {
+-	int i;
++	struct request *rq;
+ 
+-	for (i = 0; i < nr_budgets; i++)
+-		blk_mq_put_dispatch_budget(q);
++	list_for_each_entry(rq, list, queuelist) {
++		int budget_token = blk_mq_get_rq_budget_token(rq);
++
++		if (budget_token >= 0)
++			blk_mq_put_dispatch_budget(q, budget_token);
++	}
  }
  
-+static inline int scsi_device_busy(struct scsi_device *sdev)
-+{
-+	return atomic_read(&sdev->device_busy);
+ /*
+@@ -1437,7 +1446,8 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
+ 			(hctx->flags & BLK_MQ_F_TAG_QUEUE_SHARED);
+ 		bool no_budget_avail = prep == PREP_DISPATCH_NO_BUDGET;
+ 
+-		blk_mq_release_budgets(q, nr_budgets);
++		if (nr_budgets)
++			blk_mq_release_budgets(q, list);
+ 
+ 		spin_lock(&hctx->lock);
+ 		list_splice_tail_init(list, &hctx->dispatch);
+@@ -1982,6 +1992,7 @@ static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ {
+ 	struct request_queue *q = rq->q;
+ 	bool run_queue = true;
++	int budget_token;
+ 
+ 	/*
+ 	 * RCU or SRCU read lock is needed before checking quiesced flag.
+@@ -1999,11 +2010,14 @@ static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 	if (q->elevator && !bypass_insert)
+ 		goto insert;
+ 
+-	if (!blk_mq_get_dispatch_budget(q))
++	budget_token = blk_mq_get_dispatch_budget(q);
++	if (budget_token < 0)
+ 		goto insert;
+ 
++	blk_mq_set_rq_budget_token(rq, budget_token);
++
+ 	if (!blk_mq_get_driver_tag(rq)) {
+-		blk_mq_put_dispatch_budget(q);
++		blk_mq_put_dispatch_budget(q, budget_token);
+ 		goto insert;
+ 	}
+ 
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index c1458d9502f1..61a5e884a6f5 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -187,17 +187,34 @@ unsigned int blk_mq_in_flight(struct request_queue *q,
+ void blk_mq_in_flight_rw(struct request_queue *q, struct block_device *part,
+ 		unsigned int inflight[2]);
+ 
+-static inline void blk_mq_put_dispatch_budget(struct request_queue *q)
++static inline void blk_mq_put_dispatch_budget(struct request_queue *q,
++					      int budget_token)
+ {
+ 	if (q->mq_ops->put_budget)
+-		q->mq_ops->put_budget(q);
++		q->mq_ops->put_budget(q, budget_token);
+ }
+ 
+-static inline bool blk_mq_get_dispatch_budget(struct request_queue *q)
++static inline int blk_mq_get_dispatch_budget(struct request_queue *q)
+ {
+ 	if (q->mq_ops->get_budget)
+ 		return q->mq_ops->get_budget(q);
+-	return true;
++	return 0;
 +}
 +
- #define MODULE_ALIAS_SCSI_DEVICE(type) \
- 	MODULE_ALIAS("scsi:t-" __stringify(type) "*")
- #define SCSI_DEVICE_MODALIAS_FMT "scsi:t-0x%02x"
++static inline void blk_mq_set_rq_budget_token(struct request *rq, int token)
++{
++	if (token < 0)
++		return;
++
++	if (rq->q->mq_ops->set_rq_budget_token)
++		rq->q->mq_ops->set_rq_budget_token(rq, token);
++}
++
++static inline int blk_mq_get_rq_budget_token(struct request *rq)
++{
++	if (rq->q->mq_ops->get_rq_budget_token)
++		return rq->q->mq_ops->get_rq_budget_token(rq);
++	return -1;
+ }
+ 
+ static inline void __blk_mq_inc_active_requests(struct blk_mq_hw_ctx *hctx)
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index eeaae47fee8a..08a9534a9bb4 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -329,6 +329,7 @@ void scsi_device_unbusy(struct scsi_device *sdev, struct scsi_cmnd *cmd)
+ 		atomic_dec(&starget->target_busy);
+ 
+ 	atomic_dec(&sdev->device_busy);
++	cmd->budget_token = -1;
+ }
+ 
+ static void scsi_kick_queue(struct request_queue *q)
+@@ -1142,6 +1143,7 @@ void scsi_init_command(struct scsi_device *dev, struct scsi_cmnd *cmd)
+ 	unsigned long jiffies_at_alloc;
+ 	int retries, to_clear;
+ 	bool in_flight;
++	int budget_token = cmd->budget_token;
+ 
+ 	if (!blk_rq_is_scsi(rq) && !(flags & SCMD_INITIALIZED)) {
+ 		flags |= SCMD_INITIALIZED;
+@@ -1170,6 +1172,7 @@ void scsi_init_command(struct scsi_device *dev, struct scsi_cmnd *cmd)
+ 	cmd->retries = retries;
+ 	if (in_flight)
+ 		__set_bit(SCMD_STATE_INFLIGHT, &cmd->state);
++	cmd->budget_token = budget_token;
+ 
+ }
+ 
+@@ -1604,19 +1607,19 @@ static void scsi_mq_done(struct scsi_cmnd *cmd)
+ 	blk_mq_complete_request(cmd->request);
+ }
+ 
+-static void scsi_mq_put_budget(struct request_queue *q)
++static void scsi_mq_put_budget(struct request_queue *q, int budget_token)
+ {
+ 	struct scsi_device *sdev = q->queuedata;
+ 
+ 	atomic_dec(&sdev->device_busy);
+ }
+ 
+-static bool scsi_mq_get_budget(struct request_queue *q)
++static int scsi_mq_get_budget(struct request_queue *q)
+ {
+ 	struct scsi_device *sdev = q->queuedata;
+ 
+ 	if (scsi_dev_queue_ready(q, sdev))
+-		return true;
++		return 0;
+ 
+ 	atomic_inc(&sdev->restarts);
+ 
+@@ -1638,7 +1641,7 @@ static bool scsi_mq_get_budget(struct request_queue *q)
+ 	if (unlikely(atomic_read(&sdev->device_busy) == 0 &&
+ 				!scsi_device_blocked(sdev)))
+ 		blk_mq_delay_run_hw_queues(sdev->request_queue, SCSI_QUEUE_DELAY);
+-	return false;
++	return -1;
+ }
+ 
+ static void scsi_mq_set_rq_budget_token(struct request *req, int token)
+@@ -1666,6 +1669,8 @@ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	blk_status_t ret;
+ 	int reason;
+ 
++	WARN_ON_ONCE(cmd->budget_token < 0);
++
+ 	/*
+ 	 * If the device is not in running state we will reject some or all
+ 	 * commands.
+@@ -1717,7 +1722,8 @@ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	if (scsi_target(sdev)->can_queue > 0)
+ 		atomic_dec(&scsi_target(sdev)->target_busy);
+ out_put_budget:
+-	scsi_mq_put_budget(q);
++	scsi_mq_put_budget(q, cmd->budget_token);
++	cmd->budget_token = -1;
+ 	switch (ret) {
+ 	case BLK_STS_OK:
+ 		break;
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 1f84d47b72f6..3646f3b8d9df 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -310,12 +310,12 @@ struct blk_mq_ops {
+ 	 * reserved budget. Also we have to handle failure case
+ 	 * of .get_budget for avoiding I/O deadlock.
+ 	 */
+-	bool (*get_budget)(struct request_queue *);
++	int (*get_budget)(struct request_queue *);
+ 
+ 	/**
+ 	 * @put_budget: Release the reserved budget.
+ 	 */
+-	void (*put_budget)(struct request_queue *);
++	void (*put_budget)(struct request_queue *, int);
+ 
+ 	/*
+ 	 * @set_rq_budget_toekn: store rq's budget token
 -- 
 2.28.0
 
