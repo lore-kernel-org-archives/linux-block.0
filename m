@@ -2,67 +2,86 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40443C433E0
-	for <linux-block@archiver.kernel.org>; Fri, 22 Jan 2021 22:36:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E863CC433E0
+	for <linux-block@archiver.kernel.org>; Fri, 22 Jan 2021 23:08:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EC8B120684
-	for <linux-block@archiver.kernel.org>; Fri, 22 Jan 2021 22:36:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A778B23B52
+	for <linux-block@archiver.kernel.org>; Fri, 22 Jan 2021 23:08:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729190AbhAVWgl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Jan 2021 17:36:41 -0500
-Received: from mail.kernel.org ([198.145.29.99]:38462 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728420AbhAVWgR (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Jan 2021 17:36:17 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPS id F3F8623AA1;
-        Fri, 22 Jan 2021 22:35:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1611354937;
-        bh=nKsot06SVVGVyPb8Gtw+UyWwGDBBNWWxZ3aL2F4Jp4Y=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=FXTGL8P8mQxrdeIJbn0cybDT1BYrjwLoOjxvuWI3QSDHGDBRgSM0wDRUjtn6Pl0tF
-         qMVCxwp1wd5pNiLGL/I2RUPFu5Ta69Jve48OARI96horzLC9hWQC8emOC6GXhKv6Bz
-         ofdBJEZT/VCg8GDvsS+R0FXc5yvLaOdSQ8p3T4mupZ/wCwmy3GKARS//B07POq3auu
-         Uxrf0qKXt7+x8SVv0aCe9kZlXphye90k849brFQIoLMp2auDnG8UffCnJrcLmSG2ap
-         ACMZljabb8rs1qAx7NbpWuG/uLZsk5eVEBomPbdi0cnDlmQ+LQ50ZwL3ySYth4S5Pl
-         MMR8dwKhFsFnA==
-Subject: Re: [git pull] device mapper fixes for 5.11-rc5
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <20210122222445.GA14822@redhat.com>
-References: <20210122222445.GA14822@redhat.com>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20210122222445.GA14822@redhat.com>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-5.11/dm-fixes-2
-X-PR-Tracked-Commit-Id: 809b1e4945774c9ec5619a8f4e2189b7b3833c0c
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: fe75a21824e78405b8d812421974524092250c63
-Message-Id: <161135493682.18620.13368578806910993868.pr-tracker-bot@kernel.org>
-Date:   Fri, 22 Jan 2021 22:35:36 +0000
-To:     Mike Snitzer <snitzer@redhat.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        dm-devel@redhat.com, linux-block@vger.kernel.org,
-        Alasdair G Kergon <agk@redhat.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Ignat Korchagin <ignat@cloudflare.com>,
-        Mikulas Patocka <mpatocka@redhat.com>
+        id S1728199AbhAVXIn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Jan 2021 18:08:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34328 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730787AbhAVTju (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 22 Jan 2021 14:39:50 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C039DC061786;
+        Fri, 22 Jan 2021 11:39:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=fJjrLTchpZuvDRdgUaJrEMQ1tsdbXe3AFrBHowtkRTE=; b=IqrLDNur1JkaUgBRhjlM73OSmu
+        b6lCABj2VbpFJ32JmgrlgxU2CyUXiR6VLkTwP4UIxHqo3BYloo1ehCVFe/hfI0x3EXeRaoeahtGLQ
+        INgelaOuYKfJf1jePi8BKJNBtE7TvnfpZVkuS+ey7Tf4YejyqNcE1uNaAkIKreKDpgKoLo+UC1ppO
+        KMFM0MjV55nhjXlBXaiNm9HYEOytCROcdHY7DtAe+VIG2ynUaRyW0QT/TsXZTTscxNoB/0dcVVZ40
+        H//J7uN4RblWtwH2XhJcnYhUd4IAMjerKJUUUgSqsuj5pMP76Sf7eSLOglzBMIAUxGC2ZK+wyvRz/
+        TQ9nZmpg==;
+Received: from hch by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
+        id 1l32GG-0018wl-ED; Fri, 22 Jan 2021 19:38:26 +0000
+Date:   Fri, 22 Jan 2021 19:38:24 +0000
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Lauri Kasanen <cand@gmx.com>
+Cc:     linux-mips@vger.kernel.org, tsbogend@alpha.franken.de,
+        axboe@kernel.dk, linux-block@vger.kernel.org,
+        Keith Busch <kbusch@kernel.org>,
+        Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH v10] block: Add n64 cart driver
+Message-ID: <20210122193824.GA271343@infradead.org>
+References: <20210122213346.774020bb9393ebded17e7412@gmx.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210122213346.774020bb9393ebded17e7412@gmx.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Fri, 22 Jan 2021 17:24:45 -0500:
+> +static int n64cart_do_bvec(struct device *dev, struct bio_vec *bv,
+> +			   unsigned int len, unsigned int off,
+> +			   u32 pos)
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-5.11/dm-fixes-2
+I think this should either return bool or a blk_status_t instead
+of the int with 1/0 values.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/fe75a21824e78405b8d812421974524092250c63
+> +	if (bio_end_sector(bio) > get_capacity(bio->bi_disk))
+> +		goto io_error;
 
-Thank you!
+This check is already performed by the block layer.  I have a series
+pending that removes it from the few drivers that duplicate it.
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+> +
+> +	bio_for_each_segment(bvec, bio, iter) {
+> +		unsigned int len = bvec.bv_len;
+> +		int err;
+> +
+> +		/* Alignment check */
+> +		WARN_ON_ONCE((bvec.bv_offset & (MIN_ALIGNMENT - 1)) ||
+> +				(len & (MIN_ALIGNMENT - 1)));
+> +
+> +		err = n64cart_do_bvec(dev, &bvec, len,
+> +				      bvec.bv_offset, pos);
+> +		if (err)
+> +			goto io_error;
+> +		pos += len;
+
+Nit: I'd just pass the bvec to n64cart_do_bvec, calculate pos there
+locally each time, and also move the WARN_ON_ONCE into the helper.
+
+No real need for the len local variable either.
