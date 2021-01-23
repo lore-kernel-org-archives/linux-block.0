@@ -2,58 +2,98 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80FCDC433E6
-	for <linux-block@archiver.kernel.org>; Sat, 23 Jan 2021 12:43:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E15CDC433E0
+	for <linux-block@archiver.kernel.org>; Sat, 23 Jan 2021 20:11:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 50E9122CB2
-	for <linux-block@archiver.kernel.org>; Sat, 23 Jan 2021 12:43:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A3E9E22CF6
+	for <linux-block@archiver.kernel.org>; Sat, 23 Jan 2021 20:11:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726016AbhAWMnJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 23 Jan 2021 07:43:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56364 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726013AbhAWMnI (ORCPT
+        id S1726480AbhAWULU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 23 Jan 2021 15:11:20 -0500
+Received: from Galois.linutronix.de ([193.142.43.55]:33390 "EHLO
+        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726363AbhAWULS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 23 Jan 2021 07:43:08 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD410C06174A;
-        Sat, 23 Jan 2021 04:42:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=l2WBiCb5duYJRA9nKpihqrJOH1Qjg6utSrFiu8qAdtc=; b=PIQ+56ytgL8BITTLkCIzNrn7rp
-        rkwLLz37WYnmE4hAW5jNkxI6hgNTsT34NP4KuhYwCiS0hiAdi+caWZ7ydU5hCNTnwxJ6BpP4uLFR5
-        ozKvqtzHTEfgLkdIi3q4j0SePMiambd2pNojHGvQjqgaEg4BgGFvvRn/6hrVUA1QUFoFrSnXCqG/R
-        pDyYGvjgJ476RTozrXcVf0daXPRY2JBi5lYvf/2dPzWpZmjAju198qkwrx7ASc9IbPrqzpVRNsZPF
-        ZlFX5Nr/QqcLbfEd/uuO4uni5F7KHLIJ/dhj/fsWLGVQeGZNxneJmnmM9vnxP7TSuVVYHByePJJKR
-        sylR9eAQ==;
-Received: from hch by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1l3IF0-001vNH-RQ; Sat, 23 Jan 2021 12:42:12 +0000
-Date:   Sat, 23 Jan 2021 12:42:10 +0000
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Lauri Kasanen <cand@gmx.com>
-Cc:     linux-mips@vger.kernel.org, tsbogend@alpha.franken.de,
-        axboe@kernel.dk, linux-block@vger.kernel.org,
-        Keith Busch <kbusch@kernel.org>,
-        Christoph Hellwig <hch@infradead.org>
-Subject: Re: [PATCH v11] block: Add n64 cart driver
-Message-ID: <20210123124210.GB458363@infradead.org>
-References: <20210123095327.58e5ab6c05f38e9080a79bd3@gmx.com>
+        Sat, 23 Jan 2021 15:11:18 -0500
+From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1611432636;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=FXtKHqimthZytcdJDbVm1RJiJEFrCp7q87+tAWESN50=;
+        b=Xpr0UAX3SBHng2S2PsZcHE9cil5C2zfy62SMwHQ9oana5hWH2FqnXJFUjplVYbrPnc5c9V
+        alABo9w6jnrrt+P3AWNKa5EUbb8GgzHTGZMd0gpalXhQhQlRWoB/E/pgTs4ok7T0aimbrV
+        AUwJrDBw0V11RrTn4DXgGAolTAB4TKLYsDwawcrTKAjWHfzpqYA8FY7ULRH96pXTym5Gh4
+        CE2Fp6s0EK8dYMkCl7gzYwHpNaJDTBDms3rmhJJFpGfVjKzvbsjigGFlQeaX/7hFD3ys8Q
+        Ocj00S7+6RK3ierIm8ChUAtTRB3QrvaekQU6Izlz3l0ztPLRZST68YwVsTbVOg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1611432636;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=FXtKHqimthZytcdJDbVm1RJiJEFrCp7q87+tAWESN50=;
+        b=ouIsL2O14nSxYq0yflXVMdGLkZdVAg5NqvPVmOBSlT66bALlbVhPk8ezeM98DO7ePm+t3q
+        oBljjHyZQ/S5G0DQ==
+To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Jens Axboe <axboe@kernel.dk>, Thomas Gleixner <tglx@linutronix.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@kernel.org>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Subject: [PATCH 2/3] blk-mq: Always complete remote completions requests in softirq
+Date:   Sat, 23 Jan 2021 21:10:26 +0100
+Message-Id: <20210123201027.3262800-3-bigeasy@linutronix.de>
+In-Reply-To: <20210123201027.3262800-1-bigeasy@linutronix.de>
+References: <20210123201027.3262800-1-bigeasy@linutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210123095327.58e5ab6c05f38e9080a79bd3@gmx.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Looks good,
+Controllers with multiple queues have their IRQ-handelers pinned to a
+CPU. The core shouldn't need to complete the request on a remote CPU.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Remove this case and always raise the softirq to complete the request.
+
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
+ block/blk-mq.c | 14 +-------------
+ 1 file changed, 1 insertion(+), 13 deletions(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index f285a9123a8b0..90348ae518461 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -628,19 +628,7 @@ static void __blk_mq_complete_request_remote(void *dat=
+a)
+ {
+ 	struct request *rq =3D data;
+=20
+-	/*
+-	 * For most of single queue controllers, there is only one irq vector
+-	 * for handling I/O completion, and the only irq's affinity is set
+-	 * to all possible CPUs.  On most of ARCHs, this affinity means the irq
+-	 * is handled on one specific CPU.
+-	 *
+-	 * So complete I/O requests in softirq context in case of single queue
+-	 * devices to avoid degrading I/O performance due to irqsoff latency.
+-	 */
+-	if (rq->q->nr_hw_queues =3D=3D 1)
+-		blk_mq_trigger_softirq(rq);
+-	else
+-		rq->q->mq_ops->complete(rq);
++	blk_mq_trigger_softirq(rq);
+ }
+=20
+ static inline bool blk_mq_complete_need_ipi(struct request *rq)
+--=20
+2.30.0
+
