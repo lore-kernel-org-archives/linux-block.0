@@ -2,59 +2,69 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-20.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41A1FC433E0
-	for <linux-block@archiver.kernel.org>; Sun, 24 Jan 2021 16:39:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED051C433E0
+	for <linux-block@archiver.kernel.org>; Sun, 24 Jan 2021 18:51:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F1C0B22AAA
-	for <linux-block@archiver.kernel.org>; Sun, 24 Jan 2021 16:39:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A6DF522583
+	for <linux-block@archiver.kernel.org>; Sun, 24 Jan 2021 18:51:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726173AbhAXQjv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 24 Jan 2021 11:39:51 -0500
-Received: from mail-pg1-f171.google.com ([209.85.215.171]:37601 "EHLO
-        mail-pg1-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725798AbhAXQju (ORCPT
+        id S1726149AbhAXSvD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 24 Jan 2021 13:51:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46776 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726007AbhAXSvC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 24 Jan 2021 11:39:50 -0500
-Received: by mail-pg1-f171.google.com with SMTP id z21so7311816pgj.4
-        for <linux-block@vger.kernel.org>; Sun, 24 Jan 2021 08:39:35 -0800 (PST)
+        Sun, 24 Jan 2021 13:51:02 -0500
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1F5CC061573
+        for <linux-block@vger.kernel.org>; Sun, 24 Jan 2021 10:50:22 -0800 (PST)
+Received: by mail-pj1-x102f.google.com with SMTP id my11so8203023pjb.1
+        for <linux-block@vger.kernel.org>; Sun, 24 Jan 2021 10:50:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=to:cc:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=wuUuJw3YQG9c7bOcLvNV2/Uggb4QG21vcoNm7Qy76l0=;
+        b=AjOXCtHqBhJY3gtCI7fyMU2T6LdKIzmFXWOGzkqcTp8HeQKU9h8d0g17Vj0YhZHVfK
+         zyno8feeVLBkh93FGStbxdeUvjcXYHFd5pmcdiYDx0vPzAuqtwyY+ro3/HDwrNiVP/Wu
+         GrMAz1lFfZTGUCbVkPW0pVeG7nObYPNoBWlgzLg8DGDh+w59nzIkS3tUYB1+JPPXHVtx
+         Md5DU1sM7I7TOH0HNfNggmoaaoEqKhErVVZ/2j717cI8ZuvJTQp6pIGPaPClgz0zhwae
+         uHcJ9PfdEET2vs2v7XDX5LYre1wn5qc3OpBtu7Mk2alHwdbTHeAWAI3DYHNBtyPBc3/j
+         FDvw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=pt65GlXwf76DZ1LYRGzxRJe9I+7Kcrgh557dbUouhEs=;
-        b=dlDsMc4QxETTYpOqooFRxDwNcWKpUQME8i7t7pMb5bdMumjuy1n43356cATaNByBi/
-         96/b3yM2NAohHtCFqPrAc8eyb1IYiFvTHS7LwunGQ7kd/maLQ3J4QdS17VhyzO8F34BE
-         6W+yMMstTrGvUxMm5oLcpPmV7zWvK+4VRNmwMR+L/QBvnq2kCvydofQSv28DjFrrC+Nq
-         0ah4tCBEuwhvf0Tre9+bR2DOWZ+gUPsl8qgW7+5/nYyDngGZSJMA2N1jBYdjoXLJI5/i
-         jOfL+117UhGUsEVycYo1HLroOhROfKykk89PaRDvb0s2qXa4paRJPP6CC0PLDPbrWYOK
-         OE/w==
-X-Gm-Message-State: AOAM531xBhPmOJjnA/73SZmSYrlmqmRDe+leg7e9pHjT+6ucIgw+PKiV
-        Y1yzSFUlQaBhuWcACrU/tNHtQlT6zWw=
-X-Google-Smtp-Source: ABdhPJyVMU0pcAX2DOoblhS3/zILaTbOVk+U9seAp8XkPYNV0BTLHYxJo8uIoER9a4zPJhF1ecHz0A==
-X-Received: by 2002:a63:ec4f:: with SMTP id r15mr14309638pgj.344.1611506349732;
-        Sun, 24 Jan 2021 08:39:09 -0800 (PST)
-Received: from ?IPv6:2601:647:4000:d7:c1e4:1a69:ee7d:c77b? ([2601:647:4000:d7:c1e4:1a69:ee7d:c77b])
-        by smtp.gmail.com with ESMTPSA id ga4sm15615220pjb.53.2021.01.24.08.39.07
+        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=wuUuJw3YQG9c7bOcLvNV2/Uggb4QG21vcoNm7Qy76l0=;
+        b=BIOIFufEM7q0wk0UFb7GFIc+HIP4MFJjeYp1iY2CDzNITcPnWAuDQkR8meuvb31kLk
+         4vlbVGPBAzSGG3YP0xgHyxDQsdSxtqgnNaMBHkp8EHtWiuXECLofLL/uNXmf4QIeBGeU
+         VOgIsBzr234Azq82J+x5nrrQQFB+19Ybg3jBS+t3CnUf3ClzMEHIxpEuYKBte5m6lqf+
+         KWEbGDjHfPl85v4Kw2w7qRy4MjP55i0HPf4SlJf4fIAE0cxc/zfjxA3i7NWUz673tIZ9
+         U5hcuKUihZZTiSPHtZyJ1jTa3QH8e3a0De77RLNNIYjcmJ6uf/3wtKfmhOiQThfa69M7
+         CzCw==
+X-Gm-Message-State: AOAM531GWRyyO28TlZ1Vl3IXXYcwBnr4Xw4T8rMF0VGODV85/5DkucT7
+        tTXYdh+MMtgznlCBIlvRnYByEVPz6kCXAA==
+X-Google-Smtp-Source: ABdhPJwSKD0kcWgJnv2QvQD79ySHd/6//L3gr9bJcuF6OK7oGnvvBgEQRO6GNuMjhyCJhj3iI5nfWg==
+X-Received: by 2002:a17:902:aa43:b029:dc:26a7:7391 with SMTP id c3-20020a170902aa43b02900dc26a77391mr15975572plr.51.1611514221810;
+        Sun, 24 Jan 2021 10:50:21 -0800 (PST)
+Received: from [192.168.4.41] (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
+        by smtp.gmail.com with ESMTPSA id s1sm4081624pjg.17.2021.01.24.10.50.20
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 24 Jan 2021 08:39:08 -0800 (PST)
-Subject: Re: [PATCH blktests] nvmeof-mp/rc: fix nvmeof-mp failure when
- NVME_TARGET_PASSTHRU enabled
-To:     Yi Zhang <yi.zhang@redhat.com>, osandov@fb.com
-Cc:     linux-block@vger.kernel.org
-References: <20210124052644.6925-1-yi.zhang@redhat.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <99bde154-0388-26cd-19ed-354053f3f52a@acm.org>
-Date:   Sun, 24 Jan 2021 08:39:06 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.1
+        Sun, 24 Jan 2021 10:50:21 -0800 (PST)
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 5.11-rc5
+Message-ID: <c97bdf40-6552-ab35-3071-a5b96855c80a@kernel.dk>
+Date:   Sun, 24 Jan 2021 11:50:17 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210124052644.6925-1-yi.zhang@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -62,35 +72,76 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/23/21 9:26 PM, Yi Zhang wrote:
-> $ ./check nvmeof-mp/001
-> nvmeof-mp/001 (Log in and log out)                           [passed]
->     runtime  0.400s  ...  0.457s
-> rmdir: failed to remove 'subsystems/nvme-test/passthru/admin_timeout': Not a directory
-> rmdir: failed to remove 'subsystems/nvme-test/passthru/device_path': Not a directory
-> rmdir: failed to remove 'subsystems/nvme-test/passthru/enable': Not a directory
-> rmdir: failed to remove 'subsystems/nvme-test/passthru/io_timeout': Not a directory
-> 
-> Signed-off-by: Yi Zhang <yi.zhang@redhat.com>
-> ---
->  tests/nvmeof-mp/rc | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tests/nvmeof-mp/rc b/tests/nvmeof-mp/rc
-> index c77526f..ab7770f 100755
-> --- a/tests/nvmeof-mp/rc
-> +++ b/tests/nvmeof-mp/rc
-> @@ -265,8 +265,8 @@ stop_nvme_target() {
->  			rm -f -- ports/*/subsystems/* &&
->  			for d in {*/*/*/*,*/*}; do
->  				[ -e "$d" ] &&
-> -					[ "$(basename "$(dirname "$d")")" != ana_groups ] &&
-> -					rmdir "$d"
-> +				[[ ! "$(basename "$(dirname "$d")")" =~ ana_groups|passthru ]] &&
-> +				rmdir "$d"
->  			done
->  	)
->  	unload_module nvmet_rdma &&
-> 
+Hi Linus,
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+- NVMe pull request from Christoph:
+	- fix a status code in nvmet (Chaitanya Kulkarni)
+	- avoid double completions in nvme-rdma/nvme-tcp (Chao Leng)
+	- fix the CMB support to cope with NVMe 1.4 controllers (Klaus Jensen)
+	- fix PRINFO handling in the passthrough ioctl (Revanth Rajashekar)
+	- fix a double DMA unmap in nvme-pci
+
+- lightnvm error path leak fix (Pan)
+
+- MD pull request from Song:
+	- Flush request fix (Xiao)
+
+Please pull!
+
+
+The following changes since commit b4f664252f51e119e9403ef84b6e9ff36d119510:
+
+  Merge tag 'nvme-5.11-2021-01-14' of git://git.infradead.org/nvme into block-5.11 (2021-01-14 15:17:33 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux-block.git tags/block-5.11-2021-01-24
+
+for you to fetch changes up to 97784481757fba7570121a70dd37ca74a29f50a8:
+
+  lightnvm: fix memory leak when submit fails (2021-01-21 05:45:51 -0700)
+
+----------------------------------------------------------------
+block-5.11-2021-01-24
+
+----------------------------------------------------------------
+Chaitanya Kulkarni (1):
+      nvmet: set right status on error in id-ns handler
+
+Chao Leng (2):
+      nvme-rdma: avoid request double completion for concurrent nvme_rdma_timeout
+      nvme-tcp: avoid request double completion for concurrent nvme_tcp_timeout
+
+Christoph Hellwig (2):
+      nvme-pci: refactor nvme_unmap_data
+      nvme-pci: fix error unwind in nvme_map_data
+
+Jens Axboe (2):
+      Merge branch 'md-fixes' of https://git.kernel.org/.../song/md into block-5.11
+      Merge tag 'nvme-5.11-2020-01-21' of git://git.infradead.org/nvme into block-5.11
+
+Klaus Jensen (1):
+      nvme-pci: allow use of cmb on v1.4 controllers
+
+Pan Bian (1):
+      lightnvm: fix memory leak when submit fails
+
+Revanth Rajashekar (1):
+      nvme: check the PRINFO bit before deciding the host buffer length
+
+Xiao Ni (1):
+      md: Set prev_flush_start and flush_bio in an atomic way
+
+ drivers/lightnvm/core.c         |   3 +-
+ drivers/md/md.c                 |   2 +
+ drivers/nvme/host/core.c        |  17 +++++-
+ drivers/nvme/host/pci.c         | 119 +++++++++++++++++++++++++++-------------
+ drivers/nvme/host/rdma.c        |  15 +++--
+ drivers/nvme/host/tcp.c         |  14 +++--
+ drivers/nvme/target/admin-cmd.c |   8 ++-
+ include/linux/nvme.h            |   6 ++
+ 8 files changed, 132 insertions(+), 52 deletions(-)
+
+-- 
+Jens Axboe
+
