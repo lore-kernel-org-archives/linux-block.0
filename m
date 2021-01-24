@@ -2,86 +2,139 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D527DC433DB
-	for <linux-block@archiver.kernel.org>; Sun, 24 Jan 2021 05:28:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38DABC43381
+	for <linux-block@archiver.kernel.org>; Sun, 24 Jan 2021 10:06:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 963AC22C9C
-	for <linux-block@archiver.kernel.org>; Sun, 24 Jan 2021 05:28:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F0C15225A9
+	for <linux-block@archiver.kernel.org>; Sun, 24 Jan 2021 10:06:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725837AbhAXF2Z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 24 Jan 2021 00:28:25 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55238 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725803AbhAXF2Y (ORCPT
+        id S1726721AbhAXKGE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 24 Jan 2021 05:06:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47570 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726482AbhAXKF4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 24 Jan 2021 00:28:24 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611466018;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=085Fy3vC7BUZwVACF5KtJQeFe+7dRXAkuEeU9MPcjsE=;
-        b=RmHEOmbnv2mHIsZcENq0N6mqN45BzhcVZiAaYsNaGgq0xGG1AcV1wzBT3WqoVIwfscEDD7
-        nIrqntZhecSYzop0+HgHUTnDNVs0Av9BoQuis4VD566JeLm1xZUNl6fsEpSvaW8k2N+Hkt
-        87PmHv0979pV1F4PNBead1eOOIlZyAg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-503-WIE96KpVOb6OCI2orvuy3g-1; Sun, 24 Jan 2021 00:26:53 -0500
-X-MC-Unique: WIE96KpVOb6OCI2orvuy3g-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9FA37180A094;
-        Sun, 24 Jan 2021 05:26:52 +0000 (UTC)
-Received: from dhcp-12-105.nay.redhat.com (unknown [10.66.61.33])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5F2D35B4BC;
-        Sun, 24 Jan 2021 05:26:51 +0000 (UTC)
-From:   Yi Zhang <yi.zhang@redhat.com>
-To:     osandov@fb.com, bvanassche@acm.org
-Cc:     linux-block@vger.kernel.org
-Subject: [PATCH blktests] nvmeof-mp/rc: fix nvmeof-mp failure when NVME_TARGET_PASSTHRU enabled
-Date:   Sun, 24 Jan 2021 13:26:44 +0800
-Message-Id: <20210124052644.6925-1-yi.zhang@redhat.com>
+        Sun, 24 Jan 2021 05:05:56 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C035C061573;
+        Sun, 24 Jan 2021 02:05:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=TvDyKhz7ulAHBtG2FFhYq5BP/15LHCtoLOOoolMNz4I=; b=HUFYKHB/XNVoXfOKSNWlp2Lk3P
+        6hG277ofN9oRneNTdG82/P4N5jHzEIWZw7Y2yNc4U0YFmhPtxEOVss/hE6ZMuhO6iEOl1uoBQUvyC
+        SfKUg/qgyzHD96TJxq1ozjRxYqeA6RHXmgARaWeOEUpIpYiqnOTer+DfUk5FwNEhqdakStkWj0Yj2
+        nucorlBDow281qe8G+B36Gd7ZYjURUT4eCjnucXc0AJKnnnNYnmcyMT+IBldK1pkOZcZ4tAdg7Odz
+        opTS3zlVtyn7N8CI3iMBx6Uhyx0o7LevaBBcA79j6jcvyA54K8Wpihxc2vBvRZ94HqKW7Zqw/R5X1
+        kx9BpSKg==;
+Received: from 089144206130.atnat0015.highway.bob.at ([89.144.206.130] helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
+        id 1l3cGJ-002q3S-S7; Sun, 24 Jan 2021 10:04:55 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Tejun Heo <tj@kernel.org>, Coly Li <colyli@suse.de>,
+        Song Liu <song@kernel.org>, dm-devel@redhat.com,
+        linux-bcache@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-block@vger.kernel.org
+Subject: store a pointer to the block_device in struct bio (again) v2
+Date:   Sun, 24 Jan 2021 11:02:31 +0100
+Message-Id: <20210124100241.1167849-1-hch@lst.de>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-$ ./check nvmeof-mp/001
-nvmeof-mp/001 (Log in and log out)                           [passed]
-    runtime  0.400s  ...  0.457s
-rmdir: failed to remove 'subsystems/nvme-test/passthru/admin_timeout': Not a directory
-rmdir: failed to remove 'subsystems/nvme-test/passthru/device_path': Not a directory
-rmdir: failed to remove 'subsystems/nvme-test/passthru/enable': Not a directory
-rmdir: failed to remove 'subsystems/nvme-test/passthru/io_timeout': Not a directory
+Hi Jens,
 
-Signed-off-by: Yi Zhang <yi.zhang@redhat.com>
----
- tests/nvmeof-mp/rc | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+this series switches back from storing the gendisk + partno to storing
+a block_device pointer in struct bio.  The reason is two fold:  for one
+the new struct block_device actually is always available, removing the
+need to avoid originally.  Second the merge struct block_device is much
+more useful than the old one, as storing it avoids the need for looking
+up what used to be hd_struct during partition remapping and I/O
+accounting.
 
-diff --git a/tests/nvmeof-mp/rc b/tests/nvmeof-mp/rc
-index c77526f..ab7770f 100755
---- a/tests/nvmeof-mp/rc
-+++ b/tests/nvmeof-mp/rc
-@@ -265,8 +265,8 @@ stop_nvme_target() {
- 			rm -f -- ports/*/subsystems/* &&
- 			for d in {*/*/*/*,*/*}; do
- 				[ -e "$d" ] &&
--					[ "$(basename "$(dirname "$d")")" != ana_groups ] &&
--					rmdir "$d"
-+				[[ ! "$(basename "$(dirname "$d")")" =~ ana_groups|passthru ]] &&
-+				rmdir "$d"
- 			done
- 	)
- 	unload_module nvmet_rdma &&
--- 
-2.21.0
+Note that this series depends on the posted but not merged
+"split hard read-only vs read-only policy" series.
 
+A git tree is also available:
+
+    git://git.infradead.org/users/hch/block.git bi_bdev
+
+Gitweb:
+
+    http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/bi_bdev
+
+Changes since v1:
+ - protect against double remapping I/O to partitions
+
+Diffstat:
+ arch/m68k/emu/nfblock.c             |    2 
+ arch/xtensa/platforms/iss/simdisk.c |    2 
+ block/bio-integrity.c               |   18 +-
+ block/bio.c                         |   31 +---
+ block/blk-cgroup.c                  |    7 
+ block/blk-core.c                    |  100 ++++++-------
+ block/blk-crypto-fallback.c         |    2 
+ block/blk-crypto.c                  |    2 
+ block/blk-merge.c                   |   17 +-
+ block/blk-mq.c                      |    2 
+ block/blk-settings.c                |    2 
+ block/blk-throttle.c                |    2 
+ block/blk.h                         |    5 
+ block/bounce.c                      |    2 
+ block/genhd.c                       |  271 ++++--------------------------------
+ block/partitions/core.c             |   31 ----
+ drivers/block/brd.c                 |    8 -
+ drivers/block/drbd/drbd_int.h       |    4 
+ drivers/block/drbd/drbd_req.c       |    2 
+ drivers/block/null_blk/main.c       |    2 
+ drivers/block/pktcdvd.c             |    4 
+ drivers/block/ps3vram.c             |    2 
+ drivers/block/rsxx/dev.c            |    2 
+ drivers/block/umem.c                |    2 
+ drivers/block/zram/zram_drv.c       |    2 
+ drivers/lightnvm/pblk-init.c        |    2 
+ drivers/md/bcache/debug.c           |    2 
+ drivers/md/bcache/request.c         |   39 +++--
+ drivers/md/dm-bio-record.h          |    9 -
+ drivers/md/dm-raid1.c               |   10 -
+ drivers/md/dm.c                     |   14 -
+ drivers/md/md-linear.c              |    2 
+ drivers/md/md.c                     |   10 -
+ drivers/md/md.h                     |    6 
+ drivers/md/raid1.c                  |    6 
+ drivers/md/raid10.c                 |   12 -
+ drivers/md/raid5.c                  |    2 
+ drivers/nvdimm/blk.c                |    4 
+ drivers/nvdimm/btt.c                |    4 
+ drivers/nvdimm/pmem.c               |    4 
+ drivers/nvme/host/core.c            |    6 
+ drivers/nvme/host/lightnvm.c        |    3 
+ drivers/nvme/host/multipath.c       |    6 
+ drivers/nvme/host/rdma.c            |    2 
+ drivers/s390/block/dasd.c           |   26 ---
+ drivers/s390/block/dcssblk.c        |    6 
+ drivers/s390/block/xpram.c          |    2 
+ fs/btrfs/check-integrity.c          |   10 -
+ fs/btrfs/raid56.c                   |    7 
+ fs/btrfs/scrub.c                    |    2 
+ fs/direct-io.c                      |    2 
+ fs/f2fs/data.c                      |   12 -
+ include/linux/bio.h                 |   20 +-
+ include/linux/blk-mq.h              |    4 
+ include/linux/blk_types.h           |    4 
+ include/linux/blkdev.h              |   20 --
+ include/linux/genhd.h               |   21 --
+ kernel/trace/blktrace.c             |   16 +-
+ mm/page_io.c                        |    2 
+ 59 files changed, 260 insertions(+), 561 deletions(-)
