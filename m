@@ -2,103 +2,86 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F5DBC433DB
-	for <linux-block@archiver.kernel.org>; Sat, 23 Jan 2021 20:12:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D527DC433DB
+	for <linux-block@archiver.kernel.org>; Sun, 24 Jan 2021 05:28:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 67D6922EBE
-	for <linux-block@archiver.kernel.org>; Sat, 23 Jan 2021 20:12:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 963AC22C9C
+	for <linux-block@archiver.kernel.org>; Sun, 24 Jan 2021 05:28:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726495AbhAWULW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 23 Jan 2021 15:11:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39182 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726249AbhAWULT (ORCPT
+        id S1725837AbhAXF2Z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 24 Jan 2021 00:28:25 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55238 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725803AbhAXF2Y (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 23 Jan 2021 15:11:19 -0500
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 187C5C06174A;
-        Sat, 23 Jan 2021 12:10:39 -0800 (PST)
-From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1611432635;
+        Sun, 24 Jan 2021 00:28:24 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1611466018;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=RvialIUza76ZQsVU543wsyBevXPATQcHABCWvzhOsa0=;
-        b=WvSBCSb7AKFnNe0oNkxslbemJCZo+5Wn3G8cPxu2WQHbSkRcsMxQ7zXSEi+mrqAjE3e5bP
-        sirdN98jEqRvdfI97P28vkHMaiwZzr1+ha3bVFW+7oRtJOwKfS5oDElKJf0u0+HfuRHb38
-        ULM9Vc84IakrEMl0pwxTXqnFzUCALQl+Nxw4uCJc/jaYtgKg9M5SaxSevVzsVm1cWZ4cWq
-        QKFbmRG9TRcxVHKCNxHyZuRS2fnLPuo4IMJENO1Ee3FDZpzBMxeMytVRql7ox+g1q11bld
-        eTehjLw9gVnl0QAYMmbOpCj/xS1Z7vmjIVJGzLX4M55mO6/Yr8Nrnw4cRhTXng==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1611432635;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=RvialIUza76ZQsVU543wsyBevXPATQcHABCWvzhOsa0=;
-        b=n5lkVAuRVZqteTCZ7UWJtYsIMymG6Zjw0vi4qtRMTPqoCQw4OFzkFApI6HCVCWb74H2qAx
-        cGgbT30Jxat9iyAg==
-To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Jens Axboe <axboe@kernel.dk>, Thomas Gleixner <tglx@linutronix.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@kernel.org>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Subject: [PATCH 1/3] smp: Process pending softirqs in flush_smp_call_function_from_idle()
-Date:   Sat, 23 Jan 2021 21:10:25 +0100
-Message-Id: <20210123201027.3262800-2-bigeasy@linutronix.de>
-In-Reply-To: <20210123201027.3262800-1-bigeasy@linutronix.de>
-References: <20210123201027.3262800-1-bigeasy@linutronix.de>
+         content-transfer-encoding:content-transfer-encoding;
+        bh=085Fy3vC7BUZwVACF5KtJQeFe+7dRXAkuEeU9MPcjsE=;
+        b=RmHEOmbnv2mHIsZcENq0N6mqN45BzhcVZiAaYsNaGgq0xGG1AcV1wzBT3WqoVIwfscEDD7
+        nIrqntZhecSYzop0+HgHUTnDNVs0Av9BoQuis4VD566JeLm1xZUNl6fsEpSvaW8k2N+Hkt
+        87PmHv0979pV1F4PNBead1eOOIlZyAg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-503-WIE96KpVOb6OCI2orvuy3g-1; Sun, 24 Jan 2021 00:26:53 -0500
+X-MC-Unique: WIE96KpVOb6OCI2orvuy3g-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9FA37180A094;
+        Sun, 24 Jan 2021 05:26:52 +0000 (UTC)
+Received: from dhcp-12-105.nay.redhat.com (unknown [10.66.61.33])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5F2D35B4BC;
+        Sun, 24 Jan 2021 05:26:51 +0000 (UTC)
+From:   Yi Zhang <yi.zhang@redhat.com>
+To:     osandov@fb.com, bvanassche@acm.org
+Cc:     linux-block@vger.kernel.org
+Subject: [PATCH blktests] nvmeof-mp/rc: fix nvmeof-mp failure when NVME_TARGET_PASSTHRU enabled
+Date:   Sun, 24 Jan 2021 13:26:44 +0800
+Message-Id: <20210124052644.6925-1-yi.zhang@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-send_call_function_single_ipi() may wake an idle CPU without sending an
-IPI. The woken up CPU will process the SMP-functions in
-flush_smp_call_function_from_idle(). Any raised softirq from within the
-SMP-function call will not be processed.
-Should the CPU have no tasks assigned, then it will go back to idle with
-pending softirqs and the NOHZ will rightfully complain.
+$ ./check nvmeof-mp/001
+nvmeof-mp/001 (Log in and log out)                           [passed]
+    runtime  0.400s  ...  0.457s
+rmdir: failed to remove 'subsystems/nvme-test/passthru/admin_timeout': Not a directory
+rmdir: failed to remove 'subsystems/nvme-test/passthru/device_path': Not a directory
+rmdir: failed to remove 'subsystems/nvme-test/passthru/enable': Not a directory
+rmdir: failed to remove 'subsystems/nvme-test/passthru/io_timeout': Not a directory
 
-Process pending softirqs on return from flush_smp_call_function_queue().
-
-Fixes: b2a02fc43a1f4 ("smp: Optimize send_call_function_single_ipi()")
-Reported-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Signed-off-by: Yi Zhang <yi.zhang@redhat.com>
 ---
- kernel/smp.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ tests/nvmeof-mp/rc | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/kernel/smp.c b/kernel/smp.c
-index 1b6070bf97bb0..aeb0adfa06063 100644
---- a/kernel/smp.c
-+++ b/kernel/smp.c
-@@ -14,6 +14,7 @@
- #include <linux/export.h>
- #include <linux/percpu.h>
- #include <linux/init.h>
-+#include <linux/interrupt.h>
- #include <linux/gfp.h>
- #include <linux/smp.h>
- #include <linux/cpu.h>
-@@ -449,6 +450,9 @@ void flush_smp_call_function_from_idle(void)
-=20
- 	local_irq_save(flags);
- 	flush_smp_call_function_queue(true);
-+	if (local_softirq_pending())
-+		do_softirq();
-+
- 	local_irq_restore(flags);
- }
-=20
---=20
-2.30.0
+diff --git a/tests/nvmeof-mp/rc b/tests/nvmeof-mp/rc
+index c77526f..ab7770f 100755
+--- a/tests/nvmeof-mp/rc
++++ b/tests/nvmeof-mp/rc
+@@ -265,8 +265,8 @@ stop_nvme_target() {
+ 			rm -f -- ports/*/subsystems/* &&
+ 			for d in {*/*/*/*,*/*}; do
+ 				[ -e "$d" ] &&
+-					[ "$(basename "$(dirname "$d")")" != ana_groups ] &&
+-					rmdir "$d"
++				[[ ! "$(basename "$(dirname "$d")")" =~ ana_groups|passthru ]] &&
++				rmdir "$d"
+ 			done
+ 	)
+ 	unload_module nvmet_rdma &&
+-- 
+2.21.0
 
