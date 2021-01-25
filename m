@@ -5,66 +5,66 @@ X-Spam-Level:
 X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26C11C433E0
-	for <linux-block@archiver.kernel.org>; Mon, 25 Jan 2021 23:37:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33E17C433E0
+	for <linux-block@archiver.kernel.org>; Mon, 25 Jan 2021 23:37:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F0EDB22AAC
-	for <linux-block@archiver.kernel.org>; Mon, 25 Jan 2021 23:36:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0C12722B3F
+	for <linux-block@archiver.kernel.org>; Mon, 25 Jan 2021 23:37:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732666AbhAYXgr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Jan 2021 18:36:47 -0500
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:31658 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732878AbhAYXgh (ORCPT
+        id S1732634AbhAYXgq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Jan 2021 18:36:46 -0500
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:5731 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732824AbhAYXgi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Jan 2021 18:36:37 -0500
+        Mon, 25 Jan 2021 18:36:38 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1611617796; x=1643153796;
+  t=1611617798; x=1643153798;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=CppnLNFdDfx1rBWN4d8ngNiQ+nl+NvmcK/8f1AWUUzU=;
-  b=ZwRBGpcoeNjZofjLya9MkoYQaMqR4a2V7VK4W1SyAye4gpnSPIr8PPSC
-   /9kKfDdJI6arTX0WhZa3AxjOC4jDpr8fe1swbGClzsn/gruzxgqeobMa7
-   MbDdV6MmqPBNaZucIAcZE30unlsh3UKjooo/XooSSzcdfIoXuBdRWfIBQ
-   9UGAQsApJcG5TAoqI7O9f6Jes49M1Yr7K6re+/fIqGu9w7clqzDs1UpCw
-   L+LvC5KWrTt+GxiHrz/1V+zB5I+JKbw+3+8Z/zdtWm2iKFFGIayZfseR5
-   u7lofw+tFwe5x8XICi/QpyI2YhZj23++g7gQUOPN5ezPbA+2flBH8bBhx
-   Q==;
-IronPort-SDR: cVvqNKDDJ8GJ4tyOtqxkN3IYm2+vrGQpR/j1OUbeb4bH1IU9NGTKlDpb/qR/T5iPBE55Vqyto9
- xQAbsQ/z9CgJIbesPg8hU33oMNohqrNtLT90AWrkl5IJ7dG2mE9/ctl7HMMLViizF4gbGEnrq5
- tWLtPIX/0Xkh2bMrIE9rZLPBn/tkiStsd7BlkQ9iEQc1rxK4jF04D+t0EptrE3UmQdBn0wXTOE
- KeGXymNE+kOqnCF57qhrcdVWxXfz70I0CZVMuEvlR6BFgBlgeHIBGV5zo1u/a2XlsHw+3+NtBi
- /VA=
+  bh=u3nLlME8qfr7Z4mJ4z3Lc1197XAsZU5OOL/6R2Ttjyk=;
+  b=X7Rj5omlZ/SWNOa7Onr/nV4y7+p2lOmnBDQIqi7gJ4Wa4DT+XFsQafZ3
+   LfrWjONR+FphYID/uvFwv/NXpVE2v6a8nyx3J4fMnw/kaGNSHr8biYd88
+   vTVy1Bx8EkOlS7kfZ/9wfI6bLmrA3ZndSzvzZBjaK7YcT/2Jab3DQgwn5
+   yBAJz01eAEyXe2RDzllNOGNC/7/MKzKP20LiYOc07/gNTHjZgYRItW1Dl
+   UKOdNS3lGsdf39pXb4ySX0+rf/J1mz7vH7FIx453ocZh6rKeiMv2g2CFo
+   R3dua+cb6OsjxLiRp/5d5OBT42GysFgjs8g64M2RP0fRaMQr+WBY15kKY
+   w==;
+IronPort-SDR: G3eVZmJux4XdIkxQqcD8w1tcmim/uZZix4CVfaOBgfWlAhFJdQlYdC7ZFMuChqTSOIllwitfO4
+ lKFbnDGK7XOiYaRGAec0uKskM6f/DH8/uYCXxFo8cm7wF8CgjqQlV40asX4ct2DV7iSVF6WS19
+ OxXhmwp7v/c+dAQiStRFvUT6nULBkl3kN7QXQLAzsyh5WP/zZqOxCChdRPYquS9LQis+kfHjMf
+ dF17DK7LJCqLU1dLltA3moN2KsdPfvNsWtoLf6SY30NsSmlY8IsmhUK6hX/R0/CFRhsIMT+PgY
+ X3g=
 X-IronPort-AV: E=Sophos;i="5.79,374,1602518400"; 
-   d="scan'208";a="162741787"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 26 Jan 2021 07:33:32 +0800
-IronPort-SDR: zUGvYLqzkArXk8NI+57/DPuPlcu+a8U36b7Lkkqa1yOXM20DxcE2xF2/GlLlzCvY6g7NzdCufU
- YpBGQE7lrAaCI5eEt1LdZqZx5hc0I5Louk55JzXyr5ujcWfBUNohRmgU0mPwBDsNOlX2mNJp1p
- rNVc2Rwo9KzVTCuycUFJtE9A6flDKDPLcdYIUoayiz6UjMEd3535a2aM6DSYGJfSdWKTqc4221
- ksaAHhnIjWAA3eT9+tlAHHHFgyILC7rpYqLnmORCEDQZwS1r5SZYFjEfltWbKgz/x63rSUbmJ5
- GbhSJebraviC+4Vulc2aBFg/
+   d="scan'208";a="159472155"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 26 Jan 2021 07:33:06 +0800
+IronPort-SDR: 8k3RVkrEbbHaE1VcVctrg8MAVOLmN30wdZ1+qPKhzZxtNMcKlgTTBJ+2AaSDbBn+sgz/CMVwZZ
+ 3gBaCRYuyOXAtTa9BoqVPy6VxC2ay5KZ8XbEYtKfDZhev6d/24pec7GKd/XBNhnEU5RhtbpppK
+ Vpcy5OKObgR2J4Mcwary4wgOCVnf/A/Z6/MSqxlyX55t5fA7c7yEpbEXEMLRBAp5P+cmU5Vnv9
+ ND57BEGSEqwP5NdU0JwHo5Gc1gwBHAMTyhzbi1bH0zgRD2q41Ojg1WUc6taSZyQnaioyl33CIy
+ 05LQTIWfZwKAlOX65PFCxYr0
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jan 2021 15:17:59 -0800
-IronPort-SDR: xE02mVV0/lnc7WFzb1tdGlLAjo63FILGTAmOCBz1cYBWPXP+HcOiX67J4oOSUhTN9WyIih0CSX
- h/zWzIE5F4XCEclSBCSiAsPx9NWyzOIR7QqRU8cEu09v8/JaGbJUMgQay7XWAHwnG4WlmUtgKx
- cWtVhZdjLlblxUpYNi0nSq+pWmxAlJWzmmE9SrT2bQ05JBKxIyIqYij2JPLoYx1y9rGBWUpsi0
- q4afLyWaX8XaMmGxZpOs1r0pqxZnyR/Z/xyjtT5hmcNeJq9vB6vLViMaIVHO2Grnz/fBhJpQ2u
- v/Q=
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jan 2021 15:17:33 -0800
+IronPort-SDR: yo7oXNN2lrYZFpZD6I7RWNcFGKdhwIDE/Ub299+V8sHqICebm5BaoOfVMdyZP0oCbPg6db68+C
+ kWYNyzwxMk6oI4r9a06x8VjqEZOjp5hhw49Y5huLZ9X7w8EejhN5BylbrWBnjhie/Tp7TCnou/
+ ROVmBsyP0LS7zgMYNoFQZQkivYH5xajdyE5hebEnSh5SvFcjRFzxWL6GuHDbuBx2jsZDMjlXaU
+ 1tTK6QqhSYPM3/AHUYXWEvivcQ1wZpk4EEzDKOXbXClospMEirLuxyFdbuYgOO0Nvyy/dhrRAT
+ 8ds=
 WDCIronportException: Internal
 Received: from vm.labspan.wdc.com (HELO vm.sc.wdc.com) ([10.6.137.102])
-  by uls-op-cesaip02.wdc.com with ESMTP; 25 Jan 2021 15:33:32 -0800
+  by uls-op-cesaip02.wdc.com with ESMTP; 25 Jan 2021 15:33:06 -0800
 From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 To:     linux-mips@vger.kernel.org
 Cc:     tsbogend@alpha.franken.de, axboe@kernel.dk,
         linux-block@vger.kernel.org, cand@gmx.com,
         Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [PATCH 9/9] n64: store dev instance into disk private data
-Date:   Mon, 25 Jan 2021 15:32:43 -0800
-Message-Id: <20210125233243.5982-10-chaitanya.kulkarni@wdc.com>
+Subject: [PATCH 4/9] n64: use enums for reg
+Date:   Mon, 25 Jan 2021 15:32:38 -0800
+Message-Id: <20210125233243.5982-5-chaitanya.kulkarni@wdc.com>
 X-Mailer: git-send-email 2.22.1
 In-Reply-To: <20210125233243.5982-1-chaitanya.kulkarni@wdc.com>
 References: <20210125233243.5982-1-chaitanya.kulkarni@wdc.com>
@@ -74,50 +74,37 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The device instance is declared globally. Remove global variable & use
-the disk->private_data to store the device instance in the
-n64cart_probe() and get the same instance from bio->bi_disk->private
-data in n64cart_submit_bio.
+Macros tend to be not type-safe. Use enum for register definitions.
 
 Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 Reviewed-by: Lauri Kasanen <cand@gmx.com>
 ---
- drivers/block/n64cart.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ drivers/block/n64cart.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/block/n64cart.c b/drivers/block/n64cart.c
-index 43482d158640..47bdf324e962 100644
+index b18f034ee1ad..620f9e080d5d 100644
 --- a/drivers/block/n64cart.c
 +++ b/drivers/block/n64cart.c
-@@ -30,7 +30,6 @@ enum {
- #define MIN_ALIGNMENT		8
+@@ -13,11 +13,13 @@
+ #include <linux/module.h>
+ #include <linux/platform_device.h>
  
- static u32 __iomem *reg_base;
--static struct device *dev;
+-#define PI_DRAM_REG		0
+-#define PI_CART_REG		1
+-#define PI_READ_REG		2
+-#define PI_WRITE_REG		3
+-#define PI_STATUS_REG		4
++enum {
++	PI_DRAM_REG = 0,
++	PI_CART_REG,
++	PI_READ_REG,
++	PI_WRITE_REG,
++	PI_STATUS_REG,
++};
  
- static unsigned int start;
- module_param(start, uint, 0);
-@@ -89,6 +88,7 @@ static blk_qc_t n64cart_submit_bio(struct bio *bio)
- {
- 	struct bio_vec bvec;
- 	struct bvec_iter iter;
-+	struct device *dev = bio->bi_disk->private_data;
- 	u32 pos = bio->bi_iter.bi_sector << SECTOR_SHIFT;
- 
- 	bio_for_each_segment(bvec, bio, iter) {
-@@ -140,11 +140,10 @@ static int __init n64cart_probe(struct platform_device *pdev)
- 	if (!disk->queue)
- 		return -ENOMEM;
- 
--	dev = &pdev->dev;
--
- 	disk->first_minor = 0;
- 	disk->flags = GENHD_FL_NO_PART_SCAN | GENHD_FL_EXT_DEVT;
- 	disk->fops = &n64cart_fops;
-+	disk->private_data = &pdev->dev;
- 	strcpy(disk->disk_name, "n64cart");
- 
- 	set_capacity(disk, size >> SECTOR_SHIFT);
+ #define PI_STATUS_DMA_BUSY	(1 << 0)
+ #define PI_STATUS_IO_BUSY	(1 << 1)
 -- 
 2.22.1
 
