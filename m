@@ -2,120 +2,64 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3450C433E0
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 19:53:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CD3DC43381
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 19:53:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B477C22B3B
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 19:53:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 12D2A22A85
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 19:53:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727251AbhAZFcX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Jan 2021 00:32:23 -0500
-Received: from out30-44.freemail.mail.aliyun.com ([115.124.30.44]:40002 "EHLO
-        out30-44.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727870AbhAYMPk (ORCPT
+        id S1727700AbhAZFcE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Jan 2021 00:32:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46552 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727413AbhAYKQY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Jan 2021 07:15:40 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R711e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e01424;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=5;SR=0;TI=SMTPD_---0UMpeZ6G_1611576820;
-Received: from localhost(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0UMpeZ6G_1611576820)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Mon, 25 Jan 2021 20:13:41 +0800
-From:   Jeffle Xu <jefflexu@linux.alibaba.com>
-To:     snitzer@redhat.com
-Cc:     joseph.qi@linux.alibaba.com, dm-devel@redhat.com,
-        linux-block@vger.kernel.org, io-uring@vger.kernel.org
-Subject: [PATCH v2 0/6] dm: support IO polling for bio-based dm device
-Date:   Mon, 25 Jan 2021 20:13:34 +0800
-Message-Id: <20210125121340.70459-1-jefflexu@linux.alibaba.com>
-X-Mailer: git-send-email 2.27.0
+        Mon, 25 Jan 2021 05:16:24 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48D92C06178B;
+        Mon, 25 Jan 2021 02:15:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=l2WBiCb5duYJRA9nKpihqrJOH1Qjg6utSrFiu8qAdtc=; b=EpzAO0iqhpxUKy/j0uXljmV9Rd
+        S3sNnn6W3uVI7/1+e/09WTq70rb3FrVXj2HHhc3kJ0tG68btenp6UffDhhZf4lY5wCpvgQIvY643W
+        /lZWh+Ks+fxaHW1C5o6mEcPlAlO7Y2fGZcgSrJ5ap8qbEwzqJn7T/0UriZZtPcvA0kDJx8FOKGAT+
+        UhyLRQKKP6SV3N6AeGfwWVIAScZReNTgR+7YO7PLBN1wARN6P5kf16Rd2aOzP/rN6frSZSRrxNco2
+        alIP035p63YPXOaRDRjx1c9PAaab+Wkq4ARc9xvSxVPTDFvLE14cDeWA2L0u1sIHroGbybgqnFAYx
+        5X8J53Eg==;
+Received: from hch by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
+        id 1l3ytI-00448g-22; Mon, 25 Jan 2021 10:14:43 +0000
+Date:   Mon, 25 Jan 2021 10:14:36 +0000
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc:     Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@kernel.org>
+Subject: Re: [PATCH 3/3 v2] blk-mq: Use llist_head for blk_cpu_done
+Message-ID: <20210125101436.GB967667@infradead.org>
+References: <20210123201027.3262800-1-bigeasy@linutronix.de>
+ <20210123201027.3262800-4-bigeasy@linutronix.de>
+ <20210125083012.GD942655@infradead.org>
+ <20210125083204.ahddujk5m6njwbju@linutronix.de>
+ <20210125083903.GB945284@infradead.org>
+ <20210125095412.qxknd2vbsmgtrhqb@linutronix.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210125095412.qxknd2vbsmgtrhqb@linutronix.de>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Since currently we have no simple but efficient way to implement the
-bio-based IO polling in the split-bio tracking style, this patch set
-turns to the original implementation mechanism that iterates and
-polls all underlying hw queues in polling mode. One optimization is
-introduced to mitigate the race of one hw queue among multiple polling
-instances.
+Looks good,
 
-I'm still open to the split bio tracking mechanism, if there's
-reasonable way to implement it.
-
-
-[Performance Test]
-The performance is tested by fio (engine=io_uring) 4k randread on
-dm-linear device. The dm-linear device is built upon nvme devices,
-and every nvme device has one polling hw queue (nvme.poll_queues=1).
-
-Test Case		    | IOPS in IRQ mode | IOPS in polling mode | Diff
-			    | (hipri=0)	       | (hipri=1)	      |
---------------------------- | ---------------- | -------------------- | ----
-3 target nvme, num_jobs = 1 | 198k 	       | 276k		      | ~40%
-3 target nvme, num_jobs = 3 | 608k 	       | 705k		      | ~16%
-6 target nvme, num_jobs = 6 | 1197k 	       | 1347k		      | ~13%
-3 target nvme, num_jobs = 6 | 1285k 	       | 1293k		      | ~0%
-
-As the number of polling instances (num_jobs) increases, the
-performance improvement decreases, though it's still positive
-compared to the IRQ mode.
-
-[Optimization]
-To mitigate the race when iterating all the underlying hw queues, one
-flag is maintained on a per-hw-queue basis. This flag is used to
-indicate whether this polling hw queue currently being polled on or
-not. Every polling hw queue is exclusive to one polling instance, i.e.,
-the polling instance will skip this polling hw queue if this hw queue
-currently is being polled by another polling instance, and start
-polling on the next hw queue.
-
-This per-hw-queue flag map is currently maintained in dm layer. In
-the table load phase, a table describing all underlying polling hw
-queues is built and stored in 'struct dm_table'. It is safe when
-reloading the mapping table.
-
-
-changes since v1:
-- patch 1,2,4 is the same as v1 and have already been reviewed
-- patch 3 is refactored a bit on the basis of suggestions from
-Mike Snitzer.
-- patch 5 is newly added and introduces one new queue flag
-representing if the queue is capable of IO polling. This mainly
-simplifies the logic in queue_poll_store().
-- patch 6 implements the core mechanism supporting IO polling.
-The sanity check checking if the dm device supports IO polling is
-also folded into this patch, and the queue flag will be cleared if
-it doesn't support, in case of table reloading.
-
-
-Jeffle Xu (6):
-  block: move definition of blk_qc_t to types.h
-  block: add queue_to_disk() to get gendisk from request_queue
-  block: add iopoll method to support bio-based IO polling
-  dm: always return BLK_QC_T_NONE for bio-based device
-  block: add QUEUE_FLAG_POLL_CAP flag
-  dm: support IO polling for bio-based dm device
-
- block/blk-core.c             |  76 +++++++++++++++++++++
- block/blk-mq.c               |  76 +++------------------
- block/blk-sysfs.c            |   3 +-
- drivers/md/dm-core.h         |  21 ++++++
- drivers/md/dm-table.c        | 127 +++++++++++++++++++++++++++++++++++
- drivers/md/dm.c              |  61 ++++++++++++-----
- include/linux/blk-mq.h       |   3 +
- include/linux/blk_types.h    |   2 +-
- include/linux/blkdev.h       |   9 +++
- include/linux/fs.h           |   2 +-
- include/linux/types.h        |   3 +
- include/trace/events/kyber.h |   6 +-
- 12 files changed, 302 insertions(+), 87 deletions(-)
-
--- 
-2.27.0
-
+Reviewed-by: Christoph Hellwig <hch@lst.de>
