@@ -2,72 +2,74 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	PDS_TONAME_EQ_TOLOCAL_SHORT,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1923FC433DB
-	for <linux-block@archiver.kernel.org>; Mon, 25 Jan 2021 01:25:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3B32C433DB
+	for <linux-block@archiver.kernel.org>; Mon, 25 Jan 2021 02:20:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DAE4F22571
-	for <linux-block@archiver.kernel.org>; Mon, 25 Jan 2021 01:25:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 829C322BEF
+	for <linux-block@archiver.kernel.org>; Mon, 25 Jan 2021 02:20:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726601AbhAYBZo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 24 Jan 2021 20:25:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45324 "EHLO
+        id S1726712AbhAYCTg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 24 Jan 2021 21:19:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53354 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726480AbhAYBVl (ORCPT
+        with ESMTP id S1726855AbhAYCAQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 24 Jan 2021 20:21:41 -0500
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 235E1C061756
-        for <linux-block@vger.kernel.org>; Sun, 24 Jan 2021 17:21:01 -0800 (PST)
-Received: by mail-pj1-x1033.google.com with SMTP id my11so8401472pjb.1
-        for <linux-block@vger.kernel.org>; Sun, 24 Jan 2021 17:21:01 -0800 (PST)
+        Sun, 24 Jan 2021 21:00:16 -0500
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3D6CC061574
+        for <linux-block@vger.kernel.org>; Sun, 24 Jan 2021 17:58:53 -0800 (PST)
+Received: by mail-pj1-x102b.google.com with SMTP id jx18so2078417pjb.5
+        for <linux-block@vger.kernel.org>; Sun, 24 Jan 2021 17:58:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=f7QtsZwPr4U46GTFuhzyc8M7URNXvRStxFGcvYKpg4Y=;
-        b=dxPJSW7sJXGk9Z7ugYcaWLjVSvz/6xTcnLwO41v+nGxxOXbAL9YFZ/+kaBrUc1qHoq
-         3dyBBwxb7cvbUb2FKL/DgAaxk84qalOL+k4XKdHGcSEcEE3krqSHKIH/9wIPmQPWcBjl
-         jgXDdNWnC7lnHPQnl13UuM6y0DoBRZs2QJOZwEI3swKbKBJ/evd/4wQOiWtgmkYTfgWU
-         mFFsUmCFSb5E5S5yXOb3r5noySr0/+PAyvdsSABWBCra37B8cGWZlOJM+pmijybOyYe9
-         0WLwDW5O5P/ynxM58WpNyQsf6iZfIGLNPHNExuWZEXuRFc7LwALQAh9HskjCarBMi7ai
-         +wCQ==
+        bh=91281cUbpRUSz4u3H6AZl6FqTb9jBLHCSsmx4sm3+ZE=;
+        b=ebWH9BgFwO2wmb/cezHbCyAIf+34C1N5gC23I/PViWaU38L/Amo/c15t/H646UN0n1
+         vDs7lauKZEjXomq5w/N5uNtyVDpy6uhB1/keJ1+xC3Lw4jLITfbhTBDk7Ii7xWKbT/oc
+         y84Mbo6u1CHnLWp1zi9amvi6ZH4foA2Q/GYpFh5rYsEfqu5Vs2yC3uD4wWOnP5f8LdXv
+         W34DRrkPJryAGxJJw01tFyyn5Ygv8vsI+MFsg/et7qEmKvqkNgb1xFEaHTMTEkWDbJQK
+         LJmFOqDvWxkofzJmMUY7/1iNFf753yL41OmPcaGis8krWuwIIzRMIv85xzUfgF0g9dYZ
+         2YOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=f7QtsZwPr4U46GTFuhzyc8M7URNXvRStxFGcvYKpg4Y=;
-        b=Z6rjcXYt1vc2+LI+OsPgiR//nfD2X/7vFurySW/Ynyds0/PC/h2sy852wnbU45xWsm
-         8oU6j6aZjfFmtB0O3SgqSrGtY+yI4XCtC7xGHr0gPYPXheUtPaMnjARjVDx17wAIdM7M
-         ICKkkrwL56aHLNMpFinYO3RJgs+Y+jE403DBx9vxv04VxaCA5VI/CLqw71gBt/U79hYF
-         LaOPFYLf4cTPfdG216RNfBVJDhzBYWC6U/3ppglwMnY1adMyBoA0h0e+V/NMTIDp4PnW
-         zE9k2zoZ9NlQpnQh/m0nb9bYrQCgqWYXwUpM7xA/mIaVQk7zf4EUmElnnriBZNhIEvjF
-         GXQw==
-X-Gm-Message-State: AOAM532Yb2+AJdac12B0ojXAN20rInTdcEI2ucvYKmFOLNv0JbV5+vjZ
-        NsJrEROMwprZZojbJl2agPSu9nl5fYVw5A==
-X-Google-Smtp-Source: ABdhPJxMYBoliHQRb+yB0y+wU/ln9B7DO7VcnUWGxF9Arwj8gp7wLjnxVFvUK2H3IemOuchDHyHDsA==
-X-Received: by 2002:a17:90a:eb13:: with SMTP id j19mr4708041pjz.219.1611537660417;
-        Sun, 24 Jan 2021 17:21:00 -0800 (PST)
+        bh=91281cUbpRUSz4u3H6AZl6FqTb9jBLHCSsmx4sm3+ZE=;
+        b=C/Ts00SQ560YRboMZ5GHWh8q3mGApZqR0Gr6yO2rC9wx+j8giFan+Gu2o+onzb0R2K
+         YhfXzue+l8C2XDfneXJYClBtFO9ptLDGi7JrxAEjvMAh0l2Fh7JMaoqGmcksRkd3020I
+         OTsFMFMNyrOHf3CVUhnP6Oki7tr8thPa6dUqYK7ha69FncBpCmvIwqnkXfzgnCsdJGKR
+         CQ7Y64cvyno2eavcG78a47pyIoND5N9bwQFmwiwYSJcE1zrMfcqSOUXoJFdlnOeBFfus
+         Z8tcy/TlkkQKhcedX8/FSqRc/PKvd40vIjNwfYY8hg/aaXlcGh0R1rDs7+AQ3C16dHue
+         VQJw==
+X-Gm-Message-State: AOAM533UTgBXX3uG0xoRWKUQK2SPkdJOG4JaEAYffMJoBbD6A/Gwq+32
+        GLklaXneyPeGcdxi40ej5oyGlw==
+X-Google-Smtp-Source: ABdhPJy3fIaNU7wcqZWs6Bytqm1PzUM1P+6ZbcRWB/ZhQCu7HowmoYOmOle5I88PFPlhlw5yXUPrjQ==
+X-Received: by 2002:a17:90a:f28d:: with SMTP id fs13mr2409880pjb.22.1611539932864;
+        Sun, 24 Jan 2021 17:58:52 -0800 (PST)
 Received: from [192.168.4.41] (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
-        by smtp.gmail.com with ESMTPSA id j3sm16147773pjs.50.2021.01.24.17.20.59
+        by smtp.gmail.com with ESMTPSA id x26sm8307865pfi.176.2021.01.24.17.58.51
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 24 Jan 2021 17:20:59 -0800 (PST)
-Subject: Re: [PATCH] bfq: don't duplicate code for different paths
-To:     huhai <huhai@tj.kylinos.cn>, paolo.valente@linaro.org
-Cc:     linux-block@vger.kernel.org
-References: <20201225130016.20485-1-huhai@tj.kylinos.cn>
+        Sun, 24 Jan 2021 17:58:52 -0800 (PST)
+Subject: Re: [PATCH] fio: add hipri option to sg engine
+To:     Douglas Gilbert <dgilbert@interlog.com>,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
+Cc:     martin.petersen@oracle.com, jejb@linux.vnet.ibm.com, hare@suse.de,
+        kashyap.desai@broadcom.com
+References: <20210125013751.269675-1-dgilbert@interlog.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <508c8e85-908b-573e-289d-796c6cd254a7@kernel.dk>
-Date:   Sun, 24 Jan 2021 18:20:58 -0700
+Message-ID: <fef432a4-29ed-c560-1d91-b05bd239b9c9@kernel.dk>
+Date:   Sun, 24 Jan 2021 18:58:50 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20201225130016.20485-1-huhai@tj.kylinos.cn>
+In-Reply-To: <20210125013751.269675-1-dgilbert@interlog.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -75,11 +77,22 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/25/20 6:00 AM, huhai wrote:
-> As we can see, returns parent_sched_may_change whether
-> sd->next_in_service changes or not, so remove this judgment.
+On 1/24/21 6:37 PM, Douglas Gilbert wrote:
+> Adds hipri option to the Linux sg driver engine. This turns on the
+> SGV4_FLAG_HIPRI flag in recent sg drivers (January 2021) on READ
+> and WRITE commands (and not on UNMAP (trim), VERIFY, etc). Uses
+> blk_poll() and the mq_poll() callback in SCSI LLDs. The mechanism
+> is also called "iopoll".
+> 
+> The Linux sg engine in fio uses the struct sg_io_hdr based interface
+> known as the sg driver "v3" interface.
+> Linux sg drivers in the kernel prior to January 2021 (sg version
+> 4.0.12) will just ignore the SGV4_FLAG_HIPRI flag and do normal
+> completions where LLDs indicate command completion with a (software)
+> interrupt or similar mechanism.
 
-Applied, thanks.
+Looks fine, and is consistent with eg io_uring. Can you add the
+engine specific option to the HOWTO and fio.1 as well?
 
 -- 
 Jens Axboe
