@@ -2,88 +2,85 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 627A1C433E6
-	for <linux-block@archiver.kernel.org>; Mon, 25 Jan 2021 18:44:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C75B5C433E0
+	for <linux-block@archiver.kernel.org>; Mon, 25 Jan 2021 18:46:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2E054221E7
-	for <linux-block@archiver.kernel.org>; Mon, 25 Jan 2021 18:44:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 942AD2067B
+	for <linux-block@archiver.kernel.org>; Mon, 25 Jan 2021 18:46:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728765AbhAYSn4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Jan 2021 13:43:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43750 "EHLO
+        id S1727349AbhAYSqO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Jan 2021 13:46:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44242 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728827AbhAYSnu (ORCPT
+        with ESMTP id S1729505AbhAYSqJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Jan 2021 13:43:50 -0500
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07CB2C06178A
-        for <linux-block@vger.kernel.org>; Mon, 25 Jan 2021 10:42:45 -0800 (PST)
-Received: by mail-pj1-x102f.google.com with SMTP id j12so127824pjy.5
-        for <linux-block@vger.kernel.org>; Mon, 25 Jan 2021 10:42:45 -0800 (PST)
+        Mon, 25 Jan 2021 13:46:09 -0500
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47B9CC061573
+        for <linux-block@vger.kernel.org>; Mon, 25 Jan 2021 10:45:26 -0800 (PST)
+Received: by mail-pl1-x633.google.com with SMTP id s15so8201011plr.9
+        for <linux-block@vger.kernel.org>; Mon, 25 Jan 2021 10:45:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=Pf3PHu2OFluDfmQCuWJ4Or1an7uayPJEkaL31BqG8mM=;
-        b=Wvi4vtoazMM+IYZjRK9Rb7YjxDa3JmEGgBruFAGrtyMmWOuj7EcpNiX9aOBnG+i7ZI
-         ks3oHiSwShiuWmOWbwcpC6WaySQRXKqAH26yfkt7u5xlORJFpo0Ez2HwwA6tD7rXat/p
-         rIaHoBV6nsUDQM6J6rukW83Vte2EsXJ0rEckcficR6BynCWB9+M4uja85Vr2SXjt3usW
-         iJaJRvOFX/haWAlw8fH2mTJjfHgkRP4/cNGDs9m/ojfqFRWoFQuMK8OAWx3zQ+QfEcip
-         DwRAisQMheg5AxNjG790kktlTKUMtMg4VvhrQ4/GK2XSnX9SFCXxzm0AlsybMzEETLg4
-         1ERg==
+        d=osandov-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=WNSUf+1zQH7Gb9CW24gntEAO1TIhL5fiTlJD9nXzmD0=;
+        b=IrcM+urqitTP2zvIteu0JcZDpfhw+3IZA2nICpT/bvktfxMtT14kcKU+/73FeT8E08
+         HSmfP7oTJA5ivZgNG+XF4TV2Mp52PPVxaZ0jsZ3p1cDl+SVCGqBCGVMRSzYTtm2HMQdY
+         QrdUIuM9I0x1YCutZpMnFeVPplrBp1dddUTuuQLnnPVrJ54Pv0ZhDepwl6FNghgjdlyg
+         8e7Zx4vSY1lKeEDjqVNYcya5mg93scmPfBTjkVSG3F+aDZZTdCKWqjrITdOWUeWf6xLW
+         vPO3G0wyLX6KKvEe16PNe7Rir2LYJcc+MzfsPfS8bSKbYLYxzlJjMgOY6k3ChS9+NjQK
+         xlxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Pf3PHu2OFluDfmQCuWJ4Or1an7uayPJEkaL31BqG8mM=;
-        b=WBIvPsI1RD0ETJvFFZmOXHnrgOiMTflIA12ZFiiikeYgWfWCyZyHqKBxl10E59ne2U
-         J78Z3tawwr4r1xPuRf5QEZFucDLsSYc88OCdWZ1RtteVxOTjjzU8+zHN85LQOHgkFfT4
-         scCYyDIIwyYvvgA6bpWKoXTJJ+CvQM7nIlehGJKlUV7MdGmH7tVJ0eg0nb/1W4EsUyHr
-         gNjaa9WUufdz9cXeLCL2XfZL2fi6ZfHmBThL7Vqn3R6EMCYK0hxPMAQ/v5LDWAo6QwQh
-         NNTNJaGYUguM0Qsz/D84Y0Mb/HlBccDEp5nAj+b0EncKwtk8SnSfBVkiP+c4p+30GOgW
-         2JrQ==
-X-Gm-Message-State: AOAM530NIp4ggHp9QvLXDCPEkpWNRPhgZ9g3+uER8dPwvyXtt845QLic
-        veG8AdqZ9iWGtFJ6fVQ+jHbCndAVloMX8A==
-X-Google-Smtp-Source: ABdhPJwz6OcuZr88v6HDv27DiOQZOL0BEsBj5ImogJTgChQhfoYuh3AU4Gmbtm/6v+6ErWPjXL+P8Q==
-X-Received: by 2002:a17:902:ea94:b029:df:edfe:fac3 with SMTP id x20-20020a170902ea94b02900dfedfefac3mr1801406plb.61.1611600164392;
-        Mon, 25 Jan 2021 10:42:44 -0800 (PST)
-Received: from [192.168.4.41] (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
-        by smtp.gmail.com with ESMTPSA id u187sm9828893pfc.158.2021.01.25.10.42.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 25 Jan 2021 10:42:43 -0800 (PST)
-Subject: Re: [PATCH] block: skip bio_check_eod for partition-remapped bios
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org
-References: <20210125183957.1674124-1-hch@lst.de>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <6c5ffcad-31bf-2ddc-8b66-d6d2b5b65418@kernel.dk>
-Date:   Mon, 25 Jan 2021 11:42:22 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=WNSUf+1zQH7Gb9CW24gntEAO1TIhL5fiTlJD9nXzmD0=;
+        b=NB7y3MWtkPlZ0AXbd+69a0iceMhDFi+JW3z/w6nzECLDb8CTYpRfa7QELLmMzug046
+         SCf08mTSqfa7W5w6a7smJbTdQKpO/D1IFZEWQ6gzhfZcz5sHFWKlW9vK+y/MDj91ZC1w
+         kvcJjgyc4B5wWLiIxYDGOTKWcgK3HJkZ8cDhJWx1LuKcstlk8WF4j8pXr4scOGv7sgSK
+         Q50/45FP3DzhsSWGfTNqb0IQZjW8eBrKq6rQFe7mH2LAoSfPKqeeVCHtVv9Vz8FoFhTn
+         urndd5W0/MiaGX+aaNHpz+tUvXyWr0zNof2y7Zqx2nZyBA5mDsZ8nLiY4DAEnG/DVZqY
+         1BWg==
+X-Gm-Message-State: AOAM533GeMLgv/JCMy0iLActt8GLJh0b/8F3r7NAVfOfbGqqgR9lPw86
+        dgYBYyO4z7E+mkohR7cY+NeeQA==
+X-Google-Smtp-Source: ABdhPJxZfWfeeDN2Cu2LoI10QoUms2vkVcJrkiyo3YRVaVghtezGKR38Cp5xV1iHCWYlHhpWz5T1+Q==
+X-Received: by 2002:a17:90b:3751:: with SMTP id ne17mr1656688pjb.174.1611600325792;
+        Mon, 25 Jan 2021 10:45:25 -0800 (PST)
+Received: from relinquished.localdomain ([2601:602:8b80:8e0::703])
+        by smtp.gmail.com with ESMTPSA id c11sm15803972pfl.185.2021.01.25.10.45.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Jan 2021 10:45:24 -0800 (PST)
+Date:   Mon, 25 Jan 2021 10:45:23 -0800
+From:   Omar Sandoval <osandov@osandov.com>
+To:     Yi Zhang <yi.zhang@redhat.com>
+Cc:     osandov@fb.com, bvanassche@acm.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH blktests] nvmeof-mp/rc: fix nvmeof-mp failure when
+ NVME_TARGET_PASSTHRU enabled
+Message-ID: <YA8Rw4MGrg0P8hZ/@relinquished.localdomain>
+References: <20210124052644.6925-1-yi.zhang@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210125183957.1674124-1-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210124052644.6925-1-yi.zhang@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/25/21 11:39 AM, Christoph Hellwig wrote:
-> When an already remapped bio is resubmitted (e.g. by blk_queue_split),
-> bio_check_eod will compare the remapped bi_sector against the size
-> of the partition, leading to spurious I/O failures.
+On Sun, Jan 24, 2021 at 01:26:44PM +0800, Yi Zhang wrote:
+> $ ./check nvmeof-mp/001
+> nvmeof-mp/001 (Log in and log out)                           [passed]
+>     runtime  0.400s  ...  0.457s
+> rmdir: failed to remove 'subsystems/nvme-test/passthru/admin_timeout': Not a directory
+> rmdir: failed to remove 'subsystems/nvme-test/passthru/device_path': Not a directory
+> rmdir: failed to remove 'subsystems/nvme-test/passthru/enable': Not a directory
+> rmdir: failed to remove 'subsystems/nvme-test/passthru/io_timeout': Not a directory
 > 
-> Skip the EOD check in this case.
+> Signed-off-by: Yi Zhang <yi.zhang@redhat.com>
 
-Applied, thanks.
-
--- 
-Jens Axboe
-
+Thanks, applied.
