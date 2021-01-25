@@ -2,146 +2,184 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-23.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31DAAC433DB
-	for <linux-block@archiver.kernel.org>; Mon, 25 Jan 2021 20:14:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED993C433DB
+	for <linux-block@archiver.kernel.org>; Mon, 25 Jan 2021 20:16:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E8D8522583
-	for <linux-block@archiver.kernel.org>; Mon, 25 Jan 2021 20:14:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BB58B22582
+	for <linux-block@archiver.kernel.org>; Mon, 25 Jan 2021 20:16:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731222AbhAYUNB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Jan 2021 15:13:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34988 "EHLO
+        id S1725789AbhAYUQk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Jan 2021 15:16:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35478 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731877AbhAYUMk (ORCPT
+        with ESMTP id S1726716AbhAYUOw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Jan 2021 15:12:40 -0500
-Received: from mail-qk1-x734.google.com (mail-qk1-x734.google.com [IPv6:2607:f8b0:4864:20::734])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83E61C06174A
-        for <linux-block@vger.kernel.org>; Mon, 25 Jan 2021 12:11:59 -0800 (PST)
-Received: by mail-qk1-x734.google.com with SMTP id a12so3876258qkh.10
-        for <linux-block@vger.kernel.org>; Mon, 25 Jan 2021 12:11:59 -0800 (PST)
+        Mon, 25 Jan 2021 15:14:52 -0500
+Received: from mail-io1-xd2f.google.com (mail-io1-xd2f.google.com [IPv6:2607:f8b0:4864:20::d2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE456C06174A
+        for <linux-block@vger.kernel.org>; Mon, 25 Jan 2021 12:14:11 -0800 (PST)
+Received: by mail-io1-xd2f.google.com with SMTP id z22so29166562ioh.9
+        for <linux-block@vger.kernel.org>; Mon, 25 Jan 2021 12:14:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=soleen.com; s=google;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=C9nkFhjU5njicagJGun4ufUpTiD2I63Zo0PXOZCwddU=;
-        b=nojJ+D4kawGxVb48gTvmnEePW6Thx1S7hWNnopt3NadONtOz5v4hB/g/RYc0e0DDUX
-         D24RGBWWMBwDlhETSQxnbKMFzd2qtFkw2VeoQvIIucDjdnDkAUqQ8WuI51OFcT3Q1n2F
-         w5X5/QbZwwYX7/P7YvETM4mbtNehBDVKHtbZkrwXKlsWCtn/0U6i83jEtXT6mTtbQl9J
-         s77gMXxXz/NKDYMlFNSG6+XiWBpJCyM9OZ1gpvjT4pq4nUM/I5lSszpfWS6+mGodYzgI
-         MGzDpaRSPwg/Yq/nPsAxRPDnu9tEohKaAFm0up7Nbk86jNr1S/40XWM9nADEMG4uhqkA
-         WX2A==
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=5oPVxsDUHFnjzZ37jztimVx7kT5rl5MLP23lod84D8k=;
+        b=O7ObVy/vbDbvYgKIJLJJe1Y9IKfOCCLlQ6AzYhjLSNlxQ1feUkOZBwlBjw+UCjoO68
+         SoONYMJJPORKbbwddqa0AP8EdbK0fP3GezYgLp2C7FF3PJT9bdhP+7EtHDzxCH3z1Hgr
+         ZaDtA2Pb5lNw5h7P7YQp2ybuW1FNCqIq3AjX5MFuiFDJfI5sJ+tgm+v+KDfaSNsbZA3D
+         t6QCSDvG9sY9qA0cmzpFWbArfD3avEasYZvSHAsSXvxqmTUst4QOhxubnaG2MPygpyIm
+         r2s7yZdAYKTJFhAfIJwa2MgmhNICTcpq16Bcb8DmgRQdQ4y61MZsVNfs0dXPo5QNUSZd
+         sFUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=C9nkFhjU5njicagJGun4ufUpTiD2I63Zo0PXOZCwddU=;
-        b=SNPj07CaC3JWDsQpYgXZw/uA+EXDH1QYpo414WLttlW5x+jKQzIOx6W4Vb9RQ9GYew
-         SHbkTFkIXCn9jW8rI09J7ZXEGAPx3SFp1tAoe86pdAUKDoBH8PX8xYnZ9ldCqnVXkjP5
-         xqnuG6RKlzKJWx2XQTaFcH44JoYdIKoKO0QINWMbmT78OQ9uGj+v3SBPJ9nhOGZg2T77
-         1azCTq1aqVARoXNZrkpcQpqgIBlZEOrwKwwB+b0LS6Qsm/7el81+BQrSGv/ygfy2S0Mv
-         v/OhVIrvGpuGX3qWeCir4PWI76wEA1lhInFnUW1rMT04MsPmKFgBnx/mOkhQTt8em7pg
-         jMNQ==
-X-Gm-Message-State: AOAM532NxGmG7w4O/DWemFru7DuGqPO9NzWcCL3IXqKAkwzDY9J0LAEx
-        wkrihfoCa2jtEzX0G1o/2XR+TBh1JVUa0A==
-X-Google-Smtp-Source: ABdhPJwYKlhAOUltpHl5IUufiWHQpgdYM9D3VAOvH5xCW66euBRQbGG8vibLvusmFuMUJklo7W9ozg==
-X-Received: by 2002:a37:2784:: with SMTP id n126mr2562649qkn.328.1611605518742;
-        Mon, 25 Jan 2021 12:11:58 -0800 (PST)
-Received: from localhost.localdomain (c-73-69-118-222.hsd1.nh.comcast.net. [73.69.118.222])
-        by smtp.gmail.com with ESMTPSA id 2sm11918564qtt.24.2021.01.25.12.11.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Jan 2021 12:11:58 -0800 (PST)
-From:   Pavel Tatashin <pasha.tatashin@soleen.com>
-To:     pasha.tatashin@soleen.com, tyhicks@linux.microsoft.com,
-        axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, sashal@kernel.org, jmorris@namei.org,
-        lukas.bulwahn@gmail.com, hch@lst.de, pvorel@suse.cz,
-        ming.lei@redhat.com, mzxreary@0pointer.de, mcgrof@kernel.org,
-        zhengbin13@huawei.com, maco@android.com, colin.king@canonical.com,
-        evgreen@chromium.org
-Subject: [PATCH v3 0/1] scale loop device lock
-Date:   Mon, 25 Jan 2021 15:11:55 -0500
-Message-Id: <20210125201156.1330164-1-pasha.tatashin@soleen.com>
-X-Mailer: git-send-email 2.25.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=5oPVxsDUHFnjzZ37jztimVx7kT5rl5MLP23lod84D8k=;
+        b=ENE1Vc5RZJx1XVEBCDEog7yqjbxrNF/EC4ozY4agvJA2F0K9Ui8xw9+eI6adfVYME4
+         rvxt7k7Kw9W679RKVLaiHbEi6PTGTMfUHXAnKZZA8uKqQ8EzBcLNSetl/LLIV/B8bc0l
+         B1pcL/yq3nHWfbdeKvQNhcCCWVoVBHZ2VJVLLEqiVyH04FU2V9QlrGgHQYugCASCZd1i
+         YPYCk3cVN5rhdIcZJq9VVS0komBn/SbWoIjaaHWYsf1kXlHAdk97qoW+p3TmjJu1eXkl
+         SnGxRlMD095qsEpCFk/x5nYXIoCbSoJojymmBGj3e08Y0uRPYEGx66VX8afowmPRsWRd
+         ZKKw==
+X-Gm-Message-State: AOAM5310NJN0dYslp5CAT14nLnqpTQekUVKVuwSgx6+xnP093eXz/Lss
+        irOGDbrbJUW2WZBaeUfTEedJhJbLOvIxwe6bwDNtm1q38kw=
+X-Google-Smtp-Source: ABdhPJzMjR4NyG/6n7ZBSL9gkgUVYaYxJ5W7f+6z3TKM10CBC8DzB/dFVXPVii8iOsQguaod82m7mEWmkYOU3l7Har4=
+X-Received: by 2002:a5e:8905:: with SMTP id k5mr1836963ioj.140.1611605651165;
+ Mon, 25 Jan 2021 12:14:11 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20210121082155.111333-1-ebiggers@kernel.org> <20210121082155.111333-2-ebiggers@kernel.org>
+In-Reply-To: <20210121082155.111333-2-ebiggers@kernel.org>
+From:   Satya Tangirala <satyat@google.com>
+Date:   Mon, 25 Jan 2021 12:14:00 -0800
+Message-ID: <CAA+FYZerh02JXSKghCKuG29ATdYU_=2O93moGnLgD6Jv2v2auQ@mail.gmail.com>
+Subject: Re: [PATCH 1/2] block/keyslot-manager: introduce devm_blk_ksm_init()
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-block@vger.kernel.org, linux-mmc@vger.kernel.org,
+        linux-scsi@vger.kernel.org, Ulf Hansson <ulf.hansson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Changelog
-v3
-  - Added review-by Tyler
-  - Sync with mainline
-v2
-  - Addressed Tyler Hicks comments
-  - added mutex_destroy()
-  - comment in lo_open()
-  - added lock around lo_disk
-===
-
-In our environment we are using systemd portable containers in
-squashfs formats, convert them into loop device, and mount.
-
-NAME                      MAJ:MIN RM   SIZE RO TYPE  MOUNTPOINT
-loop5                       7:5    0  76.4M  0 loop
-`-BaseImageM1908          252:3    0  76.4M  1 crypt /BaseImageM1908
-loop6                       7:6    0    20K  0 loop
-`-test_launchperf20       252:17   0   1.3M  1 crypt /app/test_launchperf20
-loop7                       7:7    0    20K  0 loop
-`-test_launchperf18       252:4    0   1.5M  1 crypt /app/test_launchperf18
-loop8                       7:8    0     8K  0 loop
-`-test_launchperf8        252:25   0    28K  1 crypt app/test_launchperf8
-loop9                       7:9    0   376K  0 loop
-`-test_launchperf14       252:29   0  45.7M  1 crypt /app/test_launchperf14
-loop10                      7:10   0    16K  0 loop
-`-test_launchperf4        252:11   0   968K  1 crypt app/test_launchperf4
-loop11                      7:11   0   1.2M  0 loop
-`-test_launchperf17       252:26   0 150.4M  1 crypt /app/test_launchperf17
-loop12                      7:12   0    36K  0 loop
-`-test_launchperf19       252:13   0   3.3M  1 crypt /app/test_launchperf19
-loop13                      7:13   0     8K  0 loop
-...
-
-We have over 50 loop devices which are mounted  during boot.
-
-We observed contentions around loop_ctl_mutex.
-
-The sample contentions stacks:
-
-Contention 1:
-__blkdev_get()
-   bdev->bd_disk->fops->open()
-      lo_open()
-         mutex_lock_killable(&loop_ctl_mutex); <- contention
-
-Contention 2:
-__blkdev_put()
-   disk->fops->release()
-      lo_release()
-         mutex_lock(&loop_ctl_mutex); <- contention
-
-With total time waiting for loop_ctl_mutex ~18.8s during boot (across 8
-CPUs) on our machine (69 loop devices): 2.35s per CPU.
-
-Scaling this lock eliminates this contention entirely, and improves the boot
-performance by 2s on our machine.
-
-v2 https://lore.kernel.org/lkml/20200723211748.13139-1-pasha.tatashin@soleen.com
-v1 https://lore.kernel.org/lkml/20200717205322.127694-1-pasha.tatashin@soleen.com
-
-Pavel Tatashin (1):
-  loop: scale loop device by introducing per device lock
-
- drivers/block/loop.c | 92 +++++++++++++++++++++++++-------------------
- drivers/block/loop.h |  1 +
- 2 files changed, 54 insertions(+), 39 deletions(-)
-
--- 
-2.25.1
-
+On Thu, Jan 21, 2021 at 12:23 AM Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> From: Eric Biggers <ebiggers@google.com>
+>
+> Add a resource-managed variant of blk_ksm_init() so that drivers don't
+> have to worry about calling blk_ksm_destroy().
+>
+> Note that the implementation uses a custom devres action to call
+> blk_ksm_destroy() rather than switching the two allocations to be
+> directly devres-managed, e.g. with devm_kmalloc().  This is because we
+> need to keep zeroing the memory containing the keyslots when it is
+> freed, and also because we want to continue using kvmalloc() (and there
+> is no devm_kvmalloc()).
+>
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> ---
+>  Documentation/block/inline-encryption.rst | 12 +++++-----
+>  block/keyslot-manager.c                   | 29 +++++++++++++++++++++++
+>  include/linux/keyslot-manager.h           |  3 +++
+>  3 files changed, 38 insertions(+), 6 deletions(-)
+>
+> diff --git a/Documentation/block/inline-encryption.rst b/Documentation/block/inline-encryption.rst
+> index e75151e467d39..7f9b40d6b416b 100644
+> --- a/Documentation/block/inline-encryption.rst
+> +++ b/Documentation/block/inline-encryption.rst
+> @@ -182,8 +182,9 @@ API presented to device drivers
+>
+>  A :c:type:``struct blk_keyslot_manager`` should be set up by device drivers in
+>  the ``request_queue`` of the device. The device driver needs to call
+> -``blk_ksm_init`` on the ``blk_keyslot_manager``, which specifying the number of
+> -keyslots supported by the hardware.
+> +``blk_ksm_init`` (or its resource-managed variant ``devm_blk_ksm_init``) on the
+> +``blk_keyslot_manager``, while specifying the number of keyslots supported by
+> +the hardware.
+>
+>  The device driver also needs to tell the KSM how to actually manipulate the
+>  IE hardware in the device to do things like programming the crypto key into
+> @@ -202,10 +203,9 @@ needs each and every of its keyslots to be reprogrammed with the key it
+>  "should have" at the point in time when the function is called. This is useful
+>  e.g. if a device loses all its keys on runtime power down/up.
+>
+> -``blk_ksm_destroy`` should be called to free up all resources used by a keyslot
+> -manager upon ``blk_ksm_init``, once the ``blk_keyslot_manager`` is no longer
+> -needed.
+> -
+> +If the driver used ``blk_ksm_init`` instead of ``devm_blk_ksm_init``, then
+> +``blk_ksm_destroy`` should be called to free up all resources used by a
+> +``blk_keyslot_manager`` once it is no longer needed.
+>
+>  Layered Devices
+>  ===============
+> diff --git a/block/keyslot-manager.c b/block/keyslot-manager.c
+> index 86f8195d8039e..324bf4244f5fb 100644
+> --- a/block/keyslot-manager.c
+> +++ b/block/keyslot-manager.c
+> @@ -29,6 +29,7 @@
+>  #define pr_fmt(fmt) "blk-crypto: " fmt
+>
+>  #include <linux/keyslot-manager.h>
+> +#include <linux/device.h>
+>  #include <linux/atomic.h>
+>  #include <linux/mutex.h>
+>  #include <linux/pm_runtime.h>
+> @@ -127,6 +128,34 @@ int blk_ksm_init(struct blk_keyslot_manager *ksm, unsigned int num_slots)
+>  }
+>  EXPORT_SYMBOL_GPL(blk_ksm_init);
+>
+> +static void blk_ksm_destroy_callback(void *ksm)
+> +{
+> +       blk_ksm_destroy(ksm);
+> +}
+> +
+> +/**
+> + * devm_blk_ksm_init() - Resource-managed blk_ksm_init()
+> + * @dev: The device which owns the blk_keyslot_manager.
+> + * @ksm: The blk_keyslot_manager to initialize.
+> + * @num_slots: The number of key slots to manage.
+> + *
+> + * Like blk_ksm_init(), but causes blk_ksm_destroy() to be called automatically
+> + * on driver detach.
+> + *
+> + * Return: 0 on success, or else a negative error code.
+> + */
+> +int devm_blk_ksm_init(struct device *dev, struct blk_keyslot_manager *ksm,
+> +                     unsigned int num_slots)
+> +{
+> +       int err = blk_ksm_init(ksm, num_slots);
+> +
+> +       if (err)
+> +               return err;
+> +
+> +       return devm_add_action_or_reset(dev, blk_ksm_destroy_callback, ksm);
+> +}
+> +EXPORT_SYMBOL_GPL(devm_blk_ksm_init);
+> +
+>  static inline struct hlist_head *
+>  blk_ksm_hash_bucket_for_key(struct blk_keyslot_manager *ksm,
+>                             const struct blk_crypto_key *key)
+> diff --git a/include/linux/keyslot-manager.h b/include/linux/keyslot-manager.h
+> index 18f3f5346843f..443ad817c6c57 100644
+> --- a/include/linux/keyslot-manager.h
+> +++ b/include/linux/keyslot-manager.h
+> @@ -85,6 +85,9 @@ struct blk_keyslot_manager {
+>
+>  int blk_ksm_init(struct blk_keyslot_manager *ksm, unsigned int num_slots);
+>
+> +int devm_blk_ksm_init(struct device *dev, struct blk_keyslot_manager *ksm,
+> +                     unsigned int num_slots);
+> +
+>  blk_status_t blk_ksm_get_slot_for_key(struct blk_keyslot_manager *ksm,
+>                                       const struct blk_crypto_key *key,
+>                                       struct blk_ksm_keyslot **slot_ptr);
+> --
+> 2.30.0
+Looks good to me. Please feel free to add
+Reviewed-by: Satya Tangirala <satyat@google.com>
