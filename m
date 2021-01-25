@@ -2,260 +2,141 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,PDS_BAD_THREAD_QP_64,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF3E5C433E0
-	for <linux-block@archiver.kernel.org>; Mon, 25 Jan 2021 09:58:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C0CFC433E0
+	for <linux-block@archiver.kernel.org>; Mon, 25 Jan 2021 14:18:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 74DBC225AB
-	for <linux-block@archiver.kernel.org>; Mon, 25 Jan 2021 09:58:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 27E742311B
+	for <linux-block@archiver.kernel.org>; Mon, 25 Jan 2021 14:18:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727235AbhAYJ5F (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Jan 2021 04:57:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41892 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727061AbhAYJ4l (ORCPT
+        id S1729326AbhAYORn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Jan 2021 09:17:43 -0500
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:28212 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729186AbhAYORd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Jan 2021 04:56:41 -0500
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 420B4C061794;
-        Mon, 25 Jan 2021 01:54:14 -0800 (PST)
-Date:   Mon, 25 Jan 2021 10:54:12 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1611568452;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=En+PvuTxJbTaSF56ABQ0NQAdfK6Gng9dHg0giYYwJFE=;
-        b=GxGMLNJTLzBSohgS50rUkkbgTtdwGe2Xj/9xt8GaGsC/JvYFcuJmujjXDfell0RwilfUDr
-        kOzJw/mDywtTh9BchdlnjsoTEFlfRbn3YvlgSoE8rB3uoWnMZ5G5QLKpBjn18QRtOG3zVU
-        4hTIwAC9Ia5cj8xCaBYwiMn6+hDtqWm5ajNKPF5rGsSXrL02T2GA6l1JX2AZP6LfdWcl9R
-        qJLmm8aYF+2sjkzNNMmxNTeZ87+RAe/Y6hk3UeBjnJe/QiZMMZVv7FUlxwb4sI5pdMjuvX
-        yaqUk0qs6va7vuRCE1OAyB1H65VRzrxbw0rUH7X2yLX2HbBQvVJZ5AQN3y8tiA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1611568452;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=En+PvuTxJbTaSF56ABQ0NQAdfK6Gng9dHg0giYYwJFE=;
-        b=tx0I+MKzUAKZuVs+7/M38+6CjW1DLBOtMFDSMheUlFHRVANB4J7DGg951SE5ApmebeYl5U
-        OUIC9rzyEi7QTVBw==
-From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@kernel.org>
-Subject: [PATCH 3/3 v2] blk-mq: Use llist_head for blk_cpu_done
-Message-ID: <20210125095412.qxknd2vbsmgtrhqb@linutronix.de>
-References: <20210123201027.3262800-1-bigeasy@linutronix.de>
- <20210123201027.3262800-4-bigeasy@linutronix.de>
- <20210125083012.GD942655@infradead.org>
- <20210125083204.ahddujk5m6njwbju@linutronix.de>
- <20210125083903.GB945284@infradead.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+        Mon, 25 Jan 2021 09:17:33 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1611584253; x=1643120253;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=G8FZ0D3PP/OudJ5uuxCAz/C/vBHo8wESZoPwxTWqVEI=;
+  b=plqN6ULfZWOnYxzWZjh5wDrZvU6JIiXe5tNC7vjgfGWJgo7N6JXokkPV
+   V8VeVPMXqK9zrmg2l/+NlGsdOL5ANKj143JNCeXLJyls0hgZKzkKqboiJ
+   1PVmNVtpTV0VM5dZon5UgFmKGzWh2gp4cPF7k/Lb+MhuwBc5qPOY3wELN
+   3olQx0pLTOU7pnGMweXNWQ/dcZml2s8C02uIgFToGYeaXuYEyI02zreh0
+   NcqplF4qpZAorRDuK8HpAj97U7z8Ze40bO0OP3VYaP5QCeOxCYi0/uwN7
+   lOOMajRnuJ/0dMhRosPJMkqBdCLCHku13EhFo+/sE7/jcKFqLhxlJn/nz
+   A==;
+IronPort-SDR: qTagf3ki+EPA/XAMm7uptzJnwMYd+FUpsoAUPAXs2F5/7oAFJMPCspjzJygQU86vKC2ccoGWuF
+ Kh4S0i8WG3GQ5l6hOkJT1og4TGqGI04ektdvdIDO16ww5lpXrtAwgZPD47DpNMS2eWswyhk//x
+ gjVYby7OeRUokKDO61m8cIzVxlll39W3LMFcvCRl5/wmDf+hY3vYE9bJqp3uk2o7efDjOm0sVp
+ 5Sj+v6UljCw5GESobRnMrhJa5u1ff5MnUiWTpRr5Vwpu/1UxH/0cebkSB14088mRAY7JC4tORm
+ d/c=
+X-IronPort-AV: E=Sophos;i="5.79,373,1602518400"; 
+   d="scan'208";a="162701801"
+Received: from mail-bn7nam10lp2106.outbound.protection.outlook.com (HELO NAM10-BN7-obe.outbound.protection.outlook.com) ([104.47.70.106])
+  by ob1.hgst.iphmx.com with ESMTP; 25 Jan 2021 22:14:08 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JIKzWtm70kuelpOWyzrrIYam3rDPkakiCbEjR3G1tKr0FNvXEw68YWbkWCKoF53qgy8HTuCLHnbb632MWD2CJEwKIsEhXAdiCI6k48rPNbw8MEzWQi6cHGNsgnmoSIHX5sKax9HKbrVZorArps+3vbm35rdVeeTHy09apPNyWvWtKHF6T4OfZ6DDsdCfuYDUgo603OKUq7SUGoVkly9QV/DFgmWAjCo6exXhvAKPuC2yWraDk61iiGn1X+MCgWEtHDs15XznTgR6Ft5Pc5uUb5ErkBteJ11A3+YMchavdScjf8PjAwt9mZsi+Z6xfHY3KANNlLFhqmDW53AJFfdcxg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=G8FZ0D3PP/OudJ5uuxCAz/C/vBHo8wESZoPwxTWqVEI=;
+ b=dK6Y9YB1ploSPo5LS1a1ghI/9Q/hA3+0bMiCWReYk60nRgzwSj/4OZ1jAhW7QUbgG21ODZSu3UXuziqSmURXjMvg1TymDa0XYb+v1Gsg3cm659Znnr9eNj/CMXMzJ82h3Pqpi0VQ1IMmtF5AXUA+wa4CPSuQY7wLnQEWpf2NWpON4ReXuOjD6/amG/37xgPxsH9rmDip45NoJcxvbshgkF0w3JO6CAW/IcMQ5UHgrJ36MXrb7y7U+z8q8CVetM4ZZxC8uSI2D8t1C8VMF7pp/o6fhNeHh9Drq7G8fWKOXBJ9iCRsSvQkyej9UN+OArUGbgeB7zP1q70ecZ9tMZZU0w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=G8FZ0D3PP/OudJ5uuxCAz/C/vBHo8wESZoPwxTWqVEI=;
+ b=QM0m5iUjH1JwYfWdKn9+yOS2OyYhA7XPUkY/dbBEEmRF3e24CnN+5cNUlwUefNyZohDwVjbPWgBx2wxmseDWl06M2ExmYKDdoICViNGvzV6mLCAfVf5272hLbhy7FcfuVcEhIYxviELAfk9v7BT2IuHKARlxvSy+ek1ioC3iAwI=
+Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
+ (2603:10b6:803:47::21) by SN6PR04MB4319.namprd04.prod.outlook.com
+ (2603:10b6:805:31::27) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3784.16; Mon, 25 Jan
+ 2021 14:14:06 +0000
+Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
+ ([fe80::c19b:805:20e0:6274]) by SN4PR0401MB3598.namprd04.prod.outlook.com
+ ([fe80::c19b:805:20e0:6274%6]) with mapi id 15.20.3784.017; Mon, 25 Jan 2021
+ 14:14:06 +0000
+From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+CC:     Tejun Heo <tj@kernel.org>, Coly Li <colyli@suse.de>,
+        Song Liu <song@kernel.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "linux-bcache@vger.kernel.org" <linux-bcache@vger.kernel.org>,
+        "linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH 08/10] block: add a disk_uevent helper
+Thread-Topic: [PATCH 08/10] block: add a disk_uevent helper
+Thread-Index: AQHW8jkXIqNElehhEEiDCcJeiMg69A==
+Date:   Mon, 25 Jan 2021 14:14:06 +0000
+Message-ID: <SN4PR0401MB35987817DFEC3A6344C34E0D9BBD9@SN4PR0401MB3598.namprd04.prod.outlook.com>
+References: <20210124100241.1167849-1-hch@lst.de>
+ <20210124100241.1167849-9-hch@lst.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: lst.de; dkim=none (message not signed)
+ header.d=none;lst.de; dmarc=none action=none header.from=wdc.com;
+x-originating-ip: [129.253.240.72]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 485e63bb-7c3f-4581-5bc0-08d8c13b7a01
+x-ms-traffictypediagnostic: SN6PR04MB4319:
+x-microsoft-antispam-prvs: <SN6PR04MB4319C6923F6CBB53E34518EF9BBD9@SN6PR04MB4319.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:1728;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: bCk6Jb8+QfXyraTfaRPSO0Z4tOap/NHbwVyo7Ed7Jsgx8xTRxqHvWq7y6zJP8fEExTQYQKRUQK1ld+pb0WwwG+gjCh4sQDsJz5WjOlXIu+p+nVDv3oMS+KadBoXNvZqdA5Ee6A0cfNHjItEy0zpotJIZr57k9/2tt8qnt/jfXlLHdwZ1ctQ1EAklQi8u2K+zEyOTDWBmOzjq1JzJFbMrXW5gO+F2oYQ5PUI7ePcGsF4SIKo4aecLTz1ixW+J3i9zfpB0bjlH/0sbJB3/JeGb/AlyxErjif/dXCn6S2hZacoDE0EF5hwO+a9ZzejOMdbHNKxTzeEWaXO8QmMxHeQObU2LW9MXjS55Upr63mcztFFZYvy3B6RgflkbTTA1vv6OeMj3EIKKtEceP7Dw831l4g==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN4PR0401MB3598.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(376002)(346002)(136003)(366004)(39860400002)(4270600006)(71200400001)(54906003)(8676002)(110136005)(8936002)(316002)(33656002)(7696005)(5660300002)(2906002)(66946007)(91956017)(76116006)(86362001)(64756008)(66446008)(558084003)(66556008)(4326008)(66476007)(7416002)(52536014)(186003)(9686003)(19618925003)(26005)(55016002)(478600001)(6506007);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: =?us-ascii?Q?DY4V+TmXM55i/Akra5XOIzLfrUZf+oUb1MrkLQUi8EmFMZfVUQJ95xWLANBG?=
+ =?us-ascii?Q?+KsioA+tJf1dA6Ee+9jFMVVIsUVA38uB9jCDhGmS7Upr8IEobkLNawH0hhGO?=
+ =?us-ascii?Q?tmzxMBs1DGutZfFxxW9/2lgG6v7X4EUhN/2NO2Ah1zECZftXg8j86vS+3Kp3?=
+ =?us-ascii?Q?nLQhOYeRuszHqCL3TaYTT8NKCSxL6JbFt+/KGzkBJC0zkRM/9Hpvt9FdC47z?=
+ =?us-ascii?Q?eukQfCgzRrxUyfSzKvtbpE+vO5gpZsnVxxe0RCtMBIYjzCppJ6l73Y9MEFKL?=
+ =?us-ascii?Q?RHxPth6r8J7jGV+f9GF4dt/3vIvrtsZ/1b7o4lrQVKNtx7p1/wex9R+4G/AP?=
+ =?us-ascii?Q?/2J/Mtn5ayzuoWfcma3iVYhvv0J0twtUZwRgRS1VqtzR5TM06Jk5JouP9PMm?=
+ =?us-ascii?Q?ny1xJGODZJeWmPwAP+W9ByPoOdKOWZK/CjdtqU3CBb1dYsJXiTl29S9No27M?=
+ =?us-ascii?Q?SvdF5d6Nr1Uy52DMPhUWplgE0dapsfhnUAa9LZpj+zhKno2QIo3WoU/aaK3K?=
+ =?us-ascii?Q?3a81Dp8MnJ039V78Xwt2zrF6Oo0r2DvOPz3JueRia+3jOqObr+R0/qT+ooOs?=
+ =?us-ascii?Q?9PXVOjkoHZVClX3n/O9bKYsLgv49mx6mKMAL0R0wWSkSGQiPgW1VXhKdQxVL?=
+ =?us-ascii?Q?vT74q2KgF76BgyQNCrrF5U9BnCuZxoGEAew/KWGoA8ZD02U0RtIsC8W3bBwY?=
+ =?us-ascii?Q?Tmy6J6HHIW1mlnMOo1u++1IqmSmio8zp+2hf1orJKEwltWkuIu34yBEA54Di?=
+ =?us-ascii?Q?nVgIhHiTn39toJwchB73wvTFYXOG6MXuGc3vhkdmxEmMzD5ATJdoYFNvCczV?=
+ =?us-ascii?Q?LeTfCGoKqxJbMDJySrR1W3Y//7qH18Leusieco2hQ4ZHK0405YDPS6i3LKu6?=
+ =?us-ascii?Q?2ZkQSBORQ565A3EtRUTYVRTW6SZXQwv199sUWbz9mv3PlZ/1wXN4Tu9Jwc5v?=
+ =?us-ascii?Q?0xd3QYONjsDGRWq7U61V2b89guhlJvzgaP+R9C/8K7O4YAidWRtSz7Ikz1RN?=
+ =?us-ascii?Q?JRbERlmLkbXdVjB8IuJFFve5gpoD4nYEnCBarx6/Xadh5B7//fZ5OZ5R0jY6?=
+ =?us-ascii?Q?/xUsOE2ObhYYtSNSiRBNiM3HQmXFag=3D=3D?=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20210125083903.GB945284@infradead.org>
+MIME-Version: 1.0
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SN4PR0401MB3598.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 485e63bb-7c3f-4581-5bc0-08d8c13b7a01
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Jan 2021 14:14:06.6516
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: EC4IJ1mPr5agF1kGHk101F2P1wfJRJTDjk2KyI7YmzH+lFZX8NEXxI2XkX7EFkR8eHiF+gjMi+E2/FJZke38g/gRXuu5GTvCKgL88N6T7UM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR04MB4319
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-With llist_head it is possible to avoid the locking (the irq-off region)
-when items are added. This makes it possible to add items on a remote
-CPU without additional locking.
-llist_add() returns true if the list was previously empty. This can be
-used to invoke the SMP function call / raise sofirq only if the first
-item was added (otherwise it is already pending).
-This simplifies the code a little and reduces the IRQ-off regions.
-
-blk_mq_raise_softirq() needs a preempt-disable section to ensure the
-request is enqueued on the same CPU as the softirq is raised.
-Some callers (USB-storage) invoke this path in preemptible context.
-
-Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
----
-v1=E2=80=A6v2: Move var initialisation to declaration in
-       blk_mq_complete_send_ipi(). Suggested by hch.
-
- block/blk-mq.c         | 95 +++++++++++++++++-------------------------
- include/linux/blkdev.h |  2 +-
- 2 files changed, 40 insertions(+), 57 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 90348ae518461..8429be0d9b8dd 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -41,7 +41,7 @@
- #include "blk-mq-sched.h"
- #include "blk-rq-qos.h"
-=20
--static DEFINE_PER_CPU(struct list_head, blk_cpu_done);
-+static DEFINE_PER_CPU(struct llist_head, blk_cpu_done);
-=20
- static void blk_mq_poll_stats_start(struct request_queue *q);
- static void blk_mq_poll_stats_fn(struct blk_stat_callback *cb);
-@@ -567,68 +567,29 @@ void blk_mq_end_request(struct request *rq, blk_statu=
-s_t error)
- }
- EXPORT_SYMBOL(blk_mq_end_request);
-=20
--/*
-- * Softirq action handler - move entries to local list and loop over them
-- * while passing them to the queue registered handler.
-- */
--static __latent_entropy void blk_done_softirq(struct softirq_action *h)
-+static void blk_complete_reqs(struct llist_head *list)
- {
--	struct list_head *cpu_list, local_list;
-+	struct llist_node *entry =3D llist_reverse_order(llist_del_all(list));
-+	struct request *rq, *next;
-=20
--	local_irq_disable();
--	cpu_list =3D this_cpu_ptr(&blk_cpu_done);
--	list_replace_init(cpu_list, &local_list);
--	local_irq_enable();
--
--	while (!list_empty(&local_list)) {
--		struct request *rq;
--
--		rq =3D list_entry(local_list.next, struct request, ipi_list);
--		list_del_init(&rq->ipi_list);
-+	llist_for_each_entry_safe(rq, next, entry, ipi_list)
- 		rq->q->mq_ops->complete(rq);
--	}
- }
-=20
--static void blk_mq_trigger_softirq(struct request *rq)
-+static __latent_entropy void blk_done_softirq(struct softirq_action *h)
- {
--	struct list_head *list;
--	unsigned long flags;
--
--	local_irq_save(flags);
--	list =3D this_cpu_ptr(&blk_cpu_done);
--	list_add_tail(&rq->ipi_list, list);
--
--	/*
--	 * If the list only contains our just added request, signal a raise of
--	 * the softirq.  If there are already entries there, someone already
--	 * raised the irq but it hasn't run yet.
--	 */
--	if (list->next =3D=3D &rq->ipi_list)
--		raise_softirq_irqoff(BLOCK_SOFTIRQ);
--	local_irq_restore(flags);
-+	blk_complete_reqs(this_cpu_ptr(&blk_cpu_done));
- }
-=20
- static int blk_softirq_cpu_dead(unsigned int cpu)
- {
--	/*
--	 * If a CPU goes away, splice its entries to the current CPU
--	 * and trigger a run of the softirq
--	 */
--	local_irq_disable();
--	list_splice_init(&per_cpu(blk_cpu_done, cpu),
--			 this_cpu_ptr(&blk_cpu_done));
--	raise_softirq_irqoff(BLOCK_SOFTIRQ);
--	local_irq_enable();
--
-+	blk_complete_reqs(&per_cpu(blk_cpu_done, cpu));
- 	return 0;
- }
-=20
--
- static void __blk_mq_complete_request_remote(void *data)
- {
--	struct request *rq =3D data;
--
--	blk_mq_trigger_softirq(rq);
-+	__raise_softirq_irqoff(BLOCK_SOFTIRQ);
- }
-=20
- static inline bool blk_mq_complete_need_ipi(struct request *rq)
-@@ -657,6 +618,28 @@ static inline bool blk_mq_complete_need_ipi(struct req=
-uest *rq)
- 	return cpu_online(rq->mq_ctx->cpu);
- }
-=20
-+static void blk_mq_complete_send_ipi(struct request *rq)
-+{
-+	unsigned int cpu =3D rq->mq_ctx->cpu;
-+	struct llist_head *list =3D &per_cpu(blk_cpu_done, cpu);
-+
-+	if (llist_add(&rq->ipi_list, list)) {
-+		INIT_CSD(&rq->csd, __blk_mq_complete_request_remote, rq);
-+		smp_call_function_single_async(cpu, &rq->csd);
-+	}
-+}
-+
-+static void blk_mq_raise_softirq(struct request *rq)
-+{
-+	struct llist_head *list;
-+
-+	preempt_disable();
-+	list =3D this_cpu_ptr(&blk_cpu_done);
-+	if (llist_add(&rq->ipi_list, list))
-+		raise_softirq(BLOCK_SOFTIRQ);
-+	preempt_enable();
-+}
-+
- bool blk_mq_complete_request_remote(struct request *rq)
- {
- 	WRITE_ONCE(rq->state, MQ_RQ_COMPLETE);
-@@ -669,15 +652,15 @@ bool blk_mq_complete_request_remote(struct request *r=
-q)
- 		return false;
-=20
- 	if (blk_mq_complete_need_ipi(rq)) {
--		INIT_CSD(&rq->csd, __blk_mq_complete_request_remote, rq);
--		smp_call_function_single_async(rq->mq_ctx->cpu, &rq->csd);
--	} else {
--		if (rq->q->nr_hw_queues > 1)
--			return false;
--		blk_mq_trigger_softirq(rq);
-+		blk_mq_complete_send_ipi(rq);
-+		return true;
- 	}
-=20
--	return true;
-+	if (rq->q->nr_hw_queues =3D=3D 1) {
-+		blk_mq_raise_softirq(rq);
-+		return true;
-+	}
-+	return false;
- }
- EXPORT_SYMBOL_GPL(blk_mq_complete_request_remote);
-=20
-@@ -3892,7 +3875,7 @@ static int __init blk_mq_init(void)
- 	int i;
-=20
- 	for_each_possible_cpu(i)
--		INIT_LIST_HEAD(&per_cpu(blk_cpu_done, i));
-+		init_llist_head(&per_cpu(blk_cpu_done, i));
- 	open_softirq(BLOCK_SOFTIRQ, blk_done_softirq);
-=20
- 	cpuhp_setup_state_nocalls(CPUHP_BLOCK_SOFTIRQ_DEAD,
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index f94ee3089e015..89a444c5a5833 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -153,7 +153,7 @@ struct request {
- 	 */
- 	union {
- 		struct hlist_node hash;	/* merge hash */
--		struct list_head ipi_list;
-+		struct llist_node ipi_list;
- 	};
-=20
- 	/*
---=20
-2.30.0
-
+Looks good,=0A=
+Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>=0A=
