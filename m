@@ -2,141 +2,278 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,PDS_BAD_THREAD_QP_64,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81335C433DB
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 05:33:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F934C433DB
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 05:33:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 42925229C4
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 05:33:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0EE4F229C4
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 05:33:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387672AbhAZFdV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Jan 2021 00:33:21 -0500
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:60488 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729183AbhAYODy (ORCPT
+        id S2387767AbhAZFdZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Jan 2021 00:33:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48220 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731285AbhAYTD7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Jan 2021 09:03:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1611583433; x=1643119433;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=G8FZ0D3PP/OudJ5uuxCAz/C/vBHo8wESZoPwxTWqVEI=;
-  b=Ek2G7xRmYt8CIqEqm1zWuFdOelKVDeLNfESt/tOkG5QIgstFlJcvqmeB
-   GrXlMgQCtcYqWaxXN+IpPiJs/+qMyQEyEu8AzfdV/rV17VQhYmf+pm8VO
-   g0A/q05XEGNDQWfTQBB7eSkgQUvrHemXYTPWaK/ojrlcztl5I19ETNdj6
-   WeFMcGkIlm6cClwkZ/tWmerqMzw1kGyHOnUUNd4TNecQybFarfrnWhuwW
-   uM1uWk83lWNK38AuzeS9W/BvF1jelSHzxR2vfDAIMSYFf3rRqWNlXStTg
-   VLhMunftGAB1ewI6ERpECKk6D23t+G9OFt6z/C9X6ldc/s15UlSXBAexw
-   w==;
-IronPort-SDR: V3N7ZrSNWeXTX+/dvYszCBh4E/pXfqshqmFMQiMDWHwAOGTJLRcZyxI7cUo0ne28UotquITEKB
- hnQwqn/jFVOVtBJJoaTeOUBFGDZ5/ZFyrhIj+VIsmE6lUg1fhJwQ1XV9HpOq3eyypOn+lrR42W
- FNq8SmU/8wKOP+cwLSCO+abdeSsPtD1YM+6BGllHSO7Wo6lqKk9ys0tIxZPaL6+kJp1FVrleH3
- s2CLpO2JgDRD2q2cVeg/mxi6xsXZI/4HkZ6+GgxKMC5Sxpfiwe4I+HsoIfaeGP6XKvrzcHdc5G
- kJE=
-X-IronPort-AV: E=Sophos;i="5.79,373,1602518400"; 
-   d="scan'208";a="268618223"
-Received: from mail-dm6nam10lp2108.outbound.protection.outlook.com (HELO NAM10-DM6-obe.outbound.protection.outlook.com) ([104.47.58.108])
-  by ob1.hgst.iphmx.com with ESMTP; 25 Jan 2021 22:02:43 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=l6bcB5R5jIoIfcZc6+zFOHuKSzvTUeHiqn46Q9kH+cxGQiAW+dxW1QO1LtqdLsljZXk3r6ni91anp7sow46DkaBRC7tN27xSyH5PkPpeclOqnkWZuFFOpkxM/wvJ49M09uKkYg/3zg+NI5amn57QJDtHq0HIAUsxpPYw+0LxeFVSJmpNegJIz9Ioq14lkLHrSrncwHb+8dHK7ccXZipYE/bl4kEZdPgVzgnBl8U1h3Fz+S5nmiNIGEZt+B+5J6P2ZqWuRod1QbvS1Uef8S0pVsc87HVYxSkYfWYJakuh54g8nh26ebvqD2oi/3ERF7lakdRUb+u6NO2ebsr1fnIwMQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=G8FZ0D3PP/OudJ5uuxCAz/C/vBHo8wESZoPwxTWqVEI=;
- b=kE/1ffCr2PsT/L/ulxGI7UqOOVPBs1vt8wNsJ3mhubM8+zv83o3xwSR6LgosGNbFltKaD0XZa8F5uAsyN9+oomBeCG/ChC0WIRMI8F84NenOHLrDbyfVxbQLq+LM16J/Jydx6ClG661CMTvq6LUNUtmlfCEi4x0PvHFMW/F0hs/Df7pDnPzK0OlnNVnKGQT64T4N3T5tNyXqqvodNGxHhNERFYvwDhxPiLt9Q0tswKpiyCqoumEDf85m+DD6hEiPcnn9yiXeb+I4rYLqXMhle9++rdy8BT9QuK75NBn7LOICzcaPpyXWjh9M3M2D3qFvUFRA+bPkUzLDjLOZ8xUYMg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
+        Mon, 25 Jan 2021 14:03:59 -0500
+Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A593C061756
+        for <linux-block@vger.kernel.org>; Mon, 25 Jan 2021 11:03:16 -0800 (PST)
+Received: by mail-wr1-x42c.google.com with SMTP id d16so13419304wro.11
+        for <linux-block@vger.kernel.org>; Mon, 25 Jan 2021 11:03:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=G8FZ0D3PP/OudJ5uuxCAz/C/vBHo8wESZoPwxTWqVEI=;
- b=pSsJNYj9HSyBhWLlyls+otVykfUCHA9ifkm+K0huU+DSdLclkDks3gwjGEfoeI+zZ0CB7mDSS3Pn+g2DHTMxYWSmhX+3pO2pGWVRDps5x/fSkFqPtBSNyJ0o1TjIjcR0stVEJ7lorvU9WtrRUUseAHtB+rhKheY1QTphV3zI9k8=
-Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
- (2603:10b6:803:47::21) by SA0PR04MB7212.namprd04.prod.outlook.com
- (2603:10b6:806:ef::16) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3784.16; Mon, 25 Jan
- 2021 14:02:42 +0000
-Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
- ([fe80::c19b:805:20e0:6274]) by SN4PR0401MB3598.namprd04.prod.outlook.com
- ([fe80::c19b:805:20e0:6274%6]) with mapi id 15.20.3784.017; Mon, 25 Jan 2021
- 14:02:42 +0000
-From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-CC:     Tejun Heo <tj@kernel.org>, Coly Li <colyli@suse.de>,
-        Song Liu <song@kernel.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "linux-bcache@vger.kernel.org" <linux-bcache@vger.kernel.org>,
-        "linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH 04/10] block: simplify submit_bio_checks a bit
-Thread-Topic: [PATCH 04/10] block: simplify submit_bio_checks a bit
-Thread-Index: AQHW8jixUFjfNZP8d0CYJnK7p9X8jw==
-Date:   Mon, 25 Jan 2021 14:02:42 +0000
-Message-ID: <SN4PR0401MB35984AC9DFB6DD0A76E1D70D9BBD9@SN4PR0401MB3598.namprd04.prod.outlook.com>
-References: <20210124100241.1167849-1-hch@lst.de>
- <20210124100241.1167849-5-hch@lst.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: lst.de; dkim=none (message not signed)
- header.d=none;lst.de; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [129.253.240.72]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 663f6028-63f4-4c21-dbfb-08d8c139e21e
-x-ms-traffictypediagnostic: SA0PR04MB7212:
-x-microsoft-antispam-prvs: <SA0PR04MB7212FF2C79CE723C2C66ED789BBD9@SA0PR04MB7212.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:1728;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 3z+t9zY+VtyQRVr6x2e728wxrgOx8Z1LU8v2ZTfhEyKJV5EJZa9wXklT+6x7v/Rpx06TnTCc5M7quAZqxbulQc2YjI+zwcBRAgs2aFAABXGIApSYD/YpkUUsBKvPsjH4CDe/meID2menHRrNVYTbg0ivQRi7ViWNjJ8cczsvBX5v8BiJ0St5f4hF/52lvSWk6X/Y5Ujov5hajxKPAXr5b+wEEzamhUScP5ekVhFbs27+V1FPi++DIyONVBU2p3FOF9xc7dv5QSzQDKZL9QV8x7KuaKH8vRrIeVdfOp67kmjypLaR1VwIjJp94jJ2aTgRx96v2o873FFBDswTaPWKgUnhjUffwKiuk3+wJ6TKKtdghTjH5uSlMiI2yF3sDdpwHByxZW4YJVpkeg7dkHK76w==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN4PR0401MB3598.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(396003)(39860400002)(376002)(136003)(346002)(8936002)(26005)(8676002)(478600001)(66446008)(4270600006)(55016002)(4326008)(91956017)(76116006)(5660300002)(2906002)(19618925003)(316002)(33656002)(66556008)(9686003)(66946007)(71200400001)(52536014)(54906003)(7416002)(558084003)(6506007)(7696005)(86362001)(110136005)(64756008)(186003)(66476007);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: =?us-ascii?Q?v+KZhFzsc9vL0pMjFctD/Kc+LQPY1mH7rMEVZCQxzqvGZHos/FBc5dt4qqmX?=
- =?us-ascii?Q?8G6urzTZDq99meQ25U7cWy3ck1Kh0weXZqD+PTERKuBiWX5v2wm6e1lObFdw?=
- =?us-ascii?Q?0pNulamlrVka219ThF+QGBZLaDqXWb/UOvuKdX1Mb5dcRVm6EY6ZainjG4Hi?=
- =?us-ascii?Q?fyeKwVY2HPq3ysq6MlKmth3p2nqyYPcK6ZjEcvrwujmrzg8QvwndUe4Y3JrI?=
- =?us-ascii?Q?4gwr4N6CLCcXB3mvr+onujNgvzuj9mkWNnseao52/uKc//zWfUaL7ip0FkPV?=
- =?us-ascii?Q?fI5678ALh0ITCAZXHFywPbfjAELzW7InbKkif374TqBVxRpPMHj91ZzsP8Qu?=
- =?us-ascii?Q?l9inPvKZUnhKdceb4uz82QD01+DSIo0NCVxeEr6u95PNW3D0fI2w2wR7pnmh?=
- =?us-ascii?Q?rcNFJsIGLy1+j/ZKkRx/gLhqD0zWzxAKliMO+q1pN7pqdqBA/g3T0NaGuu/v?=
- =?us-ascii?Q?2t04krV6s9HzBMZVLr/ApGAHaa8ZQyXAyi/Mwqi+WRonR8TZ7WtE1kqEDlUc?=
- =?us-ascii?Q?kzflIx+pRtB8qM5DNxYoqv2GJlk4vkw2Ht7NbGFlwffHO3zzjFkA03IsqB7T?=
- =?us-ascii?Q?Djoo7cPHPaFzZJbQ/qRP866AVIaSDgBPfwM0ZXwKPBf0RxthWa2/QbFgRPT8?=
- =?us-ascii?Q?lBxqFPkpEOU+GWE+u1xDYEXh+VSRhnver6pJ93Tnn0B8Gw82s6T/qpkRvM1W?=
- =?us-ascii?Q?esgQdO4GD69U79d0Iy9kma4vTcKODHLqDp/baeuvf00jQWMlFT9pO+6Wqvq9?=
- =?us-ascii?Q?TUcBzSpuVqyoJgjRGbaCSbI5CezgmnYNjPY9uFmOipDkRhWCXkaPvZGjYiFQ?=
- =?us-ascii?Q?SCuca5lbcZWBTfVX7EkdoVHjZXzI/KZOHXylvFor1feGxDpcu5SpFHs6vVrl?=
- =?us-ascii?Q?s9w+NHvAQFJcX5mYmGjuheoWfaq5/kNMsAwSza+V6T4Sijs4LQndUQMmB0q4?=
- =?us-ascii?Q?hx2p1AtDFDvg33W0HWSFtaIDw74DOdYR1GmxuyqRlf/PaACQ4VntjeknRCEk?=
- =?us-ascii?Q?NFpBu45Um8n+ullPbPdnCDlzweKPM3/TKiIFi+yGdC16DFB9q7H4zkINgGp1?=
- =?us-ascii?Q?P170RebQYjRvZMRCYUBR0J9LPoLOJA=3D=3D?=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        d=linaro.org; s=google;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=ZgGFbvXxHvS5eUAN/hln5OKJlAJbciVhefRf0mMTswU=;
+        b=KjoB8VpoBeqeCFf+1js5OWLn3XeZLjEhCQcs7QPGEfZdwqHQ0iMln4FfmlXmM/dYdw
+         Od+jRiFZo7ddkhBE8ByTSWYCVO8Fo84QHRIuAkBIp9XJpb4dqrxVNOgMECme+VNZ8s7P
+         p4aVOdjjCtBcMXs/Zy4+fhKkBJgEpyu7bM8cSAupcricts2FrbLFeCT16jTjUeAutXcq
+         NYcUx+UDSAqXkI/itiY5J7zhUUPB8IvJFqN73NkEjkQr3/W9CjDjSq7yrNn0qqwgyzey
+         SypkN40Dq8GyymVh7g12ZbEEUTV7fYeK8BZJ/PBWHtqCKIueciFmbkiQCBu/noHV96aO
+         7PaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=ZgGFbvXxHvS5eUAN/hln5OKJlAJbciVhefRf0mMTswU=;
+        b=U3zigaSYQ063/LysqziWHdbxthLOP3256xT3ewKRVameVfOS7ffOoQuOrOI5QK84B6
+         AtFSnsEPTBf8jwkBe5/PR53QRX2g2+0Ct3tmzpC248XEc21sEa1BpG1lGyjcwDJ9WkPF
+         w5VaDIqqJaDFsRg/c5vh5tdHAF9VndOJXDPfKzU96tlfpFmnJ49QrvpIMK0pgAi9ygib
+         DxR3Uz2ZHxy4oZM+tF8Ks1Gib15bITd32hfIpXvCMyz8Xn6BfR+DTkTEwWUab5xOU7bu
+         ndyjM6i1mS6DpxvYqi791f84aJZTVRMkBmb5J0kCTChIFih2AncF9ftgewKoeM9qxSJE
+         pUEQ==
+X-Gm-Message-State: AOAM531sNov2lwZfYpNzOIk9rr5JEUASWVM8uwMGLMQXfHQXUFyeXrDJ
+        hXkNJSh6oxUiyJAdV8u4SWpjiw==
+X-Google-Smtp-Source: ABdhPJwUWAsFf6dK2EcfP+GGoeBvK78AUFHELoUYX26fRo4bwu35ni+MdVc7neA/Qw7dzWF+RzE3UA==
+X-Received: by 2002:adf:decb:: with SMTP id i11mr1213090wrn.78.1611601395112;
+        Mon, 25 Jan 2021 11:03:15 -0800 (PST)
+Received: from localhost.localdomain ([37.160.159.175])
+        by smtp.gmail.com with ESMTPSA id g194sm222534wme.39.2021.01.25.11.03.13
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 25 Jan 2021 11:03:14 -0800 (PST)
+From:   Paolo Valente <paolo.valente@linaro.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Jan Kara <jack@suse.cz>
+Subject: [PATCH BUGFIX/IMPROVEMENT 1/6] block, bfq: replace mechanism for evaluating I/O intensity
+Date:   Mon, 25 Jan 2021 20:02:43 +0100
+Message-Id: <20210125190248.49338-2-paolo.valente@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20210125190248.49338-1-paolo.valente@linaro.org>
+References: <20210125190248.49338-1-paolo.valente@linaro.org>
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN4PR0401MB3598.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 663f6028-63f4-4c21-dbfb-08d8c139e21e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Jan 2021 14:02:42.3355
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Fecisb+yikKWREgRIW50+ya6NJK+A8bZWz/Eb5F1pseTJMZRl00cGDVDkHaUMTFuuJTLJWBXdzr5zQN863D87daA+RyOKYEuyk2QWI8UqMY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR04MB7212
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Looks good,=0A=
-Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>=0A=
+Some BFQ mechanisms make their decisions on a bfq_queue basing also on
+whether the bfq_queue is I/O bound. In this respect, the current logic
+for evaluating whether a bfq_queue is I/O bound is rather rough. This
+commits replaces this logic with a more effective one.
+
+The new logic measures the percentage of time during which a bfq_queue
+is active, and marks the bfq_queue as I/O bound if the latter if this
+percentage is above a fixed threshold.
+
+Tested-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+---
+ block/bfq-iosched.c | 63 +++++++++++++++++++++++++++++++--------------
+ block/bfq-iosched.h | 16 ++++++------
+ 2 files changed, 52 insertions(+), 27 deletions(-)
+
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index c045613ce927..db393f5d70ba 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -1026,6 +1026,8 @@ bfq_bfqq_resume_state(struct bfq_queue *bfqq, struct bfq_data *bfqd,
+ 
+ 	bfqq->entity.new_weight = bic->saved_weight;
+ 	bfqq->ttime = bic->saved_ttime;
++	bfqq->io_start_time = bic->saved_io_start_time;
++	bfqq->tot_idle_time = bic->saved_tot_idle_time;
+ 	bfqq->wr_coeff = bic->saved_wr_coeff;
+ 	bfqq->wr_start_at_switch_to_srt = bic->saved_wr_start_at_switch_to_srt;
+ 	bfqq->last_wr_start_finish = bic->saved_last_wr_start_finish;
+@@ -1721,17 +1723,6 @@ static void bfq_bfqq_handle_idle_busy_switch(struct bfq_data *bfqd,
+ 
+ 	bfq_clear_bfqq_just_created(bfqq);
+ 
+-
+-	if (!bfq_bfqq_IO_bound(bfqq)) {
+-		if (arrived_in_time) {
+-			bfqq->requests_within_timer++;
+-			if (bfqq->requests_within_timer >=
+-			    bfqd->bfq_requests_within_timer)
+-				bfq_mark_bfqq_IO_bound(bfqq);
+-		} else
+-			bfqq->requests_within_timer = 0;
+-	}
+-
+ 	if (bfqd->low_latency) {
+ 		if (unlikely(time_is_after_jiffies(bfqq->split_time)))
+ 			/* wraparound */
+@@ -1865,6 +1856,36 @@ static void bfq_reset_inject_limit(struct bfq_data *bfqd,
+ 	bfqq->decrease_time_jif = jiffies;
+ }
+ 
++static void bfq_update_io_intensity(struct bfq_queue *bfqq, u64 now_ns)
++{
++	u64 tot_io_time = now_ns - bfqq->io_start_time;
++
++	if (RB_EMPTY_ROOT(&bfqq->sort_list) && bfqq->dispatched == 0)
++		bfqq->tot_idle_time +=
++			now_ns - bfqq->ttime.last_end_request;
++
++	if (unlikely(bfq_bfqq_just_created(bfqq)))
++		return;
++
++	/*
++	 * Must be busy for at least about 80% of the time to be
++	 * considered I/O bound.
++	 */
++	if (bfqq->tot_idle_time * 5 > tot_io_time)
++		bfq_clear_bfqq_IO_bound(bfqq);
++	else
++		bfq_mark_bfqq_IO_bound(bfqq);
++
++	/*
++	 * Keep an observation window of at most 200 ms in the past
++	 * from now.
++	 */
++	if (tot_io_time > 200 * NSEC_PER_MSEC) {
++		bfqq->io_start_time = now_ns - (tot_io_time>>1);
++		bfqq->tot_idle_time >>= 1;
++	}
++}
++
+ static void bfq_add_request(struct request *rq)
+ {
+ 	struct bfq_queue *bfqq = RQ_BFQQ(rq);
+@@ -1872,6 +1893,7 @@ static void bfq_add_request(struct request *rq)
+ 	struct request *next_rq, *prev;
+ 	unsigned int old_wr_coeff = bfqq->wr_coeff;
+ 	bool interactive = false;
++	u64 now_ns = ktime_get_ns();
+ 
+ 	bfq_log_bfqq(bfqd, bfqq, "add_request %d", rq_is_sync(rq));
+ 	bfqq->queued[rq_is_sync(rq)]++;
+@@ -1934,7 +1956,7 @@ static void bfq_add_request(struct request *rq)
+ 		 */
+ 		if (bfqd->last_completed_rq_bfqq &&
+ 		    !bfq_bfqq_has_short_ttime(bfqq) &&
+-		    ktime_get_ns() - bfqd->last_completion <
++		    now_ns - bfqd->last_completion <
+ 		    4 * NSEC_PER_MSEC) {
+ 			if (bfqd->last_completed_rq_bfqq != bfqq &&
+ 			    bfqd->last_completed_rq_bfqq !=
+@@ -2051,6 +2073,9 @@ static void bfq_add_request(struct request *rq)
+ 		}
+ 	}
+ 
++	if (bfq_bfqq_sync(bfqq))
++		bfq_update_io_intensity(bfqq, now_ns);
++
+ 	elv_rb_add(&bfqq->sort_list, rq);
+ 
+ 	/*
+@@ -2712,6 +2737,8 @@ static void bfq_bfqq_save_state(struct bfq_queue *bfqq)
+ 	bic->saved_ttime = bfqq->ttime;
+ 	bic->saved_has_short_ttime = bfq_bfqq_has_short_ttime(bfqq);
+ 	bic->saved_IO_bound = bfq_bfqq_IO_bound(bfqq);
++	bic->saved_io_start_time = bfqq->io_start_time;
++	bic->saved_tot_idle_time = bfqq->tot_idle_time;
+ 	bic->saved_in_large_burst = bfq_bfqq_in_large_burst(bfqq);
+ 	bic->was_in_burst_list = !hlist_unhashed(&bfqq->burst_list_node);
+ 	if (unlikely(bfq_bfqq_just_created(bfqq) &&
+@@ -3979,10 +4006,6 @@ void bfq_bfqq_expire(struct bfq_data *bfqd,
+ 	      bfq_bfqq_budget_left(bfqq) >=  entity->budget / 3)))
+ 		bfq_bfqq_charge_time(bfqd, bfqq, delta);
+ 
+-	if (reason == BFQQE_TOO_IDLE &&
+-	    entity->service <= 2 * entity->budget / 10)
+-		bfq_clear_bfqq_IO_bound(bfqq);
+-
+ 	if (bfqd->low_latency && bfqq->wr_coeff == 1)
+ 		bfqq->last_wr_start_finish = jiffies;
+ 
+@@ -5088,6 +5111,8 @@ static void bfq_check_ioprio_change(struct bfq_io_cq *bic, struct bio *bio)
+ static void bfq_init_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ 			  struct bfq_io_cq *bic, pid_t pid, int is_sync)
+ {
++	u64 now_ns = ktime_get_ns();
++
+ 	RB_CLEAR_NODE(&bfqq->entity.rb_node);
+ 	INIT_LIST_HEAD(&bfqq->fifo);
+ 	INIT_HLIST_NODE(&bfqq->burst_list_node);
+@@ -5115,7 +5140,9 @@ static void bfq_init_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ 		bfq_clear_bfqq_sync(bfqq);
+ 
+ 	/* set end request to minus infinity from now */
+-	bfqq->ttime.last_end_request = ktime_get_ns() + 1;
++	bfqq->ttime.last_end_request = now_ns + 1;
++
++	bfqq->io_start_time = now_ns;
+ 
+ 	bfq_mark_bfqq_IO_bound(bfqq);
+ 
+@@ -6529,8 +6556,6 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_type *e)
+ 	bfqd->bfq_slice_idle = bfq_slice_idle;
+ 	bfqd->bfq_timeout = bfq_timeout;
+ 
+-	bfqd->bfq_requests_within_timer = 120;
+-
+ 	bfqd->bfq_large_burst_thresh = 8;
+ 	bfqd->bfq_burst_interval = msecs_to_jiffies(180);
+ 
+diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+index 703895224562..c913b06016b3 100644
+--- a/block/bfq-iosched.h
++++ b/block/bfq-iosched.h
+@@ -291,6 +291,11 @@ struct bfq_queue {
+ 	/* associated @bfq_ttime struct */
+ 	struct bfq_ttime ttime;
+ 
++	/* when bfqq started to do I/O within the last observation window */
++	u64 io_start_time;
++	/* how long bfqq has remained empty during the last observ. window */
++	u64 tot_idle_time;
++
+ 	/* bit vector: a 1 for each seeky requests in history */
+ 	u32 seek_history;
+ 
+@@ -407,6 +412,9 @@ struct bfq_io_cq {
+ 	 */
+ 	bool saved_IO_bound;
+ 
++	u64 saved_io_start_time;
++	u64 saved_tot_idle_time;
++
+ 	/*
+ 	 * Same purpose as the previous fields for the value of the
+ 	 * field keeping the queue's belonging to a large burst
+@@ -641,14 +649,6 @@ struct bfq_data {
+ 	 */
+ 	unsigned int bfq_timeout;
+ 
+-	/*
+-	 * Number of consecutive requests that must be issued within
+-	 * the idle time slice to set again idling to a queue which
+-	 * was marked as non-I/O-bound (see the definition of the
+-	 * IO_bound flag for further details).
+-	 */
+-	unsigned int bfq_requests_within_timer;
+-
+ 	/*
+ 	 * Force device idling whenever needed to provide accurate
+ 	 * service guarantees, without caring about throughput
+-- 
+2.20.1
+
