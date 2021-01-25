@@ -2,141 +2,339 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,PDS_BAD_THREAD_QP_64,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F24AAC433E9
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 19:53:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A4A8C43381
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 19:53:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B7D2A22B51
+	by mail.kernel.org (Postfix) with ESMTP id DBF8722B3F
 	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 19:53:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730587AbhAZFdK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Jan 2021 00:33:10 -0500
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:15164 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729016AbhAYNwX (ORCPT
+        id S1728842AbhAZFco (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Jan 2021 00:32:44 -0500
+Received: from out30-57.freemail.mail.aliyun.com ([115.124.30.57]:49793 "EHLO
+        out30-57.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727883AbhAYMS1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Jan 2021 08:52:23 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1611582743; x=1643118743;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=G8FZ0D3PP/OudJ5uuxCAz/C/vBHo8wESZoPwxTWqVEI=;
-  b=kkA5mkVdr4tK4VndD8Pb19QBeES38CaHWeu8aV782IjJvHAIcNj1BUIt
-   j0U/0woRdCuTH/Sn+nrAMiIqw4py0wOMphIvnBHD92cFqkm28+aFKr7OU
-   MHkrcZjnM26rXrLQrGs3CTnMCBQSIVoq25M61u3M+d/tiOb+ctPCAjGAm
-   5qQo0N7U5zlOsjvanAo3rFs+KgRz/9Ypu1X6Ro5uPa+lzVk+NJxe6KtSQ
-   KiJVAdfnpj/EmBjX6iuZWT/wokpwVyIEcAlPtKqqmMPMlEPN0INs0Js7O
-   AScbZd0Qg+4EIAM6NDBCwt7z2CmTkMXAQNytJYvUw8dxgBHjYtdRGlqyd
-   w==;
-IronPort-SDR: cTNFEceCeU89THMwRJ6J2qN6mabMNFKK671hb8z1ZcSRDoAxOiOnXTrx3iGBnJ1UaRxYOMgR3j
- k3hXwWxE3IwwQDLAY5c7GgRki8seBfSF9v9jFwCobIhTzzjhttLvy0Q+7RHpPBJVXe3Yr7DXDz
- c/TOgqtZw3H1+CDGfAZ3kP4T6f2n/6WDJs2QVUYzE5ypwGtj3xSW/9Gc4SlJuNJVPLX1E/Yo0P
- SWi0qjOpleWHlxZBkUnYkovO2Sg8fd7bkuCVgdOzttwfUHGZ161fFSNpbzhQMuFF0fcavf8ipT
- Cm0=
-X-IronPort-AV: E=Sophos;i="5.79,373,1602518400"; 
-   d="scan'208";a="159434226"
-Received: from mail-dm6nam11lp2177.outbound.protection.outlook.com (HELO NAM11-DM6-obe.outbound.protection.outlook.com) ([104.47.57.177])
-  by ob1.hgst.iphmx.com with ESMTP; 25 Jan 2021 21:51:07 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gwwVos+4hHcvAuDGvwPbtJRi5WkbJeHSa2xIrHkLgeJyEXFE+vr7/czel4EZ5w6/mjfmk12hzJ6m2D1UckQP1M8Azbs2Wwh3WMe4NFuqkKAHz39N5UqGajWOAuWrVT1f/q9JOPj1Iec0HGY7c86G4hb4pOIEuTQWlc5eW4M4rINhDhGAOFKLDcUuT1qS8kOK49kOgUnONPimuRV2Ob98wZOmcpslhCLbgmPnjEcaFovAAGLkptjFHihfyYfKecQg0g3SoJ34UY39icq5GIP5vm10hzFPBiPkOvtk5UmTW1awRghS4jqLxBhLB1tUe9enPSqCUADonOku4g5mQwO0Fg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=G8FZ0D3PP/OudJ5uuxCAz/C/vBHo8wESZoPwxTWqVEI=;
- b=f2m9KWBISBqw0Ym13dUqm8j3si6o3ED21sHv7eL5TgZsBpoDGdDfLgmz/6KGHYJ/LKbtpDgahN4JJg08dYu7jHh1Wg3NTEnEOV3GZjTgkWGDv3Au8ozLsyLzLTYqpmkzTJGzQmoYwmg0Ut8cpKiTMGkE45muSARZrwVZvUrpbH9k/Fjs7o+zQnAbgEIMUDbbz8FW06Jwe5wrxwvWmfwxGIXtYiHfWPaDCJsdntjey75nPqQFEhx6MG1gNv/0t26rJjQWm6Xv6MGX7QSnqHMTeOpLvUPoK9SfqOZ0zZ+jiUkag/dT2znzZ1aV/XFkoGLAWCx+knsW0jqKD8EI6MGNiQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=G8FZ0D3PP/OudJ5uuxCAz/C/vBHo8wESZoPwxTWqVEI=;
- b=tP0QRKDIJXxqH7af9tspeuQzbCI7EEhT8j8XcRgasKoxYbFzSyadC2q8qlBcO7Fu7M/tuEMBM9mN256ViZeWULyHWJrVQgdzaaI6umx797CCUhrhIjHpOBnAmapFiBro7IwwP5n6N9JcvufyKSJvtcIlRtLDo5cON2QOzaT84LI=
-Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
- (2603:10b6:803:47::21) by SA2PR04MB7612.namprd04.prod.outlook.com
- (2603:10b6:806:147::16) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3784.11; Mon, 25 Jan
- 2021 13:51:05 +0000
-Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
- ([fe80::c19b:805:20e0:6274]) by SN4PR0401MB3598.namprd04.prod.outlook.com
- ([fe80::c19b:805:20e0:6274%6]) with mapi id 15.20.3784.017; Mon, 25 Jan 2021
- 13:51:05 +0000
-From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-CC:     Tejun Heo <tj@kernel.org>, Coly Li <colyli@suse.de>,
-        Song Liu <song@kernel.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "linux-bcache@vger.kernel.org" <linux-bcache@vger.kernel.org>,
-        "linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH 01/10] brd: remove the end of device check in brd_do_bvec
-Thread-Topic: [PATCH 01/10] brd: remove the end of device check in brd_do_bvec
-Thread-Index: AQHW8jiwwuJ8D6w9T0iSZ+Qk0m6aPQ==
-Date:   Mon, 25 Jan 2021 13:51:05 +0000
-Message-ID: <SN4PR0401MB35982F96772179339E14453A9BBD9@SN4PR0401MB3598.namprd04.prod.outlook.com>
-References: <20210124100241.1167849-1-hch@lst.de>
- <20210124100241.1167849-2-hch@lst.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: lst.de; dkim=none (message not signed)
- header.d=none;lst.de; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [129.253.240.72]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 3d333f5b-95de-47c9-36f0-08d8c13842f6
-x-ms-traffictypediagnostic: SA2PR04MB7612:
-x-microsoft-antispam-prvs: <SA2PR04MB761243AE27FDE64BEF44063E9BBD9@SA2PR04MB7612.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:1728;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: nU1Mk2FRvwuR2W58MPpSVIZ+8D3rXEcUWWb/d1oqsSmwldvd32TXZerkd1qR+39N1iOyWJ3u2YiX2zkb/l8USWqJe7ZiTHaV5J9D94ewPQguAjxg7GCFXo2zNT8ozZt5GP8Hy12mJpfbwb3M+gScCe4pGxq5cst7m0eiFGuEKTy4L0WujJ7zzAuzUeQ6VLPP3ZdyQLKxFMg/zd75dsFAOH9HELAAYU91TGDI6TLnrVgdWNySSddzYIKb2cDTir8D/rii0Ith1024MPIQAdWOhB1umdRQ7Sk9jEjYqC89ywMG1iYRxOqLlALVLkC9QueVNbYquvsckbxU+PbIVdkfMzVpbtObP+wnp1bYHAuhELzlDwhnD9PIQ8jryTW+AGd9NwpLHM2oyaPsn2d1kyJ75A==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN4PR0401MB3598.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(366004)(39860400002)(346002)(136003)(376002)(64756008)(186003)(5660300002)(4326008)(86362001)(7416002)(316002)(8936002)(52536014)(2906002)(33656002)(66446008)(66556008)(6506007)(4270600006)(66476007)(55016002)(110136005)(66946007)(8676002)(558084003)(76116006)(9686003)(478600001)(26005)(71200400001)(19618925003)(54906003)(7696005)(91956017);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: =?us-ascii?Q?SYLvfzUGSx1iDkeetP6rvCfTyX4UdRtVnYU064X1rFBJQJyiar96NH3ZfIxL?=
- =?us-ascii?Q?QKxSsEWZlMZItS6HfOmtjfoRxuj6HhDLbTX7es/K+We0dDabUGfcFJckimAq?=
- =?us-ascii?Q?P3Bwj4QESJnnENLKKUTBfqiEK6CJQJ1HyNq8x2KHX8cHBeUGLUm7QDPHjOrH?=
- =?us-ascii?Q?p5rbFFnhBwGudXr6ZALMCGJULrZ9bnpjcjhM0BOq/79KMV59s7jEa1o3WU0a?=
- =?us-ascii?Q?HP+UeUOAGGuDQgBi7tuJ3XiXC7/L/AW+Eyp7a5JNXK3HuFWG1cugtJgb/tvO?=
- =?us-ascii?Q?xTrUIiy5P3Pu+EPMt3lfXXNTwc138In4TBI4qnsI+lYU7mdwQRnOnL3WmCYy?=
- =?us-ascii?Q?/c1OXV81m8qwnK5kme3RH8+fbIrI+Ec3dIah3PjOlN/oilt9vJoXTGJ2Pp4P?=
- =?us-ascii?Q?hnA90A4oLmtqVQ7dhgmNBA5VNooWkFJ6RL6GhuRwKRMoq5PE41/MLuMoDwFj?=
- =?us-ascii?Q?XomV8NWdGZQvyC1McnCkooEh7VQizG96c0GytQ5QZNBp9Kk5DyCU/+Hya1Yd?=
- =?us-ascii?Q?5iAIDpbWa586NY7YIXR1qmb2UNcvu+CwEqa+Wgx8w6IiINzaGUZobFg9Tr8m?=
- =?us-ascii?Q?mwMre6hRNwXluFi7g1AoJF3t8K3pIiSpDbrTyJ8DmVgHrpKR/PROKnk8f+NN?=
- =?us-ascii?Q?b2d6egovr/bjxRNzlioVk6fBQ80v01yCW3meYGTYd7s3xkZZ5voY5woMEdyG?=
- =?us-ascii?Q?VAb+yfI3U4fXm7hARSeG+s99RaZXCl0kIgiPg5py8EmMeihs7aGFGETUDNPV?=
- =?us-ascii?Q?5+h+qP9Po+VwNlDMjuq1TryTIXyi74yUnnCAYGBOzaKFkCFJI/Ihc+3O1zov?=
- =?us-ascii?Q?q0mi3AabG/k8nV2AvQp2jPehnkpi8vtTAS1fofZ59z47eng1a6Mq2wXnXGjF?=
- =?us-ascii?Q?ZbdlLo4uvq5xW/i/EJlBQmAtZWi/ha+kXC7M8/gJeXtsgCfDv7Y1ShmirVD2?=
- =?us-ascii?Q?UxhbSDynWVix1vOXo6zQhoFVA/v/tKFkOr8VjFCMp5brfH8XEZ6Wr9346npk?=
- =?us-ascii?Q?dOUv+ouq8IWKOtdNS75cmzFU1jGQGen8Nw6ckq2azMGG0oREQlJkbgCM3GFn?=
- =?us-ascii?Q?m8GLTZsyU95loMl7XkWP29MrXgzpyA=3D=3D?=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Mon, 25 Jan 2021 07:18:27 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R521e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04420;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=5;SR=0;TI=SMTPD_---0UMqzTdK_1611576823;
+Received: from localhost(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0UMqzTdK_1611576823)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Mon, 25 Jan 2021 20:13:43 +0800
+From:   Jeffle Xu <jefflexu@linux.alibaba.com>
+To:     snitzer@redhat.com
+Cc:     joseph.qi@linux.alibaba.com, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, io-uring@vger.kernel.org
+Subject: [PATCH v2 6/6] dm: support IO polling for bio-based dm device
+Date:   Mon, 25 Jan 2021 20:13:40 +0800
+Message-Id: <20210125121340.70459-7-jefflexu@linux.alibaba.com>
+X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20210125121340.70459-1-jefflexu@linux.alibaba.com>
+References: <20210125121340.70459-1-jefflexu@linux.alibaba.com>
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN4PR0401MB3598.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3d333f5b-95de-47c9-36f0-08d8c13842f6
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Jan 2021 13:51:05.7407
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Nvh2FdmqvNtWZIuLkhy4dPT/oK4QDrw3SScRAJZ52O4WxgoyUu+pPFsy93WYQToSpJHLhgFHoDzZM4dTImEEC6Gtw6HGBQQ208KAvIwhBdA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR04MB7612
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Looks good,=0A=
-Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>=0A=
+DM will iterate and poll all polling hardware queues of all target mq
+devices when polling IO for dm device. To mitigate the race introduced
+by iterating all target hw queues, a per-hw-queue flag is maintained
+to indicate whether this polling hw queue currently being polled on or
+not. Every polling hw queue is exclusive to one polling instance, i.e.,
+the polling instance will skip this polling hw queue if this hw queue
+currently is being polled by another polling instance, and start
+polling on the next hw queue.
+
+IO polling is enabled when all underlying target devices are capable
+of IO polling. The sanity check supports the stacked device model, in
+which one dm device may be build upon another dm device. In this case,
+the mapped device will check if the underlying dm target device
+supports IO polling.
+
+Signed-off-by: Jeffle Xu <jefflexu@linux.alibaba.com>
+---
+ block/blk-core.c      |   8 ++-
+ drivers/md/dm-core.h  |  21 +++++++
+ drivers/md/dm-table.c | 127 ++++++++++++++++++++++++++++++++++++++++++
+ drivers/md/dm.c       |  37 ++++++++++++
+ 4 files changed, 192 insertions(+), 1 deletion(-)
+
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 3d93aaa9a49b..d81a5f0faa1d 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1150,7 +1150,13 @@ int blk_poll(struct request_queue *q, blk_qc_t cookie, bool spin)
+ 	struct blk_mq_hw_ctx *hctx = NULL;
+ 	struct gendisk *disk = NULL;
+ 
+-	if (!blk_qc_t_valid(cookie) ||
++	/*
++	 * In case of bio-base polling, the returned cookie is actually that of
++	 * the last split bio. Thus the returned cookie may be BLK_QC_T_NONE,
++	 * while the previous split bios have already been submitted and queued
++	 * into the polling hw queue.
++	 */
++	if ((queue_is_mq(q) && !blk_qc_t_valid(cookie)) ||
+ 	    !test_bit(QUEUE_FLAG_POLL, &q->queue_flags))
+ 		return 0;
+ 
+diff --git a/drivers/md/dm-core.h b/drivers/md/dm-core.h
+index 086d293c2b03..5a0391aa5cc7 100644
+--- a/drivers/md/dm-core.h
++++ b/drivers/md/dm-core.h
+@@ -127,6 +127,24 @@ static inline struct dm_stats *dm_get_stats(struct mapped_device *md)
+ 
+ #define DM_TABLE_MAX_DEPTH 16
+ 
++enum target_ctx_type {
++	TARGET_TYPE_MQ,
++	TARGET_TYPE_DM,
++};
++
++struct target_ctx {
++	union {
++		struct {
++			struct blk_mq_hw_ctx *hctx;
++			struct request_queue *q;
++			atomic_t busy;
++		};
++		struct mapped_device *md;
++	};
++
++	int type;
++};
++
+ struct dm_table {
+ 	struct mapped_device *md;
+ 	enum dm_queue_mode type;
+@@ -162,6 +180,9 @@ struct dm_table {
+ 	void *event_context;
+ 
+ 	struct dm_md_mempools *mempools;
++
++	int num_ctx;
++	struct target_ctx *ctxs;
+ };
+ 
+ static inline struct completion *dm_get_completion_from_kobject(struct kobject *kobj)
+diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
+index 188f41287f18..397bb5f57626 100644
+--- a/drivers/md/dm-table.c
++++ b/drivers/md/dm-table.c
+@@ -215,6 +215,8 @@ void dm_table_destroy(struct dm_table *t)
+ 
+ 	dm_free_md_mempools(t->mempools);
+ 
++	kfree(t->ctxs);
++
+ 	kfree(t);
+ }
+ 
+@@ -1194,6 +1196,114 @@ static int dm_table_register_integrity(struct dm_table *t)
+ 	return 0;
+ }
+ 
++static int device_supports_poll(struct dm_target *ti, struct dm_dev *dev,
++				sector_t start, sector_t len, void *data)
++{
++	struct request_queue *q = bdev_get_queue(dev->bdev);
++
++	return q && test_bit(QUEUE_FLAG_POLL, &q->queue_flags);
++}
++
++static bool dm_table_supports_poll(struct dm_table *t)
++{
++	struct dm_target *ti;
++	unsigned int i;
++
++	/* Ensure that all targets support iopoll. */
++	for (i = 0; i < dm_table_get_num_targets(t); i++) {
++		ti = dm_table_get_target(t, i);
++
++		if (!ti->type->iterate_devices ||
++		    !ti->type->iterate_devices(ti, device_supports_poll, NULL))
++			return false;
++	}
++
++	return true;
++}
++
++static int dm_table_calc_target_ctxs(struct dm_target *ti,
++		struct dm_dev *dev,
++		sector_t start, sector_t len,
++		void *data)
++{
++	int *num = data;
++	struct request_queue *q = dev->bdev->bd_disk->queue;
++
++	if (queue_is_mq(q))
++		*num += q->tag_set->map[HCTX_TYPE_POLL].nr_queues;
++	else
++		*num += 1;
++
++	return 0;
++}
++
++static int dm_table_fill_target_ctxs(struct dm_target *ti,
++		struct dm_dev *dev,
++		sector_t start, sector_t len,
++		void *data)
++{
++	int *index = data;
++	struct target_ctx *ctx;
++	struct request_queue *q = dev->bdev->bd_disk->queue;
++
++	if (queue_is_mq(q)) {
++		int i;
++		int num = q->tag_set->map[HCTX_TYPE_POLL].nr_queues;
++		int offset = q->tag_set->map[HCTX_TYPE_POLL].queue_offset;
++
++		for (i = 0; i < num; i++) {
++			ctx = &ti->table->ctxs[(*index)++];
++			ctx->q = q;
++			ctx->hctx = q->queue_hw_ctx[offset + i];
++			ctx->type = TARGET_TYPE_MQ;
++			/* ctx->busy has been initialized to zero */
++		}
++	} else {
++		struct mapped_device *md = dev->bdev->bd_disk->private_data;
++
++		ctx = &ti->table->ctxs[(*index)++];
++		ctx->md = md;
++		ctx->type = TARGET_TYPE_DM;
++	}
++
++	return 0;
++}
++
++static int dm_table_build_target_ctxs(struct dm_table *t)
++{
++	int i, num = 0, index = 0;
++
++	if (!__table_type_bio_based(t->type) || !dm_table_supports_poll(t))
++		return 0;
++
++	for (i = 0; i < t->num_targets; i++) {
++		struct dm_target *ti = dm_table_get_target(t, i);
++
++		if (ti->type->iterate_devices)
++			ti->type->iterate_devices(ti, dm_table_calc_target_ctxs,
++					&num);
++	}
++
++	if (WARN_ON(!num))
++		return 0;
++
++	t->num_ctx = num;
++
++	t->ctxs = kcalloc(num, sizeof(struct target_ctx), GFP_KERNEL);
++	if (!t->ctxs)
++		return -ENOMEM;
++
++	for (i = 0; i < t->num_targets; i++) {
++		struct dm_target *ti = dm_table_get_target(t, i);
++
++		if (ti->type->iterate_devices)
++			ti->type->iterate_devices(ti, dm_table_fill_target_ctxs,
++					&index);
++	}
++
++	return 0;
++}
++
+ /*
+  * Prepares the table for use by building the indices,
+  * setting the type, and allocating mempools.
+@@ -1224,6 +1334,10 @@ int dm_table_complete(struct dm_table *t)
+ 	if (r)
+ 		DMERR("unable to allocate mempools");
+ 
++	r = dm_table_build_target_ctxs(t);
++	if (r)
++		DMERR("unable to build target hctxs");
++
+ 	return r;
+ }
+ 
+@@ -1883,6 +1997,19 @@ void dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
+ #endif
+ 
+ 	blk_queue_update_readahead(q);
++
++	/*
++	 * Check for request-based device is remained to
++	 * dm_mq_init_request_queue()->blk_mq_init_allocated_queue().
++	 * Also clear previously set QUEUE_FLAG_POLL* if the new table doesn't
++	 * support iopoll while reloading table.
++	 */
++	if (__table_type_bio_based(t->type)) {
++		if (t->ctxs)
++			q->queue_flags |= QUEUE_FLAG_POLL_MASK;
++		else
++			q->queue_flags &= ~QUEUE_FLAG_POLL_MASK;
++	}
+ }
+ 
+ unsigned int dm_table_get_num_targets(struct dm_table *t)
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 46ca3b739396..e2be1caa086a 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -1657,6 +1657,42 @@ static blk_qc_t dm_submit_bio(struct bio *bio)
+ 	return BLK_QC_T_NONE;
+ }
+ 
++
++static int dm_poll_one_md(struct mapped_device *md)
++{
++	int i, num_ctx, srcu_idx, ret = 0;
++	struct dm_table *t;
++	struct target_ctx *ctxs;
++
++	t = dm_get_live_table(md, &srcu_idx);
++	num_ctx = t->num_ctx;
++	ctxs = t->ctxs;
++
++	for (i = 0; i < num_ctx; i++) {
++		struct target_ctx *ctx = &ctxs[i];
++
++		if (ctx->type == TARGET_TYPE_MQ) {
++			if (!atomic_cmpxchg(&ctx->busy, 0, 1)) {
++				ret += blk_mq_poll(ctx->q, ctx->hctx);
++				atomic_set(&ctx->busy, 0);
++			}
++		} else
++			ret += dm_poll_one_md(ctx->md);
++	}
++
++	dm_put_live_table(md, srcu_idx);
++
++	return ret;
++}
++
++static int dm_bio_poll(struct request_queue *q, blk_qc_t cookie)
++{
++	struct gendisk *disk = queue_to_disk(q);
++	struct mapped_device *md= disk->private_data;
++
++	return dm_poll_one_md(md);
++}
++
+ /*-----------------------------------------------------------------
+  * An IDR is used to keep track of allocated minor numbers.
+  *---------------------------------------------------------------*/
+@@ -3049,6 +3085,7 @@ static const struct pr_ops dm_pr_ops = {
+ };
+ 
+ static const struct block_device_operations dm_blk_dops = {
++	.iopoll = dm_bio_poll,
+ 	.submit_bio = dm_submit_bio,
+ 	.open = dm_blk_open,
+ 	.release = dm_blk_close,
+-- 
+2.27.0
+
