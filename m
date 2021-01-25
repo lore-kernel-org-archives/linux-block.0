@@ -2,99 +2,102 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A69DFC433DB
-	for <linux-block@archiver.kernel.org>; Mon, 25 Jan 2021 04:29:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E7D9C433DB
+	for <linux-block@archiver.kernel.org>; Mon, 25 Jan 2021 04:36:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6BF2822B42
-	for <linux-block@archiver.kernel.org>; Mon, 25 Jan 2021 04:29:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D5E8122CA2
+	for <linux-block@archiver.kernel.org>; Mon, 25 Jan 2021 04:36:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726863AbhAYE2r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 24 Jan 2021 23:28:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56822 "EHLO
+        id S1726861AbhAYEfy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 24 Jan 2021 23:35:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58346 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726855AbhAYE2p (ORCPT
+        with ESMTP id S1726849AbhAYEfw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 24 Jan 2021 23:28:45 -0500
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D474C061574
-        for <linux-block@vger.kernel.org>; Sun, 24 Jan 2021 20:28:05 -0800 (PST)
-Received: by mail-pl1-x630.google.com with SMTP id b8so6791569plh.12
-        for <linux-block@vger.kernel.org>; Sun, 24 Jan 2021 20:28:05 -0800 (PST)
+        Sun, 24 Jan 2021 23:35:52 -0500
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EDA4C0613D6
+        for <linux-block@vger.kernel.org>; Sun, 24 Jan 2021 20:35:12 -0800 (PST)
+Received: by mail-pl1-x62f.google.com with SMTP id h15so4335881pli.8
+        for <linux-block@vger.kernel.org>; Sun, 24 Jan 2021 20:35:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        d=cloud.ionos.com; s=google;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=6dXiISuywEBuazI4xj4yFxY1nkp6ZflUiyorvnDifvs=;
-        b=Pq81h34KvrPTQiyWomze+Gw0KOD9of/oGveHh8B5C5f5Sw4seL+lndqGq/fAjIrD+J
-         05Cx+85/WkzFyXxhTM5yroL3dsKGbDYim/4ymqHmdb7IR3xzTBf3w2oGIBTQFsDm1st3
-         hHEDn3TsvNVeMQ3/2qwteLe7YDeG/gE+x/cn6aO3UAHsIa7MF1h9DPFeoaf2sCEvujnO
-         6JaptvWLA7TZRWpvpkGFFG4C6yh9Hy5FZUS1NW8LBIQbROK31BVgszsAhQZK9qtmOJzX
-         WqSFtCAH8vAZvmoCr00LoAGUqYUtjbSl418ug6Cav3y2Loqs5rsA09FKY4BJumwuwhQa
-         d0VA==
+        bh=RF+U31mjU+vQtmYKwQP7k4EqO/12hyWNFfFTp846sxc=;
+        b=CfOwQ7limljMA7zl/lIAXVsTIKtNDlhwsicqotNl3TtlKhEjyZeIlEEJtHYW4c2U31
+         UY4hC8hbmTVMaTURi/h7AUevTqeIqn+Q1FFnUUJ35BV9ke4apIRUY5I8NbeB8KXYicfU
+         +trWj06hwAqSeMB9yfxG8wvJYR9/caMYTWeGkZl5KTSBZfynGCBz84SyjX0hbk7AWcGA
+         /222IeHt9HOYYROpDQ0wb25k1uTdAAL1nhrslb3U6So17SP9tJY8mfEDx1CUbEE7qC63
+         qpRcjNyJveRtr7uQu1UM1fJCkiAbkBaCmTSnXoAaT+i+isB4hYXJxGmrbyMs7d8MUbF7
+         BPGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=6dXiISuywEBuazI4xj4yFxY1nkp6ZflUiyorvnDifvs=;
-        b=XuHI9WM9bZVKY7EpttRRV6kcyNixrI+gjiuPTiJ1NPQRRht2wvwQh1Gih7DuRHJWPn
-         Es6SybAL4x5IkoH9ddm2lfFf8UyllsYLd+49SB61QMOzotr8qvfA7LTfcuAJXSeDxkrQ
-         zqCEVGa5ZvHG/Gg5/bZk1wSjE1FzWI2crXF4pFK49/b96VjI64+PstQWD/B26eVAW+Tw
-         XpeqKNqhE9d807aDF9uZXu0WyJmPUC7oiSF/vGAxBqWXtF2rQHt6R+NOzRTW4Pj8AMzU
-         YXD6nvYLrSa4rKZXOUufdsfEkQ1ZnyUYQsPgNHsZpNk58pdvnessglwBu4TzvV96U4lI
-         WLbg==
-X-Gm-Message-State: AOAM532mzgu3YmwhY1MZqNmAePjgo4CMU1MU8j7i7Chj9qAZpbTRym99
-        8EPbQgAItnHUAUHSIwwKvFzxuA==
-X-Google-Smtp-Source: ABdhPJw/2/1B5rytSzbIS7zdfgAkoF4oaB/9PLp8Tj4sfje42S00tsY6WtySESAMMoXHwKIe7NHOoQ==
-X-Received: by 2002:a17:902:ed88:b029:de:86f9:3e09 with SMTP id e8-20020a170902ed88b02900de86f93e09mr17759813plj.38.1611548885148;
-        Sun, 24 Jan 2021 20:28:05 -0800 (PST)
-Received: from [192.168.4.41] (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
-        by smtp.gmail.com with ESMTPSA id gv22sm16102738pjb.56.2021.01.24.20.28.03
+        bh=RF+U31mjU+vQtmYKwQP7k4EqO/12hyWNFfFTp846sxc=;
+        b=mXpigXogLhXQG0f3rdygecsDlkZO7GwJlxDUcIa42y6CUR79DHoK85hV8yjwxeocwD
+         no+aiVyBv2nrTvePKZ42iu85C5DABlLxW+83WQEKwC3nSGWNF4Fj5g6WZsgxZ+nujin8
+         /ybcf3vyLyutjVWya3EWWt8wvemQgCs7W+DTZZWovjFbSGD8TxBOhJLYZJ4E3LWJtBQA
+         BuUBRexnPVlvDOZCM/qa5LQJnBRVAG3yQQXZ2BW2sddK3ctLO3jSVRh7fptZk62Cii+i
+         sNekOUEZOGcHxe5OmkF5epnSf28QXeH9yjEHVAeK/7OMCiLVmcbqOQkLc3WcHF4a7ScJ
+         Agdw==
+X-Gm-Message-State: AOAM530FqRas1QVwUcKouuyMfQmi9eKFYrlu2X1fvB6ZC7aPQtgKnsie
+        1Vvs8XQQ8TJ1m7fATqxG/ff5uQ==
+X-Google-Smtp-Source: ABdhPJwcVIfcZhKpz36wBWgY9pEAr1Osy03vWby4EQev/6n4B5mRbyHylHT/8WSUq/UooHKSU12Q8g==
+X-Received: by 2002:a17:90a:1c09:: with SMTP id s9mr6518112pjs.83.1611549310994;
+        Sun, 24 Jan 2021 20:35:10 -0800 (PST)
+Received: from [10.8.2.15] ([185.125.207.232])
+        by smtp.gmail.com with ESMTPSA id x21sm15191515pgi.75.2021.01.24.20.35.02
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 24 Jan 2021 20:28:04 -0800 (PST)
-Subject: Re: [PATCH v3 0/3] blk-mq: Don't complete in IRQ, use llist_head
-To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@kernel.org>
-References: <20210123201027.3262800-1-bigeasy@linutronix.de>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <4e703284-2f75-6030-f697-aa2d362c3949@kernel.dk>
-Date:   Sun, 24 Jan 2021 21:27:54 -0700
+        Sun, 24 Jan 2021 20:35:10 -0800 (PST)
+Subject: Re: [PATCH V2 0/2] remove unused argument from blk_execute_rq_nowait
+ and blk_execute_rq
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, target-devel@vger.kernel.org,
+        linux-scsi@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-ide@vger.kernel.org, linux-mmc@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-nfs@vger.kernel.org,
+        hch@infradead.org
+References: <20210122092824.20971-1-guoqing.jiang@cloud.ionos.com>
+ <683e16be-1146-e60c-cfea-e4606844f080@kernel.dk>
+From:   Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
+Message-ID: <73fd70be-90bc-9c6c-dcbe-7981f8fef4f5@cloud.ionos.com>
+Date:   Mon, 25 Jan 2021 05:34:52 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210123201027.3262800-1-bigeasy@linutronix.de>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <683e16be-1146-e60c-cfea-e4606844f080@kernel.dk>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/23/21 1:10 PM, Sebastian Andrzej Siewior wrote:
-> Patch 2+3 were applied and then dropped by Jens due to a NOHZ+softirq
-> related warning [0]. Turns out a successful wakeup via
-> set_nr_if_polling() will not process any softirqs and the CPU may go
-> back to idle. This is addressed by patch #1.
+
+
+On 1/25/21 02:24, Jens Axboe wrote:
+> On 1/22/21 2:28 AM, Guoqing Jiang wrote:
+>> V2 changes:
+>> 1. update commit header per Christoph's comment.
+>>
+>> Hi Jens,
+>>
+>> This series remove unused 'q' from blk_execute_rq_nowait and blk_execute_rq.
+>> Also update the comment for blk_execute_rq_nowait.
 > 
-> smpcfd_dying_cpu() will also invoke SMP-functions calls via
-> flush_smp_call_function_queue() but the block layer shouldn't queue
-> anything because the CPU isn't online anymore.
-> The two caller of flush_smp_call_function_from_idle() look fine with
-> opening interrupts from within do_softirq().
+> What's this against? The lightnvm patch doesn't apply.
 > 
-> [0] https://lkml.kernel.org/r/1ee4b31b-350e-a9f5-4349-cfb34b89829a@kernel.dk
 
-I can queue up the block side once the IPI fix is in some stable branch
-that I can pull in.
+Sorry for that, will resend against for-5.12/block.
 
--- 
-Jens Axboe
-
+Thanks,
+Guoqing
