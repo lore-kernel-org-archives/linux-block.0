@@ -2,100 +2,126 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E3D5C43381
-	for <linux-block@archiver.kernel.org>; Mon, 25 Jan 2021 23:37:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2D02C433DB
+	for <linux-block@archiver.kernel.org>; Mon, 25 Jan 2021 23:47:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5E1C422AAC
-	for <linux-block@archiver.kernel.org>; Mon, 25 Jan 2021 23:37:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6F18C2226A
+	for <linux-block@archiver.kernel.org>; Mon, 25 Jan 2021 23:47:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732691AbhAYXhU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Jan 2021 18:37:20 -0500
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:5580 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732706AbhAYXhE (ORCPT
+        id S1732637AbhAYXrJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Jan 2021 18:47:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48976 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732559AbhAYVRj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Jan 2021 18:37:04 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1611617824; x=1643153824;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=VVy/lgGRMlIuhUP/DqeEb03EWvoZ5UbBH4eS8ECqgU0=;
-  b=hzCViwAJLIqDUxoYY1NGnbCGihhIwNCneAcGCehHcQSOyYDHqvHdlcsw
-   ePNQDmII8iXOabZlUHZC0/WV1GHLKSALS4zLThw3xwKjnmub3I6nkm7US
-   CEuxfcCoPxG5hr8NwuCAwSR5cRdjCPmZz3LmCLB8HguBQIvedrEpM6ov8
-   0iQ4yqKSImeKAw/k7tekjeVnI83lgRlmKC6gUmj4UnmIu/WwNYSLX5/9l
-   FYkE8yqImt6bKGzviHY6ArlhJYWB2IcmvzxtGrBaWa2vadufqNiEdH5Wo
-   n92K1jIGaQUycG8vo94C+cJKslQNrxm+2MKb6F3ZAzASrb6wMXF57E+YC
-   w==;
-IronPort-SDR: rGU2dM2huKiRkU+glDxBCreton4E8nA1o758FnPyR1Ho6jTv66OosdwULIhkLt3AK/TLankrTS
- 2M4KEMHKXaZ2WvAPjtvRwQnTvPuzbbCruGDM0LtDJUF17oJ/jxoPJPlXwXYXxBwSM4YibK3jta
- K/w+Ab2XPIXrtpxqbr/C74W5Ycpg5iNeWxcuhVm82CXl6DBYAk1l3dfKdZlX5RSPlajruMnXIq
- WB4q9RNLBBwXP7UV7ZHnvoNMivczI9eSd79CMFQnrZF69hN4kHG/vyjDP50XYUMyT+Y8exENgb
- 6PI=
-X-IronPort-AV: E=Sophos;i="5.79,374,1602518400"; 
-   d="scan'208";a="159472164"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 26 Jan 2021 07:33:12 +0800
-IronPort-SDR: CqpwEKKyU/8bJ7mJa7AcarwyfGRcsz+VwefEFYN80KxwvzWlaw3tgxWCr76IV1qkdpfbM8Oycx
- eh+bJ/miOmFeF+0VNE/dKIAxUzO9Unf0M26ZVb7CfLdOKmaWybt6pf+uuYb4EIRLg8q8JKvko1
- H2OA+YuvdfgK0MCwZLnoND0cFp7nTeIpirXeak3CIXoOZ1GXHlZe9R+Fvc89HyAuWgLogECRuh
- XYCOCzF4rOb3+AFUdJs0aT0i4twnKWwIFpSlTRR+R5I9+B49Vq0qfLgIE3EVw2cHgcnh+5WEck
- Hv/UyFWRanftsJlwmXxO9HBN
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jan 2021 15:15:39 -0800
-IronPort-SDR: oWhdoet6Gh4qVwfcNiWGteoSOHuS0kWtUkuFcLEbgHYuSnjHhSTXeTuUQSIzpt1S6o35nKfDt5
- 3c+PYzpijP7nirBawu5iVAL3zOc7CGrB5ZmdOMvqOmmChcmRNWPN6pSoIFtzhc/Zi+YWr0MI2O
- 0vjvu+YlnJoMBm09BYFEko8YkVZnvYUnwxdbHwZ/pFJwP3jmuqAsZ5mcmdSVsCSZWl/tt67zzr
- vc6qhrJ/QNym6RjsNEIXQXoy/Y2MQ6AH0aX7hAnctBj0lH/qv+1LPoGDd3X5a2WzzY/zAnYBiU
- cHI=
-WDCIronportException: Internal
-Received: from vm.labspan.wdc.com (HELO vm.sc.wdc.com) ([10.6.137.102])
-  by uls-op-cesaip02.wdc.com with ESMTP; 25 Jan 2021 15:33:11 -0800
-From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-To:     linux-mips@vger.kernel.org
-Cc:     tsbogend@alpha.franken.de, axboe@kernel.dk,
-        linux-block@vger.kernel.org, cand@gmx.com,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [PATCH 5/9] n64: use sector SECTOR_SHIFT instead 512
-Date:   Mon, 25 Jan 2021 15:32:39 -0800
-Message-Id: <20210125233243.5982-6-chaitanya.kulkarni@wdc.com>
-X-Mailer: git-send-email 2.22.1
-In-Reply-To: <20210125233243.5982-1-chaitanya.kulkarni@wdc.com>
-References: <20210125233243.5982-1-chaitanya.kulkarni@wdc.com>
+        Mon, 25 Jan 2021 16:17:39 -0500
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19061C06174A
+        for <linux-block@vger.kernel.org>; Mon, 25 Jan 2021 13:16:32 -0800 (PST)
+Received: by mail-pf1-x42a.google.com with SMTP id m6so9139067pfm.6
+        for <linux-block@vger.kernel.org>; Mon, 25 Jan 2021 13:16:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=+xXlGKTVDgIyvWhOoljB9Gs9FebPS3Flyvxw1e08Ee4=;
+        b=NdK/uI7VhBO9KWdGbLnVxZKhox4QUgowO1vpru6G1PeartHOjKFh8WvQlF0fhdPl5q
+         mIKgSpdJ+WvOOnLJcgqMvgONzmyPe9PDyw/yFcX33n45HgJJgmlsXSx1kuaMomVt/N5W
+         osFpkbr1DVcEkYoEXaU4vIk52KZkVSFgS8YkpLIzU64oGgcI44BzqlTlKjLIJL0DTace
+         ENKiFrM+ATIX/9iI2oSLmKgx6mpwqfBObVg+NvFCBLfMfULuFtG+WiOFZ/7vf7IAAu12
+         3ArfEIKUs/wSdNPilvkqKr33g5B8lK38kWT9GMJff3a7tx0lRCfU+eHbtkOMLLbtL01t
+         Ymeg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=+xXlGKTVDgIyvWhOoljB9Gs9FebPS3Flyvxw1e08Ee4=;
+        b=VYqKPgfP/SjpJBikAGAuHjYKgIBT6P6GDbR9Wv71UmV/oiVcrzs0N2tI00I1adxgtR
+         AD79Yb3AfcdfbOWBCL7ddPGVA2MVL/z9ki1yXkMZgVJ6r/CzShphkuCVT9zcF/0NcLFE
+         UMmsYQC0WLmKxm8PttBouzN16I6wfmjZ+RIFq0GDKUuGmUmkb85grxubNoka2yIcJrTH
+         axCuIHfKz26ReUpld3x8Ei42BsGbJDbIH+Bgf4WKWQUG9T9hB/aYxwk4PLZbRpHlWMG/
+         eYMitkT1YGUYFdiBLly4ZU2oz9QH2SMlVsPxnNm6btvaVyZnPPWVLZY2+E2pJP/tJZa5
+         tCEQ==
+X-Gm-Message-State: AOAM532cTGWZhQArB60kHAiL1w0ppleqDPthN2G0CobquBv787XRye1t
+        MA0BXS25GUvOZVzCrCEQdUGJ9iRdrZR06A==
+X-Google-Smtp-Source: ABdhPJwzuZn6IAHaUTKcz4pq9UDRKZp32og5hS04jcTF9nG6ejx0eeknVKsRuMOrUgoTmKNsC5GZKA==
+X-Received: by 2002:a65:6290:: with SMTP id f16mr2400670pgv.69.1611609391559;
+        Mon, 25 Jan 2021 13:16:31 -0800 (PST)
+Received: from [192.168.4.41] (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
+        by smtp.gmail.com with ESMTPSA id 6sm17653269pfz.34.2021.01.25.13.16.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 25 Jan 2021 13:16:30 -0800 (PST)
+Subject: Re: [PATCH 1/2] block/keyslot-manager: introduce devm_blk_ksm_init()
+To:     Eric Biggers <ebiggers@kernel.org>,
+        Satya Tangirala <satyat@google.com>
+Cc:     linux-block@vger.kernel.org, linux-mmc@vger.kernel.org,
+        linux-scsi@vger.kernel.org, Ulf Hansson <ulf.hansson@linaro.org>
+References: <20210121082155.111333-1-ebiggers@kernel.org>
+ <20210121082155.111333-2-ebiggers@kernel.org>
+ <CAA+FYZerh02JXSKghCKuG29ATdYU_=2O93moGnLgD6Jv2v2auQ@mail.gmail.com>
+ <YA8pMDqHsKZA0zfR@sol.localdomain>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <3b1b6a94-f283-e8a3-8638-6475d0323c30@kernel.dk>
+Date:   Mon, 25 Jan 2021 14:16:29 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <YA8pMDqHsKZA0zfR@sol.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Instead of using magic numbers use SECTOR_SHIFT to get the number of
-sectors from the size.
+On 1/25/21 1:25 PM, Eric Biggers wrote:
+> On Mon, Jan 25, 2021 at 12:14:00PM -0800, Satya Tangirala wrote:
+>> On Thu, Jan 21, 2021 at 12:23 AM Eric Biggers <ebiggers@kernel.org> wrote:
+>>>
+>>> From: Eric Biggers <ebiggers@google.com>
+>>>
+>>> Add a resource-managed variant of blk_ksm_init() so that drivers don't
+>>> have to worry about calling blk_ksm_destroy().
+>>>
+>>> Note that the implementation uses a custom devres action to call
+>>> blk_ksm_destroy() rather than switching the two allocations to be
+>>> directly devres-managed, e.g. with devm_kmalloc().  This is because we
+>>> need to keep zeroing the memory containing the keyslots when it is
+>>> freed, and also because we want to continue using kvmalloc() (and there
+>>> is no devm_kvmalloc()).
+>>>
+>>> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> [..]
+>>> diff --git a/include/linux/keyslot-manager.h b/include/linux/keyslot-manager.h
+>>> index 18f3f5346843f..443ad817c6c57 100644
+>>> --- a/include/linux/keyslot-manager.h
+>>> +++ b/include/linux/keyslot-manager.h
+>>> @@ -85,6 +85,9 @@ struct blk_keyslot_manager {
+>>>
+>>>  int blk_ksm_init(struct blk_keyslot_manager *ksm, unsigned int num_slots);
+>>>
+>>> +int devm_blk_ksm_init(struct device *dev, struct blk_keyslot_manager *ksm,
+>>> +                     unsigned int num_slots);
+>>> +
+>>>  blk_status_t blk_ksm_get_slot_for_key(struct blk_keyslot_manager *ksm,
+>>>                                       const struct blk_crypto_key *key,
+>>>                                       struct blk_ksm_keyslot **slot_ptr);
+>>> --
+>>
+>> Looks good to me. Please feel free to add
+>> Reviewed-by: Satya Tangirala <satyat@google.com>
+> 
+> Thanks Satya.  Jens, any objection to this patch going in through the MMC tree?
 
-Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Reviewed-by: Lauri Kasanen <cand@gmx.com>
----
- drivers/block/n64cart.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+No objections from me, doesn't look like we have any real worries of
+conflicts.
 
-diff --git a/drivers/block/n64cart.c b/drivers/block/n64cart.c
-index 620f9e080d5d..c83a6af5a718 100644
---- a/drivers/block/n64cart.c
-+++ b/drivers/block/n64cart.c
-@@ -157,7 +157,7 @@ static int __init n64cart_probe(struct platform_device *pdev)
- 	disk->fops = &n64cart_fops;
- 	strcpy(disk->disk_name, "n64cart");
- 
--	set_capacity(disk, size / 512);
-+	set_capacity(disk, size >> SECTOR_SHIFT);
- 	set_disk_ro(disk, 1);
- 
- 	blk_queue_flag_set(QUEUE_FLAG_NONROT, queue);
 -- 
-2.22.1
+Jens Axboe
 
