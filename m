@@ -6,87 +6,72 @@ X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A739AC433E0
-	for <linux-block@archiver.kernel.org>; Mon, 25 Jan 2021 09:38:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B33EC433E0
+	for <linux-block@archiver.kernel.org>; Mon, 25 Jan 2021 09:41:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5B0D9224DE
-	for <linux-block@archiver.kernel.org>; Mon, 25 Jan 2021 09:38:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1DC0B224B1
+	for <linux-block@archiver.kernel.org>; Mon, 25 Jan 2021 09:41:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726448AbhAYJhm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Jan 2021 04:37:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37574 "EHLO
+        id S1726954AbhAYJkz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Jan 2021 04:40:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38672 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726666AbhAYJfw (ORCPT
+        with ESMTP id S1726987AbhAYJkW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Jan 2021 04:35:52 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 280DEC061353;
-        Mon, 25 Jan 2021 00:39:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=1YTL3xi9CVuV+0Md7FSHan4RIDZ4NeHG0snB2En/L1k=; b=IKK3nq9rkHme4slZau8I2LIOE/
-        8aDher63l1E6jIGv4VbZ9GMYPJe8Z3F7SNHXKZ6mZQlZN/VcKAHx4Lz1WFAUAYzGSwDVH5w1N5yhW
-        yUNvKvJPaf8oz3524BfMXCwlKhxBPiZI6/ixqVE5joxeb75fSZGt6KEHfFlj5WwhYCHfEA7T2dgQ6
-        7YF+CT9FTFGNeKL55fNyQD8vmarHlIcOoFQh9kCxspGJOpXiK07+oO+2xnNV0hxaPSGp3G0eEDFIK
-        YNZd2wfAUcOZBC3ZcSQ41oMIaq7xpuV6Oz61w8UKIyYXteN3Wc/Y8+VAeCNwhBMu/EEkfF29DH9zy
-        ZIh8ikXg==;
-Received: from hch by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1l3xOp-003yLT-Hk; Mon, 25 Jan 2021 08:39:06 +0000
-Date:   Mon, 25 Jan 2021 08:39:03 +0000
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc:     Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org,
+        Mon, 25 Jan 2021 04:40:22 -0500
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 381D2C06174A;
+        Mon, 25 Jan 2021 01:29:10 -0800 (PST)
+Date:   Mon, 25 Jan 2021 10:29:08 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1611566948;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=jku6Tec7q+qisOnosheK7vPMPoB+SzWJoKjJCzgdLxg=;
+        b=DrPEmKrc4+G8WhLciMvGkpFc4uAI2a8BdHh8QU8pB3a+unm7cxOiq1DEOPoc1GTsSfd/3C
+        frMHNk7Sam/2rNyhTkDRsamHk48BJNeIpcIsDCIpzmiErE7SAZu8YvZYgoJ65G8vOIYRsh
+        c3x7EnfPf/BKR6Gqp73SzHCPFrxAiadldUqwkiXVhv1tqXRkuZshREBt5Zy8KuyJ5ZC/j0
+        uYg8OKkIe5Ip2erc1HJI6nOAqHjzUKFH/7+a7/24759mfkugEaei10WDQMY9DWKAXK09HC
+        fHX+5hVbz/N2T9h1KEXN5sNgFnPKGTI2DCUKnMDRgZI5rJgwZFdYGb2ojph5tg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1611566948;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=jku6Tec7q+qisOnosheK7vPMPoB+SzWJoKjJCzgdLxg=;
+        b=HuTQnFwN9rYs6voYZat4Kwko1csP9h7nuja7LDtXWfVh9hWfcWxzyjMah87AWxEuaniJUT
+        mrnNdDj6m6cH1+BQ==
+From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Hannes Reinecke <hare@suse.de>, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
         Thomas Gleixner <tglx@linutronix.de>,
         Peter Zijlstra <peterz@infradead.org>,
         Ingo Molnar <mingo@kernel.org>
-Subject: Re: [PATCH 3/3] blk-mq: Use llist_head for blk_cpu_done
-Message-ID: <20210125083903.GB945284@infradead.org>
+Subject: Re: [PATCH 2/3] blk-mq: Always complete remote completions requests
+ in softirq
+Message-ID: <20210125092908.ntugyvnbyigxpoyl@linutronix.de>
 References: <20210123201027.3262800-1-bigeasy@linutronix.de>
- <20210123201027.3262800-4-bigeasy@linutronix.de>
- <20210125083012.GD942655@infradead.org>
- <20210125083204.ahddujk5m6njwbju@linutronix.de>
+ <20210123201027.3262800-3-bigeasy@linutronix.de>
+ <30ce5ce2-8b9a-8873-4b37-c8720300942b@suse.de>
+ <20210125082542.GC942655@infradead.org>
+ <20210125083029.utnjqs2s3diqb5vx@linutronix.de>
+ <20210125083248.GA945284@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20210125083204.ahddujk5m6njwbju@linutronix.de>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20210125083248.GA945284@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jan 25, 2021 at 09:32:04AM +0100, Sebastian Andrzej Siewior wrote:
-> On 2021-01-25 08:30:12 [+0000], Christoph Hellwig wrote:
-> > > +static void blk_mq_complete_send_ipi(struct request *rq)
-> > > +{
-> > > +	struct llist_head *list;
-> > > +	unsigned int cpu;
-> > > +
-> > > +	cpu = rq->mq_ctx->cpu;
-> > > +	list = &per_cpu(blk_cpu_done, cpu);
-> > > +	if (llist_add(&rq->ipi_list, list)) {
-> > > +		INIT_CSD(&rq->csd, __blk_mq_complete_request_remote, rq);
-> > > +		smp_call_function_single_async(cpu, &rq->csd);
-> > > +	}
-> > > +}
-> > 
-> > Nit: it would be nice to initialize cpu and list in the declaration
-> > lines.
-> 
-> Why? They get initialized later.
+On 2021-01-25 08:32:48 [+0000], Christoph Hellwig wrote:
+> Well, I put it in quotes because I'm not sure what the exact effect
+> is.  But we do delay these completions to the softirq now instead of
+> hardirq context, which at least in theory increases latency.  OTOH it
+> might even have positive effects on the rest of the system.
 
-Because:
+The last part is/was my motivation ;)
 
-	unsigned int cpu = rq->mq_ctx->cpu;
-	struct llist_head *list = &per_cpu(blk_cpu_done, cpu);
-
-is a lot easier to follow than:
-
-	struct llist_head *list;
-	unsigned int cpu;
-
-	cpu = rq->mq_ctx->cpu;
-	list = &per_cpu(blk_cpu_done, cpu);
-
+Sebastian
