@@ -2,102 +2,89 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E7D9C433DB
-	for <linux-block@archiver.kernel.org>; Mon, 25 Jan 2021 04:36:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5286BC433DB
+	for <linux-block@archiver.kernel.org>; Mon, 25 Jan 2021 04:36:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D5E8122CA2
-	for <linux-block@archiver.kernel.org>; Mon, 25 Jan 2021 04:36:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 180A222CA2
+	for <linux-block@archiver.kernel.org>; Mon, 25 Jan 2021 04:36:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726861AbhAYEfy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 24 Jan 2021 23:35:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58346 "EHLO
+        id S1726810AbhAYEgw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 24 Jan 2021 23:36:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58562 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726849AbhAYEfw (ORCPT
+        with ESMTP id S1726571AbhAYEgv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 24 Jan 2021 23:35:52 -0500
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EDA4C0613D6
-        for <linux-block@vger.kernel.org>; Sun, 24 Jan 2021 20:35:12 -0800 (PST)
-Received: by mail-pl1-x62f.google.com with SMTP id h15so4335881pli.8
-        for <linux-block@vger.kernel.org>; Sun, 24 Jan 2021 20:35:12 -0800 (PST)
+        Sun, 24 Jan 2021 23:36:51 -0500
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91177C061573
+        for <linux-block@vger.kernel.org>; Sun, 24 Jan 2021 20:36:11 -0800 (PST)
+Received: by mail-pj1-x102e.google.com with SMTP id kx7so7600433pjb.2
+        for <linux-block@vger.kernel.org>; Sun, 24 Jan 2021 20:36:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=RF+U31mjU+vQtmYKwQP7k4EqO/12hyWNFfFTp846sxc=;
-        b=CfOwQ7limljMA7zl/lIAXVsTIKtNDlhwsicqotNl3TtlKhEjyZeIlEEJtHYW4c2U31
-         UY4hC8hbmTVMaTURi/h7AUevTqeIqn+Q1FFnUUJ35BV9ke4apIRUY5I8NbeB8KXYicfU
-         +trWj06hwAqSeMB9yfxG8wvJYR9/caMYTWeGkZl5KTSBZfynGCBz84SyjX0hbk7AWcGA
-         /222IeHt9HOYYROpDQ0wb25k1uTdAAL1nhrslb3U6So17SP9tJY8mfEDx1CUbEE7qC63
-         qpRcjNyJveRtr7uQu1UM1fJCkiAbkBaCmTSnXoAaT+i+isB4hYXJxGmrbyMs7d8MUbF7
-         BPGQ==
+        bh=Eqqx1gni4Q4abmvsdVexzq6eMIJu3GVUnZLPq6wIbFo=;
+        b=Y2TplnQ9iYj65TLPlSyyE6QipJSeTh2Pj+iCGthqP1bCGfCKPVAXQAZtssww6b4Uu4
+         q55bCtBN04czu06KWVLIatzqCSavXLUQE7opvY/k4XIZQsJ0WoKOcZr1nYAuVXgyJbpq
+         BIxlEAXuvk2UEBjGsc6o2kqx3qI5ByWXhUTuMGMHIQ/i0C60O157mzLjGnpmB9cFtvin
+         iTsfY3lnwB/Z3hGYYPBV655TnZmENYxmnV+oC1Tw308HNRnNknu3RZKzJfTSi+Zu0swT
+         hDgqgluDTyHRKyB0QR4EAHSjr+6uGIPtcvea6btppiItIs0UaN9KeKfc/C+82q6Ncm+P
+         uM9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=RF+U31mjU+vQtmYKwQP7k4EqO/12hyWNFfFTp846sxc=;
-        b=mXpigXogLhXQG0f3rdygecsDlkZO7GwJlxDUcIa42y6CUR79DHoK85hV8yjwxeocwD
-         no+aiVyBv2nrTvePKZ42iu85C5DABlLxW+83WQEKwC3nSGWNF4Fj5g6WZsgxZ+nujin8
-         /ybcf3vyLyutjVWya3EWWt8wvemQgCs7W+DTZZWovjFbSGD8TxBOhJLYZJ4E3LWJtBQA
-         BuUBRexnPVlvDOZCM/qa5LQJnBRVAG3yQQXZ2BW2sddK3ctLO3jSVRh7fptZk62Cii+i
-         sNekOUEZOGcHxe5OmkF5epnSf28QXeH9yjEHVAeK/7OMCiLVmcbqOQkLc3WcHF4a7ScJ
-         Agdw==
-X-Gm-Message-State: AOAM530FqRas1QVwUcKouuyMfQmi9eKFYrlu2X1fvB6ZC7aPQtgKnsie
-        1Vvs8XQQ8TJ1m7fATqxG/ff5uQ==
-X-Google-Smtp-Source: ABdhPJwcVIfcZhKpz36wBWgY9pEAr1Osy03vWby4EQev/6n4B5mRbyHylHT/8WSUq/UooHKSU12Q8g==
-X-Received: by 2002:a17:90a:1c09:: with SMTP id s9mr6518112pjs.83.1611549310994;
-        Sun, 24 Jan 2021 20:35:10 -0800 (PST)
-Received: from [10.8.2.15] ([185.125.207.232])
-        by smtp.gmail.com with ESMTPSA id x21sm15191515pgi.75.2021.01.24.20.35.02
+        bh=Eqqx1gni4Q4abmvsdVexzq6eMIJu3GVUnZLPq6wIbFo=;
+        b=siEQt7WtfUITfL2BARNetIjSY/ihY23m3+pA8xUSFvPGI33BFS650WW9KAJ/QvpOMF
+         E53pHgN3OtUIMBnQXjGjx6WjVytPX44aRMha+GLA0tcHSpwoKsOXBYNosQ+Hu5FSOIIx
+         ILWuYN/vpeofvrf6FUbfwrKSMW6tZonu5FdIV/xqKS0DPdVIqWQwzF37KZ51vs4DyYJx
+         1KbQW48cHk7JDT0+YsGS34KQjpuCr2rtOAAN2hs6SoLdthB2B0RSQBLlSqtf5xXJ2Ii4
+         wbdq/E8EGQ8ab3LER0HXan3J4yiE37s821jI+FfQUBmdQ9WUbRhTE4TGm/cEPJFYH+9X
+         Tadw==
+X-Gm-Message-State: AOAM53370m6KptU4HAY7Nwn3P5tXt4bMV/uKPnKtYIvoAuFtVjRNbDrG
+        n8dACyupjL0M1ZYftejngR7vdw==
+X-Google-Smtp-Source: ABdhPJx3lPBpwUJl7dARi46jEU8sXgzhA40DeONLxaK+kkCYBeLzfDrfg42AwsVn4afHZcri1JOFXw==
+X-Received: by 2002:a17:90a:dac6:: with SMTP id g6mr7759003pjx.178.1611549371102;
+        Sun, 24 Jan 2021 20:36:11 -0800 (PST)
+Received: from [192.168.4.41] (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
+        by smtp.gmail.com with ESMTPSA id k9sm16243155pjj.8.2021.01.24.20.36.09
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 24 Jan 2021 20:35:10 -0800 (PST)
-Subject: Re: [PATCH V2 0/2] remove unused argument from blk_execute_rq_nowait
- and blk_execute_rq
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, target-devel@vger.kernel.org,
-        linux-scsi@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-ide@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-nfs@vger.kernel.org,
-        hch@infradead.org
-References: <20210122092824.20971-1-guoqing.jiang@cloud.ionos.com>
- <683e16be-1146-e60c-cfea-e4606844f080@kernel.dk>
-From:   Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
-Message-ID: <73fd70be-90bc-9c6c-dcbe-7981f8fef4f5@cloud.ionos.com>
-Date:   Mon, 25 Jan 2021 05:34:52 +0100
+        Sun, 24 Jan 2021 20:36:10 -0800 (PST)
+Subject: Re: [PATCH] block: Fix an error handling in add_partition
+To:     Dinghao Liu <dinghao.liu@zju.edu.cn>, kjlu@umn.edu
+Cc:     Jan Kara <jack@suse.cz>, Hannes Reinecke <hare@suse.de>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20210117085023.24352-1-dinghao.liu@zju.edu.cn>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <bfd373f2-8101-d1a1-549b-9163718ec658@kernel.dk>
+Date:   Sun, 24 Jan 2021 21:36:08 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <683e16be-1146-e60c-cfea-e4606844f080@kernel.dk>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20210117085023.24352-1-dinghao.liu@zju.edu.cn>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 1/17/21 1:50 AM, Dinghao Liu wrote:
+> Once we have called device_initialize(), we should use put_device() to
+> give up the reference on error, just like what we have done on failure
+> of device_add().
 
+Applied for 5.11, thanks.
 
-On 1/25/21 02:24, Jens Axboe wrote:
-> On 1/22/21 2:28 AM, Guoqing Jiang wrote:
->> V2 changes:
->> 1. update commit header per Christoph's comment.
->>
->> Hi Jens,
->>
->> This series remove unused 'q' from blk_execute_rq_nowait and blk_execute_rq.
->> Also update the comment for blk_execute_rq_nowait.
-> 
-> What's this against? The lightnvm patch doesn't apply.
-> 
+-- 
+Jens Axboe
 
-Sorry for that, will resend against for-5.12/block.
-
-Thanks,
-Guoqing
