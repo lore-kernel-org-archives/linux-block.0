@@ -2,63 +2,90 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2814C433DB
-	for <linux-block@archiver.kernel.org>; Sun, 24 Jan 2021 20:34:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7BFAC433DB
+	for <linux-block@archiver.kernel.org>; Mon, 25 Jan 2021 01:20:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 840E123122
-	for <linux-block@archiver.kernel.org>; Sun, 24 Jan 2021 20:34:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9211222571
+	for <linux-block@archiver.kernel.org>; Mon, 25 Jan 2021 01:20:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726007AbhAXUea (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 24 Jan 2021 15:34:30 -0500
-Received: from mail.kernel.org ([198.145.29.99]:47610 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725968AbhAXUea (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 24 Jan 2021 15:34:30 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPS id 9A22122C7B;
-        Sun, 24 Jan 2021 20:33:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1611520429;
-        bh=wHWCiU0gGFfOkUFr/aDqNqf9VLFTKv19itbPocpNsz8=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=rR2YO6ygJdounvzCYyPG/Vwq/RcBqyTbw55+edChfNCB3xNGsaxCSJ4aKYXEZidVN
-         dgiEYYT1byE2yCGT5OnIvCCwbAZrSHGeaVRC9L9Qg9YLGYtjlxg9N93gGwcGxN9DDC
-         4JfVhEb/xHrvoRKHP6egyAJk4wm5VAl/nSPmQgbBhv9tDBTg0tCU2uBRspGs8gjhNR
-         l5VxvpF6/QhZ1CmERYPZKcWqnmRZwHuMPIhAtkL82BwGux0a9yRwq7HIoa7r4iKtAV
-         fj+e2wdGV2d4UHdV6PWPBIN9GUaOftu51h9BGz6NfNVzd6sx40OKejTCVH0M9DypeB
-         JB+k8e31b81dw==
-Subject: Re: [GIT PULL] Block fixes for 5.11-rc5
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <c97bdf40-6552-ab35-3071-a5b96855c80a@kernel.dk>
-References: <c97bdf40-6552-ab35-3071-a5b96855c80a@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <c97bdf40-6552-ab35-3071-a5b96855c80a@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git tags/block-5.11-2021-01-24
-X-PR-Tracked-Commit-Id: 97784481757fba7570121a70dd37ca74a29f50a8
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: a692a610d7ed632cab31b61d6c350db68a10e574
-Message-Id: <161152042960.12946.3602978408572870312.pr-tracker-bot@kernel.org>
-Date:   Sun, 24 Jan 2021 20:33:49 +0000
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        id S1726370AbhAYBTx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 24 Jan 2021 20:19:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44814 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726390AbhAYBTX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 24 Jan 2021 20:19:23 -0500
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A24BEC061573
+        for <linux-block@vger.kernel.org>; Sun, 24 Jan 2021 17:18:42 -0800 (PST)
+Received: by mail-pf1-x42b.google.com with SMTP id 11so7483393pfu.4
+        for <linux-block@vger.kernel.org>; Sun, 24 Jan 2021 17:18:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=L3uVyIQXg315cYdcWFUi5kSuy10il/YWLytcRu3EvKU=;
+        b=xCHC0TeW5olhFVBW6SBSDbklWOHvyAC/fgRBJFg+QV/Q5ZqvnsCzJQdIeYog/GvYA+
+         1FlflAU+h5Sv3UjYx7/qSst5YpD15GQvU71pZYe8ePM3LHf7kFNHWOT5y04CDdLR40el
+         ftJQkDLB68lSuut4+JZEiF6z7FuIH/dM3Q15Ph7Hhfp9c+8AIVpmuuNERcDOSUosAhYh
+         zfAeeaQ4lQrqaiFKx/jTGMBbadTTU4ZqAmvR58IdNsMNUC5N4BD2hBSmaHQkC1jILm+V
+         Xwrp9hcTiZZYP3qSSCC6mLpDW0vrHJlkuHab4dCkhhTnUT3g2j3Rp9oFXActZiDaXc2A
+         DoCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=L3uVyIQXg315cYdcWFUi5kSuy10il/YWLytcRu3EvKU=;
+        b=GhQSF69U8ADUQ0fG8Wjubsa8FS+rsHgY/V3WvnFDGVGzBOafIXL+j0Gc6sB0Pvdk8V
+         P+IqekI2Cb+6SLnj6vOvwkU+39JKxh5qMYX71KYKzWLDduyd002aJ9VvnKbQFOMcM5I3
+         is6GAgvPd44ESSNCMM/7Z7IhiYABz24ikNyN+xqe/El8Bfpec0pcnkeKaYibQERWfPuP
+         cC5qc1sRUpZHw+YxfP+1UF3o9pJzfPvKDmXhVxDMlo4taDX5TyK6eYj90Cc5ZBALqRnm
+         xcKhbh9z7/WvF633aIGte3SpB+CkZ0xHmgTH0wK+wZBaNYACQsFPnT8eqouNaSKvXoCL
+         zCEQ==
+X-Gm-Message-State: AOAM533ILG0wJ46ky/84KKll22KyDliAkwUaIYQDc0zONZH/xKaZ8GsN
+        xJV9EctMBXuFih7qppXmWrTtQlrqYgJqnA==
+X-Google-Smtp-Source: ABdhPJxFWePCWmfNnsY9gw6UORyzTKjMRFWUXJ9grK/iqp7aHvcQXCH6VKSMOOKg59exGpxH5JsEmw==
+X-Received: by 2002:a63:c702:: with SMTP id n2mr277682pgg.382.1611537522118;
+        Sun, 24 Jan 2021 17:18:42 -0800 (PST)
+Received: from [192.168.4.41] (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
+        by smtp.gmail.com with ESMTPSA id p13sm16036771pju.20.2021.01.24.17.18.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 24 Jan 2021 17:18:41 -0800 (PST)
+Subject: Re: [PATCH BUGFIX/IMPROVEMENT 0/6] block, bfq: first bath of fixes
+ and improvements
+To:     Paolo Valente <paolo.valente@linaro.org>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20210122181948.35660-1-paolo.valente@linaro.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <8e024512-992d-1f9f-2fba-5f51103b706a@kernel.dk>
+Date:   Sun, 24 Jan 2021 18:18:39 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+MIME-Version: 1.0
+In-Reply-To: <20210122181948.35660-1-paolo.valente@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Sun, 24 Jan 2021 11:50:17 -0700:
+On 1/22/21 11:19 AM, Paolo Valente wrote:
+> Hi,
+> 
+> about nine months ago, Jan (Kara, SUSE) reported a throughput
+> regression with BFQ. That was the beginning of a fruitful dev&testing
+> collaboration, which led to 18 new commits. Part are fixes, part are
+> actual performance improvements.
 
-> git://git.kernel.dk/linux-block.git tags/block-5.11-2021-01-24
-
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/a692a610d7ed632cab31b61d6c350db68a10e574
-
-Thank you!
+Applied, thanks.
 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Jens Axboe
+
