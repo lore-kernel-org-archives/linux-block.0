@@ -2,81 +2,178 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13A4FC433E6
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 05:32:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2651CC433E0
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 05:32:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D2254206F7
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 05:32:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DE9BF22B2C
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 05:32:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729932AbhAZFbv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Jan 2021 00:31:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43016 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727242AbhAYKAN (ORCPT
+        id S1731490AbhAZFcK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Jan 2021 00:32:10 -0500
+Received: from out30-130.freemail.mail.aliyun.com ([115.124.30.130]:51282 "EHLO
+        out30-130.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727875AbhAYMPa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Jan 2021 05:00:13 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B409C0617AA;
-        Mon, 25 Jan 2021 00:33:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=mjV/4Z3CDRxQhs+wKq1+GM3JPWdjP4pMPtKxh3gu3Qg=; b=qnNhg72wYDhaBpZbjBxRedU+0p
-        y18yUOE0T3saR/wjRv9Aysq05dijQ7rGD5IeOiFPH4IulcBXMa3mSOHz0nsjGONuGjnX8bUxe91Lq
-        o0iftOB1HJRWIZKgbAeUX4mB9TIgk7jLu/uAP9L1t8upK9ueQWwbbOlUgvqt/ZQjEXoM0KwZG+rou
-        3qUKywQdTwqdQxaEgTi6nJlEmmzNg13jdVCmIRVlCP50Kroa0OZiFB+esbyPn8aL4CaRTfVBIbVQi
-        0tdq9by/K4+pPYMA2KFWLNuUh2lqwMMtMUm2P7OYZsltG6zVCZ+V+b+veepwSUlfVj8Fek4VCXNzW
-        ccCPJNOA==;
-Received: from hch by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1l3xIm-003y01-HS; Mon, 25 Jan 2021 08:32:49 +0000
-Date:   Mon, 25 Jan 2021 08:32:48 +0000
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Hannes Reinecke <hare@suse.de>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@kernel.org>
-Subject: Re: [PATCH 2/3] blk-mq: Always complete remote completions requests
- in softirq
-Message-ID: <20210125083248.GA945284@infradead.org>
-References: <20210123201027.3262800-1-bigeasy@linutronix.de>
- <20210123201027.3262800-3-bigeasy@linutronix.de>
- <30ce5ce2-8b9a-8873-4b37-c8720300942b@suse.de>
- <20210125082542.GC942655@infradead.org>
- <20210125083029.utnjqs2s3diqb5vx@linutronix.de>
+        Mon, 25 Jan 2021 07:15:30 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04420;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=5;SR=0;TI=SMTPD_---0UMpgSO-_1611576822;
+Received: from localhost(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0UMpgSO-_1611576822)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Mon, 25 Jan 2021 20:13:42 +0800
+From:   Jeffle Xu <jefflexu@linux.alibaba.com>
+To:     snitzer@redhat.com
+Cc:     joseph.qi@linux.alibaba.com, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, io-uring@vger.kernel.org
+Subject: [PATCH v2 4/6] dm: always return BLK_QC_T_NONE for bio-based device
+Date:   Mon, 25 Jan 2021 20:13:38 +0800
+Message-Id: <20210125121340.70459-5-jefflexu@linux.alibaba.com>
+X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20210125121340.70459-1-jefflexu@linux.alibaba.com>
+References: <20210125121340.70459-1-jefflexu@linux.alibaba.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210125083029.utnjqs2s3diqb5vx@linutronix.de>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jan 25, 2021 at 09:30:29AM +0100, Sebastian Andrzej Siewior wrote:
-> On 2021-01-25 08:25:42 [+0000], Christoph Hellwig wrote:
-> > On Mon, Jan 25, 2021 at 08:10:16AM +0100, Hannes Reinecke wrote:
-> > > I don't get this.
-> > > This code is about _avoiding_ having to raise a softirq if the driver
-> > > exports more than one hardware queue.
-> > > So where exactly does the remote CPU case come in here?
-> > 
-> > __blk_mq_complete_request_remote is only called for the case where we
-> > do not completelky locally.  The case that "degrades" here is where
-> > the device supports multiple queues, but less than the number of CPUs,
-> > and we bounce the completion to another CPU.
-> 
-> Does it really "degrade" or just use the softirq more often? The usual
-> case is run the softirqs in irq_exit() which is just after IPI.
+Currently the returned cookie of bio-based device is not used at all.
 
-Well, I put it in quotes because I'm not sure what the exact effect
-is.  But we do delay these completions to the softirq now instead of
-hardirq context, which at least in theory increases latency.  OTOH it
-might even have positive effects on the rest of the system.
+In the following patch, bio-based device will actually return a
+pointer to a specific object as the returned cookie.
+
+Signed-off-by: Jeffle Xu <jefflexu@linux.alibaba.com>
+Reviewed-by: Mike Snitzer <snitzer@redhat.com>
+---
+ drivers/md/dm.c | 26 ++++++++++----------------
+ 1 file changed, 10 insertions(+), 16 deletions(-)
+
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 7bac564f3faa..46ca3b739396 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -1252,14 +1252,13 @@ void dm_accept_partial_bio(struct bio *bio, unsigned n_sectors)
+ }
+ EXPORT_SYMBOL_GPL(dm_accept_partial_bio);
+ 
+-static blk_qc_t __map_bio(struct dm_target_io *tio)
++static void __map_bio(struct dm_target_io *tio)
+ {
+ 	int r;
+ 	sector_t sector;
+ 	struct bio *clone = &tio->clone;
+ 	struct dm_io *io = tio->io;
+ 	struct dm_target *ti = tio->ti;
+-	blk_qc_t ret = BLK_QC_T_NONE;
+ 
+ 	clone->bi_end_io = clone_endio;
+ 
+@@ -1278,7 +1277,7 @@ static blk_qc_t __map_bio(struct dm_target_io *tio)
+ 	case DM_MAPIO_REMAPPED:
+ 		/* the bio has been remapped so dispatch it */
+ 		trace_block_bio_remap(clone, bio_dev(io->orig_bio), sector);
+-		ret = submit_bio_noacct(clone);
++		submit_bio_noacct(clone);
+ 		break;
+ 	case DM_MAPIO_KILL:
+ 		free_tio(tio);
+@@ -1292,8 +1291,6 @@ static blk_qc_t __map_bio(struct dm_target_io *tio)
+ 		DMWARN("unimplemented target map return value: %d", r);
+ 		BUG();
+ 	}
+-
+-	return ret;
+ }
+ 
+ static void bio_setup_sector(struct bio *bio, sector_t sector, unsigned len)
+@@ -1380,7 +1377,7 @@ static void alloc_multiple_bios(struct bio_list *blist, struct clone_info *ci,
+ 	}
+ }
+ 
+-static blk_qc_t __clone_and_map_simple_bio(struct clone_info *ci,
++static void __clone_and_map_simple_bio(struct clone_info *ci,
+ 					   struct dm_target_io *tio, unsigned *len)
+ {
+ 	struct bio *clone = &tio->clone;
+@@ -1391,7 +1388,7 @@ static blk_qc_t __clone_and_map_simple_bio(struct clone_info *ci,
+ 	if (len)
+ 		bio_setup_sector(clone, ci->sector, *len);
+ 
+-	return __map_bio(tio);
++	__map_bio(tio);
+ }
+ 
+ static void __send_duplicate_bios(struct clone_info *ci, struct dm_target *ti,
+@@ -1405,7 +1402,7 @@ static void __send_duplicate_bios(struct clone_info *ci, struct dm_target *ti,
+ 
+ 	while ((bio = bio_list_pop(&blist))) {
+ 		tio = container_of(bio, struct dm_target_io, clone);
+-		(void) __clone_and_map_simple_bio(ci, tio, len);
++		__clone_and_map_simple_bio(ci, tio, len);
+ 	}
+ }
+ 
+@@ -1450,7 +1447,7 @@ static int __clone_and_map_data_bio(struct clone_info *ci, struct dm_target *ti,
+ 		free_tio(tio);
+ 		return r;
+ 	}
+-	(void) __map_bio(tio);
++	__map_bio(tio);
+ 
+ 	return 0;
+ }
+@@ -1565,11 +1562,10 @@ static void init_clone_info(struct clone_info *ci, struct mapped_device *md,
+ /*
+  * Entry point to split a bio into clones and submit them to the targets.
+  */
+-static blk_qc_t __split_and_process_bio(struct mapped_device *md,
++static void __split_and_process_bio(struct mapped_device *md,
+ 					struct dm_table *map, struct bio *bio)
+ {
+ 	struct clone_info ci;
+-	blk_qc_t ret = BLK_QC_T_NONE;
+ 	int error = 0;
+ 
+ 	init_clone_info(&ci, md, map, bio);
+@@ -1613,7 +1609,7 @@ static blk_qc_t __split_and_process_bio(struct mapped_device *md,
+ 
+ 				bio_chain(b, bio);
+ 				trace_block_split(b, bio->bi_iter.bi_sector);
+-				ret = submit_bio_noacct(bio);
++				submit_bio_noacct(bio);
+ 				break;
+ 			}
+ 		}
+@@ -1621,13 +1617,11 @@ static blk_qc_t __split_and_process_bio(struct mapped_device *md,
+ 
+ 	/* drop the extra reference count */
+ 	dec_pending(ci.io, errno_to_blk_status(error));
+-	return ret;
+ }
+ 
+ static blk_qc_t dm_submit_bio(struct bio *bio)
+ {
+ 	struct mapped_device *md = bio->bi_disk->private_data;
+-	blk_qc_t ret = BLK_QC_T_NONE;
+ 	int srcu_idx;
+ 	struct dm_table *map;
+ 
+@@ -1657,10 +1651,10 @@ static blk_qc_t dm_submit_bio(struct bio *bio)
+ 	if (is_abnormal_io(bio))
+ 		blk_queue_split(&bio);
+ 
+-	ret = __split_and_process_bio(md, map, bio);
++	__split_and_process_bio(md, map, bio);
+ out:
+ 	dm_put_live_table(md, srcu_idx);
+-	return ret;
++	return BLK_QC_T_NONE;
+ }
+ 
+ /*-----------------------------------------------------------------
+-- 
+2.27.0
+
