@@ -2,73 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F211EC433E0
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 19:54:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09422C433DB
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 19:54:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B5EE222B3F
+	by mail.kernel.org (Postfix) with ESMTP id 9B77222A85
 	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 19:54:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726126AbhAZFbB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Jan 2021 00:31:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34370 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726317AbhAYJUO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Jan 2021 04:20:14 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08D92C061220;
-        Mon, 25 Jan 2021 00:49:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=6x3jwWsE8Pp1a5Oj7dG5Rac0+wUmTjdtsRT6Ukvd5hQ=; b=UQ8+JK+C5EdxVY3h9h7kqA3yxq
-        HcO3BJsbTUyaJU6LFWyBBlOSHzCtWbkEJGo+41AOwL/CIl5/c8XgOAaVylnjU7lflirCCksiS2ujD
-        pbTzXbUR5YOy48DDHhmrxLlNqsR5zo0u4s/lO6/R1TL+91NfdAtrWWHlrT/txhfG8Qjna6qyOgqyH
-        cPrth9syTOHeIujb9kKDlnkcUKHsKZJV0cksqMX088MxcSXh2qismrjgGUx1FrWYEbmbSXLVQCLuT
-        x0O1Sfy6fKCTf5xaDI4YltHgAHtVEBRpDHUjDIeKF6pqUpDRsBwnQIYU2XV70jBklmMoPx+2X8BHf
-        g+1GQqRg==;
-Received: from hch by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1l3xYb-003yxX-Jo; Mon, 25 Jan 2021 08:49:10 +0000
-Date:   Mon, 25 Jan 2021 08:49:09 +0000
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@kernel.org>
-Subject: Re: [PATCH 2/3] blk-mq: Always complete remote completions requests
- in softirq
-Message-ID: <20210125084909.GA948851@infradead.org>
-References: <20210123201027.3262800-1-bigeasy@linutronix.de>
- <20210123201027.3262800-3-bigeasy@linutronix.de>
- <20210125082259.GB942655@infradead.org>
+        id S1726480AbhAZFam (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Jan 2021 00:30:42 -0500
+Received: from verein.lst.de ([213.95.11.211]:43804 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726126AbhAYJQk (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 25 Jan 2021 04:16:40 -0500
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 7027768B05; Mon, 25 Jan 2021 09:20:42 +0100 (CET)
+Date:   Mon, 25 Jan 2021 09:20:42 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org
+Subject: Re: [PATCH] block: unexport truncate_bdev_range
+Message-ID: <20210125082042.GA11659@lst.de>
+References: <20210109111332.1132424-1-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210125082259.GB942655@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20210109111332.1132424-1-hch@lst.de>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jan 25, 2021 at 08:23:03AM +0000, Christoph Hellwig wrote:
-> On Sat, Jan 23, 2021 at 09:10:26PM +0100, Sebastian Andrzej Siewior wrote:
-> > Controllers with multiple queues have their IRQ-handelers pinned to a
-> > CPU. The core shouldn't need to complete the request on a remote CPU.
-> > 
-> > Remove this case and always raise the softirq to complete the request.
+Jens,
+
+can you pick this one up?
+
+On Sat, Jan 09, 2021 at 12:13:32PM +0100, Christoph Hellwig wrote:
+> truncate_bdev_range is only used in always built-in block layer code,
+> so remove the export and the !CONFIG_BLOCK stub.
 > 
-> What about changing blk_mq_trigger_softirq to take a void * argument
-> and thus removing __blk_mq_complete_request_remote entirely?
-
-I'll take this back - that change is in the way of what you do in patch
-3.  So this looks good as-is:
-
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  fs/block_dev.c         | 1 -
+>  include/linux/blkdev.h | 9 ++-------
+>  2 files changed, 2 insertions(+), 8 deletions(-)
+> 
+> diff --git a/fs/block_dev.c b/fs/block_dev.c
+> index 3e5b02f6606c42..41a9b0cb2d8a16 100644
+> --- a/fs/block_dev.c
+> +++ b/fs/block_dev.c
+> @@ -126,7 +126,6 @@ int truncate_bdev_range(struct block_device *bdev, fmode_t mode,
+>  		bd_abort_claiming(bdev, truncate_bdev_range);
+>  	return 0;
+>  }
+> -EXPORT_SYMBOL(truncate_bdev_range);
+>  
+>  static void set_init_blocksize(struct block_device *bdev)
+>  {
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index f94ee3089e015e..22fc4f3141d555 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -2012,21 +2012,16 @@ void bdev_add(struct block_device *bdev, dev_t dev);
+>  struct block_device *I_BDEV(struct inode *inode);
+>  struct block_device *bdgrab(struct block_device *bdev);
+>  void bdput(struct block_device *);
+> +int truncate_bdev_range(struct block_device *bdev, fmode_t mode, loff_t lstart,
+> +		loff_t lend);
+>  
+>  #ifdef CONFIG_BLOCK
+>  void invalidate_bdev(struct block_device *bdev);
+> -int truncate_bdev_range(struct block_device *bdev, fmode_t mode, loff_t lstart,
+> -			loff_t lend);
+>  int sync_blockdev(struct block_device *bdev);
+>  #else
+>  static inline void invalidate_bdev(struct block_device *bdev)
+>  {
+>  }
+> -static inline int truncate_bdev_range(struct block_device *bdev, fmode_t mode,
+> -				      loff_t lstart, loff_t lend)
+> -{
+> -	return 0;
+> -}
+>  static inline int sync_blockdev(struct block_device *bdev)
+>  {
+>  	return 0;
+> -- 
+> 2.29.2
+---end quoted text---
