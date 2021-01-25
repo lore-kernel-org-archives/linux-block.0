@@ -6,61 +6,77 @@ X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFB70C433E0
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 05:31:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4105C433E0
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 05:32:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7165B229C4
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 05:31:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B2852229C4
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 05:32:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728306AbhAZFb3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Jan 2021 00:31:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37578 "EHLO
+        id S1729690AbhAZFbq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Jan 2021 00:31:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43018 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726600AbhAYJgx (ORCPT
+        with ESMTP id S1727270AbhAYKAN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Jan 2021 04:36:53 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DB1DC061793;
-        Mon, 25 Jan 2021 00:23:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=zGgRl2LgOrK08d1LlX0vwaKxdqZFCdwsDDwW3pCK04w=; b=A63P29axSeGvBYaQuSr4Z1mADH
-        aTLPtQ6DtNCVre3pP7QIT5fd2Oag/WJkcrEHyVvNIfJq2vKZUPRzcyfB2Wqylv7D/V8cj/DNr+1Ts
-        h7oKUycP2rePf8U0wqHGmbcj49Yv40r7KQkmHCTPgt8qV8dIAqDaLbD/gSJVtoW8cmeKtXxnuLm36
-        22AW2HvZjNL0m/F/pMxCJpRGiWlVDayA399Q2a8YMUcxZWCm6MfG3wXo8MzHhAILtr/gsLPWFtyK5
-        LgegfnCry02MugNTroJREw2on5XGPe2HgX91fh87DL8ThWlWPIQrJzM9908v9CrJYL+9b6dS3h4x4
-        9plS3HCg==;
-Received: from hch by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1l3x9H-003xRk-RF; Mon, 25 Jan 2021 08:23:01 +0000
-Date:   Mon, 25 Jan 2021 08:22:59 +0000
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
+        Mon, 25 Jan 2021 05:00:13 -0500
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 339FBC0617A9;
+        Mon, 25 Jan 2021 00:33:26 -0800 (PST)
+Date:   Mon, 25 Jan 2021 09:30:29 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1611563429;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=fT0yLbgSHXoqxC+Ppvc+ZiBYpclK9xLccUp9T4OyAhY=;
+        b=BemnhpDaK7krGlakrswG4b/fJb0d7BgwDGu88JGO2M+isSnyVoDKEmoMM6aSV0B0LOABcF
+        KizpKLGwv2O49+9JMQRYLbM6MSz9FbJZJkryfJewzhBzkp90pWv2MQPychF7LvtcQtHwSr
+        Rf6lJA9Owe3+mlHcHYG2FGDTYe7QyRNcLGo8FJl+wzksispK8c8fQyTWHz7kpW1SKKHErD
+        TXOVq23qAbY6yCP1ZIbIUQXMRk/V8yhVbWRLS/WBpx5V268wwsBNp3YsCEUphps6UV+Woo
+        +5zWXHXKI/60yQc2Z2o+7UIvyU8P4klBbu2MWR3H5jEcXhaeOeQtc2CIROhNWA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1611563429;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=fT0yLbgSHXoqxC+Ppvc+ZiBYpclK9xLccUp9T4OyAhY=;
+        b=S2syWgU3yZgLg/oaHo2t20FatHzVXsIl9VXp9sdRxxBc0ky1BpeVBdetISF1tcmB303Ecv
+        R6P97UX0GXtoGCDw==
+From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Hannes Reinecke <hare@suse.de>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
         Thomas Gleixner <tglx@linutronix.de>,
         Peter Zijlstra <peterz@infradead.org>,
         Ingo Molnar <mingo@kernel.org>
 Subject: Re: [PATCH 2/3] blk-mq: Always complete remote completions requests
  in softirq
-Message-ID: <20210125082259.GB942655@infradead.org>
+Message-ID: <20210125083029.utnjqs2s3diqb5vx@linutronix.de>
 References: <20210123201027.3262800-1-bigeasy@linutronix.de>
  <20210123201027.3262800-3-bigeasy@linutronix.de>
+ <30ce5ce2-8b9a-8873-4b37-c8720300942b@suse.de>
+ <20210125082542.GC942655@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20210123201027.3262800-3-bigeasy@linutronix.de>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20210125082542.GC942655@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Jan 23, 2021 at 09:10:26PM +0100, Sebastian Andrzej Siewior wrote:
-> Controllers with multiple queues have their IRQ-handelers pinned to a
-> CPU. The core shouldn't need to complete the request on a remote CPU.
+On 2021-01-25 08:25:42 [+0000], Christoph Hellwig wrote:
+> On Mon, Jan 25, 2021 at 08:10:16AM +0100, Hannes Reinecke wrote:
+> > I don't get this.
+> > This code is about _avoiding_ having to raise a softirq if the driver
+> > exports more than one hardware queue.
+> > So where exactly does the remote CPU case come in here?
 > 
-> Remove this case and always raise the softirq to complete the request.
+> __blk_mq_complete_request_remote is only called for the case where we
+> do not completelky locally.  The case that "degrades" here is where
+> the device supports multiple queues, but less than the number of CPUs,
+> and we bounce the completion to another CPU.
 
-What about changing blk_mq_trigger_softirq to take a void * argument
-and thus removing __blk_mq_complete_request_remote entirely?
+Does it really "degrade" or just use the softirq more often? The usual
+case is run the softirqs in irq_exit() which is just after IPI.
+
+Sebastian
