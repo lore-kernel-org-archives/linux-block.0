@@ -2,103 +2,134 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0558AC433E0
-	for <linux-block@archiver.kernel.org>; Mon, 25 Jan 2021 23:34:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24099C433E6
+	for <linux-block@archiver.kernel.org>; Mon, 25 Jan 2021 23:35:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C229422482
-	for <linux-block@archiver.kernel.org>; Mon, 25 Jan 2021 23:34:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E5AB222A84
+	for <linux-block@archiver.kernel.org>; Mon, 25 Jan 2021 23:35:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732922AbhAYXeC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Jan 2021 18:34:02 -0500
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:57920 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732907AbhAYXdv (ORCPT
+        id S1732535AbhAYXeu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Jan 2021 18:34:50 -0500
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:19917 "EHLO
+        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732923AbhAYXej (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Jan 2021 18:33:51 -0500
+        Mon, 25 Jan 2021 18:34:39 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1611617631; x=1643153631;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=mPASIDLmjS6/gWOki7jCwozF9YRKuRlJbPJgrKGbESI=;
-  b=DMDQiooA0vQmxfl04dLsXcsvIdmbDRckrFwWTjrpqv8JiOkdfxG0NtFA
-   C/76JRaeCnsVRPRro+ParNDB1QKXiWoySHVV91cgxlBd++qUiOpbSeXTX
-   8N4WpR3LYjEMwJDKGCx23u4pSwVBK2V1Rm7TkKTm1NBKBbfG3YT0Y+GW5
-   FBCEpLPQp7PBIKsrl1+L4W72VYz4FCoUzLEPtAomLKLSlJKR9pCpes5ky
-   fVVwNouINxk6RP3u11sC7LebNxvS2M4dkeEwf2NkvxxxkG72LT+uTEJTT
-   LM5Bs+pGqx1K34uiBmB+PBLqXPThgWG6u1ZpbC80qyneyCe5XiepraxBC
-   A==;
-IronPort-SDR: gERTxdvqBtQItYn3w2gpBJu6ercePY/UKxYI4nl/bQZEu2jIcbi43wmsHe0alv1d/wokF7Tkd8
- WMcu5PD6t6vkuaf+IStnGP0tR2rVbxPCcuBU0PO2Z3wygbLmIL/p34w/shYuejQlRi4LCbGiDy
- pVwqXhpc7grzTveOuXO4lmfN/iFook6yrzccZJSBz84OEg6al9umLudf9glElRny2zxmf3lDWX
- JdeqMBRZ5GRUIC9Yo/MUqRZgAoyEFcyx4FKe3r6Wkd49y6nvdzvYz+Ue5414jGjuJ89wpEi/BS
- CpE=
+  t=1611617678; x=1643153678;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=5m9gUeokQN0sy90fPToB0a5giSO64cwa9Bxli7WeYwc=;
+  b=EtV7DVtts7UEloCnOblpfyxv+Ci/68HyeeLKqvoFk4JOLt43eEzIQF3G
+   t7LBUWoXAQzIqUENSWHbUp/tLQfMG5KcBO/EFMXWIDCQbapAEQbnSeSqH
+   rjOHiNo4caGkFoGB2irU4gZGs62aLt8IbElyK7rHhVxaBmekV3p5STy1W
+   56ax6JKWNXqFgWwF5Mqej/apkk1mCmRHwQ7W2zRouM+lelLOewjyRA+nK
+   O7OBH1O4tW1T9wHCMoch3bqYBC8+uaFtycNzXZNt+PE94tYMKO7m419Dv
+   pF8N3HRG7G/gKZVQwCRh2q43zJQXsCd9reKero2zopXd0kvodhUkoJGMk
+   w==;
+IronPort-SDR: 2wMObJ2QjSHImr75N6JJHXwqbI0oX1UTdsmxr2ZWF1RvaMbEEAxmmJWA5/iVHlExMROmd7DgBZ
+ 6MWuwetb/hpQpeFpWoCO+2nMXbF+LxYt73X6srjnEdaL782Ed8i1RHKAKYJrWiUIcltRHLOSy3
+ S/vnTMMGuNyf1cZzMnEmdgHmF2a5FKgP8IJUaQpA7Oj+20Zf5+Onr614LkIngKdU3qkl6txLHQ
+ SsBBocAx9nd8bM3/1k8pE7fnZhGb9gdUvNOdmm8RsUpl/YkI+YTrL9uqczaNiF0EwPHoktp07x
+ L/Y=
 X-IronPort-AV: E=Sophos;i="5.79,374,1602518400"; 
-   d="scan'208";a="268657365"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 26 Jan 2021 07:32:45 +0800
-IronPort-SDR: aXqmzUPScCimblTTfdnShwrtEJgDKkcUsaUdaOk2UmRjEgJv9OtA1BReUZrq4lnMW6k2Hctv72
- WrGHre5S5QGUj1Zf7OsYNuNie3/B/oPA7jOTYlk5WDlxLYhFBKWPe7coJ14OVMsKWoMxSsAQk1
- PZevWakdE351E2VnhwpKxA2rwdK6ulOOM94Skgme7bCyZZKZRKcyNeQHp53FXV/8GuOBsq2/Wz
- 4rvrlXbL3mtxYVLzyGphlSJiuu29gAdzy0ZFJttUWOVBkfzQebeFzeB4moORmpb8re/SOxPaM2
- N+R2ILzCJC0SXZDb9yKrXT4/
+   d="scan'208";a="158296159"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 26 Jan 2021 07:33:00 +0800
+IronPort-SDR: aztBhC5gHG0ZQpObWF56ODASP2B6OmH/eoRcYeYTsDInYC3Z9saNuvL2qqkRxUt3oo9uI7V5p/
+ h2dwwZfGY59rPo308kNvhO054/A06H18MWknp1jmXbK2XgB/QrNs/oUZt9/t/9+0yl3iqGAkem
+ 8XrD9nkleG6z4i+EfClBXAMp3OIR3XwV9m68F2c6x52YkU/gopnZA3wHwG4ykG9GdfsWDjrZbT
+ aQwwyMOEHq3mll9J973F/Y0BYO++8nYrYDRPq59l7Dtu4pY/tMAlp/UyrWb2HMG2Mgt9+1kSW6
+ P45WUx1OMCSJB1ms3a1uaZuc
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jan 2021 15:17:12 -0800
-IronPort-SDR: VAvgenprhQ+K8hfHLxdAbHdvto9J5RhQcw9vdgL+sUmhPhXEPfPKLCY4374QkI+nrZI/C4+XfU
- SXZhOa699epkurpHpSvHQwDbF2Qcv1KJem4fj+8c5pzI0m/1RSAaKmBDpoJVo1niJ9RpH2qksS
- TOGBG4B2TBwv4c6QrFdHgOgjks932AzZQoA8IkmvigsZmziS102Ejr69HUREE7Prp4Gv19nXj3
- 9eQ9+srT3+Ueb3BK6nN0yxW9+lE10WqgxiLrYUdTX2HxU4ixeTdjfOB5WMJKuUEmmtEgJraEvi
- yyg=
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jan 2021 15:15:27 -0800
+IronPort-SDR: tx6bo1E7gstAcB8yskVCrUkZDUZlx+a/G5jMGhk7gchHRsQ4SryEqx4VzqO3m2u2UYIO5IlCKg
+ M22LSJ3viGNCmqN1A8fjke5LrbsE5/kafCgfnXyQaI47Z1fmc8ViT94nbNXsZZI2Tyh21OzFtk
+ 09J2D7iz0hJNM2PSI6U7TzZwHtpTpRh7hQNUoZK3TDBFO+Aq5QPzUORZZ4oGBBqWkI2hZrQc2P
+ 26yXgP/bp+csRArNPxk3NYo0FxIGIH56VeJ6gHeBEDcNNa/4BUJ54mUa5lSt/3LlrbW+ByBpA5
+ Rfo=
 WDCIronportException: Internal
 Received: from vm.labspan.wdc.com (HELO vm.sc.wdc.com) ([10.6.137.102])
-  by uls-op-cesaip02.wdc.com with ESMTP; 25 Jan 2021 15:32:45 -0800
+  by uls-op-cesaip02.wdc.com with ESMTP; 25 Jan 2021 15:33:00 -0800
 From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 To:     linux-mips@vger.kernel.org
 Cc:     tsbogend@alpha.franken.de, axboe@kernel.dk,
         linux-block@vger.kernel.org, cand@gmx.com,
         Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [PATCH 0/9] n64: small cleanups
-Date:   Mon, 25 Jan 2021 15:32:34 -0800
-Message-Id: <20210125233243.5982-1-chaitanya.kulkarni@wdc.com>
+Subject: [PATCH 3/9] n64: move module param at the top
+Date:   Mon, 25 Jan 2021 15:32:37 -0800
+Message-Id: <20210125233243.5982-4-chaitanya.kulkarni@wdc.com>
 X-Mailer: git-send-email 2.22.1
+In-Reply-To: <20210125233243.5982-1-chaitanya.kulkarni@wdc.com>
+References: <20210125233243.5982-1-chaitanya.kulkarni@wdc.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Lauri,
+Move module parameters at the top of the file after macro definition &
+global variables below macro definitions just like we have for other
+modules.
 
-This cleanup series is based on the top of v11 that adds kernel coding
-style fixes in the various places without changing the functionality.
+Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Reviewed-by: Lauri Kasanen <cand@gmx.com>
+---
+ drivers/block/n64cart.c | 21 +++++++++++----------
+ 1 file changed, 11 insertions(+), 10 deletions(-)
 
-Instead of sending a one big patch I've made small patches which are
-easier to review, integrate, blame and revert in case of any error.
-
-I've got the reviewed-by tag from the driver owner offline which
-is added to the series.
-
--ck
-
-Chaitanya Kulkarni (9):
-  n64: use pr_fmt to avoid duplicate string
-  n64: move module info at the end
-  n64: move module param at the top
-  n64: use enums for reg
-  n64: use sector SECTOR_SHIFT instead 512
-  n64: remove curly brackets
-  n64: cosmetics changes
-  n64: cleanup n64cart_probe()
-  n64: store dev instance into disk private data
-
- drivers/block/n64cart.c | 87 ++++++++++++++++++-----------------------
- 1 file changed, 38 insertions(+), 49 deletions(-)
-
+diff --git a/drivers/block/n64cart.c b/drivers/block/n64cart.c
+index 63090030ed2b..b18f034ee1ad 100644
+--- a/drivers/block/n64cart.c
++++ b/drivers/block/n64cart.c
+@@ -13,10 +13,6 @@
+ #include <linux/module.h>
+ #include <linux/platform_device.h>
+ 
+-static unsigned int start, size;
+-static u32 __iomem *reg_base;
+-static struct device *dev;
+-
+ #define PI_DRAM_REG		0
+ #define PI_CART_REG		1
+ #define PI_READ_REG		2
+@@ -31,6 +27,17 @@ static struct device *dev;
+ 
+ #define MIN_ALIGNMENT		8
+ 
++static u32 __iomem *reg_base;
++static struct device *dev;
++
++static unsigned int start;
++module_param(start, uint, 0);
++MODULE_PARM_DESC(start, "Start address of the cart block data");
++
++static unsigned int size;
++module_param(size, uint, 0);
++MODULE_PARM_DESC(size, "Size of the cart block data, in bytes");
++
+ static void n64cart_write_reg(const u8 reg, const u32 value)
+ {
+ 	writel(value, reg_base + reg);
+@@ -177,12 +184,6 @@ static int __init n64cart_init(void)
+ 	return platform_driver_probe(&n64cart_driver, n64cart_probe);
+ }
+ 
+-module_param(start, uint, 0);
+-MODULE_PARM_DESC(start, "Start address of the cart block data");
+-
+-module_param(size, uint, 0);
+-MODULE_PARM_DESC(size, "Size of the cart block data, in bytes");
+-
+ module_init(n64cart_init);
+ 
+ MODULE_AUTHOR("Lauri Kasanen <cand@gmx.com>");
 -- 
 2.22.1
 
