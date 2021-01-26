@@ -2,162 +2,195 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D1AAC433DB
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1CD3C433E0
 	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 05:35:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 33C53229C4
+	by mail.kernel.org (Postfix) with ESMTP id A9A0122B2C
 	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 05:35:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387793AbhAZFdt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Jan 2021 00:33:49 -0500
-Received: from mailout3.samsung.com ([203.254.224.33]:26295 "EHLO
-        mailout3.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729994AbhAZBtS (ORCPT
+        id S1730003AbhAZFeS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Jan 2021 00:34:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51108 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730732AbhAZBuH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Jan 2021 20:49:18 -0500
-Received: from epcas1p1.samsung.com (unknown [182.195.41.45])
-        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20210126014809epoutp0357226ebbd4c8981a892e7a0db9680fc0~dpQayPF_62147221472epoutp03c
-        for <linux-block@vger.kernel.org>; Tue, 26 Jan 2021 01:48:09 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20210126014809epoutp0357226ebbd4c8981a892e7a0db9680fc0~dpQayPF_62147221472epoutp03c
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1611625689;
-        bh=WZWRYxFQt5Vb3eG5u4M368QXhG7uK7mseqihDVcJmwQ=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=axBN5OYumLLV2iBhUdB6HDiUUND9mA3p4Ysi4dhC7Wg4Bta1hq5pMhhcuklsoArqT
-         D3Q4y+jQ7NuwO8Vj+a8yGZMstgbBGSx07/DGBvE5d+QtsvEUAejg1o6O3XdE60UEUQ
-         Ckoz3dn/qWWhu1P8u0MSNkvci3bduEqHYmmpWVt4=
-Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
-        epcas1p3.samsung.com (KnoxPortal) with ESMTP id
-        20210126014809epcas1p3ab2cafa7277bd9759f2f66ce52b61446~dpQaQfZnS2232022320epcas1p37;
-        Tue, 26 Jan 2021 01:48:09 +0000 (GMT)
-Received: from epsmges1p3.samsung.com (unknown [182.195.40.159]) by
-        epsnrtp2.localdomain (Postfix) with ESMTP id 4DPqPg5Br0z4x9QB; Tue, 26 Jan
-        2021 01:48:07 +0000 (GMT)
-Received: from epcas1p3.samsung.com ( [182.195.41.47]) by
-        epsmges1p3.samsung.com (Symantec Messaging Gateway) with SMTP id
-        25.13.09582.7D47F006; Tue, 26 Jan 2021 10:48:07 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-        epcas1p1.samsung.com (KnoxPortal) with ESMTPA id
-        20210126014807epcas1p1a7274e9ba472286df03aac8e627b4633~dpQYWlDwB2739127391epcas1p1d;
-        Tue, 26 Jan 2021 01:48:07 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
-        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20210126014807epsmtrp1e4669d15ddca25f32fb18d60759d68ae~dpQYVWPK62628726287epsmtrp1D;
-        Tue, 26 Jan 2021 01:48:07 +0000 (GMT)
-X-AuditID: b6c32a37-899ff7000000256e-9e-600f74d70dbc
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        18.C4.13470.6D47F006; Tue, 26 Jan 2021 10:48:07 +0900 (KST)
-Received: from localhost.localdomain (unknown [10.253.99.105]) by
-        epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-        20210126014806epsmtip189c91ea1cbc3b6335f494c4e75249a36~dpQX-Y8f22087020870epsmtip1C;
-        Tue, 26 Jan 2021 01:48:06 +0000 (GMT)
-From:   Changheun Lee <nanich.lee@samsung.com>
-To:     Johannes.Thumshirn@wdc.com, asml.silence@gmail.com,
-        axboe@kernel.dk, damien.lemoal@wdc.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        ming.lei@redhat.com, osandov@fb.com, patchwork-bot@kernel.org,
-        tj@kernel.org, tom.leiming@gmail.com
-Cc:     jisoo2146.oh@samsung.com, junho89.kim@samsung.com,
-        mj0123.lee@samsung.com, seunghwan.hyun@samsung.com,
-        sookwan7.kim@samsung.com, woosung2.lee@samsung.com,
-        yt0928.kim@samsung.com, Changheun Lee <nanich.lee@samsung.com>
-Subject: [PATCH v3 2/2] bio: add limit_bio_size sysfs
-Date:   Tue, 26 Jan 2021 10:32:35 +0900
-Message-Id: <20210126013235.28711-2-nanich.lee@samsung.com>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20210126013235.28711-1-nanich.lee@samsung.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Te0xTVxzHd+5tb28JHZeC44w5YHevyKNPCwcGi1Hjqi4b7PEHzqRUuAFc
-        X+ttnW7ZxoYWB0hlJhML6JYx2SAL8hAorMaUmAUim0GhjgiMhzyUh1BxDJis9ErGf9/f7/f5
-        nW9+v3MOiYs9RDiZa7AwZoNWRxMBvOaObdI4jyUoQ9be/CqqqGkGqHbATqATBY8wVDz2FR/9
-        WziIocVhFrn6Y9DNtgoCuc/kY+hsYwWO+oauC1DHYC8PDVeV4uj3zgU+Oj+6Ay1XXwNobskj
-        QF2tZ3BU5/qH2BGiLs2fFaidjgGB+ma3Vd1Q8zWhnrvSS6hLmmqA2tsQoS64WoSlkgd0yTmM
-        NosxRzGGTGNWriE7hd7/rmaXRhUvk8fJE1ECHWXQ6pkUevebqXF7cnW+aeioI1qd1ZdK1bIs
-        LX092Wy0WpioHCNrSaEZU5bOJJeZJKxWz1oN2ZJMoz5JLpMpVD4yQ5ezXN/DM/0ccHSsZgTL
-        A6tkIRCSkNoOBx+3CQpBACmmWgFcOf8nxgULAK5NDvHXKTH1CMD57nc2OkbGi59ALgCnf53g
-        c4EXwKmTN4h1iqBiYclMP7FeCKWOY9A214evBzg1CuCtTpufCqFUsOP2sl/zqJehzdXi9xNR
-        r8GSO3U45xcJ756q9mshlQwfeOZ4HBMMO8+N+TXuY/Ivl/sNIHWbhLWVNsA174ZNI5M8TofA
-        e781CTgdDqfsNgHXUARgvu0C4ILTAFZNXMQ4SgkXvF5fgfRZbIN1bVIu/QJ0rlQCzvlpOLtY
-        zF9HICWCJ21iDnkJXj8+hG94TfzifHKiGj683w64pdoB/OMh/zSIcmyax7FpHsf/xt8BvAY8
-        w5hYfTbDyk3KzZfcAPwvPDqhFXw780DiBhgJ3ACSOB0qapcEZohFWdpjnzBmo8Zs1TGsG6h8
-        2y7Fw7dkGn1fxGDRyFUKpVKJtscnxKuUdJjokOwvjZjK1lqYDxnGxJg3+jBSGJ6HJVvx/CC+
-        8MTBlNhTPx5WAW//D5dHb0yNb105FrOlwnpwqIgXWC53NY2/EtF55W5s76giKHD63iV+7ZdP
-        GUeq6Lcnc4NqL1CF0Q5F3mrPUthsxIJHat+b5N36xq6U7kRL0Vtl1fpGNjHMERD+TUtb5K2Z
-        fXRofUBT8MVrPQOa5+odO4dXP0v3aJ6vCJ5xviidjkm6+rl63l5eeFj0ccHjloE0IlLVmN51
-        KHPme0edBK8VNjdOLFcdTW5L+6Jf7658X/rekQOKJInK9ZNOmLdYNb7v78r7urW8c4ZLo2X4
-        WcuzZZ+anDvxbuf8naWP1j4oUayZ9nSlZ7jTiOXOYE0H395H89gcrTwaN7Pa/wDs61tSagQA
-        AA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFupnkeLIzCtJLcpLzFFi42LZdlhJTvd6CX+CwcJVTBZzVm1jtFh9t5/N
-        orX9G5NFz5MmVou/XfeYLL4+LLbYe0vb4vKuOWwWhyY3M1lM3zyH2eLa/TPsFofvXWWxeLhk
-        IrPFuZOfWC3mPXaw+LX8KKPF+x/X2S1O7ZjMbLF+7082B2GPic3v2D12zrrL7nH5bKnHplWd
-        bB7v911l8+jbsorR4/MmOY/2A91MARxRXDYpqTmZZalF+nYJXBm/Nl5iKVjJVfFk1SOmBsY/
-        HF2MnBwSAiYSj571MHUxcnEICexmlNi5YTsTREJK4viJt6xdjBxAtrDE4cPFEDUfGSVOd3ew
-        gNSwCehI9L29xQaSEBGYxCSx9+BuZhCHWeA1o0TX40VgVcICphKHb/xiA7FZBFQl2vZuZwWx
-        eQWsJfrurGeG2CYv8bR3OZjNKWAj8eH6e7BeIaCahZufMkLUC0qcnPkELM4MVN+8dTbzBEaB
-        WUhSs5CkFjAyrWKUTC0ozk3PLTYsMMxLLdcrTswtLs1L10vOz93ECI4zLc0djNtXfdA7xMjE
-        wXiIUYKDWUmEd7ceT4IQb0piZVVqUX58UWlOavEhRmkOFiVx3gtdJ+OFBNITS1KzU1MLUotg
-        skwcnFINTLX+ZzYHbDnGN/HQDC3JuVcWJjxW5meu3n/pwtQ3q7zOrG5fXDKnTsGlXWNOb1HP
-        8eOWnqbtrXcOBy87d/nY4/nfWSe+vCdaXnmiWazFQpR/15XnL6+Jl5T869u7J9AucL5Y4/3V
-        m1++kM3hN+ZcyL+R1TZH5MNm3rNRdzNTJKeft3xo9O5iTcjFHS9eZ/h+ktux8ESI3Tyl24q/
-        voc8NXmWp8z3/27Ag46vm+4U2Hvqz++S4y7UmLdug2r8/eu1ngwsO/mcVk/a/Hv5TMbFRfN7
-        th6+7Lr09dHDV01Vld+wd2q3/8pg7KnYVX/905rqMOGw3P9fN2Zf40r7Jfs91DNo9uS93ZXp
-        C89rh/jYa2spsRRnJBpqMRcVJwIA2geL5SIDAAA=
-X-CMS-MailID: 20210126014807epcas1p1a7274e9ba472286df03aac8e627b4633
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: SVC_REQ_APPROVE
-CMS-TYPE: 101P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20210126014807epcas1p1a7274e9ba472286df03aac8e627b4633
-References: <20210126013235.28711-1-nanich.lee@samsung.com>
-        <CGME20210126014807epcas1p1a7274e9ba472286df03aac8e627b4633@epcas1p1.samsung.com>
+        Mon, 25 Jan 2021 20:50:07 -0500
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA260C0617AB;
+        Mon, 25 Jan 2021 16:29:10 -0800 (PST)
+Received: by mail-pl1-x633.google.com with SMTP id 31so8684371plb.10;
+        Mon, 25 Jan 2021 16:29:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=1AHl1Jx34jtswhTgBtYxAYHOD6t8RmqegigD5lUsac8=;
+        b=gA4LrW6ezNXmg9lXnOFBzmx/WQMapGLtPz5AUxxxYPROCquUMiYgpVgeuoDZfQwacZ
+         4dwqRAO46GYB0vGxgzBJMA8HtmO7z8E2myH0rDY7GGbj75orW39T2cCO7wJlVrrCHZs4
+         T542gosGDAcQv4rrktCCBwIxVTnEoNVBt4IFMKEz3q4DGsy2H5H0cQAngiUZo9W5c0XD
+         oIjhCm5Pte2gNHuMjGQAOjE6RD3RKzvryxAdnLW5Z8vzBJsmAnJ/VXpCoXoPEafELaqj
+         kKUiE6NfY5mXfU7bPtet06Qrjx9hlY/AiYeufbcwvfF85q/JbGN6IHuPHlbpVYvZc2RO
+         lnCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=1AHl1Jx34jtswhTgBtYxAYHOD6t8RmqegigD5lUsac8=;
+        b=sqkxBdMz3C/9MnBtGa+waful/ugk6VE6La3cn2tcyGolty1rirkmWxkVufTYzKk27G
+         ACGX2crGItmOxG+6cMkn6yFVeVovnUnuc5ngvq+CNLv6jXSmaFnESQkq7ZBySl2Zs+ru
+         mhmTN4qPWGNWa1rVcboS0uafRCawkHcgTUB/lRvP4pbTkDLY1iuLku29eIHn2mNuF/nE
+         C2yHYX2KE3vhEHWjWkwRzenjJJUOMGcgVm+s2Ro0+J2kGeozBZGMadns+R7xNwCKJhAq
+         JDYVbuhFg2rKFSDS7Q6p2ljJAwIxTegBH7QxFnlSrOvLFasvRVRBzXGBo7kxtAq2kmLS
+         19KA==
+X-Gm-Message-State: AOAM533ddv5zrNYfVvIlB2xoHOScUuIOCGW2S68CLE9S5ifqpxCLkQ1Q
+        1RyeqGptc+9wUxv/tTRBoEejpTcYuh748w==
+X-Google-Smtp-Source: ABdhPJyE9yobq1Vsf/eirkfosewjx3+aPxw3rFxwL5/dV9oYN0s9MY6mWyTofZqBXmFwH8TqPbigWA==
+X-Received: by 2002:a17:90b:350:: with SMTP id fh16mr3029352pjb.232.1611620950036;
+        Mon, 25 Jan 2021 16:29:10 -0800 (PST)
+Received: from localhost.localdomain ([211.108.35.36])
+        by smtp.gmail.com with ESMTPSA id 14sm16999418pfi.131.2021.01.25.16.29.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Jan 2021 16:29:09 -0800 (PST)
+From:   Minwoo Im <minwoo.im.dev@gmail.com>
+To:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-fsdevel@vger.kernel.org
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@lst.de>,
+        Minwoo Im <minwoo.im.dev@gmail.com>
+Subject: [PATCH V6 1/1] block: reject I/O for same fd if block size changed
+Date:   Tue, 26 Jan 2021 09:29:01 +0900
+Message-Id: <20210126002901.5533-2-minwoo.im.dev@gmail.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20210126002901.5533-1-minwoo.im.dev@gmail.com>
+References: <20210126002901.5533-1-minwoo.im.dev@gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add new sysfs node to limit bio size.
+This patch fixes I/O errors during BLKRRPART ioctl() behavior right
+after format operation that changed logical block size of the block
+device with a same file descriptor opened.
 
-Signed-off-by: Changheun Lee <nanich.lee@samsung.com>
+This issue can be easily reproduced with a single format command in case
+of NVMe (logical block size 512B to 4096B).
+
+	nvme format /dev/nvme0n1 --lbaf=1 --force
+
+This is because the application, nvme-cli format subcommand issues an
+admin command followed by BLKRRPART ioctl to re-read partition
+information without closing the file descriptor.  If file descriptor
+stays opened, __blkdev_get() will not be invoked at all even logical
+block size has been changed.
+
+It will cause I/O errors with invalid Read operations during the
+BLKRRPART ioctl due to i_blkbits mismatch. The invalid operations in
+BLKRRPART happens with under-flowed Number of LBA(NLB) values
+0xffff(65535) because i_blkbits is still set to 9 even the logical block
+size has been updated to 4096.  The BLKRRPART will lead buffer_head to
+hold 512B data which is less than the logical lock size of the block
+device.
+
+The root cause, which is because i_blkbits of inode of the block device
+is not updated, can be solved easily by re-opening file descriptor
+again from application.  But, that's just for application's business
+and kernel should reject invalid Read operations during the BLKRRPART
+ioctl.
+
+This patch rejects I/O from the path of add_partitions() to avoid
+issuing invalid Read operations to device.  It sets a flag to
+request_queue in blk_queue_logical_block_size to minimize caller-side
+updates.
+
+Signed-off-by: Minwoo Im <minwoo.im.dev@gmail.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-sysfs.c | 3 +++
- 1 file changed, 3 insertions(+)
+ block/blk-settings.c    |  3 +++
+ block/partitions/core.c | 12 ++++++++++++
+ fs/block_dev.c          |  8 ++++++++
+ include/linux/blkdev.h  |  1 +
+ 4 files changed, 24 insertions(+)
 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index b513f1683af0..840d97f427e6 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -288,6 +288,7 @@ QUEUE_SYSFS_BIT_FNS(nonrot, NONROT, 1);
- QUEUE_SYSFS_BIT_FNS(random, ADD_RANDOM, 0);
- QUEUE_SYSFS_BIT_FNS(iostats, IO_STAT, 0);
- QUEUE_SYSFS_BIT_FNS(stable_writes, STABLE_WRITES, 0);
-+QUEUE_SYSFS_BIT_FNS(limit_bio_size, LIMIT_BIO_SIZE, 0);
- #undef QUEUE_SYSFS_BIT_FNS
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index 4c974340f1a9..5b1e0bf54d7e 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -329,6 +329,9 @@ void blk_queue_logical_block_size(struct request_queue *q, unsigned int size)
+ {
+ 	struct queue_limits *limits = &q->limits;
  
- static ssize_t queue_zoned_show(struct request_queue *q, char *page)
-@@ -615,6 +616,7 @@ QUEUE_RW_ENTRY(queue_nonrot, "rotational");
- QUEUE_RW_ENTRY(queue_iostats, "iostats");
- QUEUE_RW_ENTRY(queue_random, "add_random");
- QUEUE_RW_ENTRY(queue_stable_writes, "stable_writes");
-+QUEUE_RW_ENTRY(queue_limit_bio_size, "limit_bio_size");
++	if (limits->logical_block_size != size)
++		blk_queue_flag_set(QUEUE_FLAG_LBSZ_CHANGED, q);
++
+ 	limits->logical_block_size = size;
  
- static struct attribute *queue_attrs[] = {
- 	&queue_requests_entry.attr,
-@@ -648,6 +650,7 @@ static struct attribute *queue_attrs[] = {
- 	&queue_rq_affinity_entry.attr,
- 	&queue_iostats_entry.attr,
- 	&queue_stable_writes_entry.attr,
-+	&queue_limit_bio_size_entry.attr,
- 	&queue_random_entry.attr,
- 	&queue_poll_entry.attr,
- 	&queue_wc_entry.attr,
+ 	if (limits->physical_block_size < size)
+diff --git a/block/partitions/core.c b/block/partitions/core.c
+index b1cdf88f96e2..092d6712c7fc 100644
+--- a/block/partitions/core.c
++++ b/block/partitions/core.c
+@@ -601,12 +601,24 @@ static bool blk_add_partition(struct gendisk *disk, struct block_device *bdev,
+ 
+ int blk_add_partitions(struct gendisk *disk, struct block_device *bdev)
+ {
++	struct request_queue *q = bdev_get_queue(bdev);
+ 	struct parsed_partitions *state;
+ 	int ret = -EAGAIN, p;
+ 
+ 	if (!disk_part_scan_enabled(disk))
+ 		return 0;
+ 
++	/*
++	 * Reject to check partition information if block size has been changed
++	 * in the runtime.  If block size of a block device has been changed,
++	 * the file descriptor should be opened agian to update the blkbits.
++	 */
++	if (test_bit(QUEUE_FLAG_LBSZ_CHANGED, &q->queue_flags)) {
++		pr_warn("%s: rejecting checking partition. fd should be opened again.\n",
++				disk->disk_name);
++		return -EBADFD;
++	}
++
+ 	state = check_partition(disk, bdev);
+ 	if (!state)
+ 		return 0;
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 6f5bd9950baf..8555308c503d 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -130,7 +130,15 @@ EXPORT_SYMBOL(truncate_bdev_range);
+ 
+ static void set_init_blocksize(struct block_device *bdev)
+ {
++	struct request_queue *q = bdev_get_queue(bdev);
++
+ 	bdev->bd_inode->i_blkbits = blksize_bits(bdev_logical_block_size(bdev));
++
++	/*
++	 * Allow I/O commands for this block device.  We can say that this
++	 * block device has proper blkbits updated.
++	 */
++	blk_queue_flag_clear(QUEUE_FLAG_LBSZ_CHANGED, q);
+ }
+ 
+ int set_blocksize(struct block_device *bdev, int size)
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 20f3706b6b2e..f725e933db40 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -621,6 +621,7 @@ struct request_queue {
+ #define QUEUE_FLAG_RQ_ALLOC_TIME 27	/* record rq->alloc_time_ns */
+ #define QUEUE_FLAG_HCTX_ACTIVE	28	/* at least one blk-mq hctx is active */
+ #define QUEUE_FLAG_NOWAIT       29	/* device supports NOWAIT */
++#define QUEUE_FLAG_LBSZ_CHANGED	30	/* logical block size changed */
+ 
+ #define QUEUE_FLAG_MQ_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
+ 				 (1 << QUEUE_FLAG_SAME_COMP) |		\
 -- 
-2.28.0
+2.17.1
 
