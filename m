@@ -2,279 +2,148 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,PDS_BAD_THREAD_QP_64,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74E87C433DB
-	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 07:27:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D16C4C433E0
+	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 07:38:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0C34A2070E
-	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 07:27:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7963E20679
+	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 07:38:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233652AbhA0H1c (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Jan 2021 02:27:32 -0500
-Received: from mailout4.samsung.com ([203.254.224.34]:58120 "EHLO
-        mailout4.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S316460AbhA0AiL (ORCPT
+        id S234250AbhA0Hiy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Jan 2021 02:38:54 -0500
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:44930 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S317393AbhAZX7y (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Jan 2021 19:38:11 -0500
-Received: from epcas1p1.samsung.com (unknown [182.195.41.45])
-        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20210127003649epoutp045d723436e52f2a1eefbc35cbe71fe19f~d77bFWS1U1680016800epoutp04e
-        for <linux-block@vger.kernel.org>; Wed, 27 Jan 2021 00:36:49 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20210127003649epoutp045d723436e52f2a1eefbc35cbe71fe19f~d77bFWS1U1680016800epoutp04e
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1611707809;
-        bh=+ih+dTOWurbRje3xLxMp11Lefmk0syXCa3jQHTVuB20=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=RjzqFQPTJqn8OEy2Bud1Uq4/3crVZFzSlMK3pmJWB7QlsEZYW2WK7P7l04+kQHpG1
-         XMM5VJXBSxBte4jbZBQbDzbuWkzgbPr3lXDRIC52hgTzK76Rbb9aRnAn0MrEbBHS6r
-         SfXDX4enr1eVjGSUCP1czh8NB4pbxiyQHSqFoefw=
-Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
-        epcas1p1.samsung.com (KnoxPortal) with ESMTP id
-        20210127003646epcas1p15eaac4dcb4a8cefd57fe84654115c20b~d77XtuE140796507965epcas1p1m;
-        Wed, 27 Jan 2021 00:36:46 +0000 (GMT)
-Received: from epsmges1p2.samsung.com (unknown [182.195.40.164]) by
-        epsnrtp1.localdomain (Postfix) with ESMTP id 4DQPmr6rnCz4x9Q7; Wed, 27 Jan
-        2021 00:36:44 +0000 (GMT)
-Received: from epcas1p1.samsung.com ( [182.195.41.45]) by
-        epsmges1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
-        79.18.63458.C95B0106; Wed, 27 Jan 2021 09:36:44 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-        epcas1p4.samsung.com (KnoxPortal) with ESMTPA id
-        20210127003642epcas1p4f167d553fc79ef5029a928550adbebea~d77UPMWxB0254202542epcas1p4t;
-        Wed, 27 Jan 2021 00:36:42 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
-        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20210127003642epsmtrp15c19e63cb752830e9df492e5e46a1497~d77UOO1k61711217112epsmtrp1Y;
-        Wed, 27 Jan 2021 00:36:42 +0000 (GMT)
-X-AuditID: b6c32a36-6dfff7000000f7e2-bb-6010b59cdc51
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        75.3C.13470.A95B0106; Wed, 27 Jan 2021 09:36:42 +0900 (KST)
-Received: from localhost.localdomain (unknown [10.253.99.105]) by
-        epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-        20210127003642epsmtip28f4165671c48059e1304c1c8d4dcfc9c~d77T8DDcz0054300543epsmtip2H;
-        Wed, 27 Jan 2021 00:36:42 +0000 (GMT)
-From:   Changheun Lee <nanich.lee@samsung.com>
-To:     damien.lemoal@wdc.com
-Cc:     Johannes.Thumshirn@wdc.com, asml.silence@gmail.com,
-        axboe@kernel.dk, jisoo2146.oh@samsung.com, junho89.kim@samsung.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        ming.lei@redhat.com, mj0123.lee@samsung.com,
-        nanich.lee@samsung.com, osandov@fb.com, patchwork-bot@kernel.org,
-        seunghwan.hyun@samsung.com, sookwan7.kim@samsung.com,
-        tj@kernel.org, tom.leiming@gmail.com, woosung2.lee@samsung.com,
-        yt0928.kim@samsung.com
-Subject: Re: [PATCH v3 1/2] bio: limit bio max size
-Date:   Wed, 27 Jan 2021 09:21:13 +0900
-Message-Id: <20210127002113.8280-1-nanich.lee@samsung.com>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <BL0PR04MB65147D829369D0E6B45507E0E7BC9@BL0PR04MB6514.namprd04.prod.outlook.com>
+        Tue, 26 Jan 2021 18:59:54 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1611706697; x=1643242697;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=xm14UQOLXx7wSE44N785si03gWHJG2mxP4GYuFEeDeU=;
+  b=J1AzTffTa0A2yV4z3JeiVkhGWkbiJ62+/vSkFQVgBD1coEE+yLImfvar
+   7ElwYGaefgqXno7PywTxjjUE2y0uKGImymyZlpi4F66Zm3wxtKBMQAnna
+   Y29osNXLsEUcQcovvO5gkOUJQcyLemF3gJvMZnBzqw10ewBaIS2tBksbs
+   CABgXJQMKUlgDeoSiDOAyFU3zGDIADHojOsRfMQv8SWnYH6shqti0jKIE
+   ajPYGn0HBZei46Pz0OGbIOJxnoEuNzf1ouFVCB7YjCuKqN/9HqjrDYOxA
+   sIT6rXPDZrnv86Nh/TuFnlCzfHi9hD6lzD3b2s3UugjJ2Bk5ck8M2cT09
+   g==;
+IronPort-SDR: df9MM/IC4mtUZMG4uj4C6lHXXqHNXaOs4y0GJgibJLaAR3P6x6xuouozXy4nlIBjaybFPK4Nkt
+ /38ztiyfeEVzk6g5AWDZUfGAFj1qI7O+XB8TbCWkkvmHYTpaJoCsnPUsMqLzFvvtXR9ZNr1s/X
+ xyjXAtxHsrG6nq/2alf9WfGfwHJ5WqbHclnyS27A3tEgnN2HvfIsNekNeIOplgVy+Z1clpHKmN
+ QIOYrb96mkr7Fx6d3933eiTmV3GefAhO5mJ4SVKh5dGtbOHLO1jQSN7+g3/vhEbTQmjIcBoJnp
+ 1HM=
+X-IronPort-AV: E=Sophos;i="5.79,377,1602518400"; 
+   d="scan'208";a="262415578"
+Received: from mail-dm6nam10lp2102.outbound.protection.outlook.com (HELO NAM10-DM6-obe.outbound.protection.outlook.com) ([104.47.58.102])
+  by ob1.hgst.iphmx.com with ESMTP; 27 Jan 2021 07:36:27 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=j8jbkFooSHzi8VFB/DpuCO4Y97wG5wVbX4l0QCDafWyt1kk57kPi0MlU23WK+KZQ+p852aW9j1fOaGaxkr35D9yWoWG8urITBbBqynboMn/pDjAdJtlnKUV29f+4kaK9XpTkNgf/M5qyO2FPMGydHOZTTUD1Mvgxhr+CJRSjRm/suy3IW4Dz7XdNS0707QiaftWzFvIur/MKWzvs6s5fQ3dOaG1jicoDxYcppfz1CbZhv43G6cNT30w+wADK8iP1lUTnvYZsjVXvDjz//XtepalO+fSJNlb6BPgN4tN3rSlCQ+Z5oznUoTJX+5V/ZUxUXeKzE7AQkO0ELBfZID83AA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=k5EKe6OX4yrWUWjyFGBkuhgR/ZX9ew6g+MK4nGB3Ohg=;
+ b=mea/5WQiGr7Wtt3Z5ti6/3xlk3s/6QQBWjb5OhZIuKCM6WupqmdMm3Y2KmsoOarLh9TnKo5UQuH3kPnAHaoGjZkkZg3ihqMAWqTmcHsdi+0LvbmN6BXM4B/09wdxm7dt74XPOSdmuQSNALebJ7kX1MrxoxBrpBoAo4uo00QKo68AKygozTg9kY2L8WsGGL19+hTJc2n+3KcIYmOFCO4Qq93HSYIe7FYZb6Hyf28RobV2Eb/JTHRo+VIfiWUsFLV0emA06wdgzoztOi8fd5Dx+LTWdBNvBWZ88Ib451nI1APK6tADXajwEiE0rt+Ed4yaO78ew5Q4lYhQux7NPcQSVg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=k5EKe6OX4yrWUWjyFGBkuhgR/ZX9ew6g+MK4nGB3Ohg=;
+ b=BuG1Ao3aMfmLJ7/GCSOJLzINrGxVqdpnFvnKszizg+thA4LiRLPekZMUfvOMWxVOr9isaMEXmUX/pkfEVSyWlaipSz4kUX7Bnv7OheTpXMHLrwksbIgXCedqNU1RzPbIwo8jP+x5OcZCMl3/4Xt0chbfkheunLnw2X4oggm4dC4=
+Received: from BYAPR04MB4965.namprd04.prod.outlook.com (2603:10b6:a03:4d::25)
+ by BYAPR04MB4104.namprd04.prod.outlook.com (2603:10b6:a02:b0::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3784.13; Tue, 26 Jan
+ 2021 23:32:09 +0000
+Received: from BYAPR04MB4965.namprd04.prod.outlook.com
+ ([fe80::1d83:38d9:143:4c9c]) by BYAPR04MB4965.namprd04.prod.outlook.com
+ ([fe80::1d83:38d9:143:4c9c%5]) with mapi id 15.20.3784.016; Tue, 26 Jan 2021
+ 23:32:09 +0000
+From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+To:     Bjorn Helgaas <helgaas@kernel.org>, Jens Axboe <axboe@kernel.dk>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Bjorn Helgaas <bhelgaas@google.com>
+Subject: Re: [PATCH 1/2] mtip32xx: use PCI #defines instead of numbers
+Thread-Topic: [PATCH 1/2] mtip32xx: use PCI #defines instead of numbers
+Thread-Index: AQHW9DCX9RtNxF9J2Ui6R7ku9PxAZA==
+Date:   Tue, 26 Jan 2021 23:32:09 +0000
+Message-ID: <BYAPR04MB496569EC5AB6FB3A8A2D562786BC9@BYAPR04MB4965.namprd04.prod.outlook.com>
+References: <20210126200433.2911982-1-helgaas@kernel.org>
+ <20210126200433.2911982-2-helgaas@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: kernel.org; dkim=none (message not signed)
+ header.d=none;kernel.org; dmarc=none action=none header.from=wdc.com;
+x-originating-ip: [199.255.45.62]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 520a1a39-2e65-4fe4-e6aa-08d8c25299ac
+x-ms-traffictypediagnostic: BYAPR04MB4104:
+x-microsoft-antispam-prvs: <BYAPR04MB4104AFC0BF425F635183A92A86BC9@BYAPR04MB4104.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:3631;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: qNnrKS6rnOgbcMmm1MzLU3RuJm70K26bnPRUvQEYNwADKRCA9Ht2HuNKWwQNbqGzSfhQWj00ujS6y7F7c3wZMWd9ogRhtwAvoTY4shXUH9zMEvkRVMJWaxir25g6jIhRJxRefs055iL47nyHZe0VHPN0dczYz4l0OFcztIJ1jQOGdA50LjYpaLQT+L3yeGQ16JAT8Jvgi4AXXVAycG58AjvCfxrMTUEgHHOaKqwAQm4ARbCqDmk+eWAuhlZ8Q85N6RqouekBAW9HIDQniLlLpD5mC82twcp8fRyiek5vnO7Whnr2R/Lish0XXBg68T19kAH2icPCvhM+A5QtypfVt+Rv7iyuqQpLx4m4rPKVMAmp1v6+g0eq2xEXfOgVOk2jGm1Z7IMvQ/LfGwJU51JMBI2cIMFC9zDps+CQ9h3qbXJQHa2aZRop9q/mK/xv3+/cp6vd6YHa5W9d8kw3t4eVSDJnblN2JmRpVgDxOPAJ1cZ79ITjWkioyG6BZEyMKylJFA5r8KDjf2oU3j7bwyRuKA==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR04MB4965.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(366004)(136003)(39860400002)(376002)(396003)(33656002)(76116006)(71200400001)(316002)(26005)(110136005)(66946007)(83380400001)(6506007)(8676002)(66446008)(64756008)(66556008)(8936002)(66476007)(4744005)(55016002)(54906003)(4326008)(478600001)(186003)(9686003)(53546011)(86362001)(52536014)(7696005)(2906002)(5660300002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: =?us-ascii?Q?0xNNFIeuN68F1ljer6XAK8SUGdkU01UL9L39sMXkURoOunYfxVU+Usm4c1ix?=
+ =?us-ascii?Q?fUZkxHJbCHLdnv8ZPWb0/4L0x6Baw6XiBjU0dASmLgLUFoLVq2m0xU2wNj26?=
+ =?us-ascii?Q?MoTflAowX/qHUgBgZsjTy7fuM0RFwUu3hKINFFvFJfYxQEs/ry6iPi5ejrjA?=
+ =?us-ascii?Q?ezIduFLXvP/5nz9dBkl3f29ia4YUJhRD8hGPZUJ8uv+oemAoT7zML02PyBof?=
+ =?us-ascii?Q?HRQNqYJcoCqyT22NfV4ANTtRqr65KoTidxxsWb3qv67TuxGBxAkP2pRDDPNu?=
+ =?us-ascii?Q?WH13wGtWoKwm6RBRWOzG/jDtF7M6q/g8LpRDDo0KPjEf2Q5DLO1ksn/sQFPu?=
+ =?us-ascii?Q?6fnflAjNDRCktM8WxSt2T8qZ3UI+L9EpPWatKPKwoY90cUCfGyMhrbs9ub66?=
+ =?us-ascii?Q?C+lz5x0C48L7d0xozGIxvtZNcrDU9UeX8nxK3lfCHoYXT+WrCFSUk0ArwxK3?=
+ =?us-ascii?Q?uWMBWAOfUggdqNI04T8dQp65Ap5YTmFX6cxh6QUs2jVRvsQlAdE9czcof49t?=
+ =?us-ascii?Q?7rGKbsCoJr6WLeoNjugCO09xFDOu2dj/Kj2IlkOK9UOGEFj37/zKn8wBDsIl?=
+ =?us-ascii?Q?t8GRVHqsiqhgNCfp8DVfmSK72HOOiIVx/Y9YtTEHQOOKqXGhps/dsRIL85Xs?=
+ =?us-ascii?Q?OvAqpTYSrQOMLlifwrDNsU5AfDMVgqw0Lez+Cb8IcmR0IcAijlcKqujV3ABJ?=
+ =?us-ascii?Q?EpBbT+amMMO+IQgNHzrFHG0M6hRlnqObf7Ph2CoB/r9HXfjOsI+dMitgMR1H?=
+ =?us-ascii?Q?PLvYJZvbUsxp4pWgU/yL6vwgiyzd/SL7Oc3BPDulmwujcJ0gA7VI8ERufBEf?=
+ =?us-ascii?Q?VIdKEZ6QvulkdA4pe6ClByp7R7NhSRSWI5pt4dYVN+XuS57ae2wps7IgOPOf?=
+ =?us-ascii?Q?lluGpCba9FUzT7BRFAAjthQ7Vr60g6JJK9vfyGBYVmY3Xam8CacmP6/DntF7?=
+ =?us-ascii?Q?FrxoAFA6n9LqThmIc+RlvR4L6wlScT1mVZC4Uv5ptxe8RyQWCbRz15bygFuh?=
+ =?us-ascii?Q?3Ww95QdSUB7Jybzfegldj/wGS3E5AzhJM9my9lxAjdZRXYyMz30Jy46XQjD1?=
+ =?us-ascii?Q?aAY5FK9SDRsP/zajnwzUfSbT2WBIYg=3D=3D?=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA01TbUxTVxj29La3F0aXa8Fx5Ad0VzejDugHrQcjC8mcu5ka2ZZsiRkrd/SG
-        ov2yly5icIBFVJDvfVm74RyC68IgBU2Rj5jCZiB+JDoQyRAZaCdGYNQK0+HW9kLGv+d9n+c9
-        T573nENg0iE8jsg15bFWE2Og8Ejhxd6NiYnOC2SWvKNDiZyuiwD9NFqFo6PHngrQyckjIrRY
-        dleAAuMc6h7ZjG5dcuLIW2cXoK/bnBgaGrsqRr13B4VovKEGQ9f750Tou4l09KzpF4BmFm6L
-        0YCnDkMt3X/j6dF0jX1aTHc4RsX0rWs22u06gdMzPYM4XdnuArTfHU8fu1wuyCD2GrbpWUbH
-        WmWsKdusyzXlpFE7P9C+pVVr5IpERSraQslMjJFNo7bvykjckWsIpqFknzEGW7CVwXAclfzm
-        NqvZlsfK9GYuL41iLTqDRSG3JHGMkbOZcpKyzcatCrlcqQ4qswx6368uzOJSHmwuuoYXgSdU
-        GYggIJkCWzv9ojIQSUhJD4Atj9xivpgDcLbHscQ8DTJdD/Dlkabn3y8R3QD+HijCQoSU9APo
-        bCsIYZx8A1Y+HgkPxJBr4cDDJ3hoACN7MDjX/kAUIqJJFbxRbheGsJB8DTa2DYexhNwKvdcX
-        Ae+WAO9XNIUNIshMeLx4AOc1q2H/qcmwHgtq7BdOY7x+mIDtf2zg8XZ4+YsKEY+j4dSVdjGP
-        4+DDqtJwTkiWA2gvrQd8UQ1gg69RwKtUcM7vDxJE0GEjbLmUzLdfhR3PvwW88ctwOnBSFJJA
-        UgKPl0p5yXp4tWQMW/byNXcsnUjDkn9mAb+5VgB7/yzHqoHMsSKPY0Uex//OZwDmAq+wFs6Y
-        w3IKi3LlHbtB+IFv0nhA7ePZJC8QEMALIIFRMZKZdWSWVKJj8g+xVrPWajOwnBeog9uuweLW
-        ZJuDP8SUp1WolSqVCqVotmjUKipWwsjvaaVkDpPH7mdZC2tdnhMQEXFFghTLwbfPfUPUdzb4
-        6X359ma1J0FxwN+t7TK2nc0e3l2YWrP4sfMdJZcpPxsV0928yqWc/3fzb4GyE9WpGxIiHlX1
-        n2trfjEdubrkoyFb1F92Kr02HmeaYj9Jmj9K0ffkp9cnl1RpEpoyouLTKm723oFr4j/9sS5r
-        cFTdeb+vcaJVkCnpWUifXjv/UqWsb+GHPaSnZwpwt1slk0nv/jye+dV76xoIx9yN4eK0L/FV
-        R2yuw/nDvlhdcSBhZ1//gkN0vj5jYq9GPzNSIHhRG9i3p7DVqzvwodBK3vSOFUzs95VLxe4z
-        7vMzbue8J7Kwq+LzBr3zyqnX7xgPvb8D8x2ufDZFCTk9o9iEWTnmP27cfhhpBAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFuphkeLIzCtJLcpLzFFi42LZdlhJXnfWVoEEg6Z/khZzVm1jtFh9t5/N
-        orX9G5NFz5MmVou/XfeYLL4+LLbYe0vb4vKuOWwWhyY3M1lM3zyH2eLa/TPsFofvXWWxeLhk
-        IrPFuZOfWC3mPXaw+LX8KKPF+x/X2S1O7ZjMbLF+7082B2GPic3v2D12zrrL7nH5bKnHplWd
-        bB7v911l8+jbsorR4/MmOY/2A91MARxRXDYpqTmZZalF+nYJXBnPj61iLlhlVLG24SxbA+MX
-        pS5GTg4JAROJ5b8XsnYxcnEICexmlLg37TQLREJK4viJt0AJDiBbWOLw4WKQsJDAR0aJab2u
-        IDabgI5E39tbbCC2iICkxKmXX9hA5jALXGGW2PxxJiNIQljAWOJ8dzPYTBYBVYllm2+A2bwC
-        VhKHzv1lhNglL/G0dzkziM0pECvR0XiKDWSvkECMxOPjtRDlghInZz4Ba2UGKm/eOpt5AqPA
-        LCSpWUhSCxiZVjFKphYU56bnFhsWGOallusVJ+YWl+al6yXn525iBEeYluYOxu2rPugdYmTi
-        YDzEKMHBrCTC+15ZIEGINyWxsiq1KD++qDQntfgQozQHi5I474Wuk/FCAumJJanZqakFqUUw
-        WSYOTqkGJlZX5kULT3ZyJ/qtXia4ievdxl0vX7gsCY58VHLKaT9fb+/Bm7XTzt1WnLqV9+YG
-        ocILcdtdS/1fF2aIxRzKePdh2RWLR6KLGrh3Bu/a+PvSyl3HnxfMU+/Y43ygq/j0zIkbbt/a
-        9vfLGxHjVV9kJyo4fgy49S9hmuktvmuvEtcKHUubonjwQ6m64kc9Mw5djgf5opW7p00IZg92
-        vzxDf8+52Mi+BW7Tbbsv2dommwvvv77Sa+IldiFXx+qTHxtF9PIUsvwnHjB8GK+q8Opxk03v
-        /OQZsQIr5BjmHXoxczvTQqalMvqvnSJ22H7rjzP4ed0i4uHrqATJhibVxGXHty1wY8zumcGY
-        xsxS3MpseFOJpTgj0VCLuag4EQD+STM4HwMAAA==
-X-CMS-MailID: 20210127003642epcas1p4f167d553fc79ef5029a928550adbebea
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: SVC_REQ_APPROVE
-CMS-TYPE: 101P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20210127003642epcas1p4f167d553fc79ef5029a928550adbebea
-References: <BL0PR04MB65147D829369D0E6B45507E0E7BC9@BL0PR04MB6514.namprd04.prod.outlook.com>
-        <CGME20210127003642epcas1p4f167d553fc79ef5029a928550adbebea@epcas1p4.samsung.com>
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR04MB4965.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 520a1a39-2e65-4fe4-e6aa-08d8c25299ac
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Jan 2021 23:32:09.3617
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: vRJ6lP9rc5FMALL2PtvkolE5AD3KBcaBEkJog1tF2MQaGGM8W+YhBVIJxOolyPw7YcHjRr12iblAObF5FaIEzw7FRKWfeFIUciVTEmEhu40=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB4104
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> On 2021/01/26 18:37, Changheun Lee wrote:
-> > bio size can grow up to 4GB when muli-page bvec is enabled.
-> > but sometimes it would lead to inefficient behaviors.
-> > in case of large chunk direct I/O, - 32MB chunk read in user space -
-> > all pages for 32MB would be merged to a bio structure if the pages
-> > physical addresses are contiguous. it makes some delay to submit
-> > until merge complete. bio max size should be limited to a proper size.
-> > 
-> > When 32MB chunk read with direct I/O option is coming from userspace,
-> > kernel behavior is below now. it's timeline.
-> > 
-> >  | bio merge for 32MB. total 8,192 pages are merged.
-> >  | total elapsed time is over 2ms.
-> >  |------------------ ... ----------------------->|
-> >                                                  | 8,192 pages merged a bio.
-> >                                                  | at this time, first bio submit is done.
-> >                                                  | 1 bio is split to 32 read request and issue.
-> >                                                  |--------------->
-> >                                                   |--------------->
-> >                                                    |--------------->
-> >                                                               ......
-> >                                                                    |--------------->
-> >                                                                     |--------------->|
-> >                           total 19ms elapsed to complete 32MB read done from device. |
-> > 
-> > If bio max size is limited with 1MB, behavior is changed below.
-> > 
-> >  | bio merge for 1MB. 256 pages are merged for each bio.
-> >  | total 32 bio will be made.
-> >  | total elapsed time is over 2ms. it's same.
-> >  | but, first bio submit timing is fast. about 100us.
-> >  |--->|--->|--->|---> ... -->|--->|--->|--->|--->|
-> >       | 256 pages merged a bio.
-> >       | at this time, first bio submit is done.
-> >       | and 1 read request is issued for 1 bio.
-> >       |--------------->
-> >            |--------------->
-> >                 |--------------->
-> >                                       ......
-> >                                                  |--------------->
-> >                                                   |--------------->|
-> >         total 17ms elapsed to complete 32MB read done from device. |
-> > 
-> > As a result, read request issue timing is faster if bio max size is limited.
-> > Current kernel behavior with multipage bvec, super large bio can be created.
-> > And it lead to delay first I/O request issue.
-> > 
-> > Signed-off-by: Changheun Lee <nanich.lee@samsung.com>
-> > ---
-> >  block/bio.c            | 17 ++++++++++++++++-
-> >  include/linux/bio.h    |  4 +++-
-> >  include/linux/blkdev.h |  3 +++
-> >  3 files changed, 22 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/block/bio.c b/block/bio.c
-> > index 1f2cc1fbe283..ec0281889045 100644
-> > --- a/block/bio.c
-> > +++ b/block/bio.c
-> > @@ -287,6 +287,21 @@ void bio_init(struct bio *bio, struct bio_vec *table,
-> >  }
-> >  EXPORT_SYMBOL(bio_init);
-> >  
-> > +unsigned int bio_max_size(struct bio *bio)
-> > +{
-> > +	struct request_queue *q;
-> > +
-> > +	if (!bio->bi_disk)
-> > +		return UINT_MAX;
-> > +
-> > +	q = bio->bi_disk->queue;
-> > +	if (!blk_queue_limit_bio_size(q))
-> > +		return UINT_MAX;
-> > +
-> > +	return blk_queue_get_max_sectors(q, bio_op(bio)) << SECTOR_SHIFT;
-> > +}
-> > +EXPORT_SYMBOL(bio_max_size);
-> 
-> Why export this ? This is only used in this file and in bio.h in bio_full().
-
-OK. I'll remove it.
-
-> 
-> > +
-> >  /**
-> >   * bio_reset - reinitialize a bio
-> >   * @bio:	bio to reset
-> > @@ -877,7 +892,7 @@ bool __bio_try_merge_page(struct bio *bio, struct page *page,
-> >  		struct bio_vec *bv = &bio->bi_io_vec[bio->bi_vcnt - 1];
-> >  
-> >  		if (page_is_mergeable(bv, page, len, off, same_page)) {
-> > -			if (bio->bi_iter.bi_size > UINT_MAX - len) {
-> > +			if (bio->bi_iter.bi_size > bio_max_size(bio) - len) {
-> >  				*same_page = false;
-> >  				return false;
-> >  			}
-> > diff --git a/include/linux/bio.h b/include/linux/bio.h
-> > index 1edda614f7ce..cdb134ca7bf5 100644
-> > --- a/include/linux/bio.h
-> > +++ b/include/linux/bio.h
-> > @@ -100,6 +100,8 @@ static inline void *bio_data(struct bio *bio)
-> >  	return NULL;
-> >  }
-> >  
-> > +extern unsigned int bio_max_size(struct bio *);
-> 
-> No need for extern.
-
-It's just for compile warning in my test environment.
-I'll remove it too. But I think compile warning could be in the other
-.c file which includes bio.h. Is it OK?
-
-> 
-> > +
-> >  /**
-> >   * bio_full - check if the bio is full
-> >   * @bio:	bio to check
-> > @@ -113,7 +115,7 @@ static inline bool bio_full(struct bio *bio, unsigned len)
-> >  	if (bio->bi_vcnt >= bio->bi_max_vecs)
-> >  		return true;
-> >  
-> > -	if (bio->bi_iter.bi_size > UINT_MAX - len)
-> > +	if (bio->bi_iter.bi_size > bio_max_size(bio) - len)
-> >  		return true;
-> >  
-> >  	return false;
-> > diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> > index f94ee3089e01..3aeab9e7e97b 100644
-> > --- a/include/linux/blkdev.h
-> > +++ b/include/linux/blkdev.h
-> > @@ -621,6 +621,7 @@ struct request_queue {
-> >  #define QUEUE_FLAG_RQ_ALLOC_TIME 27	/* record rq->alloc_time_ns */
-> >  #define QUEUE_FLAG_HCTX_ACTIVE	28	/* at least one blk-mq hctx is active */
-> >  #define QUEUE_FLAG_NOWAIT       29	/* device supports NOWAIT */
-> > +#define QUEUE_FLAG_LIMIT_BIO_SIZE 30	/* limit bio size */
-> >  
-> >  #define QUEUE_FLAG_MQ_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
-> >  				 (1 << QUEUE_FLAG_SAME_COMP) |		\
-> > @@ -667,6 +668,8 @@ bool blk_queue_flag_test_and_set(unsigned int flag, struct request_queue *q);
-> >  #define blk_queue_fua(q)	test_bit(QUEUE_FLAG_FUA, &(q)->queue_flags)
-> >  #define blk_queue_registered(q)	test_bit(QUEUE_FLAG_REGISTERED, &(q)->queue_flags)
-> >  #define blk_queue_nowait(q)	test_bit(QUEUE_FLAG_NOWAIT, &(q)->queue_flags)
-> > +#define blk_queue_limit_bio_size(q)	\
-> > +	test_bit(QUEUE_FLAG_LIMIT_BIO_SIZE, &(q)->queue_flags)
-> >  
-> >  extern void blk_set_pm_only(struct request_queue *q);
-> >  extern void blk_clear_pm_only(struct request_queue *q);
-> > 
-> 
-> 
-> -- 
-> Damien Le Moal
-> Western Digital Research
-
--- 
-Changheun Lee
-Samsung Electronics
+On 1/26/21 14:14, Bjorn Helgaas wrote:=0A=
+> From: Bjorn Helgaas <bhelgaas@google.com>=0A=
+>=0A=
+> Use PCI #defines for PCIe Device Control register values instead of=0A=
+> hard-coding bit positions.  No functional change intended.=0A=
+>=0A=
+> Signed-off-by: Bjorn Helgaas <bhelgaas@google.com>=0A=
+=0A=
+I've verified the values present in the include/uapi/linux/pci_regs.h=0A=
+matches open coded bit shift values. LGTM.=0A=
+=0A=
+Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>=0A=
+=0A=
