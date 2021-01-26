@@ -2,137 +2,160 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A25A4C10F0B
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1C4FC41621
 	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 22:20:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8A6702067C
+	by mail.kernel.org (Postfix) with ESMTP id B51F72067C
 	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 22:20:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725900AbhAZV6J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Jan 2021 16:58:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60448 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2404890AbhAZT7y (ORCPT
+        id S1727318AbhAZV5c (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Jan 2021 16:57:32 -0500
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:44616 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2393501AbhAZRvT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Jan 2021 14:59:54 -0500
-Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 278EEC0613D6;
-        Tue, 26 Jan 2021 11:59:13 -0800 (PST)
-Received: by mail-wm1-x32b.google.com with SMTP id u14so3503557wml.4;
-        Tue, 26 Jan 2021 11:59:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=Z/dDIOKSJWoqDTk0FZlKbb5WJxRrq5s89obAFyPnn+E=;
-        b=YTuimI9C7eAU5UPa/+Fj//lwk7gPiGPewvllL+0Ok38zDSSIJ3D7EizZjXg5qysJ3J
-         qb2DbfA6e/k9qyrpLAJU90GF2j3hDKFKX7mDNLQovQrbl6K7OSNCcFW76bv3reK343WJ
-         7/3JcMl/ghFahj4+XDwhWBgzSJpTbzNLCfPyoQGNNx1n2ZwFtDTzntygtAzvvoS8kTSH
-         AhqBNr6UI5Dx0mqcbUEMwD1vF94FbBUAs9V9GKMf6ae8FXWbdlk5c05Jq6lvVnHQG4ic
-         vBUnmf63cKW5x0bB6jdkJE5xc4tJJskf9XlViYG6Muna14O2ig7SZSymtR5v6+MQVYH4
-         zjtA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=Z/dDIOKSJWoqDTk0FZlKbb5WJxRrq5s89obAFyPnn+E=;
-        b=VwQWGP9kh44+iWVstXLXMdSGZCNiOE7dL3tSVPh+IQ+QvoWB4qNCB7CMT9Sv+UyKWj
-         quyY68lwV194M0eaMRkxcG45aLfAdyapV5v5dA9zM+2llbMHy0oHTxtzGb6Y4oXg8bJq
-         gVTV6hAlEh8fJbtoXtawU0NVyF94A303TZEQE2OrQVx4AAvx5ds9WTTj2H5yfTnUGYqm
-         60/11QhEFmXvfrDqNh1oLdjCbbqLj0DBxu8lxJk8Y3eY7/kcDLsnNelEYo25dDjw5A02
-         dIZyPqpxwIChgbTHrnAKaXEAn/dF2jo0H9t6ji4p0j878o1yVJAB/zf041wrtn2xDcFh
-         W+dg==
-X-Gm-Message-State: AOAM531VEzMg67XlQyElKc04cypZRRGoyhnbh3WDYayU1q2isXCwGEeh
-        rjBAbGSlpHB2dlB0WuupLog=
-X-Google-Smtp-Source: ABdhPJzOFbzyDewVYfOof2sd/OTH0kKSHxfbvcptEq+e4wMs3HMBhFrQik+dCVq1j5NNLb2w3fGbpQ==
-X-Received: by 2002:a1c:2003:: with SMTP id g3mr1145446wmg.90.1611691150967;
-        Tue, 26 Jan 2021 11:59:10 -0800 (PST)
-Received: from warrior.lan ([2a03:7380:2407:423c:8b0b:377:3cef:94ac])
-        by smtp.gmail.com with ESMTPSA id z15sm3845114wrs.25.2021.01.26.11.59.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Jan 2021 11:59:10 -0800 (PST)
-From:   Maxim Mikityanskiy <maxtram95@gmail.com>
-To:     Jens Axboe <axboe@kernel.dk>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Maxim Mikityanskiy <maxtram95@gmail.com>
-Subject: [PATCH] Revert "block: simplify set_init_blocksize" to regain lost performance
-Date:   Tue, 26 Jan 2021 21:59:07 +0200
-Message-Id: <20210126195907.2273494-1-maxtram95@gmail.com>
-X-Mailer: git-send-email 2.30.0
+        Tue, 26 Jan 2021 12:51:19 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1611683478; x=1643219478;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=mv3WEn2pcMjWOdfGVl7WT3gSU4WDy6fGoCjl3MPHc1g=;
+  b=UO/n+NAhmi0rbbo41D1n1BmMz2EOyJZz54LDrzRSHgQq3qEzPwVZNUHT
+   kUtjQ0Y9juDQ+naUh/2tPevZ+KQXFFFHf7URdvceAa0D4KoIYvFZ3UpBJ
+   l62xE+gDABEcLUO8mydkhKDyKzBcW8/M4gPAzw9qA2FocxzQnEbJi5cuv
+   q6o+8IsZMuCl2+SXS3Nz5k1RGqXAE220cm5jW5IBToVPDyOjkBMU3Tvcp
+   cpBknblaIh/xCxqNvXCpfmWFY9fChFQXYxm77IrJw8YlXH5uCvJveuU4Z
+   kCPP0CmnGnV4U3L17JekieZWI09CZhWUlxAFqe+IfPs6CpdWkVQE6u1Ax
+   g==;
+IronPort-SDR: dviz7rgVrOf8owJc2EO9IDLVk5Et8SPOxw9CiOvjCJE/Tk7DURZLDFc1kVO8Icy5OcX9PKg9pI
+ Z5yMylHEGTihykOfvDy5SzGWJHn1thF1WHehPnyXFx/mKGBYPc2e2UZdrz60HDMSUtcofMRFo7
+ /JZrUtuTgfoOs3dpzri/WvAoneUfbZyMNKK25ebSRHHWW4f88iUiH9ZcEQPiF1upgU+y3sPd7I
+ TSAPk2ScWE9JMylBKZuk/co1HzmpYACrIwdgZYtaU3w+E7sXn4jwBDB43fjmSkRVFiLis5olYT
+ 72w=
+X-IronPort-AV: E=Sophos;i="5.79,377,1602518400"; 
+   d="scan'208";a="162819787"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 27 Jan 2021 01:50:11 +0800
+IronPort-SDR: HFyIPqC7lddJM805O33FqPTpa9Oo+7uJInWiz4NsliOaD+ZyUE6Li+0qYp915EnMq/EsR+J9x5
+ yTM2T3jBgRWP9ljvUvHu3MgWHx7Mz5zpQmSFPGKYWBZ4hiAHFFSVUy6PJxARHYVx3V3MJ02+o/
+ AwiST7GieyxhIxg7NgihIkuw5NUMgm5myx0qvKOCCFEA3m14lV9TJ1hu6yH9pK0380AGhah4nL
+ B9FAocEi9GVB75Gp7/CtaoOdxP8RX4cJU7ZThbPjAZ/7XORNCyAGPDgOSAgo8sB2LO95TYWtFV
+ IviP6eUndpX8MW6YyPzMavQA
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2021 09:32:35 -0800
+IronPort-SDR: +OMEKigUfdY1CdtekM1oktsOyUYGzgoEqidNNzhZMZBCRtQoECS+lxNljOQE3cgTJw+cC+fOKz
+ W9YNDhG7onP3UOEBnO56bKyKwUsrZ7JG/KIxxvcP7fX7ru9gDBzwBuPPzTpJjC1oO5KE+HcvoP
+ 1QN4S7ciI8iFCBSvknRsnl/7aRCKRRNJHLcdRJrjJaizl7gQyTxMZF94ilwzWMojNDQe5KPeJf
+ T00GhCMC0TFYv9dRLYP9eDADHFYkIVI+1bbL4bt7PbPUV8GNHzUuehGyz8pfOyFIHDRQZgTDBa
+ +1U=
+WDCIronportException: Internal
+Received: from unknown (HELO redsun60.ssa.fujisawa.hgst.com) ([10.149.66.36])
+  by uls-op-cesaip02.wdc.com with ESMTP; 26 Jan 2021 09:50:11 -0800
+From:   Johannes Thumshirn <johannes.thumshirn@wdc.com>
+To:     Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>
+Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Subject: [PATCH] nvme: add tracing of zns commands
+Date:   Wed, 27 Jan 2021 02:50:00 +0900
+Message-Id: <46eeed2fcf2530d02fe5727a0a91a6e4675f6edd.1611683161.git.johannes.thumshirn@wdc.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The cited commit introduced a serious regression with SATA write speed,
-as found by bisecting. This patch reverts this commit, which restores
-write speed back to the values observed before this commit.
+When support for the NVMe ZNS commands was merged, tracing of these has
+been omitted.
 
-The performance tests were done on a Helios4 NAS (2nd batch) with 4 HDDs
-(WD8003FFBX) using dd (bs=1M count=2000). "Direct" is a test with a
-single HDD, the rest are different RAID levels built over the first
-partitions of 4 HDDs. Test results are in MB/s, R is read, W is write.
+Add nvme_cmd_zone_mgmt_send, nvme_cmd_zone_mgmt_recv as well as
+nvme_cmd_zone_append to the nvme driver's tracing facility.
 
-                | Direct | RAID0 | RAID10 f2 | RAID10 n2 | RAID6
-----------------+--------+-------+-----------+-----------+--------
-9011495c9466    | R:256  | R:313 | R:276     | R:313     | R:323
-(before faulty) | W:254  | W:253 | W:195     | W:204     | W:117
-----------------+--------+-------+-----------+-----------+--------
-5ff9f19231a0    | R:257  | R:398 | R:312     | R:344     | R:391
-(faulty commit) | W:154  | W:122 | W:67.7    | W:66.6    | W:67.2
-----------------+--------+-------+-----------+-----------+--------
-5.10.10         | R:256  | R:401 | R:312     | R:356     | R:375
-unpatched       | W:149  | W:123 | W:64      | W:64.1    | W:61.5
-----------------+--------+-------+-----------+-----------+--------
-5.10.10         | R:255  | R:396 | R:312     | R:340     | R:393
-patched         | W:247  | W:274 | W:220     | W:225     | W:121
-
-Applying this patch doesn't hurt read performance, while improves the
-write speed by 1.5x - 3.5x (more impact on RAID tests). The write speed
-is restored back to the state before the faulty commit, and even a bit
-higher in RAID tests (which aren't HDD-bound on this device) - that is
-likely related to other optimizations done between the faulty commit and
-5.10.10 which also improved the read speed.
-
-Signed-off-by: Maxim Mikityanskiy <maxtram95@gmail.com>
-Fixes: 5ff9f19231a0 ("block: simplify set_init_blocksize")
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 ---
- fs/block_dev.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ drivers/nvme/host/trace.c | 34 ++++++++++++++++++++++++++++++++++
+ include/linux/nvme.h      |  6 +++++-
+ 2 files changed, 39 insertions(+), 1 deletion(-)
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 3b8963e228a1..235b5042672e 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -130,7 +130,15 @@ EXPORT_SYMBOL(truncate_bdev_range);
- 
- static void set_init_blocksize(struct block_device *bdev)
- {
--	bdev->bd_inode->i_blkbits = blksize_bits(bdev_logical_block_size(bdev));
-+	unsigned int bsize = bdev_logical_block_size(bdev);
-+	loff_t size = i_size_read(bdev->bd_inode);
-+
-+	while (bsize < PAGE_SIZE) {
-+		if (size & bsize)
-+			break;
-+		bsize <<= 1;
-+	}
-+	bdev->bd_inode->i_blkbits = blksize_bits(bsize);
+diff --git a/drivers/nvme/host/trace.c b/drivers/nvme/host/trace.c
+index 5c3cb6928f3c..9f9b6108de7d 100644
+--- a/drivers/nvme/host/trace.c
++++ b/drivers/nvme/host/trace.c
+@@ -131,6 +131,35 @@ static const char *nvme_trace_dsm(struct trace_seq *p, u8 *cdw10)
+ 	return ret;
  }
  
- int set_blocksize(struct block_device *bdev, int size)
++static const char *nvme_trace_zone_mgmt_send(struct trace_seq *p, u8 *cdw10)
++{
++	const char *ret = trace_seq_buffer_ptr(p);
++	u64 slba = get_unaligned_le64(cdw10);
++	u8 zsa = cdw10[12];
++	u8 all = cdw10[13];
++
++	trace_seq_printf(p, "slba=%llu, zsa=%u, all=%u", slba, zsa, all);
++	trace_seq_putc(p, 0);
++
++	return ret;
++}
++
++static const char *nvme_trace_zone_mgmt_recv(struct trace_seq *p, u8 *cdw10)
++{
++	const char *ret = trace_seq_buffer_ptr(p);
++	u64 slba = get_unaligned_le64(cdw10);
++	u32 numd = get_unaligned_le32(cdw10 + 8);
++	u8 zra = cdw10[12];
++	u8 zrasf = cdw10[13];
++	u8 pr = cdw10[14];
++
++	trace_seq_printf(p, "slba=%llu, numd=%u, zra=%u, zrasf=%u, pr=%u",
++			 slba, numd, zra, zrasf, pr);
++	trace_seq_putc(p, 0);
++
++	return ret;
++}
++
+ static const char *nvme_trace_common(struct trace_seq *p, u8 *cdw10)
+ {
+ 	const char *ret = trace_seq_buffer_ptr(p);
+@@ -171,9 +200,14 @@ const char *nvme_trace_parse_nvm_cmd(struct trace_seq *p,
+ 	case nvme_cmd_read:
+ 	case nvme_cmd_write:
+ 	case nvme_cmd_write_zeroes:
++	case nvme_cmd_zone_append:
+ 		return nvme_trace_read_write(p, cdw10);
+ 	case nvme_cmd_dsm:
+ 		return nvme_trace_dsm(p, cdw10);
++	case nvme_cmd_zone_mgmt_send:
++		return nvme_trace_zone_mgmt_send(p, cdw10);
++	case nvme_cmd_zone_mgmt_recv:
++		return nvme_trace_zone_mgmt_recv(p, cdw10);
+ 	default:
+ 		return nvme_trace_common(p, cdw10);
+ 	}
+diff --git a/include/linux/nvme.h b/include/linux/nvme.h
+index bfed36e342cc..325dcdd221de 100644
+--- a/include/linux/nvme.h
++++ b/include/linux/nvme.h
+@@ -697,7 +697,11 @@ enum nvme_opcode {
+ 		nvme_opcode_name(nvme_cmd_resv_register),	\
+ 		nvme_opcode_name(nvme_cmd_resv_report),		\
+ 		nvme_opcode_name(nvme_cmd_resv_acquire),	\
+-		nvme_opcode_name(nvme_cmd_resv_release))
++		nvme_opcode_name(nvme_cmd_resv_release),	\
++		nvme_opcode_name(nvme_cmd_zone_mgmt_send),	\
++		nvme_opcode_name(nvme_cmd_zone_mgmt_recv),	\
++		nvme_opcode_name(nvme_cmd_zone_append))
++
+ 
+ 
+ /*
 -- 
-2.30.0
+2.26.2
 
