@@ -2,75 +2,79 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00AE6C433E0
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 17:14:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B565EC433DB
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 17:14:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C009B23108
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 17:14:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8D007230FD
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 17:14:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729352AbhAZRN5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Jan 2021 12:13:57 -0500
-Received: from mout.gmx.net ([212.227.17.22]:48357 "EHLO mout.gmx.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729435AbhAZIA1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Jan 2021 03:00:27 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
-        s=badeba3b8450; t=1611647932;
-        bh=fiH1eSkKMjtnVFMM7I/tY1R5tAWdJnbYjeo7a+GtOpA=;
-        h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
-        b=C+MGNXRZlkHBSWh7swXgnyNBtpjJ0R1qa/3leia3i+rvHpRPixfveDYzF7GF0FNAR
-         DqnJcNCCZaC88OkCuZBHIiOuLArjs+f9mDs5druTjbCC0+0mdRzT+/nEslOMq32LY0
-         5ssS50a6MkZYK7zhHNu0cf8j8Y/2Y159jv+omJPk=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from Valinor ([82.203.167.181]) by mail.gmx.net (mrgmx104
- [212.227.17.174]) with ESMTPSA (Nemesis) id 1MJVDM-1lJdCu0Xyy-00JqKg; Tue, 26
- Jan 2021 08:58:52 +0100
-Date:   Tue, 26 Jan 2021 10:00:30 +0200
-From:   Lauri Kasanen <cand@gmx.com>
-To:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Cc:     linux-mips@vger.kernel.org, tsbogend@alpha.franken.de,
-        axboe@kernel.dk, linux-block@vger.kernel.org, cand@gmx.com
-Subject: Re: [PATCH 0/9] n64: small cleanups
-Message-Id: <20210126100030.374cd4adbd3b9db72ecaa757@gmx.com>
-In-Reply-To: <20210125233243.5982-1-chaitanya.kulkarni@wdc.com>
-References: <20210125233243.5982-1-chaitanya.kulkarni@wdc.com>
-X-Mailer: Sylpheed 3.5.0 (GTK+ 2.18.6; x86_64-unknown-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Provags-ID: V03:K1:6gViuzsL8awiGdS272Fx+Wl3fWGihJoPZmfIRqRFfycT1qeDJBz
- yTj2rMZRUZ/Va7e7fPdGRkNxD1CF9+65cgZU89FjsFhtcXICCN7lAlt9dCzNh348LnLaSlz
- IvO7pkrF4QnoAlc7p7BBvlBSD/0z1L2vouRnLZSHD1pT41D4QbV4bEL/NfR3sgy3v30ebI5
- jQKamQbenBFyqm/oT5wIQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:kJ0/PAv0qPg=:25b98VcygCgts5LzlK9xUt
- BEgM0gM0XO1MZRl+fBryVvhjuGxFX64Bceqe4cy8vVhlTitQMEdGqcSh/8o4Hx1evJNB3ZIYw
- Qbp+mp51rIYBbEgsXcJU2PTuwHDrWzEB3viuh487S0KuQ2QBy/71E58XUut/mgpgymSTWCqpw
- iIP1bGwCiBPfsQ3LX08orVkaxVS3+Hr258jzSSwbsP/HNytiJMqz+JETRRh/gXWZ3XPAGFuSj
- ZbZwRpKMUFFq/rEfiOYW/Qt/U1lPK2TMk0+X9zXtuWxtWT6TUR47HbCsqN++b4HXIf/IhRtye
- Kns0v17ey6MnhnC3MwIwLpFSpFfK/g/UVWpazFzPvHHVjzRI3vGXqLVml9UosIrOsyuuDvPsa
- 1ED0TU6ImZ0vo9pDoX3gR+Oy4SH+ijATPsjekQVxhixBDxJQuJlY5FwuQjUm4OcU43ZWyeKwV
- DUmkd8A8plGC21fV3VSPn7+KAHE2IATMRfpLG7rFSrvIOj414LH7Wg5SdGK587mtpp0GVlwna
- Hl3qtLeojPW0zVB5wUDGyyegvs64C5yODDBBrG8QlZoNGry3mT2vkSupMEuWnP1nFc4E9zXJX
- SU32Lxo7H5P+Z5rcMNq1Hcvaovo5/Ip+7UeHhoGOao15DM4uI+3cetWvfm/bd3bl03wv1nnro
- zoRWxG55/pUZCwuE5mz4NPunSzT/qMUcuLkaR+Vk5iLoX3gbRsAJMONkoEvvWC384yojHwQSh
- wevEvInN3Tr3fCYke34z88Zg2MV+2hpDf0jhCHWVfke5gtvUgQFYVx238M7Fy2RX3JLXWn3GE
- cSlg4yWaT6Kli020mtZr7IOL9pjX3rmJm7p+T2qf4oLShp+b1gLoQYEWt3Aeyw9kXFgOoi/Vv
- hg1adAQPoFCx8SzF6U0w==
+        id S2389365AbhAZROe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Jan 2021 12:14:34 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:11497 "EHLO
+        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389691AbhAZIQo (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 26 Jan 2021 03:16:44 -0500
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.58])
+        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4DPzzX1qgQzjDSQ;
+        Tue, 26 Jan 2021 16:14:32 +0800 (CST)
+Received: from huawei.com (10.29.88.127) by DGGEMS412-HUB.china.huawei.com
+ (10.3.19.212) with Microsoft SMTP Server id 14.3.498.0; Tue, 26 Jan 2021
+ 16:15:42 +0800
+From:   Chao Leng <lengchao@huawei.com>
+To:     <linux-nvme@lists.infradead.org>
+CC:     <kbusch@kernel.org>, <axboe@fb.com>, <hch@lst.de>,
+        <sagi@grimberg.me>, <linux-block@vger.kernel.org>,
+        <axboe@kernel.dk>
+Subject: [PATCH v4 5/5] nvme-fc: avoid IO error for nvme native multipath
+Date:   Tue, 26 Jan 2021 16:15:39 +0800
+Message-ID: <20210126081539.13320-6-lengchao@huawei.com>
+X-Mailer: git-send-email 2.16.4
+In-Reply-To: <20210126081539.13320-1-lengchao@huawei.com>
+References: <20210126081539.13320-1-lengchao@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Originating-IP: [10.29.88.127]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 25 Jan 2021 15:32:34 -0800
-Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com> wrote:
+Work with nvme native multipath, if a path related error occurs when
+queue_rq call HBA drive to send request, queue_rq will return
+BLK_STS_IOERR to blk-mq. The request is completed with BLK_STS_IOERR
+instead of fail over to retry.
+queue_rq need call nvme_complete_rq to complete the request with
+NVME_SC_HOST_PATH_ERROR, the request will fail over to retry if needed.
 
-> I've got the reviewed-by tag from the driver owner offline which
-> is added to the series.
+Signed-off-by: Chao Leng <lengchao@huawei.com>
+---
+ drivers/nvme/host/fc.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-I confirm this, he sent it privately first. I approve the series.
+diff --git a/drivers/nvme/host/fc.c b/drivers/nvme/host/fc.c
+index 5f36cfa8136c..400a5638d68a 100644
+--- a/drivers/nvme/host/fc.c
++++ b/drivers/nvme/host/fc.c
+@@ -2791,7 +2791,12 @@ nvme_fc_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	}
+ 
+ 
+-	return nvme_fc_start_fcp_op(ctrl, queue, op, data_len, io_dir);
++	ret = nvme_fc_start_fcp_op(ctrl, queue, op, data_len, io_dir);
++	if (ret == BLK_STS_IOERR) {
++		nvme_complete_failed_rq(rq, NVME_SC_HOST_PATH_ERROR);
++		ret = BLK_STS_OK;
++	}
++	return ret;
+ }
+ 
+ static void
+-- 
+2.16.4
 
-- Lauri
