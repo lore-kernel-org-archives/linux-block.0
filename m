@@ -2,179 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8CE9C433DB
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 14:31:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57DC2C4332D
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 14:36:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6BE1C230FC
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 14:31:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1510722D58
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 14:36:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392715AbhAZOay (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Jan 2021 09:30:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45542 "EHLO
+        id S2391731AbhAZOZ2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Jan 2021 09:25:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44096 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2392439AbhAZOaq (ORCPT
+        with ESMTP id S2392070AbhAZOYI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Jan 2021 09:30:46 -0500
-Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7859CC0611BD
-        for <linux-block@vger.kernel.org>; Tue, 26 Jan 2021 06:30:05 -0800 (PST)
-Received: by mail-ed1-x52f.google.com with SMTP id j13so20003419edp.2
-        for <linux-block@vger.kernel.org>; Tue, 26 Jan 2021 06:30:05 -0800 (PST)
+        Tue, 26 Jan 2021 09:24:08 -0500
+Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D631EC0611C2
+        for <linux-block@vger.kernel.org>; Tue, 26 Jan 2021 06:23:25 -0800 (PST)
+Received: by mail-ed1-x530.google.com with SMTP id n6so19930243edt.10
+        for <linux-block@vger.kernel.org>; Tue, 26 Jan 2021 06:23:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=soleen.com; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=US8a/kB/55AFjkFFf4UVOg+wWSaZCuyXBjpUsvs+feI=;
-        b=lpn4V6P0eE+FY6dqw/ysEzqC/coXbO5OV+4q6B/Z9DSxXvvF6hCV9twibOZb1hb3IZ
-         uW/yUXid/E3Rk1HIzRWfV2D7+/Xo2SUX0FegjPS8XW++udkKwsIBtDBkf1P7XwGo29w5
-         c20hEJI7NzNoZDg6BZ+CjioEVbqz1EEd9wQzkq1112iJEvNEG2gusx7NH5JmQvppOaHf
-         E0/rX+x3fA6eN98/fX4WqYDyYJ3UOmE3faZh3LO7XWLRQkXIac7Gv82w7Jwl+T5Xx9sn
-         cT7VIwZ58SnAzZxfhQPpWrFsuBiY/NNoeoxP/9lDqnJbcRqiDXx1k293FX7j7G4IkYNz
-         HngQ==
+        bh=1czbBZLLxHwEsDj/a0a94VF0yBz3u23rkRDZfhlmeos=;
+        b=nyCAT2ReufMhKUDlIx0rQQya1EhvNd3CAXYn6nE2QL4Vmc6395uy5mK+D+jGDLbH8z
+         YBTHMXZ5OTYvLZQCey/ax2VfTRjckHrVObU3ETyQjToqgDfw4if7zzGcu1bFvjVsLdLT
+         F4gzk6kKy+eZ2ZD6f+6CMfR+xgdho8L/8V2tlsFkR6eehlqnDN5KeIm2DzPp7oGr46TA
+         I1QpUnH2hx6ubfWT7ZKBTQ13Ru+n+hkvKoz317kqYa32yGBC2jDOOm4nFn9neiUgZb6E
+         n4mwe9IXjh/CKhqAes1aQMDcP5JYr8mrKYekaWRrWhxbJQXU9qlhVaUOoSQLVgeLluAG
+         GjNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=US8a/kB/55AFjkFFf4UVOg+wWSaZCuyXBjpUsvs+feI=;
-        b=tzPu4+LtN78LP1bIYcv4fjrtl4T+YaBHQy859oWM98MMdXTijl9nSfcS6GAcAffQV3
-         k95x7IMHBKWqlJ50LoWg5ekigWKfSvPDMVuRk6camlFWgKGF3MRU+4W0JRTHCC3G5LCu
-         zUbT9U56RZ48cspoWj9a0fEWbWREClPGRr+MeLP0f+pRcIMMRab+w9uZE7m3DWPjvOCv
-         7azBoHIkee1DZuQ8Oo7Cis6oZL9o1q5uFH0u7mPq2NJ7h5AStCAuSHtgvEnTUiej6lp6
-         eptKyJYPAQkr6Yjt9SPFpPyFGMkXCZEJoULHxFYfm0fl5CBzcsIVYDZW6d3E0dWpBwjp
-         ZcnA==
-X-Gm-Message-State: AOAM533+dl1gqeBX2QAXV2EJY+bK/wsOOagLXKWFC9y+F/JyUwxxcdAr
-        8rN/YvwSR3CLDqG4ij4VjYatSTHJjO5yepvrBrkaDQ==
-X-Google-Smtp-Source: ABdhPJz0ls97OG8+OSmc9t5sQKWLr7rZ0A9Jbf5tTkXRc1iBOLXK3fdIESF/F71aZUt8OTnFhumnht6dZlyx93lBEF4=
-X-Received: by 2002:aa7:d803:: with SMTP id v3mr4667824edq.153.1611671404169;
- Tue, 26 Jan 2021 06:30:04 -0800 (PST)
+        bh=1czbBZLLxHwEsDj/a0a94VF0yBz3u23rkRDZfhlmeos=;
+        b=IsvoJLxs5zfvzhHHiUyE6yxjeOaosm/MNNxkOv8X0ZQmasxVja++2YbUKRMn/0ld16
+         xRuGh/IhedBNvY8Fc9bzP5U35o8tJBSsjAYA/qoH5XAK30VjO1TgFuwgYMT3R5AJnDpo
+         ohTNGB1/T4g+B6ctIwMCOEy/irbYQIoOqHC7Tl/kEb7Cr2FP87ctliVhsMAd0ncZ8KJw
+         i4NauXaMm8B1/maC80WdDx3F5aJVR9SGzfr03KwYACh9TReLOMnt+5Uum6Uay80H8Rnz
+         Wt98ylGRODDqKmdOdS1eFo4DhgvKieK/bJBo9lHvi8a1DZdO2u2ekYL5mQnIQeE+/i1m
+         cEWg==
+X-Gm-Message-State: AOAM533C1Ags3pEZYQba5g3gLazMS30+6SOhRC8PgGo6+9bL8O7x8ljx
+        34zQODGtGlm7o1iCZzRH/VxRQ4ru4/OI9K9tzDoQFQ==
+X-Google-Smtp-Source: ABdhPJxP3v2LeM908ihblFdyCJ83JaTf4lsLhbskKLoinjZa37ZibxDpo5jfrONK2pUpfuITkUtYiA+FbDR8mmfbk/0=
+X-Received: by 2002:a05:6402:3508:: with SMTP id b8mr4815634edd.341.1611671004588;
+ Tue, 26 Jan 2021 06:23:24 -0800 (PST)
 MIME-Version: 1.0
 References: <20210125201156.1330164-1-pasha.tatashin@soleen.com>
- <20210125201156.1330164-2-pasha.tatashin@soleen.com> <BYAPR04MB4965A6FB4ED51882E326EC1A86BC9@BYAPR04MB4965.namprd04.prod.outlook.com>
-In-Reply-To: <BYAPR04MB4965A6FB4ED51882E326EC1A86BC9@BYAPR04MB4965.namprd04.prod.outlook.com>
+ <20210125201156.1330164-2-pasha.tatashin@soleen.com> <YA/fwFU+Wg6+jr85@pevik>
+In-Reply-To: <YA/fwFU+Wg6+jr85@pevik>
 From:   Pavel Tatashin <pasha.tatashin@soleen.com>
-Date:   Tue, 26 Jan 2021 09:29:28 -0500
-Message-ID: <CA+CK2bAQcGPYtbGziyRpzTRQ8WCLsvM2DmFYLwDRMXMX6U38+w@mail.gmail.com>
+Date:   Tue, 26 Jan 2021 09:22:48 -0500
+Message-ID: <CA+CK2bBVdVOP6TmJED4Wndovxf+dGbcbw=0LQ8neAGL_2=TEwA@mail.gmail.com>
 Subject: Re: [PATCH v3 1/1] loop: scale loop device by introducing per device lock
-To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-Cc:     "tyhicks@linux.microsoft.com" <tyhicks@linux.microsoft.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "sashal@kernel.org" <sashal@kernel.org>,
-        "jmorris@namei.org" <jmorris@namei.org>,
-        "lukas.bulwahn@gmail.com" <lukas.bulwahn@gmail.com>,
-        "hch@lst.de" <hch@lst.de>, "pvorel@suse.cz" <pvorel@suse.cz>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>,
-        "mzxreary@0pointer.de" <mzxreary@0pointer.de>,
-        "mcgrof@kernel.org" <mcgrof@kernel.org>,
-        "zhengbin13@huawei.com" <zhengbin13@huawei.com>,
-        "maco@android.com" <maco@android.com>,
-        "colin.king@canonical.com" <colin.king@canonical.com>,
-        "evgreen@chromium.org" <evgreen@chromium.org>
+To:     Petr Vorel <pvorel@suse.cz>
+Cc:     Tyler Hicks <tyhicks@linux.microsoft.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>,
+        Sasha Levin <sashal@kernel.org>,
+        James Morris <jmorris@namei.org>, lukas.bulwahn@gmail.com,
+        hch@lst.de, ming.lei@redhat.com, mzxreary@0pointer.de,
+        mcgrof@kernel.org, zhengbin13@huawei.com, maco@android.com,
+        Colin King <colin.king@canonical.com>, evgreen@chromium.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jan 26, 2021 at 4:53 AM Chaitanya Kulkarni
-<Chaitanya.Kulkarni@wdc.com> wrote:
+On Tue, Jan 26, 2021 at 4:24 AM Petr Vorel <pvorel@suse.cz> wrote:
 >
-> On 1/25/21 12:15 PM, Pavel Tatashin wrote:
+> Hi,
+>
 > > Currently, loop device has only one global lock:
 > > loop_ctl_mutex.
-> Above line can be :-
-> Currently, loop device has only one global lock: loop_ctl_mutex.
-
-OK
-
 >
-> Also please provide a complete discretion what are the members it protects,
-> i.e. how big the size of the current locking is, helps the reviewers &
-> maintainer.
-
-Sure
-
 > > This becomes hot in scenarios where many loop devices are used.
-> >
+>
 > > Scale it by introducing per-device lock: lo_mutex that protects the
 > > fields in struct loop_device. Keep loop_ctl_mutex to protect global
 > > data such as loop_index_idr, loop_lookup, loop_add.
-> When it comes to scaling, lockstat data is more descriptive and useful along
-> with thetotal time of execution which has contention numbers with increasing
-> number of threads/devices/users on logarithmic scale, at-least that is
-> how I've
-> solved the some of file-systems scaling issues in the past.
-
-I found this issue using perf that shows profiling. I've previously
-used lockstat, it is indeed a good tool to work with lock contentions.
-
-> >
+>
 > > Lock ordering: loop_ctl_mutex > lo_mutex.
-> The above statement needs a in-detail commit log description. Usually >
-> sort of statements are not a good practice for something as important as
-> lock priority which was not present in the original code.
-
-OK, I will expand this to clearly state that new lock ordering
-requirement is that loop_ctl_mutex must be taken before lo_mutex.
-
-> > Signed-off-by: Pavel Tatashin <pasha.tatashin@soleen.com>
-> > Reviewed-by: Tyler Hicks <tyhicks@linux.microsoft.com>
-> > ---
-> >  drivers/block/loop.c | 92 +++++++++++++++++++++++++-------------------
-> >
-> >
-> >
-> >       /*
-> > -      * Need not hold loop_ctl_mutex to fput backing file.
-> > -      * Calling fput holding loop_ctl_mutex triggers a circular
-> > +      * Need not hold lo_mutex to fput backing file.
-> > +      * Calling fput holding lo_mutex triggers a circular
-> >        * lock dependency possibility warning as fput can take
-> > -      * bd_mutex which is usually taken before loop_ctl_mutex.
-> > +      * bd_mutex which is usually taken before lo_mutex.
-> >        */
-> This is not in your patch, but since you are touching this comment can you
-> please consider this, it save an entire line and the wasted space:-
-
-OK
-
->        /*
->         * Need not hold lo_mutex to fput backing file. Calling fput holding
->         * lo_mutex triggers a circular lock dependency possibility
-> warning as
->         * fput can take bd_mutex which is usually take before lo_mutex.
->         */
 >
-> > @@ -1879,27 +1879,33 @@ static int lo_open(struct block_device *bdev, fmode_t mode)
-> >       struct loop_device *lo;
-> >       int err;
-> >
-> > +     /*
-> > +      * take loop_ctl_mutex to protect lo pointer from race with
-> > +      * loop_control_ioctl(LOOP_CTL_REMOVE), however, to reduce
-> > +      * contention release it prior to updating lo->lo_refcnt.
-> > +      */
->
-> The above comment could be :-
->
->         /*
->          * Take loop_ctl_mutex to protect lo pointer from race with
->          * loop_control_ioctl(LOOP_CTL_REMOVE), however, to reduce
-> contention
->          * release it prior to updating lo->lo_refcnt.
->          */
+> Reviewed-by: Petr Vorel <pvorel@suse.cz>
 
-OK
+Thank you for reviewing this patch.
 
-> >       err = mutex_lock_killable(&loop_ctl_mutex);
-> >       if (err)
-
-I will send an updated patch soon.
-
-Thank you,
 Pasha
