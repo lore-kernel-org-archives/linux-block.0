@@ -7,33 +7,33 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8685BC43381
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B08EFC4332D
 	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 18:53:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 362BA22B2C
+	by mail.kernel.org (Postfix) with ESMTP id 8B35722B2C
 	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 18:53:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389244AbhAZRON (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Jan 2021 12:14:13 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:11499 "EHLO
+        id S1728900AbhAZROJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Jan 2021 12:14:09 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:11496 "EHLO
         szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389708AbhAZIQm (ORCPT
+        with ESMTP id S2389734AbhAZIQm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Tue, 26 Jan 2021 03:16:42 -0500
 Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.58])
-        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4DPzzX2LN1zjDTT;
+        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4DPzzX1Z0fzjDS4;
         Tue, 26 Jan 2021 16:14:32 +0800 (CST)
 Received: from huawei.com (10.29.88.127) by DGGEMS412-HUB.china.huawei.com
  (10.3.19.212) with Microsoft SMTP Server id 14.3.498.0; Tue, 26 Jan 2021
- 16:15:40 +0800
+ 16:15:41 +0800
 From:   Chao Leng <lengchao@huawei.com>
 To:     <linux-nvme@lists.infradead.org>
 CC:     <kbusch@kernel.org>, <axboe@fb.com>, <hch@lst.de>,
         <sagi@grimberg.me>, <linux-block@vger.kernel.org>,
         <axboe@kernel.dk>
-Subject: [PATCH v4 2/5] nvme-core: introduce complete failed request
-Date:   Tue, 26 Jan 2021 16:15:36 +0800
-Message-ID: <20210126081539.13320-3-lengchao@huawei.com>
+Subject: [PATCH v4 3/5] nvme-fabrics: avoid double request completion for nvmf_fail_nonready_command
+Date:   Tue, 26 Jan 2021 16:15:37 +0800
+Message-ID: <20210126081539.13320-4-lengchao@huawei.com>
 X-Mailer: git-send-email 2.16.4
 In-Reply-To: <20210126081539.13320-1-lengchao@huawei.com>
 References: <20210126081539.13320-1-lengchao@huawei.com>
@@ -45,50 +45,35 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Work with nvme native multipath, if a path related error occurs when
-queue_rq call HBA drive to send request, queue_rq need complete the
-request with NVME_SC_HOST_PATH_ERROR, the request will fail over to
-retry if needed.
-So introduce nvme_complete_failed_req for queue_rq and
-nvmf_fail_nonready_command.
+When reconnect, the request may be completed with NVME_SC_HOST_PATH_ERROR
+in nvmf_fail_nonready_command. The state of request will be changed to
+MQ_RQ_IN_FLIGHT before call nvme_complete_rq. If free the request
+asynchronously such as in nvme_submit_user_cmd, in extreme scenario
+the request may be completed again in tear down process.
+nvmf_fail_nonready_command do not need calling blk_mq_start_request
+before complete the request. nvmf_fail_nonready_command should set
+the state of request to MQ_RQ_COMPLETE before complete the request.
 
 Signed-off-by: Chao Leng <lengchao@huawei.com>
 ---
- drivers/nvme/host/core.c | 8 ++++++++
- drivers/nvme/host/nvme.h | 1 +
- 2 files changed, 9 insertions(+)
+ drivers/nvme/host/fabrics.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 8caf9b34734d..9aad4111d9cd 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -356,6 +356,14 @@ void nvme_complete_rq(struct request *req)
- }
- EXPORT_SYMBOL_GPL(nvme_complete_rq);
+diff --git a/drivers/nvme/host/fabrics.c b/drivers/nvme/host/fabrics.c
+index 72ac00173500..40f40c0debc1 100644
+--- a/drivers/nvme/host/fabrics.c
++++ b/drivers/nvme/host/fabrics.c
+@@ -553,9 +553,7 @@ blk_status_t nvmf_fail_nonready_command(struct nvme_ctrl *ctrl,
+ 	    !blk_noretry_request(rq) && !(rq->cmd_flags & REQ_NVME_MPATH))
+ 		return BLK_STS_RESOURCE;
  
-+void nvme_complete_failed_rq(struct request *req, u16 status)
-+{
-+	nvme_req(req)->status = status;
-+	blk_mq_set_request_complete(req);
-+	nvme_complete_rq(req);
-+}
-+EXPORT_SYMBOL_GPL(nvme_complete_failed_rq);
-+
- bool nvme_cancel_request(struct request *req, void *data, bool reserved)
- {
- 	dev_dbg_ratelimited(((struct nvme_ctrl *) data)->device,
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 88a6b97247f5..f0f609644309 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -575,6 +575,7 @@ static inline bool nvme_is_aen_req(u16 qid, __u16 command_id)
+-	nvme_req(rq)->status = NVME_SC_HOST_PATH_ERROR;
+-	blk_mq_start_request(rq);
+-	nvme_complete_rq(rq);
++	nvme_complete_failed_rq(rq, NVME_SC_HOST_PATH_ERROR);
+ 	return BLK_STS_OK;
  }
- 
- void nvme_complete_rq(struct request *req);
-+void nvme_complete_failed_rq(struct request *req, u16 status);
- bool nvme_cancel_request(struct request *req, void *data, bool reserved);
- bool nvme_change_ctrl_state(struct nvme_ctrl *ctrl,
- 		enum nvme_ctrl_state new_state);
+ EXPORT_SYMBOL_GPL(nvmf_fail_nonready_command);
 -- 
 2.16.4
 
