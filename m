@@ -2,563 +2,298 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A84C9C433DB
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 10:53:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3580C433E0
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 11:57:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 67EE323109
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 10:53:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9A82D2311C
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 11:57:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404523AbhAZKw4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Jan 2021 05:52:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54520 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2404527AbhAZKwt (ORCPT
+        id S2405220AbhAZL4v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Jan 2021 06:56:51 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:55485 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2405221AbhAZL40 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Jan 2021 05:52:49 -0500
-Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A809C0617A7
-        for <linux-block@vger.kernel.org>; Tue, 26 Jan 2021 02:51:26 -0800 (PST)
-Received: by mail-wm1-x336.google.com with SMTP id c128so2320451wme.2
-        for <linux-block@vger.kernel.org>; Tue, 26 Jan 2021 02:51:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=75nba2FFMX/u1RP+BEl5+Iv9hNTPDrpQPQBT7H2LRuU=;
-        b=G0NLYJo/1v7j+1Kc/UjJPklZNzEI25x2nqccIddRZaaTpX8JyryKm5Y2CCHUzBxZNs
-         M71QS/leJFZmFIS35QS3pmu2wl1tISCl4VXvxV1dFI96AqCzIMXi0u2FcZcYGRDFJXN/
-         mEgN7qhUSyPP10Qz9l8Y41sFWSVN11nHdwlRoIJ5Sf/IUFlHKwk/92FpGp2SsPLTxoYw
-         QTqdA4pwprFxx4daQKa+Y/rymLwsgq979Xvnv0rZuhUetBn4tEEPJ9/555XgsVZj4v+1
-         i1mMOPHva/W0n1p7SABoNu2lOpvzcwm43TSHLFaZrGDsHufPsMVOfWAsK+rhSV+fDeeE
-         k9Mg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=75nba2FFMX/u1RP+BEl5+Iv9hNTPDrpQPQBT7H2LRuU=;
-        b=hPYNnms45OZzQOvgVS7CUeacKDxFQjVBOCuTAsmcO50OdxJhkVQELVl/bA+mLmxyE0
-         ARAmvlYosP7UiFlZ4ytsCWbBbI5E4408rbG52otgqCTyePrIvEGwQNZ3pasMmnerT0As
-         iKHne4yBPq9K67oFiJ9kjycBjdcbKVNbAQEi1TtB2jy/FTXFWGXMj8aERE4yTwQvbfQq
-         Lcv61TKzxo1GB7+OV3w65leX+bVUUAXUSeu5YwVY/wbDcYzh2/ix8ui/pALtOgYHMG/o
-         ACMvXoyj9Gi9FdsjgC2y/8IaLDV9EZfPe4LlfeOH5NdWmeT4d3Bh3+C37GrFBLObgnlD
-         3GeA==
-X-Gm-Message-State: AOAM533DCbPRQMYRT5r1fx+FGj2MDHS9h6ZgqD9QcP/3J0j+S/Q5blWC
-        3c/wX7Gcetd2QHnPNQW8xcJNSQ==
-X-Google-Smtp-Source: ABdhPJwTVt/bP7QD4sX0zJAQwtBguyWVN5KO1uLPne+MV6kG7LswoXWS75QT6WgciljHs/LTvm7GRg==
-X-Received: by 2002:a05:600c:27d1:: with SMTP id l17mr4072045wmb.18.1611658284987;
-        Tue, 26 Jan 2021 02:51:24 -0800 (PST)
-Received: from localhost.localdomain ([83.216.184.132])
-        by smtp.gmail.com with ESMTPSA id h18sm7177879wru.65.2021.01.26.02.51.23
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 26 Jan 2021 02:51:24 -0800 (PST)
-From:   Paolo Valente <paolo.valente@linaro.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Jan Kara <jack@suse.cz>
-Subject: [PATCH BUGFIX/IMPROVEMENT 6/6] block, bfq: merge bursts of newly-created queues
-Date:   Tue, 26 Jan 2021 11:51:02 +0100
-Message-Id: <20210126105102.53102-7-paolo.valente@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20210126105102.53102-1-paolo.valente@linaro.org>
-References: <20210126105102.53102-1-paolo.valente@linaro.org>
+        Tue, 26 Jan 2021 06:56:26 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1611662099;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=KsgN+L2zgOz+BGgNbLxDKJ2nVpdxi7VzfvE3jmc9pXQ=;
+        b=hVEZ1WeGnW/WgD7G1szT18ig5cD/7W+6woXbOrPCBhl0nAsleuDh8yvHNVnu1zEpRb7dMy
+        zVv+EDMLA+rtWASsu8u5YD2X2Ui7RevAXEMOSSSQsThmUg5mMxVdOCcuplxnwAo9Od9aeT
+        uN/yobWvjVQWtqG31LwnKjPDBdM3OzI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-88-XFywqEy2NHSXxmw36VoO3w-1; Tue, 26 Jan 2021 06:54:57 -0500
+X-MC-Unique: XFywqEy2NHSXxmw36VoO3w-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DB24215722;
+        Tue, 26 Jan 2021 11:54:54 +0000 (UTC)
+Received: from T590 (ovpn-12-167.pek2.redhat.com [10.72.12.167])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3BDA25D9C2;
+        Tue, 26 Jan 2021 11:54:43 +0000 (UTC)
+Date:   Tue, 26 Jan 2021 19:54:39 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Damien Le Moal <Damien.LeMoal@wdc.com>
+Cc:     Changheun Lee <nanich.lee@samsung.com>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        "asml.silence@gmail.com" <asml.silence@gmail.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "osandov@fb.com" <osandov@fb.com>,
+        "patchwork-bot@kernel.org" <patchwork-bot@kernel.org>,
+        "tj@kernel.org" <tj@kernel.org>,
+        "tom.leiming@gmail.com" <tom.leiming@gmail.com>,
+        "jisoo2146.oh@samsung.com" <jisoo2146.oh@samsung.com>,
+        "junho89.kim@samsung.com" <junho89.kim@samsung.com>,
+        "mj0123.lee@samsung.com" <mj0123.lee@samsung.com>,
+        "seunghwan.hyun@samsung.com" <seunghwan.hyun@samsung.com>,
+        "sookwan7.kim@samsung.com" <sookwan7.kim@samsung.com>,
+        "woosung2.lee@samsung.com" <woosung2.lee@samsung.com>,
+        "yt0928.kim@samsung.com" <yt0928.kim@samsung.com>
+Subject: Re: [PATCH v3 1/2] bio: limit bio max size
+Message-ID: <20210126115439.GA1116639@T590>
+References: <CGME20210126014805epcas1p2c4fc40f01c9c89b0a94ff6cac5408347@epcas1p2.samsung.com>
+ <20210126013235.28711-1-nanich.lee@samsung.com>
+ <20210126035748.GA1071341@T590>
+ <BL0PR04MB65143B60B6062996764423C3E7BC9@BL0PR04MB6514.namprd04.prod.outlook.com>
+ <20210126060724.GA1086419@T590>
+ <BL0PR04MB65144B93443C4F8EF9C48024E7BC9@BL0PR04MB6514.namprd04.prod.outlook.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BL0PR04MB65144B93443C4F8EF9C48024E7BC9@BL0PR04MB6514.namprd04.prod.outlook.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Many throughput-sensitive workloads are made of several parallel I/O
-flows, with all flows generated by the same application, or more
-generically by the same task (e.g., system boot). The most
-counterproductive action with these workloads is plugging I/O dispatch
-when one of the bfq_queues associated with these flows remains
-temporarily empty.
+On Tue, Jan 26, 2021 at 06:26:02AM +0000, Damien Le Moal wrote:
+> On 2021/01/26 15:07, Ming Lei wrote:
+> > On Tue, Jan 26, 2021 at 04:06:06AM +0000, Damien Le Moal wrote:
+> >> On 2021/01/26 12:58, Ming Lei wrote:
+> >>> On Tue, Jan 26, 2021 at 10:32:34AM +0900, Changheun Lee wrote:
+> >>>> bio size can grow up to 4GB when muli-page bvec is enabled.
+> >>>> but sometimes it would lead to inefficient behaviors.
+> >>>> in case of large chunk direct I/O, - 32MB chunk read in user space -
+> >>>> all pages for 32MB would be merged to a bio structure if the pages
+> >>>> physical addresses are contiguous. it makes some delay to submit
+> >>>> until merge complete. bio max size should be limited to a proper size.
+> >>>>
+> >>>> When 32MB chunk read with direct I/O option is coming from userspace,
+> >>>> kernel behavior is below now. it's timeline.
+> >>>>
+> >>>>  | bio merge for 32MB. total 8,192 pages are merged.
+> >>>>  | total elapsed time is over 2ms.
+> >>>>  |------------------ ... ----------------------->|
+> >>>>                                                  | 8,192 pages merged a bio.
+> >>>>                                                  | at this time, first bio submit is done.
+> >>>>                                                  | 1 bio is split to 32 read request and issue.
+> >>>>                                                  |--------------->
+> >>>>                                                   |--------------->
+> >>>>                                                    |--------------->
+> >>>>                                                               ......
+> >>>>                                                                    |--------------->
+> >>>>                                                                     |--------------->|
+> >>>>                           total 19ms elapsed to complete 32MB read done from device. |
+> >>>>
+> >>>> If bio max size is limited with 1MB, behavior is changed below.
+> >>>>
+> >>>>  | bio merge for 1MB. 256 pages are merged for each bio.
+> >>>>  | total 32 bio will be made.
+> >>>>  | total elapsed time is over 2ms. it's same.
+> >>>>  | but, first bio submit timing is fast. about 100us.
+> >>>>  |--->|--->|--->|---> ... -->|--->|--->|--->|--->|
+> >>>>       | 256 pages merged a bio.
+> >>>>       | at this time, first bio submit is done.
+> >>>>       | and 1 read request is issued for 1 bio.
+> >>>>       |--------------->
+> >>>>            |--------------->
+> >>>>                 |--------------->
+> >>>>                                       ......
+> >>>>                                                  |--------------->
+> >>>>                                                   |--------------->|
+> >>>>         total 17ms elapsed to complete 32MB read done from device. |
+> >>>>
+> >>>> As a result, read request issue timing is faster if bio max size is limited.
+> >>>> Current kernel behavior with multipage bvec, super large bio can be created.
+> >>>> And it lead to delay first I/O request issue.
+> >>>>
+> >>>> Signed-off-by: Changheun Lee <nanich.lee@samsung.com>
+> >>>> ---
+> >>>>  block/bio.c            | 17 ++++++++++++++++-
+> >>>>  include/linux/bio.h    |  4 +++-
+> >>>>  include/linux/blkdev.h |  3 +++
+> >>>>  3 files changed, 22 insertions(+), 2 deletions(-)
+> >>>>
+> >>>> diff --git a/block/bio.c b/block/bio.c
+> >>>> index 1f2cc1fbe283..ec0281889045 100644
+> >>>> --- a/block/bio.c
+> >>>> +++ b/block/bio.c
+> >>>> @@ -287,6 +287,21 @@ void bio_init(struct bio *bio, struct bio_vec *table,
+> >>>>  }
+> >>>>  EXPORT_SYMBOL(bio_init);
+> >>>>  
+> >>>> +unsigned int bio_max_size(struct bio *bio)
+> >>>> +{
+> >>>> +	struct request_queue *q;
+> >>>> +
+> >>>> +	if (!bio->bi_disk)
+> >>>> +		return UINT_MAX;
+> >>>> +
+> >>>> +	q = bio->bi_disk->queue;
+> >>>> +	if (!blk_queue_limit_bio_size(q))
+> >>>> +		return UINT_MAX;
+> >>>> +
+> >>>> +	return blk_queue_get_max_sectors(q, bio_op(bio)) << SECTOR_SHIFT;
+> >>>> +}
+> >>>> +EXPORT_SYMBOL(bio_max_size);
+> >>>> +
+> >>>>  /**
+> >>>>   * bio_reset - reinitialize a bio
+> >>>>   * @bio:	bio to reset
+> >>>> @@ -877,7 +892,7 @@ bool __bio_try_merge_page(struct bio *bio, struct page *page,
+> >>>>  		struct bio_vec *bv = &bio->bi_io_vec[bio->bi_vcnt - 1];
+> >>>>  
+> >>>>  		if (page_is_mergeable(bv, page, len, off, same_page)) {
+> >>>> -			if (bio->bi_iter.bi_size > UINT_MAX - len) {
+> >>>> +			if (bio->bi_iter.bi_size > bio_max_size(bio) - len) {
+> >>>>  				*same_page = false;
+> >>>>  				return false;
+> >>>>  			}
+> >>>
+> >>> So far we don't need bio->bi_disk or bio->bi_bdev(will be changed in
+> >>> Christoph's patch) during adding page to bio, so there is null ptr
+> >>> refereance risk.
+> >>>
+> >>>> diff --git a/include/linux/bio.h b/include/linux/bio.h
+> >>>> index 1edda614f7ce..cdb134ca7bf5 100644
+> >>>> --- a/include/linux/bio.h
+> >>>> +++ b/include/linux/bio.h
+> >>>> @@ -100,6 +100,8 @@ static inline void *bio_data(struct bio *bio)
+> >>>>  	return NULL;
+> >>>>  }
+> >>>>  
+> >>>> +extern unsigned int bio_max_size(struct bio *);
+> >>>> +
+> >>>>  /**
+> >>>>   * bio_full - check if the bio is full
+> >>>>   * @bio:	bio to check
+> >>>> @@ -113,7 +115,7 @@ static inline bool bio_full(struct bio *bio, unsigned len)
+> >>>>  	if (bio->bi_vcnt >= bio->bi_max_vecs)
+> >>>>  		return true;
+> >>>>  
+> >>>> -	if (bio->bi_iter.bi_size > UINT_MAX - len)
+> >>>> +	if (bio->bi_iter.bi_size > bio_max_size(bio) - len)
+> >>>>  		return true;
+> >>>>  
+> >>>>  	return false;
+> >>>> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> >>>> index f94ee3089e01..3aeab9e7e97b 100644
+> >>>> --- a/include/linux/blkdev.h
+> >>>> +++ b/include/linux/blkdev.h
+> >>>> @@ -621,6 +621,7 @@ struct request_queue {
+> >>>>  #define QUEUE_FLAG_RQ_ALLOC_TIME 27	/* record rq->alloc_time_ns */
+> >>>>  #define QUEUE_FLAG_HCTX_ACTIVE	28	/* at least one blk-mq hctx is active */
+> >>>>  #define QUEUE_FLAG_NOWAIT       29	/* device supports NOWAIT */
+> >>>> +#define QUEUE_FLAG_LIMIT_BIO_SIZE 30	/* limit bio size */
+> >>>>  
+> >>>>  #define QUEUE_FLAG_MQ_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
+> >>>>  				 (1 << QUEUE_FLAG_SAME_COMP) |		\
+> >>>> @@ -667,6 +668,8 @@ bool blk_queue_flag_test_and_set(unsigned int flag, struct request_queue *q);
+> >>>>  #define blk_queue_fua(q)	test_bit(QUEUE_FLAG_FUA, &(q)->queue_flags)
+> >>>>  #define blk_queue_registered(q)	test_bit(QUEUE_FLAG_REGISTERED, &(q)->queue_flags)
+> >>>>  #define blk_queue_nowait(q)	test_bit(QUEUE_FLAG_NOWAIT, &(q)->queue_flags)
+> >>>> +#define blk_queue_limit_bio_size(q)	\
+> >>>> +	test_bit(QUEUE_FLAG_LIMIT_BIO_SIZE, &(q)->queue_flags)
+> >>>
+> >>> I don't think it is a good idea by adding queue flag for this purpose,
+> >>> since this case just needs to limit bio size for not delay bio submission
+> >>> too much, which is kind of logical thing, nothing to do with request queue.
+> >>>
+> >>> Just wondering why you don't take the following way:
+> >>>
+> >>>
+> >>> diff --git a/block/bio.c b/block/bio.c
+> >>> index 99040a7e6656..35852f7f47d4 100644
+> >>> --- a/block/bio.c
+> >>> +++ b/block/bio.c
+> >>> @@ -1081,7 +1081,7 @@ static int __bio_iov_append_get_pages(struct bio *bio, struct iov_iter *iter)
+> >>>   * It's intended for direct IO, so doesn't do PSI tracking, the caller is
+> >>>   * responsible for setting BIO_WORKINGSET if necessary.
+> >>>   */
+> >>> -int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+> >>> +int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter, bool sync)
+> >>>  {
+> >>>  	int ret = 0;
+> >>>  
+> >>> @@ -1092,12 +1092,20 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+> >>>  		bio_set_flag(bio, BIO_NO_PAGE_REF);
+> >>>  		return 0;
+> >>>  	} else {
+> >>> +		/*
+> >>> +		 * Don't add too many pages in case of sync dio for
+> >>> +		 * avoiding delay bio submission too much especially
+> >>> +		 * pinning user pages in memory isn't cheap.
+> >>> +		 */
+> >>> +		const unsigned int max_size = sync ? (1U << 12) : UINT_MAX;
+> >>
+> >> 4KB max bio size ? That is a little small :)
+> > 
+> > It should have been (1U << 20), :-(
+> 
+> Sounds better !
+> 
+> > 
+> >> In any case, I am not a fan of using an arbitrary value not related to the
+> >> actual device characteristics. Wouldn't it be better to us the device
+> >> max_sectors limit ? And that limit would need to be zone_append_max_sectors for
+> >> zone append writes. So some helper like Changheun bio_max_size() may be useful.
+> > 
+> > Firstly, bio->bi_disk may not be initialized when adding page to bio; secondly this
+> > limit isn't really related with device, is it? Also if it is one queue limit, it has
+> > to be stacked.
+> 
+> 1MB can be used as a fallback default if the gendisk is not yet set. If it is,
 
-To avoid this plugging, BFQ has been using a burst-handling mechanism
-for years now. This mechanism has proven effective for throughput, and
-not detrimental for service guarantees. This commit pushes this
-mechanism a little bit further, basing on the following two facts.
+IMO, only sync dio on slow machine needs such limit because pinning userspace
+pages to memory may take a bit long, so far not see other workloads needs this limit.
 
-First, all the I/O flows of a the same application or task contribute
-to the execution/completion of that common application or task. So the
-performance figures that matter are total throughput of the flows and
-task-wide I/O latency.  In particular, these flows do not need to be
-protected from each other, in terms of individual bandwidth or
-latency.
+Even today I get queries from client about why 4MB user space IO won't be converted to
+4MB bio, some workload needs big size IO.
 
-Second, the above fact holds regardless of the number of flows.
+> using a queue limit that does not cause bio splitting after submit makes most
+> sense as that avoid useless overhead. I agree, it is not critical, but it would
+> be nice to have some number that causes less splitting than the arbitrary 1MB.
 
-Putting these two facts together, this commits merges stably the
-bfq_queues associated with these I/O flows, i.e., with the processes
-that generate these IO/ flows, regardless of how many the involved
-processes are.
+That is another story. Each fs bio needs two allocation(one fixed length
+bio allocation, and variable length of bvec table), however bio splitting just
+needs single fixed length bio allocation. So if the source bio(fs bio) for holding
+data becomes smaller, splitting may become less, but more fs bio and bvec table
+allocation may be involved, not sure this way always gets better performance.
 
-To decide whether a set of bfq_queues is actually associated with the
-I/O flows of a common application or task, and to merge these queues
-stably, this commit operates as follows: given a bfq_queue, say Q2,
-currently being created, and the last bfq_queue, say Q1, created
-before Q2, Q2 is merged stably with Q1 if
-- very little time has elapsed since when Q1 was created
-- Q2 has the same ioprio as Q1
-- Q2 belongs to the same group as Q1
+Also in theory, bio splitting may not need to allocate one whole bio
+allocation, what matters is just the actual position/size info of the
+to-be-splitted bio.
 
-Merging bfq_queues also reduces scheduling overhead. A fio test with
-ten random readers on /dev/nullb shows a throughput boost of 40%, with
-a quadcore. Since BFQ's execution time amounts to ~50% of the total
-per-request processing time, the above throughput boost implies that
-BFQ's overhead is reduced by more than 50%.
+> E,g, most HDDs will likely have that 1MB BIO split... And max_sectors is a
+> stacked queue limit, no ? We could use max_hw_sectors too I think.
 
-Tested-by: Jan Kara <jack@suse.cz>
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
----
- block/bfq-cgroup.c  |   2 +
- block/bfq-iosched.c | 249 ++++++++++++++++++++++++++++++++++++++++++--
- block/bfq-iosched.h |  15 +++
- 3 files changed, 256 insertions(+), 10 deletions(-)
+bio_add_page() is really fast path, and checking queue limit here may
+hurt performance because queue_limits reference is added to the fast path.
 
-diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-index b791e2041e49..e2f14508f2d6 100644
---- a/block/bfq-cgroup.c
-+++ b/block/bfq-cgroup.c
-@@ -547,6 +547,8 @@ static void bfq_pd_init(struct blkg_policy_data *pd)
- 
- 	entity->orig_weight = entity->weight = entity->new_weight = d->weight;
- 	entity->my_sched_data = &bfqg->sched_data;
-+	entity->last_bfqq_created = NULL;
-+
- 	bfqg->my_entity = entity; /*
- 				   * the root_group's will be set to NULL
- 				   * in bfq_init_queue()
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 23d0dd7bd90f..f4e23e0ced74 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -1073,7 +1073,7 @@ bfq_bfqq_resume_state(struct bfq_queue *bfqq, struct bfq_data *bfqd,
- static int bfqq_process_refs(struct bfq_queue *bfqq)
- {
- 	return bfqq->ref - bfqq->allocated - bfqq->entity.on_st_or_in_serv -
--		(bfqq->weight_counter != NULL);
-+		(bfqq->weight_counter != NULL) - bfqq->stable_ref;
- }
- 
- /* Empty burst list and add just bfqq (see comments on bfq_handle_burst) */
-@@ -2625,6 +2625,11 @@ static bool bfq_may_be_close_cooperator(struct bfq_queue *bfqq,
- 	return true;
- }
- 
-+static bool idling_boosts_thr_without_issues(struct bfq_data *bfqd,
-+					     struct bfq_queue *bfqq);
-+
-+static void bfq_put_stable_ref(struct bfq_queue *bfqq);
-+
- /*
-  * Attempt to schedule a merge of bfqq with the currently in-service
-  * queue or with a close queue among the scheduled queues.  Return
-@@ -2647,10 +2652,49 @@ static bool bfq_may_be_close_cooperator(struct bfq_queue *bfqq,
-  */
- static struct bfq_queue *
- bfq_setup_cooperator(struct bfq_data *bfqd, struct bfq_queue *bfqq,
--		     void *io_struct, bool request)
-+		     void *io_struct, bool request, struct bfq_io_cq *bic)
- {
- 	struct bfq_queue *in_service_bfqq, *new_bfqq;
- 
-+	/*
-+	 * Check delayed stable merge for rotational or non-queueing
-+	 * devs. For this branch to be executed, bfqq must not be
-+	 * currently merged with some other queue (i.e., bfqq->bic
-+	 * must be non null). If we considered also merged queues,
-+	 * then we should also check whether bfqq has already been
-+	 * merged with bic->stable_merge_bfqq. But this would be
-+	 * costly and complicated.
-+	 */
-+	if (unlikely(!bfqd->nonrot_with_queueing)) {
-+		if (bic->stable_merge_bfqq &&
-+		    !bfq_bfqq_just_created(bfqq) &&
-+		    time_is_after_jiffies(bfqq->split_time +
-+					  msecs_to_jiffies(200))) {
-+			struct bfq_queue *stable_merge_bfqq =
-+				bic->stable_merge_bfqq;
-+			int proc_ref = min(bfqq_process_refs(bfqq),
-+					   bfqq_process_refs(stable_merge_bfqq));
-+
-+			/* deschedule stable merge, because done or aborted here */
-+			bfq_put_stable_ref(stable_merge_bfqq);
-+
-+			bic->stable_merge_bfqq = NULL;
-+
-+			if (!idling_boosts_thr_without_issues(bfqd, bfqq) &&
-+			    proc_ref > 0) {
-+				/* next function will take at least one ref */
-+				struct bfq_queue *new_bfqq =
-+					bfq_setup_merge(bfqq, stable_merge_bfqq);
-+
-+				bic->stably_merged = true;
-+				if (new_bfqq && new_bfqq->bic)
-+					new_bfqq->bic->stably_merged = true;
-+				return new_bfqq;
-+			} else
-+				return NULL;
-+		}
-+	}
-+
- 	/*
- 	 * Do not perform queue merging if the device is non
- 	 * rotational and performs internal queueing. In fact, such a
-@@ -2809,6 +2853,12 @@ void bfq_release_process_ref(struct bfq_data *bfqd, struct bfq_queue *bfqq)
- 	    bfqq != bfqd->in_service_queue)
- 		bfq_del_bfqq_busy(bfqd, bfqq, false);
- 
-+	if (bfqq->entity.parent &&
-+	    bfqq->entity.parent->last_bfqq_created == bfqq)
-+		bfqq->entity.parent->last_bfqq_created = NULL;
-+	else if (bfqq->bfqd && bfqq->bfqd->last_bfqq_created == bfqq)
-+		bfqq->bfqd->last_bfqq_created = NULL;
-+
- 	bfq_put_queue(bfqq);
- }
- 
-@@ -2905,6 +2955,13 @@ bfq_merge_bfqqs(struct bfq_data *bfqd, struct bfq_io_cq *bic,
- 	 */
- 	new_bfqq->pid = -1;
- 	bfqq->bic = NULL;
-+
-+	if (bfqq->entity.parent &&
-+	    bfqq->entity.parent->last_bfqq_created == bfqq)
-+		bfqq->entity.parent->last_bfqq_created = new_bfqq;
-+	else if (bfqq->bfqd && bfqq->bfqd->last_bfqq_created == bfqq)
-+		bfqq->bfqd->last_bfqq_created = new_bfqq;
-+
- 	bfq_release_process_ref(bfqd, bfqq);
- }
- 
-@@ -2932,7 +2989,7 @@ static bool bfq_allow_bio_merge(struct request_queue *q, struct request *rq,
- 	 * We take advantage of this function to perform an early merge
- 	 * of the queues of possible cooperating processes.
- 	 */
--	new_bfqq = bfq_setup_cooperator(bfqd, bfqq, bio, false);
-+	new_bfqq = bfq_setup_cooperator(bfqd, bfqq, bio, false, bfqd->bio_bic);
- 	if (new_bfqq) {
- 		/*
- 		 * bic still points to bfqq, then it has not yet been
-@@ -5033,6 +5090,12 @@ void bfq_put_queue(struct bfq_queue *bfqq)
- 	bfqg_and_blkg_put(bfqg);
- }
- 
-+static void bfq_put_stable_ref(struct bfq_queue *bfqq)
-+{
-+	bfqq->stable_ref--;
-+	bfq_put_queue(bfqq);
-+}
-+
- static void bfq_put_cooperator(struct bfq_queue *bfqq)
- {
- 	struct bfq_queue *__bfqq, *next;
-@@ -5089,6 +5152,17 @@ static void bfq_exit_icq(struct io_cq *icq)
- {
- 	struct bfq_io_cq *bic = icq_to_bic(icq);
- 
-+	if (bic->stable_merge_bfqq) {
-+		unsigned long flags;
-+		struct bfq_data *bfqd = bic->stable_merge_bfqq->bfqd;
-+
-+		if (bfqd)
-+			spin_lock_irqsave(&bfqd->lock, flags);
-+		bfq_put_stable_ref(bic->stable_merge_bfqq);
-+		if (bfqd)
-+			spin_unlock_irqrestore(&bfqd->lock, flags);
-+	}
-+
- 	bfq_exit_icq_bfqq(bic, true);
- 	bfq_exit_icq_bfqq(bic, false);
- }
-@@ -5149,7 +5223,8 @@ bfq_set_next_ioprio_data(struct bfq_queue *bfqq, struct bfq_io_cq *bic)
- 
- static struct bfq_queue *bfq_get_queue(struct bfq_data *bfqd,
- 				       struct bio *bio, bool is_sync,
--				       struct bfq_io_cq *bic);
-+				       struct bfq_io_cq *bic,
-+				       bool respawn);
- 
- static void bfq_check_ioprio_change(struct bfq_io_cq *bic, struct bio *bio)
- {
-@@ -5169,7 +5244,7 @@ static void bfq_check_ioprio_change(struct bfq_io_cq *bic, struct bio *bio)
- 	bfqq = bic_to_bfqq(bic, false);
- 	if (bfqq) {
- 		bfq_release_process_ref(bfqd, bfqq);
--		bfqq = bfq_get_queue(bfqd, bio, BLK_RW_ASYNC, bic);
-+		bfqq = bfq_get_queue(bfqd, bio, BLK_RW_ASYNC, bic, true);
- 		bic_set_bfqq(bic, bfqq, false);
- 	}
- 
-@@ -5212,6 +5287,8 @@ static void bfq_init_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- 	/* set end request to minus infinity from now */
- 	bfqq->ttime.last_end_request = now_ns + 1;
- 
-+	bfqq->creation_time = jiffies;
-+
- 	bfqq->io_start_time = now_ns;
- 
- 	bfq_mark_bfqq_IO_bound(bfqq);
-@@ -5261,9 +5338,156 @@ static struct bfq_queue **bfq_async_queue_prio(struct bfq_data *bfqd,
- 	}
- }
- 
-+struct bfq_queue *
-+bfq_do_early_stable_merge(struct bfq_data *bfqd, struct bfq_queue *bfqq,
-+			  struct bfq_io_cq *bic,
-+			  struct bfq_queue *last_bfqq_created)
-+{
-+	struct bfq_queue *new_bfqq =
-+		bfq_setup_merge(bfqq, last_bfqq_created);
-+
-+	if (!new_bfqq)
-+		return bfqq;
-+
-+	if (new_bfqq->bic)
-+		new_bfqq->bic->stably_merged = true;
-+	bic->stably_merged = true;
-+
-+	/*
-+	 * Reusing merge functions. This implies that
-+	 * bfqq->bic must be set too, for
-+	 * bfq_merge_bfqqs to correctly save bfqq's
-+	 * state before killing it.
-+	 */
-+	bfqq->bic = bic;
-+	bfq_merge_bfqqs(bfqd, bic, bfqq, new_bfqq);
-+
-+	return new_bfqq;
-+}
-+
-+/*
-+ * Many throughput-sensitive workloads are made of several parallel
-+ * I/O flows, with all flows generated by the same application, or
-+ * more generically by the same task (e.g., system boot). The most
-+ * counterproductive action with these workloads is plugging I/O
-+ * dispatch when one of the bfq_queues associated with these flows
-+ * remains temporarily empty.
-+ *
-+ * To avoid this plugging, BFQ has been using a burst-handling
-+ * mechanism for years now. This mechanism has proven effective for
-+ * throughput, and not detrimental for service guarantees. The
-+ * following function pushes this mechanism a little bit further,
-+ * basing on the following two facts.
-+ *
-+ * First, all the I/O flows of a the same application or task
-+ * contribute to the execution/completion of that common application
-+ * or task. So the performance figures that matter are total
-+ * throughput of the flows and task-wide I/O latency.  In particular,
-+ * these flows do not need to be protected from each other, in terms
-+ * of individual bandwidth or latency.
-+ *
-+ * Second, the above fact holds regardless of the number of flows.
-+ *
-+ * Putting these two facts together, this commits merges stably the
-+ * bfq_queues associated with these I/O flows, i.e., with the
-+ * processes that generate these IO/ flows, regardless of how many the
-+ * involved processes are.
-+ *
-+ * To decide whether a set of bfq_queues is actually associated with
-+ * the I/O flows of a common application or task, and to merge these
-+ * queues stably, this function operates as follows: given a bfq_queue,
-+ * say Q2, currently being created, and the last bfq_queue, say Q1,
-+ * created before Q2, Q2 is merged stably with Q1 if
-+ * - very little time has elapsed since when Q1 was created
-+ * - Q2 has the same ioprio as Q1
-+ * - Q2 belongs to the same group as Q1
-+ *
-+ * Merging bfq_queues also reduces scheduling overhead. A fio test
-+ * with ten random readers on /dev/nullb shows a throughput boost of
-+ * 40%, with a quadcore. Since BFQ's execution time amounts to ~50% of
-+ * the total per-request processing time, the above throughput boost
-+ * implies that BFQ's overhead is reduced by more than 50%.
-+ *
-+ * This new mechanism most certainly obsoletes the current
-+ * burst-handling heuristics. We keep those heuristics for the moment.
-+ */
-+static struct bfq_queue *bfq_do_or_sched_stable_merge(struct bfq_data *bfqd,
-+						      struct bfq_queue *bfqq,
-+						      struct bfq_io_cq *bic)
-+{
-+	struct bfq_queue **source_bfqq = bfqq->entity.parent ?
-+		&bfqq->entity.parent->last_bfqq_created :
-+		&bfqd->last_bfqq_created;
-+
-+	struct bfq_queue *last_bfqq_created = *source_bfqq;
-+
-+	/*
-+	 * If last_bfqq_created has not been set yet, then init it. If
-+	 * it has been set already, but too long ago, then move it
-+	 * forward to bfqq. Finally, move also if bfqq belongs to a
-+	 * different group than last_bfqq_created, or if bfqq has a
-+	 * different ioprio or ioprio_class. If none of these
-+	 * conditions holds true, then try an early stable merge or
-+	 * schedule a delayed stable merge.
-+	 *
-+	 * A delayed merge is scheduled (instead of performing an
-+	 * early merge), in case bfqq might soon prove to be more
-+	 * throughput-beneficial if not merged. Currently this is
-+	 * possible only if bfqd is rotational with no queueing. For
-+	 * such a drive, not merging bfqq is better for throughput if
-+	 * bfqq happens to contain sequential I/O. So, we wait a
-+	 * little bit for enough I/O to flow through bfqq. After that,
-+	 * if such an I/O is sequential, then the merge is
-+	 * canceled. Otherwise the merge is finally performed.
-+	 */
-+	if (!last_bfqq_created ||
-+	    time_before(last_bfqq_created->creation_time +
-+			bfqd->bfq_burst_interval,
-+			bfqq->creation_time) ||
-+		bfqq->entity.parent != last_bfqq_created->entity.parent ||
-+		bfqq->ioprio != last_bfqq_created->ioprio ||
-+		bfqq->ioprio_class != last_bfqq_created->ioprio_class)
-+		*source_bfqq = bfqq;
-+	else if (time_after_eq(last_bfqq_created->creation_time +
-+				 bfqd->bfq_burst_interval,
-+				 bfqq->creation_time)) {
-+		if (likely(bfqd->nonrot_with_queueing))
-+			/*
-+			 * With this type of drive, leaving
-+			 * bfqq alone may provide no
-+			 * throughput benefits compared with
-+			 * merging bfqq. So merge bfqq now.
-+			 */
-+			bfqq = bfq_do_early_stable_merge(bfqd, bfqq,
-+							 bic,
-+							 last_bfqq_created);
-+		else { /* schedule tentative stable merge */
-+			/*
-+			 * get reference on last_bfqq_created,
-+			 * to prevent it from being freed,
-+			 * until we decide whether to merge
-+			 */
-+			last_bfqq_created->ref++;
-+			/*
-+			 * need to keep track of stable refs, to
-+			 * compute process refs correctly
-+			 */
-+			last_bfqq_created->stable_ref++;
-+			/*
-+			 * Record the bfqq to merge to.
-+			 */
-+			bic->stable_merge_bfqq = last_bfqq_created;
-+		}
-+	}
-+
-+	return bfqq;
-+}
-+
-+
- static struct bfq_queue *bfq_get_queue(struct bfq_data *bfqd,
- 				       struct bio *bio, bool is_sync,
--				       struct bfq_io_cq *bic)
-+				       struct bfq_io_cq *bic,
-+				       bool respawn)
- {
- 	const int ioprio = IOPRIO_PRIO_DATA(bic->ioprio);
- 	const int ioprio_class = IOPRIO_PRIO_CLASS(bic->ioprio);
-@@ -5321,7 +5545,10 @@ static struct bfq_queue *bfq_get_queue(struct bfq_data *bfqd,
- 
- out:
- 	bfqq->ref++; /* get a process reference to this queue */
--	bfq_log_bfqq(bfqd, bfqq, "get_queue, at end: %p, %d", bfqq, bfqq->ref);
-+
-+	if (bfqq != &bfqd->oom_bfqq && is_sync && !respawn)
-+		bfqq = bfq_do_or_sched_stable_merge(bfqd, bfqq, bic);
-+
- 	rcu_read_unlock();
- 	return bfqq;
- }
-@@ -5563,7 +5790,8 @@ static void bfq_rq_enqueued(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- static bool __bfq_insert_request(struct bfq_data *bfqd, struct request *rq)
- {
- 	struct bfq_queue *bfqq = RQ_BFQQ(rq),
--		*new_bfqq = bfq_setup_cooperator(bfqd, bfqq, rq, true);
-+		*new_bfqq = bfq_setup_cooperator(bfqd, bfqq, rq, true,
-+						 RQ_BIC(rq));
- 	bool waiting, idle_timer_disabled = false;
- 
- 	if (new_bfqq) {
-@@ -6193,7 +6421,7 @@ static struct bfq_queue *bfq_get_bfqq_handle_split(struct bfq_data *bfqd,
- 
- 	if (bfqq)
- 		bfq_put_queue(bfqq);
--	bfqq = bfq_get_queue(bfqd, bio, is_sync, bic);
-+	bfqq = bfq_get_queue(bfqd, bio, is_sync, bic, split);
- 
- 	bic_set_bfqq(bic, bfqq, is_sync);
- 	if (split && is_sync) {
-@@ -6314,7 +6542,8 @@ static struct bfq_queue *bfq_init_rq(struct request *rq)
- 
- 	if (likely(!new_queue)) {
- 		/* If the queue was seeky for too long, break it apart. */
--		if (bfq_bfqq_coop(bfqq) && bfq_bfqq_split_coop(bfqq)) {
-+		if (bfq_bfqq_coop(bfqq) && bfq_bfqq_split_coop(bfqq) &&
-+			!bic->stably_merged) {
- 			struct bfq_queue *old_bfqq = bfqq;
- 
- 			/* Update bic before losing reference to bfqq */
-diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-index b8e793c34ff1..99c2a3cb081e 100644
---- a/block/bfq-iosched.h
-+++ b/block/bfq-iosched.h
-@@ -197,6 +197,9 @@ struct bfq_entity {
- 
- 	/* flag, set if the entity is counted in groups_with_pending_reqs */
- 	bool in_groups_with_pending_reqs;
-+
-+	/* last child queue of entity created (for non-leaf entities) */
-+	struct bfq_queue *last_bfqq_created;
- };
- 
- struct bfq_group;
-@@ -230,6 +233,8 @@ struct bfq_ttime {
- struct bfq_queue {
- 	/* reference counter */
- 	int ref;
-+	/* counter of references from other queues for delayed stable merge */
-+	int stable_ref;
- 	/* parent bfq_data */
- 	struct bfq_data *bfqd;
- 
-@@ -365,6 +370,8 @@ struct bfq_queue {
- 
- 	unsigned long first_IO_time; /* time of first I/O for this queue */
- 
-+	unsigned long creation_time; /* when this queue is created */
-+
- 	/* max service rate measured so far */
- 	u32 max_service_rate;
- 
-@@ -454,6 +461,11 @@ struct bfq_io_cq {
- 	u64 saved_last_serv_time_ns;
- 	unsigned int saved_inject_limit;
- 	unsigned long saved_decrease_time_jif;
-+
-+	/* candidate queue for a stable merge (due to close creation time) */
-+	struct bfq_queue *stable_merge_bfqq;
-+
-+	bool stably_merged;	/* non splittable if true */
- };
- 
- /**
-@@ -578,6 +590,9 @@ struct bfq_data {
- 	/* bfqq owning the last completed rq */
- 	struct bfq_queue *last_completed_rq_bfqq;
- 
-+	/* last bfqq created, among those in the root group */
-+	struct bfq_queue *last_bfqq_created;
-+
- 	/* time of last transition from empty to non-empty (ns) */
- 	u64 last_empty_occupied_ns;
- 
--- 
-2.20.1
+
+
+Thanks,
+Ming
 
