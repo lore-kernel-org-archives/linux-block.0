@@ -2,64 +2,97 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-9.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BACCAC43381
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 17:17:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD8FDC433E6
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 18:52:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8EA45230FE
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 17:17:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 73BB122B37
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 18:52:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389518AbhAZRO4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Jan 2021 12:14:56 -0500
-Received: from mx2.suse.de ([195.135.220.15]:35800 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2390989AbhAZJZB (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Jan 2021 04:25:01 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 6E458AC4F;
-        Tue, 26 Jan 2021 09:24:19 +0000 (UTC)
-Date:   Tue, 26 Jan 2021 10:24:16 +0100
-From:   Petr Vorel <pvorel@suse.cz>
-To:     Pavel Tatashin <pasha.tatashin@soleen.com>
-Cc:     tyhicks@linux.microsoft.com, axboe@kernel.dk,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        sashal@kernel.org, jmorris@namei.org, lukas.bulwahn@gmail.com,
-        hch@lst.de, ming.lei@redhat.com, mzxreary@0pointer.de,
-        mcgrof@kernel.org, zhengbin13@huawei.com, maco@android.com,
-        colin.king@canonical.com, evgreen@chromium.org
-Subject: Re: [PATCH v3 1/1] loop: scale loop device by introducing per device
- lock
-Message-ID: <YA/fwFU+Wg6+jr85@pevik>
-Reply-To: Petr Vorel <pvorel@suse.cz>
-References: <20210125201156.1330164-1-pasha.tatashin@soleen.com>
- <20210125201156.1330164-2-pasha.tatashin@soleen.com>
+        id S2389487AbhAZROx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Jan 2021 12:14:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57328 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390620AbhAZIyl (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 26 Jan 2021 03:54:41 -0500
+Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BC9BC061573;
+        Tue, 26 Jan 2021 00:54:01 -0800 (PST)
+Received: by mail-lf1-x131.google.com with SMTP id i187so11449373lfd.4;
+        Tue, 26 Jan 2021 00:54:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:organization:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Sb/6toZ1LycHVLxZfHlszRFpvafXWffrLwLHIch7P58=;
+        b=MEClQLDAcozrJgdfIdWWmjK9kiQ5t2+ZV7bfGHZMo7IGBB3WwBixH2DCKVGJgHWuuL
+         fYTv7tv09gzoA7uiLzCm1kzGsUkxZST+tm80Bf1LaV5n9zEHJg/CaT6Z7Nu/zPjMcHZw
+         CW4ujC3OKvJ/ml1S7bQ/SFdgQZEDnC8zWQjEGWz4lSyCngMYc4p675/rFE5FKJrvhTS3
+         K6JIt8EyhpAzDrY8ZR5UzBIBZR4nYZLfO/yI44VJqztcgbULO/3EtN56uCL5lCAdR78e
+         xPmc5+lrTedpwqgn4W7z5wt4CdI1I/fdlb7iTw2vk/HmDMlESuQC3/v9k2/yNJbh2O8q
+         ir/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:organization
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=Sb/6toZ1LycHVLxZfHlszRFpvafXWffrLwLHIch7P58=;
+        b=V1icFHZD1AJgkzYCpTmADU6p0/z3MQMWRDdcVFtGUDlNUkhzbxOvtjDayDL9BzsswU
+         BXhboq7PUIBpK7gspUUi7hpzuEFWnySRPGvNAczjvM/3RoWWHy+4Qy/7XJ2A61TY0/65
+         pv8lUI2kJAa/gtYlnBiZ6zjZmcMagStXNMb/8IncJmYo8m+Ydsw14+GHNGXElam0jGmS
+         9kW19meZOnq+GghlJ4XH2V+yV2sW3OTAia3+BCwqJ9wud1Dgmwq3UP0MP1kkTvxK7XOy
+         vViuC048gN+KPpYZpapze/DhfbE63vnF/gyviPoJvlO8sUxMT0IhejfSwzN9FfmtrvDq
+         yytA==
+X-Gm-Message-State: AOAM530yJYTXw+kYRepLOYd+HFfedlfG6dTx/wsRR5Azh+Y6GonDZKCe
+        VD3lma5eEDDGf2uvTmwi+Bk=
+X-Google-Smtp-Source: ABdhPJx/fgoA7NcvxleaAnbF1rvre3L9SR2PeGlhWa0xHE+O5IygoOIrj2QtpKKzQ5CNoocSRbVg1A==
+X-Received: by 2002:a19:8705:: with SMTP id j5mr818331lfd.148.1611651240125;
+        Tue, 26 Jan 2021 00:54:00 -0800 (PST)
+Received: from [192.168.1.100] ([178.176.75.50])
+        by smtp.gmail.com with ESMTPSA id g4sm2431428lfu.283.2021.01.26.00.53.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 26 Jan 2021 00:53:59 -0800 (PST)
+Subject: Re: [PATCH 7/9] n64: cosmetics changes
+To:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        linux-mips@vger.kernel.org
+Cc:     tsbogend@alpha.franken.de, axboe@kernel.dk,
+        linux-block@vger.kernel.org, cand@gmx.com
+References: <20210125233243.5982-1-chaitanya.kulkarni@wdc.com>
+ <20210125233243.5982-8-chaitanya.kulkarni@wdc.com>
+From:   Sergei Shtylyov <sergei.shtylyov@gmail.com>
+Organization: Brain-dead Software
+Message-ID: <01128ba0-35bf-7873-a953-bf9402d05c4c@gmail.com>
+Date:   Tue, 26 Jan 2021 11:53:48 +0300
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210125201156.1330164-2-pasha.tatashin@soleen.com>
+In-Reply-To: <20210125233243.5982-8-chaitanya.kulkarni@wdc.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+Hello!
 
-> Currently, loop device has only one global lock:
-> loop_ctl_mutex.
+On 26.01.2021 2:32, Chaitanya Kulkarni wrote:
 
-> This becomes hot in scenarios where many loop devices are used.
+> Make the variable declaration ascending order and initialize the
 
-> Scale it by introducing per-device lock: lo_mutex that protects the
-> fields in struct loop_device. Keep loop_ctl_mutex to protect global
-> data such as loop_index_idr, loop_lookup, loop_add.
+    Usually the vars are declared in descending order, no?
 
-> Lock ordering: loop_ctl_mutex > lo_mutex.
+> variables at the time of declaration when possible.
+> 
+> Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+> Reviewed-by: Lauri Kasanen <cand@gmx.com>
+[...]
 
-Reviewed-by: Petr Vorel <pvorel@suse.cz>
-
-Kind regards,
-Petr
+MBR, Sergei
