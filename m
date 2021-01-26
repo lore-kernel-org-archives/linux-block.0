@@ -2,93 +2,163 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 061DEC433E6
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 12:27:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8FD0C433DB
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 12:46:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C08622311F
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 12:27:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BF1072311D
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 12:46:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404464AbhAZM1V (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Jan 2021 07:27:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54320 "EHLO
+        id S2391725AbhAZMpb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Jan 2021 07:45:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42930 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2404430AbhAZKv7 (ORCPT
+        with ESMTP id S2391775AbhAZJ7R (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Jan 2021 05:51:59 -0500
-Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC3B3C061756
-        for <linux-block@vger.kernel.org>; Tue, 26 Jan 2021 02:51:18 -0800 (PST)
-Received: by mail-wm1-x32d.google.com with SMTP id c127so2285664wmf.5
-        for <linux-block@vger.kernel.org>; Tue, 26 Jan 2021 02:51:18 -0800 (PST)
+        Tue, 26 Jan 2021 04:59:17 -0500
+Received: from mail-vs1-xe2b.google.com (mail-vs1-xe2b.google.com [IPv6:2607:f8b0:4864:20::e2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3236C06178A
+        for <linux-block@vger.kernel.org>; Tue, 26 Jan 2021 01:58:36 -0800 (PST)
+Received: by mail-vs1-xe2b.google.com with SMTP id b5so4126270vsh.3
+        for <linux-block@vger.kernel.org>; Tue, 26 Jan 2021 01:58:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=db4DEJ/Q3N9d5WkZ8df7AudDavBMLE/1f2NlVKxQEYc=;
-        b=bJDXC2xJZS7knr6BW2QWR8M8TSd0BR+jcFln03nh0fNQax817QqmDhTQaYwzcomcIl
-         5YGDhdc6N6im+5Eqx5VrrMi9zyD7rc/fhsPvns6iiBvdbfoiox3Tf8lyRkBfVORwtnn+
-         Ti5+OzxAtiZGa50gUVEhgUtGCn41lAGTBmGEhPpjotAgvQ1phHe4z2zALtIGVlwoDcTi
-         w90Ft9Km+r4MxDyNB2Ru/mcdTQ0TRDX1wlemfB2yK42g4QfxFSRh6OeZ2USQn7/HJ+4R
-         EDUna/KZP+I70HioD5w0lXzl7G/iRxFJFN+yFMPhGiowrbBQpR7IVzBNxWi/YQXevdsZ
-         nIKA==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=xAUX4GprPzfJpnKS+Lo2k56itTCgxOq8hTIK9hhikBo=;
+        b=yMLqhusdi2aisI8n3EYsY4b7uX64DLjmgiN7ntAidBYbDsED5leOQCmJSlsCarF/T+
+         Ed34AakMn7atFG1tHuru1bxCZfLwNf3/9RWXCZqJfzrhoYcYJvYvZe3JAWsNcN3mx029
+         XvbZasWKe7z20SCTOhJwM5B5hOteG5k+4UWVWSTm7bDy4+lrjVJDZhlEPzteoaS36tCi
+         OMPlQCWh5EfwHMGAT0qeom5wyPo9iJfFcvgT/t7wjQ5SWXN46cvFMbJ5nXx1Mbgx6RBk
+         AKawWmFxBazSWcZt940JkHuyie/rMXEQA0YAypuSICTCX1A68NMG9s+JBxZurKZbKqMZ
+         X7xA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=db4DEJ/Q3N9d5WkZ8df7AudDavBMLE/1f2NlVKxQEYc=;
-        b=J9po+A0dzlQamBqD+NCGfAJHGXRVPflagRS795EZ7UxqfoE3wJUxH3RUJWRLmnqOeG
-         zJCk7A2Amj8aKo9MJabFcFg2KeFhnB48skVhOZmQerJ5O2orxk2r95drT4OevC6zB0t+
-         dsAcURhyUr7ac0w9yqN8GWX9OvfxNTglaCJqaMNuS7EmOBfzRtsIRpz0iAjO5bJFMIR1
-         HvPKJRG03Ce31FXe0bUpOasubw56Sqgd8dtMyL2qfsxDyeCLAj1VXYDO7yHuPzL2Nsx7
-         WJuUg/iOEjzPPT1fzgApOtzBXKcnEPbmgLARDkV0kejwS7Jnkmv0Abwzrnd0c3iX/tbs
-         yVCQ==
-X-Gm-Message-State: AOAM532GAUmm1stVfcmxP2ztoLU75t0BF3S/qNxXU9hMVAR4Xkg4VuRi
-        2e5n2EQ+ByEi8mLaykawlwD8uQ==
-X-Google-Smtp-Source: ABdhPJxoS0T4r1Eh0KBwNxa9jC0eIUTyCqRnQWHyZXkLnzTtqnA+eozhZd6XzKMfp0e9nXlw77AalQ==
-X-Received: by 2002:a1c:984a:: with SMTP id a71mr4044123wme.175.1611658277465;
-        Tue, 26 Jan 2021 02:51:17 -0800 (PST)
-Received: from localhost.localdomain ([83.216.184.132])
-        by smtp.gmail.com with ESMTPSA id h18sm7177879wru.65.2021.01.26.02.51.16
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 26 Jan 2021 02:51:16 -0800 (PST)
-From:   Paolo Valente <paolo.valente@linaro.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX/IMPROVEMENT 0/6] block, bfq: third and last batch of fixes and improvements
-Date:   Tue, 26 Jan 2021 11:50:56 +0100
-Message-Id: <20210126105102.53102-1-paolo.valente@linaro.org>
-X-Mailer: git-send-email 2.20.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=xAUX4GprPzfJpnKS+Lo2k56itTCgxOq8hTIK9hhikBo=;
+        b=i8d99eS7zYtBeFAhXC3d0xfuDIo2RbnSlb7u9ETCkHKJVtanKjirrFGg1wtS7YSPVN
+         h3JMDmCV1N8RfA0RnuJzxUY5SASgaENaPjExytFNQqsju5BMMY8cCwmBYRru3QqEwHdW
+         nH0rrrB4TmQ4wNEokcQBsknxhjShev2YEZ73l7LuePqhoKwekuLFqlWRQ6LajlibH+/l
+         0pHyRSQwtT27GaZYRJDNUkWKDNj/ql7mZUwqvFJo2KhU0gTFr4r/Ak+2WW28PNbYkJ2J
+         RxUOdt8ht7hZ2W3KxCr0YiZIE21dG3LPg2oQyssVP1VLHBO0pcixopqfIxV5wYXdvSD4
+         nPtA==
+X-Gm-Message-State: AOAM531NzV5bP1efr28XhopuUP6UlkFri+qQSy01n5mtsoCj01+DKrs/
+        DIoP+lWb2n3jdbTmghx0gjbI1sPpVJ+01DQosmwXnA==
+X-Google-Smtp-Source: ABdhPJz/rKFclHqeegtULkB5WJdYhx0oUc8lnkCsoUksDa5rkBDuriXnXzAWxmfhrKfLGYMbfLPN+b1awwoLDJ9pLa8=
+X-Received: by 2002:a05:6102:67b:: with SMTP id z27mr2247015vsf.19.1611655115911;
+ Tue, 26 Jan 2021 01:58:35 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20210121082155.111333-1-ebiggers@kernel.org> <20210121082155.111333-3-ebiggers@kernel.org>
+In-Reply-To: <20210121082155.111333-3-ebiggers@kernel.org>
+From:   Ulf Hansson <ulf.hansson@linaro.org>
+Date:   Tue, 26 Jan 2021 10:57:59 +0100
+Message-ID: <CAPDyKFo_nsZuCX+nVBDTJ5QxZ18mQMx=MssJZtWTfJfFC=u+xw@mail.gmail.com>
+Subject: Re: [PATCH 2/2] scsi: ufs: use devm_blk_ksm_init()
+To:     Eric Biggers <ebiggers@kernel.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>
+Cc:     linux-block <linux-block@vger.kernel.org>,
+        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+        linux-scsi <linux-scsi@vger.kernel.org>,
+        Satya Tangirala <satyat@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
-here's batch 3/3.
++ Martin, James
 
-Thanks,
-Paolo
+On Thu, 21 Jan 2021 at 09:23, Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> From: Eric Biggers <ebiggers@google.com>
+>
+> Use the new resource-managed variant of blk_ksm_init() so that the UFS
+> driver doesn't have to manually call blk_ksm_destroy().
+>
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
 
-Paolo Valente (6):
-  block, bfq: always inject I/O of queues blocked by wakers
-  block, bfq: put reqs of waker and woken in dispatch list
-  block, bfq: make shared queues inherit wakers
-  block, bfq: fix weight-raising resume with !low_latency
-  block, bfq: keep shared queues out of the waker mechanism
-  block, bfq: merge bursts of newly-created queues
+I took the liberty of applying this one to my mmc tree along with
+patch1, as it looks trivial to me.
 
- block/bfq-cgroup.c  |   2 +
- block/bfq-iosched.c | 362 +++++++++++++++++++++++++++++++++++++++++---
- block/bfq-iosched.h |  15 ++
- block/bfq-wf2q.c    |   8 +
- 4 files changed, 365 insertions(+), 22 deletions(-)
+Martin/James - if you have objections or want to ack it, please tell me.
 
---
-2.20.1
+Thanks and kind regards
+Uffe
+
+
+
+
+
+> ---
+>  drivers/scsi/ufs/ufshcd-crypto.c | 9 ++-------
+>  drivers/scsi/ufs/ufshcd-crypto.h | 5 -----
+>  drivers/scsi/ufs/ufshcd.c        | 1 -
+>  3 files changed, 2 insertions(+), 13 deletions(-)
+>
+> diff --git a/drivers/scsi/ufs/ufshcd-crypto.c b/drivers/scsi/ufs/ufshcd-crypto.c
+> index 07310b12a5dc8..153dd5765d9ca 100644
+> --- a/drivers/scsi/ufs/ufshcd-crypto.c
+> +++ b/drivers/scsi/ufs/ufshcd-crypto.c
+> @@ -179,8 +179,8 @@ int ufshcd_hba_init_crypto_capabilities(struct ufs_hba *hba)
+>         }
+>
+>         /* The actual number of configurations supported is (CFGC+1) */
+> -       err = blk_ksm_init(&hba->ksm,
+> -                          hba->crypto_capabilities.config_count + 1);
+> +       err = devm_blk_ksm_init(hba->dev, &hba->ksm,
+> +                               hba->crypto_capabilities.config_count + 1);
+>         if (err)
+>                 goto out_free_caps;
+>
+> @@ -238,8 +238,3 @@ void ufshcd_crypto_setup_rq_keyslot_manager(struct ufs_hba *hba,
+>         if (hba->caps & UFSHCD_CAP_CRYPTO)
+>                 blk_ksm_register(&hba->ksm, q);
+>  }
+> -
+> -void ufshcd_crypto_destroy_keyslot_manager(struct ufs_hba *hba)
+> -{
+> -       blk_ksm_destroy(&hba->ksm);
+> -}
+> diff --git a/drivers/scsi/ufs/ufshcd-crypto.h b/drivers/scsi/ufs/ufshcd-crypto.h
+> index d53851be55416..78a58e788dff9 100644
+> --- a/drivers/scsi/ufs/ufshcd-crypto.h
+> +++ b/drivers/scsi/ufs/ufshcd-crypto.h
+> @@ -43,8 +43,6 @@ void ufshcd_init_crypto(struct ufs_hba *hba);
+>  void ufshcd_crypto_setup_rq_keyslot_manager(struct ufs_hba *hba,
+>                                             struct request_queue *q);
+>
+> -void ufshcd_crypto_destroy_keyslot_manager(struct ufs_hba *hba);
+> -
+>  #else /* CONFIG_SCSI_UFS_CRYPTO */
+>
+>  static inline void ufshcd_prepare_lrbp_crypto(struct request *rq,
+> @@ -69,9 +67,6 @@ static inline void ufshcd_init_crypto(struct ufs_hba *hba) { }
+>  static inline void ufshcd_crypto_setup_rq_keyslot_manager(struct ufs_hba *hba,
+>                                                 struct request_queue *q) { }
+>
+> -static inline void ufshcd_crypto_destroy_keyslot_manager(struct ufs_hba *hba)
+> -{ }
+> -
+>  #endif /* CONFIG_SCSI_UFS_CRYPTO */
+>
+>  #endif /* _UFSHCD_CRYPTO_H */
+> diff --git a/drivers/scsi/ufs/ufshcd.c b/drivers/scsi/ufs/ufshcd.c
+> index e31d2c5c7b23b..d905c84474c2c 100644
+> --- a/drivers/scsi/ufs/ufshcd.c
+> +++ b/drivers/scsi/ufs/ufshcd.c
+> @@ -9139,7 +9139,6 @@ EXPORT_SYMBOL_GPL(ufshcd_remove);
+>   */
+>  void ufshcd_dealloc_host(struct ufs_hba *hba)
+>  {
+> -       ufshcd_crypto_destroy_keyslot_manager(hba);
+>         scsi_host_put(hba->host);
+>  }
+>  EXPORT_SYMBOL_GPL(ufshcd_dealloc_host);
+> --
+> 2.30.0
+>
