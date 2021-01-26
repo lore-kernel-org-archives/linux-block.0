@@ -7,70 +7,70 @@ X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 554B4C433DB
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 16:16:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B6C2C433DB
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 16:19:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 276DA20756
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 16:16:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DA3C720735
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 16:19:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391218AbhAZQQO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Jan 2021 11:16:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40630 "EHLO
+        id S2391034AbhAZQTn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Jan 2021 11:19:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41178 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2392774AbhAZQQI (ORCPT
+        with ESMTP id S2392378AbhAZQSj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Jan 2021 11:16:08 -0500
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDBD5C0613D6
-        for <linux-block@vger.kernel.org>; Tue, 26 Jan 2021 08:15:28 -0800 (PST)
-Received: by mail-pj1-x102f.google.com with SMTP id p15so2262433pjv.3
-        for <linux-block@vger.kernel.org>; Tue, 26 Jan 2021 08:15:28 -0800 (PST)
+        Tue, 26 Jan 2021 11:18:39 -0500
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A100EC061797
+        for <linux-block@vger.kernel.org>; Tue, 26 Jan 2021 08:17:57 -0800 (PST)
+Received: by mail-pf1-x430.google.com with SMTP id m6so10717484pfk.1
+        for <linux-block@vger.kernel.org>; Tue, 26 Jan 2021 08:17:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=CoACkKKaKolb5/db25iF9yoT4NneQU8hJQg65/Y8VcI=;
-        b=QFVB49MXc8QZBwwZq/6Iq8/Z6QaLYulINObGkfe4ntl71GZmQlQ2jejdVsCHK5whKY
-         rRDxfVGIQkyDHtjCdMRZE7Bx356O55nfJp6UXoYcDs9lrEetLiyHdpKSdtK1nD630ksY
-         HVrfz0RM8y7nsYroqou7N5MaI6ipPoKOSvsmkAOUIqUXomrThbu83EMUttOjP10N2/Qc
-         ojg9YCoWAncKkUb7J+2WT0xYd/t0cQsHFMlm7hUEyDbqrupSoz8vf4q0HSN590FR5K/E
-         ZglcJhfqy7eod4FDpDscmFjL+oIyc9PMwJopjb5EWGmHoZXRaXG2M/PBniAB0MCoryKY
-         IFYw==
+        bh=epgYCzdc72kBsoz5/bU1Ciqhlsremw0jcEwfc6vQq00=;
+        b=buKxZXNp5UJibZh3nqNGwDHf3vzgy8HQqITHVHIP8ptalwP+WFPqWHplJ+ssAzYibz
+         s0Z/Bn+EcuBbwJ5mxpTlbFnUjNFS+OrVHV83Xt03WmpI3B8811kASQXjlI0+xMQkGLKI
+         Vw3e2kfOsTThCoPNgAqMCdjTfjlcuWguu8xPidiIargUNrEA0KFJ5P2A4GdBMKPLbXyB
+         L+RBnTA0ITU5/w67h/91KqZg602FKiYNTpMg8sz53BTpM7xYT835NPMcmWRfDnD+covK
+         0utH7WDNIODvHxfVHRKHUVtWhn+aLevkJkcmuEU9l4opE9a63Qefhgp5EF+bsUicN4eu
+         bl+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=CoACkKKaKolb5/db25iF9yoT4NneQU8hJQg65/Y8VcI=;
-        b=lXJo5hMWSnqH1YXXHRtsOhZNl7e7WnrPMXJ4JOEkbcTkEFR9gGoXRVzNnxW4R7oHEs
-         6/w/L7XI89iEYKoiJyz7/FN9SD28NBeSbzybUndGDzzx/PgXFF8nSrzk9Ayyr+8czNZr
-         YqQ9hp0w+aeNwVlIwJ0Qv/sN24NF01brvbs8cnyoLW/F0ayncnJYXj4IiGcveMAOpuIu
-         q7abhl6JgCEwXFTqNGFpcqENhEdGsU0A+pJgmWikjdj8rR02ZoUEweauau7B3wm6OC4Y
-         OxJOHspPvCpTTibUE/1aBfCUa6s3McCHcSEgj0MVl1SI4LpxsYaRkZF30cV29npLGHCH
-         sWtQ==
-X-Gm-Message-State: AOAM530/ylcVTTLOPrGFoyQv6gSLQcPLRljyIwme3jG7KoUoPUuyfcIo
-        PfHxZlcFoQlwyL26NR+CqMXJNsCPE5R/cQ==
-X-Google-Smtp-Source: ABdhPJyatNUsl2O743yPGwTjFGdZTMmMi+wvmLPAclwnTKOZFTPTy67lYJXQnSioB1xFlcGYYZPO+g==
-X-Received: by 2002:a17:902:467:b029:da:9ac2:24ee with SMTP id 94-20020a1709020467b02900da9ac224eemr6754330ple.22.1611677728265;
-        Tue, 26 Jan 2021 08:15:28 -0800 (PST)
+        bh=epgYCzdc72kBsoz5/bU1Ciqhlsremw0jcEwfc6vQq00=;
+        b=BU7sEVV4mlU2yiSXxI95x398fOvne6Mx+/LqRPXyEQ0CURluJX7DXGWyMc52KImFEr
+         5QULOn2QUrQua2HpuEZ3lbSsx8tFJyI2rg3FrIVaP0QiYMmwoaRycH/K4XtvUr4O2fV5
+         luqz0fkaEVdBJl9XyFpws7vdy3rHjwkU0QP77S0m+P7R6Vpq7viPHmtj1adDNeoZ9ro3
+         wauLOKMcPzjgDt81KC2hLZfGS8nOFQrGknet9Dx0xRglg1KlGh1Svzz3F4/8Gg63mb8f
+         D594K1DHZzTkaYx90DnW22N39ZmvYwWNs8uJnjz1LLBUqCvXiuIVi7m+do2fDm5puSP4
+         U+mA==
+X-Gm-Message-State: AOAM533Bdyk/moRSgcOVtyqPeWanOi4/TAxnmV5EIHrGeMVKlQpwbW74
+        Wj0FPam14eKrYQixRhKprKseSg==
+X-Google-Smtp-Source: ABdhPJzayUmLqyp84K+wfgc4GWyTILacj8dMzGotGEXVhIXyu2CQpO/Go5PZbRnMpxoOHjQZaYTcTg==
+X-Received: by 2002:a65:52cc:: with SMTP id z12mr6261716pgp.116.1611677877191;
+        Tue, 26 Jan 2021 08:17:57 -0800 (PST)
 Received: from [192.168.4.41] (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
-        by smtp.gmail.com with ESMTPSA id w14sm2776355pjl.38.2021.01.26.08.15.27
+        by smtp.gmail.com with ESMTPSA id a2sm19528814pgi.8.2021.01.26.08.17.56
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Jan 2021 08:15:27 -0800 (PST)
-Subject: Re: [PATCH BUGFIX/IMPROVEMENT 6/6] block, bfq: merge bursts of
- newly-created queues
+        Tue, 26 Jan 2021 08:17:56 -0800 (PST)
+Subject: Re: [PATCH BUGFIX/IMPROVEMENT 1/6] block, bfq: always inject I/O of
+ queues blocked by wakers
 To:     Paolo Valente <paolo.valente@linaro.org>
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         Jan Kara <jack@suse.cz>
 References: <20210126105102.53102-1-paolo.valente@linaro.org>
- <20210126105102.53102-7-paolo.valente@linaro.org>
+ <20210126105102.53102-2-paolo.valente@linaro.org>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <a4874bb3-006c-85d9-5015-12443baa1e87@kernel.dk>
-Date:   Tue, 26 Jan 2021 09:15:27 -0700
+Message-ID: <23cc8281-a869-b260-ba0c-22127db2019b@kernel.dk>
+Date:   Tue, 26 Jan 2021 09:17:55 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210126105102.53102-7-paolo.valente@linaro.org>
+In-Reply-To: <20210126105102.53102-2-paolo.valente@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -78,86 +78,23 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/26/21 3:51 AM, Paolo Valente wrote:
-> @@ -2809,6 +2853,12 @@ void bfq_release_process_ref(struct bfq_data *bfqd, struct bfq_queue *bfqq)
->  	    bfqq != bfqd->in_service_queue)
->  		bfq_del_bfqq_busy(bfqd, bfqq, false);
->  
-> +	if (bfqq->entity.parent &&
-> +	    bfqq->entity.parent->last_bfqq_created == bfqq)
-> +		bfqq->entity.parent->last_bfqq_created = NULL;
-> +	else if (bfqq->bfqd && bfqq->bfqd->last_bfqq_created == bfqq)
-> +		bfqq->bfqd->last_bfqq_created = NULL;
-> +
->  	bfq_put_queue(bfqq);
->  }
->  
-> @@ -2905,6 +2955,13 @@ bfq_merge_bfqqs(struct bfq_data *bfqd, struct bfq_io_cq *bic,
->  	 */
->  	new_bfqq->pid = -1;
->  	bfqq->bic = NULL;
-> +
-> +	if (bfqq->entity.parent &&
-> +	    bfqq->entity.parent->last_bfqq_created == bfqq)
-> +		bfqq->entity.parent->last_bfqq_created = new_bfqq;
-> +	else if (bfqq->bfqd && bfqq->bfqd->last_bfqq_created == bfqq)
-> +		bfqq->bfqd->last_bfqq_created = new_bfqq;
-> +
->  	bfq_release_process_ref(bfqd, bfqq);
->  }
+On 1/26/21 3:50 AM, Paolo Valente wrote:
+> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+> index 445cef9c0bb9..a83149407336 100644
+> --- a/block/bfq-iosched.c
+> +++ b/block/bfq-iosched.c
+> @@ -4487,9 +4487,15 @@ static struct bfq_queue *bfq_select_queue(struct bfq_data *bfqd)
+>  			bfq_bfqq_busy(bfqq->bic->bfqq[0]) &&
+>  			bfqq->bic->bfqq[0]->next_rq ?
+>  			bfqq->bic->bfqq[0] : NULL;
+> +		struct bfq_queue *blocked_bfqq =
+> +			!hlist_empty(&bfqq->woken_list) ?
+> +			container_of(bfqq->woken_list.first,
+> +				     struct bfq_queue,
+> +				     woken_list_node)
+> +			: NULL;
 
-Almost identical code constructs makes it seem like this should have a
-helper instead.
-
-> @@ -5033,6 +5090,12 @@ void bfq_put_queue(struct bfq_queue *bfqq)
->  	bfqg_and_blkg_put(bfqg);
->  }
->  
-> +static void bfq_put_stable_ref(struct bfq_queue *bfqq)
-> +{
-> +	bfqq->stable_ref--;
-> +	bfq_put_queue(bfqq);
-> +}
-> +
->  static void bfq_put_cooperator(struct bfq_queue *bfqq)
->  {
->  	struct bfq_queue *__bfqq, *next;
-> @@ -5089,6 +5152,17 @@ static void bfq_exit_icq(struct io_cq *icq)
->  {
->  	struct bfq_io_cq *bic = icq_to_bic(icq);
->  
-> +	if (bic->stable_merge_bfqq) {
-> +		unsigned long flags;
-> +		struct bfq_data *bfqd = bic->stable_merge_bfqq->bfqd;
-> +
-> +		if (bfqd)
-> +			spin_lock_irqsave(&bfqd->lock, flags);
-> +		bfq_put_stable_ref(bic->stable_merge_bfqq);
-> +		if (bfqd)
-> +			spin_unlock_irqrestore(&bfqd->lock, flags);
-> +	}
-> +
-
-Construct like this are really painful. Just do:
-
-if (bfqd) {
-	unsigned long flags;
-
-	spin_lock_irqsave(&bfqd->lock, flags);
-	bfq_put_stable_ref(bic->stable_merge_bfqq);
-	spin_unlock_irqrestore(&bfqd->lock, flags);
-} else {
-	bfq_put_stable_ref(bic->stable_merge_bfqq);
-}
-
-which is also less likely to cause code analyzer false warnings. Outside
-of that, it needs a comment on why it's ok NOT to grab the lock when
-bfqd is zero, because that seems counter-intuitive and more a case of
-"well we can't grab a lock for something we don't have". Maybe it's
-because bfqd is no longer visible at this point, and it's ok, but it's
-definitely not clear just looking at this patch. Even with that, is the
-bfqq visible? Should the ref be atomic, and locking happen further down
-instead?
+hlist_first_entry_or_null?
 
 -- 
 Jens Axboe
