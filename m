@@ -2,97 +2,168 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-20.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD8FDC433E6
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 18:52:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50C92C433E0
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 18:52:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 73BB122B37
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 18:52:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1D51B22B37
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 18:52:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389487AbhAZROx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Jan 2021 12:14:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57328 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390620AbhAZIyl (ORCPT
+        id S1731240AbhAZROu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Jan 2021 12:14:50 -0500
+Received: from mail-lf1-f44.google.com ([209.85.167.44]:34655 "EHLO
+        mail-lf1-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389855AbhAZIWM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Jan 2021 03:54:41 -0500
-Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BC9BC061573;
-        Tue, 26 Jan 2021 00:54:01 -0800 (PST)
-Received: by mail-lf1-x131.google.com with SMTP id i187so11449373lfd.4;
-        Tue, 26 Jan 2021 00:54:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:organization:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Sb/6toZ1LycHVLxZfHlszRFpvafXWffrLwLHIch7P58=;
-        b=MEClQLDAcozrJgdfIdWWmjK9kiQ5t2+ZV7bfGHZMo7IGBB3WwBixH2DCKVGJgHWuuL
-         fYTv7tv09gzoA7uiLzCm1kzGsUkxZST+tm80Bf1LaV5n9zEHJg/CaT6Z7Nu/zPjMcHZw
-         CW4ujC3OKvJ/ml1S7bQ/SFdgQZEDnC8zWQjEGWz4lSyCngMYc4p675/rFE5FKJrvhTS3
-         K6JIt8EyhpAzDrY8ZR5UzBIBZR4nYZLfO/yI44VJqztcgbULO/3EtN56uCL5lCAdR78e
-         xPmc5+lrTedpwqgn4W7z5wt4CdI1I/fdlb7iTw2vk/HmDMlESuQC3/v9k2/yNJbh2O8q
-         ir/w==
+        Tue, 26 Jan 2021 03:22:12 -0500
+Received: by mail-lf1-f44.google.com with SMTP id a12so13485438lfb.1;
+        Tue, 26 Jan 2021 00:21:55 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:organization
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=Sb/6toZ1LycHVLxZfHlszRFpvafXWffrLwLHIch7P58=;
-        b=V1icFHZD1AJgkzYCpTmADU6p0/z3MQMWRDdcVFtGUDlNUkhzbxOvtjDayDL9BzsswU
-         BXhboq7PUIBpK7gspUUi7hpzuEFWnySRPGvNAczjvM/3RoWWHy+4Qy/7XJ2A61TY0/65
-         pv8lUI2kJAa/gtYlnBiZ6zjZmcMagStXNMb/8IncJmYo8m+Ydsw14+GHNGXElam0jGmS
-         9kW19meZOnq+GghlJ4XH2V+yV2sW3OTAia3+BCwqJ9wud1Dgmwq3UP0MP1kkTvxK7XOy
-         vViuC048gN+KPpYZpapze/DhfbE63vnF/gyviPoJvlO8sUxMT0IhejfSwzN9FfmtrvDq
-         yytA==
-X-Gm-Message-State: AOAM530yJYTXw+kYRepLOYd+HFfedlfG6dTx/wsRR5Azh+Y6GonDZKCe
-        VD3lma5eEDDGf2uvTmwi+Bk=
-X-Google-Smtp-Source: ABdhPJx/fgoA7NcvxleaAnbF1rvre3L9SR2PeGlhWa0xHE+O5IygoOIrj2QtpKKzQ5CNoocSRbVg1A==
-X-Received: by 2002:a19:8705:: with SMTP id j5mr818331lfd.148.1611651240125;
-        Tue, 26 Jan 2021 00:54:00 -0800 (PST)
-Received: from [192.168.1.100] ([178.176.75.50])
-        by smtp.gmail.com with ESMTPSA id g4sm2431428lfu.283.2021.01.26.00.53.59
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=N6uAHsEyZ6WgEQ8At+K9g1mYi2N+EF3aByRgWxP6Lbg=;
+        b=A0+jKnFvarbmgOBO5motmMTxjO6LDBfxsb0zmXt3PtirVWmOpe6xC7qoUAEn4wuPSj
+         NZcosRnQOn+Wx51Mt7NJnbn17ndcDXq4TlSxKfiZV6iYkSm1t32acGpWH1X0G+kbev+k
+         wNBJD1QjJDAViMr5ltXJ2p6KtOlyZJbSAJqW9CN3+iNngzQKHO8CGbc3FPaQWu06nBs7
+         aT5ip24Z/XYa9lPCRYIhfOhYUlWDxXDBqMJElhslx0ayN8wMtGu8e4VEVc4PgXYB1nNT
+         aJHJw53c7sl3ItxASdxRzQNJgM4bHO02xkYRJCk57iO8kr1fytW0lbKeqBtLCzNM7n8q
+         pC7Q==
+X-Gm-Message-State: AOAM530ZL7+cYyuRbjqbwVnOsrNJl70qNRmK+qq0EUcI9qUUZng9RP4a
+        6OUl8DgyY+7KUMreWbIWbGwsGT9zuxM=
+X-Google-Smtp-Source: ABdhPJy37CITPmRFi1sebHwyDteqDL1NOVrBthrPaHyo5WeqSvHv29bD+z3BZ0opv3lYdLx4iyXbOg==
+X-Received: by 2002:a05:6512:1105:: with SMTP id l5mr2247524lfg.179.1611649290210;
+        Tue, 26 Jan 2021 00:21:30 -0800 (PST)
+Received: from [10.68.32.192] (broadband-188-32-236-56.ip.moscow.rt.ru. [188.32.236.56])
+        by smtp.gmail.com with ESMTPSA id p3sm2422193lfu.271.2021.01.26.00.21.29
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Jan 2021 00:53:59 -0800 (PST)
-Subject: Re: [PATCH 7/9] n64: cosmetics changes
-To:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        linux-mips@vger.kernel.org
-Cc:     tsbogend@alpha.franken.de, axboe@kernel.dk,
-        linux-block@vger.kernel.org, cand@gmx.com
-References: <20210125233243.5982-1-chaitanya.kulkarni@wdc.com>
- <20210125233243.5982-8-chaitanya.kulkarni@wdc.com>
-From:   Sergei Shtylyov <sergei.shtylyov@gmail.com>
-Organization: Brain-dead Software
-Message-ID: <01128ba0-35bf-7873-a953-bf9402d05c4c@gmail.com>
-Date:   Tue, 26 Jan 2021 11:53:48 +0300
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.1
+        Tue, 26 Jan 2021 00:21:29 -0800 (PST)
+Subject: Re: [PATCH] floppy: reintroduce O_NDELAY fix
+To:     Jiri Kosina <jikos@kernel.org>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Wim Osterholt <wim@djo.tudelft.nl>,
+        Kurt Garloff <kurt@garloff.de>
+References: <20160610230255.GA27770@djo.tudelft.nl>
+ <alpine.LNX.2.00.1606131414420.6874@cbobk.fhfr.pm>
+ <20160614184308.GA6188@djo.tudelft.nl>
+ <alpine.LNX.2.00.1606150906320.6874@cbobk.fhfr.pm>
+ <20160615132040.GZ14480@ZenIV.linux.org.uk>
+ <alpine.LNX.2.00.1606151610420.6874@cbobk.fhfr.pm>
+ <20160615224722.GA9545@djo.tudelft.nl>
+ <alpine.LNX.2.00.1606160946000.6874@cbobk.fhfr.pm>
+ <alpine.LNX.2.00.1606301317290.6874@cbobk.fhfr.pm>
+ <9c713fa8-9da1-47b5-0d5d-92f4cd13493a@kernel.dk>
+ <nycvar.YFH.7.76.2101191649190.5622@cbobk.fhfr.pm>
+ <5cb57175-7f0b-5536-925d-337241bcda93@linux.com>
+ <nycvar.YFH.7.76.2101211122290.5622@cbobk.fhfr.pm>
+ <nycvar.YFH.7.76.2101211543230.5622@cbobk.fhfr.pm>
+ <e503292b-5f51-eac5-771f-e35991d1084c@linux.com>
+ <nycvar.YFH.7.76.2101211603590.5622@cbobk.fhfr.pm>
+ <nycvar.YFH.7.76.2101221209060.5622@cbobk.fhfr.pm>
+From:   Denis Efremov <efremov@linux.com>
+Message-ID: <5ef748c9-9ab9-9a7e-6ae9-6e4a292b6842@linux.com>
+Date:   Tue, 26 Jan 2021 11:21:28 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-In-Reply-To: <20210125233243.5982-8-chaitanya.kulkarni@wdc.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <nycvar.YFH.7.76.2101221209060.5622@cbobk.fhfr.pm>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello!
 
-On 26.01.2021 2:32, Chaitanya Kulkarni wrote:
 
-> Make the variable declaration ascending order and initialize the
-
-    Usually the vars are declared in descending order, no?
-
-> variables at the time of declaration when possible.
+On 1/22/21 2:13 PM, Jiri Kosina wrote:
+> From: Jiri Kosina <jkosina@suse.cz>
 > 
-> Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-> Reviewed-by: Lauri Kasanen <cand@gmx.com>
-[...]
+> This issue was originally fixed in 09954bad4 ("floppy: refactor open() 
+> flags handling").
+> 
+> The fix as a side-effect, however, introduce issue for open(O_ACCMODE) 
+> that is being used for ioctl-only open. I wrote a fix for that, but 
+> instead of it being merged, full revert of 09954bad4 was performed, 
+> re-introducing the O_NDELAY / O_NONBLOCK issue, and it strikes again.
+> 
+> This is a forward-port of the original fix to current codebase; the 
+> original submission had the changelog below:
+> 
+> ====
+> Commit 09954bad4 ("floppy: refactor open() flags handling"), as a
+> side-effect, causes open(/dev/fdX, O_ACCMODE) to fail. It turns out that
+> this is being used setfdprm userspace for ioctl-only open().
+> 
+> Reintroduce back the original behavior wrt !(FMODE_READ|FMODE_WRITE) 
+> modes, while still keeping the original O_NDELAY bug fixed.
+> 
+> Cc: stable@vger.kernel.org
+> Reported-by: Wim Osterholt <wim@djo.tudelft.nl>
+> Tested-by: Wim Osterholt <wim@djo.tudelft.nl>
+> Reported-and-tested-by: Kurt Garloff <kurt@garloff.de>
+> Fixes: 09954bad4 ("floppy: refactor open() flags handling")
+> Fixes: f2791e7ead ("Revert "floppy: refactor open() flags handling"")
+> Signed-off-by: Jiri Kosina <jkosina@suse.cz>
 
-MBR, Sergei
+Applied. I'll send it to Jens soon with a couple of cleanup patches.
+
+https://github.com/evdenis/linux-floppy/commit/e32f6163c47efbdbad06258560aa00d1c7e5b699
+
+Thanks,
+Denis
+
+> ---
+>  drivers/block/floppy.c | 30 +++++++++++++++---------------
+>  1 file changed, 15 insertions(+), 15 deletions(-)
+> 
+> diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
+> index dfe1dfc901cc..0b71292d9d5a 100644
+> --- a/drivers/block/floppy.c
+> +++ b/drivers/block/floppy.c
+> @@ -4121,23 +4121,23 @@ static int floppy_open(struct block_device *bdev, fmode_t mode)
+>  	if (fdc_state[FDC(drive)].rawcmd == 1)
+>  		fdc_state[FDC(drive)].rawcmd = 2;
+>  
+> -	if (!(mode & FMODE_NDELAY)) {
+> -		if (mode & (FMODE_READ|FMODE_WRITE)) {
+> -			drive_state[drive].last_checked = 0;
+> -			clear_bit(FD_OPEN_SHOULD_FAIL_BIT,
+> -				  &drive_state[drive].flags);
+> -			if (bdev_check_media_change(bdev))
+> -				floppy_revalidate(bdev->bd_disk);
+> -			if (test_bit(FD_DISK_CHANGED_BIT, &drive_state[drive].flags))
+> -				goto out;
+> -			if (test_bit(FD_OPEN_SHOULD_FAIL_BIT, &drive_state[drive].flags))
+> -				goto out;
+> -		}
+> -		res = -EROFS;
+> -		if ((mode & FMODE_WRITE) &&
+> -		    !test_bit(FD_DISK_WRITABLE_BIT, &drive_state[drive].flags))
+> +	if (mode & (FMODE_READ|FMODE_WRITE)) {
+> +		drive_state[drive].last_checked = 0;
+> +		clear_bit(FD_OPEN_SHOULD_FAIL_BIT, &drive_state[drive].flags);
+> +		if (bdev_check_media_change(bdev))
+> +			floppy_revalidate(bdev->bd_disk);
+> +		if (test_bit(FD_DISK_CHANGED_BIT, &drive_state[drive].flags))
+> +			goto out;
+> +		if (test_bit(FD_OPEN_SHOULD_FAIL_BIT, &drive_state[drive].flags))
+>  			goto out;
+>  	}
+> +
+> +	res = -EROFS;
+> +
+> +	if ((mode & FMODE_WRITE) &&
+> +			!test_bit(FD_DISK_WRITABLE_BIT, &drive_state[drive].flags))
+> +		goto out;
+> +
+>  	mutex_unlock(&open_lock);
+>  	mutex_unlock(&floppy_mutex);
+>  	return 0;
+> 
