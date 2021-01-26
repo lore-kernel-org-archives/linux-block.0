@@ -2,88 +2,91 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-16.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 233E5C433DB
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 22:08:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAE35C43217
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 22:19:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E74C420665
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 22:08:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AC0BD20679
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 22:19:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726935AbhAZWAe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Jan 2021 17:00:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35540 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2405501AbhAZUPW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Jan 2021 15:15:22 -0500
-Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D095CC0613ED
-        for <linux-block@vger.kernel.org>; Tue, 26 Jan 2021 12:14:41 -0800 (PST)
-Received: by mail-pg1-x533.google.com with SMTP id o16so2560907pgg.5
-        for <linux-block@vger.kernel.org>; Tue, 26 Jan 2021 12:14:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=vUWa/nqQ/A/FFzCKwNGOfLjGalA5xZDYWlP7k0RNMN4=;
-        b=aNgxpXHyhquyX9+OT/S2Ivy6rHQvxdf0vWV+hC/39bhX3aBUpNlzTSFfQdDEp6im8a
-         KZhIP25K3RXUXHMBHDU2+dIAvUM4Qov7IunrwNKrDe4/iii/ofIR3PHoAf6vIv+u0Sox
-         8o1VIvGjcaRhwqOwJS+/5qnakNwYzfdsA9Pl+1uyHDYTU7MxgqkduHTzan9z9YVbuGcA
-         WIdrk2f+1p2PLr+n/q/GH6AueR4Rccs1Cwo9IbOcka+0wNK7zwOUj2WmQibuXoQvitJB
-         2pStJzimWuAv3RFiPHpupixIKybApinZr033DoaPjOEF3xMis+zpZdSLS1YPg40rrkmU
-         FGgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=vUWa/nqQ/A/FFzCKwNGOfLjGalA5xZDYWlP7k0RNMN4=;
-        b=qfbSMtKcNch9wuB0YkWaqBndaAAIDvye817iECwxGlZRR7t7T35D/q6kfnYnGxtY4W
-         u6Dex9T2lKLYAFJ1dL9K8JKvbLlRFP4+E+hBn0SxN6lZDoSLDIOyon5VZ7FMJosrEzlo
-         0IIuJcix8YIgC2KwPD2HuMqQGg4eZoQKTRloini8lB1G2/OyP+kNF99DLsASLyMLM+sW
-         KPu0Q+u9XVLbHtRVM2PqV7/sCkmd+N3F8cF+tTr8av2kXS1asSSFuNkxSFlnIwr7x4xC
-         thuEFr+HjvPqQIqG2ORQgHo5twiscJ+8j6UAm2GaFq3WJatwVUECkr6SUI7Yg94rfGI+
-         8BCw==
-X-Gm-Message-State: AOAM533ocddcypK9KABozSWQI+9vGsaD8OpcLrETOGRh/+te1Se/AdU8
-        eHu3kvmOtHh+aQtYvvoW9epdMIFyu+4hxg==
-X-Google-Smtp-Source: ABdhPJzpMN5r9lAMFHvuk1vF95rtBTPz9BzU0foNJAQXszB/nNFtuhg2wLn+q3qj7UpO6E9wwS3P6A==
-X-Received: by 2002:a63:656:: with SMTP id 83mr7314185pgg.222.1611692081226;
-        Tue, 26 Jan 2021 12:14:41 -0800 (PST)
-Received: from [192.168.4.41] (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
-        by smtp.gmail.com with ESMTPSA id i36sm14433901pgi.81.2021.01.26.12.14.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Jan 2021 12:14:40 -0800 (PST)
-Subject: Re: [PATCH RESEND] blkcg: delete redundant get/put operations for
- queue
-To:     Chunguang Xu <brookxu.cn@gmail.com>, tj@kernel.org
-Cc:     linux-block@vger.kernel.org
-References: <1611551128-1238-1-git-send-email-brookxu@tencent.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <fc9cc1dd-9b2f-d5e2-1575-796239742b08@kernel.dk>
-Date:   Tue, 26 Jan 2021 13:14:39 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S1727024AbhAZWAk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Jan 2021 17:00:40 -0500
+Received: from mail.kernel.org ([198.145.29.99]:49188 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726902AbhAZVvr (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 26 Jan 2021 16:51:47 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id E0E7A20449;
+        Tue, 26 Jan 2021 21:51:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1611697866;
+        bh=uF4Zh493+gdGT/Bg0kWKqJydeGxsHWjFoA7xBs16rsw=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=lCGLIreDb/5Hwx8N2JmnAiiS0jiqRFkx5lWB+dYgajzTx5WDO2x1R1zbHYLyQO1UE
+         98ScSw7v1shjHJr3DWN8DeVEKxjccGxz8l94yiaaEhvMgOjW92D6rHh7wIPb+Z8Wcf
+         /WrH9o9CZLj9VLpBgdfMlPa9On6Ygs1IpZ1Ijf2DQsb5xhrrGFiJVmYaEU6R3mgkut
+         QaKR1+XYY5LF7MORkDaq36e+R/ZWRbwey+gnJIfZYHPT0K+eh+0B9d6nRjRnNDd/S0
+         dIZkNMAj/KUbyyLBEMzujKws37eYXRnxT13Nwk2S64RN7RIaBpTrze3+70kHOv4aD1
+         nwTbNcB4SZj3w==
+Date:   Tue, 26 Jan 2021 13:51:04 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Song Liu <song@kernel.org>,
+        Mike Snitzer <snitzer@redhat.com>,
+        David Sterba <dsterba@suse.com>, dm-devel@redhat.com,
+        Naohiro Aota <naohiro.aota@wdc.com>,
+        linux-nilfs@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>,
+        Chao Yu <chao@kernel.org>, linux-nfs@vger.kernel.org,
+        Coly Li <colyli@suse.de>, linux-raid@vger.kernel.org,
+        linux-bcache@vger.kernel.org, drbd-dev@tron.linbit.com,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Ryusuke Konishi <konishi.ryusuke@gmail.com>,
+        linux-block@vger.kernel.org,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        linux-f2fs-devel@lists.sourceforge.net,
+        linux-fsdevel@vger.kernel.org,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        linux-btrfs@vger.kernel.org
+Subject: Re: [PATCH 03/17] blk-crypto: use bio_kmalloc in blk_crypto_clone_bio
+Message-ID: <YBCOyBxDnSsT4jzU@sol.localdomain>
+References: <20210126145247.1964410-1-hch@lst.de>
+ <20210126145247.1964410-4-hch@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <1611551128-1238-1-git-send-email-brookxu@tencent.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210126145247.1964410-4-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/24/21 10:05 PM, Chunguang Xu wrote:
-> From: Chunguang Xu <brookxu@tencent.com>
+On Tue, Jan 26, 2021 at 03:52:33PM +0100, Christoph Hellwig wrote:
+> Use bio_kmalloc instead of open coding it.
 > 
-> When calling blkcg_schedule_throttle(), for the same queue,
-> redundant get/put operations can be removed.
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  block/blk-crypto-fallback.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/block/blk-crypto-fallback.c b/block/blk-crypto-fallback.c
+> index 50c225398e4d60..e8327c50d7c9f4 100644
+> --- a/block/blk-crypto-fallback.c
+> +++ b/block/blk-crypto-fallback.c
+> @@ -164,7 +164,7 @@ static struct bio *blk_crypto_clone_bio(struct bio *bio_src)
+>  	struct bio_vec bv;
+>  	struct bio *bio;
+>  
+> -	bio = bio_alloc_bioset(GFP_NOIO, bio_segments(bio_src), NULL);
+> +	bio = bio_kmalloc(GFP_NOIO, bio_segments(bio_src));
+>  	if (!bio)
+>  		return NULL;
+>  	bio->bi_bdev		= bio_src->bi_bdev;
+> -- 
 
-Applied, thanks.
+Looks good,
 
--- 
-Jens Axboe
-
+Reviewed-by: Eric Biggers <ebiggers@google.com>
