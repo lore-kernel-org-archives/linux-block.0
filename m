@@ -2,163 +2,140 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8FD0C433DB
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 12:46:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89ADEC433E0
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 13:15:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BF1072311D
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 12:46:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 570532311B
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 13:15:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391725AbhAZMpb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Jan 2021 07:45:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42930 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2391775AbhAZJ7R (ORCPT
+        id S2391793AbhAZMp4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Jan 2021 07:45:56 -0500
+Received: from mail-lj1-f179.google.com ([209.85.208.179]:46613 "EHLO
+        mail-lj1-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2391811AbhAZJ77 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Jan 2021 04:59:17 -0500
-Received: from mail-vs1-xe2b.google.com (mail-vs1-xe2b.google.com [IPv6:2607:f8b0:4864:20::e2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3236C06178A
-        for <linux-block@vger.kernel.org>; Tue, 26 Jan 2021 01:58:36 -0800 (PST)
-Received: by mail-vs1-xe2b.google.com with SMTP id b5so4126270vsh.3
-        for <linux-block@vger.kernel.org>; Tue, 26 Jan 2021 01:58:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=xAUX4GprPzfJpnKS+Lo2k56itTCgxOq8hTIK9hhikBo=;
-        b=yMLqhusdi2aisI8n3EYsY4b7uX64DLjmgiN7ntAidBYbDsED5leOQCmJSlsCarF/T+
-         Ed34AakMn7atFG1tHuru1bxCZfLwNf3/9RWXCZqJfzrhoYcYJvYvZe3JAWsNcN3mx029
-         XvbZasWKe7z20SCTOhJwM5B5hOteG5k+4UWVWSTm7bDy4+lrjVJDZhlEPzteoaS36tCi
-         OMPlQCWh5EfwHMGAT0qeom5wyPo9iJfFcvgT/t7wjQ5SWXN46cvFMbJ5nXx1Mbgx6RBk
-         AKawWmFxBazSWcZt940JkHuyie/rMXEQA0YAypuSICTCX1A68NMG9s+JBxZurKZbKqMZ
-         X7xA==
+        Tue, 26 Jan 2021 04:59:59 -0500
+Received: by mail-lj1-f179.google.com with SMTP id u11so18747283ljo.13;
+        Tue, 26 Jan 2021 01:59:35 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=xAUX4GprPzfJpnKS+Lo2k56itTCgxOq8hTIK9hhikBo=;
-        b=i8d99eS7zYtBeFAhXC3d0xfuDIo2RbnSlb7u9ETCkHKJVtanKjirrFGg1wtS7YSPVN
-         h3JMDmCV1N8RfA0RnuJzxUY5SASgaENaPjExytFNQqsju5BMMY8cCwmBYRru3QqEwHdW
-         nH0rrrB4TmQ4wNEokcQBsknxhjShev2YEZ73l7LuePqhoKwekuLFqlWRQ6LajlibH+/l
-         0pHyRSQwtT27GaZYRJDNUkWKDNj/ql7mZUwqvFJo2KhU0gTFr4r/Ak+2WW28PNbYkJ2J
-         RxUOdt8ht7hZ2W3KxCr0YiZIE21dG3LPg2oQyssVP1VLHBO0pcixopqfIxV5wYXdvSD4
-         nPtA==
-X-Gm-Message-State: AOAM531NzV5bP1efr28XhopuUP6UlkFri+qQSy01n5mtsoCj01+DKrs/
-        DIoP+lWb2n3jdbTmghx0gjbI1sPpVJ+01DQosmwXnA==
-X-Google-Smtp-Source: ABdhPJz/rKFclHqeegtULkB5WJdYhx0oUc8lnkCsoUksDa5rkBDuriXnXzAWxmfhrKfLGYMbfLPN+b1awwoLDJ9pLa8=
-X-Received: by 2002:a05:6102:67b:: with SMTP id z27mr2247015vsf.19.1611655115911;
- Tue, 26 Jan 2021 01:58:35 -0800 (PST)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Xmi28xkvyUxUdMMISjflxCIU4Qrn8nItoYK8w0cV+yo=;
+        b=bRY/0HP03LiNPTEXh22HhrXTz0OC2a/vwjixT3b5LyjDcGESWgWt7vXW9CSOx5rDN5
+         P9MqYeW/1m9iCwbFHJbMWQ6P+lzNcWqEMXpGSwoWePUBC35cr4+5d8raMUVp827uv1NN
+         bUdic2wN7R563Y3Afzh0GjsPX1lFt+k2nOMkMK2nYjJ9LiSAeFoG1Nczuoz4xkYzkKTU
+         AoDfPXsxBPBB8/dzylMkj9z1s2ioQ4oPy6BDOS+E6f0O/QTudiDhKdvHOIO0PH1FH5ym
+         EGZJKy8D8/6ZMFFnS/46C0vQmO0gTbUk2ypjzfByXqwReaiilygAwyhuxVpklVO/OpqV
+         NDBw==
+X-Gm-Message-State: AOAM530+PG0CX3Su6fWIif/fvM5EE/65ybbwDhpcNdRCtcQC0ospU/7s
+        K2rts4UxtKCl617gAM0KanbFBEo1WQg=
+X-Google-Smtp-Source: ABdhPJyLbthDt9qZuqRBd6OcRqpdtZTjkEa/7t5StwY1UpUD0WLMlYqsFA9p+pmJOsXRvHZwDvkehA==
+X-Received: by 2002:a05:651c:204f:: with SMTP id t15mr2540175ljo.161.1611655150121;
+        Tue, 26 Jan 2021 01:59:10 -0800 (PST)
+Received: from [10.68.32.192] (broadband-188-32-236-56.ip.moscow.rt.ru. [188.32.236.56])
+        by smtp.gmail.com with ESMTPSA id r9sm779650lfm.69.2021.01.26.01.59.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 26 Jan 2021 01:59:09 -0800 (PST)
+Subject: Re: [PATCH] floppy: reintroduce O_NDELAY fix
+To:     Kurt Garloff <kurt@garloff.de>, Jiri Kosina <jikos@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Wim Osterholt <wim@djo.tudelft.nl>
+References: <20160610230255.GA27770@djo.tudelft.nl>
+ <alpine.LNX.2.00.1606131414420.6874@cbobk.fhfr.pm>
+ <20160614184308.GA6188@djo.tudelft.nl>
+ <alpine.LNX.2.00.1606150906320.6874@cbobk.fhfr.pm>
+ <20160615132040.GZ14480@ZenIV.linux.org.uk>
+ <alpine.LNX.2.00.1606151610420.6874@cbobk.fhfr.pm>
+ <20160615224722.GA9545@djo.tudelft.nl>
+ <alpine.LNX.2.00.1606160946000.6874@cbobk.fhfr.pm>
+ <alpine.LNX.2.00.1606301317290.6874@cbobk.fhfr.pm>
+ <9c713fa8-9da1-47b5-0d5d-92f4cd13493a@kernel.dk>
+ <nycvar.YFH.7.76.2101191649190.5622@cbobk.fhfr.pm>
+ <5cb57175-7f0b-5536-925d-337241bcda93@linux.com>
+ <nycvar.YFH.7.76.2101211122290.5622@cbobk.fhfr.pm>
+ <nycvar.YFH.7.76.2101211543230.5622@cbobk.fhfr.pm>
+ <e503292b-5f51-eac5-771f-e35991d1084c@linux.com>
+ <nycvar.YFH.7.76.2101211603590.5622@cbobk.fhfr.pm>
+ <nycvar.YFH.7.76.2101221209060.5622@cbobk.fhfr.pm>
+ <5ef748c9-9ab9-9a7e-6ae9-6e4a292b6842@linux.com>
+ <f822ebde-89d6-dbbf-ae4e-b06a4aadedf5@garloff.de>
+From:   Denis Efremov <efremov@linux.com>
+Message-ID: <baf2391f-be61-90b3-9f01-db769d288576@linux.com>
+Date:   Tue, 26 Jan 2021 12:59:08 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-References: <20210121082155.111333-1-ebiggers@kernel.org> <20210121082155.111333-3-ebiggers@kernel.org>
-In-Reply-To: <20210121082155.111333-3-ebiggers@kernel.org>
-From:   Ulf Hansson <ulf.hansson@linaro.org>
-Date:   Tue, 26 Jan 2021 10:57:59 +0100
-Message-ID: <CAPDyKFo_nsZuCX+nVBDTJ5QxZ18mQMx=MssJZtWTfJfFC=u+xw@mail.gmail.com>
-Subject: Re: [PATCH 2/2] scsi: ufs: use devm_blk_ksm_init()
-To:     Eric Biggers <ebiggers@kernel.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>
-Cc:     linux-block <linux-block@vger.kernel.org>,
-        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
-        linux-scsi <linux-scsi@vger.kernel.org>,
-        Satya Tangirala <satyat@google.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <f822ebde-89d6-dbbf-ae4e-b06a4aadedf5@garloff.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-+ Martin, James
-
-On Thu, 21 Jan 2021 at 09:23, Eric Biggers <ebiggers@kernel.org> wrote:
->
-> From: Eric Biggers <ebiggers@google.com>
->
-> Use the new resource-managed variant of blk_ksm_init() so that the UFS
-> driver doesn't have to manually call blk_ksm_destroy().
->
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-
-I took the liberty of applying this one to my mmc tree along with
-patch1, as it looks trivial to me.
-
-Martin/James - if you have objections or want to ack it, please tell me.
-
-Thanks and kind regards
-Uffe
 
 
+On 1/26/21 12:31 PM, Kurt Garloff wrote:
+> Hi Denis, Jiri, Jens,
+> 
+> Am 26.01.21 um 09:21 schrieb Denis Efremov:
+>> On 1/22/21 2:13 PM, Jiri Kosina wrote:
+>>> From: Jiri Kosina <jkosina@suse.cz>
+>>>
+>>> This issue was originally fixed in 09954bad4 ("floppy: refactor open() 
+>>> flags handling").
+>>>
+>>> The fix as a side-effect, however, introduce issue for open(O_ACCMODE) 
+>>> that is being used for ioctl-only open. I wrote a fix for that, but 
+>>> instead of it being merged, full revert of 09954bad4 was performed, 
+>>> re-introducing the O_NDELAY / O_NONBLOCK issue, and it strikes again.
+>>>
+>>> This is a forward-port of the original fix to current codebase; the 
+>>> original submission had the changelog below:
+>>>
+>>> ====
+>>> Commit 09954bad4 ("floppy: refactor open() flags handling"), as a
+>>> side-effect, causes open(/dev/fdX, O_ACCMODE) to fail. It turns out that
+>>> this is being used setfdprm userspace for ioctl-only open().
+>>>
+>>> Reintroduce back the original behavior wrt !(FMODE_READ|FMODE_WRITE) 
+>>> modes, while still keeping the original O_NDELAY bug fixed.
+>>>
+>>> Cc: stable@vger.kernel.org
+>>> Reported-by: Wim Osterholt <wim@djo.tudelft.nl>
+>>> Tested-by: Wim Osterholt <wim@djo.tudelft.nl>
+>>> Reported-and-tested-by: Kurt Garloff <kurt@garloff.de>
+>>> Fixes: 09954bad4 ("floppy: refactor open() flags handling")
+>>> Fixes: f2791e7ead ("Revert "floppy: refactor open() flags handling"")
+>>> Signed-off-by: Jiri Kosina <jkosina@suse.cz>
+>> Applied. I'll send it to Jens soon with a couple of cleanup patches.
+>>
+>> https://github.com/evdenis/linux-floppy/commit/e32f6163c47efbdbad06258560aa00d1c7e5b699
+> 
+> Great, thanks.
+> 
+> Due to libblkid (rightfully) using O_NONBLOCK these days when probing
+> devices, the floppy driver does spit loads of
+> [    9.533513] floppy0: disk absent or changed during operation
+> [    9.534989] blk_update_request: I/O error, dev fd0, sector 0 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 0
+> [    9.537206] Buffer I/O error on dev fd0, logical block 0, async page read
+> [    9.546837] floppy0: disk absent or changed during operation
+> [    9.548389] blk_update_request: I/O error, dev fd0, sector 0 op 0x0:(READ) flags 0x80700 phys_seg 1
+> and fails a mount prior to being opened without O_NONBLOCK at least once.
+> (Reproduction is easy with qemu-kvm.)
+> 
+> The patch addresses it and I would suggest it to also be backported and
+> applied to the active stable kernel trees.
 
+Yes, it will be backported to all stable trees including v4.4
 
-
-> ---
->  drivers/scsi/ufs/ufshcd-crypto.c | 9 ++-------
->  drivers/scsi/ufs/ufshcd-crypto.h | 5 -----
->  drivers/scsi/ufs/ufshcd.c        | 1 -
->  3 files changed, 2 insertions(+), 13 deletions(-)
->
-> diff --git a/drivers/scsi/ufs/ufshcd-crypto.c b/drivers/scsi/ufs/ufshcd-crypto.c
-> index 07310b12a5dc8..153dd5765d9ca 100644
-> --- a/drivers/scsi/ufs/ufshcd-crypto.c
-> +++ b/drivers/scsi/ufs/ufshcd-crypto.c
-> @@ -179,8 +179,8 @@ int ufshcd_hba_init_crypto_capabilities(struct ufs_hba *hba)
->         }
->
->         /* The actual number of configurations supported is (CFGC+1) */
-> -       err = blk_ksm_init(&hba->ksm,
-> -                          hba->crypto_capabilities.config_count + 1);
-> +       err = devm_blk_ksm_init(hba->dev, &hba->ksm,
-> +                               hba->crypto_capabilities.config_count + 1);
->         if (err)
->                 goto out_free_caps;
->
-> @@ -238,8 +238,3 @@ void ufshcd_crypto_setup_rq_keyslot_manager(struct ufs_hba *hba,
->         if (hba->caps & UFSHCD_CAP_CRYPTO)
->                 blk_ksm_register(&hba->ksm, q);
->  }
-> -
-> -void ufshcd_crypto_destroy_keyslot_manager(struct ufs_hba *hba)
-> -{
-> -       blk_ksm_destroy(&hba->ksm);
-> -}
-> diff --git a/drivers/scsi/ufs/ufshcd-crypto.h b/drivers/scsi/ufs/ufshcd-crypto.h
-> index d53851be55416..78a58e788dff9 100644
-> --- a/drivers/scsi/ufs/ufshcd-crypto.h
-> +++ b/drivers/scsi/ufs/ufshcd-crypto.h
-> @@ -43,8 +43,6 @@ void ufshcd_init_crypto(struct ufs_hba *hba);
->  void ufshcd_crypto_setup_rq_keyslot_manager(struct ufs_hba *hba,
->                                             struct request_queue *q);
->
-> -void ufshcd_crypto_destroy_keyslot_manager(struct ufs_hba *hba);
-> -
->  #else /* CONFIG_SCSI_UFS_CRYPTO */
->
->  static inline void ufshcd_prepare_lrbp_crypto(struct request *rq,
-> @@ -69,9 +67,6 @@ static inline void ufshcd_init_crypto(struct ufs_hba *hba) { }
->  static inline void ufshcd_crypto_setup_rq_keyslot_manager(struct ufs_hba *hba,
->                                                 struct request_queue *q) { }
->
-> -static inline void ufshcd_crypto_destroy_keyslot_manager(struct ufs_hba *hba)
-> -{ }
-> -
->  #endif /* CONFIG_SCSI_UFS_CRYPTO */
->
->  #endif /* _UFSHCD_CRYPTO_H */
-> diff --git a/drivers/scsi/ufs/ufshcd.c b/drivers/scsi/ufs/ufshcd.c
-> index e31d2c5c7b23b..d905c84474c2c 100644
-> --- a/drivers/scsi/ufs/ufshcd.c
-> +++ b/drivers/scsi/ufs/ufshcd.c
-> @@ -9139,7 +9139,6 @@ EXPORT_SYMBOL_GPL(ufshcd_remove);
->   */
->  void ufshcd_dealloc_host(struct ufs_hba *hba)
->  {
-> -       ufshcd_crypto_destroy_keyslot_manager(hba);
->         scsi_host_put(hba->host);
->  }
->  EXPORT_SYMBOL_GPL(ufshcd_dealloc_host);
-> --
-> 2.30.0
->
+Thanks,
+Denis
