@@ -2,95 +2,75 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09422C433DB
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 19:54:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 395EFC433E0
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 21:56:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9B77222A85
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 19:54:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EE3352064C
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 21:56:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726480AbhAZFam (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Jan 2021 00:30:42 -0500
-Received: from verein.lst.de ([213.95.11.211]:43804 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726126AbhAYJQk (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Jan 2021 04:16:40 -0500
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 7027768B05; Mon, 25 Jan 2021 09:20:42 +0100 (CET)
-Date:   Mon, 25 Jan 2021 09:20:42 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org
-Subject: Re: [PATCH] block: unexport truncate_bdev_range
-Message-ID: <20210125082042.GA11659@lst.de>
-References: <20210109111332.1132424-1-hch@lst.de>
+        id S1726402AbhAZV41 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Jan 2021 16:56:27 -0500
+Received: from mail-pf1-f181.google.com ([209.85.210.181]:42054 "EHLO
+        mail-pf1-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726829AbhAZEqG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 25 Jan 2021 23:46:06 -0500
+Received: by mail-pf1-f181.google.com with SMTP id w18so9790158pfu.9
+        for <linux-block@vger.kernel.org>; Mon, 25 Jan 2021 20:45:51 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=TevLDGx6IiFMAmAKVMYNWkteiHuHEKNgEO4v2KV2j9Q=;
+        b=B+K0/BZv9ZeS+t1Jz9ojbSMWuVWy7h7sInSpyKft8A+fLmErD1xRwoBVIPP235nT/x
+         Lyv9Gduc4XgvFT6Esa55BNxlcwSxEteMDqM2ct6Qb+J2Xo5pJdRhXo9nfUsIHsCpQdT9
+         89dWNLTGMSvpAnwjdgK7FcxSK32R4i4Tr7txS/6gwA2he2ArT+G5CKXEY3M+hQC1V/DJ
+         U8RnjgMz5uvpnZJjAnxIx53MrlaqRDYrJlxfZ/qCSQOPZfp3u1aEk0cv9IJ0r5xL1a0d
+         GCQsNel0NzrOWl1V2DlEKo1Ni1waIMXb64jeL9ObYQZjCNcjDHb2vz+Sqd3QzNfEvqHi
+         nPgw==
+X-Gm-Message-State: AOAM531DIxMMY8fQC546OgAm/SoLJXRjhRTqYKFC8t57baY55ilT/hHO
+        2lIK5y3Im45CDXfr0wBT7h0=
+X-Google-Smtp-Source: ABdhPJwNYGEsfoVre+EJRbvs3dH5EyheYwL+FatAc935T9orRQ4LHNTvpP+uVLc+ehEoeHVl8pCM8Q==
+X-Received: by 2002:a62:e217:0:b029:1c1:59ed:ae73 with SMTP id a23-20020a62e2170000b02901c159edae73mr3733516pfi.6.1611636326524;
+        Mon, 25 Jan 2021 20:45:26 -0800 (PST)
+Received: from asus.hsd1.ca.comcast.net ([2601:647:4000:d7:f18a:1f6a:44e7:7404])
+        by smtp.gmail.com with ESMTPSA id m1sm866857pjz.16.2021.01.25.20.45.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Jan 2021 20:45:25 -0800 (PST)
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     Omar Sandoval <osandov@fb.com>
+Cc:     linux-block@vger.kernel.org, Yi Zhang <yi.zhang@redhat.com>,
+        Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH blktests 0/3] Three SRP patches
+Date:   Mon, 25 Jan 2021 20:45:16 -0800
+Message-Id: <20210126044519.6366-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.30.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210109111332.1132424-1-hch@lst.de>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Jens,
+Hi Omar,
 
-can you pick this one up?
+The three patches in this series improve the SRP tests. Please consider these
+patches for inclusion in the upstream blktests repository.
 
-On Sat, Jan 09, 2021 at 12:13:32PM +0100, Christoph Hellwig wrote:
-> truncate_bdev_range is only used in always built-in block layer code,
-> so remove the export and the !CONFIG_BLOCK stub.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  fs/block_dev.c         | 1 -
->  include/linux/blkdev.h | 9 ++-------
->  2 files changed, 2 insertions(+), 8 deletions(-)
-> 
-> diff --git a/fs/block_dev.c b/fs/block_dev.c
-> index 3e5b02f6606c42..41a9b0cb2d8a16 100644
-> --- a/fs/block_dev.c
-> +++ b/fs/block_dev.c
-> @@ -126,7 +126,6 @@ int truncate_bdev_range(struct block_device *bdev, fmode_t mode,
->  		bd_abort_claiming(bdev, truncate_bdev_range);
->  	return 0;
->  }
-> -EXPORT_SYMBOL(truncate_bdev_range);
->  
->  static void set_init_blocksize(struct block_device *bdev)
->  {
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> index f94ee3089e015e..22fc4f3141d555 100644
-> --- a/include/linux/blkdev.h
-> +++ b/include/linux/blkdev.h
-> @@ -2012,21 +2012,16 @@ void bdev_add(struct block_device *bdev, dev_t dev);
->  struct block_device *I_BDEV(struct inode *inode);
->  struct block_device *bdgrab(struct block_device *bdev);
->  void bdput(struct block_device *);
-> +int truncate_bdev_range(struct block_device *bdev, fmode_t mode, loff_t lstart,
-> +		loff_t lend);
->  
->  #ifdef CONFIG_BLOCK
->  void invalidate_bdev(struct block_device *bdev);
-> -int truncate_bdev_range(struct block_device *bdev, fmode_t mode, loff_t lstart,
-> -			loff_t lend);
->  int sync_blockdev(struct block_device *bdev);
->  #else
->  static inline void invalidate_bdev(struct block_device *bdev)
->  {
->  }
-> -static inline int truncate_bdev_range(struct block_device *bdev, fmode_t mode,
-> -				      loff_t lstart, loff_t lend)
-> -{
-> -	return 0;
-> -}
->  static inline int sync_blockdev(struct block_device *bdev)
->  {
->  	return 0;
-> -- 
-> 2.29.2
----end quoted text---
+Thanks,
+
+Bart.
+
+Bart Van Assche (3):
+  tests/block/030: Make this test less noisy
+  tests/srp/rc: Improve reliability of stop_lio_srpt()
+  rdma: Use rdma link instead of /sys/class/infiniband/*/parent
+
+ common/multipath-over-rdma | 111 +++++++++++--------------------------
+ tests/block/030            |   2 +-
+ tests/srp/rc               |  52 ++++++-----------
+ 3 files changed, 48 insertions(+), 117 deletions(-)
+
