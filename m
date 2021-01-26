@@ -2,73 +2,172 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBC11C433DB
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 15:11:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB9CEC433E6
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 15:12:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A096C2310E
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 15:11:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 85C752311C
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 15:12:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406079AbhAZPLL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Jan 2021 10:11:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54126 "EHLO
+        id S2406102AbhAZPLz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Jan 2021 10:11:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54648 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2406197AbhAZPJV (ORCPT
+        with ESMTP id S2406065AbhAZPLq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Jan 2021 10:09:21 -0500
+        Tue, 26 Jan 2021 10:11:46 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E93DC061A31;
-        Tue, 26 Jan 2021 07:08:41 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 475E6C061A31;
+        Tue, 26 Jan 2021 07:11:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=jywVRgQb+R/8nrC6wcC0tprf9W0TUepj2A0VJnxWY7w=; b=D4n+1nPul2NOhNPZRJuwX9YBXA
-        JCsbDOMHCHWzYej2yXoxgPSqOSFOSutcobuuWI4mrpr2gxzMUDgMRUeHaPla/101DVXo0E2AWgrYV
-        9qcPPaqJlzqQgs6POzLFnL8qlSEosQofGYG+V4fgpkbMBH1OXZo0s+BaoVzJ/LlxghxvO5AM8vdZC
-        jMQpJZRfNz/zt9dVM8wPjs6RQke1S6dshAm2nT/DLTOsyf8oKb4OkCjOmzr+JzXgQOSUezIeXLnIW
-        NfWwvWl5+8K859FC+VwnewuNACvy8w+x7rH5FySoGGAL4E4cH50i7BeSeMiPrAJHyFaG6G1Gg8GMv
-        qIaWxJVQ==;
-Received: from hch by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1l4PuB-005nGD-92; Tue, 26 Jan 2021 15:05:48 +0000
-Date:   Tue, 26 Jan 2021 15:05:19 +0000
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Changheun Lee <nanich.lee@samsung.com>, Johannes.Thumshirn@wdc.com,
-        asml.silence@gmail.com, axboe@kernel.dk, damien.lemoal@wdc.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        osandov@fb.com, patchwork-bot@kernel.org, tj@kernel.org,
-        tom.leiming@gmail.com, jisoo2146.oh@samsung.com,
-        junho89.kim@samsung.com, mj0123.lee@samsung.com,
-        seunghwan.hyun@samsung.com, sookwan7.kim@samsung.com,
-        woosung2.lee@samsung.com, yt0928.kim@samsung.com
-Subject: Re: [PATCH v3 1/2] bio: limit bio max size
-Message-ID: <20210126150519.GA1377213@infradead.org>
-References: <CGME20210126014805epcas1p2c4fc40f01c9c89b0a94ff6cac5408347@epcas1p2.samsung.com>
- <20210126013235.28711-1-nanich.lee@samsung.com>
- <20210126035748.GA1071341@T590>
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
+        Content-Type:Content-ID:Content-Description;
+        bh=o7VUFbuCs40X37XHTmVmjDE9l+0qzfo+L5D5+3HB/Xs=; b=aV79kHDk99zhkL6s5WblnMsXYm
+        MUeYdtQAir6ZpBM6WxTX2uHNWa9GoJblM5+y9lvBViksx2RanhFgtOVoykjDrNKUAASUImAhQ2S9S
+        kCfJVL4xwzijj26ZqmZV0RNsrXFPbf4N+/Nr6bUnSe70GhYydpXzWfT1u3SDcEBkvvxsPZwC5/Opl
+        QrXnJfVNQdYsJMZo5rcHFwaYuDhpw+B9jZZ2qD3QFDvKwydp8nBngTufhjUIOGN8sMm7ejCwV76Ba
+        wQKngqSt6P9/gxTf3mYfoWEoeugpEM9qEEobeCMKiVADWZmeomcieNiE/g3oi2zy++X/iQc0gI0gY
+        x6aONCMg==;
+Received: from [2001:4bb8:191:e347:5918:ac86:61cb:8801] (helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
+        id 1l4PuS-005nI7-1q; Tue, 26 Jan 2021 15:06:07 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>, Song Liu <song@kernel.org>
+Cc:     Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        Coly Li <colyli@suse.de>, Mike Snitzer <snitzer@redhat.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Naohiro Aota <naohiro.aota@wdc.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Ryusuke Konishi <konishi.ryusuke@gmail.com>,
+        linux-nilfs@vger.kernel.org, dm-devel@redhat.com,
+        linux-f2fs-devel@lists.sourceforge.net,
+        linux-block@vger.kernel.org, drbd-dev@lists.linbit.com,
+        linux-bcache@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-btrfs@vger.kernel.org,
+        linux-nfs@vger.kernel.org, linux-mm@kvack.org
+Subject: [PATCH 08/17] f2fs: remove FAULT_ALLOC_BIO
+Date:   Tue, 26 Jan 2021 15:52:38 +0100
+Message-Id: <20210126145247.1964410-9-hch@lst.de>
+X-Mailer: git-send-email 2.29.2
+In-Reply-To: <20210126145247.1964410-1-hch@lst.de>
+References: <20210126145247.1964410-1-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210126035748.GA1071341@T590>
+Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jan 26, 2021 at 11:57:48AM +0800, Ming Lei wrote:
-> >  				*same_page = false;
-> >  				return false;
-> >  			}
-> 
-> So far we don't need bio->bi_disk or bio->bi_bdev(will be changed in
-> Christoph's patch) during adding page to bio, so there is null ptr
-> refereance risk.
+Sleeping bio allocations do not fail, which means that injecting an error
+into sleeping bio allocations is a little silly.
 
-I've started resurrecting my old plan to always have a valid device
-in the bio from allocation time on.  It is pretty invasive, but
-probably worth it.  Sending out the first prep series right now, the
-actual changes should be ready for an RFC later this week.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ Documentation/filesystems/f2fs.rst |  1 -
+ fs/f2fs/data.c                     | 29 ++++-------------------------
+ fs/f2fs/f2fs.h                     |  1 -
+ fs/f2fs/super.c                    |  1 -
+ 4 files changed, 4 insertions(+), 28 deletions(-)
+
+diff --git a/Documentation/filesystems/f2fs.rst b/Documentation/filesystems/f2fs.rst
+index dae15c96e659e2..624f5f3ed93e86 100644
+--- a/Documentation/filesystems/f2fs.rst
++++ b/Documentation/filesystems/f2fs.rst
+@@ -179,7 +179,6 @@ fault_type=%d		 Support configuring fault injection type, should be
+ 			 FAULT_KVMALLOC		  0x000000002
+ 			 FAULT_PAGE_ALLOC	  0x000000004
+ 			 FAULT_PAGE_GET		  0x000000008
+-			 FAULT_ALLOC_BIO	  0x000000010
+ 			 FAULT_ALLOC_NID	  0x000000020
+ 			 FAULT_ORPHAN		  0x000000040
+ 			 FAULT_BLOCK		  0x000000080
+diff --git a/fs/f2fs/data.c b/fs/f2fs/data.c
+index 0cf0c605992431..9fb6be65592b1f 100644
+--- a/fs/f2fs/data.c
++++ b/fs/f2fs/data.c
+@@ -50,28 +50,6 @@ void f2fs_destroy_bioset(void)
+ 	bioset_exit(&f2fs_bioset);
+ }
+ 
+-static inline struct bio *__f2fs_bio_alloc(gfp_t gfp_mask,
+-						unsigned int nr_iovecs)
+-{
+-	return bio_alloc_bioset(gfp_mask, nr_iovecs, &f2fs_bioset);
+-}
+-
+-static struct bio *f2fs_bio_alloc(struct f2fs_sb_info *sbi, int npages,
+-		bool noio)
+-{
+-	if (noio) {
+-		/* No failure on bio allocation */
+-		return __f2fs_bio_alloc(GFP_NOIO, npages);
+-	}
+-
+-	if (time_to_inject(sbi, FAULT_ALLOC_BIO)) {
+-		f2fs_show_injection_info(sbi, FAULT_ALLOC_BIO);
+-		return NULL;
+-	}
+-
+-	return __f2fs_bio_alloc(GFP_KERNEL, npages);
+-}
+-
+ static bool __is_cp_guaranteed(struct page *page)
+ {
+ 	struct address_space *mapping = page->mapping;
+@@ -433,7 +411,7 @@ static struct bio *__bio_alloc(struct f2fs_io_info *fio, int npages)
+ 	struct f2fs_sb_info *sbi = fio->sbi;
+ 	struct bio *bio;
+ 
+-	bio = f2fs_bio_alloc(sbi, npages, true);
++	bio = bio_alloc_bioset(GFP_NOIO, npages, &f2fs_bioset);
+ 
+ 	f2fs_target_device(sbi, fio->new_blkaddr, bio);
+ 	if (is_read_io(fio->op)) {
+@@ -1029,8 +1007,9 @@ static struct bio *f2fs_grab_read_bio(struct inode *inode, block_t blkaddr,
+ 	struct bio_post_read_ctx *ctx;
+ 	unsigned int post_read_steps = 0;
+ 
+-	bio = f2fs_bio_alloc(sbi, min_t(int, nr_pages, BIO_MAX_PAGES),
+-								for_write);
++	bio = bio_alloc_bioset(for_write ? GFP_NOIO : GFP_KERNEL,
++			       min_t(int, nr_pages, BIO_MAX_PAGES),
++			       &f2fs_bioset);
+ 	if (!bio)
+ 		return ERR_PTR(-ENOMEM);
+ 
+diff --git a/fs/f2fs/f2fs.h b/fs/f2fs/f2fs.h
+index 902bd3267c03e1..6c78365d80ceb5 100644
+--- a/fs/f2fs/f2fs.h
++++ b/fs/f2fs/f2fs.h
+@@ -43,7 +43,6 @@ enum {
+ 	FAULT_KVMALLOC,
+ 	FAULT_PAGE_ALLOC,
+ 	FAULT_PAGE_GET,
+-	FAULT_ALLOC_BIO,
+ 	FAULT_ALLOC_NID,
+ 	FAULT_ORPHAN,
+ 	FAULT_BLOCK,
+diff --git a/fs/f2fs/super.c b/fs/f2fs/super.c
+index b4a07fe62d1a58..3a312642907e86 100644
+--- a/fs/f2fs/super.c
++++ b/fs/f2fs/super.c
+@@ -45,7 +45,6 @@ const char *f2fs_fault_name[FAULT_MAX] = {
+ 	[FAULT_KVMALLOC]	= "kvmalloc",
+ 	[FAULT_PAGE_ALLOC]	= "page alloc",
+ 	[FAULT_PAGE_GET]	= "page get",
+-	[FAULT_ALLOC_BIO]	= "alloc bio",
+ 	[FAULT_ALLOC_NID]	= "alloc nid",
+ 	[FAULT_ORPHAN]		= "orphan",
+ 	[FAULT_BLOCK]		= "no more block",
+-- 
+2.29.2
+
