@@ -2,465 +2,181 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	MAILING_LIST_MULTI,PDS_BAD_THREAD_QP_64,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EE42C433E6
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 15:09:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C50F4C433E0
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 15:11:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DC690230FE
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 15:09:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9BCA6230FE
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 15:11:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406087AbhAZPGZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Jan 2021 10:06:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53396 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2392773AbhAZPGB (ORCPT
+        id S2391658AbhAZPKG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Jan 2021 10:10:06 -0500
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:50242 "EHLO
+        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2406198AbhAZPJ0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Jan 2021 10:06:01 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91C69C061A29;
-        Tue, 26 Jan 2021 07:05:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=mm+FjonDWBaByySgjQ1ddi/zH6bwklKoVG3tDNfuqxY=; b=bdKYZI5OlfdtShDYYpA0WP6v08
-        t+AZC5vg67tHj67odGaeNQC/aSjvOtYw6JRcyroHG58a6MgYO5CDO8arEIJoG6hbq5icqonc+ugce
-        jdpt7n1iodH0SsUy+W7mLB4unDqMKtmUYSOVrrzHjjg7AQOIod879FQCvkUfnQzEU51DU7xi1uUh3
-        ZR/g6C96Xqi2qU5qOSClu3RFHw7X7FUF5xe0Kxctglg5kmrOykeQKQEdxrg4XPC4HQYA4QYmAUv/9
-        WkJ2ZN6H1CYuRhARpb02GPcSbXH+lUu6wPS2isg48+O0O8J8YyTZ33tBw9B1BryCm/JCvkADPffMc
-        GE2+pIxQ==;
-Received: from [2001:4bb8:191:e347:5918:ac86:61cb:8801] (helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
-        id 1l4PqP-005mns-Ef; Tue, 26 Jan 2021 15:01:48 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>, Song Liu <song@kernel.org>
-Cc:     Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
+        Tue, 26 Jan 2021 10:09:26 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1611673765; x=1643209765;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=knd/vq/iKZ9ytSRXl4mzhKgn7bInmSzPGgY7pLGvF38=;
+  b=qDy/+s97YyX5BNNzY5TOjGb0pu6T3BSY81EouK9EXiQkG9FjFAmgJarO
+   d9Ei5ZrwfKFdczWqSjlQ2WB/35eBg5tr2jd4GVu+i7MnQtap5XzQyXP7n
+   +QFYvK+feNUL2544sYtPjkcaheDhaanFYeL19mGFDZL46t6R/gDSsinLt
+   Rt3M5RIXgDPwHiJ5Gz8Rm3ueOyNFxaHvLzBciBNGd2aqeaQQmTGLf1WiX
+   0VoeNdUhcfgSwFyvTNicMVaxU0nfELaMHyK66lXn4FZPJJH/KLDFyN54y
+   ZSTyOyqvvdfV9SeMJDECS+OWIF+KzC890TA80amOUbMps3PQDvAqeCMky
+   w==;
+IronPort-SDR: HcbuzBJm1u6RCEVGWBL1UbDszAA+554lNR+8jGCPOhUhrTc+pKHhEVvRzitrqKNbyKqgmM+S7Q
+ G2Wdop8XSypkKCpBYBeBnooXwC2sfytvfQ3e0kVjrnwIIAQhYTSgzfyLoUcFGpu1+NQWyUaU4V
+ 00pHs71QW1NGoBT6OqA+Zu/2Pfs1SKd24Xqi0IciCZDdaEipwIxhtHh7NQahTyhBluwWxtCjrd
+ 5+ZDosG++y+NG5j75CXTMWBGV5iW1IbV1DAB57oUFFRAfht1GTG1zNuUCSQsu7bII6h0Ru2rUm
+ vPE=
+X-IronPort-AV: E=Sophos;i="5.79,375,1602518400"; 
+   d="scan'208";a="158356113"
+Received: from mail-cys01nam02lp2058.outbound.protection.outlook.com (HELO NAM02-CY1-obe.outbound.protection.outlook.com) ([104.47.37.58])
+  by ob1.hgst.iphmx.com with ESMTP; 26 Jan 2021 23:08:14 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=kr7MYt6HY1xj8L+LAyIkdkkIyMxnqL7KgFGruOzTGEbXs1MTq/i0d8JuQafkDLJNCGVathGwHMGBqU2Nzs73TQo+asB3M0ZQnvfn3JaijafvJJKcxr/D5eSE2P8km8M/tnLOb+70lo8SQVTeTJyYW8z06B9x2he+SpSdhDQ9j1ebcs1jw19UbkO3gOOf3VDHQsE4RcthmA68ErNTA4XSo03kNKbmRpQDEkded5AY8OGHPbUPQG/G+FKxxAKCbIs2JpcrtZcdp14Ven0JVyp3IzwoKkgu0yiyIMHRGatpjHv/xqNrV5M3yvKTuDPZXnlpNFzankIRodxOGowBOi0C4w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UWacF5Tz2aVg5M9uD2OwJG49WEBCvddRIk1yXegs3dI=;
+ b=E8/sAzk92F7cU7QxqMQZPHSCP0nK0661Z4A6ndp/bjUFjDu5/Hqe2R8eQM91XdseGmERc59z/DS6xKHu2kzBwW6yvOWq1V9epD1sF14bAbCEZwfTp6w9PybI42184QvbwbFGu2hW9jL+sBOSY6fpEdJjIfGyD21tQM1HLngy13GyWkIkryEbyg5P9k+OcoBbMEliCN6Bb2tVpGfME/PuRd9aHNrPFdzs4v1l4Hse968CDqZ3C+lv+p3QyySNE49pWF5WgbIY4TZgSr6FjJs0CbmgmSy59gUtN+sQ+P7rahLY0nTQiS3HYpZ2tKRgrLVlCgjfVKXQeGITwN57ApSzpw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UWacF5Tz2aVg5M9uD2OwJG49WEBCvddRIk1yXegs3dI=;
+ b=OyB9pKxpw/++A0u7MtL8FBvL4Krc6a86nPbkjXtEEj/B8FKnbRYgPbDwMZI+uxyWV9W+FacbTqcgpAcFIP0sK/rduK8aIBmsAR6keDqvz/Ca4AfV+IeHY8WnvmWBlK5P7ddTslXUETCJhmEoe8MW6cipxzAMhhFTp+XqgpAXFjo=
+Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
+ (2603:10b6:803:47::21) by SN6PR04MB4928.namprd04.prod.outlook.com
+ (2603:10b6:805:9d::28) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3784.15; Tue, 26 Jan
+ 2021 15:08:13 +0000
+Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
+ ([fe80::c19b:805:20e0:6274]) by SN4PR0401MB3598.namprd04.prod.outlook.com
+ ([fe80::c19b:805:20e0:6274%6]) with mapi id 15.20.3784.017; Tue, 26 Jan 2021
+ 15:08:12 +0000
+From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Song Liu <song@kernel.org>
+CC:     Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
         Philipp Reisner <philipp.reisner@linbit.com>,
         Lars Ellenberg <lars.ellenberg@linbit.com>,
         Coly Li <colyli@suse.de>, Mike Snitzer <snitzer@redhat.com>,
         Josef Bacik <josef@toxicpanda.com>,
         David Sterba <dsterba@suse.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Naohiro Aota <naohiro.aota@wdc.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Naohiro Aota <Naohiro.Aota@wdc.com>,
         Andrew Morton <akpm@linux-foundation.org>,
         Ryusuke Konishi <konishi.ryusuke@gmail.com>,
-        linux-nilfs@vger.kernel.org, dm-devel@redhat.com,
-        linux-f2fs-devel@lists.sourceforge.net,
-        linux-block@vger.kernel.org, drbd-dev@lists.linbit.com,
-        linux-bcache@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        linux-nfs@vger.kernel.org, linux-mm@kvack.org
-Subject: [PATCH 05/17] block: use an on-stack bio in blkdev_issue_flush
-Date:   Tue, 26 Jan 2021 15:52:35 +0100
-Message-Id: <20210126145247.1964410-6-hch@lst.de>
-X-Mailer: git-send-email 2.29.2
-In-Reply-To: <20210126145247.1964410-1-hch@lst.de>
+        "linux-nilfs@vger.kernel.org" <linux-nilfs@vger.kernel.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "linux-f2fs-devel@lists.sourceforge.net" 
+        <linux-f2fs-devel@lists.sourceforge.net>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "drbd-dev@lists.linbit.com" <drbd-dev@lists.linbit.com>,
+        "linux-bcache@vger.kernel.org" <linux-bcache@vger.kernel.org>,
+        "linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
+        "linux-nfs@vger.kernel.org" <linux-nfs@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>
+Subject: Re: [PATCH 01/17] zonefs: use bio_alloc in zonefs_file_dio_append
+Thread-Topic: [PATCH 01/17] zonefs: use bio_alloc in zonefs_file_dio_append
+Thread-Index: AQHW8/Qrc+FuLwDd/k+CySi1dId/TA==
+Date:   Tue, 26 Jan 2021 15:08:12 +0000
+Message-ID: <SN4PR0401MB359852658B9D8F386CC7C76A9BBC9@SN4PR0401MB3598.namprd04.prod.outlook.com>
 References: <20210126145247.1964410-1-hch@lst.de>
+ <20210126145247.1964410-2-hch@lst.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: lst.de; dkim=none (message not signed)
+ header.d=none;lst.de; dmarc=none action=none header.from=wdc.com;
+x-originating-ip: [62.216.203.141]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 0edb4c87-c068-4eca-1592-08d8c20c335c
+x-ms-traffictypediagnostic: SN6PR04MB4928:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <SN6PR04MB49288B3AD6F1136E28FA89949BBC9@SN6PR04MB4928.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:660;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: ExQuz7m9Z2JVMsakrHKGh0w8++Sxwbj8vy2sZznmg+RMf5rlwJ/ppA3m6/sEhNljkawHlpJht9TX5mm7If/bB/0EYB3U/pShUTwqr0LlFZ/NbtM0Ln3oVrpquJBYV7xQ4ktogxqG7S0n3864flZphyYvkvX9iZzIFpuM3eLUHBo8NGPquM1XIRl1mykcCLhZiMJyZ4kn60XiYBLIsVCyvXaU5Xfg2jKTQ0zrEx+HRmNNaXO9GdfTw6939Wxz5I+922JREaPlm4z5Kpr+Z3piocSgZjCYqw+Bp9XX+A0U5LxgP2jp4FEb+v1/w/BZnnt8LCTzNnLz8qjb9TKVensQrlig83ktPU8lKmds0gnH6PF/BVfPijaHLkvdw8tvGlYEG8kkAduxcBhD3dOXK8FHiA==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN4PR0401MB3598.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(136003)(366004)(39860400002)(346002)(396003)(4326008)(86362001)(8936002)(9686003)(4744005)(8676002)(55016002)(83380400001)(76116006)(66946007)(66476007)(66556008)(6506007)(33656002)(2906002)(64756008)(478600001)(5660300002)(66446008)(316002)(26005)(52536014)(54906003)(7696005)(91956017)(71200400001)(53546011)(186003)(110136005)(7416002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: =?us-ascii?Q?JQM9L3OEQhlXD6MnYa/VUMRsZExwv8hBqCMxm7neHEOCgV/vnva2Jko4lwvn?=
+ =?us-ascii?Q?6a5hV43yv20zlJHD4OiWZ7JqFrxjRCKRwi4D3aR8wFfWRpNdwzB+OtI1Tuqp?=
+ =?us-ascii?Q?L7+NjWgG1GIONUMdtWnCZsT5fT3IaaxfjqRG2Hukzm4fzUIQtwwqCzWMBy2l?=
+ =?us-ascii?Q?ydxkeNdzouh67olxMR/iIGc15/qRlXhVaWD6fOJWJf4trGiSm11hJjkcg2jL?=
+ =?us-ascii?Q?vBWCuMJ30PTxTvvrpbOiSMiHe7Um+Ht0mx57HkwBsF3drQld0QIMd1lv+mKh?=
+ =?us-ascii?Q?/EuvP+OPrq6A48BWYa10L1YtTUigufbDtErUVIZLXoHuMPk70FUCdzvW6JPY?=
+ =?us-ascii?Q?b7CnDgnYfPUkdVGHxdTIT8w2/UKvSruMWsgRlEkX+UDSiuBhHich9z0kUJ4C?=
+ =?us-ascii?Q?XvNaJtBj5Y1UXflXVz0UCnZNRprdvOPIQiyMslHkC/vAsSps+8HP3xAtxE17?=
+ =?us-ascii?Q?gVKZ7CzAKybcpEIjO20BCHfCAyhZN0+/zPpdzd9N+pNqKUvDCyKnYdHhOQBV?=
+ =?us-ascii?Q?sLYk/pcR+Xzw97zlXrZnI/WTKZ4x2CssnUE+4KMYDbQcoRB8sNAAvMTIrtG/?=
+ =?us-ascii?Q?9BF8YKm0a9aNS/sXsL4FY3a+XjIL87rPhpI3HRdyN9aCAO53BJNFByy0TmV/?=
+ =?us-ascii?Q?htJ3LGo1uzagc93ru67FZbKWgLnRUKbfq84XAMif6VxgPRj/1sId4wikimF2?=
+ =?us-ascii?Q?8bWEuV8aMBb25XcVqg4EkJs9iQpc6BQtslQxVQdxYC7iUQf9I+79iFGUe/cE?=
+ =?us-ascii?Q?qLr96pHL/9Hg2plPbC2nQdJWI0eUhbVxZWja8U7tgiuPZxCxMhx9G18TF6t1?=
+ =?us-ascii?Q?BIWMu/BC4BMtyiiKlVhbsobqy4tp696zVUrWmLtmgH3bacZJw4a5yDug4avi?=
+ =?us-ascii?Q?/MRJMmMOPkrD0TbEXErimf53cgaIDTba0ei/2knbuPboyxPnkFP4S15AegCh?=
+ =?us-ascii?Q?LzqEe/GWZyoboUlIt/p0nbGkjX2vX8pDYeUfU+nBvD58Hk3HBag2BDpgCWIu?=
+ =?us-ascii?Q?gdIi/PGTK0fWpr9ceKNt9APVCteH9F/etNlvGJTc87zZ3AyNgJBpo7K8N7bX?=
+ =?us-ascii?Q?AnGwC++QZn0LXiYiYAgruyRLfkPajA=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SN4PR0401MB3598.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0edb4c87-c068-4eca-1592-08d8c20c335c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Jan 2021 15:08:12.8135
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Q0E+MnIjdP3+t2e6Q3SF/nPCtiVsfV+MwOfDhDYdKs+Gxw8i48xjhHtX6szGMutRVdsMhisZcVPNCbyiIQoF8KnrFdBgFcRxwbNEaS3pxFA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR04MB4928
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-There is no point in allocating memory for a synchronous flush.
-
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-flush.c                 | 17 ++++++-----------
- drivers/md/dm-zoned-metadata.c    |  6 +++---
- drivers/md/raid5-ppl.c            |  2 +-
- drivers/nvme/target/io-cmd-bdev.c |  2 +-
- fs/block_dev.c                    |  2 +-
- fs/exfat/file.c                   |  2 +-
- fs/ext4/fast_commit.c             |  4 ++--
- fs/ext4/fsync.c                   |  2 +-
- fs/ext4/ialloc.c                  |  2 +-
- fs/ext4/super.c                   |  2 +-
- fs/fat/file.c                     |  2 +-
- fs/hfsplus/inode.c                |  2 +-
- fs/hfsplus/super.c                |  2 +-
- fs/jbd2/checkpoint.c              |  2 +-
- fs/jbd2/commit.c                  |  4 ++--
- fs/jbd2/recovery.c                |  2 +-
- fs/libfs.c                        |  2 +-
- fs/nilfs2/the_nilfs.h             |  2 +-
- fs/ocfs2/file.c                   |  2 +-
- fs/reiserfs/file.c                |  2 +-
- fs/xfs/xfs_super.c                |  2 +-
- fs/zonefs/super.c                 |  2 +-
- include/linux/blkdev.h            |  4 ++--
- 23 files changed, 33 insertions(+), 38 deletions(-)
-
-diff --git a/block/blk-flush.c b/block/blk-flush.c
-index 76c1624cb06c05..7942ca6ed3211c 100644
---- a/block/blk-flush.c
-+++ b/block/blk-flush.c
-@@ -432,23 +432,18 @@ void blk_insert_flush(struct request *rq)
- /**
-  * blkdev_issue_flush - queue a flush
-  * @bdev:	blockdev to issue flush for
-- * @gfp_mask:	memory allocation flags (for bio_alloc)
-  *
-  * Description:
-  *    Issue a flush for the block device in question.
-  */
--int blkdev_issue_flush(struct block_device *bdev, gfp_t gfp_mask)
-+int blkdev_issue_flush(struct block_device *bdev)
- {
--	struct bio *bio;
--	int ret = 0;
-+	struct bio bio;
- 
--	bio = bio_alloc(gfp_mask, 0);
--	bio_set_dev(bio, bdev);
--	bio->bi_opf = REQ_OP_WRITE | REQ_PREFLUSH;
--
--	ret = submit_bio_wait(bio);
--	bio_put(bio);
--	return ret;
-+	bio_init(&bio, NULL, 0);
-+	bio_set_dev(&bio, bdev);
-+	bio.bi_opf = REQ_OP_WRITE | REQ_PREFLUSH;
-+	return submit_bio_wait(&bio);
- }
- EXPORT_SYMBOL(blkdev_issue_flush);
- 
-diff --git a/drivers/md/dm-zoned-metadata.c b/drivers/md/dm-zoned-metadata.c
-index b298fefb022eb9..039d17b2893849 100644
---- a/drivers/md/dm-zoned-metadata.c
-+++ b/drivers/md/dm-zoned-metadata.c
-@@ -819,7 +819,7 @@ static int dmz_write_sb(struct dmz_metadata *zmd, unsigned int set)
- 	ret = dmz_rdwr_block(dev, REQ_OP_WRITE, zmd->sb[set].block,
- 			     mblk->page);
- 	if (ret == 0)
--		ret = blkdev_issue_flush(dev->bdev, GFP_NOIO);
-+		ret = blkdev_issue_flush(dev->bdev);
- 
- 	return ret;
- }
-@@ -862,7 +862,7 @@ static int dmz_write_dirty_mblocks(struct dmz_metadata *zmd,
- 
- 	/* Flush drive cache (this will also sync data) */
- 	if (ret == 0)
--		ret = blkdev_issue_flush(dev->bdev, GFP_NOIO);
-+		ret = blkdev_issue_flush(dev->bdev);
- 
- 	return ret;
- }
-@@ -933,7 +933,7 @@ int dmz_flush_metadata(struct dmz_metadata *zmd)
- 
- 	/* If there are no dirty metadata blocks, just flush the device cache */
- 	if (list_empty(&write_list)) {
--		ret = blkdev_issue_flush(dev->bdev, GFP_NOIO);
-+		ret = blkdev_issue_flush(dev->bdev);
- 		goto err;
- 	}
- 
-diff --git a/drivers/md/raid5-ppl.c b/drivers/md/raid5-ppl.c
-index d0f540296fe91e..e8c118e05dfd46 100644
---- a/drivers/md/raid5-ppl.c
-+++ b/drivers/md/raid5-ppl.c
-@@ -1037,7 +1037,7 @@ static int ppl_recover(struct ppl_log *log, struct ppl_header *pplhdr,
- 	}
- 
- 	/* flush the disk cache after recovery if necessary */
--	ret = blkdev_issue_flush(rdev->bdev, GFP_KERNEL);
-+	ret = blkdev_issue_flush(rdev->bdev);
- out:
- 	__free_page(page);
- 	return ret;
-diff --git a/drivers/nvme/target/io-cmd-bdev.c b/drivers/nvme/target/io-cmd-bdev.c
-index 125dde3f410ee7..bf6e0ac9ad2890 100644
---- a/drivers/nvme/target/io-cmd-bdev.c
-+++ b/drivers/nvme/target/io-cmd-bdev.c
-@@ -333,7 +333,7 @@ static void nvmet_bdev_execute_flush(struct nvmet_req *req)
- 
- u16 nvmet_bdev_flush(struct nvmet_req *req)
- {
--	if (blkdev_issue_flush(req->ns->bdev, GFP_KERNEL))
-+	if (blkdev_issue_flush(req->ns->bdev))
- 		return NVME_SC_INTERNAL | NVME_SC_DNR;
- 	return 0;
- }
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 6f5bd9950baf45..bc957ef7cebaae 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -681,7 +681,7 @@ int blkdev_fsync(struct file *filp, loff_t start, loff_t end, int datasync)
- 	 * i_mutex and doing so causes performance issues with concurrent
- 	 * O_SYNC writers to a block device.
- 	 */
--	error = blkdev_issue_flush(bdev, GFP_KERNEL);
-+	error = blkdev_issue_flush(bdev);
- 	if (error == -EOPNOTSUPP)
- 		error = 0;
- 
-diff --git a/fs/exfat/file.c b/fs/exfat/file.c
-index a92478eabfa4e4..183ffdf4d43c5f 100644
---- a/fs/exfat/file.c
-+++ b/fs/exfat/file.c
-@@ -361,7 +361,7 @@ int exfat_file_fsync(struct file *filp, loff_t start, loff_t end, int datasync)
- 	if (err)
- 		return err;
- 
--	return blkdev_issue_flush(inode->i_sb->s_bdev, GFP_KERNEL);
-+	return blkdev_issue_flush(inode->i_sb->s_bdev);
- }
- 
- const struct file_operations exfat_file_operations = {
-diff --git a/fs/ext4/fast_commit.c b/fs/ext4/fast_commit.c
-index 0a14a7c87bf82e..6e8208acfc62ac 100644
---- a/fs/ext4/fast_commit.c
-+++ b/fs/ext4/fast_commit.c
-@@ -1076,7 +1076,7 @@ static int ext4_fc_perform_commit(journal_t *journal)
- 	 * flush before we start writing fast commit blocks.
- 	 */
- 	if (journal->j_fs_dev != journal->j_dev)
--		blkdev_issue_flush(journal->j_fs_dev, GFP_NOFS);
-+		blkdev_issue_flush(journal->j_fs_dev);
- 
- 	blk_start_plug(&plug);
- 	if (sbi->s_fc_bytes == 0) {
-@@ -1535,7 +1535,7 @@ static int ext4_fc_replay_inode(struct super_block *sb, struct ext4_fc_tl *tl)
- out:
- 	iput(inode);
- 	if (!ret)
--		blkdev_issue_flush(sb->s_bdev, GFP_KERNEL);
-+		blkdev_issue_flush(sb->s_bdev);
- 
- 	return 0;
- }
-diff --git a/fs/ext4/fsync.c b/fs/ext4/fsync.c
-index 113bfb023a4a09..027a7d7037a07b 100644
---- a/fs/ext4/fsync.c
-+++ b/fs/ext4/fsync.c
-@@ -174,7 +174,7 @@ int ext4_sync_file(struct file *file, loff_t start, loff_t end, int datasync)
- 		ret = ext4_fsync_journal(inode, datasync, &needs_barrier);
- 
- 	if (needs_barrier) {
--		err = blkdev_issue_flush(inode->i_sb->s_bdev, GFP_KERNEL);
-+		err = blkdev_issue_flush(inode->i_sb->s_bdev);
- 		if (!ret)
- 			ret = err;
- 	}
-diff --git a/fs/ext4/ialloc.c b/fs/ext4/ialloc.c
-index b215c564bc318a..20f2fcb799f55f 100644
---- a/fs/ext4/ialloc.c
-+++ b/fs/ext4/ialloc.c
-@@ -1583,7 +1583,7 @@ int ext4_init_inode_table(struct super_block *sb, ext4_group_t group,
- 	if (ret < 0)
- 		goto err_out;
- 	if (barrier)
--		blkdev_issue_flush(sb->s_bdev, GFP_NOFS);
-+		blkdev_issue_flush(sb->s_bdev);
- 
- skip_zeroout:
- 	ext4_lock_group(sb, group);
-diff --git a/fs/ext4/super.c b/fs/ext4/super.c
-index 9a6f9875aa3499..fb5985102c1db7 100644
---- a/fs/ext4/super.c
-+++ b/fs/ext4/super.c
-@@ -5709,7 +5709,7 @@ static int ext4_sync_fs(struct super_block *sb, int wait)
- 		needs_barrier = true;
- 	if (needs_barrier) {
- 		int err;
--		err = blkdev_issue_flush(sb->s_bdev, GFP_KERNEL);
-+		err = blkdev_issue_flush(sb->s_bdev);
- 		if (!ret)
- 			ret = err;
- 	}
-diff --git a/fs/fat/file.c b/fs/fat/file.c
-index f9ee27cf4d7c2f..5fee74f1ad611d 100644
---- a/fs/fat/file.c
-+++ b/fs/fat/file.c
-@@ -195,7 +195,7 @@ int fat_file_fsync(struct file *filp, loff_t start, loff_t end, int datasync)
- 	if (err)
- 		return err;
- 
--	return blkdev_issue_flush(inode->i_sb->s_bdev, GFP_KERNEL);
-+	return blkdev_issue_flush(inode->i_sb->s_bdev);
- }
- 
- 
-diff --git a/fs/hfsplus/inode.c b/fs/hfsplus/inode.c
-index e3da9e96b83578..ca464328b79cc5 100644
---- a/fs/hfsplus/inode.c
-+++ b/fs/hfsplus/inode.c
-@@ -340,7 +340,7 @@ int hfsplus_file_fsync(struct file *file, loff_t start, loff_t end,
- 	}
- 
- 	if (!test_bit(HFSPLUS_SB_NOBARRIER, &sbi->flags))
--		blkdev_issue_flush(inode->i_sb->s_bdev, GFP_KERNEL);
-+		blkdev_issue_flush(inode->i_sb->s_bdev);
- 
- 	inode_unlock(inode);
- 
-diff --git a/fs/hfsplus/super.c b/fs/hfsplus/super.c
-index 807119ae5adf73..b9e3db3f855f96 100644
---- a/fs/hfsplus/super.c
-+++ b/fs/hfsplus/super.c
-@@ -239,7 +239,7 @@ static int hfsplus_sync_fs(struct super_block *sb, int wait)
- 	mutex_unlock(&sbi->vh_mutex);
- 
- 	if (!test_bit(HFSPLUS_SB_NOBARRIER, &sbi->flags))
--		blkdev_issue_flush(sb->s_bdev, GFP_KERNEL);
-+		blkdev_issue_flush(sb->s_bdev);
- 
- 	return error;
- }
-diff --git a/fs/jbd2/checkpoint.c b/fs/jbd2/checkpoint.c
-index 472932b9e6bca9..63b526d44886d0 100644
---- a/fs/jbd2/checkpoint.c
-+++ b/fs/jbd2/checkpoint.c
-@@ -416,7 +416,7 @@ int jbd2_cleanup_journal_tail(journal_t *journal)
- 	 * jbd2_cleanup_journal_tail() doesn't get called all that often.
- 	 */
- 	if (journal->j_flags & JBD2_BARRIER)
--		blkdev_issue_flush(journal->j_fs_dev, GFP_NOFS);
-+		blkdev_issue_flush(journal->j_fs_dev);
- 
- 	return __jbd2_update_log_tail(journal, first_tid, blocknr);
- }
-diff --git a/fs/jbd2/commit.c b/fs/jbd2/commit.c
-index b121d7d434c675..3cc4ab2ba7f4f2 100644
---- a/fs/jbd2/commit.c
-+++ b/fs/jbd2/commit.c
-@@ -825,7 +825,7 @@ void jbd2_journal_commit_transaction(journal_t *journal)
- 	if (commit_transaction->t_need_data_flush &&
- 	    (journal->j_fs_dev != journal->j_dev) &&
- 	    (journal->j_flags & JBD2_BARRIER))
--		blkdev_issue_flush(journal->j_fs_dev, GFP_NOFS);
-+		blkdev_issue_flush(journal->j_fs_dev);
- 
- 	/* Done it all: now write the commit record asynchronously. */
- 	if (jbd2_has_feature_async_commit(journal)) {
-@@ -932,7 +932,7 @@ void jbd2_journal_commit_transaction(journal_t *journal)
- 	stats.run.rs_blocks_logged++;
- 	if (jbd2_has_feature_async_commit(journal) &&
- 	    journal->j_flags & JBD2_BARRIER) {
--		blkdev_issue_flush(journal->j_dev, GFP_NOFS);
-+		blkdev_issue_flush(journal->j_dev);
- 	}
- 
- 	if (err)
-diff --git a/fs/jbd2/recovery.c b/fs/jbd2/recovery.c
-index dc0694fcfcd123..69f18fe2092369 100644
---- a/fs/jbd2/recovery.c
-+++ b/fs/jbd2/recovery.c
-@@ -326,7 +326,7 @@ int jbd2_journal_recover(journal_t *journal)
- 		err = err2;
- 	/* Make sure all replayed data is on permanent storage */
- 	if (journal->j_flags & JBD2_BARRIER) {
--		err2 = blkdev_issue_flush(journal->j_fs_dev, GFP_KERNEL);
-+		err2 = blkdev_issue_flush(journal->j_fs_dev);
- 		if (!err)
- 			err = err2;
- 	}
-diff --git a/fs/libfs.c b/fs/libfs.c
-index d1c3bade9f30dd..8398a0efb401c6 100644
---- a/fs/libfs.c
-+++ b/fs/libfs.c
-@@ -1117,7 +1117,7 @@ int generic_file_fsync(struct file *file, loff_t start, loff_t end,
- 	err = __generic_file_fsync(file, start, end, datasync);
- 	if (err)
- 		return err;
--	return blkdev_issue_flush(inode->i_sb->s_bdev, GFP_KERNEL);
-+	return blkdev_issue_flush(inode->i_sb->s_bdev);
- }
- EXPORT_SYMBOL(generic_file_fsync);
- 
-diff --git a/fs/nilfs2/the_nilfs.h b/fs/nilfs2/the_nilfs.h
-index b55cdeb4d16991..987c8ab02aeee6 100644
---- a/fs/nilfs2/the_nilfs.h
-+++ b/fs/nilfs2/the_nilfs.h
-@@ -375,7 +375,7 @@ static inline int nilfs_flush_device(struct the_nilfs *nilfs)
- 	 */
- 	smp_wmb();
- 
--	err = blkdev_issue_flush(nilfs->ns_bdev, GFP_KERNEL);
-+	err = blkdev_issue_flush(nilfs->ns_bdev);
- 	if (err != -EIO)
- 		err = 0;
- 	return err;
-diff --git a/fs/ocfs2/file.c b/fs/ocfs2/file.c
-index 85979e2214b39d..df6d709d2ae3b6 100644
---- a/fs/ocfs2/file.c
-+++ b/fs/ocfs2/file.c
-@@ -194,7 +194,7 @@ static int ocfs2_sync_file(struct file *file, loff_t start, loff_t end,
- 		needs_barrier = true;
- 	err = jbd2_complete_transaction(journal, commit_tid);
- 	if (needs_barrier) {
--		ret = blkdev_issue_flush(inode->i_sb->s_bdev, GFP_KERNEL);
-+		ret = blkdev_issue_flush(inode->i_sb->s_bdev);
- 		if (!err)
- 			err = ret;
- 	}
-diff --git a/fs/reiserfs/file.c b/fs/reiserfs/file.c
-index 0b641ae694f123..1db0254bc38b26 100644
---- a/fs/reiserfs/file.c
-+++ b/fs/reiserfs/file.c
-@@ -159,7 +159,7 @@ static int reiserfs_sync_file(struct file *filp, loff_t start, loff_t end,
- 	barrier_done = reiserfs_commit_for_inode(inode);
- 	reiserfs_write_unlock(inode->i_sb);
- 	if (barrier_done != 1 && reiserfs_barrier_flush(inode->i_sb))
--		blkdev_issue_flush(inode->i_sb->s_bdev, GFP_KERNEL);
-+		blkdev_issue_flush(inode->i_sb->s_bdev);
- 	inode_unlock(inode);
- 	if (barrier_done < 0)
- 		return barrier_done;
-diff --git a/fs/xfs/xfs_super.c b/fs/xfs/xfs_super.c
-index 813be879a5e51d..c3e32789829f90 100644
---- a/fs/xfs/xfs_super.c
-+++ b/fs/xfs/xfs_super.c
-@@ -342,7 +342,7 @@ void
- xfs_blkdev_issue_flush(
- 	xfs_buftarg_t		*buftarg)
- {
--	blkdev_issue_flush(buftarg->bt_bdev, GFP_NOFS);
-+	blkdev_issue_flush(buftarg->bt_bdev);
- }
- 
- STATIC void
-diff --git a/fs/zonefs/super.c b/fs/zonefs/super.c
-index faea2ed34b4a37..ab68e27bb322e0 100644
---- a/fs/zonefs/super.c
-+++ b/fs/zonefs/super.c
-@@ -541,7 +541,7 @@ static int zonefs_file_fsync(struct file *file, loff_t start, loff_t end,
- 	if (ZONEFS_I(inode)->i_ztype == ZONEFS_ZTYPE_CNV)
- 		ret = file_write_and_wait_range(file, start, end);
- 	if (!ret)
--		ret = blkdev_issue_flush(inode->i_sb->s_bdev, GFP_KERNEL);
-+		ret = blkdev_issue_flush(inode->i_sb->s_bdev);
- 
- 	if (ret)
- 		zonefs_io_error(inode, true);
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 20f3706b6b2e68..09f7ac5507d146 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1288,7 +1288,7 @@ static inline bool blk_needs_flush_plug(struct task_struct *tsk)
- 		 !list_empty(&plug->cb_list));
- }
- 
--int blkdev_issue_flush(struct block_device *, gfp_t);
-+int blkdev_issue_flush(struct block_device *bdev);
- long nr_blockdev_pages(void);
- #else /* CONFIG_BLOCK */
- struct blk_plug {
-@@ -1316,7 +1316,7 @@ static inline bool blk_needs_flush_plug(struct task_struct *tsk)
- 	return false;
- }
- 
--static inline int blkdev_issue_flush(struct block_device *bdev, gfp_t gfp_mask)
-+static inline int blkdev_issue_flush(struct block_device *bdev)
- {
- 	return 0;
- }
--- 
-2.29.2
-
+On 26/01/2021 16:01, Christoph Hellwig wrote:=0A=
+> Use bio_alloc instead of open coding it.=0A=
+> =0A=
+> Signed-off-by: Christoph Hellwig <hch@lst.de>=0A=
+> ---=0A=
+>  fs/zonefs/super.c | 2 +-=0A=
+>  1 file changed, 1 insertion(+), 1 deletion(-)=0A=
+> =0A=
+> diff --git a/fs/zonefs/super.c b/fs/zonefs/super.c=0A=
+> index bec47f2d074beb..faea2ed34b4a37 100644=0A=
+> --- a/fs/zonefs/super.c=0A=
+> +++ b/fs/zonefs/super.c=0A=
+> @@ -678,7 +678,7 @@ static ssize_t zonefs_file_dio_append(struct kiocb *i=
+ocb, struct iov_iter *from)=0A=
+>  	if (!nr_pages)=0A=
+>  		return 0;=0A=
+>  =0A=
+> -	bio =3D bio_alloc_bioset(GFP_NOFS, nr_pages, &fs_bio_set);=0A=
+> +	bio =3D bio_alloc(GFP_NOFS, nr_pages);=0A=
+>  	if (!bio)=0A=
+>  		return -ENOMEM;=0A=
+>  =0A=
+> =0A=
+=0A=
+Whoopsie my bad,=0A=
+Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>=0A=
