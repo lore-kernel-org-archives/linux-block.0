@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FD30C433E0
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 10:52:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 011E1C433E0
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 10:53:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4ED9E23109
-	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 10:52:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B6FBE23109
+	for <linux-block@archiver.kernel.org>; Tue, 26 Jan 2021 10:53:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404468AbhAZKwe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Jan 2021 05:52:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54448 "EHLO
+        id S2404532AbhAZKwz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Jan 2021 05:52:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54510 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2404476AbhAZKwc (ORCPT
+        with ESMTP id S2404523AbhAZKwr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Jan 2021 05:52:32 -0500
-Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4569C06178B
-        for <linux-block@vger.kernel.org>; Tue, 26 Jan 2021 02:51:22 -0800 (PST)
-Received: by mail-wr1-x431.google.com with SMTP id h9so5687038wrr.9
-        for <linux-block@vger.kernel.org>; Tue, 26 Jan 2021 02:51:22 -0800 (PST)
+        Tue, 26 Jan 2021 05:52:47 -0500
+Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8B65C061793
+        for <linux-block@vger.kernel.org>; Tue, 26 Jan 2021 02:51:23 -0800 (PST)
+Received: by mail-wm1-x331.google.com with SMTP id j18so2037187wmi.3
+        for <linux-block@vger.kernel.org>; Tue, 26 Jan 2021 02:51:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=t86iMQKIqsS0m2aCrWu55vo8IS053fSBSrJitc0MorY=;
-        b=o7mD/KjydYdHiZ0EaOi+To5IHQ2Tr3u1GFOjlqb57h46hhwlQI9CbkB+zdYmqK0C2A
-         Ndn6MZHrdqMvjJA6yFwjCnRuyvQwx9uNrzKIlYIDbSayT6cahYF7zn/w3ixc9SmG7gMl
-         O3kiZStPme9n68UyflaMzQ4Xtl4Qm4+h/cYBUnT1AjEHGaodBv1V18nFA8qmsTCuYICd
-         us2Y1L2Mk9j9mCuN8LCYzBCBfL4jGL1Gp0hNs/7S9LFU08Pjz4MJhVT/D6FtmDgTPiMR
-         c96mheNENcTGjtOYLmjONbjVreusfNQ/oeFotn42jd7TwDAWKkSVEqLGyJW/raAvT4Ab
-         a1qg==
+        bh=g0MXCokkbnaIDoDqUI9Wq5P/6nCekdb4/ZayF5jaU44=;
+        b=vj1b6NidgsO3AAvLOcErxLumqmJkTgHblZ2YHQzhzjKBenORxnL05KJV+vzV+/H4M1
+         qD6TVraUtAGqfx+BhiM51UH0O0bGE8/UfsSJZnn5kKjpc5/sATZAj7MKszmX3BfeSGaL
+         39KVXY5Igy9YDb4tUpgwnvpqoBk/6P7U1l5wAsmey3oYSlYUM6wELOk9KKELCJhtF4Yc
+         hIQU5oavrd7La/YTBNrrkM61cRzuzJvruQS8Po/Zl4YyakHcj19xuU4V79xaFl2bf1I+
+         9Xo4QuJu7tg4OS/Rco/9Y/OQQS3ntIOFkCISszXN+onU2Mb7mnabTUXTUvfUZ3Sqhm52
+         hD6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=t86iMQKIqsS0m2aCrWu55vo8IS053fSBSrJitc0MorY=;
-        b=BPWmSA7lptIZkyYjviqNrZmH1LCjzlJVN2ZBB4LiKFtJYqHNXJ/bcH6Picn83rR3L9
-         9AmGYKqtA3TNETj3R39moFr2YzJz0FC8vIK22HUN+5zjJ44F0BimpwnELt0NGQyWfmpn
-         lqSwHKUvtrlMrf4R08977k9+expdH25wE6DeEeKAj09UP/UAGsvMPcDiSteOKbBmXSFz
-         6yh7AwV2kkB1NhLmXt0Vo7MUCqKoRK5k4197m1z/O0yBAvXozcfWR1j0dH2EnlWjpFA6
-         RN+hK+xw1jF/3f474yA48zKD71jTim6SUzRB2Im74/krkf8AGFreYbGz11inL4tyw0cK
-         5CtQ==
-X-Gm-Message-State: AOAM533lY3emY60L5APnyNE1pXzyYN4nf9eg3ZgE71vDzH7krrPY53w3
-        UpgZPOQhwYeowtHDqIvEIe5sng==
-X-Google-Smtp-Source: ABdhPJyTqVADEw9M3IHNU0FlSb0fH6q1RWNU4RKVai0zsh9bNEHZ4TfAJv6yPLjuOy5tjfaM/4Uofw==
-X-Received: by 2002:adf:80c3:: with SMTP id 61mr4963946wrl.100.1611658281280;
-        Tue, 26 Jan 2021 02:51:21 -0800 (PST)
+        bh=g0MXCokkbnaIDoDqUI9Wq5P/6nCekdb4/ZayF5jaU44=;
+        b=fRT9wAE+BOfbcizLHhqkFWTtfLBh0RKhtQgZBxj2phJOJbE+5AdYAP6Nwg3SGCB4cE
+         jt/C/5Xw8g6eYsHaY5aN/+yjk888i0v9f6zuDXgHAZB5Q68a/t4uo2gMYrC1w3TohaNR
+         6tVCN+3UdgBzPAlqZmaMm1vPTjgQTiUQBlPVlEVO6YP233Ja1sagw3CZJ5TnsED1k346
+         JaBkV1zXLNYXS7jhX27dtuKeL1xv+VHiHOeTIobiFa2nURhnuUvBC28RfAVtsdNNXu7P
+         Oqi/G8QSXdui0JZMrU320hoMBJjg07ozpkvCE9U6vGbqd2qd4D4EiMlOgM9eVC3mkUyR
+         7Cuw==
+X-Gm-Message-State: AOAM530IY/BsbvzE3lPHziXf1X41o/AqJGQpWOzAf2pP8+q/ALB3vLQp
+        Q7Nlcgl98F6ef9pDWgYLE12rAvlowkJcoQ==
+X-Google-Smtp-Source: ABdhPJzK8Zs6frbsR2txsRD/xENvh79/znuNQXhGsBjUQ+py4BQ16PPJQWOtSdFqV0GvmIo8IjaV+g==
+X-Received: by 2002:a1c:e0d4:: with SMTP id x203mr4071206wmg.160.1611658282468;
+        Tue, 26 Jan 2021 02:51:22 -0800 (PST)
 Received: from localhost.localdomain ([83.216.184.132])
-        by smtp.gmail.com with ESMTPSA id h18sm7177879wru.65.2021.01.26.02.51.20
+        by smtp.gmail.com with ESMTPSA id h18sm7177879wru.65.2021.01.26.02.51.21
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 26 Jan 2021 02:51:20 -0800 (PST)
+        Tue, 26 Jan 2021 02:51:22 -0800 (PST)
 From:   Paolo Valente <paolo.valente@linaro.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         Paolo Valente <paolo.valente@linaro.org>,
         Jan Kara <jack@suse.cz>
-Subject: [PATCH BUGFIX/IMPROVEMENT 3/6] block, bfq: make shared queues inherit wakers
-Date:   Tue, 26 Jan 2021 11:50:59 +0100
-Message-Id: <20210126105102.53102-4-paolo.valente@linaro.org>
+Subject: [PATCH BUGFIX/IMPROVEMENT 4/6] block, bfq: fix weight-raising resume with !low_latency
+Date:   Tue, 26 Jan 2021 11:51:00 +0100
+Message-Id: <20210126105102.53102-5-paolo.valente@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20210126105102.53102-1-paolo.valente@linaro.org>
 References: <20210126105102.53102-1-paolo.valente@linaro.org>
@@ -73,90 +73,45 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Consider a bfq_queue bfqq that is about to be merged with another
-bfq_queue new_bfqq. The processes associated with bfqq are cooperators
-of the processes associated with new_bfqq. So, if bfqq has a waker,
-then it is reasonable (and beneficial for throughput) to assume that
-all these processes will be happy to let bfqq's waker freely inject
-I/O when they have no I/O. So this commit makes new_bfqq inherit
-bfqq's waker.
+When the io_latency heuristic is off, bfq_queues must not start to be
+weight-raised. Unfortunately, by mistake, this may happen when the
+state of a previously weight-raised bfq_queue is resumed after a queue
+split. This commit fixes this error.
 
 Tested-by: Jan Kara <jack@suse.cz>
 Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
 ---
- block/bfq-iosched.c | 42 +++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 39 insertions(+), 3 deletions(-)
+ block/bfq-iosched.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
 diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index e5b83910fbe0..c5bda33c0923 100644
+index c5bda33c0923..0c7e203085f1 100644
 --- a/block/bfq-iosched.c
 +++ b/block/bfq-iosched.c
-@@ -2819,6 +2819,29 @@ bfq_merge_bfqqs(struct bfq_data *bfqd, struct bfq_io_cq *bic,
- 		bfq_mark_bfqq_IO_bound(new_bfqq);
- 	bfq_clear_bfqq_IO_bound(bfqq);
+@@ -1010,7 +1010,7 @@ static void
+ bfq_bfqq_resume_state(struct bfq_queue *bfqq, struct bfq_data *bfqd,
+ 		      struct bfq_io_cq *bic, bool bfq_already_existing)
+ {
+-	unsigned int old_wr_coeff = bfqq->wr_coeff;
++	unsigned int old_wr_coeff = 1;
+ 	bool busy = bfq_already_existing && bfq_bfqq_busy(bfqq);
  
+ 	if (bic->saved_has_short_ttime)
+@@ -1031,7 +1031,13 @@ bfq_bfqq_resume_state(struct bfq_queue *bfqq, struct bfq_data *bfqd,
+ 	bfqq->ttime = bic->saved_ttime;
+ 	bfqq->io_start_time = bic->saved_io_start_time;
+ 	bfqq->tot_idle_time = bic->saved_tot_idle_time;
+-	bfqq->wr_coeff = bic->saved_wr_coeff;
 +	/*
-+	 * The processes associated with bfqq are cooperators of the
-+	 * processes associated with new_bfqq. So, if bfqq has a
-+	 * waker, then assume that all these processes will be happy
-+	 * to let bfqq's waker freely inject I/O when they have no
-+	 * I/O.
++	 * Restore weight coefficient only if low_latency is on
 +	 */
-+	if (bfqq->waker_bfqq && !new_bfqq->waker_bfqq &&
-+	    bfqq->waker_bfqq != new_bfqq) {
-+		new_bfqq->waker_bfqq = bfqq->waker_bfqq;
-+		new_bfqq->tentative_waker_bfqq = NULL;
-+
-+		/*
-+		 * If the waker queue disappears, then
-+		 * new_bfqq->waker_bfqq must be reset. So insert
-+		 * new_bfqq into the woken_list of the waker. See
-+		 * bfq_check_waker for details.
-+		 */
-+		hlist_add_head(&new_bfqq->woken_list_node,
-+			       &new_bfqq->waker_bfqq->woken_list);
-+
++	if (bfqd->low_latency) {
++		old_wr_coeff = bfqq->wr_coeff;
++		bfqq->wr_coeff = bic->saved_wr_coeff;
 +	}
-+
- 	/*
- 	 * If bfqq is weight-raised, then let new_bfqq inherit
- 	 * weight-raising. To reduce false positives, neglect the case
-@@ -6276,7 +6299,7 @@ static struct bfq_queue *bfq_init_rq(struct request *rq)
- 	if (likely(!new_queue)) {
- 		/* If the queue was seeky for too long, break it apart. */
- 		if (bfq_bfqq_coop(bfqq) && bfq_bfqq_split_coop(bfqq)) {
--			bfq_log_bfqq(bfqd, bfqq, "breaking apart bfqq");
-+			struct bfq_queue *old_bfqq = bfqq;
- 
- 			/* Update bic before losing reference to bfqq */
- 			if (bfq_bfqq_in_large_burst(bfqq))
-@@ -6285,11 +6308,24 @@ static struct bfq_queue *bfq_init_rq(struct request *rq)
- 			bfqq = bfq_split_bfqq(bic, bfqq);
- 			split = true;
- 
--			if (!bfqq)
-+			if (!bfqq) {
- 				bfqq = bfq_get_bfqq_handle_split(bfqd, bic, bio,
- 								 true, is_sync,
- 								 NULL);
--			else
-+				bfqq->waker_bfqq = old_bfqq->waker_bfqq;
-+				bfqq->tentative_waker_bfqq = NULL;
-+
-+				/*
-+				 * If the waker queue disappears, then
-+				 * new_bfqq->waker_bfqq must be
-+				 * reset. So insert new_bfqq into the
-+				 * woken_list of the waker. See
-+				 * bfq_check_waker for details.
-+				 */
-+				if (bfqq->waker_bfqq)
-+					hlist_add_head(&bfqq->woken_list_node,
-+						       &bfqq->waker_bfqq->woken_list);
-+			} else
- 				bfqq_already_existing = true;
- 		}
- 	}
+ 	bfqq->service_from_wr = bic->saved_service_from_wr;
+ 	bfqq->wr_start_at_switch_to_srt = bic->saved_wr_start_at_switch_to_srt;
+ 	bfqq->last_wr_start_finish = bic->saved_last_wr_start_finish;
 -- 
 2.20.1
 
