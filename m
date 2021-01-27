@@ -2,156 +2,231 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,PDS_BAD_THREAD_QP_64,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 292F7C433DB
-	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 07:19:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEB38C433E0
+	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 07:19:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D41122072C
-	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 07:19:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 82A7E2072C
+	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 07:19:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233141AbhA0HTh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Jan 2021 02:19:37 -0500
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:33867 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232950AbhA0HK3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Jan 2021 02:10:29 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1611731428; x=1643267428;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=uCa2GMUpKz+2S5SNgBMzR6fSnZ94mL+mmLlK+vjuzoU=;
-  b=has3bIYH/2TZdw18nHGBKcTGIFXJKIFeFOBWfrT/qd3NlLksdVTGWgW5
-   y7mvAcc6KPrCGeFdIoca4rtshQv4W5gY3TLB052DqWNlzWxsv1WQ3iU1s
-   VUwqzEGLxMBronzgpTWvZEuIA9cnLObdGTOq5rJ4dahPAf7r6cJkvTIte
-   a8oWNGed1Bd5Z/ZlL4ASpOI3B3Wa5ULhoLe6R2pe7CrZsCrAznwPMqqmI
-   IB/LOPK8nBAWAhCUTwVl+xn/zOTujq4Kh+WNiS9teC4P+b82TrqR9n9it
-   USBr7UgeadPxqPMAzGmzX+8ArWxklzHXQOob2LP9L/L+Xvs+zoXu5i7j5
-   A==;
-IronPort-SDR: /1a6EppGGM7pxwM3sWej5+Q8xiXtwywOyy12wrFJ4ssaBJVw2SO8jjLyNxeSvxrIUxzF9VChV2
- S73vWuEt9LjdPdtFIzAOs2gH3GdtbfwXAXZwe0ad2VNV+QKdXVyUN6R6+05U2cuQSp0TEiSIcY
- SD3PBHUG8c1nTHyG1/KbMiT9TgKJZwdCwA6aTJv8UvDysQ2qv+Z+86L/kAeyeTTXfXRyzQ+Ts9
- l7jBcux8Q0BdyJTa0Kle/2M0crK/Hc1jQx3MAGwOK72YEa+4AA/4xjvzsTy1/GnekHM/v1kLWG
- AxY=
-X-IronPort-AV: E=Sophos;i="5.79,378,1602518400"; 
-   d="scan'208";a="158424717"
-Received: from mail-dm6nam10lp2106.outbound.protection.outlook.com (HELO NAM10-DM6-obe.outbound.protection.outlook.com) ([104.47.58.106])
-  by ob1.hgst.iphmx.com with ESMTP; 27 Jan 2021 15:09:18 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LYBLEYfEte6uTRqsmAlzzbZ2KE8M1dKHwSRO3DHNcmEjFcMTUhI9aQC3H5XKRV5pj01d7cacDt9NxKElb2zuiwtJeBBC56CQg88yJ4mcOwr0ahDF1ZDzqObep3yrH17Burwaq6K12IL+273KxvbtyPhArmFOuK03/qfPfaqbJXV8NlG06VOtpBmPyQdLOVO0nt9tQV9n5Ki1Kmkf12/36fyMISxr2IrrI9YEN8nEL3C06BZuC9+cLj0KMghM1qfeSie/gVVHWGykSUPwi7usYgwVwqp8t36GZ+T4LGBbq2O2QcSQAuLvMNoH3opDaPAe324pzQYsKN+xAPNs7fZ2dw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uCa2GMUpKz+2S5SNgBMzR6fSnZ94mL+mmLlK+vjuzoU=;
- b=Po3gyslE8io4ilXT2/aGjf4qi/T7cLVcfZBJYp/NlvtRlW8MHjX8crXFMb4Kj3qKF2CL1HjRtrpS13X47VaEJoEDN22yIIkGeoRLPhJYg/G79gZLDzpGzFm5j9fJDh8WyX0UGBccRly1OcRfb4g2OvLRWkSgHWZVuwMlT6uyfXXiwRLwPy2CF5FIvlj1J8sBbxoLvSTsvwKeJ1oSLMFgFwFDH5JMU39tn52JdXX50gPWQ4TkDvs+XCCFgsNdvk0Q94qo7kX7IsAbp9rbLqXNp243nTR0X3adHZdfQ39oVz/UMRrfr/pY+/DiSKm+d9JLTSRXZlXlBWtdkrUsfjE6Cw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uCa2GMUpKz+2S5SNgBMzR6fSnZ94mL+mmLlK+vjuzoU=;
- b=gqcIijBq1cHZD/C8UJWBnYK8es8kzwkJeMihrCM5y6Gv6OzbIT07XU/comDrNA1Tp6z8FZ3NpjKpjLrX8CHZevZWpbWQB9oogDleI4KxdXBb4LDGWzCt4LzC0BjKiWAc4y6GJkzR8yU2danAdvXUuZwP+sOKMmI//cPdITsdGuo=
-Received: from DM6PR04MB6575.namprd04.prod.outlook.com (2603:10b6:5:1b7::7) by
- DM5PR04MB0410.namprd04.prod.outlook.com (2603:10b6:3:a9::22) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3784.15; Wed, 27 Jan 2021 07:09:17 +0000
-Received: from DM6PR04MB6575.namprd04.prod.outlook.com
- ([fe80::a564:c676:b866:34f6]) by DM6PR04MB6575.namprd04.prod.outlook.com
- ([fe80::a564:c676:b866:34f6%9]) with mapi id 15.20.3784.019; Wed, 27 Jan 2021
- 07:09:17 +0000
-From:   Avri Altman <Avri.Altman@wdc.com>
-To:     Asutosh Das <asutoshd@codeaurora.org>,
-        "cang@codeaurora.org" <cang@codeaurora.org>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>
-CC:     "linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>,
-        "stern@rowland.harvard.edu" <stern@rowland.harvard.edu>,
-        "Bao D . Nguyen" <nguyenb@codeaurora.org>,
-        FUJITA Tomonori <fujita.tomonori@lab.ntt.co.jp>,
-        Jens Axboe <axboe@kernel.dk>,
-        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>
-Subject: RE: [RFC PATCH v1 1/2] block: bsg: resume scsi device before
- accessing
-Thread-Topic: [RFC PATCH v1 1/2] block: bsg: resume scsi device before
- accessing
-Thread-Index: AQHW9GS91lSjV2CWj0GEr0fs2ZDDFKo7DS1g
-Date:   Wed, 27 Jan 2021 07:09:16 +0000
-Message-ID: <DM6PR04MB6575D64869B24B4275D63503FCBB9@DM6PR04MB6575.namprd04.prod.outlook.com>
-References: <cover.1611719814.git.asutoshd@codeaurora.org>
- <c04a11a590628c2497cef113b0dfea781de90416.1611719814.git.asutoshd@codeaurora.org>
-In-Reply-To: <c04a11a590628c2497cef113b0dfea781de90416.1611719814.git.asutoshd@codeaurora.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: codeaurora.org; dkim=none (message not signed)
- header.d=none;codeaurora.org; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [212.25.79.133]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 0ade7e32-c65d-467f-e571-08d8c29275cb
-x-ms-traffictypediagnostic: DM5PR04MB0410:
-x-microsoft-antispam-prvs: <DM5PR04MB0410BAF648D04705D1ACCAF9FCBB9@DM5PR04MB0410.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:199;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: tF/nc2nIaIeKN/uyPQY0uP5MxsWNG1c/PQ4VBhcbsyuxiQiIZeEdi13G7t46LHpLB0PqduPF/teKWSCabizJeX2mSbElA7Mscp6eLmWjlbwSpXWNb696jSd9XSqo9aQNwWFc0DhHDOgt3f/Ir2J7HneFVi5CxM8CED6sPl3tR9w0ziXCdXv8h9jHp9/nZsFj6NZqvFFkXITjZzdstifufVslXKWqRN0YW/W0NnKlpnDcnZwEe26kAEtaP9MtHJC3VxTjLnqH/Kjsh8fwQTOfwDoR4bMmpgmr6oL7Y+awPdg/UG31LMKNvrqYyfCxgfhYFdgtKa1U4uk3r6sRNl/+7/L8dbiII2UqwaLjWUcpmOaflITELCP4swlgt8aRdwswH6Le3z6LUX98N4KxfDHQAg==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR04MB6575.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(366004)(136003)(39860400002)(346002)(376002)(6506007)(316002)(86362001)(8936002)(66946007)(64756008)(2906002)(478600001)(186003)(26005)(4326008)(76116006)(66446008)(66476007)(66556008)(7416002)(8676002)(83380400001)(52536014)(9686003)(5660300002)(55016002)(71200400001)(54906003)(7696005)(558084003)(110136005)(33656002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: =?us-ascii?Q?WqWjZnJiBN9Iht47imiHr0zqAbq3VTZqfXGYFPJCWvIgQu64VVgYq3t4f2Nw?=
- =?us-ascii?Q?LCogH7T2rtUBvMXYUdQV/UjvgtjYQCICxmiD+ZGyI/VaFW4hT7fqAqpGaR0v?=
- =?us-ascii?Q?Q4qZ/FuH60BcUWSLfUlhkOUu4cbqsNtFzzi2XI4Ygo9mgBpjg60ZMknUKaq2?=
- =?us-ascii?Q?XiCq+oJ3N/Ks433RY+0FFAAY5nStJkbxEOeYMTZm9p+itNEdsHXjaEf3WmL9?=
- =?us-ascii?Q?/7AFNMvuCLVTGrmJaPUd4zg7J4D8jRJuZvctrqxJjT+LcPuKWg2ARCu65nlS?=
- =?us-ascii?Q?cJ7+1VmJRwCwL16bMWJtgr3nSQKJajo8oz87BD5CrZJnowyw81HDNAQrW2v1?=
- =?us-ascii?Q?hvh+gtujMIUbR/LKw2IWB9E/zdcmRdkOQeNpcEOt73Zrk/VuQ89d+v4FqTO3?=
- =?us-ascii?Q?bx43VqDYhmrimmmzCRtASxGmWtCtHn8wUDFc4EwgQO0cTT+Ds3xa1Zyj4EFr?=
- =?us-ascii?Q?vEClvF24UxEAysFlkyuGZuDnacuB275m4iAruW4V/M0b4K/jCLeO+vjNz19+?=
- =?us-ascii?Q?EgzzgQJy5WvOzPlzUq8SeHCAseHuj9HROv+pUjrFa07CMB6WDJqDc+gUYR/+?=
- =?us-ascii?Q?4HTzJKWCXlzCQYBQjhPUZUMFlm0odJz9daY2uQZvjSGr+6ilhAYqAWvC5xXP?=
- =?us-ascii?Q?2re+uTV7Ku/4IP0w+QoCLUM6nlHReyHgi9Q2wOa/Ey0ppuLWn6RE7ikqYjad?=
- =?us-ascii?Q?FHSHkzVCVaNawir5PmlXBle6CVXm5D7ZUPwy0WCcYypweQcERNlG2UnRdOnF?=
- =?us-ascii?Q?TIDbt2ehZWD2lt+N2Z5Ur3hETtAAIcEslgksZPrCwLNtiS8oBBaCfCwBoQci?=
- =?us-ascii?Q?APsoOke6NTvikw+Q+k4QtywFfTqJc4AjhWENzsq7wxHbZwGOTYMG8iECXjcC?=
- =?us-ascii?Q?0rJwdf6vZ+NAkNoaq7nHuepU8rZ+uyErQyouWBa5Sw9mnQDnasOJZ6ytS9AG?=
- =?us-ascii?Q?cxfV3+3NUi2L8HcfC6SgVS+iEEPfufIiMpZDPdTR9/wGDwDsOKtbOt62SXtO?=
- =?us-ascii?Q?V0bD4cwTHiCfgr/BH+uqyn9ZxTFMUZWAoBqpF0Brz19CQuqFlKDPZH8Y1ykf?=
- =?us-ascii?Q?DU6Ti0xr?=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S233249AbhA0HTk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Jan 2021 02:19:40 -0500
+Received: from mail.kernel.org ([198.145.29.99]:47124 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233498AbhA0HQr (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 27 Jan 2021 02:16:47 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id A14A22073A;
+        Wed, 27 Jan 2021 07:16:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1611731766;
+        bh=roeH+S42no3Sboc4a7IJP429EgMi3Brd/syWUAT1emI=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=YwAkJqJB5KFzCdu4e+4xCNTp5SGGkGySjdzbItm+79z64FYD48iciemcPnv9Mlnh2
+         fQe/1cHafViGhPE5p2SUGGk7l2Vhny6UH/75EGwWZ3nK0+HnxUNWUmWGRosC2xio9O
+         dRi+UbUKyDXe8JCUdmtUZW0806oZFEhVUm2J2GGpN8AlBtCoUdYBvDoW9GI5hoFou2
+         3xjIKrj9pkB94a6Kv5TBwDw6939ekhvFTRuKbb7P+RY+RabHAYJmGrLgripNRJJX3W
+         Raf3XxHZrQEIZAvG4133epfOMyH9k3RvBZMOilB6mOoVuQkWm455KOkyOh/K8Y5DFv
+         MHtESQFL6GhMA==
+Received: by mail-lf1-f50.google.com with SMTP id f1so1249639lfu.3;
+        Tue, 26 Jan 2021 23:16:05 -0800 (PST)
+X-Gm-Message-State: AOAM530hTGoI/NZEUqRnpztQG0Cn43JQoq4V3v2LqhN1rQpHFale6zgN
+        YHpuyXJcRDV06hRuJQEI2t3QbwUHSclvuTQlo4w=
+X-Google-Smtp-Source: ABdhPJwFmb6CVFGHBWXlzQnS58PALEhepsv7f0h0Je/37NQinPkKDgqPDkTeBlpmndchuGkIHeS1z4Fyx1z/Fa+aNwE=
+X-Received: by 2002:a05:6512:b1b:: with SMTP id w27mr4506047lfu.10.1611731763892;
+ Tue, 26 Jan 2021 23:16:03 -0800 (PST)
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR04MB6575.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0ade7e32-c65d-467f-e571-08d8c29275cb
-X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Jan 2021 07:09:16.9384
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: D939hl67ltLeqPTRphTG+0bOsKG8AeCQEhTnk+IHXesF1MLqPZ24hOG9DwNOxwZU3rHYXwelXaLObvxlachRcQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR04MB0410
+References: <20210126145247.1964410-1-hch@lst.de> <20210126145247.1964410-15-hch@lst.de>
+In-Reply-To: <20210126145247.1964410-15-hch@lst.de>
+From:   Song Liu <song@kernel.org>
+Date:   Tue, 26 Jan 2021 23:15:52 -0800
+X-Gmail-Original-Message-ID: <CAPhsuW599kbe-YFX0FOOGJy30gy3V2_hMYW3jg3sK_VwaayEBQ@mail.gmail.com>
+Message-ID: <CAPhsuW599kbe-YFX0FOOGJy30gy3V2_hMYW3jg3sK_VwaayEBQ@mail.gmail.com>
+Subject: Re: [PATCH 14/17] md/raid6: refactor raid5_read_one_chunk
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Jaegeuk Kim <jaegeuk@kernel.org>,
+        Chao Yu <chao@kernel.org>,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        Coly Li <colyli@suse.de>, Mike Snitzer <snitzer@redhat.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Naohiro Aota <naohiro.aota@wdc.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Ryusuke Konishi <konishi.ryusuke@gmail.com>,
+        linux-nilfs@vger.kernel.org, dm-devel@redhat.com,
+        linux-f2fs-devel@lists.sourceforge.net,
+        linux-block@vger.kernel.org, drbd-dev@lists.linbit.com,
+        linux-bcache@vger.kernel.org,
+        linux-raid <linux-raid@vger.kernel.org>,
+        Linux-Fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-btrfs@vger.kernel.org, linux-nfs@vger.kernel.org,
+        Linux-MM <linux-mm@kvack.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
->=20
-> Resumes the scsi device before accessing it.
->=20
-> Change-Id: I2929af60f2a92c89704a582fcdb285d35b429fde
-> Signed-off-by: Asutosh Das <asutoshd@codeaurora.org>
-> Signed-off-by: Can Guo <cang@codeaurora.org>
-> Signed-off-by: Bao D. Nguyen <nguyenb@codeaurora.org>
-Following this patch, is it possible to revert commit 74e5e468b664d?
+On Tue, Jan 26, 2021 at 7:19 AM Christoph Hellwig <hch@lst.de> wrote:
+>
+> Refactor raid5_read_one_chunk so that all simple checks are done
+> before allocating the bio.
+>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Thanks,
-Avri
+Acked-by: Song Liu <song@kernel.org>
 
+Thanks for the clean-up!
+
+
+> ---
+>  drivers/md/raid5.c | 108 +++++++++++++++++++--------------------------
+>  1 file changed, 45 insertions(+), 63 deletions(-)
+>
+> diff --git a/drivers/md/raid5.c b/drivers/md/raid5.c
+> index f411b9e5c332f4..a348b2adf2a9f9 100644
+> --- a/drivers/md/raid5.c
+> +++ b/drivers/md/raid5.c
+> @@ -5393,90 +5393,72 @@ static void raid5_align_endio(struct bio *bi)
+>  static int raid5_read_one_chunk(struct mddev *mddev, struct bio *raid_bio)
+>  {
+>         struct r5conf *conf = mddev->private;
+> -       int dd_idx;
+> -       struct bio* align_bi;
+> +       struct bio *align_bio;
+>         struct md_rdev *rdev;
+> -       sector_t end_sector;
+> +       sector_t sector, end_sector, first_bad;
+> +       int bad_sectors, dd_idx;
+>
+>         if (!in_chunk_boundary(mddev, raid_bio)) {
+>                 pr_debug("%s: non aligned\n", __func__);
+>                 return 0;
+>         }
+> -       /*
+> -        * use bio_clone_fast to make a copy of the bio
+> -        */
+> -       align_bi = bio_clone_fast(raid_bio, GFP_NOIO, &mddev->bio_set);
+> -       if (!align_bi)
+> -               return 0;
+> -       /*
+> -        *   set bi_end_io to a new function, and set bi_private to the
+> -        *     original bio.
+> -        */
+> -       align_bi->bi_end_io  = raid5_align_endio;
+> -       align_bi->bi_private = raid_bio;
+> -       /*
+> -        *      compute position
+> -        */
+> -       align_bi->bi_iter.bi_sector =
+> -               raid5_compute_sector(conf, raid_bio->bi_iter.bi_sector,
+> -                                    0, &dd_idx, NULL);
+>
+> -       end_sector = bio_end_sector(align_bi);
+> +       sector = raid5_compute_sector(conf, raid_bio->bi_iter.bi_sector, 0,
+> +                                     &dd_idx, NULL);
+> +       end_sector = bio_end_sector(raid_bio);
+> +
+>         rcu_read_lock();
+> +       if (r5c_big_stripe_cached(conf, sector))
+> +               goto out_rcu_unlock;
+> +
+>         rdev = rcu_dereference(conf->disks[dd_idx].replacement);
+>         if (!rdev || test_bit(Faulty, &rdev->flags) ||
+>             rdev->recovery_offset < end_sector) {
+>                 rdev = rcu_dereference(conf->disks[dd_idx].rdev);
+> -               if (rdev &&
+> -                   (test_bit(Faulty, &rdev->flags) ||
+> +               if (!rdev)
+> +                       goto out_rcu_unlock;
+> +               if (test_bit(Faulty, &rdev->flags) ||
+>                     !(test_bit(In_sync, &rdev->flags) ||
+> -                     rdev->recovery_offset >= end_sector)))
+> -                       rdev = NULL;
+> +                     rdev->recovery_offset >= end_sector))
+> +                       goto out_rcu_unlock;
+>         }
+>
+> -       if (r5c_big_stripe_cached(conf, align_bi->bi_iter.bi_sector)) {
+> -               rcu_read_unlock();
+> -               bio_put(align_bi);
+> +       atomic_inc(&rdev->nr_pending);
+> +       rcu_read_unlock();
+> +
+> +       align_bio = bio_clone_fast(raid_bio, GFP_NOIO, &mddev->bio_set);
+> +       bio_set_dev(align_bio, rdev->bdev);
+> +       align_bio->bi_end_io = raid5_align_endio;
+> +       align_bio->bi_private = raid_bio;
+> +       align_bio->bi_iter.bi_sector = sector;
+> +
+> +       raid_bio->bi_next = (void *)rdev;
+> +
+> +       if (is_badblock(rdev, sector, bio_sectors(align_bio), &first_bad,
+> +                       &bad_sectors)) {
+> +               bio_put(align_bio);
+> +               rdev_dec_pending(rdev, mddev);
+>                 return 0;
+>         }
+>
+> -       if (rdev) {
+> -               sector_t first_bad;
+> -               int bad_sectors;
+> -
+> -               atomic_inc(&rdev->nr_pending);
+> -               rcu_read_unlock();
+> -               raid_bio->bi_next = (void*)rdev;
+> -               bio_set_dev(align_bi, rdev->bdev);
+> -
+> -               if (is_badblock(rdev, align_bi->bi_iter.bi_sector,
+> -                               bio_sectors(align_bi),
+> -                               &first_bad, &bad_sectors)) {
+> -                       bio_put(align_bi);
+> -                       rdev_dec_pending(rdev, mddev);
+> -                       return 0;
+> -               }
+> +       /* No reshape active, so we can trust rdev->data_offset */
+> +       align_bio->bi_iter.bi_sector += rdev->data_offset;
+>
+> -               /* No reshape active, so we can trust rdev->data_offset */
+> -               align_bi->bi_iter.bi_sector += rdev->data_offset;
+> +       spin_lock_irq(&conf->device_lock);
+> +       wait_event_lock_irq(conf->wait_for_quiescent, conf->quiesce == 0,
+> +                           conf->device_lock);
+> +       atomic_inc(&conf->active_aligned_reads);
+> +       spin_unlock_irq(&conf->device_lock);
+>
+> -               spin_lock_irq(&conf->device_lock);
+> -               wait_event_lock_irq(conf->wait_for_quiescent,
+> -                                   conf->quiesce == 0,
+> -                                   conf->device_lock);
+> -               atomic_inc(&conf->active_aligned_reads);
+> -               spin_unlock_irq(&conf->device_lock);
+> +       if (mddev->gendisk)
+> +               trace_block_bio_remap(align_bio, disk_devt(mddev->gendisk),
+> +                                     raid_bio->bi_iter.bi_sector);
+> +       submit_bio_noacct(align_bio);
+> +       return 1;
+>
+> -               if (mddev->gendisk)
+> -                       trace_block_bio_remap(align_bi, disk_devt(mddev->gendisk),
+> -                                             raid_bio->bi_iter.bi_sector);
+> -               submit_bio_noacct(align_bi);
+> -               return 1;
+> -       } else {
+> -               rcu_read_unlock();
+> -               bio_put(align_bi);
+> -               return 0;
+> -       }
+> +out_rcu_unlock:
+> +       rcu_read_unlock();
+> +       return 0;
+>  }
+>
+>  static struct bio *chunk_aligned_read(struct mddev *mddev, struct bio *raid_bio)
+> --
+> 2.29.2
+>
