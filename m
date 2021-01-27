@@ -2,72 +2,152 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70035C433E0
-	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 15:20:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A505C433E0
+	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 15:21:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 26F0820771
-	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 15:20:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0715820771
+	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 15:21:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343521AbhA0PTc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Jan 2021 10:19:32 -0500
-Received: from mail.kernel.org ([198.145.29.99]:59984 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1343805AbhA0PSt (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Jan 2021 10:18:49 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id EB462207E8;
-        Wed, 27 Jan 2021 15:18:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1611760685;
-        bh=zyhEc7kPWdoyip3nZRJOgrKtgNeWHG9ySl/9Iognr+g=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:From;
-        b=aka1ho4tHdFJ+JLt3RsqrB/ZlKXDUm1HZ1rRm9nRK5R2kAySjah39sKcfUzG+eGb7
-         w0K/5fgeclSRL41i4FOqAYCnuWpDZ8QH+Kj6mPt9XsvZdVWZnzBwSM7I2K+OhUwBr9
-         +788j+/gVhd9vZvtQ6jCm4xih77W6RFGPfMiDCufCx8DGUPGWuxWx8lOXn2WxhqUyV
-         KcX31HYsmlfnc+B0uXODFJGkSQ1D7KlKo/1axNL56uWC/i/Ygr4qaWQg3s+wXvNfpj
-         nbW5abLKrgReUU1UgEzLqzFWM42Prz0eUGLecQ2Vv6h5YiPLHqbp4Xu2pTu47Bdbmg
-         sTTyP+pMhl3BQ==
-Date:   Wed, 27 Jan 2021 09:18:02 -0600
-From:   Bjorn Helgaas <helgaas@kernel.org>
-To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Bjorn Helgaas <bhelgaas@google.com>
-Subject: Re: [PATCH 1/2] mtip32xx: use PCI #defines instead of numbers
-Message-ID: <20210127151802.GA2985075@bjorn-Precision-5520>
+        id S1343800AbhA0PUx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Jan 2021 10:20:53 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49748 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1343683AbhA0PUV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 27 Jan 2021 10:20:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1611760732;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Y8CI0qhLiRTzgvTJnz39fBqQX6rleE9goWMGoeQDUHM=;
+        b=hdyTJd5ccf/N6MdfncJHTvpTOAhYOcfmQ2FVTNHDuhVGSCQ9qvloGU5D1ATcNvYAnsKdIT
+        ZVHLYTfIVIRljT9+4dywjtC4xwwg8C+8MndIlv4vqqIG4lpnyJVzhqx7Y9EFe2O/QrXtIq
+        VcGh4KXYsY3+P1OtiEFKNnLrLVQtCnk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-397-Q_p0DMDDOLWzMbA0s1tO-Q-1; Wed, 27 Jan 2021 10:18:50 -0500
+X-MC-Unique: Q_p0DMDDOLWzMbA0s1tO-Q-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 826648797E7;
+        Wed, 27 Jan 2021 15:18:48 +0000 (UTC)
+Received: from T590 (ovpn-12-152.pek2.redhat.com [10.72.12.152])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 634A45D9CA;
+        Wed, 27 Jan 2021 15:18:44 +0000 (UTC)
+Date:   Wed, 27 Jan 2021 23:18:38 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Maxim Mikityanskiy <maxtram95@gmail.com>
+Cc:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] Revert "block: simplify set_init_blocksize" to regain
+ lost performance
+Message-ID: <20210127151838.GA1325688@T590>
+References: <20210126195907.2273494-1-maxtram95@gmail.com>
+ <d3effbdc-12c2-c6aa-98ba-7bde006fc4e1@acm.org>
+ <CAKErNvpCdTvg-Bx-U+k3jYiazoz-Pr0LwruaSh+LszH9yP5c8A@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <3228074F-0E0A-4AF1-A950-C978F6FB3908@wdc.com>
+In-Reply-To: <CAKErNvpCdTvg-Bx-U+k3jYiazoz-Pr0LwruaSh+LszH9yP5c8A@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jan 27, 2021 at 07:58:26AM +0000, Chaitanya Kulkarni wrote:
-> > On Jan 26, 2021, at 11:41 PM, Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com> wrote:
-> > ﻿On 1/26/21 14:14, Bjorn Helgaas wrote:
-> >> From: Bjorn Helgaas <bhelgaas@google.com>
-> >> 
-> >> Use PCI #defines for PCIe Device Control register values instead of
-> >> hard-coding bit positions.  No functional change intended.
-> >> 
-> >> Signed-off-by: Bjorn Helgaas <bhelgaas@google.com>
-> > 
-> > I've verified the values present in the include/uapi/linux/pci_regs.h
-> > matches open coded bit shift values. LGTM.
-> > 
-> > Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-> > 
-> Something is seriously wrong. I sent out this in the morning and it
-> got delivered right now. 
+On Wed, Jan 27, 2021 at 09:44:50AM +0200, Maxim Mikityanskiy wrote:
+> On Wed, Jan 27, 2021 at 6:23 AM Bart Van Assche <bvanassche@acm.org> wrote:
+> >
+> > On 1/26/21 11:59 AM, Maxim Mikityanskiy wrote:
+> > > The cited commit introduced a serious regression with SATA write speed,
+> > > as found by bisecting. This patch reverts this commit, which restores
+> > > write speed back to the values observed before this commit.
+> > >
+> > > The performance tests were done on a Helios4 NAS (2nd batch) with 4 HDDs
+> > > (WD8003FFBX) using dd (bs=1M count=2000). "Direct" is a test with a
+> > > single HDD, the rest are different RAID levels built over the first
+> > > partitions of 4 HDDs. Test results are in MB/s, R is read, W is write.
+> > >
+> > >                 | Direct | RAID0 | RAID10 f2 | RAID10 n2 | RAID6
+> > > ----------------+--------+-------+-----------+-----------+--------
+> > > 9011495c9466    | R:256  | R:313 | R:276     | R:313     | R:323
+> > > (before faulty) | W:254  | W:253 | W:195     | W:204     | W:117
+> > > ----------------+--------+-------+-----------+-----------+--------
+> > > 5ff9f19231a0    | R:257  | R:398 | R:312     | R:344     | R:391
+> > > (faulty commit) | W:154  | W:122 | W:67.7    | W:66.6    | W:67.2
+> > > ----------------+--------+-------+-----------+-----------+--------
+> > > 5.10.10         | R:256  | R:401 | R:312     | R:356     | R:375
+> > > unpatched       | W:149  | W:123 | W:64      | W:64.1    | W:61.5
+> > > ----------------+--------+-------+-----------+-----------+--------
+> > > 5.10.10         | R:255  | R:396 | R:312     | R:340     | R:393
+> > > patched         | W:247  | W:274 | W:220     | W:225     | W:121
+> > >
+> > > Applying this patch doesn't hurt read performance, while improves the
+> > > write speed by 1.5x - 3.5x (more impact on RAID tests). The write speed
+> > > is restored back to the state before the faulty commit, and even a bit
+> > > higher in RAID tests (which aren't HDD-bound on this device) - that is
+> > > likely related to other optimizations done between the faulty commit and
+> > > 5.10.10 which also improved the read speed.
+> > >
+> > > Signed-off-by: Maxim Mikityanskiy <maxtram95@gmail.com>
+> > > Fixes: 5ff9f19231a0 ("block: simplify set_init_blocksize")
+> > > Cc: Christoph Hellwig <hch@lst.de>
+> > > Cc: Jens Axboe <axboe@kernel.dk>
+> > > ---
+> > >  fs/block_dev.c | 10 +++++++++-
+> > >  1 file changed, 9 insertions(+), 1 deletion(-)
+> > >
+> > > diff --git a/fs/block_dev.c b/fs/block_dev.c
+> > > index 3b8963e228a1..235b5042672e 100644
+> > > --- a/fs/block_dev.c
+> > > +++ b/fs/block_dev.c
+> > > @@ -130,7 +130,15 @@ EXPORT_SYMBOL(truncate_bdev_range);
+> > >
+> > >  static void set_init_blocksize(struct block_device *bdev)
+> > >  {
+> > > -     bdev->bd_inode->i_blkbits = blksize_bits(bdev_logical_block_size(bdev));
+> > > +     unsigned int bsize = bdev_logical_block_size(bdev);
+> > > +     loff_t size = i_size_read(bdev->bd_inode);
+> > > +
+> > > +     while (bsize < PAGE_SIZE) {
+> > > +             if (size & bsize)
+> > > +                     break;
+> > > +             bsize <<= 1;
+> > > +     }
+> > > +     bdev->bd_inode->i_blkbits = blksize_bits(bsize);
+> > >  }
+> > >
+> > >  int set_blocksize(struct block_device *bdev, int size)
+> >
+> > How can this patch affect write speed? I haven't found any calls of
+> > set_init_blocksize() in the I/O path. Did I perhaps overlook something?
+> 
+> I don't know the exact mechanism how this change affects the speed,
+> I'm not an expert in the block device subsystem (I'm a networking
+> guy). This commit was found by git bisect, and my performance test
+> confirmed that reverting it fixes the bug.
+> 
+> It looks to me as this function sets the block size as part of control
+> flow, and this size is used later in the fast path, and the commit
+> that removed the loop decreased this block size.
 
-I noticed that, too.  Seems like the mailing list is really backed up.
-Thanks a lot for taking a look at this!
+Right, the issue is stupid __block_write_full_page() which submits single bio
+for each buffer head. And I have tried to improve the situation by merging
+BHs into single bio, see below patch:
 
-Bjorn
+	https://lore.kernel.org/linux-block/20201230000815.3448707-1-ming.lei@redhat.com/
+
+The above patch should improve perf for your test case.
+
+-- 
+Ming
+
