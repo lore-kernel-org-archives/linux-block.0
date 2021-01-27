@@ -2,87 +2,75 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06BC6C433DB
-	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 16:53:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E32A1C433DB
+	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 17:10:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BC41364D99
-	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 16:53:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8B4D064DCC
+	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 17:10:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233074AbhA0Qw4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Jan 2021 11:52:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47228 "EHLO
+        id S233555AbhA0RKR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Jan 2021 12:10:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50998 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232813AbhA0Qwz (ORCPT
+        with ESMTP id S234675AbhA0RKF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Jan 2021 11:52:55 -0500
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51517C06174A
-        for <linux-block@vger.kernel.org>; Wed, 27 Jan 2021 08:52:15 -0800 (PST)
-Received: by mail-pj1-x1031.google.com with SMTP id cq1so1583763pjb.4
-        for <linux-block@vger.kernel.org>; Wed, 27 Jan 2021 08:52:15 -0800 (PST)
+        Wed, 27 Jan 2021 12:10:05 -0500
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E075AC06174A
+        for <linux-block@vger.kernel.org>; Wed, 27 Jan 2021 09:09:22 -0800 (PST)
+Received: by mail-pj1-x1030.google.com with SMTP id g15so1759886pjd.2
+        for <linux-block@vger.kernel.org>; Wed, 27 Jan 2021 09:09:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=lQKD9AgPexRDubj64bboSIKnHej4WVBTeYTVGyeOaHk=;
-        b=0n7IOfJztdBvyCO+NwquWZO/9oDoBxQCCGXsafUQ/GvUYsfJ9GMPAPuFm/2AHz2s7h
-         uCjspaY6eWonaZrU5TNO1bFTgmPIbBbshQEov2cSyySKuYe6JHBj4YtmSsCgqqeJQ0sz
-         TEp+kDX55Ttsnc0J6mELqLNa4WTTuqIBpHFd3WA2ygVL+9LP+Y/h3dPZ0HRlZG6rjvCq
-         o8+mzv9CEKGMlgIZqlWOyLBHKwUPEfZAqrHsgb5eQJ8jwi6mY18MiLv0LfN195kWsU1I
-         9aIP573InHU/7bIMgKM0aes7wOoE1YqdbZK7PAc68mg/7wVOpXqK0JLzoUJL/hUqxtsf
-         yCNQ==
+        bh=YJFirqRxiABeTbLcOq0B8ivyDH34hEqL7q64G4hhzdg=;
+        b=h9IX9k3+eev4VaJViLYLKESa7QZAI00kQQQYISQE1RxG0GynS5RHaXfkH0rek1dJ4a
+         vEX8Uju8YcYl5fUqZqulrC5lONPMZDBu5bjvlQGBTZbzNhjgPjnzXt+ORkyT4LpUU9mT
+         szeHTd7Ml53Vbh723gEHf5AW6zefm2cBW84PY83vEitWC/wjWg4AVGoDR06AkRQiENUQ
+         BVrsB36k4HTs9a3AcJVBegsMz7bFIMwBd9tHNPQxHXSgMychugDktQAifnnf6U+oRLeK
+         fSdTs1xGy4RQHmNZmKKHbRT9uN/fNIfdhobqRBStFHUsH6zq1iuzjcucb94WWe/IeYwJ
+         fiRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=lQKD9AgPexRDubj64bboSIKnHej4WVBTeYTVGyeOaHk=;
-        b=MZDT1LbBniAKP/syiKjGy54VSsyAYWT/IT9HEdmjBfDj3zvhJ5bx7Q5hMJ6tvWzLTp
-         bFAvD7GUSD3ZijBxdywNHtZuI5UzvpLcJrSO3KYSTPYJZAJ6uQ8t0+HdrtV4SkdXy73v
-         vaBf1L1hC4yV22h3WxYU2Oz/Vz8V7vnGmT+xyAQbDj5HtdluoMb6JSuYZ3w90Mj94anz
-         9CFgOEapD3I5DrL7N8pUL6SMpNCbomlrp+rnI9rMTV9HZDCQTCVaeN3V+LirVfAw9S0G
-         Ule5aqrgoAIH8kLEupGZLPOe0F1iurPArMCceMzfAofp0CcVH7HEc9H6YV0yq/zWpayO
-         aMGg==
-X-Gm-Message-State: AOAM530ATG8SBhhhuPkuVjO1//a/OgS5XsPCVNC8uRlFFKu1qJFs1QY9
-        OFNeAThmJCQ399jyP6IuI/g51w==
-X-Google-Smtp-Source: ABdhPJznkZAkmGjzE0K3XJ7r+1OuPOB/uSu+0QVk0qZGt1uSi7gcicfz36VtRv3b8tVtY1Mr6zsRVA==
-X-Received: by 2002:a17:90a:b782:: with SMTP id m2mr6555276pjr.220.1611766334716;
-        Wed, 27 Jan 2021 08:52:14 -0800 (PST)
+        bh=YJFirqRxiABeTbLcOq0B8ivyDH34hEqL7q64G4hhzdg=;
+        b=SOGRfVZvMCB57iozqaa3MkYX00dD0TKm6P5lM+PiX+OFt8nfI4vMQHEh3VegMZRJ5V
+         dBN9tNNq8+9kC8QOAqjbsTODI8o7k2o4SVTd2oI1t1d2mELXqRaGJO+3aGGdjGuFy37u
+         nPk3dhlvgU6fpcCGxDYzZlT/8wRiNpZKK2AcKmRZvqZM+y1eZr/JTuXDv63G7I9XJbUd
+         rRfCfXvuw4/zXgt1VKhyWTSJL2xOXHim+wWLJCCVemSLD3qDNa4uRDOI93cc9pZtzuE3
+         3anMdmKIinemuwmv5+eRw3lGoR7oo1BKS0gqlv7K2PJDMW1Jz9j3WgP6Xk1xmkCqsVtT
+         F4GA==
+X-Gm-Message-State: AOAM533FjNIyxQL01sFvYw5I8U5xh9aH0IhQV38t+nqNN/6qqC7ltgrk
+        fB0GdvxqeBUNmrjh7zfpBs6QHbkEZJxKJg==
+X-Google-Smtp-Source: ABdhPJwQ1UoM9BVwq5PjAvq/C7WXKMZZ89ZliJF81kJm3qxWSKohWAlTNJumniZHSaRUJbV+ZgAybA==
+X-Received: by 2002:a17:902:c40c:b029:dc:9bc9:b98d with SMTP id k12-20020a170902c40cb02900dc9bc9b98dmr12292977plk.19.1611767362370;
+        Wed, 27 Jan 2021 09:09:22 -0800 (PST)
 Received: from [192.168.4.41] (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
-        by smtp.gmail.com with ESMTPSA id z13sm2914261pgf.89.2021.01.27.08.52.11
+        by smtp.gmail.com with ESMTPSA id 101sm2628493pjo.38.2021.01.27.09.09.20
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 Jan 2021 08:52:14 -0800 (PST)
-Subject: Re: misc bio allocation cleanups
-To:     Christoph Hellwig <hch@lst.de>, Song Liu <song@kernel.org>
-Cc:     Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        Coly Li <colyli@suse.de>, Mike Snitzer <snitzer@redhat.com>,
-        Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Naohiro Aota <naohiro.aota@wdc.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Ryusuke Konishi <konishi.ryusuke@gmail.com>,
-        linux-nilfs@vger.kernel.org, dm-devel@redhat.com,
-        linux-f2fs-devel@lists.sourceforge.net,
-        linux-block@vger.kernel.org, drbd-dev@lists.linbit.com,
-        linux-bcache@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        linux-nfs@vger.kernel.org, linux-mm@kvack.org
-References: <20210126145247.1964410-1-hch@lst.de>
+        Wed, 27 Jan 2021 09:09:21 -0800 (PST)
+Subject: Re: [PATCH] nvme-core: check bdev value for NULL
+To:     Christoph Hellwig <hch@lst.de>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        kbusch@kernel.org
+References: <20210127053738.4922-1-chaitanya.kulkarni@wdc.com>
+ <20210127071344.GA21223@lst.de>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <53e9b2e0-7169-f2fe-3c33-5f8a28cbd01b@kernel.dk>
-Date:   Wed, 27 Jan 2021 09:52:10 -0700
+Message-ID: <683a593e-a5f2-0e09-2ad1-c2527946b253@kernel.dk>
+Date:   Wed, 27 Jan 2021 10:09:19 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210126145247.1964410-1-hch@lst.de>
+In-Reply-To: <20210127071344.GA21223@lst.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -90,13 +78,15 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/26/21 7:52 AM, Christoph Hellwig wrote:
-> Hi Jens,
+On 1/27/21 12:13 AM, Christoph Hellwig wrote:
+> Looks good:
 > 
-> this series contains various cleanups for how bios are allocated or
-> initialized plus related fallout.
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> 
+> Jens, can you pick this up as it fixes an issue I introduced in
+> for-5.12/block?
 
-Applied, thanks.
+I can, I'll add the fixes tag too.
 
 -- 
 Jens Axboe
