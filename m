@@ -2,46 +2,102 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3430C433DB
-	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 16:42:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06BC6C433DB
+	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 16:53:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B07C164D9D
-	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 16:42:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BC41364D99
+	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 16:53:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229563AbhA0QmA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Jan 2021 11:42:00 -0500
-Received: from verein.lst.de ([213.95.11.211]:53687 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232283AbhA0QlF (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Jan 2021 11:41:05 -0500
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 2C0EE68B02; Wed, 27 Jan 2021 17:40:21 +0100 (CET)
-Date:   Wed, 27 Jan 2021 17:40:20 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Chao Leng <lengchao@huawei.com>
-Cc:     linux-nvme@lists.infradead.org, kbusch@kernel.org, axboe@fb.com,
-        hch@lst.de, sagi@grimberg.me, linux-block@vger.kernel.org,
-        axboe@kernel.dk
-Subject: Re: [PATCH v4 1/5] blk-mq: introduce blk_mq_set_request_complete
-Message-ID: <20210127164020.GA23417@lst.de>
-References: <20210126081539.13320-1-lengchao@huawei.com> <20210126081539.13320-2-lengchao@huawei.com>
+        id S233074AbhA0Qw4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Jan 2021 11:52:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47228 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232813AbhA0Qwz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 27 Jan 2021 11:52:55 -0500
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51517C06174A
+        for <linux-block@vger.kernel.org>; Wed, 27 Jan 2021 08:52:15 -0800 (PST)
+Received: by mail-pj1-x1031.google.com with SMTP id cq1so1583763pjb.4
+        for <linux-block@vger.kernel.org>; Wed, 27 Jan 2021 08:52:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=lQKD9AgPexRDubj64bboSIKnHej4WVBTeYTVGyeOaHk=;
+        b=0n7IOfJztdBvyCO+NwquWZO/9oDoBxQCCGXsafUQ/GvUYsfJ9GMPAPuFm/2AHz2s7h
+         uCjspaY6eWonaZrU5TNO1bFTgmPIbBbshQEov2cSyySKuYe6JHBj4YtmSsCgqqeJQ0sz
+         TEp+kDX55Ttsnc0J6mELqLNa4WTTuqIBpHFd3WA2ygVL+9LP+Y/h3dPZ0HRlZG6rjvCq
+         o8+mzv9CEKGMlgIZqlWOyLBHKwUPEfZAqrHsgb5eQJ8jwi6mY18MiLv0LfN195kWsU1I
+         9aIP573InHU/7bIMgKM0aes7wOoE1YqdbZK7PAc68mg/7wVOpXqK0JLzoUJL/hUqxtsf
+         yCNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=lQKD9AgPexRDubj64bboSIKnHej4WVBTeYTVGyeOaHk=;
+        b=MZDT1LbBniAKP/syiKjGy54VSsyAYWT/IT9HEdmjBfDj3zvhJ5bx7Q5hMJ6tvWzLTp
+         bFAvD7GUSD3ZijBxdywNHtZuI5UzvpLcJrSO3KYSTPYJZAJ6uQ8t0+HdrtV4SkdXy73v
+         vaBf1L1hC4yV22h3WxYU2Oz/Vz8V7vnGmT+xyAQbDj5HtdluoMb6JSuYZ3w90Mj94anz
+         9CFgOEapD3I5DrL7N8pUL6SMpNCbomlrp+rnI9rMTV9HZDCQTCVaeN3V+LirVfAw9S0G
+         Ule5aqrgoAIH8kLEupGZLPOe0F1iurPArMCceMzfAofp0CcVH7HEc9H6YV0yq/zWpayO
+         aMGg==
+X-Gm-Message-State: AOAM530ATG8SBhhhuPkuVjO1//a/OgS5XsPCVNC8uRlFFKu1qJFs1QY9
+        OFNeAThmJCQ399jyP6IuI/g51w==
+X-Google-Smtp-Source: ABdhPJznkZAkmGjzE0K3XJ7r+1OuPOB/uSu+0QVk0qZGt1uSi7gcicfz36VtRv3b8tVtY1Mr6zsRVA==
+X-Received: by 2002:a17:90a:b782:: with SMTP id m2mr6555276pjr.220.1611766334716;
+        Wed, 27 Jan 2021 08:52:14 -0800 (PST)
+Received: from [192.168.4.41] (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
+        by smtp.gmail.com with ESMTPSA id z13sm2914261pgf.89.2021.01.27.08.52.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 27 Jan 2021 08:52:14 -0800 (PST)
+Subject: Re: misc bio allocation cleanups
+To:     Christoph Hellwig <hch@lst.de>, Song Liu <song@kernel.org>
+Cc:     Jaegeuk Kim <jaegeuk@kernel.org>, Chao Yu <chao@kernel.org>,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        Coly Li <colyli@suse.de>, Mike Snitzer <snitzer@redhat.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Naohiro Aota <naohiro.aota@wdc.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Ryusuke Konishi <konishi.ryusuke@gmail.com>,
+        linux-nilfs@vger.kernel.org, dm-devel@redhat.com,
+        linux-f2fs-devel@lists.sourceforge.net,
+        linux-block@vger.kernel.org, drbd-dev@lists.linbit.com,
+        linux-bcache@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-btrfs@vger.kernel.org,
+        linux-nfs@vger.kernel.org, linux-mm@kvack.org
+References: <20210126145247.1964410-1-hch@lst.de>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <53e9b2e0-7169-f2fe-3c33-5f8a28cbd01b@kernel.dk>
+Date:   Wed, 27 Jan 2021 09:52:10 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210126081539.13320-2-lengchao@huawei.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20210126145247.1964410-1-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> +static inline void blk_mq_set_request_complete(struct request *rq)
-> +{
-> +	WRITE_ONCE(rq->state, MQ_RQ_COMPLETE);
-> +}
+On 1/26/21 7:52 AM, Christoph Hellwig wrote:
+> Hi Jens,
+> 
+> this series contains various cleanups for how bios are allocated or
+> initialized plus related fallout.
 
-This function needs a detailed comment explaining the use case.
-Otherwise we'll get lots of driver abuses.
+Applied, thanks.
+
+-- 
+Jens Axboe
+
