@@ -7,71 +7,70 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76E21C433E6
-	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 16:17:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02A92C433E6
+	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 16:19:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 30EB3207B7
-	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 16:17:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CF53A20789
+	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 16:19:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237009AbhA0QRc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Jan 2021 11:17:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39184 "EHLO
+        id S235772AbhA0QTC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Jan 2021 11:19:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39540 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343961AbhA0QPo (ORCPT
+        with ESMTP id S234551AbhA0QRW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Jan 2021 11:15:44 -0500
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAAD3C061573
-        for <linux-block@vger.kernel.org>; Wed, 27 Jan 2021 08:15:03 -0800 (PST)
-Received: by mail-pl1-x62e.google.com with SMTP id g3so1306987plp.2
-        for <linux-block@vger.kernel.org>; Wed, 27 Jan 2021 08:15:03 -0800 (PST)
+        Wed, 27 Jan 2021 11:17:22 -0500
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E40B9C0613ED
+        for <linux-block@vger.kernel.org>; Wed, 27 Jan 2021 08:16:41 -0800 (PST)
+Received: by mail-pj1-x102f.google.com with SMTP id l18so1656107pji.3
+        for <linux-block@vger.kernel.org>; Wed, 27 Jan 2021 08:16:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=xiqRpJ5Ht6dR1wStXAMqrua7i2NfwhoL7Gu6JxmbtR0=;
-        b=uWA0sCspPE3AkDSyaNYslh7VDfnSpKOfrK0nXICZYMMjajQojSrQhAYij265UzsGks
-         VwWSj6yZAjVHCk2OLX+cBU2oQvVQDWNbB2quFe5YO+SFCSMrhwIXcicULLZldCXP1EHI
-         9/HeEq5Z0t5qQzwbGRPMsEimr0xkKw7XxYAtyUbkp6n5xXYk6Db8dJk9LtFfjSStcDDj
-         DyMuTkfxZ0Ako7l26doxamMLFxkz3DPmZFj0f6kSDn5YhvDNx2WonCGf0HyHUirBMUOH
-         oXPJQwBPU4sNNuf6M5qw1GF2SUOpgCZ6jotLwVlzOeEnUy0oKgVGD/R0vFYhPirac8oj
-         PxSg==
+        bh=ednta+6yXbNhz5wLJka5IF2MWHxV+wNQ13bmIeWQsJk=;
+        b=eAg+pYEGbaHJw4eO2afDCi/HtMXjXXY3dj2BLkDewHoT+wBnSYJt45aC10PHJnFZR2
+         lr2LyylAJg7K2T9kPDuY+YNJzI3PzPfFLXFamxzWCe832ZRMX2IqZYKNi81bQMvWjHwm
+         pfWe9TBchsdzVXFGs3InXadTzAxGlR6har0XujRTkDrzK6yTZq782rQ3Lt8AKIVojuCX
+         qFdJUxNEIxjEbf99jI17Ao34i5WIk4pBVbwF3FcZ5W864fSRzgl6tkOUdB2prsUKBQKO
+         D4r+8Blbg5vwnPMWCKfAh+yDSz2GK9T1ZjUv39S3im6eeLwm0rfyjFMoliWxa8zDReYl
+         IOFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=xiqRpJ5Ht6dR1wStXAMqrua7i2NfwhoL7Gu6JxmbtR0=;
-        b=g5d7LDlXMOLw7HV7TR9t/kmfYWdu9EabiIGKaDymPVQGEB6PSmDkyaj0Xqg80VDLnQ
-         9N03PRuTTXG2eDq0qqy+D5jn09+Lh5xK57ra9Hl1cQYVjJa+D8dLllOT2DZS6q8A+Jzl
-         ehB3trOACqF7u4Am1dE7jQJDtc+aGCG8+gJTUpqUw1fR3Db7y39IH33aRoz3gTZW4byr
-         4FerT8p2TA+u71IeDSwQ6Ir08QIBqNHf2UtRm4jeZ25oXkpigEJSrKhDq/fR3Fq57K36
-         S9c+pWRu++/+2RB3L48tuncBS0IJ3faRm2FdeeMcsRTZIC6VliTK5zSGqiA7iBNW6NTU
-         fTSw==
-X-Gm-Message-State: AOAM533f7jdepHwjJUq+rX+XoURKRP8EpgGlYSSF9tl0gBjJ0aZQ/L+M
-        XJPbE1faIrgiVhHEhBFB8Nqf5A==
-X-Google-Smtp-Source: ABdhPJzsswtHV3w92LRCKEE7cnjcT4Vnr+fzOt1CqP/Koqrj3vZY9dGwAEokGdDdFpPClOtSAuHMbA==
-X-Received: by 2002:a17:902:eccb:b029:de:8483:505d with SMTP id a11-20020a170902eccbb02900de8483505dmr12053475plh.63.1611764103374;
-        Wed, 27 Jan 2021 08:15:03 -0800 (PST)
+        bh=ednta+6yXbNhz5wLJka5IF2MWHxV+wNQ13bmIeWQsJk=;
+        b=SDT8lARwY5Fp8Oeg+6sgKnrbE5AQrPaZk/OW7qRA1AjGqgmzuUqEJ6H0n//GjzAHs+
+         sBPfowKZieub4DIyENaDMqGqffm3ndBfnRKe3kSZmFzTz5rA3Ye8OwlW+Mq6TaHVA9nB
+         t0uZlM9EIPV9I7TEh0LhGWxX6731BzHIlwojQIzR1EQy/Ejv0/2wKbmAaYVb6nRqAAlL
+         b3+TiWJb+PkKz7G2gwPmCfmKDAbsU34x7NNmZTVa5MrAkXo+Hu5IpmESsL45gkkIPbNR
+         gzX6r36fUij9d/wlxp5qhdbvnyhDHbiMdt2eterShl72Lz4/0GbH59tAG8vieq61rLr2
+         nEKw==
+X-Gm-Message-State: AOAM531TdIe5B+2f2IFGqMyUVoqIgVccwh307FXQfKyZ4Tfgbq0yJN5R
+        T9Lh6dp0PruWNztS3sihlc1ZgQ==
+X-Google-Smtp-Source: ABdhPJx4cs7LPOwSSwNxiwbkiEpe1IJNKwZVoM4mb39efm6PIS5BoseiRRxsaSHDLSgwFPHx8QyFpQ==
+X-Received: by 2002:a17:902:bb90:b029:df:bdbb:be99 with SMTP id m16-20020a170902bb90b02900dfbdbbbe99mr12126959pls.52.1611764201475;
+        Wed, 27 Jan 2021 08:16:41 -0800 (PST)
 Received: from [192.168.4.41] (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
-        by smtp.gmail.com with ESMTPSA id u12sm2775076pgi.91.2021.01.27.08.15.01
+        by smtp.gmail.com with ESMTPSA id y16sm3073206pgg.20.2021.01.27.08.16.40
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 Jan 2021 08:15:02 -0800 (PST)
-Subject: Re: [PATCH] Revert "block: simplify set_init_blocksize" to regain
- lost performance
-To:     Maxim Mikityanskiy <maxtram95@gmail.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20210126195907.2273494-1-maxtram95@gmail.com>
+        Wed, 27 Jan 2021 08:16:40 -0800 (PST)
+Subject: Re: [PATCH 0/3 v2] bfq: Two fixes and a cleanup for sequential
+ readers
+To:     Jan Kara <jack@suse.cz>
+Cc:     linux-block@vger.kernel.org,
+        Paolo Valente <paolo.valente@linaro.org>
+References: <20200605140837.5394-1-jack@suse.cz>
+ <20210127152729.GA15748@quack2.suse.cz>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <eac57824-f2eb-9a81-aa5f-3fd62f8e531d@kernel.dk>
-Date:   Wed, 27 Jan 2021 09:15:02 -0700
+Message-ID: <f435dbca-0fdb-dadc-7121-f4718a5b4215@kernel.dk>
+Date:   Wed, 27 Jan 2021 09:16:40 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210126195907.2273494-1-maxtram95@gmail.com>
+In-Reply-To: <20210127152729.GA15748@quack2.suse.cz>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -79,40 +78,36 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/26/21 12:59 PM, Maxim Mikityanskiy wrote:
-> The cited commit introduced a serious regression with SATA write speed,
-> as found by bisecting. This patch reverts this commit, which restores
-> write speed back to the values observed before this commit.
+On 1/27/21 8:27 AM, Jan Kara wrote:
+> On Wed 13-01-21 11:09:24, Jan Kara wrote:
+>> Hello,
+>>
+>> this patch series contains one tiny cleanup and two relatively simple fixes
+>> for BFQ I've uncovered when analyzing behavior of four parallel sequential
+>> readers on one machine. The fio jobfile is like:
+>>
+>> [global]
+>> direct=0
+>> ioengine=sync
+>> invalidate=1
+>> size=16g
+>> rw=read
+>> bs=4k
+>>
+>> [reader]
+>> numjobs=4
+>> directory=/mnt
+>>
+>> The first patch fixes a problem due to which the four bfq queues were getting
+>> merged without a reason. The third patch fixes a problem where we were unfairly
+>> raising bfq queue think time (leading to clearing of short_ttime and subsequent
+>> reduction in throughput).
+>>
+>> Jens, since Paolo has acked all the patches, can you please merge them?
 > 
-> The performance tests were done on a Helios4 NAS (2nd batch) with 4 HDDs
-> (WD8003FFBX) using dd (bs=1M count=2000). "Direct" is a test with a
-> single HDD, the rest are different RAID levels built over the first
-> partitions of 4 HDDs. Test results are in MB/s, R is read, W is write.
-> 
->                 | Direct | RAID0 | RAID10 f2 | RAID10 n2 | RAID6
-> ----------------+--------+-------+-----------+-----------+--------
-> 9011495c9466    | R:256  | R:313 | R:276     | R:313     | R:323
-> (before faulty) | W:254  | W:253 | W:195     | W:204     | W:117
-> ----------------+--------+-------+-----------+-----------+--------
-> 5ff9f19231a0    | R:257  | R:398 | R:312     | R:344     | R:391
-> (faulty commit) | W:154  | W:122 | W:67.7    | W:66.6    | W:67.2
-> ----------------+--------+-------+-----------+-----------+--------
-> 5.10.10         | R:256  | R:401 | R:312     | R:356     | R:375
-> unpatched       | W:149  | W:123 | W:64      | W:64.1    | W:61.5
-> ----------------+--------+-------+-----------+-----------+--------
-> 5.10.10         | R:255  | R:396 | R:312     | R:340     | R:393
-> patched         | W:247  | W:274 | W:220     | W:225     | W:121
-> 
-> Applying this patch doesn't hurt read performance, while improves the
-> write speed by 1.5x - 3.5x (more impact on RAID tests). The write speed
-> is restored back to the state before the faulty commit, and even a bit
-> higher in RAID tests (which aren't HDD-bound on this device) - that is
-> likely related to other optimizations done between the faulty commit and
-> 5.10.10 which also improved the read speed.
+> Jens, ping? Can you please pick up these fixes? Thanks!
 
-Can't argue with these numbers, and while this should probably get
-fixed up instead, let's leave that for future kernels. I'll apply this
-for 5.11, thanks.
+Yep, I've queued them up, thanks.
 
 -- 
 Jens Axboe
