@@ -2,134 +2,164 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9541AC433E0
-	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 05:53:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F92FC433E6
+	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 05:53:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 593962070A
-	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 05:53:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 69E0F2070A
+	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 05:53:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232149AbhA0FxV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Jan 2021 00:53:21 -0500
-Received: from mail-pj1-f41.google.com ([209.85.216.41]:51323 "EHLO
-        mail-pj1-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238506AbhA0EYZ (ORCPT
+        id S231585AbhA0Fx0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Jan 2021 00:53:26 -0500
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:5785 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235506AbhA0Fiq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Jan 2021 23:24:25 -0500
-Received: by mail-pj1-f41.google.com with SMTP id a20so509801pjs.1;
-        Tue, 26 Jan 2021 20:24:10 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=SqJGalSs1T4thlqe2OFRuAUiTlK96f+fmHA7i8AXayU=;
-        b=Nq8JpzzF4IzRv1ITuncjt2EaXqfUzPVuSAXYybacagRYRF7MzePOq98SCSkIsi5dt0
-         w824wmmodQbwJrh5Eoaht5F3NXNip/WnNq5GKYAmTKRruVyY6k0+MHbavICboj1A+hiR
-         xSu9yEzzz+wPZybmjtzVs6uG+GrJ1KUl5fTHUJGC+gU9YdyOx/6FJxndmh+F5NVtk6Hg
-         rr8F93iFLCRqs66qKg4ALxC6p3XeDpNnFIoKsHiG7LID5l125zOf44GcLXKnN4mnL21H
-         NVvIB1tkabdh3SBSa+gwmLLccf2Kt+Nm0G6APmq5MvSniVn3l54UNTVx8O0jLMXzupNR
-         Q3dw==
-X-Gm-Message-State: AOAM5312GXsZDznGgzhE3pLdgupgSBF5X38iWYbB6OPYGmF0vZ94yohf
-        u6cYiflyzwi3i6lTHf5C640bATUWLUc=
-X-Google-Smtp-Source: ABdhPJzFNH5Dqxe8SiWihU4s2H6Z7gRdvzVkrtcCEKkSc5zXtT3KUmo4kthCwpYwhUjDkvkufzvMsQ==
-X-Received: by 2002:a17:902:9a4a:b029:dc:435c:70ad with SMTP id x10-20020a1709029a4ab02900dc435c70admr9189452plv.77.1611721424555;
-        Tue, 26 Jan 2021 20:23:44 -0800 (PST)
-Received: from ?IPv6:2601:647:4000:d7:e9ac:ddc0:dd32:c413? ([2601:647:4000:d7:e9ac:ddc0:dd32:c413])
-        by smtp.gmail.com with ESMTPSA id w7sm572818pfb.62.2021.01.26.20.23.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Jan 2021 20:23:43 -0800 (PST)
-Subject: Re: [PATCH] Revert "block: simplify set_init_blocksize" to regain
- lost performance
-To:     Maxim Mikityanskiy <maxtram95@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20210126195907.2273494-1-maxtram95@gmail.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <d3effbdc-12c2-c6aa-98ba-7bde006fc4e1@acm.org>
-Date:   Tue, 26 Jan 2021 20:23:41 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.1
+        Wed, 27 Jan 2021 00:38:46 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1611725926; x=1643261926;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=3d2QpFwVqA+EAwziR0sxGf4TezRzuprvOs57VuIcJj4=;
+  b=ad/nWqaLRZTF3+dlm+Sx0XMP8lS6AYuhsWvhU2m6E5fLNmZqtp9eAryl
+   sRYpmWV8HILMaPVVfc3KENR3bHIhPvQ46RD7fYz/0BhZK2qNsw4aYHmuM
+   TTBu5BON+sZylB27PnI9/uz7LNbGmGvZARolZZbJQijHNAILMaZKIOPs9
+   /AHJCqv/7st/Hk72/4YHIy1rKYU6fbeI7lQImbeqVSWn1d4lCD7Z7GHGI
+   /8uVwFNce2YKU0qfu3ZF5O6DyvwVAzc6IZBaLcIO468wQg1l8oRl9WetN
+   UCV2ykfAKq0ZZ7F5AXj4CsW3gLQ/yEttBZXrSUGoiAS0KhNu0HG7DvRTs
+   g==;
+IronPort-SDR: ABxqyQCAyqNBzhvhezXRIjFSzpzT1N/d2Rw7Nzsrd1NscYLVdVbf6FADAZZOaIUMGAb8zG9OAG
+ ISuSUDR3+5+wq6DuxBf6+NjUMd/BVVhRhVxEflqSxK7mVzIqQLgUhpz/C6hn9gfUn19Io+M1re
+ R2qr5F1l67Mi1rv5wpT+82PkJ+Ur8JqwOa6XejZz0a+T3WdSx3K/952fIAa233GX4ynntQUDgV
+ ScMVfV47asvJtSGz5LWRksthEopK7I9323lsS8+wyswmHVOV3+yoS8bCLQmrtrtX4rCFnuzvIC
+ ETQ=
+X-IronPort-AV: E=Sophos;i="5.79,378,1602518400"; 
+   d="scan'208";a="158419055"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 27 Jan 2021 13:37:40 +0800
+IronPort-SDR: DMcC1ngxjKv/WpWewRTv/cyUrJCLU2/CALW+51zxSgA+azyMVmD6WybRMTgDHTquJFmq4Z0Da4
+ Cylt3lb03JkuRpPWQ+V6DAYlabZWCeOmcAmJfMj13PKO273c1w1xHFwqTocPtQUaOKzzh4mz9A
+ zG6+2xkiPc4OyCRLtgXFmh6Q2C1EWx7U9+GjqfRB2uSdC/Y+KuGh1ZVcQ2BN5CNm7kt5b8QoQe
+ GUoRZqkTUrxRwsbcG/uI6fuQW6Ci0ZYoi7H1eMBxLoQuJzQj2OIHvPEwkhvJXRInLKre81tIr9
+ jbz9ar5u9Fr60TDFQnh8jm66
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2021 21:22:05 -0800
+IronPort-SDR: p2RVAto3NVZEFEdYg56+AOpjFxHaZlO32pDzXYz9ZiALpMijuVvecEucsyuBUv+UyZUOOFmqm/
+ /aI4710kLPvPyY1kqDU8ku+BZFb7Sg7uNJQunWXBu+6KunD/y61O+xTCe6RV9gNeZopBPpDe5q
+ 4AfW8wCT4lM1Jdbme/0VwT8+roaRYJzwKuibj85uRQ8c/ctG4Y619e21GKBiBF3s43PKBrnBeg
+ Hr/PnkyeIcums+8I5XfC525qYVz0jlLqLcWO7UgP878eS4ROYxgOAg74otvwt629mWP6uqpdwF
+ wLE=
+WDCIronportException: Internal
+Received: from vm.labspan.wdc.com (HELO vm.sc.wdc.com) ([10.6.137.102])
+  by uls-op-cesaip02.wdc.com with ESMTP; 26 Jan 2021 21:37:40 -0800
+From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+To:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Cc:     axboe@fb.com, hch@lst.de, kbusch@kernel.org,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Subject: [PATCH] nvme-core: check bdev value for NULL
+Date:   Tue, 26 Jan 2021 21:37:38 -0800
+Message-Id: <20210127053738.4922-1-chaitanya.kulkarni@wdc.com>
+X-Mailer: git-send-email 2.22.1
 MIME-Version: 1.0
-In-Reply-To: <20210126195907.2273494-1-maxtram95@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/26/21 11:59 AM, Maxim Mikityanskiy wrote:
-> The cited commit introduced a serious regression with SATA write speed,
-> as found by bisecting. This patch reverts this commit, which restores
-> write speed back to the values observed before this commit.
-> 
-> The performance tests were done on a Helios4 NAS (2nd batch) with 4 HDDs
-> (WD8003FFBX) using dd (bs=1M count=2000). "Direct" is a test with a
-> single HDD, the rest are different RAID levels built over the first
-> partitions of 4 HDDs. Test results are in MB/s, R is read, W is write.
-> 
->                 | Direct | RAID0 | RAID10 f2 | RAID10 n2 | RAID6
-> ----------------+--------+-------+-----------+-----------+--------
-> 9011495c9466    | R:256  | R:313 | R:276     | R:313     | R:323
-> (before faulty) | W:254  | W:253 | W:195     | W:204     | W:117
-> ----------------+--------+-------+-----------+-----------+--------
-> 5ff9f19231a0    | R:257  | R:398 | R:312     | R:344     | R:391
-> (faulty commit) | W:154  | W:122 | W:67.7    | W:66.6    | W:67.2
-> ----------------+--------+-------+-----------+-----------+--------
-> 5.10.10         | R:256  | R:401 | R:312     | R:356     | R:375
-> unpatched       | W:149  | W:123 | W:64      | W:64.1    | W:61.5
-> ----------------+--------+-------+-----------+-----------+--------
-> 5.10.10         | R:255  | R:396 | R:312     | R:340     | R:393
-> patched         | W:247  | W:274 | W:220     | W:225     | W:121
-> 
-> Applying this patch doesn't hurt read performance, while improves the
-> write speed by 1.5x - 3.5x (more impact on RAID tests). The write speed
-> is restored back to the state before the faulty commit, and even a bit
-> higher in RAID tests (which aren't HDD-bound on this device) - that is
-> likely related to other optimizations done between the faulty commit and
-> 5.10.10 which also improved the read speed.
-> 
-> Signed-off-by: Maxim Mikityanskiy <maxtram95@gmail.com>
-> Fixes: 5ff9f19231a0 ("block: simplify set_init_blocksize")
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Jens Axboe <axboe@kernel.dk>
-> ---
->  fs/block_dev.c | 10 +++++++++-
->  1 file changed, 9 insertions(+), 1 deletion(-)
-> 
-> diff --git a/fs/block_dev.c b/fs/block_dev.c
-> index 3b8963e228a1..235b5042672e 100644
-> --- a/fs/block_dev.c
-> +++ b/fs/block_dev.c
-> @@ -130,7 +130,15 @@ EXPORT_SYMBOL(truncate_bdev_range);
->  
->  static void set_init_blocksize(struct block_device *bdev)
->  {
-> -	bdev->bd_inode->i_blkbits = blksize_bits(bdev_logical_block_size(bdev));
-> +	unsigned int bsize = bdev_logical_block_size(bdev);
-> +	loff_t size = i_size_read(bdev->bd_inode);
-> +
-> +	while (bsize < PAGE_SIZE) {
-> +		if (size & bsize)
-> +			break;
-> +		bsize <<= 1;
-> +	}
-> +	bdev->bd_inode->i_blkbits = blksize_bits(bsize);
->  }
->  
->  int set_blocksize(struct block_device *bdev, int size)
+The nvme-core sets the bdev to NULL when admin comamnd is issued from
+IOCTL in the following path e.g. nvme list :-
 
-How can this patch affect write speed? I haven't found any calls of
-set_init_blocksize() in the I/O path. Did I perhaps overlook something?
+block_ioctl()
+ blkdev_ioctl()
+  nvme_ioctl()
+   nvme_user_cmd()
+    nvme_submit_user_cmd()
 
-Bart.
+The commit 309dca309fc3 ("block: store a block_device pointer in struct bio")
+now uses bdev unconditionally in the macro bio_set_dev() and assumes
+that bdev value is not NULL which results in the following crash in
+since thats where bdev is actually accessed :-
 
+void bio_associate_blkg_from_css(struct bio *bio,
+				 struct cgroup_subsys_state *css)
+{
+	if (bio->bi_blkg)
+		blkg_put(bio->bi_blkg);
+
+	if (css && css->parent) {
+		bio->bi_blkg = blkg_tryget_closest(bio, css);
+	} else {
+-------------->	blkg_get(bio->bi_bdev->bd_disk->queue->root_blkg);
+		bio->bi_blkg = bio->bi_bdev->bd_disk->queue->root_blkg;
+	}
+}
+EXPORT_SYMBOL_GPL(bio_associate_blkg_from_css);
+
+<1>[  345.385947] BUG: kernel NULL pointer dereference, address: 0000000000000690
+<1>[  345.387103] #PF: supervisor read access in kernel mode
+<1>[  345.387894] #PF: error_code(0x0000) - not-present page
+<6>[  345.388756] PGD 162a2b067 P4D 162a2b067 PUD 1633eb067 PMD 0
+<4>[  345.389625] Oops: 0000 [#1] SMP NOPTI
+<4>[  345.390206] CPU: 15 PID: 4100 Comm: nvme Tainted: G           OE     5.11.0-rc5blk+ #141
+<4>[  345.391377] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.12.0-59-gc9ba52764
+<4>[  345.393074] RIP: 0010:bio_associate_blkg_from_css.cold.47+0x58/0x21f
+
+<4>[  345.396362] RSP: 0018:ffffc90000dbbce8 EFLAGS: 00010246
+<4>[  345.397078] RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000027
+<4>[  345.398114] RDX: 0000000000000000 RSI: ffff888813be91f0 RDI: ffff888813be91f8
+<4>[  345.399039] RBP: ffffc90000dbbd30 R08: 0000000000000001 R09: 0000000000000001
+<4>[  345.399950] R10: 0000000064c66670 R11: 00000000ef955201 R12: ffff888812d32800
+<4>[  345.401031] R13: 0000000000000000 R14: ffff888113e51540 R15: ffff888113e51540
+<4>[  345.401976] FS:  00007f3747f1d780(0000) GS:ffff888813a00000(0000) knlGS:0000000000000000
+<4>[  345.402997] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+<4>[  345.403737] CR2: 0000000000000690 CR3: 000000081a4bc000 CR4: 00000000003506e0
+<4>[  345.404685] Call Trace:
+<4>[  345.405031]  bio_associate_blkg+0x71/0x1c0
+<4>[  345.405649]  nvme_submit_user_cmd+0x1aa/0x38e [nvme_core]
+<4>[  345.406348]  nvme_user_cmd.isra.73.cold.98+0x54/0x92 [nvme_core]
+<4>[  345.407117]  nvme_ioctl+0x226/0x260 [nvme_core]
+<4>[  345.407707]  blkdev_ioctl+0x1c8/0x2b0
+<4>[  345.408183]  block_ioctl+0x3f/0x50
+<4>[  345.408627]  __x64_sys_ioctl+0x84/0xc0
+<4>[  345.409117]  do_syscall_64+0x33/0x40
+<4>[  345.409592]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+<4>[  345.410233] RIP: 0033:0x7f3747632107
+
+<4>[  345.413125] RSP: 002b:00007ffe461b6648 EFLAGS: 00000206 ORIG_RAX: 0000000000000010
+<4>[  345.414086] RAX: ffffffffffffffda RBX: 00000000007b7fd0 RCX: 00007f3747632107
+<4>[  345.414998] RDX: 00007ffe461b6650 RSI: 00000000c0484e41 RDI: 0000000000000004
+<4>[  345.415966] RBP: 0000000000000004 R08: 00000000007b7fe8 R09: 00000000007b9080
+<4>[  345.416883] R10: 00007ffe461b62c0 R11: 0000000000000206 R12: 00000000007b7fd0
+<4>[  345.417808] R13: 0000000000000000 R14: 0000000000000003 R15: 0000000000000000
+
+Add a NULL check before we set the bdev for bio.
+
+This issue is found on block/for-next tree.
+
+Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+---
+ drivers/nvme/host/core.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index ba5df80881ea..1a3cdc6b1036 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -1133,7 +1133,8 @@ static int nvme_submit_user_cmd(struct request_queue *q,
+ 		if (ret)
+ 			goto out;
+ 		bio = req->bio;
+-		bio_set_dev(bio, bdev);
++		if (bdev)
++			bio_set_dev(bio, bdev);
+ 		if (bdev && meta_buffer && meta_len) {
+ 			meta = nvme_add_user_metadata(bio, meta_buffer, meta_len,
+ 					meta_seed, write);
+-- 
+2.22.1
 
