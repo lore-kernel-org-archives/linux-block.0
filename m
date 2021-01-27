@@ -2,220 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60E7EC433E9
-	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 08:26:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E781CC43381
+	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 08:57:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 171FF2073C
-	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 08:26:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A6A9020754
+	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 08:57:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233118AbhA0I0n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Jan 2021 03:26:43 -0500
-Received: from mx2.suse.de ([195.135.220.15]:49146 "EHLO mx2.suse.de"
+        id S233113AbhA0I5E (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Jan 2021 03:57:04 -0500
+Received: from m42-8.mailgun.net ([69.72.42.8]:39915 "EHLO m42-8.mailgun.net"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232753AbhA0IYg (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Jan 2021 03:24:36 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1611734963; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=1fW61Yyz000lJma0e90KAjMru2VB6URi6ayHKhomjEk=;
-        b=AnZ++RAjn4k4Pa52rJa5VSmFeeWGTFBfWzL8jJuBJjLtJIGfD3CUojWbWVCwgoBnHv6WKq
-        9wfBZH6ofa93VkUZz//wC3OeO+K29nicNAehCLb14pyCK95WiIM5tw7zjCzFvKlhitbDHN
-        jPYri7LtOEgXBZQEj4yH+ZHs7pygyXQ=
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 5B2FFB925;
-        Wed, 27 Jan 2021 08:09:23 +0000 (UTC)
-Subject: Re: [PATCH v2] xen-blkfront: allow discard-* nodes to be optional
-To:     Roger Pau Monne <roger.pau@citrix.com>,
-        linux-kernel@vger.kernel.org
-Cc:     Arthur Borsboom <arthurborsboom@gmail.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Jens Axboe <axboe@kernel.dk>, xen-devel@lists.xenproject.org,
-        linux-block@vger.kernel.org
-References: <20210119105727.95173-1-roger.pau@citrix.com>
-From:   =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
-Message-ID: <f7b648c7-4d50-99ee-6b2a-0667fba1b829@suse.com>
-Date:   Wed, 27 Jan 2021 09:09:22 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.1
+        id S233362AbhA0Iyy (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 27 Jan 2021 03:54:54 -0500
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
+ s=smtp; t=1611737659; h=Message-ID: References: In-Reply-To: Subject:
+ Cc: To: From: Date: Content-Transfer-Encoding: Content-Type:
+ MIME-Version: Sender; bh=EUssQP2vZo9f1NeJLiuievSQB3Q8g6yl/yOnTsJJnrY=;
+ b=iZCbqbZ6RNPbHee+S/XWvUoQDY26ljCeA+x/MlgjuDKghB4hVjWTudOC2dKfr03Xp5W0ckg/
+ 2fjcLlyODPIxf9hJW0UUFhUPpKCnw8bu9eWXfie87TrARex+H+vsPyk594V05kXVDT9x8lSf
+ if455TgDCjycl01z/dzFKWjlgII=
+X-Mailgun-Sending-Ip: 69.72.42.8
+X-Mailgun-Sid: WyI0MmE5NyIsICJsaW51eC1ibG9ja0B2Z2VyLmtlcm5lbC5vcmciLCAiYmU5ZTRhIl0=
+Received: from smtp.codeaurora.org
+ (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
+ smtp-out-n07.prod.us-west-2.postgun.com with SMTP id
+ 60112a21a8db642432e346ab (version=TLS1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Wed, 27 Jan 2021 08:53:53
+ GMT
+Sender: cang=codeaurora.org@mg.codeaurora.org
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+        id 31DF8C43462; Wed, 27 Jan 2021 08:53:53 +0000 (UTC)
+Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
+        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        (Authenticated sender: cang)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 9273BC433CA;
+        Wed, 27 Jan 2021 08:53:52 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20210119105727.95173-1-roger.pau@citrix.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="Ao7bLDbznaqcyEQTExnEqI1zOWS70IXqQ"
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Wed, 27 Jan 2021 16:53:52 +0800
+From:   Can Guo <cang@codeaurora.org>
+To:     Avri Altman <Avri.Altman@wdc.com>
+Cc:     Asutosh Das <asutoshd@codeaurora.org>, martin.petersen@oracle.com,
+        linux-scsi@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        stern@rowland.harvard.edu,
+        "Bao D . Nguyen" <nguyenb@codeaurora.org>,
+        FUJITA Tomonori <fujita.tomonori@lab.ntt.co.jp>,
+        Jens Axboe <axboe@kernel.dk>,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>
+Subject: Re: [RFC PATCH v1 1/2] block: bsg: resume scsi device before
+ accessing
+In-Reply-To: <75c66862d61c63fcfa61cd6dce254169@codeaurora.org>
+References: <cover.1611719814.git.asutoshd@codeaurora.org>
+ <c04a11a590628c2497cef113b0dfea781de90416.1611719814.git.asutoshd@codeaurora.org>
+ <DM6PR04MB6575D64869B24B4275D63503FCBB9@DM6PR04MB6575.namprd04.prod.outlook.com>
+ <75c66862d61c63fcfa61cd6dce254169@codeaurora.org>
+Message-ID: <19e1d785e5fb3d8ee79bf55758ef2dcf@codeaurora.org>
+X-Sender: cang@codeaurora.org
+User-Agent: Roundcube Webmail/1.3.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Ao7bLDbznaqcyEQTExnEqI1zOWS70IXqQ
-Content-Type: multipart/mixed; boundary="FRInysTtmyvFTlxIDrkfHUnELRzHe5eK6";
- protected-headers="v1"
-From: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
-To: Roger Pau Monne <roger.pau@citrix.com>, linux-kernel@vger.kernel.org
-Cc: Arthur Borsboom <arthurborsboom@gmail.com>,
- Boris Ostrovsky <boris.ostrovsky@oracle.com>,
- Stefano Stabellini <sstabellini@kernel.org>,
- Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Jens Axboe
- <axboe@kernel.dk>, xen-devel@lists.xenproject.org,
- linux-block@vger.kernel.org
-Message-ID: <f7b648c7-4d50-99ee-6b2a-0667fba1b829@suse.com>
-Subject: Re: [PATCH v2] xen-blkfront: allow discard-* nodes to be optional
-References: <20210119105727.95173-1-roger.pau@citrix.com>
-In-Reply-To: <20210119105727.95173-1-roger.pau@citrix.com>
+On 2021-01-27 15:59, Can Guo wrote:
+> On 2021-01-27 15:09, Avri Altman wrote:
+>>> 
+>>> Resumes the scsi device before accessing it.
+>>> 
+>>> Change-Id: I2929af60f2a92c89704a582fcdb285d35b429fde
+>>> Signed-off-by: Asutosh Das <asutoshd@codeaurora.org>
+>>> Signed-off-by: Can Guo <cang@codeaurora.org>
+>>> Signed-off-by: Bao D. Nguyen <nguyenb@codeaurora.org>
+>> Following this patch, is it possible to revert commit 74e5e468b664d?
+>> 
+> 
+> No, but this is a good finding... This change assumes
+> that the queue->queue_data is a scsi_device, which is
+> why we call scsi_auto_pm_get(). But for ufs_bsg's case,
+> queue->queue_data is a device...
+> 
 
---FRInysTtmyvFTlxIDrkfHUnELRzHe5eK6
-Content-Type: multipart/mixed;
- boundary="------------4908A862D18199B275B706C3"
-Content-Language: en-US
+If we call pm_runtime_get/put_sync(bcd->class_dev->parent) in
+bsg_get/put_device(), commit 74e5e468b664d can be reverted.
+This is just a rough idea.
 
-This is a multi-part message in MIME format.
---------------4908A862D18199B275B706C3
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-
-On 19.01.21 11:57, Roger Pau Monne wrote:
-> This is inline with the specification described in blkif.h:
->=20
->   * discard-granularity: should be set to the physical block size if
->     node is not present.
->   * discard-alignment, discard-secure: should be set to 0 if node not
->     present.
->=20
-> This was detected as QEMU would only create the discard-granularity
-> node but not discard-alignment, and thus the setup done in
-> blkfront_setup_discard would fail.
->=20
-> Fix blkfront_setup_discard to not fail on missing nodes, and also fix
-> blkif_set_queue_limits to set the discard granularity to the physical
-> block size if none is specified in xenbus.
->=20
-> Fixes: ed30bf317c5ce ('xen-blkfront: Handle discard requests.')
-> Reported-by: Arthur Borsboom <arthurborsboom@gmail.com>
-> Signed-off-by: Roger Pau Monn=C3=A9 <roger.pau@citrix.com>
-
-Committed to xen/tip.git for-linus-5.11
-
-
-Juergen
-
---------------4908A862D18199B275B706C3
-Content-Type: application/pgp-keys;
- name="OpenPGP_0xB0DE9DD628BF132F.asc"
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: attachment;
- filename="OpenPGP_0xB0DE9DD628BF132F.asc"
-
------BEGIN PGP PUBLIC KEY BLOCK-----
-
-xsBNBFOMcBYBCACgGjqjoGvbEouQZw/ToiBg9W98AlM2QHV+iNHsEs7kxWhKMjrioyspZKOBy=
-cWx
-w3ie3j9uvg9EOB3aN4xiTv4qbnGiTr3oJhkB1gsb6ToJQZ8uxGq2kaV2KL9650I1SJvedYm8O=
-f8Z
-d621lSmoKOwlNClALZNew72NjJLEzTalU1OdT7/i1TXkH09XSSI8mEQ/ouNcMvIJNwQpd369y=
-9bf
-IhWUiVXEK7MlRgUG6MvIj6Y3Am/BBLUVbDa4+gmzDC9ezlZkTZG2t14zWPvxXP3FAp2pkW0xq=
-G7/
-377qptDmrk42GlSKN4z76ELnLxussxc7I2hx18NUcbP8+uty4bMxABEBAAHNHEp1ZXJnZW4gR=
-3Jv
-c3MgPGpnQHBmdXBmLm5ldD7CwHkEEwECACMFAlOMcBYCGwMHCwkIBwMCAQYVCAIJCgsEFgIDA=
-QIe
-AQIXgAAKCRCw3p3WKL8TL0KdB/93FcIZ3GCNwFU0u3EjNbNjmXBKDY4FUGNQH2lvWAUy+dnyT=
-hpw
-dtF/jQ6j9RwE8VP0+NXcYpGJDWlNb9/JmYqLiX2Q3TyevpB0CA3dbBQp0OW0fgCetToGIQrg0=
-MbD
-1C/sEOv8Mr4NAfbauXjZlvTj30H2jO0u+6WGM6nHwbh2l5O8ZiHkH32iaSTfN7Eu5RnNVUJbv=
-oPH
-Z8SlM4KWm8rG+lIkGurqqu5gu8q8ZMKdsdGC4bBxdQKDKHEFExLJK/nRPFmAuGlId1E3fe10v=
-5QL
-+qHI3EIPtyfE7i9Hz6rVwi7lWKgh7pe0ZvatAudZ+JNIlBKptb64FaiIOAWDCx1SzR9KdWVyZ=
-2Vu
-IEdyb3NzIDxqZ3Jvc3NAc3VzZS5jb20+wsB5BBMBAgAjBQJTjHCvAhsDBwsJCAcDAgEGFQgCC=
-QoL
-BBYCAwECHgECF4AACgkQsN6d1ii/Ey/HmQf/RtI7kv5A2PS4RF7HoZhPVPogNVbC4YA6lW7Dr=
-Wf0
-teC0RR3MzXfy6pJ+7KLgkqMlrAbN/8Dvjoz78X+5vhH/rDLa9BuZQlhFmvcGtCF8eR0T1v0nC=
-/nu
-AFVGy+67q2DH8As3KPu0344TBDpAvr2uYM4tSqxK4DURx5INz4ZZ0WNFHcqsfvlGJALDeE0Lh=
-ITT
-d9jLzdDad1pQSToCnLl6SBJZjDOX9QQcyUigZFtCXFst4dlsvddrxyqT1f17+2cFSdu7+ynLm=
-XBK
-7abQ3rwJY8SbRO2iRulogc5vr/RLMMlscDAiDkaFQWLoqHHOdfO9rURssHNN8WkMnQfvUewRz=
-80h
-SnVlcmdlbiBHcm9zcyA8amdyb3NzQG5vdmVsbC5jb20+wsB5BBMBAgAjBQJTjHDXAhsDBwsJC=
-AcD
-AgEGFQgCCQoLBBYCAwECHgECF4AACgkQsN6d1ii/Ey8PUQf/ehmgCI9jB9hlgexLvgOtf7PJn=
-FOX
-gMLdBQgBlVPO3/D9R8LtF9DBAFPNhlrsfIG/SqICoRCqUcJ96Pn3P7UUinFG/I0ECGF4EvTE1=
-jnD
-kfJZr6jrbjgyoZHiw/4BNwSTL9rWASyLgqlA8u1mf+c2yUwcGhgkRAd1gOwungxcwzwqgljf0=
-N51
-N5JfVRHRtyfwq/ge+YEkDGcTU6Y0sPOuj4Dyfm8fJzdfHNQsWq3PnczLVELStJNdapwPOoE+l=
-otu
-fe3AM2vAEYJ9rTz3Cki4JFUsgLkHFqGZarrPGi1eyQcXeluldO3m91NK/1xMI3/+8jbO0tsn1=
-tqS
-EUGIJi7ox80eSnVlcmdlbiBHcm9zcyA8amdyb3NzQHN1c2UuZGU+wsB5BBMBAgAjBQJTjHDrA=
-hsD
-BwsJCAcDAgEGFQgCCQoLBBYCAwECHgECF4AACgkQsN6d1ii/Ey+LhQf9GL45eU5vOowA2u5N3=
-g3O
-ZUEBmDHVVbqMtzwlmNC4k9Kx39r5s2vcFl4tXqW7g9/ViXYuiDXb0RfUpZiIUW89siKrkzmQ5=
-dM7
-wRqzgJpJwK8Bn2MIxAKArekWpiCKvBOB/Cc+3EXE78XdlxLyOi/NrmSGRIov0karw2RzMNOu5=
-D+j
-LRZQd1Sv27AR+IP3I8U4aqnhLpwhK7MEy9oCILlgZ1QZe49kpcumcZKORmzBTNh30FVKK1Evm=
-V2x
-AKDoaEOgQB4iFQLhJCdP1I5aSgM5IVFdn7v5YgEYuJYx37IoN1EblHI//x/e2AaIHpzK5h88N=
-Eaw
-QsaNRpNSrcfbFmAg987ATQRTjHAWAQgAyzH6AOODMBjgfWE9VeCgsrwH3exNAU32gLq2xvjpW=
-nHI
-s98ndPUDpnoxWQugJ6MpMncr0xSwFmHEgnSEjK/PAjppgmyc57BwKII3sV4on+gDVFJR6Y8ZR=
-wgn
-BC5mVM6JjQ5xDk8WRXljExRfUX9pNhdE5eBOZJrDRoLUmmjDtKzWaDhIg/+1Hzz93X4fCQkNV=
-bVF
-LELU9bMaLPBG/x5q4iYZ2k2ex6d47YE1ZFdMm6YBYMOljGkZKwYde5ldM9mo45mmwe0icXKLk=
-pEd
-IXKTZeKDO+Hdv1aqFuAcccTg9RXDQjmwhC3yEmrmcfl0+rPghO0Iv3OOImwTEe4co3c1mwARA=
-QAB
-wsBfBBgBAgAJBQJTjHAWAhsMAAoJELDendYovxMvQ/gH/1ha96vm4P/L+bQpJwrZ/dneZcmEw=
-Tbe
-8YFsw2V/Buv6Z4Mysln3nQK5ZadD534CF7TDVft7fC4tU4PONxF5D+/tvgkPfDAfF77zy2AH1=
-vJz
-Q1fOU8lYFpZXTXIHb+559UqvIB8AdgR3SAJGHHt4RKA0F7f5ipYBBrC6cyXJyyoprT10EMvU8=
-VGi
-wXvTyJz3fjoYsdFzpWPlJEBRMedCot60g5dmbdrZ5DWClAr0yau47zpWj3enf1tLWaqcsuylW=
-svi
-uGjKGw7KHQd3bxALOknAp4dN3QwBYCKuZ7AddY9yjynVaD5X7nF9nO5BjR/i1DG86lem3iBDX=
-zXs
-ZDn8R38=3D
-=3D2wuH
------END PGP PUBLIC KEY BLOCK-----
-
---------------4908A862D18199B275B706C3--
-
---FRInysTtmyvFTlxIDrkfHUnELRzHe5eK6--
-
---Ao7bLDbznaqcyEQTExnEqI1zOWS70IXqQ
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature"
-
------BEGIN PGP SIGNATURE-----
-
-wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmARH7IFAwAAAAAACgkQsN6d1ii/Ey/v
-oAf/TEpzdSHar9X+a0NQnn6Oz8Nwafmw+zkLlUhyuZxlAy/NatX+pVuxJsyYApKsa7dOiD+HJVYZ
-390CHtMgLg492orvIE7GrazMaR3vnc3qMdP8/xc/ed6G7bWQKm5d10gpe8N8FP88+wWs2iXaNoIe
-wqz+hmKGk478pgb0ZqPS0OQ4lwsn5zCU1u0dN2uPqpCrOEBO81QzzeQ+CyHPUvDBmyA0Jd32tr1W
-ZqHMW3fhoSqFFlwtHgnjxDpdXB/hhfykTETHAGyKyOJRdj1P5cuT3UuaKzUXRRvUu/yuFb80QqEG
-qH3YvkoxG7/DXjbe8gyJsyDkxYHy318WBIL4maVuug==
-=6Mjr
------END PGP SIGNATURE-----
-
---Ao7bLDbznaqcyEQTExnEqI1zOWS70IXqQ--
+> Thanks,
+> Can Guo.
+> 
+>> Thanks,
+>> Avri
