@@ -2,62 +2,74 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E3FFC433E9
-	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 17:14:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71C7DC433E6
+	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 17:16:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C8EC264DA3
-	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 17:14:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2B51A64DAC
+	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 17:16:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231452AbhA0RNr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Jan 2021 12:13:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51340 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233773AbhA0RLi (ORCPT
+        id S234783AbhA0RQQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Jan 2021 12:16:16 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:27421 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233813AbhA0RO4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Jan 2021 12:11:38 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 422F8C061573
-        for <linux-block@vger.kernel.org>; Wed, 27 Jan 2021 09:10:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=34+w+S7MCsN2gh9V4lTxkwPkwkPCHw2QT7n6VmEXuqM=; b=lLKNdfWcDjbIfPOrzxbpj6PYHJ
-        wEv/72tM3hk5oSAb2Q0PM7NxOBr6XWe2wYyk83TdvjZ8taDd//BqUIxlh6P3bqLZlMmp3KswWKc3D
-        y0vTIeK80y1P8WiM6aOqWZkVx1J8I8YkeflhHrDaqCPkc0NNglOCZeaSRaQsfcnVlBgJh/Xv+SBnj
-        iNMbBYzTNUcsA1P7kC0g3bTWTl3klXl1rgP02Gy1ujNCWjE4oGzy9d0D+ZukWnm+3B6y5yiOylKu+
-        E/Ys7E8J2Y727N/QVst/labjKZNsK5IvV8SyYPaNLCqyoUnX8qCRbDH4xXD9/EpiqcvTeDAKJ0svi
-        riMCgprg==;
-Received: from hch by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1l4oLC-007Grm-9y; Wed, 27 Jan 2021 17:10:51 +0000
-Date:   Wed, 27 Jan 2021 17:10:50 +0000
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        danil.kipnis@cloud.ionos.com, jinpu.wang@cloud.ionos.com
-Subject: Re: [PATCH 1/4] block: add a statistic table for io latency
-Message-ID: <20210127171050.GA1732656@infradead.org>
-References: <20210127145930.8826-1-guoqing.jiang@cloud.ionos.com>
- <20210127145930.8826-2-guoqing.jiang@cloud.ionos.com>
+        Wed, 27 Jan 2021 12:14:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1611767607;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Z7mGBlHRLZU/PRglXzorkWK1u2MHkwHlUmIrHobRuLA=;
+        b=B1dTFyOz7kFDglXJQhJNb5z2T0sFzDG/+BCglBO8Jj8plprlfFGh1UxTjsuLHssTKYAeZP
+        rmT2NtQ7t24Dv8sesnatGst0GCJCYC/4JY+Uu0gl9fvjknOQf3ZoduKu12cwPYZxpwrnGJ
+        P0lMFz3Q5K7C/bclJ5l+qn2siAjjYNs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-558-1z67nAIJOyGQ97FrMb-vSA-1; Wed, 27 Jan 2021 12:13:26 -0500
+X-MC-Unique: 1z67nAIJOyGQ97FrMb-vSA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0DDA98145E0;
+        Wed, 27 Jan 2021 17:13:25 +0000 (UTC)
+Received: from localhost (unknown [10.18.25.174])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id BDBB660873;
+        Wed, 27 Jan 2021 17:13:21 +0000 (UTC)
+Date:   Wed, 27 Jan 2021 12:13:21 -0500
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Jeffle Xu <jefflexu@linux.alibaba.com>
+Cc:     joseph.qi@linux.alibaba.com, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, io-uring@vger.kernel.org
+Subject: Re: [PATCH v2 5/6] block: add QUEUE_FLAG_POLL_CAP flag
+Message-ID: <20210127171320.GA11535@redhat.com>
+References: <20210125121340.70459-1-jefflexu@linux.alibaba.com>
+ <20210125121340.70459-6-jefflexu@linux.alibaba.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210127145930.8826-2-guoqing.jiang@cloud.ionos.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20210125121340.70459-6-jefflexu@linux.alibaba.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jan 27, 2021 at 03:59:27PM +0100, Guoqing Jiang wrote:
-> +config BLK_ADDITIONAL_DISKSTAT
-> +	bool "Block layer additional diskstat"
-> +	default n
+On Mon, Jan 25 2021 at  7:13am -0500,
+Jeffle Xu <jefflexu@linux.alibaba.com> wrote:
 
-n is the default default.  But more importantly I don't think having
-this as a compile time option makes much sense sense.  No one is going
-to recompile their kernel to get a few stats or to avoid the overhead
-of these stats.
+> Introduce QUEUE_FLAG_POLL_CAP flag representing if the request queue
+> capable of polling or not.
+> 
+> Signed-off-by: Jeffle Xu <jefflexu@linux.alibaba.com>
+
+Why are you adding QUEUE_FLAG_POLL_CAP?  Doesn't seem as though DM or
+anything else actually needs it.
+
+Mike
+
