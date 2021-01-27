@@ -2,151 +2,155 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F9A9C433E0
-	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 07:48:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68D73C433E9
+	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 08:13:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 041B32074D
-	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 07:48:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1CE462074F
+	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 08:13:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231278AbhA0HsC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Jan 2021 02:48:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42446 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234163AbhA0Hp5 (ORCPT
+        id S232740AbhA0IMn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Jan 2021 03:12:43 -0500
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:49760 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234194AbhA0IDv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Jan 2021 02:45:57 -0500
-Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7221C0613D6;
-        Tue, 26 Jan 2021 23:45:16 -0800 (PST)
-Received: by mail-pg1-x52c.google.com with SMTP id n25so1034018pgb.0;
-        Tue, 26 Jan 2021 23:45:16 -0800 (PST)
+        Wed, 27 Jan 2021 03:03:51 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1611734630; x=1643270630;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=9lwInD6Qg9s8edOSYImdLJNpUEMyv9YPfamIEXYvIhc=;
+  b=giJB6vkJmA8tIuj24i1vx+V4PP8Rw/CcNt/uS7H4qk/M7SbBDcYoXXQ0
+   6KyZKUl/LXoX4Paf0+JOYoTnkTjh9/eREPc84iLyT2A3pjbFrIEYyX4f8
+   wrj8zkhPtN1mmQ+AkJdSnn8MdOrnk/53tQlyQkM6tsX4nzt+RGWg5F0gb
+   E85LsfZzKEfIxAdkFFjNyy8d8jtidEmJTaLkJK6j0UXUFsu1q9tZsu6LU
+   AzDMYdNvRjNSNF5YxgEn+GAy1nlSO7xJN/2r+kQVxCs6pGGGcn9eFC0X7
+   pmeG6oo1nK8q+CkUA03R61bGBgyLmZFQoMLt4MF1fBICQbjcnAX4OO7Z9
+   A==;
+IronPort-SDR: f3/Wn6sVBL/T9AbdZKos8GRrgyHnB56eQg2KcXbFx3HJbYSI90b4arTOyfHCVjqVretvTsIkNj
+ m05P+4GoBr0BmT78ZMxXAsYVb/DtOfH3SAK5ydKmpt2dRkSfhuQF2z/IPsOsg3BJXabMRduZp8
+ 5hmiUoWecsc40fmy+qfNZCNIqaD9u1/JKU95QnOCcYOu2Fcp6fUaYnBd/1luJgTVs4Zttnrm6j
+ Vk2GGfm1FPcwhu70fQxA87kER6tpYvDspmppaJ4P3lcoP/3b4SKHt1TNAJNFVCOxCTqQZ52std
+ lTk=
+X-IronPort-AV: E=Sophos;i="5.79,378,1602518400"; 
+   d="scan'208";a="268796580"
+Received: from mail-sn1nam04lp2054.outbound.protection.outlook.com (HELO NAM04-SN1-obe.outbound.protection.outlook.com) ([104.47.44.54])
+  by ob1.hgst.iphmx.com with ESMTP; 27 Jan 2021 15:58:29 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=mqoMLf39WOeyYy0fPyxJLxbL2XbBTSImrGVWpdOJ+4o8jF9UaEywVH9SZtZwZOSjCzOJ/LTXwGY7jW1NcAT6CxYC9g1rpf7JgEB9StSj7LSSuVzcmgm2Ypk5tdyTJ6dJL3i8ZkAu6BoAIHh819kXQpYeOYNoFLJ1WpvVx/eO9Uo3tnFlyGfr5n7uS5IXO/8SB58gSFApbK/H1Hn6AnaB4MNmSui1xWjgfIg4wuvQ0S96LfqTNEOvPqEZykQwHYuDysSULhz1fa62AcwyM94g+2/n/97tVw3UPCkXdGBobns4W46rbEBsC9XVaQYfJcuVT2WfIpV2M41Z09Kq2/BDwQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9lwInD6Qg9s8edOSYImdLJNpUEMyv9YPfamIEXYvIhc=;
+ b=aRrMNQ6hESCpduYRuz3mNfOMgoHtV6Y6KkYyz1olEy/XRqypfvCmwu6+eR5zRN0mJ3h4UgpC9NTamujDLIa8bfX+fEmX6OZA+FGLOBLbhgav4f4rFIqLIxa6y2WL4xz83GjOsFZJGpnWwJFn+Ffy1wsHoZ4gTwdA9I/ONSQG+jqeFVDu59M47K//+ava8iiYbeZvPZSXBIWNJ9jWY1NxFO8seBJBEfTxlX+RXhTwe+DYtGRcHCtvCj25oR4Jl1lnL9qz/7xJXLTdn3jPJUMXNCSWQUoYECDg7cNfJX0zKvhBoRx6nX9Bf6uV0RsGNTpVZkNSCMaCdEGdbQXGOAKjTA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=uTfYbJAap7yGynm8d/+sMaK1UOCcnfG0vCnXAvPBlz0=;
-        b=sxAhR0Mk9LXCRMlMt8zcK3dONFgs2i0d+G/LaVHVWx3PrurCM+WtEY8d+6/51tiy7r
-         NBh5Htci+KqjP1Zo+aIesW1nUnoUOjgUaDr7Tax/Aag3C+acfrmxPsb07tHcHdSMgZe7
-         sam8tbDKGQbGN2Nvv0k6wju9GMPstmRAjpTwWI65iG+7W26ZkajObhoNscblHdnLPR5d
-         0YUolJtkSG91GYIoGR/pj7UeajirGmn5t1MZCMPhO/db8QdiZp5uDoQPqcV3JnIH1vi6
-         s2AS5mwX0ggCI7U8BQvOe8RQTVKNJ68rLJ7TeE5s+YM/93UoYbSZqSUNEa8jKj9Lgsmf
-         Ok9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=uTfYbJAap7yGynm8d/+sMaK1UOCcnfG0vCnXAvPBlz0=;
-        b=ZAQ3N3qwYmYD1y2w+lzD5k1XdindTRTmo0e3Q25sUzEFCU8HDgNsdjmytTYH7hBHXq
-         dhIyQnsYiRpgAUOeIzhEiSAaxON9m9612cxcK1QlZrqhoZ+BwyQ8i6QjxJVLMiuVuhId
-         U/EJQstrdXUijKU4PDBh19AWMXzif48tPVO88fVveNfl4D1S9jM8QLMi+95jefofKsdF
-         +l19O0hbT57R10bbYWetHo/8uwDwSHhm1r1gmEJkaiZ4X/09dbJD8+c2a/zQaTq+3CPJ
-         5quj+ZVn2hlI3etKTqXuTJe0Xo0l44SaFI8QAlcAwG4WaB5YpdRVc4muTVjs347GAjfV
-         8yDg==
-X-Gm-Message-State: AOAM530FbKDCivyMW+biTprQlE2jtp7mTVD5KS2xhoLubskCm6/P2Nrh
-        8a5aKrDZjuSa2OLs+VHV2xOIOIE4SpHvLor4vY4=
-X-Google-Smtp-Source: ABdhPJzOz9cyhS3OPBYhiCs+26hRU+EmgHfFR87lQhmweB0bdIjQgBfMkjgL5cmIfvI8MFGV15W+00ap3eIC0FYCniI=
-X-Received: by 2002:a63:656:: with SMTP id 83mr9969603pgg.222.1611733516481;
- Tue, 26 Jan 2021 23:45:16 -0800 (PST)
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9lwInD6Qg9s8edOSYImdLJNpUEMyv9YPfamIEXYvIhc=;
+ b=WSHwYB176+tIo3tJ+NR9HCzNCjYN813onZTmAQxPq//vMb2YdHQKScA1z3T425hjKfGu9W4sj2rdrFRo6D+2Riev4oweIRtOqRTM5x3OaMkV9pOr6QIxcsTf8cFfB/gapUvJK6N3TYd2/LNu7eKgralJdouwFjuZHKB4qjE2MV8=
+Received: from BYAPR04MB4965.namprd04.prod.outlook.com (2603:10b6:a03:4d::25)
+ by BYAPR04MB4968.namprd04.prod.outlook.com (2603:10b6:a03:42::29) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3784.13; Wed, 27 Jan
+ 2021 07:58:26 +0000
+Received: from BYAPR04MB4965.namprd04.prod.outlook.com
+ ([fe80::1d83:38d9:143:4c9c]) by BYAPR04MB4965.namprd04.prod.outlook.com
+ ([fe80::1d83:38d9:143:4c9c%5]) with mapi id 15.20.3784.016; Wed, 27 Jan 2021
+ 07:58:26 +0000
+From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+To:     Bjorn Helgaas <helgaas@kernel.org>, Jens Axboe <axboe@kernel.dk>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Bjorn Helgaas <bhelgaas@google.com>
+Subject: Re: [PATCH 1/2] mtip32xx: use PCI #defines instead of numbers
+Thread-Topic: [PATCH 1/2] mtip32xx: use PCI #defines instead of numbers
+Thread-Index: AQHW9DCX9RtNxF9J2Ui6R7ku9PxAZKo7HAEr
+Date:   Wed, 27 Jan 2021 07:58:26 +0000
+Message-ID: <3228074F-0E0A-4AF1-A950-C978F6FB3908@wdc.com>
+References: <20210126200433.2911982-1-helgaas@kernel.org>
+ <20210126200433.2911982-2-helgaas@kernel.org>,<BYAPR04MB496569EC5AB6FB3A8A2D562786BC9@BYAPR04MB4965.namprd04.prod.outlook.com>
+In-Reply-To: <BYAPR04MB496569EC5AB6FB3A8A2D562786BC9@BYAPR04MB4965.namprd04.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=none action=none header.from=wdc.com;
+x-originating-ip: [2600:8802:270c:4b00:5f6:d68b:d1ea:7c49]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 29a8c46e-b4d3-427b-9d96-08d8c29953e4
+x-ms-traffictypediagnostic: BYAPR04MB4968:
+x-microsoft-antispam-prvs: <BYAPR04MB49681FB428CCC40BEE7FF62C86BB9@BYAPR04MB4968.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:6430;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: n81hEDRtgU2bGxjOjQj44UTWrX65IkgvWqQ/GB2qmPb0XW34OVRHKreHimAeRGJtJhg7rTeMzDik71jV8NHGXzzRJE6VfFsXG8b7UJN/hn5kBERl+3fRMluXmpJWjBIFPl1Zz+ezOWLftbyVOs9JZRPqE8exWTBxj73+BzKMh5CWIUL3tgoSqd8p6PDy5sM5TuyN1Cq85/9mXvgxLlXMewfEn8InOz4LNMTUSUBgBe1oS4ZqwsD5PgRj9UXBfMUoKLE2u1/Xo70oelVNJecrRffEE9MkY1WPT98ONmvYxMqADgcQGWxrV3jz34NE7U5eRDCU1iKt1ZjPcHlR0jJKZ8ndEUaMVds4acW/JFCNBXgER28C6q4yohfC3MHlDiWEQAOy0NQAQ7yLwbdl+obsRMWfvn09MTlT0JZuHhO+5mArUpEYSUfoeZUF+GN91PU5
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR04MB4965.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(39860400002)(346002)(136003)(396003)(376002)(53546011)(2906002)(66476007)(33656002)(83380400001)(71200400001)(4326008)(66946007)(8676002)(186003)(110136005)(5660300002)(36756003)(86362001)(64756008)(316002)(76116006)(54906003)(2616005)(478600001)(6512007)(66446008)(4744005)(6506007)(66556008)(8936002)(6486002)(45980500001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: =?utf-8?B?UVVwc3ZqWVlUK2s5MVYwSk1ib3J1QzdmZDV6dlF2aDlIWTQ0MFpmcjFkTWVw?=
+ =?utf-8?B?NTRPbWpiQXNkampYMEozQ0FBaTZldWFQSFVLeUpQWDNQeW5pcTNpcUFxWDBV?=
+ =?utf-8?B?bW1IMGZjOVhKRHpIdHNUQXRlL25RQjNOeXNscUxrUUVXQ3NWS1VJb21jTmY3?=
+ =?utf-8?B?Ny82ZzA2QUY3V09xMFROazdsVUFTWjhkakNwQWZkR3BmNkxzSHhVR2JnQUJB?=
+ =?utf-8?B?dkFJQ3dVaTVQT2tSM3RqVXlQcWhDSWYyS3Z0UU00SVRnOW5jQ3pzT0k2aFNi?=
+ =?utf-8?B?eG5UVUgzTEdnNmZrZ082SGttb1hNNGRLVXJmaXhERkxxc2lDWTYzYXNvYks1?=
+ =?utf-8?B?c1g5RmN0U3EzazRhNWlPQWdQU3dRY1hRb2FRSUpmSDJraG52Yk14RVNGOXBl?=
+ =?utf-8?B?ODVLelBBKzRpSDYrbW96VFhpTm91ekErNnl2VHNlYXkzVzdXWlRSRWN3L1pJ?=
+ =?utf-8?B?RjRXSWZlVkplQ2hHUlNJMTRqSXdOamVqbUl3WEFtekpFWjFBTlY0SktTYVky?=
+ =?utf-8?B?Mm5iUk1IVmpuMnAxMUV5bGRIM0RuTytERzNvVVdvRnNyME1DejYzaFAwNkFO?=
+ =?utf-8?B?YVJMV204aU9mRWpKNnRKZmR1Q3hYcitldmJTODFQVnhPZTVzSHYxWlhwR3Bz?=
+ =?utf-8?B?ZE5icDdURkVybm9tOUpiNWFLNitPSnhOaVVMQTZjUmNsc3gxaTNCekc5RnNR?=
+ =?utf-8?B?eXZzN2xVbEl1Vy90WDRHdlYxUjV2V3hTNVV1S2V1dER6SUg2blgzeS9Lc2c4?=
+ =?utf-8?B?QXB1blF2TDVWY1o4WmpaTyt3aEYybkFiUUxNSUcxa1M4WHF0WDk4Ti9IKzAy?=
+ =?utf-8?B?WnU0dkErV0ZTUVdBZG5jM3VaQ2Vac2l6WHJIclIybExQSm5WQ0hLU1NLcjBx?=
+ =?utf-8?B?bFNqVFJnODZRU3JnSEcrS2xHdlpyVnlFc3dFQUJ0bnBRdjJvNG0wSFpuRGgy?=
+ =?utf-8?B?cGg1Y3d5MWZDcXNXalhRQ2tUWHJ6SGNONnU4Ym9HWHBVVnJxeFNkSk1qcW5z?=
+ =?utf-8?B?Q1ZPT0lta0w4QXcvQWJ0Q1VJeHNXTi9ScHE2MXcrbG9mcytSSmZWUGJJU1NU?=
+ =?utf-8?B?aUp5elJUaHV2Um94dVM0aWlQTlR6YUd3SG8wck9QcDBDUVJDcHBNamMzajVQ?=
+ =?utf-8?B?WkxteURlUnVSQnZhd0ROOS9XRjVQOU5DZUoydDBzWUxYMm1yNHhjOWlWV1Ra?=
+ =?utf-8?B?KzJkWGErdUNaQ2JtTHA3RkIrbXBmZ0ZreXpraXBnblJUWmM1eldXR2FkYVlo?=
+ =?utf-8?B?cnFDMGVENUU0ZWFlRUx3czU1OTVkVUpRVG12RGkwM0Zyc3g3aUNBRkZzUVQ4?=
+ =?utf-8?B?WDRDTWRhcEpyYkhEOW1PamF5NFJXZ2xDSnl3SHpGZGZ4UlkzcFI0YmNxOFBz?=
+ =?utf-8?B?alNjOFN6bFpCaGREc0dNNVdVdWs1bXJBMnd1VmVTZGgyTlVpeEMxQ1BZNmtE?=
+ =?utf-8?B?VG5qMkdhSXlDdmtTOEc1cFozbDIzODJKZUh1Und6REdjemF0S2VPMWY5M2s2?=
+ =?utf-8?Q?FsCKF2HFeV+c3oGhuZiLJujjkmd?=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20210126195907.2273494-1-maxtram95@gmail.com> <d3effbdc-12c2-c6aa-98ba-7bde006fc4e1@acm.org>
-In-Reply-To: <d3effbdc-12c2-c6aa-98ba-7bde006fc4e1@acm.org>
-From:   Maxim Mikityanskiy <maxtram95@gmail.com>
-Date:   Wed, 27 Jan 2021 09:44:50 +0200
-Message-ID: <CAKErNvpCdTvg-Bx-U+k3jYiazoz-Pr0LwruaSh+LszH9yP5c8A@mail.gmail.com>
-Subject: Re: [PATCH] Revert "block: simplify set_init_blocksize" to regain
- lost performance
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR04MB4965.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 29a8c46e-b4d3-427b-9d96-08d8c29953e4
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Jan 2021 07:58:26.5222
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 9U1G1Cm6A+OBuVKibn3U/JRv16IWR97j+gzewMBwaavtenLyjXsWkVEUWq/mkEj8WSMALeSXbWWgsbqIaALLB/3L/tPCw5ZzHDCPq9vAOz8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB4968
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jan 27, 2021 at 6:23 AM Bart Van Assche <bvanassche@acm.org> wrote:
->
-> On 1/26/21 11:59 AM, Maxim Mikityanskiy wrote:
-> > The cited commit introduced a serious regression with SATA write speed,
-> > as found by bisecting. This patch reverts this commit, which restores
-> > write speed back to the values observed before this commit.
-> >
-> > The performance tests were done on a Helios4 NAS (2nd batch) with 4 HDDs
-> > (WD8003FFBX) using dd (bs=1M count=2000). "Direct" is a test with a
-> > single HDD, the rest are different RAID levels built over the first
-> > partitions of 4 HDDs. Test results are in MB/s, R is read, W is write.
-> >
-> >                 | Direct | RAID0 | RAID10 f2 | RAID10 n2 | RAID6
-> > ----------------+--------+-------+-----------+-----------+--------
-> > 9011495c9466    | R:256  | R:313 | R:276     | R:313     | R:323
-> > (before faulty) | W:254  | W:253 | W:195     | W:204     | W:117
-> > ----------------+--------+-------+-----------+-----------+--------
-> > 5ff9f19231a0    | R:257  | R:398 | R:312     | R:344     | R:391
-> > (faulty commit) | W:154  | W:122 | W:67.7    | W:66.6    | W:67.2
-> > ----------------+--------+-------+-----------+-----------+--------
-> > 5.10.10         | R:256  | R:401 | R:312     | R:356     | R:375
-> > unpatched       | W:149  | W:123 | W:64      | W:64.1    | W:61.5
-> > ----------------+--------+-------+-----------+-----------+--------
-> > 5.10.10         | R:255  | R:396 | R:312     | R:340     | R:393
-> > patched         | W:247  | W:274 | W:220     | W:225     | W:121
-> >
-> > Applying this patch doesn't hurt read performance, while improves the
-> > write speed by 1.5x - 3.5x (more impact on RAID tests). The write speed
-> > is restored back to the state before the faulty commit, and even a bit
-> > higher in RAID tests (which aren't HDD-bound on this device) - that is
-> > likely related to other optimizations done between the faulty commit and
-> > 5.10.10 which also improved the read speed.
-> >
-> > Signed-off-by: Maxim Mikityanskiy <maxtram95@gmail.com>
-> > Fixes: 5ff9f19231a0 ("block: simplify set_init_blocksize")
-> > Cc: Christoph Hellwig <hch@lst.de>
-> > Cc: Jens Axboe <axboe@kernel.dk>
-> > ---
-> >  fs/block_dev.c | 10 +++++++++-
-> >  1 file changed, 9 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/fs/block_dev.c b/fs/block_dev.c
-> > index 3b8963e228a1..235b5042672e 100644
-> > --- a/fs/block_dev.c
-> > +++ b/fs/block_dev.c
-> > @@ -130,7 +130,15 @@ EXPORT_SYMBOL(truncate_bdev_range);
-> >
-> >  static void set_init_blocksize(struct block_device *bdev)
-> >  {
-> > -     bdev->bd_inode->i_blkbits = blksize_bits(bdev_logical_block_size(bdev));
-> > +     unsigned int bsize = bdev_logical_block_size(bdev);
-> > +     loff_t size = i_size_read(bdev->bd_inode);
-> > +
-> > +     while (bsize < PAGE_SIZE) {
-> > +             if (size & bsize)
-> > +                     break;
-> > +             bsize <<= 1;
-> > +     }
-> > +     bdev->bd_inode->i_blkbits = blksize_bits(bsize);
-> >  }
-> >
-> >  int set_blocksize(struct block_device *bdev, int size)
->
-> How can this patch affect write speed? I haven't found any calls of
-> set_init_blocksize() in the I/O path. Did I perhaps overlook something?
-
-I don't know the exact mechanism how this change affects the speed,
-I'm not an expert in the block device subsystem (I'm a networking
-guy). This commit was found by git bisect, and my performance test
-confirmed that reverting it fixes the bug.
-
-It looks to me as this function sets the block size as part of control
-flow, and this size is used later in the fast path, and the commit
-that removed the loop decreased this block size.
-
-> Bart.
->
->
+DQoNCj4gT24gSmFuIDI2LCAyMDIxLCBhdCAxMTo0MSBQTSwgQ2hhaXRhbnlhIEt1bGthcm5pIDxD
+aGFpdGFueWEuS3Vsa2FybmlAd2RjLmNvbT4gd3JvdGU6DQo+IA0KPiDvu79PbiAxLzI2LzIxIDE0
+OjE0LCBCam9ybiBIZWxnYWFzIHdyb3RlOg0KPj4gRnJvbTogQmpvcm4gSGVsZ2FhcyA8YmhlbGdh
+YXNAZ29vZ2xlLmNvbT4NCj4+IA0KPj4gVXNlIFBDSSAjZGVmaW5lcyBmb3IgUENJZSBEZXZpY2Ug
+Q29udHJvbCByZWdpc3RlciB2YWx1ZXMgaW5zdGVhZCBvZg0KPj4gaGFyZC1jb2RpbmcgYml0IHBv
+c2l0aW9ucy4gIE5vIGZ1bmN0aW9uYWwgY2hhbmdlIGludGVuZGVkLg0KPj4gDQo+PiBTaWduZWQt
+b2ZmLWJ5OiBCam9ybiBIZWxnYWFzIDxiaGVsZ2Fhc0Bnb29nbGUuY29tPg0KPiANCj4gSSd2ZSB2
+ZXJpZmllZCB0aGUgdmFsdWVzIHByZXNlbnQgaW4gdGhlIGluY2x1ZGUvdWFwaS9saW51eC9wY2lf
+cmVncy5oDQo+IG1hdGNoZXMgb3BlbiBjb2RlZCBiaXQgc2hpZnQgdmFsdWVzLiBMR1RNLg0KPiAN
+Cj4gUmV2aWV3ZWQtYnk6IENoYWl0YW55YSBLdWxrYXJuaSA8Y2hhaXRhbnlhLmt1bGthcm5pQHdk
+Yy5jb20+DQo+IA0KU29tZXRoaW5nIGlzIHNlcmlvdXNseSB3cm9uZy4gSSBzZW50IG91dCB0aGlz
+IGluIHRoZSBtb3JuaW5nIGFuZCBpdCBnb3QgZGVsaXZlcmVkIHJpZ2h0IG5vdy4gDQo+IA0K
