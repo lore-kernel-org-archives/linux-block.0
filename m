@@ -2,100 +2,67 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E781CC43381
-	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 08:57:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B690C433E0
+	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 09:35:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A6A9020754
-	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 08:57:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C413220771
+	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 09:35:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233113AbhA0I5E (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Jan 2021 03:57:04 -0500
-Received: from m42-8.mailgun.net ([69.72.42.8]:39915 "EHLO m42-8.mailgun.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233362AbhA0Iyy (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Jan 2021 03:54:54 -0500
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1611737659; h=Message-ID: References: In-Reply-To: Subject:
- Cc: To: From: Date: Content-Transfer-Encoding: Content-Type:
- MIME-Version: Sender; bh=EUssQP2vZo9f1NeJLiuievSQB3Q8g6yl/yOnTsJJnrY=;
- b=iZCbqbZ6RNPbHee+S/XWvUoQDY26ljCeA+x/MlgjuDKghB4hVjWTudOC2dKfr03Xp5W0ckg/
- 2fjcLlyODPIxf9hJW0UUFhUPpKCnw8bu9eWXfie87TrARex+H+vsPyk594V05kXVDT9x8lSf
- if455TgDCjycl01z/dzFKWjlgII=
-X-Mailgun-Sending-Ip: 69.72.42.8
-X-Mailgun-Sid: WyI0MmE5NyIsICJsaW51eC1ibG9ja0B2Z2VyLmtlcm5lbC5vcmciLCAiYmU5ZTRhIl0=
-Received: from smtp.codeaurora.org
- (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
- smtp-out-n07.prod.us-west-2.postgun.com with SMTP id
- 60112a21a8db642432e346ab (version=TLS1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Wed, 27 Jan 2021 08:53:53
- GMT
-Sender: cang=codeaurora.org@mg.codeaurora.org
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id 31DF8C43462; Wed, 27 Jan 2021 08:53:53 +0000 (UTC)
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        (Authenticated sender: cang)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id 9273BC433CA;
-        Wed, 27 Jan 2021 08:53:52 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Wed, 27 Jan 2021 16:53:52 +0800
-From:   Can Guo <cang@codeaurora.org>
-To:     Avri Altman <Avri.Altman@wdc.com>
-Cc:     Asutosh Das <asutoshd@codeaurora.org>, martin.petersen@oracle.com,
-        linux-scsi@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        stern@rowland.harvard.edu,
-        "Bao D . Nguyen" <nguyenb@codeaurora.org>,
-        FUJITA Tomonori <fujita.tomonori@lab.ntt.co.jp>,
-        Jens Axboe <axboe@kernel.dk>,
-        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC PATCH v1 1/2] block: bsg: resume scsi device before
- accessing
-In-Reply-To: <75c66862d61c63fcfa61cd6dce254169@codeaurora.org>
-References: <cover.1611719814.git.asutoshd@codeaurora.org>
- <c04a11a590628c2497cef113b0dfea781de90416.1611719814.git.asutoshd@codeaurora.org>
- <DM6PR04MB6575D64869B24B4275D63503FCBB9@DM6PR04MB6575.namprd04.prod.outlook.com>
- <75c66862d61c63fcfa61cd6dce254169@codeaurora.org>
-Message-ID: <19e1d785e5fb3d8ee79bf55758ef2dcf@codeaurora.org>
-X-Sender: cang@codeaurora.org
-User-Agent: Roundcube Webmail/1.3.9
+        id S235233AbhA0JfI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Jan 2021 04:35:08 -0500
+Received: from out30-42.freemail.mail.aliyun.com ([115.124.30.42]:43153 "EHLO
+        out30-42.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235240AbhA0JdF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 27 Jan 2021 04:33:05 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e01424;MF=abaci-bugfix@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0UN2J2GL_1611739923;
+Received: from j63c13417.sqa.eu95.tbsite.net(mailfrom:abaci-bugfix@linux.alibaba.com fp:SMTPD_---0UN2J2GL_1611739923)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Wed, 27 Jan 2021 17:32:10 +0800
+From:   Abaci Team <abaci-bugfix@linux.alibaba.com>
+To:     axboe@kernel.dk
+Cc:     minchan@kernel.org, ngupta@vflare.org,
+        sergey.senozhatsky.work@gmail.com, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org,
+        Abaci Team <abaci-bugfix@linux.alibaba.com>
+Subject: [PATCH] zram: remove redundant NULL check
+Date:   Wed, 27 Jan 2021 17:32:02 +0800
+Message-Id: <1611739922-3365-1-git-send-email-abaci-bugfix@linux.alibaba.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2021-01-27 15:59, Can Guo wrote:
-> On 2021-01-27 15:09, Avri Altman wrote:
->>> 
->>> Resumes the scsi device before accessing it.
->>> 
->>> Change-Id: I2929af60f2a92c89704a582fcdb285d35b429fde
->>> Signed-off-by: Asutosh Das <asutoshd@codeaurora.org>
->>> Signed-off-by: Can Guo <cang@codeaurora.org>
->>> Signed-off-by: Bao D. Nguyen <nguyenb@codeaurora.org>
->> Following this patch, is it possible to revert commit 74e5e468b664d?
->> 
-> 
-> No, but this is a good finding... This change assumes
-> that the queue->queue_data is a scsi_device, which is
-> why we call scsi_auto_pm_get(). But for ufs_bsg's case,
-> queue->queue_data is a device...
-> 
+Fix below warnings reported by coccicheck:
+./drivers/block/zram/zram_drv.c:534:2-8: WARNING: NULL check before some
+freeing functions is not needed.
 
-If we call pm_runtime_get/put_sync(bcd->class_dev->parent) in
-bsg_get/put_device(), commit 74e5e468b664d can be reverted.
-This is just a rough idea.
+Reported-by: Abaci Robot <abaci@linux.alibaba.com>
+Suggested-by: Yang Li <oswb@linux.alibaba.com>
+Signed-off-by: Abaci Team <abaci-bugfix@linux.alibaba.com>
+---
+ drivers/block/zram/zram_drv.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-> Thanks,
-> Can Guo.
-> 
->> Thanks,
->> Avri
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index e2933cb..92739b9 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -530,8 +530,7 @@ static ssize_t backing_dev_store(struct device *dev,
+ 
+ 	return len;
+ out:
+-	if (bitmap)
+-		kvfree(bitmap);
++	kvfree(bitmap);
+ 
+ 	if (bdev)
+ 		blkdev_put(bdev, FMODE_READ | FMODE_WRITE | FMODE_EXCL);
+-- 
+1.8.3.1
+
