@@ -2,140 +2,512 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.4 required=3.0 tests=BAYES_00,DATE_IN_PAST_06_12,
+	DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MIME_HEADER_CTYPE_ONLY,SPF_HELO_NONE,SPF_PASS,
+	T_TVD_MIME_NO_HEADERS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1EE5C433E6
-	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 11:40:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2ACBC433E0
+	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 12:00:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 833CA2076B
-	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 11:40:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 678BE20771
+	for <linux-block@archiver.kernel.org>; Wed, 27 Jan 2021 12:00:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236845AbhA0Ljo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Jan 2021 06:39:44 -0500
-Received: from mx2.suse.de ([195.135.220.15]:49326 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236903AbhA0Lh7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Jan 2021 06:37:59 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1611747433; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=RAR74QWx5XWwobnvcUvVOIFG3CIVrWbE/mK4xOXsXGs=;
-        b=peM+VHGL2uwW8gsRFe8GrllvRLo2AbyNjCRNr4XNiT1YyPleCO44IQiugDEN3SN2XE5Zc+
-        ZVL/lBiI76hBNbBTr/0Enl47HekiR9lAngeDsKjiChispz6CKc6dMiEAlRw1Z2EnK5Kq6k
-        ifixZiFRb8rQCbqWqkmmrf1bpwLD3PA=
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 37E02AD26;
-        Wed, 27 Jan 2021 11:37:13 +0000 (UTC)
-Subject: Re: [PATCH] xen-blkback: fix compatibility bug with single page rings
-To:     paul@xen.org
-Cc:     'Paul Durrant' <pdurrant@amazon.com>,
-        'Konrad Rzeszutek Wilk' <konrad.wilk@oracle.com>,
-        =?UTF-8?B?J1JvZ2VyIFBhdSBNb25uw6kn?= <roger.pau@citrix.com>,
-        'Jens Axboe' <axboe@kernel.dk>,
-        'Dongli Zhang' <dongli.zhang@oracle.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        xen-devel@lists.xenproject.org
-References: <20210127103034.2559-1-paul@xen.org>
- <cd70ae5e-a389-7521-8caf-15650a276152@suse.com>
- <026001d6f49c$eab982b0$c02c8810$@xen.org>
- <ed1988d9-131a-daf1-787f-3f49269b91aa@suse.com>
- <026101d6f4a0$2e3de000$8ab9a000$@xen.org>
-From:   Jan Beulich <jbeulich@suse.com>
-Message-ID: <40ab27a0-0f16-b010-1834-6d08ab0838c3@suse.com>
-Date:   Wed, 27 Jan 2021 12:37:12 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.1
-MIME-Version: 1.0
-In-Reply-To: <026101d6f4a0$2e3de000$8ab9a000$@xen.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+        id S234910AbhA0MAB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Jan 2021 07:00:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39954 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237450AbhA0L5Y (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 27 Jan 2021 06:57:24 -0500
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A786C06178C
+        for <linux-block@vger.kernel.org>; Wed, 27 Jan 2021 03:55:18 -0800 (PST)
+Received: by mail-pf1-x434.google.com with SMTP id o20so1056314pfu.0
+        for <linux-block@vger.kernel.org>; Wed, 27 Jan 2021 03:55:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=hVFf+CJeDQUuiVt7zFwfiBev38Oh+C0V7g9DYF7+35Q=;
+        b=fpyqX+7y7rlYlgZmDFqkrqsGhGZe44eBrHZ1qs5/YMp5yd/mjXlm9eK8fXWwAHzEw7
+         bZqzNohdF52fYfuMKkqmK2ZnXN1FTTaZ9EKRAqDG37hVbEEVApn6r+7a/VIkssK5A1KH
+         DfcNYbXB7Aa66RNsk+gsneIGKLRGfRT310cQc=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=hVFf+CJeDQUuiVt7zFwfiBev38Oh+C0V7g9DYF7+35Q=;
+        b=b6e2JBiPxGDypwmNGOdzRDm6jxUes/6sBzpWukoZxWQx56/8/rQzmnBUXP6nWsf6VK
+         RlsWkFUEvXRrUEDtVnu8n3VOPO8RU2iXl4mOBUAacztUHN1Nd3tDkYnmbnUhyDU8IQvA
+         eJc7JAlirYFS/n24lG41RMlz+71Q3WlEw/y4A2H6vTv7WdGgne/0EkhTJefGT5RxpXJO
+         N3wn95memPDxp3jSuv1jpzNFvfbZrJelIVt2dHs13LsaXcerHKBUCFbMSbf42XqP5APM
+         HbdvrINe1z2SDQ/FtmdtZtsOKeTZ0dEAQb1nmF4sTlG01pyn5hi1QWvL5X5kgM7FNzlk
+         13Vw==
+X-Gm-Message-State: AOAM5300M32tMLF4hTRCETs20Uz1ELimXu1cc+IHG8qe7+VhUNixHc3z
+        j8bB8Ab/kDwyYwuRCwZ0f5q16w==
+X-Google-Smtp-Source: ABdhPJya2wqMG3E/ZR/+kCiqfi44rCgCKuCppD+phMisPwcZiQAxkmAexFAw01McYPNOCed9fTmt3A==
+X-Received: by 2002:a63:c248:: with SMTP id l8mr10937859pgg.136.1611748517987;
+        Wed, 27 Jan 2021 03:55:17 -0800 (PST)
+Received: from drv-bst-rhel8.dhcp.broadcom.net ([192.19.234.250])
+        by smtp.gmail.com with ESMTPSA id l190sm2235552pfl.205.2021.01.27.03.55.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Jan 2021 03:55:17 -0800 (PST)
+From:   Kashyap Desai <kashyap.desai@broadcom.com>
+To:     linux-scsi@vger.kernel.org
+Cc:     Kashyap Desai <kashyap.desai@broadcom.com>,
+        sumit.saxena@broadcom.com, chandrakanth.patil@broadcom.com,
+        linux-block@vger.kernel.org
+Subject: [RESEND PATCH v2 2/4] megaraid_sas: iouring iopoll support
+Date:   Wed, 27 Jan 2021 09:25:25 +0530
+Message-Id: <20210127035527.40622-3-kashyap.desai@broadcom.com>
+X-Mailer: git-send-email 2.18.1
+In-Reply-To: <20210127035527.40622-1-kashyap.desai@broadcom.com>
+References: <20210127035527.40622-1-kashyap.desai@broadcom.com>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+        boundary="000000000000e7537d05b9e071d8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 27.01.2021 12:33, Paul Durrant wrote:
->> -----Original Message-----
->> From: Jan Beulich <jbeulich@suse.com>
->> Sent: 27 January 2021 11:21
->> To: paul@xen.org
->> Cc: 'Paul Durrant' <pdurrant@amazon.com>; 'Konrad Rzeszutek Wilk' <konrad.wilk@oracle.com>; 'Roger Pau
->> Monné' <roger.pau@citrix.com>; 'Jens Axboe' <axboe@kernel.dk>; 'Dongli Zhang'
->> <dongli.zhang@oracle.com>; linux-kernel@vger.kernel.org; linux-block@vger.kernel.org; xen-
->> devel@lists.xenproject.org
->> Subject: Re: [PATCH] xen-blkback: fix compatibility bug with single page rings
->>
->> On 27.01.2021 12:09, Paul Durrant wrote:
->>>> -----Original Message-----
->>>> From: Jan Beulich <jbeulich@suse.com>
->>>> Sent: 27 January 2021 10:57
->>>> To: Paul Durrant <paul@xen.org>
->>>> Cc: Paul Durrant <pdurrant@amazon.com>; Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>; Roger Pau
->>>> Monné <roger.pau@citrix.com>; Jens Axboe <axboe@kernel.dk>; Dongli Zhang <dongli.zhang@oracle.com>;
->>>> linux-kernel@vger.kernel.org; linux-block@vger.kernel.org; xen-devel@lists.xenproject.org
->>>> Subject: Re: [PATCH] xen-blkback: fix compatibility bug with single page rings
->>>>
->>>> On 27.01.2021 11:30, Paul Durrant wrote:
->>>>> From: Paul Durrant <pdurrant@amazon.com>
->>>>>
->>>>> Prior to commit 4a8c31a1c6f5 ("xen/blkback: rework connect_ring() to avoid
->>>>> inconsistent xenstore 'ring-page-order' set by malicious blkfront"), the
->>>>> behaviour of xen-blkback when connecting to a frontend was:
->>>>>
->>>>> - read 'ring-page-order'
->>>>> - if not present then expect a single page ring specified by 'ring-ref'
->>>>> - else expect a ring specified by 'ring-refX' where X is between 0 and
->>>>>   1 << ring-page-order
->>>>>
->>>>> This was correct behaviour, but was broken by the afforementioned commit to
->>>>> become:
->>>>>
->>>>> - read 'ring-page-order'
->>>>> - if not present then expect a single page ring
->>>>> - expect a ring specified by 'ring-refX' where X is between 0 and
->>>>>   1 << ring-page-order
->>>>> - if that didn't work then see if there's a single page ring specified by
->>>>>   'ring-ref'
->>>>>
->>>>> This incorrect behaviour works most of the time but fails when a frontend
->>>>> that sets 'ring-page-order' is unloaded and replaced by one that does not
->>>>> because, instead of reading 'ring-ref', xen-blkback will read the stale
->>>>> 'ring-ref0' left around by the previous frontend will try to map the wrong
->>>>> grant reference.
->>>>>
->>>>> This patch restores the original behaviour.
->>>>
->>>> Isn't this only the 2nd of a pair of fixes that's needed, the
->>>> first being the drivers, upon being unloaded, to fully clean up
->>>> after itself? Any stale key left may lead to confusion upon
->>>> re-use of the containing directory.
->>>
->>> In a backend we shouldn't be relying on, nor really expect IMO, a frontend to clean up after itself.
->> Any backend should know *exactly* what xenstore nodes it’s looking for from a frontend.
->>
->> But the backend can't know whether a node exists because the present
->> frontend has written it, or because an earlier instance forgot to
->> delete it. It can only honor what's there. (In fact the other day I
->> was wondering whether some of the writes of boolean "false" nodes
->> wouldn't better be xenbus_rm() instead.)
-> 
-> In the particular case this patch is fixing for me, the frontends are the Windows XENVBD driver and the Windows crash version of the same driver (actually built from different code). The 'normal' instance is multi-page aware and the crash instance is not quite, i.e. it uses the old ring-ref but knows to clean up 'ring-page-order'.
-> Clearly, in a crash situation, we cannot rely on frontend to clean up
+--000000000000e7537d05b9e071d8
 
-Ah, I see (and agree).
+Add support of iouring iopoll interface. This feature requires shared
+hosttag support in kernel and driver.
 
-> so what you say does highlight that there indeed needs to be a second patch to xen-blkback to make sure it removes 'ring-page-order' itself as 'state' cycles through Closed and back to InitWait.
+Driver will work in non-IRQ mode = There will not be any msix vector
+associated for poll_queues and h/w can still work in this mode.
+MegaRaid h/w is single submission queue and multiple reply queue, but
+using shared host tagset support it will enable simulated multiple hw queue.
 
-And not just this one node then, I suppose?
+Driver allocates some extra reply queues and it will be marked as poll_queue.
+These poll_queues will not have associated msix vectors. All the IO
+completion on this queue will be done from IOPOLL interface.
 
-> I think this patch does still stand on its own though.
+megaraid_sas driver having 8 poll_queues and using io_uring hiprio=1 settings,
+It can reach 3.2M IOPs and there is zero interrupt generated by h/w.
 
-Perhaps, yes.
+This feature can be enabled using module parameter poll_queues.
 
-Jan
+Signed-off-by: Kashyap Desai <kashyap.desai@broadcom.com>
+Cc: sumit.saxena@broadcom.com
+Cc: chandrakanth.patil@broadcom.com
+Cc: linux-block@vger.kernel.org
+---
+ drivers/scsi/megaraid/megaraid_sas.h        |  2 +
+ drivers/scsi/megaraid/megaraid_sas_base.c   | 90 ++++++++++++++++++---
+ drivers/scsi/megaraid/megaraid_sas_fusion.c | 43 +++++++++-
+ drivers/scsi/megaraid/megaraid_sas_fusion.h |  3 +
+ 4 files changed, 127 insertions(+), 11 deletions(-)
+
+diff --git a/drivers/scsi/megaraid/megaraid_sas.h b/drivers/scsi/megaraid/megaraid_sas.h
+index 0f808d63580e..0d58b123f0d0 100644
+--- a/drivers/scsi/megaraid/megaraid_sas.h
++++ b/drivers/scsi/megaraid/megaraid_sas.h
+@@ -2212,6 +2212,7 @@ struct megasas_irq_context {
+ 	struct irq_poll irqpoll;
+ 	bool irq_poll_scheduled;
+ 	bool irq_line_enable;
++	atomic_t   in_used;
+ };
+ 
+ struct MR_DRV_SYSTEM_INFO {
+@@ -2446,6 +2447,7 @@ struct megasas_instance {
+ 	bool support_pci_lane_margining;
+ 	u8  low_latency_index_start;
+ 	int perf_mode;
++	int iopoll_q_count;
+ };
+ 
+ struct MR_LD_VF_MAP {
+diff --git a/drivers/scsi/megaraid/megaraid_sas_base.c b/drivers/scsi/megaraid/megaraid_sas_base.c
+index af192096a82b..c9987411d215 100644
+--- a/drivers/scsi/megaraid/megaraid_sas_base.c
++++ b/drivers/scsi/megaraid/megaraid_sas_base.c
+@@ -114,6 +114,15 @@ unsigned int enable_sdev_max_qd;
+ module_param(enable_sdev_max_qd, int, 0444);
+ MODULE_PARM_DESC(enable_sdev_max_qd, "Enable sdev max qd as can_queue. Default: 0");
+ 
++int poll_queues;
++module_param(poll_queues, int, 0444);
++MODULE_PARM_DESC(poll_queues, "Number of queues to be use for io_uring poll mode.\n\t\t"
++		"This parameter is effective only if host_tagset_enable=1 &\n\t\t"
++		"It is not applicable for MFI_SERIES. &\n\t\t"
++		"Driver will work in latency mode. &\n\t\t"
++		"High iops queues are not allocated &\n\t\t"
++		);
++
+ int host_tagset_enable = 1;
+ module_param(host_tagset_enable, int, 0444);
+ MODULE_PARM_DESC(host_tagset_enable, "Shared host tagset enable/disable Default: enable(1)");
+@@ -207,6 +216,7 @@ static bool support_pci_lane_margining;
+ static spinlock_t poll_aen_lock;
+ 
+ extern struct dentry *megasas_debugfs_root;
++extern int megasas_blk_mq_poll(struct Scsi_Host *shost, unsigned int queue_num);
+ 
+ void
+ megasas_complete_cmd(struct megasas_instance *instance, struct megasas_cmd *cmd,
+@@ -3127,14 +3137,45 @@ megasas_bios_param(struct scsi_device *sdev, struct block_device *bdev,
+ static int megasas_map_queues(struct Scsi_Host *shost)
+ {
+ 	struct megasas_instance *instance;
++	int i, qoff, offset;
+ 
+ 	instance = (struct megasas_instance *)shost->hostdata;
+ 
+ 	if (shost->nr_hw_queues == 1)
+ 		return 0;
+ 
+-	return blk_mq_pci_map_queues(&shost->tag_set.map[HCTX_TYPE_DEFAULT],
+-			instance->pdev, instance->low_latency_index_start);
++	offset = instance->low_latency_index_start;
++
++	for (i = 0, qoff = 0; i < HCTX_MAX_TYPES; i++) {
++		struct blk_mq_queue_map *map = &shost->tag_set.map[i];
++
++		map->nr_queues  = 0;
++
++		if (i == HCTX_TYPE_DEFAULT)
++			map->nr_queues = instance->msix_vectors - offset;
++		else if (i == HCTX_TYPE_POLL)
++			map->nr_queues = instance->iopoll_q_count;
++
++		if (!map->nr_queues) {
++			BUG_ON(i == HCTX_TYPE_DEFAULT);
++			continue;
++		}
++
++		/*
++		 * The poll queue(s) doesn't have an IRQ (and hence IRQ
++		 * affinity), so use the regular blk-mq cpu mapping
++		 */
++		map->queue_offset = qoff;
++		if (i != HCTX_TYPE_POLL)
++			blk_mq_pci_map_queues(map, instance->pdev, offset);
++		else
++			blk_mq_map_queues(map);
++
++		qoff += map->nr_queues;
++		offset += map->nr_queues;
++	}
++
++	return 0;
+ }
+ 
+ static void megasas_aen_polling(struct work_struct *work);
+@@ -3446,6 +3487,7 @@ static struct scsi_host_template megasas_template = {
+ 	.shost_attrs = megaraid_host_attrs,
+ 	.bios_param = megasas_bios_param,
+ 	.map_queues = megasas_map_queues,
++	.mq_poll = megasas_blk_mq_poll,
+ 	.change_queue_depth = scsi_change_queue_depth,
+ 	.max_segment_size = 0xffffffff,
+ };
+@@ -5834,13 +5876,16 @@ __megasas_alloc_irq_vectors(struct megasas_instance *instance)
+ 	irq_flags = PCI_IRQ_MSIX;
+ 
+ 	if (instance->smp_affinity_enable)
+-		irq_flags |= PCI_IRQ_AFFINITY;
++		irq_flags |= PCI_IRQ_AFFINITY | PCI_IRQ_ALL_TYPES;
+ 	else
+ 		descp = NULL;
+ 
++	/* Do not allocate msix vectors for poll_queues.
++	 * msix_vectors is always within a range of FW supported reply queue.
++	 */
+ 	i = pci_alloc_irq_vectors_affinity(instance->pdev,
+ 		instance->low_latency_index_start,
+-		instance->msix_vectors, irq_flags, descp);
++		instance->msix_vectors - instance->iopoll_q_count, irq_flags, descp);
+ 
+ 	return i;
+ }
+@@ -5856,10 +5901,25 @@ megasas_alloc_irq_vectors(struct megasas_instance *instance)
+ 	int i;
+ 	unsigned int num_msix_req;
+ 
++	instance->iopoll_q_count = 0;
++	if ((instance->adapter_type != MFI_SERIES) &&
++		poll_queues) {
++
++		instance->perf_mode = MR_LATENCY_PERF_MODE;
++		instance->low_latency_index_start = 1;
++
++		/* reserve for default and non-mananged pre-vector. */
++		if (instance->msix_vectors > (instance->iopoll_q_count + 2))
++			instance->iopoll_q_count = poll_queues;
++		else
++			instance->iopoll_q_count = 0;
++	}
++
+ 	i = __megasas_alloc_irq_vectors(instance);
+ 
+-	if ((instance->perf_mode == MR_BALANCED_PERF_MODE) &&
+-	    (i != instance->msix_vectors)) {
++	if (((instance->perf_mode == MR_BALANCED_PERF_MODE)
++		|| instance->iopoll_q_count) &&
++	    (i != (instance->msix_vectors - instance->iopoll_q_count))) {
+ 		if (instance->msix_vectors)
+ 			pci_free_irq_vectors(instance->pdev);
+ 		/* Disable Balanced IOPS mode and try realloc vectors */
+@@ -5870,12 +5930,15 @@ megasas_alloc_irq_vectors(struct megasas_instance *instance)
+ 		instance->msix_vectors = min(num_msix_req,
+ 				instance->msix_vectors);
+ 
++		instance->iopoll_q_count = 0;
+ 		i = __megasas_alloc_irq_vectors(instance);
+ 
+ 	}
+ 
+ 	dev_info(&instance->pdev->dev,
+-		"requested/available msix %d/%d\n", instance->msix_vectors, i);
++		"requested/available msix %d/%d poll_queue %d\n",
++			instance->msix_vectors - instance->iopoll_q_count,
++			i, instance->iopoll_q_count);
+ 
+ 	if (i > 0)
+ 		instance->msix_vectors = i;
+@@ -6841,12 +6904,18 @@ static int megasas_io_attach(struct megasas_instance *instance)
+ 		instance->smp_affinity_enable) {
+ 		host->host_tagset = 1;
+ 		host->nr_hw_queues = instance->msix_vectors -
+-			instance->low_latency_index_start;
++			instance->low_latency_index_start + instance->iopoll_q_count;
++		if (instance->iopoll_q_count)
++			host->nr_maps = 3;
++	} else {
++		instance->iopoll_q_count = 0;
+ 	}
+ 
+ 	dev_info(&instance->pdev->dev,
+-		"Max firmware commands: %d shared with nr_hw_queues = %d\n",
+-		instance->max_fw_cmds, host->nr_hw_queues);
++		"Max firmware commands: %d shared with default "
++		"hw_queues = %d poll_queues %d\n", instance->max_fw_cmds,
++		host->nr_hw_queues - instance->iopoll_q_count,
++		instance->iopoll_q_count);
+ 	/*
+ 	 * Notify the mid-layer about the new controller
+ 	 */
+@@ -8861,6 +8930,7 @@ static int __init megasas_init(void)
+ 		msix_vectors = 1;
+ 		rdpq_enable = 0;
+ 		dual_qdepth_disable = 1;
++		poll_queues = 0;
+ 	}
+ 
+ 	/*
+diff --git a/drivers/scsi/megaraid/megaraid_sas_fusion.c b/drivers/scsi/megaraid/megaraid_sas_fusion.c
+index 38fc9467c625..e607cebdedda 100644
+--- a/drivers/scsi/megaraid/megaraid_sas_fusion.c
++++ b/drivers/scsi/megaraid/megaraid_sas_fusion.c
+@@ -685,6 +685,8 @@ megasas_alloc_reply_fusion(struct megasas_instance *instance)
+ 	fusion = instance->ctrl_context;
+ 
+ 	count = instance->msix_vectors > 0 ? instance->msix_vectors : 1;
++	count += instance->iopoll_q_count;
++
+ 	fusion->reply_frames_desc_pool =
+ 			dma_pool_create("mr_reply", &instance->pdev->dev,
+ 				fusion->reply_alloc_sz * count, 16, 0);
+@@ -779,6 +781,7 @@ megasas_alloc_rdpq_fusion(struct megasas_instance *instance)
+ 	}
+ 
+ 	msix_count = instance->msix_vectors > 0 ? instance->msix_vectors : 1;
++	msix_count += instance->iopoll_q_count;
+ 
+ 	fusion->reply_frames_desc_pool = dma_pool_create("mr_rdpq",
+ 							 &instance->pdev->dev,
+@@ -1129,7 +1132,7 @@ megasas_ioc_init_fusion(struct megasas_instance *instance)
+ 			MPI2_IOCINIT_MSGFLAG_RDPQ_ARRAY_MODE : 0;
+ 	IOCInitMessage->SystemRequestFrameBaseAddress = cpu_to_le64(fusion->io_request_frames_phys);
+ 	IOCInitMessage->SenseBufferAddressHigh = cpu_to_le32(upper_32_bits(fusion->sense_phys_addr));
+-	IOCInitMessage->HostMSIxVectors = instance->msix_vectors;
++	IOCInitMessage->HostMSIxVectors = instance->msix_vectors + instance->iopoll_q_count;
+ 	IOCInitMessage->HostPageSize = MR_DEFAULT_NVME_PAGE_SHIFT;
+ 
+ 	time = ktime_get_real();
+@@ -1823,6 +1826,8 @@ megasas_init_adapter_fusion(struct megasas_instance *instance)
+ 		 sizeof(union MPI2_SGE_IO_UNION))/16;
+ 
+ 	count = instance->msix_vectors > 0 ? instance->msix_vectors : 1;
++	count += instance->iopoll_q_count;
++
+ 	for (i = 0 ; i < count; i++)
+ 		fusion->last_reply_idx[i] = 0;
+ 
+@@ -1835,6 +1840,9 @@ megasas_init_adapter_fusion(struct megasas_instance *instance)
+ 				MEGASAS_FUSION_IOCTL_CMDS);
+ 	sema_init(&instance->ioctl_sem, MEGASAS_FUSION_IOCTL_CMDS);
+ 
++	for (i = 0; i < MAX_MSIX_QUEUES_FUSION; i++)
++		atomic_set(&fusion->busy_mq_poll[i], 0);
++
+ 	if (megasas_alloc_ioc_init_frame(instance))
+ 		return 1;
+ 
+@@ -3500,6 +3508,9 @@ complete_cmd_fusion(struct megasas_instance *instance, u32 MSIxIndex,
+ 	if (reply_descript_type == MPI2_RPY_DESCRIPT_FLAGS_UNUSED)
+ 		return IRQ_NONE;
+ 
++	if (irq_context && !atomic_add_unless(&irq_context->in_used, 1, 1))
++		return 0;
++
+ 	num_completed = 0;
+ 
+ 	while (d_val.u.low != cpu_to_le32(UINT_MAX) &&
+@@ -3613,6 +3624,7 @@ complete_cmd_fusion(struct megasas_instance *instance, u32 MSIxIndex,
+ 					irq_context->irq_line_enable = true;
+ 					irq_poll_sched(&irq_context->irqpoll);
+ 				}
++				atomic_dec(&irq_context->in_used);
+ 				return num_completed;
+ 			}
+ 		}
+@@ -3630,9 +3642,36 @@ complete_cmd_fusion(struct megasas_instance *instance, u32 MSIxIndex,
+ 				instance->reply_post_host_index_addr[0]);
+ 		megasas_check_and_restore_queue_depth(instance);
+ 	}
++
++	if (irq_context)
++		atomic_dec(&irq_context->in_used);
++
+ 	return num_completed;
+ }
+ 
++int megasas_blk_mq_poll(struct Scsi_Host *shost, unsigned int queue_num)
++{
++
++	struct megasas_instance *instance;
++	int num_entries = 0;
++	struct fusion_context *fusion;
++
++	instance = (struct megasas_instance *)shost->hostdata;
++
++	fusion = instance->ctrl_context;
++
++	queue_num = queue_num + instance->low_latency_index_start;
++
++	if (!atomic_add_unless(&fusion->busy_mq_poll[queue_num], 1, 1))
++		return 0;
++
++	num_entries = complete_cmd_fusion(instance, queue_num, NULL);
++	atomic_dec(&fusion->busy_mq_poll[queue_num]);
++
++	return num_entries;
++}
++
++
+ /**
+  * megasas_enable_irq_poll() - enable irqpoll
+  * @instance:			Adapter soft state
+@@ -4163,6 +4202,8 @@ void  megasas_reset_reply_desc(struct megasas_instance *instance)
+ 
+ 	fusion = instance->ctrl_context;
+ 	count = instance->msix_vectors > 0 ? instance->msix_vectors : 1;
++	count += instance->iopoll_q_count;
++
+ 	for (i = 0 ; i < count ; i++) {
+ 		fusion->last_reply_idx[i] = 0;
+ 		reply_desc = fusion->reply_frames_desc[i];
+diff --git a/drivers/scsi/megaraid/megaraid_sas_fusion.h b/drivers/scsi/megaraid/megaraid_sas_fusion.h
+index 30de4b01f703..242ff58a3404 100644
+--- a/drivers/scsi/megaraid/megaraid_sas_fusion.h
++++ b/drivers/scsi/megaraid/megaraid_sas_fusion.h
+@@ -1303,6 +1303,9 @@ struct fusion_context {
+ 	u8 *sense;
+ 	dma_addr_t sense_phys_addr;
+ 
++	atomic_t   busy_mq_poll[MAX_MSIX_QUEUES_FUSION];
++
++
+ 	dma_addr_t reply_frames_desc_phys[MAX_MSIX_QUEUES_FUSION];
+ 	union MPI2_REPLY_DESCRIPTORS_UNION *reply_frames_desc[MAX_MSIX_QUEUES_FUSION];
+ 	struct rdpq_alloc_detail rdpq_tracker[RDPQ_MAX_CHUNK_COUNT];
+-- 
+2.18.1
+
+
+--000000000000e7537d05b9e071d8
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+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
+yfWKfxJx8FcWmsjkSlrwDu+oVuDUa2wqeKBU12HQ4JAVd+LOb5edsbbFQxgGHu+MPuc/1hl9kTkC
+AwEAAaOCAdEwggHNMA4GA1UdDwEB/wQEAwIFoDCBngYIKwYBBQUHAQEEgZEwgY4wTQYIKwYBBQUH
+MAKGQWh0dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5jb20vY2FjZXJ0L2dzcGVyc29uYWxzaWduMnNo
+YTJnM29jc3AuY3J0MD0GCCsGAQUFBzABhjFodHRwOi8vb2NzcDIuZ2xvYmFsc2lnbi5jb20vZ3Nw
+ZXJzb25hbHNpZ24yc2hhMmczME0GA1UdIARGMEQwQgYKKwYBBAGgMgEoCjA0MDIGCCsGAQUFBwIB
+FiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzAJBgNVHRMEAjAAMEQGA1Ud
+HwQ9MDswOaA3oDWGM2h0dHA6Ly9jcmwuZ2xvYmFsc2lnbi5jb20vZ3NwZXJzb25hbHNpZ24yc2hh
+MmczLmNybDAlBgNVHREEHjAcgRprYXNoeWFwLmRlc2FpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAK
+BggrBgEFBQcDBDAfBgNVHSMEGDAWgBRpcoJiMWeVRIV3kYDEBDZJnXsLYTAdBgNVHQ4EFgQU4dX1
+Yg4eoWXbqyPW/N1ZD/LPIWcwDQYJKoZIhvcNAQELBQADggEBABBuHYKGUwHIhCjd3LieJwKVuJNr
+YohEnZzCoNaOj33/j5thiA4cZehCh6SgrIlFBIktLD7jW9Dwl88Gfcy+RrVa7XK5Hyqwr1JlCVsW
+pNj4hlSJMNNqxNSqrKaD1cR4/oZVPFVnJJYlB01cLVjGMzta9x27e6XEtseo2s7aoPS2l82koMr7
+8S/v9LyyP4X2aRTWOg9RG8D/13rLxFAApfYvCrf0quIUBWw2BXlq3+e3r7pU7j40d6P04VV3Zxws
+M+LbYxcXFT2gXvoYd2Ms8zsLrhO2M6pMzeNGWk2HWTof9s7EEHDjis/MRlbYSNaohV23IUzNlBw7
+1FmvvW5GKK0xggJvMIICawIBATBtMF0xCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWdu
+IG52LXNhMTMwMQYDVQQDEypHbG9iYWxTaWduIFBlcnNvbmFsU2lnbiAyIENBIC0gU0hBMjU2IC0g
+RzMCDDSdoX7GqonhoE7TszANBglghkgBZQMEAgEFAKCB1DAvBgkqhkiG9w0BCQQxIgQgOsFdv85B
+i8YGTzx5b3okyFFZteEqU6NIxb5DuoUdE3MwGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkq
+hkiG9w0BCQUxDxcNMjEwMTI3MTE1NTE4WjBpBgkqhkiG9w0BCQ8xXDBaMAsGCWCGSAFlAwQBKjAL
+BglghkgBZQMEARYwCwYJYIZIAWUDBAECMAoGCCqGSIb3DQMHMAsGCSqGSIb3DQEBCjALBgkqhkiG
+9w0BAQcwCwYJYIZIAWUDBAIBMA0GCSqGSIb3DQEBAQUABIIBABDv+hE7HFORrVOVSv5WzyqINiA0
+Yi+MFLO4dnoSiOkxEg1pwI/1nWzwTzRFPyAbPvmtBeJHU4lxAB/mYpLRKnDRSn9zWkhzI2tMgMTj
+kXjYA00gMUauOZbpcKTf7W404UVuzuBQ3Zj+RjzQl2TC70RajQ9RiZ5p6zRid7kUcksvp5a3+d2u
+dOnvA7+bw+Liw3zEDtRG2gTas7uIrN7AZJBgWaIMzSL2IbWbah+aCqW0xatXyvDUiRuhPtWfJKUR
+GdD+33Z3YskrL1YcVbnBZZfQPNztMUuBsZhj3ttjJvYAlC+PoobCqF1sLKtD276wxcOr+BrGCsTv
+McP9hpyD3to=
+--000000000000e7537d05b9e071d8--
