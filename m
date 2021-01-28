@@ -2,95 +2,138 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B92F5C433DB
-	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 02:54:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5056CC433E0
+	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 03:07:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6D95964DD3
-	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 02:54:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 06DF264DD7
+	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 03:07:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229682AbhA1Cyw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Jan 2021 21:54:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35282 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229673AbhA1Cys (ORCPT
+        id S229591AbhA1DHd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Jan 2021 22:07:33 -0500
+Received: from out30-133.freemail.mail.aliyun.com ([115.124.30.133]:50661 "EHLO
+        out30-133.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229545AbhA1DHc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Jan 2021 21:54:48 -0500
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CE84C061574
-        for <linux-block@vger.kernel.org>; Wed, 27 Jan 2021 18:54:08 -0800 (PST)
-Received: by mail-pj1-x1029.google.com with SMTP id cq1so3004910pjb.4
-        for <linux-block@vger.kernel.org>; Wed, 27 Jan 2021 18:54:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=z34EMXbcc/pwjLv/TbQcBPIUKWf7ItMnjSIWKA7ZVEQ=;
-        b=AqlvFjN5sjVFa/wHbZWp/nevGY/mTUOTwgJO/5nltAv3fK4c9LtHIW6ohzqCQso8+p
-         JHzQgPgkQg1CuqtNV/LeG7jBtGn3qz5edXfFypmTH9Ycz6Fwu2PectPWp4X9LCkytUoQ
-         4PE7hc9dvwQ0IgR2HMNYVHjeo1WCaYyNpt/JompfkDXoF6PiDl2ClA/zBOI7n6g3ErqB
-         NsYjRQHwctpYzh/8nGpCGdtm3RPzuRFQnxaCodP9VLEgmrSaHgyViEu4abMfvluID/7K
-         EQ0A9kjmfZEfkyVM0lgLXAOWF+OOIwpfUqjjwUprpGF3IaxI9/JtgOEa/9jCfGV53joa
-         tBEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=z34EMXbcc/pwjLv/TbQcBPIUKWf7ItMnjSIWKA7ZVEQ=;
-        b=KO0RkJxjj/cWjpdob4pLoNR5YaPHsL1KUlJa1FmZbv0ayXgn2MUlya/YnGI274uaJW
-         yBO9YRpCb/u4txZF5nc0eTILj7mK46pDQNamyhK0zKmZl/+cODQGL8bZ8mO0rijBAHRs
-         ZrKAww65N5DrgsmUaT9ZV6BfUuf0qtNiJD3pya7438dKnE5ttpw80Er+YAOmtpsaJiQ4
-         61sZk9eKePdkYQA7pOt58MdZCojQ4Rls2EYhQ/gF51wEDn+SIRYBKXXB3ejAblYKzvpT
-         jr31NpKNCn7KJMLYFHP5JtLm/z3YHlbyVTH6nxV1QtFeoNaqJHY+fwOiVHJJOCGUeSkt
-         hPzA==
-X-Gm-Message-State: AOAM533OOkY0Tyika/7owDmTRaEu/G5CH1e/Wd8X3SweWmkPDZmI8v0w
-        lYoLVtC+qxdRfR/7uc3aiznepQ==
-X-Google-Smtp-Source: ABdhPJz1DW39NsufcK8k6jFoR1QJVNiqDn+Z9Q0DGCQTr71mDlLNHy+fqj6qJGVooUQGe/Wd37RVkg==
-X-Received: by 2002:a17:90a:c902:: with SMTP id v2mr8958826pjt.144.1611802446599;
-        Wed, 27 Jan 2021 18:54:06 -0800 (PST)
-Received: from [10.8.1.98] ([89.187.162.118])
-        by smtp.gmail.com with ESMTPSA id 78sm3534348pfx.127.2021.01.27.18.54.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 Jan 2021 18:54:05 -0800 (PST)
-Subject: Re: [PATCH 4/4] block: call blk_additional_{latency,sector} only when
- io_extra_stats is true
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        danil.kipnis@cloud.ionos.com, jinpu.wang@cloud.ionos.com
-References: <20210127145930.8826-1-guoqing.jiang@cloud.ionos.com>
- <20210127145930.8826-5-guoqing.jiang@cloud.ionos.com>
- <20210127170914.GA1732537@infradead.org>
-From:   Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
-Message-ID: <9f597649-3b44-c387-0218-63e369bb13bc@cloud.ionos.com>
-Date:   Thu, 28 Jan 2021 03:53:55 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Wed, 27 Jan 2021 22:07:32 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04400;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0UN61yfy_1611803201;
+Received: from admindeMacBook-Pro-2.local(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0UN61yfy_1611803201)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Thu, 28 Jan 2021 11:06:41 +0800
+Subject: Re: [PATCH v2 0/6] dm: support IO polling for bio-based dm device
+To:     Mike Snitzer <snitzer@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     joseph.qi@linux.alibaba.com, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, io-uring@vger.kernel.org
+References: <20210125121340.70459-1-jefflexu@linux.alibaba.com>
+ <20210127171941.GA11530@redhat.com>
+From:   JeffleXu <jefflexu@linux.alibaba.com>
+Message-ID: <2ed9966f-b390-085a-1a51-5bf65038d533@linux.alibaba.com>
+Date:   Thu, 28 Jan 2021 11:06:40 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.6.1
 MIME-Version: 1.0
-In-Reply-To: <20210127170914.GA1732537@infradead.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20210127171941.GA11530@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Christoph,
 
-On 1/27/21 18:09, Christoph Hellwig wrote:
-> On Wed, Jan 27, 2021 at 03:59:30PM +0100, Guoqing Jiang wrote:
->> +		if (blk_queue_io_extra_stat(req->q))
->> +			blk_additional_sector(req->part, sgrp, bytes >> SECTOR_SHIFT);
+
+On 1/28/21 1:19 AM, Mike Snitzer wrote:
+> On Mon, Jan 25 2021 at  7:13am -0500,
+> Jeffle Xu <jefflexu@linux.alibaba.com> wrote:
 > 
-> This is completely unreadable due to the long line.
+>> Since currently we have no simple but efficient way to implement the
+>> bio-based IO polling in the split-bio tracking style, this patch set
+>> turns to the original implementation mechanism that iterates and
+>> polls all underlying hw queues in polling mode. One optimization is
+>> introduced to mitigate the race of one hw queue among multiple polling
+>> instances.
+>>
+>> I'm still open to the split bio tracking mechanism, if there's
+>> reasonable way to implement it.
+>>
+>>
+>> [Performance Test]
+>> The performance is tested by fio (engine=io_uring) 4k randread on
+>> dm-linear device. The dm-linear device is built upon nvme devices,
+>> and every nvme device has one polling hw queue (nvme.poll_queues=1).
+>>
+>> Test Case		    | IOPS in IRQ mode | IOPS in polling mode | Diff
+>> 			    | (hipri=0)	       | (hipri=1)	      |
+>> --------------------------- | ---------------- | -------------------- | ----
+>> 3 target nvme, num_jobs = 1 | 198k 	       | 276k		      | ~40%
+>> 3 target nvme, num_jobs = 3 | 608k 	       | 705k		      | ~16%
+>> 6 target nvme, num_jobs = 6 | 1197k 	       | 1347k		      | ~13%
+>> 3 target nvme, num_jobs = 6 | 1285k 	       | 1293k		      | ~0%
+>>
+>> As the number of polling instances (num_jobs) increases, the
+>> performance improvement decreases, though it's still positive
+>> compared to the IRQ mode.
+> 
+> I think there is serious room for improvement for DM's implementation;
+> but the block changes for this are all we'd need for DM in the longrun
+> anyway (famous last words).
+
+Agreed.
+
+
+> So on a block interface level I'm OK with
+> block patches 1-3.
+> 
+> I don't see why patch 5 is needed (said the same in reply to it; but I
+> just saw your reason below..).
+> 
+> Anyway, I can pick up DM patches 4 and 6 via linux-dm.git if Jens picks
+> up patches 1-3. Jens, what do you think?
+
+cc Jens.
+
+Also I will send a new version later, maybe some refactor on patch5 and
+some typo modifications.
+
+> 
+>> [Optimization]
+>> To mitigate the race when iterating all the underlying hw queues, one
+>> flag is maintained on a per-hw-queue basis. This flag is used to
+>> indicate whether this polling hw queue currently being polled on or
+>> not. Every polling hw queue is exclusive to one polling instance, i.e.,
+>> the polling instance will skip this polling hw queue if this hw queue
+>> currently is being polled by another polling instance, and start
+>> polling on the next hw queue.
+>>
+>> This per-hw-queue flag map is currently maintained in dm layer. In
+>> the table load phase, a table describing all underlying polling hw
+>> queues is built and stored in 'struct dm_table'. It is safe when
+>> reloading the mapping table.
+>>
+>>
+>> changes since v1:
+>> - patch 1,2,4 is the same as v1 and have already been reviewed
+>> - patch 3 is refactored a bit on the basis of suggestions from
+>> Mike Snitzer.
+>> - patch 5 is newly added and introduces one new queue flag
+>> representing if the queue is capable of IO polling. This mainly
+>> simplifies the logic in queue_poll_store().
+> 
+> Ah OK, don't see why we want to eat a queue flag for that though!
+> 
+>> - patch 6 implements the core mechanism supporting IO polling.
+>> The sanity check checking if the dm device supports IO polling is
+>> also folded into this patch, and the queue flag will be cleared if
+>> it doesn't support, in case of table reloading.
+> 
+> Thanks,
+> Mike
 > 
 
-Hmm, then how about move the check into blk_additional_{sector,latency}
-to make the code more readable.
-
+-- 
 Thanks,
-Guoqing
+Jeffle
