@@ -2,112 +2,103 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECA5FC433E6
-	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 03:27:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E020C433E6
+	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 03:32:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9A8F564DD3
-	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 03:27:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EC23B60235
+	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 03:32:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231147AbhA1D13 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Jan 2021 22:27:29 -0500
-Received: from labrats.qualcomm.com ([199.106.110.90]:10613 "EHLO
-        labrats.qualcomm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229831AbhA1D13 (ORCPT
+        id S231146AbhA1DcC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Jan 2021 22:32:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43210 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229578AbhA1DcA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Jan 2021 22:27:29 -0500
-IronPort-SDR: m5c5356bsjqz7qwNEQmVHgwIAo/5ayBk9kDgf2NHe8IJOgDCykV0jSPelwqwfDGBcKwiw54dfy
- smyf+oFKgOk8lC3gz2D//5AvVtNeuTxSbA3Yx0X2CtVYTVR3HanreNFfzBEIDmp+NdWP2oQ50j
- kiTWanCPMLkESwVCeROow4jEz+qStXBon6PUi5wmOkEB41qRDKokQvpK8gYU4LaREON7g7LJ9k
- l/SO1AezUiDQMgImqSoM9ARnesJZdERYpnIKJsk3MUHOBvL+VRHVj+TFLgXmAn9h8MuRl6EkKA
- f24=
-X-IronPort-AV: E=Sophos;i="5.79,381,1602572400"; 
-   d="scan'208";a="47715510"
-Received: from unknown (HELO ironmsg05-sd.qualcomm.com) ([10.53.140.145])
-  by labrats.qualcomm.com with ESMTP; 27 Jan 2021 19:26:48 -0800
-X-QCInternal: smtphost
-Received: from stor-presley.qualcomm.com ([192.168.140.85])
-  by ironmsg05-sd.qualcomm.com with ESMTP; 27 Jan 2021 19:26:42 -0800
-Received: by stor-presley.qualcomm.com (Postfix, from userid 92687)
-        id A0597219A2; Wed, 27 Jan 2021 19:26:42 -0800 (PST)
-From:   Asutosh Das <asutoshd@codeaurora.org>
-To:     cang@codeaurora.org, martin.petersen@oracle.com,
-        linux-scsi@vger.kernel.org
-Cc:     Asutosh Das <asutoshd@codeaurora.org>,
-        linux-arm-msm@vger.kernel.org, stern@rowland.harvard.edu,
-        "Bao D . Nguyen" <nguyenb@codeaurora.org>,
-        FUJITA Tomonori <fujita.tomonori@lab.ntt.co.jp>,
-        Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org (open list:BLOCK LAYER),
-        linux-kernel@vger.kernel.org (open list)
-Subject: [RFC PATCH v2 1/2] block: bsg: resume platform device before accessing
-Date:   Wed, 27 Jan 2021 19:26:37 -0800
-Message-Id: <b1db5394aa3f6cf44cd9adb9c8d569caa0c9e4f5.1611803264.git.asutoshd@codeaurora.org>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <cover.1611719814.git.asutoshd@codeaurora.org>
-References: <cover.1611719814.git.asutoshd@codeaurora.org>
+        Wed, 27 Jan 2021 22:32:00 -0500
+Received: from mail-qt1-x82c.google.com (mail-qt1-x82c.google.com [IPv6:2607:f8b0:4864:20::82c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA6E0C061573;
+        Wed, 27 Jan 2021 19:31:19 -0800 (PST)
+Received: by mail-qt1-x82c.google.com with SMTP id v3so3199955qtw.4;
+        Wed, 27 Jan 2021 19:31:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=VOw4mJ4y43ELleH9R6vau/EgvTWH40V/X9BffSOccpQ=;
+        b=JRELr5pJ/BHYdN461dpHR9FbEXmyaPZ8n28FutnjSzyXAQ9PhSgQP/kt8xKM8gi7qP
+         3MOY8cwEC0iCFfb7aCC1GbD1AjF16oMDTFJdt0ii8dJgmTugQn3g/D/8mUY7vZep5chy
+         NQsA7BNIhfvs4TuB7gwJCLYJflgU43lFBxvVCbWGXk8ROXBkOfw3cXHw/wpdq0qPy0I4
+         uIq8EUOHgwagyl1w8wl+zkUehJblW+qiGs3+BYGaOARMQvyhn+Jusx+FQ6h0zR9KKuHU
+         CsiZVj5j+gjPPCMRdmaGkmNdk9hv1BFIKPZZBF54QIBlTfvB4naW6nkA6eelg9jN1Hc1
+         jWmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition
+         :content-transfer-encoding:in-reply-to;
+        bh=VOw4mJ4y43ELleH9R6vau/EgvTWH40V/X9BffSOccpQ=;
+        b=ba13vkIDnwGhcHNe1k5unmqb6Wz2gpZf+14svhgt+x4TiIp7oh0wtUopyEaUsmX9j+
+         Q2gtqGNiXWv9GFBhXs8jXBDYj3q0PeS2n1u3sOddqPpzb0PEfdVYfuWzDMYZyguZxKQw
+         iUFF87/5DCnpZa98zHSdJk4ioIiX7L5zZXrKl5BJQwK7V4HbHtbzemJINMiJIaW5ZZEJ
+         GzJWaC1PWl/LI40BHJ1SgEuk8mX3rBu+AWLEe1hriGh2x8qEOyZBifgknLO+d4LDkSSu
+         0rxsw4SNkn3De7lscajEWuXKYnEMLE/U/z/oSTEYEEtT78T3H28CcWIING/CWguAIZ9f
+         uIYQ==
+X-Gm-Message-State: AOAM5312z/U6HTX3Q8zr4NDackzQbvPZTdX5cV/U5/86dZuvO8MiXizr
+        wkhUWeDhiqYPabsxCX3GN1BqUaAcEYw=
+X-Google-Smtp-Source: ABdhPJxfo/qHEKGK9edZWfVE+b8jJEBU5mSEhGBSikskdl6KBcBbZTlhO/Ifpk32Id1cSo8skzx+AA==
+X-Received: by 2002:ac8:6b10:: with SMTP id w16mr12721215qts.354.1611804678911;
+        Wed, 27 Jan 2021 19:31:18 -0800 (PST)
+Received: from localhost (dhcp-6c-ae-f6-dc-d8-61.cpe.echoes.net. [72.28.8.195])
+        by smtp.gmail.com with ESMTPSA id i18sm2581275qkg.66.2021.01.27.19.31.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Jan 2021 19:31:17 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Wed, 27 Jan 2021 22:31:05 -0500
+From:   Tejun Heo <tj@kernel.org>
+To:     Baolin Wang <baolin.wang@linux.alibaba.com>
+Cc:     axboe@kernel.dk, joseph.qi@linux.alibaba.com,
+        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] blk-cgroup: Use cond_resched() when destroy blkgs
+Message-ID: <YBIv+fG6jleTxOTh@slm.duckdns.org>
+References: <8e8a0c4644d5eb01b7f79ec9b67c2b240f4a6434.1611798287.git.baolin.wang@linux.alibaba.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <8e8a0c4644d5eb01b7f79ec9b67c2b240f4a6434.1611798287.git.baolin.wang@linux.alibaba.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-It may happen that the underlying device's runtime-pm is
-not controlled by block-pm. So it's possible that when
-commands are sent to the device, it's suspended and may not
-be resumed by blk-pm. Hence explicitly resume the parent
-which is the platform device.
+On Thu, Jan 28, 2021 at 11:22:00AM +0800, Baolin Wang wrote:
+> On !PREEMPT kernel, we can get below softlockup when doing stress
+> testing with creating and destroying block cgroup repeatly. The
+> reason is it may take a long time to acquire the queue's lock in
+> the loop of blkcg_destroy_blkgs(), or the system can accumulate a
+> huge number of blkgs in pathological cases. We can add a need_resched()
+> check on each loop and release locks and do cond_resched() if true
+> to avoid this issue, since the blkcg_destroy_blkgs() is not called
+> from atomic contexts.
+> 
+> [ 4757.010308] watchdog: BUG: soft lockup - CPU#11 stuck for 94s!
+> [ 4757.010698] Call trace:
+> [ 4757.010700]  blkcg_destroy_blkgs+0x68/0x150
+> [ 4757.010701]  cgwb_release_workfn+0x104/0x158
+> [ 4757.010702]  process_one_work+0x1bc/0x3f0
+> [ 4757.010704]  worker_thread+0x164/0x468
+> [ 4757.010705]  kthread+0x108/0x138
+> 
+> Suggested-by: Tejun Heo <tj@kernel.org>
+> Signed-off-by: Baolin Wang <baolin.wang@linux.alibaba.com>
 
-Signed-off-by: Asutosh Das <asutoshd@codeaurora.org>
-Signed-off-by: Can Guo <cang@codeaurora.org>
-Signed-off-by: Bao D. Nguyen <nguyenb@codeaurora.org>
----
- block/bsg.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+Acked-by: Tejun Heo <tj@kernel.org>
 
-diff --git a/block/bsg.c b/block/bsg.c
-index d7bae94..e9fc896 100644
---- a/block/bsg.c
-+++ b/block/bsg.c
-@@ -12,6 +12,7 @@
- #include <linux/idr.h>
- #include <linux/bsg.h>
- #include <linux/slab.h>
-+#include <linux/pm_runtime.h>
- 
- #include <scsi/scsi.h>
- #include <scsi/scsi_ioctl.h>
-@@ -306,12 +307,15 @@ static struct bsg_device *bsg_get_device(struct inode *inode, struct file *file)
- static int bsg_open(struct inode *inode, struct file *file)
- {
- 	struct bsg_device *bd;
-+	struct bsg_class_device *bcd;
- 
- 	bd = bsg_get_device(inode, file);
- 
- 	if (IS_ERR(bd))
- 		return PTR_ERR(bd);
- 
-+	bcd = &bd->queue->bsg_dev;
-+	pm_runtime_get_sync(bcd->class_dev->parent);
- 	file->private_data = bd;
- 	return 0;
- }
-@@ -319,8 +323,12 @@ static int bsg_open(struct inode *inode, struct file *file)
- static int bsg_release(struct inode *inode, struct file *file)
- {
- 	struct bsg_device *bd = file->private_data;
-+	struct bsg_class_device *bcd;
- 
- 	file->private_data = NULL;
-+
-+	bcd = &bd->queue->bsg_dev;
-+	pm_runtime_put_sync(bcd->class_dev->parent);
- 	return bsg_put_device(bd);
- }
- 
+Thanks.
+
 -- 
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum, a Linux Foundation Collaborative Project.
-
+tejun
