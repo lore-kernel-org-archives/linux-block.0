@@ -2,188 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8802EC433E0
-	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 13:05:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC5D7C433DB
+	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 14:33:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4195964DCE
-	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 13:05:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6EB4F64D9F
+	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 14:33:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231687AbhA1NFh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Jan 2021 08:05:37 -0500
-Received: from mail.xenproject.org ([104.130.215.37]:51948 "EHLO
-        mail.xenproject.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231697AbhA1NFe (ORCPT
+        id S231891AbhA1Ocs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Jan 2021 09:32:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43574 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231686AbhA1Ocp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Jan 2021 08:05:34 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=xen.org;
-        s=20200302mail; h=Content-Transfer-Encoding:Content-Type:MIME-Version:
-        Message-Id:Date:Subject:Cc:To:From;
-        bh=uSh/nbr5myWUoYd0uMZeNZLBjVL7y7b3A+YslUvvtUE=; b=di5UZsTvb+vMktgfuPpIFL3V6m
-        kyJMyEUOv+AuBIACA13egD+cKHvoZtoTaVLq9n/vWH/H/PB6HACTzjgQc3vB0M7aV0QIGRWCBr3Ds
-        bkyqs967pvFA729na7qb5vqnFSax+H5Roh7RWRct489JLpjBy3GYEj1akJtP5zEyPcgI=;
-Received: from xenbits.xenproject.org ([104.239.192.120])
-        by mail.xenproject.org with esmtp (Exim 4.92)
-        (envelope-from <paul@xen.org>)
-        id 1l56yb-0005yN-Fz; Thu, 28 Jan 2021 13:04:45 +0000
-Received: from [54.239.6.186] (helo=localhost.localdomain)
-        by xenbits.xenproject.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <paul@xen.org>)
-        id 1l56yb-0000K8-3m; Thu, 28 Jan 2021 13:04:45 +0000
-From:   Paul Durrant <paul@xen.org>
-To:     xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     Paul Durrant <pdurrant@amazon.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Dongli Zhang <dongli.zhang@oracle.com>
-Subject: [PATCH v2] xen-blkback: fix compatibility bug with single page rings
-Date:   Thu, 28 Jan 2021 13:04:41 +0000
-Message-Id: <20210128130441.11744-1-paul@xen.org>
-X-Mailer: git-send-email 2.17.1
+        Thu, 28 Jan 2021 09:32:45 -0500
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E9CEC0613D6
+        for <linux-block@vger.kernel.org>; Thu, 28 Jan 2021 06:32:05 -0800 (PST)
+Received: by mail-pg1-x529.google.com with SMTP id s23so3134023pgh.11
+        for <linux-block@vger.kernel.org>; Thu, 28 Jan 2021 06:32:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=R9tH9YjKdu4SV5abNwwJi97SLfnNUb/O813edamRM6Q=;
+        b=JDmPw59tJk29B48kwIPKMz8KmvxLlJaaL1BgF4PLqrTIPWOsd2twVS3BZHj3LqHf/U
+         tVkocwsz1ijDsPRE8Lh0rHKqIaPBxD68EvPZuRDRxeyFh0/RydPe00W8XBvxCIezyQDE
+         U7o4h7sq3V+jfnHYdfXa1zced+kebVZ5WwWH0AuZbpl8NrmTChkCa4zu6Pfij7OwB+Pe
+         xnLp++aHRlDNuc2B9fwl5dGTmL4I8ekGdMANiQefjJt9CwRK07Xt++q6WH8YZHf1kuOQ
+         CheoPG0P6G5bqkQugw+92XkrSKpZ+Q5qoio15YLoW05cd0ey4B9mSoo+ptj0jxQZyujf
+         cigQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=R9tH9YjKdu4SV5abNwwJi97SLfnNUb/O813edamRM6Q=;
+        b=JqVaB8RRvfVKOMyDu0zjFq1yiLg7XVfyYw9lYzC1/aUQh0Oh7opux7fz4gghGaGRTv
+         1o2Byhkr3wG6eOTpsMgqUtXPlDd84HrAIW+mnhGnfCdCw0QGU7t5HHoBq4G3SG7E9Ori
+         qKb8ddIackZw5Aq3kjApeYlLPt9y/ahpSwlPS/ylNkA7GNLPUYmk3PwAsAEjWB2FPBW3
+         iHfiWR51JzRvQMkPBan5+O/H8yYKzB8wH1/AJTlHCiiKMGCpulZMgfuitBOlVr8HlFN7
+         ODCPv2pXUxqbJo7o3DJEQCNIWYRXvcptkTKs32u19OZw9TujkOWWjydzKs2D8IN1mqv0
+         P1bA==
+X-Gm-Message-State: AOAM531eKlEhajK4MhEnbxyZdViFZOEVsPnUj1PftEXnW7+63Tn0ejeC
+        S41cAyL5BQyWiW8DQfUcCPX13Q==
+X-Google-Smtp-Source: ABdhPJyn8mjoxYrivmEV09qI42ucQQdWuIe50sPqGBeCUhM8pOyzcP5QzWmZEXPMW98hrtXAZDR3Ig==
+X-Received: by 2002:a63:4507:: with SMTP id s7mr16729858pga.390.1611844324746;
+        Thu, 28 Jan 2021 06:32:04 -0800 (PST)
+Received: from [192.168.4.41] (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
+        by smtp.gmail.com with ESMTPSA id 6sm5827613pfz.34.2021.01.28.06.32.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 28 Jan 2021 06:32:04 -0800 (PST)
+Subject: Re: [PATCH v3] blk-cgroup: Use cond_resched() when destroy blkgs
+To:     Baolin Wang <baolin.wang@linux.alibaba.com>, tj@kernel.org
+Cc:     joseph.qi@linux.alibaba.com, linux-block@vger.kernel.org,
+        cgroups@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <0be1a0a03367f7230497a2e7a5ed47d2a2d5ae1a.1611809091.git.baolin.wang@linux.alibaba.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <9087d02b-ef9b-46c4-6933-82bb3e520597@kernel.dk>
+Date:   Thu, 28 Jan 2021 07:32:03 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <0be1a0a03367f7230497a2e7a5ed47d2a2d5ae1a.1611809091.git.baolin.wang@linux.alibaba.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Paul Durrant <pdurrant@amazon.com>
+On 1/27/21 10:58 PM, Baolin Wang wrote:
+> On !PREEMPT kernel, we can get below softlockup when doing stress
+> testing with creating and destroying block cgroup repeatly. The
+> reason is it may take a long time to acquire the queue's lock in
+> the loop of blkcg_destroy_blkgs(), or the system can accumulate a
+> huge number of blkgs in pathological cases. We can add a need_resched()
+> check on each loop and release locks and do cond_resched() if true
+> to avoid this issue, since the blkcg_destroy_blkgs() is not called
+> from atomic contexts.
+> 
+> [ 4757.010308] watchdog: BUG: soft lockup - CPU#11 stuck for 94s!
+> [ 4757.010698] Call trace:
+> [ 4757.010700]  blkcg_destroy_blkgs+0x68/0x150
+> [ 4757.010701]  cgwb_release_workfn+0x104/0x158
+> [ 4757.010702]  process_one_work+0x1bc/0x3f0
+> [ 4757.010704]  worker_thread+0x164/0x468
+> [ 4757.010705]  kthread+0x108/0x138
 
-Prior to commit 4a8c31a1c6f5 ("xen/blkback: rework connect_ring() to avoid
-inconsistent xenstore 'ring-page-order' set by malicious blkfront"), the
-behaviour of xen-blkback when connecting to a frontend was:
+Thanks, applied.
 
-- read 'ring-page-order'
-- if not present then expect a single page ring specified by 'ring-ref'
-- else expect a ring specified by 'ring-refX' where X is between 0 and
-  1 << ring-page-order
-
-This was correct behaviour, but was broken by the afforementioned commit to
-become:
-
-- read 'ring-page-order'
-- if not present then expect a single page ring (i.e. ring-page-order = 0)
-- expect a ring specified by 'ring-refX' where X is between 0 and
-  1 << ring-page-order
-- if that didn't work then see if there's a single page ring specified by
-  'ring-ref'
-
-This incorrect behaviour works most of the time but fails when a frontend
-that sets 'ring-page-order' is unloaded and replaced by one that does not
-because, instead of reading 'ring-ref', xen-blkback will read the stale
-'ring-ref0' left around by the previous frontend will try to map the wrong
-grant reference.
-
-This patch restores the original behaviour.
-
-Fixes: 4a8c31a1c6f5 ("xen/blkback: rework connect_ring() to avoid inconsistent xenstore 'ring-page-order' set by malicious blkfront")
-Signed-off-by: Paul Durrant <pdurrant@amazon.com>
----
-Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Cc: "Roger Pau Monné" <roger.pau@citrix.com>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: Dongli Zhang <dongli.zhang@oracle.com>
-
-v2:
- - Remove now-spurious error path special-case when nr_grefs == 1
----
- drivers/block/xen-blkback/common.h |  1 +
- drivers/block/xen-blkback/xenbus.c | 38 +++++++++++++-----------------
- 2 files changed, 17 insertions(+), 22 deletions(-)
-
-diff --git a/drivers/block/xen-blkback/common.h b/drivers/block/xen-blkback/common.h
-index b0c71d3a81a0..524a79f10de6 100644
---- a/drivers/block/xen-blkback/common.h
-+++ b/drivers/block/xen-blkback/common.h
-@@ -313,6 +313,7 @@ struct xen_blkif {
- 
- 	struct work_struct	free_work;
- 	unsigned int 		nr_ring_pages;
-+	bool                    multi_ref;
- 	/* All rings for this device. */
- 	struct xen_blkif_ring	*rings;
- 	unsigned int		nr_rings;
-diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
-index 9860d4842f36..6c5e9373e91c 100644
---- a/drivers/block/xen-blkback/xenbus.c
-+++ b/drivers/block/xen-blkback/xenbus.c
-@@ -998,14 +998,17 @@ static int read_per_ring_refs(struct xen_blkif_ring *ring, const char *dir)
- 	for (i = 0; i < nr_grefs; i++) {
- 		char ring_ref_name[RINGREF_NAME_LEN];
- 
--		snprintf(ring_ref_name, RINGREF_NAME_LEN, "ring-ref%u", i);
-+		if (blkif->multi_ref)
-+			snprintf(ring_ref_name, RINGREF_NAME_LEN, "ring-ref%u", i);
-+		else {
-+			WARN_ON(i != 0);
-+			snprintf(ring_ref_name, RINGREF_NAME_LEN, "ring-ref");
-+		}
-+
- 		err = xenbus_scanf(XBT_NIL, dir, ring_ref_name,
- 				   "%u", &ring_ref[i]);
- 
- 		if (err != 1) {
--			if (nr_grefs == 1)
--				break;
--
- 			err = -EINVAL;
- 			xenbus_dev_fatal(dev, err, "reading %s/%s",
- 					 dir, ring_ref_name);
-@@ -1013,18 +1016,6 @@ static int read_per_ring_refs(struct xen_blkif_ring *ring, const char *dir)
- 		}
- 	}
- 
--	if (err != 1) {
--		WARN_ON(nr_grefs != 1);
--
--		err = xenbus_scanf(XBT_NIL, dir, "ring-ref", "%u",
--				   &ring_ref[0]);
--		if (err != 1) {
--			err = -EINVAL;
--			xenbus_dev_fatal(dev, err, "reading %s/ring-ref", dir);
--			return err;
--		}
--	}
--
- 	err = -ENOMEM;
- 	for (i = 0; i < nr_grefs * XEN_BLKIF_REQS_PER_PAGE; i++) {
- 		req = kzalloc(sizeof(*req), GFP_KERNEL);
-@@ -1129,10 +1120,15 @@ static int connect_ring(struct backend_info *be)
- 		 blkif->nr_rings, blkif->blk_protocol, protocol,
- 		 blkif->vbd.feature_gnt_persistent ? "persistent grants" : "");
- 
--	ring_page_order = xenbus_read_unsigned(dev->otherend,
--					       "ring-page-order", 0);
--
--	if (ring_page_order > xen_blkif_max_ring_order) {
-+	err = xenbus_scanf(XBT_NIL, dev->otherend, "ring-page-order", "%u",
-+			   &ring_page_order);
-+	if (err != 1) {
-+		blkif->nr_ring_pages = 1;
-+		blkif->multi_ref = false;
-+	} else if (ring_page_order <= xen_blkif_max_ring_order) {
-+		blkif->nr_ring_pages = 1 << ring_page_order;
-+		blkif->multi_ref = true;
-+	} else {
- 		err = -EINVAL;
- 		xenbus_dev_fatal(dev, err,
- 				 "requested ring page order %d exceed max:%d",
-@@ -1141,8 +1137,6 @@ static int connect_ring(struct backend_info *be)
- 		return err;
- 	}
- 
--	blkif->nr_ring_pages = 1 << ring_page_order;
--
- 	if (blkif->nr_rings == 1)
- 		return read_per_ring_refs(&blkif->rings[0], dev->otherend);
- 	else {
 -- 
-2.17.1
+Jens Axboe
 
