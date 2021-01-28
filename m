@@ -2,129 +2,110 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D07E4C433DB
-	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 12:12:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB4B1C433E6
+	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 12:15:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8D5FC64DDC
-	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 12:12:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5FD2164DCC
+	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 12:15:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229852AbhA1MMV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Jan 2021 07:12:21 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25896 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231183AbhA1MMS (ORCPT
+        id S231374AbhA1MOq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Jan 2021 07:14:46 -0500
+Received: from out30-130.freemail.mail.aliyun.com ([115.124.30.130]:54601 "EHLO
+        out30-130.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231363AbhA1MOZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Jan 2021 07:12:18 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611835852;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=TvEDzpmwICCgnD9J/Pj4N4QzspO+FlLTJrJK9g9h8+Y=;
-        b=NCFeiehHbjwqtrOK/pJaIEEbjVnOssW72auY5CTp8VGDf7os8sJCgdwzXKU4KXig6gsVgV
-        Bhr+pXje0TcVXuu/d2JFwlhMnnI2Ld2xrLpR/ceu2D/KYDL+UYaH+cttpudIbP9U0imYcL
-        M+tfKHHpP39W2VyFhBXlqWonQ3Sh4Zg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-291-aoPuViIGNZ27TDNE4wjxmQ-1; Thu, 28 Jan 2021 07:10:48 -0500
-X-MC-Unique: aoPuViIGNZ27TDNE4wjxmQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 80D4080668B;
-        Thu, 28 Jan 2021 12:10:47 +0000 (UTC)
-Received: from T590 (ovpn-12-191.pek2.redhat.com [10.72.12.191])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5E09B6085D;
-        Thu, 28 Jan 2021 12:10:41 +0000 (UTC)
-Date:   Thu, 28 Jan 2021 20:10:35 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Pavel Begunkov <asml.silence@gmail.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Subject: Re: [RFC 2/2] block: add a fast path for seg split of large bio
-Message-ID: <20210128121035.GA1495297@T590>
-References: <cover.1609875589.git.asml.silence@gmail.com>
- <53b86d4e86c4913658cb0f472dcc3e22ef75396b.1609875589.git.asml.silence@gmail.com>
+        Thu, 28 Jan 2021 07:14:25 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R261e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04357;MF=joseph.qi@linux.alibaba.com;NM=1;PH=DS;RN=56;SR=0;TI=SMTPD_---0UN8ZMkY_1611836008;
+Received: from B-D1K7ML85-0059.local(mailfrom:joseph.qi@linux.alibaba.com fp:SMTPD_---0UN8ZMkY_1611836008)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Thu, 28 Jan 2021 20:13:29 +0800
+Subject: Re: [RFC PATCH 25/34] ocfs/cluster: use bio_new in dm-log-writes
+To:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        dm-devel@redhat.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, drbd-dev@lists.linbit.com,
+        xen-devel@lists.xenproject.org, linux-nvme@lists.infradead.org,
+        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org,
+        jfs-discussion@lists.sourceforge.net, linux-nilfs@vger.kernel.org,
+        ocfs2-devel@oss.oracle.com, linux-pm@vger.kernel.org,
+        linux-mm@kvack.org
+Cc:     axboe@kernel.dk, philipp.reisner@linbit.com,
+        lars.ellenberg@linbit.com, konrad.wilk@oracle.com,
+        roger.pau@citrix.com, minchan@kernel.org, ngupta@vflare.org,
+        sergey.senozhatsky.work@gmail.com, agk@redhat.com,
+        snitzer@redhat.com, hch@lst.de, sagi@grimberg.me,
+        martin.petersen@oracle.com, viro@zeniv.linux.org.uk, tytso@mit.edu,
+        jaegeuk@kernel.org, ebiggers@kernel.org, djwong@kernel.org,
+        shaggy@kernel.org, konishi.ryusuke@gmail.com, mark@fasheh.com,
+        jlbec@evilplan.org, damien.lemoal@wdc.com, naohiro.aota@wdc.com,
+        jth@kernel.org, rjw@rjwysocki.net, len.brown@intel.com,
+        pavel@ucw.cz, akpm@linux-foundation.org, hare@suse.de,
+        gustavoars@kernel.org, tiwai@suse.de, alex.shi@linux.alibaba.com,
+        asml.silence@gmail.com, ming.lei@redhat.com, tj@kernel.org,
+        osandov@fb.com, bvanassche@acm.org, jefflexu@linux.alibaba.com
+References: <20210128071133.60335-1-chaitanya.kulkarni@wdc.com>
+ <20210128071133.60335-26-chaitanya.kulkarni@wdc.com>
+From:   Joseph Qi <joseph.qi@linux.alibaba.com>
+Message-ID: <8ba2c461-6042-757d-a3c1-0490932e749e@linux.alibaba.com>
+Date:   Thu, 28 Jan 2021 20:13:28 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <53b86d4e86c4913658cb0f472dcc3e22ef75396b.1609875589.git.asml.silence@gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20210128071133.60335-26-chaitanya.kulkarni@wdc.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jan 05, 2021 at 07:43:38PM +0000, Pavel Begunkov wrote:
-> blk_bio_segment_split() is very heavy, but the current fast path covers
-> only one-segment under PAGE_SIZE bios. Add another one by estimating an
-> upper bound of sectors a bio can contain.
-> 
-> One restricting factor here is queue_max_segment_size(), which it
-> compare against full iter size to not dig into bvecs. By default it's
-> 64KB, and so for requests under 64KB, but for those falling under the
-> conditions it's much faster.
-> 
-> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+I think you send a wrong subject by mistake.
+
+Thanks,
+Joseph
+
+On 1/28/21 3:11 PM, Chaitanya Kulkarni wrote:
+> Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 > ---
->  block/blk-merge.c | 29 +++++++++++++++++++++++++----
->  1 file changed, 25 insertions(+), 4 deletions(-)
+>  fs/ocfs2/cluster/heartbeat.c | 6 ++----
+>  1 file changed, 2 insertions(+), 4 deletions(-)
 > 
-> diff --git a/block/blk-merge.c b/block/blk-merge.c
-> index 84b9635b5d57..15d75f3ffc30 100644
-> --- a/block/blk-merge.c
-> +++ b/block/blk-merge.c
-> @@ -226,12 +226,12 @@ static bool bvec_split_segs(const struct request_queue *q,
->  static struct bio *__blk_bio_segment_split(struct request_queue *q,
->  					   struct bio *bio,
->  					   struct bio_set *bs,
-> -					   unsigned *segs)
-> +					   unsigned *segs,
-> +					   const unsigned max_sectors)
->  {
->  	struct bio_vec bv, bvprv, *bvprvp = NULL;
->  	struct bvec_iter iter;
->  	unsigned nsegs = 0, sectors = 0;
-> -	const unsigned max_sectors = get_max_io_size(q, bio);
->  	const unsigned max_segs = queue_max_segments(q);
+> diff --git a/fs/ocfs2/cluster/heartbeat.c b/fs/ocfs2/cluster/heartbeat.c
+> index 0179a73a3fa2..b34518036446 100644
+> --- a/fs/ocfs2/cluster/heartbeat.c
+> +++ b/fs/ocfs2/cluster/heartbeat.c
+> @@ -515,12 +515,13 @@ static struct bio *o2hb_setup_one_bio(struct o2hb_region *reg,
+>  	unsigned int cs = *current_slot;
+>  	struct bio *bio;
+>  	struct page *page;
+> +	sector_t sect = (reg->hr_start_block + cs) << (bits - 9);
 >  
->  	bio_for_each_bvec(bv, bio, iter) {
-> @@ -295,6 +295,9 @@ static inline struct bio *blk_bio_segment_split(struct request_queue *q,
->  						struct bio_set *bs,
->  						unsigned *nr_segs)
->  {
-> +	unsigned int max_sectors, q_max_sectors;
-> +	unsigned int bio_segs = bio->bi_vcnt;
-> +
->  	/*
->  	 * All drivers must accept single-segments bios that are <=
->  	 * PAGE_SIZE.  This is a quick and dirty check that relies on
-> @@ -303,14 +306,32 @@ static inline struct bio *blk_bio_segment_split(struct request_queue *q,
->  	 * are cloned, but compared to the performance impact of cloned
->  	 * bios themselves the loop below doesn't matter anyway.
->  	 */
-> -	if (!q->limits.chunk_sectors && bio->bi_vcnt == 1 &&
-> +	if (!q->limits.chunk_sectors && bio_segs == 1 &&
->  	    (bio->bi_io_vec[0].bv_len +
->  	     bio->bi_io_vec[0].bv_offset) <= PAGE_SIZE) {
->  		*nr_segs = 1;
->  		return NULL;
+>  	/* Testing has shown this allocation to take long enough under
+>  	 * GFP_KERNEL that the local node can get fenced. It would be
+>  	 * nicest if we could pre-allocate these bios and avoid this
+>  	 * all together. */
+> -	bio = bio_alloc(GFP_ATOMIC, 16);
+> +	bio = bio_new(reg->hr_bdev, sect, op, op_flags, 16, GFP_ATOMIC);
+>  	if (!bio) {
+>  		mlog(ML_ERROR, "Could not alloc slots BIO!\n");
+>  		bio = ERR_PTR(-ENOMEM);
+> @@ -528,11 +529,8 @@ static struct bio *o2hb_setup_one_bio(struct o2hb_region *reg,
 >  	}
 >  
-> -	return __blk_bio_segment_split(q, bio, bs, nr_segs);
-> +	q_max_sectors = get_max_io_size(q, bio);
-> +	if (!queue_virt_boundary(q) && bio_segs < queue_max_segments(q) &&
-> +	    bio->bi_iter.bi_size <= queue_max_segment_size(q)) {
-
-.bi_vcnt is 0 for fast cloned bio, so the above check may become true
-when real nr_segment is > queue_max_segments(), especially in case that
-max segments limit is small and segment size is big.
-
-
--- 
-Ming
-
+>  	/* Must put everything in 512 byte sectors for the bio... */
+> -	bio->bi_iter.bi_sector = (reg->hr_start_block + cs) << (bits - 9);
+> -	bio_set_dev(bio, reg->hr_bdev);
+>  	bio->bi_private = wc;
+>  	bio->bi_end_io = o2hb_bio_end_io;
+> -	bio_set_op_attrs(bio, op, op_flags);
+>  
+>  	vec_start = (cs << bits) % PAGE_SIZE;
+>  	while(cs < max_slots) {
+> 
