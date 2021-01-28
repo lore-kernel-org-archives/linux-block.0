@@ -2,138 +2,103 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5056CC433E0
-	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 03:07:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECF80C433E0
+	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 03:22:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 06DF264DD7
-	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 03:07:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A881264DD6
+	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 03:22:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229591AbhA1DHd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Jan 2021 22:07:33 -0500
-Received: from out30-133.freemail.mail.aliyun.com ([115.124.30.133]:50661 "EHLO
-        out30-133.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229545AbhA1DHc (ORCPT
+        id S229748AbhA1DWz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Jan 2021 22:22:55 -0500
+Received: from out30-43.freemail.mail.aliyun.com ([115.124.30.43]:45447 "EHLO
+        out30-43.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229563AbhA1DWx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Jan 2021 22:07:32 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04400;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0UN61yfy_1611803201;
-Received: from admindeMacBook-Pro-2.local(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0UN61yfy_1611803201)
+        Wed, 27 Jan 2021 22:22:53 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04426;MF=baolin.wang@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0UN6KA9h_1611804128;
+Received: from localhost(mailfrom:baolin.wang@linux.alibaba.com fp:SMTPD_---0UN6KA9h_1611804128)
           by smtp.aliyun-inc.com(127.0.0.1);
-          Thu, 28 Jan 2021 11:06:41 +0800
-Subject: Re: [PATCH v2 0/6] dm: support IO polling for bio-based dm device
-To:     Mike Snitzer <snitzer@redhat.com>, Jens Axboe <axboe@kernel.dk>
-Cc:     joseph.qi@linux.alibaba.com, dm-devel@redhat.com,
-        linux-block@vger.kernel.org, io-uring@vger.kernel.org
-References: <20210125121340.70459-1-jefflexu@linux.alibaba.com>
- <20210127171941.GA11530@redhat.com>
-From:   JeffleXu <jefflexu@linux.alibaba.com>
-Message-ID: <2ed9966f-b390-085a-1a51-5bf65038d533@linux.alibaba.com>
-Date:   Thu, 28 Jan 2021 11:06:40 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.6.1
+          Thu, 28 Jan 2021 11:22:08 +0800
+From:   Baolin Wang <baolin.wang@linux.alibaba.com>
+To:     axboe@kernel.dk, tj@kernel.org
+Cc:     joseph.qi@linux.alibaba.com, baolin.wang@linux.alibaba.com,
+        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v2] blk-cgroup: Use cond_resched() when destroy blkgs
+Date:   Thu, 28 Jan 2021 11:22:00 +0800
+Message-Id: <8e8a0c4644d5eb01b7f79ec9b67c2b240f4a6434.1611798287.git.baolin.wang@linux.alibaba.com>
+X-Mailer: git-send-email 1.8.3.1
 MIME-Version: 1.0
-In-Reply-To: <20210127171941.GA11530@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On !PREEMPT kernel, we can get below softlockup when doing stress
+testing with creating and destroying block cgroup repeatly. The
+reason is it may take a long time to acquire the queue's lock in
+the loop of blkcg_destroy_blkgs(), or the system can accumulate a
+huge number of blkgs in pathological cases. We can add a need_resched()
+check on each loop and release locks and do cond_resched() if true
+to avoid this issue, since the blkcg_destroy_blkgs() is not called
+from atomic contexts.
 
+[ 4757.010308] watchdog: BUG: soft lockup - CPU#11 stuck for 94s!
+[ 4757.010698] Call trace:
+[ 4757.010700]  blkcg_destroy_blkgs+0x68/0x150
+[ 4757.010701]  cgwb_release_workfn+0x104/0x158
+[ 4757.010702]  process_one_work+0x1bc/0x3f0
+[ 4757.010704]  worker_thread+0x164/0x468
+[ 4757.010705]  kthread+0x108/0x138
 
-On 1/28/21 1:19 AM, Mike Snitzer wrote:
-> On Mon, Jan 25 2021 at  7:13am -0500,
-> Jeffle Xu <jefflexu@linux.alibaba.com> wrote:
-> 
->> Since currently we have no simple but efficient way to implement the
->> bio-based IO polling in the split-bio tracking style, this patch set
->> turns to the original implementation mechanism that iterates and
->> polls all underlying hw queues in polling mode. One optimization is
->> introduced to mitigate the race of one hw queue among multiple polling
->> instances.
->>
->> I'm still open to the split bio tracking mechanism, if there's
->> reasonable way to implement it.
->>
->>
->> [Performance Test]
->> The performance is tested by fio (engine=io_uring) 4k randread on
->> dm-linear device. The dm-linear device is built upon nvme devices,
->> and every nvme device has one polling hw queue (nvme.poll_queues=1).
->>
->> Test Case		    | IOPS in IRQ mode | IOPS in polling mode | Diff
->> 			    | (hipri=0)	       | (hipri=1)	      |
->> --------------------------- | ---------------- | -------------------- | ----
->> 3 target nvme, num_jobs = 1 | 198k 	       | 276k		      | ~40%
->> 3 target nvme, num_jobs = 3 | 608k 	       | 705k		      | ~16%
->> 6 target nvme, num_jobs = 6 | 1197k 	       | 1347k		      | ~13%
->> 3 target nvme, num_jobs = 6 | 1285k 	       | 1293k		      | ~0%
->>
->> As the number of polling instances (num_jobs) increases, the
->> performance improvement decreases, though it's still positive
->> compared to the IRQ mode.
-> 
-> I think there is serious room for improvement for DM's implementation;
-> but the block changes for this are all we'd need for DM in the longrun
-> anyway (famous last words).
+Suggested-by: Tejun Heo <tj@kernel.org>
+Signed-off-by: Baolin Wang <baolin.wang@linux.alibaba.com>
+---
+Changes from v1:
+ - Add might_sleep() in blkcg_destroy_blkgs().
+ - Add an explicitly need_resched() check before releasing lock.
+ - Add some comments.
+---
+ block/blk-cgroup.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-Agreed.
-
-
-> So on a block interface level I'm OK with
-> block patches 1-3.
-> 
-> I don't see why patch 5 is needed (said the same in reply to it; but I
-> just saw your reason below..).
-> 
-> Anyway, I can pick up DM patches 4 and 6 via linux-dm.git if Jens picks
-> up patches 1-3. Jens, what do you think?
-
-cc Jens.
-
-Also I will send a new version later, maybe some refactor on patch5 and
-some typo modifications.
-
-> 
->> [Optimization]
->> To mitigate the race when iterating all the underlying hw queues, one
->> flag is maintained on a per-hw-queue basis. This flag is used to
->> indicate whether this polling hw queue currently being polled on or
->> not. Every polling hw queue is exclusive to one polling instance, i.e.,
->> the polling instance will skip this polling hw queue if this hw queue
->> currently is being polled by another polling instance, and start
->> polling on the next hw queue.
->>
->> This per-hw-queue flag map is currently maintained in dm layer. In
->> the table load phase, a table describing all underlying polling hw
->> queues is built and stored in 'struct dm_table'. It is safe when
->> reloading the mapping table.
->>
->>
->> changes since v1:
->> - patch 1,2,4 is the same as v1 and have already been reviewed
->> - patch 3 is refactored a bit on the basis of suggestions from
->> Mike Snitzer.
->> - patch 5 is newly added and introduces one new queue flag
->> representing if the queue is capable of IO polling. This mainly
->> simplifies the logic in queue_poll_store().
-> 
-> Ah OK, don't see why we want to eat a queue flag for that though!
-> 
->> - patch 6 implements the core mechanism supporting IO polling.
->> The sanity check checking if the dm device supports IO polling is
->> also folded into this patch, and the queue flag will be cleared if
->> it doesn't support, in case of table reloading.
-> 
-> Thanks,
-> Mike
-> 
-
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 3465d6e..94eeed7 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -1016,6 +1016,8 @@ static void blkcg_css_offline(struct cgroup_subsys_state *css)
+  */
+ void blkcg_destroy_blkgs(struct blkcg *blkcg)
+ {
++	might_sleep();
++
+ 	spin_lock_irq(&blkcg->lock);
+ 
+ 	while (!hlist_empty(&blkcg->blkg_list)) {
+@@ -1031,6 +1033,17 @@ void blkcg_destroy_blkgs(struct blkcg *blkcg)
+ 			cpu_relax();
+ 			spin_lock_irq(&blkcg->lock);
+ 		}
++
++		/*
++		 * Given that the system can accumulate a huge number
++		 * of blkgs in pathological cases, check to see if we
++		 * need to rescheduling to avoid softlockup.
++		 */
++		if (need_resched()) {
++			spin_unlock_irq(&blkcg->lock);
++			cond_resched();
++			spin_lock_irq(&blkcg->lock);
++		}
+ 	}
+ 
+ 	spin_unlock_irq(&blkcg->lock);
 -- 
-Thanks,
-Jeffle
+1.8.3.1
+
