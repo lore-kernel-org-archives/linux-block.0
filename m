@@ -5,121 +5,259 @@ X-Spam-Level:
 X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62E94C433E0
-	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 06:37:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C4B0C433DB
+	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 07:13:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2630B64D99
-	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 06:37:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3E8A564DDB
+	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 07:13:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231147AbhA1Gh3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Jan 2021 01:37:29 -0500
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:26758 "EHLO
+        id S231511AbhA1HNC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Jan 2021 02:13:02 -0500
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:56944 "EHLO
         esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229709AbhA1Gh2 (ORCPT
+        with ESMTP id S231573AbhA1HMx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Jan 2021 01:37:28 -0500
+        Thu, 28 Jan 2021 02:12:53 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1611815847; x=1643351847;
-  h=from:to:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=4ZrXdb+AXvrv1OR1AmmN20ATlpTNbKQ0VEYPSo13gTA=;
-  b=rKmKlqAc3M+kUoUEo4yAP/Z1U5jAU7yXBleLha/6bjVz4UaPj7YC0NG2
-   6MdVZCvlCTeIAfz3EH2+ButiU8aGcPr2CyLnr7uwuiYN8evxttcZavpgJ
-   PmRnuVL5KiV04q34RLhLLD+67E4EJtb9qJ5ZIcBLXNNPnFKx3BdG1sjva
-   M4M9d0vfLkLyNzTcIwa6Xe9UFYoGWdTdflIS40hZinsQttFRMrG80Wdmx
-   VWtbi2JIsQJZWMBGExIE6o9601PM91JweoZKGKyJth4XeZxyOedqvt8Yu
-   WYVbTOt2zWG/BAaMZkIuk69WpuYGZbh1MTVp8C3f+mfNojZJZOW22NPTA
-   g==;
-IronPort-SDR: xAH0mPRvVq8GTTFl/8dTEMTy4w/J/HpGG5FJR2fQhD8WRh1w3MeLC0Zj45T57vzi4Ap2tox+Z1
- Aaw8uQ2hXwfiF2wwfuu8/QmwWz2pLa5q9CXPYS0jc621WM7e6P1IkHkX04OuLOQuYIdDG3ocF2
- zPx7HM4ybln/t5fqi+t/2xngCLEFiroi4oU31v9rPsx/ZauOcgchU0/jBZThrqPP//0eYGO+e7
- PSaznNLpoCWaB8uBQVu1VvyZNsxGmW0CUfZF+zIVRdd46fYS/sOiqHguhw5JrL39o9P695bDUJ
- 7F4=
+  t=1611817972; x=1643353972;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=eWet3+GOqUNRw+dCyihtl3LTOeV3gTTJDd7Ea4w+clg=;
+  b=Z/Q/cUp0WjHW0/lDDrnZrBSMEvXgwTaDGuz0J9tHZJUsGZFzV7s1108c
+   S+9Ktd9IqfC4q8MEMKcUwP8pIiborwfE9f55DmOJzEoA2z+9z2UbHCBHW
+   lkGBCiCFTlmGDqwnfnUjHFnUhYv9oBsGNXlag10HfGuWulMoq7Ph842RM
+   zVDc6WugewgZuzmJUqmzZJb1uYjnG19Go7dyNwG9aSVkpSkuHtgoe/ZLn
+   PgI3M2TkDt+BpysBa6La2LsyzVaiMP1Uw1BiqcVYOR91qAL88gzALLVhH
+   lklyx3edGIKGPCXfi4RNYbtS7zpRL4xO8FVcPmX2fOmlQIcWx+cUyvVg6
+   Q==;
+IronPort-SDR: ikNxmrVd4pwwh9DAjzr/LPzb+8iZpOWSAf7j1UmN+9YPo/Q9Hgwj9iv8q63yUqErhhbmn3Ohb1
+ BIe+r6fj+Q0NyBetUFvZ+s1CHpwD1hX0j3aMVTHtWxtetANKcESVkceh9Zscoqq3M0xJsz8gPc
+ BbnHAeVrltkIOPxDicfZXoHByODQzD3BzQ/I33bhmbWGOBipy6qy6LeIR4yvKMX+4UMDIcWOY1
+ DzgKH9EXYhfAldCiM3Schs9DOEW8pLjJG2lETbz3kEikUjv49plpcm9cRt1ekRoYYQmvhjfAsg
+ 0Ww=
 X-IronPort-AV: E=Sophos;i="5.79,381,1602518400"; 
-   d="scan'208";a="162961024"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 28 Jan 2021 14:36:20 +0800
-IronPort-SDR: ajAUHKDI1steEp1jx1FhzGhk81OYQmVutldkjqGGtSfqqjjB7DSXN81H7sWQEpY+aWC+WmDEKn
- oLoDBnr/KY1F+OeCPb/U5YgS9tj38n4hC15N+DzAvnAd7AAqdxzI4FwYYa9nwOFn4tB93F+Evp
- bwAXx/RnwKVkRQXdV77jSx+5Cxv2xuMe5CdX0lK4Hw/+hnE3AFT2Kd8T9/mOwqU5ju8YHWpeM8
- Lkq7+EA+kzkvW3VpUoPDTMfuRKE+/SEt28VG6AV/f8c44jQDgAjAvro/4GzMo2xSzbADd/hSH6
- ePhXpvCcC21ryhRGr9KCallY
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jan 2021 22:20:40 -0800
-IronPort-SDR: IveD7X91LdoADkIeMJ5RnCMj998J92HVsZlb3rWbNqPrDOC/ret/yxCC7AjtdH/EryawCiIKhR
- 5eAQgPrGjQ0HPAqdxs6quWTtNpJJer7KgSa0miJayVs4PsLD6BT8+/lTQQwt+2XYuVybMAPAZM
- 8bhLnnehCBODES/wqlgfMWg0ncGrFVP2rBXRdfIGWyDS4LYtcGxhHpa5X2ejobaEBTlBpkQdJ0
- QFsVfuTsmZac7uKTmKZCcSiS1O8qklzEStbMXNyvbhr95utNF92CyprfLJk2Mb6WELHylyPo9s
- vnA=
+   d="scan'208";a="162963087"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 28 Jan 2021 15:11:47 +0800
+IronPort-SDR: CXLJyjvTh2ozBl0J0n3M4HTJHZaOclzT/km/bBWAGtt9xOPAeCc3hLIeKdi+Dc/On1SogoRxoU
+ EMMcGWgpUm5mk+9NMMMxvPjZxf7VfSUqVBGSfi5qQjym9Vz0j3F5DspBQQpxCLeJ+5+Uf9ywWc
+ wb+xVHjIHBeHee4O0H7pPo8wUu19sXKcfCThMlKQx0s2unmCSBIKccvZzm9Gc9C/j10PEMJSjP
+ SUINTY43+C6IN75F5uccJvtsTWMn9BklriausM1MKzr8/ixMeOJxaforDPXXe56NSl346LNYnX
+ QBGAd3szpraHEF9bnD1PB8uA
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jan 2021 22:54:05 -0800
+IronPort-SDR: UO027L+w2LmrSv+r4jHc7V6MfhclxochZ4q/gKoOnHb/alTZT7F9/4KjZrNCZAKJPJHjEl8zjQ
+ btfDHq8ntGB6arYkxikoGObA79gqCi3nJZAFBbpTjKtHzOWqNheZit1SHeKrnOkOlZqda10wHA
+ lKzVa+peWlZiSXNoZnitf2s3YH424/Lf6Od0Q5TvGZLxtIxoLSsxIGie29rcLN/atLab1ULG9S
+ UmjXPLLRWItiporouoLkwAzUh8fELyClcBeyT3S1PWdOuFAmZ6ShYxhRystXSbBeBsPW0LixEL
+ geY=
 WDCIronportException: Internal
-Received: from washi.fujisawa.hgst.com ([10.149.53.254])
-  by uls-op-cesaip01.wdc.com with ESMTP; 27 Jan 2021 22:36:21 -0800
-From:   Damien Le Moal <damien.lemoal@wdc.com>
-To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH] block: fix bd_size_lock use
-Date:   Thu, 28 Jan 2021 15:36:19 +0900
-Message-Id: <20210128063619.570177-1-damien.lemoal@wdc.com>
-X-Mailer: git-send-email 2.29.2
+Received: from vm.labspan.wdc.com (HELO vm.sc.wdc.com) ([10.6.137.102])
+  by uls-op-cesaip02.wdc.com with ESMTP; 27 Jan 2021 23:11:46 -0800
+From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+To:     linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        dm-devel@redhat.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, drbd-dev@lists.linbit.com,
+        xen-devel@lists.xenproject.org, linux-nvme@lists.infradead.org,
+        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org,
+        jfs-discussion@lists.sourceforge.net, linux-nilfs@vger.kernel.org,
+        ocfs2-devel@oss.oracle.com, linux-pm@vger.kernel.org,
+        linux-mm@kvack.org
+Cc:     axboe@kernel.dk, philipp.reisner@linbit.com,
+        lars.ellenberg@linbit.com, konrad.wilk@oracle.com,
+        roger.pau@citrix.com, minchan@kernel.org, ngupta@vflare.org,
+        sergey.senozhatsky.work@gmail.com, agk@redhat.com,
+        snitzer@redhat.com, hch@lst.de, sagi@grimberg.me,
+        chaitanya.kulkarni@wdc.com, martin.petersen@oracle.com,
+        viro@zeniv.linux.org.uk, tytso@mit.edu, jaegeuk@kernel.org,
+        ebiggers@kernel.org, djwong@kernel.org, shaggy@kernel.org,
+        konishi.ryusuke@gmail.com, mark@fasheh.com, jlbec@evilplan.org,
+        joseph.qi@linux.alibaba.com, damien.lemoal@wdc.com,
+        naohiro.aota@wdc.com, jth@kernel.org, rjw@rjwysocki.net,
+        len.brown@intel.com, pavel@ucw.cz, akpm@linux-foundation.org,
+        hare@suse.de, gustavoars@kernel.org, tiwai@suse.de,
+        alex.shi@linux.alibaba.com, asml.silence@gmail.com,
+        ming.lei@redhat.com, tj@kernel.org, osandov@fb.com,
+        bvanassche@acm.org, jefflexu@linux.alibaba.com
+Subject: [RFC PATCH 01/34] block: move common code into blk_next_bio()
+Date:   Wed, 27 Jan 2021 23:11:00 -0800
+Message-Id: <20210128071133.60335-2-chaitanya.kulkarni@wdc.com>
+X-Mailer: git-send-email 2.22.1
+In-Reply-To: <20210128071133.60335-1-chaitanya.kulkarni@wdc.com>
+References: <20210128071133.60335-1-chaitanya.kulkarni@wdc.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Some block device drivers, e.g. the skd driver, call set_capacity() with
-IRQ disabled. This results in lockdep ito complain about inconsistent
-lock states ("inconsistent {HARDIRQ-ON-W} -> {IN-HARDIRQ-W} usage")
-because set_capacity takes a block device bd_size_lock using the
-functions spin_lock() and spin_unlock(). Ensure a consistent locking
-state by replacing these calls with spin_lock_irqsave() and
-spin_lock_irqrestore(). The same applies to bdev_set_nr_sectors().
-With this fix, all lockdep complaints are resolved.
+blk_next_bio() is the central function which allocates the bios for
+discard, write-same, write-zeroes and zone-mgmt. The initialization of
+various bio members is duplicated in disacrd, write-same, write-zeores.
+In this preparation patch we add bdev, sector, op, and opf arguments to
+the blk_next_bio() to reduce the duplication. 
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+In the next patch we introduce bio_new(), this prepration patch allows
+us to call it inside blk_next_bio().
+
+Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 ---
- block/genhd.c           | 5 +++--
- block/partitions/core.c | 6 ++++--
- 2 files changed, 7 insertions(+), 4 deletions(-)
+ block/blk-lib.c   | 36 +++++++++++++++---------------------
+ block/blk-zoned.c |  4 +---
+ block/blk.h       |  5 +++--
+ 3 files changed, 19 insertions(+), 26 deletions(-)
 
-diff --git a/block/genhd.c b/block/genhd.c
-index d3ef29fbc536..f795bd56012f 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -45,10 +45,11 @@ static void disk_release_events(struct gendisk *disk);
- void set_capacity(struct gendisk *disk, sector_t sectors)
+diff --git a/block/blk-lib.c b/block/blk-lib.c
+index 752f9c722062..fb486a0bdb58 100644
+--- a/block/blk-lib.c
++++ b/block/blk-lib.c
+@@ -10,7 +10,9 @@
+ 
+ #include "blk.h"
+ 
+-struct bio *blk_next_bio(struct bio *bio, unsigned int nr_pages, gfp_t gfp)
++struct bio *blk_next_bio(struct bio *bio, struct block_device *bdev,
++			sector_t sect, unsigned op, unsigned opf,
++			unsigned int nr_pages, gfp_t gfp)
  {
- 	struct block_device *bdev = disk->part0;
-+	unsigned long flags;
+ 	struct bio *new = bio_alloc(gfp, nr_pages);
  
--	spin_lock(&bdev->bd_size_lock);
-+	spin_lock_irqsave(&bdev->bd_size_lock, flags);
- 	i_size_write(bdev->bd_inode, (loff_t)sectors << SECTOR_SHIFT);
--	spin_unlock(&bdev->bd_size_lock);
-+	spin_unlock_irqrestore(&bdev->bd_size_lock, flags);
- }
- EXPORT_SYMBOL(set_capacity);
+@@ -19,6 +21,10 @@ struct bio *blk_next_bio(struct bio *bio, unsigned int nr_pages, gfp_t gfp)
+ 		submit_bio(bio);
+ 	}
  
-diff --git a/block/partitions/core.c b/block/partitions/core.c
-index d6094203116a..301518bdc403 100644
---- a/block/partitions/core.c
-+++ b/block/partitions/core.c
-@@ -88,9 +88,11 @@ static int (*check_part[])(struct parsed_partitions *) = {
- 
- static void bdev_set_nr_sectors(struct block_device *bdev, sector_t sectors)
- {
--	spin_lock(&bdev->bd_size_lock);
-+	unsigned long flags;
++	new->bi_iter.bi_sector = sect;
++	bio_set_dev(new, bdev);
++	bio_set_op_attrs(new, op, opf);
 +
-+	spin_lock_irqsave(&bdev->bd_size_lock, flags);
- 	i_size_write(bdev->bd_inode, (loff_t)sectors << SECTOR_SHIFT);
--	spin_unlock(&bdev->bd_size_lock);
-+	spin_unlock_irqrestore(&bdev->bd_size_lock, flags);
+ 	return new;
  }
  
- static struct parsed_partitions *allocate_partitions(struct gendisk *hd)
+@@ -94,11 +100,7 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+ 
+ 		WARN_ON_ONCE((req_sects << 9) > UINT_MAX);
+ 
+-		bio = blk_next_bio(bio, 0, gfp_mask);
+-		bio->bi_iter.bi_sector = sector;
+-		bio_set_dev(bio, bdev);
+-		bio_set_op_attrs(bio, op, 0);
+-
++		bio = blk_next_bio(bio, bdev, sector, op, 0, 0, gfp_mask);
+ 		bio->bi_iter.bi_size = req_sects << 9;
+ 		sector += req_sects;
+ 		nr_sects -= req_sects;
+@@ -168,6 +170,7 @@ static int __blkdev_issue_write_same(struct block_device *bdev, sector_t sector,
+ {
+ 	struct request_queue *q = bdev_get_queue(bdev);
+ 	unsigned int max_write_same_sectors;
++	unsigned int op = REQ_OP_WRITE_SAME;
+ 	struct bio *bio = *biop;
+ 	sector_t bs_mask;
+ 
+@@ -188,14 +191,11 @@ static int __blkdev_issue_write_same(struct block_device *bdev, sector_t sector,
+ 	max_write_same_sectors = bio_allowed_max_sectors(q);
+ 
+ 	while (nr_sects) {
+-		bio = blk_next_bio(bio, 1, gfp_mask);
+-		bio->bi_iter.bi_sector = sector;
+-		bio_set_dev(bio, bdev);
++		bio = blk_next_bio(bio, bdev, sector, op, 0, 1, gfp_mask);
+ 		bio->bi_vcnt = 1;
+ 		bio->bi_io_vec->bv_page = page;
+ 		bio->bi_io_vec->bv_offset = 0;
+ 		bio->bi_io_vec->bv_len = bdev_logical_block_size(bdev);
+-		bio_set_op_attrs(bio, REQ_OP_WRITE_SAME, 0);
+ 
+ 		if (nr_sects > max_write_same_sectors) {
+ 			bio->bi_iter.bi_size = max_write_same_sectors << 9;
+@@ -249,7 +249,9 @@ static int __blkdev_issue_write_zeroes(struct block_device *bdev,
+ {
+ 	struct bio *bio = *biop;
+ 	unsigned int max_write_zeroes_sectors;
++	unsigned int op = REQ_OP_WRITE_ZEROES;
+ 	struct request_queue *q = bdev_get_queue(bdev);
++	unsigned int opf = flags & BLKDEV_ZERO_NOUNMAP ? REQ_NOUNMAP : 0;
+ 
+ 	if (!q)
+ 		return -ENXIO;
+@@ -264,13 +266,7 @@ static int __blkdev_issue_write_zeroes(struct block_device *bdev,
+ 		return -EOPNOTSUPP;
+ 
+ 	while (nr_sects) {
+-		bio = blk_next_bio(bio, 0, gfp_mask);
+-		bio->bi_iter.bi_sector = sector;
+-		bio_set_dev(bio, bdev);
+-		bio->bi_opf = REQ_OP_WRITE_ZEROES;
+-		if (flags & BLKDEV_ZERO_NOUNMAP)
+-			bio->bi_opf |= REQ_NOUNMAP;
+-
++		bio = blk_next_bio(bio, bdev, sector, op, opf, 0, gfp_mask);
+ 		if (nr_sects > max_write_zeroes_sectors) {
+ 			bio->bi_iter.bi_size = max_write_zeroes_sectors << 9;
+ 			nr_sects -= max_write_zeroes_sectors;
+@@ -303,6 +299,7 @@ static int __blkdev_issue_zero_pages(struct block_device *bdev,
+ 		sector_t sector, sector_t nr_sects, gfp_t gfp_mask,
+ 		struct bio **biop)
+ {
++	unsigned int nr_pages = __blkdev_sectors_to_bio_pages(nr_sects);
+ 	struct request_queue *q = bdev_get_queue(bdev);
+ 	struct bio *bio = *biop;
+ 	int bi_size = 0;
+@@ -315,11 +312,8 @@ static int __blkdev_issue_zero_pages(struct block_device *bdev,
+ 		return -EPERM;
+ 
+ 	while (nr_sects != 0) {
+-		bio = blk_next_bio(bio, __blkdev_sectors_to_bio_pages(nr_sects),
++		bio = blk_next_bio(bio, bdev, sector, REQ_OP_WRITE, 0, nr_pages,
+ 				   gfp_mask);
+-		bio->bi_iter.bi_sector = sector;
+-		bio_set_dev(bio, bdev);
+-		bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
+ 
+ 		while (nr_sects != 0) {
+ 			sz = min((sector_t) PAGE_SIZE, nr_sects << 9);
+diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+index 7a68b6e4300c..68e77628348d 100644
+--- a/block/blk-zoned.c
++++ b/block/blk-zoned.c
+@@ -231,8 +231,7 @@ int blkdev_zone_mgmt(struct block_device *bdev, enum req_opf op,
+ 		return -EINVAL;
+ 
+ 	while (sector < end_sector) {
+-		bio = blk_next_bio(bio, 0, gfp_mask);
+-		bio_set_dev(bio, bdev);
++		bio = blk_next_bio(bio, bdev, 0 , op, REQ_SYNC, 0, gfp_mask);
+ 
+ 		/*
+ 		 * Special case for the zone reset operation that reset all
+@@ -244,7 +243,6 @@ int blkdev_zone_mgmt(struct block_device *bdev, enum req_opf op,
+ 			break;
+ 		}
+ 
+-		bio->bi_opf = op | REQ_SYNC;
+ 		bio->bi_iter.bi_sector = sector;
+ 		sector += zone_sectors;
+ 
+diff --git a/block/blk.h b/block/blk.h
+index 0198335c5838..0a278bae5478 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -329,8 +329,9 @@ extern int blk_iolatency_init(struct request_queue *q);
+ static inline int blk_iolatency_init(struct request_queue *q) { return 0; }
+ #endif
+ 
+-struct bio *blk_next_bio(struct bio *bio, unsigned int nr_pages, gfp_t gfp);
+-
++struct bio *blk_next_bio(struct bio *bio, struct block_device *bdev,
++			sector_t sect, unsigned op, unsigned opf,
++			unsigned int nr_pages, gfp_t gfp);
+ #ifdef CONFIG_BLK_DEV_ZONED
+ void blk_queue_free_zone_bitmaps(struct request_queue *q);
+ #else
 -- 
-2.29.2
+2.22.1
 
