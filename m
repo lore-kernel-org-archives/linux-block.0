@@ -2,155 +2,144 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8E85C43381
-	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 04:15:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2583AC433DB
+	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 04:48:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9C15764DD8
-	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 04:15:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E4D0D64DD9
+	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 04:48:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231337AbhA1EPe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Jan 2021 23:15:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52510 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231345AbhA1EPR (ORCPT
+        id S229551AbhA1Esm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Jan 2021 23:48:42 -0500
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:21969 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229545AbhA1Esl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Jan 2021 23:15:17 -0500
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78F95C06178C
-        for <linux-block@vger.kernel.org>; Wed, 27 Jan 2021 19:51:35 -0800 (PST)
-Received: by mail-pl1-x634.google.com with SMTP id h15so2579775pli.8
-        for <linux-block@vger.kernel.org>; Wed, 27 Jan 2021 19:51:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=5/5Nw0RKDmqtkW6U2OGztqbU4sbce483ba0fNg4jHmE=;
-        b=2H7Jq4BRpHGb4e6Zb8JdRsmhcW7tJMAZ3DsQEqjU3qgSQ87DRhATbE7momvtGaeN8z
-         cPULqYS074E3yQVmL5k6TYZPM6AidXedpyNUvlChoDSqENwiuwSQrBYH7lp9UNoDynhw
-         fWShW6Egc2g6ih5k/bpBQKHXksEo8dbQKY2UcVirufVtgWOQmwBArln9Afr3RiUW4Rbj
-         myJI9z8Qsb+7DQ3RylIpWIgHz3dNfscCkRnObDsLkiOjpQoNYwJ0p2Q4SZWSuTnzQQcI
-         6NrT0iNdOXxxK1M3aeVfjA1IEJ2EA0ClNxWrors1RdQe4CXQCR65hUjIL/x/V5pK+ODr
-         WATw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=5/5Nw0RKDmqtkW6U2OGztqbU4sbce483ba0fNg4jHmE=;
-        b=Iw7pQ0qQIc2+1qKVCM4waxkLfZZJKuwe0WXU6qyoeWC+a7VuFOEj1A5LYChMAcfkOF
-         KUezipNtT6V/iLSoLa7xAh6eksTvA2RNJtrEKIymV8Mk/MUsCI71T8nKWHDf9Q7UGJOh
-         Wc/EhBLHaRchhBWGkg1zTOxNQQTZ50HQV4j0uV31yQwYaCG03Ua996ibS4QSoSyWCKuY
-         ZsRggcRGhxYbNg6ihiC+jIz4FFVA5OUzZZwf9ki8K+4QhO4YosRQAfs8oPlgB06bzMpG
-         Ss/O4uAiQdP8LVaAVhF5bpwjZJDtD4xOrgnX3xxo8XoDerBvUMFBMtkwYhV7nAb+tWJB
-         JpYg==
-X-Gm-Message-State: AOAM532AlCkE9gYAmbKMuGZpF0RrVpqYMKXg6THtQcEIrhUUik1A+bSy
-        F4KlawD6R1QMYP398/yGaKYkJQ==
-X-Google-Smtp-Source: ABdhPJzvONeZ3sIE3s9ZX7koPMUSTsnSHN1rf92uuGfpU7wGgGioX0P8v9i3I4oQFoJl2lABlGl/oA==
-X-Received: by 2002:a17:90b:368b:: with SMTP id mj11mr9050989pjb.76.1611805894673;
-        Wed, 27 Jan 2021 19:51:34 -0800 (PST)
-Received: from [192.168.4.41] (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
-        by smtp.gmail.com with ESMTPSA id b65sm4012946pfg.3.2021.01.27.19.51.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 Jan 2021 19:51:34 -0800 (PST)
-Subject: Re: [PATCH v2] blk-cgroup: Use cond_resched() when destroy blkgs
-To:     Baolin Wang <baolin.wang@linux.alibaba.com>, tj@kernel.org
-Cc:     joseph.qi@linux.alibaba.com, linux-block@vger.kernel.org,
-        cgroups@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <8e8a0c4644d5eb01b7f79ec9b67c2b240f4a6434.1611798287.git.baolin.wang@linux.alibaba.com>
- <3f3c12de-b5fb-a9ad-9324-55f5bf9d7453@kernel.dk>
- <f58ce890-d54c-e4a7-d379-ad4ad4ae20de@linux.alibaba.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <36d23f2a-4696-ff74-4423-6719b9670208@kernel.dk>
-Date:   Wed, 27 Jan 2021 20:51:32 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Wed, 27 Jan 2021 23:48:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1611809321; x=1643345321;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=e5BRWH3ndZ4m7lh7jlC59rxB91+FzmyxAYGz5VrGiO0=;
+  b=EDOwgMdgUknZq9RIkjvlWixiIupW1A/JTk24Bof9N1Pf0CoJVUj1Z6V6
+   G0eCbP96A6OQDh/ALB34W8NstuWry/rWnIKZ4J2g7J642SYHEfwtq3f3h
+   1xR8xd+vjZG/P3dzLqQPlOmyY8Q0wm0DIDJXZFOMew9D7ajKLFfD1uZ+0
+   t9OBFN4JIplnSpYuZnSeOUM0arqlpjtqX6YOI7dPeixtG2b1rKpmdUDye
+   LdY8SF0//AtYHifTfk6HRK1aPsfYJk76ZkZZdLAvgHS7XtzuAp/ViuhB6
+   WYuXtRZC+STQcyclxdn2bSEfTsT6GzQhLkoMUOOvXRfTDkyM/6ChtVI3W
+   w==;
+IronPort-SDR: gYiXVyPYXZlQkLOX/qiXQ1N7z4uwqq0fh1X2CnImq7+viqgpRu8YIgHmA5LmkGTEptBwzmG3uB
+ bOqP5ufCyRI/1YY9NtvVPfF7lgJBfqpVVTLl/9TB3tmrGzUBVq48qoqnCWZOyNV8gFLtbfklyo
+ 9dGdSvHynqs7e06QPOH9q/TLQt+9im0F7HS4Bi4CVUsbDML5MMxG4OPCUnfT+yoCbtLFZLWY65
+ cPwrA+6fWFBTsh4LRxK58IDwQ2jKr8YXUOb0Kz1sUJ8HErpqglmwojeheqaSyEDxRDi2qnq+GO
+ YPE=
+X-IronPort-AV: E=Sophos;i="5.79,381,1602518400"; 
+   d="scan'208";a="158509121"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 28 Jan 2021 12:47:36 +0800
+IronPort-SDR: aZXiiF2/6JYzTkc0MVw0rgBZXKviirYlj7EkkSJ++VxuMof7bAQCFNaBuFuZ0AD1w3W3XwHfWf
+ wxrTPtkuttloIuiwS9n1MiHLNMMBZzSC8Djkf1FUgBxtfg5cmEIkiWtP+y3BVt75vFhVWWA1S+
+ N42c/t3Z0whEbWPNjW9UeZL7LWcv1GvTJK9J1kHK4HMPK1GIZoBNwDZt895MQEv18sRSvFDl0v
+ Xfwrwcoig8kvXD5Xbf1u8GwPblcURocy1qWKMeS7B7xcyqbptjkkIzTc6XyU1NkUZnN+QJRemN
+ m277y33GOw3+ipzZzWBKDtmt
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jan 2021 20:29:54 -0800
+IronPort-SDR: ZdHmQTx/rm7fgx7E8n7fVNa6Sxm51qOl0qUltYbh/FT1cmd4L8nHShfBziClAs7ExJMvQqrAOp
+ d9pGCnce6U4YY5zqq+gO+nCmvEzSEF6ylUsvXNS1kj8leKt4TRkUXIT1jRbwz6iRddh3brI+6Y
+ tu6kEmzuWooccB6nF94ImYRnHoppa01XRD9JSPJ9af3Zr+v4hKIT1vPteGLCUNTE0dln6o3kO2
+ 5ywlDhufk75DPMZR9D+oOLi7yw/T9PLZ50WPkjvKbsJ18lBUt0YvMnkGyvPx+cpYWoS1kHN0OV
+ 1BE=
+WDCIronportException: Internal
+Received: from washi.fujisawa.hgst.com ([10.149.53.254])
+  by uls-op-cesaip01.wdc.com with ESMTP; 27 Jan 2021 20:47:34 -0800
+From:   Damien Le Moal <damien.lemoal@wdc.com>
+To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
+        Keith Busch <keith.busch@wdc.com>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Subject: [PATCH v4 0/8] block: add zone write granularity limit
+Date:   Thu, 28 Jan 2021 13:47:25 +0900
+Message-Id: <20210128044733.503606-1-damien.lemoal@wdc.com>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
-In-Reply-To: <f58ce890-d54c-e4a7-d379-ad4ad4ae20de@linux.alibaba.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/27/21 8:49 PM, Baolin Wang wrote:
-> 
-> 
-> 在 2021/1/28 11:41, Jens Axboe 写道:
->> On 1/27/21 8:22 PM, Baolin Wang wrote:
->>> On !PREEMPT kernel, we can get below softlockup when doing stress
->>> testing with creating and destroying block cgroup repeatly. The
->>> reason is it may take a long time to acquire the queue's lock in
->>> the loop of blkcg_destroy_blkgs(), or the system can accumulate a
->>> huge number of blkgs in pathological cases. We can add a need_resched()
->>> check on each loop and release locks and do cond_resched() if true
->>> to avoid this issue, since the blkcg_destroy_blkgs() is not called
->>> from atomic contexts.
->>>
->>> [ 4757.010308] watchdog: BUG: soft lockup - CPU#11 stuck for 94s!
->>> [ 4757.010698] Call trace:
->>> [ 4757.010700]  blkcg_destroy_blkgs+0x68/0x150
->>> [ 4757.010701]  cgwb_release_workfn+0x104/0x158
->>> [ 4757.010702]  process_one_work+0x1bc/0x3f0
->>> [ 4757.010704]  worker_thread+0x164/0x468
->>> [ 4757.010705]  kthread+0x108/0x138
->>
->> Kind of ugly with the two clauses for dropping the blkcg lock, one
->> being a cpu_relax() and the other a resched. How about something
->> like this:
->>
->>
->> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
->> index 031114d454a6..4221a1539391 100644
->> --- a/block/blk-cgroup.c
->> +++ b/block/blk-cgroup.c
->> @@ -1016,6 +1016,8 @@ static void blkcg_css_offline(struct cgroup_subsys_state *css)
->>    */
->>   void blkcg_destroy_blkgs(struct blkcg *blkcg)
->>   {
->> +	might_sleep();
->> +
->>   	spin_lock_irq(&blkcg->lock);
->>   
->>   	while (!hlist_empty(&blkcg->blkg_list)) {
->> @@ -1023,14 +1025,20 @@ void blkcg_destroy_blkgs(struct blkcg *blkcg)
->>   						struct blkcg_gq, blkcg_node);
->>   		struct request_queue *q = blkg->q;
->>   
->> -		if (spin_trylock(&q->queue_lock)) {
->> -			blkg_destroy(blkg);
->> -			spin_unlock(&q->queue_lock);
->> -		} else {
->> +		if (need_resched() || !spin_trylock(&q->queue_lock)) {
->> +			/*
->> +			 * Given that the system can accumulate a huge number
->> +			 * of blkgs in pathological cases, check to see if we
->> +			 * need to rescheduling to avoid softlockup.
->> +			 */
->>   			spin_unlock_irq(&blkcg->lock);
->> -			cpu_relax();
->> +			cond_resched();
->>   			spin_lock_irq(&blkcg->lock);
->> +			continue;
->>   		}
->> +
->> +		blkg_destroy(blkg);
->> +		spin_unlock(&q->queue_lock);
->>   	}
->>   
->>   	spin_unlock_irq(&blkcg->lock);
->>
-> 
-> Looks better to me. Do I need resend with your suggestion? Thanks.
+The first patch of this series adds missing documentation of the
+zone_append_max_bytes sysfs attribute.
 
-Probably best, gives Tejun another chance to sign off on it :-)
+The following 3 patches are cleanup and preparatory patches for the
+introduction of the zone write granularity limit. The goal of these
+patches is to have all code setting a device queue zoned model to use
+the helper function blk_queue_set_zoned(). The nvme driver, null_blk
+driver and the partition code are modified to do so.
 
+The fourth patch in this series introduces the zone write granularity
+queue limit to indicate the alignment constraint for write operations
+into sequential zones of zoned block devices. This limit is always set
+by default to the device logical block size. The following patch
+documents this new limit.
+
+The last 2 patches introduce the blk_queue_clear_zone_settings()
+function and modify the SCSI sd driver to clear the zone related queue
+limits and resources of a host-aware zoned disk that is changed to a
+regular disk due to the presence of partitions.
+
+Changes from v3:
+* Added pathces 2, 3, 4, 7 and 8
+* Addressed Christoph's comments on patch 5
+
+Changes from v2:
+* Added patch 3 for zonefs
+* Addressed Christoph's comments on patch 1 and added the limit
+  initialization for zoned nullblk
+
+Changes from v1:
+* Fixed typo in patch 2
+
+Damien Le Moal (8):
+  block: document zone_append_max_bytes attribute
+  nvme: cleanup zone information initialization
+  nullb: use blk_queue_set_zoned() to setup zoned devices
+  block: use blk_queue_set_zoned in add_partition()
+  block: introduce zone_write_granularity limit
+  zonefs: use zone write granularity as block size
+  block: introduce blk_queue_clear_zone_settings()
+  sd_zbc: clear zone resources for non-zoned case
+
+Damien Le Moal (8):
+  block: document zone_append_max_bytes attribute
+  nvme: cleanup zone information initialization
+  nullb: use blk_queue_set_zoned() to setup zoned devices
+  block: use blk_queue_set_zoned in add_partition()
+  block: introduce zone_write_granularity limit
+  zonefs: use zone write granularity as block size
+  block: introduce blk_queue_clear_zone_settings()
+  sd_zbc: clear zone resources for non-zoned case
+
+ Documentation/block/queue-sysfs.rst | 13 +++++++++
+ block/blk-settings.c                | 39 +++++++++++++++++++++++++-
+ block/blk-sysfs.c                   |  8 ++++++
+ block/blk-zoned.c                   | 17 ++++++++++++
+ block/blk.h                         |  2 ++
+ block/partitions/core.c             |  2 +-
+ drivers/block/null_blk/zoned.c      |  8 +++---
+ drivers/nvme/host/core.c            | 11 ++++----
+ drivers/nvme/host/zns.c             | 11 ++------
+ drivers/scsi/sd_zbc.c               | 43 ++++++++++++++++++++++++++---
+ fs/zonefs/super.c                   |  9 +++---
+ include/linux/blkdev.h              | 15 ++++++++++
+ 12 files changed, 150 insertions(+), 28 deletions(-)
 
 -- 
-Jens Axboe
+2.29.2
 
