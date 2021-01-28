@@ -7,56 +7,56 @@ X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F4E9C433DB
-	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 07:26:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30DABC433E0
+	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 07:27:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0DCDE64DDA
-	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 07:26:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C597E64DD9
+	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 07:27:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229785AbhA1HZg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Jan 2021 02:25:36 -0500
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:16178 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231759AbhA1HQZ (ORCPT
+        id S231500AbhA1H11 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Jan 2021 02:27:27 -0500
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:57290 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231751AbhA1HQU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Jan 2021 02:16:25 -0500
+        Thu, 28 Jan 2021 02:16:20 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1611818185; x=1643354185;
+  t=1611818179; x=1643354179;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=OE6wZQGKF5NjVuNViqgkr5UqZUb/ZMMrnmgRjBTexFA=;
-  b=NkEKxW/GndDOFjRVGHBMcrqRlOorSIi71kWRtlx4W7bs2l11IcJCI8rp
-   k1Xb+jRWcvcKc+AaMsVMHSWFNgZewxoL294AnQNpYxUMrCBLLT+o/+VYj
-   euQ7pPxBH899BRtwaOEucpb71W7HMqzpRCUlP3VCSuw/8OGIiO6Lzs2j8
-   h6GAk3nfp3MB6AD7+3+YUeBDUOqsJqphG/lKvivHjnRbfHLd8lyzzg0Du
-   sLznVKvE/HB4u8qtm1B+OIMqtjsgo0kok6l6mk3A80zJaQAvfJomcxgF2
-   pVrIJNgHIgSSWHe6wZZCMR4h08SbIO66rxG8uyh0AI2J6pYSza9u3iSI6
-   g==;
-IronPort-SDR: WPH/VwlJRHBYT/KgsHBsSN8VotVLhrIhxcKLXIbHjAbyQRu9nf2B/LNw6x8f5RhzueHJB9lrj6
- +ttgsV2WuNeE7WYVe2+JTHNqDb5M9rsNZvtUwtoIVZ+fYvm9CR7u/LasM0dky3KUNyELZHFSl2
- AnDGkqDQmWQUTCfOG9gtqcBTwHWp2VZvyjg09dzI1C725OX7QXvRFfIMeJOClHcVijL04NC03Q
- XfoOlQF7v0ura6pd3ITu+g9DUIk738fvDFp84LTCyuaDUIthcX/ZuaoAOAQhXSw+ihDZnH6ZVC
- SIc=
+  bh=hTRBelY7PTDZbFRPdQdHgUhYseaoF0bY2tLyF8ypbSg=;
+  b=MR4/Iae6SqQcHNtvKmTIeaPfY8MBQQxd4OvUkOQeqLrkEWKm+OuRUDs1
+   LdnySIasC3TGTrtsrJWwGUm6rYh7lyZQCIk9U9E1m/4gWXrbwob4ByO/j
+   jJwbU5i3RRLKiW9orvE4LIWICwdtRgxFFUnJVa3oc/IDCW5EobTFBBHYI
+   fE1rT8+F04QQYh1AQWS7NXawMD4jPsAtoAHCHuXvlCIvOs0SF9Acv6QB5
+   xPXzcKOWPQjx6nu8+ZHl9gwKXnIa2PigBTTjWiphNFfAUiSNvh2g4Zj9e
+   c7Ue4TrpQDL0SH+uWzJm7pb9e9x3+cqhh3LXt0oTu3eVShlNqG+IzNssh
+   w==;
+IronPort-SDR: 1iPLAwuFAvhaoaOhxIKxQzuMbC+N1b8e9fmYZtJ74cRTpEgM0v3u+i+BCmzbEw792/cHIqfGWx
+ zfn9mw5ytgwqDRBQruUaCzsUKIqlE04eW058FvdQ4/5KzxqGs0kCkt6Ev1gtt0r9MXCCchD98n
+ adkDvUrPSXUa61G8N1IVAt+iy72iGdt8wxBhblsQBfSfkRxF8NaDwezSr3j8NCs/hJY/+LzDXY
+ BJe9Jr0SeK0bcCtU/boxjSZ6Jd6t3lyksFCLAfLNNbyjTdG1I0HQWGHGr56N3Ozk3SxiGjhIeu
+ bLU=
 X-IronPort-AV: E=Sophos;i="5.79,381,1602518400"; 
-   d="scan'208";a="158518403"
+   d="scan'208";a="162963406"
 Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 28 Jan 2021 15:15:24 +0800
-IronPort-SDR: y0iwli7z4iWiTL1J3buBSjtIOLGpktZdscaKqzXq0avtmySwZMkM/DMoNosx3FbugDPsg7p1YN
- 0u1D15sXgCRvUl+AYqdnTrgXXqRikk3eKekD8el61bQ5Fje3cn/HBjjtGDA6s5HKliqLSwASoY
- 3X/pMQt2ygx/XywKJiuzecAkj/60nmg/oqFXCYKeMq89z1NUIUuw4Etvx70Q/k8GQrNK1Gmp5m
- 9D7z9Od2YRyH7URH2Y0uTiXOaN3M2ETI680ala6MyOioHNDACjKUfPyFFWCWKCbqOFYM/D1IjS
- HDbE2eeVRwRt5kJ1l7sONJNE
+  by ob1.hgst.iphmx.com with ESMTP; 28 Jan 2021 15:15:02 +0800
+IronPort-SDR: rBLGRSpa1L4IN+0/zJ9EkmyM3Rl0LtTJDDFnCrXDZ7sHoIw4PLMFJTiWic5MpYRayvrDH9z2Ad
+ jmAEjmuABBbF2cP1ntHNAlEvhHVWXr8LgHtW91GtwXd9BjBy7Tp0xxTqnKZPyts3ByEgGrVyvu
+ btKHMFp7ygMctNhz6alG+uvdeG7hIVJKd5xC8uPG4IbcX0ddcdOf37KPyHaisQaw/Lk1PYrb22
+ z+XMAydnNPIk9MQFen4J7pihuXouqmaTF43oaBxEJWJJsQP63UGX/c6MBSRzswgcY+AgOHjT3p
+ qjjHG3gAZLbhEeg4Ain2T/ha
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jan 2021 22:57:42 -0800
-IronPort-SDR: AdKYJH34AY4CiVzOXrR15FurWGZi/qDC6z/alYko7jfVcX/SfFhaxUFqHY45DLkP4HiXq60mY4
- qy4n2aJHjpVtmV4fSh3ShuNif1qvectRI2b9x90Cd2PVCzWhg42ZluTJX4mv+bwQtY61xYcAp/
- v9bG8JoB/eY2HEcD52Jlws++S0SYBgnZiIiDuQlpbjK+vhOG1JlBdY+QSI5Hl4fkjAcjiES8aY
- m35tunBPrJVbQ/UTOrTX0lDDjwM/GyWBlapp84/HLby91yE2yFuR9fqy9YimXKC2AojA6XdL7Z
- KBU=
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jan 2021 22:57:20 -0800
+IronPort-SDR: RvbuIrKpOmmqZ+oQPbnvg4P9b6yDctCj11PDSHseFUe3NzGe7aNswGzNT7aYrNNymGc7RRLBwA
+ EyS5TC5ya2f1DBzchV289rrRJN4G30R6UcKQHWHLCT1EqyVYm8BdK2p8B74xj927ubYpSXJJYX
+ yqNCzY6cgWt8a45E/OUvNDiMBg+lmhS8FA2ZqgTfl/62S3ZiS0x0JS7q7oikS9hfGQV2kW1Mb+
+ vR4fnDhlmPbHKapqq2eTmDAeG1Ipck513pFwPBeDtMk5IkG3qgl83KvWp5povuzxSWxrnJjDon
+ 5kw=
 WDCIronportException: Internal
 Received: from vm.labspan.wdc.com (HELO vm.sc.wdc.com) ([10.6.137.102])
-  by uls-op-cesaip02.wdc.com with ESMTP; 27 Jan 2021 23:15:24 -0800
+  by uls-op-cesaip02.wdc.com with ESMTP; 27 Jan 2021 23:15:02 -0800
 From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 To:     linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         dm-devel@redhat.com, linux-block@vger.kernel.org,
@@ -83,9 +83,9 @@ Cc:     axboe@kernel.dk, philipp.reisner@linbit.com,
         alex.shi@linux.alibaba.com, asml.silence@gmail.com,
         ming.lei@redhat.com, tj@kernel.org, osandov@fb.com,
         bvanassche@acm.org, jefflexu@linux.alibaba.com
-Subject: [RFC PATCH 27/34] xfs: use bio_new in xfs_buf_ioapply_map
-Date:   Wed, 27 Jan 2021 23:11:26 -0800
-Message-Id: <20210128071133.60335-28-chaitanya.kulkarni@wdc.com>
+Subject: [RFC PATCH 24/34] fs/nilfs: use bio_new nilfs_alloc_seg_bio
+Date:   Wed, 27 Jan 2021 23:11:23 -0800
+Message-Id: <20210128071133.60335-25-chaitanya.kulkarni@wdc.com>
 X-Mailer: git-send-email 2.22.1
 In-Reply-To: <20210128071133.60335-1-chaitanya.kulkarni@wdc.com>
 References: <20210128071133.60335-1-chaitanya.kulkarni@wdc.com>
@@ -97,28 +97,31 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 ---
- fs/xfs/xfs_buf.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ fs/nilfs2/segbuf.c | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
 
-diff --git a/fs/xfs/xfs_buf.c b/fs/xfs/xfs_buf.c
-index f8400bbd6473..3ff6235e4f94 100644
---- a/fs/xfs/xfs_buf.c
-+++ b/fs/xfs/xfs_buf.c
-@@ -1507,12 +1507,10 @@ xfs_buf_ioapply_map(
- 	atomic_inc(&bp->b_io_remaining);
- 	nr_pages = min(total_nr_pages, BIO_MAX_PAGES);
+diff --git a/fs/nilfs2/segbuf.c b/fs/nilfs2/segbuf.c
+index 1e75417bfe6e..df352cab7a93 100644
+--- a/fs/nilfs2/segbuf.c
++++ b/fs/nilfs2/segbuf.c
+@@ -383,15 +383,9 @@ static int nilfs_segbuf_submit_bio(struct nilfs_segment_buffer *segbuf,
+ static struct bio *nilfs_alloc_seg_bio(struct the_nilfs *nilfs, sector_t start,
+ 				       int nr_vecs)
+ {
+-	struct bio *bio;
++	sector_t sect = start << (nilfs->ns_blocksize_bits - 9);
  
--	bio = bio_alloc(GFP_NOIO, nr_pages);
--	bio_set_dev(bio, bp->b_target->bt_bdev);
--	bio->bi_iter.bi_sector = sector;
-+	bio = bio_new(bp->b_target->bt_bdev, sector, op, 0, nr_pages,
-+		      GFP_NOIO);
- 	bio->bi_end_io = xfs_buf_bio_end_io;
- 	bio->bi_private = bp;
--	bio->bi_opf = op;
+-	bio = bio_alloc(GFP_NOIO, nr_vecs);
+-	if (likely(bio)) {
+-		bio_set_dev(bio, nilfs->ns_bdev);
+-		bio->bi_iter.bi_sector =
+-			start << (nilfs->ns_blocksize_bits - 9);
+-	}
+-	return bio;
++	return bio_new(nilfs->ns_bdev, sect, 0, 0, nr_vecs, GFP_NOIO);
+ }
  
- 	for (; size && nr_pages; nr_pages--, page_index++) {
- 		int	rbytes, nbytes = PAGE_SIZE - offset;
+ static void nilfs_segbuf_prepare_write(struct nilfs_segment_buffer *segbuf,
 -- 
 2.22.1
 
