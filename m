@@ -2,103 +2,99 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B11A1C433E0
-	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 17:25:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53A4DC433E0
+	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 17:26:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6FA0A64DED
-	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 17:25:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0200664DED
+	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 17:26:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232862AbhA1RZA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Jan 2021 12:25:00 -0500
-Received: from mail.kernel.org ([198.145.29.99]:53102 "EHLO mail.kernel.org"
+        id S233105AbhA1R0c (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Jan 2021 12:26:32 -0500
+Received: from mx2.veeam.com ([64.129.123.6]:53910 "EHLO mx2.veeam.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233041AbhA1RWd (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Jan 2021 12:22:33 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 14BA564E14;
-        Thu, 28 Jan 2021 17:21:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1611854512;
-        bh=3wcbDXIsfKokQbmfUCYjGrgS3GF5z08Qdptdga5fUN4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=QWOP7EPqmN6b3MiW9yEAgNNtNjSRtrXyFEpjaAGYBZII1sVNYI1YtSMwAvt9fuQBa
-         67CiLo3o5RvfcoATyHS1j02NITEEA3iqExwlLXezGs5RMp4QWJbqX9Dn+nc6m+I4rS
-         ryQ81C45k5DR4mIk6Zm2DTepJlJx7ughkR/Vt0AUwH3+rYDSQLjDOWM7DJGp0ETUnl
-         xurghfp/gRCwfqedNMDMPHZbg7F0alqw1H/gKUa0SjDmFnvopggMP4TjgUC2t6LP2S
-         1ujXulQBT2zqjOQLupxjXSsgT0HMqyI+WyoITl6y/0OvHf8iHp4HzyLmR4yVI/FSxp
-         yznAeENjD3n6w==
-Date:   Thu, 28 Jan 2021 09:21:51 -0800
-From:   "Darrick J. Wong" <djwong@kernel.org>
-To:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Cc:     linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        dm-devel@redhat.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, drbd-dev@lists.linbit.com,
-        xen-devel@lists.xenproject.org, linux-nvme@lists.infradead.org,
-        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org,
-        jfs-discussion@lists.sourceforge.net, linux-nilfs@vger.kernel.org,
-        ocfs2-devel@oss.oracle.com, linux-pm@vger.kernel.org,
-        linux-mm@kvack.org, axboe@kernel.dk, philipp.reisner@linbit.com,
-        lars.ellenberg@linbit.com, konrad.wilk@oracle.com,
-        roger.pau@citrix.com, minchan@kernel.org, ngupta@vflare.org,
-        sergey.senozhatsky.work@gmail.com, agk@redhat.com,
-        snitzer@redhat.com, hch@lst.de, sagi@grimberg.me,
-        martin.petersen@oracle.com, viro@zeniv.linux.org.uk, tytso@mit.edu,
-        jaegeuk@kernel.org, ebiggers@kernel.org, shaggy@kernel.org,
-        konishi.ryusuke@gmail.com, mark@fasheh.com, jlbec@evilplan.org,
-        joseph.qi@linux.alibaba.com, damien.lemoal@wdc.com,
-        naohiro.aota@wdc.com, jth@kernel.org, rjw@rjwysocki.net,
-        len.brown@intel.com, pavel@ucw.cz, akpm@linux-foundation.org,
-        hare@suse.de, gustavoars@kernel.org, tiwai@suse.de,
-        alex.shi@linux.alibaba.com, asml.silence@gmail.com,
-        ming.lei@redhat.com, tj@kernel.org, osandov@fb.com,
-        bvanassche@acm.org, jefflexu@linux.alibaba.com
-Subject: Re: [RFC PATCH 27/34] xfs: use bio_new in xfs_buf_ioapply_map
-Message-ID: <20210128172151.GN7698@magnolia>
-References: <20210128071133.60335-1-chaitanya.kulkarni@wdc.com>
- <20210128071133.60335-28-chaitanya.kulkarni@wdc.com>
+        id S233120AbhA1RY2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 28 Jan 2021 12:24:28 -0500
+Received: from mail.veeam.com (prgmbx01.amust.local [172.24.0.171])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mx2.veeam.com (Postfix) with ESMTPS id CBACD41344;
+        Thu, 28 Jan 2021 12:12:48 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com; s=mx2;
+        t=1611853969; bh=BA0Er6zcH5w4NN84e+3hlB2zoRXintRQzFb3m91ZDx0=;
+        h=From:To:CC:Subject:Date:From;
+        b=Fdxg+0yOHNqvRtjoOYd+OPu46ljAAh3xQ2F2OlJiUpYjT8zY8WaXX6dhYaVjeky9a
+         UIBo0/rVc8QkRL9IrfefFBRXdXLxCVx9CQ3NoRMGT6vF2+wfDGdVKgnALbsM6BGqff
+         N4n20s45nDxj5AlFS1QSeIyljnayhEnbxwFnt0I8=
+Received: from prgdevlinuxpatch01.amust.local (172.24.14.5) by
+ prgmbx01.amust.local (172.24.0.171) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.721.2;
+ Thu, 28 Jan 2021 18:12:46 +0100
+From:   Sergei Shtepa <sergei.shtepa@veeam.com>
+To:     <hare@suse.de>, <ming.lei@redhat.com>, <agk@redhat.com>,
+        <snitzer@redhat.com>, <dm-devel@redhat.com>,
+        <linux-block@vger.kernel.org>
+CC:     <sergei.shtepa@veeam.com>, <pavel.tide@veeam.com>
+Subject: [PATCH 0/2] block: blk_interposer v3
+Date:   Thu, 28 Jan 2021 20:12:33 +0300
+Message-ID: <1611853955-32167-1-git-send-email-sergei.shtepa@veeam.com>
+X-Mailer: git-send-email 1.8.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210128071133.60335-28-chaitanya.kulkarni@wdc.com>
+Content-Type: text/plain
+X-Originating-IP: [172.24.14.5]
+X-ClientProxiedBy: prgmbx01.amust.local (172.24.0.171) To prgmbx01.amust.local
+ (172.24.0.171)
+X-EsetResult: clean, is OK
+X-EsetId: 37303A29C604D265677D6B
+X-Veeam-MMEX: True
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jan 27, 2021 at 11:11:26PM -0800, Chaitanya Kulkarni wrote:
-> Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Hi all,
 
-Reviewed-by: Darrick J. Wong <djwong@kernel.org>
+I`m ready to suggest the blk_interposer again.
+blk_interposer allows to intercept bio requests, remap bio to
+another devices or add new bios.
 
---D
+This version has support from device mapper.
 
-> ---
->  fs/xfs/xfs_buf.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
-> 
-> diff --git a/fs/xfs/xfs_buf.c b/fs/xfs/xfs_buf.c
-> index f8400bbd6473..3ff6235e4f94 100644
-> --- a/fs/xfs/xfs_buf.c
-> +++ b/fs/xfs/xfs_buf.c
-> @@ -1507,12 +1507,10 @@ xfs_buf_ioapply_map(
->  	atomic_inc(&bp->b_io_remaining);
->  	nr_pages = min(total_nr_pages, BIO_MAX_PAGES);
->  
-> -	bio = bio_alloc(GFP_NOIO, nr_pages);
-> -	bio_set_dev(bio, bp->b_target->bt_bdev);
-> -	bio->bi_iter.bi_sector = sector;
-> +	bio = bio_new(bp->b_target->bt_bdev, sector, op, 0, nr_pages,
-> +		      GFP_NOIO);
->  	bio->bi_end_io = xfs_buf_bio_end_io;
->  	bio->bi_private = bp;
-> -	bio->bi_opf = op;
->  
->  	for (; size && nr_pages; nr_pages--, page_index++) {
->  		int	rbytes, nbytes = PAGE_SIZE - offset;
-> -- 
-> 2.22.1
-> 
+For the dm-linear device creation command, the `noexcl` parameter
+has been added, which allows to open block devices without
+FMODE_EXCL mode. It allows to create dm-linear device on a block
+device with an already mounted file system.
+The new ioctl DM_DEV_REMAP allows to enable and disable bio
+interception.
+
+Thus, it is possible to add the dm-device to the block layer stack
+without reconfiguring and rebooting.
+
+
+Sergei Shtepa (2):
+  block: blk_interposer
+  [dm] blk_interposer for dm-linear
+
+ block/bio.c                   |   2 +
+ block/blk-core.c              |  29 +++
+ block/blk-mq.c                |  13 ++
+ block/genhd.c                 |  82 ++++++++
+ drivers/md/dm-core.h          |  46 +++-
+ drivers/md/dm-ioctl.c         |  39 ++++
+ drivers/md/dm-linear.c        |  17 +-
+ drivers/md/dm-table.c         |  12 +-
+ drivers/md/dm.c               | 383 ++++++++++++++++++++++++++++++++--
+ drivers/md/dm.h               |   2 +-
+ include/linux/blk-mq.h        |   1 +
+ include/linux/blk_types.h     |   6 +-
+ include/linux/device-mapper.h |   7 +
+ include/linux/genhd.h         |  19 ++
+ include/uapi/linux/dm-ioctl.h |  15 +-
+ 15 files changed, 643 insertions(+), 30 deletions(-)
+
+-- 
+2.20.1
+
