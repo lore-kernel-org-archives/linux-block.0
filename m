@@ -7,70 +7,71 @@ X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2409C433E9
-	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 02:45:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B92F5C433DB
+	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 02:54:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9EC9D64DDB
-	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 02:45:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6D95964DD3
+	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 02:54:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229830AbhA1CpV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Jan 2021 21:45:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33236 "EHLO
+        id S229682AbhA1Cyw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Jan 2021 21:54:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35282 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229494AbhA1CpU (ORCPT
+        with ESMTP id S229673AbhA1Cys (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Jan 2021 21:45:20 -0500
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80F6BC061573
-        for <linux-block@vger.kernel.org>; Wed, 27 Jan 2021 18:44:40 -0800 (PST)
-Received: by mail-pl1-x636.google.com with SMTP id s15so2498495plr.9
-        for <linux-block@vger.kernel.org>; Wed, 27 Jan 2021 18:44:40 -0800 (PST)
+        Wed, 27 Jan 2021 21:54:48 -0500
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CE84C061574
+        for <linux-block@vger.kernel.org>; Wed, 27 Jan 2021 18:54:08 -0800 (PST)
+Received: by mail-pj1-x1029.google.com with SMTP id cq1so3004910pjb.4
+        for <linux-block@vger.kernel.org>; Wed, 27 Jan 2021 18:54:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=cloud.ionos.com; s=google;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=lmvDCXclOa6IE+XJkq72UxfMlP+2yPszQwAo2L8ANJg=;
-        b=HCw0W+KHoz6gTeokd2bGZ+b51Unlk2RRYMWEYv6fZ0jUiPlS5/E0eT1bqBdIyhEa3i
-         BrVb/FOGRR4ucK6BZ7FfdWt5KbnEjKtXOgaPjDzkbP8HDxcWsmQ5Xkq2sXbgMbSpThy2
-         PmB9g39XuNHPCbO0qJPbUZEXLrD1ROeUwzF89eV/s/ptYhPdnD8kUvp9xfwPBO4Rf0es
-         aqWb8Km/6IA6maeoulka8V6RUjz5cvDXgBZeTswAKBabqTmk6Ie58P+QbBsxPZKVz30X
-         tTeT5JOM/TDqBWi5QsNEpmmQ/Fsm3ZbSrKzaDbzvtciR7Pn7O5Rl09T+J+A3n8VqYxXf
-         jopw==
+        bh=z34EMXbcc/pwjLv/TbQcBPIUKWf7ItMnjSIWKA7ZVEQ=;
+        b=AqlvFjN5sjVFa/wHbZWp/nevGY/mTUOTwgJO/5nltAv3fK4c9LtHIW6ohzqCQso8+p
+         JHzQgPgkQg1CuqtNV/LeG7jBtGn3qz5edXfFypmTH9Ycz6Fwu2PectPWp4X9LCkytUoQ
+         4PE7hc9dvwQ0IgR2HMNYVHjeo1WCaYyNpt/JompfkDXoF6PiDl2ClA/zBOI7n6g3ErqB
+         NsYjRQHwctpYzh/8nGpCGdtm3RPzuRFQnxaCodP9VLEgmrSaHgyViEu4abMfvluID/7K
+         EQ0A9kjmfZEfkyVM0lgLXAOWF+OOIwpfUqjjwUprpGF3IaxI9/JtgOEa/9jCfGV53joa
+         tBEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=lmvDCXclOa6IE+XJkq72UxfMlP+2yPszQwAo2L8ANJg=;
-        b=cuoUx0X1z5PkjQHZm6fsT6Cx7MPX6u9cb1uauxCntHpycc4/AmznZHbr3wh4oW+356
-         QNUEV/mQwkMARfHvT5WEJWECUUokwpCAzzdrxFZww3VolsW5HY9/gUUlunJS/kQYIUnC
-         oN/imHv2dIppHcfoz+wzDRqUTITrJ/Li7uoZvmulxi8jrtyn0pNAauPURWv5vjoc9nnR
-         41gE2nHwwpxOlvJRN1V68pMq3pL1WEN7n/W2gAGKupNPfzqjZCIQs2SgdIJfRRTYqTtv
-         2S0ACbChH1Cg835bZ+8LhwU+XOcLUJgwPQ5ycEdYzhvBl38/KIqj8okpI6XFUSCREyp6
-         Puqg==
-X-Gm-Message-State: AOAM530Cw7YqfnA420TjMNoC3Qrl63X2wmMwNyKshocVjMGy6OLH1OqJ
-        V5QWxJe7E6q77in8PMWVbDbI3A==
-X-Google-Smtp-Source: ABdhPJyUoYLr2Kox/cS11rFj4e957MI7du6RRijTvNazvJrUOAJL5XHyhvIOYeVsRyk6PWDDoaMbtg==
-X-Received: by 2002:a17:902:e887:b029:de:7863:19b0 with SMTP id w7-20020a170902e887b02900de786319b0mr14366222plg.42.1611801878203;
-        Wed, 27 Jan 2021 18:44:38 -0800 (PST)
+        bh=z34EMXbcc/pwjLv/TbQcBPIUKWf7ItMnjSIWKA7ZVEQ=;
+        b=KO0RkJxjj/cWjpdob4pLoNR5YaPHsL1KUlJa1FmZbv0ayXgn2MUlya/YnGI274uaJW
+         yBO9YRpCb/u4txZF5nc0eTILj7mK46pDQNamyhK0zKmZl/+cODQGL8bZ8mO0rijBAHRs
+         ZrKAww65N5DrgsmUaT9ZV6BfUuf0qtNiJD3pya7438dKnE5ttpw80Er+YAOmtpsaJiQ4
+         61sZk9eKePdkYQA7pOt58MdZCojQ4Rls2EYhQ/gF51wEDn+SIRYBKXXB3ejAblYKzvpT
+         jr31NpKNCn7KJMLYFHP5JtLm/z3YHlbyVTH6nxV1QtFeoNaqJHY+fwOiVHJJOCGUeSkt
+         hPzA==
+X-Gm-Message-State: AOAM533OOkY0Tyika/7owDmTRaEu/G5CH1e/Wd8X3SweWmkPDZmI8v0w
+        lYoLVtC+qxdRfR/7uc3aiznepQ==
+X-Google-Smtp-Source: ABdhPJz1DW39NsufcK8k6jFoR1QJVNiqDn+Z9Q0DGCQTr71mDlLNHy+fqj6qJGVooUQGe/Wd37RVkg==
+X-Received: by 2002:a17:90a:c902:: with SMTP id v2mr8958826pjt.144.1611802446599;
+        Wed, 27 Jan 2021 18:54:06 -0800 (PST)
 Received: from [10.8.1.98] ([89.187.162.118])
-        by smtp.gmail.com with ESMTPSA id 21sm3505940pfh.56.2021.01.27.18.44.33
+        by smtp.gmail.com with ESMTPSA id 78sm3534348pfx.127.2021.01.27.18.54.03
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 Jan 2021 18:44:37 -0800 (PST)
-Subject: Re: [PATCH 1/4] block: add a statistic table for io latency
+        Wed, 27 Jan 2021 18:54:05 -0800 (PST)
+Subject: Re: [PATCH 4/4] block: call blk_additional_{latency,sector} only when
+ io_extra_stats is true
 To:     Christoph Hellwig <hch@infradead.org>
 Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
         danil.kipnis@cloud.ionos.com, jinpu.wang@cloud.ionos.com
 References: <20210127145930.8826-1-guoqing.jiang@cloud.ionos.com>
- <20210127145930.8826-2-guoqing.jiang@cloud.ionos.com>
- <20210127171050.GA1732656@infradead.org>
+ <20210127145930.8826-5-guoqing.jiang@cloud.ionos.com>
+ <20210127170914.GA1732537@infradead.org>
 From:   Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
-Message-ID: <9c2c4681-41cf-94d1-12fa-3fe09bec987c@cloud.ionos.com>
-Date:   Thu, 28 Jan 2021 03:44:26 +0100
+Message-ID: <9f597649-3b44-c387-0218-63e369bb13bc@cloud.ionos.com>
+Date:   Thu, 28 Jan 2021 03:53:55 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210127171050.GA1732656@infradead.org>
+In-Reply-To: <20210127170914.GA1732537@infradead.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -78,22 +79,18 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi Christoph,
 
-
-On 1/27/21 18:10, Christoph Hellwig wrote:
-> On Wed, Jan 27, 2021 at 03:59:27PM +0100, Guoqing Jiang wrote:
->> +config BLK_ADDITIONAL_DISKSTAT
->> +	bool "Block layer additional diskstat"
->> +	default n
+On 1/27/21 18:09, Christoph Hellwig wrote:
+> On Wed, Jan 27, 2021 at 03:59:30PM +0100, Guoqing Jiang wrote:
+>> +		if (blk_queue_io_extra_stat(req->q))
+>> +			blk_additional_sector(req->part, sgrp, bytes >> SECTOR_SHIFT);
 > 
-> n is the default default.  But more importantly I don't think having
-> this as a compile time option makes much sense sense.  No one is going
-> to recompile their kernel to get a few stats or to avoid the overhead
-> of these stats.
+> This is completely unreadable due to the long line.
 > 
 
-Ok, I will just use io_extra_stats node to dynamically control the 
-stats, please let me know your thought about it.
+Hmm, then how about move the check into blk_additional_{sector,latency}
+to make the code more readable.
 
 Thanks,
-Guoqin
+Guoqing
