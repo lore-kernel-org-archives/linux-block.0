@@ -2,99 +2,105 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53A4DC433E0
-	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 17:26:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BE5BC433DB
+	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 17:27:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0200664DED
-	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 17:26:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BFB4664DF9
+	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 17:27:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233105AbhA1R0c (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Jan 2021 12:26:32 -0500
-Received: from mx2.veeam.com ([64.129.123.6]:53910 "EHLO mx2.veeam.com"
+        id S233165AbhA1R1N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Jan 2021 12:27:13 -0500
+Received: from mail.kernel.org ([198.145.29.99]:53686 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233120AbhA1RY2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Jan 2021 12:24:28 -0500
-Received: from mail.veeam.com (prgmbx01.amust.local [172.24.0.171])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mx2.veeam.com (Postfix) with ESMTPS id CBACD41344;
-        Thu, 28 Jan 2021 12:12:48 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com; s=mx2;
-        t=1611853969; bh=BA0Er6zcH5w4NN84e+3hlB2zoRXintRQzFb3m91ZDx0=;
-        h=From:To:CC:Subject:Date:From;
-        b=Fdxg+0yOHNqvRtjoOYd+OPu46ljAAh3xQ2F2OlJiUpYjT8zY8WaXX6dhYaVjeky9a
-         UIBo0/rVc8QkRL9IrfefFBRXdXLxCVx9CQ3NoRMGT6vF2+wfDGdVKgnALbsM6BGqff
-         N4n20s45nDxj5AlFS1QSeIyljnayhEnbxwFnt0I8=
-Received: from prgdevlinuxpatch01.amust.local (172.24.14.5) by
- prgmbx01.amust.local (172.24.0.171) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.721.2;
- Thu, 28 Jan 2021 18:12:46 +0100
-From:   Sergei Shtepa <sergei.shtepa@veeam.com>
-To:     <hare@suse.de>, <ming.lei@redhat.com>, <agk@redhat.com>,
-        <snitzer@redhat.com>, <dm-devel@redhat.com>,
-        <linux-block@vger.kernel.org>
-CC:     <sergei.shtepa@veeam.com>, <pavel.tide@veeam.com>
-Subject: [PATCH 0/2] block: blk_interposer v3
-Date:   Thu, 28 Jan 2021 20:12:33 +0300
-Message-ID: <1611853955-32167-1-git-send-email-sergei.shtepa@veeam.com>
-X-Mailer: git-send-email 1.8.3.1
+        id S232965AbhA1RYo (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 28 Jan 2021 12:24:44 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id B21F464DF9;
+        Thu, 28 Jan 2021 17:24:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1611854642;
+        bh=Zs2s8ZvTIPYGR4BFwbfSOZLDbQpy7x8YdhBNvxD8Dok=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=dYixlgG2K3aWwDLaJowzYgnOFmByUyz6PjYTAvhTfbvB+e9gPk0mBgRRvBez32mDu
+         g+/BEjUeO2s7tBkV+OtFiT2UlC3mn8gjSXsXC5Xpxm6KRmfDNpc8Z7+gIuibodKK4H
+         l1i2cwlyEJsSukyTcGjNrcpQfEjVAbCBE6DwgrePquTtnF0XcOLlk2eq3YbBOrXlcF
+         50KQtEwBjnE5+b+zJhPCQRu9YN8ISWqvJskcg8GQfdpqKteYo166Aso1a23IfJvuVj
+         VfAojNA36QPu6qz6sKkxuvacugxCY5JwWT3tNh6OxRrRzVwkEqP+vyF3JrdyJAT+Ys
+         o8BRepJ02vTLA==
+Date:   Thu, 28 Jan 2021 09:24:02 -0800
+From:   "Darrick J. Wong" <djwong@kernel.org>
+To:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Cc:     linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        dm-devel@redhat.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, drbd-dev@lists.linbit.com,
+        xen-devel@lists.xenproject.org, linux-nvme@lists.infradead.org,
+        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org,
+        jfs-discussion@lists.sourceforge.net, linux-nilfs@vger.kernel.org,
+        ocfs2-devel@oss.oracle.com, linux-pm@vger.kernel.org,
+        linux-mm@kvack.org, axboe@kernel.dk, philipp.reisner@linbit.com,
+        lars.ellenberg@linbit.com, konrad.wilk@oracle.com,
+        roger.pau@citrix.com, minchan@kernel.org, ngupta@vflare.org,
+        sergey.senozhatsky.work@gmail.com, agk@redhat.com,
+        snitzer@redhat.com, hch@lst.de, sagi@grimberg.me,
+        martin.petersen@oracle.com, viro@zeniv.linux.org.uk, tytso@mit.edu,
+        jaegeuk@kernel.org, ebiggers@kernel.org, shaggy@kernel.org,
+        konishi.ryusuke@gmail.com, mark@fasheh.com, jlbec@evilplan.org,
+        joseph.qi@linux.alibaba.com, damien.lemoal@wdc.com,
+        naohiro.aota@wdc.com, jth@kernel.org, rjw@rjwysocki.net,
+        len.brown@intel.com, pavel@ucw.cz, akpm@linux-foundation.org,
+        hare@suse.de, gustavoars@kernel.org, tiwai@suse.de,
+        alex.shi@linux.alibaba.com, asml.silence@gmail.com,
+        ming.lei@redhat.com, tj@kernel.org, osandov@fb.com,
+        bvanassche@acm.org, jefflexu@linux.alibaba.com
+Subject: Re: [RFC PATCH 18/34] iomap: use bio_new in iomap_dio_bio_actor
+Message-ID: <20210128172402.GO7698@magnolia>
+References: <20210128071133.60335-1-chaitanya.kulkarni@wdc.com>
+ <20210128071133.60335-19-chaitanya.kulkarni@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [172.24.14.5]
-X-ClientProxiedBy: prgmbx01.amust.local (172.24.0.171) To prgmbx01.amust.local
- (172.24.0.171)
-X-EsetResult: clean, is OK
-X-EsetId: 37303A29C604D265677D6B
-X-Veeam-MMEX: True
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210128071133.60335-19-chaitanya.kulkarni@wdc.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi all,
+On Wed, Jan 27, 2021 at 11:11:17PM -0800, Chaitanya Kulkarni wrote:
+> Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+> ---
+>  fs/iomap/direct-io.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
+> 
+> diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
+> index f6c557a1bd25..0737192f7e5c 100644
+> --- a/fs/iomap/direct-io.c
+> +++ b/fs/iomap/direct-io.c
+> @@ -267,9 +267,8 @@ iomap_dio_bio_actor(struct inode *inode, loff_t pos, loff_t length,
+>  			goto out;
+>  		}
+>  
+> -		bio = bio_alloc(GFP_KERNEL, nr_pages);
+> -		bio_set_dev(bio, iomap->bdev);
+> -		bio->bi_iter.bi_sector = iomap_sector(iomap, pos);
+> +		bio = bio_new(iomap->bdev, iomap_sector(iomap, pos), 0, 0,
+> +			      nr_pages, GFP_KERNEL);
 
-I`m ready to suggest the blk_interposer again.
-blk_interposer allows to intercept bio requests, remap bio to
-another devices or add new bios.
+op == 0?  It seems a little odd to me that we'd set the field to zero
+and then construct bi_opf later.
 
-This version has support from device mapper.
+It also strikes me as a little strange that bi_opf is combined from the
+third and fourth parameters, but maybe some day you'll want to do some
+parameter verification on debug kernels or something...?
 
-For the dm-linear device creation command, the `noexcl` parameter
-has been added, which allows to open block devices without
-FMODE_EXCL mode. It allows to create dm-linear device on a block
-device with an already mounted file system.
-The new ioctl DM_DEV_REMAP allows to enable and disable bio
-interception.
+--D
 
-Thus, it is possible to add the dm-device to the block layer stack
-without reconfiguring and rebooting.
-
-
-Sergei Shtepa (2):
-  block: blk_interposer
-  [dm] blk_interposer for dm-linear
-
- block/bio.c                   |   2 +
- block/blk-core.c              |  29 +++
- block/blk-mq.c                |  13 ++
- block/genhd.c                 |  82 ++++++++
- drivers/md/dm-core.h          |  46 +++-
- drivers/md/dm-ioctl.c         |  39 ++++
- drivers/md/dm-linear.c        |  17 +-
- drivers/md/dm-table.c         |  12 +-
- drivers/md/dm.c               | 383 ++++++++++++++++++++++++++++++++--
- drivers/md/dm.h               |   2 +-
- include/linux/blk-mq.h        |   1 +
- include/linux/blk_types.h     |   6 +-
- include/linux/device-mapper.h |   7 +
- include/linux/genhd.h         |  19 ++
- include/uapi/linux/dm-ioctl.h |  15 +-
- 15 files changed, 643 insertions(+), 30 deletions(-)
-
--- 
-2.20.1
-
+>  		bio->bi_write_hint = dio->iocb->ki_hint;
+>  		bio->bi_ioprio = dio->iocb->ki_ioprio;
+>  		bio->bi_private = dio;
+> -- 
+> 2.22.1
+> 
