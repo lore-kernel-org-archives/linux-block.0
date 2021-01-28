@@ -2,128 +2,129 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE272C4332D
-	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 07:42:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7A4EC433DB
+	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 07:42:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A332F64DDD
-	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 07:42:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7208464DD6
+	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 07:42:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231482AbhA1HjI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Jan 2021 02:39:08 -0500
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:22514 "EHLO
-        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231719AbhA1HPc (ORCPT
+        id S232031AbhA1HmG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Jan 2021 02:42:06 -0500
+Received: from szxga07-in.huawei.com ([45.249.212.35]:11904 "EHLO
+        szxga07-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231158AbhA1HlQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Jan 2021 02:15:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1611818131; x=1643354131;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=ehPvHcNFObZpIErrj099M/D2lwJDNRsp+vZtBu0oImM=;
-  b=NnAKH5lyyfwO1Gwiin4fPWBCqQ3tKqqW+PsDj8mcQ4RMlzuVJ9QfNRyE
-   5CZvQUeXRdi5Mg0fK/Oqzy7qFEPkKUmUb6P6DMQ0WH1HiL2wjqkuJj5BB
-   EV4FklXInbANDZivN+3mhsjJUA8dpnGZTbNA0GxmKGV6Cx6c0UKsMTfJL
-   np60nuNVv7jo1KQqF+DLoDdXV/Ajuu2IRwtBVIadz1xN69teQ+qJ0yrYx
-   0h1xOqz953VTrJiCnEn/yaJAdkiXCApDWlGn4NPljLJJ9Ry2zXYraQoEX
-   djBazIhd2MJAmGJiNoCzmfQbzq5Yf1Y/Nca39Xc/Chs4SFD+fiJ14N9UU
-   A==;
-IronPort-SDR: jh0svJj4UKssDGxkT25U6k22x87TSqdY9GdizYujfpunry9hII/Stb4xprrvZKSibVnwCHDqgM
- yLdXl+Lv23SwJWGDlu8OKda/v/T8BU3GmZEUM6g8BkLbeLgm7UePEmpjHPCMH19HJBxeJLzlqS
- aPfBiK7twLCkRG9dr842ksf07YZemZ3L4DpHH1YW9yUgtwarv88sbX/+pUrU+2r+mbzCT7aWEi
- aM4BX+OrCqw5RZP0EgNVGNv/j18pq28wHrFrIFNyXiHN34TcS77a7xrOvw038Q6nFYwDntGUF/
- sTc=
-X-IronPort-AV: E=Sophos;i="5.79,381,1602518400"; 
-   d="scan'208";a="158517430"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 28 Jan 2021 15:14:26 +0800
-IronPort-SDR: ge6KmcgkfxAkSyZ59ylI29KOkEr/IGzYlHyJ6i9r8K7+tUBuBpXjU8Vrmmzr7h4HabXHoIibYe
- dgBfvoBr7bCE/3PbR8ZrPCSjHtJ4830Rcz0skXr5odabQMyt55bs54p0a0WAEcgUqjtHNyEMhN
- 09ueczfImOGCw+2V9A7k6NWDUdojrLPMKX6HLRLuq/XZrobqQCDmYwyaZ1s052fOP5FiKnTK1f
- umtgFwkgcGS8fBFiDpOYRzlY927bjkmjmvPhx+dbTaNL8O5OoVOtx3FvFfEB186Fw58zMUcegm
- XuupjC3xX+pA8/pNY2tjyUHd
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jan 2021 22:56:44 -0800
-IronPort-SDR: 8zWpKV1GG73An1zpnhB0A6RHwKcvj53Vuxf9sCqOuA5ZBa5rmYze0QOVvU8HXRv/G7xpZnMIM1
- owK+1cH03BzVuf34Vf4nPTxb3MJRxKHU7MPVsfYKBvoE5U6OUm3WvlKRFiuZT6me2l9YBpl9Dw
- srBAVfHgvdy6RitQaBWTWMkJB+swHKrWKKu/bnpunnMHs5/vTt80z06ovpDFKB7vDmFytTZ38T
- a/jEmxYBTtNgI1MsJxovm0Lez6j5sfQFarO3Hedm9NgwCWDpXDWzTcx88c/FgbEiOtdVVLfaVV
- avQ=
-WDCIronportException: Internal
-Received: from vm.labspan.wdc.com (HELO vm.sc.wdc.com) ([10.6.137.102])
-  by uls-op-cesaip02.wdc.com with ESMTP; 27 Jan 2021 23:14:26 -0800
-From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-To:     linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        dm-devel@redhat.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, drbd-dev@lists.linbit.com,
-        xen-devel@lists.xenproject.org, linux-nvme@lists.infradead.org,
-        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org,
-        jfs-discussion@lists.sourceforge.net, linux-nilfs@vger.kernel.org,
-        ocfs2-devel@oss.oracle.com, linux-pm@vger.kernel.org,
-        linux-mm@kvack.org
-Cc:     axboe@kernel.dk, philipp.reisner@linbit.com,
-        lars.ellenberg@linbit.com, konrad.wilk@oracle.com,
-        roger.pau@citrix.com, minchan@kernel.org, ngupta@vflare.org,
-        sergey.senozhatsky.work@gmail.com, agk@redhat.com,
-        snitzer@redhat.com, hch@lst.de, sagi@grimberg.me,
-        chaitanya.kulkarni@wdc.com, martin.petersen@oracle.com,
-        viro@zeniv.linux.org.uk, tytso@mit.edu, jaegeuk@kernel.org,
-        ebiggers@kernel.org, djwong@kernel.org, shaggy@kernel.org,
-        konishi.ryusuke@gmail.com, mark@fasheh.com, jlbec@evilplan.org,
-        joseph.qi@linux.alibaba.com, damien.lemoal@wdc.com,
-        naohiro.aota@wdc.com, jth@kernel.org, rjw@rjwysocki.net,
-        len.brown@intel.com, pavel@ucw.cz, akpm@linux-foundation.org,
-        hare@suse.de, gustavoars@kernel.org, tiwai@suse.de,
-        alex.shi@linux.alibaba.com, asml.silence@gmail.com,
-        ming.lei@redhat.com, tj@kernel.org, osandov@fb.com,
-        bvanassche@acm.org, jefflexu@linux.alibaba.com
-Subject: [RFC PATCH 19/34] fs/jfs/jfs_logmgr.c: use bio_new in lbmRead
-Date:   Wed, 27 Jan 2021 23:11:18 -0800
-Message-Id: <20210128071133.60335-20-chaitanya.kulkarni@wdc.com>
-X-Mailer: git-send-email 2.22.1
-In-Reply-To: <20210128071133.60335-1-chaitanya.kulkarni@wdc.com>
-References: <20210128071133.60335-1-chaitanya.kulkarni@wdc.com>
+        Thu, 28 Jan 2021 02:41:16 -0500
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.58])
+        by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4DRC5y5JP5z7cFJ;
+        Thu, 28 Jan 2021 15:39:18 +0800 (CST)
+Received: from huawei.com (10.175.101.6) by DGGEMS413-HUB.china.huawei.com
+ (10.3.19.213) with Microsoft SMTP Server id 14.3.498.0; Thu, 28 Jan 2021
+ 15:40:21 +0800
+From:   Sun Ke <sunke32@huawei.com>
+To:     <josef@toxicpanda.com>, <axboe@kernel.dk>, <sunke32@huawei.com>
+CC:     <linux-block@vger.kernel.org>, <nbd@other.debian.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: [PATCH] nbd: Fix NULL pointer in flush_workqueue
+Date:   Thu, 28 Jan 2021 02:41:53 -0500
+Message-ID: <20210128074153.1633374-1-sunke32@huawei.com>
+X-Mailer: git-send-email 2.25.4
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.101.6]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
----
- fs/jfs/jfs_logmgr.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+Open /dev/nbdX first, the config_refs will be 1 and
+the pointers in nbd_device are still null. Disconnect
+/dev/nbdX, then reference a null recv_workq. The
+protection by config_refs in nbd_genl_disconnect is useless.
 
-diff --git a/fs/jfs/jfs_logmgr.c b/fs/jfs/jfs_logmgr.c
-index 9330eff210e0..4481f3e33a3f 100644
---- a/fs/jfs/jfs_logmgr.c
-+++ b/fs/jfs/jfs_logmgr.c
-@@ -1979,17 +1979,14 @@ static int lbmRead(struct jfs_log * log, int pn, struct lbuf ** bpp)
- 
- 	bp->l_flag |= lbmREAD;
- 
--	bio = bio_alloc(GFP_NOFS, 1);
--
--	bio->bi_iter.bi_sector = bp->l_blkno << (log->l2bsize - 9);
--	bio_set_dev(bio, log->bdev);
-+	bio = bio_new(log->bdev, bp->l_blkno << (log->l2bsize - 9),
-+			REQ_OP_READ, 0, 1, GFP_NOFS);
- 
- 	bio_add_page(bio, bp->l_page, LOGPSIZE, bp->l_offset);
- 	BUG_ON(bio->bi_iter.bi_size != LOGPSIZE);
- 
- 	bio->bi_end_io = lbmIODone;
- 	bio->bi_private = bp;
--	bio->bi_opf = REQ_OP_READ;
- 	/*check if journaling to disk has been disabled*/
- 	if (log->no_integrity) {
- 		bio->bi_iter.bi_size = 0;
+[  656.366194] BUG: kernel NULL pointer dereference, address: 0000000000000020
+[  656.368943] #PF: supervisor write access in kernel mode
+[  656.369844] #PF: error_code(0x0002) - not-present page
+[  656.370717] PGD 10cc87067 P4D 10cc87067 PUD 1074b4067 PMD 0
+[  656.371693] Oops: 0002 [#1] SMP
+[  656.372242] CPU: 5 PID: 7977 Comm: nbd-client Not tainted 5.11.0-rc5-00040-g76c057c84d28 #1
+[  656.373661] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS ?-20190727_073836-buildvm-ppc64le-16.ppc.fedoraproject.org-3.fc31 04/01/2014
+[  656.375904] RIP: 0010:mutex_lock+0x29/0x60
+[  656.376627] Code: 00 0f 1f 44 00 00 55 48 89 fd 48 83 05 6f d7 fe 08 01 e8 7a c3 ff ff 48 83 05 6a d7 fe 08 01 31 c0 65 48 8b 14 25 00 6d 01 00 <f0> 48 0f b1 55 d
+[  656.378934] RSP: 0018:ffffc900005eb9b0 EFLAGS: 00010246
+[  656.379350] RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
+[  656.379915] RDX: ffff888104cf2600 RSI: ffffffffaae8f452 RDI: 0000000000000020
+[  656.380473] RBP: 0000000000000020 R08: 0000000000000000 R09: ffff88813bd6b318
+[  656.381039] R10: 00000000000000c7 R11: fefefefefefefeff R12: ffff888102710b40
+[  656.381599] R13: ffffc900005eb9e0 R14: ffffffffb2930680 R15: ffff88810770ef00
+[  656.382166] FS:  00007fdf117ebb40(0000) GS:ffff88813bd40000(0000) knlGS:0000000000000000
+[  656.382806] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  656.383261] CR2: 0000000000000020 CR3: 0000000100c84000 CR4: 00000000000006e0
+[  656.383819] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+[  656.384370] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+[  656.384927] Call Trace:
+[  656.385111]  flush_workqueue+0x92/0x6c0
+[  656.385395]  nbd_disconnect_and_put+0x81/0xd0
+[  656.385716]  nbd_genl_disconnect+0x125/0x2a0
+[  656.386034]  genl_family_rcv_msg_doit.isra.0+0x102/0x1b0
+[  656.386422]  genl_rcv_msg+0xfc/0x2b0
+[  656.386685]  ? nbd_ioctl+0x490/0x490
+[  656.386954]  ? genl_family_rcv_msg_doit.isra.0+0x1b0/0x1b0
+[  656.387354]  netlink_rcv_skb+0x62/0x180
+[  656.387638]  genl_rcv+0x34/0x60
+[  656.387874]  netlink_unicast+0x26d/0x590
+[  656.388162]  netlink_sendmsg+0x398/0x6c0
+[  656.388451]  ? netlink_rcv_skb+0x180/0x180
+[  656.388750]  ____sys_sendmsg+0x1da/0x320
+[  656.389038]  ? ____sys_recvmsg+0x130/0x220
+[  656.389334]  ___sys_sendmsg+0x8e/0xf0
+[  656.389605]  ? ___sys_recvmsg+0xa2/0xf0
+[  656.389889]  ? handle_mm_fault+0x1671/0x21d0
+[  656.390201]  __sys_sendmsg+0x6d/0xe0
+[  656.390464]  __x64_sys_sendmsg+0x23/0x30
+[  656.390751]  do_syscall_64+0x45/0x70
+[  656.391017]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+
+To fix it, just add a check for a non null task_recv in
+nbd_genl_disconnect.
+
+Fixes: e9e006f5fcf2 ("nbd: fix max number of supported devs")
+Signed-off-by: Sun Ke <sunke32@huawei.com>
+---
+ drivers/block/nbd.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 6727358e147d..4f7885966d32 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -2011,12 +2011,20 @@ static int nbd_genl_disconnect(struct sk_buff *skb, struct genl_info *info)
+ 		       index);
+ 		return -EINVAL;
+ 	}
++	mutex_lock(&nbd->config_lock);
+ 	if (!refcount_inc_not_zero(&nbd->refs)) {
+ 		mutex_unlock(&nbd_index_mutex);
++		mutex_unlock(&nbd->config_lock);
+ 		printk(KERN_ERR "nbd: device at index %d is going down\n",
+ 		       index);
+ 		return -EINVAL;
+ 	}
++	if (!nbd->recv_workq) {
++		mutex_unlock(&nbd->config_lock);
++		mutex_unlock(&nbd_index_mutex);
++		return -EINVAL;
++	}
++	mutex_unlock(&nbd->config_lock);
+ 	mutex_unlock(&nbd_index_mutex);
+ 	if (!refcount_inc_not_zero(&nbd->config_refs)) {
+ 		nbd_put(nbd);
 -- 
-2.22.1
+2.25.4
 
