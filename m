@@ -4,101 +4,110 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECF80C433E0
-	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 03:22:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECA5FC433E6
+	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 03:27:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A881264DD6
-	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 03:22:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9A8F564DD3
+	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 03:27:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229748AbhA1DWz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Jan 2021 22:22:55 -0500
-Received: from out30-43.freemail.mail.aliyun.com ([115.124.30.43]:45447 "EHLO
-        out30-43.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229563AbhA1DWx (ORCPT
+        id S231147AbhA1D13 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Jan 2021 22:27:29 -0500
+Received: from labrats.qualcomm.com ([199.106.110.90]:10613 "EHLO
+        labrats.qualcomm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229831AbhA1D13 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Jan 2021 22:22:53 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04426;MF=baolin.wang@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0UN6KA9h_1611804128;
-Received: from localhost(mailfrom:baolin.wang@linux.alibaba.com fp:SMTPD_---0UN6KA9h_1611804128)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Thu, 28 Jan 2021 11:22:08 +0800
-From:   Baolin Wang <baolin.wang@linux.alibaba.com>
-To:     axboe@kernel.dk, tj@kernel.org
-Cc:     joseph.qi@linux.alibaba.com, baolin.wang@linux.alibaba.com,
-        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v2] blk-cgroup: Use cond_resched() when destroy blkgs
-Date:   Thu, 28 Jan 2021 11:22:00 +0800
-Message-Id: <8e8a0c4644d5eb01b7f79ec9b67c2b240f4a6434.1611798287.git.baolin.wang@linux.alibaba.com>
-X-Mailer: git-send-email 1.8.3.1
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+        Wed, 27 Jan 2021 22:27:29 -0500
+IronPort-SDR: m5c5356bsjqz7qwNEQmVHgwIAo/5ayBk9kDgf2NHe8IJOgDCykV0jSPelwqwfDGBcKwiw54dfy
+ smyf+oFKgOk8lC3gz2D//5AvVtNeuTxSbA3Yx0X2CtVYTVR3HanreNFfzBEIDmp+NdWP2oQ50j
+ kiTWanCPMLkESwVCeROow4jEz+qStXBon6PUi5wmOkEB41qRDKokQvpK8gYU4LaREON7g7LJ9k
+ l/SO1AezUiDQMgImqSoM9ARnesJZdERYpnIKJsk3MUHOBvL+VRHVj+TFLgXmAn9h8MuRl6EkKA
+ f24=
+X-IronPort-AV: E=Sophos;i="5.79,381,1602572400"; 
+   d="scan'208";a="47715510"
+Received: from unknown (HELO ironmsg05-sd.qualcomm.com) ([10.53.140.145])
+  by labrats.qualcomm.com with ESMTP; 27 Jan 2021 19:26:48 -0800
+X-QCInternal: smtphost
+Received: from stor-presley.qualcomm.com ([192.168.140.85])
+  by ironmsg05-sd.qualcomm.com with ESMTP; 27 Jan 2021 19:26:42 -0800
+Received: by stor-presley.qualcomm.com (Postfix, from userid 92687)
+        id A0597219A2; Wed, 27 Jan 2021 19:26:42 -0800 (PST)
+From:   Asutosh Das <asutoshd@codeaurora.org>
+To:     cang@codeaurora.org, martin.petersen@oracle.com,
+        linux-scsi@vger.kernel.org
+Cc:     Asutosh Das <asutoshd@codeaurora.org>,
+        linux-arm-msm@vger.kernel.org, stern@rowland.harvard.edu,
+        "Bao D . Nguyen" <nguyenb@codeaurora.org>,
+        FUJITA Tomonori <fujita.tomonori@lab.ntt.co.jp>,
+        Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org (open list:BLOCK LAYER),
+        linux-kernel@vger.kernel.org (open list)
+Subject: [RFC PATCH v2 1/2] block: bsg: resume platform device before accessing
+Date:   Wed, 27 Jan 2021 19:26:37 -0800
+Message-Id: <b1db5394aa3f6cf44cd9adb9c8d569caa0c9e4f5.1611803264.git.asutoshd@codeaurora.org>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <cover.1611719814.git.asutoshd@codeaurora.org>
+References: <cover.1611719814.git.asutoshd@codeaurora.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On !PREEMPT kernel, we can get below softlockup when doing stress
-testing with creating and destroying block cgroup repeatly. The
-reason is it may take a long time to acquire the queue's lock in
-the loop of blkcg_destroy_blkgs(), or the system can accumulate a
-huge number of blkgs in pathological cases. We can add a need_resched()
-check on each loop and release locks and do cond_resched() if true
-to avoid this issue, since the blkcg_destroy_blkgs() is not called
-from atomic contexts.
+It may happen that the underlying device's runtime-pm is
+not controlled by block-pm. So it's possible that when
+commands are sent to the device, it's suspended and may not
+be resumed by blk-pm. Hence explicitly resume the parent
+which is the platform device.
 
-[ 4757.010308] watchdog: BUG: soft lockup - CPU#11 stuck for 94s!
-[ 4757.010698] Call trace:
-[ 4757.010700]  blkcg_destroy_blkgs+0x68/0x150
-[ 4757.010701]  cgwb_release_workfn+0x104/0x158
-[ 4757.010702]  process_one_work+0x1bc/0x3f0
-[ 4757.010704]  worker_thread+0x164/0x468
-[ 4757.010705]  kthread+0x108/0x138
-
-Suggested-by: Tejun Heo <tj@kernel.org>
-Signed-off-by: Baolin Wang <baolin.wang@linux.alibaba.com>
+Signed-off-by: Asutosh Das <asutoshd@codeaurora.org>
+Signed-off-by: Can Guo <cang@codeaurora.org>
+Signed-off-by: Bao D. Nguyen <nguyenb@codeaurora.org>
 ---
-Changes from v1:
- - Add might_sleep() in blkcg_destroy_blkgs().
- - Add an explicitly need_resched() check before releasing lock.
- - Add some comments.
----
- block/blk-cgroup.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ block/bsg.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 3465d6e..94eeed7 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -1016,6 +1016,8 @@ static void blkcg_css_offline(struct cgroup_subsys_state *css)
-  */
- void blkcg_destroy_blkgs(struct blkcg *blkcg)
+diff --git a/block/bsg.c b/block/bsg.c
+index d7bae94..e9fc896 100644
+--- a/block/bsg.c
++++ b/block/bsg.c
+@@ -12,6 +12,7 @@
+ #include <linux/idr.h>
+ #include <linux/bsg.h>
+ #include <linux/slab.h>
++#include <linux/pm_runtime.h>
+ 
+ #include <scsi/scsi.h>
+ #include <scsi/scsi_ioctl.h>
+@@ -306,12 +307,15 @@ static struct bsg_device *bsg_get_device(struct inode *inode, struct file *file)
+ static int bsg_open(struct inode *inode, struct file *file)
  {
-+	might_sleep();
-+
- 	spin_lock_irq(&blkcg->lock);
+ 	struct bsg_device *bd;
++	struct bsg_class_device *bcd;
  
- 	while (!hlist_empty(&blkcg->blkg_list)) {
-@@ -1031,6 +1033,17 @@ void blkcg_destroy_blkgs(struct blkcg *blkcg)
- 			cpu_relax();
- 			spin_lock_irq(&blkcg->lock);
- 		}
-+
-+		/*
-+		 * Given that the system can accumulate a huge number
-+		 * of blkgs in pathological cases, check to see if we
-+		 * need to rescheduling to avoid softlockup.
-+		 */
-+		if (need_resched()) {
-+			spin_unlock_irq(&blkcg->lock);
-+			cond_resched();
-+			spin_lock_irq(&blkcg->lock);
-+		}
- 	}
+ 	bd = bsg_get_device(inode, file);
  
- 	spin_unlock_irq(&blkcg->lock);
+ 	if (IS_ERR(bd))
+ 		return PTR_ERR(bd);
+ 
++	bcd = &bd->queue->bsg_dev;
++	pm_runtime_get_sync(bcd->class_dev->parent);
+ 	file->private_data = bd;
+ 	return 0;
+ }
+@@ -319,8 +323,12 @@ static int bsg_open(struct inode *inode, struct file *file)
+ static int bsg_release(struct inode *inode, struct file *file)
+ {
+ 	struct bsg_device *bd = file->private_data;
++	struct bsg_class_device *bcd;
+ 
+ 	file->private_data = NULL;
++
++	bcd = &bd->queue->bsg_dev;
++	pm_runtime_put_sync(bcd->class_dev->parent);
+ 	return bsg_put_device(bd);
+ }
+ 
 -- 
-1.8.3.1
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum, a Linux Foundation Collaborative Project.
 
