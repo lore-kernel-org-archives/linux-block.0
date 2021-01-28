@@ -2,73 +2,173 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75A47C433E6
-	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 14:45:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F962C433E9
+	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 16:14:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2040064DEE
-	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 14:45:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5B17D64E0E
+	for <linux-block@archiver.kernel.org>; Thu, 28 Jan 2021 16:14:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231945AbhA1Ooi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Jan 2021 09:44:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46082 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231916AbhA1OoL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Jan 2021 09:44:11 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55550C061573
-        for <linux-block@vger.kernel.org>; Thu, 28 Jan 2021 06:43:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=pdZmqhJMb4qe8FoLwmPtlkXwD12Q3DS9d3aFJF4id7Y=; b=ZpOaQuRg6SrKXbFg7wL/OqruF0
-        2EByAkZVNck/0oCoOCMAMCtkp5heIifDz9svKrwmoGtqethS29bDCcIya6DyenvA7MxNRMGs5m9d2
-        e/nxvwOLRLM4YFLEpeH2iTNjekrLctCqzHo94dvmfUzLMmocdQOH1gG2am4worhnOD1QW/06xZPoR
-        io+Gv88+/kH264271hLcZhQ0qCZEBHG0eUWFHp8TVgSDrWUSSJkeDkM6wZZIFRDH8/uOn/mNNT3VE
-        C1L6l3ih8ZjH+0fJjB99HogLMtsqqOxyKfu/pEAdMay+pgU3KyTwsrxRAEbaqmILR9laJR0ehOqF4
-        REK8G0qQ==;
-Received: from hch by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1l58W1-008a2B-Qu; Thu, 28 Jan 2021 14:43:23 +0000
-Date:   Thu, 28 Jan 2021 14:43:21 +0000
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Christoph Hellwig <hch@infradead.org>,
+        id S231856AbhA1QNI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Jan 2021 11:13:08 -0500
+Received: from mail.kernel.org ([198.145.29.99]:37336 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232439AbhA1QML (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 28 Jan 2021 11:12:11 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 15C7D64DE5;
+        Thu, 28 Jan 2021 16:11:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1611850291;
+        bh=l1fZVj6lNKrtqOWXBXFlHL9KLwU2deosKLGUjGIPhaQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Ae6xo2EqTNtPiMkPuwUBcZnLyMNEeIUX+7ThLWDfngvLkjuzBSsT7Pp5WbxiOPQho
+         O6jLUshdETUx1nN4PLVPFnCLafOw9dc+CXzttS8jN/C7hNRWXbzwJxsWaoyVHO2Zak
+         boAYycf/k6EsmAbrDlF+KkgSnuk0aRy1li4Y1jQCu0cqT5tL3yDWnu6TkthAWMZ7Dx
+         DC7+JL5QB88HCrDHygJRXveBJosYNKqjW8sNNn4SLZ0p6m6F4YaeXBueIVrn/8gnEY
+         BRgUeUzaBoReyjCxZvUdOjJysQUQlUOO/PKLFRuM9Cf/ybkQZOvsk0t6nN8lV4QP9L
+         vk5bWmlQu//Pg==
+Date:   Thu, 28 Jan 2021 08:11:28 -0800
+From:   Jaegeuk Kim <jaegeuk@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Song Liu <song@kernel.org>,
+        Chao Yu <chao@kernel.org>,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        Coly Li <colyli@suse.de>, Mike Snitzer <snitzer@redhat.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>,
         Damien Le Moal <damien.lemoal@wdc.com>,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH] block: fix bd_size_lock use
-Message-ID: <20210128144321.GA2045081@infradead.org>
-References: <20210128063619.570177-1-damien.lemoal@wdc.com>
- <20210128143723.GB2043450@infradead.org>
- <9fbbeb94-64ee-6a80-05ce-c919de390376@kernel.dk>
+        Naohiro Aota <naohiro.aota@wdc.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Ryusuke Konishi <konishi.ryusuke@gmail.com>,
+        linux-nilfs@vger.kernel.org, dm-devel@redhat.com,
+        linux-f2fs-devel@lists.sourceforge.net,
+        linux-block@vger.kernel.org, drbd-dev@lists.linbit.com,
+        linux-bcache@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-btrfs@vger.kernel.org,
+        linux-nfs@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH 08/17] f2fs: remove FAULT_ALLOC_BIO
+Message-ID: <YBLiMN7zm44VWaBI@google.com>
+References: <20210126145247.1964410-1-hch@lst.de>
+ <20210126145247.1964410-9-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <9fbbeb94-64ee-6a80-05ce-c919de390376@kernel.dk>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20210126145247.1964410-9-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jan 28, 2021 at 07:39:21AM -0700, Jens Axboe wrote:
-> On 1/28/21 7:37 AM, Christoph Hellwig wrote:
-> > On Thu, Jan 28, 2021 at 03:36:19PM +0900, Damien Le Moal wrote:
-> >> Some block device drivers, e.g. the skd driver, call set_capacity() with
-> >> IRQ disabled. This results in lockdep ito complain about inconsistent
-> >> lock states ("inconsistent {HARDIRQ-ON-W} -> {IN-HARDIRQ-W} usage")
-> >> because set_capacity takes a block device bd_size_lock using the
-> >> functions spin_lock() and spin_unlock(). Ensure a consistent locking
-> >> state by replacing these calls with spin_lock_irqsave() and
-> >> spin_lock_irqrestore(). The same applies to bdev_set_nr_sectors().
-> >> With this fix, all lockdep complaints are resolved.
-> > 
-> > I'd much rather fix the driver to not call set_capacity with irqs
-> > disabled..
+On 01/26, Christoph Hellwig wrote:
+> Sleeping bio allocations do not fail, which means that injecting an error
+> into sleeping bio allocations is a little silly.
 > 
-> Agree, but that might be a bit beyond 5.10 at this point..
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-True.
+Already merged tho.
+
+Acked-by: Jaegeuk Kim <jaegeuk@kernel.org>
+
+> ---
+>  Documentation/filesystems/f2fs.rst |  1 -
+>  fs/f2fs/data.c                     | 29 ++++-------------------------
+>  fs/f2fs/f2fs.h                     |  1 -
+>  fs/f2fs/super.c                    |  1 -
+>  4 files changed, 4 insertions(+), 28 deletions(-)
+> 
+> diff --git a/Documentation/filesystems/f2fs.rst b/Documentation/filesystems/f2fs.rst
+> index dae15c96e659e2..624f5f3ed93e86 100644
+> --- a/Documentation/filesystems/f2fs.rst
+> +++ b/Documentation/filesystems/f2fs.rst
+> @@ -179,7 +179,6 @@ fault_type=%d		 Support configuring fault injection type, should be
+>  			 FAULT_KVMALLOC		  0x000000002
+>  			 FAULT_PAGE_ALLOC	  0x000000004
+>  			 FAULT_PAGE_GET		  0x000000008
+> -			 FAULT_ALLOC_BIO	  0x000000010
+>  			 FAULT_ALLOC_NID	  0x000000020
+>  			 FAULT_ORPHAN		  0x000000040
+>  			 FAULT_BLOCK		  0x000000080
+> diff --git a/fs/f2fs/data.c b/fs/f2fs/data.c
+> index 0cf0c605992431..9fb6be65592b1f 100644
+> --- a/fs/f2fs/data.c
+> +++ b/fs/f2fs/data.c
+> @@ -50,28 +50,6 @@ void f2fs_destroy_bioset(void)
+>  	bioset_exit(&f2fs_bioset);
+>  }
+>  
+> -static inline struct bio *__f2fs_bio_alloc(gfp_t gfp_mask,
+> -						unsigned int nr_iovecs)
+> -{
+> -	return bio_alloc_bioset(gfp_mask, nr_iovecs, &f2fs_bioset);
+> -}
+> -
+> -static struct bio *f2fs_bio_alloc(struct f2fs_sb_info *sbi, int npages,
+> -		bool noio)
+> -{
+> -	if (noio) {
+> -		/* No failure on bio allocation */
+> -		return __f2fs_bio_alloc(GFP_NOIO, npages);
+> -	}
+> -
+> -	if (time_to_inject(sbi, FAULT_ALLOC_BIO)) {
+> -		f2fs_show_injection_info(sbi, FAULT_ALLOC_BIO);
+> -		return NULL;
+> -	}
+> -
+> -	return __f2fs_bio_alloc(GFP_KERNEL, npages);
+> -}
+> -
+>  static bool __is_cp_guaranteed(struct page *page)
+>  {
+>  	struct address_space *mapping = page->mapping;
+> @@ -433,7 +411,7 @@ static struct bio *__bio_alloc(struct f2fs_io_info *fio, int npages)
+>  	struct f2fs_sb_info *sbi = fio->sbi;
+>  	struct bio *bio;
+>  
+> -	bio = f2fs_bio_alloc(sbi, npages, true);
+> +	bio = bio_alloc_bioset(GFP_NOIO, npages, &f2fs_bioset);
+>  
+>  	f2fs_target_device(sbi, fio->new_blkaddr, bio);
+>  	if (is_read_io(fio->op)) {
+> @@ -1029,8 +1007,9 @@ static struct bio *f2fs_grab_read_bio(struct inode *inode, block_t blkaddr,
+>  	struct bio_post_read_ctx *ctx;
+>  	unsigned int post_read_steps = 0;
+>  
+> -	bio = f2fs_bio_alloc(sbi, min_t(int, nr_pages, BIO_MAX_PAGES),
+> -								for_write);
+> +	bio = bio_alloc_bioset(for_write ? GFP_NOIO : GFP_KERNEL,
+> +			       min_t(int, nr_pages, BIO_MAX_PAGES),
+> +			       &f2fs_bioset);
+>  	if (!bio)
+>  		return ERR_PTR(-ENOMEM);
+>  
+> diff --git a/fs/f2fs/f2fs.h b/fs/f2fs/f2fs.h
+> index 902bd3267c03e1..6c78365d80ceb5 100644
+> --- a/fs/f2fs/f2fs.h
+> +++ b/fs/f2fs/f2fs.h
+> @@ -43,7 +43,6 @@ enum {
+>  	FAULT_KVMALLOC,
+>  	FAULT_PAGE_ALLOC,
+>  	FAULT_PAGE_GET,
+> -	FAULT_ALLOC_BIO,
+>  	FAULT_ALLOC_NID,
+>  	FAULT_ORPHAN,
+>  	FAULT_BLOCK,
+> diff --git a/fs/f2fs/super.c b/fs/f2fs/super.c
+> index b4a07fe62d1a58..3a312642907e86 100644
+> --- a/fs/f2fs/super.c
+> +++ b/fs/f2fs/super.c
+> @@ -45,7 +45,6 @@ const char *f2fs_fault_name[FAULT_MAX] = {
+>  	[FAULT_KVMALLOC]	= "kvmalloc",
+>  	[FAULT_PAGE_ALLOC]	= "page alloc",
+>  	[FAULT_PAGE_GET]	= "page get",
+> -	[FAULT_ALLOC_BIO]	= "alloc bio",
+>  	[FAULT_ALLOC_NID]	= "alloc nid",
+>  	[FAULT_ORPHAN]		= "orphan",
+>  	[FAULT_BLOCK]		= "no more block",
+> -- 
+> 2.29.2
