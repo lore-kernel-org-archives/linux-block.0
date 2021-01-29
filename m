@@ -2,289 +2,376 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E436EC433E9
-	for <linux-block@archiver.kernel.org>; Fri, 29 Jan 2021 07:35:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E60AC433DB
+	for <linux-block@archiver.kernel.org>; Fri, 29 Jan 2021 07:39:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B99A664DA1
-	for <linux-block@archiver.kernel.org>; Fri, 29 Jan 2021 07:35:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DF43A64E03
+	for <linux-block@archiver.kernel.org>; Fri, 29 Jan 2021 07:39:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232253AbhA2Hfz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 29 Jan 2021 02:35:55 -0500
-Received: from mx2.suse.de ([195.135.220.15]:50120 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232137AbhA2Hfz (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 29 Jan 2021 02:35:55 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1611905707; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=zAq51H83aYnizsU5uKH4Xo3JZYjQqCAFMXuwsnbMpLQ=;
-        b=egkOuZgO/1U3ZcJB0aoekc8YSPYrBM6Dbx4wpJ7qyPhKX7f9X3H2cqMyawp7VD5rpT7YDZ
-        URDzYzj3ypDwVGagHUmRlb6Wjj7WevT/XncPuMIRgZh+8067dnTdjTLZ9dAXKQn7fdCkXZ
-        665Pk57zhHySUtiPYi9FUeK8y3atlLE=
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 65E32ABDA;
-        Fri, 29 Jan 2021 07:35:07 +0000 (UTC)
-Subject: Re: [PATCH v2] xen-blkback: fix compatibility bug with single page
- rings
-To:     Dongli Zhang <dongli.zhang@oracle.com>,
-        Paul Durrant <paul@xen.org>, xen-devel@lists.xenproject.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Paul Durrant <pdurrant@amazon.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
-        Jens Axboe <axboe@kernel.dk>
-References: <20210128130441.11744-1-paul@xen.org>
- <c3a476c5-c671-4429-73d5-0bf7ced1a06b@oracle.com>
-From:   =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
-Message-ID: <7fb64e2f-141a-c848-0f8a-2313d2e821b6@suse.com>
-Date:   Fri, 29 Jan 2021 08:35:06 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.1
+        id S232349AbhA2Hiu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 29 Jan 2021 02:38:50 -0500
+Received: from out30-43.freemail.mail.aliyun.com ([115.124.30.43]:47752 "EHLO
+        out30-43.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232344AbhA2HiD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 29 Jan 2021 02:38:03 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R951e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04426;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=5;SR=0;TI=SMTPD_---0UNCgIG9_1611905828;
+Received: from admindeMacBook-Pro-2.local(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0UNCgIG9_1611905828)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Fri, 29 Jan 2021 15:37:08 +0800
+Subject: Re: [PATCH v2 6/6] dm: support IO polling for bio-based dm device
+From:   JeffleXu <jefflexu@linux.alibaba.com>
+To:     snitzer@redhat.com
+Cc:     joseph.qi@linux.alibaba.com, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, io-uring@vger.kernel.org
+References: <20210125121340.70459-1-jefflexu@linux.alibaba.com>
+ <20210125121340.70459-7-jefflexu@linux.alibaba.com>
+Message-ID: <e075bfe1-6991-bbfa-4d92-040a123f0a2b@linux.alibaba.com>
+Date:   Fri, 29 Jan 2021 15:37:08 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.6.1
 MIME-Version: 1.0
-In-Reply-To: <c3a476c5-c671-4429-73d5-0bf7ced1a06b@oracle.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="KTNhVyFFfyx2e8FCQZ7SGPr0cJJ2X0WH9"
+In-Reply-To: <20210125121340.70459-7-jefflexu@linux.alibaba.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---KTNhVyFFfyx2e8FCQZ7SGPr0cJJ2X0WH9
-Content-Type: multipart/mixed; boundary="v0ECwaP7zIbuMUDrGMvLowgnhMmWanZZI";
- protected-headers="v1"
-From: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
-To: Dongli Zhang <dongli.zhang@oracle.com>, Paul Durrant <paul@xen.org>,
- xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: Paul Durrant <pdurrant@amazon.com>,
- Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
- =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
- Jens Axboe <axboe@kernel.dk>
-Message-ID: <7fb64e2f-141a-c848-0f8a-2313d2e821b6@suse.com>
-Subject: Re: [PATCH v2] xen-blkback: fix compatibility bug with single page
- rings
-References: <20210128130441.11744-1-paul@xen.org>
- <c3a476c5-c671-4429-73d5-0bf7ced1a06b@oracle.com>
-In-Reply-To: <c3a476c5-c671-4429-73d5-0bf7ced1a06b@oracle.com>
-
---v0ECwaP7zIbuMUDrGMvLowgnhMmWanZZI
-Content-Type: multipart/mixed;
- boundary="------------23E2E4DE08DE09AA38981101"
-Content-Language: en-US
-
-This is a multi-part message in MIME format.
---------------23E2E4DE08DE09AA38981101
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-
-On 29.01.21 07:20, Dongli Zhang wrote:
->=20
->=20
-> On 1/28/21 5:04 AM, Paul Durrant wrote:
->> From: Paul Durrant <pdurrant@amazon.com>
->>
->> Prior to commit 4a8c31a1c6f5 ("xen/blkback: rework connect_ring() to a=
-void
->> inconsistent xenstore 'ring-page-order' set by malicious blkfront"), t=
-he
->> behaviour of xen-blkback when connecting to a frontend was:
->>
->> - read 'ring-page-order'
->> - if not present then expect a single page ring specified by 'ring-ref=
-'
->> - else expect a ring specified by 'ring-refX' where X is between 0 and=
-
->>    1 << ring-page-order
->>
->> This was correct behaviour, but was broken by the afforementioned comm=
-it to
->> become:
->>
->> - read 'ring-page-order'
->> - if not present then expect a single page ring (i.e. ring-page-order =
-=3D 0)
->> - expect a ring specified by 'ring-refX' where X is between 0 and
->>    1 << ring-page-order
->> - if that didn't work then see if there's a single page ring specified=
- by
->>    'ring-ref'
->>
->> This incorrect behaviour works most of the time but fails when a front=
-end
->> that sets 'ring-page-order' is unloaded and replaced by one that does =
-not
->> because, instead of reading 'ring-ref', xen-blkback will read the stal=
-e
->> 'ring-ref0' left around by the previous frontend will try to map the w=
-rong
->> grant reference.
->>
->> This patch restores the original behaviour.
->>
->> Fixes: 4a8c31a1c6f5 ("xen/blkback: rework connect_ring() to avoid inco=
-nsistent xenstore 'ring-page-order' set by malicious blkfront")
->> Signed-off-by: Paul Durrant <pdurrant@amazon.com>
->> ---
->> Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
->> Cc: "Roger Pau Monn=C3=A9" <roger.pau@citrix.com>
->> Cc: Jens Axboe <axboe@kernel.dk>
->> Cc: Dongli Zhang <dongli.zhang@oracle.com>
->>
->> v2:
->>   - Remove now-spurious error path special-case when nr_grefs =3D=3D 1=
-
->> ---
->>   drivers/block/xen-blkback/common.h |  1 +
->>   drivers/block/xen-blkback/xenbus.c | 38 +++++++++++++---------------=
---
->>   2 files changed, 17 insertions(+), 22 deletions(-)
->>
->> diff --git a/drivers/block/xen-blkback/common.h b/drivers/block/xen-bl=
-kback/common.h
->> index b0c71d3a81a0..524a79f10de6 100644
->> --- a/drivers/block/xen-blkback/common.h
->> +++ b/drivers/block/xen-blkback/common.h
->> @@ -313,6 +313,7 @@ struct xen_blkif {
->>  =20
->>   	struct work_struct	free_work;
->>   	unsigned int 		nr_ring_pages;
->> +	bool                    multi_ref;
->=20
-> Is it really necessary to introduce 'multi_ref' here or we may just re-=
-use
-> 'nr_ring_pages'?
->=20
-> According to blkfront code, 'ring-page-order' is set only when it is no=
-t zero,
-> that is, only when (info->nr_ring_pages > 1).
-
-Did you look into all other OS's (Windows, OpenBSD, FreebSD, NetBSD,
-Solaris, Netware, other proprietary systems) implementations to verify
-that claim?
-
-I don't think so. So better safe than sorry.
 
 
-Juergen
+On 1/25/21 8:13 PM, Jeffle Xu wrote:
+> DM will iterate and poll all polling hardware queues of all target mq
+> devices when polling IO for dm device. To mitigate the race introduced
+> by iterating all target hw queues, a per-hw-queue flag is maintained
+> to indicate whether this polling hw queue currently being polled on or
+> not. Every polling hw queue is exclusive to one polling instance, i.e.,
+> the polling instance will skip this polling hw queue if this hw queue
+> currently is being polled by another polling instance, and start
+> polling on the next hw queue.
+> 
+> IO polling is enabled when all underlying target devices are capable
+> of IO polling. The sanity check supports the stacked device model, in
+> which one dm device may be build upon another dm device. In this case,
+> the mapped device will check if the underlying dm target device
+> supports IO polling.
+> 
+> Signed-off-by: Jeffle Xu <jefflexu@linux.alibaba.com>
+> ---
+>  block/blk-core.c      |   8 ++-
+>  drivers/md/dm-core.h  |  21 +++++++
+>  drivers/md/dm-table.c | 127 ++++++++++++++++++++++++++++++++++++++++++
+>  drivers/md/dm.c       |  37 ++++++++++++
+>  4 files changed, 192 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index 3d93aaa9a49b..d81a5f0faa1d 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -1150,7 +1150,13 @@ int blk_poll(struct request_queue *q, blk_qc_t cookie, bool spin)
+>  	struct blk_mq_hw_ctx *hctx = NULL;
+>  	struct gendisk *disk = NULL;
+>  
+> -	if (!blk_qc_t_valid(cookie) ||
+> +	/*
+> +	 * In case of bio-base polling, the returned cookie is actually that of
+> +	 * the last split bio. Thus the returned cookie may be BLK_QC_T_NONE,
+> +	 * while the previous split bios have already been submitted and queued
+> +	 * into the polling hw queue.
+> +	 */
+> +	if ((queue_is_mq(q) && !blk_qc_t_valid(cookie)) ||
+>  	    !test_bit(QUEUE_FLAG_POLL, &q->queue_flags))
+>  		return 0;
+>  
+> diff --git a/drivers/md/dm-core.h b/drivers/md/dm-core.h
+> index 086d293c2b03..5a0391aa5cc7 100644
+> --- a/drivers/md/dm-core.h
+> +++ b/drivers/md/dm-core.h
+> @@ -127,6 +127,24 @@ static inline struct dm_stats *dm_get_stats(struct mapped_device *md)
+>  
+>  #define DM_TABLE_MAX_DEPTH 16
+>  
+> +enum target_ctx_type {
+> +	TARGET_TYPE_MQ,
+> +	TARGET_TYPE_DM,
+> +};
+> +
+> +struct target_ctx {
+> +	union {
+> +		struct {
+> +			struct blk_mq_hw_ctx *hctx;
+> +			struct request_queue *q;
+> +			atomic_t busy;
+> +		};
+> +		struct mapped_device *md;
+> +	};
+> +
+> +	int type;
+> +};
+> +
 
---------------23E2E4DE08DE09AA38981101
-Content-Type: application/pgp-keys;
- name="OpenPGP_0xB0DE9DD628BF132F.asc"
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: attachment;
- filename="OpenPGP_0xB0DE9DD628BF132F.asc"
+I suddenly realize that this implementation is somehow problematic. This
+implementation actually buffers hctx of underlying mq device. This can
+be problematic when the hctx of uderlying mq device can be dynamiclly
+changed at runtime.
 
------BEGIN PGP PUBLIC KEY BLOCK-----
+For example, nvme RESET command can trigger this issue. Users can send
+nvme RESET command while there's already one dm device built upon this
+nvme device. In this case, the hctx map of nvme device will be
+reallocated when there's one dm device built upon this nvme device. And
+the original old 'struct blk_mq_hw_ctx *hctx' buffered in the dm layer
+can be out-of-date.
 
-xsBNBFOMcBYBCACgGjqjoGvbEouQZw/ToiBg9W98AlM2QHV+iNHsEs7kxWhKMjrioyspZKOBy=
-cWx
-w3ie3j9uvg9EOB3aN4xiTv4qbnGiTr3oJhkB1gsb6ToJQZ8uxGq2kaV2KL9650I1SJvedYm8O=
-f8Z
-d621lSmoKOwlNClALZNew72NjJLEzTalU1OdT7/i1TXkH09XSSI8mEQ/ouNcMvIJNwQpd369y=
-9bf
-IhWUiVXEK7MlRgUG6MvIj6Y3Am/BBLUVbDa4+gmzDC9ezlZkTZG2t14zWPvxXP3FAp2pkW0xq=
-G7/
-377qptDmrk42GlSKN4z76ELnLxussxc7I2hx18NUcbP8+uty4bMxABEBAAHNHEp1ZXJnZW4gR=
-3Jv
-c3MgPGpnQHBmdXBmLm5ldD7CwHkEEwECACMFAlOMcBYCGwMHCwkIBwMCAQYVCAIJCgsEFgIDA=
-QIe
-AQIXgAAKCRCw3p3WKL8TL0KdB/93FcIZ3GCNwFU0u3EjNbNjmXBKDY4FUGNQH2lvWAUy+dnyT=
-hpw
-dtF/jQ6j9RwE8VP0+NXcYpGJDWlNb9/JmYqLiX2Q3TyevpB0CA3dbBQp0OW0fgCetToGIQrg0=
-MbD
-1C/sEOv8Mr4NAfbauXjZlvTj30H2jO0u+6WGM6nHwbh2l5O8ZiHkH32iaSTfN7Eu5RnNVUJbv=
-oPH
-Z8SlM4KWm8rG+lIkGurqqu5gu8q8ZMKdsdGC4bBxdQKDKHEFExLJK/nRPFmAuGlId1E3fe10v=
-5QL
-+qHI3EIPtyfE7i9Hz6rVwi7lWKgh7pe0ZvatAudZ+JNIlBKptb64FaiIOAWDCx1SzR9KdWVyZ=
-2Vu
-IEdyb3NzIDxqZ3Jvc3NAc3VzZS5jb20+wsB5BBMBAgAjBQJTjHCvAhsDBwsJCAcDAgEGFQgCC=
-QoL
-BBYCAwECHgECF4AACgkQsN6d1ii/Ey/HmQf/RtI7kv5A2PS4RF7HoZhPVPogNVbC4YA6lW7Dr=
-Wf0
-teC0RR3MzXfy6pJ+7KLgkqMlrAbN/8Dvjoz78X+5vhH/rDLa9BuZQlhFmvcGtCF8eR0T1v0nC=
-/nu
-AFVGy+67q2DH8As3KPu0344TBDpAvr2uYM4tSqxK4DURx5INz4ZZ0WNFHcqsfvlGJALDeE0Lh=
-ITT
-d9jLzdDad1pQSToCnLl6SBJZjDOX9QQcyUigZFtCXFst4dlsvddrxyqT1f17+2cFSdu7+ynLm=
-XBK
-7abQ3rwJY8SbRO2iRulogc5vr/RLMMlscDAiDkaFQWLoqHHOdfO9rURssHNN8WkMnQfvUewRz=
-80h
-SnVlcmdlbiBHcm9zcyA8amdyb3NzQG5vdmVsbC5jb20+wsB5BBMBAgAjBQJTjHDXAhsDBwsJC=
-AcD
-AgEGFQgCCQoLBBYCAwECHgECF4AACgkQsN6d1ii/Ey8PUQf/ehmgCI9jB9hlgexLvgOtf7PJn=
-FOX
-gMLdBQgBlVPO3/D9R8LtF9DBAFPNhlrsfIG/SqICoRCqUcJ96Pn3P7UUinFG/I0ECGF4EvTE1=
-jnD
-kfJZr6jrbjgyoZHiw/4BNwSTL9rWASyLgqlA8u1mf+c2yUwcGhgkRAd1gOwungxcwzwqgljf0=
-N51
-N5JfVRHRtyfwq/ge+YEkDGcTU6Y0sPOuj4Dyfm8fJzdfHNQsWq3PnczLVELStJNdapwPOoE+l=
-otu
-fe3AM2vAEYJ9rTz3Cki4JFUsgLkHFqGZarrPGi1eyQcXeluldO3m91NK/1xMI3/+8jbO0tsn1=
-tqS
-EUGIJi7ox80eSnVlcmdlbiBHcm9zcyA8amdyb3NzQHN1c2UuZGU+wsB5BBMBAgAjBQJTjHDrA=
-hsD
-BwsJCAcDAgEGFQgCCQoLBBYCAwECHgECF4AACgkQsN6d1ii/Ey+LhQf9GL45eU5vOowA2u5N3=
-g3O
-ZUEBmDHVVbqMtzwlmNC4k9Kx39r5s2vcFl4tXqW7g9/ViXYuiDXb0RfUpZiIUW89siKrkzmQ5=
-dM7
-wRqzgJpJwK8Bn2MIxAKArekWpiCKvBOB/Cc+3EXE78XdlxLyOi/NrmSGRIov0karw2RzMNOu5=
-D+j
-LRZQd1Sv27AR+IP3I8U4aqnhLpwhK7MEy9oCILlgZ1QZe49kpcumcZKORmzBTNh30FVKK1Evm=
-V2x
-AKDoaEOgQB4iFQLhJCdP1I5aSgM5IVFdn7v5YgEYuJYx37IoN1EblHI//x/e2AaIHpzK5h88N=
-Eaw
-QsaNRpNSrcfbFmAg987ATQRTjHAWAQgAyzH6AOODMBjgfWE9VeCgsrwH3exNAU32gLq2xvjpW=
-nHI
-s98ndPUDpnoxWQugJ6MpMncr0xSwFmHEgnSEjK/PAjppgmyc57BwKII3sV4on+gDVFJR6Y8ZR=
-wgn
-BC5mVM6JjQ5xDk8WRXljExRfUX9pNhdE5eBOZJrDRoLUmmjDtKzWaDhIg/+1Hzz93X4fCQkNV=
-bVF
-LELU9bMaLPBG/x5q4iYZ2k2ex6d47YE1ZFdMm6YBYMOljGkZKwYde5ldM9mo45mmwe0icXKLk=
-pEd
-IXKTZeKDO+Hdv1aqFuAcccTg9RXDQjmwhC3yEmrmcfl0+rPghO0Iv3OOImwTEe4co3c1mwARA=
-QAB
-wsBfBBgBAgAJBQJTjHAWAhsMAAoJELDendYovxMvQ/gH/1ha96vm4P/L+bQpJwrZ/dneZcmEw=
-Tbe
-8YFsw2V/Buv6Z4Mysln3nQK5ZadD534CF7TDVft7fC4tU4PONxF5D+/tvgkPfDAfF77zy2AH1=
-vJz
-Q1fOU8lYFpZXTXIHb+559UqvIB8AdgR3SAJGHHt4RKA0F7f5ipYBBrC6cyXJyyoprT10EMvU8=
-VGi
-wXvTyJz3fjoYsdFzpWPlJEBRMedCot60g5dmbdrZ5DWClAr0yau47zpWj3enf1tLWaqcsuylW=
-svi
-uGjKGw7KHQd3bxALOknAp4dN3QwBYCKuZ7AddY9yjynVaD5X7nF9nO5BjR/i1DG86lem3iBDX=
-zXs
-ZDn8R38=3D
-=3D2wuH
------END PGP PUBLIC KEY BLOCK-----
+Maybe we could embed 'atomic_t busy' in 'struct blk_mq_hw_ctx', and
+block layer needs to export one interface iterating all hw queues of
+given device, just like what I did in the very first RFC version patch:
 
---------------23E2E4DE08DE09AA38981101--
 
---v0ECwaP7zIbuMUDrGMvLowgnhMmWanZZI--
++#define queue_for_each_poll_hw_ctx(q, hctx, i)			\
++for ((i) = 0; ((q)->tag_set->nr_maps > HCTX_TYPE_POLL) &&	\
++     (i) < (q)->tag_set->map[HCTX_TYPE_POLL].nr_queues &&	\
++({ hctx =
+(q)->queue_hw_ctx[((q)->tag_set->map[HCTX_TYPE_POLL].queue_offset +
+(i))]; 1; }); \
++(i)++)
 
---KTNhVyFFfyx2e8FCQZ7SGPr0cJJ2X0WH9
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature"
 
------BEGIN PGP SIGNATURE-----
 
-wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmATuqoFAwAAAAAACgkQsN6d1ii/Ey80
-kwf/e41zDqm+jP5oJsLO4FvTwwwFeSs6ARV+zlLQCldBq5oB1HPuzNpjQsE704m/eUEZzMZy2/7W
-Z1pKAwvSLzPQyyx7Rw8pJKJuNio7oIAiCKAiupU3rJBmorI3CCLlbpwfdFGkuKJ8GxZs193BL+WC
-3dNKyBC4aFT3khnmT5y/9PF08Ms9YYVOYPq+6KOM0MbsseD9d4E9LwsC1wzWG9EUA5Ckh8wIZ3XR
-VO1561Q2S36zukXwzbvsGOk9JmD/1kjjR26wsC0JAYU5JKIJxAeeR9V1ZXXrcLjbmwC8KPF+mhOP
-/9Obe9R6O6mT4jKwbmwqJBYjBBJvMsSkKdry2YZZRg==
-=KyR6
------END PGP SIGNATURE-----
+>  struct dm_table {
+>  	struct mapped_device *md;
+>  	enum dm_queue_mode type;
+> @@ -162,6 +180,9 @@ struct dm_table {
+>  	void *event_context;
+>  
+>  	struct dm_md_mempools *mempools;
+> +
+> +	int num_ctx;
+> +	struct target_ctx *ctxs;
+>  };
+>  
+>  static inline struct completion *dm_get_completion_from_kobject(struct kobject *kobj)
+> diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
+> index 188f41287f18..397bb5f57626 100644
+> --- a/drivers/md/dm-table.c
+> +++ b/drivers/md/dm-table.c
+> @@ -215,6 +215,8 @@ void dm_table_destroy(struct dm_table *t)
+>  
+>  	dm_free_md_mempools(t->mempools);
+>  
+> +	kfree(t->ctxs);
+> +
+>  	kfree(t);
+>  }
+>  
+> @@ -1194,6 +1196,114 @@ static int dm_table_register_integrity(struct dm_table *t)
+>  	return 0;
+>  }
+>  
+> +static int device_supports_poll(struct dm_target *ti, struct dm_dev *dev,
+> +				sector_t start, sector_t len, void *data)
+> +{
+> +	struct request_queue *q = bdev_get_queue(dev->bdev);
+> +
+> +	return q && test_bit(QUEUE_FLAG_POLL, &q->queue_flags);
+> +}
+> +
+> +static bool dm_table_supports_poll(struct dm_table *t)
+> +{
+> +	struct dm_target *ti;
+> +	unsigned int i;
+> +
+> +	/* Ensure that all targets support iopoll. */
+> +	for (i = 0; i < dm_table_get_num_targets(t); i++) {
+> +		ti = dm_table_get_target(t, i);
+> +
+> +		if (!ti->type->iterate_devices ||
+> +		    !ti->type->iterate_devices(ti, device_supports_poll, NULL))
+> +			return false;
+> +	}
+> +
+> +	return true;
+> +}
+> +
+> +static int dm_table_calc_target_ctxs(struct dm_target *ti,
+> +		struct dm_dev *dev,
+> +		sector_t start, sector_t len,
+> +		void *data)
+> +{
+> +	int *num = data;
+> +	struct request_queue *q = dev->bdev->bd_disk->queue;
+> +
+> +	if (queue_is_mq(q))
+> +		*num += q->tag_set->map[HCTX_TYPE_POLL].nr_queues;
+> +	else
+> +		*num += 1;
+> +
+> +	return 0;
+> +}
+> +
+> +static int dm_table_fill_target_ctxs(struct dm_target *ti,
+> +		struct dm_dev *dev,
+> +		sector_t start, sector_t len,
+> +		void *data)
+> +{
+> +	int *index = data;
+> +	struct target_ctx *ctx;
+> +	struct request_queue *q = dev->bdev->bd_disk->queue;
+> +
+> +	if (queue_is_mq(q)) {
+> +		int i;
+> +		int num = q->tag_set->map[HCTX_TYPE_POLL].nr_queues;
+> +		int offset = q->tag_set->map[HCTX_TYPE_POLL].queue_offset;
+> +
+> +		for (i = 0; i < num; i++) {
+> +			ctx = &ti->table->ctxs[(*index)++];
+> +			ctx->q = q;
+> +			ctx->hctx = q->queue_hw_ctx[offset + i];
+> +			ctx->type = TARGET_TYPE_MQ;
+> +			/* ctx->busy has been initialized to zero */
+> +		}
+> +	} else {
+> +		struct mapped_device *md = dev->bdev->bd_disk->private_data;
+> +
+> +		ctx = &ti->table->ctxs[(*index)++];
+> +		ctx->md = md;
+> +		ctx->type = TARGET_TYPE_DM;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static int dm_table_build_target_ctxs(struct dm_table *t)
+> +{
+> +	int i, num = 0, index = 0;
+> +
+> +	if (!__table_type_bio_based(t->type) || !dm_table_supports_poll(t))
+> +		return 0;
+> +
+> +	for (i = 0; i < t->num_targets; i++) {
+> +		struct dm_target *ti = dm_table_get_target(t, i);
+> +
+> +		if (ti->type->iterate_devices)
+> +			ti->type->iterate_devices(ti, dm_table_calc_target_ctxs,
+> +					&num);
+> +	}
+> +
+> +	if (WARN_ON(!num))
+> +		return 0;
+> +
+> +	t->num_ctx = num;
+> +
+> +	t->ctxs = kcalloc(num, sizeof(struct target_ctx), GFP_KERNEL);
+> +	if (!t->ctxs)
+> +		return -ENOMEM;
+> +
+> +	for (i = 0; i < t->num_targets; i++) {
+> +		struct dm_target *ti = dm_table_get_target(t, i);
+> +
+> +		if (ti->type->iterate_devices)
+> +			ti->type->iterate_devices(ti, dm_table_fill_target_ctxs,
+> +					&index);
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>  /*
+>   * Prepares the table for use by building the indices,
+>   * setting the type, and allocating mempools.
+> @@ -1224,6 +1334,10 @@ int dm_table_complete(struct dm_table *t)
+>  	if (r)
+>  		DMERR("unable to allocate mempools");
+>  
+> +	r = dm_table_build_target_ctxs(t);
+> +	if (r)
+> +		DMERR("unable to build target hctxs");
+> +
+>  	return r;
+>  }
+>  
+> @@ -1883,6 +1997,19 @@ void dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
+>  #endif
+>  
+>  	blk_queue_update_readahead(q);
+> +
+> +	/*
+> +	 * Check for request-based device is remained to
+> +	 * dm_mq_init_request_queue()->blk_mq_init_allocated_queue().
+> +	 * Also clear previously set QUEUE_FLAG_POLL* if the new table doesn't
+> +	 * support iopoll while reloading table.
+> +	 */
+> +	if (__table_type_bio_based(t->type)) {
+> +		if (t->ctxs)
+> +			q->queue_flags |= QUEUE_FLAG_POLL_MASK;
+> +		else
+> +			q->queue_flags &= ~QUEUE_FLAG_POLL_MASK;
+> +	}
+>  }
+>  
+>  unsigned int dm_table_get_num_targets(struct dm_table *t)
+> diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+> index 46ca3b739396..e2be1caa086a 100644
+> --- a/drivers/md/dm.c
+> +++ b/drivers/md/dm.c
+> @@ -1657,6 +1657,42 @@ static blk_qc_t dm_submit_bio(struct bio *bio)
+>  	return BLK_QC_T_NONE;
+>  }
+>  
+> +
+> +static int dm_poll_one_md(struct mapped_device *md)
+> +{
+> +	int i, num_ctx, srcu_idx, ret = 0;
+> +	struct dm_table *t;
+> +	struct target_ctx *ctxs;
+> +
+> +	t = dm_get_live_table(md, &srcu_idx);
+> +	num_ctx = t->num_ctx;
+> +	ctxs = t->ctxs;
+> +
+> +	for (i = 0; i < num_ctx; i++) {
+> +		struct target_ctx *ctx = &ctxs[i];
+> +
+> +		if (ctx->type == TARGET_TYPE_MQ) {
+> +			if (!atomic_cmpxchg(&ctx->busy, 0, 1)) {
+> +				ret += blk_mq_poll(ctx->q, ctx->hctx);
+> +				atomic_set(&ctx->busy, 0);
+> +			}
+> +		} else
+> +			ret += dm_poll_one_md(ctx->md);
+> +	}
+> +
+> +	dm_put_live_table(md, srcu_idx);
+> +
+> +	return ret;
+> +}
+> +
+> +static int dm_bio_poll(struct request_queue *q, blk_qc_t cookie)
+> +{
+> +	struct gendisk *disk = queue_to_disk(q);
+> +	struct mapped_device *md= disk->private_data;
+> +
+> +	return dm_poll_one_md(md);
+> +}
+> +
+>  /*-----------------------------------------------------------------
+>   * An IDR is used to keep track of allocated minor numbers.
+>   *---------------------------------------------------------------*/
+> @@ -3049,6 +3085,7 @@ static const struct pr_ops dm_pr_ops = {
+>  };
+>  
+>  static const struct block_device_operations dm_blk_dops = {
+> +	.iopoll = dm_bio_poll,
+>  	.submit_bio = dm_submit_bio,
+>  	.open = dm_blk_open,
+>  	.release = dm_blk_close,
+> 
 
---KTNhVyFFfyx2e8FCQZ7SGPr0cJJ2X0WH9--
+-- 
+Thanks,
+Jeffle
