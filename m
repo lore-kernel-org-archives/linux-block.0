@@ -7,29 +7,29 @@ X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E57EC433DB
-	for <linux-block@archiver.kernel.org>; Fri, 29 Jan 2021 03:31:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 104E0C433DB
+	for <linux-block@archiver.kernel.org>; Fri, 29 Jan 2021 03:38:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C0C8764DEE
-	for <linux-block@archiver.kernel.org>; Fri, 29 Jan 2021 03:31:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D6E9E64DFB
+	for <linux-block@archiver.kernel.org>; Fri, 29 Jan 2021 03:38:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229786AbhA2Dbb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Jan 2021 22:31:31 -0500
-Received: from szxga02-in.huawei.com ([45.249.212.188]:2973 "EHLO
-        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229757AbhA2Dba (ORCPT
+        id S231287AbhA2DiG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Jan 2021 22:38:06 -0500
+Received: from szxga03-in.huawei.com ([45.249.212.189]:2885 "EHLO
+        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231267AbhA2DiF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Jan 2021 22:31:30 -0500
-Received: from DGGEMM401-HUB.china.huawei.com (unknown [172.30.72.55])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4DRjWL00zRz5MTk;
-        Fri, 29 Jan 2021 11:29:33 +0800 (CST)
+        Thu, 28 Jan 2021 22:38:05 -0500
+Received: from DGGEMM405-HUB.china.huawei.com (unknown [172.30.72.53])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4DRjfY5zP5z5LZt;
+        Fri, 29 Jan 2021 11:35:49 +0800 (CST)
 Received: from dggema772-chm.china.huawei.com (10.1.198.214) by
- DGGEMM401-HUB.china.huawei.com (10.3.20.209) with Microsoft SMTP Server (TLS)
- id 14.3.498.0; Fri, 29 Jan 2021 11:30:47 +0800
+ DGGEMM405-HUB.china.huawei.com (10.3.20.213) with Microsoft SMTP Server (TLS)
+ id 14.3.498.0; Fri, 29 Jan 2021 11:37:23 +0800
 Received: from [10.169.42.93] (10.169.42.93) by dggema772-chm.china.huawei.com
  (10.1.198.214) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2106.2; Fri, 29
- Jan 2021 11:30:47 +0800
+ Jan 2021 11:37:22 +0800
 Subject: Re: [PATCH v4 4/5] nvme-rdma: avoid IO error for nvme native
  multipath
 To:     Sagi Grimberg <sagi@grimberg.me>, <linux-nvme@lists.infradead.org>
@@ -43,8 +43,8 @@ References: <20210126081539.13320-1-lengchao@huawei.com>
  <29ccc5e0-66e9-93db-e9b9-09012f1c8fe2@huawei.com>
  <1651456a-3251-77db-42c9-fc1a2d2c5c13@grimberg.me>
 From:   Chao Leng <lengchao@huawei.com>
-Message-ID: <b5b70392-d4f7-6f0c-d337-a6023dc4b992@huawei.com>
-Date:   Fri, 29 Jan 2021 11:30:46 +0800
+Message-ID: <6b01cd8e-a153-1913-4e2f-0c3ce1029ccf@huawei.com>
+Date:   Fri, 29 Jan 2021 11:37:21 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
  Thunderbird/68.9.0
 MIME-Version: 1.0
@@ -53,7 +53,7 @@ Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-Originating-IP: [10.169.42.93]
-X-ClientProxiedBy: dggeme709-chm.china.huawei.com (10.1.199.105) To
+X-ClientProxiedBy: dggeme714-chm.china.huawei.com (10.1.199.110) To
  dggema772-chm.china.huawei.com (10.1.198.214)
 X-CFilter-Loop: Reflected
 Precedence: bulk
@@ -105,7 +105,8 @@ On 2021/1/29 11:24, Sagi Grimberg wrote:
 >                           */
 >                          req->status = NVME_SC_HOST_PATH_ERROR;
 >                          nvme_rdma_complete_rq(rq);
->                          return BLK_STS_OK;Need to do clean. so can not directly return.
+>                          return BLK_STS_OK;
+Need to do clean. so can not directly return.
 > 
 >                  }
 >                  goto err_unmap;
