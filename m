@@ -2,143 +2,117 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4EA5C433E0
-	for <linux-block@archiver.kernel.org>; Fri, 29 Jan 2021 02:01:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9448BC433DB
+	for <linux-block@archiver.kernel.org>; Fri, 29 Jan 2021 02:50:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AD85F64DFB
-	for <linux-block@archiver.kernel.org>; Fri, 29 Jan 2021 02:01:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5593064DFD
+	for <linux-block@archiver.kernel.org>; Fri, 29 Jan 2021 02:50:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231165AbhA2CBw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Jan 2021 21:01:52 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37662 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229627AbhA2CBw (ORCPT
+        id S229786AbhA2Ctm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Jan 2021 21:49:42 -0500
+Received: from szxga08-in.huawei.com ([45.249.212.255]:2803 "EHLO
+        szxga08-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229757AbhA2Ctl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Jan 2021 21:01:52 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611885623;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=jvsWOYvnGH9qfhesPAqZTHFgQmGBJIhRAqLETvnXfbQ=;
-        b=QVcbvOdH90vsseap6cTtuul2rkFUE0b/GOPKSIGFnoCRkQKwhGIMWvq2YCffAMd/Sj7IHb
-        gMJxq0aw4FBgmcKRTAvdJjI1N7PvBsmnC2A83pXMS2AwDlagdylx68Pc6YeZlzrDnnKIDE
-        Y6jKQg4IvPYjuZbgej1QVESYV747ZSM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-7-L6ckcgGaPCm-8SB16bMQGA-1; Thu, 28 Jan 2021 21:00:20 -0500
-X-MC-Unique: L6ckcgGaPCm-8SB16bMQGA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 92610802B48;
-        Fri, 29 Jan 2021 02:00:19 +0000 (UTC)
-Received: from T590 (ovpn-13-35.pek2.redhat.com [10.72.13.35])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 859E62719F;
-        Fri, 29 Jan 2021 02:00:14 +0000 (UTC)
-Date:   Fri, 29 Jan 2021 10:00:10 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Pavel Begunkov <asml.silence@gmail.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Subject: Re: [RFC 2/2] block: add a fast path for seg split of large bio
-Message-ID: <20210129020010.GD1649137@T590>
-References: <cover.1609875589.git.asml.silence@gmail.com>
- <53b86d4e86c4913658cb0f472dcc3e22ef75396b.1609875589.git.asml.silence@gmail.com>
- <20210128121035.GA1495297@T590>
- <48e8c791-fe4a-60c7-aa8b-bcaf0f5562c9@gmail.com>
+        Thu, 28 Jan 2021 21:49:41 -0500
+Received: from DGGEMM401-HUB.china.huawei.com (unknown [172.30.72.53])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4DRhZC1JCrz13mL4;
+        Fri, 29 Jan 2021 10:46:59 +0800 (CST)
+Received: from dggema772-chm.china.huawei.com (10.1.198.214) by
+ DGGEMM401-HUB.china.huawei.com (10.3.20.209) with Microsoft SMTP Server (TLS)
+ id 14.3.498.0; Fri, 29 Jan 2021 10:48:59 +0800
+Received: from [10.169.42.93] (10.169.42.93) by dggema772-chm.china.huawei.com
+ (10.1.198.214) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2106.2; Fri, 29
+ Jan 2021 10:48:58 +0800
+Subject: Re: [PATCH v4 4/5] nvme-rdma: avoid IO error for nvme native
+ multipath
+To:     Sagi Grimberg <sagi@grimberg.me>, <linux-nvme@lists.infradead.org>
+CC:     <kbusch@kernel.org>, <axboe@fb.com>, <hch@lst.de>,
+        <linux-block@vger.kernel.org>, <axboe@kernel.dk>
+References: <20210126081539.13320-1-lengchao@huawei.com>
+ <20210126081539.13320-5-lengchao@huawei.com>
+ <5a368693-65fd-1bdf-924a-f90df7f59b2a@grimberg.me>
+ <9c30b18a-6fdd-be1c-f3bc-1d44c35ae274@huawei.com>
+ <ca300cac-1f6c-01b2-8691-9a545381523a@grimberg.me>
+From:   Chao Leng <lengchao@huawei.com>
+Message-ID: <29ccc5e0-66e9-93db-e9b9-09012f1c8fe2@huawei.com>
+Date:   Fri, 29 Jan 2021 10:48:57 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <48e8c791-fe4a-60c7-aa8b-bcaf0f5562c9@gmail.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <ca300cac-1f6c-01b2-8691-9a545381523a@grimberg.me>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.169.42.93]
+X-ClientProxiedBy: dggeme715-chm.china.huawei.com (10.1.199.111) To
+ dggema772-chm.china.huawei.com (10.1.198.214)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jan 28, 2021 at 12:27:39PM +0000, Pavel Begunkov wrote:
-> On 28/01/2021 12:10, Ming Lei wrote:
-> > On Tue, Jan 05, 2021 at 07:43:38PM +0000, Pavel Begunkov wrote:
-> >> blk_bio_segment_split() is very heavy, but the current fast path covers
-> >> only one-segment under PAGE_SIZE bios. Add another one by estimating an
-> >> upper bound of sectors a bio can contain.
-> >>
-> >> One restricting factor here is queue_max_segment_size(), which it
-> >> compare against full iter size to not dig into bvecs. By default it's
-> >> 64KB, and so for requests under 64KB, but for those falling under the
-> >> conditions it's much faster.
-> >>
-> >> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-> >> ---
-> >>  block/blk-merge.c | 29 +++++++++++++++++++++++++----
-> >>  1 file changed, 25 insertions(+), 4 deletions(-)
-> >>
-> >> diff --git a/block/blk-merge.c b/block/blk-merge.c
-> >> index 84b9635b5d57..15d75f3ffc30 100644
-> >> --- a/block/blk-merge.c
-> >> +++ b/block/blk-merge.c
-> >> @@ -226,12 +226,12 @@ static bool bvec_split_segs(const struct request_queue *q,
-> >>  static struct bio *__blk_bio_segment_split(struct request_queue *q,
-> >>  					   struct bio *bio,
-> >>  					   struct bio_set *bs,
-> >> -					   unsigned *segs)
-> >> +					   unsigned *segs,
-> >> +					   const unsigned max_sectors)
-> >>  {
-> >>  	struct bio_vec bv, bvprv, *bvprvp = NULL;
-> >>  	struct bvec_iter iter;
-> >>  	unsigned nsegs = 0, sectors = 0;
-> >> -	const unsigned max_sectors = get_max_io_size(q, bio);
-> >>  	const unsigned max_segs = queue_max_segments(q);
-> >>  
-> >>  	bio_for_each_bvec(bv, bio, iter) {
-> >> @@ -295,6 +295,9 @@ static inline struct bio *blk_bio_segment_split(struct request_queue *q,
-> >>  						struct bio_set *bs,
-> >>  						unsigned *nr_segs)
-> >>  {
-> >> +	unsigned int max_sectors, q_max_sectors;
-> >> +	unsigned int bio_segs = bio->bi_vcnt;
-> >> +
-> >>  	/*
-> >>  	 * All drivers must accept single-segments bios that are <=
-> >>  	 * PAGE_SIZE.  This is a quick and dirty check that relies on
-> >> @@ -303,14 +306,32 @@ static inline struct bio *blk_bio_segment_split(struct request_queue *q,
-> >>  	 * are cloned, but compared to the performance impact of cloned
-> >>  	 * bios themselves the loop below doesn't matter anyway.
-> >>  	 */
-> >> -	if (!q->limits.chunk_sectors && bio->bi_vcnt == 1 &&
-> >> +	if (!q->limits.chunk_sectors && bio_segs == 1 &&
-> >>  	    (bio->bi_io_vec[0].bv_len +
-> >>  	     bio->bi_io_vec[0].bv_offset) <= PAGE_SIZE) {
-> >>  		*nr_segs = 1;
-> >>  		return NULL;
-> >>  	}
-> >>  
-> >> -	return __blk_bio_segment_split(q, bio, bs, nr_segs);
-> >> +	q_max_sectors = get_max_io_size(q, bio);
-> >> +	if (!queue_virt_boundary(q) && bio_segs < queue_max_segments(q) &&
-> >> +	    bio->bi_iter.bi_size <= queue_max_segment_size(q)) {
-> > 
-> > .bi_vcnt is 0 for fast cloned bio, so the above check may become true
-> > when real nr_segment is > queue_max_segments(), especially in case that
-> > max segments limit is small and segment size is big.
+
+
+On 2021/1/29 9:35, Sagi Grimberg wrote:
 > 
-> I guess we can skip the fast path for them (i.e. bi_vcnt == 0)
+>>>> @@ -2084,8 +2085,10 @@ static blk_status_t nvme_rdma_queue_rq(struct blk_mq_hw_ctx *hctx,
+>>>>       err = nvme_rdma_post_send(queue, sqe, req->sge, req->num_sge,
+>>>>               req->mr ? &req->reg_wr.wr : NULL);
+>>>> -    if (unlikely(err))
+>>>> +    if (unlikely(err)) {
+>>>> +        driver_error = true;
+>>>>           goto err_unmap;
+>>>
+>>> Why not just call set the status and call nvme_rdma_complete_rq and
+>>> return here?
+>> If the err is ENOMEM or EAGAIN, I am not sure the err must be a
+>> path-related error for all HBA drivers. So reused the error check code.
+>> I think it would be more reasonable to assume any errors returned by HBA
+>> driver as path-related errors.
+>> If you think so, I will modify it in next patch version.
+> 
+> Meant to do that only for -EIO. We should absolutely not do any of this
+> for stuff like EINVAL, EOPNOTSUPP, EPERM or any strange error that may
+> return due to a bug or anything like that.
+ok, please review again, thank you.
+---
+  drivers/nvme/host/rdma.c | 9 +++++++--
+  1 file changed, 7 insertions(+), 2 deletions(-)
 
-But bi_vcnt can't represent real segment number, which can be bigger or
-less than .bi_vcnt.
+diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
+index b7ce4f221d99..66b697461bd9 100644
+--- a/drivers/nvme/host/rdma.c
++++ b/drivers/nvme/host/rdma.c
+@@ -2084,8 +2084,13 @@ static blk_status_t nvme_rdma_queue_rq(struct blk_mq_hw_ctx *hctx,
 
-> I'm curious, why it's 0 but not the real number?
+         err = nvme_rdma_post_send(queue, sqe, req->sge, req->num_sge,
+                         req->mr ? &req->reg_wr.wr : NULL);
+-       if (unlikely(err))
++       if (unlikely(err)) {
++               if (err == -EIO) {
++                       nvme_complete_failed_rq(rq, NVME_SC_HOST_PATH_ERROR);
++                       err = 0;
++               }
+                 goto err_unmap;
++       }
 
-fast-cloned bio shares bvec table of original bio, so it doesn't have
-.bi_vcnt.
+         return BLK_STS_OK;
 
-
+@@ -2094,7 +2099,7 @@ static blk_status_t nvme_rdma_queue_rq(struct blk_mq_hw_ctx *hctx,
+  err:
+         if (err == -ENOMEM || err == -EAGAIN)
+                 ret = BLK_STS_RESOURCE;
+-       else
++       else if (err)
+                 ret = BLK_STS_IOERR;
+         nvme_cleanup_cmd(rq);
+  unmap_qe:
 -- 
-Ming
-
+> .
