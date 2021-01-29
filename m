@@ -5,101 +5,101 @@ X-Spam-Level:
 X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5203C433E9
-	for <linux-block@archiver.kernel.org>; Fri, 29 Jan 2021 04:56:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 043C7C433DB
+	for <linux-block@archiver.kernel.org>; Fri, 29 Jan 2021 05:02:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 96EE764E02
-	for <linux-block@archiver.kernel.org>; Fri, 29 Jan 2021 04:56:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BBAE564DFF
+	for <linux-block@archiver.kernel.org>; Fri, 29 Jan 2021 05:02:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231823AbhA2Ez4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Jan 2021 23:55:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59422 "EHLO
+        id S229463AbhA2FCm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 29 Jan 2021 00:02:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60864 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229757AbhA2Ezz (ORCPT
+        with ESMTP id S229461AbhA2FCl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Jan 2021 23:55:55 -0500
-Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42F8FC061574;
-        Thu, 28 Jan 2021 20:55:14 -0800 (PST)
-Received: by mail-ej1-x633.google.com with SMTP id l9so11148010ejx.3;
-        Thu, 28 Jan 2021 20:55:14 -0800 (PST)
+        Fri, 29 Jan 2021 00:02:41 -0500
+Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45E9EC061573;
+        Thu, 28 Jan 2021 21:02:01 -0800 (PST)
+Received: by mail-ej1-x62a.google.com with SMTP id r12so11135181ejb.9;
+        Thu, 28 Jan 2021 21:02:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id;
-        bh=LFbmYzoW/dOJ4Ds9GuxLWzJiVIPVogsncjpBRDxZzqE=;
-        b=G6b6hHEZQolaoYujMThrCKsmeO318Q0jyKSCNGH2d2SfQQtyNLnDWuvidfyOAs4g5j
-         FUPrXpcsDl83Vjl8JUIZMNiYyy8LdcvAJXhi+ptk2E0mpZXTuiTYF8cPCtUhVIx1xRve
-         yDAszQxrLEw94kyi+ymJlrh3VE/3xstSQEa/Icf1ob5CI/L4O8PpDbtxGdjP6mi7xvYU
-         BsHkXsUpjHbrbvLYesJuNE/0wdDxLxITddXN2Kz3Vd8o4lN2X5+h6H5zEwhcsXJsG0mA
-         PWr3dGI4f/IxGiXf1lzLWU0OCLrUT/JMvG0z3Uz5q2bNKo1xpWAtyqw6+kHoV8PagUyv
-         S8Hg==
+        bh=cWhDKyAXxdtoRhlimIC6AARbTEG5Y6B4xyJpzTlH1ic=;
+        b=TqydaINHVDf61oMmpXJSGXqjdWA9unjIvfQkItjpW465EUUD6dSHM7dg7Zyciw1wlS
+         xsoTGJWllfARh5RUWsq/rBMc56JTdf0rt7Q38k5GkB+8eDrTScy/UbX5dMEmPcXY4Sgw
+         Hnk9RJW9JrY9Pqh9OIqo96XaJUp4TbvbRQDr+utjOHUhGph5QRhlyjnaFby2ese3c2sv
+         DZfTCOAzQ0FuTzWBy//AeHqiO+CNDh9BzzHvd3F0eNojjOb1/zyEB1CxEl9QvXukaTLu
+         5HTLWB484YPQCgwQ21MINJ3t4fx3NwyL16o1I5VB2j8oJC4ftoTB9ed01e42tZdWUn5c
+         zs2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=LFbmYzoW/dOJ4Ds9GuxLWzJiVIPVogsncjpBRDxZzqE=;
-        b=ChaD/Yrn8moFyGqlHJ7Hyl+7eMJSX459wJUwdm8rxK07NVFMvfK44KS3YOCiBafki0
-         1XgC89gwC9JXKvw5g/i4NCLNVGYKyqDdounCis3DJu00C3IbCNPkV1hbwuTr569/biRE
-         SO+7Z62FovNY54ufjwUZICLd73lIv2MiqRU1SiRo5TDMr2LwzeUp4q7q/xRJd4eFZ6mJ
-         cPC5GvNBlGBSN5J+sj42ejr7hsLLkrrGeh9WxuJLoZYz0gjOB1uXugc7Uyad1eTqNJOO
-         0izRTBh8bWGOlPWHmKFKXWglGcRfpQtrOcJItiBZ3RnzJEmj4PXzW5tk0ZD0DbrNE1mK
-         MO3Q==
-X-Gm-Message-State: AOAM533DnJP+vzzZve3HpnKNghEQLJRsFMlt0Y84vgOD+NJXzyaQtXxI
-        1r6KOyi8MoJvltwrwlW/E5U=
-X-Google-Smtp-Source: ABdhPJwNS6rwahyR633e4Gd8I9bZfMcKgs0PMLK9XcLNmGucYcJzYw7VCH3ZwhfsqauuYNUVEEGEHA==
-X-Received: by 2002:a17:906:259a:: with SMTP id m26mr2846528ejb.399.1611896113320;
-        Thu, 28 Jan 2021 20:55:13 -0800 (PST)
+        bh=cWhDKyAXxdtoRhlimIC6AARbTEG5Y6B4xyJpzTlH1ic=;
+        b=GZoKDBy9ueGo/B2ARGuK//BoKv67kwyLuvJhK591X+LEIaWxn+BcCGId18M6FKi3t4
+         JY94rPePLpkXta9s4yg0LG+zuGbBbyJ7448wdMgX3mTtKTW2z5+94e2UxtTuOIc4GFQW
+         euIjWRJAFCQMYXCuIICQNqI5bcQQcN+xOTUPxlOH03sxqyDen7xzi/tGSL1GJhWAWKD5
+         4/f/a3jsqRNz9YkMO2PSWU14MaAiEa8U/sI31vdcKDUDTOSFxVD8RfjNVLXxDvaBxLaS
+         nlUYPdNaha4EPsD/oZLHzSFj3jWu08QLMCAE0xvy57TvykqSE67Kj2wdOQXbXR74whLb
+         euhA==
+X-Gm-Message-State: AOAM532b1PvEB57m6ihgY7n8dZQ+GdEvxky2Sr0MscudSPGPwNFHDSTd
+        URuQ9U2f90hmi8/U1DDkr5tXEMJ4Zl5oNQ==
+X-Google-Smtp-Source: ABdhPJwJ8mJoTHv6rdOAn7+9M7PYDpttdAHFO/GraR9+bM46OM8B+c11D7Aia9OEcAY0zYN30ZHc+A==
+X-Received: by 2002:a17:906:1958:: with SMTP id b24mr2767865eje.263.1611896520056;
+        Thu, 28 Jan 2021 21:02:00 -0800 (PST)
 Received: from felia.fritz.box ([2001:16b8:2d91:2600:859e:aee:ff42:2cc6])
-        by smtp.gmail.com with ESMTPSA id b26sm3981366edy.57.2021.01.28.20.55.12
+        by smtp.gmail.com with ESMTPSA id lv13sm3240171ejb.55.2021.01.28.21.01.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Jan 2021 20:55:12 -0800 (PST)
+        Thu, 28 Jan 2021 21:01:59 -0800 (PST)
 From:   Lukas Bulwahn <lukas.bulwahn@gmail.com>
 To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Cc:     Christoph Hellwig <hch@lst.de>, Jonathan Corbet <corbet@lwn.net>,
+Cc:     Guoqing Jiang <guoqing.jiang@cloud.ionos.com>,
+        Jonathan Corbet <corbet@lwn.net>,
         Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
         linux-doc@vger.kernel.org, kernel-janitors@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         Lukas Bulwahn <lukas.bulwahn@gmail.com>
-Subject: [PATCH] block: remove typo in kernel-doc of set_disk_ro()
-Date:   Fri, 29 Jan 2021 05:55:05 +0100
-Message-Id: <20210129045505.22743-1-lukas.bulwahn@gmail.com>
+Subject: [PATCH] block: drop removed argument from kernel-doc of blk_execute_rq()
+Date:   Fri, 29 Jan 2021 06:01:51 +0100
+Message-Id: <20210129050151.26926-1-lukas.bulwahn@gmail.com>
 X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Commit 52f019d43c22 ("block: add a hard-readonly flag to struct gendisk")
-provides some kernel-doc for set_disk_ro(), but introduces a small typo.
+Commit 684da7628d93 ("block: remove unnecessary argument from
+blk_execute_rq") changes the signature of blk_execute_rq(), but misses
+to adjust its kernel-doc.
 
-Hence, make htmldocs warns on ./block/genhd.c:1441:
+Hence, make htmldocs warns on ./block/blk-exec.c:78:
 
-  warning: Function parameter or member 'read_only' not described in 'set_disk_ro'
-  warning: Excess function parameter 'ready_only' description in 'set_disk_ro'
+  warning: Excess function parameter 'q' description in 'blk_execute_rq'
 
-Remove that typo in the kernel-doc for set_disk_ro().
+Drop removed argument from kernel-doc of blk_execute_rq() as well.
 
 Signed-off-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
 ---
 Jens, please pick this minor fix on your block-next tree.
 
- block/genhd.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/blk-exec.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/block/genhd.c b/block/genhd.c
-index d3ef29fbc536..304f8dcc9a9b 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -1431,7 +1431,7 @@ static void set_disk_ro_uevent(struct gendisk *gd, int ro)
+diff --git a/block/blk-exec.c b/block/blk-exec.c
+index 0ab873f10133..beae70a0e5e5 100644
+--- a/block/blk-exec.c
++++ b/block/blk-exec.c
+@@ -65,7 +65,6 @@ EXPORT_SYMBOL_GPL(blk_execute_rq_nowait);
+ 
  /**
-  * set_disk_ro - set a gendisk read-only
-  * @disk:	gendisk to operate on
-- * @ready_only:	%true to set the disk read-only, %false set the disk read/write
-+ * @read_only:	%true to set the disk read-only, %false set the disk read/write
-  *
-  * This function is used to indicate whether a given disk device should have its
-  * read-only flag set. set_disk_ro() is typically used by device drivers to
+  * blk_execute_rq - insert a request into queue for execution
+- * @q:		queue to insert the request in
+  * @bd_disk:	matching gendisk
+  * @rq:		request to insert
+  * @at_head:    insert request at head or tail of queue
 -- 
 2.17.1
 
