@@ -2,150 +2,150 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	PDS_BAD_THREAD_QP_64,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72718C433E0
-	for <linux-block@archiver.kernel.org>; Mon,  1 Feb 2021 09:48:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 639E1C433E0
+	for <linux-block@archiver.kernel.org>; Mon,  1 Feb 2021 11:03:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1B10864EAA
-	for <linux-block@archiver.kernel.org>; Mon,  1 Feb 2021 09:48:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 25EE664E9B
+	for <linux-block@archiver.kernel.org>; Mon,  1 Feb 2021 11:03:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232363AbhBAJsc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 1 Feb 2021 04:48:32 -0500
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:47413 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232290AbhBAJsb (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 1 Feb 2021 04:48:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1612172911; x=1643708911;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=PpJoBnejVqrPWyAtyRvOoW+ypFLnUavc1AJbE2Zei3Y=;
-  b=ApY2a0XpyUnM9SdTIKWxR7LPpcsX6P1XJXhABwkMXB5Zq5fXVozcq6A8
-   XSizH22VAYxbyu3VI8wcoGZx/Il9XA2oFAXFbBSOPNYEVPLxvG1uATT7K
-   ILfhtRJc455A2o0knWYrP1fpJVwLdteMvEB3jgWubzAuIadwMxZYsnYXl
-   LEJNfZQQIjhebrDyc3Un8HeZOVQops7UdJONUBvqInqbsueYu2lHqjHiW
-   +EMTKI/4YkIwHYpSNVXEWC+psOUvCBFI5WhnS5OGdUIEbF0kP73Uc+DcR
-   HGs7u19t0rnQhV4gOnmKINKzuVOJV076YsJpgq8j4NXg6oxQ8tQrOkDS2
-   Q==;
-IronPort-SDR: B+fnF3hyJcpt7QZM07aNRM6oAJJUiuEU2CXkaj7LBZa+uqZOjZEtbRi2nnXu2IfGWTyDn9/mz9
- z8Y+bV0H/axY0TarWPZUGXoQVqeVRlz1xi6R5cY1KJXwcldiCyeEuBUJwzYepKhocv6BQHVZgf
- Cs0U+zjGftT3ArDjiXqDsEuHWgSbK14wZgu8otFCJ3qHUkG+im1AZ8i5EillDx+mtlAsK7WG9n
- qZojrk8uWlsYWPJcaSOV4Qw7Vx09t5tOOsfuaFs+76Ip6k87+NSK7hPX6gLnd/7p3HCIgZzE1h
- H7Y=
-X-IronPort-AV: E=Sophos;i="5.79,392,1602518400"; 
-   d="scan'208";a="269213141"
-Received: from mail-sn1nam02lp2053.outbound.protection.outlook.com (HELO NAM02-SN1-obe.outbound.protection.outlook.com) ([104.47.36.53])
-  by ob1.hgst.iphmx.com with ESMTP; 01 Feb 2021 17:47:25 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BEx7rRLy196cwmRUS6ry8frKqP5sq8fzNO1bSIEiMBt1idkPFox9GgF6P+bLl3Z9vwN1RwqcZZQu+37kTfMYCWLnfMnqXiclxh2AL0VfzqJV264BQ75oWf3BMdy6QgopI2PAN1GoPGkO++4Z02AtbYGOS2lj8YxSeXVpcIOpXM3fUZSnmae1wYpbAcLOlR8nIBNXx7HVrvSob2RSDyU1WLuObq9beN7Ml+qioHxbKy6NSV4fsg1Yo92HMRavkW9JU47USgdGqF/hIyozHDDK8cAK3rQ6YpYxO+UF1mgCbqqfYY/bNRBq5CyhZSJtLVZ3/w7WqRVIGvtgqoo3e8FUww==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PpJoBnejVqrPWyAtyRvOoW+ypFLnUavc1AJbE2Zei3Y=;
- b=cmXq/q3KRRZ05k59u09l2HNPY01VHjL39Ir4VCLVrHhvpvrYAFs5AjAG3YPtX76Ln00jgG6TIGygWf6WzowAiixvPzBj1nLRRHEsxXAC3KF+W25oP7PYmlh4ty+FJ2R9eiWmTPgr7y11n58w/2bGJFwoEKzqDvuSAP32Md3AaJEstYfpI7TOPjENo2yoNCtCF1FxQrNr+ehXHWsgpA6Ohyyu/+GJ/jzFZYkXdXdGaqaAUcnQx2g4bwLceDtmKz4HYGIWQywWlnYO0l9vUodVV+U/QB8Ov0p5fpwWaP55LJG0+hAVIxcHSRDNoC9yVqrd+P2riPFZqezwLahScBxEQA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
+        id S233221AbhBALDj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 1 Feb 2021 06:03:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40846 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233126AbhBALDi (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 1 Feb 2021 06:03:38 -0500
+Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCF1BC061573
+        for <linux-block@vger.kernel.org>; Mon,  1 Feb 2021 03:02:57 -0800 (PST)
+Received: by mail-wr1-x42e.google.com with SMTP id d16so16043272wro.11
+        for <linux-block@vger.kernel.org>; Mon, 01 Feb 2021 03:02:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PpJoBnejVqrPWyAtyRvOoW+ypFLnUavc1AJbE2Zei3Y=;
- b=atZViaNM/tws1MVlUZTPZeV7uHXpfbbB0k5Sv5DIJNeB7O/O5cLaepWnrVbhWSfcduxR8jbUfMrsvlEkGYtPDRbxZY7xdrIcvf5/1hbTrQEHQxYwnzG99QTHtbCC/yQxOf28mxaFBp6U0tBTkHYIGwr4AXa+1SkA+ycaifqbHrE=
-Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
- (2603:10b6:803:47::21) by SA2PR04MB7500.namprd04.prod.outlook.com
- (2603:10b6:806:14d::21) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3784.13; Mon, 1 Feb
- 2021 09:47:24 +0000
-Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
- ([fe80::c19b:805:20e0:6274]) by SN4PR0401MB3598.namprd04.prod.outlook.com
- ([fe80::c19b:805:20e0:6274%7]) with mapi id 15.20.3805.024; Mon, 1 Feb 2021
- 09:47:24 +0000
-From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-To:     Guoqing Jiang <guoqing.jiang@cloud.ionos.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "danil.kipnis@cloud.ionos.com" <danil.kipnis@cloud.ionos.com>,
-        "jinpu.wang@cloud.ionos.com" <jinpu.wang@cloud.ionos.com>,
-        "hch@infradead.org" <hch@infradead.org>
-Subject: Re: [PATCH V2 3/4] block: add io_extra_stats node
-Thread-Topic: [PATCH V2 3/4] block: add io_extra_stats node
-Thread-Index: AQHW+DnWuHw03NMd2ECw7ZTtJRpHxA==
-Date:   Mon, 1 Feb 2021 09:47:24 +0000
-Message-ID: <SN4PR0401MB35980F52820FF8D6B0E3D8DD9BB69@SN4PR0401MB3598.namprd04.prod.outlook.com>
-References: <20210201012727.28305-1-guoqing.jiang@cloud.ionos.com>
- <20210201012727.28305-4-guoqing.jiang@cloud.ionos.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: cloud.ionos.com; dkim=none (message not signed)
- header.d=none;cloud.ionos.com; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [2001:a62:1542:e101:7173:b327:67d3:fffc]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 07c02a82-ec77-44f1-0e42-08d8c69660bb
-x-ms-traffictypediagnostic: SA2PR04MB7500:
-x-ld-processed: b61c8803-16f3-4c35-9b17-6f65f441df86,ExtAddr
-x-microsoft-antispam-prvs: <SA2PR04MB75000B4CD676517CABD2915D9BB69@SA2PR04MB7500.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:7691;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: YQ9q6o3q3xvztFMc3CS6zXmpKMEb6XDVr2Isy5/GIopXPn+CQ8bZktOkfIshTVwSz7aQWLWTvLWHiZZIPFfhKBTwfauUUl+/qIJ82ykHV81WZPfte0LtSZ3X4un7eeCS1FUxJjWnlXCzFZz/BoTg5Ibja+9U9TQx2CqvixwtUN180W+X/fT1W56sNoW09h7sjg5DgER/ytB0kkahp/4VQuJlalkovOAj8Abzch52qPkavkKHb/tkhFpb50UD2fy7wsAiCaLLzEegIhracIg+yc0OvZFfU1+GjLiw2uQED4rbVVIHFgWdjqriPa+IhXeG0qXO7LlwSdL44upsiasp9KbecLtTgzec1nfOUCeW9XhW+SnXaOi4LKG9wSYDYD+uZQA82eodPmEzIe5/QC9uZ4cUwi2TTVEMzqZKvgaZFMZuOs9ITidyMenkuAqlfXEJgFTy2kmrQmI/1scNVwuwK0Nfaf48q9NQ1RaH3fFCtVIobdQRRd3bLSB/ytzpS9efGRHE5ruB2FzmqSBpVRGtcw==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN4PR0401MB3598.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(39860400002)(366004)(376002)(136003)(396003)(8936002)(66476007)(6506007)(110136005)(52536014)(55016002)(186003)(316002)(33656002)(66946007)(4744005)(9686003)(71200400001)(76116006)(2906002)(64756008)(86362001)(5660300002)(91956017)(66446008)(53546011)(54906003)(66556008)(478600001)(7696005)(4326008)(8676002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: =?us-ascii?Q?8+7xpPyEmiUHfy0JsbmVf+H3VI9BEAwNZuD2ujzw0iYdnsto2e0vvVxj2RIA?=
- =?us-ascii?Q?W2M+WvIL9jlhoHDfk5XOO8dDOKZVQI4mxG6kRXSc2SX8PhV7wyc3hOwD6sOy?=
- =?us-ascii?Q?/xDh61Rruzl+hgVOzlPwfHL96u5QUnb6fwE3WAF/o9CuU9iJiPUS3ueKtcrh?=
- =?us-ascii?Q?QOUO5wCApJEbSwWIHmQdzBrYOCNzcKIrhDekm+iqswzUa+mBM0ooTcFwY5Hy?=
- =?us-ascii?Q?DxiK13krNphNvojrUGwpaJ3xIjx1y2Uo2+hmniCcGocyv5XvyB8ukiQYnxTd?=
- =?us-ascii?Q?slrYjJOZLxA5Gf/1P8gBt/nJSX6GXvqM1SE2xVaPxnANI1pCOgt+ot3ezPnE?=
- =?us-ascii?Q?1PkIIki6FWskPRmgEHEcXIBiAuOAWCmqk8b4vvxYmb5wIZmXN/AzidMGG8Yd?=
- =?us-ascii?Q?g5E9F592WxEz9OKZRNw/1USZfy7H5zlYDzPOCxyKTQ6b67eWLDZspzGKCW/8?=
- =?us-ascii?Q?87b3KTxX2FHF/4qQS0qMoOFqrhokaYhUWLJYK35A/4a1xljpoV3wL4gy+gE3?=
- =?us-ascii?Q?dP2YrTyaunLqvLXuvePVbxTeFZuO/T4e6UDbt9rgWLh9wQeoeMefiVohrwsH?=
- =?us-ascii?Q?u6fxocdmWvBLFE7AKMwN/LDHbR+fotX8TMnscPz98NgJsgijB+mFoCR3MtiS?=
- =?us-ascii?Q?drJmRvm4x8f1K6d3KGhKhLSFWsmXqpe6EnO/qjJSBhsenKHX1UsbA0yNHViB?=
- =?us-ascii?Q?STnC27GSJM9y4gEk2hpjyqBYo1aMvGZAHSuyhY/PHhfRTPu8R8T1BHYPUiai?=
- =?us-ascii?Q?OjosdCijhAxCPw8wWEHnu7L+AWJ3l8FCpXuBJcxO22AQnPqBg0RAoej0g4lb?=
- =?us-ascii?Q?d8glDE3W5ovQAkbae4WkIuNg3cK00T/MjbVnPqyrbvq2SZhsUGeRCgeyDnTD?=
- =?us-ascii?Q?mpw2wUvYOlUHz5lKeG3/5YLRQtwKwkH+eI47tEMp6m4g1/afWhJE6kX45RTM?=
- =?us-ascii?Q?AO2DB1PrPLCZeGPsYnlFUl8FqHLWG8GBenUcAsce7+aBGLAke0CAcyvjD8Ko?=
- =?us-ascii?Q?TGCQpVaqBYdiJdVJy/s2mKrOXFLYgzETiTerBY7yHYtxtAD2bRY8P3obz1yR?=
- =?us-ascii?Q?dbgh/DKIdb/JNCXiGQoM7EFjhqLw5bOVyjANCbHU1bIfbKNSI4Jqgoc4Sz/z?=
- =?us-ascii?Q?+Km4dW41eKgOr0BkgPBQgAZD3XZ+4Wc0yQ=3D=3D?=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:autocrypt:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=PP/zMRPoUZIH9Vosxey0IfdNkO5xvEKJgF+rdi0whsQ=;
+        b=BuW+JBnxM+cQbuhujz0kFeMcXbLH5lQx/UD/6yASo1+Df2ARH4m1HXeUtGYiEkyZ3X
+         CyOeKuc24wkW5276EoGMlVQFExeSjkzWmlPYYVZEeIb6FaoJiiplo1Y8X2Kfn38ymaPR
+         g7oIBdTY/VVFDoAFigtZ29jEu4AZZ3FwsthsQ05IvigH099BMRCaGYoPfTwdfEOo/fS1
+         KPh8rCem3QOOMC/0oftCOArl3WZejK+cOYjkkI9+EggUKJD+FtsHaxioPKBUw38EDinf
+         s7qxDUfEZAH45fiT4BcaqJqthzUH20v0uBXgYBHLD8wa+QFM+1wObaW0Jy/O0lZ9I4A2
+         qNBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=PP/zMRPoUZIH9Vosxey0IfdNkO5xvEKJgF+rdi0whsQ=;
+        b=SB9C6vkkFqF6eZJIxQV3UybbxdavSX/S2mmlyF5IFrqTam8CDpSdmlBpy0iNSrDkhS
+         rbASF4m0fx/nRgLMPpKQxl1rxlBeVLvGoQ/EAPyrolISyRJg54oZnkCWYKxFyIr74VOe
+         UP2AW0BvEb/d3au5SHezRkenumYlV62kHBhKAlNH+Zz3dEWu8qd/e2ZVI0w9jDYGus3J
+         TVZqWACJ29x8Sei3xURF2sZhsBo2eRYtCm8z9L6ISkCnt+CwuT7//3aMlfGvqXvnOP3L
+         BMN0BJzvzIvEfQsABgX7nE7/kg3PZSKJ+qorrernpsSRejNwaJVKw3D0P+kCikq9QQZ8
+         KNSg==
+X-Gm-Message-State: AOAM532Hv4P+9NkCZGOLPN181SmHQwcCGaCB9gbj/hkfnMj/hJlalc7z
+        oGAuxeGAkoUioevHwKB6Vx4uoJrT7DM=
+X-Google-Smtp-Source: ABdhPJwq1VOH2rm15JkdKkPQ22ooA1/5Kc46Z4YZlCIg2u+aDGAFoMBxiR7U6IRL4ovvkpj631vGlw==
+X-Received: by 2002:a5d:6947:: with SMTP id r7mr17388425wrw.150.1612177376599;
+        Mon, 01 Feb 2021 03:02:56 -0800 (PST)
+Received: from [192.168.8.166] ([185.69.145.241])
+        by smtp.gmail.com with ESMTPSA id i8sm27926336wry.90.2021.02.01.03.02.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 01 Feb 2021 03:02:55 -0800 (PST)
+Subject: Re: [RFC 2/2] block: add a fast path for seg split of large bio
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+References: <cover.1609875589.git.asml.silence@gmail.com>
+ <53b86d4e86c4913658cb0f472dcc3e22ef75396b.1609875589.git.asml.silence@gmail.com>
+ <20210128121035.GA1495297@T590>
+ <48e8c791-fe4a-60c7-aa8b-bcaf0f5562c9@gmail.com>
+ <20210129020010.GD1649137@T590>
+From:   Pavel Begunkov <asml.silence@gmail.com>
+Autocrypt: addr=asml.silence@gmail.com; prefer-encrypt=mutual; keydata=
+ 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 bA==
+Message-ID: <d36ddc6b-4c73-174d-2ca1-624fd869c8b5@gmail.com>
+Date:   Mon, 1 Feb 2021 10:59:14 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN4PR0401MB3598.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 07c02a82-ec77-44f1-0e42-08d8c69660bb
-X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Feb 2021 09:47:24.2441
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: K27oq9iYb8uAfBHPBDDKHFeCJPQmDXxfMC6w5NBp461PNIJcOhOMK+pK+sS6GthslF1V/tRnTglZ7pEZwRfjxKiYN12F4c/ukwOFCUTBbj8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR04MB7500
+In-Reply-To: <20210129020010.GD1649137@T590>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 01/02/2021 02:30, Guoqing Jiang wrote:=0A=
-> If user doesn't care about the size and latency of io, and they could=0A=
-> suffer from the additional overhead. So introduce a specific sysfs node=
-=0A=
-> to avoid such mistake.=0A=
-=0A=
-=0A=
-I would make this patch number 1 in the series and then merge patch 4=0A=
-(the check for blk_queue_io_extra_stat()) into the patches adding =0A=
-blk_additional_latency() and blk_additional_sector().=0A=
-=0A=
- =0A=
+On 29/01/2021 02:00, Ming Lei wrote:
+> On Thu, Jan 28, 2021 at 12:27:39PM +0000, Pavel Begunkov wrote:
+>> On 28/01/2021 12:10, Ming Lei wrote:
+>>> On Tue, Jan 05, 2021 at 07:43:38PM +0000, Pavel Begunkov wrote:
+>>> .bi_vcnt is 0 for fast cloned bio, so the above check may become true
+>>> when real nr_segment is > queue_max_segments(), especially in case that
+>>> max segments limit is small and segment size is big.
+>>
+>> I guess we can skip the fast path for them (i.e. bi_vcnt == 0)
+> 
+> But bi_vcnt can't represent real segment number, which can be bigger or
+> less than .bi_vcnt.
+
+Sounds like "go slow path on bi_vcnt==0" won't work. Ok, I need to
+go look what is the real purpose of .bi_vcnt
+
+> 
+>> I'm curious, why it's 0 but not the real number?
+> 
+> fast-cloned bio shares bvec table of original bio, so it doesn't have
+> .bi_vcnt.
+
+Got it, thanks
+
+
+-- 
+Pavel Begunkov
