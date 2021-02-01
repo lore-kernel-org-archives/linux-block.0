@@ -2,190 +2,125 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6F5CC433E9
-	for <linux-block@archiver.kernel.org>; Mon,  1 Feb 2021 07:20:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 126EDC433DB
+	for <linux-block@archiver.kernel.org>; Mon,  1 Feb 2021 07:34:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 93F9864E2E
-	for <linux-block@archiver.kernel.org>; Mon,  1 Feb 2021 07:20:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C804164E31
+	for <linux-block@archiver.kernel.org>; Mon,  1 Feb 2021 07:34:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231596AbhBAHT5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 1 Feb 2021 02:19:57 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23045 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231487AbhBAHTq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 1 Feb 2021 02:19:46 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612163883;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=qVx5KBLz9JmEIvZV9RVslBW3WV7EfoFeqLOHwA4c8uU=;
-        b=ES16tDNRx8NWeTQNNxk9nIZUfpOSPsPwQRLKBJ8ZCP8T+nehV7RgN0/jD0cDvGwP1H/MYX
-        Zb5EbL0lhF/6giZtYP4tJd/kgNubbpwN+6a58Q2KE+BaMHUhF/4fkLxpCrOcXwI4WOOmQI
-        MxoPb98R8LrsjHiuwHLQYMTPliC5U+I=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-581-QMUi9qZENbqEp4HT8S57fQ-1; Mon, 01 Feb 2021 02:14:30 -0500
-X-MC-Unique: QMUi9qZENbqEp4HT8S57fQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 25894801A9D;
-        Mon,  1 Feb 2021 07:14:28 +0000 (UTC)
-Received: from T590 (ovpn-13-140.pek2.redhat.com [10.72.13.140])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 98C603828;
-        Mon,  1 Feb 2021 07:14:17 +0000 (UTC)
-Date:   Mon, 1 Feb 2021 15:14:13 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Changheun Lee <nanich.lee@samsung.com>
-Cc:     Johannes.Thumshirn@wdc.com, asml.silence@gmail.com,
-        axboe@kernel.dk, damien.lemoal@wdc.com, hch@infradead.org,
-        jisoo2146.oh@samsung.com, junho89.kim@samsung.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        mj0123.lee@samsung.com, osandov@fb.com, patchwork-bot@kernel.org,
-        seunghwan.hyun@samsung.com, sookwan7.kim@samsung.com,
-        tj@kernel.org, tom.leiming@gmail.com, woosung2.lee@samsung.com,
-        yt0928.kim@samsung.com
-Subject: Re: [PATCH v4 1/2] bio: limit bio max size
-Message-ID: <20210201071413.GC9481@T590>
-References: <20210129034909.18785-1-nanich.lee@samsung.com>
- <CGME20210201030830epcas1p402e8a088fb16af9fbbb130b152e097f1@epcas1p4.samsung.com>
- <20210201025248.17679-1-nanich.lee@samsung.com>
+        id S229613AbhBAHef (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 1 Feb 2021 02:34:35 -0500
+Received: from mail.wangsu.com ([123.103.51.227]:51174 "EHLO wangsu.com"
+        rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229736AbhBAHed (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 1 Feb 2021 02:34:33 -0500
+Received: from [10.8.148.37] (unknown [59.61.78.237])
+        by app2 (Coremail) with SMTP id 4zNnewCXP++NrhdgcaYBAA--.753S2;
+        Mon, 01 Feb 2021 15:32:29 +0800 (CST)
+Subject: Re: [PATCH] Revert "bfq: Fix computation of shallow depth"
+To:     axboe@kernel.dk, paolo.valente@linaro.org, jack@suse.cz
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+References: <20210129111808.45796-1-linf@wangsu.com>
+From:   Lin Feng <linf@wangsu.com>
+Message-ID: <749df7e1-98b5-a575-506d-a7c7c4d96a6f@wangsu.com>
+Date:   Mon, 1 Feb 2021 15:32:29 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210201025248.17679-1-nanich.lee@samsung.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20210129111808.45796-1-linf@wangsu.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID: 4zNnewCXP++NrhdgcaYBAA--.753S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxCw43uw1DJry8KFW8JFW7CFg_yoW5ArWUp3
+        W3Kr13Kr4xtF429r1UAryxWryF9wn5JrySgF1aqw18CrW8XFn7XF95KFnYvFnrurs7AF40
+        vry5Wr98W3ZYqFDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUkqb7Iv0xC_Kw4lb4IE77IF4wAFc2x0x2IEx4CE42xK8VAvwI8I
+        cIk0rVWrJVCq3wA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjx
+        v20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26rxl6s0DM28EF7xvwVC2
+        z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcV
+        Aq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6x8ErcxFaVAv8VW8GwAv
+        7VCY1x0262k0Y48FwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMx
+        k0xIA0c2IEe2xFo4CEbIxvr21lc2xSY4AK67AK6r4xMxAIw28IcxkI7VAKI48JMxAIw28I
+        cVCjz48v1sIEY20_Gr4l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJV
+        WUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAK
+        I48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r
+        4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF
+        0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IUe3Ef5UUUUU==
+X-CM-SenderInfo: holqwq5zdqw23xof0z/
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Feb 01, 2021 at 11:52:48AM +0900, Changheun Lee wrote:
-> > On Fri, Jan 29, 2021 at 12:49:08PM +0900, Changheun Lee wrote:
-> > > bio size can grow up to 4GB when muli-page bvec is enabled.
-> > > but sometimes it would lead to inefficient behaviors.
-> > > in case of large chunk direct I/O, - 32MB chunk read in user space -
-> > > all pages for 32MB would be merged to a bio structure if the pages
-> > > physical addresses are contiguous. it makes some delay to submit
-> > > until merge complete. bio max size should be limited to a proper size.
-> > > 
-> > > When 32MB chunk read with direct I/O option is coming from userspace,
-> > > kernel behavior is below now. it's timeline.
-> > > 
-> > >  | bio merge for 32MB. total 8,192 pages are merged.
-> > >  | total elapsed time is over 2ms.
-> > >  |------------------ ... ----------------------->|
-> > >                                                  | 8,192 pages merged a bio.
-> > >                                                  | at this time, first bio submit is done.
-> > >                                                  | 1 bio is split to 32 read request and issue.
-> > >                                                  |--------------->
-> > >                                                   |--------------->
-> > >                                                    |--------------->
-> > >                                                               ......
-> > >                                                                    |--------------->
-> > >                                                                     |--------------->|
-> > >                           total 19ms elapsed to complete 32MB read done from device. |
-> > > 
-> > > If bio max size is limited with 1MB, behavior is changed below.
-> > > 
-bio_iov_iter_get_pages> > >  | bio merge for 1MB. 256 pages are merged for each bio.
-> > >  | total 32 bio will be made.
-> > >  | total elapsed time is over 2ms. it's same.
-> > >  | but, first bio submit timing is fast. about 100us.
-> > >  |--->|--->|--->|---> ... -->|--->|--->|--->|--->|
-> > >       | 256 pages merged a bio.
-> > >       | at this time, first bio submit is done.
-> > >       | and 1 read request is issued for 1 bio.
-> > >       |--------------->
-> > >            |--------------->
-> > >                 |--------------->
-> > >                                       ......
-> > >                                                  |--------------->
-> > >                                                   |--------------->|
-> > >         total 17ms elapsed to complete 32MB read done from device. |
-> > 
-> > Can you share us if enabling THP in your application can avoid this issue? BTW, you
-> > need to make the 32MB buffer aligned with huge page size. IMO, THP perfectly fits
-> > your case.
-> > 
+Hi, it seems that this patch was blocked by linux mailist servers, so ping again.
+
+Based on https://patchwork.kernel.org/project/linux-block/patch/20201210094433.25491-1-jack@suse.cz/,
+it looks like we have made a consensus about bfqd->word_depths[2][2]'s changing, so now the
+computation codes for bfq's word_depths array are not necessary and one variable is enough.
+
+But IMHO async depth limitation for slow drivers is essential, which is what we always did in cfq age.
+
+On 1/29/21 19:18, Lin Feng wrote:
+> This reverts commit 6d4d273588378c65915acaf7b2ee74e9dd9c130a.
 > 
-> THP is enabled already like as below in my environment. It has no effect.
+> bfq.limit_depth passes word_depths[] as shallow_depth down to sbitmap core
+> sbitmap_get_shallow, which uses just the number to limit the scan depth of
+> each bitmap word, formula:
+> scan_percentage_for_each_word = shallow_depth / (1 << sbimap->shift) * 100%
 > 
-> cat /sys/kernel/mm/transparent_hugepage/enabled
-> [always] madvise never
-
-The 32MB user buffer needs to be huge page size aligned. If your system
-supports bcc/bpftrace, it is quite easy to check if the buffer is
-aligned.
-
+> That means the comments's percentiles 50%, 75%, 18%, 37% of bfq are correct.
+> But after commit patch 'bfq: Fix computation of shallow depth', we use
+> sbitmap.depth instead, as a example in following case:
 > 
-> This issue was reported from performance benchmark application in open market.
-> I can't control application's working in open market.
-> It's not only my own case. This issue might be occured in many mobile environment.
-> At least, I checked this problem in exynos, and qualcomm chipset.
-
-You just said it takes 2ms for building 32MB bio, but you never investigate the
-reason. I guess it is from get_user_pages_fast(), but maybe others. Can you dig
-further for the reason? Maybe it is one arm64 specific issue.
-
-BTW, bio_iov_iter_get_pages() just takes ~200us on one x86_64 VM with THP, which is
-observed via bcc/funclatency when running the following workload:
-
-[root@ktest-01 test]# cat fio.job
-[global]
-bs=32768k
-rw=randread
-iodepth=1
-ioengine=psync
-direct=1
-runtime=20
-time_based
-
-group_reporting=0
-ramp_time=5
-
-[diotest]
-filename=/dev/sde
-
-
-[root@ktest-01 func]# /usr/share/bcc/tools/funclatency bio_iov_iter_get_pages
-Tracing 1 functions for "bio_iov_iter_get_pages"... Hit Ctrl-C to end.
-^C
-     nsecs               : count     distribution
-         0 -> 1          : 0        |                                        |
-         2 -> 3          : 0        |                                        |
-         4 -> 7          : 0        |                                        |
-         8 -> 15         : 0        |                                        |
-        16 -> 31         : 0        |                                        |
-        32 -> 63         : 0        |                                        |
-        64 -> 127        : 0        |                                        |
-       128 -> 255        : 0        |                                        |
-       256 -> 511        : 0        |                                        |
-       512 -> 1023       : 0        |                                        |
-      1024 -> 2047       : 0        |                                        |
-      2048 -> 4095       : 0        |                                        |
-      4096 -> 8191       : 0        |                                        |
-      8192 -> 16383      : 0        |                                        |
-     16384 -> 32767      : 0        |                                        |
-     32768 -> 65535      : 0        |                                        |
-     65536 -> 131071     : 0        |                                        |
-    131072 -> 262143     : 1842     |****************************************|
-    262144 -> 524287     : 125      |**                                      |
-    524288 -> 1048575    : 6        |                                        |
-   1048576 -> 2097151    : 0        |                                        |
-   2097152 -> 4194303    : 1        |                                        |
-   4194304 -> 8388607    : 0        |                                        |
-   8388608 -> 16777215   : 1        |                                        |
-Detaching...
-
-
-
--- 
-Ming
+> sbitmap.depth = 256, map_nr = 4, shift = 6; sbitmap_word.depth = 64.
+> The resulsts of computed bfqd->word_depths[] are {128, 192, 48, 96}, and
+> three of the numbers exceed core dirver's 'sbitmap_word.depth=64' limit
+> nothing. Do we really don't want limit depth for such workloads, or we
+> just want to bump up the percentiles to 100%?
+> 
+> Please correct me if I miss something, thanks.
+> 
+> Signed-off-by: Lin Feng <linf@wangsu.com>
+> ---
+>   block/bfq-iosched.c | 8 ++++----
+>   1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+> index 9e4eb0fc1c16..9e81d1052091 100644
+> --- a/block/bfq-iosched.c
+> +++ b/block/bfq-iosched.c
+> @@ -6332,13 +6332,13 @@ static unsigned int bfq_update_depths(struct bfq_data *bfqd,
+>   	 * limit 'something'.
+>   	 */
+>   	/* no more than 50% of tags for async I/O */
+> -	bfqd->word_depths[0][0] = max(bt->sb.depth >> 1, 1U);
+> +	bfqd->word_depths[0][0] = max((1U << bt->sb.shift) >> 1, 1U);
+>   	/*
+>   	 * no more than 75% of tags for sync writes (25% extra tags
+>   	 * w.r.t. async I/O, to prevent async I/O from starving sync
+>   	 * writes)
+>   	 */
+> -	bfqd->word_depths[0][1] = max((bt->sb.depth * 3) >> 2, 1U);
+> +	bfqd->word_depths[0][1] = max(((1U << bt->sb.shift) * 3) >> 2, 1U);
+>   
+>   	/*
+>   	 * In-word depths in case some bfq_queue is being weight-
+> @@ -6348,9 +6348,9 @@ static unsigned int bfq_update_depths(struct bfq_data *bfqd,
+>   	 * shortage.
+>   	 */
+>   	/* no more than ~18% of tags for async I/O */
+> -	bfqd->word_depths[1][0] = max((bt->sb.depth * 3) >> 4, 1U);
+> +	bfqd->word_depths[1][0] = max(((1U << bt->sb.shift) * 3) >> 4, 1U);
+>   	/* no more than ~37% of tags for sync writes (~20% extra tags) */
+> -	bfqd->word_depths[1][1] = max((bt->sb.depth * 6) >> 4, 1U);
+> +	bfqd->word_depths[1][1] = max(((1U << bt->sb.shift) * 6) >> 4, 1U);
+>   
+>   	for (i = 0; i < 2; i++)
+>   		for (j = 0; j < 2; j++)
+> 
 
