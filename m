@@ -2,150 +2,163 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,PDS_BAD_THREAD_QP_64,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8ED13C433E0
-	for <linux-block@archiver.kernel.org>; Tue,  2 Feb 2021 10:00:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD916C433E0
+	for <linux-block@archiver.kernel.org>; Tue,  2 Feb 2021 10:29:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3408364F54
-	for <linux-block@archiver.kernel.org>; Tue,  2 Feb 2021 10:00:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 71CEA64F37
+	for <linux-block@archiver.kernel.org>; Tue,  2 Feb 2021 10:29:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229719AbhBBJ74 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Feb 2021 04:59:56 -0500
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:22574 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231300AbhBBJ7e (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Feb 2021 04:59:34 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1612259974; x=1643795974;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=G8FZ0D3PP/OudJ5uuxCAz/C/vBHo8wESZoPwxTWqVEI=;
-  b=SO58mCsl9DPAfOerOeDSumKs3tXLEQyygl8MJRw9+rgtFsdPCuC9ZcYL
-   JZGW91guJPS7Rffh4rTugCWQ9lqgX2Lic18+/B1+F4jMQU0EqvwAJFvjD
-   4cwcpDYyxBzFUiaRgjAbfyaov0wJ8indOJfn3YpRToGPrku8WXeU8YzOZ
-   PPVR6n+sLNrMyCpgQTAAMOGRJAM0yA57mn1/WrobgNqJruM5EyvQ5lZaL
-   JvxV9VolpXPXVRPz+lW61nt+RnzdDDEB9uvnALn9zZa+UU1cvBdQj5q0N
-   +2AWVCwLC2ezUVD8ayS8eQIuFk3IK8ZlIs0BIOxq3c1pMF9j/T4B7fGFJ
-   Q==;
-IronPort-SDR: AjwHL17JPs75W3bJZjgAdu1KbybH0VIfwLRf8OABxJTp4FpliugJIxzpYfR5jJYJcBD0pRHHGf
- zvnpYoYp/pMA3OM9JuZBN0V7JaUtqYdiqvezjiqoGDO5mKrZ61XR/oDrRI9ystpHmQk77fLkm9
- rNlr3XdL48PtYpvkIQaIzazi/PKYZ2d6pv91CR6KouQsZY15QX10zpWg4Er1oPym5cIcYC2cCr
- 7cdl39x40a4eFheCBKXrMLgIW0+jcORan9znhKlYmDOZhOuRX4sW5YtByRxrsmNteYuz7e7E1r
- qN8=
-X-IronPort-AV: E=Sophos;i="5.79,394,1602518400"; 
-   d="scan'208";a="163354585"
-Received: from mail-dm6nam08lp2045.outbound.protection.outlook.com (HELO NAM04-DM6-obe.outbound.protection.outlook.com) ([104.47.73.45])
-  by ob1.hgst.iphmx.com with ESMTP; 02 Feb 2021 17:58:51 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gbgUygfXa9xdemyQNN7DW3Hs0qlyh9ID10lO+nu7tU88SnaeXa7iQW6ALLuz4Mh7Ef+nGqIAp14OYci/b9DVws6VT7ZkLJZbnlGQRdjuhMhFFyVgm0LH6jNw2AMEPQZKj6y4Ih+XNg5plxiGnp6aqIqNV5dYkBgCiDZZ2nt+XmtisqsChgh/MJx0ZsC2iB8z0U3CXGqDxam8cH7vEqY3i3IJm84SFVddHG7uhYnLqiadBfZ+DCChwV331Bnw3Pxtr1jacfMN8KCZ9gn8W0PknAOD1Fqll9RgNdb7gm8deSEteE/nfY6vIX0aZRv5JDlAmj07LESCEtXc7FmmK/zsAA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=G8FZ0D3PP/OudJ5uuxCAz/C/vBHo8wESZoPwxTWqVEI=;
- b=R6EPP157pT/yknZl2SUlm6zu0yo7rJEYQJ4fvGk66Jsl7JbwWU82wp/Dmn/4E2gw5ds6WPsSa4EPI8rMttm9v2Z417DwTn8hv9Ng5ztO3KxHV560HrXEOrwC6MMgFzuCA8nfY/kGRf0aIv1D048/7m91f2F0B0nqrsu6+x8JEzuGQfvjY6iXeWttJ491pkOVi1gm0eV+Efluf8HiGi44kHD606H1tvN94GpnNvE4AStgvr06v6FbdY1UBRJ44HAbvisRk4sJjYrzrK95nMtEu+LAYipuqpk8c98u7rngj0YkY0JAk1DSpjQryTW2PnG+P8AXzH6pTnlXAb7yfGJ03g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=G8FZ0D3PP/OudJ5uuxCAz/C/vBHo8wESZoPwxTWqVEI=;
- b=s20Tg9VqlYQA7FCB+eYikw7/Y9PFGSxQUFHSfpsSVbHLSoszCRLRybhNhYZMbbDbSnnzmsP4cLXLlqnyA2rkYfdkW9n4LXb7mnCM+OfTeoILUhn3iN4ZyiAMgjMYKaPnp8f+wVCiNjc6fwANqxbHhq1iYfR6mcq7Ss51GmGLR+g=
-Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
- (2603:10b6:803:47::21) by SN4PR0401MB3679.namprd04.prod.outlook.com
- (2603:10b6:803:46::15) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3805.22; Tue, 2 Feb
- 2021 09:58:49 +0000
-Received: from SN4PR0401MB3598.namprd04.prod.outlook.com
- ([fe80::c19b:805:20e0:6274]) by SN4PR0401MB3598.namprd04.prod.outlook.com
- ([fe80::c19b:805:20e0:6274%7]) with mapi id 15.20.3805.024; Tue, 2 Feb 2021
- 09:58:48 +0000
-From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-CC:     "paolo.valente@linaro.org" <paolo.valente@linaro.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "rostedt@goodmis.org" <rostedt@goodmis.org>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        "bvanassche@acm.org" <bvanassche@acm.org>,
-        "dongli.zhang@oracle.com" <dongli.zhang@oracle.com>,
-        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-        Aravind Ramesh <Aravind.Ramesh@wdc.com>,
-        "joshi.k@samsung.com" <joshi.k@samsung.com>,
-        Niklas Cassel <Niklas.Cassel@wdc.com>,
-        "hare@suse.de" <hare@suse.de>, "colyli@suse.de" <colyli@suse.de>,
-        "tj@kernel.org" <tj@kernel.org>,
-        "rdunlap@infradead.org" <rdunlap@infradead.org>,
-        "jack@suse.cz" <jack@suse.cz>, "hch@lst.de" <hch@lst.de>
-Subject: Re: [PATCH 5/7] block: get rid of the trace rq insert wrapper
-Thread-Topic: [PATCH 5/7] block: get rid of the trace rq insert wrapper
-Thread-Index: AQHW+SP6eBFVxTnq+UOKdUd7oo+5IA==
-Date:   Tue, 2 Feb 2021 09:58:48 +0000
-Message-ID: <SN4PR0401MB3598112545F8F0199DF10D729BB59@SN4PR0401MB3598.namprd04.prod.outlook.com>
-References: <20210202052544.4108-1-chaitanya.kulkarni@wdc.com>
- <20210202052544.4108-6-chaitanya.kulkarni@wdc.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: wdc.com; dkim=none (message not signed)
- header.d=none;wdc.com; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [2001:a62:1542:e101:7173:b327:67d3:fffc]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 03afb06a-0bfe-4bc3-52d9-08d8c761233d
-x-ms-traffictypediagnostic: SN4PR0401MB3679:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <SN4PR0401MB3679D9A6739A23D927E0F2879BB59@SN4PR0401MB3679.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:1728;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: Ami9W0AKUFRAYddbH7BvFQXiGyYvKfjHCzvTLuDw1oap+ID7Xeyd8NxwFpQlPD0kXEjVaPEmWIT1g5djmPld26CK91HpXqcWBoVG7IKrhEnh4oPep6tG/FdpQnir0lKIgU6nCRiE4GJALAg7evmszSgVC9Ka++EHNwoWfFSLeHKSXXsbWFTjf2AqNt89LlrUHhHW3KcBgxH3ecUwu1zY45/+ZcyUhc+r9EBpbC1YFtjZvzVXFi4Paa1ra1y/j/wrQCzBpXiMLHKWOuGLvF8DI/Lv+t/ILC8z5WjeALMCmQ/fB/XNicAGfJh5/f8FTJ1H5w9Ks0xu+nT3j65af5ivqlXDcXv5fZnVxXLhQNkpTY70zVotbtt4Ty7+wtCPDZOGnDPOgVk8Xtu/GwlFrjdVXIy1jxSWbtaFKeLE/pnqSis48ZuMJmueHgNWqXUp1sDoNR33pOn/JUC78or3KE3ZZ+cq+LxAq11RJFf6nqLYWl/AehclmbkKOamT+CoHyjnabQcetEaQZArDKBumn97GF1Hca1Hj55f/qZqG0qv4TyqZ5K8fwsNXQZAuXGZuBPk2
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN4PR0401MB3598.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(346002)(366004)(376002)(136003)(39850400004)(4270600006)(4326008)(66446008)(7696005)(66476007)(71200400001)(8676002)(19618925003)(66946007)(64756008)(2906002)(54906003)(110136005)(33656002)(9686003)(52536014)(558084003)(316002)(76116006)(55016002)(8936002)(86362001)(6506007)(91956017)(186003)(7416002)(66556008)(5660300002)(478600001)(26583001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: =?us-ascii?Q?whYkpbeR90q43qCgUnSJ6yKkKbQPLik77nxE0N38mdp5NALTde6wkzGE78hy?=
- =?us-ascii?Q?6GXo8+zQuY/oCGNHcz94MTUdATn/weUs53k1GtT5kyQIaCbVbT9drmzBfm7h?=
- =?us-ascii?Q?fxO/GG9oHuK8bs/57iv9BT94A3/730QvY4JOSbxQNGauzBAiBvzMFEDKSu7o?=
- =?us-ascii?Q?b1NxsIEU2ygDnjjMvn05QwTSK2wN2o7NAe9gIkbDPrkh7bkcR+8jYxlse7xX?=
- =?us-ascii?Q?zT3XK1OGZiJOt/h3nZ8qTzWm40fXc5QEENFj8zgXS1pD+Dlv1WnLWiBwyRoy?=
- =?us-ascii?Q?+Qv5MQHlEWw+Z+0JGToELUyYkT25h/Vz1uAJ+JHvUQ9GeQZ18wsdy1tA5kxt?=
- =?us-ascii?Q?5WT+uiSdluQSZMBPOBuqBAUku2YTl1fgw081IAo85FzIuVJQ0P4TdU0p8jjM?=
- =?us-ascii?Q?Si2obQfL8MHH+xXGYS3BX+wWoNGjR4YSF2G2f9/5/a9A++JoE6StkzPrMSfl?=
- =?us-ascii?Q?NIHMhWtaVPe6BuPuNYgBErNZJNYkHtzn77WdkJz6Wb9uJxObs5nYWWl2Dn3z?=
- =?us-ascii?Q?1hBBD5A3BdgODtw8p+0sMPVq/PQVjMaIBhehqQgjDuyLtwYNIzrNILzs3PUq?=
- =?us-ascii?Q?h/1Zke12nTg67eiRBYArn3/6MRwWAR7OZWJEm0+zDOmpT2fZJ2bMVzLeKUnY?=
- =?us-ascii?Q?yuaTRNLF3ZyMPbouyNbQJwJikVSCQ1Glx2Z0ir/UWnd8Y3SQzPKgDQqp86yC?=
- =?us-ascii?Q?lgFCTObfZ0N42UUAtazO/V4qe7NwRPqswh2ihv+cyx8lk1Lq6kTvApRy8cj/?=
- =?us-ascii?Q?QDPVwGLF+hJMH7JkRQCtZlA/iI6j2iLA6xPXRFZKls41+4ArjR51xlKqt2BK?=
- =?us-ascii?Q?K1ogr4CPHiwe6VRcWlCuWEaLUzQxmzQJiQ+u2cM19kGud2F4TGmPmIM1+oYn?=
- =?us-ascii?Q?MbUUjEWl9LAPaRScMEBV+vogkFZ1OBbgOGZK/Wkye4jogYRrWNPvVipVBCiI?=
- =?us-ascii?Q?XRDHy7JqMqdjRmmg0QzA3x0DMGmXBBB2plJqV359IJEDOmZovgktM9ekOfyK?=
- =?us-ascii?Q?/zHoJq0ZqbkXTfw1vr9VquLpE5+LY2CvdHObLUy/Nq95XaskDj1PLJV2gGso?=
- =?us-ascii?Q?TBVvIQeMlLLSNyOVU9+hE/P4LQiWBwZoiUuc53uqqZHwhYxZmwpK5xfmoR7Q?=
- =?us-ascii?Q?955MN8YMZ1HevQ/mmdgibm8MHEKFN7glAg=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S229634AbhBBK3E (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Feb 2021 05:29:04 -0500
+Received: from mail-io1-f69.google.com ([209.85.166.69]:37584 "EHLO
+        mail-io1-f69.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229593AbhBBK3B (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Feb 2021 05:29:01 -0500
+Received: by mail-io1-f69.google.com with SMTP id e10so1464681ioc.4
+        for <linux-block@vger.kernel.org>; Tue, 02 Feb 2021 02:28:45 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=MlUXTuM6nOcMNaAgBlcrcz9jVk5WWusj8rtcdYwVnH0=;
+        b=gpBO+jY5x1vfj9EfWfNuq70KKHOuQT2A06jUjwf/ejJ2kx+ekgKyR5wKU3LWG5c2xM
+         mI74h5++U/jdAk/tNiW8/B8J/KfzYnMUMTHgfqI5dI+sUqCJbu2AkJqpCVOKuUPSziKV
+         H4JnQeDL9KOu1wpLwFt0fFNVlPtP7Gj6gWaph1Gq23vs1qt/8Vwx3CKrVWSrZXm/NqEu
+         NAQXONJZUBtCvfFXaS4jNSPpoithuxql28aBoVCNO4DvaoWfo/uqlMN7eCy2GSA+y+uY
+         ++9XiKpg1M9Xmzr7ifzmaQ4Bxm/itDYm81zhhpj3kjOSER6v/R35EnqPmyLkxxvUHsbj
+         54IA==
+X-Gm-Message-State: AOAM5303BzjSdZD6WiLzLIy60LU7UW9rPIoBqMTy2ALHFqwZne/sxFDv
+        sdkGzhd/Q71i0kPbrSnKPUA4ihGOKtQ40SNTlEMMtXIJCtA+
+X-Google-Smtp-Source: ABdhPJwnAECBIuQx27J1xbO7XYer3HeB5Yjm9r18gXGnE5ccgp1BfxHjFaIEJucRIGDX/UirKlMvZBw2fbApYc7qlEFB6ZY8Hrlj
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN4PR0401MB3598.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 03afb06a-0bfe-4bc3-52d9-08d8c761233d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Feb 2021 09:58:48.8672
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: S7XQELCCW+DVmeaUvQpOUJRnnn21JYYKc6+0lMpqM5aEVaAwQzH/pcPA5TbvgEfu1R0bXb9q+ZOr4CoddFWb+pRJMKPCFQ68tGDPccNfLJ0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN4PR0401MB3679
+X-Received: by 2002:a92:8e4b:: with SMTP id k11mr16677869ilh.192.1612261700570;
+ Tue, 02 Feb 2021 02:28:20 -0800 (PST)
+Date:   Tue, 02 Feb 2021 02:28:20 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000f296a705ba57ed59@google.com>
+Subject: KASAN: use-after-free Read in recv_work
+From:   syzbot <syzbot+f91dbbabacae745d334f@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, josef@toxicpanda.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, nbd@other.debian.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Looks good,=0A=
-Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>=0A=
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    b01f250d Add linux-next specific files for 20210129
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=14366378d00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=725bc96dc234fda7
+dashboard link: https://syzkaller.appspot.com/bug?extid=f91dbbabacae745d334f
+compiler:       gcc (GCC) 10.1.0-syz 20200507
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+f91dbbabacae745d334f@syzkaller.appspotmail.com
+
+block nbd5: Receive control failed (result -107)
+==================================================================
+BUG: KASAN: use-after-free in recv_work+0x2a2/0x2c0 drivers/block/nbd.c:787
+Read of size 8 at addr ffff88801181ed20 by task kworker/u5:2/8465
+
+CPU: 1 PID: 8465 Comm: kworker/u5:2 Not tainted 5.11.0-rc5-next-20210129-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Workqueue: knbd5-recv recv_work
+Call Trace:
+ __dump_stack lib/dump_stack.c:79 [inline]
+ dump_stack+0x107/0x163 lib/dump_stack.c:120
+ print_address_description.constprop.0.cold+0x5b/0x2f8 mm/kasan/report.c:232
+ __kasan_report mm/kasan/report.c:399 [inline]
+ kasan_report.cold+0x7c/0xd8 mm/kasan/report.c:416
+ recv_work+0x2a2/0x2c0 drivers/block/nbd.c:787
+ process_one_work+0x98d/0x15f0 kernel/workqueue.c:2275
+ worker_thread+0x64c/0x1120 kernel/workqueue.c:2421
+ kthread+0x3b1/0x4a0 kernel/kthread.c:292
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:296
+
+Allocated by task 17044:
+ kasan_save_stack+0x1b/0x40 mm/kasan/common.c:38
+ kasan_set_track mm/kasan/common.c:46 [inline]
+ set_alloc_info mm/kasan/common.c:403 [inline]
+ ____kasan_kmalloc mm/kasan/common.c:434 [inline]
+ ____kasan_kmalloc.constprop.0+0xa0/0xd0 mm/kasan/common.c:406
+ kasan_slab_alloc include/linux/kasan.h:208 [inline]
+ slab_post_alloc_hook mm/slab.h:516 [inline]
+ slab_alloc_node mm/slub.c:2907 [inline]
+ slab_alloc mm/slub.c:2915 [inline]
+ __kmalloc_track_caller+0x16c/0x2e0 mm/slub.c:4550
+ __do_krealloc mm/slab_common.c:1149 [inline]
+ krealloc+0x60/0xa0 mm/slab_common.c:1178
+ nbd_add_socket+0x263/0x6a0 drivers/block/nbd.c:1044
+ __nbd_ioctl drivers/block/nbd.c:1369 [inline]
+ nbd_ioctl+0x388/0xa50 drivers/block/nbd.c:1425
+ blkdev_ioctl+0x2a1/0x6d0 block/ioctl.c:576
+ block_ioctl+0xf9/0x140 fs/block_dev.c:1650
+ vfs_ioctl fs/ioctl.c:48 [inline]
+ __do_sys_ioctl fs/ioctl.c:753 [inline]
+ __se_sys_ioctl fs/ioctl.c:739 [inline]
+ __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:739
+ do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
+ entry_SYSCALL_64_after_hwframe+0x44/0xa9
+
+Freed by task 17044:
+ kasan_save_stack+0x1b/0x40 mm/kasan/common.c:38
+ kasan_set_track+0x1c/0x30 mm/kasan/common.c:46
+ kasan_set_free_info+0x20/0x30 mm/kasan/generic.c:357
+ ____kasan_slab_free.part.0+0xe1/0x110 mm/kasan/common.c:364
+ kasan_slab_free include/linux/kasan.h:191 [inline]
+ slab_free_hook mm/slub.c:1562 [inline]
+ slab_free_freelist_hook+0x82/0x1d0 mm/slub.c:1600
+ slab_free mm/slub.c:3161 [inline]
+ kfree+0xe5/0x7b0 mm/slub.c:4202
+ krealloc+0x45/0xa0 mm/slab_common.c:1180
+ nbd_add_socket+0x263/0x6a0 drivers/block/nbd.c:1044
+ __nbd_ioctl drivers/block/nbd.c:1369 [inline]
+ nbd_ioctl+0x388/0xa50 drivers/block/nbd.c:1425
+ blkdev_ioctl+0x2a1/0x6d0 block/ioctl.c:576
+ block_ioctl+0xf9/0x140 fs/block_dev.c:1650
+ vfs_ioctl fs/ioctl.c:48 [inline]
+ __do_sys_ioctl fs/ioctl.c:753 [inline]
+ __se_sys_ioctl fs/ioctl.c:739 [inline]
+ __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:739
+ do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
+ entry_SYSCALL_64_after_hwframe+0x44/0xa9
+
+The buggy address belongs to the object at ffff88801181ed20
+ which belongs to the cache kmalloc-8 of size 8
+The buggy address is located 0 bytes inside of
+ 8-byte region [ffff88801181ed20, ffff88801181ed28)
+The buggy address belongs to the page:
+page:00000000e0a0f4b5 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x1181e
+flags: 0xfff00000000200(slab)
+raw: 00fff00000000200 ffffea000053d180 0000000500000005 ffff88800fc41280
+raw: ffff88801181ef28 0000000080660062 00000001ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+
+Memory state around the buggy address:
+ ffff88801181ec00: fc 00 fc fc fc fc fa fc fc fc fc 00 fc fc fc fc
+ ffff88801181ec80: fa fc fc fc fc 00 fc fc fc fc 00 fc fc fc fc 00
+>ffff88801181ed00: fc fc fc fc fa fc fc fc fc 00 fc fc fc fc 00 fc
+                               ^
+ ffff88801181ed80: fc fc fc 00 fc fc fc fc 00 fc fc fc fc fa fc fc
+ ffff88801181ee00: fc fc 00 fc fc fc fc fa fc fc fc fc 00 fc fc fc
+==================================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
