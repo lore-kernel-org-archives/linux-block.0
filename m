@@ -2,104 +2,91 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+X-Spam-Status: No, score=-12.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
 	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D193C433E0
-	for <linux-block@archiver.kernel.org>; Tue,  2 Feb 2021 14:37:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DA47C433E6
+	for <linux-block@archiver.kernel.org>; Tue,  2 Feb 2021 14:46:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3C37E64EAC
-	for <linux-block@archiver.kernel.org>; Tue,  2 Feb 2021 14:37:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CEBCE64F54
+	for <linux-block@archiver.kernel.org>; Tue,  2 Feb 2021 14:46:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234405AbhBBOhY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Feb 2021 09:37:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56158 "EHLO
+        id S234253AbhBBOqH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Feb 2021 09:46:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58736 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234491AbhBBOcI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Feb 2021 09:32:08 -0500
-Received: from mail-il1-x136.google.com (mail-il1-x136.google.com [IPv6:2607:f8b0:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A069C061786
-        for <linux-block@vger.kernel.org>; Tue,  2 Feb 2021 06:20:16 -0800 (PST)
-Received: by mail-il1-x136.google.com with SMTP id m20so11661322ilj.13
-        for <linux-block@vger.kernel.org>; Tue, 02 Feb 2021 06:20:16 -0800 (PST)
+        with ESMTP id S234518AbhBBOnz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Feb 2021 09:43:55 -0500
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73433C0613ED
+        for <linux-block@vger.kernel.org>; Tue,  2 Feb 2021 06:43:13 -0800 (PST)
+Received: by mail-pg1-x535.google.com with SMTP id i7so15017073pgc.8
+        for <linux-block@vger.kernel.org>; Tue, 02 Feb 2021 06:43:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        d=cloud.ionos.com; s=google;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=t1KFZQVY/DxQ9liNlk4p5rHsTe1eztkSWG9pZLclAaM=;
-        b=Roe+D204Ctd0npf37Ni88h2NOvgV6xaroR+sXYPETApFsoi3natQ82RzJtyfetiH1B
-         xKjRZ9xOv73sQOXuTZIv0Cvxk4TvlcmI3HLnxu7j7lEY8zm/CUp7TRiuf5RPwHf0pSFo
-         AC0/fAjcViva9q1JJjys0qAYFvLxqXHvetYiqtHFq/DMtv1fDDN7IGm3CyT3D5lAsTGJ
-         C9zheHWkl4bUZbZ77ZDeeQCNE6BWSabVLKcpe9VLHxhYolYY7rL6r2i3kqldDzkMVWq1
-         zL43j+s4WZZnqIhUKrcXj5ds6pK3Ok6peFO8tTpUI8f8brdDU+yy2OvOvHhd9+Yby0NR
-         YRKQ==
+        bh=QSnIdi/e9yVAo9x8m93IfOCoHH7w6yNsBlBzekuSq58=;
+        b=BebiQp/vuL3hgQKiqlex6GBVDzG6L6NbS5VxnIUq44qW9nNU7bd75USJRsEoP2MZVF
+         +e4SwtpiUJ+1/ZjR6GuXJGCJ2Gp1L9glLeLVgvIpO6No99EZBSXeGzSd7YHExG6hgiZ2
+         Tg1yKYqllpYonDwL4LQbXVjYp830zo9XdAEBmqhGlShZbREr4Xp306dbbkJbFuTtXaCK
+         sHWV9AbCcG8D5Kkly1xatDZt2SQ/Yj9dYkr397AaQtzA6EXPHelEutxASbHEDvYc1NXl
+         g5HN5lPYdIL+wyALJYFIYPSZEjVKo8pP3aVJ6Nba96rRSO5LoTsua9/BbUE6K+BVTpZf
+         5JsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=t1KFZQVY/DxQ9liNlk4p5rHsTe1eztkSWG9pZLclAaM=;
-        b=FyfBqTRA1LxpbBg9kZDF2tebd19tNig0FM4G7XZLO4GhnOIoHEyks77x1uhHyB6lRS
-         4uHYSSuPmZ638cCDf50o8LnOxAwmFQYmrFhssVfc9JTbzCbTgA7GnzYRFZ7Z/EhnBp85
-         4fvRp6Bn1BcLwlRafQ+ToEn5UHm0hmpGNJAk6V1MrvAb+TkiAhIrsC5JWvMOX08c1Rx4
-         6NgtFVwM/fYnjwlUHKZZq4vW66jMBMlUiqx7Ri6efi+50P3jD1xbEYeG5cZ4AILTSASv
-         WH2IdTlKlPVUW4lWlS/iVEsUJQwV9jaDVmmjsuHCmY/3wrEI3Auf/+mY3V/Dlm7PjECC
-         t/kA==
-X-Gm-Message-State: AOAM531LU0Qy5d5TJZonMncOjPTiuK5XmKy1cKTDb/le/9fMgLxBgbi8
-        SuxobRZSO37DoJoH/U6xYkeriKEmWJnJNVXy
-X-Google-Smtp-Source: ABdhPJxkdEchUAvYW/rkyrEcHpNi1VxOF9nH09cLjhcdz49G3SRvbrpf5/5CT4BvCNo00Q78q87qZQ==
-X-Received: by 2002:a05:6e02:b2c:: with SMTP id e12mr17301468ilu.143.1612275615609;
-        Tue, 02 Feb 2021 06:20:15 -0800 (PST)
-Received: from [192.168.1.30] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id p19sm11005722ilj.37.2021.02.02.06.20.14
+        bh=QSnIdi/e9yVAo9x8m93IfOCoHH7w6yNsBlBzekuSq58=;
+        b=lBhRjLrn6DRQtIbcRhJM7uTYMEWYRL4nrB4GFk1gAXGestPi2llNrHoUTbtmnk/537
+         njRA2YrKItB9RAcsezDSh1C+dVmT+mPjJ4zG9Y2I0Y+WZPyxDhDJmfytINY4zysZr6m0
+         WX5aLvvOJs92jIP91hVOdu1ERE3xDLz22JOnmgJEcmjG39JSFaaR8xqQ/5gTbsTbLLzX
+         If/S2DnRd4UWqqtX/csfO2c/tZnEF8EuWPi7rlEjibgv0RYSXCt1SleNWch52diKXWI3
+         X9Kiw4FeQPl3/mH/Wh41tIr3FWfbdEIyUteI3ZO5SOnxNy0xCTLYaPKeZk5hzqf/CS1d
+         cTpQ==
+X-Gm-Message-State: AOAM530uIu7yUvqmdWemjqKevD7Iit/pVluqqL2VBuDns8DY2m2kyF+d
+        9SUS93EpcvYPFn0A6oDYf4bKGA==
+X-Google-Smtp-Source: ABdhPJwEiaXPT6raIkfTP0UCXuzDM0iep9jIyK26hYq/xmU0UEWBKmptmK+CjhDzmYMqFA9K5ZJGNA==
+X-Received: by 2002:a63:794a:: with SMTP id u71mr22029715pgc.91.1612276991840;
+        Tue, 02 Feb 2021 06:43:11 -0800 (PST)
+Received: from [0.0.0.0] ([62.217.45.26])
+        by smtp.gmail.com with ESMTPSA id e191sm23220790pfh.149.2021.02.02.06.43.01
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Feb 2021 06:20:14 -0800 (PST)
-Subject: Re: [PATCH] Revert "bfq: Fix computation of shallow depth"
-To:     Jan Kara <jack@suse.cz>, Lin Feng <linf@wangsu.com>
-Cc:     paolo.valente@linaro.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org
-References: <20210129111808.45796-1-linf@wangsu.com>
- <20210202122836.GC17147@quack2.suse.cz>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <f92a55b4-0743-a700-8296-e739f4fcf093@kernel.dk>
-Date:   Tue, 2 Feb 2021 07:20:16 -0700
+        Tue, 02 Feb 2021 06:43:11 -0800 (PST)
+Subject: Re: [PATCH V3 0/3] block: add two statistic tables
+To:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "danil.kipnis@cloud.ionos.com" <danil.kipnis@cloud.ionos.com>,
+        "jinpu.wang@cloud.ionos.com" <jinpu.wang@cloud.ionos.com>
+References: <20210202031009.11584-1-guoqing.jiang@cloud.ionos.com>
+ <SN4PR0401MB359830835C1F9ECEDF7ECACA9BB59@SN4PR0401MB3598.namprd04.prod.outlook.com>
+From:   Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
+Message-ID: <7f78132a-affc-eb03-735a-4da43e143b6e@cloud.ionos.com>
+Date:   Tue, 2 Feb 2021 15:42:50 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210202122836.GC17147@quack2.suse.cz>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <SN4PR0401MB359830835C1F9ECEDF7ECACA9BB59@SN4PR0401MB3598.namprd04.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/2/21 5:28 AM, Jan Kara wrote:
-> Hello!
-> 
-> On Fri 29-01-21 19:18:08, Lin Feng wrote:
->> This reverts commit 6d4d273588378c65915acaf7b2ee74e9dd9c130a.
->>
->> bfq.limit_depth passes word_depths[] as shallow_depth down to sbitmap core
->> sbitmap_get_shallow, which uses just the number to limit the scan depth of
->> each bitmap word, formula:
->> scan_percentage_for_each_word = shallow_depth / (1 << sbimap->shift) * 100%
-> 
-> Looking at sbitmap_get_shallow() again more carefully, I agree that I
-> misunderstood how shallow_depth argument gets used and the original code
-> was correct and I broke it. Thanks for spotting this!
-> 
-> What I didn't notice is that shallow_depth indeed gets used for each bitmap
-> word separately and not for bitmap as a whole. I'd say this could use some
-> more documentation but that's unrelated to your revert. So feel free to add:
-> 
-> Reviewed-by: Jan Kara <jack@suse.cz>
 
-I don't have the original patch (neither directly nor in the archive), so
-I had to hand-apply it. In any case, applied for 5.11, thanks.
 
--- 
-Jens Axboe
+On 2/2/21 11:48, Johannes Thumshirn wrote:
+> Not a huge fan of the function names, but I don't have a better idea either.
+> 
+> For the whole series,
+> Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+> 
 
+Thanks! I will add it if I need to send a new version.
+
+Guoqing
