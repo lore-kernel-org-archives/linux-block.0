@@ -7,42 +7,42 @@ X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 648E2C4332D
-	for <linux-block@archiver.kernel.org>; Tue,  2 Feb 2021 17:23:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0D25C4332B
+	for <linux-block@archiver.kernel.org>; Tue,  2 Feb 2021 17:23:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 430AC64F9A
-	for <linux-block@archiver.kernel.org>; Tue,  2 Feb 2021 17:23:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 87F1964F8F
+	for <linux-block@archiver.kernel.org>; Tue,  2 Feb 2021 17:23:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237475AbhBBRWv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Feb 2021 12:22:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36000 "EHLO
+        id S236129AbhBBRXA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Feb 2021 12:23:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36036 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237243AbhBBRU0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Feb 2021 12:20:26 -0500
+        with ESMTP id S237321AbhBBRUd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Feb 2021 12:20:33 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0DADC061793;
-        Tue,  2 Feb 2021 09:19:46 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 926FDC0617A9;
+        Tue,  2 Feb 2021 09:19:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=bnwameR66FVk2TzMwO3FMz7nrTIgAi0+i3BRst7/0S8=; b=iMuTjZ3Cq3Tov59Gsy5Zqetet6
-        q/JakmW1uYpxjlJPeRN7U2n9zBzVbDpsNwhStcAiOPMlHjDTW/QH2ejxKG8DEuzOmw3lQMX4i5ZQn
-        f4O4+nkkE40nzP0esREcEJo3K5DcEDQea8nkCQOnW6mO62ep0D/MRpatptIF7apufauigg2lRhgCl
-        t9HcdUjF+Rgb8JlxEmrSzDW80tJL5nWo7eagOw3Hqv8vogQPRs+e8FIlNKFZ7faQHoqywMRh2cRdJ
-        Y2wc8wJ1qVIQKQHWCYXXyGXbtB3MQCs+IesKLMG6uzLguI0Zy93sLZe18xJUYMThOeH+ng/p5GlYH
-        yi22dsfg==;
+        bh=1xNd4VdNs0a6Y9GFGx9AiqZjZRBGY2oGOlLXsERzOOA=; b=GWKjXmh6QaqJtgiVxXicmw1722
+        OU6MkuBFiBg85ibR+B/uW57CgL/IK23nDoFuI4jf0y1lFJdHaDtMOvucArVoPrZCVKDfppBC0+eSG
+        VeuDc6P2isr/2ysdco+qTPjQ0vG6UykkdXk9Sk4YurhZv8wTOcHBkOlk9aQgf5DW3DLtM3tcIdtym
+        YqRbrAAiW8/R6v5iomRsy2vjho/cwZeEWAWvzasmywyLj2/10ajEfLQG+1Bk8SfhTQEDf9RuEP8Lq
+        5nHnoUszTpzl00oSMMx1GMh+n6aJyE0qTodhhNiNEReLMD//OZatES3/PS95L153r4nHptVuaX7xC
+        /+FCOZgg==;
 Received: from [2001:4bb8:198:6bf4:c70:4a89:bc61:2] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
-        id 1l6zL4-00FVys-6f; Tue, 02 Feb 2021 17:19:42 +0000
+        id 1l6zLB-00FVzz-CL; Tue, 02 Feb 2021 17:19:49 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Song Liu <song@kernel.org>,
         "Martin K. Petersen" <martin.petersen@oracle.com>,
         linux-block@vger.kernel.org, linux-raid@vger.kernel.org
-Subject: [PATCH 06/11] block: turn the nr_iovecs argument to bio_alloc* into an unsigned short
-Date:   Tue,  2 Feb 2021 18:19:24 +0100
-Message-Id: <20210202171929.1504939-7-hch@lst.de>
+Subject: [PATCH 09/11] block: mark the bio as cloned in bio_iov_bvec_set
+Date:   Tue,  2 Feb 2021 18:19:27 +0100
+Message-Id: <20210202171929.1504939-10-hch@lst.de>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210202171929.1504939-1-hch@lst.de>
 References: <20210202171929.1504939-1-hch@lst.de>
@@ -53,62 +53,33 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The bi_max_vecs and bi_vcnt fields are defined as unsigned short, so
-don't allow passing larger values in.
+bio_iov_bvec_set clones the bio_vecs from the iter, and thus should be
+treated like a cloned bio in every respect.  That also includes not
+touching bi_max_vecs as that is a property of the bio allocation and not
+its current payload.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/bio.c         | 4 ++--
- include/linux/bio.h | 7 ++++---
- 2 files changed, 6 insertions(+), 5 deletions(-)
+ block/bio.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/block/bio.c b/block/bio.c
-index ae241252ea14e5..3d28d4723f6f2f 100644
+index f753201238273b..a36f955cd120b0 100644
 --- a/block/bio.c
 +++ b/block/bio.c
-@@ -407,7 +407,7 @@ static void punt_bios_to_rescuer(struct bio_set *bs)
-  *
-  * Returns: Pointer to new bio on success, NULL on failure.
-  */
--struct bio *bio_alloc_bioset(gfp_t gfp_mask, unsigned int nr_iovecs,
-+struct bio *bio_alloc_bioset(gfp_t gfp_mask, unsigned short nr_iovecs,
- 			     struct bio_set *bs)
- {
- 	gfp_t saved_gfp = gfp_mask;
-@@ -493,7 +493,7 @@ EXPORT_SYMBOL(bio_alloc_bioset);
-  *
-  * Returns: Pointer to new bio on success, NULL on failure.
-  */
--struct bio *bio_kmalloc(gfp_t gfp_mask, unsigned int nr_iovecs)
-+struct bio *bio_kmalloc(gfp_t gfp_mask, unsigned short nr_iovecs)
- {
- 	struct bio *bio;
+@@ -937,11 +937,11 @@ static int bio_iov_bvec_set(struct bio *bio, struct iov_iter *iter)
+ 	WARN_ON_ONCE(BVEC_POOL_IDX(bio) != 0);
  
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 4a84207dd99663..9ceeb8ecdb7f23 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -407,8 +407,9 @@ extern void bioset_exit(struct bio_set *);
- extern int biovec_init_pool(mempool_t *pool, int pool_entries);
- extern int bioset_init_from_src(struct bio_set *bs, struct bio_set *src);
+ 	bio->bi_vcnt = iter->nr_segs;
+-	bio->bi_max_vecs = iter->nr_segs;
+ 	bio->bi_io_vec = (struct bio_vec *)iter->bvec;
+ 	bio->bi_iter.bi_bvec_done = iter->iov_offset;
+ 	bio->bi_iter.bi_size = iter->count;
+ 	bio_set_flag(bio, BIO_NO_PAGE_REF);
++	bio_set_flag(bio, BIO_CLONED);
  
--extern struct bio *bio_alloc_bioset(gfp_t, unsigned int, struct bio_set *);
--struct bio *bio_kmalloc(gfp_t gfp_mask, unsigned int nr_iovecs);
-+struct bio *bio_alloc_bioset(gfp_t gfp, unsigned short nr_iovecs,
-+		struct bio_set *bs);
-+struct bio *bio_kmalloc(gfp_t gfp_mask, unsigned short nr_iovecs);
- extern void bio_put(struct bio *);
- 
- extern void __bio_clone_fast(struct bio *, struct bio *);
-@@ -416,7 +417,7 @@ extern struct bio *bio_clone_fast(struct bio *, gfp_t, struct bio_set *);
- 
- extern struct bio_set fs_bio_set;
- 
--static inline struct bio *bio_alloc(gfp_t gfp_mask, unsigned int nr_iovecs)
-+static inline struct bio *bio_alloc(gfp_t gfp_mask, unsigned short nr_iovecs)
- {
- 	return bio_alloc_bioset(gfp_mask, nr_iovecs, &fs_bio_set);
- }
+ 	iov_iter_advance(iter, iter->count);
+ 	return 0;
 -- 
 2.29.2
 
