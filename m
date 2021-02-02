@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19567C433E0
-	for <linux-block@archiver.kernel.org>; Tue,  2 Feb 2021 05:38:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 771D7C433E6
+	for <linux-block@archiver.kernel.org>; Tue,  2 Feb 2021 05:38:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E066364EDC
-	for <linux-block@archiver.kernel.org>; Tue,  2 Feb 2021 05:38:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3B2B164EDC
+	for <linux-block@archiver.kernel.org>; Tue,  2 Feb 2021 05:38:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231633AbhBBFig (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Feb 2021 00:38:36 -0500
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:43351 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231469AbhBBFif (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Feb 2021 00:38:35 -0500
+        id S230369AbhBBFij (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Feb 2021 00:38:39 -0500
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:57154 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229846AbhBBFig (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Feb 2021 00:38:36 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1612244314; x=1643780314;
+  t=1612244376; x=1643780376;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=rA9+ridQg7jh92JA0OnVA5Iy1grqYZCG75rmKGzyURM=;
-  b=a34jXNczBwsSg1qhDeoZ6wsLI2cFAkmEoWahx6zRAb9Jo6W+EKixOlAw
-   6+caQ8L7nXjCvJvlQz3CIUXZ+u6obVij2/BBMn/iL6sqFDsjwWnJrYdjT
-   LKulQwhOxUCtRfwAi66GmlxdUJAGKH7wyp/JZi7sBlRpdLs74v2xOopHe
-   JjBJ7b8a50PcNBp7ETSdqnCealZfV3vx4CFt+lXIvrru2xKSeBT1ft9uc
-   6MA2DfK1BaT+HqVT/gux1KZHA8ta4xHa59BtFQBKxCYPK5HXa/TRRSMdc
-   nPbIzDU2nCK5iXnTwpLgqZmTeD2K4svhIrEa0sDyh4+sYhSgHVNsNrwwU
-   g==;
-IronPort-SDR: K5pkJarrSIWijUQBivBDdng6zz0HM1W5r+sbU6vRRLHB1W+xUIhMCxNZIPYxpLNGK5oWCS3LCr
- Se9S5t6T/1eqhU9LV4MPpZwtaR1OljrCOiyn+lnjfm2ralpFjDkEAuwHS9/1xNlG0rKY+ZU3WF
- Smv7XIk77P6zBXdUlTmhy45wByAbIdBSTbGO898Qy4yzlsGRLi6MBx8zjhwVQj+Hyu2Sq8i+Sp
- RZFV3hp17I8tcn7jC2bFi6BbOidkLl7GOpMe+aGyH0wLtXwQHv9TSx9OKCN9r9aoS7W9w325DN
- gyU=
+  bh=ca4BtS6m9c3hxquO+nIemXua1oS2Hi6c1Fi0pcfSFNQ=;
+  b=cXgxoEyLKWMN9xtHB0xRdBKGDRiGFpa0qCbcQJTUHljVKUU3gbhsVbHp
+   MU01EKMtY5DsmT/dQ56SRHtmr82C5PI+TVLbWMWqIPp/eQ5k1gICtywQP
+   lwPV2O5gdEL/BtGdbw7XrcgJmXoHPmaJGZ2pBcl+ADlD/GeaQc6V/Z/CO
+   YaJ2ExVuPg5k2vnfvBnWd+p5oNwmQP4irRftXEC21d6MPK22nrrVadFS3
+   1/OgEV76QeE4hD/jumrfjGGmheA+tkD8JfeOye5oEClLQla81a55oDeSl
+   99KpvSz5FFm5R62m3A3Wsit85Max9wUBG+/vr//GFNgItIJVB1P6oX/gW
+   Q==;
+IronPort-SDR: G4QAA02N2NVedITNwiYb9Wl5kPDtzQJgIorPZh+DcWaNe174J5aMQysrWtKX8Xb2NUdnRJvEhQ
+ UBZdn9UBB7KVr/sOqryIsxrulwhylgVeUSiGZ1J6SDstHRXschvjSHCPd8djdJ8aBScWeBbI52
+ PaXoYxWeMI5OlPwtfxzcX/vQ6M45gGZ77wPSthj8P2P8wyrmz98pT4HT9ugj6Jn1mbWcFLRIKf
+ AGXJcIcI0S/mDc+Eoivw4rO22VxhHdeQ9pnsIM3+DtS1wJP+1GWwNGn2lAp1v9ARK0EAlyAre6
+ WRo=
 X-IronPort-AV: E=Sophos;i="5.79,394,1602518400"; 
-   d="scan'208";a="163334455"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 02 Feb 2021 13:37:45 +0800
-IronPort-SDR: 2dl9FDbesQdFQ+37KYhgkhrVquBImaxdeNuB71Ha9YRh6joQkNr87AZyh2IKzVw714EjrPSTXV
- O8MmP60dtegZXcspK6VhfssD6Nke+IK4z/eZHSqYexG4qewzclHy2dI6pFLEQ7yNaBuH05NbHw
- TMkQ4e3dCcqoph0OK4LrKnNXG7Jmd2n7YrgU6xuLzQpsJOMyzi/01CgaFEBTRYiBUxqZg1u38s
- GW7AdTvC7QZ3HOWcO/vXF3feXd0sqfQf314T7SVkEEq3LQFmgBfVhOaZwzQNtPlUGG5OlnEqR+
- ipi5oDqdILoD0UULgvGQP57c
+   d="scan'208";a="262961968"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 02 Feb 2021 13:37:57 +0800
+IronPort-SDR: YxNqbQoaIXCXCV5G8X4AXIEtIyKCGURwV7veYVbs9A/vxTN9d+VBLScGwehjswH3OJ4wMAXQYW
+ ugFMHMnVtvUhUkpO+Wpw3Sav6M5IWrhWgKEGVHiYz3czkuI3455puTlzMXE1NA9V6CMOf1SXiy
+ CjL+ZVSyKkdUQ/vyokRFHpWtgGwI2Lo3k8rTmqafQNkITDE01lymh67SjH4G4RVH7V/4zQ9oKU
+ QfKbYOdwaMPWNxKu1KdxIP5RvinuFp9a7L3xSMcHzAgxu1HEeVONcnOP2GImlECjwR5wXoUANJ
+ OXbf/4AcchwoBtzvC3Ilq+D0
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2021 21:19:55 -0800
-IronPort-SDR: sz3UrHErxF3C6b0x4WAwYOG8BLErBVf1DNTHIxnl8mbJ75rulnsBHGwiOFjypjhSOlk7/5Ol+A
- e8dZSTX7vlZekgMrx4AsPs6PecmpZrcG7QofasU7n7uj4/b6Qgr8P967RVO8hL9jQ0v13SL8yk
- uxdDte5zhuFJLTpiDRuRRxaIxRL48gDzP/E5aChFZGqFVQYymfpR3KTZ0bu3IU/YTHO9iS+Vxm
- G4x3+I5C9e/XK/WPFIFJsVn46LksxRvSOdee1gOUes+z4qfTZ6nC3v+Www2d9Qav4xOdO6PJdf
- 0FQ=
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2021 21:19:38 -0800
+IronPort-SDR: tjijzQnVTCpda5knOfgUMlI3nOnqdIWXqmNywZ9AmjC8s6ZbnVEjKbRxrXllsd++joWDCYoyRx
+ r2TpgtHbd4VJLGNmvWCQB9df4LwzTQoRj27KH8TJDtJYSlPKz4Fsf6AX2lnxbrKfeK9NJG1F2F
+ gig9fXf48Bc391ZNRFSRocrSguJTAUBVkxcWSMNsDipQpk2IYAyou2xjFjBf9BYGlEOXgJClgs
+ uweSJPw7tnM4dACWskhwYUyWtL5vhaGQl5v8A1taGGO/cfg0LTuiNMd2ObIYv2S0vvMOSiFCQG
+ EWg=
 WDCIronportException: Internal
 Received: from vm.labspan.wdc.com (HELO vm.sc.wdc.com) ([10.6.137.102])
-  by uls-op-cesaip02.wdc.com with ESMTP; 01 Feb 2021 21:37:46 -0800
+  by uls-op-cesaip02.wdc.com with ESMTP; 01 Feb 2021 21:37:29 -0800
 From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 To:     linux-block@vger.kernel.org
 Cc:     axboe@kernel.dk, Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [RFC PATCH 14/20] loop: remove memset in info64 from compat
-Date:   Mon,  1 Feb 2021 21:35:46 -0800
-Message-Id: <20210202053552.4844-15-chaitanya.kulkarni@wdc.com>
+Subject: [RFC PATCH 12/20] loop: cleanup lo_ioctl()
+Date:   Mon,  1 Feb 2021 21:35:44 -0800
+Message-Id: <20210202053552.4844-13-chaitanya.kulkarni@wdc.com>
 X-Mailer: git-send-email 2.22.1
 In-Reply-To: <20210202053552.4844-1-chaitanya.kulkarni@wdc.com>
 References: <20210202053552.4844-1-chaitanya.kulkarni@wdc.com>
@@ -71,37 +71,97 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In current code loop_info64_from_compat() is only called from the one
-caller loop_set_status_compat(). Initialize the info64 local variable
-to zero before we pass it to the loop_info64_compat() so that we can get
-rid of the memset in the loop_info64_from_compat().
+Instead of storing the return values into the err variable just return
+the err from switch cases, since we don't do anything after switch with
+that error but return. This also removes the need for the local
+variable err in lo_ioctl(). Instead of declaring config variable twice
+in the set_fd and configire switch cases declare and initialize the loop
+config variabel that removes the need for memset. Also, move status64
+switch case near to set status case.
+
+No functional change in this patch.
 
 Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 ---
- drivers/block/loop.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ drivers/block/loop.c | 38 +++++++++++---------------------------
+ 1 file changed, 11 insertions(+), 27 deletions(-)
 
 diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 667a3945bf39..2029ca399ea3 100644
+index d9cd0ac3d947..bc074ad00eaf 100644
 --- a/drivers/block/loop.c
 +++ b/drivers/block/loop.c
-@@ -1731,7 +1731,6 @@ loop_info64_from_compat(const struct compat_loop_info __user *arg,
- 	if (copy_from_user(&info, arg, sizeof(info)))
- 		return -EFAULT;
- 
--	memset(info64, 0, sizeof(*info64));
- 	info64->lo_number = info.lo_number;
- 	info64->lo_device = info.lo_device;
- 	info64->lo_inode = info.lo_inode;
-@@ -1794,7 +1793,7 @@ loop_info64_to_compat(const struct loop_info64 *info64,
- static int loop_set_status_compat(struct loop_device *lo,
- 				 const struct compat_loop_info __user *arg)
+@@ -1660,48 +1660,35 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode, unsigned int cmd,
  {
--	struct loop_info64 info64;
-+	struct loop_info64 info64 = { };
- 	int ret;
+ 	struct loop_device *lo = bdev->bd_disk->private_data;
+ 	void __user *argp = (void __user *) arg;
+-	int err;
++	struct loop_config config = { };
  
- 	ret = loop_info64_from_compat(arg, &info64);
+ 	switch (cmd) {
+-	case LOOP_SET_FD: {
++	case LOOP_SET_FD:
+ 		/*
+ 		 * Legacy case - pass in a zeroed out struct loop_config with
+ 		 * only the file descriptor set , which corresponds with the
+ 		 * default parameters we'd have used otherwise.
+ 		 */
+-		struct loop_config config;
+-
+-		memset(&config, 0, sizeof(config));
+ 		config.fd = arg;
+-
+ 		return loop_configure(lo, mode, bdev, &config);
+-	}
+-	case LOOP_CONFIGURE: {
+-		struct loop_config config;
+-
++	case LOOP_CONFIGURE:
+ 		if (copy_from_user(&config, argp, sizeof(config)))
+ 			return -EFAULT;
+-
+ 		return loop_configure(lo, mode, bdev, &config);
+-	}
+ 	case LOOP_CHANGE_FD:
+ 		return loop_change_fd(lo, bdev, arg);
+ 	case LOOP_CLR_FD:
+ 		return loop_clr_fd(lo);
+ 	case LOOP_SET_STATUS:
+-		err = -EPERM;
+-		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN)) {
+-			err = loop_set_status_old(lo, argp);
+-		}
+-		break;
++		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN))
++			return loop_set_status_old(lo, argp);
++		return -EPERM;
++	case LOOP_SET_STATUS64:
++		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN))
++			return loop_set_status64(lo, argp);
++		return -EPERM;
+ 	case LOOP_GET_STATUS:
+ 		return loop_get_status_old(lo, argp);
+-	case LOOP_SET_STATUS64:
+-		err = -EPERM;
+-		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN)) {
+-			err = loop_set_status64(lo, argp);
+-		}
+-		break;
+ 	case LOOP_GET_STATUS64:
+ 		return loop_get_status64(lo, argp);
+ 	case LOOP_SET_CAPACITY:
+@@ -1711,11 +1698,8 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode, unsigned int cmd,
+ 			return -EPERM;
+ 		fallthrough;
+ 	default:
+-		err = lo_simple_ioctl(lo, cmd, arg);
+-		break;
++		return lo_simple_ioctl(lo, cmd, arg);
+ 	}
+-
+-	return err;
+ }
+ 
+ #ifdef CONFIG_COMPAT
 -- 
 2.22.1
 
