@@ -2,124 +2,89 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39477C433E6
-	for <linux-block@archiver.kernel.org>; Tue,  2 Feb 2021 15:56:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0FB9C433DB
+	for <linux-block@archiver.kernel.org>; Tue,  2 Feb 2021 15:57:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0659A64F64
-	for <linux-block@archiver.kernel.org>; Tue,  2 Feb 2021 15:56:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A2AF064E2B
+	for <linux-block@archiver.kernel.org>; Tue,  2 Feb 2021 15:57:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235905AbhBBP40 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Feb 2021 10:56:26 -0500
-Received: from mail.kernel.org ([198.145.29.99]:39394 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235253AbhBBPMW (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 2 Feb 2021 10:12:22 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 0A0EC64F70;
-        Tue,  2 Feb 2021 15:06:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1612278407;
-        bh=QEaEtUdgOwqKhjqXpL8Ve8WrJNYFJPvtx5Ol4GMzAww=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=qdGb6c1ZlHQtvYng7x2dxV7szjJuFWD/KcwQA1IYWwDWatxZpIYFDH/d9a5i/aYs2
-         8r1tioxFvikMP6ebK1BLUXBLjkMQUXI3dQXVHWHMfUoFMYgw0OAApsxs0yV4NuUYXI
-         uIxzg8VB+c9jVr4logmaUK71FUyS028vS1cXP9Z8AxYcC2d6gz/uidxI1sIesncGF8
-         XfPvhigP4NaUb8tz6lrxkOIgOqeB/g0UNmnD8s1CzmoIM/+ZBXCsc+l1N9OG1vA8Kl
-         lA1XBGOP4vLqE9zZQl8rlJhHUVtNzFcWiNo/EpuGHWKFzR7uTY1Kj3EyeTYaNMk06+
-         rWxKsfPPzLXAw==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Baolin Wang <baolin.wang@linux.alibaba.com>,
-        Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        Sasha Levin <sashal@kernel.org>, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 24/25] blk-cgroup: Use cond_resched() when destroy blkgs
-Date:   Tue,  2 Feb 2021 10:06:14 -0500
-Message-Id: <20210202150615.1864175-24-sashal@kernel.org>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20210202150615.1864175-1-sashal@kernel.org>
-References: <20210202150615.1864175-1-sashal@kernel.org>
+        id S235795AbhBBP5Z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Feb 2021 10:57:25 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40897 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235826AbhBBPzt (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 2 Feb 2021 10:55:49 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1612281262;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=RJALn1A3XyTcFbBye48gyn4DSSWq5WHJtrl3dXqiuvM=;
+        b=YrOcnk8y+XG0sUE6OjQZyY7cS9Lf+wgpIygU7GA9AWxP8g0pb3IJ0SBrI+RFiPfgVkWnb7
+        6V2lfvPS0PmtKizuN4CSnjAmO3c2mXwUkeR7b7FzCWa9QnsaXyAQqzrXbLvIXBOx+DKxnB
+        PCol956h+P9LMdAqyVec1912P7+/UTs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-409-UPJnfWkgOc2PF2IHlvJBtg-1; Tue, 02 Feb 2021 10:54:20 -0500
+X-MC-Unique: UPJnfWkgOc2PF2IHlvJBtg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 240B08162B;
+        Tue,  2 Feb 2021 15:54:19 +0000 (UTC)
+Received: from localhost (ovpn-12-169.pek2.redhat.com [10.72.12.169])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6172A60C6B;
+        Tue,  2 Feb 2021 15:54:14 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>
+Subject: [PATCH] block: fix memory leak of bvec
+Date:   Tue,  2 Feb 2021 23:54:10 +0800
+Message-Id: <20210202155410.875745-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-stable: review
-X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Baolin Wang <baolin.wang@linux.alibaba.com>
+bio_init() clears bio instance, so the bvec index has to be set after
+bio_init(), otherwise bio->bi_io_vec may be leaked.
 
-[ Upstream commit 6c635caef410aa757befbd8857c1eadde5cc22ed ]
-
-On !PREEMPT kernel, we can get below softlockup when doing stress
-testing with creating and destroying block cgroup repeatly. The
-reason is it may take a long time to acquire the queue's lock in
-the loop of blkcg_destroy_blkgs(), or the system can accumulate a
-huge number of blkgs in pathological cases. We can add a need_resched()
-check on each loop and release locks and do cond_resched() if true
-to avoid this issue, since the blkcg_destroy_blkgs() is not called
-from atomic contexts.
-
-[ 4757.010308] watchdog: BUG: soft lockup - CPU#11 stuck for 94s!
-[ 4757.010698] Call trace:
-[ 4757.010700]  blkcg_destroy_blkgs+0x68/0x150
-[ 4757.010701]  cgwb_release_workfn+0x104/0x158
-[ 4757.010702]  process_one_work+0x1bc/0x3f0
-[ 4757.010704]  worker_thread+0x164/0x468
-[ 4757.010705]  kthread+0x108/0x138
-
-Suggested-by: Tejun Heo <tj@kernel.org>
-Signed-off-by: Baolin Wang <baolin.wang@linux.alibaba.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+Fixes: 3175199ab0ac ("block: split bio_kmalloc from bio_alloc_bioset")
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Cc: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Cc: Damien Le Moal <damien.lemoal@wdc.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-cgroup.c | 18 +++++++++++++-----
- 1 file changed, 13 insertions(+), 5 deletions(-)
+ block/bio.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 54fbe1e80cc41..f13688c4b9317 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -1017,6 +1017,8 @@ static void blkcg_css_offline(struct cgroup_subsys_state *css)
-  */
- void blkcg_destroy_blkgs(struct blkcg *blkcg)
- {
-+	might_sleep();
-+
- 	spin_lock_irq(&blkcg->lock);
+diff --git a/block/bio.c b/block/bio.c
+index d4375619348c..757fee46cefc 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -482,8 +482,8 @@ struct bio *bio_alloc_bioset(gfp_t gfp_mask, unsigned int nr_iovecs,
+ 		if (unlikely(!bvl))
+ 			goto err_free;
  
- 	while (!hlist_empty(&blkcg->blkg_list)) {
-@@ -1024,14 +1026,20 @@ void blkcg_destroy_blkgs(struct blkcg *blkcg)
- 						struct blkcg_gq, blkcg_node);
- 		struct request_queue *q = blkg->q;
- 
--		if (spin_trylock(&q->queue_lock)) {
--			blkg_destroy(blkg);
--			spin_unlock(&q->queue_lock);
--		} else {
-+		if (need_resched() || !spin_trylock(&q->queue_lock)) {
-+			/*
-+			 * Given that the system can accumulate a huge number
-+			 * of blkgs in pathological cases, check to see if we
-+			 * need to rescheduling to avoid softlockup.
-+			 */
- 			spin_unlock_irq(&blkcg->lock);
--			cpu_relax();
-+			cond_resched();
- 			spin_lock_irq(&blkcg->lock);
-+			continue;
- 		}
-+
-+		blkg_destroy(blkg);
-+		spin_unlock(&q->queue_lock);
- 	}
- 
- 	spin_unlock_irq(&blkcg->lock);
+-		bio->bi_flags |= idx << BVEC_POOL_OFFSET;
+ 		bio_init(bio, bvl, bvec_nr_vecs(idx));
++		bio->bi_flags |= idx << BVEC_POOL_OFFSET;
+ 	} else if (nr_iovecs) {
+ 		bio_init(bio, bio->bi_inline_vecs, BIO_INLINE_VECS);
+ 	} else {
 -- 
-2.27.0
+2.29.2
 
