@@ -2,158 +2,176 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	PDS_BAD_THREAD_QP_64,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B620C433DB
-	for <linux-block@archiver.kernel.org>; Tue,  2 Feb 2021 20:18:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57497C433E0
+	for <linux-block@archiver.kernel.org>; Tue,  2 Feb 2021 20:46:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4063C64E75
-	for <linux-block@archiver.kernel.org>; Tue,  2 Feb 2021 20:18:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2620964E3F
+	for <linux-block@archiver.kernel.org>; Tue,  2 Feb 2021 20:46:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232677AbhBBUSS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Feb 2021 15:18:18 -0500
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:4100 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232963AbhBBURF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Feb 2021 15:17:05 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1612297024; x=1643833024;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=O5TFLcjVCKPVhbqTZsMcZQSQsLe1JWZsNKt/HTReRf8=;
-  b=jJX2HPrcuOuylhTwdlRzI1k+7Yf8FwhstnTWYrosOGuLJnaror7CyV94
-   9M5BVx93hShoMZvbND5nKU1iHaZd+SLiDRqt14qdNbtZFFrKIXaz1v41N
-   k1I2aiZMms/Yi6QKfvS3vOVtVdnrNgllgwlZfE5Iq7GINGD4G1A+0IeRz
-   lPH/aNExV6Dt4UHFuDP3KSfTIJTykbrwbuNFEyHzXL42L7OA3Ji3jcIch
-   aC5++klGv1DSTz255nD1B9VYmuYMPdsiRu5eRUkOI3vOCv2eN4/DjOIXb
-   7UtBkTw2gvDVLP0/6K8efPwUjiJg7O7xRo2IObrq7PPUXOtNy+m5S/XX3
-   Q==;
-IronPort-SDR: E3holTGOSgcHq1woS/cq3g0at4FRIhBO2U0BRpIK8k10A/GRJ+SnBEL5CX8Ikg6AF9/GyAdx8U
- DGKDx+T5hgaIIFLI01lJCyAE1GQGqbfBKA+/96PhvtELDBMeYQEq9rA1G9ke//aGmQDCi+lU4v
- KpErrbIGmURnAGtFVsrcB5jGO696QxOFiaHA+gPO914R63NIIQYUBCFB2O4S5wj6ZDYdSRYzYX
- hHRhGgmUFFvX9Hnw31Ks7xBuiNYSbhi7cfNUqKkmA9vcMfavdnC2JDUMMPEfQp4PrGThq/RrIw
- 4pI=
-X-IronPort-AV: E=Sophos;i="5.79,396,1602518400"; 
-   d="scan'208";a="163405285"
-Received: from mail-bn8nam11lp2175.outbound.protection.outlook.com (HELO NAM11-BN8-obe.outbound.protection.outlook.com) ([104.47.58.175])
-  by ob1.hgst.iphmx.com with ESMTP; 03 Feb 2021 04:15:56 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=d1ysQ/w/LgesZy6r8Zg92bJhZsKOdcLnNPNHoBjHfXOits4AqNtRYeGACZxREj8JOP5k0CXSbGmVhynX/5sh1hlyce+bU/9Nu8jF4JgCbEUPXrUmSHYK8NKx8YomdAjR5hmt9eUCEoDw1ToWJDIUW5T7taz+Bk+2F8Paf4txRnNt0uDCOw8fzIJNZhWsm8zjFQEWmsTc8WaFx7x4AUyArSyB1yCpVAouscpm1VhDo0WbXMZhvROzxRxcm6nHpLUU7SAcFPf27ZXM70KdUYg3jY4AJ3VR+OJiJ0YTxzSZKFu+8OfUAHzXgMmMQZm7qacHTpDozAE2uSP4ChDdg0M0xQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=O5TFLcjVCKPVhbqTZsMcZQSQsLe1JWZsNKt/HTReRf8=;
- b=lE1CB2/I4ub9eq38USUGR50ygYUwRBBYXZo11yxZURPpXqVcHzm6df+AAcMzn51YmQfTSrZ4QGlgjjFEsom3EWavMjRcoPrkDzUzkNSrrkh301ddTsyy09HgOhNVjDiNLSNGpo6MCIY1BC4DSecPWWdWREA2tpRkHlH+RYOMIanuuc8Bxg6xeM195PXBlhADXrjIj2FJ5QjQqEHcldhJe/tKQUCIdwuDtaP9cWQFeb/ggNhQ+4HHhyrrjFdPVk8NX5DJDWSGpvcgg3pDhkao31DEoLIqawA3m8++U6Xvaktn2WtY51usE+dYsglw5MNHn+jYFf2oQeWREC6Q976DIw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=O5TFLcjVCKPVhbqTZsMcZQSQsLe1JWZsNKt/HTReRf8=;
- b=ibVLp2M6jejIGmKgNjgtGgfUbh0efY/YgNx49Vho5SYQ7rLJoJ76olPU3Ar2CbAQLuptklWQ4gOgJKJNUruksr/c/BCU9GgjcvYPhvd7brZ/WZ2mbqN6JGbA9k5wvVlCpOwmC8xQl3o4pZaW2Hj8WcJfYAOcU0jKinhd6ISjlEc=
-Received: from BYAPR04MB4965.namprd04.prod.outlook.com (2603:10b6:a03:4d::25)
- by BY5PR04MB6550.namprd04.prod.outlook.com (2603:10b6:a03:1db::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3805.17; Tue, 2 Feb
- 2021 20:15:54 +0000
-Received: from BYAPR04MB4965.namprd04.prod.outlook.com
- ([fe80::1d83:38d9:143:4c9c]) by BYAPR04MB4965.namprd04.prod.outlook.com
- ([fe80::1d83:38d9:143:4c9c%5]) with mapi id 15.20.3805.024; Tue, 2 Feb 2021
- 20:15:54 +0000
-From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-To:     Christoph Hellwig <hch@lst.de>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "paolo.valente@linaro.org" <paolo.valente@linaro.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "rostedt@goodmis.org" <rostedt@goodmis.org>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        "bvanassche@acm.org" <bvanassche@acm.org>,
-        "dongli.zhang@oracle.com" <dongli.zhang@oracle.com>,
-        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-        Aravind Ramesh <Aravind.Ramesh@wdc.com>,
-        "joshi.k@samsung.com" <joshi.k@samsung.com>,
-        Niklas Cassel <Niklas.Cassel@wdc.com>,
-        "hare@suse.de" <hare@suse.de>, "colyli@suse.de" <colyli@suse.de>,
-        "tj@kernel.org" <tj@kernel.org>,
-        "rdunlap@infradead.org" <rdunlap@infradead.org>,
-        "jack@suse.cz" <jack@suse.cz>
-Subject: Re: [PATCH 6/7] null_blk: allow disacrd on non-membacked mode
-Thread-Topic: [PATCH 6/7] null_blk: allow disacrd on non-membacked mode
-Thread-Index: AQHW+SQ2CnC+kvMZMU2DnmnnzZp5EQ==
-Date:   Tue, 2 Feb 2021 20:15:54 +0000
-Message-ID: <BYAPR04MB4965D3A571B152859BF766EC86B59@BYAPR04MB4965.namprd04.prod.outlook.com>
-References: <20210202052544.4108-1-chaitanya.kulkarni@wdc.com>
- <20210202052544.4108-15-chaitanya.kulkarni@wdc.com>
- <20210202093622.GF17771@lst.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: lst.de; dkim=none (message not signed)
- header.d=none;lst.de; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [199.255.45.62]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 1d408ac9-f23f-4c3e-d6d2-08d8c7b75829
-x-ms-traffictypediagnostic: BY5PR04MB6550:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <BY5PR04MB6550FE87F1DC2E284C3520B886B59@BY5PR04MB6550.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:4941;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 3vZSpNZq8ANOWd5qJnJxauw8td7tFskzjmGgN1YkXD8KfKAX8aJ28+QIdDGqV7RZKjGMZb2K19rln4httfeUG4B0/WptpVLxUCfOQILc7a0fejPCWNaXIYgK2NE243oG9PC+MJLXJwn7bga2TwLVceKygzJXufODT1CLhTtJhuchbSskzq/wXxXosFvrCZrddFL/OsHEailzqhh3T2qPNudsyFPPtkhraLCfZMSsuLos5srAH4sDCVUg9PQElTnd4fyp82+OChpP2ZDyFhTKtljCXnGk8K1azY9487GchJeu8I31X817zbAINYfFSCVlzUqfvFqhUmM9MlqQTK1hM2nxz7P3qRRJWsaJv85MezpkexFEmRv0ZDSJqbxJ2GfZrk6uMwh8QgCnoExSJMO1wp0l8WXJWCvCyO3U65FUtOej30CTYeSI+55H1qrBKB+GtlEk06fU9SptK2OFmGX/tDRZv1TkpEhru4v45gd4hRhYWW0Us+n23QuJkgIvL0wPVe9l8wftnCRKJPWHCJPLvw==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR04MB4965.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(396003)(346002)(136003)(39860400002)(366004)(478600001)(8936002)(33656002)(6916009)(66476007)(54906003)(316002)(71200400001)(53546011)(2906002)(86362001)(4326008)(7696005)(7416002)(5660300002)(52536014)(6506007)(66556008)(83380400001)(76116006)(66946007)(186003)(558084003)(66446008)(64756008)(26005)(8676002)(9686003)(55016002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: =?us-ascii?Q?eVAWgPpZic5/SmpJYKBhPlrQHAyfIjmG7+W+3pk2dmYst9W9h8Js3CP+cB3a?=
- =?us-ascii?Q?8hyxSUwZWEucwxVXanTfQFmw2KeOkXdpN8ROGVzij54FPCz2jISgH/tCsOip?=
- =?us-ascii?Q?fOdicft3EnlFHcHQoPsmDfo+fVeZuwRj2ZCJ42ApeWnyJTcu17MTzKv5q/5m?=
- =?us-ascii?Q?2PPC4yNJEzmzBCLbELBC+BJtxXqr+92p6gwJyCg9XN/6FTGGNELSzSIafRNQ?=
- =?us-ascii?Q?79tlZ1Gmjs3ZleDc4VMHZ8ImPq0Bm30OncKGrnT86BPrDS1TqQJIHuCw2xe4?=
- =?us-ascii?Q?8VX1Y7/R6hGSTr5RuBtys/GBD8MrKfZa3q2QwszxfQKO2QGmm7jA88g1FAqJ?=
- =?us-ascii?Q?3VUM9U4w7cFkm787avP2rvfjj/UCEG8PrJTJSACeOHQXLfMK0bLhSlkTtu0+?=
- =?us-ascii?Q?T90Uq+/gTW5YqLBlO223bpMa7drbRk9rUemAfXCDbrskdR7z/+t8V8G+WI4H?=
- =?us-ascii?Q?GB+cRmijijWx3NWagDW4GdszYmElkZmZhk08bYunhwwCvgP5jf7DBHFpqnC1?=
- =?us-ascii?Q?w8j1/C+yPgWdFU1t6OaE7PJniH63PAKYnPifTOMgy836D5BjMWBiGOX7iSw1?=
- =?us-ascii?Q?boCJChnjRHIo73e/QLEZdPGjiO0DJF/klSZMxS8kfaTUXln87ShxNojfmuic?=
- =?us-ascii?Q?tk8+oLOkgmU7PjyEWhMj0ssdrKzXim7ElsQ5MvklN5UDoCM1s/K70ugm2yPp?=
- =?us-ascii?Q?+Xjp4MUB/iBflpdIDmxFWwklKBDvebHLS2ZOkkEwUL1OIb60RlNq8SuFPQes?=
- =?us-ascii?Q?cHuAd0slB6aRUCDr74kASy4p+zmIDaVbqTMz3AduVn+lGQxd20bDHlLwX/Ht?=
- =?us-ascii?Q?8xwXuWzNOhwx0SAoxUYvDvP5QYptT8DAaKG5cpnSv4HpMyhw2OURTh0Vehx6?=
- =?us-ascii?Q?j+6B2jmmvUVnmjL/Wb1CnghbVgvNDnXVVItxS3s8AdgYlrbMRmVZAOzdowRz?=
- =?us-ascii?Q?Q5n5/bz3obLUvT3hoI6DfVauCG0a1ZDy/QuFQnKqwJpKukFtHgGI60GZqRBe?=
- =?us-ascii?Q?aKQ0qkTEyF7F65L6qFtXQiPLeeS6VmJy5wsXaNEY74Z3CBWg4WMNea4KZhnr?=
- =?us-ascii?Q?jPAtThsetNE+I+rWc/XXvAv7kfY+dA=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S231508AbhBBUqM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Feb 2021 15:46:12 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:48008 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233384AbhBBUpc (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 2 Feb 2021 15:45:32 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1612298644;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=qB7eJjJEwuVBawwhdiSf0pwWEiHuFAZ232JKX4Aaoj8=;
+        b=fLj4Eynyfn9rc3H1DSxSAzvBDa8FFPxKAhcbsiBBA1D6K1v1ZbBMH3x4B6IE8Nlj/oj2F8
+        eoY5AfSnAg+ZXu38NdtGkdmjkY0crOKYL1K2uRUIaiDsFIBF8UhMZ5p8S20Rzug9qm5gsS
+        XEbAEFLcanWDK0td1ZgiCOk7HnGuSqg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-86-qEGmr014PPq0sHvfu2od8A-1; Tue, 02 Feb 2021 15:44:03 -0500
+X-MC-Unique: qEGmr014PPq0sHvfu2od8A-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F151810066EF;
+        Tue,  2 Feb 2021 20:44:01 +0000 (UTC)
+Received: from redhat (ovpn-117-133.rdu2.redhat.com [10.10.117.133])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 52B5360C66;
+        Tue,  2 Feb 2021 20:43:58 +0000 (UTC)
+Date:   Tue, 2 Feb 2021 15:43:55 -0500
+From:   David Jeffery <djeffery@redhat.com>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        linux-kernel@vger.kernel.org,
+        Laurence Oberman <loberman@redhat.com>
+Subject: Re: [PATCH] block: recalculate segment count for multi-segment
+ discard requests correctly
+Message-ID: <20210202204355.GA31803@redhat>
+References: <20210201164850.391332-1-djeffery@redhat.com>
+ <20210202033343.GA165584@T590>
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR04MB4965.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1d408ac9-f23f-4c3e-d6d2-08d8c7b75829
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Feb 2021 20:15:54.4025
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: U9dlTwwz4rUNe9TgRdVlnME+MFdC2uiYIOfO+MmpDSOl5kYgD4jRpFv+uPXRR82BUIsS2+Um3SBhOOtaSXlU6iObuRBG/YnnxnepOV0S0EM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR04MB6550
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210202033343.GA165584@T590>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/2/21 01:36, Christoph Hellwig wrote:=0A=
-> What does this have to do with blktrace?=0A=
->=0A=
-> Also discard is misspelled in the subject.=0A=
->=0A=
-=0A=
-I used these two patches for testing as discard is non conventional=0A=
-request which I think needs testing to make sure all types of requests=0A=
-are passing these changes.=0A=
+On Tue, Feb 02, 2021 at 11:33:43AM +0800, Ming Lei wrote:
+> 
+> On Mon, Feb 01, 2021 at 11:48:50AM -0500, David Jeffery wrote:
+> > When a stacked block device inserts a request into another block device
+> > using blk_insert_cloned_request, the request's nr_phys_segments field gets
+> > recalculated by a call to blk_recalc_rq_segments in
+> > blk_cloned_rq_check_limits. But blk_recalc_rq_segments does not know how to
+> > handle multi-segment discards. For disk types which can handle
+> > multi-segment discards like nvme, this results in discard requests which
+> > claim a single segment when it should report several, triggering a warning
+> > in nvme and causing nvme to fail the discard from the invalid state.
+> > 
+> >  WARNING: CPU: 5 PID: 191 at drivers/nvme/host/core.c:700 nvme_setup_discard+0x170/0x1e0 [nvme_core]
+> >  ...
+> >  nvme_setup_cmd+0x217/0x270 [nvme_core]
+> >  nvme_loop_queue_rq+0x51/0x1b0 [nvme_loop]
+> >  __blk_mq_try_issue_directly+0xe7/0x1b0
+> >  blk_mq_request_issue_directly+0x41/0x70
+> >  ? blk_account_io_start+0x40/0x50
+> >  dm_mq_queue_rq+0x200/0x3e0
+> >  blk_mq_dispatch_rq_list+0x10a/0x7d0
+> >  ? __sbitmap_queue_get+0x25/0x90
+> >  ? elv_rb_del+0x1f/0x30
+> >  ? deadline_remove_request+0x55/0xb0
+> >  ? dd_dispatch_request+0x181/0x210
+> >  __blk_mq_do_dispatch_sched+0x144/0x290
+> >  ? bio_attempt_discard_merge+0x134/0x1f0
+> >  __blk_mq_sched_dispatch_requests+0x129/0x180
+> >  blk_mq_sched_dispatch_requests+0x30/0x60
+> >  __blk_mq_run_hw_queue+0x47/0xe0
+> >  __blk_mq_delay_run_hw_queue+0x15b/0x170
+> >  blk_mq_sched_insert_requests+0x68/0xe0
+> >  blk_mq_flush_plug_list+0xf0/0x170
+> >  blk_finish_plug+0x36/0x50
+> >  xlog_cil_committed+0x19f/0x290 [xfs]
+> >  xlog_cil_process_committed+0x57/0x80 [xfs]
+> >  xlog_state_do_callback+0x1e0/0x2a0 [xfs]
+> >  xlog_ioend_work+0x2f/0x80 [xfs]
+> >  process_one_work+0x1b6/0x350
+> >  worker_thread+0x53/0x3e0
+> >  ? process_one_work+0x350/0x350
+> >  kthread+0x11b/0x140
+> >  ? __kthread_bind_mask+0x60/0x60
+> >  ret_from_fork+0x22/0x30
+> > 
+> > This patch fixes blk_recalc_rq_segments to be aware of devices which can
+> > have multi-segment discards. It calculates the correct discard segment
+> > count by counting the number of bio as each discard bio is considered its
+> > own segment.
+> > 
+> > Signed-off-by: David Jeffery <djeffery@redhat.com>
+> > Tested-by: Laurence Oberman <loberman@redhat.com>
+> > ---
+> >  block/blk-merge.c | 7 +++++++
+> >  1 file changed, 7 insertions(+)
+> > 
+> > diff --git a/block/blk-merge.c b/block/blk-merge.c
+> > index 808768f6b174..fe7358bd5d09 100644
+> > --- a/block/blk-merge.c
+> > +++ b/block/blk-merge.c
+> > @@ -382,6 +382,13 @@ unsigned int blk_recalc_rq_segments(struct request *rq)
+> >  
+> >  	switch (bio_op(rq->bio)) {
+> >  	case REQ_OP_DISCARD:
+> > +		if (queue_max_discard_segments(rq->q) > 1) {
+> > +			struct bio *bio = rq->bio;
+> > +			for_each_bio(bio)
+> > +				nr_phys_segs++;
+> > +			return nr_phys_segs;
+> > +		}
+> > +		/* fall through */
+> >  	case REQ_OP_SECURE_ERASE:
+> 
+> REQ_OP_SECURE_ERASE needs to be covered since block layer treats
+> the two in very similar way from discard viewpoint.
+> 
+> Also single range discard should be fixed too, since block layer
+> thinks single-range discard req segment is 1. Otherwise, the warning in
+> virtblk_setup_discard_write_zeroes() still may be triggered, at least.
+> 
+> 
+> -- 
+> Ming
+>
+
+The return 0 does seem to be an old relic that does not make sense anymore.
+Moving REQ_OP_SECURE_ERASE to be with discard and removing the old return 0,
+is this what you had in mind?
+
+ 
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 808768f6b174..68458aa01b05 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -383,8 +383,14 @@ unsigned int blk_recalc_rq_segments(struct request *rq)
+ 	switch (bio_op(rq->bio)) {
+ 	case REQ_OP_DISCARD:
+ 	case REQ_OP_SECURE_ERASE:
++		if (queue_max_discard_segments(rq->q) > 1) {
++			struct bio *bio = rq->bio;
++			for_each_bio(bio)
++				nr_phys_segs++;
++			return nr_phys_segs;
++		}
++		/* fall through */
+ 	case REQ_OP_WRITE_ZEROES:
+-		return 0;
+ 	case REQ_OP_WRITE_SAME:
+ 		return 1;
+ 	}
+
+--
+David Jeffery
+
