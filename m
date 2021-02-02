@@ -2,153 +2,99 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3C67C433E0
-	for <linux-block@archiver.kernel.org>; Tue,  2 Feb 2021 01:25:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55B03C433E0
+	for <linux-block@archiver.kernel.org>; Tue,  2 Feb 2021 01:30:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8AB0A64EC6
-	for <linux-block@archiver.kernel.org>; Tue,  2 Feb 2021 01:25:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 23CA364DD4
+	for <linux-block@archiver.kernel.org>; Tue,  2 Feb 2021 01:30:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229530AbhBBBZf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 1 Feb 2021 20:25:35 -0500
-Received: from mx4.veeam.com ([104.41.138.86]:56398 "EHLO mx4.veeam.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229527AbhBBBZf (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 1 Feb 2021 20:25:35 -0500
-Received: from mail.veeam.com (prgmbx01.amust.local [172.24.0.171])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mx4.veeam.com (Postfix) with ESMTPS id 2AD04360C1;
-        Tue,  2 Feb 2021 04:24:51 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com; s=mx4;
-        t=1612229091; bh=S/zUTKws3aaarSTDSqX2aCGHtzkWARA6qOHZn2RTR50=;
-        h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-        b=Kkcw8xU6zG6osOanXUm50Jb6PmEcqoqmkTijqzKLmkbcvmXbDvg+MFW2YJZnr1EAy
-         WeVXLCmAtvujypmceR9zzntSJ/e+Jh5rd/l6RzYkq4ZZ0t2TBw5UC6ihpm1VkiFsVR
-         RyJJXVdwtA4YnImxkg8fN3OPXgFe2qxPSbvVnICY=
-Received: from veeam.com (172.24.14.5) by prgmbx01.amust.local (172.24.0.171)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.721.2; Tue, 2 Feb 2021
- 02:24:49 +0100
-Date:   Tue, 2 Feb 2021 04:24:47 +0300
-From:   Sergei Shtepa <sergei.shtepa@veeam.com>
-To:     Mike Snitzer <snitzer@redhat.com>
-CC:     Bart Van Assche <bvanassche@acm.org>,
-        "hare@suse.de" <hare@suse.de>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>,
-        "agk@redhat.com" <agk@redhat.com>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Pavel Tide <Pavel.TIde@veeam.com>
-Subject: Re: [PATCH 0/2] block: blk_interposer v3
-Message-ID: <20210202012447.GB2515@veeam.com>
-References: <1611853955-32167-1-git-send-email-sergei.shtepa@veeam.com>
- <5c6c936a-f213-eaa3-f4fb-3461a0b4dbe1@acm.org>
- <20210201181835.GA2515@veeam.com>
- <20210201185035.GA9977@redhat.com>
+        id S229557AbhBBBaX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 1 Feb 2021 20:30:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57888 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229554AbhBBBaV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 1 Feb 2021 20:30:21 -0500
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36075C061573
+        for <linux-block@vger.kernel.org>; Mon,  1 Feb 2021 17:29:41 -0800 (PST)
+Received: by mail-pj1-x1032.google.com with SMTP id s24so1239594pjp.5
+        for <linux-block@vger.kernel.org>; Mon, 01 Feb 2021 17:29:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloud.ionos.com; s=google;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=VjH92aWRy6mqmgfZRhy4Z3v2+/on4r2pma/jBQ9X+Mk=;
+        b=D2vtVVrV7roohOULT4qWZwI54nCWhVCrViM1gmg+osP6m5wHFi8KJ8/ooKxduK3NzP
+         rXZve5I0kHGYiqAS7vKP4bVMi66WF2sGSdTEFQE5DaeC9hqrOoRufmbLS1yhsnFxcFRR
+         LXSLFByJgYrcwOmDXt9t3p7pMbil1lhp3RIoo04uWPTSYXox2oTN5ziwKhdO2PYeuwzS
+         KmOEp+i/vJIECx3mH+cHWnW4XbWUZ93PyN0+MAZVlRoEor6mot0yuvKW8FU3ibvszlon
+         97SfkNE/1wM7D+ceJAy6893rHqrUh8y4x4mYKmpKQY3Akn4Pcrd6PxApjjRe/1kLIplC
+         fyCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=VjH92aWRy6mqmgfZRhy4Z3v2+/on4r2pma/jBQ9X+Mk=;
+        b=DUkJgAsBrTHiouf3NqBPUoPcXessvZIgCfB0BPoOo/jvvFRbftLsfynAtTaOMFH4G9
+         hV4xdserGnBah8CyfnuxS+B1oZakrLmdrlIUhhW17zzadvJ6tw2s2tSf+jDK9cHhk8ye
+         CYoycsETQGl1PQvPO281a7+ZofaJ0a6wXHm+Ovy48GMaqZ0RQDUM1c0Yz/ffamYamXtP
+         aU3OtoqPa7NVRKBjE96cQyDFBcm/SRGPc0Hlh0F1G+EM38k2M8cbbeYCu6716w6VS+8f
+         aL31RE6i63gCk4H5n4STb777hHC/6u564x2xKD1GIUdZL7h4a8SlEkK8tXRdRM7P42Ze
+         HERQ==
+X-Gm-Message-State: AOAM531L6ho5dKnGRitdGtLwvgBErZ1taH2YpEge5v+CK0rneT5Ag5Vx
+        vYz0pKpWn3Nf4VBz007nupcRMg==
+X-Google-Smtp-Source: ABdhPJxkuDYT9aciE1GeNBk+fmYiIYnnXydtw8PAnUtTlWTGmbZwyJrrhQDqletKnNxyzWf0J7ul2A==
+X-Received: by 2002:a17:90b:1247:: with SMTP id gx7mr1670172pjb.22.1612229379599;
+        Mon, 01 Feb 2021 17:29:39 -0800 (PST)
+Received: from [0.0.0.0] ([62.217.45.26])
+        by smtp.gmail.com with ESMTPSA id y6sm19136373pfn.123.2021.02.01.17.29.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 01 Feb 2021 17:29:38 -0800 (PST)
+Subject: Re: [PATCH V2 3/4] block: add io_extra_stats node
+To:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "danil.kipnis@cloud.ionos.com" <danil.kipnis@cloud.ionos.com>,
+        "jinpu.wang@cloud.ionos.com" <jinpu.wang@cloud.ionos.com>,
+        "hch@infradead.org" <hch@infradead.org>
+References: <20210201012727.28305-1-guoqing.jiang@cloud.ionos.com>
+ <20210201012727.28305-4-guoqing.jiang@cloud.ionos.com>
+ <SN4PR0401MB35980F52820FF8D6B0E3D8DD9BB69@SN4PR0401MB3598.namprd04.prod.outlook.com>
+From:   Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
+Message-ID: <e335365a-4839-a240-2817-c34b9ef51d18@cloud.ionos.com>
+Date:   Tue, 2 Feb 2021 02:29:08 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-In-Reply-To: <20210201185035.GA9977@redhat.com>
-X-Originating-IP: [172.24.14.5]
-X-ClientProxiedBy: prgmbx01.amust.local (172.24.0.171) To prgmbx01.amust.local
- (172.24.0.171)
-X-EsetResult: clean, is OK
-X-EsetId: 37303A29C604D265667660
-X-Veeam-MMEX: True
+In-Reply-To: <SN4PR0401MB35980F52820FF8D6B0E3D8DD9BB69@SN4PR0401MB3598.namprd04.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The 02/01/2021 21:50, Mike Snitzer wrote:
-> On Mon, Feb 01 2021 at  1:18pm -0500,
-> Sergei Shtepa <sergei.shtepa@veeam.com> wrote:
+
+
+On 2/1/21 10:47, Johannes Thumshirn wrote:
+> On 01/02/2021 02:30, Guoqing Jiang wrote:
+>> If user doesn't care about the size and latency of io, and they could
+>> suffer from the additional overhead. So introduce a specific sysfs node
+>> to avoid such mistake.
 > 
-> > The 02/01/2021 18:45, Bart Van Assche wrote:
-> > > On 1/28/21 9:12 AM, Sergei Shtepa wrote:
-> > > > I`m ready to suggest the blk_interposer again.
-> > > > blk_interposer allows to intercept bio requests, remap bio to
-> > > > another devices or add new bios.
-> > > > 
-> > > > This version has support from device mapper.
-> > > > 
-> > > > For the dm-linear device creation command, the `noexcl` parameter
-> > > > has been added, which allows to open block devices without
-> > > > FMODE_EXCL mode. It allows to create dm-linear device on a block
-> > > > device with an already mounted file system.
-> > > > The new ioctl DM_DEV_REMAP allows to enable and disable bio
-> > > > interception.
-> > > > 
-> > > > Thus, it is possible to add the dm-device to the block layer stack
-> > > > without reconfiguring and rebooting.
-> > > 
-> > > What functionality does this driver provide that is not yet available in 
-> > > a RAID level 1 (mirroring) driver + a custom dm driver? My understanding 
-> > > is that there are already two RAID level 1 drivers in the kernel tree 
-> > > and that both driver support sending bio's to two different block devices.
-> > > 
-> > > Thanks,
-> > > 
-> > > Bart.
-> > 
-> > Hi Bart.
-> > 
-> > The proposed patch is not realy aimed at RAID1.
-> > 
-> > Creating a new dm device in the non-FMODE_EXCL mode and then remaping bio
-> > requests from the regular block device to the new DM device using
-> > the blk_interposer will allow to use device mapper for regular devices.
-> > For dm-linear, there is not much benefit from using blk_interposer.
-> > This is a good and illustrative example. Later, using blk-interposer,
-> > it will be possible to connect the dm-cache "on the fly" without having
-> > to reboot and/or reconfigure.
-> > My intention is to let users use dm-snap to create snapshots of any device.
-> > blk-interposer will allow to add new features to Device Mapper.
-> > 
-> > As per Daniel's advice I want to add a documentation, I'm working on it now.
-> > The documentation will also contain a description of new features that
-> > blk_interposer will add to Device Mapper
 > 
-> More Documentation is fine, but the code needs to be improved and fully
-> formed before you start trying to polish with Documentation --
-> definitely don't put time to Documentation that is speculative!
+> I would make this patch number 1 in the series and then merge patch 4
+> (the check for blk_queue_io_extra_stat()) into the patches adding
+> blk_additional_latency() and blk_additional_sector().
 > 
-> You'd do well to focus on an implementation that doesn't require an
-> extra clone if interposed device will use DM (DM core already handles
-> cloning all incoming bios).
-> 
-> Mike
 > 
 
-Hi Mike.
+Ok, thanks for the suggestion.
 
-I agree that quality code is more important than documentation.
-And I think this code has already solved the problem of a bio extra cloning.
-
-+static void dm_remap_fn(void *context, struct dm_rb_range *node, struct bio *bio)
-+{
-+	struct mapped_device *md = context;
-+
-+	/* Set acceptor device. */
-+	bio->bi_disk = md->disk;
-+
-+	/* Remap disks offset */
-+	bio->bi_iter.bi_sector -= node->start;
-+
-+	/*
-+	 * bio should be resubmitted.
-+	 * We can just add bio to bio_list of the current process.
-+	 * current->bio_list must be initialized when this function is called.
-+	 * If call submit_bio_noacct(), the bio will be checked twice.
-+	 */
-+	BUG_ON(!current->bio_list);
-+	bio_list_add(&current->bio_list[0], bio);
-+}
-
--- 
-Sergei Shtepa
-Veeam Software developer.
+Guoqing
