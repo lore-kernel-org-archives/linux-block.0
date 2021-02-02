@@ -2,140 +2,136 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6B8FC433E0
-	for <linux-block@archiver.kernel.org>; Tue,  2 Feb 2021 05:39:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 209F8C433E0
+	for <linux-block@archiver.kernel.org>; Tue,  2 Feb 2021 07:33:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A935D64EDC
-	for <linux-block@archiver.kernel.org>; Tue,  2 Feb 2021 05:39:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C2AC664EE2
+	for <linux-block@archiver.kernel.org>; Tue,  2 Feb 2021 07:33:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231706AbhBBFjZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Feb 2021 00:39:25 -0500
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:61659 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229846AbhBBFjZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Feb 2021 00:39:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1612244364; x=1643780364;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=wJVVyt+ZPivAtc76C1nI9owyC0Ff5319BZC4lKhOGIk=;
-  b=lgCczbERwwAOLMOCAbOMr0zhKXwx5lvh0o5hSW2NfogMZTi3ln1HF/pd
-   vLLLwsmv6cO1iQs2hOBSjJfxf7+KmruVDIRiiy1v1x1eysU6PbLu7KiDn
-   1T2dHLDUrg6O19NNwX+icgKcqqWJNOrOgJT0fFUdSmFfuXBRu7F54qbmD
-   jyVcS6Gq87M7Qn0I0M3BymE9OH7/wuGpZNE/MR3XgyoTt6Lqd5mlKwOOn
-   PwtX/dUkZtdcDy+M4Yfu9+AAZ4VFcnkI6v+sIpp/Y/1EVTt62+aN+EiGA
-   RDF12RMP8royNdpvy/GU6pJ+a1Pg77hLJ7qXRUliCFgYE8AK8dXgivGL4
-   Q==;
-IronPort-SDR: pAd/r1oF8mCnZS+nyC+lhuJcfHlGsce2JqCWpGHgCSJFdgfr5HjbFO0oM3v877vy+kgu5P/qKT
- WyLIuGiGZzUkcPiKGNNW/jJFvHOivmzaCYx6TSuUdoVFxhspEV1GSLd7qSe4AH8IShmVgcMSyY
- SfH7stkmgI/Q6kjOJ4WMnlUpSNOgLYn7/SwjcawnH3e+xyz/DHnfoaQLYaBQCj9wzbEB3PC0+y
- hhaGDu+KAnzLUZAimCI2RVl61C5FHXKqNaQQ/H4Ogf4IZcfNyhUvAMcYWInF766mcYmxiZzmRB
- Hgs=
-X-IronPort-AV: E=Sophos;i="5.79,394,1602518400"; 
-   d="scan'208";a="158885310"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 02 Feb 2021 13:38:29 +0800
-IronPort-SDR: q8D9t0JtKwwMYCl3JfM8WQu1L9n0I6A1SKnI/bL1mPTqnwXbROO8/onl+kfgDqgj0uOmVQBgEU
- OdWwyxdyO63Qj6t3LmPMPO3baJB7eV7yVCYw9kQmg7MKPe6bWzvwGv7sZ5VCbwtcFNncf54bKG
- +iv+PkEaHRTEPEf1Ly8gbuCMUl7oC9VJGaxe/1zy+vfAZZD2H3V4UqM2uFHWrkZGsql6ydpCDl
- PsrgJLBKMu8/wrCNLX28HUXVmNJ0cEuEB40rD/4igzc7Td35yMp6GkgA84nRiPDR1dzOyf+Zfz
- nZO/kp9GH3K/RRS7AJG3iZF9
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2021 21:20:39 -0800
-IronPort-SDR: PyYOk4TefLy5M2xByp3EsELWltBszA9fzJI5c1s8Q+Vhv29xbkXfPOyxzrkJVIBjc9veuySyjZ
- EOVIndrjuZeksTQNpUcybfMWdOt5YCrlR9/gUJdY0Ur4HeZ5+YzMqPGVNVpJ5HnvgFwFf1qeXu
- Q95lv09UriSWMQCf9Z4xI5vLSBL48Jm+ETJOl5ggT8ymCwR7sK6yEN+mDoeiKAauwv081w11Ev
- Ue15ccvMtG70tGI8rnmNLZ3hAyW2hzVqvd2bCIOcv59jBUinlzytp8AsRdhgkzDceTpS/4IcD8
- udk=
-WDCIronportException: Internal
-Received: from vm.labspan.wdc.com (HELO vm.sc.wdc.com) ([10.6.137.102])
-  by uls-op-cesaip02.wdc.com with ESMTP; 01 Feb 2021 21:38:30 -0800
-From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-To:     linux-block@vger.kernel.org
-Cc:     axboe@kernel.dk, Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [RFC PATCH 19/20] loop: set error value in case of actual error
-Date:   Mon,  1 Feb 2021 21:35:51 -0800
-Message-Id: <20210202053552.4844-20-chaitanya.kulkarni@wdc.com>
-X-Mailer: git-send-email 2.22.1
-In-Reply-To: <20210202053552.4844-1-chaitanya.kulkarni@wdc.com>
-References: <20210202053552.4844-1-chaitanya.kulkarni@wdc.com>
+        id S231543AbhBBHdC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Feb 2021 02:33:02 -0500
+Received: from mail-io1-f72.google.com ([209.85.166.72]:40778 "EHLO
+        mail-io1-f72.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231508AbhBBHdA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Feb 2021 02:33:00 -0500
+Received: by mail-io1-f72.google.com with SMTP id x26so13983367ior.7
+        for <linux-block@vger.kernel.org>; Mon, 01 Feb 2021 23:32:45 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=yEspMoGKMDuEEGSpdgz0FaL0GKC/NspiboJRr5zloY4=;
+        b=tcE970eEc7v3AyQ99cbrUV1Hc7awMPCsZg9fRkHeAqLVBiwQzrPaEe8MaUSvx0uoEh
+         DYzXmIep/NgynqJnxAjRzZINjLXbits6BDVDqmFhCdErxBsMGR0aCTWXL7oY0TbPMhyo
+         +WdqcU7JszW94fvhnQg6dmONG1ilYQO/vaoZLVacinYNzPO69C1laGsJQNUF0W9ZkIDd
+         Y12dJREEdokGIJ12pKY/LAqrNWJZ2aehk0mYqqq64nrs8Vxo1/9/ipfC1vVBagXFhhij
+         yfdy9IlHayV01uzvYhHB/H0uInExTv36SL2IQzJNosP9I6eMF7DYmHjajSfSzRtzYyhI
+         ijsg==
+X-Gm-Message-State: AOAM532G8w7UmtoQbIIOpoaEU5S2IQ5ZCIc+C6gzI2Vt+YePkwbHl+/0
+        2eLU6jRULZrQKA3NduVhzWUSxiwA5F3ZVVCA0UWSe/f+e7tl
+X-Google-Smtp-Source: ABdhPJw0ABknIZcjmWqfmFc8vxwHhusveS85e+Bq0Y/H0YQpQqNAseSgn9pii8y8Cj8Sj6uh56kPbgCZ9TcNWB2S/NkkfYwke/v+
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a5d:8887:: with SMTP id d7mr15283961ioo.151.1612251139885;
+ Mon, 01 Feb 2021 23:32:19 -0800 (PST)
+Date:   Mon, 01 Feb 2021 23:32:19 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000007b503905ba5578a6@google.com>
+Subject: general protection fault in invalidate_bdev
+From:   syzbot <syzbot+d65b0638dd3d123794f2@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com, viro@zeniv.linux.org.uk
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The function add loop_add() set err = -ENOMEM before the call to
-kzalloc(), err = -ENOMEM before the call to alloc_disk(). None of these
-error number values are shared. That requires err to be set explicitly
-before actual error happens.
+Hello,
 
-Conditionally set the error after we actually know that error condition
-is true insted of setting it before the if check.
+syzbot found the following issue on:
 
-Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+HEAD commit:    d03154e8 Add linux-next specific files for 20210128
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=1088091cd00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6953ffb584722a1
+dashboard link: https://syzkaller.appspot.com/bug?extid=d65b0638dd3d123794f2
+compiler:       gcc (GCC) 10.1.0-syz 20200507
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+d65b0638dd3d123794f2@syzkaller.appspotmail.com
+
+general protection fault, probably for non-canonical address 0xdffffc0000000005: 0000 [#1] PREEMPT SMP KASAN
+KASAN: null-ptr-deref in range [0x0000000000000028-0x000000000000002f]
+CPU: 0 PID: 30787 Comm: syz-executor.3 Not tainted 5.11.0-rc5-next-20210128-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+RIP: 0010:invalidate_bdev+0x1f/0xd0 fs/block_dev.c:92
+Code: ff 66 2e 0f 1f 84 00 00 00 00 00 55 53 48 89 fb e8 16 29 a0 ff 48 8d 7b 28 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <80> 3c 02 00 0f 85 93 00 00 00 48 b8 00 00 00 00 00 fc ff df 48 8b
+RSP: 0018:ffffc90017c07848 EFLAGS: 00010206
+RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffffc9000f244000
+RDX: 0000000000000005 RSI: ffffffff81d2ec3a RDI: 0000000000000028
+RBP: ffff888073ecc000 R08: 0000000000000000 R09: ffffffff8b2146c3
+R10: fffffbfff16428d8 R11: 0000000000000000 R12: ffff888076c38cc0
+R13: 0000000000000001 R14: 0000000000000001 R15: ffff888028720000
+FS:  00007fe9ef641700(0000) GS:ffff8880b9e00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fb745112db8 CR3: 000000008b834000 CR4: 00000000001506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ open_ctree+0xab3/0x4060 fs/btrfs/disk-io.c:3086
+ btrfs_fill_super fs/btrfs/super.c:1356 [inline]
+ btrfs_mount_root.cold+0x14/0x165 fs/btrfs/super.c:1723
+ legacy_get_tree+0x105/0x220 fs/fs_context.c:592
+ vfs_get_tree+0x89/0x2f0 fs/super.c:1497
+ fc_mount fs/namespace.c:993 [inline]
+ vfs_kern_mount.part.0+0xd3/0x170 fs/namespace.c:1023
+ vfs_kern_mount+0x3c/0x60 fs/namespace.c:1010
+ btrfs_mount+0x234/0xa20 fs/btrfs/super.c:1783
+ legacy_get_tree+0x105/0x220 fs/fs_context.c:592
+ vfs_get_tree+0x89/0x2f0 fs/super.c:1497
+ do_new_mount fs/namespace.c:2903 [inline]
+ path_mount+0x132a/0x1f90 fs/namespace.c:3233
+ do_mount fs/namespace.c:3246 [inline]
+ __do_sys_mount fs/namespace.c:3454 [inline]
+ __se_sys_mount fs/namespace.c:3431 [inline]
+ __x64_sys_mount+0x27f/0x300 fs/namespace.c:3431
+ do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
+ entry_SYSCALL_64_after_hwframe+0x44/0xa9
+RIP: 0033:0x460c6a
+Code: b8 a6 00 00 00 0f 05 48 3d 01 f0 ff ff 0f 83 ad 89 fb ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 49 89 ca b8 a5 00 00 00 0f 05 <48> 3d 01 f0 ff ff 0f 83 8a 89 fb ff c3 66 0f 1f 84 00 00 00 00 00
+RSP: 002b:00007fe9ef640a78 EFLAGS: 00000202 ORIG_RAX: 00000000000000a5
+RAX: ffffffffffffffda RBX: 00007fe9ef640b10 RCX: 0000000000460c6a
+RDX: 0000000020000000 RSI: 0000000020000100 RDI: 00007fe9ef640ad0
+RBP: 00007fe9ef640ad0 R08: 00007fe9ef640b10 R09: 0000000020000000
+R10: 0000000000000000 R11: 0000000000000202 R12: 0000000020000000
+R13: 0000000020000100 R14: 0000000020000200 R15: 0000000020003d00
+Modules linked in:
+---[ end trace 44edaf4ec7942bd8 ]---
+RIP: 0010:invalidate_bdev+0x1f/0xd0 fs/block_dev.c:92
+Code: ff 66 2e 0f 1f 84 00 00 00 00 00 55 53 48 89 fb e8 16 29 a0 ff 48 8d 7b 28 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <80> 3c 02 00 0f 85 93 00 00 00 48 b8 00 00 00 00 00 fc ff df 48 8b
+RSP: 0018:ffffc90017c07848 EFLAGS: 00010206
+RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffffc9000f244000
+RDX: 0000000000000005 RSI: ffffffff81d2ec3a RDI: 0000000000000028
+RBP: ffff888073ecc000 R08: 0000000000000000 R09: ffffffff8b2146c3
+R10: fffffbfff16428d8 R11: 0000000000000000 R12: ffff888076c38cc0
+R13: 0000000000000001 R14: 0000000000000001 R15: ffff888028720000
+FS:  00007fe9ef641700(0000) GS:ffff8880b9f00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007ffdfaea9138 CR3: 000000008b834000 CR4: 00000000001506e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+
+
 ---
- drivers/block/loop.c | 15 +++++++++------
- 1 file changed, 9 insertions(+), 6 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index d99ae348e4e2..ef70795e36ab 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -2062,10 +2062,11 @@ static int loop_add(struct loop_device **l, int i)
- 
- 	lockdep_assert_held(&loop_ctl_mutex);
- 
--	err = -ENOMEM;
- 	lo = kzalloc(sizeof(*lo), GFP_KERNEL);
--	if (!lo)
-+	if (!lo) {
-+		err = -ENOMEM;
- 		goto out;
-+	}
- 
- 	lo->lo_state = Lo_unbound;
- 
-@@ -2081,7 +2082,6 @@ static int loop_add(struct loop_device **l, int i)
- 		goto out_free_dev;
- 	i = err;
- 
--	err = -ENOMEM;
- 	lo->tag_set.ops = &loop_mq_ops;
- 	lo->tag_set.nr_hw_queues = 1;
- 	lo->tag_set.queue_depth = hw_queue_depth;
-@@ -2091,8 +2091,10 @@ static int loop_add(struct loop_device **l, int i)
- 	lo->tag_set.driver_data = lo;
- 
- 	err = blk_mq_alloc_tag_set(&lo->tag_set);
--	if (err)
-+	if (err) {
-+		err = -ENOMEM;
- 		goto out_free_idr;
-+	}
- 
- 	lo->lo_queue = blk_mq_init_queue(&lo->tag_set);
- 	if (IS_ERR(lo->lo_queue)) {
-@@ -2111,10 +2113,11 @@ static int loop_add(struct loop_device **l, int i)
- 	 */
- 	blk_queue_flag_set(QUEUE_FLAG_NOMERGES, lo->lo_queue);
- 
--	err = -ENOMEM;
- 	disk = lo->lo_disk = alloc_disk(1 << part_shift);
--	if (!disk)
-+	if (!disk) {
-+		err = -ENOMEM;
- 		goto out_free_queue;
-+	}
- 
- 	/*
- 	 * Disable partition scanning by default. The in-kernel partition
--- 
-2.22.1
-
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
