@@ -2,79 +2,161 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.4 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20995C433E9
-	for <linux-block@archiver.kernel.org>; Wed,  3 Feb 2021 16:54:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF8EFC433E0
+	for <linux-block@archiver.kernel.org>; Wed,  3 Feb 2021 22:22:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D7E2264F7C
-	for <linux-block@archiver.kernel.org>; Wed,  3 Feb 2021 16:54:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4BD6564E34
+	for <linux-block@archiver.kernel.org>; Wed,  3 Feb 2021 22:22:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231372AbhBCQyy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 Feb 2021 11:54:54 -0500
-Received: from mx2.suse.de ([195.135.220.15]:51032 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230229AbhBCQyt (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 3 Feb 2021 11:54:49 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id CB4C5AC45;
-        Wed,  3 Feb 2021 16:54:04 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 4A8BA1E14C4; Wed,  3 Feb 2021 17:54:04 +0100 (CET)
-Date:   Wed, 3 Feb 2021 17:54:04 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     John Garry <john.garry@huawei.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
-        linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
-Subject: Re: [PATCH 0/2 v3] blk-mq: Improve performance of non-mq IO
- schedulers with multiple HW queues
-Message-ID: <20210203165404.GE7094@quack2.suse.cz>
-References: <20210111164717.21937-1-jack@suse.cz>
- <7afa35b2-cf35-a149-d325-3ad2ae8d8935@kernel.dk>
- <8b871c07-a516-36ae-75c2-7d0a153ea753@huawei.com>
+        id S231948AbhBCWWn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 Feb 2021 17:22:43 -0500
+Received: from mail-pl1-f171.google.com ([209.85.214.171]:34780 "EHLO
+        mail-pl1-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231230AbhBCWWn (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Feb 2021 17:22:43 -0500
+Received: by mail-pl1-f171.google.com with SMTP id u15so658564plf.1
+        for <linux-block@vger.kernel.org>; Wed, 03 Feb 2021 14:22:27 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=i/NbabQJZBZ366AVWIrLP+6MNQ/MvruNt9+cq1+IsS8=;
+        b=Kb7IxZ1X1lypsbXpTnmyDztKQGg54ENXEL/0gClobX865FEF9SHw+KrO6rHGt3wUfc
+         +rrJ6fiCb3nJtI5ECPYDDuR/7C9zMytnE4hRNamIPsVTXHVhfuAeG+y3FoBBSrb03J5n
+         u0pm17959N0u7dewZkkE78fLPIHVM7r1V0BFycLqZUPl5hb7V8nNU2bXLhHYTbAJaRiC
+         Q3EK00lX1SdQ3C1kByZxFxfw0PurtjZ4HOCD9T1LmdNCCO1nPeXDPeLRy52lA8RiNeVo
+         TNQ0DZbc3T3ehM+waM2IGk1vKSRPEGTzDywkDo4XNCD2bsnnxc15IS5BbZPEP3xZHF1x
+         5duA==
+X-Gm-Message-State: AOAM531XhBwyS2YHH1fCIosWF4zLe0MxWEQJgTynAnrBemXU5uJPlKFV
+        fzMmhvKlwjpJsMBdnX46FX0=
+X-Google-Smtp-Source: ABdhPJxM20NILI5ccKSLTileVt27NeMAC0am8zdczs0gB0BrleepC1oWoLCFW0e46w6hDm46biU87g==
+X-Received: by 2002:a17:90a:fd0f:: with SMTP id cv15mr5303238pjb.36.1612390922345;
+        Wed, 03 Feb 2021 14:22:02 -0800 (PST)
+Received: from ?IPv6:2601:647:4802:9070:cd99:e813:1dae:a15a? ([2601:647:4802:9070:cd99:e813:1dae:a15a])
+        by smtp.gmail.com with ESMTPSA id d18sm2943910pjs.31.2021.02.03.14.22.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 03 Feb 2021 14:22:01 -0800 (PST)
+Subject: Re: [PATCH v5 0/3] avoid double request completion and IO error
+To:     Christoph Hellwig <hch@lst.de>, Chao Leng <lengchao@huawei.com>
+Cc:     linux-nvme@lists.infradead.org, kbusch@kernel.org, axboe@fb.com,
+        linux-block@vger.kernel.org, axboe@kernel.dk
+References: <20210201034940.18891-1-lengchao@huawei.com>
+ <20210203161455.GB4116@lst.de>
+From:   Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <ae2ff390-739e-ac2d-a7a8-162a6297653f@grimberg.me>
+Date:   Wed, 3 Feb 2021 14:22:00 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8b871c07-a516-36ae-75c2-7d0a153ea753@huawei.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20210203161455.GB4116@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed 03-02-21 16:18:59, John Garry wrote:
-> On 25/01/2021 01:20, Jens Axboe wrote:
-> > On 1/11/21 9:47 AM, Jan Kara wrote:
-> > > Hello!
-> > > 
-> > > This patch series aims to fix a regression we've noticed on our test grid when
-> > > support for multiple HW queues in megaraid_sas driver was added during the 5.10
-> > > cycle (103fbf8e4020 scsi: megaraid_sas: Added support for shared host tagset
-> > > for cpuhotplug). The commit was reverted in the end for other reasons but I
-> > > believe the fundamental problem still exists for any other similar setup.
-> 
-> That commit made it into 5.11-rc, and other SCSI HBA expose HW queues in
-> 5.10 and earlier. But then this series is targeted at 5.12.
-> 
-> Question: can we consider backport this series just due to performance issue
-> regression? I'd say no, but maybe someone strongly disagrees with me ...
 
-I also don't consider my series a stable tree material. The setup of
-multiple HW queues with BFQ IO scheduler isn't really very common...
 
-								Honza
+On 2/3/21 8:14 AM, Christoph Hellwig wrote:
+> So I think this is conceptually fine, but I still find the API a little
+> arcane.  What do you think about the following incremental patch?
+> If that looks good and tests good for you I can apply the series with
+> the modifications:
+> 
+> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+> index 0befaad788a094..02579f4f776c7d 100644
+> --- a/drivers/nvme/host/core.c
+> +++ b/drivers/nvme/host/core.c
+> @@ -355,6 +355,21 @@ void nvme_complete_rq(struct request *req)
+>   }
+>   EXPORT_SYMBOL_GPL(nvme_complete_rq);
+>   
+> +/*
+> + * Called to unwind from ->queue_rq on a failed command submission so that the
+> + * multipathing code gets called to potentially failover to another path.
+> + * The caller needs to unwind all transport specific resource allocations and
+> + * must return propagate the return value.
+> + */
+> +blk_status_t nvme_host_path_error(struct request *req)
+> +{
+> +	nvme_req(req)->status = NVME_SC_HOST_PATH_ERROR;
+> +	blk_mq_set_request_complete(req);
+> +	nvme_complete_rq(req);
+> +	return BLK_STS_OK;
+> +}
+> +EXPORT_SYMBOL_GPL(nvme_host_path_error);
+> +
+>   bool nvme_cancel_request(struct request *req, void *data, bool reserved)
+>   {
+>   	dev_dbg_ratelimited(((struct nvme_ctrl *) data)->device,
+> diff --git a/drivers/nvme/host/fabrics.c b/drivers/nvme/host/fabrics.c
+> index cedf9b31898673..5dfd806fc2d28c 100644
+> --- a/drivers/nvme/host/fabrics.c
+> +++ b/drivers/nvme/host/fabrics.c
+> @@ -552,11 +552,7 @@ blk_status_t nvmf_fail_nonready_command(struct nvme_ctrl *ctrl,
+>   	    !test_bit(NVME_CTRL_FAILFAST_EXPIRED, &ctrl->flags) &&
+>   	    !blk_noretry_request(rq) && !(rq->cmd_flags & REQ_NVME_MPATH))
+>   		return BLK_STS_RESOURCE;
+> -
+> -	nvme_req(rq)->status = NVME_SC_HOST_PATH_ERROR;
+> -	blk_mq_set_request_complete(rq);
+> -	nvme_complete_rq(rq);
+> -	return BLK_STS_OK;
+> +	return nvme_host_path_error(rq);
+>   }
+>   EXPORT_SYMBOL_GPL(nvmf_fail_nonready_command);
+>   
+> diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+> index a72f0718109100..5819f038104149 100644
+> --- a/drivers/nvme/host/nvme.h
+> +++ b/drivers/nvme/host/nvme.h
+> @@ -575,6 +575,7 @@ static inline bool nvme_is_aen_req(u16 qid, __u16 command_id)
+>   }
+>   
+>   void nvme_complete_rq(struct request *req);
+> +blk_status_t nvme_host_path_error(struct request *req);
+>   bool nvme_cancel_request(struct request *req, void *data, bool reserved);
+>   void nvme_cancel_tagset(struct nvme_ctrl *ctrl);
+>   void nvme_cancel_admin_tagset(struct nvme_ctrl *ctrl);
+> diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
+> index 6993efb27b39f0..f51af5e4970a2b 100644
+> --- a/drivers/nvme/host/rdma.c
+> +++ b/drivers/nvme/host/rdma.c
+> @@ -2091,16 +2091,6 @@ static blk_status_t nvme_rdma_queue_rq(struct blk_mq_hw_ctx *hctx,
+>   	err = nvme_rdma_post_send(queue, sqe, req->sge, req->num_sge,
+>   			req->mr ? &req->reg_wr.wr : NULL);
+>   	if (unlikely(err)) {
+> -		if (err == -EIO) {
+> -			/*
+> -			 * Fail the reqest so upper layer can failover I/O
+> -			 * if another path is available
+> -			 */
+> -			req->status = NVME_SC_HOST_PATH_ERROR;
+> -			blk_mq_set_request_complete(rq);
+> -			nvme_rdma_complete_rq(rq);
+> -			return BLK_STS_OK;
+> -		}
+>   		goto err_unmap;
+>   	}
+>   
+> @@ -2109,7 +2099,9 @@ static blk_status_t nvme_rdma_queue_rq(struct blk_mq_hw_ctx *hctx,
+>   err_unmap:
+>   	nvme_rdma_unmap_data(queue, rq);
+>   err:
+> -	if (err == -ENOMEM || err == -EAGAIN)
+> +	if (err == -EIO)
+> +		ret = nvme_host_path_error(rq);
+> +	else if (err == -ENOMEM || err == -EAGAIN)
+>   		ret = BLK_STS_RESOURCE;
+>   	else
+>   		ret = BLK_STS_IOERR;
+> 
 
-> 
-> Thanks,
-> John
-> 
-> > The
-> > > problem manifests when the storage card supports multiple hardware queues
-> > > however storage behind it is slow (single rotating disk in our case) and so
-> > > using IO scheduler such as BFQ is desirable. See the second patch for details.
-> 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+This looks good to me.
