@@ -8,33 +8,33 @@ X-Spam-Status: No, score=-19.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 799A2C433E0
-	for <linux-block@archiver.kernel.org>; Wed,  3 Feb 2021 15:57:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5A13C433E6
+	for <linux-block@archiver.kernel.org>; Wed,  3 Feb 2021 15:57:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 24CF664F8C
-	for <linux-block@archiver.kernel.org>; Wed,  3 Feb 2021 15:57:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A1F0B64F65
+	for <linux-block@archiver.kernel.org>; Wed,  3 Feb 2021 15:57:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234048AbhBCP40 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 Feb 2021 10:56:26 -0500
-Received: from mx2.veeam.com ([64.129.123.6]:55108 "EHLO mx2.veeam.com"
+        id S234485AbhBCP47 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 Feb 2021 10:56:59 -0500
+Received: from mx2.veeam.com ([64.129.123.6]:56872 "EHLO mx2.veeam.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234576AbhBCP4C (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 3 Feb 2021 10:56:02 -0500
+        id S234691AbhBCP4v (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 3 Feb 2021 10:56:51 -0500
 Received: from mail.veeam.com (prgmbx01.amust.local [172.24.0.171])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mx2.veeam.com (Postfix) with ESMTPS id C5B05415BA;
-        Wed,  3 Feb 2021 10:54:35 -0500 (EST)
+        by mx2.veeam.com (Postfix) with ESMTPS id ACD584159C;
+        Wed,  3 Feb 2021 10:54:48 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com; s=mx2;
-        t=1612367676; bh=KRRIE1mjAT5i1J0tuyS17RP7x4cjxFiHD1kWlqdATWo=;
+        t=1612367689; bh=fypuNIL3IiNG+w81W5Dyl+Eq2Mzu4AwDcNRA7TfznU8=;
         h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-        b=N3j45aCkbC/Xd8JVHlYASGskT7MQWVIcATGx3ptYWDtvbT2NrHrxaF7ghP4/fFCTw
-         bCz6ayPTzRn7vmcoTZQJmeNZcrtjtf4FuScyNOi2dnZoG4ogjdFNx6jyZfDa5dWkBP
-         y9UXPrUccmqM72f9koaqgsyhb7sVrE6xwpdiNlQs=
+        b=cxI7i634PPasqV6DLURmXOJJqhrXuLeysJ9B3gPfpxaXTQkM/YBbVlzFMIl4Hpbyo
+         z4eWQFWAdBYGTUanojepPUm7BUg91SdQtZe0w9G/X7VQeRgVfLPQvsl7Wsy/xkHZBQ
+         nU1XJ+bWo0no6GrucgLcEKKWNEs6FzNWLBq93l8k=
 Received: from prgdevlinuxpatch01.amust.local (172.24.14.5) by
  prgmbx01.amust.local (172.24.0.171) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.721.2;
- Wed, 3 Feb 2021 16:54:21 +0100
+ Wed, 3 Feb 2021 16:54:26 +0100
 From:   Sergei Shtepa <sergei.shtepa@veeam.com>
 To:     <Damien.LeMoal@wdc.com>, <snitzer@redhat.com>, <hare@suse.de>,
         <ming.lei@redhat.com>, <agk@redhat.com>, <corbet@lwn.net>,
@@ -43,9 +43,9 @@ To:     <Damien.LeMoal@wdc.com>, <snitzer@redhat.com>, <hare@suse.de>,
         <dm-devel@redhat.com>, <linux-block@vger.kernel.org>,
         <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
 CC:     <sergei.shtepa@veeam.com>, <pavgel.tide@veeam.com>
-Subject: [PATCH v4 2/6] block: add blk_interposer
-Date:   Wed, 3 Feb 2021 18:53:54 +0300
-Message-ID: <1612367638-3794-3-git-send-email-sergei.shtepa@veeam.com>
+Subject: [PATCH v4 5/6] dm: add 'noexcl' option for dm-linear
+Date:   Wed, 3 Feb 2021 18:53:57 +0300
+Message-ID: <1612367638-3794-6-git-send-email-sergei.shtepa@veeam.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1612367638-3794-1-git-send-email-sergei.shtepa@veeam.com>
 References: <1612367638-3794-1-git-send-email-sergei.shtepa@veeam.com>
@@ -61,250 +61,202 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-blk_interposer allows to intercept bio requests, remap bio to another devices or add new bios.
+The 'noexcl' option allow to open underlying block-device
+without FMODE_EXCL.
 
 Signed-off-by: Sergei Shtepa <sergei.shtepa@veeam.com>
 ---
- block/bio.c               |  2 +
- block/blk-core.c          | 33 ++++++++++++++++
- block/genhd.c             | 82 +++++++++++++++++++++++++++++++++++++++
- include/linux/blk_types.h |  6 ++-
- include/linux/genhd.h     | 18 +++++++++
- 5 files changed, 139 insertions(+), 2 deletions(-)
+ drivers/md/dm-linear.c        | 14 +++++++++++++-
+ drivers/md/dm-table.c         | 12 +++++++-----
+ drivers/md/dm.c               | 24 +++++++++++++++++-------
+ drivers/md/dm.h               |  2 +-
+ include/linux/device-mapper.h |  7 +++++++
+ 5 files changed, 45 insertions(+), 14 deletions(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index 1f2cc1fbe283..f6f135eb84b5 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -684,6 +684,8 @@ void __bio_clone_fast(struct bio *bio, struct bio *bio_src)
- 	bio_set_flag(bio, BIO_CLONED);
- 	if (bio_flagged(bio_src, BIO_THROTTLED))
- 		bio_set_flag(bio, BIO_THROTTLED);
-+	if (bio_flagged(bio_src, BIO_INTERPOSED))
-+		bio_set_flag(bio, BIO_INTERPOSED);
- 	bio->bi_opf = bio_src->bi_opf;
- 	bio->bi_ioprio = bio_src->bi_ioprio;
- 	bio->bi_write_hint = bio_src->bi_write_hint;
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 7663a9b94b80..c84bc42ba88b 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1032,6 +1032,32 @@ static blk_qc_t __submit_bio_noacct_mq(struct bio *bio)
- 	return ret;
- }
+diff --git a/drivers/md/dm-linear.c b/drivers/md/dm-linear.c
+index 00774b5d7668..b16d89802b9d 100644
+--- a/drivers/md/dm-linear.c
++++ b/drivers/md/dm-linear.c
+@@ -33,7 +33,7 @@ static int linear_ctr(struct dm_target *ti, unsigned int argc, char **argv)
+ 	char dummy;
+ 	int ret;
  
-+static blk_qc_t __submit_bio_interposed(struct bio *bio)
-+{
-+	struct bio_list bio_list[2] = { };
-+	blk_qc_t ret = BLK_QC_T_NONE;
-+
-+	current->bio_list = bio_list;
-+	if (likely(bio_queue_enter(bio) == 0)) {
-+		struct gendisk *disk = bio->bi_disk;
-+
-+		if (likely(blk_has_interposer(disk))) {
-+			bio_set_flag(bio, BIO_INTERPOSED);
-+			disk->interposer->ip_submit_bio(bio);
-+		} else /* interposer was removed */
-+			bio_list_add(&current->bio_list[0], bio);
-+
-+		blk_queue_exit(disk->queue);
-+	}
-+	current->bio_list = NULL;
-+
-+	/* Resubmit remaining bios */
-+	while ((bio = bio_list_pop(&bio_list[0])))
-+		ret = submit_bio_noacct(bio);
-+
-+	return ret;
-+}
-+
- /**
-  * submit_bio_noacct - re-submit a bio to the block device layer for I/O
-  * @bio:  The bio describing the location in memory and on the device.
-@@ -1057,6 +1083,13 @@ blk_qc_t submit_bio_noacct(struct bio *bio)
- 		return BLK_QC_T_NONE;
+-	if (argc != 2) {
++	if ((argc < 2) || (argc > 3)) {
+ 		ti->error = "Invalid argument count";
+ 		return -EINVAL;
  	}
+@@ -51,6 +51,18 @@ static int linear_ctr(struct dm_target *ti, unsigned int argc, char **argv)
+ 	}
+ 	lc->start = tmp;
  
-+	/*
-+	 * Checking the BIO_INTERPOSED flag is necessary so that the bio
-+	 * created by the blk_interposer do not get to it for processing.
-+	 */
-+	if (blk_has_interposer(bio->bi_disk) &&
-+	    !bio_flagged(bio, BIO_INTERPOSED))
-+		return __submit_bio_interposed(bio);
- 	if (!bio->bi_disk->fops->submit_bio)
- 		return __submit_bio_noacct_mq(bio);
- 	return __submit_bio_noacct(bio);
-diff --git a/block/genhd.c b/block/genhd.c
-index 419548e92d82..39785a3ef703 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -30,6 +30,7 @@
- static struct kobject *block_depr;
- 
- DECLARE_RWSEM(bdev_lookup_sem);
-+DEFINE_MUTEX(bdev_interposer_mutex);
- 
- /* for extended dynamic devt allocation, currently only one major is used */
- #define NR_EXT_DEVT		(1 << MINORBITS)
-@@ -2148,3 +2149,84 @@ static void disk_release_events(struct gendisk *disk)
- 	WARN_ON_ONCE(disk->ev && disk->ev->block != 1);
- 	kfree(disk->ev);
- }
-+
-+/**
-+ * blk_interposer_attach - Attach interposer to disk
-+ * @disk: target disk
-+ * @interposer: block device interposer
-+ * @ip_submit_bio: hook for submit_bio()
-+ *
-+ * Returns:
-+ *     -EINVAL if @interposer is NULL.
-+ *     -EPERM if queue is not frozen.
-+ *     -EBUSY if the block device already has @interposer.
-+ *     -EALREADY if the block device already has @interposer with same callback.
-+ *
-+ * Disk must be frozen by blk_mq_freeze_queue().
-+ */
-+int blk_interposer_attach(struct gendisk *disk, struct blk_interposer *interposer,
-+			  const ip_submit_bio_t ip_submit_bio)
-+{
-+	int ret = 0;
-+
-+	if (WARN_ON(!interposer))
-+		return -EINVAL;
-+
-+	if (!blk_mq_is_queue_frozen(disk->queue))
-+		return -EPERM;
-+
-+	mutex_lock(&bdev_interposer_mutex);
-+	if (blk_has_interposer(disk)) {
-+		if (disk->interposer->ip_submit_bio == ip_submit_bio)
-+			ret = -EALREADY;
-+		else
-+			ret = -EBUSY;
-+		goto out;
++	ti->non_exclusive = false;
++	if (argc > 2) {
++		if (strcmp("noexcl", argv[2]) == 0)
++			ti->non_exclusive = true;
++		else if (strcmp("excl", argv[2]) == 0)
++			ti->non_exclusive = false;
++		else {
++			ti->error = "Invalid exclusive option";
++			return -EINVAL;
++		}
 +	}
 +
-+	interposer->ip_submit_bio = ip_submit_bio;
-+	interposer->disk = disk;
-+
-+	disk->interposer = interposer;
-+out:
-+	mutex_unlock(&bdev_interposer_mutex);
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(blk_interposer_attach);
-+
-+/**
-+ * blk_interposer_detach - Detach interposer from disk
-+ * @interposer: block device interposer
-+ * @ip_submit_bio: hook for submit_bio()
-+ *
-+ * Disk must be frozen by blk_mq_freeze_queue().
-+ */
-+void blk_interposer_detach(struct blk_interposer *interposer,
-+			  const ip_submit_bio_t ip_submit_bio)
-+{
-+	struct gendisk *disk;
-+
-+	if (WARN_ON(!interposer))
-+		return;
-+
-+	mutex_lock(&bdev_interposer_mutex);
-+
-+	/* Check if the interposer is still active. */
-+	disk = interposer->disk;
-+	if (WARN_ON(!disk))
-+		goto out;
-+
-+	if (WARN_ON(!blk_mq_is_queue_frozen(disk->queue)))
-+		goto out;
-+
-+	/* Check if it is really our interposer. */
-+	if (WARN_ON(disk->interposer->ip_submit_bio != ip_submit_bio))
-+		goto out;
-+
-+	disk->interposer = NULL;
-+	interposer->disk = NULL;
-+out:
-+	mutex_unlock(&bdev_interposer_mutex);
-+}
-+EXPORT_SYMBOL_GPL(blk_interposer_detach);
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 866f74261b3b..6c1351d7b73f 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -227,7 +227,7 @@ struct bio {
- 						 * top bits REQ_OP. Use
- 						 * accessors.
- 						 */
--	unsigned short		bi_flags;	/* status, etc and bvec pool number */
-+	unsigned int		bi_flags;	/* status, etc and bvec pool number */
- 	unsigned short		bi_ioprio;
- 	unsigned short		bi_write_hint;
- 	blk_status_t		bi_status;
-@@ -304,6 +304,8 @@ enum {
- 				 * of this bio. */
- 	BIO_CGROUP_ACCT,	/* has been accounted to a cgroup */
- 	BIO_TRACKED,		/* set if bio goes through the rq_qos path */
-+	BIO_INTERPOSED,		/* bio has been interposed and can be moved to
-+				 * a different disk */
- 	BIO_FLAG_LAST
- };
- 
-@@ -322,7 +324,7 @@ enum {
-  * freed.
+ 	ret = dm_get_device(ti, argv[0], dm_table_get_mode(ti->table), &lc->dev);
+ 	if (ret) {
+ 		ti->error = "Device lookup failed";
+diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
+index 4acf2342f7ad..f15bc2171f25 100644
+--- a/drivers/md/dm-table.c
++++ b/drivers/md/dm-table.c
+@@ -322,7 +322,7 @@ static int device_area_is_invalid(struct dm_target *ti, struct dm_dev *dev,
+  * device and not to touch the existing bdev field in case
+  * it is accessed concurrently.
   */
- #define BVEC_POOL_BITS		(3)
--#define BVEC_POOL_OFFSET	(16 - BVEC_POOL_BITS)
-+#define BVEC_POOL_OFFSET	(32 - BVEC_POOL_BITS)
- #define BVEC_POOL_IDX(bio)	((bio)->bi_flags >> BVEC_POOL_OFFSET)
- #if (1<< BVEC_POOL_BITS) < (BVEC_POOL_NR+1)
- # error "BVEC_POOL_BITS is too small"
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index 809aaa32d53c..f68c8e83b4f1 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -134,6 +134,13 @@ struct blk_integrity {
- 	unsigned char				tag_size;
+-static int upgrade_mode(struct dm_dev_internal *dd, fmode_t new_mode,
++static int upgrade_mode(struct dm_dev_internal *dd, fmode_t new_mode, bool non_exclusive,
+ 			struct mapped_device *md)
+ {
+ 	int r;
+@@ -330,7 +330,7 @@ static int upgrade_mode(struct dm_dev_internal *dd, fmode_t new_mode,
+ 
+ 	old_dev = dd->dm_dev;
+ 
+-	r = dm_get_table_device(md, dd->dm_dev->bdev->bd_dev,
++	r = dm_get_table_device(md, dd->dm_dev->bdev->bd_dev, non_exclusive,
+ 				dd->dm_dev->mode | new_mode, &new_dev);
+ 	if (r)
+ 		return r;
+@@ -387,7 +387,8 @@ int dm_get_device(struct dm_target *ti, const char *path, fmode_t mode,
+ 		if (!dd)
+ 			return -ENOMEM;
+ 
+-		if ((r = dm_get_table_device(t->md, dev, mode, &dd->dm_dev))) {
++		r = dm_get_table_device(t->md, dev, mode, ti->non_exclusive, &dd->dm_dev);
++		if (r) {
+ 			kfree(dd);
+ 			return r;
+ 		}
+@@ -396,8 +397,9 @@ int dm_get_device(struct dm_target *ti, const char *path, fmode_t mode,
+ 		list_add(&dd->list, &t->devices);
+ 		goto out;
+ 
+-	} else if (dd->dm_dev->mode != (mode | dd->dm_dev->mode)) {
+-		r = upgrade_mode(dd, mode, t->md);
++	} else if ((dd->dm_dev->mode != (mode | dd->dm_dev->mode)) &&
++		   (dd->dm_dev->non_exclusive != ti->non_exclusive)) {
++		r = upgrade_mode(dd, mode, ti->non_exclusive, t->md);
+ 		if (r)
+ 			return r;
+ 	}
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 0b184dfec233..c34c75467399 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -1107,6 +1107,7 @@ static int open_table_device(struct table_device *td, dev_t dev,
+ 
+ 	td->dm_dev.bdev = bdev;
+ 	td->dm_dev.dax_dev = dax_get_by_host(bdev->bd_disk->disk_name);
++	td->dm_dev.non_exclusive = non_exclusive;
+ 	return 0;
+ }
+ 
+@@ -1118,33 +1119,41 @@ static void close_table_device(struct table_device *td, struct mapped_device *md
+ 	if (!td->dm_dev.bdev)
+ 		return;
+ 
+-	bd_unlink_disk_holder(td->dm_dev.bdev, dm_disk(md));
+-	blkdev_put(td->dm_dev.bdev, td->dm_dev.mode | FMODE_EXCL);
++	if (td->dm_dev.non_exclusive)
++		blkdev_put(td->dm_dev.bdev, td->dm_dev.mode);
++	else {
++		bd_unlink_disk_holder(td->dm_dev.bdev, dm_disk(md));
++		blkdev_put(td->dm_dev.bdev, td->dm_dev.mode | FMODE_EXCL);
++	}
++
+ 	put_dax(td->dm_dev.dax_dev);
+ 	td->dm_dev.bdev = NULL;
+ 	td->dm_dev.dax_dev = NULL;
++	td->dm_dev.non_exclusive = false;
+ }
+ 
+ static struct table_device *find_table_device(struct list_head *l, dev_t dev,
+-					      fmode_t mode)
++					      fmode_t mode, bool non_exclusive)
+ {
+ 	struct table_device *td;
+ 
+ 	list_for_each_entry(td, l, list)
+-		if (td->dm_dev.bdev->bd_dev == dev && td->dm_dev.mode == mode)
++		if (td->dm_dev.bdev->bd_dev == dev &&
++		    td->dm_dev.mode == mode &&
++		    td->dm_dev.non_exclusive == non_exclusive)
+ 			return td;
+ 
+ 	return NULL;
+ }
+ 
+-int dm_get_table_device(struct mapped_device *md, dev_t dev, fmode_t mode,
++int dm_get_table_device(struct mapped_device *md, dev_t dev, fmode_t mode, bool non_exclusive,
+ 			struct dm_dev **result)
+ {
+ 	int r;
+ 	struct table_device *td;
+ 
+ 	mutex_lock(&md->table_devices_lock);
+-	td = find_table_device(&md->table_devices, dev, mode);
++	td = find_table_device(&md->table_devices, dev, mode, non_exclusive);
+ 	if (!td) {
+ 		td = kmalloc_node(sizeof(*td), GFP_KERNEL, md->numa_node_id);
+ 		if (!td) {
+@@ -1155,7 +1164,8 @@ int dm_get_table_device(struct mapped_device *md, dev_t dev, fmode_t mode,
+ 		td->dm_dev.mode = mode;
+ 		td->dm_dev.bdev = NULL;
+ 
+-		if ((r = open_table_device(td, dev, md))) {
++		r = open_table_device(td, dev, md, non_exclusive);
++		if (r) {
+ 			mutex_unlock(&md->table_devices_lock);
+ 			kfree(td);
+ 			return r;
+diff --git a/drivers/md/dm.h b/drivers/md/dm.h
+index fffe1e289c53..7bf20fb2de74 100644
+--- a/drivers/md/dm.h
++++ b/drivers/md/dm.h
+@@ -179,7 +179,7 @@ int dm_open_count(struct mapped_device *md);
+ int dm_lock_for_deletion(struct mapped_device *md, bool mark_deferred, bool only_deferred);
+ int dm_cancel_deferred_remove(struct mapped_device *md);
+ int dm_request_based(struct mapped_device *md);
+-int dm_get_table_device(struct mapped_device *md, dev_t dev, fmode_t mode,
++int dm_get_table_device(struct mapped_device *md, dev_t dev, fmode_t mode, bool non_exclusive,
+ 			struct dm_dev **result);
+ void dm_put_table_device(struct mapped_device *md, struct dm_dev *d);
+ 
+diff --git a/include/linux/device-mapper.h b/include/linux/device-mapper.h
+index 61a66fb8ebb3..70002363bfc0 100644
+--- a/include/linux/device-mapper.h
++++ b/include/linux/device-mapper.h
+@@ -150,6 +150,7 @@ struct dm_dev {
+ 	struct block_device *bdev;
+ 	struct dax_device *dax_dev;
+ 	fmode_t mode;
++	bool non_exclusive;
+ 	char name[16];
  };
  
-+typedef void (*ip_submit_bio_t) (struct bio *bio);
+@@ -325,6 +326,12 @@ struct dm_target {
+ 	 * whether or not its underlying devices have support.
+ 	 */
+ 	bool discards_supported:1;
 +
-+struct blk_interposer {
-+	ip_submit_bio_t ip_submit_bio;
-+	struct gendisk *disk;
-+};
-+
- struct gendisk {
- 	/* major, first_minor and minors are input parameters only,
- 	 * don't use directly.  Use disk_devt() and disk_max_parts().
-@@ -158,6 +165,7 @@ struct gendisk {
++	/*
++	 * Set if this target needs to open device without FMODE_EXCL
++	 * mode.
++	 */
++	bool non_exclusive:1;
+ };
  
- 	const struct block_device_operations *fops;
- 	struct request_queue *queue;
-+	struct blk_interposer *interposer;
- 	void *private_data;
- 
- 	int flags;
-@@ -346,4 +354,14 @@ static inline void printk_all_partitions(void)
- }
- #endif /* CONFIG_BLOCK */
- 
-+/*
-+ * block layer interposer
-+ */
-+#define blk_has_interposer(d) ((d)->interposer != NULL)
-+
-+int blk_interposer_attach(struct gendisk *disk, struct blk_interposer *interposer,
-+			  const ip_submit_bio_t ip_submit_bio);
-+void blk_interposer_detach(struct blk_interposer *interposer,
-+			   const ip_submit_bio_t ip_submit_bio);
-+
- #endif /* _LINUX_GENHD_H */
+ void *dm_per_bio_data(struct bio *bio, size_t data_size);
 -- 
 2.20.1
 
