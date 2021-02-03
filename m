@@ -2,134 +2,170 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-14.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BEAFC433E0
-	for <linux-block@archiver.kernel.org>; Wed,  3 Feb 2021 15:14:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B7FCC433DB
+	for <linux-block@archiver.kernel.org>; Wed,  3 Feb 2021 15:55:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4543164E4B
-	for <linux-block@archiver.kernel.org>; Wed,  3 Feb 2021 15:14:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2D64B64F55
+	for <linux-block@archiver.kernel.org>; Wed,  3 Feb 2021 15:55:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233243AbhBCPOZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 Feb 2021 10:14:25 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:27484 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233616AbhBCPKd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 3 Feb 2021 10:10:33 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612364946;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=xFMItEJSGhts53dvXygZQoUFUOXT6QaMhCLIPm25nIk=;
-        b=Be/i8IBrO989v131goNPgk2hCwBcUKDIQRQ/9Wc0JZWJuGTII36HOP85J0XIJOwBxRbFSw
-        xXJ1OgmtL/ivgnHiX8ho6SBVAZl2LPB4N7MgtEuxsM7NJzdXlKJW1/bySXiHTx8tr4t+zs
-        Vm6z7QvRQ74OCjtm4rWrGJoHJoFUVH0=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-420-sbCY0UlQM1ilXZADNpDa6w-1; Wed, 03 Feb 2021 10:09:05 -0500
-X-MC-Unique: sbCY0UlQM1ilXZADNpDa6w-1
-Received: by mail-qk1-f199.google.com with SMTP id p185so20839721qkc.9
-        for <linux-block@vger.kernel.org>; Wed, 03 Feb 2021 07:09:04 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=xFMItEJSGhts53dvXygZQoUFUOXT6QaMhCLIPm25nIk=;
-        b=N93o5cnPVoVzUQTwZT3aL4fsFMYCa7uGxkC2wybfTcT3ps/Z8LjUleY6gBXxAu13hN
-         nKBtLOBXR2GlIlJzVjb0abC4DMr7fMSTpUf3bpAZKPYVpDfYZGn8GSjTEv3fyeiX6xKj
-         lFFG5fcVdqKoWtddM9X4b5lKqEwSZOK/ikzvPk+NY7YrwQGpRVJhQb9+Ps2/iiapFGwP
-         5dVETqnfEU+lMh/mipqeae1x1hGOVhTaXLGPaRbvG82H9EbrH5nGZPBwlu7BuMX9Jl3G
-         J3FlRQ+dWVWZYCn3TO5cJ+Hd24tk6bfl3bCBHHN4OW7yHIt1aqfoApkYjBpGcSlT73EK
-         qcvA==
-X-Gm-Message-State: AOAM531gL71xByJFuD6bx+coIfJekzhZL4p+TyjgGiqN+lXNzVfbVKn7
-        55B4el/hSQeVdiuvE1BvcpEh4yorQGSP7k3FM1teYdc49hoCY2zCJaAEytWZQxiqU44oeDbYgHH
-        GWwdC6wZ66itHfrr7SdBGEzQ=
-X-Received: by 2002:ac8:7153:: with SMTP id h19mr2941512qtp.118.1612364944479;
-        Wed, 03 Feb 2021 07:09:04 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJz5+phXNK+dlLHtuYeQZ2ngf5pRTdq92YvDS3xG9FciVBeCOSMZA4rByWnMEoQ/zVwy3Jf9Mg==
-X-Received: by 2002:ac8:7153:: with SMTP id h19mr2941489qtp.118.1612364944212;
-        Wed, 03 Feb 2021 07:09:04 -0800 (PST)
-Received: from loberhel7laptop ([2600:6c64:4e7f:cee0:ccad:a4ca:9a69:d8bc])
-        by smtp.gmail.com with ESMTPSA id k14sm1479873qtj.40.2021.02.03.07.09.03
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 03 Feb 2021 07:09:03 -0800 (PST)
-Message-ID: <e7d2a8ddb28dcf4cf4395630d6d0b7a04d89e560.camel@redhat.com>
-Subject: Re: [PATCH] block: recalculate segment count for multi-segment
- discard requests correctly
-From:   Laurence Oberman <loberman@redhat.com>
-To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        David Jeffery <djeffery@redhat.com>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Date:   Wed, 03 Feb 2021 10:08:58 -0500
-In-Reply-To: <de50b6b8c867ec1f88df54f92134a99b086da8ac.camel@redhat.com>
-References: <20210201164850.391332-1-djeffery@redhat.com>
-         <20210202033343.GA165584@T590> <20210202204355.GA31803@redhat>
-         <20210203023517.GA948998@T590>
-         <BYAPR04MB4965222989DE60A2F198358286B49@BYAPR04MB4965.namprd04.prod.outlook.com>
-         <de50b6b8c867ec1f88df54f92134a99b086da8ac.camel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-10.el7) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        id S234683AbhBCPzx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 Feb 2021 10:55:53 -0500
+Received: from mx2.veeam.com ([64.129.123.6]:54746 "EHLO mx2.veeam.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234597AbhBCPzL (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 3 Feb 2021 10:55:11 -0500
+Received: from mail.veeam.com (prgmbx01.amust.local [172.24.0.171])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mx2.veeam.com (Postfix) with ESMTPS id 49B004146C;
+        Wed,  3 Feb 2021 10:54:15 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com; s=mx2;
+        t=1612367655; bh=Ucv+L9DDcCR6mCHfjgCTJ+iggF7iBj4S37DRqcV7+7w=;
+        h=From:To:CC:Subject:Date:From;
+        b=mWcwIHtqIcxwywNiTwChiIYnyD+Nx4p0LfaX2sdWVAodHI3dBaP9ov0j8Wp1TsOSh
+         JyQvJnKP0hkXCSVvs3ORbF3TohZEnjH9+io2AFzrJ6veWJkbATPQE3SBgbz62bH6K9
+         tDsaZod7JoxT9EH431gY97cUZ8yD9En0lxMjMU2Q=
+Received: from prgdevlinuxpatch01.amust.local (172.24.14.5) by
+ prgmbx01.amust.local (172.24.0.171) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.721.2;
+ Wed, 3 Feb 2021 16:54:13 +0100
+From:   Sergei Shtepa <sergei.shtepa@veeam.com>
+To:     <Damien.LeMoal@wdc.com>, <snitzer@redhat.com>, <hare@suse.de>,
+        <ming.lei@redhat.com>, <agk@redhat.com>, <corbet@lwn.net>,
+        <axboe@kernel.dk>, <jack@suse.cz>, <johannes.thumshirn@wdc.com>,
+        <gregkh@linuxfoundation.org>, <koct9i@gmail.com>, <steve@sk2.org>,
+        <dm-devel@redhat.com>, <linux-block@vger.kernel.org>,
+        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC:     <sergei.shtepa@veeam.com>, <pavgel.tide@veeam.com>
+Subject: [PATCH v4 0/6] block-layer interposer
+Date:   Wed, 3 Feb 2021 18:53:52 +0300
+Message-ID: <1612367638-3794-1-git-send-email-sergei.shtepa@veeam.com>
+X-Mailer: git-send-email 1.8.3.1
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Originating-IP: [172.24.14.5]
+X-ClientProxiedBy: prgmbx02.amust.local (172.24.0.172) To prgmbx01.amust.local
+ (172.24.0.171)
+X-EsetResult: clean, is OK
+X-EsetId: 37303A29C604D265667062
+X-Veeam-MMEX: True
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 2021-02-03 at 08:50 -0500, Laurence Oberman wrote:
-> On Wed, 2021-02-03 at 03:15 +0000, Chaitanya Kulkarni wrote:
-> > On 2/2/21 18:39, Ming Lei wrote:
-> > > +		/* fall through */
-> > >  	case REQ_OP_WRITE_ZEROES:
-> > > -		return 0;
-> > 
-> > I don't think returning 1 for write-zeroes is right,
-> > did you test this patch with write-zeores enabled controller with
-> > the right fs that triggers this behavior ?
-> > 
-> > 
-> 
-> I tested the first iteration of the patch fully mounting an XFS file
-> system with -o discard and creating and deleting files.
-> That was our specific RHEL8 failure we were handling here with
-> David's
-> first submission.
-> 
-> I can test his most recent, I have not done that yet.
-> Again, please follow up with exactly what you want based against
-> David's patch and I can test that.
-> 
-> Regards
-> Laurence 
+Hi all.
 
-So if I understand what it is you were wanting I will test this now.
+I'm ready to suggest the block-layer interposer (blk_interposer).
+blk_interposer allows to intercept bio requests, remap bio to another
+devices or add new bios.
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 808768f6b174..a9bd958c07c4 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -383,6 +383,13 @@ unsigned int blk_recalc_rq_segments(struct request
-*rq)
-        switch (bio_op(rq->bio)) {
-        case REQ_OP_DISCARD:
-        case REQ_OP_SECURE_ERASE:
-+                if (queue_max_discard_segments(rq->q) > 1) {
-+                        struct bio *bio = rq->bio;
+This patch series adds support blk_interposer for dm-linear.
 
-+                        for_each_bio(bio)
-+                                nr_phys_segs++;
-+                        return nr_phys_segs;
-+                }
-+                /* fall through */
-        case REQ_OP_WRITE_ZEROES:
-                return 0;
-        case REQ_OP_WRITE_SAME:
+In the first patch, I suggest the remap_and_filter.rst file.
+Yes, Mike, it's probably too early for documentation, but maybe it will be
+interesting for someone. In the documentation I tried to explain
+the purpose of blk_interposer and what prospects it opens up.
+
+The second patch is dedicated to blk_interposer itself, which provides
+the ability to intercept bio.
+
+The third - adds the function blk_mq_is_queue_frozen(). It allows to
+assert a queue state.
+
+The fourth one adds support for blk_interposer from the device mapper.
+Added ioctl DM_DEV_REMAP_CMD.
+
+In the fifth - added the 'noexcl' option for dm-linear, which allows
+to open the underlying block-device without the FMODE_EXCL mode.
+This allows to create a dm device to which can redirect bio requests
+using DM_DEV_REMAP_CMD.
+
+Here I would like to discuss the implementation.
+I don't like to play with flags. Adding the non_exclusive flags creates
+an excessive complexity. An alternative solution is to explicitly specify
+the FMODE_EXCL mode for each dm-target. The problem is that in this case,
+we will have to change each dm-target. It doesn't look cool either.
+
+The latest patch changes linear.rst with the description of the 'noexcl'
+option that is added for dm-linear.
+
+A little history of changes:
+
+v4 - current patch set
+Mostly changes were made, due to Damien's comments:
+ * on the design of the code;
+ * by the patch set organization;
+ * bug with passing a wrong parameter to dm_get_device();
+ * description of the 'noexcl' parameter in the linear.rst.
+Also added remap_and_filter.rst.
+
+v3 - https://patchwork.kernel.org/project/linux-block/cover/1611853955-32167-1-git-send-email-sergei.shtepa@veeam.com/
+In this version, I already suggested blk_interposer to apply to dm-linear.
+Problems were solved:
+ * Interception of bio requests from a specific device on the disk, not
+   from the entire disk. To do this, we added the dm_interposed_dev
+   structure and an interval tree to store these structures.
+ * Implemented ioctl DM_DEV_REMAP_CMD. A patch with changes in the lvm2
+   project was sent to the team lvm-devel@redhat.com.
+ * Added the 'noexcl' option for dm-linear, which allows you to open
+   the underlying block-device without FMODE_EXCL mode.
+
+v2 - https://patchwork.kernel.org/project/linux-block/cover/1607518911-30692-1-git-send-email-sergei.shtepa@veeam.com/
+I tried to suggest blk_interposer without using it in device mapper,
+but with the addition of a sample of its use. It was then that I learned
+about the maintainers' attitudes towards the samples directory :).
+
+v1 - https://lwn.net/ml/linux-block/20201119164924.74401-1-hare@suse.de/
+This Hannes's patch can be considered as a starting point, since this is
+where the interception mechanism and the term blk_interposer itself
+appeared. It became clear that blk_interposer can be useful for
+device mapper.
+
+before v1 - https://patchwork.kernel.org/project/linux-block/cover/1603271049-20681-1-git-send-email-sergei.shtepa@veeam.com/
+I tried to offer a rather cumbersome blk-filter and a monster-like
+blk-snap module for creating snapshots.
+
+Thank you to everyone who was able to take the time to review
+the previous versions.
+I hope that this time I achieved the required quality.
+
+Thanks,
+Sergei.
+
+Sergei Shtepa (6):
+  docs: device-mapper: add remap_and_filter
+  block: add blk_interposer
+  block: add blk_mq_is_queue_frozen()
+  dm: new ioctl DM_DEV_REMAP_CMD
+  dm: add 'noexcl' option for dm-linear
+  docs: device-mapper: 'noexcl' option for dm-linear
+
+ .../admin-guide/device-mapper/index.rst       |   1 +
+ .../admin-guide/device-mapper/linear.rst      |  26 +-
+ .../device-mapper/remap_and_filter.rst        | 132 ++++++
+ block/bio.c                                   |   2 +
+ block/blk-core.c                              |  33 ++
+ block/blk-mq.c                                |  13 +
+ block/genhd.c                                 |  82 ++++
+ drivers/md/dm-core.h                          |  20 +
+ drivers/md/dm-ioctl.c                         |  39 ++
+ drivers/md/dm-linear.c                        |  14 +-
+ drivers/md/dm-table.c                         |  12 +-
+ drivers/md/dm.c                               | 400 +++++++++++++++++-
+ drivers/md/dm.h                               |   2 +-
+ include/linux/blk-mq.h                        |   1 +
+ include/linux/blk_types.h                     |   6 +-
+ include/linux/device-mapper.h                 |   7 +
+ include/linux/genhd.h                         |  18 +
+ include/uapi/linux/dm-ioctl.h                 |  15 +-
+ 18 files changed, 792 insertions(+), 31 deletions(-)
+ create mode 100644 Documentation/admin-guide/device-mapper/remap_and_filter.rst
+
+--
+2.20.1
 
