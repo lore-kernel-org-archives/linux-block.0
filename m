@@ -2,87 +2,85 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.4 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+X-Spam-Status: No, score=-10.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
 	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D55FC433E9
-	for <linux-block@archiver.kernel.org>; Thu,  4 Feb 2021 15:02:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53A99C433DB
+	for <linux-block@archiver.kernel.org>; Thu,  4 Feb 2021 15:26:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 08C9864D9F
-	for <linux-block@archiver.kernel.org>; Thu,  4 Feb 2021 15:02:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1077364DE7
+	for <linux-block@archiver.kernel.org>; Thu,  4 Feb 2021 15:26:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236922AbhBDPCo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 Feb 2021 10:02:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60722 "EHLO
+        id S236830AbhBDP0W (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 Feb 2021 10:26:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37988 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236972AbhBDPAc (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Feb 2021 10:00:32 -0500
-Received: from cc-smtpout3.netcologne.de (cc-smtpout3.netcologne.de [IPv6:2001:4dd0:100:1062:25:2:0:3])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CEAAC06178A;
-        Thu,  4 Feb 2021 06:59:51 -0800 (PST)
-Received: from cc-smtpin2.netcologne.de (cc-smtpin2.netcologne.de [89.1.8.202])
-        by cc-smtpout3.netcologne.de (Postfix) with ESMTP id 113E31297E;
-        Thu,  4 Feb 2021 15:59:49 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-        by cc-smtpin2.netcologne.de (Postfix) with ESMTP id 0C72811D8D;
-        Thu,  4 Feb 2021 15:59:49 +0100 (CET)
-Received: from [87.79.223.205] (helo=cc-smtpin2.netcologne.de)
-        by localhost with ESMTP (eXpurgate 4.19.0)
-        (envelope-from <kurt@garloff.de>)
-        id 601c0be4-0254-7f0000012729-7f0000018ffc-1
-        for <multiple-recipients>; Thu, 04 Feb 2021 15:59:48 +0100
-Received: from nas2.garloff.de (xdsl-87-79-223-205.nc.de [87.79.223.205])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by cc-smtpin2.netcologne.de (Postfix) with ESMTPSA;
-        Thu,  4 Feb 2021 15:59:44 +0100 (CET)
-Received: from [192.168.155.24] (ap4.garloff.de [192.168.155.15])
-        by nas2.garloff.de (Postfix) with ESMTPSA id 81696B3B13A5;
-        Thu,  4 Feb 2021 15:59:43 +0100 (CET)
-Subject: Re: [GIT PULL] Floppy patch for 5.12
-To:     Jens Axboe <axboe@kernel.dk>, efremov@linux.com
-Cc:     linux-block <linux-block@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Jiri Kosina <jikos@kernel.org>
-References: <45f555f4-b694-ca8e-c088-f34dea9fc7c7@linux.com>
- <ba300e13-dc16-af15-a386-0c5348e0f919@kernel.dk>
-From:   Kurt Garloff <kurt@garloff.de>
-Message-ID: <925c6067-f317-70d1-231d-9d97c517212b@garloff.de>
-Date:   Thu, 4 Feb 2021 15:59:43 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.1
+        with ESMTP id S237272AbhBDPZt (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Feb 2021 10:25:49 -0500
+Received: from mail-il1-x136.google.com (mail-il1-x136.google.com [IPv6:2607:f8b0:4864:20::136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A65CC0613D6
+        for <linux-block@vger.kernel.org>; Thu,  4 Feb 2021 07:25:07 -0800 (PST)
+Received: by mail-il1-x136.google.com with SMTP id q9so2937404ilo.1
+        for <linux-block@vger.kernel.org>; Thu, 04 Feb 2021 07:25:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=Sai1+6RvSPig1mj2EiQ4vDagcziu7Bdngd2FkgBnOJQ=;
+        b=OZbZVdo7cGClKymLkR0ySZFsAezEKOlcNuUn81XUGo0ZOyuJZ4K2KBmboTd+0P64NE
+         sdVTkjI3A3rq+eVCEka+tZ9uYlRqhiY3WlrqJstrpbmbVLkNZ0/YfCvlUzO6LbaIKGdS
+         7UHLwzkfc3A+GHvOgExu8INoO8SsIFMEBccjmcuqhiExLoYlSBeaGU3whyJRhvshzvd9
+         3n00pxoKyqoZ4hWUY1q0EWo+TycsbSJ98w+1AcmL/l3zRG0/1OT7TZ7c60UwUQPolkrb
+         2gOjUPF4VqWRekUPKcow/S2KaMM6OqW58Vt7//4vSqe562ZFSuHpHfLp1Ar5QdoKItyd
+         MQMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Sai1+6RvSPig1mj2EiQ4vDagcziu7Bdngd2FkgBnOJQ=;
+        b=dpgn/c1aZ5nx7QFNV/sFEZO4PvD9A/anq6xMm0IxNf7Tz3X3j6VxgHADOdWw0jaKUz
+         PGfGrc5vHe5Nv5FfXa37zhxfdvJGyUGLQsVhHJu2KMUZnobG9BUlDWSHiXH0fy7XBHdj
+         rptQoFY+XRqanpJqxSWtoUafpJhpGj8RURG/Vx5+C1+aYXLL22kSrweMR3LlX8dtodly
+         CoOaHzfeRowxzGNMYBsGtr7pORuN8xm/yMVK5j+4JswOVJ4EOlh+SzFi/f72UYvzG4jO
+         hYC04+0bIhinMwVcZuMDwRtP63CuQXj5JK2mHULL087IhUC7uhNfYKiQQY4ZSglx9QA0
+         T/gA==
+X-Gm-Message-State: AOAM533yUcc6QuaxWilnk5Glh/ghSaGh1E9muPlinGDsTtrSq1/tH2Qm
+        x3rvJAhp0O7nBJYlPnI6BC2XdA==
+X-Google-Smtp-Source: ABdhPJy5JJSK6zSOIARcwTjlz4jZA5OUcE/LTqoMFoK0Cyig2FdsLY5dwyPLh0PQY5PEAuH0QTtNHA==
+X-Received: by 2002:a92:3f06:: with SMTP id m6mr7143541ila.283.1612452306896;
+        Thu, 04 Feb 2021 07:25:06 -0800 (PST)
+Received: from [192.168.1.30] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id h23sm2607517ila.15.2021.02.04.07.25.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 04 Feb 2021 07:25:06 -0800 (PST)
+Subject: Re: [GIT PULL] nvme fixes for 5.11
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
+        Sagi Grimberg <sagi@grimberg.me>,
+        linux-nvme@lists.infradead.org
+References: <YBwNukLwQfsXQL9U@infradead.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <e407087c-3760-b725-4b02-692eee28041b@kernel.dk>
+Date:   Thu, 4 Feb 2021 08:25:05 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <ba300e13-dc16-af15-a386-0c5348e0f919@kernel.dk>
+In-Reply-To: <YBwNukLwQfsXQL9U@infradead.org>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
 Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
+On 2/4/21 8:07 AM, Christoph Hellwig wrote:
+> git://git.infradead.org/nvme.git nvme-5.11
 
-Am 04.02.21 um 15:37 schrieb Jens Axboe:
-> On 2/4/21 3:12 AM, Denis Efremov wrote:
->> The following changes since commit 0d7389718c32ad6bb8bee7895c91e2418b6b26aa:
->>
->>   Merge tag 'nvme-5.21-2020-02-02' of git://git.infradead.org/nvme into for-5.12/drivers (2021-02-02 07:11:47 -0700)
->>
->> are available in the Git repository at:
->>
->>   https://github.com/evdenis/linux-floppy tags/floppy-for-5.12
-> Pulled, thanks.
-
-Great, thanks!
-
-Next is -stable then ... so all those cloud images using floppy to inject metadata
-work again, despite current libblkid.
-(Fortunately, most use cdrom these days.)
-
-Best,
+You forgot the signed tag, but I pulled it.
 
 -- 
-Kurt Garloff <kurt@garloff.de>, Cologne, Germany
+Jens Axboe
 
