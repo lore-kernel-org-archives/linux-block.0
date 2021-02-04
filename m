@@ -2,128 +2,91 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBA47C433DB
-	for <linux-block@archiver.kernel.org>; Thu,  4 Feb 2021 11:47:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 326A5C433E6
+	for <linux-block@archiver.kernel.org>; Thu,  4 Feb 2021 14:40:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 81FF564F45
-	for <linux-block@archiver.kernel.org>; Thu,  4 Feb 2021 11:47:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 01A1164F76
+	for <linux-block@archiver.kernel.org>; Thu,  4 Feb 2021 14:40:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235825AbhBDLrM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 Feb 2021 06:47:12 -0500
-Received: from so15.mailgun.net ([198.61.254.15]:52487 "EHLO so15.mailgun.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235477AbhBDLrL (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 4 Feb 2021 06:47:11 -0500
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1612439206; h=Message-ID: Subject: Cc: To: From: Date:
- Content-Transfer-Encoding: Content-Type: MIME-Version: Sender;
- bh=Odha96na2nVoCzNN3drN6XcA6usmBDol8IV5BXH8O2g=; b=sMVR//qiscNIsLOwMu0xFNrKI5SPUgy7oBmkPV/g99QmyoTv6jaBw0KqBGfBgJ7FsMz5D3o/
- /mMdgKD8OTZ1bwDvOfdfyAnHg2PLfSQHHOmtvN9uH/P4XfxhmWEIZ1Waby3QkEiKm9TjgIOf
- 5ymTmlR8k/J1ifi+L3UNfTgbaCc=
-X-Mailgun-Sending-Ip: 198.61.254.15
-X-Mailgun-Sid: WyI0MmE5NyIsICJsaW51eC1ibG9ja0B2Z2VyLmtlcm5lbC5vcmciLCAiYmU5ZTRhIl0=
-Received: from smtp.codeaurora.org
- (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
- smtp-out-n05.prod.us-west-2.postgun.com with SMTP id
- 601bde894bd23a05ae31a844 (version=TLS1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Thu, 04 Feb 2021 11:46:17
- GMT
-Sender: pragalla=codeaurora.org@mg.codeaurora.org
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id 25CF4C43461; Thu,  4 Feb 2021 11:46:17 +0000 (UTC)
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        (Authenticated sender: pragalla)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id 5E2D5C433C6;
-        Thu,  4 Feb 2021 11:46:16 +0000 (UTC)
+        id S236848AbhBDOkj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 Feb 2021 09:40:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55916 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236843AbhBDOiJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Feb 2021 09:38:09 -0500
+Received: from mail-io1-xd2b.google.com (mail-io1-xd2b.google.com [IPv6:2607:f8b0:4864:20::d2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E06FC061573
+        for <linux-block@vger.kernel.org>; Thu,  4 Feb 2021 06:37:26 -0800 (PST)
+Received: by mail-io1-xd2b.google.com with SMTP id f67so1608842ioa.1
+        for <linux-block@vger.kernel.org>; Thu, 04 Feb 2021 06:37:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=6WKbmgf+2ZIGCm/dE9FPQFIm79eTOH6MS53KyM+dR2s=;
+        b=r4vyQkjzXvpYLOKwhE/8h97tN0TZDkJogkAAj7FoT87Id3rGALm6nbbQG6UxEbx9po
+         On5BqiliIKar0Lk04plkntapUUECmMraXLFrkk/SBzYedeZGK6H96SuNVvAndg4tKcm2
+         DxtmpbZo4WsRhMQTjtG4anXtrBnmWxG8KYXXTeidFMVbsTG8bkPLj8VmqnV3lo9rEry0
+         Swpyj4rt9XOb81L6OVqRtcVSYtYizt5NoK7JLKjgFQ5rw4E50Tj3clBWQb9xbx3Bh7eX
+         92o+zZwiDPIl9OSDbKG8BT9ER8SFtveTF/hrgGXq2eGLLNetUatOtUQ+UcuaoOUXxC9c
+         AsCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=6WKbmgf+2ZIGCm/dE9FPQFIm79eTOH6MS53KyM+dR2s=;
+        b=KG3KRdm59EK9Al/SSpQ1Q8jmFQcYJszXbPf0iWiF2+DXgTmXw2fA2zslmHAys4XDHG
+         yCtWe5C8XEZq/d0e7CfJef3DDdzfeicZOVCPhClT7jYVEES1sXFAqbLcK6eN97TESzBF
+         gphLcFaCWTwnpPk/IG+r2+N65dHfrHs5wjJHS2lIhY78817tVBVeOheaq6JFhKNJFm4w
+         iu+JG2/zEX1+8lVVOMu6ZfTdsCvBAvpRrshRy0RYJUUonCZ33tt0n4gKPGqzwRI21oIo
+         iyWcw3TdDbDsp2khlecZ/JNvN+btybRthoOwCX7ONybVKDNvQc8uPCouGZSXsTq0Sqv2
+         qPDw==
+X-Gm-Message-State: AOAM532ivhOX6rXDHJkTi1TSWx/uVGFbanSvQNcpOTp6RVAlIKKZfiy8
+        adpHghVphZFuMV8jPqF+5cdFmg==
+X-Google-Smtp-Source: ABdhPJxKA5Vxq5X3o3KFodyPKGEYbk4IgNMPD3Tk8eHB/YEud3CDUYpQ697oyidW2sBhnc4NFrkTsQ==
+X-Received: by 2002:a05:6638:2686:: with SMTP id o6mr8310988jat.68.1612449445609;
+        Thu, 04 Feb 2021 06:37:25 -0800 (PST)
+Received: from [192.168.1.30] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id h23sm2557045ila.15.2021.02.04.06.37.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 04 Feb 2021 06:37:25 -0800 (PST)
+Subject: Re: [GIT PULL] Floppy patch for 5.12
+To:     efremov@linux.com
+Cc:     linux-block <linux-block@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Jiri Kosina <jikos@kernel.org>, Kurt Garloff <kurt@garloff.de>
+References: <45f555f4-b694-ca8e-c088-f34dea9fc7c7@linux.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <ba300e13-dc16-af15-a386-0c5348e0f919@kernel.dk>
+Date:   Thu, 4 Feb 2021 07:37:25 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
+In-Reply-To: <45f555f4-b694-ca8e-c088-f34dea9fc7c7@linux.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Date:   Thu, 04 Feb 2021 17:16:16 +0530
-From:   pragalla@codeaurora.org
-To:     axboe@kernel.dk, bvanassche@acm.org, evgreen@google.com,
-        jianchao.w.wang@oracle.com
-Cc:     linux-block@vger.kernel.org, stummala@codeaurora.org
-Subject: use-after-free access in bt_iter()
-Message-ID: <f98dd950466b0408d8589de053b02e05@codeaurora.org>
-X-Sender: pragalla@codeaurora.org
-User-Agent: Roundcube Webmail/1.3.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens, Bart,
+On 2/4/21 3:12 AM, Denis Efremov wrote:
+> The following changes since commit 0d7389718c32ad6bb8bee7895c91e2418b6b26aa:
+> 
+>   Merge tag 'nvme-5.21-2020-02-02' of git://git.infradead.org/nvme into for-5.12/drivers (2021-02-02 07:11:47 -0700)
+> 
+> are available in the Git repository at:
+> 
+>   https://github.com/evdenis/linux-floppy tags/floppy-for-5.12
 
-This is with regards to use-after-free access in bt_iter().
-i saw this got discussed and reported on many separate threads but could 
-see
-more discussions and conversations over the solution was made on [1]
-as pointed in [2].
+Pulled, thanks.
 
-[1] 
-https://lore.kernel.org/linux-block/1545261885.185366.488.camel@acm.org/
-[2] https://lkml.org/lkml/2019/2/14/942
+-- 
+Jens Axboe
 
-A similar issue was reported again on 5.4 kernel during internal 
-stability testing.
-
-<2> Unable to handle kernel paging request at virtual address 
-ffffff8107929600
-<2> Mem abort info:
-<2>   ESR = 0x96000007
-<2>   EC = 0x25: DABT (current EL), IL = 32 bits
-<2>   SET = 0, FnV = 0
-<2>   EA = 0, S1PTW = 0
-<2> Data abort info:
-<2>   ISV = 0, ISS = 0x00000007
-<2>   CM = 0, WnR = 0
-<2> swapper pgtable: 4k pages, 39-bit VAs, pgdp=00000000a2603000
-<2> [ffffff8107929600] pgd=00000001bf909003, pud=00000001bf909003, 
-pmd=00000001bf8cc003, pte=0068000187929f12
-<2> Internal error: Oops: 96000007 [#1] PREEMPT SMP
-<2> Skip md ftrace buffer dump for: 0x1609e0
-
-<2> CPU: 0 PID: 220 Comm: kworker/0:1H Tainted: G S      W  O      
-5.4.61-qgki-debug-g85faaf6 #2
-<2> Workqueue: kblockd blk_mq_timeout_work
-<2> pstate: 20c00005 (nzCv daif +PAN +UAO)
-<2> pc : bt_for_each+0x114/0x1a4
-<2> lr : bt_for_each+0xe0/0x1a4
-<2> sp : ffffffc017f7bc60
-<2> x29: ffffffc017f7bc80 x28: 0000000000000001
-<2> x27: 0000000000000008 x26: 0000000000000001
-<2> x25: 0000000000000001 x24: 0000000000000008
-<2> x23: ffffff8107bcd800 x22: ffffff810872bd10
-<2> x21: ffffffd764e6ea50 x20: 0000000000000008
-<2> x19: 0000000000000000 x18: ffffffc017f51030
-<2> x17: 0000000005f5e100 x16: 0000000000000000
-<2> x15: ffffffffff84bf5c x14: 0000000000000598
-<2> x13: 0000000000000008 x12: 00000000212d4a53
-<2> x11: 00000000000000ff x10: 0000000000000000
-<2> x9 : ffffff810872cd00 x8 : 0000000000000009
-<2> x7 : 0000000000000000 x6 : ffffffd763890758
-<2> x5 : 0000000000000000 x4 : 0000000000000000
-<2> x3 : ffffffc017f7bd20 x2 : 0000000000000001
-<2> x1 : ffffff8107929600 x0 : 0000000000000001
-<2> Call trace:
-<2>  bt_for_each+0x114/0x1a4
-<2>  blk_mq_queue_tag_busy_iter+0xd8/0x1a4
-<2>  blk_mq_timeout_work+0xd4/0x1c0
-<2>  process_one_work+0x280/0x460
-<2>  worker_thread+0x27c/0x4dc
-<2>  kthread+0x160/0x170
-<2>  ret_from_fork+0x10/0x18
-
-Is this issue got fixed on any latest kernel ? if so, can you please 
-help point the patch ?
-If not got fixed, can we have a final solution ? i can even help in 
-testing the solution.
-
-Thanks and Regards,
-Pradeep
