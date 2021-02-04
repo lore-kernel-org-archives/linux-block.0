@@ -2,97 +2,81 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-20.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20ABAC433E0
-	for <linux-block@archiver.kernel.org>; Thu,  4 Feb 2021 16:20:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D71DFC433E0
+	for <linux-block@archiver.kernel.org>; Thu,  4 Feb 2021 16:23:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CB96664E4F
-	for <linux-block@archiver.kernel.org>; Thu,  4 Feb 2021 16:20:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 802F664DEC
+	for <linux-block@archiver.kernel.org>; Thu,  4 Feb 2021 16:23:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237279AbhBDQUu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 Feb 2021 11:20:50 -0500
-Received: from frasgout.his.huawei.com ([185.176.79.56]:2495 "EHLO
-        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237723AbhBDQUL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Feb 2021 11:20:11 -0500
-Received: from fraeml743-chm.china.huawei.com (unknown [172.18.147.200])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4DWkDk2flJz67kpt;
-        Fri,  5 Feb 2021 00:15:50 +0800 (CST)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- fraeml743-chm.china.huawei.com (10.206.15.224) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2106.2; Thu, 4 Feb 2021 17:19:22 +0100
-Received: from [10.210.168.183] (10.210.168.183) by
- lhreml724-chm.china.huawei.com (10.201.108.75) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2106.2; Thu, 4 Feb 2021 16:19:20 +0000
-Subject: Re: use-after-free access in bt_iter()
-To:     Bart Van Assche <bvanassche@acm.org>, <pragalla@codeaurora.org>,
-        <axboe@kernel.dk>, <evgreen@google.com>,
-        <jianchao.w.wang@oracle.com>
-CC:     <linux-block@vger.kernel.org>, <stummala@codeaurora.org>,
-        Ming Lei <ming.lei@redhat.com>
-References: <f98dd950466b0408d8589de053b02e05@codeaurora.org>
- <056783fa-a510-2463-f353-c64dd8f37be9@acm.org>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <f1027dc3-d5a7-02c8-ef02-e34aeb12c0ac@huawei.com>
-Date:   Thu, 4 Feb 2021 16:17:51 +0000
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
+        id S237091AbhBDQXX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 Feb 2021 11:23:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34230 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237159AbhBDPIY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Feb 2021 10:08:24 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89881C061788
+        for <linux-block@vger.kernel.org>; Thu,  4 Feb 2021 07:07:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Type:MIME-Version:Message-ID:
+        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=vc7vRliYes5zaCs8iBxhh34R72R5PPnrfftjwCg4twk=; b=YO8d0D4yNDZTcIzkA7+YUMpPaZ
+        kBM17bWol6tL2O47zoifb2czaVrFcBQgoF+jVUY33uQDvLkkFRBWqxCKduYfcE5XutLH0Pym1Lvnn
+        gWj8qhT/DeurR+anDvhIb+LDGCDxlt4YVjn8RJr5KpHLUFrgyhszM6uPdHiPJMp00IcmljwHT5GNm
+        rlfoa8mYygSsIOIsLar9QOU8yVHZhEQksYo2fhA7tA3WQ3vSqhaPYVd22uvWHWruTdPZ2aOz9lVwN
+        lYguah0E+IMVFgXADKAX5Qrhs2FTKxVMGr4xLEU8H9y6Ag/iOqrknbFj4QWFSpMdbapKxQazq10sa
+        JQCL9jmg==;
+Received: from [2001:4bb8:184:7d04:e998:f47:b9fb:7611] (helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
+        id 1l7gEN-0011WA-HK; Thu, 04 Feb 2021 15:07:39 +0000
+Date:   Thu, 4 Feb 2021 16:07:38 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
+        Sagi Grimberg <sagi@grimberg.me>,
+        linux-nvme@lists.infradead.org
+Subject: [GIT PULL] nvme fixes for 5.11
+Message-ID: <YBwNukLwQfsXQL9U@infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <056783fa-a510-2463-f353-c64dd8f37be9@acm.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.210.168.183]
-X-ClientProxiedBy: lhreml719-chm.china.huawei.com (10.201.108.70) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 04/02/2021 15:51, Bart Van Assche wrote:
-> On 2/4/21 3:46 AM,pragalla@codeaurora.org  wrote:
->> Is this issue got fixed on any latest kernel ? if so, can you please
->> help point the patch ?
->> If not got fixed, can we have a final solution ? i can even help in
->> testing the solution.
-> Hi John,
-> 
+The following changes since commit cd92cdb9c8bcfc27a8f28bcbf7c414a0ea79e5ec:
 
-Hi Bart,
+  null_blk: cleanup zoned mode initialization (2021-01-29 07:49:22 -0700)
 
-> Some time ago you replied the following to an email from me with a
-> suggestion for a fix: "Please let me consider it a bit more." Are you
-> still working on a fix?
+are available in the Git repository at:
 
-Unfortunately I have not had a chance, sorry. But I can look again.
+  git://git.infradead.org/nvme.git nvme-5.11
 
-So I have only seen KASAN use-after-free's myself, but never an actual 
-oops. IIRC, someone did report an oops.
+for you to fetch changes up to cb8563f5c735a042ea2dd7df1ad55ae06d63ffeb:
 
-@Pradeep, do you have a reliable re-creator? I noticed the timeout 
-handler stackframe in your mail, so I guess not. However, as an 
-experiment, could you test:
-https://lore.kernel.org/linux-block/1608203273-170555-2-git-send-email-john.garry@huawei.com/
+  nvmet-tcp: fix out-of-bounds access when receiving multiple h2cdata PDUs (2021-02-03 16:57:36 +0100)
 
-This should fix the common issue. But no final solution to issues 
-discussed from patch 2/2, which is more exotic.
+----------------------------------------------------------------
+Claus Stovgaard (1):
+      nvme-pci: ignore the subsysem NQN on Phison E16
 
-BTW, is this the same Pradeep who reported:
-https://lore.kernel.org/linux-block/1606402925-24420-1-git-send-email-ppvk@codeaurora.org/
+Keith Busch (1):
+      update the email address for Keith Bush
 
-I did cc ppvk@codeaurora.org on earlier version of my series, but it 
-bounced.
+Sagi Grimberg (1):
+      nvmet-tcp: fix out-of-bounds access when receiving multiple h2cdata PDUs
 
-> 
-> See also
-> https://lore.kernel.org/linux-block/1bcc1d9e-6a32-1e00-0d32-f5b7325b2f8c@huawei.com/
+Thorsten Leemhuis (1):
+      nvme-pci: avoid the deepest sleep state on Kingston A2000 SSDs
 
-Thanks,
-John
+ .mailmap                  | 2 ++
+ drivers/nvme/host/pci.c   | 4 ++++
+ drivers/nvme/target/tcp.c | 3 ++-
+ 3 files changed, 8 insertions(+), 1 deletion(-)
