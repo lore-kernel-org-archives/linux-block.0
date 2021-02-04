@@ -2,81 +2,107 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14334C433DB
-	for <linux-block@archiver.kernel.org>; Thu,  4 Feb 2021 15:53:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D59BEC433E0
+	for <linux-block@archiver.kernel.org>; Thu,  4 Feb 2021 16:10:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D078364F4D
-	for <linux-block@archiver.kernel.org>; Thu,  4 Feb 2021 15:53:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A6B4164F70
+	for <linux-block@archiver.kernel.org>; Thu,  4 Feb 2021 16:10:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237439AbhBDPxb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 Feb 2021 10:53:31 -0500
-Received: from mail-pl1-f182.google.com ([209.85.214.182]:43826 "EHLO
-        mail-pl1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237618AbhBDPwh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Feb 2021 10:52:37 -0500
-Received: by mail-pl1-f182.google.com with SMTP id 8so1960274plc.10
-        for <linux-block@vger.kernel.org>; Thu, 04 Feb 2021 07:52:20 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=IPQw/vw6QrtWvNONNThd5V+63/fFKcr3xt91STQ/8CQ=;
-        b=dSjlgfmqLjIOL+30AnPe5krYBc6PukxHAOvo7f3+zJAr+sQxtH7hX+QAR7QHw/WyNq
-         cS1w6Xs79aTOuvadPI4yo94jKuFWTuVwWZOdE1E0Fq/RZvPh/yX9v6As9tL53FaN1c0f
-         FMUeulXHwzGAeL2gbQyzn40VVXGk353l021G1Uw0h+WBGOu9aPElmwWcWjr01GNtyVBm
-         URX9kuCi9aUarz7+BFhxlUaXDu+hHMX0uYNOscIp94kq2NzHUpP4y57TTXBcns7FhCxn
-         t2XfJYACE/WgRRVvIjSo95etb9qFJ/eALokmomQZrGhQ0ZXczVFPnaulOA1LYNxyIEsJ
-         aWPA==
-X-Gm-Message-State: AOAM530kpQOxKXz/ZzDl6Pnr6tXPOV204iVi7bC6Tbv2eXTFd5GGpvZA
-        agc8U+OXdC4kMPDTPmT/ulZ9T+VaPlQ=
-X-Google-Smtp-Source: ABdhPJxDNe3ZlXWvMwcN5zzlNgSJTMW0C3EyXh520/E+DXTxD2/NaEeUVuGWVAAGuG2Wo7UUx3jahg==
-X-Received: by 2002:a17:90b:4ac8:: with SMTP id mh8mr182224pjb.38.1612453914857;
-        Thu, 04 Feb 2021 07:51:54 -0800 (PST)
-Received: from ?IPv6:2601:647:4000:d7:8322:e64a:7b80:3b82? ([2601:647:4000:d7:8322:e64a:7b80:3b82])
-        by smtp.gmail.com with ESMTPSA id g19sm6415915pfk.113.2021.02.04.07.51.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Feb 2021 07:51:53 -0800 (PST)
-Subject: Re: use-after-free access in bt_iter()
-To:     pragalla@codeaurora.org, axboe@kernel.dk, evgreen@google.com,
-        jianchao.w.wang@oracle.com
-Cc:     linux-block@vger.kernel.org, stummala@codeaurora.org,
-        John Garry <john.garry@huawei.com>
-References: <f98dd950466b0408d8589de053b02e05@codeaurora.org>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <056783fa-a510-2463-f353-c64dd8f37be9@acm.org>
-Date:   Thu, 4 Feb 2021 07:51:52 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.1
+        id S237836AbhBDQJi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 Feb 2021 11:09:38 -0500
+Received: from mail.kernel.org ([198.145.29.99]:41506 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S237835AbhBDQJa (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 4 Feb 2021 11:09:30 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id B37B264F6A;
+        Thu,  4 Feb 2021 16:08:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1612454929;
+        bh=3IAPQCCNYn5V60zzmVrr36a9HtGkWRc99HBODO496rg=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=SbGXD2TYulwmiUQymxa1aJ6E9gI3aWMtXnHBN5sPgXVrkpXtCbu+v0ZHPxelGg3kf
+         OCEK7Js2lxNP6OULdJSFxzpq9FfVDxZmJCQNHvO0+GZx0qC8q1M2tspWFbV3CM2ebX
+         7vYTxzaaKedXFZO77mr+R3l5UMy2ORCNsruSabzc=
+Date:   Thu, 4 Feb 2021 17:08:46 +0100
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <uwe@kleine-koenig.org>
+Cc:     Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jens Axboe <axboe@kernel.dk>, Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Peter Huewe <peterhuewe@gmx.de>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Haren Myneni <haren@us.ibm.com>,
+        Breno =?iso-8859-1?Q?Leit=E3o?= <leitao@debian.org>,
+        Nayna Jain <nayna@linux.ibm.com>,
+        Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
+        Steven Royer <seroyer@linux.ibm.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Cristobal Forno <cforno12@linux.ibm.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Dany Madden <drt@linux.ibm.com>, Lijun Pan <ljp@linux.ibm.com>,
+        Sukadev Bhattiprolu <sukadev@linux.ibm.com>,
+        Tyrel Datwyler <tyreld@linux.ibm.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Michael Cyr <mikecyr@linux.ibm.com>,
+        Jiri Slaby <jirislaby@kernel.org>,
+        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+        sparclinux@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
+        netdev@vger.kernel.org, linux-scsi@vger.kernel.org,
+        target-devel@vger.kernel.org
+Subject: Re: [PATCH] vio: make remove callback return void
+Message-ID: <YBwcDmtefa2WmS90@kroah.com>
+References: <20210127215010.99954-1-uwe@kleine-koenig.org>
 MIME-Version: 1.0
-In-Reply-To: <f98dd950466b0408d8589de053b02e05@codeaurora.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210127215010.99954-1-uwe@kleine-koenig.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/4/21 3:46 AM, pragalla@codeaurora.org wrote:
-> Is this issue got fixed on any latest kernel ? if so, can you please
-> help point the patch ?
-> If not got fixed, can we have a final solution ? i can even help in
-> testing the solution.
+On Wed, Jan 27, 2021 at 10:50:10PM +0100, Uwe Kleine-König wrote:
+> The driver core ignores the return value of struct bus_type::remove()
+> because there is only little that can be done. To simplify the quest to
+> make this function return void, let struct vio_driver::remove() return
+> void, too. All users already unconditionally return 0, this commit makes
+> it obvious that returning an error code is a bad idea and makes it
+> obvious for future driver authors that returning an error code isn't
+> intended.
+> 
+> Note there are two nominally different implementations for a vio bus:
+> one in arch/sparc/kernel/vio.c and the other in
+> arch/powerpc/platforms/pseries/vio.c. I didn't care to check which
+> driver is using which of these busses (or if even some of them can be
+> used with both) and simply adapt all drivers and the two bus codes in
+> one go.
+> 
+> Note that for the powerpc implementation there is a semantical change:
+> Before this patch for a device that was bound to a driver without a
+> remove callback vio_cmo_bus_remove(viodev) wasn't called. As the device
+> core still considers the device unbound after vio_bus_remove() returns
+> calling this unconditionally is the consistent behaviour which is
+> implemented here.
+> 
+> Signed-off-by: Uwe Kleine-König <uwe@kleine-koenig.org>
+> ---
+> Hello,
+> 
+> note that this change depends on
+> https://lore.kernel.org/r/20210121062005.53271-1-ljp@linux.ibm.com which removes
+> an (ignored) return -EBUSY in drivers/net/ethernet/ibm/ibmvnic.c.
+> I don't know when/if this latter patch will be applied, so it might take
+> some time until my patch can go in.
 
-Hi John,
-
-Some time ago you replied the following to an email from me with a
-suggestion for a fix: "Please let me consider it a bit more." Are you
-still working on a fix?
-
-See also
-https://lore.kernel.org/linux-block/1bcc1d9e-6a32-1e00-0d32-f5b7325b2f8c@huawei.com/
-
-Thanks,
-
-Bart.
+Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
