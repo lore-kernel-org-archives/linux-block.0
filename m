@@ -2,274 +2,153 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.4 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7497C433DB
-	for <linux-block@archiver.kernel.org>; Thu,  4 Feb 2021 04:16:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D658C433DB
+	for <linux-block@archiver.kernel.org>; Thu,  4 Feb 2021 05:57:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8348064E3F
-	for <linux-block@archiver.kernel.org>; Thu,  4 Feb 2021 04:16:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 09D9764F4E
+	for <linux-block@archiver.kernel.org>; Thu,  4 Feb 2021 05:57:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230273AbhBDEP5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 Feb 2021 23:15:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35752 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229698AbhBDEP4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Feb 2021 23:15:56 -0500
-Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FB51C061573;
-        Wed,  3 Feb 2021 20:15:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=Content-Transfer-Encoding:Content-Type:
-        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-        :Reply-To:Content-ID:Content-Description;
-        bh=JWNpbnyZqzRYkEJKXFPpQ+gv+9VW0iywE8N5U6sRF7c=; b=B8ZWvHmU8IR1lHV82/Zk+3KMk/
-        KQRGMXzimBvhlMSaxNKiR4+KVFTYZCaX4NWfL9xKZj4XxCDH0pN2esF6XZyJSkOdwAfcRxX4C4TTq
-        eHatHIFz90VrKwJTWk2EQ2QiuKABvrVkXXufUoNZdwTqOh7nSILewW41G0JXcaRLF3raoh+HKujHl
-        ZzVcx69Wxr0lvrxG/aW9XYIyKxDzTBfUA/qmiQAqqziD4HN08hpOK8erMj1MhkwXxo+ysb86bKB+b
-        hOZLx0O5jf9dHpNvG5wWdP8d4eh8tzG5DbSMGs3XcHveHrJHWZH0hipL/EHBjy87c4bgOWJEfzwLm
-        EuVD+ezg==;
-Received: from [2601:1c0:6280:3f0::aec2]
-        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1l7W2w-0002Ru-Mv; Thu, 04 Feb 2021 04:15:11 +0000
-Subject: Re: [PATCH v4 1/6] docs: device-mapper: add remap_and_filter
-To:     Sergei Shtepa <sergei.shtepa@veeam.com>, Damien.LeMoal@wdc.com,
-        snitzer@redhat.com, hare@suse.de, ming.lei@redhat.com,
-        agk@redhat.com, corbet@lwn.net, axboe@kernel.dk, jack@suse.cz,
-        johannes.thumshirn@wdc.com, gregkh@linuxfoundation.org,
-        koct9i@gmail.com, steve@sk2.org, dm-devel@redhat.com,
-        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     pavgel.tide@veeam.com
-References: <1612367638-3794-1-git-send-email-sergei.shtepa@veeam.com>
- <1612367638-3794-2-git-send-email-sergei.shtepa@veeam.com>
-From:   Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <ef604ad7-1348-1ffa-e3c4-67d153620e08@infradead.org>
-Date:   Wed, 3 Feb 2021 20:15:03 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
+        id S229752AbhBDF5S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 Feb 2021 00:57:18 -0500
+Received: from szxga02-in.huawei.com ([45.249.212.188]:3418 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229609AbhBDF5S (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Feb 2021 00:57:18 -0500
+Received: from DGGEMM405-HUB.china.huawei.com (unknown [172.30.72.55])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4DWSSh5Fk7z5Ngf;
+        Thu,  4 Feb 2021 13:55:16 +0800 (CST)
+Received: from dggema772-chm.china.huawei.com (10.1.198.214) by
+ DGGEMM405-HUB.china.huawei.com (10.3.20.213) with Microsoft SMTP Server (TLS)
+ id 14.3.498.0; Thu, 4 Feb 2021 13:56:35 +0800
+Received: from [10.169.42.93] (10.169.42.93) by dggema772-chm.china.huawei.com
+ (10.1.198.214) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2106.2; Thu, 4 Feb
+ 2021 13:56:35 +0800
+Subject: Re: [PATCH v5 0/3] avoid double request completion and IO error
+To:     Christoph Hellwig <hch@lst.de>
+CC:     <linux-nvme@lists.infradead.org>, <kbusch@kernel.org>,
+        <axboe@fb.com>, <sagi@grimberg.me>, <linux-block@vger.kernel.org>,
+        <axboe@kernel.dk>
+References: <20210201034940.18891-1-lengchao@huawei.com>
+ <20210203161455.GB4116@lst.de>
+From:   Chao Leng <lengchao@huawei.com>
+Message-ID: <7d39e0a4-3765-85b8-aab5-b0ded93f8bec@huawei.com>
+Date:   Thu, 4 Feb 2021 13:56:34 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.9.0
 MIME-Version: 1.0
-In-Reply-To: <1612367638-3794-2-git-send-email-sergei.shtepa@veeam.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20210203161455.GB4116@lst.de>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.169.42.93]
+X-ClientProxiedBy: dggeme716-chm.china.huawei.com (10.1.199.112) To
+ dggema772-chm.china.huawei.com (10.1.198.214)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/3/21 7:53 AM, Sergei Shtepa wrote:
-> remap_and_filter - describes the new features that
-> blk_interposer provides for device mapper.
+This looks good to me.
+Thank you very much.
+
+On 2021/2/4 0:14, Christoph Hellwig wrote:
+> So I think this is conceptually fine, but I still find the API a little
+> arcane.  What do you think about the following incremental patch?
+> If that looks good and tests good for you I can apply the series with
+> the modifications:
 > 
-> Signed-off-by: Sergei Shtepa <sergei.shtepa@veeam.com>
-
-Hi--
-Please see comments below.
-
-
-> ---
->  .../admin-guide/device-mapper/index.rst       |   1 +
->  .../device-mapper/remap_and_filter.rst        | 132 ++++++++++++++++++
->  2 files changed, 133 insertions(+)
->  create mode 100644 Documentation/admin-guide/device-mapper/remap_and_filter.rst
-
-> diff --git a/Documentation/admin-guide/device-mapper/remap_and_filter.rst b/Documentation/admin-guide/device-mapper/remap_and_filter.rst
-> new file mode 100644
-> index 000000000000..616b67998305
-> --- /dev/null
-> +++ b/Documentation/admin-guide/device-mapper/remap_and_filter.rst
-> @@ -0,0 +1,132 @@
-> +=================
-> +DM remap & filter
-> +=================
+> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+> index 0befaad788a094..02579f4f776c7d 100644
+> --- a/drivers/nvme/host/core.c
+> +++ b/drivers/nvme/host/core.c
+> @@ -355,6 +355,21 @@ void nvme_complete_rq(struct request *req)
+>   }
+>   EXPORT_SYMBOL_GPL(nvme_complete_rq);
+>   
+> +/*
+> + * Called to unwind from ->queue_rq on a failed command submission so that the
+> + * multipathing code gets called to potentially failover to another path.
+> + * The caller needs to unwind all transport specific resource allocations and
+> + * must return propagate the return value.
+> + */
+> +blk_status_t nvme_host_path_error(struct request *req)
+> +{
+> +	nvme_req(req)->status = NVME_SC_HOST_PATH_ERROR;
+> +	blk_mq_set_request_complete(req);
+> +	nvme_complete_rq(req);
+> +	return BLK_STS_OK;
+> +}
+> +EXPORT_SYMBOL_GPL(nvme_host_path_error);
 > +
-> +Introduction
-> +============
-> +
-> +Usually LVM should be used for new devices.
-> +The administrator have to create logical volumes for the system partition
-
-                     has
-
-> +when installing the operating system. For a running system with
-> +partitioned disk space and mounted file systems, it is quite difficult to
-> +reconfigure to logical volumes. As a result, all the features that Device
-> +Mapper provides are not available for non-LVM systems.
-> +This problem is partially solved by the dm remap functionality, which
-> +uses the kernel's blk_interposer.
-> +
-> +blk_interposer
-> +==============
-> +
-> +Blk_interposer extends the capabilities of the DM, as it allows to
-> +intercept and redirect bio requests for block devices that are not
-> +dm device. At the same time, blk_interposer allows to attach and detach
-
-      devices.
-
-> +from devices "on the fly", without stopping the execution of user
-> +programs.
-> +
-> +Blk_interposer allows to do two tasks: remap and filter.
-> +Remap allows to redirect all requests from one block device to another.
-> +Filter allows to do additional processing of the request, but without
-> +redirection. An intercepted request can get to the block device to which
-> +it was addressed, without changes.
-> +
-> +Remap
-> +=====
-> +
-> +Consider the functionality of the remap. This will allow to connect
-> +any block device with a dm device "on the fly".
-> +Suppose we have a file system mounted on the block device /dev/sda1::
-> +
-> +  +-------------+
-> +  | file system |
-> +  +-------------+
-> +        ||
-> +        \/
-> +  +-------------+
-> +  | /dev/sda1   |
-> +  +-------------+
-> +
-> +Creating a new DM device that will be mapped on the same /dev/sda1::
-
-Sometimes it's "DM", other times it's "dm" device. Please be consistent.
-
-> +
-> +  +-------------+  +-----------+
-> +  | file system |  | dm-linear |
-> +  +-------------+  +-----------+
-> +           ||         ||
-> +           \/         \/
-> +         +---------------+
-> +         |   /dev/sda1   |
-> +         +---------------+
-> +
-> +Redirecting all bio requests for the /dev/sda1 device to the new dm
-> +device::
-> +
-> +  +-------------+
-> +  | file system |
-> +  +-------------+
-> +        ||
-> +        \/
-> +   +----------+    +-----------+
-> +   |  remap   | => | dm-linear |
-> +   +----------+    +-----------+
-> +                         ||
-> +                         \/
-> +                   +-----------+
-> +                   | /dev/sda1 |
-> +                   +-----------+
-> +
-> +To achieve this, you need to:
-> +
-> +Create new dm device with option 'noexcl'. It's allow to open
-
-                                                   allowed to open the
-
-> +underlying block-device without the FMODE_EXCL flag::
-> +
-> +  echo "0 `blockdev --getsz $1` linear $DEV 0 noexcl" | dmsetup create dm-noexcl
-> +
-> +Call remap command::
-> +
-> +  dmsetup remap start dm-noexcl $1
-> +
-> +Remap can be used to extend the functionality of dm-snap. This will allow
-> +to take snapshots from any block devices, not just logical volumes.
-> +
-> +Filter
-> +======
-> +
-> +Filter does not redirect the bio to another device. It does not create
-> +a clone of the bio request. After receiving the request, the filter can
-> +only add some processing, complete the bio request, or return the bio
-> +for further processing.
-> +
-> +Suppose we have a file system mounted on the block device /dev/sda1::
-> +
-> +  +-------------+
-> +  | file system |
-> +  +-------------+
-> +        ||
-> +        \/
-> +  +-------------+
-> +  | /dev/sda1   |
-> +  +-------------+
-> +
-> +Creating a new dm device that will implement filter::
-> +
-> +  +-------------+
-> +  | file system |
-> +  +-------------+
-> +        ||
-> +        \/
-> +    +--------+    +----------+
-> +    | filter | => | dm-delay |
-> +    +--------+    +----------+
-> +        ||
-> +        \/
-> +  +-------------+
-> +  | /dev/sda1   |
-> +  +-------------+
-> +
-> +Using filter we can change the behavior of debugging tools:
-> + * dm-dust,
-> + * dm-delay,
-> + * dm-flakey,
-> + * dm-verity.
-> +
-> +In the new version, they are will be able to change the behavior of any
-
-          Either       they are able to change the behavior of any
-            or         they will be able to change the behavior of any
-
-I prefer the first choice.
-
-> +existing block device, without creating a new one.
-
-
-According to Documentation/doc-guide/sphinx.rst, here is how
-chapters, sections, etc., should be indicated:
-
-
-* Please stick to this order of heading adornments:
-
-  1. ``=`` with overline for document title::
-
-       ==============
-       Document title
-       ==============
-
-  2. ``=`` for chapters::
-
-       Chapters
-       ========
-
-  3. ``-`` for sections::
-
-       Section
-       -------
-
-  4. ``~`` for subsections::
-
-       Subsection
-       ~~~~~~~~~~
-
-  Although RST doesn't mandate a specific order ("Rather than imposing a fixed
-  number and order of section title adornment styles, the order enforced will be
-  the order as encountered."), having the higher levels the same overall makes
-  it easier to follow the documents.
-
-
-
-thanks.
--- 
-~Randy
-
+>   bool nvme_cancel_request(struct request *req, void *data, bool reserved)
+>   {
+>   	dev_dbg_ratelimited(((struct nvme_ctrl *) data)->device,
+> diff --git a/drivers/nvme/host/fabrics.c b/drivers/nvme/host/fabrics.c
+> index cedf9b31898673..5dfd806fc2d28c 100644
+> --- a/drivers/nvme/host/fabrics.c
+> +++ b/drivers/nvme/host/fabrics.c
+> @@ -552,11 +552,7 @@ blk_status_t nvmf_fail_nonready_command(struct nvme_ctrl *ctrl,
+>   	    !test_bit(NVME_CTRL_FAILFAST_EXPIRED, &ctrl->flags) &&
+>   	    !blk_noretry_request(rq) && !(rq->cmd_flags & REQ_NVME_MPATH))
+>   		return BLK_STS_RESOURCE;
+> -
+> -	nvme_req(rq)->status = NVME_SC_HOST_PATH_ERROR;
+> -	blk_mq_set_request_complete(rq);
+> -	nvme_complete_rq(rq);
+> -	return BLK_STS_OK;
+> +	return nvme_host_path_error(rq);
+>   }
+>   EXPORT_SYMBOL_GPL(nvmf_fail_nonready_command);
+>   
+> diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+> index a72f0718109100..5819f038104149 100644
+> --- a/drivers/nvme/host/nvme.h
+> +++ b/drivers/nvme/host/nvme.h
+> @@ -575,6 +575,7 @@ static inline bool nvme_is_aen_req(u16 qid, __u16 command_id)
+>   }
+>   
+>   void nvme_complete_rq(struct request *req);
+> +blk_status_t nvme_host_path_error(struct request *req);
+>   bool nvme_cancel_request(struct request *req, void *data, bool reserved);
+>   void nvme_cancel_tagset(struct nvme_ctrl *ctrl);
+>   void nvme_cancel_admin_tagset(struct nvme_ctrl *ctrl);
+> diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
+> index 6993efb27b39f0..f51af5e4970a2b 100644
+> --- a/drivers/nvme/host/rdma.c
+> +++ b/drivers/nvme/host/rdma.c
+> @@ -2091,16 +2091,6 @@ static blk_status_t nvme_rdma_queue_rq(struct blk_mq_hw_ctx *hctx,
+>   	err = nvme_rdma_post_send(queue, sqe, req->sge, req->num_sge,
+>   			req->mr ? &req->reg_wr.wr : NULL);
+>   	if (unlikely(err)) {
+> -		if (err == -EIO) {
+> -			/*
+> -			 * Fail the reqest so upper layer can failover I/O
+> -			 * if another path is available
+> -			 */
+> -			req->status = NVME_SC_HOST_PATH_ERROR;
+> -			blk_mq_set_request_complete(rq);
+> -			nvme_rdma_complete_rq(rq);
+> -			return BLK_STS_OK;
+> -		}
+>   		goto err_unmap;
+>   	}
+>   
+> @@ -2109,7 +2099,9 @@ static blk_status_t nvme_rdma_queue_rq(struct blk_mq_hw_ctx *hctx,
+>   err_unmap:
+>   	nvme_rdma_unmap_data(queue, rq);
+>   err:
+> -	if (err == -ENOMEM || err == -EAGAIN)
+> +	if (err == -EIO)
+> +		ret = nvme_host_path_error(rq);
+> +	else if (err == -ENOMEM || err == -EAGAIN)
+>   		ret = BLK_STS_RESOURCE;
+>   	else
+>   		ret = BLK_STS_IOERR;
+> .
+> 
