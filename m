@@ -2,62 +2,58 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.4 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA30DC433E6
-	for <linux-block@archiver.kernel.org>; Thu,  4 Feb 2021 03:59:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7497C433DB
+	for <linux-block@archiver.kernel.org>; Thu,  4 Feb 2021 04:16:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6696564F59
-	for <linux-block@archiver.kernel.org>; Thu,  4 Feb 2021 03:59:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8348064E3F
+	for <linux-block@archiver.kernel.org>; Thu,  4 Feb 2021 04:16:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232138AbhBDD7m (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 Feb 2021 22:59:42 -0500
-Received: from mail-pl1-f179.google.com ([209.85.214.179]:36865 "EHLO
-        mail-pl1-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232686AbhBDD7U (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Feb 2021 22:59:20 -0500
-Received: by mail-pl1-f179.google.com with SMTP id e12so1047271pls.4
-        for <linux-block@vger.kernel.org>; Wed, 03 Feb 2021 19:59:05 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=u6mnXGDFAyXxjx1ewHvhzGWWAnHu+QmTpztwBxJMexo=;
-        b=k1GGR5HppiSl3LSrZiYjsO/1TEJMncpOwRjN6kJGNPIr85SL3NW+vr9NB/Oj659knl
-         5xGYjNNoHXPt+u7Kbw9I4ceZnJdGDf0Lh1zhzdUXSiH6kz3Q100b/+VYVBvH0daZRf2B
-         AJE+8+TrLCP1vz2BWcCd2MJ9l33whf4rogTM39EuqlViSFgMbwdl4yvLpUd+GE3pOtSM
-         jasyHyqlJnHfyteJn7uqPCK26A6hNxms0iybv8aoH3q/yKAXvMlaZasGzS42gQH9YZ7c
-         /SvxT9xOQizgidv9yHtxDoZzBcNTmCwW1bnE/c/2mo4QUTbDCRxiChBqnzAQLvGVB0aZ
-         SO4g==
-X-Gm-Message-State: AOAM530ZZgtPBL5uppN+yiVXoNrx36El/U3AHJcppL/QWrsFJ+iVz/37
-        5zmjtMXTQwRZWqRQcA5/kR4CyEKBmWc=
-X-Google-Smtp-Source: ABdhPJyrJTMQRwjdAsLTfX0rJhN/UcEr2K1NlTygwLfIc9ANE08FPi0iTcnB3nBI5kaY+pPjdwp5ww==
-X-Received: by 2002:a17:90a:ba87:: with SMTP id t7mr6152129pjr.184.1612411119745;
-        Wed, 03 Feb 2021 19:58:39 -0800 (PST)
-Received: from ?IPv6:2601:647:4000:d7:65f0:cf17:ca4c:f4e5? ([2601:647:4000:d7:65f0:cf17:ca4c:f4e5])
-        by smtp.gmail.com with ESMTPSA id c3sm3793871pfj.105.2021.02.03.19.58.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 03 Feb 2021 19:58:38 -0800 (PST)
-Subject: Re: [PATCH blktests 3/3] rdma: Use rdma link instead of
- /sys/class/infiniband/*/parent
-To:     Omar Sandoval <osandov@osandov.com>
-Cc:     Omar Sandoval <osandov@fb.com>, linux-block@vger.kernel.org,
-        Yi Zhang <yi.zhang@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>
-References: <20210126044519.6366-1-bvanassche@acm.org>
- <20210126044519.6366-4-bvanassche@acm.org>
- <YBrR5anAHkyL4EVg@relinquished.localdomain>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <3c7d51d1-1470-3dbe-f471-68551d233f4b@acm.org>
-Date:   Wed, 3 Feb 2021 19:58:37 -0800
+        id S230273AbhBDEP5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 Feb 2021 23:15:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35752 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229698AbhBDEP4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Feb 2021 23:15:56 -0500
+Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1231::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FB51C061573;
+        Wed,  3 Feb 2021 20:15:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=merlin.20170209; h=Content-Transfer-Encoding:Content-Type:
+        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+        :Reply-To:Content-ID:Content-Description;
+        bh=JWNpbnyZqzRYkEJKXFPpQ+gv+9VW0iywE8N5U6sRF7c=; b=B8ZWvHmU8IR1lHV82/Zk+3KMk/
+        KQRGMXzimBvhlMSaxNKiR4+KVFTYZCaX4NWfL9xKZj4XxCDH0pN2esF6XZyJSkOdwAfcRxX4C4TTq
+        eHatHIFz90VrKwJTWk2EQ2QiuKABvrVkXXufUoNZdwTqOh7nSILewW41G0JXcaRLF3raoh+HKujHl
+        ZzVcx69Wxr0lvrxG/aW9XYIyKxDzTBfUA/qmiQAqqziD4HN08hpOK8erMj1MhkwXxo+ysb86bKB+b
+        hOZLx0O5jf9dHpNvG5wWdP8d4eh8tzG5DbSMGs3XcHveHrJHWZH0hipL/EHBjy87c4bgOWJEfzwLm
+        EuVD+ezg==;
+Received: from [2601:1c0:6280:3f0::aec2]
+        by merlin.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1l7W2w-0002Ru-Mv; Thu, 04 Feb 2021 04:15:11 +0000
+Subject: Re: [PATCH v4 1/6] docs: device-mapper: add remap_and_filter
+To:     Sergei Shtepa <sergei.shtepa@veeam.com>, Damien.LeMoal@wdc.com,
+        snitzer@redhat.com, hare@suse.de, ming.lei@redhat.com,
+        agk@redhat.com, corbet@lwn.net, axboe@kernel.dk, jack@suse.cz,
+        johannes.thumshirn@wdc.com, gregkh@linuxfoundation.org,
+        koct9i@gmail.com, steve@sk2.org, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     pavgel.tide@veeam.com
+References: <1612367638-3794-1-git-send-email-sergei.shtepa@veeam.com>
+ <1612367638-3794-2-git-send-email-sergei.shtepa@veeam.com>
+From:   Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <ef604ad7-1348-1ffa-e3c4-67d153620e08@infradead.org>
+Date:   Wed, 3 Feb 2021 20:15:03 -0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.1
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-In-Reply-To: <YBrR5anAHkyL4EVg@relinquished.localdomain>
+In-Reply-To: <1612367638-3794-2-git-send-email-sergei.shtepa@veeam.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -65,28 +61,215 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/3/21 8:40 AM, Omar Sandoval wrote:
-> On Mon, Jan 25, 2021 at 08:45:19PM -0800, Bart Van Assche wrote:
->> The approach of verifying whether or not an RDMA interface is associated
->> with the rdma_rxe interface by looking up its parent device is deprecated
->> and will be removed soon from the Linux kernel. Hence this patch that uses
->> the rdma link command instead.
->>
->> Cc: Jason Gunthorpe <jgg@nvidia.com>
->> Cc: Yi Zhang <yi.zhang@redhat.com>
->> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
->> ---
->>  common/multipath-over-rdma | 111 +++++++++++--------------------------
->>  tests/srp/rc               |   9 +--
->>  2 files changed, 32 insertions(+), 88 deletions(-)
+On 2/3/21 7:53 AM, Sergei Shtepa wrote:
+> remap_and_filter - describes the new features that
+> blk_interposer provides for device mapper.
 > 
-> I think we need to add _have_program rdma checks to srp and nvmeof-mp,
-> right? The first two patches look fine, I'll merge those.
+> Signed-off-by: Sergei Shtepa <sergei.shtepa@veeam.com>
 
-Sure, I will add a _have_program rdma check and repost this patch.
+Hi--
+Please see comments below.
 
-Thanks,
 
-Bart.
+> ---
+>  .../admin-guide/device-mapper/index.rst       |   1 +
+>  .../device-mapper/remap_and_filter.rst        | 132 ++++++++++++++++++
+>  2 files changed, 133 insertions(+)
+>  create mode 100644 Documentation/admin-guide/device-mapper/remap_and_filter.rst
 
+> diff --git a/Documentation/admin-guide/device-mapper/remap_and_filter.rst b/Documentation/admin-guide/device-mapper/remap_and_filter.rst
+> new file mode 100644
+> index 000000000000..616b67998305
+> --- /dev/null
+> +++ b/Documentation/admin-guide/device-mapper/remap_and_filter.rst
+> @@ -0,0 +1,132 @@
+> +=================
+> +DM remap & filter
+> +=================
+> +
+> +Introduction
+> +============
+> +
+> +Usually LVM should be used for new devices.
+> +The administrator have to create logical volumes for the system partition
+
+                     has
+
+> +when installing the operating system. For a running system with
+> +partitioned disk space and mounted file systems, it is quite difficult to
+> +reconfigure to logical volumes. As a result, all the features that Device
+> +Mapper provides are not available for non-LVM systems.
+> +This problem is partially solved by the dm remap functionality, which
+> +uses the kernel's blk_interposer.
+> +
+> +blk_interposer
+> +==============
+> +
+> +Blk_interposer extends the capabilities of the DM, as it allows to
+> +intercept and redirect bio requests for block devices that are not
+> +dm device. At the same time, blk_interposer allows to attach and detach
+
+      devices.
+
+> +from devices "on the fly", without stopping the execution of user
+> +programs.
+> +
+> +Blk_interposer allows to do two tasks: remap and filter.
+> +Remap allows to redirect all requests from one block device to another.
+> +Filter allows to do additional processing of the request, but without
+> +redirection. An intercepted request can get to the block device to which
+> +it was addressed, without changes.
+> +
+> +Remap
+> +=====
+> +
+> +Consider the functionality of the remap. This will allow to connect
+> +any block device with a dm device "on the fly".
+> +Suppose we have a file system mounted on the block device /dev/sda1::
+> +
+> +  +-------------+
+> +  | file system |
+> +  +-------------+
+> +        ||
+> +        \/
+> +  +-------------+
+> +  | /dev/sda1   |
+> +  +-------------+
+> +
+> +Creating a new DM device that will be mapped on the same /dev/sda1::
+
+Sometimes it's "DM", other times it's "dm" device. Please be consistent.
+
+> +
+> +  +-------------+  +-----------+
+> +  | file system |  | dm-linear |
+> +  +-------------+  +-----------+
+> +           ||         ||
+> +           \/         \/
+> +         +---------------+
+> +         |   /dev/sda1   |
+> +         +---------------+
+> +
+> +Redirecting all bio requests for the /dev/sda1 device to the new dm
+> +device::
+> +
+> +  +-------------+
+> +  | file system |
+> +  +-------------+
+> +        ||
+> +        \/
+> +   +----------+    +-----------+
+> +   |  remap   | => | dm-linear |
+> +   +----------+    +-----------+
+> +                         ||
+> +                         \/
+> +                   +-----------+
+> +                   | /dev/sda1 |
+> +                   +-----------+
+> +
+> +To achieve this, you need to:
+> +
+> +Create new dm device with option 'noexcl'. It's allow to open
+
+                                                   allowed to open the
+
+> +underlying block-device without the FMODE_EXCL flag::
+> +
+> +  echo "0 `blockdev --getsz $1` linear $DEV 0 noexcl" | dmsetup create dm-noexcl
+> +
+> +Call remap command::
+> +
+> +  dmsetup remap start dm-noexcl $1
+> +
+> +Remap can be used to extend the functionality of dm-snap. This will allow
+> +to take snapshots from any block devices, not just logical volumes.
+> +
+> +Filter
+> +======
+> +
+> +Filter does not redirect the bio to another device. It does not create
+> +a clone of the bio request. After receiving the request, the filter can
+> +only add some processing, complete the bio request, or return the bio
+> +for further processing.
+> +
+> +Suppose we have a file system mounted on the block device /dev/sda1::
+> +
+> +  +-------------+
+> +  | file system |
+> +  +-------------+
+> +        ||
+> +        \/
+> +  +-------------+
+> +  | /dev/sda1   |
+> +  +-------------+
+> +
+> +Creating a new dm device that will implement filter::
+> +
+> +  +-------------+
+> +  | file system |
+> +  +-------------+
+> +        ||
+> +        \/
+> +    +--------+    +----------+
+> +    | filter | => | dm-delay |
+> +    +--------+    +----------+
+> +        ||
+> +        \/
+> +  +-------------+
+> +  | /dev/sda1   |
+> +  +-------------+
+> +
+> +Using filter we can change the behavior of debugging tools:
+> + * dm-dust,
+> + * dm-delay,
+> + * dm-flakey,
+> + * dm-verity.
+> +
+> +In the new version, they are will be able to change the behavior of any
+
+          Either       they are able to change the behavior of any
+            or         they will be able to change the behavior of any
+
+I prefer the first choice.
+
+> +existing block device, without creating a new one.
+
+
+According to Documentation/doc-guide/sphinx.rst, here is how
+chapters, sections, etc., should be indicated:
+
+
+* Please stick to this order of heading adornments:
+
+  1. ``=`` with overline for document title::
+
+       ==============
+       Document title
+       ==============
+
+  2. ``=`` for chapters::
+
+       Chapters
+       ========
+
+  3. ``-`` for sections::
+
+       Section
+       -------
+
+  4. ``~`` for subsections::
+
+       Subsection
+       ~~~~~~~~~~
+
+  Although RST doesn't mandate a specific order ("Rather than imposing a fixed
+  number and order of section title adornment styles, the order enforced will be
+  the order as encountered."), having the higher levels the same overall makes
+  it easier to follow the documents.
+
+
+
+thanks.
+-- 
+~Randy
 
