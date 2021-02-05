@@ -2,178 +2,448 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD29EC433E6
-	for <linux-block@archiver.kernel.org>; Fri,  5 Feb 2021 02:57:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0094C433E0
+	for <linux-block@archiver.kernel.org>; Fri,  5 Feb 2021 03:51:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7B8A464FB4
-	for <linux-block@archiver.kernel.org>; Fri,  5 Feb 2021 02:57:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7049164FA3
+	for <linux-block@archiver.kernel.org>; Fri,  5 Feb 2021 03:51:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229698AbhBEC5w (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 Feb 2021 21:57:52 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:49940 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229703AbhBEC5t (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Feb 2021 21:57:49 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 1152sX5n045701;
-        Fri, 5 Feb 2021 02:57:01 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- from : message-id : references : date : in-reply-to : content-type :
- mime-version; s=corp-2020-01-29;
- bh=sI/G0LaTvhH4B/xO2CwfF61QIgr1UQhY7NaLR7lb6g8=;
- b=nxnO5E9Or6qv3KxeB2WviCiRcv6XfQlPpNS/qBCuImO4aTzu2shJNX5S9chcWsDC4dd1
- 79MtZNS1VX5DDMu36t9kSnyhTjTTH9UcOvy2Wyzw5sqG7UZlmA8jssCuLuIKyI6dPkLX
- 2nWiELZ1jQ0kNWHZ2XKQpOfqa93R+DelYPFsqKO36zTFGtc1dwn5p2x+p5l/qir5NYuB
- q3aIKo2mQtDuAAqBjc2uBw1wIOuMf+S1ewRXmJbsFOt7POZMWIaDJD994FhC0xHR3M8K
- v/OPlBSv2U6bvg0lIshYBFPcOfuNq5j/aqQBQGj6YhWJqdtr5vh+HXL/cEA7u5O2TxT3 Cw== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2130.oracle.com with ESMTP id 36cxvratu2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 05 Feb 2021 02:57:01 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 1152ohaf057048;
-        Fri, 5 Feb 2021 02:57:00 GMT
-Received: from nam04-dm6-obe.outbound.protection.outlook.com (mail-dm6nam08lp2043.outbound.protection.outlook.com [104.47.73.43])
-        by userp3030.oracle.com with ESMTP id 36dhd2990u-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 05 Feb 2021 02:57:00 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=R/EYEASBXZ098WXxEyF65crhPX65U3vbuHnVHdqUsUuqWkAKnsICeV6MLDrdGJJBrDiBl7knff541hXOcSrrqaJ/vz20/sdz9YEJOYeL4NUJ1YiztZmeFOmPIyFwba9kdlLmVG/NjSFpxbKYA+q8HF9Tzlc4SmatmO4a/ulp72toLPTwT8it3aUvDMvVAnfkqkFrWWznALZgCSt7WzJLBBkfTS1+QYJgp8dcGwtrquAxek6MamV5ZSR247NL6FFAC6dVvjao+Mi82Xou4PrjskDRBhj9jMEXe16q7pr0hhFnIM/cSWxLSmcyh2B/BiSHCzY1RRl01O5j+3z0vvWVHw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=sI/G0LaTvhH4B/xO2CwfF61QIgr1UQhY7NaLR7lb6g8=;
- b=Bawxd8v9VL85/j9n++kEMSexGPmOJeY7hRB19FexWnKx6hKj949ButXvh0MZ7xbS3ZuIAy4OZnNa0cMF9uvRfVF9WU2l6U9oL/2Ob+KGeM0O0pEAUZQmXCNZdn72xbn5Pz5a9gi+oMwneb3nb9hwvk9Uckay7x3JuUPIX875HsuCgRK4/y52GWKpj7rSfyaJcQNzaVhb/iqsm3MKitbt5xAK9XkP9bEtV58tQ6L4jqrNjYO6Y46QrfeRCKGnuiCkpZBgkJmSesJP5lD5Yk5h5CtDa8IfrGNqBgeTQH3mhpxnkiGJ0/sTGo8uzZsqNL1Rhauky5dB8w7+WSiqEle9uA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=sI/G0LaTvhH4B/xO2CwfF61QIgr1UQhY7NaLR7lb6g8=;
- b=xWrNqdw9OLtqP4lR7VGLm5WkFSKdskDSMa0OjdfFQozzZp8CXW352rTBrTZqXG+zXUyuNPQ4byGj6R18zMwnhXEws788yU+i5AkLl44YpcYMdg5vA0QcrJZL6h2FIeUltjgcY5kcjOd1TqyTPbQ48cQxl+vuU7u+9TEyYSscchA=
-Authentication-Results: wdc.com; dkim=none (message not signed)
- header.d=none;wdc.com; dmarc=none action=none header.from=oracle.com;
-Received: from PH0PR10MB4759.namprd10.prod.outlook.com (2603:10b6:510:3d::12)
- by PH0PR10MB4664.namprd10.prod.outlook.com (2603:10b6:510:41::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3805.17; Fri, 5 Feb
- 2021 02:56:58 +0000
-Received: from PH0PR10MB4759.namprd10.prod.outlook.com
- ([fe80::dc39:c9fa:7365:8c8e]) by PH0PR10MB4759.namprd10.prod.outlook.com
- ([fe80::dc39:c9fa:7365:8c8e%5]) with mapi id 15.20.3825.020; Fri, 5 Feb 2021
- 02:56:58 +0000
-To:     Damien Le Moal <damien.lemoal@wdc.com>
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
-        Keith Busch <keith.busch@wdc.com>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: Re: [PATCH v4 8/8] sd_zbc: clear zone resources for non-zoned case
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <yq1sg6bte6w.fsf@ca-mkp.ca.oracle.com>
-References: <20210128044733.503606-1-damien.lemoal@wdc.com>
-        <20210128044733.503606-9-damien.lemoal@wdc.com>
-Date:   Thu, 04 Feb 2021 21:56:54 -0500
-In-Reply-To: <20210128044733.503606-9-damien.lemoal@wdc.com> (Damien Le Moal's
-        message of "Thu, 28 Jan 2021 13:47:33 +0900")
-Content-Type: text/plain
-X-Originating-IP: [138.3.200.58]
-X-ClientProxiedBy: CH2PR19CA0018.namprd19.prod.outlook.com
- (2603:10b6:610:4d::28) To PH0PR10MB4759.namprd10.prod.outlook.com
- (2603:10b6:510:3d::12)
+        id S229913AbhBEDvz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 Feb 2021 22:51:55 -0500
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:26643 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229989AbhBEDvz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Feb 2021 22:51:55 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1612497113; x=1644033113;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Wne1jkFbyb8CuaPAZIHDIRQj6T/Z2GapBWxm/HzoBeU=;
+  b=aOu9ynwXbBE6P/W9x/4I9N3t/4GUBbV61m4MVyolL1DAtzu+kUJe2pQH
+   WE6JUjmbzfYLLaNPFuJyrRp8QuoFjNkcbmsptR1DyG3rhYPBYLHpODl+4
+   xqT0dJlYT4mWBVGwHr4BEcIW7m+bMy/V1VpSj2d50OoSRk05dsnT6PCM7
+   1InYjKYhyC4l/qYUBtd/OKe4Sm9rapNsXvvMnehqyZ4I6KPM2dT03bf1j
+   IkIzwicrFXzZdX3QmucB02a6iUh76XSqX6tkgMxe6fBqNrz9U8TK1zL+m
+   OO49OXTsMXfpB42Cpl9Ye6j5k7zeJ3poeKMoncjAbiJ4ZRaw3/+K+KFom
+   g==;
+IronPort-SDR: ePMUPxNvHy7cRN9t3oqu3wqaYXS1LsxrzYPh/xswrJwtOLhmyEgZRw46XNA8w34Q4kGxZJh5rH
+ RvqpRXeuWRYWDRw6zVjCRBIiBAMt0RsjNJfw1lhuh7YcXd7EFxoRphyUnyvaP8JZJE0nU1EBRU
+ VpMbuJrC6hXvlZbLy1DZ5D+LYk7m9TuK9bFyTe5AZZYjVZ6tZMJ9HNhZb9PVrKx5StoKepEoYv
+ ofQkAdJYc5v9T+U+9xiUuEmaR1WHUz6CWGmvWw61oNbsQWh8s6HWeiMDsjzVKL+qV09Om+pnZL
+ uF4=
+X-IronPort-AV: E=Sophos;i="5.81,154,1610380800"; 
+   d="scan'208";a="163645248"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 05 Feb 2021 11:50:48 +0800
+IronPort-SDR: GwBQRHEQ/I2aFkvWnAqZJs5gMD4bR4uqzgmNYq1+b6F/NPlW/8F7C9sRWPjgPR5P8VW4dE78mK
+ YlSvPoEyyNPRiRVHTrN22qtaLNStLMgPI/aNimH60Hr6u36m4igK9VipqUf05yHMcrh1VQEPYE
+ ijrvGG4GYknd8t8MzpIrUuEjEktbLJatXYMo3s5oMTewWg0yRManbAotFNz7YYBIqo3r0rew0k
+ AAaGW0srUzRGvIA6nTv8Iw9KUHy2ztRN/5c7CBaa7MCwM66tsV49g8ok5f9Hm66doqZZ02eBcx
+ rGAVcKhs2amEU/klfoCVt0P/
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Feb 2021 19:34:45 -0800
+IronPort-SDR: PYPWQZjE7sCV/PzanTKMXofeK0PZzq8HqZzRhm+BB5wVTT1JEaxUt9G6cYaaDOeTSjPPrkktWY
+ ICuBPNDYylwPwctvPDktCBg3Et0eM5VmqxNGwy3tc/zWK81ad6mAlI2OXzZnR9NH0D4Cy5V0eL
+ TSdexNWotf6H/z5INy2A+pfqJxSruxkniiR7Nk002lv3jCxxJc213Dbu0L2uxNZ6YNZWWkMeUX
+ cQ9Vueq6Nv2OJVI8+98Yx1wUYVOLjV21EGRzUSqZk3v1F680ZW/rpMR24se9mQMTnlQoEGYftM
+ QiQ=
+WDCIronportException: Internal
+Received: from vm.labspan.wdc.com (HELO vm.sc.wdc.com) ([10.6.137.102])
+  by uls-op-cesaip02.wdc.com with ESMTP; 04 Feb 2021 19:50:47 -0800
+From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+To:     linux-block@vger.kernel.org
+Cc:     paolo.valente@linaro.org, axboe@kernel.dk, rostedt@goodmis.org,
+        mingo@redhat.com, chaitanya.kulkarni@wdc.com,
+        johannes.thumshirn@wdc.com, damien.lemoal@wdc.com,
+        bvanassche@acm.org, dongli.zhang@oracle.com,
+        akpm@linux-foundation.org, aravind.ramesh@wdc.com,
+        joshi.k@samsung.com, niklas.cassel@wdc.com, hare@suse.de,
+        colyli@suse.de, tj@kernel.org, rdunlap@infradead.org, jack@suse.cz,
+        hch@lst.de
+Subject: [PATCH V2 0/5] blktrace: few cleanup
+Date:   Thu,  4 Feb 2021 19:50:39 -0800
+Message-Id: <20210205035044.5645-1-chaitanya.kulkarni@wdc.com>
+X-Mailer: git-send-email 2.22.1
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from ca-mkp.ca.oracle.com (138.3.200.58) by CH2PR19CA0018.namprd19.prod.outlook.com (2603:10b6:610:4d::28) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3825.20 via Frontend Transport; Fri, 5 Feb 2021 02:56:57 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 3e788f91-4d2b-4894-4fe8-08d8c981b41b
-X-MS-TrafficTypeDiagnostic: PH0PR10MB4664:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <PH0PR10MB466491D3909CDADB43C63E5E8EB29@PH0PR10MB4664.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: lJhUgsnOq9NAGqe1KAWnCQPlEjf7SS9GnjKVEtBH5m6czHnqI+L2DkXZCejlo1nYFRGTY+9qHRCrGQGFSskF8iZdCbPSDxHQ6N6W3OVnNVTYQ6CPWot9i6qC5JltrV9YTlugf8UErQotqKuCAn/a0MU8928ewXtypNnDcbq1S0dTRofR9OTUkfV4x9lU2w6zt6SVAgkFMRNS4ll3IxiIlvS1xoBxUhRiWwYOInMhF0ZjhhCV2jl8g5PwkFhCW0rAbZHVDbg00s82zayUfpOihdpK+2i7lwavsE2DFukktvYbYaU89JDq/3pD/xK9NwG5AATkOpeUBz809WcOKPNLshcfkp1HK/wU+1eFMs4/Z4Zda9AXzZJDoLfzmvJJtfKSY1Iyvbl3fj0QgnD/33H9Wp4G/yAZ4Cs148tsxQsphux2thxMy/EwYBzW1RfXHLRN1mJDMvXiId+QJL63RkSfj15BTJtWwSpVxENZhtHWLn1K9iY3sjWZmwSgrjKkWR9+7yOOojEijEX/DNlSKT64Qw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR10MB4759.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(346002)(376002)(136003)(396003)(39860400002)(366004)(52116002)(8676002)(4326008)(16526019)(55016002)(2906002)(478600001)(6916009)(5660300002)(6666004)(83380400001)(8936002)(7696005)(26005)(36916002)(66556008)(316002)(186003)(54906003)(66946007)(86362001)(956004)(66476007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?taG6Q7XmWwJKiXrtabCB8NAZ4wgxCGGfSZsYALXUL8EUiPgQ2ER/gbYDck2b?=
- =?us-ascii?Q?HRGwyGgWtYNTJ/OpnRULi5877uJByGi9gpDzDO+MfDRW/LFu467mJJ9KpSsz?=
- =?us-ascii?Q?BWkWoBl5OZTI7ZRp2mJfMmRVVSpPYUg9UhnP31IBk7y9QBZRhHnjeoAW8Jrj?=
- =?us-ascii?Q?kYQgtc1PpeH3b9SJAZfv3yq6BCApDKpr5dN1XddZvm2VqYV0mumAS+pj+6pV?=
- =?us-ascii?Q?PhNLfBOy+LId3RSoejV6sNcsAP8ugLFrg/9kQPmy0y6VdbZ4CicceKiJFa7R?=
- =?us-ascii?Q?HxAYlRkYwvhvMYON0x/Opn4L0zlEgZCaapN5NZLUUw/Qrj5fpCN/Vg06UnXA?=
- =?us-ascii?Q?fi2HearV8ZYE9zpL7d2Q8JhTJ20ZHoZzCoUfu4484SxhxxAD8pStP6a7bQzm?=
- =?us-ascii?Q?xz769H7jHMi/25RpbpE7cAzwRI8QmlZOFPH04pNAFB/B+eS5i87E82gtXd8K?=
- =?us-ascii?Q?E6OSluNRe+s61846mGVC+Fv37OU9oBZuxCuyaBhdZpf6hq02XQTNKTuPxAK+?=
- =?us-ascii?Q?GsWCGvwq08IegojntzpKDNnx8fNTHLKZbA/Bgu1IxyEO0dECt1uVeyQCGlUD?=
- =?us-ascii?Q?0TAyBD7z+luRp1aN68oQJSHkfmnRx4NdKIed0V6GViGZAuJ0L5Scl3aHuBUw?=
- =?us-ascii?Q?Wv1lBaR+MWbR+wVej0SiLtDHOR2IKd+UDQF6zgGFly4PrjsLi5b+6/I8PhW6?=
- =?us-ascii?Q?MBsaRNK61UOlkvgLOBSWNrUjAiOD+RgoSdkwtpZy1vJllj3/BL1XNS+FBBMR?=
- =?us-ascii?Q?dZM07exREb/kHqoN0P5eIs6ZIk6sbV1tpNFNkT1Ubi9rWR7Mpc4gt8ORDzTz?=
- =?us-ascii?Q?mGzWXuUxIyauZOrSX0weUQOwlFGb6sok+kqjPJYpSpVWVy6vVFKS1YiSYC2s?=
- =?us-ascii?Q?lnyLesoJX7tSXprSgOS4eerlp9nWeBGvVn8VUJRpqJiIh1ygsbQe9Iu/9JwV?=
- =?us-ascii?Q?Myc3PS1tgZ/rRypFuMDJegy/c7tBwfuqVh5Scw7961NiwHJiKWAHldfTM/N8?=
- =?us-ascii?Q?mLavHDrJzr0SN7W0HCb3QB5W0W13GdWWWRLW7lsW4hFyma8W6ROtWoRYAb0k?=
- =?us-ascii?Q?g0E9B3iXXimeNxrjoGEk9pNfFhPXw4GIKQSqZjSi5YiC9YH1Vfs9A5cRc0yo?=
- =?us-ascii?Q?Ml7+0dcwmbXsj0KsVyIVh+qcoq9qQDDt7md8Qj/wE+QdLJ861bJ/BRiZm6oY?=
- =?us-ascii?Q?fcUYoEMWgDItqR5ECrESa1cxdOm9wLjuwa3sGFEPdip8EPcvrBCmMx1Jm9Ds?=
- =?us-ascii?Q?tFzxMdDx5bBP2GyJRknhbh1yLPulePJA8b6py5qTHqTbdMeGuW1IEyYphx7a?=
- =?us-ascii?Q?g9WDI5E/Kl665SBfDQswJoyU?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3e788f91-4d2b-4894-4fe8-08d8c981b41b
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR10MB4759.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Feb 2021 02:56:58.6321
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Vph3jD+26cwiWBDPxsvTMCaULAvKnla6LB66GkZbipBNoNLNjZJ7b+q6wH5GaB86Uay7hhWyJ4S74uKF7ySEFiN2HLNwZf6rjYwz+BhpTeE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR10MB4664
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9885 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 mlxlogscore=999 phishscore=0
- spamscore=0 suspectscore=0 malwarescore=0 adultscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2102050018
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9885 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 mlxlogscore=999
- mlxscore=0 priorityscore=1501 spamscore=0 impostorscore=0 clxscore=1015
- suspectscore=0 lowpriorityscore=0 phishscore=0 adultscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2102050018
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi,
 
-Damien,
+These are few cleanups for the block trace.
 
-> For host-aware ZBC disk, setting the device zoned model to
-> BLK_ZONED_HA using blk_queue_set_zoned() in
-> sd_read_block_characteristics() may result in the block device
-> effective zoned model to be "none" (BLK_ZONED_NONE) if partitions are
-> present on the device. In this case, sd_zbc_read_zones() should not
-> setup the zone related queue limits for the disk so that the device
-> limits and configuration is consistent with a regular disk and
-> resources not uselessly allocated (e.g. the zone write pointer
-> tracking array for zone append emulation).
->
-> Furthermore, if the disk zoned model changes at run time due to the
-> creation of a partition by the user, the zone related resources can be
-> released.
->
-> Fix both problems by introducing the function sd_zbc_clear_zone_info()
-> to reset the scsi disk zone information and free resources and by
-> returning early in sd_zbc_read_zones() for a block device that has a
-> zoned model equal to BLK_ZONED_NONE.
+Below is the test log on latest linux-block/for-next.
 
-Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+Last two patches are needed to for testing.
+
+-ck
+
+V1->V2:-
+
+1. Add fixes tags.
+2. Move EXPORT_TRACEPOINT_SYMBOL_GPL(blk_rq_insert) to
+   block/blk-core.c.
+3. Add reviewed-by tags.
+4. Remove the null_blk patches fro now, create a separate series.
+
+Chaitanya Kulkarni (5):
+  block: remove superfluous param in blk_fill_rwbs()
+  blktrace: add blk_fill_rwbs documentation comment
+  blktrace: fix blk_rq_issue documentation
+  blktrace: fix blk_rq_merge documentation
+  block: get rid of the trace rq insert wrapper
+
+ block/bfq-iosched.c           |  4 +++-
+ block/blk-core.c              |  1 +
+ block/blk-mq-sched.c          |  6 ------
+ block/blk-mq-sched.h          |  1 -
+ block/kyber-iosched.c         |  4 +++-
+ block/mq-deadline.c           |  4 +++-
+ include/linux/blktrace_api.h  |  2 +-
+ include/trace/events/bcache.h | 10 +++++-----
+ include/trace/events/block.h  | 20 ++++++++++----------
+ kernel/trace/blktrace.c       | 12 +++++++++++-
+ 10 files changed, 37 insertions(+), 27 deletions(-)
+
+Scheduler, Bounce, Merge and usual tracepoint testing :-
+
+###################     kyber     #####################
+252,0   43        1     0.000000000  1095  Q  WS 0 + 8 [systemd-udevd]
+252,0   43        2     0.000011001  1095  B  WS 0 + 8 [systemd-udevd]
+252,0   43        3     0.000025768  1095  G  WS 0 + 8 [systemd-udevd]
+252,0   43        4     0.000040316  1095  Q  WS 8 + 8 [systemd-udevd]
+252,0   43        5     0.000045996  1095  B  WS 8 + 8 [systemd-udevd]
+252,0   43        6     0.000048882  1095  M  WS 8 + 8 [systemd-udevd]
+252,0   43        7     0.000062577  1095  Q  WS 16 + 8 [systemd-udevd]
+252,0   43        8     0.000067837  1095  B  WS 16 + 8 [systemd-udevd]
+252,0   43        9     0.000068949  1095  M  WS 16 + 8 [systemd-udevd]
+252,0   43       10     0.000082375  1095  Q  WS 24 + 8 [systemd-udevd]
+252,0   43       11     0.000088215  1095  B  WS 24 + 8 [systemd-udevd]
+252,0   43       12     0.000089708  1095  M  WS 24 + 8 [systemd-udevd]
+252,0   43       13     0.000102192  1095  Q  WS 32 + 8 [systemd-udevd]
+252,0   43       14     0.000107261  1095  B  WS 32 + 8 [systemd-udevd]
+252,0   43       15     0.000108333  1095  M  WS 32 + 8 [systemd-udevd]
+252,0   43       16     0.000114124  1095  I  WS 0 + 40 [systemd-udevd]
+252,0   43       17     0.000124734  1095  D  WS 0 + 40 [systemd-udevd]
+252,0   43       18     0.000159740   227  C  WS 0 + 40 [0]
+252,0   43       19     0.000165801   227  C  WS 0 + 8 [0]
+252,0   43       20     0.000258675   227  C  WS 8 + 8 [0]
+252,0   43       21     0.000265378   227  C  WS 16 + 8 [0]
+252,0   43       22     0.000271098   227  C  WS 24 + 8 [0]
+252,0   43       23     0.000276959   227  C  WS 32 + 8 [0]
+CPU43 (252,0):
+ Reads Queued:           0,        0KiB	 Writes Queued:           5,       20KiB
+ Read Dispatches:        0,        0KiB	 Write Dispatches:        1,       20KiB
+ Reads Requeued:         0		 Writes Requeued:         0
+ Reads Completed:        0,        0KiB	 Writes Completed:        6,       40KiB
+ Read Merges:            0,        0KiB	 Write Merges:            4,       16KiB
+ Read depth:             0        	 Write depth:             1
+ IO unplugs:             0        	 Timer unplugs:           0
+
+Throughput (R/W): 0KiB/s / 0KiB/s
+Events (252,0): 23 entries
+Skips: 0 forward (0 -   0.0%)
+####################     bfq     #####################
+252,0   43        1     0.000000000  1095  Q  WS 0 + 8 [systemd-udevd]
+252,0   43        2     0.000011562  1095  B  WS 0 + 8 [systemd-udevd]
+252,0   43        3     0.000035136  1095  G  WS 0 + 8 [systemd-udevd]
+252,0   43        4     0.000051967  1095  Q  WS 8 + 8 [systemd-udevd]
+252,0   43        5     0.000057017  1095  B  WS 8 + 8 [systemd-udevd]
+252,0   43        6     0.000059291  1095  M  WS 8 + 8 [systemd-udevd]
+252,0   43        7     0.000073007  1095  Q  WS 16 + 8 [systemd-udevd]
+252,0   43        8     0.000078357  1095  B  WS 16 + 8 [systemd-udevd]
+252,0   43        9     0.000079499  1095  M  WS 16 + 8 [systemd-udevd]
+252,0   43       10     0.000092914  1095  Q  WS 24 + 8 [systemd-udevd]
+252,0   43       11     0.000098384  1095  B  WS 24 + 8 [systemd-udevd]
+252,0   43       12     0.000099456  1095  M  WS 24 + 8 [systemd-udevd]
+252,0   43       13     0.000114314  1095  Q  WS 32 + 8 [systemd-udevd]
+252,0   43       14     0.000119464  1095  B  WS 32 + 8 [systemd-udevd]
+252,0   43       15     0.000120556  1095  M  WS 32 + 8 [systemd-udevd]
+252,0   43       16     0.000128411  1095  I  WS 0 + 40 [systemd-udevd]
+252,0   43       17     0.000172744  1095  D  WS 0 + 40 [systemd-udevd]
+252,0   43       18     0.000216646   227  C  WS 0 + 40 [0]
+252,0   43       19     0.000223078   227  C  WS 0 + 8 [0]
+252,0   43       20     0.000255329   227  C  WS 8 + 8 [0]
+252,0   43       21     0.000261390   227  C  WS 16 + 8 [0]
+252,0   43       22     0.000266890   227  C  WS 24 + 8 [0]
+252,0   43       23     0.000273533   227  C  WS 32 + 8 [0]
+CPU43 (252,0):
+ Reads Queued:           0,        0KiB	 Writes Queued:           5,       20KiB
+ Read Dispatches:        0,        0KiB	 Write Dispatches:        1,       20KiB
+ Reads Requeued:         0		 Writes Requeued:         0
+ Reads Completed:        0,        0KiB	 Writes Completed:        6,       40KiB
+ Read Merges:            0,        0KiB	 Write Merges:            4,       16KiB
+ Read depth:             0        	 Write depth:             1
+ IO unplugs:             0        	 Timer unplugs:           0
+
+Throughput (R/W): 0KiB/s / 0KiB/s
+Events (252,0): 23 entries
+Skips: 0 forward (0 -   0.0%)
+####################     mq-deadline     #####################
+252,0   43        1     0.000000000  1095  Q  WS 0 + 8 [systemd-udevd]
+252,0   43        2     0.000011601  1095  B  WS 0 + 8 [systemd-udevd]
+252,0   43        3     0.000022672  1095  G  WS 0 + 8 [systemd-udevd]
+252,0   43        4     0.000037821  1095  Q  WS 8 + 8 [systemd-udevd]
+252,0   43        5     0.000043651  1095  B  WS 8 + 8 [systemd-udevd]
+252,0   43        6     0.000045836  1095  M  WS 8 + 8 [systemd-udevd]
+252,0   43        7     0.000059191  1095  Q  WS 16 + 8 [systemd-udevd]
+252,0   43        8     0.000064220  1095  B  WS 16 + 8 [systemd-udevd]
+252,0   43        9     0.000065382  1095  M  WS 16 + 8 [systemd-udevd]
+252,0   43       10     0.000211276  1095  Q  WS 24 + 8 [systemd-udevd]
+252,0   43       11     0.000218459  1095  B  WS 24 + 8 [systemd-udevd]
+252,0   43       12     0.000220323  1095  M  WS 24 + 8 [systemd-udevd]
+252,0   43       13     0.000237204  1095  Q  WS 32 + 8 [systemd-udevd]
+252,0   43       14     0.000243075  1095  B  WS 32 + 8 [systemd-udevd]
+252,0   43       15     0.000244158  1095  M  WS 32 + 8 [systemd-udevd]
+252,0   43       16     0.000250850  1095  I  WS 0 + 40 [systemd-udevd]
+252,0   43       17     0.000259286  1095  D  WS 0 + 40 [systemd-udevd]
+252,0   43       18     0.000290404   227  C  WS 0 + 40 [0]
+252,0   43       19     0.000296305   227  C  WS 0 + 8 [0]
+252,0   43       20     0.000324508   227  C  WS 8 + 8 [0]
+252,0   43       21     0.000328345   227  C  WS 16 + 8 [0]
+252,0   43       22     0.000343283   227  C  WS 24 + 8 [0]
+252,0   43       23     0.000347291   227  C  WS 32 + 8 [0]
+CPU43 (252,0):
+ Reads Queued:           0,        0KiB	 Writes Queued:           5,       20KiB
+ Read Dispatches:        0,        0KiB	 Write Dispatches:        1,       20KiB
+ Reads Requeued:         0		 Writes Requeued:         0
+ Reads Completed:        0,        0KiB	 Writes Completed:        6,       40KiB
+ Read Merges:            0,        0KiB	 Write Merges:            4,       16KiB
+ Read depth:             0        	 Write depth:             1
+ IO unplugs:             0        	 Timer unplugs:           0
+
+Throughput (R/W): 0KiB/s / 0KiB/s
+Events (252,0): 23 entries
+Skips: 0 forward (0 -   0.0%)
+####################     none     #####################
+252,0   43        1     0.000000000  1095  Q  WS 0 + 8 [systemd-udevd]
+252,0   43        2     0.000009768  1095  B  WS 0 + 8 [systemd-udevd]
+252,0   43        3     0.000078246  1095  G  WS 0 + 8 [systemd-udevd]
+252,0   43        4     0.000097001  1095  Q  WS 8 + 8 [systemd-udevd]
+252,0   43        5     0.000103293  1095  B  WS 8 + 8 [systemd-udevd]
+252,0   43        6     0.000105477  1095  M  WS 8 + 8 [systemd-udevd]
+252,0   43        7     0.000121207  1095  Q  WS 16 + 8 [systemd-udevd]
+252,0   43        8     0.000126116  1095  B  WS 16 + 8 [systemd-udevd]
+252,0   43        9     0.000127248  1095  M  WS 16 + 8 [systemd-udevd]
+252,0   43       10     0.000145482  1095  Q  WS 24 + 8 [systemd-udevd]
+252,0   43       11     0.000150552  1095  B  WS 24 + 8 [systemd-udevd]
+252,0   43       12     0.000152455  1095  M  WS 24 + 8 [systemd-udevd]
+252,0   43       13     0.000166011  1095  Q  WS 32 + 8 [systemd-udevd]
+252,0   43       14     0.000171030  1095  B  WS 32 + 8 [systemd-udevd]
+252,0   43       15     0.000172102  1095  M  WS 32 + 8 [systemd-udevd]
+252,0   43       16     0.000178625  1095  D  WS 0 + 40 [systemd-udevd]
+252,0   43       17     0.000223148   227  C  WS 0 + 40 [0]
+252,0   43       18     0.000229290   227  C  WS 0 + 8 [0]
+252,0   43       19     0.000250139   227  C  WS 8 + 8 [0]
+252,0   43       20     0.000256100   227  C  WS 16 + 8 [0]
+252,0   43       21     0.000261931   227  C  WS 24 + 8 [0]
+252,0   43       22     0.000268052   227  C  WS 32 + 8 [0]
+CPU43 (252,0):
+ Reads Queued:           0,        0KiB	 Writes Queued:           5,       20KiB
+ Read Dispatches:        0,        0KiB	 Write Dispatches:        1,       20KiB
+ Reads Requeued:         0		 Writes Requeued:         0
+ Reads Completed:        0,        0KiB	 Writes Completed:        6,       40KiB
+ Read Merges:            0,        0KiB	 Write Merges:            4,       16KiB
+ Read depth:             0        	 Write depth:             1
+ IO unplugs:             0        	 Timer unplugs:           0
+
+Throughput (R/W): 0KiB/s / 0KiB/s
+Events (252,0): 22 entries
+Skips: 0 forward (0 -   0.0%)
+####################     split     #####################
+252,0   29        1     0.000000000  5312  Q  DS 0 + 80 [blkdiscard]
+252,0   29        2     0.000007694  5312  X  DS 0 / 0 [blkdiscard]
+252,0   29        3     0.000020688  5312  G  DS 0 + 4 [blkdiscard]
+252,0   29        4     0.000025297  5312  X  DS 4 / 0 [blkdiscard]
+252,0   29        5     0.000028403  5312  G  DS 4 + 4 [blkdiscard]
+252,0   29        6     0.000031429  5312  X  DS 8 / 0 [blkdiscard]
+252,0   29        7     0.000034114  5312  G  DS 8 + 4 [blkdiscard]
+252,0   29        8     0.000037049  5312  X  DS 12 / 0 [blkdiscard]
+252,0   29        9     0.000039714  5312  G  DS 12 + 4 [blkdiscard]
+252,0   29       10     0.000042489  5312  X  DS 16 / 0 [blkdiscard]
+252,0   29       11     0.000050755  5312  I  DS 0 + 4 [blkdiscard]
+252,0   29       12     0.000052658  5312  I  DS 4 + 4 [blkdiscard]
+252,0   29       13     0.000053911  5312  I  DS 8 + 4 [blkdiscard]
+252,0   29       14     0.000055073  5312  I  DS 12 + 4 [blkdiscard]
+252,0   29       15     0.000096581   920  D  DS 0 + 4 [kworker/29:1H]
+252,0   29       16     0.000108413   920  D  DS 4 + 4 [kworker/29:1H]
+252,0   29       17     0.000110777   920  D  DS 8 + 4 [kworker/29:1H]
+252,0   29       18     0.000112891   920  D  DS 12 + 4 [kworker/29:1H]
+252,0   29       19     0.000128030   157  C  DS 0 + 4 [0]
+252,0   29       20     0.000136405   157  C  DS 0 + 8 [0]
+252,0   29       21     0.000151444   157  C  DS 0 + 12 [0]
+252,0   29       22     0.000154589   157  C  DS 0 + 16 [0]
+252,0   29       23     0.000164077  5312  G  DS 16 + 4 [blkdiscard]
+252,0   29       24     0.000168125  5312  X  DS 20 / 0 [blkdiscard]
+252,0   29       25     0.000171161  5312  G  DS 20 + 4 [blkdiscard]
+252,0   29       26     0.000173936  5312  X  DS 24 / 0 [blkdiscard]
+252,0   29       27     0.000176571  5312  G  DS 24 + 4 [blkdiscard]
+252,0   29       28     0.000179316  5312  X  DS 28 / 0 [blkdiscard]
+252,0   29       29     0.000181901  5312  G  DS 28 + 4 [blkdiscard]
+252,0   29       30     0.000184626  5312  X  DS 32 / 0 [blkdiscard]
+252,0   29       31     0.000189114  5312  I  DS 16 + 4 [blkdiscard]
+252,0   29       32     0.000190417  5312  I  DS 20 + 4 [blkdiscard]
+252,0   29       33     0.000191559  5312  I  DS 24 + 4 [blkdiscard]
+252,0   29       34     0.000192671  5312  I  DS 28 + 4 [blkdiscard]
+252,0   29       35     0.000210294   920  D  DS 16 + 4 [kworker/29:1H]
+252,0   29       36     0.000217558   920  D  DS 20 + 4 [kworker/29:1H]
+252,0   29       37     0.000219782   920  D  DS 24 + 4 [kworker/29:1H]
+252,0   29       38     0.000221816   920  D  DS 28 + 4 [kworker/29:1H]
+252,0   29       39     0.000229660   157  C  DS 0 + 20 [0]
+252,0   29       40     0.000233197   157  C  DS 0 + 24 [0]
+252,0   29       41     0.000243516   157  C  DS 0 + 28 [0]
+252,0   29       42     0.000246352   157  C  DS 0 + 32 [0]
+252,0   29       43     0.000254377  5312  G  DS 32 + 4 [blkdiscard]
+252,0   29       44     0.000258304  5312  X  DS 36 / 0 [blkdiscard]
+252,0   29       45     0.000261219  5312  G  DS 36 + 4 [blkdiscard]
+252,0   29       46     0.000263985  5312  X  DS 40 / 0 [blkdiscard]
+252,0   29       47     0.000266640  5312  G  DS 40 + 4 [blkdiscard]
+252,0   29       48     0.000269425  5312  X  DS 44 / 0 [blkdiscard]
+252,0   29       49     0.000271980  5312  G  DS 44 + 4 [blkdiscard]
+252,0   29       50     0.000274695  5312  X  DS 48 / 0 [blkdiscard]
+252,0   29       51     0.000278953  5312  I  DS 32 + 4 [blkdiscard]
+252,0   29       52     0.000280175  5312  I  DS 36 + 4 [blkdiscard]
+252,0   29       53     0.000281307  5312  I  DS 40 + 4 [blkdiscard]
+252,0   29       54     0.000282379  5312  I  DS 44 + 4 [blkdiscard]
+252,0   29       55     0.000346269   920  D  DS 32 + 4 [kworker/29:1H]
+252,0   29       56     0.000353793   920  D  DS 36 + 4 [kworker/29:1H]
+252,0   29       57     0.000355927   920  D  DS 40 + 4 [kworker/29:1H]
+252,0   29       58     0.000357951   920  D  DS 44 + 4 [kworker/29:1H]
+252,0   29       59     0.000366286   157  C  DS 0 + 36 [0]
+252,0   29       60     0.000370284   157  C  DS 0 + 40 [0]
+252,0   29       61     0.000380523   157  C  DS 0 + 44 [0]
+252,0   29       62     0.000383338   157  C  DS 0 + 48 [0]
+252,0   29       63     0.000391484  5312  G  DS 48 + 4 [blkdiscard]
+252,0   29       64     0.000395742  5312  X  DS 52 / 0 [blkdiscard]
+252,0   29       65     0.000398807  5312  G  DS 52 + 4 [blkdiscard]
+252,0   29       66     0.000401593  5312  X  DS 56 / 0 [blkdiscard]
+252,0   29       67     0.000404147  5312  G  DS 56 + 4 [blkdiscard]
+252,0   29       68     0.000406943  5312  X  DS 60 / 0 [blkdiscard]
+252,0   29       69     0.000409538  5312  G  DS 60 + 4 [blkdiscard]
+252,0   29       70     0.000412273  5312  X  DS 64 / 0 [blkdiscard]
+252,0   29       71     0.000416821  5312  I  DS 48 + 4 [blkdiscard]
+252,0   29       72     0.000417993  5312  I  DS 52 + 4 [blkdiscard]
+252,0   29       73     0.000419136  5312  I  DS 56 + 4 [blkdiscard]
+252,0   29       74     0.000420228  5312  I  DS 60 + 4 [blkdiscard]
+252,0   29       75     0.000438342   920  D  DS 48 + 4 [kworker/29:1H]
+252,0   29       76     0.000445515   920  D  DS 52 + 4 [kworker/29:1H]
+252,0   29       77     0.000447679   920  D  DS 56 + 4 [kworker/29:1H]
+252,0   29       78     0.000449693   920  D  DS 60 + 4 [kworker/29:1H]
+252,0   29       79     0.000457197   157  C  DS 0 + 52 [0]
+252,0   29       80     0.000460473   157  C  DS 0 + 56 [0]
+252,0   29       81     0.000470261   157  C  DS 0 + 60 [0]
+252,0   29       82     0.000473017   157  C  DS 0 + 64 [0]
+252,0   29       83     0.000480691  5312  G  DS 64 + 4 [blkdiscard]
+252,0   29       84     0.000484478  5312  X  DS 68 / 0 [blkdiscard]
+252,0   29       85     0.000487313  5312  G  DS 68 + 4 [blkdiscard]
+252,0   29       86     0.000490099  5312  X  DS 72 / 0 [blkdiscard]
+252,0   29       87     0.000492724  5312  G  DS 72 + 4 [blkdiscard]
+252,0   29       88     0.000496821  5312  G  DS 76 + 4 [blkdiscard]
+252,0   29       89     0.000501580  5312  I  DS 64 + 4 [blkdiscard]
+252,0   29       90     0.000502732  5312  I  DS 68 + 4 [blkdiscard]
+252,0   29       91     0.000503844  5312  I  DS 72 + 4 [blkdiscard]
+252,0   29       92     0.000504977  5312  I  DS 76 + 4 [blkdiscard]
+252,0   29       93     0.000523030   920  D  DS 64 + 4 [kworker/29:1H]
+252,0   29       94     0.000529763   920  D  DS 68 + 4 [kworker/29:1H]
+252,0   29       95     0.000531827   920  D  DS 72 + 4 [kworker/29:1H]
+252,0   29       96     0.000533861   920  D  DS 76 + 4 [kworker/29:1H]
+252,0   29       97     0.000541275   157  C  DS 0 + 68 [0]
+252,0   29       98     0.000544591   157  C  DS 0 + 72 [0]
+252,0   29       99     0.000547266   157  C  DS 0 + 76 [0]
+252,0   29      100     0.000549881   157  C  DS 0 + 80 [0]
+CPU29 (252,0):
+ Reads Queued:           0,        0KiB	 Writes Queued:           1,       40KiB
+ Read Dispatches:        0,        0KiB	 Write Dispatches:       20,       40KiB
+ Reads Requeued:         0		 Writes Requeued:         0
+ Reads Completed:        0,        0KiB	 Writes Completed:       20,      420KiB
+ Read Merges:            0,        0KiB	 Write Merges:            0,        0KiB
+ Read depth:             0        	 Write depth:             4
+ IO unplugs:             0        	 Timer unplugs:           0
+
+Throughput (R/W): 0KiB/s / 0KiB/s
+Events (252,0): 100 entries
+Skips: 0 forward (0 -   0.0%)
+####################     requeue     #####################
+252,0   29        1     0.000000000  5404  Q  WS 0 + 8 [dd]
+252,0   29        2     0.000013586  5404  G  WS 0 + 8 [dd]
+252,0   29        3     0.000019647  5404  I  WS 0 + 8 [dd]
+252,0   29        4     0.000065293   920  D  WS 0 + 8 [kworker/29:1H]
+252,0   29        5     0.000069881   920  R  WS 0 + 8 [0]
+252,0   29        6     0.000082565   920  I  WS 0 + 8 [kworker/29:1H]
+252,0   29        7     0.000087063   920  D  WS 0 + 8 [kworker/29:1H]
+252,0   29        8     0.000115106   157  C  WS 0 + 8 [0]
+252,0   29        9     0.000160140  5404  Q  WS 8 + 8 [dd]
+252,0   29       10     0.000163998  5404  G  WS 8 + 8 [dd]
+252,0   29       11     0.000167524  5404  I  WS 8 + 8 [dd]
+252,0   29       12     0.000185177   920  D  WS 8 + 8 [kworker/29:1H]
+252,0   29       13     0.000198763   157  C  WS 8 + 8 [0]
+252,0   29       14     0.000230382  5404  Q  WS 16 + 8 [dd]
+252,0   29       15     0.000233849  5404  G  WS 16 + 8 [dd]
+252,0   29       16     0.000237075  5404  I  WS 16 + 8 [dd]
+252,0   29       17     0.000253005   920  D  WS 16 + 8 [kworker/29:1H]
+252,0   29       18     0.000265608   157  C  WS 16 + 8 [0]
+252,0   29       19     0.000295935  5404  Q  WS 24 + 8 [dd]
+252,0   29       20     0.000299362  5404  G  WS 24 + 8 [dd]
+252,0   29       21     0.000366467  5404  I  WS 24 + 8 [dd]
+252,0   29       22     0.000385343   920  D  WS 24 + 8 [kworker/29:1H]
+252,0   29       23     0.000387797   920  R  WS 24 + 8 [0]
+252,0   29       24     0.000396844   920  D  WS 24 + 8 [kworker/29:1H]
+252,0   29       25     0.000410941   157  C  WS 24 + 8 [0]
+252,0   29       26     0.000452308  5404  Q  WS 32 + 8 [dd]
+252,0   29       27     0.000456556  5404  G  WS 32 + 8 [dd]
+252,0   29       28     0.000460053  5404  I  WS 32 + 8 [dd]
+252,0   29       29     0.000477676   920  D  WS 32 + 8 [kworker/29:1H]
+252,0   29       30     0.000490159   157  C  WS 32 + 8 [0]
+252,0   29       31     0.000521779  5404  Q  WS 40 + 8 [dd]
+252,0   29       32     0.000525205  5404  G  WS 40 + 8 [dd]
+252,0   29       33     0.000528361  5404  I  WS 40 + 8 [dd]
+252,0   29       34     0.000544030   920  D  WS 40 + 8 [kworker/29:1H]
+252,0   29       35     0.000556514   157  C  WS 40 + 8 [0]
+252,0   29       36     0.000588003  5404  Q  WS 48 + 8 [dd]
+252,0   29       37     0.000591379  5404  G  WS 48 + 8 [dd]
+252,0   29       38     0.000594525  5404  I  WS 48 + 8 [dd]
+252,0   29       39     0.000610535   920  D  WS 48 + 8 [kworker/29:1H]
+252,0   29       40     0.000612709   920  R  WS 48 + 8 [0]
+252,0   29       41     0.000621175   920  I  WS 48 + 8 [kworker/29:1H]
+252,0   29       42     0.000624601   920  D  WS 48 + 8 [kworker/29:1H]
+252,0   29       43     0.000637155   157  C  WS 48 + 8 [0]
+252,0   29       44     0.000667993  5404  Q  WS 56 + 8 [dd]
+252,0   29       45     0.000671509  5404  G  WS 56 + 8 [dd]
+252,0   29       46     0.000674705  5404  I  WS 56 + 8 [dd]
+252,0   29       47     0.000691447   920  D  WS 56 + 8 [kworker/29:1H]
+252,0   29       48     0.000703780   157  C  WS 56 + 8 [0]
+252,0   29       49     0.000735710  5404  Q  WS 64 + 8 [dd]
+252,0   29       50     0.000739116  5404  G  WS 64 + 8 [dd]
+252,0   29       51     0.000742322  5404  I  WS 64 + 8 [dd]
+252,0   29       52     0.000757531   920  D  WS 64 + 8 [kworker/29:1H]
+252,0   29       53     0.000769643   157  C  WS 64 + 8 [0]
+252,0   29       54     0.000800051  5404  Q  WS 72 + 8 [dd]
+252,0   29       55     0.000803487  5404  G  WS 72 + 8 [dd]
+252,0   29       56     0.000806633  5404  I  WS 72 + 8 [dd]
+252,0   29       57     0.000821411   920  D  WS 72 + 8 [kworker/29:1H]
+252,0   29       58     0.000833834   157  C  WS 72 + 8 [0]
+CPU29 (252,0):
+ Reads Queued:           0,        0KiB	 Writes Queued:          10,       40KiB
+ Read Dispatches:        0,        0KiB	 Write Dispatches:       13,       40KiB
+ Reads Requeued:         0		 Writes Requeued:         3
+ Reads Completed:        0,        0KiB	 Writes Completed:       10,       40KiB
+ Read Merges:            0,        0KiB	 Write Merges:            0,        0KiB
+ Read depth:             0        	 Write depth:             1
+ IO unplugs:             0        	 Timer unplugs:           0
+
+Throughput (R/W): 0KiB/s / 0KiB/s
+Events (252,0): 58 entries
+Skips: 0 forward (0 -   0.0%)
+# 
 
 -- 
-Martin K. Petersen	Oracle Linux Engineering
+2.22.1
+
