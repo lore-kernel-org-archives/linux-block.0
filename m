@@ -7,55 +7,55 @@ X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5146C433DB
-	for <linux-block@archiver.kernel.org>; Fri,  5 Feb 2021 03:52:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0957EC433DB
+	for <linux-block@archiver.kernel.org>; Fri,  5 Feb 2021 03:52:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8DED264FBC
-	for <linux-block@archiver.kernel.org>; Fri,  5 Feb 2021 03:52:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B91CD64FBC
+	for <linux-block@archiver.kernel.org>; Fri,  5 Feb 2021 03:52:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229989AbhBEDwR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 Feb 2021 22:52:17 -0500
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:47376 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229692AbhBEDwR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Feb 2021 22:52:17 -0500
+        id S230134AbhBEDwZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 Feb 2021 22:52:25 -0500
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:26691 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229692AbhBEDwY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Feb 2021 22:52:24 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1612497356; x=1644033356;
+  t=1612497143; x=1644033143;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=NwgzSfysxAnsV/PwmEDbkBo+3nnTrLiXXNuavPj2YT4=;
-  b=FDGvGI5v8WgniGLzXofrs6b0RwOMWckBoV/HULoW/uHafXfw3XquIKUw
-   xNyc2I5NvOg7gRTAum3Mq26OS+1ycY4JUx/1tE9S2zDYjapRn5TgLpaRU
-   X+ItAB3fGpO4v3xj7tb7TIvMwPDT4xQqvhDpkcwPZwXZzQBfU5npjPuIP
-   wfD7oDELJeeGQudIV/xouJZet8wnFidrYCQiNr3WpazUbtbpGRq8S5oZ8
-   Wpo5b9GgdiRMczDvwejH3PJmLyH28KMO5SzLKOs0XhbEGOu6igtXaHY44
-   7//y4yRgxcdjyb80xazsK24g4Lsh8NV0tIu1G5qN/0bZuU1QpkzI3K7eq
-   g==;
-IronPort-SDR: xx87rwkN9reRyCu0GqsAJardMPl/7VuaNQevoRDaYH5lJ1xNmKSonq2wAnmbJcyotAQbPgHGZ6
- GO6wWiR9JX5otYJDzs+q5YeWEL6ezGpSrCx3yovXyyd3XPNfpnDuIfG5B8vHeKQNFuwbeDEC1g
- 2fg0qXl7HXVQP6NDDeSHebDyl0T5xbtuwwWm0U76OhXvdZEbArS0xYHkS5JEHvArchEPLp5135
- QZAOGha86ICzUMkDQD/hoAG/2qLFIpG5X312UOr0vFEZJwH5hCRBhCmjjBjyFU63zLZha6YiIy
- F0o=
+  bh=RwSG67ACNLCwVXwgmCiXvQu1KQSR5+t16hNQS7JHeOY=;
+  b=kEAfFIO8+7a0qFic3dCBQN8Po2KeiazqcoBYLWV7eI42E04VICZVG04L
+   5ar2Q7wPFysUyl1dEXhtae8IRSyVgxig4tAGT5PrXm6BIsDlRmqjssXXy
+   U0yy5ktudkToHz9vLPMkhAgNaWSQ8lt47baSahUmC809Ae0/pT5m/qFCc
+   RWLmW3ewcdHqGOTpQd09o2ku/y7THi8R4M1fUlDQuMjYx0gwlWQbM5BB0
+   RY8jIB9ppB4nRg94C6TV/eZkeDU2mF9ww3Ak+zsmEtPzflETu+EkmoYya
+   Grf/NMpIhUHf28xOpUTfU2Kh5a+R8azx5EA0L4reunFcXmP8vudDixC63
+   Q==;
+IronPort-SDR: DYlN++uRKBEmnkN8xmuvVpCTm/27JMZuVzjgB/BP8r60yQJ0b+JY0TDv5ej8glwhORRbGHWDBG
+ vNlx1RwrySyGeS1KrE8kb85s9+GweM3weEo2WnV5cvumGYuBJdLSUkosZspbMayojxaEJD/Jqe
+ ZWFOgHlMajeOuUnnfDHiKQhofAn+xcE4UeLJl27eOK9Xb8QzTCpe9UKtDPdEn+qeKRJviBt777
+ 89eXhzsde672rDJFRRyPSpXkMV84HTVy+7i+DlsDFtiLlr5Vo0WEM0MRApX90Dj16XgZP+ZaIR
+ zZs=
 X-IronPort-AV: E=Sophos;i="5.81,154,1610380800"; 
-   d="scan'208";a="263300861"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 05 Feb 2021 11:54:16 +0800
-IronPort-SDR: J47+agh5kYZASikXTDfhdaDK96z0TdF5yk6tvqyfiuYgeVkelj4Mz+O/Eyi2IkeR+43Wkjp95Z
- mHAKV2J73hiW/FG8Y/M8s140HGHA5oyklsppEbtHZEH+DLVqy62LrXhEIAreQpnqO+zXhTbHnl
- 4VzdCrJ45/O7eX3nRyGn/AdOpf+Yqs9Xvnzc/fnETaDgAG0qhcR2j5BBhswkxrFT42Hl5alVgw
- ixcHf7VtYwxP5sfg2fPEJbdTqADywdcRpStEp2TTVHQZQ6guw7/e1nmLTjJxc5+i2it8QJb8Mz
- QX3By8t6UD7Sarr+wfhAhvcU
+   d="scan'208";a="163645290"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 05 Feb 2021 11:51:18 +0800
+IronPort-SDR: TFD9gs+33eyAeoAjrwZKY4GBrZuG64F819fH3C4T92ZlTB+gdLhuvPIUE0AAxq+QJbCWKwcmpg
+ 7GpMWhHp8NZp8OL+fdwQSTgmzYds+MfLA+qaM1j0hNqg6IKUtxfD0aSfC9YLkzXijSPvL0fhx2
+ qDjlkq9GFZxdTG1SvWTCv/FtoIkqLvVcIDExjZxFB5u1jLHbLR+/l2Y8GYR4hm+Ynd7YY3o/xj
+ OwoDH94IwhK8D1nOKUCQoFb45jry3C+4lWFYNR3fBdlPTEVr3cJ33XxD/kVm5EhD5a2sYd0O5J
+ R3yD9pBYTj/0zuVAy1wyGdps
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Feb 2021 19:33:13 -0800
-IronPort-SDR: y0orts6v3OSiNNsoJEURzGib9GzTrueBFFil8RGP0kbEG6h1dMa+ZY/6ULMrVPhWb1T12qFOfg
- vFftqs/wE/kMKNMwqtOmHP34vdrMlQ1LyafQijLBsHDz/L3wiC+VjXPmHWkTuoeRKP3CkxsTVo
- CNyQfvCl2SvfI/hdJibUG7zbh0jXs523W7RoGURwr1NDUjJ+YxKNaHvU7RsO51B4boEa8x9boG
- Y17KlJ64sUIAwvphtz/fmWTVxokgqJXOYhmN2aobLv/5rvZ/GjivRi4VbqPcc1YiF9O1m09949
- Ct0=
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Feb 2021 19:35:16 -0800
+IronPort-SDR: CO+PaLAyqHKpp6ParyOFGHUGgdkzGAiWghJ60jfD8gUbOhmXL+vs/poa1G4qCcqlWzUhR4A+pE
+ HjrxfWXhlSEJT+mZO6iTFZAuM4VH9W6+/dndWJ1/PHraYEUla8s5lYhSE1QiiPXNfJJ+bjdk3s
+ PKQblPpb/N3op2fmH1FLOGchiey2sRdo5xoOcG+NtZc78/XRec0JgAlRpe1HK+RryteIBrx5HG
+ TPqU63FMGCmYwe+dZEXmJ5+t0Ei+glycLfLka9jAy1MyURGp5vs4yMXDI5ntQZbVtgPNKejA9U
+ VM4=
 WDCIronportException: Internal
 Received: from vm.labspan.wdc.com (HELO vm.sc.wdc.com) ([10.6.137.102])
-  by uls-op-cesaip02.wdc.com with ESMTP; 04 Feb 2021 19:51:11 -0800
+  by uls-op-cesaip02.wdc.com with ESMTP; 04 Feb 2021 19:51:18 -0800
 From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 To:     linux-block@vger.kernel.org
 Cc:     paolo.valente@linaro.org, axboe@kernel.dk, rostedt@goodmis.org,
@@ -66,9 +66,9 @@ Cc:     paolo.valente@linaro.org, axboe@kernel.dk, rostedt@goodmis.org,
         joshi.k@samsung.com, niklas.cassel@wdc.com, hare@suse.de,
         colyli@suse.de, tj@kernel.org, rdunlap@infradead.org, jack@suse.cz,
         hch@lst.de
-Subject: [PATCH V2 3/5] blktrace: fix blk_rq_issue documentation
-Date:   Thu,  4 Feb 2021 19:50:42 -0800
-Message-Id: <20210205035044.5645-4-chaitanya.kulkarni@wdc.com>
+Subject: [PATCH V2 4/5] blktrace: fix blk_rq_merge documentation
+Date:   Thu,  4 Feb 2021 19:50:43 -0800
+Message-Id: <20210205035044.5645-5-chaitanya.kulkarni@wdc.com>
 X-Mailer: git-send-email 2.22.1
 In-Reply-To: <20210205035044.5645-1-chaitanya.kulkarni@wdc.com>
 References: <20210205035044.5645-1-chaitanya.kulkarni@wdc.com>
@@ -78,11 +78,11 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The commit 881245dcff29 ("Add DocBook documentation for the block tracepoints.")
-added the comment for blk_rq_issue() tracepoint. Remove the duplicate
+The commit f3bdc62fd82e ("blktrace: Provide event for request merging")
+added the comment for blk_rq_merge() tracepoint. Remove the duplicate
 word from the tracepoint documentation.
 
-Fixes: 881245dcff29 ("Add DocBook documentation for the block tracepoints.")
+Fixes: f3bdc62fd82e ("blktrace: Provide event for request merging")
 Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 Reviewed-by: Damien Le Moal <damien.lemoal@wdc.com>
@@ -92,18 +92,18 @@ Reviewed-by: Christoph Hellwig <hch@lst.de>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/include/trace/events/block.h b/include/trace/events/block.h
-index 879cba8bdfca..004cfe34ef37 100644
+index 004cfe34ef37..cc5ab96a7471 100644
 --- a/include/trace/events/block.h
 +++ b/include/trace/events/block.h
-@@ -196,7 +196,7 @@ DEFINE_EVENT(block_rq, block_rq_insert,
+@@ -210,7 +210,7 @@ DEFINE_EVENT(block_rq, block_rq_issue,
  
  /**
-  * block_rq_issue - issue pending block IO request operation to device driver
+  * block_rq_merge - merge request with another one in the elevator
 - * @rq: block IO operation operation request
 + * @rq: block IO operation request
   *
-  * Called when block operation request @rq from queue @q is sent to a
-  * device driver for processing.
+  * Called when block operation request @rq from queue @q is merged to another
+  * request queued in the elevator.
 -- 
 2.22.1
 
