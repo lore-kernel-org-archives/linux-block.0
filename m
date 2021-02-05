@@ -2,72 +2,79 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.4 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB623C433E0
-	for <linux-block@archiver.kernel.org>; Fri,  5 Feb 2021 02:03:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6812BC433DB
+	for <linux-block@archiver.kernel.org>; Fri,  5 Feb 2021 02:18:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8F00164F87
-	for <linux-block@archiver.kernel.org>; Fri,  5 Feb 2021 02:03:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1EAB464F3D
+	for <linux-block@archiver.kernel.org>; Fri,  5 Feb 2021 02:18:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229851AbhBECDD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 Feb 2021 21:03:03 -0500
-Received: from szxga01-in.huawei.com ([45.249.212.187]:4606 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229789AbhBECDC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Feb 2021 21:03:02 -0500
-Received: from DGGEMM401-HUB.china.huawei.com (unknown [172.30.72.55])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4DWzD16hg1zY5t0;
-        Fri,  5 Feb 2021 10:01:05 +0800 (CST)
-Received: from dggema772-chm.china.huawei.com (10.1.198.214) by
- DGGEMM401-HUB.china.huawei.com (10.3.20.209) with Microsoft SMTP Server (TLS)
- id 14.3.498.0; Fri, 5 Feb 2021 10:02:17 +0800
-Received: from [10.169.42.93] (10.169.42.93) by dggema772-chm.china.huawei.com
- (10.1.198.214) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2106.2; Fri, 5 Feb
- 2021 10:02:17 +0800
-Subject: Re: [PATCH v5 0/3] avoid double request completion and IO error
-To:     Christoph Hellwig <hch@lst.de>
-CC:     <linux-nvme@lists.infradead.org>, <kbusch@kernel.org>,
-        <axboe@fb.com>, <sagi@grimberg.me>, <linux-block@vger.kernel.org>,
-        <axboe@kernel.dk>
-References: <20210201034940.18891-1-lengchao@huawei.com>
- <20210203161455.GB4116@lst.de>
- <7d39e0a4-3765-85b8-aab5-b0ded93f8bec@huawei.com>
- <20210204080442.GA30542@lst.de>
-From:   Chao Leng <lengchao@huawei.com>
-Message-ID: <47992bb8-3f37-ac6a-1544-e2cd30caefae@huawei.com>
-Date:   Fri, 5 Feb 2021 10:02:16 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+        id S229548AbhBECSv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 Feb 2021 21:18:51 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37338 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229508AbhBECSt (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 4 Feb 2021 21:18:49 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1612491443;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=yViiFj5/UvknIHJmYdZC5PhHVIA9CzYdE/iPEoPmYT8=;
+        b=VydWRsDoNbaS9UaBqjHIvkohG4qYws9p1v67yObKpKlFN5b862YmYfU+jf6eLTdPu1RYH2
+        Um+UM8xCZ+B7Vwta7SAX/5+673bnejoG120YQLuXzzw9REzRYBa3iN6aEBkWnmYVtlHzEv
+        ji4Nzo1hZjWU6DRvYx3tLaNr3UvOBTg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-109-WFpP9iRCNVqjMO78oLbFrQ-1; Thu, 04 Feb 2021 21:17:21 -0500
+X-MC-Unique: WFpP9iRCNVqjMO78oLbFrQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A68B19126D;
+        Fri,  5 Feb 2021 02:17:20 +0000 (UTC)
+Received: from localhost (ovpn-13-14.pek2.redhat.com [10.72.13.14])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C9FC45D762;
+        Fri,  5 Feb 2021 02:17:16 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        "Ewan D . Milne" <emilne@redhat.com>
+Subject: [PATCH 0/2] block: avoid to drop & re-add partitions if partitions aren't changed
+Date:   Fri,  5 Feb 2021 10:17:06 +0800
+Message-Id: <20210205021708.1498711-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210204080442.GA30542@lst.de>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.169.42.93]
-X-ClientProxiedBy: dggeme712-chm.china.huawei.com (10.1.199.108) To
- dggema772-chm.china.huawei.com (10.1.198.214)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi Guys,
 
+The two patches changes block ioctl(BLKRRPART) for avoiding drop &
+re-add partitions if partitions state isn't changed. The current
+behavior confuses userspace because partitions can disappear anytime
+when ioctl(BLKRRPART).
 
-On 2021/2/4 16:04, Christoph Hellwig wrote:
-> On Thu, Feb 04, 2021 at 01:56:34PM +0800, Chao Leng wrote:
->> This looks good to me.
->> Thank you very much.
-> 
-> Thanks a lot to you!
-> 
-> Please double check there version here:
-> 
-> http://git.infradead.org/nvme.git/shortlog/refs/heads/nvme-5.12
-Looks good.
-> .
-> 
+Ming Lei (2):
+  block: move partitions check code into single helper
+  block: avoid to drop & re-add partitions if partitions aren't changed
+
+ block/genhd.c            |   2 +
+ block/partitions/check.h |   2 +
+ block/partitions/core.c  | 101 ++++++++++++++++++++++++++++++++-------
+ fs/block_dev.c           |  28 +++++++++--
+ include/linux/genhd.h    |   4 ++
+ 5 files changed, 118 insertions(+), 19 deletions(-)
+
+Cc: Ewan D. Milne <emilne@redhat.com>
+-- 
+2.29.2
+
