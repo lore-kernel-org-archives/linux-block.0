@@ -2,169 +2,237 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-23.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCA1DC433E0
-	for <linux-block@archiver.kernel.org>; Fri,  5 Feb 2021 17:11:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9807C433DB
+	for <linux-block@archiver.kernel.org>; Fri,  5 Feb 2021 17:11:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A264B64F10
-	for <linux-block@archiver.kernel.org>; Fri,  5 Feb 2021 17:11:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6E09C64EF0
+	for <linux-block@archiver.kernel.org>; Fri,  5 Feb 2021 17:11:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232930AbhBEP3B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 5 Feb 2021 10:29:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56248 "EHLO
+        id S233247AbhBEP3D (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 5 Feb 2021 10:29:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56258 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233253AbhBEP1Q (ORCPT
+        with ESMTP id S233249AbhBEP1Q (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Fri, 5 Feb 2021 10:27:16 -0500
-Received: from mail-oi1-x22b.google.com (mail-oi1-x22b.google.com [IPv6:2607:f8b0:4864:20::22b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F89DC06178C
-        for <linux-block@vger.kernel.org>; Fri,  5 Feb 2021 09:07:05 -0800 (PST)
-Received: by mail-oi1-x22b.google.com with SMTP id j25so8216823oii.0
-        for <linux-block@vger.kernel.org>; Fri, 05 Feb 2021 09:07:05 -0800 (PST)
+Received: from mail-ej1-x649.google.com (mail-ej1-x649.google.com [IPv6:2a00:1450:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB371C0617A7
+        for <linux-block@vger.kernel.org>; Fri,  5 Feb 2021 08:58:44 -0800 (PST)
+Received: by mail-ej1-x649.google.com with SMTP id m4so6945347ejc.14
+        for <linux-block@vger.kernel.org>; Fri, 05 Feb 2021 08:58:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=6CiRHiBjfgyKWH3em9AEl+bMDdVNYxlHfJr2DRSDCVA=;
-        b=NBKD+zfoWfUVKP89J2Ssz3Psr/aqZy7P/yxdbeUclUL2nsLAmpMJPjuIqgfnO72M+R
-         OWbAGtezNS0EqGFi5gs7atqG1Jns61I5+lffC18AMCZ79goL1vtoeakGDY3VGPsFC6pN
-         bjNfE2uFHcCWp2BEYsK4eRRuP0vDwyAXBjkx1RnDbA8SM1+volxFk6c+KG+g1urYAERT
-         9KsQjcxW6KEFW6jHdWOY9Li4Oq2eVwdJrd4cXiAkocnP5eoAJhVLoBsZ6w39lnLzBAuF
-         ofqKCVAaQ1FDA4WK6c4gBoHZvk6Sm8T/WKC3R1WxVfr/bgvVgAXb651Zu+1QJTD6Ye0E
-         K4SA==
+        h=sender:date:message-id:mime-version:subject:from:to:cc;
+        bh=4GtWCwQDeimvfkN1mTaSptGywDj7eww9UKGtvZYIBUg=;
+        b=KBklsWedQU4WWmG49UKX496WNk8xQGJXnMQCKxME7lEcweuC3XA0fTMug2U9c8htls
+         2c++B32BAC1MtXZo6OZjeHeOFZ90sT5JzwAbZwjtZM23BcbfMBEDUhKcH3Eo/LpIuzKm
+         4wO2OrG5iyTZ+H4nQDjcePBPjpv1CBp8AvOiZyWQ4sJK10khL4FY9ERkg96LxoLSNzQy
+         RlvTjuSB61dpR8aCxO9crcD6BTIZ1RdjWWulg1OvWVSiYD4JhbxMJuB1ooMwL4gxuaJM
+         RcSD3HGmSkmx7pB+WRYezM+yeaJKpFC23Z1xOeQQOjae9LYy9OwS6eKpRR6qodl5sB9S
+         cAjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=6CiRHiBjfgyKWH3em9AEl+bMDdVNYxlHfJr2DRSDCVA=;
-        b=ZlAvo6Wi7eMJmLvGwFQ0MJp5MLbMo03K7C8EwpB8lJmG/DSc3tBu6AVZajXTaB/z9z
-         /gJ23XyinFX0zTqTK4dwFqEqb/zMBjaucASLMDfSvMd5sMPN55ym0scetYW3V77a+Q7x
-         ngClJehNrQRTGFBimNqvm+9vys3ed6FGA5z9g3BlKUqiUKqLOoJbdTghbSFkRYlioonS
-         Ef/8Jo48nlEc01z4Xbt8QO0R3eakFwfNs01DkyttZNw8WrHx2W2qU9wkT8cfp8gPGmgf
-         4Gtsr/StN9PjZVb3ysKMB3976ATMVUQJJr1ygGkSymSJX0q6xM59DKN4ATQdxnvbogT7
-         HvyQ==
-X-Gm-Message-State: AOAM533r7i3+suKwIj4aWwhgyz217/U+/IcSxI5Qddu8z+JnA10uXpyY
-        h73DkI9k3rrJOssTl61LEyLVfEK7vofoBi2chyqBOlD+1Sh92g==
-X-Google-Smtp-Source: ABdhPJwyG5XHMfddTE3lTh9bXPoLB+Ng8ywxGO1+tKiyNWfb5gczV3/qwp51P3hd5Ndbwk/m3ODFCndmdHaw3xEkRrE=
-X-Received: by 2002:a54:4482:: with SMTP id v2mr3641744oiv.121.1612544824351;
- Fri, 05 Feb 2021 09:07:04 -0800 (PST)
-MIME-Version: 1.0
-References: <0000000000006e8af605ba99c1af@google.com>
-In-Reply-To: <0000000000006e8af605ba99c1af@google.com>
+        h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
+         :to:cc;
+        bh=4GtWCwQDeimvfkN1mTaSptGywDj7eww9UKGtvZYIBUg=;
+        b=ZZQQGgHxVk9L0xxr1HbvDhCq3FkdsyaxnHx/HC29NSr7BWj5B7P2O0GG4HDVYHyb2P
+         cxyEuEx7kh84ruYtbiiA+IzH39POk1Sysr7DVtuA43rW5/d7xu1Fg3rC2W+l/wzcDPRK
+         amdfJwW+dyMOkENgdN1py+IXNdkm8jQdxf8dHk6eT/6rPq/KydIoQdbfA5ocvWAphRF1
+         6Yd+wOGJ5t7AwFi0NVE/1tw9P8LFr23/XnWWc81iXK+SUrhLOfY+SINmZ8u3nK0n8MBd
+         rS78zsAjhA4zV+1LOx7HVYUND3Ib98jGPNM7zB3uRsi9Ly8Mlnzqe4NE0jgfoslaLese
+         K5wA==
+X-Gm-Message-State: AOAM53397mVbPFuV53EvSY2BZe6N57k1iGqIGSoXC4YTVF161b1ibVrA
+        DoGnZpvK1RYXXy9ha3PyvNx9jYoxaA==
+X-Google-Smtp-Source: ABdhPJyg+Z53MiQXPBUdbUaO+0V+VxVmGSyDZvALt8fHclQXS0owRQ1TA0F83a2RbOjfnAR1jb/VTUBYPw==
+Sender: "elver via sendgmr" <elver@elver.muc.corp.google.com>
+X-Received: from elver.muc.corp.google.com ([2a00:79e0:15:13:c86d:8e60:951e:3880])
+ (user=elver job=sendgmr) by 2002:a50:e14d:: with SMTP id i13mr2777193edl.106.1612544323216;
+ Fri, 05 Feb 2021 08:58:43 -0800 (PST)
+Date:   Fri,  5 Feb 2021 17:58:35 +0100
+Message-Id: <20210205165835.821714-1-elver@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.30.0.365.g02bc693789-goog
+Subject: [PATCH] blk-mq-debugfs: mark concurrent stats counters as data races
 From:   Marco Elver <elver@google.com>
-Date:   Fri, 5 Feb 2021 18:06:53 +0100
-Message-ID: <CANpmjNNX22dDoYK3XgrgCmoEPo5Fv+1dqm=nbYhTJWs7gPSw_A@mail.gmail.com>
-Subject: Re: KCSAN: data-race in blk_stat_add / blk_stat_timer_fn (5)
-To:     syzbot <syzbot+2b6452167d85a022bc6f@syzkaller.appspotmail.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
-        Dmitry Vyukov <dvyukov@google.com>
+To:     elver@google.com
+Cc:     linux-kernel@vger.kernel.org, kasan-dev@googlegroups.com,
+        axboe@kernel.dk, linux-block@vger.kernel.org,
+        syzbot+2c308b859c8c103aae53@syzkaller.appspotmail.com,
+        syzbot+44f9b37d2de57637dbfd@syzkaller.appspotmail.com,
+        syzbot+49a9bcf457723ecaf1cf@syzkaller.appspotmail.com,
+        syzbot+b9914ed52d5b1d63f71d@syzkaller.appspotmail.com
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 5 Feb 2021 at 18:00, syzbot
-<syzbot+2b6452167d85a022bc6f@syzkaller.appspotmail.com> wrote:
-> Hello,
->
-> syzbot found the following issue on:
->
-> HEAD commit:    2ab38c17 mailmap: remove the "repo-abbrev" comment
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=130e19b4d00000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=38728258f37833e3
-> dashboard link: https://syzkaller.appspot.com/bug?extid=2b6452167d85a022bc6f
-> compiler:       clang version 12.0.0 (https://github.com/llvm/llvm-project.git 913f6005669cfb590c99865a90bc51ed0983d09d)
->
-> Unfortunately, I don't have any reproducer for this issue yet.
->
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+2b6452167d85a022bc6f@syzkaller.appspotmail.com
->
-> ==================================================================
-> BUG: KCSAN: data-race in blk_stat_add / blk_stat_timer_fn
->
-> write to 0xffffe8ffffd35c80 of 8 bytes by interrupt on cpu 0:
->  blk_rq_stat_init block/blk-stat.c:24 [inline]
->  blk_stat_timer_fn+0x349/0x410 block/blk-stat.c:95
->  call_timer_fn+0x2e/0x240 kernel/time/timer.c:1417
->  expire_timers+0x116/0x260 kernel/time/timer.c:1462
->  __run_timers+0x338/0x3d0 kernel/time/timer.c:1731
->  run_timer_softirq+0x19/0x30 kernel/time/timer.c:1744
->  __do_softirq+0x13c/0x2c3 kernel/softirq.c:343
->  asm_call_irq_on_stack+0xf/0x20
->  __run_on_irqstack arch/x86/include/asm/irq_stack.h:26 [inline]
->  run_on_irqstack_cond arch/x86/include/asm/irq_stack.h:77 [inline]
->  do_softirq_own_stack+0x32/0x40 arch/x86/kernel/irq_64.c:77
->  invoke_softirq kernel/softirq.c:226 [inline]
->  __irq_exit_rcu+0xb4/0xc0 kernel/softirq.c:420
->  sysvec_apic_timer_interrupt+0x74/0x90 arch/x86/kernel/apic/apic.c:1096
->  asm_sysvec_apic_timer_interrupt+0x12/0x20 arch/x86/include/asm/idtentry.h:628
->
-> read to 0xffffe8ffffd35c80 of 8 bytes by interrupt on cpu 1:
->  blk_rq_stat_add block/blk-stat.c:46 [inline]
->  blk_stat_add+0x13d/0x230 block/blk-stat.c:74
->  __blk_mq_end_request+0x142/0x230 block/blk-mq.c:546
->  scsi_end_request+0x2a6/0x470 drivers/scsi/scsi_lib.c:604
->  scsi_io_completion+0x104/0xfb0 drivers/scsi/scsi_lib.c:969
->  scsi_finish_command+0x263/0x2b0 drivers/scsi/scsi.c:214
->  scsi_softirq_done+0xdf/0x440 drivers/scsi/scsi_lib.c:1449
->  blk_done_softirq+0x145/0x190 block/blk-mq.c:588
->  __do_softirq+0x13c/0x2c3 kernel/softirq.c:343
->  asm_call_irq_on_stack+0xf/0x20
->  __run_on_irqstack arch/x86/include/asm/irq_stack.h:26 [inline]
->  run_on_irqstack_cond arch/x86/include/asm/irq_stack.h:77 [inline]
->  do_softirq_own_stack+0x32/0x40 arch/x86/kernel/irq_64.c:77
->  invoke_softirq kernel/softirq.c:226 [inline]
->  __irq_exit_rcu+0xb4/0xc0 kernel/softirq.c:420
->  common_interrupt+0xb5/0x130 arch/x86/kernel/irq.c:239
->  asm_common_interrupt+0x1e/0x40 arch/x86/include/asm/idtentry.h:619
->  check_access kernel/kcsan/core.c:633 [inline]
->  __tsan_read1+0x156/0x180 kernel/kcsan/core.c:839
->  tomoyo_get_mode security/tomoyo/util.c:1003 [inline]
->  tomoyo_init_request_info+0xfc/0x160 security/tomoyo/util.c:1031
->  tomoyo_path_perm+0x8b/0x330 security/tomoyo/file.c:815
->  tomoyo_inode_getattr+0x18/0x20 security/tomoyo/tomoyo.c:123
->  security_inode_getattr+0x7f/0xd0 security/security.c:1280
->  vfs_getattr fs/stat.c:121 [inline]
->  vfs_fstat+0x45/0x390 fs/stat.c:146
->  __do_sys_newfstat fs/stat.c:386 [inline]
->  __se_sys_newfstat+0x35/0x240 fs/stat.c:383
->  __x64_sys_newfstat+0x2d/0x40 fs/stat.c:383
->  do_syscall_64+0x39/0x80 arch/x86/entry/common.c:46
->  entry_SYSCALL_64_after_hwframe+0x44/0xa9
->
-> Reported by Kernel Concurrency Sanitizer on:
-> CPU: 1 PID: 18199 Comm: modprobe Not tainted 5.11.0-rc5-syzkaller #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-> ==================================================================
+KCSAN reports that several of the blk-mq debugfs stats counters are
+updated concurrently. Because blk-mq-debugfs does not demand precise
+stats counters, potential lossy updates due to data races can be
+tolerated. Therefore, mark and comment the accesses accordingly.
 
-I've been looking at some data races in block/. For this one I was
-wondering if there are any requirements for the stats counters? E.g.
-do they have to be somewhat consistent, or does it not matter at all?
+Reported-by: syzbot+2c308b859c8c103aae53@syzkaller.appspotmail.com
+Reported-by: syzbot+44f9b37d2de57637dbfd@syzkaller.appspotmail.com
+Reported-by: syzbot+49a9bcf457723ecaf1cf@syzkaller.appspotmail.com
+Reported-by: syzbot+b9914ed52d5b1d63f71d@syzkaller.appspotmail.com
+Signed-off-by: Marco Elver <elver@google.com>
+---
+Note: These 4 data races are among the most frequently encountered by
+syzbot:
 
-Because as-is, with concurrent update and aggregation (followed by
-reinit) of the per-CPU counters, the values in blk_rq_stat can become
-quite inconsistent.
+  https://syzkaller.appspot.com/bug?id=7994761095b9677fb8bccaf41a77a82d5f444839
+  https://syzkaller.appspot.com/bug?id=08193ca23b80ec0e9bcbefba039162cff4f5d7a3
+  https://syzkaller.appspot.com/bug?id=7c51c15438f963024c4a4b3a6d7e119f4bdb2199
+  https://syzkaller.appspot.com/bug?id=6436cb57d04e8c5d6f0f40926d7511232aa2b5d4
+---
+ block/blk-mq-debugfs.c | 22 ++++++++++++----------
+ block/blk-mq-sched.c   |  3 ++-
+ block/blk-mq.c         |  9 ++++++---
+ 3 files changed, 20 insertions(+), 14 deletions(-)
 
-I wanted to throw together a fix for this, but wasn't sure what the
-level of tolerable errors for these counters is appropriate. I thought
-of 3 options:
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index 4de03da9a624..687d201f0d7b 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -554,15 +554,16 @@ static int hctx_dispatched_show(void *data, struct seq_file *m)
+ 	struct blk_mq_hw_ctx *hctx = data;
+ 	int i;
+ 
+-	seq_printf(m, "%8u\t%lu\n", 0U, hctx->dispatched[0]);
++	seq_printf(m, "%8u\t%lu\n", 0U, data_race(hctx->dispatched[0]));
+ 
+ 	for (i = 1; i < BLK_MQ_MAX_DISPATCH_ORDER - 1; i++) {
+ 		unsigned int d = 1U << (i - 1);
+ 
+-		seq_printf(m, "%8u\t%lu\n", d, hctx->dispatched[i]);
++		seq_printf(m, "%8u\t%lu\n", d, data_race(hctx->dispatched[i]));
+ 	}
+ 
+-	seq_printf(m, "%8u+\t%lu\n", 1U << (i - 1), hctx->dispatched[i]);
++	seq_printf(m, "%8u+\t%lu\n", 1U << (i - 1),
++		   data_race(hctx->dispatched[i]));
+ 	return 0;
+ }
+ 
+@@ -573,7 +574,7 @@ static ssize_t hctx_dispatched_write(void *data, const char __user *buf,
+ 	int i;
+ 
+ 	for (i = 0; i < BLK_MQ_MAX_DISPATCH_ORDER; i++)
+-		hctx->dispatched[i] = 0;
++		data_race(hctx->dispatched[i] = 0);
+ 	return count;
+ }
+ 
+@@ -581,7 +582,7 @@ static int hctx_queued_show(void *data, struct seq_file *m)
+ {
+ 	struct blk_mq_hw_ctx *hctx = data;
+ 
+-	seq_printf(m, "%lu\n", hctx->queued);
++	seq_printf(m, "%lu\n", data_race(hctx->queued));
+ 	return 0;
+ }
+ 
+@@ -590,7 +591,7 @@ static ssize_t hctx_queued_write(void *data, const char __user *buf,
+ {
+ 	struct blk_mq_hw_ctx *hctx = data;
+ 
+-	hctx->queued = 0;
++	data_race(hctx->queued = 0);
+ 	return count;
+ }
+ 
+@@ -598,7 +599,7 @@ static int hctx_run_show(void *data, struct seq_file *m)
+ {
+ 	struct blk_mq_hw_ctx *hctx = data;
+ 
+-	seq_printf(m, "%lu\n", hctx->run);
++	seq_printf(m, "%lu\n", data_race(hctx->run));
+ 	return 0;
+ }
+ 
+@@ -607,7 +608,7 @@ static ssize_t hctx_run_write(void *data, const char __user *buf, size_t count,
+ {
+ 	struct blk_mq_hw_ctx *hctx = data;
+ 
+-	hctx->run = 0;
++	data_race(hctx->run = 0);
+ 	return count;
+ }
+ 
+@@ -702,7 +703,8 @@ static int ctx_completed_show(void *data, struct seq_file *m)
+ {
+ 	struct blk_mq_ctx *ctx = data;
+ 
+-	seq_printf(m, "%lu %lu\n", ctx->rq_completed[1], ctx->rq_completed[0]);
++	seq_printf(m, "%lu %lu\n", data_race(ctx->rq_completed[1]),
++		   data_race(ctx->rq_completed[0]));
+ 	return 0;
+ }
+ 
+@@ -711,7 +713,7 @@ static ssize_t ctx_completed_write(void *data, const char __user *buf,
+ {
+ 	struct blk_mq_ctx *ctx = data;
+ 
+-	ctx->rq_completed[0] = ctx->rq_completed[1] = 0;
++	data_race(ctx->rq_completed[0] = ctx->rq_completed[1] = 0);
+ 	return count;
+ }
+ 
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index deff4e826e23..71a49835e89a 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -332,7 +332,8 @@ void blk_mq_sched_dispatch_requests(struct blk_mq_hw_ctx *hctx)
+ 	if (unlikely(blk_mq_hctx_stopped(hctx) || blk_queue_quiesced(q)))
+ 		return;
+ 
+-	hctx->run++;
++	/* data race ok: hctx->run only for debugfs stats. */
++	data_race(hctx->run++);
+ 
+ 	/*
+ 	 * A return of -EAGAIN is an indication that hctx->dispatch is not
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index f285a9123a8b..1d8970602032 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -341,7 +341,8 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
+ 		}
+ 	}
+ 
+-	data->hctx->queued++;
++	/* data race ok: hctx->queued only for debugfs stats. */
++	data_race(data->hctx->queued++);
+ 	return rq;
+ }
+ 
+@@ -519,7 +520,8 @@ void blk_mq_free_request(struct request *rq)
+ 		}
+ 	}
+ 
+-	ctx->rq_completed[rq_is_sync(rq)]++;
++	/* data race ok: ctx->rq_completed only for debugfs stats. */
++	data_race(ctx->rq_completed[rq_is_sync(rq)]++);
+ 	if (rq->rq_flags & RQF_MQ_INFLIGHT)
+ 		__blk_mq_dec_active_requests(hctx);
+ 
+@@ -1419,7 +1421,8 @@ bool blk_mq_dispatch_rq_list(struct blk_mq_hw_ctx *hctx, struct list_head *list,
+ 	if (!list_empty(&zone_list))
+ 		list_splice_tail_init(&zone_list, list);
+ 
+-	hctx->dispatched[queued_to_index(queued)]++;
++	/* data race ok: hctx->dispatched only for debugfs stats. */
++	data_race(hctx->dispatched[queued_to_index(queued)]++);
+ 
+ 	/* If we didn't flush the entire list, we could have told the driver
+ 	 * there was more coming, but that turned out to be a lie.
 
-1. Just add more data_race() around them and accept whatever
-inaccuracies we get due to the data races.
+base-commit: 61556703b610a104de324e4f061dc6cf7b218b46
+-- 
+2.30.0.365.g02bc693789-goog
 
-2. Add a per-CPU spinlock. This should be uncontended unless the timer
-fires too often.
-
-3. Use per-CPU seqlock. Not sure this buys us much because the timer
-also resets the per-CPU counters and has to be serialized with other
-potential updaters.
-
-Thanks,
--- Marco
