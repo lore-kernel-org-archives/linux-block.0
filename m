@@ -2,130 +2,138 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-20.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 725B6C4332B
-	for <linux-block@archiver.kernel.org>; Sat,  6 Feb 2021 02:45:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B37CDC433E9
+	for <linux-block@archiver.kernel.org>; Sat,  6 Feb 2021 02:54:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 40F3B64FE4
-	for <linux-block@archiver.kernel.org>; Sat,  6 Feb 2021 02:45:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7CADF64F51
+	for <linux-block@archiver.kernel.org>; Sat,  6 Feb 2021 02:54:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231327AbhBFCox (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 5 Feb 2021 21:44:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38644 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231293AbhBFCkF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Feb 2021 21:40:05 -0500
-Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AFDEC08ED38
-        for <linux-block@vger.kernel.org>; Fri,  5 Feb 2021 15:16:50 -0800 (PST)
-Received: by mail-pg1-x535.google.com with SMTP id g15so5589338pgu.9
-        for <linux-block@vger.kernel.org>; Fri, 05 Feb 2021 15:16:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=to:cc:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=Qzublt+OSpzjrakyinu33+i+M4UkOIdnFqOBEWhR9Ds=;
-        b=Qt32I1ykmR+juSOU2UYUjoCULWgIzKxi16l4onKNx+1VsS7eCIbrdcFDOiZDJindHP
-         rxr4l4h2pM+n7/aG2Ge0F546UlB6ObXrWu3WNSP8LW0bYKFBga1KLHP5LjMEXS+JNZor
-         E9Qbz77uihS/BWOxnfuu4YC+YmnqA38Qox/Grm7zKn9Oy9EGgr3mZdh/0059TKsp4FoS
-         My+8poGn5Ilwd6KLdfhWWCX9RVTZ5r2iNzn3v6pnK4/LCh8vfvzN4zcr6dIApLY9Emij
-         kpaV3owUlEDkJAB4LtXXmJc3V6+kuG0P9rz/fwKYq9riNqPjKFpsyHaQh4SPiEbbxk0X
-         5cyg==
+        id S229787AbhBFCyY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 5 Feb 2021 21:54:24 -0500
+Received: from mail-wm1-f45.google.com ([209.85.128.45]:38637 "EHLO
+        mail-wm1-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231569AbhBFCk7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Feb 2021 21:40:59 -0500
+Received: by mail-wm1-f45.google.com with SMTP id y187so7445510wmd.3;
+        Fri, 05 Feb 2021 18:40:42 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=Qzublt+OSpzjrakyinu33+i+M4UkOIdnFqOBEWhR9Ds=;
-        b=FgXixPeRleo8GkRcILNDQj2uj0qcjRNehHXe60igWxD4tw5excyPzG2T6bus6B2u4p
-         ifWjRk6u0lnDqQ0/UoBsWZBRa3IfaGNRRmsn4VrCZuB3aKfVoR91IVkl1QjNpTYq3ghh
-         mr17yu3TpeEoa6tZv/hktfc+3OUT0zxLHjItE0tAVC0ZkA4p7eBPrMNRQD94u/I7ER3V
-         lA8KL0KQDz6LVPqqxEIdAKzGemBeSROuuBW1J5Rj3wkyTLWt76Aq1AuBJPirmGRWUYOa
-         3zm0vDnIfoYbjo5E6sFf/0S/3at1VPWbB5uPvtbMhbJ7dr3hajrWR8faaeyxtlvFHvj8
-         FE0Q==
-X-Gm-Message-State: AOAM5302r/thLhcAUqZJKXQruSiM6nyQH1PJAMNjk2cuogCvlZmydfon
-        8rd0eqWPPzng54yb81hXMWhAEKuW7VKh6Q==
-X-Google-Smtp-Source: ABdhPJzn/wwdkk97Bv4rXRsFPztDfe+QYJx5EkiS4aXWf3pKkrlEDQ7sFwxMFKTS6MjHjV075BnIGg==
-X-Received: by 2002:a63:4444:: with SMTP id t4mr6481289pgk.329.1612567009463;
-        Fri, 05 Feb 2021 15:16:49 -0800 (PST)
-Received: from [192.168.1.134] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id j26sm10072215pfa.35.2021.02.05.15.16.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 Feb 2021 15:16:49 -0800 (PST)
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 5.11-rc7
-Message-ID: <1b6014c3-84cf-ec3e-69bf-73a8b10c7e88@kernel.dk>
-Date:   Fri, 5 Feb 2021 16:16:47 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=crp7AXUnob0dNe1RTlaAdYK5J2RKpyaUTwbxaLZLJdY=;
+        b=rOXPkEooWjKH2/AOpnh5HoBndkOLmhLdwC+A0HSRCSFnROvbiHWH8rsiQSvNch/sJa
+         xnTRfl9Bir0d2NXkC2Q6rGnuaVAyotbVHBWi1O0k+yuiVSBGcuApZvujUqLbP8fa8zch
+         niBkIYDsULdR60RFAQF2/m6YFPbNJim0G2HnZ1wQZkw+scZGfjD+c3RzR06+kBvb9BH5
+         H1vp7EOZZR5dbVucQ5mWz1FyAYBP75OlK7YsOYOK5QJ1DIYR3n8n3aoEQ5O01c0iHLwi
+         bCuVAA2IqGL1Uoio6YKzHrqRaBPn6ALp1YpKdaLQFb96LcWUzUmQvE8vjCmA1mPLAVAc
+         yjKQ==
+X-Gm-Message-State: AOAM532RdTH5GGEbfgNfLLbBektSm0C6M9LrC/CAEf5e0+4a+Yltdezi
+        oL3sYfhlZxSQAEW3kZrLqZCFRMZX6lQ=
+X-Google-Smtp-Source: ABdhPJwGQ66skeYfY9kGR9UXMXYyL5qwHO1V0r5hQL55M80HyRceyEgT9G8HOp22Tc+hIswm6TbPcQ==
+X-Received: by 2002:a1c:720b:: with SMTP id n11mr5613002wmc.154.1612570265034;
+        Fri, 05 Feb 2021 16:11:05 -0800 (PST)
+Received: from msft-t490s.teknoraver.net (net-37-182-2-234.cust.vodafonedsl.it. [37.182.2.234])
+        by smtp.gmail.com with ESMTPSA id d3sm14566390wrp.79.2021.02.05.16.11.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Feb 2021 16:11:04 -0800 (PST)
+From:   Matteo Croce <mcroce@linux.microsoft.com>
+To:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org,
+        Lennart Poettering <lennart@poettering.net>,
+        Luca Boccassi <bluca@debian.org>, Jens Axboe <axboe@kernel.dk>,
+        Alexander Viro <viro@zeniv.linux.org.uk>
+Subject: [PATCH 1/5] block: add disk sequence number
+Date:   Sat,  6 Feb 2021 01:08:59 +0100
+Message-Id: <20210206000903.215028-2-mcroce@linux.microsoft.com>
+X-Mailer: git-send-email 2.29.2
+In-Reply-To: <20210206000903.215028-1-mcroce@linux.microsoft.com>
+References: <20210206000903.215028-1-mcroce@linux.microsoft.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+From: Matteo Croce <mcroce@microsoft.com>
 
-A few small regression fixes:
+Add a sequence number to the disk devices. This number is put in the
+uevent so userspace can correlate events when a driver reuses a device,
+like the loop one.
 
-- NVMe pull request from Christoph:
-	- more quirks for buggy devices (Thorsten Leemhuis, Claus Stovgaard)
-	- update the email address for Keith (Keith Busch)
-	- fix an out of bounds access in nvmet-tcp (Sagi Grimberg)
+Signed-off-by: Matteo Croce <mcroce@microsoft.com>
+---
+ block/genhd.c         | 19 +++++++++++++++++++
+ include/linux/genhd.h |  2 ++
+ 2 files changed, 21 insertions(+)
 
-- Regression fix for BFQ shallow depth calculations introduced in this
-  merge window (Lin)
-
-Please pull!
-
-
-The following changes since commit cd92cdb9c8bcfc27a8f28bcbf7c414a0ea79e5ec:
-
-  null_blk: cleanup zoned mode initialization (2021-01-29 07:49:22 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux-block.git tags/block-5.11-2021-02-05
-
-for you to fetch changes up to ea8465e611022a04d85393f776874911a9fc0a2b:
-
-  Merge branch 'nvme-5.11' of git://git.infradead.org/nvme into block-5.11 (2021-02-04 08:24:16 -0700)
-
-----------------------------------------------------------------
-block-5.11-2021-02-05
-
-----------------------------------------------------------------
-Claus Stovgaard (1):
-      nvme-pci: ignore the subsysem NQN on Phison E16
-
-Jens Axboe (1):
-      Merge branch 'nvme-5.11' of git://git.infradead.org/nvme into block-5.11
-
-Keith Busch (1):
-      update the email address for Keith Bush
-
-Lin Feng (1):
-      bfq-iosched: Revert "bfq: Fix computation of shallow depth"
-
-Sagi Grimberg (1):
-      nvmet-tcp: fix out-of-bounds access when receiving multiple h2cdata PDUs
-
-Thorsten Leemhuis (1):
-      nvme-pci: avoid the deepest sleep state on Kingston A2000 SSDs
-
- .mailmap                  | 2 ++
- block/bfq-iosched.c       | 8 ++++----
- drivers/nvme/host/pci.c   | 4 ++++
- drivers/nvme/target/tcp.c | 3 ++-
- 4 files changed, 12 insertions(+), 5 deletions(-)
-
+diff --git a/block/genhd.c b/block/genhd.c
+index 9e741a4f351b..4dbf589e1610 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -1425,8 +1425,17 @@ static void disk_release(struct device *dev)
+ 		blk_put_queue(disk->queue);
+ 	kfree(disk);
+ }
++
++static int block_uevent(struct device *dev, struct kobj_uevent_env *env)
++{
++	struct gendisk *disk = dev_to_disk(dev);
++
++	return add_uevent_var(env, "DISKSEQ=%llu", disk->diskseq);
++}
++
+ struct class block_class = {
+ 	.name		= "block",
++	.dev_uevent	= block_uevent,
+ };
+ 
+ static char *block_devnode(struct device *dev, umode_t *mode,
+@@ -1601,6 +1610,8 @@ struct gendisk *__alloc_disk_node(int minors, int node_id)
+ 	disk_to_dev(disk)->class = &block_class;
+ 	disk_to_dev(disk)->type = &disk_type;
+ 	device_initialize(disk_to_dev(disk));
++	inc_diskseq(disk);
++
+ 	return disk;
+ 
+ out_bdput:
+@@ -2149,3 +2160,11 @@ static void disk_release_events(struct gendisk *disk)
+ 	WARN_ON_ONCE(disk->ev && disk->ev->block != 1);
+ 	kfree(disk->ev);
+ }
++
++void inc_diskseq(struct gendisk *disk)
++{
++	static atomic64_t diskseq;
++
++	disk->diskseq = atomic64_inc_return(&diskseq);
++}
++EXPORT_SYMBOL_GPL(inc_diskseq);
+diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+index 809aaa32d53c..2e5a0b8893db 100644
+--- a/include/linux/genhd.h
++++ b/include/linux/genhd.h
+@@ -177,6 +177,7 @@ struct gendisk {
+ 	int node_id;
+ 	struct badblocks *bb;
+ 	struct lockdep_map lockdep_map;
++	u64 diskseq;
+ };
+ 
+ /*
+@@ -335,6 +336,7 @@ static inline void bd_unlink_disk_holder(struct block_device *bdev,
+ #endif /* CONFIG_SYSFS */
+ 
+ extern struct rw_semaphore bdev_lookup_sem;
++extern void inc_diskseq(struct gendisk *disk);
+ 
+ dev_t blk_lookup_devt(const char *name, int partno);
+ void blk_request_module(dev_t devt);
 -- 
-Jens Axboe
+2.29.2
 
