@@ -4,52 +4,52 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 702DEC433E0
-	for <linux-block@archiver.kernel.org>; Sat,  6 Feb 2021 03:08:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DB37C433DB
+	for <linux-block@archiver.kernel.org>; Sat,  6 Feb 2021 03:17:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3815564FD6
-	for <linux-block@archiver.kernel.org>; Sat,  6 Feb 2021 03:08:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 76A3064F99
+	for <linux-block@archiver.kernel.org>; Sat,  6 Feb 2021 03:17:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231268AbhBFDHu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 5 Feb 2021 22:07:50 -0500
-Received: from mail-wm1-f50.google.com ([209.85.128.50]:38269 "EHLO
-        mail-wm1-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232463AbhBFDBS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Feb 2021 22:01:18 -0500
-Received: by mail-wm1-f50.google.com with SMTP id y187so7471403wmd.3;
-        Fri, 05 Feb 2021 19:01:01 -0800 (PST)
+        id S231735AbhBFDPi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 5 Feb 2021 22:15:38 -0500
+Received: from mail-wm1-f49.google.com ([209.85.128.49]:39342 "EHLO
+        mail-wm1-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232211AbhBFCzd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Feb 2021 21:55:33 -0500
+Received: by mail-wm1-f49.google.com with SMTP id u14so7446042wmq.4;
+        Fri, 05 Feb 2021 18:55:16 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=bexfxdD7y04/NN1BW/2LR9HyyA70oxPcF36yfxCxKpg=;
-        b=WtqVklhFNAKxH/D+PWJIM65mryGk/rDijSCe9RK3Gc5XhCTEjZkXXKSdEHyEwSSW9q
-         iwaBwv9337oh38Q0XF3sjqQe913FCpjJ6UTYQBEvUNbXvfq9EWuUuUo/B1PE4opyw0uY
-         +rzjFbBiybNOBVar7y9V5RdK+F+CMRHTyOJdK5qCN3wad16ZAa38rmMbQ7s2w0lQ3w9f
-         8LrBtkof2HDSBAKHYjtA10ZAqps06PlHAO/gevVpXN7QBTTmxO3lE5cUO5TMOnSfYXdV
-         GbTwpOEncI3LUS8MMfniKwMhQdK4qR/sSWbiKhewr6e5frD+8XX50FK70dMzvqywAoDq
-         fe1g==
-X-Gm-Message-State: AOAM533PY1glDbZHsCoi0bIJVasUn4JmsqdDf/1nmVLOLkmkJHvLCdRJ
-        qie1M98A+c2duRn5q3GCql+D/ZZzBuA=
-X-Google-Smtp-Source: ABdhPJw+KDHxxnP1/yl3ky5khDln+lFM6/pjtRM5lgi82AtvgGV0nU+5ibW4yldcAcq8uOrdqw9EaQ==
-X-Received: by 2002:a1c:acc9:: with SMTP id v192mr5436823wme.22.1612570320604;
-        Fri, 05 Feb 2021 16:12:00 -0800 (PST)
+        bh=aCJ5PaXDlTI4AjcUCXBQTCjHD7JcPX94ZBJxHdZFYJs=;
+        b=q+EabVDft+zoeSQ23UoeV4vHAXE1pK811ECDaoNlarAnD4VrXeYHR1CPrxjYKVDF+J
+         sW+ZD37+Vcecr2nLip5DtmNkLcCb9PYaRvmw2Irj9HXlAngFfuYfj+boBRMCV0+95pEB
+         aqrjefR0PcHEqFEiuiOMAFIx6sqY8jptoJVijO7EOJr2Ls2kKB8k2SMWS879C2+jlWZ4
+         1ER4QwE5IbmiWdUzBE7Etk/QBPYXTSd576bsm1LD82DpWyqdCxBabeXluhprmleh8M+x
+         QjtrpefifQH92WslSISQqkh3Q8QZJ3Rkkz173LY0WlGwH3Wg5jDAhrCgoAxa7ySLL8Dg
+         rVSQ==
+X-Gm-Message-State: AOAM532bSE+ahezXE2yhxIzC6qRb/1k42w+KnHs3+LLqesqF3bNJ8mTi
+        jZJ+iVCzJJjJ0E2FmwUiKi1X6T5IjoA=
+X-Google-Smtp-Source: ABdhPJx7aqDZs1uXhcmo/ZfRQRW7gg++4yuzlD1SZ+jzLQ7pwK52YYcGgJWxOjbdbuPtsMr5bMSAow==
+X-Received: by 2002:a05:600c:4f8b:: with SMTP id n11mr5472818wmq.160.1612570388879;
+        Fri, 05 Feb 2021 16:13:08 -0800 (PST)
 Received: from msft-t490s.teknoraver.net (net-37-182-2-234.cust.vodafonedsl.it. [37.182.2.234])
-        by smtp.gmail.com with ESMTPSA id d3sm14566390wrp.79.2021.02.05.16.11.59
+        by smtp.gmail.com with ESMTPSA id d3sm14566390wrp.79.2021.02.05.16.13.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Feb 2021 16:12:00 -0800 (PST)
+        Fri, 05 Feb 2021 16:13:08 -0800 (PST)
 From:   Matteo Croce <mcroce@linux.microsoft.com>
 To:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org,
         Lennart Poettering <lennart@poettering.net>,
         Luca Boccassi <bluca@debian.org>, Jens Axboe <axboe@kernel.dk>,
         Alexander Viro <viro@zeniv.linux.org.uk>
-Subject: [PATCH 2/5] block: add ioctl to read the disk sequence number
-Date:   Sat,  6 Feb 2021 01:09:00 +0100
-Message-Id: <20210206000903.215028-3-mcroce@linux.microsoft.com>
+Subject: [PATCH 4/5] block: export diskseq in sysfs
+Date:   Sat,  6 Feb 2021 01:09:02 +0100
+Message-Id: <20210206000903.215028-5-mcroce@linux.microsoft.com>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210206000903.215028-1-mcroce@linux.microsoft.com>
 References: <20210206000903.215028-1-mcroce@linux.microsoft.com>
@@ -61,40 +61,77 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Matteo Croce <mcroce@microsoft.com>
 
-Add a new BLKGETDISKSEQ ioctl which retrieves the disk sequence number
-from the genhd structure.
+Add a new sysfs handle to export the new diskseq value.
+Place it in <sysfs>/block/<disk>/diskseq and document it.
 
 Signed-off-by: Matteo Croce <mcroce@microsoft.com>
 ---
- block/ioctl.c           | 2 ++
- include/uapi/linux/fs.h | 1 +
- 2 files changed, 3 insertions(+)
+ Documentation/ABI/testing/sysfs-block | 12 ++++++++++++
+ block/genhd.c                         | 11 +++++++++++
+ 2 files changed, 23 insertions(+)
 
-diff --git a/block/ioctl.c b/block/ioctl.c
-index d61d652078f4..037fec888098 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -460,6 +460,8 @@ static int blkdev_common_ioctl(struct block_device *bdev, fmode_t mode,
- 				BLKDEV_DISCARD_SECURE);
- 	case BLKZEROOUT:
- 		return blk_ioctl_zeroout(bdev, mode, arg);
-+	case BLKGETDISKSEQ:
-+		return put_u64(argp, bdev->bd_disk->diskseq);
- 	case BLKREPORTZONE:
- 		return blkdev_report_zones_ioctl(bdev, mode, cmd, arg);
- 	case BLKRESETZONE:
-diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
-index f44eb0a04afd..5dc72bbdd9b7 100644
---- a/include/uapi/linux/fs.h
-+++ b/include/uapi/linux/fs.h
-@@ -184,6 +184,7 @@ struct fsxattr {
- #define BLKSECDISCARD _IO(0x12,125)
- #define BLKROTATIONAL _IO(0x12,126)
- #define BLKZEROOUT _IO(0x12,127)
-+#define BLKGETDISKSEQ _IOR(0x12,128,__u64)
- /*
-  * A jump here: 130-131 are reserved for zoned block devices
-  * (see uapi/linux/blkzoned.h)
+diff --git a/Documentation/ABI/testing/sysfs-block b/Documentation/ABI/testing/sysfs-block
+index e34cdeeeb9d4..a0ed87386639 100644
+--- a/Documentation/ABI/testing/sysfs-block
++++ b/Documentation/ABI/testing/sysfs-block
+@@ -28,6 +28,18 @@ Description:
+ 		For more details refer Documentation/admin-guide/iostats.rst
+ 
+ 
++What:		/sys/block/<disk>/diskseq
++Date:		February 2021
++Contact:	Matteo Croce <mcroce@microsoft.com>
++Description:
++		The /sys/block/<disk>/diskseq files reports the disk
++		sequence number, which is a monotonically increasing
++		number assigned to every drive.
++		Some devices, like the loop device, refresh such number
++		every time the backing file is changed.
++		The value type is 64 bit unsigned.
++
++
+ What:		/sys/block/<disk>/<part>/stat
+ Date:		February 2008
+ Contact:	Jerome Marchand <jmarchan@redhat.com>
+diff --git a/block/genhd.c b/block/genhd.c
+index a59a35cf452c..1aedd4fab6f3 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -1975,6 +1975,7 @@ static void disk_check_events(struct disk_events *ev,
+  * events_async		: list of events which can be detected w/o polling
+  *			  (always empty, only for backwards compatibility)
+  * events_poll_msecs	: polling interval, 0: disable, -1: system default
++ * diskseq		: disk sequence number, since boot
+  */
+ static ssize_t __disk_events_show(unsigned int events, char *buf)
+ {
+@@ -2045,16 +2046,26 @@ static ssize_t disk_events_poll_msecs_store(struct device *dev,
+ 	return count;
+ }
+ 
++static ssize_t diskseq_show(struct device *dev,
++			    struct device_attribute *attr, char *buf)
++{
++	struct gendisk *disk = dev_to_disk(dev);
++
++	return sprintf(buf, "%llu\n", disk->diskseq);
++}
++
+ static const DEVICE_ATTR(events, 0444, disk_events_show, NULL);
+ static const DEVICE_ATTR(events_async, 0444, disk_events_async_show, NULL);
+ static const DEVICE_ATTR(events_poll_msecs, 0644,
+ 			 disk_events_poll_msecs_show,
+ 			 disk_events_poll_msecs_store);
++static const DEVICE_ATTR(diskseq, 0444, diskseq_show, NULL);
+ 
+ static const struct attribute *disk_sysfs_attrs[] = {
+ 	&dev_attr_events.attr,
+ 	&dev_attr_events_async.attr,
+ 	&dev_attr_events_poll_msecs.attr,
++	&dev_attr_diskseq.attr,
+ 	NULL,
+ };
+ 
 -- 
 2.29.2
 
