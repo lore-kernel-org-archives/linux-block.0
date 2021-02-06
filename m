@@ -2,81 +2,129 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-7.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81C42C433DB
-	for <linux-block@archiver.kernel.org>; Sat,  6 Feb 2021 17:29:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B3ABC433DB
+	for <linux-block@archiver.kernel.org>; Sat,  6 Feb 2021 19:20:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4558F64E88
-	for <linux-block@archiver.kernel.org>; Sat,  6 Feb 2021 17:29:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CB26364E36
+	for <linux-block@archiver.kernel.org>; Sat,  6 Feb 2021 19:20:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229727AbhBFR2q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 6 Feb 2021 12:28:46 -0500
-Received: from mout.gmx.net ([212.227.17.22]:50659 "EHLO mout.gmx.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229715AbhBFR2p (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 6 Feb 2021 12:28:45 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
-        s=badeba3b8450; t=1612632417;
-        bh=FSHSMR3+epyEoGOWn+GBPxMtU05puYCj4o407Ut46H8=;
-        h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
-        b=hls1Y240HsVZrm1LMCt35w7THyLhHjBcLNjaZnietizfxsfeUWwCQ1jxU27SEmzMS
-         1MXEdIIp+/EsalCyH2azTXhiRITtDU9OrXZV6AxyNzgVwBwkWzbByKHycPX8lP8d7p
-         Q2ce5epf2oYXTXE6xSLl/qnGulpwwQ0hVN4Hkqqs=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from Valinor ([87.94.111.216]) by mail.gmx.net (mrgmx105
- [212.227.17.174]) with ESMTPSA (Nemesis) id 1N6sit-1lzt3W0zT5-018LKM; Sat, 06
- Feb 2021 18:26:57 +0100
-Date:   Sat, 6 Feb 2021 19:28:37 +0200
-From:   Lauri Kasanen <cand@gmx.com>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     linux-mips@vger.kernel.org, tsbogend@alpha.franken.de,
-        axboe@kernel.dk, linux-block@vger.kernel.org,
-        Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH v11] block: Add n64 cart driver
-Message-Id: <20210206192837.5ecec54cc5ac120ade1d5060@gmx.com>
-In-Reply-To: <20210123124210.GB458363@infradead.org>
-References: <20210123095327.58e5ab6c05f38e9080a79bd3@gmx.com>
-        <20210123124210.GB458363@infradead.org>
-X-Mailer: Sylpheed 3.5.0 (GTK+ 2.18.6; x86_64-unknown-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:quvw3zq9+dUhyqkjiVEWFXI5iU1rv1IlqvDbHp1gIeIOy0VxiN6
- rcfokB/0eUFcy7jsGLn0E5KRMe2qtNH+2IfkUQCAOARbM5YkqPVQorIKJSlxA8iaLcEcgcK
- tsMphdIqW1NbOJb1x70vYtGheDOAIwoM0msSYLUizZ/dy75i0SGhI7NSl+eGJ+LAJOFsAgp
- ztpF612O8uj85sRu8tMFg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:ODsxNitNhH4=:CUAz7QG19sdg60wZ/cixNC
- jii5q2mGxQj8KwNBWLxYFJm2X9AMTfornNjn92lQNpO2DhZJXIG+bN6BOq+wJP37snHW1OA4d
- CfPuJo7BQxP/yEMs3MkIj+MO4xOKND7cn0KyIKjN65iIYBaXPmpcuSHEOr56q20OgmScUHeXb
- uLRF+983fNJh2LxcQTymnGW2y4+pVOcj7wBHsBSvdLs/3F9Qg9LDxPddltHGVCjTRXU8QjcA/
- 1ddQjiB/h/EX3MCgUcdv4fS6X04J2aFeYEIqqZrEHi+5qNC9+t8LsNbSYEaC1+eUWdwpJ5J1a
- ZU7skWY+7++lIPCNvR97z74NEoRF/3RBjxAaGPHa/xvF8CLxP2xJ79Cs83LHONkeFAl2hCV/n
- oT9ZZaP4C+4Yaw04EXiJEUpf+S4vx+qWgxHABgfks9d0bEoh9mwBIvytkMrdYIvoSHbYvzeMI
- nhZFdPUMJOBC9Od7GcyYVAAP4oOm5ZXy9ieTFeykze3jMijVt9q42R3sZaGuBzib0+VHVzxHp
- +/GvLwNFCbnJrtdSyH/oacV+JWXdHunHQ2hOhKFlGOjSgmyBYiN4LNZXAiIk3j7HgnlCDY5Q2
- gswNlUoV7bTQxNxALB8dQjFx6Lx487ydWhU8PiTAE5poBI/blqDKYEMg3DwEj5ZOLJKgg44xN
- PGVzoh8jHzhp3mW72FTdMX4BwG5uA601zy5wuss8X97qsryhhIcCpUJNA9KZYGD2bEHkUt+q3
- UHXpAS/P82svJAD2wiru/PRhzXi7yIXzQ+agTbFu0E4m0PRBgkGLS1zyJPy9MoNNDRv2tKYX0
- jB7CCdwpa+2pBYx4roZzzOeRtyoS3UuMWXjc7AGi3l8pwKi4KfEoWE0OTgypEyMK69SAJ76iI
- b1Ivu6mvwx7iFVaohinw==
+        id S229997AbhBFTUQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 6 Feb 2021 14:20:16 -0500
+Received: from mail.xenproject.org ([104.130.215.37]:55394 "EHLO
+        mail.xenproject.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230027AbhBFTUL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 6 Feb 2021 14:20:11 -0500
+X-Greylist: delayed 1943 seconds by postgrey-1.27 at vger.kernel.org; Sat, 06 Feb 2021 14:20:09 EST
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=xen.org;
+        s=20200302mail; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:
+        MIME-Version:Date:Message-ID:From:References:Cc:To:Subject;
+        bh=t6RLyrgrl+6icHjlUcT9RbYfFIeBzwHbjcRTiWQRm98=; b=43EaaP4+j2FIHADQ+iNmhrZtp0
+        GLLA9A9bhzBLCUTEmZpoYo6oq6x56VWfSamlcEe/O4+HBPeu8pCDytu4q9Bzkgv7ilF9il4FX1NOD
+        K7jLFGXa7skQOkAsb39MmrKdRzJI8/tOs0ZLz1rkmDtI72Y9XJ/WSlFNsht6iZoWXYVs=;
+Received: from xenbits.xenproject.org ([104.239.192.120])
+        by mail.xenproject.org with esmtp (Exim 4.92)
+        (envelope-from <julien@xen.org>)
+        id 1l8SbJ-0006wh-UU; Sat, 06 Feb 2021 18:46:33 +0000
+Received: from [54.239.6.185] (helo=a483e7b01a66.ant.amazon.com)
+        by xenbits.xenproject.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <julien@xen.org>)
+        id 1l8SbJ-0001KW-JY; Sat, 06 Feb 2021 18:46:33 +0000
+Subject: Re: [PATCH 0/7] xen/events: bug fixes and some diagnostic aids
+To:     Juergen Gross <jgross@suse.com>, xen-devel@lists.xenproject.org,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        netdev@vger.kernel.org, linux-scsi@vger.kernel.org
+Cc:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        stable@vger.kernel.org,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
+        Jens Axboe <axboe@kernel.dk>, Wei Liu <wei.liu@kernel.org>,
+        Paul Durrant <paul@xen.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>
+References: <20210206104932.29064-1-jgross@suse.com>
+From:   Julien Grall <julien@xen.org>
+Message-ID: <bd63694e-ac0c-7954-ec00-edad05f8da1c@xen.org>
+Date:   Sat, 6 Feb 2021 18:46:30 +0000
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.7.0
+MIME-Version: 1.0
+In-Reply-To: <20210206104932.29064-1-jgross@suse.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, 23 Jan 2021 12:42:10 +0000
-Christoph Hellwig <hch@infradead.org> wrote:
+Hi Juergen,
 
-> Looks good,
->
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
+On 06/02/2021 10:49, Juergen Gross wrote:
+> The first three patches are fixes for XSA-332. The avoid WARN splats
+> and a performance issue with interdomain events.
 
-Hi,
+Thanks for helping to figure out the problem. Unfortunately, I still see 
+reliably the WARN splat with the latest Linux master (1e0d27fce010) + 
+your first 3 patches.
 
-Ping on this patch. Thomas, do you want to pick it up?
+I am using Xen 4.11 (1c7d984645f9) and dom0 is forced to use the 2L 
+events ABI.
 
-- Lauri
+After some debugging, I think I have an idea what's went wrong. The 
+problem happens when the event is initially bound from vCPU0 to a 
+different vCPU.
+
+ From the comment in xen_rebind_evtchn_to_cpu(), we are masking the 
+event to prevent it being delivered on an unexpected vCPU. However, I 
+believe the following can happen:
+
+vCPU0				| vCPU1
+				|
+				| Call xen_rebind_evtchn_to_cpu()
+receive event X			|
+				| mask event X
+				| bind to vCPU1
+<vCPU descheduled>		| unmask event X
+				|
+				| receive event X
+				|
+				| handle_edge_irq(X)
+handle_edge_irq(X)		|  -> handle_irq_event()
+				|   -> set IRQD_IN_PROGRESS
+  -> set IRQS_PENDING		|
+				|   -> evtchn_interrupt()
+				|   -> clear IRQD_IN_PROGRESS
+				|  -> IRQS_PENDING is set
+				|  -> handle_irq_event()
+				|   -> evtchn_interrupt()
+				|     -> WARN()
+				|
+
+All the lateeoi handlers expect a ONESHOT semantic and 
+evtchn_interrupt() is doesn't tolerate any deviation.
+
+I think the problem was introduced by 7f874a0447a9 ("xen/events: fix 
+lateeoi irq acknowledgment") because the interrupt was disabled 
+previously. Therefore we wouldn't do another iteration in handle_edge_irq().
+
+Aside the handlers, I think it may impact the defer EOI mitigation 
+because in theory if a 3rd vCPU is joining the party (let say vCPU A 
+migrate the event from vCPU B to vCPU C). So info->{eoi_cpu, irq_epoch, 
+eoi_time} could possibly get mangled?
+
+For a fix, we may want to consider to hold evtchn_rwlock with the write 
+permission. Although, I am not 100% sure this is going to prevent 
+everything.
+
+Does my write-up make sense to you?
+
+Cheers,
+
+-- 
+Julien Grall
