@@ -2,107 +2,108 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-21.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A777DC4321A
-	for <linux-block@archiver.kernel.org>; Fri,  5 Feb 2021 22:19:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A0D6C433DB
+	for <linux-block@archiver.kernel.org>; Sat,  6 Feb 2021 02:36:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 90CF664FA0
-	for <linux-block@archiver.kernel.org>; Fri,  5 Feb 2021 22:19:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2377164DDB
+	for <linux-block@archiver.kernel.org>; Sat,  6 Feb 2021 02:36:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229981AbhBEWTL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 5 Feb 2021 17:19:11 -0500
-Received: from frasgout.his.huawei.com ([185.176.79.56]:2510 "EHLO
-        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232659AbhBEObN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Feb 2021 09:31:13 -0500
-Received: from fraeml715-chm.china.huawei.com (unknown [172.18.147.200])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4DXKtg4Bs6z67kVq;
-        Sat,  6 Feb 2021 00:02:19 +0800 (CST)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- fraeml715-chm.china.huawei.com (10.206.15.34) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2106.2; Fri, 5 Feb 2021 17:08:39 +0100
-Received: from [10.210.170.68] (10.210.170.68) by
- lhreml724-chm.china.huawei.com (10.201.108.75) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2106.2; Fri, 5 Feb 2021 16:08:38 +0000
-Subject: Re: use-after-free access in bt_iter()
-To:     <pragalla@codeaurora.org>
-CC:     Bart Van Assche <bvanassche@acm.org>, <axboe@kernel.dk>,
-        <evgreen@google.com>, <linux-block@vger.kernel.org>,
-        <stummala@codeaurora.org>, Ming Lei <ming.lei@redhat.com>
-References: <f98dd950466b0408d8589de053b02e05@codeaurora.org>
- <056783fa-a510-2463-f353-c64dd8f37be9@acm.org>
- <f1027dc3-d5a7-02c8-ef02-e34aeb12c0ac@huawei.com>
- <bbed52ea0c788b07ca68142bd86a07df@codeaurora.org>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <5ab6e628-6c93-618a-a10b-fe0df1ab4a40@huawei.com>
-Date:   Fri, 5 Feb 2021 16:07:08 +0000
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
+        id S230170AbhBFCfC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 5 Feb 2021 21:35:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37426 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230088AbhBFCcp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Feb 2021 21:32:45 -0500
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28691C033274;
+        Fri,  5 Feb 2021 17:25:47 -0800 (PST)
+Received: by mail-lf1-x130.google.com with SMTP id v24so12824349lfr.7;
+        Fri, 05 Feb 2021 17:25:47 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=OAQ3yX80CT+PWZsMkbbsby+9FcIwY7MvIPOlo3nK144=;
+        b=jXKpZcpWWst4BmGxxnTV2rntTCu+YReE3ptmp4wsVMDmPjq3mdmbIOqNiBfvP1F40t
+         6CO8122CaHFMkRgcFpTnC+0KR8rnA2pzthxZ6FbKXVxxwAue3EDxtt6pYcGoiNJnXt0z
+         Ajo5EvlZJb2gNk2pjDvbH93qMT4cFshCQlRTVOAKGflDBJfioBGGOzvgVYwuxyK9b5lH
+         a31SmEIawjDVSvRJkH7RnOKUlNfT+GN6y/YSpMvop4GGDIyL/ug1OA8Zx7K0wNeTWgiZ
+         3uBY+w5UZNko9rf4jiFzf5+NEnhpvjdqefgaCklHxTXU2mN2t7JvdQ3dSnb94uvtdg/b
+         OHjg==
+X-Gm-Message-State: AOAM533BBrprVhZWmcHg5m7jnQjZoZA4MVQszPFpp7O8aKKaAed3WXeF
+        T3jNZAd5mghNBBKip1+JqcMdKIWTelk=
+X-Google-Smtp-Source: ABdhPJwSrxaDHvFQ2KqpN0/Iz/1gmfklhTKJ65S7WGsWwCRT1efpQ4IcZxhDzsPPHBKdwAysHD51uw==
+X-Received: by 2002:a5d:4204:: with SMTP id n4mr7772326wrq.196.1612570429573;
+        Fri, 05 Feb 2021 16:13:49 -0800 (PST)
+Received: from msft-t490s.teknoraver.net (net-37-182-2-234.cust.vodafonedsl.it. [37.182.2.234])
+        by smtp.gmail.com with ESMTPSA id d3sm14566390wrp.79.2021.02.05.16.13.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Feb 2021 16:13:48 -0800 (PST)
+From:   Matteo Croce <mcroce@linux.microsoft.com>
+To:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org,
+        Lennart Poettering <lennart@poettering.net>,
+        Luca Boccassi <bluca@debian.org>, Jens Axboe <axboe@kernel.dk>,
+        Alexander Viro <viro@zeniv.linux.org.uk>
+Subject: [PATCH 5/5] loop: increment sequence number
+Date:   Sat,  6 Feb 2021 01:09:03 +0100
+Message-Id: <20210206000903.215028-6-mcroce@linux.microsoft.com>
+X-Mailer: git-send-email 2.29.2
+In-Reply-To: <20210206000903.215028-1-mcroce@linux.microsoft.com>
+References: <20210206000903.215028-1-mcroce@linux.microsoft.com>
 MIME-Version: 1.0
-In-Reply-To: <bbed52ea0c788b07ca68142bd86a07df@codeaurora.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.210.170.68]
-X-ClientProxiedBy: lhreml748-chm.china.huawei.com (10.201.108.198) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-- bouncing jianchao.w.wang@oracle.com
+From: Matteo Croce <mcroce@microsoft.com>
 
->>
->>> Some time ago you replied the following to an email from me with a
->>> suggestion for a fix: "Please let me consider it a bit more." Are you
->>> still working on a fix?
->>
->> Unfortunately I have not had a chance, sorry. But I can look again.
->>
->> So I have only seen KASAN use-after-free's myself, but never an actual
->> oops. IIRC, someone did report an oops.
->>
-> Hi John,
-> 
->> @Pradeep, do you have a reliable re-creator? I noticed the timeout
->> handler stackframe in your mail, so I guess not. However, as an
->> experiment, could you test:
->> https://lore.kernel.org/linux-block/1608203273-170555-2-git-send-email-john.garry@huawei.com/ 
->>
->>
-> Yes, i don't have a reliable re-creator. The oops was noticed as a part 
-> of stability testing and
-> was not an intentional try. This was noticed couple of times.
-> Please share the steps (if any) to easy hit or to exercise this path 
-> more frequently.
-> Meanwhile, i will go with the usual stability procedure. i will update 
-> the results here later.
-> 
+On a very loaded system, if there are many events queued up from multiple
+attach/detach cycles, it's impossible to match them up with the
+LOOP_CONFIGURE or LOOP_SET_FD call, since we don't know where the position
+of our own association in the queue is[1].
+Not even an empty uevent queue is a reliable indication that we already
+received the uevent we were waiting for, since with multi-partition block
+devices each partition's event is queued asynchronously and might be
+delivered later.
 
-Do you have a full kernel log for your crash?
+Increment the disk sequence number when setting or changing the backing
+file, so the userspace knows which backing file generated the event.
 
-So there are different flavors of this issue, and you reported a crash 
-from blk_mq_queue_tag_busy_iter().
+[1] https://github.com/systemd/systemd/issues/17469#issuecomment-762919781
 
-If you check:
-https://lore.kernel.org/linux-block/76190c94-c5c1-9553-5509-9969fc323544@huawei.com/
+Signed-off-by: Matteo Croce <mcroce@microsoft.com>
+---
+ drivers/block/loop.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-You can see how I artificially trigger an issue in 
-blk_mq_queue_tag_busy_iter().
-
->> This should fix the common issue. But no final solution to issues
->> discussed from patch 2/2, which is more exotic.
->>
->> BTW, is this the same Pradeep who reported:
->> https://lore.kernel.org/linux-block/1606402925-24420-1-git-send-email-ppvk@codeaurora.org/ 
->>
-
-Thanks,
-John
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index e5ff328f0917..c12b3faae3ab 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -734,6 +734,7 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
+ 		goto out_err;
+ 
+ 	/* and ... switch */
++	inc_diskseq(lo->lo_disk);
+ 	blk_mq_freeze_queue(lo->lo_queue);
+ 	mapping_set_gfp_mask(old_file->f_mapping, lo->old_gfp_mask);
+ 	lo->lo_backing_file = file;
+@@ -1122,6 +1123,8 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
+ 	if (error)
+ 		goto out_unlock;
+ 
++	inc_diskseq(lo->lo_disk);
++
+ 	if (!(file->f_mode & FMODE_WRITE) || !(mode & FMODE_WRITE) ||
+ 	    !file->f_op->write_iter)
+ 		lo->lo_flags |= LO_FLAGS_READ_ONLY;
+-- 
+2.29.2
 
