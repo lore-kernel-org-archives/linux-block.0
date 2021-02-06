@@ -2,118 +2,84 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07A5CC433E6
-	for <linux-block@archiver.kernel.org>; Sat,  6 Feb 2021 07:13:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3FF7C433DB
+	for <linux-block@archiver.kernel.org>; Sat,  6 Feb 2021 07:20:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C9D5D64FCC
-	for <linux-block@archiver.kernel.org>; Sat,  6 Feb 2021 07:13:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6F1DB64FD4
+	for <linux-block@archiver.kernel.org>; Sat,  6 Feb 2021 07:20:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229683AbhBFHNX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 6 Feb 2021 02:13:23 -0500
-Received: from m12-14.163.com ([220.181.12.14]:45331 "EHLO m12-14.163.com"
+        id S229539AbhBFHUv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 6 Feb 2021 02:20:51 -0500
+Received: from mx2.suse.de ([195.135.220.15]:47896 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229572AbhBFHNW (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 6 Feb 2021 02:13:22 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-        s=s110527; h=From:Subject:Date:Message-Id; bh=XTjul6edC9FmtB9jkA
-        AnYebdbC+m5/JicB+b/cgtNbU=; b=ZvyL5N+srJabKV3KJATl6BynrlSfxMUbQf
-        ZuqtO6OOO1NDsIjzdK8CaIBcNRP7lXFQjciNbdzNrDeoLc4xPz/agkK/HY4FNAyz
-        IdJf2gT+ZqofDY6Zr/c+NA0TDAFkVK/Bh8cSmdD/w1nXSLJDGQ3r+WLE1Anu+26G
-        PMKsPBODA=
-Received: from localhost.localdomain.localdomain (unknown [182.150.162.248])
-        by smtp10 (Coremail) with SMTP id DsCowACntpoKQR5g_q3Ajg--.62473S2;
-        Sat, 06 Feb 2021 15:11:07 +0800 (CST)
-From:   winndows@163.com
-To:     josef@toxicpanda.com, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
-        linux-kernel@vger.kernel.org, Liao Pingfang <winndows@163.com>
-Subject: [PATCH] nbd: Convert to DEFINE_SHOW_ATTRIBUTE
-Date:   Sat,  6 Feb 2021 15:10:55 +0800
-Message-Id: <1612595455-4050-1-git-send-email-winndows@163.com>
-X-Mailer: git-send-email 1.8.3.1
-X-CM-TRANSID: DsCowACntpoKQR5g_q3Ajg--.62473S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7AF13tw1DCr4kZr45KFW3ZFb_yoW8uFW7pF
-        s3Ca1DCFW0kw4UWrs5tFsxZa4S93Z7try0gry2v34SyryDurWSyFs5WFWftFyrKFWrJrsr
-        XFn8GFy8J3WUCrJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UO0eLUUUUU=
-X-Originating-IP: [182.150.162.248]
-X-CM-SenderInfo: hzlq0vxrzvqiywtou0bp/1tbi8QsxmV-PKDed+AAAs4
+        id S229492AbhBFHUv (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 6 Feb 2021 02:20:51 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id F1D29ACB0;
+        Sat,  6 Feb 2021 07:20:08 +0000 (UTC)
+From:   Coly Li <colyli@suse.de>
+To:     linux-bcache@vger.kernel.org
+Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
+Subject: [PATCH 0/6] bcache-tools: store meta data on NVDIMM 
+Date:   Sat,  6 Feb 2021 15:19:59 +0800
+Message-Id: <20210206072005.24811-1-colyli@suse.de>
+X-Mailer: git-send-email 2.26.2
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Liao Pingfang <winndows@163.com>
+This series is the first effort to support NVDIMM for bcache: store
+journal meta data on nvdimm namespace.
 
-Use DEFINE_SHOW_ATTRIBUTE macro to simplify the code.
+With this series, a NVDIMM namespace can be formatted as a bcache
+meta device with '-M' option. This meta device can be shared among
+multiple cache sets.
 
-Signed-off-by: Liao Pingfang <winndows@163.com>
+Except for adding BCH_FEATURE_INCOMPAT_NVDIMM_META to incompatible
+feature set, there is no on-disk layout change for supporting NVDIMM.
+
+A new super block format struct bch_nvm_pages_sb is introduced for
+the NVDIMM meta-data device, it might be changed time-to-time before
+the EXPERIMENTAL removed from Linux kernel code.
+
+This series is just enough to make things work, more changes will
+follow up to make more improvement later.
+
+Coly Li
 ---
- drivers/block/nbd.c | 28 ++++------------------------
- 1 file changed, 4 insertions(+), 24 deletions(-)
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index e6ea5d3..8b9622e 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -1529,17 +1529,7 @@ static int nbd_dbg_tasks_show(struct seq_file *s, void *unused)
- 	return 0;
- }
- 
--static int nbd_dbg_tasks_open(struct inode *inode, struct file *file)
--{
--	return single_open(file, nbd_dbg_tasks_show, inode->i_private);
--}
--
--static const struct file_operations nbd_dbg_tasks_ops = {
--	.open = nbd_dbg_tasks_open,
--	.read = seq_read,
--	.llseek = seq_lseek,
--	.release = single_release,
--};
-+DEFINE_SHOW_ATTRIBUTE(nbd_dbg_tasks);
- 
- static int nbd_dbg_flags_show(struct seq_file *s, void *unused)
- {
-@@ -1564,17 +1554,7 @@ static int nbd_dbg_flags_show(struct seq_file *s, void *unused)
- 	return 0;
- }
- 
--static int nbd_dbg_flags_open(struct inode *inode, struct file *file)
--{
--	return single_open(file, nbd_dbg_flags_show, inode->i_private);
--}
--
--static const struct file_operations nbd_dbg_flags_ops = {
--	.open = nbd_dbg_flags_open,
--	.read = seq_read,
--	.llseek = seq_lseek,
--	.release = single_release,
--};
-+DEFINE_SHOW_ATTRIBUTE(nbd_dbg_flags);
- 
- static int nbd_dev_dbg_init(struct nbd_device *nbd)
- {
-@@ -1592,11 +1572,11 @@ static int nbd_dev_dbg_init(struct nbd_device *nbd)
- 	}
- 	config->dbg_dir = dir;
- 
--	debugfs_create_file("tasks", 0444, dir, nbd, &nbd_dbg_tasks_ops);
-+	debugfs_create_file("tasks", 0444, dir, nbd, &nbd_dbg_tasks_fops);
- 	debugfs_create_u64("size_bytes", 0444, dir, &config->bytesize);
- 	debugfs_create_u32("timeout", 0444, dir, &nbd->tag_set.timeout);
- 	debugfs_create_u64("blocksize", 0444, dir, &config->blksize);
--	debugfs_create_file("flags", 0444, dir, nbd, &nbd_dbg_flags_ops);
-+	debugfs_create_file("flags", 0444, dir, nbd, &nbd_dbg_flags_fops);
- 
- 	return 0;
- }
+Coly Li (6):
+  bcache-tools: add initial data structures for nvm_pages
+  bcache-tools: reduce parameters of write_sb()
+  bcache-tools: add BCH_FEATURE_INCOMPAT_NVDIMM_META to incompatible
+    feature set
+  bcache-tools: move super block info display routines into show.c
+  bcache-tools: write nvm namespace super block on nvdimm
+  bcache-tools: support "bcache show -d" for nvdimm-meta device
+
+ Makefile            |   2 +-
+ bcache-super-show.c |  24 ----
+ bcache.c            | 289 +--------------------------------------
+ bcache.h            |   7 +-
+ features.c          |   2 +
+ lib.c               | 158 +++++++++++++++++++---
+ lib.h               |  28 +++-
+ make.c              | 244 +++++++++++++++++++++++++++++----
+ nvm_pages.h         | 187 ++++++++++++++++++++++++++
+ show.c              | 321 ++++++++++++++++++++++++++++++++++++++++++++
+ show.h              |  10 ++
+ 11 files changed, 917 insertions(+), 355 deletions(-)
+ create mode 100644 nvm_pages.h
+ create mode 100644 show.c
+ create mode 100644 show.h
+
 -- 
-1.8.3.1
-
+2.26.2
 
