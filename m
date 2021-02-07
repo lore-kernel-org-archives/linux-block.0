@@ -2,82 +2,103 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.4 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FF97C433E0
-	for <linux-block@archiver.kernel.org>; Sun,  7 Feb 2021 02:24:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37BD6C433E0
+	for <linux-block@archiver.kernel.org>; Sun,  7 Feb 2021 04:51:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 697E164E87
-	for <linux-block@archiver.kernel.org>; Sun,  7 Feb 2021 02:24:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F309D64E92
+	for <linux-block@archiver.kernel.org>; Sun,  7 Feb 2021 04:51:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229537AbhBGCYk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 6 Feb 2021 21:24:40 -0500
-Received: from mail-pg1-f169.google.com ([209.85.215.169]:41687 "EHLO
-        mail-pg1-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229522AbhBGCYj (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 6 Feb 2021 21:24:39 -0500
-Received: by mail-pg1-f169.google.com with SMTP id t11so4288420pgu.8;
-        Sat, 06 Feb 2021 18:24:24 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=DV9HHj90/6CU2obG3fOkTfyceXYyBSjTuvrMdoSYT4c=;
-        b=iFvJ7bz/qRVsOZ33D9VbVw483HO+57AL+eyl8ykEpYGpwR3MxD3TsC+PesBsv4n5cx
-         TQBHuoUcB6tB4ZRvRcKun4ooCgBqayzsbFBPk/z/R+fdHyS9rOdCkLdxBawWn7HHs/QY
-         O+StKcOyl39yofzsgbfUsEhicUec7LunrHkLfQA9qjxGEvqfG4Ah9IPXqwuyIKOxqhCx
-         aBrbOmG0UN8sk+AIHK5plE2F+3gAJp8dfP7QJjdb5lBW9ulRZxR9qz1rrsN2Qm4XAV/t
-         bPyxRfIgmNUT5BQQ1QxsizesmjPz9nWYDCE2LaS/Kfa2RXFBPsBPN670yN/zDWIMspzT
-         OCHQ==
-X-Gm-Message-State: AOAM530RHMtFvMhJlFWhAldCIqLRjDLe+eE2Kn6wjTr4Lpo2/+cdzGFQ
-        bTmBeHll9xK/jCcReAyVLrVaHPBlyrc=
-X-Google-Smtp-Source: ABdhPJwtnw8SZQ2wx4sc+xxcjWnCOja9n0ib3wtDBNghEuUST9w/8PrNn78lYbXSNr7Is/+5IHj/4Q==
-X-Received: by 2002:a62:ab16:0:b029:1bd:9bdc:2459 with SMTP id p22-20020a62ab160000b02901bd9bdc2459mr11980992pff.19.1612664638483;
-        Sat, 06 Feb 2021 18:23:58 -0800 (PST)
-Received: from ?IPv6:2601:647:4000:d7:7d2:d17b:df07:7747? ([2601:647:4000:d7:7d2:d17b:df07:7747])
-        by smtp.gmail.com with ESMTPSA id c15sm7748482pjc.9.2021.02.06.18.23.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 06 Feb 2021 18:23:57 -0800 (PST)
-Subject: Re: [RFC PATCH v1 1/2] block: bsg: resume scsi device before
- accessing
-To:     Asutosh Das <asutoshd@codeaurora.org>, cang@codeaurora.org,
-        martin.petersen@oracle.com, linux-scsi@vger.kernel.org
-Cc:     linux-arm-msm@vger.kernel.org, stern@rowland.harvard.edu,
-        "Bao D . Nguyen" <nguyenb@codeaurora.org>,
-        FUJITA Tomonori <fujita.tomonori@lab.ntt.co.jp>,
-        Jens Axboe <axboe@kernel.dk>,
-        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>
-References: <cover.1611719814.git.asutoshd@codeaurora.org>
- <c04a11a590628c2497cef113b0dfea781de90416.1611719814.git.asutoshd@codeaurora.org>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <f83e890d-61b9-e428-6289-b7268fbe7e01@acm.org>
-Date:   Sat, 6 Feb 2021 18:23:55 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        id S229581AbhBGEvl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 6 Feb 2021 23:51:41 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39751 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229636AbhBGEvk (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 6 Feb 2021 23:51:40 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1612673414;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ErY66w4dhgf5LV2CZcSNdVtB+mUOpkXGVfPnBx1/S5o=;
+        b=RzerSZmyFRgzXn6H2ezuWzN6Gj8Qpf2or8MpOpwRDsIQlz+yB53Hn1L+OFEOmLjOi0bvwo
+        tMew8JnOtBFKgnE349v8LbPuF5IDyGitVKAqPscnTbJxfI0TZfaC2Ql2ks4pVdSJWcSUPt
+        1JNB+i4shOlJzOcNhi94r6KTK97x6tk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-543-iLvtF_prOHuUHLPmKpmrdQ-1; Sat, 06 Feb 2021 23:50:12 -0500
+X-MC-Unique: iLvtF_prOHuUHLPmKpmrdQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C9A4B107ACE6;
+        Sun,  7 Feb 2021 04:50:10 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-12-23.pek2.redhat.com [10.72.12.23])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 457731C923;
+        Sun,  7 Feb 2021 04:50:03 +0000 (UTC)
+Subject: Re: kernel null pointer at nvme_tcp_init_iter[nvme_tcp] with blktests
+ nvme-tcp/012
+From:   Yi Zhang <yi.zhang@redhat.com>
+To:     linux-nvme@lists.infradead.org,
+        linux-block <linux-block@vger.kernel.org>
+Cc:     axboe@kernel.dk, Rachel Sibley <rasibley@redhat.com>,
+        CKI Project <cki-project@redhat.com>,
+        Sagi Grimberg <sagi@grimberg.me>
+References: <cki.F3E139361A.EN5MUSJKK9@redhat.com>
+ <630237787.11660686.1612580898410.JavaMail.zimbra@redhat.com>
+Message-ID: <80b7184e-cdfb-cebc-fe07-a228ce57a9e7@redhat.com>
+Date:   Sun, 7 Feb 2021 12:50:01 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <c04a11a590628c2497cef113b0dfea781de90416.1611719814.git.asutoshd@codeaurora.org>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <630237787.11660686.1612580898410.JavaMail.zimbra@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/26/21 8:00 PM, Asutosh Das wrote:
-> Resumes the scsi device before accessing it.
-> 
-> Change-Id: I2929af60f2a92c89704a582fcdb285d35b429fde
-> Signed-off-by: Asutosh Das <asutoshd@codeaurora.org>
-> Signed-off-by: Can Guo <cang@codeaurora.org>
-> Signed-off-by: Bao D. Nguyen <nguyenb@codeaurora.org>
 
-No Change-Id tags in upstream patches please.
+The issue was introduced after merge the NVMe updates
 
-Thanks,
+commit 0fd6456fd1f4c8f3ec5a2df6ed7f34458a180409 (HEAD)
+Merge: 44d10e4b2f2c 0d7389718c32
+Author: Jens Axboe <axboe@kernel.dk>
+Date:   Tue Feb 2 07:12:06 2021 -0700
 
-Bart.
+     Merge branch 'for-5.12/drivers' into for-next
+
+     * for-5.12/drivers: (22 commits)
+       nvme-tcp: use cancel tagset helper for tear down
+       nvme-rdma: use cancel tagset helper for tear down
+       nvme-tcp: add clean action for failed reconnection
+       nvme-rdma: add clean action for failed reconnection
+       nvme-core: add cancel tagset helpers
+       nvme-core: get rid of the extra space
+       nvme: add tracing of zns commands
+       nvme: parse format nvm command details when tracing
+       nvme: update enumerations for status codes
+       nvmet: add lba to sect conversion helpers
+       nvmet: remove extra variable in identify ns
+       nvmet: remove extra variable in id-desclist
+       nvmet: remove extra variable in smart log nsid
+       nvme: refactor ns->ctrl by request
+       nvme-tcp: pass multipage bvec to request iov_iter
+       nvme-tcp: get rid of unused helper function
+       nvme-tcp: fix wrong setting of request iov_iter
+       nvme: support command retry delay for admin command
+       nvme: constify static attribute_group structs
+       nvmet-fc: use RCU proctection for assoc_list
+
+
+On 2/6/21 11:08 AM, Yi Zhang wrote:
+> blktests nvme-tcp/012
+
