@@ -2,161 +2,226 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,PDS_BAD_THREAD_QP_64,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30687C433DB
-	for <linux-block@archiver.kernel.org>; Mon,  8 Feb 2021 06:40:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69617C433DB
+	for <linux-block@archiver.kernel.org>; Mon,  8 Feb 2021 06:50:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E245664DF2
-	for <linux-block@archiver.kernel.org>; Mon,  8 Feb 2021 06:40:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1E6DD64E6E
+	for <linux-block@archiver.kernel.org>; Mon,  8 Feb 2021 06:50:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229707AbhBHGkj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 8 Feb 2021 01:40:39 -0500
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:1805 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229565AbhBHGkh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Feb 2021 01:40:37 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1612766436; x=1644302436;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=KH/MP3wrpK5GNFynkfDCNRcKwL44QQw9Zv4abn+kefM=;
-  b=OC/rMTawmy39xAlNdwZeGT9u2ulpCsGcIi+9aXf8EphfSz6Ftajhiund
-   iKJaQRruPh/vaVKOckcv6uDh0AWy2scN1VQdd/OXFk1b6lbm1nqz6BkaF
-   WV7ekq0CDcH+X9N3MwiJuqb7ixEY+EucY3fQLqIqtMZkkxudA/uKdxKba
-   NBzAOoXzZwfa0833LdJy4SpnaHfeXNI2v+ubJycBrD5mtimCFv+9V+krV
-   cgNTaPnxtkKuw09C59+dBnUyf3sxVsydglNjFST3bzZo6FyP//HSsPyLE
-   s/MV4mqgUS7GC4jm1zqPZk7jDjYOrVD6B6J+3GuP2A1e/ON9QR0C/5rs/
-   g==;
-IronPort-SDR: i52aTEkoBzdR3Y56bUgJhdl/GwEovcnTsFMS8N+alsU9HM8urZd1M/yuc+d1Lvbe1srtKreWM4
- FNPHFqrIpa09ULbreHT0zkHwqIxXpirL9i4svaPrV4iWxgaoz2dVKfvBcloS4En8FWBzaTyS75
- vAoxVxwzF1JyA4Mze9ZTRYFmX1MpvnM7kAyCXyOeJFvGEgDkT1S4KFUuFiTySQ0uRPmaPld8qh
- WllZzGL9CcjbWsBej1pSL7hL769+OMH3YStxzqUKZNEJ/hkRVL+0FQFq7FNMybCjh5BW6OzAep
- 8YU=
-X-IronPort-AV: E=Sophos;i="5.81,161,1610380800"; 
-   d="scan'208";a="269886112"
-Received: from mail-co1nam04lp2052.outbound.protection.outlook.com (HELO NAM04-CO1-obe.outbound.protection.outlook.com) ([104.47.45.52])
-  by ob1.hgst.iphmx.com with ESMTP; 08 Feb 2021 14:39:30 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=H35c7FdpHP9i2eGyEUeONhyFkafK9E1WHe3YD3bZoKdTFY57X1TnxmJUKvQeYiXbcgIRWWYhLmICQ3Ixlv3LIhsTlgld1oqVMc0pj/e2rgVxjmpvl8PojVJMnZdUK8V1nuQ0eGPtSv5GSwVdSVT2UXnpFX38rs+sWVdgjE6ONanhX/K38v/m7r3Ny3PjOBw2M3SIpuH1rLmwS5WIslLa4ZMgMbQxkzujpNLS6iHJJCAbjALeVtebV81BR4QsGSZdhG0Xj6fnbCch6PN1b4fQNMqrL1GdB0rbVZ0/rIgxgjJQpQN5ZflaBaoPvaE3bo0P2PLe3BN+wT19EiTIVg6s0A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KH/MP3wrpK5GNFynkfDCNRcKwL44QQw9Zv4abn+kefM=;
- b=RUlFcKx3dpH7fnGHLwquTisrIz9UkEc761rwaKGE9kpMWRvNXq3RWNu2I/Pw1AxGMKQG2rBfsnJ8OfTQ4AQ3jdCLVOydsGaTKnSE3WzNCUC4LXdzWAN6BjpNK6YS8L4T4tlVJng8+FIoWSvRsdlVAdvESkQl844++axUKA8NYpXpYgnN+m2aQebxAZi4Gk+QlHikSZoaDQMuMC/nUiC1FtpS0E4Zfgvyx7VyhsrKRyLfDVzRolg+qKyjkJkQZrEQVA/8S6q/Fk8xeDWhgyTWruHUaZYXdGHhngsTukeXlYMARmJp1lYZqEoC1VTwCVVIlG2ZCFEvdKXX+D5P/Tbk8w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KH/MP3wrpK5GNFynkfDCNRcKwL44QQw9Zv4abn+kefM=;
- b=Y5GdsKobx9is2d2g3YjuwEjH6wbiZ/Wuu5n4PnmDKHqPCy8PWk7OZ4un0qUTYRP21alO1p/zs357s2Cx5GxC4aKibZjwwh66W4F1Z4dYbkBBuovMIF4KUTlw0KA3nC+Hw2aTlpCOgd4finYWmfaGezuEeTU6rL3w9Zr+EcJSlYQ=
-Received: from BYAPR04MB4965.namprd04.prod.outlook.com (52.135.233.89) by
- SJ0PR04MB7261.namprd04.prod.outlook.com (20.182.1.7) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3825.29; Mon, 8 Feb 2021 06:39:29 +0000
-Received: from BYAPR04MB4965.namprd04.prod.outlook.com
- ([fe80::1d83:38d9:143:4c9c]) by BYAPR04MB4965.namprd04.prod.outlook.com
- ([fe80::1d83:38d9:143:4c9c%5]) with mapi id 15.20.3825.027; Mon, 8 Feb 2021
- 06:39:29 +0000
-From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-To:     "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-CC:     Lauri Kasanen <cand@gmx.com>,
-        "hch@infradead.org" <hch@infradead.org>,
-        "tsbogend@alpha.franken.de" <tsbogend@alpha.franken.de>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH v11] block: Add n64 cart driver
-Thread-Topic: [PATCH v11] block: Add n64 cart driver
-Thread-Index: AQHW8V0RPSwnc2UUP06/pmxPHYESZg==
-Date:   Mon, 8 Feb 2021 06:39:29 +0000
-Message-ID: <BYAPR04MB49656CEB3D04F94633D255B8868F9@BYAPR04MB4965.namprd04.prod.outlook.com>
-References: <20210123095327.58e5ab6c05f38e9080a79bd3@gmx.com>
- <20210123124210.GB458363@infradead.org>
- <20210206192837.5ecec54cc5ac120ade1d5060@gmx.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [199.255.45.62]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 92ea7dc6-6c63-4430-8c12-08d8cbfc4931
-x-ms-traffictypediagnostic: SJ0PR04MB7261:
-x-ld-processed: b61c8803-16f3-4c35-9b17-6f65f441df86,ExtAddr
-x-microsoft-antispam-prvs: <SJ0PR04MB7261E9B3E2C31C45C31392FD868F9@SJ0PR04MB7261.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:6108;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 95NacspXaTY3JHKybjgXebxFkNAg+zhY+EmjcCbErC6tD13m6YfniQO6l+jntxbGxFRjD+7JIzuX8B6Ew49FyyDwOqafLAOWAW4KKXxOkZcLQndtW295ia0khxn00cU2F2YaA4P1bptHTz1dXEZcaQKgrd032IWuW0zI+hi76jThoVGqIuAMDkOhZ4i+dMwZz5UCXOmxJSOyNPDqjBYn57ZWhm8JJeNi1QMMuKHl2FKxrKum8i5OUVrf25WqoWeaZBgbuH5NGMz7hdmjGir7xt4JMf6v2RpKy0lq0SWWWaOfBE/2MtZjPEoZ6+tXBeH+6MSNwsu3eOo+uObqgHH/rp4Aq8D9rmyyKDDx5t0yvCGiHi8dcqF659gfMD7RqD8wfRkPgbMDdiY655vDAlWgE3pJJckpiyLZybrz05zFO3PMdjCZWdLxUPd5RpxdBHkiTF1JHS43LnzQo5T14lxJRlNeoabzH+2bOiUsbvJS99QjMWrEeMvnLHEvMxFPoTdXQgnmQrbTXFw8iQNnCxrvkdAvM3bi1Uqq6+cvcW3xDno+IM/4ftxhpzJu7hXMsQ5+WIgxVnpzASizLpZX1RQMcWFO48CJgoLa2W3yPTvTLOY=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR04MB4965.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(39860400002)(366004)(396003)(346002)(136003)(7696005)(6506007)(26005)(186003)(86362001)(2906002)(4326008)(52536014)(76116006)(478600001)(66556008)(66446008)(4744005)(110136005)(316002)(9686003)(71200400001)(54906003)(8676002)(66946007)(66476007)(966005)(55016002)(53546011)(33656002)(64756008)(5660300002)(8936002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: =?us-ascii?Q?POtcpudGtV6ueF971boyQ3mJUIhKPewgRdwLVLmBK50yHoqHEsteOIo5e7lq?=
- =?us-ascii?Q?1q9POz2oiE2AucHJ4eAqfLPqT9b6VIb9lqe4ZNzZilsHZ/jEjh4xo0SAhOYG?=
- =?us-ascii?Q?+EEijp77eDlUX80wNRZCYZ+TojDgJtlSt82s785ZAzA73Eqrm60Tetdk4Au/?=
- =?us-ascii?Q?vHn9+1fTfPxz/drNNr18f/KFg2wJr0wV6Yl3oR/X/sDaB7UzqeFth6u8uUzC?=
- =?us-ascii?Q?7MdQF7diZNiBcN6Gv3PW1BqacuAkWlJZtTmn333N5PI8T+hCAPIJJsJ6h1Gt?=
- =?us-ascii?Q?JYUJCBdkq3cDe+XqGa6429yn++NWHf8M3IJ3e+EvcijIct+hCKI0KCZQrRCp?=
- =?us-ascii?Q?6o1sVCIWEJvI5m4l1gKh4qvkAKk8i1AbkOLNCVCATXJ88Qg935Llqh9QVVZE?=
- =?us-ascii?Q?GbtepEf+cy+nIpVrEI9rgzy+HYuz2LK7EC/6K69VHAcR64ghcIhpRBEGfCxW?=
- =?us-ascii?Q?RTdEnsp3uNnIm5guPzdZjeOsaj/KymJmwlftDLFq40AyiWNp+HQdw4sx+qP7?=
- =?us-ascii?Q?6XJE3qdlL6sO/2wl+5Ykh3FXdY2XaNBslwKJX6ezm4fIFhYfgVQwhOkIGgRD?=
- =?us-ascii?Q?cbndmYpx3C+Lv9PmtT7fbZqIvxwrA958sK89Pk0jEI91M7qrk1qb8uT5LHZi?=
- =?us-ascii?Q?S7vGypgmeAq/k7340EVGhwENSWgcdQBVFUEp96RS0T1kP3x67Z9piu5RHaE0?=
- =?us-ascii?Q?bsdbcjIGAQ+PjZDjPZyfmvorGSgTYlPRxapG0ug541yTx6Ykzq5jTWd4ZzoX?=
- =?us-ascii?Q?bT5uHMfoNgMazpEFq0z7cW1h5fxm690YtQEGGTx252+rh36hAUS/yQBvUisA?=
- =?us-ascii?Q?yMtzC6INUiam0FEzJ2Un/YXw+LPJ0Bs2qJs62Dagq+VAktSXjHddEOHXES+O?=
- =?us-ascii?Q?vqHWupPfSZ9n56LyJRRWRPlxtYdcUxshhZFzMy05f2VWTBqcZYuyYJYyLiz+?=
- =?us-ascii?Q?nL+JxZS3cmEZgenmT9++YU8ixZD+2cAeJGrvI4ciL84r+ft3tM3hpH3Nc8Oz?=
- =?us-ascii?Q?RPJWo6uJGeFH6wyP7Ux1IIJ/0UemnXSpkRveb1J50a6aEzUobO2h6nbDlAlg?=
- =?us-ascii?Q?rUhyuwv6/BHWRUbW2/itU36/Tr8RVRpQDZ9cMMEBe9IvzBE47fr/1xqxspMU?=
- =?us-ascii?Q?ikUKXMlFt2flS4NLdWkWh1Tog+VvfxPOox6iKZN6M5/zNiXzkDrsDEnoZwNd?=
- =?us-ascii?Q?Fo5lFD8ikYl+ianr+BatIczDxdC0n483l4G6XuvU24mzYKrAzz9UqQ8DWTzB?=
- =?us-ascii?Q?Dcklm4TraGLSclIXpIu6RMIBBAklmj3kbuoMPaA2yF465uux7KVgJdtj7LAs?=
- =?us-ascii?Q?QhuIg4EUs8yoIK+hsMxvv9zq?=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S229770AbhBHGtw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 8 Feb 2021 01:49:52 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39009 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229729AbhBHGtv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 8 Feb 2021 01:49:51 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1612766904;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=f5CaU1MyH5H8Hj9CUshwG5TX0YIuttmYfvo+2Lb4+Fo=;
+        b=hmZKOY6lFtQ7OFztrCsJiWS0CG55tlaiXTZOCvvID59oyeOXGwgP32DSE1OUTihpxpLrbL
+        s6tLYHa+1Ru4JeN3ipqcq1xD9a+A2vnT4A12q2hLWu9R+VYvHuvdIXaSps4+GaILck11dU
+        RolkVLmv07td9pVSyN3at6ulQG7/Njc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-233-RXMfEEjLNq-28-idzwEEEw-1; Mon, 08 Feb 2021 01:48:21 -0500
+X-MC-Unique: RXMfEEjLNq-28-idzwEEEw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 71B1C803648;
+        Mon,  8 Feb 2021 06:48:19 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.71.19.178])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id F2BC7722F9;
+        Mon,  8 Feb 2021 06:48:13 +0000 (UTC)
+Subject: Re: kernel null pointer at nvme_tcp_init_iter[nvme_tcp] with blktests
+ nvme-tcp/012
+To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        linux-block <linux-block@vger.kernel.org>
+Cc:     "axboe@kernel.dk" <axboe@kernel.dk>,
+        Rachel Sibley <rasibley@redhat.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        CKI Project <cki-project@redhat.com>
+References: <cki.F3E139361A.EN5MUSJKK9@redhat.com>
+ <630237787.11660686.1612580898410.JavaMail.zimbra@redhat.com>
+ <80b7184e-cdfb-cebc-fe07-a228ce57a9e7@redhat.com>
+ <BYAPR04MB49654E940FACB778A787B68E86B09@BYAPR04MB4965.namprd04.prod.outlook.com>
+From:   Yi Zhang <yi.zhang@redhat.com>
+Message-ID: <79af2e42-f1f1-bb51-2e6c-b0d8a7294bcc@redhat.com>
+Date:   Mon, 8 Feb 2021 14:48:11 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR04MB4965.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 92ea7dc6-6c63-4430-8c12-08d8cbfc4931
-X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Feb 2021 06:39:29.2276
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Qba/CrkIDr1MRMdAdkSDBZULlOkGbU5hnDfM1PCf431C9zS2kLuQbi8KA7J7a8fGfTjZQlJegRnsdjWpeUjIel9wEPtSfFP5gnBK3b84K/0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR04MB7261
+In-Reply-To: <BYAPR04MB49654E940FACB778A787B68E86B09@BYAPR04MB4965.namprd04.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/6/21 09:31, Lauri Kasanen wrote:=0A=
-> On Sat, 23 Jan 2021 12:42:10 +0000=0A=
-> Christoph Hellwig <hch@infradead.org> wrote:=0A=
->=0A=
->> Looks good,=0A=
->>=0A=
->> Reviewed-by: Christoph Hellwig <hch@lst.de>=0A=
-> Hi,=0A=
->=0A=
-> Ping on this patch. Thomas, do you want to pick it up?=0A=
->=0A=
-> - Lauri=0A=
->=0A=
-=0A=
-Whoever is going to apply this patch please apply following series on the=
-=0A=
-top of this one :-=0A=
-=0A=
-https://www.spinics.net/lists/linux-mips/msg03296.html=0A=
+
+
+On 2/7/21 1:25 PM, Chaitanya Kulkarni wrote:
+> Yi,
+>
+> On 2/6/21 20:51, Yi Zhang wrote:
+>> The issue was introduced after merge the NVMe updates
+>>
+>> commit 0fd6456fd1f4c8f3ec5a2df6ed7f34458a180409 (HEAD)
+>> Merge: 44d10e4b2f2c 0d7389718c32
+>> Author: Jens Axboe <axboe@kernel.dk>
+>> Date:   Tue Feb 2 07:12:06 2021 -0700
+>>
+>>       Merge branch 'for-5.12/drivers' into for-next
+>>
+>>       * for-5.12/drivers: (22 commits)
+>>         nvme-tcp: use cancel tagset helper for tear down
+>>         nvme-rdma: use cancel tagset helper for tear down
+>>         nvme-tcp: add clean action for failed reconnection
+>>         nvme-rdma: add clean action for failed reconnection
+>>         nvme-core: add cancel tagset helpers
+>>         nvme-core: get rid of the extra space
+>>         nvme: add tracing of zns commands
+>>         nvme: parse format nvm command details when tracing
+>>         nvme: update enumerations for status codes
+>>         nvmet: add lba to sect conversion helpers
+>>         nvmet: remove extra variable in identify ns
+>>         nvmet: remove extra variable in id-desclist
+>>         nvmet: remove extra variable in smart log nsid
+>>         nvme: refactor ns->ctrl by request
+>>         nvme-tcp: pass multipage bvec to request iov_iter
+>>         nvme-tcp: get rid of unused helper function
+>>         nvme-tcp: fix wrong setting of request iov_iter
+>>         nvme: support command retry delay for admin command
+>>         nvme: constify static attribute_group structs
+>>         nvmet-fc: use RCU proctection for assoc_list
+>>
+>>
+>> On 2/6/21 11:08 AM, Yi Zhang wrote:
+>>> blktests nvme-tcp/012
+> Thanks for reporting, you can further bisect this using following
+> NVMe tree if is from NVMEe tree :- http://git.infradead.org/nvme.git
+> Branch :- 5.12
+I've tried that branch, but encountered another NULL pointer.
+
+[  224.290720] run blktests nvme/012 at 2021-02-08 01:46:25
+[  224.515479] BUG: kernel NULL pointer dereference, address: 
+0000000000000368
+[  224.522442] #PF: supervisor read access in kernel mode
+[  224.527590] #PF: error_code(0x0000) - not-present page
+[  224.532737] PGD 0 P4D 0
+[  224.535276] Oops: 0000 [#1] SMP PTI
+[  224.538770] CPU: 0 PID: 2403 Comm: multipath Tainted: G S I       
+5.11.0-rc5+ #1
+[  224.546776] Hardware name: Dell Inc. PowerEdge R640/08HT8T, BIOS 
+2.10.0 11/12/2020
+[  224.554340] RIP: 0010:bio_associate_blkg_from_css+0xbd/0x2c0
+[  224.560009] Code: 03 75 79 65 48 ff 00 e8 b1 94 cc ff e8 ac 94 cc ff 
+49 89 5c 24 48 48 83 c4 10 5b 5d 41 5c 41 5d 41 5e 41 5f c3 49 8b 44 24 
+08 <48> 8b 808
+[  224.578761] RSP: 0018:ffffad748ec5bd78 EFLAGS: 00010246
+[  224.583988] RAX: 0000000000000000 RBX: ffffa0e96452b3c0 RCX: 
+0000000000000000
+[  224.591120] RDX: ffffa11077088000 RSI: ffffffffa06edb20 RDI: 
+ffffa0e96452b3c0
+[  224.598253] RBP: 0000000000000000 R08: 0000000000000000 R09: 
+0000000000000002
+[  224.605385] R10: 0000000000000022 R11: 0000000000000c10 R12: 
+ffffa0e96452b3c0
+[  224.612516] R13: ffffffffa06edb20 R14: 0000000000001000 R15: 
+0000000000000000
+[  224.619649] FS:  00007fb6647feb00(0000) GS:ffffa107f0000000(0000) 
+knlGS:0000000000000000
+[  224.627734] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  224.633479] CR2: 0000000000000368 CR3: 0000002884b54002 CR4: 
+00000000007706f0
+[  224.640611] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 
+0000000000000000
+[  224.647751] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 
+0000000000000400
+[  224.654884] PKRU: 55555554
+[  224.657595] Call Trace:
+[  224.660043]  bio_associate_blkg+0x20/0x70
+[  224.664055]  nvme_submit_user_cmd+0xd7/0x340 [nvme_core]
+[  224.669375]  nvme_user_cmd.isra.82+0x120/0x190 [nvme_core]
+[  224.674859]  nvme_dev_ioctl+0x13b/0x150 [nvme_core]
+[  224.679738]  __x64_sys_ioctl+0x84/0xc0
+[  224.683500]  do_syscall_64+0x33/0x40
+[  224.687088]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+[  224.692149] RIP: 0033:0x7fb66338161b
+[  224.695726] Code: 0f 1e fa 48 8b 05 6d b8 2c 00 64 c7 00 26 00 00 00 
+48 c7 c0 ff ff ff ff c3 66 0f 1f 44 00 00 f3 0f 1e fa b8 10 00 00 00 0f 
+05 <48> 3d 018
+[  224.714469] RSP: 002b:00007ffeae59aba8 EFLAGS: 00000246 ORIG_RAX: 
+0000000000000010
+[  224.722036] RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 
+00007fb66338161b
+[  224.729168] RDX: 00007ffeae59abb0 RSI: 00000000c0484e41 RDI: 
+0000000000000003
+[  224.736300] RBP: 00007ffeae59ac10 R08: 0000559af0bb3d20 R09: 
+00007fb66340e580
+[  224.743431] R10: 0000000000000000 R11: 0000000000000246 R12: 
+00007ffeae59bcb0
+[  224.750563] R13: 0000559af0bb3d20 R14: 0000000000000003 R15: 
+0000000000000000
+[  224.757697] Modules linked in: loop nvme_tcp nvme_fabrics nvme_core 
+nvmet_tcp nvmet rfkill sunrpc dm_multipath intel_rapl_msr 
+intel_rapl_common isst_if_cod
+[  224.833264] CR2: 0000000000000368
+[  224.836604] ---[ end trace fa77e7cc26f8cfc1 ]---
+[  224.883915] RIP: 0010:bio_associate_blkg_from_css+0xbd/0x2c0
+[  224.889584] Code: 03 75 79 65 48 ff 00 e8 b1 94 cc ff e8 ac 94 cc ff 
+49 89 5c 24 48 48 83 c4 10 5b 5d 41 5c 41 5d 41 5e 41 5f c3 49 8b 44 24 
+08 <48> 8b 808
+[  224.908329] RSP: 0018:ffffad748ec5bd78 EFLAGS: 00010246
+[  224.913554] RAX: 0000000000000000 RBX: ffffa0e96452b3c0 RCX: 
+0000000000000000
+[  224.920686] RDX: ffffa11077088000 RSI: ffffffffa06edb20 RDI: 
+ffffa0e96452b3c0
+[  224.927818] RBP: 0000000000000000 R08: 0000000000000000 R09: 
+0000000000000002
+[  224.934948] R10: 0000000000000022 R11: 0000000000000c10 R12: 
+ffffa0e96452b3c0
+[  224.942082] R13: ffffffffa06edb20 R14: 0000000000001000 R15: 
+0000000000000000
+[  224.949213] FS:  00007fb6647feb00(0000) GS:ffffa107f0000000(0000) 
+knlGS:0000000000000000
+[  224.957301] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  224.963044] CR2: 0000000000000368 CR3: 0000002884b54002 CR4: 
+00000000007706f0
+[  224.970177] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 
+0000000000000000
+[  224.977309] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 
+0000000000000400
+[  224.984441] PKRU: 55555554
+[  224.987155] Kernel panic - not syncing: Fatal exception
+[  225.425279] Kernel Offset: 0x1d400000 from 0xffffffff81000000 
+(relocation range: 0xffffffff80000000-0xffffffffbfffffff)
+[  225.478268] ---[ end Kernel panic - not syncing: Fatal exception ]---
+
+> Looking at the commit log it seems like nvme-tcp commits might be
+> the issue given that you got the problem in nvme_tcp_init_iter()
+> and just eliminating by the looking at the code
+> commit 9f99a29e5307 can lead to this behavior.
+>
+> *I may be completely wrong as I'm not expert in the nvme-tcp host.*
+>
+>
+>
+> _______________________________________________
+> Linux-nvme mailing list
+> Linux-nvme@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-nvme
+>
+
