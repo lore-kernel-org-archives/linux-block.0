@@ -5,43 +5,43 @@ X-Spam-Level:
 X-Spam-Status: No, score=-19.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D59D5C433E0
-	for <linux-block@archiver.kernel.org>; Mon,  8 Feb 2021 18:05:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C557C433DB
+	for <linux-block@archiver.kernel.org>; Mon,  8 Feb 2021 18:09:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 95A4864DE1
-	for <linux-block@archiver.kernel.org>; Mon,  8 Feb 2021 18:05:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 418B464DE1
+	for <linux-block@archiver.kernel.org>; Mon,  8 Feb 2021 18:09:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235276AbhBHSEY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 8 Feb 2021 13:04:24 -0500
-Received: from mail.kernel.org ([198.145.29.99]:47686 "EHLO mail.kernel.org"
+        id S235066AbhBHSJN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 8 Feb 2021 13:09:13 -0500
+Received: from mail.kernel.org ([198.145.29.99]:47384 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235337AbhBHSDS (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 8 Feb 2021 13:03:18 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 21C0B64ED4;
-        Mon,  8 Feb 2021 17:59:19 +0000 (UTC)
+        id S235189AbhBHSDf (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 8 Feb 2021 13:03:35 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 3A91764EE2;
+        Mon,  8 Feb 2021 17:59:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1612807159;
-        bh=nubV/1ygv6kqsM4aIbnBzomM+6P/DuLH9iUpEwabiJU=;
+        s=k20201202; t=1612807180;
+        bh=axZ0Jl2Xd0A1Y4Llp/hS6PE0wj1Pn8dRYAEkgCvlvr8=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=HXibZl9195HYu61maEJ2xxxX2qCeWklrVHPgD4wpigCWMeI8mmG+2k9lOBZ+hfcBy
-         XZbWSrFX2RFW9rnlmdHBnsLRcrgryjf5vaFPapQlc25hP+XaV2n8/nAynHbkItXfvH
-         Qdp3GmkszvT+U/H5Vl67eMSaVFVSVaN6aERUFNFOEHzsjDbc17/Qg37ow0H3oack4a
-         bIlFMlro3AS+kTxbZbDegG+e8h8XjU3uq5D/FSDFwayTTQ6JaxQIpPuqcQB+5YWuHx
-         HusYHM/rQXGYtrhd8AzSr6LuMaqBJmL/WrcYq/eULMdwhj4wJPLWz3pXkjcQ3WBl1H
-         wSN4rJ8DEPAVQ==
+        b=HBN6AQly2PquD8zcWSJqlkskLY9ilVMeiIAgSqGb7Tb5VAMbuuptO7s5O4u6HClmb
+         jK+C7sJz8UCaIxWRbM0ySfCJk0fJHjztPi3ak3mLoK1rx2PL2QSIF7gZ8/rk7LIr6P
+         nwf/DzK/iQRDh0d05krCtNTToT0/iu5fF9pUmPfINiWmxERnDm0DF71ks7XrcKUM5l
+         Ne3o/9AO4UERAcPS7Z5cw7cnNPvT3RylQorHwcFhUwfi/05Ab0zg4W2CrLLWWd4Em1
+         bSueuQM+2qDckzDIYsrsRi1/SF1o8T2v75NNWbYZBD/0D760ry23zU6SeFBueGncFz
+         8dQK3NGphhYQg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Lin Feng <linf@wangsu.com>, Jan Kara <jack@suse.cz>,
         Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
         linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 15/19] bfq-iosched: Revert "bfq: Fix computation of shallow depth"
-Date:   Mon,  8 Feb 2021 12:58:54 -0500
-Message-Id: <20210208175858.2092008-15-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 10/14] bfq-iosched: Revert "bfq: Fix computation of shallow depth"
+Date:   Mon,  8 Feb 2021 12:59:22 -0500
+Message-Id: <20210208175926.2092211-10-sashal@kernel.org>
 X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20210208175858.2092008-1-sashal@kernel.org>
-References: <20210208175858.2092008-1-sashal@kernel.org>
+In-Reply-To: <20210208175926.2092211-1-sashal@kernel.org>
+References: <20210208175926.2092211-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -79,10 +79,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 7d19aae015aeb..ba32adaeefdd0 100644
+index b7ad8ac6bb41e..5198ed1b36690 100644
 --- a/block/bfq-iosched.c
 +++ b/block/bfq-iosched.c
-@@ -6320,13 +6320,13 @@ static unsigned int bfq_update_depths(struct bfq_data *bfqd,
+@@ -5280,13 +5280,13 @@ static unsigned int bfq_update_depths(struct bfq_data *bfqd,
  	 * limit 'something'.
  	 */
  	/* no more than 50% of tags for async I/O */
@@ -98,7 +98,7 @@ index 7d19aae015aeb..ba32adaeefdd0 100644
  
  	/*
  	 * In-word depths in case some bfq_queue is being weight-
-@@ -6336,9 +6336,9 @@ static unsigned int bfq_update_depths(struct bfq_data *bfqd,
+@@ -5296,9 +5296,9 @@ static unsigned int bfq_update_depths(struct bfq_data *bfqd,
  	 * shortage.
  	 */
  	/* no more than ~18% of tags for async I/O */
