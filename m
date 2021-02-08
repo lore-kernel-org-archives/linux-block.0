@@ -2,475 +2,165 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF660C433DB
-	for <linux-block@archiver.kernel.org>; Mon,  8 Feb 2021 08:59:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41C9BC433E9
+	for <linux-block@archiver.kernel.org>; Mon,  8 Feb 2021 09:14:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7190164E88
-	for <linux-block@archiver.kernel.org>; Mon,  8 Feb 2021 08:59:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0E73264E7A
+	for <linux-block@archiver.kernel.org>; Mon,  8 Feb 2021 09:14:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231206AbhBHI71 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 8 Feb 2021 03:59:27 -0500
-Received: from out30-54.freemail.mail.aliyun.com ([115.124.30.54]:45179 "EHLO
-        out30-54.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230365AbhBHIxv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 8 Feb 2021 03:53:51 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04423;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0UO9soA-_1612774372;
-Received: from localhost(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0UO9soA-_1612774372)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Mon, 08 Feb 2021 16:52:52 +0800
-From:   Jeffle Xu <jefflexu@linux.alibaba.com>
-To:     snitzer@redhat.com, axboe@kernel.dk
-Cc:     joseph.qi@linux.alibaba.com, caspar@linux.alibaba.com, hch@lst.de,
-        linux-block@vger.kernel.org, dm-devel@redhat.com,
-        io-uring@vger.kernel.org
-Subject: [PATCH v3 08/11] dm: fix iterate_device sanity check
-Date:   Mon,  8 Feb 2021 16:52:40 +0800
-Message-Id: <20210208085243.82367-9-jefflexu@linux.alibaba.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20210208085243.82367-1-jefflexu@linux.alibaba.com>
-References: <20210208085243.82367-1-jefflexu@linux.alibaba.com>
+        id S231444AbhBHJNu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 8 Feb 2021 04:13:50 -0500
+Received: from mail.xenproject.org ([104.130.215.37]:58000 "EHLO
+        mail.xenproject.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231431AbhBHJMa (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Feb 2021 04:12:30 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=xen.org;
+        s=20200302mail; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:
+        MIME-Version:Date:Message-ID:From:References:Cc:To:Subject;
+        bh=Z2FuntU0FCSPGAWD+ofKK+yUmsoCyrZClvV7APxBvaU=; b=S3YFzpNjNeKQK9a3thbvJwcCVT
+        /0VqloskC35+uEOgRFBZD+9JV3WrwxjsyPgNFqKOnfjWAtoIi0DKRJlxFQvbTwbupeSSukJX8x1dj
+        n1sYe+iGxzjWMHsDVsqLDKXVJUELdnB3CcU8BTrhm0NTQvuJ5S5mzzk9OVF2XbxfQZ1w=;
+Received: from xenbits.xenproject.org ([104.239.192.120])
+        by mail.xenproject.org with esmtp (Exim 4.92)
+        (envelope-from <julien@xen.org>)
+        id 1l92Zm-00046z-Fi; Mon, 08 Feb 2021 09:11:22 +0000
+Received: from [54.239.6.177] (helo=a483e7b01a66.ant.amazon.com)
+        by xenbits.xenproject.org with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <julien@xen.org>)
+        id 1l92Zm-0003Oc-7O; Mon, 08 Feb 2021 09:11:22 +0000
+Subject: Re: [PATCH 0/7] xen/events: bug fixes and some diagnostic aids
+To:     =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>,
+        xen-devel@lists.xenproject.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, netdev@vger.kernel.org,
+        linux-scsi@vger.kernel.org
+Cc:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        stable@vger.kernel.org,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
+        Jens Axboe <axboe@kernel.dk>, Wei Liu <wei.liu@kernel.org>,
+        Paul Durrant <paul@xen.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>
+References: <20210206104932.29064-1-jgross@suse.com>
+ <bd63694e-ac0c-7954-ec00-edad05f8da1c@xen.org>
+ <eeb62129-d9fc-2155-0e0f-aff1fbb33fbc@suse.com>
+From:   Julien Grall <julien@xen.org>
+Message-ID: <fcf3181b-3efc-55f5-687c-324937b543e6@xen.org>
+Date:   Mon, 8 Feb 2021 09:11:18 +0000
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.7.0
 MIME-Version: 1.0
+In-Reply-To: <eeb62129-d9fc-2155-0e0f-aff1fbb33fbc@suse.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-According to the definition of dm_iterate_devices_fn:
- * This function must iterate through each section of device used by the
- * target until it encounters a non-zero return code, which it then returns.
- * Returns zero if no callout returned non-zero.
+Hi Juergen,
 
-For some target type (e.g., dm-stripe), one call of iterate_devices()
-may iterate multiple underlying devices internally, in which case a
-non-zero return code returned by iterate_devices_callout_fn will stop
-the iteration in advance.
+On 07/02/2021 12:58, Jürgen Groß wrote:
+> On 06.02.21 19:46, Julien Grall wrote:
+>> Hi Juergen,
+>>
+>> On 06/02/2021 10:49, Juergen Gross wrote:
+>>> The first three patches are fixes for XSA-332. The avoid WARN splats
+>>> and a performance issue with interdomain events.
+>>
+>> Thanks for helping to figure out the problem. Unfortunately, I still 
+>> see reliably the WARN splat with the latest Linux master 
+>> (1e0d27fce010) + your first 3 patches.
+>>
+>> I am using Xen 4.11 (1c7d984645f9) and dom0 is forced to use the 2L 
+>> events ABI.
+>>
+>> After some debugging, I think I have an idea what's went wrong. The 
+>> problem happens when the event is initially bound from vCPU0 to a 
+>> different vCPU.
+>>
+>>  From the comment in xen_rebind_evtchn_to_cpu(), we are masking the 
+>> event to prevent it being delivered on an unexpected vCPU. However, I 
+>> believe the following can happen:
+>>
+>> vCPU0                | vCPU1
+>>                  |
+>>                  | Call xen_rebind_evtchn_to_cpu()
+>> receive event X            |
+>>                  | mask event X
+>>                  | bind to vCPU1
+>> <vCPU descheduled>        | unmask event X
+>>                  |
+>>                  | receive event X
+>>                  |
+>>                  | handle_edge_irq(X)
+>> handle_edge_irq(X)        |  -> handle_irq_event()
+>>                  |   -> set IRQD_IN_PROGRESS
+>>   -> set IRQS_PENDING        |
+>>                  |   -> evtchn_interrupt()
+>>                  |   -> clear IRQD_IN_PROGRESS
+>>                  |  -> IRQS_PENDING is set
+>>                  |  -> handle_irq_event()
+>>                  |   -> evtchn_interrupt()
+>>                  |     -> WARN()
+>>                  |
+>>
+>> All the lateeoi handlers expect a ONESHOT semantic and 
+>> evtchn_interrupt() is doesn't tolerate any deviation.
+>>
+>> I think the problem was introduced by 7f874a0447a9 ("xen/events: fix 
+>> lateeoi irq acknowledgment") because the interrupt was disabled 
+>> previously. Therefore we wouldn't do another iteration in 
+>> handle_edge_irq().
+> 
+> I think you picked the wrong commit for blaming, as this is just
+> the last patch of the three patches you were testing.
 
-Thus if we want to ensure that _all_ underlying devices support some
-kind of attribute, the iteration structure like
-dm_table_supports_nowait() should be used, while the input
-iterate_devices_callout_fn should handle the 'not support' semantics.
-On the opposite, the iteration structure like dm_table_any_dev_attr()
-should be used if _any_ underlying device supporting this attibute is
-sufficient. In this case, the input iterate_devices_callout_fn should
-handle the 'support' semantics.
+I actually found the right commit for blaming but I copied the 
+information from the wrong shell :/. The bug was introduced by:
 
-Besides, remove the unnecessary NULL pointer check for request_queue,
-since the request_queue pointer returned from bdev_get_queue() shall
-never be NULL according to commit ff9ea323816d ("block, bdi: an active
-gendisk always has a request_queue associated with it").
+c44b849cee8c ("xen/events: switch user event channels to lateeoi model")
 
-Fixes: 545ed20e6df6 ("dm: add infrastructure for DAX support")
-Fixes: c3c4555edd10 ("dm table: clear add_random unless all devices have it set")
-Fixes: 4693c9668fdc ("dm table: propagate non rotational flag")
-Cc: stable@vger.kernel.org
-Signed-off-by: Jeffle Xu <jefflexu@linux.alibaba.com>
----
- drivers/md/dm-table.c | 195 +++++++++++++++++++-----------------------
- drivers/md/dm.c       |   2 +-
- drivers/md/dm.h       |   2 +-
- 3 files changed, 91 insertions(+), 108 deletions(-)
+> 
+>> Aside the handlers, I think it may impact the defer EOI mitigation 
+>> because in theory if a 3rd vCPU is joining the party (let say vCPU A 
+>> migrate the event from vCPU B to vCPU C). So info->{eoi_cpu, 
+>> irq_epoch, eoi_time} could possibly get mangled?
+>>
+>> For a fix, we may want to consider to hold evtchn_rwlock with the 
+>> write permission. Although, I am not 100% sure this is going to 
+>> prevent everything.
+> 
+> It will make things worse, as it would violate the locking hierarchy
+> (xen_rebind_evtchn_to_cpu() is called with the IRQ-desc lock held).
 
-diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
-index 4acf2342f7ad..aa37f3e82238 100644
---- a/drivers/md/dm-table.c
-+++ b/drivers/md/dm-table.c
-@@ -820,24 +820,24 @@ void dm_table_set_type(struct dm_table *t, enum dm_queue_mode type)
- EXPORT_SYMBOL_GPL(dm_table_set_type);
- 
- /* validate the dax capability of the target device span */
--int device_supports_dax(struct dm_target *ti, struct dm_dev *dev,
--			sector_t start, sector_t len, void *data)
-+int device_not_dax_capable(struct dm_target *ti, struct dm_dev *dev,
-+			   sector_t start, sector_t len, void *data)
- {
- 	int blocksize = *(int *) data, id;
- 	bool rc;
- 
- 	id = dax_read_lock();
--	rc = dax_supported(dev->dax_dev, dev->bdev, blocksize, start, len);
-+	rc = !dax_supported(dev->dax_dev, dev->bdev, blocksize, start, len);
- 	dax_read_unlock(id);
- 
- 	return rc;
- }
- 
- /* Check devices support synchronous DAX */
--static int device_dax_synchronous(struct dm_target *ti, struct dm_dev *dev,
--				  sector_t start, sector_t len, void *data)
-+static int device_not_dax_sync_capable(struct dm_target *ti, struct dm_dev *dev,
-+				       sector_t start, sector_t len, void *data)
- {
--	return dev->dax_dev && dax_synchronous(dev->dax_dev);
-+	return !dev->dax_dev || !dax_synchronous(dev->dax_dev);
- }
- 
- bool dm_table_supports_dax(struct dm_table *t,
-@@ -854,7 +854,7 @@ bool dm_table_supports_dax(struct dm_table *t,
- 			return false;
- 
- 		if (!ti->type->iterate_devices ||
--		    !ti->type->iterate_devices(ti, iterate_fn, blocksize))
-+		    ti->type->iterate_devices(ti, iterate_fn, blocksize))
- 			return false;
- 	}
- 
-@@ -925,7 +925,7 @@ static int dm_table_determine_type(struct dm_table *t)
- verify_bio_based:
- 		/* We must use this table as bio-based */
- 		t->type = DM_TYPE_BIO_BASED;
--		if (dm_table_supports_dax(t, device_supports_dax, &page_size) ||
-+		if (dm_table_supports_dax(t, device_not_dax_capable, &page_size) ||
- 		    (list_empty(devices) && live_md_type == DM_TYPE_DAX_BIO_BASED)) {
- 			t->type = DM_TYPE_DAX_BIO_BASED;
- 		}
-@@ -1331,13 +1331,49 @@ bool dm_table_has_no_data_devices(struct dm_table *table)
- 	return true;
- }
- 
--static int device_is_zoned_model(struct dm_target *ti, struct dm_dev *dev,
--				 sector_t start, sector_t len, void *data)
-+/*
-+ * Cases requiring _any_ underlying device supporting some kind of attribute,
-+ * should use the iteration structure like dm_table_any_dev_attr(), or call
-+ * it directly. @func should handle semantics of positive examples, e.g.,
-+ * capable of something.
-+ */
-+static bool dm_table_any_dev_attr(struct dm_table *t,
-+				  iterate_devices_callout_fn func, void *data)
-+{
-+	struct dm_target *ti;
-+	unsigned int i;
-+
-+	for (i = 0; i < dm_table_get_num_targets(t); i++) {
-+		ti = dm_table_get_target(t, i);
-+
-+		if (ti->type->iterate_devices &&
-+		    ti->type->iterate_devices(ti, func, data))
-+			return true;
-+	}
-+
-+	return false;
-+}
-+
-+/*
-+ * Cases requiring _all_ underlying devices supporting some kind of attribute,
-+ * should use the iteration structure like dm_table_supports_nowait(), or call
-+ * dm_table_all_devs_attr() directly. @anti_func should handle semantics of
-+ * counter examples, e.g., not capable of something.
-+ */
-+static inline bool dm_table_all_devs_attr(struct dm_table *t,
-+					  iterate_devices_callout_fn anti_func,
-+					  void *data)
-+{
-+	return !dm_table_any_dev_attr(t, anti_func, data);
-+}
-+
-+static int device_not_zoned_model(struct dm_target *ti, struct dm_dev *dev,
-+				  sector_t start, sector_t len, void *data)
- {
- 	struct request_queue *q = bdev_get_queue(dev->bdev);
- 	enum blk_zoned_model *zoned_model = data;
- 
--	return q && blk_queue_zoned_model(q) == *zoned_model;
-+	return blk_queue_zoned_model(q) != *zoned_model;
- }
- 
- static bool dm_table_supports_zoned_model(struct dm_table *t,
-@@ -1354,37 +1390,20 @@ static bool dm_table_supports_zoned_model(struct dm_table *t,
- 			return false;
- 
- 		if (!ti->type->iterate_devices ||
--		    !ti->type->iterate_devices(ti, device_is_zoned_model, &zoned_model))
-+		    ti->type->iterate_devices(ti, device_not_zoned_model, &zoned_model))
- 			return false;
- 	}
- 
- 	return true;
- }
- 
--static int device_matches_zone_sectors(struct dm_target *ti, struct dm_dev *dev,
--				       sector_t start, sector_t len, void *data)
-+static int device_not_matches_zone_sectors(struct dm_target *ti, struct dm_dev *dev,
-+					   sector_t start, sector_t len, void *data)
- {
- 	struct request_queue *q = bdev_get_queue(dev->bdev);
- 	unsigned int *zone_sectors = data;
- 
--	return q && blk_queue_zone_sectors(q) == *zone_sectors;
--}
--
--static bool dm_table_matches_zone_sectors(struct dm_table *t,
--					  unsigned int zone_sectors)
--{
--	struct dm_target *ti;
--	unsigned i;
--
--	for (i = 0; i < dm_table_get_num_targets(t); i++) {
--		ti = dm_table_get_target(t, i);
--
--		if (!ti->type->iterate_devices ||
--		    !ti->type->iterate_devices(ti, device_matches_zone_sectors, &zone_sectors))
--			return false;
--	}
--
--	return true;
-+	return blk_queue_zone_sectors(q) != *zone_sectors;
- }
- 
- static int validate_hardware_zoned_model(struct dm_table *table,
-@@ -1404,7 +1423,7 @@ static int validate_hardware_zoned_model(struct dm_table *table,
- 	if (!zone_sectors || !is_power_of_2(zone_sectors))
- 		return -EINVAL;
- 
--	if (!dm_table_matches_zone_sectors(table, zone_sectors)) {
-+	if (dm_table_any_dev_attr(table, device_not_matches_zone_sectors, &zone_sectors)) {
- 		DMERR("%s: zone sectors is not consistent across all devices",
- 		      dm_device_name(table->md));
- 		return -EINVAL;
-@@ -1533,7 +1552,7 @@ static int device_flush_capable(struct dm_target *ti, struct dm_dev *dev,
- 	unsigned long flush = (unsigned long) data;
- 	struct request_queue *q = bdev_get_queue(dev->bdev);
- 
--	return q && (q->queue_flags & flush);
-+	return (q->queue_flags & flush);
- }
- 
- static bool dm_table_supports_flush(struct dm_table *t, unsigned long flush)
-@@ -1578,54 +1597,20 @@ static int device_dax_write_cache_enabled(struct dm_target *ti,
- 	return false;
- }
- 
--static int dm_table_supports_dax_write_cache(struct dm_table *t)
--{
--	struct dm_target *ti;
--	unsigned i;
--
--	for (i = 0; i < dm_table_get_num_targets(t); i++) {
--		ti = dm_table_get_target(t, i);
--
--		if (ti->type->iterate_devices &&
--		    ti->type->iterate_devices(ti,
--				device_dax_write_cache_enabled, NULL))
--			return true;
--	}
--
--	return false;
--}
--
--static int device_is_nonrot(struct dm_target *ti, struct dm_dev *dev,
--			    sector_t start, sector_t len, void *data)
-+static int device_is_rot(struct dm_target *ti, struct dm_dev *dev,
-+			 sector_t start, sector_t len, void *data)
- {
- 	struct request_queue *q = bdev_get_queue(dev->bdev);
- 
--	return q && blk_queue_nonrot(q);
-+	return !blk_queue_nonrot(q);
- }
- 
- static int device_is_not_random(struct dm_target *ti, struct dm_dev *dev,
--			     sector_t start, sector_t len, void *data)
-+				sector_t start, sector_t len, void *data)
- {
- 	struct request_queue *q = bdev_get_queue(dev->bdev);
- 
--	return q && !blk_queue_add_random(q);
--}
--
--static bool dm_table_all_devices_attribute(struct dm_table *t,
--					   iterate_devices_callout_fn func)
--{
--	struct dm_target *ti;
--	unsigned i;
--
--	for (i = 0; i < dm_table_get_num_targets(t); i++) {
--		ti = dm_table_get_target(t, i);
--
--		if (!ti->type->iterate_devices ||
--		    !ti->type->iterate_devices(ti, func, NULL))
--			return false;
--	}
--
--	return true;
-+	return !blk_queue_add_random(q);
- }
- 
- static int device_not_write_same_capable(struct dm_target *ti, struct dm_dev *dev,
-@@ -1633,7 +1618,7 @@ static int device_not_write_same_capable(struct dm_target *ti, struct dm_dev *de
- {
- 	struct request_queue *q = bdev_get_queue(dev->bdev);
- 
--	return q && !q->limits.max_write_same_sectors;
-+	return !q->limits.max_write_same_sectors;
- }
- 
- static bool dm_table_supports_write_same(struct dm_table *t)
-@@ -1660,7 +1645,7 @@ static int device_not_write_zeroes_capable(struct dm_target *ti, struct dm_dev *
- {
- 	struct request_queue *q = bdev_get_queue(dev->bdev);
- 
--	return q && !q->limits.max_write_zeroes_sectors;
-+	return !q->limits.max_write_zeroes_sectors;
- }
- 
- static bool dm_table_supports_write_zeroes(struct dm_table *t)
-@@ -1687,7 +1672,7 @@ static int device_not_nowait_capable(struct dm_target *ti, struct dm_dev *dev,
- {
- 	struct request_queue *q = bdev_get_queue(dev->bdev);
- 
--	return q && !blk_queue_nowait(q);
-+	return !blk_queue_nowait(q);
- }
- 
- static bool dm_table_supports_nowait(struct dm_table *t)
-@@ -1714,7 +1699,7 @@ static int device_not_discard_capable(struct dm_target *ti, struct dm_dev *dev,
- {
- 	struct request_queue *q = bdev_get_queue(dev->bdev);
- 
--	return q && !blk_queue_discard(q);
-+	return !blk_queue_discard(q);
- }
- 
- static bool dm_table_supports_discards(struct dm_table *t)
-@@ -1748,7 +1733,7 @@ static int device_not_secure_erase_capable(struct dm_target *ti,
- {
- 	struct request_queue *q = bdev_get_queue(dev->bdev);
- 
--	return q && !blk_queue_secure_erase(q);
-+	return !blk_queue_secure_erase(q);
- }
- 
- static bool dm_table_supports_secure_erase(struct dm_table *t)
-@@ -1776,30 +1761,23 @@ static int device_requires_stable_pages(struct dm_target *ti,
- {
- 	struct request_queue *q = bdev_get_queue(dev->bdev);
- 
--	return q && blk_queue_stable_writes(q);
-+	return blk_queue_stable_writes(q);
- }
- 
- /*
-- * If any underlying device requires stable pages, a table must require
-- * them as well.  Only targets that support iterate_devices are considered:
-- * don't want error, zero, etc to require stable pages.
-+ * type->iterate_devices() should be called when the sanity check needs to
-+ * iterate and check all underlying data devices. iterate_devices() will
-+ * iterate all underlying data devices until it encounters a non-zero return
-+ * code, returned by whether the input iterate_devices_callout_fn, or
-+ * iterate_devices() itself internally.
-+ *
-+ * For some target type (e.g., dm-stripe), one call of iterate_devices() may
-+ * iterate multiple underlying devices internally, in which case a non-zero
-+ * return code returned by iterate_devices_callout_fn will stop the iteration
-+ * in advance.
-+ * Thus users should call dm_table_any_dev_attr() or dm_table_all_devs_attr()
-+ * directly if possible. See comments of these two functions for more details.
-  */
--static bool dm_table_requires_stable_pages(struct dm_table *t)
--{
--	struct dm_target *ti;
--	unsigned i;
--
--	for (i = 0; i < dm_table_get_num_targets(t); i++) {
--		ti = dm_table_get_target(t, i);
--
--		if (ti->type->iterate_devices &&
--		    ti->type->iterate_devices(ti, device_requires_stable_pages, NULL))
--			return true;
--	}
--
--	return false;
--}
--
- void dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
- 			       struct queue_limits *limits)
- {
-@@ -1837,22 +1815,22 @@ void dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
- 	}
- 	blk_queue_write_cache(q, wc, fua);
- 
--	if (dm_table_supports_dax(t, device_supports_dax, &page_size)) {
-+	if (dm_table_supports_dax(t, device_not_dax_capable, &page_size)) {
- 		blk_queue_flag_set(QUEUE_FLAG_DAX, q);
--		if (dm_table_supports_dax(t, device_dax_synchronous, NULL))
-+		if (dm_table_supports_dax(t, device_not_dax_sync_capable, NULL))
- 			set_dax_synchronous(t->md->dax_dev);
- 	}
- 	else
- 		blk_queue_flag_clear(QUEUE_FLAG_DAX, q);
- 
--	if (dm_table_supports_dax_write_cache(t))
-+	if (dm_table_any_dev_attr(t, device_dax_write_cache_enabled, NULL))
- 		dax_write_cache(t->md->dax_dev, true);
- 
- 	/* Ensure that all underlying devices are non-rotational. */
--	if (dm_table_all_devices_attribute(t, device_is_nonrot))
--		blk_queue_flag_set(QUEUE_FLAG_NONROT, q);
--	else
-+	if (dm_table_any_dev_attr(t, device_is_rot, NULL))
- 		blk_queue_flag_clear(QUEUE_FLAG_NONROT, q);
-+	else
-+		blk_queue_flag_set(QUEUE_FLAG_NONROT, q);
- 
- 	if (!dm_table_supports_write_same(t))
- 		q->limits.max_write_same_sectors = 0;
-@@ -1864,8 +1842,11 @@ void dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
- 	/*
- 	 * Some devices don't use blk_integrity but still want stable pages
- 	 * because they do their own checksumming.
-+	 * If any underlying device requires stable pages, a table must require
-+	 * them as well.  Only targets that support iterate_devices are considered:
-+	 * don't want error, zero, etc to require stable pages.
- 	 */
--	if (dm_table_requires_stable_pages(t))
-+	if (dm_table_any_dev_attr(t, device_requires_stable_pages, NULL))
- 		blk_queue_flag_set(QUEUE_FLAG_STABLE_WRITES, q);
- 	else
- 		blk_queue_flag_clear(QUEUE_FLAG_STABLE_WRITES, q);
-@@ -1876,8 +1857,10 @@ void dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
- 	 * Clear QUEUE_FLAG_ADD_RANDOM if any underlying device does not
- 	 * have it set.
- 	 */
--	if (blk_queue_add_random(q) && dm_table_all_devices_attribute(t, device_is_not_random))
-+	if (dm_table_any_dev_attr(t, device_is_not_random, NULL))
- 		blk_queue_flag_clear(QUEUE_FLAG_ADD_RANDOM, q);
-+	else
-+		blk_queue_flag_set(QUEUE_FLAG_ADD_RANDOM, q);
- 
- 	/*
- 	 * For a zoned target, the number of zones should be updated for the
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index 46ca3b739396..c2945c90745e 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -1128,7 +1128,7 @@ static bool dm_dax_supported(struct dax_device *dax_dev, struct block_device *bd
- 	if (!map)
- 		goto out;
- 
--	ret = dm_table_supports_dax(map, device_supports_dax, &blocksize);
-+	ret = dm_table_supports_dax(map, device_not_dax_capable, &blocksize);
- 
- out:
- 	dm_put_live_table(md, srcu_idx);
-diff --git a/drivers/md/dm.h b/drivers/md/dm.h
-index fffe1e289c53..b441ad772c18 100644
---- a/drivers/md/dm.h
-+++ b/drivers/md/dm.h
-@@ -73,7 +73,7 @@ void dm_table_free_md_mempools(struct dm_table *t);
- struct dm_md_mempools *dm_table_get_md_mempools(struct dm_table *t);
- bool dm_table_supports_dax(struct dm_table *t, iterate_devices_callout_fn fn,
- 			   int *blocksize);
--int device_supports_dax(struct dm_target *ti, struct dm_dev *dev,
-+int device_not_dax_capable(struct dm_target *ti, struct dm_dev *dev,
- 			   sector_t start, sector_t len, void *data);
- 
- void dm_lock_md_type(struct mapped_device *md);
+Ah, right.
+
+> 
+> On a first glance I think we'll need a 3rd masking state ("temporarily
+> masked") in the second patch in order to avoid a race with lateeoi.
+> 
+> In order to avoid the race you outlined above we need an "event is being
+> handled" indicator checked via test_and_set() semantics in
+> handle_irq_for_port() and reset only when calling clear_evtchn().
+
+It feels like we are trying to workaround the IRQ flow we are using 
+(i.e. handle_edge_irq()).
+
+This reminds me the thread we had before discovering XSA-332 (see [1]). 
+Back then, it was suggested to switch back to handle_fasteoi_irq().
+
+Cheers,
+
+[1] 
+https://lore.kernel.org/xen-devel/alpine.DEB.2.21.2004271552430.29217@sstabellini-ThinkPad-T480s/
+
 -- 
-2.27.0
-
+Julien Grall
