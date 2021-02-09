@@ -2,167 +2,81 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B013C433DB
-	for <linux-block@archiver.kernel.org>; Tue,  9 Feb 2021 08:49:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14B73C433E6
+	for <linux-block@archiver.kernel.org>; Tue,  9 Feb 2021 10:05:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D846A64EB4
-	for <linux-block@archiver.kernel.org>; Tue,  9 Feb 2021 08:49:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CD58664E60
+	for <linux-block@archiver.kernel.org>; Tue,  9 Feb 2021 10:05:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230224AbhBIIsq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 9 Feb 2021 03:48:46 -0500
-Received: from out30-42.freemail.mail.aliyun.com ([115.124.30.42]:55181 "EHLO
-        out30-42.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230139AbhBIIqq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 9 Feb 2021 03:46:46 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R171e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04400;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0UOHsEzl_1612860361;
-Received: from admindeMacBook-Pro-2.local(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0UOHsEzl_1612860361)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Tue, 09 Feb 2021 16:46:02 +0800
-Subject: Re: [PATCH v3 09/11] dm: support IO polling for bio-based dm device
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     snitzer@redhat.com, axboe@kernel.dk, joseph.qi@linux.alibaba.com,
-        caspar@linux.alibaba.com, hch@lst.de, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, io-uring@vger.kernel.org
-References: <20210208085243.82367-1-jefflexu@linux.alibaba.com>
- <20210208085243.82367-10-jefflexu@linux.alibaba.com>
- <20210209031122.GA63798@T590>
- <a499a33f-da2e-b5aa-5266-9e7c76a34b48@linux.alibaba.com>
- <20210209080739.GB94287@T590>
-From:   JeffleXu <jefflexu@linux.alibaba.com>
-Message-ID: <4ac63594-7764-dc13-a217-50a96cd9a93c@linux.alibaba.com>
-Date:   Tue, 9 Feb 2021 16:46:01 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.7.0
+        id S231261AbhBIKFP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 9 Feb 2021 05:05:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40502 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231310AbhBIKDC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Feb 2021 05:03:02 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64CB6C06178C;
+        Tue,  9 Feb 2021 02:02:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=X2PQU1d5jzox0n/Xj9r6pmILEewABEB0sLzcB3dEs78=; b=wXj1WWStI2PDo6gGZKOUwwRAGM
+        zjYH0nZlrd5tAt61XXt21vqKF2C7UNREVLl6r6dr3dXgFcYpbY82PWna0H+cBcDXek5+/3PCuLGOV
+        MG3YPg93Y2rqo4o7yJw3cTjk3KIN7cgZiSAR1m0jHi6kZasS3XfRZ6PU8Q6bKT3GJe84AkemyCv+q
+        faNz+AUi7sxy33XmmWYMUMHcqB5xnWahR1Q+r+eZUx4M7f2VDJ+lTMEowRvc4axvXWtmroqYFE27D
+        htFI6Bu7j8Wtmvufjh7huqRbzb1TKKGnQMV2CFLFh5xE8HZ/HqEgvIpYv7k+nW2S8jJbgCjnDnPvm
+        HdIbE7aQ==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
+        id 1l9PqV-007H0M-GH; Tue, 09 Feb 2021 10:02:12 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 19DC7301324;
+        Tue,  9 Feb 2021 11:02:11 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id E5A392C0909CA; Tue,  9 Feb 2021 11:02:10 +0100 (CET)
+Date:   Tue, 9 Feb 2021 11:02:10 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@kernel.org>
+Subject: Re: [PATCH 1/3] smp: Process pending softirqs in
+ flush_smp_call_function_from_idle()
+Message-ID: <YCJdoovwxhlbJ4ln@hirez.programming.kicks-ass.net>
+References: <20210123201027.3262800-1-bigeasy@linutronix.de>
+ <20210123201027.3262800-2-bigeasy@linutronix.de>
 MIME-Version: 1.0
-In-Reply-To: <20210209080739.GB94287@T590>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210123201027.3262800-2-bigeasy@linutronix.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 2/9/21 4:07 PM, Ming Lei wrote:
-> On Tue, Feb 09, 2021 at 02:13:38PM +0800, JeffleXu wrote:
->>
->>
->> On 2/9/21 11:11 AM, Ming Lei wrote:
->>> On Mon, Feb 08, 2021 at 04:52:41PM +0800, Jeffle Xu wrote:
->>>> DM will iterate and poll all polling hardware queues of all target mq
->>>> devices when polling IO for dm device. To mitigate the race introduced
->>>> by iterating all target hw queues, a per-hw-queue flag is maintained
->>>
->>> What is the per-hw-queue flag?
->>
->> Sorry I forgot to update the commit message as the implementation
->> changed. Actually this mechanism is implemented by patch 10 of this
->> patch set.
+On Sat, Jan 23, 2021 at 09:10:25PM +0100, Sebastian Andrzej Siewior wrote:
+> send_call_function_single_ipi() may wake an idle CPU without sending an
+> IPI. The woken up CPU will process the SMP-functions in
+> flush_smp_call_function_from_idle(). Any raised softirq from within the
+> SMP-function call will not be processed.
+> Should the CPU have no tasks assigned, then it will go back to idle with
+> pending softirqs and the NOHZ will rightfully complain.
 > 
-> It is hard to associate patch 10's spin_trylock() with per-hw-queue
-> flag. 
-
-You're right, the commit message here is totally a mistake. Actually I
-had ever implemented a per-hw-queue flag, such as
-
-```
-struct blk_mq_hw_ctx {
-	atomic_t busy;
-	...
-};
-```
-
-In this case, the skipping mechanism is implemented in block layer.
-
-
-But later I refactor the code and move the implementation to the device
-driver layer as described by patch 10, while forgetting to update the
-commit message. The reason why I implement it in device driver layer is
-that, the competition actually stems from the underlying device driver
-(e.g., nvme driver), as described in the following snippet.
-
-```
-nvme_poll
-	spin_lock(&nvmeq->cq_poll_lock);
-	found = nvme_process_cq(nvmeq);
-	spin_unlock(&nvmeq->cq_poll_lock);
-```
-
-It is @nvmeq->cq_poll_lock, i.e., the implementation of the underlying
-device driver that has caused the competition. Thus maybe it is
-reasonable to handle the competition issue in the device driver layer?
-
-
-> Also scsi's poll implementation is in-progress, and scsi's poll may
-> not be implemented in this way.
-
-Yes. The defect of leaving the competition issue to the device driver
-layer is that, every device driver supporting polling need to be somehow
-optimized individually. Actually I have not taken a close look at the
-other two types of nvme driver (drivers/nvme/host/tcp.c and
-drivers/nvme/host/rdma.c), which also support polling.
-
-
-
->>
->>>
->>>> to indicate whether this polling hw queue currently being polled on or
->>>> not. Every polling hw queue is exclusive to one polling instance, i.e.,
->>>> the polling instance will skip this polling hw queue if this hw queue
->>>> currently is being polled by another polling instance, and start
->>>> polling on the next hw queue.
->>>
->>> Not see such skip in dm_poll_one_dev() in which
->>> queue_for_each_poll_hw_ctx() is called directly for polling all POLL
->>> hctxs of the request queue, so can you explain it a bit more about this
->>> skip mechanism?
->>>
->>
->> It is implemented as patch 10 of this patch set. When spin_trylock()
->> fails, the polling instance will return immediately, instead of busy
->> waiting.
->>
->>
->>> Even though such skipping is implemented, not sure if good performance
->>> can be reached because hctx poll may be done in ping-pong style
->>> among several CPUs. But blk-mq hctx is supposed to have its cpu affinities.
->>>
->>
->> Yes, the mechanism of iterating all hw queues can make the competition
->> worse.
->>
->> If every underlying data device has **only** one polling hw queue, then
->> this ping-pong style polling still exist, even when we implement split
->> bio tracking mechanism, i.e., acquiring the specific hw queue the bio
->> enqueued into. Because multiple polling instance has to compete for the
->> only polling hw queue.
->>
->> But if multiple polling hw queues per device are reserved for multiple
->> polling instances, (e.g., every underlying data device has 3 polling hw
->> queues when there are 3 polling instances), just as what we practice on
->> mq polling, then the current implementation of iterating all hw queues
->> will indeed works in a ping-pong style, while this issue shall not exist
->> when accurate split bio tracking mechanism could be implemented.
+> Process pending softirqs on return from flush_smp_call_function_queue().
 > 
-> In reality it could be possible to have one hw queue for each numa node.
-> 
-> And you may re-use blk_mq_map_queue() for getting the proper hw queue for poll.
+> Fixes: b2a02fc43a1f4 ("smp: Optimize send_call_function_single_ipi()")
+> Reported-by: Jens Axboe <axboe@kernel.dk>
+> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 
-Thanks. But the optimization I proposed in [1] may not works well when
-the IO submitting process migrates to another CPU halfway. I mean, the
-process has submitted several split bios, and then it migrates to
-another CPU and moves on submitting the left split bios.
+Fair enough. I'll stick this in tip/sched/smp for Jens and merge that
+into tip/sched/core.
 
-[1]
-https://lore.kernel.org/io-uring/20210208085243.82367-1-jefflexu@linux.alibaba.com/T/#m0d9a0e55e11874a70c6a3491f191289df72a84f8
-
--- 
-Thanks,
-Jeffle
+Thanks!
