@@ -2,131 +2,86 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20057C433E0
-	for <linux-block@archiver.kernel.org>; Tue,  9 Feb 2021 00:43:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91587C433DB
+	for <linux-block@archiver.kernel.org>; Tue,  9 Feb 2021 03:14:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CEF4B64E10
-	for <linux-block@archiver.kernel.org>; Tue,  9 Feb 2021 00:43:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 41BB664E9D
+	for <linux-block@archiver.kernel.org>; Tue,  9 Feb 2021 03:14:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230059AbhBIAm4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 8 Feb 2021 19:42:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33348 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229716AbhBIAmy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Feb 2021 19:42:54 -0500
-Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FBE1C06178A
-        for <linux-block@vger.kernel.org>; Mon,  8 Feb 2021 16:42:14 -0800 (PST)
-Received: by mail-ed1-x534.google.com with SMTP id t5so21399879eds.12
-        for <linux-block@vger.kernel.org>; Mon, 08 Feb 2021 16:42:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloud.ionos.com; s=google;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=yi/OsGvm9F4NGL8CsgpgANjWj0CeFOFwGfa0MH8SBbQ=;
-        b=aZFukaxgh6Itq9XMTFXNvaFVakAZAE1Cn81OtQ1aEoM6cjG75x+j4N5ayzxQjtti5K
-         pIC6D924rmUFP7+L/a516Qf59JXLH+7IzP2Zo+yE3J1oBJnFq0JuN8bIhufWFiQCQz9N
-         xKYAjmC2u3PEKPpiZoo82lewhKaHDQd01UA3GjdC3uStXugu4wD6d70HHamKavyoyNjH
-         8OPktNTmhDt/xF/ILxG63TRHRkkEklNNnzeGmw+pPT+xfcwyExwZDFpLOCO0L2l9ns//
-         ssPId/EO0J9cgL9y6gVSQ4sqwxJFBB3cyNwS9+mVc+MmeWMmeeEyfqHPVv5OBDdAIgng
-         CsTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=yi/OsGvm9F4NGL8CsgpgANjWj0CeFOFwGfa0MH8SBbQ=;
-        b=XGCsL8ReM8QphcOSg+2OYFyqrA1zfNBs8p4EykuB+sxdOa3DfqzZfA0mrXUxnJd3KA
-         nqZo7luSWx3PTQFicZPYkZeuEvnJzvWaJph16r/jEU1g7o5NTgVFCTYP0fxmVOy2lVNb
-         mnG4rA2DyBTc4sYKZKPC9V+da4u6vXCPysWvax78oXPx3J8w4phiY/6jmJkHZXNfEvTA
-         ZroqtSwoPFwzXfvCQtm3QGgAbNaPRM+cKsaFs44j67Tk16j2x2rFraUZP4iuGrB4XX8t
-         /dHEfoT4PUPwH1zsi/bFZ/O8pV9BjoGF4BwQ1tYcVn+aliTXEook5yyOjgyeUg+ZAk95
-         jtjA==
-X-Gm-Message-State: AOAM532apkCd2SSY4ZB7zk5n1pUVW+O1nEW5dE2R2FGCo2JPZK4pn3vs
-        HXa0KQSNt1iBWp47/VWa3ESmiQ==
-X-Google-Smtp-Source: ABdhPJxUF4Jo5HaYG9V20Z/NUZ2WK6MEkrBEtxLiDAgKxVORCxula/ZdedexG3wTbvg/MOo/LjxF6Q==
-X-Received: by 2002:a05:6402:31a3:: with SMTP id dj3mr19557589edb.172.1612831332540;
-        Mon, 08 Feb 2021 16:42:12 -0800 (PST)
-Received: from [0.0.0.0] ([2001:1438:4010:2540:8ad:59ed:fe2a:9dd9])
-        by smtp.gmail.com with ESMTPSA id u18sm9747207ejc.76.2021.02.08.16.42.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 08 Feb 2021 16:42:11 -0800 (PST)
-Subject: Re: [PATCH V4 0/3] block: add two statistic tables
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, danil.kipnis@cloud.ionos.com,
-        jinpu.wang@cloud.ionos.com
-References: <20210203151019.27036-1-guoqing.jiang@cloud.ionos.com>
-From:   Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
-Message-ID: <d3e8d3e3-9061-373e-5a6a-47216dfe6778@cloud.ionos.com>
-Date:   Tue, 9 Feb 2021 01:42:05 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S229980AbhBIDOU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 8 Feb 2021 22:14:20 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60239 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229693AbhBIDNP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 8 Feb 2021 22:13:15 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1612840304;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=HLiqMW2n7YYtMYQAHHLQv7F6f639zWMgh5L7ZVOjcXI=;
+        b=LACwDmZB0N2Suicgn9TagTnVE5Zrv836YnTuH/VjijGp6nj0uK7zSQyf3nvfin0MllQqSO
+        GZKGAKR/7JPi1/59nJ0xOWcPFzmJawtOknRhmIcrctvcCkg9EtDAWy9okA8Y4eenrSjJm4
+        XKcPpLFOTmdir1LzMenD6wc+Z26UHfM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-219-8_ei_ySOMzu40yLQ1nxtkQ-1; Mon, 08 Feb 2021 22:11:42 -0500
+X-MC-Unique: 8_ei_ySOMzu40yLQ1nxtkQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9DC1A107ACE4;
+        Tue,  9 Feb 2021 03:11:40 +0000 (UTC)
+Received: from T590 (ovpn-13-86.pek2.redhat.com [10.72.13.86])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 45B205D6A8;
+        Tue,  9 Feb 2021 03:11:26 +0000 (UTC)
+Date:   Tue, 9 Feb 2021 11:11:22 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jeffle Xu <jefflexu@linux.alibaba.com>
+Cc:     snitzer@redhat.com, axboe@kernel.dk, joseph.qi@linux.alibaba.com,
+        caspar@linux.alibaba.com, hch@lst.de, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, io-uring@vger.kernel.org
+Subject: Re: [PATCH v3 09/11] dm: support IO polling for bio-based dm device
+Message-ID: <20210209031122.GA63798@T590>
+References: <20210208085243.82367-1-jefflexu@linux.alibaba.com>
+ <20210208085243.82367-10-jefflexu@linux.alibaba.com>
 MIME-Version: 1.0
-In-Reply-To: <20210203151019.27036-1-guoqing.jiang@cloud.ionos.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210208085243.82367-10-jefflexu@linux.alibaba.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
+On Mon, Feb 08, 2021 at 04:52:41PM +0800, Jeffle Xu wrote:
+> DM will iterate and poll all polling hardware queues of all target mq
+> devices when polling IO for dm device. To mitigate the race introduced
+> by iterating all target hw queues, a per-hw-queue flag is maintained
 
-Any chance can this be considered for 5.12?
+What is the per-hw-queue flag?
 
-Thanks,
-Guoqing
+> to indicate whether this polling hw queue currently being polled on or
+> not. Every polling hw queue is exclusive to one polling instance, i.e.,
+> the polling instance will skip this polling hw queue if this hw queue
+> currently is being polled by another polling instance, and start
+> polling on the next hw queue.
 
-On 2/3/21 16:10, Guoqing Jiang wrote:
-> Hi Jens,
-> 
-> This version adds Reviewed-by tag from Johannes.
-> 
-> Thanks,
-> Guoqing
-> 
-> PATCH V3: https://lore.kernel.org/linux-block/7f78132a-affc-eb03-735a-4da43e143b6e@cloud.ionos.com/T/#t
-> * reorgnize the patchset per Johannes's suggestion.
-> 
-> PATCH V2: https://lore.kernel.org/linux-block/20210201012727.28305-1-guoqing.jiang@cloud.ionos.com/T/#t
-> *. remove BLK_ADDITIONAL_DISKSTAT option per Christoph's comment.
-> *. move blk_queue_io_extra_stat into blk_additional_{latency,sector}
->     per Christoph's comment.
-> *. simplify blk_additional_latency by pass duration time directly.
-> 
-> PATCH V1: https://marc.info/?l=linux-block&m=161176000024443&w=2
-> * add Jack's reviewed-by.
-> 
-> RFC V4: https://marc.info/?l=linux-block&m=161027198729158&w=2
-> * rebase with latest code.
-> 
-> RFC V3: https://marc.info/?l=linux-block&m=159730633416534&w=2
-> * Move the #ifdef CONFIG_BLK_ADDITIONAL_DISKSTAT into the function body
->    per Johannes's comment.
-> * Tweak the output of two tables to make they are more intuitive
-> 
-> RFC V2: https://marc.info/?l=linux-block&m=159467483514062&w=2
-> * don't call ktime_get_ns and drop unnecessary patches.
-> * add io_extra_stats to avoid potential overhead.
-> 
-> RFC V1: https://marc.info/?l=linux-block&m=159419516730386&w=2
-> 
-> Guoqing Jiang (3):
->    block: add io_extra_stats node
->    block: add a statistic table for io latency
->    block: add a statistic table for io sector
-> 
->   Documentation/ABI/testing/sysfs-block | 26 ++++++++++
->   Documentation/block/queue-sysfs.rst   |  5 ++
->   block/blk-core.c                      | 43 ++++++++++++++++
->   block/blk-sysfs.c                     |  3 ++
->   block/genhd.c                         | 74 +++++++++++++++++++++++++++
->   include/linux/blkdev.h                |  2 +
->   include/linux/part_stat.h             |  6 +++
->   7 files changed, 159 insertions(+)
-> 
+Not see such skip in dm_poll_one_dev() in which
+queue_for_each_poll_hw_ctx() is called directly for polling all POLL
+hctxs of the request queue, so can you explain it a bit more about this
+skip mechanism?
+
+Even though such skipping is implemented, not sure if good performance
+can be reached because hctx poll may be done in ping-pong style
+among several CPUs. But blk-mq hctx is supposed to have its cpu affinities.
+
+-- 
+Ming
+
