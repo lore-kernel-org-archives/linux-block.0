@@ -2,163 +2,123 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 498B9C433E0
-	for <linux-block@archiver.kernel.org>; Tue,  9 Feb 2021 04:24:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D666FC433DB
+	for <linux-block@archiver.kernel.org>; Tue,  9 Feb 2021 06:15:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0FDDD64E4F
-	for <linux-block@archiver.kernel.org>; Tue,  9 Feb 2021 04:24:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9F2C864EB9
+	for <linux-block@archiver.kernel.org>; Tue,  9 Feb 2021 06:15:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229636AbhBIEYi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 8 Feb 2021 23:24:38 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52266 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230139AbhBIEXE (ORCPT
+        id S229521AbhBIGOm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 9 Feb 2021 01:14:42 -0500
+Received: from out30-131.freemail.mail.aliyun.com ([115.124.30.131]:39905 "EHLO
+        out30-131.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229636AbhBIGOX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 8 Feb 2021 23:23:04 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612844484;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=/eFer26DbD5JrI/cKhVP4gnabxdLf1Clq3I+VIutzqc=;
-        b=ESRm6AkjAZV9avgdXcdmqsLoQxdopTYHTYvj3EEEymTh4uiet+uALW1x0zNHixrB5dguKe
-        XZsVVQLvG4i8w0HW2twoBAXTPWjy9yHImrjxlV9jT3mPxyohO/3DGlHLLvmeXOmCFD9Vmo
-        shsWfgvAZt9iG2MCnKHD35ii63tohac=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-583-2-cxNutzMUG-vfdb2RmxEw-1; Mon, 08 Feb 2021 23:21:23 -0500
-X-MC-Unique: 2-cxNutzMUG-vfdb2RmxEw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C32B9192D789;
-        Tue,  9 Feb 2021 04:21:20 +0000 (UTC)
-Received: from T590 (ovpn-13-86.pek2.redhat.com [10.72.13.86])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id BF37F10013D7;
-        Tue,  9 Feb 2021 04:21:07 +0000 (UTC)
-Date:   Tue, 9 Feb 2021 12:21:03 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Sagi Grimberg <sagi@grimberg.me>
-Cc:     Yi Zhang <yi.zhang@redhat.com>, linux-nvme@lists.infradead.org,
-        linux-block <linux-block@vger.kernel.org>, axboe@kernel.dk,
-        Rachel Sibley <rasibley@redhat.com>,
-        Chaitanya.Kulkarni@wdc.com, CKI Project <cki-project@redhat.com>
-Subject: Re: kernel null pointer at nvme_tcp_init_iter+0x7d/0xd0 [nvme_tcp]
-Message-ID: <20210209042103.GB63798@T590>
-References: <cki.F3E139361A.EN5MUSJKK9@redhat.com>
- <630237787.11660686.1612580898410.JavaMail.zimbra@redhat.com>
- <e1d08160-ca49-91e2-dafc-3ee80516842d@grimberg.me>
- <5848858e-239d-acb2-fa24-c371a3360557@redhat.com>
- <af1d7e9d-0170-82f6-30e1-01f045d73fc7@grimberg.me>
- <6147d452-a12e-c76c-22f1-5d9e7cb6b01d@grimberg.me>
+        Tue, 9 Feb 2021 01:14:23 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=alimailimapcm10staff010182156082;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0UOH.b00_1612851218;
+Received: from admindeMacBook-Pro-2.local(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0UOH.b00_1612851218)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Tue, 09 Feb 2021 14:13:38 +0800
+Subject: Re: [PATCH v3 09/11] dm: support IO polling for bio-based dm device
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     snitzer@redhat.com, axboe@kernel.dk, joseph.qi@linux.alibaba.com,
+        caspar@linux.alibaba.com, hch@lst.de, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, io-uring@vger.kernel.org
+References: <20210208085243.82367-1-jefflexu@linux.alibaba.com>
+ <20210208085243.82367-10-jefflexu@linux.alibaba.com>
+ <20210209031122.GA63798@T590>
+From:   JeffleXu <jefflexu@linux.alibaba.com>
+Message-ID: <a499a33f-da2e-b5aa-5266-9e7c76a34b48@linux.alibaba.com>
+Date:   Tue, 9 Feb 2021 14:13:38 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <6147d452-a12e-c76c-22f1-5d9e7cb6b01d@grimberg.me>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20210209031122.GA63798@T590>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Feb 08, 2021 at 10:42:28AM -0800, Sagi Grimberg wrote:
+
+
+On 2/9/21 11:11 AM, Ming Lei wrote:
+> On Mon, Feb 08, 2021 at 04:52:41PM +0800, Jeffle Xu wrote:
+>> DM will iterate and poll all polling hardware queues of all target mq
+>> devices when polling IO for dm device. To mitigate the race introduced
+>> by iterating all target hw queues, a per-hw-queue flag is maintained
 > 
-> > > Hi Sagi
-> > > 
-> > > On 2/8/21 5:46 PM, Sagi Grimberg wrote:
-> > > > 
-> > > > > Hello
-> > > > > 
-> > > > > We found this kernel NULL pointer issue with latest
-> > > > > linux-block/for-next and it's 100% reproduced, let me know
-> > > > > if you need more info/testing, thanks
-> > > > > 
-> > > > > Kernel repo:
-> > > > > https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git
-> > > > > Commit: 11f8b6fd0db9 - Merge branch 'for-5.12/io_uring' into for-next
-> > > > > 
-> > > > > Reproducer: blktests nvme-tcp/012
-> > > > 
-> > > > Thanks for reporting Ming, I've tried to reproduce this on my VM
-> > > > but did not succeed. Given that you have it 100% reproducible,
-> > > > can you try to revert commit:
-> > > > 
-> > > > 0dc9edaf80ea nvme-tcp: pass multipage bvec to request iov_iter
-> > > > 
-> > > 
-> > > Revert this commit fixed the issue and I've attached the config. :)
-> > 
-> > Good to know,
-> > 
-> > I see some differences that I should probably change to hit this:
-> > -- 
-> > @@ -254,14 +256,15 @@ CONFIG_PERF_EVENTS=y
-> >   # end of Kernel Performance Events And Counters
-> > 
-> >   CONFIG_VM_EVENT_COUNTERS=y
-> > +CONFIG_SLUB_DEBUG=y
-> >   # CONFIG_COMPAT_BRK is not set
-> > -CONFIG_SLAB=y
-> > -# CONFIG_SLUB is not set
-> > -# CONFIG_SLOB is not set
-> > -CONFIG_SLAB_MERGE_DEFAULT=y
-> > -# CONFIG_SLAB_FREELIST_RANDOM is not set
-> > +# CONFIG_SLAB is not set
-> > +CONFIG_SLUB=y
-> > +# CONFIG_SLAB_MERGE_DEFAULT is not set
-> > +CONFIG_SLAB_FREELIST_RANDOM=y
-> >   # CONFIG_SLAB_FREELIST_HARDENED is not set
-> > -# CONFIG_SHUFFLE_PAGE_ALLOCATOR is not set
-> > +CONFIG_SHUFFLE_PAGE_ALLOCATOR=y
-> > +CONFIG_SLUB_CPU_PARTIAL=y
-> >   CONFIG_SYSTEM_DATA_VERIFICATION=y
-> >   CONFIG_PROFILING=y
-> >   CONFIG_TRACEPOINTS=y
-> > @@ -299,7 +302,8 @@ CONFIG_HAVE_INTEL_TXT=y
-> >   CONFIG_X86_64_SMP=y
-> >   CONFIG_ARCH_SUPPORTS_UPROBES=y
-> >   CONFIG_FIX_EARLYCON_MEM=y
-> > -CONFIG_PGTABLE_LEVELS=4
-> > +CONFIG_DYNAMIC_PHYSICAL_MASK=y
-> > +CONFIG_PGTABLE_LEVELS=5
-> >   CONFIG_CC_HAS_SANE_STACKPROTECTOR=y
-> > -- 
-> > 
-> > Probably CONFIG_SLUB and CONFIG_SLUB_DEBUG should be used.
+> What is the per-hw-queue flag?
+
+Sorry I forgot to update the commit message as the implementation
+changed. Actually this mechanism is implemented by patch 10 of this
+patch set.
+
 > 
-> Used your profile and this still does not happen :(
+>> to indicate whether this polling hw queue currently being polled on or
+>> not. Every polling hw queue is exclusive to one polling instance, i.e.,
+>> the polling instance will skip this polling hw queue if this hw queue
+>> currently is being polled by another polling instance, and start
+>> polling on the next hw queue.
+> 
+> Not see such skip in dm_poll_one_dev() in which
+> queue_for_each_poll_hw_ctx() is called directly for polling all POLL
+> hctxs of the request queue, so can you explain it a bit more about this
+> skip mechanism?
+> 
 
-One obvious error is that nr_segments is computed wrong.
+It is implemented as patch 10 of this patch set. When spin_trylock()
+fails, the polling instance will return immediately, instead of busy
+waiting.
 
-Yi, can you try the following patch?
 
-diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
-index 881d28eb15e9..a393d99b74e1 100644
---- a/drivers/nvme/host/tcp.c
-+++ b/drivers/nvme/host/tcp.c
-@@ -239,9 +239,14 @@ static void nvme_tcp_init_iter(struct nvme_tcp_request *req,
- 		offset = 0;
- 	} else {
- 		struct bio *bio = req->curr_bio;
-+		struct bio_vec bv;
-+		struct bvec_iter iter;
-+
-+		nsegs = 0;
-+		bio_for_each_bvec(bv, bio, iter)
-+			nsegs++;
- 
- 		vec = __bvec_iter_bvec(bio->bi_io_vec, bio->bi_iter);
--		nsegs = bio_segments(bio);
- 		size = bio->bi_iter.bi_size;
- 		offset = bio->bi_iter.bi_bvec_done;
- 	}
+> Even though such skipping is implemented, not sure if good performance
+> can be reached because hctx poll may be done in ping-pong style
+> among several CPUs. But blk-mq hctx is supposed to have its cpu affinities.
+> 
+
+Yes, the mechanism of iterating all hw queues can make the competition
+worse.
+
+If every underlying data device has **only** one polling hw queue, then
+this ping-pong style polling still exist, even when we implement split
+bio tracking mechanism, i.e., acquiring the specific hw queue the bio
+enqueued into. Because multiple polling instance has to compete for the
+only polling hw queue.
+
+But if multiple polling hw queues per device are reserved for multiple
+polling instances, (e.g., every underlying data device has 3 polling hw
+queues when there are 3 polling instances), just as what we practice on
+mq polling, then the current implementation of iterating all hw queues
+will indeed works in a ping-pong style, while this issue shall not exist
+when accurate split bio tracking mechanism could be implemented.
+
+As for the performance, I cite the test results here, as summarized in
+the cover-letter
+(https://lore.kernel.org/io-uring/20210208085243.82367-1-jefflexu@linux.alibaba.com/)
+
+	    | IOPS (IRQ mode) | IOPS (iopoll=1 mode) | diff
+----------- | --------------- | -------------------- | ----
+without opt | 		 318k |		 	256k | ~-20%
+with opt    |		 314k |		 	354k | ~13%
+
+The 'opt' refers to the optimization of patch 10, i.e., the skipping
+mechanism. There are 3 polling instances (i.e., 3 CPUs) in this test case.
+
+
+Indeed the current implementation of iterating all hw queues is some
+sort of compromise, as I find it really difficult to implement the
+accurate split bio mechanism, and to achieve high performance at the
+same time. Thus I turn to optimizing the original implementation of
+iterating all hw queues, such as optimization of patch 10 and 11.
+
 
 -- 
-Ming
-
+Thanks,
+Jeffle
