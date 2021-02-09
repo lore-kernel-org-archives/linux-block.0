@@ -2,38 +2,39 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-19.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80FE4C433E6
-	for <linux-block@archiver.kernel.org>; Tue,  9 Feb 2021 14:31:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CBEBC433DB
+	for <linux-block@archiver.kernel.org>; Tue,  9 Feb 2021 14:32:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3FCFC64DED
-	for <linux-block@archiver.kernel.org>; Tue,  9 Feb 2021 14:31:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EDCAE64E56
+	for <linux-block@archiver.kernel.org>; Tue,  9 Feb 2021 14:32:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230269AbhBIObj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 9 Feb 2021 09:31:39 -0500
-Received: from mx2.veeam.com ([64.129.123.6]:54696 "EHLO mx2.veeam.com"
+        id S229609AbhBIObo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 9 Feb 2021 09:31:44 -0500
+Received: from mx2.veeam.com ([64.129.123.6]:54914 "EHLO mx2.veeam.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229609AbhBIObi (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 9 Feb 2021 09:31:38 -0500
+        id S231366AbhBIObn (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 9 Feb 2021 09:31:43 -0500
 Received: from mail.veeam.com (prgmbx01.amust.local [172.24.0.171])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mx2.veeam.com (Postfix) with ESMTPS id DEBBD415DC;
-        Tue,  9 Feb 2021 09:30:52 -0500 (EST)
+        by mx2.veeam.com (Postfix) with ESMTPS id E9F9B4031C;
+        Tue,  9 Feb 2021 09:30:55 -0500 (EST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com; s=mx2;
-        t=1612881053; bh=OFwZKhsGuko0X0w9i3hfgoHaa6lOMWeFSq7BdeGM+gE=;
-        h=From:To:CC:Subject:Date:From;
-        b=jjIOlUjDYhD6wQzoQ38zXyiaan4xG0YFvs4Ko3dpIeUvhfILESU2wP9sNuxxGZsBj
-         AQ5slmF490CQ2LXBumDoo8jB1eUIOREpLspTwvRyJPiP0j6V8sStk+8y5aRlzNGuam
-         AoOE8pkL3XU8SxrK5YiI6zkgwV7sHYGBHkCrDe30=
+        t=1612881056; bh=xuGBXydOqpQxhGsIdjXtgJDgMIszE2ypZb9iQnBJEG0=;
+        h=From:To:CC:Subject:Date:In-Reply-To:References:From;
+        b=cDfpmBb+OzQnKKurNJXzfYGxOCw5A3NU5gur3ECNfwjF8kHrDplEx3Q3gTjBL118j
+         gb6ELsLwX8dn9cE+O84NJ7Nwhcrvzkum50t5iU1+WCOElzbYjkUS+m6epZUwsEeuTE
+         DCLO6Nj0MYlk1n+Mbj9nAMOxv46VMRUTgZwAl1hg=
 Received: from prgdevlinuxpatch01.amust.local (172.24.14.5) by
  prgmbx01.amust.local (172.24.0.171) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.721.2;
- Tue, 9 Feb 2021 15:30:45 +0100
+ Tue, 9 Feb 2021 15:30:50 +0100
 From:   Sergei Shtepa <sergei.shtepa@veeam.com>
 To:     <Damien.LeMoal@wdc.com>, <snitzer@redhat.com>, <hare@suse.de>,
         <ming.lei@redhat.com>, <agk@redhat.com>, <corbet@lwn.net>,
@@ -42,10 +43,12 @@ To:     <Damien.LeMoal@wdc.com>, <snitzer@redhat.com>, <hare@suse.de>,
         <dm-devel@redhat.com>, <linux-block@vger.kernel.org>,
         <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
 CC:     <sergei.shtepa@veeam.com>, <pavel.tide@veeam.com>
-Subject: [PATCH v5 0/6] block-layer interposer
-Date:   Tue, 9 Feb 2021 17:30:22 +0300
-Message-ID: <1612881028-7878-1-git-send-email-sergei.shtepa@veeam.com>
+Subject: [PATCH v5 1/6] docs: device-mapper: add remap_and_filter
+Date:   Tue, 9 Feb 2021 17:30:23 +0300
+Message-ID: <1612881028-7878-2-git-send-email-sergei.shtepa@veeam.com>
 X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1612881028-7878-1-git-send-email-sergei.shtepa@veeam.com>
+References: <1612881028-7878-1-git-send-email-sergei.shtepa@veeam.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-Originating-IP: [172.24.14.5]
@@ -58,119 +61,166 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi all.
+remap_and_filter - describes the new features that
+blk_interposer provides for device mapper.
 
-I'm joyful to suggest the block-layer interposer (blk_interposer) v5.
-blk_interposer allows to intercept bio requests, remap bio to another
-devices or add new bios.
-
-This patch series adds support blk_interposer for dm-linear.
-
-In the first patch, I suggest the remap_and_filter.rst file.
-Yes, Mike, it's probably too early for documentation, but maybe it will be
-interesting for someone. In the documentation I tried to explain
-the purpose of blk_interposer and what prospects it opens up.
-
-The second patch adds the function blk_mq_is_queue_frozen(). It allows to
-assert a queue state.
-
-The third patch is dedicated to blk_interposer itself, which provides
-the ability to intercept bio.
-
-The fourth one adds support for blk_interposer from the device mapper.
-Added ioctl DM_DEV_REMAP_CMD.
-
-In the fifth - added the 'noexcl' option for dm-linear, which allows
-to open the underlying block-device without the FMODE_EXCL mode.
-This allows to create a dm device to which can redirect bio requests
-using DM_DEV_REMAP_CMD.
-
-The latest patch changes linear.rst with the description of the 'noexcl'
-option that is added for dm-linear.
-
-A little history of changes:
-
-v5 - current patch set
-Changes:
- * rebase for v5.11-rc7;
- * patch set organization;
- * fix defects in documentation;
- * add some comments;
- * change mutex names for better code readability;
- * remove calling bd_unlink_disk_holder() for targets with non-exclusive
-   flag;
- * change type for struct dm_remap_param from uint8_t to __u8.
-
-v4 - https://patchwork.kernel.org/project/linux-block/cover/1612367638-3794-1-git-send-email-sergei.shtepa@veeam.com/
-Mostly changes were made, due to Damien's comments:
- * on the design of the code;
- * by the patch set organization;
- * bug with passing a wrong parameter to dm_get_device();
- * description of the 'noexcl' parameter in the linear.rst.
-Also added remap_and_filter.rst.
-
-v3 - https://patchwork.kernel.org/project/linux-block/cover/1611853955-32167-1-git-send-email-sergei.shtepa@veeam.com/
-In this version, I already suggested blk_interposer to apply to dm-linear.
-Problems were solved:
- * Interception of bio requests from a specific device on the disk, not
-   from the entire disk. To do this, we added the dm_interposed_dev
-   structure and an interval tree to store these structures.
- * Implemented ioctl DM_DEV_REMAP_CMD. A patch with changes in the lvm2
-   project was sent to the team lvm-devel@redhat.com.
- * Added the 'noexcl' option for dm-linear, which allows you to open
-   the underlying block-device without FMODE_EXCL mode.
-
-v2 - https://patchwork.kernel.org/project/linux-block/cover/1607518911-30692-1-git-send-email-sergei.shtepa@veeam.com/
-I tried to suggest blk_interposer without using it in device mapper,
-but with the addition of a sample of its use. It was then that I learned
-about the maintainers' attitudes towards the samples directory :).
-
-v1 - https://lwn.net/ml/linux-block/20201119164924.74401-1-hare@suse.de/
-This Hannes's patch can be considered as a starting point, since this is
-where the interception mechanism and the term blk_interposer itself
-appeared. It became clear that blk_interposer can be useful for
-device mapper.
-
-before v1 - https://patchwork.kernel.org/project/linux-block/cover/1603271049-20681-1-git-send-email-sergei.shtepa@veeam.com/
-I tried to offer a rather cumbersome blk-filter and a monster-like
-blk-snap module for creating snapshots.
-
-Thank you to everyone who was able to take the time to review
-the previous versions.
-I hope that this time I achieved the required quality.
-
-Thanks,
-Sergei.
-
-Sergei Shtepa (6):
-  docs: device-mapper: add remap_and_filter
-  block: add blk_mq_is_queue_frozen()
-  block: add blk_interposer
-  dm: new ioctl DM_DEV_REMAP_CMD
-  dm: add 'noexcl' option for dm-linear
-  docs: device-mapper: 'noexcl' option for dm-linear
-
+Signed-off-by: Sergei Shtepa <sergei.shtepa@veeam.com>
+---
  .../admin-guide/device-mapper/index.rst       |   1 +
- .../admin-guide/device-mapper/linear.rst      |  26 +-
- .../device-mapper/remap_and_filter.rst        | 132 ++++++
- block/bio.c                                   |   2 +
- block/blk-core.c                              |  35 ++
- block/blk-mq.c                                |  13 +
- block/genhd.c                                 |  86 ++++
- drivers/md/dm-core.h                          |  20 +
- drivers/md/dm-ioctl.c                         |  35 ++
- drivers/md/dm-linear.c                        |  14 +-
- drivers/md/dm-table.c                         |  14 +-
- drivers/md/dm.c                               | 401 +++++++++++++++++-
- drivers/md/dm.h                               |   2 +-
- include/linux/blk-mq.h                        |   1 +
- include/linux/blk_types.h                     |   6 +-
- include/linux/device-mapper.h                 |   7 +
- include/linux/genhd.h                         |  18 +
- include/uapi/linux/dm-ioctl.h                 |  15 +-
- 18 files changed, 796 insertions(+), 32 deletions(-)
+ .../device-mapper/remap_and_filter.rst        | 132 ++++++++++++++++++
+ 2 files changed, 133 insertions(+)
  create mode 100644 Documentation/admin-guide/device-mapper/remap_and_filter.rst
 
---
+diff --git a/Documentation/admin-guide/device-mapper/index.rst b/Documentation/admin-guide/device-mapper/index.rst
+index 6cf8adc86fa8..e868d5bbec7e 100644
+--- a/Documentation/admin-guide/device-mapper/index.rst
++++ b/Documentation/admin-guide/device-mapper/index.rst
+@@ -27,6 +27,7 @@ Device Mapper
+     linear
+     log-writes
+     persistent-data
++    remap_and_filter
+     snapshot
+     statistics
+     striped
+diff --git a/Documentation/admin-guide/device-mapper/remap_and_filter.rst b/Documentation/admin-guide/device-mapper/remap_and_filter.rst
+new file mode 100644
+index 000000000000..b896a7de2c97
+--- /dev/null
++++ b/Documentation/admin-guide/device-mapper/remap_and_filter.rst
+@@ -0,0 +1,132 @@
++=================
++DM remap & filter
++=================
++
++Introduction
++============
++
++Usually LVM should be used for new devices.
++The administrator has to create logical volumes for the system partition
++when installing the operating system. For a running system with
++partitioned disk space and mounted file systems, it is quite difficult to
++reconfigure to logical volumes. As a result, all the features that Device
++Mapper provides are not available for non-LVM systems.
++This problem is partially solved by the DM remap functionality, which
++uses the kernel's blk_interposer.
++
++Blk_interposer
++==============
++
++Blk_interposer extends the capabilities of the DM, as it allows to
++intercept and redirect bio requests for block devices that are not
++DM devices. At the same time, blk_interposer allows to attach and detach
++from devices "on the fly", without stopping the execution of user
++programs.
++
++Blk_interposer allows to do two tasks: remap and filter.
++Remap allows to redirect all requests from one block device to another.
++Filter allows to do additional processing of the request, but without
++redirection. An intercepted request can get to the block device to which
++it was addressed, without changes.
++
++Remap
++=====
++
++Consider the functionality of the remap. This will allow to connect
++any block device with a DM device "on the fly".
++Suppose we have a file system mounted on the block device /dev/sda1::
++
++  +-------------+
++  | file system |
++  +-------------+
++        ||
++        \/
++  +-------------+
++  |  /dev/sda1  |
++  +-------------+
++
++Creating a new DM device that will be mapped on the same /dev/sda1::
++
++  +-------------+  +-----------+
++  | file system |  | dm-linear |
++  +-------------+  +-----------+
++           ||         ||
++           \/         \/
++         +---------------+
++         |   /dev/sda1   |
++         +---------------+
++
++Redirecting all bio requests for the /dev/sda1 device to the new DM
++device::
++
++  +-------------+
++  | file system |
++  +-------------+
++        ||
++        \/
++   +----------+    +-----------+
++   |  remap   | => | dm-linear |
++   +----------+    +-----------+
++                         ||
++                         \/
++                   +-----------+
++                   | /dev/sda1 |
++                   +-----------+
++
++To achieve this, you need to:
++
++Create new DM device with option 'noexcl'. It's allowed to open the
++underlying block-device without the FMODE_EXCL flag::
++
++  echo "0 `blockdev --getsz $1` linear $DEV 0 noexcl" | dmsetup create dm-noexcl
++
++Call remap command::
++
++  dmsetup remap start dm-noexcl $1
++
++Remap can be used to extend the functionality of dm-snap. This will allow
++to take snapshots from any block devices, not just logical volumes.
++
++Filter
++======
++
++Filter does not redirect the bio to another device. It does not create
++a clone of the bio request. After receiving the request, the filter can
++only add some processing, complete the bio request, or return the bio
++for further processing.
++
++Suppose we have a file system mounted on the block device /dev/sda1::
++
++  +-------------+
++  | file system |
++  +-------------+
++        ||
++        \/
++  +-------------+
++  |  /dev/sda1  |
++  +-------------+
++
++Creating a new DM device that will implement filter::
++
++  +-------------+
++  | file system |
++  +-------------+
++        ||
++        \/
++    +--------+    +----------+
++    | filter | => | dm-delay |
++    +--------+    +----------+
++        ||
++        \/
++  +-------------+
++  |  /dev/sda1  |
++  +-------------+
++
++Using filter we can change the behavior of debugging tools:
++ * dm-dust,
++ * dm-delay,
++ * dm-flakey,
++ * dm-verity.
++
++In the new version, they will be able to change the behavior of any
++existing block device, without creating a new one.
+-- 
 2.20.1
 
