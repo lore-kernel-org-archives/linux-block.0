@@ -2,117 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA2FCC433DB
-	for <linux-block@archiver.kernel.org>; Wed, 10 Feb 2021 15:12:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91123C433E0
+	for <linux-block@archiver.kernel.org>; Wed, 10 Feb 2021 15:21:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A514864DEC
-	for <linux-block@archiver.kernel.org>; Wed, 10 Feb 2021 15:12:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4B14564E9A
+	for <linux-block@archiver.kernel.org>; Wed, 10 Feb 2021 15:21:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231559AbhBJPMC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 Feb 2021 10:12:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50584 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230028AbhBJPMB (ORCPT
+        id S232059AbhBJPVa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 Feb 2021 10:21:30 -0500
+Received: from vulcan.natalenko.name ([104.207.131.136]:43638 "EHLO
+        vulcan.natalenko.name" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231962AbhBJPV3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 Feb 2021 10:12:01 -0500
-Received: from mail-io1-xd35.google.com (mail-io1-xd35.google.com [IPv6:2607:f8b0:4864:20::d35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85542C06174A
-        for <linux-block@vger.kernel.org>; Wed, 10 Feb 2021 07:11:20 -0800 (PST)
-Received: by mail-io1-xd35.google.com with SMTP id e133so2191621iof.8
-        for <linux-block@vger.kernel.org>; Wed, 10 Feb 2021 07:11:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=tS5pwHzwXhieHszIWnMmjReWJIdbc2e31FQOtEQl4cg=;
-        b=pJVodo9Rtion0T6XJgMylaX2zcsRoFqygAtB4s3ACHGJBjJHnN0GfB46pLNSddQH9F
-         rNTsmkjiuclaX2RyaazmlfrcaCuGtArMcbeIlV8R1ELa8DhgKJ1LNkGrgdl+vLxfi57F
-         eXB/o/mLCnGAmesPo3ohf/eCv0U/hsaPT455oWWESKhEaoeklm88XPU0Fkhq/28uUoBz
-         qBVByD0YGEBjCk7ozBla1UheB2DbGs15cuAgpHPHJoNgKS78LKQxkpYb3hTYJfNy0KXH
-         n3f1IPEMZDXBFdrHfJUTIdAVyjJAaZDZyo4gb7wKDV49Kf2eUGxTSywGHRchCa5HImwk
-         juKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=tS5pwHzwXhieHszIWnMmjReWJIdbc2e31FQOtEQl4cg=;
-        b=kve1uZPbZVepO4lZOAr7Du68gr5r/vTFFqcZqCnS3zy4wqpil5oVWD+RbRtFP5tSWx
-         LSWS7BJJiKnnLw0gNuu18bQOeaVllyr0RB+xLuR6oOXvFSnsCrPTOrQQ7eQWQOnhswgn
-         yW5YuWI1gn4PkzLWY6ZuYQjLogcagJSoerOX1+i9DeqRQ8bqYPurqKPCHWdvOt3uVGur
-         c01UQIvWIu/GkBUShhq+M0o1YvCDLxS1EXcQPR3dRzy13KLYR1nQG4mb5aZyaRccreHY
-         JU8QYOhaESCMOEJgoGdJkl+SKMgmyRYr5xW+uaiy3bA784OTivn9NVEIN/O7g51me38z
-         R1pQ==
-X-Gm-Message-State: AOAM533zBeGm9fVeknKDgzVZjqBqrRL4tQ9HjJ1F9x9qkP8lhMVQInn2
-        OPNUJeERBBg7LOhsK1m1IggAoA==
-X-Google-Smtp-Source: ABdhPJyEombVB+Gwzrdb4DYEQ+PXgxb1sdRnlhIIujQN+T/M1QLxqTYHX2yXc7y1kO9QlVSXbZwOcg==
-X-Received: by 2002:a05:6638:3bc:: with SMTP id z28mr3721115jap.118.1612969879655;
-        Wed, 10 Feb 2021 07:11:19 -0800 (PST)
-Received: from [192.168.1.30] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id z7sm1108033iod.8.2021.02.10.07.11.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 Feb 2021 07:11:19 -0800 (PST)
-Subject: Re: [PATCH 00/20] bcache patches for Linux v5.12
-To:     Coly Li <colyli@suse.de>
-Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        Jianpeng Ma <jianpeng.ma@intel.com>,
-        Qiaowei Ren <qiaowei.ren@intel.com>,
-        Kai Krakow <kai@kaishome.de>
-References: <20210210050742.31237-1-colyli@suse.de>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <50173dee-31dd-9951-bc7f-b5247a46ef5e@kernel.dk>
-Date:   Wed, 10 Feb 2021 08:11:18 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Wed, 10 Feb 2021 10:21:29 -0500
+Received: from localhost (kaktus.kanapka.ml [151.237.229.131])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by vulcan.natalenko.name (Postfix) with ESMTPSA id BC2759831BB;
+        Wed, 10 Feb 2021 16:20:34 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=natalenko.name;
+        s=dkim-20170712; t=1612970434;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=q7ojA/KR388M4BV02zdLByuP79wkh35otkGQ4vyB7ZU=;
+        b=lK9/GiRGp/fcBjlVdIqebCIqSnbX5jE4cQSwlBYXEAzJS5N0erF23SmD4O6EWsxKn5pNlN
+        VxJBMrmzISL2qjtKbdiHIqPQjWvztoH7hMjVot4OEssXAlz703DtS2R9qZO41xFEtJagTA
+        BXC1jTzGBmP+ORweuhO0bfkysVzKKjA=
+Date:   Wed, 10 Feb 2021 16:20:34 +0100
+From:   Oleksandr Natalenko <oleksandr@natalenko.name>
+To:     Paolo Valente <paolo.valente@linaro.org>
+Cc:     Chunguang Xu <brookxu.cn@gmail.com>, axboe@kernel.dk,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] bfq: remove some useless logic of
+ bfq_update_next_in_service()
+Message-ID: <20210210152034.puimoewzgtnnp2zl@spock.localdomain>
+References: <1611917485-584-1-git-send-email-brookxu@tencent.com>
+ <B4751549-78D9-4A84-8FB2-5DAA86ED39C8@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20210210050742.31237-1-colyli@suse.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <B4751549-78D9-4A84-8FB2-5DAA86ED39C8@linaro.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/9/21 10:07 PM, Coly Li wrote:
-> Hi Jens,
+On Wed, Feb 10, 2021 at 12:13:29PM +0100, Paolo Valente wrote:
 > 
-> This is the first wave bcache patches for Linux v5.12.
 > 
-> It is nice to see in this round we have 3 new patch contributors:
-> Jianpeng Ma, Qiaowei Ren and Kai Krakow.
+> > Il giorno 29 gen 2021, alle ore 11:51, Chunguang Xu <brookxu.cn@gmail.com> ha scritto:
+> > 
+> > From: Chunguang Xu <brookxu@tencent.com>
+> > 
+> > The if statement at the end of the function is obviously useless,
+> > maybe we can delete it.
+> > 
 > 
-> In this series, the EXPERIMENTAL patches from Jianpeng Ma, Qiaowei Ren
-> and me are initial effort to store bcache meta-data on NVDIMM namespace.
-> The NVDIMM space is managed and mapped via DAX interface, and accessed
-> by linear address. In this submission we store bcache journal on NVDIMM,
-> in future bcache btree nodes and other meta data will be added in too,
-> before we remove the EXPERIMENTAL statues.
+> Thanks for spotting this mistake.
 > 
-> Dongdong Tao contributes a performance optimization when
-> bcache cache buckets are highly fregmented, Dongdong's patch makes the
-> dirty data writeback faster and from his benchmark reprots such changes
-> have recognized improvement for randome write I/O thoughput and latency
-> for highly fregmented buckets, and no regression for regular I/O
-> observed.
+> Acked-by: Paolo Valente <paolo.valente@linaro.org>
 > 
-> Kai Krakow contributes 4 patches to offload system_wq usage to separated
-> btree_io_wq and bch_flush_wq. In his environment the daily backup job
-> throughput increases from 60.2MB/s to 419MB/s and accomplished time
-> reduced from 14h29m to 2h13m.
-> 
-> Joe Perches also contributes a fine code stype fix which I pick for this
-> submission.
-> 
-> Please take them for Linux v5.12 merge window.
+> > Signed-off-by: Chunguang Xu <brookxu@tencent.com>
+> > ---
+> > block/bfq-wf2q.c | 3 ---
+> > 1 file changed, 3 deletions(-)
+> > 
+> > diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
+> > index 26776bd..070e34a 100644
+> > --- a/block/bfq-wf2q.c
+> > +++ b/block/bfq-wf2q.c
+> > @@ -137,9 +137,6 @@ static bool bfq_update_next_in_service(struct bfq_sched_data *sd,
+> > 
+> > 	sd->next_in_service = next_in_service;
+> > 
+> > -	if (!next_in_service)
+> > -		return parent_sched_may_change;
+> > -
 
-Applied 1-6 for now, that weird situation with the user visible header
-needs to get resolved before it can go any further.
+Unless I'm missing something, this has already been fixed here:
+
+https://git.kernel.dk/cgit/linux-block/commit/?h=for-5.12/block&id=1a23e06cdab2be07cbda460c6417d7de564c48e6
+
+> > 	return parent_sched_may_change;
+> > }
+> > 
+> > -- 
+> > 1.8.3.1
+> > 
+> 
 
 -- 
-Jens Axboe
-
+  Oleksandr Natalenko (post-factum)
