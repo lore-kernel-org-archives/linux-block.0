@@ -7,71 +7,70 @@ X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2348C433DB
-	for <linux-block@archiver.kernel.org>; Wed, 10 Feb 2021 14:45:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3DB2C433E0
+	for <linux-block@archiver.kernel.org>; Wed, 10 Feb 2021 15:10:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B15F264E2A
-	for <linux-block@archiver.kernel.org>; Wed, 10 Feb 2021 14:45:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 875F964E74
+	for <linux-block@archiver.kernel.org>; Wed, 10 Feb 2021 15:10:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231237AbhBJOp4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 Feb 2021 09:45:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44992 "EHLO
+        id S231311AbhBJPKW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 Feb 2021 10:10:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50220 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229639AbhBJOpy (ORCPT
+        with ESMTP id S229934AbhBJPKT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 Feb 2021 09:45:54 -0500
-Received: from mail-il1-x12e.google.com (mail-il1-x12e.google.com [IPv6:2607:f8b0:4864:20::12e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFE32C06174A
-        for <linux-block@vger.kernel.org>; Wed, 10 Feb 2021 06:45:12 -0800 (PST)
-Received: by mail-il1-x12e.google.com with SMTP id a16so2037425ilq.5
-        for <linux-block@vger.kernel.org>; Wed, 10 Feb 2021 06:45:12 -0800 (PST)
+        Wed, 10 Feb 2021 10:10:19 -0500
+Received: from mail-io1-xd30.google.com (mail-io1-xd30.google.com [IPv6:2607:f8b0:4864:20::d30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F09CFC06174A
+        for <linux-block@vger.kernel.org>; Wed, 10 Feb 2021 07:09:38 -0800 (PST)
+Received: by mail-io1-xd30.google.com with SMTP id n201so2175207iod.12
+        for <linux-block@vger.kernel.org>; Wed, 10 Feb 2021 07:09:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=ysd4jTSM/A3Qbvo3IAamzntPbVEsPTPu5msfcyC0amY=;
-        b=n/cl3sU4LxnsDfTlbLqkffWFtoeo/limIQtoBM8kz/2fWU2gL1fPfJ2kXfAXu+gcVa
-         nhqwc2x/5b+bogrjP+YNHvnzG7LtQmY33VDtQ62/D9hiL2S5l/2QbIzpsE289QYd6INV
-         nCKWcb+Gosn6FHz6FRn6UaGFwchiiA21g7C/I/Rk/3JMwzK3Fhid1vmH6BBZR5XNUD66
-         mKBuFGIU1gH3EN9fT9WHhMQLyByOlJPpbX8FOwRPocPek2Odww3BhWLT08k9vvqR5dY3
-         ibIT8pO4WLWI49PogeDRiDHb7DJoJlU8HLwX0Gkep21uFk+o/WsAEuuS+dVFarSG+vSz
-         c8ag==
+        bh=L6P2NX/DTL8ff0P2HA6ZaoSj2C/OuBgNDFZ8rYrxH6A=;
+        b=QWG5ruo31OnLIDF+acawcGjChk0qRnDtYH2wqsFwDv12NumjnqTJumluVd/cYLbgSe
+         NRu1OopFvD2boZLmc5NZJEavgvNU7AuUl3cKYvkCzsqZ9Qr5tlnHWXtB/Dp72a7hQ4tk
+         m7TlZuGNx5k/feyE1/DUcmBfAvS3oRPhCBSTQFTAGUrgXGt9EAtZvTFbdajm4jpceyu+
+         QkPz+BVGRyprjwdrFoIcPNrKXXUttShZw8tmAtWml2qscrOI7lnCIM5CVf4dsiA1Qa7N
+         vgLx/DwSrBibS7jzo5C+XlRdsZZsSSTm2g/0YZ1rvtRG5paYA++aBaj9zYvU5NQw+B+g
+         iF0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=ysd4jTSM/A3Qbvo3IAamzntPbVEsPTPu5msfcyC0amY=;
-        b=hk3G4yF1ObzNWV2jpdvCPuX8yI7YmLqShKD6c33+DqqCtU7meVYf7tr958CpUsdmci
-         torRNNlMd9KvSXFY/DHCGxEYZqqUWv7rbAFD8P8JdEOgVIoY9fEJoFQ84k7vRgFb78DT
-         nX+lv86lodi99bfsdZcx4ObOXmKhJT3e0SDSxSG/v1mklHvPtyuh6BuYwF0egEAs3qjd
-         czlMn0QqOc5Y4cNws60VAO6YvX80cuVgrObIoEnEPnynJi9XjSS9dBl9cQBSs4QpNs4E
-         obqPfppQzhuWTjiHx7UO6kA9IO4WsALyLMCXh1fKCg3cajzaJBNyTMi3xlMBRusDFt+E
-         YS+A==
-X-Gm-Message-State: AOAM530uog+vITyQv33a7CWINtD1s+x4hvtvbL5uU8lyDbYUdITAT1yB
-        zIqQY7RjO5NLmk5RYJzMstNf7g==
-X-Google-Smtp-Source: ABdhPJzLNMS1CqKK3WC8WmbvmcLOE3sfTRaTeeyEbcdTj69ndKl5ePzTxDZuwjdkwGqxqKGNIyEpJA==
-X-Received: by 2002:a92:4b06:: with SMTP id m6mr1345567ilg.177.1612968312334;
-        Wed, 10 Feb 2021 06:45:12 -0800 (PST)
+        bh=L6P2NX/DTL8ff0P2HA6ZaoSj2C/OuBgNDFZ8rYrxH6A=;
+        b=NwhYi5VliEXtcS7ZJizsm8Y3+Gj+ZdJFBunZNJYQYA3B4pR6gI8cpr7mWRnVfUUz5F
+         w+Ct5LLOq23EPtne8YSXw2g66uihd1T3QLn6uFbcpjNQxq/Tu3aUHnLCdDavg8Wkf/Xe
+         Z52M7t2HiGJMQRvmG5x9XBKx24ahMjo6ykPRmU4W0OFXf5uFgNBpKzRdAQdgTUfjD0sM
+         2Li3Db6hcnQi66VwipAUcGyAgP/cFGTDJQ2UYN/1L4RFcrxyr7xIfvq6atntevkZF8rq
+         mpniO64CkU5aHawL68b0vXnoyXoXJQ5m4ggECwtZky28+/iGkotrSbkA+1bNCzh0S1oA
+         OdTQ==
+X-Gm-Message-State: AOAM530l73RXj1RGpyv+Ak/UzzFphRPiRwoaEN2pNFdZ98GR0UMHaTji
+        homJoFN1usRZw9y6lT9kYZUrSA==
+X-Google-Smtp-Source: ABdhPJxhrCo4d2ZxcT3su2gTAbH1vNyVsJVKZIANtOV0wGf+UDw1dFcCmwt5oapjDLUo0m65yk2c+g==
+X-Received: by 2002:a05:6638:235:: with SMTP id f21mr3907067jaq.32.1612969778216;
+        Wed, 10 Feb 2021 07:09:38 -0800 (PST)
 Received: from [192.168.1.30] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id h9sm1086368ili.43.2021.02.10.06.45.11
+        by smtp.gmail.com with ESMTPSA id d2sm1136062ilr.66.2021.02.10.07.09.37
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 Feb 2021 06:45:12 -0800 (PST)
-Subject: Re: [PATCH v4 0/8] block: add zone write granularity limit
-To:     Damien Le Moal <damien.lemoal@wdc.com>, linux-block@vger.kernel.org
-Cc:     linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
-        Keith Busch <keith.busch@wdc.com>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-References: <20210128044733.503606-1-damien.lemoal@wdc.com>
+        Wed, 10 Feb 2021 07:09:37 -0800 (PST)
+Subject: Re: [PATCH 07/20] bcache: add initial data structures for nvm pages
+To:     Coly Li <colyli@suse.de>
+Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        Jianpeng Ma <jianpeng.ma@intel.com>,
+        Qiaowei Ren <qiaowei.ren@intel.com>
+References: <20210210050742.31237-1-colyli@suse.de>
+ <20210210050742.31237-8-colyli@suse.de>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <cfe15751-e07e-101f-49d8-a2f184e30618@kernel.dk>
-Date:   Wed, 10 Feb 2021 07:45:12 -0700
+Message-ID: <76adf7d2-821b-c7a5-426e-4d3963d36455@kernel.dk>
+Date:   Wed, 10 Feb 2021 08:09:37 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210128044733.503606-1-damien.lemoal@wdc.com>
+In-Reply-To: <20210210050742.31237-8-colyli@suse.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -79,28 +78,91 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/27/21 9:47 PM, Damien Le Moal wrote:
-> The first patch of this series adds missing documentation of the
-> zone_append_max_bytes sysfs attribute.
-> 
-> The following 3 patches are cleanup and preparatory patches for the
-> introduction of the zone write granularity limit. The goal of these
-> patches is to have all code setting a device queue zoned model to use
-> the helper function blk_queue_set_zoned(). The nvme driver, null_blk
-> driver and the partition code are modified to do so.
-> 
-> The fourth patch in this series introduces the zone write granularity
-> queue limit to indicate the alignment constraint for write operations
-> into sequential zones of zoned block devices. This limit is always set
-> by default to the device logical block size. The following patch
-> documents this new limit.
-> 
-> The last 2 patches introduce the blk_queue_clear_zone_settings()
-> function and modify the SCSI sd driver to clear the zone related queue
-> limits and resources of a host-aware zoned disk that is changed to a
-> regular disk due to the presence of partitions.
+On 2/9/21 10:07 PM, Coly Li wrote:
+> +struct bch_nvm_pgalloc_recs {
+> +union {
+> +	struct {
+> +		struct bch_nvm_pages_owner_head	*owner;
+> +		struct bch_nvm_pgalloc_recs	*next;
+> +		__u8				magic[16];
+> +		__u8				owner_uuid[16];
+> +		__u32				size;
+> +		__u32				used;
+> +		__u64				_pad[4];
+> +		struct bch_pgalloc_rec		recs[];
+> +	};
+> +	__u8	pad[8192];
+> +};
+> +};
 
-Applied, thanks.
+This doesn't look right in a user header, any user API should be 32-bit
+and 64-bit agnostic.
+
+> +struct bch_nvm_pages_owner_head {
+> +	__u8			uuid[16];
+> +	char			label[BCH_NVM_PAGES_LABEL_SIZE];
+> +	/* Per-namespace own lists */
+> +	struct bch_nvm_pgalloc_recs	*recs[BCH_NVM_PAGES_NAMESPACES_MAX];
+> +};
+
+Same here.
+
+> +/* heads[0] is always for nvm_pages internal usage */
+> +struct bch_owner_list_head {
+> +union {
+> +	struct {
+> +		__u32				size;
+> +		__u32				used;
+> +		__u64				_pad[4];
+> +		struct bch_nvm_pages_owner_head	heads[];
+> +	};
+> +	__u8	pad[8192];
+> +};
+> +};
+
+And here.
+
+> +#define BCH_MAX_OWNER_LIST				\
+> +	((sizeof(struct bch_owner_list_head) -		\
+> +	 offsetof(struct bch_owner_list_head, heads)) /	\
+> +	 sizeof(struct bch_nvm_pages_owner_head))
+> +
+> +/* The on-media bit order is local CPU order */
+> +struct bch_nvm_pages_sb {
+> +	__u64			csum;
+> +	__u64			ns_start;
+> +	__u64			sb_offset;
+> +	__u64			version;
+> +	__u8			magic[16];
+> +	__u8			uuid[16];
+> +	__u32			page_size;
+> +	__u32			total_namespaces_nr;
+> +	__u32			this_namespace_nr;
+> +	union {
+> +		__u8		set_uuid[16];
+> +		__u64		set_magic;
+> +	};
+
+This doesn't look like it packs right either.
+
+> +
+> +	__u64			flags;
+> +	__u64			seq;
+> +
+> +	__u64			feature_compat;
+> +	__u64			feature_incompat;
+> +	__u64			feature_ro_compat;
+> +
+> +	/* For allocable nvm pages from buddy systems */
+> +	__u64			pages_offset;
+> +	__u64			pages_total;
+> +
+> +	__u64			pad[8];
+> +
+> +	/* Only on the first name space */
+> +	struct bch_owner_list_head	*owner_list_head;
+
+And here's another pointer...
 
 -- 
 Jens Axboe
