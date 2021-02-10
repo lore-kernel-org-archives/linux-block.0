@@ -5,32 +5,32 @@ X-Spam-Level:
 X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FBDFC433E0
-	for <linux-block@archiver.kernel.org>; Wed, 10 Feb 2021 05:08:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 318C5C433E6
+	for <linux-block@archiver.kernel.org>; Wed, 10 Feb 2021 05:08:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DF32E64E2A
-	for <linux-block@archiver.kernel.org>; Wed, 10 Feb 2021 05:08:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0A98164E53
+	for <linux-block@archiver.kernel.org>; Wed, 10 Feb 2021 05:08:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229608AbhBJFIr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 Feb 2021 00:08:47 -0500
-Received: from mx2.suse.de ([195.135.220.15]:40098 "EHLO mx2.suse.de"
+        id S230445AbhBJFIs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 Feb 2021 00:08:48 -0500
+Received: from mx2.suse.de ([195.135.220.15]:40138 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229610AbhBJFIp (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 Feb 2021 00:08:45 -0500
+        id S230429AbhBJFIr (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 10 Feb 2021 00:08:47 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 496BAAB98;
-        Wed, 10 Feb 2021 05:08:02 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id 22FC6B016;
+        Wed, 10 Feb 2021 05:08:06 +0000 (UTC)
 From:   Coly Li <colyli@suse.de>
 To:     axboe@kernel.dk
 Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        dongdong tao <dongdong.tao@canonical.com>,
-        Coly Li <colyli@suse.de>
-Subject: [PATCH 01/20] bcache: consider the fragmentation when update the writeback rate
-Date:   Wed, 10 Feb 2021 13:07:23 +0800
-Message-Id: <20210210050742.31237-2-colyli@suse.de>
+        Kai Krakow <kai@kaishome.de>, Coly Li <colyli@suse.de>,
+        stable@vger.kernel.org
+Subject: [PATCH 03/20] Revert "bcache: Kill btree_io_wq"
+Date:   Wed, 10 Feb 2021 13:07:25 +0800
+Message-Id: <20210210050742.31237-4-colyli@suse.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20210210050742.31237-1-colyli@suse.de>
 References: <20210210050742.31237-1-colyli@suse.de>
@@ -40,265 +40,118 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: dongdong tao <dongdong.tao@canonical.com>
+From: Kai Krakow <kai@kaishome.de>
 
-Current way to calculate the writeback rate only considered the
-dirty sectors, this usually works fine when the fragmentation
-is not high, but it will give us unreasonable small rate when
-we are under a situation that very few dirty sectors consumed
-a lot dirty buckets. In some case, the dirty bucekts can reached
-to CUTOFF_WRITEBACK_SYNC while the dirty data(sectors) not even
-reached the writeback_percent, the writeback rate will still
-be the minimum value (4k), thus it will cause all the writes to be
-stucked in a non-writeback mode because of the slow writeback.
+This reverts commit 56b30770b27d54d68ad51eccc6d888282b568cee.
 
-We accelerate the rate in 3 stages with different aggressiveness,
-the first stage starts when dirty buckets percent reach above
-BCH_WRITEBACK_FRAGMENT_THRESHOLD_LOW (50), the second is
-BCH_WRITEBACK_FRAGMENT_THRESHOLD_MID (57), the third is
-BCH_WRITEBACK_FRAGMENT_THRESHOLD_HIGH (64). By default
-the first stage tries to writeback the amount of dirty data
-in one bucket (on average) in (1 / (dirty_buckets_percent - 50)) second,
-the second stage tries to writeback the amount of dirty data in one bucket
-in (1 / (dirty_buckets_percent - 57)) * 100 millisecond, the third
-stage tries to writeback the amount of dirty data in one bucket in
-(1 / (dirty_buckets_percent - 64)) millisecond.
+With the btree using the `system_wq`, I seem to see a lot more desktop
+latency than I should.
 
-the initial rate at each stage can be controlled by 3 configurable
-parameters writeback_rate_fp_term_{low|mid|high}, they are by default
-1, 10, 1000, the hint of IO throughput that these values are trying
-to achieve is described by above paragraph, the reason that
-I choose those value as default is based on the testing and the
-production data, below is some details:
+After some more investigation, it looks like the original assumption
+of 56b3077 no longer is true, and bcache has a very high potential of
+congesting the `system_wq`. In turn, this introduces laggy desktop
+performance, IO stalls (at least with btrfs), and input events may be
+delayed.
 
-A. When it comes to the low stage, there is still a bit far from the 70
-   threshold, so we only want to give it a little bit push by setting the
-   term to 1, it means the initial rate will be 170 if the fragment is 6,
-   it is calculated by bucket_size/fragment, this rate is very small,
-   but still much reasonable than the minimum 8.
-   For a production bcache with unheavy workload, if the cache device
-   is bigger than 1 TB, it may take hours to consume 1% buckets,
-   so it is very possible to reclaim enough dirty buckets in this stage,
-   thus to avoid entering the next stage.
+So let's revert this. It's important to note that the semantics of
+using `system_wq` previously mean that `btree_io_wq` should be created
+before and destroyed after other bcache wqs to keep the same
+assumptions.
 
-B. If the dirty buckets ratio didn't turn around during the first stage,
-   it comes to the mid stage, then it is necessary for mid stage
-   to be more aggressive than low stage, so i choose the initial rate
-   to be 10 times more than low stage, that means 1700 as the initial
-   rate if the fragment is 6. This is some normal rate
-   we usually see for a normal workload when writeback happens
-   because of writeback_percent.
-
-C. If the dirty buckets ratio didn't turn around during the low and mid
-   stages, it comes to the third stage, and it is the last chance that
-   we can turn around to avoid the horrible cutoff writeback sync issue,
-   then we choose 100 times more aggressive than the mid stage, that
-   means 170000 as the initial rate if the fragment is 6. This is also
-   inferred from a production bcache, I've got one week's writeback rate
-   data from a production bcache which has quite heavy workloads,
-   again, the writeback is triggered by the writeback percent,
-   the highest rate area is around 100000 to 240000, so I believe this
-   kind aggressiveness at this stage is reasonable for production.
-   And it should be mostly enough because the hint is trying to reclaim
-   1000 bucket per second, and from that heavy production env,
-   it is consuming 50 bucket per second on average in one week's data.
-
-Option writeback_consider_fragment is to control whether we want
-this feature to be on or off, it's on by default.
-
-Lastly, below is the performance data for all the testing result,
-including the data from production env:
-https://docs.google.com/document/d/1AmbIEa_2MhB9bqhC3rfga9tp7n9YX9PLn0jSUxscVW0/edit?usp=sharing
-
-Signed-off-by: dongdong tao <dongdong.tao@canonical.com>
+Cc: Coly Li <colyli@suse.de>
+Cc: stable@vger.kernel.org # 5.4+
+Signed-off-by: Kai Krakow <kai@kaishome.de>
 Signed-off-by: Coly Li <colyli@suse.de>
 ---
- drivers/md/bcache/bcache.h    |  4 ++++
- drivers/md/bcache/sysfs.c     | 23 +++++++++++++++++++
- drivers/md/bcache/writeback.c | 42 +++++++++++++++++++++++++++++++++++
- drivers/md/bcache/writeback.h |  4 ++++
- 4 files changed, 73 insertions(+)
+ drivers/md/bcache/bcache.h |  2 ++
+ drivers/md/bcache/btree.c  | 21 +++++++++++++++++++--
+ drivers/md/bcache/super.c  |  4 ++++
+ 3 files changed, 25 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index 1d57f48307e6..d7a84327b7f1 100644
+index d7a84327b7f1..2b8c7dd2cfae 100644
 --- a/drivers/md/bcache/bcache.h
 +++ b/drivers/md/bcache/bcache.h
-@@ -373,6 +373,7 @@ struct cached_dev {
- 	unsigned int		partial_stripes_expensive:1;
- 	unsigned int		writeback_metadata:1;
- 	unsigned int		writeback_running:1;
-+	unsigned int		writeback_consider_fragment:1;
- 	unsigned char		writeback_percent;
- 	unsigned int		writeback_delay;
+@@ -1046,5 +1046,7 @@ void bch_debug_exit(void);
+ void bch_debug_init(void);
+ void bch_request_exit(void);
+ int bch_request_init(void);
++void bch_btree_exit(void);
++int bch_btree_init(void);
  
-@@ -385,6 +386,9 @@ struct cached_dev {
- 	unsigned int		writeback_rate_update_seconds;
- 	unsigned int		writeback_rate_i_term_inverse;
- 	unsigned int		writeback_rate_p_term_inverse;
-+	unsigned int		writeback_rate_fp_term_low;
-+	unsigned int		writeback_rate_fp_term_mid;
-+	unsigned int		writeback_rate_fp_term_high;
- 	unsigned int		writeback_rate_minimum;
+ #endif /* _BCACHE_H */
+diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
+index 910df242c83d..952f022db5a5 100644
+--- a/drivers/md/bcache/btree.c
++++ b/drivers/md/bcache/btree.c
+@@ -99,6 +99,8 @@
+ #define PTR_HASH(c, k)							\
+ 	(((k)->ptr[0] >> c->bucket_bits) | PTR_GEN(k, 0))
  
- 	enum stop_on_failure	stop_when_cache_set_failed;
-diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
-index 00a520c03f41..eef15f8022ba 100644
---- a/drivers/md/bcache/sysfs.c
-+++ b/drivers/md/bcache/sysfs.c
-@@ -117,10 +117,14 @@ rw_attribute(writeback_running);
- rw_attribute(writeback_percent);
- rw_attribute(writeback_delay);
- rw_attribute(writeback_rate);
-+rw_attribute(writeback_consider_fragment);
- 
- rw_attribute(writeback_rate_update_seconds);
- rw_attribute(writeback_rate_i_term_inverse);
- rw_attribute(writeback_rate_p_term_inverse);
-+rw_attribute(writeback_rate_fp_term_low);
-+rw_attribute(writeback_rate_fp_term_mid);
-+rw_attribute(writeback_rate_fp_term_high);
- rw_attribute(writeback_rate_minimum);
- read_attribute(writeback_rate_debug);
- 
-@@ -195,6 +199,7 @@ SHOW(__bch_cached_dev)
- 	var_printf(bypass_torture_test,	"%i");
- 	var_printf(writeback_metadata,	"%i");
- 	var_printf(writeback_running,	"%i");
-+	var_printf(writeback_consider_fragment,	"%i");
- 	var_print(writeback_delay);
- 	var_print(writeback_percent);
- 	sysfs_hprint(writeback_rate,
-@@ -205,6 +210,9 @@ SHOW(__bch_cached_dev)
- 	var_print(writeback_rate_update_seconds);
- 	var_print(writeback_rate_i_term_inverse);
- 	var_print(writeback_rate_p_term_inverse);
-+	var_print(writeback_rate_fp_term_low);
-+	var_print(writeback_rate_fp_term_mid);
-+	var_print(writeback_rate_fp_term_high);
- 	var_print(writeback_rate_minimum);
- 
- 	if (attr == &sysfs_writeback_rate_debug) {
-@@ -303,6 +311,7 @@ STORE(__cached_dev)
- 	sysfs_strtoul_bool(bypass_torture_test, dc->bypass_torture_test);
- 	sysfs_strtoul_bool(writeback_metadata, dc->writeback_metadata);
- 	sysfs_strtoul_bool(writeback_running, dc->writeback_running);
-+	sysfs_strtoul_bool(writeback_consider_fragment, dc->writeback_consider_fragment);
- 	sysfs_strtoul_clamp(writeback_delay, dc->writeback_delay, 0, UINT_MAX);
- 
- 	sysfs_strtoul_clamp(writeback_percent, dc->writeback_percent,
-@@ -331,6 +340,16 @@ STORE(__cached_dev)
- 	sysfs_strtoul_clamp(writeback_rate_p_term_inverse,
- 			    dc->writeback_rate_p_term_inverse,
- 			    1, UINT_MAX);
-+	sysfs_strtoul_clamp(writeback_rate_fp_term_low,
-+			    dc->writeback_rate_fp_term_low,
-+			    1, dc->writeback_rate_fp_term_mid - 1);
-+	sysfs_strtoul_clamp(writeback_rate_fp_term_mid,
-+			    dc->writeback_rate_fp_term_mid,
-+			    dc->writeback_rate_fp_term_low + 1,
-+			    dc->writeback_rate_fp_term_high - 1);
-+	sysfs_strtoul_clamp(writeback_rate_fp_term_high,
-+			    dc->writeback_rate_fp_term_high,
-+			    dc->writeback_rate_fp_term_mid + 1, UINT_MAX);
- 	sysfs_strtoul_clamp(writeback_rate_minimum,
- 			    dc->writeback_rate_minimum,
- 			    1, UINT_MAX);
-@@ -499,9 +518,13 @@ static struct attribute *bch_cached_dev_files[] = {
- 	&sysfs_writeback_delay,
- 	&sysfs_writeback_percent,
- 	&sysfs_writeback_rate,
-+	&sysfs_writeback_consider_fragment,
- 	&sysfs_writeback_rate_update_seconds,
- 	&sysfs_writeback_rate_i_term_inverse,
- 	&sysfs_writeback_rate_p_term_inverse,
-+	&sysfs_writeback_rate_fp_term_low,
-+	&sysfs_writeback_rate_fp_term_mid,
-+	&sysfs_writeback_rate_fp_term_high,
- 	&sysfs_writeback_rate_minimum,
- 	&sysfs_writeback_rate_debug,
- 	&sysfs_io_errors,
-diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
-index a129e4d2707c..82d4e0880a99 100644
---- a/drivers/md/bcache/writeback.c
-+++ b/drivers/md/bcache/writeback.c
-@@ -88,6 +88,44 @@ static void __update_writeback_rate(struct cached_dev *dc)
- 	int64_t integral_scaled;
- 	uint32_t new_rate;
- 
-+	/*
-+	 * We need to consider the number of dirty buckets as well
-+	 * when calculating the proportional_scaled, Otherwise we might
-+	 * have an unreasonable small writeback rate at a highly fragmented situation
-+	 * when very few dirty sectors consumed a lot dirty buckets, the
-+	 * worst case is when dirty buckets reached cutoff_writeback_sync and
-+	 * dirty data is still not even reached to writeback percent, so the rate
-+	 * still will be at the minimum value, which will cause the write
-+	 * stuck at a non-writeback mode.
-+	 */
-+	struct cache_set *c = dc->disk.c;
++static struct workqueue_struct *btree_io_wq;
 +
-+	int64_t dirty_buckets = c->nbuckets - c->avail_nbuckets;
+ #define insert_lock(s, b)	((b)->level <= (s)->lock)
+ 
+ 
+@@ -308,7 +310,7 @@ static void __btree_node_write_done(struct closure *cl)
+ 	btree_complete_write(b, w);
+ 
+ 	if (btree_node_dirty(b))
+-		schedule_delayed_work(&b->work, 30 * HZ);
++		queue_delayed_work(btree_io_wq, &b->work, 30 * HZ);
+ 
+ 	closure_return_with_destructor(cl, btree_node_write_unlock);
+ }
+@@ -481,7 +483,7 @@ static void bch_btree_leaf_dirty(struct btree *b, atomic_t *journal_ref)
+ 	BUG_ON(!i->keys);
+ 
+ 	if (!btree_node_dirty(b))
+-		schedule_delayed_work(&b->work, 30 * HZ);
++		queue_delayed_work(btree_io_wq, &b->work, 30 * HZ);
+ 
+ 	set_btree_node_dirty(b);
+ 
+@@ -2764,3 +2766,18 @@ void bch_keybuf_init(struct keybuf *buf)
+ 	spin_lock_init(&buf->lock);
+ 	array_allocator_init(&buf->freelist);
+ }
 +
-+	if (dc->writeback_consider_fragment &&
-+		c->gc_stats.in_use > BCH_WRITEBACK_FRAGMENT_THRESHOLD_LOW && dirty > 0) {
-+		int64_t fragment =
-+			div_s64((dirty_buckets *  c->cache->sb.bucket_size), dirty);
-+		int64_t fp_term;
-+		int64_t fps;
++void bch_btree_exit(void)
++{
++	if (btree_io_wq)
++		destroy_workqueue(btree_io_wq);
++}
 +
-+		if (c->gc_stats.in_use <= BCH_WRITEBACK_FRAGMENT_THRESHOLD_MID) {
-+			fp_term = dc->writeback_rate_fp_term_low *
-+			(c->gc_stats.in_use - BCH_WRITEBACK_FRAGMENT_THRESHOLD_LOW);
-+		} else if (c->gc_stats.in_use <= BCH_WRITEBACK_FRAGMENT_THRESHOLD_HIGH) {
-+			fp_term = dc->writeback_rate_fp_term_mid *
-+			(c->gc_stats.in_use - BCH_WRITEBACK_FRAGMENT_THRESHOLD_MID);
-+		} else {
-+			fp_term = dc->writeback_rate_fp_term_high *
-+			(c->gc_stats.in_use - BCH_WRITEBACK_FRAGMENT_THRESHOLD_HIGH);
-+		}
-+		fps = div_s64(dirty, dirty_buckets) * fp_term;
-+		if (fragment > 3 && fps > proportional_scaled) {
-+			/* Only overrite the p when fragment > 3 */
-+			proportional_scaled = fps;
-+		}
-+	}
++int __init bch_btree_init(void)
++{
++	btree_io_wq = create_singlethread_workqueue("bch_btree_io");
++	if (!btree_io_wq)
++		return -ENOMEM;
 +
- 	if ((error < 0 && dc->writeback_rate_integral > 0) ||
- 	    (error > 0 && time_before64(local_clock(),
- 			 dc->writeback_rate.next + NSEC_PER_MSEC))) {
-@@ -977,6 +1015,7 @@ void bch_cached_dev_writeback_init(struct cached_dev *dc)
++	return 0;
++}
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index e7d1b52c5cc8..85a44a0cffe0 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -2821,6 +2821,7 @@ static void bcache_exit(void)
+ 		destroy_workqueue(bcache_wq);
+ 	if (bch_journal_wq)
+ 		destroy_workqueue(bch_journal_wq);
++	bch_btree_exit();
  
- 	dc->writeback_metadata		= true;
- 	dc->writeback_running		= false;
-+	dc->writeback_consider_fragment = true;
- 	dc->writeback_percent		= 10;
- 	dc->writeback_delay		= 30;
- 	atomic_long_set(&dc->writeback_rate.rate, 1024);
-@@ -984,6 +1023,9 @@ void bch_cached_dev_writeback_init(struct cached_dev *dc)
+ 	if (bcache_major)
+ 		unregister_blkdev(bcache_major, "bcache");
+@@ -2876,6 +2877,9 @@ static int __init bcache_init(void)
+ 		return bcache_major;
+ 	}
  
- 	dc->writeback_rate_update_seconds = WRITEBACK_RATE_UPDATE_SECS_DEFAULT;
- 	dc->writeback_rate_p_term_inverse = 40;
-+	dc->writeback_rate_fp_term_low = 1;
-+	dc->writeback_rate_fp_term_mid = 10;
-+	dc->writeback_rate_fp_term_high = 1000;
- 	dc->writeback_rate_i_term_inverse = 10000;
- 
- 	WARN_ON(test_and_clear_bit(BCACHE_DEV_WB_RUNNING, &dc->disk.flags));
-diff --git a/drivers/md/bcache/writeback.h b/drivers/md/bcache/writeback.h
-index 3f1230e22de0..02b2f9df73f6 100644
---- a/drivers/md/bcache/writeback.h
-+++ b/drivers/md/bcache/writeback.h
-@@ -16,6 +16,10 @@
- 
- #define BCH_AUTO_GC_DIRTY_THRESHOLD	50
- 
-+#define BCH_WRITEBACK_FRAGMENT_THRESHOLD_LOW 50
-+#define BCH_WRITEBACK_FRAGMENT_THRESHOLD_MID 57
-+#define BCH_WRITEBACK_FRAGMENT_THRESHOLD_HIGH 64
++	if (bch_btree_init())
++		goto err;
 +
- #define BCH_DIRTY_INIT_THRD_MAX	64
- /*
-  * 14 (16384ths) is chosen here as something that each backing device
+ 	bcache_wq = alloc_workqueue("bcache", WQ_MEM_RECLAIM, 0);
+ 	if (!bcache_wq)
+ 		goto err;
 -- 
 2.26.2
 
