@@ -5,31 +5,32 @@ X-Spam-Level:
 X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79105C43381
-	for <linux-block@archiver.kernel.org>; Wed, 10 Feb 2021 05:09:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B8C6C4332D
+	for <linux-block@archiver.kernel.org>; Wed, 10 Feb 2021 05:09:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5908C64E4B
-	for <linux-block@archiver.kernel.org>; Wed, 10 Feb 2021 05:09:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 136F464E2A
+	for <linux-block@archiver.kernel.org>; Wed, 10 Feb 2021 05:09:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230488AbhBJFJc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 Feb 2021 00:09:32 -0500
-Received: from mx2.suse.de ([195.135.220.15]:40714 "EHLO mx2.suse.de"
+        id S230497AbhBJFJe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 Feb 2021 00:09:34 -0500
+Received: from mx2.suse.de ([195.135.220.15]:40752 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230308AbhBJFJ1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 Feb 2021 00:09:27 -0500
+        id S230470AbhBJFJ3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 10 Feb 2021 00:09:29 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 22E37B062;
-        Wed, 10 Feb 2021 05:08:12 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id 620DAAFE6;
+        Wed, 10 Feb 2021 05:08:20 +0000 (UTC)
 From:   Coly Li <colyli@suse.de>
 To:     axboe@kernel.dk
 Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        Joe Perches <joe@perches.com>, Coly Li <colyli@suse.de>
-Subject: [PATCH 06/20] bcache: Avoid comma separated statements
-Date:   Wed, 10 Feb 2021 13:07:28 +0800
-Message-Id: <20210210050742.31237-7-colyli@suse.de>
+        Jianpeng Ma <jianpeng.ma@intel.com>,
+        Qiaowei Ren <qiaowei.ren@intel.com>, Coly Li <colyli@suse.de>
+Subject: [PATCH 10/20] bcache: bch_nvm_alloc_pages() of the buddy
+Date:   Wed, 10 Feb 2021 13:07:32 +0800
+Message-Id: <20210210050742.31237-11-colyli@suse.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20210210050742.31237-1-colyli@suse.de>
 References: <20210210050742.31237-1-colyli@suse.de>
@@ -39,64 +40,174 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Joe Perches <joe@perches.com>
+From: Jianpeng Ma <jianpeng.ma@intel.com>
 
-Use semicolons and braces.
+This patch implements the bch_nvm_alloc_pages() of the buddy.
 
-Signed-off-by: Joe Perches <joe@perches.com>
+Signed-off-by: Jianpeng Ma <jianpeng.ma@intel.com>
+Co-authored-by: Qiaowei Ren <qiaowei.ren@intel.com>
 Signed-off-by: Coly Li <colyli@suse.de>
 ---
- drivers/md/bcache/bset.c  | 12 ++++++++----
- drivers/md/bcache/sysfs.c |  6 ++++--
- 2 files changed, 12 insertions(+), 6 deletions(-)
+ drivers/md/bcache/nvm-pages.c | 121 ++++++++++++++++++++++++++++++++++
+ drivers/md/bcache/nvm-pages.h |   6 ++
+ 2 files changed, 127 insertions(+)
 
-diff --git a/drivers/md/bcache/bset.c b/drivers/md/bcache/bset.c
-index 67a2c47f4201..94d38e8a59b3 100644
---- a/drivers/md/bcache/bset.c
-+++ b/drivers/md/bcache/bset.c
-@@ -712,8 +712,10 @@ void bch_bset_build_written_tree(struct btree_keys *b)
- 	for (j = inorder_next(0, t->size);
- 	     j;
- 	     j = inorder_next(j, t->size)) {
--		while (bkey_to_cacheline(t, k) < cacheline)
--			prev = k, k = bkey_next(k);
-+		while (bkey_to_cacheline(t, k) < cacheline) {
-+			prev = k;
-+			k = bkey_next(k);
-+		}
+diff --git a/drivers/md/bcache/nvm-pages.c b/drivers/md/bcache/nvm-pages.c
+index 7efb99c0fc07..0b992c17ce47 100644
+--- a/drivers/md/bcache/nvm-pages.c
++++ b/drivers/md/bcache/nvm-pages.c
+@@ -124,6 +124,127 @@ static inline void remove_owner_space(struct bch_nvm_namespace *ns,
+ 	bitmap_set(ns->pages_bitmap, pgoff, nr);
+ }
  
- 		t->prev[j] = bkey_u64s(prev);
- 		t->tree[j].m = bkey_to_cacheline_offset(t, cacheline++, k);
-@@ -901,8 +903,10 @@ unsigned int bch_btree_insert_key(struct btree_keys *b, struct bkey *k,
- 	status = BTREE_INSERT_STATUS_INSERT;
- 
- 	while (m != bset_bkey_last(i) &&
--	       bkey_cmp(k, b->ops->is_extents ? &START_KEY(m) : m) > 0)
--		prev = m, m = bkey_next(m);
-+	       bkey_cmp(k, b->ops->is_extents ? &START_KEY(m) : m) > 0) {
-+		prev = m;
-+		m = bkey_next(m);
++/* If not found, it will create if create == true */
++static struct bch_owner_list *find_owner_list(const char *owner_uuid, bool create)
++{
++	struct bch_owner_list *owner_list;
++	int i;
++
++	for (i = 0; i < only_set->owner_list_used; i++) {
++		if (!memcmp(owner_uuid, only_set->owner_lists[i]->owner_uuid, 16))
++			return only_set->owner_lists[i];
 +	}
- 
- 	/* prev is in the tree, if we merge we're done */
- 	status = BTREE_INSERT_STATUS_BACK_MERGE;
-diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
-index eef15f8022ba..cc89f3156d1a 100644
---- a/drivers/md/bcache/sysfs.c
-+++ b/drivers/md/bcache/sysfs.c
-@@ -1094,8 +1094,10 @@ SHOW(__bch_cache)
- 			--n;
- 
- 		while (cached < p + n &&
--		       *cached == BTREE_PRIO)
--			cached++, n--;
-+		       *cached == BTREE_PRIO) {
-+			cached++;
-+			n--;
++
++	if (create) {
++		owner_list = alloc_owner_list(owner_uuid, NULL, only_set->total_namespaces_nr);
++		only_set->owner_lists[only_set->owner_list_used++] = owner_list;
++		return owner_list;
++	} else
++		return NULL;
++}
++
++static struct bch_nvm_alloced_recs *find_nvm_alloced_recs(struct bch_owner_list *owner_list,
++		struct bch_nvm_namespace *ns, bool create)
++{
++	int position = ns->sb.this_namespace_nr;
++
++	if (create && !owner_list->alloced_recs[position]) {
++		struct bch_nvm_alloced_recs *alloced_recs =
++			kzalloc(sizeof(*alloced_recs), GFP_KERNEL|__GFP_NOFAIL);
++
++		alloced_recs->ns = ns;
++		INIT_LIST_HEAD(&alloced_recs->extent_head);
++		owner_list->alloced_recs[position] = alloced_recs;
++		return alloced_recs;
++	} else
++		return owner_list->alloced_recs[position];
++}
++
++static inline void *extent_end_addr(struct bch_extent *extent)
++{
++	return extent->kaddr + ((u64)(extent->nr) << PAGE_SHIFT);
++}
++
++static void add_extent(struct bch_nvm_alloced_recs *alloced_recs, void *addr, int order)
++{
++	struct list_head *list = alloced_recs->extent_head.next;
++	struct bch_extent *extent, *tmp;
++	void *end_addr = addr + (((u64)1 << order) << PAGE_SHIFT);
++
++	while (list != &alloced_recs->extent_head) {
++		extent = container_of(list, struct bch_extent, list);
++		if (addr > extent->kaddr) {
++			list = list->next;
++			continue;
 +		}
++		break;
++	}
++
++	extent = kzalloc(sizeof(*extent), GFP_KERNEL);
++	extent->kaddr = addr;
++	extent->nr = 1 << order;
++	list_add_tail(&extent->list, list);
++	alloced_recs->nr++;
++}
++
++void *bch_nvm_alloc_pages(int order, const char *owner_uuid)
++{
++	void *kaddr = NULL;
++	struct bch_owner_list *owner_list;
++	struct bch_nvm_alloced_recs *alloced_recs;
++	int i, j;
++
++	mutex_lock(&only_set->lock);
++	owner_list = find_owner_list(owner_uuid, true);
++
++	for (j = 0; j < only_set->total_namespaces_nr; j++) {
++		struct bch_nvm_namespace *ns = only_set->nss[j];
++
++		if (!ns || (ns->free < (1 << order)))
++			continue;
++
++		for (i = order; i < BCH_MAX_ORDER; i++) {
++			struct list_head *list;
++			struct page *page, *buddy_page;
++
++			if (list_empty(&ns->free_area[i]))
++				continue;
++
++			list = ns->free_area[i].next;
++			page = container_of((void *)list, struct page, zone_device_data);
++
++			list_del(list);
++
++			while (i != order) {
++				buddy_page = nvm_vaddr_to_page(ns,
++					nvm_pgoff_to_vaddr(ns, page->index + (1 << (i - 1))));
++				set_page_private(buddy_page, i - 1);
++				buddy_page->index = page->index + (1 << (i - 1));
++				__SetPageBuddy(buddy_page);
++				list_add((struct list_head *)&buddy_page->zone_device_data,
++					&ns->free_area[i - 1]);
++				i--;
++			}
++
++			set_page_private(page, order);
++			__ClearPageBuddy(page);
++			ns->free -= 1 << order;
++			kaddr = nvm_pgoff_to_vaddr(ns, page->index);
++			break;
++		}
++
++		if (i != BCH_MAX_ORDER) {
++			alloced_recs = find_nvm_alloced_recs(owner_list, ns, true);
++			add_extent(alloced_recs, kaddr, order);
++			break;
++		}
++	}
++
++	mutex_unlock(&only_set->lock);
++	return kaddr;
++}
++EXPORT_SYMBOL_GPL(bch_nvm_alloc_pages);
++
+ static int init_owner_info(struct bch_nvm_namespace *ns)
+ {
+ 	struct bch_owner_list_head *owner_list_head;
+diff --git a/drivers/md/bcache/nvm-pages.h b/drivers/md/bcache/nvm-pages.h
+index ed3431daae06..10157d993126 100644
+--- a/drivers/md/bcache/nvm-pages.h
++++ b/drivers/md/bcache/nvm-pages.h
+@@ -79,6 +79,7 @@ extern struct bch_nvm_set *only_set;
+ struct bch_nvm_namespace *bch_register_namespace(const char *dev_path);
+ int bch_nvm_init(void);
+ void bch_nvm_exit(void);
++void *bch_nvm_alloc_pages(int order, const char *owner_uuid);
  
- 		for (i = 0; i < n; i++)
- 			sum += INITIAL_PRIO - cached[i];
+ #else
+ 
+@@ -92,6 +93,11 @@ static inline int bch_nvm_init(void)
+ }
+ static inline void bch_nvm_exit(void) { }
+ 
++static inline void *bch_nvm_alloc_pages(int order, const char *owner_uuid)
++{
++	return NULL;
++}
++
+ #endif /* CONFIG_BCACHE_NVM_PAGES */
+ 
+ #endif /* _BCACHE_NVM_PAGES_H */
 -- 
 2.26.2
 
