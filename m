@@ -5,65 +5,64 @@ X-Spam-Level:
 X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
+	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49336C433E6
-	for <linux-block@archiver.kernel.org>; Thu, 11 Feb 2021 22:55:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54EFFC433DB
+	for <linux-block@archiver.kernel.org>; Thu, 11 Feb 2021 22:55:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1078964E44
-	for <linux-block@archiver.kernel.org>; Thu, 11 Feb 2021 22:55:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 115CF64E42
+	for <linux-block@archiver.kernel.org>; Thu, 11 Feb 2021 22:55:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229777AbhBKWzX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S230150AbhBKWzX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Thu, 11 Feb 2021 17:55:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35714 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35718 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229943AbhBKWzO (ORCPT
+        with ESMTP id S229946AbhBKWzP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Feb 2021 17:55:14 -0500
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA0CCC061794
-        for <linux-block@vger.kernel.org>; Thu, 11 Feb 2021 14:53:56 -0800 (PST)
-Received: by mail-pg1-x549.google.com with SMTP id v16so5727944pgl.23
-        for <linux-block@vger.kernel.org>; Thu, 11 Feb 2021 14:53:56 -0800 (PST)
+        Thu, 11 Feb 2021 17:55:15 -0500
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C311AC0617A7
+        for <linux-block@vger.kernel.org>; Thu, 11 Feb 2021 14:53:58 -0800 (PST)
+Received: by mail-yb1-xb4a.google.com with SMTP id i2so7728814ybl.16
+        for <linux-block@vger.kernel.org>; Thu, 11 Feb 2021 14:53:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:in-reply-to:message-id:mime-version:references:subject
          :from:to:cc;
-        bh=PzZ3HqYXXMl4x2ko2AkyE6044tKsCbJJ6g3BR1Cqc4U=;
-        b=VMR9fwBw+N+vaWHcFXK3rnI3ZsKDRmCwOY3WpZeIPfakOWfkpzv6nTp2m4BxJougLu
-         A2yAYOJhIUSD1hhs64JoQjmNyH5A7WJs05SQcL2sC+vkVM6hkRrlA7AC+xgoKHv9bKI8
-         YzAMCxey9+mHDKWIlO1Ctl660ve7MgD+1YLon2hGTuxrUayqc+WMtU4lDCROP4+wG+Lu
-         YBoY5jq97Wl+F7sgPnG8xifCNHHNfTxsCaUrN+DvVeP/A9Rx+Zvmw3Km8fmcXLKK0kR2
-         WpbHlT9IroRY7+RWkcuqD5mrI5R3952W27wss+dOUNgkiPFSUFxYT3QoaJdsGeE56ahJ
-         4Qng==
+        bh=PxM9IT9eyGUZNP1LzuDRc/mngpIW4AQ9SBaT5vWfza8=;
+        b=Ucglw7ZkrxpuhIWFGcDbMTMcG+6MYu5YOUu80nYNxay54B1uHqiuqCk1Qi8vWIzCBE
+         gspPnFYy8NosLiC3gpvQJJPsGEwQLooMncjiDV24kf0b85qB2u/DqJ481HBQyjlKYKoe
+         PRoym98ZiZRSORjEzkCqqkjGBMKGGv0J786/ccj+f79WfOZ+XKM2e0u76uQMfDjXO/36
+         8PySDt9wc0r28i2GymYPEmEwEQnWynLeL7qMnNdR3a+E/OUDMFSoUNRDBOe24DdQVlwz
+         LoMDhNNiYezk2MO4sPOMTVRmNJesB1d2e+Ft4TFy+dDbQacaFsvM5CUsdG5rW60f2vlx
+         Wmcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=PzZ3HqYXXMl4x2ko2AkyE6044tKsCbJJ6g3BR1Cqc4U=;
-        b=uUQgJ5E/jskeUH/fzKRjTUwKrcH8f/AJb9ORBtLZhpnGnhuD9bSYFeu7L9oOwRdeRx
-         BNNA+Nfp+M/8UaDr4EBheE2/3yw7WjNq+SgvHOatFTOH77iz8yA2musX16clnYzoC2rA
-         E/yRFjGHPzuiMb0rrA9nufRraO+i+fWSln91O80EtpXBOcLCDU5qwiSqDCMoVhRH06Mj
-         KDQIKrlnSOZzoTVD69w6DFGzRsVVZue9yVo3s6GfC05KGovDO1hcS9afAC//SL+57Osh
-         f7yT/aKoBdF9JBVUnsJveL15gn0wOMZLmyQYtUq5EBv8x3IJCu71zPdzoiC4Vzt9ZvSM
-         TGsQ==
-X-Gm-Message-State: AOAM530A1H5pQOnG6WbvjYHkyziGVAIvl91BNTc1rfqGb0csN1+QNnXg
-        5inZUQwW5D87ClBiTjH3f2HhGYVXzRlKaIj5hGrLsyNrXijNr2BY/pdQHp2uUQjawmpZtGUHhlo
-        teHNjeZgdd32xhgYxl90k4e2q3Dr5pW8eVOTcrnfPBz/1rXhGTlMD9cPBJog2El7Io6ia
-X-Google-Smtp-Source: ABdhPJxr7Lu0fj77ZerbVC8vr9ZFlGLKh5WjfVS661/jKvtGrdEM4EOTjautbcR2338CpJZzoQ2SJIKLixQ=
+        bh=PxM9IT9eyGUZNP1LzuDRc/mngpIW4AQ9SBaT5vWfza8=;
+        b=jeZq61mgW3+1tbpJOx4VKYr47dTs8WAXeiujolOJTQchPSqaNs7lPfW1zDoUg1ebiw
+         bMqOPNcdnp22DwwQ9phIim9vs8p7qEJ6EtncK5h0MmsikQ1hBCnlr30rTINT1WiKncBp
+         sHXeckU1esmp318t1hAWJWlZTTRALOc56eLnl857/d/vSH7OBlYowsEGoj9HMgbrFPWJ
+         6vRk0B41OXVb337JRKbIZhqis8stJv9+K7SZjB9CBzo8aY6MWoG6KXycg3+tjLiPqfBd
+         1Ft4ffsAA+cmiloGV/FFxZdgR8rKO1YdaaJlVyZa6n/lUb/ADayObwyFGqpypEUyBajX
+         yZew==
+X-Gm-Message-State: AOAM530dT5Z4KhxJ+KMqGDLuJoUWbdtXJ8SSV9bqb+OBQMyImnG2Dy8R
+        oyPrgy/F11igGpfuDGRcTh7dkQ/9PfabaYVSxajGfPaz6dIrwnSoiY8CFW8WJe2DoZMclr9eGv9
+        1XzLjzFEhaDPgK7t8dFQoyMMOJ3RKIMVm0dphVh6Qk9u+vrLVrWxPDPQhGt6/BzHA+zAo
+X-Google-Smtp-Source: ABdhPJyCcEkUUWB8T8w/MJOUbhtPs5xiGKEOUKflHC1JDKFUsf7YIQuwF9tUmiR7CFT6Wa50/QpxaMDywZM=
 Sender: "satyat via sendgmr" <satyat@satyaprateek.c.googlers.com>
 X-Received: from satyaprateek.c.googlers.com ([fda3:e722:ac3:10:24:72f4:c0a8:1092])
- (user=satyat job=sendgmr) by 2002:a17:90b:1217:: with SMTP id
- gl23mr5924163pjb.163.1613084036078; Thu, 11 Feb 2021 14:53:56 -0800 (PST)
-Date:   Thu, 11 Feb 2021 22:53:42 +0000
+ (user=satyat job=sendgmr) by 2002:a25:b749:: with SMTP id e9mr170105ybm.457.1613084037955;
+ Thu, 11 Feb 2021 14:53:57 -0800 (PST)
+Date:   Thu, 11 Feb 2021 22:53:43 +0000
 In-Reply-To: <20210211225343.3145732-1-satyat@google.com>
-Message-Id: <20210211225343.3145732-5-satyat@google.com>
+Message-Id: <20210211225343.3145732-6-satyat@google.com>
 Mime-Version: 1.0
 References: <20210211225343.3145732-1-satyat@google.com>
 X-Mailer: git-send-email 2.30.0.478.g8a0d178c01-goog
-Subject: [PATCH v5 4/5] dm: support key eviction from keyslot managers of
- underlying devices
+Subject: [PATCH v5 5/5] dm: set DM_TARGET_PASSES_CRYPTO feature for some targets
 From:   Satya Tangirala <satyat@google.com>
 To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         dm-devel@redhat.com
@@ -76,100 +75,51 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Now that device mapper supports inline encryption, add the ability to
-evict keys from all underlying devices. When an upper layer requests
-a key eviction, we simply iterate through all underlying devices
-and evict that key from each device.
+dm-linear and dm-flakey obviously can pass through inline crypto support.
 
 Co-developed-by: Eric Biggers <ebiggers@google.com>
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 Signed-off-by: Satya Tangirala <satyat@google.com>
 Reviewed-by: Eric Biggers <ebiggers@google.com>
 ---
- block/blk-crypto.c    |  1 +
- drivers/md/dm-table.c | 53 +++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 54 insertions(+)
+ drivers/md/dm-flakey.c | 4 +++-
+ drivers/md/dm-linear.c | 5 +++--
+ 2 files changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/block/blk-crypto.c b/block/blk-crypto.c
-index 5da43f0973b4..c2be8f15006c 100644
---- a/block/blk-crypto.c
-+++ b/block/blk-crypto.c
-@@ -409,3 +409,4 @@ int blk_crypto_evict_key(struct request_queue *q,
- 	 */
- 	return blk_crypto_fallback_evict_key(key);
- }
-+EXPORT_SYMBOL_GPL(blk_crypto_evict_key);
-diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
-index fbaadfc6eed9..b036a349aaad 100644
---- a/drivers/md/dm-table.c
-+++ b/drivers/md/dm-table.c
-@@ -1214,6 +1214,58 @@ struct dm_keyslot_manager {
- 	struct mapped_device *md;
- };
- 
-+struct dm_keyslot_evict_args {
-+	const struct blk_crypto_key *key;
-+	int err;
-+};
-+
-+static int dm_keyslot_evict_callback(struct dm_target *ti, struct dm_dev *dev,
-+				     sector_t start, sector_t len, void *data)
-+{
-+	struct dm_keyslot_evict_args *args = data;
-+	int err;
-+
-+	err = blk_crypto_evict_key(bdev_get_queue(dev->bdev), args->key);
-+	if (!args->err)
-+		args->err = err;
-+	/* Always try to evict the key from all devices. */
-+	return 0;
-+}
-+
-+/*
-+ * When an inline encryption key is evicted from a device-mapper device, evict
-+ * it from all the underlying devices.
-+ */
-+static int dm_keyslot_evict(struct blk_keyslot_manager *ksm,
-+			    const struct blk_crypto_key *key, unsigned int slot)
-+{
-+	struct dm_keyslot_manager *dksm = container_of(ksm,
-+						       struct dm_keyslot_manager,
-+						       ksm);
-+	struct mapped_device *md = dksm->md;
-+	struct dm_keyslot_evict_args args = { key };
-+	struct dm_table *t;
-+	int srcu_idx;
-+	int i;
-+	struct dm_target *ti;
-+
-+	t = dm_get_live_table(md, &srcu_idx);
-+	if (!t)
-+		return 0;
-+	for (i = 0; i < dm_table_get_num_targets(t); i++) {
-+		ti = dm_table_get_target(t, i);
-+		if (!ti->type->iterate_devices)
-+			continue;
-+		ti->type->iterate_devices(ti, dm_keyslot_evict_callback, &args);
-+	}
-+	dm_put_live_table(md, srcu_idx);
-+	return args.err;
-+}
-+
-+static struct blk_ksm_ll_ops dm_ksm_ll_ops = {
-+	.keyslot_evict = dm_keyslot_evict,
-+};
-+
- static int device_intersect_crypto_modes(struct dm_target *ti,
- 					 struct dm_dev *dev, sector_t start,
- 					 sector_t len, void *data)
-@@ -1271,6 +1323,7 @@ dm_table_construct_keyslot_manager(struct dm_table *t)
- 
- 	ksm = &dksm->ksm;
- 	blk_ksm_init_passthrough(ksm);
-+	ksm->ksm_ll_ops = dm_ksm_ll_ops;
- 	ksm->max_dun_bytes_supported = UINT_MAX;
- 	memset(ksm->crypto_modes_supported, 0xFF,
- 	       sizeof(ksm->crypto_modes_supported));
+diff --git a/drivers/md/dm-flakey.c b/drivers/md/dm-flakey.c
+index a2cc9e45cbba..30c6bc151213 100644
+--- a/drivers/md/dm-flakey.c
++++ b/drivers/md/dm-flakey.c
+@@ -482,8 +482,10 @@ static struct target_type flakey_target = {
+ 	.name   = "flakey",
+ 	.version = {1, 5, 0},
+ #ifdef CONFIG_BLK_DEV_ZONED
+-	.features = DM_TARGET_ZONED_HM,
++	.features = DM_TARGET_ZONED_HM | DM_TARGET_PASSES_CRYPTO,
+ 	.report_zones = flakey_report_zones,
++#else
++	.features = DM_TARGET_PASSES_CRYPTO,
+ #endif
+ 	.module = THIS_MODULE,
+ 	.ctr    = flakey_ctr,
+diff --git a/drivers/md/dm-linear.c b/drivers/md/dm-linear.c
+index 00774b5d7668..fc9c4272c10d 100644
+--- a/drivers/md/dm-linear.c
++++ b/drivers/md/dm-linear.c
+@@ -229,10 +229,11 @@ static struct target_type linear_target = {
+ 	.version = {1, 4, 0},
+ #ifdef CONFIG_BLK_DEV_ZONED
+ 	.features = DM_TARGET_PASSES_INTEGRITY | DM_TARGET_NOWAIT |
+-		    DM_TARGET_ZONED_HM,
++		    DM_TARGET_ZONED_HM | DM_TARGET_PASSES_CRYPTO,
+ 	.report_zones = linear_report_zones,
+ #else
+-	.features = DM_TARGET_PASSES_INTEGRITY | DM_TARGET_NOWAIT,
++	.features = DM_TARGET_PASSES_INTEGRITY | DM_TARGET_NOWAIT |
++		    DM_TARGET_PASSES_CRYPTO,
+ #endif
+ 	.module = THIS_MODULE,
+ 	.ctr    = linear_ctr,
 -- 
 2.30.0.478.g8a0d178c01-goog
 
