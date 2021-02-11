@@ -2,87 +2,172 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F4A2C433E0
-	for <linux-block@archiver.kernel.org>; Thu, 11 Feb 2021 03:08:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 382B9C433DB
+	for <linux-block@archiver.kernel.org>; Thu, 11 Feb 2021 03:59:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 33F2864E2E
-	for <linux-block@archiver.kernel.org>; Thu, 11 Feb 2021 03:08:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EF4C164DE9
+	for <linux-block@archiver.kernel.org>; Thu, 11 Feb 2021 03:59:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229935AbhBKDId (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 Feb 2021 22:08:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35882 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229799AbhBKDI0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 Feb 2021 22:08:26 -0500
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0460DC06174A
-        for <linux-block@vger.kernel.org>; Wed, 10 Feb 2021 19:07:46 -0800 (PST)
-Received: by mail-pl1-x634.google.com with SMTP id b8so2487629plh.12
-        for <linux-block@vger.kernel.org>; Wed, 10 Feb 2021 19:07:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=3mhBJs7OoyfS2zcVrbQAP79xwHQs56wVRNi/BY1bbvY=;
-        b=zWdzLtxtpSIzvCC92tWtiO8n8oojDUA7anDSZzkEE4lkpolIANyXBag5Fmb/HGhQXb
-         51RfYqW84ZIIY9q5iK6XVAvOxC3KBHEhDeDRUdYytDRk1P5/NxCqs9Bu/mxKU510V1t2
-         o3nhicKcHDi+EGf2cASP5264ruoQlNnSgkmCTTQtNKMNejvYZc6CnyN44tzcPoNIliI7
-         XO4pOcOOsOWs57gS9dbEMbzQMb4kxrj2AUdpjOzREo65XYPi/td+jcf8M93/GGLTt5/D
-         bg4+O9zgy8/rOXJ/TJvDfaNPwkvPRyzRbHG6X9pks0Tf7DMt5xddNWG7gOieZFU704MH
-         WQhw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=3mhBJs7OoyfS2zcVrbQAP79xwHQs56wVRNi/BY1bbvY=;
-        b=sMyrNjyJlu66p0c6Yt8juzXG5NjOftffquxjWTdQXeR8eoF5apgJjnbnIP7y6fTgUe
-         DvdZ10MoWn6IWpOqVV22+jTg/1DsfdSywoovoA75YAJy69ZITL4Tbkm1HhHZvggGi+cQ
-         eURbsMg8dVhJP4bqtv0uEygrRR7Lb0t5A1L5W1ws9i1Oc+54SUlLRlMqiJWdNPXz9KWd
-         cXw1AFLmkpvdm3FyhfKeSkb5ad2z/2IRrhUwNOu2uu05TPs7H6cxa5EvNDQdlYf+77mj
-         1512sJcIyA5RhZkVBDGeovnBbJGHKJKPI3sRZb4SfoHIXJ98MKQIQCGqBZ+sM6NEWUPq
-         hleQ==
-X-Gm-Message-State: AOAM533hRktrSVZwr/SB0qdeT60BR7HqtaPw/bydUnP3Vw35MeXZMcB0
-        /dR4/tcSgEdbJCJ72AnlHSrXp1haKO2LzQ==
-X-Google-Smtp-Source: ABdhPJyS3EIC1/0cxujchAyzsIFrMFqk/EK4Apvf/tfm5JIYYCsOoMqnVgrUU8+L9AA6Vl2lzq8YOQ==
-X-Received: by 2002:a17:90a:ca8d:: with SMTP id y13mr1992054pjt.76.1613012865254;
-        Wed, 10 Feb 2021 19:07:45 -0800 (PST)
-Received: from ?IPv6:2620:10d:c085:21e1::11c9? ([2620:10d:c090:400::5:9df6])
-        by smtp.gmail.com with ESMTPSA id p8sm3778200pgh.0.2021.02.10.19.07.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 Feb 2021 19:07:44 -0800 (PST)
-Subject: Re: [PATCH] block: Replace lkml.org links with lore
-To:     Kees Cook <keescook@chromium.org>, linux-kernel@vger.kernel.org
-Cc:     Joe Perches <joe@perches.com>, Justin Sanders <justin@coraid.com>,
-        linux-block@vger.kernel.org
-References: <20210210235159.3190756-1-keescook@chromium.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <8cdd00cd-c17f-fe69-fa07-b144a64c55e5@kernel.dk>
-Date:   Wed, 10 Feb 2021 20:07:43 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S229452AbhBKD7L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 Feb 2021 22:59:11 -0500
+Received: from mx2.suse.de ([195.135.220.15]:44476 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229456AbhBKD7J (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 10 Feb 2021 22:59:09 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id B2EBEAC69;
+        Thu, 11 Feb 2021 03:58:26 +0000 (UTC)
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        Jianpeng Ma <jianpeng.ma@intel.com>,
+        Qiaowei Ren <qiaowei.ren@intel.com>
+References: <20210210050742.31237-1-colyli@suse.de>
+ <20210210050742.31237-8-colyli@suse.de>
+ <76adf7d2-821b-c7a5-426e-4d3963d36455@kernel.dk>
+From:   Coly Li <colyli@suse.de>
+Subject: Re: [PATCH 07/20] bcache: add initial data structures for nvm pages
+Message-ID: <e2b05bd8-8129-73f1-2f17-00eb95ce5184@suse.de>
+Date:   Thu, 11 Feb 2021 11:58:23 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:78.0)
+ Gecko/20100101 Thunderbird/78.7.0
 MIME-Version: 1.0
-In-Reply-To: <20210210235159.3190756-1-keescook@chromium.org>
+In-Reply-To: <76adf7d2-821b-c7a5-426e-4d3963d36455@kernel.dk>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/10/21 4:51 PM, Kees Cook wrote:
-> As started by commit 05a5f51ca566 ("Documentation: Replace lkml.org
-> links with lore"), replace lkml.org links with lore to better use a
-> single source that's more likely to stay available long-term.
+On 2/10/21 11:09 PM, Jens Axboe wrote:
+> On 2/9/21 10:07 PM, Coly Li wrote:
+>> +struct bch_nvm_pgalloc_recs {
+>> +union {
+>> +	struct {
+>> +		struct bch_nvm_pages_owner_head	*owner;
+>> +		struct bch_nvm_pgalloc_recs	*next;
+>> +		__u8				magic[16];
+>> +		__u8				owner_uuid[16];
+>> +		__u32				size;
+>> +		__u32				used;
+>> +		__u64				_pad[4];
+>> +		struct bch_pgalloc_rec		recs[];
+>> +	};
+>> +	__u8	pad[8192];
+>> +};
+>> +};
+> 
 
-Applied, thanks.
+Hi Jens,
 
--- 
-Jens Axboe
+> This doesn't look right in a user header, any user API should be 32-bit
+> and 64-bit agnostic.
 
+The above data structure is stored in NVDIMM as allocator's meta data.
+It is designed to be directly accessed (in future update) as in-memory
+object, but stored on non-volatiled memory like on-disk data structure.
+
+To me, it is fine to use unsigned int/long/long long to define the
+members, because nvdimm driver only works on 64bit platform. It is just
+unclear to me which form/style I should use to define such data
+structure. On one side they are stores as non-volatiled media, on other
+side they are accessed directly as in-memory object...
+
+
+> 
+>> +struct bch_nvm_pages_owner_head {
+>> +	__u8			uuid[16];
+>> +	char			label[BCH_NVM_PAGES_LABEL_SIZE];
+>> +	/* Per-namespace own lists */
+>> +	struct bch_nvm_pgalloc_recs	*recs[BCH_NVM_PAGES_NAMESPACES_MAX];
+>> +};
+> 
+> Same here.
+
+For the above pointer, it is the same reason. In later version, such
+object on NVDIMM will be referenced directly by an in-memory pointer
+like we normally do for an in-memory object.
+
+Therefore I do treat the data structure as in-memory object after the
+DAX mapping accomplished. If not define it as an in-memory pointer, I
+have to cast it into (void *) every time when I use it.
+
+
+> 
+>> +/* heads[0] is always for nvm_pages internal usage */
+>> +struct bch_owner_list_head {
+>> +union {
+>> +	struct {
+>> +		__u32				size;
+>> +		__u32				used;
+>> +		__u64				_pad[4];
+>> +		struct bch_nvm_pages_owner_head	heads[];
+>> +	};
+>> +	__u8	pad[8192];
+>> +};
+>> +};
+> 
+> And here.
+> 
+>> +#define BCH_MAX_OWNER_LIST				\
+>> +	((sizeof(struct bch_owner_list_head) -		\
+>> +	 offsetof(struct bch_owner_list_head, heads)) /	\
+>> +	 sizeof(struct bch_nvm_pages_owner_head))
+>> +
+>> +/* The on-media bit order is local CPU order */
+>> +struct bch_nvm_pages_sb {
+>> +	__u64			csum;
+>> +	__u64			ns_start;
+>> +	__u64			sb_offset;
+>> +	__u64			version;
+>> +	__u8			magic[16];
+>> +	__u8			uuid[16];
+>> +	__u32			page_size;
+>> +	__u32			total_namespaces_nr;
+>> +	__u32			this_namespace_nr;
+>> +	union {
+>> +		__u8		set_uuid[16];
+>> +		__u64		set_magic;
+>> +	};
+> 
+> This doesn't look like it packs right either.
+
+This is my mimicry from bcache code, which uses the least significant 8
+bytes from the randomly generated UUID as a magic number. It is solid
+and not changed during the whole life cycle for the nvm pages set.
+
+
+> 
+>> +
+>> +	__u64			flags;
+>> +	__u64			seq;
+>> +
+>> +	__u64			feature_compat;
+>> +	__u64			feature_incompat;
+>> +	__u64			feature_ro_compat;
+>> +
+>> +	/* For allocable nvm pages from buddy systems */
+>> +	__u64			pages_offset;
+>> +	__u64			pages_total;
+>> +
+>> +	__u64			pad[8];
+>> +
+>> +	/* Only on the first name space */
+>> +	struct bch_owner_list_head	*owner_list_head;
+> 
+> And here's another pointer...
+> 
+
+Same reason for I use it as an in-memory pointer.
+
+The above definition is just using all the structures as in-memory
+object, the difference is just they are non-volatiled after reboot.
+
+Thanks.
+
+Coly Li
