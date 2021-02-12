@@ -2,86 +2,83 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D749EC433E0
-	for <linux-block@archiver.kernel.org>; Fri, 12 Feb 2021 16:10:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFBB7C433DB
+	for <linux-block@archiver.kernel.org>; Fri, 12 Feb 2021 16:14:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 900F464E6B
-	for <linux-block@archiver.kernel.org>; Fri, 12 Feb 2021 16:10:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 984E164E08
+	for <linux-block@archiver.kernel.org>; Fri, 12 Feb 2021 16:14:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229558AbhBLQK0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 12 Feb 2021 11:10:26 -0500
-Received: from mx2.suse.de ([195.135.220.15]:35908 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229493AbhBLQKZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 12 Feb 2021 11:10:25 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 4DF8EAD29;
-        Fri, 12 Feb 2021 16:09:42 +0000 (UTC)
-Subject: Re: [PATCH 00/20] bcache patches for Linux v5.12
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        Jianpeng Ma <jianpeng.ma@intel.com>,
-        Qiaowei Ren <qiaowei.ren@intel.com>,
-        Kai Krakow <kai@kaishome.de>
-References: <20210210050742.31237-1-colyli@suse.de>
- <50173dee-31dd-9951-bc7f-b5247a46ef5e@kernel.dk>
-From:   Coly Li <colyli@suse.de>
-Message-ID: <4f6a39e3-f80b-cdc2-aa50-5aa44a6fb8eb@suse.de>
-Date:   Sat, 13 Feb 2021 00:09:38 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:78.0)
- Gecko/20100101 Thunderbird/78.7.0
+        id S229903AbhBLQOv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 12 Feb 2021 11:14:51 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35049 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229660AbhBLQOr (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 12 Feb 2021 11:14:47 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1613146399;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=L5Nb2hpHuSmEncyB7k8Kpd8+QlfZitjO1fAJZA9q6Ek=;
+        b=c04pVCzCWxuAj4I8knnl2Fc94M4gxl+vhFqM+4N8r4Cm0A/BpGqOXwXqNEVxtHAYhVZb7T
+        OobeeyS2WarBEiKts6MoyUTrSQytJ2ObQDHpnw+Uua1ooCDVEHs1vrNFB5V3bvaw97KC3R
+        EYk0c8+lQt+x/A/VxwJcUl0fttwz2rs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-295-2ly9sgg-M8a8-Mt3Amhy4g-1; Fri, 12 Feb 2021 11:13:14 -0500
+X-MC-Unique: 2ly9sgg-M8a8-Mt3Amhy4g-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 271E51934100;
+        Fri, 12 Feb 2021 16:13:12 +0000 (UTC)
+Received: from localhost (unknown [10.18.25.174])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0204360BF1;
+        Fri, 12 Feb 2021 16:13:05 +0000 (UTC)
+Date:   Fri, 12 Feb 2021 11:13:05 -0500
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Sergei Shtepa <sergei.shtepa@veeam.com>
+Cc:     Damien.LeMoal@wdc.com, hare@suse.de, ming.lei@redhat.com,
+        agk@redhat.com, corbet@lwn.net, axboe@kernel.dk, jack@suse.cz,
+        johannes.thumshirn@wdc.com, gregkh@linuxfoundation.org,
+        koct9i@gmail.com, steve@sk2.org, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, pavel.tide@veeam.com
+Subject: Re: [PATCH v5 4/6] dm: new ioctl DM_DEV_REMAP_CMD
+Message-ID: <20210212161305.GB19424@redhat.com>
+References: <1612881028-7878-1-git-send-email-sergei.shtepa@veeam.com>
+ <1612881028-7878-5-git-send-email-sergei.shtepa@veeam.com>
 MIME-Version: 1.0
-In-Reply-To: <50173dee-31dd-9951-bc7f-b5247a46ef5e@kernel.dk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1612881028-7878-5-git-send-email-sergei.shtepa@veeam.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/10/21 11:11 PM, Jens Axboe wrote:
-> On 2/9/21 10:07 PM, Coly Li wrote:
->> Hi Jens,
->>
->> This is the first wave bcache patches for Linux v5.12.
->>
->> It is nice to see in this round we have 3 new patch contributors:
->> Jianpeng Ma, Qiaowei Ren and Kai Krakow.
->>
->> In this series, the EXPERIMENTAL patches from Jianpeng Ma, Qiaowei Ren
->> and me are initial effort to store bcache meta-data on NVDIMM namespace.
->> The NVDIMM space is managed and mapped via DAX interface, and accessed
->> by linear address. In this submission we store bcache journal on NVDIMM,
->> in future bcache btree nodes and other meta data will be added in too,
->> before we remove the EXPERIMENTAL statues.
->>
->> Dongdong Tao contributes a performance optimization when
->> bcache cache buckets are highly fregmented, Dongdong's patch makes the
->> dirty data writeback faster and from his benchmark reprots such changes
->> have recognized improvement for randome write I/O thoughput and latency
->> for highly fregmented buckets, and no regression for regular I/O
->> observed.
->>
->> Kai Krakow contributes 4 patches to offload system_wq usage to separated
->> btree_io_wq and bch_flush_wq. In his environment the daily backup job
->> throughput increases from 60.2MB/s to 419MB/s and accomplished time
->> reduced from 14h29m to 2h13m.
->>
->> Joe Perches also contributes a fine code stype fix which I pick for this
->> submission.
->>
->> Please take them for Linux v5.12 merge window.
-> 
-> Applied 1-6 for now, that weird situation with the user visible header
-> needs to get resolved before it can go any further.
-> 
-Thanks for taking care of the patches and offering your opinion. I will
-ask you and other developers' suggestion for a proper form for the data
-structure definition.
+On Tue, Feb 09 2021 at  9:30am -0500,
+Sergei Shtepa <sergei.shtepa@veeam.com> wrote:
 
-Coly Li
+> New ioctl DM_DEV_REMAP_CMD allow to remap bio requests
+> from regular block device to dm device.
+
+I really dislike the (ab)use of "REMAP" for this. DM is and always has
+been about remapping IO.  Would prefer DM_DEV_INTERPOSE_CMD
+
+Similarly, all places documenting "remap" or variables with "remap"
+changed to "interpose".
+
+Also, any chance you'd be open to putting all these interposer specific
+changes in dm-interposer.[ch] ?
+(the various internal structs for DM core _should_ be available via dm-core.h)
+
+Mike
+
