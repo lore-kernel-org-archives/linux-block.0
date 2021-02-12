@@ -2,172 +2,102 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C91DC433DB
-	for <linux-block@archiver.kernel.org>; Fri, 12 Feb 2021 05:43:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9698C433DB
+	for <linux-block@archiver.kernel.org>; Fri, 12 Feb 2021 07:06:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0357E64E6C
-	for <linux-block@archiver.kernel.org>; Fri, 12 Feb 2021 05:43:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ABAF464DCE
+	for <linux-block@archiver.kernel.org>; Fri, 12 Feb 2021 07:06:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229589AbhBLFn0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 12 Feb 2021 00:43:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38244 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229547AbhBLFnZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 12 Feb 2021 00:43:25 -0500
-Received: from mail-io1-xd29.google.com (mail-io1-xd29.google.com [IPv6:2607:f8b0:4864:20::d29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75257C061574
-        for <linux-block@vger.kernel.org>; Thu, 11 Feb 2021 21:42:45 -0800 (PST)
-Received: by mail-io1-xd29.google.com with SMTP id p132so8154008iod.11
-        for <linux-block@vger.kernel.org>; Thu, 11 Feb 2021 21:42:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=4lipxPM8WIe2Nq215U51DffXjPHE831yVP7oaiBC0XA=;
-        b=qwBx22/gWPOjnG/66+l3hS9O7nnFlq4V5DcSUZFqBTBNnZYi7sSXV0WvNap+javWb4
-         8Zext2s6DzjtE3L4PBBPQjpbDgduHkkRLp6j8eU6pQLFkZpj5JInx+QLWnvgHpKBQhap
-         s8Lh518R3rQcEDag8RTEFYw523eGuOsAjzy/3DQuywgziV0yfHPYl42Di7TRmK3xIyf0
-         /Hm024CCC52xF2wGna74hhlu+Zkfk/dGucL9iuP7+fwl7V2wRIYcYL5HkZrCSdxGY/8e
-         he5fkK5865McmCZi/Hn7RUCfOUx/cRF8ySXI8IaZJ3WEUr2jdacmPFN1AiIV3WlAkJh1
-         b6Qw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=4lipxPM8WIe2Nq215U51DffXjPHE831yVP7oaiBC0XA=;
-        b=jLf6FviR4TzJ+vDq4ywYF+qvrrLysMA5HkU+yKQfGA7LR3M2FtUHDRhevlQD66Rvi+
-         1dvO8U9KWRNOiNIveBvMhip8p12w2HkrFW1lej8oNxDRKNAmxhaZFlR2QbV2uKhx0xAw
-         yfvCuKw8g/d+85eqf4h+ss9LsHLfqGfP6CJQBW8tZ3Dqo/1U7bGMZ/bMrhAGJz4qoSTx
-         807MYk6NGIT+r8O4IcPgHsZ91KxgjpHZgAnedIGvSQ83tES7qC2uDJguVrxq07nf/aug
-         C475VRDjuHJwp/3ZgyeTskvEeur2GTIPfwlOiS5BZg7fcesbbola3H6l60zY7/LeUREA
-         T4Gw==
-X-Gm-Message-State: AOAM532gQZjWLtL4Ya8jwcZsqxeagOK30S7Ds9zKsq5Lts8mjvu/AANw
-        fieOKSvB7oISug5Qu3dIyu0+70u3TIcRczmdiOkv+6yL6ODF8AqI
-X-Google-Smtp-Source: ABdhPJxct8kksahwahA3irB1+dOWbieb1u/QIjKgq6qVBs8ib8BBMYpH2a2CK8lWomYUbesP15dYMdKPKsqUgyb3c7o=
-X-Received: by 2002:a02:856d:: with SMTP id g100mr1221375jai.10.1613108564622;
- Thu, 11 Feb 2021 21:42:44 -0800 (PST)
+        id S229625AbhBLHGW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 12 Feb 2021 02:06:22 -0500
+Received: from mx2.suse.de ([195.135.220.15]:43660 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229497AbhBLHGV (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 12 Feb 2021 02:06:21 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1613113532; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+        bh=vrL9Zn8zb56V6RB7toYtaZkIjemy0EUqcbeydQlHpJ0=;
+        b=tfmimBFXyU5ZhMY0e1HiPb/l/gCAlJM4gTVuItO4u+kNp+7VwS3Uin7Dy92j+G0tHqb7Hq
+        TYu1ZpcYXyeRvuT6C8/mIc98Y4eBOngIjyqpq87CVGeHr7CmLd1Yq3NxlMMlV6s8MkRxTe
+        XRGASV2meUM8OvMfMm6j9kEJG9b2mjk=
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 6D5C4B07D;
+        Fri, 12 Feb 2021 07:05:32 +0000 (UTC)
+Subject: Re: [PATCH] bcache: remove PTR_BUCKET
+To:     Christoph Hellwig <hch@lst.de>, colyli@suse.de
+Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+References: <20210211081926.104917-1-hch@lst.de>
+From:   Nikolay Borisov <nborisov@suse.com>
+Autocrypt: addr=nborisov@suse.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <c622c60a-fe50-ba47-8af9-861f53d6b3d4@suse.com>
+Date:   Fri, 12 Feb 2021 09:05:31 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-From:   Tom Seewald <tseewald@gmail.com>
-Date:   Thu, 11 Feb 2021 23:42:33 -0600
-Message-ID: <CAARYdbiUBxFTY25VusuxgxqVzNRnoB61fFQeXcmsKyDP_d_ipQ@mail.gmail.com>
-Subject: [Regression] [Bisected] Errors when ejecting USB storage drives since v5.10
-To:     linux-block@vger.kernel.org
-Cc:     Christoph Hellwig <hch@lst.de>, axboe@kernel.dk,
-        tseewald <tseewald@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20210211081926.104917-1-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
 
-Since v5.10 ejecting removable USB devices on my desktop has resulted
-in the kernel throwing errors and not cleanly unmounting the drives
-(dirty bit is set upon remounting).
 
-I have bisected this issue to commit 471bd0af544b ("sd: use
-bdev_check_media_change"), and have confirmed the problem is still
-present as of v5.11-rc7. It appears that several others have run into
-this issue, as I see that there was a bugzilla report filed a month
-ago [1]. There was also a bug report filed against udisks [2], and it
-looks like they believe it is also a kernel issue.
+On 11.02.21 г. 10:19 ч., Christoph Hellwig wrote:
+> Remove the PTR_BUCKET inline and replace it with a direct dereference
+> of c->cache.
 
-Steps to reproduce the problem:
-1. Insert removable USB storage device.
-2. Use eject(1) to attempt to eject the USB device. (e.g. # eject /dev/sdd)
+You of course wanted to say PTR_CACHE :)
 
-Example result:
-[42006.656393] sd 8:0:0:1: [sdd] tag#0 FAILED Result: hostbyte=DID_OK
-driverbyte=DRIVER_SENSE cmd_age=0s
-[42006.656402] sd 8:0:0:1: [sdd] tag#0 Sense Key : Not Ready [current]
-[42006.656406] sd 8:0:0:1: [sdd] tag#0 Add. Sense: Medium not present
-[42006.656411] sd 8:0:0:1: [sdd] tag#0 CDB: Read(10) 28 00 00 00 00 00
-00 00 08 00
-[42006.656413] blk_update_request: I/O error, dev sdd, sector 0 op
-0x0:(READ) flags 0x0 phys_seg 1 prio class 0
-[42006.656420] Buffer I/O error on dev sdd, logical block 0, async page read
-[42006.657520] sd 8:0:0:1: [sdd] tag#0 FAILED Result: hostbyte=DID_OK
-driverbyte=DRIVER_SENSE cmd_age=0s
-[42006.657528] sd 8:0:0:1: [sdd] tag#0 Sense Key : Not Ready [current]
-[42006.657531] sd 8:0:0:1: [sdd] tag#0 Add. Sense: Medium not present
-[42006.657535] sd 8:0:0:1: [sdd] tag#0 CDB: Read(10) 28 00 00 00 00 00
-00 00 08 00
-[42006.657537] blk_update_request: I/O error, dev sdd, sector 0 op
-0x0:(READ) flags 0x0 phys_seg 1 prio class 0
-[42006.657544] Buffer I/O error on dev sdd, logical block 0, async page read
-[42006.658490] sd 8:0:0:1: [sdd] tag#0 FAILED Result: hostbyte=DID_OK
-driverbyte=DRIVER_SENSE cmd_age=0s
-[42006.658492] sd 8:0:0:1: [sdd] tag#0 Sense Key : Not Ready [current]
-[42006.658494] sd 8:0:0:1: [sdd] tag#0 Add. Sense: Medium not present
-[42006.658496] sd 8:0:0:1: [sdd] tag#0 CDB: Read(10) 28 00 00 00 00 00
-00 00 08 00
-[42006.658497] blk_update_request: I/O error, dev sdd, sector 0 op
-0x0:(READ) flags 0x0 phys_seg 1 prio class 0
-[42006.658499] Buffer I/O error on dev sdd, logical block 0, async page read
-[42006.658505] ldm_validate_partition_table(): Disk read failed.
-[42006.659490] sd 8:0:0:1: [sdd] tag#0 FAILED Result: hostbyte=DID_OK
-driverbyte=DRIVER_SENSE cmd_age=0s
-[42006.659492] sd 8:0:0:1: [sdd] tag#0 Sense Key : Not Ready [current]
-[42006.659494] sd 8:0:0:1: [sdd] tag#0 Add. Sense: Medium not present
-[42006.659496] sd 8:0:0:1: [sdd] tag#0 CDB: Read(10) 28 00 00 00 00 00
-00 00 08 00
-[42006.659497] blk_update_request: I/O error, dev sdd, sector 0 op
-0x0:(READ) flags 0x0 phys_seg 1 prio class 0
-[42006.659499] Buffer I/O error on dev sdd, logical block 0, async page read
-[42006.661000] sd 8:0:0:1: [sdd] tag#0 FAILED Result: hostbyte=DID_OK
-driverbyte=DRIVER_SENSE cmd_age=0s
-[42006.661003] sd 8:0:0:1: [sdd] tag#0 Sense Key : Not Ready [current]
-[42006.661005] sd 8:0:0:1: [sdd] tag#0 Add. Sense: Medium not present
-[42006.661006] sd 8:0:0:1: [sdd] tag#0 CDB: Read(10) 28 00 00 00 00 00
-00 00 08 00
-[42006.661007] blk_update_request: I/O error, dev sdd, sector 0 op
-0x0:(READ) flags 0x0 phys_seg 1 prio class 0
-[42006.661010] Buffer I/O error on dev sdd, logical block 0, async page read
-[42006.662002] sd 8:0:0:1: [sdd] tag#0 FAILED Result: hostbyte=DID_OK
-driverbyte=DRIVER_SENSE cmd_age=0s
-[42006.662006] sd 8:0:0:1: [sdd] tag#0 Sense Key : Not Ready [current]
-[42006.662007] sd 8:0:0:1: [sdd] tag#0 Add. Sense: Medium not present
-[42006.662009] sd 8:0:0:1: [sdd] tag#0 CDB: Read(10) 28 00 00 00 00 00
-00 00 08 00
-[42006.662010] blk_update_request: I/O error, dev sdd, sector 0 op
-0x0:(READ) flags 0x0 phys_seg 1 prio class 0
-[42006.662013] Buffer I/O error on dev sdd, logical block 0, async page read
-[42006.663050] sd 8:0:0:1: [sdd] tag#0 FAILED Result: hostbyte=DID_OK
-driverbyte=DRIVER_SENSE cmd_age=0s
-[42006.663053] sd 8:0:0:1: [sdd] tag#0 Sense Key : Not Ready [current]
-[42006.663054] sd 8:0:0:1: [sdd] tag#0 Add. Sense: Medium not present
-[42006.663055] sd 8:0:0:1: [sdd] tag#0 CDB: Read(10) 28 00 00 00 00 00
-00 00 08 00
-[42006.663056] blk_update_request: I/O error, dev sdd, sector 0 op
-0x0:(READ) flags 0x0 phys_seg 1 prio class 0
-[42006.663059] Buffer I/O error on dev sdd, logical block 0, async page read
-[42006.663068] Dev sdd: unable to read RDB block 0
-[42006.663993] sd 8:0:0:1: [sdd] tag#0 FAILED Result: hostbyte=DID_OK
-driverbyte=DRIVER_SENSE cmd_age=0s
-[42006.663995] sd 8:0:0:1: [sdd] tag#0 Sense Key : Not Ready [current]
-[42006.663997] sd 8:0:0:1: [sdd] tag#0 Add. Sense: Medium not present
-[42006.663998] sd 8:0:0:1: [sdd] tag#0 CDB: Read(10) 28 00 00 00 00 00
-00 00 08 00
-[42006.663999] blk_update_request: I/O error, dev sdd, sector 0 op
-0x0:(READ) flags 0x0 phys_seg 1 prio class 0
-[42006.664001] Buffer I/O error on dev sdd, logical block 0, async page read
-[42006.665000] sd 8:0:0:1: [sdd] tag#0 FAILED Result: hostbyte=DID_OK
-driverbyte=DRIVER_SENSE cmd_age=0s
-[42006.665003] sd 8:0:0:1: [sdd] tag#0 Sense Key : Not Ready [current]
-[42006.665004] sd 8:0:0:1: [sdd] tag#0 Add. Sense: Medium not present
-[42006.665006] sd 8:0:0:1: [sdd] tag#0 CDB: Read(10) 28 00 00 00 00 00
-00 00 08 00
-[42006.665007] blk_update_request: I/O error, dev sdd, sector 0 op
-0x0:(READ) flags 0x0 phys_seg 1 prio class 0
-[42006.665009] Buffer I/O error on dev sdd, logical block 0, async page read
-[42006.665019]  sdd: unable to read partition table
-[42006.668496] sdd: detected capacity change from 0 to 62333952
-
-Please cc me on replies as I am not subscribed to the block mailing list.
-
-[1] https://bugzilla.kernel.org/show_bug.cgi?id=211023
-[2] https://github.com/storaged-project/udisks/issues/827
+<snip>
