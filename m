@@ -2,83 +2,104 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFBB7C433DB
-	for <linux-block@archiver.kernel.org>; Fri, 12 Feb 2021 16:14:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA39BC433E0
+	for <linux-block@archiver.kernel.org>; Sun, 14 Feb 2021 10:32:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 984E164E08
-	for <linux-block@archiver.kernel.org>; Fri, 12 Feb 2021 16:14:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 80EA064E52
+	for <linux-block@archiver.kernel.org>; Sun, 14 Feb 2021 10:32:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229903AbhBLQOv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 12 Feb 2021 11:14:51 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35049 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229660AbhBLQOr (ORCPT
+        id S229637AbhBNKcF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 14 Feb 2021 05:32:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35636 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229575AbhBNKcE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 12 Feb 2021 11:14:47 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1613146399;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=L5Nb2hpHuSmEncyB7k8Kpd8+QlfZitjO1fAJZA9q6Ek=;
-        b=c04pVCzCWxuAj4I8knnl2Fc94M4gxl+vhFqM+4N8r4Cm0A/BpGqOXwXqNEVxtHAYhVZb7T
-        OobeeyS2WarBEiKts6MoyUTrSQytJ2ObQDHpnw+Uua1ooCDVEHs1vrNFB5V3bvaw97KC3R
-        EYk0c8+lQt+x/A/VxwJcUl0fttwz2rs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-295-2ly9sgg-M8a8-Mt3Amhy4g-1; Fri, 12 Feb 2021 11:13:14 -0500
-X-MC-Unique: 2ly9sgg-M8a8-Mt3Amhy4g-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 271E51934100;
-        Fri, 12 Feb 2021 16:13:12 +0000 (UTC)
-Received: from localhost (unknown [10.18.25.174])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0204360BF1;
-        Fri, 12 Feb 2021 16:13:05 +0000 (UTC)
-Date:   Fri, 12 Feb 2021 11:13:05 -0500
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Sergei Shtepa <sergei.shtepa@veeam.com>
-Cc:     Damien.LeMoal@wdc.com, hare@suse.de, ming.lei@redhat.com,
-        agk@redhat.com, corbet@lwn.net, axboe@kernel.dk, jack@suse.cz,
-        johannes.thumshirn@wdc.com, gregkh@linuxfoundation.org,
-        koct9i@gmail.com, steve@sk2.org, dm-devel@redhat.com,
-        linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, pavel.tide@veeam.com
-Subject: Re: [PATCH v5 4/6] dm: new ioctl DM_DEV_REMAP_CMD
-Message-ID: <20210212161305.GB19424@redhat.com>
-References: <1612881028-7878-1-git-send-email-sergei.shtepa@veeam.com>
- <1612881028-7878-5-git-send-email-sergei.shtepa@veeam.com>
+        Sun, 14 Feb 2021 05:32:04 -0500
+Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21AD6C061756
+        for <linux-block@vger.kernel.org>; Sun, 14 Feb 2021 02:31:23 -0800 (PST)
+Received: by mail-ed1-x536.google.com with SMTP id df22so4889682edb.1
+        for <linux-block@vger.kernel.org>; Sun, 14 Feb 2021 02:31:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=lightnvm-io.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=r6lfNCFf4uKnnzJN/1ss3nfQ+Q8FtVs4F7Dj+Ua2rTA=;
+        b=WDW2Keoae3cOc4k4eLbq/veMFVTgA1wVt5pvVxq/WJTjG7kuPIdvUSQdPBTulud5U9
+         fM1VdNUvplD8WMBVS77jAhEk3qNsU+ZR6701r8YEZgK43bk56Ct+1SfLkQGQMWCev9LD
+         qaYA8zdxj+CrJn+48B5UJCGfpMlCFCSJL724y0nHedfmcFGGzmsAV8+8hFlo4S+R73pa
+         4OMMzrDVszyKjyMg0CuRjH7RG9Asv1ZRcct4ZuVrAMGGcVjtW+Zxl0fHI90EL5Nmtvx/
+         na/VrGRILiy8RSobhmV0syIN5RNhpHITUe0lvhLVH7pOVNvPpkMVRKxsqUD4XC0D8KcB
+         L16Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=r6lfNCFf4uKnnzJN/1ss3nfQ+Q8FtVs4F7Dj+Ua2rTA=;
+        b=hDvF6OqZknVWByjNo0ZmSR8VZH8hdrHXmrvVE0IpfNqdGRPDr8uFTe6zJ03qcZuoXw
+         ma3enymozcJvSkEFX15zqYTcNr2Li5fwkP5ZO3mb30t699JinUNJlNe2hxZtQFY5uD3w
+         4xLt6Qpje493RffrURspoPgbpMHpbwj5DCn1ZMVHSm4fMH2FAUClQTPTGuXv/aRWHSqd
+         f4csyCSw+qC8aqT7Af4eHKcE5Wf78h4A7Zi4mjtr3dsYlSecgQiwpbIgDpR6weJ9eZMv
+         ujRuLLVqe6qaZUYRKqorwjumBBKvXEHzCn1DQyx20rxmhyCMfEzf8eNlUZU/3GLzLnl2
+         HmTw==
+X-Gm-Message-State: AOAM530eKKHHT3sDuQkmCWiudq1FlSs2M87e7JziYyGgLj1G0cWTbBCG
+        JvRUeyHxDMZLykG8taZ3S5QCVA==
+X-Google-Smtp-Source: ABdhPJyE3Lt+s4+Drdb++31omBVZy7TDEq+TkdOJw7dKZKXxsHM7DzH6hoGU6FEWfMJOA6+o8a+YhA==
+X-Received: by 2002:a05:6402:26d5:: with SMTP id x21mr11055285edd.50.1613298681879;
+        Sun, 14 Feb 2021 02:31:21 -0800 (PST)
+Received: from dellx1.cphwdc ([87.116.37.42])
+        by smtp.googlemail.com with ESMTPSA id c18sm8180512edu.20.2021.02.14.02.31.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 14 Feb 2021 02:31:21 -0800 (PST)
+From:   "=?UTF-8?q?Matias=20Bj=C3=B8rling?=" <mb@lightnvm.io>
+X-Google-Original-From: =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias.bjorling@wdc.com>
+To:     axboe@kernel.dk, m@bjorling.me
+Cc:     linux-block@vger.kernel.org, Tian Tao <tiantao6@hisilicon.com>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <matias.bjorling@wdc.com>
+Subject: [PATCH 1/2] lightnvm: fix unnecessary NULL check warnings
+Date:   Sun, 14 Feb 2021 10:31:02 +0000
+Message-Id: <20210214103103.122312-2-matias.bjorling@wdc.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20210214103103.122312-1-matias.bjorling@wdc.com>
+References: <20210214103103.122312-1-matias.bjorling@wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1612881028-7878-5-git-send-email-sergei.shtepa@veeam.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Feb 09 2021 at  9:30am -0500,
-Sergei Shtepa <sergei.shtepa@veeam.com> wrote:
+From: Tian Tao <tiantao6@hisilicon.com>
 
-> New ioctl DM_DEV_REMAP_CMD allow to remap bio requests
-> from regular block device to dm device.
+Remove NULL checks before vfree() to fix these warnings:
+./drivers/lightnvm/pblk-gc.c:27:2-7: WARNING: NULL check before some
+freeing functions is not needed.
 
-I really dislike the (ab)use of "REMAP" for this. DM is and always has
-been about remapping IO.  Would prefer DM_DEV_INTERPOSE_CMD
+Signed-off-by: Tian Tao <tiantao6@hisilicon.com>
+Signed-off-by: Matias Bjørling <matias.bjorling@wdc.com>
+---
+ drivers/lightnvm/pblk-gc.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-Similarly, all places documenting "remap" or variables with "remap"
-changed to "interpose".
-
-Also, any chance you'd be open to putting all these interposer specific
-changes in dm-interposer.[ch] ?
-(the various internal structs for DM core _should_ be available via dm-core.h)
-
-Mike
+diff --git a/drivers/lightnvm/pblk-gc.c b/drivers/lightnvm/pblk-gc.c
+index 2581eebcfc41..b31658be35a7 100644
+--- a/drivers/lightnvm/pblk-gc.c
++++ b/drivers/lightnvm/pblk-gc.c
+@@ -23,8 +23,7 @@
+ 
+ static void pblk_gc_free_gc_rq(struct pblk_gc_rq *gc_rq)
+ {
+-	if (gc_rq->data)
+-		vfree(gc_rq->data);
++	vfree(gc_rq->data);
+ 	kfree(gc_rq);
+ }
+ 
+-- 
+2.25.1
 
