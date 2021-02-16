@@ -2,170 +2,259 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03AC5C433E6
-	for <linux-block@archiver.kernel.org>; Tue, 16 Feb 2021 06:37:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEE6FC433E0
+	for <linux-block@archiver.kernel.org>; Tue, 16 Feb 2021 06:59:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C60DE64E02
-	for <linux-block@archiver.kernel.org>; Tue, 16 Feb 2021 06:37:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4C39264D9A
+	for <linux-block@archiver.kernel.org>; Tue, 16 Feb 2021 06:59:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229979AbhBPGhB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 Feb 2021 01:37:01 -0500
-Received: from mail-io1-f72.google.com ([209.85.166.72]:35720 "EHLO
-        mail-io1-f72.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229977AbhBPGg4 (ORCPT
+        id S229695AbhBPG7e (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Feb 2021 01:59:34 -0500
+Received: from mailout4.samsung.com ([203.254.224.34]:18823 "EHLO
+        mailout4.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229635AbhBPG7d (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Feb 2021 01:36:56 -0500
-Received: by mail-io1-f72.google.com with SMTP id a1so8507887ios.2
-        for <linux-block@vger.kernel.org>; Mon, 15 Feb 2021 22:36:40 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=iszLzMBeRTLoO8PyD6GycRzYEaLBqiitKad70+RYWqQ=;
-        b=kxAUhDGKuqiqlaTUogXD7ShbdgdHrCfvxyCDCJdtrs9dIf7t3kb7EbBc8qbx2lF4SE
-         LV/ROBuPV//5kAaUETyT0r6BQ2decaHbBgvl5EubsacK5UTcEGY+6pkwW4wwJneo/nlE
-         jSXn+hSDCrikBc6OoBeW3rOjF5EXUsvC8V/3M88XqMF7i1qr0aTLbyr+wTwzr+BbG9Uy
-         RIAhMcskpIKqLd/gZR1afa/KuCQkgeerrb/uHaeGFoBRPTv7YcHHmSAfD0ftrF96F1T2
-         URfQlCivyUg7wi2g2qGHY5z7sHLhHKgyI/YpYhTJYf4Uxpm3S11UK714LNaNUeWg3WNQ
-         UPVw==
-X-Gm-Message-State: AOAM532DJ+bFERAOzGh8qJeL5pXA6qk7W1ZppVCtCtnmYASdsHLr4I9e
-        qrDin1wzWqDgCd7fxhfng25HkMfzC0WGuYpQZlAaHgmHXVZl
-X-Google-Smtp-Source: ABdhPJzw0/M/liDMn5PWQKKKtXNUHOMjH74uHbwO3wg67caoHqWun9ooTZkecKVv/0UhXOzDA9G5OyzwXwzU8FxWmfZTfsF3viRv
+        Tue, 16 Feb 2021 01:59:33 -0500
+Received: from epcas1p2.samsung.com (unknown [182.195.41.46])
+        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20210216065850epoutp0455ceef996baf0f4cbcb3acfc7b65e0a5~kKCqnLetr0461604616epoutp04I
+        for <linux-block@vger.kernel.org>; Tue, 16 Feb 2021 06:58:50 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20210216065850epoutp0455ceef996baf0f4cbcb3acfc7b65e0a5~kKCqnLetr0461604616epoutp04I
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1613458730;
+        bh=msi/Qe3vFnQpELUc4a+s+F9IiMqwTL74fLpfFaOgmJU=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=Tbpu8EqAUbwIpLUyl+DhS0fS7NLjwwINBCZTMNQnbzvKBksSdaDL9Az99cvo397dH
+         fqEOx6pIzGFPfBh1Bph1ZrvHCdPpdIuqb2PX6hMWsdASBXJJvKkORblYA8DQArf7ap
+         EpNiM13k2eG1+VUslhYkV/xGWMb3Bee0wZHCT148=
+Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
+        epcas1p4.samsung.com (KnoxPortal) with ESMTP id
+        20210216065849epcas1p4f3974c07993cc02ecdfe061787a88276~kKCqDGkMy2270222702epcas1p4o;
+        Tue, 16 Feb 2021 06:58:49 +0000 (GMT)
+Received: from epsmges1p5.samsung.com (unknown [182.195.40.163]) by
+        epsnrtp1.localdomain (Postfix) with ESMTP id 4DfsJQ2BX9z4x9Q1; Tue, 16 Feb
+        2021 06:58:46 +0000 (GMT)
+Received: from epcas1p4.samsung.com ( [182.195.41.48]) by
+        epsmges1p5.samsung.com (Symantec Messaging Gateway) with SMTP id
+        F8.FF.09577.62D6B206; Tue, 16 Feb 2021 15:58:46 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas1p2.samsung.com (KnoxPortal) with ESMTPA id
+        20210216065845epcas1p2dcb0d476c5118999d6d764badf05c1c5~kKCmfL0m00283902839epcas1p2I;
+        Tue, 16 Feb 2021 06:58:45 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20210216065845epsmtrp206f080ca4168a84b9f07fe67d51cf943~kKCmdyi0J0295502955epsmtrp2f;
+        Tue, 16 Feb 2021 06:58:45 +0000 (GMT)
+X-AuditID: b6c32a39-193b3a8000002569-20-602b6d26bd98
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        6F.8F.13470.52D6B206; Tue, 16 Feb 2021 15:58:45 +0900 (KST)
+Received: from localhost.localdomain (unknown [10.253.99.105]) by
+        epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+        20210216065845epsmtip1951eb470d7be7346f780836551078077~kKCmL48iJ0043700437epsmtip1S;
+        Tue, 16 Feb 2021 06:58:45 +0000 (GMT)
+From:   Changheun Lee <nanich.lee@samsung.com>
+To:     gregkh@linuxfoundation.org, Johannes.Thumshirn@wdc.com,
+        asml.silence@gmail.com, axboe@kernel.dk, damien.lemoal@wdc.com,
+        hch@infradead.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, ming.lei@redhat.com, osandov@fb.com,
+        patchwork-bot@kernel.org, tj@kernel.org, tom.leiming@gmail.com
+Cc:     jisoo2146.oh@samsung.com, junho89.kim@samsung.com,
+        mj0123.lee@samsung.com, nanich.lee@samsung.com,
+        seunghwan.hyun@samsung.com, sookwan7.kim@samsung.com,
+        woosung2.lee@samsung.com, yt0928.kim@samsung.com
+Subject: Re: [PATCH v5 1/2] bio: limit bio max size
+Date:   Tue, 16 Feb 2021 15:42:42 +0900
+Message-Id: <20210216064242.14979-1-nanich.lee@samsung.com>
+X-Mailer: git-send-email 2.28.0
+In-Reply-To: <YCtkAZNIgehq3ewF@kroah.com>
 MIME-Version: 1.0
-X-Received: by 2002:a6b:6016:: with SMTP id r22mr15554666iog.93.1613457375433;
- Mon, 15 Feb 2021 22:36:15 -0800 (PST)
-Date:   Mon, 15 Feb 2021 22:36:15 -0800
-In-Reply-To: <0000000000004a624a05b05a756d@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000b91a6b05bb6e51fe@google.com>
-Subject: Re: INFO: task hung in nbd_ioctl (3)
-From:   syzbot <syzbot+fe03c50d25c0188f7487@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, josef@toxicpanda.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, mchristi@redhat.com,
-        nbd@other.debian.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrNJsWRmVeSWpSXmKPExsWy7bCmga5arnaCwbtN3BZzVm1jtFh9t5/N
+        orX9G5NF8+L1bBanJyxisuh50sRq8bfrHpPF14fFFntvaVtc3jWHzeLQ5GYmi+mb5zBbXLt/
+        ht3i8L2rLBYPl0xktjh38hOrxbzHDha/lh9ltHj/4zq7xakdk5kt1u/9yeYg6jGx+R27x85Z
+        d9k9Nq/Q8rh8ttRj06pONo/9c9ewe7zfd5XNo2/LKkaPz5vkPNoPdDMFcEXl2GSkJqakFimk
+        5iXnp2TmpdsqeQfHO8ebmhkY6hpaWpgrKeQl5qbaKrn4BOi6ZeYAPaikUJaYUwoUCkgsLlbS
+        t7Mpyi8tSVXIyC8usVVKLUjJKTA0KNArTswtLs1L10vOz7UyNDAwMgWqTMjJOHrmO0vBbZ2K
+        p++XsjUwzpHvYuTkkBAwkWi8+oG5i5GLQ0hgB6PEm0XzGCGcT4wS+1euYIdwvjFKbPr6ngWm
+        5dmRtVAtexklVp67zALhfGaUuHthFhNIFZuAjkTf21tsIAkRga1MEjfvtoI5zAIXGSX+zbgA
+        NktYwFji7K4vjCA2i4CqxPUpC9hBbF4Ba4k3/+YzQeyTl3jau5wZxOYU0JR48vogVI2gxMmZ
+        T8DmMAPVNG+dDXaThMAHDonGdbugml0k5h3aywphC0u8Or6FHcKWkvj8bi8bREM3o0Rz23xG
+        CGcCo8SS58uguo0lPn3+DJTgAFqhKbF+lz5EWFFi5++5jBCb+STefe1hBSmREOCV6GgTgihR
+        kTjTcp8ZZtfztTuhJnpI7O35Ana0kECNxMeFS9kmMCrMQvLPLCT/zEJYvICReRWjWGpBcW56
+        arFhgSlyLG9iBKd6LcsdjNPfftA7xMjEwXiIUYKDWUmEl/2zVoIQb0piZVVqUX58UWlOavEh
+        RlNgaE9klhJNzgdmm7ySeENTI2NjYwsTM3MzU2Mlcd4kgwfxQgLpiSWp2ampBalFMH1MHJxS
+        DUzNf903O9/p3VGtwfYqJmXPw95bZftSwu/zxopeWx/QUZKown/Ka+/9dd+6ZNtnPU8KTOWd
+        aKiSlq/Xdu7ukY74Gt66948Sphu+49FTNzr88c87g2JLsdefn8mtvK5WMKP/wWHnOGCaryhk
+        dVnwKVXyd+PNrytYN/wRnHp3avo1v9anrF59Ujwbtz0Tu5S09PS727U3l6w8uuj/YbkvHlWO
+        +j/Zv/51/z1x41fHmh2rfqwU2l9v+ujsZjdvffvS9LxJwofDd2hc87va4HTp3SXr3w6RzpVX
+        WuOZCjKVtkxVnumk3itccIb5l+fC/gwD0Vt1L5dtMhc5PbPy7dYHQsyXT2glmepqb4zy9eb0
+        /KLEUpyRaKjFXFScCAAEO4hwfgQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrEIsWRmVeSWpSXmKPExsWy7bCSnK5qrnaCwacWZYs5q7YxWqy+289m
+        0dr+jcmiefF6NovTExYxWfQ8aWK1+Nt1j8ni68Nii723tC0u75rDZnFocjOTxfTNc5gtrt0/
+        w25x+N5VFouHSyYyW5w7+YnVYt5jB4tfy48yWrz/cZ3d4tSOycwW6/f+ZHMQ9ZjY/I7dY+es
+        u+wem1doeVw+W+qxaVUnm8f+uWvYPd7vu8rm0bdlFaPH501yHu0HupkCuKK4bFJSczLLUov0
+        7RK4Mo6e+c5ScFun4un7pWwNjHPkuxg5OSQETCSeHVnL3MXIxSEksJtRYv6NqSwQCSmJ4yfe
+        snYxcgDZwhKHDxdD1HxklDj6YBszSA2bgI5E39tbbCAJEYGjTBLb7/SzgjjMAreBJp17wQZS
+        JSxgLHF21xdGEJtFQFXi+pQF7CA2r4C1xJt/85kgtslLPO1dDjaVU0BT4snrg2A1QgIaEmd7
+        9rJA1AtKnJz5BMxmBqpv3jqbeQKjwCwkqVlIUgsYmVYxSqYWFOem5xYbFhjmpZbrFSfmFpfm
+        pesl5+duYgRHo5bmDsbtqz7oHWJk4mA8xCjBwawkwsv+WStBiDclsbIqtSg/vqg0J7X4EKM0
+        B4uSOO+FrpPxQgLpiSWp2ampBalFMFkmDk6pBqagtJizG7K8JgZXLj589c+ECF+2jexX954R
+        WSh1ekd4SKpbnFbdvcVTNyzQrP/6bvvbCd+uPgidwpaiFnv6ykvRjZdYcguYPdcrcU+JLznW
+        6jnz6KWmVnVfSc66Bd+cLjt7/spb+ufyXTvbzy4Ltt7X26icfuyr8yK5BA3liCgF61tXi5f3
+        Zy2bsbv0wR3fXGWnhsD8uDhL0fs70kt9VO7yZFxNFPvn1uTXPeWYRP3KFOfp0WoMXcKOi/UD
+        Hdl5Rc34MszLs9eUtVXcFLzerfvnjji/WXes/wZnI4s4gyWmqTOqL1h/WyRX5nI16YP6qf7d
+        By7oV7CG5thVO89YycXTZtT8fkUd71fd1S82KrEUZyQaajEXFScCAEaA5Ao1AwAA
+X-CMS-MailID: 20210216065845epcas1p2dcb0d476c5118999d6d764badf05c1c5
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: SVC_REQ_APPROVE
+CMS-TYPE: 101P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20210216065845epcas1p2dcb0d476c5118999d6d764badf05c1c5
+References: <YCtkAZNIgehq3ewF@kroah.com>
+        <CGME20210216065845epcas1p2dcb0d476c5118999d6d764badf05c1c5@epcas1p2.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-syzbot has found a reproducer for the following issue on:
+> 
+> On Tue, Feb 16, 2021 at 11:00:32AM +0900, Changheun Lee wrote:
+> > Please feedback to me if more modification is needed to apply. :)
+> 
+> No context here :(
+> 
 
-HEAD commit:    f40ddce8 Linux 5.11
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=10a8b204d00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=4b919ebed7b4902
-dashboard link: https://syzkaller.appspot.com/bug?extid=fe03c50d25c0188f7487
-compiler:       Debian clang version 11.0.1-2
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11a7953cd00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11bc9914d00000
+I'm so sorry. I missed it.
 
-The issue was bisected to:
+> bio size can grow up to 4GB when muli-page bvec is enabled.
+> but sometimes it would lead to inefficient behaviors.
+> in case of large chunk direct I/O, - 32MB chunk read in user space -
+> all pages for 32MB would be merged to a bio structure if the pages
+> physical addresses are contiguous. it makes some delay to submit
+> until merge complete. bio max size should be limited to a proper size.
+> 
+> When 32MB chunk read with direct I/O option is coming from userspace,
+> kernel behavior is below now in do_direct_IO() loop. it's timeline.
+> 
+>  | bio merge for 32MB. total 8,192 pages are merged.
+>  | total elapsed time is over 2ms.
+>  |------------------ ... ----------------------->|
+>                                                  | 8,192 pages merged a bio.
+>                                                  | at this time, first bio submit is done.
+>                                                  | 1 bio is split to 32 read request and issue.
+>                                                  |--------------->
+>                                                   |--------------->
+>                                                    |--------------->
+>                                                               ......
+>                                                                    |--------------->
+>                                                                     |--------------->|
+>                           total 19ms elapsed to complete 32MB read done from device. |
+> 
+> If bio max size is limited with 1MB, behavior is changed below.
+> 
+>  | bio merge for 1MB. 256 pages are merged for each bio.
+>  | total 32 bio will be made.
+>  | total elapsed time is over 2ms. it's same.
+>  | but, first bio submit timing is fast. about 100us.
+>  |--->|--->|--->|---> ... -->|--->|--->|--->|--->|
+>       | 256 pages merged a bio.
+>       | at this time, first bio submit is done.
+>       | and 1 read request is issued for 1 bio.
+>       |--------------->
+>            |--------------->
+>                 |--------------->
+>                                       ......
+>                                                  |--------------->
+>                                                   |--------------->|
+>         total 17ms elapsed to complete 32MB read done from device. |
+> 
+> As a result, read request issue timing is faster if bio max size is limited.
+> Current kernel behavior with multipage bvec, super large bio can be created.
+> And it lead to delay first I/O request issue.
+> 
+> Signed-off-by: Changheun Lee <nanich.lee@samsung.com>
+> ---
+>  block/bio.c            | 13 ++++++++++++-
+>  include/linux/bio.h    |  2 +-
+>  include/linux/blkdev.h |  3 +++
+>  3 files changed, 16 insertions(+), 2 deletions(-)
+> 
+> diff --git a/block/bio.c b/block/bio.c
+> index 1f2cc1fbe283..c528e1f944c7 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -287,6 +287,17 @@ void bio_init(struct bio *bio, struct bio_vec *table,
+>  }
+>  EXPORT_SYMBOL(bio_init);
+>  
+> +unsigned int bio_max_size(struct bio *bio)
+> +{
+> +	struct request_queue *q = bio->bi_disk->queue;
+> +
+> +	if (blk_queue_limit_bio_size(q))
+> +		return blk_queue_get_max_sectors(q, bio_op(bio))
+> +			<< SECTOR_SHIFT;
+> +
+> +	return UINT_MAX;
+> +}
+> +
+>  /**
+>   * bio_reset - reinitialize a bio
+>   * @bio:	bio to reset
+> @@ -877,7 +888,7 @@ bool __bio_try_merge_page(struct bio *bio, struct page *page,
+>  		struct bio_vec *bv = &bio->bi_io_vec[bio->bi_vcnt - 1];
+>  
+>  		if (page_is_mergeable(bv, page, len, off, same_page)) {
+> -			if (bio->bi_iter.bi_size > UINT_MAX - len) {
+> +			if (bio->bi_iter.bi_size > bio_max_size(bio) - len) {
+>  				*same_page = false;
+>  				return false;
+>  			}
+> diff --git a/include/linux/bio.h b/include/linux/bio.h
+> index 1edda614f7ce..13b6f6562a5b 100644
+> --- a/include/linux/bio.h
+> +++ b/include/linux/bio.h
+> @@ -113,7 +113,7 @@ static inline bool bio_full(struct bio *bio, unsigned len)
+>  	if (bio->bi_vcnt >= bio->bi_max_vecs)
+>  		return true;
+>  
+> -	if (bio->bi_iter.bi_size > UINT_MAX - len)
+> +	if (bio->bi_iter.bi_size > bio_max_size(bio) - len)
+>  		return true;
+>  
+>  	return false;
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index f94ee3089e01..3aeab9e7e97b 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -621,6 +621,7 @@ struct request_queue {
+>  #define QUEUE_FLAG_RQ_ALLOC_TIME 27	/* record rq->alloc_time_ns */
+>  #define QUEUE_FLAG_HCTX_ACTIVE	28	/* at least one blk-mq hctx is active */
+>  #define QUEUE_FLAG_NOWAIT       29	/* device supports NOWAIT */
+> +#define QUEUE_FLAG_LIMIT_BIO_SIZE 30	/* limit bio size */
+>  
+>  #define QUEUE_FLAG_MQ_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\
+>  				 (1 << QUEUE_FLAG_SAME_COMP) |		\
+> @@ -667,6 +668,8 @@ bool blk_queue_flag_test_and_set(unsigned int flag, struct request_queue *q);
+>  #define blk_queue_fua(q)	test_bit(QUEUE_FLAG_FUA, &(q)->queue_flags)
+>  #define blk_queue_registered(q)	test_bit(QUEUE_FLAG_REGISTERED, &(q)->queue_flags)
+>  #define blk_queue_nowait(q)	test_bit(QUEUE_FLAG_NOWAIT, &(q)->queue_flags)
+> +#define blk_queue_limit_bio_size(q)	\
+> +	test_bit(QUEUE_FLAG_LIMIT_BIO_SIZE, &(q)->queue_flags)
+>  
+>  extern void blk_set_pm_only(struct request_queue *q);
+>  extern void blk_clear_pm_only(struct request_queue *q);
+> -- 
+> 2.28.0
+> 
 
-commit e9e006f5fcf2bab59149cb38a48a4817c1b538b4
-Author: Mike Christie <mchristi@redhat.com>
-Date:   Sun Aug 4 19:10:06 2019 +0000
+Please feedback to me if more modification is needed to apply. :)
 
-    nbd: fix max number of supported devs
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=171556f0500000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=149556f0500000
-console output: https://syzkaller.appspot.com/x/log.txt?x=109556f0500000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+fe03c50d25c0188f7487@syzkaller.appspotmail.com
-Fixes: e9e006f5fcf2 ("nbd: fix max number of supported devs")
-
-INFO: task syz-executor645:8465 blocked for more than 143 seconds.
-      Not tainted 5.11.0-syzkaller #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor645 state:D stack:28256 pid: 8465 ppid:  8464 flags:0x00004004
-Call Trace:
- context_switch kernel/sched/core.c:4327 [inline]
- __schedule+0x999/0xe70 kernel/sched/core.c:5078
- schedule+0x14b/0x200 kernel/sched/core.c:5157
- schedule_timeout+0x43/0x250 kernel/time/timer.c:1854
- do_wait_for_common+0x266/0x3a0 kernel/sched/completion.c:85
- __wait_for_common kernel/sched/completion.c:106 [inline]
- wait_for_common kernel/sched/completion.c:117 [inline]
- wait_for_completion+0x43/0x50 kernel/sched/completion.c:138
- flush_workqueue+0x704/0x1620 kernel/workqueue.c:2838
- nbd_start_device_ioctl drivers/block/nbd.c:1332 [inline]
- __nbd_ioctl drivers/block/nbd.c:1393 [inline]
- nbd_ioctl+0x76d/0x940 drivers/block/nbd.c:1433
- blkdev_ioctl+0x2d6/0x5f0 block/ioctl.c:576
- block_ioctl+0xae/0xf0 fs/block_dev.c:1658
- vfs_ioctl fs/ioctl.c:48 [inline]
- __do_sys_ioctl fs/ioctl.c:753 [inline]
- __se_sys_ioctl+0xfb/0x170 fs/ioctl.c:739
- do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
- entry_SYSCALL_64_after_hwframe+0x44/0xa9
-RIP: 0033:0x4441e9
-RSP: 002b:00007ffc87363948 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00000000004004a0 RCX: 00000000004441e9
-RDX: 0000000000000000 RSI: 000000000000ab03 RDI: 0000000000000003
-RBP: 0000000000000000 R08: 00007ffc87363ae8 R09: 00007ffc87363ae8
-R10: 00007ffc87363ae8 R11: 0000000000000246 R12: 0000000000403500
-R13: 431bde82d7b634db R14: 00000000004b2018 R15: 00000000004004a0
-
-Showing all locks held in the system:
-1 lock held by khungtaskd/1644:
- #0: ffffffff8c711680 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire+0x0/0x30 arch/x86/pci/mmconfig_64.c:151
-3 locks held by kworker/u5:0/2034:
- #0: ffff888016152938 ((wq_completion)knbd0-recv){+.+.}-{0:0}, at: process_one_work+0x6f4/0xfc0 kernel/workqueue.c:2248
- #1: ffffc900072afd78 ((work_completion)(&args->work)){+.+.}-{0:0}, at: process_one_work+0x733/0xfc0 kernel/workqueue.c:2250
- #2: ffff888018ca7120 (sk_lock-AF_AX25){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1594 [inline]
- #2: ffff888018ca7120 (sk_lock-AF_AX25){+.+.}-{0:0}, at: ax25_recvmsg+0x86/0x740 net/ax25/af_ax25.c:1626
-1 lock held by in:imklog/8097:
- #0: ffff8880198b14f0 (&f->f_pos_lock){+.+.}-{3:3}, at: __fdget_pos+0x24e/0x2f0 fs/file.c:947
-
-=============================================
-
-NMI backtrace for cpu 1
-CPU: 1 PID: 1644 Comm: khungtaskd Not tainted 5.11.0-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Call Trace:
- __dump_stack lib/dump_stack.c:79 [inline]
- dump_stack+0x137/0x1be lib/dump_stack.c:120
- nmi_cpu_backtrace+0x16c/0x190 lib/nmi_backtrace.c:105
- nmi_trigger_cpumask_backtrace+0x191/0x2f0 lib/nmi_backtrace.c:62
- trigger_all_cpu_backtrace include/linux/nmi.h:146 [inline]
- check_hung_uninterruptible_tasks kernel/hung_task.c:209 [inline]
- watchdog+0xce9/0xd30 kernel/hung_task.c:294
- kthread+0x39a/0x3c0 kernel/kthread.c:292
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:296
-Sending NMI from CPU 1 to CPUs 0:
-NMI backtrace for cpu 0
-CPU: 0 PID: 4866 Comm: systemd-journal Not tainted 5.11.0-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-RIP: 0010:rw_verify_area+0xef/0x370 fs/read_write.c:392
-Code: 49 8d 9f 20 02 00 00 48 89 d8 48 c1 e8 03 48 b9 00 00 00 00 00 fc ff df 80 3c 08 00 74 08 48 89 df e8 55 a5 f6 ff 48 83 3b 00 <74> 6f 49 8d 5f 28 48 89 d8 48 c1 e8 03 48 b9 00 00 00 00 00 fc ff
-RSP: 0018:ffffc9000167fde0 EFLAGS: 00000246
-RAX: 1ffff110280e66bc RBX: ffff8881407335e0 RCX: dffffc0000000000
-RDX: 0000000000000000 RSI: 0000000000002000 RDI: ffffffffffffffff
-RBP: ffffc9000167ff00 R08: ffffffff81c4ad94 R09: ffffed1004612f81
-R10: ffffed1004612f81 R11: 0000000000000000 R12: 0000000000000000
-R13: 0000000000000000 R14: 0000000000002000 R15: ffff8881407333c0
-FS:  00007f86aed678c0(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f86ac137000 CR3: 0000000012623000 CR4: 00000000001506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- vfs_read+0x168/0xa80 fs/read_write.c:487
- ksys_read+0x11b/0x220 fs/read_write.c:634
- do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
- entry_SYSCALL_64_after_hwframe+0x44/0xa9
-RIP: 0033:0x7f86ae2f6210
-Code: 73 01 c3 48 8b 0d 98 7d 20 00 f7 d8 64 89 01 48 83 c8 ff c3 66 0f 1f 44 00 00 83 3d b9 c1 20 00 00 75 10 b8 00 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 31 c3 48 83 ec 08 e8 4e fc ff ff 48 89 04 24
-RSP: 002b:00007ffc24b39f78 EFLAGS: 00000246 ORIG_RAX: 0000000000000000
-RAX: ffffffffffffffda RBX: 00007ffc24b3c9f0 RCX: 00007f86ae2f6210
-RDX: 0000000000002000 RSI: 00007ffc24b3a7f0 RDI: 0000000000000009
-RBP: 0000000000000000 R08: 0000000000000008 R09: 0000000000000070
-R10: 00007ffc24bb6118 R11: 0000000000000246 R12: 00007ffc24b3a7f0
-R13: 00007ffc24b3c948 R14: 00005570d8efb958 R15: 0005bb6e4751e476
-
+---
+Changheun Lee
