@@ -2,49 +2,53 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7135C433DB
-	for <linux-block@archiver.kernel.org>; Tue, 16 Feb 2021 17:17:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4337DC433E0
+	for <linux-block@archiver.kernel.org>; Tue, 16 Feb 2021 17:50:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A175564E28
-	for <linux-block@archiver.kernel.org>; Tue, 16 Feb 2021 17:17:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F05B564E04
+	for <linux-block@archiver.kernel.org>; Tue, 16 Feb 2021 17:50:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230464AbhBPRQw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 Feb 2021 12:16:52 -0500
-Received: from mx2.suse.de ([195.135.220.15]:47638 "EHLO mx2.suse.de"
+        id S231273AbhBPRu1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Feb 2021 12:50:27 -0500
+Received: from mail.kernel.org ([198.145.29.99]:37760 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230391AbhBPRQv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Feb 2021 12:16:51 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 0869FB7A8;
-        Tue, 16 Feb 2021 17:16:10 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id AD3541F2AA7; Tue, 16 Feb 2021 18:16:09 +0100 (CET)
-Date:   Tue, 16 Feb 2021 18:16:09 +0100
-From:   Jan Kara <jack@suse.cz>
+        id S231133AbhBPRuY (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 16 Feb 2021 12:50:24 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 27F1164DAF;
+        Tue, 16 Feb 2021 17:49:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1613497783;
+        bh=Am0sK4KyJqJIoqkuEi2qAp1hjiKCUzGPfH2hUly5C/M=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=IeP94X7d6OJrcHaYE73M40AHIF58RZaC0ufkZ/Y4u2PE91/zeUf9ZIwUmDene2MU3
+         UtyA9j/H3bB5fts2CHRlAKZRzS74GRswlL6U5RGHaOfFufwYJMJLiql1uEdWxbt9EU
+         RG+KIPdGgkbH61FNnnlaJNlsGS+GuSn8cpUL+2zAe4v5xQWSSIPgnRUYmmR7MqAGu/
+         xsJfUIZQIkqqb/qxRaKdAa1jwkXhlwUvHhuCaxJG7ClX8/dRwjcf2ZYzYHXx+lMpsz
+         Omm2JlmimqCObhrRLTJvDt8exQ0dU4w1nHYFrxeq+EbGuXv6ixZqD/O7OwF6LiSV7J
+         4yLF7x7WKs2gw==
+Date:   Tue, 16 Feb 2021 09:49:41 -0800
+From:   Keith Busch <kbusch@kernel.org>
 To:     Christoph Hellwig <hch@infradead.org>
 Cc:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Miklos Szeredi <miklos@szeredi.hu>
+        linux-block@vger.kernel.org
 Subject: Re: [PATCH] Revert "block: Do not discard buffers under a mounted
  filesystem"
-Message-ID: <20210216171609.GH21108@quack2.suse.cz>
+Message-ID: <20210216174941.GA2708768@dhcp-10-100-145-180.wdc.com>
 References: <20210216133849.8244-1-jack@suse.cz>
  <20210216163606.GA4063489@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20210216163606.GA4063489@infradead.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue 16-02-21 16:36:06, Christoph Hellwig wrote:
+On Tue, Feb 16, 2021 at 04:36:06PM +0000, Christoph Hellwig wrote:
 > On Tue, Feb 16, 2021 at 02:38:49PM +0100, Jan Kara wrote:
 > > Apparently there are several userspace programs that depend on being
 > > able to call BLKDISCARD ioctl without the ability to grab bdev
@@ -62,23 +66,7 @@ On Tue 16-02-21 16:36:06, Christoph Hellwig wrote:
 > but also don't return an error.  After all discard and thus
 > BLKDISCARD is purely advisory.
 
-Yeah, certainly we'd have to fix the original problem in some other way.
-Just silently ignoring BLKDISCARD if we cannot claim the device exclusively
-is certainly an option to stop complaints from userspace. But note that
-fstrim with fuse-based filesystem would still stay silent NOP which is
-suboptimal. It could be fixed on FUSE side as I talked to Miklos but it
-is not trivial. Similarly for the LVM regression...
-
-I was wondering whether we could do something like:
-	use truncate_inode_pages() if we can claim bdev exclusively
-	use invalidate_inode_pages2_range() if we cannot claim bdev
-          exclusively, possibly do nothing if that returns EBUSY?
-
-The downside is that cases where we cannot claim bdev exclusively would
-unnecessarily write dirty buffer cache before discard.
-
-								Honza
-
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+A discard is advisory, but BLKZEROOUT is not, so something different
+should happen there. We were also planning to send a patch using this
+same pattern for Zone Reset to fix stale page cache issues after the
+reset, but we'll wait to see how this settles before sending that.
