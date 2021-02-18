@@ -2,130 +2,88 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF3DDC433E0
-	for <linux-block@archiver.kernel.org>; Thu, 18 Feb 2021 08:01:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69403C433E0
+	for <linux-block@archiver.kernel.org>; Thu, 18 Feb 2021 08:05:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6CE9B64DE9
-	for <linux-block@archiver.kernel.org>; Thu, 18 Feb 2021 08:01:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1CC2961494
+	for <linux-block@archiver.kernel.org>; Thu, 18 Feb 2021 08:05:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230509AbhBRIAm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 Feb 2021 03:00:42 -0500
-Received: from mout.gmx.net ([212.227.15.19]:60223 "EHLO mout.gmx.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231159AbhBRH6O (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 Feb 2021 02:58:14 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
-        s=badeba3b8450; t=1613634989;
-        bh=QeAcWnwPblqNyubgFIFqLd8P/WvfTtzF5TIl0YCBXSo=;
-        h=X-UI-Sender-Class:To:From:Cc:Subject:Date;
-        b=LOoll5uv9f+m0Z7Yblp8RPNkulfN3WLjmZm/T6A221Gqw+oVmSqEkojOqpsnrtrl+
-         FkI2Z0BcVsiVrm8mLq/sbfUnD1rUrhVDBTpxhafZJDHfhD/QpH7Y86yuDW0NYp+mfd
-         u1aNeeR8aAchmZV9ocGBV1cuvbrvjoxYIBe6bGo0=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from [10.10.213.91] ([103.59.50.2]) by mail.gmx.net (mrgmx005
- [212.227.17.184]) with ESMTPSA (Nemesis) id 1MhlKs-1lqMe50tFI-00doMn; Thu, 18
- Feb 2021 08:56:29 +0100
-To:     linux-bcache@vger.kernel.org
-From:   "Norman.Kern" <norman.kern@gmx.com>
-Cc:     linux-block@vger.kernel.org, colyli@suse.de, axboe@kernel.dk
-Subject: Large latency with bcache for Ceph OSD
-Message-ID: <3f3e20a3-c165-1de1-7fdd-f0bd4da598fe@gmx.com>
-Date:   Thu, 18 Feb 2021 15:56:25 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.0
+        id S231208AbhBRIDN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 Feb 2021 03:03:13 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22398 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231287AbhBRH7Y (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 18 Feb 2021 02:59:24 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1613635047;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=BwgbTD1RiX92ln5WFKH395xpEWd8VBJvefZ9GEKuK+c=;
+        b=Vc3KZO1MKPZPGgenwOLARktMmZHdYSniJFKzIKKO80qhMA8W9cRrQh0exBC+De45t/DrnO
+        2MVzlxwG8TW4ZqwzKp9ZnXryx36wLda2+EQ5nXyumRUnzOaTJH5R/vDBnNejZ6JPcJ39Oo
+        I2gpA0rP22fMnj/ajA3Re5jwKuOZUYY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-534-Q5JcY8imPzKIzNWdY6MVhQ-1; Thu, 18 Feb 2021 02:57:25 -0500
+X-MC-Unique: Q5JcY8imPzKIzNWdY6MVhQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 37857100CCC1;
+        Thu, 18 Feb 2021 07:57:24 +0000 (UTC)
+Received: from T590 (ovpn-13-178.pek2.redhat.com [10.72.13.178])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 820A22E066;
+        Thu, 18 Feb 2021 07:57:13 +0000 (UTC)
+Date:   Thu, 18 Feb 2021 15:57:03 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, "Ewan D . Milne" <emilne@redhat.com>
+Subject: Re: [PATCH 0/2] block: avoid to drop & re-add partitions if
+ partitions aren't changed
+Message-ID: <20210218075703.GD284137@T590>
+References: <20210205021708.1498711-1-ming.lei@redhat.com>
+ <20210215040341.GA257964@T590>
+ <20210216084430.GA23694@lst.de>
+ <20210217030714.GB259250@T590>
+ <20210217071629.GA15362@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: base64
-Content-Language: en-US
-X-Provags-ID: V03:K1:SFAsE+ZgdK/hqWUb5d0Wzd+l5R38CWgeL19RhUk2IP1SyWXXWP8
- RjJ3GtZgAsuaMb/IkUn5/qs6G0sVR4HRhb8FZUWLeRjWLOcmws/gyrjGJH50ZcauN/CUTZu
- OB2SjED8/xL9IioWR5Wa9Upp2dTWKgkqN+uXf7MR0+MxtXXKZ4KP7xP0i+v4yKui2uewOZ6
- hQWz9vbtPqYRDqtdzyZ0g==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:E7Knp2pNKbc=:S4OCDcT8DFKiKhKM2iZ0ph
- J8wq9DpTMXzxnIaTQrrpjLcMZcOEWzyMenf5eUrF0misyQazcPdqA5eGF3qw6KOXjrfR4K49N
- x5dRmY4SZa9DYD2TKKTNuG8jttHoFtCr9Nuga6l75VHnEXGDJwpF2BlMP7l+rXQez6WyNMhzg
- mf+5Bl8vVYfGC8jKX21/HvDUOf/AWvCcMWTv0ku2vVKSsLwWPx9vPYvEGx8cgbZIzkZMCiYfE
- i27YX70lMdfCguV3bwBu3o2+4grYyXYHlDlYvHxqcKZbuWvmeEKAQR8BJnQzLxZsr2t1ZBN1g
- SLIsB8u3Ttzccn9NsLzKv0aUVq1yxsl0uHq4wWRzu7jGm9TfYv+IA+DyPN1hcs4FFpysdat0V
- bZN++UV25fh0UdBV6vohJeRI+RlvPuNWpVJIqtRfZnDeFcmotWglDvQJIlIkW+hDpj/SSdlTV
- SCM48udNWuTn3LDiIdtAeCir1kB0nV1mmLi/Roi5/qrXofe2dTM6fSFMiQGOKUOJAoXUlY8Sn
- vP2zqfFSBXGID9BGhVr4UGRBRSsYxaMCq0qYam5cUOQDuCuWyWVI/BvUisn6X5bcqfc62KmK1
- 1IANX4kWk1k44BLydPiKpDxZZgfvzC6VlwLtVW641VivJdVX9PRnZIcy+L1N4yZH0MRbvfAvr
- /M4aDBzTYu/DNA/Tjf508JkX/8Jy6Af12nXO2iH7Fk/54HOgaZVCy97UKXfAxHskhIsI0k0il
- Co4ScHJVagpYUqvE5deYJhJMaq+pe+/PDFmTiGBMakKs7FZtlg14OFCUFIY03hr140AUZuOk9
- 0vqynolnyNNQKaXRCuofjfgsM8p3niM26hfwI15Mt46Sx571XXqW/sY9k/wdC7B6i/UKml6h/
- TDsXcpnuldgc6PtyHH8A==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210217071629.GA15362@lst.de>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-SGkgZ3V5cywNCg0KSSBhbSB0ZXN0aW5nIGNlcGggd2l0aCBiY2FjaGUsIEkgZm91bmQgc29tZSBJ
-L08gd2l0aCBPX1NZTkMgd3JpdGViYWNrIHRvIA0KSERELCB3aGljaCBjYXVzZWQgbGFyZ2UgbGF0
-ZW5jeSBvbiBIREQsIEkgdHJhY2UgdGhlIEkvTyB3aXRoIGlvc25vb3A6DQoNCi4vaW9zbm9vcMKg
-IC1RIC10cyAtZCAnOCwxOTINCg0KVHJhY2luZyBibG9jayBJL08gZm9yIDEgc2Vjb25kcyAoYnVm
-ZmVyZWQpLi4uDQpTVEFSVHPCoMKgwqDCoMKgwqDCoMKgwqAgRU5Ec8KgwqDCoMKgwqDCoMKgwqDC
-oMKgwqAgQ09NTcKgwqDCoMKgwqDCoMKgwqAgUElEwqDCoMKgIFRZUEUgREVWIA0KQkxPQ0vCoMKg
-wqDCoMKgwqDCoCBCWVRFU8KgwqDCoMKgIExBVG1zDQoNCjE4MDkyOTYuMjkyMzUwwqAgMTgwOTI5
-Ni4zMTkwNTLCoCB0cF9vc2RfdHDCoMKgwqAgMjIxOTHCoCBSwqDCoMKgIDgsMTkyIA0KNDU3ODk0
-MDI0MMKgwqAgMTYzODTCoMKgwqDCoCAyNi43MA0KMTgwOTI5Ni4yOTIzMzDCoCAxODA5Mjk2LjMy
-MDk3NMKgIHRwX29zZF90cMKgwqDCoCAyMjE5McKgIFLCoMKgwqAgOCwxOTIgDQo0NTc3OTM4NzA0
-wqDCoCAxNjM4NMKgwqDCoMKgIDI4LjY0DQoxODA5Mjk2LjI5MjYxNMKgIDE4MDkyOTYuMzIzMjky
-wqAgdHBfb3NkX3RwwqDCoMKgIDIyMTkxwqAgUsKgwqDCoCA4LDE5MiANCjQ2MDA0MDQzMDTCoMKg
-IDE2Mzg0wqDCoMKgwqAgMzAuNjgNCjE4MDkyOTYuMjkyMzUzwqAgMTgwOTI5Ni4zMjUzMDDCoCB0
-cF9vc2RfdHDCoMKgwqAgMjIxOTHCoCBSwqDCoMKgIDgsMTkyIA0KNDU3ODM0MzA4OMKgwqAgMTYz
-ODTCoMKgwqDCoCAzMi45NQ0KMTgwOTI5Ni4yOTIzNDDCoCAxODA5Mjk2LjMyODAxM8KgIHRwX29z
-ZF90cMKgwqDCoCAyMjE5McKgIFLCoMKgwqAgOCwxOTIgDQo0NTc4MDU1NDcywqDCoCAxNjM4NMKg
-wqDCoMKgIDM1LjY3DQoxODA5Mjk2LjI5MjYwNsKgIDE4MDkyOTYuMzMwNTE4wqAgdHBfb3NkX3Rw
-wqDCoMKgIDIyMTkxwqAgUsKgwqDCoCA4LDE5MiANCjQ1Nzg1ODE2NDjCoMKgIDE2Mzg0wqDCoMKg
-wqAgMzcuOTENCjE4MDkyOTUuMTY5MjY2wqAgMTgwOTI5Ni4zMzQwNDHCoCBic3RvcmVfa3ZfZmkg
-MTcyNjbCoCBXU8KgwqAgOCwxOTIgDQo0MjQ0OTk2MzYwwqDCoCA0MDk2wqDCoMKgIDExNjQuNzgN
-CjE4MDkyOTYuMjkyNjE4wqAgMTgwOTI5Ni4zMzYzNDnCoCB0cF9vc2RfdHDCoMKgwqAgMjIxOTHC
-oCBSwqDCoMKgIDgsMTkyIA0KNDYwMjYzMTc2MMKgwqAgMTYzODTCoMKgwqDCoCA0My43Mw0KMTgw
-OTI5Ni4yOTI2MTjCoCAxODA5Mjk2LjMzODgxMsKgIHRwX29zZF90cMKgwqDCoCAyMjE5McKgIFLC
-oMKgwqAgOCwxOTIgDQo0NjAyNjMyOTc2wqDCoCAxNjM4NMKgwqDCoMKgIDQ2LjE5DQoxODA5Mjk2
-LjAzMDEwM8KgIDE4MDkyOTYuMzQyNzgwwqAgdHBfb3NkX3RwwqDCoMKgIDIyMTgwwqAgV1PCoMKg
-IDgsMTkyIA0KNDc0MTI3NjA0OMKgwqAgMTMxMDcywqDCoCAzMTIuNjgNCjE4MDkyOTYuMjkyMzQ3
-wqAgMTgwOTI5Ni4zNDUwNDXCoCB0cF9vc2RfdHDCoMKgwqAgMjIxOTHCoCBSwqDCoMKgIDgsMTky
-IA0KNDYwOTAzNzg3MsKgwqAgMTYzODTCoMKgwqDCoCA1Mi43MA0KMTgwOTI5Ni4yOTI2MjDCoCAx
-ODA5Mjk2LjM0NTEwOcKgIHRwX29zZF90cMKgwqDCoCAyMjE5McKgIFLCoMKgwqAgOCwxOTIgDQo0
-NjA5MDM3OTA0wqDCoCAxNjM4NMKgwqDCoMKgIDUyLjQ5DQoxODA5Mjk2LjI5MjYxMsKgIDE4MDky
-OTYuMzQ3MjUxwqAgdHBfb3NkX3RwwqDCoMKgIDIyMTkxwqAgUsKgwqDCoCA4LDE5MiANCjQ1Nzg5
-Mzc2MTbCoMKgIDE2Mzg0wqDCoMKgwqAgNTQuNjQNCjE4MDkyOTYuMjkyNjIxwqAgMTgwOTI5Ni4z
-NTExMzbCoCB0cF9vc2RfdHDCoMKgwqAgMjIxOTHCoCBSwqDCoMKgIDgsMTkyIA0KNDYxMjY1NDk5
-MsKgwqAgMTYzODTCoMKgwqDCoCA1OC41MQ0KMTgwOTI5Ni4yOTIzNDHCoCAxODA5Mjk2LjM1MzQy
-OMKgIHRwX29zZF90cMKgwqDCoCAyMjE5McKgIFLCoMKgwqAgOCwxOTIgDQo0NTc4MjIwNjU2wqDC
-oCAxNjM4NMKgwqDCoMKgIDYxLjA5DQoxODA5Mjk2LjI5MjM0MsKgIDE4MDkyOTYuMzUzODY0wqAg
-dHBfb3NkX3RwwqDCoMKgIDIyMTkxwqAgUsKgwqDCoCA4LDE5MiANCjQ1NzgyMjA4ODDCoMKgIDE2
-Mzg0wqDCoMKgwqAgNjEuNTINCjE4MDkyOTUuMTY3NjUwwqAgMTgwOTI5Ni4zNTg1MTDCoCBic3Rv
-cmVfa3ZfZmkgMTcyNjbCoCBXU8KgwqAgOCwxOTIgDQo0OTIzNjk1OTYwwqDCoCA0MDk2wqDCoMKg
-IDExOTAuODYNCjE4MDkyOTYuMjkyMzQ3wqAgMTgwOTI5Ni4zNjE4ODXCoCB0cF9vc2RfdHDCoMKg
-wqAgMjIxOTHCoCBSwqDCoMKgIDgsMTkyIA0KNDYwNzQzNzEzNsKgwqAgMTYzODTCoMKgwqDCoCA2
-OS41NA0KMTgwOTI5Ni4wMjkzNjPCoCAxODA5Mjk2LjM2NzMxM8KgIHRwX29zZF90cMKgwqDCoCAy
-MjE4MMKgIFdTwqDCoCA4LDE5MiANCjQ3Mzk4MjQ0MDDCoMKgIDk4MzA0wqDCoMKgIDMzNy45NQ0K
-MTgwOTI5Ni4yOTIzNDnCoCAxODA5Mjk2LjM3MDI0NcKgIHRwX29zZF90cMKgwqDCoCAyMjE5McKg
-IFLCoMKgwqAgOCwxOTIgDQo0NTkxMzc5ODg4wqDCoCAxNjM4NMKgwqDCoMKgIDc3LjkwDQoxODA5
-Mjk2LjI5MjM0OMKgIDE4MDkyOTYuMzc2MjczwqAgdHBfb3NkX3RwwqDCoMKgIDIyMTkxwqAgUsKg
-wqDCoCA4LDE5MiANCjQ1OTEyODk1NTLCoMKgIDE2Mzg0wqDCoMKgwqAgODMuOTINCjE4MDkyOTYu
-MjkyMzUzwqAgMTgwOTI5Ni4zNzg2NTnCoCB0cF9vc2RfdHDCoMKgwqAgMjIxOTHCoCBSwqDCoMKg
-IDgsMTkyIA0KNDU3ODI0ODY1NsKgwqAgMTYzODTCoMKgwqDCoCA4Ni4zMQ0KMTgwOTI5Ni4yOTI2
-MTnCoCAxODA5Mjk2LjM4NDgzNcKgIHRwX29zZF90cMKgwqDCoCAyMjE5McKgIFLCoMKgwqAgOCwx
-OTIgDQo0NjE3NDk0MTYwwqDCoCA2NTUzNsKgwqDCoMKgIDkyLjIyDQoxODA5Mjk1LjE2NTQ1McKg
-IDE4MDkyOTYuMzkzNzE1wqAgYnN0b3JlX2t2X2ZpIDE3MjY2wqAgV1PCoMKgIDgsMTkyIA0KMTM1
-NTcwMzEyMMKgwqAgNDA5NsKgwqDCoCAxMjI4LjI2DQoxODA5Mjk1LjE2ODU5NcKgIDE4MDkyOTYu
-NDAxNTYwwqAgYnN0b3JlX2t2X2ZpIDE3MjY2wqAgV1PCoMKgIDgsMTkyIA0KMTEyMjIwMMKgwqDC
-oMKgwqAgNDA5NsKgwqDCoCAxMjMyLjk2DQoxODA5Mjk1LjE2NTIyMcKgIDE4MDkyOTYuNDA4MDE4
-wqAgYnN0b3JlX2t2X2ZpIDE3MjY2wqAgV1PCoMKgIDgsMTkyIA0KOTYwNjU2wqDCoMKgwqDCoMKg
-IDQwOTbCoMKgwqAgMTI0Mi44MA0KMTgwOTI5NS4xNjY3MzfCoCAxODA5Mjk2LjQxMTUwNcKgIGJz
-dG9yZV9rdl9maSAxNzI2NsKgIFdTwqDCoCA4LDE5MiANCjU3NjgyNTA0wqDCoMKgwqAgNDA5NsKg
-wqDCoCAxMjQ0Ljc3DQoxODA5Mjk2LjI5MjM1MsKgIDE4MDkyOTYuNDE4MTIzwqAgdHBfb3NkX3Rw
-wqDCoMKgIDIyMTkxwqAgUsKgwqDCoCA4LDE5MiANCjQ1Nzk0NTkwNTbCoMKgIDMyNzY4wqDCoMKg
-IDEyNS43Nw0KDQpJJ20gY29uZnVzZWQgd2h5IHdyaXRlIHdpdGggT19TWU5DIG11c3Qgd3JpdGVi
-YWNrIG9uIHRoZSBiYWNrZW5kIHN0b3JhZ2UgDQpkZXZpY2U/wqAgQW5kIHdoZW4gSSB1c2VkIGJj
-YWNoZSBmb3IgYSB0aW1lLA0KDQp0aGUgbGF0ZW5jeSBpbmNyZWFzZWQgYSBsb3QuKFRoZSBTU0Qg
-aXMgbm90IHZlcnkgYnVzeSksIFRoZXJlJ3Mgc29tZSANCmJlc3QgcHJhY3RpY2VzIG9uIGNvbmZp
-Z3VyYXRpb24/DQoNCg==
+On Wed, Feb 17, 2021 at 08:16:29AM +0100, Christoph Hellwig wrote:
+> On Wed, Feb 17, 2021 at 11:07:14AM +0800, Ming Lei wrote:
+> > Do you think it is correct for ioctl(BLKRRPART) to always drop/re-add
+> > partition device node?
+> 
+> Yes, that is what it is designed to do.  The only reason to call this
+> ioctl is when userspace software has written new partition table
+> information to the disk.
+
+I am wondering how userspace can know this design or implication since
+this behavior wasn't documented anywhere.
+
+For example, 'blockdev --rereadpt' can do it simply, without updating
+partition table at all.
+
+The reality is that almost of all the main userspace consumers of
+ioctl(BLKRRPART) didn't follow such 'rule', then partitions node from
+'bdev' fs can disappear & re-appear anytime. I believe it is one bug
+from userspace view.
+
+
+Thanks,
+Ming
+
