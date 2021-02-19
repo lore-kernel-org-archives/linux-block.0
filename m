@@ -2,110 +2,170 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 413CAC433E0
-	for <linux-block@archiver.kernel.org>; Fri, 19 Feb 2021 10:27:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9274FC433E0
+	for <linux-block@archiver.kernel.org>; Fri, 19 Feb 2021 12:06:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E034864EAF
-	for <linux-block@archiver.kernel.org>; Fri, 19 Feb 2021 10:27:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 42A0C64EC0
+	for <linux-block@archiver.kernel.org>; Fri, 19 Feb 2021 12:06:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229587AbhBSK1y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 Feb 2021 05:27:54 -0500
-Received: from mx2.suse.de ([195.135.220.15]:35382 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229555AbhBSK1x (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 Feb 2021 05:27:53 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id C8699ACBF;
-        Fri, 19 Feb 2021 10:27:11 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id EA2921E14BC; Fri, 19 Feb 2021 11:27:11 +0100 (CET)
-Date:   Fri, 19 Feb 2021 11:27:11 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     Damien Le Moal <Damien.LeMoal@wdc.com>
-Cc:     Jan Kara <jack@suse.cz>, Keith Busch <kbusch@kernel.org>,
-        "hch@infradead.org" <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH] Revert "block: Do not discard buffers under a mounted
- filesystem"
-Message-ID: <20210219102711.GC6086@quack2.suse.cz>
-References: <20210216133849.8244-1-jack@suse.cz>
- <20210216163606.GA4063489@infradead.org>
- <20210216174941.GA2708768@dhcp-10-100-145-180.wdc.com>
- <BL0PR04MB651447424E3A3EFD5BE7A987E7879@BL0PR04MB6514.namprd04.prod.outlook.com>
- <20210218140703.GD16953@quack2.suse.cz>
- <BL0PR04MB651418C1C31967E5AF7743A2E7859@BL0PR04MB6514.namprd04.prod.outlook.com>
+        id S229959AbhBSMFr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 Feb 2021 07:05:47 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:12194 "EHLO
+        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231207AbhBSMD4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 19 Feb 2021 07:03:56 -0500
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.59])
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4Dhqt61WxKzlMTl;
+        Fri, 19 Feb 2021 20:01:18 +0800 (CST)
+Received: from [10.174.179.129] (10.174.179.129) by
+ DGGEMS406-HUB.china.huawei.com (10.3.19.206) with Microsoft SMTP Server id
+ 14.3.498.0; Fri, 19 Feb 2021 20:03:04 +0800
+Subject: Re: question about relative control for sync io using bfq
+To:     Paolo Valente <paolo.valente@linaro.org>
+CC:     Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
+        "Christoph Hellwig" <hch@lst.de>,
+        linux-block <linux-block@vger.kernel.org>,
+        chenzhou <chenzhou10@huawei.com>,
+        "houtao (A)" <houtao1@huawei.com>
+References: <b4163392-0462-ff6f-b958-1f96f33d69e6@huawei.com>
+ <7E41BC22-33EA-4D0F-9EBD-3AB0824E3F2E@linaro.org>
+ <7c28a80f-dea9-d701-0399-a22522c4509b@huawei.com>
+ <554AE702-9A13-4FB5-9B29-9AF11F09CE5B@linaro.org>
+ <97ce5ede-0f7e-ce63-7a92-01c3356f4e44@huawei.com>
+ <3E4B9F62-7376-4CA5-9C9D-21F6B9437313@linaro.org>
+From:   "yukuai (C)" <yukuai3@huawei.com>
+Message-ID: <6ba9537b-052c-715b-111b-34a7d53179ec@huawei.com>
+Date:   Fri, 19 Feb 2021 20:03:04 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BL0PR04MB651418C1C31967E5AF7743A2E7859@BL0PR04MB6514.namprd04.prod.outlook.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <3E4B9F62-7376-4CA5-9C9D-21F6B9437313@linaro.org>
+Content-Type: text/plain; charset="gbk"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.179.129]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu 18-02-21 22:35:41, Damien Le Moal wrote:
-> On 2021/02/18 23:07, Jan Kara wrote:
-> > On Tue 16-02-21 23:05:57, Damien Le Moal wrote:
-> >> On 2021/02/17 2:51, Keith Busch wrote:
-> >>> On Tue, Feb 16, 2021 at 04:36:06PM +0000, Christoph Hellwig wrote:
-> >>>> On Tue, Feb 16, 2021 at 02:38:49PM +0100, Jan Kara wrote:
-> >>>>> Apparently there are several userspace programs that depend on being
-> >>>>> able to call BLKDISCARD ioctl without the ability to grab bdev
-> >>>>> exclusively - namely FUSE filesystems have the device open without
-> >>>>> O_EXCL (the kernel has the bdev open with O_EXCL) so the commit breaks
-> >>>>> fstrim(8) for such filesystems. Also LVM when shrinking LV opens PV and
-> >>>>> discards ranges released from LV but that PV may be already open
-> >>>>> exclusively by someone else (see bugzilla link below for more details).
-> >>>>>
-> >>>>> This reverts commit 384d87ef2c954fc58e6c5fd8253e4a1984f5fe02.
-> >>>>
-> >>>> I think that is a bad idea. We fixed the problem for a reason.
-> >>>> I think the right fix is to just do nothing if the device hasn't been
-> >>>> opened with O_EXCL and can't be reopened with it, just don't do anything
-> >>>> but also don't return an error.  After all discard and thus
-> >>>> BLKDISCARD is purely advisory.
-> >>>
-> >>> A discard is advisory, but BLKZEROOUT is not, so something different
-> >>> should happen there. We were also planning to send a patch using this
-> >>> same pattern for Zone Reset to fix stale page cache issues after the
-> >>> reset, but we'll wait to see how this settles before sending that.
-> >>
-> >> There is also another problem: the truncate_bdev & operation following it
-> >> (discard, zeroout or zone reset) are not atomic vs read/write operations to the
-> >> bdev. Without mutual exclusion, that page invalidation is best effort only since
-> >> reads can snick in between the truncate and discard (or zeroout or zone reset).
-> >> With our zone reset stale page problem case, it is reads from udevd that we see
-> >> snicking in between the truncate bdev and zone reset and so we still get stale
-> >> pages after the zone reset is finished. No solution to propose for solving that,
-> >> yet...
-> > 
-> > Well, at least blkdev_fallocate() does:
-> > 
-> > 	truncate_bdev_range();
-> > 	blkdev_issue_zeroout();
-> > 	invalidate_inode_pages2_range();
-> > 
-> > so racing reads should not result in stale page cache contents AFAICT.
+
+On 2021/02/09 3:05, Paolo Valente wrote:
 > 
-> Yes, but concurrent writes can then get in between the blkdev_issue_zeroout()
-> and invalidate_inode_pages2_range() and data discarded before hitting the
-> drive... Not very nice either. Granted, that would mean that userland has 2
-> concurrent writers that are not synchronized. So weird results are to be
-> expected. I guess it is probably safe to ignore that case ?
+> 
+>> Il giorno 7 feb 2021, alle ore 13:49, yukuai (C) <yukuai3@huawei.com> ha scritto:
+>>
+>>
+>> On 2021/02/05 15:49, Paolo Valente wrote:
+>>>> Il giorno 29 gen 2021, alle ore 09:28, yukuai (C) <yukuai3@huawei.com> ha scritto:
+>>>>
+>>>> Hi,
+>>>>
+>>>> Thanks for your response, and my apologize for the delay, my tmie
+>>>> is very limited recently.
+>>>>
+>>> I do know that problem ...
+>>>> On 2021/01/22 18:09, Paolo Valente wrote:
+>>>>> Hi,
+>>>>> this is a core problem, not of BFQ but of any possible solution that
+>>>>> has to provide bandwidth isolation with sync I/O.  One of the examples
+>>>>
+>>>> I'm not sure about this, so I test it with iocost in mq and cfq in sq,
+>>>> result shows that they do can provide bandwidth isolation with sync I/O
+>>>> without significant performance degradation.
+>>> Yep, that means just that, with your specific workload, bandwidth
+>>> isolation gets guaranteed without idling.  So that's exactly one of
+>>> the workloads for which I'm suggesting my handling of a special case.
+>>>>> is the one I made for you in my other email.  At any rate, the problem
+>>>>> that you report seems to occur with just one group.  We may think of
+>>>>> simply changing my condition
+>>>>> bfqd->num_groups_with_pending_reqs > 0
+>>>>> to
+>>>>> bfqd->num_groups_with_pending_reqs > 1
+>>>>
+>>>> We aredy tried this, the problem will dispeare if only one group is
+>>>> active. And I think this modification is reasonable because
+>>>> bandwidth isolation is not necessary in this case.
+>>>>
+>>> Thanks for your feedback. I'll consider submitting this change.
+>>>> However, considering the common case, when more than one
+>>>> group is active, and one of the group is issuing sync IO, I think
+>>>> we need to find a way to prevent the preformance degradation.
+>>> I agree.  What do you think of my suggestion for solving the problem?
+>>> Might you help with that?
+>>
+>> Hi
+>>
+>> Do you mead the suggestion that you mentioned in another email:
+>> "a varied_rq_size flag, similar to the varied_weights flag" ?
+>> I'm afraid that's just a circumvention plan, not a solution to the
+>> special case.
+>>
+> 
+> I'm a little confused.  Could you explain why you think this is a
+> circumvention plan?  Maybe even better, could you describe in detail
+> the special case you have in mind?  We could start from there, to think
+> of a possible, satisfactory solution.
+> 
+Hi,
 
-Yes. IMHO any result that doesn't crash the kernel (or burn the HW) is fine
-in that case.
+First of all, there are two conditions to trigger the problem in bfq:
+a. issuing sync IO concurrently. (I was testing in one cgroup, and
+I think multiple cgroups is the same.)
+b. not issuing in root cgroup.
 
-> I guess the same pattern as above for zeroout would work for reset zone too.
-> Will try to see if that solves our test problem.
+The phenomenon is that the performance will degradated to single
+process. The reason is that bfq_queue will never expired untill
+BUDGET_TIMEOUT since num_groups_with_pending_reqs will always be
+nonzero after issuing io to driver, which means that there is only
+one request in progress(during D2C) at any given moment.
 
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+I was trying to skip the checking of active group if bfq.weight is not
+changed, and it's implemented by adding a varible 'check_active_group',
+it'll only set to true if bfq.weight is changed.
+
+This approach will work fine is the weight stay unchanged, and will
+not be effective if the weight ever changed. This is why I said it's
+a circumvention plan.
+
+By the way, while testing with cfq, I found that the current active cfq
+queue can be preempted in such special case. I wonder if it's worth
+referring to bfq.
+
+Thanks,
+Yu Kuai
+
+> 
+>> By the way, I'm glad if there is anything I can help, however it'll
+>> wait for a few days cause the Spring Festival is coming.
+>>
+> 
+> Ok, Happy Spring Festival then.
+> 
+> Thanks.
+> Paolo
+> 
+>> Thanks,
+>> Yu Kuai
+>>
+>>> Thanks,
+>>> Paolo
+>>>>> If this simple solution does solve the problem you report, then I
+>>>>> could run my batch of tests to check whether it causes some
+>>>>> regression.
+>>>>> What do you think?
+>>>>> Thanks.
+>>>>> Paolo
+>>>>
+>>>> Thanks
+>>>> Yu Kuai
+>>>>> .
+>>> .
+> 
+> .
+> 
