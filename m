@@ -2,170 +2,108 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9274FC433E0
-	for <linux-block@archiver.kernel.org>; Fri, 19 Feb 2021 12:06:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05C8DC433DB
+	for <linux-block@archiver.kernel.org>; Fri, 19 Feb 2021 14:18:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 42A0C64EC0
-	for <linux-block@archiver.kernel.org>; Fri, 19 Feb 2021 12:06:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BE1CD64EBD
+	for <linux-block@archiver.kernel.org>; Fri, 19 Feb 2021 14:18:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229959AbhBSMFr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 Feb 2021 07:05:47 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:12194 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231207AbhBSMD4 (ORCPT
+        id S229826AbhBSOSy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 Feb 2021 09:18:54 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:38805 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229804AbhBSOSy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 Feb 2021 07:03:56 -0500
-Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.59])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4Dhqt61WxKzlMTl;
-        Fri, 19 Feb 2021 20:01:18 +0800 (CST)
-Received: from [10.174.179.129] (10.174.179.129) by
- DGGEMS406-HUB.china.huawei.com (10.3.19.206) with Microsoft SMTP Server id
- 14.3.498.0; Fri, 19 Feb 2021 20:03:04 +0800
-Subject: Re: question about relative control for sync io using bfq
-To:     Paolo Valente <paolo.valente@linaro.org>
-CC:     Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
-        "Christoph Hellwig" <hch@lst.de>,
-        linux-block <linux-block@vger.kernel.org>,
-        chenzhou <chenzhou10@huawei.com>,
-        "houtao (A)" <houtao1@huawei.com>
-References: <b4163392-0462-ff6f-b958-1f96f33d69e6@huawei.com>
- <7E41BC22-33EA-4D0F-9EBD-3AB0824E3F2E@linaro.org>
- <7c28a80f-dea9-d701-0399-a22522c4509b@huawei.com>
- <554AE702-9A13-4FB5-9B29-9AF11F09CE5B@linaro.org>
- <97ce5ede-0f7e-ce63-7a92-01c3356f4e44@huawei.com>
- <3E4B9F62-7376-4CA5-9C9D-21F6B9437313@linaro.org>
-From:   "yukuai (C)" <yukuai3@huawei.com>
-Message-ID: <6ba9537b-052c-715b-111b-34a7d53179ec@huawei.com>
-Date:   Fri, 19 Feb 2021 20:03:04 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Fri, 19 Feb 2021 09:18:54 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1613744247;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=vcaXkz3DIMXR6O8tkWCRCDaH2CJZE8gRDs1qdSdAtsA=;
+        b=dqikdrElXxjqxkXSpcP6/9H185Ch2BWOPtQ/c9BXwXkX7JEet9nhTCU7hilHlj5KVwklDr
+        5LGMzItvQUf2zZt9CPVRLBxBPGuO19fCYKw959utADUJD9wlpZLbxwCGRWaGljR6L7EAF7
+        9MPsHIpYpM5U8cGs92vvLagKnHkFrv4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-142-5tiPo4NSO-ODLee_WA6QXA-1; Fri, 19 Feb 2021 09:17:23 -0500
+X-MC-Unique: 5tiPo4NSO-ODLee_WA6QXA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DCCB7AFA81;
+        Fri, 19 Feb 2021 14:17:21 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id B40145D9C6;
+        Fri, 19 Feb 2021 14:17:14 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 11JEHEkJ007662;
+        Fri, 19 Feb 2021 09:17:14 -0500
+Received: from localhost (mpatocka@localhost)
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 11JEHCXs007658;
+        Fri, 19 Feb 2021 09:17:13 -0500
+X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
+Date:   Fri, 19 Feb 2021 09:17:12 -0500 (EST)
+From:   Mikulas Patocka <mpatocka@redhat.com>
+X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
+To:     Jeffle Xu <jefflexu@linux.alibaba.com>
+cc:     snitzer@redhat.com, axboe@kernel.dk, caspar@linux.alibaba.com,
+        hch@lst.de, linux-block@vger.kernel.org,
+        joseph.qi@linux.alibaba.com, dm-devel@redhat.com,
+        io-uring@vger.kernel.org
+Subject: Re: [dm-devel] [PATCH v3 09/11] dm: support IO polling for bio-based
+ dm device
+In-Reply-To: <20210208085243.82367-10-jefflexu@linux.alibaba.com>
+Message-ID: <alpine.LRH.2.02.2102190907560.10545@file01.intranet.prod.int.rdu2.redhat.com>
+References: <20210208085243.82367-1-jefflexu@linux.alibaba.com> <20210208085243.82367-10-jefflexu@linux.alibaba.com>
+User-Agent: Alpine 2.02 (LRH 1266 2009-07-14)
 MIME-Version: 1.0
-In-Reply-To: <3E4B9F62-7376-4CA5-9C9D-21F6B9437313@linaro.org>
-Content-Type: text/plain; charset="gbk"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.179.129]
-X-CFilter-Loop: Reflected
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
-On 2021/02/09 3:05, Paolo Valente wrote:
-> 
-> 
->> Il giorno 7 feb 2021, alle ore 13:49, yukuai (C) <yukuai3@huawei.com> ha scritto:
->>
->>
->> On 2021/02/05 15:49, Paolo Valente wrote:
->>>> Il giorno 29 gen 2021, alle ore 09:28, yukuai (C) <yukuai3@huawei.com> ha scritto:
->>>>
->>>> Hi,
->>>>
->>>> Thanks for your response, and my apologize for the delay, my tmie
->>>> is very limited recently.
->>>>
->>> I do know that problem ...
->>>> On 2021/01/22 18:09, Paolo Valente wrote:
->>>>> Hi,
->>>>> this is a core problem, not of BFQ but of any possible solution that
->>>>> has to provide bandwidth isolation with sync I/O.  One of the examples
->>>>
->>>> I'm not sure about this, so I test it with iocost in mq and cfq in sq,
->>>> result shows that they do can provide bandwidth isolation with sync I/O
->>>> without significant performance degradation.
->>> Yep, that means just that, with your specific workload, bandwidth
->>> isolation gets guaranteed without idling.  So that's exactly one of
->>> the workloads for which I'm suggesting my handling of a special case.
->>>>> is the one I made for you in my other email.  At any rate, the problem
->>>>> that you report seems to occur with just one group.  We may think of
->>>>> simply changing my condition
->>>>> bfqd->num_groups_with_pending_reqs > 0
->>>>> to
->>>>> bfqd->num_groups_with_pending_reqs > 1
->>>>
->>>> We aredy tried this, the problem will dispeare if only one group is
->>>> active. And I think this modification is reasonable because
->>>> bandwidth isolation is not necessary in this case.
->>>>
->>> Thanks for your feedback. I'll consider submitting this change.
->>>> However, considering the common case, when more than one
->>>> group is active, and one of the group is issuing sync IO, I think
->>>> we need to find a way to prevent the preformance degradation.
->>> I agree.  What do you think of my suggestion for solving the problem?
->>> Might you help with that?
->>
->> Hi
->>
->> Do you mead the suggestion that you mentioned in another email:
->> "a varied_rq_size flag, similar to the varied_weights flag" ?
->> I'm afraid that's just a circumvention plan, not a solution to the
->> special case.
->>
-> 
-> I'm a little confused.  Could you explain why you think this is a
-> circumvention plan?  Maybe even better, could you describe in detail
-> the special case you have in mind?  We could start from there, to think
-> of a possible, satisfactory solution.
-> 
-Hi,
 
-First of all, there are two conditions to trigger the problem in bfq:
-a. issuing sync IO concurrently. (I was testing in one cgroup, and
-I think multiple cgroups is the same.)
-b. not issuing in root cgroup.
+On Mon, 8 Feb 2021, Jeffle Xu wrote:
 
-The phenomenon is that the performance will degradated to single
-process. The reason is that bfq_queue will never expired untill
-BUDGET_TIMEOUT since num_groups_with_pending_reqs will always be
-nonzero after issuing io to driver, which means that there is only
-one request in progress(during D2C) at any given moment.
+> diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+> index c2945c90745e..8423f1347bb8 100644
+> --- a/drivers/md/dm.c
+> +++ b/drivers/md/dm.c
+> @@ -1657,6 +1657,68 @@ static blk_qc_t dm_submit_bio(struct bio *bio)
+>  	return BLK_QC_T_NONE;
+>  }
+>  
+> +static int dm_poll_one_md(struct mapped_device *md);
+> +
+> +static int dm_poll_one_dev(struct dm_target *ti, struct dm_dev *dev,
+> +				sector_t start, sector_t len, void *data)
+> +{
+> +	int i, *count = data;
+> +	struct request_queue *q = bdev_get_queue(dev->bdev);
+> +	struct blk_mq_hw_ctx *hctx;
+> +
+> +	if (queue_is_mq(q)) {
+> +		if (!percpu_ref_tryget(&q->q_usage_counter))
+> +			return 0;
+> +
+> +		queue_for_each_poll_hw_ctx(q, hctx, i)
+> +			*count += blk_mq_poll_hctx(q, hctx);
+> +
+> +		percpu_ref_put(&q->q_usage_counter);
+> +	} else
+> +		*count += dm_poll_one_md(dev->bdev->bd_disk->private_data);
 
-I was trying to skip the checking of active group if bfq.weight is not
-changed, and it's implemented by adding a varible 'check_active_group',
-it'll only set to true if bfq.weight is changed.
+This is fragile, because in the future there may be other bio-based 
+drivers that support polling. You should check that "q" is really a device 
+mapper device before calling dm_poll_one_md on it.
 
-This approach will work fine is the weight stay unchanged, and will
-not be effective if the weight ever changed. This is why I said it's
-a circumvention plan.
+Mikulas
 
-By the way, while testing with cfq, I found that the current active cfq
-queue can be preempted in such special case. I wonder if it's worth
-referring to bfq.
-
-Thanks,
-Yu Kuai
-
-> 
->> By the way, I'm glad if there is anything I can help, however it'll
->> wait for a few days cause the Spring Festival is coming.
->>
-> 
-> Ok, Happy Spring Festival then.
-> 
-> Thanks.
-> Paolo
-> 
->> Thanks,
->> Yu Kuai
->>
->>> Thanks,
->>> Paolo
->>>>> If this simple solution does solve the problem you report, then I
->>>>> could run my batch of tests to check whether it causes some
->>>>> regression.
->>>>> What do you think?
->>>>> Thanks.
->>>>> Paolo
->>>>
->>>> Thanks
->>>> Yu Kuai
->>>>> .
->>> .
-> 
-> .
-> 
