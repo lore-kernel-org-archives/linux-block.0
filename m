@@ -2,108 +2,94 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05C8DC433DB
-	for <linux-block@archiver.kernel.org>; Fri, 19 Feb 2021 14:18:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D673C433E6
+	for <linux-block@archiver.kernel.org>; Fri, 19 Feb 2021 15:41:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BE1CD64EBD
-	for <linux-block@archiver.kernel.org>; Fri, 19 Feb 2021 14:18:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0B2F864E77
+	for <linux-block@archiver.kernel.org>; Fri, 19 Feb 2021 15:41:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229826AbhBSOSy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 Feb 2021 09:18:54 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:38805 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229804AbhBSOSy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 Feb 2021 09:18:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1613744247;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=vcaXkz3DIMXR6O8tkWCRCDaH2CJZE8gRDs1qdSdAtsA=;
-        b=dqikdrElXxjqxkXSpcP6/9H185Ch2BWOPtQ/c9BXwXkX7JEet9nhTCU7hilHlj5KVwklDr
-        5LGMzItvQUf2zZt9CPVRLBxBPGuO19fCYKw959utADUJD9wlpZLbxwCGRWaGljR6L7EAF7
-        9MPsHIpYpM5U8cGs92vvLagKnHkFrv4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-142-5tiPo4NSO-ODLee_WA6QXA-1; Fri, 19 Feb 2021 09:17:23 -0500
-X-MC-Unique: 5tiPo4NSO-ODLee_WA6QXA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DCCB7AFA81;
-        Fri, 19 Feb 2021 14:17:21 +0000 (UTC)
-Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B40145D9C6;
-        Fri, 19 Feb 2021 14:17:14 +0000 (UTC)
-Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
-        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 11JEHEkJ007662;
-        Fri, 19 Feb 2021 09:17:14 -0500
-Received: from localhost (mpatocka@localhost)
-        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 11JEHCXs007658;
-        Fri, 19 Feb 2021 09:17:13 -0500
-X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
-Date:   Fri, 19 Feb 2021 09:17:12 -0500 (EST)
-From:   Mikulas Patocka <mpatocka@redhat.com>
-X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
-To:     Jeffle Xu <jefflexu@linux.alibaba.com>
-cc:     snitzer@redhat.com, axboe@kernel.dk, caspar@linux.alibaba.com,
-        hch@lst.de, linux-block@vger.kernel.org,
-        joseph.qi@linux.alibaba.com, dm-devel@redhat.com,
-        io-uring@vger.kernel.org
-Subject: Re: [dm-devel] [PATCH v3 09/11] dm: support IO polling for bio-based
- dm device
-In-Reply-To: <20210208085243.82367-10-jefflexu@linux.alibaba.com>
-Message-ID: <alpine.LRH.2.02.2102190907560.10545@file01.intranet.prod.int.rdu2.redhat.com>
-References: <20210208085243.82367-1-jefflexu@linux.alibaba.com> <20210208085243.82367-10-jefflexu@linux.alibaba.com>
-User-Agent: Alpine 2.02 (LRH 1266 2009-07-14)
+        id S229840AbhBSPl2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 Feb 2021 10:41:28 -0500
+Received: from mx2.suse.de ([195.135.220.15]:47414 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229681AbhBSPl0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 19 Feb 2021 10:41:26 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1613749238; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=MHxag6mUxa0dootKy2U+lJVR2k8UiaKbpKfVyKM/EZ4=;
+        b=jjsdawg1KZYf+nItuzbxyqaXeDKHiLv6YoeaErBu4tJer4zXSytLV7xk92MixdQUnvPRED
+        iXUz6DrGfs47sGkqcF453+W0zBJW6WReMsknyI3WKg9iAusmhGukYAazPdCEFJ6k8mopm3
+        ZGwTClr2lapCAwa2bLNQ99xzaXwou3k=
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 17FFFAED2;
+        Fri, 19 Feb 2021 15:40:38 +0000 (UTC)
+From:   Juergen Gross <jgross@suse.com>
+To:     xen-devel@lists.xenproject.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org
+Cc:     Juergen Gross <jgross@suse.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        stable@vger.kernel.org, Wei Liu <wei.liu@kernel.org>,
+        Paul Durrant <paul@xen.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
+        Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH v3 0/8] xen/events: bug fixes and some diagnostic aids
+Date:   Fri, 19 Feb 2021 16:40:22 +0100
+Message-Id: <20210219154030.10892-1-jgross@suse.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+The first four patches are fixes for XSA-332. The avoid WARN splats
+and a performance issue with interdomain events.
 
+Patches 5 and 6 are some additions to event handling in order to add
+some per pv-device statistics to sysfs and the ability to have a per
+backend device spurious event delay control.
 
-On Mon, 8 Feb 2021, Jeffle Xu wrote:
+Patches 7 and 8 are minor fixes I had lying around.
 
-> diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-> index c2945c90745e..8423f1347bb8 100644
-> --- a/drivers/md/dm.c
-> +++ b/drivers/md/dm.c
-> @@ -1657,6 +1657,68 @@ static blk_qc_t dm_submit_bio(struct bio *bio)
->  	return BLK_QC_T_NONE;
->  }
->  
-> +static int dm_poll_one_md(struct mapped_device *md);
-> +
-> +static int dm_poll_one_dev(struct dm_target *ti, struct dm_dev *dev,
-> +				sector_t start, sector_t len, void *data)
-> +{
-> +	int i, *count = data;
-> +	struct request_queue *q = bdev_get_queue(dev->bdev);
-> +	struct blk_mq_hw_ctx *hctx;
-> +
-> +	if (queue_is_mq(q)) {
-> +		if (!percpu_ref_tryget(&q->q_usage_counter))
-> +			return 0;
-> +
-> +		queue_for_each_poll_hw_ctx(q, hctx, i)
-> +			*count += blk_mq_poll_hctx(q, hctx);
-> +
-> +		percpu_ref_put(&q->q_usage_counter);
-> +	} else
-> +		*count += dm_poll_one_md(dev->bdev->bd_disk->private_data);
+Juergen Gross (8):
+  xen/events: reset affinity of 2-level event when tearing it down
+  xen/events: don't unmask an event channel when an eoi is pending
+  xen/events: avoid handling the same event on two cpus at the same time
+  xen/netback: fix spurious event detection for common event case
+  xen/events: link interdomain events to associated xenbus device
+  xen/events: add per-xenbus device event statistics and settings
+  xen/evtchn: use smp barriers for user event ring
+  xen/evtchn: use READ/WRITE_ONCE() for accessing ring indices
 
-This is fragile, because in the future there may be other bio-based 
-drivers that support polling. You should check that "q" is really a device 
-mapper device before calling dm_poll_one_md on it.
+ .../ABI/testing/sysfs-devices-xenbus          |  41 ++++
+ drivers/block/xen-blkback/xenbus.c            |   2 +-
+ drivers/net/xen-netback/interface.c           |  24 ++-
+ drivers/xen/events/events_2l.c                |  22 +-
+ drivers/xen/events/events_base.c              | 199 +++++++++++++-----
+ drivers/xen/events/events_fifo.c              |   7 -
+ drivers/xen/events/events_internal.h          |  14 +-
+ drivers/xen/evtchn.c                          |  29 ++-
+ drivers/xen/pvcalls-back.c                    |   4 +-
+ drivers/xen/xen-pciback/xenbus.c              |   2 +-
+ drivers/xen/xen-scsiback.c                    |   2 +-
+ drivers/xen/xenbus/xenbus_probe.c             |  66 ++++++
+ include/xen/events.h                          |   7 +-
+ include/xen/xenbus.h                          |   7 +
+ 14 files changed, 327 insertions(+), 99 deletions(-)
+ create mode 100644 Documentation/ABI/testing/sysfs-devices-xenbus
 
-Mikulas
+-- 
+2.26.2
 
