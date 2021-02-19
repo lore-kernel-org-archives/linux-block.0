@@ -2,399 +2,224 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04CFFC433E0
-	for <linux-block@archiver.kernel.org>; Fri, 19 Feb 2021 15:42:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5A50C433E0
+	for <linux-block@archiver.kernel.org>; Fri, 19 Feb 2021 19:41:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C562864DFD
-	for <linux-block@archiver.kernel.org>; Fri, 19 Feb 2021 15:42:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B66246023B
+	for <linux-block@archiver.kernel.org>; Fri, 19 Feb 2021 19:41:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229970AbhBSPmX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 Feb 2021 10:42:23 -0500
-Received: from mx2.suse.de ([195.135.220.15]:48180 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229796AbhBSPmO (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 Feb 2021 10:42:14 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1613749239; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
+        id S229774AbhBSTlr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 Feb 2021 14:41:47 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:27442 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229763AbhBSTlp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 19 Feb 2021 14:41:45 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1613763618;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=Ak07w92nb7YZjr3VNNPBcdRWHdpt4Qfsb+0QEiXHvow=;
-        b=m4oBqkbD/J0XMEHCZgXSg4TG7sdainHTuh9UGcR5bUtj6PJT9S5rbPq0yawzRopsO1fKg/
-        fjSM1x0hUPEPyBkPo6wvzAa/BWiMgBbeMiebc2U5iC19UpbuoIMh3EdMB1hDw5ObeZ9Tyc
-        FCiyRKbsyQ6RmR5diqVsVt7inPEpljI=
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 349CDB112;
-        Fri, 19 Feb 2021 15:40:39 +0000 (UTC)
-From:   Juergen Gross <jgross@suse.com>
-To:     xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        linux-scsi@vger.kernel.org
-Cc:     Juergen Gross <jgross@suse.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-        Jens Axboe <axboe@kernel.dk>, Wei Liu <wei.liu@kernel.org>,
-        Paul Durrant <paul@xen.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Stefano Stabellini <sstabellini@kernel.org>
-Subject: [PATCH v3 5/8] xen/events: link interdomain events to associated xenbus device
-Date:   Fri, 19 Feb 2021 16:40:27 +0100
-Message-Id: <20210219154030.10892-6-jgross@suse.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20210219154030.10892-1-jgross@suse.com>
-References: <20210219154030.10892-1-jgross@suse.com>
+        bh=Bs7S2E20DJwyOK6XIPGdAph5cz5A2jlVdAjpHfdozmU=;
+        b=KKDk9b/+ACWscD5J7AuFNFTvDWqnYADrxOw22pr6aecZVpPkMjmECa46RsafxuIG/JGNZV
+        rK3yUthnudoV6UIo0GbKV4qmwciBNqoxboqusYMTfPtQ+sDODEYBIVbjkJnyJx0F9BCJfJ
+        8MPGWoWzluhxM/4kqWjFbhD6US+rDgM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-428-V82hEyd7PtSvzvDIKNIU7g-1; Fri, 19 Feb 2021 14:40:16 -0500
+X-MC-Unique: V82hEyd7PtSvzvDIKNIU7g-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 642168DB095;
+        Fri, 19 Feb 2021 19:39:28 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 556CC60C79;
+        Fri, 19 Feb 2021 19:38:39 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 11JJcccc006464;
+        Fri, 19 Feb 2021 14:38:38 -0500
+Received: from localhost (mpatocka@localhost)
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 11JJcc89006460;
+        Fri, 19 Feb 2021 14:38:38 -0500
+X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
+Date:   Fri, 19 Feb 2021 14:38:38 -0500 (EST)
+From:   Mikulas Patocka <mpatocka@redhat.com>
+X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
+To:     Jeffle Xu <jefflexu@linux.alibaba.com>
+cc:     snitzer@redhat.com, axboe@kernel.dk, caspar@linux.alibaba.com,
+        hch@lst.de, linux-block@vger.kernel.org,
+        joseph.qi@linux.alibaba.com, dm-devel@redhat.com,
+        io-uring@vger.kernel.org
+Subject: Re: [dm-devel] [PATCH v3 11/11] dm: fastpath of bio-based polling
+In-Reply-To: <20210208085243.82367-12-jefflexu@linux.alibaba.com>
+Message-ID: <alpine.LRH.2.02.2102191351200.10545@file01.intranet.prod.int.rdu2.redhat.com>
+References: <20210208085243.82367-1-jefflexu@linux.alibaba.com> <20210208085243.82367-12-jefflexu@linux.alibaba.com>
+User-Agent: Alpine 2.02 (LRH 1266 2009-07-14)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In order to support the possibility of per-device event channel
-settings (e.g. lateeoi spurious event thresholds) add a xenbus device
-pointer to struct irq_info() and modify the related event channel
-binding interfaces to take the pointer to the xenbus device as a
-parameter instead of the domain id of the other side.
 
-While at it remove the stale prototype of bind_evtchn_to_irq_lateeoi().
 
-Signed-off-by: Juergen Gross <jgross@suse.com>
-Reviewed-by: Boris Ostrovsky <boris.ostrovsky@oracle.com>
-Reviewed-by: Wei Liu <wei.liu@kernel.org>
-Reviewed-by: Paul Durrant <paul@xen.org>
----
- drivers/block/xen-blkback/xenbus.c  |  2 +-
- drivers/net/xen-netback/interface.c | 16 +++++------
- drivers/xen/events/events_base.c    | 41 +++++++++++++++++------------
- drivers/xen/pvcalls-back.c          |  4 +--
- drivers/xen/xen-pciback/xenbus.c    |  2 +-
- drivers/xen/xen-scsiback.c          |  2 +-
- include/xen/events.h                |  7 ++---
- 7 files changed, 41 insertions(+), 33 deletions(-)
+On Mon, 8 Feb 2021, Jeffle Xu wrote:
 
-diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
-index 9860d4842f36..c2aaf690352c 100644
---- a/drivers/block/xen-blkback/xenbus.c
-+++ b/drivers/block/xen-blkback/xenbus.c
-@@ -245,7 +245,7 @@ static int xen_blkif_map(struct xen_blkif_ring *ring, grant_ref_t *gref,
- 	if (req_prod - rsp_prod > size)
- 		goto fail;
- 
--	err = bind_interdomain_evtchn_to_irqhandler_lateeoi(blkif->domid,
-+	err = bind_interdomain_evtchn_to_irqhandler_lateeoi(blkif->be->dev,
- 			evtchn, xen_blkif_be_int, 0, "blkif-backend", ring);
- 	if (err < 0)
- 		goto fail;
-diff --git a/drivers/net/xen-netback/interface.c b/drivers/net/xen-netback/interface.c
-index e02a4fbb74de..50a94e58c150 100644
---- a/drivers/net/xen-netback/interface.c
-+++ b/drivers/net/xen-netback/interface.c
-@@ -630,13 +630,13 @@ int xenvif_connect_ctrl(struct xenvif *vif, grant_ref_t ring_ref,
- 			unsigned int evtchn)
- {
- 	struct net_device *dev = vif->dev;
-+	struct xenbus_device *xendev = xenvif_to_xenbus_device(vif);
- 	void *addr;
- 	struct xen_netif_ctrl_sring *shared;
- 	RING_IDX rsp_prod, req_prod;
- 	int err;
- 
--	err = xenbus_map_ring_valloc(xenvif_to_xenbus_device(vif),
--				     &ring_ref, 1, &addr);
-+	err = xenbus_map_ring_valloc(xendev, &ring_ref, 1, &addr);
- 	if (err)
- 		goto err;
- 
-@@ -650,7 +650,7 @@ int xenvif_connect_ctrl(struct xenvif *vif, grant_ref_t ring_ref,
- 	if (req_prod - rsp_prod > RING_SIZE(&vif->ctrl))
- 		goto err_unmap;
- 
--	err = bind_interdomain_evtchn_to_irq_lateeoi(vif->domid, evtchn);
-+	err = bind_interdomain_evtchn_to_irq_lateeoi(xendev, evtchn);
- 	if (err < 0)
- 		goto err_unmap;
- 
-@@ -673,8 +673,7 @@ int xenvif_connect_ctrl(struct xenvif *vif, grant_ref_t ring_ref,
- 	vif->ctrl_irq = 0;
- 
- err_unmap:
--	xenbus_unmap_ring_vfree(xenvif_to_xenbus_device(vif),
--				vif->ctrl.sring);
-+	xenbus_unmap_ring_vfree(xendev, vif->ctrl.sring);
- 	vif->ctrl.sring = NULL;
- 
- err:
-@@ -719,6 +718,7 @@ int xenvif_connect_data(struct xenvif_queue *queue,
- 			unsigned int tx_evtchn,
- 			unsigned int rx_evtchn)
- {
-+	struct xenbus_device *dev = xenvif_to_xenbus_device(queue->vif);
- 	struct task_struct *task;
- 	int err;
- 
-@@ -755,7 +755,7 @@ int xenvif_connect_data(struct xenvif_queue *queue,
- 	if (tx_evtchn == rx_evtchn) {
- 		/* feature-split-event-channels == 0 */
- 		err = bind_interdomain_evtchn_to_irqhandler_lateeoi(
--			queue->vif->domid, tx_evtchn, xenvif_interrupt, 0,
-+			dev, tx_evtchn, xenvif_interrupt, 0,
- 			queue->name, queue);
- 		if (err < 0)
- 			goto err;
-@@ -766,7 +766,7 @@ int xenvif_connect_data(struct xenvif_queue *queue,
- 		snprintf(queue->tx_irq_name, sizeof(queue->tx_irq_name),
- 			 "%s-tx", queue->name);
- 		err = bind_interdomain_evtchn_to_irqhandler_lateeoi(
--			queue->vif->domid, tx_evtchn, xenvif_tx_interrupt, 0,
-+			dev, tx_evtchn, xenvif_tx_interrupt, 0,
- 			queue->tx_irq_name, queue);
- 		if (err < 0)
- 			goto err;
-@@ -776,7 +776,7 @@ int xenvif_connect_data(struct xenvif_queue *queue,
- 		snprintf(queue->rx_irq_name, sizeof(queue->rx_irq_name),
- 			 "%s-rx", queue->name);
- 		err = bind_interdomain_evtchn_to_irqhandler_lateeoi(
--			queue->vif->domid, rx_evtchn, xenvif_rx_interrupt, 0,
-+			dev, rx_evtchn, xenvif_rx_interrupt, 0,
- 			queue->rx_irq_name, queue);
- 		if (err < 0)
- 			goto err;
-diff --git a/drivers/xen/events/events_base.c b/drivers/xen/events/events_base.c
-index 9d7ba7623510..b60df189ecbc 100644
---- a/drivers/xen/events/events_base.c
-+++ b/drivers/xen/events/events_base.c
-@@ -63,6 +63,7 @@
- #include <xen/interface/physdev.h>
- #include <xen/interface/sched.h>
- #include <xen/interface/vcpu.h>
-+#include <xen/xenbus.h>
- #include <asm/hw_irq.h>
- 
- #include "events_internal.h"
-@@ -121,6 +122,7 @@ struct irq_info {
- 			unsigned char flags;
- 			uint16_t domid;
- 		} pirq;
-+		struct xenbus_device *interdomain;
- 	} u;
- };
- 
-@@ -322,11 +324,16 @@ static int xen_irq_info_common_setup(struct irq_info *info,
- }
- 
- static int xen_irq_info_evtchn_setup(unsigned irq,
--				     evtchn_port_t evtchn)
-+				     evtchn_port_t evtchn,
-+				     struct xenbus_device *dev)
- {
- 	struct irq_info *info = info_for_irq(irq);
-+	int ret;
- 
--	return xen_irq_info_common_setup(info, irq, IRQT_EVTCHN, evtchn, 0);
-+	ret = xen_irq_info_common_setup(info, irq, IRQT_EVTCHN, evtchn, 0);
-+	info->u.interdomain = dev;
-+
-+	return ret;
- }
- 
- static int xen_irq_info_ipi_setup(unsigned cpu,
-@@ -1162,7 +1169,8 @@ int xen_pirq_from_irq(unsigned irq)
- }
- EXPORT_SYMBOL_GPL(xen_pirq_from_irq);
- 
--static int bind_evtchn_to_irq_chip(evtchn_port_t evtchn, struct irq_chip *chip)
-+static int bind_evtchn_to_irq_chip(evtchn_port_t evtchn, struct irq_chip *chip,
-+				   struct xenbus_device *dev)
- {
- 	int irq;
- 	int ret;
-@@ -1182,7 +1190,7 @@ static int bind_evtchn_to_irq_chip(evtchn_port_t evtchn, struct irq_chip *chip)
- 		irq_set_chip_and_handler_name(irq, chip,
- 					      handle_edge_irq, "event");
- 
--		ret = xen_irq_info_evtchn_setup(irq, evtchn);
-+		ret = xen_irq_info_evtchn_setup(irq, evtchn, dev);
- 		if (ret < 0) {
- 			__unbind_from_irq(irq);
- 			irq = ret;
-@@ -1209,7 +1217,7 @@ static int bind_evtchn_to_irq_chip(evtchn_port_t evtchn, struct irq_chip *chip)
- 
- int bind_evtchn_to_irq(evtchn_port_t evtchn)
- {
--	return bind_evtchn_to_irq_chip(evtchn, &xen_dynamic_chip);
-+	return bind_evtchn_to_irq_chip(evtchn, &xen_dynamic_chip, NULL);
- }
- EXPORT_SYMBOL_GPL(bind_evtchn_to_irq);
- 
-@@ -1258,27 +1266,27 @@ static int bind_ipi_to_irq(unsigned int ipi, unsigned int cpu)
- 	return irq;
- }
- 
--static int bind_interdomain_evtchn_to_irq_chip(unsigned int remote_domain,
-+static int bind_interdomain_evtchn_to_irq_chip(struct xenbus_device *dev,
- 					       evtchn_port_t remote_port,
- 					       struct irq_chip *chip)
- {
- 	struct evtchn_bind_interdomain bind_interdomain;
- 	int err;
- 
--	bind_interdomain.remote_dom  = remote_domain;
-+	bind_interdomain.remote_dom  = dev->otherend_id;
- 	bind_interdomain.remote_port = remote_port;
- 
- 	err = HYPERVISOR_event_channel_op(EVTCHNOP_bind_interdomain,
- 					  &bind_interdomain);
- 
- 	return err ? : bind_evtchn_to_irq_chip(bind_interdomain.local_port,
--					       chip);
-+					       chip, dev);
- }
- 
--int bind_interdomain_evtchn_to_irq_lateeoi(unsigned int remote_domain,
-+int bind_interdomain_evtchn_to_irq_lateeoi(struct xenbus_device *dev,
- 					   evtchn_port_t remote_port)
- {
--	return bind_interdomain_evtchn_to_irq_chip(remote_domain, remote_port,
-+	return bind_interdomain_evtchn_to_irq_chip(dev, remote_port,
- 						   &xen_lateeoi_chip);
- }
- EXPORT_SYMBOL_GPL(bind_interdomain_evtchn_to_irq_lateeoi);
-@@ -1391,7 +1399,7 @@ static int bind_evtchn_to_irqhandler_chip(evtchn_port_t evtchn,
- {
- 	int irq, retval;
- 
--	irq = bind_evtchn_to_irq_chip(evtchn, chip);
-+	irq = bind_evtchn_to_irq_chip(evtchn, chip, NULL);
- 	if (irq < 0)
- 		return irq;
- 	retval = request_irq(irq, handler, irqflags, devname, dev_id);
-@@ -1426,14 +1434,13 @@ int bind_evtchn_to_irqhandler_lateeoi(evtchn_port_t evtchn,
- EXPORT_SYMBOL_GPL(bind_evtchn_to_irqhandler_lateeoi);
- 
- static int bind_interdomain_evtchn_to_irqhandler_chip(
--		unsigned int remote_domain, evtchn_port_t remote_port,
-+		struct xenbus_device *dev, evtchn_port_t remote_port,
- 		irq_handler_t handler, unsigned long irqflags,
- 		const char *devname, void *dev_id, struct irq_chip *chip)
- {
- 	int irq, retval;
- 
--	irq = bind_interdomain_evtchn_to_irq_chip(remote_domain, remote_port,
--						  chip);
-+	irq = bind_interdomain_evtchn_to_irq_chip(dev, remote_port, chip);
- 	if (irq < 0)
- 		return irq;
- 
-@@ -1446,14 +1453,14 @@ static int bind_interdomain_evtchn_to_irqhandler_chip(
- 	return irq;
- }
- 
--int bind_interdomain_evtchn_to_irqhandler_lateeoi(unsigned int remote_domain,
-+int bind_interdomain_evtchn_to_irqhandler_lateeoi(struct xenbus_device *dev,
- 						  evtchn_port_t remote_port,
- 						  irq_handler_t handler,
- 						  unsigned long irqflags,
- 						  const char *devname,
- 						  void *dev_id)
- {
--	return bind_interdomain_evtchn_to_irqhandler_chip(remote_domain,
-+	return bind_interdomain_evtchn_to_irqhandler_chip(dev,
- 				remote_port, handler, irqflags, devname,
- 				dev_id, &xen_lateeoi_chip);
- }
-@@ -1727,7 +1734,7 @@ void rebind_evtchn_irq(evtchn_port_t evtchn, int irq)
- 	   so there should be a proper type */
- 	BUG_ON(info->type == IRQT_UNBOUND);
- 
--	(void)xen_irq_info_evtchn_setup(irq, evtchn);
-+	(void)xen_irq_info_evtchn_setup(irq, evtchn, NULL);
- 
- 	mutex_unlock(&irq_mapping_update_lock);
- 
-diff --git a/drivers/xen/pvcalls-back.c b/drivers/xen/pvcalls-back.c
-index a7d293fa8d14..b47fd8435061 100644
---- a/drivers/xen/pvcalls-back.c
-+++ b/drivers/xen/pvcalls-back.c
-@@ -348,7 +348,7 @@ static struct sock_mapping *pvcalls_new_active_socket(
- 	map->bytes = page;
- 
- 	ret = bind_interdomain_evtchn_to_irqhandler_lateeoi(
--			fedata->dev->otherend_id, evtchn,
-+			fedata->dev, evtchn,
- 			pvcalls_back_conn_event, 0, "pvcalls-backend", map);
- 	if (ret < 0)
- 		goto out;
-@@ -948,7 +948,7 @@ static int backend_connect(struct xenbus_device *dev)
- 		goto error;
- 	}
- 
--	err = bind_interdomain_evtchn_to_irq_lateeoi(dev->otherend_id, evtchn);
-+	err = bind_interdomain_evtchn_to_irq_lateeoi(dev, evtchn);
- 	if (err < 0)
- 		goto error;
- 	fedata->irq = err;
-diff --git a/drivers/xen/xen-pciback/xenbus.c b/drivers/xen/xen-pciback/xenbus.c
-index e7c692cfb2cf..5188f02e75fb 100644
---- a/drivers/xen/xen-pciback/xenbus.c
-+++ b/drivers/xen/xen-pciback/xenbus.c
-@@ -124,7 +124,7 @@ static int xen_pcibk_do_attach(struct xen_pcibk_device *pdev, int gnt_ref,
- 	pdev->sh_info = vaddr;
- 
- 	err = bind_interdomain_evtchn_to_irqhandler_lateeoi(
--		pdev->xdev->otherend_id, remote_evtchn, xen_pcibk_handle_event,
-+		pdev->xdev, remote_evtchn, xen_pcibk_handle_event,
- 		0, DRV_NAME, pdev);
- 	if (err < 0) {
- 		xenbus_dev_fatal(pdev->xdev, err,
-diff --git a/drivers/xen/xen-scsiback.c b/drivers/xen/xen-scsiback.c
-index 862162dca33c..8b59897b2df9 100644
---- a/drivers/xen/xen-scsiback.c
-+++ b/drivers/xen/xen-scsiback.c
-@@ -799,7 +799,7 @@ static int scsiback_init_sring(struct vscsibk_info *info, grant_ref_t ring_ref,
- 	sring = (struct vscsiif_sring *)area;
- 	BACK_RING_INIT(&info->ring, sring, PAGE_SIZE);
- 
--	err = bind_interdomain_evtchn_to_irq_lateeoi(info->domid, evtchn);
-+	err = bind_interdomain_evtchn_to_irq_lateeoi(info->dev, evtchn);
- 	if (err < 0)
- 		goto unmap_page;
- 
-diff --git a/include/xen/events.h b/include/xen/events.h
-index 8ec418e30c7f..c204262d9fc2 100644
---- a/include/xen/events.h
-+++ b/include/xen/events.h
-@@ -12,10 +12,11 @@
- #include <asm/xen/hypercall.h>
- #include <asm/xen/events.h>
- 
-+struct xenbus_device;
-+
- unsigned xen_evtchn_nr_channels(void);
- 
- int bind_evtchn_to_irq(evtchn_port_t evtchn);
--int bind_evtchn_to_irq_lateeoi(evtchn_port_t evtchn);
- int bind_evtchn_to_irqhandler(evtchn_port_t evtchn,
- 			      irq_handler_t handler,
- 			      unsigned long irqflags, const char *devname,
-@@ -35,9 +36,9 @@ int bind_ipi_to_irqhandler(enum ipi_vector ipi,
- 			   unsigned long irqflags,
- 			   const char *devname,
- 			   void *dev_id);
--int bind_interdomain_evtchn_to_irq_lateeoi(unsigned int remote_domain,
-+int bind_interdomain_evtchn_to_irq_lateeoi(struct xenbus_device *dev,
- 					   evtchn_port_t remote_port);
--int bind_interdomain_evtchn_to_irqhandler_lateeoi(unsigned int remote_domain,
-+int bind_interdomain_evtchn_to_irqhandler_lateeoi(struct xenbus_device *dev,
- 						  evtchn_port_t remote_port,
- 						  irq_handler_t handler,
- 						  unsigned long irqflags,
--- 
-2.26.2
+> Offer one fastpath of bio-based polling when bio submitted to dm device
+> is not split.
+> 
+> In this case, there will be only one bio submitted to only one polling
+> hw queue of one underlying mq device, and thus we don't need to track
+> all split bios or iterate through all polling hw queues. The pointer to
+> the polling hw queue the bio submitted to is returned here as the
+> returned cookie.
+
+This doesn't seem safe - note that between submit_bio() and blk_poll(), no 
+locks are held - so the device mapper device may be reconfigured 
+arbitrarily. When you call blk_poll() with a pointer returned by 
+submit_bio(), the pointer may point to a stale address.
+
+Mikulas
+
+> In this case, the polling routine will call
+> mq_ops->poll() directly with the hw queue converted from the input
+> cookie.
+> 
+> If the original bio submitted to dm device is split to multiple bios and
+> thus submitted to multiple polling hw queues, the bio submission routine
+> will return BLK_QC_T_BIO_MULTI, while the polling routine will fall
+> back to iterating all hw queues (in polling mode) of all underlying mq
+> devices.
+> 
+> Signed-off-by: Jeffle Xu <jefflexu@linux.alibaba.com>
+> ---
+>  block/blk-core.c          | 33 +++++++++++++++++++++++++++++++--
+>  include/linux/blk_types.h |  8 ++++++++
+>  include/linux/types.h     |  2 +-
+>  3 files changed, 40 insertions(+), 3 deletions(-)
+> 
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index 37aa513da5f2..cb24b33a4870 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -956,11 +956,19 @@ static blk_qc_t __submit_bio(struct bio *bio)
+>   * bio_list_on_stack[0] contains bios submitted by the current ->submit_bio.
+>   * bio_list_on_stack[1] contains bios that were submitted before the current
+>   *	->submit_bio_bio, but that haven't been processed yet.
+> + *
+> + * Return:
+> + *   - BLK_QC_T_NONE, no need for IO polling.
+> + *   - BLK_QC_T_BIO_MULTI, @bio gets split and enqueued into multi hw queues.
+> + *   - Otherwise, @bio is not split, returning the pointer to the corresponding
+> + *     hw queue that the bio enqueued into as the returned cookie.
+>   */
+>  static blk_qc_t __submit_bio_noacct(struct bio *bio)
+>  {
+>  	struct bio_list bio_list_on_stack[2];
+>  	blk_qc_t ret = BLK_QC_T_NONE;
+> +	struct request_queue *top_q = bio->bi_disk->queue;
+> +	bool poll_on = test_bit(QUEUE_FLAG_POLL, &top_q->queue_flags);
+>  
+>  	BUG_ON(bio->bi_next);
+>  
+> @@ -968,6 +976,7 @@ static blk_qc_t __submit_bio_noacct(struct bio *bio)
+>  	current->bio_list = bio_list_on_stack;
+>  
+>  	do {
+> +		blk_qc_t cookie;
+>  		struct request_queue *q = bio->bi_disk->queue;
+>  		struct bio_list lower, same;
+>  
+> @@ -980,7 +989,20 @@ static blk_qc_t __submit_bio_noacct(struct bio *bio)
+>  		bio_list_on_stack[1] = bio_list_on_stack[0];
+>  		bio_list_init(&bio_list_on_stack[0]);
+>  
+> -		ret = __submit_bio(bio);
+> +		cookie = __submit_bio(bio);
+> +
+> +		if (poll_on &&
+> +		    blk_qc_t_bio_valid(ret) && blk_qc_t_valid(cookie)) {
+> +			unsigned int queue_num = blk_qc_t_to_queue_num(cookie);
+> +			struct blk_mq_hw_ctx *hctx = q->queue_hw_ctx[queue_num];
+> +
+> +			cookie = (blk_qc_t)hctx;
+> +
+> +			if (!blk_qc_t_valid(ret)) /* set initial value */
+> +				ret = cookie;
+> +			else if (ret != cookie)   /* bio got split */
+> +				ret = BLK_QC_T_BIO_MULTI;
+> +		}
+>  
+>  		/*
+>  		 * Sort new bios into those for a lower level and those for the
+> @@ -1003,6 +1025,7 @@ static blk_qc_t __submit_bio_noacct(struct bio *bio)
+>  	} while ((bio = bio_list_pop(&bio_list_on_stack[0])));
+>  
+>  	current->bio_list = NULL;
+> +
+>  	return ret;
+>  }
+>  
+> @@ -1142,7 +1165,13 @@ static int blk_bio_poll(struct request_queue *q, blk_qc_t cookie, bool spin)
+>  	do {
+>  		int ret;
+>  
+> -		ret = disk->fops->poll(q, cookie);
+> +		if (blk_qc_t_bio_valid(cookie)) {
+> +			struct blk_mq_hw_ctx *hctx = (struct blk_mq_hw_ctx *)cookie;
+> +			struct request_queue *target_q = hctx->queue;
+> +
+> +			ret = blk_mq_poll_hctx(target_q, hctx);
+> +		} else
+> +			ret = disk->fops->poll(q, cookie);
+>  		if (ret > 0) {
+>  			__set_current_state(TASK_RUNNING);
+>  			return ret;
+> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+> index 2e05244fc16d..4173754532c0 100644
+> --- a/include/linux/blk_types.h
+> +++ b/include/linux/blk_types.h
+> @@ -557,6 +557,14 @@ static inline bool blk_qc_t_is_internal(blk_qc_t cookie)
+>  	return (cookie & BLK_QC_T_INTERNAL) != 0;
+>  }
+>  
+> +/* Macros for blk_qc_t used for bio-based polling */
+> +#define BLK_QC_T_BIO_MULTI	-2U
+> +
+> +static inline bool blk_qc_t_bio_valid(blk_qc_t cookie)
+> +{
+> +	return cookie != BLK_QC_T_BIO_MULTI;
+> +}
+> +
+>  struct blk_rq_stat {
+>  	u64 mean;
+>  	u64 min;
+> diff --git a/include/linux/types.h b/include/linux/types.h
+> index da5ca7e1bea9..f6301014a459 100644
+> --- a/include/linux/types.h
+> +++ b/include/linux/types.h
+> @@ -126,7 +126,7 @@ typedef u64 sector_t;
+>  typedef u64 blkcnt_t;
+>  
+>  /* cookie used for IO polling */
+> -typedef unsigned int blk_qc_t;
+> +typedef uintptr_t blk_qc_t;
+>  
+>  /*
+>   * The type of an index into the pagecache.
+> -- 
+> 2.27.0
+> 
+> --
+> dm-devel mailing list
+> dm-devel@redhat.com
+> https://listman.redhat.com/mailman/listinfo/dm-devel
+> 
 
