@@ -2,95 +2,89 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D633AC433E6
-	for <linux-block@archiver.kernel.org>; Sat, 20 Feb 2021 11:09:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC4B7C433E0
+	for <linux-block@archiver.kernel.org>; Sat, 20 Feb 2021 18:04:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A530B64ED6
-	for <linux-block@archiver.kernel.org>; Sat, 20 Feb 2021 11:09:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 80DCF64DDA
+	for <linux-block@archiver.kernel.org>; Sat, 20 Feb 2021 18:04:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229824AbhBTLHi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 20 Feb 2021 06:07:38 -0500
-Received: from out30-132.freemail.mail.aliyun.com ([115.124.30.132]:55520 "EHLO
-        out30-132.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229796AbhBTLH0 (ORCPT
+        id S229812AbhBTSDk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 20 Feb 2021 13:03:40 -0500
+Received: from eu-smtp-delivery-151.mimecast.com ([207.82.80.151]:28270 "EHLO
+        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229803AbhBTSDj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 20 Feb 2021 06:07:26 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R251e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04394;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0UP1N.EP_1613819202;
-Received: from localhost(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0UP1N.EP_1613819202)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Sat, 20 Feb 2021 19:06:43 +0800
-From:   Jeffle Xu <jefflexu@linux.alibaba.com>
-To:     snitzer@redhat.com, axboe@kernel.dk
-Cc:     hch@lst.de, ming.lei@redhat.com, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, io-uring@vger.kernel.org,
-        joseph.qi@linux.alibaba.com, caspar@linux.alibaba.com
-Subject: [PATCH v4 05/12] blk-mq: extract one helper function polling hw queue
-Date:   Sat, 20 Feb 2021 19:06:30 +0800
-Message-Id: <20210220110637.50305-6-jefflexu@linux.alibaba.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20210220110637.50305-1-jefflexu@linux.alibaba.com>
-References: <20210220110637.50305-1-jefflexu@linux.alibaba.com>
+        Sat, 20 Feb 2021 13:03:39 -0500
+Received: from AcuMS.aculab.com (156.67.243.126 [156.67.243.126]) (Using
+ TLS) by relay.mimecast.com with ESMTP id
+ uk-mta-246-SoJwM6GlPY20W1KbkIBHGQ-1; Sat, 20 Feb 2021 18:01:58 +0000
+X-MC-Unique: SoJwM6GlPY20W1KbkIBHGQ-1
+Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) by
+ AcuMS.aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) with Microsoft SMTP
+ Server (TLS) id 15.0.1347.2; Sat, 20 Feb 2021 18:01:57 +0000
+Received: from AcuMS.Aculab.com ([fe80::43c:695e:880f:8750]) by
+ AcuMS.aculab.com ([fe80::43c:695e:880f:8750%12]) with mapi id 15.00.1347.000;
+ Sat, 20 Feb 2021 18:01:57 +0000
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'SelvaKumar S' <selvakuma.s1@samsung.com>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+CC:     "kbusch@kernel.org" <kbusch@kernel.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "damien.lemoal@wdc.com" <damien.lemoal@wdc.com>,
+        "hch@lst.de" <hch@lst.de>, "sagi@grimberg.me" <sagi@grimberg.me>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "snitzer@redhat.com" <snitzer@redhat.com>,
+        "selvajove@gmail.com" <selvajove@gmail.com>,
+        "joshiiitr@gmail.com" <joshiiitr@gmail.com>,
+        "nj.shetty@samsung.com" <nj.shetty@samsung.com>,
+        "joshi.k@samsung.com" <joshi.k@samsung.com>,
+        "javier.gonz@samsung.com" <javier.gonz@samsung.com>,
+        "kch@kernel.org" <kch@kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
+Subject: RE: [RFC PATCH v5 0/4] add simple copy support
+Thread-Topic: [RFC PATCH v5 0/4] add simple copy support
+Thread-Index: AQHXByyi0XMTfmzR3kSGd6ttkW2CGaphVhLg
+Date:   Sat, 20 Feb 2021 18:01:56 +0000
+Message-ID: <146c47907c2446d4a896830de400dd81@AcuMS.aculab.com>
+References: <CGME20210219124555epcas5p1334e7c4d64ada5dc4a2ca0feb48c1d44@epcas5p1.samsung.com>
+ <20210219124517.79359-1-selvakuma.s1@samsung.com>
+In-Reply-To: <20210219124517.79359-1-selvakuma.s1@samsung.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Authentication-Results: relay.mimecast.com;
+        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Extract the logic of polling one hw queue and related statistics
-handling out as the helper function.
-
-Signed-off-by: Jeffle Xu <jefflexu@linux.alibaba.com>
----
- block/blk-mq.c         |  5 +----
- include/linux/blk-mq.h | 13 +++++++++++++
- 2 files changed, 14 insertions(+), 4 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index c18bc23834a0..b4de2b37b826 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -3850,11 +3850,8 @@ int blk_mq_poll(struct request_queue *q, blk_qc_t cookie, bool spin)
- 	do {
- 		int ret;
- 
--		hctx->poll_invoked++;
--
--		ret = q->mq_ops->poll(hctx);
-+		ret = blk_mq_poll_hctx(q, hctx);
- 		if (ret > 0) {
--			hctx->poll_success++;
- 			__set_current_state(TASK_RUNNING);
- 			return ret;
- 		}
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index adc789d5888e..cf1910c6d5ae 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -606,6 +606,19 @@ static inline void blk_rq_bio_prep(struct request *rq, struct bio *bio,
- 		rq->rq_disk = bio->bi_disk;
- }
- 
-+static inline int blk_mq_poll_hctx(struct request_queue *q,
-+				   struct blk_mq_hw_ctx *hctx)
-+{
-+	int ret;
-+
-+	hctx->poll_invoked++;
-+	ret = q->mq_ops->poll(hctx);
-+	if (ret > 0)
-+		hctx->poll_success++;
-+
-+	return ret;
-+}
-+
- blk_qc_t blk_mq_submit_bio(struct bio *bio);
- int blk_mq_poll(struct request_queue *q, blk_qc_t cookie, bool spin);
- void blk_mq_hctx_set_fq_lock_class(struct blk_mq_hw_ctx *hctx,
--- 
-2.27.0
+RnJvbTogU2VsdmFLdW1hciBTDQo+IFNlbnQ6IDE5IEZlYnJ1YXJ5IDIwMjEgMTI6NDUNCj4gDQo+
+IFRoaXMgcGF0Y2hzZXQgdHJpZXMgdG8gYWRkIHN1cHBvcnQgZm9yIFRQNDA2NWEgKCJTaW1wbGUg
+Q29weSBDb21tYW5kIiksDQo+IHYyMDIwLjA1LjA0ICgiUmF0aWZpZWQiKQ0KPiANCj4gVGhlIFNw
+ZWNpZmljYXRpb24gY2FuIGJlIGZvdW5kIGluIGZvbGxvd2luZyBsaW5rLg0KPiBodHRwczovL252
+bWV4cHJlc3Mub3JnL3dwLWNvbnRlbnQvdXBsb2Fkcy9OVk0tRXhwcmVzcy0xLjQtUmF0aWZpZWQt
+VFBzLTEuemlwDQo+IA0KPiBTaW1wbGUgY29weSBjb21tYW5kIGlzIGEgY29weSBvZmZsb2FkaW5n
+IG9wZXJhdGlvbiBhbmQgaXMgIHVzZWQgdG8gY29weQ0KPiBtdWx0aXBsZSBjb250aWd1b3VzIHJh
+bmdlcyAoc291cmNlX3Jhbmdlcykgb2YgTEJBJ3MgdG8gYSBzaW5nbGUgZGVzdGluYXRpb24NCj4g
+TEJBIHdpdGhpbiB0aGUgZGV2aWNlIHJlZHVjaW5nIHRyYWZmaWMgYmV0d2VlbiBob3N0IGFuZCBk
+ZXZpY2UuDQoNClNvdW5kcyB0byBtZSBsaWtlIHRoZSByZWFsIHJlYXNvbiBpcyB0aGF0IHRoZSBj
+b3B5IGp1c3QgZW5kcyB1cCBjaGFuZ2luZw0Kc29tZSBpbmRpcmVjdCBibG9jayBwb2ludGVycyBy
+YXRoZXIgdGhhbiBoYXZpbmcgdG8gYWN0dWFsbHkgY29weSB0aGUgZGF0YS4NCg0KCURhdmlkDQoN
+Ci0NClJlZ2lzdGVyZWQgQWRkcmVzcyBMYWtlc2lkZSwgQnJhbWxleSBSb2FkLCBNb3VudCBGYXJt
+LCBNaWx0b24gS2V5bmVzLCBNSzEgMVBULCBVSw0KUmVnaXN0cmF0aW9uIE5vOiAxMzk3Mzg2IChX
+YWxlcykNCg==
 
