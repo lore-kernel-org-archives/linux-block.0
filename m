@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D5AAC43381
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39604C433E9
 	for <linux-block@archiver.kernel.org>; Sun, 21 Feb 2021 19:15:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 25E476501F
+	by mail.kernel.org (Postfix) with ESMTP id 1101065021
 	for <linux-block@archiver.kernel.org>; Sun, 21 Feb 2021 19:15:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230158AbhBUTPh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S230107AbhBUTPh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Sun, 21 Feb 2021 14:15:37 -0500
-Received: from mail.kernel.org ([198.145.29.99]:34112 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:34122 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230132AbhBUTPe (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        id S230158AbhBUTPe (ORCPT <rfc822;linux-block@vger.kernel.org>);
         Sun, 21 Feb 2021 14:15:34 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPS id EB79064E04;
-        Sun, 21 Feb 2021 19:14:53 +0000 (UTC)
+Received: by mail.kernel.org (Postfix) with ESMTPS id 1115B64E41;
+        Sun, 21 Feb 2021 19:14:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1613934894;
-        bh=ZgIaKMGGFA6Pu0fBzIoUbgh4T8J9d5xOBow50N9MJEY=;
+        bh=btRmAof1180ALHybP9xO3KojrUjgwrzpS2sGNeHYLqU=;
         h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=D+dKbqZt+yyIbWC3hMi3rFPF/mTXS8aUPi0CzeJWVwSSGLy+BBaOLhb9Us3DMSfMs
-         XRON4HK8gEXiY5K/MDv/WzB9cXJkiJ+zX3aoPk0q1k+CseN7fhKBmAa0umugsQ47pp
-         wg6EhsY5HY9CNV5Tg7iaHvE7SqVZm5ruDqMCIBhlna0RvvmXOzslrZXPjcev7UCSkg
-         LOFuCM0lxx7T/F7dx4UGtM5yXUNhHRmzZW7McmWkWRguQHslkVTlzi+k9H1NE8YASh
-         EdJYoc5k3EXkxVOUSDskIY9qIheg45euv6W1UbNImMp+73+JFOCz9VXZ08P1pKElDY
-         W+Yp9VDfQ1Mlw==
-Subject: Re: [GIT PULL] Core block changes for 5.12-rc
+        b=tNVaz5I8mcCI+8xFgSjusLA1/HgH3DRsjYe9huj+TFVru2k66oVFf39Am51pYlNn0
+         /KsslnYgnhfjPAp6+/lK7G1y33UQj+TfU+RI1ZXX5Yv0vSHMcV/VvtbfvjMT3xX0D9
+         bj1491/eJ7zA4UfIC61UYwtMxJKLmjAJmesZCikJ8/AH9tgfApq4NUS2v8nCk3JvjA
+         KtrggbupU1Ewl7ZGxhBZtfJjieeB0hsUtIMUrkH31Rlh+hSBHVFpHSOCJKjJcDFWFA
+         tIl33LnZvkwoDVrxDnmq5JKITkpf90P9nyBmicuOV/pgGO2+SYVtabB10Qq63furvR
+         6AHybpVVzaTeQ==
+Subject: Re: [GIT PULL] Block driver changes for 5.12-rc
 From:   pr-tracker-bot@kernel.org
-In-Reply-To: <ff4cdd19-1930-bf79-c0fd-f022147095f7@kernel.dk>
-References: <ff4cdd19-1930-bf79-c0fd-f022147095f7@kernel.dk>
+In-Reply-To: <2026e767-054e-00ba-46bd-716eb827a600@kernel.dk>
+References: <2026e767-054e-00ba-46bd-716eb827a600@kernel.dk>
 X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <ff4cdd19-1930-bf79-c0fd-f022147095f7@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git tags/for-5.12/block-2021-02-17
-X-PR-Tracked-Commit-Id: f885056a48ccf4ad4332def91e973f3993fa8695
+X-PR-Tracked-Message-Id: <2026e767-054e-00ba-46bd-716eb827a600@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git tags/for-5.12/drivers-2021-02-17
+X-PR-Tracked-Commit-Id: f4b64ae6745177642cd9610cfd7df0041e7fca58
 X-PR-Merge-Tree: torvalds/linux.git
 X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 582cd91f69de8e44857cb610ebca661dac8656b7
-Message-Id: <161393489394.9182.6498557931805054890.pr-tracker-bot@kernel.org>
-Date:   Sun, 21 Feb 2021 19:14:53 +0000
+X-PR-Merge-Commit-Id: 9820b4dca0f9c6b7ab8b4307286cdace171b724d
+Message-Id: <161393489404.9182.8227513667570114625.pr-tracker-bot@kernel.org>
+Date:   Sun, 21 Feb 2021 19:14:54 +0000
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
@@ -51,12 +51,12 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Wed, 17 Feb 2021 15:45:27 -0700:
+The pull request you sent on Wed, 17 Feb 2021 15:58:02 -0700:
 
-> git://git.kernel.dk/linux-block.git tags/for-5.12/block-2021-02-17
+> git://git.kernel.dk/linux-block.git tags/for-5.12/drivers-2021-02-17
 
 has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/582cd91f69de8e44857cb610ebca661dac8656b7
+https://git.kernel.org/torvalds/c/9820b4dca0f9c6b7ab8b4307286cdace171b724d
 
 Thank you!
 
