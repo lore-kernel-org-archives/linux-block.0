@@ -2,95 +2,111 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD504C433E0
-	for <linux-block@archiver.kernel.org>; Sun, 21 Feb 2021 06:54:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 226AAC433E6
+	for <linux-block@archiver.kernel.org>; Sun, 21 Feb 2021 13:14:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6CE5764F04
-	for <linux-block@archiver.kernel.org>; Sun, 21 Feb 2021 06:54:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EBBB761494
+	for <linux-block@archiver.kernel.org>; Sun, 21 Feb 2021 13:14:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229680AbhBUGyb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 21 Feb 2021 01:54:31 -0500
-Received: from mout.gmx.net ([212.227.17.20]:34485 "EHLO mout.gmx.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229685AbhBUGya (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 21 Feb 2021 01:54:30 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
-        s=badeba3b8450; t=1613890361;
-        bh=LgwThxy8MMlowZ/SirLakbUxTacLUv1YTQ2H4UZTdDw=;
-        h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
-        b=IRCZi7n0+S3zqf5rDlI3PPaOemSVKYdi00wqdw4IXnSSMBLs9TZpoiSfdd62dYOrU
-         WZzt6uMVshylfzfPPJAjb8XVi7E9bRNl8qYFqSsM4cduUkgdySRbYeEiBn2ro6uMM9
-         vAjljTmY+gzEPzbpJwRLBiU5HedgmTOeB2i83C98=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from Valinor ([87.94.110.98]) by mail.gmx.net (mrgmx104
- [212.227.17.174]) with ESMTPSA (Nemesis) id 1MLR1f-1lV6le0XeF-00ISST; Sun, 21
- Feb 2021 07:52:41 +0100
-Date:   Sun, 21 Feb 2021 08:54:21 +0200
-From:   Lauri Kasanen <cand@gmx.com>
-To:     Thomas Bogendoerfer <tsbogend@alpha.franken.de>
-Cc:     Christoph Hellwig <hch@infradead.org>, linux-mips@vger.kernel.org,
-        axboe@kernel.dk, linux-block@vger.kernel.org,
-        Keith Busch <kbusch@kernel.org>
+        id S229605AbhBUNOx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 21 Feb 2021 08:14:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46590 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229735AbhBUNOc (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 21 Feb 2021 08:14:32 -0500
+Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29862C061574
+        for <linux-block@vger.kernel.org>; Sun, 21 Feb 2021 05:13:52 -0800 (PST)
+Received: by mail-pg1-x530.google.com with SMTP id m2so8403406pgq.5
+        for <linux-block@vger.kernel.org>; Sun, 21 Feb 2021 05:13:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=ZzhsAzI+WwVZdpOkDos1+vbKvp69jC1HTeXXKiCZqmo=;
+        b=wX9aoRjkttXuVHotMvkxJlXH4a6/x1WTC0NIBNRcbPP/ZJiB/Qw8xMFCw838fEyLR+
+         huUhbIPkPz8FAk7ECfSHYxa3Z+045Ufvos5mOaI4D1OOeqYwOFwAGjLpCFUYeWh9zENQ
+         12M8gsCTfYKYbpHmcDbNx9ACPNV5rHyMgfYu7MVVoNGq4wpuYejME9cbPBEQQNG+ren+
+         BIx07LplzByJ9c4xR9fc7V4+Si8MEBuWXOw8igK0sRuxz1lLl5gyY22GDYrl/EZXyJoi
+         OARvftvTs2tOVkqt/C7EIyx9bHfrhDaAn+xivMEfdJ13RQan58cxlSu9+5eEU2uUvWqu
+         V2jw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ZzhsAzI+WwVZdpOkDos1+vbKvp69jC1HTeXXKiCZqmo=;
+        b=CGth1OQmKSqccF62nxqWXkst5Z6XedCic8i0vlhopFtdlzhekmkcFGogT6JaURuscY
+         Cl6brtbXPv4wSRxAlfuZ/OxaAXXW7KCh2XgnR79FkxE5VsvUNAON90XLvzAtMFUbXXJF
+         qSYwvLvKlK1j/15/aKh34uDUker2tWTXdHLyCzcVj2YLjmIFSyoUijkxZCygUiRevWGS
+         /X2x6BjYVPaoQoRAeSbzqgW8WGWJG74Sg5m0ZMdkSbM4BDXQ5HdMsOzjK9yVsHSe/jkJ
+         2RrGQ8KDwpKFijTu0NaYDhtbIhQG6oZw8Qa7llKvU8ZFTfgTGU+nlr3Lvg51CuadPdCp
+         VUfg==
+X-Gm-Message-State: AOAM531DM09lm6qWc05CjbKFKn5xKONKOmxMVFaut/sktXI6/vjVhAsC
+        U+F8QeFF3/fKo0EQZ+xa/o68jQ==
+X-Google-Smtp-Source: ABdhPJwN4Xl8Yqv5LLznbNU+sXyTh+ABxiKKbIL7xelk4+AbJDaScYfDIWMOLxmQA0uZVs0m1EpTOQ==
+X-Received: by 2002:aa7:9356:0:b029:1dd:644a:d904 with SMTP id 22-20020aa793560000b02901dd644ad904mr17697411pfn.18.1613913231729;
+        Sun, 21 Feb 2021 05:13:51 -0800 (PST)
+Received: from [192.168.1.134] ([66.219.217.173])
+        by smtp.gmail.com with ESMTPSA id fz24sm14966856pjb.35.2021.02.21.05.13.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 21 Feb 2021 05:13:50 -0800 (PST)
 Subject: Re: [PATCH v11] block: Add n64 cart driver
-Message-Id: <20210221085421.882c8f0b8b51f44272beb471@gmx.com>
-In-Reply-To: <20210211102314.GD7985@alpha.franken.de>
+To:     Lauri Kasanen <cand@gmx.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>
+Cc:     Christoph Hellwig <hch@infradead.org>, linux-mips@vger.kernel.org,
+        linux-block@vger.kernel.org, Keith Busch <kbusch@kernel.org>
 References: <20210123095327.58e5ab6c05f38e9080a79bd3@gmx.com>
-        <20210123124210.GB458363@infradead.org>
-        <20210206192837.5ecec54cc5ac120ade1d5060@gmx.com>
-        <20210211102314.GD7985@alpha.franken.de>
-X-Mailer: Sylpheed 3.5.0 (GTK+ 2.18.6; x86_64-unknown-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:/pZRpuinlpMACajZrOCJ9JDhbAWry3u4QWsdFcitATR9AttRK1L
- XbUxxCdcVLWRrWnn9jaPrwSyMi6PtcgTPHLbR5qpCXKPLwppAQw1A55yKNHGn6ZiRdWLvRo
- sodsymfAiZb5OiK0ipXQYnwCr7WsEyfNW5xt+gYKwjyzV8lpqlOQeM5ZV79FPyEmTgAMra0
- PxFvh4edGUMP8gCv97dKw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:4YO572L1tIc=:iQNZXyAwgsjZhtZ7f113G2
- +MipF6D3P7MI94OmimShsLNQKUh1DRJU6f493fEAsKX0lKPXXbmghd6/XtlvBA1h3cXd1jE5r
- uwoTRy9Hlj33ehYCWowI64W+wtFiNKQ39HDelQfPQ4FNJRDNmqvIKZ20gVQOFVMg+wou3A3N+
- JLVUYnpsuyoZwVtZaNCS6zDU0IUalW+ecL2NB3RwpF3ehyKSeE/WFgTiJjjM6rK5KweggYQhk
- s0UAiO68VPWx+OPtv0VVdBaFNDwHMcrSwH3KDa7WGJ04+VtnFHlw4cEJKsvtIfrhwgaaFD8y4
- 6l49UtEOj8Tei3NKg1Op87DqnbCeMwn8b54OJbkDlsNTf/36P/eAHn4gUm8bBy3DPHIO7L44/
- RgVawJV1Oketc9COyU+KFN3B9zjdlWWrfGN5RaL7W/H9nrAjtx71URGWepzX71fMxM8wkFgPU
- MXuRd+DUt6w1vWNEjGUr3Pdt0aZQHllDYWiL56jNFTaYJ5/IR2l6Ci+6kFRd/mCGLKD28V8O+
- ubmuLjVRcdRSBOBTyt0OvR6zj6rVdvA/OtqHSSePRjJE6UfTz0Xu9/2q7o90VahD3nSIWV6A3
- GbrFatjfGjW6z7P2mwOIOsZrBcyhqyqiyCeRK4JU9lU4qeEi3rd5r4UJZv2S74fBaC/3Tqi2b
- GYPxqYfr3quUgioNL3tz0QEQUdxJneAk58mSvapxO48UF92VYk5lnJvYHNgwT5V5Jo+tyBlXn
- 9b9r1Fvd0S/PygELAEeeBGTY/MPAO5OaLbBA6TMezhma6VstArG9oVG73rXi9ebXTpeJA7Fn/
- 57gpz90gy8qfynyvxvoV3KhTxEPBhzJYvMQb2jKhmPCD8EgJQzXM37HO6m4AMhgo9pGCb74N/
- n2lq7cHFV4po2qneMyKA==
+ <20210123124210.GB458363@infradead.org>
+ <20210206192837.5ecec54cc5ac120ade1d5060@gmx.com>
+ <20210211102314.GD7985@alpha.franken.de>
+ <20210221085421.882c8f0b8b51f44272beb471@gmx.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <6c003ea4-2d4e-c50a-25de-00f3ed55b0c2@kernel.dk>
+Date:   Sun, 21 Feb 2021 06:13:50 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+MIME-Version: 1.0
+In-Reply-To: <20210221085421.882c8f0b8b51f44272beb471@gmx.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 11 Feb 2021 11:23:14 +0100
-Thomas Bogendoerfer <tsbogend@alpha.franken.de> wrote:
+On 2/20/21 11:54 PM, Lauri Kasanen wrote:
+> On Thu, 11 Feb 2021 11:23:14 +0100
+> Thomas Bogendoerfer <tsbogend@alpha.franken.de> wrote:
+> 
+>> On Sat, Feb 06, 2021 at 07:28:37PM +0200, Lauri Kasanen wrote:
+>>> On Sat, 23 Jan 2021 12:42:10 +0000
+>>> Christoph Hellwig <hch@infradead.org> wrote:
+>>>
+>>>> Looks good,
+>>>>
+>>>> Reviewed-by: Christoph Hellwig <hch@lst.de>
+>>>
+>>> Hi,
+>>>
+>>> Ping on this patch. Thomas, do you want to pick it up?
+>>
+>> well that's up to the block maintainer. I'm open to take it
+>> trhough mips-next, but then I need an acked-by for it.
+> 
+> Hi,
+> 
+> Ping 2. Jens, I know you're busy, but just a mention this is on your
+> TODO list would be fine.
 
-> On Sat, Feb 06, 2021 at 07:28:37PM +0200, Lauri Kasanen wrote:
-> > On Sat, 23 Jan 2021 12:42:10 +0000
-> > Christoph Hellwig <hch@infradead.org> wrote:
-> >
-> > > Looks good,
-> > >
-> > > Reviewed-by: Christoph Hellwig <hch@lst.de>
-> >
-> > Hi,
-> >
-> > Ping on this patch. Thomas, do you want to pick it up?
->
-> well that's up to the block maintainer. I'm open to take it
-> trhough mips-next, but then I need an acked-by for it.
+That's fine, you can add my acked-by to the driver.
 
-Hi,
+-- 
+Jens Axboe
 
-Ping 2. Jens, I know you're busy, but just a mention this is on your
-TODO list would be fine.
-
-- Lauri
