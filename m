@@ -2,157 +2,144 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8257CC433DB
-	for <linux-block@archiver.kernel.org>; Mon, 22 Feb 2021 14:51:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BD82C433DB
+	for <linux-block@archiver.kernel.org>; Mon, 22 Feb 2021 15:42:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 32D0C64DF0
-	for <linux-block@archiver.kernel.org>; Mon, 22 Feb 2021 14:51:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DBD5D64E74
+	for <linux-block@archiver.kernel.org>; Mon, 22 Feb 2021 15:42:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230221AbhBVOvU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 Feb 2021 09:51:20 -0500
-Received: from esa2.hc3370-68.iphmx.com ([216.71.145.153]:33292 "EHLO
-        esa2.hc3370-68.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230220AbhBVOvR (ORCPT
+        id S230317AbhBVPmf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 Feb 2021 10:42:35 -0500
+Received: from youngberry.canonical.com ([91.189.89.112]:39861 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230036AbhBVPm1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 Feb 2021 09:51:17 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=citrix.com; s=securemail; t=1614005476;
-  h=date:from:to:cc:subject:message-id:references:
-   content-transfer-encoding:in-reply-to:mime-version;
-  bh=MJCxW3qNl1hPqMGc5zH16ZGY1J+V6SCxU2+Rwzu6njQ=;
-  b=g71G0Hdq5gHhhv/HR4GVOw+o1/tboNbkV/gMu4iyN/x1VUZw1dfJupDu
-   HrTEA3oR9C54zGsMWttuWJ3hpxCwubiuKxrmp6l1qSNPGlsCbDMzdzpS6
-   Gise5fYOcwmXjXkp22wYDRZ0eulzMTbCEVnbTTGbRGk1QX980VLQTL39d
-   8=;
-Authentication-Results: esa2.hc3370-68.iphmx.com; dkim=pass (signature verified) header.i=@citrix.onmicrosoft.com
-IronPort-SDR: 4FTGYgDDVZVKUJiVByAJDO+Gq2ll4f3pfvbAQ5vnRiwBYIoOKobf2dCEXaGK+mCuIsvbbnw0jh
- gOfPGd9qOR+0f0FrmusWHV4F89lXZxGm4l31j4dP1u/AMBN+6lxL86wq1i/plBAHnCne7Ej3Sr
- wM7hp7+LtJBQ8V8S5RiKPie6sNmYMZ/a6pmW5lllLZi3b6bakS3pg8LiepHFqSfY4kB1iObfMW
- okuNPVnN/yDjm+rr0IGOMy1EmbCt2HXZ5e0SbMGPdPm2OIiCSZsvmuFivPVslOqHWxGFqCKU3O
- weg=
-X-SBRS: 5.2
-X-MesageID: 37761949
-X-Ironport-Server: esa2.hc3370-68.iphmx.com
-X-Remote-IP: 162.221.156.83
-X-Policy: $RELAYED
-X-IronPort-AV: E=Sophos;i="5.81,197,1610427600"; 
-   d="scan'208";a="37761949"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AXFgoFxid9SBdi90XzbWQoD7zc+/Z/oua60Zh0A6YTHNCQ2x19T4T/Wt8+9jSfzYjhjV59Aj5/Gq12L08nRDkZqyhORw0QyBNGJrZ/NiwvbReR4Lly7HPRPt+aZtEvgurXFsJcwaZ7AdzB//qEYCfMGnbIVLYWwbTEQQAOTKccTMBzoDeNz7hdJd4XVa9W3FTjZ3AP/2X8Fh7I18CLvJT+nf5zsZZ2kg7Rpknq5YTvgcc110WFPOBugoCcE22aAiRuaJcMR/2CKVU2A0PC1zqs1dVeRTVDocKmTX7A3ro74K1nNWs71kqIo3OkUb471LAaaZU2nw2IPK1ajBbJopfg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=IHWIzam8C4gOjndBTLDHVX7Kab5zRN8V8acWF+pcAAs=;
- b=gIi/CBQye3wk8w2BE87B8aYZ9wpMuOuuMm2tED4AijYoGV/UzWAND7C+/md/XmESFRueKQCQg06ENEP8xDPvCutUjhGpgs8dcFOo5ZK1WMLdT6+66AmRUOaELTc/GSNtIrhets5EGItqEFQ/zqk71Kj4hBgGC1/ppB6uYXcoHZ0zfKxHQAlkqN1qqf4vIPsPHEMcz12BauywsNR7ZhLzr/XqMhHCzj+lwYLjfTjxBjULqEi2vli/CVAnyYi0TPCXAVSfDzciP/vLxEU+nIllXKeFGSLj7B7Ii3dlIl1JFZiMfPT4NgEr0HC2FE9R1JIRP5s2fAHpZGTrtXcT0k3Kjw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=citrix.com; dmarc=pass action=none header.from=citrix.com;
- dkim=pass header.d=citrix.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=citrix.onmicrosoft.com; s=selector2-citrix-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=IHWIzam8C4gOjndBTLDHVX7Kab5zRN8V8acWF+pcAAs=;
- b=YbJMCD2VfUmFtIGu7o4d6nBIqnOAG/Gcmjn+6ZeUPebwLlY7+qfUb9bN9tpVUjzfZ0uvrIMQP2GzhxwAxQcBhDgkmhJshg1aGDk4ZpvCAjY873MqQi2/mFBxwZBvKHXP/3g8fNzUvfpmJfOmVFYWKZgtaiYzHUXym271a/TOHE0=
-Date:   Mon, 22 Feb 2021 15:50:00 +0100
-From:   Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>
-To:     Juergen Gross <jgross@suse.com>
-CC:     <xen-devel@lists.xenproject.org>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-scsi@vger.kernel.org>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Jens Axboe <axboe@kernel.dk>, Wei Liu <wei.liu@kernel.org>,
-        Paul Durrant <paul@xen.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Stefano Stabellini <sstabellini@kernel.org>
-Subject: Re: [PATCH v3 5/8] xen/events: link interdomain events to associated
- xenbus device
-Message-ID: <YDPEmFaWQsBhvmb0@Air-de-Roger>
-References: <20210219154030.10892-1-jgross@suse.com>
- <20210219154030.10892-6-jgross@suse.com>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210219154030.10892-6-jgross@suse.com>
-X-ClientProxiedBy: MR2P264CA0047.FRAP264.PROD.OUTLOOK.COM (2603:10a6:500::35)
- To DS7PR03MB5608.namprd03.prod.outlook.com (2603:10b6:5:2c9::18)
+        Mon, 22 Feb 2021 10:42:27 -0500
+Received: from mail-qk1-f197.google.com ([209.85.222.197])
+        by youngberry.canonical.com with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.86_2)
+        (envelope-from <mfo@canonical.com>)
+        id 1lEDLD-00019c-Cy
+        for linux-block@vger.kernel.org; Mon, 22 Feb 2021 15:41:43 +0000
+Received: by mail-qk1-f197.google.com with SMTP id r15so9436861qke.5
+        for <linux-block@vger.kernel.org>; Mon, 22 Feb 2021 07:41:43 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=vrhpPKzimuceCgC93oDFemcstTw5fQ1szdLIsIshKp8=;
+        b=cyVJFDfMz2KfpcI7+3Fw3BJ+A/YrCteZFjhYMIyah/eYrqjcTDeQrHuswV1072QbLU
+         TxXeEbK76AfM38ZDG+667t+6kfVjWA8yItaD3XbCQUL5HOmlOETPGqJP9q2km1pnx7gw
+         QZ2PfMS+9z1W2bDle+V/qMlkcgSmGfV5Gkrq1wmf1ObtdwS3kWvvKzpQ7kEYNDX/+NVc
+         xkqdPba2CbA1hh+BhZjhHbEWHupo4cgc9pvvSQm9TYUjS9QwevAmb4OpkcXu1J7EIOJb
+         tkaP3LCUx1+Z1S0og72P2ISsS3s2lW7TnAZx1Yfxl82SAZoEw/nOoGqNqh1cEXNROcwV
+         SJlA==
+X-Gm-Message-State: AOAM532rIIvrjZU1eKnFCaWMZO+j32URO0QrdJMXhTVBonEJt+Y8PQTd
+        dK2jiYuORF6WMwDV5/esXHcznfnHynftvcTmJ/cVj8ACgCoFRJzbSZwLnSgimq/FreRE1o+ZvOZ
+        4ic9ScQtWXpVyh9NDb879B7HacYA9BTqC6rXLX5D/
+X-Received: by 2002:ac8:5651:: with SMTP id 17mr7326055qtt.16.1614008502513;
+        Mon, 22 Feb 2021 07:41:42 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxLhXaaiCO/evjVkr0RG8kQA1G6hbwR1y4mKbBd/mknD20/5MsrTSVXO4jf0eDsCLl4XtmVbg==
+X-Received: by 2002:ac8:5651:: with SMTP id 17mr7326028qtt.16.1614008502247;
+        Mon, 22 Feb 2021 07:41:42 -0800 (PST)
+Received: from localhost.localdomain ([2804:14c:4e6:9293:753:8a4c:6a34:9239])
+        by smtp.gmail.com with ESMTPSA id j2sm12336978qkk.96.2021.02.22.07.41.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Feb 2021 07:41:41 -0800 (PST)
+From:   Mauricio Faria de Oliveira <mfo@canonical.com>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, ming.lei@redhat.com,
+        krisman@collabora.com, eric.desrochers@canonical.com
+Subject: [PATCH RESEND v4] loop: fix I/O error on fsync() in detached loop devices
+Date:   Mon, 22 Feb 2021 12:41:23 -0300
+Message-Id: <20210222154123.61797-1-mfo@canonical.com>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 387c4e78-c9b3-4029-2c2f-08d8d7412459
-X-MS-TrafficTypeDiagnostic: DM5PR03MB3068:
-X-Microsoft-Antispam-PRVS: <DM5PR03MB3068FF543A6D78210C9E04EA8F819@DM5PR03MB3068.namprd03.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2958;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Je14NHuU8TTgtU49vAC30bDxawrIvvoOhuXCa5JPGzMcNPZ6Z3VE4gcwLorgev9+wHVhGb8x45OiYfdiZI23AWAUqMEXzi9oiDtrcXeoQnV7TUK/9kbmwTOGpOum9nkDQqzPeYrrU2CtuEXrUZODzyRBdNocVaKcJCGiemolY7Mo/oHwDRiZm+r6tr5Ql2hvFlRK8t4GnRiiweoXhJMM+DSoV+0umpQxFzkfNhYbPaDYi/D9J23gHKS/xxeA1+WQirHjDqZV/iG802YIF9AvrvYfuT/Oe4PzDcblohiBA1oEBonGI8qsoecU1Wa5f67pHMFroVscrlXSWKuKu6TDprZnQU8F3ZF7XCkzXse6y89FoCmGNQlBdZ4DdRPTnqfx5A9u4LRNkORAcBGynaD6gf+rfYDq/z/nyuKvtEgtzCFYkSk5oIoGzeozjYKpceU/Z7IVTrh7roCD10VqjrvGLAxt/kSCgxKNlBTbyJBg92BCsJHiz430/0+4BxsjQgmpuqNAMr2hOrV6UZJdEkVy4g==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR03MB5608.namprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(7916004)(39860400002)(346002)(366004)(376002)(396003)(136003)(6666004)(6496006)(7416002)(54906003)(8676002)(6486002)(8936002)(4326008)(4744005)(85182001)(6916009)(83380400001)(186003)(33716001)(66476007)(9686003)(26005)(66556008)(5660300002)(86362001)(316002)(16526019)(478600001)(66946007)(956004)(2906002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?S2Z1VFREOEJpdEdmU3Y4SVBndTY0WU1leGVtdUxaOGN4RythVkdJMmxMM0Jm?=
- =?utf-8?B?b0dmWlo2QnRhYUkwT0FMVlpOcXN6cDl5djFFUmlpZytCMVR6QnpZZXBtQ0xT?=
- =?utf-8?B?bGsrSHZ5N2xITmlBTlkvQjFzWlRXR1grS2h1M3NqVXFLY2lPT2VvVVFaWWNl?=
- =?utf-8?B?U0J4TUFudExLOFRmNnZmWndoWlQ2czBIbXBOM1ZsRlBUV3U1RnBuUG1KcHZC?=
- =?utf-8?B?Y0llaG15MjlLZ2orUU9SMkxzc3pPV3lpSlZqM0MzR2x3T2RWb2Q2b3c1MThq?=
- =?utf-8?B?US9pUEZOSExpNnFUR2toVmtqaUlHcFdkOE9UQXlkd2E2ZTRyNEJXbERUcFRr?=
- =?utf-8?B?VzRtbHlSRVE2QVh2RlVMeWlnNWY5V1VxV3NIU2Q1WnVzZjB2WDQwQ0xQbGpy?=
- =?utf-8?B?WjIrSEQyZU9hN0ZpRzFZZXRRRUpJRldEMjhyaktScnJzdzNSa0Y5dkhVRXRS?=
- =?utf-8?B?RU5UYXg5YVZiYytNekprRGJReG5ZT1dSYTlBSTNuSEpuQ3ZwTjFYY0JLOWcx?=
- =?utf-8?B?VWRlcWc3cWJnKzRINU96MGVaYUc4b1JrUHJDQkFRRkxxRCsvUkhER3FCalpl?=
- =?utf-8?B?UVFzYkdNYURGcGJMaTU5Nyt0djJEM0drMnpWc1E3aEptZVFVL3pYakJXMzcw?=
- =?utf-8?B?b01zaE8xVWZ3M0FNM2VVNDExRWJKYjBick8raGZsczdyUHRiRXovS1FLMXl3?=
- =?utf-8?B?TElyTTgraWcxMFZDQkFWeG5zTkJ0dndYd1pNazdwci9aKzFieTVtZjRaeUJu?=
- =?utf-8?B?RXAwZDdNUEtOV00waVlldUNXUmNJcGExYTc3bFNxeUVnT2RhZjJZTGJob1dh?=
- =?utf-8?B?NkZGL1A4b1JvWFo3dE5PTjRoNFZ6Zk9aZ292bDBtSG5KM0FoUXl2SXBIY3Zm?=
- =?utf-8?B?YVh4MVVUem1RN1l0RUExM2JUYU9EczRibTVmbnhnSTdOdnhTMEVsQXptWm5Q?=
- =?utf-8?B?QnJDOXlTOE01L2FwUkRuaW50Tm8zQSthdFAvTGlVbHEzbE8zTWJoeVZjMGZx?=
- =?utf-8?B?eUFnSndQK2tEMXA3RHpKT2NZWjRoeGNEdjIydTMzUDVTTWIxc1dHNWxISTVi?=
- =?utf-8?B?dUt4aDhXTGxBUzJQUHpicjU1UzlvVUNlSHZsZHNHRzE2WTdwQ3ZQY2Exd2Rv?=
- =?utf-8?B?SjIyOVJsS0VZbHlWeDNBd3hzYXRlR0lYSkNYdXdKYkNKTHo2NnN2cCsrNEU3?=
- =?utf-8?B?MXhPL05XUnZEVDFJaTdUUEVzdURqbGRXTEtScnVrb2FrMjMyY2owcDZaZmow?=
- =?utf-8?B?ck9yNCsvQzV6YU11WG9EN2VFZFoyR1R1UVFCN1VzUVhGUFlRcW83Rm9TR1Qw?=
- =?utf-8?B?Z2tCU1k5a0RmQ2lWMzVndXlXV1RSWDdVRE9PSDRtZDZITGJaTnM4Um9qWnhR?=
- =?utf-8?B?TjFaenF3WVkwYWcrVFZ1ZGtldXg2MHB6MThsRDlib2EwTUxLa2tZaGczMTBB?=
- =?utf-8?B?cnNYbHVpamZVNzNOY1Y1VlBIVGQzMXFYRzBwVmZOZ3NpWE5vbWpFaXdqZmZj?=
- =?utf-8?B?Y0JsZnhQWkZWdU9BUWw4WVNmcWJWd3FpejNwUDY2QVI4TDBPY2lyRkZqWVFp?=
- =?utf-8?B?V3pnWUtiYVBSUDl4Mm5GMFIyNkZsMGZSejN3RmZiaUtGc2I3MVJhOTJTcHhm?=
- =?utf-8?B?Q3o2YlpQSkFzK2M4eGRJdVVMRlJxZEh4ZzlxNHllSFhucGpManZhdjE1MTM4?=
- =?utf-8?B?ZmdkS1J5WjRLYk9PcTRha2x1VXpjblR0bk11Z0JkN2ZhY2pDb293Vk9HZWty?=
- =?utf-8?Q?5908sgLNKSbpSZwrIzUyMPAzJADEFhDtCUpvYjy?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 387c4e78-c9b3-4029-2c2f-08d8d7412459
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR03MB5608.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Feb 2021 14:50:05.8044
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 335836de-42ef-43a2-b145-348c2ee9ca5b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: gGVLEiKd4DwEUnfr+UjobNjiT+4qMmPV7Z85YSjlp9pypfFRv0P/YmxSFJsd/5YiOcV/hm7XibDc0TzXTguZYg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR03MB3068
-X-OriginatorOrg: citrix.com
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Feb 19, 2021 at 04:40:27PM +0100, Juergen Gross wrote:
-> In order to support the possibility of per-device event channel
-> settings (e.g. lateeoi spurious event thresholds) add a xenbus device
-> pointer to struct irq_info() and modify the related event channel
-> binding interfaces to take the pointer to the xenbus device as a
-> parameter instead of the domain id of the other side.
-> 
-> While at it remove the stale prototype of bind_evtchn_to_irq_lateeoi().
-> 
-> Signed-off-by: Juergen Gross <jgross@suse.com>
-> Reviewed-by: Boris Ostrovsky <boris.ostrovsky@oracle.com>
-> Reviewed-by: Wei Liu <wei.liu@kernel.org>
-> Reviewed-by: Paul Durrant <paul@xen.org>
-> ---
->  drivers/block/xen-blkback/xenbus.c  |  2 +-
+There's an I/O error on fsync() in a detached loop device
+if it has been previously attached.
 
-Reviewed-by: Roger Pau Monné <roger.pau@citrix.com>
+The issue is write cache is enabled in the attach path in
+loop_configure() but it isn't disabled in the detach path;
+thus it remains enabled in the block device regardless of
+whether it is attached or not.
 
-Thanks, Roger.
+Now fsync() can get an I/O request that will just be failed
+later in loop_queue_rq() as device's state is not 'Lo_bound'.
+
+So, disable write cache in the detach path.
+
+Do so based on the queue flag, not the loop device flag for
+read-only (used to enable) as the queue flag can be changed
+via sysfs even on read-only loop devices (e.g., losetup -r.)
+
+Test-case:
+
+    # DEV=/dev/loop7
+
+    # IMG=/tmp/image
+    # truncate --size 1M $IMG
+
+    # losetup $DEV $IMG
+    # losetup -d $DEV
+
+Before:
+
+    # strace -e fsync parted -s $DEV print 2>&1 | grep fsync
+    fsync(3)                                = -1 EIO (Input/output error)
+    Warning: Error fsyncing/closing /dev/loop7: Input/output error
+    [  982.529929] blk_update_request: I/O error, dev loop7, sector 0 op 0x1:(WRITE) flags 0x800 phys_seg 0 prio class 0
+
+After:
+
+    # strace -e fsync parted -s $DEV print 2>&1 | grep fsync
+    fsync(3)                                = 0
+
+Co-developed-by: Eric Desrochers <eric.desrochers@canonical.com>
+Signed-off-by: Eric Desrochers <eric.desrochers@canonical.com>
+Signed-off-by: Mauricio Faria de Oliveira <mfo@canonical.com>
+Tested-by: Gabriel Krisman Bertazi <krisman@collabora.com>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+
+---
+v4:
+- Add Reviewed-By: tag (thanks, Ming.)
+v3:
+- Disable write cache based on QUEUE_FLAG_WC, not just
+  !LO_FLAGS_READ_ONLY, as the former can be enabled in
+  sysfs even for LO_FLAGS_READ_ONLY, thus not disabled
+  later. Mention that in commit message. (thanks, Ming)
+v2:
+- Fix ordering of Co-developed-by:/Signed-off-by: tags.
+  (thanks, Krisman)
+- Add Tested-by: tag. (likewise.)
+
+ drivers/block/loop.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index e5ff328f0917..e94a11dbb5bd 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1212,6 +1212,9 @@ static int __loop_clr_fd(struct loop_device *lo, bool release)
+ 		goto out_unlock;
+ 	}
+ 
++	if (test_bit(QUEUE_FLAG_WC, &lo->lo_queue->queue_flags))
++		blk_queue_write_cache(lo->lo_queue, false, false);
++
+ 	/* freeze request queue during the transition */
+ 	blk_mq_freeze_queue(lo->lo_queue);
+ 
+-- 
+2.27.0
+
