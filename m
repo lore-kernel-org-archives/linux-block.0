@@ -2,32 +2,47 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EEA6C433DB
-	for <linux-block@archiver.kernel.org>; Mon, 22 Feb 2021 00:16:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 129C5C433E0
+	for <linux-block@archiver.kernel.org>; Mon, 22 Feb 2021 01:34:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4D8AF64E77
-	for <linux-block@archiver.kernel.org>; Mon, 22 Feb 2021 00:16:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CE7D464EC8
+	for <linux-block@archiver.kernel.org>; Mon, 22 Feb 2021 01:34:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229974AbhBVAQb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 21 Feb 2021 19:16:31 -0500
-Received: from mail108.syd.optusnet.com.au ([211.29.132.59]:35876 "EHLO
-        mail108.syd.optusnet.com.au" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229962AbhBVAQa (ORCPT
+        id S230326AbhBVBdz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 21 Feb 2021 20:33:55 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27384 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231603AbhBVBdo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 21 Feb 2021 19:16:30 -0500
-X-Greylist: delayed 1377 seconds by postgrey-1.27 at vger.kernel.org; Sun, 21 Feb 2021 19:16:30 EST
-Received: from dread.disaster.area (pa49-179-130-210.pa.nsw.optusnet.com.au [49.179.130.210])
-        by mail108.syd.optusnet.com.au (Postfix) with ESMTPS id 7E7221ADB51;
-        Mon, 22 Feb 2021 10:52:49 +1100 (AEDT)
-Received: from dave by dread.disaster.area with local (Exim 4.92.3)
-        (envelope-from <david@fromorbit.com>)
-        id 1lDyWu-00Fq01-QV; Mon, 22 Feb 2021 10:52:48 +1100
-Date:   Mon, 22 Feb 2021 10:52:48 +1100
-From:   Dave Chinner <david@fromorbit.com>
+        Sun, 21 Feb 2021 20:33:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1613957536;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=N34hBKZHkXIxa+0JV+MfgWWrHN+GVw6/8nre7Mkust8=;
+        b=ALy7NNCzhbIKQHibcAg9FcLoi49TmvRXNApUfoxWJfjSckTEY6F0R/O/Erqwq4+fnB5lxs
+        NaWHcZ3ueg2qxCmCiZLlqEb58l/GUOoO434tE4OQqVOTOOUcEIEzhvsQcTIxSYO+RyFLt7
+        86Lz0eC+igeyL7+i3sxZDIcbV6iJtEA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-181-vCCu8_aQNUS3Y2da_gJthQ-1; Sun, 21 Feb 2021 20:32:00 -0500
+X-MC-Unique: vCCu8_aQNUS3Y2da_gJthQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EA26A79EC0;
+        Mon, 22 Feb 2021 01:31:57 +0000 (UTC)
+Received: from T590 (ovpn-12-196.pek2.redhat.com [10.72.12.196])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7972B1A867;
+        Mon, 22 Feb 2021 01:31:37 +0000 (UTC)
+Date:   Mon, 22 Feb 2021 09:31:33 +0800
+From:   Ming Lei <ming.lei@redhat.com>
 To:     SelvaKumar S <selvakuma.s1@samsung.com>
 Cc:     linux-nvme@lists.infradead.org, kbusch@kernel.org, axboe@kernel.dk,
         damien.lemoal@wdc.com, hch@lst.de, sagi@grimberg.me,
@@ -35,21 +50,17 @@ Cc:     linux-nvme@lists.infradead.org, kbusch@kernel.org, axboe@kernel.dk,
         dm-devel@redhat.com, snitzer@redhat.com, selvajove@gmail.com,
         joshiiitr@gmail.com, nj.shetty@samsung.com, joshi.k@samsung.com,
         javier.gonz@samsung.com, kch@kernel.org,
-        linux-fsdevel@vger.kernel.org
+        linux-fsdevel@vger.kernel.org, linux-scsi@vger.kernel.org,
+        "Martin K. Petersen" <martin.petersen@oracle.com>
 Subject: Re: [RFC PATCH v5 0/4] add simple copy support
-Message-ID: <20210221235248.GZ4626@dread.disaster.area>
+Message-ID: <YDMJdekWhy/Y1Y1r@T590>
 References: <CGME20210219124555epcas5p1334e7c4d64ada5dc4a2ca0feb48c1d44@epcas5p1.samsung.com>
  <20210219124517.79359-1-selvakuma.s1@samsung.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20210219124517.79359-1-selvakuma.s1@samsung.com>
-X-Optus-CM-Score: 0
-X-Optus-CM-Analysis: v=2.3 cv=YKPhNiOx c=1 sm=1 tr=0 cx=a_idp_d
-        a=JD06eNgDs9tuHP7JIKoLzw==:117 a=JD06eNgDs9tuHP7JIKoLzw==:17
-        a=kj9zAlcOel0A:10 a=qa6Q16uM49sA:10 a=pNaSbsGRAAAA:8 a=7-415B0cAAAA:8
-        a=bdcsEvdjF_AAMq5uHxAA:9 a=CjuIK1q_8ugA:10 a=k8uaQqolKd8A:10
-        a=cz0TccRYsqG1oLvFGeGV:22 a=biEYGPWJfzWAr4FL6Ov7:22
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
@@ -68,27 +79,25 @@ On Fri, Feb 19, 2021 at 06:15:13PM +0530, SelvaKumar S wrote:
 > This implementation doesn't add native copy offload support for stacked
 > devices rather copy offload is done through emulation. Possible use
 > cases are F2FS gc and BTRFS relocation/balance.
-
-It sounds like you are missing the most obvious use case for this:
-hooking up filesystem copy_file_range() implementations to allow
-userspace to offload user data copies to hardware....
-
-Another fs level feature that could use this for hardware
-acceleration fallocate(FALLOC_FL_UNSHARE).
-
-These are probably going to be far easier to hook up than filesystem
-GC algorithms, and there is also solid data integrity and stress
-testing checking infrastructure for these operations via fstests.
-
+> 
+> *blkdev_issue_copy* takes source bdev, no of sources, array of source
+> ranges (in sectors), destination bdev and destination offset(in sectors).
+> If both source and destination block devices are same and copy_offload = 1,
+> then copy is done through native copy offloading. Copy emulation is used
+> in other cases.
+> 
 > As SCSI XCOPY can take two different block devices and no of source range is
 > equal to 1, this interface can be extended in future to support SCSI XCOPY.
 
-That greatly complicates the implementation. do we even care at this
-point about cross-device XCOPY at this point?
+The patchset adds ioctl(BLKCOPY) and two userspace visible data
+struture(range_entry, and copy_range), all belong to kabi stuff, and the
+interface is generic block layer kabi.
 
-Cheers,
+The API has to be allowed to extend for supporting SCSI XCOPY in future or similar
+block copy commands without breaking previous application, so please CC linux-scsi
+and scsi guys in your next post.
 
-Dave.
+
 -- 
-Dave Chinner
-david@fromorbit.com
+Ming
+
