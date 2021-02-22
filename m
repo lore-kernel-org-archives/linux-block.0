@@ -2,128 +2,103 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DD8BC433E0
-	for <linux-block@archiver.kernel.org>; Mon, 22 Feb 2021 18:18:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87A4BC433DB
+	for <linux-block@archiver.kernel.org>; Mon, 22 Feb 2021 18:19:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 577C064F00
-	for <linux-block@archiver.kernel.org>; Mon, 22 Feb 2021 18:18:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3E2CB64F00
+	for <linux-block@archiver.kernel.org>; Mon, 22 Feb 2021 18:19:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232107AbhBVSSB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 Feb 2021 13:18:01 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28629 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232115AbhBVSRK (ORCPT
+        id S232335AbhBVST0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 Feb 2021 13:19:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51944 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232053AbhBVSSP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 Feb 2021 13:17:10 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614017743;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=WaZ2kh4UnOsLrC34DpoJEUcu/sl/BIRVLnI4aWYpm3I=;
-        b=HjqITfOs0z40Q4lykUBi1oHgHv9LpUVmJXqTRtL0zHwqbay+Jlnqj5yGmG7Nl2gGegr7lt
-        IE0Ddxngl2OdIWCgbRuWElgNrNMIR8RXOf1jxjko12uOBkd7mg2bbwUDFiazuoeU+nmmuf
-        M3FSFb0pmVmmy8PDMKm0eY1JbqYNUVs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-464-ePKjqakSMKWWusfWSD5WEQ-1; Mon, 22 Feb 2021 13:15:39 -0500
-X-MC-Unique: ePKjqakSMKWWusfWSD5WEQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EA63A195D560;
-        Mon, 22 Feb 2021 18:15:37 +0000 (UTC)
-Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 350A45D6D5;
-        Mon, 22 Feb 2021 18:15:33 +0000 (UTC)
-Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
-        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 11MIFW0P006167;
-        Mon, 22 Feb 2021 13:15:32 -0500
-Received: from localhost (mpatocka@localhost)
-        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 11MIFW2J006163;
-        Mon, 22 Feb 2021 13:15:32 -0500
-X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
-Date:   Mon, 22 Feb 2021 13:15:32 -0500 (EST)
-From:   Mikulas Patocka <mpatocka@redhat.com>
-X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
-To:     Jens Axboe <axboe@kernel.dk>, Marian Csontos <mcsontos@redhat.com>
-cc:     linux-block@vger.kernel.org, dm-devel@redhat.com
-Subject: [PATCH] blk-settings: make sure that max_sectors is aligned on
- "logical_block_size" boundary. (fwd)
-Message-ID: <alpine.LRH.2.02.2102221312070.5407@file01.intranet.prod.int.rdu2.redhat.com>
-User-Agent: Alpine 2.02 (LRH 1266 2009-07-14)
+        Mon, 22 Feb 2021 13:18:15 -0500
+Received: from mail-qt1-x834.google.com (mail-qt1-x834.google.com [IPv6:2607:f8b0:4864:20::834])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1DF6C061574
+        for <linux-block@vger.kernel.org>; Mon, 22 Feb 2021 10:17:34 -0800 (PST)
+Received: by mail-qt1-x834.google.com with SMTP id x3so9948687qti.5
+        for <linux-block@vger.kernel.org>; Mon, 22 Feb 2021 10:17:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=toxicpanda-com.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:references:from:message-id:date:user-agent:mime-version
+         :in-reply-to:content-language:content-transfer-encoding;
+        bh=afQMezrHHZ/s/cFD66A7wjauGG6Mot8qzrIoVlp+Mjs=;
+        b=DHrXj9tMDFBraxw7X4jINTU+CsW1tO9WZM8lqySA+3+QPTXgB75H65JRSLty4fkbc+
+         grztx9O4Sd4IbLW6h05IGADg7dRhZAq2bBCyy7Zfs7aQ+pDlqpsvxmPjYAcke8FDpbbE
+         DrBD29lvXrFQ2RY+nI0Me/MkOsUj+CMPIKmfgRUcJnNCFpq87TDC4MX0vXkF4LyBpxmp
+         UzN7sltqmxCPCr5gdMK6dCtZTcPhHf01RKYmm1pg2neUHj1WcyVfgTRbnKw9MfszNlOz
+         s386jdT7k3hR3+I5Pnz6gQNedrI7syzZSe7m/TSUilko46VXzXxU8erXuXGuYb1ThJ7D
+         1Wbw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=afQMezrHHZ/s/cFD66A7wjauGG6Mot8qzrIoVlp+Mjs=;
+        b=i5XAln+IEDm2gYd0Nyu0e4sFTw3UkIrwXueFdLVsk+8J5jmacBm2IP81ohPhS9RTTN
+         tH8E0MruEIaG/wZub85r1ScHi1GNOVOpxuFNsr0bZuKml4ojBp+SCrwf5LHYQicTuV0t
+         lmyLDFxIFR99ik38YZmRw/OMMHtW5z5tKMBPTfpb1p9NrES+snShOsz2ZuY7daid2SRR
+         KifeE5PxvL5uKxKI136TYgpBeEeYYXHrscARPKaOqU/cYZaltuVCDx6qZgM6kmSty6sG
+         hAQO4VxE2cpMT4reXVgbSD9W0/tOAYTxF+qXYcBv31AoBV+lKcwwwFKIXE//NLhSAT1f
+         oG+Q==
+X-Gm-Message-State: AOAM531b1MR4TmPKfaV/mCVjDbASl9ErjUnTPYqSkx/S4mVKmw+KUXRh
+        tzjZvYKXEKVv5qj8DaUdfsHCDw==
+X-Google-Smtp-Source: ABdhPJxL4io7CWfbZu6770iiQG2aFziBpKkjjFDeAcumIDrZ4paU3pVZ02Fog3B5IfLb8FGSlIAOyw==
+X-Received: by 2002:ac8:4c8e:: with SMTP id j14mr21698071qtv.92.1614017853927;
+        Mon, 22 Feb 2021 10:17:33 -0800 (PST)
+Received: from [192.168.1.45] (cpe-174-109-172-136.nc.res.rr.com. [174.109.172.136])
+        by smtp.gmail.com with ESMTPSA id o194sm12816499qke.101.2021.02.22.10.17.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 22 Feb 2021 10:17:33 -0800 (PST)
+Subject: Re: KASAN: use-after-free Read in nbd_genl_connect
+To:     syzbot <syzbot+429d3f82d757c211bff3@syzkaller.appspotmail.com>,
+        axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, nbd@other.debian.org,
+        syzkaller-bugs@googlegroups.com
+References: <000000000000bda69205bbe88a09@google.com>
+From:   Josef Bacik <josef@toxicpanda.com>
+Message-ID: <49ac93fc-57b0-1f94-c43e-f9ab9a3913af@toxicpanda.com>
+Date:   Mon, 22 Feb 2021 13:17:32 -0500
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.7.0
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <000000000000bda69205bbe88a09@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 2/22/21 3:25 AM, syzbot wrote:
+> Hello,
+> 
+> syzbot found the following issue on:
+> 
+> HEAD commit:    f40ddce8 Linux 5.11
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=179e8d22d00000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=e53d04227c52a0df
+> dashboard link: https://syzkaller.appspot.com/bug?extid=429d3f82d757c211bff3
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10d190cad00000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13dc8a82d00000
+> 
+> Bisection is inconclusive: the issue happens on the oldest tested release.
+> 
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1128ae60d00000
+> final oops:     https://syzkaller.appspot.com/x/report.txt?x=1328ae60d00000
+> console output: https://syzkaller.appspot.com/x/log.txt?x=1528ae60d00000
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+429d3f82d757c211bff3@syzkaller.appspotmail.com
+> 
 
-
----------- Forwarded message ----------
-Date: Thu, 19 Nov 2020 15:36:51 -0500 (EST)
-From: Mikulas Patocka <mpatocka@redhat.com>
-To: David Teigland <teigland@redhat.com>, Jens Axboe <axboe@kernel.dk>
-Cc: heinzm@redhat.com, Zdenek Kabelac <zkabelac@redhat.com>,
-    Marian Csontos <mcsontos@redhat.com>, linux-block@vger.kernel.org,
-    dm-devel@redhat.com
-Subject: [PATCH] blk-settings: make sure that max_sectors is aligned on
-    "logical_block_size" boundary.
-
-We get these I/O errors when we run md-raid1 on the top of dm-integrity on 
-the top of ramdisk:
-device-mapper: integrity: Bio not aligned on 8 sectors: 0xff00, 0xff
-device-mapper: integrity: Bio not aligned on 8 sectors: 0xff00, 0xff
-device-mapper: integrity: Bio not aligned on 8 sectors: 0xffff, 0x1
-device-mapper: integrity: Bio not aligned on 8 sectors: 0xffff, 0x1
-device-mapper: integrity: Bio not aligned on 8 sectors: 0x8048, 0xff
-device-mapper: integrity: Bio not aligned on 8 sectors: 0x8147, 0xff
-device-mapper: integrity: Bio not aligned on 8 sectors: 0x8246, 0xff
-device-mapper: integrity: Bio not aligned on 8 sectors: 0x8345, 0xbb
-
-The ramdisk device has logical_block_size 512 and max_sectors 255. The 
-dm-integrity device uses logical_block_size 4096 and it doesn't affect the 
-"max_sectors" value - thus, it inherits 255 from the ramdisk. So, we have 
-a device with max_sectors not aligned on logical_block_size.
-
-The md-raid device sees that the underlying leg has max_sectors 255 and it
-will split the bios on 255-sector boundary, making the bios unaligned on
-logical_block_size.
-
-In order to fix the bug, we round down max_sectors to logical_block_size.
-
-Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
-Cc: stable@vger.kernel.org
-
----
- block/blk-settings.c |   10 ++++++++++
- 1 file changed, 10 insertions(+)
-
-Index: linux-2.6/block/blk-settings.c
-===================================================================
---- linux-2.6.orig/block/blk-settings.c	2020-10-29 12:20:46.000000000 +0100
-+++ linux-2.6/block/blk-settings.c	2020-11-19 21:20:18.000000000 +0100
-@@ -591,6 +591,16 @@ int blk_stack_limits(struct queue_limits
- 		ret = -1;
- 	}
- 
-+	t->max_sectors = round_down(t->max_sectors, t->logical_block_size / 512);
-+	if (t->max_sectors < PAGE_SIZE / 512)
-+		t->max_sectors = PAGE_SIZE / 512;
-+	t->max_hw_sectors = round_down(t->max_hw_sectors, t->logical_block_size / 512);
-+	if (t->max_sectors < PAGE_SIZE / 512)
-+		t->max_hw_sectors = PAGE_SIZE / 512;
-+	t->max_dev_sectors = round_down(t->max_dev_sectors, t->logical_block_size / 512);
-+	if (t->max_sectors < PAGE_SIZE / 512)
-+		t->max_dev_sectors = PAGE_SIZE / 512;
-+
- 	/* Discard alignment and granularity */
- 	if (b->discard_granularity) {
- 		alignment = queue_limit_discard_alignment(b, start);
-
+#syz test:  git://git.kernel.org/pub/scm/linux/kernel/git/josef/btrfs-next.git 
+nbd-kasan-fix
