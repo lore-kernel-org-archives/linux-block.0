@@ -2,94 +2,157 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4393C433DB
-	for <linux-block@archiver.kernel.org>; Mon, 22 Feb 2021 09:49:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36C73C433DB
+	for <linux-block@archiver.kernel.org>; Mon, 22 Feb 2021 09:50:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9096E64E5F
-	for <linux-block@archiver.kernel.org>; Mon, 22 Feb 2021 09:49:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E859964E2F
+	for <linux-block@archiver.kernel.org>; Mon, 22 Feb 2021 09:50:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230172AbhBVJs5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 Feb 2021 04:48:57 -0500
-Received: from mx2.suse.de ([195.135.220.15]:45648 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230122AbhBVJsx (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 Feb 2021 04:48:53 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 6CDF3AED2;
-        Mon, 22 Feb 2021 09:48:11 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 17C561E14ED; Mon, 22 Feb 2021 10:48:11 +0100 (CET)
-From:   Jan Kara <jack@suse.cz>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     <linux-block@vger.kernel.org>,
-        Christoph Hellwig <hch@infradead.org>, Jan Kara <jack@suse.cz>,
-        stable@vger.kernel.org
-Subject: [PATCH v2] block: Try to handle busy underlying device on discard
-Date:   Mon, 22 Feb 2021 10:48:09 +0100
-Message-Id: <20210222094809.21775-1-jack@suse.cz>
-X-Mailer: git-send-email 2.26.2
+        id S230316AbhBVJuc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 Feb 2021 04:50:32 -0500
+Received: from mail-m121144.qiye.163.com ([115.236.121.144]:49094 "EHLO
+        mail-m121144.qiye.163.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230147AbhBVJuH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 22 Feb 2021 04:50:07 -0500
+Received: from [127.0.0.1] (unknown [157.0.31.124])
+        by mail-m121144.qiye.163.com (Hmail) with ESMTPA id 6043AAC0460;
+        Mon, 22 Feb 2021 17:49:10 +0800 (CST)
+Subject: Re: [PATCH v2] kyber: introduce kyber_depth_updated()
+From:   Yang Yang <yang.yang@vivo.com>
+To:     Omar Sandoval <osandov@osandov.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     onlyfever@icloud.com, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org
+References: <20210205091311.129498-1-yang.yang@vivo.com>
+Message-ID: <c1ac179d-5d22-e4bb-e661-87981c8535f3@vivo.com>
+Date:   Mon, 22 Feb 2021 17:49:10 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210205091311.129498-1-yang.yang@vivo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-HM-Spam-Status: e1kfGhgUHx5ZQUtXWQgYFAkeWUFZS1VLWVdZKFlBSE83V1ktWUFJV1kPCR
+        oVCBIfWUFZH0NOSxhNTkhIQxofVkpNSkhCQ0xITktOSklVEwETFhoSFyQUDg9ZV1kWGg8SFR0UWU
+        FZT0tIVUpKS0hNSlVLWQY+
+X-HM-Sender-Digest: e1kMHhlZQR0aFwgeV1kSHx4VD1lBWUc6KyI6UQw*ED8UExgNKxkNFi8u
+        FTwaFBFVSlVKTUpIQkNMSE5LQ0NPVTMWGhIXVQIaFRxVAhoVHDsNEg0UVRgUFkVZV1kSC1lBWUpO
+        TFVLVUhKVUpJT1lXWQgBWUFPQ0hDNwY+
+X-HM-Tid: 0a77c92487c8b039kuuu6043aac0460
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Commit 384d87ef2c95 ("block: Do not discard buffers under a mounted
-filesystem") made paths issuing discard or zeroout requests to the
-underlying device try to grab block device in exclusive mode. If that
-failed we returned EBUSY to userspace. This however caused unexpected
-fallout in userspace where e.g. FUSE filesystems issue discard requests
-from userspace daemons although the device is open exclusively by the
-kernel. Also shrinking of logical volume by LVM issues discard requests
-to a device which may be claimed exclusively because there's another LV
-on the same PV. So to avoid these userspace regressions, fall back to
-invalidate_inode_pages2_range() instead of returning EBUSY to userspace
-and return EBUSY only of that call fails as well (meaning that there's
-indeed someone using the particular device range we are trying to
-discard).
+On 2021/2/5 17:13, Yang Yang wrote:
+> Hang occurs when user changes the scheduler queue depth, by writing to
+> the 'nr_requests' sysfs file of that device.
+> 
+> The details of the environment that we found the problem are as follows:
+>    an eMMC block device
+>    total driver tags: 16
+>    default queue_depth: 32
+>    kqd->async_depth initialized in kyber_init_sched() with queue_depth=32
+> 
+> Then we change queue_depth to 256, by writing to the 'nr_requests' sysfs
+> file. But kqd->async_depth don't be updated after queue_depth changes.
+> Now the value of async depth is too small for queue_depth=256, this may
+> cause hang.
+> 
+> This patch introduces kyber_depth_updated(), so that kyber can update
+> async depth when queue depth changes.
+> 
+> Signed-off-by: Yang Yang <yang.yang@vivo.com>
+> ---
+> v2:
+> - Change the commit message
+> - Change from sbitmap::depth to 2^sbitmap::shift
+> ---
+>   block/kyber-iosched.c | 29 +++++++++++++----------------
+>   1 file changed, 13 insertions(+), 16 deletions(-)
+> 
+> diff --git a/block/kyber-iosched.c b/block/kyber-iosched.c
+> index dc89199bc8c6..17215b6bf482 100644
+> --- a/block/kyber-iosched.c
+> +++ b/block/kyber-iosched.c
+> @@ -353,19 +353,9 @@ static void kyber_timer_fn(struct timer_list *t)
+>   	}
+>   }
+>   
+> -static unsigned int kyber_sched_tags_shift(struct request_queue *q)
+> -{
+> -	/*
+> -	 * All of the hardware queues have the same depth, so we can just grab
+> -	 * the shift of the first one.
+> -	 */
+> -	return q->queue_hw_ctx[0]->sched_tags->bitmap_tags->sb.shift;
+> -}
+> -
+>   static struct kyber_queue_data *kyber_queue_data_alloc(struct request_queue *q)
+>   {
+>   	struct kyber_queue_data *kqd;
+> -	unsigned int shift;
+>   	int ret = -ENOMEM;
+>   	int i;
+>   
+> @@ -400,9 +390,6 @@ static struct kyber_queue_data *kyber_queue_data_alloc(struct request_queue *q)
+>   		kqd->latency_targets[i] = kyber_latency_targets[i];
+>   	}
+>   
+> -	shift = kyber_sched_tags_shift(q);
+> -	kqd->async_depth = (1U << shift) * KYBER_ASYNC_PERCENT / 100U;
+> -
+>   	return kqd;
+>   
+>   err_buckets:
+> @@ -458,9 +445,19 @@ static void kyber_ctx_queue_init(struct kyber_ctx_queue *kcq)
+>   		INIT_LIST_HEAD(&kcq->rq_list[i]);
+>   }
+>   
+> -static int kyber_init_hctx(struct blk_mq_hw_ctx *hctx, unsigned int hctx_idx)
+> +static void kyber_depth_updated(struct blk_mq_hw_ctx *hctx)
+>   {
+>   	struct kyber_queue_data *kqd = hctx->queue->elevator->elevator_data;
+> +	struct blk_mq_tags *tags = hctx->sched_tags;
+> +	unsigned int shift = tags->bitmap_tags->sb.shift;
+> +
+> +	kqd->async_depth = (1U << shift) * KYBER_ASYNC_PERCENT / 100U;
+> +
+> +	sbitmap_queue_min_shallow_depth(tags->bitmap_tags, kqd->async_depth);
+> +}
+> +
+> +static int kyber_init_hctx(struct blk_mq_hw_ctx *hctx, unsigned int hctx_idx)
+> +{
+>   	struct kyber_hctx_data *khd;
+>   	int i;
+>   
+> @@ -502,8 +499,7 @@ static int kyber_init_hctx(struct blk_mq_hw_ctx *hctx, unsigned int hctx_idx)
+>   	khd->batching = 0;
+>   
+>   	hctx->sched_data = khd;
+> -	sbitmap_queue_min_shallow_depth(hctx->sched_tags->bitmap_tags,
+> -					kqd->async_depth);
+> +	kyber_depth_updated(hctx);
+>   
+>   	return 0;
+>   
+> @@ -1022,6 +1018,7 @@ static struct elevator_type kyber_sched = {
+>   		.completed_request = kyber_completed_request,
+>   		.dispatch_request = kyber_dispatch_request,
+>   		.has_work = kyber_has_work,
+> +		.depth_updated = kyber_depth_updated,
+>   	},
+>   #ifdef CONFIG_BLK_DEBUG_FS
+>   	.queue_debugfs_attrs = kyber_queue_debugfs_attrs,
+> 
 
-Link: https://bugzilla.kernel.org/show_bug.cgi?id=211167
-Fixes: 384d87ef2c95 ("block: Do not discard buffers under a mounted filesystem")
-CC: stable@vger.kernel.org
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- fs/block_dev.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+Hello,
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 235b5042672e..c33151020bcd 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -118,13 +118,22 @@ int truncate_bdev_range(struct block_device *bdev, fmode_t mode,
- 	if (!(mode & FMODE_EXCL)) {
- 		int err = bd_prepare_to_claim(bdev, truncate_bdev_range);
- 		if (err)
--			return err;
-+			goto invalidate;
- 	}
- 
- 	truncate_inode_pages_range(bdev->bd_inode->i_mapping, lstart, lend);
- 	if (!(mode & FMODE_EXCL))
- 		bd_abort_claiming(bdev, truncate_bdev_range);
- 	return 0;
-+
-+invalidate:
-+	/*
-+	 * Someone else has handle exclusively open. Try invalidating instead.
-+	 * The 'end' argument is inclusive so the rounding is safe.
-+	 */
-+	return invalidate_inode_pages2_range(bdev->bd_inode->i_mapping,
-+					     lstart >> PAGE_SHIFT,
-+					     lend >> PAGE_SHIFT);
- }
- EXPORT_SYMBOL(truncate_bdev_range);
- 
--- 
-2.26.2
+Ping...
 
+Thanks!
