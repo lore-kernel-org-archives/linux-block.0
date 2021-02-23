@@ -2,71 +2,50 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 334F4C433E6
-	for <linux-block@archiver.kernel.org>; Tue, 23 Feb 2021 13:53:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DACA0C4332D
+	for <linux-block@archiver.kernel.org>; Tue, 23 Feb 2021 14:50:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CC32A64E6C
-	for <linux-block@archiver.kernel.org>; Tue, 23 Feb 2021 13:53:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A58E064E60
+	for <linux-block@archiver.kernel.org>; Tue, 23 Feb 2021 14:50:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230441AbhBWNxA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Feb 2021 08:53:00 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:12641 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230400AbhBWNwx (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Feb 2021 08:52:53 -0500
-Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.60])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4DlL691mY9z16BjX;
-        Tue, 23 Feb 2021 21:50:25 +0800 (CST)
-Received: from localhost.localdomain (10.175.102.38) by
- DGGEMS407-HUB.china.huawei.com (10.3.19.207) with Microsoft SMTP Server id
- 14.3.498.0; Tue, 23 Feb 2021 21:51:51 +0800
-From:   Wei Yongjun <weiyongjun1@huawei.com>
-To:     Hulk Robot <hulkci@huawei.com>, Jens Axboe <axboe@kernel.dk>,
-        "Lauri Kasanen" <cand@gmx.com>
-CC:     Wei Yongjun <weiyongjun1@huawei.com>, <linux-block@vger.kernel.org>
-Subject: [PATCH -next] n64: fix return value check in n64cart_probe()
-Date:   Tue, 23 Feb 2021 14:01:04 +0000
-Message-ID: <20210223140104.1743541-1-weiyongjun1@huawei.com>
-X-Mailer: git-send-email 2.25.1
+        id S233158AbhBWOup (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Feb 2021 09:50:45 -0500
+Received: from verein.lst.de ([213.95.11.211]:34136 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233152AbhBWOun (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 23 Feb 2021 09:50:43 -0500
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id E79C668D0A; Tue, 23 Feb 2021 15:50:00 +0100 (CET)
+Date:   Tue, 23 Feb 2021 15:50:00 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH] block: fix logging on capacity change
+Message-ID: <20210223145000.GA17432@lst.de>
+References: <20210223085015.832088-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type:   text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
-X-Originating-IP: [10.175.102.38]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210223085015.832088-1-ming.lei@redhat.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In case of error, the function devm_platform_ioremap_resource()
-returns ERR_PTR() and never returns NULL. The NULL test in the
-return value check should be replaced with IS_ERR().
+On Tue, Feb 23, 2021 at 04:50:15PM +0800, Ming Lei wrote:
+> Local variable of 'capacity' stores the previous disk capacity, and
+> 'size' variable records the latest disk capacity, so swap them for
+> fixing logging on capacity change.
 
-Fixes: d9b2a2bbbb4d ("block: Add n64 cart driver")
-Reported-by: Hulk Robot <hulkci@huawei.com>
-Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
----
- drivers/block/n64cart.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Ok, looks like we're racing for fixes a lot lately.  I have the same
+fix commited locally since this morning..
 
-diff --git a/drivers/block/n64cart.c b/drivers/block/n64cart.c
-index 47bdf324e962..84a0f8d0be29 100644
---- a/drivers/block/n64cart.c
-+++ b/drivers/block/n64cart.c
-@@ -129,8 +129,8 @@ static int __init n64cart_probe(struct platform_device *pdev)
- 	}
- 
- 	reg_base = devm_platform_ioremap_resource(pdev, 0);
--	if (!reg_base)
--		return -EINVAL;
-+	if (IS_ERR(reg_base))
-+		return ERR_PTR(reg_base);
- 
- 	disk = alloc_disk(0);
- 	if (!disk)
+Looks good:
 
+Reviewed-by: Christoph Hellwig <hch@lst.de>
