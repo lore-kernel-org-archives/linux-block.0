@@ -2,151 +2,143 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-23.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97972C433E6
-	for <linux-block@archiver.kernel.org>; Tue, 23 Feb 2021 15:48:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59283C433E0
+	for <linux-block@archiver.kernel.org>; Tue, 23 Feb 2021 16:30:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 64DBD64E5C
-	for <linux-block@archiver.kernel.org>; Tue, 23 Feb 2021 15:48:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 13B1260234
+	for <linux-block@archiver.kernel.org>; Tue, 23 Feb 2021 16:30:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233449AbhBWPsv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Feb 2021 10:48:51 -0500
-Received: from linux.microsoft.com ([13.77.154.182]:41060 "EHLO
-        linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233393AbhBWPsI (ORCPT
+        id S232529AbhBWQaH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Feb 2021 11:30:07 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56959 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232473AbhBWQaG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Feb 2021 10:48:08 -0500
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
-        by linux.microsoft.com (Postfix) with ESMTPSA id B74C42089C9B;
-        Tue, 23 Feb 2021 07:47:27 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com B74C42089C9B
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1614095247;
-        bh=CNobBivITyIZHfV9IIhBh12WyKXN0ArCPEmTlhSkQys=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=AnWeEW+Ah60JQOeGC0VbHERpDEPpLFss8vZ9u9f1/Zj/tWCEOvEaNwGrEJHsKUib8
-         k/IxJZVPeLBQm2ku7quSz0P7Fb1VzwXEeKzxkZNByyfl1VskznqcWyc8zLI7Xq8I2c
-         pINtq091F6bkw43wY5mu0wF7wRD2HO3tzV4nUV10=
-Received: by mail-pf1-f178.google.com with SMTP id w18so9010011pfu.9;
-        Tue, 23 Feb 2021 07:47:27 -0800 (PST)
-X-Gm-Message-State: AOAM530fb7kMUxO8Tah2WM4y+nDQwVed39m0t31rVu9g9MdNHb/5b5A/
-        DPNLqCZqfAgf2Pbci3HfoPvjny7V/DU74BHCaIc=
-X-Google-Smtp-Source: ABdhPJxpQGF6YDtaKy9RwYuxdhixk5+xajdkcOUF6LcT/2J4R6s08m7LRjdk1BOqzpmP8JcZJdeTBLElCiLzh161BEo=
-X-Received: by 2002:a62:fc45:0:b029:1ed:bdd2:a07d with SMTP id
- e66-20020a62fc450000b02901edbdd2a07dmr2847913pfh.0.1614095247349; Tue, 23 Feb
- 2021 07:47:27 -0800 (PST)
+        Tue, 23 Feb 2021 11:30:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1614097718;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=hEdmz9TmoqCfu4qyhdj28PLtLhLryIeyp1D9apTQzYs=;
+        b=Syl2TCRK0wInF49TYmnJoiRWridsp/tc4o4lzTsUYs2JKXh4z9WBsbRYFYQ6+YgoZXgDCV
+        /WdQD1HzGfYSLsJ0KkpOYLxT7CwOLTqiH2YQty3MiSQDOZhylj0O89E3SHmtn8NLGmSnnz
+        50DNbzHLzjrnAjMXCrM0tsFbPm+bImU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-199-rTiTab6_OfqOd0YuUHsHfA-1; Tue, 23 Feb 2021 11:28:35 -0500
+X-MC-Unique: rTiTab6_OfqOd0YuUHsHfA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EB27F8F508;
+        Tue, 23 Feb 2021 16:28:34 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id BDE525D6AC;
+        Tue, 23 Feb 2021 16:28:28 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 11NGSSLe028212;
+        Tue, 23 Feb 2021 11:28:28 -0500
+Received: from localhost (mpatocka@localhost)
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 11NGSRxm028208;
+        Tue, 23 Feb 2021 11:28:28 -0500
+X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
+Date:   Tue, 23 Feb 2021 11:28:27 -0500 (EST)
+From:   Mikulas Patocka <mpatocka@redhat.com>
+X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
+To:     Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>
+cc:     Mike Snitzer <msnitzer@redhat.com>,
+        Marian Csontos <mcsontos@redhat.com>,
+        linux-block@vger.kernel.org, dm-devel@redhat.com
+Subject: [PATCH v2] blk-settings: make sure that max_sectors is aligned on
+ "logical_block_size" boundary
+In-Reply-To: <YDSwyrLeiP/fKgZH@T590>
+Message-ID: <alpine.LRH.2.02.2102231125170.27597@file01.intranet.prod.int.rdu2.redhat.com>
+References: <alpine.LRH.2.02.2102221312070.5407@file01.intranet.prod.int.rdu2.redhat.com> <YDSwyrLeiP/fKgZH@T590>
+User-Agent: Alpine 2.02 (LRH 1266 2009-07-14)
 MIME-Version: 1.0
-References: <20210206000903.215028-1-mcroce@linux.microsoft.com>
-In-Reply-To: <20210206000903.215028-1-mcroce@linux.microsoft.com>
-From:   Matteo Croce <mcroce@linux.microsoft.com>
-Date:   Tue, 23 Feb 2021 16:46:51 +0100
-X-Gmail-Original-Message-ID: <CAFnufp1zuXTVcNvSX9eE9hekZ6h455JVve0q2=Ht+xd007CVdQ@mail.gmail.com>
-Message-ID: <CAFnufp1zuXTVcNvSX9eE9hekZ6h455JVve0q2=Ht+xd007CVdQ@mail.gmail.com>
-Subject: Re: [PATCH 0/5] block: add a sequence number to disks
-To:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
-        Lennart Poettering <lennart@poettering.net>,
-        Luca Boccassi <bluca@debian.org>, Jens Axboe <axboe@kernel.dk>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Feb 6, 2021 at 1:09 AM Matteo Croce <mcroce@linux.microsoft.com> wrote:
->
-> From: Matteo Croce <mcroce@microsoft.com>
->
-> With this series a monotonically increasing number is added to disks,
-> precisely in the genhd struct, and it's exported in sysfs and uevent.
->
-> This helps the userspace correlate events for devices that reuse the
-> same device, like loop.
->
-> The first patch is the core one, the 2..4 expose the information in
-> different ways, while the last one increase the sequence number for
-> loop devices at every attach.
->
->     # udevadm monitor -kp |grep -e ^DEVNAME -e ^DISKSEQ &
->     [1] 523
->     # losetup -fP 3part
->     [ 3698.615848] loop0: detected capacity change from 16384 to 0
->     DEVNAME=/dev/loop0
->     DISKSEQ=13
->     [ 3698.647189]  loop0: p1 p2 p3
->     DEVNAME=/dev/loop0
->     DISKSEQ=13
->     DEVNAME=/dev/loop0p1
->     DISKSEQ=13
->     DEVNAME=/dev/loop0p2
->     DISKSEQ=13
->     DEVNAME=/dev/loop0p3
->     DISKSEQ=13
->     # losetup -fP 2part
->     [ 3705.170766] loop1: detected capacity change from 40960 to 0
->     DEVNAME=/dev/loop1
->     DISKSEQ=14
->     [ 3705.247280]  loop1: p1 p2
->     DEVNAME=/dev/loop1
->     DISKSEQ=14
->     DEVNAME=/dev/loop1p1
->     DISKSEQ=14
->     DEVNAME=/dev/loop1p2
->     DISKSEQ=14
->     # ./getdiskseq /dev/loop*
->     /dev/loop0:     13
->     /dev/loop0p1:   13
->     /dev/loop0p2:   13
->     /dev/loop0p3:   13
->     /dev/loop1:     14
->     /dev/loop1p1:   14
->     /dev/loop1p2:   14
->     /dev/loop2:     5
->     /dev/loop3:     6
->     /dev/loop-control: Function not implemented
->     # grep . /sys/class/block/*/diskseq
->     /sys/class/block/loop0/diskseq:13
->     /sys/class/block/loop1/diskseq:14
->     /sys/class/block/loop2/diskseq:5
->     /sys/class/block/loop3/diskseq:6
->     /sys/class/block/ram0/diskseq:1
->     /sys/class/block/ram1/diskseq:2
->     /sys/class/block/vda/diskseq:7
->
-> If merged, this feature will immediately used by the userspace:
-> https://github.com/systemd/systemd/issues/17469#issuecomment-762919781
->
-> Matteo Croce (5):
->   block: add disk sequence number
->   block: add ioctl to read the disk sequence number
->   block: refactor sysfs code
->   block: export diskseq in sysfs
->   loop: increment sequence number
->
->  Documentation/ABI/testing/sysfs-block | 12 ++++++++
->  block/genhd.c                         | 43 ++++++++++++++++++++++++---
->  block/ioctl.c                         |  2 ++
->  drivers/block/loop.c                  |  3 ++
->  include/linux/genhd.h                 |  2 ++
->  include/uapi/linux/fs.h               |  1 +
->  6 files changed, 59 insertions(+), 4 deletions(-)
->
-> --
-> 2.29.2
->
-
-Hi,
-
-Did anyone have a chance to look at this series?
-
-Ideas or suggestions?
-
-Regards,
 
 
---
-per aspera ad upstream
+On Tue, 23 Feb 2021, Ming Lei wrote:
+
+> I'd suggest to add a helper(such as, blk_round_down_sectors()) to round_down each
+> one.
+
+Yes - Here I'm sending the updated patch.
+
+> -- 
+> Ming
+
+From: Mikulas Patocka <mpatocka@redhat.com>
+
+We get I/O errors when we run md-raid1 on the top of dm-integrity on the
+top of ramdisk.
+device-mapper: integrity: Bio not aligned on 8 sectors: 0xff00, 0xff
+device-mapper: integrity: Bio not aligned on 8 sectors: 0xff00, 0xff
+device-mapper: integrity: Bio not aligned on 8 sectors: 0xffff, 0x1
+device-mapper: integrity: Bio not aligned on 8 sectors: 0xffff, 0x1
+device-mapper: integrity: Bio not aligned on 8 sectors: 0x8048, 0xff
+device-mapper: integrity: Bio not aligned on 8 sectors: 0x8147, 0xff
+device-mapper: integrity: Bio not aligned on 8 sectors: 0x8246, 0xff
+device-mapper: integrity: Bio not aligned on 8 sectors: 0x8345, 0xbb
+
+The ramdisk device has logical_block_size 512 and max_sectors 255. The
+dm-integrity device uses logical_block_size 4096 and it doesn't affect the
+"max_sectors" value - thus, it inherits 255 from the ramdisk. So, we have
+a device with max_sectors not aligned on logical_block_size.
+
+The md-raid device sees that the underlying leg has max_sectors 255 and it
+will split the bios on 255-sector boundary, making the bios unaligned on
+logical_block_size.
+
+In order to fix the bug, we round down max_sectors to logical_block_size.
+
+Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
+Cc: stable@vger.kernel.org
+
+---
+ block/blk-settings.c |   12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+Index: linux-2.6/block/blk-settings.c
+===================================================================
+--- linux-2.6.orig/block/blk-settings.c	2021-02-23 17:18:59.000000000 +0100
++++ linux-2.6/block/blk-settings.c	2021-02-23 17:23:58.000000000 +0100
+@@ -481,6 +481,14 @@ void blk_queue_io_opt(struct request_que
+ }
+ EXPORT_SYMBOL(blk_queue_io_opt);
+ 
++static unsigned int blk_round_down_sectors(unsigned int sectors, unsigned int lbs)
++{
++	sectors = round_down(sectors, lbs >> SECTOR_SHIFT);
++	if (sectors < PAGE_SIZE >> SECTOR_SHIFT)
++		sectors = PAGE_SIZE >> SECTOR_SHIFT;
++	return sectors;
++}
++
+ /**
+  * blk_stack_limits - adjust queue_limits for stacked devices
+  * @t:	the stacking driver limits (top device)
+@@ -607,6 +615,10 @@ int blk_stack_limits(struct queue_limits
+ 		ret = -1;
+ 	}
+ 
++	t->max_sectors = blk_round_down_sectors(t->max_sectors, t->logical_block_size);
++	t->max_hw_sectors = blk_round_down_sectors(t->max_hw_sectors, t->logical_block_size);
++	t->max_dev_sectors = blk_round_down_sectors(t->max_dev_sectors, t->logical_block_size);
++
+ 	/* Discard alignment and granularity */
+ 	if (b->discard_granularity) {
+ 		alignment = queue_limit_discard_alignment(b, start);
+
