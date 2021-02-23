@@ -2,208 +2,331 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	PDS_BAD_THREAD_QP_64,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D4D8C433DB
-	for <linux-block@archiver.kernel.org>; Tue, 23 Feb 2021 03:53:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10527C433E0
+	for <linux-block@archiver.kernel.org>; Tue, 23 Feb 2021 03:57:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0D2FA64E2E
-	for <linux-block@archiver.kernel.org>; Tue, 23 Feb 2021 03:53:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9BF5364E4B
+	for <linux-block@archiver.kernel.org>; Tue, 23 Feb 2021 03:57:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230486AbhBWDwf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 Feb 2021 22:52:35 -0500
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:12252 "EHLO
-        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230010AbhBWDwd (ORCPT
+        id S231439AbhBWD4p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 Feb 2021 22:56:45 -0500
+Received: from out30-132.freemail.mail.aliyun.com ([115.124.30.132]:52286 "EHLO
+        out30-132.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230253AbhBWD4o (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 Feb 2021 22:52:33 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1614052351; x=1645588351;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=qHumi863sYoH26CUanBGXSCqGoZpnp0TUapVkWwjBgE=;
-  b=BfC1Btjr7iz6ddQZdRhdocOYQBnLxVAPimVDesk2ae16+0Fr1HoeqV3I
-   uDS2FECwF4zE3q/sZpPjmqLoO61N1540U4HE4QfLUJnUlyNM9dyACo09r
-   +IYzdbihYCB5mASOeMwotyS7H+61vzuYbw0vaC13fpS+nWanSLmDWgjmC
-   ppFptOeeBGdw+UWteoHYD/PZXbTQKO+3JEnKiYBohPI/cVLYbLZAc6yGH
-   bVk7iHi6GUHE2HODgXHT3xmBSOkW/JzUFRnb3a9zt7612HranQM3UkG4n
-   asME54TRjEGVWelwcMdUC4oPoq3INw4Bb1HRaPBgJcVQUo3QicLh4fX/i
-   g==;
-IronPort-SDR: N3Fy8o9TJLxKDuMUbwkv4OjzSSph7S+BRjE2V7zdYJn2adzJzcDBX4SXLycv6y4LyEt2OWbWmW
- SeOrR5VmGOzopy5R8mMTDabUxSymKFUeTFGdNFRrGBF6ii6o2tDclRjaDHlHPNKe21umYjo+lN
- frOHI9k1nNlfhID9DIQe+gaQTNS5QQ/xxAz4Tn1SM9567fQN+LIxD97pxmcj6zBAZ6OOd5rxxJ
- 7Rd6ejDzGJ3ZLjUyZQ9EsOVMKmgTogvJVbCV8TNUAGea48SmPWQUv3ZP0EdbEO77nPCAxmmBR8
- dyc=
-X-IronPort-AV: E=Sophos;i="5.81,199,1610380800"; 
-   d="scan'208";a="160544919"
-Received: from mail-co1nam11lp2168.outbound.protection.outlook.com (HELO NAM11-CO1-obe.outbound.protection.outlook.com) ([104.47.56.168])
-  by ob1.hgst.iphmx.com with ESMTP; 23 Feb 2021 11:51:25 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DSkMbnHM8woltSGCNkutE3sn0If4k8VtaMBqsz6vcrcx6clqZmBMQFVoYp9tnePH1QdSHYGFlwFSFkV4d0XCQYHmLCYVhJVKCOKriMo3FFZfeCBxORWMR7GgXLxNG5idTApafJYILJ2T+qPElIicMzdh79KV7njsHvruI4ATU1VAsNydBV4wMCFRFVpEdgNL5Qu9Ts/zR4C5Hv05/zC/MpUqWwRhIqweLlIARSL6U/iZr8CRwzWSn1wkC2yhS06xJvDrZ3/BkDh4BqhATFpIiWlmX2mozCcuDtr/2AJL3QhbvkjTTorpXRQ7NSxQXfcDIDiEM0oy18zRdaUk+VVzoA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+VhaD21BQNfKbnHVIpPpnR+6fkaM66NsALLAyXWL10s=;
- b=MlTeHzG71q4RRHqLu9xVgfKpTp2QpDSe4eqD7N1ZChY/oMD58hbeUXfr2tBnhcPHahPmeRwUw9VbxCLF7tQv9JzwVfn95ES9u1tvNH8ziqC+8YUFwFHW5KbHsI6aJIFXszonUMcKNYrZi4gvrRlckPUhNjLuFk7Yg6f5Gq1OYE/magMDklw2ExaeAcagRqYgMPj76DrYtPZAPSe0hKDI/oYvt3dT8zAKpeeZ/RJ1AvKNGVlCH92djFJ2xS1Zvm2YNYHJ1WicZROm9ooRzGLeGI9BMSvjpgd+isYohnMLaeto152yiYMUjjC9u1aAfeAJD+TM8xQAWsqx/+gIRYSikA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+VhaD21BQNfKbnHVIpPpnR+6fkaM66NsALLAyXWL10s=;
- b=GOlIC3Pww4sBTNgvc+vDVAwwgdVGXuEMqZKDeS5SHkaXYv7249gAJw80Zww1TrTQxUU4bdJMjibA5xI90SSrYDd7T4pERt9aJvBj6K/D1mZbhF9iYlhuT7X/d22RvVDGM6H9RqpMfG8mIowABRJr+/w2HAccDBURfY9eaqm40P4=
-Received: from BYAPR04MB4965.namprd04.prod.outlook.com (2603:10b6:a03:4d::25)
- by BYAPR04MB6103.namprd04.prod.outlook.com (2603:10b6:a03:e6::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3868.31; Tue, 23 Feb
- 2021 03:51:23 +0000
-Received: from BYAPR04MB4965.namprd04.prod.outlook.com
- ([fe80::1d83:38d9:143:4c9c]) by BYAPR04MB4965.namprd04.prod.outlook.com
- ([fe80::1d83:38d9:143:4c9c%5]) with mapi id 15.20.3868.033; Tue, 23 Feb 2021
- 03:51:23 +0000
-From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-To:     Christoph Hellwig <hch@lst.de>
-CC:     John Stultz <john.stultz@linaro.org>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        David Anderson <dvander@google.com>,
-        Alistair Delva <adelva@google.com>,
-        Todd Kjos <tkjos@google.com>,
-        Amit Pundir <amit.pundir@linaro.org>,
-        YongQin Liu <yongqin.liu@linaro.org>,
-        lkml <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [REGRESSION] "split bio_kmalloc from bio_alloc_bioset" causing
- crash shortly after bootup
-Thread-Topic: [REGRESSION] "split bio_kmalloc from bio_alloc_bioset" causing
- crash shortly after bootup
-Thread-Index: AQHXCZD3vAo2wh9jek+o1gtQqbdo1w==
-Date:   Tue, 23 Feb 2021 03:51:23 +0000
-Message-ID: <BYAPR04MB4965F0B60169371A25CD423E86809@BYAPR04MB4965.namprd04.prod.outlook.com>
-References: <CALAqxLUWjr2oR=5XxyGQ2HcC-TLARvboHRHHaAOUFq6_TsKXyw@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: lst.de; dkim=none (message not signed)
- header.d=none;lst.de; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [199.255.45.62]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 6814ea6b-1cfb-43f3-7a3e-08d8d7ae49ac
-x-ms-traffictypediagnostic: BYAPR04MB6103:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <BYAPR04MB61031928F0502E4E701BEDE886809@BYAPR04MB6103.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:7219;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: cCy6xnz1d4/k3kQzxQkpngXSyUTraxjxjLN+024f5TNigvE3FlYaEl9lVFwJMpHkWBsvIA4wA3VXh/k7seLvJ/8cFjOfhnkqmMA7l1zJnSRNGXKxcRb2RD5Kh1/gMLH2ZTBautUYq743KAHa1AxeRhAWiXHvZDL2w+bQGuACnvf8PMi9BbVE9RCJiFSe6zkVueEKlOCchdzyIOuvS/QEJH4jtGkcHSnrAEARQdnFrAuO1lp8JKbgn+9/npWmTrN+typEJfD4Xc4SjvSmCxpNjJAke1tImx0gsSJMGk+QA+rE3tMUvKuCTzQZn0t+sLylboNSebhxryMzKPGZ9RJFNsevS0RiKvr/R9NJzUzIuq6iYktuIyULqHhEAyIsZrCnPYMUzrqHLtJ5mYp4zlSE2iPjlBng/vdQfqA3VA/FNUagDItoKJKtUu6/x5Sn3UaCzn8UFMXXwxPYcjR9D9L/D/CqGy4o2kVKBTgtaT3U+p4BxR0eUivkVUFh1o6XBPf+3FWY2dbXNdqDhD7ETLVg/g==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR04MB4965.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(376002)(39860400002)(136003)(366004)(396003)(6916009)(53546011)(2906002)(64756008)(83380400001)(186003)(33656002)(316002)(7416002)(8936002)(9686003)(86362001)(7696005)(91956017)(54906003)(76116006)(4326008)(5660300002)(26005)(66476007)(6506007)(55016002)(478600001)(66946007)(8676002)(71200400001)(66556008)(66446008)(52536014);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: =?us-ascii?Q?NWzywEJSfuafnJrhkTpuDkEvV34XsFUZ7j8cIbPIFCbaTq7e3Ph6LUnuOOhg?=
- =?us-ascii?Q?FOCg9QruFL1BdUNIhcAJYlKqgiw/S8sDB0DMKQBkhKyRPq/ORbrAFIHvEY3i?=
- =?us-ascii?Q?fSyrzAMXnCHB5rO66MeODmfUF9wdHKevMpWiogA0H88neW9gsyreNa5DLOV5?=
- =?us-ascii?Q?5Tuz/2/x9bGOBpnteFSRJsfgy3Fd1s+GtRprMx572tpbQAvTrAjx3EXlSUjf?=
- =?us-ascii?Q?QHKrkNgF9pb/Ep7cV3DlRgfjVz02VevoR6scZEQxqfIPNIGpRpUxgCJOVaq1?=
- =?us-ascii?Q?s3EaoNHMtnsFjnMXbj9XU7qH79EqTix20mKa/oxDQpwdTkuP8b/BZ7A3wWje?=
- =?us-ascii?Q?36w9fGssFEuXSV7ChlyT/tSpdqMbFh/0/8jyB9H6ZSSQjhzHftZVN6VdUG+J?=
- =?us-ascii?Q?wG+192i8v30SR/Qb6FXPgflAJDVISpqqYDW/VzwXgz2DsCA5vswNwTx61vd9?=
- =?us-ascii?Q?eikWSp6/k3URJqVV8bA4zsLuQrv+q/3y1/6oogOaw7N9Hjs0zBB7bHZ33KaQ?=
- =?us-ascii?Q?n6RP4YELTM9VTfb3O3hxbGai7exGkWUR2i7BVcum/npKlxk/ox5jhhQHdwMT?=
- =?us-ascii?Q?nM0PtJWCuSdh1nfSlpXfVUbHHxUKZ4imZUCq/YV/iUwQwU7fBh2qg3mIYTGq?=
- =?us-ascii?Q?4GPl4+8VUA3EuqEsEBrrngxONidWXKispnGOfyhyX397YyCbpiFkhudQueaW?=
- =?us-ascii?Q?A2yY+G8iVBnr1rH5wuN4Wonu9h9LFeLk+s1o3YNjDZIj6pAO9Ypf2XodoTkW?=
- =?us-ascii?Q?OXFRo3tL+WF8XdKVKIXbE8aYxI7LFgtfJCXhY6bvDtFjHyjFhco4I2nbfltu?=
- =?us-ascii?Q?7Su2s40z9L6ewG2YiOVTAs90GfmUfgKbKyJohV7T63HH8WTWUfQqCuRlkKDi?=
- =?us-ascii?Q?Cf/LJ3bEmXLs4K88y3/zy2l3z6127ME8hV6oX3OxOYdrolllJywonekH7BiP?=
- =?us-ascii?Q?G+bhKOKC7t900AF7or/M1xhN/eeEWjIAngmc0/Ivw+EMxqucUEdKfabNaq53?=
- =?us-ascii?Q?BJDs5rcx2PFB3Og2vcfM6a8/Mvf4/+RPjoenxefmWsJuKlZzSrC/8mhYRmxL?=
- =?us-ascii?Q?bAnEOoco3fU8wDaHkmGnd2b08Z7iz6G9xcwhRKo3XMUytAlr32my7HcTdrU9?=
- =?us-ascii?Q?k1PQayOZ6S6rEeLwKKwPvtTdlvQtLqAm2XkRCwouCj9DfT8ofBpz+kibvjYB?=
- =?us-ascii?Q?Ag0upDYbgxS2WeRhhhI5Gn/4MIKyivmtATmdxi/KD3SygFpKN9xMlRZCyDDN?=
- =?us-ascii?Q?dMyKFgAZqR4Tb5LilReY/jjk3mragPCVmh2R3Rft+svC92dZqt9xmA93CXF0?=
- =?us-ascii?Q?NQ9i8VpTULJuK9shUvrcYhZC?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Mon, 22 Feb 2021 22:56:44 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04423;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0UPKc-Tv_1614052555;
+Received: from admindeMacBook-Pro-2.local(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0UPKc-Tv_1614052555)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Tue, 23 Feb 2021 11:55:56 +0800
+Subject: Re: [PATCH v4 00/12] dm: support IO polling
+From:   JeffleXu <jefflexu@linux.alibaba.com>
+To:     snitzer@redhat.com, axboe@kernel.dk
+Cc:     hch@lst.de, ming.lei@redhat.com, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, io-uring@vger.kernel.org,
+        joseph.qi@linux.alibaba.com, caspar@linux.alibaba.com
+References: <20210220110637.50305-1-jefflexu@linux.alibaba.com>
+Message-ID: <e3b3fc0a-cd07-a09c-5a8d-2d81c5d00435@linux.alibaba.com>
+Date:   Tue, 23 Feb 2021 11:55:55 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.7.0
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR04MB4965.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6814ea6b-1cfb-43f3-7a3e-08d8d7ae49ac
-X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Feb 2021 03:51:23.1747
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 2Rl6iC7yCaYRodFPzsUjjJk8q0CcVtrJXvT42DDs0KlAPy8LCphrJJouLoT4NnwBXhVUdf+e09ExKtrJ7hmm0EHOsWLAKnxKuIUrQwltWlk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB6103
+In-Reply-To: <20210220110637.50305-1-jefflexu@linux.alibaba.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Christoph,=0A=
-=0A=
-On 2/22/21 19:07, John Stultz wrote:=0A=
-> [   34.785313]  bio_alloc_bioset+0x14/0x230=0A=
-> [   34.796189]  bio_clone_fast+0x28/0x80=0A=
-> [   34.799848]  bio_split+0x50/0xd0=0A=
-> [   34.803072]  blk_crypto_fallback_encrypt_bio+0x2ec/0x5e8=0A=
-> [   34.808384]  blk_crypto_fallback_bio_prep+0xfc/0x140=0A=
-> [   34.813345]  __blk_crypto_bio_prep+0x13c/0x150=0A=
-> [   34.817784]  submit_bio_noacct+0x3c0/0x548=0A=
-> [   34.821880]  submit_bio+0x48/0x200=0A=
-> [   34.825278]  ext4_io_submit+0x50/0x68=0A=
-> [   34.828939]  ext4_writepages+0x558/0xca8=0A=
-> [   34.832860]  do_writepages+0x58/0x108=0A=
-> [   34.836522]  __writeback_single_inode+0x44/0x510=0A=
-> [   34.841137]  writeback_sb_inodes+0x1e0/0x4a8=0A=
-> [   34.845404]  __writeback_inodes_wb+0x78/0xe8=0A=
-> [   34.849670]  wb_writeback+0x274/0x3e8=0A=
-> [   34.853328]  wb_workfn+0x308/0x5f0=0A=
-> [   34.856726]  process_one_work+0x1ec/0x4d0=0A=
-> [   34.860734]  worker_thread+0x44/0x478=0A=
-> [   34.864392]  kthread+0x140/0x150=0A=
-> [   34.867618]  ret_from_fork+0x10/0x30=0A=
-> [   34.871197] Code: a9ba7bfd 910003fd f9000bf3 7900bfa1 (f9403441)=0A=
-> [   34.877289] ---[ end trace e6c2a3ab108278f0 ]---=0A=
-> [   34.893636] Kernel panic - not syncing: Oops: Fatal exception=0A=
->=0A=
-Looking at the other call sites do we need something like following ?=0A=
-=0A=
-diff --git a/block/bounce.c b/block/bounce.c=0A=
-index fc55314aa426..f8a3656e89c3 100644=0A=
---- a/block/bounce.c=0A=
-+++ b/block/bounce.c=0A=
-@@ -217,6 +217,7 @@ static void bounce_end_io_read_isa(struct bio *bio)=0A=
- static struct bio *bounce_clone_bio(struct bio *bio_src, gfp_t gfp_mask,=
-=0A=
-                struct bio_set *bs)=0A=
- {=0A=
-+       unsigned int nr_iovecs =3D bio_segments(bio_src);=0A=
-        struct bvec_iter iter;=0A=
-        struct bio_vec bv;=0A=
-        struct bio *bio;=0A=
-@@ -243,7 +244,11 @@ static struct bio *bounce_clone_bio(struct bio=0A=
-*bio_src, gfp_t gfp_mask,=0A=
-         *    __bio_clone_fast() anyways.=0A=
-         */=0A=
- =0A=
--       bio =3D bio_alloc_bioset(gfp_mask, bio_segments(bio_src), bs);=0A=
-+       if (bs)=0A=
-+               bio =3D bio_alloc_bioset(gfp_mask, nr_iovecs, bs);=0A=
-+       else=0A=
-+               bio =3D bio_kmalloc(gfp_mask, nr_iovecs);=0A=
-+=0A=
-        if (!bio)=0A=
-                return NULL;=0A=
-        bio->bi_bdev            =3D bio_src->bi_bdev;=0A=
-=0A=
-Since __blk_queue_bounce() passes the NULL for the passthru case as a=0A=
-bio_set value ?=0A=
-=0A=
+
+
+On 2/20/21 7:06 PM, Jeffle Xu wrote:
+> [Changes since v3]
+> - newly add patch 7 and patch 11, as a new optimization improving
+> performance of multiple polling processes. Now performance of multiple
+> polling processes can be as scalable as single polling process (~30%).
+> Refer to the following [Performance] chapter for more details.
+> 
+
+Hi Mike, would please evaluate this new version patch set? I think this
+mechanism is near maturity, since multi-thread performance is as
+scalable as single-thread (~30%) now.
+
+
+Thanks
+Jeffle
+
+> 
+> [Intention]
+> Bio-based polling (e.g., for dm/md devices) is one indispensable part of
+> high performance IO stack. As far as I know, dm (e.g., dm-stripe) is
+> widely used in database, splicing several NVMe disks as one whole disk,
+> in hope of achieving better performance. With this patch set, io_uring
+> could be used upon dm devices.
+> 
+> 
+> [Optimizations]
+> Basically, there are three paths for IO polling.
+> 
+> 1. fastpath (patch 9/10)
+> The polling routine will go into this path when bio submitted to dm
+> device is not split.
+> 
+> In this case, there will be only one bio submitted to only one polling
+> hw queue of one underlying mq device, and thus we don't need to track
+> all split bios or iterate through all polling hw queues. The pointer to
+> the polling hw queue the bio submitted to is returned here as the
+> returned cookie. In this case, the polling routine will call
+> mq_ops->poll() directly with the hw queue converted from the input
+> cookie.
+> 
+> 
+> - One process reading dm-linear (mapping to three underlying NVMe devices,
+> with one polling hw queue per NVMe device).
+> 
+> (ioengine=io_uring, iodepth=128, numjobs=1, rw=randread, sqthread_poll=0
+> direct=1, bs=4k)
+> 
+> 	    	 | IOPS (IRQ mode) | IOPS (iopoll=1 mode) | diff
+> ---------------- | --------------- | -------------------- | ----
+> with patchset    |	      212k |		     284k | ~32%
+> 
+> 
+> - Three processes reading dm-linear (mapping to three underlying NVMe
+> devices, with one polling hw queue per NVMe device).
+> 
+> (ioengine=io_uring, iodepth=128, numjobs=3, rw=randread, sqthread_poll=0
+> direct=1, bs=4k)
+> 
+> 	    	 | IOPS (IRQ mode) | IOPS (iopoll=1 mode) | diff
+> ---------------- | --------------- | -------------------- | ----
+> with patchset    |	      615k |		     735k | ~16%
+> 
+> 
+> - Three processes reading dm-linear (mapping to three underlying NVMe
+> devices, with three polling hw queues per NVMe device), with every
+> process pinned to one CPU and mapped to one exclusive hw queue.
+> 
+> (ioengine=io_uring, iodepth=128, numjobs=3, rw=randread, sqthread_poll=0
+> direct=1, bs=4k)
+> 
+> 	    	 | IOPS (IRQ mode) | IOPS (iopoll=1 mode) | diff
+> ---------------- | --------------- | -------------------- | ----
+> with patchset    |	      631k |		     833k | ~32%
+> 
+> 
+> 
+> 2. sub-fastpath (patch 7/11)
+> 
+> The polling routine will go into this path when bio submitted to dm
+> device gets split and enqueued into multiple hw queues, while the IO
+> submission process has not been migrated to another CPU.
+> 
+> In this case, the IO submission routine will return the CPU number on
+> which the IO submission happened as the returned cookie, while the
+> polling routine will only iterate and poll on hw queues that this CPU
+> number maps, instead of iterating *all* hw queues.
+> 
+> This optimization can dramatically reduce cache ping-pong and thus
+> improve the polling performance, when multiple hw queues in polling mode
+> per device could be reserved when there are multiple polling processes.
+> 
+> - Three processes reading dm-stripe (mapping to three underlying NVMe
+> devices, with three polling hw queues per NVMe device), with every
+> process pinned to one CPU and mapped to one exclusive hw queue.
+> 
+> (ioengine=io_uring, iodepth=128, numjobs=3, rw=randread, sqthread_poll=0
+> direct=1, bs=12k(4k for every NVMe device))
+> 
+> 	    	 | IOPS (IRQ mode) | IOPS (iopoll=1 mode) | diff
+> ---------------- | --------------- | -------------------- | ----
+> with patchset    |	      307k |		     412k | ~34%
+> 
+> 
+> 3. default path
+> 
+> It will fall back to iterating all hw queues in polling mode, once bio
+> submitted to dm device gets split and enqueued into multiple hw queues,
+> and the IO process has ever been migrated to another CPU during the IO
+> submission phase.
+> 
+> 
+> [Remained Issue]
+> It has been mentioned in patch 4 that, users could change the state of
+> the underlying devices through '/sys/block/<dev>/io_poll', bypassing
+> the dm device above. Thus it can cause a situation where QUEUE_FLAG_POLL
+> is still set for the request_queue of dm device, while one of the
+> underlying mq device may has cleared this flag.
+> 
+> In this case, it will pass the 'test_bit(QUEUE_FLAG_POLL, &q->queue_flags)'
+> check in blk_poll(), while the input cookie may actually points to a hw
+> queue in IRQ mode since patch 11. Thus for this hw queue (in IRQ mode),
+> the bio-based polling routine will handle this hw queue acquiring
+> 'spin_lock(&nvmeq->cq_poll_lock)' (refer
+> drivers/nvme/host/pci.c:nvme_poll), which is not adequate since this hw
+> queue may also be accessed in IRQ context. In other words,
+> spin_lock_irq() should be used here.
+> 
+> I have not come up one simple way to fix it. I don't want to do sanity
+> check (e.g., the type of the hw queue is HCTX_TYPE_POLL or not) in the
+> IO path (submit_bio()/blk_poll()), i.e., fast path.
+> 
+> We'd better fix it in the control path, i.e., dm could be aware of the
+> change when attribute (e.g., support io_poll or not) of one of the
+> underlying devices changed at runtime.
+> 
+> 
+> 
+> 
+> [Changes since v2]
+> 
+> Patchset v2 caches all hw queues (in polling mode) of underlying mq
+> devices in dm layer. The polling routine actually iterates through all
+> these cached hw queues.
+> 
+> However, mq may change the queue mapping at runtime (e.g., NVMe RESET
+> command), thus the cached hw queues in dm layer may be out-of-date. Thus
+> patchset v3 falls back to the implementation of the very first RFC
+> version, in which the mq layer needs to export one interface iterating
+> all polling hw queues (patch 5), and the bio-based polling routine just
+> calls this interface to iterate all polling hw queues.
+> 
+> Besides, several new optimization is proposed.
+> 
+> 
+> - patch 1,2,7
+> same as v2, untouched
+> 
+> - patch 3
+> Considering advice from Christoph Hellwig, while refactoring blk_poll(),
+> split mq and bio-based polling routine from the very beginning. Now
+> blk_poll() is just a simple entry. blk_bio_poll() is simply copied from
+> blk_mq_poll(), while the loop structure is some sort of duplication
+> though.
+> 
+> - patch 4
+> This patch is newly added to support turning on/off polling through
+> '/sys/block/<dev>/queue/io_poll' dynamiclly for bio-based devices.
+> Patchset v2 implemented this functionality by added one new queue flag,
+> which is not preferred since the queue flag resource is quite short of
+> nowadays.
+> 
+> - patch 5
+> This patch is newly added, preparing for the following bio-based
+> polling. The following bio-based polling will call this helper function,
+> accounting on the corresponding hw queue.
+> 
+> - patch 6
+> It's from the very first RFC version, preparing for the following
+> bio-based polling.
+> 
+> - patch 8
+> One fixing patch needed by the following bio-based polling. It's
+> actually a v2 of [1]. I had sent the v2 singly in-reply-to [1], though
+> it has not been visible on the mailing list maybe due to the delay.
+> 
+> - patch 9
+> It's from the very first RFC version.
+> 
+> - patch 10
+> This patch is newly added. Patchset v2 had ever proposed one
+> optimization that, skipping the **busy** hw queues during the iteration
+> phase. Back upon that time, one flag of 'atomic_t' is specifically
+> maintained in dm layer, representing if the corresponding hw queue is
+> busy or not. The idea is inherited, while the implementation changes.
+> Now @nvmeq->cq_poll_lock is used directly here, no need for extra flag
+> anymore.
+> 
+> This optimization can significantly reduce the competition for one hw
+> queue between multiple polling instances. Following statistics is the
+> test result when 3 threads concurrently randread (bs=4k, direct=1) one
+> dm-linear device, which is built upon 3 nvme devices, with one polling
+> hw queue per nvme device.
+> 
+> 	    | IOPS (IRQ mode) | IOPS (iopoll=1 mode) | diff
+> ----------- | --------------- | -------------------- | ----
+> without opt | 		 318k |		 	256k | ~-20%
+> with opt    |		 314k |		 	354k | ~13%
+> 							
+> 
+> - patch 11
+> This is another newly added optimizatin for bio-based polling.
+> 
+> One intuitive insight is that, when the original bio submitted to dm
+> device doesn't get split, then the bio gets enqueued into only one hw
+> queue of one of the underlying mq devices. In this case, we no longer
+> need to track all split bios, and one cookie (for the only split bio)
+> is enough. It is implemented by returning the pointer to the
+> corresponding hw queue in this case.
+> 
+> It should be safe by directly returning the pointer to the hw queue,
+> since 'struct blk_mq_hw_ctx' won't be freed during the whole lifetime of
+> 'struct request_queue'. Even when the number of hw queues may decrease
+> when NVMe RESET happens, the 'struct request_queue' structure of decreased
+> hw queues won't be freed, instead it's buffered into
+> &q->unused_hctx_list list.
+> 
+> Though this optimization seems quite intuitive, the performance test
+> shows that it does no benefit nor harm to the performance, while 3
+> threads concurrently randreading (bs=4k, direct=1) one dm-linear
+> device, which is built upon 3 nvme devices, with one polling hw queue
+> per nvme device.
+> 
+> I'm not sure why it doesn't work, maybe because the number of devices,
+> or the depth of the devcice stack is to low in my test case?
+> 
+> 
+> changes since v1:
+> - patch 1,2,4 is the same as v1 and have already been reviewed
+> - patch 3 is refactored a bit on the basis of suggestions from
+> Mike Snitzer.
+> - patch 5 is newly added and introduces one new queue flag
+> representing if the queue is capable of IO polling. This mainly
+> simplifies the logic in queue_poll_store().
+> - patch 6 implements the core mechanism supporting IO polling.
+> The sanity check checking if the dm device supports IO polling is
+> also folded into this patch, and the queue flag will be cleared if
+> it doesn't support, in case of table reloading.
+> 
+> 
+> 
+> 
+> Jeffle Xu (12):
+>   block: move definition of blk_qc_t to types.h
+>   block: add queue_to_disk() to get gendisk from request_queue
+>   block: add poll method to support bio-based IO polling
+>   block: add poll_capable method to support bio-based IO polling
+>   blk-mq: extract one helper function polling hw queue
+>   blk-mq: add iterator for polling hw queues
+>   blk-mq: add one helper function getting hw queue
+>   dm: always return BLK_QC_T_NONE for bio-based device
+>   nvme/pci: don't wait for locked polling queue
+>   block: fastpath for bio-based polling
+>   block: sub-fastpath for bio-based polling
+>   dm: support IO polling for bio-based dm device
+> 
+>  block/blk-core.c              | 112 +++++++++++++++++++++++++++++++++-
+>  block/blk-mq.c                |  37 ++++-------
+>  block/blk-sysfs.c             |  14 ++++-
+>  drivers/md/dm-table.c         |  26 ++++++++
+>  drivers/md/dm.c               | 102 ++++++++++++++++++++++++++-----
+>  drivers/nvme/host/pci.c       |   4 +-
+>  include/linux/blk-mq.h        |  23 +++++++
+>  include/linux/blk_types.h     |  66 +++++++++++++++++++-
+>  include/linux/blkdev.h        |   4 ++
+>  include/linux/device-mapper.h |   1 +
+>  include/linux/fs.h            |   2 +-
+>  include/linux/types.h         |   3 +
+>  include/trace/events/kyber.h  |   6 +-
+>  13 files changed, 350 insertions(+), 50 deletions(-)
+> 
+
+-- 
+Thanks,
+Jeffle
