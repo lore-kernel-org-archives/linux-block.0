@@ -4,140 +4,131 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56A0CC43381
-	for <linux-block@archiver.kernel.org>; Wed, 24 Feb 2021 01:17:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF011C433DB
+	for <linux-block@archiver.kernel.org>; Wed, 24 Feb 2021 01:41:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1CBC664E21
-	for <linux-block@archiver.kernel.org>; Wed, 24 Feb 2021 01:17:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 736D164E7A
+	for <linux-block@archiver.kernel.org>; Wed, 24 Feb 2021 01:41:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233691AbhBXBQ6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Feb 2021 20:16:58 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:37088 "EHLO
+        id S232014AbhBXBlE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Feb 2021 20:41:04 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34209 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233582AbhBXAlN (ORCPT
+        by vger.kernel.org with ESMTP id S232050AbhBXBlD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Feb 2021 19:41:13 -0500
+        Tue, 23 Feb 2021 20:41:03 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614127176;
+        s=mimecast20190719; t=1614130776;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=5yWW5XOpCbYIsCmTqtOH2R27GfGNH2jDGr2dQJVGvIg=;
-        b=DhY+1TQulG3ACS6oENCGF/pLufm1me2E+wUofmA3R0VWyedDOCqv6TxbeEExVhdzbcBB4D
-        KMFuC7PVyteygVvpg8CJEtgjGfGEaLrZXj38LMpy3tlfILpVu/Rz5JnUWvfEvXraGD3IcY
-        Z6JAU5oy/IolePFyTzhJ7llyKc/cYL0=
+        bh=VZuELx3YPIz0q6Av5RIhb7o/L20RAqonrzXYZvGp11k=;
+        b=MDqmV06eZXoQc8ol9otNYqyp7gq0antJyTT/jlRl1QUjojM9Tzcn6U6t/j7LZLc003mcBb
+        0d07aMs6eGbvXJpKuXlZBthpu4yzqXQWJQ2cKH6NohxmIBy6WMlve8fT3LGUYRLkyVXkbK
+        YZ9whbRxflUo7mWFjUPN2Yn/HLhkjcY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-470-uKtNNRe4ON2UvIook1-IRA-1; Tue, 23 Feb 2021 19:39:32 -0500
-X-MC-Unique: uKtNNRe4ON2UvIook1-IRA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-31-zVEFquoONYiWZ4hVboyUgg-1; Tue, 23 Feb 2021 20:39:02 -0500
+X-MC-Unique: zVEFquoONYiWZ4hVboyUgg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1B0D7835E21;
-        Wed, 24 Feb 2021 00:39:31 +0000 (UTC)
-Received: from T590 (ovpn-12-117.pek2.redhat.com [10.72.12.117])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id BB3B66F998;
-        Wed, 24 Feb 2021 00:39:21 +0000 (UTC)
-Date:   Wed, 24 Feb 2021 08:39:17 +0800
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3D3F1100CCC2;
+        Wed, 24 Feb 2021 01:39:01 +0000 (UTC)
+Received: from T590 (ovpn-13-84.pek2.redhat.com [10.72.13.84])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9EF8C2C01F;
+        Wed, 24 Feb 2021 01:38:55 +0000 (UTC)
+Date:   Wed, 24 Feb 2021 09:38:50 +0800
 From:   Ming Lei <ming.lei@redhat.com>
-To:     Mikulas Patocka <mpatocka@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Mike Snitzer <msnitzer@redhat.com>,
-        Marian Csontos <mcsontos@redhat.com>,
-        linux-block@vger.kernel.org, dm-devel@redhat.com
-Subject: Re: [PATCH v2] blk-settings: make sure that max_sectors is aligned
- on "logical_block_size" boundary
-Message-ID: <YDWgNbz9ZX2Rjc+X@T590>
-References: <alpine.LRH.2.02.2102221312070.5407@file01.intranet.prod.int.rdu2.redhat.com>
- <YDSwyrLeiP/fKgZH@T590>
- <alpine.LRH.2.02.2102231125170.27597@file01.intranet.prod.int.rdu2.redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        Tom Seewald <tseewald@gmail.com>
+Subject: Re: [PATCH] block: reopen the device in blkdev_reread_part
+Message-ID: <YDWuKk3SkyMCFfci@T590>
+References: <20210223151822.399791-1-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <alpine.LRH.2.02.2102231125170.27597@file01.intranet.prod.int.rdu2.redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20210223151822.399791-1-hch@lst.de>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Feb 23, 2021 at 11:28:27AM -0500, Mikulas Patocka wrote:
+On Tue, Feb 23, 2021 at 04:18:22PM +0100, Christoph Hellwig wrote:
+> Historically the BLKRRPART ioctls called into the now defunct ->revalidate
+> method, which caused the sd driver to check if any media is present.
+> When the ->revalidate method was removed this revalidation was lost,
+> leading to lots of I/O errors when using the eject command.  Fix this by
+> reopening the device to rescan the partitions, and thus calling the
+> revalidation logic in the sd driver.
 > 
-> 
-> On Tue, 23 Feb 2021, Ming Lei wrote:
-> 
-> > I'd suggest to add a helper(such as, blk_round_down_sectors()) to round_down each
-> > one.
-> 
-> Yes - Here I'm sending the updated patch.
-> 
-> > -- 
-> > Ming
-> 
-> From: Mikulas Patocka <mpatocka@redhat.com>
-> 
-> We get I/O errors when we run md-raid1 on the top of dm-integrity on the
-> top of ramdisk.
-> device-mapper: integrity: Bio not aligned on 8 sectors: 0xff00, 0xff
-> device-mapper: integrity: Bio not aligned on 8 sectors: 0xff00, 0xff
-> device-mapper: integrity: Bio not aligned on 8 sectors: 0xffff, 0x1
-> device-mapper: integrity: Bio not aligned on 8 sectors: 0xffff, 0x1
-> device-mapper: integrity: Bio not aligned on 8 sectors: 0x8048, 0xff
-> device-mapper: integrity: Bio not aligned on 8 sectors: 0x8147, 0xff
-> device-mapper: integrity: Bio not aligned on 8 sectors: 0x8246, 0xff
-> device-mapper: integrity: Bio not aligned on 8 sectors: 0x8345, 0xbb
-> 
-> The ramdisk device has logical_block_size 512 and max_sectors 255. The
-> dm-integrity device uses logical_block_size 4096 and it doesn't affect the
-> "max_sectors" value - thus, it inherits 255 from the ramdisk. So, we have
-> a device with max_sectors not aligned on logical_block_size.
-> 
-> The md-raid device sees that the underlying leg has max_sectors 255 and it
-> will split the bios on 255-sector boundary, making the bios unaligned on
-> logical_block_size.
-> 
-> In order to fix the bug, we round down max_sectors to logical_block_size.
-> 
-> Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
-> Cc: stable@vger.kernel.org
-> 
+> Fixes: 471bd0af544b ("sd: use bdev_check_media_change")
+> Reported--by: Tom Seewald <tseewald@gmail.com>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Tested-by: Tom Seewald <tseewald@gmail.com>
 > ---
->  block/blk-settings.c |   12 ++++++++++++
->  1 file changed, 12 insertions(+)
+>  block/ioctl.c | 21 ++++++++++++++-------
+>  1 file changed, 14 insertions(+), 7 deletions(-)
 > 
-> Index: linux-2.6/block/blk-settings.c
-> ===================================================================
-> --- linux-2.6.orig/block/blk-settings.c	2021-02-23 17:18:59.000000000 +0100
-> +++ linux-2.6/block/blk-settings.c	2021-02-23 17:23:58.000000000 +0100
-> @@ -481,6 +481,14 @@ void blk_queue_io_opt(struct request_que
+> diff --git a/block/ioctl.c b/block/ioctl.c
+> index d61d652078f41c..ff241e663c018f 100644
+> --- a/block/ioctl.c
+> +++ b/block/ioctl.c
+> @@ -81,20 +81,27 @@ static int compat_blkpg_ioctl(struct block_device *bdev,
 >  }
->  EXPORT_SYMBOL(blk_queue_io_opt);
+>  #endif
 >  
-> +static unsigned int blk_round_down_sectors(unsigned int sectors, unsigned int lbs)
-> +{
-> +	sectors = round_down(sectors, lbs >> SECTOR_SHIFT);
-> +	if (sectors < PAGE_SIZE >> SECTOR_SHIFT)
-> +		sectors = PAGE_SIZE >> SECTOR_SHIFT;
-> +	return sectors;
-> +}
-> +
->  /**
->   * blk_stack_limits - adjust queue_limits for stacked devices
->   * @t:	the stacking driver limits (top device)
-> @@ -607,6 +615,10 @@ int blk_stack_limits(struct queue_limits
->  		ret = -1;
->  	}
+> -static int blkdev_reread_part(struct block_device *bdev)
+> +static int blkdev_reread_part(struct block_device *bdev, fmode_t mode)
+>  {
+> -	int ret;
+> +	struct block_device *tmp;
 >  
-> +	t->max_sectors = blk_round_down_sectors(t->max_sectors, t->logical_block_size);
-> +	t->max_hw_sectors = blk_round_down_sectors(t->max_hw_sectors, t->logical_block_size);
-> +	t->max_dev_sectors = blk_round_down_sectors(t->max_dev_sectors, t->logical_block_size);
-> +
->  	/* Discard alignment and granularity */
->  	if (b->discard_granularity) {
->  		alignment = queue_limit_discard_alignment(b, start);
+>  	if (!disk_part_scan_enabled(bdev->bd_disk) || bdev_is_partition(bdev))
+>  		return -EINVAL;
+>  	if (!capable(CAP_SYS_ADMIN))
+>  		return -EACCES;
+>  
+> -	mutex_lock(&bdev->bd_mutex);
+> -	ret = bdev_disk_changed(bdev, false);
+> -	mutex_unlock(&bdev->bd_mutex);
+> +	/*
+> +	 * Reopen the device to revalidate the driver state and force a
+> +	 * partition rescan.
+> +	 */
+> +	mode &= ~FMODE_EXCL;
+> +	set_bit(GD_NEED_PART_SCAN, &bdev->bd_disk->state);
+>  
+> -	return ret;
+> +	tmp = blkdev_get_by_dev(bdev->bd_dev, mode, NULL);
+> +	if (IS_ERR(tmp))
+> +		return PTR_ERR(tmp);
+> +	blkdev_put(tmp, mode);
+> +	return 0;
+>  }
+>  
+>  static int blk_ioctl_discard(struct block_device *bdev, fmode_t mode,
+> @@ -498,7 +505,7 @@ static int blkdev_common_ioctl(struct block_device *bdev, fmode_t mode,
+>  		bdev->bd_bdi->ra_pages = (arg * 512) / PAGE_SIZE;
+>  		return 0;
+>  	case BLKRRPART:
+> -		return blkdev_reread_part(bdev);
+> +		return blkdev_reread_part(bdev, mode);
+>  	case BLKTRACESTART:
+>  	case BLKTRACESTOP:
+>  	case BLKTRACETEARDOWN:
+> -- 
+> 2.29.2
+> 
+
+Looks fine,
 
 Reviewed-by: Ming Lei <ming.lei@redhat.com>
+
 
 -- 
 Ming
