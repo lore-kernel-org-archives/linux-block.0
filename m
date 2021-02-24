@@ -2,129 +2,94 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 244FEC433DB
-	for <linux-block@archiver.kernel.org>; Wed, 24 Feb 2021 11:02:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3233C433DB
+	for <linux-block@archiver.kernel.org>; Wed, 24 Feb 2021 11:21:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CD6E264E4B
-	for <linux-block@archiver.kernel.org>; Wed, 24 Feb 2021 11:02:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 64537600CF
+	for <linux-block@archiver.kernel.org>; Wed, 24 Feb 2021 11:21:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234923AbhBXLCQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Feb 2021 06:02:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39080 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234385AbhBXLB6 (ORCPT
+        id S231978AbhBXLVp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Feb 2021 06:21:45 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35550 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232806AbhBXLVi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Feb 2021 06:01:58 -0500
-Received: from mail-yb1-xb2b.google.com (mail-yb1-xb2b.google.com [IPv6:2607:f8b0:4864:20::b2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F23DBC061574;
-        Wed, 24 Feb 2021 03:01:17 -0800 (PST)
-Received: by mail-yb1-xb2b.google.com with SMTP id u3so1443540ybk.6;
-        Wed, 24 Feb 2021 03:01:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=q5EBUPu7DHD+FuA5SGZ+0iNoNfQivrRarTOBbjTJdyk=;
-        b=PpKt4nXgl8dkkxBzxuaLrjlXX0hqqCr8wUyXp2yPXNJFwryHemyu90dCsMWVBumO+n
-         1RL9h3nYbcv61lEowunFuKgz64z7Yzeh8Lgpc+qhcQk3o47Q8vXTa/1JqCs0I07wh3ha
-         Uz5wfupBLDaMNbhfqzaE3k0qhkd7I5DtWuNC4bkQLJKrI5aDDHXPPyyYB1y2GQNdUs5T
-         5kHhKZrfhGu76w2/xSocoV9KQw24jWXlmIw0Kwd03g0L4j4RAnepznV2u3xE8Gs6fLMU
-         EAMzIh826mV8TtupQHPvIlfwN+/s/AhkuamaO0KCG5dcOHlst96H3i75lGMtPG9LM+IU
-         /Deg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=q5EBUPu7DHD+FuA5SGZ+0iNoNfQivrRarTOBbjTJdyk=;
-        b=IzZAkbHDJe/QJxIrdWGAU7lMkIiSCp/M20ACbkl7H7Z5BowIQYipLWV7JJ9QJkuuW2
-         kN2KRYe5dcOGCPBVIqqtcpQ61KZsSSD49GQu1czAov4HVUKBslbkpxTCRC1XGaG8D9dQ
-         ZYREryi2RCLrupnbYaye33/JzV03zilCFZANV0ekc+HR+M2kCOielz1OJJbYbmjFROlV
-         60DsShvsNHn70F56NyAX11S9HJTj3eZYrSGBsScWRdo1g6LeIwZGjKLQm6pulRX5oyT6
-         RAeGJM735uA3Q0JYf6Gf6WJFtZe1M6Mw4q6QIop2j9K6Rt1xV21x8c9mIz6PtGJdr9aS
-         K5Fg==
-X-Gm-Message-State: AOAM53144j2dPkZAsYro/5kmeOUcS4zkYpsR/piAqpI8etuM+Yil6d4v
-        lJLETuMZhNYS//i8LnwTuWMrGnELvGVAkZyE49I=
-X-Google-Smtp-Source: ABdhPJxhiCfGjIzPOx2Fqgi7qb3IEYMwNvLkNSu5A5vWCLP2a0ja0byv/ganfMSniEGrB2L8iDsLWc4l18D5rmld2Ec=
-X-Received: by 2002:a25:324b:: with SMTP id y72mr46115248yby.233.1614164477289;
- Wed, 24 Feb 2021 03:01:17 -0800 (PST)
+        Wed, 24 Feb 2021 06:21:38 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1614165612;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=3jJ4jc72M5PbEjXxT0Wi0W4m7621PUvO0etSZ1MK8OI=;
+        b=EqnD18adXbhD/DyybQvxo//gxRor9S+OpPL6GFji0kc+bpKFNOkrPKrnY2PDi0523VB4kE
+        zLEpW4fTMdHWASQz5y51WVaIXwMHG8ViMNhyetPJQ6pKGOschgBVRPz17TkGSnK6PBMI/o
+        V6m+WPn3zpDZfaqZ2IyFNP/3XAUcipk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-189-v2JpZjoCONSLnFILOV-duA-1; Wed, 24 Feb 2021 06:20:08 -0500
+X-MC-Unique: v2JpZjoCONSLnFILOV-duA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CC7661008304;
+        Wed, 24 Feb 2021 11:20:06 +0000 (UTC)
+Received: from T590 (ovpn-12-63.pek2.redhat.com [10.72.12.63])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 954026064B;
+        Wed, 24 Feb 2021 11:19:57 +0000 (UTC)
+Date:   Wed, 24 Feb 2021 19:19:52 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Satya Tangirala <satyat@google.com>,
+        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        John Stultz <john.stultz@linaro.org>,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH 4/4] block: memory allocations in bounce_clone_bio must
+ not fail
+Message-ID: <YDY2WPtSLmvNt0W2@T590>
+References: <20210224072407.46363-1-hch@lst.de>
+ <20210224072407.46363-5-hch@lst.de>
 MIME-Version: 1.0
-References: <20210224072516.74696-1-uwe@kleine-koenig.org>
-In-Reply-To: <20210224072516.74696-1-uwe@kleine-koenig.org>
-From:   Anatoly Pugachev <matorola@gmail.com>
-Date:   Wed, 24 Feb 2021 14:01:06 +0300
-Message-ID: <CADxRZqzG7jtNwYsdnO1xm8FLes_+GqTB=2naxaUTP2MNkzGG3g@mail.gmail.com>
-Subject: Re: [PATCH v2] vio: make remove callback return void
-To:     =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <uwe@kleine-koenig.org>
-Cc:     Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jens Axboe <axboe@kernel.dk>, Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Peter Huewe <peterhuewe@gmx.de>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Haren Myneni <haren@us.ibm.com>,
-        =?UTF-8?Q?Breno_Leit=C3=A3o?= <leitao@debian.org>,
-        Nayna Jain <nayna@linux.ibm.com>,
-        Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
-        Steven Royer <seroyer@linux.ibm.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Cristobal Forno <cforno12@linux.ibm.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Dany Madden <drt@linux.ibm.com>, Lijun Pan <ljp@linux.ibm.com>,
-        Sukadev Bhattiprolu <sukadev@linux.ibm.com>,
-        Tyrel Datwyler <tyreld@linux.ibm.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Michael Cyr <mikecyr@linux.ibm.com>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        linuxppc-dev@lists.ozlabs.org,
-        Linux Kernel list <linux-kernel@vger.kernel.org>,
-        Sparc kernel list <sparclinux@vger.kernel.org>,
-        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-integrity@vger.kernel.org, netdev@vger.kernel.org,
-        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210224072407.46363-5-hch@lst.de>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Feb 24, 2021 at 11:17 AM Uwe Kleine-K=C3=B6nig <uwe@kleine-koenig.o=
-rg> wrote:
->
-> The driver core ignores the return value of struct bus_type::remove()
-> because there is only little that can be done. To simplify the quest to
-> make this function return void, let struct vio_driver::remove() return
-> void, too. All users already unconditionally return 0, this commit makes
-> it obvious that returning an error code is a bad idea and makes it
-> obvious for future driver authors that returning an error code isn't
-> intended.
->
-> Note there are two nominally different implementations for a vio bus:
-> one in arch/sparc/kernel/vio.c and the other in
-> arch/powerpc/platforms/pseries/vio.c. I didn't care to check which
-> driver is using which of these busses (or if even some of them can be
-> used with both) and simply adapt all drivers and the two bus codes in
-> one go.
+On Wed, Feb 24, 2021 at 08:24:07AM +0100, Christoph Hellwig wrote:
+> The caller can't cope with a failure from bounce_clone_bio, so
+> use __GFP_NOFAIL for the passthrough case.  bio_alloc_bioset already
+> won't fail due to the use of mempools.
+> 
+> And yes, we need to get rid of this bock layer bouncing code entirely
+> sooner or later..
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  block/bounce.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
+> 
+> diff --git a/block/bounce.c b/block/bounce.c
+> index 417faaac36b691..87983a35079c22 100644
+> --- a/block/bounce.c
+> +++ b/block/bounce.c
+> @@ -242,12 +242,11 @@ static struct bio *bounce_clone_bio(struct bio *bio_src)
+>  	 *    __bio_clone_fast() anyways.
+>  	 */
+>  	if (bio_is_passthrough(bio_src))
+> -		bio = bio_kmalloc(GFP_NOIO, bio_segments(bio_src));
+> +		bio = bio_kmalloc(GFP_NOIO | __GFP_NOFAIL,
+> +				  bio_segments(bio_src));
 
-Applied over current git kernel, boots on my sparc64 LDOM (sunvdc
-block driver which uses vio).
-Linux ttip 5.11.0-10201-gc03c21ba6f4e-dirty #189 SMP Wed Feb 24
-13:48:37 MSK 2021 sparc64 GNU/Linux
-boot logs (and kernel config) on [1] for "5.11.0-10201-gc03c21ba6f4e-dirty"=
-.
-Up to you to add "tested-by".
-Thanks.
+bio_kmalloc() still may fail if bio_segments(bio_src) is > UIO_MAXIOV.
 
-1. https://github.com/mator/sparc64-dmesg
 
-PS: going to check with ppc64 later as well on LPAR (uses vio).
+-- 
+Ming
+
