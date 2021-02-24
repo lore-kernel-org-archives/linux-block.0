@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B22F5C433DB
-	for <linux-block@archiver.kernel.org>; Wed, 24 Feb 2021 07:30:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12D54C433E0
+	for <linux-block@archiver.kernel.org>; Wed, 24 Feb 2021 07:30:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 542D164ECF
-	for <linux-block@archiver.kernel.org>; Wed, 24 Feb 2021 07:30:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A48E964ECF
+	for <linux-block@archiver.kernel.org>; Wed, 24 Feb 2021 07:30:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231830AbhBXHaB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Feb 2021 02:30:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50172 "EHLO
+        id S233521AbhBXHaV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Feb 2021 02:30:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50224 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234371AbhBXHaA (ORCPT
+        with ESMTP id S232453AbhBXHaO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Feb 2021 02:30:00 -0500
+        Wed, 24 Feb 2021 02:30:14 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D97D4C061574
-        for <linux-block@vger.kernel.org>; Tue, 23 Feb 2021 23:29:19 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0664C06174A
+        for <linux-block@vger.kernel.org>; Tue, 23 Feb 2021 23:29:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=KApmaFE0CLCq8ntx3/Q1++hKQ3ATXV4KSXg5+UXa1mU=; b=S7SnOvqexn6dxuZRlN+VT7aGlB
-        NSFaqsXvL+lFrkaNpAHwrWKLHFc+Q4bEZzcCQgjppSMitwHyKzf8+aYsKouLFl1PbGL9jOi6UVbb0
-        ee7YLDjxeMxwbjMLBspELrVR8Z3DD/BLSDRS05l+ndWCV0eWwmP1M8CaN7cBwwwx84IgJv9JpGf0t
-        bPeBtP2qcTSMZf7/NpdXtVnZWfjTK+dcvOUALGXt0NuVUrxEHxPbGyRrjK4Mn3+bWQArBTbOX0ZuG
-        FTCkhbPl5D+15qTcxrtXgoBL2qTI5d7hVPT23IrCG+V9eGtYfPrc+45fmy8WK18KqNBC6Kqls4WMu
-        tR/Fjohw==;
-Received: from 213-225-9-156.nat.highway.a1.net ([213.225.9.156] helo=localhost)
+        bh=ONLVj2QSujtOtbvfhfJgfbnxPjQkq6uN4eCX/6DvZaU=; b=Vevf+PRSI+bXtW/1SimtJ/HiWV
+        1SQ8fmfY1AcTzeor5yPOaYRZgl/Y1v0oeZG13vITiGae64A+Xsglz1Rtil642Qol/x9HLlxvNvK8l
+        3zK9HOqVbfOfvQhn3RN17puh6TbFDqzHVAV6RbjAT70+6N9GTU5HelzX3uziKXNYwulSjxCnKtVEy
+        O2GtZrS04+pbDfuo0MZDYcIgX6WQ8g8dc+us3TAHonTOl3Cr8/RbcFEmbsDknaQxUSDB27gHVMl4d
+        2UmkY3wHjFUyPgVqJh7nSdC4Nq8tleILDf1paR7E3jsMg4GHOPTsS7O6DlWUWyl3Gb10Xt26hHlER
+        rBkjAI8Q==;
+Received: from [2001:4bb8:188:6508:b7b:4fb9:de1e:2c81] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
-        id 1lEobO-0096fo-FD; Wed, 24 Feb 2021 07:29:00 +0000
+        id 1lEobe-0096gu-AI; Wed, 24 Feb 2021 07:29:14 +0000
 From:   Christoph Hellwig <hch@lst.de>
 Cc:     Jens Axboe <axboe@kernel.dk>, Satya Tangirala <satyat@google.com>,
         Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
         John Stultz <john.stultz@linaro.org>,
         linux-block@vger.kernel.org
-Subject: [PATCH 1/4] block-crypto-fallback: use a bio_set for splitting bios
-Date:   Wed, 24 Feb 2021 08:24:04 +0100
-Message-Id: <20210224072407.46363-2-hch@lst.de>
+Subject: [PATCH 2/4] block: fix bounce_clone_bio for passthrough bios
+Date:   Wed, 24 Feb 2021 08:24:05 +0100
+Message-Id: <20210224072407.46363-3-hch@lst.de>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210224072407.46363-1-hch@lst.de>
 References: <20210224072407.46363-1-hch@lst.de>
@@ -55,66 +55,73 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-bio_split with a NULL bs argumen used to fall back to kmalloc the
-bio, which does not guarantee forward progress and could to deadlocks.
-Now that the overloading of the NULL bs argument to bio_alloc_bioset
-has been removed it crashes instead.  Fix all that by using a special
-crafted bioset.
+Now that bio_alloc_bioset does not fall back to kmalloc for a NULL
+bio_set, handle that case explicitly and simplify the calling
+conventions.
+
+Based on an earlier patch from Chaitanya Kulkarni.
 
 Fixes: 3175199ab0ac ("block: split bio_kmalloc from bio_alloc_bioset")
-Reported-by: John Stultz <john.stultz@linaro.org>
+Reported-by: Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
 Signed-off-by: Christoph Hellwig <hch@lst.de>
-Tested-by: John Stultz <john.stultz@linaro.org>
 ---
- block/blk-crypto-fallback.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+ block/bounce.c | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
 
-diff --git a/block/blk-crypto-fallback.c b/block/blk-crypto-fallback.c
-index e8327c50d7c9f4..c176b7af56a7a5 100644
---- a/block/blk-crypto-fallback.c
-+++ b/block/blk-crypto-fallback.c
-@@ -80,6 +80,7 @@ static struct blk_crypto_keyslot {
- static struct blk_keyslot_manager blk_crypto_ksm;
- static struct workqueue_struct *blk_crypto_wq;
- static mempool_t *blk_crypto_bounce_page_pool;
-+static struct bio_set crypto_bio_split;
- 
- /*
-  * This is the key we set when evicting a keyslot. This *should* be the all 0's
-@@ -224,7 +225,8 @@ static bool blk_crypto_split_bio_if_needed(struct bio **bio_ptr)
- 	if (num_sectors < bio_sectors(bio)) {
- 		struct bio *split_bio;
- 
--		split_bio = bio_split(bio, num_sectors, GFP_NOIO, NULL);
-+		split_bio = bio_split(bio, num_sectors, GFP_NOIO,
-+				      &crypto_bio_split);
- 		if (!split_bio) {
- 			bio->bi_status = BLK_STS_RESOURCE;
- 			return false;
-@@ -538,9 +540,13 @@ static int blk_crypto_fallback_init(void)
- 
- 	prandom_bytes(blank_key, BLK_CRYPTO_MAX_KEY_SIZE);
- 
--	err = blk_ksm_init(&blk_crypto_ksm, blk_crypto_num_keyslots);
-+	err = bioset_init(&crypto_bio_split, 64, 0, 0);
- 	if (err)
- 		goto out;
-+
-+	err = blk_ksm_init(&blk_crypto_ksm, blk_crypto_num_keyslots);
-+	if (err)
-+		goto fail_free_bioset;
- 	err = -ENOMEM;
- 
- 	blk_crypto_ksm.ksm_ll_ops = blk_crypto_ksm_ll_ops;
-@@ -591,6 +597,8 @@ static int blk_crypto_fallback_init(void)
- 	destroy_workqueue(blk_crypto_wq);
- fail_free_ksm:
- 	blk_ksm_destroy(&blk_crypto_ksm);
-+fail_free_bioset:
-+	bioset_exit(&crypto_bio_split);
- out:
- 	return err;
+diff --git a/block/bounce.c b/block/bounce.c
+index fc55314aa4269a..79d81221446dfe 100644
+--- a/block/bounce.c
++++ b/block/bounce.c
+@@ -214,8 +214,7 @@ static void bounce_end_io_read_isa(struct bio *bio)
+ 	__bounce_end_io_read(bio, &isa_page_pool);
  }
+ 
+-static struct bio *bounce_clone_bio(struct bio *bio_src, gfp_t gfp_mask,
+-		struct bio_set *bs)
++static struct bio *bounce_clone_bio(struct bio *bio_src, gfp_t gfp_mask)
+ {
+ 	struct bvec_iter iter;
+ 	struct bio_vec bv;
+@@ -242,8 +241,11 @@ static struct bio *bounce_clone_bio(struct bio *bio_src, gfp_t gfp_mask,
+ 	 *    asking for trouble and would force extra work on
+ 	 *    __bio_clone_fast() anyways.
+ 	 */
+-
+-	bio = bio_alloc_bioset(gfp_mask, bio_segments(bio_src), bs);
++	if (bio_is_passthrough(bio_src))
++		bio = bio_kmalloc(gfp_mask, bio_segments(bio_src));
++	else
++		bio = bio_alloc_bioset(gfp_mask, bio_segments(bio_src),
++				       &bounce_bio_set);
+ 	if (!bio)
+ 		return NULL;
+ 	bio->bi_bdev		= bio_src->bi_bdev;
+@@ -296,7 +298,6 @@ static void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig,
+ 	unsigned i = 0;
+ 	bool bounce = false;
+ 	int sectors = 0;
+-	bool passthrough = bio_is_passthrough(*bio_orig);
+ 
+ 	bio_for_each_segment(from, *bio_orig, iter) {
+ 		if (i++ < BIO_MAX_PAGES)
+@@ -307,14 +308,14 @@ static void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig,
+ 	if (!bounce)
+ 		return;
+ 
+-	if (!passthrough && sectors < bio_sectors(*bio_orig)) {
++	if (!bio_is_passthrough(*bio_orig) &&
++	    sectors < bio_sectors(*bio_orig)) {
+ 		bio = bio_split(*bio_orig, sectors, GFP_NOIO, &bounce_bio_split);
+ 		bio_chain(bio, *bio_orig);
+ 		submit_bio_noacct(*bio_orig);
+ 		*bio_orig = bio;
+ 	}
+-	bio = bounce_clone_bio(*bio_orig, GFP_NOIO, passthrough ? NULL :
+-			&bounce_bio_set);
++	bio = bounce_clone_bio(*bio_orig, GFP_NOIO);
+ 
+ 	/*
+ 	 * Bvec table can't be updated by bio_for_each_segment_all(),
 -- 
 2.29.2
 
