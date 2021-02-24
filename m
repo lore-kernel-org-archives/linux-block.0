@@ -2,134 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF011C433DB
-	for <linux-block@archiver.kernel.org>; Wed, 24 Feb 2021 01:41:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37CD0C433E0
+	for <linux-block@archiver.kernel.org>; Wed, 24 Feb 2021 01:43:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 736D164E7A
-	for <linux-block@archiver.kernel.org>; Wed, 24 Feb 2021 01:41:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D2EEC64EB6
+	for <linux-block@archiver.kernel.org>; Wed, 24 Feb 2021 01:43:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232014AbhBXBlE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Feb 2021 20:41:04 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34209 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232050AbhBXBlD (ORCPT
+        id S229961AbhBXBni (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Feb 2021 20:43:38 -0500
+Received: from out4436.biz.mail.alibaba.com ([47.88.44.36]:65491 "EHLO
+        out4436.biz.mail.alibaba.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229791AbhBXBnh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Feb 2021 20:41:03 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614130776;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=VZuELx3YPIz0q6Av5RIhb7o/L20RAqonrzXYZvGp11k=;
-        b=MDqmV06eZXoQc8ol9otNYqyp7gq0antJyTT/jlRl1QUjojM9Tzcn6U6t/j7LZLc003mcBb
-        0d07aMs6eGbvXJpKuXlZBthpu4yzqXQWJQ2cKH6NohxmIBy6WMlve8fT3LGUYRLkyVXkbK
-        YZ9whbRxflUo7mWFjUPN2Yn/HLhkjcY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-31-zVEFquoONYiWZ4hVboyUgg-1; Tue, 23 Feb 2021 20:39:02 -0500
-X-MC-Unique: zVEFquoONYiWZ4hVboyUgg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3D3F1100CCC2;
-        Wed, 24 Feb 2021 01:39:01 +0000 (UTC)
-Received: from T590 (ovpn-13-84.pek2.redhat.com [10.72.13.84])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9EF8C2C01F;
-        Wed, 24 Feb 2021 01:38:55 +0000 (UTC)
-Date:   Wed, 24 Feb 2021 09:38:50 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        Tom Seewald <tseewald@gmail.com>
-Subject: Re: [PATCH] block: reopen the device in blkdev_reread_part
-Message-ID: <YDWuKk3SkyMCFfci@T590>
-References: <20210223151822.399791-1-hch@lst.de>
+        Tue, 23 Feb 2021 20:43:37 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04420;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0UPP9wNK_1614130975;
+Received: from admindeMacBook-Pro-2.local(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0UPP9wNK_1614130975)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Wed, 24 Feb 2021 09:42:55 +0800
+Subject: Re: [dm-devel] [PATCH v3 09/11] dm: support IO polling for bio-based
+ dm device
+To:     Mikulas Patocka <mpatocka@redhat.com>
+Cc:     axboe@kernel.dk, snitzer@redhat.com, caspar@linux.alibaba.com,
+        io-uring@vger.kernel.org, linux-block@vger.kernel.org,
+        joseph.qi@linux.alibaba.com, dm-devel@redhat.com, hch@lst.de
+References: <20210208085243.82367-1-jefflexu@linux.alibaba.com>
+ <20210208085243.82367-10-jefflexu@linux.alibaba.com>
+ <alpine.LRH.2.02.2102190907560.10545@file01.intranet.prod.int.rdu2.redhat.com>
+From:   JeffleXu <jefflexu@linux.alibaba.com>
+Message-ID: <83c2ec7a-d000-d9cc-d54a-5e69c35c5eb9@linux.alibaba.com>
+Date:   Wed, 24 Feb 2021 09:42:55 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210223151822.399791-1-hch@lst.de>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <alpine.LRH.2.02.2102190907560.10545@file01.intranet.prod.int.rdu2.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Feb 23, 2021 at 04:18:22PM +0100, Christoph Hellwig wrote:
-> Historically the BLKRRPART ioctls called into the now defunct ->revalidate
-> method, which caused the sd driver to check if any media is present.
-> When the ->revalidate method was removed this revalidation was lost,
-> leading to lots of I/O errors when using the eject command.  Fix this by
-> reopening the device to rescan the partitions, and thus calling the
-> revalidation logic in the sd driver.
+
+
+On 2/19/21 10:17 PM, Mikulas Patocka wrote:
 > 
-> Fixes: 471bd0af544b ("sd: use bdev_check_media_change")
-> Reported--by: Tom Seewald <tseewald@gmail.com>
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Tested-by: Tom Seewald <tseewald@gmail.com>
-> ---
->  block/ioctl.c | 21 ++++++++++++++-------
->  1 file changed, 14 insertions(+), 7 deletions(-)
 > 
-> diff --git a/block/ioctl.c b/block/ioctl.c
-> index d61d652078f41c..ff241e663c018f 100644
-> --- a/block/ioctl.c
-> +++ b/block/ioctl.c
-> @@ -81,20 +81,27 @@ static int compat_blkpg_ioctl(struct block_device *bdev,
->  }
->  #endif
->  
-> -static int blkdev_reread_part(struct block_device *bdev)
-> +static int blkdev_reread_part(struct block_device *bdev, fmode_t mode)
->  {
-> -	int ret;
-> +	struct block_device *tmp;
->  
->  	if (!disk_part_scan_enabled(bdev->bd_disk) || bdev_is_partition(bdev))
->  		return -EINVAL;
->  	if (!capable(CAP_SYS_ADMIN))
->  		return -EACCES;
->  
-> -	mutex_lock(&bdev->bd_mutex);
-> -	ret = bdev_disk_changed(bdev, false);
-> -	mutex_unlock(&bdev->bd_mutex);
-> +	/*
-> +	 * Reopen the device to revalidate the driver state and force a
-> +	 * partition rescan.
-> +	 */
-> +	mode &= ~FMODE_EXCL;
-> +	set_bit(GD_NEED_PART_SCAN, &bdev->bd_disk->state);
->  
-> -	return ret;
-> +	tmp = blkdev_get_by_dev(bdev->bd_dev, mode, NULL);
-> +	if (IS_ERR(tmp))
-> +		return PTR_ERR(tmp);
-> +	blkdev_put(tmp, mode);
-> +	return 0;
->  }
->  
->  static int blk_ioctl_discard(struct block_device *bdev, fmode_t mode,
-> @@ -498,7 +505,7 @@ static int blkdev_common_ioctl(struct block_device *bdev, fmode_t mode,
->  		bdev->bd_bdi->ra_pages = (arg * 512) / PAGE_SIZE;
->  		return 0;
->  	case BLKRRPART:
-> -		return blkdev_reread_part(bdev);
-> +		return blkdev_reread_part(bdev, mode);
->  	case BLKTRACESTART:
->  	case BLKTRACESTOP:
->  	case BLKTRACETEARDOWN:
-> -- 
-> 2.29.2
+> On Mon, 8 Feb 2021, Jeffle Xu wrote:
+> 
+>> diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+>> index c2945c90745e..8423f1347bb8 100644
+>> --- a/drivers/md/dm.c
+>> +++ b/drivers/md/dm.c
+>> @@ -1657,6 +1657,68 @@ static blk_qc_t dm_submit_bio(struct bio *bio)
+>>  	return BLK_QC_T_NONE;
+>>  }
+>>  
+>> +static int dm_poll_one_md(struct mapped_device *md);
+>> +
+>> +static int dm_poll_one_dev(struct dm_target *ti, struct dm_dev *dev,
+>> +				sector_t start, sector_t len, void *data)
+>> +{
+>> +	int i, *count = data;
+>> +	struct request_queue *q = bdev_get_queue(dev->bdev);
+>> +	struct blk_mq_hw_ctx *hctx;
+>> +
+>> +	if (queue_is_mq(q)) {
+>> +		if (!percpu_ref_tryget(&q->q_usage_counter))
+>> +			return 0;
+>> +
+>> +		queue_for_each_poll_hw_ctx(q, hctx, i)
+>> +			*count += blk_mq_poll_hctx(q, hctx);
+>> +
+>> +		percpu_ref_put(&q->q_usage_counter);
+>> +	} else
+>> +		*count += dm_poll_one_md(dev->bdev->bd_disk->private_data);
+> 
+> This is fragile, because in the future there may be other bio-based 
+> drivers that support polling. You should check that "q" is really a device 
+> mapper device before calling dm_poll_one_md on it.
 > 
 
-Looks fine,
-
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-
+Sorry I missed this reply. Your advice matters, thanks.
 
 -- 
-Ming
-
+Thanks,
+Jeffle
