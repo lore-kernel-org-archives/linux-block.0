@@ -2,140 +2,106 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFAE6C433E0
-	for <linux-block@archiver.kernel.org>; Wed, 24 Feb 2021 08:53:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F15FC433E0
+	for <linux-block@archiver.kernel.org>; Wed, 24 Feb 2021 08:55:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7481464EBB
-	for <linux-block@archiver.kernel.org>; Wed, 24 Feb 2021 08:53:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2A8CD64ECB
+	for <linux-block@archiver.kernel.org>; Wed, 24 Feb 2021 08:55:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234539AbhBXIxR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Feb 2021 03:53:17 -0500
-Received: from mx2.suse.de ([195.135.220.15]:55146 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234605AbhBXIwz (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Feb 2021 03:52:55 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 90F84AF3E;
-        Wed, 24 Feb 2021 08:52:05 +0000 (UTC)
-Subject: Re: Large latency with bcache for Ceph OSD
-To:     "Norman.Kern" <norman.kern@gmx.com>
-Cc:     linux-block@vger.kernel.org, axboe@kernel.dk,
-        linux-bcache@vger.kernel.org
-References: <3f3e20a3-c165-1de1-7fdd-f0bd4da598fe@gmx.com>
- <632258f7-b138-3fba-456b-9da37c1de710@gmx.com>
-From:   Coly Li <colyli@suse.de>
-Message-ID: <5867daf1-0960-39aa-1843-1a76c1e9a28d@suse.de>
-Date:   Wed, 24 Feb 2021 16:52:01 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:78.0)
- Gecko/20100101 Thunderbird/78.7.1
+        id S232582AbhBXIyr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Feb 2021 03:54:47 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21874 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234654AbhBXIyd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 24 Feb 2021 03:54:33 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1614156785;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=eYX3O7xufjYNf15XEImsk+LomkH45mrlcqP2kQFdtWI=;
+        b=EBtAhro3XLt1JclgTBdWhvOZCCTnzu/SZKKi03hTM3THn9W+lnY94xatz4AMAyVLVKL11m
+        lS418eQObN4uQh6vc1RwicH+COCez6dgU3E1tbsZDW9mhhlEsWPac41ey/S/mlo3sUBFa4
+        PZBj0liHUfeADqtbHaTliYRnav566j0=
+Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com
+ [209.85.161.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-27-cUdaB8ncMEKIsB0dS2sLHA-1; Wed, 24 Feb 2021 03:53:03 -0500
+X-MC-Unique: cUdaB8ncMEKIsB0dS2sLHA-1
+Received: by mail-oo1-f69.google.com with SMTP id n9so788682oom.5
+        for <linux-block@vger.kernel.org>; Wed, 24 Feb 2021 00:53:03 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=eYX3O7xufjYNf15XEImsk+LomkH45mrlcqP2kQFdtWI=;
+        b=P+7N/zFN/wKZWjCbKWcu0JrAEAC8KE9K6n3Goew4x6Ybe5OQcy21F1Unhfi7kEVMKx
+         6DlrVGtj0yRmEcRYbAwVsZPYfYl1NIAfJ8SfXtufh9DI/YNZsfItyEi4e+HOwsDf8fwu
+         3ZKIeb3mPaeRmRwpLmn/5ji2N8/mhOriAi7HX+xP848MG53pCwWuyAgcPK++nsAt6rHw
+         PgR/SaRbp24n1/5kn2pFlLh4sg+Ta/gAIEDH9HiRFNpOxvOlTw1CvOn/2aNYDYxFVGQv
+         sZpy/W+F3oD3ROzQcpQWFCW2hWAkFGTXnjA3VkmbnIy/c8GTkE+duYP5Vmeyy5p8BC50
+         gSDA==
+X-Gm-Message-State: AOAM533sztch/RsoiTgtpcHDkZNTova+Yn5tJulsj6jEMUKmhR5aj3M1
+        mZUIut3blJFcC9s6xP7A8wOVcMvG5qqUN72LOF4H35C8K1ryAQUuWGHSc/q19bYi2ytLsjs1GDc
+        KQkrMUGFp8NeIz9mxYGiTiKzK4w2SQMvx5HqlIqA=
+X-Received: by 2002:a05:6808:93:: with SMTP id s19mr2022400oic.115.1614156780100;
+        Wed, 24 Feb 2021 00:53:00 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzO4cfy0bUojTjyHdSrD56xVGttP1p7Ju2D2F8oBtKZrrAad0081kuiYlpozxqxkKAwaStqgXIGaI3LDQ9nT1I=
+X-Received: by 2002:a05:6808:93:: with SMTP id s19mr2022383oic.115.1614156779840;
+ Wed, 24 Feb 2021 00:52:59 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <632258f7-b138-3fba-456b-9da37c1de710@gmx.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <cki.1891A5313F.9U2FASPBG7@redhat.com> <CA+QYu4qihd=wkrknUjaLtGFa4AGpweMWL4Wg=ZPyn=_Mdsx_jg@mail.gmail.com>
+ <6e0146f1-fdf4-0727-87f2-dd057e8496a1@kernel.dk>
+In-Reply-To: <6e0146f1-fdf4-0727-87f2-dd057e8496a1@kernel.dk>
+From:   Bruno Goncalves <bgoncalv@redhat.com>
+Date:   Wed, 24 Feb 2021 09:52:48 +0100
+Message-ID: <CA+QYu4p1Ya_NW69q=UizOh5j-B2rjPs0s3kzG8f2yipKW_EbJA@mail.gmail.com>
+Subject: =?UTF-8?B?UmU6IOKdjCBGQUlMOiBUZXN0IHJlcG9ydCBmb3Iga2VybmVsIDUuMTEuMCAoYmxvY2sp?=
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     CKI Project <cki-project@redhat.com>,
+        skt-results-master@redhat.com, linux-block@vger.kernel.org,
+        Guangwu Zhang <guazhang@redhat.com>, Lin Li <lilin@redhat.com>,
+        Xiong Zhou <xzhou@redhat.com>,
+        Memory Management <mm-qe@redhat.com>,
+        Zorro Lang <zlang@redhat.com>,
+        Marco Patalano <mpatalan@redhat.com>,
+        Jianhong Yin <jiyin@redhat.com>, Al Stone <ahs3@redhat.com>,
+        Fine Fan <ffan@redhat.com>, Jeff Bastian <jbastian@redhat.com>,
+        Yi Zhang <yizhan@redhat.com>, Jan Stancek <jstancek@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/22/21 7:48 AM, Norman.Kern wrote:
-> Ping.
-> 
-> I'm confused on the SYNC I/O on bcache. why SYNC I/O must be writen back
-> for persistent cache?  It can cause some latency.
-> 
-> @Coly, can you give help me to explain why bcache handle O_SYNC like this.?
-> 
-> 
+On Tue, Feb 23, 2021 at 7:59 PM Jens Axboe <axboe@kernel.dk> wrote:
+>
+> On 2/23/21 6:36 AM, Bruno Goncalves wrote:
+> > Hello,
+> >
+> > In this run a lot of tests failed due to a known issue with SELinux policy, but 1 failure reported on LTP io_uring01 test when running on ppc64le might be a kernel bug [1].
+> > Note the sefgault (io_uring01[138555]: User access of kernel address (c0000000005a0258) - exploit attempt? (uid: 0)) on console log [2] when executing the test. The test logs are [3].
+> >
+> > [1] https://arr-cki-prod-datawarehouse-public.s3.amazonaws.com/datawarehouse-public/2021/02/23/624525/build_ppc64le_redhat%3A1110530/tests/LTP/9600734_ppc64le_1_syscalls.fail.log
+> > [2] https://arr-cki-prod-datawarehouse-public.s3.amazonaws.com/datawarehouse-public/2021/02/23/624525/build_ppc64le_redhat%3A1110530/tests/9600734_ppc64le_1_console.log
+> > [3] https://arr-cki-prod-datawarehouse-public.s3.amazonaws.com/index.html?prefix=datawarehouse-public/2021/02/23/624525/build_ppc64le_redhat%3A1110530/tests/LTP/
+>
+> That's my fault, for some reason I totally overlooked parisc and powerpc
+> in the PF_IO_WORKER change. Current for-next should work for you, this
+> is the change that fixes it:
+>
+> https://git.kernel.dk/cgit/linux-block/commit/?h=io_uring-worker.v3&id=e4595c30ec3053a15d12615195b7a8726f9bee79
 
-Hmm, normally we won't observe the application issuing I/Os on backing
-device except for,
-- I/O bypass by SSD congestion
-- Sequential I/O request
-- Dirty buckets exceeds the cutoff threshold
-- Write through mode
+Thanks for the fix, the test now passes.
 
-Do you set the write/read congestion threshold to 0 ?
+Bruno Goncalves
 
-Coly Li
-
-> On 2021/2/18 下午3:56, Norman.Kern wrote:
->> Hi guys,
->>
->> I am testing ceph with bcache, I found some I/O with O_SYNC writeback
->> to HDD, which caused large latency on HDD, I trace the I/O with iosnoop:
->>
->> ./iosnoop  -Q -ts -d '8,192
->>
->> Tracing block I/O for 1 seconds (buffered)...
->> STARTs          ENDs            COMM         PID    TYPE DEV
->> BLOCK        BYTES     LATms
->>
->> 1809296.292350  1809296.319052  tp_osd_tp    22191  R    8,192
->> 4578940240   16384     26.70
->> 1809296.292330  1809296.320974  tp_osd_tp    22191  R    8,192
->> 4577938704   16384     28.64
->> 1809296.292614  1809296.323292  tp_osd_tp    22191  R    8,192
->> 4600404304   16384     30.68
->> 1809296.292353  1809296.325300  tp_osd_tp    22191  R    8,192
->> 4578343088   16384     32.95
->> 1809296.292340  1809296.328013  tp_osd_tp    22191  R    8,192
->> 4578055472   16384     35.67
->> 1809296.292606  1809296.330518  tp_osd_tp    22191  R    8,192
->> 4578581648   16384     37.91
->> 1809295.169266  1809296.334041  bstore_kv_fi 17266  WS   8,192
->> 4244996360   4096    1164.78
->> 1809296.292618  1809296.336349  tp_osd_tp    22191  R    8,192
->> 4602631760   16384     43.73
->> 1809296.292618  1809296.338812  tp_osd_tp    22191  R    8,192
->> 4602632976   16384     46.19
->> 1809296.030103  1809296.342780  tp_osd_tp    22180  WS   8,192
->> 4741276048   131072   312.68
->> 1809296.292347  1809296.345045  tp_osd_tp    22191  R    8,192
->> 4609037872   16384     52.70
->> 1809296.292620  1809296.345109  tp_osd_tp    22191  R    8,192
->> 4609037904   16384     52.49
->> 1809296.292612  1809296.347251  tp_osd_tp    22191  R    8,192
->> 4578937616   16384     54.64
->> 1809296.292621  1809296.351136  tp_osd_tp    22191  R    8,192
->> 4612654992   16384     58.51
->> 1809296.292341  1809296.353428  tp_osd_tp    22191  R    8,192
->> 4578220656   16384     61.09
->> 1809296.292342  1809296.353864  tp_osd_tp    22191  R    8,192
->> 4578220880   16384     61.52
->> 1809295.167650  1809296.358510  bstore_kv_fi 17266  WS   8,192
->> 4923695960   4096    1190.86
->> 1809296.292347  1809296.361885  tp_osd_tp    22191  R    8,192
->> 4607437136   16384     69.54
->> 1809296.029363  1809296.367313  tp_osd_tp    22180  WS   8,192
->> 4739824400   98304    337.95
->> 1809296.292349  1809296.370245  tp_osd_tp    22191  R    8,192
->> 4591379888   16384     77.90
->> 1809296.292348  1809296.376273  tp_osd_tp    22191  R    8,192
->> 4591289552   16384     83.92
->> 1809296.292353  1809296.378659  tp_osd_tp    22191  R    8,192
->> 4578248656   16384     86.31
->> 1809296.292619  1809296.384835  tp_osd_tp    22191  R    8,192
->> 4617494160   65536     92.22
->> 1809295.165451  1809296.393715  bstore_kv_fi 17266  WS   8,192
->> 1355703120   4096    1228.26
->> 1809295.168595  1809296.401560  bstore_kv_fi 17266  WS   8,192
->> 1122200      4096    1232.96
->> 1809295.165221  1809296.408018  bstore_kv_fi 17266  WS   8,192
->> 960656       4096    1242.80
->> 1809295.166737  1809296.411505  bstore_kv_fi 17266  WS   8,192
->> 57682504     4096    1244.77
->> 1809296.292352  1809296.418123  tp_osd_tp    22191  R    8,192
->> 4579459056   32768    125.77
->>
->> I'm confused why write with O_SYNC must writeback on the backend
->> storage device?  And when I used bcache for a time,
->>
->> the latency increased a lot.(The SSD is not very busy), There's some
->> best practices on configuration?
->>
+>
+> --
+> Jens Axboe
+>
 
