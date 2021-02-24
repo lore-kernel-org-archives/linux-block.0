@@ -2,96 +2,140 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E49EBC433E0
-	for <linux-block@archiver.kernel.org>; Wed, 24 Feb 2021 08:33:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFAE6C433E0
+	for <linux-block@archiver.kernel.org>; Wed, 24 Feb 2021 08:53:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9F42C64ED6
-	for <linux-block@archiver.kernel.org>; Wed, 24 Feb 2021 08:33:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7481464EBB
+	for <linux-block@archiver.kernel.org>; Wed, 24 Feb 2021 08:53:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234431AbhBXIdm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Feb 2021 03:33:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35516 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233888AbhBXId2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Feb 2021 03:33:28 -0500
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF32FC061574
-        for <linux-block@vger.kernel.org>; Wed, 24 Feb 2021 00:32:48 -0800 (PST)
-Received: by mail-pl1-x62e.google.com with SMTP id g20so775336plo.2
-        for <linux-block@vger.kernel.org>; Wed, 24 Feb 2021 00:32:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=1A/Kwbkz4UTAAAMiX7pxPJv/hxIZpmtgyIqS3D8GBto=;
-        b=ENQo8iCRt8GIck63Eo01THW6ZR0v7WvrkFcjXTV8YuHA3KlcpX4fX+zKqPgrJ2qb3D
-         Isja2VlnerHW5HnoP3T3NQqiFZCBOjQXEVv//MfIC2VS4qHA2H8Y/462v10LHBSMKAjc
-         7Ac4VW2uAgJA0/zrKNdRWt+vhTCkTue0xWI8KitAcBduEI0wC5OuV14zLAza0o8P86kt
-         TmZPQekfxc9ei0aUxNJAPSdRCZ/YVFyaLPItICuObmnIX8vfLxY3QAb5rR688jYvBRH9
-         3Vq+1fL8rQs4nSF1l5yWRxXF78IrMKcGwtD+7fU20r5sUvygO4SUghRlRgvZAKw7ljGY
-         qumg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=1A/Kwbkz4UTAAAMiX7pxPJv/hxIZpmtgyIqS3D8GBto=;
-        b=HpDr21LPiw6imml/mPz7NRAf4vQR8/ZhO0k/zEzw5Ef/iB4DBOJX2n1E3X+TTgVOPQ
-         D3X1z/KPeArs+72YaYln3DFW2hDygVAQLAN/4WUJBvywn/NVOCBZRwyPNfaIRYGsOvJW
-         nhQuet/V6NF/jaXS05bIBelXOhzHj8UKr8EskW5EqhZcuqWZ1VEHjL0mY0XdaBC8owj2
-         YWWfJFgw7w6VipEpeSwxfDweMTbQNOIkZ46m/1LWSAgfBfPmM9+94O8qZJTklT+JE6yB
-         6tSUMBRVJfFLr+5qlz1PEW5XfTM4SLTgfegJUAOJAQcaYYhhlBqS3XOvxLCZBf9dDO9U
-         7VRw==
-X-Gm-Message-State: AOAM5326qIB9rnWbyUc5CE2k6QzQ9qbcZXBSmZ0SHElU7kaRlcudfu0K
-        myx9IZA6kwFsudLwyloT3W8uoibRGZ6omQ==
-X-Google-Smtp-Source: ABdhPJwOvaCVta9p8auGUqH6NxSQzp8CdWhb+uYvAfWDvSZUXY0D3rqDAPMKareqWXhq4M95w0E30w==
-X-Received: by 2002:a17:90a:ea05:: with SMTP id w5mr3445383pjy.105.1614155568353;
-        Wed, 24 Feb 2021 00:32:48 -0800 (PST)
-Received: from localhost ([211.108.35.36])
-        by smtp.gmail.com with ESMTPSA id 67sm1828861pfw.92.2021.02.24.00.32.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Feb 2021 00:32:48 -0800 (PST)
-Date:   Wed, 24 Feb 2021 17:32:46 +0900
-From:   Minwoo Im <minwoo.im.dev@gmail.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        Tom Seewald <tseewald@gmail.com>
-Subject: Re: [PATCH] block: reopen the device in blkdev_reread_part
-Message-ID: <20210224083246.GB2166@localhost.localdomain>
-References: <20210223151822.399791-1-hch@lst.de>
- <20210224015202.GA2166@localhost.localdomain>
- <20210224072603.GA32368@lst.de>
+        id S234539AbhBXIxR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Feb 2021 03:53:17 -0500
+Received: from mx2.suse.de ([195.135.220.15]:55146 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234605AbhBXIwz (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 24 Feb 2021 03:52:55 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 90F84AF3E;
+        Wed, 24 Feb 2021 08:52:05 +0000 (UTC)
+Subject: Re: Large latency with bcache for Ceph OSD
+To:     "Norman.Kern" <norman.kern@gmx.com>
+Cc:     linux-block@vger.kernel.org, axboe@kernel.dk,
+        linux-bcache@vger.kernel.org
+References: <3f3e20a3-c165-1de1-7fdd-f0bd4da598fe@gmx.com>
+ <632258f7-b138-3fba-456b-9da37c1de710@gmx.com>
+From:   Coly Li <colyli@suse.de>
+Message-ID: <5867daf1-0960-39aa-1843-1a76c1e9a28d@suse.de>
+Date:   Wed, 24 Feb 2021 16:52:01 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:78.0)
+ Gecko/20100101 Thunderbird/78.7.1
 MIME-Version: 1.0
+In-Reply-To: <632258f7-b138-3fba-456b-9da37c1de710@gmx.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20210224072603.GA32368@lst.de>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 21-02-24 08:26:03, Christoph Hellwig wrote:
-> On Wed, Feb 24, 2021 at 10:52:02AM +0900, Minwoo Im wrote:
-> > On 21-02-23 16:18:22, Christoph Hellwig wrote:
-> > > Historically the BLKRRPART ioctls called into the now defunct ->revalidate
-> > > method, which caused the sd driver to check if any media is present.
-> > > When the ->revalidate method was removed this revalidation was lost,
-> > > leading to lots of I/O errors when using the eject command.  Fix this by
-> > > reopening the device to rescan the partitions, and thus calling the
-> > > revalidation logic in the sd driver.
-> > 
-> > It looks like a related issue that I've reported in [1].  And this looks
-> > much better!
+On 2/22/21 7:48 AM, Norman.Kern wrote:
+> Ping.
 > 
-> I don't think it fixes the block size issue, does it?
+> I'm confused on the SYNC I/O on bcache. why SYNC I/O must be writen back
+> for persistent cache?  It can cause some latency.
+> 
+> @Coly, can you give help me to explain why bcache handle O_SYNC like this.?
+> 
+> 
 
-Uh... Sorry for the noise.  This reopen is not the first shot so that the
-block size will not be updated because bd_openers is not 0.
-set_init_blocksize is not being invoked.
+Hmm, normally we won't observe the application issuing I/Os on backing
+device except for,
+- I/O bypass by SSD congestion
+- Sequential I/O request
+- Dirty buckets exceeds the cutoff threshold
+- Write through mode
 
-Sorry please ignore this noise.
+Do you set the write/read congestion threshold to 0 ?
+
+Coly Li
+
+> On 2021/2/18 下午3:56, Norman.Kern wrote:
+>> Hi guys,
+>>
+>> I am testing ceph with bcache, I found some I/O with O_SYNC writeback
+>> to HDD, which caused large latency on HDD, I trace the I/O with iosnoop:
+>>
+>> ./iosnoop  -Q -ts -d '8,192
+>>
+>> Tracing block I/O for 1 seconds (buffered)...
+>> STARTs          ENDs            COMM         PID    TYPE DEV
+>> BLOCK        BYTES     LATms
+>>
+>> 1809296.292350  1809296.319052  tp_osd_tp    22191  R    8,192
+>> 4578940240   16384     26.70
+>> 1809296.292330  1809296.320974  tp_osd_tp    22191  R    8,192
+>> 4577938704   16384     28.64
+>> 1809296.292614  1809296.323292  tp_osd_tp    22191  R    8,192
+>> 4600404304   16384     30.68
+>> 1809296.292353  1809296.325300  tp_osd_tp    22191  R    8,192
+>> 4578343088   16384     32.95
+>> 1809296.292340  1809296.328013  tp_osd_tp    22191  R    8,192
+>> 4578055472   16384     35.67
+>> 1809296.292606  1809296.330518  tp_osd_tp    22191  R    8,192
+>> 4578581648   16384     37.91
+>> 1809295.169266  1809296.334041  bstore_kv_fi 17266  WS   8,192
+>> 4244996360   4096    1164.78
+>> 1809296.292618  1809296.336349  tp_osd_tp    22191  R    8,192
+>> 4602631760   16384     43.73
+>> 1809296.292618  1809296.338812  tp_osd_tp    22191  R    8,192
+>> 4602632976   16384     46.19
+>> 1809296.030103  1809296.342780  tp_osd_tp    22180  WS   8,192
+>> 4741276048   131072   312.68
+>> 1809296.292347  1809296.345045  tp_osd_tp    22191  R    8,192
+>> 4609037872   16384     52.70
+>> 1809296.292620  1809296.345109  tp_osd_tp    22191  R    8,192
+>> 4609037904   16384     52.49
+>> 1809296.292612  1809296.347251  tp_osd_tp    22191  R    8,192
+>> 4578937616   16384     54.64
+>> 1809296.292621  1809296.351136  tp_osd_tp    22191  R    8,192
+>> 4612654992   16384     58.51
+>> 1809296.292341  1809296.353428  tp_osd_tp    22191  R    8,192
+>> 4578220656   16384     61.09
+>> 1809296.292342  1809296.353864  tp_osd_tp    22191  R    8,192
+>> 4578220880   16384     61.52
+>> 1809295.167650  1809296.358510  bstore_kv_fi 17266  WS   8,192
+>> 4923695960   4096    1190.86
+>> 1809296.292347  1809296.361885  tp_osd_tp    22191  R    8,192
+>> 4607437136   16384     69.54
+>> 1809296.029363  1809296.367313  tp_osd_tp    22180  WS   8,192
+>> 4739824400   98304    337.95
+>> 1809296.292349  1809296.370245  tp_osd_tp    22191  R    8,192
+>> 4591379888   16384     77.90
+>> 1809296.292348  1809296.376273  tp_osd_tp    22191  R    8,192
+>> 4591289552   16384     83.92
+>> 1809296.292353  1809296.378659  tp_osd_tp    22191  R    8,192
+>> 4578248656   16384     86.31
+>> 1809296.292619  1809296.384835  tp_osd_tp    22191  R    8,192
+>> 4617494160   65536     92.22
+>> 1809295.165451  1809296.393715  bstore_kv_fi 17266  WS   8,192
+>> 1355703120   4096    1228.26
+>> 1809295.168595  1809296.401560  bstore_kv_fi 17266  WS   8,192
+>> 1122200      4096    1232.96
+>> 1809295.165221  1809296.408018  bstore_kv_fi 17266  WS   8,192
+>> 960656       4096    1242.80
+>> 1809295.166737  1809296.411505  bstore_kv_fi 17266  WS   8,192
+>> 57682504     4096    1244.77
+>> 1809296.292352  1809296.418123  tp_osd_tp    22191  R    8,192
+>> 4579459056   32768    125.77
+>>
+>> I'm confused why write with O_SYNC must writeback on the backend
+>> storage device?  And when I used bcache for a time,
+>>
+>> the latency increased a lot.(The SSD is not very busy), There's some
+>> best practices on configuration?
+>>
+
