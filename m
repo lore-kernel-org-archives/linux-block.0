@@ -2,130 +2,89 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B216AC433DB
-	for <linux-block@archiver.kernel.org>; Wed, 24 Feb 2021 13:43:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B408C433E0
+	for <linux-block@archiver.kernel.org>; Wed, 24 Feb 2021 16:12:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6A5B5601FB
-	for <linux-block@archiver.kernel.org>; Wed, 24 Feb 2021 13:43:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D2B6464E6C
+	for <linux-block@archiver.kernel.org>; Wed, 24 Feb 2021 16:12:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235870AbhBXNik (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Feb 2021 08:38:40 -0500
-Received: from mail.kernel.org ([198.145.29.99]:55444 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235369AbhBXNCV (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Feb 2021 08:02:21 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 952A264F13;
-        Wed, 24 Feb 2021 12:53:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1614171200;
-        bh=1voqjsAoBFLxX7rDbdvLrvHACJsPGL3qdmFT+MVPv9g=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=n4CaV2DsapOHyAY2CTejx635bsmN1PT/GI+bXaSP41g0MUkn97yPgHWDfUXDGusrK
-         hJYCVndOTt3ljWNDEpNMfC+OwFIWm1Y3O7RlCa8ajND8LdyjkXHFjBnJKfAhempKb+
-         FrCFJyhjQLdQFEOJhAPQ+ezCqlszTuMIAwjc4wmZUsH3UYNbNpXF/D5N3qzaZx2fMn
-         vs88qYTVw4CanXIbaallaqKw5ZJCkNUESoOl5oc5VYtTk3LrgntI4V5abPeY1m+lJB
-         C02lj9za7z7k5bu7x2r24d7iynMZK1mZhdTxXkTUkxvwsBF7jQ3duMS6nw0kc2NV49
-         WWwh3F9SmVCuA==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Jan Beulich <jbeulich@suse.com>, Juergen Gross <jgross@suse.com>,
-        Julien Grall <julien@xen.org>, Sasha Levin <sashal@kernel.org>,
-        xen-devel@lists.xenproject.org, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 51/56] xen-blkback: fix error handling in xen_blkbk_map()
-Date:   Wed, 24 Feb 2021 07:52:07 -0500
-Message-Id: <20210224125212.482485-51-sashal@kernel.org>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20210224125212.482485-1-sashal@kernel.org>
-References: <20210224125212.482485-1-sashal@kernel.org>
+        id S235735AbhBXQMG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Feb 2021 11:12:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45918 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235219AbhBXP4M (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 24 Feb 2021 10:56:12 -0500
+Received: from mail-il1-x12d.google.com (mail-il1-x12d.google.com [IPv6:2607:f8b0:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7909AC061788
+        for <linux-block@vger.kernel.org>; Wed, 24 Feb 2021 07:55:11 -0800 (PST)
+Received: by mail-il1-x12d.google.com with SMTP id c10so2115659ilo.8
+        for <linux-block@vger.kernel.org>; Wed, 24 Feb 2021 07:55:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=WNLTnpurdEVGQyELRj8Mcnx3jCoSc8XZQ/4PoKsDj2M=;
+        b=At+NJtkiSvXd1pGP9JAzS2/T2CxfS7TZNVAQCy/sv9dqTOvnHmvLen1K03AZgq2r04
+         mrVxM8FqcAOyxB9xfC9u3ncx32XLkA2slIRsupF6PPBspv+XxiKnXYiPxYSjN1gR9Asz
+         PN8Jwadq2czLAQ/ZzpdJUVmCs1iRTlITZmeuokO2oxoo7zqP8RGsOtzMmmEXiMl/B0t+
+         x02RGr2ZIXm3K6r6GAhr1/+XxVuKNr5sz6ScyFfPmRinosRsRefynA1orB4r3hMnBQ6h
+         VIIMLm2cbcETnyVLiY7RlctTUTA7vvOwQoNeTf/+2fMrue/ZFrpkANVe7wgctMS8YozR
+         Jv8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=WNLTnpurdEVGQyELRj8Mcnx3jCoSc8XZQ/4PoKsDj2M=;
+        b=c9G4kwbeXSXswe1SRGUX1Tg8Jx8Hgasrf65raDrG/1Dt3xIk3CfLPH++mG3iNIVfFN
+         dRk3qpVO9K/xKccpNF+FFa5YeJstvagZ4WYkeLDUgj0R0ijiK5R7/9Pjfxl/oii5xj2W
+         dh7lNfnqseNSLYObgHMPZtro5nT2dlw7cb2dI0eIiw9fqAzKd2Q6oc+c/Q8DRXeaJEoZ
+         iu1qcsCu3xxsWNgJRV0FKP4j0KKbbw0h7qeFYD8d5Dt/+ig+8YSWf0pI8kys66FJveK5
+         EEgZTe8FdW0mQRYMT5+pyHu5mnmAZpNRWXKYvoHOZobhAf8FEHfzygRql9F0sHirVZ/H
+         jPAw==
+X-Gm-Message-State: AOAM533ImVy49juF8HbpxNHD8bytbm/SwfYfDWGjHO0D69dMiGT9+hy0
+        GDFVURbItdnxYYvrBY4hbKH153t6m5MYjlDB
+X-Google-Smtp-Source: ABdhPJz+iO6GyvOIjaJhHOlrkyx8JcM8vBFssFNxDEx2eBM4DOWYKf+qOYI3z7gdwmZiRdqVJa6yJg==
+X-Received: by 2002:a05:6e02:20c4:: with SMTP id 4mr24508346ilq.221.1614182110725;
+        Wed, 24 Feb 2021 07:55:10 -0800 (PST)
+Received: from [192.168.1.30] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id t7sm1760439ilj.62.2021.02.24.07.55.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 24 Feb 2021 07:55:09 -0800 (PST)
+Subject: Re: bio_kmalloc related fixes for 5.12
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Satya Tangirala <satyat@google.com>,
+        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        John Stultz <john.stultz@linaro.org>,
+        linux-block@vger.kernel.org
+References: <20210224072407.46363-1-hch@lst.de>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <c1b68f27-e6ae-77c4-99c0-ab20ac99c11b@kernel.dk>
+Date:   Wed, 24 Feb 2021 08:55:08 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210224072407.46363-1-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Jan Beulich <jbeulich@suse.com>
+On 2/24/21 12:24 AM, Christoph Hellwig wrote:
+> Hi Jens,
+> 
+> a few fixes for 5.12 below.
 
-[ Upstream commit 871997bc9e423f05c7da7c9178e62dde5df2a7f8 ]
+Applied, thanks.
 
-The function uses a goto-based loop, which may lead to an earlier error
-getting discarded by a later iteration. Exit this ad-hoc loop when an
-error was encountered.
-
-The out-of-memory error path additionally fails to fill a structure
-field looked at by xen_blkbk_unmap_prepare() before inspecting the
-handle which does get properly set (to BLKBACK_INVALID_HANDLE).
-
-Since the earlier exiting from the ad-hoc loop requires the same field
-filling (invalidation) as that on the out-of-memory path, fold both
-paths. While doing so, drop the pr_alert(), as extra log messages aren't
-going to help the situation (the kernel will log oom conditions already
-anyway).
-
-This is XSA-365.
-
-Signed-off-by: Jan Beulich <jbeulich@suse.com>
-Reviewed-by: Juergen Gross <jgross@suse.com>
-Reviewed-by: Julien Grall <julien@xen.org>
-Signed-off-by: Juergen Gross <jgross@suse.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/block/xen-blkback/blkback.c | 26 ++++++++++++++++----------
- 1 file changed, 16 insertions(+), 10 deletions(-)
-
-diff --git a/drivers/block/xen-blkback/blkback.c b/drivers/block/xen-blkback/blkback.c
-index 9ebf53903d7bf..9301de1386436 100644
---- a/drivers/block/xen-blkback/blkback.c
-+++ b/drivers/block/xen-blkback/blkback.c
-@@ -794,8 +794,13 @@ static int xen_blkbk_map(struct xen_blkif_ring *ring,
- 			pages[i]->persistent_gnt = persistent_gnt;
- 		} else {
- 			if (gnttab_page_cache_get(&ring->free_pages,
--						  &pages[i]->page))
--				goto out_of_memory;
-+						  &pages[i]->page)) {
-+				gnttab_page_cache_put(&ring->free_pages,
-+						      pages_to_gnt,
-+						      segs_to_map);
-+				ret = -ENOMEM;
-+				goto out;
-+			}
- 			addr = vaddr(pages[i]->page);
- 			pages_to_gnt[segs_to_map] = pages[i]->page;
- 			pages[i]->persistent_gnt = NULL;
-@@ -882,17 +887,18 @@ static int xen_blkbk_map(struct xen_blkif_ring *ring,
- 	}
- 	segs_to_map = 0;
- 	last_map = map_until;
--	if (map_until != num)
-+	if (!ret && map_until != num)
- 		goto again;
- 
--	return ret;
--
--out_of_memory:
--	pr_alert("%s: out of memory\n", __func__);
--	gnttab_page_cache_put(&ring->free_pages, pages_to_gnt, segs_to_map);
--	for (i = last_map; i < num; i++)
-+out:
-+	for (i = last_map; i < num; i++) {
-+		/* Don't zap current batch's valid persistent grants. */
-+		if(i >= last_map + segs_to_map)
-+			pages[i]->persistent_gnt = NULL;
- 		pages[i]->handle = BLKBACK_INVALID_HANDLE;
--	return -ENOMEM;
-+	}
-+
-+	return ret;
- }
- 
- static int xen_blkbk_map_seg(struct pending_req *pending_req)
 -- 
-2.27.0
+Jens Axboe
 
