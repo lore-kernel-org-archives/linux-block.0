@@ -2,160 +2,130 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D26F3C433E6
-	for <linux-block@archiver.kernel.org>; Wed, 24 Feb 2021 11:56:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46D39C4332E
+	for <linux-block@archiver.kernel.org>; Wed, 24 Feb 2021 13:38:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 75E0164DFF
-	for <linux-block@archiver.kernel.org>; Wed, 24 Feb 2021 11:56:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 009ED64EBA
+	for <linux-block@archiver.kernel.org>; Wed, 24 Feb 2021 13:38:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235210AbhBXL4C (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Feb 2021 06:56:02 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40717 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235216AbhBXLzS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Feb 2021 06:55:18 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614167631;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=rL0rqJykzi+068H31HVXzImuu55OZFksWorJVNSie2w=;
-        b=AVFfWoIB1B0wob/EqO4FUTrrCsPT9d5RuCqmIva9C54I23kINCZpVWlAQo/vqklVHP3MnQ
-        BnAZ3eK4hNpoz62TNme8iLb0kUe4m7y/ZM1/dInBsB3yT2OGSjOrZIZ8cOFn69bF3ZVMCh
-        q8u9ypQQFIr++Ozu2DBDNH6Hx0u0Vmg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-525-f_kFJMjjM8aoNLA5ErJwfQ-1; Wed, 24 Feb 2021 06:53:48 -0500
-X-MC-Unique: f_kFJMjjM8aoNLA5ErJwfQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9EB0A18B6142;
-        Wed, 24 Feb 2021 11:53:42 +0000 (UTC)
-Received: from localhost (ovpn-115-137.ams2.redhat.com [10.36.115.137])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A20EE10016F0;
-        Wed, 24 Feb 2021 11:53:30 +0000 (UTC)
-Date:   Wed, 24 Feb 2021 11:53:29 +0000
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Cc:     linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-ide@vger.kernel.org, linux-mmc@vger.kernel.org,
-        target-devel@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-block@vger.kernel.org, dm-devel@redhat.com, axboe@kernel.dk,
-        fujita.tomonori@lab.ntt.co.jp, tim@cyberelk.net, mst@redhat.com,
-        jasowang@redhat.com, pbonzini@redhat.com, davem@davemloft.net,
-        bp@alien8.de, agk@redhat.com, snitzer@redhat.com,
-        ulf.hansson@linaro.org, jejb@linux.ibm.com,
-        martin.petersen@oracle.com, dgilbert@interlog.com,
-        Kai.Makisara@kolumbus.fi, alim.akhtar@samsung.com,
-        avri.altman@wdc.com, bfields@fieldses.org, chuck.lever@oracle.com,
-        baolin.wang@linaro.org, vbadigan@codeaurora.org, zliua@micron.com,
-        richard.peng@oppo.com, guoqing.jiang@cloud.ionos.com,
-        stanley.chu@mediatek.com, cang@codeaurora.org,
-        asutoshd@codeaurora.org, beanhuo@micron.com, jaegeuk@kernel.org
-Subject: Re: [RFC PATCH] blk-core: remove blk_put_request()
-Message-ID: <YDY+ObNNiBMMuSEt@stefanha-x1.localdomain>
-References: <20210222211115.30416-1-chaitanya.kulkarni@wdc.com>
+        id S232290AbhBXNgo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Feb 2021 08:36:44 -0500
+Received: from mail.kernel.org ([198.145.29.99]:50301 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S235421AbhBXMzs (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 24 Feb 2021 07:55:48 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 0A48C64F35;
+        Wed, 24 Feb 2021 12:51:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1614171110;
+        bh=1voqjsAoBFLxX7rDbdvLrvHACJsPGL3qdmFT+MVPv9g=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=spjwNbA3ZtlvtPipEn6gfBOlftIW6w7odr2XfL2181T9bK8cCwsM2LBQNoGUtghVL
+         +buNAx7SgQMw6ZIpQxTknwVpx5NTpass/l7ybj6RtHiqw9UifteXfGfnkOwSCWkU4i
+         +eBluSCs+cPiUN6qhMjkc3eoReO4D1oa9TLyuyE4tq8CN6fadJcqZBZAI1aZZ7k9cD
+         E3yRxJH9Z7tX130usP78uATGssnbZnpngxHbuZmw7O9YU3ORHsxEqmWUN5YE2qR+8x
+         2J/Vt5H8IzJBZzsLr2Ld6nXRjj1t9XqhG1tLoj/1TkTDZVWtIxCDwIiZOwDXvLRHs2
+         +1WGDif58wmhw==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Jan Beulich <jbeulich@suse.com>, Juergen Gross <jgross@suse.com>,
+        Julien Grall <julien@xen.org>, Sasha Levin <sashal@kernel.org>,
+        xen-devel@lists.xenproject.org, linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.11 62/67] xen-blkback: fix error handling in xen_blkbk_map()
+Date:   Wed, 24 Feb 2021 07:50:20 -0500
+Message-Id: <20210224125026.481804-62-sashal@kernel.org>
+X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20210224125026.481804-1-sashal@kernel.org>
+References: <20210224125026.481804-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="nED3gpEEOc5iD8Dg"
-Content-Disposition: inline
-In-Reply-To: <20210222211115.30416-1-chaitanya.kulkarni@wdc.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+From: Jan Beulich <jbeulich@suse.com>
 
---nED3gpEEOc5iD8Dg
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+[ Upstream commit 871997bc9e423f05c7da7c9178e62dde5df2a7f8 ]
 
-On Mon, Feb 22, 2021 at 01:11:15PM -0800, Chaitanya Kulkarni wrote:
-> The function blk_put_request() is just a wrapper to
-> blk_mq_free_request(), remove the unnecessary wrapper.
->=20
-> Any feedback is welcome on this RFC.
->=20
-> Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-> ---
->  block/blk-core.c                   |  6 ------
->  block/blk-merge.c                  |  2 +-
->  block/bsg-lib.c                    |  4 ++--
->  block/bsg.c                        |  4 ++--
->  block/scsi_ioctl.c                 |  6 +++---
->  drivers/block/paride/pd.c          |  2 +-
->  drivers/block/pktcdvd.c            |  2 +-
->  drivers/block/virtio_blk.c         |  2 +-
->  drivers/cdrom/cdrom.c              |  4 ++--
->  drivers/ide/ide-atapi.c            |  2 +-
->  drivers/ide/ide-cd.c               |  4 ++--
->  drivers/ide/ide-cd_ioctl.c         |  2 +-
->  drivers/ide/ide-devsets.c          |  2 +-
->  drivers/ide/ide-disk.c             |  2 +-
->  drivers/ide/ide-ioctls.c           |  4 ++--
->  drivers/ide/ide-park.c             |  2 +-
->  drivers/ide/ide-pm.c               |  4 ++--
->  drivers/ide/ide-tape.c             |  2 +-
->  drivers/ide/ide-taskfile.c         |  2 +-
->  drivers/md/dm-mpath.c              |  2 +-
->  drivers/mmc/core/block.c           | 10 +++++-----
->  drivers/scsi/scsi_error.c          |  2 +-
->  drivers/scsi/scsi_lib.c            |  2 +-
->  drivers/scsi/sg.c                  |  6 +++---
->  drivers/scsi/st.c                  |  4 ++--
->  drivers/scsi/ufs/ufshcd.c          |  6 +++---
->  drivers/target/target_core_pscsi.c |  4 ++--
->  fs/nfsd/blocklayout.c              |  4 ++--
->  include/linux/blkdev.h             |  1 -
->  29 files changed, 46 insertions(+), 53 deletions(-)
->=20
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index fc60ff208497..1754f5e7cc80 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -642,12 +642,6 @@ struct request *blk_get_request(struct request_queue=
- *q, unsigned int op,
->  }
->  EXPORT_SYMBOL(blk_get_request);
-> =20
-> -void blk_put_request(struct request *req)
-> -{
-> -	blk_mq_free_request(req);
-> -}
-> -EXPORT_SYMBOL(blk_put_request);
+The function uses a goto-based loop, which may lead to an earlier error
+getting discarded by a later iteration. Exit this ad-hoc loop when an
+error was encountered.
 
-blk_get_request() still exists after this patch. A "get" API usually has
-a corresponding "put" API. I'm not sure this patch helps the consistency
-and clarity of the code.
+The out-of-memory error path additionally fails to fill a structure
+field looked at by xen_blkbk_unmap_prepare() before inspecting the
+handle which does get properly set (to BLKBACK_INVALID_HANDLE).
 
-If you do go ahead, please update the blk_get_request() doc comment
-explicitly mentioning that blk_mq_free_request() needs to be called.
+Since the earlier exiting from the ad-hoc loop requires the same field
+filling (invalidation) as that on the out-of-memory path, fold both
+paths. While doing so, drop the pr_alert(), as extra log messages aren't
+going to help the situation (the kernel will log oom conditions already
+anyway).
 
-Stefan
+This is XSA-365.
 
---nED3gpEEOc5iD8Dg
-Content-Type: application/pgp-signature; name="signature.asc"
+Signed-off-by: Jan Beulich <jbeulich@suse.com>
+Reviewed-by: Juergen Gross <jgross@suse.com>
+Reviewed-by: Julien Grall <julien@xen.org>
+Signed-off-by: Juergen Gross <jgross@suse.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/block/xen-blkback/blkback.c | 26 ++++++++++++++++----------
+ 1 file changed, 16 insertions(+), 10 deletions(-)
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmA2PjkACgkQnKSrs4Gr
-c8hCowf/apCHcJenx6DM1jzpYo1NNnpfJb2nifukyVLP2UVasntjvQM1WD7v1t84
-WZMQu4BXSLlqhke4oxGQpx0/dNYaC3vi0/XB4yedtojqiAeLYqUgZf17ZDRybfvo
-o0JmcTVjGtEm48hmt4kulUe9VTeIBaMh8c+IkEjxAEjFN45LgERG9YKRDdTVDCIg
-ozqQR2DJJDN7ND80Mu397WnT32WJAJnpU5fLYIKrp8Y3ZINRly5h9F6rn87RmbHq
-KdfZiGjiKMHIOnF1hP1oXi+a9xckj9US9MbvSBiMovQhs5zxuI0hBnpmsO1J6Pnl
-6OYJzeRg/xtmqSUt8yY53YS9Hur9zg==
-=4OR2
------END PGP SIGNATURE-----
-
---nED3gpEEOc5iD8Dg--
+diff --git a/drivers/block/xen-blkback/blkback.c b/drivers/block/xen-blkback/blkback.c
+index 9ebf53903d7bf..9301de1386436 100644
+--- a/drivers/block/xen-blkback/blkback.c
++++ b/drivers/block/xen-blkback/blkback.c
+@@ -794,8 +794,13 @@ static int xen_blkbk_map(struct xen_blkif_ring *ring,
+ 			pages[i]->persistent_gnt = persistent_gnt;
+ 		} else {
+ 			if (gnttab_page_cache_get(&ring->free_pages,
+-						  &pages[i]->page))
+-				goto out_of_memory;
++						  &pages[i]->page)) {
++				gnttab_page_cache_put(&ring->free_pages,
++						      pages_to_gnt,
++						      segs_to_map);
++				ret = -ENOMEM;
++				goto out;
++			}
+ 			addr = vaddr(pages[i]->page);
+ 			pages_to_gnt[segs_to_map] = pages[i]->page;
+ 			pages[i]->persistent_gnt = NULL;
+@@ -882,17 +887,18 @@ static int xen_blkbk_map(struct xen_blkif_ring *ring,
+ 	}
+ 	segs_to_map = 0;
+ 	last_map = map_until;
+-	if (map_until != num)
++	if (!ret && map_until != num)
+ 		goto again;
+ 
+-	return ret;
+-
+-out_of_memory:
+-	pr_alert("%s: out of memory\n", __func__);
+-	gnttab_page_cache_put(&ring->free_pages, pages_to_gnt, segs_to_map);
+-	for (i = last_map; i < num; i++)
++out:
++	for (i = last_map; i < num; i++) {
++		/* Don't zap current batch's valid persistent grants. */
++		if(i >= last_map + segs_to_map)
++			pages[i]->persistent_gnt = NULL;
+ 		pages[i]->handle = BLKBACK_INVALID_HANDLE;
+-	return -ENOMEM;
++	}
++
++	return ret;
+ }
+ 
+ static int xen_blkbk_map_seg(struct pending_req *pending_req)
+-- 
+2.27.0
 
