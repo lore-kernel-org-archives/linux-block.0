@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46D39C4332E
-	for <linux-block@archiver.kernel.org>; Wed, 24 Feb 2021 13:38:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B216AC433DB
+	for <linux-block@archiver.kernel.org>; Wed, 24 Feb 2021 13:43:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 009ED64EBA
-	for <linux-block@archiver.kernel.org>; Wed, 24 Feb 2021 13:38:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6A5B5601FB
+	for <linux-block@archiver.kernel.org>; Wed, 24 Feb 2021 13:43:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232290AbhBXNgo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Feb 2021 08:36:44 -0500
-Received: from mail.kernel.org ([198.145.29.99]:50301 "EHLO mail.kernel.org"
+        id S235870AbhBXNik (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Feb 2021 08:38:40 -0500
+Received: from mail.kernel.org ([198.145.29.99]:55444 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235421AbhBXMzs (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Feb 2021 07:55:48 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 0A48C64F35;
-        Wed, 24 Feb 2021 12:51:48 +0000 (UTC)
+        id S235369AbhBXNCV (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 24 Feb 2021 08:02:21 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 952A264F13;
+        Wed, 24 Feb 2021 12:53:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1614171110;
+        s=k20201202; t=1614171200;
         bh=1voqjsAoBFLxX7rDbdvLrvHACJsPGL3qdmFT+MVPv9g=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=spjwNbA3ZtlvtPipEn6gfBOlftIW6w7odr2XfL2181T9bK8cCwsM2LBQNoGUtghVL
-         +buNAx7SgQMw6ZIpQxTknwVpx5NTpass/l7ybj6RtHiqw9UifteXfGfnkOwSCWkU4i
-         +eBluSCs+cPiUN6qhMjkc3eoReO4D1oa9TLyuyE4tq8CN6fadJcqZBZAI1aZZ7k9cD
-         E3yRxJH9Z7tX130usP78uATGssnbZnpngxHbuZmw7O9YU3ORHsxEqmWUN5YE2qR+8x
-         2J/Vt5H8IzJBZzsLr2Ld6nXRjj1t9XqhG1tLoj/1TkTDZVWtIxCDwIiZOwDXvLRHs2
-         +1WGDif58wmhw==
+        b=n4CaV2DsapOHyAY2CTejx635bsmN1PT/GI+bXaSP41g0MUkn97yPgHWDfUXDGusrK
+         hJYCVndOTt3ljWNDEpNMfC+OwFIWm1Y3O7RlCa8ajND8LdyjkXHFjBnJKfAhempKb+
+         FrCFJyhjQLdQFEOJhAPQ+ezCqlszTuMIAwjc4wmZUsH3UYNbNpXF/D5N3qzaZx2fMn
+         vs88qYTVw4CanXIbaallaqKw5ZJCkNUESoOl5oc5VYtTk3LrgntI4V5abPeY1m+lJB
+         C02lj9za7z7k5bu7x2r24d7iynMZK1mZhdTxXkTUkxvwsBF7jQ3duMS6nw0kc2NV49
+         WWwh3F9SmVCuA==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Jan Beulich <jbeulich@suse.com>, Juergen Gross <jgross@suse.com>,
         Julien Grall <julien@xen.org>, Sasha Levin <sashal@kernel.org>,
         xen-devel@lists.xenproject.org, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.11 62/67] xen-blkback: fix error handling in xen_blkbk_map()
-Date:   Wed, 24 Feb 2021 07:50:20 -0500
-Message-Id: <20210224125026.481804-62-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 51/56] xen-blkback: fix error handling in xen_blkbk_map()
+Date:   Wed, 24 Feb 2021 07:52:07 -0500
+Message-Id: <20210224125212.482485-51-sashal@kernel.org>
 X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20210224125026.481804-1-sashal@kernel.org>
-References: <20210224125026.481804-1-sashal@kernel.org>
+In-Reply-To: <20210224125212.482485-1-sashal@kernel.org>
+References: <20210224125212.482485-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
