@@ -2,50 +2,164 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F19D4C43381
-	for <linux-block@archiver.kernel.org>; Wed, 24 Feb 2021 16:46:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A8DBC433E6
+	for <linux-block@archiver.kernel.org>; Wed, 24 Feb 2021 16:49:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BDE6E64F0D
-	for <linux-block@archiver.kernel.org>; Wed, 24 Feb 2021 16:46:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 69E6E64F07
+	for <linux-block@archiver.kernel.org>; Wed, 24 Feb 2021 16:49:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234973AbhBXQqR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Feb 2021 11:46:17 -0500
-Received: from verein.lst.de ([213.95.11.211]:38611 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234405AbhBXQqH (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Feb 2021 11:46:07 -0500
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id DD25468AFE; Wed, 24 Feb 2021 17:45:23 +0100 (CET)
-Date:   Wed, 24 Feb 2021 17:45:23 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     javier@javigon.com
-Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        hch@lst.de, kbusch@kernel.org, sagi@grimberg.me,
-        minwoo.im.dev@gmail.com
-Subject: Re: [PATCH V5 2/2] nvme: allow open for nvme-generic char device
-Message-ID: <20210224164523.GB11338@lst.de>
-References: <20210222190107.8479-1-javier.gonz@samsung.com> <20210222190107.8479-3-javier.gonz@samsung.com>
+        id S234687AbhBXQtN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Feb 2021 11:49:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57364 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235565AbhBXQtF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 24 Feb 2021 11:49:05 -0500
+Received: from mail-io1-xd31.google.com (mail-io1-xd31.google.com [IPv6:2607:f8b0:4864:20::d31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6305C06178A
+        for <linux-block@vger.kernel.org>; Wed, 24 Feb 2021 08:48:23 -0800 (PST)
+Received: by mail-io1-xd31.google.com with SMTP id f6so2656433iop.11
+        for <linux-block@vger.kernel.org>; Wed, 24 Feb 2021 08:48:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=1+mpX7zx0n4pKPlEw3hBAnsSTnEgaecbMXBQXh8Z37U=;
+        b=bJRnx9a0JrFxWlYgyk2jyiRpJPQJNXNMPWbL5EnUxyVSch3NY812m+zPkaOOeQG9gE
+         rs0rCo0fJuj/glleu3wdzyZ1sbMyHYwsV5BHTbcMpvcNSEN1VzYR9JpF1EJFbPokIpRP
+         pQFA9x0cFcUm+wj/d9C7MittCB6Pzu9NBrIWj0+f0KwN2z25gJ9NY8wag2SjQO0ua0ev
+         ZVb26i7aH9IF/twGU677bbnoqNxjoX/YznSaZOR126/+xhxo8OHS4QMUdKCTDjp0BRQo
+         RNRen7wNfFOzqDylSea/+a0RlJ08r6OWvecZNFxJhZUCe5oZYOK06fy2FnZ88SyWM37D
+         dX/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=1+mpX7zx0n4pKPlEw3hBAnsSTnEgaecbMXBQXh8Z37U=;
+        b=AOzmi8JVQdRhdzeX9W9vmyHh2lo/mSGjUeNUBmwUz3mVZQBxQRniw3ZzMZVUuCUGGJ
+         l2pKsozuOVtoEMBMSSSUwUZVxL23cQ9nuBTQ+oVNcDgzV4+dtYjUJKqNmb4XD7pnP3pH
+         6hDsn6EBwtbEvv3SV+21N30AN8m5UHwCcnop6WAKVZK2eoDtdBfk/USjA2z/g12UcyfY
+         LU8wUg2P8MisS7mrSgWuCsG9bevIFWls7XbMLzNte4Wg1pG9fjFAVu0UteMZOduSxFq4
+         ARuBJ2Qww7pnItB4XTwZGoujCB902+tw1tU4Yy623bHETyeWAXmFDcOs+sHY2peE/yAY
+         MYAA==
+X-Gm-Message-State: AOAM532IiTbpcQZvBtDQbTS9ufmRE/gBXf4qYa3repJU09XUZJRae09d
+        5YqI4ioZHvk/RfGCTNz0WI04Bg==
+X-Google-Smtp-Source: ABdhPJwss97019ILy/7qQcv1GNjekopW38KQaiSTkiRj6pTu3XozM6UbMn7yxILO9vbNkFv7yo9ZjA==
+X-Received: by 2002:a02:1c49:: with SMTP id c70mr34122809jac.136.1614185303233;
+        Wed, 24 Feb 2021 08:48:23 -0800 (PST)
+Received: from [192.168.1.30] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id m15sm1760501ilh.6.2021.02.24.08.48.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 24 Feb 2021 08:48:22 -0800 (PST)
+Subject: Re: [RFC PATCH] blk-core: remove blk_put_request()
+To:     Stefan Hajnoczi <stefanha@redhat.com>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Cc:     linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-ide@vger.kernel.org, linux-mmc@vger.kernel.org,
+        target-devel@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        fujita.tomonori@lab.ntt.co.jp, tim@cyberelk.net, mst@redhat.com,
+        jasowang@redhat.com, pbonzini@redhat.com, davem@davemloft.net,
+        bp@alien8.de, agk@redhat.com, snitzer@redhat.com,
+        ulf.hansson@linaro.org, jejb@linux.ibm.com,
+        martin.petersen@oracle.com, dgilbert@interlog.com,
+        Kai.Makisara@kolumbus.fi, alim.akhtar@samsung.com,
+        avri.altman@wdc.com, bfields@fieldses.org, chuck.lever@oracle.com,
+        baolin.wang@linaro.org, vbadigan@codeaurora.org, zliua@micron.com,
+        richard.peng@oppo.com, guoqing.jiang@cloud.ionos.com,
+        stanley.chu@mediatek.com, cang@codeaurora.org,
+        asutoshd@codeaurora.org, beanhuo@micron.com, jaegeuk@kernel.org
+References: <20210222211115.30416-1-chaitanya.kulkarni@wdc.com>
+ <YDY+ObNNiBMMuSEt@stefanha-x1.localdomain>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <f3141eb3-9938-a216-a9f8-cb193589a657@kernel.dk>
+Date:   Wed, 24 Feb 2021 09:48:21 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210222190107.8479-3-javier.gonz@samsung.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <YDY+ObNNiBMMuSEt@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Feb 22, 2021 at 08:01:07PM +0100, javier@javigon.com wrote:
-> @@ -1885,7 +1885,7 @@ static int nvme_ns_open(struct nvme_ns *ns)
->  {
->  #ifdef CONFIG_NVME_MULTIPATH
->  	/* should never be called due to GENHD_FL_HIDDEN */
-> -	if (WARN_ON_ONCE(ns->head->disk))
-> +	if (WARN_ON_ONCE(!nvme_ns_is_generic(ns) && ns->head->disk))
->  		goto fail;
+On 2/24/21 4:53 AM, Stefan Hajnoczi wrote:
+> On Mon, Feb 22, 2021 at 01:11:15PM -0800, Chaitanya Kulkarni wrote:
+>> The function blk_put_request() is just a wrapper to
+>> blk_mq_free_request(), remove the unnecessary wrapper.
+>>
+>> Any feedback is welcome on this RFC.
+>>
+>> Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+>> ---
+>>  block/blk-core.c                   |  6 ------
+>>  block/blk-merge.c                  |  2 +-
+>>  block/bsg-lib.c                    |  4 ++--
+>>  block/bsg.c                        |  4 ++--
+>>  block/scsi_ioctl.c                 |  6 +++---
+>>  drivers/block/paride/pd.c          |  2 +-
+>>  drivers/block/pktcdvd.c            |  2 +-
+>>  drivers/block/virtio_blk.c         |  2 +-
+>>  drivers/cdrom/cdrom.c              |  4 ++--
+>>  drivers/ide/ide-atapi.c            |  2 +-
+>>  drivers/ide/ide-cd.c               |  4 ++--
+>>  drivers/ide/ide-cd_ioctl.c         |  2 +-
+>>  drivers/ide/ide-devsets.c          |  2 +-
+>>  drivers/ide/ide-disk.c             |  2 +-
+>>  drivers/ide/ide-ioctls.c           |  4 ++--
+>>  drivers/ide/ide-park.c             |  2 +-
+>>  drivers/ide/ide-pm.c               |  4 ++--
+>>  drivers/ide/ide-tape.c             |  2 +-
+>>  drivers/ide/ide-taskfile.c         |  2 +-
+>>  drivers/md/dm-mpath.c              |  2 +-
+>>  drivers/mmc/core/block.c           | 10 +++++-----
+>>  drivers/scsi/scsi_error.c          |  2 +-
+>>  drivers/scsi/scsi_lib.c            |  2 +-
+>>  drivers/scsi/sg.c                  |  6 +++---
+>>  drivers/scsi/st.c                  |  4 ++--
+>>  drivers/scsi/ufs/ufshcd.c          |  6 +++---
+>>  drivers/target/target_core_pscsi.c |  4 ++--
+>>  fs/nfsd/blocklayout.c              |  4 ++--
+>>  include/linux/blkdev.h             |  1 -
+>>  29 files changed, 46 insertions(+), 53 deletions(-)
+>>
+>> diff --git a/block/blk-core.c b/block/blk-core.c
+>> index fc60ff208497..1754f5e7cc80 100644
+>> --- a/block/blk-core.c
+>> +++ b/block/blk-core.c
+>> @@ -642,12 +642,6 @@ struct request *blk_get_request(struct request_queue *q, unsigned int op,
+>>  }
+>>  EXPORT_SYMBOL(blk_get_request);
+>>  
+>> -void blk_put_request(struct request *req)
+>> -{
+>> -	blk_mq_free_request(req);
+>> -}
+>> -EXPORT_SYMBOL(blk_put_request);
+> 
+> blk_get_request() still exists after this patch. A "get" API usually has
+> a corresponding "put" API. I'm not sure this patch helps the consistency
+> and clarity of the code.
+> 
+> If you do go ahead, please update the blk_get_request() doc comment
+> explicitly mentioning that blk_mq_free_request() needs to be called.
 
-Maybe just move the check into the block device caller instead?
+Would make sense to rename blk_get_request() to blk_mq_alloc_request()
+and then we have API symmetry. The get/put don't make sense when there
+are no references involved.
+
+But it's a lot of churn for very little reward, which is always kind
+of annoying. Especially for the person that has to carry the patches.
+
+-- 
+Jens Axboe
+
