@@ -7,56 +7,56 @@ X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4C64C433DB
-	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 07:11:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76556C433DB
+	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 07:12:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6DF8564E85
-	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 07:11:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 25C1B64E6C
+	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 07:12:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233996AbhBYHLR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Feb 2021 02:11:17 -0500
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:13993 "EHLO
-        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232600AbhBYHJF (ORCPT
+        id S233253AbhBYHLr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Feb 2021 02:11:47 -0500
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:53171 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233030AbhBYHJo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Feb 2021 02:09:05 -0500
+        Thu, 25 Feb 2021 02:09:44 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1614236945; x=1645772945;
+  t=1614236983; x=1645772983;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=meQL1JMpFqt94nC7NLV1ujzWJeKhbSQBgmyhyvdKdTk=;
-  b=fNbkqUeuhdm3tjfty6BdKjuHQbUlPJ+GSPxgnkU8iAMZh9z4HNbmyxHF
-   klYjtZYgexqivEjcp1rlIUBrO7nz43rOml8e0+Q16p4nl9Kfd+enzl3c1
-   CTjwaRCir3tDIEANeH4Ff1P+o18MSkZzU/h1gYiJYjiN3HmOlTwvAtUq6
-   X6XpMOOGzmHEWqTsoT0Sy0dBuKymHJkSverIzh894Qg+a49pFi/gjVHgD
-   nc67xG1fq/F9Put/VmSboecUrvg+3cIxEB04XJCNIpNVEWG8F91kxh47b
-   3TXzmMtIytHkBcwGAQsnl+t4Qql7XUl9aat04Rcwdk5bwvhYpXgRlI6XC
-   Q==;
-IronPort-SDR: Splu0NwJn2Lc/Eg6O7NTiyyppfPnEghCKG0iVrrVqmoTapokEMSGiFUuD6021FODroz3H3VIH9
- Q4ce6/vG4P8IOq+9txz3X+oi84WbFjdpngFWcGAK4qlVJKzQlxzEyQvlxDeWiBiG9PVChr0nFC
- GwzY5FNDFpKThiFxE7QnA6NnXM9/9DAcqwF2VXkbz31Fhz1ZuEe6qahLLTMHlhGjXMHWbK3LVJ
- 7sSPGpbUxaYhRKtsFd5q390syFa8CqV1kXDCZdb7EDhYpV1GFbnJo+b/vkPp1Lw0vfnKt3u7UO
- XB0=
+  bh=qmVWl/riaxHF0ICKpnD1wtzPBpIFIgQ86tmQdnEqvsU=;
+  b=Eh9SOixuIjb2ShKvhsZNlfPfH8RPehhgklKtcIfNDANx50YjNI8NN2J3
+   rm/clL4sz/Orjzmi5lix/QqVDZxMSfUGL+zF41ruzVDJiuJ3jTwdbyRmf
+   Ie5MBc8gDimMnhl3Y/5U/vVoBYCU7sdlikmxvFXUc6/LGCKQwWrIeaQvc
+   xe3RtDl/6ZufHGpgAS8T9J9HY65sPqxL3s6F3PAfWGxHzA02Y5ixQpf+x
+   dtziuIFNa5ouan+RGW2njWRsC8EWBGBaDh2bO/Sea8HUm2cLv7n3XYIno
+   wYXqzU76NxOHFtAEf/EX0d3yOElyP2nNZj9pcNMnW3bleBuhrJQHph0ZZ
+   A==;
+IronPort-SDR: Hz/7lBWcrSh/O/IPMUY7MZ7CVsIUd0SskKckgbYbQOpV/7hpxlCiorJL1TTBxEBg5hvQGZED2J
+ g+FhCwZu2N8XGZu886wh/IRgBvtgSaAA85k7gJvK6oKuqbhNzzB78WkLr6ROpK1S2+CETw6qaN
+ 7/dSWIbtTACo7Z72eU80Vfv7jJ2kH8BG87msLk7dWIjMlIMmMKbz85pmC4TqqohOzu0qo1Og9Z
+ 3bI9Csp+6GjBRKw+96/Unfmh2P8kWgxrhBx3SlyEuRvAjL5lBQMAR15nWgm+gth8uFBWA+yfQ/
+ wYs=
 X-IronPort-AV: E=Sophos;i="5.81,205,1610380800"; 
-   d="scan'208";a="160751973"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 25 Feb 2021 15:08:02 +0800
-IronPort-SDR: AuTrhQqJhu9M50V0N87awvkORBzl7EqE/Bsom5asYLrpmasLJPLwqOC9ukvOydUq8Y+C/Xab3i
- XjKczvRRrcF9SKLBKjBf85KPW51eN1FM37oLGqB251LfjKamLlGmWxdUsyKM1NYo0PZc+T8TGr
- RpAJOPWesfHxAoNyGJKBdVrKl75ZLQEqoB8IA7GQX7mYwe6D1gWZrIte+lhfIY+n9SxLrkaRCA
- D8SkmrDOFiYwEmIb+yofq8NasWXAh1nqZsm2ccSVLBNiixuyI+D/1J9wjrrliw66+pvh/1WpiU
- xV+gdcwm58GNyJCfpC8TVA2f
+   d="scan'208";a="160778112"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 25 Feb 2021 15:07:39 +0800
+IronPort-SDR: ZDCsaWGF+XlFuK+RkQU/OIvjvmm++99RFL+Aa0iki5rikYrrN9u58NaYm+tZUQ0Wf1B4Wr25n4
+ Y4UrGapiRZiTVk9JaVwRN8SpZaGseFyPPMeQgkH5bgL8gPVh1PNzfSRb5jAYTB/KjdMDf50a20
+ 5xWXTcx5J2tNA7SMWYFgvW9ldeEUrn1vw9yKjz3OOmcZ4uRYrUPCzMtF6tTMg+1IxWEaf3j47D
+ co3IpTKGiq2zjY43I8PiXe1V+LNvQo8cQNFahN7kaNh75BQBHdNItNPWFYmNWDX4iB9zlOtokR
+ IUzb+Rei7kq3GMb/rabteyc3
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2021 22:49:24 -0800
-IronPort-SDR: RWgwNxvF+jMxkY5pmDIYl1N9kFSic+cuJLznej9ATn2Ra1ri8n257BI4KQMBtBYiBoVqX4PqA3
- V3efPkeZ7//gvBqehB0pT4d0S0+O3oQPF9RqmXXbkkhh7CS8SHPXAhCU5jK358fIiKi0NA4Bti
- yVA6g1mGdoTrwtPxwgIsbPgjGyqUWLIFCt7iisO8IMgAB3Tfn5mjmYI3K/m8Ot1LJJHtB5G7pb
- Bji8m5Z4tj4sPzsUoVxpqw5mbH1626CSNdyjoVQvlVJ6Q/waivnRmiJOT3rdOCz+1tGMOIHlxg
- pnw=
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2021 22:49:00 -0800
+IronPort-SDR: 8ncxIOdAJ5I7FAzqO4m2G3XBPtBwH3hoZa4YW6kLoVPEaz6aZ0oPiKkgwStOsUhAzcorO8Jk6Q
+ YXVH2s7DO44Fzh2tGbonkVgBXgA4lskbeduavKIoUjtfAb4SC5p9DJhzQpQBfpIovhNR34PY54
+ 2Tuu2wUMyJ6G/XpLAPLCe+znRo7uZaMPdI7QxpHkBDE+9ghtbZQ7S5Rb/sjAZgxU6cCVH/0BS8
+ yib2lb5d/ZCv8dFYJTnJplFw75jEJTbu3rGiKtpGAS6TGehUDPnoZY7Wuj+uXvKR1zqJi9GQbQ
+ 1jA=
 WDCIronportException: Internal
 Received: from vm.labspan.wdc.com (HELO vm.sc.wdc.com) ([10.6.137.102])
-  by uls-op-cesaip01.wdc.com with ESMTP; 24 Feb 2021 23:08:02 -0800
+  by uls-op-cesaip01.wdc.com with ESMTP; 24 Feb 2021 23:07:38 -0800
 From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 To:     axboe@kernel.dk, viro@zeniv.linux.org.uk, rostedt@goodmis.org,
         mingo@redhat.com, chaitanya.kulkarni@wdc.com,
@@ -65,9 +65,9 @@ To:     axboe@kernel.dk, viro@zeniv.linux.org.uk, rostedt@goodmis.org,
         aravind.ramesh@wdc.com, joshi.k@samsung.com, niklas.cassel@wdc.com,
         hch@lst.de, osandov@fb.com, martin.petersen@oracle.com
 Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: [RFC PATCH 39/39] blktrace: debug patch for the demo
-Date:   Wed, 24 Feb 2021 23:02:31 -0800
-Message-Id: <20210225070231.21136-40-chaitanya.kulkarni@wdc.com>
+Subject: [RFC PATCH 36/39] blktrace: add integrity tracking support
+Date:   Wed, 24 Feb 2021 23:02:28 -0800
+Message-Id: <20210225070231.21136-37-chaitanya.kulkarni@wdc.com>
 X-Mailer: git-send-email 2.22.1.dirty
 In-Reply-To: <20210225070231.21136-1-chaitanya.kulkarni@wdc.com>
 References: <20210225070231.21136-1-chaitanya.kulkarni@wdc.com>
@@ -77,176 +77,216 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
----
- block/blk-lib.c                   |  4 ++++
- block/blk-zoned.c                 |  1 +
- drivers/block/null_blk/main.c     | 32 ++++++++++++++++++++++++-------
- drivers/block/null_blk/null_blk.h |  1 +
- 4 files changed, 31 insertions(+), 7 deletions(-)
+This patch adds support to track the integrity related information.
+We update struct blk_io_trace_ext with two new members :-
+1. seed :- to track the integrity seed.
+2. integrity :- to store the integrity related flags and integrity
+   size buffer.
 
-diff --git a/block/blk-lib.c b/block/blk-lib.c
-index 752f9c722062..dd8854341bf6 100644
---- a/block/blk-lib.c
-+++ b/block/blk-lib.c
-@@ -98,6 +98,7 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
- 		bio->bi_iter.bi_sector = sector;
- 		bio_set_dev(bio, bdev);
- 		bio_set_op_attrs(bio, op, 0);
-+		bio_set_prio(bio, get_current_ioprio());
+Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Suggested-by: Martin K. Petersen <martin.petersen@oracle.com>
+---
+ include/uapi/linux/blktrace_api.h |  2 ++
+ kernel/trace/blktrace.c           | 60 ++++++++++++++++++++++---------
+ 2 files changed, 46 insertions(+), 16 deletions(-)
+
+diff --git a/include/uapi/linux/blktrace_api.h b/include/uapi/linux/blktrace_api.h
+index fdb3a5cdfa22..ac533a0b0928 100644
+--- a/include/uapi/linux/blktrace_api.h
++++ b/include/uapi/linux/blktrace_api.h
+@@ -158,6 +158,8 @@ struct blk_io_trace_ext {
+ 	__u32 bytes;		/* transfer length */
+ 	__u64 action;		/* what happened */
+ 	__u32 ioprio;		/* I/O priority */
++	__u64 seed;		/* integrity seed */
++	__u64 integrity;	/* store integrity flags */
+ 	__u32 pid;		/* who did it */
+ 	__u32 device;		/* device number */
+ 	__u32 cpu;		/* on what cpu did it happen */
+diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+index 3bd56b741379..6759ac7bc6c7 100644
+--- a/kernel/trace/blktrace.c
++++ b/kernel/trace/blktrace.c
+@@ -66,6 +66,26 @@ static int blk_probes_ref;
+ static void blk_register_tracepoints(void);
+ static void blk_unregister_tracepoints(void);
  
- 		bio->bi_iter.bi_size = req_sects << 9;
- 		sector += req_sects;
-@@ -191,6 +192,7 @@ static int __blkdev_issue_write_same(struct block_device *bdev, sector_t sector,
- 		bio = blk_next_bio(bio, 1, gfp_mask);
- 		bio->bi_iter.bi_sector = sector;
- 		bio_set_dev(bio, bdev);
-+		bio_set_prio(bio, get_current_ioprio());
- 		bio->bi_vcnt = 1;
- 		bio->bi_io_vec->bv_page = page;
- 		bio->bi_io_vec->bv_offset = 0;
-@@ -267,6 +269,7 @@ static int __blkdev_issue_write_zeroes(struct block_device *bdev,
- 		bio = blk_next_bio(bio, 0, gfp_mask);
- 		bio->bi_iter.bi_sector = sector;
- 		bio_set_dev(bio, bdev);
-+		bio_set_prio(bio, get_current_ioprio());
- 		bio->bi_opf = REQ_OP_WRITE_ZEROES;
- 		if (flags & BLKDEV_ZERO_NOUNMAP)
- 			bio->bi_opf |= REQ_NOUNMAP;
-@@ -319,6 +322,7 @@ static int __blkdev_issue_zero_pages(struct block_device *bdev,
- 				   gfp_mask);
- 		bio->bi_iter.bi_sector = sector;
- 		bio_set_dev(bio, bdev);
-+		bio_set_prio(bio, get_current_ioprio());
- 		bio_set_op_attrs(bio, REQ_OP_WRITE, 0);
- 
- 		while (nr_sects != 0) {
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index 833978c02e60..3df0f22cbc54 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -233,6 +233,7 @@ int blkdev_zone_mgmt(struct block_device *bdev, enum req_opf op,
- 	while (sector < end_sector) {
- 		bio = blk_next_bio(bio, 0, gfp_mask);
- 		bio_set_dev(bio, bdev);
-+		bio_set_prio(bio, get_current_ioprio());
- 
- 		/*
- 		 * Special case for the zone reset operation that reset all
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index d6c821d48090..0c2bc7188d27 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -84,6 +84,10 @@ enum {
- 	NULL_Q_MQ		= 2,
- };
- 
-+static bool g_discard;
-+module_param_named(discard, g_discard, bool, 0444);
-+MODULE_PARM_DESC(discard, "Enable queue discard (default: false)");
-+
- static int g_no_sched;
- module_param_named(no_sched, g_no_sched, int, 0444);
- MODULE_PARM_DESC(no_sched, "No io scheduler");
-@@ -156,6 +160,10 @@ static int g_max_sectors;
- module_param_named(max_sectors, g_max_sectors, int, 0444);
- MODULE_PARM_DESC(max_sectors, "Maximum size of a command (in 512B sectors)");
- 
-+static unsigned int g_bounce_pfn;
-+module_param_named(bounce_pfn, g_bounce_pfn, int, 0444);
-+MODULE_PARM_DESC(bounce_pfn, "Queue Bounce limit (default: 0)");
-+
- static unsigned int nr_devices = 1;
- module_param(nr_devices, uint, 0444);
- MODULE_PARM_DESC(nr_devices, "Number of devices to register");
-@@ -350,6 +358,7 @@ NULLB_DEVICE_ATTR(submit_queues, uint, nullb_apply_submit_queues);
- NULLB_DEVICE_ATTR(home_node, uint, NULL);
- NULLB_DEVICE_ATTR(queue_mode, uint, NULL);
- NULLB_DEVICE_ATTR(blocksize, uint, NULL);
-+NULLB_DEVICE_ATTR(bounce_pfn, uint, NULL);
- NULLB_DEVICE_ATTR(max_sectors, uint, NULL);
- NULLB_DEVICE_ATTR(irqmode, uint, NULL);
- NULLB_DEVICE_ATTR(hw_queue_depth, uint, NULL);
-@@ -468,6 +477,7 @@ static struct configfs_attribute *nullb_device_attrs[] = {
- 	&nullb_device_attr_home_node,
- 	&nullb_device_attr_queue_mode,
- 	&nullb_device_attr_blocksize,
-+	&nullb_device_attr_bounce_pfn,
- 	&nullb_device_attr_max_sectors,
- 	&nullb_device_attr_irqmode,
- 	&nullb_device_attr_hw_queue_depth,
-@@ -539,7 +549,7 @@ nullb_group_drop_item(struct config_group *group, struct config_item *item)
- static ssize_t memb_group_features_show(struct config_item *item, char *page)
- {
- 	return snprintf(page, PAGE_SIZE,
--			"memory_backed,discard,bandwidth,cache,badblocks,zoned,zone_size,zone_capacity,zone_nr_conv,zone_max_open,zone_max_active,blocksize,max_sectors\n");
-+			"memory_backed,discard,bounce_pfn,bandwidth,cache,badblocks,zoned,zone_size,zone_capacity,zone_nr_conv\n");
- }
- 
- CONFIGFS_ATTR_RO(memb_group_, features);
-@@ -600,6 +610,7 @@ static struct nullb_device *null_alloc_dev(void)
- 	dev->blocking = g_blocking;
- 	dev->use_per_node_hctx = g_use_per_node_hctx;
- 	dev->zoned = g_zoned;
-+	dev->discard = g_discard;
- 	dev->zone_size = g_zone_size;
- 	dev->zone_capacity = g_zone_capacity;
- 	dev->zone_nr_conv = g_zone_nr_conv;
-@@ -1588,15 +1599,10 @@ static void null_del_dev(struct nullb *nullb)
- 
- static void null_config_discard(struct nullb *nullb)
- {
-+	blk_queue_max_write_zeroes_sectors(nullb->q, UINT_MAX >> 9);
- 	if (nullb->dev->discard == false)
- 		return;
- 
--	if (!nullb->dev->memory_backed) {
--		nullb->dev->discard = false;
--		pr_info("discard option is ignored without memory backing\n");
--		return;
--	}
--
- 	if (nullb->dev->zoned) {
- 		nullb->dev->discard = false;
- 		pr_info("discard option is ignored in zoned mode\n");
-@@ -1609,6 +1615,17 @@ static void null_config_discard(struct nullb *nullb)
- 	blk_queue_flag_set(QUEUE_FLAG_DISCARD, nullb->q);
- }
- 
-+static void null_config_bounce_pfn(struct nullb *nullb)
++#ifdef CONFIG_BLK_DEV_INTEGRITY
++static void set_integrity(struct blk_io_trace_ext *t,
++			  struct bio_integrity_payload *bip)
 +{
-+	if (nullb->dev->memory_backed && nullb->dev->bounce_pfn == false)
-+		return;
-+
-+	if (!nullb->dev->memory_backed && !g_bounce_pfn)
-+		return;
-+
-+	blk_queue_bounce_limit(nullb->q, nullb->dev->bounce_pfn);
++	t->seed = (u64)bip_get_seed(bip);
++	/*
++	 * We store integrity buffer size and flags as :-
++	 *
++	 * 63            48          32            16     5           0
++	 * |          reserved       | buffer size | rsvd | bip flags |
++	 */
++	t->integrity = (bip->bip_iter.bi_size << 16) | bip->bip_flags;
 +}
++#else
++static void set_integrity(struct blk_io_trace_ext *t, void *bip)
++{
 +
- static const struct block_device_operations null_bio_ops = {
- 	.owner		= THIS_MODULE,
- 	.submit_bio	= null_submit_bio,
-@@ -1881,6 +1898,7 @@ static int null_add_dev(struct nullb_device *dev)
- 	blk_queue_max_hw_sectors(nullb->q, dev->max_sectors);
++}
++#endif
++
+ /*
+  * Send out a notify message.
+  */
+@@ -115,7 +135,8 @@ static void trace_note(struct blk_trace *bt, pid_t pid, int action,
+ }
  
- 	null_config_discard(nullb);
-+	null_config_bounce_pfn(nullb);
+ static void trace_note_ext(struct blk_trace_ext *bt, pid_t pid, u64 action,
+-			   const void *data, size_t len, u64 cgid, u32 ioprio)
++			   const void *data, size_t len, u64 cgid, u32 ioprio,
++			   struct bio_integrity_payload *bip)
+ {
+ 	struct blk_io_trace_ext *t;
+ 	struct ring_buffer_event *event = NULL;
+@@ -148,6 +169,8 @@ static void trace_note_ext(struct blk_trace_ext *bt, pid_t pid, u64 action,
+ 		t->device = bt->dev;
+ 		t->action = action | (cgid ? __BLK_TN_CGROUP : 0);
+ 		t->ioprio = ioprio;
++		if (bip)
++			set_integrity(t, bip);
+ 		t->pid = pid;
+ 		t->cpu = cpu;
+ 		t->pdu_len = len + cgid_len;
+@@ -178,7 +201,8 @@ static void trace_note_tsk(struct task_struct *tsk)
+ 	spin_unlock_irqrestore(&running_trace_lock, flags);
+ }
  
- 	sprintf(nullb->disk_name, "nullb%d", nullb->index);
+-static void trace_note_tsk_ext(struct task_struct *tsk, u32 ioprio)
++static void trace_note_tsk_ext(struct task_struct *tsk, u32 ioprio,
++			       struct bio_integrity_payload *bip)
+ {
+ 	unsigned long flags;
+ 	struct blk_trace_ext *bt;
+@@ -187,7 +211,7 @@ static void trace_note_tsk_ext(struct task_struct *tsk, u32 ioprio)
+ 	spin_lock_irqsave(&running_trace_ext_lock, flags);
+ 	list_for_each_entry(bt, &running_trace_ext_list, running_ext_list) {
+ 		trace_note_ext(bt, tsk->pid, BLK_TN_PROCESS_EXT, tsk->comm,
+-			   sizeof(tsk->comm), 0, ioprio);
++			       sizeof(tsk->comm), 0, ioprio, bip);
+ 	}
+ 	spin_unlock_irqrestore(&running_trace_ext_lock, flags);
+ }
+@@ -220,7 +244,7 @@ static void trace_note_time_ext(struct blk_trace_ext *bt)
+ 	words[1] = now.tv_nsec;
  
-diff --git a/drivers/block/null_blk/null_blk.h b/drivers/block/null_blk/null_blk.h
-index 83504f3cc9d6..cd55f99118bf 100644
---- a/drivers/block/null_blk/null_blk.h
-+++ b/drivers/block/null_blk/null_blk.h
-@@ -86,6 +86,7 @@ struct nullb_device {
- 	unsigned int queue_mode; /* block interface */
- 	unsigned int blocksize; /* block size */
- 	unsigned int max_sectors; /* Max sectors per command */
-+	unsigned int bounce_pfn; /* bounce page frame number */
- 	unsigned int irqmode; /* IRQ completion handler */
- 	unsigned int hw_queue_depth; /* queue depth */
- 	unsigned int index; /* index of the disk, only valid with a disk */
+ 	local_irq_save(flags);
+-	trace_note_ext(bt, 0, BLK_TN_TIMESTAMP, words, sizeof(words), 0, 0);
++	trace_note_ext(bt, 0, BLK_TN_TIMESTAMP, words, sizeof(words), 0, 0, NULL);
+ 	local_irq_restore(flags);
+ }
+ 
+@@ -290,9 +314,9 @@ void __trace_note_message_ext(struct blk_trace_ext *bt, struct blkcg *blkcg,
+ 		blkcg = NULL;
+ #ifdef CONFIG_BLK_CGROUP
+ 	trace_note_ext(bt, 0, BLK_TN_MESSAGE_EXT, buf, n,
+-		blkcg ? cgroup_id(blkcg->css.cgroup) : 1, 0);
++		blkcg ? cgroup_id(blkcg->css.cgroup) : 1, 0, NULL);
+ #else
+-	trace_note_ext(bt, 0, BLK_TN_MESSAGE_EXT, buf, n, 0, 0);
++	trace_note_ext(bt, 0, BLK_TN_MESSAGE_EXT, buf, n, 0, 0, NULL);
+ #endif
+ 	local_irq_restore(flags);
+ }
+@@ -478,7 +502,7 @@ static const u64 ddir_act_ext[2] = { BLK_TC_ACT_EXT(BLK_TC_READ),
+  */
+ static void __blk_add_trace_ext(struct blk_trace_ext *bt, sector_t sector, int bytes,
+ 		     int op, int op_flags, u64 what, int error, int pdu_len,
+-		     void *pdu_data, u64 cgid, u32 ioprio)
++		     void *pdu_data, u64 cgid, u32 ioprio, void *bip)
+ {
+ 	struct task_struct *tsk = current;
+ 	struct ring_buffer_event *event = NULL;
+@@ -545,7 +569,7 @@ static void __blk_add_trace_ext(struct blk_trace_ext *bt, sector_t sector, int b
+ 	}
+ 
+ 	if (unlikely(tsk->btrace_seq != blktrace_seq))
+-		trace_note_tsk_ext(tsk, ioprio);
++		trace_note_tsk_ext(tsk, ioprio, bip);
+ 
+ 	/*
+ 	 * A word about the locking here - we disable interrupts to reserve
+@@ -1421,7 +1445,7 @@ static void blk_add_trace_rq(struct request *rq, int error,
+ 			what |= BLK_TC_ACT_EXT(BLK_TC_FS);
+ 		__blk_add_trace_ext(bte, blk_rq_trace_sector(rq), nr_bytes,
+ 				    req_op(rq), rq->cmd_flags, what, error, 0,
+-				    NULL, cgid, req_get_ioprio(rq));
++				    NULL, cgid, req_get_ioprio(rq), NULL);
+ 	}
+ 	rcu_read_unlock();
+ }
+@@ -1564,7 +1588,7 @@ static void blk_add_trace_bio(struct request_queue *q, struct bio *bio,
+ 				    bio->bi_iter.bi_size, bio_op(bio),
+ 				    bio->bi_opf, what, error, 0, NULL,
+ 				    blk_trace_bio_get_cgid(q, bio),
+-				    bio_prio(bio));
++				    bio_prio(bio), bio_integrity(bio));
+ 	}
+ 	rcu_read_unlock();
+ }
+@@ -1724,7 +1748,7 @@ static void blk_add_trace_plug(void *ignore, struct request_queue *q)
+ 		__blk_add_trace(bt, 0, 0, 0, 0, BLK_TA_PLUG, 0, 0, NULL, 0);
+ 	else if (bte)
+ 		__blk_add_trace_ext(bte, 0, 0, 0, 0, BLK_TA_PLUG_EXT, 0, 0,
+-				    NULL, 0, 0);
++				    NULL, 0, 0, NULL);
+ 	rcu_read_unlock();
+ }
+ 
+@@ -1756,7 +1780,7 @@ static void blk_add_trace_unplug(void *ignore, struct request_queue *q,
+ 		else
+ 			what = BLK_TA_UNPLUG_TIMER_EXT;
+ 		__blk_add_trace_ext(bte, 0, 0, 0, 0, what, 0, sizeof(rpdu),
+-				&rpdu, 0, 0);
++				&rpdu, 0, 0, NULL);
+ 	}
+ 	rcu_read_unlock();
+ }
+@@ -1787,7 +1811,9 @@ static void blk_add_trace_split(void *ignore, struct bio *bio, unsigned int pdu)
+ 				    bio->bi_iter.bi_size, bio_op(bio),
+ 				    bio->bi_opf, BLK_TA_SPLIT_EXT,
+ 				    bio->bi_status, sizeof(rpdu), &rpdu,
+-				    blk_trace_bio_get_cgid(q, bio), 0);
++				    blk_trace_bio_get_cgid(q, bio),
++				    bio_prio(bio),
++				    bio_integrity(bio));
+ 	}
+ 	rcu_read_unlock();
+ }
+@@ -1831,7 +1857,9 @@ static void blk_add_trace_bio_remap(void *ignore, struct bio *bio, dev_t dev,
+ 				    bio->bi_iter.bi_size, bio_op(bio),
+ 				    bio->bi_opf, BLK_TA_REMAP_EXT, bio->bi_status,
+ 				    sizeof(r), &r,
+-				    blk_trace_bio_get_cgid(q, bio), 0);
++				    blk_trace_bio_get_cgid(q, bio),
++				    bio_prio(bio),
++				    bio_integrity(bio));
+ 	}
+ 	rcu_read_unlock();
+ }
+@@ -1876,7 +1904,7 @@ static void blk_add_trace_rq_remap(void *ignore, struct request *rq, dev_t dev,
+ 		__blk_add_trace_ext(bte, blk_rq_pos(rq), blk_rq_bytes(rq),
+ 				    rq_data_dir(rq), 0, BLK_TA_REMAP_EXT, 0,
+ 				    sizeof(r), &r,
+-				    blk_trace_request_get_cgid(rq), 0);
++				    blk_trace_request_get_cgid(rq), 0, NULL);
+ 	}
+ 	rcu_read_unlock();
+ }
+@@ -1912,7 +1940,7 @@ void blk_add_driver_data(struct request *rq, void *data, size_t len)
+ 		__blk_add_trace_ext(bte, blk_rq_trace_sector(rq),
+ 				blk_rq_bytes(rq), 0, 0, BLK_TA_DRV_DATA_EXT, 0,
+ 				len, data, blk_trace_request_get_cgid(rq),
+-				req_get_ioprio(rq));
++				req_get_ioprio(rq), NULL);
+ 	}
+ 	rcu_read_unlock();
+ }
 -- 
 2.22.1
 
