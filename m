@@ -2,61 +2,61 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADE0CC433DB
-	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 07:10:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34453C433E0
+	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 07:10:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6CB5D64ED3
-	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 07:10:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E1E9064EF5
+	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 07:10:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233688AbhBYHJ7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Feb 2021 02:09:59 -0500
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:4515 "EHLO
+        id S233919AbhBYHK2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Feb 2021 02:10:28 -0500
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:4544 "EHLO
         esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232923AbhBYHIZ (ORCPT
+        with ESMTP id S233383AbhBYHIh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Feb 2021 02:08:25 -0500
+        Thu, 25 Feb 2021 02:08:37 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1614236904; x=1645772904;
+  t=1614236916; x=1645772916;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=1hBv8Gu4qfS+3fsLLBjregm8reryLOBw/ybrB5vLfFM=;
-  b=hh5BCxDhIdlQRkZEY1Z9QFxD1q9NNgXT8qPgJrWO/6BvpW9bmgNlFhiB
-   MrIo9CiQBLCDHfZ/sD9/pwM5Fr7VKvBc0XNw2XBcq31+Iuv4uoD0TF44i
-   9/NlCgjEmN5XD7ugd63gLcNPEeCiguPE4glemmPS7CMBRuv8KtngY+f6h
-   GSdaxTfT37Ms3yKHVpnsS8JTH8HEv0/EkXaG6IN0pqtau2wvtxROszRp/
-   Of/XsnrdO9lQ5PnwTFq1iBDJK02NRD5+F83U5opVfOj24634+0IUysv55
-   59/RjIlVBGB9CgDpHyqa7/GbBIZDYOouJecCKStuX19a9IsAsWrGbDJ3o
+  bh=mMNdpWTlLEM3dM1FX5uUB+nf43YofWvX3hWgSz3vKQQ=;
+  b=m4QL6RXSwpER+bs2UTWuEjjOzShmt4W1RjiJuKj1DukQ0ALyQVMS12r6
+   Oq1/jGXn2zaieTAq3vUvQBTqJLHLufAGDoJBbqmzKzofy1FClxfHP76K5
+   Ui5rM9gEglIUDXb87MRboa8mE2Tq4soirM6pEE4X0AnuCuq3ggFGqpEDq
+   vkArKQiRmVrAvAJeHrF795sM54UvJVwO1S4KKpud+jI34qP4yVeKKNhPd
+   Fw7Eh3jeAa8hhOUhP+gvTyp2KqIXbygCflqvtnWN8VpSM2CBLqDa8xegN
+   WEpdqoKHebgm1znLWdEnvnjjRClEvLfKh+h5jOD4wArQ/jwnj5J3uCOxk
    Q==;
-IronPort-SDR: zGxBJxxQrDDdC0ucph/RfmrlfTaJvE+vEAn7evILrLtpVlg7CLKRZz/edzmU0NvDAUEb6tNgza
- E+WHAPtGfA2RjAZm6kJrmb1ylw75scoJs52w2Q8UsRiIqfrCSOKBcilpJW7MHg/a+cfY1gpQMH
- 3T3kOJ1uv3hsjVnFBnTm9QiO+9qcUEVzKfIGpP5f55Wno3gTeEdPfhYSv/3fWyMQ5ytgIfa0Me
- ImfBWYUzGaCRYRTjfdrTD6aWz44gXJylxAriv3jcc/E0xsvClaF2eAADlnVKpmFBJiVF31eIKT
- +oA=
+IronPort-SDR: rVsQeEgz8ow6a8m+LaKiCdM0D5wK5Z4/GjkCn2N2VbTJeUzQ6rhZn7KQWm8Ia0TX6BEnrclG+z
+ nrAsuox7E3VbqqKnlY62765wYM7sweg7hZpGgrBcrzCJLWk7+VUYRszMwcnhNhZYLeBtcEzgPN
+ Oa1AYGSkBytWaSg+6TaXvqjpnzo2oIlDELxAlnh8tTaOfLp+ThA6rnYugj2DSwT2FVJB6DlNJ/
+ 3maFJU4r8KMcc0pYm0nt6tpnkAJz7isULRVzmBF7JakDaJMbxh7+w4tHrMbHwUrJlMoF59K/L5
+ ieU=
 X-IronPort-AV: E=Sophos;i="5.81,205,1610380800"; 
-   d="scan'208";a="271319252"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 25 Feb 2021 15:07:16 +0800
-IronPort-SDR: 0uoramwMAK5nO91+krnq9wy/JMpUFv2o1OEjLhYsBd5x7eVLqwrULfT9e17H8RSvM8uVXIpzjR
- YOVMek6wUTsV1o8bP4ADpc1X8Jliocjjqf7V33QUWHVGME77lW2jXX6zap6le14+b68SuvyfuC
- 7gvCorzsUIxhBRB7XSh/3GSoJhlIDFCNQbzjl0Vhn9q0m8yLB5qOjmM1sYcjFm8fpHns+mNQ7U
- Yhvq8/1d0CCZNVyhYHL4EuoEPeTmguALgfKQBYBDmUOqu+F662Lz0ymVvmBdlFog0qYMBapGSh
- jWTuzAZMax5D+/q+jLRVy9TY
+   d="scan'208";a="271319267"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 25 Feb 2021 15:07:31 +0800
+IronPort-SDR: dDyziYqBNpAZh1uVVAYJTDRXKnGFiW+ZWVCoa48v9rPZ9RHQCVckbRTnR7JH2keSZvQ+n+UFYv
+ Pmjquil+Mb4rs6Veq9cI1iKKWghe8Omu+fUBk/66sGZ5KPH+wID07HM07vFwT7dHfAqIDy0RKp
+ F6pZ8hPb9z0HqtYpwc5W0mnEfrOtI/8ZDu7NLjBhpEWboBMyvr1aljR8+QLkErfcbArKgZASSy
+ akRGQ4vpuwdX8yLXz/boY3cBYA1psZgR7Kryn6r0MLZPIXyGwYxg8kG8wxRWTQ9JZ97qpDPrGY
+ ENKbeaPcSoeyk/XXxa4hx4RR
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2021 22:48:38 -0800
-IronPort-SDR: tTkqodW0+y/1iCCApd6wfSVWRetFjKjxI+gnXFyP8IMFdCZjLziwK1eUJixyaalCKBKexVMApX
- LtQx1fqtoA7r9H96areCy7K00hwXk1fvRlf2QB6iNDw8vM+1a+UfN4Gnp2EPhcmr+MILCQgeNq
- +G/bBLGGkQdlkz7o92uszxZY1V+h/BJXGshCY8ykmt6h0+ob0lVROC//GO7OSxzyg+L47/fUS1
- cmHfxubD+Sxz831jFiWZjQgyibvUF9kyZXBG1uBascPLcwKdTN74/jcSo/GQdLYMRfFdiAXtP3
- ZOQ=
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2021 22:50:46 -0800
+IronPort-SDR: Lg8JC040IaD4Bis3lI841Kfg7JXF+70Ehi6NqJwDicoXTGuOQCTtN6gBA5Ri/WEE9v3dCANpBA
+ FG9UkQzlG0pkT+6LWRKzZEFi5wbICyRkSBUAXRMQ8z/Xo2I8ptl3L58ra5IjPGUjEAJ6VgDMl7
+ pKo6CQaS00ESCz9dcpp4NUPvgYPKMEcsDANqMW5gp4kXj+YzSQwvy+fikyU3opROXfDvZMcdAX
+ Uq6hcXbHxk/erH+MNpclbvKri0dFOJPS1+nv1rUQsQ2W6xuVJjetFobHza83KNe/TjmwYNHPg/
+ cxA=
 WDCIronportException: Internal
 Received: from vm.labspan.wdc.com (HELO vm.sc.wdc.com) ([10.6.137.102])
-  by uls-op-cesaip01.wdc.com with ESMTP; 24 Feb 2021 23:07:16 -0800
+  by uls-op-cesaip01.wdc.com with ESMTP; 24 Feb 2021 23:07:31 -0800
 From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 To:     axboe@kernel.dk, viro@zeniv.linux.org.uk, rostedt@goodmis.org,
         mingo@redhat.com, chaitanya.kulkarni@wdc.com,
@@ -65,9 +65,9 @@ To:     axboe@kernel.dk, viro@zeniv.linux.org.uk, rostedt@goodmis.org,
         aravind.ramesh@wdc.com, joshi.k@samsung.com, niklas.cassel@wdc.com,
         hch@lst.de, osandov@fb.com, martin.petersen@oracle.com
 Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: [RFC PATCH 33/39] blktrace: add blkext tracer
-Date:   Wed, 24 Feb 2021 23:02:25 -0800
-Message-Id: <20210225070231.21136-34-chaitanya.kulkarni@wdc.com>
+Subject: [RFC PATCH 35/39] block: update blkdev_ioctl with new trace ioctls
+Date:   Wed, 24 Feb 2021 23:02:27 -0800
+Message-Id: <20210225070231.21136-36-chaitanya.kulkarni@wdc.com>
 X-Mailer: git-send-email 2.22.1.dirty
 In-Reply-To: <20210225070231.21136-1-chaitanya.kulkarni@wdc.com>
 References: <20210225070231.21136-1-chaitanya.kulkarni@wdc.com>
@@ -77,103 +77,28 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Add newly intoduce IOCTLs so that userspace tools can call them.
+
 Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 ---
- kernel/trace/blktrace.c | 47 ++++++++++++++++++++++++++++++++++++++---
- kernel/trace/trace.h    |  1 +
- 2 files changed, 45 insertions(+), 3 deletions(-)
+ block/ioctl.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index 53bba8537294..f707ebde0062 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -2490,18 +2490,42 @@ static struct tracer blk_tracer __read_mostly = {
- 	.set_flag	= blk_tracer_set_flag,
- };
- 
-+static struct tracer blk_tracer_ext __read_mostly = {
-+	.name		= "blkext",
-+	.init		= blk_tracer_init,
-+	.reset		= blk_tracer_reset,
-+	.start		= blk_tracer_start,
-+	.stop		= blk_tracer_stop,
-+	.print_header	= blk_tracer_print_header,
-+	.print_line	= blk_tracer_print_line_ext,
-+	.flags		= &blk_tracer_flags,
-+	.set_flag	= blk_tracer_set_flag,
-+};
-+
- static struct trace_event_functions trace_blk_event_funcs = {
- 	.trace		= blk_trace_event_print,
- 	.binary		= blk_trace_event_print_binary,
- };
- 
-+static struct trace_event_functions trace_blk_event_funcs_ext = {
-+	.trace		= blk_trace_event_print_ext,
-+	.binary		= blk_trace_event_print_binary_ext,
-+};
-+
- static struct trace_event trace_blk_event = {
- 	.type		= TRACE_BLK,
- 	.funcs		= &trace_blk_event_funcs,
- };
- 
-+static struct trace_event trace_blk_event_ext = {
-+	.type		= TRACE_BLK_EXT,
-+	.funcs		= &trace_blk_event_funcs_ext,
-+};
-+
- static int __init init_blk_tracer(void)
- {
-+	int ret = 0;
-+
- 	if (!register_trace_event(&trace_blk_event)) {
- 		pr_warn("Warning: could not register block events\n");
- 		return 1;
-@@ -2509,11 +2533,28 @@ static int __init init_blk_tracer(void)
- 
- 	if (register_tracer(&blk_tracer) != 0) {
- 		pr_warn("Warning: could not register the block tracer\n");
--		unregister_trace_event(&trace_blk_event);
--		return 1;
-+		goto unregister_trace_event;
- 	}
- 
--	return 0;
-+	if (!register_trace_event(&trace_blk_event_ext)) {
-+		pr_warn("Warning: could not register block events\n");
-+		/* unregister blk_tracer */
-+		goto unregister_trace_event;
-+	}
-+
-+	if (register_tracer(&blk_tracer_ext) != 0) {
-+		pr_warn("Warning: could not register the block tracer\n");
-+		goto unregister_trace_event_ext;
-+	}
-+out:
-+	return ret;
-+
-+unregister_trace_event_ext:
-+	unregister_trace_event(&trace_blk_event_ext);
-+unregister_trace_event:
-+	unregister_trace_event(&trace_blk_event);
-+	ret = 1;
-+	goto out;
- }
- 
- device_initcall(init_blk_tracer);
-diff --git a/kernel/trace/trace.h b/kernel/trace/trace.h
-index e448d2da0b99..8bb010753a17 100644
---- a/kernel/trace/trace.h
-+++ b/kernel/trace/trace.h
-@@ -42,6 +42,7 @@ enum trace_type {
- 	TRACE_GRAPH_ENT,
- 	TRACE_USER_STACK,
- 	TRACE_BLK,
-+	TRACE_BLK_EXT,
- 	TRACE_BPUTS,
- 	TRACE_HWLAT,
- 	TRACE_RAW_DATA,
+diff --git a/block/ioctl.c b/block/ioctl.c
+index ff241e663c01..9d5e742ce8be 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -509,6 +509,10 @@ static int blkdev_common_ioctl(struct block_device *bdev, fmode_t mode,
+ 	case BLKTRACESTART:
+ 	case BLKTRACESTOP:
+ 	case BLKTRACETEARDOWN:
++	case BLKTRACESETUP_EXT:
++	case BLKTRACESTART_EXT:
++	case BLKTRACESTOP_EXT:
++	case BLKTRACETEARDOWN_EXT:
+ 		return blk_trace_ioctl(bdev, cmd, argp);
+ 	case IOC_PR_REGISTER:
+ 		return blkdev_pr_register(bdev, argp);
 -- 
 2.22.1
 
