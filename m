@@ -2,231 +2,118 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FF1CC433E6
-	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 02:25:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C945C433DB
+	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 03:48:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1298564ECB
-	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 02:25:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 941C164ED3
+	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 03:48:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234314AbhBYCZI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Feb 2021 21:25:08 -0500
-Received: from mout.gmx.net ([212.227.17.21]:40363 "EHLO mout.gmx.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232033AbhBYCZH (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Feb 2021 21:25:07 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
-        s=badeba3b8450; t=1614219813;
-        bh=onxWgCyxaTGOD38y2anSIAoGQT5mCjHv8FiPC1q8PJU=;
-        h=X-UI-Sender-Class:Subject:To:Cc:References:From:Date:In-Reply-To;
-        b=KX2Q3Tcz3CoyTqwY3kJYaDdfd+61AQlrLhVYnmugUj5gs8TQoDvqo8JIErdQGhtu3
-         yzaS2hSngp/aOz+WIFfhZ3mowM+9I1IZpXS5UP/UX+U5rzN6xDynRGnusTQsaRbB/T
-         OsMwinX5D5CR8jja5Out+/i/3eGDhvjEwo7UKPjA=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from [10.10.213.91] ([103.52.188.137]) by mail.gmx.net (mrgmx105
- [212.227.17.174]) with ESMTPSA (Nemesis) id 1M59GG-1lE0Nk2QFA-0019ij; Thu, 25
- Feb 2021 03:23:33 +0100
-Subject: Re: Large latency with bcache for Ceph OSD
-To:     Coly Li <colyli@suse.de>
-Cc:     linux-block@vger.kernel.org, axboe@kernel.dk,
-        linux-bcache@vger.kernel.org
-References: <3f3e20a3-c165-1de1-7fdd-f0bd4da598fe@gmx.com>
- <632258f7-b138-3fba-456b-9da37c1de710@gmx.com>
- <5867daf1-0960-39aa-1843-1a76c1e9a28d@suse.de>
-From:   "Norman.Kern" <norman.kern@gmx.com>
-Message-ID: <07bcb6c8-21e1-11de-d1f0-ffd417bd36ff@gmx.com>
-Date:   Thu, 25 Feb 2021 10:23:29 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.0
+        id S233452AbhBYDr7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Feb 2021 22:47:59 -0500
+Received: from mail-il1-f198.google.com ([209.85.166.198]:48973 "EHLO
+        mail-il1-f198.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233311AbhBYDr7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 24 Feb 2021 22:47:59 -0500
+Received: by mail-il1-f198.google.com with SMTP id n12so3266923ili.15
+        for <linux-block@vger.kernel.org>; Wed, 24 Feb 2021 19:47:43 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=WqS9rOcx9yS17LIpvXVzxUWXWLEmGt7NJ28w5bEBMqI=;
+        b=Mw8hrtGrMnyZVEkxK2BFDS1Pk90W8IuId7QF6kOHS8q7xTL+7VaWpEVVKY58TxR486
+         cLxgHdLBi9dAM+S6Oga8Br+VpwahBHYOmCFM+ewJtHCgFf/dXJi3sLiHLMgKI0HHEduy
+         0bNGIt3NyCB80Hjd0aEqJdCUJ5JjxGmbLbM6GDhpRk3ogj7FqBZsmOAfR7QyAGOTRmKe
+         tqNXbP+kAI4ancWYKMDfmGBaisISeppZQuQeYsHIpzSo4OUeGGn4KeYQmbAvu1eqjaji
+         atV7OInQO5dbr4TiEUmkneGQjOlS3G57OjIHw1jdlosKpD7Ywfj+DvzhfwBQx+MQonEr
+         vmYA==
+X-Gm-Message-State: AOAM5334J/MjzILXaaCNvC/pV9ik9HQAUecbbOp9w1fi8/C9fFxbXXoe
+        F4OizrTtIG38bATx3oXVKI1yMNIni/7NJ0lKZ3WiViKU+44h
+X-Google-Smtp-Source: ABdhPJyVhZVWrlYNayYRCvIGqvB4QPlmNcHBH1HWkDe9dZ572NP3ON+nvyZqclZMvzGxuNbDKAjgev96eW2MhGH7k9cXjgwB1BbZ
 MIME-Version: 1.0
-In-Reply-To: <5867daf1-0960-39aa-1843-1a76c1e9a28d@suse.de>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-X-Provags-ID: V03:K1:p1qqbpFusbZ9E+GzDum6822o2Bn7z/0VNUN7Jpkrh2q75rb06pT
- iFcgHXCzllxqKitHCgr56zh+EDb95qagAGdRTSKw1wQTas2dZK5wD+nX06btZzfCFPJYd1s
- 5ai+6+ySS2aeBzp4OIpkDvBwQkL24+y7/h3JnbFjBcwZDtO4WDjJgeJG2krHqdOReV6yg7c
- zfdmJKX48ZjidJHsfDqKA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:MIuOjKvF4AM=:qnu6K1Tsddh1wKUgtvfJtE
- VzOtfTeGrP+kqWHKg4S3tx/XUF1fa+lnA+kRPQf3UN2H6y1ZRTNeYZ/GqWdNr8zylr0QnxJzT
- fGH/UETD7ebApVsEFYcvU6q4nyIn2CTtb7IGA83XAs+YJ82ogMalmZlHOAVZfcd+VWjQXc0cw
- jUovTerIwAWKZp6S3UwBm1GQ55fkZYelwzN2Yw2bSrKYMFR9YX4WvVVLytQx7tOErqcP4XFPC
- gjOkzMXtnu8pVgaJdsQlVuAbk7ltoSYCt+++lbLFde6tWfEFDvQPVExvBCWCqCM6pMmGKZSZ6
- F4X5STGOWVi9N36b51UKQUnztWV6R3q5ROXFZJUxHfB7nvx2zWrYeXjZrCVYyoTnRa9Pd14aG
- kr5R+/pQLpXKpwXwV1G5Arsuy/qZrMkiXdvrmmCEoXwlRk2JCvPmW2YoceBkEIcupruX5eU1v
- wtBC0721LyPIq9/YR+A0FC0lpOUFjgqvKg+ZXcJKKSUr50PerJSVtr6JoXeFxGYv5d3HOcPUI
- qfBQ+izkY3yZhVkTBeGeI39r3lkrHEipJ9ljtnDEaKdPBofR9xj+4u5/gscebOrKnBY16o48h
- yE6/k0AebWXRH9wo+t3V+xhnc0+bX631KpoXVuG0XS+nWlkmnuzgp9iPbJ87tcNKppo7wgYib
- MSONQ6yIjFca83KA6OMZ9u2QV3qvXnbnFxaCjL7Xel5IE28vkmyAhqjP4HaynlZ0ZdvnjoDwC
- 7qB4s/OquVWxzy0HPizrEsTNzQzf2YfpsEZtqJPsDRFhhxYrO+tG3JW1rPd0iDhW3BpWDJl+J
- 9OjTwAIBj+8oJJ/N0sshDQDfo/JkdbrwiMkvASI9xbiyKFAXc2S+y29HOMjK0SK2wl30Qm1TP
- t+2IXIwaYr1I85xk8lzA==
+X-Received: by 2002:a05:6602:2191:: with SMTP id b17mr331549iob.114.1614224838526;
+ Wed, 24 Feb 2021 19:47:18 -0800 (PST)
+Date:   Wed, 24 Feb 2021 19:47:18 -0800
+In-Reply-To: <000000000000251ce705bbe91ddb@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000168cb405bc210223@google.com>
+Subject: Re: WARNING in nbd_dev_add
+From:   syzbot <syzbot+9b658439133becd38da1@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+syzbot has found a reproducer for the following issue on:
 
-On 2021/2/24 =E4=B8=8B=E5=8D=884:52, Coly Li wrote:
-> On 2/22/21 7:48 AM, Norman.Kern wrote:
->> Ping.
->>
->> I'm confused on the SYNC I/O on bcache. why SYNC I/O must be writen bac=
-k
->> for persistent cache?=C2=A0 It can cause some latency.
->>
->> @Coly, can you give help me to explain why bcache handle O_SYNC like th=
-is.?
->>
->>
-> Hmm, normally we won't observe the application issuing I/Os on backing
-> device except for,
-> - I/O bypass by SSD congestion
-> - Sequential I/O request
-> - Dirty buckets exceeds the cutoff threshold
-> - Write through mode
->
-> Do you set the write/read congestion threshold to 0 ?
+HEAD commit:    6fbd15c0 Merge branch '100GbE' of git://git.kernel.org/pub..
+git tree:       net
+console output: https://syzkaller.appspot.com/x/log.txt?x=17a009a8d00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=2b8307379601586a
+dashboard link: https://syzkaller.appspot.com/bug?extid=9b658439133becd38da1
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=101ff9b6d00000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14c9a5cad00000
 
-Thanks for you reply.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+9b658439133becd38da1@syzkaller.appspotmail.com
 
-I have set the threshold to zero, all configs:
+RBP: 0000000000403430 R08: 00000000004004a0 R09: 00000000004004a0
+R10: 0000000000000000 R11: 0000000000000246 R12: 00000000004034c0
+R13: 0000000000000000 R14: 00000000004ad018 R15: 00000000004004a0
+kobject_add_internal failed for 43:0 with -EEXIST, don't try to register things with the same name in the same directory.
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 8421 at block/genhd.c:620 __device_add_disk+0x1030/0x1300 block/genhd.c:620
+Modules linked in:
+CPU: 0 PID: 8421 Comm: syz-executor614 Not tainted 5.11.0-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+RIP: 0010:__device_add_disk+0x1030/0x1300 block/genhd.c:620
+Code: f1 ff ff e8 42 c4 c1 fd 0f 0b e9 e6 f6 ff ff 48 89 7c 24 20 e8 31 c4 c1 fd 0f 0b 48 8b 7c 24 20 e9 9b f4 ff ff e8 20 c4 c1 fd <0f> 0b e9 dd fb ff ff 4c 89 ef e8 a1 fc 04 fe e9 28 f1 ff ff 48 8b
+RSP: 0018:ffffc9000163f340 EFLAGS: 00010293
+RAX: 0000000000000000 RBX: 0000000000000001 RCX: 0000000000000000
+RDX: ffff888015548000 RSI: ffffffff83b11590 RDI: 0000000000000003
+RBP: ffff888025956000 R08: 0000000000000000 R09: ffffffff8fa9a837
+R10: ffffffff83b1116b R11: 0000000000000000 R12: 00000000ffffffef
+R13: ffff8880259560a0 R14: ffff888016fa97d0 R15: ffff8880171ae000
+FS:  0000000001b2c300(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000020000380 CR3: 0000000015534000 CR4: 00000000001506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ add_disk include/linux/genhd.h:231 [inline]
+ nbd_dev_add+0x720/0x910 drivers/block/nbd.c:1719
+ nbd_genl_connect+0x557/0x1570 drivers/block/nbd.c:1829
+ genl_family_rcv_msg_doit+0x228/0x320 net/netlink/genetlink.c:739
+ genl_family_rcv_msg net/netlink/genetlink.c:783 [inline]
+ genl_rcv_msg+0x328/0x580 net/netlink/genetlink.c:800
+ netlink_rcv_skb+0x153/0x420 net/netlink/af_netlink.c:2502
+ genl_rcv+0x24/0x40 net/netlink/genetlink.c:811
+ netlink_unicast_kernel net/netlink/af_netlink.c:1312 [inline]
+ netlink_unicast+0x533/0x7d0 net/netlink/af_netlink.c:1338
+ netlink_sendmsg+0x856/0xd90 net/netlink/af_netlink.c:1927
+ sock_sendmsg_nosec net/socket.c:652 [inline]
+ sock_sendmsg+0xcf/0x120 net/socket.c:672
+ ____sys_sendmsg+0x6e8/0x810 net/socket.c:2348
+ ___sys_sendmsg+0xf3/0x170 net/socket.c:2402
+ __sys_sendmsg+0xe5/0x1b0 net/socket.c:2435
+ do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x43f9c9
+Code: 28 c3 e8 5a 14 00 00 66 2e 0f 1f 84 00 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffd2bb97998 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00000000004004a0 RCX: 000000000043f9c9
+RDX: 0000000000000000 RSI: 0000000020000240 RDI: 0000000000000004
+RBP: 0000000000403430 R08: 00000000004004a0 R09: 00000000004004a0
+R10: 0000000000000000 R11: 0000000000000246 R12: 00000000004034c0
+R13: 0000000000000000 R14: 00000000004ad018 R15: 00000000004004a0
 
-#make-bcache -C -b 4m -w 4k --discard --cache_replacement_policy=3Dlru /de=
-v/sdm
-#make-bcache -B --writeback -w 4KiB /dev/sdn --wipe-bcache
-congested_read_threshold_us =3D 0
-congested_write_threshold_us =3D 0
-
-# I tried to set sequential_cutoff to 0, but it didn't solve it.
-
-sequential_cutoff =3D 4194304
-writeback_percent =3D 40
-cache_mode =3D writeback
-
-I renew the cluster=EF=BC=8C run for hours and reproduced the problem. I c=
-heck the cache status:
-
-root@WXS0106:/root/perf-tools# cat /sys/fs/bcache/d87713c6-2e76-4a09-8517-=
-d48306468659/cache_available_percent
-29
-root@WXS0106:/root/perf-tools# cat /sys/fs/bcache/d87713c6-2e76-4a09-8517-=
-d48306468659/internal/cutoff_writeback_sync
-70
-'Dirty buckets exceeds the cutoff threshold' caused the problem?=C2=A0 My =
-configs=C2=A0 are wrong or other reasons?
-
->
-> Coly Li
->
->> On 2021/2/18 =E4=B8=8B=E5=8D=883:56, Norman.Kern wrote:
->>> Hi guys,
->>>
->>> I am testing ceph with bcache, I found some I/O with O_SYNC writeback
->>> to HDD, which caused large latency on HDD, I trace the I/O with iosnoo=
-p:
->>>
->>> ./iosnoop=C2=A0 -Q -ts -d '8,192
->>>
->>> Tracing block I/O for 1 seconds (buffered)...
->>> STARTs=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ENDs=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 COMM=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 PID=C2=A0=C2=A0=C2=A0 TYPE DEV
->>> BLOCK=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BYTES=C2=A0=C2=A0=C2=
-=A0=C2=A0 LATms
->>>
->>> 1809296.292350=C2=A0 1809296.319052=C2=A0 tp_osd_tp=C2=A0=C2=A0=C2=A0 =
-22191=C2=A0 R=C2=A0=C2=A0=C2=A0 8,192
->>> 4578940240=C2=A0=C2=A0 16384=C2=A0=C2=A0=C2=A0=C2=A0 26.70
->>> 1809296.292330=C2=A0 1809296.320974=C2=A0 tp_osd_tp=C2=A0=C2=A0=C2=A0 =
-22191=C2=A0 R=C2=A0=C2=A0=C2=A0 8,192
->>> 4577938704=C2=A0=C2=A0 16384=C2=A0=C2=A0=C2=A0=C2=A0 28.64
->>> 1809296.292614=C2=A0 1809296.323292=C2=A0 tp_osd_tp=C2=A0=C2=A0=C2=A0 =
-22191=C2=A0 R=C2=A0=C2=A0=C2=A0 8,192
->>> 4600404304=C2=A0=C2=A0 16384=C2=A0=C2=A0=C2=A0=C2=A0 30.68
->>> 1809296.292353=C2=A0 1809296.325300=C2=A0 tp_osd_tp=C2=A0=C2=A0=C2=A0 =
-22191=C2=A0 R=C2=A0=C2=A0=C2=A0 8,192
->>> 4578343088=C2=A0=C2=A0 16384=C2=A0=C2=A0=C2=A0=C2=A0 32.95
->>> 1809296.292340=C2=A0 1809296.328013=C2=A0 tp_osd_tp=C2=A0=C2=A0=C2=A0 =
-22191=C2=A0 R=C2=A0=C2=A0=C2=A0 8,192
->>> 4578055472=C2=A0=C2=A0 16384=C2=A0=C2=A0=C2=A0=C2=A0 35.67
->>> 1809296.292606=C2=A0 1809296.330518=C2=A0 tp_osd_tp=C2=A0=C2=A0=C2=A0 =
-22191=C2=A0 R=C2=A0=C2=A0=C2=A0 8,192
->>> 4578581648=C2=A0=C2=A0 16384=C2=A0=C2=A0=C2=A0=C2=A0 37.91
->>> 1809295.169266=C2=A0 1809296.334041=C2=A0 bstore_kv_fi 17266=C2=A0 WS=
-=C2=A0=C2=A0 8,192
->>> 4244996360=C2=A0=C2=A0 4096=C2=A0=C2=A0=C2=A0 1164.78
->>> 1809296.292618=C2=A0 1809296.336349=C2=A0 tp_osd_tp=C2=A0=C2=A0=C2=A0 =
-22191=C2=A0 R=C2=A0=C2=A0=C2=A0 8,192
->>> 4602631760=C2=A0=C2=A0 16384=C2=A0=C2=A0=C2=A0=C2=A0 43.73
->>> 1809296.292618=C2=A0 1809296.338812=C2=A0 tp_osd_tp=C2=A0=C2=A0=C2=A0 =
-22191=C2=A0 R=C2=A0=C2=A0=C2=A0 8,192
->>> 4602632976=C2=A0=C2=A0 16384=C2=A0=C2=A0=C2=A0=C2=A0 46.19
->>> 1809296.030103=C2=A0 1809296.342780=C2=A0 tp_osd_tp=C2=A0=C2=A0=C2=A0 =
-22180=C2=A0 WS=C2=A0=C2=A0 8,192
->>> 4741276048=C2=A0=C2=A0 131072=C2=A0=C2=A0 312.68
->>> 1809296.292347=C2=A0 1809296.345045=C2=A0 tp_osd_tp=C2=A0=C2=A0=C2=A0 =
-22191=C2=A0 R=C2=A0=C2=A0=C2=A0 8,192
->>> 4609037872=C2=A0=C2=A0 16384=C2=A0=C2=A0=C2=A0=C2=A0 52.70
->>> 1809296.292620=C2=A0 1809296.345109=C2=A0 tp_osd_tp=C2=A0=C2=A0=C2=A0 =
-22191=C2=A0 R=C2=A0=C2=A0=C2=A0 8,192
->>> 4609037904=C2=A0=C2=A0 16384=C2=A0=C2=A0=C2=A0=C2=A0 52.49
->>> 1809296.292612=C2=A0 1809296.347251=C2=A0 tp_osd_tp=C2=A0=C2=A0=C2=A0 =
-22191=C2=A0 R=C2=A0=C2=A0=C2=A0 8,192
->>> 4578937616=C2=A0=C2=A0 16384=C2=A0=C2=A0=C2=A0=C2=A0 54.64
->>> 1809296.292621=C2=A0 1809296.351136=C2=A0 tp_osd_tp=C2=A0=C2=A0=C2=A0 =
-22191=C2=A0 R=C2=A0=C2=A0=C2=A0 8,192
->>> 4612654992=C2=A0=C2=A0 16384=C2=A0=C2=A0=C2=A0=C2=A0 58.51
->>> 1809296.292341=C2=A0 1809296.353428=C2=A0 tp_osd_tp=C2=A0=C2=A0=C2=A0 =
-22191=C2=A0 R=C2=A0=C2=A0=C2=A0 8,192
->>> 4578220656=C2=A0=C2=A0 16384=C2=A0=C2=A0=C2=A0=C2=A0 61.09
->>> 1809296.292342=C2=A0 1809296.353864=C2=A0 tp_osd_tp=C2=A0=C2=A0=C2=A0 =
-22191=C2=A0 R=C2=A0=C2=A0=C2=A0 8,192
->>> 4578220880=C2=A0=C2=A0 16384=C2=A0=C2=A0=C2=A0=C2=A0 61.52
->>> 1809295.167650=C2=A0 1809296.358510=C2=A0 bstore_kv_fi 17266=C2=A0 WS=
-=C2=A0=C2=A0 8,192
->>> 4923695960=C2=A0=C2=A0 4096=C2=A0=C2=A0=C2=A0 1190.86
->>> 1809296.292347=C2=A0 1809296.361885=C2=A0 tp_osd_tp=C2=A0=C2=A0=C2=A0 =
-22191=C2=A0 R=C2=A0=C2=A0=C2=A0 8,192
->>> 4607437136=C2=A0=C2=A0 16384=C2=A0=C2=A0=C2=A0=C2=A0 69.54
->>> 1809296.029363=C2=A0 1809296.367313=C2=A0 tp_osd_tp=C2=A0=C2=A0=C2=A0 =
-22180=C2=A0 WS=C2=A0=C2=A0 8,192
->>> 4739824400=C2=A0=C2=A0 98304=C2=A0=C2=A0=C2=A0 337.95
->>> 1809296.292349=C2=A0 1809296.370245=C2=A0 tp_osd_tp=C2=A0=C2=A0=C2=A0 =
-22191=C2=A0 R=C2=A0=C2=A0=C2=A0 8,192
->>> 4591379888=C2=A0=C2=A0 16384=C2=A0=C2=A0=C2=A0=C2=A0 77.90
->>> 1809296.292348=C2=A0 1809296.376273=C2=A0 tp_osd_tp=C2=A0=C2=A0=C2=A0 =
-22191=C2=A0 R=C2=A0=C2=A0=C2=A0 8,192
->>> 4591289552=C2=A0=C2=A0 16384=C2=A0=C2=A0=C2=A0=C2=A0 83.92
->>> 1809296.292353=C2=A0 1809296.378659=C2=A0 tp_osd_tp=C2=A0=C2=A0=C2=A0 =
-22191=C2=A0 R=C2=A0=C2=A0=C2=A0 8,192
->>> 4578248656=C2=A0=C2=A0 16384=C2=A0=C2=A0=C2=A0=C2=A0 86.31
->>> 1809296.292619=C2=A0 1809296.384835=C2=A0 tp_osd_tp=C2=A0=C2=A0=C2=A0 =
-22191=C2=A0 R=C2=A0=C2=A0=C2=A0 8,192
->>> 4617494160=C2=A0=C2=A0 65536=C2=A0=C2=A0=C2=A0=C2=A0 92.22
->>> 1809295.165451=C2=A0 1809296.393715=C2=A0 bstore_kv_fi 17266=C2=A0 WS=
-=C2=A0=C2=A0 8,192
->>> 1355703120=C2=A0=C2=A0 4096=C2=A0=C2=A0=C2=A0 1228.26
->>> 1809295.168595=C2=A0 1809296.401560=C2=A0 bstore_kv_fi 17266=C2=A0 WS=
-=C2=A0=C2=A0 8,192
->>> 1122200=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 4096=C2=A0=C2=A0=C2=A0 1232.96
->>> 1809295.165221=C2=A0 1809296.408018=C2=A0 bstore_kv_fi 17266=C2=A0 WS=
-=C2=A0=C2=A0 8,192
->>> 960656=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 4096=C2=A0=C2=A0=C2=A0 1242=
-.80
->>> 1809295.166737=C2=A0 1809296.411505=C2=A0 bstore_kv_fi 17266=C2=A0 WS=
-=C2=A0=C2=A0 8,192
->>> 57682504=C2=A0=C2=A0=C2=A0=C2=A0 4096=C2=A0=C2=A0=C2=A0 1244.77
->>> 1809296.292352=C2=A0 1809296.418123=C2=A0 tp_osd_tp=C2=A0=C2=A0=C2=A0 =
-22191=C2=A0 R=C2=A0=C2=A0=C2=A0 8,192
->>> 4579459056=C2=A0=C2=A0 32768=C2=A0=C2=A0=C2=A0 125.77
->>>
->>> I'm confused why write with O_SYNC must writeback on the backend
->>> storage device?=C2=A0 And when I used bcache for a time,
->>>
->>> the latency increased a lot.(The SSD is not very busy), There's some
->>> best practices on configuration?
->>>
