@@ -7,56 +7,56 @@ X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2169C433DB
-	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 07:06:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA168C433DB
+	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 07:06:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7A27164E85
-	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 07:06:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AD8F464E4D
+	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 07:06:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232196AbhBYHGY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Feb 2021 02:06:24 -0500
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:13049 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232417AbhBYHFf (ORCPT
+        id S232403AbhBYHG1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Feb 2021 02:06:27 -0500
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:54936 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232465AbhBYHFj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Feb 2021 02:05:35 -0500
+        Thu, 25 Feb 2021 02:05:39 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1614237255; x=1645773255;
+  t=1614236738; x=1645772738;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=UrkLJRrs1lnD9LqgYlpTtfqj+52EYKJ9/MSNX1BWZfM=;
-  b=lTEuqchBHA7fdPDiumW/1pEMai09Rr6OvTxpbQwhIjUzQ3YcY3IhCYvr
-   YKrqJa/XyUizZ04K79qzaZCunxKYciIwdp16vlK46AAqQZebWibEti3x8
-   3Ezpbet9B/cEuBVIY8LRaZLm5bWux8YLsYS7Ru0jOHdj9l5EiFrRU8+1f
-   sHRXaOGcliWmxfFDDj74RdvqsSuxSehnO0ljVJyiIPX7keXdR8XK1s2G1
-   mJWXY1SR495iEJ4erhySvMmDNgll+KooYHBbYGF9IkOP+86lWBkRYG3R/
-   xtpUdNDg617RgfVLmMBpBTnYVlIEJPS7FwSirgVg126Dq/xAsSNMPHYOk
-   w==;
-IronPort-SDR: +SJxXmBxfPRfPpQ7RHbYnEYxZvvSin4IHj7qnS12tOFw343+TwOm3IpiARg7jgMrT4tGc3cqKY
- jTqGJR29nnPsKdeDQFyJTasNcK8U2HAahOa9zGtToO5YX6v+hQswx7cx4fBRBkDf+uCQumWaGL
- Xd2Naw/jMAIebOncclrPJtqxkYlTPVUr8kMo6OlFJ3P86tpwkcVdfFL6Wh2qoL+jm0zs9ZxciU
- dXYXBPxXtfEkhQrWpAQ2iYnLQOWq5SkpVgJzvTFGrRPHeg7AGDSdiq2QwbwyjL7qoIqpalcI8V
- 3SY=
+  bh=bRSf7aRHFZjwKCFxu48NbjjHqZ6tr+RDQGJuYmhf/1w=;
+  b=oJ7QiiCn0IwezQVjse7j8NTXId7/nIwwBbGElirTVeYwuDPBjd8WYxMZ
+   XunyyV60HLnmdbfNknKN/WjLdHx+VNk1D7wKx9kpGCzRVBpRb4RDPq4AV
+   iNbb0XNnhkqTBd55lFVQiNqrDw7+vPvWU4qDkMUWT+hg+x/GoGPokMg4m
+   xOEgNZ/v/pkiShhzAExXdm4Hm5U9gIEhhPMkEJ/iM23526kDDe2Zf/yto
+   KHG3cib9LpgQixeiATI9hUlnmngpVFvrSNhJhL/2P5hEPzfZnCIlV79gM
+   rsRbhOG/aZ7o0SlKb+5gNVDRsVYVgn7z9rM2qQ2Jmkp5HgkVrokt/D8fj
+   Q==;
+IronPort-SDR: 10RcSK9zhObgF9dGyXzF1QncTT/iFEW/WgghG5A7f0ZQ3tNL2KdKAhipEtB4F7Pb0bJcPpT2lP
+ +mI+fw6CbW6kzAAdUFLQFXNjn9keyZ9YVeLrsgqpRt3SxdX2YaEZYcUWokCmfjfSa9osr2Imvz
+ kIqMd0mmDz+mGQTO/1onaD83vtVbt1OQEblJDB3XS6maWYpINHH+EtsTehDXDaqxNZ4GXqQ8H9
+ Nm57h+8lVQHj4sMwBX1gGxZ4vzx1TcoRfKFlLZ9hzShWI+qcwjpeJ9ar6iJAMJyfGomBRnzhKf
+ wCE=
 X-IronPort-AV: E=Sophos;i="5.81,205,1610380800"; 
-   d="scan'208";a="264978837"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 25 Feb 2021 15:12:12 +0800
-IronPort-SDR: 4CUeEASSTR4Uss64K5Fq+0Bt+W1LeMpYusHF45L0HJsW7nM7qTnClrVxDrrqKmJ523Sz9eLr4W
- 0suqbkX0bDqfTKT6nRwwPwrX5MvvI1CH3QlNDxlAaVS3UgQf6vlo5e5R5Lc433SncazDD5PFCJ
- AzlHGEGU/EEAL3aTOFJfCziQr5xHMGjizjUMvcmIE7wQKVPwo/u/8dWS2fnyxEE3r6zGfSADGi
- MpJyBUBHgHLTKQUIxwPPfhAGP68F1UDb0is+MJ/uCSCVvsI3YT7O7xvIADoyIqFD76xmv7qWkZ
- QVifGWVlF8wGWWCY53M6jrPx
+   d="scan'208";a="160777912"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 25 Feb 2021 15:04:32 +0800
+IronPort-SDR: 5garp/d4Zg/wHtV8BeW4ZCOg1EBwI+/sLaL8eJXrUc/uBj8kXw84TBjFGNh/FByCwyLE30noXE
+ 6Yacb0rfI9uu1qORkDMSPWx9GGOdsLa8e8e8EERdTcvlXFvTFcuifVEvQFBrvPzTADZPCPvS77
+ 8abLuRYvmx7BL0AeuufdCGUfMLCP5higUSfqaEAWy/05uvvdjpJybrYGh5CX5WGrOOMeYpCaw8
+ vGdfJzADZUQ+7KzsZ3psRN72K/d/cipeK9dT5pa/9VFAOoX46d64EEixuqdwDxlIUz/cjubSEi
+ 6t5Srilw7z1UbZE7zWtJmdvv
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2021 22:47:29 -0800
-IronPort-SDR: Zl81cQDbLFnJjbZTlvLnrD6Ew73F5BR/Ye1TJvXMPlaipyAYtm4aYrO7i3KDhn40nvbpbhpocp
- bEiw1n8emCshrkLq2tBK+lO+J1cCsou+EoLL9awDw3ZS+x/lV96F/IiV19lViFY6omqr4+imOE
- R7MAbg2lEHyBSwszt8sG9VVidC3RcL3ZGsCA+Joco2cXzvjryqZJilDb82kR+s7lsTGjkw0f5E
- Iw/IyxPiPeP3OUucRrzdFojQlG7eQv8Ep359GvznxFd/kERMsEnOe8qOULwKiCsv566YgD6Nmf
- pkM=
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2021 22:47:47 -0800
+IronPort-SDR: vKKlsoTwwQ8w99awhN2gezM3J9FdT3hxy1J3T4UVldZCiEolV/GH4GCxrpEuTLS7C9eQzBNrk2
+ viZ3D/UHE3RIfltfADz2ukcEdfaegZTSb2XEyWTLY7ASiqBCp+zFJRJJl+T3QpZ7lRuKqNsS5X
+ 11fcMEOjCk9mahgtW1R2WF8ncOujuLh2GwBR66JEQ0M/hfCy1CG6u7X/hVPbqqmbuwzT+eTWcq
+ JC9KfT0o4Qle+pdlslSl+0Un+F2gBVz9vNhxyMZQuOqW3Fig3TJThQB6Xw61DX6Pf3+0m7dUrD
+ iDs=
 WDCIronportException: Internal
 Received: from vm.labspan.wdc.com (HELO vm.sc.wdc.com) ([10.6.137.102])
-  by uls-op-cesaip01.wdc.com with ESMTP; 24 Feb 2021 23:04:13 -0800
+  by uls-op-cesaip01.wdc.com with ESMTP; 24 Feb 2021 23:04:31 -0800
 From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 To:     axboe@kernel.dk, viro@zeniv.linux.org.uk, rostedt@goodmis.org,
         mingo@redhat.com, chaitanya.kulkarni@wdc.com,
@@ -65,9 +65,9 @@ To:     axboe@kernel.dk, viro@zeniv.linux.org.uk, rostedt@goodmis.org,
         aravind.ramesh@wdc.com, joshi.k@samsung.com, niklas.cassel@wdc.com,
         hch@lst.de, osandov@fb.com, martin.petersen@oracle.com
 Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: [RFC PATCH 10/39] blktrace: update blk_add_trace_rq_issue()
-Date:   Wed, 24 Feb 2021 23:02:02 -0800
-Message-Id: <20210225070231.21136-11-chaitanya.kulkarni@wdc.com>
+Subject: [RFC PATCH 12/39] blktrace: update blk_add_trace_rq_complete()
+Date:   Wed, 24 Feb 2021 23:02:04 -0800
+Message-Id: <20210225070231.21136-13-chaitanya.kulkarni@wdc.com>
 X-Mailer: git-send-email 2.22.1.dirty
 In-Reply-To: <20210225070231.21136-1-chaitanya.kulkarni@wdc.com>
 References: <20210225070231.21136-1-chaitanya.kulkarni@wdc.com>
@@ -83,14 +83,14 @@ Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
  1 file changed, 19 insertions(+), 1 deletion(-)
 
 diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index 906afa0982c2..e1646d74ac9a 100644
+index 8a7fedfac6b3..07f71a052a0d 100644
 --- a/kernel/trace/blktrace.c
 +++ b/kernel/trace/blktrace.c
-@@ -1158,7 +1158,25 @@ static void blk_add_trace_rq_insert(void *ignore, struct request *rq)
- 
- static void blk_add_trace_rq_issue(void *ignore, struct request *rq)
+@@ -1213,7 +1213,25 @@ static void blk_add_trace_rq_requeue(void *ignore, struct request *rq)
+ static void blk_add_trace_rq_complete(void *ignore, struct request *rq,
+ 			int error, unsigned int nr_bytes)
  {
--	blk_add_trace_rq(rq, 0, blk_rq_bytes(rq), BLK_TA_ISSUE,
+-	blk_add_trace_rq(rq, error, nr_bytes, BLK_TA_COMPLETE,
 +	u64 ta;
 +	struct blk_trace *bt;
 +	struct blk_trace_ext *bte;
@@ -104,12 +104,12 @@ index 906afa0982c2..e1646d74ac9a 100644
 +	}
 +
 +	if (bt) {
-+		ta = BLK_TA_ISSUE;
++		ta = BLK_TA_COMPLETE;
 +	} else if (bte) {
-+		ta = BLK_TA_ISSUE_EXT;
++		ta = BLK_TA_COMPLETE_EXT;
 +	}
 +	rcu_read_unlock();
-+	blk_add_trace_rq(rq, 0, blk_rq_bytes(rq), ta,
++	blk_add_trace_rq(rq, error, nr_bytes, ta,
  			 blk_trace_request_get_cgid(rq));
  }
  
