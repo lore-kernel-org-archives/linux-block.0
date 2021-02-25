@@ -7,56 +7,56 @@ X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7051C433E6
-	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 07:05:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCCF4C433E0
+	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 07:05:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9FDCD64ED9
-	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 07:05:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 95FF764EDD
+	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 07:05:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231160AbhBYHE6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Feb 2021 02:04:58 -0500
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:40841 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229566AbhBYHE3 (ORCPT
+        id S231604AbhBYHFA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Feb 2021 02:05:00 -0500
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:13098 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229510AbhBYHEf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Feb 2021 02:04:29 -0500
+        Thu, 25 Feb 2021 02:04:35 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1614236668; x=1645772668;
+  t=1614237164; x=1645773164;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=YqyjlzPNQjTMRjOk6Mtz4VEUf84S5Nuxb+VjgSMGlAw=;
-  b=UaW74+j7pQoSpS/9ZXr8d6w1v/HAU6NP/MjOe2QBVb1gcwN3KsrCy5vl
-   Qj5oauJsrKV/PMs/0CaWknZ118X2yyUI7fCdSbAeLCFu6TchQKoNUzptn
-   JpxFn0YnsG5gCD6fGuhd70RwENr22RgKXO6bNcDbvHmm5MYxTAsIgCZhV
-   jZ9a+L3pNhVQ4ztOaz1EMccu38MuMnWbABByrot3qZclhow4ut8gDZb2P
-   FlyQswkdmaq9byyN/AA7MuIpS9WPtL2yUdd1yhfGbDVq9ir07vjUnMiXG
-   gN8Cvz53Vm6HbjYpk01rc4x6+AR5GPOanf7Yq5qd7NVHj+Ac3Qw4SLcWX
-   g==;
-IronPort-SDR: vug1FgfP955B5CgApzZts6lfg3uSpKmH1ZpKE0jCyG+0atOc4P3lagz4LCM3+amho/wmhFnj/z
- TVlTYxWR/yQWAInDOyK3dl5SysX8BIJ4AG0Wx1zl5327PatURRKBKciZTiK7XBmB67spJXJuCm
- 7YEFliVsraMMgqF07T62tIz+M/wBulXC6SZP1+AJcglyuWbk4XGkeV/BHtVDwtLf+F+o/oTbXT
- tJDiX6eLrR0DUNamm+evd8chNZU9p5wPAOUeZH0QzpxPknT1SVMy7fthl0g1d3eL/JItdWLwUl
- lH4=
+  bh=YHFpfpeQSYIOW2oaDbitZ5qqGXHdZ7t0JGdaE7Ribi4=;
+  b=lNEOabQtbKUQDK+Xkg0gO7Nth3FjBAhjK6fy9Z3DXm7+MBts32yZos/g
+   xdyUnF6chRoMiEifF4JdE6cEWja3+yjHPinXtcl7+sOrLHWhvSuvOGSTa
+   W0+CgfCvhAJu8gntdSQBgrIqcsOKmqB9EBdCXkCa67XYH3bWmCI2uglkl
+   L+PgfqM/fiOVz9RcpgHykwqZ3bdCPIL3tMd/y1Pn9TpThC9dOYy0dX5gZ
+   JDn9yunfhBithVkTgAykyajFaTuN4OaRt0svCCS8Vu1XfhMzRLL9yxBpk
+   ZNlkwAQBk8Lt7zXc1W02aTSItfBO9JlpeDCSs3Z/spvcUrhjociPIB1PJ
+   Q==;
+IronPort-SDR: 2GCn4lzTdaxE9rUkuzQwMx+RlMjKD0Rf+lIoXnNd17t29hABDB1qV7HjIU3uuJ504VMd9zyDaF
+ WjsSkzJ7ZgryyZRdp2AAjhfzDE0imCNRxPhbRHtIfUaARJDxfhKVXTCG0qJCniPjKoPO4byizl
+ dMglyaGS2J7vKVDxlgvlM3L3nNlzMj0ZO3ELCpgFaBBAk3p2EThwZYIIwEODi+sg30eXJ+53So
+ sNS7CJ/KYS4Gj9JaoWnwz88vNlZmMhAqYWxOqq8PapnJMI6RZr08T6GpJcH+0YkRCBGC5GhP23
+ /zg=
 X-IronPort-AV: E=Sophos;i="5.81,205,1610380800"; 
-   d="scan'208";a="271318941"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 25 Feb 2021 15:03:20 +0800
-IronPort-SDR: XHoA/padyu3eAVe0wow4xq6KZprJeYXDVXB4pj95VJutdAhbIuubARBKCu01iQJ96f/gJmiKOr
- 0YRA4B0L0J/SSWjZNJ3ttdKDEUWiQNlMN9xq0NdvnCumxNDYk8fNzx2xkhA0a6zNzxdhIqL1ko
- lY5HNNnnOAo6HLH9pgg6fx3NiSTONtKr38Q/KlLCB8c4vCkQEpWqyj+642eILq1/Cjagy/MOzF
- 2j3qQvkYKBPrn4FYD8MvyABohLsxy7+3/T5HZuHLOdfHWg23f2eHQyFcgHReg9LTuBr6p1rXrO
- aCVRKdJcIWwG5XcP++/6hcWH
+   d="scan'208";a="264978751"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 25 Feb 2021 15:10:25 +0800
+IronPort-SDR: MdmwdJTo//4u0g1TOkbgmjfHEmROYK8Rg4lQ5B+G6xpMSYlNybHVZNuRXuIRH6DGLJbMlqXIeF
+ EQvmVUw0V25ECKTrhvjxp3HTk0ux8EqcmQylDwEx4BWc09Hiyaxtb3H7HeE/y9LlGCfjGYMxFu
+ 5QYouYNdvXd1Cu9GwgQLs4+Xr3KSF0/2qgUhD4V9Go0uTqaLmtshCDeBbDsRiB/jfc+fVM6Pbt
+ eqG4YuBKg9YlKKSyWiTSEFQL1qlO4oC+zKaTtkebcXXh9kwB1W7ahBANUR41cGq2wJiHtJ5V7M
+ /HPVO1YSrHRs/AKkesrJxoKZ
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2021 22:44:42 -0800
-IronPort-SDR: /hjG3Gw3NpTQ7UoUXCey8Agu3ljuUiBGQbfO/EQmLCyI3xHTR+KfpB6Ii8FPxyUgbB9CzPKL5e
- jOjj/xsxrWHba2EZ5XZzyczE9szDplFR2ahNG1oBXxUF8WewA0ygQULv7KFgEbkVwrHK/4hviY
- rF2Qn1uxI7XfZg7jwODu5qkMedGLnhN3bDYrNMrUgRS9rsMCmOJ71HgIMuubzv4Bj1wC4P9OJN
- 83KMkdikvEDTK7AHfzBtbOiLI6VmAs6pgFusE3ewldgarFDhYJ8fXuDCh+ESsDuDQtFInhpeFV
- 9wI=
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2021 22:46:18 -0800
+IronPort-SDR: wAMKbg1ieOidwvDUbTerEBZNf1ivBanSrkSpyh775lln15HTIx1A4URg3A/bN851aip0jXicPs
+ tR+1jF+//r9upLjJKL78GfLSa3irUPYFVl3Oa+owaXW5c5vABXG2pqz2Uupg/dcG5pEw1sQ2D7
+ B22asBF1klNr91EyaJ20lLbgkSqvA51c4GUGcRzP48c8ZlYOJv4CgGcQ1ujSVcXOT+bWnxGXey
+ 9nRhFZ4yepAALIQT3NfAW/IG7yQA6Gq2/6NOZQki66FHLPipFKeMIkYx60a25wor6IJaoAHx4m
+ urI=
 WDCIronportException: Internal
 Received: from vm.labspan.wdc.com (HELO vm.sc.wdc.com) ([10.6.137.102])
-  by uls-op-cesaip01.wdc.com with ESMTP; 24 Feb 2021 23:03:20 -0800
+  by uls-op-cesaip01.wdc.com with ESMTP; 24 Feb 2021 23:03:02 -0800
 From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 To:     axboe@kernel.dk, viro@zeniv.linux.org.uk, rostedt@goodmis.org,
         mingo@redhat.com, chaitanya.kulkarni@wdc.com,
@@ -65,9 +65,9 @@ To:     axboe@kernel.dk, viro@zeniv.linux.org.uk, rostedt@goodmis.org,
         aravind.ramesh@wdc.com, joshi.k@samsung.com, niklas.cassel@wdc.com,
         hch@lst.de, osandov@fb.com, martin.petersen@oracle.com
 Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: [RFC PATCH 04/39] blktrace: add a new global list
-Date:   Wed, 24 Feb 2021 23:01:56 -0800
-Message-Id: <20210225070231.21136-5-chaitanya.kulkarni@wdc.com>
+Subject: [RFC PATCH 02/39] blktrace_api: add new trace definition
+Date:   Wed, 24 Feb 2021 23:01:54 -0800
+Message-Id: <20210225070231.21136-3-chaitanya.kulkarni@wdc.com>
 X-Mailer: git-send-email 2.22.1.dirty
 In-Reply-To: <20210225070231.21136-1-chaitanya.kulkarni@wdc.com>
 References: <20210225070231.21136-1-chaitanya.kulkarni@wdc.com>
@@ -77,27 +77,43 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add a separate list to hold running extension traces.
+This patch adds new structure similar to struct blk_trace to support
+block trace extensions.
 
 Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 ---
- kernel/trace/blktrace.c | 3 +++
- 1 file changed, 3 insertions(+)
+ include/linux/blktrace_api.h | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index ca6f0ceba09b..e45bbfcb5daf 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -36,6 +36,9 @@ static bool blk_tracer_enabled __read_mostly;
- static LIST_HEAD(running_trace_list);
- static __cacheline_aligned_in_smp DEFINE_SPINLOCK(running_trace_lock);
+diff --git a/include/linux/blktrace_api.h b/include/linux/blktrace_api.h
+index a083e15df608..6c2654f45ad2 100644
+--- a/include/linux/blktrace_api.h
++++ b/include/linux/blktrace_api.h
+@@ -27,6 +27,24 @@ struct blk_trace {
+ 	atomic_t dropped;
+ };
  
-+static LIST_HEAD(running_trace_ext_list);
-+static __cacheline_aligned_in_smp DEFINE_SPINLOCK(running_trace_ext_lock);
++struct blk_trace_ext {
++	int trace_state;
++	struct rchan *rchan;
++	unsigned long __percpu *sequence;
++	unsigned char __percpu *msg_data;
++	u64 act_mask;
++	u32 prio_mask;
++	u64 start_lba;
++	u64 end_lba;
++	u32 pid;
++	u32 dev;
++	struct dentry *dir;
++	struct dentry *dropped_file;
++	struct dentry *msg_file;
++	struct list_head running_ext_list;
++	atomic_t dropped;
++};
 +
- /* Select an alternative, minimalistic output than the original one */
- #define TRACE_BLK_OPT_CLASSIC	0x1
- #define TRACE_BLK_OPT_CGROUP	0x2
+ struct blkcg;
+ 
+ extern int blk_trace_ioctl(struct block_device *, unsigned, char __user *);
 -- 
 2.22.1
 
