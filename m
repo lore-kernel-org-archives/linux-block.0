@@ -7,56 +7,56 @@ X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56CAFC433E0
-	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 07:09:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B15FC433DB
+	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 07:09:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0E18964ED3
-	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 07:09:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BDD8A64E4D
+	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 07:09:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232486AbhBYHJO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Feb 2021 02:09:14 -0500
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:53171 "EHLO
+        id S232984AbhBYHJ0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Feb 2021 02:09:26 -0500
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:26799 "EHLO
         esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233169AbhBYHHx (ORCPT
+        with ESMTP id S232447AbhBYHIK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Feb 2021 02:07:53 -0500
+        Thu, 25 Feb 2021 02:08:10 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1614236873; x=1645772873;
+  t=1614236890; x=1645772890;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=SC0pXVUCDuaPbg+F0lWxh72IEBX9ZhX5hajRxPIkVPU=;
-  b=pAhZPr0Arm7V5sKxUnWamD5hWEWw4DuckhDm2ALM0LeXH2sX3ladTrDR
-   UT6R4q3kf5BefyvKCYNpvTrjoxtCkQfeA7az7iGzZzrQJ2BpUBaM+C2y0
-   Q7rZ2gBgKF70ZcXtETOvB9WScshgTHCWxb0nPCIhY44K1lhgPhwC32tGf
-   JpP+Zrt+L72wloBahBmXSoDSL1iLh52BvrvhlDA8q9ZBZSgbtzELp6oy/
-   O2YauWXEWeaSkjlEg/HIWm2Ji7YtXtTXROEsmrLPmCZbG7QPK38H9FF9v
-   KPxW/87v0BxECPeDNb0tqqIOO0UNZ77jLz5s3SbigPGU/9Dc7SZD5BPjQ
+  bh=hDmja61HZFUIv20A9Mnm2VsUFWdVGWs+qU/9EVKHfqA=;
+  b=QDeCCdPXUPuPvJ77QaD2ZkHRoAEabeEvsaxrJoaUO+mUoUG1GofexfQp
+   ZEvuSWmzqkyejR96a4L0yP86k654mvtB/7GHZnZDzVpDFKz92PhIQE7zW
+   gKu112is2bgxHEzPJGexjidP+qNWnm3mp679uuYU+kBGsePKobuJT3aKM
+   y/BFuJu8i7jO3cRbz+Od656gHiasbxjln2JfSPNgZJSmaBgU1FFFEwCJv
+   7VEvwOTX9kI3Sa0NTNV38DhsWIc3eBSI9DTlDYDcdJSI9aApbfvWaEFki
+   fMyChU7cBynmmmGop+FVtFDQKEtUuQkD9O2Vtwsmf2UPTG/YwzePpQz06
    g==;
-IronPort-SDR: 4K/2Qj4LqJKPs+drCu7XeWEux3OU1EysjFUzX/bIiMjIODfdNLBMjE/9UoMmgoW7X1kHyqVclH
- jagyonPEnAU7fKe/06JhuZCThZSbCwFG6Jp8VKFi65zaG0ktHU8kyky4zCsQztnjfauO1zAZTF
- ydaGjYh2/6vBeRADfu+1CN+lFX1h7FhhM5DBL05OKFE34SlgfSShZ0gL5vzFpqCc6dWSaBD43b
- sp50W+dhWV+rvFItsLa4dJzmEuPwdSu+AAU4ejAN+xAcqMJRPwlIOUOO2KTj4/oHNtIqUm833q
- qYU=
+IronPort-SDR: vk0v9O38q2fCgEM4LUfG5FuETWJ24ybM/LOOwXdm9ygG+eDdfeHzj3cbADbZVZjH/9myQBdoUr
+ +hq5tB7DvrIzsbRj92jvldrHvRSsL3QoDW/yCt9zaVyvTGQ2vqHzev0Uy0h/vCfww0oRgf7JbS
+ Vs/TI7qvXeTcOL0gDrmU6TM+ki5/k3h3CXNlIBsmKbBCvSu7O0WnqQGyac3eefhGHGCep7rYhb
+ yKM2cf+Op+4+xzVcmXOvYu0Fxa6XLcQQE2ldPCZD7P8yd70+UvwoJHH8dDYloVGcNw/ayinkpt
+ Pdk=
 X-IronPort-AV: E=Sophos;i="5.81,205,1610380800"; 
-   d="scan'208";a="160778025"
+   d="scan'208";a="160778067"
 Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 25 Feb 2021 15:06:31 +0800
-IronPort-SDR: O2EYhLQUJDq6JMLiMDc3GXjzcxEvV8vQn5QAFER9XsLRQgoUkkWth52FKcRaJNfGWGHYSb5UaN
- SHj8gSb02B6I5qLx0ZMO7sm2jedqI94wYYQrlXAnffUY86yV1FEOtcuwmHbw7GXFH3396Hw+mT
- D2+YGX1qupZcNe8Y9YnyAdd5yYiYKMhuVEF1Y0tOSko1zgDV6d8uwnEXSQRDe4moJ0tepZvT19
- gbdE2al46mtw3y6eWtBrOyMZPTCMBiIA+LdAF+L0lR75TZ/QzR9B9UL/aE/Y865Ys8weUyegcg
- 6mRXiYQ46nNqUnijvr6bJMMg
+  by ob1.hgst.iphmx.com with ESMTP; 25 Feb 2021 15:07:01 +0800
+IronPort-SDR: gVBEH77x5Zo8nXUTQnGsFO15VfXM/m8LQOSVOvqObHbHqB7Hkrbe3zAVTLx4SGJ1sylkU93H8G
+ Q7d+caTiuIqUZg6mWK9DRIe6rBRvKyONxkT/SK+ar4OmILEDm0poFenba82oj118slFde/jFmW
+ ZXA8rh9wvkA1DoJRw771Nu9/Md99WTb7SIQ5zB0iqMKBp0vwQZ3mFYRH23J38h9rOmH+6y+1jI
+ 90j1QNlV+/2u10eqq19QeEjNQ0JrpaSFQyzFCEe48LcjQQX6zAsij8elV+qSd4LuEApgXu+X+Z
+ CETy2c3t1QADLS8FMiEuaRFJ
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2021 22:49:46 -0800
-IronPort-SDR: 5UjRW13wELQaoILvjTuJW1uTQ2Reo7QcTwFg2ymZEjUdyxbflF4kqglXRB7TbrN679yLIo/9eh
- LtbOIm1qTpRdn4iXSBx9rNuewZfhwkWo3tWtVc/amVN45ND5g5qeuuS36hANy2pefoezaHLEQT
- ox9ILkFA+vIKM1c0jmUBZgnXs2Dp/DvZRqxGqydoWJhyxwQI06CUJMCm2u8AlI47ihwtGu3RqP
- 8qwPUdC+DYY8DXJhe1GbM6F++EZP7fspwojPhxAdwa3OtOLVFsi841xwGQb8ii21s4Fq4W/aVp
- 5A0=
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2021 22:50:16 -0800
+IronPort-SDR: CHhvpJieFcZHaxcsqGdeS2DaoT2/z9LZL4ieb8JtJY5UqwOOs1MxpTh2UONdE++l88e7chonHA
+ +bGxbkH/OqttlCEBYQvHk20ZVuimEZdFmRqgu3VDXoYAOkKsEAwN77JK88Tw8ttED4/02pL1zd
+ JYrY3L9FbE8Ya1KGKr5VjmWDpM0rA98wo0jHnITnFZM788s2o+gQwajMZacPxLJNGbn0Rr0kTc
+ vp4H+a3kzfp6c8NNnJCbYZwsMqOLxLuaW2wzPFycCLvpxgVSISmSFw5DReqAeu9K5Bokt/f9FH
+ 3wE=
 WDCIronportException: Internal
 Received: from vm.labspan.wdc.com (HELO vm.sc.wdc.com) ([10.6.137.102])
-  by uls-op-cesaip01.wdc.com with ESMTP; 24 Feb 2021 23:06:30 -0800
+  by uls-op-cesaip01.wdc.com with ESMTP; 24 Feb 2021 23:07:01 -0800
 From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 To:     axboe@kernel.dk, viro@zeniv.linux.org.uk, rostedt@goodmis.org,
         mingo@redhat.com, chaitanya.kulkarni@wdc.com,
@@ -65,9 +65,9 @@ To:     axboe@kernel.dk, viro@zeniv.linux.org.uk, rostedt@goodmis.org,
         aravind.ramesh@wdc.com, joshi.k@samsung.com, niklas.cassel@wdc.com,
         hch@lst.de, osandov@fb.com, martin.petersen@oracle.com
 Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: [RFC PATCH 27/39] blktrace: add a new formatting routine
-Date:   Wed, 24 Feb 2021 23:02:19 -0800
-Message-Id: <20210225070231.21136-28-chaitanya.kulkarni@wdc.com>
+Subject: [RFC PATCH 31/39] blktrace: add trace_synthesize helper
+Date:   Wed, 24 Feb 2021 23:02:23 -0800
+Message-Id: <20210225070231.21136-32-chaitanya.kulkarni@wdc.com>
 X-Mailer: git-send-email 2.22.1.dirty
 In-Reply-To: <20210225070231.21136-1-chaitanya.kulkarni@wdc.com>
 References: <20210225070231.21136-1-chaitanya.kulkarni@wdc.com>
@@ -79,83 +79,35 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 ---
- kernel/trace/blktrace.c | 57 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 57 insertions(+)
+ kernel/trace/blktrace.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
 diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index 84bee8677162..2241c7304749 100644
+index 75b2ec88d8c4..a904a800b696 100644
 --- a/kernel/trace/blktrace.c
 +++ b/kernel/trace/blktrace.c
-@@ -1722,6 +1722,62 @@ static void fill_rwbs(char *rwbs, const struct blk_io_trace *t)
- 	rwbs[i] = '\0';
+@@ -2416,6 +2416,21 @@ static void blk_trace_synthesize_old_trace(struct trace_iterator *iter)
+ 			 sizeof(old) - offset + t->pdu_len);
  }
  
-+static void fill_rwbs_ext(char *rwbs, const struct blk_io_trace_ext *t)
++static void blk_trace_synthesize_old_trace_ext(struct trace_iterator *iter)
 +{
-+	int i = 0;
-+	int tc = t->action >> BLK_TC_SHIFT_EXT;
++	struct trace_seq *s = &iter->seq;
++	struct blk_io_trace_ext *t = (struct blk_io_trace_ext *)iter->ent;
++	const int offset = offsetof(struct blk_io_trace_ext, sector);
++	struct blk_io_trace_ext old = {
++		.magic	  = BLK_IO_TRACE_MAGIC | BLK_IO_TRACE_VERSION_EXT,
++		.time     = iter->ts,
++	};
 +
-+	if ((t->action & ~__BLK_TN_CGROUP) == BLK_TN_MESSAGE_EXT) {
-+		rwbs[i++] = 'N';
-+		goto out;
-+	}
-+
-+	if (tc & BLK_TC_FLUSH)
-+		rwbs[i++] = 'F';
-+
-+	if (tc & BLK_TC_DISCARD)
-+		rwbs[i++] = 'D';
-+	else if ((tc & BLK_TC_WRITE_ZEROES)) {
-+		rwbs[i++] = 'W';
-+		rwbs[i++] = 'Z';
-+	} else if ((tc & BLK_TC_ZONE_RESET)) {
-+		rwbs[i++] = 'Z';
-+		rwbs[i++] = 'R';
-+	} else if ((tc & BLK_TC_ZONE_RESET_ALL)) {
-+		rwbs[i++] = 'Z';
-+		rwbs[i++] = 'R';
-+		rwbs[i++] = 'A';
-+	} else if ((tc & BLK_TC_ZONE_APPEND)) {
-+		rwbs[i++] = 'Z';
-+		rwbs[i++] = 'A';
-+	} else if ((tc & BLK_TC_ZONE_OPEN)) {
-+		rwbs[i++] = 'Z';
-+		rwbs[i++] = 'O';
-+	} else if ((tc & BLK_TC_ZONE_CLOSE)) {
-+		rwbs[i++] = 'Z';
-+		rwbs[i++] = 'C';
-+	} else if ((tc & BLK_TC_ZONE_FINISH)) {
-+		rwbs[i++] = 'Z';
-+		rwbs[i++] = 'F';
-+	} else if (tc & BLK_TC_WRITE)
-+		rwbs[i++] = 'W';
-+	else if (t->bytes)
-+		rwbs[i++] = 'R';
-+	else
-+		rwbs[i++] = 'N';
-+
-+	if (tc & BLK_TC_FUA)
-+		rwbs[i++] = 'F';
-+	if (tc & BLK_TC_AHEAD)
-+		rwbs[i++] = 'A';
-+	if (tc & BLK_TC_SYNC)
-+		rwbs[i++] = 'S';
-+	if (tc & BLK_TC_META)
-+		rwbs[i++] = 'M';
-+out:
-+	rwbs[i] = '\0';
++	trace_seq_putmem(s, &old, offset);
++	trace_seq_putmem(s, &t->sector,
++			 sizeof(old) - offset + t->pdu_len);
 +}
 +
- static inline
- const struct blk_io_trace *te_blk_io_trace(const struct trace_entry *ent)
- {
-@@ -2514,5 +2570,6 @@ void blk_fill_rwbs(char *rwbs, unsigned int op)
- }
- EXPORT_SYMBOL_GPL(blk_fill_rwbs);
- 
-+
- #endif /* CONFIG_EVENT_TRACING */
- 
+ static enum print_line_t
+ blk_trace_event_print_binary(struct trace_iterator *iter, int flags,
+ 			     struct trace_event *event)
 -- 
 2.22.1
 
