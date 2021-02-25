@@ -7,56 +7,56 @@ X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9F48C433E0
-	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 07:11:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40FD1C433E6
+	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 07:11:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A47B264ED3
-	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 07:11:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F112264ED3
+	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 07:11:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233136AbhBYHKw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Feb 2021 02:10:52 -0500
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:50748 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233440AbhBYHIz (ORCPT
+        id S231974AbhBYHLK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Feb 2021 02:11:10 -0500
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:13098 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233443AbhBYHI6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Feb 2021 02:08:55 -0500
+        Thu, 25 Feb 2021 02:08:58 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1614236936; x=1645772936;
+  t=1614237562; x=1645773562;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=cJQvU0rRFxDr7whJauE5NqjCq8pb+jrxymeltC/I/EM=;
-  b=p0yvmUKB29zcJ8n8XK8opHBvEN+wAUjUAm1pwOfNPCR6ro1i5NKorR9u
-   xjyO5Vkfjn9jpakvZeQxovmflb4i3/DompdLDJq8aVsu7+qlgsTdXTinl
-   CEJ5Me5QTie2cwX3KR6iU9jBYrTjmhTtRGdnOKBiWXzKFzlpcQaF44a2x
-   zWYgaAQevnuORtfDq2g9T7At1v1EHHAuQLKV2xAm4JtkEEqfO7iC63Ksw
-   L2GYv8EvoGlYveM2mgxwwbnM/TYwKr+gU07zrpp4GzBrQLDYGAalMrKAH
-   J78GaV34EV3EsL4OqMkBxdhekfbhdkGjYyYTh3fEkqXch/2nX5SGvWagq
+  bh=noVlfdAKnU4/DGq6YcXktGnI8djjvUkkGf2lKgCrAX4=;
+  b=cSPIYwhGSIUejV88S5mKlwioyBu6zbWW1mtPo90H8faTR7QILTFRpGxp
+   ELianDUDr28tdOFE9idOto/0qzezhYC9GZC0qxg8aggG8nFwKdoSdA1Er
+   6qCGNi9rzgRknoxfjV2w6oRZiGcE4L0jZ7yAACPL5w9P4ifxmHSfBZY9D
+   X9VB/VBOVk9BklHu8183u5TqK/aMoGZJ2Xq/oQzYtL4jS1btWqWAoMmBe
+   yVaQqyBVFExEr4x+vH7ccRSdJ7GpYbfLFCqInXKHdiDgjC5j1g8NqkTTW
+   82WVWTlXV+qaRNFCoKkf8UKibKksdhJfRQVx9vSV1qa2VB6b6cYQnyxn9
    w==;
-IronPort-SDR: sWtl5nE+GbJJODQCE6oW3F8NQ2OmeWzffAusN6pMVSoSUYl9q6Wip5kGndsIMnji5jniup1g+7
- cO61581qHu+AMctAuzfedol/5YODrdUWSP0hvL6YPrJar2J54ihXk2JtgAG3Cs9ttzN6zEHcOo
- g8Ldq6lfg1kq0JIo7l3ldoloJe1Zug95BKKxdJ7hFSO72v7JWSvWsq/E0pwpZ1L974h6DFG3BP
- aKbY8nM+niqfmrXfXg/245bfUFR/ZGAilD049/KmhAHQFoU+vzY956BbAQMpLfdvIxuYlP8E96
- cKQ=
+IronPort-SDR: 8gqxMM8ZWzHpKGx+n1PWvpekDx8AWvcPgAghsllp6V2uXMXIqtg0tZM7od/aiiwOwnMxx3RCli
+ nuymznVq0U5V2UGzndHgM6Ley2QL4cgV/Je/DtolfzPVegyYzZ/Ru4awaudSn48WfwLZDhaWa+
+ /GSExXVYpMYBsv0syx55tgEeXH6H38mPTt+HD56QfCSaEc9L7soRqSUiQr1/7+B/FEWNYxRfiP
+ 5Bz0meudCACB8sXg+eiOhWmhFja8HEgy71hh6wV8gF3qeH6ShZEfmGmMAltEnKCd4pE6Typ05q
+ Z4s=
 X-IronPort-AV: E=Sophos;i="5.81,205,1610380800"; 
-   d="scan'208";a="161931681"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 25 Feb 2021 15:07:47 +0800
-IronPort-SDR: Uz9WINJxeRxXr1CSYmHMx+9pPkkikVTLcnyGqSlUcc4JAZZoZQ7zfBbTjz+0SVCrmKEL4109gc
- 345osgHqL9EEyDp7u5e8Aamrf6ttDR1VHQN26jfFgLSdu6O3VlKnra50IrQ/gFna2F0GTL0jmN
- /tDkOQR5WtL9EgzzRYqryvFMtPJp62BCTHcCPQMz/WmoZbYhp2orhCf9wsaUBG09cTeGiEcWwL
- 3MTYazelKkTjb2omZWJHXPq6DJry9RZst49NYvtY3RPaIs4chQFfcBK90U4CRtNd75YGLDLntd
- gtLinU5A6DPDl1XC42uU6sjF
+   d="scan'208";a="264979007"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 25 Feb 2021 15:16:03 +0800
+IronPort-SDR: rsNQwtKUayRvaSkli0NLoqm1GObehnsms0PPysiLq+d4vDtTvq2LPc+/hfDISMpUUSY9tFlquy
+ CtdKDEnHlEvi8iyw4C3KXJvcBVmMUyE4f4uw7VVxDOznhEuOd+16+GWthpVPTCtXnooS5bFDng
+ UzIcB+99MkRr/S5sf1fkgpnAyxff89q1XLhTbkJNQ2qqO6w6nCVL190mjPyWRRei8nZDUDb+yx
+ JJXDFr6n0T1neVd3sdBR9VFggAGvItS3LbD9zSoVsdMxOzfQPY9y/wMaC1cN3cWbvhrXJ/Xoun
+ dLnujhaFKkR0ZDW0/liTV2jS
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2021 22:49:08 -0800
-IronPort-SDR: 1Ai/00Lm2cIyeyrSTjldjAq0K/s6INxGPiOcn+Ipc9i/4uq4e+yBU6GBdKWHv6+F7KSEF646yX
- NjFdYYumwkHZYhnsg3aqsZrX133zslPqldO6zMJCTyx8/JSod8KGZmpaZCDROA3TpXi+8JDDAZ
- rfxvV+W3/qoKQA7y59W9tjzMEpDWRJFnnLls3mM8wbbGo7Nfv1I9TNUFpAj37w/Dtf5PVuAExn
- sfmEZCoPMN3njd5YnCHgiHJ1g9F/mby4pJ9/67Tw1E6jBSF35lk5/J5/ajJCe8V7eJ5+zAuf1q
- rBI=
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2021 22:50:01 -0800
+IronPort-SDR: vmgi6cHID6K41DB+8KrCq4QjXdT70xFkXHUOdUmSgXrJwU9B2QMv7y/3Si5TgBo85fwjIblUhc
+ WoYO3YwnUJXGat67wjhTWCk5EV6WZKdLYnXsnoyshNnoAbrlC6XvUtOq8xuXf5y0vnGxsMSZD9
+ TjPusohN+UnSYA/ElQwAZU7Mh3Vy9smvxumz6fjlAIm3/Q+MfmfX6dXmSW3ibXK9QIsbcGzgcR
+ 3QlhcEnH1GvHyiI0J1BPhWmp+XZR6TocQ4qSzTejWkkZcATBZj2WxmVdzhfcVK6hEv28w2j6a7
+ 30Q=
 WDCIronportException: Internal
 Received: from vm.labspan.wdc.com (HELO vm.sc.wdc.com) ([10.6.137.102])
-  by uls-op-cesaip01.wdc.com with ESMTP; 24 Feb 2021 23:07:46 -0800
+  by uls-op-cesaip01.wdc.com with ESMTP; 24 Feb 2021 23:06:46 -0800
 From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 To:     axboe@kernel.dk, viro@zeniv.linux.org.uk, rostedt@goodmis.org,
         mingo@redhat.com, chaitanya.kulkarni@wdc.com,
@@ -65,9 +65,9 @@ To:     axboe@kernel.dk, viro@zeniv.linux.org.uk, rostedt@goodmis.org,
         aravind.ramesh@wdc.com, joshi.k@samsung.com, niklas.cassel@wdc.com,
         hch@lst.de, osandov@fb.com, martin.petersen@oracle.com
 Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: [RFC PATCH 37/39] blktrace: update blk_fill_rwbs() with new requests
-Date:   Wed, 24 Feb 2021 23:02:29 -0800
-Message-Id: <20210225070231.21136-38-chaitanya.kulkarni@wdc.com>
+Subject: [RFC PATCH 29/39] blktrace: link blk_log_xxx() to trace action
+Date:   Wed, 24 Feb 2021 23:02:21 -0800
+Message-Id: <20210225070231.21136-30-chaitanya.kulkarni@wdc.com>
 X-Mailer: git-send-email 2.22.1.dirty
 In-Reply-To: <20210225070231.21136-1-chaitanya.kulkarni@wdc.com>
 References: <20210225070231.21136-1-chaitanya.kulkarni@wdc.com>
@@ -79,49 +79,42 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 ---
- kernel/trace/blktrace.c | 29 +++++++++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
+ kernel/trace/blktrace.c | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
 diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index 6759ac7bc6c7..32100c5db7a6 100644
+index 425756a62457..4a4ba1d45cb9 100644
 --- a/kernel/trace/blktrace.c
 +++ b/kernel/trace/blktrace.c
-@@ -3184,6 +3184,35 @@ void blk_fill_rwbs(char *rwbs, unsigned int op)
- 	case REQ_OP_READ:
- 		rwbs[i++] = 'R';
- 		break;
-+	case REQ_OP_WRITE_ZEROES:
-+		rwbs[i++] = 'W';
-+		rwbs[i++] = 'Z';
-+		break;
-+	case REQ_OP_ZONE_RESET:
-+		rwbs[i++] = 'Z';
-+		rwbs[i++] = 'R';
-+		break;
-+	case REQ_OP_ZONE_RESET_ALL:
-+		rwbs[i++] = 'Z';
-+		rwbs[i++] = 'R';
-+		rwbs[i++] = 'A';
-+		break;
-+	case REQ_OP_ZONE_APPEND:
-+		rwbs[i++] = 'Z';
-+		rwbs[i++] = 'A';
-+		break;
-+	case REQ_OP_ZONE_OPEN:
-+		rwbs[i++] = 'Z';
-+		rwbs[i++] = 'O';
-+		break;
-+	case REQ_OP_ZONE_CLOSE:
-+		rwbs[i++] = 'Z';
-+		rwbs[i++] = 'C';
-+		break;
-+	case REQ_OP_ZONE_FINISH:
-+		rwbs[i++] = 'Z';
-+		rwbs[i++] = 'F';
-+		break;
- 	default:
- 		rwbs[i++] = 'N';
- 	}
+@@ -2301,6 +2301,28 @@ static const struct {
+ 	[__BLK_TA_REMAP]	= {{  "A", "remap" },	   blk_log_remap },
+ };
+ 
++static const struct {
++	const char *act[2];
++	void	   (*print)(struct trace_seq *s, const struct trace_entry *ent,
++			    bool has_cg);
++} what2act_ext[] = {
++	[__BLK_TA_QUEUE]	= {{  "Q", "queue" },	   blk_log_generic_ext },
++	[__BLK_TA_BACKMERGE]	= {{  "M", "backmerge" },  blk_log_generic_ext },
++	[__BLK_TA_FRONTMERGE]	= {{  "F", "frontmerge" }, blk_log_generic_ext },
++	[__BLK_TA_GETRQ]	= {{  "G", "getrq" },	   blk_log_generic_ext },
++	[__BLK_TA_SLEEPRQ]	= {{  "S", "sleeprq" },	   blk_log_generic_ext },
++	[__BLK_TA_REQUEUE]	= {{  "R", "requeue" },	   blk_log_with_error_ext },
++	[__BLK_TA_ISSUE]	= {{  "D", "issue" },	   blk_log_generic_ext },
++	[__BLK_TA_COMPLETE]	= {{  "C", "complete" },   blk_log_with_error_ext },
++	[__BLK_TA_PLUG]		= {{  "P", "plug" },	   blk_log_plug },
++	[__BLK_TA_UNPLUG_IO]	= {{  "U", "unplug_io" },  blk_log_unplug_ext },
++	[__BLK_TA_UNPLUG_TIMER]	= {{ "UT", "unplug_timer" }, blk_log_unplug_ext},
++	[__BLK_TA_INSERT]	= {{  "I", "insert" },	   blk_log_generic_ext},
++	[__BLK_TA_SPLIT]	= {{  "X", "split" },	   blk_log_split_ext },
++	[__BLK_TA_BOUNCE]	= {{  "B", "bounce" },	   blk_log_generic_ext },
++	[__BLK_TA_REMAP]	= {{  "A", "remap" },	   blk_log_remap_ext },
++};
++
+ static enum print_line_t print_one_line(struct trace_iterator *iter,
+ 					bool classic)
+ {
 -- 
 2.22.1
 
