@@ -4,74 +4,74 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4556C433E0
-	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 15:58:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0CA6C433DB
+	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 17:26:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9925364EB7
-	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 15:58:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8C19064F20
+	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 17:26:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229845AbhBYP6r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Feb 2021 10:58:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44430 "EHLO
+        id S232984AbhBYRZ4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Feb 2021 12:25:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34878 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229548AbhBYP6q (ORCPT
+        with ESMTP id S229561AbhBYRZr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Feb 2021 10:58:46 -0500
-Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6127CC06174A
-        for <linux-block@vger.kernel.org>; Thu, 25 Feb 2021 07:58:04 -0800 (PST)
-Received: by mail-wm1-x333.google.com with SMTP id g11so1321465wmh.1
-        for <linux-block@vger.kernel.org>; Thu, 25 Feb 2021 07:58:04 -0800 (PST)
+        Thu, 25 Feb 2021 12:25:47 -0500
+Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A609EC061756
+        for <linux-block@vger.kernel.org>; Thu, 25 Feb 2021 09:25:00 -0800 (PST)
+Received: by mail-wr1-x42c.google.com with SMTP id v1so6032223wrd.6
+        for <linux-block@vger.kernel.org>; Thu, 25 Feb 2021 09:25:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=mime-version:subject:from:in-reply-to:date:cc
          :content-transfer-encoding:message-id:references:to;
-        bh=HTEp27ZNB/VIL5Wwc1HQRqf6ZorVyEspIjtn3xeL9W0=;
-        b=aZikez9cYeIMFSF0rE2oEcbpGLEn3mH6UDHddIRligtWUj+PtRyEHe9ibboq/4U8M3
-         mBz3bO/Bves8lGnENdHMqVGUxNfHWtgJvNJNNgy68J9eONo6zpQ6hra5YNr75CI14hft
-         n9X4ojJFLHQs4sk8GBws/UtQZXDG2bFay/rPsWaW0OnkNVhCmdjrz4aauZAjVdai7bue
-         s34s2/EAuYQTDHSyO9xYJxCpe+TAgjcz6tXppgtG8tCHDr89JM9WCkOl3QpCXHRmdCCS
-         HdqI+V3dGWgxDSjsbJqQR8ztrFzBIhD6x+heOnEPB4KIzG4wfTKasLn9aGbGpztYF72G
-         F8pw==
+        bh=MVkbF/1jc72x8ZGzUYYsizLbk7+O8V1Wq4Viv7ATlRM=;
+        b=pbQ02jWikzGsiY9snWIAHCeyQM+XaczYLcwXs+SV8ZbYBmuG2+oSoY6CRN72gUjHhu
+         eDV2XfeRG1O3MneZmVInnMAU46MSzVCGlSbDHXCpRH1HPxmJCYRvk66lvL/ihuoWAAvn
+         FjodqSa4LIQBj7GQEdafh1dw189O3NVzVPiaFyWxPPkc0hEWiq5EK+uWLxjrQT0au6Xn
+         KOZnJ4zBE2sN24jpnjv97CZQofAEZrHv4OqQhLnQO9liJtF8MSTC38aiF41R073QN36u
+         ABRZPk3MLG+0xli8o4C512MoIdYB2yxksFc5mOsMAyTS1WW2t+47BGj8hkZBs7VNsHaT
+         o7eQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
          :content-transfer-encoding:message-id:references:to;
-        bh=HTEp27ZNB/VIL5Wwc1HQRqf6ZorVyEspIjtn3xeL9W0=;
-        b=nmL5QejM+NKYZJmQtgTeOs9yFcCn+v7ltDmgrK20Oe3d7iqQvvsx5B8QUmNoxhlLzU
-         4xxAjoNg3qTZdU5ESMR68hcA/PsgW63lsr6YHvyPwldP2qXLfiFz3ax9XGSC4omecg4E
-         K2sF/eHkfC4mkpIvIssQKruoao49lkj1ESJTp/KQTik+v2/vzFBD4ypE1suCst2WgVDh
-         XGp54HyW7qqgBViCv0YMP22OSOZmEndqTxCZNqH9Xm0rrK6uLL56MtiNRjlJB8kMAj9C
-         e88CwKAilPWYjuv83vBJySMyfvlEMj/RQmhPYCEnCIy2BRuzK3Y9YtZQx47sIYxPHUQx
-         ys7g==
-X-Gm-Message-State: AOAM532ZMh5UpQSqfdDcLk8feJoQU4yZqVyoejW7W6RCx1rRS0fSmemj
-        CAnwLX4Z2rmM28uN7Cs2y1a+vjnsM+x6fw==
-X-Google-Smtp-Source: ABdhPJymRQM/RQkQUCShsPIWjBy7sexfLrBD1t+yZhVR/HXz1+HZOCpzBFUR41DvqYPhX+Cv/STLUQ==
-X-Received: by 2002:a1c:7fd8:: with SMTP id a207mr3484641wmd.40.1614268683107;
-        Thu, 25 Feb 2021 07:58:03 -0800 (PST)
+        bh=MVkbF/1jc72x8ZGzUYYsizLbk7+O8V1Wq4Viv7ATlRM=;
+        b=qvA4qVIHyh24obEh43UOWuPJhGLEpmS0y8CsM85dU+euBRz6vCkIgvz8wPWsehWRPk
+         3YaTYmZlJ0mBGKfHmP14ZJOVKFuWcpN7GEFwTRLl0/N8WHI0Z+i7/HR2buOxVyK/PrMs
+         PlAcEstPbaLhr4+dsjPl8RawXsTy4yA9ZxHw+T3WhrzoqtnIEzqOyksCgze7JIZnLjZU
+         /SnKSC3UDzUQWl5l/oGxF4Lrnx95Jaex+xdeqE7O7xSW9vhN/aFGlpkGiajiPj03ZHvz
+         WC6peiCjd5UtW9hSJTA/sMCfLAJMMl8FNbrPEsQuP0rzE1yzs94LNW624rTJT7o4j7gU
+         Z6mw==
+X-Gm-Message-State: AOAM530IL+yQtixaZeOwz70f4THNQc8rVLnYywyIx3vl1SM3tDSYV4mv
+        2uVY2kEhhnklxE1wCh5KydCzcWkFcP6ymA==
+X-Google-Smtp-Source: ABdhPJyrHo1WPhB3+0cKMV7aiFIAQKTMaoTrfzFCN6TFDitufQhT+C1RGUAe5vehIi2xEyqUmVJ36Q==
+X-Received: by 2002:adf:bac8:: with SMTP id w8mr4677372wrg.68.1614273899260;
+        Thu, 25 Feb 2021 09:24:59 -0800 (PST)
 Received: from [192.168.0.13] ([83.216.184.132])
-        by smtp.gmail.com with ESMTPSA id w13sm10387508wre.2.2021.02.25.07.58.02
+        by smtp.gmail.com with ESMTPSA id o3sm2521016wmq.46.2021.02.25.09.24.57
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 25 Feb 2021 07:58:02 -0800 (PST)
+        Thu, 25 Feb 2021 09:24:58 -0800 (PST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH BUGFIX/IMPROVEMENT 1/6] block, bfq: always inject I/O of
- queues blocked by wakers
+Subject: Re: [PATCH BUGFIX/IMPROVEMENT 6/6] block, bfq: merge bursts of
+ newly-created queues
 From:   Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <23cc8281-a869-b260-ba0c-22127db2019b@kernel.dk>
-Date:   Thu, 25 Feb 2021 16:58:59 +0100
+In-Reply-To: <a4874bb3-006c-85d9-5015-12443baa1e87@kernel.dk>
+Date:   Thu, 25 Feb 2021 18:25:53 +0100
 Cc:     linux-block <linux-block@vger.kernel.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         Jan Kara <jack@suse.cz>
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <1653E35E-CFEF-437C-9D52-4E004ED1CAFF@linaro.org>
+Message-Id: <4F6EF0B5-A63D-4A0B-A563-71495D7FFDCE@linaro.org>
 References: <20210126105102.53102-1-paolo.valente@linaro.org>
- <20210126105102.53102-2-paolo.valente@linaro.org>
- <23cc8281-a869-b260-ba0c-22127db2019b@kernel.dk>
+ <20210126105102.53102-7-paolo.valente@linaro.org>
+ <a4874bb3-006c-85d9-5015-12443baa1e87@kernel.dk>
 To:     Jens Axboe <axboe@kernel.dk>
 X-Mailer: Apple Mail (2.3445.104.11)
 Precedence: bulk
@@ -80,36 +80,120 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 
 
-> Il giorno 26 gen 2021, alle ore 17:17, Jens Axboe <axboe@kernel.dk> ha =
+> Il giorno 26 gen 2021, alle ore 17:15, Jens Axboe <axboe@kernel.dk> ha =
 scritto:
 >=20
-> On 1/26/21 3:50 AM, Paolo Valente wrote:
->> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
->> index 445cef9c0bb9..a83149407336 100644
->> --- a/block/bfq-iosched.c
->> +++ b/block/bfq-iosched.c
->> @@ -4487,9 +4487,15 @@ static struct bfq_queue =
-*bfq_select_queue(struct bfq_data *bfqd)
->> 			bfq_bfqq_busy(bfqq->bic->bfqq[0]) &&
->> 			bfqq->bic->bfqq[0]->next_rq ?
->> 			bfqq->bic->bfqq[0] : NULL;
->> +		struct bfq_queue *blocked_bfqq =3D
->> +			!hlist_empty(&bfqq->woken_list) ?
->> +			container_of(bfqq->woken_list.first,
->> +				     struct bfq_queue,
->> +				     woken_list_node)
->> +			: NULL;
+> On 1/26/21 3:51 AM, Paolo Valente wrote:
+>> @@ -2809,6 +2853,12 @@ void bfq_release_process_ref(struct bfq_data =
+*bfqd, struct bfq_queue *bfqq)
+>> 	    bfqq !=3D bfqd->in_service_queue)
+>> 		bfq_del_bfqq_busy(bfqd, bfqq, false);
+>>=20
+>> +	if (bfqq->entity.parent &&
+>> +	    bfqq->entity.parent->last_bfqq_created =3D=3D bfqq)
+>> +		bfqq->entity.parent->last_bfqq_created =3D NULL;
+>> +	else if (bfqq->bfqd && bfqq->bfqd->last_bfqq_created =3D=3D =
+bfqq)
+>> +		bfqq->bfqd->last_bfqq_created =3D NULL;
+>> +
+>> 	bfq_put_queue(bfqq);
+>> }
+>>=20
+>> @@ -2905,6 +2955,13 @@ bfq_merge_bfqqs(struct bfq_data *bfqd, struct =
+bfq_io_cq *bic,
+>> 	 */
+>> 	new_bfqq->pid =3D -1;
+>> 	bfqq->bic =3D NULL;
+>> +
+>> +	if (bfqq->entity.parent &&
+>> +	    bfqq->entity.parent->last_bfqq_created =3D=3D bfqq)
+>> +		bfqq->entity.parent->last_bfqq_created =3D new_bfqq;
+>> +	else if (bfqq->bfqd && bfqq->bfqd->last_bfqq_created =3D=3D =
+bfqq)
+>> +		bfqq->bfqd->last_bfqq_created =3D new_bfqq;
+>> +
+>> 	bfq_release_process_ref(bfqd, bfqq);
+>> }
 >=20
-> hlist_first_entry_or_null?
+> Almost identical code constructs makes it seem like this should have a
+> helper instead.
 >=20
 
-I didn't find any such function.  There is a list_first_entry_or_null,
-but it's for circular doubly linked lists.
+Right, sorry. Improved in V2.
 
-I'll wait a little bit for your reply, then send a V2 with this patch
-unchanged.
+>> @@ -5033,6 +5090,12 @@ void bfq_put_queue(struct bfq_queue *bfqq)
+>> 	bfqg_and_blkg_put(bfqg);
+>> }
+>>=20
+>> +static void bfq_put_stable_ref(struct bfq_queue *bfqq)
+>> +{
+>> +	bfqq->stable_ref--;
+>> +	bfq_put_queue(bfqq);
+>> +}
+>> +
+>> static void bfq_put_cooperator(struct bfq_queue *bfqq)
+>> {
+>> 	struct bfq_queue *__bfqq, *next;
+>> @@ -5089,6 +5152,17 @@ static void bfq_exit_icq(struct io_cq *icq)
+>> {
+>> 	struct bfq_io_cq *bic =3D icq_to_bic(icq);
+>>=20
+>> +	if (bic->stable_merge_bfqq) {
+>> +		unsigned long flags;
+>> +		struct bfq_data *bfqd =3D bic->stable_merge_bfqq->bfqd;
+>> +
+>> +		if (bfqd)
+>> +			spin_lock_irqsave(&bfqd->lock, flags);
+>> +		bfq_put_stable_ref(bic->stable_merge_bfqq);
+>> +		if (bfqd)
+>> +			spin_unlock_irqrestore(&bfqd->lock, flags);
+>> +	}
+>> +
+>=20
+> Construct like this are really painful. Just do:
+>=20
+> if (bfqd) {
+> 	unsigned long flags;
+>=20
+> 	spin_lock_irqsave(&bfqd->lock, flags);
+> 	bfq_put_stable_ref(bic->stable_merge_bfqq);
+> 	spin_unlock_irqrestore(&bfqd->lock, flags);
+> } else {
+> 	bfq_put_stable_ref(bic->stable_merge_bfqq);
+> }
+>=20
+> which is also less likely to cause code analyzer false warnings.
 
-Thanks,
+Done, thanks.
+
+> Outside
+> of that, it needs a comment on why it's ok NOT to grab the lock when
+> bfqd is zero, because that seems counter-intuitive and more a case of
+> "well we can't grab a lock for something we don't have". Maybe it's
+> because bfqd is no longer visible at this point, and it's ok,
+
+yes
+
+> but it's
+> definitely not clear just looking at this patch.
+
+Right, the reason is already reported a few lines above, but not
+repeated in this function.  I'll repeat it.
+
+
+> Even with that, is the
+> bfqq visible? Should the ref be atomic, and locking happen further =
+down
+> instead?
+>=20
+
+Since the scheduler is gone, no pending I/O is expected to still
+reference bfqq.  I'll write this too in V2.
+
+As I stated in my reply to another comments of yours, I'll submit the
+V2 soon, unless I receive a reply before.
+
+Thanks.
 Paolo
 
 > --=20
