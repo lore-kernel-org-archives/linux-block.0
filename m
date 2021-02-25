@@ -7,56 +7,56 @@ X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76556C433DB
-	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 07:12:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08012C433DB
+	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 07:12:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 25C1B64E6C
-	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 07:12:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B4BE964E6C
+	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 07:12:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233253AbhBYHLr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Feb 2021 02:11:47 -0500
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:53171 "EHLO
+        id S232634AbhBYHMG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Feb 2021 02:12:06 -0500
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:26799 "EHLO
         esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233030AbhBYHJo (ORCPT
+        with ESMTP id S229993AbhBYHKA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Feb 2021 02:09:44 -0500
+        Thu, 25 Feb 2021 02:10:00 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1614236983; x=1645772983;
+  t=1614237000; x=1645773000;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=qmVWl/riaxHF0ICKpnD1wtzPBpIFIgQ86tmQdnEqvsU=;
-  b=Eh9SOixuIjb2ShKvhsZNlfPfH8RPehhgklKtcIfNDANx50YjNI8NN2J3
-   rm/clL4sz/Orjzmi5lix/QqVDZxMSfUGL+zF41ruzVDJiuJ3jTwdbyRmf
-   Ie5MBc8gDimMnhl3Y/5U/vVoBYCU7sdlikmxvFXUc6/LGCKQwWrIeaQvc
-   xe3RtDl/6ZufHGpgAS8T9J9HY65sPqxL3s6F3PAfWGxHzA02Y5ixQpf+x
-   dtziuIFNa5ouan+RGW2njWRsC8EWBGBaDh2bO/Sea8HUm2cLv7n3XYIno
-   wYXqzU76NxOHFtAEf/EX0d3yOElyP2nNZj9pcNMnW3bleBuhrJQHph0ZZ
-   A==;
-IronPort-SDR: Hz/7lBWcrSh/O/IPMUY7MZ7CVsIUd0SskKckgbYbQOpV/7hpxlCiorJL1TTBxEBg5hvQGZED2J
- g+FhCwZu2N8XGZu886wh/IRgBvtgSaAA85k7gJvK6oKuqbhNzzB78WkLr6ROpK1S2+CETw6qaN
- 7/dSWIbtTACo7Z72eU80Vfv7jJ2kH8BG87msLk7dWIjMlIMmMKbz85pmC4TqqohOzu0qo1Og9Z
- 3bI9Csp+6GjBRKw+96/Unfmh2P8kWgxrhBx3SlyEuRvAjL5lBQMAR15nWgm+gth8uFBWA+yfQ/
- wYs=
+  bh=zF7/doyKoEogbpCRXSeDJCnl1y9SdsmStX/bXUCeES0=;
+  b=gz3+qrV5aoo6tX5TzvEO1Jb7dasqKV6nYigJoUEVP9+8Yc4BemhkUICL
+   UEZQeFxFNtQMvh3g2FwADaGPOw/bXT47Gn6iFCYqB5H9aPU7bY0Agrtln
+   2pt0/ntO/v8FeoqgRI81uFqRceX05D2eeKRhRdnblHgAKvNP+KBjg0QQj
+   PLaLhZk2sGlzk8YTEeZUVeAWtQO+nrgqdq8tgIVCikw5cER9zTy6uPh4y
+   OGoJAa8+MoMD/EH1uYWut9vpd0nYQ/vgwuhoJ/8zaYSwGZemUjI5iH2xY
+   vgd1C4atiVAHAm4PN28C4wtIGg7gM983aQ70w18Ib34A+0O1IhpeHoI0X
+   g==;
+IronPort-SDR: hTwAjRhBAyD/iYPX+dBdAddXOS2C6wnnsz9YNZWr7Y3JDu9AJP2xEfrAr2LrpXIxXL7+Q7sJiG
+ haX8OJ6Qn48sOQGVa9L1l1np8Q7e/HOKdihBlBdCUDJxQqg60EwygWG9mBpZ+orIn9ZWpunDqY
+ UCVr2PQyWuZN10FhxT7/hm3KY5DR8w8a3gvRriwNzSUfiRtUcDPo8KDXtw5pUMI4v2RxD+eJR6
+ 41PRp8+/eWpWyCq2QKVcIuUjZqy7mk8axJ/SBiev6nh9nWf7wQSrfJi/WX7k7WhA3Q4bHRP60n
+ ZQg=
 X-IronPort-AV: E=Sophos;i="5.81,205,1610380800"; 
-   d="scan'208";a="160778112"
+   d="scan'208";a="160778125"
 Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 25 Feb 2021 15:07:39 +0800
-IronPort-SDR: ZDCsaWGF+XlFuK+RkQU/OIvjvmm++99RFL+Aa0iki5rikYrrN9u58NaYm+tZUQ0Wf1B4Wr25n4
- Y4UrGapiRZiTVk9JaVwRN8SpZaGseFyPPMeQgkH5bgL8gPVh1PNzfSRb5jAYTB/KjdMDf50a20
- 5xWXTcx5J2tNA7SMWYFgvW9ldeEUrn1vw9yKjz3OOmcZ4uRYrUPCzMtF6tTMg+1IxWEaf3j47D
- co3IpTKGiq2zjY43I8PiXe1V+LNvQo8cQNFahN7kaNh75BQBHdNItNPWFYmNWDX4iB9zlOtokR
- IUzb+Rei7kq3GMb/rabteyc3
+  by ob1.hgst.iphmx.com with ESMTP; 25 Feb 2021 15:07:54 +0800
+IronPort-SDR: AB5TIZt57zuC793FNzMHCokdEQuLFMA8wUOz77XSN45IestPNUolCrEQXGZKEk6NnEkRw9BNZW
+ ADfwzwtxRhH+6kCrYztlxBGCvuNwrgEBdEiLJvW4a8MD3p3vFQDM17FbcSRXIakh53W8RdVZRS
+ r/BtVN0mGEI9JrBERrebh7GZcDSTXO+dqcWP2WLh9gwwtGv+2avwNUE2U/K1Iqdm0jTHniuhbS
+ CaO0gC1GO8mG8TISGJs2K4RZEuMqj/HYLgKnkXpoAklXiYnUoLqM+7uqQyHw45iAiZ24rIXp/g
+ M/ZQc18XobLskU/N2l6MbF6K
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2021 22:49:00 -0800
-IronPort-SDR: 8ncxIOdAJ5I7FAzqO4m2G3XBPtBwH3hoZa4YW6kLoVPEaz6aZ0oPiKkgwStOsUhAzcorO8Jk6Q
- YXVH2s7DO44Fzh2tGbonkVgBXgA4lskbeduavKIoUjtfAb4SC5p9DJhzQpQBfpIovhNR34PY54
- 2Tuu2wUMyJ6G/XpLAPLCe+znRo7uZaMPdI7QxpHkBDE+9ghtbZQ7S5Rb/sjAZgxU6cCVH/0BS8
- yib2lb5d/ZCv8dFYJTnJplFw75jEJTbu3rGiKtpGAS6TGehUDPnoZY7Wuj+uXvKR1zqJi9GQbQ
- 1jA=
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2021 22:49:16 -0800
+IronPort-SDR: ryJ6gXargtDm0+QkHLSc5S5vTvL835ijcFWtYSf9MpFOuw/C+fmXqevnuJWRq5QddwxEL6EXFo
+ KtCZZS00JTeUfDVPUO3nyiaMDOhk9TBGJ//aQaXviKDmuZpBhV+44WPckprZQWheCKX/Lom1gV
+ pFgn41H4ryr2A55MmgY5NFrDCzSe6tOhWSx1xY3vwx9svTqZ6ZqLTsMjwnPiGmLTCkr46LAm5G
+ VgzTMDJaj6Rwxx68vz6FnuXlHQX4/f3g1CYh8js4h8qzbiqquxOsu+Xllu4z3twJROEamjKox9
+ EY0=
 WDCIronportException: Internal
 Received: from vm.labspan.wdc.com (HELO vm.sc.wdc.com) ([10.6.137.102])
-  by uls-op-cesaip01.wdc.com with ESMTP; 24 Feb 2021 23:07:38 -0800
+  by uls-op-cesaip01.wdc.com with ESMTP; 24 Feb 2021 23:07:54 -0800
 From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 To:     axboe@kernel.dk, viro@zeniv.linux.org.uk, rostedt@goodmis.org,
         mingo@redhat.com, chaitanya.kulkarni@wdc.com,
@@ -65,9 +65,9 @@ To:     axboe@kernel.dk, viro@zeniv.linux.org.uk, rostedt@goodmis.org,
         aravind.ramesh@wdc.com, joshi.k@samsung.com, niklas.cassel@wdc.com,
         hch@lst.de, osandov@fb.com, martin.petersen@oracle.com
 Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: [RFC PATCH 36/39] blktrace: add integrity tracking support
-Date:   Wed, 24 Feb 2021 23:02:28 -0800
-Message-Id: <20210225070231.21136-37-chaitanya.kulkarni@wdc.com>
+Subject: [RFC PATCH 38/39] blktrace: track zone appaend completion sector
+Date:   Wed, 24 Feb 2021 23:02:30 -0800
+Message-Id: <20210225070231.21136-39-chaitanya.kulkarni@wdc.com>
 X-Mailer: git-send-email 2.22.1.dirty
 In-Reply-To: <20210225070231.21136-1-chaitanya.kulkarni@wdc.com>
 References: <20210225070231.21136-1-chaitanya.kulkarni@wdc.com>
@@ -77,213 +77,211 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch adds support to track the integrity related information.
-We update struct blk_io_trace_ext with two new members :-
-1. seed :- to track the integrity seed.
-2. integrity :- to store the integrity related flags and integrity
-   size buffer.
+The request type REQ_OP_ZONE_APPENDT needs zone start the when issued
+not the actual sector where this I/O lands and returns completion sector
+in for trace complete event 'C'. Right now we cannot track submission &
+completion sector for this special request with existing format.
+
+Add a new completion sector field in the blk_io_trace_ext structure,
+when generating the trace when req_op is REQ_OP_ZONE_APPEND update
+the completion sector from the I/O and store the zone start (where
+actual I/O was issued) in the secor field of the trace.
+
+With this new format we can track completion sector. (* is not a part
+real trace it is here as a place holder so that it is easy to read for
+reviewers) :-
+
+252,0 15  1 92.785481956  6139  Q ZAS N 262144 + 8 [dd]
+252,0 15  2 92.785490381  6139  G ZAS N 262144 + 8 [dd]
+252,0 15  3 92.785498517  6139  I ZAS N 262144 + 8 [dd]
+252,0 15  4 92.785519065   804  D ZAS N 262144 + 8 [kworker/15:1H]
+252,0 15  5 92.785541527    86  C ZAS N 262144 + 8 [0] <262144>
+
+252,0 15  6 92.785561936  6139  Q ZAS N 262144 + 8 [dd]
+252,0 15  7 92.785568368  6139  G ZAS N 262144 + 8 [dd]
+252,0 15  8 92.785574820  6139  I ZAS N 262144 + 8 [dd]
+252,0 15  9 92.785587754   804  D ZAS N 262144 + 8 [kworker/15:1H]
+252,0 15 10 92.785602802    86  C ZAS N 262144 + 8 [0] <262152>
+
+252,0 15 11 92.785619704  6139  Q ZAS N 262144 + 8 [dd]
+252,0 15 12 92.785626076  6139  G ZAS N 262144 + 8 [dd]
+252,0 15 13 92.785632438  6139  I ZAS N 262144 + 8 [dd]
+252,0 15 14 92.785644801   804  D ZAS N 262144 + 8 [kworker/15:1H]
+252,0 15 15 92.785659939    86  C ZAS N 262144 + 8 [0] <262160>
+
+252,0 15 16 92.785676460  6139  Q ZAS N 262144 + 8 [dd]
+252,0 15 17 92.785682872  6139  G ZAS N 262144 + 8 [dd]
+252,0 15 18 92.785689294  6139  I ZAS N 262144 + 8 [dd]
+252,0 15 19 92.785701487   804  D ZAS N 262144 + 8 [kworker/15:1H]
+252,0 15 20 92.785716024    86  C ZAS N 262144 + 8 [0] <262168>
+
+252,0 15 21 92.785732335  6139  Q ZAS N 262144 + 8 [dd]
+252,0 15 22 92.785738687  6139  G ZAS N 262144 + 8 [dd]
+252,0 15 23 92.785745019  6139  I ZAS N 262144 + 8 [dd]
+252,0 15 24 92.785757843   804  D ZAS N 262144 + 8 [kworker/15:1H]
+252,0 15 25 92.785772020    86  C ZAS N 262144 + 8 [0] <262176>
+
+252,0 15 26 92.785788180  6139  Q ZAS N 262144 + 8 [dd]
+252,0 15 27 92.785794492  6139  G ZAS N 262144 + 8 [dd]
+252,0 15 28 92.785800763  6139  I ZAS N 262144 + 8 [dd]
+252,0 15 29 92.785812696   804  D ZAS N 262144 + 8 [kworker/15:1H]
+252,0 15 30 92.785826762    86  C ZAS N 262144 + 8 [0] <262184>
+
+252,0 15 31 92.785842852  6139  Q ZAS N 262144 + 8 [dd]
+252,0 15 32 92.785849104  6139  G ZAS N 262144 + 8 [dd]
+252,0 15 33 92.785855346  6139  I ZAS N 262144 + 8 [dd]
+252,0 15 34 92.785867599   804  D ZAS N 262144 + 8 [kworker/15:1H]
+252,0 15 35 92.785881835    86  C ZAS N 262144 + 8 [0] <262192>
+
+252,0 15 36 92.785897845  6139  Q ZAS N 262144 + 8 [dd]
+252,0 15 37 92.785904107  6139  G ZAS N 262144 + 8 [dd]
+252,0 15 38 92.785910329  6139  I ZAS N 262144 + 8 [dd]
+252,0 15 39 92.785922181   804  D ZAS N 262144 + 8 [kworker/15:1H]
+252,0 15 40 92.785936237    86  C ZAS N 262144 + 8 [0] <262200>
+
+252,0 15 41 92.785952037  6139  Q ZAS N 262144 + 8 [dd]
+252,0 15 42 92.785958289  6139  G ZAS N 262144 + 8 [dd]
+252,0 15 43 92.785964651  6139  I ZAS N 262144 + 8 [dd]
+252,0 15 44 92.785976373   804  D ZAS N 262144 + 8 [kworker/15:1H]
+252,0 15 45 92.785990419    86  C ZAS N 262144 + 8 [0] <262208>
+
+252,0 15 46 92.786006339  6139  Q ZAS N 262144 + 8 [dd]
+252,0 15 47 92.786025204  6139  G ZAS N 262144 + 8 [dd]
+252,0 15 48 92.786031566  6139  I ZAS N 262144 + 8 [dd]
+252,0 15 49 92.786043869   804  D ZAS N 262144 + 8 [kworker/15:1H]
+252,0 15 50 92.786058216    86  C ZAS N 262144 + 8 [0] <262216>
+
+252,0 10  1 92.783369654  6138  Q ZRS N 262144 + 0 [truncate]
+252,0 10  2 92.783384813  6138  G ZRS N 262144 + 0 [truncate]
+252,0 10  3 92.783395182  6138  I ZRS N 262144 + 0 [truncate]
+252,0 10  4 92.783419628   782  D ZRS N 262144 + 0 [kworker/10:1H]
+252,0 10  5 92.783460895    61  C ZRS N 262144 + 0 [0]
+252,0  8  1 92.788546342  6140  Q ZRAS N 0 + 0 [blkzone]
+252,0  8  2 92.788554628  6140  G ZRAS N 0 + 0 [blkzone]
+252,0  8  3 92.788562232  6140  I ZRAS N 0 + 0 [blkzone]
+252,0  8  4 92.788580977   934  D ZRAS N 0 + 0 [kworker/8:1H]
+252,0  8  5 92.788597268    51  C ZRAS N 0 + 0 [0]
 
 Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Suggested-by: Martin K. Petersen <martin.petersen@oracle.com>
 ---
- include/uapi/linux/blktrace_api.h |  2 ++
- kernel/trace/blktrace.c           | 60 ++++++++++++++++++++++---------
- 2 files changed, 46 insertions(+), 16 deletions(-)
+ include/uapi/linux/blktrace_api.h |  1 +
+ kernel/trace/blktrace.c           | 31 ++++++++++++++++++++++---------
+ 2 files changed, 23 insertions(+), 9 deletions(-)
 
 diff --git a/include/uapi/linux/blktrace_api.h b/include/uapi/linux/blktrace_api.h
-index fdb3a5cdfa22..ac533a0b0928 100644
+index ac533a0b0928..ebfe3029cd10 100644
 --- a/include/uapi/linux/blktrace_api.h
 +++ b/include/uapi/linux/blktrace_api.h
-@@ -158,6 +158,8 @@ struct blk_io_trace_ext {
+@@ -155,6 +155,7 @@ struct blk_io_trace_ext {
+ 	__u32 sequence;		/* event number */
+ 	__u64 time;		/* in nanoseconds */
+ 	__u64 sector;		/* disk offset */
++	__u64 completion_sector;/* zone append completion sector */
  	__u32 bytes;		/* transfer length */
  	__u64 action;		/* what happened */
  	__u32 ioprio;		/* I/O priority */
-+	__u64 seed;		/* integrity seed */
-+	__u64 integrity;	/* store integrity flags */
- 	__u32 pid;		/* who did it */
- 	__u32 device;		/* device number */
- 	__u32 cpu;		/* on what cpu did it happen */
 diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index 3bd56b741379..6759ac7bc6c7 100644
+index 32100c5db7a6..59bf99b4106a 100644
 --- a/kernel/trace/blktrace.c
 +++ b/kernel/trace/blktrace.c
-@@ -66,6 +66,26 @@ static int blk_probes_ref;
- static void blk_register_tracepoints(void);
- static void blk_unregister_tracepoints(void);
- 
-+#ifdef CONFIG_BLK_DEV_INTEGRITY
-+static void set_integrity(struct blk_io_trace_ext *t,
-+			  struct bio_integrity_payload *bip)
-+{
-+	t->seed = (u64)bip_get_seed(bip);
-+	/*
-+	 * We store integrity buffer size and flags as :-
-+	 *
-+	 * 63            48          32            16     5           0
-+	 * |          reserved       | buffer size | rsvd | bip flags |
-+	 */
-+	t->integrity = (bip->bip_iter.bi_size << 16) | bip->bip_flags;
-+}
-+#else
-+static void set_integrity(struct blk_io_trace_ext *t, void *bip)
-+{
-+
-+}
-+#endif
-+
- /*
-  * Send out a notify message.
-  */
-@@ -115,7 +135,8 @@ static void trace_note(struct blk_trace *bt, pid_t pid, int action,
- }
- 
- static void trace_note_ext(struct blk_trace_ext *bt, pid_t pid, u64 action,
--			   const void *data, size_t len, u64 cgid, u32 ioprio)
-+			   const void *data, size_t len, u64 cgid, u32 ioprio,
-+			   struct bio_integrity_payload *bip)
- {
- 	struct blk_io_trace_ext *t;
- 	struct ring_buffer_event *event = NULL;
-@@ -148,6 +169,8 @@ static void trace_note_ext(struct blk_trace_ext *bt, pid_t pid, u64 action,
- 		t->device = bt->dev;
- 		t->action = action | (cgid ? __BLK_TN_CGROUP : 0);
- 		t->ioprio = ioprio;
-+		if (bip)
-+			set_integrity(t, bip);
- 		t->pid = pid;
- 		t->cpu = cpu;
- 		t->pdu_len = len + cgid_len;
-@@ -178,7 +201,8 @@ static void trace_note_tsk(struct task_struct *tsk)
- 	spin_unlock_irqrestore(&running_trace_lock, flags);
- }
- 
--static void trace_note_tsk_ext(struct task_struct *tsk, u32 ioprio)
-+static void trace_note_tsk_ext(struct task_struct *tsk, u32 ioprio,
-+			       struct bio_integrity_payload *bip)
- {
- 	unsigned long flags;
- 	struct blk_trace_ext *bt;
-@@ -187,7 +211,7 @@ static void trace_note_tsk_ext(struct task_struct *tsk, u32 ioprio)
- 	spin_lock_irqsave(&running_trace_ext_lock, flags);
- 	list_for_each_entry(bt, &running_trace_ext_list, running_ext_list) {
- 		trace_note_ext(bt, tsk->pid, BLK_TN_PROCESS_EXT, tsk->comm,
--			   sizeof(tsk->comm), 0, ioprio);
-+			       sizeof(tsk->comm), 0, ioprio, bip);
- 	}
- 	spin_unlock_irqrestore(&running_trace_ext_lock, flags);
- }
-@@ -220,7 +244,7 @@ static void trace_note_time_ext(struct blk_trace_ext *bt)
- 	words[1] = now.tv_nsec;
- 
- 	local_irq_save(flags);
--	trace_note_ext(bt, 0, BLK_TN_TIMESTAMP, words, sizeof(words), 0, 0);
-+	trace_note_ext(bt, 0, BLK_TN_TIMESTAMP, words, sizeof(words), 0, 0, NULL);
- 	local_irq_restore(flags);
- }
- 
-@@ -290,9 +314,9 @@ void __trace_note_message_ext(struct blk_trace_ext *bt, struct blkcg *blkcg,
- 		blkcg = NULL;
- #ifdef CONFIG_BLK_CGROUP
- 	trace_note_ext(bt, 0, BLK_TN_MESSAGE_EXT, buf, n,
--		blkcg ? cgroup_id(blkcg->css.cgroup) : 1, 0);
-+		blkcg ? cgroup_id(blkcg->css.cgroup) : 1, 0, NULL);
- #else
--	trace_note_ext(bt, 0, BLK_TN_MESSAGE_EXT, buf, n, 0, 0);
-+	trace_note_ext(bt, 0, BLK_TN_MESSAGE_EXT, buf, n, 0, 0, NULL);
- #endif
- 	local_irq_restore(flags);
- }
-@@ -478,7 +502,7 @@ static const u64 ddir_act_ext[2] = { BLK_TC_ACT_EXT(BLK_TC_READ),
+@@ -502,7 +502,8 @@ static const u64 ddir_act_ext[2] = { BLK_TC_ACT_EXT(BLK_TC_READ),
   */
  static void __blk_add_trace_ext(struct blk_trace_ext *bt, sector_t sector, int bytes,
  		     int op, int op_flags, u64 what, int error, int pdu_len,
--		     void *pdu_data, u64 cgid, u32 ioprio)
-+		     void *pdu_data, u64 cgid, u32 ioprio, void *bip)
+-		     void *pdu_data, u64 cgid, u32 ioprio, void *bip)
++		     void *pdu_data, u64 cgid, u32 ioprio, void *bip,
++		     sector_t blk_queue_zone_sectors)
  {
  	struct task_struct *tsk = current;
  	struct ring_buffer_event *event = NULL;
-@@ -545,7 +569,7 @@ static void __blk_add_trace_ext(struct blk_trace_ext *bt, sector_t sector, int b
- 	}
+@@ -595,6 +596,16 @@ static void __blk_add_trace_ext(struct blk_trace_ext *bt, sector_t sector, int b
+ 		t->pid = pid;
  
- 	if (unlikely(tsk->btrace_seq != blktrace_seq))
--		trace_note_tsk_ext(tsk, ioprio);
-+		trace_note_tsk_ext(tsk, ioprio, bip);
- 
- 	/*
- 	 * A word about the locking here - we disable interrupts to reserve
-@@ -1421,7 +1445,7 @@ static void blk_add_trace_rq(struct request *rq, int error,
+ 		t->sector = sector;
++		if (op == REQ_OP_ZONE_APPEND) {
++			sector_t zno = sector >> ilog2(blk_queue_zone_sectors);
++
++			t->completion_sector = sector;
++			/*
++			*  Start of the zone sector in which this completion
++			*  sector belongs to.
++			*/
++			sector = zno * blk_queue_zone_sectors;
++		}
+ 		t->bytes = bytes;
+ 		t->action = what;
+ 		t->ioprio = ioprio;
+@@ -1445,7 +1456,8 @@ static void blk_add_trace_rq(struct request *rq, int error,
  			what |= BLK_TC_ACT_EXT(BLK_TC_FS);
  		__blk_add_trace_ext(bte, blk_rq_trace_sector(rq), nr_bytes,
  				    req_op(rq), rq->cmd_flags, what, error, 0,
--				    NULL, cgid, req_get_ioprio(rq));
-+				    NULL, cgid, req_get_ioprio(rq), NULL);
+-				    NULL, cgid, req_get_ioprio(rq), NULL);
++				    NULL, cgid, req_get_ioprio(rq), NULL,
++				    blk_queue_zone_sectors(rq->q));
  	}
  	rcu_read_unlock();
  }
-@@ -1564,7 +1588,7 @@ static void blk_add_trace_bio(struct request_queue *q, struct bio *bio,
+@@ -1588,7 +1600,8 @@ static void blk_add_trace_bio(struct request_queue *q, struct bio *bio,
  				    bio->bi_iter.bi_size, bio_op(bio),
  				    bio->bi_opf, what, error, 0, NULL,
  				    blk_trace_bio_get_cgid(q, bio),
--				    bio_prio(bio));
-+				    bio_prio(bio), bio_integrity(bio));
+-				    bio_prio(bio), bio_integrity(bio));
++				    bio_prio(bio), bio_integrity(bio),
++				    blk_queue_zone_sectors(q));
  	}
  	rcu_read_unlock();
  }
-@@ -1724,7 +1748,7 @@ static void blk_add_trace_plug(void *ignore, struct request_queue *q)
+@@ -1748,7 +1761,7 @@ static void blk_add_trace_plug(void *ignore, struct request_queue *q)
  		__blk_add_trace(bt, 0, 0, 0, 0, BLK_TA_PLUG, 0, 0, NULL, 0);
  	else if (bte)
  		__blk_add_trace_ext(bte, 0, 0, 0, 0, BLK_TA_PLUG_EXT, 0, 0,
--				    NULL, 0, 0);
-+				    NULL, 0, 0, NULL);
+-				    NULL, 0, 0, NULL);
++				    NULL, 0, 0, NULL, 0);
  	rcu_read_unlock();
  }
  
-@@ -1756,7 +1780,7 @@ static void blk_add_trace_unplug(void *ignore, struct request_queue *q,
+@@ -1780,7 +1793,7 @@ static void blk_add_trace_unplug(void *ignore, struct request_queue *q,
  		else
  			what = BLK_TA_UNPLUG_TIMER_EXT;
  		__blk_add_trace_ext(bte, 0, 0, 0, 0, what, 0, sizeof(rpdu),
--				&rpdu, 0, 0);
-+				&rpdu, 0, 0, NULL);
+-				&rpdu, 0, 0, NULL);
++				&rpdu, 0, 0, NULL, 0);
  	}
  	rcu_read_unlock();
  }
-@@ -1787,7 +1811,9 @@ static void blk_add_trace_split(void *ignore, struct bio *bio, unsigned int pdu)
- 				    bio->bi_iter.bi_size, bio_op(bio),
- 				    bio->bi_opf, BLK_TA_SPLIT_EXT,
+@@ -1813,7 +1826,7 @@ static void blk_add_trace_split(void *ignore, struct bio *bio, unsigned int pdu)
  				    bio->bi_status, sizeof(rpdu), &rpdu,
--				    blk_trace_bio_get_cgid(q, bio), 0);
-+				    blk_trace_bio_get_cgid(q, bio),
-+				    bio_prio(bio),
-+				    bio_integrity(bio));
+ 				    blk_trace_bio_get_cgid(q, bio),
+ 				    bio_prio(bio),
+-				    bio_integrity(bio));
++				    bio_integrity(bio), 0);
  	}
  	rcu_read_unlock();
  }
-@@ -1831,7 +1857,9 @@ static void blk_add_trace_bio_remap(void *ignore, struct bio *bio, dev_t dev,
- 				    bio->bi_iter.bi_size, bio_op(bio),
- 				    bio->bi_opf, BLK_TA_REMAP_EXT, bio->bi_status,
+@@ -1859,7 +1872,7 @@ static void blk_add_trace_bio_remap(void *ignore, struct bio *bio, dev_t dev,
  				    sizeof(r), &r,
--				    blk_trace_bio_get_cgid(q, bio), 0);
-+				    blk_trace_bio_get_cgid(q, bio),
-+				    bio_prio(bio),
-+				    bio_integrity(bio));
+ 				    blk_trace_bio_get_cgid(q, bio),
+ 				    bio_prio(bio),
+-				    bio_integrity(bio));
++				    bio_integrity(bio), 0);
  	}
  	rcu_read_unlock();
  }
-@@ -1876,7 +1904,7 @@ static void blk_add_trace_rq_remap(void *ignore, struct request *rq, dev_t dev,
+@@ -1904,7 +1917,7 @@ static void blk_add_trace_rq_remap(void *ignore, struct request *rq, dev_t dev,
  		__blk_add_trace_ext(bte, blk_rq_pos(rq), blk_rq_bytes(rq),
  				    rq_data_dir(rq), 0, BLK_TA_REMAP_EXT, 0,
  				    sizeof(r), &r,
--				    blk_trace_request_get_cgid(rq), 0);
-+				    blk_trace_request_get_cgid(rq), 0, NULL);
+-				    blk_trace_request_get_cgid(rq), 0, NULL);
++				    blk_trace_request_get_cgid(rq), 0, NULL, 0);
  	}
  	rcu_read_unlock();
  }
-@@ -1912,7 +1940,7 @@ void blk_add_driver_data(struct request *rq, void *data, size_t len)
+@@ -1940,7 +1953,7 @@ void blk_add_driver_data(struct request *rq, void *data, size_t len)
  		__blk_add_trace_ext(bte, blk_rq_trace_sector(rq),
  				blk_rq_bytes(rq), 0, 0, BLK_TA_DRV_DATA_EXT, 0,
  				len, data, blk_trace_request_get_cgid(rq),
--				req_get_ioprio(rq));
-+				req_get_ioprio(rq), NULL);
+-				req_get_ioprio(rq), NULL);
++				req_get_ioprio(rq), NULL, 0);
  	}
  	rcu_read_unlock();
  }
