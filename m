@@ -7,56 +7,56 @@ X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FDAFC433E0
-	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 07:06:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACDADC433E0
+	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 07:07:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D77EB64EDC
-	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 07:06:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 63E4C64ED3
+	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 07:07:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232746AbhBYHGf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Feb 2021 02:06:35 -0500
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:13098 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232486AbhBYHFj (ORCPT
+        id S233067AbhBYHHD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Feb 2021 02:07:03 -0500
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:13993 "EHLO
+        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229596AbhBYHFy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Feb 2021 02:05:39 -0500
+        Thu, 25 Feb 2021 02:05:54 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1614237261; x=1645773261;
+  t=1614236752; x=1645772752;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=oCu3+kNWbsW2ZNvShwFNhd9xthlLzpeD0o9Ug702zLA=;
-  b=aUYfqxm5ElNMRX9VonJ/8ZJEe0VpHiUw2Ujop9DrX2VlXvJyNuvPQhxP
-   UWaseu3wn/i8IdBWLIh/fMnW+2Lo21V+IEVAlWUxM4o+hHqxyK1oU09d9
-   RbuIPXp/ABwCTV58qryxg6QkAD4lSPjboinI21sqmiI+lI1c7ydybEZfC
-   iTzPksTYArcJ+u/g+PjwsIGGMlzRU+/ckrWpBVIQ2ZdLVNAdJT/qwBvKf
-   LBvFFs+gz7SN+PY5B+sEZ1Dh8LjtxQI+EUjVQSoR8xltdGu2hScz7mcfC
-   07CCkpVm1EAQIiyz3G+57ab1eE4pbBhoofBQx/SvzpCX5l9x5GzPb7JAd
-   A==;
-IronPort-SDR: Q+dkk34Zc4w2OV2u3FNywpJsNBcSQ/REtYCu+/negt6RD9DFhsXUxJRJLdV125q+d6FGYHq5nF
- DC0uSjBTuNZfZgEIrfDEBm83zWqSvbS+rVwqPtAl35HUbWbYTS4D0YJLFgF/UWjFYXVXMqLZLo
- zw031ukqsGMPPf5FS1Caot5cSm3CFKqqF+kl0JnPPQKr9nkr+MUD9b1UO/2BYjvcBQuica6I/g
- eXb/SDqqUZLCAR5msVs2pw7M5c5hMPhh+CitstFeN469Ls+z6DhkjgV5lDUeXwePnjT5DrwJnl
- SGg=
+  bh=zX5u0LGVFFUDJJ8B1co7L0h1Qj5Ehc3inMJ8ZLgIl1c=;
+  b=jKrwKdzo/7mZ3WtBBYLc2uFJdf+nLFWVASj/yTWpcIboBwad1sDpKalU
+   ta6gHZF9b5VKGUxQjKSpojhZ6uBSmFSVbXPXfUZVRHxbZ7IMnQIA0+c5W
+   lbi343Ne9ahI9mELky7EZ8M+89BQn5Wjt4v9nWkZxIAyz0OWv15fDe9Y7
+   W9YEeKyu0e8UIiJdEOcamY2JrHnufE7Bcv3Jyw75dMBH6TFTDkqxM1Ond
+   +dn/zTmwigeoM4QAyXRCI2o67hTaV4Sl6dmZjQZ37ROZqxHXtBQITP+1Y
+   iye3IJY2GJKlLbR7uQcTZNNgo4Vlsr2DAihqAkBRo+CTQscxeV8DBfQZb
+   Q==;
+IronPort-SDR: PrhtrCCNo8yg0EJ610XmTrxf2GB4eDTb/4nS7s9OdyMe+jvPEy/YNkCsWkb0UaU27lpzrKHFw4
+ 4cR17VgSidUvUrka56IAgxcxNepA7vHQiJdWWVBi7aeQQvNyz6DiGhmnm5Ki28Si3mO2I04Ks7
+ YYllqG1mX4C1DhO3NjO9NaKZ8joNT81YJs8LbdDpM9DzEQzokK8x9yK3/lGJvj7wOJZ5wPTsOr
+ In3Qt7pntMjWCCHM4aFNv1M6HhoDGX39hygy4M84TZkoTZiGBhlSCfTCfS7TDBDXur7/YFnw09
+ p+4=
 X-IronPort-AV: E=Sophos;i="5.81,205,1610380800"; 
-   d="scan'208";a="264978876"
+   d="scan'208";a="160751717"
 Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 25 Feb 2021 15:13:06 +0800
-IronPort-SDR: MFLFIMLo8QsX1IknvU+4uu7t9LH84ls9VuefsK/yL9m6pfTM0KQlYVoaYsIeetmVsz97B0mrM9
- DekNCogVXv6QKo23A/2M7sXaGmaK8ygAiGzbAdV8eZ1hYq+NaxJ2UOpP1iLRcvyqWZRxch1reQ
- Eub7QZDQzhzwYfNVBBfBpyUa2zo3bjMApNny91pv5q83AtwTZRGh11on4KFBI8mux9MNM9dzwZ
- oUhjiejTK0Tq8SenPidcfz/nQNaKVQDZVj8xjV8GYzY79ieDTdio47+HCrkK3m78YxinvCxGY2
- ANZxYsnbyk8VtS3Goq52WkRu
+  by ob1.hgst.iphmx.com with ESMTP; 25 Feb 2021 15:04:23 +0800
+IronPort-SDR: VnFEYYatB/sNso+/0b+MIAtsHbDRFdUwrIDLcWArwtMrNZ3mnu6LdHtfxUftd/WVWW50VjRtxQ
+ YHsrRE6hPiB233nLMIb9L+WGPKPI8agG4i1Bw754IK/VTTOd3AVOJ+u01t+xgy/99l0cIhViwS
+ UbmeOuToEC55r4DSA2c6WEX8Qq5J11b0iwQQzcATGakUAgixacBfMTXDgQLLBF7ZetWgkyK0wo
+ 9m3TAFZjBFw6qh091u/ugF72uPH6enLdPWvm6bY7uOWubFvDusUzn8iVBVovJHhLhWOKK8lJoD
+ IFQ82npZLI0m4IND4jKLSRn4
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2021 22:48:05 -0800
-IronPort-SDR: WcQGSHilogCONek1dvPeaTZ+NSX6ZsQpzH7zXtz4o78vPCAIOvdh9BGJpfmYDZCj3I/HuvZv5l
- j2afCI6Pgo+cysftS/CEWeNDd3kZ4aE3j7wBDRQ/k5RWFp4J/lU41LjcjX2Y8ZLi6d2Fs+4k/u
- Mun8vCjNBzgXaRbugeggqBNZ62Z8Ta4by3ZR3Xkl7hFRjQ6nvcsj2wfjXYBWRii5tIDZR4nHTV
- 40PriSHdrHwH08V/GGoOm3cg2t9+ZQObMMeGpO9OLzu1V7SPRNYTNu0xcAJhharAvCiOwSCLnA
- vNI=
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2021 22:47:38 -0800
+IronPort-SDR: b6D3DJ2Y/kk6gNN5eORP+52pxYzmVI5Ds+/VMwpHylQgt3DiU8fh2pQp0DOzzSqO+dceFu6tUX
+ aoiAMzk45FSmXILPfpz5jtHZar/G5oTO+GC3MjzgzM9Z16Met/XeFyGmq8SS0sSu1BCy95YgEo
+ 4kgHSefPuyxvh21KwXoZWwvACWcl2/WTUeSzMslqQF9h8mUjMBjvhWy/f3ZdeAoWMlKNDSiGiY
+ w5SwvI4Ma/1icgaGtxLd0sruHWwbainJwlQR4MSDl4wPdVXH2hycAixWsLtQ+m3BjJl+31smQd
+ kP8=
 WDCIronportException: Internal
 Received: from vm.labspan.wdc.com (HELO vm.sc.wdc.com) ([10.6.137.102])
-  by uls-op-cesaip01.wdc.com with ESMTP; 24 Feb 2021 23:04:49 -0800
+  by uls-op-cesaip01.wdc.com with ESMTP; 24 Feb 2021 23:04:22 -0800
 From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 To:     axboe@kernel.dk, viro@zeniv.linux.org.uk, rostedt@goodmis.org,
         mingo@redhat.com, chaitanya.kulkarni@wdc.com,
@@ -65,9 +65,9 @@ To:     axboe@kernel.dk, viro@zeniv.linux.org.uk, rostedt@goodmis.org,
         aravind.ramesh@wdc.com, joshi.k@samsung.com, niklas.cassel@wdc.com,
         hch@lst.de, osandov@fb.com, martin.petersen@oracle.com
 Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: [RFC PATCH 14/39] blktrace: update blk_add_trace_bio_bounce()
-Date:   Wed, 24 Feb 2021 23:02:06 -0800
-Message-Id: <20210225070231.21136-15-chaitanya.kulkarni@wdc.com>
+Subject: [RFC PATCH 11/39] blktrace: update blk_add_trace_rq_requeue()
+Date:   Wed, 24 Feb 2021 23:02:03 -0800
+Message-Id: <20210225070231.21136-12-chaitanya.kulkarni@wdc.com>
 X-Mailer: git-send-email 2.22.1.dirty
 In-Reply-To: <20210225070231.21136-1-chaitanya.kulkarni@wdc.com>
 References: <20210225070231.21136-1-chaitanya.kulkarni@wdc.com>
@@ -83,36 +83,36 @@ Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
  1 file changed, 19 insertions(+), 1 deletion(-)
 
 diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index 14658b2a3fc8..d4c3ae0f419e 100644
+index e1646d74ac9a..8a7fedfac6b3 100644
 --- a/kernel/trace/blktrace.c
 +++ b/kernel/trace/blktrace.c
-@@ -1277,7 +1277,25 @@ static void blk_add_trace_bio(struct request_queue *q, struct bio *bio,
+@@ -1188,7 +1188,25 @@ static void blk_add_trace_rq_merge(void *ignore, struct request *rq)
  
- static void blk_add_trace_bio_bounce(void *ignore, struct bio *bio)
+ static void blk_add_trace_rq_requeue(void *ignore, struct request *rq)
  {
--	blk_add_trace_bio(bio->bi_bdev->bd_disk->queue, bio, BLK_TA_BOUNCE, 0);
-+	u64 ta = 0;
+-	blk_add_trace_rq(rq, 0, blk_rq_bytes(rq), BLK_TA_REQUEUE,
++	u64 ta;
 +	struct blk_trace *bt;
 +	struct blk_trace_ext *bte;
 +
 +	rcu_read_lock();
-+	bt = rcu_dereference(bio->bi_bdev->bd_disk->queue->blk_trace);
-+	bte = rcu_dereference(bio->bi_bdev->bd_disk->queue->blk_trace_ext);
++	bt = rcu_dereference(rq->q->blk_trace);
++	bte = rcu_dereference(rq->q->blk_trace_ext);
 +	if (likely(!bt) && likely(!bte)) {
 +		rcu_read_unlock();
 +		return;
 +	}
 +
 +	if (bt) {
-+		ta = BLK_TA_BOUNCE;
++		ta = BLK_TA_REQUEUE;
 +	} else if (bte) {
-+		ta = BLK_TA_BOUNCE_EXT;
++		ta = BLK_TA_REQUEUE_EXT;
 +	}
 +	rcu_read_unlock();
-+	blk_add_trace_bio(bio->bi_bdev->bd_disk->queue, bio, ta, 0);
++	blk_add_trace_rq(rq, 0, blk_rq_bytes(rq), ta,
+ 			 blk_trace_request_get_cgid(rq));
  }
  
- static void blk_add_trace_bio_complete(void *ignore,
 -- 
 2.22.1
 
