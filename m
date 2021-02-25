@@ -7,56 +7,56 @@ X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9FD0C433E0
-	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 07:04:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7051C433E6
+	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 07:05:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8C02364E4D
-	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 07:04:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9FDCD64ED9
+	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 07:05:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230174AbhBYHE4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Feb 2021 02:04:56 -0500
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:13049 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232471AbhBYHE1 (ORCPT
+        id S231160AbhBYHE6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Feb 2021 02:04:58 -0500
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:40841 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229566AbhBYHE3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Feb 2021 02:04:27 -0500
+        Thu, 25 Feb 2021 02:04:29 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1614237151; x=1645773151;
+  t=1614236668; x=1645772668;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=EiTEA8rJ+zvTS8aqZsBQxKesJgcmxfVC6VzIj84hvAg=;
-  b=FOynYpEZFv5VH73EX8VthfMXWxbbLVmHHdRzZ86Q4b4IKvQVGceAUOgJ
-   CI9VWDbC+/hKry154PbPi7vEodn7u200WdKdJndbw8bhG8emCLcTiuB9O
-   FKbJa0XI2DtGjhq2AnX5LdtIXR9hIpLCJ1bi4nGU8Yfgl+MWmYe2ue5kT
-   PgAeiMmR0hzpCOJ19iwIcdRz1ryddsn7o16tRyXFSA7PLam99y1MItPD5
-   tdhHoumsCFldMtQLyg4Dddp12DHe8Hwhxfx6f9UzeP4tft/eUGj1P54cT
-   3K17bde+8YrXhPWExBxwYS/4gxzkUH+Pc0n/G1qZd7xaQR+gFGN2N8a2y
-   w==;
-IronPort-SDR: gZ25v9M7mI62mr5idEYVUi5V7S4lBlxia8YN3PX/Dw7JWqjPwm6ckiqo4sOUJBRJ5i5YuvHVLg
- ZPiPM4xCk7J7HwL8FpkMRexnvaFx/zqiCqtSoDdtaiCyyS+hOId57K07qd6X/ImHVugtwRLuJX
- CAvy+y/gNlb1moTKLJP6CStYKNi0qpmbTonR7BQpLVmzYmf6jFnDaOGIyhC+m6MLkfHB3eZypB
- FnpdbjvYxsr7eskApzuCrzOUZeQPMkJlXv9ETvcPh6rGjeKW20rGFRI3bQ5cXHE7ml8OavS57f
- NF8=
+  bh=YqyjlzPNQjTMRjOk6Mtz4VEUf84S5Nuxb+VjgSMGlAw=;
+  b=UaW74+j7pQoSpS/9ZXr8d6w1v/HAU6NP/MjOe2QBVb1gcwN3KsrCy5vl
+   Qj5oauJsrKV/PMs/0CaWknZ118X2yyUI7fCdSbAeLCFu6TchQKoNUzptn
+   JpxFn0YnsG5gCD6fGuhd70RwENr22RgKXO6bNcDbvHmm5MYxTAsIgCZhV
+   jZ9a+L3pNhVQ4ztOaz1EMccu38MuMnWbABByrot3qZclhow4ut8gDZb2P
+   FlyQswkdmaq9byyN/AA7MuIpS9WPtL2yUdd1yhfGbDVq9ir07vjUnMiXG
+   gN8Cvz53Vm6HbjYpk01rc4x6+AR5GPOanf7Yq5qd7NVHj+Ac3Qw4SLcWX
+   g==;
+IronPort-SDR: vug1FgfP955B5CgApzZts6lfg3uSpKmH1ZpKE0jCyG+0atOc4P3lagz4LCM3+amho/wmhFnj/z
+ TVlTYxWR/yQWAInDOyK3dl5SysX8BIJ4AG0Wx1zl5327PatURRKBKciZTiK7XBmB67spJXJuCm
+ 7YEFliVsraMMgqF07T62tIz+M/wBulXC6SZP1+AJcglyuWbk4XGkeV/BHtVDwtLf+F+o/oTbXT
+ tJDiX6eLrR0DUNamm+evd8chNZU9p5wPAOUeZH0QzpxPknT1SVMy7fthl0g1d3eL/JItdWLwUl
+ lH4=
 X-IronPort-AV: E=Sophos;i="5.81,205,1610380800"; 
-   d="scan'208";a="264978745"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 25 Feb 2021 15:10:11 +0800
-IronPort-SDR: 8CaMf0F2w5QaKLxAa8Il9wVovreEuAwf/YFhNObbETqHgmkNK7dfr+hJpWLSXkbq6eB7smKw+J
- mdrrQDGilv08PPz+F6cyMb0mqLfXiDCVULYVxVRzNu25cm90jOJXrUiMB+8SYXapH0xW8c2NkO
- ulSxMrH5G/BEVqA7O+AR6zDzK6ifyY25naZ68u/e9PiS30tUULSfQIXpw9NVLJFBWZPrsZVVE2
- MwKJXDjVKgRc7XGzSVessK2tD6HOg3ekzsji/0HswTo9ITyAk4YYdnYOuzy/eOr2955ABhYKx5
- Qn2AG+Qqzp7Gg54O/L1LAbHs
+   d="scan'208";a="271318941"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 25 Feb 2021 15:03:20 +0800
+IronPort-SDR: XHoA/padyu3eAVe0wow4xq6KZprJeYXDVXB4pj95VJutdAhbIuubARBKCu01iQJ96f/gJmiKOr
+ 0YRA4B0L0J/SSWjZNJ3ttdKDEUWiQNlMN9xq0NdvnCumxNDYk8fNzx2xkhA0a6zNzxdhIqL1ko
+ lY5HNNnnOAo6HLH9pgg6fx3NiSTONtKr38Q/KlLCB8c4vCkQEpWqyj+642eILq1/Cjagy/MOzF
+ 2j3qQvkYKBPrn4FYD8MvyABohLsxy7+3/T5HZuHLOdfHWg23f2eHQyFcgHReg9LTuBr6p1rXrO
+ aCVRKdJcIWwG5XcP++/6hcWH
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2021 22:44:15 -0800
-IronPort-SDR: 3XQYXge+QisbPCejLdBFccnJRWKymYEXC/6SYM+GtSuop1vUOQyDChD+eIqYWQOUXFnz24g3tT
- Kxc65b/1w7Px+bKEBNVhhbEjXKXcWzVfxejEtyIS+CHIq+6U4ykF8ZE3PedQ+/B8zG4fYjKaEh
- jfJerGeuCGZY4X14c77d6qsTnADp2DPkJf5UQiGqRADEOQGyh6vLFQfTfGvuZEEd0OGmTGenb+
- BSfklIiP8EW4dEfBdK94hgTePEqtjhIUoxVEfsQEl+WWZYfrsPneGhXcJ34fZIId6RD/Pj1Zil
- 43I=
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2021 22:44:42 -0800
+IronPort-SDR: /hjG3Gw3NpTQ7UoUXCey8Agu3ljuUiBGQbfO/EQmLCyI3xHTR+KfpB6Ii8FPxyUgbB9CzPKL5e
+ jOjj/xsxrWHba2EZ5XZzyczE9szDplFR2ahNG1oBXxUF8WewA0ygQULv7KFgEbkVwrHK/4hviY
+ rF2Qn1uxI7XfZg7jwODu5qkMedGLnhN3bDYrNMrUgRS9rsMCmOJ71HgIMuubzv4Bj1wC4P9OJN
+ 83KMkdikvEDTK7AHfzBtbOiLI6VmAs6pgFusE3ewldgarFDhYJ8fXuDCh+ESsDuDQtFInhpeFV
+ 9wI=
 WDCIronportException: Internal
 Received: from vm.labspan.wdc.com (HELO vm.sc.wdc.com) ([10.6.137.102])
-  by uls-op-cesaip01.wdc.com with ESMTP; 24 Feb 2021 23:02:53 -0800
+  by uls-op-cesaip01.wdc.com with ESMTP; 24 Feb 2021 23:03:20 -0800
 From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 To:     axboe@kernel.dk, viro@zeniv.linux.org.uk, rostedt@goodmis.org,
         mingo@redhat.com, chaitanya.kulkarni@wdc.com,
@@ -65,9 +65,9 @@ To:     axboe@kernel.dk, viro@zeniv.linux.org.uk, rostedt@goodmis.org,
         aravind.ramesh@wdc.com, joshi.k@samsung.com, niklas.cassel@wdc.com,
         hch@lst.de, osandov@fb.com, martin.petersen@oracle.com
 Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: [RFC PATCH 01/39] blktrace_api: add new trace definitions
-Date:   Wed, 24 Feb 2021 23:01:53 -0800
-Message-Id: <20210225070231.21136-2-chaitanya.kulkarni@wdc.com>
+Subject: [RFC PATCH 04/39] blktrace: add a new global list
+Date:   Wed, 24 Feb 2021 23:01:56 -0800
+Message-Id: <20210225070231.21136-5-chaitanya.kulkarni@wdc.com>
 X-Mailer: git-send-email 2.22.1.dirty
 In-Reply-To: <20210225070231.21136-1-chaitanya.kulkarni@wdc.com>
 References: <20210225070231.21136-1-chaitanya.kulkarni@wdc.com>
@@ -77,165 +77,27 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch adds a new trace categories, trace actions adds a new
-version number for the trace extentions, adds new trace extension
-structure to hold actual trace along with structure nedded to execute
-various IOCTLs to configure trace from user space.
+Add a separate list to hold running extension traces.
 
 Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 ---
- include/uapi/linux/blktrace_api.h | 110 ++++++++++++++++++++++++------
- 1 file changed, 89 insertions(+), 21 deletions(-)
+ kernel/trace/blktrace.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/include/uapi/linux/blktrace_api.h b/include/uapi/linux/blktrace_api.h
-index 690621b610e5..fdb3a5cdfa22 100644
---- a/include/uapi/linux/blktrace_api.h
-+++ b/include/uapi/linux/blktrace_api.h
-@@ -8,30 +8,41 @@
-  * Trace categories
-  */
- enum blktrace_cat {
--	BLK_TC_READ	= 1 << 0,	/* reads */
--	BLK_TC_WRITE	= 1 << 1,	/* writes */
--	BLK_TC_FLUSH	= 1 << 2,	/* flush */
--	BLK_TC_SYNC	= 1 << 3,	/* sync IO */
--	BLK_TC_SYNCIO	= BLK_TC_SYNC,
--	BLK_TC_QUEUE	= 1 << 4,	/* queueing/merging */
--	BLK_TC_REQUEUE	= 1 << 5,	/* requeueing */
--	BLK_TC_ISSUE	= 1 << 6,	/* issue */
--	BLK_TC_COMPLETE	= 1 << 7,	/* completions */
--	BLK_TC_FS	= 1 << 8,	/* fs requests */
--	BLK_TC_PC	= 1 << 9,	/* pc requests */
--	BLK_TC_NOTIFY	= 1 << 10,	/* special message */
--	BLK_TC_AHEAD	= 1 << 11,	/* readahead */
--	BLK_TC_META	= 1 << 12,	/* metadata */
--	BLK_TC_DISCARD	= 1 << 13,	/* discard requests */
--	BLK_TC_DRV_DATA	= 1 << 14,	/* binary per-driver data */
--	BLK_TC_FUA	= 1 << 15,	/* fua requests */
--
--	BLK_TC_END	= 1 << 15,	/* we've run out of bits! */
-+	BLK_TC_READ		= 1 << 0,	/* reads */
-+	BLK_TC_WRITE		= 1 << 1,	/* writes */
-+	BLK_TC_FLUSH		= 1 << 2,	/* flush */
-+	BLK_TC_SYNC		= 1 << 3,	/* sync IO */
-+	BLK_TC_SYNCIO		= BLK_TC_SYNC,
-+	BLK_TC_QUEUE		= 1 << 4,	/* queueing/merging */
-+	BLK_TC_REQUEUE		= 1 << 5,	/* requeueing */
-+	BLK_TC_ISSUE		= 1 << 6,	/* issue */
-+	BLK_TC_COMPLETE		= 1 << 7,	/* completions */
-+	BLK_TC_FS		= 1 << 8,	/* fs requests */
-+	BLK_TC_PC		= 1 << 9,	/* pc requests */
-+	BLK_TC_NOTIFY		= 1 << 10,	/* special message */
-+	BLK_TC_AHEAD		= 1 << 11,	/* readahead */
-+	BLK_TC_META		= 1 << 12,	/* metadata */
-+	BLK_TC_DISCARD		= 1 << 13,	/* discard requests */
-+	BLK_TC_DRV_DATA		= 1 << 14,	/* binary per-driver data */
-+	BLK_TC_FUA		= 1 << 15,	/* fua requests */
-+	BLK_TC_WRITE_ZEROES	= 1 << 16,	/* write-zeores */
-+	BLK_TC_ZONE_RESET	= 1 << 17,	/* zone-reset */
-+	BLK_TC_ZONE_RESET_ALL	= 1 << 18,	/* zone-reset-all */
-+	BLK_TC_ZONE_APPEND	= 1 << 19,	/* zone-append */
-+	BLK_TC_ZONE_OPEN	= 1 << 20,	/* zone-open */
-+	BLK_TC_ZONE_CLOSE	= 1 << 21,	/* zone-close */
-+	BLK_TC_ZONE_FINISH	= 1 << 22,	/* zone-finish */
-+
-+	BLK_TC_END		= 1 << 15,	/* we've run out of bits! */
-+	BLK_TC_END_EXT		= 1 << 31,	/* we've run out of bits! */
- };
+diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+index ca6f0ceba09b..e45bbfcb5daf 100644
+--- a/kernel/trace/blktrace.c
++++ b/kernel/trace/blktrace.c
+@@ -36,6 +36,9 @@ static bool blk_tracer_enabled __read_mostly;
+ static LIST_HEAD(running_trace_list);
+ static __cacheline_aligned_in_smp DEFINE_SPINLOCK(running_trace_lock);
  
- #define BLK_TC_SHIFT		(16)
- #define BLK_TC_ACT(act)		((act) << BLK_TC_SHIFT)
- 
-+#define BLK_TC_SHIFT_EXT   	(32)
-+#define BLK_TC_ACT_EXT(act)		(((u64)act) << BLK_TC_SHIFT_EXT)
++static LIST_HEAD(running_trace_ext_list);
++static __cacheline_aligned_in_smp DEFINE_SPINLOCK(running_trace_ext_lock);
 +
- /*
-  * Basic trace actions
-  */
-@@ -88,12 +99,38 @@ enum blktrace_notify {
- #define BLK_TA_ABORT		(__BLK_TA_ABORT | BLK_TC_ACT(BLK_TC_QUEUE))
- #define BLK_TA_DRV_DATA	(__BLK_TA_DRV_DATA | BLK_TC_ACT(BLK_TC_DRV_DATA))
- 
-+#define BLK_TA_QUEUE_EXT	(__BLK_TA_QUEUE | BLK_TC_ACT_EXT(BLK_TC_QUEUE))
-+#define BLK_TA_BACKMERGE_EXT	(__BLK_TA_BACKMERGE | BLK_TC_ACT_EXT(BLK_TC_QUEUE))
-+#define BLK_TA_FRONTMERGE_EXT	(__BLK_TA_FRONTMERGE | BLK_TC_ACT_EXT(BLK_TC_QUEUE))
-+#define BLK_TA_GETRQ_EXT	(__BLK_TA_GETRQ | BLK_TC_ACT_EXT(BLK_TC_QUEUE))
-+#define BLK_TA_SLEEPRQ_EXT	(__BLK_TA_SLEEPRQ | BLK_TC_ACT_EXT(BLK_TC_QUEUE))
-+#define BLK_TA_REQUEUE_EXT	(__BLK_TA_REQUEUE | BLK_TC_ACT_EXT(BLK_TC_REQUEUE))
-+#define BLK_TA_ISSUE_EXT	(__BLK_TA_ISSUE | BLK_TC_ACT_EXT(BLK_TC_ISSUE))
-+#define BLK_TA_COMPLETE_EXT	(__BLK_TA_COMPLETE | BLK_TC_ACT_EXT(BLK_TC_COMPLETE))
-+#define BLK_TA_PLUG_EXT		(__BLK_TA_PLUG | BLK_TC_ACT_EXT(BLK_TC_QUEUE))
-+#define BLK_TA_UNPLUG_IO_EXT	(__BLK_TA_UNPLUG_IO | BLK_TC_ACT_EXT(BLK_TC_QUEUE))
-+#define BLK_TA_UNPLUG_TIMER_EXT		\
-+	(__BLK_TA_UNPLUG_TIMER | BLK_TC_ACT_EXT(BLK_TC_QUEUE))
-+#define BLK_TA_INSERT_EXT	(__BLK_TA_INSERT | BLK_TC_ACT_EXT(BLK_TC_QUEUE))
-+#define BLK_TA_SPLIT_EXT	(__BLK_TA_SPLIT)
-+#define BLK_TA_BOUNCE_EXT	(__BLK_TA_BOUNCE)
-+#define BLK_TA_REMAP_EXT	(__BLK_TA_REMAP | BLK_TC_ACT_EXT(BLK_TC_QUEUE))
-+#define BLK_TA_ABORT_EXT	(__BLK_TA_ABORT | BLK_TC_ACT_EXT(BLK_TC_QUEUE))
-+#define BLK_TA_DRV_DATA_EXT	\
-+	(__BLK_TA_DRV_DATA | BLK_TC_ACT_EXT(BLK_TC_DRV_DATA))
-+
- #define BLK_TN_PROCESS		(__BLK_TN_PROCESS | BLK_TC_ACT(BLK_TC_NOTIFY))
- #define BLK_TN_TIMESTAMP	(__BLK_TN_TIMESTAMP | BLK_TC_ACT(BLK_TC_NOTIFY))
- #define BLK_TN_MESSAGE		(__BLK_TN_MESSAGE | BLK_TC_ACT(BLK_TC_NOTIFY))
- 
--#define BLK_IO_TRACE_MAGIC	0x65617400
--#define BLK_IO_TRACE_VERSION	0x07
-+#define BLK_TN_PROCESS_EXT	(__BLK_TN_PROCESS | BLK_TC_ACT_EXT(BLK_TC_NOTIFY))
-+#define BLK_TN_TIMESTAMP_EXT	(__BLK_TN_TIMESTAMP | BLK_TC_ACT_EXT(BLK_TC_NOTIFY))
-+#define BLK_TN_MESSAGE_EXT	(__BLK_TN_MESSAGE | BLK_TC_ACT_EXT(BLK_TC_NOTIFY))
-+
-+#define BLK_IO_TRACE_MAGIC             0x65617400
-+#define BLK_IO_TRACE_VERSION           0x07
-+#define BLK_IO_TRACE_VERSION_EXT       0x08
-+
- 
- /*
-  * The trace itself
-@@ -113,6 +150,23 @@ struct blk_io_trace {
- 	/* cgroup id will be stored here if exists */
- };
- 
-+struct blk_io_trace_ext {
-+	__u32 magic;		/* MAGIC << 8 | version */
-+	__u32 sequence;		/* event number */
-+	__u64 time;		/* in nanoseconds */
-+	__u64 sector;		/* disk offset */
-+	__u32 bytes;		/* transfer length */
-+	__u64 action;		/* what happened */
-+	__u32 ioprio;		/* I/O priority */
-+	__u32 pid;		/* who did it */
-+	__u32 device;		/* device number */
-+	__u32 cpu;		/* on what cpu did it happen */
-+	__u16 error;		/* completion error */
-+	__u16 pdu_len;		/* length of data after this trace */
-+	/* cgroup id will be stored here if exists */
-+};
-+
-+
- /*
-  * The remap event
-  */
-@@ -143,4 +197,18 @@ struct blk_user_trace_setup {
- 	__u32 pid;
- };
- 
-+/*
-+ * User setup structure passed with BLKTRACESETUP_EXT
-+ */
-+struct blk_user_trace_setup_ext {
-+	char name[BLKTRACE_BDEV_SIZE];	/* output */
-+	__u64 act_mask;			/* input */
-+	__u32 prio_mask;		/* input */
-+	__u32 buf_size;			/* input */
-+	__u32 buf_nr;			/* input */
-+	__u64 start_lba;
-+	__u64 end_lba;
-+	__u32 pid;
-+};
-+
- #endif /* _UAPIBLKTRACE_H */
+ /* Select an alternative, minimalistic output than the original one */
+ #define TRACE_BLK_OPT_CLASSIC	0x1
+ #define TRACE_BLK_OPT_CGROUP	0x2
 -- 
 2.22.1
 
