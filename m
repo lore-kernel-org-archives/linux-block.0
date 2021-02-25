@@ -2,126 +2,135 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7216C433E6
-	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 14:02:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BE42C433DB
+	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 14:45:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6203A64F06
-	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 14:02:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EE34864EB7
+	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 14:45:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231284AbhBYOCY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Feb 2021 09:02:24 -0500
-Received: from mail.kernel.org ([198.145.29.99]:44314 "EHLO mail.kernel.org"
+        id S231160AbhBYOoy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Feb 2021 09:44:54 -0500
+Received: from mx2.suse.de ([195.135.220.15]:43414 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230467AbhBYOCY (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Feb 2021 09:02:24 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 33D3764F1B;
-        Thu, 25 Feb 2021 14:01:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1614261702;
-        bh=gB6SQ75V2Rk37+UKLUfmsXNjtKCUUEXnmz4FEJPQVQY=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=iGKh9gRLvR8o04SWuKsCmipjtlzTrYuO47BWoJKHisDTteOpg/JDJDJJNnt+rGTTb
-         0rw4Z/+2u64PifagBhihDsPlyJ67Y3oQmsZn/oOul3KOK4yi2rGalMnkTSGw0hDAQu
-         5UCXh/aLF+AKNOXFFYPj9pbvUcZ+cJQXjOePkvmGZX37GfJUD/b8DZYdke/mmAKvZT
-         fAGvXP4lcs8maCpu0ckyrKPIoHkrpGb6cRtLNo09qQE/bWR08AfpprntjG9xmxGdei
-         eNSETbirr5t3ogcQ9xtRSswYiW1kh8gzy8rrgKIT9HRwylXF4qapcoQRRth0EghGpX
-         ctCpWU8hVtI2A==
-Received: by mail-oo1-f51.google.com with SMTP id x10so1389976oor.3;
-        Thu, 25 Feb 2021 06:01:42 -0800 (PST)
-X-Gm-Message-State: AOAM530YQNSUY6DI1p/w+oMByG+xrschcT2x6xk2C68fFUBMnyNwDQQJ
-        HRKQc6KM13zEsopqRnEASZN4oYZnOLKbfAR4rYM=
-X-Google-Smtp-Source: ABdhPJy0Z8oAC8F3qvd9r/HrjNWv0zSRZwzOF/sqWqHtbHpdIOPcLKBh4nK6FxEKGL+hdddWAENt07LK/yhwcmvgmrE=
-X-Received: by 2002:a4a:870c:: with SMTP id z12mr2391944ooh.15.1614261701193;
- Thu, 25 Feb 2021 06:01:41 -0800 (PST)
+        id S229752AbhBYOox (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 25 Feb 2021 09:44:53 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 9BF62AF6F;
+        Thu, 25 Feb 2021 14:44:10 +0000 (UTC)
+To:     "Norman.Kern" <norman.kern@gmx.com>
+Cc:     linux-block@vger.kernel.org, axboe@kernel.dk,
+        linux-bcache@vger.kernel.org
+References: <3f3e20a3-c165-1de1-7fdd-f0bd4da598fe@gmx.com>
+ <632258f7-b138-3fba-456b-9da37c1de710@gmx.com>
+ <5867daf1-0960-39aa-1843-1a76c1e9a28d@suse.de>
+ <07bcb6c8-21e1-11de-d1f0-ffd417bd36ff@gmx.com>
+ <cfe2746f-18a7-a768-ea72-901793a3133e@gmx.com>
+From:   Coly Li <colyli@suse.de>
+Subject: Re: Large latency with bcache for Ceph OSD
+Message-ID: <96daa0bf-c8e1-a334-14cb-2d260aed5115@suse.de>
+Date:   Thu, 25 Feb 2021 22:44:05 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:78.0)
+ Gecko/20100101 Thunderbird/78.7.1
 MIME-Version: 1.0
-References: <20210224072516.74696-1-uwe@kleine-koenig.org> <87sg5ks6xp.fsf@mpe.ellerman.id.au>
-In-Reply-To: <87sg5ks6xp.fsf@mpe.ellerman.id.au>
-From:   Arnd Bergmann <arnd@kernel.org>
-Date:   Thu, 25 Feb 2021 15:01:25 +0100
-X-Gmail-Original-Message-ID: <CAK8P3a1q=zqyOxBgV-nprpN3jBczZWexupkA1Wy6g+AEW6rQqw@mail.gmail.com>
-Message-ID: <CAK8P3a1q=zqyOxBgV-nprpN3jBczZWexupkA1Wy6g+AEW6rQqw@mail.gmail.com>
-Subject: Re: [PATCH v2] vio: make remove callback return void
-To:     Michael Ellerman <mpe@ellerman.id.au>
-Cc:     =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <uwe@kleine-koenig.org>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jens Axboe <axboe@kernel.dk>, Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Peter Huewe <peterhuewe@gmx.de>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Haren Myneni <haren@us.ibm.com>,
-        =?UTF-8?Q?Breno_Leit=C3=A3o?= <leitao@debian.org>,
-        Nayna Jain <nayna@linux.ibm.com>,
-        Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
-        Steven Royer <seroyer@linux.ibm.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Cristobal Forno <cforno12@linux.ibm.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Dany Madden <drt@linux.ibm.com>, Lijun Pan <ljp@linux.ibm.com>,
-        Sukadev Bhattiprolu <sukadev@linux.ibm.com>,
-        Tyrel Datwyler <tyreld@linux.ibm.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Michael Cyr <mikecyr@linux.ibm.com>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        sparclinux <sparclinux@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>, linux-integrity@vger.kernel.org,
-        Networking <netdev@vger.kernel.org>,
-        linux-scsi <linux-scsi@vger.kernel.org>,
-        target-devel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <cfe2746f-18a7-a768-ea72-901793a3133e@gmx.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Feb 25, 2021 at 12:52 PM Michael Ellerman <mpe@ellerman.id.au> wrot=
-e:
->
-> Uwe Kleine-K=C3=B6nig <uwe@kleine-koenig.org> writes:
-> > The driver core ignores the return value of struct bus_type::remove()
-> > because there is only little that can be done. To simplify the quest to
-> > make this function return void, let struct vio_driver::remove() return
-> > void, too. All users already unconditionally return 0, this commit make=
-s
-> > it obvious that returning an error code is a bad idea and makes it
-> > obvious for future driver authors that returning an error code isn't
-> > intended.
-> >
-> > Note there are two nominally different implementations for a vio bus:
-> > one in arch/sparc/kernel/vio.c and the other in
-> > arch/powerpc/platforms/pseries/vio.c. I didn't care to check which
-> > driver is using which of these busses (or if even some of them can be
-> > used with both) and simply adapt all drivers and the two bus codes in
-> > one go.
->
-> I'm 99% sure there's no connection between the two implementations,
-> other than the name.
->
-> So splitting the patch by arch would make it easier to merge. I'm
-> reluctant to merge changes to sparc code.
+On 2/25/21 9:00 PM, Norman.Kern wrote:
+> I made a test:
 
-The sparc subsystem clearly started out as a copy of the powerpc
-version, and serves roughly the same purpose, but the communication
-with the hypervisor is quite different.
+BTW, what is the version of your kernel, and your bcache-tool, and which
+distribution is running ?
 
-As there are only four drivers for the sparc vio subsystem:
-drivers/block/sunvdc.c
-drivers/net/ethernet/sun/ldmvsw.c
-drivers/net/ethernet/sun/sunvnet.c
-drivers/tty/vcc.c
-maybe it would make sense to rename those to use distinct
-identifiers now?
+> 
+> - Stop writing and wait for dirty data writen back
+> 
+> $ lsblk
+> NAME                                                                                                   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+> sdf                                                                                                      8:80   0   7.3T  0 disk
+> └─bcache0                                                                                              252:0    0   7.3T  0 disk
+>   └─ceph--32a481f9--313c--417e--aaf7--bdd74515fd86-osd--data--2f670929--3c8a--45dd--bcef--c60ce3ee08e1 253:1    0   7.3T  0 lvm 
+> sdd                                                                                                      8:48   0   7.3T  0 disk
+> sdb                                                                                                      8:16   0   7.3T  0 disk
+> sdk                                                                                                      8:160  0 893.8G  0 disk
+> └─bcache0                                                                                              252:0    0   7.3T  0 disk
+>   └─ceph--32a481f9--313c--417e--aaf7--bdd74515fd86-osd--data--2f670929--3c8a--45dd--bcef--c60ce3ee08e1 253:1    0   7.3T  0 lvm 
+> $ cat /sys/block/bcache0/bcache/dirty_data
+> 0.0k
+> 
+> root@WXS0106:~# bcache-super-show /dev/sdf
+> sb.magic                ok
+> sb.first_sector         8 [match]
+> sb.csum                 71DA9CA968B4A625 [match]
+> sb.version              1 [backing device]
+> 
+> dev.label               (empty)
+> dev.uuid                d07dc435-129d-477d-8378-a6af75199852
+> dev.sectors_per_block   8
+> dev.sectors_per_bucket  1024
+> dev.data.first_sector   16
+> dev.data.cache_mode     1 [writeback]
+> dev.data.cache_state    1 [clean]
+> cset.uuid               d87713c6-2e76-4a09-8517-d48306468659
+> 
+> - check the available cache
+> 
+> # cat /sys/fs/bcache/d87713c6-2e76-4a09-8517-d48306468659/cache_available_percent
+> 27
+> 
 
-       Arnd
+What is the content from
+/sys/fs/bcache/<cache-set-uuid>/cache0/priority_stats ? Can you past
+here too.
+
+There is no dirty blocks, but cache is occupied 78% buckets, if you are
+using 5.8+ kernel, then a gc is probably desired.
+
+You may try to trigger a gc by writing to
+sys/fs/bcache/<cache-set-uuid>/internal/trigger_gc
+
+
+> 
+> As the doc described:
+> 
+> cache_available_percent
+>     Percentage of cache device which doesn’t contain dirty data, and could potentially be used for writeback. This doesn’t mean this space isn’t used for clean cached data; the unused statistic (in priority_stats) is typically much lower.
+> When all dirty data writen back,  why cache_available_percent was not 100?
+> 
+> And when I start the write I/O, the new writen didn't replace the clean cache(it think the cache is diry now?), so it cause the hdd with large latency:
+> 
+> ./bin/iosnoop -Q -d '8,80'
+> 
+> <...>        73338  WS   8,80     3513701472   4096     217.69
+> <...>        73338  WS   8,80     3513759360   4096     448.80
+> <...>        73338  WS   8,80     3562211912   4096     511.69
+> <...>        73335  WS   8,80     3562212528   4096     505.08
+> <...>        73339  WS   8,80     3562213376   4096     501.19
+> <...>        73336  WS   8,80     3562213992   4096     511.16
+> <...>        73343  WS   8,80     3562214016   4096     511.74
+> <...>        73340  WS   8,80     3562214128   4096     512.95
+> <...>        73329  WS   8,80     3562214208   4096     510.48
+> <...>        73338  WS   8,80     3562214600   4096     518.64
+> <...>        73341  WS   8,80     3562214632   4096     519.09
+> <...>        73342  WS   8,80     3562214664   4096     518.28
+> <...>        73336  WS   8,80     3562214688   4096     519.27
+> <...>        73343  WS   8,80     3562214736   4096     528.31
+> <...>        73339  WS   8,80     3562214784   4096     530.13
+> 
+
+I just wondering why gc thread does not run up ....
+
+
+Thanks.
+
+Coly Li
+
