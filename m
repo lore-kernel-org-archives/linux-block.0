@@ -2,142 +2,120 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C69AC433E6
-	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 07:13:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D77F0C433E0
+	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 11:50:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 218F864EF5
-	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 07:13:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8812C64F16
+	for <linux-block@archiver.kernel.org>; Thu, 25 Feb 2021 11:50:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233869AbhBYHMi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Feb 2021 02:12:38 -0500
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:5434 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233938AbhBYHKc (ORCPT
+        id S229596AbhBYLuv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Feb 2021 06:50:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47740 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229961AbhBYLut (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Feb 2021 02:10:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1614237703; x=1645773703;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=qELsFddYf/fZidR2F4nWrGgbbzisn0TnUODqE1wzd5c=;
-  b=KK3+F1DVazhWSCN8fEN4KeAc2nNxhw4NaCh+AA7qxdfDOVFxdwVptBr2
-   o1A3Vi9gBIdPtMp6hb7D9qu38Wg7t1+S+MhBLoz0l3GECzldpcGlAinu5
-   wBWVBWvhtIh7GuGnTSQhFucvtvKwJ6X85hAV9CdfgtQmD0Mw+tICC5lhY
-   0FPncYhXL0vyJ+R8/YKPoOcckSdc/tIjPyS1QBl/EEXGAF4Kl4+a/oJuA
-   gxwC2vR6W7U/cg1910idH2masHAHiZjRoe6VNjT5IeKWxp7Lk6Ne0uG1N
-   INxdkNVQU7Gippn+Gf3BNIlTet6RiusJquj2MYxIpi/MIz3vHNJAhNraz
-   w==;
-IronPort-SDR: +jLz/R4w7Sq0TKfJTcjsqN5sLuk4VjYt79Y1Qxifn/oaIYUMIT4mE7PVwYEtFGy/4XMRrQvooi
- ylo58BrhhgYeayFaq1TKbwcfSNDUprmK9BmhUwGbODdSg8Rp4sJsVtLQZFnqj+dj5d/oR3lRmB
- hlghH6OJ4HJuTCGRFmRCSpF4LXykvc7Z1Pj/cSUINzZ5/MYTCaXJPmxu6gOJ/0meYHrzkIbtVD
- zAz8pvFLAR/7oGX8GBOqCNhy8FgJ2wgpqa0tPCNuiVRihZYqU9aQNFA8CDcuqidHg8nqNALwFI
- 9iw=
-X-IronPort-AV: E=Sophos;i="5.81,205,1610380800"; 
-   d="scan'208";a="264979019"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 25 Feb 2021 15:16:14 +0800
-IronPort-SDR: AFsHqhGAozGpbCPqpMs6v1fKIwznRauQ7wfZa1lg3CJvQ5nsWqSW1gLG+qWvnmy/I7ozs+Wnge
- +8A1ZArxZYl3tMX7BwFnykEiiAsoRx1/4DxcpIu6ow0nCGQr+TrVgaSnGip35Oe+C/g/+eS4p1
- tcYO1lDzNqqnWKVL+kAoQbwxFrcRe7YMYGe8JoC1vuEHpdwB3SuGTS396fTjxvZQwojJKvNXk5
- nRQv3vUtzAZ+F0iwINm8M91AJsit4TK56sZa+ZVEtN3oB0lu2h/MfLRj3Q4IqrCN6TErAI6UqX
- cT4mM/afnoIBmLxQ+qCTmGnW
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Feb 2021 22:50:09 -0800
-IronPort-SDR: PQVvuUl0urV+AuHXoztIv2ko4ec5dnFXGMemj8nj98xLSxNSzY+fPjPQsEHPXi+DWIf/mEpthf
- lxggagRReXwz2a3qn1VtF0ulgngisTFgDc8GARpNPqvFCmSjwrqNPYJBYWQmXJuwJW1I+jcOfi
- mBefp/964dE3h3HgCffZkJDMNQ+Y2CTcG3X9wPYJRI/aNXIxvpkFSZCvBPjh/0AQZ9CcjAywMA
- VsiZcNWe2+YTYB+oTNZV9z4YznZH7rcm2BK8z8DwmhzxhVgCmg+FR6smll6MEDUYZv4HormmV6
- /k8=
-WDCIronportException: Internal
-Received: from vm.labspan.wdc.com (HELO vm.sc.wdc.com) ([10.6.137.102])
-  by uls-op-cesaip01.wdc.com with ESMTP; 24 Feb 2021 23:06:53 -0800
-From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-To:     axboe@kernel.dk, viro@zeniv.linux.org.uk, rostedt@goodmis.org,
-        mingo@redhat.com, chaitanya.kulkarni@wdc.com,
-        johannes.thumshirn@wdc.com, damien.lemoal@wdc.com,
-        bvanassche@acm.org, dongli.zhang@oracle.com,
-        aravind.ramesh@wdc.com, joshi.k@samsung.com, niklas.cassel@wdc.com,
-        hch@lst.de, osandov@fb.com, martin.petersen@oracle.com
-Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: [RFC PATCH 30/39] blktrace: add trace event print helper
-Date:   Wed, 24 Feb 2021 23:02:22 -0800
-Message-Id: <20210225070231.21136-31-chaitanya.kulkarni@wdc.com>
-X-Mailer: git-send-email 2.22.1.dirty
-In-Reply-To: <20210225070231.21136-1-chaitanya.kulkarni@wdc.com>
-References: <20210225070231.21136-1-chaitanya.kulkarni@wdc.com>
+        Thu, 25 Feb 2021 06:50:49 -0500
+Received: from ozlabs.org (ozlabs.org [IPv6:2401:3900:2:1::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0769C06174A;
+        Thu, 25 Feb 2021 03:50:08 -0800 (PST)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4DmWLG6r0dz9sVF;
+        Thu, 25 Feb 2021 22:49:58 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ellerman.id.au;
+        s=201909; t=1614253805;
+        bh=/SYtgE5qENlSC96VzcIwZTaGUmL6HCYNrQHwHPYZSs4=;
+        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+        b=iSkCaS/DJVPQlH0gbL+LD45kazqnKgdUXrGSiY0t5rVH7XgWyEZ3dVcZQMrrdzWxb
+         5MgqcVG9pQkFcrHW+MXEpmHj5iL5Dc/O0Q3xerdpbA7nNL2QioWinUYOGNO1CftmBu
+         foAGxV0uCzTC0mgQqEJOVDt+y1/5VQz2b92Jel0/OqIMCucyj2A49/JmP77ew5X9ex
+         7ocZxtF4Q7Ij1XMzTR+G4KGixhAD12BQzG5y3VyTqzm+g5IL6UR67JPFL4nCBTOTxL
+         1NBGWLbvxkYV3zB/XybDZ47lwrc8H7FUaYmZhnqcTWr1RcqeZBKCgq+EBQqZHvNLXS
+         lfxhg1WNI9+Mg==
+From:   Michael Ellerman <mpe@ellerman.id.au>
+To:     Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <uwe@kleine-koenig.org>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jens Axboe <axboe@kernel.dk>, Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Peter Huewe <peterhuewe@gmx.de>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Haren Myneni <haren@us.ibm.com>,
+        Breno =?utf-8?Q?Leit?= =?utf-8?Q?=C3=A3o?= <leitao@debian.org>,
+        Nayna Jain <nayna@linux.ibm.com>,
+        Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
+        Steven Royer <seroyer@linux.ibm.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Cristobal Forno <cforno12@linux.ibm.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Dany Madden <drt@linux.ibm.com>, Lijun Pan <ljp@linux.ibm.com>,
+        Sukadev Bhattiprolu <sukadev@linux.ibm.com>,
+        Tyrel Datwyler <tyreld@linux.ibm.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Michael Cyr <mikecyr@linux.ibm.com>,
+        Jiri Slaby <jirislaby@kernel.org>
+Cc:     linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+        sparclinux@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
+        netdev@vger.kernel.org, linux-scsi@vger.kernel.org,
+        target-devel@vger.kernel.org
+Subject: Re: [PATCH v2] vio: make remove callback return void
+In-Reply-To: <20210224072516.74696-1-uwe@kleine-koenig.org>
+References: <20210224072516.74696-1-uwe@kleine-koenig.org>
+Date:   Thu, 25 Feb 2021 22:49:54 +1100
+Message-ID: <87sg5ks6xp.fsf@mpe.ellerman.id.au>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
----
- kernel/trace/blktrace.c | 39 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 39 insertions(+)
+Uwe Kleine-K=C3=B6nig <uwe@kleine-koenig.org> writes:
+> The driver core ignores the return value of struct bus_type::remove()
+> because there is only little that can be done. To simplify the quest to
+> make this function return void, let struct vio_driver::remove() return
+> void, too. All users already unconditionally return 0, this commit makes
+> it obvious that returning an error code is a bad idea and makes it
+> obvious for future driver authors that returning an error code isn't
+> intended.
+>
+> Note there are two nominally different implementations for a vio bus:
+> one in arch/sparc/kernel/vio.c and the other in
+> arch/powerpc/platforms/pseries/vio.c. I didn't care to check which
+> driver is using which of these busses (or if even some of them can be
+> used with both) and simply adapt all drivers and the two bus codes in
+> one go.
 
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index 4a4ba1d45cb9..75b2ec88d8c4 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -2356,12 +2356,51 @@ static enum print_line_t print_one_line(struct trace_iterator *iter,
- 	return trace_handle_return(s);
- }
- 
-+static enum print_line_t print_one_line_ext(struct trace_iterator *iter,
-+					bool classic)
-+{
-+	struct trace_array *tr = iter->tr;
-+	struct trace_seq *s = &iter->seq;
-+	const struct blk_io_trace_ext *t;
-+	u32 what;
-+	bool long_act;
-+	blk_log_action_t *log_action;
-+	bool has_cg;
-+
-+	t	   = te_blk_io_trace_ext(iter->ent);
-+	what	   = (t->action & ((1ULL << BLK_TC_SHIFT_EXT) - 1)) & ~__BLK_TA_CGROUP;
-+	long_act   = !!(tr->trace_flags & TRACE_ITER_VERBOSE);
-+	log_action = classic ? &blk_log_action_classic_ext : &blk_log_action_ext;
-+	has_cg	   = t->action & __BLK_TA_CGROUP;
-+
-+	if ((t->action & ~__BLK_TN_CGROUP) == BLK_TN_MESSAGE_EXT) {
-+		log_action(iter, long_act ? "message" : "m", has_cg);
-+		blk_log_msg_ext(s, iter->ent, has_cg);
-+		return trace_handle_return(s);
-+	}
-+
-+	if (unlikely(what == 0 || what >= ARRAY_SIZE(what2act_ext)))
-+		trace_seq_printf(s, "Unknown action %x\n", what);
-+	else {
-+		log_action(iter, what2act_ext[what].act[long_act], has_cg);
-+		what2act_ext[what].print(s, iter->ent, has_cg);
-+	}
-+
-+	return trace_handle_return(s);
-+}
-+
- static enum print_line_t blk_trace_event_print(struct trace_iterator *iter,
- 					       int flags, struct trace_event *event)
- {
- 	return print_one_line(iter, false);
- }
- 
-+static enum print_line_t blk_trace_event_print_ext(struct trace_iterator *iter,
-+					       int flags, struct trace_event *event)
-+{
-+	return print_one_line_ext(iter, false);
-+}
-+
- static void blk_trace_synthesize_old_trace(struct trace_iterator *iter)
- {
- 	struct trace_seq *s = &iter->seq;
--- 
-2.22.1
+I'm 99% sure there's no connection between the two implementations,
+other than the name.
 
+So splitting the patch by arch would make it easier to merge. I'm
+reluctant to merge changes to sparc code.
+
+The list of powerpc specific drivers is:
+
+  drivers/char/hw_random/pseries-rng.c
+  drivers/char/tpm/tpm_ibmvtpm.c
+  drivers/crypto/nx/nx-842-pseries.c
+  drivers/crypto/nx/nx.c
+  drivers/misc/ibmvmc.c
+  drivers/net/ethernet/ibm/ibmveth.c
+  drivers/net/ethernet/ibm/ibmvnic.c
+  drivers/scsi/ibmvscsi/ibmvfc.c
+  drivers/scsi/ibmvscsi/ibmvscsi.c
+  drivers/scsi/ibmvscsi_tgt/ibmvscsi_tgt.c
+  drivers/tty/hvc/hvcs.c
+
+cheers
