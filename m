@@ -2,44 +2,73 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F6D5C433DB
-	for <linux-block@archiver.kernel.org>; Fri, 26 Feb 2021 09:57:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3950EC433DB
+	for <linux-block@archiver.kernel.org>; Fri, 26 Feb 2021 18:40:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 07D4364EE2
-	for <linux-block@archiver.kernel.org>; Fri, 26 Feb 2021 09:57:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E1C8764DAF
+	for <linux-block@archiver.kernel.org>; Fri, 26 Feb 2021 18:40:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230499AbhBZJ5A (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 Feb 2021 04:57:00 -0500
-Received: from mx2.suse.de ([195.135.220.15]:53314 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230509AbhBZJyx (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 Feb 2021 04:54:53 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 2A881AAAE;
-        Fri, 26 Feb 2021 09:54:12 +0000 (UTC)
-Subject: Re: Large latency with bcache for Ceph OSD
-To:     "Norman.Kern" <norman.kern@gmx.com>
-Cc:     linux-block@vger.kernel.org, axboe@kernel.dk,
-        linux-bcache@vger.kernel.org
-References: <3f3e20a3-c165-1de1-7fdd-f0bd4da598fe@gmx.com>
- <632258f7-b138-3fba-456b-9da37c1de710@gmx.com>
- <5867daf1-0960-39aa-1843-1a76c1e9a28d@suse.de>
- <07bcb6c8-21e1-11de-d1f0-ffd417bd36ff@gmx.com>
- <cfe2746f-18a7-a768-ea72-901793a3133e@gmx.com>
- <96daa0bf-c8e1-a334-14cb-2d260aed5115@suse.de>
- <b808dde3-cb58-907b-4df0-e0eb2938b51e@gmx.com>
-From:   Coly Li <colyli@suse.de>
-Message-ID: <04770825-b1d2-8ec0-2345-77d49d99631a@suse.de>
-Date:   Fri, 26 Feb 2021 17:54:08 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:78.0)
- Gecko/20100101 Thunderbird/78.7.1
+        id S230527AbhBZSkP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 Feb 2021 13:40:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48738 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230351AbhBZSkL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 26 Feb 2021 13:40:11 -0500
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A78CC06174A
+        for <linux-block@vger.kernel.org>; Fri, 26 Feb 2021 10:39:30 -0800 (PST)
+Received: by mail-pf1-x432.google.com with SMTP id m6so6843505pfk.1
+        for <linux-block@vger.kernel.org>; Fri, 26 Feb 2021 10:39:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=5TKey9ScIqE1QVqAmzRm7Pa4QrBfTm9Rk2AGeQ0kJow=;
+        b=fUN2KwZrbraD0MKMQlWDp0oZdDMQ1OraOoZMs6OKbwOz/1JY23qoqgI9lu1qelp/HZ
+         zNPT3pg8qJ7OEqkPEhTz6sOZA2F7jAchAdVzkQXSPUC7/XcV3gIVyAj7/Yw+D3BetLC/
+         H+eZzgpJmBuoPO7A3mAYDpDb4DVxV7f7zuxduq/PbSyTSDAWf3vu3LVAy+sMKEUe261s
+         HoGUOvinMVZJdUSNpr+G1ACrC8IOkbFn+qzUSSKPVAjut7qjbrWHEh7LUKu8+2bUikY+
+         1DflO9TTeJJ6iQRTVc4pPczfqyJ6VpVhIqAaAYwEMQHm+sE+d21vxlxD5w3WapmPrkgw
+         DDrg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=5TKey9ScIqE1QVqAmzRm7Pa4QrBfTm9Rk2AGeQ0kJow=;
+        b=MctItH/CFJHuTFXq0AZXl2diYokjjNwjonUtCTFbNEbmsKvKbJlmLc7V92pD0L68LX
+         rj0qtLQOYEXwYu9EyIGHxbB3KPY9ByzAx3fGWOok6O4kzFdxYBZPXLQTQIvzrCqZPfAL
+         +VQfFScDoRFcHH+jwIMT7yDvTtyDGmoXdFzabHcQMXEMQLe/HJcLuHMLa1I9W00EwFX6
+         y0hAhrlZ0IGN8GgIJ669XOj2bcnZBrYA8xNbfBp+mHOGoCla+kfhVI6ZGBnWXj7sLHAt
+         fhVj/FI3NzgAJzAHDqCGvCmKTqBPraJT5a5lMHrCY5sSpjIJnhMIfFHPzr6hQbJX+BpC
+         LhZg==
+X-Gm-Message-State: AOAM53287Rd7ffhfUM/+xyHP7vk88NXqsGWu1VktJnbObd1ZKJ7pPfb5
+        aD3ksfvGhtFgAxajoGJ67F1Rphxls43LcLkG
+X-Google-Smtp-Source: ABdhPJy8+qr4YNNvR4swIeojRSfHn774tb24hJI9RxD5ui4LFMl+xjjEfPSsZ+2jEB/0yy/r1c+mNg==
+X-Received: by 2002:a05:6602:99:: with SMTP id h25mr3721659iob.168.1614364283829;
+        Fri, 26 Feb 2021 10:31:23 -0800 (PST)
+Received: from [192.168.1.30] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id g6sm4896443ilf.3.2021.02.26.10.31.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 26 Feb 2021 10:31:23 -0800 (PST)
+Subject: Re: Stray reference to RQF_SORTED
+To:     Jean Delvare <jdelvare@suse.de>
+Cc:     Ming Lei <ming.lei@redhat.com>, Omar Sandoval <osandov@fb.com>,
+        linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.com>
+References: <3f5f3d34220d882ca20696da0df1b9feeeaba879.camel@suse.de>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <26ca21d3-ef5b-5715-ef24-05a1242be6aa@kernel.dk>
+Date:   Fri, 26 Feb 2021 11:31:22 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <b808dde3-cb58-907b-4df0-e0eb2938b51e@gmx.com>
+In-Reply-To: <3f5f3d34220d882ca20696da0df1b9feeeaba879.camel@suse.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -47,34 +76,21 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/26/21 4:57 PM, Norman.Kern wrote:
->
-[snipped]
->> You may try to trigger a gc by writing to
->> sys/fs/bcache/<cache-set-uuid>/internal/trigger_gc
->>
-> When all cache had written back, I triggered gc, it recalled.
+On 2/26/21 2:52 AM, Jean Delvare wrote:
+> Hi Jens,
 > 
-> root@WXS0106:~# cat /sys/block/bcache0/bcache/cache/cache_available_percent
-> 30
+> In commit a1ce35fa49852db60fc6e268038530be533c5b15 ("block: remove dead
+> elevator code") you removed all users of RQF_SORTED. However there is
+> still one reference left to it:
 > 
-> root@WXS0106:~# echo 1 > /sys/block/bcache0/bcache/cache/internal/trigger_gc
-> root@WXS0106:~# cat /sys/block/bcache0/bcache/cache/cache_available_percent
-> 97
+> block/blk-mq-sched.c:412:               rq->rq_flags |= RQF_SORTED;
 > 
-> Why must I trigger gc manually? Is not a default action of bcache-gc thread? And I found it can only work when all dirty data written back.
-> 
+> This in effect is dead code now. Should this statement have been
+> removed as part of the aforementioned commit? And then maybe also the
+> definition of RQF_SORTED, to prevent further confusion?
 
-1, GC is automatically triggered after some mount of data consumed. I
-guess it is just not about time in your situation.
+It's just a leftover, feel free to send a patch to kill it.
 
-2, Because the gc will shrink all cached clean data, which is very
-unfriendly for read-intend workload. Therefore gc_after_writeback is
-defaulted as 0, when this sysfs file content set to 1, a gc will trigger
-after the writeback accomplished.
-
-Coly Li
-
-
-
+-- 
+Jens Axboe
 
