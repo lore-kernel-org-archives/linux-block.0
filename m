@@ -2,55 +2,79 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31358C433E6
-	for <linux-block@archiver.kernel.org>; Fri, 26 Feb 2021 09:53:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F6D5C433DB
+	for <linux-block@archiver.kernel.org>; Fri, 26 Feb 2021 09:57:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0FF6564EE3
-	for <linux-block@archiver.kernel.org>; Fri, 26 Feb 2021 09:53:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 07D4364EE2
+	for <linux-block@archiver.kernel.org>; Fri, 26 Feb 2021 09:57:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229915AbhBZJxY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 Feb 2021 04:53:24 -0500
-Received: from mx2.suse.de ([195.135.220.15]:51056 "EHLO mx2.suse.de"
+        id S230499AbhBZJ5A (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 Feb 2021 04:57:00 -0500
+Received: from mx2.suse.de ([195.135.220.15]:53314 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230178AbhBZJw5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 Feb 2021 04:52:57 -0500
+        id S230509AbhBZJyx (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 26 Feb 2021 04:54:53 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id B74D4ACF6;
-        Fri, 26 Feb 2021 09:52:15 +0000 (UTC)
-Message-ID: <3f5f3d34220d882ca20696da0df1b9feeeaba879.camel@suse.de>
-Subject: Stray reference to RQF_SORTED
-From:   Jean Delvare <jdelvare@suse.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Ming Lei <ming.lei@redhat.com>, Omar Sandoval <osandov@fb.com>,
-        linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.com>
-Date:   Fri, 26 Feb 2021 10:52:14 +0100
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.34.4 
+        by mx2.suse.de (Postfix) with ESMTP id 2A881AAAE;
+        Fri, 26 Feb 2021 09:54:12 +0000 (UTC)
+Subject: Re: Large latency with bcache for Ceph OSD
+To:     "Norman.Kern" <norman.kern@gmx.com>
+Cc:     linux-block@vger.kernel.org, axboe@kernel.dk,
+        linux-bcache@vger.kernel.org
+References: <3f3e20a3-c165-1de1-7fdd-f0bd4da598fe@gmx.com>
+ <632258f7-b138-3fba-456b-9da37c1de710@gmx.com>
+ <5867daf1-0960-39aa-1843-1a76c1e9a28d@suse.de>
+ <07bcb6c8-21e1-11de-d1f0-ffd417bd36ff@gmx.com>
+ <cfe2746f-18a7-a768-ea72-901793a3133e@gmx.com>
+ <96daa0bf-c8e1-a334-14cb-2d260aed5115@suse.de>
+ <b808dde3-cb58-907b-4df0-e0eb2938b51e@gmx.com>
+From:   Coly Li <colyli@suse.de>
+Message-ID: <04770825-b1d2-8ec0-2345-77d49d99631a@suse.de>
+Date:   Fri, 26 Feb 2021 17:54:08 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:78.0)
+ Gecko/20100101 Thunderbird/78.7.1
 MIME-Version: 1.0
+In-Reply-To: <b808dde3-cb58-907b-4df0-e0eb2938b51e@gmx.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
+On 2/26/21 4:57 PM, Norman.Kern wrote:
+>
+[snipped]
+>> You may try to trigger a gc by writing to
+>> sys/fs/bcache/<cache-set-uuid>/internal/trigger_gc
+>>
+> When all cache had written back, I triggered gc, it recalled.
+> 
+> root@WXS0106:~# cat /sys/block/bcache0/bcache/cache/cache_available_percent
+> 30
+> 
+> root@WXS0106:~# echo 1 > /sys/block/bcache0/bcache/cache/internal/trigger_gc
+> root@WXS0106:~# cat /sys/block/bcache0/bcache/cache/cache_available_percent
+> 97
+> 
+> Why must I trigger gc manually? Is not a default action of bcache-gc thread? And I found it can only work when all dirty data written back.
+> 
 
-In commit a1ce35fa49852db60fc6e268038530be533c5b15 ("block: remove dead
-elevator code") you removed all users of RQF_SORTED. However there is
-still one reference left to it:
+1, GC is automatically triggered after some mount of data consumed. I
+guess it is just not about time in your situation.
 
-block/blk-mq-sched.c:412:               rq->rq_flags |= RQF_SORTED;
+2, Because the gc will shrink all cached clean data, which is very
+unfriendly for read-intend workload. Therefore gc_after_writeback is
+defaulted as 0, when this sysfs file content set to 1, a gc will trigger
+after the writeback accomplished.
 
-This in effect is dead code now. Should this statement have been
-removed as part of the aforementioned commit? And then maybe also the
-definition of RQF_SORTED, to prevent further confusion?
+Coly Li
 
-Thanks,
--- 
-Jean Delvare
-SUSE L3 Support
+
+
 
