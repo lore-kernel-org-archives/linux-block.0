@@ -2,161 +2,165 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D86F6C433DB
-	for <linux-block@archiver.kernel.org>; Mon,  1 Mar 2021 12:23:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5B39C433DB
+	for <linux-block@archiver.kernel.org>; Sun, 28 Feb 2021 17:13:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A50CB64E31
-	for <linux-block@archiver.kernel.org>; Mon,  1 Mar 2021 12:23:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 936A164DD2
+	for <linux-block@archiver.kernel.org>; Sun, 28 Feb 2021 17:13:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234972AbhCAMXQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 1 Mar 2021 07:23:16 -0500
-Received: from frasgout.his.huawei.com ([185.176.79.56]:2615 "EHLO
-        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234976AbhCAMXN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 1 Mar 2021 07:23:13 -0500
-Received: from fraeml738-chm.china.huawei.com (unknown [172.18.147.207])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4DpzjC0B4cz67v05;
-        Mon,  1 Mar 2021 20:14:55 +0800 (CST)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- fraeml738-chm.china.huawei.com (10.206.15.219) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2106.2; Mon, 1 Mar 2021 13:22:30 +0100
-Received: from [10.47.7.243] (10.47.7.243) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2106.2; Mon, 1 Mar 2021
- 12:22:28 +0000
-Subject: Re: [RFC PATCH 1/2] blk-mq: test tags bitmap before get request
-To:     Hannes Reinecke <hare@suse.de>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Yufen Yu <yuyufen@huawei.com>, <axboe@kernel.dk>,
-        <linux-block@vger.kernel.org>
-CC:     <josef@toxicpanda.com>, <ming.lei@redhat.com>, <hch@lst.de>
-References: <20210301021444.4134047-1-yuyufen@huawei.com>
- <20210301021444.4134047-2-yuyufen@huawei.com>
- <e364502d-a00a-d079-edc2-c99a1ae6936e@acm.org>
- <52f56e63-659f-fc7c-0b16-0fa9dfd0007d@suse.de>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <afca6349-743b-98f4-c154-c9f7b44a2956@huawei.com>
-Date:   Mon, 1 Mar 2021 12:20:36 +0000
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
+        id S231300AbhB1RMn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 28 Feb 2021 12:12:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49154 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230461AbhB1RMj (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 28 Feb 2021 12:12:39 -0500
+Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10048C06174A;
+        Sun, 28 Feb 2021 09:11:58 -0800 (PST)
+Received: by mail-ej1-x635.google.com with SMTP id g5so23843438ejt.2;
+        Sun, 28 Feb 2021 09:11:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=dfQ46OGWItLgoKPUR/Czwfd0qqTUSj25+jf5yrElG/4=;
+        b=GzeA/aDB2UBhnNVhm++I/Jk3Up7Sjll8FWko6UUVrR8GbwUj6tdWvj7U7T3p1JnaWE
+         tuDT5n8KyfWwgonEFcDAlbP9Wnm/lzI5ynLZd5zXrmZLcqy0e5qJFV+Ury6tgPUdhcIC
+         ZnUpySrUVv3A0oExsLsVOkNej6wDTO/NVed1e1lRxfeovoJIixufVCuML3LKRgEXHaK6
+         AQIpA41ncR2vIctG/YIpRBR7PPh4Vs9caRlig7rCLuPUPKUXlteysI6kNYwN/3Yc//ci
+         tD2NQsug/MYd9mQ+dWSVvw0ZV+w1YK/V6hQL8df04yN35+nWGaht76tutf0kiQ1Fxgq5
+         E6Vw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=dfQ46OGWItLgoKPUR/Czwfd0qqTUSj25+jf5yrElG/4=;
+        b=DFk3PQk4Tg5+x/JyUn1GIB9WRKbs4ZjvCjYZr9JKO8621MT6/JMbxVEVcdDoUwHVL+
+         For3KnKO03QZ25kxJo4JrfZHSkIeuz8ttxAxFkjgF2q6WYdlaegFsyL7pwebxMCJOuh/
+         NrMre9pjnYhb6I4oOeQe6UNOpaC6IPz2m13QnfLeVZ2YZGlmr1DYxmPi+bvVPkKasB7e
+         u9RBjICZzwxg7kg714yWmesb+O+Rtbcpc99VRzJxNj+AhqwCvcU1kFYQqrqosKdGeMu3
+         qv1KRTCKEbd/EDeY1ITs68EsyfQGwPqrqB4AdfJhZ2zoof+PofoZAtTFpktFx3ZcE2nA
+         XTjg==
+X-Gm-Message-State: AOAM5304vRkhWj/qH8naxa3syBxpk1crx5yAp/FsV3b7mRkxQxwuuOcN
+        4SYwXjH8z05UBhk34i8rBvOfdoP18tGg
+X-Google-Smtp-Source: ABdhPJw5sLbCUCcgxkhNvC6IgO3vmNaTgOeasYPBEho60Poa4WNRXoZ/cPiXNkLCHgbgyBJUziViqw==
+X-Received: by 2002:a17:906:acb:: with SMTP id z11mr3855755ejf.193.1614532316774;
+        Sun, 28 Feb 2021 09:11:56 -0800 (PST)
+Received: from localhost.localdomain ([46.53.249.223])
+        by smtp.gmail.com with ESMTPSA id fw3sm6654338ejb.82.2021.02.28.09.11.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 28 Feb 2021 09:11:56 -0800 (PST)
+Date:   Sun, 28 Feb 2021 20:11:54 +0300
+From:   Alexey Dobriyan <adobriyan@gmail.com>
+To:     torvalds@linux-foundation.org, linux-kernel@vger.kernel.org,
+        akpm@linux-foundation.org, linux-arch@vger.kernel.org
+Subject: [PATCH 12/11] pragma once: scripted treewide conversion
+Message-ID: <YDvO2kmidKZaK26j@localhost.localdomain>
+References: <YDvLYzsGu+l1pQ2y@localhost.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <52f56e63-659f-fc7c-0b16-0fa9dfd0007d@suse.de>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.47.7.243]
-X-ClientProxiedBy: lhreml747-chm.china.huawei.com (10.201.108.197) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <YDvLYzsGu+l1pQ2y@localhost.localdomain>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 01/03/2021 07:54, Hannes Reinecke wrote:
->>>
->>> For example, we reported use-after-free of request in nbd device
->>> by syzkaller:
->>>
->>> BUG: KASAN: use-after-free in blk_mq_request_started+0x24/0x40 
->>> block/blk-mq.c:644
->>> Read of size 4 at addr ffff80036b77f9d4 by task kworker/u9:0/10086
->>> Call trace:
->>>   dump_backtrace+0x0/0x310 arch/arm64/kernel/time.c:78
->>>   show_stack+0x28/0x38 arch/arm64/kernel/traps.c:158
->>>   __dump_stack lib/dump_stack.c:77 [inline]
->>>   dump_stack+0x144/0x1b4 lib/dump_stack.c:118
->>>   print_address_description+0x68/0x2d0 mm/kasan/report.c:253
->>>   kasan_report_error mm/kasan/report.c:351 [inline]
->>>   kasan_report+0x134/0x2f0 mm/kasan/report.c:409
->>>   check_memory_region_inline mm/kasan/kasan.c:260 [inline]
->>>   __asan_load4+0x88/0xb0 mm/kasan/kasan.c:699
->>>   __read_once_size include/linux/compiler.h:193 [inline]
->>>   blk_mq_rq_state block/blk-mq.h:106 [inline]
->>>   blk_mq_request_started+0x24/0x40 block/blk-mq.c:644
->>>   nbd_read_stat drivers/block/nbd.c:670 [inline]
->>>   recv_work+0x1bc/0x890 drivers/block/nbd.c:749
->>>   process_one_work+0x3ec/0x9e0 kernel/workqueue.c:2156
->>>   worker_thread+0x80/0x9d0 kernel/workqueue.c:2311
->>>   kthread+0x1d8/0x1e0 kernel/kthread.c:255
->>>   ret_from_fork+0x10/0x18 arch/arm64/kernel/entry.S:1174
->>>
->>> The syzkaller test program sended a reply package to client
->>> without client sending request. After receiving the package,
->>> recv_work() try to get the remained request in tags->rqs[]
->>> by tag, which have been free.
->>>
->>> To avoid this type of problem, we may need to ensure the request
->>> valid when get it by tag.
->>>
->>> Signed-off-by: Yufen Yu <yuyufen@huawei.com>
->>> ---
->>>   block/blk-mq.c | 10 +++++++++-
->>>   1 file changed, 9 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/block/blk-mq.c b/block/blk-mq.c
->>> index d4d7c1caa439..5362a7958b74 100644
->>> --- a/block/blk-mq.c
->>> +++ b/block/blk-mq.c
->>> @@ -836,9 +836,17 @@ void blk_mq_delay_kick_requeue_list(struct 
->>> request_queue *q,
->>>   }
->>>   EXPORT_SYMBOL(blk_mq_delay_kick_requeue_list);
->>> +static int blk_mq_test_tag_bit(struct blk_mq_tags *tags, unsigned 
->>> int tag)
->>> +{
->>> +    if (!blk_mq_tag_is_reserved(tags, tag))
->>> +        return sbitmap_test_bit(&tags->bitmap_tags->sb, tag);
->>> +    else
->>> +        return sbitmap_test_bit(&tags->breserved_tags->sb, tag);
->>> +}
->>> +
->>>   struct request *blk_mq_tag_to_rq(struct blk_mq_tags *tags, unsigned 
->>> int tag)
->>>   {
->>> -    if (tag < tags->nr_tags) {
->>> +    if (tag < tags->nr_tags && blk_mq_test_tag_bit(tags, tag)) {
->>>           prefetch(tags->rqs[tag]);
->>>           return tags->rqs[tag];
->>>       }
->>
->> Please do not slow down the hot path by inserting additional code in the
->> hot path. I am convinced that the race described in the patch
->> description can be fixed without changing the hot path. See also the
->> conversation I had recently with John Garry on linux-block.
->>
+[  Bcc a lot of lists so that people understand what's this is all         ]
+[  about without creating uber-cc-thread.                                  ]
+[  Apologies if I missed your subsystem                                    ]
+[  Please see [PATCH 11/11: pragma once: conversion script (in Python 2)]  ]
 
-I plan to send an updated series later this week:
-https://lore.kernel.org/linux-block/28be6446-7e06-b03c-a373-39c5eef89c8a@huawei.com/
+Hi, Linus.
 
-I'm inclined to say that the first patch there may solve all reasonable 
-scenarios, but we should see how to fix all scenarios and decide on the 
-path forward.
+Please run the script below from top-level directory, it will convert
+most kernel headers to #pragma once directive advancing them into
+21-st century.
 
-Thanks,
-john
+The advantages are:
 
-> Seems to be cropping up everywhere now; anyway, I do agree with Bart here.
-> For the hot path (typically when looking up the associated command from 
-> within the interrupt routine) we really should not add any further code 
-> to not slow down processing.
-> Additionally, this is typically a firmware response so we can be 
-> reasonably certain that this is a response to valid command, so in 
-> nearly all cases the bit will be set.
-> (Pathological cases like spoofed response frames aside).
-> 
-> However, there another use case where blk_mq_tag_to_rq() is used, and 
-> that is for traversing outstanding commands eg during a device reset.
-> There we _have_ to ensure that the request is valid lest we run into
-> uninitialized values.
-> 
-> So I would advocate to have a slow path variant here which would 
-> validate the bitmap before trying to access the request.
-> 
-> Or, really, converting those drivers to use blk_mq_tagset_busy_iter().
+* less LOC
 
+	18087 files changed, 18878 insertions(+), 99804 deletions(-)
+	= -81 kLOC (give or take)
+
+* less mental tax on developers forced to name things which aren't even
+  real code
+
+* less junk in preprocessor hashtables and editors/IDEs autocompletion
+  lists
+
+There are two bit exceptions: UAPI headers and ACPICA.
+Given ubiquity of #pragma once, I personally think even these subsystems
+should be converted in the future.
+
+Compile tested on alpha, arc, arm, arm64, h8300, ia64, m68k, microblaze,
+mips, nios2, parisc, powerpc, riscv, s390, sh, sparc, um-i386, um-x86_64,
+i386, x86_64, xtensa (allnoconfig, all defconfigs, allmodconfig with or
+without SMP/DEBUG_KERNEL + misc stuff).
+
+Not compile tested on csky, hexagon, nds32, openrisc. 
+
+Love,
+	Alexey
+
+Signed-off-by: Alexey Dobriyan <adobriyan@gmail.com>
+
+
+
+#!/bin/sh -x
+find . -type f -name '*.h' -print	|\
+LC_ALL=C sort				|\
+sed -e 's#^./##g'			|\
+xargs ./scripts/pragma-once.py
+
+find . -type d -name 'uapi' | xargs git checkout -f
+git checkout -f arch/alpha/include/asm/cmpxchg.h
+git checkout -f arch/arm/mach-imx/hardware.h
+git checkout -f arch/arm/mach-ixp4xx/include/mach/hardware.h
+git checkout -f arch/arm/mach-sa1100/include/mach/hardware.h
+git checkout -f arch/mips/include/asm/mips-cps.h
+git checkout -f arch/x86/boot/boot.h
+git checkout -f arch/x86/boot/ctype.h
+git checkout -f arch/x86/include/asm/cpufeatures.h
+git checkout -f arch/x86/include/asm/disabled-features.h
+git checkout -f arch/x86/include/asm/required-features.h
+git checkout -f arch/x86/include/asm/vmxfeatures.h
+git checkout -f arch/x86/include/asm/vvar.h
+git checkout -f drivers/acpi/acpica/
+git checkout -f drivers/gpu/drm/amd/pm/inc/vega10_ppsmc.h
+git checkout -f drivers/gpu/drm/amd/pm/powerplay/ppsmc.h
+git checkout -f drivers/input/misc/yealink.h
+git checkout -f drivers/media/usb/dvb-usb-v2/mxl111sf-demod.h
+git checkout -f drivers/media/usb/dvb-usb-v2/mxl111sf-tuner.h
+git checkout -f drivers/pcmcia/yenta_socket.h
+git checkout -f drivers/staging/rtl8723bs/include/hal_com_h2c.h
+git checkout -f include/linux/acpi.h
+git checkout -f include/linux/bitops.h
+git checkout -f include/linux/compiler_types.h
+git checkout -f include/linux/device.h
+git checkout -f include/linux/kbuild.h
+git checkout -f include/linux/libfdt_env.h
+git checkout -f include/linux/local_lock.h
+git checkout -f include/linux/spinlock.h
+git checkout -f include/linux/spinlock_api_smp.h
+git checkout -f include/linux/spinlock_types.h
+git checkout -f include/linux/tracepoint.h
+git checkout -f mm/gup_test.h
+git checkout -f net/batman-adv/main.h
+git checkout -f scripts/dtc/
+git checkout -f tools/include/linux/bitops.h
+git checkout -f tools/include/linux/compiler.h
+git checkout -f tools/testing/selftests/clone3/clone3_selftests.h
+git checkout -f tools/testing/selftests/futex/include/atomic.h
+git checkout -f tools/testing/selftests/futex/include/futextest.h
+git checkout -f tools/testing/selftests/futex/include/logging.h
+git checkout -f tools/testing/selftests/kselftest.h
+git checkout -f tools/testing/selftests/kselftest_harness.h
+git checkout -f tools/testing/selftests/pidfd/pidfd.h
+git checkout -f tools/testing/selftests/x86/helpers.h
