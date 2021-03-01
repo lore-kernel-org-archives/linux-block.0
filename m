@@ -2,79 +2,86 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 545F7C433E0
-	for <linux-block@archiver.kernel.org>; Mon,  1 Mar 2021 15:38:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69C89C433DB
+	for <linux-block@archiver.kernel.org>; Mon,  1 Mar 2021 16:22:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1343D64DF5
-	for <linux-block@archiver.kernel.org>; Mon,  1 Mar 2021 15:38:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 24C2B64EE0
+	for <linux-block@archiver.kernel.org>; Mon,  1 Mar 2021 16:22:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237330AbhCAPiO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 1 Mar 2021 10:38:14 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:38063 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237266AbhCAPiI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 1 Mar 2021 10:38:08 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614613001;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=vLNNdUu1sjfy3lYGJToaIuw/3vCXTFj7Ta9EQpAP6XE=;
-        b=ahO79pVSuIVaQyi9abwOO5lHEBqHppefrZYC2LQbfRbz3dv0ZlQDh10xuWk2HFxB5ZG+Ro
-        EPBYMukagU8bPwGH2gv3FtqoC854sxeacvcvBajx1D/nSmydf4uHCxalilt0x9MliwUrVe
-        7Eu7YMAsdiHXk8DQ60RCIyG3UOUO6FQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-306-VskzaCcYNZSmXo48o-qECA-1; Mon, 01 Mar 2021 10:36:39 -0500
-X-MC-Unique: VskzaCcYNZSmXo48o-qECA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6B76650742;
-        Mon,  1 Mar 2021 15:36:38 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-12-197.pek2.redhat.com [10.72.12.197])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 379561002C10;
-        Mon,  1 Mar 2021 15:36:35 +0000 (UTC)
-Subject: Re: [bug report]null pointer at scsi_mq_exit_request+0x14 with
- blktests srp/015
-To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>
-References: <418155251.14154941.1614505772200.JavaMail.zimbra@redhat.com>
- <BYAPR04MB4965FDA9847096508E35FFB9869B9@BYAPR04MB4965.namprd04.prod.outlook.com>
-From:   Yi Zhang <yi.zhang@redhat.com>
-Message-ID: <8b1fc0cd-196a-ad78-71c6-a7515ffbb4ad@redhat.com>
-Date:   Mon, 1 Mar 2021 23:36:33 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        id S236663AbhCAQWB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 1 Mar 2021 11:22:01 -0500
+Received: from mx2.suse.de ([195.135.220.15]:50288 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S237796AbhCAQUs (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 1 Mar 2021 11:20:48 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 4FFD3AE14;
+        Mon,  1 Mar 2021 16:20:00 +0000 (UTC)
+Date:   Mon, 1 Mar 2021 17:19:59 +0100
+From:   Jean Delvare <jdelvare@suse.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Omar Sandoval <osandov@fb.com>, Hannes Reinecke <hare@suse.com>
+Subject: Re: [PATCH] block: Drop leftover references to RQF_SORTED
+Message-ID: <20210301171959.1ee26ef9@endymion>
+In-Reply-To: <7602f62a-f495-4c6e-3c95-d435a016b996@kernel.dk>
+References: <20210301120439.1fd0eb7b@endymion>
+        <7602f62a-f495-4c6e-3c95-d435a016b996@kernel.dk>
+Organization: SUSE Linux
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-suse-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <BYAPR04MB4965FDA9847096508E35FFB9869B9@BYAPR04MB4965.namprd04.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This issue cannot be reproduced on latest 5.12.0-rc1.
+Hi Jens,
 
-Please ignore this report, sorry for the noise.
+On Mon, 1 Mar 2021 08:13:18 -0700, Jens Axboe wrote:
+> On 3/1/21 4:04 AM, Jean Delvare wrote:
+> > Commit a1ce35fa49852db60fc6e268038530be533c5b15 ("block: remove dead
+> > elevator code") removed all users of RQF_SORTED. However it is still
+> > defined, and there is one reference left to it (which in effect is
+> > dead code). Clear it all up.
+> > 
+> > Signed-off-by: Jean Delvare <jdelvare@suse.de>
+> > Cc: Jens Axboe <axboe@kernel.dk>
+> > Cc: Ming Lei <ming.lei@redhat.com>
+> > Cc: Omar Sandoval <osandov@fb.com>
+> > Cc: Hannes Reinecke <hare@suse.com>
+> > ---
+> >  block/blk-mq-debugfs.c |    1 -
+> >  block/blk-mq-sched.c   |    3 ---
+> >  include/linux/blkdev.h |    2 --
+> >  3 files changed, 6 deletions(-)
+> > 
+> > --- linux-5.11.orig/block/blk-mq-sched.c	2021-02-14 23:32:24.000000000 +0100
+> > +++ linux-5.11/block/blk-mq-sched.c	2021-03-01 11:06:49.629077653 +0100
+> > @@ -408,9 +408,6 @@ static bool blk_mq_sched_bypass_insert(s
+> >  	if ((rq->rq_flags & RQF_FLUSH_SEQ) || blk_rq_is_passthrough(rq))
+> >  		return true;
+> >  
+> > -	if (has_sched)
+> > -		rq->rq_flags |= RQF_SORTED;
+> > -
+> >  	return false;
+> >  }  
+> 
+> Since that's the only reason why we are passing in 'has_sched', you should
+> kill that argument as well from the function and the single caller.
 
-On 3/1/21 3:07 AM, Chaitanya Kulkarni wrote:
-> On 2/28/21 01:52, Yi Zhang wrote:
->> Hello
->>
->> I found this issue with blktests srp/015, could anyone help check it?
-> Until you get some reply you can try and bisect it.
->
->
+Sorry, missed that. Surprised the compiler didn't warn.
 
+I'll post a v2 shortly.
+
+Thanks,
+-- 
+Jean Delvare
+SUSE L3 Support
