@@ -2,122 +2,146 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B432FC433E0
-	for <linux-block@archiver.kernel.org>; Mon,  1 Mar 2021 03:05:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69A1BC433DB
+	for <linux-block@archiver.kernel.org>; Mon,  1 Mar 2021 03:50:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 819E064D9F
-	for <linux-block@archiver.kernel.org>; Mon,  1 Mar 2021 03:05:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 353BA64EB2
+	for <linux-block@archiver.kernel.org>; Mon,  1 Mar 2021 03:50:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231869AbhCADFL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 28 Feb 2021 22:05:11 -0500
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:54217 "EHLO
-        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231867AbhCADFK (ORCPT
+        id S231614AbhCADuf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 28 Feb 2021 22:50:35 -0500
+Received: from mail-pl1-f172.google.com ([209.85.214.172]:44115 "EHLO
+        mail-pl1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231506AbhCADue (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 28 Feb 2021 22:05:10 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1614567909; x=1646103909;
-  h=from:to:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=NHVL84jbY7PLyXc6909fwVRSLZ8BmFYLYBBAG7PCOkE=;
-  b=fze6DRPOpRcC+vH0qQa1FXfl6Te5K/uTzLvf8CCuSLBdCO+rCwRMi1xS
-   J4AnEQGTqJt7PooFmKOrrVlOo/ajubU7vxZa6v+Ww37YtYMfz4a4l/a/b
-   KjsQZK9/DILzNyyRMCJVZIsGmVN3+SItqET/bhCt0UZPemCmk9Q9485/p
-   xqV4nO0rrHZiDEd16BzUaIhJR4VR893XoDdSBKHCBr/Y2WDDeao3w27Zl
-   ZcSBqvKoJ8nWBd0Nii/XNhe7bHEIa/ziKZHjQ6gSEnYfeuTqtLPSkrK2K
-   PumopyOaNqT54Dby3gSeP0L/ysaW/z0tDgIbbRNTfO9PMfKOelq2sRPyb
-   Q==;
-IronPort-SDR: Xkuk6cCOum5UeTZwGJ7f8816GJZpNDIksfVMUttr1YoA74AyXWhadPwuAdHmCs6HFQxLG2sAoB
- /E3d4jihXfVf7nIs3WUmQ23NbCwtrvrJEcXdeRdsmQWeq5z4g/GHu0iHHLj5y0olA71bx63/uZ
- XD3L4z1jcEn5NSsK19BIqH3LhA02WzL1LeLMd9Ol6nkgaFUpGnexb5087t8rZvdvyghnbEYLAh
- Ic4CSq0sGKG3UJkbjOdWsMKTAZMPN//fLqeNjQuvVRSFH9oCAn0RoVqGLYjbR1MidSaHb8hEgc
- vec=
-X-IronPort-AV: E=Sophos;i="5.81,214,1610380800"; 
-   d="scan'208";a="161015856"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 01 Mar 2021 11:04:03 +0800
-IronPort-SDR: FZLg09Sr562l1M5JeA5FIEAryCs29AzV62Cn/lsqJSHu4gTmBzeaLPvVKd5VM4x7vL/xtaerWU
- qlWxWBQGa1p49GJ4pybOYkL9iwCE7j4J8Gf+aMLJlWCHFuGgKZ8BGXCL/zpJMRklXqldLTNPJc
- yl2YF8plVoiW1NBlLp9bld+2a0P1U3E9wgy6jK/nGLa72u/BxdVrRG/1Mpm9ysGWdkRTuh09GW
- FN0bNHoE+rY/d0WO/RR6RzHp9A4ZU8taXXUkd1EcoetSEJNnTqzFhCzI8podirwY++UwH8FOpc
- lxOsOIDcpFtQVCy2El6xP3X1
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2021 18:45:21 -0800
-IronPort-SDR: c1g23mMfYseKxIQF1dFAGS4dlHuSwxFOWrpTBk0S940BZedFsKPylhiH0gVbAaJWHX+YpnSKnJ
- K353zUaNLqnmpss21Z9WiS+avo1ENVwhX61nJgTrmWs2bQeNNaELAIfCyjp6MovyOsqjmdi8HB
- aFG06wHmFV4OANzVbpvzM2Spoc6D7d5gIlsUCVOMDTYdz7kTO+45+UXKmMN5LoyNphE4Sgw2Lm
- +HkNFXuPclKwi7jjskGfEiRVQkNpxPWxObTRjETNNlHxF83XRXTbnvJxrVmI/XdUmXJ1VYB8XA
- 3Ds=
-WDCIronportException: Internal
-Received: from washi.fujisawa.hgst.com ([10.149.53.254])
-  by uls-op-cesaip01.wdc.com with ESMTP; 28 Feb 2021 19:04:03 -0800
-From:   Damien Le Moal <damien.lemoal@wdc.com>
-To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH] block: revert "block: fix bd_size_lock use"
-Date:   Mon,  1 Mar 2021 12:04:02 +0900
-Message-Id: <20210301030402.690822-1-damien.lemoal@wdc.com>
-X-Mailer: git-send-email 2.29.2
+        Sun, 28 Feb 2021 22:50:34 -0500
+Received: by mail-pl1-f172.google.com with SMTP id a24so9021138plm.11
+        for <linux-block@vger.kernel.org>; Sun, 28 Feb 2021 19:50:18 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=yMWVVjFkCg6xvNlRsf6sBEmdPdTbzAhLRqkuZIGa2jg=;
+        b=rtbbvVTX43F94cKdx74Ks1rYlozHkjkf9ZdLIkP27qbUaOYpW7/jCHyuWdL087lgRC
+         JxCaSuZGLmOaxpIcKgw1oFH3lw2RW2gr4bRO3IL1GmOEjk+pQR3jYxr0eXH1yoLfByDA
+         dR6dvkiXhZnGncx7Razl6sxB7xMUKjKkY4jC7vpMRnq9Cspx/bZupAD5AaLWxPt25nPX
+         28si3b4F+yBi3s8IGbZj2eEl5AyCCfXHRun5opcXlu80vMqjLD/rHyJkyi+mi8APYtb7
+         VTd481lV8nBNLqP5aQeqyANYZPRKUevuMQNXYJ/H/1Jcu9aAiC5Zx5dnXEOeHE1rLq7s
+         dehQ==
+X-Gm-Message-State: AOAM5315hdxQoE5eXq4QMg2OOFusmDl4VgJYyoiYEAQSn9Mt1rVHqbtF
+        mOLsdiMRjG17IPLePPckAAI=
+X-Google-Smtp-Source: ABdhPJwzug7R7lZ98QhzVijeB23lL+qhp3kOzUY1KoAlbPmsz+qtcY6TKJE0ojHRtjQFBt5OCVHqpg==
+X-Received: by 2002:a17:90a:34cc:: with SMTP id m12mr15208288pjf.232.1614570593358;
+        Sun, 28 Feb 2021 19:49:53 -0800 (PST)
+Received: from ?IPv6:2601:647:4000:d7:4f3d:dd5a:d38b:3f76? ([2601:647:4000:d7:4f3d:dd5a:d38b:3f76])
+        by smtp.gmail.com with ESMTPSA id g7sm13865015pgb.10.2021.02.28.19.49.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 28 Feb 2021 19:49:52 -0800 (PST)
+Subject: Re: [RFC PATCH 1/2] blk-mq: test tags bitmap before get request
+To:     Yufen Yu <yuyufen@huawei.com>, axboe@kernel.dk,
+        linux-block@vger.kernel.org
+Cc:     josef@toxicpanda.com, ming.lei@redhat.com, hch@lst.de
+References: <20210301021444.4134047-1-yuyufen@huawei.com>
+ <20210301021444.4134047-2-yuyufen@huawei.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <e364502d-a00a-d079-edc2-c99a1ae6936e@acm.org>
+Date:   Sun, 28 Feb 2021 19:49:51 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210301021444.4134047-2-yuyufen@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-With the removal of the skd driver, using IRQ safe locking of a bdev
-bd_size_lock spinlock to protect the bdev inode size is not necessary
-anymore as there is no other known driver using this lock under an IRQ
-disabled context (e.g. calling set_capacity() with IRQ disabled).
-Revert commit 0fe37724f8e7 ("block: fix bd_size_lock use") which
-introduced the IRQ safe change.
+On 2/28/21 6:14 PM, Yufen Yu wrote:
+> For now, we set hctx->tags->rqs[i] when get driver tag successfully.
+> The request either comes from sched_tags->static_rqs[] with scheduler,
+> or comes from tags->static_rqs[] with no scheduler. But, the value won't
+> be clear when put driver tag. Thus, tags->rqs[i] still remain old request.
+> 
+> We can free these sched_tags->static_rqs[] requests when switch elevator,
+> update nr_requests or update nr_hw_queues. After that, unexpected access
+> of tags->rqs[i] may cause use-after-free crash.
+> 
+> For example, we reported use-after-free of request in nbd device
+> by syzkaller:
+> 
+> BUG: KASAN: use-after-free in blk_mq_request_started+0x24/0x40 block/blk-mq.c:644
+> Read of size 4 at addr ffff80036b77f9d4 by task kworker/u9:0/10086
+> Call trace:
+>  dump_backtrace+0x0/0x310 arch/arm64/kernel/time.c:78
+>  show_stack+0x28/0x38 arch/arm64/kernel/traps.c:158
+>  __dump_stack lib/dump_stack.c:77 [inline]
+>  dump_stack+0x144/0x1b4 lib/dump_stack.c:118
+>  print_address_description+0x68/0x2d0 mm/kasan/report.c:253
+>  kasan_report_error mm/kasan/report.c:351 [inline]
+>  kasan_report+0x134/0x2f0 mm/kasan/report.c:409
+>  check_memory_region_inline mm/kasan/kasan.c:260 [inline]
+>  __asan_load4+0x88/0xb0 mm/kasan/kasan.c:699
+>  __read_once_size include/linux/compiler.h:193 [inline]
+>  blk_mq_rq_state block/blk-mq.h:106 [inline]
+>  blk_mq_request_started+0x24/0x40 block/blk-mq.c:644
+>  nbd_read_stat drivers/block/nbd.c:670 [inline]
+>  recv_work+0x1bc/0x890 drivers/block/nbd.c:749
+>  process_one_work+0x3ec/0x9e0 kernel/workqueue.c:2156
+>  worker_thread+0x80/0x9d0 kernel/workqueue.c:2311
+>  kthread+0x1d8/0x1e0 kernel/kthread.c:255
+>  ret_from_fork+0x10/0x18 arch/arm64/kernel/entry.S:1174
+> 
+> The syzkaller test program sended a reply package to client
+> without client sending request. After receiving the package,
+> recv_work() try to get the remained request in tags->rqs[]
+> by tag, which have been free.
+> 
+> To avoid this type of problem, we may need to ensure the request
+> valid when get it by tag.
+> 
+> Signed-off-by: Yufen Yu <yuyufen@huawei.com>
+> ---
+>  block/blk-mq.c | 10 +++++++++-
+>  1 file changed, 9 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index d4d7c1caa439..5362a7958b74 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -836,9 +836,17 @@ void blk_mq_delay_kick_requeue_list(struct request_queue *q,
+>  }
+>  EXPORT_SYMBOL(blk_mq_delay_kick_requeue_list);
+>  
+> +static int blk_mq_test_tag_bit(struct blk_mq_tags *tags, unsigned int tag)
+> +{
+> +	if (!blk_mq_tag_is_reserved(tags, tag))
+> +		return sbitmap_test_bit(&tags->bitmap_tags->sb, tag);
+> +	else
+> +		return sbitmap_test_bit(&tags->breserved_tags->sb, tag);
+> +}
+> +
+>  struct request *blk_mq_tag_to_rq(struct blk_mq_tags *tags, unsigned int tag)
+>  {
+> -	if (tag < tags->nr_tags) {
+> +	if (tag < tags->nr_tags && blk_mq_test_tag_bit(tags, tag)) {
+>  		prefetch(tags->rqs[tag]);
+>  		return tags->rqs[tag];
+>  	}
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
----
- block/genhd.c           | 5 ++---
- block/partitions/core.c | 6 ++----
- 2 files changed, 4 insertions(+), 7 deletions(-)
+Please do not slow down the hot path by inserting additional code in the
+hot path. I am convinced that the race described in the patch
+description can be fixed without changing the hot path. See also the
+conversation I had recently with John Garry on linux-block.
 
-diff --git a/block/genhd.c b/block/genhd.c
-index fcc530164b5a..c55e8f0fced1 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -45,11 +45,10 @@ static void disk_release_events(struct gendisk *disk);
- void set_capacity(struct gendisk *disk, sector_t sectors)
- {
- 	struct block_device *bdev = disk->part0;
--	unsigned long flags;
- 
--	spin_lock_irqsave(&bdev->bd_size_lock, flags);
-+	spin_lock(&bdev->bd_size_lock);
- 	i_size_write(bdev->bd_inode, (loff_t)sectors << SECTOR_SHIFT);
--	spin_unlock_irqrestore(&bdev->bd_size_lock, flags);
-+	spin_unlock(&bdev->bd_size_lock);
- }
- EXPORT_SYMBOL(set_capacity);
- 
-diff --git a/block/partitions/core.c b/block/partitions/core.c
-index f3d9ff2cafb6..1a7558917c47 100644
---- a/block/partitions/core.c
-+++ b/block/partitions/core.c
-@@ -88,11 +88,9 @@ static int (*check_part[])(struct parsed_partitions *) = {
- 
- static void bdev_set_nr_sectors(struct block_device *bdev, sector_t sectors)
- {
--	unsigned long flags;
--
--	spin_lock_irqsave(&bdev->bd_size_lock, flags);
-+	spin_lock(&bdev->bd_size_lock);
- 	i_size_write(bdev->bd_inode, (loff_t)sectors << SECTOR_SHIFT);
--	spin_unlock_irqrestore(&bdev->bd_size_lock, flags);
-+	spin_unlock(&bdev->bd_size_lock);
- }
- 
- static struct parsed_partitions *allocate_partitions(struct gendisk *hd)
--- 
-2.29.2
+Thanks,
 
+Bart.
+
+Bart.
