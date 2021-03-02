@@ -7,31 +7,31 @@ X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7EE0C4332D
-	for <linux-block@archiver.kernel.org>; Tue,  2 Mar 2021 23:51:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2664AC433DB
+	for <linux-block@archiver.kernel.org>; Tue,  2 Mar 2021 23:52:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A4DF264F0B
-	for <linux-block@archiver.kernel.org>; Tue,  2 Mar 2021 23:51:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CD17A64F3A
+	for <linux-block@archiver.kernel.org>; Tue,  2 Mar 2021 23:52:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231265AbhCBXmY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Mar 2021 18:42:24 -0500
-Received: from mx2.suse.de ([195.135.220.15]:40010 "EHLO mx2.suse.de"
+        id S231208AbhCBXn0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Mar 2021 18:43:26 -0500
+Received: from mx2.suse.de ([195.135.220.15]:44726 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238284AbhCBEKz (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 1 Mar 2021 23:10:55 -0500
+        id S1576133AbhCBEYS (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 1 Mar 2021 23:24:18 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 9FF02AED8;
-        Tue,  2 Mar 2021 04:03:27 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id 729AAAED0;
+        Tue,  2 Mar 2021 04:03:18 +0000 (UTC)
 From:   Coly Li <colyli@suse.de>
 To:     linux-block@vger.kernel.org, axboe@kernel.dk,
         dan.j.williams@intel.com, vishal.l.verma@intel.com, neilb@suse.de
 Cc:     antlists@youngman.org.uk, linux-kernel@vger.kernel.org,
         linux-raid@vger.kernel.org, linux-nvdimm@lists.01.org,
         Coly Li <colyli@suse.de>
-Subject: [RFC PATCH v1 6/6] badblocks: switch to the improved badblock handling code
-Date:   Tue,  2 Mar 2021 12:02:52 +0800
-Message-Id: <20210302040252.103720-7-colyli@suse.de>
+Subject: [RFC PATCH v1 4/6] badblocks: improve badblocks_clear() for multiple ranges handling
+Date:   Tue,  2 Mar 2021 12:02:50 +0800
+Message-Id: <20210302040252.103720-5-colyli@suse.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20210302040252.103720-1-colyli@suse.de>
 References: <20210302040252.103720-1-colyli@suse.de>
@@ -41,356 +41,384 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch removes old code of badblocks_set(), badblocks_clear() and
-badblocks_check(), and make them as wrappers to call _badblocks_set(),
-_badblocks_clear() and _badblocks_check().
+With the foundamental ideas and helper routines from badblocks_set()
+improvement, clearing bad block for multiple ranges is much simpler.
 
-By this change now the badblock handing switch to the improved algorithm
-in  _badblocks_set(), _badblocks_clear() and _badblocks_check().
+With a similar idea from badblocks_set() improvement, this patch
+simplifies bad block range clearing into 5 situations. No matter how
+complicated the clearing condition is, we just look at the head part
+of clearing range with relative already set bad block range from the
+bad block table. The rested part will be handled in next run of the
+while-loop.
 
-This patch only contains the changes of old code deletion, new added
-code for the improved algorithms are in previous patches.
+Based on existing helpers addef from badblocks_set(), this patch adds
+two more helpers,
+- front_clear()
+  Clear the bad block range from bad block table which is front
+  overlapped with the clearing range.
+- front_splitting_clear()
+  Handle the condition that the clearing range hits middle of an
+  already set bad block range from bad block table.
+
+Similar as badblocks_set(), the first part of clearing range is handled
+with relative bad block range which is find by prev_badblocks(). In most
+cases a valid hint is provided to prev_badblocks() to avoid unnecessary
+bad block table iteration.
+
+This patch also explains the detail algorithm code comments at beginning
+of badblocks.c, including which five simplified situations are categried
+and how all the bad block range clearing conditions are handled by these
+five situations.
+
+Again, in order to make the code review easier and avoid the code
+changes mixed together, this patch does not modify badblock_clear() and
+implement another routine called _badblock_clear() for the improvement.
+Later patch will delete current code of badblock_clear() and make it as
+a wrapper to _badblock_clear(), so the code change can be much clear for
+review.
 
 Signed-off-by: Coly Li <colyli@suse.de>
 ---
- block/badblocks.c | 310 +---------------------------------------------
- 1 file changed, 3 insertions(+), 307 deletions(-)
+ block/badblocks.c | 319 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 319 insertions(+)
 
 diff --git a/block/badblocks.c b/block/badblocks.c
-index 304b91159a42..904c6ed0de6d 100644
+index b0a7780d75c2..4db6d1adff42 100644
 --- a/block/badblocks.c
 +++ b/block/badblocks.c
-@@ -1386,75 +1386,7 @@ static int _badblocks_check(struct badblocks *bb, sector_t s, int sectors,
- int badblocks_check(struct badblocks *bb, sector_t s, int sectors,
- 			sector_t *first_bad, int *bad_sectors)
- {
--	int hi;
--	int lo;
--	u64 *p = bb->page;
--	int rv;
--	sector_t target = s + sectors;
--	unsigned seq;
--
--	if (bb->shift > 0) {
--		/* round the start down, and the end up */
--		s >>= bb->shift;
--		target += (1<<bb->shift) - 1;
--		target >>= bb->shift;
--		sectors = target - s;
--	}
--	/* 'target' is now the first block after the bad range */
--
--retry:
--	seq = read_seqbegin(&bb->lock);
--	lo = 0;
--	rv = 0;
--	hi = bb->count;
--
--	/* Binary search between lo and hi for 'target'
--	 * i.e. for the last range that starts before 'target'
--	 */
--	/* INVARIANT: ranges before 'lo' and at-or-after 'hi'
--	 * are known not to be the last range before target.
--	 * VARIANT: hi-lo is the number of possible
--	 * ranges, and decreases until it reaches 1
--	 */
--	while (hi - lo > 1) {
--		int mid = (lo + hi) / 2;
--		sector_t a = BB_OFFSET(p[mid]);
--
--		if (a < target)
--			/* This could still be the one, earlier ranges
--			 * could not.
--			 */
--			lo = mid;
--		else
--			/* This and later ranges are definitely out. */
--			hi = mid;
--	}
--	/* 'lo' might be the last that started before target, but 'hi' isn't */
--	if (hi > lo) {
--		/* need to check all range that end after 's' to see if
--		 * any are unacknowledged.
--		 */
--		while (lo >= 0 &&
--		       BB_OFFSET(p[lo]) + BB_LEN(p[lo]) > s) {
--			if (BB_OFFSET(p[lo]) < target) {
--				/* starts before the end, and finishes after
--				 * the start, so they must overlap
--				 */
--				if (rv != -1 && BB_ACK(p[lo]))
--					rv = 1;
--				else
--					rv = -1;
--				*first_bad = BB_OFFSET(p[lo]);
--				*bad_sectors = BB_LEN(p[lo]);
--			}
--			lo--;
--		}
--	}
--
--	if (read_seqretry(&bb->lock, seq))
--		goto retry;
--
--	return rv;
-+	return _badblocks_check(bb, s, sectors, first_bad, bad_sectors);
- }
- EXPORT_SYMBOL_GPL(badblocks_check);
- 
-@@ -1476,154 +1408,7 @@ EXPORT_SYMBOL_GPL(badblocks_check);
- int badblocks_set(struct badblocks *bb, sector_t s, int sectors,
- 			int acknowledged)
- {
--	u64 *p;
--	int lo, hi;
--	int rv = 0;
--	unsigned long flags;
--
--	if (bb->shift < 0)
--		/* badblocks are disabled */
--		return 1;
--
--	if (bb->shift) {
--		/* round the start down, and the end up */
--		sector_t next = s + sectors;
--
--		s >>= bb->shift;
--		next += (1<<bb->shift) - 1;
--		next >>= bb->shift;
--		sectors = next - s;
--	}
--
--	write_seqlock_irqsave(&bb->lock, flags);
--
--	p = bb->page;
--	lo = 0;
--	hi = bb->count;
--	/* Find the last range that starts at-or-before 's' */
--	while (hi - lo > 1) {
--		int mid = (lo + hi) / 2;
--		sector_t a = BB_OFFSET(p[mid]);
--
--		if (a <= s)
--			lo = mid;
--		else
--			hi = mid;
--	}
--	if (hi > lo && BB_OFFSET(p[lo]) > s)
--		hi = lo;
--
--	if (hi > lo) {
--		/* we found a range that might merge with the start
--		 * of our new range
--		 */
--		sector_t a = BB_OFFSET(p[lo]);
--		sector_t e = a + BB_LEN(p[lo]);
--		int ack = BB_ACK(p[lo]);
--
--		if (e >= s) {
--			/* Yes, we can merge with a previous range */
--			if (s == a && s + sectors >= e)
--				/* new range covers old */
--				ack = acknowledged;
--			else
--				ack = ack && acknowledged;
--
--			if (e < s + sectors)
--				e = s + sectors;
--			if (e - a <= BB_MAX_LEN) {
--				p[lo] = BB_MAKE(a, e-a, ack);
--				s = e;
--			} else {
--				/* does not all fit in one range,
--				 * make p[lo] maximal
--				 */
--				if (BB_LEN(p[lo]) != BB_MAX_LEN)
--					p[lo] = BB_MAKE(a, BB_MAX_LEN, ack);
--				s = a + BB_MAX_LEN;
--			}
--			sectors = e - s;
--		}
--	}
--	if (sectors && hi < bb->count) {
--		/* 'hi' points to the first range that starts after 's'.
--		 * Maybe we can merge with the start of that range
--		 */
--		sector_t a = BB_OFFSET(p[hi]);
--		sector_t e = a + BB_LEN(p[hi]);
--		int ack = BB_ACK(p[hi]);
--
--		if (a <= s + sectors) {
--			/* merging is possible */
--			if (e <= s + sectors) {
--				/* full overlap */
--				e = s + sectors;
--				ack = acknowledged;
--			} else
--				ack = ack && acknowledged;
--
--			a = s;
--			if (e - a <= BB_MAX_LEN) {
--				p[hi] = BB_MAKE(a, e-a, ack);
--				s = e;
--			} else {
--				p[hi] = BB_MAKE(a, BB_MAX_LEN, ack);
--				s = a + BB_MAX_LEN;
--			}
--			sectors = e - s;
--			lo = hi;
--			hi++;
--		}
--	}
--	if (sectors == 0 && hi < bb->count) {
--		/* we might be able to combine lo and hi */
--		/* Note: 's' is at the end of 'lo' */
--		sector_t a = BB_OFFSET(p[hi]);
--		int lolen = BB_LEN(p[lo]);
--		int hilen = BB_LEN(p[hi]);
--		int newlen = lolen + hilen - (s - a);
--
--		if (s >= a && newlen < BB_MAX_LEN) {
--			/* yes, we can combine them */
--			int ack = BB_ACK(p[lo]) && BB_ACK(p[hi]);
--
--			p[lo] = BB_MAKE(BB_OFFSET(p[lo]), newlen, ack);
--			memmove(p + hi, p + hi + 1,
--				(bb->count - hi - 1) * 8);
--			bb->count--;
--		}
--	}
--	while (sectors) {
--		/* didn't merge (it all).
--		 * Need to add a range just before 'hi'
--		 */
--		if (bb->count >= MAX_BADBLOCKS) {
--			/* No room for more */
--			rv = 1;
--			break;
--		} else {
--			int this_sectors = sectors;
--
--			memmove(p + hi + 1, p + hi,
--				(bb->count - hi) * 8);
--			bb->count++;
--
--			if (this_sectors > BB_MAX_LEN)
--				this_sectors = BB_MAX_LEN;
--			p[hi] = BB_MAKE(s, this_sectors, acknowledged);
--			sectors -= this_sectors;
--			s += this_sectors;
--		}
--	}
--
--	bb->changed = 1;
--	if (!acknowledged)
--		bb->unacked_exist = 1;
--	else
--		badblocks_update_acked(bb);
--	write_sequnlock_irqrestore(&bb->lock, flags);
--
--	return rv;
-+	return _badblocks_set(bb, s, sectors, acknowledged);
- }
- EXPORT_SYMBOL_GPL(badblocks_set);
- 
-@@ -1643,96 +1428,7 @@ EXPORT_SYMBOL_GPL(badblocks_set);
+@@ -330,6 +330,123 @@
+  * avoided. In my test with the hint to prev_badblocks(), except for the first
+  * loop, all rested calls to prev_badblocks() can go into the fast path and
+  * return correct bad blocks table index immediately.
++ *
++ *
++ * Clearing a bad blocks range from the bad block table has similar idea as
++ * setting does, but much more simpler. The only thing needs to be noticed is
++ * when the clearning range hits middle of a bad block range, the existing bad
++ * block range will split into two, and one more item should be added into the
++ * bad block table. The simplified situations to beconsidered are, (The already
++ * set bad blocks ranges in bad block table are naming with prefix E, and the
++ * clearing bad blocks range is naming with prefix C)
++ *
++ * 1) A clearing range is not overlapped to any already set ranges in bad block
++ *    table.
++ *    +-----+         |          +-----+         |          +-----+
++ *    |  C  |         |          |  C  |         |          |  C  |
++ *    +-----+         or         +-----+         or         +-----+
++ *            +---+   |   +----+         +----+  |  +---+
++ *            | E |   |   | E1 |         | E2 |  |  | E |
++ *            +---+   |   +----+         +----+  |  +---+
++ *    For the above situations, no bad block to be cleared and no failure
++ *    happens, simply returns 0.
++ * 2) The clearing range hits middle of an already setting bad blocks range in
++ *    the bad block table.
++ *            +---+
++ *            | C |
++ *            +---+
++ *     +-----------------+
++ *     |         E       |
++ *     +-----------------+
++ *    In this situation if the bad block table is not full, the range E will be
++ *    split into two ranges E1 and E2. The result is,
++ *     +------+   +------+
++ *     |  E1  |   |  E2  |
++ *     +------+   +------+
++ * 3) The clearing range starts exactly at same LBA as an already set bad block range
++ *    from the bad block table.
++ * 3.1) Partially covered at head part
++ *         +------------+
++ *         |     C      |
++ *         +------------+
++ *         +-----------------+
++ *         |         E       |
++ *         +-----------------+
++ *    For this situation, the overlapped already set range will update the
++ *    start LBA to end of C and shrink the range to BB_LEN(E) - BB_LEN(C). No
++ *    item deleted from bad block table. The result is,
++ *                      +----+
++ *                      | E1 |
++ *                      +----+
++ * 3.2) Exact fully covered
++ *         +-----------------+
++ *         |         C       |
++ *         +-----------------+
++ *         +-----------------+
++ *         |         E       |
++ *         +-----------------+
++ *    For this situation the whole bad blocks range E will be cleared and its
++ *    corresponded item is deleted from the bad block table.
++ * 4) The clearing range exactly ends at same LBA as an already set bad block
++ *    range.
++ *                   +-------+
++ *                   |   C   |
++ *                   +-------+
++ *         +-----------------+
++ *         |         E       |
++ *         +-----------------+
++ *    For the above situation, the already set range E is updated to shrink its
++ *    end to the start of C, and reduce its length to BB_LEN(E) - BB_LEN(C).
++ *    The result is,
++ *         +---------+
++ *         |    E    |
++ *         +---------+
++ * 5) The clearing range is partially overlapped with an already set bad block
++ *    range from the bad block table.
++ * 5.1) The already set bad block range is front overlapped with the clearing
++ *    range.
++ *         +----------+
++ *         |     C    |
++ *         +----------+
++ *              +------------+
++ *              |      E     |
++ *              +------------+
++ *   For such situation, the clearing range C can be treated as two parts. The
++ *   first part ends at the start LBA of range E, and the second part starts at
++ *   same LBA of range E.
++ *         +----+-----+               +----+   +-----+
++ *         | C1 | C2  |               | C1 |   | C2  |
++ *         +----+-----+         ===>  +----+   +-----+
++ *              +------------+                 +------------+
++ *              |      E     |                 |      E     |
++ *              +------------+                 +------------+
++ *   Now the first part C1 can be handled as condition 1), and the second part C2 can be
++ *   handled as condition 3.1) in next loop.
++ * 5.2) The already set bad block range is behind overlaopped with the clearing
++ *   range.
++ *                 +----------+
++ *                 |     C    |
++ *                 +----------+
++ *         +------------+
++ *         |      E     |
++ *         +------------+
++ *   For such situation, the clearing range C can be treated as two parts. The
++ *   first part C1 ends at same end LBA of range E, and the second part starts
++ *   at end LBA of range E.
++ *                 +----+-----+                 +----+    +-----+
++ *                 | C1 | C2  |                 | C1 |    | C2  |
++ *                 +----+-----+  ===>           +----+    +-----+
++ *         +------------+               +------------+
++ *         |      E     |               |      E     |
++ *         +------------+               +------------+
++ *   Now the first part clearing range C1 can be handled as condition 4), and
++ *   the second part clearing range C2 can be handled as condition 1) in next
++ *   loop.
++ *
++ *   All bad blocks range clearing can be simplified into the above 5 situations
++ *   by only handling the head part of the clearing range in each run of the
++ *   while-loop. The idea is similar to bad blocks range setting but much
++ *   simpler.
   */
- int badblocks_clear(struct badblocks *bb, sector_t s, int sectors)
- {
--	u64 *p;
--	int lo, hi;
--	sector_t target = s + sectors;
--	int rv = 0;
--
--	if (bb->shift > 0) {
--		/* When clearing we round the start up and the end down.
--		 * This should not matter as the shift should align with
--		 * the block size and no rounding should ever be needed.
--		 * However it is better the think a block is bad when it
--		 * isn't than to think a block is not bad when it is.
--		 */
--		s += (1<<bb->shift) - 1;
--		s >>= bb->shift;
--		target >>= bb->shift;
--		sectors = target - s;
--	}
--
--	write_seqlock_irq(&bb->lock);
--
--	p = bb->page;
--	lo = 0;
--	hi = bb->count;
--	/* Find the last range that starts before 'target' */
--	while (hi - lo > 1) {
--		int mid = (lo + hi) / 2;
--		sector_t a = BB_OFFSET(p[mid]);
--
--		if (a < target)
--			lo = mid;
--		else
--			hi = mid;
--	}
--	if (hi > lo) {
--		/* p[lo] is the last range that could overlap the
--		 * current range.  Earlier ranges could also overlap,
--		 * but only this one can overlap the end of the range.
--		 */
--		if ((BB_OFFSET(p[lo]) + BB_LEN(p[lo]) > target) &&
--		    (BB_OFFSET(p[lo]) < target)) {
--			/* Partial overlap, leave the tail of this range */
--			int ack = BB_ACK(p[lo]);
--			sector_t a = BB_OFFSET(p[lo]);
--			sector_t end = a + BB_LEN(p[lo]);
--
--			if (a < s) {
--				/* we need to split this range */
--				if (bb->count >= MAX_BADBLOCKS) {
--					rv = -ENOSPC;
--					goto out;
--				}
--				memmove(p+lo+1, p+lo, (bb->count - lo) * 8);
--				bb->count++;
--				p[lo] = BB_MAKE(a, s-a, ack);
--				lo++;
--			}
--			p[lo] = BB_MAKE(target, end - target, ack);
--			/* there is no longer an overlap */
--			hi = lo;
--			lo--;
--		}
--		while (lo >= 0 &&
--		       (BB_OFFSET(p[lo]) + BB_LEN(p[lo]) > s) &&
--		       (BB_OFFSET(p[lo]) < target)) {
--			/* This range does overlap */
--			if (BB_OFFSET(p[lo]) < s) {
--				/* Keep the early parts of this range. */
--				int ack = BB_ACK(p[lo]);
--				sector_t start = BB_OFFSET(p[lo]);
--
--				p[lo] = BB_MAKE(start, s - start, ack);
--				/* now low doesn't overlap, so.. */
--				break;
--			}
--			lo--;
--		}
--		/* 'lo' is strictly before, 'hi' is strictly after,
--		 * anything between needs to be discarded
--		 */
--		if (hi - lo > 1) {
--			memmove(p+lo+1, p+hi, (bb->count - hi) * 8);
--			bb->count -= (hi - lo - 1);
--		}
--	}
--
--	badblocks_update_acked(bb);
--	bb->changed = 1;
--out:
--	write_sequnlock_irq(&bb->lock);
--	return rv;
-+	return _badblocks_clear(bb, s, sectors);
- }
- EXPORT_SYMBOL_GPL(badblocks_clear);
  
+ /*
+@@ -931,6 +1048,208 @@ static int _badblocks_set(struct badblocks *bb, sector_t s, int sectors,
+ 	return rv;
+ }
+ 
++/*
++ * Clear the bad block range from bad block table which is front overlapped
++ * with the clearing range. The return value is how many sectors from an
++ * already set bad block range are cleared. If the whole bad block range is
++ * covered by the clearing range and fully cleared, 'delete' is set as 1 for
++ * the caller to reduce bb->count.
++ */
++static int front_clear(struct badblocks *bb, int prev,
++		       struct bad_context *bad, int *deleted)
++{
++	sector_t sectors = bad->len;
++	sector_t s = bad->start;
++	u64 *p = bb->page;
++	int cleared = 0;
++
++	*deleted = 0;
++	if (s == BB_OFFSET(p[prev])) {
++		if (BB_LEN(p[prev]) > sectors) {
++			p[prev] = BB_MAKE(BB_OFFSET(p[prev]) + sectors,
++					  BB_LEN(p[prev]) - sectors,
++					  BB_ACK(p[prev]));
++			cleared = sectors;
++		} else {
++			/* BB_LEN(p[prev]) <= sectors */
++			cleared = BB_LEN(p[prev]);
++			if ((prev + 1) < bb->count)
++				memmove(p + prev, p + prev + 1,
++				       (bb->count - prev - 1) * 8);
++			*deleted = 1;
++		}
++	} else if (s > BB_OFFSET(p[prev])) {
++		if (BB_END(p[prev]) <= (s + sectors)) {
++			cleared = BB_END(p[prev]) - s;
++			p[prev] = BB_MAKE(BB_OFFSET(p[prev]),
++					  s - BB_OFFSET(p[prev]),
++					  BB_ACK(p[prev]));
++		} else {
++			/* Splitting is handled in front_splitting_clear() */
++			BUG();
++		}
++	}
++
++	return cleared;
++}
++
++/*
++ * Handle the condition that the clearing range hits middle of an already set
++ * bad block range from bad block table. In this condition the existing bad
++ * block range is split into two after the middle part is cleared.
++ */
++static int front_splitting_clear(struct badblocks *bb, int prev,
++				  struct bad_context *bad)
++{
++	sector_t sectors = bad->len;
++	sector_t s = bad->start;
++	u64 *p = bb->page;
++	u64 end = BB_END(p[prev]);
++	int ack = BB_ACK(p[prev]);
++
++	p[prev] = BB_MAKE(BB_OFFSET(p[prev]),
++			  s - BB_OFFSET(p[prev]),
++			  ack);
++	memmove(p + prev + 2, p + prev + 1, (bb->count - prev - 1) * 8);
++	p[prev + 1] = BB_MAKE(s + sectors, end - s - sectors, ack);
++	return sectors;
++}
++
++/* Do the exact work to clear bad block range from the bad block table */
++static int _badblocks_clear(struct badblocks *bb, sector_t s, int sectors)
++{
++	u64 *p;
++	struct bad_context bad;
++	int prev = -1, hint = -1;
++	int len = 0, cleared = 0;
++	int rv = 0;
++
++	if (bb->shift < 0)
++		/* badblocks are disabled */
++		return 1;
++
++	if (sectors == 0)
++		/* Invalid sectors number */
++		return 1;
++
++	if (bb->shift) {
++		sector_t target;
++
++		/* When clearing we round the start up and the end down.
++		 * This should not matter as the shift should align with
++		 * the block size and no rounding should ever be needed.
++		 * However it is better the think a block is bad when it
++		 * isn't than to think a block is not bad when it is.
++		 */
++		target = s + sectors;
++		roundup(s, bb->shift);
++		rounddown(target, bb->shift);
++		sectors = target - s;
++	}
++
++	write_seqlock_irq(&bb->lock);
++
++	bad.orig_start = s;
++	bad.orig_len = sectors;
++	bad.ack = true;
++	p = bb->page;
++
++re_clear:
++	bad.start = s;
++	bad.len = sectors;
++
++	if (badblocks_empty(bb)) {
++		len = sectors;
++		cleared++;
++		goto update_sectors;
++	}
++
++
++	prev = prev_badblocks(bb, &bad, hint);
++
++	/* start before all badblocks */
++	if (prev < 0) {
++		if (overlap_behind(bb, &bad, 0)) {
++			len = BB_OFFSET(p[0]) - s;
++			hint = prev;
++		} else {
++			len = sectors;
++			cleared++;
++		}
++		goto update_sectors;
++	}
++
++	/* start after all badblocks */
++	if ((prev + 1) >= bb->count && !overlap_front(bb, prev, &bad)) {
++		len = sectors;
++		cleared++;
++		goto update_sectors;
++	}
++
++	/* Clear will split a bad record but the table is full */
++	if (badblocks_full(bb) && (BB_OFFSET(p[prev]) < bad.start) &&
++	    (BB_END(p[prev]) > (bad.start + sectors))) {
++		len = sectors;
++		goto update_sectors;
++	}
++
++	if (overlap_front(bb, prev, &bad)) {
++		if ((BB_OFFSET(p[prev]) < bad.start) &&
++		    (BB_END(p[prev]) > (bad.start + bad.len))) {
++			/* Splitting */
++			if ((bb->count + 1) < MAX_BADBLOCKS) {
++				len = front_splitting_clear(bb, prev, &bad);
++				bb->count += 1;
++				cleared++;
++			} else {
++				/* No space to split, give up */
++				len = sectors;
++			}
++		} else {
++			int deleted = 0;
++
++			len = front_clear(bb, prev, &bad, &deleted);
++			bb->count -= deleted;
++			cleared++;
++			hint = prev;
++		}
++
++		goto update_sectors;
++	}
++
++	/* Not front overlap, but behind overlap */
++	if ((prev + 1) < bb->count && overlap_behind(bb, &bad, prev + 1)) {
++		len = BB_OFFSET(p[prev + 1]) - bad.start;
++		hint = prev + 1;
++		goto update_sectors;
++	}
++
++	/* not cover any badblocks range in the table */
++	len = sectors;
++
++update_sectors:
++	s += len;
++	sectors -= len;
++
++	if (sectors > 0)
++		goto re_clear;
++
++	WARN_ON(sectors < 0);
++
++	if (cleared) {
++		badblocks_update_acked(bb);
++		set_changed(bb);
++	}
++
++	write_sequnlock_irq(&bb->lock);
++
++	if (!cleared)
++		rv = 1;
++
++	return rv;
++}
++
++
+ /**
+  * badblocks_check() - check a given range for bad sectors
+  * @bb:		the badblocks structure that holds all badblock information
 -- 
 2.26.2
 
