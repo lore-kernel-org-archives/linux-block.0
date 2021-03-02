@@ -2,126 +2,88 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 885E0C433E9
-	for <linux-block@archiver.kernel.org>; Tue,  2 Mar 2021 23:52:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E9D2C433E0
+	for <linux-block@archiver.kernel.org>; Tue,  2 Mar 2021 23:52:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4D3F964F3A
-	for <linux-block@archiver.kernel.org>; Tue,  2 Mar 2021 23:52:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 46F9464F18
+	for <linux-block@archiver.kernel.org>; Tue,  2 Mar 2021 23:52:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231701AbhCBXq6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Mar 2021 18:46:58 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23309 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1835404AbhCBTFy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 2 Mar 2021 14:05:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614711862;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=WQxbA1PhZkKy7mqy3MPmoeD7hbqef+YoioB+uiK7JR0=;
-        b=HGVS7keCmpzeEgYbFMnA+wNSVl48oeZcZUU3SwmTG/1K8YclEKxLwqW+KdfXkNq5Sn5iMK
-        +ae9VCcxhM8OfyMMKTywqzO+LDUdDT3VEOZIhTykvr7Rt7/kgcmgs35eoauefkMzCRzTvR
-        laycWLr3fgiBL5zph2Prx+UfMXQc48M=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-304-yxb4KF5XNoug1SZwn2NZoA-1; Tue, 02 Mar 2021 14:04:08 -0500
-X-MC-Unique: yxb4KF5XNoug1SZwn2NZoA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0CB6B814318;
-        Tue,  2 Mar 2021 19:04:07 +0000 (UTC)
-Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A5C9B62465;
-        Tue,  2 Mar 2021 19:03:56 +0000 (UTC)
-Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
-        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 122J3uSc011834;
-        Tue, 2 Mar 2021 14:03:56 -0500
-Received: from localhost (mpatocka@localhost)
-        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 122J3sh4011830;
-        Tue, 2 Mar 2021 14:03:55 -0500
-X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
-Date:   Tue, 2 Mar 2021 14:03:54 -0500 (EST)
-From:   Mikulas Patocka <mpatocka@redhat.com>
-X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
-To:     JeffleXu <jefflexu@linux.alibaba.com>
-cc:     axboe@kernel.dk, snitzer@redhat.com, caspar@linux.alibaba.com,
-        io-uring@vger.kernel.org, linux-block@vger.kernel.org,
-        joseph.qi@linux.alibaba.com, dm-devel@redhat.com, hch@lst.de
-Subject: Re: [dm-devel] [PATCH v3 11/11] dm: fastpath of bio-based polling
-In-Reply-To: <af9223b9-8960-1ed4-799a-bcd56299c587@linux.alibaba.com>
-Message-ID: <alpine.LRH.2.02.2103021353490.9353@file01.intranet.prod.int.rdu2.redhat.com>
-References: <20210208085243.82367-1-jefflexu@linux.alibaba.com> <20210208085243.82367-12-jefflexu@linux.alibaba.com> <alpine.LRH.2.02.2102191351200.10545@file01.intranet.prod.int.rdu2.redhat.com> <af9223b9-8960-1ed4-799a-bcd56299c587@linux.alibaba.com>
-User-Agent: Alpine 2.02 (LRH 1266 2009-07-14)
+        id S231491AbhCBXqq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Mar 2021 18:46:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32844 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1350258AbhCBS04 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Mar 2021 13:26:56 -0500
+Received: from mail-il1-x12a.google.com (mail-il1-x12a.google.com [IPv6:2607:f8b0:4864:20::12a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F8B8C0617AB
+        for <linux-block@vger.kernel.org>; Tue,  2 Mar 2021 10:25:53 -0800 (PST)
+Received: by mail-il1-x12a.google.com with SMTP id d5so18925350iln.6
+        for <linux-block@vger.kernel.org>; Tue, 02 Mar 2021 10:25:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=/tR2XTG0HxjyVGlaiC+WrfL7p8OXI5fljdp3i9qrHB0=;
+        b=aqjY/V6RGVgwKRL3/lnscUN2LZ6ifrGWr6AfB4V8YKtxF6R2oeWYBA19kyaPGfjI9i
+         1+OZ+ZoBIQgOmkat3LFIZ4oXs9nUp3wluYxoRBavOpqQg7AlgdOkqYIJ6ha4GCWhniZj
+         eudr58unxm0p5t6SC2J12nC6zk14Dj2uUIW7P+JeI/hiwPLRMyFW41Pk+HDwY6szSXOR
+         pjb7i5NyzCaMtMcGxYV9snoFVZBU8xrnFi+bvEOXzgOJd4/AsdNLWTc2uaw1Zc1cg9fT
+         ZC+Xptql+b5CzelkIDp7i0xdCCi8cLL5qhvnVz0IuPq5naC/xtkBdtv0HdPrzlCy8ABM
+         uq0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=/tR2XTG0HxjyVGlaiC+WrfL7p8OXI5fljdp3i9qrHB0=;
+        b=UzurAbML2HThlP8WiVqyOpCmSXG/a0nGfUp4cuDUX/jLz1qBPPynhh8VbHkPadS1rr
+         p3mLiOZ309JA4hYO5mikRLg5m2JJZC+FaXseEWLbvUvflfOM11hWeMM35bQGBTULQHVp
+         Ugy2csfgTTjHkv28/efyRq2+6FDljGNBKwU5IkUT1PQxOnuemFba2MyfR6gH/LH+u9a9
+         qA1Y4u6nJRjEiVAw9YaCiV7fXz9d07F39lD4Gc3qtuAVARg1v7lc0FWqZEm1oGkskyMy
+         Vq+jcVWifnLT5GcV8FVkyaucNYnCqOuQU3xYVGzH/YvlzfrddSQT8s7kPIQPLdwpdffj
+         CY9A==
+X-Gm-Message-State: AOAM531wdw8/4SZbxQWVIjD2CgUj+d4iFto0DNbZs2bLpQG7mwOiAmqF
+        yHPEtIhmF6fxcrgyZKwN14OTRCMHAPWpig==
+X-Google-Smtp-Source: ABdhPJxy5HeFvi7BpQUeJ7U/Std4KxNuGk5C3a6ucMAQfIiEHxLI3BHv4WrSSKvXo1Q9FozOFscU1A==
+X-Received: by 2002:a05:6e02:e87:: with SMTP id t7mr18767828ilj.211.1614709552488;
+        Tue, 02 Mar 2021 10:25:52 -0800 (PST)
+Received: from [192.168.1.30] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id g6sm8840282ilj.28.2021.03.02.10.25.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 02 Mar 2021 10:25:52 -0800 (PST)
+Subject: Re: [PATCH] block/bfq: update comments and default value in docs for
+ fifo_expire
+To:     Joseph Qi <joseph.qi@linux.alibaba.com>,
+        Paolo Valente <paolo.valente@linaro.org>
+Cc:     linux-block@vger.kernel.org, linux-doc@vger.kernel.org
+References: <1614045328-87234-1-git-send-email-joseph.qi@linux.alibaba.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <a98d251d-f68f-a0e0-acda-54ad0b2779d8@kernel.dk>
+Date:   Tue, 2 Mar 2021 11:25:51 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <1614045328-87234-1-git-send-email-joseph.qi@linux.alibaba.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 2/22/21 6:55 PM, Joseph Qi wrote:
+> Correct the comments since bfq_fifo_expire[0] is for async request,
+> while bfq_fifo_expire[1] is for sync request.
+> Also update docs, according the source code, the default
+> fifo_expire_async is 250ms, and fifo_expire_sync is 125ms.
 
+Applied, thanks.
 
-On Fri, 26 Feb 2021, JeffleXu wrote:
-
-> 
-> 
-> On 2/20/21 3:38 AM, Mikulas Patocka wrote:
-> > 
-> > 
-> > On Mon, 8 Feb 2021, Jeffle Xu wrote:
-> > 
-> >> Offer one fastpath of bio-based polling when bio submitted to dm device
-> >> is not split.
-> >>
-> >> In this case, there will be only one bio submitted to only one polling
-> >> hw queue of one underlying mq device, and thus we don't need to track
-> >> all split bios or iterate through all polling hw queues. The pointer to
-> >> the polling hw queue the bio submitted to is returned here as the
-> >> returned cookie.
-> > 
-> > This doesn't seem safe - note that between submit_bio() and blk_poll(), no 
-> > locks are held - so the device mapper device may be reconfigured 
-> > arbitrarily. When you call blk_poll() with a pointer returned by 
-> > submit_bio(), the pointer may point to a stale address.
-> > 
-> 
-> Thanks for the feedback. Indeed maybe it's not a good idea to directly
-> return a 'struct blk_mq_hw_ctx *' pointer as the returned cookie.
-> 
-> Currently I have no idea to fix it, orz... The
-> blk_get_queue()/blk_put_queue() tricks may not work in this case.
-> Because the returned cookie may not be used at all. Before calling
-> blk_poll(), the polling routine may find that the corresponding IO has
-> already completed, and thus won't call blk_poll(), in which case we have
-> no place to put the refcount.
-> 
-> But I really don't want to drop this optimization, since this
-> optimization is quite intuitive when dm device maps to a lot of
-> underlying devices. Though this optimization doesn't actually achieve
-> reasonable performance gain in my test, maybe because there are at most
-> seven nvme devices in my test machine.
-> 
-> Any thoughts?
-> 
-> Thanks,
-> Jeffle
-
-Hi
-
-I reworked device mapper polling, so that we poll in the function 
-__split_and_process_bio. The pointer to a queue and the polling cookie is 
-passed only inside device mapper code, it never leaves it.
-
-I'll send you my patches - try them and tell me how does it perform 
-compared to your patchset.
-
-Mikulas
+-- 
+Jens Axboe
 
