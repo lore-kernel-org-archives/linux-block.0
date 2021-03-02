@@ -2,141 +2,123 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2062CC433DB
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64183C433E9
 	for <linux-block@archiver.kernel.org>; Tue,  2 Mar 2021 23:51:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C584264F18
-	for <linux-block@archiver.kernel.org>; Tue,  2 Mar 2021 23:51:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 288C664F40
+	for <linux-block@archiver.kernel.org>; Tue,  2 Mar 2021 23:51:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230414AbhCBXhW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Mar 2021 18:37:22 -0500
-Received: from mout.gmx.net ([212.227.15.19]:45213 "EHLO mout.gmx.net"
+        id S230468AbhCBXii (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Mar 2021 18:38:38 -0500
+Received: from mx2.suse.de ([195.135.220.15]:39278 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S240706AbhCBCFx (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 1 Mar 2021 21:05:53 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
-        s=badeba3b8450; t=1614650635;
-        bh=vuF4asm5oftnr0ailpx2QxWzLruw3F+JLEa0u6Q/iz0=;
-        h=X-UI-Sender-Class:Subject:To:Cc:References:From:Date:In-Reply-To;
-        b=J3vMVIkQhE2CS6WsVY2LesmwrUrxzKoNhn8dzZ4QG+mS5iIG8zDVnuHmZPfcCJQoR
-         2invWuX8AcP/UjqswIVL/oAsvEA0/ggmTGRm8HcP34r6EMh+XSyQAXM9yZUFyjhvPr
-         50E3fxLkjnVu+Z14J2H3sDlerd8QVYiMueaQDctw=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from [10.10.213.91] ([103.52.188.137]) by mail.gmx.net (mrgmx005
- [212.227.17.184]) with ESMTPSA (Nemesis) id 1Mel3n-1loaa73Hcb-00anph; Tue, 02
- Mar 2021 03:03:55 +0100
-Subject: Re: Large latency with bcache for Ceph OSD
-To:     Coly Li <colyli@suse.de>
-Cc:     linux-block@vger.kernel.org, axboe@kernel.dk,
-        linux-bcache@vger.kernel.org
-References: <3f3e20a3-c165-1de1-7fdd-f0bd4da598fe@gmx.com>
- <632258f7-b138-3fba-456b-9da37c1de710@gmx.com>
- <5867daf1-0960-39aa-1843-1a76c1e9a28d@suse.de>
- <07bcb6c8-21e1-11de-d1f0-ffd417bd36ff@gmx.com>
- <cfe2746f-18a7-a768-ea72-901793a3133e@gmx.com>
- <96daa0bf-c8e1-a334-14cb-2d260aed5115@suse.de>
- <b808dde3-cb58-907b-4df0-e0eb2938b51e@gmx.com>
- <04770825-b1d2-8ec0-2345-77d49d99631a@suse.de>
-From:   "Norman.Kern" <norman.kern@gmx.com>
-Message-ID: <8eb6739c-090d-f925-333e-df34a6d05101@gmx.com>
-Date:   Tue, 2 Mar 2021 10:03:50 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.0
+        id S236440AbhCBEGq (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 1 Mar 2021 23:06:46 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 3F926ABF4;
+        Tue,  2 Mar 2021 04:03:04 +0000 (UTC)
+From:   Coly Li <colyli@suse.de>
+To:     linux-block@vger.kernel.org, axboe@kernel.dk,
+        dan.j.williams@intel.com, vishal.l.verma@intel.com, neilb@suse.de
+Cc:     antlists@youngman.org.uk, linux-kernel@vger.kernel.org,
+        linux-raid@vger.kernel.org, linux-nvdimm@lists.01.org,
+        Coly Li <colyli@suse.de>
+Subject: [RFC PATCH v1 1/6] badblocks: add more helper structure and routines in badblocks.h
+Date:   Tue,  2 Mar 2021 12:02:47 +0800
+Message-Id: <20210302040252.103720-2-colyli@suse.de>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20210302040252.103720-1-colyli@suse.de>
+References: <20210302040252.103720-1-colyli@suse.de>
 MIME-Version: 1.0
-In-Reply-To: <04770825-b1d2-8ec0-2345-77d49d99631a@suse.de>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-X-Provags-ID: V03:K1:zcUrsm3jMU5IwCt0k0hA8Cjb5TdcuCwoIFrRQMq33on95yaWdf1
- FKjkrI5Z8xufqT1DiDc2eUtRB9HpekTxQu+vjV46gw31LL7UrnqSoS5xJB/k3MMOZ8zJCmP
- JsgiGCaURW6jvyMWgRT/zL4hlGCW/ET6K59LpWPY0QE3C1tHtGeg6CCll61fjZKVKHGtBBn
- A9BV+t47sie7WBTA9z3UA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:Mv90uQif5z0=:mkPZnt/wAzgCji6VgOJveB
- 1f4EKQWxRHBiHrPiJxSu/+LY9k9C7xeeY3CRh69qmwh/t9NjjFjJm63vKx42nej7TjZN9GJh7
- OjeuL0QxP7YUDb7/uuatHAJFNRE+Qa09O/szoUK99lGojTqxSxZO4UMdpc8Fv8GaDxGLrymhk
- rENMJWZ4ZHom2LibiDweuPgZ9tBY8NfOg6pza4DxSVw5W/p2++yYwUtH/9AKkJIcBBT8iR6gR
- Up0dVsWBxMHtKqQp3LhgHXL7DZMigxJkW9fRgOAqsjjfTRhXjOKxzdUHMz368Pgd5ZBn5dKvX
- p7o8Ltb0h6X/Kp6GAXBNbjy58gfwBEQjsxsJZP3f862ttw+XrWwoR+swBknlPKpa43kMtwBwu
- St4YJAGElaG/D2345KpU5qqPHu2V19AkHtpy2gdMEKYQaKg6FxInZY8HjRaVKhYr+DeVu8LV1
- QyYb+OyLOoKL1s+Q9oLFzmqeCOxJkBcLv3P6r9y6rDptMLxCfkeXKK45EkJnaT/c4rMCVLmKp
- NeGdihft1aDpLCfnq557u/eEJHRIu9gBNbs7epPjK5QHvOCgheY+RfeHja0iepkogG3n5BfxY
- rIgy9CjsgLgqHH/3I2adhWPGyRfKQFaAz9m4rhQLxVpZxqb5GfD+lN63lDwpH3pFfq/6BLu9d
- QzqXjCfkCgD/rx1t7vwwRJ/GU05wveQ6gxMiPwtVIOMBrGqOP+T4F8PMw39+i4hRnMoFJhDFo
- zXXt+lfdZleTUXz1UfzFkxFEZCpRc6XFBUei1jiMveVeHnlqhGgcltC1m/UCaQWLqES74qZf9
- X8eaBqPK5WE8Mpu5AvIIOAe3Y/59oC6BKg5B1D8BUoiOgcjN9wa4H6TCuT0sKkGOmfbFgshAO
- nFI8b+r4uqhXmppGpGVg==
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+This patch adds the following helper structure and routines into
+badblocks.h,
+- struct bad_context
+  This structure is used in improved badblocks code for bad table
+  iteration.
+- BB_END()
+  The macro to culculate end LBA of a bad range record from bad
+  table.
+- badblocks_full() and badblocks_empty()
+  The inline routines to check whether bad table is full or empty.
+- set_changed() and clear_changed()
+  The inline routines to set and clear 'changed' tag from struct
+  badblocks.
 
-On 2021/2/26 =E4=B8=8B=E5=8D=885:54, Coly Li wrote:
-> On 2/26/21 4:57 PM, Norman.Kern wrote:
-> [snipped]
->>> You may try to trigger a gc by writing to
->>> sys/fs/bcache/<cache-set-uuid>/internal/trigger_gc
->>>
->> When all cache had written back, I triggered gc, it recalled.
->>
->> root@WXS0106:~# cat /sys/block/bcache0/bcache/cache/cache_available_per=
-cent
->> 30
->>
->> root@WXS0106:~# echo 1 > /sys/block/bcache0/bcache/cache/internal/trigg=
-er_gc
->> root@WXS0106:~# cat /sys/block/bcache0/bcache/cache/cache_available_per=
-cent
->> 97
->>
->> Why must I trigger gc manually? Is not a default action of bcache-gc th=
-read? And I found it can only work when all dirty data written back.
->>
-> 1, GC is automatically triggered after some mount of data consumed. I
-> guess it is just not about time in your situation.
->
-> 2, Because the gc will shrink all cached clean data, which is very
-> unfriendly for read-intend workload. Therefore gc_after_writeback is
-> defaulted as 0, when this sysfs file content set to 1, a gc will trigger
-> after the writeback accomplished.
+These new helper structure and routines can help to make the code more
+clear, they will be used in the improved badblocks code in following
+patches.
 
-I made a test again and get more infomation:
+Signed-off-by: Coly Li <colyli@suse.de>
+---
+ include/linux/badblocks.h | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
 
-root@WXS0089:~# cat /sys/block/bcache0/bcache/dirty_data
-0.0k
-root@WXS0089:~# lsblk /dev/sda
-NAME=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 MAJ:MIN RM=C2=A0=C2=A0 SIZE RO TYPE MOU=
-NTPOINT
-sda=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 8:0=C2=A0=C2=A0=C2=A0 =
-0 447.1G=C2=A0 0 disk
-`-bcache0 252:0=C2=A0=C2=A0=C2=A0 0=C2=A0 10.9T=C2=A0 0 disk
-root@WXS0089:~# cat /sys/block/sda/bcache/priority_stats
-Unused:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 1%
-Clean:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 29%
-Dirty:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 70%
-Metadata:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0%
-Average:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 49
-Sectors per Q:=C2=A0 29184768
-Quantiles:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 [1 2 3 5 6 8 9 11 13 14 16 19 21 =
-23 26 29 32 36 39 43 48 53 59 65 73 83 94 109 129 156 203]
-root@WXS0089:~# cat /sys/fs/bcache/066319e1-8680-4b5b-adb8-49596319154b/in=
-ternal/gc_after_writeback
-1
-You have new mail in /var/mail/root
-root@WXS0089:~# cat /sys/fs/bcache/066319e1-8680-4b5b-adb8-49596319154b/ca=
-che_available_percent
-28
+diff --git a/include/linux/badblocks.h b/include/linux/badblocks.h
+index 2426276b9bd3..166161842d1f 100644
+--- a/include/linux/badblocks.h
++++ b/include/linux/badblocks.h
+@@ -15,6 +15,7 @@
+ #define BB_OFFSET(x)	(((x) & BB_OFFSET_MASK) >> 9)
+ #define BB_LEN(x)	(((x) & BB_LEN_MASK) + 1)
+ #define BB_ACK(x)	(!!((x) & BB_ACK_MASK))
++#define BB_END(x)	(BB_OFFSET(x) + BB_LEN(x))
+ #define BB_MAKE(a, l, ack) (((a)<<9) | ((l)-1) | ((u64)(!!(ack)) << 63))
+ 
+ /* Bad block numbers are stored sorted in a single page.
+@@ -41,6 +42,14 @@ struct badblocks {
+ 	sector_t size;		/* in sectors */
+ };
+ 
++struct bad_context {
++	sector_t	start;
++	sector_t	len;
++	int		ack;
++	sector_t	orig_start;
++	sector_t	orig_len;
++};
++
+ int badblocks_check(struct badblocks *bb, sector_t s, int sectors,
+ 		   sector_t *first_bad, int *bad_sectors);
+ int badblocks_set(struct badblocks *bb, sector_t s, int sectors,
+@@ -63,4 +72,27 @@ static inline void devm_exit_badblocks(struct device *dev, struct badblocks *bb)
+ 	}
+ 	badblocks_exit(bb);
+ }
++
++static inline int badblocks_full(struct badblocks *bb)
++{
++	return (bb->count >= MAX_BADBLOCKS);
++}
++
++static inline int badblocks_empty(struct badblocks *bb)
++{
++	return (bb->count == 0);
++}
++
++static inline void set_changed(struct badblocks *bb)
++{
++	if (bb->changed != 1)
++		bb->changed = 1;
++}
++
++static inline void clear_changed(struct badblocks *bb)
++{
++	if (bb->changed != 0)
++		bb->changed = 0;
++}
++
+ #endif
+-- 
+2.26.2
 
-I read the source codes and found if cache_available_percent > 50, it shou=
-ld wakeup gc while doing writeback, but it seemed not work right.
-
->
-> Coly Li
->
->
->
->
