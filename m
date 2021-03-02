@@ -2,99 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3139FC4332B
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53696C4332E
 	for <linux-block@archiver.kernel.org>; Tue,  2 Mar 2021 23:53:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E339264F40
-	for <linux-block@archiver.kernel.org>; Tue,  2 Mar 2021 23:52:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 334B164F46
+	for <linux-block@archiver.kernel.org>; Tue,  2 Mar 2021 23:53:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231575AbhCBXrh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Mar 2021 18:47:37 -0500
-Received: from smtp02.tmcz.cz ([93.153.104.113]:47295 "EHLO smtp02.tmcz.cz"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1581890AbhCBT2p (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 2 Mar 2021 14:28:45 -0500
-Received: from leontynka.twibright.com (109-183-129-149.customers.tmcz.cz [109.183.129.149])
-        by smtp02.tmcz.cz (Postfix) with ESMTPS id 01629405E0;
-        Tue,  2 Mar 2021 20:05:54 +0100 (CET)
-Received: from debian-a64.vm ([192.168.208.2])
-        by leontynka.twibright.com with smtp (Exim 4.92)
-        (envelope-from <mpatocka@redhat.com>)
-        id 1lHALA-0003k7-OQ; Tue, 02 Mar 2021 20:05:53 +0100
-Received: by debian-a64.vm (sSMTP sendmail emulation); Tue, 02 Mar 2021 20:05:51 +0100
-Message-Id: <20210302190551.473015400@debian-a64.vm>
-User-Agent: quilt/0.65
-Date:   Tue, 02 Mar 2021 20:05:14 +0100
-From:   Mikulas Patocka <mpatocka@redhat.com>
-To:     JeffleXu <jefflexu@linux.alibaba.com>,
-        Mike Snitzer <msnitzer@redhat.com>,
-        Heinz Mauelshagen <heinzm@redhat.com>, axboe@kernel.dk,
-        caspar@linux.alibaba.com, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org, joseph.qi@linux.alibaba.com,
-        dm-devel@redhat.com, hch@lst.de
-Cc:     Mikulas Patocka <mpatocka@redhat.com>
-Subject: [PATCH 1/4] block: introduce a function submit_bio_noacct_mq_direct
+        id S231607AbhCBXrw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Mar 2021 18:47:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57324 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1350794AbhCBWcm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Mar 2021 17:32:42 -0500
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C4D8C06178A
+        for <linux-block@vger.kernel.org>; Tue,  2 Mar 2021 14:31:36 -0800 (PST)
+Received: by mail-pf1-x433.google.com with SMTP id 201so14791392pfw.5
+        for <linux-block@vger.kernel.org>; Tue, 02 Mar 2021 14:31:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=dDOaCYCI2rpb4LQP8rVQ+Pz//+9Nqe8cELMz0UAeG/0=;
+        b=OydL0mHpz8KkNLNjKg7Zcw4wTSbA9kc6aXnfOAX70XgHQvEPOG40YrS25pKI1DVtr4
+         UbRHduhr4FhAqoaiMb4z9azXoFNMnr52gKTbbsfpq9jSlG917vdFyj5Q+q0f/8T+KXZb
+         OCNZ7aUa/jjafQiiLYbD09B95mPvJj1tRyJj9g5PbTtv7mlMm6WUzS4hB4n4hPJEK9HB
+         zMNSgvVxZ29tI8u6blcJAROHOHfV2OgtkuUoNfWOsQ11ctzgWmoPA6y8Zkfbru9IdXoP
+         uqBEhrouei5ayHodTThwjOWrH9I/l+Pn2rar5uhS/egj4mI8ckHarMn+A9zzrh2WY4H6
+         zQag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=dDOaCYCI2rpb4LQP8rVQ+Pz//+9Nqe8cELMz0UAeG/0=;
+        b=fldqM+xI8Met4JfC1sGNwwdQlR15QayBh2u6fwxlRxe8zV8pWcyDDWnr7/A6AEWONK
+         C8PDw3HoGnb7QF1QAhB/3mJGsshAd7hWbdd0RhWN93eq3JS3FfXCEkWtbrvjgF/HQ6if
+         0nLJcrnd6zJN2Atp4k8F5WTvrqjFFAhIjZH2fxQct+MtWY2cl5NsPKawBE0PMXqajwp7
+         WzvGGDsUxSCZeacHbndWaXcS/qHf5GAQ5hUml6xkrmvS5YfcTCqUHER2A/WXcAPTNA64
+         ByUEDURaiqwzGP+Fs1XYGrOBi4ZsfnJCozAiVAunooDZ8HI26h7vX8DDiYYy0ZJtps73
+         ofOQ==
+X-Gm-Message-State: AOAM531LAJSVb+Z9NTWuS9HgvhNI0diMUzQ6QqdTg+Y6cpOkYnOJvRRP
+        eWMCC9MOIr6EMznfLYPDuaUELw==
+X-Google-Smtp-Source: ABdhPJynei85DD/12aeywxJt2eZTx14tQ/eEgKpARUyMiW6zvkxoyIapV6e2KTjaHjLzyHbHckRm5Q==
+X-Received: by 2002:aa7:9281:0:b029:1ec:48b2:811c with SMTP id j1-20020aa792810000b02901ec48b2811cmr5109495pfa.18.1614724296196;
+        Tue, 02 Mar 2021 14:31:36 -0800 (PST)
+Received: from [192.168.1.134] ([66.219.217.173])
+        by smtp.gmail.com with ESMTPSA id 68sm8831655pfd.75.2021.03.02.14.31.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 02 Mar 2021 14:31:35 -0800 (PST)
+Subject: Re: 5.12-rc1 regression: freezing iou-mgr/wrk failed
+To:     "Alex Xu (Hello71)" <alex_y_xu@yahoo.ca>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1614646241.av51lk2de4.none.ref@localhost>
+ <1614646241.av51lk2de4.none@localhost>
+ <ad672889-2757-142b-9259-3e0aee6d8078@kernel.dk>
+ <fd148797-d8cb-7597-8612-83ddfafac425@kernel.dk>
+ <8cd026a0-ada6-9ae5-9ea1-a685b482173c@kernel.dk>
+ <1614722744.btwkumq4s4.none@localhost>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <bb6fc05c-f2b0-d7ad-489b-2db23e2abe52@kernel.dk>
+Date:   Tue, 2 Mar 2021 15:31:33 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Disposition: inline; filename=block-submit-bio-mq-direct.patch
+In-Reply-To: <1614722744.btwkumq4s4.none@localhost>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Introduce a function that submits bio to a request-based device driver.
-The function doesn't offload requests to current->bio_list. It is expected
-to be called from device mapper, where current->bio_list is already set
-up.
+On 3/2/21 3:13 PM, Alex Xu (Hello71) wrote:
+> I tried 29be7fc03d ("io_uring: ensure that threads freeze on suspend") 
+> and it seems to work OK. The system suspends fine and no errors are 
+> printed to the kernel log.
+> 
+> I am using Gentoo on the machine in question.
+> 
+> I didn't test the other patches you supplied. Let me know if there's 
+> anything you would like me to test.
 
-Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
+OK great, thanks. I'll add your reported/tested-by to the patch.
 
----
- block/blk-core.c       |   16 ++++++++++++++++
- include/linux/blkdev.h |    1 +
- 2 files changed, 17 insertions(+)
-
-Index: linux-2.6/block/blk-core.c
-===================================================================
---- linux-2.6.orig/block/blk-core.c	2021-03-01 19:47:27.000000000 +0100
-+++ linux-2.6/block/blk-core.c	2021-03-02 10:43:28.000000000 +0100
-@@ -992,6 +992,22 @@ static blk_qc_t __submit_bio_noacct(stru
- 	return ret;
- }
- 
-+blk_qc_t submit_bio_noacct_mq_direct(struct bio *bio)
-+{
-+	struct gendisk *disk = bio->bi_bdev->bd_disk;
-+
-+	if (unlikely(bio_queue_enter(bio) != 0))
-+		return BLK_QC_T_NONE;
-+	
-+	if (!blk_crypto_bio_prep(&bio)) {
-+		blk_queue_exit(disk->queue);
-+		return BLK_QC_T_NONE;
-+	}
-+
-+	return blk_mq_submit_bio(bio);
-+}
-+EXPORT_SYMBOL(submit_bio_noacct_mq_direct);
-+
- static blk_qc_t __submit_bio_noacct_mq(struct bio *bio)
- {
- 	struct bio_list bio_list[2] = { };
-Index: linux-2.6/include/linux/blkdev.h
-===================================================================
---- linux-2.6.orig/include/linux/blkdev.h	2021-03-01 19:47:29.000000000 +0100
-+++ linux-2.6/include/linux/blkdev.h	2021-03-02 10:44:04.000000000 +0100
-@@ -912,6 +912,7 @@ static inline void rq_flush_dcache_pages
- 
- extern int blk_register_queue(struct gendisk *disk);
- extern void blk_unregister_queue(struct gendisk *disk);
-+blk_qc_t submit_bio_noacct_mq_direct(struct bio *bio);
- blk_qc_t submit_bio_noacct(struct bio *bio);
- extern void blk_rq_init(struct request_queue *q, struct request *rq);
- extern void blk_put_request(struct request *);
+-- 
+Jens Axboe
 
