@@ -2,217 +2,94 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DC14C43381
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39799C4332D
 	for <linux-block@archiver.kernel.org>; Tue,  2 Mar 2021 23:53:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BA92964F3A
-	for <linux-block@archiver.kernel.org>; Tue,  2 Mar 2021 23:52:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 14C2764F55
+	for <linux-block@archiver.kernel.org>; Tue,  2 Mar 2021 23:53:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231384AbhCBXr3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Mar 2021 18:47:29 -0500
-Received: from smtp01.tmcz.cz ([93.153.104.112]:33440 "EHLO smtp01.tmcz.cz"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1581887AbhCBT2o (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 2 Mar 2021 14:28:44 -0500
-Received: from leontynka.twibright.com (109-183-129-149.customers.tmcz.cz [109.183.129.149])
-        by smtp01.tmcz.cz (Postfix) with ESMTPS id 81892405A8;
-        Tue,  2 Mar 2021 20:05:56 +0100 (CET)
-Received: from debian-a64.vm ([192.168.208.2])
-        by leontynka.twibright.com with smtp (Exim 4.92)
-        (envelope-from <mpatocka@redhat.com>)
-        id 1lHALD-0003kH-7p; Tue, 02 Mar 2021 20:05:56 +0100
-Received: by debian-a64.vm (sSMTP sendmail emulation); Tue, 02 Mar 2021 20:05:54 +0100
-Message-Id: <20210302190553.961608080@debian-a64.vm>
-User-Agent: quilt/0.65
-Date:   Tue, 02 Mar 2021 20:05:16 +0100
-From:   Mikulas Patocka <mpatocka@redhat.com>
-To:     JeffleXu <jefflexu@linux.alibaba.com>,
-        Mike Snitzer <msnitzer@redhat.com>,
-        Heinz Mauelshagen <heinzm@redhat.com>, axboe@kernel.dk,
-        caspar@linux.alibaba.com, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org, joseph.qi@linux.alibaba.com,
-        dm-devel@redhat.com, hch@lst.de
-Cc:     Mikulas Patocka <mpatocka@redhat.com>
-Subject: [PATCH 3/4] dm: use submit_bio_noacct_mq_direct
+        id S231598AbhCBXrq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Mar 2021 18:47:46 -0500
+Received: from sonic308-55.consmr.mail.gq1.yahoo.com ([98.137.68.31]:46138
+        "EHLO sonic308-55.consmr.mail.gq1.yahoo.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1838041AbhCBWO7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 2 Mar 2021 17:14:59 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.ca; s=s2048; t=1614723223; bh=IoJyUk4Nbh+2Yi6LTvulv/umucSKxOqnBZJ9GCPOcw0=; h=Date:From:Subject:To:Cc:References:In-Reply-To:From:Subject:Reply-To; b=mXmmAAXWDd5KucDFiZfAUgJisY7bNyIius9akQPBlsZwy1SIN47u7bi0Ny00fi8feqKioQ5r6pim8uxkF2d/3JSfmwgb4JOUY8vCqZGw1C3GIQ3X4f61YhxZICuUF3dSUyYOJXYlIqnJRU8a0MZOoJCF6RnXPkHM8ydIkVlKW6qE+4QwRq4fxp+/UVXdRvLyWblm9HVYP5bmY3NGJXaXUoDhsNFb/OSPEFTYWjR0VvBscthitk3PFf2fcRqwzWdguBsKCCbtZm2GOTUJ5t+CfIvc4Ul/YEZ1uQLeWmlzklS16E48KZFRAtRRXwR9I0Pps0kESvxqsTwdaNHzV/GZGA==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1614723223; bh=nSnUWLqFKDj7l9bM1P39OX0x1yrMMRmmaL3EhCjtJCx=; h=X-Sonic-MF:Date:From:Subject:To:From:Subject; b=rOYTDKaXbjAv4DTWQ7Xtp37OxaOtsXeuLmCgTQRmFIbUvhUurioNr4X5P4ZanOj4+IWNLQg7/azXXFvyOp1D37JAnvj1/SaMRbYRs5nLIvRlZQ4ecSsVsZDzY6HG4dLle+p+5kgJWeGF3DweTTJUhewQJ+KCco7fRNQNzKLRvKUTsWrcN5tMDRARzFOaDtRjRUJ7xoEyXbi8DGeYAtLpMuamDDBXcR03eiKjdHA+PXqlrowJ+3P7L+ydm4AUC+sZ8rYpwwbaFS0P7QmxymFWLonp2QsFJGNjWUAo7bQB9vcVNQQ2D9n16Jo/RNbHG8lSbq+ggQU3suzSurm3CT8T/w==
+X-YMail-OSG: kiwJ1NIVM1nIwCu0XcoAuO0BzwhSgO437LZSUF7P.no3b2g6XUtdD8dOwiY8wkB
+ NxZ6k1U0c5s6nQAZNHnsQDujVap0Ji90jOxdhqDGB5g9A12.c6b32XE9kFmcsGORB9U7xP1CnqHY
+ _57WTOMUY7jpnCZ2MCz8A4gh9CIqpE.8xMOr7cGtuJ_Jmt1qZvoEfc7MdKDAFBfdg3kNpDXIb3o9
+ 13st_.3h.oqeFo7ePsUodU6j1OtdSEu8xkS6Xg4fJtlfOiHRk.4pMRXBZ7vaeKZHw4R60zhLiz9J
+ K495DAaTeUEfI183oOFXAPf.wBybp9rBH1nw5pIqVT8fJ160Un2b63IeVzQsb.RbXg0Kij2u7Kxa
+ _nU8grCaoBjtIWjzKJM2PJ5hqKmVfn14TAbTQOwSro6pomLlGZSAEYdDSt5v_porEk4Q7kuIgEtQ
+ Z9Nrzs34EO0kTi4BGSulr53ahzuAB_9NAGBgn1q8u1_TsgRQMbDbO1x5LCmHhdPzTNKYYf.vr4V6
+ FnXCJPYRJrg85SB1O0874MvguA73OoZqdfTfh4.KZb.IFGjdjJMCbtUaHWpm9yNsPCBzRuFqeBHQ
+ YtJsPU6lo1hTRPHffH_kaP65Fqc34e5d310ejnd6.eej6SMpzeMy2mTy4uZvoTkGKtIVeBr1vKUI
+ iXP2UYdjEKG6uR.pZbNT.xydPcl57LBudbw644Negp94MgKTgTd7uMG7e0wNYQdgIWd.0wPFMgMr
+ g40.d_XX4jizXZP6p7kkg.uHoFP2NM7zLYi5k9EUbpQy_o0BHgPTy5ertlcDF9SrwMUCEYX.4WDc
+ ua_ql6MFz8Hfe3ybOQtoiGrO9l10egzYcfhD_Os.7SnLMlPVL2LjHbidCqz6nU6Ker.q9PRYv8Io
+ WLFvsTOIDN9MAV_nMv90AhOWZwsrVlAm.wwpSCBlK_1oZRBLQCGT1zitl_XRea1cjtPXhisJO10j
+ fZ3iBSDTii.WbO3ac5N7nYL7m6H9LWztP4kPcKIPhs8Z9yKQO6hL5U_wuC2zcP2wNpOIsq5B4Dro
+ s4ye39T0qSH1ObNHHhXrkCE4f7AVKkFxzHETKudBG3fmqc7s52xJM98byyoWaTjdbEU8Vp84rVn0
+ NQQmy_XIFa0KDBzL4PyRdjxO6ckMXLgR3Zsu8bolLZH_ChG84Iaw1_O41MPdu8qAyqRYKr0mw7hN
+ OiPyvJOA5V0gWocwX7q6M8rWc0SHFa6tXPMyWPjTl0VkHukO3viopv5IFfkLaLkK4wzUrk3DcBYy
+ fGmm_ZSc5xuMsJBcwKLcwotujMQOyLWtZtF1WsdhtkgQzS3AnkM2XAwPbdIeZDvlWlDccNQwErMN
+ an_XK3HKn7Ia01jxA39j.JwwmuPuCc99qEQcyPfKScNV.FdxSvs3V.TcOmwJMMsJt55rVrEEI98s
+ cvPAmfYogjxTLuCiOR7zrVy7Pofpkh6W3SmBVXmaqUDQaM0KWrlSExDJakmLEeqCaPGGT9MlqAnL
+ OYqWeptnwlOcZMl8Y1A7d4f9OgHbUiLH7DMPmeXmQ7WD4WOAD2Cru1d7hqjaP4gHrtebPDemqkoM
+ Re41hosA_swxRfYOf3TJiItadXgMySMw5e8eSF62ZIoo5gJTV3gHLpJLRPlOapaLZoiHf4H71ohU
+ gVWAqBarrYM8hJP1brvfFAg30FqeNeiU0TAW5x5yukfAlL.zF2jCRhVTOW_FxXvUxafMbd5iEVEC
+ 6I3roJt74TXTt8Y60Yere.Lv_Tbk1MiOrMWiYRMa_KX5XQ2ajOVrGYvuIOGp.JUYsN0DgvfaNRtV
+ mrVLxWDa5UExj5nFfcZI5_.1.2BNgRRtHsam9CdOlb.yIuJiP4g4rGPCXtRli3_Xa.Yvp0UEPKSa
+ .wxZ8TuNvU3hDkuWRdeP_wCb_Xdy1Ivi6jRSNz3PBc4Ww.JO3zFgXDXYtMoKCtWkE6zuZP4yhkqA
+ M_XrzDOyOfEo6m.LNgsIqNNEAKfyhxVMmadMdmtLGbp2J1O7TUS3MvDbXJAz.GcxM9CVi_vT0qcI
+ uM0nI9FstEyo4JfrW5fjKmIkt0i1yUCv8DyOE0ofawmNdQ5CpLbGEkD_OUT_LHcvktRdlBeAs67E
+ dLjOgX7GZZIpqbBwTu1.Mkt0qLXIDzpECapinf4zqqep_UQrnt3eqvnpyeknK4ab0PNFQhpdq1QU
+ hYAhMXdozJXp.jEA6L18QY8AjBg90zDV5.6u8tEzmDMornWBvmjDbcvlr6HzItNPqlnuAqT7K28B
+ .LOzf3Qnb.FB50gEfww510IWFwvwjg8WvWphGwyAeIk3_9RPGbwdNhQrfhLOE4bC4kXXBiwD4Qzr
+ rQ4fwn.pubC59fYxm95i3zqhInCqfkNS.zGPJ8eDMmcMWw.G5EliVKhS2CNTC.S6oc1pTY2PoLYg
+ MejlGUFHaJN.2dqaH8mZ0CwI3C9mQ1FNXv9QNQF8xIE3117sxFU1613c2TCOLuW3HxGEsLlH6d5F
+ DL8GzSbpDNUYSWuEN.E38YOGnfoZCzzgSnCHGYOw8SlbT.fvoMzHmfi.5wX0uq7awXWygfaUnh9v
+ mWJETy6dMmIpDgX_ZAM6rT_o1souRHP2UtWDrWrbbKBak7z5mLvwBTIchH.cj7PPoBmL.cPJHEDo
+ -
+X-Sonic-MF: <alex_y_xu@yahoo.ca>
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic308.consmr.mail.gq1.yahoo.com with HTTP; Tue, 2 Mar 2021 22:13:43 +0000
+Received: by smtp404.mail.gq1.yahoo.com (VZM Hermes SMTP Server) with ESMTPA ID 4d896f5c720e3fb92b3aad8e7a720f1c;
+          Tue, 02 Mar 2021 22:13:39 +0000 (UTC)
+Date:   Tue, 02 Mar 2021 17:13:35 -0500
+From:   "Alex Xu (Hello71)" <alex_y_xu@yahoo.ca>
+Subject: Re: 5.12-rc1 regression: freezing iou-mgr/wrk failed
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1614646241.av51lk2de4.none.ref@localhost>
+        <1614646241.av51lk2de4.none@localhost>
+        <ad672889-2757-142b-9259-3e0aee6d8078@kernel.dk>
+        <fd148797-d8cb-7597-8612-83ddfafac425@kernel.dk>
+        <8cd026a0-ada6-9ae5-9ea1-a685b482173c@kernel.dk>
+In-Reply-To: <8cd026a0-ada6-9ae5-9ea1-a685b482173c@kernel.dk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Disposition: inline; filename=dm-submit-bio-mq-direct.patch
+Message-Id: <1614722744.btwkumq4s4.none@localhost>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Mailer: WebService/1.1.17828 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo Apache-HttpAsyncClient/4.1.4 (Java/11.0.9.1)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use submit_bio_noacct_mq_direct and pass the returned cookie through the
-device mapper stack. The cookie and queue is stored in the structure
-clone_info.
+I tried 29be7fc03d ("io_uring: ensure that threads freeze on suspend")=20
+and it seems to work OK. The system suspends fine and no errors are=20
+printed to the kernel log.
 
-Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
+I am using Gentoo on the machine in question.
 
----
- drivers/md/dm.c |   42 +++++++++++++++++++++++-------------------
- 1 file changed, 23 insertions(+), 19 deletions(-)
+I didn't test the other patches you supplied. Let me know if there's=20
+anything you would like me to test.
 
-Index: linux-2.6/drivers/md/dm.c
-===================================================================
---- linux-2.6.orig/drivers/md/dm.c	2021-03-02 19:24:13.000000000 +0100
-+++ linux-2.6/drivers/md/dm.c	2021-03-02 19:25:54.000000000 +0100
-@@ -72,6 +72,8 @@ struct clone_info {
- 	struct dm_io *io;
- 	sector_t sector;
- 	unsigned sector_count;
-+	blk_qc_t poll_cookie;
-+	struct request_queue *poll_queue;
- };
- 
- /*
-@@ -1294,14 +1296,13 @@ static noinline void __set_swap_bios_lim
- 	mutex_unlock(&md->swap_bios_lock);
- }
- 
--static blk_qc_t __map_bio(struct dm_target_io *tio)
-+static void __map_bio(struct clone_info *ci, struct dm_target_io *tio)
- {
- 	int r;
- 	sector_t sector;
- 	struct bio *clone = &tio->clone;
- 	struct dm_io *io = tio->io;
- 	struct dm_target *ti = tio->ti;
--	blk_qc_t ret = BLK_QC_T_NONE;
- 
- 	clone->bi_end_io = clone_endio;
- 
-@@ -1328,7 +1329,14 @@ static blk_qc_t __map_bio(struct dm_targ
- 	case DM_MAPIO_REMAPPED:
- 		/* the bio has been remapped so dispatch it */
- 		trace_block_bio_remap(clone, bio_dev(io->orig_bio), sector);
--		ret = submit_bio_noacct(clone);
-+		if (clone->bi_opf & REQ_HIPRI &&
-+		    test_bit(QUEUE_FLAG_POLL, &clone->bi_bdev->bd_disk->queue->queue_flags)) {
-+			ci->poll_queue = clone->bi_bdev->bd_disk->queue;
-+			ci->poll_cookie = submit_bio_noacct_mq_direct(clone);
-+		} else {
-+			ci->poll_cookie = BLK_QC_T_NONE;
-+			submit_bio_noacct(clone);
-+		}
- 		break;
- 	case DM_MAPIO_KILL:
- 		if (unlikely(swap_bios_limit(ti, clone))) {
-@@ -1350,8 +1358,6 @@ static blk_qc_t __map_bio(struct dm_targ
- 		DMWARN("unimplemented target map return value: %d", r);
- 		BUG();
- 	}
--
--	return ret;
- }
- 
- static void bio_setup_sector(struct bio *bio, sector_t sector, unsigned len)
-@@ -1438,8 +1444,8 @@ static void alloc_multiple_bios(struct b
- 	}
- }
- 
--static blk_qc_t __clone_and_map_simple_bio(struct clone_info *ci,
--					   struct dm_target_io *tio, unsigned *len)
-+static void __clone_and_map_simple_bio(struct clone_info *ci,
-+				       struct dm_target_io *tio, unsigned *len)
- {
- 	struct bio *clone = &tio->clone;
- 
-@@ -1449,7 +1455,7 @@ static blk_qc_t __clone_and_map_simple_b
- 	if (len)
- 		bio_setup_sector(clone, ci->sector, *len);
- 
--	return __map_bio(tio);
-+	__map_bio(ci, tio);
- }
- 
- static void __send_duplicate_bios(struct clone_info *ci, struct dm_target *ti,
-@@ -1463,7 +1469,7 @@ static void __send_duplicate_bios(struct
- 
- 	while ((bio = bio_list_pop(&blist))) {
- 		tio = container_of(bio, struct dm_target_io, clone);
--		(void) __clone_and_map_simple_bio(ci, tio, len);
-+		__clone_and_map_simple_bio(ci, tio, len);
- 	}
- }
- 
-@@ -1507,7 +1513,7 @@ static int __clone_and_map_data_bio(stru
- 		free_tio(tio);
- 		return r;
- 	}
--	(void) __map_bio(tio);
-+	__map_bio(ci, tio);
- 
- 	return 0;
- }
-@@ -1614,6 +1620,7 @@ static void init_clone_info(struct clone
- 	ci->map = map;
- 	ci->io = alloc_io(md, bio);
- 	ci->sector = bio->bi_iter.bi_sector;
-+	ci->poll_cookie = BLK_QC_T_NONE;
- }
- 
- #define __dm_part_stat_sub(part, field, subnd)	\
-@@ -1622,11 +1629,10 @@ static void init_clone_info(struct clone
- /*
-  * Entry point to split a bio into clones and submit them to the targets.
-  */
--static blk_qc_t __split_and_process_bio(struct mapped_device *md,
--					struct dm_table *map, struct bio *bio)
-+static void __split_and_process_bio(struct mapped_device *md,
-+				    struct dm_table *map, struct bio *bio)
- {
- 	struct clone_info ci;
--	blk_qc_t ret = BLK_QC_T_NONE;
- 	int error = 0;
- 
- 	init_clone_info(&ci, md, map, bio);
-@@ -1643,7 +1649,7 @@ static blk_qc_t __split_and_process_bio(
- 		ci.sector_count = bio_sectors(bio);
- 		while (ci.sector_count && !error) {
- 			error = __split_and_process_non_flush(&ci);
--			if (ci.sector_count && !error) {
-+			if (ci.sector_count && !error && ci.poll_cookie == BLK_QC_T_NONE) {
- 				/*
- 				 * Remainder must be passed to submit_bio_noacct()
- 				 * so that it gets handled *after* bios already submitted
-@@ -1670,7 +1676,7 @@ static blk_qc_t __split_and_process_bio(
- 
- 				bio_chain(b, bio);
- 				trace_block_split(b, bio->bi_iter.bi_sector);
--				ret = submit_bio_noacct(bio);
-+				submit_bio_noacct(bio);
- 				break;
- 			}
- 		}
-@@ -1678,13 +1684,11 @@ static blk_qc_t __split_and_process_bio(
- 
- 	/* drop the extra reference count */
- 	dec_pending(ci.io, errno_to_blk_status(error));
--	return ret;
- }
- 
- static blk_qc_t dm_submit_bio(struct bio *bio)
- {
- 	struct mapped_device *md = bio->bi_bdev->bd_disk->private_data;
--	blk_qc_t ret = BLK_QC_T_NONE;
- 	int srcu_idx;
- 	struct dm_table *map;
- 
-@@ -1714,10 +1718,10 @@ static blk_qc_t dm_submit_bio(struct bio
- 	if (is_abnormal_io(bio))
- 		blk_queue_split(&bio);
- 
--	ret = __split_and_process_bio(md, map, bio);
-+	__split_and_process_bio(md, map, bio);
- out:
- 	dm_put_live_table(md, srcu_idx);
--	return ret;
-+	return BLK_QC_T_NONE;
- }
- 
- /*-----------------------------------------------------------------
-
+Thanks,
+Alex.
