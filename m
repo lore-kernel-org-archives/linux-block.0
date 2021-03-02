@@ -2,76 +2,69 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53696C4332E
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71281C43332
 	for <linux-block@archiver.kernel.org>; Tue,  2 Mar 2021 23:53:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 334B164F46
+	by mail.kernel.org (Postfix) with ESMTP id 4CC3764F40
 	for <linux-block@archiver.kernel.org>; Tue,  2 Mar 2021 23:53:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231607AbhCBXrw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Mar 2021 18:47:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57324 "EHLO
+        id S231628AbhCBXry (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Mar 2021 18:47:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58460 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350794AbhCBWcm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Mar 2021 17:32:42 -0500
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C4D8C06178A
-        for <linux-block@vger.kernel.org>; Tue,  2 Mar 2021 14:31:36 -0800 (PST)
-Received: by mail-pf1-x433.google.com with SMTP id 201so14791392pfw.5
-        for <linux-block@vger.kernel.org>; Tue, 02 Mar 2021 14:31:36 -0800 (PST)
+        with ESMTP id S1351277AbhCBWic (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Mar 2021 17:38:32 -0500
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CA50C061221
+        for <linux-block@vger.kernel.org>; Tue,  2 Mar 2021 14:36:23 -0800 (PST)
+Received: by mail-pj1-x1034.google.com with SMTP id i4-20020a17090a7184b02900bfb60fbc6bso1882920pjk.0
+        for <linux-block@vger.kernel.org>; Tue, 02 Mar 2021 14:36:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=dDOaCYCI2rpb4LQP8rVQ+Pz//+9Nqe8cELMz0UAeG/0=;
-        b=OydL0mHpz8KkNLNjKg7Zcw4wTSbA9kc6aXnfOAX70XgHQvEPOG40YrS25pKI1DVtr4
-         UbRHduhr4FhAqoaiMb4z9azXoFNMnr52gKTbbsfpq9jSlG917vdFyj5Q+q0f/8T+KXZb
-         OCNZ7aUa/jjafQiiLYbD09B95mPvJj1tRyJj9g5PbTtv7mlMm6WUzS4hB4n4hPJEK9HB
-         zMNSgvVxZ29tI8u6blcJAROHOHfV2OgtkuUoNfWOsQ11ctzgWmoPA6y8Zkfbru9IdXoP
-         uqBEhrouei5ayHodTThwjOWrH9I/l+Pn2rar5uhS/egj4mI8ckHarMn+A9zzrh2WY4H6
-         zQag==
+        h=to:cc:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=Mir62bOXnIH92T0sLRTFyT91DoW8sHfVsY1HtQPZomc=;
+        b=Zb6RtjXU08p1l0ippNC0Ipnm/Aq/CLUPktuCCBksFhco91hlwTCjfCErH28oh0E9bx
+         93a6PrrHx/fiC+0EvaWHLF26uJvYSnq46dQnlW5GShf2LZI+WgpYvwNLat/YJ6pQSTs4
+         hMJcGgKNhO971/gKMJ7xNCBsgNh6exUv9CMR4RGp8U59lGYH8KprZk8Wv3qdiva7ZpNo
+         B4/N1QWyMlJy5n6T563L5T7VhOKniyOhihsU8MnsbE+yd4KwYpnqqt2Lko/AEUdAtY3p
+         wAvZibidLSVZxfllvunsAQb00Bn9p4njY/gc+l2xZQqtFq0eJsQsiKI8d0MAaUf+k5aF
+         qkWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=dDOaCYCI2rpb4LQP8rVQ+Pz//+9Nqe8cELMz0UAeG/0=;
-        b=fldqM+xI8Met4JfC1sGNwwdQlR15QayBh2u6fwxlRxe8zV8pWcyDDWnr7/A6AEWONK
-         C8PDw3HoGnb7QF1QAhB/3mJGsshAd7hWbdd0RhWN93eq3JS3FfXCEkWtbrvjgF/HQ6if
-         0nLJcrnd6zJN2Atp4k8F5WTvrqjFFAhIjZH2fxQct+MtWY2cl5NsPKawBE0PMXqajwp7
-         WzvGGDsUxSCZeacHbndWaXcS/qHf5GAQ5hUml6xkrmvS5YfcTCqUHER2A/WXcAPTNA64
-         ByUEDURaiqwzGP+Fs1XYGrOBi4ZsfnJCozAiVAunooDZ8HI26h7vX8DDiYYy0ZJtps73
-         ofOQ==
-X-Gm-Message-State: AOAM531LAJSVb+Z9NTWuS9HgvhNI0diMUzQ6QqdTg+Y6cpOkYnOJvRRP
-        eWMCC9MOIr6EMznfLYPDuaUELw==
-X-Google-Smtp-Source: ABdhPJynei85DD/12aeywxJt2eZTx14tQ/eEgKpARUyMiW6zvkxoyIapV6e2KTjaHjLzyHbHckRm5Q==
-X-Received: by 2002:aa7:9281:0:b029:1ec:48b2:811c with SMTP id j1-20020aa792810000b02901ec48b2811cmr5109495pfa.18.1614724296196;
-        Tue, 02 Mar 2021 14:31:36 -0800 (PST)
+        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=Mir62bOXnIH92T0sLRTFyT91DoW8sHfVsY1HtQPZomc=;
+        b=RNcHxaQSR21CKiSIe70gnZXlf8LocUNjOYcjOPSGIDFEkyCYWzGQW8BUKZd8b8j1IS
+         iPynj5Nxs5imvBh0OB4UlNnhLmUrizQM66pmYXOrmfuVxj1LIvk1OPHy0wlF1rbBGD8w
+         zeSUOGTNYcjYGV5cUE/3W8FUDGne0i2oUCg2N0qCQ5vlcrqHgChSr2kK4yYw6qZ2yxWe
+         Mc5DB267LZDaS4gYA7sDZkun4zU0Fmg4ChtcMtEpwVtP6OZrITixuXgSarD49/ma/s8F
+         5If5kDYdw9sPXhq0cDx+JmYPfC1uf8HPhx1xfVhp8ufBEzh4URsJybpUsaM4nD+KbeUU
+         PB7Q==
+X-Gm-Message-State: AOAM531rNvIUkxEJDOM/uQVIEIeCLwWY3gII8byZjvOHKjxveMtT5iN6
+        c0FnNk29+Lkw2Oh1GWF6el/ilg==
+X-Google-Smtp-Source: ABdhPJw41pdUbU2zAiLhZneNiwheggwVDMC2i4BRcFNz6QP8YyiqjsTzy3fZEmbcUnULumBT6/Pf8A==
+X-Received: by 2002:a17:902:e5c5:b029:e3:cfac:db3f with SMTP id u5-20020a170902e5c5b02900e3cfacdb3fmr5458845plf.11.1614724582889;
+        Tue, 02 Mar 2021 14:36:22 -0800 (PST)
 Received: from [192.168.1.134] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id 68sm8831655pfd.75.2021.03.02.14.31.35
+        by smtp.gmail.com with ESMTPSA id d11sm480663pfd.43.2021.03.02.14.36.21
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Mar 2021 14:31:35 -0800 (PST)
-Subject: Re: 5.12-rc1 regression: freezing iou-mgr/wrk failed
-To:     "Alex Xu (Hello71)" <alex_y_xu@yahoo.ca>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <1614646241.av51lk2de4.none.ref@localhost>
- <1614646241.av51lk2de4.none@localhost>
- <ad672889-2757-142b-9259-3e0aee6d8078@kernel.dk>
- <fd148797-d8cb-7597-8612-83ddfafac425@kernel.dk>
- <8cd026a0-ada6-9ae5-9ea1-a685b482173c@kernel.dk>
- <1614722744.btwkumq4s4.none@localhost>
+        Tue, 02 Mar 2021 14:36:22 -0800 (PST)
+To:     Linux Memory Management List <linux-mm@kvack.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Cc:     Christoph Hellwig <hch@lst.de>, akpm@linux-foundation.org
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <bb6fc05c-f2b0-d7ad-489b-2db23e2abe52@kernel.dk>
-Date:   Tue, 2 Mar 2021 15:31:33 -0700
+Subject: [PATCH] swap: fix swapfile read/write offset
+Message-ID: <6f9da9c6-c6c5-08fe-95ea-940954456c40@kernel.dk>
+Date:   Tue, 2 Mar 2021 15:36:19 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <1614722744.btwkumq4s4.none@localhost>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -79,17 +72,78 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/2/21 3:13 PM, Alex Xu (Hello71) wrote:
-> I tried 29be7fc03d ("io_uring: ensure that threads freeze on suspend") 
-> and it seems to work OK. The system suspends fine and no errors are 
-> printed to the kernel log.
-> 
-> I am using Gentoo on the machine in question.
-> 
-> I didn't test the other patches you supplied. Let me know if there's 
-> anything you would like me to test.
+We're not factoring in the start of the file for where to write and
+read the swapfile, which leads to very unfortunate side effects of
+writing where we should not be...
 
-OK great, thanks. I'll add your reported/tested-by to the patch.
+Fixes: 48d15436fde6 ("mm: remove get_swap_bio")
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+
+---
+
+diff --git a/include/linux/swap.h b/include/linux/swap.h
+index 32f665b1ee85..4cc6ec3bf0ab 100644
+--- a/include/linux/swap.h
++++ b/include/linux/swap.h
+@@ -485,6 +485,7 @@ struct backing_dev_info;
+ extern int init_swap_address_space(unsigned int type, unsigned long nr_pages);
+ extern void exit_swap_address_space(unsigned int type);
+ extern struct swap_info_struct *get_swap_device(swp_entry_t entry);
++sector_t swap_page_sector(struct page *page);
+ 
+ static inline void put_swap_device(struct swap_info_struct *si)
+ {
+diff --git a/mm/page_io.c b/mm/page_io.c
+index 485fa5cca4a2..c493ce9ebcf5 100644
+--- a/mm/page_io.c
++++ b/mm/page_io.c
+@@ -254,11 +254,6 @@ int swap_writepage(struct page *page, struct writeback_control *wbc)
+ 	return ret;
+ }
+ 
+-static sector_t swap_page_sector(struct page *page)
+-{
+-	return (sector_t)__page_file_index(page) << (PAGE_SHIFT - 9);
+-}
+-
+ static inline void count_swpout_vm_event(struct page *page)
+ {
+ #ifdef CONFIG_TRANSPARENT_HUGEPAGE
+diff --git a/mm/swapfile.c b/mm/swapfile.c
+index f039745989d2..7a8636c6c9ff 100644
+--- a/mm/swapfile.c
++++ b/mm/swapfile.c
+@@ -199,8 +199,8 @@ static int discard_swap(struct swap_info_struct *si)
+ 	return err;		/* That will often be -EOPNOTSUPP */
+ }
+ 
+-static struct swap_extent *
+-offset_to_swap_extent(struct swap_info_struct *sis, unsigned long offset)
++struct swap_extent *offset_to_swap_extent(struct swap_info_struct *sis,
++					  unsigned long offset)
+ {
+ 	struct swap_extent *se;
+ 	struct rb_node *rb;
+@@ -1858,6 +1858,19 @@ sector_t swapdev_block(int type, pgoff_t offset)
+ 	return se->start_block + (offset - se->start_page);
+ }
+ 
++sector_t swap_page_sector(struct page *page)
++{
++	struct swap_info_struct *sis = page_swap_info(page);
++	struct swap_extent *se;
++	sector_t sector;
++	pgoff_t offset;
++
++	offset = __page_file_index(page);
++	se = offset_to_swap_extent(sis, offset);
++	sector = se->start_block + (offset - se->start_page);
++	return sector << (PAGE_SHIFT - 9);
++}
++
+ /*
+  * Return either the total number of swap pages of given type, or the number
+  * of free pages of that type (depending on @free)
 
 -- 
 Jens Axboe
