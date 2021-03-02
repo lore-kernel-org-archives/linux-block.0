@@ -2,77 +2,141 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-2.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27021C433E6
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2062CC433DB
 	for <linux-block@archiver.kernel.org>; Tue,  2 Mar 2021 23:51:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E268E64F1E
+	by mail.kernel.org (Postfix) with ESMTP id C584264F18
 	for <linux-block@archiver.kernel.org>; Tue,  2 Mar 2021 23:51:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230433AbhCBXiK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Mar 2021 18:38:10 -0500
-Received: from mail-pg1-f171.google.com ([209.85.215.171]:46775 "EHLO
-        mail-pg1-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233254AbhCBEAM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 1 Mar 2021 23:00:12 -0500
-Received: by mail-pg1-f171.google.com with SMTP id h4so12961610pgf.13;
-        Mon, 01 Mar 2021 19:59:49 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=lIWzDiqoJEqo1Bg1QhNKMK2MRYP+ewMQz28y/3y4MQU=;
-        b=hGEDou1ZolrwXnKNpmVmqOl9pNeY8LRJLCj3O6nKnytzrzW+8ynH8JnTfabm+0AkxL
-         vlGlg1klsMMEF97aeGOXrwLmbUbvcD43Jlcu3NdhFJO+A3KSQf1eWCYdj/OXv1zET4ON
-         C+EfQxenhJh4KVkkCUDyTLCNIh39BlaIsqGsjxgWVbzsc2pDIqPFsR8wcNuR/SvJOcVj
-         ZhW98tFOvhftCSh9MSokP9HQ+J3FUqPeo8xeG3QqG6jl1QNxYjXgoxoC2C/ASEYIOdFh
-         rYVZY+SdntkUloEFRJHVZBrwg2Jc3Zsf3mex+G9BgFB43mDCFt1EZ8s3RbMLL1Y2YpEw
-         liHg==
-X-Gm-Message-State: AOAM531nX/ivzXMRxqMlJDSp0i+OfiUttOnYTvn1tItx+5cgOPdBgkX/
-        CD8KKPYDDWv5Ys1gZ2owP/4OkpolfQI=
-X-Google-Smtp-Source: ABdhPJx1DOmeowL8c3tVPEhpocfYiDjRETOJnhQOgDjvcxCxsnWMnsyh4jpCyy17C9lLERVoGN8axA==
-X-Received: by 2002:a63:5962:: with SMTP id j34mr16269769pgm.331.1614657563407;
-        Mon, 01 Mar 2021 19:59:23 -0800 (PST)
-Received: from ?IPv6:2601:647:4000:d7:c6e8:5c02:da81:d405? ([2601:647:4000:d7:c6e8:5c02:da81:d405])
-        by smtp.gmail.com with ESMTPSA id r202sm20492015pfc.10.2021.03.01.19.59.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 01 Mar 2021 19:59:22 -0800 (PST)
-Subject: Re: [bug report]null pointer at scsi_mq_exit_request+0x14 with
- blktests srp/015
-To:     Yi Zhang <yi.zhang@redhat.com>,
-        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>
-References: <418155251.14154941.1614505772200.JavaMail.zimbra@redhat.com>
- <BYAPR04MB4965FDA9847096508E35FFB9869B9@BYAPR04MB4965.namprd04.prod.outlook.com>
- <8b1fc0cd-196a-ad78-71c6-a7515ffbb4ad@redhat.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <4d188158-3f18-c801-02ca-97350eb10c1b@acm.org>
-Date:   Mon, 1 Mar 2021 19:59:21 -0800
+        id S230414AbhCBXhW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Mar 2021 18:37:22 -0500
+Received: from mout.gmx.net ([212.227.15.19]:45213 "EHLO mout.gmx.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S240706AbhCBCFx (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 1 Mar 2021 21:05:53 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
+        s=badeba3b8450; t=1614650635;
+        bh=vuF4asm5oftnr0ailpx2QxWzLruw3F+JLEa0u6Q/iz0=;
+        h=X-UI-Sender-Class:Subject:To:Cc:References:From:Date:In-Reply-To;
+        b=J3vMVIkQhE2CS6WsVY2LesmwrUrxzKoNhn8dzZ4QG+mS5iIG8zDVnuHmZPfcCJQoR
+         2invWuX8AcP/UjqswIVL/oAsvEA0/ggmTGRm8HcP34r6EMh+XSyQAXM9yZUFyjhvPr
+         50E3fxLkjnVu+Z14J2H3sDlerd8QVYiMueaQDctw=
+X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
+Received: from [10.10.213.91] ([103.52.188.137]) by mail.gmx.net (mrgmx005
+ [212.227.17.184]) with ESMTPSA (Nemesis) id 1Mel3n-1loaa73Hcb-00anph; Tue, 02
+ Mar 2021 03:03:55 +0100
+Subject: Re: Large latency with bcache for Ceph OSD
+To:     Coly Li <colyli@suse.de>
+Cc:     linux-block@vger.kernel.org, axboe@kernel.dk,
+        linux-bcache@vger.kernel.org
+References: <3f3e20a3-c165-1de1-7fdd-f0bd4da598fe@gmx.com>
+ <632258f7-b138-3fba-456b-9da37c1de710@gmx.com>
+ <5867daf1-0960-39aa-1843-1a76c1e9a28d@suse.de>
+ <07bcb6c8-21e1-11de-d1f0-ffd417bd36ff@gmx.com>
+ <cfe2746f-18a7-a768-ea72-901793a3133e@gmx.com>
+ <96daa0bf-c8e1-a334-14cb-2d260aed5115@suse.de>
+ <b808dde3-cb58-907b-4df0-e0eb2938b51e@gmx.com>
+ <04770825-b1d2-8ec0-2345-77d49d99631a@suse.de>
+From:   "Norman.Kern" <norman.kern@gmx.com>
+Message-ID: <8eb6739c-090d-f925-333e-df34a6d05101@gmx.com>
+Date:   Tue, 2 Mar 2021 10:03:50 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.1
+ Thunderbird/78.5.0
 MIME-Version: 1.0
-In-Reply-To: <8b1fc0cd-196a-ad78-71c6-a7515ffbb4ad@redhat.com>
+In-Reply-To: <04770825-b1d2-8ec0-2345-77d49d99631a@suse.de>
 Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Provags-ID: V03:K1:zcUrsm3jMU5IwCt0k0hA8Cjb5TdcuCwoIFrRQMq33on95yaWdf1
+ FKjkrI5Z8xufqT1DiDc2eUtRB9HpekTxQu+vjV46gw31LL7UrnqSoS5xJB/k3MMOZ8zJCmP
+ JsgiGCaURW6jvyMWgRT/zL4hlGCW/ET6K59LpWPY0QE3C1tHtGeg6CCll61fjZKVKHGtBBn
+ A9BV+t47sie7WBTA9z3UA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:Mv90uQif5z0=:mkPZnt/wAzgCji6VgOJveB
+ 1f4EKQWxRHBiHrPiJxSu/+LY9k9C7xeeY3CRh69qmwh/t9NjjFjJm63vKx42nej7TjZN9GJh7
+ OjeuL0QxP7YUDb7/uuatHAJFNRE+Qa09O/szoUK99lGojTqxSxZO4UMdpc8Fv8GaDxGLrymhk
+ rENMJWZ4ZHom2LibiDweuPgZ9tBY8NfOg6pza4DxSVw5W/p2++yYwUtH/9AKkJIcBBT8iR6gR
+ Up0dVsWBxMHtKqQp3LhgHXL7DZMigxJkW9fRgOAqsjjfTRhXjOKxzdUHMz368Pgd5ZBn5dKvX
+ p7o8Ltb0h6X/Kp6GAXBNbjy58gfwBEQjsxsJZP3f862ttw+XrWwoR+swBknlPKpa43kMtwBwu
+ St4YJAGElaG/D2345KpU5qqPHu2V19AkHtpy2gdMEKYQaKg6FxInZY8HjRaVKhYr+DeVu8LV1
+ QyYb+OyLOoKL1s+Q9oLFzmqeCOxJkBcLv3P6r9y6rDptMLxCfkeXKK45EkJnaT/c4rMCVLmKp
+ NeGdihft1aDpLCfnq557u/eEJHRIu9gBNbs7epPjK5QHvOCgheY+RfeHja0iepkogG3n5BfxY
+ rIgy9CjsgLgqHH/3I2adhWPGyRfKQFaAz9m4rhQLxVpZxqb5GfD+lN63lDwpH3pFfq/6BLu9d
+ QzqXjCfkCgD/rx1t7vwwRJ/GU05wveQ6gxMiPwtVIOMBrGqOP+T4F8PMw39+i4hRnMoFJhDFo
+ zXXt+lfdZleTUXz1UfzFkxFEZCpRc6XFBUei1jiMveVeHnlqhGgcltC1m/UCaQWLqES74qZf9
+ X8eaBqPK5WE8Mpu5AvIIOAe3Y/59oC6BKg5B1D8BUoiOgcjN9wa4H6TCuT0sKkGOmfbFgshAO
+ nFI8b+r4uqhXmppGpGVg==
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/1/21 7:36 AM, Yi Zhang wrote:
-> This issue cannot be reproduced on latest 5.12.0-rc1.
-> 
-> Please ignore this report, sorry for the noise.
 
-How about rerunning the same test against v5.11.2, the latest v5.11
-stable kernel? I think your report means that v5.11 can be improved...
+On 2021/2/26 =E4=B8=8B=E5=8D=885:54, Coly Li wrote:
+> On 2/26/21 4:57 PM, Norman.Kern wrote:
+> [snipped]
+>>> You may try to trigger a gc by writing to
+>>> sys/fs/bcache/<cache-set-uuid>/internal/trigger_gc
+>>>
+>> When all cache had written back, I triggered gc, it recalled.
+>>
+>> root@WXS0106:~# cat /sys/block/bcache0/bcache/cache/cache_available_per=
+cent
+>> 30
+>>
+>> root@WXS0106:~# echo 1 > /sys/block/bcache0/bcache/cache/internal/trigg=
+er_gc
+>> root@WXS0106:~# cat /sys/block/bcache0/bcache/cache/cache_available_per=
+cent
+>> 97
+>>
+>> Why must I trigger gc manually? Is not a default action of bcache-gc th=
+read? And I found it can only work when all dirty data written back.
+>>
+> 1, GC is automatically triggered after some mount of data consumed. I
+> guess it is just not about time in your situation.
+>
+> 2, Because the gc will shrink all cached clean data, which is very
+> unfriendly for read-intend workload. Therefore gc_after_writeback is
+> defaulted as 0, when this sysfs file content set to 1, a gc will trigger
+> after the writeback accomplished.
 
-Thanks,
+I made a test again and get more infomation:
 
-Bart.
+root@WXS0089:~# cat /sys/block/bcache0/bcache/dirty_data
+0.0k
+root@WXS0089:~# lsblk /dev/sda
+NAME=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 MAJ:MIN RM=C2=A0=C2=A0 SIZE RO TYPE MOU=
+NTPOINT
+sda=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 8:0=C2=A0=C2=A0=C2=A0 =
+0 447.1G=C2=A0 0 disk
+`-bcache0 252:0=C2=A0=C2=A0=C2=A0 0=C2=A0 10.9T=C2=A0 0 disk
+root@WXS0089:~# cat /sys/block/sda/bcache/priority_stats
+Unused:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 1%
+Clean:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 29%
+Dirty:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 70%
+Metadata:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0%
+Average:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 49
+Sectors per Q:=C2=A0 29184768
+Quantiles:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 [1 2 3 5 6 8 9 11 13 14 16 19 21 =
+23 26 29 32 36 39 43 48 53 59 65 73 83 94 109 129 156 203]
+root@WXS0089:~# cat /sys/fs/bcache/066319e1-8680-4b5b-adb8-49596319154b/in=
+ternal/gc_after_writeback
+1
+You have new mail in /var/mail/root
+root@WXS0089:~# cat /sys/fs/bcache/066319e1-8680-4b5b-adb8-49596319154b/ca=
+che_available_percent
+28
+
+I read the source codes and found if cache_available_percent > 50, it shou=
+ld wakeup gc while doing writeback, but it seemed not work right.
+
+>
+> Coly Li
+>
+>
+>
+>
