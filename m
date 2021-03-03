@@ -2,69 +2,45 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71281C43332
-	for <linux-block@archiver.kernel.org>; Tue,  2 Mar 2021 23:53:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0918C43381
+	for <linux-block@archiver.kernel.org>; Wed,  3 Mar 2021 16:35:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4CC3764F40
-	for <linux-block@archiver.kernel.org>; Tue,  2 Mar 2021 23:53:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9F1C964E6F
+	for <linux-block@archiver.kernel.org>; Wed,  3 Mar 2021 16:35:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231628AbhCBXry (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Mar 2021 18:47:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58460 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351277AbhCBWic (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Mar 2021 17:38:32 -0500
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CA50C061221
-        for <linux-block@vger.kernel.org>; Tue,  2 Mar 2021 14:36:23 -0800 (PST)
-Received: by mail-pj1-x1034.google.com with SMTP id i4-20020a17090a7184b02900bfb60fbc6bso1882920pjk.0
-        for <linux-block@vger.kernel.org>; Tue, 02 Mar 2021 14:36:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=to:cc:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=Mir62bOXnIH92T0sLRTFyT91DoW8sHfVsY1HtQPZomc=;
-        b=Zb6RtjXU08p1l0ippNC0Ipnm/Aq/CLUPktuCCBksFhco91hlwTCjfCErH28oh0E9bx
-         93a6PrrHx/fiC+0EvaWHLF26uJvYSnq46dQnlW5GShf2LZI+WgpYvwNLat/YJ6pQSTs4
-         hMJcGgKNhO971/gKMJ7xNCBsgNh6exUv9CMR4RGp8U59lGYH8KprZk8Wv3qdiva7ZpNo
-         B4/N1QWyMlJy5n6T563L5T7VhOKniyOhihsU8MnsbE+yd4KwYpnqqt2Lko/AEUdAtY3p
-         wAvZibidLSVZxfllvunsAQb00Bn9p4njY/gc+l2xZQqtFq0eJsQsiKI8d0MAaUf+k5aF
-         qkWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=Mir62bOXnIH92T0sLRTFyT91DoW8sHfVsY1HtQPZomc=;
-        b=RNcHxaQSR21CKiSIe70gnZXlf8LocUNjOYcjOPSGIDFEkyCYWzGQW8BUKZd8b8j1IS
-         iPynj5Nxs5imvBh0OB4UlNnhLmUrizQM66pmYXOrmfuVxj1LIvk1OPHy0wlF1rbBGD8w
-         zeSUOGTNYcjYGV5cUE/3W8FUDGne0i2oUCg2N0qCQ5vlcrqHgChSr2kK4yYw6qZ2yxWe
-         Mc5DB267LZDaS4gYA7sDZkun4zU0Fmg4ChtcMtEpwVtP6OZrITixuXgSarD49/ma/s8F
-         5If5kDYdw9sPXhq0cDx+JmYPfC1uf8HPhx1xfVhp8ufBEzh4URsJybpUsaM4nD+KbeUU
-         PB7Q==
-X-Gm-Message-State: AOAM531rNvIUkxEJDOM/uQVIEIeCLwWY3gII8byZjvOHKjxveMtT5iN6
-        c0FnNk29+Lkw2Oh1GWF6el/ilg==
-X-Google-Smtp-Source: ABdhPJw41pdUbU2zAiLhZneNiwheggwVDMC2i4BRcFNz6QP8YyiqjsTzy3fZEmbcUnULumBT6/Pf8A==
-X-Received: by 2002:a17:902:e5c5:b029:e3:cfac:db3f with SMTP id u5-20020a170902e5c5b02900e3cfacdb3fmr5458845plf.11.1614724582889;
-        Tue, 02 Mar 2021 14:36:22 -0800 (PST)
-Received: from [192.168.1.134] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id d11sm480663pfd.43.2021.03.02.14.36.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Mar 2021 14:36:22 -0800 (PST)
-To:     Linux Memory Management List <linux-mm@kvack.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Cc:     Christoph Hellwig <hch@lst.de>, akpm@linux-foundation.org
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH] swap: fix swapfile read/write offset
-Message-ID: <6f9da9c6-c6c5-08fe-95ea-940954456c40@kernel.dk>
-Date:   Tue, 2 Mar 2021 15:36:19 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S233004AbhCCQbv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 Mar 2021 11:31:51 -0500
+Received: from out30-57.freemail.mail.aliyun.com ([115.124.30.57]:60648 "EHLO
+        out30-57.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S239831AbhCCB5x (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 2 Mar 2021 20:57:53 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04420;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0UQ9w27U_1614736537;
+Received: from admindeMacBook-Pro-2.local(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0UQ9w27U_1614736537)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Wed, 03 Mar 2021 09:55:38 +0800
+Subject: Re: [dm-devel] [PATCH v3 11/11] dm: fastpath of bio-based polling
+To:     Mikulas Patocka <mpatocka@redhat.com>
+Cc:     axboe@kernel.dk, snitzer@redhat.com, caspar@linux.alibaba.com,
+        io-uring@vger.kernel.org, linux-block@vger.kernel.org,
+        joseph.qi@linux.alibaba.com, dm-devel@redhat.com, hch@lst.de
+References: <20210208085243.82367-1-jefflexu@linux.alibaba.com>
+ <20210208085243.82367-12-jefflexu@linux.alibaba.com>
+ <alpine.LRH.2.02.2102191351200.10545@file01.intranet.prod.int.rdu2.redhat.com>
+ <af9223b9-8960-1ed4-799a-bcd56299c587@linux.alibaba.com>
+ <alpine.LRH.2.02.2103021353490.9353@file01.intranet.prod.int.rdu2.redhat.com>
+From:   JeffleXu <jefflexu@linux.alibaba.com>
+Message-ID: <3ce93e18-190a-fb63-3efa-9d0d7119920c@linux.alibaba.com>
+Date:   Wed, 3 Mar 2021 09:55:37 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.7.0
 MIME-Version: 1.0
+In-Reply-To: <alpine.LRH.2.02.2103021353490.9353@file01.intranet.prod.int.rdu2.redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -72,79 +48,70 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We're not factoring in the start of the file for where to write and
-read the swapfile, which leads to very unfortunate side effects of
-writing where we should not be...
 
-Fixes: 48d15436fde6 ("mm: remove get_swap_bio")
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
 
----
+On 3/3/21 3:03 AM, Mikulas Patocka wrote:
+> 
+> 
+> On Fri, 26 Feb 2021, JeffleXu wrote:
+> 
+>>
+>>
+>> On 2/20/21 3:38 AM, Mikulas Patocka wrote:
+>>>
+>>>
+>>> On Mon, 8 Feb 2021, Jeffle Xu wrote:
+>>>
+>>>> Offer one fastpath of bio-based polling when bio submitted to dm device
+>>>> is not split.
+>>>>
+>>>> In this case, there will be only one bio submitted to only one polling
+>>>> hw queue of one underlying mq device, and thus we don't need to track
+>>>> all split bios or iterate through all polling hw queues. The pointer to
+>>>> the polling hw queue the bio submitted to is returned here as the
+>>>> returned cookie.
+>>>
+>>> This doesn't seem safe - note that between submit_bio() and blk_poll(), no 
+>>> locks are held - so the device mapper device may be reconfigured 
+>>> arbitrarily. When you call blk_poll() with a pointer returned by 
+>>> submit_bio(), the pointer may point to a stale address.
+>>>
+>>
+>> Thanks for the feedback. Indeed maybe it's not a good idea to directly
+>> return a 'struct blk_mq_hw_ctx *' pointer as the returned cookie.
+>>
+>> Currently I have no idea to fix it, orz... The
+>> blk_get_queue()/blk_put_queue() tricks may not work in this case.
+>> Because the returned cookie may not be used at all. Before calling
+>> blk_poll(), the polling routine may find that the corresponding IO has
+>> already completed, and thus won't call blk_poll(), in which case we have
+>> no place to put the refcount.
+>>
+>> But I really don't want to drop this optimization, since this
+>> optimization is quite intuitive when dm device maps to a lot of
+>> underlying devices. Though this optimization doesn't actually achieve
+>> reasonable performance gain in my test, maybe because there are at most
+>> seven nvme devices in my test machine.
+>>
+>> Any thoughts?
+>>
+>> Thanks,
+>> Jeffle
+> 
+> Hi
+> 
+> I reworked device mapper polling, so that we poll in the function 
+> __split_and_process_bio. The pointer to a queue and the polling cookie is 
+> passed only inside device mapper code, it never leaves it.
+> 
+> I'll send you my patches - try them and tell me how does it perform 
+> compared to your patchset.
+> 
 
-diff --git a/include/linux/swap.h b/include/linux/swap.h
-index 32f665b1ee85..4cc6ec3bf0ab 100644
---- a/include/linux/swap.h
-+++ b/include/linux/swap.h
-@@ -485,6 +485,7 @@ struct backing_dev_info;
- extern int init_swap_address_space(unsigned int type, unsigned long nr_pages);
- extern void exit_swap_address_space(unsigned int type);
- extern struct swap_info_struct *get_swap_device(swp_entry_t entry);
-+sector_t swap_page_sector(struct page *page);
- 
- static inline void put_swap_device(struct swap_info_struct *si)
- {
-diff --git a/mm/page_io.c b/mm/page_io.c
-index 485fa5cca4a2..c493ce9ebcf5 100644
---- a/mm/page_io.c
-+++ b/mm/page_io.c
-@@ -254,11 +254,6 @@ int swap_writepage(struct page *page, struct writeback_control *wbc)
- 	return ret;
- }
- 
--static sector_t swap_page_sector(struct page *page)
--{
--	return (sector_t)__page_file_index(page) << (PAGE_SHIFT - 9);
--}
--
- static inline void count_swpout_vm_event(struct page *page)
- {
- #ifdef CONFIG_TRANSPARENT_HUGEPAGE
-diff --git a/mm/swapfile.c b/mm/swapfile.c
-index f039745989d2..7a8636c6c9ff 100644
---- a/mm/swapfile.c
-+++ b/mm/swapfile.c
-@@ -199,8 +199,8 @@ static int discard_swap(struct swap_info_struct *si)
- 	return err;		/* That will often be -EOPNOTSUPP */
- }
- 
--static struct swap_extent *
--offset_to_swap_extent(struct swap_info_struct *sis, unsigned long offset)
-+struct swap_extent *offset_to_swap_extent(struct swap_info_struct *sis,
-+					  unsigned long offset)
- {
- 	struct swap_extent *se;
- 	struct rb_node *rb;
-@@ -1858,6 +1858,19 @@ sector_t swapdev_block(int type, pgoff_t offset)
- 	return se->start_block + (offset - se->start_page);
- }
- 
-+sector_t swap_page_sector(struct page *page)
-+{
-+	struct swap_info_struct *sis = page_swap_info(page);
-+	struct swap_extent *se;
-+	sector_t sector;
-+	pgoff_t offset;
-+
-+	offset = __page_file_index(page);
-+	se = offset_to_swap_extent(sis, offset);
-+	sector = se->start_block + (offset - se->start_page);
-+	return sector << (PAGE_SHIFT - 9);
-+}
-+
- /*
-  * Return either the total number of swap pages of given type, or the number
-  * of free pages of that type (depending on @free)
+Thanks. Be glad to hear that you're also working on this. I'm glad to
+give some comments on your patch set.
+
 
 -- 
-Jens Axboe
-
+Thanks,
+Jeffle
