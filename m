@@ -2,133 +2,123 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AA79C4332E
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 540D7C43332
 	for <linux-block@archiver.kernel.org>; Wed,  3 Mar 2021 16:41:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C94C964EE8
-	for <linux-block@archiver.kernel.org>; Wed,  3 Mar 2021 16:41:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2679E64EF1
+	for <linux-block@archiver.kernel.org>; Wed,  3 Mar 2021 16:41:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243220AbhCCQhv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 Mar 2021 11:37:51 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26543 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1842918AbhCCKWe (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 3 Mar 2021 05:22:34 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614766867;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=WEHgjz6/FP1rmehlGd9kgHsqB+jD47VZkOkNcRGSeHE=;
-        b=LupNyjk4rRSQ6zfvanOOlzU26DdoUbuO/b3CKcudvBJQO/BrFg7FfpE1P17QZU+wi4ZXyj
-        Oz7iy9WmCrIpLRIblONsMImmQBBTqU/ifGG2KO+MEmhpb0GyCoHK9b5ERydHOFciGjlF6c
-        z+tAwOMK2o7naU60hXZrWOz/6WzYPFk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-99-M7QVroaiPRm4jGliw5o2IQ-1; Wed, 03 Mar 2021 05:05:37 -0500
-X-MC-Unique: M7QVroaiPRm4jGliw5o2IQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4D108100A8EA;
-        Wed,  3 Mar 2021 10:05:36 +0000 (UTC)
-Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 84D3410013C1;
-        Wed,  3 Mar 2021 10:05:32 +0000 (UTC)
-Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
-        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 123A5VJq001824;
-        Wed, 3 Mar 2021 05:05:31 -0500
-Received: from localhost (mpatocka@localhost)
-        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 123A5Uda001816;
-        Wed, 3 Mar 2021 05:05:31 -0500
-X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
-Date:   Wed, 3 Mar 2021 05:05:30 -0500 (EST)
-From:   Mikulas Patocka <mpatocka@redhat.com>
-X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
-To:     JeffleXu <jefflexu@linux.alibaba.com>
-cc:     Mike Snitzer <msnitzer@redhat.com>,
-        Heinz Mauelshagen <heinzm@redhat.com>, axboe@kernel.dk,
-        caspar@linux.alibaba.com, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org, joseph.qi@linux.alibaba.com,
-        dm-devel@redhat.com, hch@lst.de
-Subject: Re: [dm-devel] [PATCH 2/4] block: dont clear REQ_HIPRI for bio-based
- drivers
-In-Reply-To: <3e8b3b2e-f1f4-e946-4858-d2c78e2a8825@linux.alibaba.com>
-Message-ID: <alpine.LRH.2.02.2103030430080.29593@file01.intranet.prod.int.rdu2.redhat.com>
-References: <20210302190552.715551440@debian-a64.vm> <3e8b3b2e-f1f4-e946-4858-d2c78e2a8825@linux.alibaba.com>
-User-Agent: Alpine 2.02 (LRH 1266 2009-07-14)
+        id S1345573AbhCCQiN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 Mar 2021 11:38:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37964 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1843030AbhCCKYg (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Mar 2021 05:24:36 -0500
+Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6920C08ECB8
+        for <linux-block@vger.kernel.org>; Wed,  3 Mar 2021 02:02:15 -0800 (PST)
+Received: by mail-wr1-x436.google.com with SMTP id j2so10122919wrx.9
+        for <linux-block@vger.kernel.org>; Wed, 03 Mar 2021 02:02:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=javigon-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=IN4csN/tIDBWFNMljb2TQOPsrzBCa+hy7W7Ri9Ms9BA=;
+        b=D06W3jcaxkyfLLWehHEA1KSZybTfutUorO7qKIi0xU4FfSetGALeqbPPyvcBmlCpBe
+         ckSVhm1xMsnvIa0scm5aShh8RpUNXPXCuQC+QVsFPkcqE0Z0ih+lNjKvws/bD7P2LnFu
+         FzoAQ9LD5xEf/qMI/zN979rCbBr3y5RtCwlyNm5KF/aWoCWzryXkEn5rZzAH4SdPQexz
+         IPq8xDkVVoUfxkDBAOUyvRci1n6QYUtqJ0nycPRvC6bozBOVnOuvaXZl99ZsFTCI7ehv
+         k2az9sfTQ5Z7Bh+KKj+iw9rg9BKYPq1MwY/WFdLiIaRn9zNwukua/MLC35ZX1w6Jt4/5
+         9ljA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=IN4csN/tIDBWFNMljb2TQOPsrzBCa+hy7W7Ri9Ms9BA=;
+        b=ZDp7wFR6jost0ndlYpA8MzOhEKFLcjcwUuUIisQGRf+ioTQRohHrv5qtX2bj8hnIPM
+         BX31ek3Yw4nYOHD1j8sWXMb6TEAGe0tlVRTK++4wQHet//UPOdS0soDf6Cyns+MmUhq5
+         0KIjBvmEMi/4jcEs7QqKNKyyKjObBVGlbOE3b20RRiHt9Jt1wuIbl89rb4MdNBGNKl5N
+         lKEV3pX79Sk6CIPIU55LC9xo88/xW5rZdf22NJs3F3TmXwctZ+hG1yvK3vGJXZzouJ3f
+         3TqGFO6g1nueLrHYCNfSdgfjUFwPHnzJljJYxHRKUnfa6jg40FJ0lNZHkVbcajUHty2+
+         TZmw==
+X-Gm-Message-State: AOAM532Db+W6Jl2X8vwKK0s4PSGbZT1czjXcOdNd7v1faEXETl/XF9D2
+        ezjFsiuQOjwoCE2owy/2jWkjrA==
+X-Google-Smtp-Source: ABdhPJzBZ8VRJHJo7828xeX1KUFyDAQHh9wAtm0lEBnQzY78Mj0gG5jMJBBqtkJDLPTI8tv+Opw0ug==
+X-Received: by 2002:a5d:5043:: with SMTP id h3mr26038578wrt.120.1614765734353;
+        Wed, 03 Mar 2021 02:02:14 -0800 (PST)
+Received: from localhost (5.186.124.214.cgn.fibianet.dk. [5.186.124.214])
+        by smtp.gmail.com with ESMTPSA id z7sm3704954wrt.70.2021.03.03.02.02.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Mar 2021 02:02:13 -0800 (PST)
+Date:   Wed, 3 Mar 2021 11:02:12 +0100
+From:   Javier =?utf-8?B?R29uesOhbGV6?= <javier@javigon.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        kbusch@kernel.org, sagi@grimberg.me, minwoo.im.dev@gmail.com
+Subject: Re: [PATCH V6 1/2] nvme: enable char device per namespace
+Message-ID: <20210303100212.e43jgjvuomgybmy2@mpHalley.localdomain>
+References: <20210301192452.16770-1-javier.gonz@samsung.com>
+ <20210301192452.16770-2-javier.gonz@samsung.com>
+ <20210303091022.GA12784@lst.de>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210303091022.GA12784@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 03.03.2021 10:10, Christoph Hellwig wrote:
+>On Mon, Mar 01, 2021 at 08:24:51PM +0100, javier@javigon.com wrote:
+>> From: Javier González <javier.gonz@samsung.com>
+>>
+>> Create a char device per NVMe namespace. This char device is always
+>> initialized, independently of whether the features implemented by the
+>> device are supported by the kernel. User-space can therefore always
+>> issue IOCTLs to the NVMe driver using the char device.
+>>
+>> The char device is presented as /dev/nvme-generic-XcYnZ. This naming
+>> scheme follows the convention of the hidden device (nvmeXcYnZ). Support
+>> for multipath will follow.
+>
+>So I'm a little worried about the "support for multipath will follow" as
+>this has implications for the naming scheme, and our policy of how we
+>allow access to a namespace.
 
+I maintained the message to follow the original commit. In this
+patchset multipath is implemented. I maintains the same naming scheme.
 
-On Wed, 3 Mar 2021, JeffleXu wrote:
+We can remove this comment as multipath is supported in the existing
+series.
 
-> 
-> 
-> On 3/3/21 3:05 AM, Mikulas Patocka wrote:
-> > Don't clear REQ_HIPRI for bio-based drivers. Device mapper will need to
-> > see this flag in order to support polling.
-> > 
-> > Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
-> > 
-> > ---
-> >  block/blk-core.c |    2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > Index: linux-2.6/block/blk-core.c
-> > ===================================================================
-> > --- linux-2.6.orig/block/blk-core.c	2021-03-02 10:43:28.000000000 +0100
-> > +++ linux-2.6/block/blk-core.c	2021-03-02 10:53:50.000000000 +0100
-> 
-> I notice that the diff header indicates that the code base is from
-> linux-2.6. Or it's just the name of your directory, while the code base
-> is for the latest upstream 5.12?
+>
+>Ignoring some of the deprecated historic mistakes I think the policy
+>should be:
+>
+> - admin commands that often are controller specific should usually
+>   go to a controller-specific device, the existing /dev/nvmeX
+>   devices
+> - I/O commands and admin command that do specific a nsid should go
+>   through a per-namespace node that is multipath aware and not
+>   controller specific
 
-It's just the name of the git repository. The patch is against 5.12-rc1.
+Sounds good.
 
-> 
-> > @@ -836,7 +836,7 @@ static noinline_for_stack bool submit_bi
-> >  		}
-> >  	}
-> >  
-> > -	if (!test_bit(QUEUE_FLAG_POLL, &q->queue_flags))
-> > +	if (!test_bit(QUEUE_FLAG_POLL, &q->queue_flags) && !bdev->bd_disk->fops->submit_bio)
-> >  		bio->bi_opf &= ~REQ_HIPRI;
-> >  
-> >  	switch (bio_op(bio)) {
-> > 
-> > --
-> 
-> What if dm device is built upon mq devices that are not capable of
-> polling, i.e., mq devices without QUEUE_FLAG_POLL set? Then this dm
-> device shall not support polling.
+The current implementation re-routes IOCTLs to the char device through
+the existing bdev IOCTLs, so I believe we follow this policy already. We
+basically default to current behavior.
 
-We will check if the underlying queue has QUEUE_FLAG_POLL in __map_bio - 
-see this piece of code:
+And I assume that for legacy, namespace IOCTLs to the controller will
+still be routed to the namespace (assuming a single namespace).
 
-        case DM_MAPIO_REMAPPED:
-                /* the bio has been remapped so dispatch it */
-                trace_block_bio_remap(clone, bio_dev(io->orig_bio), sector);
-                if (clone->bi_opf & REQ_HIPRI &&
-                    test_bit(QUEUE_FLAG_POLL, &clone->bi_bdev->bd_disk->queue->queue_flags)) {
-                        ci->poll_queue = clone->bi_bdev->bd_disk->queue;
-                        ci->poll_cookie = submit_bio_noacct_mq_direct(clone);
-                } else {
-                        ci->poll_cookie = BLK_QC_T_NONE;
-                        submit_bio_noacct(clone);
-                }
-                break;
+>Which also makes me wonder about patch 2 in the series that seems
+>somewhat dangerous.   Can we clearly state the policy implemented?
 
-Mikulas
-
+Patch 2 is the one that exposes the existing logic for multipath. How do
+you think we should do it instead?
