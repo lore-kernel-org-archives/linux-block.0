@@ -2,398 +2,287 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0CC9C433E9
-	for <linux-block@archiver.kernel.org>; Wed,  3 Mar 2021 16:44:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E1A8C4332D
+	for <linux-block@archiver.kernel.org>; Wed,  3 Mar 2021 16:44:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 709FF64ED7
-	for <linux-block@archiver.kernel.org>; Wed,  3 Mar 2021 16:44:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1AF6A64EBB
+	for <linux-block@archiver.kernel.org>; Wed,  3 Mar 2021 16:44:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348330AbhCCQjZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 Mar 2021 11:39:25 -0500
-Received: from mx2.veeam.com ([64.129.123.6]:50992 "EHLO mx2.veeam.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S237257AbhCCMbm (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 3 Mar 2021 07:31:42 -0500
-Received: from mail.veeam.com (prgmbx01.amust.local [172.24.0.171])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1376346AbhCCQjb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 Mar 2021 11:39:31 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45427 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S241171AbhCCPSV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 3 Mar 2021 10:18:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1614784602;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=IdwTtmgVoGgNcz8nBwLl1FfQ9hlaGjTwxN2l/vfPQCQ=;
+        b=MpDpS4c88e5r5gcIbMCZOuDRgnYGlb1WwXThcucWKfNxPe93Pqyz898ztMWTfX1jCQBTDA
+        sIep1kkdFeyE11OjgiIoL7TaJolDLfbBmu4nzkpFZCnIN0X/ZzVVeo2jT1lgroBqiliyP0
+        42ByZHAHUedn4S4tcLzBabmixsn6prU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-369-sMy3pAWSO_2HpKwpUbPVxA-1; Wed, 03 Mar 2021 10:16:38 -0500
+X-MC-Unique: sMy3pAWSO_2HpKwpUbPVxA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx2.veeam.com (Postfix) with ESMTPS id 0622741352;
-        Wed,  3 Mar 2021 07:30:49 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com; s=mx2;
-        t=1614774649; bh=kVdX0DoMqCg6JGjEDh1pSv+rLQxBcVCpC74d42rJURQ=;
-        h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-        b=wV8pWzIdQyQSSGnkRh1rKgKxx41WUvYfp/5N1isebLcSQ5MkXucvwFOox3aO5R8dc
-         NLyhVOew7CISDPj3Bs9baPftpWvsdlX2snfExRpGClAbmDBWcgC8+5O9wOmwHCDENZ
-         tQUrYzGtbxODEmL6IFkQIUwJcIfp+k2Vc0MhQKl0=
-Received: from prgdevlinuxpatch01.amust.local (172.24.14.5) by
- prgmbx01.amust.local (172.24.0.171) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.721.2;
- Wed, 3 Mar 2021 13:30:46 +0100
-From:   Sergei Shtepa <sergei.shtepa@veeam.com>
-To:     <snitzer@redhat.com>, <agk@redhat.com>, <hare@suse.de>,
-        <song@kernel.org>, <axboe@kernel.dk>, <dm-devel@redhat.com>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-raid@vger.kernel.org>, <linux-api@vger.kernel.org>
-CC:     <sergei.shtepa@veeam.com>, <pavel.tide@veeam.com>
-Subject: [PATCH v6 3/4] dm: introduce dm-interposer
-Date:   Wed, 3 Mar 2021 15:30:17 +0300
-Message-ID: <1614774618-22410-4-git-send-email-sergei.shtepa@veeam.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1614774618-22410-1-git-send-email-sergei.shtepa@veeam.com>
-References: <1614774618-22410-1-git-send-email-sergei.shtepa@veeam.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 08A161007281;
+        Wed,  3 Mar 2021 15:16:37 +0000 (UTC)
+Received: from T590 (ovpn-12-17.pek2.redhat.com [10.72.12.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 526735C241;
+        Wed,  3 Mar 2021 15:16:27 +0000 (UTC)
+Date:   Wed, 3 Mar 2021 23:16:24 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Yi Zhang <yi.zhang@redhat.com>
+Cc:     linux-scsi@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>
+Subject: Re: [bug report]null pointer at scsi_mq_exit_request+0x14 with
+ blktests srp/015
+Message-ID: <YD+oSKPQJR2hl2ul@T590>
+References: <347186099.14151179.1614497065881.JavaMail.zimbra@redhat.com>
+ <418155251.14154941.1614505772200.JavaMail.zimbra@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [172.24.14.5]
-X-ClientProxiedBy: prgmbx01.amust.local (172.24.0.171) To prgmbx01.amust.local
- (172.24.0.171)
-X-EsetResult: clean, is OK
-X-EsetId: 37303A29C604D265637363
-X-Veeam-MMEX: True
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <418155251.14154941.1614505772200.JavaMail.zimbra@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-dm-interposer.c/. h contains code for working with blk_interposer
-and provides an API for interposer in device-mapper.
+On Sun, Feb 28, 2021 at 04:49:32AM -0500, Yi Zhang wrote:
+> Hello
+>=20
+> I found this issue with blktests srp/015, could anyone help check it?
+>=20
+> [  250.415156] run blktests srp/015 at 2021-02-28 09:23:02
+> [  250.525538] eno2 speed is unknown, defaulting to 1000
+> [  250.530599] eno2 speed is unknown, defaulting to 1000
+> [  250.535665] eno2 speed is unknown, defaulting to 1000
+> [  250.541768] eno3 speed is unknown, defaulting to 1000
+> [  250.546821] eno3 speed is unknown, defaulting to 1000
+> [  250.551881] eno3 speed is unknown, defaulting to 1000
+> [  250.557844] eno4 speed is unknown, defaulting to 1000
+> [  250.562912] eno4 speed is unknown, defaulting to 1000
+> [  250.567978] eno4 speed is unknown, defaulting to 1000
+> [  250.573945] lo speed is unknown, defaulting to 1000
+> [  250.578827] lo speed is unknown, defaulting to 1000
+> [  250.583712] lo speed is unknown, defaulting to 1000
+> [  250.605512] sd 15:0:0:0: Power-on or device reset occurred
+> [  250.673453] device-mapper: table: 253:3: multipath: error getting devi=
+ce
+> [  250.680160] device-mapper: ioctl: error adding target to table
+> [  250.732648] eno2 speed is unknown, defaulting to 1000
+> [  250.737724] eno3 speed is unknown, defaulting to 1000
+> [  250.742784] eno4 speed is unknown, defaulting to 1000
+> [  250.747843] lo speed is unknown, defaulting to 1000
+> [  250.752725] ib_srpt MAD registration failed for lo_siw-1.
+> [  251.106511] scsi host16:   REJ reason 0xffffff98
+> [  251.111150] scsi host16: ib_srp: Connection 0/4 to 10.16.221.116 failed
+> [  251.246254] sd 16:0:0:0: Warning! Received an indication that the LUN =
+assignments on this target have changed. The Linux SCSI layer does not auto=
+matical
+> [  251.260567] srpt/0xf0d4e2e6e1e000000000000000000000: Unsupported SCSI =
+Opcode 0xa3, sending CHECK_CONDITION.
+> [  251.260765] srpt/0xf0d4e2e6e1e000000000000000000000: Unsupported SCSI =
+Opcode 0xa3, sending CHECK_CONDITION.
+> [  251.280135] sd 16:0:0:1: Warning! Received an indication that the LUN =
+assignments on this target have changed. The Linux SCSI layer does not auto=
+matical
+> [  251.298968] srpt/0xf0d4e2e6e1e000000000000000000000: Unsupported SCSI =
+Opcode 0xa3, sending CHECK_CONDITION.
+> [  252.505389] ext4 filesystem being mounted at /root/blktests/results/tm=
+pdir.srp.015.63f/mnt0 supports timestamps until 2038 (0x7fffffff)
+> [  253.522565] device-mapper: table: 253:6: multipath: error getting devi=
+ce
+> [  253.529277] device-mapper: ioctl: error adding target to table
+> [  257.526935] device-mapper: multipath: 253:4: Failing path 8:32.
+> [  262.542076] scsi host16:   REJ reason 0xffffff98
+> [  262.546708] scsi host16: ib_srp: Connection 0/4 to 10.16.221.116 failed
+> [  262.671752] srpt/0xf0d4e2e6e1e000000000000000000000: Unsupported SCSI =
+Opcode 0xa3, sending CHECK_CONDITION.
+> [  262.672079] srpt/0xf0d4e2e6e1e000000000000000000000: Unsupported SCSI =
+Opcode 0xa3, sending CHECK_CONDITION.
+> [  262.692394] srpt/0xf0d4e2e6e1e000000000000000000000: Unsupported SCSI =
+Opcode 0xa3, sending CHECK_CONDITION.
+> [  267.804429] device-mapper: multipath: 253:4: Failing path 8:32.
+> [  267.882487] srpt_recv_done: 502 callbacks suppressed
+> [  269.819904] scsi host16:   REJ reason 0xffffff98
+> [  269.824533] scsi host16: ib_srp: Connection 0/4 to 10.16.221.116 failed
+> [  269.951714] srpt/0xf0d4e2e6e1e000000000000000000000: Unsupported SCSI =
+Opcode 0xa3, sending CHECK_CONDITION.
+> [  269.952049] srpt/0xf0d4e2e6e1e000000000000000000000: Unsupported SCSI =
+Opcode 0xa3, sending CHECK_CONDITION.
+> [  269.972080] srpt/0xf0d4e2e6e1e000000000000000000000: Unsupported SCSI =
+Opcode 0xa3, sending CHECK_CONDITION.
+> [  275.085527] device-mapper: multipath: 253:4: Failing path 8:32.
+> [  275.152684] srpt_recv_done: 502 callbacks suppressed
+> [  277.100827] scsi host16:   REJ reason 0xffffff98
+> [  277.105452] scsi host16: ib_srp: Connection 0/4 to 10.16.221.116 failed
+> [  277.231922] srpt/0xf0d4e2e6e1e000000000000000000000: Unsupported SCSI =
+Opcode 0xa3, sending CHECK_CONDITION.
+> [  277.242758] srpt/0xf0d4e2e6e1e000000000000000000000: Unsupported SCSI =
+Opcode 0xa3, sending CHECK_CONDITION.
+> [  277.252505] srpt/0xf0d4e2e6e1e000000000000000000000: Unsupported SCSI =
+Opcode 0xa3, sending CHECK_CONDITION.
+> [  282.353149] device-mapper: multipath: 253:4: Failing path 8:32.
+> [  282.419429] srpt_recv_done: 502 callbacks suppressed
+> [  282.842310] scsi host17:   REJ reason 0xffffff98
+> [  282.846939] scsi host17: ib_srp: Connection 0/4 to 10.16.221.116 failed
+> [  282.981432] srpt/0xf0d4e2e6e1e000000000000000000000: Unsupported SCSI =
+Opcode 0xa3, sending CHECK_CONDITION.
+> [  282.991501] srpt/0xf0d4e2e6e1e000000000000000000000: Unsupported SCSI =
+Opcode 0xa3, sending CHECK_CONDITION.
+> [  283.001358] srpt/0xf0d4e2e6e1e000000000000000000000: Unsupported SCSI =
+Opcode 0xa3, sending CHECK_CONDITION.
+> [  284.690990] device-mapper: multipath: 253:4: Failing path 8:96.
+> [  285.493848] BUG: unable to handle page fault for address: ffffffffc0a8=
+9150
+> [  285.500724] #PF: supervisor read access in kernel mode
+> [  285.505863] #PF: error_code(0x0000) - not-present page
+> [  285.511001] PGD 37bc13067 P4D 37bc13067 PUD 37bc15067 PMD 13839d067 PT=
+E 0
+> [  285.517789] Oops: 0000 [#1] SMP NOPTI
+> [  285.521454] CPU: 31 PID: 17943 Comm: multipathd Tainted: G S        I =
+      5.11.0 #4
+> [  285.529279] Hardware name: Dell Inc. PowerEdge R640/06NR82, BIOS 2.10.=
+0 11/12/2020
+> [  285.536837] RIP: 0010:scsi_mq_exit_request+0x14/0x50
+> [  285.541804] Code: 00 00 e9 bf eb 58 00 e9 ea bc e0 ff 66 2e 0f 1f 84 0=
+0 00 00 00 00 0f 1f 44 00 00 53 48 8b 7f 60 48 89 f3 48 8b 87 98 00 00 00 <=
+48> 8b 40 30 48 85 c0 74 0c 48 8d b6 10 01 00 00 e8 87 eb 58 00 f6
+> [  285.560548] RSP: 0018:ffffa66e82e37c98 EFLAGS: 00010286
+> [  285.565774] RAX: ffffffffc0a89120 RBX: ffff8a0e8a3e0000 RCX: 000000000=
+0000000
+> [  285.572906] RDX: 0000000000000000 RSI: ffff8a0e8a3e0000 RDI: ffff8a0e6=
+92a1000
+> [  285.580038] RBP: ffff8a0ea8469800 R08: 000000000000020d R09: 000000000=
+002a780
+> [  285.587170] R10: 00000376b4157308 R11: 0000000000000000 R12: 000000000=
+0000000
+> [  285.594304] R13: ffff8a0e692a10a8 R14: 0000000000000000 R15: ffff8a0e9=
+244b700
+> [  285.601435] FS:  00007f616c291700(0000) GS:ffff8a1d801c0000(0000) knlG=
+S:0000000000000000
+> [  285.609521] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [  285.615269] CR2: ffffffffc0a89150 CR3: 000000011e43e003 CR4: 000000000=
+07706e0
+> [  285.622401] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 000000000=
+0000000
+> [  285.629532] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 000000000=
+0000400
+> [  285.636664] PKRU: 55555554
+> [  285.639369] Call Trace:
+> [  285.641824]  blk_mq_free_rqs+0x59/0xd0
+> [  285.645573]  blk_mq_free_map_and_requests+0x31/0x60
+> [  285.650454]  blk_mq_free_tag_set+0x22/0x80
+> [  285.654553]  scsi_host_dev_release+0x86/0xe0
+> [  285.658826]  device_release+0x33/0x90
+> [  285.662490]  kobject_release+0x46/0x150
+> [  285.666332]  device_release+0x33/0x90
+> [  285.669995]  kobject_release+0x46/0x150
+> [  285.673836]  execute_in_process_context+0x21/0x60
+> [  285.678542]  device_release+0x33/0x90
+> [  285.682208]  kobject_release+0x46/0x150
+> [  285.686046]  scsi_disk_put+0x2b/0x40 [sd_mod]
+> [  285.690406]  __blkdev_put+0x186/0x1b0
+> [  285.694072]  blkdev_put+0x4c/0x110
+> [  285.697476]  blkdev_close+0x21/0x30
+> [  285.700970]  __fput+0x92/0x230
+> [  285.704029]  task_work_run+0x70/0xb0
+> [  285.707608]  exit_to_user_mode_prepare+0x150/0x160
+> [  285.712402]  syscall_exit_to_user_mode+0x12/0x40
+> [  285.717021]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+> [  285.722071] RIP: 0033:0x7f616b1ce977
+> [  285.725652] Code: 12 b8 03 00 00 00 0f 05 48 3d 00 f0 ff ff 77 3b c3 6=
+6 90 53 89 fb 48 83 ec 10 e8 e4 fb ff ff 89 df 89 c2 b8 03 00 00 00 0f 05 <=
+48> 3d 00 f0 ff ff 77 2b 89 d7 89 44 24 0c e8 26 fc ff ff 8b 44 24
+> [  285.744397] RSP: 002b:00007f616c28f7b0 EFLAGS: 00000293 ORIG_RAX: 0000=
+000000000003
+> [  285.751962] RAX: 0000000000000000 RBX: 000000000000000b RCX: 00007f616=
+b1ce977
+> [  285.759094] RDX: 0000000000000000 RSI: 0000000000000001 RDI: 000000000=
+000000b
+> [  285.766227] RBP: 00005588a853efb0 R08: 0000000000000001 R09: 000000000=
+0000007
+> [  285.773359] R10: 0000000000000000 R11: 0000000000000293 R12: 00005588a=
+8215b19
+> [  285.780492] R13: 00007f615401d630 R14: 0000000000000001 R15: 00007f615=
+401d630
+> [  285.787624] Modules linked in: target_core_user uio target_core_pscsi =
+target_core_file ib_srpt target_core_iblock target_core_mod scsi_debug siw =
+null_blk ext4 mbcache jbd2 rpcrdma rdma_ucm ib_umad ib_iser libiscsi scsi_t=
+ransport_iscsi rdma_cm iw_cm ib_cm ib_uverbs ib_core rfkill sunrpc vfat fat=
+ dm_service_time dm_multipath intel_rapl_msr intel_rapl_common isst_if_comm=
+on skx_edac x86_pkg_temp_thermal intel_powerclamp coretemp kvm_intel ipmi_s=
+sif kvm mgag200 i2c_algo_bit drm_kms_helper iTCO_wdt iTCO_vendor_support ir=
+qbypass dcdbas syscopyarea crct10dif_pclmul sysfillrect crc32_pclmul sysimg=
+blt fb_sys_fops ghash_clmulni_intel drm acpi_ipmi rapl ipmi_si intel_cstate=
+ dell_smbios dax_pmem_compat mei_me i2c_i801 ipmi_devintf device_dax intel_=
+uncore mei wmi_bmof dell_wmi_descriptor pcspkr intel_pch_thermal lpc_ich i2=
+c_smbus ipmi_msghandler dax_pmem_core acpi_power_meter ip_tables xfs libcrc=
+32c nd_pmem nd_btt sd_mod t10_pi sg ahci libahci nfit megaraid_sas libata t=
+g3 crc32c_intel libnvdimm wmi
+> [  285.787672]  dm_mirror dm_region_hash dm_log dm_mod [last unloaded: sc=
+si_transport_srp]
+> [  285.882703] CR2: ffffffffc0a89150
+> [  285.886032] ---[ end trace 718c96f79b0576a6 ]---
+> [  285.896061] RIP: 0010:scsi_mq_exit_request+0x14/0x50
+> [  285.901024] Code: 00 00 e9 bf eb 58 00 e9 ea bc e0 ff 66 2e 0f 1f 84 0=
+0 00 00 00 00 0f 1f 44 00 00 53 48 8b 7f 60 48 89 f3 48 8b 87 98 00 00 00 <=
+48> 8b 40 30 48 85 c0 74 0c 48 8d b6 10 01 00 00 e8 87 eb 58 00 f6
+> [  285.919768] RSP: 0018:ffffa66e82e37c98 EFLAGS: 00010286
+> [  285.924995] RAX: ffffffffc0a89120 RBX: ffff8a0e8a3e0000 RCX: 000000000=
+0000000
+> [  285.932128] RDX: 0000000000000000 RSI: ffff8a0e8a3e0000 RDI: ffff8a0e6=
+92a1000
+> [  285.939260] RBP: ffff8a0ea8469800 R08: 000000000000020d R09: 000000000=
+002a780
+> [  285.946394] R10: 00000376b4157308 R11: 0000000000000000 R12: 000000000=
+0000000
+> [  285.953524] R13: ffff8a0e692a10a8 R14: 0000000000000000 R15: ffff8a0e9=
+244b700
+> [  285.960658] FS:  00007f616c291700(0000) GS:ffff8a1d801c0000(0000) knlG=
+S:0000000000000000
+> [  285.968742] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [  285.974489] CR2: ffffffffc0a89150 CR3: 000000011e43e003 CR4: 000000000=
+07706e0
+> [  285.981623] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 000000000=
+0000000
+> [  285.988753] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 000000000=
+0000400
+> [  285.995885] PKRU: 55555554
+> [  285.998590] Kernel panic - not syncing: Fatal exception
+> [  286.504449] Kernel Offset: 0x2c200000 from 0xffffffff81000000 (relocat=
+ion range: 0xffffffff80000000-0xffffffffbfffffff)
+> [  286.520574] ---[ end Kernel panic - not syncing: Fatal exception ]---
+>=20
+> (gdb) l *(scsi_mq_exit_request+0x14)
+> 0xffffffff81673784 is in scsi_mq_exit_request (drivers/scsi/scsi_lib.c:17=
+85).
+> 1780					 unsigned int hctx_idx)
+> 1781	{
+> 1782		struct Scsi_Host *shost =3D set->driver_data;
+> 1783		struct scsi_cmnd *cmd =3D blk_mq_rq_to_pdu(rq);
+> 1784=09
+> 1785		if (shost->hostt->exit_cmd_priv)
+> 1786			shost->hostt->exit_cmd_priv(shost, cmd);
 
-Signed-off-by: Sergei Shtepa <sergei.shtepa@veeam.com>
----
- drivers/md/Makefile        |   2 +-
- drivers/md/dm-interposer.c | 258 +++++++++++++++++++++++++++++++++++++
- drivers/md/dm-interposer.h |  40 ++++++
- 3 files changed, 299 insertions(+), 1 deletion(-)
- create mode 100644 drivers/md/dm-interposer.c
- create mode 100644 drivers/md/dm-interposer.h
+Looks it is weird since not see any drivers implement .exit_cmd_priv in
+v5.11.
 
-diff --git a/drivers/md/Makefile b/drivers/md/Makefile
-index ef7ddc27685c..bd5b38bee82e 100644
---- a/drivers/md/Makefile
-+++ b/drivers/md/Makefile
-@@ -5,7 +5,7 @@
- 
- dm-mod-y	+= dm.o dm-table.o dm-target.o dm-linear.o dm-stripe.o \
- 		   dm-ioctl.o dm-io.o dm-kcopyd.o dm-sysfs.o dm-stats.o \
--		   dm-rq.o
-+		   dm-rq.o dm-interposer.o
- dm-multipath-y	+= dm-path-selector.o dm-mpath.o
- dm-historical-service-time-y += dm-ps-historical-service-time.o
- dm-io-affinity-y += dm-ps-io-affinity.o
-diff --git a/drivers/md/dm-interposer.c b/drivers/md/dm-interposer.c
-new file mode 100644
-index 000000000000..e5346db81def
---- /dev/null
-+++ b/drivers/md/dm-interposer.c
-@@ -0,0 +1,258 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include <linux/bio.h>
-+#include <linux/rwsem.h>
-+#include <linux/refcount.h>
-+#include <linux/device-mapper.h>
-+#include <linux/interval_tree_generic.h>
-+
-+#include "dm-core.h"
-+#include "dm-interposer.h"
-+
-+#define DM_MSG_PREFIX "interposer"
-+
-+struct dm_interposer {
-+	struct bdev_interposer blk_ip;
-+
-+	struct kref kref;
-+	struct rw_semaphore ip_devs_lock;
-+	struct rb_root_cached ip_devs_root; /* dm_interposed_dev tree, since there can be multiple
-+					     * interceptors for different ranges for a single
-+					     * block device. */
-+};
-+
-+/*
-+ * Interval tree for device mapper
-+ */
-+#define START(node) ((node)->start)
-+#define LAST(node) ((node)->last)
-+INTERVAL_TREE_DEFINE(struct dm_rb_range, node, sector_t, _subtree_last,
-+		     START, LAST,, dm_rb);
-+
-+static DEFINE_MUTEX(dm_interposer_attach_lock);
-+
-+static void dm_submit_bio_interposer_fn(struct bio *bio)
-+{
-+	struct dm_interposer *ip;
-+	unsigned int noio_flag = 0;
-+	sector_t start;
-+	sector_t last;
-+	struct dm_rb_range *node;
-+
-+	ip = container_of(bio->bi_bdev->bd_interposer, struct dm_interposer, blk_ip);
-+
-+	start = bio->bi_iter.bi_sector;
-+	if (bio_flagged(bio, BIO_REMAPPED))
-+		start -= get_start_sect(bio->bi_bdev);
-+	last = start + dm_sector_div_up(bio->bi_iter.bi_size, SECTOR_SIZE);
-+
-+	noio_flag = memalloc_noio_save();
-+	down_read(&ip->ip_devs_lock);
-+	node = dm_rb_iter_first(&ip->ip_devs_root, start, last);
-+	while (node) {
-+		struct dm_interposed_dev *ip_dev =
-+			container_of(node, struct dm_interposed_dev, node);
-+
-+		atomic64_inc(&ip_dev->ip_cnt);
-+		ip_dev->dm_interpose_bio(ip_dev, bio);
-+
-+		node = dm_rb_iter_next(node, start, last);
-+	}
-+	up_read(&ip->ip_devs_lock);
-+	memalloc_noio_restore(noio_flag);
-+}
-+
-+void dm_interposer_free(struct kref *kref)
-+{
-+	struct dm_interposer *ip = container_of(kref, struct dm_interposer, kref);
-+
-+	bdev_interposer_detach(&ip->blk_ip, dm_submit_bio_interposer_fn);
-+
-+	kfree(ip);
-+}
-+
-+struct dm_interposer *dm_interposer_new(struct block_device *bdev)
-+{
-+	int ret = 0;
-+	struct dm_interposer *ip;
-+
-+	ip = kzalloc(sizeof(struct dm_interposer), GFP_NOIO);
-+	if (!ip)
-+		return ERR_PTR(-ENOMEM);
-+
-+	kref_init(&ip->kref);
-+	init_rwsem(&ip->ip_devs_lock);
-+	ip->ip_devs_root = RB_ROOT_CACHED;
-+
-+	ret = bdev_interposer_attach(bdev, &ip->blk_ip, dm_submit_bio_interposer_fn);
-+	if (ret) {
-+		DMERR("Failed to attach bdev_interposer.");
-+		kref_put(&ip->kref, dm_interposer_free);
-+		return ERR_PTR(ret);
-+	}
-+
-+	return ip;
-+}
-+
-+static struct dm_interposer *dm_interposer_get(struct block_device *bdev)
-+{
-+	struct dm_interposer *ip;
-+
-+	if (!bdev_has_interposer(bdev))
-+		return NULL;
-+
-+	if (bdev->bd_interposer->ip_submit_bio != dm_submit_bio_interposer_fn) {
-+		DMERR("Block devices interposer slot already occupied.");
-+		return ERR_PTR(-EBUSY);
-+	}
-+
-+	ip = container_of(bdev->bd_interposer, struct dm_interposer, blk_ip);
-+
-+	kref_get(&ip->kref);
-+	return ip;
-+}
-+
-+static inline void dm_disk_freeze(struct gendisk *disk)
-+{
-+	blk_mq_freeze_queue(disk->queue);
-+	blk_mq_quiesce_queue(disk->queue);
-+}
-+
-+static inline void dm_disk_unfreeze(struct gendisk *disk)
-+{
-+	blk_mq_unquiesce_queue(disk->queue);
-+	blk_mq_unfreeze_queue(disk->queue);
-+}
-+
-+/**
-+ * dm_interposer_dev_init - initialize interposed device
-+ * @ip_dev: interposed device
-+ * @ofs: offset from the beginning of the block device
-+ * @len: the length of the part of the block device to which requests will be interposed
-+ * @private: user purpose parameter
-+ * @interpose_fn: interposing callback
-+ *
-+ * Initialize structure dm_interposed_dev.
-+ * For interposing part of block device set ofs and len.
-+ * For interposing whole device set ofs=0 and len=0.
-+ */
-+void dm_interposer_dev_init(struct dm_interposed_dev *ip_dev,
-+			    sector_t ofs, sector_t len,
-+			    void *private, dm_interpose_bio_t interpose_fn)
-+{
-+	ip_dev->node.start = ofs;
-+	ip_dev->node.last = ofs + len - 1;
-+	ip_dev->dm_interpose_bio = interpose_fn;
-+	ip_dev->private = private;
-+
-+	atomic64_set(&ip_dev->ip_cnt, 0);
-+}
-+
-+/**
-+ * dm_interposer_dev_attach - attach interposed device to his block device
-+ * @bdev: block device
-+ * @ip_dev: interposed device
-+ *
-+ * Return error code.
-+ */
-+int dm_interposer_dev_attach(struct block_device *bdev, struct dm_interposed_dev *ip_dev)
-+{
-+	int ret = 0;
-+	struct dm_interposer *ip = NULL;
-+	unsigned int noio_flag = 0;
-+
-+	if (!ip_dev)
-+		return -EINVAL;
-+
-+	dm_disk_freeze(bdev->bd_disk);
-+	mutex_lock(&dm_interposer_attach_lock);
-+	noio_flag = memalloc_noio_save();
-+
-+	ip = dm_interposer_get(bdev);
-+	if (ip == NULL)
-+		ip = dm_interposer_new(bdev);
-+	if (IS_ERR(ip)) {
-+		ret = PTR_ERR(ip);
-+		goto out;
-+	}
-+
-+	/* Attach dm_interposed_dev to dm_interposer */
-+	down_write(&ip->ip_devs_lock);
-+	do {
-+		struct dm_rb_range *node;
-+
-+		/* checking that ip_dev already exists for this region */
-+		node = dm_rb_iter_first(&ip->ip_devs_root, ip_dev->node.start, ip_dev->node.last);
-+		if (node) {
-+			DMERR("Block device in region [%llu,%llu] already have interposer.",
-+			      node->start, node->last);
-+
-+			ret = -EBUSY;
-+			break;
-+		}
-+
-+		/* insert ip_dev to ip tree */
-+		dm_rb_insert(&ip_dev->node, &ip->ip_devs_root);
-+		/* increment ip reference counter */
-+		kref_get(&ip->kref);
-+	} while (false);
-+	up_write(&ip->ip_devs_lock);
-+
-+	kref_put(&ip->kref, dm_interposer_free);
-+
-+out:
-+	memalloc_noio_restore(noio_flag);
-+	mutex_unlock(&dm_interposer_attach_lock);
-+	dm_disk_unfreeze(bdev->bd_disk);
-+
-+	return ret;
-+}
-+
-+/**
-+ * dm_interposer_detach_dev - detach interposed device from his block device
-+ * @bdev: block device
-+ * @ip_dev: interposed device
-+ *
-+ * Return error code.
-+ */
-+int dm_interposer_detach_dev(struct block_device *bdev, struct dm_interposed_dev *ip_dev)
-+{
-+	int ret = 0;
-+	struct dm_interposer *ip = NULL;
-+	unsigned int noio_flag = 0;
-+
-+	if (!ip_dev)
-+		return -EINVAL;
-+
-+	dm_disk_freeze(bdev->bd_disk);
-+	mutex_lock(&dm_interposer_attach_lock);
-+	noio_flag = memalloc_noio_save();
-+
-+	ip = dm_interposer_get(bdev);
-+	if (IS_ERR(ip)) {
-+		ret = PTR_ERR(ip);
-+		DMERR("Interposer not found.");
-+		goto out;
-+	}
-+	if (unlikely(ip == NULL)) {
-+		ret = -ENXIO;
-+		DMERR("Interposer not found.");
-+		goto out;
-+	}
-+
-+	down_write(&ip->ip_devs_lock);
-+	{
-+		dm_rb_remove(&ip_dev->node, &ip->ip_devs_root);
-+		/* the reference counter here cannot be zero */
-+		kref_put(&ip->kref, dm_interposer_free);
-+	}
-+	up_write(&ip->ip_devs_lock);
-+
-+	/* detach and free interposer if it's not needed */
-+	kref_put(&ip->kref, dm_interposer_free);
-+out:
-+	memalloc_noio_restore(noio_flag);
-+	mutex_unlock(&dm_interposer_attach_lock);
-+	dm_disk_unfreeze(bdev->bd_disk);
-+
-+	return ret;
-+}
-diff --git a/drivers/md/dm-interposer.h b/drivers/md/dm-interposer.h
-new file mode 100644
-index 000000000000..17a5411f6f00
---- /dev/null
-+++ b/drivers/md/dm-interposer.h
-@@ -0,0 +1,40 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+/*
-+ * Device mapper's interposer.
-+ */
-+
-+#include <linux/rbtree.h>
-+
-+struct dm_rb_range {
-+	struct rb_node node;
-+	sector_t start;		/* start sector of rb node */
-+	sector_t last;		/* end sector of rb node */
-+	sector_t _subtree_last; /* highest sector in subtree of rb node */
-+};
-+
-+typedef void (*dm_interpose_bio_t) (struct dm_interposed_dev *ip_dev, struct bio *bio);
-+
-+struct dm_interposed_dev {
-+	struct dm_rb_range node;
-+	void *private;
-+	dm_interpose_bio_t dm_interpose_bio;
-+
-+	atomic64_t ip_cnt; /* for debug purpose only */
-+};
-+
-+/*
-+ * Initialize structure dm_interposed_dev.
-+ * For interposing part of block device set ofs and len.
-+ * For interposing whole device set ofs=0 and len=0.
-+ */
-+void dm_interposer_dev_init(struct dm_interposed_dev *ip_dev,
-+			    sector_t ofs, sector_t len,
-+			    void *private, dm_interpose_bio_t interpose_fn);
-+/*
-+ * Attach interposer to his block device.
-+ */
-+int dm_interposer_dev_attach(struct block_device *bdev, struct dm_interposed_dev *ip_dev);
-+/*
-+ * Detach interposer from his block device.
-+ */
-+int dm_interposer_detach_dev(struct block_device *bdev, struct dm_interposed_dev *ip_dev);
--- 
-2.20.1
+--=20
+Ming
 
