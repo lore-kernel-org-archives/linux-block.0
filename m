@@ -2,134 +2,133 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8C75C43381
-	for <linux-block@archiver.kernel.org>; Wed,  3 Mar 2021 16:41:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AA79C4332E
+	for <linux-block@archiver.kernel.org>; Wed,  3 Mar 2021 16:41:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 80B3A614A7
+	by mail.kernel.org (Postfix) with ESMTP id C94C964EE8
 	for <linux-block@archiver.kernel.org>; Wed,  3 Mar 2021 16:41:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240965AbhCCQhK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 Mar 2021 11:37:10 -0500
-Received: from mout.gmx.net ([212.227.17.20]:58413 "EHLO mout.gmx.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S242396AbhCCD2O (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 2 Mar 2021 22:28:14 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
-        s=badeba3b8450; t=1614741941;
-        bh=Dbl45cYffM5VpBIUPk3aPwijqlx22eo8BibXzeyHTpA=;
-        h=X-UI-Sender-Class:Subject:To:Cc:References:From:Date:In-Reply-To;
-        b=FFJZU9w878QZNIgGE7AIcB530Gb8uX2kHutABSkzBx1ImYEUrLAuiRwZ9bh/KvlRI
-         qe4xMgD7EMul1aASa5um6GKcvQXZkN63MiIFH4HAkXI+bruYnvFls9Fk9sbI6HPgkc
-         cDfB085t7yVxNM7pLV2yBmVNn1a0oy3lCNUaCWlU=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from [10.10.213.91] ([103.52.188.137]) by mail.gmx.net (mrgmx104
- [212.227.17.174]) with ESMTPSA (Nemesis) id 1MSKu0-1lO0Fg34A4-00ScLs; Wed, 03
- Mar 2021 04:25:41 +0100
-Subject: Re: Large latency with bcache for Ceph OSD(new mail thread)
-To:     Coly Li <colyli@suse.de>
-Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-References: <9b7dfd49-67b0-53b1-96e1-3b90c2d9d09a@gmx.com>
- <f6755b89-4d13-92a5-df1a-343602dec957@suse.de>
-From:   "Norman.Kern" <norman.kern@gmx.com>
-Message-ID: <f7b3c407-386f-ab3d-092d-890478abd2c9@gmx.com>
-Date:   Wed, 3 Mar 2021 11:25:37 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.0
+        id S243220AbhCCQhv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 Mar 2021 11:37:51 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26543 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1842918AbhCCKWe (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 3 Mar 2021 05:22:34 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1614766867;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=WEHgjz6/FP1rmehlGd9kgHsqB+jD47VZkOkNcRGSeHE=;
+        b=LupNyjk4rRSQ6zfvanOOlzU26DdoUbuO/b3CKcudvBJQO/BrFg7FfpE1P17QZU+wi4ZXyj
+        Oz7iy9WmCrIpLRIblONsMImmQBBTqU/ifGG2KO+MEmhpb0GyCoHK9b5ERydHOFciGjlF6c
+        z+tAwOMK2o7naU60hXZrWOz/6WzYPFk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-99-M7QVroaiPRm4jGliw5o2IQ-1; Wed, 03 Mar 2021 05:05:37 -0500
+X-MC-Unique: M7QVroaiPRm4jGliw5o2IQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4D108100A8EA;
+        Wed,  3 Mar 2021 10:05:36 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 84D3410013C1;
+        Wed,  3 Mar 2021 10:05:32 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 123A5VJq001824;
+        Wed, 3 Mar 2021 05:05:31 -0500
+Received: from localhost (mpatocka@localhost)
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 123A5Uda001816;
+        Wed, 3 Mar 2021 05:05:31 -0500
+X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
+Date:   Wed, 3 Mar 2021 05:05:30 -0500 (EST)
+From:   Mikulas Patocka <mpatocka@redhat.com>
+X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
+To:     JeffleXu <jefflexu@linux.alibaba.com>
+cc:     Mike Snitzer <msnitzer@redhat.com>,
+        Heinz Mauelshagen <heinzm@redhat.com>, axboe@kernel.dk,
+        caspar@linux.alibaba.com, io-uring@vger.kernel.org,
+        linux-block@vger.kernel.org, joseph.qi@linux.alibaba.com,
+        dm-devel@redhat.com, hch@lst.de
+Subject: Re: [dm-devel] [PATCH 2/4] block: dont clear REQ_HIPRI for bio-based
+ drivers
+In-Reply-To: <3e8b3b2e-f1f4-e946-4858-d2c78e2a8825@linux.alibaba.com>
+Message-ID: <alpine.LRH.2.02.2103030430080.29593@file01.intranet.prod.int.rdu2.redhat.com>
+References: <20210302190552.715551440@debian-a64.vm> <3e8b3b2e-f1f4-e946-4858-d2c78e2a8825@linux.alibaba.com>
+User-Agent: Alpine 2.02 (LRH 1266 2009-07-14)
 MIME-Version: 1.0
-In-Reply-To: <f6755b89-4d13-92a5-df1a-343602dec957@suse.de>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-X-Provags-ID: V03:K1:WhGy41qMcy29eNrypJcrubMAdwVFszEDZZ8RDJx8QZTR6ZVQmXW
- JKXNrJO8AnRBfnBMrgcrqGSQeCiwcgFWISrnP+qfAzQtJTiUnZ+YvMCuLpDaGbXPnUTjWEb
- 9TgUDZD1X6CZTpoilFMDnAtQvueMlMNPWLlfRYbx/tKiiK4JfzTAxAkYiIMyiFmkXajbY+u
- MLJoFp+e8NC0NU4hmcHRg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:RR+Ia3bucGc=:kyBnJsTtx7xZoGvLiFalEs
- uOYgqdU/7UHXhYXYE2Wz/sPeNgoGOdkR6n7uHGZUcMgJn19TeWjMok/iBHdZNCAnXgnZ/jceN
- uPPB3C2cVR+O7WOXKJrk6TZ7R9EKRtPrOFWFhuYOlSI7FN+Rq9ArIm39kQNlv1rH6tmbgt7g0
- lmTFdQe7F23lvamu5u3zWpt7jHGSmgEtMbZVZw9uWwvO6iErXpMSnXvW0IRq/L5PHbF6lJzn+
- 6zy4AFoY6Qqr0+JxNNK/hD7BmQjZEfzJSQonKFC3eDLrRayk84PTXoAX9FUkeo5sglqPWqLjm
- OaGMCDsvHr5wyUUYlFsoN2owXa2mUXef0ksBdcwIKjR9+pD/0QXnhNMI/QpO7HO61WrWyEH7p
- 7r5HMkFUPN9Nn3H+hQPbKzei5F7zTWYs61aqH/T40RMucDgxy4KwFHwE2w4BUR8gt6H1YdnHd
- eyYqBGEapU8fFmZDeRfeaphuNFkfkryiSTDuuFwgHQ926lm+XDvuy1+xFeyV+oMOpuaykD2kL
- OMVdkydCx1EPHOk2BJ5Qc6kvex4GyexTaKxJ8r4UAg5yDRcMYM/gK8Ho6+9nwGtcqBEAykIhc
- T+xH3i+Se9ygdKwxGYKktXffz/VkVijz/91MalgEF2mD3SZKLrlktlFsUiMcci1Hs7brjvRb9
- Nf0HyJQ1liJFE11ESpS9Yb8+UEq3flDzJW/aLA20h1rqAFU21VPig822SjbkNCpMNm4b3RD5e
- htmP0AsT1e5V1StiRWc2lrz2D61ub+csRlSphkMZMF1oAsOodn+NzpbiPrt4J9QpplBLZbzOo
- 91kTdMHVVxGdJNLy12W1+ihWCo6QHFFiLPnSu62d/E9bsK4Njql+yeShmuU51K+WSXdYuYtQ7
- +/hNzUKCCrcyYSVWlzZQ==
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
-On 2021/3/2 =E4=B8=8B=E5=8D=889:20, Coly Li wrote:
-> On 3/2/21 6:20 PM, Norman.Kern wrote:
->> Sorry for creating a new mail thread(the origin is so long...)
->>
->>
->> I made a test again and get more infomation:
->>
->> root@WXS0089:~# cat /sys/block/bcache0/bcache/dirty_data
->> 0.0k
->> root@WXS0089:~# lsblk /dev/sda
->> NAME=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 MAJ:MIN RM=C2=A0=C2=A0 SIZE RO TYPE =
-MOUNTPOINT
->> sda=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 8:0=C2=A0=C2=A0=C2=
-=A0 0 447.1G=C2=A0 0 disk
->> `-bcache0 252:0=C2=A0=C2=A0=C2=A0 0=C2=A0 10.9T=C2=A0 0 disk
->> root@WXS0089:~# cat /sys/block/sda/bcache/priority_stats
->> Unused:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 1%
->> Clean:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 29%
->> Dirty:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 70%
->> Metadata:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0%
->> Average:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 49
->> Sectors per Q:=C2=A0 29184768
->> Quantiles:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 [1 2 3 5 6 8 9 11 13 14 16 19 =
-21 23 26 29 32 36 39 43 48 53 59 65 73 83 94 109 129 156 203]
->> root@WXS0089:~# cat /sys/fs/bcache/066319e1-8680-4b5b-adb8-49596319154b=
-/internal/gc_after_writeback
->> 1
->> You have new mail in /var/mail/root
->> root@WXS0089:~# cat /sys/fs/bcache/066319e1-8680-4b5b-adb8-49596319154b=
-/cache_available_percent
->> 28
->>
->> I read the source codes and found if cache_available_percent > 50, it s=
-hould wakeup gc while doing writeback, but it seemed not work right.
->>
-> If gc_after_writeback is enabled, and after it is enabled and the cache
-> usage > 50%, a tag BCH_DO_AUTO_GC will be set to c->gc_after_writeback.
-> Then when the writeback completed the gc thread will wake up in force.
->
-> so the auto gc after writeback will be triggered when,
-> 1, the bcache device is in writeback mode
-> 2, gc_after_writeback set to 1
-> 3, After 2) done, the cache usage exceeds 50% threshold.
-> 4, writeback rate set to maximum rate when the bcache device is idle (no
-> regular I/O request)
-> 5, after the writeback accomplished, the gc thread will be waken up.
->
-> But /sys/block/bcache0/bcache/dirty_data is 0.0k doesn't mean the
-> writeback is accomplished. It is possible the writeback thread still
-> goes through all btree keys for the last try even all the dirty data are
-> flushed. Therefore you should check whether the writeback thread is
-> still active before a conclusion is made that the writeback is completed=
-.
->
-> BTW, do you try a Linux v5.8+ kernel and see how things are ?
-I stoped all rw tests for almost the whole day and no iops from iostat. Wh=
-en I echo 1 to trigger_gc the
 
-cache_available_percent changed for 29 to 100 in seconds.
-I will have a test on 5.8.0-44.
+On Wed, 3 Mar 2021, JeffleXu wrote:
 
->
-> Thanks.
->
-> Coly Li
+> 
+> 
+> On 3/3/21 3:05 AM, Mikulas Patocka wrote:
+> > Don't clear REQ_HIPRI for bio-based drivers. Device mapper will need to
+> > see this flag in order to support polling.
+> > 
+> > Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
+> > 
+> > ---
+> >  block/blk-core.c |    2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > Index: linux-2.6/block/blk-core.c
+> > ===================================================================
+> > --- linux-2.6.orig/block/blk-core.c	2021-03-02 10:43:28.000000000 +0100
+> > +++ linux-2.6/block/blk-core.c	2021-03-02 10:53:50.000000000 +0100
+> 
+> I notice that the diff header indicates that the code base is from
+> linux-2.6. Or it's just the name of your directory, while the code base
+> is for the latest upstream 5.12?
+
+It's just the name of the git repository. The patch is against 5.12-rc1.
+
+> 
+> > @@ -836,7 +836,7 @@ static noinline_for_stack bool submit_bi
+> >  		}
+> >  	}
+> >  
+> > -	if (!test_bit(QUEUE_FLAG_POLL, &q->queue_flags))
+> > +	if (!test_bit(QUEUE_FLAG_POLL, &q->queue_flags) && !bdev->bd_disk->fops->submit_bio)
+> >  		bio->bi_opf &= ~REQ_HIPRI;
+> >  
+> >  	switch (bio_op(bio)) {
+> > 
+> > --
+> 
+> What if dm device is built upon mq devices that are not capable of
+> polling, i.e., mq devices without QUEUE_FLAG_POLL set? Then this dm
+> device shall not support polling.
+
+We will check if the underlying queue has QUEUE_FLAG_POLL in __map_bio - 
+see this piece of code:
+
+        case DM_MAPIO_REMAPPED:
+                /* the bio has been remapped so dispatch it */
+                trace_block_bio_remap(clone, bio_dev(io->orig_bio), sector);
+                if (clone->bi_opf & REQ_HIPRI &&
+                    test_bit(QUEUE_FLAG_POLL, &clone->bi_bdev->bd_disk->queue->queue_flags)) {
+                        ci->poll_queue = clone->bi_bdev->bd_disk->queue;
+                        ci->poll_cookie = submit_bio_noacct_mq_direct(clone);
+                } else {
+                        ci->poll_cookie = BLK_QC_T_NONE;
+                        submit_bio_noacct(clone);
+                }
+                break;
+
+Mikulas
+
