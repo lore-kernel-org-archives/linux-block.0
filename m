@@ -7,31 +7,31 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE306C433E0
-	for <linux-block@archiver.kernel.org>; Wed,  3 Mar 2021 16:42:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F6C3C433DB
+	for <linux-block@archiver.kernel.org>; Wed,  3 Mar 2021 16:43:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 942E364E6F
-	for <linux-block@archiver.kernel.org>; Wed,  3 Mar 2021 16:42:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3D99B64EBB
+	for <linux-block@archiver.kernel.org>; Wed,  3 Mar 2021 16:43:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346831AbhCCQiy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 Mar 2021 11:38:54 -0500
-Received: from out30-54.freemail.mail.aliyun.com ([115.124.30.54]:57298 "EHLO
+        id S1346822AbhCCQi4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 Mar 2021 11:38:56 -0500
+Received: from out30-54.freemail.mail.aliyun.com ([115.124.30.54]:48176 "EHLO
         out30-54.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1442103AbhCCL6a (ORCPT
+        by vger.kernel.org with ESMTP id S1442110AbhCCL6d (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 3 Mar 2021 06:58:30 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04426;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0UQGHkBm_1614772664;
-Received: from localhost(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0UQGHkBm_1614772664)
+        Wed, 3 Mar 2021 06:58:33 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R211e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04426;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0UQFn1IH_1614772667;
+Received: from localhost(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0UQFn1IH_1614772667)
           by smtp.aliyun-inc.com(127.0.0.1);
-          Wed, 03 Mar 2021 19:57:45 +0800
+          Wed, 03 Mar 2021 19:57:48 +0800
 From:   Jeffle Xu <jefflexu@linux.alibaba.com>
 To:     msnitzer@redhat.com, axboe@kernel.dk
 Cc:     io-uring@vger.kernel.org, dm-devel@redhat.com,
         linux-block@vger.kernel.org, mpatocka@redhat.com,
         caspar@linux.alibaba.com, joseph.qi@linux.alibaba.com
-Subject: [PATCH v5 04/12] block: add poll_capable method to support bio-based IO polling
-Date:   Wed,  3 Mar 2021 19:57:32 +0800
-Message-Id: <20210303115740.127001-5-jefflexu@linux.alibaba.com>
+Subject: [PATCH v5 07/12] blk-mq: add one helper function getting hw queue
+Date:   Wed,  3 Mar 2021 19:57:35 +0800
+Message-Id: <20210303115740.127001-8-jefflexu@linux.alibaba.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20210303115740.127001-1-jefflexu@linux.alibaba.com>
 References: <20210303115740.127001-1-jefflexu@linux.alibaba.com>
@@ -41,64 +41,48 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This method can be used to check if bio-based device supports IO polling
-or not. For mq devices, checking for hw queue in polling mode is
-adequate, while the sanity check shall be implementation specific for
-bio-based devices. For example, dm device needs to check if all
-underlying devices are capable of IO polling.
-
-Though bio-based device may have done the sanity check during the
-device initialization phase, cacheing the result of this sanity check
-(such as by cacheing in the queue_flags) may not work. Because for dm
-devices, users could change the state of the underlying devices through
-'/sys/block/<dev>/io_poll', bypassing the dm device above. In this case,
-the cached result of the very beginning sanity check could be
-out-of-date. Thus the sanity check needs to be done every time 'io_poll'
-is to be modified.
+Add one helper function getting hw queue mapping to specific CPU, and of
+specific type.
 
 Signed-off-by: Jeffle Xu <jefflexu@linux.alibaba.com>
 ---
- block/blk-sysfs.c      | 14 +++++++++++---
- include/linux/blkdev.h |  1 +
- 2 files changed, 12 insertions(+), 3 deletions(-)
+ block/blk-mq.c         | 10 ++++++++++
+ include/linux/blk-mq.h |  2 ++
+ 2 files changed, 12 insertions(+)
 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 0f4f0c8a7825..367c1d9a55c6 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -426,9 +426,17 @@ static ssize_t queue_poll_store(struct request_queue *q, const char *page,
- 	unsigned long poll_on;
- 	ssize_t ret;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 6ef9f0b038c2..72390f208c82 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -3902,6 +3902,16 @@ unsigned int blk_mq_rq_cpu(struct request *rq)
+ }
+ EXPORT_SYMBOL(blk_mq_rq_cpu);
  
--	if (!q->tag_set || q->tag_set->nr_maps <= HCTX_TYPE_POLL ||
--	    !q->tag_set->map[HCTX_TYPE_POLL].nr_queues)
--		return -EINVAL;
-+	if (queue_is_mq(q)) {
-+		if (!q->tag_set || q->tag_set->nr_maps <= HCTX_TYPE_POLL ||
-+		    !q->tag_set->map[HCTX_TYPE_POLL].nr_queues)
-+			return -EINVAL;
-+	} else {
-+		struct gendisk *disk = queue_to_disk(q);
 +
-+		if (!disk->fops->poll_capable ||
-+		    !disk->fops->poll_capable(disk))
-+			return -EINVAL;
-+	}
++struct blk_mq_hw_ctx *blk_mq_get_hctx(struct request_queue *q, int cpu,
++				      unsigned int flags)
++{
++	struct blk_mq_ctx *ctx = __blk_mq_get_ctx(q, cpu);
++
++	return blk_mq_map_queue(q, flags, ctx);
++}
++EXPORT_SYMBOL(blk_mq_get_hctx);
++
+ static int __init blk_mq_init(void)
+ {
+ 	int i;
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index d22269b3dbe9..149f6a9d9aa7 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -638,5 +638,7 @@ blk_qc_t blk_mq_submit_bio(struct bio *bio);
+ int blk_mq_poll(struct request_queue *q, blk_qc_t cookie, bool spin);
+ void blk_mq_hctx_set_fq_lock_class(struct blk_mq_hw_ctx *hctx,
+ 		struct lock_class_key *key);
++struct blk_mq_hw_ctx *blk_mq_get_hctx(struct request_queue *q, int cpu,
++		unsigned int flags);
  
- 	ret = queue_var_store(&poll_on, page, count);
- 	if (ret < 0)
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 9dc83c30e7bc..7df40792c032 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1867,6 +1867,7 @@ static inline void blk_ksm_unregister(struct request_queue *q) { }
- struct block_device_operations {
- 	blk_qc_t (*submit_bio) (struct bio *bio);
- 	int (*poll)(struct request_queue *q, blk_qc_t cookie);
-+	bool (*poll_capable)(struct gendisk *disk);
- 	int (*open) (struct block_device *, fmode_t);
- 	void (*release) (struct gendisk *, fmode_t);
- 	int (*rw_page)(struct block_device *, sector_t, struct page *, unsigned int);
+ #endif
 -- 
 2.27.0
 
