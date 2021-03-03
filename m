@@ -2,69 +2,92 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACBDEC432C3
-	for <linux-block@archiver.kernel.org>; Wed,  3 Mar 2021 16:41:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 049E4C433DB
+	for <linux-block@archiver.kernel.org>; Wed,  3 Mar 2021 16:42:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7373B64EBB
-	for <linux-block@archiver.kernel.org>; Wed,  3 Mar 2021 16:41:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CC08264E6F
+	for <linux-block@archiver.kernel.org>; Wed,  3 Mar 2021 16:42:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346459AbhCCQic (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 Mar 2021 11:38:32 -0500
-Received: from verein.lst.de ([213.95.11.211]:36072 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S241299AbhCCK1l (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 3 Mar 2021 05:27:41 -0500
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 1513A68B02; Wed,  3 Mar 2021 10:10:23 +0100 (CET)
-Date:   Wed, 3 Mar 2021 10:10:22 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     javier@javigon.com
-Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        hch@lst.de, kbusch@kernel.org, sagi@grimberg.me,
-        minwoo.im.dev@gmail.com,
-        Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier.gonz@samsung.com>
-Subject: Re: [PATCH V6 1/2] nvme: enable char device per namespace
-Message-ID: <20210303091022.GA12784@lst.de>
-References: <20210301192452.16770-1-javier.gonz@samsung.com> <20210301192452.16770-2-javier.gonz@samsung.com>
+        id S1346666AbhCCQik (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 Mar 2021 11:38:40 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:35908 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234386AbhCCLmM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 3 Mar 2021 06:42:12 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1614771639;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=WCfj/IdYiX5hh1kSfgYnluMWA7KXC90R6NsWIPre0IU=;
+        b=HBVL+/OjAD9ZsoQhlnF/iBKnZ9qq4TH2HjAWkkyiv3AvEK7pZaPg9brt5FnSMCUCl/lJvn
+        kn08pvUJfG1xfMy27xYLoHvTJ9bVvkTMs74cMe3HwrfZus7/Vddl7f3B9Er5/IX5H6uPEZ
+        628JmPYJ7Hw6B2PCSCNwlRwT4bkLiU0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-142-WaMgdSZ6MemmT9VJqrHiuQ-1; Wed, 03 Mar 2021 06:40:37 -0500
+X-MC-Unique: WaMgdSZ6MemmT9VJqrHiuQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C91DD107ACE3;
+        Wed,  3 Mar 2021 11:40:35 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-12-197.pek2.redhat.com [10.72.12.197])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8FD4660C5E;
+        Wed,  3 Mar 2021 11:40:33 +0000 (UTC)
+Subject: Re: [bug report]null pointer at scsi_mq_exit_request+0x14 with
+ blktests srp/015
+To:     Bart Van Assche <bvanassche@acm.org>,
+        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>
+References: <418155251.14154941.1614505772200.JavaMail.zimbra@redhat.com>
+ <BYAPR04MB4965FDA9847096508E35FFB9869B9@BYAPR04MB4965.namprd04.prod.outlook.com>
+ <8b1fc0cd-196a-ad78-71c6-a7515ffbb4ad@redhat.com>
+ <4d188158-3f18-c801-02ca-97350eb10c1b@acm.org>
+From:   Yi Zhang <yi.zhang@redhat.com>
+Message-ID: <70398f13-aefa-8de2-f6fe-bcfbfb20fcae@redhat.com>
+Date:   Wed, 3 Mar 2021 19:40:24 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+In-Reply-To: <4d188158-3f18-c801-02ca-97350eb10c1b@acm.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210301192452.16770-2-javier.gonz@samsung.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Mar 01, 2021 at 08:24:51PM +0100, javier@javigon.com wrote:
-> From: Javier Gonz�lez <javier.gonz@samsung.com>
-> 
-> Create a char device per NVMe namespace. This char device is always
-> initialized, independently of whether the features implemented by the
-> device are supported by the kernel. User-space can therefore always
-> issue IOCTLs to the NVMe driver using the char device.
-> 
-> The char device is presented as /dev/nvme-generic-XcYnZ. This naming
-> scheme follows the convention of the hidden device (nvmeXcYnZ). Support
-> for multipath will follow.
 
-So I'm a little worried about the "support for multipath will follow" as
-this has implications for the naming scheme, and our policy of how we
-allow access to a namespace.
 
-Ignoring some of the deprecated historic mistakes I think the policy
-should be:
+On 3/2/21 11:59 AM, Bart Van Assche wrote:
+> On 3/1/21 7:36 AM, Yi Zhang wrote:
+>> This issue cannot be reproduced on latest 5.12.0-rc1.
+>>
+>> Please ignore this report, sorry for the noise.
+> How about rerunning the same test against v5.11.2, the latest v5.11
+> stable kernel? I think your report means that v5.11 can be improved...
+I tried on stable kernel 5.11.2/5.10.19, and all reproduced, here is the log
+5.11.2  https://pastebin.com/hG4iBETG
+5.10.19  https://pastebin.com/ExFbQMdg
 
- - admin commands that often are controller specific should usually
-   go to a controller-specific device, the existing /dev/nvmeX
-   devices
- - I/O commands and admin command that do specific a nsid should go
-   through a per-namespace node that is multipath aware and not
-   controller specific
+It' not 100% reproduced and sometimes can be reproduced within 20 times' 
+testing.
+I tried bisect, but unfortunately my attempts don't land on anything that
+looks like the real culprit. :(
 
-Which also makes me wonder about patch 2 in the series that seems
-somewhat dangerous.   Can we clearly state the policy implemented?
+> Thanks,
+>
+> Bart.
+>
+
