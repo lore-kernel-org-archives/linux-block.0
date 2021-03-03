@@ -2,92 +2,108 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 049E4C433DB
-	for <linux-block@archiver.kernel.org>; Wed,  3 Mar 2021 16:42:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76713C433E0
+	for <linux-block@archiver.kernel.org>; Wed,  3 Mar 2021 16:42:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CC08264E6F
-	for <linux-block@archiver.kernel.org>; Wed,  3 Mar 2021 16:42:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 36D0964E6F
+	for <linux-block@archiver.kernel.org>; Wed,  3 Mar 2021 16:42:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346666AbhCCQik (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 Mar 2021 11:38:40 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:35908 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234386AbhCCLmM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 3 Mar 2021 06:42:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614771639;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=WCfj/IdYiX5hh1kSfgYnluMWA7KXC90R6NsWIPre0IU=;
-        b=HBVL+/OjAD9ZsoQhlnF/iBKnZ9qq4TH2HjAWkkyiv3AvEK7pZaPg9brt5FnSMCUCl/lJvn
-        kn08pvUJfG1xfMy27xYLoHvTJ9bVvkTMs74cMe3HwrfZus7/Vddl7f3B9Er5/IX5H6uPEZ
-        628JmPYJ7Hw6B2PCSCNwlRwT4bkLiU0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-142-WaMgdSZ6MemmT9VJqrHiuQ-1; Wed, 03 Mar 2021 06:40:37 -0500
-X-MC-Unique: WaMgdSZ6MemmT9VJqrHiuQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C91DD107ACE3;
-        Wed,  3 Mar 2021 11:40:35 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-12-197.pek2.redhat.com [10.72.12.197])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8FD4660C5E;
-        Wed,  3 Mar 2021 11:40:33 +0000 (UTC)
-Subject: Re: [bug report]null pointer at scsi_mq_exit_request+0x14 with
- blktests srp/015
-To:     Bart Van Assche <bvanassche@acm.org>,
-        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>
-References: <418155251.14154941.1614505772200.JavaMail.zimbra@redhat.com>
- <BYAPR04MB4965FDA9847096508E35FFB9869B9@BYAPR04MB4965.namprd04.prod.outlook.com>
- <8b1fc0cd-196a-ad78-71c6-a7515ffbb4ad@redhat.com>
- <4d188158-3f18-c801-02ca-97350eb10c1b@acm.org>
-From:   Yi Zhang <yi.zhang@redhat.com>
-Message-ID: <70398f13-aefa-8de2-f6fe-bcfbfb20fcae@redhat.com>
-Date:   Wed, 3 Mar 2021 19:40:24 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        id S1346717AbhCCQin (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 Mar 2021 11:38:43 -0500
+Received: from mx2.suse.de ([195.135.220.15]:54172 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S242631AbhCCLqP (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 3 Mar 2021 06:46:15 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 2929EAD2B;
+        Wed,  3 Mar 2021 11:45:12 +0000 (UTC)
+Subject: Re: [RFC PATCH v1 1/6] badblocks: add more helper structure and
+ routines in badblocks.h
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     antlists@youngman.org.uk, axboe@kernel.dk,
+        linux-kernel@vger.kernel.org, dan.j.williams@intel.com,
+        linux-raid@vger.kernel.org, vishal.l.verma@intel.com,
+        linux-nvdimm@lists.01.org, linux-block@vger.kernel.org,
+        neilb@suse.de
+References: <20210302040252.103720-1-colyli@suse.de>
+ <20210302040252.103720-2-colyli@suse.de>
+ <96a899a9-151e-ff8c-c61c-900df1122357@suse.de>
+From:   Coly Li <colyli@suse.de>
+Message-ID: <01aee83b-89d6-6048-ebfc-d07be1aaea7e@suse.de>
+Date:   Wed, 3 Mar 2021 19:45:07 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:78.0)
+ Gecko/20100101 Thunderbird/78.8.0
 MIME-Version: 1.0
-In-Reply-To: <4d188158-3f18-c801-02ca-97350eb10c1b@acm.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <96a899a9-151e-ff8c-c61c-900df1122357@suse.de>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 3/2/21 11:59 AM, Bart Van Assche wrote:
-> On 3/1/21 7:36 AM, Yi Zhang wrote:
->> This issue cannot be reproduced on latest 5.12.0-rc1.
+On 3/3/21 4:20 PM, Hannes Reinecke wrote:
+> On 3/2/21 5:02 AM, Coly Li wrote:
+>> This patch adds the following helper structure and routines into
+>> badblocks.h,
+>> - struct bad_context
+>>   This structure is used in improved badblocks code for bad table
+>>   iteration.
+>> - BB_END()
+>>   The macro to culculate end LBA of a bad range record from bad
+>>   table.
+>> - badblocks_full() and badblocks_empty()
+>>   The inline routines to check whether bad table is full or empty.
+>> - set_changed() and clear_changed()
+>>   The inline routines to set and clear 'changed' tag from struct
+>>   badblocks.
 >>
->> Please ignore this report, sorry for the noise.
-> How about rerunning the same test against v5.11.2, the latest v5.11
-> stable kernel? I think your report means that v5.11 can be improved...
-I tried on stable kernel 5.11.2/5.10.19, and all reproduced, here is the log
-5.11.2  https://pastebin.com/hG4iBETG
-5.10.19  https://pastebin.com/ExFbQMdg
+>> These new helper structure and routines can help to make the code more
+>> clear, they will be used in the improved badblocks code in following
+>> patches.
+>>
+>> Signed-off-by: Coly Li <colyli@suse.de>
+>> ---
+>>  include/linux/badblocks.h | 32 ++++++++++++++++++++++++++++++++
+>>  1 file changed, 32 insertions(+)
+>>
+>> diff --git a/include/linux/badblocks.h b/include/linux/badblocks.h
+>> index 2426276b9bd3..166161842d1f 100644
+>> --- a/include/linux/badblocks.h
+>> +++ b/include/linux/badblocks.h
+>> @@ -15,6 +15,7 @@
+>>  #define BB_OFFSET(x)	(((x) & BB_OFFSET_MASK) >> 9)
+>>  #define BB_LEN(x)	(((x) & BB_LEN_MASK) + 1)
+>>  #define BB_ACK(x)	(!!((x) & BB_ACK_MASK))
+>> +#define BB_END(x)	(BB_OFFSET(x) + BB_LEN(x))
+>>  #define BB_MAKE(a, l, ack) (((a)<<9) | ((l)-1) | ((u64)(!!(ack)) << 63))
+>>  
+>>  /* Bad block numbers are stored sorted in a single page.
+>> @@ -41,6 +42,14 @@ struct badblocks {
+>>  	sector_t size;		/* in sectors */
+>>  };
+>>  
+>> +struct bad_context {
+>> +	sector_t	start;
+>> +	sector_t	len;
+>> +	int		ack;
+>> +	sector_t	orig_start;
+>> +	sector_t	orig_len;
+>> +};
+>> +
+> Maybe rename it to 'badblocks_context'.
+> It's not the context which is bad ...
+> 
 
-It' not 100% reproduced and sometimes can be reproduced within 20 times' 
-testing.
-I tried bisect, but unfortunately my attempts don't land on anything that
-looks like the real culprit. :(
+Copied, I will modify it in next version.
 
-> Thanks,
->
-> Bart.
->
+Thanks for the suggestion.
+
+Coly Li
 
