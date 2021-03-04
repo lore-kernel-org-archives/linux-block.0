@@ -8,40 +8,40 @@ X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DATE_IN_PAST_06_12,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB949C4160E
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDA61C15502
 	for <linux-block@archiver.kernel.org>; Thu,  4 Mar 2021 12:30:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A4AAD64F1E
+	by mail.kernel.org (Postfix) with ESMTP id B402764F45
 	for <linux-block@archiver.kernel.org>; Thu,  4 Mar 2021 12:30:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240676AbhCDM3l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 Mar 2021 07:29:41 -0500
-Received: from relay.smtp-ext.broadcom.com ([192.19.221.30]:40562 "EHLO
+        id S240670AbhCDM3k (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 Mar 2021 07:29:40 -0500
+Received: from relay.smtp-ext.broadcom.com ([192.19.221.30]:40564 "EHLO
         relay.smtp-ext.broadcom.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S240626AbhCDM3F (ORCPT
+        by vger.kernel.org with ESMTP id S240629AbhCDM3F (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Thu, 4 Mar 2021 07:29:05 -0500
 Received: from localhost.localdomain (unknown [10.157.2.20])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by relay.smtp-ext.broadcom.com (Postfix) with ESMTPS id 527D822581;
-        Thu,  4 Mar 2021 04:19:56 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 relay.smtp-ext.broadcom.com 527D822581
+        by relay.smtp-ext.broadcom.com (Postfix) with ESMTPS id 854DA24352;
+        Thu,  4 Mar 2021 04:20:02 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 relay.smtp-ext.broadcom.com 854DA24352
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=broadcom.com;
-        s=dkimrelay; t=1614860396;
-        bh=TZeHhRQiIohq2Wlci4C9f8oW0wk8hoNs2pmCNB/WCx4=;
+        s=dkimrelay; t=1614860402;
+        bh=srb5Vb2ueRAHp4t+HFxlbTF+4prF+ZqavV1+8P0nMg4=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=axRKb/wRMhhiUmXSyj364PFAQX28zQJZ2kRvmtTMfjqmMHMJtAPBHURtrxfvQ/Dyz
-         jSUcxDlymOLkRwiDImWlFIWafitBxgC/hNGP274hRvBKy9xWAf+If1KTAZ/swrGEii
-         AczdLwlrLtB3fLs2jIJgrgajTVfvkOnGjd5oORJs=
+        b=WmJsB400xXyVoKDokTAUZbRL5X7v3MtX61NYfDRFkg6HF1ucLByQP9zwFJsNqvAF6
+         vIjOZGfCZopfTUyCWKws58RsK+487tmO9JRBC1M3Clf7TU5HihwD7Z1q0nYpitqb4b
+         ULrn8EiiQi+rE0u+BzyrGFiWog1LwmR50nkhUzXs=
 From:   Muneendra <muneendra.kumar@broadcom.com>
 To:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
         tj@kernel.org, linux-nvme@lists.infradead.org, hare@suse.de
 Cc:     jsmart2021@gmail.com, emilne@redhat.com, mkumar@redhat.com,
-        Muneendra <muneendra.kumar@broadcom.com>
-Subject: [PATCH v8 03/16] nvme: Added a newsysfs attribute appid_store
-Date:   Thu,  4 Mar 2021 10:57:13 +0530
-Message-Id: <1614835646-16217-4-git-send-email-muneendra.kumar@broadcom.com>
+        Gaurav Srivastava <gaurav.srivastava@broadcom.com>
+Subject: [PATCH v8 14/16] lpfc: vmid: Adding qfpa and vmid timeout check in worker thread
+Date:   Thu,  4 Mar 2021 10:57:24 +0530
+Message-Id: <1614835646-16217-15-git-send-email-muneendra.kumar@broadcom.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1614835646-16217-1-git-send-email-muneendra.kumar@broadcom.com>
 References: <1614835646-16217-1-git-send-email-muneendra.kumar@broadcom.com>
@@ -49,144 +49,108 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Added a new sysfs attribute appid_store under
-/sys/class/fc/fc_udev_device/*
+From: Gaurav Srivastava <gaurav.srivastava@broadcom.com>
 
-With this new interface the user can set the application identfier
-in  the blkcg associted with cgroup id.
+This patch add the periodic check for issuing of qfpa command and vmid
+timeout in the worker thread. The inactivity timeout check is added via
+the timer function.
 
-Once the application identifer has set with this interface it allows
-identification of traffic sources at an individual cgroup based
-Applications (ex:virtual machine (VM))level in both host and
-fabric infrastructure(FC).
-
-Below is the interface provided to set the app_id
-
-echo "<cgroupid>:<appid>" >> /sys/class/fc/fc_udev_device/appid_store
-echo "457E:100000109b521d27" >> /sys/class/fc/fc_udev_device/appid_store
-
-Signed-off-by: Muneendra <muneendra.kumar@broadcom.com>
+Signed-off-by: Gaurav Srivastava  <gaurav.srivastava@broadcom.com>
+Signed-off-by: James Smart <jsmart2021@gmail.com>
 
 ---
 v8:
-No change
+checked the function return value
 
 v7:
 No change
 
 v6:
-No change
+Added Forward declarations and removed unused variable
 
 v5:
-Replaced APPID_LEN with FC_APPID_LEN
+No change
 
 v4:
 No change
 
 v3:
-Replaced blkcg_set_app_identifier function with blkcg_set_fc_appid
+No change
 
 v2:
-New Patch
+Ported the patch on top of 5.10/scsi-queue
 ---
- drivers/nvme/host/fc.c | 73 +++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 72 insertions(+), 1 deletion(-)
+ drivers/scsi/lpfc/lpfc_hbadisc.c | 43 ++++++++++++++++++++++++++++++++
+ 1 file changed, 43 insertions(+)
 
-diff --git a/drivers/nvme/host/fc.c b/drivers/nvme/host/fc.c
-index 38373a0e86ef..4cad4364fbce 100644
---- a/drivers/nvme/host/fc.c
-+++ b/drivers/nvme/host/fc.c
-@@ -9,7 +9,7 @@
- #include <uapi/scsi/fc/fc_els.h>
- #include <linux/delay.h>
- #include <linux/overflow.h>
--
-+#include <linux/blk-cgroup.h>
- #include "nvme.h"
- #include "fabrics.h"
- #include <linux/nvme-fc-driver.h>
-@@ -3769,10 +3769,81 @@ static ssize_t nvme_fc_nvme_discovery_store(struct device *dev,
+diff --git a/drivers/scsi/lpfc/lpfc_hbadisc.c b/drivers/scsi/lpfc/lpfc_hbadisc.c
+index c4519f6349bc..c807302a782d 100644
+--- a/drivers/scsi/lpfc/lpfc_hbadisc.c
++++ b/drivers/scsi/lpfc/lpfc_hbadisc.c
+@@ -73,6 +73,7 @@ static void lpfc_unregister_fcfi_cmpl(struct lpfc_hba *, LPFC_MBOXQ_t *);
+ static int lpfc_fcf_inuse(struct lpfc_hba *);
+ static void lpfc_mbx_cmpl_read_sparam(struct lpfc_hba *, LPFC_MBOXQ_t *);
+ static void lpfc_check_inactive_vmid(struct lpfc_hba *phba);
++static void lpfc_check_vmid_qfpa_issue(struct lpfc_hba *phba);
  
- 	return count;
+ static int
+ lpfc_valid_xpt_node(struct lpfc_nodelist *ndlp)
+@@ -439,6 +440,32 @@ lpfc_dev_loss_tmo_handler(struct lpfc_nodelist *ndlp)
+ 	return fcf_inuse;
  }
-+
-+/*parse the Cgroup id from a buf and returns the length of cgrpid*/
-+static int fc_parse_cgrpid(const char *buf, u64 *id)
+ 
++static void lpfc_check_vmid_qfpa_issue(struct lpfc_hba *phba)
 +{
-+	char cgrp_id[16+1];
-+	int cgrpid_len, j;
++	struct lpfc_vport *vport;
++	struct lpfc_vport **vports;
++	int i;
 +
-+	memset(cgrp_id, 0x0, sizeof(cgrp_id));
-+	for (cgrpid_len = 0, j = 0; cgrpid_len < 17; cgrpid_len++) {
-+		if (buf[cgrpid_len] != ':')
-+			cgrp_id[cgrpid_len] = buf[cgrpid_len];
-+		else {
-+			j = 1;
++	vports = lpfc_create_vport_work_array(phba);
++	if (!vports)
++		return;
++
++	for (i = 0; i <= phba->max_vports; i++) {
++		if ((!vports[i]) && (i == 0))
++			vport = phba->pport;
++		else
++			vport = vports[i];
++		if (!vport)
 +			break;
++
++		if (vport->vmid_flag & LPFC_VMID_ISSUE_QFPA) {
++			if (!lpfc_issue_els_qfpa(vport))
++				vport->vmid_flag &= ~LPFC_VMID_ISSUE_QFPA;
 +		}
 +	}
-+	if (!j)
-+		return -EINVAL;
-+	if (kstrtou64(cgrp_id, 16, id) < 0)
-+		return -EINVAL;
-+	return cgrpid_len;
++	lpfc_destroy_vport_work_array(phba, vports);
 +}
 +
-+/*
-+ * fc_update_appid :parses and updates the appid in the blkcg associated with
-+ * cgroupid.
-+ * @buf: buf contains both cgrpid and appid info
-+ * @count: size of the buffer
-+ */
-+static int fc_update_appid(const char *buf, size_t count)
-+{
-+	u64 cgrp_id;
-+	int appid_len = 0;
-+	int cgrpid_len = 0;
-+	char app_id[FC_APPID_LEN];
-+	int ret = 0;
-+
-+	if (buf[count-1] == '\n')
-+		count--;
-+
-+	if ((count > (16+1+FC_APPID_LEN)) || (!strchr(buf, ':')))
-+		return -EINVAL;
-+
-+	cgrpid_len = fc_parse_cgrpid(buf, &cgrp_id);
-+	if (cgrpid_len < 0)
-+		return -EINVAL;
-+	/*appid len is count - cgrpid_len -1 (: + \n) */
-+	appid_len = count - cgrpid_len - 1;
-+	if (appid_len > FC_APPID_LEN)
-+		return -EINVAL;
-+
-+	memset(app_id, 0x0, sizeof(app_id));
-+	memcpy(app_id, &buf[cgrpid_len+1], appid_len);
-+	ret = blkcg_set_fc_appid(app_id, cgrp_id, sizeof(app_id));
-+	if (ret < 0)
-+		return ret;
-+	return count;
-+}
-+
-+static ssize_t fc_appid_store(struct device *dev,
-+		struct device_attribute *attr, const char *buf, size_t count)
-+{
-+	int ret  = 0;
-+
-+	ret = fc_update_appid(buf, count);
-+	if (ret < 0)
-+		return -EINVAL;
-+	return count;
-+}
- static DEVICE_ATTR(nvme_discovery, 0200, NULL, nvme_fc_nvme_discovery_store);
-+static DEVICE_ATTR(appid_store, 0200, NULL, fc_appid_store);
+ /**
+  * lpfc_sli4_post_dev_loss_tmo_handler - SLI4 post devloss timeout handler
+  * @phba: Pointer to hba context object.
+@@ -759,6 +786,22 @@ lpfc_work_done(struct lpfc_hba *phba)
+ 	if (ha_copy & HA_LATT)
+ 		lpfc_handle_latt(phba);
  
- static struct attribute *nvme_fc_attrs[] = {
- 	&dev_attr_nvme_discovery.attr,
-+	&dev_attr_appid_store.attr,
- 	NULL
- };
- 
++	/* Handle VMID Events */
++	if (lpfc_is_vmid_enabled(phba)) {
++		if (phba->pport->work_port_events &
++		    WORKER_CHECK_VMID_ISSUE_QFPA) {
++			lpfc_check_vmid_qfpa_issue(phba);
++			phba->pport->work_port_events &=
++				~WORKER_CHECK_VMID_ISSUE_QFPA;
++		}
++		if (phba->pport->work_port_events &
++		    WORKER_CHECK_INACTIVE_VMID) {
++			lpfc_check_inactive_vmid(phba);
++			phba->pport->work_port_events &=
++			    ~WORKER_CHECK_INACTIVE_VMID;
++		}
++	}
++
+ 	/* Process SLI4 events */
+ 	if (phba->pci_dev_grp == LPFC_PCI_DEV_OC) {
+ 		if (phba->hba_flag & HBA_RRQ_ACTIVE)
 -- 
 2.26.2
 
