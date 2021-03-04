@@ -2,91 +2,105 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95355C433E0
-	for <linux-block@archiver.kernel.org>; Thu,  4 Mar 2021 10:16:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88D46C433E0
+	for <linux-block@archiver.kernel.org>; Thu,  4 Mar 2021 12:04:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5B76764F18
-	for <linux-block@archiver.kernel.org>; Thu,  4 Mar 2021 10:16:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4A6F664F27
+	for <linux-block@archiver.kernel.org>; Thu,  4 Mar 2021 12:04:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238369AbhCDKP7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 Mar 2021 05:15:59 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:44507 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238401AbhCDKPr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 4 Mar 2021 05:15:47 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1614852862;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=T9wLNs0hY9LPW8i/bbOeiyn0/hKvk++/9L1iE/B+NAI=;
-        b=JM+2qWzCFEA5gpFR0r2YP5TI/0QqwtGhxxZKrrf4Dr9xFfEXEN7emEZtetdEl/9FdmHCOF
-        HmNal6ZhkoGLPIhZIp9wVCldAhUBTHg7bac66/Of2if+4KRROlQQdTAS1gR9FHTiW+OVzK
-        v2n8blO0jDcsNUz+yYQRGvvgU8akLCs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-558-x_5YU6v_O-uljnGm4Wrmpw-1; Thu, 04 Mar 2021 05:14:20 -0500
-X-MC-Unique: x_5YU6v_O-uljnGm4Wrmpw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D6A9B107465E;
-        Thu,  4 Mar 2021 10:14:18 +0000 (UTC)
-Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A700639A73;
-        Thu,  4 Mar 2021 10:14:15 +0000 (UTC)
-Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
-        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 124AEFOQ008051;
-        Thu, 4 Mar 2021 05:14:15 -0500
-Received: from localhost (mpatocka@localhost)
-        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 124AEFO1008046;
-        Thu, 4 Mar 2021 05:14:15 -0500
-X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
-Date:   Thu, 4 Mar 2021 05:14:15 -0500 (EST)
-From:   Mikulas Patocka <mpatocka@redhat.com>
-X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
+        id S239809AbhCDMD3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 Mar 2021 07:03:29 -0500
+Received: from mx2.suse.de ([195.135.220.15]:48770 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S239807AbhCDMD1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 4 Mar 2021 07:03:27 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id EE8ADAE44;
+        Thu,  4 Mar 2021 12:02:45 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 2DCAA1F2B0A; Thu,  4 Mar 2021 13:02:45 +0100 (CET)
+Date:   Thu, 4 Mar 2021 13:02:45 +0100
+From:   Jan Kara <jack@suse.cz>
 To:     Jens Axboe <axboe@kernel.dk>
-cc:     JeffleXu <jefflexu@linux.alibaba.com>,
-        Mike Snitzer <msnitzer@redhat.com>,
-        Heinz Mauelshagen <heinzm@redhat.com>,
-        caspar@linux.alibaba.com, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org, joseph.qi@linux.alibaba.com,
-        dm-devel@redhat.com, hch@lst.de
-Subject: Re: [PATCH 1/4] block: introduce a function
- submit_bio_noacct_mq_direct
-In-Reply-To: <8424036e-fba9-227e-4173-8f6d05562ee3@kernel.dk>
-Message-ID: <alpine.LRH.2.02.2103040511050.7400@file01.intranet.prod.int.rdu2.redhat.com>
-References: <20210302190551.473015400@debian-a64.vm> <8424036e-fba9-227e-4173-8f6d05562ee3@kernel.dk>
-User-Agent: Alpine 2.02 (LRH 1266 2009-07-14)
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Jan Kara <jack@suse.cz>, stable@vger.kernel.org
+Subject: Re: [PATCH v2] block: Try to handle busy underlying device on discard
+Message-ID: <20210304120245.GA17824@quack2.suse.cz>
+References: <20210222094809.21775-1-jack@suse.cz>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210222094809.21775-1-jack@suse.cz>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On Wed, 3 Mar 2021, Jens Axboe wrote:
-
-> On 3/2/21 12:05 PM, Mikulas Patocka wrote:
+On Mon 22-02-21 10:48:09, Jan Kara wrote:
+> Commit 384d87ef2c95 ("block: Do not discard buffers under a mounted
+> filesystem") made paths issuing discard or zeroout requests to the
+> underlying device try to grab block device in exclusive mode. If that
+> failed we returned EBUSY to userspace. This however caused unexpected
+> fallout in userspace where e.g. FUSE filesystems issue discard requests
+> from userspace daemons although the device is open exclusively by the
+> kernel. Also shrinking of logical volume by LVM issues discard requests
+> to a device which may be claimed exclusively because there's another LV
+> on the same PV. So to avoid these userspace regressions, fall back to
+> invalidate_inode_pages2_range() instead of returning EBUSY to userspace
+> and return EBUSY only of that call fails as well (meaning that there's
+> indeed someone using the particular device range we are trying to
+> discard).
 > 
-> There seems to be something wrong with how this series is being sent
-> out. I have 1/4 and 3/4, but both are just attachments.
+> Link: https://bugzilla.kernel.org/show_bug.cgi?id=211167
+> Fixes: 384d87ef2c95 ("block: Do not discard buffers under a mounted filesystem")
+> CC: stable@vger.kernel.org
+> Signed-off-by: Jan Kara <jack@suse.cz>
+
+Ping guys? Can we get this reviewed and merged? Thanks!
+
+								Honza
+
+> ---
+>  fs/block_dev.c | 11 ++++++++++-
+>  1 file changed, 10 insertions(+), 1 deletion(-)
 > 
+> diff --git a/fs/block_dev.c b/fs/block_dev.c
+> index 235b5042672e..c33151020bcd 100644
+> --- a/fs/block_dev.c
+> +++ b/fs/block_dev.c
+> @@ -118,13 +118,22 @@ int truncate_bdev_range(struct block_device *bdev, fmode_t mode,
+>  	if (!(mode & FMODE_EXCL)) {
+>  		int err = bd_prepare_to_claim(bdev, truncate_bdev_range);
+>  		if (err)
+> -			return err;
+> +			goto invalidate;
+>  	}
+>  
+>  	truncate_inode_pages_range(bdev->bd_inode->i_mapping, lstart, lend);
+>  	if (!(mode & FMODE_EXCL))
+>  		bd_abort_claiming(bdev, truncate_bdev_range);
+>  	return 0;
+> +
+> +invalidate:
+> +	/*
+> +	 * Someone else has handle exclusively open. Try invalidating instead.
+> +	 * The 'end' argument is inclusive so the rounding is safe.
+> +	 */
+> +	return invalidate_inode_pages2_range(bdev->bd_inode->i_mapping,
+> +					     lstart >> PAGE_SHIFT,
+> +					     lend >> PAGE_SHIFT);
+>  }
+>  EXPORT_SYMBOL(truncate_bdev_range);
+>  
 > -- 
-> Jens Axboe
-
-I used quilt to send it. I don't know what's wrong with it - if you look 
-at archives at 
-https://listman.redhat.com/archives/dm-devel/2021-March/thread.html , it 
-seems normal.
-
-Mikulas
-
+> 2.26.2
+> 
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
