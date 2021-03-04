@@ -2,110 +2,117 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C51BEC433E6
-	for <linux-block@archiver.kernel.org>; Thu,  4 Mar 2021 12:54:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1759C433DB
+	for <linux-block@archiver.kernel.org>; Thu,  4 Mar 2021 15:03:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9F80E64F34
-	for <linux-block@archiver.kernel.org>; Thu,  4 Mar 2021 12:54:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 745C964F76
+	for <linux-block@archiver.kernel.org>; Thu,  4 Mar 2021 15:03:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238066AbhCDMyK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 Mar 2021 07:54:10 -0500
-Received: from mx2.suse.de ([195.135.220.15]:48138 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S239419AbhCDMxt (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 4 Mar 2021 07:53:49 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id B92DFADDB;
-        Thu,  4 Mar 2021 12:53:07 +0000 (UTC)
-Subject: Re: [PATCH v8 16/16] scsi: Made changes in Kconfig to select
- BLK_CGROUP_FC_APPID
-To:     Muneendra <muneendra.kumar@broadcom.com>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        tj@kernel.org, linux-nvme@lists.infradead.org
-Cc:     jsmart2021@gmail.com, emilne@redhat.com, mkumar@redhat.com
-References: <1614835646-16217-1-git-send-email-muneendra.kumar@broadcom.com>
- <1614835646-16217-17-git-send-email-muneendra.kumar@broadcom.com>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <9e01bb33-f8b0-3770-40f2-06adf5d9a917@suse.de>
-Date:   Thu, 4 Mar 2021 13:53:06 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        id S229505AbhCDPCo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 Mar 2021 10:02:44 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58305 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232967AbhCDPCe (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 4 Mar 2021 10:02:34 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1614870068;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ejUN3tvqkFllhrARw3o33HWriTSZkp02yrNAR9+FPd0=;
+        b=NwtiX86I7R5ItTqTzw+k47+Mr8comhnvYKAWmGL1LltJIFkwy6K+dlFFPW3GuW9wTj162G
+        7PhSdliPEKO0OMCyuHUiAincdkEBHOqqLcR1NxrEq0kctcdyuqBdq7v0n96Vk2EjkQUerV
+        TOPof1T0SY+Y+vGoqVBeo2Dr0r+dVdw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-181-VzNcRQMZNeS97iJomllj_Q-1; Thu, 04 Mar 2021 10:01:04 -0500
+X-MC-Unique: VzNcRQMZNeS97iJomllj_Q-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DBDA21019624;
+        Thu,  4 Mar 2021 15:01:02 +0000 (UTC)
+Received: from segfault.boston.devel.redhat.com (segfault.boston.devel.redhat.com [10.19.60.26])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 60BBB5D705;
+        Thu,  4 Mar 2021 15:00:58 +0000 (UTC)
+From:   Jeff Moyer <jmoyer@redhat.com>
+To:     Mikulas Patocka <mpatocka@redhat.com>
+Cc:     JeffleXu <jefflexu@linux.alibaba.com>,
+        Mike Snitzer <msnitzer@redhat.com>,
+        Heinz Mauelshagen <heinzm@redhat.com>, axboe@kernel.dk,
+        caspar@linux.alibaba.com, io-uring@vger.kernel.org,
+        linux-block@vger.kernel.org, joseph.qi@linux.alibaba.com,
+        dm-devel@redhat.com, hch@lst.de
+Subject: Re: [dm-devel] [PATCH 4/4] dm: support I/O polling
+References: <20210302190555.201228400@debian-a64.vm>
+        <33fa121a-88a8-5c27-0a43-a7efc9b5b3e3@linux.alibaba.com>
+        <alpine.LRH.2.02.2103030505460.29593@file01.intranet.prod.int.rdu2.redhat.com>
+X-PGP-KeyID: 1F78E1B4
+X-PGP-CertKey: F6FE 280D 8293 F72C 65FD  5A58 1FF8 A7CA 1F78 E1B4
+Date:   Thu, 04 Mar 2021 10:01:38 -0500
+In-Reply-To: <alpine.LRH.2.02.2103030505460.29593@file01.intranet.prod.int.rdu2.redhat.com>
+        (Mikulas Patocka's message of "Wed, 3 Mar 2021 05:09:18 -0500 (EST)")
+Message-ID: <x49o8fzklnx.fsf@segfault.boston.devel.redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <1614835646-16217-17-git-send-email-muneendra.kumar@broadcom.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/4/21 6:27 AM, Muneendra wrote:
-> Added a new config FC_APPID to select BLK_CGROUP_FC_APPID
-> which Enable support to track FC io Traffic.
-> 
-> Reported-by: kernel test robot <lkp@intel.com>
-> Signed-off-by: Muneendra <muneendra.kumar@broadcom.com>
-> 
-> ---
-> v8:
-> No change
-> 
-> v7:
-> Modified the Kconfig comments
-> 
-> v6:
-> Modified the Kconfig comments
-> 
-> v5:
-> No change
-> 
-> v4:
-> Addressed the error reported by kernel test robot
-> 
-> v3:
-> New patch
-> ---
->   drivers/scsi/Kconfig | 13 +++++++++++++
->   1 file changed, 13 insertions(+)
-> 
-> diff --git a/drivers/scsi/Kconfig b/drivers/scsi/Kconfig
-> index 06b87c7f6bab..20aa1536a3ba 100644
-> --- a/drivers/scsi/Kconfig
-> +++ b/drivers/scsi/Kconfig
-> @@ -235,6 +235,19 @@ config SCSI_FC_ATTRS
->   	  each attached FiberChannel device to sysfs, say Y.
->   	  Otherwise, say N.
->   
-> +config FC_APPID
-> +	bool "Enable support to track FC I/O Traffic"
-> +	depends on BLOCK && BLK_CGROUP
-> +	depends on SCSI
-> +	select BLK_CGROUP_FC_APPID
-> +	default y
-> +	help
-> +	  If you say Y here, it enables the support to track
-> +	  FC I/O traffic over fabric. It enables the Fabric and the
-> +	  storage targets to identify, monitor, and handle FC traffic
-> +	  based on VM tags by inserting application specific
-> +	  identification into the FC frame.
-> +
->   config SCSI_ISCSI_ATTRS
->   	tristate "iSCSI Transport Attributes"
->   	depends on SCSI && NET
-> 
-Should be merged with the patch using the Kconfig settings.
+Hi, Mikulas,
 
-Cheers,
+Mikulas Patocka <mpatocka@redhat.com> writes:
 
-Hannes
--- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
+> On Wed, 3 Mar 2021, JeffleXu wrote:
+>
+>> 
+>> 
+>> On 3/3/21 3:05 AM, Mikulas Patocka wrote:
+>> 
+>> > Support I/O polling if submit_bio_noacct_mq_direct returned non-empty
+>> > cookie.
+>> > 
+>> > Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
+>> > 
+>> > ---
+>> >  drivers/md/dm.c |    5 +++++
+>> >  1 file changed, 5 insertions(+)
+>> > 
+>> > Index: linux-2.6/drivers/md/dm.c
+>> > ===================================================================
+>> > --- linux-2.6.orig/drivers/md/dm.c	2021-03-02 19:26:34.000000000 +0100
+>> > +++ linux-2.6/drivers/md/dm.c	2021-03-02 19:26:34.000000000 +0100
+>> > @@ -1682,6 +1682,11 @@ static void __split_and_process_bio(stru
+>> >  		}
+>> >  	}
+>> >  
+>> > +	if (ci.poll_cookie != BLK_QC_T_NONE) {
+>> > +		while (atomic_read(&ci.io->io_count) > 1 &&
+>> > +		       blk_poll(ci.poll_queue, ci.poll_cookie, true)) ;
+>> > +	}
+>> > +
+>> >  	/* drop the extra reference count */
+>> >  	dec_pending(ci.io, errno_to_blk_status(error));
+>> >  }
+>> 
+>> It seems that the general idea of your design is to
+>> 1) submit *one* split bio
+>> 2) blk_poll(), waiting the previously submitted split bio complets
+>
+> No, I submit all the bios and poll for the last one.
+
+What happens if the last bio completes first?  It looks like you will
+call blk_poll with a cookie that already completed, and I'm pretty sure
+that's invalid.
+
+Thanks,
+Jeff
+
