@@ -2,108 +2,101 @@ Return-Path: <SRS0=MGRw=ID=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-20.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71516C4332E
-	for <linux-block@archiver.kernel.org>; Fri,  5 Mar 2021 16:06:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BBD1C433E0
+	for <linux-block@archiver.kernel.org>; Fri,  5 Mar 2021 16:12:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 59E196508F
-	for <linux-block@archiver.kernel.org>; Fri,  5 Mar 2021 16:06:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 15FA96508C
+	for <linux-block@archiver.kernel.org>; Fri,  5 Mar 2021 16:12:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231159AbhCEQFu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 5 Mar 2021 11:05:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55030 "EHLO
+        id S230034AbhCEQLn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 5 Mar 2021 11:11:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56340 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231156AbhCEQFa (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Mar 2021 11:05:30 -0500
-Received: from mail-il1-x129.google.com (mail-il1-x129.google.com [IPv6:2607:f8b0:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B369C061574
-        for <linux-block@vger.kernel.org>; Fri,  5 Mar 2021 08:05:30 -0800 (PST)
-Received: by mail-il1-x129.google.com with SMTP id p10so2433599ils.9
-        for <linux-block@vger.kernel.org>; Fri, 05 Mar 2021 08:05:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=dOutfGYiG2A+64OXk3o//THXPi5TUSoKfgG/x5Y+cgc=;
-        b=ahyA8ReExwW3Iq2o6f2b0T203bj8n3qviDv8OT1IH6eeP5RxkpeVM0I6eHDRuv8wV9
-         wF967WgX3Ag88gyivBVf6V4xCfR+Jj+Hjsq6a5PUet63jBb+fxzQOf9akL3ziiGQwhzg
-         +ff0AWnwWtnjtlT97mYwTVE4AoI2g9kGkGggyB4NXNtoOQGu6N3leOlbzegQjSdNSBkq
-         6hqUyyJB2Y5sm7Qqbfhc5EQZdY601q8K7KAZ7YALmIU5w3sXgfXjnd4qnyEljV93PGAw
-         i3s+3XZD5c3/R5yj0+70N6g8JJOglEMRmcHhY8+8lJl1HM7BTpzL4naZEkpOi2kPypUQ
-         jhsw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=dOutfGYiG2A+64OXk3o//THXPi5TUSoKfgG/x5Y+cgc=;
-        b=bjm7xG+pqU8euwo8zBHECdtq0F/KwPuDa03Iun505Grz4U1ALn38Z2NYdzA0uG+ffS
-         fN83bNCZQ5fcbWp3ld8RJoHKftc6Xrev5VZ9FOHCcqLtVUM/sAi6bfC+J892Pl/deajL
-         Q1vvHos1JnGkzu85yK8Yisu0xleLs5NRxf3IEGWxCvIC1FXbVCVYMEKL4gE1gFCxmSzu
-         uWsbcGzNn0cqKsRuXWRPPZzxS6isILxjvkpiGfSaiUgPd4LsBXYTgpxl8qgeL3DrMDMo
-         hvdN3Yt70FQWAT/SNfp0dW/GyiPnP4z0eXa/F0Q8+PI6zKFJTGM+n1xmfZouBYt4QlzL
-         CTqw==
-X-Gm-Message-State: AOAM5300Xwn1Lmkov3xCcudTDtg1d9H8ZOfhSUzt8pSY8OoElb3m1heg
-        VDesm7EIUWHkKCPshR4ABncBkQ==
-X-Google-Smtp-Source: ABdhPJzv0jdG7nN+mYnWzwgQAczr0646hMx1maK6gX9UzCs8SwL7oosIal47E+i7NmfN4horO3h4Rg==
-X-Received: by 2002:a05:6e02:1a6e:: with SMTP id w14mr9126622ilv.3.1614960329393;
-        Fri, 05 Mar 2021 08:05:29 -0800 (PST)
-Received: from [192.168.1.30] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id w13sm1535763ilg.48.2021.03.05.08.05.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 Mar 2021 08:05:28 -0800 (PST)
-Subject: Re: [PATCH 1/4] block: introduce a function
- submit_bio_noacct_mq_direct
-To:     Mikulas Patocka <mpatocka@redhat.com>
-Cc:     JeffleXu <jefflexu@linux.alibaba.com>,
-        Mike Snitzer <msnitzer@redhat.com>,
-        Heinz Mauelshagen <heinzm@redhat.com>,
-        caspar@linux.alibaba.com, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org, joseph.qi@linux.alibaba.com,
-        dm-devel@redhat.com, hch@lst.de
-References: <20210302190551.473015400@debian-a64.vm>
- <8424036e-fba9-227e-4173-8f6d05562ee3@kernel.dk>
- <alpine.LRH.2.02.2103040511050.7400@file01.intranet.prod.int.rdu2.redhat.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <0e730b1f-5b49-85f7-c5b7-2d6267c6a7ef@kernel.dk>
-Date:   Fri, 5 Mar 2021 09:05:28 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        with ESMTP id S230512AbhCEQLe (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Mar 2021 11:11:34 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6621EC061574
+        for <linux-block@vger.kernel.org>; Fri,  5 Mar 2021 08:11:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:Content-Type:
+        MIME-Version:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=Wb3hp7rUaFmiEPgk5Zlai5Ac7+Fj0yvLC8OgsUfflBA=; b=LEA54gjUsFK8PPNV+ub+eqnmBr
+        tGXA6FqS9M0DclxcjoxC7jDMfoW8dBjxGQyZze5ruTh7Rg7n+o6nU89Fy+wp/XpoZSTMHYVjRsPc6
+        dflvkEgZTfPYEWEjiEbCsGR6zlXfbDaONtKKKWZiP+t6RTB2cv+wE3RZAlHzR+vjjW6M3nRcn5h3d
+        nYi4v/ujF8ybQC4TEwEw9mk8N3AD0bIYuX4tLejx0bj0vXclojX2HUW207t5SvsyCtzva6RMX6ZWe
+        ez4Z/63Jh5VrhZ4bYrIJdHc8zO9eaAFJCotQwJmkchJLQx8SrlPAfPBx38M0LUMi1wARNa56bSxze
+        2sQuOsAw==;
+Received: from 089144194051.atnat0003.highway.a1.net ([89.144.194.51] helo=localhost)
+        by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
+        id 1lID2e-00Bxob-9w; Fri, 05 Mar 2021 16:11:13 +0000
+Date:   Fri, 5 Mar 2021 17:11:01 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
+        Sagi Grimberg <sagi@grimberg.me>,
+        linux-nvme@lists.infradead.org
+Subject: [GIT PULL] nvme fixes for 5.12
+Message-ID: <YEJYFTnbec9jteOc@infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <alpine.LRH.2.02.2103040511050.7400@file01.intranet.prod.int.rdu2.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/4/21 3:14 AM, Mikulas Patocka wrote:
-> 
-> 
-> On Wed, 3 Mar 2021, Jens Axboe wrote:
-> 
->> On 3/2/21 12:05 PM, Mikulas Patocka wrote:
->>
->> There seems to be something wrong with how this series is being sent
->> out. I have 1/4 and 3/4, but both are just attachments.
->>
->> -- 
->> Jens Axboe
-> 
-> I used quilt to send it. I don't know what's wrong with it - if you look 
-> at archives at 
-> https://listman.redhat.com/archives/dm-devel/2021-March/thread.html , it 
-> seems normal.
+The following changes since commit 77516d25f54912a7baedeeac1b1b828b6f285152:
 
-I guess the archives handle it, but it just shows up as an empty email with
-an attachment. Not very conducive to review, so I do suggest you fix how
-you're sending them out.
+  rsxx: Return -EFAULT if copy_to_user() fails (2021-03-03 06:48:44 -0700)
 
--- 
-Jens Axboe
+are available in the Git repository at:
 
+  git://git.infradead.org/nvme.git tags/nvme-5.12-2021-03-05
+
+for you to fetch changes up to d9f273b7585c380d7a10d4b3187ddc2d37f2740b:
+
+  nvmet: model_number must be immutable once set (2021-03-05 13:41:03 +0100)
+
+----------------------------------------------------------------
+nvme fixes for 5.12:
+
+ - more device quirks (Julian Einwag, Zoltán Böszörményi, Pascal Terjan)
+ - fix a hwmon error return (Daniel Wagner)
+ - fix the keep alive timeout initialization (Martin George)
+ - ensure the model_number can't be changed on a used subsystem
+   (Max Gurtovoy)
+
+----------------------------------------------------------------
+Daniel Wagner (1):
+      nvme-hwmon: Return error code when registration fails
+
+Julian Einwag (1):
+      nvme-pci: mark Seagate Nytro XM1440 as QUIRK_NO_NS_DESC_LIST.
+
+Martin George (1):
+      nvme-fabrics: fix kato initialization
+
+Max Gurtovoy (1):
+      nvmet: model_number must be immutable once set
+
+Pascal Terjan (1):
+      nvme-pci: add quirks for Lexar 256GB SSD
+
+Zoltán Böszörményi (1):
+      nvme-pci: mark Kingston SKC2000 as not supporting the deepest power state
+
+ drivers/nvme/host/fabrics.c     |  5 ++++-
+ drivers/nvme/host/hwmon.c       |  1 +
+ drivers/nvme/host/pci.c         |  8 ++++++-
+ drivers/nvme/target/admin-cmd.c | 36 ++++++++++++++++++++---------
+ drivers/nvme/target/configfs.c  | 50 +++++++++++++++++++----------------------
+ drivers/nvme/target/core.c      |  2 +-
+ drivers/nvme/target/nvmet.h     |  7 +-----
+ 7 files changed, 62 insertions(+), 47 deletions(-)
