@@ -2,101 +2,85 @@ Return-Path: <SRS0=MGRw=ID=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-20.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BBD1C433E0
-	for <linux-block@archiver.kernel.org>; Fri,  5 Mar 2021 16:12:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAD82C433DB
+	for <linux-block@archiver.kernel.org>; Fri,  5 Mar 2021 16:14:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 15FA96508C
-	for <linux-block@archiver.kernel.org>; Fri,  5 Mar 2021 16:12:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 743006508C
+	for <linux-block@archiver.kernel.org>; Fri,  5 Mar 2021 16:14:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230034AbhCEQLn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 5 Mar 2021 11:11:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56340 "EHLO
+        id S230212AbhCEQNx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 5 Mar 2021 11:13:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56772 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230512AbhCEQLe (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Mar 2021 11:11:34 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6621EC061574
-        for <linux-block@vger.kernel.org>; Fri,  5 Mar 2021 08:11:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:Content-Type:
-        MIME-Version:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=Wb3hp7rUaFmiEPgk5Zlai5Ac7+Fj0yvLC8OgsUfflBA=; b=LEA54gjUsFK8PPNV+ub+eqnmBr
-        tGXA6FqS9M0DclxcjoxC7jDMfoW8dBjxGQyZze5ruTh7Rg7n+o6nU89Fy+wp/XpoZSTMHYVjRsPc6
-        dflvkEgZTfPYEWEjiEbCsGR6zlXfbDaONtKKKWZiP+t6RTB2cv+wE3RZAlHzR+vjjW6M3nRcn5h3d
-        nYi4v/ujF8ybQC4TEwEw9mk8N3AD0bIYuX4tLejx0bj0vXclojX2HUW207t5SvsyCtzva6RMX6ZWe
-        ez4Z/63Jh5VrhZ4bYrIJdHc8zO9eaAFJCotQwJmkchJLQx8SrlPAfPBx38M0LUMi1wARNa56bSxze
-        2sQuOsAw==;
-Received: from 089144194051.atnat0003.highway.a1.net ([89.144.194.51] helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
-        id 1lID2e-00Bxob-9w; Fri, 05 Mar 2021 16:11:13 +0000
-Date:   Fri, 5 Mar 2021 17:11:01 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jens Axboe <axboe@kernel.dk>
+        with ESMTP id S230343AbhCEQNh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Mar 2021 11:13:37 -0500
+Received: from mail-il1-x12b.google.com (mail-il1-x12b.google.com [IPv6:2607:f8b0:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12A06C061574
+        for <linux-block@vger.kernel.org>; Fri,  5 Mar 2021 08:13:37 -0800 (PST)
+Received: by mail-il1-x12b.google.com with SMTP id k2so2488547ili.4
+        for <linux-block@vger.kernel.org>; Fri, 05 Mar 2021 08:13:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=6DWum0PkSFOC7EqnCDn0YxayPunMKftKntuZCF5jSJc=;
+        b=sHStvXrtBm6j4SWxFCJpnJ+pVtAmQg1uacMFUfPAQteAAbaiBcpbANbT7TRRRxDPHy
+         JUdTBvSZFhigNZCUH89PlBHI1cLYC5fsV2R5d2z/T8Z0Z9yiVCYarIAE3AqHM8+bGIqB
+         4z8CflWwuAFmyiRq16M4SO08/3yXfUv7I5YMvu80lhQ47ePg4psxwr2tcqbRsqjAyF1p
+         jo4eMNnKc7rU6ZzBrrFe9E9NHCWvHx/GTrEKyqUR1uXFg8TynqdHQ6rvNLif8KSoK4gQ
+         onVZN21d5Zlgr2uvxJLAdc7iLOG25r/0wYG6/oUfKEDZ4qs1fqnbFz7ZvbgEIniXGNj7
+         OZLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=6DWum0PkSFOC7EqnCDn0YxayPunMKftKntuZCF5jSJc=;
+        b=qjsLwAXYCWTB0Si60MTmut0IGfYyHxm3tWx+EUGMKZPl3CnA1NG3lH+qB94XFx4D7S
+         yaA9OZxGL1tMWSHKJz8w520DwQROUoWtqn0WDDJbhcBxWgEhr+5rm9zE1kNtvUWc8iBB
+         NVL50H8YDc/l72DAeDhBaCenHjTEzGra43hxSbQvXsIJVG6yR1l7zbjXkY1en5uiypCx
+         yaLKhZs1KYhMkJQVh12xAuarbed+drEASCkiAMIA1iBzKaZabOem/f/4549SZaoDglf0
+         090w4iqxZUyiaCCJ3hwuifAiHUPzgBRgV8guh2MLjCTj/fYq4hMmzLApERtTBzcbk+XN
+         4EzA==
+X-Gm-Message-State: AOAM530vyD4ygpNNvRXQhRiOkQ1a+rFfSxyn/Q6UQfawb18brLpgbn1U
+        V9i+MhN9YvX4IsCt/Z94bMr3JQ==
+X-Google-Smtp-Source: ABdhPJztVmGl6jVH9oIl+8Ya5KaL8hRp1949lAmDKpwctA2ro7Y8mZ5278NfNDNTc9d08kfFDygcaQ==
+X-Received: by 2002:a05:6e02:1384:: with SMTP id d4mr9470392ilo.307.1614960816442;
+        Fri, 05 Mar 2021 08:13:36 -0800 (PST)
+Received: from [192.168.1.30] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id o19sm1519955ioh.47.2021.03.05.08.13.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 05 Mar 2021 08:13:36 -0800 (PST)
+Subject: Re: [GIT PULL] nvme fixes for 5.12
+To:     Christoph Hellwig <hch@infradead.org>
 Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
         Sagi Grimberg <sagi@grimberg.me>,
         linux-nvme@lists.infradead.org
-Subject: [GIT PULL] nvme fixes for 5.12
-Message-ID: <YEJYFTnbec9jteOc@infradead.org>
+References: <YEJYFTnbec9jteOc@infradead.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <353e221d-3d17-63ae-3956-507ea7d46846@kernel.dk>
+Date:   Fri, 5 Mar 2021 09:13:35 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <YEJYFTnbec9jteOc@infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The following changes since commit 77516d25f54912a7baedeeac1b1b828b6f285152:
+On 3/5/21 9:11 AM, Christoph Hellwig wrote:
+> git://git.infradead.org/nvme.git tags/nvme-5.12-2021-03-05
 
-  rsxx: Return -EFAULT if copy_to_user() fails (2021-03-03 06:48:44 -0700)
+Pulled, thanks.
 
-are available in the Git repository at:
+-- 
+Jens Axboe
 
-  git://git.infradead.org/nvme.git tags/nvme-5.12-2021-03-05
-
-for you to fetch changes up to d9f273b7585c380d7a10d4b3187ddc2d37f2740b:
-
-  nvmet: model_number must be immutable once set (2021-03-05 13:41:03 +0100)
-
-----------------------------------------------------------------
-nvme fixes for 5.12:
-
- - more device quirks (Julian Einwag, Zoltán Böszörményi, Pascal Terjan)
- - fix a hwmon error return (Daniel Wagner)
- - fix the keep alive timeout initialization (Martin George)
- - ensure the model_number can't be changed on a used subsystem
-   (Max Gurtovoy)
-
-----------------------------------------------------------------
-Daniel Wagner (1):
-      nvme-hwmon: Return error code when registration fails
-
-Julian Einwag (1):
-      nvme-pci: mark Seagate Nytro XM1440 as QUIRK_NO_NS_DESC_LIST.
-
-Martin George (1):
-      nvme-fabrics: fix kato initialization
-
-Max Gurtovoy (1):
-      nvmet: model_number must be immutable once set
-
-Pascal Terjan (1):
-      nvme-pci: add quirks for Lexar 256GB SSD
-
-Zoltán Böszörményi (1):
-      nvme-pci: mark Kingston SKC2000 as not supporting the deepest power state
-
- drivers/nvme/host/fabrics.c     |  5 ++++-
- drivers/nvme/host/hwmon.c       |  1 +
- drivers/nvme/host/pci.c         |  8 ++++++-
- drivers/nvme/target/admin-cmd.c | 36 ++++++++++++++++++++---------
- drivers/nvme/target/configfs.c  | 50 +++++++++++++++++++----------------------
- drivers/nvme/target/core.c      |  2 +-
- drivers/nvme/target/nvmet.h     |  7 +-----
- 7 files changed, 62 insertions(+), 47 deletions(-)
