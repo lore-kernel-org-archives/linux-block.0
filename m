@@ -2,132 +2,92 @@ Return-Path: <SRS0=MGRw=ID=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-22.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C4E4C433E0
-	for <linux-block@archiver.kernel.org>; Fri,  5 Mar 2021 18:35:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C247FC433E0
+	for <linux-block@archiver.kernel.org>; Fri,  5 Mar 2021 19:27:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5F0756508B
-	for <linux-block@archiver.kernel.org>; Fri,  5 Mar 2021 18:35:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 957B0650A6
+	for <linux-block@archiver.kernel.org>; Fri,  5 Mar 2021 19:27:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230053AbhCEScV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 5 Mar 2021 13:32:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58444 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230212AbhCEScG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Mar 2021 13:32:06 -0500
-Received: from mail-il1-x12a.google.com (mail-il1-x12a.google.com [IPv6:2607:f8b0:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A6D3C061756
-        for <linux-block@vger.kernel.org>; Fri,  5 Mar 2021 10:32:06 -0800 (PST)
-Received: by mail-il1-x12a.google.com with SMTP id e7so2878976ile.7
-        for <linux-block@vger.kernel.org>; Fri, 05 Mar 2021 10:32:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=xyYvWN9CdVcGaizLmclP8f/7E1L76lIbSbn9tpFjonE=;
-        b=EwU19WKQglB4fj5XTujhitA2tx0OM+SV2CtSd0dTsvxj242jTHXwQEnoyhojxAHuLF
-         wQphFkNayBbDddUcmcV8AS+CEBW5kufh+/uskGY1SgMGn5QajykCczcK7wrRrnWTHIwc
-         ApbBhL9hJ8pVHRf08MgqKUCxENI1zFCq3l39CvSZCmGwb/eaGOdUG5xaVWIYLgcgLaHS
-         LHaDO2zSBJQ29tN2YLt8ImI0XrtTbYm3s8rta7nVweOP3DV9GugyHdsM11ipF/CDAqAj
-         IB/1FGaXOmwQ59+5rFOi4dZS674MODhcLakAafqYCNxAkcTdQ1ERhBz7WHigzTh+FYQh
-         lTxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=xyYvWN9CdVcGaizLmclP8f/7E1L76lIbSbn9tpFjonE=;
-        b=mJHpDXx0kT2yA/kRFmnUQ+UuHiZabEOyUKAzruiVsbIU/jnySSISZq6sdtXqKgw1Lk
-         FRaDtjTk3C55LFzFn1iDncylXHWJ/HOrdFGfwbZS7HI2nuWh6/Lzf4rnlyLtPrZbZ945
-         TkW/0JPHCWaNA6Q6PyEoN2E1t6Srbc+G4SWzhP/N2KOm0dQdq8O9kt5Tx3e0m4LIjpt+
-         XvjkB76QxNkccgcExQfMT8v6+jlYauMgb4ZZl+PVNIcrZ4d7rIFU+ANdqlMFc+1q50Ab
-         4tG7qLhsoBd5H6luwG0ZqaUg3MQropytri81uBDbfOtaunH+hmKP1xbcYZINDyfikCbE
-         bImQ==
-X-Gm-Message-State: AOAM532Q+NOk7myVFLOyxy6RE2P4/3upMS4665PWM1CXHKkf/7GfIQHb
-        Oh68PzzJwWQz+eqokpDrm44k6sHHVgUnkw==
-X-Google-Smtp-Source: ABdhPJxm+EZVrr7eQOOci/buzkKSaRKVj7cA3NiT34F6vl0PFTL1OxMsiOrSYOfkrtaXCYWDt7kP9Q==
-X-Received: by 2002:a05:6e02:506:: with SMTP id d6mr10155780ils.150.1614969125837;
-        Fri, 05 Mar 2021 10:32:05 -0800 (PST)
-Received: from [192.168.1.30] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id l16sm1704564ils.11.2021.03.05.10.32.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 Mar 2021 10:32:05 -0800 (PST)
-Subject: Re: [PATCH] blk-cgroup: Fix the recursive blkg rwstat
-To:     Xunlei Pang <xlpang@linux.alibaba.com>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        tj@kernel.org
-References: <1614932007-97224-1-git-send-email-xlpang@linux.alibaba.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <4cc104d1-9aa3-a838-b786-9a808dd85945@kernel.dk>
-Date:   Fri, 5 Mar 2021 11:32:05 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S229971AbhCET1T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 5 Mar 2021 14:27:19 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50211 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230050AbhCET0w (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 5 Mar 2021 14:26:52 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1614972411;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=GY+uKh6sS0CGlfkrX+aRF2CjNhAbEJ9WWwro18686IM=;
+        b=Hujsn7qx2BMUxXujqMhWolaPypM5Fwx1a6z+9iVpQ/GWUXaTrp9OfVUHhvPqKw1M2MfoVH
+        nuckaCBgI/7CJrY9mpzLVkTgazhSdinzleSamiD9cSN+Rt99MWo40o6OZo7JyXisAE5FfL
+        18g3ENR9VyzT18e8D1GeTpsW6jPa41w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-107-lnRSfnIGNWCYUrUQRRKDww-1; Fri, 05 Mar 2021 14:26:47 -0500
+X-MC-Unique: lnRSfnIGNWCYUrUQRRKDww-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6990A87A82A;
+        Fri,  5 Mar 2021 19:26:46 +0000 (UTC)
+Received: from localhost (unknown [10.18.25.174])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3C89D1349A;
+        Fri,  5 Mar 2021 19:26:43 +0000 (UTC)
+Date:   Fri, 5 Mar 2021 14:26:42 -0500
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
+        Alasdair G Kergon <agk@redhat.com>,
+        Mikulas Patocka <mpatocka@redhat.com>,
+        Milan Broz <gmazyland@gmail.com>
+Subject: [git pull] device mapper fixes for 5.12-rc2
+Message-ID: <20210305192641.GA21876@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1614932007-97224-1-git-send-email-xlpang@linux.alibaba.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/5/21 1:13 AM, Xunlei Pang wrote:
-> The current blkio.throttle.io_service_bytes_recursive doesn't
-> work correctly.
-> 
-> As an example, for the following blkcg hierarchy:
->  (Made 1GB READ in test1, 512MB READ in test2)
->      test
->     /    \
->  test1   test2
-> 
-> $ head -n 1 test/test1/blkio.throttle.io_service_bytes_recursive
-> 8:0 Read 1073684480
-> $ head -n 1 test/test2/blkio.throttle.io_service_bytes_recursive
-> 8:0 Read 537448448
-> $ head -n 1 test/blkio.throttle.io_service_bytes_recursive
-> 8:0 Read 537448448
-> 
-> Clearly, above data of "test" reflects "test2" not "test1"+"test2".
-> 
-> Do the correct summary in blkg_rwstat_recursive_sum().
+Hi Linus,
 
-LGTM, Tejun?
+The following changes since commit a666e5c05e7c4aaabb2c5d58117b0946803d03d2:
 
-> 
-> Signed-off-by: Xunlei Pang <xlpang@linux.alibaba.com>
-> ---
->  block/blk-cgroup-rwstat.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/block/blk-cgroup-rwstat.c b/block/blk-cgroup-rwstat.c
-> index 85d5790..3304e84 100644
-> --- a/block/blk-cgroup-rwstat.c
-> +++ b/block/blk-cgroup-rwstat.c
-> @@ -109,6 +109,7 @@ void blkg_rwstat_recursive_sum(struct blkcg_gq *blkg, struct blkcg_policy *pol,
->  
->  	lockdep_assert_held(&blkg->q->queue_lock);
->  
-> +	memset(sum, 0, sizeof(*sum));
->  	rcu_read_lock();
->  	blkg_for_each_descendant_pre(pos_blkg, pos_css, blkg) {
->  		struct blkg_rwstat *rwstat;
-> @@ -122,7 +123,7 @@ void blkg_rwstat_recursive_sum(struct blkcg_gq *blkg, struct blkcg_policy *pol,
->  			rwstat = (void *)pos_blkg + off;
->  
->  		for (i = 0; i < BLKG_RWSTAT_NR; i++)
-> -			sum->cnt[i] = blkg_rwstat_read_counter(rwstat, i);
-> +			sum->cnt[i] += blkg_rwstat_read_counter(rwstat, i);
->  	}
->  	rcu_read_unlock();
->  }
-> 
+  dm: fix deadlock when swapping to encrypted device (2021-02-11 09:45:28 -0500)
 
+are available in the Git repository at:
 
--- 
-Jens Axboe
+  git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-5.12/dm-fixes
+
+for you to fetch changes up to df7b59ba9245c4a3115ebaa905e3e5719a3810da:
+
+  dm verity: fix FEC for RS roots unaligned to block size (2021-03-04 15:08:18 -0500)
+
+Please pull, thanks.
+Mike
+
+----------------------------------------------------------------
+Fix DM verity target's optional Forward Error Correction (FEC) for
+Reed-Solomon roots that are unaligned to block size.
+
+----------------------------------------------------------------
+Mikulas Patocka (1):
+      dm bufio: subtract the number of initial sectors in dm_bufio_get_device_size
+
+Milan Broz (1):
+      dm verity: fix FEC for RS roots unaligned to block size
+
+ drivers/md/dm-bufio.c      |  4 ++++
+ drivers/md/dm-verity-fec.c | 23 ++++++++++++-----------
+ 2 files changed, 16 insertions(+), 11 deletions(-)
 
