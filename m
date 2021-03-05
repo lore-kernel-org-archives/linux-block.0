@@ -2,85 +2,139 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E205BC433E0
-	for <linux-block@archiver.kernel.org>; Thu,  4 Mar 2021 20:28:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD9EFC433E0
+	for <linux-block@archiver.kernel.org>; Fri,  5 Mar 2021 09:01:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A517C64F69
-	for <linux-block@archiver.kernel.org>; Thu,  4 Mar 2021 20:28:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7192864EDF
+	for <linux-block@archiver.kernel.org>; Fri,  5 Mar 2021 09:01:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238575AbhCDU2F (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 Mar 2021 15:28:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55872 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238389AbhCDU1e (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Mar 2021 15:27:34 -0500
-Received: from mail-io1-xd2d.google.com (mail-io1-xd2d.google.com [IPv6:2607:f8b0:4864:20::d2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BA01C061574
-        for <linux-block@vger.kernel.org>; Thu,  4 Mar 2021 12:26:54 -0800 (PST)
-Received: by mail-io1-xd2d.google.com with SMTP id z13so31214242iox.8
-        for <linux-block@vger.kernel.org>; Thu, 04 Mar 2021 12:26:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=XFKn59CF1p2RXs/QYRNWRDnrQj3ENHOQmiAUNdwvt/8=;
-        b=goAo/R7+UfioF8QKCapnUVAbDiE1D8ybcizf6fF+H1/dhyQJpR0Okh8peBp/uDi4g1
-         /voaLbInCz3O/pxD9/cRPCP89mF7NQWHaesOZmw2xDeS9s6dr3k6OqAjvzkGMomAiV5D
-         NHDdeNx/+o+lE7o5jSFKn2JwGZDv+JD95EL6V81iS5haFMGqE/oenUDESPXp+r2KJtO2
-         WjeUswIzSEpLuqghJo2VGi7K9I3quUOhaQ3Yw8dXwjegLR6wDjD01Tm2/ZPJJXCWscan
-         PE53HBYGkprlI7zmUUOtSlAnsHIuF+Ke5J6aFFbpnRFKMIy31m/yavKUaaoLKHyAgHA3
-         gbMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=XFKn59CF1p2RXs/QYRNWRDnrQj3ENHOQmiAUNdwvt/8=;
-        b=QhGM4PnMKUbivW1/FXPfn20ce793fqyuBlsObfuaDwhhRaPpMZ/6aznPggOWvp+RI2
-         tx4KihQ/f5oi/XxdJ7eX5NEuHKzQmW7zC/caFdqiGGSwGv/HNFBm8l26jwF69/y5rO2H
-         WJ0/FkuGBkUgiAcamwlrr36uuGpM/IHJH+0iew/MfdU6lBHclyaXLZ0/2rfNOgFho6fu
-         BGDYrlVOEd5FbrG/JDUIYnrKvMTyk0q5LhIM7PNo8wpRyDKQ2ZtXak8Dsx4z7MRWwxTi
-         ow5t6c4Kqo+sorolKXl8YEVSpF4zglXLpdxA74Uz+PIrhbjb++pyN3UzYoLo0YJ7BzRk
-         pPLA==
-X-Gm-Message-State: AOAM531ULX38JZ77R+blWesjxGjMoBg6fmNmhvv4j4YobowGhsSwkVT1
-        MqDG2MIPgradS9+ZAZiZVcAtnA==
-X-Google-Smtp-Source: ABdhPJzHHwzOOuPqOOtNNPiTepGm3D6zLTMpZsCvsY80ZOdfAhQ1CplzfOYFKkFrYo1ne9Ip/jXGnQ==
-X-Received: by 2002:a05:6602:2191:: with SMTP id b17mr5080325iob.114.1614889613494;
-        Thu, 04 Mar 2021 12:26:53 -0800 (PST)
-Received: from [192.168.1.30] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id l14sm254530ilc.33.2021.03.04.12.26.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Mar 2021 12:26:53 -0800 (PST)
-Subject: Re: [GIT PULL] nvme fixes for 5.12
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
-        Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org
-References: <YEEf/hvMMuqpp63T@infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <55b373ce-304e-f79a-6904-dc1c1205a9b2@kernel.dk>
-Date:   Thu, 4 Mar 2021 13:26:52 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S229582AbhCEJBX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 5 Mar 2021 04:01:23 -0500
+Received: from mout.gmx.net ([212.227.17.22]:40515 "EHLO mout.gmx.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229672AbhCEJA7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 5 Mar 2021 04:00:59 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
+        s=badeba3b8450; t=1614934857;
+        bh=igxj5LgMmYbcBIHKFR3fz4BAwGgmoVOuqlu3GD1Rk2A=;
+        h=X-UI-Sender-Class:Subject:To:Cc:References:From:Date:In-Reply-To;
+        b=MGSzemqWITYMQwJxB9dZVs96BKWtzJXyAvmuBY9r4FQ+92L16QVfEVTuD8XveX9Lz
+         69+L2f2Vg90u15AjFiIoPrQ+OKfS/SjdjYSFcPFMy4VHYy3CpPUNJNXV8jP4kCYj5A
+         t+ZZbKh/VMOz/uXw0C4hi2h6CzdRKFheJYfbth80=
+X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
+Received: from [10.10.25.85] ([103.52.188.137]) by mail.gmx.net (mrgmx104
+ [212.227.17.174]) with ESMTPSA (Nemesis) id 1Mv2xU-1lZUgi20WG-00qzsV; Fri, 05
+ Mar 2021 10:00:57 +0100
+Subject: Re: Large latency with bcache for Ceph OSD(new mail thread)
+To:     Coly Li <colyli@suse.de>
+Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+References: <9b7dfd49-67b0-53b1-96e1-3b90c2d9d09a@gmx.com>
+ <f6755b89-4d13-92a5-df1a-343602dec957@suse.de>
+From:   "Norman.Kern" <norman.kern@gmx.com>
+Message-ID: <91cf3980-ed9d-a5f8-4f2d-d9a79b1cbed0@gmx.com>
+Date:   Fri, 5 Mar 2021 17:00:53 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.0
 MIME-Version: 1.0
-In-Reply-To: <YEEf/hvMMuqpp63T@infradead.org>
+In-Reply-To: <f6755b89-4d13-92a5-df1a-343602dec957@suse.de>
 Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Provags-ID: V03:K1:ipOUIE5i5zm5oB2dKflm+ce+569Uh+Gu6LkZVLykciAjgdgmx7J
+ gdV0J1QFVZ5qT8GyKDnoDP/SmemLmM582w6o/K20Mne+LX6pNa9Nj1BW8tFHQiV9rOaWbCF
+ MLNfVVsIoKl4PgJDebzwfIN0dy0fmOaLehdlX9W6dsc81F+iZ78VXPCW3Z2lLaWgfia3CZT
+ yzNwPADxpHJY5ZGuRUV5Q==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:oqGFe+d6zw8=:pUnyUfGE59xjjD/GIvNcQU
+ FeqUjTzbMSXBQ3yH9BdSNwBPU0ABa5cExF3TuEtyuNSxLgcESKhkYD13DxgoiJ9KhSMttXPxJ
+ jpLMF7sf69F7Le/v0N9DDKSSPGK7zPD7XyA8fkmxBOkaOoDL2J7KgfmSUM6Vqpujh79zpxeNA
+ 8C12e87NfRjekRH/UZ3f66eLHVh5aCYr1PBsqjO/aghD5YAHSu2vpronYim9SGSln7sxAugT/
+ v65r/w7aGQlVzjwUm7TLghOEHlW9Hy0AuHeNM0BgDzdv0/PDzZKTTS+zqJhS+cwQZp9z0k6DO
+ o8Ogiz4I4NcaCoYs7wPQwyG2fFZJGO8/JrIrlKTLtc/Npf5Y+zSi0FYYqZGOIr+OWH1LEQGwk
+ iHZKOmxS1Lb47IaCAp8WshuyIBJw7vhLifYAf5Yuh0W8ZS+df6w7gPn/pchPr+dBINWf8p374
+ oIwgy/W02K6YWottIrOw9GMeK1Kr3JH9c27h7xnIe6MhGQXBIxCkL+fB4h2QWlzVt3NPJrTed
+ qUWVisWin4L4YwSjoAadqGDyE4PH7QcTIuKMBKCL5/kftRYfUDy/sBXO5yjVlMPY71s1DW41V
+ DlANxhci89pNQp7/zvXgECKrDw//HM7c4jDGEH/rU1kG810z1rJy4r7Ru/TIu3vtH/hv/OBCw
+ AMdk11UWL5P2CAot5+vqVELxksPqA1bJK6qqoB0ZYM++QS3QmisSo2Xd4QPzeTDSu7KrzBMo+
+ 3gsanqZKP0zWfTj/aIkFdQ1NrZ1WAhDHe2qxEDfB+iJrzDiwY+Ghm6sPYCefI/th//GOUyaii
+ 63kq6bKOJex6wpLFHEk9gVVuG2uwQNyvuGrXpS1vYha1wp9CA54OI7uBBMthKPYNjz9tK52W4
+ 0P18kufEdoGgVt0Jet6g==
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/4/21 10:59 AM, Christoph Hellwig wrote:
->   git://git.infradead.org/nvme.git tags/nvme-5.12-2021-03-04
 
-Pulled, thanks.
+On 2021/3/2 =E4=B8=8B=E5=8D=889:20, Coly Li wrote:
+> On 3/2/21 6:20 PM, Norman.Kern wrote:
+>> Sorry for creating a new mail thread(the origin is so long...)
+>>
+>>
+>> I made a test again and get more infomation:
+>>
+>> root@WXS0089:~# cat /sys/block/bcache0/bcache/dirty_data
+>> 0.0k
+>> root@WXS0089:~# lsblk /dev/sda
+>> NAME=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 MAJ:MIN RM=C2=A0=C2=A0 SIZE RO TYPE =
+MOUNTPOINT
+>> sda=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 8:0=C2=A0=C2=A0=C2=
+=A0 0 447.1G=C2=A0 0 disk
+>> `-bcache0 252:0=C2=A0=C2=A0=C2=A0 0=C2=A0 10.9T=C2=A0 0 disk
+>> root@WXS0089:~# cat /sys/block/sda/bcache/priority_stats
+>> Unused:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 1%
+>> Clean:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 29%
+>> Dirty:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 70%
+>> Metadata:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0%
+>> Average:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 49
+>> Sectors per Q:=C2=A0 29184768
+>> Quantiles:=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 [1 2 3 5 6 8 9 11 13 14 16 19 =
+21 23 26 29 32 36 39 43 48 53 59 65 73 83 94 109 129 156 203]
+>> root@WXS0089:~# cat /sys/fs/bcache/066319e1-8680-4b5b-adb8-49596319154b=
+/internal/gc_after_writeback
+>> 1
+>> You have new mail in /var/mail/root
+>> root@WXS0089:~# cat /sys/fs/bcache/066319e1-8680-4b5b-adb8-49596319154b=
+/cache_available_percent
+>> 28
+>>
+>> I read the source codes and found if cache_available_percent > 50, it s=
+hould wakeup gc while doing writeback, but it seemed not work right.
+>>
+> If gc_after_writeback is enabled, and after it is enabled and the cache
+> usage > 50%, a tag BCH_DO_AUTO_GC will be set to c->gc_after_writeback.
+> Then when the writeback completed the gc thread will wake up in force.
+>
+> so the auto gc after writeback will be triggered when,
+> 1, the bcache device is in writeback mode
+> 2, gc_after_writeback set to 1
+> 3, After 2) done, the cache usage exceeds 50% threshold.
+> 4, writeback rate set to maximum rate when the bcache device is idle (no
+> regular I/O request)
+> 5, after the writeback accomplished, the gc thread will be waken up.
+>
+> But /sys/block/bcache0/bcache/dirty_data is 0.0k doesn't mean the
+> writeback is accomplished. It is possible the writeback thread still
+> goes through all btree keys for the last try even all the dirty data are
+> flushed. Therefore you should check whether the writeback thread is
+> still active before a conclusion is made that the writeback is completed=
+.
+>
+> BTW, do you try a Linux v5.8+ kernel and see how things are ?
 
--- 
-Jens Axboe
+I have test on 5.8.X,=C2=A0 but it doesn't help. I test on the same config=
+ on another server(480G SSD + 8T HDD),
 
+it can't reproduce, this really made me confused. I will compare the confi=
+gs and try to find out the diffs.
+
+Thanks.
+
+Norman
+
+>
+> Thanks.
+>
+> Coly Li
