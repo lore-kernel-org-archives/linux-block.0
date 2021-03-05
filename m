@@ -7,75 +7,67 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A300C433E0
-	for <linux-block@archiver.kernel.org>; Fri,  5 Mar 2021 18:22:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B20BEC43381
+	for <linux-block@archiver.kernel.org>; Fri,  5 Mar 2021 18:28:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 68458650A3
-	for <linux-block@archiver.kernel.org>; Fri,  5 Mar 2021 18:22:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 81DB8650A3
+	for <linux-block@archiver.kernel.org>; Fri,  5 Mar 2021 18:28:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229690AbhCESVc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 5 Mar 2021 13:21:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56104 "EHLO
+        id S230034AbhCES17 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 5 Mar 2021 13:27:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57464 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229493AbhCESV2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Mar 2021 13:21:28 -0500
-Received: from mail-il1-x129.google.com (mail-il1-x129.google.com [IPv6:2607:f8b0:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 591BDC061756
-        for <linux-block@vger.kernel.org>; Fri,  5 Mar 2021 10:21:28 -0800 (PST)
-Received: by mail-il1-x129.google.com with SMTP id b5so2832728ilq.10
-        for <linux-block@vger.kernel.org>; Fri, 05 Mar 2021 10:21:28 -0800 (PST)
+        with ESMTP id S229512AbhCES1p (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Mar 2021 13:27:45 -0500
+Received: from mail-io1-xd2a.google.com (mail-io1-xd2a.google.com [IPv6:2607:f8b0:4864:20::d2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4216C061574
+        for <linux-block@vger.kernel.org>; Fri,  5 Mar 2021 10:27:45 -0800 (PST)
+Received: by mail-io1-xd2a.google.com with SMTP id k2so3013066ioh.5
+        for <linux-block@vger.kernel.org>; Fri, 05 Mar 2021 10:27:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=OEh/sWcetf4+lkEDVwLPAVNhW+72rKN70d51beTZb3Q=;
-        b=yk2EpWw/jTc5NfKFj8PzaotMNefoDlziRutMdRyUkrooGjDsjiEx2wA10qJ3mG2wZ0
-         sYXDZYHohoWbxptDtHO7fdNV79jA1I9Qk0bw2UZ9+Pm8ukDlRkHMOLTlWuMPfBZXERi3
-         fKxWi9KggJGtL7x7RzAq/oNNIETyCk144Jpq53hVxTq6gO3lTmPepeeoCgPDOKpfHJhs
-         +isGdor+45t3n9kIIpuX5nlzKutHCajB/c0WkmLrlqeKAd+J1FVvwcFx3L8slb1//Gtl
-         yYoO4wAGowXP68w1gvzS3ZzwfcCynS8aQ1hln2bSyZy22xeUe/UECetV04L3CRNP4lI4
-         LvsA==
+        bh=URvi90fjReX66GGxg6Cc/WcyhDQVeYyWsL++jmjfP4w=;
+        b=WEcDFIAY3501+eCSpuhzyzBep81t7Z9AAUlxXimo7Aj5Z5MbkoPNCt5g0sUEOHU6Hd
+         yqIdAYxqfkEU3KDkjUjVAYOc1+/Ncw198mvgLsIwQDHD6ii43q/bPHpT4wOsn8sLY+di
+         IvXMg1hk3Q7LWAwLPeYG9mVaNmrK7QQf2VDuFyU2AEO9hu2bTrw9/xCkKb+RiI41hP36
+         /16mlEeJvW35yXQJDrHUXoxYQL5BgVCkwyinR7XOLlfoUsidgJ2AWIpz64LHF/35KTFk
+         71qxnCYG/tNsCBuGsj7ByY9p3H38hIVgFDtiof7bivJo2RGBHmOiSAtIv8yt+7ihjRMh
+         8kjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=OEh/sWcetf4+lkEDVwLPAVNhW+72rKN70d51beTZb3Q=;
-        b=bBY24dACtPXvLKa4PjTBOJz8aWoySDG33FLno4mnZzWK/hc70hJzI/eFpHhDWYUjgu
-         7X2tIt+Tf6LVImLfDlwFL8taSbsotaSlvkBT19LCDvaWzkd7fIWbvREqpaXIMC0oF3wE
-         XUR9Uoek4QN8C3tGQJu86Son1sUqPAULQc8ARCjrTu/9qIms1tpzAoyboNOkilxKRMMd
-         YWQ/GziOTuWQctUolzd72owmC1uByxx8+bmRr7M6YgxlSMIYkC4TlfFhlB0jxYykVImv
-         QqdRG5lQUIVr2eju1lpvVAMMAoqYAH5InAbioYQ6AUrHBow+SmTOm7JtCiQP059aKTxc
-         91JQ==
-X-Gm-Message-State: AOAM533ZdIZPdDsJDvoyQE4QWekeUlGro6WVtg4JF2G22nwVh7t9uHnP
-        fGXsvkjkp0U2ys54GTLCiABvkQ==
-X-Google-Smtp-Source: ABdhPJy7QwpL95S/HOl2DljHxhZENGECbkHbofdfBkOTTuXvGfnc2qKDYfIIf0kBZ1v5ayol17f6Og==
-X-Received: by 2002:a05:6e02:12c2:: with SMTP id i2mr9419720ilm.34.1614968487685;
-        Fri, 05 Mar 2021 10:21:27 -0800 (PST)
+        bh=URvi90fjReX66GGxg6Cc/WcyhDQVeYyWsL++jmjfP4w=;
+        b=XYP/JF+tBYpnV50sT393Prnffjw74l0UhMBSUTTBGaKVQqFy3vUecsi4MelUhsPMQN
+         S98hstlyRUI8FIIzBTL+g0TurjdO6ctEcn5y7Bi378eYo1jaCqm7JhrE7IttEy2twI9C
+         sGTN6UHuwFVR090bL4SiyWvzT/4r29elFoo9oZq3tpc0ylYCHlSQ634fRT9CUGiM/SXk
+         rpNhH+rKTDS2BMfnGYgKmACeK+OGvrrpUYRqB/JeZ1mV4Rvn5VbY+xdVKKBicLiWnHlu
+         zNIW5Wq5yRbc9oV2WtoJwfbhUhBCNq8PFMN4LGTFlXSQGMgvL2Ra2ncIU0CvJFOZRKEk
+         /s3A==
+X-Gm-Message-State: AOAM530xrRG5TxX2+BRSmPH/puNwi5OhfKJrwJ5GDfJynnSWhr65BSS+
+        zLNxzKQdU80t4fWS2TAbIPA6qg==
+X-Google-Smtp-Source: ABdhPJwqjG7Eq8kF3HmSR3Fy2ObJJoErkj1f5tNBTd9wUKtd5rUPdCoxhJ/05fFUXlAn0FSoCLxdjQ==
+X-Received: by 2002:a02:8545:: with SMTP id g63mr11315827jai.79.1614968865235;
+        Fri, 05 Mar 2021 10:27:45 -0800 (PST)
 Received: from [192.168.1.30] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id w2sm1602885ioa.46.2021.03.05.10.21.27
+        by smtp.gmail.com with ESMTPSA id s16sm1630643ioe.44.2021.03.05.10.27.44
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 Mar 2021 10:21:27 -0800 (PST)
-Subject: Re: [dm-devel] [PATCH 4/4] dm: support I/O polling
-To:     Mikulas Patocka <mpatocka@redhat.com>,
-        JeffleXu <jefflexu@linux.alibaba.com>
-Cc:     Mike Snitzer <msnitzer@redhat.com>,
-        Heinz Mauelshagen <heinzm@redhat.com>,
-        caspar@linux.alibaba.com, io-uring@vger.kernel.org,
-        linux-block@vger.kernel.org, joseph.qi@linux.alibaba.com,
-        dm-devel@redhat.com, hch@lst.de
-References: <20210302190555.201228400@debian-a64.vm>
- <33fa121a-88a8-5c27-0a43-a7efc9b5b3e3@linux.alibaba.com>
- <alpine.LRH.2.02.2103030505460.29593@file01.intranet.prod.int.rdu2.redhat.com>
- <f9dd41f1-7a4c-5901-c099-dca08c4e6d65@linux.alibaba.com>
- <alpine.LRH.2.02.2103040507040.7400@file01.intranet.prod.int.rdu2.redhat.com>
+        Fri, 05 Mar 2021 10:27:44 -0800 (PST)
+Subject: Re: [PATCH v2] block: Try to handle busy underlying device on discard
+To:     Jan Kara <jack@suse.cz>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        stable@vger.kernel.org
+References: <20210222094809.21775-1-jack@suse.cz>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <7ff9599c-d729-87b2-4fc0-e2413b2d8718@kernel.dk>
-Date:   Fri, 5 Mar 2021 11:21:26 -0700
+Message-ID: <53689a67-7591-0ad8-3e7d-dca9a626cd99@kernel.dk>
+Date:   Fri, 5 Mar 2021 11:27:44 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <alpine.LRH.2.02.2103040507040.7400@file01.intranet.prod.int.rdu2.redhat.com>
+In-Reply-To: <20210222094809.21775-1-jack@suse.cz>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -83,47 +75,22 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/4/21 3:09 AM, Mikulas Patocka wrote:
-> 
-> 
-> On Thu, 4 Mar 2021, JeffleXu wrote:
-> 
->>> __split_and_process_non_flush records the poll cookie in ci.poll_cookie. 
->>> When we processed all the bios, we poll for the last cookie here:
->>>
->>>         if (ci.poll_cookie != BLK_QC_T_NONE) {
->>>                 while (atomic_read(&ci.io->io_count) > 1 &&
->>>                        blk_poll(ci.poll_queue, ci.poll_cookie, true)) ;
->>>         }
->>
->> So what will happen if one bio submitted to dm device crosses the device
->> boundary among several target devices (e.g., dm-stripe)? Please refer
->> the following call graph.
->>
->> ```
->> submit_bio
->>   __submit_bio_noacct
->>     disk->fops->submit_bio(), calling into __split_and_process_bio(),
->> call __split_and_process_non_flush() once, submitting the *first* split bio
->>     disk->fops->submit_bio(), calling into __split_and_process_bio(),
->> call __split_and_process_non_flush() once, submitting the *second* split bio
->>     ...
->> ```
->>
->>
->> So the loop is in __submit_bio_noacct(), rather than
->> __split_and_process_bio(). Your design will send the first split bio,
->> and then poll on this split bio, then send the next split bio, polling
->> on this, go on and on...
-> 
-> No. It will send all the bios and poll for the last one.
+On 2/22/21 2:48 AM, Jan Kara wrote:
+> Commit 384d87ef2c95 ("block: Do not discard buffers under a mounted
+> filesystem") made paths issuing discard or zeroout requests to the
+> underlying device try to grab block device in exclusive mode. If that
+> failed we returned EBUSY to userspace. This however caused unexpected
+> fallout in userspace where e.g. FUSE filesystems issue discard requests
+> from userspace daemons although the device is open exclusively by the
+> kernel. Also shrinking of logical volume by LVM issues discard requests
+> to a device which may be claimed exclusively because there's another LV
+> on the same PV. So to avoid these userspace regressions, fall back to
+> invalidate_inode_pages2_range() instead of returning EBUSY to userspace
+> and return EBUSY only of that call fails as well (meaning that there's
+> indeed someone using the particular device range we are trying to
+> discard).
 
-I took a quick look, and this seems very broken. You must not poll off
-the submission path, polling should be invoked by the higher layer when
-someone wants to reap events. IOW, dm should not be calling blk_poll()
-by itself, only off mq_ops->poll(). Your patch seems to do it off
-submission once you submit the last bio in that batch, effectively
-implementing sync polling for that series. That's not right.
+This missed -rc2, but I'll queue it up for -rc3.
 
 -- 
 Jens Axboe
