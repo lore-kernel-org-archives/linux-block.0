@@ -2,306 +2,176 @@ Return-Path: <SRS0=+JuZ=IE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-22.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0D39C433E6
-	for <linux-block@archiver.kernel.org>; Sat,  6 Mar 2021 02:21:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D79DC433E0
+	for <linux-block@archiver.kernel.org>; Sat,  6 Mar 2021 02:54:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8F35864FFD
-	for <linux-block@archiver.kernel.org>; Sat,  6 Mar 2021 02:21:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 268AE65011
+	for <linux-block@archiver.kernel.org>; Sat,  6 Mar 2021 02:54:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230051AbhCFCUy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 5 Mar 2021 21:20:54 -0500
-Received: from mail-pj1-f50.google.com ([209.85.216.50]:42974 "EHLO
-        mail-pj1-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229982AbhCFCUu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Mar 2021 21:20:50 -0500
-Received: by mail-pj1-f50.google.com with SMTP id j6-20020a17090adc86b02900cbfe6f2c96so112377pjv.1;
-        Fri, 05 Mar 2021 18:20:40 -0800 (PST)
+        id S229935AbhCFCxo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 5 Mar 2021 21:53:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52810 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230052AbhCFCxM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Mar 2021 21:53:12 -0500
+Received: from mail-qk1-x72f.google.com (mail-qk1-x72f.google.com [IPv6:2607:f8b0:4864:20::72f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99E85C06175F
+        for <linux-block@vger.kernel.org>; Fri,  5 Mar 2021 18:53:05 -0800 (PST)
+Received: by mail-qk1-x72f.google.com with SMTP id f124so4097249qkj.5
+        for <linux-block@vger.kernel.org>; Fri, 05 Mar 2021 18:53:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=M+YCL/IyIuK1NeKJH3MDV8vrtJRaU1BXYq0SRzFaHFQ=;
+        b=NAPjS6p6uFmhxnv93faL3kvzWHSRSQt1qokfnVEazvdCO7i8FU//usO0BNP5WZj/+W
+         Oioi7uZz8pXsYeE9mCppDD6RTgrQqXc/kdwLRT4tJuK/f4g/VeppLBlzgi4Xdiuc1xuM
+         +JUrON6zinWyzAjVY48fpOwtnaElkaUFr8KTPrviCEhhM8ebRq1isZSZVTGolD/+DimE
+         gm/vjlQlYCC0XzmBsYDuLuhN0xhOPw4k1+1FzOyZ6y6au6uL99ac/JIbvDtAa1itBHoW
+         f/iLpFCv5RAnWKeV0D9ze0Fnj023Lqpwg+XeWfD34omY8FcjD9OG/CTOQj99HQMubFKD
+         YvfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=zGW5ass4mj+ZAyNE6F4phND74HXAz5QHRa5GYjeiy8s=;
-        b=QFpkPiCW3VAfjOlBEH0cTo5elCvz7i/yXIVzc2xd9bpG8ZL2YuVZzP9bfltFY+KiWk
-         28FcZpz4C7BM/J59ykha93Zl1yxaub6k5CdJuUptSs5zf9ansKRSeSUZy5Q2UyC5ZbAo
-         EW5GsJDr5OR1tuViUhHPT58PStTvjnrptMofZtntXiyCBIcGqSKU78PEiJDvrhZ/Zj0X
-         1K2wOhYpBxnCqcbYLZ5p9cFI3VxuwTcLcyMV+9KQE92U2lLN3dsShRJOxtDVhtP+ZRTy
-         hupq5d1m4ywDA/1vR0c43T994lDSflt9rHZ0AOBcNJMMrig8+aoVKnDvUIDnfNFSWUgQ
-         r4tQ==
-X-Gm-Message-State: AOAM533eDY0wkyECawZisD9YMNt1aFyuzGd2wLbafwTa7GWYHEnO03YI
-        4idIPQbqbRwUXfojMLBBg/Y=
-X-Google-Smtp-Source: ABdhPJzNW5auzinvPjkCI6V3mge0FUJcM14U5ZZC3IG4yeYMjPBzoJ8eL+Ex2TYgXvqNeJdd7lX3sA==
-X-Received: by 2002:a17:902:ecc3:b029:e5:d7cc:2a20 with SMTP id a3-20020a170902ecc3b02900e5d7cc2a20mr11227518plh.11.1614997239804;
-        Fri, 05 Mar 2021 18:20:39 -0800 (PST)
-Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
-        by smtp.gmail.com with ESMTPSA id x23sm3609675pff.133.2021.03.05.18.20.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Mar 2021 18:20:37 -0800 (PST)
-Received: by 42.do-not-panic.com (Postfix, from userid 1000)
-        id BD5D9400CD; Sat,  6 Mar 2021 02:20:36 +0000 (UTC)
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     minchan@kernel.org, ngupta@vflare.org,
-        sergey.senozhatsky.work@gmail.com
-Cc:     axboe@kernel.dk, mbenes@suse.com, mcgrof@kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 1/2] zram: fix crashes due to use of cpu hotplug multistate
-Date:   Sat,  6 Mar 2021 02:20:34 +0000
-Message-Id: <20210306022035.11266-2-mcgrof@kernel.org>
-X-Mailer: git-send-email 2.23.0.rc1
-In-Reply-To: <20210306022035.11266-1-mcgrof@kernel.org>
-References: <20210306022035.11266-1-mcgrof@kernel.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=M+YCL/IyIuK1NeKJH3MDV8vrtJRaU1BXYq0SRzFaHFQ=;
+        b=VMHcfuDCISKI18S9j8zsVgzHd398Fy5wbB5C5YPxK705uBPKUNln00yhLAqOoU9AEG
+         if/s8UEESjGlsfwr9yVqqrW85b6E5jcPVj3chRB/KlFCySdjY8VcMq0mzT/kI4row157
+         xb7fxesMDFj0dMG0Gaq6A5jSKkOrgP9GaQhmmvYvqe0XiKW0fZkJqAnrMfp5qn08FDJy
+         KSFDcQ0KaHeLXNVEZ+7j7bU59fvMlR3QlG5xbRLjsB5+6eabLf7QBHeMnvEKG1yGKNFC
+         dut+OPib3lTWyQzWaquYuEgeEN4iRcNTBejnC/8jeAE6RQKc0I1eeHyZC21MX8WAIjQY
+         ZIIw==
+X-Gm-Message-State: AOAM532A7KabgBhEg5RWD4lAlCpcQRygOKFEix4kAcvFUmIQavps6G/Y
+        seedIZgpQ9WMozAg1XT0mLSli0UBz5t8tm0PL2PXcQ==
+X-Google-Smtp-Source: ABdhPJzYBwiaQNBAKnZ8nLw6CQcMDxTnugmhc1fHi+vsy50PArwEFZdPY10xorkg+82823h2HgImdM2Yk9GYOdkgSpI=
+X-Received: by 2002:a05:620a:981:: with SMTP id x1mr11739808qkx.501.1614999184492;
+ Fri, 05 Mar 2021 18:53:04 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <1614957294-188540-1-git-send-email-john.garry@huawei.com> <1614957294-188540-2-git-send-email-john.garry@huawei.com>
+In-Reply-To: <1614957294-188540-2-git-send-email-john.garry@huawei.com>
+From:   Khazhy Kumykov <khazhy@google.com>
+Date:   Fri, 5 Mar 2021 18:52:53 -0800
+Message-ID: <CACGdZY+Qft=55Si5Lmjh1RmVb5Roe-KTsrJHJLz0opSXuesTBg@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 1/3] blk-mq: Clean up references to old requests
+ when freeing rqs
+To:     John Garry <john.garry@huawei.com>
+Cc:     hare@suse.de, Bart Van Assche <bvanassche@acm.org>,
+        ming.lei@redhat.com, Jens Axboe <axboe@kernel.dk>, hch@lst.de,
+        linux-block@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        pragalla@codeaurora.org, kashyap.desai@broadcom.com,
+        yuyufen@huawei.com
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+        boundary="000000000000bb490f05bcd54c4c"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The zram driver makes use of cpu hotplug multistate support,
-whereby it associates a zram compression stream per CPU. To
-support CPU hotplug multistate a callback enabled to allow
-the driver to do what it needs when a CPU hotplugs.
+--000000000000bb490f05bcd54c4c
+Content-Type: text/plain; charset="UTF-8"
 
-It is however currently possible to end up removing the
-zram driver callback prior to removing the zram compression
-streams per CPU. This would leave these compression streams
-hanging.
+On Fri, Mar 5, 2021 at 7:20 AM John Garry <john.garry@huawei.com> wrote:
+>
+> It has been reported many times that a use-after-free can be intermittently
+> found when iterating busy requests:
+>
+> - https://lore.kernel.org/linux-block/8376443a-ec1b-0cef-8244-ed584b96fa96@huawei.com/
+> - https://lore.kernel.org/linux-block/5c3ac5af-ed81-11e4-fee3-f92175f14daf@acm.org/T/#m6c1ac11540522716f645d004e2a5a13c9f218908
+> - https://lore.kernel.org/linux-block/04e2f9e8-79fa-f1cb-ab23-4a15bf3f64cc@kernel.dk/
+>
+> The issue is that when we switch scheduler or change queue depth, there may
+> be references in the driver tagset to the stale requests.
+>
+> As a solution, clean up any references to those requests in the driver
+> tagset. This is done with a cmpxchg to make safe any race with setting the
+> driver tagset request from another queue.
 
-We need to fix ordering for driver load / removal, zram
-device additions, in light of the driver's use of cpu
-hotplug multistate. Since the zram driver exposes many
-sysfs attribute which can also muck with the comrpession
-streams this also means we can hit page faults today easily.
+I noticed this crash recently when running blktests on a "debug"
+config on a 4.15 based kernel (it would always crash), and backporting
+this change fixes it. (testing on linus's latest tree also confirmed
+the fix, with the same config). I realize I'm late to the
+conversation, but appreciate the investigation and fixes :)
 
-Fix all this by providing an zram initialization boolean
-protected the shared in the driver zram_index_mutex,
-which we can use to annotate when sysfs attributes are
-safe to use or not -- once the driver is properly initialized.
-When the driver is going down we also are sure to not let
-userspace muck with attributes which may affect zram cpu
-compression streams.
+--000000000000bb490f05bcd54c4c
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-This also fixes a series of possible memory leaks. The
-crashes and memory leaks can easily be caused by issuing
-the zram02.sh script from the LTP project [0] in a loop
-in two separate windows:
-
-  cd testcases/kernel/device-drivers/zram
-  while true; do PATH=$PATH:$PWD:$PWD/../../../lib/ ./zram02.sh; done
-
-You end up with a splat as follows:
-
-kernel: zram: Removed device: zram0
-kernel: zram: Added device: zram0
-kernel: zram0: detected capacity change from 0 to 209715200
-kernel: Adding 104857596k swap on /dev/zram0. Priority:-2 extents:1 across:104857596k SSFS
-kernel: zram0: detected capacitky change from 209715200 to 0
-kernel: zram0: detected capacity change from 0 to 209715200
-kernel: ------------[ cut here ]------------
-kernel: Error: Removing state 63 which has instances left.
-kernel: WARNING: CPU: 7 PID: 70457 at kernel/cpu.c:2069 __cpuhp_remove_state_cpuslocked+0xf9/0x100
-kernel: Modules linked in: zram(E-) zsmalloc(E) <etc>
-kernel: CPU: 7 PID: 70457 Comm: rmmod Tainted: G            E     5.12.0-rc1-next-20210304 #3
-kernel: Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.14.0-2 04/01/2014
-kernel: RIP: 0010:__cpuhp_remove_state_cpuslocked+0xf9/0x100
-kernel: Code: <etc>
-kernel: RSP: 0018:ffffa800c139be98 EFLAGS: 00010282
-kernel: RAX: 0000000000000000 RBX: ffffffff9083db58 RCX: ffff9609f7dd86d8
-kernel: RDX: 00000000ffffffd8 RSI: 0000000000000027 RDI: ffff9609f7dd86d0
-kernel: RBP: 0000000000000000i R08: 0000000000000000 R09: ffffa800c139bcb8
-kernel: R10: ffffa800c139bcb0 R11: ffffffff908bea40 R12: 000000000000003f
-kernel: R13: 00000000000009d8 R14: 0000000000000000 R15: 0000000000000000
-kernel: FS: 00007f1b075a7540(0000) GS:ffff9609f7dc0000(0000) knlGS:0000000000000000
-kernel: CS:  0010 DS: 0000 ES 0000 CR0: 0000000080050033
-kernel: CR2: 00007f1b07610490 CR3: 00000001bd04e000 CR4: 0000000000350ee0
-kernel: Call Trace:
-kernel: __cpuhp_remove_state+0x2e/0x80
-kernel: __do_sys_delete_module+0x190/0x2a0
-kernel:  do_syscall_64+0x33/0x80
-kernel: entry_SYSCALL_64_after_hwframe+0x44/0xae
-
-The "Error: Removing state 63 which has instances left" refers
-to the zram per CPU compression streams still left.
-
-[0] https://github.com/linux-test-project/ltp.git
-
-Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
----
- drivers/block/zram/zram_drv.c | 63 ++++++++++++++++++++++++++++++-----
- 1 file changed, 55 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index a711a2e2a794..63b6119cee93 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -44,6 +44,8 @@ static DEFINE_MUTEX(zram_index_mutex);
- static int zram_major;
- static const char *default_compressor = CONFIG_ZRAM_DEF_COMP;
- 
-+bool zram_up;
-+
- /* Module params (documentation at end) */
- static unsigned int num_devices = 1;
- /*
-@@ -1699,6 +1701,7 @@ static void zram_reset_device(struct zram *zram)
- 	comp = zram->comp;
- 	disksize = zram->disksize;
- 	zram->disksize = 0;
-+	zram->comp = NULL;
- 
- 	set_capacity_and_notify(zram->disk, 0);
- 	part_stat_set_all(zram->disk->part0, 0);
-@@ -1719,9 +1722,18 @@ static ssize_t disksize_store(struct device *dev,
- 	struct zram *zram = dev_to_zram(dev);
- 	int err;
- 
-+	mutex_lock(&zram_index_mutex);
-+
-+	if (!zram_up) {
-+		err = -ENODEV;
-+		goto out;
-+	}
-+
- 	disksize = memparse(buf, NULL);
--	if (!disksize)
--		return -EINVAL;
-+	if (!disksize) {
-+		err = -EINVAL;
-+		goto out;
-+	}
- 
- 	down_write(&zram->init_lock);
- 	if (init_done(zram)) {
-@@ -1749,12 +1761,16 @@ static ssize_t disksize_store(struct device *dev,
- 	set_capacity_and_notify(zram->disk, zram->disksize >> SECTOR_SHIFT);
- 	up_write(&zram->init_lock);
- 
-+	mutex_unlock(&zram_index_mutex);
-+
- 	return len;
- 
- out_free_meta:
- 	zram_meta_free(zram, disksize);
- out_unlock:
- 	up_write(&zram->init_lock);
-+out:
-+	mutex_unlock(&zram_index_mutex);
- 	return err;
- }
- 
-@@ -1770,8 +1786,17 @@ static ssize_t reset_store(struct device *dev,
- 	if (ret)
- 		return ret;
- 
--	if (!do_reset)
--		return -EINVAL;
-+	mutex_lock(&zram_index_mutex);
-+
-+	if (!zram_up) {
-+		len = -ENODEV;
-+		goto out;
-+	}
-+
-+	if (!do_reset) {
-+		len = -EINVAL;
-+		goto out;
-+	}
- 
- 	zram = dev_to_zram(dev);
- 	bdev = zram->disk->part0;
-@@ -1780,7 +1805,8 @@ static ssize_t reset_store(struct device *dev,
- 	/* Do not reset an active device or claimed device */
- 	if (bdev->bd_openers || zram->claim) {
- 		mutex_unlock(&bdev->bd_mutex);
--		return -EBUSY;
-+		len = -EBUSY;
-+		goto out;
- 	}
- 
- 	/* From now on, anyone can't open /dev/zram[0-9] */
-@@ -1795,6 +1821,8 @@ static ssize_t reset_store(struct device *dev,
- 	zram->claim = false;
- 	mutex_unlock(&bdev->bd_mutex);
- 
-+out:
-+	mutex_unlock(&zram_index_mutex);
- 	return len;
- }
- 
-@@ -2016,6 +2044,10 @@ static ssize_t hot_add_show(struct class *class,
- 	int ret;
- 
- 	mutex_lock(&zram_index_mutex);
-+	if (!zram_up) {
-+		mutex_unlock(&zram_index_mutex);
-+		return -ENODEV;
-+	}
- 	ret = zram_add();
- 	mutex_unlock(&zram_index_mutex);
- 
-@@ -2043,6 +2075,11 @@ static ssize_t hot_remove_store(struct class *class,
- 
- 	mutex_lock(&zram_index_mutex);
- 
-+	if (!zram_up) {
-+		ret = -ENODEV;
-+		goto out;
-+	}
-+
- 	zram = idr_find(&zram_index_idr, dev_id);
- 	if (zram) {
- 		ret = zram_remove(zram);
-@@ -2052,6 +2089,7 @@ static ssize_t hot_remove_store(struct class *class,
- 		ret = -ENODEV;
- 	}
- 
-+out:
- 	mutex_unlock(&zram_index_mutex);
- 	return ret ? ret : count;
- }
-@@ -2078,12 +2116,15 @@ static int zram_remove_cb(int id, void *ptr, void *data)
- 
- static void destroy_devices(void)
- {
-+	mutex_lock(&zram_index_mutex);
-+	zram_up = false;
- 	class_unregister(&zram_control_class);
- 	idr_for_each(&zram_index_idr, &zram_remove_cb, NULL);
- 	zram_debugfs_destroy();
- 	idr_destroy(&zram_index_idr);
- 	unregister_blkdev(zram_major, "zram");
- 	cpuhp_remove_multi_state(CPUHP_ZCOMP_PREPARE);
-+	mutex_unlock(&zram_index_mutex);
- }
- 
- static int __init zram_init(void)
-@@ -2111,15 +2152,21 @@ static int __init zram_init(void)
- 		return -EBUSY;
- 	}
- 
-+	mutex_lock(&zram_index_mutex);
-+
- 	while (num_devices != 0) {
--		mutex_lock(&zram_index_mutex);
- 		ret = zram_add();
--		mutex_unlock(&zram_index_mutex);
--		if (ret < 0)
-+		if (ret < 0) {
-+			mutex_unlock(&zram_index_mutex);
- 			goto out_error;
-+		}
- 		num_devices--;
- 	}
- 
-+	zram_up = true;
-+
-+	mutex_unlock(&zram_index_mutex);
-+
- 	return 0;
- 
- out_error:
--- 
-2.30.1
-
+MIIPmAYJKoZIhvcNAQcCoIIPiTCCD4UCAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
+ggzyMIIEtjCCA56gAwIBAgIQeAMYYHb81ngUVR0WyMTzqzANBgkqhkiG9w0BAQsFADBMMSAwHgYD
+VQQLExdHbG9iYWxTaWduIFJvb3QgQ0EgLSBSMzETMBEGA1UEChMKR2xvYmFsU2lnbjETMBEGA1UE
+AxMKR2xvYmFsU2lnbjAeFw0yMDA3MjgwMDAwMDBaFw0yOTAzMTgwMDAwMDBaMFQxCzAJBgNVBAYT
+AkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMSowKAYDVQQDEyFHbG9iYWxTaWduIEF0bGFz
+IFIzIFNNSU1FIENBIDIwMjAwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCvLe9xPU9W
+dpiHLAvX7kFnaFZPuJLey7LYaMO8P/xSngB9IN73mVc7YiLov12Fekdtn5kL8PjmDBEvTYmWsuQS
+6VBo3vdlqqXZ0M9eMkjcKqijrmDRleudEoPDzTumwQ18VB/3I+vbN039HIaRQ5x+NHGiPHVfk6Rx
+c6KAbYceyeqqfuJEcq23vhTdium/Bf5hHqYUhuJwnBQ+dAUcFndUKMJrth6lHeoifkbw2bv81zxJ
+I9cvIy516+oUekqiSFGfzAqByv41OrgLV4fLGCDH3yRh1tj7EtV3l2TngqtrDLUs5R+sWIItPa/4
+AJXB1Q3nGNl2tNjVpcSn0uJ7aFPbAgMBAAGjggGKMIIBhjAOBgNVHQ8BAf8EBAMCAYYwHQYDVR0l
+BBYwFAYIKwYBBQUHAwIGCCsGAQUFBwMEMBIGA1UdEwEB/wQIMAYBAf8CAQAwHQYDVR0OBBYEFHzM
+CmjXouseLHIb0c1dlW+N+/JjMB8GA1UdIwQYMBaAFI/wS3+oLkUkrk1Q+mOai97i3Ru8MHsGCCsG
+AQUFBwEBBG8wbTAuBggrBgEFBQcwAYYiaHR0cDovL29jc3AyLmdsb2JhbHNpZ24uY29tL3Jvb3Ry
+MzA7BggrBgEFBQcwAoYvaHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvcm9vdC1y
+My5jcnQwNgYDVR0fBC8wLTAroCmgJ4YlaHR0cDovL2NybC5nbG9iYWxzaWduLmNvbS9yb290LXIz
+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
+MEvaI7F4ZN2DM20wTAYDVR0gBEUwQzBBBgkrBgEEAaAyASgwNDAyBggrBgEFBQcCARYmaHR0cHM6
+Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADCBmgYIKwYBBQUHAQEE
+gY0wgYowPgYIKwYBBQUHMAGGMmh0dHA6Ly9vY3NwLmdsb2JhbHNpZ24uY29tL2NhL2dzYXRsYXNy
+M3NtaW1lY2EyMDIwMEgGCCsGAQUFBzAChjxodHRwOi8vc2VjdXJlLmdsb2JhbHNpZ24uY29tL2Nh
+Y2VydC9nc2F0bGFzcjNzbWltZWNhMjAyMC5jcnQwHwYDVR0jBBgwFoAUfMwKaNei6x4schvRzV2V
+b4378mMwRgYDVR0fBD8wPTA7oDmgN4Y1aHR0cDovL2NybC5nbG9iYWxzaWduLmNvbS9jYS9nc2F0
+bGFzcjNzbWltZWNhMjAyMC5jcmwwDQYJKoZIhvcNAQELBQADggEBAIKZMQsUIWBTlSa6tHLU5L8W
+YVOXfTkEXU6aeq8JjYjcj1fQD+1K0EQhvwz6SB5I0NhqfMLyQBUZHJXChsLGygbCqXbmBF143+sK
+xsY5En+KQ03HHHn8pmLHFMAgvO2f8cJyJD3cBi8nMNRia/ZMy2jayQPOiiK34RpcoyXr80KWUZQh
+iqPea7dSkHy8G0Vjeo4vj+RQBse+NKpyEzJilDUVpd5x307jeFjYBp2fLWt0UAZ8P2nUeSPjC2fF
+kGXeiYWeVPpQCSzowcRluUVFrKApZDZpm3Ly7a5pMVFQ23m2Waaup/DHnJkgxlRQRbcxDhqLKrJj
+tATPzBYapBLXne4xggJqMIICZgIBATBoMFQxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxT
+aWduIG52LXNhMSowKAYDVQQDEyFHbG9iYWxTaWduIEF0bGFzIFIzIFNNSU1FIENBIDIwMjACEAH+
+DkXtUaeOlUVJH2IZ1xgwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEINPhOn/hZ9KP
+h/1bcG39a7myQp9gt6wb2eMaPOdXEFRSMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZI
+hvcNAQkFMQ8XDTIxMDMwNjAyNTMwNFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJ
+YIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcN
+AQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQB0VK8nQRQmzoV28HJOzpNGgXgReMmB
+fOjNH/ctVGY6535M7p031O0fzesI/D2ZKVaS4mppDPYMghNw8jXgVzmTjTzfXYwORghvGoH0MgCG
+OVci9rgGcBOHMTs46CX2qRIkypVWGe6kwZCPeGdhh462aZ5nB4qt9B3JJZk4PGt7qESIhiCpKosr
+7d/wGWRn+3vncz3FD4pstVPK9c/0YhpDU2kGSm/sCUSQM81jiVUyeqfbmjbIVgAIOnaryTY3R34v
+4NeVyMP0taXL9ausv0+VLFnuzSq3WSbzoCbyFfmxKErDorE/D1GcxfxefTJO8y0E6ip2s+a1rM4O
+GR41HARR
+--000000000000bb490f05bcd54c4c--
