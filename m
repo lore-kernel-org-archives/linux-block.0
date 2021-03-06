@@ -7,57 +7,57 @@ X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4BD5C433E0
-	for <linux-block@archiver.kernel.org>; Sat,  6 Mar 2021 04:33:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAB5AC433DB
+	for <linux-block@archiver.kernel.org>; Sat,  6 Mar 2021 04:44:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 98FCE64FBD
-	for <linux-block@archiver.kernel.org>; Sat,  6 Mar 2021 04:33:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7B0BA65011
+	for <linux-block@archiver.kernel.org>; Sat,  6 Mar 2021 04:44:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229898AbhCFEcj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 5 Mar 2021 23:32:39 -0500
-Received: from mail-pj1-f41.google.com ([209.85.216.41]:33788 "EHLO
-        mail-pj1-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229714AbhCFEc1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Mar 2021 23:32:27 -0500
-Received: by mail-pj1-f41.google.com with SMTP id j14-20020a17090a588eb02900cefe2daa2cso151487pji.0;
-        Fri, 05 Mar 2021 20:32:27 -0800 (PST)
+        id S229651AbhCFEnX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 5 Mar 2021 23:43:23 -0500
+Received: from mail-pl1-f177.google.com ([209.85.214.177]:33294 "EHLO
+        mail-pl1-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229642AbhCFEnH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Mar 2021 23:43:07 -0500
+Received: by mail-pl1-f177.google.com with SMTP id c16so2439356ply.0;
+        Fri, 05 Mar 2021 20:43:07 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=0FLdb7WRYyetMAGeVkmVyaxyT94n1/im6YgyjkPRT3E=;
-        b=CGCJrIPfnZ7Mgz/1f6l55lxDaAjW9oRsxkl9RmG4YzHZqO5MzkjqVmWevj5B3eKirb
-         X9we6corwSdoP2XxUcYWO1kQX3hBFjvxXjRJnCO3IJU49qcTENl9R3RVkZ2PjAR3+fuI
-         DAFRTb303F02N7+uCq6y0RmxdoHFzoVaZEcWxMuwQbfRPYATXNzYmBZk428BTkt4OsMS
-         G6tDxzElikvAhrJO4qUYL2/FndpxSUpxyOkyaBGial9nWpqd73hBtMNPEC56Uk33sizM
-         rUQUQ6PD6hLUocHV9YxVGxnBa6X5TBq6IGf9s0p3LK9zUOu1xKIYoj6VnSWBx2CwWk90
-         gvjA==
-X-Gm-Message-State: AOAM533fyeUmVKntMeeY/xlZIRBvs9TyoFk7YcYyM5Ctxj8MyzlY+yvD
-        gqIelo7BLo2Pud+ExThDJeTafsagqKk=
-X-Google-Smtp-Source: ABdhPJywIhgawDTlWs6vOPCOvxkKzRxO0NIFJq96trJk5+cU+UtxNV74qZdVpuhUal9m/JelfZChkg==
-X-Received: by 2002:a17:90a:4381:: with SMTP id r1mr14325348pjg.20.1615005146889;
-        Fri, 05 Mar 2021 20:32:26 -0800 (PST)
+        bh=WpuX4jtViXGHBqpqCDoI3IPp3tBlZBEZA1GBacd28cw=;
+        b=i7hLxZOUDceuapM0M9f8/X0dUPqxFtYHHTSdTgCvRngpWIykp+cmczq80G9csK4iy8
+         02nmCHqH729P0QSMPc6YVfchJ6rPV0kr3kdSeDlI1EjUjtIPhCebQxEQz479XO/tAjUL
+         EfQVZFVp6pwISKLWWpNO/wxP4sjJt2NHT60XAaXUjeNh6SiDSHV8m3dcvjNxnXLKSJFI
+         C2IFacmyteNdw46aYW2Mc4xrt5dXIlsapaBmJiGZF2TXOyog51rgun04bNgT2v8aZ9lE
+         /XW1f05IuApaMqYUFJSxcvmOAGoN8gIyMrFh0xxkbBFj1RWeCC+eW8F7M5dy/LjkK1Z0
+         Rtmg==
+X-Gm-Message-State: AOAM5316jnn4L6z5UqI6esmDvVvdu6x0DJ2vQJoZ7t9CFSN8JpLpg28i
+        UEoKufePQVOd59meq4sns+8=
+X-Google-Smtp-Source: ABdhPJyjpLfbzjfzX2gwl18nucxUcIfibp3ZYmX+nqFjK7BU4AymfgOUJJxNmUDOgCa/oeamnYyd2Q==
+X-Received: by 2002:a17:90a:4a06:: with SMTP id e6mr13643790pjh.141.1615005786526;
+        Fri, 05 Mar 2021 20:43:06 -0800 (PST)
 Received: from ?IPv6:2601:647:4000:d7:508e:d398:f4d5:3d44? ([2601:647:4000:d7:508e:d398:f4d5:3d44])
-        by smtp.gmail.com with ESMTPSA id z3sm3233394pff.40.2021.03.05.20.32.25
+        by smtp.gmail.com with ESMTPSA id k9sm3437410pji.8.2021.03.05.20.43.04
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 Mar 2021 20:32:26 -0800 (PST)
-Subject: Re: [RFC PATCH v3 2/3] blk-mq: Freeze and quiesce all queues for
- tagset in elevator_exit()
+        Fri, 05 Mar 2021 20:43:05 -0800 (PST)
+Subject: Re: [RFC PATCH v3 3/3] blk-mq: Lockout tagset iterator when exiting
+ elevator
 To:     John Garry <john.garry@huawei.com>, hare@suse.de,
         ming.lei@redhat.com, axboe@kernel.dk, hch@lst.de
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         pragalla@codeaurora.org, kashyap.desai@broadcom.com,
         yuyufen@huawei.com
 References: <1614957294-188540-1-git-send-email-john.garry@huawei.com>
- <1614957294-188540-3-git-send-email-john.garry@huawei.com>
+ <1614957294-188540-4-git-send-email-john.garry@huawei.com>
 From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <52618092-07ca-ecb5-320f-957af26ab146@acm.org>
-Date:   Fri, 5 Mar 2021 20:32:24 -0800
+Message-ID: <48a3cf78-3f6d-c13c-bca2-1f8277817b45@acm.org>
+Date:   Fri, 5 Mar 2021 20:43:03 -0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.7.1
 MIME-Version: 1.0
-In-Reply-To: <1614957294-188540-3-git-send-email-john.garry@huawei.com>
+In-Reply-To: <1614957294-188540-4-git-send-email-john.garry@huawei.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -66,42 +66,44 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 3/5/21 7:14 AM, John Garry wrote:
-> diff --git a/block/blk.h b/block/blk.h
-> index 3b53e44b967e..1a948bfd91e4 100644
-> --- a/block/blk.h
-> +++ b/block/blk.h
-> @@ -201,10 +201,29 @@ void elv_unregister_queue(struct request_queue *q);
->  static inline void elevator_exit(struct request_queue *q,
->  		struct elevator_queue *e)
+> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+> index 7ff1b20d58e7..5950fee490e8 100644
+> --- a/block/blk-mq-tag.c
+> +++ b/block/blk-mq-tag.c
+> @@ -358,11 +358,16 @@ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
 >  {
-> +	struct blk_mq_tag_set *set = q->tag_set;
-> +	struct request_queue *tmp;
-> +
->  	lockdep_assert_held(&q->sysfs_lock);
+>  	int i;
 >  
-> +	mutex_lock(&set->tag_list_lock);
-> +	list_for_each_entry(tmp, &set->tag_list, tag_set_list) {
-> +		if (tmp == q)
-> +			continue;
-> +		blk_mq_freeze_queue(tmp);
-> +		blk_mq_quiesce_queue(tmp);
-> +	}
+> +	if (!atomic_inc_not_zero(&tagset->iter_usage_counter))
+> +		return;
 > +
+>  	for (i = 0; i < tagset->nr_hw_queues; i++) {
+>  		if (tagset->tags && tagset->tags[i])
+>  			__blk_mq_all_tag_iter(tagset->tags[i], fn, priv,
+>  					      BT_TAG_ITER_STARTED);
+>  	}
+> +
+> +	atomic_dec(&tagset->iter_usage_counter);
+>  }
+>  EXPORT_SYMBOL(blk_mq_tagset_busy_iter);
+
+This changes the behavior of blk_mq_tagset_busy_iter(). What will e.g.
+happen if the mtip driver calls blk_mq_tagset_busy_iter(&dd->tags,
+mtip_abort_cmd, dd) concurrently with another blk_mq_tagset_busy_iter()
+call and if that causes all mtip_abort_cmd() calls to be skipped?
+
+> +	while (atomic_cmpxchg(&set->iter_usage_counter, 1, 0) != 1);
+
+Isn't it recommended to call cpu_relax() inside busy-waiting loops?
+
 >  	blk_mq_sched_free_requests(q);
 >  	__elevator_exit(q, e);
-> +
-> +	list_for_each_entry(tmp, &set->tag_list, tag_set_list) {
-> +		if (tmp == q)
-> +			continue;
-> +		blk_mq_unquiesce_queue(tmp);
-> +		blk_mq_unfreeze_queue(tmp);
-> +	}
-> +	mutex_unlock(&set->tag_list_lock);
->  }
+>  
+> +	atomic_set(&set->iter_usage_counter, 1);
 
-This patch introduces nesting of tag_list_lock inside sysfs_lock. The
-latter is per request queue while the former can be shared across
-multiple request queues. Has it been analyzed whether this is safe?
+Can it happen that the above atomic_set() call happens while a
+blk_mq_tagset_busy_iter() call is in progress? Should that atomic_set()
+call perhaps be changed into an atomic_inc() call?
 
 Thanks,
 
