@@ -1,87 +1,112 @@
-Return-Path: <SRS0=+JuZ=IE=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=nGPF=IF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A19BDC433DB
-	for <linux-block@archiver.kernel.org>; Sat,  6 Mar 2021 22:47:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FEC7C433E0
+	for <linux-block@archiver.kernel.org>; Sun,  7 Mar 2021 02:44:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5621C64FF0
-	for <linux-block@archiver.kernel.org>; Sat,  6 Mar 2021 22:47:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DBBCE6505D
+	for <linux-block@archiver.kernel.org>; Sun,  7 Mar 2021 02:44:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229713AbhCFWqf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 6 Mar 2021 17:46:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54286 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229709AbhCFWqf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 6 Mar 2021 17:46:35 -0500
-Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37891C06174A
-        for <linux-block@vger.kernel.org>; Sat,  6 Mar 2021 14:46:35 -0800 (PST)
-Received: by mail-wr1-x435.google.com with SMTP id h98so7010018wrh.11
-        for <linux-block@vger.kernel.org>; Sat, 06 Mar 2021 14:46:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=to:from:subject:message-id:date:mime-version:content-language
-         :content-transfer-encoding;
-        bh=3N43K5i5K2H7r2Nt1FUw4nSeM7pjUTtXg8LS/Jw2058=;
-        b=UmcrF9zxiTfcUsTPACEg9E52ylvQH/gMmSUbu77JQS7JuuoctWOLnEL1n/qjlIMMjm
-         rm7F2fhhZRX3ZIP5Xy94VGU5PtFf3zUYj69Vel0sIgp8ppWFjQ6Pm9V2X7QZJjos5GM4
-         hS4mUpZYdoCF3ZT/nNINWcdAfqcXiU/MkRhVe7jjxbxkWG+oaHaxe+rMj4YfWMWsi0pI
-         NtmMXE0QVrei+40DP/L5+IQ0+QQio64dAvd0LOQ582GdZduKe6Af8OhIfWIcgYmAeRRZ
-         MuOMVk6ZWIgtKLhSeDRfZCc2B6nG5SGIHX6agKYKdcI6QBWyYklw6n4K43Hu+4hnxdkp
-         Irpw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:from:subject:message-id:date:mime-version
-         :content-language:content-transfer-encoding;
-        bh=3N43K5i5K2H7r2Nt1FUw4nSeM7pjUTtXg8LS/Jw2058=;
-        b=bk2DDa7m6mDd5JnIxgeRCYLUsYT6t96+6nwx+m/2DRtZa6UpCImFBnvMPuThiiwhhd
-         FPz85RnIPX0uPc4et74PjFyAoGKmYYEaebz6E9ByJ4Usgl6KAiUKJdo7j6Ty361Hw97X
-         gOG34j9sBrsWlj09H7L5ygeVWGDwVHC6VHlNw3Asvs1mShJmgemm0AIdnH2d27uFuGQx
-         iFwIuWVq/Zl0fLoxikFKFUS808vTUENvWG1A1JGT4zI1O7n/v8YexBud4+s0q1S1D798
-         Zbs2YkoV/xc7awI9t3d7ir2QiKp9L7KaYokIOffStLSiTcYyh4tSVKKjzb61Exyv0SzZ
-         SoKA==
-X-Gm-Message-State: AOAM530P8ghI+yKwz1VpnJNBW+JpHjMd5dEQ3sfW7jRopWTyMj3yS53j
-        JX2pgrHe1B9Xo0zwCw9xEf09BV0s1A==
-X-Google-Smtp-Source: ABdhPJxQd9DzkmIUQhjmmqWhjdH+ppEl1wEDunef81gv9CQ1h1yjuKLQp4iPhRZPp3TPOiJMTNo6Aw==
-X-Received: by 2002:a5d:6307:: with SMTP id i7mr15938667wru.305.1615070793799;
-        Sat, 06 Mar 2021 14:46:33 -0800 (PST)
-Received: from localhost (215.red-81-43-178.staticip.rima-tde.net. [81.43.178.215])
-        by smtp.gmail.com with ESMTPSA id j125sm10639755wmb.44.2021.03.06.14.46.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 06 Mar 2021 14:46:33 -0800 (PST)
-To:     Paolo Valente <paolo.valente@linaro.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        BLOCK ML <linux-block@vger.kernel.org>
-From:   Xose Vazquez Perez <xose.vazquez@gmail.com>
-Subject: [RFC] iosched: add cfq -> bfq alias
-Message-ID: <7962131d-12c5-0862-483f-e8873cac8ba0@gmail.com>
-Date:   Sat, 6 Mar 2021 23:46:31 +0100
+        id S229964AbhCGCoV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 6 Mar 2021 21:44:21 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:50228 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229957AbhCGCoP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 6 Mar 2021 21:44:15 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1615085054;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=M0WnSa3naWt2OVfaPh0CiLpNPziDQ+aRkwGpZTCk1hI=;
+        b=E5VIhx3ZPhIWfbZKwwSvBhKGTA4ZOYMvgrvRVjDpYU79N9Ictigia+qCWWEkg9QKV7pUHp
+        rNMblXxYkmx46OwX3kTK2FwuAy4rar1J84f53eCLarcq8dXogtQUXHzJqBf9R3LgzBWLf6
+        l9zJ0fBBgEm3Re5McI69jjfiEQ7KAak=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-220-UyPtakhFNjOWSh53soEQNw-1; Sat, 06 Mar 2021 21:44:13 -0500
+X-MC-Unique: UyPtakhFNjOWSh53soEQNw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1FD2F1842142;
+        Sun,  7 Mar 2021 02:44:12 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-12-18.pek2.redhat.com [10.72.12.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 706D91002382;
+        Sun,  7 Mar 2021 02:44:10 +0000 (UTC)
+Subject: Re: [PATCH blktests] tests/srp/rc, tests/nvmeof-mp/rc: add fio check
+ to group_requires
+To:     Bart Van Assche <bvanassche@acm.org>, osandov@fb.com
+Cc:     linux-block@vger.kernel.org
+References: <20210306071943.31194-1-yi.zhang@redhat.com>
+ <7b0ec432-07e4-7f08-dd66-06e0bfd3ae56@acm.org>
+From:   Yi Zhang <yi.zhang@redhat.com>
+Message-ID: <20390115-41e8-3833-4dba-004ffce0fea3@redhat.com>
+Date:   Sun, 7 Mar 2021 10:44:06 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
+In-Reply-To: <7b0ec432-07e4-7f08-dd66-06e0bfd3ae56@acm.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
-Avoid break old scrips and udev rules.
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 95586137194e..8c6c82860a45 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -6914,6 +6914,7 @@ static struct elevator_type iosched_bfq_mq = {
-  	.icq_align =		__alignof__(struct bfq_io_cq),
-  	.elevator_attrs =	bfq_attrs,
-  	.elevator_name =	"bfq",
-+	.elevator_alias =	"cfq",
-  	.elevator_owner =	THIS_MODULE,
-  };
-  MODULE_ALIAS("bfq-iosched");
+On 3/7/21 2:14 AM, Bart Van Assche wrote:
+> On 3/5/21 11:19 PM, Yi Zhang wrote:
+>> Most of the srp and nvmeof-mp tests need fio, we need add fio
+>> check before running the tests
+>>
+>> Signed-off-by: Yi Zhang <yi.zhang@redhat.com>
+>> ---
+>>   tests/nvmeof-mp/rc | 2 +-
+>>   tests/srp/rc       | 2 +-
+>>   2 files changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/tests/nvmeof-mp/rc b/tests/nvmeof-mp/rc
+>> index ab7770f..4348b16 100755
+>> --- a/tests/nvmeof-mp/rc
+>> +++ b/tests/nvmeof-mp/rc
+>> @@ -42,7 +42,7 @@ and multipathing has been enabled in the nvme_core kernel module"
+>>   	)
+>>   	_have_modules "${required_modules[@]}" || return
+>>   
+>> -	for p in mkfs.ext4 mkfs.xfs multipath multipathd pidof; do
+>> +	for p in mkfs.ext4 mkfs.xfs multipath multipathd pidof fio; do
+>>   		_have_program "$p" || return
+>>   	done
+>>   
+>> diff --git a/tests/srp/rc b/tests/srp/rc
+>> index 700cd71..2daf199 100755
+>> --- a/tests/srp/rc
+>> +++ b/tests/srp/rc
+>> @@ -59,7 +59,7 @@ group_requires() {
+>>   	)
+>>   	_have_modules "${required_modules[@]}" || return
+>>   
+>> -	for p in mkfs.ext4 mkfs.xfs multipath multipathd pidof sg_reset; do
+>> +	for p in mkfs.ext4 mkfs.xfs multipath multipathd pidof sg_reset fio; do
+>>   		_have_program "$p" || return
+>>   	done
+> This patch looks good to me but unfortunately it conflicts with my patch
+> with title "[PATCH blktests v2] rdma: Use rdma link instead of
+> /sys/class/infiniband/*/parent" ...
+Yeah, will send V2 based on yours, thanks.
+
+> Bart.
+>
+
