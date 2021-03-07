@@ -7,87 +7,82 @@ X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1351BC433DB
-	for <linux-block@archiver.kernel.org>; Sun,  7 Mar 2021 20:41:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4822C433DB
+	for <linux-block@archiver.kernel.org>; Sun,  7 Mar 2021 20:42:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BDB0E6516B
-	for <linux-block@archiver.kernel.org>; Sun,  7 Mar 2021 20:41:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7496B64FE9
+	for <linux-block@archiver.kernel.org>; Sun,  7 Mar 2021 20:42:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231732AbhCGUkx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 7 Mar 2021 15:40:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53724 "EHLO
+        id S232955AbhCGUl5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 7 Mar 2021 15:41:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232952AbhCGUkw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 7 Mar 2021 15:40:52 -0500
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9523AC06174A
-        for <linux-block@vger.kernel.org>; Sun,  7 Mar 2021 12:40:52 -0800 (PST)
-Received: by mail-pj1-x102d.google.com with SMTP id kr3-20020a17090b4903b02900c096fc01deso1929791pjb.4
-        for <linux-block@vger.kernel.org>; Sun, 07 Mar 2021 12:40:52 -0800 (PST)
+        with ESMTP id S232958AbhCGUlk (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 7 Mar 2021 15:41:40 -0500
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A24FDC06174A
+        for <linux-block@vger.kernel.org>; Sun,  7 Mar 2021 12:41:40 -0800 (PST)
+Received: by mail-pg1-x535.google.com with SMTP id w34so4015136pga.8
+        for <linux-block@vger.kernel.org>; Sun, 07 Mar 2021 12:41:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=osandov-com.20150623.gappssmtp.com; s=20150623;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=zFKZ+plkHJCabvx87gFRsKwL2LA7EPxXKyKCRVNXqdA=;
-        b=ZC2D4D/aVHsWUTTm3RDAJVPFkV2BW4wgA+aydBJa7A3Ljuft7+StGQJHZ6gBOMQdLZ
-         TwXW6sHJ0LZz3/IcmbJN+eORuW85NwiusviPvNFwFNcjXqT+rJtcXJI6glhl/6WkrHzK
-         yltWygrAXucJYoo9LaiJ5CEKX2f9J3yiOxai9498SuJOINnVfyUGW28J7x5xYqRF9GdP
-         3cx7Ln/LVUGAhSR13x7TPq2vgsBn9P9C9OXxl1EvDEOycAaZhsJQ/4F8afmDllSRdh/l
-         i8gr8q2OQgdooF11kubysMaxHEKgjeFYXFCVvctRfhs8B4in82CTEvoZFMkrhQ3A9uZ4
-         GUJg==
+        bh=7/d4om0ohwwj8Ihc9aj9cAGxv2Fxe1zZP149StO2flQ=;
+        b=J/xZIsquufb+zPte+L/pBXWf9HGO7v9EmN/ly91VKI6N9ykYGrZa9pA18wnfnxQqbf
+         ZUEn10DDyFf2KPucbf7rVsVO9QfthihIVgOZx9ROg4zcoHJ5uBa5QpkWDi/tw9qFtEHs
+         r1l5ub4l7LirjVxeUzDhN+Oof4LzL2Vgug56E1MOM4BSMd28fOYdm+bx6QGF581J7PSU
+         9cx9HCTGnYOR1h/QGLbr6uD4H2NyuRu0X0efmOBunqn5tZesZCOA8YES8ONkgFYcpljz
+         9u0/bdda1vPBoWxc432FICcZlos+6r2afY+EAoN/wi+fGpQqrTVesj+GhSHmpSNn1oEy
+         Tz/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=zFKZ+plkHJCabvx87gFRsKwL2LA7EPxXKyKCRVNXqdA=;
-        b=mIbE9ebiJR6kXFJSpP+g3CKpf7JTeAeVLLg3TSsl/5xV83Oelo1eH/Kp+TnlGh5NlZ
-         0kZpLAzq/V4Mn7iZIADLRMRrA2siIWK4zv+HnWMESWgxlNErg47rc1tjBnyqH13tB7Id
-         jWkY0aXmW9W+QZWzPSeUfV0EXYd2n+x8PLjt2uMyt/2E7VXAJaMa4ZnGnxNBy2vGxHCt
-         8xzW9UZh3fkxBRjU+/8kc2e1CYurENZcXdAipXdw1kB5IAYsl4rn3mHLQsb2e7xvdOzQ
-         jUVagllD3I7MISG1YOkQaHZ5jd+WVUHqCrIZRQGp/F4suhK/KnqyrzmeO85KJIEhWulo
-         xV0g==
-X-Gm-Message-State: AOAM532bdhFPEsMR8LzgpovuHbEL4uNicAboYpBGDBxh8FJDX7EAflH0
-        2/RKiqYaa9TAu2phbT4m7nTlVQ==
-X-Google-Smtp-Source: ABdhPJxutYvFuc6odYhs2QIdmOO58P3Xh4VTykp4Ddo2cZVxikmzufFvnF4B/oGyr28tfkB/kQnOFg==
-X-Received: by 2002:a17:90a:d590:: with SMTP id v16mr20747172pju.118.1615149652099;
-        Sun, 07 Mar 2021 12:40:52 -0800 (PST)
+        bh=7/d4om0ohwwj8Ihc9aj9cAGxv2Fxe1zZP149StO2flQ=;
+        b=UlwGZ3j22slZFPmocwip4kLIxMWbQ5bLET49Gx5ZNjGD9gjFqNlb2goqBoN+GnN0tQ
+         9gcDZIKzEldngTu9SfuRjmS/nxr5cqa2g5Dt+CDm7zkdhPNZTmIMTboCdlPMw5ZbsJve
+         WJ6HQ8BXJSoZhHqaf/KOZ4CfzTAsZ4r9zhlaTQzmReERTEM1aXf1XnEDk2Ug69yVKt1A
+         /EOfX51BDyrHUxGfBeg1ZnIw1we6W0mvtRQSF6I6DNbnLmye9LLAl94cdMoF1yokkhzx
+         2BlG3xEYQtEPCdAcZHZ/dYbtWjiFYnkvOCXmBvM6IvCmJ/caci+JjfY4gqMjf/F/3+gQ
+         CxLg==
+X-Gm-Message-State: AOAM530X8XU7DJ87cjeXPNU5+FyibDAdLFoC9YjD67oIhWoS1B6s87ys
+        2cLNDFDxG3knSyxhWLuCya6Rgg==
+X-Google-Smtp-Source: ABdhPJxCXjHgzhDNxCo74pxi0w4+LVa2A7jLYPizUTbAtyvC5KC0s+vQBXERvfwyODnW9CVghaXblw==
+X-Received: by 2002:a65:46c9:: with SMTP id n9mr17358686pgr.116.1615149699643;
+        Sun, 07 Mar 2021 12:41:39 -0800 (PST)
 Received: from relinquished.localdomain ([2620:10d:c090:400::5:ac1a])
-        by smtp.gmail.com with ESMTPSA id x14sm8366800pfm.207.2021.03.07.12.40.50
+        by smtp.gmail.com with ESMTPSA id 17sm4498213pfb.71.2021.03.07.12.41.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 07 Mar 2021 12:40:51 -0800 (PST)
-Date:   Sun, 7 Mar 2021 12:40:49 -0800
+        Sun, 07 Mar 2021 12:41:38 -0800 (PST)
+Date:   Sun, 7 Mar 2021 12:41:36 -0800
 From:   Omar Sandoval <osandov@osandov.com>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Omar Sandoval <osandov@fb.com>, linux-block@vger.kernel.org,
-        Yi Zhang <yi.zhang@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>
-Subject: Re: [PATCH blktests v2] rdma: Use rdma link instead of
- /sys/class/infiniband/*/parent
-Message-ID: <YEU6Uf6cY+TAWfxW@relinquished.localdomain>
-References: <20210228223403.21685-1-bvanassche@acm.org>
+To:     Yi Zhang <yi.zhang@redhat.com>
+Cc:     osandov@fb.com, linux-block@vger.kernel.org, bvanassche@acm.org
+Subject: Re: [PATCH blktests v2] tests/srp/rc, tests/nvmeof-mp/rc: add fio
+ check to group_requires
+Message-ID: <YEU6gBo0o8KA1QuF@relinquished.localdomain>
+References: <20210307163142.6918-1-yi.zhang@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210228223403.21685-1-bvanassche@acm.org>
+In-Reply-To: <20210307163142.6918-1-yi.zhang@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Feb 28, 2021 at 02:34:03PM -0800, Bart Van Assche wrote:
-> The approach of verifying whether or not an RDMA interface is associated
-> with the rdma_rxe interface by looking up its parent device is deprecated
-> and will be removed soon from the Linux kernel. Hence this patch that uses
-> the rdma link command instead.
+On Mon, Mar 08, 2021 at 12:31:42AM +0800, Yi Zhang wrote:
+> Most of the srp and nvmeof-mp tests need fio, we need add fio
+> check before running the tests
 > 
-> Cc: Jason Gunthorpe <jgg@nvidia.com>
-> Cc: Yi Zhang <yi.zhang@redhat.com>
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+> Signed-off-by: Yi Zhang <yi.zhang@redhat.com>
 > ---
-> v2: Added a _have_program check for 'rdma' as requested by Omar.
+> v2: update to based on Bart's patch
+> [PATCH blktests v2] rdma: Use rdma link instead of
+> /sys/class/infiniband/*/parent
 > ---
->  common/multipath-over-rdma | 111 +++++++++++--------------------------
->  tests/nvmeof-mp/rc         |   2 +-
->  tests/srp/rc               |  12 +---
->  3 files changed, 35 insertions(+), 90 deletions(-)
+>  tests/nvmeof-mp/rc | 2 +-
+>  tests/srp/rc       | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
 
 Thanks, applied.
