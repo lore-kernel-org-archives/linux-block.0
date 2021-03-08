@@ -2,89 +2,136 @@ Return-Path: <SRS0=eh4K=IG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B00B4C433E0
-	for <linux-block@archiver.kernel.org>; Mon,  8 Mar 2021 11:21:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE88AC433E0
+	for <linux-block@archiver.kernel.org>; Mon,  8 Mar 2021 12:01:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 60293651CA
-	for <linux-block@archiver.kernel.org>; Mon,  8 Mar 2021 11:21:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A0506651A7
+	for <linux-block@archiver.kernel.org>; Mon,  8 Mar 2021 12:01:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229551AbhCHLVT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 8 Mar 2021 06:21:19 -0500
-Received: from frasgout.his.huawei.com ([185.176.79.56]:2652 "EHLO
-        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231760AbhCHLU7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Mar 2021 06:20:59 -0500
-Received: from fraeml745-chm.china.huawei.com (unknown [172.18.147.200])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4DvG2w4069z67wh2;
-        Mon,  8 Mar 2021 19:15:04 +0800 (CST)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- fraeml745-chm.china.huawei.com (10.206.15.226) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2106.2; Mon, 8 Mar 2021 12:20:58 +0100
-Received: from [10.210.165.214] (10.210.165.214) by
- lhreml724-chm.china.huawei.com (10.201.108.75) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2106.2; Mon, 8 Mar 2021 11:20:56 +0000
-Subject: Re: [RFC PATCH v3 1/3] blk-mq: Clean up references to old requests
- when freeing rqs
-To:     Khazhy Kumykov <khazhy@google.com>
-CC:     <hare@suse.de>, Bart Van Assche <bvanassche@acm.org>,
-        <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>, <hch@lst.de>,
-        <linux-block@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        <pragalla@codeaurora.org>, <kashyap.desai@broadcom.com>,
-        <yuyufen@huawei.com>
-References: <1614957294-188540-1-git-send-email-john.garry@huawei.com>
- <1614957294-188540-2-git-send-email-john.garry@huawei.com>
- <CACGdZY+Qft=55Si5Lmjh1RmVb5Roe-KTsrJHJLz0opSXuesTBg@mail.gmail.com>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <03e09428-b4e1-c77c-2e00-5b6fd53bf894@huawei.com>
-Date:   Mon, 8 Mar 2021 11:18:57 +0000
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
-MIME-Version: 1.0
-In-Reply-To: <CACGdZY+Qft=55Si5Lmjh1RmVb5Roe-KTsrJHJLz0opSXuesTBg@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.210.165.214]
-X-ClientProxiedBy: lhreml739-chm.china.huawei.com (10.201.108.189) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+        id S231531AbhCHMAj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 8 Mar 2021 07:00:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52396 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231228AbhCHMAZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Mar 2021 07:00:25 -0500
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7539C06175F;
+        Mon,  8 Mar 2021 04:00:24 -0800 (PST)
+Received: by mail-pj1-x1032.google.com with SMTP id fu20so2894460pjb.2;
+        Mon, 08 Mar 2021 04:00:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=R/mts98GlDutHhgzA1LEz4Tkn30xrY5SkbMfoTtOKwI=;
+        b=ozGqeSDtM+WQItumTUxas1Vds2nU8frKxEEIEHXOZmKh2lsgNKNvcdDze/Rfa0Lvqg
+         lcEnFEpSimHAr/Uab85hbMNFHxN4E1tVh3dxrKtETgesboEsGooNUJtxjoA4aFwLGzSN
+         LBo4ehifa1YPEjj/Gl+VqND0LaAd8ck52aiD398nNHCdWuXpIJ5k7ecyBEUiODz2wE41
+         wIAo3JtEI63O+1eebruaN2UGgYaVKDkenND/FWVEeksFQwVGAeQEcnpHDj07poMrzF4H
+         EooZQ+45nn17MLGGI3NeLKLfS+PRppswwud1ePUQKH5BMaH+tiIi71tC/NMyCIZ+eYsG
+         4Iyg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=R/mts98GlDutHhgzA1LEz4Tkn30xrY5SkbMfoTtOKwI=;
+        b=oxbkKGVUWv/AY++TptcVpjEtqo06I9pvXkiXaNf/gEN8OsoTqBwgAcqx89oVhbzUGN
+         AtFDC5Fp5oTHWe5SgRpqcZL3FvZlhxZHCa0tzH3oQnLGThZKIVe3S3naDYbQifWUZCIe
+         FXKxZwtV0piM/H7S262ovoxxKQ8/2bLFlKa85rI+EYnDE9xe38ooN3wEVj64b+nDKlMQ
+         eEOAUZDGns/7TTMZBWmuwV9Sz3L/Mmnr8YY97fNEgVwAGkTCvL2LIXQvuV/rfg4Rk8XM
+         9qEy0NRGRRpRktu1mCYpExXf4XdLiLK1zwZOpb8CzqGxtSv4zXEPf1TVFDfHs0X6QBsn
+         l07w==
+X-Gm-Message-State: AOAM530uivOojPCXfrVKKhUktoiNfbvE8jt7ewAR0CtVqfZhwp0Voada
+        27hpVa7s6Wr3a0kmxHu7iQE=
+X-Google-Smtp-Source: ABdhPJwaDRBzYr1cVksVC4Y/XFmyyXFQ1vqDoe/2MrvtdPOB46HlZUHawNIxlbh3oFz8yLpVZJxrBQ==
+X-Received: by 2002:a17:90a:990a:: with SMTP id b10mr381631pjp.178.1615204824279;
+        Mon, 08 Mar 2021 04:00:24 -0800 (PST)
+Received: from VM-0-3-centos.localdomain ([101.32.213.191])
+        by smtp.gmail.com with ESMTPSA id mp19sm22570855pjb.2.2021.03.08.04.00.22
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 08 Mar 2021 04:00:23 -0800 (PST)
+From:   brookxu <brookxu.cn@gmail.com>
+To:     paolo.valente@linaro.org, axboe@kernel.dk, tj@kernel.org
+Cc:     linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [RFC PATCH 0/8] bfq: introduce bfq.ioprio for cgroup
+Date:   Mon,  8 Mar 2021 20:00:13 +0800
+Message-Id: <cover.1615203034.git.brookxu@tencent.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 06/03/2021 02:52, Khazhy Kumykov wrote:
-> On Fri, Mar 5, 2021 at 7:20 AM John Garry <john.garry@huawei.com> wrote:
->>
->> It has been reported many times that a use-after-free can be intermittently
->> found when iterating busy requests:
->>
->> - https://lore.kernel.org/linux-block/8376443a-ec1b-0cef-8244-ed584b96fa96@huawei.com/
->> - https://lore.kernel.org/linux-block/5c3ac5af-ed81-11e4-fee3-f92175f14daf@acm.org/T/#m6c1ac11540522716f645d004e2a5a13c9f218908
->> - https://lore.kernel.org/linux-block/04e2f9e8-79fa-f1cb-ab23-4a15bf3f64cc@kernel.dk/
->>
->> The issue is that when we switch scheduler or change queue depth, there may
->> be references in the driver tagset to the stale requests.
->>
->> As a solution, clean up any references to those requests in the driver
->> tagset. This is done with a cmpxchg to make safe any race with setting the
->> driver tagset request from another queue.
-> 
-> I noticed this crash recently when running blktests on a "debug"
-> config on a 4.15 based kernel (it would always crash), and backporting
-> this change fixes it. (testing on linus's latest tree also confirmed
-> the fix, with the same config). I realize I'm late to the
-> conversation, but appreciate the investigation and fixes :)
+From: Chunguang Xu <brookxu@tencent.com>
 
-Good to know. I'll explicitly cc you on further versions.
+Tasks in the production environment can be roughly divided into
+three categories: emergency tasks, ordinary tasks and offline
+tasks. Emergency tasks need to be scheduled in real time, and the
+amount of data for such tasks is usually not very large, such as
+system agents. Offline tasks do not need to guarantee QoS, but
+can improve system resource utilization during system idle
+periods, such as various background tasks. The above requirements
+need to achieve IO preemption. At present, we can use weights to
+simulate IO preemption, but since weights are more of a shared
+concept, they cannot be simulated well. For example, the weights
+of emergency tasks and ordinary tasks cannot be determined well,
+offline tasks (with the same weight) actually occupy different
+resources on disks with different performance, and the tail delay
+caused by offline tasks cannot be well controlled. Using ioprio's
+concept of preemption, we can solve the above problems very well.
+Second, we can still use weights to control resource isolation of
+the same priority, thereby achieving better IO Qos control.
 
-Thanks,
-John
+However, currently implemented by bfq, the class of bfq_group is
+always be class, and the ioprio class of the task can only be
+reflected in a single cgroup. We cannot guarantee that real-time
+tasks in a cgroup are scheduled in time. To this end, we
+introduced cgroup ioprio. In this way, we can ensure that the
+real-time tasks of a cgroup can be scheduled in time. Similarly,
+the processing of offline task groups can also be simpler.
+
+To this end, we have introduced the bfq.ioprio interface for
+cgroup v1 and cgroup v2. Users can configure the priority
+through this interface, as shown below:
+
+echo "1 2"> blkio.bfq.weight
+
+The above two values respectively represent the values of ioprio
+class and ioprio for cgroup. The ioprio of tasks within the cgroup
+is uniformly equal to the ioprio of the cgroup. If the ioprio of
+the cgroup is disabled, the ioprio of the task remains the same,
+usually from io_context.
+
+When testing, using fio and fio_generate_plots we can clearly see
+that the IO delay of the task satisfies RT> BE> IDLE. When RT is
+running, BE and IDLE are guaranteed minimum bandwidth. When used
+with bfq.weight, we can also isolate the weight within the same
+class.
+
+The last three patches are irrelevant to the cgroup ioprio,
+they are brought together here for the convenience of patch
+management.
+
+Chunguang Xu (8):
+  bfq: introduce bfq_entity_to_bfqg helper method
+  bfq: limit the IO depth of idle_class to 1
+  bfq: keep the minimun bandwidth for be_class
+  bfq: expire bfqq if a higher priority class is waiting
+  bfq: introduce bfq.ioprio for cgroup
+  bfq: convert the type of bfq_group.bfqd to bfq_data*
+  bfq: remove unnecessary initialization logic
+  bfq: optimize the calculation of bfq_weight_to_ioprio()
+
+ block/bfq-cgroup.c  |  99 +++++++++++++++++++++++++++++++++++++-----
+ block/bfq-iosched.c |  32 +++++++++++++-
+ block/bfq-iosched.h |  20 ++++++---
+ block/bfq-wf2q.c    | 103 +++++++++++++++++++++++++++++++-------------
+ 4 files changed, 207 insertions(+), 47 deletions(-)
+
+-- 
+2.30.0
 
