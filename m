@@ -2,110 +2,79 @@ Return-Path: <SRS0=eh4K=IG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F345CC43333
-	for <linux-block@archiver.kernel.org>; Mon,  8 Mar 2021 12:01:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E8A4C433E6
+	for <linux-block@archiver.kernel.org>; Mon,  8 Mar 2021 12:27:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BD4986520B
-	for <linux-block@archiver.kernel.org>; Mon,  8 Mar 2021 12:01:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1FB14651CC
+	for <linux-block@archiver.kernel.org>; Mon,  8 Mar 2021 12:27:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231734AbhCHMAm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 8 Mar 2021 07:00:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52452 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231494AbhCHMAf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Mar 2021 07:00:35 -0500
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A547AC06175F;
-        Mon,  8 Mar 2021 04:00:35 -0800 (PST)
-Received: by mail-pj1-x102c.google.com with SMTP id kk2-20020a17090b4a02b02900c777aa746fso2986789pjb.3;
-        Mon, 08 Mar 2021 04:00:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :in-reply-to:references;
-        bh=+kTmKHq9zv3XGMbtsWeY32mKkijl5gEMIKMC+s/P+Co=;
-        b=DAA7KXeIH95cxgwsQLL5AnnEDn/kBgAQ+5tuUAikWQsPAFy7TklwND3fH5aW5yhbea
-         /op2WHfyZ55X8d5bFjKIed2hk+fjfJDUwD3DQzFSs75mmwSUoSY3WEVq1siy5XaT39RH
-         gz3K6pIOmcCfftym8RWn9eLHtmKhJDiUtUskevuNA340Fjdb52ceRxWBroZCa/aze5oe
-         MTdrD5JXKsVGYKyCcl7ZwPTw+ATAfLC3jxgLF5a+of7I5YfdY9Sq7yw2W/yLycwAkz+/
-         qxEbdkfmyc2e1DsH1/EgZEuPGcocmFxjr3cur+FH/miRxBa5WEj2fvpSBQa4ghGO29mS
-         fBtA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:in-reply-to:references;
-        bh=+kTmKHq9zv3XGMbtsWeY32mKkijl5gEMIKMC+s/P+Co=;
-        b=sY6E3DhTFJYHLTefD3TTE2Pc5yhmoIYi1eDqFctWC9X8553E4eTIMKQwhCOKGBLycP
-         b8wEz+FpwJxZ5D87wbfzzQ3lSVCsDdwapQGnyteiHIy2EzmHdspQGFyAxY2BwHQLx5UM
-         ISgsFwwS0LL2mF/HLqsn9D7XGUXo866Js2AZQTY4RHZouECUl3ChbJf+AldVaPatEXBh
-         AcuVMgGaW5wh7UPv2CdBIRJdZHU8ECNORNgpvdEE+5hKBrLvjTbeIK8rHK80YziHfmM5
-         gqBkczgUnU3xJXw7TsynnECLzNNKrGC5hVBccc2Ls844h1Yog5ScosPz1P6qal6ZmwiV
-         9esg==
-X-Gm-Message-State: AOAM532qKLhbkAK0qvGNyQlE121cXAejc52zAqjIwMjB+F5hK4mV2LtP
-        VBcnxRrkDk1sW/XfBcrtd58=
-X-Google-Smtp-Source: ABdhPJwVE1kPLdyQilajTGaqh5C094kYziVCmPwnBjpOwD1mPGva0OdDLYHltV7luoPuAwIjyWDWBQ==
-X-Received: by 2002:a17:902:8641:b029:e4:7e05:c916 with SMTP id y1-20020a1709028641b02900e47e05c916mr19879207plt.57.1615204835304;
-        Mon, 08 Mar 2021 04:00:35 -0800 (PST)
-Received: from VM-0-3-centos.localdomain ([101.32.213.191])
-        by smtp.gmail.com with ESMTPSA id mp19sm22570855pjb.2.2021.03.08.04.00.33
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 08 Mar 2021 04:00:35 -0800 (PST)
-From:   brookxu <brookxu.cn@gmail.com>
-To:     paolo.valente@linaro.org, axboe@kernel.dk, tj@kernel.org
-Cc:     linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [RFC PATCH 7/8] bfq: remove unnecessary initialization logic
-Date:   Mon,  8 Mar 2021 20:00:20 +0800
-Message-Id: <baf6d16ce98ef609c57a324166219003ab77e30c.1615203034.git.brookxu@tencent.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <cover.1615203034.git.brookxu@tencent.com>
-References: <cover.1615203034.git.brookxu@tencent.com>
-In-Reply-To: <cover.1615203034.git.brookxu@tencent.com>
-References: <cover.1615203034.git.brookxu@tencent.com>
+        id S229965AbhCHM0n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 8 Mar 2021 07:26:43 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:13484 "EHLO
+        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229818AbhCHM0Y (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Mar 2021 07:26:24 -0500
+Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.58])
+        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4DvHb63w6ZzrSXX;
+        Mon,  8 Mar 2021 20:24:34 +0800 (CST)
+Received: from localhost.localdomain (10.175.102.38) by
+ DGGEMS403-HUB.china.huawei.com (10.3.19.203) with Microsoft SMTP Server id
+ 14.3.498.0; Mon, 8 Mar 2021 20:26:10 +0800
+From:   'Wei Yongjun <weiyongjun1@huawei.com>
+To:     <weiyongjun1@huawei.com>, Jens Axboe <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>, Hulk Robot <hulkci@huawei.com>
+Subject: [PATCH -next] umem: fix error return code in mm_pci_probe()
+Date:   Mon, 8 Mar 2021 12:35:01 +0000
+Message-ID: <20210308123501.2573816-1-weiyongjun1@huawei.com>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
+Content-Type:   text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+X-Originating-IP: [10.175.102.38]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Chunguang Xu <brookxu@tencent.com>
+From: Wei Yongjun <weiyongjun1@huawei.com>
 
-From: Chunguang Xu <brookxu@tencent.com>
+Fix to return negative error code -ENOMEM from the blk_alloc_queue()
+and dma_alloc_coherent() error handling cases instead of 0, as done
+elsewhere in this function.
 
-Since we will initialize sched_data.service_tree[] in
-bfq_init_root_group(), bfq_create_group_hierarchy() can
-ignore this part of the initialization, which can avoid
-repeated initialization.
-
-Signed-off-by: Chunguang Xu <brookxu@tencent.com>
+Reported-by: Hulk Robot <hulkci@huawei.com>
+Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
 ---
- block/bfq-cgroup.c | 4 ----
- 1 file changed, 4 deletions(-)
+ drivers/block/umem.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-index ab4bc410e635..05054e1b5d97 100644
---- a/block/bfq-cgroup.c
-+++ b/block/bfq-cgroup.c
-@@ -1514,15 +1514,11 @@ void bfqg_and_blkg_put(struct bfq_group *bfqg) {}
- struct bfq_group *bfq_create_group_hierarchy(struct bfq_data *bfqd, int node)
- {
- 	struct bfq_group *bfqg;
--	int i;
+diff --git a/drivers/block/umem.c b/drivers/block/umem.c
+index 982732dbe82e..664280f23bee 100644
+--- a/drivers/block/umem.c
++++ b/drivers/block/umem.c
+@@ -877,6 +877,7 @@ static int mm_pci_probe(struct pci_dev *dev, const struct pci_device_id *id)
+ 	if (card->mm_pages[0].desc == NULL ||
+ 	    card->mm_pages[1].desc == NULL) {
+ 		dev_printk(KERN_ERR, &card->dev->dev, "alloc failed\n");
++		ret = -ENOMEM;
+ 		goto failed_alloc;
+ 	}
+ 	reset_page(&card->mm_pages[0]);
+@@ -888,8 +889,10 @@ static int mm_pci_probe(struct pci_dev *dev, const struct pci_device_id *id)
+ 	spin_lock_init(&card->lock);
  
- 	bfqg = kmalloc_node(sizeof(*bfqg), GFP_KERNEL | __GFP_ZERO, node);
- 	if (!bfqg)
- 		return NULL;
+ 	card->queue = blk_alloc_queue(NUMA_NO_NODE);
+-	if (!card->queue)
++	if (!card->queue) {
++		ret = -ENOMEM;
+ 		goto failed_alloc;
++	}
  
--	for (i = 0; i < BFQ_IOPRIO_CLASSES; i++)
--		bfqg->sched_data.service_tree[i] = BFQ_SERVICE_TREE_INIT;
--
- 	return bfqg;
- }
- #endif	/* CONFIG_BFQ_GROUP_IOSCHED */
--- 
-2.30.0
+ 	tasklet_init(&card->tasklet, process_page, (unsigned long)card);
+ 
 
