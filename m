@@ -2,136 +2,114 @@ Return-Path: <SRS0=eh4K=IG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE88AC433E0
-	for <linux-block@archiver.kernel.org>; Mon,  8 Mar 2021 12:01:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D29BC43381
+	for <linux-block@archiver.kernel.org>; Mon,  8 Mar 2021 12:01:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A0506651A7
-	for <linux-block@archiver.kernel.org>; Mon,  8 Mar 2021 12:01:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 13A91651C9
+	for <linux-block@archiver.kernel.org>; Mon,  8 Mar 2021 12:01:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231531AbhCHMAj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 8 Mar 2021 07:00:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52396 "EHLO
+        id S231573AbhCHMAk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 8 Mar 2021 07:00:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52410 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231228AbhCHMAZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Mar 2021 07:00:25 -0500
+        with ESMTP id S231334AbhCHMA1 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Mar 2021 07:00:27 -0500
 Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7539C06175F;
-        Mon,  8 Mar 2021 04:00:24 -0800 (PST)
-Received: by mail-pj1-x1032.google.com with SMTP id fu20so2894460pjb.2;
-        Mon, 08 Mar 2021 04:00:24 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C889CC06174A;
+        Mon,  8 Mar 2021 04:00:27 -0800 (PST)
+Received: by mail-pj1-x1032.google.com with SMTP id t9so2885917pjl.5;
+        Mon, 08 Mar 2021 04:00:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=R/mts98GlDutHhgzA1LEz4Tkn30xrY5SkbMfoTtOKwI=;
-        b=ozGqeSDtM+WQItumTUxas1Vds2nU8frKxEEIEHXOZmKh2lsgNKNvcdDze/Rfa0Lvqg
-         lcEnFEpSimHAr/Uab85hbMNFHxN4E1tVh3dxrKtETgesboEsGooNUJtxjoA4aFwLGzSN
-         LBo4ehifa1YPEjj/Gl+VqND0LaAd8ck52aiD398nNHCdWuXpIJ5k7ecyBEUiODz2wE41
-         wIAo3JtEI63O+1eebruaN2UGgYaVKDkenND/FWVEeksFQwVGAeQEcnpHDj07poMrzF4H
-         EooZQ+45nn17MLGGI3NeLKLfS+PRppswwud1ePUQKH5BMaH+tiIi71tC/NMyCIZ+eYsG
-         4Iyg==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :in-reply-to:references;
+        bh=dJz1mJNUFCu8/5ZpciRC6YOn6iNHDwCBUMOb6meMbWM=;
+        b=VCBfFCHPdKB3UhuPOgg2Yl0CKxU24aFecGuDgxFYy0jOzvUcnjdNfbcmGVRaXyDYsa
+         bAiaaKxzyJlYvUy/tR1Ko00yth8vjfUTKC5UJRAuxpY3MDubB9tSrc1aJQH0RzlGSkoS
+         qbKgJC8o2DnY2wUjKr8IYnXKMvmho0+bDYbqmTbvMwjIgrKrsGc8RiqDSlS54oFkNHmo
+         K66njTNaHiGJn5X6kOMvbwlEJjN+GaR5wMqXS2IuW2bmHcy1RPfWh8ZDXGCkIJ6aqRCO
+         k/xN3/wy5TdmCEnQTD48QngEyGv+7eeUTE80tgBcGb1HqUS7mqlEntr3zL4n1JLzo7OG
+         xYjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=R/mts98GlDutHhgzA1LEz4Tkn30xrY5SkbMfoTtOKwI=;
-        b=oxbkKGVUWv/AY++TptcVpjEtqo06I9pvXkiXaNf/gEN8OsoTqBwgAcqx89oVhbzUGN
-         AtFDC5Fp5oTHWe5SgRpqcZL3FvZlhxZHCa0tzH3oQnLGThZKIVe3S3naDYbQifWUZCIe
-         FXKxZwtV0piM/H7S262ovoxxKQ8/2bLFlKa85rI+EYnDE9xe38ooN3wEVj64b+nDKlMQ
-         eEOAUZDGns/7TTMZBWmuwV9Sz3L/Mmnr8YY97fNEgVwAGkTCvL2LIXQvuV/rfg4Rk8XM
-         9qEy0NRGRRpRktu1mCYpExXf4XdLiLK1zwZOpb8CzqGxtSv4zXEPf1TVFDfHs0X6QBsn
-         l07w==
-X-Gm-Message-State: AOAM530uivOojPCXfrVKKhUktoiNfbvE8jt7ewAR0CtVqfZhwp0Voada
-        27hpVa7s6Wr3a0kmxHu7iQE=
-X-Google-Smtp-Source: ABdhPJwaDRBzYr1cVksVC4Y/XFmyyXFQ1vqDoe/2MrvtdPOB46HlZUHawNIxlbh3oFz8yLpVZJxrBQ==
-X-Received: by 2002:a17:90a:990a:: with SMTP id b10mr381631pjp.178.1615204824279;
-        Mon, 08 Mar 2021 04:00:24 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:in-reply-to:references;
+        bh=dJz1mJNUFCu8/5ZpciRC6YOn6iNHDwCBUMOb6meMbWM=;
+        b=e0FkIWDIuHG/G3G7FVsEzWmalMzW9SquNamyuAKtJ5eGomKc9qqWDe2bX7DHTGiE8j
+         7Jj7s1UgiOp9E+N2MpQRGe3cY3Kb2N2K6CS+8zRh1phBxtT52oUbFZu1JLN8bUgPGgic
+         JLf4RR0Q1+NjAt7ZwJcTxaW/f5akkAPEQnDc83ohlm4QrHuL//uVUJz5vCrpcJU91QiE
+         jO/iljfQ0NmS8HHM+9Uo2/XL3T6GvxyVJYXGIEpa4BPuJwONChKMSxVPGSvrc/C4nq5+
+         xkbl8XuMTIbnMnU2+rmzI1Z2F77K92mtjT8t0x3+PpfGTNziVi+AfFgJ/cZq4AIuDSNX
+         P6cg==
+X-Gm-Message-State: AOAM5334iKSkCZEvJRXnKN71vOepMh4hSk24M89/U03fempeckaSvGxH
+        NQW/AmyxG89pKYVwbk7twXc=
+X-Google-Smtp-Source: ABdhPJxPN7/CFgtm7rYrSzTZHeTeVbLsiGlR4ss5CSQPbKO6qHbUMhjSo1wAejjzzJFgwqoEu5fvJA==
+X-Received: by 2002:a17:90a:ae0a:: with SMTP id t10mr23982088pjq.169.1615204827488;
+        Mon, 08 Mar 2021 04:00:27 -0800 (PST)
 Received: from VM-0-3-centos.localdomain ([101.32.213.191])
-        by smtp.gmail.com with ESMTPSA id mp19sm22570855pjb.2.2021.03.08.04.00.22
+        by smtp.gmail.com with ESMTPSA id mp19sm22570855pjb.2.2021.03.08.04.00.26
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 08 Mar 2021 04:00:23 -0800 (PST)
+        Mon, 08 Mar 2021 04:00:27 -0800 (PST)
 From:   brookxu <brookxu.cn@gmail.com>
 To:     paolo.valente@linaro.org, axboe@kernel.dk, tj@kernel.org
 Cc:     linux-block@vger.kernel.org, cgroups@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [RFC PATCH 0/8] bfq: introduce bfq.ioprio for cgroup
-Date:   Mon,  8 Mar 2021 20:00:13 +0800
-Message-Id: <cover.1615203034.git.brookxu@tencent.com>
+Subject: [RFC PATCH 2/8] bfq: limit the IO depth of idle_class to 1
+Date:   Mon,  8 Mar 2021 20:00:15 +0800
+Message-Id: <c23ff2bafdf20b3f18debfa1021e59a87aba1a11.1615203034.git.brookxu@tencent.com>
 X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <cover.1615203034.git.brookxu@tencent.com>
+References: <cover.1615203034.git.brookxu@tencent.com>
+In-Reply-To: <cover.1615203034.git.brookxu@tencent.com>
+References: <cover.1615203034.git.brookxu@tencent.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 From: Chunguang Xu <brookxu@tencent.com>
 
-Tasks in the production environment can be roughly divided into
-three categories: emergency tasks, ordinary tasks and offline
-tasks. Emergency tasks need to be scheduled in real time, and the
-amount of data for such tasks is usually not very large, such as
-system agents. Offline tasks do not need to guarantee QoS, but
-can improve system resource utilization during system idle
-periods, such as various background tasks. The above requirements
-need to achieve IO preemption. At present, we can use weights to
-simulate IO preemption, but since weights are more of a shared
-concept, they cannot be simulated well. For example, the weights
-of emergency tasks and ordinary tasks cannot be determined well,
-offline tasks (with the same weight) actually occupy different
-resources on disks with different performance, and the tail delay
-caused by offline tasks cannot be well controlled. Using ioprio's
-concept of preemption, we can solve the above problems very well.
-Second, we can still use weights to control resource isolation of
-the same priority, thereby achieving better IO Qos control.
+From: Chunguang Xu <brookxu@tencent.com>
 
-However, currently implemented by bfq, the class of bfq_group is
-always be class, and the ioprio class of the task can only be
-reflected in a single cgroup. We cannot guarantee that real-time
-tasks in a cgroup are scheduled in time. To this end, we
-introduced cgroup ioprio. In this way, we can ensure that the
-real-time tasks of a cgroup can be scheduled in time. Similarly,
-the processing of offline task groups can also be simpler.
+The IO depth of idle_class is limited to 1, so that it can
+avoid introducing a larger tail latency under a device with
+a larger IO depth. Although limiting the IO depth may reduce
+the performance of idle_class, it is generally not a big
+problem, because idle_class usually does not have strict
+performance requirements.
 
-To this end, we have introduced the bfq.ioprio interface for
-cgroup v1 and cgroup v2. Users can configure the priority
-through this interface, as shown below:
+Signed-off-by: Chunguang Xu <brookxu@tencent.com>
+---
+ block/bfq-iosched.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-echo "1 2"> blkio.bfq.weight
-
-The above two values respectively represent the values of ioprio
-class and ioprio for cgroup. The ioprio of tasks within the cgroup
-is uniformly equal to the ioprio of the cgroup. If the ioprio of
-the cgroup is disabled, the ioprio of the task remains the same,
-usually from io_context.
-
-When testing, using fio and fio_generate_plots we can clearly see
-that the IO delay of the task satisfies RT> BE> IDLE. When RT is
-running, BE and IDLE are guaranteed minimum bandwidth. When used
-with bfq.weight, we can also isolate the weight within the same
-class.
-
-The last three patches are irrelevant to the cgroup ioprio,
-they are brought together here for the convenience of patch
-management.
-
-Chunguang Xu (8):
-  bfq: introduce bfq_entity_to_bfqg helper method
-  bfq: limit the IO depth of idle_class to 1
-  bfq: keep the minimun bandwidth for be_class
-  bfq: expire bfqq if a higher priority class is waiting
-  bfq: introduce bfq.ioprio for cgroup
-  bfq: convert the type of bfq_group.bfqd to bfq_data*
-  bfq: remove unnecessary initialization logic
-  bfq: optimize the calculation of bfq_weight_to_ioprio()
-
- block/bfq-cgroup.c  |  99 +++++++++++++++++++++++++++++++++++++-----
- block/bfq-iosched.c |  32 +++++++++++++-
- block/bfq-iosched.h |  20 ++++++---
- block/bfq-wf2q.c    | 103 +++++++++++++++++++++++++++++++-------------
- 4 files changed, 207 insertions(+), 47 deletions(-)
-
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index ec482e6641ff..ea9d7f6f4e3d 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -4808,6 +4808,17 @@ static struct request *__bfq_dispatch_request(struct blk_mq_hw_ctx *hctx)
+ 	if (!bfqq)
+ 		goto exit;
+ 
++	/*
++	 * Here, the IO depth of idle_class is limited to 1, so that it
++	 * can avoid introducing a larger tail latency under a device
++	 * with a larger IO depth. Although limiting the IO depth may
++	 * reduce the performance of idle_class, it is generally not a
++	 * big problem, because idle_class usually does not have strict
++	 * performance requirements.
++	 */
++	if (bfq_class_idle(bfqq) && bfqq->dispatched)
++		goto exit;
++
+ 	rq = bfq_dispatch_rq_from_bfqq(bfqd, bfqq);
+ 
+ 	if (rq) {
 -- 
 2.30.0
 
