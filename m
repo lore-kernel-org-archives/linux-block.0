@@ -8,61 +8,61 @@ X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D29BC43381
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B2F7C4332D
 	for <linux-block@archiver.kernel.org>; Mon,  8 Mar 2021 12:01:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 13A91651C9
+	by mail.kernel.org (Postfix) with ESMTP id 55FCD651A7
 	for <linux-block@archiver.kernel.org>; Mon,  8 Mar 2021 12:01:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231573AbhCHMAk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 8 Mar 2021 07:00:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52410 "EHLO
+        id S231681AbhCHMAm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 8 Mar 2021 07:00:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231334AbhCHMA1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Mar 2021 07:00:27 -0500
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C889CC06174A;
-        Mon,  8 Mar 2021 04:00:27 -0800 (PST)
-Received: by mail-pj1-x1032.google.com with SMTP id t9so2885917pjl.5;
-        Mon, 08 Mar 2021 04:00:27 -0800 (PST)
+        with ESMTP id S231484AbhCHMAe (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Mar 2021 07:00:34 -0500
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DEC5C06174A;
+        Mon,  8 Mar 2021 04:00:34 -0800 (PST)
+Received: by mail-pj1-x102f.google.com with SMTP id b15so2897624pjb.0;
+        Mon, 08 Mar 2021 04:00:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :in-reply-to:references;
-        bh=dJz1mJNUFCu8/5ZpciRC6YOn6iNHDwCBUMOb6meMbWM=;
-        b=VCBfFCHPdKB3UhuPOgg2Yl0CKxU24aFecGuDgxFYy0jOzvUcnjdNfbcmGVRaXyDYsa
-         bAiaaKxzyJlYvUy/tR1Ko00yth8vjfUTKC5UJRAuxpY3MDubB9tSrc1aJQH0RzlGSkoS
-         qbKgJC8o2DnY2wUjKr8IYnXKMvmho0+bDYbqmTbvMwjIgrKrsGc8RiqDSlS54oFkNHmo
-         K66njTNaHiGJn5X6kOMvbwlEJjN+GaR5wMqXS2IuW2bmHcy1RPfWh8ZDXGCkIJ6aqRCO
-         k/xN3/wy5TdmCEnQTD48QngEyGv+7eeUTE80tgBcGb1HqUS7mqlEntr3zL4n1JLzo7OG
-         xYjw==
+        bh=gAfbhvGkPzPG0rraXenDrWcyqUN3oR0H7AbaTCt/P0M=;
+        b=MhJxkrwtVPHN3jfh+JdW9vwPDs3s/SFzk1Ui4YFRSc8ZzPKHHdKlDh2ewhoOzvn7mL
+         VYrhkmlvYPzF9zZJFInAr0qHaOLWm5ucixaLCRdwIevWkHM7dCj5xYhbLrshg99V44h8
+         oeTyFI+q8JdnzqcYzJ1NtVlh5YHkkJGn0HuTFC9IBKHSYZj84dCwGIbxQ7/4+j9MOy6n
+         RuzWLYaROtcG+Fx4v03FZchiNMH8VFbDXiwhNQJnzIuyO9LBaf8OboxQpt5Erau32d7j
+         dAaBicVQGvcIwbKN4wKr1sOC3D5sl1X1Jqw8gefLyITKGW7WDkeh3jrM5mgmQjuMPH3Q
+         ndIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:in-reply-to:references;
-        bh=dJz1mJNUFCu8/5ZpciRC6YOn6iNHDwCBUMOb6meMbWM=;
-        b=e0FkIWDIuHG/G3G7FVsEzWmalMzW9SquNamyuAKtJ5eGomKc9qqWDe2bX7DHTGiE8j
-         7Jj7s1UgiOp9E+N2MpQRGe3cY3Kb2N2K6CS+8zRh1phBxtT52oUbFZu1JLN8bUgPGgic
-         JLf4RR0Q1+NjAt7ZwJcTxaW/f5akkAPEQnDc83ohlm4QrHuL//uVUJz5vCrpcJU91QiE
-         jO/iljfQ0NmS8HHM+9Uo2/XL3T6GvxyVJYXGIEpa4BPuJwONChKMSxVPGSvrc/C4nq5+
-         xkbl8XuMTIbnMnU2+rmzI1Z2F77K92mtjT8t0x3+PpfGTNziVi+AfFgJ/cZq4AIuDSNX
-         P6cg==
-X-Gm-Message-State: AOAM5334iKSkCZEvJRXnKN71vOepMh4hSk24M89/U03fempeckaSvGxH
-        NQW/AmyxG89pKYVwbk7twXc=
-X-Google-Smtp-Source: ABdhPJxPN7/CFgtm7rYrSzTZHeTeVbLsiGlR4ss5CSQPbKO6qHbUMhjSo1wAejjzzJFgwqoEu5fvJA==
-X-Received: by 2002:a17:90a:ae0a:: with SMTP id t10mr23982088pjq.169.1615204827488;
-        Mon, 08 Mar 2021 04:00:27 -0800 (PST)
+        bh=gAfbhvGkPzPG0rraXenDrWcyqUN3oR0H7AbaTCt/P0M=;
+        b=Ach5mqih3Cli4UPKEw5OyuHl3UUwhkHYYUTkQJunkR65LLe+UsLX+Opm+Qe8OWvrn9
+         5e3p3xxkuWTZBMoMe6I1pG7ta6utX7WEdfx0eE/NSVD2fJUF2ZN/DcWgloj+TaPXc+DS
+         dVFRtP6EJBRJFkTWBQJmADE+tygkaef0EA3gnhouQUybvZs74443AQR+Zl2qLzPUPApE
+         UpZ+CJdQsCpnHiK2Hz1KyzkZAPfBub8/4FCBKw2/cx/8Fizefhcx2R7JblPLqS0hVrCW
+         fJDK0nFWq/MnN5N60bDfarXOxj2UqiQmkHapXyHwcUSxvgJegKgwhE0aOrY96H65t6dq
+         1nYQ==
+X-Gm-Message-State: AOAM531yebJahxSbJshZnoimTDdT52ZyJOyroq78O1bTaFNUET8fyS9h
+        wzs2F9BTSl5cEPgRUIOJ9Ck=
+X-Google-Smtp-Source: ABdhPJzK7h0jtzWWVzT2PZYIVwMwYkpEUeyLlAHAKHtozaJSbmklZ39vIITyWsAp0+6qXkQKPuCA9w==
+X-Received: by 2002:a17:902:9783:b029:e5:bfa2:dc24 with SMTP id q3-20020a1709029783b02900e5bfa2dc24mr20793675plp.70.1615204833747;
+        Mon, 08 Mar 2021 04:00:33 -0800 (PST)
 Received: from VM-0-3-centos.localdomain ([101.32.213.191])
-        by smtp.gmail.com with ESMTPSA id mp19sm22570855pjb.2.2021.03.08.04.00.26
+        by smtp.gmail.com with ESMTPSA id mp19sm22570855pjb.2.2021.03.08.04.00.32
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 08 Mar 2021 04:00:27 -0800 (PST)
+        Mon, 08 Mar 2021 04:00:33 -0800 (PST)
 From:   brookxu <brookxu.cn@gmail.com>
 To:     paolo.valente@linaro.org, axboe@kernel.dk, tj@kernel.org
 Cc:     linux-block@vger.kernel.org, cgroups@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [RFC PATCH 2/8] bfq: limit the IO depth of idle_class to 1
-Date:   Mon,  8 Mar 2021 20:00:15 +0800
-Message-Id: <c23ff2bafdf20b3f18debfa1021e59a87aba1a11.1615203034.git.brookxu@tencent.com>
+Subject: [RFC PATCH 6/8] bfq: convert the type of bfq_group.bfqd to bfq_data*
+Date:   Mon,  8 Mar 2021 20:00:19 +0800
+Message-Id: <f016f4d41815c12a8053ef938bb0e210e7c745bf.1615203034.git.brookxu@tencent.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <cover.1615203034.git.brookxu@tencent.com>
 References: <cover.1615203034.git.brookxu@tencent.com>
@@ -76,40 +76,74 @@ From: Chunguang Xu <brookxu@tencent.com>
 
 From: Chunguang Xu <brookxu@tencent.com>
 
-The IO depth of idle_class is limited to 1, so that it can
-avoid introducing a larger tail latency under a device with
-a larger IO depth. Although limiting the IO depth may reduce
-the performance of idle_class, it is generally not a big
-problem, because idle_class usually does not have strict
-performance requirements.
+Setting bfq_group.bfqd to void* type does not seem to make much sense.
+This will cause unnecessary type conversion. Perhaps it would be better
+to change it to bfq_data* type.
 
 Signed-off-by: Chunguang Xu <brookxu@tencent.com>
 ---
- block/bfq-iosched.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ block/bfq-cgroup.c  | 2 +-
+ block/bfq-iosched.h | 2 +-
+ block/bfq-wf2q.c    | 6 +++---
+ 3 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index ec482e6641ff..ea9d7f6f4e3d 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -4808,6 +4808,17 @@ static struct request *__bfq_dispatch_request(struct blk_mq_hw_ctx *hctx)
- 	if (!bfqq)
- 		goto exit;
+diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
+index 0b0a3514a5d2..ab4bc410e635 100644
+--- a/block/bfq-cgroup.c
++++ b/block/bfq-cgroup.c
+@@ -224,7 +224,7 @@ void bfqg_stats_update_io_add(struct bfq_group *bfqg, struct bfq_queue *bfqq,
+ {
+ 	blkg_rwstat_add(&bfqg->stats.queued, op, 1);
+ 	bfqg_stats_end_empty_time(&bfqg->stats);
+-	if (!(bfqq == ((struct bfq_data *)bfqg->bfqd)->in_service_queue))
++	if (!(bfqq == bfqg->bfqd->in_service_queue))
+ 		bfqg_stats_set_start_group_wait_time(bfqg, bfqq_group(bfqq));
+ }
  
-+	/*
-+	 * Here, the IO depth of idle_class is limited to 1, so that it
-+	 * can avoid introducing a larger tail latency under a device
-+	 * with a larger IO depth. Although limiting the IO depth may
-+	 * reduce the performance of idle_class, it is generally not a
-+	 * big problem, because idle_class usually does not have strict
-+	 * performance requirements.
-+	 */
-+	if (bfq_class_idle(bfqq) && bfqq->dispatched)
-+		goto exit;
-+
- 	rq = bfq_dispatch_rq_from_bfqq(bfqd, bfqq);
+diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+index d5c05d5f9714..ab44b10ece1d 100644
+--- a/block/bfq-iosched.h
++++ b/block/bfq-iosched.h
+@@ -916,7 +916,7 @@ struct bfq_group {
+ 	struct bfq_entity entity;
+ 	struct bfq_sched_data sched_data;
  
- 	if (rq) {
+-	void *bfqd;
++	struct bfq_data *bfqd;
+ 
+ 	struct bfq_queue *async_bfqq[2][IOPRIO_BE_NR];
+ 	struct bfq_queue *async_idle_bfqq;
+diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
+index 01172202b076..850a8e2f0bda 100644
+--- a/block/bfq-wf2q.c
++++ b/block/bfq-wf2q.c
+@@ -507,7 +507,7 @@ static void bfq_active_insert(struct bfq_service_tree *st,
+ #ifdef CONFIG_BFQ_GROUP_IOSCHED
+ 	sd = entity->sched_data;
+ 	bfqg = container_of(sd, struct bfq_group, sched_data);
+-	bfqd = (struct bfq_data *)bfqg->bfqd;
++	bfqd = bfqg->bfqd;
+ #endif
+ 	if (bfqq)
+ 		list_add(&bfqq->bfqq_list, &bfqq->bfqd->active_list);
+@@ -606,7 +606,7 @@ static void bfq_active_extract(struct bfq_service_tree *st,
+ #ifdef CONFIG_BFQ_GROUP_IOSCHED
+ 	sd = entity->sched_data;
+ 	bfqg = container_of(sd, struct bfq_group, sched_data);
+-	bfqd = (struct bfq_data *)bfqg->bfqd;
++	bfqd = bfqg->bfqd;
+ #endif
+ 	if (bfqq)
+ 		list_del(&bfqq->bfqq_list);
+@@ -752,7 +752,7 @@ __bfq_entity_update_weight_prio(struct bfq_service_tree *old_st,
+ 		else {
+ 			sd = entity->my_sched_data;
+ 			bfqg = container_of(sd, struct bfq_group, sched_data);
+-			bfqd = (struct bfq_data *)bfqg->bfqd;
++			bfqd = bfqg->bfqd;
+ 		}
+ #endif
+ 
 -- 
 2.30.0
 
