@@ -2,136 +2,139 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BE77C433E0
-	for <linux-block@archiver.kernel.org>; Mon,  8 Mar 2021 20:00:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23D9AC433DB
+	for <linux-block@archiver.kernel.org>; Tue,  9 Mar 2021 02:56:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0668D65208
-	for <linux-block@archiver.kernel.org>; Mon,  8 Mar 2021 20:00:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D24346527E
+	for <linux-block@archiver.kernel.org>; Tue,  9 Mar 2021 02:56:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229650AbhCHT7u (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 8 Mar 2021 14:59:50 -0500
-Received: from mail-pg1-f172.google.com ([209.85.215.172]:39180 "EHLO
-        mail-pg1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231359AbhCHT70 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Mar 2021 14:59:26 -0500
-Received: by mail-pg1-f172.google.com with SMTP id x29so7119878pgk.6;
-        Mon, 08 Mar 2021 11:59:26 -0800 (PST)
+        id S229904AbhCICzk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 8 Mar 2021 21:55:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49794 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229520AbhCICzd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Mar 2021 21:55:33 -0500
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D7D5C06174A;
+        Mon,  8 Mar 2021 18:55:33 -0800 (PST)
+Received: by mail-pj1-x102e.google.com with SMTP id jx13so91444pjb.1;
+        Mon, 08 Mar 2021 18:55:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=X1NdEaeznqDG0w3Bd/Nb0MooHdcqj7OMlg+M+dl0jEk=;
+        b=JcFCVCA1vhjhbzEHAoko4Jj6BjMumWdOa097H0rfulPeKTK9V4yxCqgLEu6FODS7/L
+         u6PRVZqB1Bptq58B104MQXpFRMMP+AEoIbDhve75xZtjXamMbW3cOII+4VqLU2YOVmeR
+         PNFCV3L1PlhY+fgeAESTV06Y+XNc+0RK4clhnQ7ugAtiwF9f7IwXgWhkvl4DuPDUCTcC
+         rMdJ5RBn/wB0r520hnbc40j9U1fSiOsyGpoog4MRYNUhnygsDRlKp3kp+cXq7/6od1Vg
+         SRnB0lvStkJBCesGQn09WRo4bQqtKIWWj7/O6EwYRL3BryizpEYSjJCSHIpy9glWnLs1
+         MvSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=OEgorovdQsjkjU9qNekIDia6GRBVJARi8Jz71Iix888=;
-        b=H5Y+/i7ruuKh0UvHGT3wk64OF2eHFJfohAb8v8hjXR28zLK8ThA+nPofQdqE0t5P+Y
-         9B0BmKmx230WtzzHU18lJCPy+sCC7mYT2iOYjB64CxpdKmnSZhQVLNCblxiwuyr3ZOVG
-         YrK1G4vg0XqF8SlJ5UiQNcZl9eNB9d/QmSmTksoUPW69HEbkTHL9RIRJatchkC62yjtl
-         +zg++LoN0J7MzUAEZnzlGSGj+YxUiz7WbY03Lie1hJ3TLqDqFGK7dW4D9bn40ohUNgn7
-         Xh8aSr9OzO9LWls7wdUSO14Etj2AWEUFyTXQdl7xtXKAHopAAmES5q7rhGT+Er3T6goU
-         4owg==
-X-Gm-Message-State: AOAM531cuzY77w+BekSKLrBilpOyOfkpcJxm0PZiAylQH61fGNupHXad
-        1422U7mHiBLfAvH9dw0GF40=
-X-Google-Smtp-Source: ABdhPJzQyZ82aCuUVMiC4SsPlaY0Ixw9qU7ADHahR5G9nnjByuE2qAnpH+xAJlgki0Zs+Ik3cO/guw==
-X-Received: by 2002:aa7:881a:0:b029:1f1:6148:15c3 with SMTP id c26-20020aa7881a0000b02901f1614815c3mr14667561pfo.30.1615233565986;
-        Mon, 08 Mar 2021 11:59:25 -0800 (PST)
-Received: from [192.168.51.110] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
-        by smtp.gmail.com with ESMTPSA id y29sm6529501pfp.206.2021.03.08.11.59.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 08 Mar 2021 11:59:25 -0800 (PST)
-Subject: Re: [RFC PATCH v3 3/3] blk-mq: Lockout tagset iterator when exiting
- elevator
-To:     John Garry <john.garry@huawei.com>, hare@suse.de,
-        ming.lei@redhat.com, axboe@kernel.dk, hch@lst.de
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pragalla@codeaurora.org, kashyap.desai@broadcom.com,
-        yuyufen@huawei.com
-References: <1614957294-188540-1-git-send-email-john.garry@huawei.com>
- <1614957294-188540-4-git-send-email-john.garry@huawei.com>
- <48a3cf78-3f6d-c13c-bca2-1f8277817b45@acm.org>
- <9c9360bf-7ca9-5c8f-c61d-441044f9c78f@huawei.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <784a3686-cb54-561d-740c-30e0b3f46df8@acm.org>
-Date:   Mon, 8 Mar 2021 11:59:23 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.1
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=X1NdEaeznqDG0w3Bd/Nb0MooHdcqj7OMlg+M+dl0jEk=;
+        b=Eu1ue0FKlOQpbkie+Un9Uj8UQoP1JKs9Y++ruLeR2e8aZGlWpQgGhUr4yhsDLCO8Hh
+         5Za4qEEcQU9qvnZw1utYuekkl1kmq7xpoLpRH2TAjBd0SLpe2GmOHzBJPQXTTDnY4HH7
+         ngiqKhTapNj8Zxj//P91zFSMtvz0n6D5Tt0zRY2yN+G4hF8BzZG4sramZBEpaujMIiKv
+         LJtEzG53cZAk0g9dhsygkkmA+gSs7UfxSTXMndISa9k3x8x2Uqw6hFcu4knmauw5k+a0
+         dsAaAc0aGvmXkUFV3eGP8EmEnfQD8zjhHW3B3anNYBlvZPnZBjT1UwrwWev+H07h/NZ8
+         eV6A==
+X-Gm-Message-State: AOAM531o/0RXUx4XalYMefmhTf8NaQRZQk8ySCEBLShWSWU3UJFIhJ31
+        tXVX6qpVT2rDAUSBl/IG6es=
+X-Google-Smtp-Source: ABdhPJwDGoOrBNsG7W6D7YEYRWeYZihu5tHW/dziBjZoDxtF8HP24+vk2/7pCBqBrodOpkFgHr+SiQ==
+X-Received: by 2002:a17:90a:7e94:: with SMTP id j20mr2343701pjl.8.1615258532930;
+        Mon, 08 Mar 2021 18:55:32 -0800 (PST)
+Received: from google.com ([2620:15c:211:201:4ccc:acdd:25da:14d1])
+        by smtp.gmail.com with ESMTPSA id a19sm7825247pfc.65.2021.03.08.18.55.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Mar 2021 18:55:31 -0800 (PST)
+Sender: Minchan Kim <minchan.kim@gmail.com>
+Date:   Mon, 8 Mar 2021 18:55:30 -0800
+From:   Minchan Kim <minchan@kernel.org>
+To:     Luis Chamberlain <mcgrof@kernel.org>
+Cc:     ngupta@vflare.org, sergey.senozhatsky.work@gmail.com,
+        axboe@kernel.dk, mbenes@suse.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] zram: fix crashes due to use of cpu hotplug
+ multistate
+Message-ID: <YEbjom8FIclEgRYv@google.com>
+References: <20210306022035.11266-1-mcgrof@kernel.org>
+ <20210306022035.11266-2-mcgrof@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <9c9360bf-7ca9-5c8f-c61d-441044f9c78f@huawei.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210306022035.11266-2-mcgrof@kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/8/21 3:17 AM, John Garry wrote:
-> On 06/03/2021 04:43, Bart Van Assche wrote:
->> On 3/5/21 7:14 AM, John Garry wrote:
->>> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
->>> index 7ff1b20d58e7..5950fee490e8 100644
->>> --- a/block/blk-mq-tag.c
->>> +++ b/block/blk-mq-tag.c
->>> @@ -358,11 +358,16 @@ void blk_mq_tagset_busy_iter(struct 
->>> blk_mq_tag_set *tagset,
->>>   {
->>>       int i;
->>> +    if (!atomic_inc_not_zero(&tagset->iter_usage_counter))
->>> +        return;
->>> +
->>>       for (i = 0; i < tagset->nr_hw_queues; i++) {
->>>           if (tagset->tags && tagset->tags[i])
->>>               __blk_mq_all_tag_iter(tagset->tags[i], fn, priv,
->>>                             BT_TAG_ITER_STARTED);
->>>       }
->>> +
->>> +    atomic_dec(&tagset->iter_usage_counter);
->>>   }
->>>   EXPORT_SYMBOL(blk_mq_tagset_busy_iter);
+On Sat, Mar 06, 2021 at 02:20:34AM +0000, Luis Chamberlain wrote:
+> The zram driver makes use of cpu hotplug multistate support,
+> whereby it associates a zram compression stream per CPU. To
+> support CPU hotplug multistate a callback enabled to allow
+> the driver to do what it needs when a CPU hotplugs.
 > 
-> Hi Bart,
+> It is however currently possible to end up removing the
+> zram driver callback prior to removing the zram compression
+> streams per CPU. This would leave these compression streams
+> hanging.
 > 
->> This changes the behavior of blk_mq_tagset_busy_iter(). What will e.g.
->> happen if the mtip driver calls blk_mq_tagset_busy_iter(&dd->tags,
->> mtip_abort_cmd, dd) concurrently with another blk_mq_tagset_busy_iter()
->> call and if that causes all mtip_abort_cmd() calls to be skipped?
-> 
-> I'm not sure that I understand this problem you describe. So if 
-> blk_mq_tagset_busy_iter(&dd->tags, mtip_abort_cmd, dd) is called, either 
-> can happen:
-> a. normal operation, iter_usage_counter initially holds >= 1, and then 
-> iter_usage_counter is incremented in blk_mq_tagset_busy_iter() and we 
-> iter the busy tags. Any parallel call to blk_mq_tagset_busy_iter() will 
-> also increase iter_usage_counter.
-> b. we're switching IO scheduler. In this scenario, first we quiesce all 
-> queues. After that, there should be no active requests. At that point, 
-> we ensure any calls to blk_mq_tagset_busy_iter() are finished and block 
-> (or discard may be a better term) any more calls. Blocking any more 
-> calls should be safe as there are no requests to iter. atomic_cmpxchg() 
-> is used to set iter_usage_counter to 0, blocking any more calls.
+> We need to fix ordering for driver load / removal, zram
+> device additions, in light of the driver's use of cpu
+> hotplug multistate. Since the zram driver exposes many
+> sysfs attribute which can also muck with the comrpession
+> streams this also means we can hit page faults today easily.
 
+Hi Luis,
 
-Hi John,
+First of all, thanks for reporting the ancient bugs.
 
-My concern is about the insertion of the early return statement in 
-blk_mq_tagset_busy_iter(). Although most blk_mq_tagset_busy_iter() 
-callers can handle skipping certain blk_mq_tagset_busy_iter() calls 
-(e.g. when gathering statistics), I'm not sure this is safe for all 
-blk_mq_tagset_busy_iter() callers. The example I cited is an example of 
-a blk_mq_tagset_busy_iter() call with side effects.
+Looks like you found several bugs and I am trying to digest them
+from your description to understand more clear. I need to ask
+stupid questions, first.
 
-The mtip driver allocates one tag set per request queue so quiescing 
-queues should be sufficient to address my concern for the mtip driver.
+If I understand correctly, bugs you found were related to module
+unloading race while the zram are still working.
+If so, couldn't we fix the bug like this(it's not a perfect
+patch but just wanted to show close module unloading race)?
+(I might miss other pieces here. Let me know. Thanks!)
 
-The NVMe core and SCSI core however share a single tag set across 
-multiple namespaces / LUNs. In the error path of nvme_rdma_setup_ctrl() 
-I found a call to nvme_cancel_tagset(). nvme_cancel_tagset() calls 
-blk_mq_tagset_busy_iter(ctrl->tagset, nvme_cancel_request, ctrl). I'm 
-not sure it is safe to skip the nvme_cancel_request() calls if the I/O 
-scheduler for another NVMe namespace is being modified.
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index a711a2e2a794..646ae9e0b710 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -1696,6 +1696,8 @@ static void zram_reset_device(struct zram *zram)
+                return;
+        }
 
-Thanks,
++       module_put(THIS_MODULE);
++
+        comp = zram->comp;
+        disksize = zram->disksize;
+        zram->disksize = 0;
+@@ -1744,13 +1746,19 @@ static ssize_t disksize_store(struct device *dev,
+                goto out_free_meta;
+        }
 
-Bart.
++       if (!try_module_get(THIS_MODULE))
++               goto out_free_zcomp;
++
+        zram->comp = comp;
+        zram->disksize = disksize;
++
+        set_capacity_and_notify(zram->disk, zram->disksize >> SECTOR_SHIFT);
+        up_write(&zram->init_lock);
+
+        return len;
+
++out_free_zcomp:
++       zcomp_destroy(comp);
+ out_free_meta:
+        zram_meta_free(zram, disksize);
+ out_unlock:
