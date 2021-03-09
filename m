@@ -2,195 +2,132 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5633AC433DB
-	for <linux-block@archiver.kernel.org>; Tue,  9 Mar 2021 17:37:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B34F8C433DB
+	for <linux-block@archiver.kernel.org>; Tue,  9 Mar 2021 17:50:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 05E3064F02
-	for <linux-block@archiver.kernel.org>; Tue,  9 Mar 2021 17:37:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8909965215
+	for <linux-block@archiver.kernel.org>; Tue,  9 Mar 2021 17:50:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230453AbhCIRgu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 9 Mar 2021 12:36:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43018 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230173AbhCIRgf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Mar 2021 12:36:35 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1167DC06174A;
-        Tue,  9 Mar 2021 09:36:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=aNwUo/LtHmQGqRnI1vgEqwPKSe5SPBhW6I6/Yb0wI8I=; b=qYc4qsbKTDNENjLXPk8gvcLhtM
-        SnnONfH1FbECsnGYc3qSefRGw/xG/g2aMXyRO8rCZMbiRrNvqZFT39C2jhz2K6nRvbqx7tcDlihPE
-        tLf1nnazVbDMyu+Ek0Ewb5Q7NNGvuqrTLREr3nzigLBlgozbHK2pj8ytFPHs+0IO74UGlxkrZDVD6
-        02NTvp4VQAV7wCPHSgXBoajeakKgih10589Ax148QYEx/PISsuRCs3FK7yYyu+2F7hDnli9U1v2tA
-        rkn5ugF3eNcG7tTBkBxGtNih6ocgga3qekhgO/7BSll1ZX7BM8CjOX92zNExcPgnWk3Ydu91J9WGS
-        UwG+EE6g==;
-Received: from hch by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1lJgGx-000rxw-Fk; Tue, 09 Mar 2021 17:35:58 +0000
-Date:   Tue, 9 Mar 2021 17:35:55 +0000
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Sergei Shtepa <sergei.shtepa@veeam.com>
-Cc:     snitzer@redhat.com, agk@redhat.com, hare@suse.de, song@kernel.org,
-        axboe@kernel.dk, dm-devel@redhat.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-api@vger.kernel.org, pavel.tide@veeam.com
-Subject: Re: [PATCH v6 4/4] dm: add DM_INTERPOSED_FLAG
-Message-ID: <20210309173555.GC201344@infradead.org>
-References: <1614774618-22410-1-git-send-email-sergei.shtepa@veeam.com>
- <1614774618-22410-5-git-send-email-sergei.shtepa@veeam.com>
+        id S230453AbhCIRt2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 9 Mar 2021 12:49:28 -0500
+Received: from frasgout.his.huawei.com ([185.176.79.56]:2673 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230303AbhCIRtU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Mar 2021 12:49:20 -0500
+Received: from fraeml744-chm.china.huawei.com (unknown [172.18.147.206])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Dw2fH35Pdz67x39;
+        Wed, 10 Mar 2021 01:44:55 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml744-chm.china.huawei.com (10.206.15.225) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Tue, 9 Mar 2021 18:49:18 +0100
+Received: from [10.210.172.22] (10.210.172.22) by
+ lhreml724-chm.china.huawei.com (10.201.108.75) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Tue, 9 Mar 2021 17:49:16 +0000
+Subject: Re: [RFC PATCH v3 3/3] blk-mq: Lockout tagset iterator when exiting
+ elevator
+To:     Bart Van Assche <bvanassche@acm.org>, <hare@suse.de>,
+        <ming.lei@redhat.com>, <axboe@kernel.dk>, <hch@lst.de>
+CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <pragalla@codeaurora.org>, <kashyap.desai@broadcom.com>,
+        <yuyufen@huawei.com>
+References: <1614957294-188540-1-git-send-email-john.garry@huawei.com>
+ <1614957294-188540-4-git-send-email-john.garry@huawei.com>
+ <48a3cf78-3f6d-c13c-bca2-1f8277817b45@acm.org>
+ <9c9360bf-7ca9-5c8f-c61d-441044f9c78f@huawei.com>
+ <784a3686-cb54-561d-740c-30e0b3f46df8@acm.org>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <f60dc68f-9206-2bfb-950e-cb312f1c4c8b@huawei.com>
+Date:   Tue, 9 Mar 2021 17:47:15 +0000
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1614774618-22410-5-git-send-email-sergei.shtepa@veeam.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <784a3686-cb54-561d-740c-30e0b3f46df8@acm.org>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.210.172.22]
+X-ClientProxiedBy: lhreml748-chm.china.huawei.com (10.201.108.198) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 03, 2021 at 03:30:18PM +0300, Sergei Shtepa wrote:
-> DM_INTERPOSED_FLAG allow to create dm targets on "the fly".
-> Underlying block device opens without a flag FMODE_EXCL.
-> Dm target receives bio from the original device via
-> blk_interposer.
+On 08/03/2021 19:59, Bart Van Assche wrote:
+>>> This changes the behavior of blk_mq_tagset_busy_iter(). What will e.g.
+>>> happen if the mtip driver calls blk_mq_tagset_busy_iter(&dd->tags,
+>>> mtip_abort_cmd, dd) concurrently with another blk_mq_tagset_busy_iter()
+>>> call and if that causes all mtip_abort_cmd() calls to be skipped?
+>>
+>> I'm not sure that I understand this problem you describe. So if 
+>> blk_mq_tagset_busy_iter(&dd->tags, mtip_abort_cmd, dd) is called, 
+>> either can happen:
+>> a. normal operation, iter_usage_counter initially holds >= 1, and then 
+>> iter_usage_counter is incremented in blk_mq_tagset_busy_iter() and we 
+>> iter the busy tags. Any parallel call to blk_mq_tagset_busy_iter() 
+>> will also increase iter_usage_counter.
+>> b. we're switching IO scheduler. In this scenario, first we quiesce 
+>> all queues. After that, there should be no active requests. At that 
+>> point, we ensure any calls to blk_mq_tagset_busy_iter() are finished 
+>> and block (or discard may be a better term) any more calls. Blocking 
+>> any more calls should be safe as there are no requests to iter. 
+>> atomic_cmpxchg() is used to set iter_usage_counter to 0, blocking any 
+>> more calls.
 > 
-> Signed-off-by: Sergei Shtepa <sergei.shtepa@veeam.com>
-> ---
->  drivers/md/dm-core.h          |   6 ++
->  drivers/md/dm-ioctl.c         |   9 +++
->  drivers/md/dm-table.c         | 115 +++++++++++++++++++++++++++++++---
->  drivers/md/dm.c               |  38 +++++++----
->  include/linux/device-mapper.h |   1 +
->  include/uapi/linux/dm-ioctl.h |   6 ++
->  6 files changed, 154 insertions(+), 21 deletions(-)
+
+
+Hi Bart,
+
+> My concern is about the insertion of the early return statement in 
+> blk_mq_tagset_busy_iter(). 
+
+So I take this approach as I don't see any way to use a mutual exclusion 
+waiting mechanism to block calls to blk_mq_tagset_busy_iter() while the 
+IO scheduler is being switched.
+
+The reason is that blk_mq_tagset_busy_iter() can be called from any 
+context, including hardirq.
+
+> Although most blk_mq_tagset_busy_iter() 
+> callers can handle skipping certain blk_mq_tagset_busy_iter() calls 
+> (e.g. when gathering statistics), I'm not sure this is safe for all 
+> blk_mq_tagset_busy_iter() callers. The example I cited is an example of 
+> a blk_mq_tagset_busy_iter() call with side effects.
+
+I don't like to think that we're skipping it, which may imply that there 
+are some active requests to iter and we're just ignoring them.
+
+It's more like: we know that there are no requests active, so don't 
+bother trying to iterate.
+
 > 
-> diff --git a/drivers/md/dm-core.h b/drivers/md/dm-core.h
-> index 5953ff2bd260..e5c845f9b1df 100644
-> --- a/drivers/md/dm-core.h
-> +++ b/drivers/md/dm-core.h
-> @@ -21,6 +21,8 @@
->  
->  #define DM_RESERVED_MAX_IOS		1024
->  
-> +struct dm_interposed_dev;
-> +
->  struct dm_kobject_holder {
->  	struct kobject kobj;
->  	struct completion completion;
-> @@ -114,6 +116,10 @@ struct mapped_device {
->  	bool init_tio_pdu:1;
->  
->  	struct srcu_struct io_barrier;
-> +
-> +	/* for interposers logic */
-> +	bool is_interposed;
-> +	struct dm_interposed_dev *ip_dev;
->  };
->  
->  void disable_discard(struct mapped_device *md);
-> diff --git a/drivers/md/dm-ioctl.c b/drivers/md/dm-ioctl.c
-> index 5e306bba4375..2bcb316144a1 100644
-> --- a/drivers/md/dm-ioctl.c
-> +++ b/drivers/md/dm-ioctl.c
-> @@ -1267,6 +1267,11 @@ static inline fmode_t get_mode(struct dm_ioctl *param)
->  	return mode;
->  }
->  
-> +static inline bool get_interposer_flag(struct dm_ioctl *param)
-> +{
-> +	return (param->flags & DM_INTERPOSED_FLAG);
-> +}
-> +
->  static int next_target(struct dm_target_spec *last, uint32_t next, void *end,
->  		       struct dm_target_spec **spec, char **target_params)
->  {
-> @@ -1338,6 +1343,8 @@ static int table_load(struct file *filp, struct dm_ioctl *param, size_t param_si
->  	if (!md)
->  		return -ENXIO;
->  
-> +	md->is_interposed = get_interposer_flag(param);
-> +
->  	r = dm_table_create(&t, get_mode(param), param->target_count, md);
->  	if (r)
->  		goto err;
-> @@ -2098,6 +2105,8 @@ int __init dm_early_create(struct dm_ioctl *dmi,
->  	if (r)
->  		goto err_hash_remove;
->  
-> +	md->is_interposed = get_interposer_flag(dmi);
-> +
->  	/* add targets */
->  	for (i = 0; i < dmi->target_count; i++) {
->  		r = dm_table_add_target(t, spec_array[i]->target_type,
-> diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
-> index 95391f78b8d5..0b2f9b66ade5 100644
-> --- a/drivers/md/dm-table.c
-> +++ b/drivers/md/dm-table.c
-> @@ -6,6 +6,7 @@
->   */
->  
->  #include "dm-core.h"
-> +#include "dm-interposer.h"
->  
->  #include <linux/module.h>
->  #include <linux/vmalloc.h>
-> @@ -225,12 +226,13 @@ void dm_table_destroy(struct dm_table *t)
->  /*
->   * See if we've already got a device in the list.
->   */
-> -static struct dm_dev_internal *find_device(struct list_head *l, dev_t dev)
-> +static struct dm_dev_internal *find_device(struct list_head *l, dev_t dev, bool is_interposed)
->  {
->  	struct dm_dev_internal *dd;
->  
->  	list_for_each_entry (dd, l, list)
-> -		if (dd->dm_dev->bdev->bd_dev == dev)
-> +		if ((dd->dm_dev->bdev->bd_dev == dev) &&
-> +		    (dd->dm_dev->is_interposed == is_interposed))
->  			return dd;
->  
->  	return NULL;
-> @@ -358,6 +360,90 @@ dev_t dm_get_dev_t(const char *path)
->  }
->  EXPORT_SYMBOL_GPL(dm_get_dev_t);
->  
-> +/*
-> + * Redirect bio from interposed device to dm device
-> + */
-> +static void dm_interpose_fn(struct dm_interposed_dev *ip_dev, struct bio *bio)
-> +{
-> +	struct mapped_device *md = ip_dev->private;
-> +
-> +	if (bio_flagged(bio, BIO_REMAPPED)) {
-> +		/*
-> +		 * Since bio has already been remapped, we need to subtract
-> +		 * the block device offset from the beginning of the disk.
-> +		 */
-> +		bio->bi_iter.bi_sector -= get_start_sect(bio->bi_bdev);
-> +
-> +		bio_clear_flag(bio, BIO_REMAPPED);
-> +	}
+> The mtip driver allocates one tag set per request queue so quiescing 
+> queues should be sufficient to address my concern for the mtip driver.
+> 
+> The NVMe core and SCSI core however share a single tag set across 
+> multiple namespaces / LUNs. In the error path of nvme_rdma_setup_ctrl()
+> I found a call to nvme_cancel_tagset(). nvme_cancel_tagset() calls 
+> blk_mq_tagset_busy_iter(ctrl->tagset, nvme_cancel_request, ctrl). I'm 
+> not sure it is safe to skip the nvme_cancel_request() calls if the I/O 
+> scheduler for another NVMe namespace is being modified.
 
-So instead of doing this shoudn't the imposer just always submit to the
-whole device?  But if we keep it, the logic in this funtion should go
-into a block layer helper, passing a block device instead of the
-dm_interposed_dev.  This avoids having such fragile logic in drivers.
+Again, I would be relying on all request_queues associated with that 
+tagset to be queisced when switching IO scheduler at the point 
+blk_mq_tagset_busy_iter() is called and returns early.
 
-> +	if ((ofs + len) > bdev_nr_sectors(bdev)) {
-> +		DMERR("The specified range of sectors exceeds of the size of the block device.");
-> +		return -ERANGE;
-> +	}
-> +
-> +	md->ip_dev = kzalloc(sizeof(struct dm_interposed_dev), GFP_KERNEL);
-> +	if (!md->ip_dev)
-> +		return -ENOMEM;
-> +
-> +	if ((ofs == 0) && (len == 0))
+Now if there were active requests, I am relying on the request queue 
+quiescing to flush them. So blk_mq_tagset_busy_iter() could be called 
+during that quiescing period, and would continue to iter the requests.
 
-Lots of superflous inner braces.
+This does fall over if some tags are allocated without associated 
+request queue, which I do not know exists.
+
+Thanks,
+John
+
