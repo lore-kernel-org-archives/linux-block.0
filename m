@@ -2,211 +2,114 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-23.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A741AC433DB
-	for <linux-block@archiver.kernel.org>; Tue,  9 Mar 2021 11:44:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07F12C433DB
+	for <linux-block@archiver.kernel.org>; Tue,  9 Mar 2021 11:46:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7461B65268
-	for <linux-block@archiver.kernel.org>; Tue,  9 Mar 2021 11:44:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BD1A86525B
+	for <linux-block@archiver.kernel.org>; Tue,  9 Mar 2021 11:46:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230395AbhCILn3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 9 Mar 2021 06:43:29 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23840 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230431AbhCILnB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 9 Mar 2021 06:43:01 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615290181;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ZiyY19GCsUbfic9JgXHPjlAqbux8h++RemzkQScjlxY=;
-        b=anFPrqdBpTB8XxChcQkH9buhuDb0/Kz/s8LT335ueg9XBEfi4L+CC7BA6wkIMuxOyHsN2m
-        w5rb90uxPc3fsfOEzxNrWC5xC5HjnmmpXeLkQyGNfXGoj997xIUVhOTMjk7No3oJCc2PSE
-        GTErzGz5SZxOsrlt35cOLiqFWDCQtC0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-376-dNdDl4_KMtOsyweYpcsang-1; Tue, 09 Mar 2021 06:42:57 -0500
-X-MC-Unique: dNdDl4_KMtOsyweYpcsang-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DEA4219057A0;
-        Tue,  9 Mar 2021 11:42:55 +0000 (UTC)
-Received: from [192.168.1.10] (ovpn-115-45.ams2.redhat.com [10.36.115.45])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B31C660C04;
-        Tue,  9 Mar 2021 11:42:50 +0000 (UTC)
-Subject: Re: [dm-devel] [PATCH 4/4] dm: support I/O polling
-To:     JeffleXu <jefflexu@linux.alibaba.com>,
-        Mikulas Patocka <mpatocka@redhat.com>
-Cc:     axboe@kernel.dk, Mike Snitzer <msnitzer@redhat.com>,
-        caspar@linux.alibaba.com, hch@lst.de, linux-block@vger.kernel.org,
-        joseph.qi@linux.alibaba.com, dm-devel@redhat.com,
-        io-uring@vger.kernel.org
-References: <20210302190555.201228400@debian-a64.vm>
- <33fa121a-88a8-5c27-0a43-a7efc9b5b3e3@linux.alibaba.com>
- <alpine.LRH.2.02.2103030505460.29593@file01.intranet.prod.int.rdu2.redhat.com>
- <157a750d-3d58-ae2e-07f1-b677c1b471c7@linux.alibaba.com>
- <bd447632-f174-e6f2-ddf8-d5385da13f6b@redhat.com>
- <fc9707dc-0a21-90d3-ed4f-e201406c50eb@redhat.com>
- <06d17f27-c043-f69c-eeef-f6df714c1764@linux.alibaba.com>
-From:   Heinz Mauelshagen <heinzm@redhat.com>
-Message-ID: <bc0cdc50-22c9-031f-2ebf-3c8b0879eeb5@redhat.com>
-Date:   Tue, 9 Mar 2021 12:42:49 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.0
+        id S229544AbhCILqP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 9 Mar 2021 06:46:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51172 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229546AbhCILpv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Mar 2021 06:45:51 -0500
+Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B5EDC06174A
+        for <linux-block@vger.kernel.org>; Tue,  9 Mar 2021 03:45:51 -0800 (PST)
+Received: by mail-pg1-x533.google.com with SMTP id g4so8593411pgj.0
+        for <linux-block@vger.kernel.org>; Tue, 09 Mar 2021 03:45:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Sl9b/us0C0jdpcXHOmeBKnY/z8CpUYEmxoA0HRkJGCs=;
+        b=tPyvuChJRrlUTV6o1eBLoop/el+ZIZ+l36l9W+juy5G+AFeYBEJty94urmN2bhRvYM
+         gmhGa1qsg+Z5ozP/LF0SruB6sfIIFGp+cVkJYe70iQv8l49RXs0+ivdfaNg9EcKcsYmo
+         WAVbecrHziWana5QvOKa+RT8KGp3u+dRBdUWur0wtudrhGpfUGneP9Vz/nX5QKuSSQK1
+         FaCLhzUqJMaR2uAbTtUp+ykkjYrgEm13YO8Jf9B8ffsbO8d5vibr+8N4WkWemRdpNiwI
+         JWXvKi3Kb/yPqxOurV+sJdCrFCVfyLB/pyvyq2HFJ/XwP6JCORhqlZXIxvngpxTz9LXh
+         g6Pw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Sl9b/us0C0jdpcXHOmeBKnY/z8CpUYEmxoA0HRkJGCs=;
+        b=faS2UJo5pHcA1sU1bAG5S7XGuhjSTnQIWiPD4jBTwaOqemDwLWGG+iG4edJKNfjOAR
+         x6lYb1lx56+NPGVhlE8lYWcC6EcmMlUr4rZxgxNbEZ+qFASVykda0U4n+ubHOLeI36EE
+         jn//2Ev2+V6bNqIIPGOiplR5wOmPXEAyracwe3tRvSFbW+4mKvOhxtANZj3pnmrBZFLj
+         Or7zxvyEgeG0ljHqH4HBNE/qcWy+fyNnTbHEUhf2Qb2sTUwrHsGKnHk9TYTmZpwraT7F
+         UmQRLy4oF0CRdM6JZQHXqLBmdDkBGp2KBPoUsiSJCx7pONpx4xYKMTTmpe48dYPkdgAy
+         EjRw==
+X-Gm-Message-State: AOAM530US0gs3y3d2kM9f5hhTsBBCgFw9FtyGDUH/Zf9uZuJX7wMbTkT
+        fBapz+8qFNABUWietk8L1dPw0Q==
+X-Google-Smtp-Source: ABdhPJz6MrnnoCyvgci+UWqV8dD5wlkg6JLQmfVwo3Z1QLe4jbhSP53q9Vi0HyHDSYPVyUCGxvOs2w==
+X-Received: by 2002:aa7:99c4:0:b029:1f6:c0bf:43d1 with SMTP id v4-20020aa799c40000b02901f6c0bf43d1mr3190310pfi.37.1615290350850;
+        Tue, 09 Mar 2021 03:45:50 -0800 (PST)
+Received: from google.com (139.60.82.34.bc.googleusercontent.com. [34.82.60.139])
+        by smtp.gmail.com with ESMTPSA id il6sm2536154pjb.56.2021.03.09.03.45.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Mar 2021 03:45:50 -0800 (PST)
+Date:   Tue, 9 Mar 2021 11:45:46 +0000
+From:   Satya Tangirala <satyat@google.com>
+To:     Jia-Ju Bai <baijiaju1990@gmail.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] block: keyslot-manager: fix error return code of
+ blk_ksm_evict_key()
+Message-ID: <YEdf6utvWih7mToY@google.com>
+References: <20210309091812.26029-1-baijiaju1990@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <06d17f27-c043-f69c-eeef-f6df714c1764@linux.alibaba.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210309091812.26029-1-baijiaju1990@gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/8/21 4:54 AM, JeffleXu wrote:
->
-> On 3/6/21 1:56 AM, Heinz Mauelshagen wrote:
->> On 3/5/21 6:46 PM, Heinz Mauelshagen wrote:
->>> On 3/5/21 10:52 AM, JeffleXu wrote:
->>>> On 3/3/21 6:09 PM, Mikulas Patocka wrote:
->>>>> On Wed, 3 Mar 2021, JeffleXu wrote:
->>>>>
->>>>>> On 3/3/21 3:05 AM, Mikulas Patocka wrote:
->>>>>>
->>>>>>> Support I/O polling if submit_bio_noacct_mq_direct returned non-empty
->>>>>>> cookie.
->>>>>>>
->>>>>>> Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
->>>>>>>
->>>>>>> ---
->>>>>>>    drivers/md/dm.c |    5 +++++
->>>>>>>    1 file changed, 5 insertions(+)
->>>>>>>
->>>>>>> Index: linux-2.6/drivers/md/dm.c
->>>>>>> ===================================================================
->>>>>>> --- linux-2.6.orig/drivers/md/dm.c    2021-03-02
->>>>>>> 19:26:34.000000000 +0100
->>>>>>> +++ linux-2.6/drivers/md/dm.c    2021-03-02 19:26:34.000000000 +0100
->>>>>>> @@ -1682,6 +1682,11 @@ static void __split_and_process_bio(stru
->>>>>>>            }
->>>>>>>        }
->>>>>>>    +    if (ci.poll_cookie != BLK_QC_T_NONE) {
->>>>>>> +        while (atomic_read(&ci.io->io_count) > 1 &&
->>>>>>> +               blk_poll(ci.poll_queue, ci.poll_cookie, true)) ;
->>>>>>> +    }
->>>>>>> +
->>>>>>>        /* drop the extra reference count */
->>>>>>>        dec_pending(ci.io, errno_to_blk_status(error));
->>>>>>>    }
->>>>>> It seems that the general idea of your design is to
->>>>>> 1) submit *one* split bio
->>>>>> 2) blk_poll(), waiting the previously submitted split bio complets
->>>>> No, I submit all the bios and poll for the last one.
->>>>>
->>>>>> and then submit next split bio, repeating the above process. I'm
->>>>>> afraid
->>>>>> the performance may be an issue here, since the batch every time
->>>>>> blk_poll() reaps may decrease.
->>>>> Could you benchmark it?
->>>> I only tested dm-linear.
->>>>
->>>> The configuration (dm table) of dm-linear is:
->>>> 0 1048576 linear /dev/nvme0n1 0
->>>> 1048576 1048576 linear /dev/nvme2n1 0
->>>> 2097152 1048576 linear /dev/nvme5n1 0
->>>>
->>>>
->>>> fio script used is:
->>>> ```
->>>> $cat fio.conf
->>>> [global]
->>>> name=iouring-sqpoll-iopoll-1
->>>> ioengine=io_uring
->>>> iodepth=128
->>>> numjobs=1
->>>> thread
->>>> rw=randread
->>>> direct=1
->>>> registerfiles=1
->>>> hipri=1
->>>> runtime=10
->>>> time_based
->>>> group_reporting
->>>> randrepeat=0
->>>> filename=/dev/mapper/testdev
->>>> bs=4k
->>>>
->>>> [job-1]
->>>> cpus_allowed=14
->>>> ```
->>>>
->>>> IOPS (IRQ mode) | IOPS (iopoll mode (hipri=1))
->>>> --------------- | --------------------
->>>>              213k |           19k
->>>>
->>>> At least, it doesn't work well with io_uring interface.
->>>>
->>>>
->>>
->>> Jeffle,
->>>
->>> I ran your above fio test on a linear LV split across 3 NVMes to
->>> second your split mapping
->>> (system: 32 core Intel, 256GiB RAM) comparing io engines sync, libaio
->>> and io_uring,
->>> the latter w/ and w/o hipri (sync+libaio obviously w/o registerfiles
->>> and hipri) which resulted ok:
->>>
->>>
->>>
->>> sync  |  libaio  |  IRQ mode (hipri=0) | iopoll (hipri=1)
->>> ------|----------|---------------------|----------------- 56.3K |
->>> 290K  |                329K |             351K I can't second your
->>> drastic hipri=1 drop here...
->>
->> Sorry, email mess.
->>
->>
->> sync   |  libaio  |  IRQ mode (hipri=0) | iopoll (hipri=1)
->> -------|----------|---------------------|-----------------
->> 56.3K  |    290K  |                329K |             351K
->>
->>
->>
->> I can't second your drastic hipri=1 drop here...
->>
-> Hummm, that's indeed somewhat strange...
->
-> My test environment:
-> - CPU: 128 cores, though only one CPU core is used since
-> 'cpus_allowed=14' in fio configuration
-> - memory: 983G memory free
-> - NVMe: Huawai ES3510P (HWE52P434T0L005N), with 'nvme.poll_queues=3'
->
-> Maybe you didn't specify 'nvme.poll_queues=XXX'? In this case, IO still
-> goes into IRQ mode, even you have specified 'hipri=1'?
->
-Jeffle,
+On Tue, Mar 09, 2021 at 01:18:12AM -0800, Jia-Ju Bai wrote:
+> When blk_ksm_find_keyslot() returns NULL to slot, no error return code
+> of blk_ksm_evict_key() is assigned.
+> To fix this bug, err is assigned with -ENOENT in this case.
+> 
+> Fixes: 1b2628397058 ("block: Keyslot Manager for Inline Encryption")
+> Reported-by: TOTE Robot <oslab@tsinghua.edu.cn>
+> Signed-off-by: Jia-Ju Bai <baijiaju1990@gmail.com>
+> ---
+>  block/keyslot-manager.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/keyslot-manager.c b/block/keyslot-manager.c
+> index 2c4a55bea6ca..4dd5da0645bc 100644
+> --- a/block/keyslot-manager.c
+> +++ b/block/keyslot-manager.c
+> @@ -375,8 +375,10 @@ int blk_ksm_evict_key(struct blk_keyslot_manager *ksm,
+>  
+>  	blk_ksm_hw_enter(ksm);
+>  	slot = blk_ksm_find_keyslot(ksm, key);
+> -	if (!slot)
+> +	if (!slot) {
+> +		err = -ENOENT;
+>  		goto out_unlock;
+> +	}
+>  
+>  	if (WARN_ON_ONCE(atomic_read(&slot->slot_refs) != 0)) {
+>  		err = -EBUSY;
+> -- 
+> 2.17.1
+> 
+This function was deliberately designed to return 0 on success *and also*
+if there's no keyslot found with the specified key - i.e. it returns 0 if
+the key is no longer programmed into the keyslot manager, which is what the
+callers care about, so I don't think there's a bug here.
 
-nvme.poll_queues was zero indeed.
+Also if we were to apply this patch, we'd also need to change the callers
+to handle this new -ENOENT case (and not treat it as an error/not propogate
+-ENOENT in e.g. dm_keyslot_evict_callback()).
 
-At 3 results are hipri=0 / hipri=1 : 1699K / 1702K IOPS (all cores)
-
-Single core results : 315K / 329K
-
-Still no extreme drop...
-
-FWIW:
-
-Thanks,
-Heinz
-
+Is there a reason we want to change the behaviour of this function?
