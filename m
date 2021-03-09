@@ -2,118 +2,102 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5227C4332B
-	for <linux-block@archiver.kernel.org>; Tue,  9 Mar 2021 21:00:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A224C433DB
+	for <linux-block@archiver.kernel.org>; Tue,  9 Mar 2021 21:19:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A39C565243
-	for <linux-block@archiver.kernel.org>; Tue,  9 Mar 2021 21:00:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 58575651AE
+	for <linux-block@archiver.kernel.org>; Tue,  9 Mar 2021 21:19:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231907AbhCIU7j (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 9 Mar 2021 15:59:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58712 "EHLO
+        id S231878AbhCIVTD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 9 Mar 2021 16:19:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34754 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230173AbhCIU7S (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Mar 2021 15:59:18 -0500
-Received: from mail-il1-x132.google.com (mail-il1-x132.google.com [IPv6:2607:f8b0:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D306DC06174A
-        for <linux-block@vger.kernel.org>; Tue,  9 Mar 2021 12:59:17 -0800 (PST)
-Received: by mail-il1-x132.google.com with SMTP id e7so13444235ile.7
-        for <linux-block@vger.kernel.org>; Tue, 09 Mar 2021 12:59:17 -0800 (PST)
+        with ESMTP id S231915AbhCIVSo (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Mar 2021 16:18:44 -0500
+Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4299C06174A
+        for <linux-block@vger.kernel.org>; Tue,  9 Mar 2021 13:18:43 -0800 (PST)
+Received: by mail-wm1-x329.google.com with SMTP id e23so3881171wmh.3
+        for <linux-block@vger.kernel.org>; Tue, 09 Mar 2021 13:18:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=hIzrQXT4h4W7AAe4jB29ri4tAfpUHw+wk/thHCyaZW8=;
-        b=0PynGrDnEoidiWaGP32JQlA4a5VjaKkR4KQKhqeG77Fqs8yD8G7u99UoKt8GalCtyr
-         TqL7WMhubuDC6guqo+zx+QQiRXrUy3UoQoZq6GnxoFv+CzUb3C7wCX8sySwmDY9bEn0I
-         TL7sY5nhJo6IbgDzvcPo3qHI/ZxMgful41e/1caGki+V6vmEJuVIrxDV7wu5ZzAnAFU6
-         j3xDxnAVozU8PD/meTNgkQQFmLFT7NkjPD/++eCvA08Wb0YlR080pVb466SYQTCXDEIY
-         YP/1wX9/CVb3+DFxWBIOy6jI2gWuB7zfUr+as+/UcomSiYO/KQFqN3c0LR6uB4u/0x+H
-         WBWw==
+        d=javigon-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=7puXEMns6yXED5Cipm23w3KOcm4gDxuggjUf51KLHTQ=;
+        b=rGAqJWN9ilfYM1SO4qMWZvE+nNSI2R3JWDSKJRx3sysE+fH3oYybOnt8JLV6Ezqw1M
+         B8jHfc+RhhSCAMgQxg5rXp/XTfM+fNJwhCwleKiIHT/0j+ljl3ZnwC33QNqW9RGwR60y
+         ck2AaySaaA1/eRQffqYC328eC80Zm6hy84w9KhxjirzetfWccZv8DRoTo1JLZPuZb4WC
+         Oe1ik7YkK0VMwKBzdH1BMC8cWGuA77Lenjyc4ZhTAUCXL0cXkcGEIJ570BAhCLbd7N1D
+         GXQ1c/n1VifRYApW96OJM0v37tUv9rmaP/c/PKgwFlAbyw2Tud8GvIZUdPzoGGd461cv
+         wPqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=hIzrQXT4h4W7AAe4jB29ri4tAfpUHw+wk/thHCyaZW8=;
-        b=lVEQnR8ULXBOa6hASjqMm1xeKPmjpL+IaKra049qGNXbKKBTl67EOa/E4zJbziI/lb
-         l01CGC3z5fOZu4ZTiRO3GfV9k7U+P5b6r4YE/NVXFGVv6M/ZDbpKMKzgUWqtQS3+D7dK
-         zjFoJZsjT/u3ITqHIFMv0Q13vkfTgrzOezRtftrkBhw6/Mn+eK/WAnn0neaWEkN/Xffm
-         B5XNUN9oWUy57PGBw/DvPz/Ta6QyXiqb6PJixuLWun5FoofsJNqmODpqUGXDNbehJHpb
-         mR5RWJRPT7CenpMvgmbdlgbBjM1WYzAGFrVE04ABvtCBh2pX7WiHIzrSNytEkef89W4x
-         qC/A==
-X-Gm-Message-State: AOAM5335gjKx5Jf+1TEvQOCdArDX7gab/vDyLKmCy8gnf04aBkwCPhhp
-        GTrgnVb6R/86eRPc3Fxbxkq1mA==
-X-Google-Smtp-Source: ABdhPJx6YWGVJo0YZArjr64qms/FJr2bXrrXCNjG3kmjLDReMWKK0JV3kBMtCHPy/70KnggJjKw+AA==
-X-Received: by 2002:a92:b003:: with SMTP id x3mr43220ilh.15.1615323557300;
-        Tue, 09 Mar 2021 12:59:17 -0800 (PST)
-Received: from [192.168.1.30] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id i8sm7865845ilv.57.2021.03.09.12.59.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Mar 2021 12:59:16 -0800 (PST)
-Subject: Re: [PATCH] block: rsxx: fix error return code of rsxx_pci_probe()
-To:     Jia-Ju Bai <baijiaju1990@gmail.com>, josh.h.morris@us.ibm.com,
-        pjk1939@linux.ibm.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210308100554.10375-1-baijiaju1990@gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <cf2dd66c-0e1e-944e-f4c5-542095f6c9d7@kernel.dk>
-Date:   Tue, 9 Mar 2021 13:59:16 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=7puXEMns6yXED5Cipm23w3KOcm4gDxuggjUf51KLHTQ=;
+        b=fk5Fw1Gd5xJF2AJNLjyR8UQMN3EBEfvOvH1ghTX42ljt2X2saWu+uJvQJIHg43AqrE
+         ja/aWnaELicwPD0Lw00SIG8h/AfMRuEWmT1eZEcb7rXiVCXchD3IlHM/62jwY5fLq2Ye
+         Eci9aU5bFein0w4dUY24BvM30oce83Lxxel0ibxjiQldfaHXvq449SUBD6Pj9//rqle7
+         olyz36CS5flDiO4cKuZmx+TW7Q8Jd4V/GlaD0QjIPHAvBE9jF+//MD1p3HHDCqeaoPfw
+         3TtV1MrAq0etGc/UD2TYyLyyPYmeYMpeYv983QWexugx3uF0qj+cedOugF5uQP20w2A8
+         Yb0A==
+X-Gm-Message-State: AOAM533I4eRvO4V5jE39NR+vSgqWol5HFGxgESeaSi/9IHIsJ6/hwAwH
+        3jeKKzSidADLtLVB0oj4sLi3sA==
+X-Google-Smtp-Source: ABdhPJzuqIW0djcZgigY2I6784lju5FS2TCbP5AKmg3fcGMn6h8S4K++dO5zXnoTPxnQIPOPqBQDRg==
+X-Received: by 2002:a7b:c0c7:: with SMTP id s7mr6141029wmh.5.1615324722703;
+        Tue, 09 Mar 2021 13:18:42 -0800 (PST)
+Received: from localhost (5.186.124.214.cgn.fibianet.dk. [5.186.124.214])
+        by smtp.gmail.com with ESMTPSA id p6sm25289599wru.2.2021.03.09.13.18.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Mar 2021 13:18:42 -0800 (PST)
+Date:   Tue, 9 Mar 2021 22:18:41 +0100
+From:   Javier =?utf-8?B?R29uesOhbGV6?= <javier@javigon.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        kbusch@kernel.org, sagi@grimberg.me, minwoo.im.dev@gmail.com
+Subject: Re: [PATCH V6 1/2] nvme: enable char device per namespace
+Message-ID: <20210309211841.tl5pq75iihilil5o@mpHalley.localdomain>
+References: <20210301192452.16770-1-javier.gonz@samsung.com>
+ <20210301192452.16770-2-javier.gonz@samsung.com>
+ <20210303091022.GA12784@lst.de>
+ <20210303100212.e43jgjvuomgybmy2@mpHalley.localdomain>
+ <20210309113103.GA9233@lst.de>
+ <20210309124104.uowad6bd4vlcthmw@mpHalley.local>
+ <20210309150531.GA15052@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <20210308100554.10375-1-baijiaju1990@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210309150531.GA15052@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/8/21 3:05 AM, Jia-Ju Bai wrote:
-> Some error handling segments of rsxx_pci_probe() do not return error code, 
-> so add error code for these segments.
-> 
-> Fixes: 8722ff8cdbfa ("block: IBM RamSan 70/80 device driver")
-> Reported-by: TOTE Robot <oslab@tsinghua.edu.cn>
-> Signed-off-by: Jia-Ju Bai <baijiaju1990@gmail.com>
-> ---
->  drivers/block/rsxx/core.c | 18 +++++++++++++++---
->  1 file changed, 15 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/block/rsxx/core.c b/drivers/block/rsxx/core.c
-> index 63f549889f87..6b3b9b31a3e8 100644
-> --- a/drivers/block/rsxx/core.c
-> +++ b/drivers/block/rsxx/core.c
-> @@ -760,13 +760,17 @@ static int rsxx_pci_probe(struct pci_dev *dev,
->  	pci_set_drvdata(dev, card);
->  
->  	st = ida_alloc(&rsxx_disk_ida, GFP_KERNEL);
-> -	if (st < 0)
-> +	if (st < 0) {
-> +		st = -ENOMEM;
->  		goto failed_ida_get;
-> +	}
->  	card->disk_id = st;
->  
->  	st = pci_enable_device(dev);
-> -	if (st)
-> +	if (st) {
-> +		st = -EIO;
->  		goto failed_enable;
-> +	}
->  
->  	pci_set_master(dev);
+On 09.03.2021 16:05, Christoph Hellwig wrote:
+>On Tue, Mar 09, 2021 at 01:42:23PM +0100, Javier González wrote:
+>>> - nvme_cdev_fops implements file operations that directly on a nvme_ns,
+>>>   so they are path specific
+>>
+>> This is correct.
+>>
+>>> - we allow opening them even for a hidden controller
+>>
+>> This is also correct.
+>>
+>>> - there does not seem to be a char device node for ns_head at all.
+>>
+>> Also correct.
+>>
+>> We tried to keep it simple in the first iteration. Am I understanding
+>> that you see necessary to have per ns_head char devices?
+>
+>That would be my understanding of "multipath support" for this character
+>device, yes.  Especially as hiding the individual char devices for the
+>hidden controllers once they are initially exposed would be an ABI break.
 
-Maybe there are some valid parts to the patch, but the two above at
-least make no sense - we're returning the error here as passed from
-ida_alloc or pci_enable_device, why are you overriding them?
-
--- 
-Jens Axboe
-
+Ok. Will look into it for the next iteration.
