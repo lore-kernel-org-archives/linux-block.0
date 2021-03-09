@@ -2,60 +2,104 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89E5EC433E0
-	for <linux-block@archiver.kernel.org>; Tue,  9 Mar 2021 15:06:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16FBAC4332E
+	for <linux-block@archiver.kernel.org>; Tue,  9 Mar 2021 16:37:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 443BE65253
-	for <linux-block@archiver.kernel.org>; Tue,  9 Mar 2021 15:06:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E486365238
+	for <linux-block@archiver.kernel.org>; Tue,  9 Mar 2021 16:37:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230490AbhCIPGA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 9 Mar 2021 10:06:00 -0500
-Received: from verein.lst.de ([213.95.11.211]:60578 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230147AbhCIPFd (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 9 Mar 2021 10:05:33 -0500
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 2C9B168B05; Tue,  9 Mar 2021 16:05:31 +0100 (CET)
-Date:   Tue, 9 Mar 2021 16:05:31 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier@javigon.com>
-Cc:     Christoph Hellwig <hch@lst.de>, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, kbusch@kernel.org, sagi@grimberg.me,
-        minwoo.im.dev@gmail.com
-Subject: Re: [PATCH V6 1/2] nvme: enable char device per namespace
-Message-ID: <20210309150531.GA15052@lst.de>
-References: <20210301192452.16770-1-javier.gonz@samsung.com> <20210301192452.16770-2-javier.gonz@samsung.com> <20210303091022.GA12784@lst.de> <20210303100212.e43jgjvuomgybmy2@mpHalley.localdomain> <20210309113103.GA9233@lst.de> <20210309124104.uowad6bd4vlcthmw@mpHalley.local>
+        id S229790AbhCIQhT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 9 Mar 2021 11:37:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58226 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231423AbhCIQg5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Mar 2021 11:36:57 -0500
+Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C2F5C06175F
+        for <linux-block@vger.kernel.org>; Tue,  9 Mar 2021 08:36:57 -0800 (PST)
+Received: by mail-ed1-x52f.google.com with SMTP id w9so21363036edt.13
+        for <linux-block@vger.kernel.org>; Tue, 09 Mar 2021 08:36:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=intel-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=m/fpSmEn/Omnn9hT4CF3J0SxPNZ3B3Al6CQWKVqNiBQ=;
+        b=StNMHMhRfB8T/5YxpdFifEdg64ybP3EsolQTfz9j8mT99xOZm4AP2PLj7Lj9Vz8yxG
+         t5u2mGMp0ID0D2xI8sewZ7MWYrJpiZf9DOe+jqwFthRMU64XdYV/mO36V14t786ILnIk
+         NTCWj5xpdpoohcsKdU048Qt/svji00BGtnFKLOPAz0HnCpdFfdFOseG6w2cbR0I61l+q
+         ylc00Qdh7rjzdHbe91XpFhqJElhF8V1IG2GSkNBs613QrMQKTdnSt3JUBY4C0RzkWEie
+         qpFxLVikQOfstznmBtOfKLxIaeAcH7Bsla0eOGj/AxQ+1Kaykq6N9GN770mMWhm9x6Dv
+         Pq7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=m/fpSmEn/Omnn9hT4CF3J0SxPNZ3B3Al6CQWKVqNiBQ=;
+        b=Kfuki/4S99fxZjv3ymRqX7RMA3Sbkyx8CjX2vbxcn5uhdSmH9gkUoq0BdxTUxSS6yc
+         aZXiRw9+HHrmogqVniRkPUgl/JObTlPF/IomvjMRc31WkWiSmSigbDrgI54YcXDvGuRQ
+         78Sh1Y1MyXHb+uHThGAtI/1pDtd89outDM4JiAtJSNqQSixOplaljs97dlbS3Ccgtk7d
+         r5VarYumt6lwteH9LpNpKgaM/Le01GrbmVI7vl2ZZwbbS0qx+bj0KMnOE9+sNn/WAZ+W
+         h5rUPXa7Ycg90RkeLpKqye0u1nQ3VeLwmn/qHYeBXS4hYb9mBidLIJZZjvEPW7016Bm7
+         3VIA==
+X-Gm-Message-State: AOAM532tOFast17q2HA6TvXyAmWksD1L8iPV8559Hubwin5S8yvId8rE
+        j7fT/vFefvdnfm+1HSlcOmdGBLT97PELlOCKLOouPA==
+X-Google-Smtp-Source: ABdhPJyzPjVHBi3eKHJ3wMsoze0wVkKY9whBDXBrbn5HcD+NO5qt8MclSQ/sO8bdsyXTxsn1FW30Wg1M45vhSD/6jKQ=
+X-Received: by 2002:aa7:cd87:: with SMTP id x7mr5285330edv.210.1615307815848;
+ Tue, 09 Mar 2021 08:36:55 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210309124104.uowad6bd4vlcthmw@mpHalley.local>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+References: <161527286194.446794.5215036039655765042.stgit@dwillia2-desk3.amr.corp.intel.com>
+ <20210309073110.GA3140@lst.de>
+In-Reply-To: <20210309073110.GA3140@lst.de>
+From:   Dan Williams <dan.j.williams@intel.com>
+Date:   Tue, 9 Mar 2021 08:36:53 -0800
+Message-ID: <CAPcyv4iQShzBxyZcn+H=2DGnnpifaV_e=5yBaGA1sF+ESS0jAQ@mail.gmail.com>
+Subject: Re: [PATCH] libnvdimm: Let revalidate_disk() revalidate region read-only
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     linux-nvdimm <linux-nvdimm@lists.01.org>,
+        Ming Lei <ming.lei@redhat.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>,
+        kernel test robot <lkp@intel.com>,
+        Vishal Verma <vishal.l.verma@intel.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Mar 09, 2021 at 01:42:23PM +0100, Javier González wrote:
->> - nvme_cdev_fops implements file operations that directly on a nvme_ns,
->>   so they are path specific
+On Mon, Mar 8, 2021 at 11:31 PM Christoph Hellwig <hch@lst.de> wrote:
 >
-> This is correct.
+> On Mon, Mar 08, 2021 at 10:54:22PM -0800, Dan Williams wrote:
+> > Previous kernels allowed the BLKROSET to override the disk's read-only
+> > status. With that situation fixed the pmem driver needs to rely on
+> > revalidate_disk() to clear the disk read-only status after the host
+> > region has been marked read-write.
+> >
+> > Recall that when libnvdimm determines that the persistent memory has
+> > lost persistence (for example lack of energy to flush from DRAM to FLASH
+> > on an NVDIMM-N device) it marks the region read-only, but that state can
+> > be overridden by the user via:
+> >
+> >    echo 0 > /sys/bus/nd/devices/regionX/read_only
+> >
+> > ...to date there is no notification that the region has restored
+> > persistence, so the user override is the only recovery.
 >
->> - we allow opening them even for a hidden controller
+> I've just resent my series to kill of ->revalidate_disk for good, so this
+> obvious makes me a little unhappy.  Given that ->revalidate_disk
+> only ends up beeing called from the same path that ->open is called,
+> why can't you just hook this up from the open method?
 >
-> This is also correct.
->
->> - there does not seem to be a char device node for ns_head at all.
->
-> Also correct.
->
-> We tried to keep it simple in the first iteration. Am I understanding
-> that you see necessary to have per ns_head char devices?
+> Also any reason the sysfs attribute can't just directly propagate the
+> information to the disk?
 
-That would be my understanding of "multipath support" for this character
-device, yes.  Especially as hiding the individual char devices for the
-hidden controllers once they are initially exposed would be an ABI break.
+I should have assumed that revalidate_disk() was on the chopping
+block. Let me take a look at just propagating from the region update
+down to all affected disks. There's already a notification path for
+regions to communicate badblocks, should be straightforward to reuse
+for read-only updates.
