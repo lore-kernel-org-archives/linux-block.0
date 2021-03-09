@@ -2,94 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AE5FC433DB
-	for <linux-block@archiver.kernel.org>; Tue,  9 Mar 2021 20:47:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D472AC433DB
+	for <linux-block@archiver.kernel.org>; Tue,  9 Mar 2021 20:51:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1A16765243
-	for <linux-block@archiver.kernel.org>; Tue,  9 Mar 2021 20:47:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A041D6522E
+	for <linux-block@archiver.kernel.org>; Tue,  9 Mar 2021 20:51:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231828AbhCIUrT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 9 Mar 2021 15:47:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56064 "EHLO
+        id S231781AbhCIUuf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 9 Mar 2021 15:50:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56776 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231808AbhCIUrE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Mar 2021 15:47:04 -0500
-Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 010ADC06174A
-        for <linux-block@vger.kernel.org>; Tue,  9 Mar 2021 12:47:03 -0800 (PST)
-Received: by mail-ej1-x62b.google.com with SMTP id c10so31504803ejx.9
-        for <linux-block@vger.kernel.org>; Tue, 09 Mar 2021 12:47:03 -0800 (PST)
+        with ESMTP id S229948AbhCIUuU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Mar 2021 15:50:20 -0500
+Received: from mail-il1-x12c.google.com (mail-il1-x12c.google.com [IPv6:2607:f8b0:4864:20::12c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A91DC06175F
+        for <linux-block@vger.kernel.org>; Tue,  9 Mar 2021 12:50:20 -0800 (PST)
+Received: by mail-il1-x12c.google.com with SMTP id b5so13429047ilq.10
+        for <linux-block@vger.kernel.org>; Tue, 09 Mar 2021 12:50:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=intel-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=rxekq9CmjmqiQezEq23fxoA2lWRbGVUv5ZHopeMn1UE=;
-        b=cnHrmQr/VMb/t2E/EgCby5Ir+NbwqGQ0u5beELJg+31cT1IgztSHwumMnd5zdcoDB2
-         66n4NERbQg+uvwjesYYTCrNMtq9i9BOp/xxNWs/vGHWpji0JOhm5y/MI1V1Ox4Pc4WRW
-         tBCkqmAvU9bVb4X02t4bXL1znuI21REF0jrmhFii+VAU1w787tzlvvkSi8J6MFfQp9Qc
-         pDQjCC5HheYIdn0dNKCnxnEBuaRZu7xTQPpa9IDV/OMAz50a7gzVrpOYTiwkLGnkyiNv
-         Xl9tJ2GvH5S31+9GqAUexpRyDEuTmNjlBu3J2Ogs0+mgYdfyBUBeIAD+tjEcWDtq2eIa
-         u1mA==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=T8Beol1vwvugLcX6dyhYM7QV2XmUWY2CELTq49rlsJk=;
+        b=D4CmLh/h2w/J1i0VPcOxlMFzEuqzUjkpZtNtGOHi/2VTPRS7Z4qe8S9++KSJqtONh2
+         GOPmuiR+6JbHCGHAK13IqjCjXyDgT+XXLFglPrNmHuLwPgKTq7CqhnBpQJQ70AMRdJjx
+         9AcgAFs/YLmF9GzqzhmbtkFISp6+3GH3IngohIJDFQBaAml64P+bL1kaBQDvjiHAD+nZ
+         ylIvnP/ECzkcH6FTu/Eq8i3heCzxDc+WojQ+JLZxZg36GU20orXdHOUYWfHzCBedmaED
+         sMWf4IbjzJFW7nkYDaVelbHDETMOt1gMYXO8haqGobcIHTaasa4OPllmCpVlfRC4Ix3c
+         YTuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=rxekq9CmjmqiQezEq23fxoA2lWRbGVUv5ZHopeMn1UE=;
-        b=pu7VNbt0EnOPBxneYrPOGDd/W3fho/MoKT475ZaIcDVHME48bGqYXMV8OQvAVEkHtR
-         10+6DiKRYyImipV+BbdJQR8NtJrzWOQaGB3Yuzb+GnG7S8v+rDkuDD8xurrAfTys/9Wx
-         cz39x2XwnX7bt4LjmOY0i0crKLwlKpUuy7I28Py7FLOtyQfvMKt2zjdUhwGziFIHouse
-         nFm3nvvVWO0ZzbT/LybnmlDyjUms693fWHON6/l4FCq3cukF8q7hfnppHKnGAEw5FlLn
-         AeONA0cnim9PZNAT4xycxYWH1CpY92txrYEtrl/cqg/I82DyaSjCoAYwzkh92U4iPXP8
-         2d1Q==
-X-Gm-Message-State: AOAM533tGPCyx5l54QpJeJZZeQgsThiOXa5USd9wUWGe/HZj84nDAKS6
-        5/qzCZ8VQeovK1VpWdTBYGWsloUsf6P8E8a9b172WA==
-X-Google-Smtp-Source: ABdhPJyGCNUbmQJ/wDHu5IcJL/niMgxwiRhAm5hQcCcYAEaJxVRh4Cge+6PJtQJj3bcb2aVMkwUuE9suuO9SNZofuRY=
-X-Received: by 2002:a17:906:c405:: with SMTP id u5mr22581663ejz.341.1615322822643;
- Tue, 09 Mar 2021 12:47:02 -0800 (PST)
-MIME-Version: 1.0
-References: <20210309195747.283796-1-willy@infradead.org>
-In-Reply-To: <20210309195747.283796-1-willy@infradead.org>
-From:   Dan Williams <dan.j.williams@intel.com>
-Date:   Tue, 9 Mar 2021 12:47:00 -0800
-Message-ID: <CAPcyv4iQ8qfyhungkhdDKqmOUrd0e3XtExxC_2yz+zX8ncBsrA@mail.gmail.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=T8Beol1vwvugLcX6dyhYM7QV2XmUWY2CELTq49rlsJk=;
+        b=nqo1oNkgeYfVuu7Ait76aQT2G99ju7M0IXSGnvti+/ZC/P4mt9TEVreKqokyn8kg1D
+         oXIxIh2llCy935Qp2OUAj3n6hzVSWLHur4XLn8uaVkHIR4hj5AXIRdOXxWNLC0i0QTPH
+         uQDvYOfd9GRGMhQmfu1I7hvsPacQEoy/ra5LNTT+EHCA2RqQmWdQTPgsJid5nZ5Tph+N
+         Uz2954y6aDlgDeu9FcJe+QiWF/gMmJx0zn42nojWttqk3fwWjMyD1rO3jFsPVo8x3iZt
+         yCkIeXoZEdtYBlLP2Uf6x7bX7Z7Z/TtkzObqEGNo6Xlqfr+Z3CjbilOrpadR8U4CRhrX
+         qS3Q==
+X-Gm-Message-State: AOAM530aUidz+RplDjlehcZCHMPPWHfTj5LF/Z+7TCjcffuSS8Vl9Kzj
+        u2J8felMyVTh7S9UdLR9luDt/Q==
+X-Google-Smtp-Source: ABdhPJzL4us6wU9N46CCAROdfi7JEXE1HxM1m4J4+Smd3ru46Jtr3H8nfy06m2kjHYjK9tiAsRTGag==
+X-Received: by 2002:a92:ddd0:: with SMTP id d16mr45367ilr.52.1615323019838;
+        Tue, 09 Mar 2021 12:50:19 -0800 (PST)
+Received: from [192.168.1.30] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id c19sm8079624ile.17.2021.03.09.12.50.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 09 Mar 2021 12:50:19 -0800 (PST)
 Subject: Re: [PATCH v2] include: Remove pagemap.h from blkdev.h
-To:     "Matthew Wilcox (Oracle)" <willy@infradead.org>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Linux MM <linux-mm@kvack.org>, linux-block@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-bcache@vger.kernel.org,
-        linux-nvdimm <linux-nvdimm@lists.01.org>,
-        linux-scsi <linux-scsi@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+To:     "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-bcache@vger.kernel.org, linux-nvdimm@lists.01.org,
+        linux-scsi@vger.kernel.org
+References: <20210309195747.283796-1-willy@infradead.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <b4d3285a-e1a2-1381-2bfd-ceeaf5ab55c9@kernel.dk>
+Date:   Tue, 9 Mar 2021 13:50:18 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+MIME-Version: 1.0
+In-Reply-To: <20210309195747.283796-1-willy@infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Mar 9, 2021 at 11:59 AM Matthew Wilcox (Oracle)
-<willy@infradead.org> wrote:
->
+On 3/9/21 12:57 PM, Matthew Wilcox (Oracle) wrote:
 > My UEK-derived config has 1030 files depending on pagemap.h before
 > this change.  Afterwards, just 326 files need to be rebuilt when I
 > touch pagemap.h.  I think blkdev.h is probably included too widely,
 > but untangling that dependency is harder and this solves my problem.
 > x86 allmodconfig builds, but there may be implicit include problems
 > on other architectures.
->
-> Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
-> ---
-> v2: Fix CONFIG_SWAP=n implicit use of pagemap.h by swap.h.  Increases
->     the number of files from 240, but that's still a big win -- 68%
->     reduction instead of 77%.
->
-[..]
->  drivers/nvdimm/btt.c      | 1 +
->  drivers/nvdimm/pmem.c     | 1 +
 
-For the nvdimm bits:
+For the block bits:
 
-Acked-by: Dan Williams <dan.j.williams@intel.com>
+Acked-by: Jens Axboe <axboe@kernel.dk>
+
+-- 
+Jens Axboe
+
