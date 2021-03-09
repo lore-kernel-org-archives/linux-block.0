@@ -2,71 +2,72 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CDCDC433DB
-	for <linux-block@archiver.kernel.org>; Tue,  9 Mar 2021 20:57:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5227C4332B
+	for <linux-block@archiver.kernel.org>; Tue,  9 Mar 2021 21:00:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 12C896522E
-	for <linux-block@archiver.kernel.org>; Tue,  9 Mar 2021 20:56:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A39C565243
+	for <linux-block@archiver.kernel.org>; Tue,  9 Mar 2021 21:00:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230173AbhCIU41 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 9 Mar 2021 15:56:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58080 "EHLO
+        id S231907AbhCIU7j (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 9 Mar 2021 15:59:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58712 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230431AbhCIU4T (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Mar 2021 15:56:19 -0500
-Received: from mail-il1-x135.google.com (mail-il1-x135.google.com [IPv6:2607:f8b0:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B20F2C06174A
-        for <linux-block@vger.kernel.org>; Tue,  9 Mar 2021 12:56:19 -0800 (PST)
-Received: by mail-il1-x135.google.com with SMTP id e7so13437118ile.7
-        for <linux-block@vger.kernel.org>; Tue, 09 Mar 2021 12:56:19 -0800 (PST)
+        with ESMTP id S230173AbhCIU7S (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Mar 2021 15:59:18 -0500
+Received: from mail-il1-x132.google.com (mail-il1-x132.google.com [IPv6:2607:f8b0:4864:20::132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D306DC06174A
+        for <linux-block@vger.kernel.org>; Tue,  9 Mar 2021 12:59:17 -0800 (PST)
+Received: by mail-il1-x132.google.com with SMTP id e7so13444235ile.7
+        for <linux-block@vger.kernel.org>; Tue, 09 Mar 2021 12:59:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=BNwwShfJ99REridSMvDgWguNqA1PF7ZieDr3sKpJ4o0=;
-        b=C6EeR0PkoONZaFODzmSUja3CjRpP9B28DJWDSx+ToLshGOGxOtmRUFypBChje0nELp
-         W3J+fJ5ZOJA3khauf8G8Si1APY23Y+bOeQArIcvyO3Pi6nHt5UN79jafYGXJzD+/s0zo
-         wrFA51aht5K7BohPaoaPlyfLCEdra+c5dRuNYkEui0VXO3ZPmTs5zh/L3fApPKXLsJIl
-         i5SsAJ3UNRSZa2uxVT3yRtxamfyrieFlD5/GlCmRJfNynRxRUQnPfz9PZTpC1NaIBeTW
-         3W4BBR0I4+ThOg4pTNzh+otO0PUWuwZoPLRXxoscutGP3aYuyce+4ytnsvrCltMDDNK4
-         ir2g==
+        bh=hIzrQXT4h4W7AAe4jB29ri4tAfpUHw+wk/thHCyaZW8=;
+        b=0PynGrDnEoidiWaGP32JQlA4a5VjaKkR4KQKhqeG77Fqs8yD8G7u99UoKt8GalCtyr
+         TqL7WMhubuDC6guqo+zx+QQiRXrUy3UoQoZq6GnxoFv+CzUb3C7wCX8sySwmDY9bEn0I
+         TL7sY5nhJo6IbgDzvcPo3qHI/ZxMgful41e/1caGki+V6vmEJuVIrxDV7wu5ZzAnAFU6
+         j3xDxnAVozU8PD/meTNgkQQFmLFT7NkjPD/++eCvA08Wb0YlR080pVb466SYQTCXDEIY
+         YP/1wX9/CVb3+DFxWBIOy6jI2gWuB7zfUr+as+/UcomSiYO/KQFqN3c0LR6uB4u/0x+H
+         WBWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=BNwwShfJ99REridSMvDgWguNqA1PF7ZieDr3sKpJ4o0=;
-        b=jt99pYc9GI/6Lu0KEW0mH5drgMtDhgcuwR0ZmlFBw90letpkPHx7yNd8GOzQH3bRZx
-         kTF/Epmp0lJ8Ht9ZeTJjq+ywo0RDdwqTrcW28GpCqCoBseHi4DcmVLtedDS1fnIqmHA2
-         3IS6/cdHrZcB57z0ERYZuvV+lLIK8Vce8G1AVMqoRmRGb6f/5C0f4uidVIn7YFNE9ShU
-         XuR+DHmDxZ9/dFqywPGopKfIMC4o3jCvUZwTKSBQyEqa5VlmuOdl2qZqTRNsxvrtJwCe
-         z32+6kqvqoAl77jTBiMHCQf0wkzp5mbQvwNTh9jfWWCXmgb++HJNU0KGljkwLeM43Gmt
-         /oMw==
-X-Gm-Message-State: AOAM530QOAevoNe5xkqpcaViP+uJoWqVaQAf2NPe+v+jCtvYGZf+NhCG
-        wI8t/KJ08M/KTB8nsrdpQjQ1Tw==
-X-Google-Smtp-Source: ABdhPJw1RmiX9LcUGimg1p+XrUjJZb/ZLQ/jT47ghEmT6E6E+AHrNeJigMegsln5rkka5BDgEZAZLg==
-X-Received: by 2002:a05:6e02:ccf:: with SMTP id c15mr13923ilj.189.1615323379158;
-        Tue, 09 Mar 2021 12:56:19 -0800 (PST)
+        bh=hIzrQXT4h4W7AAe4jB29ri4tAfpUHw+wk/thHCyaZW8=;
+        b=lVEQnR8ULXBOa6hASjqMm1xeKPmjpL+IaKra049qGNXbKKBTl67EOa/E4zJbziI/lb
+         l01CGC3z5fOZu4ZTiRO3GfV9k7U+P5b6r4YE/NVXFGVv6M/ZDbpKMKzgUWqtQS3+D7dK
+         zjFoJZsjT/u3ITqHIFMv0Q13vkfTgrzOezRtftrkBhw6/Mn+eK/WAnn0neaWEkN/Xffm
+         B5XNUN9oWUy57PGBw/DvPz/Ta6QyXiqb6PJixuLWun5FoofsJNqmODpqUGXDNbehJHpb
+         mR5RWJRPT7CenpMvgmbdlgbBjM1WYzAGFrVE04ABvtCBh2pX7WiHIzrSNytEkef89W4x
+         qC/A==
+X-Gm-Message-State: AOAM5335gjKx5Jf+1TEvQOCdArDX7gab/vDyLKmCy8gnf04aBkwCPhhp
+        GTrgnVb6R/86eRPc3Fxbxkq1mA==
+X-Google-Smtp-Source: ABdhPJx6YWGVJo0YZArjr64qms/FJr2bXrrXCNjG3kmjLDReMWKK0JV3kBMtCHPy/70KnggJjKw+AA==
+X-Received: by 2002:a92:b003:: with SMTP id x3mr43220ilh.15.1615323557300;
+        Tue, 09 Mar 2021 12:59:17 -0800 (PST)
 Received: from [192.168.1.30] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id s18sm8351758ilt.9.2021.03.09.12.56.18
+        by smtp.gmail.com with ESMTPSA id i8sm7865845ilv.57.2021.03.09.12.59.16
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Mar 2021 12:56:18 -0800 (PST)
-Subject: Re: [PATCH -next] umem: fix error return code in mm_pci_probe()
-To:     'Wei Yongjun <weiyongjun1@huawei.com>
-Cc:     linux-block@vger.kernel.org, Hulk Robot <hulkci@huawei.com>
-References: <20210308123501.2573816-1-weiyongjun1@huawei.com>
+        Tue, 09 Mar 2021 12:59:16 -0800 (PST)
+Subject: Re: [PATCH] block: rsxx: fix error return code of rsxx_pci_probe()
+To:     Jia-Ju Bai <baijiaju1990@gmail.com>, josh.h.morris@us.ibm.com,
+        pjk1939@linux.ibm.com
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20210308100554.10375-1-baijiaju1990@gmail.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <610194e5-47ec-8877-6897-53011fe2bcce@kernel.dk>
-Date:   Tue, 9 Mar 2021 13:56:18 -0700
+Message-ID: <cf2dd66c-0e1e-944e-f4c5-542095f6c9d7@kernel.dk>
+Date:   Tue, 9 Mar 2021 13:59:16 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210308123501.2573816-1-weiyongjun1@huawei.com>
+In-Reply-To: <20210308100554.10375-1-baijiaju1990@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -74,14 +75,44 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/8/21 5:35 AM, 'Wei Yongjun wrote:
-> From: Wei Yongjun <weiyongjun1@huawei.com>
+On 3/8/21 3:05 AM, Jia-Ju Bai wrote:
+> Some error handling segments of rsxx_pci_probe() do not return error code, 
+> so add error code for these segments.
 > 
-> Fix to return negative error code -ENOMEM from the blk_alloc_queue()
-> and dma_alloc_coherent() error handling cases instead of 0, as done
-> elsewhere in this function.
+> Fixes: 8722ff8cdbfa ("block: IBM RamSan 70/80 device driver")
+> Reported-by: TOTE Robot <oslab@tsinghua.edu.cn>
+> Signed-off-by: Jia-Ju Bai <baijiaju1990@gmail.com>
+> ---
+>  drivers/block/rsxx/core.c | 18 +++++++++++++++---
+>  1 file changed, 15 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/block/rsxx/core.c b/drivers/block/rsxx/core.c
+> index 63f549889f87..6b3b9b31a3e8 100644
+> --- a/drivers/block/rsxx/core.c
+> +++ b/drivers/block/rsxx/core.c
+> @@ -760,13 +760,17 @@ static int rsxx_pci_probe(struct pci_dev *dev,
+>  	pci_set_drvdata(dev, card);
+>  
+>  	st = ida_alloc(&rsxx_disk_ida, GFP_KERNEL);
+> -	if (st < 0)
+> +	if (st < 0) {
+> +		st = -ENOMEM;
+>  		goto failed_ida_get;
+> +	}
+>  	card->disk_id = st;
+>  
+>  	st = pci_enable_device(dev);
+> -	if (st)
+> +	if (st) {
+> +		st = -EIO;
+>  		goto failed_enable;
+> +	}
+>  
+>  	pci_set_master(dev);
 
-Applied, thanks.
+Maybe there are some valid parts to the patch, but the two above at
+least make no sense - we're returning the error here as passed from
+ida_alloc or pci_enable_device, why are you overriding them?
 
 -- 
 Jens Axboe
