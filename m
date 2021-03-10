@@ -2,126 +2,224 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1869DC433DB
-	for <linux-block@archiver.kernel.org>; Wed, 10 Mar 2021 01:14:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BDD6C433E6
+	for <linux-block@archiver.kernel.org>; Wed, 10 Mar 2021 01:44:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D73E0650F2
-	for <linux-block@archiver.kernel.org>; Wed, 10 Mar 2021 01:14:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4B603650FD
+	for <linux-block@archiver.kernel.org>; Wed, 10 Mar 2021 01:44:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230320AbhCJBNz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 9 Mar 2021 20:13:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57260 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229875AbhCJBNq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Mar 2021 20:13:46 -0500
-Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93EAAC06174A;
-        Tue,  9 Mar 2021 17:13:46 -0800 (PST)
-Received: by mail-pg1-x52b.google.com with SMTP id a4so10251547pgc.11;
-        Tue, 09 Mar 2021 17:13:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=HAvrErAtPddyjYyJYAyf788CsMnyM1RI7DtELqfq+ic=;
-        b=RV+aERCThFCVgscdZboFZd7Uq+eloAhBXvO9Xw8cETG9WOBDmcUXxdna+bRNwZzXco
-         d25hyE6VQJRqwsvsErDGzftMheK8lZkdl7xUVC81IFN6FKLHN5rukiTIYGmGqbwLSGaj
-         lRxv87zD6w+W+5U9BDHbioH3ExjdLWzyBxZldHquLWG/1LAa4x1NTre6GH57uhSXmiNv
-         Afhw+9H8GmfFJri4NmOCEZqkWpQU8MqJrlQS62XoIOUCcui4ihhAz9a6edkYWuBGgi82
-         aXLD91kyXanfntaYGvGEokLEKtu9Po/sPRs2NgUcDFZA//Y6EdCITBsbOqs/LSVPAoAN
-         5kaQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=HAvrErAtPddyjYyJYAyf788CsMnyM1RI7DtELqfq+ic=;
-        b=HKOa77o7SZD/qDbFfO1cPAkZLyDi+95mADbvFWeUuzGo/AVNcZC7fNF3smn65kzd5z
-         gKzqQRaM2lN6zdDejj+fNFI8+i6JNn22H7LB/1wMZXTvcQPjxhc9bCc4uvN4C18nsGtq
-         uU/qUeV+mpLHRRi8NPOGrKBUnJC6zte0DBBFx9lhJNJg1BJaSxwqj4FHbDm0u68Q6voS
-         mEIYuIJ+r8hckds2YfrvpXrwLpwSDHMoKPVi3s4q59hxq59hf6RW/ShrK//NDcTgOafL
-         /HEv966WU8elkOBQVEdSXFvDYkB1ZxUnkHvYRiCtpPHCda3kPyOTYOPFJohCdK8foX6e
-         P//w==
-X-Gm-Message-State: AOAM5328xBMBeanQw+VH6JbZwOEA2w1Xw91bKQYbyBzZZAm5Ruui54PV
-        Wy8drvjoEJAUNnL3BEmZevW/+dnwLM5+nZhb
-X-Google-Smtp-Source: ABdhPJwGBk0Dixui9JMCtm7RGKjxDs5DtOcvorAnSHG6EIX9f+zAin4cuiqNJaMEBLXmUsu7Ob98Kw==
-X-Received: by 2002:a63:ab05:: with SMTP id p5mr516446pgf.149.1615338825867;
-        Tue, 09 Mar 2021 17:13:45 -0800 (PST)
-Received: from [10.38.0.14] ([45.135.186.59])
-        by smtp.gmail.com with ESMTPSA id s28sm14629138pfd.155.2021.03.09.17.13.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Mar 2021 17:13:45 -0800 (PST)
-Subject: Re: [PATCH] block: rsxx: fix error return code of rsxx_pci_probe()
-To:     Jens Axboe <axboe@kernel.dk>, josh.h.morris@us.ibm.com,
-        pjk1939@linux.ibm.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210308100554.10375-1-baijiaju1990@gmail.com>
- <cf2dd66c-0e1e-944e-f4c5-542095f6c9d7@kernel.dk>
-From:   Jia-Ju Bai <baijiaju1990@gmail.com>
-Message-ID: <0a0a6160-f469-9be8-a9e2-3067c02f0b57@gmail.com>
-Date:   Wed, 10 Mar 2021 09:13:43 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+        id S231382AbhCJBnp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 9 Mar 2021 20:43:45 -0500
+Received: from mga11.intel.com ([192.55.52.93]:20658 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231422AbhCJBnm (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 9 Mar 2021 20:43:42 -0500
+IronPort-SDR: JZTopoaVIAtciT6GBg6LMHiGyQCBhkM354fHXBs8ZoxscnF3O47DCdloFlpDIcNBt+n2s6Tnwm
+ YRRO+SwcBx4w==
+X-IronPort-AV: E=McAfee;i="6000,8403,9917"; a="185004425"
+X-IronPort-AV: E=Sophos;i="5.81,236,1610438400"; 
+   d="scan'208";a="185004425"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Mar 2021 17:43:39 -0800
+IronPort-SDR: Y7+W9Tom12E92Bku2I5dnJLtcYucyCcPGg1e9R0eUmX++VmOvYAoe74ImkoAF04m6TxXJHyD+q
+ JzwsFQh5Lx0Q==
+X-IronPort-AV: E=Sophos;i="5.81,236,1610438400"; 
+   d="scan'208";a="409973299"
+Received: from dwillia2-desk3.jf.intel.com (HELO dwillia2-desk3.amr.corp.intel.com) ([10.54.39.25])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Mar 2021 17:43:38 -0800
+Subject: [PATCH v2] libnvdimm: Notify disk drivers to revalidate region
+ read-only
+From:   Dan Williams <dan.j.williams@intel.com>
+To:     linux-nvdimm@lists.01.org
+Cc:     Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>,
+        kernel test robot <lkp@intel.com>,
+        Vishal Verma <vishal.l.verma@intel.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Date:   Tue, 09 Mar 2021 17:43:38 -0800
+Message-ID: <161534060720.528671.2341213328968989192.stgit@dwillia2-desk3.amr.corp.intel.com>
+User-Agent: StGit/0.18-3-g996c
 MIME-Version: 1.0
-In-Reply-To: <cf2dd66c-0e1e-944e-f4c5-542095f6c9d7@kernel.dk>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Previous kernels allowed the BLKROSET to override the disk's read-only
+status. With that situation fixed the pmem driver needs to rely on
+notification events to reevaluate the disk read-only status after the
+host region has been marked read-write.
 
+Recall that when libnvdimm determines that the persistent memory has
+lost persistence (for example lack of energy to flush from DRAM to FLASH
+on an NVDIMM-N device) it marks the region read-only, but that state can
+be overridden by the user via:
 
-On 2021/3/10 4:59, Jens Axboe wrote:
-> On 3/8/21 3:05 AM, Jia-Ju Bai wrote:
->> Some error handling segments of rsxx_pci_probe() do not return error code,
->> so add error code for these segments.
->>
->> Fixes: 8722ff8cdbfa ("block: IBM RamSan 70/80 device driver")
->> Reported-by: TOTE Robot <oslab@tsinghua.edu.cn>
->> Signed-off-by: Jia-Ju Bai <baijiaju1990@gmail.com>
->> ---
->>   drivers/block/rsxx/core.c | 18 +++++++++++++++---
->>   1 file changed, 15 insertions(+), 3 deletions(-)
->>
->> diff --git a/drivers/block/rsxx/core.c b/drivers/block/rsxx/core.c
->> index 63f549889f87..6b3b9b31a3e8 100644
->> --- a/drivers/block/rsxx/core.c
->> +++ b/drivers/block/rsxx/core.c
->> @@ -760,13 +760,17 @@ static int rsxx_pci_probe(struct pci_dev *dev,
->>   	pci_set_drvdata(dev, card);
->>   
->>   	st = ida_alloc(&rsxx_disk_ida, GFP_KERNEL);
->> -	if (st < 0)
->> +	if (st < 0) {
->> +		st = -ENOMEM;
->>   		goto failed_ida_get;
->> +	}
->>   	card->disk_id = st;
->>   
->>   	st = pci_enable_device(dev);
->> -	if (st)
->> +	if (st) {
->> +		st = -EIO;
->>   		goto failed_enable;
->> +	}
->>   
->>   	pci_set_master(dev);
-> Maybe there are some valid parts to the patch, but the two above at
-> least make no sense - we're returning the error here as passed from
-> ida_alloc or pci_enable_device, why are you overriding them?
->
+   echo 0 > /sys/bus/nd/devices/regionX/read_only
 
-Ah, sorry for these incorrect parts...
-I will send a new patch.
+...to date there is no notification that the region has restored
+persistence, so the user override is the only recovery.
 
+Fixes: 52f019d43c22 ("block: add a hard-readonly flag to struct gendisk")
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Martin K. Petersen <martin.petersen@oracle.com>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Jens Axboe <axboe@kernel.dk>
+Reported-by: kernel test robot <lkp@intel.com>
+Reported-by: Vishal Verma <vishal.l.verma@intel.com>
+Signed-off-by: Dan Williams <dan.j.williams@intel.com>
+---
+Changes since v1 [1]:
+- Move from the sinking ship of revalidate_disk() to the local hotness
+  of nd_pmem_notify() (hch).
 
-Best wishes,
-Jia-Ju Bai
+[1]: http://lore.kernel.org/r/161527286194.446794.5215036039655765042.stgit@dwillia2-desk3.amr.corp.intel.com
+
+ drivers/nvdimm/bus.c         |   14 ++++++--------
+ drivers/nvdimm/pmem.c        |   37 +++++++++++++++++++++++++++++++++----
+ drivers/nvdimm/region_devs.c |    7 +++++++
+ include/linux/nd.h           |    1 +
+ 4 files changed, 47 insertions(+), 12 deletions(-)
+
+diff --git a/drivers/nvdimm/bus.c b/drivers/nvdimm/bus.c
+index 48f0985ca8a0..3a777d0073b7 100644
+--- a/drivers/nvdimm/bus.c
++++ b/drivers/nvdimm/bus.c
+@@ -631,16 +631,14 @@ void nvdimm_check_and_set_ro(struct gendisk *disk)
+ 	struct nd_region *nd_region = to_nd_region(dev->parent);
+ 	int disk_ro = get_disk_ro(disk);
+ 
+-	/*
+-	 * Upgrade to read-only if the region is read-only preserve as
+-	 * read-only if the disk is already read-only.
+-	 */
+-	if (disk_ro || nd_region->ro == disk_ro)
++	/* catch the disk up with the region ro state */
++	if (disk_ro == nd_region->ro)
+ 		return;
+ 
+-	dev_info(dev, "%s read-only, marking %s read-only\n",
+-			dev_name(&nd_region->dev), disk->disk_name);
+-	set_disk_ro(disk, 1);
++	dev_info(dev, "%s read-%s, marking %s read-%s\n",
++		 dev_name(&nd_region->dev), nd_region->ro ? "only" : "write",
++		 disk->disk_name, nd_region->ro ? "only" : "write");
++	set_disk_ro(disk, nd_region->ro);
+ }
+ EXPORT_SYMBOL(nvdimm_check_and_set_ro);
+ 
+diff --git a/drivers/nvdimm/pmem.c b/drivers/nvdimm/pmem.c
+index b8a85bfb2e95..7daac795db39 100644
+--- a/drivers/nvdimm/pmem.c
++++ b/drivers/nvdimm/pmem.c
+@@ -26,6 +26,7 @@
+ #include <linux/mm.h>
+ #include <asm/cacheflush.h>
+ #include "pmem.h"
++#include "btt.h"
+ #include "pfn.h"
+ #include "nd.h"
+ 
+@@ -585,7 +586,7 @@ static void nd_pmem_shutdown(struct device *dev)
+ 	nvdimm_flush(to_nd_region(dev->parent), NULL);
+ }
+ 
+-static void nd_pmem_notify(struct device *dev, enum nvdimm_event event)
++static void pmem_revalidate_poison(struct device *dev)
+ {
+ 	struct nd_region *nd_region;
+ 	resource_size_t offset = 0, end_trunc = 0;
+@@ -595,9 +596,6 @@ static void nd_pmem_notify(struct device *dev, enum nvdimm_event event)
+ 	struct range range;
+ 	struct kernfs_node *bb_state;
+ 
+-	if (event != NVDIMM_REVALIDATE_POISON)
+-		return;
+-
+ 	if (is_nd_btt(dev)) {
+ 		struct nd_btt *nd_btt = to_nd_btt(dev);
+ 
+@@ -635,6 +633,37 @@ static void nd_pmem_notify(struct device *dev, enum nvdimm_event event)
+ 		sysfs_notify_dirent(bb_state);
+ }
+ 
++static void pmem_revalidate_region(struct device *dev)
++{
++	struct pmem_device *pmem;
++
++	if (is_nd_btt(dev)) {
++		struct nd_btt *nd_btt = to_nd_btt(dev);
++		struct btt *btt = nd_btt->btt;
++
++		nvdimm_check_and_set_ro(btt->btt_disk);
++		return;
++	}
++
++	pmem = dev_get_drvdata(dev);
++	nvdimm_check_and_set_ro(pmem->disk);
++}
++
++static void nd_pmem_notify(struct device *dev, enum nvdimm_event event)
++{
++	switch (event) {
++	case NVDIMM_REVALIDATE_POISON:
++		pmem_revalidate_poison(dev);
++		break;
++	case NVDIMM_REVALIDATE_REGION:
++		pmem_revalidate_region(dev);
++		break;
++	default:
++		dev_WARN_ONCE(dev, 1, "notify: unknown event: %d\n", event);
++		break;
++	}
++}
++
+ MODULE_ALIAS("pmem");
+ MODULE_ALIAS_ND_DEVICE(ND_DEVICE_NAMESPACE_IO);
+ MODULE_ALIAS_ND_DEVICE(ND_DEVICE_NAMESPACE_PMEM);
+diff --git a/drivers/nvdimm/region_devs.c b/drivers/nvdimm/region_devs.c
+index ef23119db574..51870eb51da6 100644
+--- a/drivers/nvdimm/region_devs.c
++++ b/drivers/nvdimm/region_devs.c
+@@ -518,6 +518,12 @@ static ssize_t read_only_show(struct device *dev,
+ 	return sprintf(buf, "%d\n", nd_region->ro);
+ }
+ 
++static int revalidate_read_only(struct device *dev, void *data)
++{
++	nd_device_notify(dev, NVDIMM_REVALIDATE_REGION);
++	return 0;
++}
++
+ static ssize_t read_only_store(struct device *dev,
+ 		struct device_attribute *attr, const char *buf, size_t len)
+ {
+@@ -529,6 +535,7 @@ static ssize_t read_only_store(struct device *dev,
+ 		return rc;
+ 
+ 	nd_region->ro = ro;
++	device_for_each_child(dev, NULL, revalidate_read_only);
+ 	return len;
+ }
+ static DEVICE_ATTR_RW(read_only);
+diff --git a/include/linux/nd.h b/include/linux/nd.h
+index cec526c8043d..ee9ad76afbba 100644
+--- a/include/linux/nd.h
++++ b/include/linux/nd.h
+@@ -11,6 +11,7 @@
+ 
+ enum nvdimm_event {
+ 	NVDIMM_REVALIDATE_POISON,
++	NVDIMM_REVALIDATE_REGION,
+ };
+ 
+ enum nvdimm_claim_class {
+
