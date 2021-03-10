@@ -2,278 +2,108 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A27A1C433DB
-	for <linux-block@archiver.kernel.org>; Wed, 10 Mar 2021 20:02:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6AEFC433E0
+	for <linux-block@archiver.kernel.org>; Wed, 10 Mar 2021 20:22:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 78A8F64FD2
-	for <linux-block@archiver.kernel.org>; Wed, 10 Mar 2021 20:02:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9E3B564FCD
+	for <linux-block@archiver.kernel.org>; Wed, 10 Mar 2021 20:22:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232254AbhCJUBw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 Mar 2021 15:01:52 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31783 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232329AbhCJUBg (ORCPT
+        id S231687AbhCJUWN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 Mar 2021 15:22:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51724 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231664AbhCJUVx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 Mar 2021 15:01:36 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615406496;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=poyGnt9n0OdNHM1Evcpdrl3pvfRWRlWbLJKTw7KwIcM=;
-        b=TPjVVVJ/c+W+ALNq0U62w2C4Jj8/vRB5HVB5wvvNDu+3o1f3Sn1Fvfc3lU68EVHIPApFa1
-        REg9ZU2SD5CZ7zmbtaFsM6e5tHmFxI1cmMCj0TByr2PNakJJKBpaSbzVxDX3epZGzbvya2
-        t3YTUlxaYTv4+grvtoRdtkWSRDUOuag=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-283-7d03MIJjME2V4YZ5Lf2NXA-1; Wed, 10 Mar 2021 15:01:31 -0500
-X-MC-Unique: 7d03MIJjME2V4YZ5Lf2NXA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7A9BF81746F;
-        Wed, 10 Mar 2021 20:01:29 +0000 (UTC)
-Received: from localhost (unknown [10.18.25.174])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9C31D83C11;
-        Wed, 10 Mar 2021 20:01:28 +0000 (UTC)
-Date:   Wed, 10 Mar 2021 15:01:27 -0500
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Jeffle Xu <jefflexu@linux.alibaba.com>
-Cc:     axboe@kernel.dk, joseph.qi@linux.alibaba.com,
-        caspar@linux.alibaba.com, hch@lst.de, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, io-uring@vger.kernel.org, ejt@redhat.com
-Subject: Re: [PATCH v3 00/11] dm: support IO polling
-Message-ID: <20210310200127.GA22542@redhat.com>
-References: <20210208085243.82367-1-jefflexu@linux.alibaba.com>
+        Wed, 10 Mar 2021 15:21:53 -0500
+Received: from mail-il1-x135.google.com (mail-il1-x135.google.com [IPv6:2607:f8b0:4864:20::135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0F09C061574
+        for <linux-block@vger.kernel.org>; Wed, 10 Mar 2021 12:21:53 -0800 (PST)
+Received: by mail-il1-x135.google.com with SMTP id d5so16818131iln.6
+        for <linux-block@vger.kernel.org>; Wed, 10 Mar 2021 12:21:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=16SMPeE21CushitzJ7QMJXGi9ZvpBG0rD0GsXsI6hkU=;
+        b=spJ0UNdk80g6IuuuMgwcY1AR/MlQcbuEaGPdCTXj/1jApxV2p8lLCbpw2FXeZARvWw
+         y/3ktMyTJ21jResBV0RdchCy0MqpQWNv6dER4WFlnhzYk11bwv9aqcm+KgHMLqKIFAg9
+         wF9GAaMI7rlW6A9bWBqHeVNEog/S6909mlwkSYh4TiTs7CPTx7DyMRuCfR5rgcfLGNPw
+         7niYk993aUFxdD50MZMH/zMHbKSz3aFLl/hTPoGJ9DZoAjDfDnhpA9Yejl0H8WuBPrrr
+         mEbiTH3WB8Tk5vq0oyUEyB0M7QqkyfIHA/kpU0TP4QB2m7ME4eNl4B6QEjUSfovzkZcb
+         hE7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=16SMPeE21CushitzJ7QMJXGi9ZvpBG0rD0GsXsI6hkU=;
+        b=DlRwd1h2s9HfE9QGRGbVaPNXMJ0zEDty0QvWpk34isZ5/Dkw9qC07E3BpYSQ2rxgGy
+         SsNp0u2hWxDgVtOY5G5emJx0570KiCv6D1xTUsmy/TJkRPFsjYOIKO9SpZxvbOEI+JKb
+         QVcp5ereeGOOnoxmwrgCF/FfQCxRDLwCMmbvhZQV2ey4QJ1EuDSYbwiQQNTcZHjyFsDg
+         BlfFyl2c+m49sWWaoKDLswvIOy/M0w9Duwi7dIs9MIsbLFwg+g81jDZDmEogYYa6xR+X
+         LI5jKVJL/UAc4fCEpO6mfPiby05Y+3j3vuDehDGdCkoTVUbSKd3oMlKnIJgaVUdm9SrG
+         3gcg==
+X-Gm-Message-State: AOAM533WXgcU9sm3hHgfRntOdVLw2HUTDsmC0yz15PrEYqpYc+MojwvF
+        aG+W/dzXZ/uiiRFlH7YTPpuwO8agZjY00Q==
+X-Google-Smtp-Source: ABdhPJzg7g/La5YMg5wKnM0/F2ii9+d2ML0g09VHJPp0z1r9WLx+9Fj1ToRDzy/DzFD7axi1WAT7xQ==
+X-Received: by 2002:a92:1312:: with SMTP id 18mr3843559ilt.92.1615407713037;
+        Wed, 10 Mar 2021 12:21:53 -0800 (PST)
+Received: from [192.168.1.30] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id h15sm199377ils.73.2021.03.10.12.21.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 10 Mar 2021 12:21:52 -0800 (PST)
+Subject: Re: -Walign-mismatch in block/blk-mq.c
+To:     Nathan Chancellor <nathan@kernel.org>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        clang-built-linux@googlegroups.com
+References: <20210310182307.zzcbi5w5jrmveld4@archlinux-ax161>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <99cf90ea-81c0-e110-4815-dd1f7df36cb4@kernel.dk>
+Date:   Wed, 10 Mar 2021 13:21:52 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210208085243.82367-1-jefflexu@linux.alibaba.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20210310182307.zzcbi5w5jrmveld4@archlinux-ax161>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Feb 08 2021 at  3:52am -0500,
-Jeffle Xu <jefflexu@linux.alibaba.com> wrote:
+On 3/10/21 11:23 AM, Nathan Chancellor wrote:
+> Hi Jens,
+> 
+> There is a new clang warning added in the development branch,
+> -Walign-mismatch, which shows an instance in block/blk-mq.c:
+> 
+> block/blk-mq.c:630:39: warning: passing 8-byte aligned argument to
+> 32-byte aligned parameter 2 of 'smp_call_function_single_async' may
+> result in an unaligned pointer access [-Walign-mismatch]
+>                 smp_call_function_single_async(cpu, &rq->csd);
+>                                                     ^
+> 1 warning generated.
+> 
+> There appears to be some history here as I can see that this member was
+> purposefully unaligned in commit 4ccafe032005 ("block: unalign
+> call_single_data in struct request"). However, I later see a change in
+> commit 7c3fb70f0341 ("block: rearrange a few request fields for better
+> cache layout") that seems somewhat related. Is it possible to get back
+> the alignment by rearranging the structure again? This seems to be the
+> only solution for the warning aside from just outright disabling it,
+> which would be a shame since it seems like it could be useful for
+> architectures that cannot handle unaligned accesses well, unless I am
+> missing something obvious :)
 
-> 
-> [Performance]
-> 1. One thread (numjobs=1) randread (bs=4k, direct=1) one dm-linear
-> device, which is built upon 3 nvme devices, with one polling hw
-> queue per nvme device.
-> 
->      | IOPS (IRQ mode) | IOPS (iopoll=1 mode) | diff
-> ---- | --------------- | -------------------- | ----
->   dm | 		  208k |		 279k | ~34%
-> 
-> 
-> 2. Three threads (numjobs=3) randread (bs=4k, direct=1) one dm-linear
-> device, which is built upon 3 nvme devices, with one polling hw
-> queue per nvme device.
-> 
-> It's compared to 3 threads directly randread 3 nvme devices, with one
-> polling hw queue per nvme device. No CPU affinity set for these 3
-> threads. Thus every thread can access every nvme device
-> (filename=/dev/nvme0n1:/dev/nvme1n1:/dev/nvme2n1), i.e., every thread
-> need to competing for every polling hw queue.
-> 
->      | IOPS (IRQ mode) | IOPS (iopoll=1 mode) | diff
-> ---- | --------------- | -------------------- | ----
->   dm | 		  615k |		 728k | ~18%
-> nvme | 		  728k |		 873k | ~20%
-> 
-> The result shows that the performance gain of bio-based polling is
-> comparable as that of mq polling in the same test case.
-> 
-> 
-> 3. Three threads (numjobs=3) randread (bs=12k, direct=1) one
-> **dm-stripe** device, which is built upon 3 nvme devices, with one
-> polling hw queue per nvme device.
-> 
-> It's compared to 3 threads directly randread 3 nvme devices, with one
-> polling hw queue per nvme device. No CPU affinity set for these 3
-> threads. Thus every thread can access every nvme device
-> (filename=/dev/nvme0n1:/dev/nvme1n1:/dev/nvme2n1), i.e., every thread
-> need to competing for every polling hw queue.
-> 
->      | IOPS (IRQ mode) | IOPS (iopoll=1 mode) | diff
-> ---- | --------------- | -------------------- | ----
->   dm | 		  314k |		 354k | ~13%
-> nvme | 		  728k |		 873k | ~20%
-> 
+It should not be hard to ensure that alignment without re-introducing
+the bloat. Is there some background on why 32-byte alignment is
+required?
 
-So this "3." case is meant to illustrate effects of polling when bio is
-split to 3 different underlying blk-mq devices. (think it odd that
-dm-stripe across 3 nvme devices is performing so much worse than a
-single nvme device)
-
-Would be nice to see comparison of this same workload but _with_ CPU
-affinity to show relative benefit of your patch 11 in this series (where
-you try to leverage CPU pinning).
-
-In general, I don't think patch 11 a worthwhile effort.  It is a
-half-measure that is trying to paper over the fact that this bio-based
-IO polling patchset is quite coarse grained about how it copes with the
-need to poll multiple devices.
-
-Patch 10 is a proper special case that should be accounted for (when a
-bio isn't split and only gets submitted to a single blk-mq
-device/hctx).  But even patch 10's approach is fragile (we we've
-discussed in private and I'll touch on in reply to patch 10).
-
-But I think patch 11 should be dropped and we defer optimizing bio
-splitting at a later time with follow-on work.
-
-Just so you're aware, I'm now thinking the proper way forward is to
-update DM core, at the time of DM table load, to assemble an array of
-underlying _data_ devices in that table (as iterated with
-.iterate_devices) -- this would allow each underlying data device to be
-assigned an immutable index for the lifetime of a DM table.  It'd be
-hooked off the 'struct dm_table' and would share that object's
-lifetime.
-
-With that bit of infrastructure in place, we could then take steps to
-make DM's cookie more dense in its description of underlying devices
-that need polling.  This is where I'll get a bit handwavvy.. but I
-raised this idea with Joe Thornber and he is going to have a think about
-it too.
-
-But this is all to say: optimizing the complex case of bio-splitting
-that is such an integral part of bio-based IO processing needs more than
-what you've attempted to do (noble effort on your part but again, really
-just a half-measure).
-
-SO I think it best to keep the initial implementation of bio-based
-polling relatively simple by laying foundation for follow-on work.  And
-it is also important to _not_ encode in block core some meaning to what
-_should_ be a largely opaque cookie (blk_qc_t) that is for the
-underlying driver to make sense of.
-
-
-> 
-> 4. This patchset shall do no harm to the performance of the original mq
-> polling. Following is the test results of one thread (numjobs=1)
-> randread (bs=4k, direct=1) one nvme device.
-> 
-> 	    	 | IOPS (IRQ mode) | IOPS (iopoll=1 mode) | diff
-> ---------------- | --------------- | -------------------- | ----
-> without patchset | 	      242k |		     332k | ~39%
-> with patchset    |	      236k |		     332k | ~39%
-
-OK, good, this needs to be the case.
-
-> 
-> [Changes since v2]
-> 
-> Patchset v2 caches all hw queues (in polling mode) of underlying mq
-> devices in dm layer. The polling routine actually iterates through all
-> these cached hw queues.
-> 
-> However, mq may change the queue mapping at runtime (e.g., NVMe RESET
-> command), thus the cached hw queues in dm layer may be out-of-date. Thus
-> patchset v3 falls back to the implementation of the very first RFC
-> version, in which the mq layer needs to export one interface iterating
-> all polling hw queues (patch 5), and the bio-based polling routine just
-> calls this interface to iterate all polling hw queues.
-> 
-> Besides, several new optimization is proposed.
-> 
-> 
-> - patch 1,2,7
-> same as v2, untouched
-> 
-> - patch 3
-> Considering advice from Christoph Hellwig, while refactoring blk_poll(),
-> split mq and bio-based polling routine from the very beginning. Now
-> blk_poll() is just a simple entry. blk_bio_poll() is simply copied from
-> blk_mq_poll(), while the loop structure is some sort of duplication
-> though.
-> 
-> - patch 4
-> This patch is newly added to support turning on/off polling through
-> '/sys/block/<dev>/queue/io_poll' dynamiclly for bio-based devices.
-> Patchset v2 implemented this functionality by added one new queue flag,
-> which is not preferred since the queue flag resource is quite short of
-> nowadays.
-> 
-> - patch 5
-> This patch is newly added, preparing for the following bio-based
-> polling. The following bio-based polling will call this helper function,
-> accounting on the corresponding hw queue.
-> 
-> - patch 6
-> It's from the very first RFC version, preparing for the following
-> bio-based polling.
-> 
-> - patch 8
-> One fixing patch needed by the following bio-based polling. It's
-> actually a v2 of [1]. I had sent the v2 singly in-reply-to [1], though
-> it has not been visible on the mailing list maybe due to the delay.
-> 
-> - patch 9
-> It's from the very first RFC version.
-> 
-> - patch 10
-> This patch is newly added. Patchset v2 had ever proposed one
-> optimization that, skipping the **busy** hw queues during the iteration
-> phase. Back upon that time, one flag of 'atomic_t' is specifically
-> maintained in dm layer, representing if the corresponding hw queue is
-> busy or not. The idea is inherited, while the implementation changes.
-> Now @nvmeq->cq_poll_lock is used directly here, no need for extra flag
-> anymore.
-> 
-> This optimization can significantly reduce the competition for one hw
-> queue between multiple polling instances. Following statistics is the
-> test result when 3 threads concurrently randread (bs=4k, direct=1) one
-> dm-linear device, which is built upon 3 nvme devices, with one polling
-> hw queue per nvme device.
-> 
-> 	    | IOPS (IRQ mode) | IOPS (iopoll=1 mode) | diff
-> ----------- | --------------- | -------------------- | ----
-> without opt | 		 318k |		 	256k | ~-20%
-> with opt    |		 314k |		 	354k | ~13%
-> 							
-> 
-> - patch 11
-> This is another newly added optimizatin for bio-based polling.
-> 
-> One intuitive insight is that, when the original bio submitted to dm
-> device doesn't get split, then the bio gets enqueued into only one hw
-> queue of one of the underlying mq devices. In this case, we no longer
-> need to track all split bios, and one cookie (for the only split bio)
-> is enough. It is implemented by returning the pointer to the
-> corresponding hw queue in this case.
-> 
-> It should be safe by directly returning the pointer to the hw queue,
-> since 'struct blk_mq_hw_ctx' won't be freed during the whole lifetime of
-> 'struct request_queue'. Even when the number of hw queues may decrease
-> when NVMe RESET happens, the 'struct request_queue' structure of decreased
-> hw queues won't be freed, instead it's buffered into
-> &q->unused_hctx_list list.
-> 
-> Though this optimization seems quite intuitive, the performance test
-> shows that it does no benefit nor harm to the performance, while 3
-> threads concurrently randreading (bs=4k, direct=1) one dm-linear
-> device, which is built upon 3 nvme devices, with one polling hw queue
-> per nvme device.
-> 
-> I'm not sure why it doesn't work, maybe because the number of devices,
-> or the depth of the devcice stack is to low in my test case?
-
-Looks like these patch references are stale (was relative to v3 I
-think).. e.g: "patch 11" from v3 is really "patch 10" in v5.. but its
-implementation has changed because Mikulas pointed out that the
-implementation was unsafe.. IIRC?
-
-Anyway, I'll just focus on reviewing each patch in this v5 now.
-
-Thanks,
-Mike
+-- 
+Jens Axboe
 
