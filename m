@@ -2,324 +2,173 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 519BBC433E0
-	for <linux-block@archiver.kernel.org>; Thu, 11 Mar 2021 07:08:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE37BC433E6
+	for <linux-block@archiver.kernel.org>; Thu, 11 Mar 2021 07:26:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 05A1264FD3
-	for <linux-block@archiver.kernel.org>; Thu, 11 Mar 2021 07:08:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 73CED64FAA
+	for <linux-block@archiver.kernel.org>; Thu, 11 Mar 2021 07:26:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231428AbhCKHHt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 11 Mar 2021 02:07:49 -0500
-Received: from out30-43.freemail.mail.aliyun.com ([115.124.30.43]:51120 "EHLO
-        out30-43.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230458AbhCKHHX (ORCPT
+        id S231613AbhCKH0A (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 11 Mar 2021 02:26:00 -0500
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:46730 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231520AbhCKHZs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Mar 2021 02:07:23 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e01424;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0URQREIY_1615446438;
-Received: from admindeMacBook-Pro-2.local(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0URQREIY_1615446438)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Thu, 11 Mar 2021 15:07:19 +0800
-Subject: Re: [dm-devel] [PATCH v3 00/11] dm: support IO polling
-To:     Mike Snitzer <snitzer@redhat.com>
-Cc:     axboe@kernel.dk, ejt@redhat.com, caspar@linux.alibaba.com,
-        io-uring@vger.kernel.org, linux-block@vger.kernel.org,
-        joseph.qi@linux.alibaba.com, dm-devel@redhat.com, hch@lst.de
-References: <20210208085243.82367-1-jefflexu@linux.alibaba.com>
- <20210310200127.GA22542@redhat.com>
-From:   JeffleXu <jefflexu@linux.alibaba.com>
-Message-ID: <a67102b8-d799-c072-3d57-5267e3ea060e@linux.alibaba.com>
-Date:   Thu, 11 Mar 2021 15:07:18 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.7.0
+        Thu, 11 Mar 2021 02:25:48 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1615447548; x=1646983548;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=FBGcvCEj254gZQUwFxXgLlHXamEzHqbmsASfYOOIP8I=;
+  b=AQbsScV/Auqhm0QwCCt5O0y00orlnn8o23JcbqydcHl2FocdaFsYq42+
+   lCvyYvHGcygLAv0qk5VM1a6clt+diJkOD+38DSJrK2oR8WxEWAN4G0L7j
+   oTunOQAphYwupgUFizPSDmCO6aTOPxoGxXm/CkHR2kpzW5PfSblDTW7+w
+   cOSDqTKpo3PcIavBTqoguSiRVYK5XJH5katjP1QaLVHCV02NNQLivGIjU
+   CNrvnhIiSLcLhnXmML7WN5JniYFKny+NQcoCRoNNH7Rr9lefNCS6V4YuA
+   N4OQON9Jme9AhQ0YHwrN+SPW5n599xH8wjRHiZYWFvK1nS+yLGQBW3rU/
+   Q==;
+IronPort-SDR: yluKivBy6CY07qUIDP19g0HtStm1bXZzdS1CzVikH6nL6HursA9TSBfHWIMxM2BiLbfFhiWy4r
+ 5USwyAf33NtMrlraMg9veeN+nTK2isGkrA6CuiuCWdhXvf4fw6nQFszWCHXQwRXnIw5T4atA+c
+ q1PS4EOf26m2dhYkSngtpUZq+LWNTbRmm7Xbs7z3yI/81ws07Fz20XQd1dJOe4nbFlwI0I4ktg
+ v/jo5O+XfM0fUtZFYEONNyZykNeNsp6OXCMwbZjHK7lkCpC6mhOsG3c6QwuLF0lXls2R6O68fH
+ yxM=
+X-IronPort-AV: E=Sophos;i="5.81,239,1610380800"; 
+   d="scan'208";a="272577357"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 11 Mar 2021 15:25:48 +0800
+IronPort-SDR: 1RpPEcawbEseXY+v8wBZsiyu/5f6fXNdQQYvLAASGERuHjqm7yssYGHaUwcN8iFaKvnnZGI3A5
+ nDKpdfKmyAKnVEpjf8P0WnC0qNl+dRc3JKZLatU9FQjo8di5E83epQt9V3wPljxlYk18+5c5jF
+ AS8ee0FAVj9OumAYQYix3BS3/ZLb2yYRgQQLB/Jw8CBS76tkYmX34nHvx+ofZLJ0fPx8fLE+q+
+ vOEQChmaIr1WqNQonyQTYmvu7vojVkZeEn3dz56JhGd7kmDnN0Lns8Wsz29gBb0eFCsrAn/4Jq
+ Ix9wDQb4MnkxAHyxvusF7P2N
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2021 23:08:27 -0800
+IronPort-SDR: 9ndqmu0z3TgdI22Ng5268iL2+xU4Bgvj//nAcLjAP+CLoF1ExSqcgF2q8R5rwZScViE3D4m3rK
+ AMbYi899A7rPUkyFBiA3SudUauP0rbR3Fo5CiFEw1F52Qb1MK00Zc6lkRoc9MS/lvEwo8ebU5F
+ L8QQr50MrHdxZtkKRixwgF+dVIjetMsrr6MXUvNnD0sC7RavvCV14eGscJLyzEVC8pfmAEUOvJ
+ gSVmfgl6AmNI8X/B8eZGiViRcXSfJxQGVvWq43GIIuSRgNm6ydecEaMgAc5UiQY3QpFlL7E8q6
+ YNs=
+WDCIronportException: Internal
+Received: from shindev.dhcp.fujisawa.hgst.com ([10.149.52.189])
+  by uls-op-cesaip01.wdc.com with ESMTP; 10 Mar 2021 23:25:47 -0800
+From:   Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Cc:     Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Keith Busch <kbusch@kernel.org>, Jan Kara <jack@suse.cz>,
+        Kanchan Joshi <joshi.k@samsung.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: [PATCH v3] block: Discard page cache of zone reset target range
+Date:   Thu, 11 Mar 2021 16:25:46 +0900
+Message-Id: <20210311072546.678999-1-shinichiro.kawasaki@wdc.com>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
-In-Reply-To: <20210310200127.GA22542@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+When zone reset ioctl and data read race for a same zone on zoned block
+devices, the data read leaves stale page cache even though the zone
+reset ioctl zero clears all the zone data on the device. To avoid
+non-zero data read from the stale page cache after zone reset, discard
+page cache of reset target zones in blkdev_zone_mgmt_ioctl(). Introduce
+the helper function blkdev_truncate_zone_range() to discard the page
+cache. Ensure the page cache discarded by calling the helper function
+before and after zone reset in same manner as fallocate does.
 
+This patch can be applied back to the stable kernel version v5.10.y.
+Rework is needed for older stable kernels.
 
-On 3/11/21 4:01 AM, Mike Snitzer wrote:
-> On Mon, Feb 08 2021 at  3:52am -0500,
-> Jeffle Xu <jefflexu@linux.alibaba.com> wrote:
-> 
->>
->> [Performance]
->> 1. One thread (numjobs=1) randread (bs=4k, direct=1) one dm-linear
->> device, which is built upon 3 nvme devices, with one polling hw
->> queue per nvme device.
->>
->>      | IOPS (IRQ mode) | IOPS (iopoll=1 mode) | diff
->> ---- | --------------- | -------------------- | ----
->>   dm | 		  208k |		 279k | ~34%
->>
->>
->> 2. Three threads (numjobs=3) randread (bs=4k, direct=1) one dm-linear
->> device, which is built upon 3 nvme devices, with one polling hw
->> queue per nvme device.
->>
->> It's compared to 3 threads directly randread 3 nvme devices, with one
->> polling hw queue per nvme device. No CPU affinity set for these 3
->> threads. Thus every thread can access every nvme device
->> (filename=/dev/nvme0n1:/dev/nvme1n1:/dev/nvme2n1), i.e., every thread
->> need to competing for every polling hw queue.
->>
->>      | IOPS (IRQ mode) | IOPS (iopoll=1 mode) | diff
->> ---- | --------------- | -------------------- | ----
->>   dm | 		  615k |		 728k | ~18%
->> nvme | 		  728k |		 873k | ~20%
->>
->> The result shows that the performance gain of bio-based polling is
->> comparable as that of mq polling in the same test case.
->>
->>
->> 3. Three threads (numjobs=3) randread (bs=12k, direct=1) one
->> **dm-stripe** device, which is built upon 3 nvme devices, with one
->> polling hw queue per nvme device.
->>
->> It's compared to 3 threads directly randread 3 nvme devices, with one
->> polling hw queue per nvme device. No CPU affinity set for these 3
->> threads. Thus every thread can access every nvme device
->> (filename=/dev/nvme0n1:/dev/nvme1n1:/dev/nvme2n1), i.e., every thread
->> need to competing for every polling hw queue.
->>
->>      | IOPS (IRQ mode) | IOPS (iopoll=1 mode) | diff
->> ---- | --------------- | -------------------- | ----
->>   dm | 		  314k |		 354k | ~13%
->> nvme | 		  728k |		 873k | ~20%
->>
-> 
-> So this "3." case is meant to illustrate effects of polling when bio is
-> split to 3 different underlying blk-mq devices. (think it odd that
-> dm-stripe across 3 nvme devices is performing so much worse than a
-> single nvme device)
-> 
-> Would be nice to see comparison of this same workload but _with_ CPU
-> affinity to show relative benefit of your patch 11 in this series (where
-> you try to leverage CPU pinning).
+Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Fixes: 3ed05a987e0f ("blk-zoned: implement ioctls")
+Cc: <stable@vger.kernel.org> # 5.10+
+---
+Changes from v2:
+* Factored out blkdev_truncate_zone_range()
 
-Actually I have done the test. You can see that without the optimization
-in patch 1,, i.e., to leverage CPU pinning, there's only ~13%
-performance gain of polling.
+Changes from v1:
+* Addressed comments on the list
 
-As I stated here [1] (see the clause two "2. sub-fastpath"), with the
-optimization in patch 11, the performance gain is ~32%. The optimization
-behave well. It mainly decreases the race where multiple CPUs competing
-for the same hw queue.
+ block/blk-zoned.c | 38 ++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 36 insertions(+), 2 deletions(-)
 
-
-[1]
-https://patchwork.kernel.org/project/dm-devel/cover/20210303115740.127001-1-jefflexu@linux.alibaba.com/
-
-> 
-> In general, I don't think patch 11 a worthwhile effort.  It is a
-> half-measure that is trying to paper over the fact that this bio-based
-> IO polling patchset is quite coarse grained about how it copes with the
-> need to poll multiple devices.
-
-Indeed. It is a result of somewhat compromise. If we have better scheme
-improving multi-thread performance, it shall certainly go... I can
-explain the difficulty of implementing the optimization in other ways in
-the following comment.
-
-> 
-> Patch 10 is a proper special case that should be accounted for (when a
-> bio isn't split and only gets submitted to a single blk-mq
-> device/hctx).  But even patch 10's approach is fragile (we we've
-> discussed in private and I'll touch on in reply to patch 10).
-> 
-> But I think patch 11 should be dropped and we defer optimizing bio
-> splitting at a later time with follow-on work.
-> 
-> Just so you're aware, I'm now thinking the proper way forward is to
-> update DM core, at the time of DM table load, to assemble an array of
-> underlying _data_ devices in that table (as iterated with
-> .iterate_devices) -- this would allow each underlying data device to be
-> assigned an immutable index for the lifetime of a DM table.  It'd be
-> hooked off the 'struct dm_table' and would share that object's
-> lifetime.
-
-I have also considered it. There's two way organizing the table, with
-each having its own defect though.
-
-1. Each dm table maintains underlying devices at its own level, e.g., if
-dm-0 is built upon dm-1, then the dm table of dm-0 maintains all
-underlying devices of dm-0, while the dm table of dm-1 maintaining its
-own underlying devices.
-
-In this case, there are multiple arrays at each level. If the returned
-cookie is still one integer type, it may be difficult to design the
-cookie, making it reflecting one slot among all these multiple arrays.
-
-If the returned cookie is actually a group of indexes, with each
-indexing one dm table, then where and how to store these indexes...
-
-
-2. The dm device at the top most level maintains a large array,
-aggregating all underlying devices on all levels.
-
-In this case, one unique array is maintained and one cookie of integer
-type is enough. However the defect is that, when one underlying dm
-device reloads table, how and when to update the array in the top most
-level.
-
-> 
-> With that bit of infrastructure in place, we could then take steps to
-> make DM's cookie more dense in its description of underlying devices
-> that need polling.  This is where I'll get a bit handwavvy.. but I
-> raised this idea with Joe Thornber and he is going to have a think about
-> it too.
-> 
-> But this is all to say: optimizing the complex case of bio-splitting
-> that is such an integral part of bio-based IO processing needs more than
-> what you've attempted to do (noble effort on your part but again, really
-> just a half-measure).
-> 
-> SO I think it best to keep the initial implementation of bio-based
-> polling relatively simple by laying foundation for follow-on work.  And
-> it is also important to _not_ encode in block core some meaning to what
-> _should_ be a largely opaque cookie (blk_qc_t) that is for the
-> underlying driver to make sense of.
-> 
-
-Agreed. The difficulty of the design pattern is explained in the
-corresponding reply for v5.
-
-> 
->>
->> 4. This patchset shall do no harm to the performance of the original mq
->> polling. Following is the test results of one thread (numjobs=1)
->> randread (bs=4k, direct=1) one nvme device.
->>
->> 	    	 | IOPS (IRQ mode) | IOPS (iopoll=1 mode) | diff
->> ---------------- | --------------- | -------------------- | ----
->> without patchset | 	      242k |		     332k | ~39%
->> with patchset    |	      236k |		     332k | ~39%
-> 
-> OK, good, this needs to be the case.
-> 
->>
->> [Changes since v2]
->>
->> Patchset v2 caches all hw queues (in polling mode) of underlying mq
->> devices in dm layer. The polling routine actually iterates through all
->> these cached hw queues.
->>
->> However, mq may change the queue mapping at runtime (e.g., NVMe RESET
->> command), thus the cached hw queues in dm layer may be out-of-date. Thus
->> patchset v3 falls back to the implementation of the very first RFC
->> version, in which the mq layer needs to export one interface iterating
->> all polling hw queues (patch 5), and the bio-based polling routine just
->> calls this interface to iterate all polling hw queues.
->>
->> Besides, several new optimization is proposed.
->>
->>
->> - patch 1,2,7
->> same as v2, untouched
->>
->> - patch 3
->> Considering advice from Christoph Hellwig, while refactoring blk_poll(),
->> split mq and bio-based polling routine from the very beginning. Now
->> blk_poll() is just a simple entry. blk_bio_poll() is simply copied from
->> blk_mq_poll(), while the loop structure is some sort of duplication
->> though.
->>
->> - patch 4
->> This patch is newly added to support turning on/off polling through
->> '/sys/block/<dev>/queue/io_poll' dynamiclly for bio-based devices.
->> Patchset v2 implemented this functionality by added one new queue flag,
->> which is not preferred since the queue flag resource is quite short of
->> nowadays.
->>
->> - patch 5
->> This patch is newly added, preparing for the following bio-based
->> polling. The following bio-based polling will call this helper function,
->> accounting on the corresponding hw queue.
->>
->> - patch 6
->> It's from the very first RFC version, preparing for the following
->> bio-based polling.
->>
->> - patch 8
->> One fixing patch needed by the following bio-based polling. It's
->> actually a v2 of [1]. I had sent the v2 singly in-reply-to [1], though
->> it has not been visible on the mailing list maybe due to the delay.
->>
->> - patch 9
->> It's from the very first RFC version.
->>
->> - patch 10
->> This patch is newly added. Patchset v2 had ever proposed one
->> optimization that, skipping the **busy** hw queues during the iteration
->> phase. Back upon that time, one flag of 'atomic_t' is specifically
->> maintained in dm layer, representing if the corresponding hw queue is
->> busy or not. The idea is inherited, while the implementation changes.
->> Now @nvmeq->cq_poll_lock is used directly here, no need for extra flag
->> anymore.
->>
->> This optimization can significantly reduce the competition for one hw
->> queue between multiple polling instances. Following statistics is the
->> test result when 3 threads concurrently randread (bs=4k, direct=1) one
->> dm-linear device, which is built upon 3 nvme devices, with one polling
->> hw queue per nvme device.
->>
->> 	    | IOPS (IRQ mode) | IOPS (iopoll=1 mode) | diff
->> ----------- | --------------- | -------------------- | ----
->> without opt | 		 318k |		 	256k | ~-20%
->> with opt    |		 314k |		 	354k | ~13%
->> 							
->>
->> - patch 11
->> This is another newly added optimizatin for bio-based polling.
->>
->> One intuitive insight is that, when the original bio submitted to dm
->> device doesn't get split, then the bio gets enqueued into only one hw
->> queue of one of the underlying mq devices. In this case, we no longer
->> need to track all split bios, and one cookie (for the only split bio)
->> is enough. It is implemented by returning the pointer to the
->> corresponding hw queue in this case.
->>
->> It should be safe by directly returning the pointer to the hw queue,
->> since 'struct blk_mq_hw_ctx' won't be freed during the whole lifetime of
->> 'struct request_queue'. Even when the number of hw queues may decrease
->> when NVMe RESET happens, the 'struct request_queue' structure of decreased
->> hw queues won't be freed, instead it's buffered into
->> &q->unused_hctx_list list.
->>
->> Though this optimization seems quite intuitive, the performance test
->> shows that it does no benefit nor harm to the performance, while 3
->> threads concurrently randreading (bs=4k, direct=1) one dm-linear
->> device, which is built upon 3 nvme devices, with one polling hw queue
->> per nvme device.
->>
->> I'm not sure why it doesn't work, maybe because the number of devices,
->> or the depth of the devcice stack is to low in my test case?
-> 
-> Looks like these patch references are stale (was relative to v3 I
-> think).. e.g: "patch 11" from v3 is really "patch 10" in v5.. but its
-> implementation has changed because Mikulas pointed out that the
-> implementation was unsafe.. IIRC?
-> 
-> Anyway, I'll just focus on reviewing each patch in this v5 now.
-> 
-> Thanks,
-> Mike
-> 
-> --
-> dm-devel mailing list
-> dm-devel@redhat.com
-> https://listman.redhat.com/mailman/listinfo/dm-devel
-> 
-
+diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+index 833978c02e60..03c3b8df2c0d 100644
+--- a/block/blk-zoned.c
++++ b/block/blk-zoned.c
+@@ -318,6 +318,22 @@ int blkdev_report_zones_ioctl(struct block_device *bdev, fmode_t mode,
+ 	return 0;
+ }
+ 
++static int blkdev_truncate_zone_range(struct block_device *bdev, fmode_t mode,
++				      const struct blk_zone_range *zrange)
++{
++	loff_t start, end;
++
++	if (zrange->sector + zrange->nr_sectors <= zrange->sector ||
++	    zrange->sector + zrange->nr_sectors > get_capacity(bdev->bd_disk))
++		/* Out of range */
++		return -EINVAL;
++
++	start = zrange->sector << SECTOR_SHIFT;
++	end = ((zrange->sector + zrange->nr_sectors) << SECTOR_SHIFT) - 1;
++
++	return truncate_bdev_range(bdev, mode, start, end);
++}
++
+ /*
+  * BLKRESETZONE, BLKOPENZONE, BLKCLOSEZONE and BLKFINISHZONE ioctl processing.
+  * Called from blkdev_ioctl.
+@@ -329,6 +345,7 @@ int blkdev_zone_mgmt_ioctl(struct block_device *bdev, fmode_t mode,
+ 	struct request_queue *q;
+ 	struct blk_zone_range zrange;
+ 	enum req_opf op;
++	int ret;
+ 
+ 	if (!argp)
+ 		return -EINVAL;
+@@ -352,6 +369,11 @@ int blkdev_zone_mgmt_ioctl(struct block_device *bdev, fmode_t mode,
+ 	switch (cmd) {
+ 	case BLKRESETZONE:
+ 		op = REQ_OP_ZONE_RESET;
++
++		/* Invalidate the page cache, including dirty pages. */
++		ret = blkdev_truncate_zone_range(bdev, mode, &zrange);
++		if (ret)
++			return ret;
+ 		break;
+ 	case BLKOPENZONE:
+ 		op = REQ_OP_ZONE_OPEN;
+@@ -366,8 +388,20 @@ int blkdev_zone_mgmt_ioctl(struct block_device *bdev, fmode_t mode,
+ 		return -ENOTTY;
+ 	}
+ 
+-	return blkdev_zone_mgmt(bdev, op, zrange.sector, zrange.nr_sectors,
+-				GFP_KERNEL);
++	ret = blkdev_zone_mgmt(bdev, op, zrange.sector, zrange.nr_sectors,
++			       GFP_KERNEL);
++
++	/*
++	 * Invalidate the page cache again for zone reset: writes can only be
++	 * direct for zoned devices so concurrent writes would not add any page
++	 * to the page cache after/during reset. The page cache may be filled
++	 * again due to concurrent reads though and dropping the pages for
++	 * these is fine.
++	 */
++	if (!ret && cmd == BLKRESETZONE)
++		ret = blkdev_truncate_zone_range(bdev, mode, &zrange);
++
++	return ret;
+ }
+ 
+ static inline unsigned long *blk_alloc_zone_bitmap(int node,
 -- 
-Thanks,
-Jeffle
+2.29.2
+
