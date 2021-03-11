@@ -2,98 +2,144 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36A61C433E0
-	for <linux-block@archiver.kernel.org>; Thu, 11 Mar 2021 18:50:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F1B5C433DB
+	for <linux-block@archiver.kernel.org>; Thu, 11 Mar 2021 19:09:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DA49064FE0
-	for <linux-block@archiver.kernel.org>; Thu, 11 Mar 2021 18:50:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2AF4664E60
+	for <linux-block@archiver.kernel.org>; Thu, 11 Mar 2021 19:09:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229806AbhCKStx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 11 Mar 2021 13:49:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59422 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229675AbhCKStu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Mar 2021 13:49:50 -0500
-Received: from mail-il1-x12c.google.com (mail-il1-x12c.google.com [IPv6:2607:f8b0:4864:20::12c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F37DC061574
-        for <linux-block@vger.kernel.org>; Thu, 11 Mar 2021 10:49:50 -0800 (PST)
-Received: by mail-il1-x12c.google.com with SMTP id p10so248718ils.9
-        for <linux-block@vger.kernel.org>; Thu, 11 Mar 2021 10:49:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=SR/K1SCB2ahRjUI01f7yqd0PaiNzw4Ak6BDEiKjZTEM=;
-        b=IIeROJPknOEH8MbJ/sEtfxXqCzjWaEvenzFjPibE89ipMq82UEd2mfaEUqDoLetrjp
-         xkbxbTLJFmrijJdH0A6u1uvW/tQxlxuqArA+Ip3pZQ70mxPzqg1ewqxAKwMOq7UoJHGp
-         xU+ALG/YJfe05OzSf7wl0bg3SKfV4IF004ahR0ZshNUawOGrPAvvgApXwRthdh5RTQaT
-         BrWdLIXVLKGpXz6qYfKD2i7PVaXMbaxIUFY9WHWeuP4MIiCW1ygMpLODg8kvtFicEk3s
-         Fhtw2Fl18bmhlEVOdQiprH2BwGwOnt9e9LEjZi3Mqy98UUKo136jPRv+rLF51f8stQKF
-         pWug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=SR/K1SCB2ahRjUI01f7yqd0PaiNzw4Ak6BDEiKjZTEM=;
-        b=XQnEB0Dm3aJn1hDbahfI8rnOQHNLjBdC5LIRHldH4o5uLC4nF7gXbnB0N/XkGjAimH
-         xxemYAJEJ3uNYi46mf6kBmQAzUl5pStlF8LBHYoa/ECfaHg4qac74ZN7FSSp5eRhX87q
-         7fmbm/XWDx7GqfLeGPz65Cfq3VqiTCn8rBqfGszk75lpg3+KhtnGW8wJpVvb5TU4EiZh
-         I6HHxadJczNFfxACeisr6GiKpO26WydNDuIVou3fY4rkbJQV2C83S8ddSEbUNZGr0NDa
-         iuo4FI/LWGYrSjOdD1KvHkiJYHmbEr5ksUYpPaQfT5FdbSmVRhXR3PpreK50gmtm8h7S
-         VT6g==
-X-Gm-Message-State: AOAM531P1QF6dXdLt+N7oqI4Ug2FcExnh+tARLZmb9z/wu5y/vH8wvik
-        45mbhTlprx5KA1Q0VQR0ySS6TA==
-X-Google-Smtp-Source: ABdhPJyckJWegb9iuD3pQSSFuX/uoYBAsxnmRz2QFlHUPee0rowvDfYLn+GDK63SmDJ+yeC51fdnzQ==
-X-Received: by 2002:a05:6e02:18c9:: with SMTP id s9mr8295504ilu.265.1615488589883;
-        Thu, 11 Mar 2021 10:49:49 -0800 (PST)
-Received: from [192.168.1.30] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id k12sm1688396ilo.8.2021.03.11.10.49.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 11 Mar 2021 10:49:49 -0800 (PST)
-Subject: Re: [PATCH v3] block: Discard page cache of zone reset target range
-To:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        linux-block@vger.kernel.org
-Cc:     Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Keith Busch <kbusch@kernel.org>, Jan Kara <jack@suse.cz>,
-        Kanchan Joshi <joshi.k@samsung.com>,
-        Christoph Hellwig <hch@infradead.org>
-References: <20210311072546.678999-1-shinichiro.kawasaki@wdc.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <684410f6-2b4f-ad61-79a0-461a5604b6c5@kernel.dk>
-Date:   Thu, 11 Mar 2021 11:49:48 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S229944AbhCKTIc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 11 Mar 2021 14:08:32 -0500
+Received: from mail.kernel.org ([198.145.29.99]:39536 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229721AbhCKTIE (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 11 Mar 2021 14:08:04 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 77EF664FE0;
+        Thu, 11 Mar 2021 19:08:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1615489682;
+        bh=+MqxPqLxS0fmcZSkxqaGS/7xnCYlQhr8+DK+/ePJsDE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=V5MNT4BHOqod0O8XEiHiDDZBzJM7BDrJFZjL0FvTnGjdV85TOijRaR9AQvrOnhQVV
+         ulfWeO2Q785ENXGd2iGmhcoNfHLkxx2Bqc08uWVvOnOubM6nPIb0RQsSvdDDieSMQp
+         KppyVCtJpMEDvovtpatEtA4lyZkdu3Xj28dkoQmEbWotinPIbdSq69fhHZqd+5XoOc
+         dWbaROFQm2qh/8YRFEwDfHNd49yvkAMK2B3kTwPRFD1mfJ93HRE0Noih6TRvCZ90hV
+         AF+nW/B5JSeAfFgAf+u0Rld8GnK/9c9HWhHUrV1gMUzjZCMNEk+hNUpJ30iF/+g1CN
+         3Fv1Efm/4Cegg==
+Date:   Thu, 11 Mar 2021 11:08:00 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Linus Walleij <linus.walleij@linaro.org>
+Cc:     Peng Zhou <peng.zhou@mediatek.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Chaotian Jing <chaotian.jing@mediatek.com>,
+        linux-mmc <linux-mmc@vger.kernel.org>,
+        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
+        <devicetree@vger.kernel.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Satya Tangirala <satyat@google.com>,
+        Wulin Li <wulin.li@mediatek.com>
+Subject: Re: [PATCH v2 2/4] mmc: Mediatek: enable crypto hardware engine
+Message-ID: <YEpqkAq6wOZ+TpR9@gmail.com>
+References: <20210309015750.6283-1-peng.zhou@mediatek.com>
+ <CACRpkdYTkW7b9SFEY6Ubq4NicgR_5ewQMjE2zHvGbgxYadhHQQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20210311072546.678999-1-shinichiro.kawasaki@wdc.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CACRpkdYTkW7b9SFEY6Ubq4NicgR_5ewQMjE2zHvGbgxYadhHQQ@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/11/21 12:25 AM, Shin'ichiro Kawasaki wrote:
-> When zone reset ioctl and data read race for a same zone on zoned block
-> devices, the data read leaves stale page cache even though the zone
-> reset ioctl zero clears all the zone data on the device. To avoid
-> non-zero data read from the stale page cache after zone reset, discard
-> page cache of reset target zones in blkdev_zone_mgmt_ioctl(). Introduce
-> the helper function blkdev_truncate_zone_range() to discard the page
-> cache. Ensure the page cache discarded by calling the helper function
-> before and after zone reset in same manner as fallocate does.
+On Thu, Mar 11, 2021 at 02:48:23PM +0100, Linus Walleij wrote:
+> Hi Peng,
 > 
-> This patch can be applied back to the stable kernel version v5.10.y.
-> Rework is needed for older stable kernels.
+> thanks for your patch!
+> 
+> On Tue, Mar 9, 2021 at 3:06 AM Peng Zhou <peng.zhou@mediatek.com> wrote:
+> 
+> > Use SMC call enable hardware crypto engine
+> > due to it only be changed in ATF(EL3).
+> >
+> > Signed-off-by: Peng Zhou <peng.zhou@mediatek.com>
+> 
+> Unfortunately this commit message is way to short to
+> understand what is going on, and has a lot of assumed
+> previous knowledge.
+> 
+> Can you expand the commit message so that anyone
+> who just know MMC and some SoC basics can understand
+> what an SMC call and and what ATF(EL3) means?
+> 
+> I assume this some kind of inline encryption?
+> 
+> I think maybe linux-block mailing list need to be involved
+> because there is certain a Linux standard way of setting
+> up inline encryption for the block layer.
+> 
+> For example: how is the key to be used derived?
+> How is the device unlocked in the first place?
+> 
+> If I insert a LUKS encrypted harddrive in a Linux machine
+> the whole system is pretty much aware of how this should
+> be handled and everything "just works", I enter a pass
+> phrase and off it goes. I can use symmetric keys as well.
+> How is this stuff done for this hardware?
+> 
+> > +       /*
+> > +        * 1: MSDC_AES_CTL_INIT
+> > +        * 4: cap_id, no-meaning now
+> > +        * 1: cfg_id, we choose the second cfg group
+> > +        */
+> > +       if (mmc->caps2 & MMC_CAP2_CRYPTO)
+> > +               arm_smccc_smc(MTK_SIP_MMC_CONTROL,
+> > +                             1, 4, 1, 0, 0, 0, 0, &smccc_res);
+> 
+> The same as above: these comments assume that everyone
+> already knows what is going on.
+> 
+> AES encryption requires a key and I don't see the driver
+> setting up any key. How is the code in this file:
+> drivers/mmc/core/crypto.c
+> interacting with your driver?
+> drivers/mmc/host/cqhci-crypto.c
+> is used by SDHCI and is quite readable and I see what is going on.
+> For example it contains functions like:
+> cqhci_crypto_program_key()
+> cqhci_crypto_keyslot_program()
+> cqhci_crypto_clear_keyslot()
+> cqhci_crypto_keyslot_evict()
+> cqhci_find_blk_crypto_mode()
+> 
+> MMC_CAP2_CRYPTO is used as a sign that the driver
+> can do inline encryption, then devm_blk_ksm_init() is called
+> to initialize a block encryption abstraction with the block layer.
+> Ops are registered using
+> struct blk_ksm_ll_ops cqhci_ksm_ops.
+> 
+> This is very straight forward.
+> 
+> But where does all the above happen for this driver?
+> 
 
-Applied, thanks.
+It happens in the same place, cqhci-crypto.c.  Mediatek's eMMC inline encryption
+hardware follows the eMMC standard fairly closely, so Peng's patch series just
+sets MMC_CAP2_CRYPTO to make it use the standard cqhci crypto code, and does a
+couple extra things to actually enable the hardware's crypto support on Mediatek
+platforms since it isn't enabled by default.  (*Why* it requires an SMC call to
+enable instead of just working as expected, I don't know though.)
 
--- 
-Jens Axboe
+The way all this gets used is via the blk-crypto framework
+(Documentation/block/inline-encryption.rst), which is used by fscrypt
+(ext4 and f2fs encryption).
 
+Peng, if you could explain all this properly in the cover letter, commit
+messages, and code comments (where it makes sense), that would be really helpful
+for people.  Also please make sure your patch series is in a thread so that
+people see it together.
+
+- Eric
