@@ -2,59 +2,85 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC505C433E0
-	for <linux-block@archiver.kernel.org>; Thu, 11 Mar 2021 08:21:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 854B0C433DB
+	for <linux-block@archiver.kernel.org>; Thu, 11 Mar 2021 08:24:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9177164EAE
-	for <linux-block@archiver.kernel.org>; Thu, 11 Mar 2021 08:21:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 31E7064E4B
+	for <linux-block@archiver.kernel.org>; Thu, 11 Mar 2021 08:24:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230092AbhCKIUz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 11 Mar 2021 03:20:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36636 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231655AbhCKIUp (ORCPT
+        id S230448AbhCKIXf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 11 Mar 2021 03:23:35 -0500
+Received: from frasgout.his.huawei.com ([185.176.79.56]:2684 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230289AbhCKIX2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Mar 2021 03:20:45 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97619C061574
-        for <linux-block@vger.kernel.org>; Thu, 11 Mar 2021 00:20:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=l2WBiCb5duYJRA9nKpihqrJOH1Qjg6utSrFiu8qAdtc=; b=PLJWqp3pbH0QOtOdoASzQztiwe
-        yVhEzV6v9HMr9yjdOz6NJAheNpQN9VYBVe3P25xvLvl/IQ7rc/vU0J8wqo4Q1BA0UJVMf/nY8KLNZ
-        xH3Su1OyilljfmMqX92WG5UOSTak6Dn8ZTTeRz9h8mGmWKuukWOpX42az3uvGy3K+tC59oEabqHD0
-        b+dQPwUiz9ybdILLd4qY7kYhjbhGAaNUpXxeGtBQseD8k0tVYChX2Y4tl3iDRxID6b824qIBCqLwx
-        Vl98zAXZrA0U8cZK1T+HYG1YG3/yctLTuBcxaSCMwoMXwKh7BDNh1ethVYKDK/jjUmOSy7ogqe+t/
-        tySDR2JQ==;
-Received: from hch by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1lKGYO-006nu6-Cm; Thu, 11 Mar 2021 08:20:21 +0000
-Date:   Thu, 11 Mar 2021 08:20:20 +0000
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Keith Busch <kbusch@kernel.org>, Jan Kara <jack@suse.cz>,
-        Kanchan Joshi <joshi.k@samsung.com>,
-        Christoph Hellwig <hch@infradead.org>
-Subject: Re: [PATCH v3] block: Discard page cache of zone reset target range
-Message-ID: <20210311082020.GA1621202@infradead.org>
-References: <20210311072546.678999-1-shinichiro.kawasaki@wdc.com>
+        Thu, 11 Mar 2021 03:23:28 -0500
+Received: from fraeml715-chm.china.huawei.com (unknown [172.18.147.207])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Dx20N5kFxz67wjQ;
+        Thu, 11 Mar 2021 16:19:00 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml715-chm.china.huawei.com (10.206.15.34) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Thu, 11 Mar 2021 09:23:25 +0100
+Received: from [10.47.4.196] (10.47.4.196) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2106.2; Thu, 11 Mar
+ 2021 08:23:24 +0000
+Subject: Re: [RFC PATCH v3 2/3] blk-mq: Freeze and quiesce all queues for
+ tagset in elevator_exit()
+To:     Ming Lei <ming.lei@redhat.com>
+CC:     <hare@suse.de>, <bvanassche@acm.org>, <axboe@kernel.dk>,
+        <hch@lst.de>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <pragalla@codeaurora.org>,
+        <kashyap.desai@broadcom.com>, <yuyufen@huawei.com>
+References: <1614957294-188540-1-git-send-email-john.garry@huawei.com>
+ <1614957294-188540-3-git-send-email-john.garry@huawei.com>
+ <YElrSFGyim3rjDN+@T590>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <8c6c6783-6152-2332-2f50-14c409e40320@huawei.com>
+Date:   Thu, 11 Mar 2021 08:21:21 +0000
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210311072546.678999-1-shinichiro.kawasaki@wdc.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <YElrSFGyim3rjDN+@T590>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.47.4.196]
+X-ClientProxiedBy: lhreml715-chm.china.huawei.com (10.201.108.66) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Looks good,
+On 11/03/2021 00:58, Ming Lei wrote:
+>> Indeed, blk_mq_queue_tag_busy_iter() already does take a reference to its
+>> queue usage counter when called, and the queue cannot be frozen to switch
+>> IO scheduler until all refs are dropped. This ensures no stale references
+>> to IO scheduler requests will be seen by blk_mq_queue_tag_busy_iter().
+>>
+>> However, there is nothing to stop blk_mq_queue_tag_busy_iter() being
+>> run for another queue associated with the same tagset, and it seeing
+>> a stale IO scheduler request from the other queue after they are freed.
+>>
+>> To stop this happening, freeze and quiesce all queues associated with the
+>> tagset as the elevator is exited.
+> I think this way can't be accepted since switching one queue's scheduler
+> is nothing to do with other request queues attached to same HBA.
+> 
+> This patch will cause performance regression because userspace may
+> switch scheduler according to medium or workloads, at that time other
+> LUNs will be affected by this patch.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Hmmm..that was my concern also. Do you think that it may cause a big 
+impact? Depends totally on the workload, I suppose.
+
+FWIW, it is useful though for solving both iterator problems.
+
+Thanks,
+John
