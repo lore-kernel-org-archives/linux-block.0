@@ -2,90 +2,122 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B960EC433DB
-	for <linux-block@archiver.kernel.org>; Wed, 10 Mar 2021 23:31:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5096FC433DB
+	for <linux-block@archiver.kernel.org>; Thu, 11 Mar 2021 00:59:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 789F864FC6
-	for <linux-block@archiver.kernel.org>; Wed, 10 Mar 2021 23:31:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DC55D64FC0
+	for <linux-block@archiver.kernel.org>; Thu, 11 Mar 2021 00:59:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232181AbhCJXaa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 10 Mar 2021 18:30:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35830 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233862AbhCJXaQ (ORCPT
+        id S229520AbhCKA7X (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 10 Mar 2021 19:59:23 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27753 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229563AbhCKA7J (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 10 Mar 2021 18:30:16 -0500
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE1BFC061574
-        for <linux-block@vger.kernel.org>; Wed, 10 Mar 2021 15:30:15 -0800 (PST)
-Received: by mail-ed1-x52c.google.com with SMTP id b13so365613edx.1
-        for <linux-block@vger.kernel.org>; Wed, 10 Mar 2021 15:30:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=intel-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Vuj/D7o1+/AE9t3wM/vQsuPf0MOJqhA/d5cfPutvQfU=;
-        b=o2uQ9nbLBO9R5FOm8KE2FiXDRix0GjxEoucgtHfPLR/wQNZblGYKZeUbZaB3a3gVls
-         j5myReVOVSv8e+2as+yWYoc126H5rXjnDz1S/XKEZZqyjP5CjOuJtJdCXwtvh1gGajGB
-         AttnNRUhzEiJr3aYXULMyxlHaZvK4tQR2BqqciENC5bZuYnHlM/sDf07rKUZp/9ev5Cl
-         YaTNrQmG9WizlGQCUI2TAeuVaoqvCRRHdWDslVQgyQLqCWkKN4ZG/iNSyYEhHzvH3WFj
-         K4JoRLLeA8DgfDKV+deTn3ktf5nSBZdM2H3ftPJJGmo54eTR0tvDEMLQuNJeSgoQMGGN
-         ngGQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Vuj/D7o1+/AE9t3wM/vQsuPf0MOJqhA/d5cfPutvQfU=;
-        b=enFrI87HAn1EX9stkJit7r8eStOMvCmI3BA4ds2wqMw1CFrRPtnqzdTVirX2y5jbdx
-         CJDS2xmqSyoPKNpsUYcUuQole24lo5SX1gCW1LPE+O2cBkdPBJUOnfDLCHiMv9LCmOEr
-         S8R5Yrc0eqCJOsrm+lZVk3Mk2f2kq6LAcJAbz1UPNEDi8AEcoDWbhxOPrzL79JGSgWSs
-         fBPZX0WgokGRL47PXauVcCqMd4JluCWeegQghMLxyeQ2x0Vs94wkDyDl71rEkETUsUQx
-         mtr/aMKuHlbciAPsGnI+LBubcPFJZ/LFo+RH8VnBjokePSnOQKGRxKctqGNd3WTwRFYh
-         BYsg==
-X-Gm-Message-State: AOAM532mbP2NAeDJwcCykV3AUlatBfp/SkM3dGmRBU0Rpoj7AzKfIrXK
-        tLl57M5GGiMuM2xCcUJqbX8oaVrILEj0KE5cs81K0Q==
-X-Google-Smtp-Source: ABdhPJyAUtjsQZeO+IyfOJ0D71CMa4kn2W9c7sy/JaW+YXPD6tUcwvd9d32TJu/3+N1X9rS+ufsB+LKVJeI/Uw+LbQg=
-X-Received: by 2002:aa7:c3cd:: with SMTP id l13mr5720329edr.52.1615419014504;
- Wed, 10 Mar 2021 15:30:14 -0800 (PST)
+        Wed, 10 Mar 2021 19:59:09 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1615424348;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=MKJWdQZ9xVwyf7XoR6K/eDY0UWy7RkCHbwONKzeZFqY=;
+        b=hfjlzuAYCpskiBG3eA1k3zMpBgMXo5vM5rl3u454nCDUPopCTifEq/mqmUUM8hTZR7rj6X
+        wfJJm/Lj+MgfzAPrqixW8kmeSZkmys4RKVD6s8TW0tUPj8HDyl0TDz4R9kpUnSn4yZsLKd
+        0RmTbItp4dqNfFKe6Ko7IfcgKjvLQL4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-519-HI68m85zPqid4GvSdDfaiw-1; Wed, 10 Mar 2021 19:59:04 -0500
+X-MC-Unique: HI68m85zPqid4GvSdDfaiw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4FDB88015BD;
+        Thu, 11 Mar 2021 00:59:02 +0000 (UTC)
+Received: from T590 (ovpn-12-103.pek2.redhat.com [10.72.12.103])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id CC80810013D6;
+        Thu, 11 Mar 2021 00:58:53 +0000 (UTC)
+Date:   Thu, 11 Mar 2021 08:58:48 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     John Garry <john.garry@huawei.com>
+Cc:     hare@suse.de, bvanassche@acm.org, axboe@kernel.dk, hch@lst.de,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pragalla@codeaurora.org, kashyap.desai@broadcom.com,
+        yuyufen@huawei.com
+Subject: Re: [RFC PATCH v3 2/3] blk-mq: Freeze and quiesce all queues for
+ tagset in elevator_exit()
+Message-ID: <YElrSFGyim3rjDN+@T590>
+References: <1614957294-188540-1-git-send-email-john.garry@huawei.com>
+ <1614957294-188540-3-git-send-email-john.garry@huawei.com>
 MIME-Version: 1.0
-References: <161534060720.528671.2341213328968989192.stgit@dwillia2-desk3.amr.corp.intel.com>
- <20210310065425.GA1794@lst.de>
-In-Reply-To: <20210310065425.GA1794@lst.de>
-From:   Dan Williams <dan.j.williams@intel.com>
-Date:   Wed, 10 Mar 2021 15:30:02 -0800
-Message-ID: <CAPcyv4i4SUEd_zg7HyuqpE3_KUQU=4Pci40CKX7aM6NNsy9wew@mail.gmail.com>
-Subject: Re: [PATCH v2] libnvdimm: Notify disk drivers to revalidate region read-only
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-nvdimm <linux-nvdimm@lists.01.org>,
-        Ming Lei <ming.lei@redhat.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>,
-        kernel test robot <lkp@intel.com>,
-        Vishal Verma <vishal.l.verma@intel.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1614957294-188540-3-git-send-email-john.garry@huawei.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Mar 9, 2021 at 10:54 PM Christoph Hellwig <hch@lst.de> wrote:
->
-> Looks good to me:
->
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
->
-> Question on the pre-existing code: given that nvdimm_check_and_set_ro is
-> the only caller of set_disk_ro for nvdimm devices, we'll also get
-> the message when initially setting up any read-only disk.  Is that
-> intentional?
+On Fri, Mar 05, 2021 at 11:14:53PM +0800, John Garry wrote:
+> A use-after-free may occur if blk_mq_queue_tag_busy_iter() is run on a
+> queue when another queue associated with the same tagset is switching IO
+> scheduler:
+> 
+> BUG: KASAN: use-after-free in bt_iter+0xa0/0x120
+> Read of size 8 at addr ffff0410285e7e00 by task fio/2302
+> 
+> CPU: 24 PID: 2302 Comm: fio Not tainted 5.12.0-rc1-11925-g29a317e228d9 #747
+> Hardware name: Huawei Taishan 2280 /D05, BIOS Hisilicon D05 IT21 Nemo 2.0 RC0 04/18/2018 
+>  Call trace:
+> dump_backtrace+0x0/0x2d8 
+> show_stack+0x18/0x68
+> dump_stack+0x124/0x1a0
+> print_address_description.constprop.13+0x68/0x30c
+> kasan_report+0x1e8/0x258 
+> __asan_load8+0x9c/0xd8
+> bt_iter+0xa0/0x120 
+> blk_mq_queue_tag_busy_iter+0x348/0x5d8
+> blk_mq_in_flight+0x80/0xb8
+> part_stat_show+0xcc/0x210
+> dev_attr_show+0x44/0x90
+> sysfs_kf_seq_show+0x120/0x1c0
+> kernfs_seq_show+0x9c/0xb8
+> seq_read_iter+0x214/0x668
+> kernfs_fop_read_iter+0x204/0x2c0
+> new_sync_read+0x1ec/0x2d0
+> vfs_read+0x18c/0x248
+> ksys_read+0xc8/0x178
+> __arm64_sys_read+0x44/0x58
+> el0_svc_common.constprop.1+0xc8/0x1a8
+> do_el0_svc+0x90/0xa0
+> el0_svc+0x24/0x38
+> el0_sync_handler+0x90/0xb8
+> el0_sync+0x154/0x180
+> 
+> Indeed, blk_mq_queue_tag_busy_iter() already does take a reference to its
+> queue usage counter when called, and the queue cannot be frozen to switch
+> IO scheduler until all refs are dropped. This ensures no stale references
+> to IO scheduler requests will be seen by blk_mq_queue_tag_busy_iter().
+> 
+> However, there is nothing to stop blk_mq_queue_tag_busy_iter() being
+> run for another queue associated with the same tagset, and it seeing
+> a stale IO scheduler request from the other queue after they are freed.
+> 
+> To stop this happening, freeze and quiesce all queues associated with the
+> tagset as the elevator is exited.
 
-Yeah, that's intentional. There's no other notification that userspace
-would be looking for by default besides the kernel log, and the block
-device name is more meaningful than the region name, or the nvdimm
-device status for that matter.
+I think this way can't be accepted since switching one queue's scheduler
+is nothing to do with other request queues attached to same HBA.
+
+This patch will cause performance regression because userspace may
+switch scheduler according to medium or workloads, at that time other
+LUNs will be affected by this patch.
+
+
+-- 
+Ming
+
