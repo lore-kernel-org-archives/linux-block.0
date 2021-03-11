@@ -2,132 +2,162 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87D6EC433DB
-	for <linux-block@archiver.kernel.org>; Thu, 11 Mar 2021 13:57:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26100C433E0
+	for <linux-block@archiver.kernel.org>; Thu, 11 Mar 2021 14:29:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 48F8E64FA9
-	for <linux-block@archiver.kernel.org>; Thu, 11 Mar 2021 13:57:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CBB0764FE2
+	for <linux-block@archiver.kernel.org>; Thu, 11 Mar 2021 14:29:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233774AbhCKN5K (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 11 Mar 2021 08:57:10 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21467 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233558AbhCKN4m (ORCPT
+        id S233571AbhCKO3P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 11 Mar 2021 09:29:15 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:33386 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233300AbhCKO2x (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Mar 2021 08:56:42 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615471002;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=C+ScMbdR52Xee4kQKYcH1NEbK4+U/YcVRwEPYz1S0oA=;
-        b=WMC80yejOSUNWTuHrUQ+9HLTFSn1Yqy9peFU6nQapdCFD/wbExtETXE4Yzifr9h4sgruq2
-        p2eili0eWgOvAJ8v/fCKNXFW0GxDiNjNUeJkQhrpu5LMFsgcXfzTTs4TqrwpAY9UIyRG3Q
-        k0YlmbCAdQ+pvnUzDmiElSW+12D8HLs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-397-ISQI7s4rMeesc7OZIHZOFw-1; Thu, 11 Mar 2021 08:56:38 -0500
-X-MC-Unique: ISQI7s4rMeesc7OZIHZOFw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 12323193248C;
-        Thu, 11 Mar 2021 13:56:36 +0000 (UTC)
-Received: from T590 (ovpn-12-19.pek2.redhat.com [10.72.12.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id DF3B92B16E;
-        Thu, 11 Mar 2021 13:56:23 +0000 (UTC)
-Date:   Thu, 11 Mar 2021 21:56:19 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jeffle Xu <jefflexu@linux.alibaba.com>
-Cc:     msnitzer@redhat.com, axboe@kernel.dk, io-uring@vger.kernel.org,
-        dm-devel@redhat.com, linux-block@vger.kernel.org,
-        mpatocka@redhat.com, caspar@linux.alibaba.com,
-        joseph.qi@linux.alibaba.com
-Subject: Re: [PATCH v5 10/12] block: fastpath for bio-based polling
-Message-ID: <YEohgwIIy5ryme8x@T590>
-References: <20210303115740.127001-1-jefflexu@linux.alibaba.com>
- <20210303115740.127001-11-jefflexu@linux.alibaba.com>
+        Thu, 11 Mar 2021 09:28:53 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 12BEKfS3127632;
+        Thu, 11 Mar 2021 14:28:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : message-id : references : date : in-reply-to : content-type :
+ mime-version; s=corp-2020-01-29;
+ bh=sGeUMijq/SWiHDDhGTef7euLdnghuPlLAS7sWbZOeVA=;
+ b=ybcJthE44Eovmr5m5AJSWngNetAEjrERZvh4NM+nNNHtzesnBjuIKiymh0n5EbD0YTbX
+ OmhADG4tQ/XM7b70RkLZniNTYPlMLfh1hDBtAVtXHHmMPpcVfKMgMjcW9Px+grql8hh/
+ 0D99L4fL15g4mJMC0l9lDsimmzABRrz+c9PGnR3aRGI8HqCDzTyZkZD7KAECh3LLZxYi
+ 6/NrZd+xEWOZvFqYRSVe9s/zm+AnOofrjtQQL+0tQz0eUu1hHHr8/FrXWGvRGdOQdlyW
+ VFPFkNKvO/1wRhYsTub7OGwMNezAyx96CVN09rCBZo7JfU6ESOV5ACaMpclmYXEF7SSV 7w== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2130.oracle.com with ESMTP id 37415rerk7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 11 Mar 2021 14:28:44 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 12BEJafS176420;
+        Thu, 11 Mar 2021 14:28:43 GMT
+Received: from nam04-co1-obe.outbound.protection.outlook.com (mail-co1nam04lp2059.outbound.protection.outlook.com [104.47.45.59])
+        by aserp3020.oracle.com with ESMTP id 374kn2ka80-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 11 Mar 2021 14:28:43 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=nT4PBk++JJyJIP8JhvTRxOUg0wLT8P5dU51HDWl28loo1j2SNVbwMKYvvgT7NoM4LKRHmFSuCqqzBhGU+Jmcmk7ODm1nidN3+xj/s5ibHw9F81CimQQj+6fLhkh5lpRxG6xuF3O7rJDpNpPqSQ+oO/GuddrAOfKdP71CnJqhjvJYUpTjf4a+9hDJE2wO8AmpmBHOpiwSBekuQNawpu1euy7XhGsHWoM94LSko8JkePd9JcbOtCSyge17vbTlv4YEHS9zQqNr0AL/cZHfQj3IVrgy90IevhGL2PPEBmDwpcywCLkac11gLz39Vd2I7NE9mhHGJCRxe6cmFLrAjzEPWg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=sGeUMijq/SWiHDDhGTef7euLdnghuPlLAS7sWbZOeVA=;
+ b=CbsGVrKwVi/u7R1klVC9DtTLALyNIUEfWONd98r4NLOOe1G/G0YgliZ+OzI31zSgBTDpX7OwpRDoAmzuR+zMRuJha2jZP4bLKbY0m5UqM3hLifH2WsvuVtHgc5JXRxC28wNTMcT2BwW+XhduwciifkAS7DPXn+jfE0coLys1/qc6rYpP56Ty7RnA7/GLJoo/l8/MORdaqXkYtCNVNFnUiISRjkpuLOgiXcHPdxgs7qdjtUAvO6EqfkNtxA2o5572e6ayg912keoLj0UA/RH6IbP9uyaMqAEE93L2y/FSVRt+Uw843jTW/Oa3CIjWzbfMG+/bC3ot0GwTQ8/IdYyltA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=sGeUMijq/SWiHDDhGTef7euLdnghuPlLAS7sWbZOeVA=;
+ b=uA3ElAwGoHirqUrwRa+chWrskpGqKUS6bgxzDiXTuOfiZ69ARysKgMOLVSR8m2VZxApb7iptSYi7dJ7+auolMIUUqW9AkdxMINpZjYSy7loHDXDuplEQSPWL1JRL4ZYbXu3gMS3ERupZ0VTNnnHCHYjX94t7aMqnR8bx+QL8JqA=
+Authentication-Results: lst.de; dkim=none (message not signed)
+ header.d=none;lst.de; dmarc=none action=none header.from=oracle.com;
+Received: from PH0PR10MB4759.namprd10.prod.outlook.com (2603:10b6:510:3d::12)
+ by PH0PR10MB4549.namprd10.prod.outlook.com (2603:10b6:510:37::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3912.27; Thu, 11 Mar
+ 2021 14:28:41 +0000
+Received: from PH0PR10MB4759.namprd10.prod.outlook.com
+ ([fe80::dc39:c9fa:7365:8c8e]) by PH0PR10MB4759.namprd10.prod.outlook.com
+ ([fe80::dc39:c9fa:7365:8c8e%5]) with mapi id 15.20.3912.031; Thu, 11 Mar 2021
+ 14:28:41 +0000
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH] block: rename BIO_MAX_PAGES to BIO_MAX_VECS
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <yq1y2et935l.fsf@ca-mkp.ca.oracle.com>
+References: <20210311110137.1132391-1-hch@lst.de>
+        <20210311110137.1132391-2-hch@lst.de>
+Date:   Thu, 11 Mar 2021 09:28:37 -0500
+In-Reply-To: <20210311110137.1132391-2-hch@lst.de> (Christoph Hellwig's
+        message of "Thu, 11 Mar 2021 12:01:37 +0100")
+Content-Type: text/plain
+X-Originating-IP: [138.3.200.58]
+X-ClientProxiedBy: CY4PR13CA0003.namprd13.prod.outlook.com
+ (2603:10b6:903:32::13) To PH0PR10MB4759.namprd10.prod.outlook.com
+ (2603:10b6:510:3d::12)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210303115740.127001-11-jefflexu@linux.alibaba.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from ca-mkp.ca.oracle.com (138.3.200.58) by CY4PR13CA0003.namprd13.prod.outlook.com (2603:10b6:903:32::13) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3955.10 via Frontend Transport; Thu, 11 Mar 2021 14:28:40 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: f3be4030-a3dc-49f8-9d32-08d8e499f7b8
+X-MS-TrafficTypeDiagnostic: PH0PR10MB4549:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <PH0PR10MB4549F303DFB48BBACC6322B58E909@PH0PR10MB4549.namprd10.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:4941;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Ji8I49oIBT2+tEE7ZU/t5mRzQ133mlPzGp5w9hU9jSiZeIKBlSEMsCjNDruhLayvZrQ/Ztleo4MGFvdAHLy0xIylFXZi2mrZRfueoYegZheB2F5uy8oPq8mbX83CxRtCz9kQWtoue+ojKzcqyZV7OKKNDuZ6vH5OsfuCaC3XUWOxabisQ3c5otDZrbPJwfh9W3gtokd5P+X8caKVtYNWAIvasKkz7ocTLkDLaB8fJdRZSl4yVeKcnWkbBcvqIZ2dCMyOAHuUCJRLwhNCQia3uxOQca1laWom5uwHD4TZrMqQTwItvRLN2x5t1hj0IDZMhm7efavR/ftzl7YhUoguHyVCiS6LNYWNfK9D/ge7qpkF0IfBH12HQymSEHwljTxz2UlLpK3cUAV0lmTRQBlsZj6f/xgfIJYzV7NjaOzzLQn/yYe+e47fI9R63ODRt5wHk9yja8y8LuLp/neKuecLkkjKAgAJeXKNc3ILz6aV1g5PbTGcWBQpT4jCAFsn9yrpj0MZtRDiORzLfSKerePI1w==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR10MB4759.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(136003)(346002)(376002)(39860400002)(366004)(396003)(956004)(4326008)(6666004)(26005)(66556008)(66476007)(66946007)(186003)(16526019)(8676002)(2906002)(52116002)(7696005)(86362001)(4744005)(36916002)(8936002)(6916009)(5660300002)(478600001)(316002)(55016002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?ySWw+UjEOp51HDqruEedGEDInTy9ZBJJ8kuDCNauHZEokOxgc3NWA7dZDLqS?=
+ =?us-ascii?Q?dKUU5RWjIKSkPWgDweL2m7DSLUaD5fN+CxvgCs8S2RKgOSkjut0RyYcbenWv?=
+ =?us-ascii?Q?h2d+2fkXMjzlJTNxGiNT8xbD2WK+izdtWWGK2ZQ6ab4X8NJbAy8tdpGMJJIU?=
+ =?us-ascii?Q?qT1SyiZlw6zY8JfbmPxdoXBbDu5MCijzI2Zi7v34sD83l3JLNpijEjbXB4I9?=
+ =?us-ascii?Q?+2sQJKpZ9OCUeBTZftRAI+lyzuSJ30BcE7SzTAT928WsrX3KrYZPq0kk71kA?=
+ =?us-ascii?Q?d4Yq99iauXttG5k+sennvvMHcIWmS+Cp0mLESQeJ3YynHwPlbLA0ZWkb8uQt?=
+ =?us-ascii?Q?0rnQbzV/mbfg7aNbjmXkANNhYiBWN+PBEseyk0umFr8XeLpZiz6ucUX6h/bS?=
+ =?us-ascii?Q?44dcRmRGTJIJi8wTp5Z0zSkwavETVdno0sIw2tF3zWKePlFvAK2WZ/9hjLbQ?=
+ =?us-ascii?Q?0iDRyQ5vDlpdpVsSWLL9P91QfqO+Zp6HPTFGRQ3XJPPMGIcVt9ZgjabBDuQM?=
+ =?us-ascii?Q?WF+E2+HIyrcdfbjOxyiyByyrUGzPcVqS8zo+TxisKoldZdEDj01IqpzOW9ka?=
+ =?us-ascii?Q?Wx/eCg1lI8fCVwxfujwPrd5g281d4+f8WCGarjnI8ztbbceupiG1x8i2E+Mu?=
+ =?us-ascii?Q?bhGD1lW6rF0TFcesY3t0QaO2gDLOOvr6d5bBRM13uGdGPNRM7bSuu8Dp2SY0?=
+ =?us-ascii?Q?kd/n1j9Q8RaIwYPxxR+a8KWvQnVMXJBujCYByGUj5Gm0b/5SXCdnDbteCVpb?=
+ =?us-ascii?Q?O0oWUyhBbs9cCMK3aYTTfUoUP/Zn5+jli/+tbHE7Y/CuUK8AZOrHLRn79E2Z?=
+ =?us-ascii?Q?OaKWMsZnxMZAa6lzvOYGFqu00KyO2Tgzv0A637D9ROSgT0xQ2ZXSDNs/6FiK?=
+ =?us-ascii?Q?oTRtTk2ptoOwuVqCEoRjQxK0GD+cXs2HkkIrcze4DOyH2/cQ/ui7YvCTRRKE?=
+ =?us-ascii?Q?zxUHAMybcnZGwBmGrK6/eexWgeqhGZVkjP7LWAAwcTbt3Sz1p/xYs4NIgFZp?=
+ =?us-ascii?Q?yIXSaPUCH5UG9hQ+mfvL3qKUGKMAWihy8h+0TPmO0onCSqJ3P0pM/w6tPXji?=
+ =?us-ascii?Q?wYIoueXqYqTv8OWLWiYtu+WWwnYQcAxFqDRU21KiQT+cmsqcFJ/uJKAALFGh?=
+ =?us-ascii?Q?qfzBAohkK6lC3v3h7TEK88Wuc5VlgoM0hfExyJL8ocNzV9suTQHYXxHHrJO/?=
+ =?us-ascii?Q?F7/mJzd2PpTgSer/S9kGC8TGvL2W20T7pey84gfkezTMV0FrZeTpAOEFrukx?=
+ =?us-ascii?Q?UzSkEILpRkXFCqPb+f/J7bHTjQvxLYMLdPtIarqL7IcS/sqljZay7OBXBJVR?=
+ =?us-ascii?Q?0gUg0ILHiMSSHoFKf/YZjdxl?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f3be4030-a3dc-49f8-9d32-08d8e499f7b8
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR10MB4759.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Mar 2021 14:28:41.1987
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ymZgGH3YIPqjcNRzsu6SDLh0NqGwxpzkoRRPNeOrnJEej+du4lwaSO6Y5spXRcSzD4ZITK00k2PF2JS48qv6V+PJgykPn6czw/B2kOYxTJA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR10MB4549
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9920 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 bulkscore=0 malwarescore=0
+ spamscore=0 mlxlogscore=999 phishscore=0 adultscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2103110078
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9920 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 lowpriorityscore=0
+ impostorscore=0 mlxlogscore=999 malwarescore=0 suspectscore=0 adultscore=0
+ phishscore=0 spamscore=0 priorityscore=1501 bulkscore=0 clxscore=1011
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2103110078
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 03, 2021 at 07:57:38PM +0800, Jeffle Xu wrote:
-> Offer one fastpath for bio-based polling when bio submitted to dm
-> device is not split.
-> 
-> In this case, there will be only one bio submitted to only one polling
-> hw queue of one underlying mq device, and thus we don't need to track
-> all split bios or iterate through all polling hw queues. The pointer to
-> the polling hw queue the bio submitted to is returned here as the
-> returned cookie. In this case, the polling routine will call
-> mq_ops->poll() directly with the hw queue converted from the input
-> cookie.
-> 
-> If the original bio submitted to dm device is split to multiple bios and
-> thus submitted to multiple polling hw queues, the polling routine will
-> fall back to iterating all hw queues (in polling mode) of all underlying
-> mq devices.
-> 
-> Signed-off-by: Jeffle Xu <jefflexu@linux.alibaba.com>
-> ---
->  block/blk-core.c          | 73 +++++++++++++++++++++++++++++++++++++--
->  include/linux/blk_types.h | 66 +++++++++++++++++++++++++++++++++--
->  include/linux/types.h     |  2 +-
->  3 files changed, 135 insertions(+), 6 deletions(-)
-> 
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index 6d7d53030d7c..e5cd4ff08f5c 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -947,14 +947,22 @@ static blk_qc_t __submit_bio_noacct(struct bio *bio)
->  {
->  	struct bio_list bio_list_on_stack[2];
->  	blk_qc_t ret = BLK_QC_T_NONE;
-> +	struct request_queue *top_q;
-> +	bool poll_on;
->  
->  	BUG_ON(bio->bi_next);
->  
->  	bio_list_init(&bio_list_on_stack[0]);
->  	current->bio_list = bio_list_on_stack;
->  
-> +	top_q = bio->bi_bdev->bd_disk->queue;
-> +	poll_on = test_bit(QUEUE_FLAG_POLL, &top_q->queue_flags) &&
-> +		  (bio->bi_opf & REQ_HIPRI);
-> +
->  	do {
-> -		struct request_queue *q = bio->bi_bdev->bd_disk->queue;
-> +		blk_qc_t cookie;
-> +		struct block_device *bdev = bio->bi_bdev;
-> +		struct request_queue *q = bdev->bd_disk->queue;
->  		struct bio_list lower, same;
->  
->  		if (unlikely(bio_queue_enter(bio) != 0))
-> @@ -966,7 +974,23 @@ static blk_qc_t __submit_bio_noacct(struct bio *bio)
->  		bio_list_on_stack[1] = bio_list_on_stack[0];
->  		bio_list_init(&bio_list_on_stack[0]);
->  
-> -		ret = __submit_bio(bio);
-> +		cookie = __submit_bio(bio);
-> +
-> +		if (poll_on && blk_qc_t_valid(cookie)) {
 
-In patch 8, dm_submit_bio() is changed to return BLK_QC_T_NONE always,
-so the returned cookie may be BLK_QC_T_NONE for DM device, such as, in
-case of DM_MAPIO_SUBMITTED returned from ->map(), and underlying bios
-can be submitted from another context, then nothing is fed to blk_poll().
+Christoph,
 
+> Ever since the addition of multipage bio_vecs BIO_MAX_PAGES has been
+> horribly confusingly misnamed.  Rename it to BIO_MAX_VECS to stop
+> confusing users of the bio API.
 
-thanks, 
-Ming
+Looks good!
 
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+
+-- 
+Martin K. Petersen	Oracle Linux Engineering
