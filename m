@@ -5,70 +5,67 @@ X-Spam-Level:
 X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2048C28E86
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CE6AC28E82
 	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 10:56:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 828596500E
+	by mail.kernel.org (Postfix) with ESMTP id 634B065004
 	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 10:56:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233732AbhCLK4B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 12 Mar 2021 05:56:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41002 "EHLO
+        id S233725AbhCLK4A (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 12 Mar 2021 05:56:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40992 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233692AbhCLKzr (ORCPT
+        with ESMTP id S233681AbhCLKzo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 12 Mar 2021 05:55:47 -0500
-Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF797C061761
-        for <linux-block@vger.kernel.org>; Fri, 12 Mar 2021 02:55:46 -0800 (PST)
-Received: by mail-wm1-x32d.google.com with SMTP id m20-20020a7bcb940000b029010cab7e5a9fso15505736wmi.3
-        for <linux-block@vger.kernel.org>; Fri, 12 Mar 2021 02:55:46 -0800 (PST)
+        Fri, 12 Mar 2021 05:55:44 -0500
+Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A926C061761
+        for <linux-block@vger.kernel.org>; Fri, 12 Mar 2021 02:55:44 -0800 (PST)
+Received: by mail-wr1-x42b.google.com with SMTP id j18so1516402wra.2
+        for <linux-block@vger.kernel.org>; Fri, 12 Mar 2021 02:55:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=xA52xjDJnHJLgzflByk0CYC2xv7fgNWSlI8xs2AjI2I=;
-        b=yBhGkoCBvWZlTxApi3aQJCnXm6iZzfXW4lQ1f6lbu63T/UR1hwscaZQgi6mFsVg64a
-         oiA/rWoXUQKQGJ5nth3GW+1+N6Q9vQ+LsOSskFQvM5+FfVpyUsxa1oVrzuO7bgSsVet+
-         1LCEz6xdgaUNJ0NNVGWeHhf6ln0L/JSLz2qMsYBqA3fk6Yl2JEUPxgAQyQB+GlNOero6
-         ZpeDtbIKY2N+DkzL73rgHW+TRdFtjfwk7QEw69eurO+gkMsQEIQpbkTgDWbcfs1q/+t5
-         Bx5XTPDeM450Q5ULCtVDlRXPeZuf8JJp9FGJSRNnul8wY2tmaHUSIYbYczvw3aGjkxBJ
-         9yiQ==
+        bh=ra48pT9rfpiijjx5/hqCOGUdkD2PZ1gvyu+SmCrCjD4=;
+        b=Oef+d4eRWh1sAVKLw1nPhinRKqgeXpg/GUlyB4VHS87v+IMN6D8TxBv1W64GWviozS
+         VoIEf+MupbFHJFaNddKk1CGZfBGSchQpUsXuDWcwTdiJ3KRmd4gPqtLIfy29kogPBbgu
+         hjixb95FG3Isvqs/BhAjWAm923IKAVF7M+mi70eSov3NFrbG0RwI7Zel83ln6I/2VszK
+         f7bWbDXZZBKhU59Pnpnh3itv2dH5MchQgMwyJak0kjvEA4xUvZFS1C+XdkiXRX6tMfQw
+         Ii+IuYZ74uJiRQHgtzit+eUkURgREtTUka8Xb1LXjJgnvNFtYqGapKdTzKmhD68hj71T
+         pCEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=xA52xjDJnHJLgzflByk0CYC2xv7fgNWSlI8xs2AjI2I=;
-        b=b49Ys+FZHGlxbGQWn4exSpn4ZDZU6a28B4ndct021jUMKsiWfelWx9/LIdCJzfRUvK
-         Uf1OAgauloWc5MhsbGZpRAmN99EDCzXJ9s3/da0O9V48fF3YU6S/E3lqX9iGrv89k+IO
-         gAYjA6d3oInfvKxs0Vyp3Uuy/Vv/Ww+rav3gSbWczW9cN+nUcpjncC9x/+1I0btNdZkc
-         Lfuh/W/AWvifzW6NLXj75FQK7tpcEMOBdTzt7O7eg5dijeTwe/UGvaMVivpx1CxYBo1q
-         cUF+oNtV691A2jVe+/O8bFINaV5v2WhZfGIz6j9uADmhjDfHX0tOMefmec/bjVb8/O84
-         DSDQ==
-X-Gm-Message-State: AOAM530a2CxXlHqtMgS8u+uCJQPzW1eO9DTeU66nfRSmQgjOqiohRzaS
-        BonwL2tTf68Ixk/9r16Oww+xPw==
-X-Google-Smtp-Source: ABdhPJyuSwTDyvh7rCaXNW786qrIPBHDymlJenX8Hl8exjSrhayuRqjYskb8CzXmWzlIWfVNFKDDdw==
-X-Received: by 2002:a1c:9a0e:: with SMTP id c14mr12656107wme.34.1615546545649;
-        Fri, 12 Mar 2021 02:55:45 -0800 (PST)
+        bh=ra48pT9rfpiijjx5/hqCOGUdkD2PZ1gvyu+SmCrCjD4=;
+        b=kEbS+lW+OE6uWtFe+/j29XTIQDax8fTXRAUHX/Rrv3VBtnXbblx0UVoK/nrnaue56u
+         i6AW6/aOCU+I9YFf0SPHyK6KIRNo50l4lC0ZW2Ec+i8HkSwq2qThMMhQ6NRVJkJLHLiq
+         w7vWvmv5IgXactDPZMBTfzNsW2LxlWIRVHuIvM9bjMHkTjMQQib5kHrpOIFJH/yniPXo
+         +lXWfhwlTC2T9cz3LopdQydYPd5OQ7wOg5U4IhU8cD3ckRslpuKidzXACgTzQUyJtsGL
+         S8lQZy6m8t0B0icuv44U902CuRqgJ7gMJekZjnMa7fclrQxOfrvB5wHvrQdK59d7wQME
+         HZcw==
+X-Gm-Message-State: AOAM531hYVliUwfAdvdd0YClpzhXc44PDH0TMYkHbrAtAJ+AbB8xBIwt
+        6lyrCV8p828PAlUACRjAmsalFJK618BugA==
+X-Google-Smtp-Source: ABdhPJzMqLsZXEdmvMOw6kJWzAJoj5oRWwuNxlJb3z7y5Zj3s4CdlgUTzAeRsuGUgysF2Ux1mr9chQ==
+X-Received: by 2002:adf:d1ce:: with SMTP id b14mr13284518wrd.126.1615546542769;
+        Fri, 12 Mar 2021 02:55:42 -0800 (PST)
 Received: from dell.default ([91.110.221.204])
-        by smtp.gmail.com with ESMTPSA id q15sm7264962wrr.58.2021.03.12.02.55.44
+        by smtp.gmail.com with ESMTPSA id q15sm7264962wrr.58.2021.03.12.02.55.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Mar 2021 02:55:45 -0800 (PST)
+        Fri, 12 Mar 2021 02:55:42 -0800 (PST)
 From:   Lee Jones <lee.jones@linaro.org>
 To:     lee.jones@linaro.org
 Cc:     linux-kernel@vger.kernel.org,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Juergen Gross <jgross@suse.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, xen-devel@lists.xenproject.org,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        Jens Axboe <axboe@kernel.dk>, drbd-dev@lists.linbit.com,
         linux-block@vger.kernel.org
-Subject: [PATCH 10/11] block: xen-blkfront: Demote kernel-doc abuses
-Date:   Fri, 12 Mar 2021 10:55:29 +0000
-Message-Id: <20210312105530.2219008-11-lee.jones@linaro.org>
+Subject: [PATCH 07/11] block: drbd: drbd_nl: Make conversion to 'enum drbd_ret_code' explicit
+Date:   Fri, 12 Mar 2021 10:55:26 +0000
+Message-Id: <20210312105530.2219008-8-lee.jones@linaro.org>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20210312105530.2219008-1-lee.jones@linaro.org>
 References: <20210312105530.2219008-1-lee.jones@linaro.org>
@@ -81,57 +78,73 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 Fixes the following W=1 kernel build warning(s):
 
- drivers/block/xen-blkfront.c:1960: warning: Function parameter or member 'dev' not described in 'blkfront_probe'
- drivers/block/xen-blkfront.c:1960: warning: Function parameter or member 'id' not described in 'blkfront_probe'
- drivers/block/xen-blkfront.c:1960: warning: expecting prototype for Allocate the basic(). Prototype was for blkfront_probe() instead
- drivers/block/xen-blkfront.c:2085: warning: Function parameter or member 'dev' not described in 'blkfront_resume'
- drivers/block/xen-blkfront.c:2085: warning: expecting prototype for or a backend(). Prototype was for blkfront_resume() instead
- drivers/block/xen-blkfront.c:2444: warning: wrong kernel-doc identifier on line:
+ from drivers/block/drbd/drbd_nl.c:24:
+ drivers/block/drbd/drbd_nl.c: In function ‘drbd_adm_set_role’:
+ drivers/block/drbd/drbd_nl.c:793:11: warning: implicit conversion from ‘enum drbd_state_rv’ to ‘enum drbd_ret_code’ [-Wenum-conversion]
+ drivers/block/drbd/drbd_nl.c:795:11: warning: implicit conversion from ‘enum drbd_state_rv’ to ‘enum drbd_ret_code’ [-Wenum-conversion]
+ drivers/block/drbd/drbd_nl.c: In function ‘drbd_adm_attach’:
+ drivers/block/drbd/drbd_nl.c:1965:10: warning: implicit conversion from ‘enum drbd_state_rv’ to ‘enum drbd_ret_code’ [-Wenum-conversion]
+ drivers/block/drbd/drbd_nl.c: In function ‘drbd_adm_connect’:
+ drivers/block/drbd/drbd_nl.c:2690:10: warning: implicit conversion from ‘enum drbd_state_rv’ to ‘enum drbd_ret_code’ [-Wenum-conversion]
+ drivers/block/drbd/drbd_nl.c: In function ‘drbd_adm_disconnect’:
+ drivers/block/drbd/drbd_nl.c:2803:11: warning: implicit conversion from ‘enum drbd_state_rv’ to ‘enum drbd_ret_code’ [-Wenum-conversion]
 
-Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Cc: "Roger Pau Monné" <roger.pau@citrix.com>
-Cc: Boris Ostrovsky <boris.ostrovsky@oracle.com>
-Cc: Juergen Gross <jgross@suse.com>
-Cc: Stefano Stabellini <sstabellini@kernel.org>
+Cc: Philipp Reisner <philipp.reisner@linbit.com>
+Cc: Lars Ellenberg <lars.ellenberg@linbit.com>
 Cc: Jens Axboe <axboe@kernel.dk>
-Cc: xen-devel@lists.xenproject.org
+Cc: drbd-dev@lists.linbit.com
 Cc: linux-block@vger.kernel.org
 Signed-off-by: Lee Jones <lee.jones@linaro.org>
 ---
- drivers/block/xen-blkfront.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ drivers/block/drbd/drbd_nl.c | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
-index e1c6798889f48..e57e3cd354fb8 100644
---- a/drivers/block/xen-blkfront.c
-+++ b/drivers/block/xen-blkfront.c
-@@ -1949,7 +1949,7 @@ module_param(feature_persistent, bool, 0644);
- MODULE_PARM_DESC(feature_persistent,
- 		"Enables the persistent grants feature");
+diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c
+index bf7de4c7b96c1..31902304ddac7 100644
+--- a/drivers/block/drbd/drbd_nl.c
++++ b/drivers/block/drbd/drbd_nl.c
+@@ -790,9 +790,11 @@ int drbd_adm_set_role(struct sk_buff *skb, struct genl_info *info)
+ 	mutex_lock(&adm_ctx.resource->adm_mutex);
  
--/**
-+/*
-  * Entry point to this code when a new device is created.  Allocate the basic
-  * structures and the ring buffer for communication with the backend, and
-  * inform the backend of the appropriate details for those.  Switch to
-@@ -2075,7 +2075,7 @@ static int blkif_recover(struct blkfront_info *info)
- 	return 0;
- }
+ 	if (info->genlhdr->cmd == DRBD_ADM_PRIMARY)
+-		retcode = drbd_set_role(adm_ctx.device, R_PRIMARY, parms.assume_uptodate);
++		retcode = (enum drbd_ret_code)drbd_set_role(adm_ctx.device,
++						R_PRIMARY, parms.assume_uptodate);
+ 	else
+-		retcode = drbd_set_role(adm_ctx.device, R_SECONDARY, 0);
++		retcode = (enum drbd_ret_code)drbd_set_role(adm_ctx.device,
++						R_SECONDARY, 0);
  
--/**
-+/*
-  * We are reconnecting to the backend, due to a suspend/resume, or a backend
-  * driver restart.  We tear down our blkif structure and recreate it, but
-  * leave the device-layer structures intact so that this is transparent to the
-@@ -2440,7 +2440,7 @@ static void blkfront_connect(struct blkfront_info *info)
- 	return;
- }
+ 	mutex_unlock(&adm_ctx.resource->adm_mutex);
+ 	genl_lock();
+@@ -1962,7 +1964,7 @@ int drbd_adm_attach(struct sk_buff *skb, struct genl_info *info)
+ 	drbd_flush_workqueue(&connection->sender_work);
  
--/**
-+/*
-  * Callback received when the backend's state changes.
-  */
- static void blkback_changed(struct xenbus_device *dev,
+ 	rv = _drbd_request_state(device, NS(disk, D_ATTACHING), CS_VERBOSE);
+-	retcode = rv;  /* FIXME: Type mismatch. */
++	retcode = (enum drbd_ret_code)rv;
+ 	drbd_resume_io(device);
+ 	if (rv < SS_SUCCESS)
+ 		goto fail;
+@@ -2687,7 +2689,8 @@ int drbd_adm_connect(struct sk_buff *skb, struct genl_info *info)
+ 	}
+ 	rcu_read_unlock();
+ 
+-	retcode = conn_request_state(connection, NS(conn, C_UNCONNECTED), CS_VERBOSE);
++	retcode = (enum drbd_ret_code)conn_request_state(connection,
++					NS(conn, C_UNCONNECTED), CS_VERBOSE);
+ 
+ 	conn_reconfig_done(connection);
+ 	mutex_unlock(&adm_ctx.resource->adm_mutex);
+@@ -2800,7 +2803,7 @@ int drbd_adm_disconnect(struct sk_buff *skb, struct genl_info *info)
+ 	mutex_lock(&adm_ctx.resource->adm_mutex);
+ 	rv = conn_try_disconnect(connection, parms.force_disconnect);
+ 	if (rv < SS_SUCCESS)
+-		retcode = rv;  /* FIXME: Type mismatch. */
++		retcode = (enum drbd_ret_code)rv;
+ 	else
+ 		retcode = NO_ERROR;
+ 	mutex_unlock(&adm_ctx.resource->adm_mutex);
 -- 
 2.27.0
 
