@@ -2,100 +2,159 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEEB0C433DB
-	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 20:02:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C2D3C433E0
+	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 20:07:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 90E3A64F86
-	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 20:02:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BEFB164F0B
+	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 20:07:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234121AbhCLUBc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 12 Mar 2021 15:01:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46378 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234528AbhCLUBV (ORCPT
+        id S234600AbhCLUHY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 12 Mar 2021 15:07:24 -0500
+Received: from ale.deltatee.com ([204.191.154.188]:59886 "EHLO
+        ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234596AbhCLUGx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 12 Mar 2021 15:01:21 -0500
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC9B2C061574
-        for <linux-block@vger.kernel.org>; Fri, 12 Mar 2021 12:01:21 -0800 (PST)
-Received: by mail-pj1-x1032.google.com with SMTP id t18so5669636pjs.3
-        for <linux-block@vger.kernel.org>; Fri, 12 Mar 2021 12:01:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=v/UNWIhoMbNZ2UJ0E/ZPfqJfvT9+60zw5SGiKePJ9P4=;
-        b=tR4EvNUStAuDoH0p5DW9uLKts2Vr+kbFqtfq1b924wIlp2vsh65kX96+bmNOP6ATsv
-         9fhaB7YNCJPPBZl0r7kNL3dcnClaHeODnpUREZFbHKhvvX72HeYliAvlMFCF34SxOM2+
-         IpuxavzDW4CIHWCN80nRAqY6Xf3FpeXEmnD5J2h/gGfdmalVZ/Kr5seUQzYUmpdySTVm
-         Gc6NcKdU5G6+RkuxLBJ48Csl6uoGfgL4QYUQ+VHo28oM7wGiKaj35Sxgzks9Wml+w8DY
-         aG2wPr/2jUHA5/oZ4cHn+JtyzOjrezlV1H3l6uyVV0BEhmgcUzDcxTCEuhZvZ3BzG86t
-         wgHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=v/UNWIhoMbNZ2UJ0E/ZPfqJfvT9+60zw5SGiKePJ9P4=;
-        b=YRc5WnxA7kaEKzgKXw4t7PaUgJ03oTrID/mbxLT/nhtKfiU1zYKf8DzbE3ua0ugg6C
-         s1/WmaTmpplw8O0jcE1v0WeF3w4wYmvhliVyQ1pAB/28WJmuPjVes6dKz5BBe/eJD5Rs
-         BT2HhDtCn66fMRSRoC/Gd65gQTvfEuWOHUWED+SM3qylaUGNCtUXxdSqu1mJHjB0gFwK
-         fpLV4HqXalgQrFfXVWqe3Jb4kr4PM6dzrdCB9lY6n8VFnEJufQp6jagHScXKe9IVjGbR
-         tBL1YFuvJaXSqwHa8HGlDAbBo96366fpldHh5MohdADav/aS2YPNdwI6So3DHgHTUH1n
-         uQVA==
-X-Gm-Message-State: AOAM533S1nLEVOZgJwBFyIaOmxiX7nMneWkO41OLml9BeDUZ5/1ZQhwn
-        EwO01Q4clJRnvPrOaeKkJ8k9TLz4y1nzcg==
-X-Google-Smtp-Source: ABdhPJwNAeGOkGbc1Usxrnpb7ZPM8m7wt+fqXqNzM9fEAdLRRKmXLi2c1R97H64SSacE9F5tshbBMg==
-X-Received: by 2002:a17:90a:5889:: with SMTP id j9mr3709168pji.69.1615579280612;
-        Fri, 12 Mar 2021 12:01:20 -0800 (PST)
-Received: from [192.168.1.134] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id 2sm6173752pfi.116.2021.03.12.12.01.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 12 Mar 2021 12:01:19 -0800 (PST)
-Subject: Re: [GIT PULL] nvme fixes for 5.12
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
-        Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org
-References: <YEszeMEAQyfTPgHH@infradead.org>
- <2a34717a-b5c5-0a3c-02b0-eb8a144aba15@kernel.dk>
- <20210312195932.GA2766489@infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <7d7e0f1d-649f-e977-f65a-e0a6ae69d327@kernel.dk>
-Date:   Fri, 12 Mar 2021 13:01:18 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Fri, 12 Mar 2021 15:06:53 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:MIME-Version:Date:
+        Message-ID:From:References:Cc:To:content-disposition;
+        bh=/dKXn2MTgnalq4INDTL+cUYvr798DsS+qKv7RTLo0q8=; b=da62C93BS1h63ogYf0+1s+anR6
+        jE7LGT3lzTTjYIIqb+PgW/fdS/Tx6fEntgD51NJlTprHY0a60/LT/QP4Fc5Ai6ePuzSg+5NF+L6py
+        nRbrs8LRxsjgEQ3bbreB2q1tcLRZSbwiR6N63c8IPAj25MKLjTff5d3tDmA5GNH69iLyo75HdTRQL
+        icsGfRW5L4uGM435GQLPMFZysIjMtxvto4KAjvE2O5c0vlurrQcxvNGeRxzpZnms87a0en6OmRz0y
+        4VE4+Oyatorjzq2kdC3StQcBh4Yfq+TM0mZnbCUm+7sKjhSlsjY53WT5kVLKDNyivZA8UJ6mwJmxv
+        bJOEOTPw==;
+Received: from s01060023bee90a7d.cg.shawcable.net ([24.64.145.4] helo=[192.168.0.10])
+        by ale.deltatee.com with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <logang@deltatee.com>)
+        id 1lKo3U-00023x-1V; Fri, 12 Mar 2021 13:06:41 -0700
+To:     Robin Murphy <robin.murphy@arm.com>, linux-kernel@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        linux-pci@vger.kernel.org, linux-mm@kvack.org,
+        iommu@lists.linux-foundation.org
+Cc:     Minturn Dave B <dave.b.minturn@intel.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Ira Weiny <iweiny@intel.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Jason Ekstrand <jason@jlekstrand.net>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Stephen Bates <sbates@raithlin.com>,
+        Jakowski Andrzej <andrzej.jakowski@intel.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Xiong Jianxin <jianxin.xiong@intel.com>
+References: <20210311233142.7900-1-logang@deltatee.com>
+ <20210311233142.7900-9-logang@deltatee.com>
+ <accd4187-7a9d-a8fc-f216-98ec24e3411a@arm.com>
+ <45701356-ee41-1ad2-0e06-ca74af87b05a@deltatee.com>
+ <76cc1c82-3cf4-92d3-992f-5c876ed30523@arm.com>
+From:   Logan Gunthorpe <logang@deltatee.com>
+Message-ID: <6dd679b3-e38b-2c18-1990-bfc96bb4d971@deltatee.com>
+Date:   Fri, 12 Mar 2021 13:06:34 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.1
 MIME-Version: 1.0
-In-Reply-To: <20210312195932.GA2766489@infradead.org>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <76cc1c82-3cf4-92d3-992f-5c876ed30523@arm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 24.64.145.4
+X-SA-Exim-Rcpt-To: jianxin.xiong@intel.com, hch@lst.de, andrzej.jakowski@intel.com, sbates@raithlin.com, dan.j.williams@intel.com, daniel.vetter@ffwll.ch, jason@jlekstrand.net, jgg@ziepe.ca, christian.koenig@amd.com, willy@infradead.org, iweiny@intel.com, dave.hansen@linux.intel.com, jhubbard@nvidia.com, dave.b.minturn@intel.com, iommu@lists.linux-foundation.org, linux-mm@kvack.org, linux-pci@vger.kernel.org, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, robin.murphy@arm.com
+X-SA-Exim-Mail-From: logang@deltatee.com
+Subject: Re: [RFC PATCH v2 08/11] iommu/dma: Support PCI P2PDMA pages in
+ dma-iommu map_sg
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/12/21 12:59 PM, Christoph Hellwig wrote:
-> On Fri, Mar 12, 2021 at 07:21:39AM -0700, Jens Axboe wrote:
->> On 3/12/21 2:25 AM, Christoph Hellwig wrote:
->>> The following changes since commit df66617bfe87487190a60783d26175b65d2502ce:
+
+
+On 2021-03-12 12:47 p.m., Robin Murphy wrote:
+>>>>    {
+>>>>        struct scatterlist *s, *cur = sg;
+>>>>        unsigned long seg_mask = dma_get_seg_boundary(dev);
+>>>> @@ -864,6 +865,20 @@ static int __finalise_sg(struct device *dev,
+>>>> struct scatterlist *sg, int nents,
+>>>>            sg_dma_address(s) = DMA_MAPPING_ERROR;
+>>>>            sg_dma_len(s) = 0;
+>>>>    +        if (is_pci_p2pdma_page(sg_page(s)) && !s_iova_len) {
+>>>> +            if (i > 0)
+>>>> +                cur = sg_next(cur);
+>>>> +
+>>>> +            sg_dma_address(cur) = sg_phys(s) + s->offset -
 >>>
->>>   block: rsxx: fix error return code of rsxx_pci_probe() (2021-03-10 08:25:37 -0700)
->>>
->>> are available in the Git repository at:
->>>
->>>   git://git.infradead.org/nvme.git tags/nvme-5.12-2021-03-12
+>>> Are you sure about that? ;)
 >>
->> Pulled, thanks.
+>> Do you see a bug? I don't follow you...
 > 
-> I just sent you another one liner fixup on top of this directly.
+> sg_phys() already accounts for the offset, so you're adding it twice.
 
-Where? I didn't receive any.
+Ah, oops. Nice catch. I missed that.
 
--- 
-Jens Axboe
+> 
+>>>> +                pci_p2pdma_bus_offset(sg_page(s));
+>>>
+>>> Can the bus offset make P2P addresses overlap with regions of mem space
+>>> that we might use for regular IOVA allocation? That would be very bad...
+>>
+>> No. IOMMU drivers already disallow all PCI addresses from being used as
+>> IOVA addresses. See, for example,  dmar_init_reserved_ranges(). It would
+>> be a huge problem for a whole lot of other reasons if it didn't.
+> 
+> I know we reserve the outbound windows (largely *because* some host 
+> bridges will consider those addresses as attempts at unsupported P2P and 
+> prevent them working), I just wanted to confirm that this bus offset is 
+> always something small that stays within the relevant window, rather 
+> than something that might make a BAR appear in a completely different 
+> place for P2P purposes. If so, that's good.
 
+Yes, well if an IOVA overlaps with any PCI bus address there's going to 
+be some difficult brokenness because when the IOVA is used it might be 
+directed to the a PCI device and not the IOMMU. I fixed a bug like that 
+once.
+>>> I'm not really thrilled about the idea of passing zero-length segments
+>>> to iommu_map_sg(). Yes, it happens to trick the concatenation logic in
+>>> the current implementation into doing what you want, but it feels 
+>>> fragile.
+>>
+>> We're not passing zero length segments to iommu_map_sg() (or any
+>> function). This loop is just scanning to calculate the length of the
+>> required IOVA. __finalise_sg() (which is intimately tied to this loop)
+>> then needs a way to determine which segments were P2P segments. The
+>> existing code already overwrites s->length with an aligned length and
+>> stores the original length in sg_dma_len. So we're not relying on
+>> tricking any logic here.
+> 
+> Yes, we temporarily shuffle in page-aligned quantities to satisfy the 
+> needs of the iommu_map_sg() call, before unpacking things again in 
+> __finalise_sg(). It's some disgusting trickery that I'm particularly 
+> proud of. My point is that if you have a mix of both p2p and normal 
+> segments - which seems to be a case you want to support - then the 
+> length of 0 that you set to flag p2p segments here will be seen by 
+> iommu_map_sg() (as it walks the list to map the other segments) before 
+> you then use it as a key to override the DMA address in the final step. 
+> It's not a concern if you have a p2p-only list and short-circuit 
+> straight to that step (in which case all the shuffling was wasted effort 
+> anyway), but since it's not entirely clear what a segment with zero 
+> length would mean in general, it seems like a good idea to avoid passing 
+> the list across a public boundary in that state, if possible.
+
+Ok, well, I mean the iommu_map_sg() does the right thing as is without 
+changing it and IMO sg->length set to zero does make sense. Supporting 
+mixed P2P and normal segments is really the whole point of this series 
+(the current kernel supports homogeneous SGLs with a specialized path -- 
+see pci_p2pdma_unmap_sg_attrs()). But do you have an alternate solution 
+for sg->length?
+
+Logan
