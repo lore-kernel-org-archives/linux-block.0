@@ -2,125 +2,116 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA908C433E0
-	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 02:15:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6E92C433E0
+	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 02:19:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8D01664F8E
-	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 02:15:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 88E2964F70
+	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 02:19:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229606AbhCLCPO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 11 Mar 2021 21:15:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42086 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229558AbhCLCOo (ORCPT
+        id S230084AbhCLCS7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 11 Mar 2021 21:18:59 -0500
+Received: from ale.deltatee.com ([204.191.154.188]:49156 "EHLO
+        ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229569AbhCLCSb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Mar 2021 21:14:44 -0500
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74892C061574;
-        Thu, 11 Mar 2021 18:14:44 -0800 (PST)
-Received: by mail-pf1-x42d.google.com with SMTP id a188so834368pfb.4;
-        Thu, 11 Mar 2021 18:14:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=DLypqHmd9Wl8adDWo2RyhZBE8XSLiDUVzOC9qvznIU8=;
-        b=B3oWOI+K2T5zV/Md7TadfLAmGLPu+uD1roU9mISoVp8QM6Lton5aFPivU8QWfVxj4j
-         5zfvtkNN2yjCDsDAt27yTASwV8QOfEq5cT58TNhxWU0dL/g/6DYGP47z6dSqzhPsI2I+
-         BDc9thgGofUPaS4GbYAqm6nR0VgRjU7LiWtACxjR0TddbJFDRvZXvIVbt1JCUrcL0bhe
-         8F1E+XSbMT5jQZ1E331ImgIUYr7nQe4+a78GtAqAUe8O9PKjDC/eOiAIhkd0btitmR98
-         BQmrgY3a74lrgjv3kSNGf+FLhv9Sl7ncAUKrwi2BgvO8kuspQm3smpflI/pZ6a2MHJ+9
-         xj9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=DLypqHmd9Wl8adDWo2RyhZBE8XSLiDUVzOC9qvznIU8=;
-        b=YKapaVX+tC4G7bELxBX9uIeYbJAwfaMB+0DA1Vh+PqDPEch0roKT18qX5uiAlFptwN
-         7kKqNqxOO+WiI1pnhy/zAS2yO0UgSzI97fj29CXG4rOb+jD/UVqnvkAEE8YgBHdAxL+S
-         j8D9TXj7LYCZizYjIUgFMKuvHe3IZPUnhnskn/Ii4vSlTDWO9blZYIj0xtZyBsmCQ26o
-         RwzM7l2VX5Y4uIleCQgZoNZR9ibBZW+E1FIg72/eVI/v5nOnA1e+HALo9UXTpQcI4lyb
-         7LLckPfATZK1aHm8P1H0GrBU6Qqd3KgfKSKY97tATlqi9zPji5z4HPsSBpudGzbc9dd/
-         8hCw==
-X-Gm-Message-State: AOAM531YAWFWKtyhptMqqHC/UQC+l66bSvl42C6MTQhQAdehqe/+IfyO
-        dJxGJ0jf2nWYzxsAmdam8uU=
-X-Google-Smtp-Source: ABdhPJz33tsfuzaXaKHm7Wr7SIqzZWngowKHicIKhIrkJ5ud501aWmDCFj1D/XjPCwgckpPdOhrnMQ==
-X-Received: by 2002:a63:fb18:: with SMTP id o24mr9404191pgh.55.1615515283833;
-        Thu, 11 Mar 2021 18:14:43 -0800 (PST)
-Received: from google.com ([2620:15c:211:201:64cb:74c7:f2c:e5e0])
-        by smtp.gmail.com with ESMTPSA id l22sm371771pjl.14.2021.03.11.18.14.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Mar 2021 18:14:42 -0800 (PST)
-Sender: Minchan Kim <minchan.kim@gmail.com>
-Date:   Thu, 11 Mar 2021 18:14:40 -0800
-From:   Minchan Kim <minchan@kernel.org>
-To:     Luis Chamberlain <mcgrof@kernel.org>, gregkh@linuxfoundation.org
-Cc:     ngupta@vflare.org, sergey.senozhatsky.work@gmail.com,
-        axboe@kernel.dk, mbenes@suse.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] zram: fix crashes due to use of cpu hotplug
- multistate
-Message-ID: <YErOkGrvtQODXtB0@google.com>
-References: <20210306022035.11266-1-mcgrof@kernel.org>
- <20210306022035.11266-2-mcgrof@kernel.org>
- <YEbjom8FIclEgRYv@google.com>
- <20210310212128.GR4332@42.do-not-panic.com>
+        Thu, 11 Mar 2021 21:18:31 -0500
+X-Greylist: delayed 2466 seconds by postgrey-1.27 at vger.kernel.org; Thu, 11 Mar 2021 21:18:30 EST
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:MIME-Version:Date:
+        Message-ID:From:References:Cc:To:content-disposition;
+        bh=TthgKQQeKaY8Nk8kByxBsMn1+rajpO9j2vCO0oMycYg=; b=k5/TOv/t9MI8U4lhl5xd0eVHRI
+        DEKyTXEcuq5sX7Xy2TXIwqOAOZ73ZqhrLuTntYIMTvCOCq8PRu9o7rWRFdwy4LEmwJcHwyWL9BvxE
+        E3psi+/9MRziL+BVzgCEmcxCM77bWwNBiF0H8QBoLUfFeTtCEH58WSnu/bBSwfWEc0X1HLYx+UY6W
+        Ig6tahtLX1Cp8ddWB4Vw3kJiR4S7bXzhUgT4PrlGFGZiBmn37haj35vV85OvDcD2h9GakgTEPhmP8
+        5ULZeqF8e05hdIS9qe+Vati5jKVwahKR4z2FkN46o43eFB9sPRT5TVTR6byB7fKBkdA6vj9c1GMvK
+        qXUpe9FA==;
+Received: from s01060023bee90a7d.cg.shawcable.net ([24.64.145.4] helo=[192.168.0.10])
+        by ale.deltatee.com with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <logang@deltatee.com>)
+        id 1lKWjj-0005aG-5w; Thu, 11 Mar 2021 18:37:08 -0700
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-mm@kvack.org, iommu@lists.linux-foundation.org,
+        Stephen Bates <sbates@raithlin.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Dan Williams <dan.j.williams@intel.com>,
+        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
+        Ira Weiny <iweiny@intel.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Don Dutile <ddutile@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Jakowski Andrzej <andrzej.jakowski@intel.com>,
+        Minturn Dave B <dave.b.minturn@intel.com>,
+        Jason Ekstrand <jason@jlekstrand.net>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Xiong Jianxin <jianxin.xiong@intel.com>
+References: <20210311233142.7900-1-logang@deltatee.com>
+ <20210311233142.7900-12-logang@deltatee.com>
+ <20210311235943.GB2710221@ziepe.ca>
+From:   Logan Gunthorpe <logang@deltatee.com>
+Message-ID: <c6cc9e07-b7cf-6d3d-b0bf-25428b197731@deltatee.com>
+Date:   Thu, 11 Mar 2021 18:37:03 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210310212128.GR4332@42.do-not-panic.com>
+In-Reply-To: <20210311235943.GB2710221@ziepe.ca>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-CA
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 24.64.145.4
+X-SA-Exim-Rcpt-To: jianxin.xiong@intel.com, dave.hansen@linux.intel.com, jason@jlekstrand.net, dave.b.minturn@intel.com, andrzej.jakowski@intel.com, daniel.vetter@ffwll.ch, willy@infradead.org, ddutile@redhat.com, jhubbard@nvidia.com, iweiny@intel.com, christian.koenig@amd.com, dan.j.williams@intel.com, hch@lst.de, sbates@raithlin.com, iommu@lists.linux-foundation.org, linux-mm@kvack.org, linux-pci@vger.kernel.org, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, jgg@ziepe.ca
+X-SA-Exim-Mail-From: logang@deltatee.com
+Subject: Re: [RFC PATCH v2 11/11] nvme-pci: Convert to using dma_map_sg for
+ p2pdma pages
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 10, 2021 at 09:21:28PM +0000, Luis Chamberlain wrote:
-> On Mon, Mar 08, 2021 at 06:55:30PM -0800, Minchan Kim wrote:
-> > If I understand correctly, bugs you found were related to module
-> > unloading race while the zram are still working.
+
+
+On 2021-03-11 4:59 p.m., Jason Gunthorpe wrote:
+> On Thu, Mar 11, 2021 at 04:31:41PM -0700, Logan Gunthorpe wrote:
+>> Convert to using dma_[un]map_sg() for PCI p2pdma pages.
+>>
+>> This should be equivalent, though support will be somewhat less
+>> (only dma-direct and dma-iommu are currently supported).
+>>
+>> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+>>  drivers/nvme/host/pci.c | 27 +++++++--------------------
+>>  1 file changed, 7 insertions(+), 20 deletions(-)
+>>
+>> diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+>> index 7d40c6a9e58e..89ca5acf7a62 100644
+>> +++ b/drivers/nvme/host/pci.c
+>> @@ -577,17 +577,6 @@ static void nvme_free_sgls(struct nvme_dev *dev, struct request *req)
+>>  
+>>  }
+>>  
+>> -static void nvme_unmap_sg(struct nvme_dev *dev, struct request *req)
+>> -{
+>> -	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
+>> -
+>> -	if (is_pci_p2pdma_page(sg_page(iod->sg)))
+>> -		pci_p2pdma_unmap_sg(dev->dev, iod->sg, iod->nents,
+>> -				    rq_dma_dir(req));
+>> -	else
+>> -		dma_unmap_sg(dev->dev, iod->sg, iod->nents, rq_dma_dir(req));
+>> -}
 > 
-> No, that is a simplifcation of the issue. The issue consists of
-> two separate issues:
-> 
->  a) race against module unloading in light of incorrect racty use of
->     cpu hotplug multistate support
+> Can the two other places with this code pattern be changed too?
 
+Yes, if this goes forward, I imagine completely dropping
+pci_p2pdma_unmap_sg().
 
-Could you add some pusedo code sequence to show the race cleary?
-It would be great if it goes in the description, too since it's
-more clear to show the problme.
-
->  b) module unload race with sysfs attribute race on *any* driver which
->     has sysfs attributes which also shares the same lock as used during
->     module unload
-
-Yub, that part I missed. Maybe, we need some wrapper to zram sysfs
-to get try_module_get in the warapper funnction and then call sub
-rountine only if it got the refcount.
-
-zram_sysfs_wrapper(func, A, B)
-    if (!try_module_get(THIS_MODULE)
-        return -ENODEV;
-    ret = func(A,B);
-    module_put(THIS_MODULE);
-    return ret;
-
-> 
-> It is important to realize that issue b) is actually a generic kernel
-> issue, it would be present on *any* driver which shares a lock used on
-> a sysfs attribute and module unload. I looked to implement a generic
-> solution on kernfs, however we don't yet have semantics to enable this
-> generically, and so for now each driver needs to deal with those races
-> on their own. That sysfs race is dealt with in the second patch.
-
-It's unforunate. Let me Cc Greg who might have some ideas or
-find zram mess on zram sysfs implementation.
-
-> 
-> The first patch only deals with the cpu hotplug races exposed at module
-> unloading.
-
-True. Thanks for the clarification.
+Logan
