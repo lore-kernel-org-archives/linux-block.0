@@ -2,170 +2,154 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8530FC433DB
-	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 18:29:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE908C433E6
+	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 18:33:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 422C464F6B
-	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 18:29:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B6F7664F77
+	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 18:33:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233170AbhCLS2h (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 12 Mar 2021 13:28:37 -0500
-Received: from ale.deltatee.com ([204.191.154.188]:47694 "EHLO
-        ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232802AbhCLS2I (ORCPT
+        id S232554AbhCLScx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 12 Mar 2021 13:32:53 -0500
+Received: from mail-pg1-f173.google.com ([209.85.215.173]:39791 "EHLO
+        mail-pg1-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233329AbhCLSck (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 12 Mar 2021 13:28:08 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:MIME-Version:Date:
-        Message-ID:From:References:Cc:To:content-disposition;
-        bh=Hyn4+hD/rcL5U1sAMSyBYqlThrIcs7n2BvWezL3fddg=; b=O02RcMlN/pcj/N4ypIgx4I/pQ5
-        odKzndiBxONwDvQY7XeQHM0yUL6tNtRu+tqAeZboQCn2uqEptBRencRIbjQGRldJW/jyvUA/KDtL+
-        coOgr94guexcTd1f7Szt8zRpwy1IvMAy2W3ftljmL4P8GFdKj1SN8onH4rfBxF57fhBf9xXAzAhQV
-        /qljiRXeamubdsafvZ8ZJFJ3NXcbdH1tgLymdvkHTAsjp3Q7Tool9D/nXyWTP4daDpVDiawZwjhWQ
-        lPu90abCSPKAPLbTenEiF3R13QKr9Taag/gseqawH8n8+t4hT7g05jFpAdVBsSakM2wzLS7c3hm29
-        lwmEDUkA==;
-Received: from s01060023bee90a7d.cg.shawcable.net ([24.64.145.4] helo=[192.168.0.10])
-        by ale.deltatee.com with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <logang@deltatee.com>)
-        id 1lKmVn-0000Xs-8W; Fri, 12 Mar 2021 11:27:48 -0700
-To:     Robin Murphy <robin.murphy@arm.com>, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        linux-pci@vger.kernel.org, linux-mm@kvack.org,
-        iommu@lists.linux-foundation.org
-Cc:     Minturn Dave B <dave.b.minturn@intel.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Jason Ekstrand <jason@jlekstrand.net>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Stephen Bates <sbates@raithlin.com>,
-        Jakowski Andrzej <andrzej.jakowski@intel.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Xiong Jianxin <jianxin.xiong@intel.com>
-References: <20210311233142.7900-1-logang@deltatee.com>
- <20210311233142.7900-7-logang@deltatee.com>
- <215e1472-5294-d20a-a43a-ff6dfe8cd66e@arm.com>
- <d7ead722-7356-8e0f-22de-cb9dea12b556@deltatee.com>
- <a8205c02-a43f-d4e8-a9fe-5963df3a7b40@arm.com>
-From:   Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <367fa81e-588d-5734-c69c-8cdc800dcb7e@deltatee.com>
-Date:   Fri, 12 Mar 2021 11:27:46 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.0
+        Fri, 12 Mar 2021 13:32:40 -0500
+Received: by mail-pg1-f173.google.com with SMTP id x29so16415646pgk.6;
+        Fri, 12 Mar 2021 10:32:40 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=KrGljEZwb2bS+cueEd9y2/XUe0Gja93YKDJ2vBoyhUs=;
+        b=rFFcycGySuQs/5LeDBOJDWW0lj4YtyHA60Ug9GB5839eSKT6sR8eBWu7gnkDGVc+Hx
+         bfPolTS4I8wn/dUHSEelCKhRLQ1CY/3s7+aGV4rJvnIOwy5HSeSm+l5ysKTZp6nqxcax
+         LWS/tJmdl1S0aGRfeD0cXxrpjPOq7cXjbkg6NQLzCOb9hlZlbjda8SkRJnw6e51Mg/KX
+         T01w5fROeW2ndfPF+xIV+/gZSJjlzZP5o886PdLvx/8/R4FzG6g+bOJSmKJdzLl9DwRq
+         AavnyvNnMr4pmJC8l0unKIH+vkJIRO3JQ94uYA2/BsJjj9ODkxh1alKBnLs806999zxi
+         QDeA==
+X-Gm-Message-State: AOAM531PUdDfrCxC19add0CE3DZjsMGXQZrqSU7d3mF/OLKw6kYnYb6+
+        tjYGXbx6ujK2/SsDerx85ZCwOMsBtQgIJw==
+X-Google-Smtp-Source: ABdhPJxObxLCPgA9Ydhlid7OJOWKBz7zBPkUEn94yrezjP+V5yT3o5+c64crDbXUf7YnDUPFMNbIdQ==
+X-Received: by 2002:a63:4b04:: with SMTP id y4mr1485991pga.245.1615573960324;
+        Fri, 12 Mar 2021 10:32:40 -0800 (PST)
+Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
+        by smtp.gmail.com with ESMTPSA id d25sm6111030pfo.218.2021.03.12.10.32.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Mar 2021 10:32:39 -0800 (PST)
+Received: by 42.do-not-panic.com (Postfix, from userid 1000)
+        id 5D8614046C; Fri, 12 Mar 2021 18:32:38 +0000 (UTC)
+Date:   Fri, 12 Mar 2021 18:32:38 +0000
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Minchan Kim <minchan@kernel.org>
+Cc:     gregkh@linuxfoundation.org, ngupta@vflare.org,
+        sergey.senozhatsky.work@gmail.com, axboe@kernel.dk,
+        mbenes@suse.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] zram: fix crashes due to use of cpu hotplug
+ multistate
+Message-ID: <20210312183238.GW4332@42.do-not-panic.com>
+References: <20210306022035.11266-1-mcgrof@kernel.org>
+ <20210306022035.11266-2-mcgrof@kernel.org>
+ <YEbjom8FIclEgRYv@google.com>
+ <20210310212128.GR4332@42.do-not-panic.com>
+ <YErOkGrvtQODXtB0@google.com>
 MIME-Version: 1.0
-In-Reply-To: <a8205c02-a43f-d4e8-a9fe-5963df3a7b40@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-CA
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 24.64.145.4
-X-SA-Exim-Rcpt-To: jianxin.xiong@intel.com, hch@lst.de, andrzej.jakowski@intel.com, sbates@raithlin.com, dan.j.williams@intel.com, daniel.vetter@ffwll.ch, jason@jlekstrand.net, jgg@ziepe.ca, christian.koenig@amd.com, willy@infradead.org, dave.hansen@linux.intel.com, jhubbard@nvidia.com, dave.b.minturn@intel.com, iommu@lists.linux-foundation.org, linux-mm@kvack.org, linux-pci@vger.kernel.org, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, robin.murphy@arm.com
-X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: [RFC PATCH v2 06/11] dma-direct: Support PCI P2PDMA pages in
- dma-direct map_sg
-X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YErOkGrvtQODXtB0@google.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 2021-03-12 11:11 a.m., Robin Murphy wrote:
-> On 2021-03-12 16:24, Logan Gunthorpe wrote:
->>
->>
->> On 2021-03-12 8:52 a.m., Robin Murphy wrote:
->>>> +
->>>>            sg->dma_address = dma_direct_map_page(dev, sg_page(sg),
->>>>                    sg->offset, sg->length, dir, attrs);
->>>>            if (sg->dma_address == DMA_MAPPING_ERROR)
->>>> @@ -411,7 +440,7 @@ int dma_direct_map_sg(struct device *dev, struct
->>>> scatterlist *sgl, int nents,
->>>>      out_unmap:
->>>>        dma_direct_unmap_sg(dev, sgl, i, dir, attrs |
->>>> DMA_ATTR_SKIP_CPU_SYNC);
->>>> -    return 0;
->>>> +    return ret;
->>>>    }
->>>>      dma_addr_t dma_direct_map_resource(struct device *dev, phys_addr_t
->>>> paddr,
->>>> diff --git a/kernel/dma/mapping.c b/kernel/dma/mapping.c
->>>> index b6a633679933..adc1a83950be 100644
->>>> --- a/kernel/dma/mapping.c
->>>> +++ b/kernel/dma/mapping.c
->>>> @@ -178,8 +178,15 @@ void dma_unmap_page_attrs(struct device *dev,
->>>> dma_addr_t addr, size_t size,
->>>>    EXPORT_SYMBOL(dma_unmap_page_attrs);
->>>>      /*
->>>> - * dma_maps_sg_attrs returns 0 on error and > 0 on success.
->>>> - * It should never return a value < 0.
->>>> + * dma_maps_sg_attrs returns 0 on any resource error and > 0 on
->>>> success.
->>>> + *
->>>> + * If 0 is returned, the mapping can be retried and will succeed once
->>>> + * sufficient resources are available.
->>>
->>> That's not a guarantee we can uphold. Retrying forever in the vain hope
->>> that a device might evolve some extra address bits, or a bounce buffer
->>> might magically grow big enough for a gigantic mapping, isn't
->>> necessarily the best idea.
->>
->> Perhaps this is just poorly worded. Returning 0 is the normal case and
->> nothing has changed there. The block layer, for example, will retry if
->> zero is returned as this only happens if it failed to allocate resources
->> for the mapping. The reason we have to return -1 is to tell the block
->> layer not to retry these requests as they will never succeed in the
->> future.
->>
->>>> + *
->>>> + * If there are P2PDMA pages in the scatterlist then this function may
->>>> + * return -EREMOTEIO to indicate that the pages are not mappable by
->>>> the
->>>> + * device. In this case, an error should be returned for the IO as it
->>>> + * will never be successfully retried.
->>>>     */
->>>>    int dma_map_sg_attrs(struct device *dev, struct scatterlist *sg, int
->>>> nents,
->>>>            enum dma_data_direction dir, unsigned long attrs)
->>>> @@ -197,7 +204,7 @@ int dma_map_sg_attrs(struct device *dev, struct
->>>> scatterlist *sg, int nents,
->>>>            ents = dma_direct_map_sg(dev, sg, nents, dir, attrs);
->>>>        else
->>>>            ents = ops->map_sg(dev, sg, nents, dir, attrs);
->>>> -    BUG_ON(ents < 0);
->>>> +
->>>
->>> This scares me - I hesitate to imagine the amount of driver/subsystem
->>> code out there that will see nonzero and merrily set off iterating a
->>> negative number of segments, if we open the floodgates of allowing
->>> implementations to return error codes here.
->>
->> Yes, but it will never happen on existing drivers/subsystems. The only
->> way it can return a negative number is if the driver passes in P2PDMA
->> pages which can't happen without changes in the driver. We are careful
->> about where P2PDMA pages can get into so we don't have to worry about
->> all the existing driver code out there.
+On Thu, Mar 11, 2021 at 06:14:40PM -0800, Minchan Kim wrote:
+> On Wed, Mar 10, 2021 at 09:21:28PM +0000, Luis Chamberlain wrote:
+> > On Mon, Mar 08, 2021 at 06:55:30PM -0800, Minchan Kim wrote:
+> > > If I understand correctly, bugs you found were related to module
+> > > unloading race while the zram are still working.
+> > 
+> > No, that is a simplifcation of the issue. The issue consists of
+> > two separate issues:
+> > 
+> >  a) race against module unloading in light of incorrect racty use of
+> >     cpu hotplug multistate support
 > 
-> Sure, that's how things stand immediately after this patch. But then
-> someone comes along with the perfectly reasonable argument for returning
-> more expressive error information for regular mapping failures as well
-> (because sometimes those can be terminal too, as above), we start to get
-> divergent behaviour across architectures and random bits of old code
-> subtly breaking down the line. *That* is what makes me wary of making a
-> fundamental change to a long-standing "nonzero means success" interface...
+> 
+> Could you add some pusedo code sequence to show the race cleary?
 
-So then we reject the patches that make that change. Seems like an odd
-argument to say that we can't do something that won't cause problems
-because someone might use it as an example and do something that will
-cause problems. Reject the change that causes the problem.
+Let us deal with each issue one at time. First, let's address
+understanding the kernel warning can be reproduced easily by
+triggering zram02.sh from LTP twice:
 
-Logan
+kernel: ------------[ cut here ]------------
+kernel: Error: Removing state 63 which has instances left.
+kernel: WARNING: CPU: 7 PID: 70457 at kernel/cpu.c:2069 __cpuhp_remove_state_cpuslocked+0xf9/0x100
+kernel: Modules linked in: zram(E-) zsmalloc(E) <etc>
+
+The first patch prevents this race. This race is possible because on
+module init we associate callbacks for CPU hotplug add / remove:
+
+static int __init zram_init(void)                                               
+{
+	...
+	ret = cpuhp_setup_state_multi(CPUHP_ZCOMP_PREPARE, "block/zram:prepare",
+	                              zcomp_cpu_up_prepare, zcomp_cpu_dead); 
+	...
+}
+
+The zcomp_cpu_dead() accesses the zcom->comp, and if zcomp->comp is
+removed and this function is called, clearly we'll be accessing some
+random data here and can easily crash afterwards:
+
+int zcomp_cpu_dead(unsigned int cpu, struct hlist_node *node)                   
+{
+	struct zcomp *comp = hlist_entry(node, struct zcomp, node);
+	struct zcomp_strm *zstrm;
+
+	zstrm = per_cpu_ptr(comp->stream, cpu);
+	zcomp_strm_free(zstrm);
+	return 0;
+}
+
+And zram's syfs reset_store() lets userspace call zram_reset_device()
+which calls zcomp_destroy():
+
+void zcomp_destroy(struct zcomp *comp)
+{
+	cpuhp_state_remove_instance(CPUHP_ZCOMP_PREPARE, &comp->node);
+	free_percpu(comp->stream);
+	kfree(comp);
+}
+
+> It would be great if it goes in the description, too since it's
+> more clear to show the problme.
+
+Does the above do it?
+> 
+> >  b) module unload race with sysfs attribute race on *any* driver which
+> >     has sysfs attributes which also shares the same lock as used during
+> >     module unload
+> 
+> Yub, that part I missed. Maybe, we need some wrapper to zram sysfs
+> to get try_module_get in the warapper funnction and then call sub
+> rountine only if it got the refcount.
+> 
+> zram_sysfs_wrapper(func, A, B)
+>     if (!try_module_get(THIS_MODULE)
+>         return -ENODEV;
+>     ret = func(A,B);
+>     module_put(THIS_MODULE);
+>     return ret;
+
+I'd much prefer this be resolved in kernfs later, if you look at the kernel
+there are already some drivers which may have realized this requirement
+the hard way. Open coding this I think makes the race / intent clearer.
+
+Right now we have no semantics possible for a generic solution, but I
+can work on one later.
+
+  Luis
