@@ -2,173 +2,92 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDAC8C28E86
-	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 11:09:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA234C433DB
+	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 14:22:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9D74965018
-	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 11:09:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 82F5A64FD6
+	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 14:22:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234085AbhCLLJT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 12 Mar 2021 06:09:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43902 "EHLO
+        id S230463AbhCLOVm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 12 Mar 2021 09:21:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57392 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234049AbhCLLIv (ORCPT
+        with ESMTP id S231855AbhCLOVj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 12 Mar 2021 06:08:51 -0500
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49D3DC061574;
-        Fri, 12 Mar 2021 03:08:51 -0800 (PST)
-Received: by mail-pf1-x434.google.com with SMTP id t29so1603439pfg.11;
-        Fri, 12 Mar 2021 03:08:51 -0800 (PST)
+        Fri, 12 Mar 2021 09:21:39 -0500
+Received: from mail-il1-x12a.google.com (mail-il1-x12a.google.com [IPv6:2607:f8b0:4864:20::12a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FDFFC061574
+        for <linux-block@vger.kernel.org>; Fri, 12 Mar 2021 06:21:39 -0800 (PST)
+Received: by mail-il1-x12a.google.com with SMTP id g9so2721199ilc.3
+        for <linux-block@vger.kernel.org>; Fri, 12 Mar 2021 06:21:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :in-reply-to:references;
-        bh=kelUwn0Whs7JivQ1KuhMZo0HpcgwSby3dPMp6TcStyI=;
-        b=CIIlIw+pCqMT8TkvG6gOiFr2Fzp9zN9Z7AAIc8gn5XlcMYTNbW+7LaaO1j0vUyxNio
-         Wb2UFhlR+D1TJnz9zlXK8JiMkeDj5w0YLvUzELVEMjjQ1vUiWbmhvv8qCF2IEe3xCEDF
-         NxiO2aBUfmmc2qpeIHBYH0fscahca6LqO0P2pgdmvHBicJQzKBOgEIY/LVYK//p/uBnL
-         TifpSFejxf3HzkUE6qCVLWQ/NgGITahZYxGC6NXBUXhChe25kDecPJv3h7lsLTbyebHB
-         SliDYHIT+aiVtG8Gr8O1ZN4DgdwIPSL8S7GOpj/wtdxjeFqKYNLuB1Rj6Zhs5pC8/dnB
-         3Nwg==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=E61zkshFErZvXwXXuG6eHT/uAMrwiprKwUlm/Jt8qKA=;
+        b=UFvsmMq8GC/8RpJgAwOoqBuWirjkiwtoO3aTyOSlf+jZEMSzQvpbygbWeJDs3Nq96F
+         PGETCYGxDq4j+QKuZr3RU8S0bH20bpWKemt/cyXlSG3Nx7hMMdPBSQ0E/spC1ct6UVq5
+         25NciDA2wxhJRplCMFcGM3eRNjQI9n+ZUudeVHLGxwBDxPmXlHYIYgHjH4Y5YveGtxF7
+         lHniiQtsuWosvtrnpgtQZ9wUnuSqHsI5ZcZKTOII+0b3EYXYwjNbi4EsBzM58LicUXXi
+         n6haLNgHmNvQKXdryAdcxW9KZossNXMSVjLP+AeXJNISVub2uGUjDdDqQ9raCqKbcdaa
+         8ENw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:in-reply-to:references;
-        bh=kelUwn0Whs7JivQ1KuhMZo0HpcgwSby3dPMp6TcStyI=;
-        b=Cdnm90qLlyM0Oebxlm/P3VY/tXuYyHH9zABuHHpM5cOE5U+EqbbVtiO8cTnKTpjiia
-         rowUgcJJVMZTAeCUo6LvIA0wvtSysmnMyGpIGQt7s3wqq5zycVNiWYF2IATkNFC47AWQ
-         RzbFFXLH7jldka1+uSwe33IAyP3msN10ARGzU7wDhVzfeuWGFPrcMKFB5a0eWBLKgBFM
-         4TuOAXkSeSCBk/J3D8ljsNTRs4RqmanUbQGDwNBdjA8Bm4l+mARLWrzuo4grooWU7PF7
-         CA01UY01ndVxXgYXP25XH0GvxzV0iNHg4RE9hEebBXkINe7ruF0TDFnS3ydBbH/Pb8J4
-         77mw==
-X-Gm-Message-State: AOAM5316LP8ObI/i55ClLBhdjSL2ZI2Rpy2mEUPqwXSfAQkEx82da6U7
-        va8kWPYtk+S7Z4KyFWrwBtvCL5CrI+zgKg==
-X-Google-Smtp-Source: ABdhPJz9EPPkbNsOE1UZGh1rrBaFy21feXm6jWVEoFy0RnjrlZ9tXUoe22uIL7W0QV4Xlawn83n0qw==
-X-Received: by 2002:a63:dc50:: with SMTP id f16mr11272929pgj.16.1615547330960;
-        Fri, 12 Mar 2021 03:08:50 -0800 (PST)
-Received: from VM-0-3-centos.localdomain ([101.32.213.191])
-        by smtp.gmail.com with ESMTPSA id t5sm4942181pgl.89.2021.03.12.03.08.49
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 12 Mar 2021 03:08:50 -0800 (PST)
-From:   brookxu <brookxu.cn@gmail.com>
-To:     paolo.valente@linaro.org, axboe@kernel.dk, tj@kernel.org
-Cc:     linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [RFC PATCH v2 01/11] bfq: introduce bfq_entity_to_bfqg helper method
-Date:   Fri, 12 Mar 2021 19:08:35 +0800
-Message-Id: <1e04546dd04dc35f0f658b0699cc3470f8de5bbd.1615527324.git.brookxu@tencent.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <cover.1615517202.git.brookxu@tencent.com>
-References: <cover.1615517202.git.brookxu@tencent.com>
-In-Reply-To: <cover.1615527324.git.brookxu@tencent.com>
-References: <cover.1615527324.git.brookxu@tencent.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=E61zkshFErZvXwXXuG6eHT/uAMrwiprKwUlm/Jt8qKA=;
+        b=OK86NBYVgxP0itNwdgNdmnFeP1VZ4qAQ3adhIHel2cgBo4lTJkBJslCUV8NDNSoSTn
+         eqs/DY0U7tInAqiucvdfGD1ax/MjYVO6fbE7aBdVGhtsDa46LTXoU4jXYAfgaaIVIjKP
+         NqrM/Uu/aAW01BHdhjY7bJHuB8LEdLM2rE8nGISSaVnzOZsunnc4iQOxFc5BPAPnX/zW
+         y0vlOqHClglxwz4qf510GECJ3CHL1dEKVRy9WBBwjaz6//u9iz818aeAbQasm0mvUpxC
+         KOssS8hq8luY+eUUbHPDcVD9RU3m2ukCazAyOi1wC4wKGLaSStOVQGpMEWZkHdbrT6V4
+         pWsg==
+X-Gm-Message-State: AOAM531kKGGG+JHxhVFPvkVTpuODfC/r0ZwuAANK+xuSd6/2dW8VX8gI
+        zgv0+Fdjg0W6MIPgEIdPVOd9iA==
+X-Google-Smtp-Source: ABdhPJz3ST4OLgnhxfMSrAKuyp0V67FNBCcu3PSlX/U6NVi94ExgQoTRrdvtdqgdWgOzwVEOn9wI7A==
+X-Received: by 2002:a05:6e02:ee1:: with SMTP id j1mr2834065ilk.179.1615558898838;
+        Fri, 12 Mar 2021 06:21:38 -0800 (PST)
+Received: from [192.168.1.30] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id c9sm3098343ili.34.2021.03.12.06.21.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 12 Mar 2021 06:21:38 -0800 (PST)
+Subject: Re: [GIT PULL] nvme fixes for 5.12
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
+        Sagi Grimberg <sagi@grimberg.me>,
+        linux-nvme@lists.infradead.org
+References: <YEszeMEAQyfTPgHH@infradead.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <2a34717a-b5c5-0a3c-02b0-eb8a144aba15@kernel.dk>
+Date:   Fri, 12 Mar 2021 07:21:39 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+MIME-Version: 1.0
+In-Reply-To: <YEszeMEAQyfTPgHH@infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Chunguang Xu <brookxu@tencent.com>
+On 3/12/21 2:25 AM, Christoph Hellwig wrote:
+> The following changes since commit df66617bfe87487190a60783d26175b65d2502ce:
+> 
+>   block: rsxx: fix error return code of rsxx_pci_probe() (2021-03-10 08:25:37 -0700)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.infradead.org/nvme.git tags/nvme-5.12-2021-03-12
 
-Introduce bfq_entity_to_bfqg() to make it easier to obtain the
-bfq_group corresponding to the entity.
+Pulled, thanks.
 
-Signed-off-by: Chunguang Xu <brookxu@tencent.com>
----
- block/bfq-cgroup.c  |  6 ++----
- block/bfq-iosched.h |  1 +
- block/bfq-wf2q.c    | 16 ++++++++++++----
- 3 files changed, 15 insertions(+), 8 deletions(-)
-
-diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-index b791e2041e49..a5f544acaa61 100644
---- a/block/bfq-cgroup.c
-+++ b/block/bfq-cgroup.c
-@@ -309,8 +309,7 @@ struct bfq_group *bfqq_group(struct bfq_queue *bfqq)
- {
- 	struct bfq_entity *group_entity = bfqq->entity.parent;
- 
--	return group_entity ? container_of(group_entity, struct bfq_group,
--					   entity) :
-+	return group_entity ? bfq_entity_to_bfqg(group_entity) :
- 			      bfqq->bfqd->root_group;
- }
- 
-@@ -610,8 +609,7 @@ struct bfq_group *bfq_find_set_group(struct bfq_data *bfqd,
- 	 */
- 	entity = &bfqg->entity;
- 	for_each_entity(entity) {
--		struct bfq_group *curr_bfqg = container_of(entity,
--						struct bfq_group, entity);
-+		struct bfq_group *curr_bfqg = bfq_entity_to_bfqg(entity);
- 		if (curr_bfqg != bfqd->root_group) {
- 			parent = bfqg_parent(curr_bfqg);
- 			if (!parent)
-diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-index b8e793c34ff1..a6f98e9e14b5 100644
---- a/block/bfq-iosched.h
-+++ b/block/bfq-iosched.h
-@@ -941,6 +941,7 @@ struct bfq_group {
- #endif
- 
- struct bfq_queue *bfq_entity_to_bfqq(struct bfq_entity *entity);
-+struct bfq_group *bfq_entity_to_bfqg(struct bfq_entity *entity);
- 
- /* --------------- main algorithm interface ----------------- */
- 
-diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
-index 070e34a7feb1..5ff0028920a2 100644
---- a/block/bfq-wf2q.c
-+++ b/block/bfq-wf2q.c
-@@ -149,7 +149,7 @@ struct bfq_group *bfq_bfqq_to_bfqg(struct bfq_queue *bfqq)
- 	if (!group_entity)
- 		group_entity = &bfqq->bfqd->root_group->entity;
- 
--	return container_of(group_entity, struct bfq_group, entity);
-+	return bfq_entity_to_bfqg(group_entity);
- }
- 
- /*
-@@ -208,7 +208,7 @@ static bool bfq_no_longer_next_in_service(struct bfq_entity *entity)
- 	if (bfq_entity_to_bfqq(entity))
- 		return true;
- 
--	bfqg = container_of(entity, struct bfq_group, entity);
-+	bfqg = bfq_entity_to_bfqg(entity);
- 
- 	/*
- 	 * The field active_entities does not always contain the
-@@ -266,6 +266,15 @@ struct bfq_queue *bfq_entity_to_bfqq(struct bfq_entity *entity)
- 	return bfqq;
- }
- 
-+struct bfq_group *bfq_entity_to_bfqg(struct bfq_entity *entity)
-+{
-+	struct bfq_group *bfqg = NULL;
-+
-+	if (entity->my_sched_data)
-+		bfqg = container_of(entity, struct bfq_group, entity);
-+
-+	return bfqg;
-+}
- 
- /**
-  * bfq_delta - map service into the virtual time domain.
-@@ -1001,8 +1010,7 @@ static void __bfq_activate_entity(struct bfq_entity *entity,
- 
- #ifdef CONFIG_BFQ_GROUP_IOSCHED
- 	if (!bfq_entity_to_bfqq(entity)) { /* bfq_group */
--		struct bfq_group *bfqg =
--			container_of(entity, struct bfq_group, entity);
-+		struct bfq_group *bfqg = bfq_entity_to_bfqg(entity);
- 		struct bfq_data *bfqd = bfqg->bfqd;
- 
- 		if (!entity->in_groups_with_pending_reqs) {
 -- 
-2.30.0
+Jens Axboe
 
