@@ -2,35 +2,42 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EA62C433E0
-	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 15:54:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DB04C433DB
+	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 16:20:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CFF3E64FFD
-	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 15:54:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 19C7365006
+	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 16:20:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231557AbhCLPyK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 12 Mar 2021 10:54:10 -0500
-Received: from foss.arm.com ([217.140.110.172]:56294 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232553AbhCLPwI (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 12 Mar 2021 10:52:08 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E8D0211B3;
-        Fri, 12 Mar 2021 07:52:07 -0800 (PST)
-Received: from [10.57.52.136] (unknown [10.57.52.136])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9DA3A3F7D7;
-        Fri, 12 Mar 2021 07:52:04 -0800 (PST)
-Subject: Re: [RFC PATCH v2 06/11] dma-direct: Support PCI P2PDMA pages in
- dma-direct map_sg
-To:     Logan Gunthorpe <logang@deltatee.com>,
-        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-mm@kvack.org, iommu@lists.linux-foundation.org
+        id S231519AbhCLQTj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 12 Mar 2021 11:19:39 -0500
+Received: from ale.deltatee.com ([204.191.154.188]:42376 "EHLO
+        ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232054AbhCLQTP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 12 Mar 2021 11:19:15 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:MIME-Version:Date:
+        Message-ID:From:References:Cc:To:content-disposition;
+        bh=I89VDuZejubSyokWT+qiAjRrhT4T4AjRHHyD/4UUauw=; b=YWISg10aSxm+jQaX+X6OhfxFPO
+        wP4pNsP9huRyLmE2n03E4hyIpdRH1yQeyJ+V9wg1wgsxjmVmS1xL+gBAk6XsaxpB+l0aIYU98JxQZ
+        ciEEug4Y5ay/LYN0UyHg/bEyINwquKoUxnSPKQlqr1ajywPFKVP1ujdzy7/srZYnjWdTlz12JRzIw
+        pI3U2FUOw+RIbjwTV9CMHkfRjKlk6ew/bqxHeIk3ZfYxJ+T4OZozC6OE16gN7hqtn6YLwyH0xRZPH
+        86uvVT4Ir+w62abwFg8otMV5BX+4owBFgtQVj4Uu2xHzYQCNGi5/KyJe8bEhgCWqEgHXOqoB1UiVm
+        ehwWevcw==;
+Received: from s01060023bee90a7d.cg.shawcable.net ([24.64.145.4] helo=[192.168.0.10])
+        by ale.deltatee.com with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.92)
+        (envelope-from <logang@deltatee.com>)
+        id 1lKkV1-00079p-IQ; Fri, 12 Mar 2021 09:18:52 -0700
+To:     Robin Murphy <robin.murphy@arm.com>, linux-kernel@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        linux-pci@vger.kernel.org, linux-mm@kvack.org,
+        iommu@lists.linux-foundation.org
 Cc:     Minturn Dave B <dave.b.minturn@intel.com>,
         John Hubbard <jhubbard@nvidia.com>,
         Dave Hansen <dave.hansen@linux.intel.com>,
@@ -46,149 +53,78 @@ Cc:     Minturn Dave B <dave.b.minturn@intel.com>,
         Christoph Hellwig <hch@lst.de>,
         Xiong Jianxin <jianxin.xiong@intel.com>
 References: <20210311233142.7900-1-logang@deltatee.com>
- <20210311233142.7900-7-logang@deltatee.com>
-From:   Robin Murphy <robin.murphy@arm.com>
-Message-ID: <215e1472-5294-d20a-a43a-ff6dfe8cd66e@arm.com>
-Date:   Fri, 12 Mar 2021 15:52:02 +0000
-User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101
- Thunderbird/78.7.1
+ <6b9be188-1ec7-527c-ae47-3f5b4e153758@arm.com>
+From:   Logan Gunthorpe <logang@deltatee.com>
+Message-ID: <c66d247e-5da9-4866-8e6b-ee2ec4bc03d5@deltatee.com>
+Date:   Fri, 12 Mar 2021 09:18:46 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.0
 MIME-Version: 1.0
-In-Reply-To: <20210311233142.7900-7-logang@deltatee.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
+In-Reply-To: <6b9be188-1ec7-527c-ae47-3f5b4e153758@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-CA
 Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 24.64.145.4
+X-SA-Exim-Rcpt-To: jianxin.xiong@intel.com, hch@lst.de, andrzej.jakowski@intel.com, sbates@raithlin.com, dan.j.williams@intel.com, daniel.vetter@ffwll.ch, jason@jlekstrand.net, jgg@ziepe.ca, christian.koenig@amd.com, willy@infradead.org, iweiny@intel.com, dave.hansen@linux.intel.com, jhubbard@nvidia.com, dave.b.minturn@intel.com, iommu@lists.linux-foundation.org, linux-mm@kvack.org, linux-pci@vger.kernel.org, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, robin.murphy@arm.com
+X-SA-Exim-Mail-From: logang@deltatee.com
+Subject: Re: [RFC PATCH v2 00/11] Add support to dma_map_sg for P2PDMA
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2021-03-11 23:31, Logan Gunthorpe wrote:
-> Add PCI P2PDMA support for dma_direct_map_sg() so that it can map
-> PCI P2PDMA pages directly without a hack in the callers. This allows
-> for heterogeneous SGLs that contain both P2PDMA and regular pages.
+
+
+On 2021-03-12 8:51 a.m., Robin Murphy wrote:
+> On 2021-03-11 23:31, Logan Gunthorpe wrote:
+>> Hi,
+>>
+>> This is a rework of the first half of my RFC for doing P2PDMA in
+>> userspace
+>> with O_DIRECT[1].
+>>
+>> The largest issue with that series was the gross way of flagging P2PDMA
+>> SGL segments. This RFC proposes a different approach, (suggested by
+>> Dan Williams[2]) which uses the third bit in the page_link field of the
+>> SGL.
+>>
+>> This approach is a lot less hacky but comes at the cost of adding a
+>> CONFIG_64BIT dependency to CONFIG_PCI_P2PDMA and using up the last
+>> scarce bit in the page_link. For our purposes, a 64BIT restriction is
+>> acceptable but it's not clear if this is ok for all usecases hoping
+>> to make use of P2PDMA.
+>>
+>> Matthew Wilcox has already suggested (off-list) that this is the wrong
+>> approach, preferring a new dma mapping operation and an SGL
+>> replacement. I
+>> don't disagree that something along those lines would be a better long
+>> term solution, but it involves overcoming a lot of challenges to get
+>> there. Creating a new mapping operation still means adding support to
+>> more
+>> than 25 dma_map_ops implementations (many of which are on obscure
+>> architectures) or creating a redundant path to fallback with dma_map_sg()
+>> for every driver that uses the new operation. This RFC is an approach
+>> that doesn't require overcoming these blocks.
 > 
-> SGL segments that contain PCI bus addresses are marked with
-> sg_mark_pci_p2pdma() and are ignored when unmapped.
-> 
-> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-> ---
->   kernel/dma/direct.c  | 35 ++++++++++++++++++++++++++++++++---
->   kernel/dma/mapping.c | 13 ++++++++++---
->   2 files changed, 42 insertions(+), 6 deletions(-)
-> 
-> diff --git a/kernel/dma/direct.c b/kernel/dma/direct.c
-> index 002268262c9a..f326d32062dd 100644
-> --- a/kernel/dma/direct.c
-> +++ b/kernel/dma/direct.c
-> @@ -13,6 +13,7 @@
->   #include <linux/vmalloc.h>
->   #include <linux/set_memory.h>
->   #include <linux/slab.h>
-> +#include <linux/pci-p2pdma.h>
->   #include "direct.h"
->   
->   /*
-> @@ -387,19 +388,47 @@ void dma_direct_unmap_sg(struct device *dev, struct scatterlist *sgl,
->   	struct scatterlist *sg;
->   	int i;
->   
-> -	for_each_sg(sgl, sg, nents, i)
-> +	for_each_sg(sgl, sg, nents, i) {
-> +		if (sg_is_pci_p2pdma(sg))
-> +			continue;
-> +
->   		dma_direct_unmap_page(dev, sg->dma_address, sg_dma_len(sg), dir,
->   			     attrs);
-> +	}
->   }
->   #endif
->   
->   int dma_direct_map_sg(struct device *dev, struct scatterlist *sgl, int nents,
->   		enum dma_data_direction dir, unsigned long attrs)
->   {
-> -	int i;
-> +	struct dev_pagemap *pgmap = NULL;
-> +	int i, map = -1, ret = 0;
->   	struct scatterlist *sg;
-> +	u64 bus_off;
->   
->   	for_each_sg(sgl, sg, nents, i) {
-> +		if (is_pci_p2pdma_page(sg_page(sg))) {
-> +			if (sg_page(sg)->pgmap != pgmap) {
-> +				pgmap = sg_page(sg)->pgmap;
-> +				map = pci_p2pdma_dma_map_type(dev, pgmap);
-> +				bus_off = pci_p2pdma_bus_offset(sg_page(sg));
-> +			}
-> +
-> +			if (map < 0) {
-> +				sg->dma_address = DMA_MAPPING_ERROR;
-> +				ret = -EREMOTEIO;
-> +				goto out_unmap;
-> +			}
-> +
-> +			if (map) {
-> +				sg->dma_address = sg_phys(sg) + sg->offset -
-> +					bus_off;
-> +				sg_dma_len(sg) = sg->length;
-> +				sg_mark_pci_p2pdma(sg);
-> +				continue;
-> +			}
-> +		}
-> +
->   		sg->dma_address = dma_direct_map_page(dev, sg_page(sg),
->   				sg->offset, sg->length, dir, attrs);
->   		if (sg->dma_address == DMA_MAPPING_ERROR)
-> @@ -411,7 +440,7 @@ int dma_direct_map_sg(struct device *dev, struct scatterlist *sgl, int nents,
->   
->   out_unmap:
->   	dma_direct_unmap_sg(dev, sgl, i, dir, attrs | DMA_ATTR_SKIP_CPU_SYNC);
-> -	return 0;
-> +	return ret;
->   }
->   
->   dma_addr_t dma_direct_map_resource(struct device *dev, phys_addr_t paddr,
-> diff --git a/kernel/dma/mapping.c b/kernel/dma/mapping.c
-> index b6a633679933..adc1a83950be 100644
-> --- a/kernel/dma/mapping.c
-> +++ b/kernel/dma/mapping.c
-> @@ -178,8 +178,15 @@ void dma_unmap_page_attrs(struct device *dev, dma_addr_t addr, size_t size,
->   EXPORT_SYMBOL(dma_unmap_page_attrs);
->   
->   /*
-> - * dma_maps_sg_attrs returns 0 on error and > 0 on success.
-> - * It should never return a value < 0.
-> + * dma_maps_sg_attrs returns 0 on any resource error and > 0 on success.
-> + *
-> + * If 0 is returned, the mapping can be retried and will succeed once
-> + * sufficient resources are available.
+> I don't really follow that argument - you're only adding support to two
+> implementations with the awkward flag, so why would using a dedicated
+> operation instead be any different? Whatever callers need to do if
+> dma_pci_p2pdma_supported() says no, they could equally do if
+> dma_map_p2p_sg() (or whatever) returns -ENXIO, no?
 
-That's not a guarantee we can uphold. Retrying forever in the vain hope 
-that a device might evolve some extra address bits, or a bounce buffer 
-might magically grow big enough for a gigantic mapping, isn't 
-necessarily the best idea.
+The thing is if the dma_map_sg doesn't support P2PDMA then P2PDMA
+transactions cannot be done, but regular transactions can still go
+through as they always did.
 
-> + *
-> + * If there are P2PDMA pages in the scatterlist then this function may
-> + * return -EREMOTEIO to indicate that the pages are not mappable by the
-> + * device. In this case, an error should be returned for the IO as it
-> + * will never be successfully retried.
->    */
->   int dma_map_sg_attrs(struct device *dev, struct scatterlist *sg, int nents,
->   		enum dma_data_direction dir, unsigned long attrs)
-> @@ -197,7 +204,7 @@ int dma_map_sg_attrs(struct device *dev, struct scatterlist *sg, int nents,
->   		ents = dma_direct_map_sg(dev, sg, nents, dir, attrs);
->   	else
->   		ents = ops->map_sg(dev, sg, nents, dir, attrs);
-> -	BUG_ON(ents < 0);
-> +
+But replacing dma_map_sg() with dma_map_new() affects all operations,
+P2PDMA or otherwise. If dma_map_new() isn't supported it can't simply
+not support P2PDMA; it has to maintain a fallback path to dma_map_sg().
+Given that the inputs and outputs for dma_map_new() will be completely
+different data structures this will be quite a lot of similar paths
+required in the driver. (ie mapping a bvec to the input struct and the
+output struct to hardware requirements) If a bug crops up in the old
+dma_map_sg(), developers might not notice it for some time seeing it
+won't be used on the most popular architectures.
 
-This scares me - I hesitate to imagine the amount of driver/subsystem 
-code out there that will see nonzero and merrily set off iterating a 
-negative number of segments, if we open the floodgates of allowing 
-implementations to return error codes here.
-
-Robin.
-
->   	debug_dma_map_sg(dev, sg, nents, ents, dir);
->   
->   	return ents;
-> 
+Logan
