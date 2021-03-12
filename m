@@ -6,64 +6,64 @@ X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A58AC43142
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 712C1C4160E
 	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 11:09:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1E4A76504B
+	by mail.kernel.org (Postfix) with ESMTP id 3DE156500E
 	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 11:09:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234080AbhCLLJW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 12 Mar 2021 06:09:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43958 "EHLO
+        id S234067AbhCLLJU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 12 Mar 2021 06:09:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43930 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234103AbhCLLJE (ORCPT
+        with ESMTP id S234082AbhCLLI6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 12 Mar 2021 06:09:04 -0500
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6315C061574;
-        Fri, 12 Mar 2021 03:09:04 -0800 (PST)
-Received: by mail-pf1-x42c.google.com with SMTP id x7so1616714pfi.7;
-        Fri, 12 Mar 2021 03:09:04 -0800 (PST)
+        Fri, 12 Mar 2021 06:08:58 -0500
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A85ECC061574;
+        Fri, 12 Mar 2021 03:08:58 -0800 (PST)
+Received: by mail-pf1-x42f.google.com with SMTP id s21so1642373pfm.1;
+        Fri, 12 Mar 2021 03:08:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :in-reply-to:references;
-        bh=3QEWlUrFLMLaUGl8wHuUk98pwVzXJV4Z6adAvQh0quw=;
-        b=AGOaWhDWZN5OxUpAk5V5Je2FjeTyxmmJlwyPNZzcQmCQ+g/rNzmGRA5ryZ1FcaImaO
-         jqKkyKDssGkwA3qgyEp4KuNPs4zMC4GInA4VFAlsduFYqPgdxhU9J+tQemyGyTnmT6wN
-         XAHdNUtd8/4ReAlRmlcv8q5kQEwJgkJZakU3RNBvTyIu6DVkU13lj6L1Mq0vJyx+MLhk
-         qKSmRn52WJ0F12fAviPFMVW7yiDDq0ovLTmUcGvswcGNbaR4daC7yoGG98tgwLtrylEl
-         IQ2TNM1RUug/vlh4k9Qoc5dZcyMo8M7VQBVByQcN0SX3C0vpECt3udTKKTHx473mSmdq
-         Qkvw==
+        bh=hunTPZCviArd0MXDnzzzFZQhSy4vbv7jKWoalPSpEQw=;
+        b=SrCFlWpyYEENRUBIySkHbIQhj3YL/u8Dq4FFAhdS3eeNRP8iej9jnd0fxfZgReZzq6
+         vQbg8sifDsDYphc1Xv+ncKLBisptBg6GlH0013HzPCzSPkA/12LCWS61x6KtPhDcdTMw
+         yuzt+ATDX2NbXACFByh9moNeIOuO+VN7i12hTiaB7qqDwr9dUPqpZF/MhoA64Cx99DUm
+         +jx9n3kGXj1eDGOOksXjz5TVRpAsEpqWh1mkpDoXV/z3xXuvRCWfEW5CC6boKc8P89RL
+         RLKcSlaMj5yqtGWc7okGN3PB7hSjtsPBFfple7Eee8i7AvJyiin26R2tP86CmrROgyF7
+         8jog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:in-reply-to:references;
-        bh=3QEWlUrFLMLaUGl8wHuUk98pwVzXJV4Z6adAvQh0quw=;
-        b=kTybwVO14i55cRmz/EjNFbjUghecjCy9Tf6A+CeG+GPyP227hjnYv7pg8ML01lOh8e
-         1eybl3iFFv1nAQlVQY1I/qiAtKa60Ebz3tZD3A2Eomd6Vab8WYQJV0Xfv3FLu5ydbzpt
-         3rGGb5qMe9Bfr/MHL/tznbLd9cTmC+XzaU/foXFxhQl2aAhpy9m7crZ3Z1tC2YN3KlPP
-         WlO91SuluccttFX8FCYpitWdn0vLL1gzaTRyy4n3yXFB/sz8eAvUpeNsALrP6Et0VDg9
-         h7jMPUkRlB8Oy/ZyFWg5wZ+YM6UWSgtCES1t/Jj9f+1VYR3/KLOcdB2bzE9Ai95c5410
-         O04w==
-X-Gm-Message-State: AOAM530pgwOZjHRgs1OacHebcLmECX92NK4FATMQyFp0joSkaxuzZ5CB
-        yn+Ql55ajfasCQUISi9fdC0=
-X-Google-Smtp-Source: ABdhPJyAmFhCeKa9Bdvj9G+/TcYVgqEkq97gru3z2frPInR/4yI5Pq+gxKrqp0bYgnUUO+du+awdvQ==
-X-Received: by 2002:a63:2262:: with SMTP id t34mr11509579pgm.303.1615547344417;
-        Fri, 12 Mar 2021 03:09:04 -0800 (PST)
+        bh=hunTPZCviArd0MXDnzzzFZQhSy4vbv7jKWoalPSpEQw=;
+        b=CAmqfX2MMxO7qZ2yrVWaQiCnD7LHFE9lBo8ddJ1Mr78L6vraEzxfWUPGnjm55tRKHn
+         9DNWf+ZajpJCAU4Dwk7yEFOl3CcgQIakrawZVGaiHdWx717tg1+4egxtq+yteL+AWu7E
+         PTeNHFptu1DXVkdo1THZQAUOUkfwj4EGjA/XQ4rta7K+62FX8GHvsUAbFTXPygJ3uY6L
+         hi36zTtnTYyb8X6XzqZ0a3kSsyKuZ3nJ55cimQfdRFu68vmP0uMZCi2F53W78pSu4FAx
+         BS90K0gfI8mmAAgp7zYz/AG6ltxE/7Z+h/4vZcyZ2lcXYL2mKMSVNLhtpFFaTSORM+0U
+         ANbw==
+X-Gm-Message-State: AOAM531cQKsjE/9VVOBtignPePeFO+Qz2IvtvINaILqVs5vTZwloowPa
+        yALsH11q1oXlgxRvB5y/InU=
+X-Google-Smtp-Source: ABdhPJyvyI1eJ1KcpGMI7kjlKJJ0otm9rAhR9+gmTS0WlkgeI7YqcPoszbCabXyl8WuqDLxZtxOaAA==
+X-Received: by 2002:a63:2c0f:: with SMTP id s15mr11331171pgs.351.1615547338331;
+        Fri, 12 Mar 2021 03:08:58 -0800 (PST)
 Received: from VM-0-3-centos.localdomain ([101.32.213.191])
-        by smtp.gmail.com with ESMTPSA id t5sm4942181pgl.89.2021.03.12.03.09.02
+        by smtp.gmail.com with ESMTPSA id t5sm4942181pgl.89.2021.03.12.03.08.56
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 12 Mar 2021 03:09:03 -0800 (PST)
+        Fri, 12 Mar 2021 03:08:57 -0800 (PST)
 From:   brookxu <brookxu.cn@gmail.com>
 To:     paolo.valente@linaro.org, axboe@kernel.dk, tj@kernel.org
 Cc:     linux-block@vger.kernel.org, cgroups@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [RFC PATCH v2 07/11] bfq: optimse IO injection for CLASS_RT
-Date:   Fri, 12 Mar 2021 19:08:41 +0800
-Message-Id: <ab86856f91a4734adf9cbf4212adfe2252ddbc57.1615527324.git.brookxu@tencent.com>
+Subject: [RFC PATCH v2 04/11] bfq: limit the IO depth of idle_class to 1
+Date:   Fri, 12 Mar 2021 19:08:38 +0800
+Message-Id: <e5928d0b76ef665701df034eb2bd7f85681f4656.1615527324.git.brookxu@tencent.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <cover.1615517202.git.brookxu@tencent.com>
 References: <cover.1615517202.git.brookxu@tencent.com>
@@ -75,52 +75,40 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Chunguang Xu <brookxu@tencent.com>
 
-CLASS_RT is more sensitive to latency, and IO injection
-will increase the CLASS_RT latency. For this reason,
-consider prohibiting the injection of async queue for
-CLASS_RT, and only the waker queue and other active
-queues belonging to CLASS_RT are allowed to inject. In
-this way, for CLASS_RT, both the advantages of inject
-and IO latency can be maintained.
+The IO depth of queues belong to CLASS_IDLE  is limited to 1,
+so that it can avoid introducing a larger tail latency under
+a device with a larger IO depth. Although limiting the IO
+depth may reduce the performance of idle_class, it is
+generally not a big problem, because idle_class usually does
+not have strict performance requirements.
 
 Signed-off-by: Chunguang Xu <brookxu@tencent.com>
 ---
- block/bfq-iosched.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ block/bfq-iosched.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
 diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 8af73473c45c..a5f13589df79 100644
+index f0f53d6f1f6e..91e903f1e550 100644
 --- a/block/bfq-iosched.c
 +++ b/block/bfq-iosched.c
-@@ -1965,6 +1965,9 @@ static void bfq_check_waker(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- 	    bfqd->last_completed_rq_bfqq == bfqq->waker_bfqq)
- 		return;
+@@ -4808,6 +4808,17 @@ static struct request *__bfq_dispatch_request(struct blk_mq_hw_ctx *hctx)
+ 	if (!bfqq)
+ 		goto exit;
  
-+	if (bfq_class_rt(bfqq) && !bfq_class_rt(bfqd->last_completed_rq_bfqq))
-+		return;
++	/*
++	 * Here, the IO depth of queues belong to CLASS_IDLE is limited
++	 * to 1, so that it can avoid introducing a larger tail latency
++	 * under a device with a larger IO depth. Although limiting the
++	 * IO depth may reduce the performance of idle_class, it is
++	 * generally not a big problem, because idle_class usually
++	 * does not have strict performance requirements.
++	 */
++	if (bfq_class_idle(bfqq) && bfqq->dispatched)
++		goto exit;
 +
- 	if (bfqd->last_completed_rq_bfqq !=
- 	    bfqq->tentative_waker_bfqq) {
- 		/*
-@@ -4391,6 +4394,9 @@ bfq_choose_bfqq_for_injection(struct bfq_data *bfqd)
- 			else
- 				limit = in_serv_bfqq->inject_limit;
+ 	rq = bfq_dispatch_rq_from_bfqq(bfqd, bfqq);
  
-+			if (bfq_class_rt(in_serv_bfqq) && !bfq_class_rt(bfqq))
-+				continue;
-+
- 			if (bfqd->rq_in_driver < limit) {
- 				bfqd->rqs_injected = true;
- 				return bfqq;
-@@ -4565,7 +4571,7 @@ static struct bfq_queue *bfq_select_queue(struct bfq_data *bfqd)
- 		 * may not be minimized, because the waker queue may
- 		 * happen to be served only after other queues.
- 		 */
--		if (async_bfqq &&
-+		if (async_bfqq && !bfq_class_rt(bfqq) &&
- 		    icq_to_bic(async_bfqq->next_rq->elv.icq) == bfqq->bic &&
- 		    bfq_serv_to_charge(async_bfqq->next_rq, async_bfqq) <=
- 		    bfq_bfqq_budget_left(async_bfqq))
+ 	if (rq) {
 -- 
 2.30.0
 
