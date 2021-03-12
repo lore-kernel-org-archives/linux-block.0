@@ -2,229 +2,148 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-20.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 912F2C433E6
-	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 20:30:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A0ACC433E6
+	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 20:40:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5DCF664F80
-	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 20:30:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C930564F80
+	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 20:40:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234914AbhCLU3s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 12 Mar 2021 15:29:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52608 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234694AbhCLU3n (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 12 Mar 2021 15:29:43 -0500
-Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEA8AC061574
-        for <linux-block@vger.kernel.org>; Fri, 12 Mar 2021 12:29:42 -0800 (PST)
-Received: by mail-pg1-x535.google.com with SMTP id x29so16602736pgk.6
-        for <linux-block@vger.kernel.org>; Fri, 12 Mar 2021 12:29:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=from:subject:to:cc:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=UeDWw6Np1eI120i2i7RSNebFxLMgX8BqbvihiK3n5s0=;
-        b=BkXNgaRkAHQtke97UyL68NuIiJIYBt15C/jRZvZqVt8cS5Wb6ojCociICKTMTmp7se
-         ZzDSTVFULawfBvtUImMmE8HmOpD0Nu0PwlMl82az8i4cDAeyGHEf9DVWjL/NJ3W422Ho
-         OAOChLCZ+v82wLE/PpXgWT1R3zfQMXw6SVxpHwyPXU7LSPZqhlKu6zNCUnE3j0uR3FeT
-         vMiBtlNhvWHNJvarzAdbUdRQZdQqGp7EZPqiMJq2jCl8Y9OpBDoB+EhWPZyb19u3zVqS
-         oLhqckzIgbUYTP1r0tAUArAagETXk4ZpojACoFJ3y5nVgWmsND7a+uZ+uhGtxF1iRnUC
-         y1pw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:subject:to:cc:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=UeDWw6Np1eI120i2i7RSNebFxLMgX8BqbvihiK3n5s0=;
-        b=qaP7ERQ/0YADdxyuAgZU8HbZcnMnEmvpKf0ZH6okQgbzS+ypnLb4YqzGLCqVM7Tdo8
-         x0hacunw2iDdqTJCaF/D6GsRFfGKCW/Y7Kan6OXbB4z1dAaSFCMdnEmeI8JC1wXbfGrM
-         oYLSNOP/iGjGy1S8/MvkUbp6eeIObitMc1k7IoqCZXncdjCcMoVgem/Wz1gxxmC292YN
-         uzFOkoE9iM0RnQj8KOVWcIT+b1HxWo7e4Q5fTlNM+EM+Hl65WkJ1iys0tVjwXl2AY05Q
-         r+0z9WnqhcwVsYllAmE1OS4oEKItm+7X1lp+NVHlIHHSx7UMfe8Z3tZa1Mf8wDic9VR/
-         OdOA==
-X-Gm-Message-State: AOAM530hfw4FUf2YAhYhwbB9tZ/MVBuCViMMjpBq0YLWrvY9tdIpTQ9n
-        uWOXDXrB9K9K7Meg/vJ/ildL8yh1xIS2FbEa
-X-Google-Smtp-Source: ABdhPJwLPVpA/C+hL1twrpuuVbK5EkKg6MvFWDuY2t+TCZAttqfYmg8VGePMjHT/ShsWJwlXNn6SBA==
-X-Received: by 2002:a63:440e:: with SMTP id r14mr13243672pga.331.1615580982065;
-        Fri, 12 Mar 2021 12:29:42 -0800 (PST)
-Received: from ?IPv6:2600:380:b46b:1540:2a49:5dda:db8:a2f8? ([2600:380:b46b:1540:2a49:5dda:db8:a2f8])
-        by smtp.gmail.com with ESMTPSA id w203sm6362301pff.59.2021.03.12.12.29.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 12 Mar 2021 12:29:41 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL v2] Block fixes for 5.12-rc3
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Message-ID: <cc2462b6-b7ae-200c-d9f6-1a3d1aac3632@kernel.dk>
-Date:   Fri, 12 Mar 2021 13:29:38 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S234975AbhCLUj4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 12 Mar 2021 15:39:56 -0500
+Received: from mail.kernel.org ([198.145.29.99]:37322 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234936AbhCLUji (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 12 Mar 2021 15:39:38 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 7CA2864F4F;
+        Fri, 12 Mar 2021 20:39:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1615581577;
+        bh=9xbU4dGm9+BmmqkFklPfuZZosdug6fd3AsnEv7H5YFw=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:From;
+        b=HwKo5k8pp1FCYm+q0FK8hZDzmOtZx9D48iVHE47cQK63UFdrBQCVKqUKLkgEBggln
+         9ztDXjeFMO5NtU6M81ttmz3YIzjAGdpaoj3WUyaTpYbLYPOIKTitTDDSUkBhPVh3ei
+         uZsnO60vXuNiDQWVZ67GOIH2ex/69BES8gJ7TKBgxsWmrOjmXpp0jtb76zJB+drQ+5
+         ttjsPLmcKVIKwI3YB6xyobjyZP8xBLzeJdU5wwcKBBOdxC6tVTrjKJeom0pbVqECZk
+         AfgwD4VNAjFL9YMwxOIBwj+mIvgXP13JwgZm35A3RHZfv+EulcxAypQ0uvjMBrvARD
+         TGvtqBg9cRwfw==
+Date:   Fri, 12 Mar 2021 14:39:36 -0600
+From:   Bjorn Helgaas <helgaas@kernel.org>
+To:     Logan Gunthorpe <logang@deltatee.com>
+Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-mm@kvack.org, iommu@lists.linux-foundation.org,
+        Stephen Bates <sbates@raithlin.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+        Ira Weiny <iweiny@intel.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Don Dutile <ddutile@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Jakowski Andrzej <andrzej.jakowski@intel.com>,
+        Minturn Dave B <dave.b.minturn@intel.com>,
+        Jason Ekstrand <jason@jlekstrand.net>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Xiong Jianxin <jianxin.xiong@intel.com>
+Subject: Re: [RFC PATCH v2 01/11] PCI/P2PDMA: Pass gfp_mask flags to
+ upstream_bridge_distance_warn()
+Message-ID: <20210312203936.GA2286981@bjorn-Precision-5520>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210311233142.7900-2-logang@deltatee.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+On Thu, Mar 11, 2021 at 04:31:31PM -0700, Logan Gunthorpe wrote:
+> In order to call this function from a dma_map function, it must not sleep.
+> The only reason it does sleep so to allocate the seqbuf to print
+> which devices are within the ACS path.
 
-Mostly just random fixes all over the map. Only odd-one-out change is
-finally getting the rename of BIO_MAX_PAGES to BIO_MAX_VECS done. This
-should've been done with the multipage bvec change, but it's been left.
-Do it now to avoid hassles around changes piling up for the next merge
-window.
+s/this function/upstream_bridge_distance_warn()/ ?
+s/so to/is to/
 
-- NVMe pull request
-	- one more quirk (Dmitry Monakhov)
-	- fix max_zone_append_sectors initialization (Chaitanya Kulkarni)
-	- nvme-fc reset/create race fix (James Smart)
-	- fix status code on aborts/resets (Hannes Reinecke)
-	- fix the CSS check for ZNS namespaces (Chaitanya Kulkarni)
-	- fix a use after free in a debug printk in nvme-rdma (Lv Yunlong)
+Maybe the subject could say something about the purpose, e.g., allow
+calling from atomic context or something?  "Pass gfp_mask flags" sort
+of restates what we can read from the patch, but without the
+motivation of why this is useful.
 
-- Follow-up NVMe error fix for NULL 'id' (Christoph)
+> Switch the kmalloc call to use a passed in gfp_mask  and don't print that
+> message if the buffer fails to be allocated.
+> 
+> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
 
-- Fixup for the bd_size_lock being IRQ safe, now that the offending
-  driver has been dropped (Damien).
+Acked-by: Bjorn Helgaas <bhelgaas@google.com>
 
-- rsxx probe failure error return (Jia-Ju)
-
-- umem probe failure error return (Wei)
-
-- s390/dasd unbind fixes (Stefan)
-
-- blk-cgroup stats summing fix (Xunlei)
-
-- zone reset handling fix (Damien)
-
-- Rename BIO_MAX_PAGES to BIO_MAX_VECS (Christoph)
-
-- Suppress uevent trigger for hidden devices (Daniel)
-
-- Fix handling of discard on busy device (Jan)
-
-- Fix stale cache issue with zone reset (Shin'ichiro)
-
-Please pull!
-
-
-The following changes since commit a2b658e4a07d05fcf056e2b9524ed8cc214f486a:
-
-  Merge tag 'nvme-5.12-2021-03-05' of git://git.infradead.org/nvme into block-5.12 (2021-03-05 09:13:07 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux-block.git tags/block-5.12-2021-03-12-v2
-
-for you to fetch changes up to f4f9fc29e56b6fa9d7fa65ec51d3c82aff99c99b:
-
-  nvme: fix the nsid value to print in nvme_validate_or_alloc_ns (2021-03-12 13:17:45 -0700)
-
-----------------------------------------------------------------
-block-5.12-2021-03-12-v2
-
-----------------------------------------------------------------
-Chaitanya Kulkarni (2):
-      nvme: set max_zone_append_sectors nvme_revalidate_zones
-      nvme-core: check ctrl css before setting up zns
-
-Christoph Hellwig (2):
-      block: rename BIO_MAX_PAGES to BIO_MAX_VECS
-      nvme: fix the nsid value to print in nvme_validate_or_alloc_ns
-
-Damien Le Moal (1):
-      block: Fix REQ_OP_ZONE_RESET_ALL handling
-
-Daniel Wagner (1):
-      block: Suppress uevent for hidden device when removed
-
-Dmitry Monakhov (1):
-      nvme-pci: add the DISABLE_WRITE_ZEROES quirk for a Samsung PM1725a
-
-Hannes Reinecke (4):
-      nvme: simplify error logic in nvme_validate_ns()
-      nvme: add NVME_REQ_CANCELLED flag in nvme_cancel_request()
-      nvme-fc: set NVME_REQ_CANCELLED in nvme_fc_terminate_exchange()
-      nvme-fc: return NVME_SC_HOST_ABORTED_CMD when a command has been aborted
-
-James Smart (1):
-      nvme-fc: fix racing controller reset and create association
-
-Jan Kara (1):
-      block: Try to handle busy underlying device on discard
-
-Jens Axboe (1):
-      Merge tag 'nvme-5.12-2021-03-12' of git://git.infradead.org/nvme into block-5.12
-
-Jia-Ju Bai (1):
-      block: rsxx: fix error return code of rsxx_pci_probe()
-
-Lv Yunlong (1):
-      nvme-rdma: Fix a use after free in nvmet_rdma_write_data_done
-
-Shin'ichiro Kawasaki (1):
-      block: Discard page cache of zone reset target range
-
-Stefan Haberland (2):
-      s390/dasd: fix hanging DASD driver unbind
-      s390/dasd: fix hanging IO request during DASD driver unbind
-
-Wei Yongjun (1):
-      umem: fix error return code in mm_pci_probe()
-
-Xunlei Pang (1):
-      blk-cgroup: Fix the recursive blkg rwstat
-
- block/bio.c                    | 14 +++++++-------
- block/blk-cgroup-rwstat.c      |  3 ++-
- block/blk-crypto-fallback.c    |  2 +-
- block/blk-lib.c                |  2 +-
- block/blk-map.c                |  2 +-
- block/blk-zoned.c              | 40 +++++++++++++++++++++++++++++++++++++---
- block/bounce.c                 |  6 +++---
- block/genhd.c                  |  4 +---
- drivers/block/drbd/drbd_int.h  |  2 +-
- drivers/block/rsxx/core.c      |  1 +
- drivers/block/umem.c           |  5 ++++-
- drivers/md/bcache/super.c      |  2 +-
- drivers/md/dm-crypt.c          |  8 ++++----
- drivers/md/dm-writecache.c     |  4 ++--
- drivers/md/raid5-cache.c       |  4 ++--
- drivers/md/raid5-ppl.c         |  2 +-
- drivers/nvme/host/core.c       | 15 +++++++++++----
- drivers/nvme/host/fc.c         |  5 +++--
- drivers/nvme/host/pci.c        |  1 +
- drivers/nvme/host/zns.c        |  9 +++++++--
- drivers/nvme/target/passthru.c |  6 +++---
- drivers/nvme/target/rdma.c     |  5 ++---
- drivers/s390/block/dasd.c      |  6 +++---
- fs/block_dev.c                 | 17 +++++++++++++----
- fs/btrfs/extent_io.c           |  2 +-
- fs/btrfs/scrub.c               |  2 +-
- fs/crypto/bio.c                |  6 +++---
- fs/erofs/zdata.c               |  2 +-
- fs/ext4/page-io.c              |  2 +-
- fs/f2fs/checkpoint.c           |  2 +-
- fs/f2fs/data.c                 |  4 ++--
- fs/f2fs/segment.c              |  2 +-
- fs/f2fs/segment.h              |  4 ++--
- fs/f2fs/super.c                |  4 ++--
- fs/gfs2/lops.c                 |  2 +-
- fs/iomap/buffered-io.c         |  4 ++--
- fs/iomap/direct-io.c           |  4 ++--
- fs/mpage.c                     |  2 +-
- fs/nilfs2/segbuf.c             |  2 +-
- fs/squashfs/block.c            |  2 +-
- fs/zonefs/super.c              |  2 +-
- include/linux/bio.h            |  4 ++--
- 42 files changed, 138 insertions(+), 79 deletions(-)
-
--- 
-Jens Axboe
-
+> ---
+>  drivers/pci/p2pdma.c | 21 +++++++++++----------
+>  1 file changed, 11 insertions(+), 10 deletions(-)
+> 
+> diff --git a/drivers/pci/p2pdma.c b/drivers/pci/p2pdma.c
+> index 196382630363..bd89437faf06 100644
+> --- a/drivers/pci/p2pdma.c
+> +++ b/drivers/pci/p2pdma.c
+> @@ -267,7 +267,7 @@ static int pci_bridge_has_acs_redir(struct pci_dev *pdev)
+>  
+>  static void seq_buf_print_bus_devfn(struct seq_buf *buf, struct pci_dev *pdev)
+>  {
+> -	if (!buf)
+> +	if (!buf || !buf->buffer)
+>  		return;
+>  
+>  	seq_buf_printf(buf, "%s;", pci_name(pdev));
+> @@ -495,25 +495,26 @@ upstream_bridge_distance(struct pci_dev *provider, struct pci_dev *client,
+>  
+>  static enum pci_p2pdma_map_type
+>  upstream_bridge_distance_warn(struct pci_dev *provider, struct pci_dev *client,
+> -			      int *dist)
+> +			      int *dist, gfp_t gfp_mask)
+>  {
+>  	struct seq_buf acs_list;
+>  	bool acs_redirects;
+>  	int ret;
+>  
+> -	seq_buf_init(&acs_list, kmalloc(PAGE_SIZE, GFP_KERNEL), PAGE_SIZE);
+> -	if (!acs_list.buffer)
+> -		return -ENOMEM;
+> +	seq_buf_init(&acs_list, kmalloc(PAGE_SIZE, gfp_mask), PAGE_SIZE);
+>  
+>  	ret = upstream_bridge_distance(provider, client, dist, &acs_redirects,
+>  				       &acs_list);
+>  	if (acs_redirects) {
+>  		pci_warn(client, "ACS redirect is set between the client and provider (%s)\n",
+>  			 pci_name(provider));
+> -		/* Drop final semicolon */
+> -		acs_list.buffer[acs_list.len-1] = 0;
+> -		pci_warn(client, "to disable ACS redirect for this path, add the kernel parameter: pci=disable_acs_redir=%s\n",
+> -			 acs_list.buffer);
+> +
+> +		if (acs_list.buffer) {
+> +			/* Drop final semicolon */
+> +			acs_list.buffer[acs_list.len - 1] = 0;
+> +			pci_warn(client, "to disable ACS redirect for this path, add the kernel parameter: pci=disable_acs_redir=%s\n",
+> +				 acs_list.buffer);
+> +		}
+>  	}
+>  
+>  	if (ret == PCI_P2PDMA_MAP_NOT_SUPPORTED) {
+> @@ -566,7 +567,7 @@ int pci_p2pdma_distance_many(struct pci_dev *provider, struct device **clients,
+>  
+>  		if (verbose)
+>  			ret = upstream_bridge_distance_warn(provider,
+> -					pci_client, &distance);
+> +					pci_client, &distance, GFP_KERNEL);
+>  		else
+>  			ret = upstream_bridge_distance(provider, pci_client,
+>  						       &distance, NULL, NULL);
+> -- 
+> 2.20.1
+> 
