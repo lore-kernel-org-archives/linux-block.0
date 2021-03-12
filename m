@@ -7,33 +7,33 @@ X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56AD0C43381
-	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 16:26:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F169C433DB
+	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 17:04:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2126C6500B
-	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 16:26:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3712C6501A
+	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 17:04:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231636AbhCLQZd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 12 Mar 2021 11:25:33 -0500
-Received: from ale.deltatee.com ([204.191.154.188]:46686 "EHLO
+        id S232553AbhCLREJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 12 Mar 2021 12:04:09 -0500
+Received: from ale.deltatee.com ([204.191.154.188]:42248 "EHLO
         ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232550AbhCLQZI (ORCPT
+        with ESMTP id S232324AbhCLRDz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 12 Mar 2021 11:25:08 -0500
+        Fri, 12 Mar 2021 12:03:55 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=deltatee.com; s=20200525; h=Subject:In-Reply-To:MIME-Version:Date:
         Message-ID:From:References:Cc:To:content-disposition;
-        bh=z71Dy4S8XtDaYoM2XRkuE2wAHe2/+OE53EIe7Kw+TNU=; b=HqXLStXu7JHag3wGbK3mOgF/M8
-        gsYjKlyGMCNs6Kp2trWSjJWEdoTTL7l0upjMGEke4ssz2qv6SN3QkQZ8mcg+a143IC5xIOM3SURoN
-        lw4HuqO4LhNWzh1WAKj6/9SxZhr2mvmmvBMwjW/oqcvFMPefmD+CQ/sZD2cfS3DQ9XdARnulhX379
-        XEmUxtLccrt+N+K+iBiVDqkj/U2P4KyQUA3p6kqQsHQwLLUNipLb7OSQ8YfLEh8+nzalEco/na8NL
-        WnrW6BHAXcHt9X8Oyt7VfthZmCHT2QggtvHtaFRpzf4jqY5LDY0Xy1Vgj3qD6rJy+XfYFYP5DTIA3
-        2H01sjhg==;
+        bh=V/VslKJywQsa+B9YAC8dghP1OO6CVmZUKXpLzW4pIhQ=; b=hvIdFq2DAqZRf+jqWidcKj23gK
+        25AAfGpLmwIThDbmmZoRtxX0b8MWQN1I83BkIkCfG35j4ZNKIf8B6ZTZ/jgdT003ovN4T5xlZVcsy
+        jMqI7v7ZgfNyjIK9Y3gz/UFDtQLfV2L/5OTBbVO+4EeCF29eUe/Xs8yA4hGkodsUWqZMHjl9ObvbT
+        UlWR/0K94BQ0t2VXgd4rlsJO1VCweVLuaREQlx4mCqN1D2xxRvOOd5SQUMQBcFk3W6Kuukq0HeoG5
+        sUeZeX9ISQJYUCc+e8SQ1CtaHLsHhzcptg5958i8F1nX8awDpGpn036mCjZazwTrRxyKMG3rEht3H
+        HLX9E1fA==;
 Received: from s01060023bee90a7d.cg.shawcable.net ([24.64.145.4] helo=[192.168.0.10])
         by ale.deltatee.com with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
         (Exim 4.92)
         (envelope-from <logang@deltatee.com>)
-        id 1lKkar-0007E2-BR; Fri, 12 Mar 2021 09:24:54 -0700
+        id 1lKlCO-0007pn-Nb; Fri, 12 Mar 2021 10:03:41 -0700
 To:     Robin Murphy <robin.murphy@arm.com>, linux-kernel@vger.kernel.org,
         linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
         linux-pci@vger.kernel.org, linux-mm@kvack.org,
@@ -53,23 +53,23 @@ Cc:     Minturn Dave B <dave.b.minturn@intel.com>,
         Christoph Hellwig <hch@lst.de>,
         Xiong Jianxin <jianxin.xiong@intel.com>
 References: <20210311233142.7900-1-logang@deltatee.com>
- <20210311233142.7900-7-logang@deltatee.com>
- <215e1472-5294-d20a-a43a-ff6dfe8cd66e@arm.com>
+ <20210311233142.7900-9-logang@deltatee.com>
+ <accd4187-7a9d-a8fc-f216-98ec24e3411a@arm.com>
 From:   Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <d7ead722-7356-8e0f-22de-cb9dea12b556@deltatee.com>
-Date:   Fri, 12 Mar 2021 09:24:51 -0700
+Message-ID: <45701356-ee41-1ad2-0e06-ca74af87b05a@deltatee.com>
+Date:   Fri, 12 Mar 2021 10:03:38 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.8.0
 MIME-Version: 1.0
-In-Reply-To: <215e1472-5294-d20a-a43a-ff6dfe8cd66e@arm.com>
+In-Reply-To: <accd4187-7a9d-a8fc-f216-98ec24e3411a@arm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-CA
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 24.64.145.4
 X-SA-Exim-Rcpt-To: jianxin.xiong@intel.com, hch@lst.de, andrzej.jakowski@intel.com, sbates@raithlin.com, dan.j.williams@intel.com, daniel.vetter@ffwll.ch, jason@jlekstrand.net, jgg@ziepe.ca, christian.koenig@amd.com, willy@infradead.org, iweiny@intel.com, dave.hansen@linux.intel.com, jhubbard@nvidia.com, dave.b.minturn@intel.com, iommu@lists.linux-foundation.org, linux-mm@kvack.org, linux-pci@vger.kernel.org, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, robin.murphy@arm.com
 X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: [RFC PATCH v2 06/11] dma-direct: Support PCI P2PDMA pages in
- dma-direct map_sg
+Subject: Re: [RFC PATCH v2 08/11] iommu/dma: Support PCI P2PDMA pages in
+ dma-iommu map_sg
 X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
 X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
@@ -79,72 +79,143 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 
 On 2021-03-12 8:52 a.m., Robin Murphy wrote:
+> On 2021-03-11 23:31, Logan Gunthorpe wrote:
+>> When a PCI P2PDMA page is seen, set the IOVA length of the segment
+>> to zero so that it is not mapped into the IOVA. Then, in finalise_sg(),
+>> apply the appropriate bus address to the segment. The IOVA is not
+>> created if the scatterlist only consists of P2PDMA pages.
+> 
+> This misled me at first, but I see the implementation does actually
+> appear to accomodate the case of working ACS where P2P *would* still
+> need to be mapped at the IOMMU.
+
+Yes, that's correct.
+>>   static int __finalise_sg(struct device *dev, struct scatterlist *sg,
+>> int nents,
+>> -        dma_addr_t dma_addr)
+>> +        dma_addr_t dma_addr, unsigned long attrs)
+>>   {
+>>       struct scatterlist *s, *cur = sg;
+>>       unsigned long seg_mask = dma_get_seg_boundary(dev);
+>> @@ -864,6 +865,20 @@ static int __finalise_sg(struct device *dev,
+>> struct scatterlist *sg, int nents,
+>>           sg_dma_address(s) = DMA_MAPPING_ERROR;
+>>           sg_dma_len(s) = 0;
+>>   +        if (is_pci_p2pdma_page(sg_page(s)) && !s_iova_len) {
+>> +            if (i > 0)
+>> +                cur = sg_next(cur);
 >> +
->>           sg->dma_address = dma_direct_map_page(dev, sg_page(sg),
->>                   sg->offset, sg->length, dir, attrs);
->>           if (sg->dma_address == DMA_MAPPING_ERROR)
->> @@ -411,7 +440,7 @@ int dma_direct_map_sg(struct device *dev, struct
->> scatterlist *sgl, int nents,
->>     out_unmap:
->>       dma_direct_unmap_sg(dev, sgl, i, dir, attrs |
->> DMA_ATTR_SKIP_CPU_SYNC);
->> -    return 0;
->> +    return ret;
+>> +            sg_dma_address(cur) = sg_phys(s) + s->offset -
+> 
+> Are you sure about that? ;)
+
+Do you see a bug? I don't follow you...
+
+>> +                pci_p2pdma_bus_offset(sg_page(s));
+> 
+> Can the bus offset make P2P addresses overlap with regions of mem space
+> that we might use for regular IOVA allocation? That would be very bad...
+
+No. IOMMU drivers already disallow all PCI addresses from being used as
+IOVA addresses. See, for example,  dmar_init_reserved_ranges(). It would
+be a huge problem for a whole lot of other reasons if it didn't.
+
+
+>> @@ -960,11 +975,12 @@ static int iommu_dma_map_sg(struct device *dev,
+>> struct scatterlist *sg,
+>>       struct iommu_dma_cookie *cookie = domain->iova_cookie;
+>>       struct iova_domain *iovad = &cookie->iovad;
+>>       struct scatterlist *s, *prev = NULL;
+>> +    struct dev_pagemap *pgmap = NULL;
+>>       int prot = dma_info_to_prot(dir, dev_is_dma_coherent(dev), attrs);
+>>       dma_addr_t iova;
+>>       size_t iova_len = 0;
+>>       unsigned long mask = dma_get_seg_boundary(dev);
+>> -    int i;
+>> +    int i, map = -1, ret = 0;
+>>         if (static_branch_unlikely(&iommu_deferred_attach_enabled) &&
+>>           iommu_deferred_attach(dev, domain))
+>> @@ -993,6 +1009,23 @@ static int iommu_dma_map_sg(struct device *dev,
+>> struct scatterlist *sg,
+>>           s_length = iova_align(iovad, s_length + s_iova_off);
+>>           s->length = s_length;
+>>   +        if (is_pci_p2pdma_page(sg_page(s))) {
+>> +            if (sg_page(s)->pgmap != pgmap) {
+>> +                pgmap = sg_page(s)->pgmap;
+>> +                map = pci_p2pdma_dma_map_type(dev, pgmap);
+>> +            }
+>> +
+>> +            if (map < 0) {
+> 
+> It rather feels like it should be the job of whoever creates the list in
+> the first place not to put unusable pages in it, especially since the
+> p2pdma_map_type looks to be a fairly coarse-grained and static thing.
+> The DMA API isn't responsible for validating normal memory pages, so
+> what makes P2P special?
+
+Yes, that would be ideal, but there's some difficulties there. For the
+driver to check the pages, it would need to loop through the entire SG
+one more time on every transaction, regardless of whether there are
+P2PDMA pages, or not. So that will have a performance impact even when
+the feature isn't being used. I don't think that'll be acceptable for
+many drivers.
+
+The other possibility is for GUP to do it when it gets the pages from
+userspace. But GUP doesn't have all the information to do this at the
+moment. We'd have to pass the struct device that will eventually map the
+pages through all the nested functions in the GUP to do that test at
+that time. This might not be a bad option (that I half looked into), but
+I'm not sure how acceptable it would be to the GUP developers.
+
+But even if we do verify the pages ahead of time, we still need the same
+infrastructure in dma_map_sg(); it could only now be a BUG if the driver
+sent invalid pages instead of an error return.
+
+>> +                ret = -EREMOTEIO;
+>> +                goto out_restore_sg;
+>> +            }
+>> +
+>> +            if (map) {
+>> +                s->length = 0;
+> 
+> I'm not really thrilled about the idea of passing zero-length segments
+> to iommu_map_sg(). Yes, it happens to trick the concatenation logic in
+> the current implementation into doing what you want, but it feels fragile.
+
+We're not passing zero length segments to iommu_map_sg() (or any
+function). This loop is just scanning to calculate the length of the
+required IOVA. __finalise_sg() (which is intimately tied to this loop)
+then needs a way to determine which segments were P2P segments. The
+existing code already overwrites s->length with an aligned length and
+stores the original length in sg_dma_len. So we're not relying on
+tricking any logic here.
+
+
 >>   }
->>     dma_addr_t dma_direct_map_resource(struct device *dev, phys_addr_t
->> paddr,
->> diff --git a/kernel/dma/mapping.c b/kernel/dma/mapping.c
->> index b6a633679933..adc1a83950be 100644
->> --- a/kernel/dma/mapping.c
->> +++ b/kernel/dma/mapping.c
->> @@ -178,8 +178,15 @@ void dma_unmap_page_attrs(struct device *dev,
->> dma_addr_t addr, size_t size,
->>   EXPORT_SYMBOL(dma_unmap_page_attrs);
->>     /*
->> - * dma_maps_sg_attrs returns 0 on error and > 0 on success.
->> - * It should never return a value < 0.
->> + * dma_maps_sg_attrs returns 0 on any resource error and > 0 on success.
->> + *
->> + * If 0 is returned, the mapping can be retried and will succeed once
->> + * sufficient resources are available.
+>>     static void iommu_dma_unmap_sg(struct device *dev, struct
+>> scatterlist *sg,
+>>           int nents, enum dma_data_direction dir, unsigned long attrs)
+>>   {
+>> -    dma_addr_t start, end;
+>> +    dma_addr_t end, start = DMA_MAPPING_ERROR;
+>>       struct scatterlist *tmp;
+>>       int i;
+>>   @@ -1054,14 +1090,20 @@ static void iommu_dma_unmap_sg(struct device
+>> *dev, struct scatterlist *sg,
+>>        * The scatterlist segments are mapped into a single
+>>        * contiguous IOVA allocation, so this is incredibly easy.
+>>        */
+>> -    start = sg_dma_address(sg);
+>> -    for_each_sg(sg_next(sg), tmp, nents - 1, i) {
+>> +    for_each_sg(sg, tmp, nents, i) {
+>> +        if (sg_is_pci_p2pdma(tmp))
 > 
-> That's not a guarantee we can uphold. Retrying forever in the vain hope
-> that a device might evolve some extra address bits, or a bounce buffer
-> might magically grow big enough for a gigantic mapping, isn't
-> necessarily the best idea.
+> Since the flag is associated with the DMA address which will no longer
+> be valid, shouldn't it be cleared? The circumstances in which leaving it
+> around could cause a problem are tenuous, but definitely possible.
 
-Perhaps this is just poorly worded. Returning 0 is the normal case and
-nothing has changed there. The block layer, for example, will retry if
-zero is returned as this only happens if it failed to allocate resources
-for the mapping. The reason we have to return -1 is to tell the block
-layer not to retry these requests as they will never succeed in the future.
+Yes, that's a good idea.
 
->> + *
->> + * If there are P2PDMA pages in the scatterlist then this function may
->> + * return -EREMOTEIO to indicate that the pages are not mappable by the
->> + * device. In this case, an error should be returned for the IO as it
->> + * will never be successfully retried.
->>    */
->>   int dma_map_sg_attrs(struct device *dev, struct scatterlist *sg, int
->> nents,
->>           enum dma_data_direction dir, unsigned long attrs)
->> @@ -197,7 +204,7 @@ int dma_map_sg_attrs(struct device *dev, struct
->> scatterlist *sg, int nents,
->>           ents = dma_direct_map_sg(dev, sg, nents, dir, attrs);
->>       else
->>           ents = ops->map_sg(dev, sg, nents, dir, attrs);
->> -    BUG_ON(ents < 0);
->> +
-> 
-> This scares me - I hesitate to imagine the amount of driver/subsystem
-> code out there that will see nonzero and merrily set off iterating a
-> negative number of segments, if we open the floodgates of allowing
-> implementations to return error codes here.
-
-Yes, but it will never happen on existing drivers/subsystems. The only
-way it can return a negative number is if the driver passes in P2PDMA
-pages which can't happen without changes in the driver. We are careful
-about where P2PDMA pages can get into so we don't have to worry about
-all the existing driver code out there.
+Thanks for the review!
 
 Logan
