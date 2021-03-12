@@ -2,149 +2,204 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CE6AC28E82
-	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 10:56:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFD1BC433DB
+	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 11:09:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 634B065004
-	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 10:56:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8EB3C64FEA
+	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 11:09:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233725AbhCLK4A (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 12 Mar 2021 05:56:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40992 "EHLO
+        id S233792AbhCLLJS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 12 Mar 2021 06:09:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233681AbhCLKzo (ORCPT
+        with ESMTP id S233947AbhCLLIt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 12 Mar 2021 05:55:44 -0500
-Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A926C061761
-        for <linux-block@vger.kernel.org>; Fri, 12 Mar 2021 02:55:44 -0800 (PST)
-Received: by mail-wr1-x42b.google.com with SMTP id j18so1516402wra.2
-        for <linux-block@vger.kernel.org>; Fri, 12 Mar 2021 02:55:44 -0800 (PST)
+        Fri, 12 Mar 2021 06:08:49 -0500
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9291EC061574;
+        Fri, 12 Mar 2021 03:08:49 -0800 (PST)
+Received: by mail-pf1-x42a.google.com with SMTP id s21so1642160pfm.1;
+        Fri, 12 Mar 2021 03:08:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=ra48pT9rfpiijjx5/hqCOGUdkD2PZ1gvyu+SmCrCjD4=;
-        b=Oef+d4eRWh1sAVKLw1nPhinRKqgeXpg/GUlyB4VHS87v+IMN6D8TxBv1W64GWviozS
-         VoIEf+MupbFHJFaNddKk1CGZfBGSchQpUsXuDWcwTdiJ3KRmd4gPqtLIfy29kogPBbgu
-         hjixb95FG3Isvqs/BhAjWAm923IKAVF7M+mi70eSov3NFrbG0RwI7Zel83ln6I/2VszK
-         f7bWbDXZZBKhU59Pnpnh3itv2dH5MchQgMwyJak0kjvEA4xUvZFS1C+XdkiXRX6tMfQw
-         Ii+IuYZ74uJiRQHgtzit+eUkURgREtTUka8Xb1LXjJgnvNFtYqGapKdTzKmhD68hj71T
-         pCEg==
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=bTPvw3IUJ9WwR588wMJx9zIhcLtpvhfNVx1XrrnOYxE=;
+        b=uacnWCwaZE8woNMCG/63jKiql0GCb1RAWsGNNANEjFev7+Ce4FH89lrOAGQse/v+fC
+         oHyQhOY1K7MQdt2kUCazgGEXV3WdpE2ZajjsBUVe+l6FO7P4iwKhynOjLbiOJXhjlF16
+         f1w30m6CMa5oAL8nyRkUKFQ6S/ckj+DmNqrrMtk9pf24QZbUpHwxOnitWcPgSPQ06Ukj
+         yJhiRxntJPYJ74hXKv0e/JoxciQZAsyjO0gWSOKG3tnOrjLP2FUdEu6ZuGtuhL0TuSRf
+         O/evwCTxwbx1uYb1F0XrAWluvR23otNH/xC+AC0PyZYxzOYOp/qUHG3gplj/FJGFvhzE
+         s8YQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=ra48pT9rfpiijjx5/hqCOGUdkD2PZ1gvyu+SmCrCjD4=;
-        b=kEbS+lW+OE6uWtFe+/j29XTIQDax8fTXRAUHX/Rrv3VBtnXbblx0UVoK/nrnaue56u
-         i6AW6/aOCU+I9YFf0SPHyK6KIRNo50l4lC0ZW2Ec+i8HkSwq2qThMMhQ6NRVJkJLHLiq
-         w7vWvmv5IgXactDPZMBTfzNsW2LxlWIRVHuIvM9bjMHkTjMQQib5kHrpOIFJH/yniPXo
-         +lXWfhwlTC2T9cz3LopdQydYPd5OQ7wOg5U4IhU8cD3ckRslpuKidzXACgTzQUyJtsGL
-         S8lQZy6m8t0B0icuv44U902CuRqgJ7gMJekZjnMa7fclrQxOfrvB5wHvrQdK59d7wQME
-         HZcw==
-X-Gm-Message-State: AOAM531hYVliUwfAdvdd0YClpzhXc44PDH0TMYkHbrAtAJ+AbB8xBIwt
-        6lyrCV8p828PAlUACRjAmsalFJK618BugA==
-X-Google-Smtp-Source: ABdhPJzMqLsZXEdmvMOw6kJWzAJoj5oRWwuNxlJb3z7y5Zj3s4CdlgUTzAeRsuGUgysF2Ux1mr9chQ==
-X-Received: by 2002:adf:d1ce:: with SMTP id b14mr13284518wrd.126.1615546542769;
-        Fri, 12 Mar 2021 02:55:42 -0800 (PST)
-Received: from dell.default ([91.110.221.204])
-        by smtp.gmail.com with ESMTPSA id q15sm7264962wrr.58.2021.03.12.02.55.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Mar 2021 02:55:42 -0800 (PST)
-From:   Lee Jones <lee.jones@linaro.org>
-To:     lee.jones@linaro.org
-Cc:     linux-kernel@vger.kernel.org,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        Jens Axboe <axboe@kernel.dk>, drbd-dev@lists.linbit.com,
-        linux-block@vger.kernel.org
-Subject: [PATCH 07/11] block: drbd: drbd_nl: Make conversion to 'enum drbd_ret_code' explicit
-Date:   Fri, 12 Mar 2021 10:55:26 +0000
-Message-Id: <20210312105530.2219008-8-lee.jones@linaro.org>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20210312105530.2219008-1-lee.jones@linaro.org>
-References: <20210312105530.2219008-1-lee.jones@linaro.org>
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=bTPvw3IUJ9WwR588wMJx9zIhcLtpvhfNVx1XrrnOYxE=;
+        b=JZA9za405DpYK+6HuKp4ta1qExOe5OE6005T4kQx6TK54kQWV0vOaVAavph9NazOqq
+         kpI9HlFw8h8c5/tp7d8daH7Bildv45GxuMS5uLiwwO1odON8koaBzuoLvA9QGBFpGC/N
+         TTj2CPjJIRG79zL3jD+X6Fl/5rFgq5oHH+TiuL5gb6ybiFDVOmA6pLnrVjPYT2mu3y1l
+         wE60yyfKg49xBo8kpLGFx6VKvVlFGTN6M5PTUtVlSlJv2SLKXHm9L4jD9Ossdo0140TE
+         L5xQu83r4Al40UY23pXoqeMKSzSPva0OCi4+q2JFLMbDzkAzQABJWdgn0s5WiNVyiSiJ
+         B49Q==
+X-Gm-Message-State: AOAM531QGnFvmNkM3iP7bPMjHceZxJvt2Xfudt2bosu9Lslkj+1p4YHX
+        JrrAp6GTTeOlOrQMJ0CZ/fQ=
+X-Google-Smtp-Source: ABdhPJx/cFWcwpuDmhmP01aEDzigM10jG1/KSXVD01TyNgTDOzA75TODKb6Hj3QIL6T1MOxSLLSInw==
+X-Received: by 2002:a63:e4d:: with SMTP id 13mr11043066pgo.452.1615547329097;
+        Fri, 12 Mar 2021 03:08:49 -0800 (PST)
+Received: from VM-0-3-centos.localdomain ([101.32.213.191])
+        by smtp.gmail.com with ESMTPSA id t5sm4942181pgl.89.2021.03.12.03.08.47
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 12 Mar 2021 03:08:48 -0800 (PST)
+From:   brookxu <brookxu.cn@gmail.com>
+To:     paolo.valente@linaro.org, axboe@kernel.dk, tj@kernel.org
+Cc:     linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [RFC PATCH v2 00/11] bfq: introduce bfq.ioprio for cgroup
+Date:   Fri, 12 Mar 2021 19:08:34 +0800
+Message-Id: <cover.1615517202.git.brookxu@tencent.com>
+X-Mailer: git-send-email 1.8.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Fixes the following W=1 kernel build warning(s):
+From: Chunguang Xu <brookxu@tencent.com>
 
- from drivers/block/drbd/drbd_nl.c:24:
- drivers/block/drbd/drbd_nl.c: In function ‘drbd_adm_set_role’:
- drivers/block/drbd/drbd_nl.c:793:11: warning: implicit conversion from ‘enum drbd_state_rv’ to ‘enum drbd_ret_code’ [-Wenum-conversion]
- drivers/block/drbd/drbd_nl.c:795:11: warning: implicit conversion from ‘enum drbd_state_rv’ to ‘enum drbd_ret_code’ [-Wenum-conversion]
- drivers/block/drbd/drbd_nl.c: In function ‘drbd_adm_attach’:
- drivers/block/drbd/drbd_nl.c:1965:10: warning: implicit conversion from ‘enum drbd_state_rv’ to ‘enum drbd_ret_code’ [-Wenum-conversion]
- drivers/block/drbd/drbd_nl.c: In function ‘drbd_adm_connect’:
- drivers/block/drbd/drbd_nl.c:2690:10: warning: implicit conversion from ‘enum drbd_state_rv’ to ‘enum drbd_ret_code’ [-Wenum-conversion]
- drivers/block/drbd/drbd_nl.c: In function ‘drbd_adm_disconnect’:
- drivers/block/drbd/drbd_nl.c:2803:11: warning: implicit conversion from ‘enum drbd_state_rv’ to ‘enum drbd_ret_code’ [-Wenum-conversion]
+Tasks in the production environment can be roughly divided into
+three categories: emergency tasks, ordinary tasks and offline
+tasks. Emergency tasks need to be scheduled in real time, such
+as system agents. Offline tasks do not need to guarantee QoS,
+but can improve system resource utilization during system idle
+periods, such as background tasks. The above requirements need
+to achieve IO preemption. At present, we can use weights to
+simulate IO preemption, but since weights are more of a shared
+concept, they cannot be simulated well. For example, the weights
+of emergency tasks and ordinary tasks cannot be determined well,
+offline tasks (with the same weight) actually occupy different
+resources on disks with different performance, and the tail
+latency caused by offline tasks cannot be well controlled. Using
+ioprio's concept of preemption, we can solve the above problems
+very well. Since ioprio will eventually be converted to weight,
+using ioprio alone can also achieve weight isolation within the
+same class. But we can still use bfq.weight to control resource,
+achieving better IO Qos control.
 
-Cc: Philipp Reisner <philipp.reisner@linbit.com>
-Cc: Lars Ellenberg <lars.ellenberg@linbit.com>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: drbd-dev@lists.linbit.com
-Cc: linux-block@vger.kernel.org
-Signed-off-by: Lee Jones <lee.jones@linaro.org>
----
- drivers/block/drbd/drbd_nl.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+However, currently the class of bfq_group is always be class, and
+the ioprio class of the task can only be reflected in a single
+cgroup. We cannot guarantee that real-time tasks in a cgroup are
+scheduled in time. Therefore, we introduce bfq.ioprio, which
+allows us to configure ioprio class for cgroup. In this way, we
+can ensure that the real-time tasks of a cgroup can be scheduled
+in time. Similarly, the processing of offline task groups can
+also be simpler.
 
-diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c
-index bf7de4c7b96c1..31902304ddac7 100644
---- a/drivers/block/drbd/drbd_nl.c
-+++ b/drivers/block/drbd/drbd_nl.c
-@@ -790,9 +790,11 @@ int drbd_adm_set_role(struct sk_buff *skb, struct genl_info *info)
- 	mutex_lock(&adm_ctx.resource->adm_mutex);
- 
- 	if (info->genlhdr->cmd == DRBD_ADM_PRIMARY)
--		retcode = drbd_set_role(adm_ctx.device, R_PRIMARY, parms.assume_uptodate);
-+		retcode = (enum drbd_ret_code)drbd_set_role(adm_ctx.device,
-+						R_PRIMARY, parms.assume_uptodate);
- 	else
--		retcode = drbd_set_role(adm_ctx.device, R_SECONDARY, 0);
-+		retcode = (enum drbd_ret_code)drbd_set_role(adm_ctx.device,
-+						R_SECONDARY, 0);
- 
- 	mutex_unlock(&adm_ctx.resource->adm_mutex);
- 	genl_lock();
-@@ -1962,7 +1964,7 @@ int drbd_adm_attach(struct sk_buff *skb, struct genl_info *info)
- 	drbd_flush_workqueue(&connection->sender_work);
- 
- 	rv = _drbd_request_state(device, NS(disk, D_ATTACHING), CS_VERBOSE);
--	retcode = rv;  /* FIXME: Type mismatch. */
-+	retcode = (enum drbd_ret_code)rv;
- 	drbd_resume_io(device);
- 	if (rv < SS_SUCCESS)
- 		goto fail;
-@@ -2687,7 +2689,8 @@ int drbd_adm_connect(struct sk_buff *skb, struct genl_info *info)
- 	}
- 	rcu_read_unlock();
- 
--	retcode = conn_request_state(connection, NS(conn, C_UNCONNECTED), CS_VERBOSE);
-+	retcode = (enum drbd_ret_code)conn_request_state(connection,
-+					NS(conn, C_UNCONNECTED), CS_VERBOSE);
- 
- 	conn_reconfig_done(connection);
- 	mutex_unlock(&adm_ctx.resource->adm_mutex);
-@@ -2800,7 +2803,7 @@ int drbd_adm_disconnect(struct sk_buff *skb, struct genl_info *info)
- 	mutex_lock(&adm_ctx.resource->adm_mutex);
- 	rv = conn_try_disconnect(connection, parms.force_disconnect);
- 	if (rv < SS_SUCCESS)
--		retcode = rv;  /* FIXME: Type mismatch. */
-+		retcode = (enum drbd_ret_code)rv;
- 	else
- 		retcode = NO_ERROR;
- 	mutex_unlock(&adm_ctx.resource->adm_mutex);
+The bfq.ioprio interface now is available for cgroup v1 and cgroup
+v2. Users can configure the ioprio for cgroup through this interface,
+as shown below:
+
+echo "1 2"> blkio.bfq.ioprio
+
+The above two values respectively represent the values of ioprio
+class and ioprio for cgroup. The ioprio of tasks within the cgroup
+is uniformly equal to the ioprio of the cgroup. If the ioprio of
+the cgroup is disabled, the ioprio of the task remains the same,
+usually from io_context.
+
+When testing, using fio and fio_generate_plots we can clearly see
+that the IO delay of the task satisfies RT> BE> IDLE. When RT is
+running, BE and IDLE are guaranteed minimum bandwidth. When used
+with bfq.weight, we can also isolate the resource within the same
+class.
+
+The test process is as follows:
+# prepare data disk
+mount /dev/sdb /data1
+
+# create cgroup v1 hierarchy
+cd /sys/fs/cgroup/blkio
+mkdir rt be idle
+echo "1 0" > rt/blkio.bfq.ioprio
+echo "2 0" > be/blkio.bfq.ioprio
+echo "3 0" > idle/blkio.bfq.ioprio
+
+# run fio test
+fio fio.ini
+
+# generate svg graph
+fio_generate_plots res
+
+The contents of fio.ini are as follows:
+[global]
+ioengine=libaio
+group_reporting=1
+log_avg_msec=500
+direct=1
+time_based=1
+iodepth=16
+size=100M
+rw=write
+bs=1M
+[rt]
+name=rt
+write_bw_log=rt
+write_lat_log=rt
+write_iops_log=rt
+filename=/data1/rt.bin
+cgroup=rt
+runtime=30s
+nice=-10
+[be]
+name=be
+new_group
+write_bw_log=be
+write_lat_log=be
+write_iops_log=be
+filename=/data1/be.bin
+cgroup=be
+runtime=60s
+[idle]
+name=idle
+new_group
+write_bw_log=idle
+write_lat_log=idle
+write_iops_log=idle
+filename=/data1/idle.bin
+cgroup=idle
+runtime=90s
+
+V2:
+1. Optmise bfq_select_next_class().
+2. Introduce bfq_group [] to track the number of groups for each CLASS.
+3. Optimse IO injection, EMQ and Idle mechanism for CLASS_RT.
+
+Chunguang Xu (11):
+  bfq: introduce bfq_entity_to_bfqg helper method
+  bfq: limit the IO depth of idle_class to 1
+  bfq: keep the minimun bandwidth for be_class
+  bfq: expire other class if CLASS_RT is waiting
+  bfq: optimse IO injection for CLASS_RT
+  bfq: disallow idle if CLASS_RT waiting for service
+  bfq: disallow merge CLASS_RT with other class
+  bfq: introduce bfq.ioprio for cgroup
+  bfq: convert the type of bfq_group.bfqd to bfq_data*
+  bfq: remove unnecessary initialization logic
+  bfq: optimize the calculation of bfq_weight_to_ioprio()
+
+ block/bfq-cgroup.c  |  99 +++++++++++++++++++++++++++++++----
+ block/bfq-iosched.c |  47 ++++++++++++++---
+ block/bfq-iosched.h |  28 ++++++++--
+ block/bfq-wf2q.c    | 124 +++++++++++++++++++++++++++++++++-----------
+ 4 files changed, 244 insertions(+), 54 deletions(-)
+
 -- 
-2.27.0
+2.30.0
 
