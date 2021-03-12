@@ -2,116 +2,155 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6E92C433E0
-	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 02:19:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 266FDC433E0
+	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 02:27:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 88E2964F70
-	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 02:19:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 004E364F93
+	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 02:27:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230084AbhCLCS7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 11 Mar 2021 21:18:59 -0500
-Received: from ale.deltatee.com ([204.191.154.188]:49156 "EHLO
-        ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229569AbhCLCSb (ORCPT
+        id S229664AbhCLC0d (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 11 Mar 2021 21:26:33 -0500
+Received: from out30-57.freemail.mail.aliyun.com ([115.124.30.57]:47331 "EHLO
+        out30-57.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229569AbhCLC03 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 11 Mar 2021 21:18:31 -0500
-X-Greylist: delayed 2466 seconds by postgrey-1.27 at vger.kernel.org; Thu, 11 Mar 2021 21:18:30 EST
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:MIME-Version:Date:
-        Message-ID:From:References:Cc:To:content-disposition;
-        bh=TthgKQQeKaY8Nk8kByxBsMn1+rajpO9j2vCO0oMycYg=; b=k5/TOv/t9MI8U4lhl5xd0eVHRI
-        DEKyTXEcuq5sX7Xy2TXIwqOAOZ73ZqhrLuTntYIMTvCOCq8PRu9o7rWRFdwy4LEmwJcHwyWL9BvxE
-        E3psi+/9MRziL+BVzgCEmcxCM77bWwNBiF0H8QBoLUfFeTtCEH58WSnu/bBSwfWEc0X1HLYx+UY6W
-        Ig6tahtLX1Cp8ddWB4Vw3kJiR4S7bXzhUgT4PrlGFGZiBmn37haj35vV85OvDcD2h9GakgTEPhmP8
-        5ULZeqF8e05hdIS9qe+Vati5jKVwahKR4z2FkN46o43eFB9sPRT5TVTR6byB7fKBkdA6vj9c1GMvK
-        qXUpe9FA==;
-Received: from s01060023bee90a7d.cg.shawcable.net ([24.64.145.4] helo=[192.168.0.10])
-        by ale.deltatee.com with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.92)
-        (envelope-from <logang@deltatee.com>)
-        id 1lKWjj-0005aG-5w; Thu, 11 Mar 2021 18:37:08 -0700
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-mm@kvack.org, iommu@lists.linux-foundation.org,
-        Stephen Bates <sbates@raithlin.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Dan Williams <dan.j.williams@intel.com>,
-        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
-        Ira Weiny <iweiny@intel.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Don Dutile <ddutile@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Jakowski Andrzej <andrzej.jakowski@intel.com>,
-        Minturn Dave B <dave.b.minturn@intel.com>,
-        Jason Ekstrand <jason@jlekstrand.net>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Xiong Jianxin <jianxin.xiong@intel.com>
-References: <20210311233142.7900-1-logang@deltatee.com>
- <20210311233142.7900-12-logang@deltatee.com>
- <20210311235943.GB2710221@ziepe.ca>
-From:   Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <c6cc9e07-b7cf-6d3d-b0bf-25428b197731@deltatee.com>
-Date:   Thu, 11 Mar 2021 18:37:03 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.0
+        Thu, 11 Mar 2021 21:26:29 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R371e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04400;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0URYCgK-_1615515984;
+Received: from admindeMacBook-Pro-2.local(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0URYCgK-_1615515984)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Fri, 12 Mar 2021 10:26:25 +0800
+Subject: Re: [dm-devel] [PATCH v5 10/12] block: fastpath for bio-based polling
+From:   JeffleXu <jefflexu@linux.alibaba.com>
+To:     Mike Snitzer <snitzer@redhat.com>
+Cc:     axboe@kernel.dk, caspar@linux.alibaba.com,
+        linux-block@vger.kernel.org, joseph.qi@linux.alibaba.com,
+        dm-devel@redhat.com, mpatocka@redhat.com, io-uring@vger.kernel.org
+References: <20210303115740.127001-1-jefflexu@linux.alibaba.com>
+ <20210303115740.127001-11-jefflexu@linux.alibaba.com>
+ <20210310231808.GD23410@redhat.com>
+ <b6f0799a-1a11-3778-9b8a-702c3c103db5@linux.alibaba.com>
+Message-ID: <99a31346-0720-d586-4e9f-ba6ee855f9b5@linux.alibaba.com>
+Date:   Fri, 12 Mar 2021 10:26:24 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.7.0
 MIME-Version: 1.0
-In-Reply-To: <20210311235943.GB2710221@ziepe.ca>
+In-Reply-To: <b6f0799a-1a11-3778-9b8a-702c3c103db5@linux.alibaba.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-CA
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 24.64.145.4
-X-SA-Exim-Rcpt-To: jianxin.xiong@intel.com, dave.hansen@linux.intel.com, jason@jlekstrand.net, dave.b.minturn@intel.com, andrzej.jakowski@intel.com, daniel.vetter@ffwll.ch, willy@infradead.org, ddutile@redhat.com, jhubbard@nvidia.com, iweiny@intel.com, christian.koenig@amd.com, dan.j.williams@intel.com, hch@lst.de, sbates@raithlin.com, iommu@lists.linux-foundation.org, linux-mm@kvack.org, linux-pci@vger.kernel.org, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, jgg@ziepe.ca
-X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: [RFC PATCH v2 11/11] nvme-pci: Convert to using dma_map_sg for
- p2pdma pages
-X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
 
-On 2021-03-11 4:59 p.m., Jason Gunthorpe wrote:
-> On Thu, Mar 11, 2021 at 04:31:41PM -0700, Logan Gunthorpe wrote:
->> Convert to using dma_[un]map_sg() for PCI p2pdma pages.
->>
->> This should be equivalent, though support will be somewhat less
->> (only dma-direct and dma-iommu are currently supported).
->>
->> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
->>  drivers/nvme/host/pci.c | 27 +++++++--------------------
->>  1 file changed, 7 insertions(+), 20 deletions(-)
->>
->> diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
->> index 7d40c6a9e58e..89ca5acf7a62 100644
->> +++ b/drivers/nvme/host/pci.c
->> @@ -577,17 +577,6 @@ static void nvme_free_sgls(struct nvme_dev *dev, struct request *req)
->>  
->>  }
->>  
->> -static void nvme_unmap_sg(struct nvme_dev *dev, struct request *req)
->> -{
->> -	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
->> -
->> -	if (is_pci_p2pdma_page(sg_page(iod->sg)))
->> -		pci_p2pdma_unmap_sg(dev->dev, iod->sg, iod->nents,
->> -				    rq_dma_dir(req));
->> -	else
->> -		dma_unmap_sg(dev->dev, iod->sg, iod->nents, rq_dma_dir(req));
->> -}
+On 3/11/21 2:36 PM, JeffleXu wrote:
 > 
-> Can the two other places with this code pattern be changed too?
+> 
+> On 3/11/21 7:18 AM, Mike Snitzer wrote:
+>> On Wed, Mar 03 2021 at  6:57am -0500,
+>> Jeffle Xu <jefflexu@linux.alibaba.com> wrote:
+>>
+>>> Offer one fastpath for bio-based polling when bio submitted to dm
+>>> device is not split.
+>>>
+>>> In this case, there will be only one bio submitted to only one polling
+>>> hw queue of one underlying mq device, and thus we don't need to track
+>>> all split bios or iterate through all polling hw queues. The pointer to
+>>> the polling hw queue the bio submitted to is returned here as the
+>>> returned cookie. In this case, the polling routine will call
+>>> mq_ops->poll() directly with the hw queue converted from the input
+>>> cookie.
+>>>
+>>> If the original bio submitted to dm device is split to multiple bios and
+>>> thus submitted to multiple polling hw queues, the polling routine will
+>>> fall back to iterating all hw queues (in polling mode) of all underlying
+>>> mq devices.
+>>>
+>>> Signed-off-by: Jeffle Xu <jefflexu@linux.alibaba.com>
+>>> ---
+>>>  block/blk-core.c          | 73 +++++++++++++++++++++++++++++++++++++--
+>>>  include/linux/blk_types.h | 66 +++++++++++++++++++++++++++++++++--
+>>>  include/linux/types.h     |  2 +-
+>>>  3 files changed, 135 insertions(+), 6 deletions(-)
+>>>
+>>> diff --git a/block/blk-core.c b/block/blk-core.c
+>>> index 6d7d53030d7c..e5cd4ff08f5c 100644
+>>> --- a/block/blk-core.c
+>>> +++ b/block/blk-core.c
+>>> @@ -947,14 +947,22 @@ static blk_qc_t __submit_bio_noacct(struct bio *bio)
+>>>  {
+>>>  	struct bio_list bio_list_on_stack[2];
+>>>  	blk_qc_t ret = BLK_QC_T_NONE;
+>>> +	struct request_queue *top_q;
+>>> +	bool poll_on;
+>>>  
+>>>  	BUG_ON(bio->bi_next);
+>>>  
+>>>  	bio_list_init(&bio_list_on_stack[0]);
+>>>  	current->bio_list = bio_list_on_stack;
+>>>  
+>>> +	top_q = bio->bi_bdev->bd_disk->queue;
+>>> +	poll_on = test_bit(QUEUE_FLAG_POLL, &top_q->queue_flags) &&
+>>> +		  (bio->bi_opf & REQ_HIPRI);
+>>> +
+>>>  	do {
+>>> -		struct request_queue *q = bio->bi_bdev->bd_disk->queue;
+>>> +		blk_qc_t cookie;
+>>> +		struct block_device *bdev = bio->bi_bdev;
+>>> +		struct request_queue *q = bdev->bd_disk->queue;
+>>>  		struct bio_list lower, same;
+>>>  
+>>>  		if (unlikely(bio_queue_enter(bio) != 0))
+>>> @@ -966,7 +974,23 @@ static blk_qc_t __submit_bio_noacct(struct bio *bio)
+>>>  		bio_list_on_stack[1] = bio_list_on_stack[0];
+>>>  		bio_list_init(&bio_list_on_stack[0]);
+>>>  
+>>> -		ret = __submit_bio(bio);
+>>> +		cookie = __submit_bio(bio);
+>>> +
+>>> +		if (poll_on && blk_qc_t_valid(cookie)) {
+>>> +			unsigned int queue_num = blk_qc_t_to_queue_num(cookie);
+>>> +			unsigned int devt = bdev_whole(bdev)->bd_dev;
+>>> +
+>>> +			cookie = blk_qc_t_get_by_devt(devt, queue_num);
+>>
+>> The need to rebuild the cookie here is pretty awkward.  This
+>> optimization living in block core may be worthwhile but the duality of
+>> block core conditionally overriding the driver's returned cookie (that
+>> is meant to be opaque to upper layer) is not great.
+> 
+> I agree that currently this design pattern has caused blk-core and dm
+> being tightly coupled together. Maybe it's the most serous problem of
+> this patchset, personally.
+> 
+> I can explain it though... Since the nature of the IO path of dm, dm
+> itself doesn't know if the original bio be split to multiple split bios
+> and thus submitted to multiple underlying devices or not. Currently I
+> can only get this information in __submit_bio_noacct(), and that's why
+> there's so much logic specific to dm is coupled with blk-core here.
+> 
 
-Yes, if this goes forward, I imagine completely dropping
-pci_p2pdma_unmap_sg().
+I didn't point out the most important part of that. dm can't get the
+(really valid) cookie returned by mq. Suppose one dm device is built
+upon one nvme, then dm_submit_bio() only remaps and the remapped bio is
+actually *buffered* in the bio_list. In fact, he remapped bio is later
+submitted in __submit_bio_noacct(). So dm doesn't know the cookie
+(returned by underlying mq), while blk-core does.
 
-Logan
+dm could "predict" the cookie of following submitted IO to mq (dev_t and
+index of hw queue), and return it (built by dev_t and hw queue index) in
+advance, but this "prediction" is quite fragile, since the IO submitting
+process could be migrated to another CPU, or the hw queue mapping of the
+underlying mq device could change before __submit_bio_noacct() really
+submits the IO.
+
+
+-- 
+Thanks,
+Jeffle
