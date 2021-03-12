@@ -8,62 +8,62 @@ X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20789C4332B
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71224C432C3
 	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 11:09:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D785F65005
-	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 11:09:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 55E9A64E45
+	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 11:09:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234077AbhCLLJV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 12 Mar 2021 06:09:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43948 "EHLO
+        id S233948AbhCLLJX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 12 Mar 2021 06:09:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233886AbhCLLJD (ORCPT
+        with ESMTP id S233691AbhCLLJL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 12 Mar 2021 06:09:03 -0500
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7309C061574;
-        Fri, 12 Mar 2021 03:09:02 -0800 (PST)
-Received: by mail-pf1-x42e.google.com with SMTP id e26so1612866pfd.9;
-        Fri, 12 Mar 2021 03:09:02 -0800 (PST)
+        Fri, 12 Mar 2021 06:09:11 -0500
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 844FBC061574;
+        Fri, 12 Mar 2021 03:09:11 -0800 (PST)
+Received: by mail-pf1-x431.google.com with SMTP id t29so1603985pfg.11;
+        Fri, 12 Mar 2021 03:09:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :in-reply-to:references;
-        bh=Ud/HIpdKfmY9i4QsmVRo1Nb5Ke6E9oHUsnblYDWdhJA=;
-        b=e1vbgjvwidHePgd6EoNDd4Kl3SpU2Ae5fZbmZdf58I/SUQga9/4NxJsg8nhEDi0Xq/
-         d0QlLsGmYasbGPSeXTH82FF9XRxKEr8O609+waQaXAWnEn406rZXd13RiIfd+zMBnbGX
-         gTK4STN1RllcfTW8fJ87Ihwy0ziWn4t1AK8lelxVyYUPpu6LprxDmVrSVnBWi+XmET2o
-         iHgT+1xWgVb/i+AMAlycS8OYhczx5IzZQfrnAPS6/1dr9MCH4QdAtQLYAjcXbdmx8uvZ
-         6ybzcpsWnypeog9LOEINXDuFIJTsntRawy7krddQoQ7g7mSfzGAL+GLvmQOFPbxhW/Q6
-         Fv4Q==
+        bh=T9l6k5OqXtfEirisuPLMZitzFU3x0IHKvGRBmuRDlLQ=;
+        b=Gt865lGSosE/T4BW16U1yPG0jYVc3NdxxtP9Pd66qyhtwSv8Q5grSCA5RTm/buM6aL
+         9QbLbKH1f8qHAak2n67AjGhs1iL4kBnc1SZmJBzrA8mgMSDEnKJ3FwMC9l0lTFbe90a0
+         iY6n13l7NyU5i6HJ5zH75q20VJCRQtXXuM2lD9cx3cZM0k4FBde1K0JS6uJ5IjbAM07J
+         mAE/X6bOQkORjeAZ3xiXZBrAGZ4C6ueGaPjCAfhKj+Pc3SjUkf2Fxq0QUJgpEqByJerw
+         LCb7b6eTB2PcZ1NG+OlTXFgSXjcQ29I0ulqlfsjC2A/ZaJ2a3UrMIAf8Ty5L+Kembe8r
+         g5/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:in-reply-to:references;
-        bh=Ud/HIpdKfmY9i4QsmVRo1Nb5Ke6E9oHUsnblYDWdhJA=;
-        b=lRh0GJdYFSL2lRuqUImnVgwdwbxmitFtWUFxXwpEWWkb2VeYjWav9bwa/NOdYLTvAh
-         ZIOwo/rJgfQETvxG6FLhIACbttyq+NfN0GCSDNOs6QKzvEqHVLaA08D8MiL238/6DjLX
-         JWdNviuQVHY8Gl4RQYNVE45MkwdFVx1242/C2/sOu5poSOrll4b1fZk5oB6LP20Hvn0X
-         xQmc2jAtlGF+oNX6Z7m5J4mxt/bjzpaT2FAfnMOV0LHXAEQNxpNn/NEbtD70sf7RAP71
-         HZlDYpsTypTCW3kMjZFrsomeaSKfqF6M7WhmlmwBYe67Y8ftHxOiESXwKhu/8I6xwdpO
-         vY8w==
-X-Gm-Message-State: AOAM532OQ77w5lbimWptpwaQdi4qB8DKETWdo8ALi5tcIQjXEpjqdakB
-        0CulccoxRRx8lc53KF2Qqlk=
-X-Google-Smtp-Source: ABdhPJxUdZTkbLNrb0MvnJecybeT3l961ku5o4tPjGZ/oUsdoGbV8jfQYJP6Nphy5bXK4bQdCbT4ag==
-X-Received: by 2002:a63:8f5d:: with SMTP id r29mr10970412pgn.353.1615547342505;
-        Fri, 12 Mar 2021 03:09:02 -0800 (PST)
+        bh=T9l6k5OqXtfEirisuPLMZitzFU3x0IHKvGRBmuRDlLQ=;
+        b=CYJgypqOiRCLVNZuyaxaiOjjoZ9cDzdkM6bGkz26hmQKq0Wb3qKqc0zRPAJxxbyA9i
+         2vlLNwYreGJNh2ndH9hwa9IYwiYbB8UxPLsgMmtZOi241iBg/cuhvOXyJ76DgKLaCGK5
+         /Us4h5TLdpuivaU4Je8XHVJbV/DI8FQfdj6CauwCBq4I1LSC0RKw1fk9pU55E6Bx0vHd
+         W5vIEZMMqzCfgTA+Fuk17WZcFeMHhDD4OyyOkUYtJej2yfuDfdlDFnpbX1uGybHeO9TW
+         uT9JLo/yiOMEoj7+oioDoR0aVewy5ZAzt7Y6/4BmaXLof8J9yWYg9UWqFGsFsWm4hSd/
+         1A6A==
+X-Gm-Message-State: AOAM530uPLD7bl6gM6jIL0W2WWqByGpXidUvxJiP93+uWp8jkyYQIMOO
+        cRRAeRG7wkgIfMsM4Vlq0L0=
+X-Google-Smtp-Source: ABdhPJy9G5gJnnGBZ9t7gdQqp0bXaQtCLsYb+yxvxnAUoO/hz6slcE7o1So1Cqw7WSA+4qZDTeBhuw==
+X-Received: by 2002:a05:6a00:2292:b029:1ff:bcb8:91f9 with SMTP id f18-20020a056a002292b02901ffbcb891f9mr6512877pfe.63.1615547351188;
+        Fri, 12 Mar 2021 03:09:11 -0800 (PST)
 Received: from VM-0-3-centos.localdomain ([101.32.213.191])
-        by smtp.gmail.com with ESMTPSA id t5sm4942181pgl.89.2021.03.12.03.09.00
+        by smtp.gmail.com with ESMTPSA id t5sm4942181pgl.89.2021.03.12.03.09.09
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 12 Mar 2021 03:09:01 -0800 (PST)
+        Fri, 12 Mar 2021 03:09:10 -0800 (PST)
 From:   brookxu <brookxu.cn@gmail.com>
 To:     paolo.valente@linaro.org, axboe@kernel.dk, tj@kernel.org
 Cc:     linux-block@vger.kernel.org, cgroups@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [RFC PATCH v2 06/11] bfq: expire other class if CLASS_RT is waiting
-Date:   Fri, 12 Mar 2021 19:08:40 +0800
-Message-Id: <7c5d7791d538aa3f705c7e1da8debe463a6ce174.1615527324.git.brookxu@tencent.com>
+Subject: [RFC PATCH v2 10/11] bfq: remove unnecessary initialization logic
+Date:   Fri, 12 Mar 2021 19:08:44 +0800
+Message-Id: <dae42cd3c1c9f798a3c390e0a14ef77d02e94ce0.1615527324.git.brookxu@tencent.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <cover.1615517202.git.brookxu@tencent.com>
 References: <cover.1615517202.git.brookxu@tencent.com>
@@ -75,111 +75,36 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Chunguang Xu <brookxu@tencent.com>
 
-Expire bfqq not belong to CLASS_RT and CLASS_RT is waiting for
-service, we can further guarantee the latency for CLASS_RT.
+Since we will initialize sched_data.service_tree[] in
+bfq_init_root_group(), bfq_create_group_hierarchy() can
+ignore this part of the initialization, which can avoid
+repeated initialization.
 
 Signed-off-by: Chunguang Xu <brookxu@tencent.com>
 ---
- block/bfq-iosched.c | 15 ++++++++++-----
- block/bfq-iosched.h |  8 ++++++++
- block/bfq-wf2q.c    | 12 ++++++++++++
- 3 files changed, 30 insertions(+), 5 deletions(-)
+ block/bfq-cgroup.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index ab00b664348c..8af73473c45c 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -428,6 +428,7 @@ void bfq_schedule_dispatch(struct bfq_data *bfqd)
- 	}
- }
- 
-+#define bfq_class_rt(bfqq)	((bfqq)->ioprio_class == IOPRIO_CLASS_RT)
- #define bfq_class_idle(bfqq)	((bfqq)->ioprio_class == IOPRIO_CLASS_IDLE)
- 
- #define bfq_sample_valid(samples)	((samples) > 80)
-@@ -4709,12 +4710,16 @@ static struct request *bfq_dispatch_rq_from_bfqq(struct bfq_data *bfqd,
- 	/*
- 	 * Expire bfqq, pretending that its budget expired, if bfqq
- 	 * belongs to CLASS_IDLE and other queues are waiting for
--	 * service.
-+	 * service, or if bfqq not belongs to CLASS_RT and CLASS_RT
-+	 * is waiting for service.
- 	 */
--	if (!(bfq_tot_busy_queues(bfqd) > 1 && bfq_class_idle(bfqq)))
--		goto return_rq;
--
--	bfq_bfqq_expire(bfqd, bfqq, false, BFQQE_BUDGET_EXHAUSTED);
-+#ifdef CONFIG_BFQ_GROUP_IOSCHED
-+	if ((bfq_tot_busy_queues(bfqd) > 1 && bfq_class_idle(bfqq)) ||
-+	    (!bfq_class_rt(bfqq) && bfqd->busy_groups[0]))
-+#else
-+	if (bfq_tot_busy_queues(bfqd) > 1 && bfq_class_idle(bfqq))
-+#endif
-+		bfq_bfqq_expire(bfqd, bfqq, false, BFQQE_BUDGET_EXHAUSTED);
- 
- return_rq:
- 	return rq;
-diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-index de7301664ad3..6b87ba53db94 100644
---- a/block/bfq-iosched.h
-+++ b/block/bfq-iosched.h
-@@ -531,6 +531,14 @@ struct bfq_data {
- 	 */
- 	unsigned int num_groups_with_pending_reqs;
- 
-+#ifdef CONFIG_BFQ_GROUP_IOSCHED
-+	/*
-+	 * Per-class (RT, BE, IDLE) number of bfq_groups waiting for
-+	 * service.
-+	 */
-+	unsigned int busy_groups[3];
-+#endif
-+
- 	/*
- 	 * Per-class (RT, BE, IDLE) number of bfq_queues containing
- 	 * requests (including the queue in service, even if it is
-diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
-index 0ac35fd4f2ab..f6c67a80e454 100644
---- a/block/bfq-wf2q.c
-+++ b/block/bfq-wf2q.c
-@@ -1032,11 +1032,14 @@ static void __bfq_activate_entity(struct bfq_entity *entity,
- 	if (!bfq_entity_to_bfqq(entity)) { /* bfq_group */
- 		struct bfq_group *bfqg = bfq_entity_to_bfqg(entity);
- 		struct bfq_data *bfqd = bfqg->bfqd;
-+		int idx = bfq_class_idx(entity);
- 
- 		if (!entity->in_groups_with_pending_reqs) {
- 			entity->in_groups_with_pending_reqs = true;
- 			bfqd->num_groups_with_pending_reqs++;
- 		}
-+
-+		bfqd->busy_groups[idx]++;
- 	}
- #endif
- 
-@@ -1188,6 +1191,9 @@ bool __bfq_deactivate_entity(struct bfq_entity *entity, bool ins_into_idle_tree)
+diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
+index ab4bc410e635..05054e1b5d97 100644
+--- a/block/bfq-cgroup.c
++++ b/block/bfq-cgroup.c
+@@ -1514,15 +1514,11 @@ void bfqg_and_blkg_put(struct bfq_group *bfqg) {}
+ struct bfq_group *bfq_create_group_hierarchy(struct bfq_data *bfqd, int node)
  {
- 	struct bfq_sched_data *sd = entity->sched_data;
- 	struct bfq_service_tree *st;
-+#ifdef CONFIG_BFQ_GROUP_IOSCHED
-+	struct bfq_group *bfqg;
-+#endif
- 	int idx = bfq_class_idx(entity);
- 	bool is_in_service;
+ 	struct bfq_group *bfqg;
+-	int i;
  
-@@ -1229,6 +1235,12 @@ bool __bfq_deactivate_entity(struct bfq_entity *entity, bool ins_into_idle_tree)
- 		bfq_idle_insert(st, entity);
+ 	bfqg = kmalloc_node(sizeof(*bfqg), GFP_KERNEL | __GFP_ZERO, node);
+ 	if (!bfqg)
+ 		return NULL;
  
- 	sd->bfq_class_last_service[idx] = jiffies;
-+#ifdef CONFIG_BFQ_GROUP_IOSCHED
-+	bfqg = bfq_entity_to_bfqg(entity);
-+	if (bfqg)
-+		bfqg->bfqd->busy_groups[idx]--;
-+#endif
-+
- 	return true;
+-	for (i = 0; i < BFQ_IOPRIO_CLASSES; i++)
+-		bfqg->sched_data.service_tree[i] = BFQ_SERVICE_TREE_INIT;
+-
+ 	return bfqg;
  }
- 
+ #endif	/* CONFIG_BFQ_GROUP_IOSCHED */
 -- 
 2.30.0
 
