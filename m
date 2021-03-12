@@ -2,92 +2,131 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA234C433DB
-	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 14:22:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3583C433DB
+	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 14:46:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 82F5A64FD6
-	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 14:22:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BEA8964FDD
+	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 14:46:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230463AbhCLOVm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 12 Mar 2021 09:21:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57392 "EHLO
+        id S229908AbhCLOqJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 12 Mar 2021 09:46:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34346 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231855AbhCLOVj (ORCPT
+        with ESMTP id S231416AbhCLOpk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 12 Mar 2021 09:21:39 -0500
-Received: from mail-il1-x12a.google.com (mail-il1-x12a.google.com [IPv6:2607:f8b0:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FDFFC061574
-        for <linux-block@vger.kernel.org>; Fri, 12 Mar 2021 06:21:39 -0800 (PST)
-Received: by mail-il1-x12a.google.com with SMTP id g9so2721199ilc.3
-        for <linux-block@vger.kernel.org>; Fri, 12 Mar 2021 06:21:39 -0800 (PST)
+        Fri, 12 Mar 2021 09:45:40 -0500
+Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9ED2AC061574
+        for <linux-block@vger.kernel.org>; Fri, 12 Mar 2021 06:45:39 -0800 (PST)
+Received: by mail-wr1-x42e.google.com with SMTP id v11so1917808wro.7
+        for <linux-block@vger.kernel.org>; Fri, 12 Mar 2021 06:45:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=E61zkshFErZvXwXXuG6eHT/uAMrwiprKwUlm/Jt8qKA=;
-        b=UFvsmMq8GC/8RpJgAwOoqBuWirjkiwtoO3aTyOSlf+jZEMSzQvpbygbWeJDs3Nq96F
-         PGETCYGxDq4j+QKuZr3RU8S0bH20bpWKemt/cyXlSG3Nx7hMMdPBSQ0E/spC1ct6UVq5
-         25NciDA2wxhJRplCMFcGM3eRNjQI9n+ZUudeVHLGxwBDxPmXlHYIYgHjH4Y5YveGtxF7
-         lHniiQtsuWosvtrnpgtQZ9wUnuSqHsI5ZcZKTOII+0b3EYXYwjNbi4EsBzM58LicUXXi
-         n6haLNgHmNvQKXdryAdcxW9KZossNXMSVjLP+AeXJNISVub2uGUjDdDqQ9raCqKbcdaa
-         8ENw==
+        d=linaro.org; s=google;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=zNm99R4uMu8Wbja5tyUhmwmE1+/8YzPhAAxGmhIJuZ8=;
+        b=qabzXqtEOSS8ndXP7Mx1jPRfza9+oCwYABMu/LnBE7fmVPME5eSEXYXVaQlaE7Nmxo
+         67UFDGjaVaI/yhHJv3JgbJJY8M3DwJFlPk++8PqrvGT275k2TO/cKqzLY5MHwQtysbRw
+         ebVWoGjCqCzAFw6x91o80FsJexKp/ikt1ImU6bx1psVSwflrbujisy3FsiwGBGEptzCn
+         9EHF4V3czvqEaZP9wIm/N5qMizrBSzSA31SALYR/LQQFlt+OClP9syIGJS/mXNMGwgAF
+         9xE3GMcCnyFwR3aSL8oT6Y9VFtxo/QBoOMmv53puPWAxhcx2WuNlgArlkNbocXfRwAIq
+         Q/KA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=E61zkshFErZvXwXXuG6eHT/uAMrwiprKwUlm/Jt8qKA=;
-        b=OK86NBYVgxP0itNwdgNdmnFeP1VZ4qAQ3adhIHel2cgBo4lTJkBJslCUV8NDNSoSTn
-         eqs/DY0U7tInAqiucvdfGD1ax/MjYVO6fbE7aBdVGhtsDa46LTXoU4jXYAfgaaIVIjKP
-         NqrM/Uu/aAW01BHdhjY7bJHuB8LEdLM2rE8nGISSaVnzOZsunnc4iQOxFc5BPAPnX/zW
-         y0vlOqHClglxwz4qf510GECJ3CHL1dEKVRy9WBBwjaz6//u9iz818aeAbQasm0mvUpxC
-         KOssS8hq8luY+eUUbHPDcVD9RU3m2ukCazAyOi1wC4wKGLaSStOVQGpMEWZkHdbrT6V4
-         pWsg==
-X-Gm-Message-State: AOAM531kKGGG+JHxhVFPvkVTpuODfC/r0ZwuAANK+xuSd6/2dW8VX8gI
-        zgv0+Fdjg0W6MIPgEIdPVOd9iA==
-X-Google-Smtp-Source: ABdhPJz3ST4OLgnhxfMSrAKuyp0V67FNBCcu3PSlX/U6NVi94ExgQoTRrdvtdqgdWgOzwVEOn9wI7A==
-X-Received: by 2002:a05:6e02:ee1:: with SMTP id j1mr2834065ilk.179.1615558898838;
-        Fri, 12 Mar 2021 06:21:38 -0800 (PST)
-Received: from [192.168.1.30] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id c9sm3098343ili.34.2021.03.12.06.21.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 12 Mar 2021 06:21:38 -0800 (PST)
-Subject: Re: [GIT PULL] nvme fixes for 5.12
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
-        Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org
-References: <YEszeMEAQyfTPgHH@infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <2a34717a-b5c5-0a3c-02b0-eb8a144aba15@kernel.dk>
-Date:   Fri, 12 Mar 2021 07:21:39 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <YEszeMEAQyfTPgHH@infradead.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=zNm99R4uMu8Wbja5tyUhmwmE1+/8YzPhAAxGmhIJuZ8=;
+        b=bJ6z0jTDgqgmn3CSQWpsG/u0KJpEbJ+Wn3wjkGz/ldA41JVFvT3aPe5f8xlQiAWZFD
+         SeoxcOhJehxFFcK94xnVaUeiybDjRuqnUBlzWsZee0YHbNRXTDWbADjnevxrmfBMq9NC
+         x/yAWkwvhfV+rW3zZ/sZrcTW0QdeB8OLMW/lEIZ3N6Ia5FIjqXRPaREikTI+90gx7UNd
+         BUuBune10haX4qHTlsud5oRU6qnFlQgVhwIszKcLBxgPcOstyc4tfG7XgbY+0szwEmT9
+         yp6in8KjMCYD8wmHEbHzqV7wlTSjVH1wm4HCE3wAgl/Qbe5gTIK6Tgha8S5tL0rF/IqY
+         kyag==
+X-Gm-Message-State: AOAM531eSSlzgakFDchTtmAz6tqHG2ZE7y3qtROQUdZ5RO+kGGpvBCr0
+        N/DrrkyOWCMs608O4LwqNYFR9NrNa3Fdqpjb
+X-Google-Smtp-Source: ABdhPJztcuRzhjP41YXI4iuB3tsYNDF/SWY6EZTV3OmpXB7cI9VefZEbC/DVsUKRxtUlX6XcUi8XTw==
+X-Received: by 2002:adf:83c2:: with SMTP id 60mr14268795wre.386.1615560338298;
+        Fri, 12 Mar 2021 06:45:38 -0800 (PST)
+Received: from [192.168.0.13] ([83.216.184.132])
+        by smtp.gmail.com with ESMTPSA id w131sm2340962wmb.8.2021.03.12.06.45.35
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 12 Mar 2021 06:45:37 -0800 (PST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: [BUG] block/bfq-wf2q: A Use After Free bug in bfq_del_bfqq_busy
+From:   Paolo Valente <paolo.valente@linaro.org>
+X-Priority: 3
+In-Reply-To: <24de85db.8011.1781a216e77.Coremail.lyl2019@mail.ustc.edu.cn>
+Date:   Fri, 12 Mar 2021 15:47:22 +0100
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        security@kernel.org
 Content-Transfer-Encoding: 7bit
+Message-Id: <275344D4-8DF4-4F7B-A3C9-592CE2DB0AC8@linaro.org>
+References: <24de85db.8011.1781a216e77.Coremail.lyl2019@mail.ustc.edu.cn>
+To:     lyl2019@mail.ustc.edu.cn
+X-Mailer: Apple Mail (2.3445.104.11)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/12/21 2:25 AM, Christoph Hellwig wrote:
-> The following changes since commit df66617bfe87487190a60783d26175b65d2502ce:
-> 
->   block: rsxx: fix error return code of rsxx_pci_probe() (2021-03-10 08:25:37 -0700)
-> 
-> are available in the Git repository at:
-> 
->   git://git.infradead.org/nvme.git tags/nvme-5.12-2021-03-12
 
-Pulled, thanks.
 
--- 
-Jens Axboe
+> Il giorno 10 mar 2021, alle ore 04:15, lyl2019@mail.ustc.edu.cn ha scritto:
+> 
+> File: block/bfq-wf2q.c
+> 
+> There exist a feasible path to trigger a use after free bug in
+> bfq_del_bfqq_busy, since v4.12-rc1. It could cause denial of service.
+> 
+
+Thank you very much for analyzing this.
+
+> In the implemention of bfq_del_bfqq_busy,
+
+I've checked all invocations of bfq_del_bfqq_busy, comments below.
+
+> it calls bfq_deactivate_bfqq()
+> and use `bfqq` later. Whereas bfq_deactivate_bfqq() could free `bfqq`.
+> 
+> The trigger path is as follow:
+> |- bfq_deactivate_bfqq(.., bfqq, true, ..)
+> |--  entity = &bfqq->entity;   // get entity
+> |--  bfq_deactivate_entity(entity, true, ...); //has a path to free `bfqq`
+> |--  if (!bfqq->dispatched) // use after free!
+> 		
+>  
+> |- bfq_deactivate_entity(entity, true, ...)
+> |--  ...
+> |--  for_each_entity_safe(entity, parent) { // in the first loop,
+>                             //entity is the same as before
+>  		if (!__bfq_deactivate_entity(entity, true)) {
+> 
+> |- __bfq_deactivate_entity(entity, true)
+> |--  ...
+> |--  if (!ins_into_idle_tree || !bfq_gt(entity->finish, st->vtime))
+> 		bfq_forget_entity(st, entity, is_in_service); 
+> 
+> |- bfq_forget_entity(st, entity, is_in_service)
+> |--   bfqq = bfq_entity_to_bfqq(entity); // recover `bfqq` by entity
+> |--	if (bfqq && !is_in_service)
+> 		 bfq_put_queue(bfqq); // free the `bfqq`
+> 
+
+For this put to turn into a free, bfqq should have only one ref.  But
+I did not find any invocation of bfq_del_bfqq_busy with bfqq->ref == 1.
+
+Did you spot any?
+
+Looking forward to your feedback,
+Paolo
+
+> The bug fix needs to add some checks to avoid freeing `bfqq` in the first
+> loop in __bfq_deactivate_entity(). I can't come out a good patch for it,
+> so i report it for you.
 
