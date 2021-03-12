@@ -8,62 +8,62 @@ X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78CB2C433E6
-	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 11:09:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F4B1C433E9
+	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 11:09:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 46ED964FEE
+	by mail.kernel.org (Postfix) with ESMTP id ECDE165017
 	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 11:09:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234142AbhCLLJT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 12 Mar 2021 06:09:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43912 "EHLO
+        id S234131AbhCLLJV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 12 Mar 2021 06:09:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43940 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234056AbhCLLIx (ORCPT
+        with ESMTP id S234093AbhCLLJB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 12 Mar 2021 06:08:53 -0500
-Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FAE6C061574;
-        Fri, 12 Mar 2021 03:08:53 -0800 (PST)
-Received: by mail-pg1-x52f.google.com with SMTP id w34so14569336pga.8;
-        Fri, 12 Mar 2021 03:08:53 -0800 (PST)
+        Fri, 12 Mar 2021 06:09:01 -0500
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED06CC061574;
+        Fri, 12 Mar 2021 03:09:00 -0800 (PST)
+Received: by mail-pf1-x42b.google.com with SMTP id r16so301910pfh.10;
+        Fri, 12 Mar 2021 03:09:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :in-reply-to:references;
-        bh=T14uQktm+Sg7+gpVLlmca1QlgsLzohgO//zswTvqmzc=;
-        b=qQDIP426SYd0JFMuLOjcjCvM4b7lir3T36QLUC/aPgXpKn0w4+ZiPKbzzaDVqbdx7S
-         N2ig54PNAeA0G8Jal9Yrlp0BoyTf1wIDq6n51EfRR8jxA1nf6sCkh8/0ThlPy2gFMRt5
-         EpwK+5oted7MknJGGmQI6Qx/xhmpdUVaPJIcdvtjMzaqLTdoX0+Y8LvH6VPnz764xmIr
-         FCWG3oLX0ehAyAi0Vbl6tvCLEQHGgI9KF997kPOyyyluYVldm6i4l8UMT2s25LNfHEXe
-         812ijlTGrWs3LvuPq6dOa24ceKqExR4JAK0WzFHETP8xN2NUjjtc5xjb6pHJTDXy1VWf
-         pUsw==
+        bh=j0cc3FhyIkik1ZqjcQtP+JY263bu0AJPOx8K4+YzkWU=;
+        b=PESSmFeV+dR08oaB+9e064Or+JEAcMV+WuNyyP/qM/X9qGtme4jCGFu7TJs4o2BSR2
+         hKo5/U3IqDyD8di7CTWm/jxlKBsrlFAw6aTed3PLBO3fwsWDYWeJajNruMRQYe5YGvIu
+         cuDkXz2Mb6X2Wn1cU4PQqT02SEpi5L3LpSbA/FmHAvEuSU0FcJ/GLURD1/14VzhZ13H8
+         0CeVSNYx8g+B7dcz1rlcKzova4YJNiGLIFdgNfb8K2WzY3m4hblvlVqfM24F7n4yP8gz
+         Bkn2m9JU4Kkhiw8DxBfuhWR8iGPf9G5b5TfPrWmbDFPWiI0B9cnhh1s1rcNYnPC3hqEv
+         YyFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:in-reply-to:references;
-        bh=T14uQktm+Sg7+gpVLlmca1QlgsLzohgO//zswTvqmzc=;
-        b=JsVdS1BDvfVnO12XQgSUNkPQODBmDUj8QfUR0rbS+ccGBn/65HR2UncMiBdKWJRoLH
-         9IS+lGIRM2E3oCT4RINvLzVjX4bN5YdgKfvSt2BGkgJjhdK3+lhl/QuTkBT5dgqdxLQm
-         YafAWlquMpOhk9WRDlwC4fAXtvKipqd0g8juU0k5j00R68upnhb4pd7YRZQgkXFRSuAl
-         a2cM4yEHQftD5vhfy6nCPW7cTp0rp52iC9Dg5FxHjpE+zYVw/NFdFzSOnOfMsWyYGOCq
-         F9YJLiFSZZB9553jQrkiiVHOprr2AEFdFvju7DJJsVu0N6LD0LLwTXw//q9MUrB+Rghe
-         UWcQ==
-X-Gm-Message-State: AOAM530+k0bnKdlwnRyvkstE8OeYaSwiPZL/t66ozVRtGSETkr6cTj8n
-        RyISTxrG9eJgl1zaNQYT7txJIGsAh1hvMg==
-X-Google-Smtp-Source: ABdhPJxGJ91CMWXuEolUAbRKeimsUEu0lDGZMW8Y6/+awVo9HLGTSAc4MOY9yKwM8lgmK/iOOHXPNw==
-X-Received: by 2002:a63:3182:: with SMTP id x124mr3570255pgx.317.1615547333186;
-        Fri, 12 Mar 2021 03:08:53 -0800 (PST)
+        bh=j0cc3FhyIkik1ZqjcQtP+JY263bu0AJPOx8K4+YzkWU=;
+        b=qS80So8pE0B8kYJE72MjarYUqm1Jh74Q8ZJSHJEDJY0bFOsiX3jE5O9Ni6An7sGoVK
+         YJOJoCId3gQmYpZS+A/coavMrgqQToBfD4u6hMNtlHD4iRK5/aYvdA2oA1ZoHlgmQqfU
+         pNmKYxd4lAoKQWjr+1tJcF94TJgtfkhqYf/F18jWUWm2yzBceaEwH1IqVe3CbbGr5E5o
+         cCjdI/MTd32yrJe3qSgwy7QKXqeHi0qpE0DKYL8ZII3U4sHTLvWxOhDHv7qZSBJEJ8Vy
+         mfAlslIHxraZygH2kNC9zmpaKaqEdYdmOXATi6TPOZJGIW6NGA2o/tJesLl25SuB2hpW
+         n6fA==
+X-Gm-Message-State: AOAM531YUM2E/XaXavCBaO4W2K81QQ+7Lb4GyainCxkDuhzSgnaSebkA
+        9geZxCDpLWaiOYFJp5sQmDQ=
+X-Google-Smtp-Source: ABdhPJzU5XQyUYRFkKS9vKeaHY21ODg3DXsk5Q9T9gLwei5z5g2CuaFZEJ6++fDzOaB3B+0a9j8vag==
+X-Received: by 2002:aa7:9a89:0:b029:200:1eed:1388 with SMTP id w9-20020aa79a890000b02902001eed1388mr5657428pfi.79.1615547340577;
+        Fri, 12 Mar 2021 03:09:00 -0800 (PST)
 Received: from VM-0-3-centos.localdomain ([101.32.213.191])
-        by smtp.gmail.com with ESMTPSA id t5sm4942181pgl.89.2021.03.12.03.08.51
+        by smtp.gmail.com with ESMTPSA id t5sm4942181pgl.89.2021.03.12.03.08.58
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 12 Mar 2021 03:08:52 -0800 (PST)
+        Fri, 12 Mar 2021 03:08:59 -0800 (PST)
 From:   brookxu <brookxu.cn@gmail.com>
 To:     paolo.valente@linaro.org, axboe@kernel.dk, tj@kernel.org
 Cc:     linux-block@vger.kernel.org, cgroups@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [RFC PATCH v2 02/11] bfq: convert the type of bfq_group.bfqd to bfq_data*
-Date:   Fri, 12 Mar 2021 19:08:36 +0800
-Message-Id: <856a594d70b9a43b911285ff192d892d664001b0.1615527324.git.brookxu@tencent.com>
+Subject: [RFC PATCH v2 05/11] bfq: keep the minimun bandwidth for be_class
+Date:   Fri, 12 Mar 2021 19:08:39 +0800
+Message-Id: <189426afb7e3d2fa4e0c0df3c9037b2ed51f0fe5.1615527324.git.brookxu@tencent.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <cover.1615517202.git.brookxu@tencent.com>
 References: <cover.1615517202.git.brookxu@tencent.com>
@@ -75,74 +75,158 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Chunguang Xu <brookxu@tencent.com>
 
-Setting bfq_group.bfqd to void* type does not seem to make much sense.
-This will cause unnecessary type conversion. Perhaps it would be better
-to change it to bfq_data* type.
+rt_class will preempt other classes, which may cause other
+classes to starve to death. At present, idle_class has
+alleviated the starvation problem through the minimum
+bandwidth mechanism. Similarly, we should do the same for
+be_class.
 
 Signed-off-by: Chunguang Xu <brookxu@tencent.com>
 ---
- block/bfq-cgroup.c  | 2 +-
- block/bfq-iosched.h | 2 +-
- block/bfq-wf2q.c    | 6 +++---
- 3 files changed, 5 insertions(+), 5 deletions(-)
+ block/bfq-iosched.c |  6 +++--
+ block/bfq-iosched.h | 11 ++++++---
+ block/bfq-wf2q.c    | 59 ++++++++++++++++++++++++++++++++-------------
+ 3 files changed, 53 insertions(+), 23 deletions(-)
 
-diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-index a5f544acaa61..50d06c760194 100644
---- a/block/bfq-cgroup.c
-+++ b/block/bfq-cgroup.c
-@@ -224,7 +224,7 @@ void bfqg_stats_update_io_add(struct bfq_group *bfqg, struct bfq_queue *bfqq,
- {
- 	blkg_rwstat_add(&bfqg->stats.queued, op, 1);
- 	bfqg_stats_end_empty_time(&bfqg->stats);
--	if (!(bfqq == ((struct bfq_data *)bfqg->bfqd)->in_service_queue))
-+	if (!(bfqq == bfqg->bfqd->in_service_queue))
- 		bfqg_stats_set_start_group_wait_time(bfqg, bfqq_group(bfqq));
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 91e903f1e550..ab00b664348c 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -6542,9 +6542,11 @@ static void bfq_init_root_group(struct bfq_group *root_group,
+ 	root_group->bfqd = bfqd;
+ #endif
+ 	root_group->rq_pos_tree = RB_ROOT;
+-	for (i = 0; i < BFQ_IOPRIO_CLASSES; i++)
++	for (i = 0; i < BFQ_IOPRIO_CLASSES; i++) {
+ 		root_group->sched_data.service_tree[i] = BFQ_SERVICE_TREE_INIT;
+-	root_group->sched_data.bfq_class_idle_last_service = jiffies;
++		root_group->sched_data.bfq_class_last_service[i] = jiffies;
++	}
++	root_group->sched_data.class_timeout_last_check = jiffies;
  }
  
+ static int bfq_init_queue(struct request_queue *q, struct elevator_type *e)
 diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-index a6f98e9e14b5..28d85903cf66 100644
+index 3416a75f47da..de7301664ad3 100644
 --- a/block/bfq-iosched.h
 +++ b/block/bfq-iosched.h
-@@ -914,7 +914,7 @@ struct bfq_group {
- 	struct bfq_entity entity;
- 	struct bfq_sched_data sched_data;
+@@ -13,7 +13,7 @@
+ #include "blk-cgroup-rwstat.h"
  
--	void *bfqd;
-+	struct bfq_data *bfqd;
+ #define BFQ_IOPRIO_CLASSES	3
+-#define BFQ_CL_IDLE_TIMEOUT	(HZ/5)
++#define BFQ_CLASS_TIMEOUT	(HZ/5)
  
- 	struct bfq_queue *async_bfqq[2][IOPRIO_BE_NR];
- 	struct bfq_queue *async_idle_bfqq;
+ #define BFQ_MIN_WEIGHT			1
+ #define BFQ_MAX_WEIGHT			1000
+@@ -97,9 +97,12 @@ struct bfq_sched_data {
+ 	struct bfq_entity *next_in_service;
+ 	/* array of service trees, one per ioprio_class */
+ 	struct bfq_service_tree service_tree[BFQ_IOPRIO_CLASSES];
+-	/* last time CLASS_IDLE was served */
+-	unsigned long bfq_class_idle_last_service;
+-
++	/* last time the class was served */
++	unsigned long bfq_class_last_service[BFQ_IOPRIO_CLASSES];
++	/* last time class timeout was checked */
++	unsigned long class_timeout_last_check;
++	/* next index to check class timeout */
++	unsigned int next_class_index;
+ };
+ 
+ /**
 diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
-index 5ff0028920a2..276f225f9c6e 100644
+index 7405be960a92..0ac35fd4f2ab 100644
 --- a/block/bfq-wf2q.c
 +++ b/block/bfq-wf2q.c
-@@ -498,7 +498,7 @@ static void bfq_active_insert(struct bfq_service_tree *st,
- #ifdef CONFIG_BFQ_GROUP_IOSCHED
- 	sd = entity->sched_data;
- 	bfqg = container_of(sd, struct bfq_group, sched_data);
--	bfqd = (struct bfq_data *)bfqg->bfqd;
-+	bfqd = bfqg->bfqd;
- #endif
- 	if (bfqq)
- 		list_add(&bfqq->bfqq_list, &bfqq->bfqd->active_list);
-@@ -597,7 +597,7 @@ static void bfq_active_extract(struct bfq_service_tree *st,
- #ifdef CONFIG_BFQ_GROUP_IOSCHED
- 	sd = entity->sched_data;
- 	bfqg = container_of(sd, struct bfq_group, sched_data);
--	bfqd = (struct bfq_data *)bfqg->bfqd;
-+	bfqd = bfqg->bfqd;
- #endif
- 	if (bfqq)
- 		list_del(&bfqq->bfqq_list);
-@@ -743,7 +743,7 @@ __bfq_entity_update_weight_prio(struct bfq_service_tree *old_st,
- 		else {
- 			sd = entity->my_sched_data;
- 			bfqg = container_of(sd, struct bfq_group, sched_data);
--			bfqd = (struct bfq_data *)bfqg->bfqd;
-+			bfqd = bfqg->bfqd;
- 		}
- #endif
+@@ -1188,6 +1188,7 @@ bool __bfq_deactivate_entity(struct bfq_entity *entity, bool ins_into_idle_tree)
+ {
+ 	struct bfq_sched_data *sd = entity->sched_data;
+ 	struct bfq_service_tree *st;
++	int idx = bfq_class_idx(entity);
+ 	bool is_in_service;
  
+ 	if (!entity->on_st_or_in_serv) /*
+@@ -1227,6 +1228,7 @@ bool __bfq_deactivate_entity(struct bfq_entity *entity, bool ins_into_idle_tree)
+ 	else
+ 		bfq_idle_insert(st, entity);
+ 
++	sd->bfq_class_last_service[idx] = jiffies;
+ 	return true;
+ }
+ 
+@@ -1455,6 +1457,45 @@ __bfq_lookup_next_entity(struct bfq_service_tree *st, bool in_service)
+ 	return entity;
+ }
+ 
++static int bfq_select_next_class(struct bfq_sched_data *sd)
++{
++	struct bfq_service_tree *st = sd->service_tree;
++	unsigned long last_check, last_serve;
++	int i, class_idx, next_class = 0;
++	bool found = false;
++
++	/*
++	 * we needed to guarantee a minimum bandwidth for each class (if
++	 * there is some active entity in this class). This should also
++	 * mitigate priority-inversion problems in case a low priority
++	 * task is holding file system resources.
++	 */
++	last_check = sd->class_timeout_last_check;
++	if (time_is_after_jiffies(last_check + BFQ_CLASS_TIMEOUT))
++		return next_class;
++
++	sd->class_timeout_last_check = jiffies;
++	for (i = 0; i < BFQ_IOPRIO_CLASSES; i++) {
++		class_idx = (sd->next_class_index + i) % BFQ_IOPRIO_CLASSES;
++		last_serve = sd->bfq_class_last_service[class_idx];
++
++		if (time_is_after_jiffies(last_serve + BFQ_CLASS_TIMEOUT))
++			continue;
++
++		if (!RB_EMPTY_ROOT(&(st + class_idx)->active)) {
++			if (found)
++				continue;
++
++			next_class = class_idx++;
++			class_idx %= BFQ_IOPRIO_CLASSES;
++			sd->next_class_index = class_idx;
++			found = true;
++		}
++		sd->bfq_class_last_service[class_idx] = jiffies;
++	}
++	return next_class;
++}
++
+ /**
+  * bfq_lookup_next_entity - return the first eligible entity in @sd.
+  * @sd: the sched_data.
+@@ -1468,24 +1509,8 @@ static struct bfq_entity *bfq_lookup_next_entity(struct bfq_sched_data *sd,
+ 						 bool expiration)
+ {
+ 	struct bfq_service_tree *st = sd->service_tree;
+-	struct bfq_service_tree *idle_class_st = st + (BFQ_IOPRIO_CLASSES - 1);
+ 	struct bfq_entity *entity = NULL;
+-	int class_idx = 0;
+-
+-	/*
+-	 * Choose from idle class, if needed to guarantee a minimum
+-	 * bandwidth to this class (and if there is some active entity
+-	 * in idle class). This should also mitigate
+-	 * priority-inversion problems in case a low priority task is
+-	 * holding file system resources.
+-	 */
+-	if (time_is_before_jiffies(sd->bfq_class_idle_last_service +
+-				   BFQ_CL_IDLE_TIMEOUT)) {
+-		if (!RB_EMPTY_ROOT(&idle_class_st->active))
+-			class_idx = BFQ_IOPRIO_CLASSES - 1;
+-		/* About to be served if backlogged, or not yet backlogged */
+-		sd->bfq_class_idle_last_service = jiffies;
+-	}
++	int class_idx = bfq_select_next_class(sd);
+ 
+ 	/*
+ 	 * Find the next entity to serve for the highest-priority
 -- 
 2.30.0
 
