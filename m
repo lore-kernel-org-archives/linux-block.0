@@ -8,62 +8,62 @@ X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5631C4321A
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA8D6C43619
 	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 11:09:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8A1BF65038
+	by mail.kernel.org (Postfix) with ESMTP id BD67C6501C
 	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 11:09:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234109AbhCLLJY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 12 Mar 2021 06:09:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44012 "EHLO
+        id S234084AbhCLLJX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 12 Mar 2021 06:09:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43982 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233736AbhCLLJP (ORCPT
+        with ESMTP id S234119AbhCLLJJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 12 Mar 2021 06:09:15 -0500
-Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65B44C061574;
-        Fri, 12 Mar 2021 03:09:15 -0800 (PST)
-Received: by mail-pg1-x52c.google.com with SMTP id o38so15626994pgm.9;
-        Fri, 12 Mar 2021 03:09:15 -0800 (PST)
+        Fri, 12 Mar 2021 06:09:09 -0500
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E21BC061574;
+        Fri, 12 Mar 2021 03:09:09 -0800 (PST)
+Received: by mail-pj1-x102b.google.com with SMTP id a22-20020a17090aa516b02900c1215e9b33so10590412pjq.5;
+        Fri, 12 Mar 2021 03:09:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :in-reply-to:references;
-        bh=ZEYL/pbFIoRQQHylJZyb6mvpBG/vJ0CzVs8U+fDkQms=;
-        b=fDVgcd6CradPpZOVQhUMVl1zY6XDbhFqMkk4LY+ex6E56v/JqmtuN+XcpqYkN0QxU8
-         eOv3acgR/VQTPgS+YCZlSYLiwXSLKMSCBcguGL40LJ6EOBXrvWHegtWndkARFq8ZVQ1Q
-         rcJ99csDt8f0DX2tAYsw0iJ4T2CAGL66fx6rvQx6PEz0Nkzo/KfWE0Gam//0TeEtYzZQ
-         xvyYfViiR6iAuln08vPKuT+id9NBl+Zwu2JJxZEkOEZ8/RXIKj9UtpWHvAv0zuLkfupT
-         Elq1xJxBCFfVQidEQUGLC1gcHQbQXy/EIcmK0WTWhplSm0Ak+/hgpJf3MjptOgn7T/fg
-         O07Q==
+        bh=SiVV6EtJZFIFkG/CEJdYUnLYJ8IcYQwEYTMUZJ4BL9Q=;
+        b=YC4HWpCJruAgTzfDhVZNQ6U66EvejBlEQQyydGG0jwfqwp9h3Dr3L7Y3WwGt+Hex6X
+         1Xcts7hqe3FXHQ5RbBV8FvZRFmKl+KXUbSGbNxR8oXPH/I4mU8cymvoEujoTS12WgP88
+         uCNoDsD3/sCxjRs62AaH/We1Ys/QfFTEWsYgxmzEW3w6M8mS9HRiy4lCLZMH3Jch0/27
+         1XLqZyIDbyok6EfcrmOhMjs8IkA9a51KFbeksGzEi+8TtCNyVeWMkJ4a0fVBzsZ6EIrC
+         gs7q7HeVTxkD/6x3/YUNQg1mIkOxjx8rqVDk6IY5ry+ruSeK5RW/HS/SSlQ4YZTawn/Z
+         3OYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:in-reply-to:references;
-        bh=ZEYL/pbFIoRQQHylJZyb6mvpBG/vJ0CzVs8U+fDkQms=;
-        b=r8dwvgH859MKwKA+yF3D25/3QMLoE5SujAqE8T3I05iJgZ0bwh800j9aTfzp+aAQVP
-         r5vrCuUu0GrcEakO/7YxMKqeGAKbLXxIXpiP9b37FoazsJVqu1B/Rpi1GolX7GlOxgHm
-         Tb1+B2I0b5IBMy6uleq2N+hGr1w+JdePQ//wIVn612XjbcVEiutmQ6luL3KjqRQQxJJc
-         DvFd5Um7grbDZFctHjczssSeZx1DQDk6MOGTvic2ttA7oyeTHK6HCbpG/YVpKgs72bH8
-         rW8IPpkK4hyv7rgzasucGVonkO/Ie9ixtpMa20spxQ5V5EBHpfA3qT0WQJMRXjtJrTom
-         7thg==
-X-Gm-Message-State: AOAM532g7GNAtEv7UYh+uyrc2VOzVLZ0BuI5vBDuR4Yg6B3I2js63pem
-        2hwG3Y1apcdzcl/AROr0roP9TEiz5pMwfw==
-X-Google-Smtp-Source: ABdhPJw+YrsbC3H4O1aCuj7GJv0goHt0TbNgi6zhIsUyNlKRzie8i1hXPGLPWMgqibDXPP5xGFEvbw==
-X-Received: by 2002:a63:b1c:: with SMTP id 28mr11292784pgl.165.1615547354950;
-        Fri, 12 Mar 2021 03:09:14 -0800 (PST)
+        bh=SiVV6EtJZFIFkG/CEJdYUnLYJ8IcYQwEYTMUZJ4BL9Q=;
+        b=PHmT+zNby/NWifMyTrExJP0lPDvmOxXtKSDaX9hG3IypAciQbIp2v/LrRzjsSFp23s
+         rmwwYh4SodxYFwvxRPRoLho6T14N9O6FJkTbGAx3I9D9SnJcaF2Mm9iAXiGUkOpEYwFY
+         W+KohNtHN8BYDYu0qY+Zf2HQkfF/XKcyRLQ0OAfZ6IlsDQ1OcpfvmyKqHjU5hCE1p4hr
+         iqNLHI/lF6ZotNpN4SGzqpcmYlMdzty3sSEuqh9+3adjYkhUgUgMcPyLJqQBAtXi0VpZ
+         /38ShFXRP557y75uaN7edn7bbCeHj2OU6erlfUJpMBbva+RjE9P9hPKtGn4Uzot3nJPI
+         c4MQ==
+X-Gm-Message-State: AOAM531G9vIQ409ZuIKS6p8ofiLG7sZllYGIy08AAWvmxKZLtWSxZTGP
+        kpBQJczae9KqxrxPzmkhFS8=
+X-Google-Smtp-Source: ABdhPJwBs2BSLFhpEfC6/U4aNhlZ0ug3jSui6YDmWiHRb6gjqtsFFYiMX+WabYyEtJTzDFyhZ3TcUw==
+X-Received: by 2002:a17:902:e8cb:b029:e2:9906:45a6 with SMTP id v11-20020a170902e8cbb02900e2990645a6mr13043416plg.41.1615547349036;
+        Fri, 12 Mar 2021 03:09:09 -0800 (PST)
 Received: from VM-0-3-centos.localdomain ([101.32.213.191])
-        by smtp.gmail.com with ESMTPSA id t5sm4942181pgl.89.2021.03.12.03.09.11
+        by smtp.gmail.com with ESMTPSA id t5sm4942181pgl.89.2021.03.12.03.09.07
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 12 Mar 2021 03:09:13 -0800 (PST)
+        Fri, 12 Mar 2021 03:09:08 -0800 (PST)
 From:   brookxu <brookxu.cn@gmail.com>
 To:     paolo.valente@linaro.org, axboe@kernel.dk, tj@kernel.org
 Cc:     linux-block@vger.kernel.org, cgroups@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [RFC PATCH v2 11/11] bfq: optimize the calculation of bfq_weight_to_ioprio()
-Date:   Fri, 12 Mar 2021 19:08:45 +0800
-Message-Id: <29efad299fd111b38ad215dcbc6eb506290e7937.1615527324.git.brookxu@tencent.com>
+Subject: [RFC PATCH v2 09/11] bfq: disallow merge CLASS_RT with other class
+Date:   Fri, 12 Mar 2021 19:08:43 +0800
+Message-Id: <9b3b89cf193896f459b5c59f58b65783df0f490c.1615527324.git.brookxu@tencent.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <cover.1615517202.git.brookxu@tencent.com>
 References: <cover.1615517202.git.brookxu@tencent.com>
@@ -75,31 +75,29 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Chunguang Xu <brookxu@tencent.com>
 
-The value range of ioprio is [0, 7], but the result of
-bfq_weight_to_ioprio() may exceed this range, so simple
-optimization is required.
+In EMQ, perhaps we should not merge the CLASS_RT queue
+with other class queues. Otherwise, the delay of
+CLASS_RT IO will increase.
 
 Signed-off-by: Chunguang Xu <brookxu@tencent.com>
 ---
- block/bfq-wf2q.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ block/bfq-iosched.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
-index f6c67a80e454..86558a8fede1 100644
---- a/block/bfq-wf2q.c
-+++ b/block/bfq-wf2q.c
-@@ -536,8 +536,9 @@ unsigned short bfq_ioprio_to_weight(int ioprio)
-  */
- static unsigned short bfq_weight_to_ioprio(int weight)
- {
--	return max_t(int, 0,
--		     IOPRIO_BE_NR * BFQ_WEIGHT_CONVERSION_COEFF - weight);
-+	int ioprio = IOPRIO_BE_NR  - weight / BFQ_WEIGHT_CONVERSION_COEFF;
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 9330043cdd53..bb6cc8c9ddf5 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -2623,6 +2623,9 @@ static bool bfq_may_be_close_cooperator(struct bfq_queue *bfqq,
+ 	if (!bfq_bfqq_sync(bfqq) || !bfq_bfqq_sync(new_bfqq))
+ 		return false;
+ 
++	if (bfq_class_rt(bfqq) && !bfq_class_rt(new_bfqq))
++		return false;
 +
-+	return ioprio < 0 ? 0 : min_t(int, ioprio, IOPRIO_BE_NR - 1);
+ 	return true;
  }
  
- static void bfq_get_entity(struct bfq_entity *entity)
 -- 
 2.30.0
 
