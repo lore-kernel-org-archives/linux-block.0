@@ -2,242 +2,186 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-20.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49889C433E9
-	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 19:48:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93C15C433DB
+	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 19:49:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1338064F8D
-	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 19:48:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4ADDE64F80
+	for <linux-block@archiver.kernel.org>; Fri, 12 Mar 2021 19:49:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234486AbhCLTrn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 12 Mar 2021 14:47:43 -0500
-Received: from foss.arm.com ([217.140.110.172]:59856 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234524AbhCLTrS (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 12 Mar 2021 14:47:18 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 20D92ED1;
-        Fri, 12 Mar 2021 11:47:18 -0800 (PST)
-Received: from [10.57.52.136] (unknown [10.57.52.136])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CA35E3F793;
-        Fri, 12 Mar 2021 11:47:13 -0800 (PST)
-Subject: Re: [RFC PATCH v2 08/11] iommu/dma: Support PCI P2PDMA pages in
- dma-iommu map_sg
-To:     Logan Gunthorpe <logang@deltatee.com>,
-        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-mm@kvack.org, iommu@lists.linux-foundation.org
-Cc:     Minturn Dave B <dave.b.minturn@intel.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Ira Weiny <iweiny@intel.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Jason Ekstrand <jason@jlekstrand.net>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Stephen Bates <sbates@raithlin.com>,
-        Jakowski Andrzej <andrzej.jakowski@intel.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Xiong Jianxin <jianxin.xiong@intel.com>
-References: <20210311233142.7900-1-logang@deltatee.com>
- <20210311233142.7900-9-logang@deltatee.com>
- <accd4187-7a9d-a8fc-f216-98ec24e3411a@arm.com>
- <45701356-ee41-1ad2-0e06-ca74af87b05a@deltatee.com>
-From:   Robin Murphy <robin.murphy@arm.com>
-Message-ID: <76cc1c82-3cf4-92d3-992f-5c876ed30523@arm.com>
-Date:   Fri, 12 Mar 2021 19:47:08 +0000
-User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101
- Thunderbird/78.7.1
+        id S234421AbhCLTsp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 12 Mar 2021 14:48:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43610 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234383AbhCLTsg (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 12 Mar 2021 14:48:36 -0500
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6088C061574
+        for <linux-block@vger.kernel.org>; Fri, 12 Mar 2021 11:48:36 -0800 (PST)
+Received: by mail-pj1-x102f.google.com with SMTP id bt4so5655907pjb.5
+        for <linux-block@vger.kernel.org>; Fri, 12 Mar 2021 11:48:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=from:subject:to:cc:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=lD/FmaJkum3/PtS9bwYWdQBjwvAN9x2XlbRumN2IVDQ=;
+        b=XLgL3dH9IkW4X/j/sRgWWFtrzRb3T7bdzHvOgySTuY+CPgTFKgIL5bQDbidtMGeSei
+         NFg1xArqRVLjMYolOGTkZ6xbYzmBnqi8/4hqOSeIfdeluDlkb6Za52QfTZ1mvQ5i97qh
+         w4ZbLBH1/AS1Qr4GWUX4azc6A4N/pYBB6k1EA9a3QqUVvOpQ7adAyuhy/0FWR2mLMy7f
+         LJ0m0kp4ofVCfa8C0hHs+eMr5fXZrBs8/lZeoCHpnwQzho9cMy+3rt7kDxERm8kRs2NL
+         w2jBc1aAKpRNNbzSo4Rl1639cNUeRsQUqx7h4ymwX/1Q5UINAkLfCOYMro7e/9C6MPIB
+         XAwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:subject:to:cc:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=lD/FmaJkum3/PtS9bwYWdQBjwvAN9x2XlbRumN2IVDQ=;
+        b=aDQQ5B5LdR6NCGJxY7znLxvkVHFVpZSZ7IAxae9t6uGMrGRq+qZP1ZZ2l6ZPBOIooz
+         SzNVDSuz7sAeBcY8Ay3L7CgplhqRI9Cwq+rYfiKe7IgykXRcPAOnN7f2fAZNFj2ukJ7f
+         zBeEynJoO1KjyOTVD55lhEeTo7SdcAR3nRs0a2duXm2sQeEiP07BNLQUb7P3HYF4jGEg
+         Exidr7wCs8fcHe5yvpIAHaRf8BIgvz91IqOlDLeWSRXJuAoOPVs7/quiTzN5Y72qdUii
+         V4nSUQWMPG6kuVYISW6+Rb9s+X/71BRjS8piA0afjh/6AjBG+TK1ZRCxHECxYGXFKT6v
+         IlSw==
+X-Gm-Message-State: AOAM532eEb8LY5Ymf8sPN7y1zzGwoAh+AizY1QsKcPCpFIcuszCUpvq3
+        I1dNHXt1CXU6g56ix2aQr1mVqVx/CunZvA==
+X-Google-Smtp-Source: ABdhPJzC2qlgIj1xHp8970H6oupFi/oPDLamfEpMy6d78OO9zOS1aGwdAfMy27Mv7qvHlGD/0zOVhA==
+X-Received: by 2002:a17:90a:e614:: with SMTP id j20mr15478117pjy.184.1615578515947;
+        Fri, 12 Mar 2021 11:48:35 -0800 (PST)
+Received: from [192.168.1.134] ([66.219.217.173])
+        by smtp.gmail.com with ESMTPSA id r23sm3182557pje.38.2021.03.12.11.48.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 12 Mar 2021 11:48:35 -0800 (PST)
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 5.12-rc3
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Message-ID: <fc1d6ba8-9245-dced-6a64-eaf7baf69be7@kernel.dk>
+Date:   Fri, 12 Mar 2021 12:48:34 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <45701356-ee41-1ad2-0e06-ca74af87b05a@deltatee.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2021-03-12 17:03, Logan Gunthorpe wrote:
-> 
-> 
-> On 2021-03-12 8:52 a.m., Robin Murphy wrote:
->> On 2021-03-11 23:31, Logan Gunthorpe wrote:
->>> When a PCI P2PDMA page is seen, set the IOVA length of the segment
->>> to zero so that it is not mapped into the IOVA. Then, in finalise_sg(),
->>> apply the appropriate bus address to the segment. The IOVA is not
->>> created if the scatterlist only consists of P2PDMA pages.
->>
->> This misled me at first, but I see the implementation does actually
->> appear to accomodate the case of working ACS where P2P *would* still
->> need to be mapped at the IOMMU.
-> 
-> Yes, that's correct.
->>>    static int __finalise_sg(struct device *dev, struct scatterlist *sg,
->>> int nents,
->>> -        dma_addr_t dma_addr)
->>> +        dma_addr_t dma_addr, unsigned long attrs)
->>>    {
->>>        struct scatterlist *s, *cur = sg;
->>>        unsigned long seg_mask = dma_get_seg_boundary(dev);
->>> @@ -864,6 +865,20 @@ static int __finalise_sg(struct device *dev,
->>> struct scatterlist *sg, int nents,
->>>            sg_dma_address(s) = DMA_MAPPING_ERROR;
->>>            sg_dma_len(s) = 0;
->>>    +        if (is_pci_p2pdma_page(sg_page(s)) && !s_iova_len) {
->>> +            if (i > 0)
->>> +                cur = sg_next(cur);
->>> +
->>> +            sg_dma_address(cur) = sg_phys(s) + s->offset -
->>
->> Are you sure about that? ;)
-> 
-> Do you see a bug? I don't follow you...
+Hi Linus,
 
-sg_phys() already accounts for the offset, so you're adding it twice.
+Mostly just random fixes all over the map. Only odd-one-out change is
+finally getting the rename of BIO_MAX_PAGES to BIO_MAX_VECS done. This
+should've been done with the multipage bvec change, but it's been left.
+Do it now to avoid hassles around changes piling up for the next merge
+window.
 
->>> +                pci_p2pdma_bus_offset(sg_page(s));
->>
->> Can the bus offset make P2P addresses overlap with regions of mem space
->> that we might use for regular IOVA allocation? That would be very bad...
-> 
-> No. IOMMU drivers already disallow all PCI addresses from being used as
-> IOVA addresses. See, for example,  dmar_init_reserved_ranges(). It would
-> be a huge problem for a whole lot of other reasons if it didn't.
+- NVMe pull request
+	- one more quirk (Dmitry Monakhov)
+	- fix max_zone_append_sectors initialization (Chaitanya Kulkarni)
+	- nvme-fc reset/create race fix (James Smart)
+	- fix status code on aborts/resets (Hannes Reinecke)
+	- fix the CSS check for ZNS namespaces (Chaitanya Kulkarni)
+	- fix a use after free in a debug printk in nvme-rdma (Lv Yunlong)
 
-I know we reserve the outbound windows (largely *because* some host 
-bridges will consider those addresses as attempts at unsupported P2P and 
-prevent them working), I just wanted to confirm that this bus offset is 
-always something small that stays within the relevant window, rather 
-than something that might make a BAR appear in a completely different 
-place for P2P purposes. If so, that's good.
+- Fixup for the bd_size_lock being IRQ safe, now that the offending
+  driver has been dropped (Damien).
 
->>> @@ -960,11 +975,12 @@ static int iommu_dma_map_sg(struct device *dev,
->>> struct scatterlist *sg,
->>>        struct iommu_dma_cookie *cookie = domain->iova_cookie;
->>>        struct iova_domain *iovad = &cookie->iovad;
->>>        struct scatterlist *s, *prev = NULL;
->>> +    struct dev_pagemap *pgmap = NULL;
->>>        int prot = dma_info_to_prot(dir, dev_is_dma_coherent(dev), attrs);
->>>        dma_addr_t iova;
->>>        size_t iova_len = 0;
->>>        unsigned long mask = dma_get_seg_boundary(dev);
->>> -    int i;
->>> +    int i, map = -1, ret = 0;
->>>          if (static_branch_unlikely(&iommu_deferred_attach_enabled) &&
->>>            iommu_deferred_attach(dev, domain))
->>> @@ -993,6 +1009,23 @@ static int iommu_dma_map_sg(struct device *dev,
->>> struct scatterlist *sg,
->>>            s_length = iova_align(iovad, s_length + s_iova_off);
->>>            s->length = s_length;
->>>    +        if (is_pci_p2pdma_page(sg_page(s))) {
->>> +            if (sg_page(s)->pgmap != pgmap) {
->>> +                pgmap = sg_page(s)->pgmap;
->>> +                map = pci_p2pdma_dma_map_type(dev, pgmap);
->>> +            }
->>> +
->>> +            if (map < 0) {
->>
->> It rather feels like it should be the job of whoever creates the list in
->> the first place not to put unusable pages in it, especially since the
->> p2pdma_map_type looks to be a fairly coarse-grained and static thing.
->> The DMA API isn't responsible for validating normal memory pages, so
->> what makes P2P special?
-> 
-> Yes, that would be ideal, but there's some difficulties there. For the
-> driver to check the pages, it would need to loop through the entire SG
-> one more time on every transaction, regardless of whether there are
-> P2PDMA pages, or not. So that will have a performance impact even when
-> the feature isn't being used. I don't think that'll be acceptable for
-> many drivers.
-> 
-> The other possibility is for GUP to do it when it gets the pages from
-> userspace. But GUP doesn't have all the information to do this at the
-> moment. We'd have to pass the struct device that will eventually map the
-> pages through all the nested functions in the GUP to do that test at
-> that time. This might not be a bad option (that I half looked into), but
-> I'm not sure how acceptable it would be to the GUP developers.
+- rsxx probe failure error return (Jia-Ju)
 
-Urgh, yes, if a page may or may not be valid for p2p depending on which 
-device is trying to map it, then it probably is most reasonable to 
-figure that out at this point. It's a little unfortunate having to cope 
-with failure so late, but oh well.
+- umem probe failure error return (Wei)
 
-> But even if we do verify the pages ahead of time, we still need the same
-> infrastructure in dma_map_sg(); it could only now be a BUG if the driver
-> sent invalid pages instead of an error return.
+- s390/dasd unbind fixes (Stefan)
 
-The hope was that we could save doing even that - e.g. if you pass a 
-dodgy page into dma_map_page(), maybe page_to_phys() will crash, maybe 
-you'll just end up with a DMA address that won't work, but either way it 
-doesn't care in its own right - but it seems that's moot.
+- blk-cgroup stats summing fix (Xunlei)
 
->>> +                ret = -EREMOTEIO;
->>> +                goto out_restore_sg;
->>> +            }
->>> +
->>> +            if (map) {
->>> +                s->length = 0;
->>
->> I'm not really thrilled about the idea of passing zero-length segments
->> to iommu_map_sg(). Yes, it happens to trick the concatenation logic in
->> the current implementation into doing what you want, but it feels fragile.
-> 
-> We're not passing zero length segments to iommu_map_sg() (or any
-> function). This loop is just scanning to calculate the length of the
-> required IOVA. __finalise_sg() (which is intimately tied to this loop)
-> then needs a way to determine which segments were P2P segments. The
-> existing code already overwrites s->length with an aligned length and
-> stores the original length in sg_dma_len. So we're not relying on
-> tricking any logic here.
+- zone reset handling fix (Damien)
 
-Yes, we temporarily shuffle in page-aligned quantities to satisfy the 
-needs of the iommu_map_sg() call, before unpacking things again in 
-__finalise_sg(). It's some disgusting trickery that I'm particularly 
-proud of. My point is that if you have a mix of both p2p and normal 
-segments - which seems to be a case you want to support - then the 
-length of 0 that you set to flag p2p segments here will be seen by 
-iommu_map_sg() (as it walks the list to map the other segments) before 
-you then use it as a key to override the DMA address in the final step. 
-It's not a concern if you have a p2p-only list and short-circuit 
-straight to that step (in which case all the shuffling was wasted effort 
-anyway), but since it's not entirely clear what a segment with zero 
-length would mean in general, it seems like a good idea to avoid passing 
-the list across a public boundary in that state, if possible.
+- Rename BIO_MAX_PAGES to BIO_MAX_VECS (Christoph)
 
-Robin.
+- Suppress uevent trigger for hidden devices (Daniel)
 
->>>    }
->>>      static void iommu_dma_unmap_sg(struct device *dev, struct
->>> scatterlist *sg,
->>>            int nents, enum dma_data_direction dir, unsigned long attrs)
->>>    {
->>> -    dma_addr_t start, end;
->>> +    dma_addr_t end, start = DMA_MAPPING_ERROR;
->>>        struct scatterlist *tmp;
->>>        int i;
->>>    @@ -1054,14 +1090,20 @@ static void iommu_dma_unmap_sg(struct device
->>> *dev, struct scatterlist *sg,
->>>         * The scatterlist segments are mapped into a single
->>>         * contiguous IOVA allocation, so this is incredibly easy.
->>>         */
->>> -    start = sg_dma_address(sg);
->>> -    for_each_sg(sg_next(sg), tmp, nents - 1, i) {
->>> +    for_each_sg(sg, tmp, nents, i) {
->>> +        if (sg_is_pci_p2pdma(tmp))
->>
->> Since the flag is associated with the DMA address which will no longer
->> be valid, shouldn't it be cleared? The circumstances in which leaving it
->> around could cause a problem are tenuous, but definitely possible.
-> 
-> Yes, that's a good idea.
-> 
-> Thanks for the review!
-> 
-> Logan
-> 
+- Fix handling of discard on busy device (Jan)
+
+- Fix stale cache issue with zone reset (Shin'ichiro)
+
+Please pull!
+
+
+The following changes since commit fe07bfda2fb9cdef8a4d4008a409bb02f35f1bd8:
+
+  Linux 5.12-rc1 (2021-02-28 16:05:19 -0800)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux-block.git tags/block-5.12-2021-03-05
+
+for you to fetch changes up to a2b658e4a07d05fcf056e2b9524ed8cc214f486a:
+
+  Merge tag 'nvme-5.12-2021-03-05' of git://git.infradead.org/nvme into block-5.12 (2021-03-05 09:13:07 -0700)
+
+----------------------------------------------------------------
+block-5.12-2021-03-05
+
+----------------------------------------------------------------
+Damien Le Moal (1):
+      block: revert "block: fix bd_size_lock use"
+
+Dan Carpenter (1):
+      rsxx: Return -EFAULT if copy_to_user() fails
+
+Daniel Wagner (1):
+      nvme-hwmon: Return error code when registration fails
+
+Jean Delvare (1):
+      block: Drop leftover references to RQF_SORTED
+
+Jens Axboe (1):
+      Merge tag 'nvme-5.12-2021-03-05' of git://git.infradead.org/nvme into block-5.12
+
+Joseph Qi (1):
+      block/bfq: update comments and default value in docs for fifo_expire
+
+Julian Einwag (1):
+      nvme-pci: mark Seagate Nytro XM1440 as QUIRK_NO_NS_DESC_LIST.
+
+Martin George (1):
+      nvme-fabrics: fix kato initialization
+
+Max Gurtovoy (1):
+      nvmet: model_number must be immutable once set
+
+Pascal Terjan (1):
+      nvme-pci: add quirks for Lexar 256GB SSD
+
+Tian Tao (1):
+      rsxx: remove unused including <linux/version.h>
+
+Zoltán Böszörményi (1):
+      nvme-pci: mark Kingston SKC2000 as not supporting the deepest power state
+
+ Documentation/block/bfq-iosched.rst |  4 +--
+ block/bfq-iosched.c                 |  2 +-
+ block/blk-mq-debugfs.c              |  1 -
+ block/blk-mq-sched.c                |  6 +----
+ block/genhd.c                       |  5 ++--
+ block/partitions/core.c             |  6 ++---
+ drivers/block/rsxx/core.c           |  8 +++---
+ drivers/block/rsxx/rsxx_priv.h      |  1 -
+ drivers/nvme/host/fabrics.c         |  5 +++-
+ drivers/nvme/host/hwmon.c           |  1 +
+ drivers/nvme/host/pci.c             |  8 +++++-
+ drivers/nvme/target/admin-cmd.c     | 36 ++++++++++++++++++--------
+ drivers/nvme/target/configfs.c      | 50 +++++++++++++++++--------------------
+ drivers/nvme/target/core.c          |  2 +-
+ drivers/nvme/target/nvmet.h         |  7 +-----
+ include/linux/blkdev.h              |  2 --
+ 16 files changed, 75 insertions(+), 69 deletions(-)
+
+-- 
+Jens Axboe
+
