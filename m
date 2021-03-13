@@ -2,83 +2,107 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B104C433E0
-	for <linux-block@archiver.kernel.org>; Sat, 13 Mar 2021 02:38:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08A4BC433DB
+	for <linux-block@archiver.kernel.org>; Sat, 13 Mar 2021 02:56:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 781FF64F84
-	for <linux-block@archiver.kernel.org>; Sat, 13 Mar 2021 02:38:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C1AA164F83
+	for <linux-block@archiver.kernel.org>; Sat, 13 Mar 2021 02:56:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232255AbhCMCh2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 12 Mar 2021 21:37:28 -0500
-Received: from mga06.intel.com ([134.134.136.31]:47383 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233086AbhCMCg7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 12 Mar 2021 21:36:59 -0500
-IronPort-SDR: cJORzfneF+E1h6BVEedk2B31mPGAkpZmaKvhxZLRM+7QZ0kgVQRWom2LxJg/V06Maxa9TM9wrd
- 522Po48FfejA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9921"; a="250281130"
-X-IronPort-AV: E=Sophos;i="5.81,245,1610438400"; 
-   d="scan'208";a="250281130"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2021 18:36:58 -0800
-IronPort-SDR: vWH9MrQPUopS4cxXwdJS5su75dKHztdNXjGGlH9ufjynLLu86PmrmvGK6dqQ7nNaiN1giHbb0p
- Ed7tLl9U/OgQ==
-X-IronPort-AV: E=Sophos;i="5.81,245,1610438400"; 
-   d="scan'208";a="404614708"
-Received: from iweiny-desk2.sc.intel.com (HELO localhost) ([10.3.52.147])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2021 18:36:57 -0800
-Date:   Fri, 12 Mar 2021 18:36:57 -0800
-From:   Ira Weiny <ira.weiny@intel.com>
-To:     Logan Gunthorpe <logang@deltatee.com>
-Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-mm@kvack.org, iommu@lists.linux-foundation.org,
-        Stephen Bates <sbates@raithlin.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-        Ira Weiny <iweiny@intel.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Don Dutile <ddutile@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Jakowski Andrzej <andrzej.jakowski@intel.com>,
-        Minturn Dave B <dave.b.minturn@intel.com>,
-        Jason Ekstrand <jason@jlekstrand.net>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Xiong Jianxin <jianxin.xiong@intel.com>
-Subject: Re: [RFC PATCH v2 07/11] dma-mapping: Add flags to dma_map_ops to
- indicate PCI P2PDMA support
-Message-ID: <20210313023657.GC3402637@iweiny-DESK2.sc.intel.com>
-References: <20210311233142.7900-1-logang@deltatee.com>
- <20210311233142.7900-8-logang@deltatee.com>
+        id S232867AbhCMCzj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 12 Mar 2021 21:55:39 -0500
+Received: from szxga07-in.huawei.com ([45.249.212.35]:14324 "EHLO
+        szxga07-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232468AbhCMCzI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 12 Mar 2021 21:55:08 -0500
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.60])
+        by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4Dy6gc1L4gz8xFC;
+        Sat, 13 Mar 2021 10:53:16 +0800 (CST)
+Received: from huawei.com (10.175.127.227) by DGGEMS413-HUB.china.huawei.com
+ (10.3.19.213) with Microsoft SMTP Server id 14.3.498.0; Sat, 13 Mar 2021
+ 10:54:58 +0800
+From:   "zhangyi (F)" <yi.zhang@huawei.com>
+To:     <linux-fsdevel@vger.kernel.org>, <linux-ext4@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <jack@suse.cz>
+CC:     <tytso@mit.edu>, <viro@zeniv.linux.org.uk>, <hch@infradead.org>,
+        <axboe@kernel.dk>, <mcgrof@kernel.org>, <keescook@chromium.org>,
+        <yzaikin@google.com>, <yi.zhang@huawei.com>
+Subject: [RFC PATCH 3/3] block_dump: remove comments in docs
+Date:   Sat, 13 Mar 2021 11:01:46 +0800
+Message-ID: <20210313030146.2882027-4-yi.zhang@huawei.com>
+X-Mailer: git-send-email 2.25.4
+In-Reply-To: <20210313030146.2882027-1-yi.zhang@huawei.com>
+References: <20210313030146.2882027-1-yi.zhang@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210311233142.7900-8-logang@deltatee.com>
-User-Agent: Mutt/1.11.1 (2018-12-01)
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.127.227]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 11, 2021 at 04:31:37PM -0700, Logan Gunthorpe wrote:
+Now block_dump feature is gone, remove all comments in docs.
+
+Signed-off-by: zhangyi (F) <yi.zhang@huawei.com>
+---
+ Documentation/admin-guide/laptops/laptop-mode.rst | 11 -----------
+ Documentation/admin-guide/sysctl/vm.rst           |  8 --------
+ 2 files changed, 19 deletions(-)
+
+diff --git a/Documentation/admin-guide/laptops/laptop-mode.rst b/Documentation/admin-guide/laptops/laptop-mode.rst
+index c984c4262f2e..b61cc601d298 100644
+--- a/Documentation/admin-guide/laptops/laptop-mode.rst
++++ b/Documentation/admin-guide/laptops/laptop-mode.rst
+@@ -101,17 +101,6 @@ this results in concentration of disk activity in a small time interval which
+ occurs only once every 10 minutes, or whenever the disk is forced to spin up by
+ a cache miss. The disk can then be spun down in the periods of inactivity.
  
-> +int dma_pci_p2pdma_supported(struct device *dev)
-   ^^^
-  bool?
+-If you want to find out which process caused the disk to spin up, you can
+-gather information by setting the flag /proc/sys/vm/block_dump. When this flag
+-is set, Linux reports all disk read and write operations that take place, and
+-all block dirtyings done to files. This makes it possible to debug why a disk
+-needs to spin up, and to increase battery life even more. The output of
+-block_dump is written to the kernel output, and it can be retrieved using
+-"dmesg". When you use block_dump and your kernel logging level also includes
+-kernel debugging messages, you probably want to turn off klogd, otherwise
+-the output of block_dump will be logged, causing disk activity that is not
+-normally there.
+-
+ 
+ Configuration
+ -------------
+diff --git a/Documentation/admin-guide/sysctl/vm.rst b/Documentation/admin-guide/sysctl/vm.rst
+index 586cd4b86428..3ca6679f16ea 100644
+--- a/Documentation/admin-guide/sysctl/vm.rst
++++ b/Documentation/admin-guide/sysctl/vm.rst
+@@ -25,7 +25,6 @@ files can be found in mm/swap.c.
+ Currently, these files are in /proc/sys/vm:
+ 
+ - admin_reserve_kbytes
+-- block_dump
+ - compact_memory
+ - compaction_proactiveness
+ - compact_unevictable_allowed
+@@ -106,13 +105,6 @@ On x86_64 this is about 128MB.
+ Changing this takes effect whenever an application requests memory.
+ 
+ 
+-block_dump
+-==========
+-
+-block_dump enables block I/O debugging when set to a nonzero value. More
+-information on block I/O debugging is in Documentation/admin-guide/laptops/laptop-mode.rst.
+-
+-
+ compact_memory
+ ==============
+ 
+-- 
+2.25.4
 
-> +{
-> +	const struct dma_map_ops *ops = get_dma_ops(dev);
-> +
-> +	return !ops || ops->flags & DMA_F_PCI_P2PDMA_SUPPORTED;
-
-Is this logic correct?  I would have expected.
-
-	return (ops && ops->flags & DMA_F_PCI_P2PDMA_SUPPORTED);
-
-Ira
