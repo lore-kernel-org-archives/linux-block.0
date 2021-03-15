@@ -2,117 +2,131 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0B14C433DB
-	for <linux-block@archiver.kernel.org>; Mon, 15 Mar 2021 13:42:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 622A5C433DB
+	for <linux-block@archiver.kernel.org>; Mon, 15 Mar 2021 16:28:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AC14464EAE
-	for <linux-block@archiver.kernel.org>; Mon, 15 Mar 2021 13:42:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2F70664F2A
+	for <linux-block@archiver.kernel.org>; Mon, 15 Mar 2021 16:28:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229829AbhCONmM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 15 Mar 2021 09:42:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40830 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229817AbhCONmL (ORCPT
+        id S232111AbhCOQ1q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 15 Mar 2021 12:27:46 -0400
+Received: from ale.deltatee.com ([204.191.154.188]:49644 "EHLO
+        ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233101AbhCOQ1d (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 15 Mar 2021 09:42:11 -0400
-Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE419C06174A
-        for <linux-block@vger.kernel.org>; Mon, 15 Mar 2021 06:42:10 -0700 (PDT)
-Received: by mail-lj1-x22d.google.com with SMTP id r20so16282477ljk.4
-        for <linux-block@vger.kernel.org>; Mon, 15 Mar 2021 06:42:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=X5pbXwp0jQ2rf0gS7DhWdzLYC/FdH6bN4erEwcj2Y3w=;
-        b=eRplPfivqS4zqfEYdF7516756o43/GB69SM030Lbw5+KTM9ZUInXX/BsqvDJOCTrSJ
-         T7E3OChMVSid26+uM2F2wdfKttRfMWparxKTulKyxeUFZoyGmFZzXE3mIeX3HWMZHy8k
-         xuvNEXQv6GSE8rTrBlpxyZC8+AWImHRr0wx/Gp5aUttX1MjU15Ysl6yNHPbG9rdQoq7R
-         o1lPpIhZ+goNEheJUcJBvq4LczBIX7twM/7vGM791jYQm6tXSVC0Z1/S3hj4ENKIHEU4
-         I777yFwNAYg6JAe4kzRaSC50HptYWMybYuAynnqkEnNJUwuTHQpmCmh11JDhDcmlo/OF
-         /6Zg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=X5pbXwp0jQ2rf0gS7DhWdzLYC/FdH6bN4erEwcj2Y3w=;
-        b=IwsmSWab74tBhcHcY2mYYXTBuxGQB2nhAEGy/Hw0TSW7onfIMNGVZbYu58ofGsh7AT
-         wTpt5cis1zHXsL8oRvU79T4iMdpuYqxu3JGJJl4SiNkTrjZnJbmNl5inekP+HyifvpI3
-         ebvnuU7hM/aVxPYhjJmTFqYJE1cDA1gD7W7ZPQIGpyNPbsklHhZoMPyZ5TNED0BtLO8s
-         2+f5XWE+KLxEkzNgzaME6Az8lB4R7ZyK6yFkVP4Wtsbusdsxe/rOhX7P+Yt9nvrB7ujk
-         zzVlntbSvdAyVG2pQ82m6hVYe0dkWeRjtJHUrlBHLp+V05rp9uSpf0kSHoFtlWxQEBKB
-         99BQ==
-X-Gm-Message-State: AOAM5336IXkb0lQlc6F+nDBODeU0Jr6aT2LNEfC7ntFt8+GXodTEoJws
-        9e3GCblqVF+LStqmA3bZO6/HFSB3dOj8CsUMlamcIQ==
-X-Google-Smtp-Source: ABdhPJyUx7DcXAXEJVIgv4ihoNgOoMUF8D64squn8PsmV1cihZWhRtLWq6RORu3j6jnE9W9WyqQlmCiNzfnWCPRvJWk=
-X-Received: by 2002:a2e:864a:: with SMTP id i10mr10195795ljj.467.1615815729288;
- Mon, 15 Mar 2021 06:42:09 -0700 (PDT)
+        Mon, 15 Mar 2021 12:27:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:MIME-Version:Date:
+        Message-ID:From:References:Cc:To:content-disposition;
+        bh=m8eFPt4Ky/TIsfccDRiBKAA6Im8fSHoSL1rWmfMykMo=; b=litugTKON8LXh2E4fNWf+tdFsh
+        q2CsD9IDYGKKVIawn8gamhxRH644MuufqFWDCKKprPoZHtnAsUpBhIfbDLYsRIwcTEv0TojuuQngh
+        9J3WiaV60JpGFYmjOv2GNCbeGl6swiX0xF3BgMcQ26cgzBguK1z1MH20QdPZRSQUkmZ+cHM0b8weO
+        nMw1zNo5ZDzrtWTjylir56GRiIHipKmvmqBkHqMQTaNXL2ccxzXkV9uRTIH6IoeArfVAH59w8/LqW
+        lQKk+yTetQfXb8ka5Hd5m4l/qqdvdrI67gA7aRHbkH+i+GOkWx0VzhB9jVE/dO+eFCXLyB281bkpf
+        Y9mF4fFg==;
+Received: from guinness.priv.deltatee.com ([172.16.1.162])
+        by ale.deltatee.com with esmtp (Exim 4.92)
+        (envelope-from <logang@deltatee.com>)
+        id 1lLq3k-0000KL-25; Mon, 15 Mar 2021 10:27:13 -0600
+To:     Ira Weiny <ira.weiny@intel.com>
+Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-mm@kvack.org, iommu@lists.linux-foundation.org,
+        Stephen Bates <sbates@raithlin.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
+        Ira Weiny <iweiny@intel.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Don Dutile <ddutile@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Jakowski Andrzej <andrzej.jakowski@intel.com>,
+        Minturn Dave B <dave.b.minturn@intel.com>,
+        Jason Ekstrand <jason@jlekstrand.net>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Xiong Jianxin <jianxin.xiong@intel.com>
+References: <20210311233142.7900-1-logang@deltatee.com>
+ <20210311233142.7900-5-logang@deltatee.com>
+ <20210313013856.GA3402637@iweiny-DESK2.sc.intel.com>
+From:   Logan Gunthorpe <logang@deltatee.com>
+Message-ID: <7509243d-b605-953b-6941-72876a60d527@deltatee.com>
+Date:   Mon, 15 Mar 2021 10:27:08 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-References: <20210309015750.6283-1-peng.zhou@mediatek.com> <CACRpkdYTkW7b9SFEY6Ubq4NicgR_5ewQMjE2zHvGbgxYadhHQQ@mail.gmail.com>
- <YEpqkAq6wOZ+TpR9@gmail.com>
-In-Reply-To: <YEpqkAq6wOZ+TpR9@gmail.com>
-From:   Linus Walleij <linus.walleij@linaro.org>
-Date:   Mon, 15 Mar 2021 14:41:58 +0100
-Message-ID: <CACRpkdb7vmFgH0XTG3Z6OzFv0CfPsBguKqVAZt=PZ+ms2-0WjA@mail.gmail.com>
-Subject: Re: [PATCH v2 2/4] mmc: Mediatek: enable crypto hardware engine
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Peng Zhou <peng.zhou@mediatek.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Chaotian Jing <chaotian.jing@mediatek.com>,
-        linux-mmc <linux-mmc@vger.kernel.org>,
-        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
-        <devicetree@vger.kernel.org>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Satya Tangirala <satyat@google.com>,
-        Wulin Li <wulin.li@mediatek.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20210313013856.GA3402637@iweiny-DESK2.sc.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-CA
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 172.16.1.162
+X-SA-Exim-Rcpt-To: jianxin.xiong@intel.com, dave.hansen@linux.intel.com, jason@jlekstrand.net, dave.b.minturn@intel.com, andrzej.jakowski@intel.com, daniel.vetter@ffwll.ch, willy@infradead.org, ddutile@redhat.com, jhubbard@nvidia.com, iweiny@intel.com, christian.koenig@amd.com, jgg@ziepe.ca, dan.j.williams@intel.com, hch@lst.de, sbates@raithlin.com, iommu@lists.linux-foundation.org, linux-mm@kvack.org, linux-pci@vger.kernel.org, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, ira.weiny@intel.com
+X-SA-Exim-Mail-From: logang@deltatee.com
+Subject: Re: [RFC PATCH v2 04/11] PCI/P2PDMA: Introduce
+ pci_p2pdma_should_map_bus() and pci_p2pdma_bus_offset()
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Eric,
 
-thanks for stepping in and clarifying! I get it better now, I though
-this was some other encryption scheme "on the side".
 
-There is one worrying thing in the patch still:
+On 2021-03-12 6:38 p.m., Ira Weiny wrote:
+> On Thu, Mar 11, 2021 at 04:31:34PM -0700, Logan Gunthorpe wrote:
+>> Introduce pci_p2pdma_should_map_bus() which is meant to be called by
+>> DMA map functions to determine how to map a given p2pdma page.
+>>
+>> pci_p2pdma_bus_offset() is also added to allow callers to get the bus
+>> offset if they need to map the bus address.
+>>
+>> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+>> ---
+>>  drivers/pci/p2pdma.c       | 50 ++++++++++++++++++++++++++++++++++++++
+>>  include/linux/pci-p2pdma.h | 11 +++++++++
+>>  2 files changed, 61 insertions(+)
+>>
+>> diff --git a/drivers/pci/p2pdma.c b/drivers/pci/p2pdma.c
+>> index 7f6836732bce..66d16b7eb668 100644
+>> --- a/drivers/pci/p2pdma.c
+>> +++ b/drivers/pci/p2pdma.c
+>> @@ -912,6 +912,56 @@ void pci_p2pdma_unmap_sg_attrs(struct device *dev, struct scatterlist *sg,
+>>  }
+>>  EXPORT_SYMBOL_GPL(pci_p2pdma_unmap_sg_attrs);
+>>  
+>> +/**
+>> + * pci_p2pdma_bus_offset - returns the bus offset for a given page
+>> + * @page: page to get the offset for
+>> + *
+>> + * Must be passed a PCI p2pdma page.
+>> + */
+>> +u64 pci_p2pdma_bus_offset(struct page *page)
+>> +{
+>> +	struct pci_p2pdma_pagemap *p2p_pgmap = to_p2p_pgmap(page->pgmap);
+>> +
+>> +	WARN_ON(!is_pci_p2pdma_page(page));
+> 
+> Shouldn't this check be before the to_p2p_pgmap() call?  
 
-On Thu, Mar 11, 2021 at 8:08 PM Eric Biggers <ebiggers@kernel.org> wrote:
-> On Thu, Mar 11, 2021 at 02:48:23PM +0100, Linus Walleij wrote:
-> > On Tue, Mar 9, 2021 at 3:06 AM Peng Zhou <peng.zhou@mediatek.com> wrote:
+The to_p2p_pgmap() call is just doing pointer arithmetic, so strictly
+speaking it doesn't need to be before. We just can't access p2p_pgmap
+until it has been checked.
 
-> > > +       /*
-> > > +        * 1: MSDC_AES_CTL_INIT
-> > > +        * 4: cap_id, no-meaning now
-> > > +        * 1: cfg_id, we choose the second cfg group
-> > > +        */
-> > > +       if (mmc->caps2 & MMC_CAP2_CRYPTO)
-> > > +               arm_smccc_smc(MTK_SIP_MMC_CONTROL,
-> > > +                             1, 4, 1, 0, 0, 0, 0, &smccc_res);
+> And I've been told not
+> to introduce WARN_ON's.  Should this be?
+> 
+> 	if (!is_pci_p2pdma_page(page))
+> 		return -1;
 
-So MSDC_AES_CTL_INIT. Assumes we are using AES and AES
-only I suppose?
+In this case the WARN_ON is just to guard against misuse of the
+function. It should never happen unless a developer changes the code in
+a way that is incorrect. So I think that's the correct use of WARN_ON.
+Though I might change it to WARN and return, that seems safer.
 
-> It happens in the same place, cqhci-crypto.c.  Mediatek's eMMC inline encryption
-> hardware follows the eMMC standard fairly closely, so Peng's patch series just
-> sets MMC_CAP2_CRYPTO to make it use the standard cqhci crypto code, and does a
-> couple extra things to actually enable the hardware's crypto support on Mediatek
-> platforms since it isn't enabled by default.  (*Why* it requires an SMC call to
-> enable instead of just working as expected, I don't know though.)
-
-Now I don't know the limitations of cqhci crypto. Clearly it only supports
-AES today.
-
-However would the cqhci crypto grow support for any other crypto
-like 2Fish or DES and the user request this, then I suppose there is
-no way for the MTK driver to announce "uh no I don't do that"?
-
-Or will this cqhci hardware only ever support AES?
-
-Yours,
-Linus Walleij
+Logan
