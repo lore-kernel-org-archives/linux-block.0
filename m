@@ -2,97 +2,128 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C1E0C433E0
-	for <linux-block@archiver.kernel.org>; Mon, 15 Mar 2021 02:27:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4E3AC433DB
+	for <linux-block@archiver.kernel.org>; Mon, 15 Mar 2021 09:48:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4F67A6157E
-	for <linux-block@archiver.kernel.org>; Mon, 15 Mar 2021 02:27:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6695F64E90
+	for <linux-block@archiver.kernel.org>; Mon, 15 Mar 2021 09:48:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229570AbhCOC04 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 14 Mar 2021 22:26:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36948 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229808AbhCOC0n (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 14 Mar 2021 22:26:43 -0400
-Received: from merlin.infradead.org (merlin.infradead.org [IPv6:2001:8b0:10b:1234::107])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36C96C061574;
-        Sun, 14 Mar 2021 19:26:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=Content-Transfer-Encoding:Content-Type:
-        In-Reply-To:MIME-Version:Date:Message-ID:From:References:To:Subject:Sender:
-        Reply-To:Cc:Content-ID:Content-Description;
-        bh=ElaAFY9/UXStLJRalxeZD6FlZJd58vjvmaaC1RSadXE=; b=VbiKtHNHJ7VxkWquU5vdjACOhp
-        SnxDYA8jIeHjrxGQOZNKR7ptPRVLPCan0hg2wk+2xLm9CQ1jA3IpdwjAfSKmuB0gdBpqDkqxfb/j8
-        9ARyhHDMg0g2FI3pCUq6HdzpQjlKhHmjFsMR1l1A1gMhW/x9HEE0J6OIRCa+pNMeCCUGP4PGL3XBa
-        meVpurneS2XEVFblNsDwbwVn9WkvfrJOP6vnBbFVdOpm9LnNtkliOtxPpb7JppmTtU8xJpu6hPjRp
-        6LsWA8qCc+uhqmWQoBBP3L47T8/kCx8noeGsGnCmZFR6GOfMyXit2Zl0Ane0WTmJUR7MHsfVuEMTY
-        o18njTeQ==;
-Received: from [2601:1c0:6280:3f0::9757]
-        by merlin.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
-        id 1lLcwG-001FOq-A6; Mon, 15 Mar 2021 02:26:39 +0000
-Subject: Re: [PATCH] block: Few spelling fixes in the file blk-merge.c
-To:     Bhaskar Chowdhury <unixbhaskar@gmail.com>, axboe@kernel.dk,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210315011849.3964886-1-unixbhaskar@gmail.com>
-From:   Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <4f8b61d9-dc3a-7ba2-2f49-4a596f19d385@infradead.org>
-Date:   Sun, 14 Mar 2021 19:26:33 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.0
+        id S229510AbhCOJsI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 15 Mar 2021 05:48:08 -0400
+Received: from mx2.suse.de ([195.135.220.15]:60690 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229624AbhCOJrr (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 15 Mar 2021 05:47:47 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id BCC60AC1D;
+        Mon, 15 Mar 2021 09:47:45 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id CE6971E423D; Mon, 15 Mar 2021 10:47:44 +0100 (CET)
+Date:   Mon, 15 Mar 2021 10:47:44 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     "zhangyi (F)" <yi.zhang@huawei.com>
+Cc:     linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-block@vger.kernel.org, jack@suse.cz, tytso@mit.edu,
+        viro@zeniv.linux.org.uk, hch@infradead.org, axboe@kernel.dk,
+        mcgrof@kernel.org, keescook@chromium.org, yzaikin@google.com
+Subject: Re: [RFC PATCH 1/3] block_dump: remove block_dump feature in
+ mark_inode_dirty()
+Message-ID: <20210315094744.GA3227@quack2.suse.cz>
+References: <20210313030146.2882027-1-yi.zhang@huawei.com>
+ <20210313030146.2882027-2-yi.zhang@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20210315011849.3964886-1-unixbhaskar@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210313030146.2882027-2-yi.zhang@huawei.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/14/21 6:18 PM, Bhaskar Chowdhury wrote:
+On Sat 13-03-21 11:01:44, zhangyi (F) wrote:
+> block_dump is an old debugging interface, one of it's functions is used
+> to print the information about who write which file on disk. If we
+> enable block_dump through /proc/sys/vm/block_dump and turn on debug log
+> level, we can gather information about write process name, target file
+> name and disk from kernel message. This feature is realized in
+> block_dump___mark_inode_dirty(), it print above information into kernel
+> message directly when marking inode dirty, so it is noisy and can easily
+> trigger log storm. At the same time, get the dentry refcount is also not
+> safe, we found it will lead to deadlock on ext4 file system with
+> data=journal mode.
 > 
+> After tracepoints has been introduced into the kernel, we got a
+> tracepoint in __mark_inode_dirty(), which is a better replacement of
+> block_dump___mark_inode_dirty(). The only downside is that it only trace
+> the inode number and not a file name, but it probably doesn't matter
+> because the original printed file name in block_dump is not accurate in
+> some cases, and we can still find it through the inode number and device
+> id. So this patch delete the dirting inode part of block_dump feature.
 > 
-> s/trival/trivial/
-> s/attributs/attributes/
-> 
-> Signed-off-by: Bhaskar Chowdhury <unixbhaskar@gmail.com>
+> Signed-off-by: zhangyi (F) <yi.zhang@huawei.com>
 
-Acked-by: Randy Dunlap <rdunlap@infradead.org>
+Looks good to me. Feel free to add:
+
+Reviewed-by: Jan Kara <jack@suse.cz>
+
+								Honza
 
 > ---
->  block/blk-merge.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  fs/fs-writeback.c | 25 -------------------------
+>  1 file changed, 25 deletions(-)
 > 
-> diff --git a/block/blk-merge.c b/block/blk-merge.c
-> index 808768f6b174..a39327e38276 100644
-> --- a/block/blk-merge.c
-> +++ b/block/blk-merge.c
-> @@ -283,7 +283,7 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
->  	/*
->  	 * Bio splitting may cause subtle trouble such as hang when doing sync
->  	 * iopoll in direct IO routine. Given performance gain of iopoll for
-> -	 * big IO can be trival, disable iopoll when split needed.
-> +	 * big IO can be trivial, disable iopoll when split needed.
->  	 */
->  	bio->bi_opf &= ~REQ_HIPRI;
+> diff --git a/fs/fs-writeback.c b/fs/fs-writeback.c
+> index e91980f49388..7c46d1588a19 100644
+> --- a/fs/fs-writeback.c
+> +++ b/fs/fs-writeback.c
+> @@ -2205,28 +2205,6 @@ int dirtytime_interval_handler(struct ctl_table *table, int write,
+>  	return ret;
+>  }
+>  
+> -static noinline void block_dump___mark_inode_dirty(struct inode *inode)
+> -{
+> -	if (inode->i_ino || strcmp(inode->i_sb->s_id, "bdev")) {
+> -		struct dentry *dentry;
+> -		const char *name = "?";
+> -
+> -		dentry = d_find_alias(inode);
+> -		if (dentry) {
+> -			spin_lock(&dentry->d_lock);
+> -			name = (const char *) dentry->d_name.name;
+> -		}
+> -		printk(KERN_DEBUG
+> -		       "%s(%d): dirtied inode %lu (%s) on %s\n",
+> -		       current->comm, task_pid_nr(current), inode->i_ino,
+> -		       name, inode->i_sb->s_id);
+> -		if (dentry) {
+> -			spin_unlock(&dentry->d_lock);
+> -			dput(dentry);
+> -		}
+> -	}
+> -}
+> -
+>  /**
+>   * __mark_inode_dirty -	internal function to mark an inode dirty
+>   *
+> @@ -2296,9 +2274,6 @@ void __mark_inode_dirty(struct inode *inode, int flags)
+>  	    (dirtytime && (inode->i_state & I_DIRTY_INODE)))
+>  		return;
+>  
+> -	if (unlikely(block_dump))
+> -		block_dump___mark_inode_dirty(inode);
+> -
+>  	spin_lock(&inode->i_lock);
+>  	if (dirtytime && (inode->i_state & I_DIRTY_INODE))
+>  		goto out_unlock_inode;
+> -- 
+> 2.25.4
 > 
-> @@ -675,7 +675,7 @@ void blk_rq_set_mixed_merge(struct request *rq)
->  	/*
->  	 * @rq will no longer represent mixable attributes for all the
->  	 * contained bios.  It will just track those of the first one.
-> -	 * Distributes the attributs to each bio.
-> +	 * Distributes the attributes to each bio.
->  	 */
->  	for (bio = rq->bio; bio; bio = bio->bi_next) {
->  		WARN_ON_ONCE((bio->bi_opf & REQ_FAILFAST_MASK) &&
-> --
-
-
 -- 
-~Randy
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
