@@ -2,45 +2,35 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA93DC433E0
-	for <linux-block@archiver.kernel.org>; Mon, 15 Mar 2021 21:06:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BB54C433E6
+	for <linux-block@archiver.kernel.org>; Mon, 15 Mar 2021 21:33:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ACCDA64F26
-	for <linux-block@archiver.kernel.org>; Mon, 15 Mar 2021 21:06:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E5D8264F5D
+	for <linux-block@archiver.kernel.org>; Mon, 15 Mar 2021 21:33:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233027AbhCOVFg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 15 Mar 2021 17:05:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52638 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233464AbhCOVFU (ORCPT
+        id S231855AbhCOVct (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 15 Mar 2021 17:32:49 -0400
+Received: from gardel.0pointer.net ([85.214.157.71]:34556 "EHLO
+        gardel.0pointer.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232825AbhCOVcj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 15 Mar 2021 17:05:20 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7048C06174A;
-        Mon, 15 Mar 2021 14:05:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=mipVcPgUrd+3HFD65EuwhnJwQPlV9zdNxH74YQjuxSk=; b=X0DFCQ9D5Q5P9elSsDANxvz6+8
-        6Fzdu5livWeCHsWmwhNuOsGTKeVdpct2E/zattr8W2sGyBBNRo9ypNinmV6qdrnJ1PdYod107zgRS
-        Ov3nprLAbFNrA5dNhzsOC2A5zhUmW12p6rFqzBjquiKzJf+N+nV4AKJLA9+pY9PN9cax13kc78mUq
-        Eysnjb0IYlUJM/t/0ZY7BE2rRO9I5nkOv5sQoj2WNW8Rmm2BgXGYfybX19rT1grnGgMh1RvUPT2vw
-        AsuDgVTwv5RV8GdacJyaCQBqj4T3Kc6mb/fJsR2yNETdZr8IJ6x3kEJmv2VWhgsyJFjGq3/kPxrol
-        EiZhaiAQ==;
-Received: from willy by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1lLuOS-000lg9-Sj; Mon, 15 Mar 2021 21:05:06 +0000
-Date:   Mon, 15 Mar 2021 21:04:52 +0000
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Matteo Croce <mcroce@linux.microsoft.com>
-Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Lennart Poettering <lennart@poettering.net>,
-        Luca Boccassi <bluca@debian.org>, Jens Axboe <axboe@kernel.dk>,
+        Mon, 15 Mar 2021 17:32:39 -0400
+Received: from gardel-login.0pointer.net (gardel-mail [85.214.157.71])
+        by gardel.0pointer.net (Postfix) with ESMTP id B1728E80100;
+        Mon, 15 Mar 2021 22:32:35 +0100 (CET)
+Received: by gardel-login.0pointer.net (Postfix, from userid 1000)
+        id 5D27D160945; Mon, 15 Mar 2021 22:32:35 +0100 (CET)
+Date:   Mon, 15 Mar 2021 22:32:35 +0100
+From:   Lennart Poettering <mzxreary@0pointer.de>
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     Matteo Croce <mcroce@linux.microsoft.com>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Luca Boccassi <bluca@debian.org>,
+        Jens Axboe <axboe@kernel.dk>,
         Alexander Viro <viro@zeniv.linux.org.uk>,
         Damien Le Moal <damien.lemoal@wdc.com>,
         Tejun Heo <tj@kernel.org>,
@@ -49,50 +39,100 @@ Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         Johannes Thumshirn <johannes.thumshirn@wdc.com>,
         Hannes Reinecke <hare@suse.de>
 Subject: Re: [PATCH -next 1/5] block: add disk sequence number
-Message-ID: <20210315210452.GC2577561@casper.infradead.org>
+Message-ID: <YE/ScxsHLAI49Ba1@gardel-login>
 References: <20210315200242.67355-1-mcroce@linux.microsoft.com>
  <20210315200242.67355-2-mcroce@linux.microsoft.com>
  <20210315201824.GB2577561@casper.infradead.org>
+ <20210315210452.GC2577561@casper.infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210315201824.GB2577561@casper.infradead.org>
+In-Reply-To: <20210315210452.GC2577561@casper.infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Mar 15, 2021 at 08:18:24PM +0000, Matthew Wilcox wrote:
-> On Mon, Mar 15, 2021 at 09:02:38PM +0100, Matteo Croce wrote:
-> > From: Matteo Croce <mcroce@microsoft.com>
-> > 
-> > Add a sequence number to the disk devices. This number is put in the
-> > uevent so userspace can correlate events when a driver reuses a device,
-> > like the loop one.
-> 
-> Should this be documented as monotonically increasing?  I think this
-> is actually a media identifier.  Consider (if you will) a floppy disc.
-> Back when such things were common, it was possible with personal computers
-> of the era to have multiple floppy discs "in play" and be prompted to
-> insert them as needed.  So shouldn't it be possible to support something
-> similar here -- you're really removing the media from the loop device.
-> With a monotonically increasing number, you're always destroying the
-> media when you remove it, but in principle, it should be possible to
-> reinsert the same media and have the same media identifier number.
+On Mo, 15.03.21 21:04, Matthew Wilcox (willy@infradead.org) wrote:
 
-So ... a lot of devices have UUIDs or similar.  eg:
+> On Mon, Mar 15, 2021 at 08:18:24PM +0000, Matthew Wilcox wrote:
+> > On Mon, Mar 15, 2021 at 09:02:38PM +0100, Matteo Croce wrote:
+> > > From: Matteo Croce <mcroce@microsoft.com>
+> > >
+> > > Add a sequence number to the disk devices. This number is put in the
+> > > uevent so userspace can correlate events when a driver reuses a device,
+> > > like the loop one.
+> >
+> > Should this be documented as monotonically increasing?  I think this
+> > is actually a media identifier.  Consider (if you will) a floppy disc.
+> > Back when such things were common, it was possible with personal computers
+> > of the era to have multiple floppy discs "in play" and be prompted to
+> > insert them as needed.  So shouldn't it be possible to support something
+> > similar here -- you're really removing the media from the loop device.
+> > With a monotonically increasing number, you're always destroying the
+> > media when you remove it, but in principle, it should be possible to
+> > reinsert the same media and have the same media identifier number.
+>
+> So ... a lot of devices have UUIDs or similar.  eg:
+>
+> $ cat /sys/block/nvme0n1/uuid
+> e8238fa6-bf53-0001-001b-448b49cec94f
+>
+> https://linux.die.net/man/8/scsi_id (for scsi)
+>
+> how about making this way more generic; create an xattr on a file to
+> store the uuid (if one doesn't already exist) whenever it's used as the
+> base for a loop device.  then sysfs (or whatever) can report the contents
+> of that xattr as the unique id.
+>
+> That can be mostly in userspace -- losetup can create it, and read it.
+> It can be passed in as the first two current-reserved __u64 entries in
+> loop_config.  The only kernel change should be creating the sysfs
+> entry /sys/block/loopN/uuid from those two array entries.
 
-$ cat /sys/block/nvme0n1/uuid 
-e8238fa6-bf53-0001-001b-448b49cec94f
+As a (part-time) maintainer of udev: as one major likely consumer of
+this I'd *really* prefer some concept here that works without
+`losetup` needing to be patched. i.e. we have plenty userspace that
+calls LOOP_CONFIGURE or LOOP_SET_FD, not just losetup, and we'd have
+to patch them all. In particular in a world of containers it's even
+worse: people probably will continue to use old userspaces (mixed with
+newer ones) for a very long time (decades!), and those old userpace
+won't fill in the fields for the ioctl hence.
 
-https://linux.die.net/man/8/scsi_id (for scsi)
+Hence, for me it would be essential to have an identifier that is
+assigned by the kernel, instead of requiring userspace to assign it,
+because userspace won't for a long long time.
 
-how about making this way more generic; create an xattr on a file to
-store the uuid (if one doesn't already exist) whenever it's used as the
-base for a loop device.  then sysfs (or whatever) can report the contents
-of that xattr as the unique id.
+I'd be OK with a hybrid approach where userspace *can* fill
+something in, but doesn't have to in which case the kernel would fill
+it in.
 
-That can be mostly in userspace -- losetup can create it, and read it.
-It can be passed in as the first two current-reserved __u64 entries in
-loop_config.  The only kernel change should be creating the sysfs
-entry /sys/block/loopN/uuid from those two array entries.
+That all said, I very much prefer if we'd use a kernel-enforced
+"sequence number" or "generation counter" or so for this instead of a
+uuid or random cookie or so. Why? because it allows userspace that
+monitors things to derive ordering from these ids: when you watch
+these events and see a uevent for a device seqno=4711 then you know
+that it is from an earlier use than one you see for seqno=8878. UUIDs
+can't give you that. That's in particular a nice property since
+uevents/netlink are not a reliable transport: messages can get lost
+when the socket buffers overrun, or when udev as the uevent broker
+gets overloaded. Hence, for a userspace program it's kinda nice to
+know whether it' worth waiting for a specific loop device use or if
+it's clear that ship has sailed already: i.e. if my own use of a
+specific loop device gets seqno 777 then I know it still makes sense
+to wait for appropriate uevents as long as I see seqno <= 776. But if
+we I see seqneo >= 778 then I know it's not worth waiting anymore and
+one component in the uevent message chain has dropped my messages.
 
+But of course, beggars can't be choosers. If a seqno/generation
+counter concept is not in the cards, I'd be OK with a uuid/random
+cooie approach too. And if an approach where the kernel assigns these
+seqnos strictly monotonically is not in the cards, then I'd be OK with
+an approach where userspace can pick the ids, too. I'll take what I
+can get. My primary concern is that we get something to match up
+uevents, partition devices and the main block device with, and all of
+the suggested approaches could deliver that.
+
+Lennart
+
+--
+Lennart Poettering, Berlin
