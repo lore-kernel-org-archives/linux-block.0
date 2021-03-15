@@ -2,103 +2,148 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3B97C433E6
-	for <linux-block@archiver.kernel.org>; Mon, 15 Mar 2021 16:34:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42EE9C433DB
+	for <linux-block@archiver.kernel.org>; Mon, 15 Mar 2021 20:03:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ADEA464F41
-	for <linux-block@archiver.kernel.org>; Mon, 15 Mar 2021 16:34:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0589D64F52
+	for <linux-block@archiver.kernel.org>; Mon, 15 Mar 2021 20:03:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233369AbhCOQdi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 15 Mar 2021 12:33:38 -0400
-Received: from ale.deltatee.com ([204.191.154.188]:41178 "EHLO
-        ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233564AbhCOQdc (ORCPT
+        id S233924AbhCOUDF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 15 Mar 2021 16:03:05 -0400
+Received: from mail-ej1-f50.google.com ([209.85.218.50]:33975 "EHLO
+        mail-ej1-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233923AbhCOUCz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 15 Mar 2021 12:33:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:MIME-Version:Date:
-        Message-ID:From:References:Cc:To:content-disposition;
-        bh=25tvzr6LDKuaRWZ7Kq1InXgjrQLBkOCY64hHowQXZig=; b=jd/7txTKwBaK4XM4L4pEdPfaXK
-        j77z2FSuQPygPyzOaNtQeB/WuPI0mEHeLQ5XoVaOvM0peJGMT0rSFK7QLdYPovQdiR6d9crYwP30V
-        U3qzhU7lI4cnhPY5eLbFwsQgHc3dgrwJ+5RCrXGFRhWPpVYBx20B8JOfELVsToLgjg+JhMv9AAQoV
-        QXi+qBm+8NQLJ8YR2We0YcMp4QAshPbXnXH9nMM7W7FgIHCSgDMML5rQNraVpwyWQFm6LURTNIcjG
-        M4ZrRp9VjFELAy3KrIPg5y1v+lSFYwe8hnogW0iDZtEp5btt8nr/QzFZs11lfwZQdVaCWefOipyWS
-        LCYU1tFQ==;
-Received: from guinness.priv.deltatee.com ([172.16.1.162])
-        by ale.deltatee.com with esmtp (Exim 4.92)
-        (envelope-from <logang@deltatee.com>)
-        id 1lLq9a-0000OV-Kj; Mon, 15 Mar 2021 10:33:15 -0600
-To:     Ira Weiny <ira.weiny@intel.com>
-Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-mm@kvack.org, iommu@lists.linux-foundation.org,
-        Stephen Bates <sbates@raithlin.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
-        Ira Weiny <iweiny@intel.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Don Dutile <ddutile@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Jakowski Andrzej <andrzej.jakowski@intel.com>,
-        Minturn Dave B <dave.b.minturn@intel.com>,
-        Jason Ekstrand <jason@jlekstrand.net>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Xiong Jianxin <jianxin.xiong@intel.com>
-References: <20210311233142.7900-1-logang@deltatee.com>
- <20210311233142.7900-8-logang@deltatee.com>
- <20210313023657.GC3402637@iweiny-DESK2.sc.intel.com>
-From:   Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <e9a6689a-3cb7-aa30-33e7-b27015754b73@deltatee.com>
-Date:   Mon, 15 Mar 2021 10:33:13 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        Mon, 15 Mar 2021 16:02:55 -0400
+Received: by mail-ej1-f50.google.com with SMTP id si25so12686408ejb.1;
+        Mon, 15 Mar 2021 13:02:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=embSwMWKLR6mcojsmr9qI/asFqc3qxsVqoQVl8EgYLk=;
+        b=Ap6WK7et//RMwv4PoAfLVBkmaxWXZSlNS/OzSouGECrQf8rKNt63SgZPIboy85WY9k
+         Yms0aoKrSSkzJo8PRI0d24R2TNPFZyV9qi33qTWS+aoqp5ruYzRWQSvHnMN9PwxbWer2
+         U6Bb8cZm6yprSFweJgsTvUBiNUcC8RJl2xa7pfGm+MUuYM/iT1X8DS9rs4WAd/FLC+7C
+         JIezABlNqWaX2v6Vde1sADiH8d9tiiLRb722494oiKhwmCk57opEE6r++9MuZOC4TzDS
+         LF8yoW9SfQcbvWjqgV14rduwUE/1CPra19eT9/V+QaucxdBKlHMQmLOJyEJlCCCwcQRR
+         Y0BA==
+X-Gm-Message-State: AOAM5335k+GFNkQRqde06k3BlNVRz+ROleIaEofu5T2gFUEvtIjX5WGE
+        XYeiaDjWk4haNfq8yhb/Q4IPpgbuAHydaw==
+X-Google-Smtp-Source: ABdhPJyx3QM4ywAoSpn8hnDr2mudD6du5ZjdHOy0G7Uo62mvt+m3mjQ1/YY5ppPB6qChgQAlR+O8mg==
+X-Received: by 2002:a17:906:3b47:: with SMTP id h7mr25280421ejf.377.1615838573458;
+        Mon, 15 Mar 2021 13:02:53 -0700 (PDT)
+Received: from msft-t490s.teknoraver.net (net-188-216-41-250.cust.vodafonedsl.it. [188.216.41.250])
+        by smtp.gmail.com with ESMTPSA id x21sm8551210eds.53.2021.03.15.13.02.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Mar 2021 13:02:52 -0700 (PDT)
+From:   Matteo Croce <mcroce@linux.microsoft.com>
+To:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org,
+        Lennart Poettering <lennart@poettering.net>,
+        Luca Boccassi <bluca@debian.org>, Jens Axboe <axboe@kernel.dk>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Tejun Heo <tj@kernel.org>,
+        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@javigon.com>,
+        Niklas Cassel <niklas.cassel@wdc.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Hannes Reinecke <hare@suse.de>
+Subject: [PATCH -next 0/5] block: add a sequence number to disks
+Date:   Mon, 15 Mar 2021 21:02:37 +0100
+Message-Id: <20210315200242.67355-1-mcroce@linux.microsoft.com>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-In-Reply-To: <20210313023657.GC3402637@iweiny-DESK2.sc.intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-CA
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 172.16.1.162
-X-SA-Exim-Rcpt-To: jianxin.xiong@intel.com, dave.hansen@linux.intel.com, jason@jlekstrand.net, dave.b.minturn@intel.com, andrzej.jakowski@intel.com, daniel.vetter@ffwll.ch, willy@infradead.org, ddutile@redhat.com, jhubbard@nvidia.com, iweiny@intel.com, christian.koenig@amd.com, jgg@ziepe.ca, dan.j.williams@intel.com, hch@lst.de, sbates@raithlin.com, iommu@lists.linux-foundation.org, linux-mm@kvack.org, linux-pci@vger.kernel.org, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, ira.weiny@intel.com
-X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: [RFC PATCH v2 07/11] dma-mapping: Add flags to dma_map_ops to
- indicate PCI P2PDMA support
-X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+From: Matteo Croce <mcroce@microsoft.com>
 
+With this series a monotonically increasing number is added to disks,
+precisely in the genhd struct, and it's exported in sysfs and uevent.
 
-On 2021-03-12 7:36 p.m., Ira Weiny wrote:
-> On Thu, Mar 11, 2021 at 04:31:37PM -0700, Logan Gunthorpe wrote:
->  
->> +int dma_pci_p2pdma_supported(struct device *dev)
->    ^^^
->   bool?
+This helps the userspace correlate events for devices that reuse the
+same device, like loop.
 
-Sure.
+The first patch is the core one, the 2..4 expose the information in
+different ways, while the last one increase the sequence number for
+loop devices at every attach.
 
-> 
->> +{
->> +	const struct dma_map_ops *ops = get_dma_ops(dev);
->> +
->> +	return !ops || ops->flags & DMA_F_PCI_P2PDMA_SUPPORTED;
-> 
-> Is this logic correct?  I would have expected.
-> 
-> 	return (ops && ops->flags & DMA_F_PCI_P2PDMA_SUPPORTED);
+    # udevadm monitor -kp |grep -e ^DEVNAME -e ^DISKSEQ &
+    [1] 523
+    # losetup -fP 3part
+    [ 3698.615848] loop0: detected capacity change from 16384 to 0
+    DEVNAME=/dev/loop0
+    DISKSEQ=13
+    [ 3698.647189]  loop0: p1 p2 p3
+    DEVNAME=/dev/loop0
+    DISKSEQ=13
+    DEVNAME=/dev/loop0p1
+    DISKSEQ=13
+    DEVNAME=/dev/loop0p2
+    DISKSEQ=13
+    DEVNAME=/dev/loop0p3
+    DISKSEQ=13
+    # losetup -fP 2part
+    [ 3705.170766] loop1: detected capacity change from 40960 to 0
+    DEVNAME=/dev/loop1
+    DISKSEQ=14
+    [ 3705.247280]  loop1: p1 p2
+    DEVNAME=/dev/loop1
+    DISKSEQ=14
+    DEVNAME=/dev/loop1p1
+    DISKSEQ=14
+    DEVNAME=/dev/loop1p2
+    DISKSEQ=14
+    # ./getdiskseq /dev/loop*
+    /dev/loop0:     13
+    /dev/loop0p1:   13
+    /dev/loop0p2:   13
+    /dev/loop0p3:   13
+    /dev/loop1:     14
+    /dev/loop1p1:   14
+    /dev/loop1p2:   14
+    /dev/loop2:     5
+    /dev/loop3:     6
+    /dev/loop-control: Function not implemented
+    # grep . /sys/class/block/*/diskseq
+    /sys/class/block/loop0/diskseq:13
+    /sys/class/block/loop1/diskseq:14
+    /sys/class/block/loop2/diskseq:5
+    /sys/class/block/loop3/diskseq:6
+    /sys/class/block/ram0/diskseq:1
+    /sys/class/block/ram1/diskseq:2
+    /sys/class/block/vda/diskseq:7
 
+If merged, this feature will immediately used by the userspace:
+https://github.com/systemd/systemd/issues/17469#issuecomment-762919781
 
-If ops is NULL then the operations in kernel/dma/direct.c are used and
-support is added to those in patch 6. So it is correct as written.
+This is just a resend after the merge window and rebased on linux-block.
+Also, added more people in CC from the get_maintainer.pl output
+as well as -next in the subject.
 
-Logan
+Matteo Croce (5):
+  block: add disk sequence number
+  block: add ioctl to read the disk sequence number
+  block: refactor sysfs code
+  block: export diskseq in sysfs
+  loop: increment sequence number
+
+ Documentation/ABI/testing/sysfs-block | 12 ++++++++
+ block/genhd.c                         | 43 ++++++++++++++++++++++++---
+ block/ioctl.c                         |  2 ++
+ drivers/block/loop.c                  |  3 ++
+ include/linux/genhd.h                 |  2 ++
+ include/uapi/linux/fs.h               |  1 +
+ 6 files changed, 59 insertions(+), 4 deletions(-)
+
+-- 
+2.30.2
+
