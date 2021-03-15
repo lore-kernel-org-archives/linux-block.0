@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C754C433E0
-	for <linux-block@archiver.kernel.org>; Mon, 15 Mar 2021 20:04:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0DA4C43381
+	for <linux-block@archiver.kernel.org>; Mon, 15 Mar 2021 20:04:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3D63D64E12
-	for <linux-block@archiver.kernel.org>; Mon, 15 Mar 2021 20:04:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7FC8164E12
+	for <linux-block@archiver.kernel.org>; Mon, 15 Mar 2021 20:04:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233959AbhCOUDh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 15 Mar 2021 16:03:37 -0400
-Received: from mail-ej1-f46.google.com ([209.85.218.46]:33712 "EHLO
-        mail-ej1-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233947AbhCOUDM (ORCPT
+        id S233985AbhCOUDj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 15 Mar 2021 16:03:39 -0400
+Received: from mail-ed1-f49.google.com ([209.85.208.49]:33453 "EHLO
+        mail-ed1-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233951AbhCOUDY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 15 Mar 2021 16:03:12 -0400
-Received: by mail-ej1-f46.google.com with SMTP id jt13so68452059ejb.0;
-        Mon, 15 Mar 2021 13:03:11 -0700 (PDT)
+        Mon, 15 Mar 2021 16:03:24 -0400
+Received: by mail-ed1-f49.google.com with SMTP id w18so18833519edc.0;
+        Mon, 15 Mar 2021 13:03:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=8g9BTEw5cXK8BEbWg9s2vlc3/G9KI2ob9t2ObMjWarw=;
-        b=Fz8FFQxzAL9tX20K/L5eeJ5E1wD2HC/d/FB8OnbgEeg7CgaWcjQqPgX35YxZuM9MzX
-         8Nhrivk0iD+CEr47tpwIHC9mrsRnbIIx3B3Mi0ieAd9KvOvjt+5Km7rmsBM/bV1d4PuI
-         5vgIx3AoUAhQNw0nmk/wYHgg4eBVYsRfuuplBBmWQrmPLVIKQPKt9nB/niSaR46L17ui
-         2dXFCiI2eFK++Lkewcn/Ys5vTr53YjFxJT2fh4jBLuMA+Qk0KELwTdmd5G980BacJD9j
-         oIIDkRH59eomFDOsd+yFZthVPJlAu4oha1ArGUHypoHSmEEgYb2WcqT1EZorc5fFV8Fs
-         /SfA==
-X-Gm-Message-State: AOAM532P+yPmA/yfC59YQlaGqMYABZZhUOeVTMZvi9iwz5RzwYdiIg16
-        0vvdpM9ALxYD8mVM99pPjrzL+fEZBlPflA==
-X-Google-Smtp-Source: ABdhPJxlFVm09S5cvJx2HpIRxw1HVJAgESec3ReO0bsgBmooLvC4DyVbOu+jaLxI+QSFDfvllh5hcQ==
-X-Received: by 2002:a17:907:9e6:: with SMTP id ce6mr25172779ejc.207.1615838590529;
-        Mon, 15 Mar 2021 13:03:10 -0700 (PDT)
+        bh=unr0lspPbExoMGaeory8crjBzhS6zdKvWVCk960aOU8=;
+        b=tHGuTWArVlnyWL96Q2qsOFW3yVRN6lP8hVWhh82OCtrYJ7KHsbrfwbYXpLHDs+mt8o
+         uHN6V4WL0Vs23l1xsBxB3g9pscXIBJhoeqHkYU1KBydaYfg3OrtfHyVm/AsFEW46dwUh
+         bGExCzkkcxMndbqOA9zrrCb78p9V+MJDeg/ZiEPSW3EZfBOwxlLlc6GSOXwI9tOZpiv1
+         LhYOkyiTsQtf33454f2flWelWsdarlrwjZZEE1iL4iRSBENubaEPiWEnsCkUr+FHZAXd
+         I2Znj19xwfq9DbCu8ZGWpqUP350Au/nBo6v56leVhcHBf6AfgJgy9gjxU7fhGb6WeCHx
+         gUcg==
+X-Gm-Message-State: AOAM5317WgsWDdvQHfHzIu9a4cHDoOb20/F6OmLSDCQ1ux2e5dRoiRTP
+        DUib/onmhaD1mU9JquWqwDU0NoYbDc9GaA==
+X-Google-Smtp-Source: ABdhPJw0N/kDWEh6kOqJlt94kMa0MzE7BuOPpXhECb38QCm2ntvmtWHsfe7q1B138tAx+Xg1wutazA==
+X-Received: by 2002:a05:6402:5189:: with SMTP id q9mr31635414edd.168.1615838602881;
+        Mon, 15 Mar 2021 13:03:22 -0700 (PDT)
 Received: from msft-t490s.teknoraver.net (net-188-216-41-250.cust.vodafonedsl.it. [188.216.41.250])
-        by smtp.gmail.com with ESMTPSA id x21sm8551210eds.53.2021.03.15.13.03.09
+        by smtp.gmail.com with ESMTPSA id x21sm8551210eds.53.2021.03.15.13.03.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Mar 2021 13:03:09 -0700 (PDT)
+        Mon, 15 Mar 2021 13:03:22 -0700 (PDT)
 From:   Matteo Croce <mcroce@linux.microsoft.com>
 To:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org,
@@ -54,9 +54,9 @@ Cc:     linux-kernel@vger.kernel.org,
         Niklas Cassel <niklas.cassel@wdc.com>,
         Johannes Thumshirn <johannes.thumshirn@wdc.com>,
         Hannes Reinecke <hare@suse.de>
-Subject: [PATCH -next 1/5] block: add disk sequence number
-Date:   Mon, 15 Mar 2021 21:02:38 +0100
-Message-Id: <20210315200242.67355-2-mcroce@linux.microsoft.com>
+Subject: [PATCH -next 3/5] block: refactor sysfs code
+Date:   Mon, 15 Mar 2021 21:02:40 +0100
+Message-Id: <20210315200242.67355-4-mcroce@linux.microsoft.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210315200242.67355-1-mcroce@linux.microsoft.com>
 References: <20210315200242.67355-1-mcroce@linux.microsoft.com>
@@ -68,79 +68,72 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Matteo Croce <mcroce@microsoft.com>
 
-Add a sequence number to the disk devices. This number is put in the
-uevent so userspace can correlate events when a driver reuses a device,
-like the loop one.
+Move the sysfs register code from a function named disk_add_events() to
+a new function named disk_add_sysfs(). Also, rename the attribute list
+with a more generic name than disk_events_attrs.
 
 Signed-off-by: Matteo Croce <mcroce@microsoft.com>
 ---
- block/genhd.c         | 19 +++++++++++++++++++
- include/linux/genhd.h |  2 ++
- 2 files changed, 21 insertions(+)
+ block/genhd.c | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
 
 diff --git a/block/genhd.c b/block/genhd.c
-index 8c8f543572e6..92debcb9e061 100644
+index 92debcb9e061..57d92ea7ae05 100644
 --- a/block/genhd.c
 +++ b/block/genhd.c
-@@ -1215,8 +1215,17 @@ static void disk_release(struct device *dev)
- 		blk_put_queue(disk->queue);
- 	kfree(disk);
+@@ -41,6 +41,7 @@ static void disk_alloc_events(struct gendisk *disk);
+ static void disk_add_events(struct gendisk *disk);
+ static void disk_del_events(struct gendisk *disk);
+ static void disk_release_events(struct gendisk *disk);
++static void disk_add_sysfs(struct gendisk *disk);
+ 
+ void set_capacity(struct gendisk *disk, sector_t sectors)
+ {
+@@ -628,6 +629,7 @@ static void __device_add_disk(struct device *parent, struct gendisk *disk,
+ 	 */
+ 	WARN_ON_ONCE(!blk_get_queue(disk->queue));
+ 
++	disk_add_sysfs(disk);
+ 	disk_add_events(disk);
+ 	blk_integrity_add(disk);
  }
-+
-+static int block_uevent(struct device *dev, struct kobj_uevent_env *env)
-+{
-+	struct gendisk *disk = dev_to_disk(dev);
-+
-+	return add_uevent_var(env, "DISKSEQ=%llu", disk->diskseq);
-+}
-+
- struct class block_class = {
- 	.name		= "block",
-+	.dev_uevent	= block_uevent,
- };
+@@ -1838,7 +1840,7 @@ static const DEVICE_ATTR(events_poll_msecs, 0644,
+ 			 disk_events_poll_msecs_show,
+ 			 disk_events_poll_msecs_store);
  
- static char *block_devnode(struct device *dev, umode_t *mode,
-@@ -1388,6 +1397,8 @@ struct gendisk *__alloc_disk_node(int minors, int node_id)
- 	disk_to_dev(disk)->class = &block_class;
- 	disk_to_dev(disk)->type = &disk_type;
- 	device_initialize(disk_to_dev(disk));
-+	inc_diskseq(disk);
-+
- 	return disk;
- 
- out_destroy_part_tbl:
-@@ -1938,3 +1949,11 @@ static void disk_release_events(struct gendisk *disk)
- 	WARN_ON_ONCE(disk->ev && disk->ev->block != 1);
- 	kfree(disk->ev);
+-static const struct attribute *disk_events_attrs[] = {
++static const struct attribute *disk_sysfs_attrs[] = {
+ 	&dev_attr_events.attr,
+ 	&dev_attr_events_async.attr,
+ 	&dev_attr_events_poll_msecs.attr,
+@@ -1909,13 +1911,16 @@ static void disk_alloc_events(struct gendisk *disk)
+ 	disk->ev = ev;
  }
-+
-+void inc_diskseq(struct gendisk *disk)
-+{
-+	static atomic64_t diskseq;
-+
-+	disk->diskseq = atomic64_inc_return(&diskseq);
+ 
+-static void disk_add_events(struct gendisk *disk)
++static void disk_add_sysfs(struct gendisk *disk)
+ {
+ 	/* FIXME: error handling */
+-	if (sysfs_create_files(&disk_to_dev(disk)->kobj, disk_events_attrs) < 0)
++	if (sysfs_create_files(&disk_to_dev(disk)->kobj, disk_sysfs_attrs) < 0)
+ 		pr_warn("%s: failed to create sysfs files for events\n",
+ 			disk->disk_name);
 +}
-+EXPORT_SYMBOL_GPL(inc_diskseq);
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index f364619092cc..632141b360d2 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -167,6 +167,7 @@ struct gendisk {
- 	int node_id;
- 	struct badblocks *bb;
- 	struct lockdep_map lockdep_map;
-+	u64 diskseq;
- };
  
- /*
-@@ -326,6 +327,7 @@ static inline void bd_unlink_disk_holder(struct block_device *bdev,
- #endif /* CONFIG_SYSFS */
++static void disk_add_events(struct gendisk *disk)
++{
+ 	if (!disk->ev)
+ 		return;
  
- extern struct rw_semaphore bdev_lookup_sem;
-+extern void inc_diskseq(struct gendisk *disk);
+@@ -1940,7 +1945,7 @@ static void disk_del_events(struct gendisk *disk)
+ 		mutex_unlock(&disk_events_mutex);
+ 	}
  
- dev_t blk_lookup_devt(const char *name, int partno);
- void blk_request_module(dev_t devt);
+-	sysfs_remove_files(&disk_to_dev(disk)->kobj, disk_events_attrs);
++	sysfs_remove_files(&disk_to_dev(disk)->kobj, disk_sysfs_attrs);
+ }
+ 
+ static void disk_release_events(struct gendisk *disk)
 -- 
 2.30.2
 
