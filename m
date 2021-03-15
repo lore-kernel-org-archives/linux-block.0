@@ -2,58 +2,79 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB979C433E6
-	for <linux-block@archiver.kernel.org>; Mon, 15 Mar 2021 09:57:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBAE1C433DB
+	for <linux-block@archiver.kernel.org>; Mon, 15 Mar 2021 12:06:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5DF4C64E98
-	for <linux-block@archiver.kernel.org>; Mon, 15 Mar 2021 09:57:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7610B64E41
+	for <linux-block@archiver.kernel.org>; Mon, 15 Mar 2021 12:06:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229460AbhCOJ5V (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 15 Mar 2021 05:57:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48696 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229596AbhCOJ4t (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 15 Mar 2021 05:56:49 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 917EAC061574;
-        Mon, 15 Mar 2021 02:56:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=l2WBiCb5duYJRA9nKpihqrJOH1Qjg6utSrFiu8qAdtc=; b=htbYC9iEopWtJ4y8Zm3XAv1Jzw
-        bi9Q4J0G7LJqzikz0CjxjwgBMbrifq3uN/CE7RWX1PcJNGS/PXBVpNTKJPqtgmlVRBiZLo3yCX1yI
-        EVNS/TNYiYWwQv1T3/uq9dfXj9uJ1q44w5+HFSaZiINukieN7v8bxpVU2td2uJLvI21SvgZflRxRY
-        Jdfk2x9WhTwp2OBjD6oNxnDN03fSqRDMMHuqVeNLmIEAVXoUK3eAnDxnAHa+CEYG82ekfCbBJCmBJ
-        +nsBfm66Eli8cWVd5Q4iZ+oQa0j9MhI246O84qZy1Vf/qo9JjCOplDrgIZdcQPbWjrtafZ0he9EsB
-        fqAPFLNQ==;
-Received: from hch by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1lLjxq-00HXpG-E3; Mon, 15 Mar 2021 09:56:42 +0000
-Date:   Mon, 15 Mar 2021 09:56:42 +0000
-From:   Christoph Hellwig <hch@infradead.org>
-To:     "zhangyi (F)" <yi.zhang@huawei.com>
-Cc:     linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-block@vger.kernel.org, jack@suse.cz, tytso@mit.edu,
-        viro@zeniv.linux.org.uk, hch@infradead.org, axboe@kernel.dk,
-        mcgrof@kernel.org, keescook@chromium.org, yzaikin@google.com
-Subject: Re: [RFC PATCH 0/3] block_dump: remove block dump
-Message-ID: <20210315095642.GA4181451@infradead.org>
-References: <20210313030146.2882027-1-yi.zhang@huawei.com>
+        id S230171AbhCOMGX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 15 Mar 2021 08:06:23 -0400
+Received: from mx4.veeam.com ([104.41.138.86]:50584 "EHLO mx4.veeam.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230169AbhCOMGX (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 15 Mar 2021 08:06:23 -0400
+Received: from mail.veeam.com (prgmbx01.amust.local [172.24.0.171])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mx4.veeam.com (Postfix) with ESMTPS id 32402171E;
+        Mon, 15 Mar 2021 15:06:18 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com; s=mx4;
+        t=1615809978; bh=mVn36BTSzFhaZLEUHYffL8xe3v6UOYz/YXSHVjys07s=;
+        h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+        b=gFh+ULS+jNH0u4XnkuWd8sf+8rvbY99vFfRjjm4mDEf6PHHBD3hbXQdcJTXrWousR
+         kvi9VzOitKCEQcZacJvCpfiUJC65HMpxP2Rqln8k33a+IdaAGwD5jnjfs0Yajxl/87
+         VqqUvn6sP+9xGhzKK9yp89S4zV2dW0RQ71xl/o6o=
+Received: from veeam.com (172.24.14.5) by prgmbx01.amust.local (172.24.0.171)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.721.2; Mon, 15 Mar 2021
+ 13:06:16 +0100
+Date:   Mon, 15 Mar 2021 15:06:08 +0300
+From:   Sergei Shtepa <sergei.shtepa@veeam.com>
+To:     Christoph Hellwig <hch@infradead.org>
+CC:     Mike Snitzer <snitzer@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-api@vger.kernel.org" <linux-api@vger.kernel.org>,
+        Pavel Tide <Pavel.TIde@veeam.com>
+Subject: Re: [PATCH v7 1/3] block: add blk_mq_is_queue_frozen()
+Message-ID: <20210315120608.GA30489@veeam.com>
+References: <1615563895-28565-1-git-send-email-sergei.shtepa@veeam.com>
+ <1615563895-28565-2-git-send-email-sergei.shtepa@veeam.com>
+ <20210312190641.GA2550@redhat.com>
+ <20210314091441.GA3773360@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="utf-8"
 Content-Disposition: inline
-In-Reply-To: <20210313030146.2882027-1-yi.zhang@huawei.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20210314091441.GA3773360@infradead.org>
+X-Originating-IP: [172.24.14.5]
+X-ClientProxiedBy: prgmbx01.amust.local (172.24.0.171) To prgmbx01.amust.local
+ (172.24.0.171)
+X-EsetResult: clean, is OK
+X-EsetId: 37303A29D2A50B58627C62
+X-Veeam-MMEX: True
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Looks good,
+The 03/14/2021 12:14, Christoph Hellwig wrote:
+> On Fri, Mar 12, 2021 at 02:06:41PM -0500, Mike Snitzer wrote:
+> > This is returning a frozen state that is immediately stale.  I don't
+> > think any code calling this is providing the guarantees you think it
+> > does due to the racey nature of this state once the mutex is dropped.
+> 
+> The code only uses it for asserts in the form of WARN_ONs.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+But perhaps it is possible to come up with a more elegant solution?
+I'll think about it.
+-- 
+Sergei Shtepa
+Veeam Software developer.
