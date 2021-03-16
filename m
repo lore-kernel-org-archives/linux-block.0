@@ -2,332 +2,320 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C99EDC433E6
-	for <linux-block@archiver.kernel.org>; Tue, 16 Mar 2021 11:01:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69DE7C433DB
+	for <linux-block@archiver.kernel.org>; Tue, 16 Mar 2021 13:57:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9A53965031
-	for <linux-block@archiver.kernel.org>; Tue, 16 Mar 2021 11:01:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2C06865067
+	for <linux-block@archiver.kernel.org>; Tue, 16 Mar 2021 13:57:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237006AbhCPLBX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 Mar 2021 07:01:23 -0400
-Received: from out30-42.freemail.mail.aliyun.com ([115.124.30.42]:38980 "EHLO
-        out30-42.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236935AbhCPLAx (ORCPT
+        id S235193AbhCPN4y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Mar 2021 09:56:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44214 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235635AbhCPN43 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Mar 2021 07:00:53 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04426;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0US9MIBa_1615892449;
-Received: from admindeMacBook-Pro-2.local(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0US9MIBa_1615892449)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Tue, 16 Mar 2021 19:00:49 +0800
-Subject: Re: [RFC PATCH 08/11] block: use per-task poll context to implement
- bio based io poll
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
-References: <20210316031523.864506-1-ming.lei@redhat.com>
- <20210316031523.864506-9-ming.lei@redhat.com>
- <b4dce8c6-61dd-9524-0a55-41db63eb084d@linux.alibaba.com>
- <YFBbjY+oDpjIHI3P@T590>
-From:   JeffleXu <jefflexu@linux.alibaba.com>
-Message-ID: <b2a33da7-84e6-14ba-c960-988bba448bf4@linux.alibaba.com>
-Date:   Tue, 16 Mar 2021 19:00:49 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.7.0
+        Tue, 16 Mar 2021 09:56:29 -0400
+Received: from mail-vs1-xe2d.google.com (mail-vs1-xe2d.google.com [IPv6:2607:f8b0:4864:20::e2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53901C06175F
+        for <linux-block@vger.kernel.org>; Tue, 16 Mar 2021 06:56:24 -0700 (PDT)
+Received: by mail-vs1-xe2d.google.com with SMTP id a15so18243290vsi.7
+        for <linux-block@vger.kernel.org>; Tue, 16 Mar 2021 06:56:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=0vFQFGLSSv2U1mK0qvvL4LwGLqVceQgVdP6wn35XKeY=;
+        b=xoAgoDD1cdTmq6TLmF6RruGkLb5WMpfnyAm6P6aAuCUONdWy8AbNhst39rn6HGuP+r
+         ZMvwnrWEZLlzN3Vx9ViMahXAZiZQ2+781y33Egkf2RCd78XnatWEkvzZnf1wlAWi3I2A
+         bm58del1VSse/HqX9larxzmPXJWguX0GtatOoGXgqqkRiiTlf2P445oXiGL8Q4nM1AW4
+         GPWSLMjVWkJ8ltFsluYB/MLoxLQvoOMGApinKl5WB8fTX0+kYYVjDHcBp0p0Tp1xGKeu
+         O4n6dVnU+cNA0p6dBsFbbI6KEtHkUXvunfVGenZ3pw6atiZxbLRFW+dF/ziIxx/rhWPS
+         8+7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=0vFQFGLSSv2U1mK0qvvL4LwGLqVceQgVdP6wn35XKeY=;
+        b=rQCCDyn/yn5byfdmrlMT5jlwODWQKftpzPvHb5ooZke6Eco6IAWIcC6Ey10TuiHM+I
+         T4nWkSGcmBnUb63h4RxdMb8ugRJeaXLh4JkZS1TnSo7CsyRnkL1NNfTvjgOHZuSnZKyG
+         mE/29BMXDgpBIhS0XOywhxLSRhlW1tztwnot8hHmaTQZXo2VU2vVFnnqaLMa3ayG6mkl
+         z5SvVcWQEhca2zmbICvZw1abnknJTsxxgqQvvWpvWznyYFNFbdXLinS7Qq5bdXBoBq61
+         sL6iZK8+4Kf9aEDEKap7RTt7cgGhhVHpdUCp0uBbuRwsHRq1DSHzZckGKLoE8YqfHBDz
+         YhUw==
+X-Gm-Message-State: AOAM530InRrjTGiC+sngHbNtFaC1qaNKZNFNvYvTgTa4Nlbr5SAMbWLF
+        2m8iR57zgyBt3he9o9gh5TwRBADc7YM0Kh9EX7243g==
+X-Google-Smtp-Source: ABdhPJynQHxnw3W3Y2x9UcxU8AP4VSE+hIcOBueGj+Oknjhjx9EbtnzZe9qkmrxRsq2741T+btkAncvMqvXiiHhSsic=
+X-Received: by 2002:a67:8c89:: with SMTP id o131mr5786746vsd.42.1615902983266;
+ Tue, 16 Mar 2021 06:56:23 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <YFBbjY+oDpjIHI3P@T590>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20210309015750.6283-1-peng.zhou@mediatek.com> <CACRpkdYTkW7b9SFEY6Ubq4NicgR_5ewQMjE2zHvGbgxYadhHQQ@mail.gmail.com>
+ <YEpqkAq6wOZ+TpR9@gmail.com> <CAPDyKFoWg7HYHAbxYJRbOad5kqm+rzVLVQ0O3g76ROO5Z+MF3Q@mail.gmail.com>
+ <1615884533.21508.118.camel@mbjsdccf07> <CAPDyKFqtjYVAAe_wUKQC3n3ok5bUpGtpu=TUiOgFmbb6+Qkg=A@mail.gmail.com>
+ <1615893329.21508.128.camel@mbjsdccf07>
+In-Reply-To: <1615893329.21508.128.camel@mbjsdccf07>
+From:   Ulf Hansson <ulf.hansson@linaro.org>
+Date:   Tue, 16 Mar 2021 14:55:46 +0100
+Message-ID: <CAPDyKFqaFbviwxQ8U_X8U64F7OwNaxXde6XdUcGPeGg8k9MWWg@mail.gmail.com>
+Subject: Re: [PATCH v2 2/4] mmc: Mediatek: enable crypto hardware engine
+To:     "Peng.Zhou" <peng.zhou@mediatek.com>
+Cc:     Eric Biggers <ebiggers@kernel.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Chaotian Jing <chaotian.jing@mediatek.com>,
+        linux-mmc <linux-mmc@vger.kernel.org>,
+        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
+        <devicetree@vger.kernel.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Satya Tangirala <satyat@google.com>,
+        Wulin Li <wulin.li@mediatek.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Sudeep Holla <sudeep.holla@arm.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Tue, 16 Mar 2021 at 12:22, Peng.Zhou <peng.zhou@mediatek.com> wrote:
+>
+> On Tue, 2021-03-16 at 11:09 +0100, Ulf Hansson wrote:
+> > On Tue, 16 Mar 2021 at 09:55, Peng.Zhou <peng.zhou@mediatek.com> wrote:
+> > >
+> > > On Fri, 2021-03-12 at 10:05 +0100, Ulf Hansson wrote:
+> > > > + Arnd, Sudeep
+> > > >
+> > > > On Thu, 11 Mar 2021 at 20:08, Eric Biggers <ebiggers@kernel.org> wrote:
+> > > > >
+> > > > > On Thu, Mar 11, 2021 at 02:48:23PM +0100, Linus Walleij wrote:
+> > > > > > Hi Peng,
+> > > > > >
+> > > > > > thanks for your patch!
+> > > > > >
+> > > > > > On Tue, Mar 9, 2021 at 3:06 AM Peng Zhou <peng.zhou@mediatek.com> wrote:
+> > > > > >
+> > > > > > > Use SMC call enable hardware crypto engine
+> > > > > > > due to it only be changed in ATF(EL3).
+> > > > > > >
+> > > > > > > Signed-off-by: Peng Zhou <peng.zhou@mediatek.com>
+> > > > > >
+> > > > > > Unfortunately this commit message is way to short to
+> > > > > > understand what is going on, and has a lot of assumed
+> > > > > > previous knowledge.
+> > > > > >
+> > > > > > Can you expand the commit message so that anyone
+> > > > > > who just know MMC and some SoC basics can understand
+> > > > > > what an SMC call and and what ATF(EL3) means?
+> > > > > >
+> > > > > > I assume this some kind of inline encryption?
+> > > > > >
+> > > > > > I think maybe linux-block mailing list need to be involved
+> > > > > > because there is certain a Linux standard way of setting
+> > > > > > up inline encryption for the block layer.
+> > > > > >
+> > > > > > For example: how is the key to be used derived?
+> > > > > > How is the device unlocked in the first place?
+> > > > > >
+> > > > > > If I insert a LUKS encrypted harddrive in a Linux machine
+> > > > > > the whole system is pretty much aware of how this should
+> > > > > > be handled and everything "just works", I enter a pass
+> > > > > > phrase and off it goes. I can use symmetric keys as well.
+> > > > > > How is this stuff done for this hardware?
+> > > > > >
+> > > > > > > +       /*
+> > > > > > > +        * 1: MSDC_AES_CTL_INIT
+> > > > > > > +        * 4: cap_id, no-meaning now
+> > > > > > > +        * 1: cfg_id, we choose the second cfg group
+> > > > > > > +        */
+> > > > > > > +       if (mmc->caps2 & MMC_CAP2_CRYPTO)
+> > > > > > > +               arm_smccc_smc(MTK_SIP_MMC_CONTROL,
+> > > > > > > +                             1, 4, 1, 0, 0, 0, 0, &smccc_res);
+> > > > > >
+> > > > > > The same as above: these comments assume that everyone
+> > > > > > already knows what is going on.
+> > > > > >
+> > > > > > AES encryption requires a key and I don't see the driver
+> > > > > > setting up any key. How is the code in this file:
+> > > > > > drivers/mmc/core/crypto.c
+> > > > > > interacting with your driver?
+> > > > > > drivers/mmc/host/cqhci-crypto.c
+> > > > > > is used by SDHCI and is quite readable and I see what is going on.
+> > > > > > For example it contains functions like:
+> > > > > > cqhci_crypto_program_key()
+> > > > > > cqhci_crypto_keyslot_program()
+> > > > > > cqhci_crypto_clear_keyslot()
+> > > > > > cqhci_crypto_keyslot_evict()
+> > > > > > cqhci_find_blk_crypto_mode()
+> > > > > >
+> > > > > > MMC_CAP2_CRYPTO is used as a sign that the driver
+> > > > > > can do inline encryption, then devm_blk_ksm_init() is called
+> > > > > > to initialize a block encryption abstraction with the block layer.
+> > > > > > Ops are registered using
+> > > > > > struct blk_ksm_ll_ops cqhci_ksm_ops.
+> > > > > >
+> > > > > > This is very straight forward.
+> > > > > >
+> > > > > > But where does all the above happen for this driver?
+> > > > > >
+> > > > >
+> > > > > It happens in the same place, cqhci-crypto.c.  Mediatek's eMMC inline encryption
+> > > > > hardware follows the eMMC standard fairly closely, so Peng's patch series just
+> > > > > sets MMC_CAP2_CRYPTO to make it use the standard cqhci crypto code, and does a
+> > > > > couple extra things to actually enable the hardware's crypto support on Mediatek
+> > > > > platforms since it isn't enabled by default.  (*Why* it requires an SMC call to
+> > > > > enable instead of just working as expected, I don't know though.)
+> > > >
+> > > > As I have probably indicated earlier, I am starting to become more and
+> > > > more annoyed with these arm_smccc_smc() calls in generic drivers.
+> > > >
+> > > > As a matter of fact, I think the situation is about to explode. Just
+> > > > do a "git grep arm_smccc_smc" and you will find that it's not only SoC
+> > > > specific drivers that call them. In general we want to keep drivers
+> > > > portable and this is clearly moving in the wrong direction. Or maybe
+> > > > it's just me being grumpy and having a bad day. :-)
+> > > >
+> > > > In the Qcom mmc case (drivers/mmc/host/sdhci-msm.c) for eMMC inline
+> > > > encryption, the arm_smccc_smc() call is slightly better handled as
+> > > > it's abstracted behind a Qcom specific firmware API. So, sdhci-msm.c
+> > > > calls qcom_scm_ice_set_key() (implemented in
+> > > > drivers/firmware/qcom_scm.c) to program a key. I guess we don't have
+> > > > an abstraction layer that would fit for this case, right?
+> > > >
+> > > > My point is, when there is no proper abstraction layer to use for the
+> > > > relevant arm_smccc_smc() call, the Qcom way is fine to me.
+> > > >
+> > > > In this Mediatek case, it looks slightly different. To me it looks
+> > > > more like a resource that needs to be turned on/off to enable/disable
+> > > > the "inline encryption engine". Could it be modeled as phy,
+> > > > power-rail, clock, pinctrl or perhaps behind a PM domain (where SoC
+> > > > specific calls makes perfect sense).
+> > > >
+> > > > Peng can you please elaborate on what goes on behind the
+> > > > arm_smccc_smc() call, as that would help us to understand what
+> > > > abstraction layer to pick?
+> > > >
+> > > > [...]
+> > > >
+> > > > Kind regards
+> > > > Uffe
+> > >
+> > > Hi All,
+> > >
+> > > First of all, I appreciated that you are interested in my patch series
+> > > and give me so much significant suggestions! Then, please let me summary
+> > > the detail information about MediaTek eMMC hardware crypto IP.
+> > >
+> > > Before that, as you know, due to I work for MediaTek.inc that means I'm
+> > > as an employee in this mail thread, so I don't give any comment about
+> > > other SoC manufacturers.I will only focus on ours.
+> > >
+> > >
+> > > [Background] Why I upstream this patch series?
+> > > Obiviously, we want to support hardware level file base encryption, file
+> > > encryption had been a mandatory feature in mobile device such as Android
+> > > environment.
+> > >
+> > > A few years ago, we only support software level file encryption, it
+> > > based on the reality of that time:
+> > >  - There is no official encryption specification announced by JEDEC or
+> > > any device manufacturers
+> > >  - File based encryption is not a mandatory feature for mobile devices
+> > >  - Security is not the highest priority thing for our most of Customers
+> > >
+> > > Time can fly and Market requirement is also, hardware level encryption
+> > > functions had been add in our SoCs in soon, because that:
+> > >  - An encryption specification which is widely recognized by device
+> > > manufacturers and SoC manufacturers had been announced. Although it
+> > > doesn't been accepted by JEDEC until now, most of eMMC device
+> > > manufacturers had support it.
+> > >  - Performance, special in low end mobile device, to some extent,
+> > > hardware encryption could reduce some CPU loading,
+> > >  - Almost overnight, Security has became the super star, everyone want
+> > > it, consider the performance (comparing with full disk encryption) and
+> > > flexibility, file based encryption is indispensable.
+> > >
+> > > One more thing, there is no common framework in kernel when our SoCs had
+> > > crypto IP in that time, so we design a special framework in kernel to
+> > > support it. In fact, we had support hardware encryption for several
+> > > years in a special and non-public way.
+> > >
+> > > You'll know the rest, Eric design a common framework that lets SoC
+> > > manufacturers support hardware encryption easier now. That' why we give
+> > > up our own special private way and try to support it.
+> > >
+> > > In fact, at this point in time, we have used this framework(include my
+> > > patch series) in our mobile products with newest Android version for
+> > > almost one year.
+> > >
+> > >
+> > > [Your question] Why we need use SMC call in our driver? or Why our
+> > > crypto hardware IP is not default on?
+> > >
+> > > Yes, MediaTek eMMC crypto hardware IP is default off in current design
+> > > and most important is we only turn it on in ARM exception level 3
+> > > (EL3,the highest security level), that means we can only control it
+> > > under ARM trust firmware (ATF) environment, but kernel space (it's EL2
+> > > in our platform).
+> > >
+> > > I can get your bewilderment: why it's default off and why put it in high
+> > > security level control?
+> >
+> > Actually, I don't have an issue with this, at all. Instead, my worries
+> > are about keeping generic drivers portable, which means resources need
+> > to be modelled through proper abstraction layers. SoC specific drivers
+> > are different, they don't necessarily need to cope with this
+> > requirement.
+> >
+> > Additionally, to me, it makes perfect sense to allow the crypto IP
+> > block to be powered off, as you would likely waste energy to have it
+> > always powered on, especially when it's not being in use.
+> >
+> > So, this boils down to understand what "turn on" crypto hardware IP
+> > actually means? Is it a clock, a phy, a power-rail or perhaps a
+> > combination of things that is turned on for the IP to work? What
+> > happens behind the SMC call?
+> >
+> > The answer to this question will help us understand what abstraction
+> > layer we should pick.
+>
+> Hi,
+>
+> "turn on" crypto hardware IP has no related about clock or power, it
+> means:
+>
+> On: eMMC host encrypt/dencrpt data works normally.
+> Off: eMMC host encrypt/dencrpt data works error, although clock and
+> power had been enabled. Error is command timeout or bus hang in our
+> platforms.
+>
+> SMC call means write a register of our SoC specific, a bit of a special
+> register actually, such as 0 means disable and 1 means enable.
 
+Okay, thanks for clarifying.
 
-On 3/16/21 3:17 PM, Ming Lei wrote:
-> On Tue, Mar 16, 2021 at 02:46:08PM +0800, JeffleXu wrote:
->> It is a giant progress to gather all split bios that need to be polled
->> in a per-task queue. Still some comments below.
->>
->>
->> On 3/16/21 11:15 AM, Ming Lei wrote:
->>> Currently bio based IO poll needs to poll all hw queue blindly, this way
->>> is very inefficient, and the big reason is that we can't pass bio
->>> submission result to io poll task.
->>>
->>> In IO submission context, store associated underlying bios into the
->>> submission queue and save 'cookie' poll data in bio->bi_iter.bi_private_data,
->>> and return current->pid to caller of submit_bio() for any DM or bio based
->>> driver's IO, which is submitted from FS.
->>>
->>> In IO poll context, the passed cookie tells us the PID of submission
->>> context, and we can find the bio from that submission context. Moving
->>> bio from submission queue to poll queue of the poll context, and keep
->>> polling until these bios are ended. Remove bio from poll queue if the
->>> bio is ended. Add BIO_DONE and BIO_END_BY_POLL for such purpose.
->>>
->>> Usually submission shares context with io poll. The per-task poll context
->>> is just like stack variable, and it is cheap to move data between the two
->>> per-task queues.
->>>
->>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
->>> ---
->>>  block/bio.c               |   5 ++
->>>  block/blk-core.c          |  74 +++++++++++++++++-
->>>  block/blk-mq.c            | 156 +++++++++++++++++++++++++++++++++++++-
->>>  include/linux/blk_types.h |   3 +
->>>  4 files changed, 235 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/block/bio.c b/block/bio.c
->>> index a1c4d2900c7a..bcf5eca0e8e3 100644
->>> --- a/block/bio.c
->>> +++ b/block/bio.c
->>> @@ -1402,6 +1402,11 @@ static inline bool bio_remaining_done(struct bio *bio)
->>>   **/
->>>  void bio_endio(struct bio *bio)
->>>  {
->>> +	/* BIO_END_BY_POLL has to be set before calling submit_bio */
->>> +	if (bio_flagged(bio, BIO_END_BY_POLL)) {
->>> +		bio_set_flag(bio, BIO_DONE);
->>> +		return;
->>> +	}
->>>  again:
->>>  	if (!bio_remaining_done(bio))
->>>  		return;
->>> diff --git a/block/blk-core.c b/block/blk-core.c
->>> index a082bbc856fb..970b23fa2e6e 100644
->>> --- a/block/blk-core.c
->>> +++ b/block/blk-core.c
->>> @@ -854,6 +854,40 @@ static inline void blk_bio_poll_preprocess(struct request_queue *q,
->>>  		bio->bi_opf |= REQ_TAG;
->>>  }
->>>  
->>> +static bool blk_bio_poll_prep_submit(struct io_context *ioc, struct bio *bio)
->>> +{
->>> +	struct blk_bio_poll_data data = {
->>> +		.bio	=	bio,
->>> +	};
->>> +	struct blk_bio_poll_ctx *pc = ioc->data;
->>> +	unsigned int queued;
->>> +
->>> +	/* lock is required if there is more than one writer */
->>> +	if (unlikely(atomic_read(&ioc->nr_tasks) > 1)) {
->>> +		spin_lock(&pc->lock);
->>> +		queued = kfifo_put(&pc->sq, data);
->>> +		spin_unlock(&pc->lock);
->>> +	} else {
->>> +		queued = kfifo_put(&pc->sq, data);
->>> +	}
->>> +
->>> +	/*
->>> +	 * Now the bio is added per-task fifo, mark it as END_BY_POLL,
->>> +	 * so we can save cookie into this bio after submit_bio().
->>> +	 */
->>> +	if (queued)
->>> +		bio_set_flag(bio, BIO_END_BY_POLL);
->>> +	else
->>> +		bio->bi_opf &= ~(REQ_HIPRI | REQ_TAG);
->>> +
->>> +	return queued;
->>> +}
->>
->> The size of kfifo is limited, and it seems that once the sq of kfifio is
->> full, REQ_HIPRI flag is cleared and the corresponding bio is actually
->> enqueued into the default hw queue, which is IRQ driven.
-> 
-> Yeah, this patch starts with 64 queue depth, and we can increase it to
-> 128, which should cover most of cases.
-> 
->>
->>
->>> +
->>> +static void blk_bio_poll_post_submit(struct bio *bio, blk_qc_t cookie)
->>> +{
->>> +	bio->bi_iter.bi_private_data = cookie;
->>> +}
->>> +
->>>  static noinline_for_stack bool submit_bio_checks(struct bio *bio)
->>>  {
->>>  	struct block_device *bdev = bio->bi_bdev;
->>> @@ -1008,7 +1042,7 @@ static blk_qc_t __submit_bio(struct bio *bio)
->>>   * bio_list_on_stack[1] contains bios that were submitted before the current
->>>   *	->submit_bio_bio, but that haven't been processed yet.
->>>   */
->>> -static blk_qc_t __submit_bio_noacct(struct bio *bio)
->>> +static blk_qc_t __submit_bio_noacct_int(struct bio *bio, struct io_context *ioc)
->>>  {
->>>  	struct bio_list bio_list_on_stack[2];
->>>  	blk_qc_t ret = BLK_QC_T_NONE;
->>> @@ -1031,7 +1065,16 @@ static blk_qc_t __submit_bio_noacct(struct bio *bio)
->>>  		bio_list_on_stack[1] = bio_list_on_stack[0];
->>>  		bio_list_init(&bio_list_on_stack[0]);
->>>  
->>> -		ret = __submit_bio(bio);
->>> +		if (ioc && queue_is_mq(q) &&
->>> +				(bio->bi_opf & (REQ_HIPRI | REQ_TAG))) {
->>> +			bool queued = blk_bio_poll_prep_submit(ioc, bio);
->>> +
->>> +			ret = __submit_bio(bio);
->>> +			if (queued)
->>> +				blk_bio_poll_post_submit(bio, ret);
->>> +		} else {
->>> +			ret = __submit_bio(bio);
->>> +		}
->>>  
->>>  		/*
->>>  		 * Sort new bios into those for a lower level and those for the
->>> @@ -1057,6 +1100,33 @@ static blk_qc_t __submit_bio_noacct(struct bio *bio)
->>>  	return ret;
->>>  }
->>>  
->>> +static inline blk_qc_t __submit_bio_noacct_poll(struct bio *bio,
->>> +		struct io_context *ioc)
->>> +{
->>> +	struct blk_bio_poll_ctx *pc = ioc->data;
->>> +	int entries = kfifo_len(&pc->sq);
->>> +
->>> +	__submit_bio_noacct_int(bio, ioc);
->>> +
->>> +	/* bio submissions queued to per-task poll context */
->>> +	if (kfifo_len(&pc->sq) > entries)
->>> +		return current->pid;
->>> +
->>> +	/* swapper's pid is 0, but it can't submit poll IO for us */
->>> +	return 0;
->>> +}
->>> +
->>> +static inline blk_qc_t __submit_bio_noacct(struct bio *bio)
->>> +{
->>> +	struct io_context *ioc = current->io_context;
->>> +
->>> +	if (ioc && ioc->data && (bio->bi_opf & REQ_HIPRI))
->>> +		return __submit_bio_noacct_poll(bio, ioc);
->>> +
->>> +	return __submit_bio_noacct_int(bio, NULL);
->>> +}
->>> +
->>> +
->>>  static blk_qc_t __submit_bio_noacct_mq(struct bio *bio)
->>>  {
->>>  	struct bio_list bio_list[2] = { };
->>> diff --git a/block/blk-mq.c b/block/blk-mq.c
->>> index 03f59915fe2c..4e6f1467d303 100644
->>> --- a/block/blk-mq.c
->>> +++ b/block/blk-mq.c
->>> @@ -3865,14 +3865,168 @@ static inline int blk_mq_poll_hctx(struct request_queue *q,
->>>  	return ret;
->>>  }
->>>  
->>> +static blk_qc_t bio_get_poll_cookie(struct bio *bio)
->>> +{
->>> +	return bio->bi_iter.bi_private_data;
->>> +}
->>> +
->>> +static int blk_mq_poll_io(struct bio *bio)
->>> +{
->>> +	struct request_queue *q = bio->bi_bdev->bd_disk->queue;
->>> +	blk_qc_t cookie = bio_get_poll_cookie(bio);
->>> +	int ret = 0;
->>> +
->>> +	if (!bio_flagged(bio, BIO_DONE) && blk_qc_t_valid(cookie)) {
->>> +		struct blk_mq_hw_ctx *hctx =
->>> +			q->queue_hw_ctx[blk_qc_t_to_queue_num(cookie)];
->>> +
->>> +		ret += blk_mq_poll_hctx(q, hctx);
->>> +	}
->>> +	return ret;
->>> +}
->>> +
->>> +static int blk_bio_poll_and_end_io(struct request_queue *q,
->>> +		struct blk_bio_poll_ctx *poll_ctx)
->>> +{
->>> +	struct blk_bio_poll_data *poll_data = &poll_ctx->pq[0];
->>> +	int ret = 0;
->>> +	int i;
->>> +
->>> +	for (i = 0; i < BLK_BIO_POLL_PQ_SZ; i++) {
->>> +		struct bio *bio = poll_data[i].bio;
->>> +
->>> +		if (!bio)
->>> +			continue;
->>> +
->>> +		ret += blk_mq_poll_io(bio);
->>> +		if (bio_flagged(bio, BIO_DONE)) {
->>> +			poll_data[i].bio = NULL;
->>> +
->>> +			/* clear BIO_END_BY_POLL and end me really */
->>> +			bio_clear_flag(bio, BIO_END_BY_POLL);
->>> +			bio_endio(bio);
->>> +		}
->>> +	}
->>> +	return ret;
->>> +}
->>
->> When there are multiple threads polling, saying thread A and thread B,
->> then there's one bio which should be polled by thread A (the pid is
->> passed to thread A), while it's actually completed by thread B. In this
->> case, when the bio is completed by thread B, the bio is not really
->> completed and one extra blk_poll() still needs to be called.
-> 
-> When this happens, the dm bio can't be completed, and the associated
-> kiocb can't be completed too, io_uring or other poll code context will
-> keep calling blk_poll() by passing thread A's pid until this dm bio is
-> done, since the dm bio is submitted from thread A.
-> 
+It looks like we have a couple of options to support this. I suggest
+we consider the two below, but perhaps others (Arnd/Linus?) have
+better ideas?
 
-This will affect the multi-thread polling performance. I tested
-dm-stripe, in which every bio will be split and enqueued into all
-underlying devices, and thus amplify the interference between multiple
-threads.
+1)
+Model the power on/off of the silicon around the crypto HW through a
+phy provider driver. The phy provider should then manage the "ice"
+clock and the SMC call, through the ->power_on|off() callbacks, while
+the mmc driver would act as the consumer of the phy. This would be
+rather straightforward to implement, but I guess it can be debated if
+this fits as a phy or not.
 
-Test Result:
-IOPS: 332k (IRQ) -> 363k (iopoll), aka ~10% performance gain
+2)
+Another slightly more complicated solution, would be to manage the SMC
+call and the "ice" clock through a PM domain (aka genpd provider). As
+a matter of fact, we already have a couple of references that use the
+genpd infracture like this, as it allows devices to be turned on/off
+from SoC specific code, through runtime PM. I wouldn't mind giving you
+more pointers to examples for inspirations, if this is the option we
+decide to go for.
 
-
-Test Environment:
-
-nvme.poll_queues = 3
-
-BLK_BIO_POLL_SQ_SZ = 128
-
-dmsetup create testdev --table "0 629145600 striped 3 8 /dev/nvme0n1 0
-/dev/nvme1n1 0 /dev/nvme4n1 0"
-
-
-```
-$cat fio.conf
-[global]
-name=iouring-sqpoll-iopoll-1
-ioengine=io_uring
-iodepth=128
-numjobs=1
-thread
-rw=randread
-direct=1
-hipri=1
-runtime=10
-time_based
-group_reporting
-randrepeat=0
-filename=/dev/mapper/testdev
-bs=12k
-
-[job-1]
-cpus_allowed=14
-
-[job-2]
-cpus_allowed=16
-
-[job-3]
-cpus_allowed=84
-```
-
--- 
-Thanks,
-Jeffle
+Kind regards
+Uffe
