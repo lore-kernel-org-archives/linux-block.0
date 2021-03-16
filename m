@@ -2,150 +2,112 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCC22C433E0
-	for <linux-block@archiver.kernel.org>; Tue, 16 Mar 2021 01:45:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E718AC433E9
+	for <linux-block@archiver.kernel.org>; Tue, 16 Mar 2021 03:17:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6CC1E64FB9
-	for <linux-block@archiver.kernel.org>; Tue, 16 Mar 2021 01:45:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B8DFF6508E
+	for <linux-block@archiver.kernel.org>; Tue, 16 Mar 2021 03:17:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232720AbhCPBpT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 15 Mar 2021 21:45:19 -0400
-Received: from out30-130.freemail.mail.aliyun.com ([115.124.30.130]:36432 "EHLO
-        out30-130.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232323AbhCPBo5 (ORCPT
+        id S232156AbhCPDRV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 15 Mar 2021 23:17:21 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32536 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234902AbhCPDRL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 15 Mar 2021 21:44:57 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04394;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0US4JnEj_1615859094;
-Received: from admindeMacBook-Pro-2.local(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0US4JnEj_1615859094)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Tue, 16 Mar 2021 09:44:55 +0800
-Subject: Re: [PATCH -next 1/5] block: add disk sequence number
-To:     Matteo Croce <mcroce@linux.microsoft.com>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
-        Lennart Poettering <lennart@poettering.net>,
-        Luca Boccassi <bluca@debian.org>, Jens Axboe <axboe@kernel.dk>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Tejun Heo <tj@kernel.org>,
-        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@javigon.com>,
-        Niklas Cassel <niklas.cassel@wdc.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Hannes Reinecke <hare@suse.de>
-References: <20210315200242.67355-1-mcroce@linux.microsoft.com>
- <20210315200242.67355-2-mcroce@linux.microsoft.com>
-From:   JeffleXu <jefflexu@linux.alibaba.com>
-Message-ID: <7358d5ae-afd6-f0d9-5535-b1d7ecfbd785@linux.alibaba.com>
-Date:   Tue, 16 Mar 2021 09:44:54 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.7.0
+        Mon, 15 Mar 2021 23:17:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1615864631;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=8eYh0DIWl8wBr3z0zSAva45a4IdtTQ49vVigt7lTGOA=;
+        b=b7q0f8SpcniKLv50LjsqUlT1ZACY9qDsl+jF4DrkhV4NdeRZrUfX4gStfCNkCmG61idj2Q
+        nKen4k2QqsZnvOvIIQZCN0p0kWTvMmsVgB5JsM0zTByU4Q0jgzip47kH3vVF5bxKVZQiVG
+        SeRsPwG6aYpx3GDGjMopY8sgtqWNEGc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-23-q4IJxz76N6mMvJKYcTuCPw-1; Mon, 15 Mar 2021 23:17:08 -0400
+X-MC-Unique: q4IJxz76N6mMvJKYcTuCPw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4D8C418460E1;
+        Tue, 16 Mar 2021 03:17:07 +0000 (UTC)
+Received: from localhost (ovpn-12-86.pek2.redhat.com [10.72.12.86])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 85D6E614FB;
+        Tue, 16 Mar 2021 03:16:56 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Jeffle Xu <jefflexu@linux.alibaba.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [RFC PATCH 00/11] block: support bio based io polling
+Date:   Tue, 16 Mar 2021 11:15:12 +0800
+Message-Id: <20210316031523.864506-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210315200242.67355-2-mcroce@linux.microsoft.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi,
+
+Add per-task io poll context for holding HIPRI blk-mq/underlying bios
+queued from bio based driver's io submission context, and reuse one bio
+padding field for storing 'cookie' returned from submit_bio() for these
+bios. Also explicitly end these bios in poll context by adding two
+new bio flags.
+
+In this way, we needn't to poll all underlying hw queues any more,
+which is implemented in Jeffle's patches. And we can just poll hw queues
+in which there is HIPRI IO queued.
+
+Usually io submission and io poll share same context, so the added io
+poll context data is just like one stack variable, and the cost for
+saving bios is cheap.
+
+Any comments are welcome.
 
 
-On 3/16/21 4:02 AM, Matteo Croce wrote:
-> From: Matteo Croce <mcroce@microsoft.com>
-> 
-> Add a sequence number to the disk devices. This number is put in the
-> uevent so userspace can correlate events when a driver reuses a device,
-> like the loop one.
-> 
-> Signed-off-by: Matteo Croce <mcroce@microsoft.com>
-> ---
->  block/genhd.c         | 19 +++++++++++++++++++
->  include/linux/genhd.h |  2 ++
->  2 files changed, 21 insertions(+)
-> 
-> diff --git a/block/genhd.c b/block/genhd.c
-> index 8c8f543572e6..92debcb9e061 100644
-> --- a/block/genhd.c
-> +++ b/block/genhd.c
-> @@ -1215,8 +1215,17 @@ static void disk_release(struct device *dev)
->  		blk_put_queue(disk->queue);
->  	kfree(disk);
->  }
-> +
-> +static int block_uevent(struct device *dev, struct kobj_uevent_env *env)
-> +{
-> +	struct gendisk *disk = dev_to_disk(dev);
-> +
-> +	return add_uevent_var(env, "DISKSEQ=%llu", disk->diskseq);
-> +}
-> +
->  struct class block_class = {
->  	.name		= "block",
-> +	.dev_uevent	= block_uevent,
->  };
->  
->  static char *block_devnode(struct device *dev, umode_t *mode,
-> @@ -1388,6 +1397,8 @@ struct gendisk *__alloc_disk_node(int minors, int node_id)
->  	disk_to_dev(disk)->class = &block_class;
->  	disk_to_dev(disk)->type = &disk_type;
->  	device_initialize(disk_to_dev(disk));
-> +	inc_diskseq(disk);
-> +
->  	return disk;
->  
->  out_destroy_part_tbl:
-> @@ -1938,3 +1949,11 @@ static void disk_release_events(struct gendisk *disk)
->  	WARN_ON_ONCE(disk->ev && disk->ev->block != 1);
->  	kfree(disk->ev);
->  }
-> +
-> +void inc_diskseq(struct gendisk *disk)
-> +{
-> +	static atomic64_t diskseq;
-> +
-> +	disk->diskseq = atomic64_inc_return(&diskseq);
-> +}
-> +EXPORT_SYMBOL_GPL(inc_diskseq);
+Jeffle Xu (4):
+  block/mq: extract one helper function polling hw queue
+  block: add queue_to_disk() to get gendisk from request_queue
+  block: add poll_capable method to support bio-based IO polling
+  dm: support IO polling for bio-based dm device
 
-Hi, I'm quite interested in this 'seqnum'. Actually I'm also planing to
-add support for some sort of 'seqnum' when supporting IO polling for dm
-devices, so that every time dm device changes its dm table, the seqnum
-will be increased.
+Ming Lei (7):
+  block: add helper of blk_queue_poll
+  block: add one helper to free io_context
+  block: add helper of blk_create_io_context
+  block: create io poll context for submission and poll task
+  block: add req flag of REQ_TAG
+  block: add new field into 'struct bvec_iter'
+  block: use per-task poll context to implement bio based io poll
 
-As for your patch, @diskseq is declared as one static variable in
-inc_diskseq(). Then I doubt if all callers of inc_diskseq() will share
-*one* counting when inc_diskseq() is compiled as the separate call entry
-rather than inlined.
-
-
-
-> diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-> index f364619092cc..632141b360d2 100644
-> --- a/include/linux/genhd.h
-> +++ b/include/linux/genhd.h
-> @@ -167,6 +167,7 @@ struct gendisk {
->  	int node_id;
->  	struct badblocks *bb;
->  	struct lockdep_map lockdep_map;
-> +	u64 diskseq;
->  };
->  
->  /*
-> @@ -326,6 +327,7 @@ static inline void bd_unlink_disk_holder(struct block_device *bdev,
->  #endif /* CONFIG_SYSFS */
->  
->  extern struct rw_semaphore bdev_lookup_sem;
-> +extern void inc_diskseq(struct gendisk *disk);
->  
->  dev_t blk_lookup_devt(const char *name, int partno);
->  void blk_request_module(dev_t devt);
-> 
+ block/bio.c                   |   5 +
+ block/blk-core.c              | 161 ++++++++++++++++++++++++++---
+ block/blk-ioc.c               |  12 ++-
+ block/blk-mq.c                | 189 ++++++++++++++++++++++++++++++++--
+ block/blk-sysfs.c             |  14 ++-
+ block/blk.h                   |  45 ++++++++
+ drivers/md/dm-table.c         |  24 +++++
+ drivers/md/dm.c               |  14 +++
+ drivers/nvme/host/core.c      |   2 +-
+ include/linux/blk_types.h     |   7 ++
+ include/linux/blkdev.h        |   4 +
+ include/linux/bvec.h          |   9 ++
+ include/linux/device-mapper.h |   1 +
+ include/linux/iocontext.h     |   2 +
+ include/trace/events/kyber.h  |   6 +-
+ 15 files changed, 466 insertions(+), 29 deletions(-)
 
 -- 
-Thanks,
-Jeffle
+2.29.2
+
