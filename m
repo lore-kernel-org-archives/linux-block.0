@@ -2,170 +2,103 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-23.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7CB2C433DB
-	for <linux-block@archiver.kernel.org>; Tue, 16 Mar 2021 15:51:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4103EC433DB
+	for <linux-block@archiver.kernel.org>; Tue, 16 Mar 2021 15:56:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 73F1A650FF
-	for <linux-block@archiver.kernel.org>; Tue, 16 Mar 2021 15:51:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1B2C1650F6
+	for <linux-block@archiver.kernel.org>; Tue, 16 Mar 2021 15:56:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231565AbhCPPuj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 Mar 2021 11:50:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40702 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237543AbhCPPub (ORCPT
+        id S232634AbhCPPza (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Mar 2021 11:55:30 -0400
+Received: from ale.deltatee.com ([204.191.154.188]:36728 "EHLO
+        ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238235AbhCPPzV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Mar 2021 11:50:31 -0400
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36757C061764
-        for <linux-block@vger.kernel.org>; Tue, 16 Mar 2021 08:50:30 -0700 (PDT)
-Received: by mail-lf1-x12a.google.com with SMTP id q25so63181661lfc.8
-        for <linux-block@vger.kernel.org>; Tue, 16 Mar 2021 08:50:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=WwakdtxuHaTN5z0HCiQ4MNVrrN9llL1dGHrwS+1rEFI=;
-        b=Y8vlN3SI/ykxQTjQbv4kH+9CK9WxCxroUfhO5YAG/Q06fEfhC7gmihPG0b2gkbg7p2
-         BJcipNhPpwfAYZQawmSVw4SuDq9HgHqrnJ72QN6YzAPc/iS45ymhVnlsheWAmhIcRFFC
-         5n043KRfcygMCCaESFPz/xle+ga7BJvXFjAgDJ2KE3+DwTFKrqQGRARQHbIWQizdgYAx
-         yjC00EWkXA7CGN93CjqVoC9HMMj3XE/OgUEkwHEjGGzbImbrc7x5KngmL6YhRLcDwLnF
-         rOlY48nIfjjcwEFdjlIDwqnZrPTEBtobD5wnEMK+86kKf6TRdXu36PZTzykBdCGIV382
-         K6bQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=WwakdtxuHaTN5z0HCiQ4MNVrrN9llL1dGHrwS+1rEFI=;
-        b=umHXLlmGFuGkWtbeQ0nN1WYtE7SXKiYwRRdGRoFiFko6YmquRwBLR3YUS8gm5lvnrI
-         tX0c6I7ovitLVNWCpOEJ/1kqFWQXNG6AXajT8J+E/Vp7u338UhxurSeENNrBrN4KQbt8
-         0oSmLv383TCcFTAcgW15mlweYPXEDyJHHOGonRNAU5jZIB/9CFeij43tqY8rqhU4nG8z
-         h1g0EZ2Lkk2snCFVlli3CE6YYVlchnuCx77VH2IIc4uRTuDOmQqW7P8Z6MWDxkB5Ii4R
-         pl1Us0pUcxTKhMf5sbR8/zaN1oGTkmtJK73RyDY5Av6YMtSWSzM0Gcbpl6Pb3qnZTGxa
-         YEqA==
-X-Gm-Message-State: AOAM531JmWF18RdmXkqu5yDm1P8pWZoAtuhcGHwINB6JEFgayG0ol4Cb
-        E+zcT4WJPars1c+aWpwSt1YWEWst/zScsxKHjG96zw==
-X-Google-Smtp-Source: ABdhPJyZ/vV2IRRHujPOKeVa0QetQ4VOSuoAxfKAEM82kauFP2bOtUCTQcIxCf4r+D48huq9DC6J/O4En2deKcexRrA=
-X-Received: by 2002:a05:6512:39c9:: with SMTP id k9mr11272677lfu.432.1615909828360;
- Tue, 16 Mar 2021 08:50:28 -0700 (PDT)
+        Tue, 16 Mar 2021 11:55:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:MIME-Version:Date:
+        Message-ID:From:References:Cc:To:content-disposition;
+        bh=oFF8o/RVegrG3G5YG5dTK44WOWDv57bdoGVgR2ktNWc=; b=dsqiw2UqRHpc2m6czITifyPazC
+        l3KC3T9j57KTF3XoWiyV+LPgw4lbLtgOWKdd598bgRLfvrtkF2yuQDTcMKhGG9vB+KiBIJHVKMqOo
+        mz5L+MEsdNsRbgo0gzz/8XPLL0CEathKtt+ZC61Qu6pAMYwbwCzqpb34Hfj+pEJnqN+lbJ6lzm9Ih
+        wMlXJ7CnBmVPIFSao3qYHQjM/uSXXdMUZqbGyOWB+ccwh0ZmHoBC+XWjsMT4ETu8VxhHGEnyC4uu8
+        9v/yv+i4wmpSzCRFdT+0I+6inCilQdZbbQP3yiENwxiLiBsWDTPHNXrs7QPi+fZVB9gawHTLngfEt
+        /Q9Irqsg==;
+Received: from guinness.priv.deltatee.com ([172.16.1.162])
+        by ale.deltatee.com with esmtp (Exim 4.92)
+        (envelope-from <logang@deltatee.com>)
+        id 1lMC27-00012D-3W; Tue, 16 Mar 2021 09:54:59 -0600
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Robin Murphy <robin.murphy@arm.com>, linux-kernel@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        linux-pci@vger.kernel.org, linux-mm@kvack.org,
+        iommu@lists.linux-foundation.org,
+        Minturn Dave B <dave.b.minturn@intel.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Jason Ekstrand <jason@jlekstrand.net>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Stephen Bates <sbates@raithlin.com>,
+        Jakowski Andrzej <andrzej.jakowski@intel.com>,
+        Xiong Jianxin <jianxin.xiong@intel.com>
+References: <20210311233142.7900-1-logang@deltatee.com>
+ <20210311233142.7900-7-logang@deltatee.com>
+ <215e1472-5294-d20a-a43a-ff6dfe8cd66e@arm.com>
+ <d7ead722-7356-8e0f-22de-cb9dea12b556@deltatee.com>
+ <a8205c02-a43f-d4e8-a9fe-5963df3a7b40@arm.com>
+ <367fa81e-588d-5734-c69c-8cdc800dcb7e@deltatee.com>
+ <20210316075821.GB15949@lst.de>
+From:   Logan Gunthorpe <logang@deltatee.com>
+Message-ID: <093b77cb-e8b1-c8a8-620b-ab36cdb7f3cc@deltatee.com>
+Date:   Tue, 16 Mar 2021 09:54:53 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-References: <20210316153655.500806-1-schatzberg.dan@gmail.com> <20210316153655.500806-3-schatzberg.dan@gmail.com>
-In-Reply-To: <20210316153655.500806-3-schatzberg.dan@gmail.com>
-From:   Shakeel Butt <shakeelb@google.com>
-Date:   Tue, 16 Mar 2021 08:50:16 -0700
-Message-ID: <CALvZod7sk52OYwxP=VRhS0q4xZ57UuSdL6Mi4Y956xDq3pTatQ@mail.gmail.com>
-Subject: Re: [PATCH 2/3] mm: Charge active memcg when no mm is set
-To:     Dan Schatzberg <schatzberg.dan@gmail.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        Zefan Li <lizefan.x@bytedance.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Michal Hocko <mhocko@kernel.org>,
-        Vladimir Davydov <vdavydov.dev@gmail.com>,
-        Hugh Dickins <hughd@google.com>, Roman Gushchin <guro@fb.com>,
-        Muchun Song <songmuchun@bytedance.com>,
-        Alex Shi <alex.shi@linux.alibaba.com>,
-        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
-        Chris Down <chris@chrisdown.name>,
-        Yafang Shao <laoar.shao@gmail.com>,
-        Wei Yang <richard.weiyang@gmail.com>,
-        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        "open list:CONTROL GROUP (CGROUP)" <cgroups@vger.kernel.org>,
-        "open list:MEMORY MANAGEMENT" <linux-mm@kvack.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20210316075821.GB15949@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-CA
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 172.16.1.162
+X-SA-Exim-Rcpt-To: jianxin.xiong@intel.com, andrzej.jakowski@intel.com, sbates@raithlin.com, dan.j.williams@intel.com, daniel.vetter@ffwll.ch, jason@jlekstrand.net, jgg@ziepe.ca, christian.koenig@amd.com, willy@infradead.org, dave.hansen@linux.intel.com, jhubbard@nvidia.com, dave.b.minturn@intel.com, iommu@lists.linux-foundation.org, linux-mm@kvack.org, linux-pci@vger.kernel.org, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, robin.murphy@arm.com, hch@lst.de
+X-SA-Exim-Mail-From: logang@deltatee.com
+Subject: Re: [RFC PATCH v2 06/11] dma-direct: Support PCI P2PDMA pages in
+ dma-direct map_sg
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Mar 16, 2021 at 8:37 AM Dan Schatzberg <schatzberg.dan@gmail.com> wrote:
->
-> memalloc_use_memcg() worked for kernel allocations but was silently
-> ignored for user pages.
 
-set_active_memcg()
 
->
-> This patch establishes a precedence order for who gets charged:
->
-> 1. If there is a memcg associated with the page already, that memcg is
->    charged. This happens during swapin.
->
-> 2. If an explicit mm is passed, mm->memcg is charged. This happens
->    during page faults, which can be triggered in remote VMs (eg gup).
->
-> 3. Otherwise consult the current process context. If it has configured
->    a current->active_memcg, use that. Otherwise, current->mm->memcg.
+On 2021-03-16 1:58 a.m., Christoph Hellwig wrote:
+> On Fri, Mar 12, 2021 at 11:27:46AM -0700, Logan Gunthorpe wrote:
+>> So then we reject the patches that make that change. Seems like an odd
+>> argument to say that we can't do something that won't cause problems
+>> because someone might use it as an example and do something that will
+>> cause problems. Reject the change that causes the problem.
+> 
+> No, the problem is a mess of calling conventions.  A calling convention
+> returning 0 for error, positive values for success is fine.  One returning
+> a negative errno for error and positive values for success is fine a well.
+> One returning 0 for the usual errors and negativ errnos for an unusual
+> corner case is just a complete mess.
 
-It's a bit more sophisticated than current->active_memcg. It has been
-extended to work in interrupt context as well.
+Fair enough. I can try implementing a dma_map_sg_p2p() roughly as Robin
+suggested that has a more reasonable calling convention.
 
->
-> Previously, if a NULL mm was passed to mem_cgroup_try_charge (case 3) it
+Most of your other feedback seems easy enough so I'll address it in a
+future series.
 
-mem_cgroup_charge()
+Thanks,
 
-> would always charge the root cgroup. Now it looks up the current
-> active_memcg first (falling back to charging the root cgroup if not
-> set).
->
-> Signed-off-by: Dan Schatzberg <schatzberg.dan@gmail.com>
-> Acked-by: Johannes Weiner <hannes@cmpxchg.org>
-> Acked-by: Tejun Heo <tj@kernel.org>
-> Acked-by: Chris Down <chris@chrisdown.name>
-> Reviewed-by: Shakeel Butt <shakeelb@google.com>
-> ---
->  mm/filemap.c    |  2 +-
->  mm/memcontrol.c | 14 +++++++++++---
->  mm/shmem.c      |  4 ++--
->  3 files changed, 14 insertions(+), 6 deletions(-)
->
-> diff --git a/mm/filemap.c b/mm/filemap.c
-> index 43700480d897..5135f330f05c 100644
-> --- a/mm/filemap.c
-> +++ b/mm/filemap.c
-> @@ -843,7 +843,7 @@ noinline int __add_to_page_cache_locked(struct page *page,
->         page->index = offset;
->
->         if (!huge) {
-> -               error = mem_cgroup_charge(page, current->mm, gfp);
-> +               error = mem_cgroup_charge(page, NULL, gfp);
->                 if (error)
->                         goto error;
->                 charged = true;
-> diff --git a/mm/memcontrol.c b/mm/memcontrol.c
-> index e064ac0d850a..9a1b23ed3412 100644
-> --- a/mm/memcontrol.c
-> +++ b/mm/memcontrol.c
-> @@ -6690,7 +6690,8 @@ void mem_cgroup_calculate_protection(struct mem_cgroup *root,
->   * @gfp_mask: reclaim mode
->   *
->   * Try to charge @page to the memcg that @mm belongs to, reclaiming
-> - * pages according to @gfp_mask if necessary.
-> + * pages according to @gfp_mask if necessary. if @mm is NULL, try to
-> + * charge to the active memcg.
->   *
->   * Returns 0 on success. Otherwise, an error code is returned.
->   */
-> @@ -6726,8 +6727,15 @@ int mem_cgroup_charge(struct page *page, struct mm_struct *mm, gfp_t gfp_mask)
->                 rcu_read_unlock();
->         }
->
-> -       if (!memcg)
-> -               memcg = get_mem_cgroup_from_mm(mm);
-> +       if (!memcg) {
-> +               if (!mm) {
-> +                       memcg = get_mem_cgroup_from_current();
-> +                       if (!memcg)
-> +                               memcg = get_mem_cgroup_from_mm(current->mm);
-> +               } else {
-> +                       memcg = get_mem_cgroup_from_mm(mm);
-> +               }
-> +       }
-
-You will need to rebase to the latest mm tree. This code has changed.
+Logan
