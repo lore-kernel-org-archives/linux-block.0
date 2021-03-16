@@ -2,346 +2,219 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BD7FC433E0
-	for <linux-block@archiver.kernel.org>; Tue, 16 Mar 2021 15:26:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA1B1C433E0
+	for <linux-block@archiver.kernel.org>; Tue, 16 Mar 2021 15:38:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5D22F650E4
-	for <linux-block@archiver.kernel.org>; Tue, 16 Mar 2021 15:26:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BA932650F4
+	for <linux-block@archiver.kernel.org>; Tue, 16 Mar 2021 15:38:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230047AbhCPPZh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 Mar 2021 11:25:37 -0400
-Received: from casper.infradead.org ([90.155.50.34]:37380 "EHLO
-        casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232456AbhCPPZ1 (ORCPT
+        id S231598AbhCPPhf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Mar 2021 11:37:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37772 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234572AbhCPPhK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Mar 2021 11:25:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=YKpxXpBnW4nbd5qI6DXunIfxtVthTR1e36xUzlkaskA=; b=BM2YyQ+RcJhc+gUVaiJMbXRBN4
-        9RfoWcqJmOTZ62rocN0WvWm7V4ufUVkSbuqMzNJvP2DNvaQdbY610eFleULsjckdsHV9gixbBJfi9
-        3cXUozMHGwcnaXw4tJX2dXGq6cpK+066wpEmr0xK+mlBnkmaQktuNZ8nImXyqdK3dIkiUo9oVYZLC
-        VCtQhcLHikCpkcFJHeQi0/Tfyw8olOZSHRyKDhFGzGwaPbERAgJTo8hHr1Gx+kYiMFa9KGdAbRWZG
-        YPzMAKBjfrXP+bzms9vhYC8g0Al/9LWRN3eMazdTnNVXF0x3JS67GonT3HC28aYscl3mYZCizF51X
-        SJ78KSdA==;
-Received: from hch by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1lMBZ6-000EY4-Kn; Tue, 16 Mar 2021 15:25:00 +0000
-Date:   Tue, 16 Mar 2021 15:25:00 +0000
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Sergei Shtepa <sergei.shtepa@veeam.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-api@vger.kernel.org" <linux-api@vger.kernel.org>,
-        Pavel Tide <Pavel.TIde@veeam.com>
-Subject: Re: [PATCH v7 3/3] dm: add DM_INTERPOSED_FLAG
-Message-ID: <20210316152500.GA55711@infradead.org>
-References: <1615563895-28565-1-git-send-email-sergei.shtepa@veeam.com>
- <1615563895-28565-4-git-send-email-sergei.shtepa@veeam.com>
- <20210314093038.GC3773360@infradead.org>
- <20210315132509.GD30489@veeam.com>
- <20210316152314.GA55391@infradead.org>
+        Tue, 16 Mar 2021 11:37:10 -0400
+Received: from mail-qt1-x830.google.com (mail-qt1-x830.google.com [IPv6:2607:f8b0:4864:20::830])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EB0AC06174A;
+        Tue, 16 Mar 2021 08:37:10 -0700 (PDT)
+Received: by mail-qt1-x830.google.com with SMTP id f12so11932992qtq.4;
+        Tue, 16 Mar 2021 08:37:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Tkj0ia5hpCZDucubv8I4sizyR82LNTriAr2vMPAQj/E=;
+        b=fmqt1PM3c9r4ycT0+M0peIYt0t0qYLcjBuaENLbx/bgURKlepe0/DFmwjyLv+NL1Bp
+         6BU8XJAV59vNYUVC9nXjmBpPTRRNCP/CTiplDVoETJt9qLIDRkS7W2GRQKQczjlEU/yv
+         NJ5y4i+hWh9cJyzwXPEsmB19k3cNXI7y8h4SyZmhZdnIIvSKoXFtqiMXn54u107oblhr
+         qN9rTSkdIoB3UUciSVvUOqZeHFgmPwkCL456MECrA54N5VUoh3QnQqHqs+k3d4jOldwF
+         cDzQ8oeLbXMQ+chuTZxAdS2KeMuB9lkB40aYVhq36Gfdj2n4zSKFXWJ4ANDmsMvl60rK
+         qCuw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Tkj0ia5hpCZDucubv8I4sizyR82LNTriAr2vMPAQj/E=;
+        b=HwqfQDaEXxgjg66oPTiVLUDV1OT9+Mw09oUt5+0y+kVampVtzzdFVI8mwu1e8cDXCT
+         qHV5lzZglMgs0EhaWkMFTFVNc3b1CqZ4+iyfZD9kIPF8ZumSI4Q219YvQrwgry2eTsiA
+         XFAWcLVatDmQz27TgOyZc3PBPok+5XMbjj3LzJ8KJMEDKGdrqidObFOSWoiLQ19B+MAf
+         GXxrmDEcOXCVJdYUlOaIIzc5A/PYKbeSNF1xsxW21lKG9Cw1XcHBOwgxR2lbKKobfjaH
+         Jpvv3L46X6wxdfPz/Fu2JCukHt8fbOORw2cLHgPLf0l3lmfU5CQriGBHujTWugdLcEhD
+         aB4g==
+X-Gm-Message-State: AOAM531gUXV57hnjFzFE7SJP57NvuiBdSz07OYCg7dREBf4gVpx8C5A6
+        lv6OEel7qOME8EAgxpWsgwU=
+X-Google-Smtp-Source: ABdhPJwemAre0PlJRoHQM1SeNE4jPOqETZrw2LN1kDiEtB+J4YeYq2Pdj3MbPBjFrm3tG+aawQdU1A==
+X-Received: by 2002:ac8:7f52:: with SMTP id g18mr273540qtk.250.1615909029421;
+        Tue, 16 Mar 2021 08:37:09 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:480::1:1ee])
+        by smtp.gmail.com with ESMTPSA id v7sm15321005qkv.86.2021.03.16.08.37.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Mar 2021 08:37:09 -0700 (PDT)
+From:   Dan Schatzberg <schatzberg.dan@gmail.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        Zefan Li <lizefan.x@bytedance.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        Vladimir Davydov <vdavydov.dev@gmail.com>,
+        Hugh Dickins <hughd@google.com>,
+        Shakeel Butt <shakeelb@google.com>,
+        Roman Gushchin <guro@fb.com>,
+        Muchun Song <songmuchun@bytedance.com>,
+        Alex Shi <alex.shi@linux.alibaba.com>,
+        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+        Chris Down <chris@chrisdown.name>,
+        Yafang Shao <laoar.shao@gmail.com>,
+        Wei Yang <richard.weiyang@gmail.com>,
+        linux-block@vger.kernel.org (open list:BLOCK LAYER),
+        linux-kernel@vger.kernel.org (open list),
+        cgroups@vger.kernel.org (open list:CONTROL GROUP (CGROUP)),
+        linux-mm@kvack.org (open list:MEMORY MANAGEMENT)
+Subject: [PATCH v10 0/3] Charge loop device i/o to issuing cgroup
+Date:   Tue, 16 Mar 2021 08:36:49 -0700
+Message-Id: <20210316153655.500806-1-schatzberg.dan@gmail.com>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210316152314.GA55391@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
+To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Mar 16, 2021 at 03:23:14PM +0000, Christoph Hellwig wrote:
-> On Mon, Mar 15, 2021 at 04:25:09PM +0300, Sergei Shtepa wrote:
-> > The 03/14/2021 12:30, Christoph Hellwig wrote:
-> > > On Fri, Mar 12, 2021 at 06:44:55PM +0300, Sergei Shtepa wrote:
-> > > > DM_INTERPOSED_FLAG allow to create DM targets on "the fly".
-> > > > Underlying block device opens without a flag FMODE_EXCL.
-> > > > DM target receives bio from the original device via
-> > > > bdev_interposer.
-> > > 
-> > > This is more of a philopical comment, but the idea of just letting the
-> > > interposed reopen the device by itself seems like a bad idea.  I think
-> > > that is probably better hidden in the block layer interposer attachment
-> > > function, which could do the extra blkdev_get_by_dev for the caller.
-> > 
-> > I suppose this cannot be implemented, since we need to change the behavior
-> > for block devices that already have been opened.
-> 
-> That's not what I mean.  Take a look at the patch relative to your
-> series to let me know what you think.  The new blkdev_interposer_attach
-> now takes a dev_t + mode for the original device and opens it on
-> behalf of the interposer.  It also moves the queue freezing into the
-> API, which should address the concerns about the helper and adds a few
-> more sanity checks.
+No major changes, just rebasing and resubmitting
 
-And now actually with the diff:
+Changes since V10:
 
+* Added page-cache charging to mm: Charge active memcg when no mm is set
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 2f188a865024ac..d4d7c1caa43966 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -161,19 +161,6 @@ int blk_mq_freeze_queue_wait_timeout(struct request_queue *q,
- }
- EXPORT_SYMBOL_GPL(blk_mq_freeze_queue_wait_timeout);
- 
--bool blk_mq_is_queue_frozen(struct request_queue *q)
--{
--	bool frozen;
--
--	mutex_lock(&q->mq_freeze_lock);
--	frozen = percpu_ref_is_dying(&q->q_usage_counter) &&
--		 percpu_ref_is_zero(&q->q_usage_counter);
--	mutex_unlock(&q->mq_freeze_lock);
--
--	return frozen;
--}
--EXPORT_SYMBOL_GPL(blk_mq_is_queue_frozen);
--
- /*
-  * Guarantee no request is in use, so we can change any data structure of
-  * the queue afterward.
-diff --git a/block/genhd.c b/block/genhd.c
-index fa406b972371ae..64d6338b08cc87 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -1944,51 +1944,70 @@ static void disk_release_events(struct gendisk *disk)
- 	kfree(disk->ev);
- }
- 
--int bdev_interposer_attach(struct block_device *original,
-+struct block_device *blkdev_interposer_attach(dev_t dev, fmode_t mode,
- 			   struct block_device *interposer)
- {
-+	struct block_device *bdev;
- 	int ret = 0;
- 
--	if (WARN_ON(((!original) || (!interposer))))
--		return -EINVAL;
--	/*
--	 * interposer should be simple, no a multi-queue device
--	 */
--	if (!interposer->bd_disk->fops->submit_bio)
--		return -EINVAL;
-+	if (WARN_ON_ONCE(!bdev_is_partition(interposer)))
-+		return ERR_PTR(-EINVAL);
-+	if (WARN_ON_ONCE(!queue_is_mq(interposer->bd_disk->queue)))
-+		return ERR_PTR(-EINVAL);
- 
--	if (WARN_ON(!blk_mq_is_queue_frozen(original->bd_disk->queue)))
--		return -EPERM;
-+	bdev = blkdev_get_by_dev(dev, mode, NULL);
-+	if (IS_ERR(bdev))
-+		return bdev;
- 
--	mutex_lock(&bdev_interposer_attach_lock);
-+	ret = -EINVAL;
-+	if (WARN_ON_ONCE(bdev_nr_sectors(bdev) != bdev_nr_sectors(interposer)))
-+		goto out;
- 
--	if (bdev_has_interposer(original))
--		ret = -EBUSY;
--	else {
--		original->bd_interposer = bdgrab(interposer);
--		if (!original->bd_interposer)
--			ret = -ENODEV;
--	}
-+	blk_mq_freeze_queue(bdev->bd_disk->queue);
-+	blk_mq_quiesce_queue(bdev->bd_disk->queue);
- 
-+	mutex_lock(&bdev_interposer_attach_lock);
-+	ret = -EBUSY;
-+	if (bdev_has_interposer(bdev))
-+		goto out_unlock;
-+	ret = -ENODEV;
-+	bdev->bd_interposer = bdgrab(interposer);
-+	if (!bdev->bd_interposer)
-+		goto out_unlock;
-+	ret = 0;
-+out_unlock:
- 	mutex_unlock(&bdev_interposer_attach_lock);
- 
--	return ret;
-+	blk_mq_unquiesce_queue(bdev->bd_disk->queue);
-+	blk_mq_unfreeze_queue(bdev->bd_disk->queue);
-+out:
-+	if (ret) {
-+		blkdev_put(bdev, mode);
-+		bdev = ERR_PTR(ret);
-+	}
-+
-+	return bdev;
- }
--EXPORT_SYMBOL_GPL(bdev_interposer_attach);
-+EXPORT_SYMBOL_GPL(blkdev_interposer_attach);
- 
--void bdev_interposer_detach(struct block_device *original)
-+void blkdev_interposer_detach(struct block_device *bdev, fmode_t mode)
- {
--	if (WARN_ON(!original))
--		return;
-+	struct block_device *interposer;
- 
--	if (WARN_ON(!blk_mq_is_queue_frozen(original->bd_disk->queue)))
-+	if (WARN_ON_ONCE(!bdev_has_interposer(bdev)))
- 		return;
- 
-+	blk_mq_freeze_queue(bdev->bd_disk->queue);
-+	blk_mq_quiesce_queue(bdev->bd_disk->queue);
-+
- 	mutex_lock(&bdev_interposer_attach_lock);
--	if (bdev_has_interposer(original)) {
--		bdput(original->bd_interposer);
--		original->bd_interposer = NULL;
--	}
-+	interposer = bdev->bd_interposer;
-+	bdev->bd_interposer = NULL;
- 	mutex_unlock(&bdev_interposer_attach_lock);
-+
-+	blk_mq_unquiesce_queue(bdev->bd_disk->queue);
-+	blk_mq_unfreeze_queue(bdev->bd_disk->queue);
-+
-+	blkdev_put(interposer, mode);
- }
--EXPORT_SYMBOL_GPL(bdev_interposer_detach);
-+EXPORT_SYMBOL_GPL(blkdev_interposer_detach);
-diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
-index f6e2eb3f894940..fde57bb5105025 100644
---- a/drivers/md/dm-table.c
-+++ b/drivers/md/dm-table.c
-@@ -359,18 +359,6 @@ dev_t dm_get_dev_t(const char *path)
- }
- EXPORT_SYMBOL_GPL(dm_get_dev_t);
- 
--static inline void dm_disk_freeze(struct gendisk *disk)
--{
--	blk_mq_freeze_queue(disk->queue);
--	blk_mq_quiesce_queue(disk->queue);
--}
--
--static inline void dm_disk_unfreeze(struct gendisk *disk)
--{
--	blk_mq_unquiesce_queue(disk->queue);
--	blk_mq_unfreeze_queue(disk->queue);
--}
--
- /*
-  * Add a device to the list, or just increment the usage count if
-  * it's already present.
-@@ -418,29 +406,11 @@ int dm_get_device(struct dm_target *ti, const char *path, fmode_t mode,
- 		refcount_inc(&dd->count);
- 	}
- 
--	if (t->md->is_interposed) {
--		struct block_device *original = dd->dm_dev->bdev;
--		struct block_device *interposer = t->md->disk->part0;
--
--		if ((ti->begin != 0) || (ti->len < bdev_nr_sectors(original))) {
--			dm_put_device(ti, dd->dm_dev);
--			DMERR("The interposer device should not be less than the original.");
--			return -EINVAL;
--		}
--
--		/*
--		 * Attach mapped interposer device to original.
--		 * It is quite convenient that device mapper creates
--		 * one disk for one block device.
--		 */
--		dm_disk_freeze(original->bd_disk);
--		r = bdev_interposer_attach(original, interposer);
--		dm_disk_unfreeze(original->bd_disk);
--		if (r) {
--			dm_put_device(ti, dd->dm_dev);
--			DMERR("Failed to attach dm interposer.");
--			return r;
--		}
-+	if (t->md->is_interposed &&
-+	    (ti->begin != 0 || ti->len < bdev_nr_sectors(dd->dm_dev->bdev))) {
-+		dm_put_device(ti, dd->dm_dev);
-+		DMERR("The interposer device should not be less than the original.");
-+		return -EINVAL;
- 	}
- 
- 	*result = dd->dm_dev;
-@@ -496,11 +466,6 @@ void dm_put_device(struct dm_target *ti, struct dm_dev *d)
- 		       dm_device_name(md), d->name);
- 		return;
- 	}
--	if (md->is_interposed) {
--		dm_disk_freeze(d->bdev->bd_disk);
--		bdev_interposer_detach(d->bdev);
--		dm_disk_unfreeze(d->bdev->bd_disk);
--	}
- 
- 	if (refcount_dec_and_test(&dd->count)) {
- 		dm_put_table_device(md, d);
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index c488e9554aa000..532ce17064b1c1 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -763,10 +763,12 @@ static int open_table_device(struct table_device *td, dev_t dev,
- 	BUG_ON(td->dm_dev.bdev);
- 
- 	if (md->is_interposed) {
--
--		bdev = blkdev_get_by_dev(dev, td->dm_dev.mode, NULL);
--		if (IS_ERR(bdev))
-+		bdev = blkdev_interposer_attach(dev, td->dm_dev.mode,
-+						md->disk->part0);
-+		if (IS_ERR(bdev)) {
-+			DMERR("Failed to attach dm interposer.");
- 			return PTR_ERR(bdev);
-+		}
- 	} else {
- 		bdev = blkdev_get_by_dev(dev, td->dm_dev.mode | FMODE_EXCL, _dm_claim_ptr);
- 		if (IS_ERR(bdev))
-@@ -793,9 +795,9 @@ static void close_table_device(struct table_device *td, struct mapped_device *md
- 	if (!td->dm_dev.bdev)
- 		return;
- 
--	if (td->dm_dev.is_interposed)
--		blkdev_put(td->dm_dev.bdev, td->dm_dev.mode);
--	else {
-+	if (td->dm_dev.is_interposed) {
-+		blkdev_interposer_detach(td->dm_dev.bdev, td->dm_dev.mode);
-+	} else {
- 		bd_unlink_disk_holder(td->dm_dev.bdev, dm_disk(md));
- 		blkdev_put(td->dm_dev.bdev, td->dm_dev.mode | FMODE_EXCL);
- 	}
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 6f01971abf7b9b..2c473c9b899089 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -533,7 +533,6 @@ void blk_freeze_queue_start(struct request_queue *q);
- void blk_mq_freeze_queue_wait(struct request_queue *q);
- int blk_mq_freeze_queue_wait_timeout(struct request_queue *q,
- 				     unsigned long timeout);
--bool blk_mq_is_queue_frozen(struct request_queue *q);
- 
- int blk_mq_map_queues(struct blk_mq_queue_map *qmap);
- void blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set, int nr_hw_queues);
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 90f62b4197da91..fbc510162c3827 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -2036,8 +2036,8 @@ static inline bool bdev_has_interposer(struct block_device *bdev)
- 	return (bdev->bd_interposer != NULL);
- };
- 
--int bdev_interposer_attach(struct block_device *original,
-+struct block_device *blkdev_interposer_attach(dev_t dev, fmode_t mode,
- 			   struct block_device *interposer);
--void bdev_interposer_detach(struct block_device *original);
-+void blkdev_interposer_detach(struct block_device *bdev, fmode_t mode);
- 
- #endif /* _LINUX_BLKDEV_H */
+Changes since V9:
+
+* Rebased against linus's branch which now includes Roman Gushchin's
+  patch this series is based off of
+
+Changes since V8:
+
+* Rebased on top of Roman Gushchin's patch
+  (https://lkml.org/lkml/2020/8/21/1464) which provides the nesting
+  support for setting active memcg. Dropped the patch from this series
+  that did the same thing.
+
+Changes since V7:
+
+* Rebased against linus's branch
+
+Changes since V6:
+
+* Added separate spinlock for worker synchronization
+* Minor style changes
+
+Changes since V5:
+
+* Fixed a missing css_put when failing to allocate a worker
+* Minor style changes
+
+Changes since V4:
+
+Only patches 1 and 2 have changed.
+
+* Fixed irq lock ordering bug
+* Simplified loop detach
+* Added support for nesting memalloc_use_memcg
+
+Changes since V3:
+
+* Fix race on loop device destruction and deferred worker cleanup
+* Ensure charge on shmem_swapin_page works just like getpage
+* Minor style changes
+
+Changes since V2:
+
+* Deferred destruction of workqueue items so in the common case there
+  is no allocation needed
+
+Changes since V1:
+
+* Split out and reordered patches so cgroup charging changes are
+  separate from kworker -> workqueue change
+
+* Add mem_css to struct loop_cmd to simplify logic
+
+The loop device runs all i/o to the backing file on a separate kworker
+thread which results in all i/o being charged to the root cgroup. This
+allows a loop device to be used to trivially bypass resource limits
+and other policy. This patch series fixes this gap in accounting.
+
+A simple script to demonstrate this behavior on cgroupv2 machine:
+
+'''
+#!/bin/bash
+set -e
+
+CGROUP=/sys/fs/cgroup/test.slice
+LOOP_DEV=/dev/loop0
+
+if [[ ! -d $CGROUP ]]
+then
+    sudo mkdir $CGROUP
+fi
+
+grep oom_kill $CGROUP/memory.events
+
+# Set a memory limit, write more than that limit to tmpfs -> OOM kill
+sudo unshare -m bash -c "
+echo \$\$ > $CGROUP/cgroup.procs;
+echo 0 > $CGROUP/memory.swap.max;
+echo 64M > $CGROUP/memory.max;
+mount -t tmpfs -o size=512m tmpfs /tmp;
+dd if=/dev/zero of=/tmp/file bs=1M count=256" || true
+
+grep oom_kill $CGROUP/memory.events
+
+# Set a memory limit, write more than that limit through loopback
+# device -> no OOM kill
+sudo unshare -m bash -c "
+echo \$\$ > $CGROUP/cgroup.procs;
+echo 0 > $CGROUP/memory.swap.max;
+echo 64M > $CGROUP/memory.max;
+mount -t tmpfs -o size=512m tmpfs /tmp;
+truncate -s 512m /tmp/backing_file
+losetup $LOOP_DEV /tmp/backing_file
+dd if=/dev/zero of=$LOOP_DEV bs=1M count=256;
+losetup -D $LOOP_DEV" || true
+
+grep oom_kill $CGROUP/memory.events
+'''
+
+Naively charging cgroups could result in priority inversions through
+the single kworker thread in the case where multiple cgroups are
+reading/writing to the same loop device. This patch series does some
+minor modification to the loop driver so that each cgroup can make
+forward progress independently to avoid this inversion.
+
+With this patch series applied, the above script triggers OOM kills
+when writing through the loop device as expected.
+
+Dan Schatzberg (3):
+  loop: Use worker per cgroup instead of kworker
+  mm: Charge active memcg when no mm is set
+  loop: Charge i/o to mem and blk cg
+
+ drivers/block/loop.c       | 248 ++++++++++++++++++++++++++++++-------
+ drivers/block/loop.h       |  15 ++-
+ include/linux/memcontrol.h |  11 ++
+ kernel/cgroup/cgroup.c     |   1 +
+ mm/filemap.c               |   2 +-
+ mm/memcontrol.c            |  15 ++-
+ mm/shmem.c                 |   4 +-
+ 7 files changed, 242 insertions(+), 54 deletions(-)
+
+-- 
+2.30.2
+
