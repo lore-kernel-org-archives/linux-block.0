@@ -2,259 +2,110 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFB20C433E0
-	for <linux-block@archiver.kernel.org>; Tue, 16 Mar 2021 16:36:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B09DC433E6
+	for <linux-block@archiver.kernel.org>; Tue, 16 Mar 2021 17:00:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9EA9D6510B
-	for <linux-block@archiver.kernel.org>; Tue, 16 Mar 2021 16:36:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4D4EF65113
+	for <linux-block@archiver.kernel.org>; Tue, 16 Mar 2021 17:00:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237951AbhCPQgI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 Mar 2021 12:36:08 -0400
-Received: from mx4.veeam.com ([104.41.138.86]:59098 "EHLO mx4.veeam.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S237871AbhCPQf6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Mar 2021 12:35:58 -0400
-Received: from mail.veeam.com (prgmbx01.amust.local [172.24.0.171])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mx4.veeam.com (Postfix) with ESMTPS id 3FCF38A77C;
-        Tue, 16 Mar 2021 19:35:53 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com; s=mx4;
-        t=1615912553; bh=F1gKLL7wk3iE1vLbPnTkUW3slRzh6GWWwMLJyS5YH1U=;
-        h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-        b=LgzU5IuRT4MU2/aszmA5F9lbIBFZyR0JP9db5s+sCQFZiTjb45y6KnOJxlsOfzgGF
-         2TgpDyaufoHsv+9icTxQL+xZ6vLqIKVJ3pB4tYjq5umA9JBEcWgrbih71QTueezVpN
-         YP/fey343S+4gT4Xc9pWcLfTWJlQBacMoU6aItoE=
-Received: from veeam.com (172.24.14.5) by prgmbx01.amust.local (172.24.0.171)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.721.2; Tue, 16 Mar 2021
- 17:35:50 +0100
-Date:   Tue, 16 Mar 2021 19:35:44 +0300
-From:   Sergei Shtepa <sergei.shtepa@veeam.com>
-To:     Ming Lei <ming.lei@redhat.com>
-CC:     Christoph Hellwig <hch@infradead.org>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        id S236988AbhCPRA0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Mar 2021 13:00:26 -0400
+Received: from mail-pg1-f175.google.com ([209.85.215.175]:34115 "EHLO
+        mail-pg1-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236971AbhCPRAH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 16 Mar 2021 13:00:07 -0400
+Received: by mail-pg1-f175.google.com with SMTP id l2so23017011pgb.1;
+        Tue, 16 Mar 2021 10:00:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=nzyLAzp9XA/aLRyNpG0/Wcg9B/Qt9o8s5jH7pFizpQ4=;
+        b=Rvc6We7+gel/t8EHnvng0RFCNL6j9Pc4mE5ONJY21Ep1Zmuh75JQc3VmwEaQ/ndMjz
+         jCyiiEW6NeaQGcT3x+y+EHw9GWDSth2NGgZ0tbuf57srU1VK2tlmMLX2HecoAQY6A/cO
+         Yay4IGuZ7noVfyMa+OXiQw2PGHUeQBZ1esvGzPtU0vAS0/vUmSrIHHjVqNycDsLkQoAU
+         xE5lrhbHYSt56UGyFGCbdfbIRT+o6HYI8WK8U5mcLa603wPb6DMubqVaa3p/1PIM1VIJ
+         FNuHzkCYYEVihC3etv9pxqO9KDjbZ/sN+0D+L/aY19Ps/l77QaYCPOyzf7IKIbwaesE1
+         gkMg==
+X-Gm-Message-State: AOAM530AOihWkYKAnPYnFG99jNET868Mvn1RkaxTniUpZx9vAlONzkyX
+        YMPgIejIbYLvku3mGWasJO0=
+X-Google-Smtp-Source: ABdhPJzwgAcQRWzQ7BNkdV+5+2zLQZOZCBZ4yDYZU85bxU+58iHR/myQ0FSqa4J/UqY4FEu2DTTm+Q==
+X-Received: by 2002:a05:6a00:138e:b029:204:422e:a87e with SMTP id t14-20020a056a00138eb0290204422ea87emr547433pfg.24.1615914006283;
+        Tue, 16 Mar 2021 10:00:06 -0700 (PDT)
+Received: from [192.168.51.110] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
+        by smtp.gmail.com with ESMTPSA id 2sm16901197pfi.116.2021.03.16.10.00.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 16 Mar 2021 10:00:05 -0700 (PDT)
+Subject: Re: [RFC PATCH v3 2/3] blk-mq: Freeze and quiesce all queues for
+ tagset in elevator_exit()
+To:     John Garry <john.garry@huawei.com>, Ming Lei <ming.lei@redhat.com>
+Cc:     "hare@suse.de" <hare@suse.de>, "axboe@kernel.dk" <axboe@kernel.dk>,
+        "hch@lst.de" <hch@lst.de>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-api@vger.kernel.org" <linux-api@vger.kernel.org>,
-        Pavel Tide <Pavel.TIde@veeam.com>
-Subject: Re: [PATCH v7 2/3] block: add bdev_interposer
-Message-ID: <20210316163544.GA31272@veeam.com>
-References: <1615563895-28565-1-git-send-email-sergei.shtepa@veeam.com>
- <1615563895-28565-3-git-send-email-sergei.shtepa@veeam.com>
- <YFBnypYemiR08A/c@T590>
+        "pragalla@codeaurora.org" <pragalla@codeaurora.org>,
+        "kashyap.desai@broadcom.com" <kashyap.desai@broadcom.com>,
+        yuyufen <yuyufen@huawei.com>
+References: <1614957294-188540-1-git-send-email-john.garry@huawei.com>
+ <1614957294-188540-3-git-send-email-john.garry@huawei.com>
+ <YElrSFGyim3rjDN+@T590> <8c6c6783-6152-2332-2f50-14c409e40320@huawei.com>
+ <2b0c66ba-03b3-844c-1684-f8e80d11cdbb@acm.org>
+ <4ffaba53-100a-43a5-8746-b753d4153be5@huawei.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <fff92b15-d483-ad6a-bb01-ef61117b7cbd@acm.org>
+Date:   Tue, 16 Mar 2021 10:00:02 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-In-Reply-To: <YFBnypYemiR08A/c@T590>
-X-Originating-IP: [172.24.14.5]
-X-ClientProxiedBy: prgmbx02.amust.local (172.24.0.172) To prgmbx01.amust.local
- (172.24.0.171)
-X-EsetResult: clean, is OK
-X-EsetId: 37303A29D2A50B586D756B
-X-Veeam-MMEX: True
+In-Reply-To: <4ffaba53-100a-43a5-8746-b753d4153be5@huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The 03/16/2021 11:09, Ming Lei wrote:
-> On Fri, Mar 12, 2021 at 06:44:54PM +0300, Sergei Shtepa wrote:
-> > bdev_interposer allows to redirect bio requests to another devices.
-> > 
-> > Signed-off-by: Sergei Shtepa <sergei.shtepa@veeam.com>
-> > ---
-> >  block/bio.c               |  2 ++
-> >  block/blk-core.c          | 57 +++++++++++++++++++++++++++++++++++++++
-> >  block/genhd.c             | 54 +++++++++++++++++++++++++++++++++++++
-> >  include/linux/blk_types.h |  3 +++
-> >  include/linux/blkdev.h    |  9 +++++++
-> >  5 files changed, 125 insertions(+)
-> > 
-> > diff --git a/block/bio.c b/block/bio.c
-> > index a1c4d2900c7a..0bfbf06475ee 100644
-> > --- a/block/bio.c
-> > +++ b/block/bio.c
-> > @@ -640,6 +640,8 @@ void __bio_clone_fast(struct bio *bio, struct bio *bio_src)
-> >  		bio_set_flag(bio, BIO_THROTTLED);
-> >  	if (bio_flagged(bio_src, BIO_REMAPPED))
-> >  		bio_set_flag(bio, BIO_REMAPPED);
-> > +	if (bio_flagged(bio_src, BIO_INTERPOSED))
-> > +		bio_set_flag(bio, BIO_INTERPOSED);
-> >  	bio->bi_opf = bio_src->bi_opf;
-> >  	bio->bi_ioprio = bio_src->bi_ioprio;
-> >  	bio->bi_write_hint = bio_src->bi_write_hint;
-> > diff --git a/block/blk-core.c b/block/blk-core.c
-> > index fc60ff208497..da1abc4c27a9 100644
-> > --- a/block/blk-core.c
-> > +++ b/block/blk-core.c
-> > @@ -1018,6 +1018,55 @@ static blk_qc_t __submit_bio_noacct_mq(struct bio *bio)
-> >  	return ret;
-> >  }
-> >  
-> > +static noinline blk_qc_t submit_bio_interposed(struct bio *bio)
-> > +{
-> > +	blk_qc_t ret = BLK_QC_T_NONE;
-> > +	struct bio_list bio_list[2] = { };
-> > +	struct gendisk *orig_disk;
-> > +
-> > +	if (current->bio_list) {
-> > +		bio_list_add(&current->bio_list[0], bio);
-> > +		return BLK_QC_T_NONE;
-> > +	}
-> > +
-> > +	orig_disk = bio->bi_bdev->bd_disk;
-> > +	if (unlikely(bio_queue_enter(bio)))
-> > +		return BLK_QC_T_NONE;
-> > +
-> > +	current->bio_list = bio_list;
-> > +
-> > +	do {
-> > +		struct block_device *interposer = bio->bi_bdev->bd_interposer;
-> > +
-> > +		if (unlikely(!interposer)) {
-> > +			/* interposer was removed */
-> > +			bio_list_add(&current->bio_list[0], bio);
-> > +			break;
-> > +		}
-> > +		/* assign bio to interposer device */
-> > +		bio_set_dev(bio, interposer);
-> > +		bio_set_flag(bio, BIO_INTERPOSED);
-> > +
-> > +		if (!submit_bio_checks(bio))
-> > +			break;
-> > +		/*
-> > +		 * Because the current->bio_list is initialized,
-> > +		 * the submit_bio callback will always return BLK_QC_T_NONE.
-> > +		 */
-> > +		interposer->bd_disk->fops->submit_bio(bio);
+On 3/16/21 9:15 AM, John Garry wrote:
+> I'll have a look at this ASAP -  a bit busy.
 > 
-> Given original request queue may become live when calling attach() and
-> detach(), see below comment. bdev_interposer_detach() may be run
-> when running ->submit_bio(), meantime the interposer device is
-> gone during the period, then kernel oops.
+> But a quick scan and I notice this:
+> 
+>  > @@ -226,6 +226,7 @@ static inline void __blk_mq_put_driver_tag(struct 
+> blk_mq_hw_ctx *hctx,
+>  >                          struct request *rq)
+>  >   {
+>  >       blk_mq_put_tag(hctx->tags, rq->mq_ctx, rq->tag);
+>  > +    rcu_assign_pointer(hctx->tags->rqs[rq->tag], NULL);
+> 
+> Wasn't a requirement to not touch the fastpath at all, including even if 
+> only NULLifying a pointer?
+> 
+> IIRC, Kashyap some time ago had a patch like above (but without RCU 
+> usage), but the request from Jens was to not touch the fastpath.
+> 
+> Maybe I'm mistaken - I will try to dig up the thread.
 
-I think that since the bio_queue_enter() function was called,
-q->q_usage_counter will not allow the critical code in the attach/detach
-functions to be executed, which is located between the blk_freeze_queue
-and blk_unfreeze_queue calls.
-Please correct me if I'm wrong.
+Hi John,
 
-> 
-> > +	} while (false);
-> > +
-> > +	current->bio_list = NULL;
-> > +
-> > +	blk_queue_exit(orig_disk->queue);
-> > +
-> > +	/* Resubmit remaining bios */
-> > +	while ((bio = bio_list_pop(&bio_list[0])))
-> > +		ret = submit_bio_noacct(bio);
-> > +
-> > +	return ret;
-> > +}
-> > +
-> >  /**
-> >   * submit_bio_noacct - re-submit a bio to the block device layer for I/O
-> >   * @bio:  The bio describing the location in memory and on the device.
-> > @@ -1029,6 +1078,14 @@ static blk_qc_t __submit_bio_noacct_mq(struct bio *bio)
-> >   */
-> >  blk_qc_t submit_bio_noacct(struct bio *bio)
-> >  {
-> > +	/*
-> > +	 * Checking the BIO_INTERPOSED flag is necessary so that the bio
-> > +	 * created by the bdev_interposer do not get to it for processing.
-> > +	 */
-> > +	if (bdev_has_interposer(bio->bi_bdev) &&
-> > +	    !bio_flagged(bio, BIO_INTERPOSED))
-> > +		return submit_bio_interposed(bio);
-> > +
-> >  	if (!submit_bio_checks(bio))
-> >  		return BLK_QC_T_NONE;
-> >  
-> > diff --git a/block/genhd.c b/block/genhd.c
-> > index c55e8f0fced1..c840ecffea68 100644
-> > --- a/block/genhd.c
-> > +++ b/block/genhd.c
-> > @@ -30,6 +30,11 @@
-> >  static struct kobject *block_depr;
-> >  
-> >  DECLARE_RWSEM(bdev_lookup_sem);
-> > +/*
-> > + * Prevents different block-layer interposers from attaching or detaching
-> > + * to the block device at the same time.
-> > + */
-> > +static DEFINE_MUTEX(bdev_interposer_attach_lock);
-> >  
-> >  /* for extended dynamic devt allocation, currently only one major is used */
-> >  #define NR_EXT_DEVT		(1 << MINORBITS)
-> > @@ -1940,3 +1945,52 @@ static void disk_release_events(struct gendisk *disk)
-> >  	WARN_ON_ONCE(disk->ev && disk->ev->block != 1);
-> >  	kfree(disk->ev);
-> >  }
-> > +
-> > +int bdev_interposer_attach(struct block_device *original,
-> > +			   struct block_device *interposer)
-> > +{
-> > +	int ret = 0;
-> > +
-> > +	if (WARN_ON(((!original) || (!interposer))))
-> > +		return -EINVAL;
-> > +	/*
-> > +	 * interposer should be simple, no a multi-queue device
-> > +	 */
-> > +	if (!interposer->bd_disk->fops->submit_bio)
-> > +		return -EINVAL;
-> > +
-> > +	if (WARN_ON(!blk_mq_is_queue_frozen(original->bd_disk->queue)))
-> > +		return -EPERM;
-> 
-> The original request queue may become live now...
+I agree that Jens asked at the end of 2018 not to touch the fast path to 
+fix this use-after-free (maybe that request has been repeated more 
+recently). If Jens or anyone else feels strongly about not clearing 
+hctx->tags->rqs[rq->tag] from the fast path then I will make that 
+change. My motivation for clearing these pointers from the fast path is 
+as follows:
+- This results in code that is easier to read and easier to maintain.
+- Every modern CPU pipelines store instructions so the performance 
+impact of adding an additional store should be small.
+- Since the block layer has a tendency to reuse tags that have been 
+freed recently, it is likely that hctx->tags->rqs[rq->tag] will be used 
+for a next request and hence that it will have to be loaded into the CPU 
+cache anyway.
 
-Yes.
-I will remove the blk_mq_is_queue_frozen() function and use a different
-approach.
-
-> 
-> > +
-> > +	mutex_lock(&bdev_interposer_attach_lock);
-> > +
-> > +	if (bdev_has_interposer(original))
-> > +		ret = -EBUSY;
-> > +	else {
-> > +		original->bd_interposer = bdgrab(interposer);
-> > +		if (!original->bd_interposer)
-> > +			ret = -ENODEV;
-> > +	}
-> > +
-> > +	mutex_unlock(&bdev_interposer_attach_lock);
-> > +
-> > +	return ret;
-> > +}
-> > +EXPORT_SYMBOL_GPL(bdev_interposer_attach);
-> > +
-> > +void bdev_interposer_detach(struct block_device *original)
-> > +{
-> > +	if (WARN_ON(!original))
-> > +		return;
-> > +
-> > +	if (WARN_ON(!blk_mq_is_queue_frozen(original->bd_disk->queue)))
-> > +		return;
-> 
-> The original request queue may become live now...
-> 
-> 
-> -- 
-> Ming
-> 
-
--- 
-Sergei Shtepa
-Veeam Software developer.
+Bart.
