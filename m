@@ -6,79 +6,77 @@ X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEFC9C433DB
-	for <linux-block@archiver.kernel.org>; Tue, 16 Mar 2021 14:39:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DB0AC433E0
+	for <linux-block@archiver.kernel.org>; Tue, 16 Mar 2021 15:24:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A937965081
-	for <linux-block@archiver.kernel.org>; Tue, 16 Mar 2021 14:39:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3B30965074
+	for <linux-block@archiver.kernel.org>; Tue, 16 Mar 2021 15:24:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236646AbhCPOiw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 Mar 2021 10:38:52 -0400
-Received: from casper.infradead.org ([90.155.50.34]:34912 "EHLO
+        id S236108AbhCPPYB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Mar 2021 11:24:01 -0400
+Received: from casper.infradead.org ([90.155.50.34]:37308 "EHLO
         casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236705AbhCPOil (ORCPT
+        with ESMTP id S229973AbhCPPXh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Mar 2021 10:38:41 -0400
-X-Greylist: delayed 1491 seconds by postgrey-1.27 at vger.kernel.org; Tue, 16 Mar 2021 10:38:38 EDT
+        Tue, 16 Mar 2021 11:23:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
         References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=rP6CC9aFyoPKSVnxzeAObDkX6GZ6Hhe9Q4ri+l1u2pA=; b=cH/w8vwNvLgG0SrRl2Nt+Fypv4
-        QOXU8VhtVPS06zEJcVM/wsZRBm/HxFuL7D91SfEotUGCMU+/gi+VzHXFtP6PNZre6qRjHKndk/wf6
-        z8AARNbhLCbMiMuvUhhhoyBo69Wo/Hwzj9NiIzU03/c5iR56Vx/eTWIhLr9nKcrcON+tphU0DDoim
-        RJAaD6OXJH80dt+vLa6fUU3+FlwPldkltU1TStVILQpXKNqpFuu6ErwPUWUDdYmOo9b2kWDe+el9d
-        nYJbWOCmcKwi1+QcVMtubksLCQqN413h1M3QvRxLihBxoVPaLGaE53BZY2nYC3pBwGh9162n2v8Ca
-        9j8ywUOA==;
+        bh=2LFHkTsbHPGvR5g6piEA0fvad3DcfT58cnGlmZRHYxs=; b=SmkVxld2/3wHzaFeYQD+egXhSj
+        L7BVcHR8AYpXEa7EaRy9Y6/uic1TmA6nuyXq6JLKgxEaRUBYbZ137cq6Id2jXRz+ZeoyfljtYwfdq
+        mPv1APPaZDCodHCZSs6V4eo3q+LNv6rkbEDws06jEuEKHy/ncJ7lq/VKrG745fBs0A8YFKqyPu3O5
+        ARFJpkb5jRqrcPwp8ZyAWmDX8dWOPBRa+KidI3PgQuHz92dFfUXTGcwoIoBl86cvxV2866vJ8qBFf
+        VtODKAayUQEul+uh4hdiVpvnaLEj02mN5+CsJC8vYCNsJpE2AwxCHMpwdaABruEODHwUhBZcneAX+
+        P1jUU5Lg==;
 Received: from hch by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1lMARq-0009xZ-QS; Tue, 16 Mar 2021 14:13:29 +0000
-Date:   Tue, 16 Mar 2021 14:13:26 +0000
+        id 1lMBXO-000EUG-5Z; Tue, 16 Mar 2021 15:23:15 +0000
+Date:   Tue, 16 Mar 2021 15:23:14 +0000
 From:   Christoph Hellwig <hch@infradead.org>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     Matteo Croce <mcroce@linux.microsoft.com>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Lennart Poettering <lennart@poettering.net>,
-        Luca Boccassi <bluca@debian.org>, Jens Axboe <axboe@kernel.dk>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Tejun Heo <tj@kernel.org>,
-        Javier Gonz?lez <javier@javigon.com>,
-        Niklas Cassel <niklas.cassel@wdc.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCH -next 1/5] block: add disk sequence number
-Message-ID: <20210316141326.GA37773@infradead.org>
-References: <20210315200242.67355-1-mcroce@linux.microsoft.com>
- <20210315200242.67355-2-mcroce@linux.microsoft.com>
- <20210315201824.GB2577561@casper.infradead.org>
+To:     Sergei Shtepa <sergei.shtepa@veeam.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-api@vger.kernel.org" <linux-api@vger.kernel.org>,
+        Pavel Tide <Pavel.TIde@veeam.com>
+Subject: Re: [PATCH v7 3/3] dm: add DM_INTERPOSED_FLAG
+Message-ID: <20210316152314.GA55391@infradead.org>
+References: <1615563895-28565-1-git-send-email-sergei.shtepa@veeam.com>
+ <1615563895-28565-4-git-send-email-sergei.shtepa@veeam.com>
+ <20210314093038.GC3773360@infradead.org>
+ <20210315132509.GD30489@veeam.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210315201824.GB2577561@casper.infradead.org>
+In-Reply-To: <20210315132509.GD30489@veeam.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Mar 15, 2021 at 08:18:24PM +0000, Matthew Wilcox wrote:
-> On Mon, Mar 15, 2021 at 09:02:38PM +0100, Matteo Croce wrote:
-> > From: Matteo Croce <mcroce@microsoft.com>
+On Mon, Mar 15, 2021 at 04:25:09PM +0300, Sergei Shtepa wrote:
+> The 03/14/2021 12:30, Christoph Hellwig wrote:
+> > On Fri, Mar 12, 2021 at 06:44:55PM +0300, Sergei Shtepa wrote:
+> > > DM_INTERPOSED_FLAG allow to create DM targets on "the fly".
+> > > Underlying block device opens without a flag FMODE_EXCL.
+> > > DM target receives bio from the original device via
+> > > bdev_interposer.
 > > 
-> > Add a sequence number to the disk devices. This number is put in the
-> > uevent so userspace can correlate events when a driver reuses a device,
-> > like the loop one.
+> > This is more of a philopical comment, but the idea of just letting the
+> > interposed reopen the device by itself seems like a bad idea.  I think
+> > that is probably better hidden in the block layer interposer attachment
+> > function, which could do the extra blkdev_get_by_dev for the caller.
 > 
-> Should this be documented as monotonically increasing?  I think this
-> is actually a media identifier.  Consider (if you will) a floppy disc.
-> Back when such things were common, it was possible with personal computers
-> of the era to have multiple floppy discs "in play" and be prompted to
-> insert them as needed.  So shouldn't it be possible to support something
-> similar here -- you're really removing the media from the loop device.
-> With a monotonically increasing number, you're always destroying the
-> media when you remove it, but in principle, it should be possible to
-> reinsert the same media and have the same media identifier number.
+> I suppose this cannot be implemented, since we need to change the behavior
+> for block devices that already have been opened.
 
-And we have some decent infrastructure related to media changes,
-grep for disk_events.  I think this needs to plug into that
-infrastructure instead of duplicating it.
+That's not what I mean.  Take a look at the patch relative to your
+series to let me know what you think.  The new blkdev_interposer_attach
+now takes a dev_t + mode for the original device and opens it on
+behalf of the interposer.  It also moves the queue freezing into the
+API, which should address the concerns about the helper and adds a few
+more sanity checks.
