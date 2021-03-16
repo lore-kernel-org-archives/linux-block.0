@@ -2,119 +2,82 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C346AC433E6
-	for <linux-block@archiver.kernel.org>; Tue, 16 Mar 2021 17:46:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B5B1C433E0
+	for <linux-block@archiver.kernel.org>; Tue, 16 Mar 2021 17:47:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 991CC6511D
-	for <linux-block@archiver.kernel.org>; Tue, 16 Mar 2021 17:46:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 616DE65127
+	for <linux-block@archiver.kernel.org>; Tue, 16 Mar 2021 17:47:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239013AbhCPRqR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 Mar 2021 13:46:17 -0400
-Received: from frasgout.his.huawei.com ([185.176.79.56]:2705 "EHLO
-        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239017AbhCPRpt (ORCPT
+        id S239343AbhCPRrV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Mar 2021 13:47:21 -0400
+Received: from mail-pj1-f54.google.com ([209.85.216.54]:56319 "EHLO
+        mail-pj1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239242AbhCPRqs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Mar 2021 13:45:49 -0400
-Received: from fraeml736-chm.china.huawei.com (unknown [172.18.147.206])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4F0LBt3QFQz67yt6;
-        Wed, 17 Mar 2021 01:39:34 +0800 (CST)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- fraeml736-chm.china.huawei.com (10.206.15.217) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2106.2; Tue, 16 Mar 2021 18:45:46 +0100
-Received: from [10.210.172.72] (10.210.172.72) by
- lhreml724-chm.china.huawei.com (10.201.108.75) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2106.2; Tue, 16 Mar 2021 17:45:45 +0000
-Subject: Re: [RFC PATCH v3 2/3] blk-mq: Freeze and quiesce all queues for
- tagset in elevator_exit()
-To:     Bart Van Assche <bvanassche@acm.org>,
-        Ming Lei <ming.lei@redhat.com>
-CC:     "hare@suse.de" <hare@suse.de>, "axboe@kernel.dk" <axboe@kernel.dk>,
-        "hch@lst.de" <hch@lst.de>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "pragalla@codeaurora.org" <pragalla@codeaurora.org>,
-        "kashyap.desai@broadcom.com" <kashyap.desai@broadcom.com>,
-        yuyufen <yuyufen@huawei.com>
-References: <1614957294-188540-1-git-send-email-john.garry@huawei.com>
- <1614957294-188540-3-git-send-email-john.garry@huawei.com>
- <YElrSFGyim3rjDN+@T590> <8c6c6783-6152-2332-2f50-14c409e40320@huawei.com>
- <2b0c66ba-03b3-844c-1684-f8e80d11cdbb@acm.org>
- <4ffaba53-100a-43a5-8746-b753d4153be5@huawei.com>
- <fff92b15-d483-ad6a-bb01-ef61117b7cbd@acm.org>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <82526e78-66e5-fc3c-7acd-38f1813ebe1e@huawei.com>
-Date:   Tue, 16 Mar 2021 17:43:37 +0000
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
+        Tue, 16 Mar 2021 13:46:48 -0400
+Received: by mail-pj1-f54.google.com with SMTP id bt4so11028998pjb.5;
+        Tue, 16 Mar 2021 10:46:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition;
+        bh=cDz1OoD3tDdvu9yZyAWDwJ6QedSgxN+Vxkt9EmQTDzc=;
+        b=ZgA11HSZTxPkTPNEIF7Iwm468YzalhPu5PX3ys4YDWcVt0bVN+n8szofus4mJLc6Dz
+         hjy4JSLnblDyKMP8NlbrR0LONq7t0yyaNO4hNYiNLZC1/i7T4uVER5PJHoxYPbTGYrqd
+         OSDTmVc1ZY+odRiEDf7pN/IfkrobrUR/EVQlHcnt2nf8sFHOks+JpQrjJoXzF06FJVO8
+         xdrVDclvwIddxolsereTgxZ52RPTEfc7vSLh2mVKhsuYU97MI3S0rcXYQHmsdjgc5KQE
+         rVQtBgWgYZafUGtSmda1d2Qux8McRrPNdz5pSQuk7po5EGH2Sr8a34Ho3fXfLQ/AgKQf
+         ISgw==
+X-Gm-Message-State: AOAM533zUBewTS6z2gnFoOjIzn4iB4q0wIZTQuq+eIyytYAF7YmFZILu
+        PfcjoGOmlrhy7PmqBMe5tBjXIWihO0Biyg==
+X-Google-Smtp-Source: ABdhPJwzP9XKjt2OANRgMC82UXqNJ/kn6lLddkdek0OKFvBOE6LikIdcIRjIGKw0bk+8oennH3ZpPA==
+X-Received: by 2002:a17:90a:e656:: with SMTP id ep22mr228107pjb.60.1615916807990;
+        Tue, 16 Mar 2021 10:46:47 -0700 (PDT)
+Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
+        by smtp.gmail.com with ESMTPSA id q15sm79386pje.28.2021.03.16.10.46.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Mar 2021 10:46:47 -0700 (PDT)
+Received: by 42.do-not-panic.com (Postfix, from userid 1000)
+        id 7E83B40244; Tue, 16 Mar 2021 17:46:45 +0000 (UTC)
+Date:   Tue, 16 Mar 2021 17:46:45 +0000
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     linux-block@vger.kernel.org, jejb@linux.ibm.com,
+        martin.petersen@oracle.com
+Cc:     Luis Chamberlain <mcgrof@kernel.org>, linux-scsi@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: blktests: block/009 next-20210304 failure rate average of 1/448
+Message-ID: <20210316174645.GI4332@42.do-not-panic.com>
 MIME-Version: 1.0
-In-Reply-To: <fff92b15-d483-ad6a-bb01-ef61117b7cbd@acm.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.210.172.72]
-X-ClientProxiedBy: lhreml714-chm.china.huawei.com (10.201.108.65) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 16/03/2021 17:00, Bart Van Assche wrote:
-> On 3/16/21 9:15 AM, John Garry wrote:
->> I'll have a look at this ASAP -  a bit busy.
->>
->> But a quick scan and I notice this:
->>
->>  > @@ -226,6 +226,7 @@ static inline void 
->> __blk_mq_put_driver_tag(struct blk_mq_hw_ctx *hctx,
->>  >                          struct request *rq)
->>  >   {
->>  >       blk_mq_put_tag(hctx->tags, rq->mq_ctx, rq->tag);
->>  > +    rcu_assign_pointer(hctx->tags->rqs[rq->tag], NULL);
->>
->> Wasn't a requirement to not touch the fastpath at all, including even 
->> if only NULLifying a pointer?
->>
->> IIRC, Kashyap some time ago had a patch like above (but without RCU 
->> usage), but the request from Jens was to not touch the fastpath.
->>
->> Maybe I'm mistaken - I will try to dig up the thread.
-> 
+I've managed to reproduce blktests block/009 failures with kdevops [0]
+on linux-next tag next-20210304 with a current failure rate average of
+1/448 (3 counted failures so far). I've documented the failure on
+korg#212305 [1] and provide instructions on how to reproduce. The
+failure happens on KVM virtualized guests, for the host OS I am
+using debian testing, but the target kernel is linux-next.
 
-Hi Bart,
+My personal suspicion is not on the block layer but on scsi_debug
+because this can fail:
 
-> 
-> I agree that Jens asked at the end of 2018 not to touch the fast path to 
-> fix this use-after-free (maybe that request has been repeated more 
-> recently). If Jens or anyone else feels strongly about not clearing 
-> hctx->tags->rqs[rq->tag] from the fast path then I will make that 
-> change. 
+modprobe scsi_debug; rmmod scsi_debug
 
-Is that possible for this same approach? I need to check the code more..
+This second issue may be a secondary separate issue, but I figured 
+I'd mention it. To fix this later issue I've looked at ways to
+make scsi_debug_init() wait until its scsi devices are probed,
+however its not clear how to do this correctly. If someone has
+an idea let me know. If that fixes this issue then we know it was
+that.
 
-And don't we still have the problem that some iter callbacks may 
-sleep/block, which is not allowed in an RCU read-side critical section?
+[0] https://github.com/mcgrof/kdevops
+[1] https://bugzilla.kernel.org/show_bug.cgi?id=212305
 
-> My motivation for clearing these pointers from the fast path is 
-> as follows:
-> - This results in code that is easier to read and easier to maintain.
-> - Every modern CPU pipelines store instructions so the performance 
-> impact of adding an additional store should be small.
-> - Since the block layer has a tendency to reuse tags that have been 
-> freed recently, it is likely that hctx->tags->rqs[rq->tag] will be used 
-> for a next request and hence that it will have to be loaded into the CPU 
-> cache anyway.
-> 
-
-Those points make sense to me, but obviously it's the maintainers call.
-
-Thanks,
-john
-
+  Luis
