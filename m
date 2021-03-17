@@ -2,295 +2,122 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71ED1C432C3
-	for <linux-block@archiver.kernel.org>; Wed, 17 Mar 2021 15:49:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54742C433E9
+	for <linux-block@archiver.kernel.org>; Wed, 17 Mar 2021 15:51:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3DC0764FAB
-	for <linux-block@archiver.kernel.org>; Wed, 17 Mar 2021 15:49:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 07A7F64F79
+	for <linux-block@archiver.kernel.org>; Wed, 17 Mar 2021 15:51:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232076AbhCQPsr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 17 Mar 2021 11:48:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36945 "EHLO
+        id S232196AbhCQPvc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 17 Mar 2021 11:51:32 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:52884 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232489AbhCQPsN (ORCPT
+        by vger.kernel.org with ESMTP id S232756AbhCQPvE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 17 Mar 2021 11:48:13 -0400
+        Wed, 17 Mar 2021 11:51:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1615996030;
+        s=mimecast20190719; t=1615996263;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=bS562R8ZbCAdtUYBEJRmkMw/Gswbis07k6mCSdtR3fo=;
-        b=Vatm2869H92XWbBMyBh8TTs1iDnUJ7AXySGYjR97DfyQA082csXMc01YSWG/cgZEECzz8s
-        1bGYMaXcV6X/bMs9VMdUxbn+z6zblTSaVs4OjwGoiGrg9WcVw3oPS9hVnG8nUhq0Px2tvk
-        VhIC4fpHYkaxBsz28A+l/voyeIC7Ft0=
+        bh=8H8OWhg17sJjqBEbsaohXSLcVxJEm1vjVGCfPGKif5o=;
+        b=EUoimClbzDvc0p01BWjtoCqq4lJzpkhTZSz3wHNPxl/P3YIAHynUQPNHb6P8HAsAdmqi9f
+        7AYCeNk13Z2nNsJYrVkbshcj1QJ1hawUZMrFQ0Q47EyMgk1NlVY6IoUDq1TRAAAu/OU92U
+        aTs1BO469KDvKTcxdY/cqH505oPJPKo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-477-A0MEi7tmPa-56E-_e6i5vw-1; Wed, 17 Mar 2021 11:04:50 -0400
-X-MC-Unique: A0MEi7tmPa-56E-_e6i5vw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-359-OicBpSriMyKFn0ji33RJ3Q-1; Wed, 17 Mar 2021 11:34:48 -0400
+X-MC-Unique: OicBpSriMyKFn0ji33RJ3Q-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D25B781622;
-        Wed, 17 Mar 2021 15:04:48 +0000 (UTC)
-Received: from localhost (unknown [10.18.25.174])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5B31719C45;
-        Wed, 17 Mar 2021 15:04:42 +0000 (UTC)
-Date:   Wed, 17 Mar 2021 11:04:41 -0400
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Sergei Shtepa <sergei.shtepa@veeam.com>
-Cc:     Ming Lei <ming.lei@redhat.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Alasdair Kergon <agk@redhat.com>,
-        Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-api@vger.kernel.org" <linux-api@vger.kernel.org>,
-        Pavel Tide <Pavel.TIde@veeam.com>
-Subject: Re: [PATCH v7 2/3] block: add bdev_interposer
-Message-ID: <20210317150441.GB29481@redhat.com>
-References: <1615563895-28565-1-git-send-email-sergei.shtepa@veeam.com>
- <1615563895-28565-3-git-send-email-sergei.shtepa@veeam.com>
- <YFBnypYemiR08A/c@T590>
- <20210316163544.GA31272@veeam.com>
- <YFFxdz84esfiTvNk@T590>
- <20210317122217.GA31781@veeam.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4FBB210866A3;
+        Wed, 17 Mar 2021 15:34:47 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A0AE05C5DF;
+        Wed, 17 Mar 2021 15:34:40 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 12HFYeMU029722;
+        Wed, 17 Mar 2021 11:34:40 -0400
+Received: from localhost (mpatocka@localhost)
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 12HFYdrE029718;
+        Wed, 17 Mar 2021 11:34:39 -0400
+X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
+Date:   Wed, 17 Mar 2021 11:34:39 -0400 (EDT)
+From:   Mikulas Patocka <mpatocka@redhat.com>
+X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
+To:     Christoph Hellwig <hch@infradead.org>
+cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, Zdenek Kabelac <zkabelac@redhat.com>,
+        ming.lei@redhat.com
+Subject: Re: [PATCH] block: remove the "detected capacity change" message
+In-Reply-To: <20210317134715.GA362913@infradead.org>
+Message-ID: <alpine.LRH.2.02.2103171129550.2959@file01.intranet.prod.int.rdu2.redhat.com>
+References: <alpine.LRH.2.02.2103170644080.32577@file01.intranet.prod.int.rdu2.redhat.com> <20210317134715.GA362913@infradead.org>
+User-Agent: Alpine 2.02 (LRH 1266 2009-07-14)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210317122217.GA31781@veeam.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: TEXT/PLAIN; charset=US-ASCII
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 17 2021 at  8:22am -0400,
-Sergei Shtepa <sergei.shtepa@veeam.com> wrote:
 
-> The 03/17/2021 06:03, Ming Lei wrote:
-> > On Tue, Mar 16, 2021 at 07:35:44PM +0300, Sergei Shtepa wrote:
-> > > The 03/16/2021 11:09, Ming Lei wrote:
-> > > > On Fri, Mar 12, 2021 at 06:44:54PM +0300, Sergei Shtepa wrote:
-> > > > > bdev_interposer allows to redirect bio requests to another devices.
-> > > > > 
-> > > > > Signed-off-by: Sergei Shtepa <sergei.shtepa@veeam.com>
-> > > > > ---
-> > > > >  block/bio.c               |  2 ++
-> > > > >  block/blk-core.c          | 57 +++++++++++++++++++++++++++++++++++++++
-> > > > >  block/genhd.c             | 54 +++++++++++++++++++++++++++++++++++++
-> > > > >  include/linux/blk_types.h |  3 +++
-> > > > >  include/linux/blkdev.h    |  9 +++++++
-> > > > >  5 files changed, 125 insertions(+)
-> > > > > 
-> > > > > diff --git a/block/bio.c b/block/bio.c
-> > > > > index a1c4d2900c7a..0bfbf06475ee 100644
-> > > > > --- a/block/bio.c
-> > > > > +++ b/block/bio.c
-> > > > > @@ -640,6 +640,8 @@ void __bio_clone_fast(struct bio *bio, struct bio *bio_src)
-> > > > >  		bio_set_flag(bio, BIO_THROTTLED);
-> > > > >  	if (bio_flagged(bio_src, BIO_REMAPPED))
-> > > > >  		bio_set_flag(bio, BIO_REMAPPED);
-> > > > > +	if (bio_flagged(bio_src, BIO_INTERPOSED))
-> > > > > +		bio_set_flag(bio, BIO_INTERPOSED);
-> > > > >  	bio->bi_opf = bio_src->bi_opf;
-> > > > >  	bio->bi_ioprio = bio_src->bi_ioprio;
-> > > > >  	bio->bi_write_hint = bio_src->bi_write_hint;
-> > > > > diff --git a/block/blk-core.c b/block/blk-core.c
-> > > > > index fc60ff208497..da1abc4c27a9 100644
-> > > > > --- a/block/blk-core.c
-> > > > > +++ b/block/blk-core.c
-> > > > > @@ -1018,6 +1018,55 @@ static blk_qc_t __submit_bio_noacct_mq(struct bio *bio)
-> > > > >  	return ret;
-> > > > >  }
-> > > > >  
-> > > > > +static noinline blk_qc_t submit_bio_interposed(struct bio *bio)
-> > > > > +{
-> > > > > +	blk_qc_t ret = BLK_QC_T_NONE;
-> > > > > +	struct bio_list bio_list[2] = { };
-> > > > > +	struct gendisk *orig_disk;
-> > > > > +
-> > > > > +	if (current->bio_list) {
-> > > > > +		bio_list_add(&current->bio_list[0], bio);
-> > > > > +		return BLK_QC_T_NONE;
-> > > > > +	}
-> > > > > +
-> > > > > +	orig_disk = bio->bi_bdev->bd_disk;
-> > > > > +	if (unlikely(bio_queue_enter(bio)))
-> > > > > +		return BLK_QC_T_NONE;
-> > > > > +
-> > > > > +	current->bio_list = bio_list;
-> > > > > +
-> > > > > +	do {
-> > > > > +		struct block_device *interposer = bio->bi_bdev->bd_interposer;
-> > > > > +
-> > > > > +		if (unlikely(!interposer)) {
-> > > > > +			/* interposer was removed */
-> > > > > +			bio_list_add(&current->bio_list[0], bio);
-> > > > > +			break;
-> > > > > +		}
-> > > > > +		/* assign bio to interposer device */
-> > > > > +		bio_set_dev(bio, interposer);
-> > > > > +		bio_set_flag(bio, BIO_INTERPOSED);
-> > > > > +
-> > > > > +		if (!submit_bio_checks(bio))
-> > > > > +			break;
-> > > > > +		/*
-> > > > > +		 * Because the current->bio_list is initialized,
-> > > > > +		 * the submit_bio callback will always return BLK_QC_T_NONE.
-> > > > > +		 */
-> > > > > +		interposer->bd_disk->fops->submit_bio(bio);
-> > > > 
-> > > > Given original request queue may become live when calling attach() and
-> > > > detach(), see below comment. bdev_interposer_detach() may be run
-> > > > when running ->submit_bio(), meantime the interposer device is
-> > > > gone during the period, then kernel oops.
-> > > 
-> > > I think that since the bio_queue_enter() function was called,
-> > > q->q_usage_counter will not allow the critical code in the attach/detach
-> > > functions to be executed, which is located between the blk_freeze_queue
-> > > and blk_unfreeze_queue calls.
-> > > Please correct me if I'm wrong.
-> > > 
-> > > > 
-> > > > > +	} while (false);
-> > > > > +
-> > > > > +	current->bio_list = NULL;
-> > > > > +
-> > > > > +	blk_queue_exit(orig_disk->queue);
-> > > > > +
-> > > > > +	/* Resubmit remaining bios */
-> > > > > +	while ((bio = bio_list_pop(&bio_list[0])))
-> > > > > +		ret = submit_bio_noacct(bio);
-> > > > > +
-> > > > > +	return ret;
-> > > > > +}
-> > > > > +
-> > > > >  /**
-> > > > >   * submit_bio_noacct - re-submit a bio to the block device layer for I/O
-> > > > >   * @bio:  The bio describing the location in memory and on the device.
-> > > > > @@ -1029,6 +1078,14 @@ static blk_qc_t __submit_bio_noacct_mq(struct bio *bio)
-> > > > >   */
-> > > > >  blk_qc_t submit_bio_noacct(struct bio *bio)
-> > > > >  {
-> > > > > +	/*
-> > > > > +	 * Checking the BIO_INTERPOSED flag is necessary so that the bio
-> > > > > +	 * created by the bdev_interposer do not get to it for processing.
-> > > > > +	 */
-> > > > > +	if (bdev_has_interposer(bio->bi_bdev) &&
-> > > > > +	    !bio_flagged(bio, BIO_INTERPOSED))
-> > > > > +		return submit_bio_interposed(bio);
-> > > > > +
-> > > > >  	if (!submit_bio_checks(bio))
-> > > > >  		return BLK_QC_T_NONE;
-> > > > >  
-> > > > > diff --git a/block/genhd.c b/block/genhd.c
-> > > > > index c55e8f0fced1..c840ecffea68 100644
-> > > > > --- a/block/genhd.c
-> > > > > +++ b/block/genhd.c
-> > > > > @@ -30,6 +30,11 @@
-> > > > >  static struct kobject *block_depr;
-> > > > >  
-> > > > >  DECLARE_RWSEM(bdev_lookup_sem);
-> > > > > +/*
-> > > > > + * Prevents different block-layer interposers from attaching or detaching
-> > > > > + * to the block device at the same time.
-> > > > > + */
-> > > > > +static DEFINE_MUTEX(bdev_interposer_attach_lock);
-> > > > >  
-> > > > >  /* for extended dynamic devt allocation, currently only one major is used */
-> > > > >  #define NR_EXT_DEVT		(1 << MINORBITS)
-> > > > > @@ -1940,3 +1945,52 @@ static void disk_release_events(struct gendisk *disk)
-> > > > >  	WARN_ON_ONCE(disk->ev && disk->ev->block != 1);
-> > > > >  	kfree(disk->ev);
-> > > > >  }
-> > > > > +
-> > > > > +int bdev_interposer_attach(struct block_device *original,
-> > > > > +			   struct block_device *interposer)
-> > > > > +{
-> > > > > +	int ret = 0;
-> > > > > +
-> > > > > +	if (WARN_ON(((!original) || (!interposer))))
-> > > > > +		return -EINVAL;
-> > > > > +	/*
-> > > > > +	 * interposer should be simple, no a multi-queue device
-> > > > > +	 */
-> > > > > +	if (!interposer->bd_disk->fops->submit_bio)
-> > > > > +		return -EINVAL;
-> > > > > +
-> > > > > +	if (WARN_ON(!blk_mq_is_queue_frozen(original->bd_disk->queue)))
-> > > > > +		return -EPERM;
-> > > > 
-> > > > The original request queue may become live now...
-> > > 
-> > > Yes.
-> > > I will remove the blk_mq_is_queue_frozen() function and use a different
-> > > approach.
-> > 
-> > Looks what attach and detach needs is that queue is kept as frozen state
-> > instead of being froze simply at the beginning of the two functions, so
-> > you can simply call freeze/unfreeze inside the two functions.
-> > 
-> > But what if 'original' isn't a MQ queue?  queue usage counter is just
-> > grabed when calling ->submit_bio(), and queue freeze doesn't guarantee there
-> > isn't any io activity, is that a problem for bdev_interposer use case?
-> > 
-> > -- 
-> > Ming
-> > 
+
+On Wed, 17 Mar 2021, Christoph Hellwig wrote:
+
+> No, it is everything but useless.  It is not needed during device
+> creation, but that is something that the GENHD_FL_UP check should catch.
 > 
-> It makes sense to add freeze_bdev/thaw_bdev. This will be useful.
-> For the main file systems, the freeze functions are defined 
-> sb->s_op->freeze_super() or sb - >s_op->freeze_fs()
-> (btrfs, ext2, ext4, f2fs, jfs, nilfs2, reiserfs, xfs).
-> If the file system is frozen, then no new requests should be received.
-> 
-> But if the file system does not support freeze or the disk is used without
-> a file system, as for some databases, freeze_bdev seems useless to me.
-> In this case, we will need to stop working with the disk from user-space,
-> for example, to freeze the database itself.
-> 
-> I can add dm_suspend() before bdev_interposer_detach(). This will ensure that
-> all intercepted requests have been processed. Applying dm_suspend() before
-> bdev_interposer_attach() is pointless. The attachment is made when the target
-> is created, and at this time the target is not ready to work yet.
-> There shouldn't be any bio requests, I suppose. In addition,
-> sb->s_op->freeze_fs() for the interposer will not be called, because the file
-> system is not mounted for the interposer device. It should not be able to
-> be mounted. To do this, I will add an exclusive opening of the interposer
-> device.
-> 
-> I'll add freeze_bdev() for the original device and dm_suspend() for the
-> interposer to the DM code. For normal operation of bdev_interposer,
-> it is enough to transfer blk_mq_freeze_queue and blk_mq_quiesce_queue to
-> bdev_interposer_attach/bdev_interposer_detach.
-> The lock on the counter q->q_usage_counter is enough to not catch NULL in
-> bd_interposer.
-> 
-> Do you think this is enough?
-> I think there are no other ways to stop the block device queue.
+> You should probably audit the device mapper code why it sets the initial
+> capacity when the gendisk is up already, as that can cause all kinds of
+> problems.  If the setting of the initial capacity after add_disk is
+> indeed intentional you can switch to set_capacity(), but you should
+> probably document the rationale in a detailed comment.
 
-Either you're pretty confused, or I am... regardless.. I think we need
-to cover the basics of how interposer is expected to be paired with
-an "original" device.
+BTW. the loop device has the same problem as device mapper - it also 
+prints "loop0: detected capacity change from 0 to 2097152" when it is 
+being activated.
 
-Those "original" device are already active and potentially in use
-right?  They may be either request-based blk-mq _or_ bio-based.
+Would you accept this patch?
 
-So what confuses me is that you're making assertions about how actively
-used bio-based DM devices aren't in use until the interposed device
-create happens... this is all getting very muddled.
+Or do you think that we should change device mapper and the loopback 
+driver to call "set_capacity" on the initial device creation?
 
-And your lack of understanding of these various IO flushing methods
-(freeze/thaw, suspend/resume, etc) is showing.  Please slow down and
-approach this more systematically.
+Mikulas
 
-Thanks,
-Mike
+---
+ block/genhd.c |    8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+Index: linux-2.6/block/genhd.c
+===================================================================
+--- linux-2.6.orig/block/genhd.c	2021-03-17 16:26:11.000000000 +0100
++++ linux-2.6/block/genhd.c	2021-03-17 16:26:42.000000000 +0100
+@@ -71,16 +71,16 @@ bool set_capacity_and_notify(struct gend
+ 	if (size == capacity ||
+ 	    (disk->flags & (GENHD_FL_UP | GENHD_FL_HIDDEN)) != GENHD_FL_UP)
+ 		return false;
+-
+-	pr_info("%s: detected capacity change from %lld to %lld\n",
+-		disk->disk_name, capacity, size);
+-
+ 	/*
+ 	 * Historically we did not send a uevent for changes to/from an empty
+ 	 * device.
+ 	 */
+ 	if (!capacity || !size)
+ 		return false;
++
++	pr_info("%s: detected capacity change from %lld to %lld\n",
++		disk->disk_name, capacity, size);
++
+ 	kobject_uevent_env(&disk_to_dev(disk)->kobj, KOBJ_CHANGE, envp);
+ 	return true;
+ }
 
