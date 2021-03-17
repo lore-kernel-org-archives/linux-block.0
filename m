@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-19.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0C9BC43603
-	for <linux-block@archiver.kernel.org>; Wed, 17 Mar 2021 00:57:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4EA1C2BB53
+	for <linux-block@archiver.kernel.org>; Wed, 17 Mar 2021 00:58:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C39F864FBD
-	for <linux-block@archiver.kernel.org>; Wed, 17 Mar 2021 00:57:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B28A865018
+	for <linux-block@archiver.kernel.org>; Wed, 17 Mar 2021 00:58:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230015AbhCQA5I (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 Mar 2021 20:57:08 -0400
-Received: from mail.kernel.org ([198.145.29.99]:34484 "EHLO mail.kernel.org"
+        id S231769AbhCQA5v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Mar 2021 20:57:51 -0400
+Received: from mail.kernel.org ([198.145.29.99]:35236 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231250AbhCQA4r (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Mar 2021 20:56:47 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 5D56D64F8F;
-        Wed, 17 Mar 2021 00:56:46 +0000 (UTC)
+        id S231129AbhCQA5M (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 16 Mar 2021 20:57:12 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 7D06464FAE;
+        Wed, 17 Mar 2021 00:57:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1615942607;
-        bh=gOMOVCnoTGjPjB6RH8Q4v6SnzGKeivtoZ0N8xUOMArQ=;
+        s=k20201202; t=1615942629;
+        bh=O/0q2JjobzsUmuE+dvnraPV+i669n5v5EMZTYrRvoEI=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=SGpIOq6s1Wugj//CkhjRukT4akETZJRTSh8mUBW5Pup+QGhnJbveQem120m6sBsqv
-         rfgPZ0vXIxs/xFSd61WhgPYzTEkBKQXtT6xRUHNUWDNUQuig544hri5AqjIkqDhAs+
-         E+Z+N+WPjIqCJ/AInu8JwQ8+S924wNaJtlPkMm30evK6vpxQI9uY1fpyvUoMOiL1uh
-         E8L4CoJo/C3LfFLJ2Z+1YA/RTtvmpvNSNTIGJfZUn/Iglq7gUJ2dr8Fw/t0/dp+7c6
-         8f5M54cDMFyuEMnxGCoEPgw1XJ5Z0C+GR3Lso0XL4OfLe1yDlYMc8LBF1Va2cs6yn9
-         09qAoKthzX9XA==
+        b=Smtc452d+GYzlUC/pP+JcQUO6VtVK7zv1T6MczjKNrBIQWhgdnj4Y4cmr7zJqGnez
+         HMBmtqLuifXNB7PXCQ6FsnIxmZJG1OPrvclQcSnlko3ULM8cSGH/rOzLT6U6S9Eg4x
+         lDflwE1e61IHUT1TRQmwNb++whU27VPKeXkAeWRojDuKCP7NpSY6DxhCoI1Pb5bM99
+         2ZemzGPSMAP1pS5f5+1Lw9rEQmzqZlunlivrZC/nmvg6Xi4o4LASaJVwE6aAj86hlx
+         D52dlIM6kyqFJDGRhqCPoHXUD6PCVE06Flq6eihIF6Y1GwWKKB2PDD1gJNtEYsgd7s
+         HoiympzF+gt6A==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Daniel Wagner <dwagner@suse.de>, Christoph Hellwig <hch@lst.de>,
-        Martin Wilck <mwilck@suse.com>, Jens Axboe <axboe@kernel.dk>,
-        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.11 57/61] block: Suppress uevent for hidden device when removed
-Date:   Tue, 16 Mar 2021 20:55:31 -0400
-Message-Id: <20210317005536.724046-57-sashal@kernel.org>
+Cc:     Xunlei Pang <xlpang@linux.alibaba.com>,
+        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
+        linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.10 11/54] blk-cgroup: Fix the recursive blkg rwstat
+Date:   Tue, 16 Mar 2021 20:56:10 -0400
+Message-Id: <20210317005654.724862-11-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.1
-In-Reply-To: <20210317005536.724046-1-sashal@kernel.org>
-References: <20210317005536.724046-1-sashal@kernel.org>
+In-Reply-To: <20210317005654.724862-1-sashal@kernel.org>
+References: <20210317005654.724862-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -50,48 +50,58 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Daniel Wagner <dwagner@suse.de>
+From: Xunlei Pang <xlpang@linux.alibaba.com>
 
-[ Upstream commit 9ec491447b90ad6a4056a9656b13f0b3a1e83043 ]
+[ Upstream commit 4f44657d74873735e93a50eb25014721a66aac19 ]
 
-register_disk() suppress uevents for devices with the GENHD_FL_HIDDEN
-but enables uevents at the end again in order to announce disk after
-possible partitions are created.
+The current blkio.throttle.io_service_bytes_recursive doesn't
+work correctly.
 
-When the device is removed the uevents are still on and user land sees
-'remove' messages for devices which were never 'add'ed to the system.
+As an example, for the following blkcg hierarchy:
+ (Made 1GB READ in test1, 512MB READ in test2)
+     test
+    /    \
+ test1   test2
 
-  KERNEL[95481.571887] remove   /devices/virtual/nvme-fabrics/ctl/nvme5/nvme0c5n1 (block)
+$ head -n 1 test/test1/blkio.throttle.io_service_bytes_recursive
+8:0 Read 1073684480
+$ head -n 1 test/test2/blkio.throttle.io_service_bytes_recursive
+8:0 Read 537448448
+$ head -n 1 test/blkio.throttle.io_service_bytes_recursive
+8:0 Read 537448448
 
-Let's suppress the uevents for GENHD_FL_HIDDEN by not enabling the
-uevents at all.
+Clearly, above data of "test" reflects "test2" not "test1"+"test2".
 
-Signed-off-by: Daniel Wagner <dwagner@suse.de>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Martin Wilck <mwilck@suse.com>
-Link: https://lore.kernel.org/r/20210311151917.136091-1-dwagner@suse.de
+Do the correct summary in blkg_rwstat_recursive_sum().
+
+Signed-off-by: Xunlei Pang <xlpang@linux.alibaba.com>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- block/genhd.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ block/blk-cgroup-rwstat.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 07a0ef741de1..12940cfa68af 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -658,10 +658,8 @@ static void register_disk(struct device *parent, struct gendisk *disk,
- 		kobject_create_and_add("holders", &ddev->kobj);
- 	disk->slave_dir = kobject_create_and_add("slaves", &ddev->kobj);
+diff --git a/block/blk-cgroup-rwstat.c b/block/blk-cgroup-rwstat.c
+index 85d5790ac49b..3304e841df7c 100644
+--- a/block/blk-cgroup-rwstat.c
++++ b/block/blk-cgroup-rwstat.c
+@@ -109,6 +109,7 @@ void blkg_rwstat_recursive_sum(struct blkcg_gq *blkg, struct blkcg_policy *pol,
  
--	if (disk->flags & GENHD_FL_HIDDEN) {
--		dev_set_uevent_suppress(ddev, 0);
-+	if (disk->flags & GENHD_FL_HIDDEN)
- 		return;
--	}
+ 	lockdep_assert_held(&blkg->q->queue_lock);
  
- 	disk_scan_partitions(disk);
++	memset(sum, 0, sizeof(*sum));
+ 	rcu_read_lock();
+ 	blkg_for_each_descendant_pre(pos_blkg, pos_css, blkg) {
+ 		struct blkg_rwstat *rwstat;
+@@ -122,7 +123,7 @@ void blkg_rwstat_recursive_sum(struct blkcg_gq *blkg, struct blkcg_policy *pol,
+ 			rwstat = (void *)pos_blkg + off;
  
+ 		for (i = 0; i < BLKG_RWSTAT_NR; i++)
+-			sum->cnt[i] = blkg_rwstat_read_counter(rwstat, i);
++			sum->cnt[i] += blkg_rwstat_read_counter(rwstat, i);
+ 	}
+ 	rcu_read_unlock();
+ }
 -- 
 2.30.1
 
