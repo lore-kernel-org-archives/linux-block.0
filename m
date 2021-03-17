@@ -4,41 +4,41 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-19.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9212C433E9
-	for <linux-block@archiver.kernel.org>; Wed, 17 Mar 2021 00:57:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6C56C2BBDC
+	for <linux-block@archiver.kernel.org>; Wed, 17 Mar 2021 00:57:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B463164FC4
-	for <linux-block@archiver.kernel.org>; Wed, 17 Mar 2021 00:57:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6C4C564FC2
+	for <linux-block@archiver.kernel.org>; Wed, 17 Mar 2021 00:57:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230513AbhCQA4h (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 Mar 2021 20:56:37 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33306 "EHLO mail.kernel.org"
+        id S230034AbhCQA4A (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Mar 2021 20:56:00 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60986 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230394AbhCQA4R (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Mar 2021 20:56:17 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 0403464F8F;
-        Wed, 17 Mar 2021 00:56:15 +0000 (UTC)
+        id S229871AbhCQAzw (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 16 Mar 2021 20:55:52 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 6788964F9E;
+        Wed, 17 Mar 2021 00:55:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1615942576;
-        bh=t549l9Uw5gYRXHZbXiDetHBjMekwEXPSC78muQDnEsI=;
+        s=k20201202; t=1615942552;
+        bh=O/0q2JjobzsUmuE+dvnraPV+i669n5v5EMZTYrRvoEI=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=YYj7RRQZM2/qobMzX2mmAVwr5eVJd+1wBUAgEx0CwUUBPie+3OKdUsjdDS472hBWp
-         u9l9VcCECgPK1GUpaNIMAK4OfwGBb363Q4NnZrRj1EgYW8vwe0Ok8Slzc7bWyXtoLG
-         AwuG/QAnm7siVMrcQPCr1Cvmf8/M2sV8CHGGbQQFKKDqYi4cLFM6moxUxYqd8arQZ0
-         5edIR5gol7eoucayjZIyLU64N5oEsxiPDxXRX925ogxaD26HnhXzXr2VZL31qdCKIQ
-         VxX4tqax9Gxx0UKS3pKeDsxBAeUvcAKRud7oRiQ0gQM4sKk7ZERHzC/vL1PnGFhG23
-         zmCh12YzzHGeg==
+        b=UVWbtaKt5AE+9BJ1ke1Oka9+q6I/uxTjwcWERS2Uc2DH9oA4G0bi7CglSVv3W/hl6
+         cwjUAyy3LfL7wakL0E3G+XAJq9L2ASbVTP5r98E6hxxxvIulPBQ31vf/YcAMRaW8LB
+         95a5+c7mhLjQRrMtd8nZDZfhtX+QOu0MUkUED+sCF9FkI+Pgx/nrCAWLsBm8cR2A5D
+         lS78joHpOTD9Be61JOCKmL/MZZdYOKg7ETyroeDBq4mOT6kvZItcOUYLJJvJOsPsOX
+         fplf8XW8Pk73G8kCJoqs10PntYojMS/Uh06eTRsxL+nu6z8PV2hcfx0wyMZRZiSUnD
+         8YJuJB3ThPk6w==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Wei Yongjun <weiyongjun1@huawei.com>,
-        Hulk Robot <hulkci@huawei.com>, Jens Axboe <axboe@kernel.dk>,
-        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.11 33/61] umem: fix error return code in mm_pci_probe()
-Date:   Tue, 16 Mar 2021 20:55:07 -0400
-Message-Id: <20210317005536.724046-33-sashal@kernel.org>
+Cc:     Xunlei Pang <xlpang@linux.alibaba.com>,
+        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
+        linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.11 12/61] blk-cgroup: Fix the recursive blkg rwstat
+Date:   Tue, 16 Mar 2021 20:54:46 -0400
+Message-Id: <20210317005536.724046-12-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.1
 In-Reply-To: <20210317005536.724046-1-sashal@kernel.org>
 References: <20210317005536.724046-1-sashal@kernel.org>
@@ -50,47 +50,58 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Wei Yongjun <weiyongjun1@huawei.com>
+From: Xunlei Pang <xlpang@linux.alibaba.com>
 
-[ Upstream commit eeb05595d22c19c8f814ff893dcf88ec277a2365 ]
+[ Upstream commit 4f44657d74873735e93a50eb25014721a66aac19 ]
 
-Fix to return negative error code -ENOMEM from the blk_alloc_queue()
-and dma_alloc_coherent() error handling cases instead of 0, as done
-elsewhere in this function.
+The current blkio.throttle.io_service_bytes_recursive doesn't
+work correctly.
 
-Reported-by: Hulk Robot <hulkci@huawei.com>
-Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
-Link: https://lore.kernel.org/r/20210308123501.2573816-1-weiyongjun1@huawei.com
+As an example, for the following blkcg hierarchy:
+ (Made 1GB READ in test1, 512MB READ in test2)
+     test
+    /    \
+ test1   test2
+
+$ head -n 1 test/test1/blkio.throttle.io_service_bytes_recursive
+8:0 Read 1073684480
+$ head -n 1 test/test2/blkio.throttle.io_service_bytes_recursive
+8:0 Read 537448448
+$ head -n 1 test/blkio.throttle.io_service_bytes_recursive
+8:0 Read 537448448
+
+Clearly, above data of "test" reflects "test2" not "test1"+"test2".
+
+Do the correct summary in blkg_rwstat_recursive_sum().
+
+Signed-off-by: Xunlei Pang <xlpang@linux.alibaba.com>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/block/umem.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ block/blk-cgroup-rwstat.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/block/umem.c b/drivers/block/umem.c
-index 2b95d7b33b91..5eb44e4a91ee 100644
---- a/drivers/block/umem.c
-+++ b/drivers/block/umem.c
-@@ -877,6 +877,7 @@ static int mm_pci_probe(struct pci_dev *dev, const struct pci_device_id *id)
- 	if (card->mm_pages[0].desc == NULL ||
- 	    card->mm_pages[1].desc == NULL) {
- 		dev_printk(KERN_ERR, &card->dev->dev, "alloc failed\n");
-+		ret = -ENOMEM;
- 		goto failed_alloc;
+diff --git a/block/blk-cgroup-rwstat.c b/block/blk-cgroup-rwstat.c
+index 85d5790ac49b..3304e841df7c 100644
+--- a/block/blk-cgroup-rwstat.c
++++ b/block/blk-cgroup-rwstat.c
+@@ -109,6 +109,7 @@ void blkg_rwstat_recursive_sum(struct blkcg_gq *blkg, struct blkcg_policy *pol,
+ 
+ 	lockdep_assert_held(&blkg->q->queue_lock);
+ 
++	memset(sum, 0, sizeof(*sum));
+ 	rcu_read_lock();
+ 	blkg_for_each_descendant_pre(pos_blkg, pos_css, blkg) {
+ 		struct blkg_rwstat *rwstat;
+@@ -122,7 +123,7 @@ void blkg_rwstat_recursive_sum(struct blkcg_gq *blkg, struct blkcg_policy *pol,
+ 			rwstat = (void *)pos_blkg + off;
+ 
+ 		for (i = 0; i < BLKG_RWSTAT_NR; i++)
+-			sum->cnt[i] = blkg_rwstat_read_counter(rwstat, i);
++			sum->cnt[i] += blkg_rwstat_read_counter(rwstat, i);
  	}
- 	reset_page(&card->mm_pages[0]);
-@@ -888,8 +889,10 @@ static int mm_pci_probe(struct pci_dev *dev, const struct pci_device_id *id)
- 	spin_lock_init(&card->lock);
- 
- 	card->queue = blk_alloc_queue(NUMA_NO_NODE);
--	if (!card->queue)
-+	if (!card->queue) {
-+		ret = -ENOMEM;
- 		goto failed_alloc;
-+	}
- 
- 	tasklet_init(&card->tasklet, process_page, (unsigned long)card);
- 
+ 	rcu_read_unlock();
+ }
 -- 
 2.30.1
 
