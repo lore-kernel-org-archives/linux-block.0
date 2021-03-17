@@ -4,41 +4,41 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-19.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E121EC2BBCF
-	for <linux-block@archiver.kernel.org>; Wed, 17 Mar 2021 00:59:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B05EC433DB
+	for <linux-block@archiver.kernel.org>; Wed, 17 Mar 2021 00:59:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BA58664F10
-	for <linux-block@archiver.kernel.org>; Wed, 17 Mar 2021 00:59:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 669B164F8F
+	for <linux-block@archiver.kernel.org>; Wed, 17 Mar 2021 00:59:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232129AbhCQA6u (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 Mar 2021 20:58:50 -0400
-Received: from mail.kernel.org ([198.145.29.99]:36214 "EHLO mail.kernel.org"
+        id S232314AbhCQA7J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Mar 2021 20:59:09 -0400
+Received: from mail.kernel.org ([198.145.29.99]:35314 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231730AbhCQA5g (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Mar 2021 20:57:36 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 6469C64FD2;
-        Wed, 17 Mar 2021 00:57:33 +0000 (UTC)
+        id S231929AbhCQA6H (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 16 Mar 2021 20:58:07 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 579CE64FB6;
+        Wed, 17 Mar 2021 00:57:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1615942654;
-        bh=t549l9Uw5gYRXHZbXiDetHBjMekwEXPSC78muQDnEsI=;
+        s=k20201202; t=1615942677;
+        bh=BST6BERa959iMhTwUiAolYvYPSiDPLKLUM2upjFG3ek=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=AdIhRQ52ahEmHTgXIoxWb+SG9G+vUVlsDwIamhnv6cgdHaZVJWW+PV7m2dx2w4pPr
-         aI7kR1ZBR5dBxyvgU4XWrzR99fLJqv+9SvJlnF6dd0MoRKOkeNhKG6xAv7x4DkBp7P
-         TxlQzxNSil9GvYk2kpjqHi6VEcHDQ3v0z4O5n72UZIllz/3j3Tmqg59HIROW/RSUnp
-         0N1Yb8fXi58oPsEkRKH1BBsIGmAmNsZRVSy9p3Jrr8l54RYd7BbyNYJ+ea1Pm/4GFz
-         9oWXLsWghJG02M9ptsaECKbLq1G4gy5J5thwTCJjKf0qi8jTkFa+vyvuQmRxyk54RV
-         ly0dZkTMGaopg==
+        b=iRlYvaRtHM56oF1g1BmV9Piz/otUG8JeEaxlj8Uw4+rvrMtqoFC5OPABAAj02pvRj
+         E35uVgjzCqI2ahAnm2lF7A7Cg50bPaV87TPcrJ3pvtPrh0yHlQ+v4X+1KSSqABpwYA
+         hMf59w2M0Z14OOJX04wMACaU/xWvyMXtwnckLyVSoO/nn/Sl+ikO0IsdNgyxhF2wFX
+         /hhAigpwKjpLvrHABVmw4Xh9NoTtkcSAodeJi8SYIDBca7ta+vmI33u1ZplhNcGmkY
+         jmivmmqBnMAo2ZbwWlonQnm0aCxnwr5eYRN/mhNucpvDTjfHvSJ6gOyCqLXwfs8xi3
+         U9Ru3m1g3juJQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Wei Yongjun <weiyongjun1@huawei.com>,
-        Hulk Robot <hulkci@huawei.com>, Jens Axboe <axboe@kernel.dk>,
+Cc:     Daniel Wagner <dwagner@suse.de>, Christoph Hellwig <hch@lst.de>,
+        Martin Wilck <mwilck@suse.com>, Jens Axboe <axboe@kernel.dk>,
         Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 32/54] umem: fix error return code in mm_pci_probe()
-Date:   Tue, 16 Mar 2021 20:56:31 -0400
-Message-Id: <20210317005654.724862-32-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 51/54] block: Suppress uevent for hidden device when removed
+Date:   Tue, 16 Mar 2021 20:56:50 -0400
+Message-Id: <20210317005654.724862-51-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.1
 In-Reply-To: <20210317005654.724862-1-sashal@kernel.org>
 References: <20210317005654.724862-1-sashal@kernel.org>
@@ -50,46 +50,47 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Wei Yongjun <weiyongjun1@huawei.com>
+From: Daniel Wagner <dwagner@suse.de>
 
-[ Upstream commit eeb05595d22c19c8f814ff893dcf88ec277a2365 ]
+[ Upstream commit 9ec491447b90ad6a4056a9656b13f0b3a1e83043 ]
 
-Fix to return negative error code -ENOMEM from the blk_alloc_queue()
-and dma_alloc_coherent() error handling cases instead of 0, as done
-elsewhere in this function.
+register_disk() suppress uevents for devices with the GENHD_FL_HIDDEN
+but enables uevents at the end again in order to announce disk after
+possible partitions are created.
 
-Reported-by: Hulk Robot <hulkci@huawei.com>
-Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
-Link: https://lore.kernel.org/r/20210308123501.2573816-1-weiyongjun1@huawei.com
+When the device is removed the uevents are still on and user land sees
+'remove' messages for devices which were never 'add'ed to the system.
+
+  KERNEL[95481.571887] remove   /devices/virtual/nvme-fabrics/ctl/nvme5/nvme0c5n1 (block)
+
+Let's suppress the uevents for GENHD_FL_HIDDEN by not enabling the
+uevents at all.
+
+Signed-off-by: Daniel Wagner <dwagner@suse.de>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Martin Wilck <mwilck@suse.com>
+Link: https://lore.kernel.org/r/20210311151917.136091-1-dwagner@suse.de
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/block/umem.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ block/genhd.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/drivers/block/umem.c b/drivers/block/umem.c
-index 2b95d7b33b91..5eb44e4a91ee 100644
---- a/drivers/block/umem.c
-+++ b/drivers/block/umem.c
-@@ -877,6 +877,7 @@ static int mm_pci_probe(struct pci_dev *dev, const struct pci_device_id *id)
- 	if (card->mm_pages[0].desc == NULL ||
- 	    card->mm_pages[1].desc == NULL) {
- 		dev_printk(KERN_ERR, &card->dev->dev, "alloc failed\n");
-+		ret = -ENOMEM;
- 		goto failed_alloc;
- 	}
- 	reset_page(&card->mm_pages[0]);
-@@ -888,8 +889,10 @@ static int mm_pci_probe(struct pci_dev *dev, const struct pci_device_id *id)
- 	spin_lock_init(&card->lock);
+diff --git a/block/genhd.c b/block/genhd.c
+index ec6264e2ed67..796baf761202 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -732,10 +732,8 @@ static void register_disk(struct device *parent, struct gendisk *disk,
+ 	disk->part0.holder_dir = kobject_create_and_add("holders", &ddev->kobj);
+ 	disk->slave_dir = kobject_create_and_add("slaves", &ddev->kobj);
  
- 	card->queue = blk_alloc_queue(NUMA_NO_NODE);
--	if (!card->queue)
-+	if (!card->queue) {
-+		ret = -ENOMEM;
- 		goto failed_alloc;
-+	}
+-	if (disk->flags & GENHD_FL_HIDDEN) {
+-		dev_set_uevent_suppress(ddev, 0);
++	if (disk->flags & GENHD_FL_HIDDEN)
+ 		return;
+-	}
  
- 	tasklet_init(&card->tasklet, process_page, (unsigned long)card);
+ 	disk_scan_partitions(disk);
  
 -- 
 2.30.1
