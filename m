@@ -4,41 +4,41 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-19.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9C17C4332B
-	for <linux-block@archiver.kernel.org>; Wed, 17 Mar 2021 00:57:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0C9BC43603
+	for <linux-block@archiver.kernel.org>; Wed, 17 Mar 2021 00:57:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A151564FC2
-	for <linux-block@archiver.kernel.org>; Wed, 17 Mar 2021 00:57:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C39F864FBD
+	for <linux-block@archiver.kernel.org>; Wed, 17 Mar 2021 00:57:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229931AbhCQA5G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 Mar 2021 20:57:06 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33544 "EHLO mail.kernel.org"
+        id S230015AbhCQA5I (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Mar 2021 20:57:08 -0400
+Received: from mail.kernel.org ([198.145.29.99]:34484 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230425AbhCQA41 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Mar 2021 20:56:27 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id DCA0D64F97;
-        Wed, 17 Mar 2021 00:56:25 +0000 (UTC)
+        id S231250AbhCQA4r (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 16 Mar 2021 20:56:47 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 5D56D64F8F;
+        Wed, 17 Mar 2021 00:56:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1615942586;
-        bh=EHVD1Bszn93nsf/vciw4KnHQG2gd8dz9190jW55PaE4=;
+        s=k20201202; t=1615942607;
+        bh=gOMOVCnoTGjPjB6RH8Q4v6SnzGKeivtoZ0N8xUOMArQ=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=BmDUXbQ/bCuWoBWxlUq4pHWCdJ969sObmhyK2MGJI1Be9O68rRMCg8YwPGF32m3Db
-         J405Igj0oDoOcsF/1DMsQPHc2s3/HRvdIBkqcqwFOseTn+fDzxBJvT4HrLp21TXaeG
-         iPbGefjIBmFbGU/HbN/xjJ04bmBMjlWv56XinuNUmRYmLjFTBl8zQiaraE96iZffyJ
-         9FOOOhoqNOww76PTKK3Lt8axlZTy2AZue0/5gpRjkYFYUHRa6qkwxYrvDYopywfzT9
-         1AvvYTRUW3pACgUc0Lv5iqHya+7W3YiIu3hknXjpPMmjVJ1GczEv/Qr+qxK+jsUxBK
-         D55Bs0I90H5DQ==
+        b=SGpIOq6s1Wugj//CkhjRukT4akETZJRTSh8mUBW5Pup+QGhnJbveQem120m6sBsqv
+         rfgPZ0vXIxs/xFSd61WhgPYzTEkBKQXtT6xRUHNUWDNUQuig544hri5AqjIkqDhAs+
+         E+Z+N+WPjIqCJ/AInu8JwQ8+S924wNaJtlPkMm30evK6vpxQI9uY1fpyvUoMOiL1uh
+         E8L4CoJo/C3LfFLJ2Z+1YA/RTtvmpvNSNTIGJfZUn/Iglq7gUJ2dr8Fw/t0/dp+7c6
+         8f5M54cDMFyuEMnxGCoEPgw1XJ5Z0C+GR3Lso0XL4OfLe1yDlYMc8LBF1Va2cs6yn9
+         09qAoKthzX9XA==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Damien Le Moal <damien.lemoal@wdc.com>,
-        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
-        linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.11 42/61] block: Fix REQ_OP_ZONE_RESET_ALL handling
-Date:   Tue, 16 Mar 2021 20:55:16 -0400
-Message-Id: <20210317005536.724046-42-sashal@kernel.org>
+Cc:     Daniel Wagner <dwagner@suse.de>, Christoph Hellwig <hch@lst.de>,
+        Martin Wilck <mwilck@suse.com>, Jens Axboe <axboe@kernel.dk>,
+        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.11 57/61] block: Suppress uevent for hidden device when removed
+Date:   Tue, 16 Mar 2021 20:55:31 -0400
+Message-Id: <20210317005536.724046-57-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.1
 In-Reply-To: <20210317005536.724046-1-sashal@kernel.org>
 References: <20210317005536.724046-1-sashal@kernel.org>
@@ -50,32 +50,47 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Damien Le Moal <damien.lemoal@wdc.com>
+From: Daniel Wagner <dwagner@suse.de>
 
-[ Upstream commit faa44c69daf9ccbd5b8a1aee13e0e0d037c0be17 ]
+[ Upstream commit 9ec491447b90ad6a4056a9656b13f0b3a1e83043 ]
 
-Similarly to a single zone reset operation (REQ_OP_ZONE_RESET), execute
-REQ_OP_ZONE_RESET_ALL operations with REQ_SYNC set.
+register_disk() suppress uevents for devices with the GENHD_FL_HIDDEN
+but enables uevents at the end again in order to announce disk after
+possible partitions are created.
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+When the device is removed the uevents are still on and user land sees
+'remove' messages for devices which were never 'add'ed to the system.
+
+  KERNEL[95481.571887] remove   /devices/virtual/nvme-fabrics/ctl/nvme5/nvme0c5n1 (block)
+
+Let's suppress the uevents for GENHD_FL_HIDDEN by not enabling the
+uevents at all.
+
+Signed-off-by: Daniel Wagner <dwagner@suse.de>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Martin Wilck <mwilck@suse.com>
+Link: https://lore.kernel.org/r/20210311151917.136091-1-dwagner@suse.de
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- block/blk-zoned.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/genhd.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index 7a68b6e4300c..f1683f10b020 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -240,7 +240,7 @@ int blkdev_zone_mgmt(struct block_device *bdev, enum req_opf op,
- 		 */
- 		if (op == REQ_OP_ZONE_RESET &&
- 		    blkdev_allow_reset_all_zones(bdev, sector, nr_sectors)) {
--			bio->bi_opf = REQ_OP_ZONE_RESET_ALL;
-+			bio->bi_opf = REQ_OP_ZONE_RESET_ALL | REQ_SYNC;
- 			break;
- 		}
+diff --git a/block/genhd.c b/block/genhd.c
+index 07a0ef741de1..12940cfa68af 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -658,10 +658,8 @@ static void register_disk(struct device *parent, struct gendisk *disk,
+ 		kobject_create_and_add("holders", &ddev->kobj);
+ 	disk->slave_dir = kobject_create_and_add("slaves", &ddev->kobj);
+ 
+-	if (disk->flags & GENHD_FL_HIDDEN) {
+-		dev_set_uevent_suppress(ddev, 0);
++	if (disk->flags & GENHD_FL_HIDDEN)
+ 		return;
+-	}
+ 
+ 	disk_scan_partitions(disk);
  
 -- 
 2.30.1
