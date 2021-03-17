@@ -4,44 +4,44 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-19.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B05EC433DB
-	for <linux-block@archiver.kernel.org>; Wed, 17 Mar 2021 00:59:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A63AAC2BB9A
+	for <linux-block@archiver.kernel.org>; Wed, 17 Mar 2021 01:00:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 669B164F8F
-	for <linux-block@archiver.kernel.org>; Wed, 17 Mar 2021 00:59:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7835464FAB
+	for <linux-block@archiver.kernel.org>; Wed, 17 Mar 2021 01:00:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232314AbhCQA7J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 16 Mar 2021 20:59:09 -0400
-Received: from mail.kernel.org ([198.145.29.99]:35314 "EHLO mail.kernel.org"
+        id S232050AbhCQBAG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 16 Mar 2021 21:00:06 -0400
+Received: from mail.kernel.org ([198.145.29.99]:35252 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231929AbhCQA6H (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 16 Mar 2021 20:58:07 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 579CE64FB6;
-        Wed, 17 Mar 2021 00:57:56 +0000 (UTC)
+        id S232238AbhCQA7B (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 16 Mar 2021 20:59:01 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 4DD3164F94;
+        Wed, 17 Mar 2021 00:58:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1615942677;
-        bh=BST6BERa959iMhTwUiAolYvYPSiDPLKLUM2upjFG3ek=;
+        s=k20201202; t=1615942726;
+        bh=m05uKoHPXx4Jy8SfL08GslsTqZbcXfvyQiP0aGQwkLQ=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=iRlYvaRtHM56oF1g1BmV9Piz/otUG8JeEaxlj8Uw4+rvrMtqoFC5OPABAAj02pvRj
-         E35uVgjzCqI2ahAnm2lF7A7Cg50bPaV87TPcrJ3pvtPrh0yHlQ+v4X+1KSSqABpwYA
-         hMf59w2M0Z14OOJX04wMACaU/xWvyMXtwnckLyVSoO/nn/Sl+ikO0IsdNgyxhF2wFX
-         /hhAigpwKjpLvrHABVmw4Xh9NoTtkcSAodeJi8SYIDBca7ta+vmI33u1ZplhNcGmkY
-         jmivmmqBnMAo2ZbwWlonQnm0aCxnwr5eYRN/mhNucpvDTjfHvSJ6gOyCqLXwfs8xi3
-         U9Ru3m1g3juJQ==
+        b=WTfY/izRnH8OU+vEtRU/DXUg0qu94CdrZhobwWGsQzfWbjl9YXE6+UaoRHOPOv/wy
+         rRIkonjJMCZ3/xpkIAQxGlOVeZhTYt+bbS+660wAvJf+7p9n3ObjKB13q/MjBPRBbn
+         hXn/y3yn/KOhLYnbhSm7ltZ0CGmLoBpQqDHpLdB6qjSGlD4RYzBnqV4gX3EqNUJd2a
+         k9Qcvk2pP16Z9KIW6Y3U0nBn+vo8tXBrxdkiy72lYzX2wQ6hsDHGmDOBkjMjFvM6Y/
+         iey980ZCRD8cWFv7UIewkgTL6fd7TJ9pajGdqY8ZvLGx4YUzYFHPgAjuloEGa9opR/
+         lrRFZ0upCaH/A==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Daniel Wagner <dwagner@suse.de>, Christoph Hellwig <hch@lst.de>,
         Martin Wilck <mwilck@suse.com>, Jens Axboe <axboe@kernel.dk>,
         Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 51/54] block: Suppress uevent for hidden device when removed
-Date:   Tue, 16 Mar 2021 20:56:50 -0400
-Message-Id: <20210317005654.724862-51-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 35/37] block: Suppress uevent for hidden device when removed
+Date:   Tue, 16 Mar 2021 20:58:00 -0400
+Message-Id: <20210317005802.725825-35-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.1
-In-Reply-To: <20210317005654.724862-1-sashal@kernel.org>
-References: <20210317005654.724862-1-sashal@kernel.org>
+In-Reply-To: <20210317005802.725825-1-sashal@kernel.org>
+References: <20210317005802.725825-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -77,10 +77,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+), 3 deletions(-)
 
 diff --git a/block/genhd.c b/block/genhd.c
-index ec6264e2ed67..796baf761202 100644
+index 604f0a2cbc9a..2f6f341a8fbb 100644
 --- a/block/genhd.c
 +++ b/block/genhd.c
-@@ -732,10 +732,8 @@ static void register_disk(struct device *parent, struct gendisk *disk,
+@@ -637,10 +637,8 @@ static void register_disk(struct device *parent, struct gendisk *disk,
  	disk->part0.holder_dir = kobject_create_and_add("holders", &ddev->kobj);
  	disk->slave_dir = kobject_create_and_add("slaves", &ddev->kobj);
  
@@ -90,8 +90,8 @@ index ec6264e2ed67..796baf761202 100644
  		return;
 -	}
  
- 	disk_scan_partitions(disk);
- 
+ 	/* No minors to use for partitions */
+ 	if (!disk_part_scan_enabled(disk))
 -- 
 2.30.1
 
