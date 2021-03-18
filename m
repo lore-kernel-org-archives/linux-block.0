@@ -7,50 +7,50 @@ X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D09EAC4332E
-	for <linux-block@archiver.kernel.org>; Thu, 18 Mar 2021 16:50:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2584BC432C3
+	for <linux-block@archiver.kernel.org>; Thu, 18 Mar 2021 16:50:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B0B4264F40
+	by mail.kernel.org (Postfix) with ESMTP id 0397B64ED2
 	for <linux-block@archiver.kernel.org>; Thu, 18 Mar 2021 16:50:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231129AbhCRQuC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 Mar 2021 12:50:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52351 "EHLO
+        id S232207AbhCRQuD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 Mar 2021 12:50:03 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44858 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232248AbhCRQtl (ORCPT
+        by vger.kernel.org with ESMTP id S232257AbhCRQtt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 Mar 2021 12:49:41 -0400
+        Thu, 18 Mar 2021 12:49:49 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1616086180;
+        s=mimecast20190719; t=1616086189;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=rVViYM6RdcSRq6ph00xTm+3/tk+wViBgPjyHPeg8h0o=;
-        b=adqKpVPayfCWKdbSi8csED/p4w48+1eszJiTp82sWI3uslOYbckMnBrLI+oAjieTuaIIjH
-        N/C8FGshqH+C9K11ygmCwb/A9XaBqTEWVmh+Bw64gdQeJ5bS/62l6h7HO8sj/XW7wGeBFN
-        JvRwYWXopu/7aS3n+xGCgUBB2VANqtc=
+        bh=OGFzBt2lBQvR+kYNIXjbrj2LIjdMT9WGJclN37ZNiu4=;
+        b=FGWcLFLWJvj/JglHfEF+6PzD3di4LdxwR58x7Z0hTsEGmqP9Ah9l5h5d3LZNYzk9QSOELy
+        Gu8Myfkx17GgY3DV7X8BiXinZwc+XxiwQoeWmFZ05e87q6kz3WuVZyrj35+K7ykYPOUbun
+        80bF/PgMIpZ3Z7ZaEubrZCc8YTksAL0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-81-mn_cV9J9M5Cn_DKDSpihiQ-1; Thu, 18 Mar 2021 12:49:38 -0400
-X-MC-Unique: mn_cV9J9M5Cn_DKDSpihiQ-1
+ us-mta-551-jvjTZ1-mPEWPBJd5xe_OFA-1; Thu, 18 Mar 2021 12:49:43 -0400
+X-MC-Unique: jvjTZ1-mPEWPBJd5xe_OFA-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 06A2D881283;
-        Thu, 18 Mar 2021 16:49:17 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1E871107B79B;
+        Thu, 18 Mar 2021 16:49:35 +0000 (UTC)
 Received: from localhost (ovpn-12-24.pek2.redhat.com [10.72.12.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id EBD865D9C6;
-        Thu, 18 Mar 2021 16:49:15 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 371DE5D9C6;
+        Thu, 18 Mar 2021 16:49:33 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Jeffle Xu <jefflexu@linux.alibaba.com>,
         Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
         Ming Lei <ming.lei@redhat.com>
-Subject: [RFC PATCH V2 02/13] block: add one helper to free io_context
-Date:   Fri, 19 Mar 2021 00:48:16 +0800
-Message-Id: <20210318164827.1481133-3-ming.lei@redhat.com>
+Subject: [RFC PATCH V2 07/13] block/mq: extract one helper function polling hw queue
+Date:   Fri, 19 Mar 2021 00:48:21 +0800
+Message-Id: <20210318164827.1481133-8-ming.lei@redhat.com>
 In-Reply-To: <20210318164827.1481133-1-ming.lei@redhat.com>
 References: <20210318164827.1481133-1-ming.lei@redhat.com>
 MIME-Version: 1.0
@@ -60,57 +60,54 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Prepare for putting bio poll queue into io_context, so add one helper
-for free io_context.
+From: Jeffle Xu <jefflexu@linux.alibaba.com>
 
+Extract the logic of polling one hw queue and related statistics
+handling out as the helper function.
+
+Signed-off-by: Jeffle Xu <jefflexu@linux.alibaba.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-ioc.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+ block/blk-mq.c | 18 ++++++++++++++----
+ 1 file changed, 14 insertions(+), 4 deletions(-)
 
-diff --git a/block/blk-ioc.c b/block/blk-ioc.c
-index 57299f860d41..b0cde18c4b8c 100644
---- a/block/blk-ioc.c
-+++ b/block/blk-ioc.c
-@@ -17,6 +17,11 @@
-  */
- static struct kmem_cache *iocontext_cachep;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index c832faa52ca0..03f59915fe2c 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -3852,6 +3852,19 @@ static bool blk_mq_poll_hybrid(struct request_queue *q,
+ 	return blk_mq_poll_hybrid_sleep(q, rq);
+ }
  
-+static inline void free_io_context(struct io_context *ioc)
++static inline int blk_mq_poll_hctx(struct request_queue *q,
++				   struct blk_mq_hw_ctx *hctx)
 +{
-+	kmem_cache_free(iocontext_cachep, ioc);
++	int ret;
++
++	hctx->poll_invoked++;
++	ret = q->mq_ops->poll(hctx);
++	if (ret > 0)
++		hctx->poll_success++;
++
++	return ret;
 +}
 +
- /**
-  * get_io_context - increment reference count to io_context
-  * @ioc: io_context to get
-@@ -129,7 +134,7 @@ static void ioc_release_fn(struct work_struct *work)
+ static int blk_bio_poll(struct request_queue *q, blk_qc_t cookie, bool spin)
+ {
+ 	/*
+@@ -3908,11 +3921,8 @@ int blk_poll(struct request_queue *q, blk_qc_t cookie, bool spin)
+ 	do {
+ 		int ret;
  
- 	spin_unlock_irq(&ioc->lock);
- 
--	kmem_cache_free(iocontext_cachep, ioc);
-+	free_io_context(ioc);
- }
- 
- /**
-@@ -164,7 +169,7 @@ void put_io_context(struct io_context *ioc)
- 	}
- 
- 	if (free_ioc)
--		kmem_cache_free(iocontext_cachep, ioc);
-+		free_io_context(ioc);
- }
- 
- /**
-@@ -278,7 +283,7 @@ int create_task_io_context(struct task_struct *task, gfp_t gfp_flags, int node)
- 	    (task == current || !(task->flags & PF_EXITING)))
- 		task->io_context = ioc;
- 	else
--		kmem_cache_free(iocontext_cachep, ioc);
-+		free_io_context(ioc);
- 
- 	ret = task->io_context ? 0 : -EBUSY;
- 
+-		hctx->poll_invoked++;
+-
+-		ret = q->mq_ops->poll(hctx);
++		ret = blk_mq_poll_hctx(q, hctx);
+ 		if (ret > 0) {
+-			hctx->poll_success++;
+ 			__set_current_state(TASK_RUNNING);
+ 			return ret;
+ 		}
 -- 
 2.29.2
 
