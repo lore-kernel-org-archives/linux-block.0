@@ -2,64 +2,63 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC62FC433E0
-	for <linux-block@archiver.kernel.org>; Thu, 18 Mar 2021 15:54:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7B7CC433E0
+	for <linux-block@archiver.kernel.org>; Thu, 18 Mar 2021 16:00:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A560964DFF
-	for <linux-block@archiver.kernel.org>; Thu, 18 Mar 2021 15:54:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B853264E6B
+	for <linux-block@archiver.kernel.org>; Thu, 18 Mar 2021 16:00:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231992AbhCRPx5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 Mar 2021 11:53:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44570 "EHLO
+        id S231889AbhCRQA1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 Mar 2021 12:00:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45974 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232004AbhCRPxs (ORCPT
+        with ESMTP id S231981AbhCRQAT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 Mar 2021 11:53:48 -0400
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 963F1C06174A
-        for <linux-block@vger.kernel.org>; Thu, 18 Mar 2021 08:53:47 -0700 (PDT)
-Received: by mail-lf1-x129.google.com with SMTP id u10so5349174lff.1
-        for <linux-block@vger.kernel.org>; Thu, 18 Mar 2021 08:53:47 -0700 (PDT)
+        Thu, 18 Mar 2021 12:00:19 -0400
+Received: from mail-il1-x12d.google.com (mail-il1-x12d.google.com [IPv6:2607:f8b0:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7521DC06174A
+        for <linux-block@vger.kernel.org>; Thu, 18 Mar 2021 09:00:19 -0700 (PDT)
+Received: by mail-il1-x12d.google.com with SMTP id z9so5323262ilb.4
+        for <linux-block@vger.kernel.org>; Thu, 18 Mar 2021 09:00:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=pq/eBnxufGHS03GB6g8W63yjQMuRCa5QlbRp3PwKUEw=;
-        b=bgdV4hZplv+94CUHWEbu9IHkjeAlUPO8LEb5m90TFIXf2m9HsOiO9yTkUsNDIdAL/2
-         rBZTdVoEZ257H5o2v1HojtAp7qwdrf7q6Ii2ntKX7WkOrgSD01JG2StigU5YHcWoqSJZ
-         bTXqHezszXCYygdvLZ/D4lwuJVAa88DpyGrABJ/xN9LlrHbBIre4dBG8nHgZCCo7PWaS
-         YykPvxidGKJ7WFvtyyCMDgKpOdLSC7cUPueTA3LN63sNMlGVX/MIeRRWbisyCFlEdCpG
-         VXqLfvbBzVRVVJY9HgvpGs9mCleH1KBcPG9F1+PKCOZB9CKurbXljzRWCaGovWH1biG9
-         +hXA==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=wUijfwg+uIfKfZvAaaXdkGTXi/eEZcihpR4YJOsQcao=;
+        b=x4gGUgw/3leBjfQHr9OOg+OpXui02/U/2GUZyNPrOGO0bY2mPIcrTwKHXxWy9qZ4EM
+         7tvKJoaDcaSG9p354Dma+Y4AEo8dHqedWnCovZGA9AcGBEzqN1WJImRhBoawGR0IWW7w
+         uHHXneMsob/NSsiZjL1y4DtteY0j8oseFc2oEsyAuvIEdazYmMNQyS+DEX6e5v6xED9l
+         qW63lH5JdKzrpPTBfitQt28mJ+iazG3qO+Qrqn4n86reF2TRsB5gSf3r8QoJEZYF5etR
+         TjWV3pyO9o+TCsXcMIGXdrMgtnxKLFg17mpOFDiOwR2qzDnqT235xki7H3U4Mj9MZnB7
+         DR7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=pq/eBnxufGHS03GB6g8W63yjQMuRCa5QlbRp3PwKUEw=;
-        b=U3WmBYfIJEptE3oa90DIB6qhq0dO3phNEcwomAMUWciJwh05wbZbjHAz+Z7nqLtAmg
-         uA4encCGGczn4kPxErtDoHrE57teYjSNj7r18oxFrQEA6OpKypvPx8BRLvi+2eBceQds
-         Yqq58W67zBVt2ttFLPeHSBYfQ95LP/8yiSgY2DNxb4iDDQuuWIYjWXSEzu5qRHRkPTG7
-         rnbIcqVOHDf37ZergU69QjcJRH6ciRnlNZxEHFYuqtVKueiXI9yakdhJ6SWpqe8Wv7sb
-         uA6vNCcQPVvqgAl1sP7T3nqiTRTITiCFBeez7VGV5R3/+sy8TQtEA5vtFv02UwRETzIp
-         EK9w==
-X-Gm-Message-State: AOAM532pkJ3JvKP1WYEKBt2G4alnWWDdV3eGAaP3LhEou8znzU58KFxQ
-        IsfDU3xojyAQyPn7KyQ/2oSF0qjdadPJTtU8y1B58A==
-X-Google-Smtp-Source: ABdhPJxEgWeS33XZh839tg6ABZ5gTUZAm8ikQzXDtakEINgKM9uy1FMacx7hcnhzqgiPX7UJktfr+qQJhl78XhvdRtk=
-X-Received: by 2002:a19:3804:: with SMTP id f4mr5990396lfa.117.1616082825932;
- Thu, 18 Mar 2021 08:53:45 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210316153655.500806-1-schatzberg.dan@gmail.com> <7ca79335-026f-2511-2b58-0e9f32caa063@kernel.dk>
-In-Reply-To: <7ca79335-026f-2511-2b58-0e9f32caa063@kernel.dk>
-From:   Shakeel Butt <shakeelb@google.com>
-Date:   Thu, 18 Mar 2021 08:53:32 -0700
-Message-ID: <CALvZod6tvrZ_sj=BnM4baQepexwvOPREx3qe5ZJrmqftrqwBEA@mail.gmail.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=wUijfwg+uIfKfZvAaaXdkGTXi/eEZcihpR4YJOsQcao=;
+        b=jr5g5yYQ86B077wNvKutXR/CXD/vqLbQcxZHhQW4+GbXDMQlOl0RdzzZEsxH76kP13
+         0Fl1owdazACH9Kavphl07hlz7w8SKGOZGEBW6IZMi+AAGfOhvC+lvkLISLVyZy0W7ipx
+         4JzxfXpUa/pwlM6w9SgkqvKPpylJB5DQ0kujBagr9KpSxQ34jCkU+WlnCMT/Wbe56t32
+         gytHaqIaoeZFF+VFs8tmaW1r9Fd/orthG+JWm/mJlwrT9ECLeaHugZ/p3UWsxjF8ucZx
+         7No8h5rCo/QOwXkVkB1VsLyCo70RwFyO08xO8rWIfd367q2uJiV2/0tvuoiIA2d6JleW
+         B3Vw==
+X-Gm-Message-State: AOAM533vF80s5vSJLfjR9+Js6boMC6Qm1j6eUhKLtVN8pe5y0AhB5UEU
+        61PYnKJhLw+Az1Op/J5ndqLrPQ==
+X-Google-Smtp-Source: ABdhPJxlHExmFB6rIshjX3M+428ad5PJKaQtEKKzbesPb669+u9AuEgwT7KfkFuTEC8MiGGHQRN92A==
+X-Received: by 2002:a92:4b0b:: with SMTP id m11mr3097091ilg.156.1616083218822;
+        Thu, 18 Mar 2021 09:00:18 -0700 (PDT)
+Received: from [192.168.1.30] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id f15sm1292869ilj.24.2021.03.18.09.00.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 18 Mar 2021 09:00:18 -0700 (PDT)
 Subject: Re: [PATCH v10 0/3] Charge loop device i/o to issuing cgroup
-To:     Jens Axboe <axboe@kernel.dk>
+To:     Shakeel Butt <shakeelb@google.com>
 Cc:     Dan Schatzberg <schatzberg.dan@gmail.com>,
         Tejun Heo <tj@kernel.org>, Zefan Li <lizefan.x@bytedance.com>,
         Johannes Weiner <hannes@cmpxchg.org>,
@@ -77,18 +76,39 @@ Cc:     Dan Schatzberg <schatzberg.dan@gmail.com>,
         open list <linux-kernel@vger.kernel.org>,
         "open list:CONTROL GROUP (CGROUP)" <cgroups@vger.kernel.org>,
         "open list:MEMORY MANAGEMENT" <linux-mm@kvack.org>
-Content-Type: text/plain; charset="UTF-8"
+References: <20210316153655.500806-1-schatzberg.dan@gmail.com>
+ <7ca79335-026f-2511-2b58-0e9f32caa063@kernel.dk>
+ <CALvZod6tvrZ_sj=BnM4baQepexwvOPREx3qe5ZJrmqftrqwBEA@mail.gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <8c32421c-4bd8-ec46-f1d0-25996956f4da@kernel.dk>
+Date:   Thu, 18 Mar 2021 10:00:17 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+MIME-Version: 1.0
+In-Reply-To: <CALvZod6tvrZ_sj=BnM4baQepexwvOPREx3qe5ZJrmqftrqwBEA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 17, 2021 at 3:30 PM Jens Axboe <axboe@kernel.dk> wrote:
->
-> On 3/16/21 9:36 AM, Dan Schatzberg wrote:
-> > No major changes, just rebasing and resubmitting
->
-> Applied for 5.13, thanks.
->
+On 3/18/21 9:53 AM, Shakeel Butt wrote:
+> On Wed, Mar 17, 2021 at 3:30 PM Jens Axboe <axboe@kernel.dk> wrote:
+>>
+>> On 3/16/21 9:36 AM, Dan Schatzberg wrote:
+>>> No major changes, just rebasing and resubmitting
+>>
+>> Applied for 5.13, thanks.
+>>
+> 
+> I have requested a couple of changes in the patch series. Can this
+> applied series still be changed or new patches are required?
 
-I have requested a couple of changes in the patch series. Can this
-applied series still be changed or new patches are required?
+I have nothing sitting on top of it for now, so as far as I'm concerned
+we can apply a new series instead. Then we can also fold in that fix
+from Colin that he posted this morning...
+
+-- 
+Jens Axboe
+
