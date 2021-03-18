@@ -2,113 +2,122 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7B7CC433E0
-	for <linux-block@archiver.kernel.org>; Thu, 18 Mar 2021 16:00:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64BAFC433E6
+	for <linux-block@archiver.kernel.org>; Thu, 18 Mar 2021 16:50:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B853264E6B
-	for <linux-block@archiver.kernel.org>; Thu, 18 Mar 2021 16:00:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 371ED64F1F
+	for <linux-block@archiver.kernel.org>; Thu, 18 Mar 2021 16:50:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231889AbhCRQA1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 Mar 2021 12:00:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45974 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231981AbhCRQAT (ORCPT
+        id S230085AbhCRQuC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 Mar 2021 12:50:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:54344 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232251AbhCRQtl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 Mar 2021 12:00:19 -0400
-Received: from mail-il1-x12d.google.com (mail-il1-x12d.google.com [IPv6:2607:f8b0:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7521DC06174A
-        for <linux-block@vger.kernel.org>; Thu, 18 Mar 2021 09:00:19 -0700 (PDT)
-Received: by mail-il1-x12d.google.com with SMTP id z9so5323262ilb.4
-        for <linux-block@vger.kernel.org>; Thu, 18 Mar 2021 09:00:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=wUijfwg+uIfKfZvAaaXdkGTXi/eEZcihpR4YJOsQcao=;
-        b=x4gGUgw/3leBjfQHr9OOg+OpXui02/U/2GUZyNPrOGO0bY2mPIcrTwKHXxWy9qZ4EM
-         7tvKJoaDcaSG9p354Dma+Y4AEo8dHqedWnCovZGA9AcGBEzqN1WJImRhBoawGR0IWW7w
-         uHHXneMsob/NSsiZjL1y4DtteY0j8oseFc2oEsyAuvIEdazYmMNQyS+DEX6e5v6xED9l
-         qW63lH5JdKzrpPTBfitQt28mJ+iazG3qO+Qrqn4n86reF2TRsB5gSf3r8QoJEZYF5etR
-         TjWV3pyO9o+TCsXcMIGXdrMgtnxKLFg17mpOFDiOwR2qzDnqT235xki7H3U4Mj9MZnB7
-         DR7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=wUijfwg+uIfKfZvAaaXdkGTXi/eEZcihpR4YJOsQcao=;
-        b=jr5g5yYQ86B077wNvKutXR/CXD/vqLbQcxZHhQW4+GbXDMQlOl0RdzzZEsxH76kP13
-         0Fl1owdazACH9Kavphl07hlz7w8SKGOZGEBW6IZMi+AAGfOhvC+lvkLISLVyZy0W7ipx
-         4JzxfXpUa/pwlM6w9SgkqvKPpylJB5DQ0kujBagr9KpSxQ34jCkU+WlnCMT/Wbe56t32
-         gytHaqIaoeZFF+VFs8tmaW1r9Fd/orthG+JWm/mJlwrT9ECLeaHugZ/p3UWsxjF8ucZx
-         7No8h5rCo/QOwXkVkB1VsLyCo70RwFyO08xO8rWIfd367q2uJiV2/0tvuoiIA2d6JleW
-         B3Vw==
-X-Gm-Message-State: AOAM533vF80s5vSJLfjR9+Js6boMC6Qm1j6eUhKLtVN8pe5y0AhB5UEU
-        61PYnKJhLw+Az1Op/J5ndqLrPQ==
-X-Google-Smtp-Source: ABdhPJxlHExmFB6rIshjX3M+428ad5PJKaQtEKKzbesPb669+u9AuEgwT7KfkFuTEC8MiGGHQRN92A==
-X-Received: by 2002:a92:4b0b:: with SMTP id m11mr3097091ilg.156.1616083218822;
-        Thu, 18 Mar 2021 09:00:18 -0700 (PDT)
-Received: from [192.168.1.30] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id f15sm1292869ilj.24.2021.03.18.09.00.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 18 Mar 2021 09:00:18 -0700 (PDT)
-Subject: Re: [PATCH v10 0/3] Charge loop device i/o to issuing cgroup
-To:     Shakeel Butt <shakeelb@google.com>
-Cc:     Dan Schatzberg <schatzberg.dan@gmail.com>,
-        Tejun Heo <tj@kernel.org>, Zefan Li <lizefan.x@bytedance.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Michal Hocko <mhocko@kernel.org>,
-        Vladimir Davydov <vdavydov.dev@gmail.com>,
-        Hugh Dickins <hughd@google.com>, Roman Gushchin <guro@fb.com>,
-        Muchun Song <songmuchun@bytedance.com>,
-        Alex Shi <alex.shi@linux.alibaba.com>,
-        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
-        Chris Down <chris@chrisdown.name>,
-        Yafang Shao <laoar.shao@gmail.com>,
-        Wei Yang <richard.weiyang@gmail.com>,
-        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        "open list:CONTROL GROUP (CGROUP)" <cgroups@vger.kernel.org>,
-        "open list:MEMORY MANAGEMENT" <linux-mm@kvack.org>
-References: <20210316153655.500806-1-schatzberg.dan@gmail.com>
- <7ca79335-026f-2511-2b58-0e9f32caa063@kernel.dk>
- <CALvZod6tvrZ_sj=BnM4baQepexwvOPREx3qe5ZJrmqftrqwBEA@mail.gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <8c32421c-4bd8-ec46-f1d0-25996956f4da@kernel.dk>
-Date:   Thu, 18 Mar 2021 10:00:17 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Thu, 18 Mar 2021 12:49:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1616086181;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=EP7yM5rpujErrHx2U82otFcEit6FbUguftQX3M6MNi0=;
+        b=PH+FwMAo1jOz6uql/jb5n2a9ExdgWg8u3ry/OUH96EEYEl7s8obXhNBXsYGNLvxFiMtsN3
+        GPRW+/kPQsNwxuLxlNkKmZiJoMzhbDzBL24F2m4ZR2BSU1Oz9xOXoPsuyhlKKMMAutkftz
+        gkNvOchYb2V81lWoHv7mynf8VWXoKKQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-356-ufvVLZ4aPUCVi82DcUBAsw-1; Thu, 18 Mar 2021 12:49:37 -0400
+X-MC-Unique: ufvVLZ4aPUCVi82DcUBAsw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 16FD1100A26F;
+        Thu, 18 Mar 2021 16:49:10 +0000 (UTC)
+Received: from localhost (ovpn-12-24.pek2.redhat.com [10.72.12.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 7E36B6B8F7;
+        Thu, 18 Mar 2021 16:48:35 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Jeffle Xu <jefflexu@linux.alibaba.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [RFC PATCH V2 00/13] block: support bio based io polling
+Date:   Fri, 19 Mar 2021 00:48:14 +0800
+Message-Id: <20210318164827.1481133-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CALvZod6tvrZ_sj=BnM4baQepexwvOPREx3qe5ZJrmqftrqwBEA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/18/21 9:53 AM, Shakeel Butt wrote:
-> On Wed, Mar 17, 2021 at 3:30 PM Jens Axboe <axboe@kernel.dk> wrote:
->>
->> On 3/16/21 9:36 AM, Dan Schatzberg wrote:
->>> No major changes, just rebasing and resubmitting
->>
->> Applied for 5.13, thanks.
->>
-> 
-> I have requested a couple of changes in the patch series. Can this
-> applied series still be changed or new patches are required?
+Hi,
 
-I have nothing sitting on top of it for now, so as far as I'm concerned
-we can apply a new series instead. Then we can also fold in that fix
-from Colin that he posted this morning...
+Add per-task io poll context for holding HIPRI blk-mq/underlying bios
+queued from bio based driver's io submission context, and reuse one bio
+padding field for storing 'cookie' returned from submit_bio() for these
+bios. Also explicitly end these bios in poll context by adding two
+new bio flags.
+
+In this way, we needn't to poll all underlying hw queues any more,
+which is implemented in Jeffle's patches. And we can just poll hw queues
+in which there is HIPRI IO queued.
+
+Usually io submission and io poll share same context, so the added io
+poll context data is just like one stack variable, and the cost for
+saving bios is cheap.
+
+Any comments are welcome.
+
+V2:
+	- address queue depth scalability issue reported by Jeffle via bio
+	group list. Reuse .bi_end_io for linking bios which share same
+	.bi_end_io, and support 32 such groups in submit queue. With this way,
+	the scalability issue caused by kfifio is solved. Before really
+	ending bio, .bi_end_io is recovered from the group head.
+
+
+Jeffle Xu (4):
+  block/mq: extract one helper function polling hw queue
+  block: add queue_to_disk() to get gendisk from request_queue
+  block: add poll_capable method to support bio-based IO polling
+  dm: support IO polling for bio-based dm device
+
+Ming Lei (9):
+  block: add helper of blk_queue_poll
+  block: add one helper to free io_context
+  block: add helper of blk_create_io_context
+  block: create io poll context for submission and poll task
+  block: add req flag of REQ_TAG
+  block: add new field into 'struct bvec_iter'
+  block: prepare for supporting bio_list via other link
+  block: use per-task poll context to implement bio based io poll
+  blk-mq: limit hw queues to be polled in each blk_poll()
+
+ block/bio.c                   |   5 +
+ block/blk-core.c              | 248 ++++++++++++++++++++++++++++++++--
+ block/blk-ioc.c               |  12 +-
+ block/blk-mq.c                | 232 ++++++++++++++++++++++++++++++-
+ block/blk-sysfs.c             |  14 +-
+ block/blk.h                   |  55 ++++++++
+ drivers/md/dm-table.c         |  24 ++++
+ drivers/md/dm.c               |  14 ++
+ drivers/nvme/host/core.c      |   2 +-
+ include/linux/bio.h           | 132 +++++++++---------
+ include/linux/blk_types.h     |  20 ++-
+ include/linux/blkdev.h        |   4 +
+ include/linux/bvec.h          |   9 ++
+ include/linux/device-mapper.h |   1 +
+ include/linux/iocontext.h     |   2 +
+ include/trace/events/kyber.h  |   6 +-
+ 16 files changed, 686 insertions(+), 94 deletions(-)
 
 -- 
-Jens Axboe
+2.29.2
 
