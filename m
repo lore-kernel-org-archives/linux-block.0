@@ -2,40 +2,40 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0A32C433E0
-	for <linux-block@archiver.kernel.org>; Thu, 18 Mar 2021 06:41:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EA52C433E6
+	for <linux-block@archiver.kernel.org>; Thu, 18 Mar 2021 06:41:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BB2B664F10
-	for <linux-block@archiver.kernel.org>; Thu, 18 Mar 2021 06:41:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1597664F3B
+	for <linux-block@archiver.kernel.org>; Thu, 18 Mar 2021 06:41:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229584AbhCRGk1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 Mar 2021 02:40:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37978 "EHLO
+        id S229704AbhCRGlG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 Mar 2021 02:41:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38114 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229512AbhCRGkV (ORCPT
+        with ESMTP id S229621AbhCRGk5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 Mar 2021 02:40:21 -0400
+        Thu, 18 Mar 2021 02:40:57 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FC77C06174A;
-        Wed, 17 Mar 2021 23:40:20 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 825CBC06174A;
+        Wed, 17 Mar 2021 23:40:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=w9eSeMx5GnmBb+ZPo7/G+ahBTYSxETSJHbZaK5M9CNg=; b=tjt8WhyOumzMC+a1st5QIabgtm
-        mWxIFHF88awil0Jau6Kai1XE+ICj9X0t/RB/6yta3NqXK84mplZ1KK340torHjDSl0Vby69e1Q7Zu
-        hFLKvIAfPz7BHymi8Ci62Qf+1DrvW+Dn9o8XVAbMMAjdRuOQmiICZG9hLZGhhXKBX0IRQw1A6uSx1
-        0GXwoWcAAmH4Z10+bv49lrplQzs4M+Gwj993a+RbLU8c2Mlby8DTe97sc0DzwKltJTOPs+fvCEf3V
-        9H6YJc5SEqbBcnaDkW3fCFwEqttN+1Nmk7AauaRA77RwMNJk3BoWV8NE/WVX38NWyjt0aQR5CRO/f
-        ExraqXtg==;
+        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
+        Content-Type:Content-ID:Content-Description;
+        bh=E5Oz1o3YwApZ0VyKUKJi0hPEuGJ9FeHDCsxBzoLWkVM=; b=UJTAUWwdcNUoVdUn3Rn/iZvNCj
+        /ZC7RgDuLC6Lf8xtLPHOKpEcN5wKAM7CLVjt5mWdhF/kykIAdkmJT56RdT/tf3o8OTh0aCeqE3iAs
+        tku1D8ou9/ujQfZFQxKoH3symXbOAEAnCN2y+cWJV+ggNRpnPKeTOPtu7GCjYp7vYRbhJcE/kLEPS
+        MbbTNMFOfkPU2bi+vqzTbQiwFPr29eAb0ZpnYU5Jh4BLCeSPqIjG2dLbIh3TjOZxR0xfKWa63jdrJ
+        QIS9lnAP4oEhGoCgUlBwfRxYUd7i5w3kkDOx0CgJfVFaK/EXCW30BbYwQAFrpSXCMHd8NOC1Z14H3
+        LprATFNQ==;
 Received: from [2001:4bb8:18c:bb3:e1cf:ad2f:7ff7:7a0b] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
-        id 1lMmJX-002evj-Vg; Thu, 18 Mar 2021 06:39:30 +0000
+        id 1lMmKU-002f2g-Bh; Thu, 18 Mar 2021 06:40:30 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>, Khalid Aziz <khalid@gonehiking.org>,
         "Martin K. Petersen" <martin.petersen@oracle.com>,
@@ -43,10 +43,12 @@ To:     Jens Axboe <axboe@kernel.dk>, Khalid Aziz <khalid@gonehiking.org>,
         Hannes Reinecke <hare@suse.com>,
         Ondrej Zary <linux@rainbow-software.org>
 Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
-Subject: start removing block bounce buffering support
-Date:   Thu, 18 Mar 2021 07:39:15 +0100
-Message-Id: <20210318063923.302738-1-hch@lst.de>
+Subject: [PATCH 3/8] BusLogic: reject broken old firmware that requires ISA-style bounce buffering
+Date:   Thu, 18 Mar 2021 07:39:18 +0100
+Message-Id: <20210318063923.302738-4-hch@lst.de>
 X-Mailer: git-send-email 2.30.1
+In-Reply-To: <20210318063923.302738-1-hch@lst.de>
+References: <20210318063923.302738-1-hch@lst.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
@@ -54,54 +56,83 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi all,
+Warn on and don't support adapters that have a DMA bug that forces ISA-style
+bounce buffering.
 
-this series starts to clean up and remove the impact of the legacy old
-block layer bounce buffering code.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/scsi/BusLogic.c | 21 ++++++---------------
+ drivers/scsi/BusLogic.h |  1 -
+ 2 files changed, 6 insertions(+), 16 deletions(-)
 
-First it removes support for ISA bouncing.  This was used by three SCSI
-drivers.  One of them actually had an active user and developer 5 years
-ago so I've converted it to use a local bounce buffer - Ondrej, can you
-test the coversion?  The next one has been known broken for years, and
-the third one looks like it has no users for the ISA support so they
-are just dropped.
+diff --git a/drivers/scsi/BusLogic.c b/drivers/scsi/BusLogic.c
+index c3ed03c4b3f5cb..c8977e4bdba8c2 100644
+--- a/drivers/scsi/BusLogic.c
++++ b/drivers/scsi/BusLogic.c
+@@ -1616,14 +1616,12 @@ static bool __init blogic_rdconfig(struct blogic_adapter *adapter)
+ 	   hardware bug whereby when the BIOS is enabled, transfers to/from
+ 	   the same address range the BIOS occupies modulo 16MB are handled
+ 	   incorrectly.  Only properly functioning BT-445S Host Adapters
+-	   have firmware version 3.37, so require that ISA Bounce Buffers
+-	   be used for the buggy BT-445S models if there is more than 16MB
+-	   memory.
++	   have firmware version 3.37.
+ 	 */
+-	if (adapter->bios_addr > 0 && strcmp(adapter->model, "BT-445S") == 0 &&
+-			strcmp(adapter->fw_ver, "3.37") < 0 &&
+-			(void *) high_memory > (void *) MAX_DMA_ADDRESS)
+-		adapter->need_bouncebuf = true;
++	if (adapter->bios_addr > 0 &&
++	    strcmp(adapter->model, "BT-445S") == 0 &&
++	    strcmp(adapter->fw_ver, "3.37") < 0)
++		return blogic_failure(adapter, "Too old firmware");
+ 	/*
+ 	   Initialize parameters common to MultiMaster and FlashPoint
+ 	   Host Adapters.
+@@ -1646,14 +1644,9 @@ static bool __init blogic_rdconfig(struct blogic_adapter *adapter)
+ 		if (adapter->drvr_opts != NULL &&
+ 				adapter->drvr_opts->qdepth[tgt_id] > 0)
+ 			qdepth = adapter->drvr_opts->qdepth[tgt_id];
+-		else if (adapter->need_bouncebuf)
+-			qdepth = BLOGIC_TAG_DEPTH_BB;
+ 		adapter->qdepth[tgt_id] = qdepth;
+ 	}
+-	if (adapter->need_bouncebuf)
+-		adapter->untag_qdepth = BLOGIC_UNTAG_DEPTH_BB;
+-	else
+-		adapter->untag_qdepth = BLOGIC_UNTAG_DEPTH;
++	adapter->untag_qdepth = BLOGIC_UNTAG_DEPTH;
+ 	if (adapter->drvr_opts != NULL)
+ 		adapter->common_qdepth = adapter->drvr_opts->common_qdepth;
+ 	if (adapter->common_qdepth > 0 &&
+@@ -2155,7 +2148,6 @@ static void __init blogic_inithoststruct(struct blogic_adapter *adapter,
+ 	host->this_id = adapter->scsi_id;
+ 	host->can_queue = adapter->drvr_qdepth;
+ 	host->sg_tablesize = adapter->drvr_sglimit;
+-	host->unchecked_isa_dma = adapter->need_bouncebuf;
+ 	host->cmd_per_lun = adapter->untag_qdepth;
+ }
+ 
+@@ -3705,7 +3697,6 @@ static struct scsi_host_template blogic_template = {
+ #if 0
+ 	.eh_abort_handler = blogic_abort,
+ #endif
+-	.unchecked_isa_dma = 1,
+ 	.max_sectors = 128,
+ };
+ 
+diff --git a/drivers/scsi/BusLogic.h b/drivers/scsi/BusLogic.h
+index 6eaddc009b5c55..858187af8fd1e8 100644
+--- a/drivers/scsi/BusLogic.h
++++ b/drivers/scsi/BusLogic.h
+@@ -1010,7 +1010,6 @@ struct blogic_adapter {
+ 	bool terminfo_valid:1;
+ 	bool low_term:1;
+ 	bool high_term:1;
+-	bool need_bouncebuf:1;
+ 	bool strict_rr:1;
+ 	bool scam_enabled:1;
+ 	bool scam_lev2:1;
+-- 
+2.30.1
 
-It then removes support for dealing with bounce buffering highmem pages
-for passthrough requests as we can just use the copy instead of the map
-path for them.  This will reduce efficiency for such setups on highmem
-systems (e.g. usb-storage attached DVD drives), but then again that is
-what you get for using a driver not using modern interfaces on a 32-bit
-highmem system.  It does allow to streamline the common path pretty nicely.
-
-Diffstat:
- Documentation/scsi/scsi_mid_low_api.rst |    4 
- block/bio-integrity.c                   |    3 
- block/blk-core.c                        |    6 
- block/blk-map.c                         |  120 +++----------
- block/blk-settings.c                    |   53 ------
- block/blk.h                             |   17 +
- block/bounce.c                          |  138 ++-------------
- block/scsi_ioctl.c                      |    2 
- drivers/ata/libata-scsi.c               |    3 
- drivers/nvme/host/lightnvm.c            |    2 
- drivers/scsi/BusLogic.c                 |  177 +-------------------
- drivers/scsi/BusLogic.h                 |    4 
- drivers/scsi/Kconfig                    |    2 
- drivers/scsi/advansys.c                 |  279 ++------------------------------
- drivers/scsi/aha1542.c                  |  105 ++++++------
- drivers/scsi/esas2r/esas2r_main.c       |    1 
- drivers/scsi/hosts.c                    |    7 
- drivers/scsi/scsi_debugfs.c             |    1 
- drivers/scsi/scsi_lib.c                 |   52 -----
- drivers/scsi/scsi_scan.c                |    6 
- drivers/scsi/scsi_sysfs.c               |    2 
- drivers/scsi/sg.c                       |   10 -
- drivers/scsi/sr_ioctl.c                 |   12 -
- drivers/scsi/st.c                       |   20 --
- drivers/scsi/st.h                       |    2 
- drivers/target/target_core_pscsi.c      |    4 
- include/linux/blkdev.h                  |   38 +---
- include/scsi/scsi_cmnd.h                |    7 
- include/scsi/scsi_host.h                |    6 
- mm/Kconfig                              |    9 -
- 30 files changed, 210 insertions(+), 882 deletions(-)
