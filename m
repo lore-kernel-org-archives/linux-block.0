@@ -4,38 +4,38 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EA52C433E6
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25890C433E0
 	for <linux-block@archiver.kernel.org>; Thu, 18 Mar 2021 06:41:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1597664F3B
-	for <linux-block@archiver.kernel.org>; Thu, 18 Mar 2021 06:41:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E6E4A64F10
+	for <linux-block@archiver.kernel.org>; Thu, 18 Mar 2021 06:41:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229704AbhCRGlG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 18 Mar 2021 02:41:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38114 "EHLO
+        id S229634AbhCRGlE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 18 Mar 2021 02:41:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38024 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229621AbhCRGk5 (ORCPT
+        with ESMTP id S229512AbhCRGkb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 Mar 2021 02:40:57 -0400
+        Thu, 18 Mar 2021 02:40:31 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 825CBC06174A;
-        Wed, 17 Mar 2021 23:40:57 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAE1AC06174A;
+        Wed, 17 Mar 2021 23:40:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
         References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
         Content-Type:Content-ID:Content-Description;
-        bh=E5Oz1o3YwApZ0VyKUKJi0hPEuGJ9FeHDCsxBzoLWkVM=; b=UJTAUWwdcNUoVdUn3Rn/iZvNCj
-        /ZC7RgDuLC6Lf8xtLPHOKpEcN5wKAM7CLVjt5mWdhF/kykIAdkmJT56RdT/tf3o8OTh0aCeqE3iAs
-        tku1D8ou9/ujQfZFQxKoH3symXbOAEAnCN2y+cWJV+ggNRpnPKeTOPtu7GCjYp7vYRbhJcE/kLEPS
-        MbbTNMFOfkPU2bi+vqzTbQiwFPr29eAb0ZpnYU5Jh4BLCeSPqIjG2dLbIh3TjOZxR0xfKWa63jdrJ
-        QIS9lnAP4oEhGoCgUlBwfRxYUd7i5w3kkDOx0CgJfVFaK/EXCW30BbYwQAFrpSXCMHd8NOC1Z14H3
-        LprATFNQ==;
+        bh=X0mTB17u4X56qha0KVy3ncQBqzZpXhHbkl0cffm7+as=; b=Bom9eGjgxgcp8sQ7FJJvhwqZ2b
+        fqU9ZdNbcU1vdVGQ9iDPtH26jBvGiS17APgy+kUcOSTmjsyFkUjG/3ijXMJcuhX1uBqxqfVPdWkYA
+        8XSpeNaCxxSXZhHY65jN1Dl8jKxmwdnkJ2czrhJfAu57exueGmYk7z7WszbC3MsJ2PuBAVt3K+6KB
+        RR3mm2cVOOaD5AWuqdkOV3twLAY6fqfCeyztBEEQvcdVGIq4yrl4C+YHApEcqCWywY/Pd9r1Bq/ye
+        3u1aUKcqfHBrQI6+HJ3+fJO8BXb89DHW0OrmSHSK7LnmqcZsYi5YCNVz50F2B39m02x2xUCuZQvUJ
+        2aF83VmA==;
 Received: from [2001:4bb8:18c:bb3:e1cf:ad2f:7ff7:7a0b] (helo=localhost)
         by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
-        id 1lMmKU-002f2g-Bh; Thu, 18 Mar 2021 06:40:30 +0000
+        id 1lMmJm-002ewB-Nd; Thu, 18 Mar 2021 06:39:42 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>, Khalid Aziz <khalid@gonehiking.org>,
         "Martin K. Petersen" <martin.petersen@oracle.com>,
@@ -43,9 +43,9 @@ To:     Jens Axboe <axboe@kernel.dk>, Khalid Aziz <khalid@gonehiking.org>,
         Hannes Reinecke <hare@suse.com>,
         Ondrej Zary <linux@rainbow-software.org>
 Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
-Subject: [PATCH 3/8] BusLogic: reject broken old firmware that requires ISA-style bounce buffering
-Date:   Thu, 18 Mar 2021 07:39:18 +0100
-Message-Id: <20210318063923.302738-4-hch@lst.de>
+Subject: [PATCH 1/8] aha1542: use a local bounce buffer
+Date:   Thu, 18 Mar 2021 07:39:16 +0100
+Message-Id: <20210318063923.302738-2-hch@lst.de>
 X-Mailer: git-send-email 2.30.1
 In-Reply-To: <20210318063923.302738-1-hch@lst.de>
 References: <20210318063923.302738-1-hch@lst.de>
@@ -56,83 +56,190 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Warn on and don't support adapters that have a DMA bug that forces ISA-style
-bounce buffering.
+To remove the last user of the unchecked_isa_dma flag and thus the block
+layer ISA bounce buffering switch this driver to use its own local bounce
+buffer.  This has the effect of not needing the chain indirection and
+supporting and unlimited number of segments.  It does however limit the
+transfer size for each command to something that can be reasonable
+allocated by dma_alloc_coherent like 8K.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/scsi/BusLogic.c | 21 ++++++---------------
- drivers/scsi/BusLogic.h |  1 -
- 2 files changed, 6 insertions(+), 16 deletions(-)
+ drivers/scsi/aha1542.c | 105 ++++++++++++++++++++++-------------------
+ 1 file changed, 57 insertions(+), 48 deletions(-)
 
-diff --git a/drivers/scsi/BusLogic.c b/drivers/scsi/BusLogic.c
-index c3ed03c4b3f5cb..c8977e4bdba8c2 100644
---- a/drivers/scsi/BusLogic.c
-+++ b/drivers/scsi/BusLogic.c
-@@ -1616,14 +1616,12 @@ static bool __init blogic_rdconfig(struct blogic_adapter *adapter)
- 	   hardware bug whereby when the BIOS is enabled, transfers to/from
- 	   the same address range the BIOS occupies modulo 16MB are handled
- 	   incorrectly.  Only properly functioning BT-445S Host Adapters
--	   have firmware version 3.37, so require that ISA Bounce Buffers
--	   be used for the buggy BT-445S models if there is more than 16MB
--	   memory.
-+	   have firmware version 3.37.
- 	 */
--	if (adapter->bios_addr > 0 && strcmp(adapter->model, "BT-445S") == 0 &&
--			strcmp(adapter->fw_ver, "3.37") < 0 &&
--			(void *) high_memory > (void *) MAX_DMA_ADDRESS)
--		adapter->need_bouncebuf = true;
-+	if (adapter->bios_addr > 0 &&
-+	    strcmp(adapter->model, "BT-445S") == 0 &&
-+	    strcmp(adapter->fw_ver, "3.37") < 0)
-+		return blogic_failure(adapter, "Too old firmware");
- 	/*
- 	   Initialize parameters common to MultiMaster and FlashPoint
- 	   Host Adapters.
-@@ -1646,14 +1644,9 @@ static bool __init blogic_rdconfig(struct blogic_adapter *adapter)
- 		if (adapter->drvr_opts != NULL &&
- 				adapter->drvr_opts->qdepth[tgt_id] > 0)
- 			qdepth = adapter->drvr_opts->qdepth[tgt_id];
--		else if (adapter->need_bouncebuf)
--			qdepth = BLOGIC_TAG_DEPTH_BB;
- 		adapter->qdepth[tgt_id] = qdepth;
- 	}
--	if (adapter->need_bouncebuf)
--		adapter->untag_qdepth = BLOGIC_UNTAG_DEPTH_BB;
--	else
--		adapter->untag_qdepth = BLOGIC_UNTAG_DEPTH;
-+	adapter->untag_qdepth = BLOGIC_UNTAG_DEPTH;
- 	if (adapter->drvr_opts != NULL)
- 		adapter->common_qdepth = adapter->drvr_opts->common_qdepth;
- 	if (adapter->common_qdepth > 0 &&
-@@ -2155,7 +2148,6 @@ static void __init blogic_inithoststruct(struct blogic_adapter *adapter,
- 	host->this_id = adapter->scsi_id;
- 	host->can_queue = adapter->drvr_qdepth;
- 	host->sg_tablesize = adapter->drvr_sglimit;
--	host->unchecked_isa_dma = adapter->need_bouncebuf;
- 	host->cmd_per_lun = adapter->untag_qdepth;
- }
- 
-@@ -3705,7 +3697,6 @@ static struct scsi_host_template blogic_template = {
- #if 0
- 	.eh_abort_handler = blogic_abort,
- #endif
--	.unchecked_isa_dma = 1,
- 	.max_sectors = 128,
+diff --git a/drivers/scsi/aha1542.c b/drivers/scsi/aha1542.c
+index 21aab9f5b1172a..1210e61afb1838 100644
+--- a/drivers/scsi/aha1542.c
++++ b/drivers/scsi/aha1542.c
+@@ -65,9 +65,12 @@ struct aha1542_hostdata {
+ 	dma_addr_t ccb_handle;
  };
  
-diff --git a/drivers/scsi/BusLogic.h b/drivers/scsi/BusLogic.h
-index 6eaddc009b5c55..858187af8fd1e8 100644
---- a/drivers/scsi/BusLogic.h
-+++ b/drivers/scsi/BusLogic.h
-@@ -1010,7 +1010,6 @@ struct blogic_adapter {
- 	bool terminfo_valid:1;
- 	bool low_term:1;
- 	bool high_term:1;
--	bool need_bouncebuf:1;
- 	bool strict_rr:1;
- 	bool scam_enabled:1;
- 	bool scam_lev2:1;
++#define AHA1542_MAX_SECTORS       16
++
+ struct aha1542_cmd {
+-	struct chain *chain;
+-	dma_addr_t chain_handle;
++	/* bounce buffer */
++	void *data_buffer;
++	dma_addr_t data_buffer_handle;
+ };
+ 
+ static inline void aha1542_intr_reset(u16 base)
+@@ -257,15 +260,19 @@ static int aha1542_test_port(struct Scsi_Host *sh)
+ static void aha1542_free_cmd(struct scsi_cmnd *cmd)
+ {
+ 	struct aha1542_cmd *acmd = scsi_cmd_priv(cmd);
+-	struct device *dev = cmd->device->host->dma_dev;
+-	size_t len = scsi_sg_count(cmd) * sizeof(struct chain);
+ 
+-	if (acmd->chain) {
+-		dma_unmap_single(dev, acmd->chain_handle, len, DMA_TO_DEVICE);
+-		kfree(acmd->chain);
++	if (cmd->sc_data_direction == DMA_FROM_DEVICE) {
++		void *buf = acmd->data_buffer;
++		struct req_iterator iter;
++		struct bio_vec bv;
++
++		rq_for_each_segment(bv, cmd->request, iter) {
++			memcpy_to_page(bv.bv_page, bv.bv_offset, buf,
++				       bv.bv_len);
++			buf += bv.bv_len;
++		}
+ 	}
+ 
+-	acmd->chain = NULL;
+ 	scsi_dma_unmap(cmd);
+ }
+ 
+@@ -416,7 +423,7 @@ static int aha1542_queuecommand(struct Scsi_Host *sh, struct scsi_cmnd *cmd)
+ 	u8 lun = cmd->device->lun;
+ 	unsigned long flags;
+ 	int bufflen = scsi_bufflen(cmd);
+-	int mbo, sg_count;
++	int mbo;
+ 	struct mailbox *mb = aha1542->mb;
+ 	struct ccb *ccb = aha1542->ccb;
+ 
+@@ -438,17 +445,17 @@ static int aha1542_queuecommand(struct Scsi_Host *sh, struct scsi_cmnd *cmd)
+ 		print_hex_dump_bytes("command: ", DUMP_PREFIX_NONE, cmd->cmnd, cmd->cmd_len);
+ 	}
+ #endif
+-	sg_count = scsi_dma_map(cmd);
+-	if (sg_count) {
+-		size_t len = sg_count * sizeof(struct chain);
+-
+-		acmd->chain = kmalloc(len, GFP_DMA);
+-		if (!acmd->chain)
+-			goto out_unmap;
+-		acmd->chain_handle = dma_map_single(sh->dma_dev, acmd->chain,
+-				len, DMA_TO_DEVICE);
+-		if (dma_mapping_error(sh->dma_dev, acmd->chain_handle))
+-			goto out_free_chain;
++
++	if (cmd->sc_data_direction == DMA_TO_DEVICE) {
++		void *buf = acmd->data_buffer;
++		struct req_iterator iter;
++		struct bio_vec bv;
++
++		rq_for_each_segment(bv, cmd->request, iter) {
++			memcpy_from_page(buf, bv.bv_page, bv.bv_offset,
++					 bv.bv_len);
++			buf += bv.bv_len;
++		}
+ 	}
+ 
+ 	/*
+@@ -496,27 +503,12 @@ static int aha1542_queuecommand(struct Scsi_Host *sh, struct scsi_cmnd *cmd)
+ 		direction = 16;
+ 
+ 	memcpy(ccb[mbo].cdb, cmd->cmnd, ccb[mbo].cdblen);
+-
+-	if (bufflen) {
+-		struct scatterlist *sg;
+-		int i;
+-
+-		ccb[mbo].op = 2;	/* SCSI Initiator Command  w/scatter-gather */
+-		scsi_for_each_sg(cmd, sg, sg_count, i) {
+-			any2scsi(acmd->chain[i].dataptr, sg_dma_address(sg));
+-			any2scsi(acmd->chain[i].datalen, sg_dma_len(sg));
+-		};
+-		any2scsi(ccb[mbo].datalen, sg_count * sizeof(struct chain));
+-		any2scsi(ccb[mbo].dataptr, acmd->chain_handle);
+-#ifdef DEBUG
+-		shost_printk(KERN_DEBUG, sh, "cptr %p: ", acmd->chain);
+-		print_hex_dump_bytes("cptr: ", DUMP_PREFIX_NONE, acmd->chain, 18);
+-#endif
+-	} else {
+-		ccb[mbo].op = 0;	/* SCSI Initiator Command */
+-		any2scsi(ccb[mbo].datalen, 0);
++	ccb[mbo].op = 0;	/* SCSI Initiator Command */
++	any2scsi(ccb[mbo].datalen, bufflen);
++	if (bufflen)
++		any2scsi(ccb[mbo].dataptr, acmd->data_buffer_handle);
++	else
+ 		any2scsi(ccb[mbo].dataptr, 0);
+-	};
+ 	ccb[mbo].idlun = (target & 7) << 5 | direction | (lun & 7);	/*SCSI Target Id */
+ 	ccb[mbo].rsalen = 16;
+ 	ccb[mbo].linkptr[0] = ccb[mbo].linkptr[1] = ccb[mbo].linkptr[2] = 0;
+@@ -531,12 +523,6 @@ static int aha1542_queuecommand(struct Scsi_Host *sh, struct scsi_cmnd *cmd)
+ 	spin_unlock_irqrestore(sh->host_lock, flags);
+ 
+ 	return 0;
+-out_free_chain:
+-	kfree(acmd->chain);
+-	acmd->chain = NULL;
+-out_unmap:
+-	scsi_dma_unmap(cmd);
+-	return SCSI_MLQUEUE_HOST_BUSY;
+ }
+ 
+ /* Initialize mailboxes */
+@@ -1027,6 +1013,27 @@ static int aha1542_biosparam(struct scsi_device *sdev,
+ }
+ MODULE_LICENSE("GPL");
+ 
++static int aha1542_init_cmd_priv(struct Scsi_Host *shost, struct scsi_cmnd *cmd)
++{
++	struct aha1542_cmd *acmd = scsi_cmd_priv(cmd);
++
++	acmd->data_buffer = dma_alloc_coherent(shost->dma_dev,
++			SECTOR_SIZE * AHA1542_MAX_SECTORS,
++			&acmd->data_buffer_handle, GFP_KERNEL);
++	if (!acmd->data_buffer)
++		return -ENOMEM;
++	return 0;
++}
++
++static int aha1542_exit_cmd_priv(struct Scsi_Host *shost, struct scsi_cmnd *cmd)
++{
++	struct aha1542_cmd *acmd = scsi_cmd_priv(cmd);
++
++	dma_free_coherent(shost->dma_dev, SECTOR_SIZE * AHA1542_MAX_SECTORS,
++			acmd->data_buffer, acmd->data_buffer_handle);
++	return 0;
++}
++
+ static struct scsi_host_template driver_template = {
+ 	.module			= THIS_MODULE,
+ 	.proc_name		= "aha1542",
+@@ -1037,10 +1044,12 @@ static struct scsi_host_template driver_template = {
+ 	.eh_bus_reset_handler	= aha1542_bus_reset,
+ 	.eh_host_reset_handler	= aha1542_host_reset,
+ 	.bios_param		= aha1542_biosparam,
++	.init_cmd_priv		= aha1542_init_cmd_priv,
++	.exit_cmd_priv		= aha1542_exit_cmd_priv,
+ 	.can_queue		= AHA1542_MAILBOXES,
+ 	.this_id		= 7,
+-	.sg_tablesize		= 16,
+-	.unchecked_isa_dma	= 1,
++	.max_sectors		= AHA1542_MAX_SECTORS,
++	.sg_tablesize		= SG_ALL,
+ };
+ 
+ static int aha1542_isa_match(struct device *pdev, unsigned int ndev)
 -- 
 2.30.1
 
