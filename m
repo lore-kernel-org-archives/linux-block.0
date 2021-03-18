@@ -5,92 +5,123 @@ X-Spam-Level:
 X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C3F4C433E9
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91DC4C43381
 	for <linux-block@archiver.kernel.org>; Thu, 18 Mar 2021 16:50:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4B98B64F11
+	by mail.kernel.org (Postfix) with ESMTP id 6CEDD64F1C
 	for <linux-block@archiver.kernel.org>; Thu, 18 Mar 2021 16:50:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232064AbhCRQuD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S232218AbhCRQuD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Thu, 18 Mar 2021 12:50:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:33164 "EHLO
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57025 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232255AbhCRQts (ORCPT
+        by vger.kernel.org with ESMTP id S231648AbhCRQtp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 18 Mar 2021 12:49:48 -0400
+        Thu, 18 Mar 2021 12:49:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1616086187;
+        s=mimecast20190719; t=1616086184;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=pPmdiGFpIEVHHdkjC5nrbTsamI2Cw8osFs9EsU37nO0=;
-        b=CYJKcOmb32PRoeC1AyOoAOOC2tYKhrIpOdC3YinRQGap990stWqryf8kJwRWMsUiUC1i38
-        ztKFECX750WioAoq0mOAwf6Mg6TFQZS1sCyOM7BZDJj32cdSyyGNRmFGYzYdno/bcUgykP
-        oXp3TBVFYRlQdiP+gjSGMHhHpp7hgsM=
+        bh=iduzOVbp86yy7arPyGbofc+R5X4b5q0A6YTz87JrZjs=;
+        b=RMkpJL1sdEIMtktijJ2GTXRFrrwkWvNhJIgOKl0CEFdgmA05PTMW2mVc1cKTXU6P5NmIsL
+        WnpxG5ETeG9VaNxQhxhhNP+6LbQBhLB8HU/5vBhz3AnzriQvSpMXsmZc+NjazrN5LivDs2
+        mUUW49FLHHp3P0LCYMGadkHKgp0WVGo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-420-Uvsna_TyP4i-6-UkduWWfA-1; Thu, 18 Mar 2021 12:49:45 -0400
-X-MC-Unique: Uvsna_TyP4i-6-UkduWWfA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-587-kETfDDwPO-WAw8meZalcxQ-1; Thu, 18 Mar 2021 12:49:41 -0400
+X-MC-Unique: kETfDDwPO-WAw8meZalcxQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7FFDC1B2C9A7;
-        Thu, 18 Mar 2021 16:49:31 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C1D29100E334;
+        Thu, 18 Mar 2021 16:49:13 +0000 (UTC)
 Received: from localhost (ovpn-12-24.pek2.redhat.com [10.72.12.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 754FC5D9C6;
-        Thu, 18 Mar 2021 16:49:30 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E55C519D9B;
+        Thu, 18 Mar 2021 16:49:12 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Jeffle Xu <jefflexu@linux.alibaba.com>,
         Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
         Ming Lei <ming.lei@redhat.com>
-Subject: [RFC PATCH V2 06/13] block: add new field into 'struct bvec_iter'
-Date:   Fri, 19 Mar 2021 00:48:20 +0800
-Message-Id: <20210318164827.1481133-7-ming.lei@redhat.com>
+Subject: [RFC PATCH V2 01/13] block: add helper of blk_queue_poll
+Date:   Fri, 19 Mar 2021 00:48:15 +0800
+Message-Id: <20210318164827.1481133-2-ming.lei@redhat.com>
 In-Reply-To: <20210318164827.1481133-1-ming.lei@redhat.com>
 References: <20210318164827.1481133-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-There is a hole at the end of 'struct bvec_iter', so put a new field
-here and we can save cookie returned from submit_bio() here for
-supporting bio based polling.
-
-This way can avoid to extend bio unnecessarily.
+There has been 3 users, and will be more, so add one such helper.
 
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- include/linux/bvec.h | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ block/blk-core.c         | 2 +-
+ block/blk-mq.c           | 3 +--
+ drivers/nvme/host/core.c | 2 +-
+ include/linux/blkdev.h   | 1 +
+ 4 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/include/linux/bvec.h b/include/linux/bvec.h
-index ff832e698efb..61c0f55f7165 100644
---- a/include/linux/bvec.h
-+++ b/include/linux/bvec.h
-@@ -43,6 +43,15 @@ struct bvec_iter {
+diff --git a/block/blk-core.c b/block/blk-core.c
+index fc60ff208497..a31371d55b9d 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -836,7 +836,7 @@ static noinline_for_stack bool submit_bio_checks(struct bio *bio)
+ 		}
+ 	}
  
- 	unsigned int            bi_bvec_done;	/* number of bytes completed in
- 						   current bvec */
-+
-+	/*
-+	 * There is a hole at the end of bvec_iter, define one filed to
-+	 * hold something which isn't relate with 'bvec_iter', so that we can
-+	 * avoid to extend bio. So far this new field is used for bio based
-+	 * pooling, we will store returning value of underlying queue's
-+	 * submit_bio() here.
-+	 */
-+	unsigned int		bi_private_data;
- };
+-	if (!test_bit(QUEUE_FLAG_POLL, &q->queue_flags))
++	if (!blk_queue_poll(q))
+ 		bio->bi_opf &= ~REQ_HIPRI;
  
- struct bvec_iter_all {
+ 	switch (bio_op(bio)) {
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index d4d7c1caa439..63c81df3b8b5 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -3869,8 +3869,7 @@ int blk_poll(struct request_queue *q, blk_qc_t cookie, bool spin)
+ 	struct blk_mq_hw_ctx *hctx;
+ 	long state;
+ 
+-	if (!blk_qc_t_valid(cookie) ||
+-	    !test_bit(QUEUE_FLAG_POLL, &q->queue_flags))
++	if (!blk_qc_t_valid(cookie) || !blk_queue_poll(q))
+ 		return 0;
+ 
+ 	if (current->plug)
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index a5653892d773..1bf94f0d2e8d 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -956,7 +956,7 @@ static void nvme_execute_rq_polled(struct request_queue *q,
+ {
+ 	DECLARE_COMPLETION_ONSTACK(wait);
+ 
+-	WARN_ON_ONCE(!test_bit(QUEUE_FLAG_POLL, &q->queue_flags));
++	WARN_ON_ONCE(!blk_queue_poll(q));
+ 
+ 	rq->cmd_flags |= REQ_HIPRI;
+ 	rq->end_io_data = &wait;
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index bc6bc8383b43..89a01850cf12 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -665,6 +665,7 @@ bool blk_queue_flag_test_and_set(unsigned int flag, struct request_queue *q);
+ #define blk_queue_fua(q)	test_bit(QUEUE_FLAG_FUA, &(q)->queue_flags)
+ #define blk_queue_registered(q)	test_bit(QUEUE_FLAG_REGISTERED, &(q)->queue_flags)
+ #define blk_queue_nowait(q)	test_bit(QUEUE_FLAG_NOWAIT, &(q)->queue_flags)
++#define blk_queue_poll(q)	test_bit(QUEUE_FLAG_POLL, &(q)->queue_flags)
+ 
+ extern void blk_set_pm_only(struct request_queue *q);
+ extern void blk_clear_pm_only(struct request_queue *q);
 -- 
 2.29.2
 
