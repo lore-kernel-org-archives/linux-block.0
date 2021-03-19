@@ -2,114 +2,98 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17B1FC433DB
-	for <linux-block@archiver.kernel.org>; Fri, 19 Mar 2021 17:45:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AFF6C433C1
+	for <linux-block@archiver.kernel.org>; Fri, 19 Mar 2021 18:22:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C9A446197B
-	for <linux-block@archiver.kernel.org>; Fri, 19 Mar 2021 17:45:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2A84C61961
+	for <linux-block@archiver.kernel.org>; Fri, 19 Mar 2021 18:22:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229925AbhCSRoi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 Mar 2021 13:44:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42334 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230205AbhCSRod (ORCPT
+        id S230064AbhCSSWT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 Mar 2021 14:22:19 -0400
+Received: from frasgout.his.huawei.com ([185.176.79.56]:2720 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230304AbhCSSVw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 Mar 2021 13:44:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1616175873;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=yprWRSB7vS80FLiQJh7hMRGMJTNWmDK1YYymuS08YsU=;
-        b=cJH+0lowBQrIp9OlB6EAh1xY3zwSh9NhpEELRFbq5xRYPawodLt9a3ZrYIkLAEo7l6rcd1
-        xuJ08EFfiVU4YLfKzGJlYGkMuzkNe3e8UP1TbxTaTDY7zzz47ev2htHH+8E7qEkAfkMXvb
-        zssKcujnQeC1Bg6UEBETL8xS1UW/w1I=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-107-Z6xNQzUzO0SAJjXNwNAqiA-1; Fri, 19 Mar 2021 13:44:31 -0400
-X-MC-Unique: Z6xNQzUzO0SAJjXNwNAqiA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D466681744F;
-        Fri, 19 Mar 2021 17:44:29 +0000 (UTC)
-Received: from localhost (unknown [10.18.25.174])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 766C019C79;
-        Fri, 19 Mar 2021 17:44:23 +0000 (UTC)
-Date:   Fri, 19 Mar 2021 13:44:22 -0400
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        Jeffle Xu <jefflexu@linux.alibaba.com>, dm-devel@redhat.com
-Subject: Re: [RFC PATCH V2 06/13] block: add new field into 'struct bvec_iter'
-Message-ID: <20210319174422.GD9938@redhat.com>
-References: <20210318164827.1481133-1-ming.lei@redhat.com>
- <20210318164827.1481133-7-ming.lei@redhat.com>
+        Fri, 19 Mar 2021 14:21:52 -0400
+Received: from fraeml710-chm.china.huawei.com (unknown [172.18.147.201])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4F2Btx0ht5z680lw;
+        Sat, 20 Mar 2021 02:17:13 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml710-chm.china.huawei.com (10.206.15.59) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Fri, 19 Mar 2021 19:21:50 +0100
+Received: from [10.47.10.104] (10.47.10.104) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2106.2; Fri, 19 Mar
+ 2021 18:21:49 +0000
+Subject: Re: [RFC PATCH v3 2/3] blk-mq: Freeze and quiesce all queues for
+ tagset in elevator_exit()
+To:     Bart Van Assche <bvanassche@acm.org>,
+        Ming Lei <ming.lei@redhat.com>
+CC:     "hare@suse.de" <hare@suse.de>, "axboe@kernel.dk" <axboe@kernel.dk>,
+        "hch@lst.de" <hch@lst.de>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "pragalla@codeaurora.org" <pragalla@codeaurora.org>,
+        "kashyap.desai@broadcom.com" <kashyap.desai@broadcom.com>,
+        yuyufen <yuyufen@huawei.com>
+References: <1614957294-188540-1-git-send-email-john.garry@huawei.com>
+ <1614957294-188540-3-git-send-email-john.garry@huawei.com>
+ <YElrSFGyim3rjDN+@T590> <8c6c6783-6152-2332-2f50-14c409e40320@huawei.com>
+ <2b0c66ba-03b3-844c-1684-f8e80d11cdbb@acm.org>
+ <4ffaba53-100a-43a5-8746-b753d4153be5@huawei.com>
+ <fff92b15-d483-ad6a-bb01-ef61117b7cbd@acm.org>
+ <82526e78-66e5-fc3c-7acd-38f1813ebe1e@huawei.com>
+ <e0906b2e-6a2b-ce34-84a1-36eaddbb824d@acm.org>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <85fd2c95-2258-9b51-02f8-01895c06f814@huawei.com>
+Date:   Fri, 19 Mar 2021 18:19:38 +0000
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210318164827.1481133-7-ming.lei@redhat.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <e0906b2e-6a2b-ce34-84a1-36eaddbb824d@acm.org>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.47.10.104]
+X-ClientProxiedBy: lhreml717-chm.china.huawei.com (10.201.108.68) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 18 2021 at 12:48pm -0400,
-Ming Lei <ming.lei@redhat.com> wrote:
+On 16/03/2021 19:59, Bart Van Assche wrote:
+> On 3/16/21 10:43 AM, John Garry wrote:
+>> On 16/03/2021 17:00, Bart Van Assche wrote:
+>>> I agree that Jens asked at the end of 2018 not to touch the fast path
+>>> to fix this use-after-free (maybe that request has been repeated more
+>>> recently). If Jens or anyone else feels strongly about not clearing
+>>> hctx->tags->rqs[rq->tag] from the fast path then I will make that change.
 
-> There is a hole at the end of 'struct bvec_iter', so put a new field
-> here and we can save cookie returned from submit_bio() here for
-> supporting bio based polling.
+Hi Bart,
+
+>> Is that possible for this same approach? I need to check the code more..
+> If the fast path should not be modified, I'm considering to borrow patch
+> 1/3 from your patch series
+
+Fine
+
+> and to add an rcu_barrier() between the code
+> that clears the request pointers and that frees the scheduler requests.
 > 
-> This way can avoid to extend bio unnecessarily.
-> 
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  include/linux/bvec.h | 9 +++++++++
->  1 file changed, 9 insertions(+)
-> 
-> diff --git a/include/linux/bvec.h b/include/linux/bvec.h
-> index ff832e698efb..61c0f55f7165 100644
-> --- a/include/linux/bvec.h
-> +++ b/include/linux/bvec.h
-> @@ -43,6 +43,15 @@ struct bvec_iter {
->  
->  	unsigned int            bi_bvec_done;	/* number of bytes completed in
->  						   current bvec */
-> +
-> +	/*
-> +	 * There is a hole at the end of bvec_iter, define one filed to
+>> And don't we still have the problem that some iter callbacks may
+>> sleep/block, which is not allowed in an RCU read-side critical section?
+> Thanks for having brought this up. Since none of the functions that
+> iterate over requests should be called from the hot path of a block
+> driver, I think that we can use srcu_read_(un|)lock() inside bt_iter()
+> and bt_tags_iter() instead of rcu_read_(un|)lock().
 
-s/filed/field/
+OK, but TBH, I am not so familiar with srcu - where you going to try this?
 
-> +	 * hold something which isn't relate with 'bvec_iter', so that we can
-
-s/relate/related/
-or
-s/isn't relate with/doesn't relate to/
-
-> +	 * avoid to extend bio. So far this new field is used for bio based
-
-s/to extend/extending/
-
-> +	 * pooling, we will store returning value of underlying queue's
-
-s/pooling/polling/
-
-> +	 * submit_bio() here.
-> +	 */
-> +	unsigned int		bi_private_data;
->  };
->  
->  struct bvec_iter_all {
-> -- 
-> 2.29.2
-> 
-
+Thanks,
+John
