@@ -2,175 +2,111 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16FF3C433DB
-	for <linux-block@archiver.kernel.org>; Fri, 19 Mar 2021 09:48:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2495BC43381
+	for <linux-block@archiver.kernel.org>; Fri, 19 Mar 2021 09:49:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 984BA64EE2
-	for <linux-block@archiver.kernel.org>; Fri, 19 Mar 2021 09:48:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EE23864F6A
+	for <linux-block@archiver.kernel.org>; Fri, 19 Mar 2021 09:49:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229634AbhCSJsH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 Mar 2021 05:48:07 -0400
-Received: from out30-45.freemail.mail.aliyun.com ([115.124.30.45]:39714 "EHLO
-        out30-45.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229469AbhCSJrg (ORCPT
+        id S229772AbhCSJsj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 Mar 2021 05:48:39 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:52758 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229512AbhCSJsU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 Mar 2021 05:47:36 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R661e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e01424;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0USZnQFW_1616147254;
-Received: from admindeMacBook-Pro-2.local(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0USZnQFW_1616147254)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Fri, 19 Mar 2021 17:47:34 +0800
-Subject: Re: [RFC PATCH V2 05/13] block: add req flag of REQ_TAG
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
-References: <20210318164827.1481133-1-ming.lei@redhat.com>
- <20210318164827.1481133-6-ming.lei@redhat.com>
- <50e454b9-2027-cf38-0be7-a4ecfdd54027@linux.alibaba.com>
- <YFRlYw0efpq/PfMu@T590>
-From:   JeffleXu <jefflexu@linux.alibaba.com>
-Message-ID: <23a5b4cc-af80-9ec9-ae91-8b1a7e284ac9@linux.alibaba.com>
-Date:   Fri, 19 Mar 2021 17:47:33 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.7.1
+        Fri, 19 Mar 2021 05:48:20 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 12J9dnUk042618;
+        Fri, 19 Mar 2021 09:48:15 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2020-01-29;
+ bh=SEAtkM0w4DEiPBQH9PWUjwAjyKt3uTwfJj3iDqVVRMA=;
+ b=tRjsI8CYyp15K98dnUaEKKxoQlQxrM5yXr8enf415zb35+DQgHIJ5UWuvxBb7jQCf5nJ
+ Pmein1VHUvX5DQPr3bgGOFKNNJrosbWx556FA3z+IbwQJu6rGvXfgBjxn+sfF71t4VWW
+ MtxdzSBUTfNusRTIKFZx57UWIkeDiixUGDl2W8JagCJwjG7lrjglov6qeHNWIQ8vNpdO
+ 62D5XkUMkOGCuIXLGzN2wWqGHH2SiJFhjgStZlXiwdOKAsuVHsXNxh44dogSs48YsCd8
+ XPJSXPy8DIHlsfRXa5mcavPawAo2xNWeMaEd0U3ftMcDP/Nr6TXnU+e6Y65VyW8x+ODL zg== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by aserp2120.oracle.com with ESMTP id 378nbmjfx0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 19 Mar 2021 09:48:15 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 12J9eDud033192;
+        Fri, 19 Mar 2021 09:48:13 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by userp3030.oracle.com with ESMTP id 3797b421rn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 19 Mar 2021 09:48:13 +0000
+Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 12J9m9l4024988;
+        Fri, 19 Mar 2021 09:48:12 GMT
+Received: from kadam (/102.36.221.92)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 19 Mar 2021 02:48:08 -0700
+Date:   Fri, 19 Mar 2021 12:47:59 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Colin Ian King <colin.king@canonical.com>,
+        Dan Schatzberg <schatzberg.dan@gmail.com>,
+        linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH][next] loop: Fix missing max_active argument in
+ alloc_workqueue call
+Message-ID: <20210319094759.GH2087@kadam>
+References: <20210318151626.17442-1-colin.king@canonical.com>
+ <13a1d187-4d6d-9e06-b94a-553d872de756@kernel.dk>
+ <62cd71bc-86e1-412d-b2b9-716c0f8021be@canonical.com>
+ <d32641ca-e34a-2bfd-9b86-28c95546f434@kernel.dk>
 MIME-Version: 1.0
-In-Reply-To: <YFRlYw0efpq/PfMu@T590>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d32641ca-e34a-2bfd-9b86-28c95546f434@kernel.dk>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Proofpoint-IMR: 1
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9927 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 spamscore=0 bulkscore=0
+ malwarescore=0 adultscore=0 mlxscore=0 mlxlogscore=999 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2103190068
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9927 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 impostorscore=0
+ malwarescore=0 adultscore=0 mlxscore=0 clxscore=1011 mlxlogscore=999
+ lowpriorityscore=0 phishscore=0 priorityscore=1501 spamscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2103190068
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Thu, Mar 18, 2021 at 02:42:33PM -0600, Jens Axboe wrote:
+> On 3/18/21 2:24 PM, Colin Ian King wrote:
+> > On 18/03/2021 20:12, Jens Axboe wrote:
+> >> On 3/18/21 9:16 AM, Colin King wrote:
+> >>> From: Colin Ian King <colin.king@canonical.com>
+> >>>
+> >>> The 3rd argument to alloc_workqueue should be the max_active count,
+> >>> however currently it is the lo->lo_number that is intended for the
+> >>> loop%d number. Fix this by adding in the missing max_active count.
+> >>
+> >> Dan, please fold this (or something similar) in when you're redoing the
+> >> series.
+> >>
+> > Appreciate this fix being picked up. Are we going to lose the SoB?
+> 
+> If it's being redone, would be silly to have that error in there. Do
+> we have a tag that's appropriate for this? I often wonder when I'm
+> folding in a fix. Ala Fixes-by: or something like that.
 
+I've always lobied for a Fixes-from: tag, but the kbuild-bot tells
+everyone to add a Reported-by: tag.  But then a lot of people are like
+Reported-by doesn't make sense.  And other people are like Reported-by
+is fine, what's wrong with it?
 
-On 3/19/21 4:48 PM, Ming Lei wrote:
-> On Fri, Mar 19, 2021 at 03:59:06PM +0800, JeffleXu wrote:
->>
->>
->> On 3/19/21 12:48 AM, Ming Lei wrote:
->>> Add one req flag REQ_TAG which will be used in the following patch for
->>> supporting bio based IO polling.
->>>
->>> Exactly this flag can help us to do:
->>>
->>> 1) request flag is cloned in bio_fast_clone(), so if we mark one FS bio
->>> as REQ_TAG, all bios cloned from this FS bio will be marked as REQ_TAG.
->>>
->>> 2)create per-task io polling context if the bio based queue supports polling
->>> and the submitted bio is HIPRI. This per-task io polling context will be
->>> created during submit_bio() before marking this HIPRI bio as REQ_TAG. Then
->>> we can avoid to create such io polling context if one cloned bio with REQ_TAG
->>> is submitted from another kernel context.
->>>
->>> 3) for supporting bio based io polling, we need to poll IOs from all
->>> underlying queues of bio device/driver, this way help us to recognize which
->>> IOs need to polled in bio based style, which will be implemented in next
->>> patch.
->>>
->>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
->>> ---
->>>  block/blk-core.c          | 29 +++++++++++++++++++++++++++--
->>>  include/linux/blk_types.h |  4 ++++
->>>  2 files changed, 31 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/block/blk-core.c b/block/blk-core.c
->>> index 0b00c21cbefb..efc7a61a84b4 100644
->>> --- a/block/blk-core.c
->>> +++ b/block/blk-core.c
->>> @@ -840,11 +840,30 @@ static inline bool blk_queue_support_bio_poll(struct request_queue *q)
->>>  static inline void blk_bio_poll_preprocess(struct request_queue *q,
->>>  		struct bio *bio)
->>>  {
->>> +	bool mq;
->>> +
->>>  	if (!(bio->bi_opf & REQ_HIPRI))
->>>  		return;
->>>  
->>> -	if (!blk_queue_poll(q) || (!queue_is_mq(q) && !blk_get_bio_poll_ctx()))
->>> +	/*
->>> +	 * Can't support bio based IO poll without per-task poll queue
->>> +	 *
->>> +	 * Now we have created per-task io poll context, and mark this
->>> +	 * bio as REQ_TAG, so: 1) if any cloned bio from this bio is
->>> +	 * submitted from another kernel context, we won't create bio
->>> +	 * poll context for it, so that bio will be completed by IRQ;
->>> +	 * 2) If such bio is submitted from current context, we will
->>> +	 * complete it via blk_poll(); 3) If driver knows that one
->>> +	 * underlying bio allocated from driver is for FS bio, meantime
->>> +	 * it is submitted in current context, driver can mark such bio
->>> +	 * as REQ_TAG manually, so the bio can be completed via blk_poll
->>> +	 * too.
->>> +	 */
->>
->> Sorry I can't understand case 3, could you please further explain it? If
-> 
-> I meant driver may allocate bio and submit it in current context, and this
-> allocated bio is for completing FS hipri bio too. So far, HIPRI won't be
-> set for this bio, but driver may mark this bio as HIPRI and TAG, so this
-> created bio can be polled.
-> 
->> 'driver marks such bio as REQ_TAG manually', then per-task io poll
->> context won't be created, and thus REQ_HIPRI will be cleared, in which
->> case the bio will be completed by IRQ. How could it be completed by
->> blk_poll()?
-> 
-> The io poll context is created when FS HIPRI bio on based queue(DM) is
-> submitted, at that time, bio based driver's ->submit_bio isn't called
-> yet. So when bio driver's ->submit_bio() allocates new bios and submits
-> them in current context, if driver marks this bio as HIPRI and TAG, they
-> can be polled too.
-
-Got it.
-
-
-> 
->>
->>
->>> +	mq = queue_is_mq(q);
->>> +	if (!blk_queue_poll(q) || (!mq && !blk_get_bio_poll_ctx()))
->>>  		bio->bi_opf &= ~REQ_HIPRI;
->>
->>
->>
->>
->> If the use cases are mixed, saying one kernel context may submit IO with
->> and without REQ_TAG at the meantime (though I don't know if this
->> situation exists), then the above code may not work as we expect.
-> 
-> Poll context shouldn't be created for kernel context.
-> 
-> So far, this patch won't cover bios submitted from kernel context, and
-> for any bios submitted from kernel context, their HIPRI will be cleared.
-> 
->>
->> For example, dm-XXX will return DM_MAPIO_SUBMITTED and actually submits
->> the cloned bio (with REQ_TAG) with internal kernel threads. Besides,
->> dm-XXX will also allocate bio (without REQ_TAG) of itself for metadata
->> logging or something. When submitting bios (without REQ_TAG), per-task
-> 
-> But HIPRI won't be set for this allocated bio.
-> 
->> io poll context will be allocated. Later when submitting cloned bios
->> (with REQ_TAG), the poll context already exists and thus REQ_HIPRI is
->> kept for these bios and they are submitted to polling hw queues.
-> 
-> Originally I planed to add new helper of submit_poll_bio() for current
-> HIPRI uses, and only create poll context in this code path, this way can
-> decouple REQ_TAG a bit. But looks it is enough to re-use REQ_TAG for this
-> purpose. If not, it can be quite easy to address issue wrt. creating poll
-> context.
-> 
-> 
-> Thanks, 
-> Ming
-> 
-
--- 
-Thanks,
-Jeffle
+regards,
+dan carpenter
