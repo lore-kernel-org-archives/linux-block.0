@@ -2,133 +2,102 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-20.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BD5DC433E0
-	for <linux-block@archiver.kernel.org>; Fri, 19 Mar 2021 22:31:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCDCFC433E0
+	for <linux-block@archiver.kernel.org>; Fri, 19 Mar 2021 22:55:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 57C9E61932
-	for <linux-block@archiver.kernel.org>; Fri, 19 Mar 2021 22:31:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7CBBD6197F
+	for <linux-block@archiver.kernel.org>; Fri, 19 Mar 2021 22:55:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230226AbhCSWbP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 Mar 2021 18:31:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46598 "EHLO
+        id S229648AbhCSWzM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 Mar 2021 18:55:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51666 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230186AbhCSWbC (ORCPT
+        with ESMTP id S229512AbhCSWyp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 Mar 2021 18:31:02 -0400
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A70AC061760
-        for <linux-block@vger.kernel.org>; Fri, 19 Mar 2021 15:31:02 -0700 (PDT)
-Received: by mail-pf1-x42d.google.com with SMTP id q5so6865622pfh.10
-        for <linux-block@vger.kernel.org>; Fri, 19 Mar 2021 15:31:02 -0700 (PDT)
+        Fri, 19 Mar 2021 18:54:45 -0400
+Received: from mail-qk1-x729.google.com (mail-qk1-x729.google.com [IPv6:2607:f8b0:4864:20::729])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AC53C061760;
+        Fri, 19 Mar 2021 15:54:45 -0700 (PDT)
+Received: by mail-qk1-x729.google.com with SMTP id c4so4649681qkg.3;
+        Fri, 19 Mar 2021 15:54:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=to:cc:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=h4T1QO/eWVa2RE7FWa5A8e2KGY1PxnacN1N1AEKDkW8=;
-        b=S1QQHrEIzvEi8SKQFxSCUoaDF7C+O8b0cN8KNje/Ol9yQT6EWrX7ne8lqbExlOVVfL
-         1SZBX+Bo5mTyjziMe2G42CgO+0W1JyvTNIIt2GS+8oiHE1M5oU13Jqtza452+hV+y+HJ
-         rblFO3dKKogUgkHVY/PTnxou2Uhev9gV675gL8u63QWoqk9wUXYnRfVFIpD8EzeZi948
-         kCYXcjwUWeI3BsQPsxwX6XUwExibzT7MPYA4cqsCOGV/lYcF+voIjRU89QRHX02h1Vhg
-         A3QKd/1M/mUBR3g/CdnuI7fjTFANv657zTVhLhI73vhnY/mkr19510WUx7ywR/BokHl3
-         DYHg==
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=SABJNqEe2HTdb1AVdo1Gt/ohe6JCde9WaW5fPa98XwA=;
+        b=Wvo+uuqDcgtg9VaGpmq8Qv+shNwtdkeGHMlO/k6R8QcJmh1vS4JcWK6yA+EIn3oeQN
+         TD0crPBAz4AdltViCX36ekKWjBl40vnfWHuOC3dUjdeKzvi7j+zNbAAX/+KX4So+1uG/
+         iK3mRS9m27P9aHxve92o/gMlP1oC1dV+zWHLUTzWzg+9rocKrmrZQD1gkCdCzk3RhwKl
+         yRmSulO9VhzXtgdpVuYpSWFdjSCICOV2tg1rPAoF7wLNJpnVBLe1RtSvVkVE5lA7NwLp
+         i6xRmtaNW2LbqnKC2J0YMg/jqqp2KBicIhBv0//dU9IAhh7AkWCVkdGgsrHAn+6NSDyU
+         1thg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=h4T1QO/eWVa2RE7FWa5A8e2KGY1PxnacN1N1AEKDkW8=;
-        b=NNltCc00u7HxqjiWj92A13dJ5nUWSQ6A0/mMqd5emZEHNDNtFh08WePQ5zB76PuGnn
-         oNLfpCw2j4VHbSwkjLwcoOZbTPPmB9SD07z7YH7fJv6LONqcaiYNHAsCa37x1fLTsD80
-         Oy2cGCgm2vdktnZFlxPtxI7f7iMC1ks8bhIXJaGTXyWH+PZIVysIf09jBZ+45Jn+zxYw
-         LOAqvDnkS/R18xzfZO1etWy5dYFVvl1Ee3Oz+tPVaipqm9b9QqC9Ef/HdTT31CJz1zNY
-         tArPIiOwPWnehHD2OhlUmvXf7WXYIzmowCe30EOZypCI2PFQf6CKLZNtAn9rB8woPkv7
-         RYzw==
-X-Gm-Message-State: AOAM533mHnO5+EdWdDcXXEXCQ8HYtP5Pjvn2MNF0QG1uw3+qqqOxW+p0
-        +/q/dULZe5BGVz5ZqfJswKg3hGCLLgLxDQ==
-X-Google-Smtp-Source: ABdhPJw8FOPgYwI2qg2Rmw6A/2gCY73YWYbY5tqMZ+zdZs9rsA5fr+o+W2SbKk5HJacdpXXsFHo5YQ==
-X-Received: by 2002:a63:3189:: with SMTP id x131mr127416pgx.430.1616193061902;
-        Fri, 19 Mar 2021 15:31:01 -0700 (PDT)
-Received: from [192.168.1.134] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id f15sm6288145pgr.90.2021.03.19.15.31.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 19 Mar 2021 15:31:01 -0700 (PDT)
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 5.12-rc4
-Message-ID: <d68738f1-c8c7-c0ee-9d04-1e9d913fd742@kernel.dk>
-Date:   Fri, 19 Mar 2021 16:31:00 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=SABJNqEe2HTdb1AVdo1Gt/ohe6JCde9WaW5fPa98XwA=;
+        b=KH3kKsNWvgfT3diH/jRnMnrb9ILwuor330AQmEmZ/kWcxjfTYqLu9iIl1JwH80nsJb
+         Vn1i11rC0o69Pc2R/ZSP2YWatthOCC0ThkjLmDi8JlkKMaps2i+mrrXpgyD9M+9k84N3
+         GQ883ZPq/TShwqaWD8P28BVGYGBdQi1u7b7xs6IloBJXqccH16AjnNTwp5aFEZcZelUX
+         80AH1ZUODLKRqeNKiSieLIjtJqxqOg+E1pJ3uGkEF3UXNLho4pWrdEJjnHhOm7CWg9XX
+         KIYA9QLE0KMS9ymxs6dwduD1tbSQ3rgurSRUTSmqm+9Pj4+RnucEdC4cB9MUMfIvr1LT
+         l3Ug==
+X-Gm-Message-State: AOAM5338sLGJLTXei6oYDps7UtDh2M4lGlBjjnNZpeEPkfLlNK8SUWWz
+        NiDqAzn0ozwbNlJP06AEAdQ=
+X-Google-Smtp-Source: ABdhPJzuNghuDe0oGQW/ObrT/OYFaBsnaKJTTQoor7x8AKd7qTUQ6l5zZh2aAgcEZEir7qKSJGwo8w==
+X-Received: by 2002:a37:bb02:: with SMTP id l2mr878051qkf.391.1616194484412;
+        Fri, 19 Mar 2021 15:54:44 -0700 (PDT)
+Received: from localhost.localdomain ([37.19.198.27])
+        by smtp.gmail.com with ESMTPSA id z5sm4840804qtc.42.2021.03.19.15.54.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 Mar 2021 15:54:43 -0700 (PDT)
+From:   Bhaskar Chowdhury <unixbhaskar@gmail.com>
+To:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     rdunlap@infradead.org, Bhaskar Chowdhury <unixbhaskar@gmail.com>
+Subject: [PATCH V4] blk-mq: Sentence reconstruct for better readability
+Date:   Sat, 20 Mar 2021 04:22:22 +0530
+Message-Id: <20210319225222.14271-1-unixbhaskar@gmail.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+Sentence reconstruction for better readability.
 
-Just an NVMe pull request this week:
+Signed-off-by: Bhaskar Chowdhury <unixbhaskar@gmail.com>
+---
+  Changes from V3:
+  Adjust the subject text as per actual change made.
+  Copied Jens's text verbatim for the sake of clarity.
+  Thanks Randy,Tom for the suggestions.
 
-- fix tag allocation for keep alive
-- fix a unit mismatch for the Write Zeroes limits
-- various TCP transport fixes (Sagi Grimberg, Elad Grupi)
-- fix iosqes and iocqes validation for discovery controllers (Sagi Grimberg)
+ block/blk-mq-tag.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Please pull!
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index 9c92053e704d..e5bfecf2940d 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -373,8 +373,8 @@ static bool blk_mq_tagset_count_completed_rqs(struct request *rq,
+ }
 
-
-The following changes since commit 1e28eed17697bcf343c6743f0028cc3b5dd88bf0:
-
-  Linux 5.12-rc3 (2021-03-14 14:41:02 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux-block.git tags/block-5.12-2021-03-19
-
-for you to fetch changes up to d38b4d289486daee01c1fdf056b46b7cdfe72e9e:
-
-  Merge tag 'nvme-5.12-20210319' of git://git.infradead.org/nvme into block-5.12 (2021-03-19 06:40:47 -0600)
-
-----------------------------------------------------------------
-block-5.12-2021-03-19
-
-----------------------------------------------------------------
-Christoph Hellwig (4):
-      nvme-fabrics: only reserve a single tag
-      nvme: merge nvme_keep_alive into nvme_keep_alive_work
-      nvme: allocate the keep alive request using BLK_MQ_REQ_NOWAIT
-      nvme: fix Write Zeroes limitations
-
-Elad Grupi (1):
-      nvmet-tcp: fix kmap leak when data digest in use
-
-Jens Axboe (1):
-      Merge tag 'nvme-5.12-20210319' of git://git.infradead.org/nvme into block-5.12
-
-Sagi Grimberg (5):
-      nvme-tcp: fix a NULL deref when receiving a 0-length r2t PDU
-      nvme-tcp: fix misuse of __smp_processor_id with preemption enabled
-      nvme-tcp: fix possible hang when failing to set io queues
-      nvme-rdma: fix possible hang when failing to set io queues
-      nvmet: don't check iosqes,iocqes for discovery controllers
-
- drivers/nvme/host/core.c    | 64 +++++++++++++++------------------------------
- drivers/nvme/host/fabrics.h |  7 +++++
- drivers/nvme/host/fc.c      |  4 +--
- drivers/nvme/host/rdma.c    | 11 +++++---
- drivers/nvme/host/tcp.c     | 20 ++++++++++----
- drivers/nvme/target/core.c  | 17 +++++++++---
- drivers/nvme/target/loop.c  |  4 +--
- drivers/nvme/target/tcp.c   |  2 +-
- 8 files changed, 69 insertions(+), 60 deletions(-)
-
--- 
-Jens Axboe
+ /**
+- * blk_mq_tagset_wait_completed_request - wait until all completed req's
+- * complete funtion is run
++ * blk_mq_tagset_wait_completed_request - Wait until all scheduled request
++ * completions have finished.
+  * @tagset:	Tag set to drain completed request
+  *
+  * Note: This function has to be run after all IO queues are shutdown
+--
+2.26.2
 
