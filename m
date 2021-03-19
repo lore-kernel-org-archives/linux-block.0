@@ -7,55 +7,54 @@ X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F84FC433DB
-	for <linux-block@archiver.kernel.org>; Fri, 19 Mar 2021 17:06:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6166C433C1
+	for <linux-block@archiver.kernel.org>; Fri, 19 Mar 2021 17:39:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 67AAF6198A
-	for <linux-block@archiver.kernel.org>; Fri, 19 Mar 2021 17:06:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BBEA661925
+	for <linux-block@archiver.kernel.org>; Fri, 19 Mar 2021 17:39:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229806AbhCSRFw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 Mar 2021 13:05:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59956 "EHLO
+        id S230024AbhCSRil (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 Mar 2021 13:38:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:45550 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229925AbhCSRF1 (ORCPT
+        by vger.kernel.org with ESMTP id S230047AbhCSRi0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 Mar 2021 13:05:27 -0400
+        Fri, 19 Mar 2021 13:38:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1616173526;
+        s=mimecast20190719; t=1616175505;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=lQdqa2Cw6/NxD/6Jzle27sztIA3RWvsIxyd92gBjjr8=;
-        b=UMtCvHde2BDo/p6g3OeisRkXXu+PLzV1qcIv4H77F0URikoZDxrzWZV42fjtDN7NFFNjA8
-        ho7nV/dGm9K31WudHqEHOjT8gzFbbshLXB6Er1eyyBdhErWpnoxVM/Tj0DqHiX1lQTjabj
-        p/MVNnPcvfKPnV7LgCGuM8KAmJgmr4o=
+        bh=m+8xF8gYUrkReXcd+pmBcxm2zbrVki0YD9Q60+pRbu8=;
+        b=NitXZgv83ex/2jIwYBZZ3scMhqV9DKdwh6KqI3xT77xtPVIep1MOwT7JAwTFcQGb/LTacn
+        R0MVecsPZ4WChZ9T6aiHVbJkhtfb9/CZ/FCvhkL0SRQH+U60eGazibSbH3Bbt6QhlEhMHA
+        eGJDucHX70IM22gAI2omIk91B615tIk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-37-oKZu55YoP76dNWf8-RTJXA-1; Fri, 19 Mar 2021 13:05:18 -0400
-X-MC-Unique: oKZu55YoP76dNWf8-RTJXA-1
+ us-mta-384-8nmvxrDfOAGyjMUTlNQHbw-1; Fri, 19 Mar 2021 13:38:22 -0400
+X-MC-Unique: 8nmvxrDfOAGyjMUTlNQHbw-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5318A100746C;
-        Fri, 19 Mar 2021 17:05:17 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DA4A28018A1;
+        Fri, 19 Mar 2021 17:38:20 +0000 (UTC)
 Received: from localhost (unknown [10.18.25.174])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B1F3460C5E;
-        Fri, 19 Mar 2021 17:05:10 +0000 (UTC)
-Date:   Fri, 19 Mar 2021 13:05:09 -0400
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 69B5060613;
+        Fri, 19 Mar 2021 17:38:14 +0000 (UTC)
+Date:   Fri, 19 Mar 2021 13:38:13 -0400
 From:   Mike Snitzer <snitzer@redhat.com>
 To:     Ming Lei <ming.lei@redhat.com>
 Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         Christoph Hellwig <hch@lst.de>,
         Jeffle Xu <jefflexu@linux.alibaba.com>, dm-devel@redhat.com
-Subject: Re: [RFC PATCH V2 04/13] block: create io poll context for
- submission and poll task
-Message-ID: <20210319170509.GB9938@redhat.com>
+Subject: Re: [RFC PATCH V2 05/13] block: add req flag of REQ_TAG
+Message-ID: <20210319173813.GC9938@redhat.com>
 References: <20210318164827.1481133-1-ming.lei@redhat.com>
- <20210318164827.1481133-5-ming.lei@redhat.com>
+ <20210318164827.1481133-6-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210318164827.1481133-5-ming.lei@redhat.com>
+In-Reply-To: <20210318164827.1481133-6-ming.lei@redhat.com>
 User-Agent: Mutt/1.5.21 (2010-09-15)
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
@@ -65,242 +64,119 @@ X-Mailing-List: linux-block@vger.kernel.org
 On Thu, Mar 18 2021 at 12:48pm -0400,
 Ming Lei <ming.lei@redhat.com> wrote:
 
-> Create per-task io poll context for both IO submission and poll task
-> if the queue is bio based and supports polling.
-> 
-> This io polling context includes two queues:
-1) submission queue(sq) for storing HIPRI bio submission result(cookie)
-   and the bio, written by submission task and read by poll task.
-2) polling queue(pq) for holding data moved from sq, only used in poll
-   context for running bio polling.
- 
-(nit, but it just reads a bit clearer to enumerate the 2 queues)
+> Add one req flag REQ_TAG which will be used in the following patch for
+> supporting bio based IO polling.
 
-> Following patches will support bio poll.
+"REQ_TAG" is so generic yet is used in such a specific way (to mark an
+FS bio as having polling context)
+
+I don't have a great suggestion for a better name, just seems "REQ_TAG"
+is lacking... (especially given the potential for confusion due to
+blk-mq's notion of "tag").
+
+REQ_FS? REQ_FS_CTX? REQ_POLL? REQ_POLL_CTX? REQ_NAMING_IS_HARD :)
+
+Maybe others have better ideas?
+
+Mike
+
+> Exactly this flag can help us to do:
+> 
+> 1) request flag is cloned in bio_fast_clone(), so if we mark one FS bio
+> as REQ_TAG, all bios cloned from this FS bio will be marked as REQ_TAG.
+> 
+> 2)create per-task io polling context if the bio based queue supports polling
+> and the submitted bio is HIPRI. This per-task io polling context will be
+> created during submit_bio() before marking this HIPRI bio as REQ_TAG. Then
+> we can avoid to create such io polling context if one cloned bio with REQ_TAG
+> is submitted from another kernel context.
+> 
+> 3) for supporting bio based io polling, we need to poll IOs from all
+> underlying queues of bio device/driver, this way help us to recognize which
+> IOs need to polled in bio based style, which will be implemented in next
+> patch.
 > 
 > Signed-off-by: Ming Lei <ming.lei@redhat.com>
 > ---
->  block/blk-core.c          | 71 ++++++++++++++++++++++++++++++++-------
->  block/blk-ioc.c           |  1 +
->  block/blk-mq.c            | 14 ++++++++
->  block/blk.h               | 46 +++++++++++++++++++++++++
->  include/linux/iocontext.h |  2 ++
->  5 files changed, 122 insertions(+), 12 deletions(-)
+>  block/blk-core.c          | 29 +++++++++++++++++++++++++++--
+>  include/linux/blk_types.h |  4 ++++
+>  2 files changed, 31 insertions(+), 2 deletions(-)
 > 
 > diff --git a/block/blk-core.c b/block/blk-core.c
-> index d58f8a0c80de..0b00c21cbefb 100644
+> index 0b00c21cbefb..efc7a61a84b4 100644
 > --- a/block/blk-core.c
 > +++ b/block/blk-core.c
-> @@ -792,16 +792,59 @@ static inline blk_status_t blk_check_zone_append(struct request_queue *q,
->  	return BLK_STS_OK;
->  }
->  
-> -static inline void blk_create_io_context(struct request_queue *q)
-> +static inline struct blk_bio_poll_ctx *blk_get_bio_poll_ctx(void)
+> @@ -840,11 +840,30 @@ static inline bool blk_queue_support_bio_poll(struct request_queue *q)
+>  static inline void blk_bio_poll_preprocess(struct request_queue *q,
+>  		struct bio *bio)
 >  {
-> -	/*
-> -	 * Various block parts want %current->io_context, so allocate it up
-> -	 * front rather than dealing with lots of pain to allocate it only
-> -	 * where needed. This may fail and the block layer knows how to live
-> -	 * with it.
-> -	 */
-> -	if (unlikely(!current->io_context))
-> -		create_task_io_context(current, GFP_ATOMIC, q->node);
-> +	struct io_context *ioc = current->io_context;
+> +	bool mq;
 > +
-> +	return ioc ? ioc->data : NULL;
-> +}
-> +
-> +static inline unsigned int bio_grp_list_size(unsigned int nr_grps)
-> +{
-> +	return sizeof(struct bio_grp_list) + nr_grps *
-> +		sizeof(struct bio_grp_list_data);
-> +}
-> +
-> +static void bio_poll_ctx_init(struct blk_bio_poll_ctx *pc)
-> +{
-> +	pc->sq = (void *)pc + sizeof(*pc);
-> +	pc->sq->max_nr_grps = BLK_BIO_POLL_SQ_SZ;
-> +
-> +	pc->pq = (void *)pc->sq + bio_grp_list_size(BLK_BIO_POLL_SQ_SZ);
-> +	pc->pq->max_nr_grps = BLK_BIO_POLL_PQ_SZ;
-> +
-> +	spin_lock_init(&pc->sq_lock);
-> +	mutex_init(&pc->pq_lock);
-> +}
-> +
-> +void bio_poll_ctx_alloc(struct io_context *ioc)
-> +{
-> +	struct blk_bio_poll_ctx *pc;
-> +	unsigned int size = sizeof(*pc) +
-> +		bio_grp_list_size(BLK_BIO_POLL_SQ_SZ) +
-> +		bio_grp_list_size(BLK_BIO_POLL_PQ_SZ);
-> +
-> +	pc = kzalloc(GFP_ATOMIC, size);
-> +	if (pc) {
-> +		bio_poll_ctx_init(pc);
-> +		if (cmpxchg(&ioc->data, NULL, (void *)pc))
-> +			kfree(pc);
-> +	}
-> +}
-> +
-> +static inline bool blk_queue_support_bio_poll(struct request_queue *q)
-> +{
-> +	return !queue_is_mq(q) && blk_queue_poll(q);
-> +}
-> +
-> +static inline void blk_bio_poll_preprocess(struct request_queue *q,
-> +		struct bio *bio)
-> +{
-> +	if (!(bio->bi_opf & REQ_HIPRI))
-> +		return;
-> +
-> +	if (!blk_queue_poll(q) || (!queue_is_mq(q) && !blk_get_bio_poll_ctx()))
-> +		bio->bi_opf &= ~REQ_HIPRI;
+>  	if (!(bio->bi_opf & REQ_HIPRI))
+>  		return;
+>  
+> -	if (!blk_queue_poll(q) || (!queue_is_mq(q) && !blk_get_bio_poll_ctx()))
+> +	/*
+> +	 * Can't support bio based IO poll without per-task poll queue
+> +	 *
+> +	 * Now we have created per-task io poll context, and mark this
+> +	 * bio as REQ_TAG, so: 1) if any cloned bio from this bio is
+> +	 * submitted from another kernel context, we won't create bio
+> +	 * poll context for it, so that bio will be completed by IRQ;
+> +	 * 2) If such bio is submitted from current context, we will
+> +	 * complete it via blk_poll(); 3) If driver knows that one
+> +	 * underlying bio allocated from driver is for FS bio, meantime
+> +	 * it is submitted in current context, driver can mark such bio
+> +	 * as REQ_TAG manually, so the bio can be completed via blk_poll
+> +	 * too.
+> +	 */
+> +	mq = queue_is_mq(q);
+> +	if (!blk_queue_poll(q) || (!mq && !blk_get_bio_poll_ctx()))
+>  		bio->bi_opf &= ~REQ_HIPRI;
+> +	else if (!mq)
+> +		bio->bi_opf |= REQ_TAG;
 >  }
 >  
 >  static noinline_for_stack bool submit_bio_checks(struct bio *bio)
-> @@ -848,10 +891,14 @@ static noinline_for_stack bool submit_bio_checks(struct bio *bio)
->  		}
->  	}
->  
-> -	blk_create_io_context(q);
-> +	/*
-> +	 * Created per-task io poll queue if we supports bio polling
-> +	 * and it is one HIPRI bio.
-> +	 */
-
-Create per-task io poll queue if bio polling supported and HIPRI set.
-
-
-> +	blk_create_io_context(q, blk_queue_support_bio_poll(q) &&
-> +			(bio->bi_opf & REQ_HIPRI));
->  
-> -	if (!blk_queue_poll(q))
-> -		bio->bi_opf &= ~REQ_HIPRI;
-> +	blk_bio_poll_preprocess(q, bio);
->  
->  	switch (bio_op(bio)) {
->  	case REQ_OP_DISCARD:
-> diff --git a/block/blk-ioc.c b/block/blk-ioc.c
-> index b0cde18c4b8c..5574c398eff6 100644
-> --- a/block/blk-ioc.c
-> +++ b/block/blk-ioc.c
-> @@ -19,6 +19,7 @@ static struct kmem_cache *iocontext_cachep;
->  
->  static inline void free_io_context(struct io_context *ioc)
->  {
-> +	kfree(ioc->data);
->  	kmem_cache_free(iocontext_cachep, ioc);
->  }
->  
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 63c81df3b8b5..c832faa52ca0 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -3852,6 +3852,17 @@ static bool blk_mq_poll_hybrid(struct request_queue *q,
->  	return blk_mq_poll_hybrid_sleep(q, rq);
->  }
->  
-> +static int blk_bio_poll(struct request_queue *q, blk_qc_t cookie, bool spin)
-> +{
-> +	/*
-> +	 * Create poll queue for storing poll bio and its cookie from
-> +	 * submission queue
-> +	 */
-> +	blk_create_io_context(q, true);
-> +
-> +	return 0;
-> +}
-> +
->  /**
->   * blk_poll - poll for IO completions
->   * @q:  the queue
-> @@ -3875,6 +3886,9 @@ int blk_poll(struct request_queue *q, blk_qc_t cookie, bool spin)
->  	if (current->plug)
->  		blk_flush_plug_list(current->plug, false);
->  
-> +	if (!queue_is_mq(q))
-> +		return blk_bio_poll(q, cookie, spin);
-> +
->  	hctx = q->queue_hw_ctx[blk_qc_t_to_queue_num(cookie)];
+> @@ -893,9 +912,15 @@ static noinline_for_stack bool submit_bio_checks(struct bio *bio)
 >  
 >  	/*
-> diff --git a/block/blk.h b/block/blk.h
-> index 3b53e44b967e..ae58a706327e 100644
-> --- a/block/blk.h
-> +++ b/block/blk.h
-> @@ -357,4 +357,50 @@ int bio_add_hw_page(struct request_queue *q, struct bio *bio,
->  		struct page *page, unsigned int len, unsigned int offset,
->  		unsigned int max_sectors, bool *same_page);
+>  	 * Created per-task io poll queue if we supports bio polling
+> -	 * and it is one HIPRI bio.
+> +	 * and it is one HIPRI bio, and this HIPRI bio has to be from
+> +	 * FS. If REQ_TAG isn't set for HIPRI bio, we think it originated
+> +	 * from FS.
+> +	 *
+> +	 * Driver may allocated bio by itself and REQ_TAG is set, but they
+> +	 * won't be marked as HIPRI.
+>  	 */
+>  	blk_create_io_context(q, blk_queue_support_bio_poll(q) &&
+> +			!(bio->bi_opf & REQ_TAG) &&
+>  			(bio->bi_opf & REQ_HIPRI));
 >  
-> +/* grouping bios belonging to same group into one list  */
-
-Reads awkwardly, maybe:
-/* Grouping bios that share same data into one list */
-
-> +struct bio_grp_list_data {
-> +	/* group data */
-
-Don't think this ^ comment is needed (variable name achieves same).
-
-> +	void *grp_data;
-> +
-> +	/* all bios in this list share same 'grp_data' */
-> +	struct bio_list list;
-> +};
-> +
-> +struct bio_grp_list {
-> +	unsigned int max_nr_grps, nr_grps;
-> +	struct bio_grp_list_data head[0];
-> +};
-> +
-> +struct blk_bio_poll_ctx {
-> +	spinlock_t sq_lock;
-> +	struct bio_grp_list *sq;
-> +
-> +	struct mutex pq_lock;
-> +	struct bio_grp_list *pq;
-> +};
-> +
-> +#define BLK_BIO_POLL_SQ_SZ		32U
-> +#define BLK_BIO_POLL_PQ_SZ		(BLK_BIO_POLL_SQ_SZ * 2)
-> +
-> +void bio_poll_ctx_alloc(struct io_context *ioc);
-> +
-> +static inline void blk_create_io_context(struct request_queue *q,
-> +		bool need_poll_ctx)
-> +{
-> +	struct io_context *ioc;
-> +
-> +	/*
-> +	 * Various block parts want %current->io_context, so allocate it up
-> +	 * front rather than dealing with lots of pain to allocate it only
-> +	 * where needed. This may fail and the block layer knows how to live
-> +	 * with it.
-> +	 */
-> +	if (unlikely(!current->io_context))
-> +		create_task_io_context(current, GFP_ATOMIC, q->node);
-> +
-> +	ioc = current->io_context;
-> +	if (need_poll_ctx && unlikely(ioc && !ioc->data))
-> +		bio_poll_ctx_alloc(ioc);
-> +}
-> +
->  #endif /* BLK_INTERNAL_H */
-> diff --git a/include/linux/iocontext.h b/include/linux/iocontext.h
-> index 0a9dc40b7be8..f9a467571356 100644
-> --- a/include/linux/iocontext.h
-> +++ b/include/linux/iocontext.h
-> @@ -110,6 +110,8 @@ struct io_context {
->  	struct io_cq __rcu	*icq_hint;
->  	struct hlist_head	icq_list;
+>  	blk_bio_poll_preprocess(q, bio);
+> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+> index db026b6ec15a..a1bcade4bcc3 100644
+> --- a/include/linux/blk_types.h
+> +++ b/include/linux/blk_types.h
+> @@ -394,6 +394,9 @@ enum req_flag_bits {
 >  
-> +	void			*data;
-> +
->  	struct work_struct release_work;
->  };
+>  	__REQ_HIPRI,
 >  
+> +	/* for marking IOs originated from same FS bio in same context */
+> +	__REQ_TAG,
+> +
+>  	/* for driver use */
+>  	__REQ_DRV,
+>  	__REQ_SWAP,		/* swapping request. */
+> @@ -418,6 +421,7 @@ enum req_flag_bits {
+>  
+>  #define REQ_NOUNMAP		(1ULL << __REQ_NOUNMAP)
+>  #define REQ_HIPRI		(1ULL << __REQ_HIPRI)
+> +#define REQ_TAG			(1ULL << __REQ_TAG)
+>  
+>  #define REQ_DRV			(1ULL << __REQ_DRV)
+>  #define REQ_SWAP		(1ULL << __REQ_SWAP)
 > -- 
 > 2.29.2
 > 
