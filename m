@@ -2,99 +2,127 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-20.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBFCFC433DB
-	for <linux-block@archiver.kernel.org>; Fri, 19 Mar 2021 07:17:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37C09C433E0
+	for <linux-block@archiver.kernel.org>; Fri, 19 Mar 2021 07:55:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7E42064F69
-	for <linux-block@archiver.kernel.org>; Fri, 19 Mar 2021 07:17:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 07E5664F68
+	for <linux-block@archiver.kernel.org>; Fri, 19 Mar 2021 07:55:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233832AbhCSHQp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 Mar 2021 03:16:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46534 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234094AbhCSHQm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 Mar 2021 03:16:42 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC34FC06174A
-        for <linux-block@vger.kernel.org>; Fri, 19 Mar 2021 00:16:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Type:MIME-Version:Message-ID:
-        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=M76xO1K/EQV5CCb+NqCLsqK0FN5oML1Ebg7OCq+pRBQ=; b=jxcC9LoF5K+EckjwTs6DaZdETQ
-        y9XFjmtdVE2fcqDbe/TC2f4Q8OGLdYN9gdfG1t5ynE1u+UxmLnMXSEgMh6CftwuL6VuLB8MtJPV9x
-        CV5IIBSvoVewMkk35HP7qjWcBh+DxEKZJfp2a5d00y0p0vbfBwR8qz7edSSou3mYxp9TTQvHCv7tO
-        54Y7SRNkYWG5NRUc0jk8ZbUu0KiVzudYqAv4UONvtZJJQm4oP2Xgje7uVDtbJKGg2xRkmPeNdTTBV
-        j4blFiTeRHXVVqiQtB2Wy5h4UpkLuxVE9VbpkObjoq+O5gBINlbVlp7yZH9ZKrfoOcBdBl9gkqCmm
-        AXhyKdkg==;
-Received: from 089144199244.atnat0008.highway.a1.net ([89.144.199.244] helo=localhost)
-        by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
-        id 1lN9Mt-0045v0-Vh; Fri, 19 Mar 2021 07:16:26 +0000
-Date:   Fri, 19 Mar 2021 08:14:12 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
-        Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org
-Subject: [GIT PULL] nvme fixes for 5.12
-Message-ID: <YFRPRP/WLS/5FCSc@infradead.org>
+        id S234163AbhCSHzN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 Mar 2021 03:55:13 -0400
+Received: from mx2.suse.de ([195.135.220.15]:41438 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233993AbhCSHzF (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 19 Mar 2021 03:55:05 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 91312AE04;
+        Fri, 19 Mar 2021 07:55:03 +0000 (UTC)
+Subject: Re: [PATCH 1/3] scsi: check the whole result for reading write
+ protect flag
+To:     Jason Yan <yanaijie@huawei.com>, axboe@kernel.dk,
+        ming.lei@redhat.com, hch@lst.de, keescook@chromium.org,
+        kbusch@kernel.org, linux-block@vger.kernel.org,
+        martin.petersen@oracle.com, jejb@linux.vnet.ibm.com
+Cc:     linux-scsi@vger.kernel.org
+References: <20210319030128.1345061-1-yanaijie@huawei.com>
+ <20210319030128.1345061-2-yanaijie@huawei.com>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <078d47ac-907c-ec20-f600-7073bf375f1a@suse.de>
+Date:   Fri, 19 Mar 2021 08:55:02 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20210319030128.1345061-2-yanaijie@huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The following changes since commit 1e28eed17697bcf343c6743f0028cc3b5dd88bf0:
+On 3/19/21 4:01 AM, Jason Yan wrote:
+> When the scsi device status is offline, mode sense command will return a
+> result with only DID_NO_CONNECT set. Then in sd_read_write_protect_flag(),
+> only status byte of the result is checked, we still consider the command
+> returned good, and read sdkp->write_prot from the buffer. And because of
+> bug [1], garbage data is copied to the buffer, the disk sometimes
+> be set readonly. When the scsi device is set running again, users cannot
+> write data to the disk.
+> 
+> Fix this by check the whole result returned by the driver.
+> 
+> [1] https://patchwork.kernel.org/project/linux-block/patch/20210318122621.330010-1-yanaijie@huawei.com/
+> 
+> Signed-off-by: Jason Yan <yanaijie@huawei.com>
+> ---
+>   drivers/scsi/sd.c   |  6 +++---
+>   include/scsi/scsi.h | 13 +++++++++++++
+>   2 files changed, 16 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+> index ed0b1bb99f08..16f8cd2895fd 100644
+> --- a/drivers/scsi/sd.c
+> +++ b/drivers/scsi/sd.c
+> @@ -2669,18 +2669,18 @@ sd_read_write_protect_flag(struct scsi_disk *sdkp, unsigned char *buffer)
+>   		 * 5: Illegal Request, Sense Code 24: Invalid field in
+>   		 * CDB.
+>   		 */
+> -		if (!scsi_status_is_good(res))
+> +		if (!scsi_result_is_good(res))
+>   			res = sd_do_mode_sense(sdkp, 0, 0, buffer, 4, &data, NULL);
+>   
+>   		/*
+>   		 * Third attempt: ask 255 bytes, as we did earlier.
+>   		 */
+> -		if (!scsi_status_is_good(res))
+> +		if (!scsi_result_is_good(res))
+>   			res = sd_do_mode_sense(sdkp, 0, 0x3F, buffer, 255,
+>   					       &data, NULL);
+>   	}
+>   
+> -	if (!scsi_status_is_good(res)) {
+> +	if (!scsi_result_is_good(res)) {
+>   		sd_first_printk(KERN_WARNING, sdkp,
+>   			  "Test WP failed, assume Write Enabled\n");
+>   	} else {
+> diff --git a/include/scsi/scsi.h b/include/scsi/scsi.h
+> index e75cca25338a..db0f346a31b2 100644
+> --- a/include/scsi/scsi.h
+> +++ b/include/scsi/scsi.h
+> @@ -55,6 +55,19 @@ static inline int scsi_status_is_good(int status)
+>   		(status == SAM_STAT_COMMAND_TERMINATED));
+>   }
+>   
+> +/** scsi_result_is_good - check the result return.
+> + *
+> + * @result: the result passed up from the driver (including host and
+> + *          driver components)
+> + *
+> + * Drivers may only set other bytes but not status byte.
+> + * This checks both the status byte and other bytes.
+> + */
+> +static inline int scsi_result_is_good(int result)
+> +{
+> +	return scsi_status_is_good(result) && (result & ~0xff) == 0;
+> +}
+> +
+>   
+>   /*
+>    * standard mode-select header prepended to all mode-select commands
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-  Linux 5.12-rc3 (2021-03-14 14:41:02 -0700)
+Cheers,
 
-are available in the Git repository at:
-
-  git://git.infradead.org/nvme.git tags/nvme-5.12-20210319
-
-for you to fetch changes up to bac04454ef9fada009f0572576837548b190bf94:
-
-  nvmet-tcp: fix kmap leak when data digest in use (2021-03-18 05:39:18 +0100)
-
-----------------------------------------------------------------
-nvme fixes for 5.12
-
- - fix tag allocation for keep alive
- - fix a unit mismatch for the Write Zeroes limits
- - various TCP transport fixes (Sagi Grimberg, Elad Grupi)
- - fix iosqes and iocqes validation for discovery controllers (Sagi Grimberg)
-
-----------------------------------------------------------------
-Christoph Hellwig (4):
-      nvme-fabrics: only reserve a single tag
-      nvme: merge nvme_keep_alive into nvme_keep_alive_work
-      nvme: allocate the keep alive request using BLK_MQ_REQ_NOWAIT
-      nvme: fix Write Zeroes limitations
-
-Elad Grupi (1):
-      nvmet-tcp: fix kmap leak when data digest in use
-
-Sagi Grimberg (5):
-      nvme-tcp: fix a NULL deref when receiving a 0-length r2t PDU
-      nvme-tcp: fix misuse of __smp_processor_id with preemption enabled
-      nvme-tcp: fix possible hang when failing to set io queues
-      nvme-rdma: fix possible hang when failing to set io queues
-      nvmet: don't check iosqes,iocqes for discovery controllers
-
- drivers/nvme/host/core.c    | 64 +++++++++++++++------------------------------
- drivers/nvme/host/fabrics.h |  7 +++++
- drivers/nvme/host/fc.c      |  4 +--
- drivers/nvme/host/rdma.c    | 11 +++++---
- drivers/nvme/host/tcp.c     | 20 ++++++++++----
- drivers/nvme/target/core.c  | 17 +++++++++---
- drivers/nvme/target/loop.c  |  4 +--
- drivers/nvme/target/tcp.c   |  2 +-
- 8 files changed, 69 insertions(+), 60 deletions(-)
+Hannes
+-- 
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
