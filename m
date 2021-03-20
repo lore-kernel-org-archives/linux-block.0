@@ -2,138 +2,64 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B67EC433E0
-	for <linux-block@archiver.kernel.org>; Fri, 19 Mar 2021 22:56:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4081BC433C1
+	for <linux-block@archiver.kernel.org>; Sat, 20 Mar 2021 00:10:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0B26261990
-	for <linux-block@archiver.kernel.org>; Fri, 19 Mar 2021 22:56:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E662561983
+	for <linux-block@archiver.kernel.org>; Sat, 20 Mar 2021 00:10:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229793AbhCSW4R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 19 Mar 2021 18:56:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51972 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229879AbhCSW4K (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 19 Mar 2021 18:56:10 -0400
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22789C061760
-        for <linux-block@vger.kernel.org>; Fri, 19 Mar 2021 15:56:10 -0700 (PDT)
-Received: by mail-pf1-x434.google.com with SMTP id g15so6898306pfq.3
-        for <linux-block@vger.kernel.org>; Fri, 19 Mar 2021 15:56:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=e+jorAuKHjccGGronBtEJjxolrvQB+eZ/bSU4ApIaGU=;
-        b=eyJU9zSEh0X7QgDoDvtKBN9JoTvhbORmoIkQ8fRIixNzCCry0E9M2bRgybWWCGrsRn
-         QhQXQEZUKm6NXw5tjb5fYOhUxAYRzvlpRMRRH7w2C2yIWeb2ijCc+Hj0TMDCnrj9n8QQ
-         i/li5jcAD1mEgTZ2yqc0pasmnLRZhT0C22NgaX+HqKN859wzU05R3ilpOw0I4HEZJl5w
-         UxKlJgFkJ6HSPYLrl7j457yjyErFDj2GHKRnYykLrty7uTYPRYpQbSMNVdhGfWvw/7/S
-         DO/+pLBHBL1AP1X6TBn5EqbZgrMgKiWVD6T2O5BXA/ewwIqM07GSNB4cQCgCU3nQGaoM
-         uRzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=e+jorAuKHjccGGronBtEJjxolrvQB+eZ/bSU4ApIaGU=;
-        b=H8dcKcsBENbXXSViTu6EfFqpdw20+B+u/pAVh3+EVqUk5aaBkoFGHrXI2YuGG831eP
-         xoGWaYNKx4qexLmds4RxOpBpu1A8ygIi9t/o+7oEMobG6lEj9438DM1bl107Yrwwr8qZ
-         vIyp1XjMBacIBlSdAnPpb5npsRmBa+Km7US6X+rWQRABnrRf+wCk+M8EVb5Dl0vcF4FN
-         pARYTTyQ5zu4PzhHo4qPFX9Hc3Ny3XmYmV6kPpiGFFzQ3P86QNt9/uKdddg6ncRCGF2/
-         ZaA/MjTQUVJZZtgpZ2rD+Sg87UZ5BN+uxnQJ+VThYI9b9ItScgokfgPG6LcQ1R8v3R4y
-         o/Vw==
-X-Gm-Message-State: AOAM533DNiQ6Y1bG5huUE1AoQuFupABuhZBQaF8AhURUAKo5KoCeIlSh
-        CZyHK4ghdgi5MaflttSxkGP7IQ==
-X-Google-Smtp-Source: ABdhPJy5BSJaBEGkTgocKKUpwz0gFz9hDkLyzm3Unp+7j3gHj/V4hQkK8oUOofwxQ1QHBJWWQyVPLA==
-X-Received: by 2002:a63:db57:: with SMTP id x23mr13332240pgi.432.1616194569650;
-        Fri, 19 Mar 2021 15:56:09 -0700 (PDT)
-Received: from [192.168.1.134] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id q95sm6236116pjq.20.2021.03.19.15.56.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 19 Mar 2021 15:56:09 -0700 (PDT)
-Subject: Re: [PATCH V3] blk-mq: Trivial typo fix and sentence construction for
- better readability
-To:     Bhaskar Chowdhury <unixbhaskar@gmail.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        rdunlap@infradead.org
-References: <20210319202359.8893-1-unixbhaskar@gmail.com>
- <771aa286-5270-9642-7d6d-9cdb2f7014f8@kernel.dk> <YFUMFBB8iuoSULxL@Gentoo>
- <080d3720-3174-e47f-95a1-ad7640a64051@kernel.dk> <YFUryzVjSQU0RqCv@Gentoo>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <a5956c2c-1390-5c88-b61a-dffd10753de9@kernel.dk>
-Date:   Fri, 19 Mar 2021 16:56:08 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <YFUryzVjSQU0RqCv@Gentoo>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S229875AbhCTAJi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 19 Mar 2021 20:09:38 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49958 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229646AbhCTAJV (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 19 Mar 2021 20:09:21 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPS id 725DD6198C;
+        Sat, 20 Mar 2021 00:09:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1616198961;
+        bh=+DopkhZKdTNvYK7z4/LO7zy/9JKck6Xvf/n2xN+k+DY=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=sM1BROgEQxK0GAdNF1SqZndhgLOVLHmnhYV2kVJ9SH6SWOeC53k0+QffvJFRI6+Tc
+         WJcAx1UHD5Ji6frrA9wHuWDzuAnrvtGhkwyVS4HK+Dw8EyeehKCGCfz/0lcEyN+wra
+         ZY/RgyrJe/FtrCAlSorGCi0uSu+T9CgzwSqauAs+a4SAPlxfmZCa6pw1f7NHUdmhou
+         LHOY5LB6k2NtrTY26nma8qilJQZIlYdIRJj/4IAOjsNxiBtbBFoKey6w671N2HMOtv
+         OGKKh1BD6SYU2Q38MkmraGPB/aL7o1LH6fuGNAFvKZAY8fD/gqvX39vDl6NgjeUgVy
+         OR1ev5f62onuQ==
+Subject: Re: [GIT PULL] Block fixes for 5.12-rc4
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <d68738f1-c8c7-c0ee-9d04-1e9d913fd742@kernel.dk>
+References: <d68738f1-c8c7-c0ee-9d04-1e9d913fd742@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <d68738f1-c8c7-c0ee-9d04-1e9d913fd742@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git tags/block-5.12-2021-03-19
+X-PR-Tracked-Commit-Id: d38b4d289486daee01c1fdf056b46b7cdfe72e9e
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: d626c692aaeb2ff839bfe463f096660c39a6d1eb
+Message-Id: <161619896144.24257.13797506553779355789.pr-tracker-bot@kernel.org>
+Date:   Sat, 20 Mar 2021 00:09:21 +0000
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/19/21 4:55 PM, Bhaskar Chowdhury wrote:
-> On 16:19 Fri 19 Mar 2021, Jens Axboe wrote:
->> On 3/19/21 2:39 PM, Bhaskar Chowdhury wrote:
->>> On 14:27 Fri 19 Mar 2021, Jens Axboe wrote:
->>>> On 3/19/21 2:23 PM, Bhaskar Chowdhury wrote:
->>>>>
->>>>> A typo fix and sentence reconstruction for better readability.
->>>>>
->>>>> Signed-off-by: Bhaskar Chowdhury <unixbhaskar@gmail.com>
->>>>> ---
->>>>>   Changes from V2:
->>>>>   Thanks, Randy and Tom for the suggestion,mould it.
->>>>>   Missed the subject line prefix of pattern,so added back
->>>>>
->>>>>  block/blk-mq-tag.c | 4 ++--
->>>>>  1 file changed, 2 insertions(+), 2 deletions(-)
->>>>>
->>>>> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
->>>>> index 9c92053e704d..9da426d20f12 100644
->>>>> --- a/block/blk-mq-tag.c
->>>>> +++ b/block/blk-mq-tag.c
->>>>> @@ -373,8 +373,8 @@ static bool blk_mq_tagset_count_completed_rqs(struct request *rq,
->>>>>  }
->>>>>
->>>>>  /**
->>>>> - * blk_mq_tagset_wait_completed_request - wait until all completed req's
->>>>> - * complete funtion is run
->>>>> + * blk_mq_tagset_wait_completed_request - wait until all the req's
->>>>> + * functions completed their run
->>>>
->>>> This is still nonsense, see reply to previous version.
->>>>
->>> Well, I was just trying get a sense of your sense...so ...it's all yours
->>> fella,take on ...
->>
->> It's not my sense, I didn't write that function or comment. Just seems
->> pointless to me to update it and not get it actually legible and
->> correct, which is why I sent you a suggestion to what should be. From
->> that point of view, the suggested change actually makes it _worse_,
->> because "requests functions completed their run" doesn't mean anything.
->> At least the current one is kind of legible, since the "complete
->> function" refers to the IPI completion function, which is what we're
->> waiting for here.
->>
->> In any case, what I replied in v2 should be generally readable, and
->> avoids the weird req's thing too which I really dislike. Just uses
->> requests, that's correct and avoids a nonsensical possessive.
->>
->> So do send a v4 if you want with that wording.
->>
-> I am apologetic about the pain I caused you to take this long route. I shall be
->   prudent in the future. Thanks for standing, Jens.
+The pull request you sent on Fri, 19 Mar 2021 16:31:00 -0600:
 
-Well, at least the end result pulled it to completion :-)
+> git://git.kernel.dk/linux-block.git tags/block-5.12-2021-03-19
+
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/d626c692aaeb2ff839bfe463f096660c39a6d1eb
+
+Thank you!
 
 -- 
-Jens Axboe
-
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
