@@ -2,223 +2,235 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 120CBC433DB
-	for <linux-block@archiver.kernel.org>; Sat, 20 Mar 2021 20:54:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0E20C433C1
+	for <linux-block@archiver.kernel.org>; Sun, 21 Mar 2021 11:05:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DB11161938
-	for <linux-block@archiver.kernel.org>; Sat, 20 Mar 2021 20:54:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AE1106193A
+	for <linux-block@archiver.kernel.org>; Sun, 21 Mar 2021 11:05:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229772AbhCTUxy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 20 Mar 2021 16:53:54 -0400
-Received: from mail-il1-f197.google.com ([209.85.166.197]:39309 "EHLO
-        mail-il1-f197.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229618AbhCTUxY (ORCPT
+        id S229870AbhCULFV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 21 Mar 2021 07:05:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33842 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229834AbhCULE6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 20 Mar 2021 16:53:24 -0400
-Received: by mail-il1-f197.google.com with SMTP id v20so36924368ile.6
-        for <linux-block@vger.kernel.org>; Sat, 20 Mar 2021 13:53:22 -0700 (PDT)
+        Sun, 21 Mar 2021 07:04:58 -0400
+Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 797F9C061762
+        for <linux-block@vger.kernel.org>; Sun, 21 Mar 2021 04:04:57 -0700 (PDT)
+Received: by mail-ed1-x531.google.com with SMTP id h10so15874551edt.13
+        for <linux-block@vger.kernel.org>; Sun, 21 Mar 2021 04:04:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=8pbSHoOc4fdbEmSmiSG1Rc1zJ6Vo+wX1h1aVlPgdpxQ=;
+        b=TFrOc3y6fE6WVMQzcw5ZSat+UP1VZf4xVGkAH9McSR/CRL8zo/CbAx1Phy681QQ3xZ
+         IX0JgOzzYmM1oAvOawijWUnf0NW4iVNcZtcBtOCQfIsIFCpOfNomPF6RB7VDT9zLHrBq
+         EMd7qkmVGhEXIK0vTetvTuuVv8TI6cYtiMQo7TxDBlE8hfEeC7JZu+HMu/2ChVsf7D90
+         nl7grNbHuz5JPSDXrjFrztfwIYB/+51dNzl4tqczsrjvnzs8fpKRNJYpG5z1kZY7x6Ue
+         cBv4KoTgqFrXI9dGb1vNrvdV2HiuPCSL9nCpdyyHkAJ/Cjmv5GUHyDW1Q3XuKh7HKc7d
+         yZYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=4V27qZ8HGyrQu+l3shguVQUVaWwB04qajz95OS6c1nY=;
-        b=KY16H+VE8w1m7lQ0bZ1kP0K5OUjNnwnSVrkCjvvoJj3augZPCoCI/tYA71dbhJgPkE
-         LB6YSN/qa3zrhrtndGuC80BCNeZ92jdf99Z0GgyAbmRQ/w4SbL5ChwEpVynevmNaGaYQ
-         4EakEhlHZ6IiTxV1+qXIXxlbah3GW6h0RV2YCZTbS8y/l8upkWmxBUtrof80aWezBXBV
-         Ii2INg6W6r6f4Q0Pp70bnDXLUKTbNQ+BXTbReF55hNuiVBm6Obp4Ay5aI8wvErQTWS6o
-         BplorCOj9ZPrpMOTeA2lUcy4+/VCTPZAdOEBqZKAJ+MY7NaUvrtuwExTXnXvxQaR8rNL
-         EOdQ==
-X-Gm-Message-State: AOAM5306G35eo51wivePTnwdqTD2J+quJdjre/Amz+ed3+SGDFp1z8xp
-        ur/Ckl+J8Sp97ZxwpuOuQTmfJnwbRQBiV8tZpHdG9xjBwJKu
-X-Google-Smtp-Source: ABdhPJx5niHz0GajqLEPAJmIyP55isEXpo/am+K2V0qoyfLIArUbxx/bntc1KqdEVVQVW6KgquGX88cpc3UHpX62X5RxAPMZETch
-MIME-Version: 1.0
-X-Received: by 2002:a92:da82:: with SMTP id u2mr6832094iln.301.1616273602363;
- Sat, 20 Mar 2021 13:53:22 -0700 (PDT)
-Date:   Sat, 20 Mar 2021 13:53:22 -0700
-In-Reply-To: <00000000000053da9405bd7d2644@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000edc8ba05bdfe052d@google.com>
-Subject: Re: [syzbot] KASAN: use-after-free Read in disk_part_iter_next (2)
-From:   syzbot <syzbot+8fede7e30c7cee0de139@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=8pbSHoOc4fdbEmSmiSG1Rc1zJ6Vo+wX1h1aVlPgdpxQ=;
+        b=FU6le5xdeUF7mHFsRJnVhXkjPa9dDTzMT/x/iHz20mPmxxLkTcFW+dDpttrIWr7kSR
+         Wu7P9ugohCMyyT8+LxVNWkQQhbjouqDbzQwC6LW2uQ86iE9xpP+5teXh0Pgk/EFtoTg8
+         WhxWFS0mvovr5SL2FSUInO7yx5PPDyqyN1ibNuoohI0ieu7vUjlrUco6fcR07MEqaGaA
+         VpvUg6NEeO+ypooLS/+QFUBXZVjA03jUk9KoZXMSx57ZIFRxYoykiu8xzgYRN3KezXcc
+         B9RxxG0iVFz1R906gcxyGv5p2TfsL4jEf/3oWR66p4M8nMCD4Hy52D52oNt0BqbVysG1
+         REyw==
+X-Gm-Message-State: AOAM531Bw+YTZdG9+Tw6orYEV+r+vHw8mGEeFNtfX8p4skxP/RkHWDUC
+        DqQMkQ00aqTgzm6/VKAGxQJqeA==
+X-Google-Smtp-Source: ABdhPJyJ+ucISqC14qWVE5aQwMAabKowr89pwwN8mGomfk/kl0g2xJPav4RKOyPIA5QeyEaB0ZOmpA==
+X-Received: by 2002:aa7:c7c5:: with SMTP id o5mr19889227eds.31.1616324695913;
+        Sun, 21 Mar 2021 04:04:55 -0700 (PDT)
+Received: from [192.168.0.13] ([83.216.184.132])
+        by smtp.gmail.com with ESMTPSA id s6sm6901887ejx.83.2021.03.21.04.04.54
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Sun, 21 Mar 2021 04:04:55 -0700 (PDT)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: [RFC PATCH v2 00/11] bfq: introduce bfq.ioprio for cgroup
+From:   Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <cover.1615517202.git.brookxu@tencent.com>
+Date:   Sun, 21 Mar 2021 12:04:53 +0100
+Cc:     axboe@kernel.dk, tj@kernel.org, linux-block@vger.kernel.org,
+        cgroups@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <F64D5CC8-E650-4AE6-8452-7FA0C1976271@linaro.org>
+References: <cover.1615517202.git.brookxu@tencent.com>
+To:     brookxu <brookxu.cn@gmail.com>
+X-Mailer: Apple Mail (2.3445.104.11)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-syzbot has found a reproducer for the following issue on:
 
-HEAD commit:    1c273e10 Merge tag 'zonefs-5.12-rc4' of git://git.kernel.o..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=16889906d00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=6abda3336c698a07
-dashboard link: https://syzkaller.appspot.com/bug?extid=8fede7e30c7cee0de139
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13dfe8bed00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=155a117cd00000
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+8fede7e30c7cee0de139@syzkaller.appspotmail.com
+> Il giorno 12 mar 2021, alle ore 12:08, brookxu <brookxu.cn@gmail.com> =
+ha scritto:
+>=20
+> From: Chunguang Xu <brookxu@tencent.com>
+>=20
 
-==================================================================
-BUG: KASAN: use-after-free in bdev_nr_sectors include/linux/genhd.h:266 [inline]
-BUG: KASAN: use-after-free in disk_part_iter_next+0x49d/0x530 block/genhd.c:206
-Read of size 8 at addr ffff88803268d0a8 by task syz-executor193/10255
+Hi Chunguang,
 
-CPU: 0 PID: 10255 Comm: syz-executor193 Not tainted 5.12.0-rc3-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Call Trace:
- __dump_stack lib/dump_stack.c:79 [inline]
- dump_stack+0x141/0x1d7 lib/dump_stack.c:120
- print_address_description.constprop.0.cold+0x5b/0x2f8 mm/kasan/report.c:232
- __kasan_report mm/kasan/report.c:399 [inline]
- kasan_report.cold+0x7c/0xd8 mm/kasan/report.c:416
- bdev_nr_sectors include/linux/genhd.h:266 [inline]
- disk_part_iter_next+0x49d/0x530 block/genhd.c:206
- partition_overlaps+0x96/0x200 block/partitions/core.c:425
- bdev_add_partition+0x66/0x130 block/partitions/core.c:444
- blkpg_do_ioctl+0x2d0/0x340 block/ioctl.c:43
- blkpg_ioctl block/ioctl.c:60 [inline]
- blkdev_ioctl+0x577/0x6d0 block/ioctl.c:548
- block_ioctl+0xf9/0x140 fs/block_dev.c:1667
- vfs_ioctl fs/ioctl.c:48 [inline]
- __do_sys_ioctl fs/ioctl.c:753 [inline]
- __se_sys_ioctl fs/ioctl.c:739 [inline]
- __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:739
- do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x445739
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffca5947308 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 0000000000445739
-RDX: 0000000020000240 RSI: 0000000000001269 RDI: 0000000000000003
-RBP: 00007ffca5947380 R08: 000000000000ece4 R09: 000000000000ece4
-R10: 0023706f6f6c2f76 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007ffca5947370 R14: 00007ffca5947360 R15: 00007ffca594732c
+> Tasks in the production environment can be roughly divided into
+> three categories: emergency tasks, ordinary tasks and offline
+> tasks. Emergency tasks need to be scheduled in real time, such
+> as system agents. Offline tasks do not need to guarantee QoS,
+> but can improve system resource utilization during system idle
+> periods, such as background tasks. The above requirements need
+> to achieve IO preemption. At present, we can use weights to
+> simulate IO preemption, but since weights are more of a shared
+> concept, they cannot be simulated well. For example, the weights
+> of emergency tasks and ordinary tasks cannot be determined well,
+> offline tasks (with the same weight) actually occupy different
+> resources on disks with different performance, and the tail
+> latency caused by offline tasks cannot be well controlled. Using
+> ioprio's concept of preemption, we can solve the above problems
+> very well. Since ioprio will eventually be converted to weight,
+> using ioprio alone can also achieve weight isolation within the
+> same class. But we can still use bfq.weight to control resource,
+> achieving better IO Qos control.
+>=20
+> However, currently the class of bfq_group is always be class, and
+> the ioprio class of the task can only be reflected in a single
+> cgroup. We cannot guarantee that real-time tasks in a cgroup are
+> scheduled in time. Therefore, we introduce bfq.ioprio, which
+> allows us to configure ioprio class for cgroup. In this way, we
+> can ensure that the real-time tasks of a cgroup can be scheduled
+> in time. Similarly, the processing of offline task groups can
+> also be simpler.
+>=20
 
-Allocated by task 10192:
- kasan_save_stack+0x1b/0x40 mm/kasan/common.c:38
- kasan_set_track mm/kasan/common.c:46 [inline]
- set_alloc_info mm/kasan/common.c:427 [inline]
- __kasan_slab_alloc+0x75/0x90 mm/kasan/common.c:460
- kasan_slab_alloc include/linux/kasan.h:223 [inline]
- slab_post_alloc_hook mm/slab.h:516 [inline]
- slab_alloc_node mm/slub.c:2907 [inline]
- slab_alloc mm/slub.c:2915 [inline]
- kmem_cache_alloc+0x155/0x370 mm/slub.c:2920
- bdev_alloc_inode+0x18/0x80 fs/block_dev.c:795
- alloc_inode+0x61/0x230 fs/inode.c:234
- new_inode_pseudo fs/inode.c:928 [inline]
- new_inode+0x27/0x2f0 fs/inode.c:957
- bdev_alloc+0x20/0x2f0 fs/block_dev.c:885
- add_partition+0x1ab/0x880 block/partitions/core.c:346
- bdev_add_partition+0xb6/0x130 block/partitions/core.c:449
- blkpg_do_ioctl+0x2d0/0x340 block/ioctl.c:43
- blkpg_ioctl block/ioctl.c:60 [inline]
- blkdev_ioctl+0x577/0x6d0 block/ioctl.c:548
- block_ioctl+0xf9/0x140 fs/block_dev.c:1667
- vfs_ioctl fs/ioctl.c:48 [inline]
- __do_sys_ioctl fs/ioctl.c:753 [inline]
- __se_sys_ioctl fs/ioctl.c:739 [inline]
- __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:739
- do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
- entry_SYSCALL_64_after_hwframe+0x44/0xae
+I find this contribution very interesting.  Anyway, given the
+relevance of such a contribution, I'd like to hear from relevant
+people (Jens, Tejun, ...?), before revising individual patches.
 
-Freed by task 0:
- kasan_save_stack+0x1b/0x40 mm/kasan/common.c:38
- kasan_set_track+0x1c/0x30 mm/kasan/common.c:46
- kasan_set_free_info+0x20/0x30 mm/kasan/generic.c:357
- ____kasan_slab_free mm/kasan/common.c:360 [inline]
- ____kasan_slab_free mm/kasan/common.c:325 [inline]
- __kasan_slab_free+0xf5/0x130 mm/kasan/common.c:367
- kasan_slab_free include/linux/kasan.h:199 [inline]
- slab_free_hook mm/slub.c:1562 [inline]
- slab_free_freelist_hook+0x92/0x210 mm/slub.c:1600
- slab_free mm/slub.c:3161 [inline]
- kmem_cache_free+0x8a/0x740 mm/slub.c:3177
- i_callback+0x3f/0x70 fs/inode.c:223
- rcu_do_batch kernel/rcu/tree.c:2559 [inline]
- rcu_core+0x74a/0x12f0 kernel/rcu/tree.c:2794
- __do_softirq+0x29b/0x9f6 kernel/softirq.c:345
+Yet I already have a general question.  How does this mechanism comply
+with per-process ioprios and ioprio classes?  For example, what
+happens if a process belongs to BE-class group according to your
+mechanism, but to a RT class according to its ioprio?  Does the
+pre-group class dominate the per-process class?  Is all clean and
+predictable?
 
-Last potentially related work creation:
- kasan_save_stack+0x1b/0x40 mm/kasan/common.c:38
- kasan_record_aux_stack+0xe5/0x110 mm/kasan/generic.c:345
- __call_rcu kernel/rcu/tree.c:3039 [inline]
- call_rcu+0xb1/0x740 kernel/rcu/tree.c:3114
- destroy_inode+0x129/0x1b0 fs/inode.c:289
- iput_final fs/inode.c:1654 [inline]
- iput.part.0+0x57e/0x810 fs/inode.c:1680
- iput+0x58/0x70 fs/inode.c:1670
- disk_part_iter_exit block/genhd.c:235 [inline]
- disk_part_iter_next+0x9a/0x530 block/genhd.c:202
- blk_drop_partitions+0x10a/0x180 block/partitions/core.c:541
- bdev_disk_changed+0x238/0x430 fs/block_dev.c:1246
- __loop_clr_fd+0x7c7/0xff0 drivers/block/loop.c:1271
- lo_release+0x1ac/0x1f0 drivers/block/loop.c:1923
- __blkdev_put+0x54e/0x800 fs/block_dev.c:1588
- blkdev_put+0x92/0x580 fs/block_dev.c:1641
- blkdev_close+0x8c/0xb0 fs/block_dev.c:1649
- __fput+0x288/0x920 fs/file_table.c:280
- task_work_run+0xdd/0x1a0 kernel/task_work.c:140
- tracehook_notify_resume include/linux/tracehook.h:189 [inline]
- exit_to_user_mode_loop kernel/entry/common.c:174 [inline]
- exit_to_user_mode_prepare+0x249/0x250 kernel/entry/common.c:208
- __syscall_exit_to_user_mode_work kernel/entry/common.c:290 [inline]
- syscall_exit_to_user_mode+0x19/0x60 kernel/entry/common.c:301
- entry_SYSCALL_64_after_hwframe+0x44/0xae
+> The bfq.ioprio interface now is available for cgroup v1 and cgroup
+> v2. Users can configure the ioprio for cgroup through this interface,
+> as shown below:
+>=20
+> echo "1 2"> blkio.bfq.ioprio
 
-Second to last potentially related work creation:
- kasan_save_stack+0x1b/0x40 mm/kasan/common.c:38
- kasan_record_aux_stack+0xe5/0x110 mm/kasan/generic.c:345
- __call_rcu kernel/rcu/tree.c:3039 [inline]
- call_rcu+0xb1/0x740 kernel/rcu/tree.c:3114
- destroy_inode+0x129/0x1b0 fs/inode.c:289
- iput_final fs/inode.c:1654 [inline]
- iput.part.0+0x57e/0x810 fs/inode.c:1680
- iput+0x58/0x70 fs/inode.c:1670
- disk_part_iter_exit block/genhd.c:235 [inline]
- disk_part_iter_next+0x9a/0x530 block/genhd.c:202
- blk_drop_partitions+0x10a/0x180 block/partitions/core.c:541
- bdev_disk_changed+0x238/0x430 fs/block_dev.c:1246
- __blkdev_get+0x86c/0xa30 fs/block_dev.c:1350
- blkdev_get_by_dev fs/block_dev.c:1454 [inline]
- blkdev_get_by_dev+0x26c/0x600 fs/block_dev.c:1422
- blkdev_reread_part block/ioctl.c:100 [inline]
- blkdev_common_ioctl+0x137e/0x17e0 block/ioctl.c:508
- blkdev_ioctl+0x1ef/0x6d0 block/ioctl.c:577
- block_ioctl+0xf9/0x140 fs/block_dev.c:1667
- vfs_ioctl fs/ioctl.c:48 [inline]
- __do_sys_ioctl fs/ioctl.c:753 [inline]
- __se_sys_ioctl fs/ioctl.c:739 [inline]
- __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:739
- do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
- entry_SYSCALL_64_after_hwframe+0x44/0xae
+Wouldn't it be nicer to have acronyms for classes (RT, BE, IDLE),
+instead of numbers?
 
-The buggy address belongs to the object at ffff88803268d080
- which belongs to the cache bdev_cache of size 2792
-The buggy address is located 40 bytes inside of
- 2792-byte region [ffff88803268d080, ffff88803268db68)
-The buggy address belongs to the page:
-page:ffffea0000c9a200 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x32688
-head:ffffea0000c9a200 order:3 compound_mapcount:0 compound_pincount:0
-flags: 0xfff00000010200(slab|head)
-raw: 00fff00000010200 ffffea0005110a00 0000000200000002 ffff8880109bdb40
-raw: 0000000000000000 00000000800b000b 00000001ffffffff 0000000000000000
-page dumped because: kasan: bad access detected
+Thank you very much for this improvement proposal,
+Paolo
 
-Memory state around the buggy address:
- ffff88803268cf80: fb fb fb fb fb fb fb fb fb fb fb fb fb fc fc fc
- ffff88803268d000: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
->ffff88803268d080: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                                  ^
- ffff88803268d100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff88803268d180: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-==================================================================
+>=20
+> The above two values respectively represent the values of ioprio
+> class and ioprio for cgroup. The ioprio of tasks within the cgroup
+> is uniformly equal to the ioprio of the cgroup. If the ioprio of
+> the cgroup is disabled, the ioprio of the task remains the same,
+> usually from io_context.
+>=20
+> When testing, using fio and fio_generate_plots we can clearly see
+> that the IO delay of the task satisfies RT> BE> IDLE. When RT is
+> running, BE and IDLE are guaranteed minimum bandwidth. When used
+> with bfq.weight, we can also isolate the resource within the same
+> class.
+>=20
+> The test process is as follows:
+> # prepare data disk
+> mount /dev/sdb /data1
+>=20
+> # create cgroup v1 hierarchy
+> cd /sys/fs/cgroup/blkio
+> mkdir rt be idle
+> echo "1 0" > rt/blkio.bfq.ioprio
+> echo "2 0" > be/blkio.bfq.ioprio
+> echo "3 0" > idle/blkio.bfq.ioprio
+>=20
+> # run fio test
+> fio fio.ini
+>=20
+> # generate svg graph
+> fio_generate_plots res
+>=20
+> The contents of fio.ini are as follows:
+> [global]
+> ioengine=3Dlibaio
+> group_reporting=3D1
+> log_avg_msec=3D500
+> direct=3D1
+> time_based=3D1
+> iodepth=3D16
+> size=3D100M
+> rw=3Dwrite
+> bs=3D1M
+> [rt]
+> name=3Drt
+> write_bw_log=3Drt
+> write_lat_log=3Drt
+> write_iops_log=3Drt
+> filename=3D/data1/rt.bin
+> cgroup=3Drt
+> runtime=3D30s
+> nice=3D-10
+> [be]
+> name=3Dbe
+> new_group
+> write_bw_log=3Dbe
+> write_lat_log=3Dbe
+> write_iops_log=3Dbe
+> filename=3D/data1/be.bin
+> cgroup=3Dbe
+> runtime=3D60s
+> [idle]
+> name=3Didle
+> new_group
+> write_bw_log=3Didle
+> write_lat_log=3Didle
+> write_iops_log=3Didle
+> filename=3D/data1/idle.bin
+> cgroup=3Didle
+> runtime=3D90s
+>=20
+> V2:
+> 1. Optmise bfq_select_next_class().
+> 2. Introduce bfq_group [] to track the number of groups for each =
+CLASS.
+> 3. Optimse IO injection, EMQ and Idle mechanism for CLASS_RT.
+>=20
+> Chunguang Xu (11):
+>  bfq: introduce bfq_entity_to_bfqg helper method
+>  bfq: limit the IO depth of idle_class to 1
+>  bfq: keep the minimun bandwidth for be_class
+>  bfq: expire other class if CLASS_RT is waiting
+>  bfq: optimse IO injection for CLASS_RT
+>  bfq: disallow idle if CLASS_RT waiting for service
+>  bfq: disallow merge CLASS_RT with other class
+>  bfq: introduce bfq.ioprio for cgroup
+>  bfq: convert the type of bfq_group.bfqd to bfq_data*
+>  bfq: remove unnecessary initialization logic
+>  bfq: optimize the calculation of bfq_weight_to_ioprio()
+>=20
+> block/bfq-cgroup.c  |  99 +++++++++++++++++++++++++++++++----
+> block/bfq-iosched.c |  47 ++++++++++++++---
+> block/bfq-iosched.h |  28 ++++++++--
+> block/bfq-wf2q.c    | 124 +++++++++++++++++++++++++++++++++-----------
+> 4 files changed, 244 insertions(+), 54 deletions(-)
+>=20
+> --=20
+> 2.30.0
+>=20
 
