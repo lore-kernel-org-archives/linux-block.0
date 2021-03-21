@@ -2,235 +2,76 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0E20C433C1
-	for <linux-block@archiver.kernel.org>; Sun, 21 Mar 2021 11:05:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA91EC433C1
+	for <linux-block@archiver.kernel.org>; Sun, 21 Mar 2021 12:41:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AE1106193A
-	for <linux-block@archiver.kernel.org>; Sun, 21 Mar 2021 11:05:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A5F9961946
+	for <linux-block@archiver.kernel.org>; Sun, 21 Mar 2021 12:41:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229870AbhCULFV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 21 Mar 2021 07:05:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33842 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229834AbhCULE6 (ORCPT
+        id S229863AbhCUMk1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 21 Mar 2021 08:40:27 -0400
+Received: from mail-il1-f200.google.com ([209.85.166.200]:47614 "EHLO
+        mail-il1-f200.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229846AbhCUMkF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 21 Mar 2021 07:04:58 -0400
-Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 797F9C061762
-        for <linux-block@vger.kernel.org>; Sun, 21 Mar 2021 04:04:57 -0700 (PDT)
-Received: by mail-ed1-x531.google.com with SMTP id h10so15874551edt.13
-        for <linux-block@vger.kernel.org>; Sun, 21 Mar 2021 04:04:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=8pbSHoOc4fdbEmSmiSG1Rc1zJ6Vo+wX1h1aVlPgdpxQ=;
-        b=TFrOc3y6fE6WVMQzcw5ZSat+UP1VZf4xVGkAH9McSR/CRL8zo/CbAx1Phy681QQ3xZ
-         IX0JgOzzYmM1oAvOawijWUnf0NW4iVNcZtcBtOCQfIsIFCpOfNomPF6RB7VDT9zLHrBq
-         EMd7qkmVGhEXIK0vTetvTuuVv8TI6cYtiMQo7TxDBlE8hfEeC7JZu+HMu/2ChVsf7D90
-         nl7grNbHuz5JPSDXrjFrztfwIYB/+51dNzl4tqczsrjvnzs8fpKRNJYpG5z1kZY7x6Ue
-         cBv4KoTgqFrXI9dGb1vNrvdV2HiuPCSL9nCpdyyHkAJ/Cjmv5GUHyDW1Q3XuKh7HKc7d
-         yZYA==
+        Sun, 21 Mar 2021 08:40:05 -0400
+Received: by mail-il1-f200.google.com with SMTP id x11so19210589ilu.14
+        for <linux-block@vger.kernel.org>; Sun, 21 Mar 2021 05:40:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=8pbSHoOc4fdbEmSmiSG1Rc1zJ6Vo+wX1h1aVlPgdpxQ=;
-        b=FU6le5xdeUF7mHFsRJnVhXkjPa9dDTzMT/x/iHz20mPmxxLkTcFW+dDpttrIWr7kSR
-         Wu7P9ugohCMyyT8+LxVNWkQQhbjouqDbzQwC6LW2uQ86iE9xpP+5teXh0Pgk/EFtoTg8
-         WhxWFS0mvovr5SL2FSUInO7yx5PPDyqyN1ibNuoohI0ieu7vUjlrUco6fcR07MEqaGaA
-         VpvUg6NEeO+ypooLS/+QFUBXZVjA03jUk9KoZXMSx57ZIFRxYoykiu8xzgYRN3KezXcc
-         B9RxxG0iVFz1R906gcxyGv5p2TfsL4jEf/3oWR66p4M8nMCD4Hy52D52oNt0BqbVysG1
-         REyw==
-X-Gm-Message-State: AOAM531Bw+YTZdG9+Tw6orYEV+r+vHw8mGEeFNtfX8p4skxP/RkHWDUC
-        DqQMkQ00aqTgzm6/VKAGxQJqeA==
-X-Google-Smtp-Source: ABdhPJyJ+ucISqC14qWVE5aQwMAabKowr89pwwN8mGomfk/kl0g2xJPav4RKOyPIA5QeyEaB0ZOmpA==
-X-Received: by 2002:aa7:c7c5:: with SMTP id o5mr19889227eds.31.1616324695913;
-        Sun, 21 Mar 2021 04:04:55 -0700 (PDT)
-Received: from [192.168.0.13] ([83.216.184.132])
-        by smtp.gmail.com with ESMTPSA id s6sm6901887ejx.83.2021.03.21.04.04.54
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 21 Mar 2021 04:04:55 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [RFC PATCH v2 00/11] bfq: introduce bfq.ioprio for cgroup
-From:   Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <cover.1615517202.git.brookxu@tencent.com>
-Date:   Sun, 21 Mar 2021 12:04:53 +0100
-Cc:     axboe@kernel.dk, tj@kernel.org, linux-block@vger.kernel.org,
-        cgroups@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <F64D5CC8-E650-4AE6-8452-7FA0C1976271@linaro.org>
-References: <cover.1615517202.git.brookxu@tencent.com>
-To:     brookxu <brookxu.cn@gmail.com>
-X-Mailer: Apple Mail (2.3445.104.11)
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=Du7jbAAe3dZDXGgzm0EhuVuhWQs9ocY52TW7Eb3PJSI=;
+        b=VoOHG7Ez0yJB4J+qKnCmv4HG3naHxvc9zZDCyxKtkYmt6nfCnQM2OODQTHrmZT7nu0
+         xJTSC3/5KMyC3RE3g2umo6etTB0qDA/WxNWVbVQepEStWKhxF8YD8mF4B6lcmZbwZL86
+         s4ztvFBLnPIliTRXLI27h/y8fQOCSVo+vTyGyPBczhY6I1OI7naOSCmWOPaaLijzhuz/
+         ZPF7uqpOSwyO7uj6kkaBU/FKJLY4BJuFOKvlk8uavvjIR4IBzODPnvmlGwU+xAD0XKJR
+         KDrkWXgfajsbL/5RYuQkih4ntItStlLzw2NUr8GqXDBRaSAh6sdKN9B41YcYiKRfjNni
+         4RuA==
+X-Gm-Message-State: AOAM533ebnJzdtWIAyBWlpUlgyfCtxRl7TRzHBSXweOCyEjp//ieupyZ
+        qUvlgN9P3Lpe03/Op3e/7q6skRN5HIdQhDVcDYQhG7oQoDPf
+X-Google-Smtp-Source: ABdhPJwLUId8Sas9RSZ3Jj2SPQjCYzKqv5Gs8fATOIuPtXwbqn1x3RcTQQiwdqKz10rHDN98oBhipUM12tdzeJmdaeVp+nWELDAY
+MIME-Version: 1.0
+X-Received: by 2002:a05:6e02:1351:: with SMTP id k17mr8707489ilr.204.1616330405017;
+ Sun, 21 Mar 2021 05:40:05 -0700 (PDT)
+Date:   Sun, 21 Mar 2021 05:40:05 -0700
+In-Reply-To: <00000000000053da9405bd7d2644@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000a17fb305be0b3f38@google.com>
+Subject: Re: [syzbot] KASAN: use-after-free Read in disk_part_iter_next (2)
+From:   syzbot <syzbot+8fede7e30c7cee0de139@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, hch@lst.de, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+        tj@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+syzbot has bisected this issue to:
 
+commit a33df75c6328bf40078b35f2040d8e54d574c357
+Author: Christoph Hellwig <hch@lst.de>
+Date:   Sun Jan 24 10:02:41 2021 +0000
 
-> Il giorno 12 mar 2021, alle ore 12:08, brookxu <brookxu.cn@gmail.com> =
-ha scritto:
->=20
-> From: Chunguang Xu <brookxu@tencent.com>
->=20
+    block: use an xarray for disk->part_tbl
 
-Hi Chunguang,
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=17989906d00000
+start commit:   1c273e10 Merge tag 'zonefs-5.12-rc4' of git://git.kernel.o..
+git tree:       upstream
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=14589906d00000
+console output: https://syzkaller.appspot.com/x/log.txt?x=10589906d00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6abda3336c698a07
+dashboard link: https://syzkaller.appspot.com/bug?extid=8fede7e30c7cee0de139
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13dfe8bed00000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=155a117cd00000
 
-> Tasks in the production environment can be roughly divided into
-> three categories: emergency tasks, ordinary tasks and offline
-> tasks. Emergency tasks need to be scheduled in real time, such
-> as system agents. Offline tasks do not need to guarantee QoS,
-> but can improve system resource utilization during system idle
-> periods, such as background tasks. The above requirements need
-> to achieve IO preemption. At present, we can use weights to
-> simulate IO preemption, but since weights are more of a shared
-> concept, they cannot be simulated well. For example, the weights
-> of emergency tasks and ordinary tasks cannot be determined well,
-> offline tasks (with the same weight) actually occupy different
-> resources on disks with different performance, and the tail
-> latency caused by offline tasks cannot be well controlled. Using
-> ioprio's concept of preemption, we can solve the above problems
-> very well. Since ioprio will eventually be converted to weight,
-> using ioprio alone can also achieve weight isolation within the
-> same class. But we can still use bfq.weight to control resource,
-> achieving better IO Qos control.
->=20
-> However, currently the class of bfq_group is always be class, and
-> the ioprio class of the task can only be reflected in a single
-> cgroup. We cannot guarantee that real-time tasks in a cgroup are
-> scheduled in time. Therefore, we introduce bfq.ioprio, which
-> allows us to configure ioprio class for cgroup. In this way, we
-> can ensure that the real-time tasks of a cgroup can be scheduled
-> in time. Similarly, the processing of offline task groups can
-> also be simpler.
->=20
+Reported-by: syzbot+8fede7e30c7cee0de139@syzkaller.appspotmail.com
+Fixes: a33df75c6328 ("block: use an xarray for disk->part_tbl")
 
-I find this contribution very interesting.  Anyway, given the
-relevance of such a contribution, I'd like to hear from relevant
-people (Jens, Tejun, ...?), before revising individual patches.
-
-Yet I already have a general question.  How does this mechanism comply
-with per-process ioprios and ioprio classes?  For example, what
-happens if a process belongs to BE-class group according to your
-mechanism, but to a RT class according to its ioprio?  Does the
-pre-group class dominate the per-process class?  Is all clean and
-predictable?
-
-> The bfq.ioprio interface now is available for cgroup v1 and cgroup
-> v2. Users can configure the ioprio for cgroup through this interface,
-> as shown below:
->=20
-> echo "1 2"> blkio.bfq.ioprio
-
-Wouldn't it be nicer to have acronyms for classes (RT, BE, IDLE),
-instead of numbers?
-
-Thank you very much for this improvement proposal,
-Paolo
-
->=20
-> The above two values respectively represent the values of ioprio
-> class and ioprio for cgroup. The ioprio of tasks within the cgroup
-> is uniformly equal to the ioprio of the cgroup. If the ioprio of
-> the cgroup is disabled, the ioprio of the task remains the same,
-> usually from io_context.
->=20
-> When testing, using fio and fio_generate_plots we can clearly see
-> that the IO delay of the task satisfies RT> BE> IDLE. When RT is
-> running, BE and IDLE are guaranteed minimum bandwidth. When used
-> with bfq.weight, we can also isolate the resource within the same
-> class.
->=20
-> The test process is as follows:
-> # prepare data disk
-> mount /dev/sdb /data1
->=20
-> # create cgroup v1 hierarchy
-> cd /sys/fs/cgroup/blkio
-> mkdir rt be idle
-> echo "1 0" > rt/blkio.bfq.ioprio
-> echo "2 0" > be/blkio.bfq.ioprio
-> echo "3 0" > idle/blkio.bfq.ioprio
->=20
-> # run fio test
-> fio fio.ini
->=20
-> # generate svg graph
-> fio_generate_plots res
->=20
-> The contents of fio.ini are as follows:
-> [global]
-> ioengine=3Dlibaio
-> group_reporting=3D1
-> log_avg_msec=3D500
-> direct=3D1
-> time_based=3D1
-> iodepth=3D16
-> size=3D100M
-> rw=3Dwrite
-> bs=3D1M
-> [rt]
-> name=3Drt
-> write_bw_log=3Drt
-> write_lat_log=3Drt
-> write_iops_log=3Drt
-> filename=3D/data1/rt.bin
-> cgroup=3Drt
-> runtime=3D30s
-> nice=3D-10
-> [be]
-> name=3Dbe
-> new_group
-> write_bw_log=3Dbe
-> write_lat_log=3Dbe
-> write_iops_log=3Dbe
-> filename=3D/data1/be.bin
-> cgroup=3Dbe
-> runtime=3D60s
-> [idle]
-> name=3Didle
-> new_group
-> write_bw_log=3Didle
-> write_lat_log=3Didle
-> write_iops_log=3Didle
-> filename=3D/data1/idle.bin
-> cgroup=3Didle
-> runtime=3D90s
->=20
-> V2:
-> 1. Optmise bfq_select_next_class().
-> 2. Introduce bfq_group [] to track the number of groups for each =
-CLASS.
-> 3. Optimse IO injection, EMQ and Idle mechanism for CLASS_RT.
->=20
-> Chunguang Xu (11):
->  bfq: introduce bfq_entity_to_bfqg helper method
->  bfq: limit the IO depth of idle_class to 1
->  bfq: keep the minimun bandwidth for be_class
->  bfq: expire other class if CLASS_RT is waiting
->  bfq: optimse IO injection for CLASS_RT
->  bfq: disallow idle if CLASS_RT waiting for service
->  bfq: disallow merge CLASS_RT with other class
->  bfq: introduce bfq.ioprio for cgroup
->  bfq: convert the type of bfq_group.bfqd to bfq_data*
->  bfq: remove unnecessary initialization logic
->  bfq: optimize the calculation of bfq_weight_to_ioprio()
->=20
-> block/bfq-cgroup.c  |  99 +++++++++++++++++++++++++++++++----
-> block/bfq-iosched.c |  47 ++++++++++++++---
-> block/bfq-iosched.h |  28 ++++++++--
-> block/bfq-wf2q.c    | 124 +++++++++++++++++++++++++++++++++-----------
-> 4 files changed, 244 insertions(+), 54 deletions(-)
->=20
-> --=20
-> 2.30.0
->=20
-
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
