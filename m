@@ -2,76 +2,73 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA91EC433C1
-	for <linux-block@archiver.kernel.org>; Sun, 21 Mar 2021 12:41:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67286C433C1
+	for <linux-block@archiver.kernel.org>; Sun, 21 Mar 2021 21:32:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A5F9961946
-	for <linux-block@archiver.kernel.org>; Sun, 21 Mar 2021 12:41:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 270C461943
+	for <linux-block@archiver.kernel.org>; Sun, 21 Mar 2021 21:32:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229863AbhCUMk1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 21 Mar 2021 08:40:27 -0400
-Received: from mail-il1-f200.google.com ([209.85.166.200]:47614 "EHLO
-        mail-il1-f200.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229846AbhCUMkF (ORCPT
+        id S231351AbhCUV0L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 21 Mar 2021 17:26:11 -0400
+Received: from mail-pj1-f54.google.com ([209.85.216.54]:40767 "EHLO
+        mail-pj1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230167AbhCUV0K (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 21 Mar 2021 08:40:05 -0400
-Received: by mail-il1-f200.google.com with SMTP id x11so19210589ilu.14
-        for <linux-block@vger.kernel.org>; Sun, 21 Mar 2021 05:40:05 -0700 (PDT)
+        Sun, 21 Mar 2021 17:26:10 -0400
+Received: by mail-pj1-f54.google.com with SMTP id a22-20020a17090aa516b02900c1215e9b33so9356449pjq.5;
+        Sun, 21 Mar 2021 14:26:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=Du7jbAAe3dZDXGgzm0EhuVuhWQs9ocY52TW7Eb3PJSI=;
-        b=VoOHG7Ez0yJB4J+qKnCmv4HG3naHxvc9zZDCyxKtkYmt6nfCnQM2OODQTHrmZT7nu0
-         xJTSC3/5KMyC3RE3g2umo6etTB0qDA/WxNWVbVQepEStWKhxF8YD8mF4B6lcmZbwZL86
-         s4ztvFBLnPIliTRXLI27h/y8fQOCSVo+vTyGyPBczhY6I1OI7naOSCmWOPaaLijzhuz/
-         ZPF7uqpOSwyO7uj6kkaBU/FKJLY4BJuFOKvlk8uavvjIR4IBzODPnvmlGwU+xAD0XKJR
-         KDrkWXgfajsbL/5RYuQkih4ntItStlLzw2NUr8GqXDBRaSAh6sdKN9B41YcYiKRfjNni
-         4RuA==
-X-Gm-Message-State: AOAM533ebnJzdtWIAyBWlpUlgyfCtxRl7TRzHBSXweOCyEjp//ieupyZ
-        qUvlgN9P3Lpe03/Op3e/7q6skRN5HIdQhDVcDYQhG7oQoDPf
-X-Google-Smtp-Source: ABdhPJwLUId8Sas9RSZ3Jj2SPQjCYzKqv5Gs8fATOIuPtXwbqn1x3RcTQQiwdqKz10rHDN98oBhipUM12tdzeJmdaeVp+nWELDAY
-MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1351:: with SMTP id k17mr8707489ilr.204.1616330405017;
- Sun, 21 Mar 2021 05:40:05 -0700 (PDT)
-Date:   Sun, 21 Mar 2021 05:40:05 -0700
-In-Reply-To: <00000000000053da9405bd7d2644@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000a17fb305be0b3f38@google.com>
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=0iamQhREoLz4yBTZ1ac4df91aNQ8GHtf/WoDk/3WJ7o=;
+        b=sxUcnHfbX2QQz4bFtJOqUDSrKvM8STDfC90kgoIZzZOx+ulBr8xVfZqPSY7+9uourS
+         2NfpEhP4FBOIE9tFRLQEadlkVlCIG9BEyi0gVUumuYCccb0F0lusPhgg+/sKTBBxTS3r
+         /3mG+XPkTOzG0neqsp9T2Q6wUOOup8lL68AL8nC6Mf/uChFgkSG8+IJjRkn3ZyqX1QOL
+         NAlT5IYwSemu+D8IH0AvrCPu6QVbEd2hNd+7B7oFg86Bu+SGmn8JlaqzsBB2PN137/QO
+         NTi7gxGLqG+MdNNe3GfjEX0FFMNiZTypUP7myYEUph+oEzOOaFVCMGYpIc4TZ1cC9GG4
+         BIRA==
+X-Gm-Message-State: AOAM531aHdSJ4QcfZCDVZPMcwMUM7/hrhR7LM6+edv9mFcDVaQJK1DQD
+        u48wO8ea+o/3t+Hi1Qw2CV4tMHlbKUE=
+X-Google-Smtp-Source: ABdhPJxBYX3cfQlW+9TXDGgYilDA2rXayowMbW3ZqGmlFDGOE2zxgvxrS2qAmngN6wahKWveqXBYbg==
+X-Received: by 2002:a17:90a:a4cb:: with SMTP id l11mr9648060pjw.144.1616361969509;
+        Sun, 21 Mar 2021 14:26:09 -0700 (PDT)
+Received: from ?IPv6:2601:647:4000:d7:17e0:fd07:e626:199? ([2601:647:4000:d7:17e0:fd07:e626:199])
+        by smtp.gmail.com with ESMTPSA id l19sm11320534pjt.16.2021.03.21.14.26.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 21 Mar 2021 14:26:08 -0700 (PDT)
 Subject: Re: [syzbot] KASAN: use-after-free Read in disk_part_iter_next (2)
-From:   syzbot <syzbot+8fede7e30c7cee0de139@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, hch@lst.de, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        tj@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+To:     syzbot <syzbot+8fede7e30c7cee0de139@syzkaller.appspotmail.com>,
+        axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+References: <00000000000053da9405bd7d2644@google.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <f40ed33d-8ca2-a2f2-e534-9db9920570ad@acm.org>
+Date:   Sun, 21 Mar 2021 14:26:06 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.0
+MIME-Version: 1.0
+In-Reply-To: <00000000000053da9405bd7d2644@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-syzbot has bisected this issue to:
+On 3/14/21 4:08 AM, syzbot wrote:
+> syzbot found the following issue on:
+> 
+> HEAD commit:    280d542f Merge tag 'drm-fixes-2021-03-05' of git://anongit..
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=15ade5aed00000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=952047a9dbff6a6a
+> dashboard link: https://syzkaller.appspot.com/bug?extid=8fede7e30c7cee0de139
 
-commit a33df75c6328bf40078b35f2040d8e54d574c357
-Author: Christoph Hellwig <hch@lst.de>
-Date:   Sun Jan 24 10:02:41 2021 +0000
-
-    block: use an xarray for disk->part_tbl
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=17989906d00000
-start commit:   1c273e10 Merge tag 'zonefs-5.12-rc4' of git://git.kernel.o..
-git tree:       upstream
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=14589906d00000
-console output: https://syzkaller.appspot.com/x/log.txt?x=10589906d00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=6abda3336c698a07
-dashboard link: https://syzkaller.appspot.com/bug?extid=8fede7e30c7cee0de139
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13dfe8bed00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=155a117cd00000
-
-Reported-by: syzbot+8fede7e30c7cee0de139@syzkaller.appspotmail.com
-Fixes: a33df75c6328 ("block: use an xarray for disk->part_tbl")
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+#syz test: https://github.com/bvanassche/linux a5f35387ebdc
