@@ -2,141 +2,198 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-23.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F544C433DB
-	for <linux-block@archiver.kernel.org>; Mon, 22 Mar 2021 07:50:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE2EEC433DB
+	for <linux-block@archiver.kernel.org>; Mon, 22 Mar 2021 08:02:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DE75F6196F
-	for <linux-block@archiver.kernel.org>; Mon, 22 Mar 2021 07:50:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B23C761973
+	for <linux-block@archiver.kernel.org>; Mon, 22 Mar 2021 08:02:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229614AbhCVHuN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 Mar 2021 03:50:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47438 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229548AbhCVHt6 (ORCPT
+        id S229548AbhCVIBc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 22 Mar 2021 04:01:32 -0400
+Received: from mail-io1-f70.google.com ([209.85.166.70]:55612 "EHLO
+        mail-io1-f70.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229547AbhCVIBF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 Mar 2021 03:49:58 -0400
-Received: from mail-qk1-x72b.google.com (mail-qk1-x72b.google.com [IPv6:2607:f8b0:4864:20::72b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 539BCC061574
-        for <linux-block@vger.kernel.org>; Mon, 22 Mar 2021 00:49:58 -0700 (PDT)
-Received: by mail-qk1-x72b.google.com with SMTP id q3so9632623qkq.12
-        for <linux-block@vger.kernel.org>; Mon, 22 Mar 2021 00:49:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=xdYbX1lteOBwhkyNfi6D2Jmq8cQAJlo4XY28RQPU2sA=;
-        b=bkRa+rshm6YMoxJcQkZ0KfWG9jCNHIr/UQhklJG9Rgnhsf64hZdwjSWA4hX8FNbEgN
-         IgyvjybD2/S5rpU/X6oaTEnPbFObO+zaCGjvACUk29p9WU6KKvv/E/RQESKyQsuXpggs
-         nvTDRT9v6C4KQ6gQ8lMI4ixexwGUNOy0RUGTyBm35gWQejkc0m87KfkU0C9iEeucL9df
-         yGK6If9Q6zJN9JwrTV0FPLxVLu15Q/wMhfCxiKDGN0AYjb09b6byfWCYWHvKjmoLnCVR
-         awvQ+pW2o5PZD7PG1Zx4tEPtLm1aVk2lT+wORkvAB5Uoi3KjosTiBjKdRzSfBkq9S9C3
-         sV/w==
+        Mon, 22 Mar 2021 04:01:05 -0400
+Received: by mail-io1-f70.google.com with SMTP id e15so33488128ioe.22
+        for <linux-block@vger.kernel.org>; Mon, 22 Mar 2021 01:01:04 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=xdYbX1lteOBwhkyNfi6D2Jmq8cQAJlo4XY28RQPU2sA=;
-        b=iuvTJVNrYWF/aA1axByNzh9vU5hMPZgAps6twyvmc/Bt05kgmVphnkRRodzn0PXy4r
-         LYS00JQeYpsVAUHro6R+u4Yi8AFIcW2jqWS62ZJ2lM4UTXBZOF+imdsnX0op7cfSoZXg
-         L/cLeFQEwaJlOIBkQFFbhvHiyIDbADiKV2eVzW//aNrGmdEMMRy3yZQ9t1q5vNTIIy+s
-         8klBa1cOgVwWj7MnCcgDHnQUoaCIHUS2TTy2P/XbJUKH64zxPslVRQS3Wot8mE2yPcVI
-         ah+A7Q0Fl3c57LmNl9I4tTPLAL44fyqkQl5UOcrGXAAslnBeMncH5coNJEqZ5V4U+cqg
-         eSgw==
-X-Gm-Message-State: AOAM533/54h+V5yIvryHlOhHA95USEbz09JaKVAOmOtb5O+q/eknRJ3v
-        vNnHteZlvIJKWrsGkCPnh/Dnzswnqy+2M/6RyvKKMQ==
-X-Google-Smtp-Source: ABdhPJxAIoJKu7FdQTOldr6rYJb4dltQXuYIwByoH4qJ9DpEFzerNaXUNS5rnknv4fAhRcGJjuUsgmvJra2W9u12NdU=
-X-Received: by 2002:a05:620a:410f:: with SMTP id j15mr9877450qko.424.1616399397132;
- Mon, 22 Mar 2021 00:49:57 -0700 (PDT)
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=eMhzoyUhmnkUQM/d9deweN5U363WaslaUrLhrrqxZQE=;
+        b=gB/oLglLx4vEpOyK5deZ+hAdu2v+C7M29PG9ITSAxA1CWr5SXg8MqmNNEYCHeUIHFy
+         lZ7hwaImv4NZL6VXWJYSug7aegYo3e10hVnMx/5RMFBGfT/Coxx0z3GoCEnO1uG1VV+B
+         2cU/r1Wl+Wea3CXsuzXCCK6S+f4BFEJolq/rkKxY1FwTzv0fINW8r3oq+R8El2bEASFy
+         +sDhxTP5GFZytvUPB0dKlxObAAVba/47YWhiRMkCpdBoQ09JIBjnRlbSycQceGBBwjKR
+         Yyx6Ii5sGwkvmKcCUXtgqYDZ/w/wqqrfNoRHKSOBaDJrb9Jqd20HFUU9/yTBb5blsK+4
+         34AA==
+X-Gm-Message-State: AOAM532potBmoH51ClMy+Ap8GLxA2QArNoC2k40HRf/7gI6wjLEPQtxw
+        vXQNposIjGyet03kNNlA+DpUFROz9mOeit7WfnTrazLXtAMM
+X-Google-Smtp-Source: ABdhPJygSFEqdCo0KLClNkVcr7dSfoJblCboacjhqv5cLogCuZ5KWemfhk0tbSB7p/IYqi3lHuuOpmEPKp0gf9YG5TXMcfiXCKbS
 MIME-Version: 1.0
-References: <00000000000053da9405bd7d2644@google.com> <000000000000a17fb305be0b3f38@google.com>
- <20210322071801.GE3440@lst.de>
-In-Reply-To: <20210322071801.GE3440@lst.de>
-From:   Dmitry Vyukov <dvyukov@google.com>
-Date:   Mon, 22 Mar 2021 08:49:45 +0100
-Message-ID: <CACT4Y+bDdmUH4eJV0P7OwT_z1pSi3CWs9fFrtiO89obtK6mpcw@mail.gmail.com>
+X-Received: by 2002:a6b:b5c2:: with SMTP id e185mr10080122iof.204.1616400064543;
+ Mon, 22 Mar 2021 01:01:04 -0700 (PDT)
+Date:   Mon, 22 Mar 2021 01:01:04 -0700
+In-Reply-To: <CACT4Y+bDdmUH4eJV0P7OwT_z1pSi3CWs9fFrtiO89obtK6mpcw@mail.gmail.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000a989e205be1b7771@google.com>
 Subject: Re: [syzbot] KASAN: use-after-free Read in disk_part_iter_next (2)
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     syzbot <syzbot+8fede7e30c7cee0de139@syzkaller.appspotmail.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
-        Tejun Heo <tj@kernel.org>
-Content-Type: multipart/mixed; boundary="000000000000e24a1905be1b4ff7"
+From:   syzbot <syzbot+8fede7e30c7cee0de139@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, dvyukov@google.com, hch@lst.de,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com, tj@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---000000000000e24a1905be1b4ff7
-Content-Type: text/plain; charset="UTF-8"
+Hello,
 
-On Mon, Mar 22, 2021 at 8:18 AM Christoph Hellwig <hch@lst.de> wrote:
->
-> I've been running the reproducer on a KASAN enable VM for about
-> 15 minutes now, but haven't been able to reproduce it.
->
-> Is there a way to inject this proposed fix into the syzbot queue?
+syzbot has tested the proposed patch but the reproducer is still triggering an issue:
+KASAN: use-after-free Read in disk_part_iter_next
 
-Hi Christoph,
+==================================================================
+BUG: KASAN: use-after-free in bdev_nr_sectors include/linux/genhd.h:266 [inline]
+BUG: KASAN: use-after-free in disk_part_iter_next+0x49d/0x530 block/genhd.c:206
+Read of size 8 at addr ffff88814403d0a8 by task syz-executor.0/10269
 
-Yes, since this bug has a reproducer, syzbot can test patches. See:
+CPU: 1 PID: 10269 Comm: syz-executor.0 Not tainted 5.12.0-rc4-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Call Trace:
+ __dump_stack lib/dump_stack.c:79 [inline]
+ dump_stack+0x141/0x1d7 lib/dump_stack.c:120
+ print_address_description.constprop.0.cold+0x5b/0x2f8 mm/kasan/report.c:232
+ __kasan_report mm/kasan/report.c:399 [inline]
+ kasan_report.cold+0x7c/0xd8 mm/kasan/report.c:416
+ bdev_nr_sectors include/linux/genhd.h:266 [inline]
+ disk_part_iter_next+0x49d/0x530 block/genhd.c:206
+ partition_overlaps+0x96/0x200 block/partitions/core.c:422
+ bdev_add_partition+0x66/0x130 block/partitions/core.c:441
+ blkpg_do_ioctl+0x2d0/0x340 block/ioctl.c:43
+ blkpg_ioctl block/ioctl.c:60 [inline]
+ blkdev_ioctl+0x577/0x6d0 block/ioctl.c:548
+ block_ioctl+0xf9/0x140 fs/block_dev.c:1667
+ vfs_ioctl fs/ioctl.c:48 [inline]
+ __do_sys_ioctl fs/ioctl.c:753 [inline]
+ __se_sys_ioctl fs/ioctl.c:739 [inline]
+ __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:739
+ do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x466459
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 bc ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f65eb831188 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 000000000056c008 RCX: 0000000000466459
+RDX: 0000000020000240 RSI: 0000000000001269 RDI: 0000000000000003
+RBP: 00000000004bf9fb R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 000000000056c008
+R13: 00007ffc7d37ce9f R14: 00007f65eb831300 R15: 0000000000022000
 
-http://bit.do/syzbot#testing-patches
+Allocated by task 10226:
+ kasan_save_stack+0x1b/0x40 mm/kasan/common.c:38
+ kasan_set_track mm/kasan/common.c:46 [inline]
+ set_alloc_info mm/kasan/common.c:427 [inline]
+ __kasan_slab_alloc+0x75/0x90 mm/kasan/common.c:460
+ kasan_slab_alloc include/linux/kasan.h:223 [inline]
+ slab_post_alloc_hook mm/slab.h:516 [inline]
+ slab_alloc_node mm/slub.c:2907 [inline]
+ slab_alloc mm/slub.c:2915 [inline]
+ kmem_cache_alloc+0x155/0x370 mm/slub.c:2920
+ bdev_alloc_inode+0x18/0x80 fs/block_dev.c:795
+ alloc_inode+0x61/0x230 fs/inode.c:234
+ new_inode_pseudo fs/inode.c:928 [inline]
+ new_inode+0x27/0x2f0 fs/inode.c:957
+ bdev_alloc+0x20/0x2f0 fs/block_dev.c:885
+ add_partition+0x1ab/0x880 block/partitions/core.c:343
+ bdev_add_partition+0xb6/0x130 block/partitions/core.c:446
+ blkpg_do_ioctl+0x2d0/0x340 block/ioctl.c:43
+ blkpg_ioctl block/ioctl.c:60 [inline]
+ blkdev_ioctl+0x577/0x6d0 block/ioctl.c:548
+ block_ioctl+0xf9/0x140 fs/block_dev.c:1667
+ vfs_ioctl fs/ioctl.c:48 [inline]
+ __do_sys_ioctl fs/ioctl.c:753 [inline]
+ __se_sys_ioctl fs/ioctl.c:739 [inline]
+ __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:739
+ do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
 
-It would be, for example:
+Freed by task 10255:
+ kasan_save_stack+0x1b/0x40 mm/kasan/common.c:38
+ kasan_set_track+0x1c/0x30 mm/kasan/common.c:46
+ kasan_set_free_info+0x20/0x30 mm/kasan/generic.c:357
+ ____kasan_slab_free mm/kasan/common.c:360 [inline]
+ ____kasan_slab_free mm/kasan/common.c:325 [inline]
+ __kasan_slab_free+0xf5/0x130 mm/kasan/common.c:367
+ kasan_slab_free include/linux/kasan.h:199 [inline]
+ slab_free_hook mm/slub.c:1562 [inline]
+ slab_free_freelist_hook+0x92/0x210 mm/slub.c:1600
+ slab_free mm/slub.c:3161 [inline]
+ kmem_cache_free+0x8a/0x740 mm/slub.c:3177
+ i_callback+0x3f/0x70 fs/inode.c:223
+ rcu_do_batch kernel/rcu/tree.c:2559 [inline]
+ rcu_core+0x74a/0x12f0 kernel/rcu/tree.c:2794
+ __do_softirq+0x29b/0x9f6 kernel/softirq.c:345
 
-#syz test: git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
-master
+Last potentially related work creation:
+ kasan_save_stack+0x1b/0x40 mm/kasan/common.c:38
+ kasan_record_aux_stack+0xe5/0x110 mm/kasan/generic.c:345
+ __call_rcu kernel/rcu/tree.c:3039 [inline]
+ call_rcu+0xb1/0x740 kernel/rcu/tree.c:3114
+ destroy_inode+0x129/0x1b0 fs/inode.c:289
+ iput_final fs/inode.c:1654 [inline]
+ iput.part.0+0x57e/0x810 fs/inode.c:1680
+ iput+0x58/0x70 fs/inode.c:1670
+ disk_part_iter_exit block/genhd.c:235 [inline]
+ disk_part_iter_next+0x9a/0x530 block/genhd.c:202
+ blk_drop_partitions+0x10a/0x180 block/partitions/core.c:538
+ bdev_disk_changed+0x238/0x430 fs/block_dev.c:1246
+ loop_reread_partitions+0x29/0x50 drivers/block/loop.c:655
+ loop_set_status+0x704/0x1050 drivers/block/loop.c:1418
+ loop_set_status64 drivers/block/loop.c:1538 [inline]
+ lo_ioctl+0x4ca/0x1620 drivers/block/loop.c:1706
+ blkdev_ioctl+0x2a1/0x6d0 block/ioctl.c:583
+ block_ioctl+0xf9/0x140 fs/block_dev.c:1667
+ vfs_ioctl fs/ioctl.c:48 [inline]
+ __do_sys_ioctl fs/ioctl.c:753 [inline]
+ __se_sys_ioctl fs/ioctl.c:739 [inline]
+ __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:739
+ do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+
+The buggy address belongs to the object at ffff88814403d080
+ which belongs to the cache bdev_cache of size 2792
+The buggy address is located 40 bytes inside of
+ 2792-byte region [ffff88814403d080, ffff88814403db68)
+The buggy address belongs to the page:
+page:ffffea0005100e00 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x144038
+head:ffffea0005100e00 order:3 compound_mapcount:0 compound_pincount:0
+flags: 0x57ff00000010200(slab|head)
+raw: 057ff00000010200 dead000000000100 dead000000000122 ffff8880101bdb40
+raw: 0000000000000000 00000000000b000b 00000001ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+
+Memory state around the buggy address:
+ ffff88814403cf80: 00 00 00 00 00 00 00 00 00 00 00 00 00 fc fc fc
+ ffff88814403d000: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+>ffff88814403d080: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                                  ^
+ ffff88814403d100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff88814403d180: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+==================================================================
 
 
-> diff --git a/block/partitions/core.c b/block/partitions/core.c
-> index 1a7558917c47d6..f5d5872b89d57e 100644
-> --- a/block/partitions/core.c
-> +++ b/block/partitions/core.c
-> @@ -288,15 +288,12 @@ struct device_type part_type = {
->  void delete_partition(struct block_device *part)
->  {
->         xa_erase(&part->bd_disk->part_tbl, part->bd_partno);
-> -       kobject_put(part->bd_holder_dir);
-> -       device_del(&part->bd_device);
-> -
-> -       /*
-> -        * Remove the block device from the inode hash, so that it cannot be
-> -        * looked up any more even when openers still hold references.
-> -        */
->         remove_inode_hash(part->bd_inode);
->
-> +       synchronize_rcu();
-> +
-> +       kobject_put(part->bd_holder_dir);
-> +       device_del(&part->bd_device);
->         put_device(&part->bd_device);
->  }
+Tested on:
 
---000000000000e24a1905be1b4ff7
-Content-Type: application/octet-stream; name=patch
-Content-Disposition: attachment; filename=patch
-Content-Transfer-Encoding: base64
-Content-ID: <f_kmkaeeyy0>
-X-Attachment-Id: f_kmkaeeyy0
+commit:         0d02ec6b Linux 5.12-rc4
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=127b4506d00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=4b6433fa3370faed
+dashboard link: https://syzkaller.appspot.com/bug?extid=8fede7e30c7cee0de139
+compiler:       
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=14d738bed00000
 
-ZGlmZiAtLWdpdCBhL2Jsb2NrL3BhcnRpdGlvbnMvY29yZS5jIGIvYmxvY2svcGFydGl0aW9ucy9j
-b3JlLmMKaW5kZXggMWE3NTU4OTE3YzQ3ZDYuLmY1ZDU4NzJiODlkNTdlIDEwMDY0NAotLS0gYS9i
-bG9jay9wYXJ0aXRpb25zL2NvcmUuYworKysgYi9ibG9jay9wYXJ0aXRpb25zL2NvcmUuYwpAQCAt
-Mjg4LDE1ICsyODgsMTIgQEAgc3RydWN0IGRldmljZV90eXBlIHBhcnRfdHlwZSA9IHsKIHZvaWQg
-ZGVsZXRlX3BhcnRpdGlvbihzdHJ1Y3QgYmxvY2tfZGV2aWNlICpwYXJ0KQogewogCXhhX2VyYXNl
-KCZwYXJ0LT5iZF9kaXNrLT5wYXJ0X3RibCwgcGFydC0+YmRfcGFydG5vKTsKLQlrb2JqZWN0X3B1
-dChwYXJ0LT5iZF9ob2xkZXJfZGlyKTsKLQlkZXZpY2VfZGVsKCZwYXJ0LT5iZF9kZXZpY2UpOwot
-Ci0JLyoKLQkgKiBSZW1vdmUgdGhlIGJsb2NrIGRldmljZSBmcm9tIHRoZSBpbm9kZSBoYXNoLCBz
-byB0aGF0IGl0IGNhbm5vdCBiZQotCSAqIGxvb2tlZCB1cCBhbnkgbW9yZSBldmVuIHdoZW4gb3Bl
-bmVycyBzdGlsbCBob2xkIHJlZmVyZW5jZXMuCi0JICovCiAJcmVtb3ZlX2lub2RlX2hhc2gocGFy
-dC0+YmRfaW5vZGUpOwogCisJc3luY2hyb25pemVfcmN1KCk7CisKKwlrb2JqZWN0X3B1dChwYXJ0
-LT5iZF9ob2xkZXJfZGlyKTsKKwlkZXZpY2VfZGVsKCZwYXJ0LT5iZF9kZXZpY2UpOwogCXB1dF9k
-ZXZpY2UoJnBhcnQtPmJkX2RldmljZSk7CiB9Cg==
---000000000000e24a1905be1b4ff7--
