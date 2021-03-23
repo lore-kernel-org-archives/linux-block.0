@@ -2,121 +2,148 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFA49C433E0
-	for <linux-block@archiver.kernel.org>; Tue, 23 Mar 2021 14:55:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0BA5C433C1
+	for <linux-block@archiver.kernel.org>; Tue, 23 Mar 2021 15:40:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C5130619BD
-	for <linux-block@archiver.kernel.org>; Tue, 23 Mar 2021 14:55:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6AC02619B2
+	for <linux-block@archiver.kernel.org>; Tue, 23 Mar 2021 15:40:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232456AbhCWOyw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Mar 2021 10:54:52 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37782 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232491AbhCWOxh (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Mar 2021 10:53:37 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id A56D860232;
-        Tue, 23 Mar 2021 14:53:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1616511217;
-        bh=h5LZB7DGfoEeckCd6NF3dO8C/UBNfhNOFjdcQ4pFMt4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=fUeIkHRN1lvzu9REhSjwjHepwClYcjwIyh2KpHpjtDLX2h1KiSJfJD5TGvNMnPsr2
-         QqIYGHbPwd98xYrzTgH9Mzk3x6MH0UjqxjqNxYTqwGaiufZ7IMiH5TZfwUDdn9rOty
-         v3HcpSj7iI7fH2Xxfbcie+7MxzLmQ6rpmnxp4vrGjhBdvVKZLN6WlLpSaKdIOQHOtI
-         dMh1FEYp01HKZ/k9XcnP0Da5Gjv6DZnG9jhX1Yg4PhdiPbvHOLoUnXhwED3t5sAlxm
-         7sYKw6FCzJ2y5gegAq55rTo3ZNx6BFtQ7HBKD7BmqPOssaNcMRBrC/zMjPE0az1exN
-         f9euHlxucs8ww==
-Date:   Tue, 23 Mar 2021 23:53:30 +0900
-From:   Keith Busch <kbusch@kernel.org>
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     Sagi Grimberg <sagi@grimberg.me>, Christoph Hellwig <hch@lst.de>,
-        Jens Axboe <axboe@kernel.dk>, Chao Leng <lengchao@huawei.com>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: Re: [PATCH 2/2] nvme-multipath: don't block on blk_queue_enter of
- the underlying device
-Message-ID: <20210323145330.GB21687@redsun51.ssa.fujisawa.hgst.com>
-References: <20210322073726.788347-1-hch@lst.de>
- <20210322073726.788347-3-hch@lst.de>
- <34e574dc-5e80-4afe-b858-71e6ff5014d6@grimberg.me>
- <c064b296-c25c-3731-cbbd-f99ab93e6bd2@suse.de>
- <608f8198-8c0d-b59c-180b-51666840382d@grimberg.me>
- <250dc97d-8781-1655-02ca-5171b0bd6e24@suse.de>
+        id S232894AbhCWPjm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Mar 2021 11:39:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35882 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232993AbhCWPjh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 23 Mar 2021 11:39:37 -0400
+Received: from mail-io1-xd2a.google.com (mail-io1-xd2a.google.com [IPv6:2607:f8b0:4864:20::d2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A08DBC061763
+        for <linux-block@vger.kernel.org>; Tue, 23 Mar 2021 08:39:36 -0700 (PDT)
+Received: by mail-io1-xd2a.google.com with SMTP id x17so6856638iog.2
+        for <linux-block@vger.kernel.org>; Tue, 23 Mar 2021 08:39:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=MMOXNb+O2wXfYQW35rUSCGI74G6+HJz3hHwWTGaaHPo=;
+        b=Vms0NpLf24bhKMFEGMXlMhZHupcUHxFR6xEoyBX7Ix9aLjemTLTkWUIiwvTvShMNcW
+         G2wRzi9Q8nn8bCCuozZWyfek+LCDWONTgN5WV257GlyF3FSPMTg15sGH0coIBwMUvxyM
+         FiDc+yb+yt0vMqY8WKrhlW1bS+cRR0UCepfTs8ROnsyLRQ3fqFyQoyoDBrmcHPs4yLJ8
+         VdnNOYqhwiakCybuugtyvwcR8ILqOjLmxsiKlI5uKbV4K78aoLQNFzBo4ZNTGooFFGZR
+         60GLLLrSfg2jGooCWYt7kmYG5aotnrtMXhKRnGgFxg8XvXS7sh/Mbeu6dhYUmL9nFHAM
+         Mb7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=MMOXNb+O2wXfYQW35rUSCGI74G6+HJz3hHwWTGaaHPo=;
+        b=H398HK+sw9fOs8MkS3EuFb7GR4BO094QaWAcWqbUHUcKciv41u9KL1dz92buN4Y7DQ
+         Tprac/5eQc0i6jOfimnFj5KquBYhTh8Xzg0N5YGAcZthrM0gU/hoSiSEYGvPB9Nn5A3j
+         22SoDE+aKTl6sus5VRK8ukXQ8D9JI+VKvCkFMdggC55SaznpovHgB8/NfomVweZGwOXc
+         w1qfTm3v3Van5/tT59Uckpv4+S4CK/vCXN7d+qS9PzWrnveN8lWBRdDp8WY+YC2EdUd8
+         XC2HNPeq8i+A0AujgjlslNuAmuPOzT/t5b+jzp0Uyt4NGqHSiWht+28Jn2gFHpbm+xPK
+         RBTA==
+X-Gm-Message-State: AOAM533u4YMVBMyPVgDalxG1sCz5p4bOUZjKv3aFxAlcGEr/lWTtmrPt
+        wnX5fw5GTTQlgzMVhnDk6jKvpg==
+X-Google-Smtp-Source: ABdhPJweG1DDe6bGzcXvI/3yUdC5fMk+FvUK+FyQVbBY3wnFeeqrJLes8iUdSzW2z3a98+WlcdxX4w==
+X-Received: by 2002:a5e:d908:: with SMTP id n8mr4883261iop.121.1616513975896;
+        Tue, 23 Mar 2021 08:39:35 -0700 (PDT)
+Received: from [192.168.1.30] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id g16sm9545537iln.29.2021.03.23.08.39.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 23 Mar 2021 08:39:35 -0700 (PDT)
+Subject: Re: [PATCH] blk-mq: Fix races between iterating over requests and
+ freeing requests
+To:     John Garry <john.garry@huawei.com>,
+        Bart Van Assche <bvanassche@acm.org>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Ming Lei <ming.lei@redhat.com>,
+        Khazhy Kumykov <khazhy@google.com>,
+        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+References: <20210319010009.10041-1-bvanassche@acm.org>
+ <721c833d-7dc6-30a5-371e-c8c6388fb852@huawei.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <ecab7c5c-53b8-61e4-800e-b9c368e4b8b4@kernel.dk>
+Date:   Tue, 23 Mar 2021 09:39:34 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <250dc97d-8781-1655-02ca-5171b0bd6e24@suse.de>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+In-Reply-To: <721c833d-7dc6-30a5-371e-c8c6388fb852@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Mar 23, 2021 at 09:36:47AM +0100, Hannes Reinecke wrote:
-> On 3/23/21 8:31 AM, Sagi Grimberg wrote:
-> > 
-> > > Actually, I had been playing around with marking the entire bio as
-> > > 'NOWAIT'; that would avoid the tag stall, too:
-> > > 
-> > > @@ -313,7 +316,7 @@ blk_qc_t nvme_ns_head_submit_bio(struct bio *bio)
-> > >          ns = nvme_find_path(head);
-> > >          if (likely(ns)) {
-> > >                  bio_set_dev(bio, ns->disk->part0);
-> > > -               bio->bi_opf |= REQ_NVME_MPATH;
-> > > +               bio->bi_opf |= REQ_NVME_MPATH | REQ_NOWAIT;
-> > >                  trace_block_bio_remap(bio, disk_devt(ns->head->disk),
-> > >                                        bio->bi_iter.bi_sector);
-> > >                  ret = submit_bio_noacct(bio);
-> > > 
-> > > 
-> > > My only worry here is that we might incur spurious failures under
-> > > high load; but then this is not necessarily a bad thing.
-> > 
-> > What? making spurious failures is not ok under any load. what fs will
-> > take into account that you may have run out of tags?
+On 3/23/21 6:34 AM, John Garry wrote:
+> On 19/03/2021 01:00, Bart Van Assche wrote:
+>> Multiple users have reported use-after-free complaints similar to the
+>> following (see also https://lore.kernel.org/linux-block/1545261885.185366.488.camel@acm.org/):
+>>
+>> BUG: KASAN: use-after-free in bt_iter+0x86/0xf0
+>> Read of size 8 at addr ffff88803b335240 by task fio/21412
+>>
+>> CPU: 0 PID: 21412 Comm: fio Tainted: G        W         4.20.0-rc6-dbg+ #3
+>> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1 04/01/2014
+>> Call Trace:
+>>   dump_stack+0x86/0xca
+>>   print_address_description+0x71/0x239
+>>   kasan_report.cold.5+0x242/0x301
+>>   __asan_load8+0x54/0x90
+>>   bt_iter+0x86/0xf0
+>>   blk_mq_queue_tag_busy_iter+0x373/0x5e0
+>>   blk_mq_in_flight+0x96/0xb0
+>>   part_in_flight+0x40/0x140
+>>   part_round_stats+0x18e/0x370
+>>   blk_account_io_start+0x3d7/0x670
+>>   blk_mq_bio_to_request+0x19c/0x3a0
+>>   blk_mq_make_request+0x7a9/0xcb0
+>>   generic_make_request+0x41d/0x960
+>>   submit_bio+0x9b/0x250
+>>   do_blockdev_direct_IO+0x435c/0x4c70
+>>   __blockdev_direct_IO+0x79/0x88
+>>   ext4_direct_IO+0x46c/0xc00
+>>   generic_file_direct_write+0x119/0x210
+>>   __generic_file_write_iter+0x11c/0x280
+>>   ext4_file_write_iter+0x1b8/0x6f0
+>>   aio_write+0x204/0x310
+>>   io_submit_one+0x9d3/0xe80
+>>   __x64_sys_io_submit+0x115/0x340
+>>   do_syscall_64+0x71/0x210
+>>
 > 
-> Well, it's not actually a spurious failure but rather a spurious failover,
-> as we're still on a multipath scenario, and bios will still be re-routed to
-> other paths. Or queued if all paths are out of tags.
-> Hence the OS would not see any difference in behaviour.
+> Hi Bart,
+> 
+> Do we have any performance figures to say that the effect is negligible?
 
-Failover might be overkill. We can run out of tags in a perfectly normal
-situation, and simply waiting may be the best option, or even scheduling
-on a different CPU may be sufficient to get a viable tag  rather than
-selecting a different path.
+I ran this through my usual peak testing, it's pretty good at finding
+any changes in performance related to changes in overhead. The workload
+is a pretty simple 512b random read, QD 128, using io_uring and polled
+IO.
 
-Does it make sense to just abort all allocated tags during a reset and
-let the original bio requeue for multipath IO?
+It seems to cause a slight slowdown for me. Performance before the patch
+is around 3.23-3.27M IOPS, and after we're at around 3.20-3.22. Looking
+at perf diff, the most interesting bits seem to be:
 
- 
-> But in the end, we abandoned this attempt, as the crash we've been seeing
-> was in bio_endio (due to bi_bdev still pointing to the removed path device):
-> 
-> [ 6552.155251]  bio_endio+0x74/0x120
-> [ 6552.155260]  nvme_ns_head_submit_bio+0x36f/0x3e0 [nvme_core]
-> [ 6552.155271]  submit_bio_noacct+0x175/0x490
-> [ 6552.155284]  ? nvme_requeue_work+0x5a/0x70 [nvme_core]
-> [ 6552.155290]  nvme_requeue_work+0x5a/0x70 [nvme_core]
-> [ 6552.155296]  process_one_work+0x1f4/0x3e0
-> [ 6552.155299]  worker_thread+0x2d/0x3e0
-> [ 6552.155302]  ? process_one_work+0x3e0/0x3e0
-> [ 6552.155305]  kthread+0x10d/0x130
-> [ 6552.155307]  ? kthread_park+0xa0/0xa0
-> [ 6552.155311]  ret_from_fork+0x35/0x40
-> 
-> So we're not blocked on blk_queue_enter(), and it's a crash, not a deadlock.
-> Blocking on blk_queue_enter() certainly plays a part here,
-> but is seems not to be the full picture.
-> 
-> Cheers,
-> 
-> Hannes
-> -- 
-> Dr. Hannes Reinecke                Kernel Storage Architect
-> hare@suse.de                              +49 911 74053 688
-> SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-> HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
+
+2.09%     -1.05%  [kernel.vmlinux]  [k] blk_mq_get_tag
+0.48%     +0.98%  [kernel.vmlinux]  [k] __do_sys_io_uring_enter
+1.49%     +0.85%  [kernel.vmlinux]  [k] __blk_mq_alloc_request
+          +0.71%  [kernel.vmlinux]  [k] __blk_mq_free_request
+
+which seems to show some shifting around of cost (often happens), but
+generally up a bit looking at the blk side.
+
+So nothing really major here, and I don't think it's something that
+should getting this fixed. John, I can run your series through the same,
+let me know.
+
+-- 
+Jens Axboe
+
