@@ -2,117 +2,88 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE5B9C433DB
-	for <linux-block@archiver.kernel.org>; Tue, 23 Mar 2021 11:07:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9530AC433C1
+	for <linux-block@archiver.kernel.org>; Tue, 23 Mar 2021 11:19:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A8CA4619C3
-	for <linux-block@archiver.kernel.org>; Tue, 23 Mar 2021 11:07:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 697D1619B8
+	for <linux-block@archiver.kernel.org>; Tue, 23 Mar 2021 11:19:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230385AbhCWLHP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Mar 2021 07:07:15 -0400
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:23494 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229728AbhCWLHL (ORCPT
+        id S230320AbhCWLSa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Mar 2021 07:18:30 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58596 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229448AbhCWLR6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Mar 2021 07:07:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1616497630; x=1648033630;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=PSigW5l4uj53gvIzjqtg7mzBZlTvWpQ3zlmEYHHRAlQ=;
-  b=VYkssNVKR6D+KP2fi1T2e9QWTS/c1jefpOCtpXak0y4yu+15eEO90mDZ
-   kGRviUYH6h+1ENZgKT6uFDHnCoRJ+GTuGVbz+n5GJLt43us8t1qvBMSkh
-   qYFECwR0PiZbBiwHblKneb4KG2AvyIiurDdgnCzcIaIiuIwfLyxszV5Oh
-   SYPo5E9FhhCeG8r3RrAi1gIMaDKZBYGRLGbqQW4c7FtJVLvC0UIZELSbP
-   Zcl/N7SUrCxikwWDrYjD8mEO/HuS6ghKuQCoYlPSt5ybEMIzijDoyZKfB
-   VmhiGCSM2PdEAGhNpAFVQdYHlCUc1Lx27d/Hgcw+juTPR3hou5r9qvBRI
-   Q==;
-IronPort-SDR: RdmW8UJiaag9A4GY260pXqB2DlH5HPx8bJqo648rM+l7BBzvIO4+i5BqyVaJ5H2zY3bxEABD9h
- YeVNBBC08UsSfTVOJjwovcAq97IShEs3FcX0CyF8iszB9erIy63wEKmqp8YAJeCevB46BK3Yev
- 7neR1SjfQMb0iHt1oYNT8QRGt733MmtaYwXMKHsop4OhYy4cqUBROgdHWB059uozDuL7uQE0la
- c+7a1lAY1cGuXRUnM3w17S9FXfYmMgYkwkQKAf4DOznBHpVJHIayG0H59RJYGno/QxUNWmk98O
- kAE=
-X-IronPort-AV: E=Sophos;i="5.81,271,1610380800"; 
-   d="scan'208";a="162781588"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 23 Mar 2021 19:07:09 +0800
-IronPort-SDR: d8ctiPdg6u2VnEY+0mfP7ysYkS4OczDav/FNJBexlrkETmubZ2FkX/OS0nEvNvI6ki//f5VTw6
- MM33byJxdJ7FRMuof3ZECe+1t5wKR9ZvPr3OEcGzyJHYPjFJy5uvkRvqPq2WMLi0wE/kSfHHbS
- ikf4pcCR2pXAEPgtdpFZfNdLU2KBB+sjACVtvxt8TujJxZ1NTdTJ1mHPeR/T5PCMr+XdTkLkyU
- eZhWjsr5zFkVo+IILcIHipUGz9tht/g7YhQ6zhkbChpJw+Bc1eCzU2XJSJXV9ckiXXZrVPTAS2
- f9S5lI5mlgOnmbMYdjpdklkL
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Mar 2021 03:49:16 -0700
-IronPort-SDR: 7AGweo7Kh/Sk4Do2fMyiJNDwmxbD3jT6XWvKDswphevV18+EMj/NC5g6AnTJJqSptDLMaXtSix
- ba8vGG91yMR7ObrughJ1ijSPZ/pUjG/rwldZWgVWNA7WHgIqXWiMEsGDduuItF8QcV/kjRnJpD
- Di89P7Rh7OFH5ugMN85sOmdMOooFDEN23rXAePVddvJHodamH8BW8RQ/LalE+ilXWnoghy1CQp
- 8+MJUSVUZzyqJVg8FsfvASgH5fQcRXwcbMc0/HFVah9p4AqsjRckvVK/5BdmPLdy29jWcvelkD
- FmU=
-WDCIronportException: Internal
-Received: from unknown (HELO redsun60.ssa.fujisawa.hgst.com) ([10.149.66.36])
-  by uls-op-cesaip02.wdc.com with ESMTP; 23 Mar 2021 04:07:09 -0700
-From:   Johannes Thumshirn <johannes.thumshirn@wdc.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Naohiro Aota <naohiro.aota@wdc.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH] block: support zone append bvecs
-Date:   Tue, 23 Mar 2021 20:06:56 +0900
-Message-Id: <739a96e185f008c238fcf06cb22068016149ad4a.1616497531.git.johannes.thumshirn@wdc.com>
-X-Mailer: git-send-email 2.30.0
+        Tue, 23 Mar 2021 07:17:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1616498277;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=fEyCPjfB1lRuNmux4TUgSTUDLeSi+0dHPVKsXtM+qB4=;
+        b=RK++CBbhnTgXLzFQJh9QwsWw4njc5WwItevt9kAY/5mQ0f2PQG839xewKJ4oQc771ybHzH
+        xIvt1WqNVkfPA699WMHhml2WkcMMEuAjgUHUIXBGif2eF78SpWfCsGumkbiQrl9U7pjn3G
+        BUec+mUQiDVTpHYr4prFGB9doYI1Z5Y=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-127-0R8p61ecNwGufIGiH6IZ_Q-1; Tue, 23 Mar 2021 07:17:53 -0400
+X-MC-Unique: 0R8p61ecNwGufIGiH6IZ_Q-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4E39B5B361;
+        Tue, 23 Mar 2021 11:17:52 +0000 (UTC)
+Received: from T590 (ovpn-13-171.pek2.redhat.com [10.72.13.171])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4FD871002D71;
+        Tue, 23 Mar 2021 11:17:38 +0000 (UTC)
+Date:   Tue, 23 Mar 2021 19:17:31 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Mike Snitzer <snitzer@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        Jeffle Xu <jefflexu@linux.alibaba.com>, dm-devel@redhat.com
+Subject: Re: [RFC PATCH V2 01/13] block: add helper of blk_queue_poll
+Message-ID: <YFnOS23G0OcL34RI@T590>
+References: <20210318164827.1481133-1-ming.lei@redhat.com>
+ <20210318164827.1481133-2-ming.lei@redhat.com>
+ <20210319165241.GA9938@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210319165241.GA9938@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Christoph reported that we'll likely trigger the WARN_ON_ONCE() checking
-that we're not submitting a bvec with REQ_OP_ZONE_APPEND in
-bio_iov_iter_get_pages() some time ago using zoned btrfs, but I couldn't
-reproduce it back then.
+On Fri, Mar 19, 2021 at 12:52:42PM -0400, Mike Snitzer wrote:
+> On Thu, Mar 18 2021 at 12:48pm -0400,
+> Ming Lei <ming.lei@redhat.com> wrote:
+> 
+> > There has been 3 users, and will be more, so add one such helper.
+> > 
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> 
+> Not sure if you're collecting Reviewed-by or Acked-by at this point?
+> Seems you dropped Chaitanya's Reviewed-by to v1:
+> https://listman.redhat.com/archives/dm-devel/2021-March/msg00166.html
 
-Now Naohiro was able to trigger the bug as well with xfstests generic/095
-on a zoned btrfs.
+Sorry, that should be an accident.
 
-There is nothing that prevents bvec submissions via REQ_OP_ZONE_APPEND if
-the hardware's zone append limit is met.
+> 
+> Do you plan to iterate a lot more before you put out a non-RFC?  For
+> this RFC v2, I'll withhold adding any of my Reviewed-by tags and just
+> reply where I see things that might need folding into the next
+> iteration.
 
-Reported-by: Naohiro Aota <naohiro.aota@wdc.com>
-Reported-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
----
- block/bio.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+If no one objects the basic approach taken in V2, I will remove RFC in
+V3.
 
-diff --git a/block/bio.c b/block/bio.c
-index 26b7f721cda8..215fe24a01ee 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1094,8 +1094,14 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- 	int ret = 0;
- 
- 	if (iov_iter_is_bvec(iter)) {
--		if (WARN_ON_ONCE(bio_op(bio) == REQ_OP_ZONE_APPEND))
--			return -EINVAL;
-+		if (bio_op(bio) == REQ_OP_ZONE_APPEND) {
-+			struct request_queue *q = bio->bi_bdev->bd_disk->queue;
-+			unsigned int max_append =
-+				queue_max_zone_append_sectors(q) << 9;
-+
-+			if (WARN_ON_ONCE(iter->count > max_append))
-+				return -EINVAL;
-+		}
- 		return bio_iov_bvec_set(bio, iter);
- 	}
- 
 -- 
-2.30.0
+Ming
 
