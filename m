@@ -2,134 +2,121 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7F80C433E4
-	for <linux-block@archiver.kernel.org>; Tue, 23 Mar 2021 13:39:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFA49C433E0
+	for <linux-block@archiver.kernel.org>; Tue, 23 Mar 2021 14:55:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 854F3619C2
-	for <linux-block@archiver.kernel.org>; Tue, 23 Mar 2021 13:39:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C5130619BD
+	for <linux-block@archiver.kernel.org>; Tue, 23 Mar 2021 14:55:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230236AbhCWNi2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Mar 2021 09:38:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37506 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231285AbhCWNiN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Mar 2021 09:38:13 -0400
-Received: from mail-vk1-xa36.google.com (mail-vk1-xa36.google.com [IPv6:2607:f8b0:4864:20::a36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92113C061763
-        for <linux-block@vger.kernel.org>; Tue, 23 Mar 2021 06:38:13 -0700 (PDT)
-Received: by mail-vk1-xa36.google.com with SMTP id u144so4616246vkb.13
-        for <linux-block@vger.kernel.org>; Tue, 23 Mar 2021 06:38:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Oh8GJQVSl1PJxaKgrZv7bYmOGictbqv/x3tJgCJgmNY=;
-        b=hXeRdtOg6s6oCUh964ZpAQTncTbLLJXrp/kU0meqsqiV9FkKkuyt1xzKm5e1OkRKMk
-         NyuRM5Ah6fUdbC9IncKfYuDUY34v0kGDvZgEh66BykgceGA/7P7V21k/slrNFQJlOzNI
-         xwP93/HiMS7DK+7fxU4SBf1rFgs6FOMR/pxPVAkxATZi35imXsLrTVQxqxlvPiS0aSp8
-         6MOyQLghm+S1uE97UnEr3vPmMtszLGLNzmBNrvQKnkXC1st1mQAHijvS9JHDHoWTnD1O
-         KBHyxHMKcT2kLYCqfCyDkrrtbCBgG4SJhrK1sry5qrfSq93yb2uZ7f/ihzRzKKH89uAr
-         ASGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Oh8GJQVSl1PJxaKgrZv7bYmOGictbqv/x3tJgCJgmNY=;
-        b=DpxmzJQBAM5iotV0eEpNv2qxPV++UugPnzvlkujybnSjr/hXYFEbxzMfijhBX34iHm
-         5XbmKSVF7OOCj05c+w3ojeykH4oRRb4kNMHVvmYS+5sreR/LUsbajaWPMRxr1wOGZF7+
-         F6EZaaEfNvW3jN3KUp2z6586FEZrv28WYsJ+JjpQEvCzjblnoR46rG2mdZgkYDu4OjVU
-         UHFhyVXWRc3ej0WG0R+U5IUXb/jKLOdeJPfzOCZctTtBTJupU9eZHBaKrSdaYydeROm+
-         lTsPCUccm8eSnYuvHhb6RTSaV3/0MnVfgyPq/ITK+tACa2rG7ulDnFcOgZkMhck9BmCE
-         EIvw==
-X-Gm-Message-State: AOAM532Os8tMj8S9MEMGAx1ZlVWn9sx5UZg3yWdHoKcv/BDssfZnk8Hz
-        ulX499Ude/lBqL61FQ5yOMl0ZsgwErDrs437k/GhNw==
-X-Google-Smtp-Source: ABdhPJzHVz6S/kvCdH7mWuoFkpqTLaGBI2y1Hi+RhDqPCnK9CqSxiUwvz72xiMlX2kMOYZEhRIQX4DXsvqOcSbETtB4=
-X-Received: by 2002:a1f:2c58:: with SMTP id s85mr3271635vks.15.1616506692244;
- Tue, 23 Mar 2021 06:38:12 -0700 (PDT)
+        id S232456AbhCWOyw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Mar 2021 10:54:52 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37782 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232491AbhCWOxh (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 23 Mar 2021 10:53:37 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id A56D860232;
+        Tue, 23 Mar 2021 14:53:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1616511217;
+        bh=h5LZB7DGfoEeckCd6NF3dO8C/UBNfhNOFjdcQ4pFMt4=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=fUeIkHRN1lvzu9REhSjwjHepwClYcjwIyh2KpHpjtDLX2h1KiSJfJD5TGvNMnPsr2
+         QqIYGHbPwd98xYrzTgH9Mzk3x6MH0UjqxjqNxYTqwGaiufZ7IMiH5TZfwUDdn9rOty
+         v3HcpSj7iI7fH2Xxfbcie+7MxzLmQ6rpmnxp4vrGjhBdvVKZLN6WlLpSaKdIOQHOtI
+         dMh1FEYp01HKZ/k9XcnP0Da5Gjv6DZnG9jhX1Yg4PhdiPbvHOLoUnXhwED3t5sAlxm
+         7sYKw6FCzJ2y5gegAq55rTo3ZNx6BFtQ7HBKD7BmqPOssaNcMRBrC/zMjPE0az1exN
+         f9euHlxucs8ww==
+Date:   Tue, 23 Mar 2021 23:53:30 +0900
+From:   Keith Busch <kbusch@kernel.org>
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     Sagi Grimberg <sagi@grimberg.me>, Christoph Hellwig <hch@lst.de>,
+        Jens Axboe <axboe@kernel.dk>, Chao Leng <lengchao@huawei.com>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Subject: Re: [PATCH 2/2] nvme-multipath: don't block on blk_queue_enter of
+ the underlying device
+Message-ID: <20210323145330.GB21687@redsun51.ssa.fujisawa.hgst.com>
+References: <20210322073726.788347-1-hch@lst.de>
+ <20210322073726.788347-3-hch@lst.de>
+ <34e574dc-5e80-4afe-b858-71e6ff5014d6@grimberg.me>
+ <c064b296-c25c-3731-cbbd-f99ab93e6bd2@suse.de>
+ <608f8198-8c0d-b59c-180b-51666840382d@grimberg.me>
+ <250dc97d-8781-1655-02ca-5171b0bd6e24@suse.de>
 MIME-Version: 1.0
-References: <20210309015750.6283-1-peng.zhou@mediatek.com> <CACRpkdYTkW7b9SFEY6Ubq4NicgR_5ewQMjE2zHvGbgxYadhHQQ@mail.gmail.com>
- <YEpqkAq6wOZ+TpR9@gmail.com> <CAPDyKFoWg7HYHAbxYJRbOad5kqm+rzVLVQ0O3g76ROO5Z+MF3Q@mail.gmail.com>
- <1615884533.21508.118.camel@mbjsdccf07> <CAPDyKFqtjYVAAe_wUKQC3n3ok5bUpGtpu=TUiOgFmbb6+Qkg=A@mail.gmail.com>
- <1615893329.21508.128.camel@mbjsdccf07> <CAPDyKFqaFbviwxQ8U_X8U64F7OwNaxXde6XdUcGPeGg8k9MWWg@mail.gmail.com>
- <CACRpkdapAOq7NtZDOgnugvTmO0+Yh+EoCVod-s_akPfs2=Sj9Q@mail.gmail.com>
-In-Reply-To: <CACRpkdapAOq7NtZDOgnugvTmO0+Yh+EoCVod-s_akPfs2=Sj9Q@mail.gmail.com>
-From:   Ulf Hansson <ulf.hansson@linaro.org>
-Date:   Tue, 23 Mar 2021 14:37:35 +0100
-Message-ID: <CAPDyKFoCjv7S_2yyVZOAgwbEEZV5H_dmQxQGFVTt7awSE3Ss8Q@mail.gmail.com>
-Subject: Re: [PATCH v2 2/4] mmc: Mediatek: enable crypto hardware engine
-To:     Linus Walleij <linus.walleij@linaro.org>
-Cc:     "Peng.Zhou" <peng.zhou@mediatek.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Chaotian Jing <chaotian.jing@mediatek.com>,
-        linux-mmc <linux-mmc@vger.kernel.org>,
-        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
-        <devicetree@vger.kernel.org>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Satya Tangirala <satyat@google.com>,
-        Wulin Li <wulin.li@mediatek.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Sudeep Holla <sudeep.holla@arm.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <250dc97d-8781-1655-02ca-5171b0bd6e24@suse.de>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 22 Mar 2021 at 14:45, Linus Walleij <linus.walleij@linaro.org> wrote:
->
-> On Tue, Mar 16, 2021 at 2:56 PM Ulf Hansson <ulf.hansson@linaro.org> wrote:
->
-> > It looks like we have a couple of options to support this. I suggest
-> > we consider the two below, but perhaps others (Arnd/Linus?) have
-> > better ideas?
->
-> Admittedly it's a bit hard to shoehorn this in as it is not a standard
-> resource (clk, regulator, genpd, reset, gpio...)
+On Tue, Mar 23, 2021 at 09:36:47AM +0100, Hannes Reinecke wrote:
+> On 3/23/21 8:31 AM, Sagi Grimberg wrote:
+> > 
+> > > Actually, I had been playing around with marking the entire bio as
+> > > 'NOWAIT'; that would avoid the tag stall, too:
+> > > 
+> > > @@ -313,7 +316,7 @@ blk_qc_t nvme_ns_head_submit_bio(struct bio *bio)
+> > >          ns = nvme_find_path(head);
+> > >          if (likely(ns)) {
+> > >                  bio_set_dev(bio, ns->disk->part0);
+> > > -               bio->bi_opf |= REQ_NVME_MPATH;
+> > > +               bio->bi_opf |= REQ_NVME_MPATH | REQ_NOWAIT;
+> > >                  trace_block_bio_remap(bio, disk_devt(ns->head->disk),
+> > >                                        bio->bi_iter.bi_sector);
+> > >                  ret = submit_bio_noacct(bio);
+> > > 
+> > > 
+> > > My only worry here is that we might incur spurious failures under
+> > > high load; but then this is not necessarily a bad thing.
+> > 
+> > What? making spurious failures is not ok under any load. what fs will
+> > take into account that you may have run out of tags?
+> 
+> Well, it's not actually a spurious failure but rather a spurious failover,
+> as we're still on a multipath scenario, and bios will still be re-routed to
+> other paths. Or queued if all paths are out of tags.
+> Hence the OS would not see any difference in behaviour.
 
-In my opinion, I wouldn't object if we would model this as phy, simply
-because I think it would be the easiest way. Although, I agree, it's
-not a perfect fit.
+Failover might be overkill. We can run out of tags in a perfectly normal
+situation, and simply waiting may be the best option, or even scheduling
+on a different CPU may be sufficient to get a viable tag  rather than
+selecting a different path.
 
->
-> There is drivers/soc and then you end up with the same custom
-> abstraction that qcom is using. The upside to using that
-> is that we can #ifdef it to static stubs in the .h file if this SoC
-> is not used, so I would go for that.
->
-> See for example qcom_scm_ice_invalidate_key() used from
-> drivers/firmware/qcom_scm.c, header is at
-> include/linux/qcom_scm.h and here you find:
-> #if IS_ENABLED(CONFIG_QCOM_SCM)
-> and if not, there are some stubs.
+Does it make sense to just abort all allocated tags during a reset and
+let the original bio requeue for multipath IO?
 
-Please, no. As discussed and also pointed out by Arnd in another
-thread, generic drivers must remain portable and must not get
-sprinkled with SoC specific code. If not, we would be moving backwards
-and increasing the fragmentation of the kernel.
-
-The qcom case is about programming a crypto key, which seems rather
-specific to me. I can't figure out another generic way to support
-this, but using the SoC specific calls.
-
-The Mediatek case is about turning on/off a resource to activate the
-device. If the phy framework doesn't work for us (or another), then at
-least we should fall back to use runtime PM + PM domain provider
-(genpd), because this would solve the problem. SoC specific code, like
-the SMC call can then be called from the genpd provider driver and
-abstracted from generic drivers.
-
-Additionally, in this case the mmc driver has already runtime PM
-support deployed, which means some of the work has already been
-completed.
-
->
-> Yours,
-> Linus Walleij
-
-Kind regards
-Uffe
+ 
+> But in the end, we abandoned this attempt, as the crash we've been seeing
+> was in bio_endio (due to bi_bdev still pointing to the removed path device):
+> 
+> [ 6552.155251]  bio_endio+0x74/0x120
+> [ 6552.155260]  nvme_ns_head_submit_bio+0x36f/0x3e0 [nvme_core]
+> [ 6552.155271]  submit_bio_noacct+0x175/0x490
+> [ 6552.155284]  ? nvme_requeue_work+0x5a/0x70 [nvme_core]
+> [ 6552.155290]  nvme_requeue_work+0x5a/0x70 [nvme_core]
+> [ 6552.155296]  process_one_work+0x1f4/0x3e0
+> [ 6552.155299]  worker_thread+0x2d/0x3e0
+> [ 6552.155302]  ? process_one_work+0x3e0/0x3e0
+> [ 6552.155305]  kthread+0x10d/0x130
+> [ 6552.155307]  ? kthread_park+0xa0/0xa0
+> [ 6552.155311]  ret_from_fork+0x35/0x40
+> 
+> So we're not blocked on blk_queue_enter(), and it's a crash, not a deadlock.
+> Blocking on blk_queue_enter() certainly plays a part here,
+> but is seems not to be the full picture.
+> 
+> Cheers,
+> 
+> Hannes
+> -- 
+> Dr. Hannes Reinecke                Kernel Storage Architect
+> hare@suse.de                              +49 911 74053 688
+> SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+> HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
