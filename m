@@ -2,104 +2,117 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 940F6C433E0
-	for <linux-block@archiver.kernel.org>; Tue, 23 Mar 2021 08:37:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE5B9C433DB
+	for <linux-block@archiver.kernel.org>; Tue, 23 Mar 2021 11:07:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 67D8A619B1
-	for <linux-block@archiver.kernel.org>; Tue, 23 Mar 2021 08:37:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A8CA4619C3
+	for <linux-block@archiver.kernel.org>; Tue, 23 Mar 2021 11:07:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229500AbhCWIhR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Mar 2021 04:37:17 -0400
-Received: from mx2.suse.de ([195.135.220.15]:37922 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229574AbhCWIgt (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Mar 2021 04:36:49 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 6110AAC3E;
-        Tue, 23 Mar 2021 08:36:48 +0000 (UTC)
-Subject: Re: [PATCH 2/2] nvme-multipath: don't block on blk_queue_enter of the
- underlying device
-To:     Sagi Grimberg <sagi@grimberg.me>, Christoph Hellwig <hch@lst.de>,
-        Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>
-Cc:     Chao Leng <lengchao@huawei.com>, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org
-References: <20210322073726.788347-1-hch@lst.de>
- <20210322073726.788347-3-hch@lst.de>
- <34e574dc-5e80-4afe-b858-71e6ff5014d6@grimberg.me>
- <c064b296-c25c-3731-cbbd-f99ab93e6bd2@suse.de>
- <608f8198-8c0d-b59c-180b-51666840382d@grimberg.me>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <250dc97d-8781-1655-02ca-5171b0bd6e24@suse.de>
-Date:   Tue, 23 Mar 2021 09:36:47 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        id S230385AbhCWLHP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Mar 2021 07:07:15 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:23494 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229728AbhCWLHL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 23 Mar 2021 07:07:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1616497630; x=1648033630;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=PSigW5l4uj53gvIzjqtg7mzBZlTvWpQ3zlmEYHHRAlQ=;
+  b=VYkssNVKR6D+KP2fi1T2e9QWTS/c1jefpOCtpXak0y4yu+15eEO90mDZ
+   kGRviUYH6h+1ENZgKT6uFDHnCoRJ+GTuGVbz+n5GJLt43us8t1qvBMSkh
+   qYFECwR0PiZbBiwHblKneb4KG2AvyIiurDdgnCzcIaIiuIwfLyxszV5Oh
+   SYPo5E9FhhCeG8r3RrAi1gIMaDKZBYGRLGbqQW4c7FtJVLvC0UIZELSbP
+   Zcl/N7SUrCxikwWDrYjD8mEO/HuS6ghKuQCoYlPSt5ybEMIzijDoyZKfB
+   VmhiGCSM2PdEAGhNpAFVQdYHlCUc1Lx27d/Hgcw+juTPR3hou5r9qvBRI
+   Q==;
+IronPort-SDR: RdmW8UJiaag9A4GY260pXqB2DlH5HPx8bJqo648rM+l7BBzvIO4+i5BqyVaJ5H2zY3bxEABD9h
+ YeVNBBC08UsSfTVOJjwovcAq97IShEs3FcX0CyF8iszB9erIy63wEKmqp8YAJeCevB46BK3Yev
+ 7neR1SjfQMb0iHt1oYNT8QRGt733MmtaYwXMKHsop4OhYy4cqUBROgdHWB059uozDuL7uQE0la
+ c+7a1lAY1cGuXRUnM3w17S9FXfYmMgYkwkQKAf4DOznBHpVJHIayG0H59RJYGno/QxUNWmk98O
+ kAE=
+X-IronPort-AV: E=Sophos;i="5.81,271,1610380800"; 
+   d="scan'208";a="162781588"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 23 Mar 2021 19:07:09 +0800
+IronPort-SDR: d8ctiPdg6u2VnEY+0mfP7ysYkS4OczDav/FNJBexlrkETmubZ2FkX/OS0nEvNvI6ki//f5VTw6
+ MM33byJxdJ7FRMuof3ZECe+1t5wKR9ZvPr3OEcGzyJHYPjFJy5uvkRvqPq2WMLi0wE/kSfHHbS
+ ikf4pcCR2pXAEPgtdpFZfNdLU2KBB+sjACVtvxt8TujJxZ1NTdTJ1mHPeR/T5PCMr+XdTkLkyU
+ eZhWjsr5zFkVo+IILcIHipUGz9tht/g7YhQ6zhkbChpJw+Bc1eCzU2XJSJXV9ckiXXZrVPTAS2
+ f9S5lI5mlgOnmbMYdjpdklkL
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Mar 2021 03:49:16 -0700
+IronPort-SDR: 7AGweo7Kh/Sk4Do2fMyiJNDwmxbD3jT6XWvKDswphevV18+EMj/NC5g6AnTJJqSptDLMaXtSix
+ ba8vGG91yMR7ObrughJ1ijSPZ/pUjG/rwldZWgVWNA7WHgIqXWiMEsGDduuItF8QcV/kjRnJpD
+ Di89P7Rh7OFH5ugMN85sOmdMOooFDEN23rXAePVddvJHodamH8BW8RQ/LalE+ilXWnoghy1CQp
+ 8+MJUSVUZzyqJVg8FsfvASgH5fQcRXwcbMc0/HFVah9p4AqsjRckvVK/5BdmPLdy29jWcvelkD
+ FmU=
+WDCIronportException: Internal
+Received: from unknown (HELO redsun60.ssa.fujisawa.hgst.com) ([10.149.66.36])
+  by uls-op-cesaip02.wdc.com with ESMTP; 23 Mar 2021 04:07:09 -0700
+From:   Johannes Thumshirn <johannes.thumshirn@wdc.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Naohiro Aota <naohiro.aota@wdc.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH] block: support zone append bvecs
+Date:   Tue, 23 Mar 2021 20:06:56 +0900
+Message-Id: <739a96e185f008c238fcf06cb22068016149ad4a.1616497531.git.johannes.thumshirn@wdc.com>
+X-Mailer: git-send-email 2.30.0
 MIME-Version: 1.0
-In-Reply-To: <608f8198-8c0d-b59c-180b-51666840382d@grimberg.me>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/23/21 8:31 AM, Sagi Grimberg wrote:
-> 
->> Actually, I had been playing around with marking the entire bio as 
->> 'NOWAIT'; that would avoid the tag stall, too:
->>
->> @@ -313,7 +316,7 @@ blk_qc_t nvme_ns_head_submit_bio(struct bio *bio)
->>          ns = nvme_find_path(head);
->>          if (likely(ns)) {
->>                  bio_set_dev(bio, ns->disk->part0);
->> -               bio->bi_opf |= REQ_NVME_MPATH;
->> +               bio->bi_opf |= REQ_NVME_MPATH | REQ_NOWAIT;
->>                  trace_block_bio_remap(bio, disk_devt(ns->head->disk),
->>                                        bio->bi_iter.bi_sector);
->>                  ret = submit_bio_noacct(bio);
->>
->>
->> My only worry here is that we might incur spurious failures under high 
->> load; but then this is not necessarily a bad thing.
-> 
-> What? making spurious failures is not ok under any load. what fs will
-> take into account that you may have run out of tags?
+Christoph reported that we'll likely trigger the WARN_ON_ONCE() checking
+that we're not submitting a bvec with REQ_OP_ZONE_APPEND in
+bio_iov_iter_get_pages() some time ago using zoned btrfs, but I couldn't
+reproduce it back then.
 
-Well, it's not actually a spurious failure but rather a spurious 
-failover, as we're still on a multipath scenario, and bios will still be 
-re-routed to other paths. Or queued if all paths are out of tags.
-Hence the OS would not see any difference in behaviour.
+Now Naohiro was able to trigger the bug as well with xfstests generic/095
+on a zoned btrfs.
 
-But in the end, we abandoned this attempt, as the crash we've been 
-seeing was in bio_endio (due to bi_bdev still pointing to the removed 
-path device):
+There is nothing that prevents bvec submissions via REQ_OP_ZONE_APPEND if
+the hardware's zone append limit is met.
 
-[ 6552.155251]  bio_endio+0x74/0x120
-[ 6552.155260]  nvme_ns_head_submit_bio+0x36f/0x3e0 [nvme_core]
-[ 6552.155271]  submit_bio_noacct+0x175/0x490
-[ 6552.155284]  ? nvme_requeue_work+0x5a/0x70 [nvme_core]
-[ 6552.155290]  nvme_requeue_work+0x5a/0x70 [nvme_core]
-[ 6552.155296]  process_one_work+0x1f4/0x3e0
-[ 6552.155299]  worker_thread+0x2d/0x3e0
-[ 6552.155302]  ? process_one_work+0x3e0/0x3e0
-[ 6552.155305]  kthread+0x10d/0x130
-[ 6552.155307]  ? kthread_park+0xa0/0xa0
-[ 6552.155311]  ret_from_fork+0x35/0x40
+Reported-by: Naohiro Aota <naohiro.aota@wdc.com>
+Reported-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+---
+ block/bio.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-So we're not blocked on blk_queue_enter(), and it's a crash, not a 
-deadlock. Blocking on blk_queue_enter() certainly plays a part here,
-but is seems not to be the full picture.
-
-Cheers,
-
-Hannes
+diff --git a/block/bio.c b/block/bio.c
+index 26b7f721cda8..215fe24a01ee 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1094,8 +1094,14 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+ 	int ret = 0;
+ 
+ 	if (iov_iter_is_bvec(iter)) {
+-		if (WARN_ON_ONCE(bio_op(bio) == REQ_OP_ZONE_APPEND))
+-			return -EINVAL;
++		if (bio_op(bio) == REQ_OP_ZONE_APPEND) {
++			struct request_queue *q = bio->bi_bdev->bd_disk->queue;
++			unsigned int max_append =
++				queue_max_zone_append_sectors(q) << 9;
++
++			if (WARN_ON_ONCE(iter->count > max_append))
++				return -EINVAL;
++		}
+ 		return bio_iov_bvec_set(bio, iter);
+ 	}
+ 
 -- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
+2.30.0
+
