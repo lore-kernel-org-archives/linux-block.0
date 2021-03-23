@@ -2,108 +2,261 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0A2EC433C1
-	for <linux-block@archiver.kernel.org>; Tue, 23 Mar 2021 03:46:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B376C433C1
+	for <linux-block@archiver.kernel.org>; Tue, 23 Mar 2021 04:09:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8D3A06196F
-	for <linux-block@archiver.kernel.org>; Tue, 23 Mar 2021 03:46:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B3C1361992
+	for <linux-block@archiver.kernel.org>; Tue, 23 Mar 2021 04:09:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229548AbhCWDqT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 22 Mar 2021 23:46:19 -0400
-Received: from mail-pg1-f181.google.com ([209.85.215.181]:36808 "EHLO
-        mail-pg1-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229547AbhCWDqG (ORCPT
+        id S229482AbhCWEIq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Mar 2021 00:08:46 -0400
+Received: from mail-io1-f69.google.com ([209.85.166.69]:50963 "EHLO
+        mail-io1-f69.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229437AbhCWEIP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 22 Mar 2021 23:46:06 -0400
-Received: by mail-pg1-f181.google.com with SMTP id h25so10360268pgm.3
-        for <linux-block@vger.kernel.org>; Mon, 22 Mar 2021 20:46:06 -0700 (PDT)
+        Tue, 23 Mar 2021 00:08:15 -0400
+Received: by mail-io1-f69.google.com with SMTP id a1so975063iow.17
+        for <linux-block@vger.kernel.org>; Mon, 22 Mar 2021 21:08:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=AQohhoHNI0iXfeHD5Zwk4VUO1Vj7NH97ijqHBjTVA5I=;
-        b=J/nc2PAle6Y3xLbbOwrM9axnkzL0GOpU8qEpBqNiT1a31yuWEGAIPcIfAjf50WUA2D
-         fTQ1XEZaFjUjnXfJFluxJ4J6vD1fSBaar7YN5nbDe7gRGfgkOpGJmlbEcK7tcE/0RQ0s
-         OvYBsMm+4V22jhH/yEZQyS6IJiTnrfe+gN6SN2fKyLWvVjlY1D6o0bSJR7o4mHmlUS+V
-         rGk+oOn+hZZ3XWrdHkumVnlBWUH1SWndEVzWAG6LPKFX07TpTknZlqX2p2xqpFzX5/9I
-         1NNhKv4DLc1GXt8NSNtoAoyL0pcSoVO94MFdNqWjezI/4HBparyQzttTUylhrjoAvKb7
-         GekA==
-X-Gm-Message-State: AOAM531ZFDcfrc8pMRYVo2t3ugaLg5qp1RDfHN4kkmBw/K38qHKeW409
-        RfpnQMIHFnvlAp/4wXOwlgQ=
-X-Google-Smtp-Source: ABdhPJwmedZp89STq0PIkMKEWtugmsX2OXYRIcgiHPi7IsZMyYW1NGFCN0q6xZd9TAwj/7P95k7GeA==
-X-Received: by 2002:a17:902:9a0a:b029:e6:bf00:8a36 with SMTP id v10-20020a1709029a0ab02900e6bf008a36mr3028144plp.51.1616471165897;
-        Mon, 22 Mar 2021 20:46:05 -0700 (PDT)
-Received: from ?IPv6:2601:647:4802:9070:2a1:40ef:41b6:3cf0? ([2601:647:4802:9070:2a1:40ef:41b6:3cf0])
-        by smtp.gmail.com with ESMTPSA id y15sm16062282pgi.31.2021.03.22.20.46.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 22 Mar 2021 20:46:05 -0700 (PDT)
-Subject: Re: [RFC PATCH V2 09/13] block: use per-task poll context to
- implement bio based io poll
-To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Jeffle Xu <jefflexu@linux.alibaba.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
-References: <20210318164827.1481133-1-ming.lei@redhat.com>
- <20210318164827.1481133-10-ming.lei@redhat.com>
-From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <522a2c87-e9f3-e62a-e09b-084821c698a0@grimberg.me>
-Date:   Mon, 22 Mar 2021 20:46:04 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.1
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=0U88+G95cAsWJhc41ZWcXhG8yBOjOuy+fVe4cZKA5vY=;
+        b=nvATgz1qWnVc2oKw2jGKIbOM7fgjnEhTOZeEqSuoSxj6BdftIQ8ecHl5tetzYSRtDq
+         YQy4FZx73MAZnRjY4kyRp8wGcdvheJDMPWC1/LH2kbW6fIoy1KKLWN5pOhIA9FMP1Uqe
+         9ALaDLdMjtxFcmQEwCBOeBZa+OHX5/Cb7EUhHNTv6d1u7WXEzduElrkfOBTZo0rk+Dfa
+         bjspocxbcJxpki3WIp4knTmcsni1qgxHmkehSR2kDFlsETu1hvI5OH++UJZI6XDKpQTW
+         B0XIzdiIbEciKvytJOS0fa+1bmfjpChV3IqjIbwUf9ZLGA2pkS/BN/eQvlzO40TFOBr1
+         ZKeg==
+X-Gm-Message-State: AOAM530EAbc3KVstOS0neZ3BvyyxRs5QWu5OXeN+5FG0A7yn+B09R5N5
+        4qG9e6U9SDUjBN74KQIuWlxqpxQkQGLfVc/rCqnguVFQFASs
+X-Google-Smtp-Source: ABdhPJx/yxzT7bELVO9/s5+VXfU7vy6tC3+QOG+xXxSCUI0KtZqmb1L4IGuKUXIO7Rvso9BQPo9Nwuz0brgVvZLraxwMmTViB65i
 MIME-Version: 1.0
-In-Reply-To: <20210318164827.1481133-10-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6638:2711:: with SMTP id m17mr2628467jav.115.1616472494883;
+ Mon, 22 Mar 2021 21:08:14 -0700 (PDT)
+Date:   Mon, 22 Mar 2021 21:08:14 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000d8c65105be2c5407@google.com>
+Subject: [syzbot] possible deadlock in __loop_clr_fd
+From:   syzbot <syzbot+707d51092ab7b87b23df@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hello,
 
-> +static void blk_bio_poll_post_submit(struct bio *bio, blk_qc_t cookie)
-> +{
-> +	bio->bi_iter.bi_private_data = cookie;
-> +}
-> +
+syzbot found the following issue on:
 
-Hey Ming, thinking about nvme-mpath, I'm thinking that this should be
-an exported function for failover. nvme-mpath updates bio.bi_dev
-when re-submitting I/Os to an alternate path, so I'm thinking
-that if this function is exported then nvme-mpath could do as little
-as the below to allow polling?
+HEAD commit:    ba5b053a Add linux-next specific files for 20210318
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=10cfb406d00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=cd6e556bdf0188e4
+dashboard link: https://syzkaller.appspot.com/bug?extid=707d51092ab7b87b23df
 
---
-diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
-index 92adebfaf86f..e562e296153b 100644
---- a/drivers/nvme/host/multipath.c
-+++ b/drivers/nvme/host/multipath.c
-@@ -345,6 +345,7 @@ static void nvme_requeue_work(struct work_struct *work)
-         struct nvme_ns_head *head =
-                 container_of(work, struct nvme_ns_head, requeue_work);
-         struct bio *bio, *next;
-+       blk_qc_t cookie;
+Unfortunately, I don't have any reproducer for this issue yet.
 
-         spin_lock_irq(&head->requeue_lock);
-         next = bio_list_get(&head->requeue_list);
-@@ -359,7 +360,8 @@ static void nvme_requeue_work(struct work_struct *work)
-                  * path.
-                  */
-                 bio_set_dev(bio, head->disk->part0);
--               submit_bio_noacct(bio);
-+               cookie = submit_bio_noacct(bio);
-+               blk_bio_poll_post_submit(bio, cookie);
-         }
-  }
---
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+707d51092ab7b87b23df@syzkaller.appspotmail.com
 
-I/O failover will create misalignment from the polling context cpu and
-the submission cpu (running requeue_work), but I don't see if there is
-something that would break here...
+UDF-fs: warning (device loop4): udf_load_vrs: No VRS found
+UDF-fs: Scanning with blocksize 4096 failed
+======================================================
+WARNING: possible circular locking dependency detected
+5.12.0-rc3-next-20210318-syzkaller #0 Not tainted
+------------------------------------------------------
+syz-executor.4/13936 is trying to acquire lock:
+ffff88805cb9b138 ((wq_completion)loop292057088){+.+.}-{0:0}, at: flush_workqueue+0xe1/0x13e0 kernel/workqueue.c:2783
 
-Thoughts?
+but task is already holding lock:
+ffff88801a730468 (&lo->lo_mutex){+.+.}-{3:3}, at: __loop_clr_fd+0x95/0x14a0 drivers/block/loop.c:1278
+
+which lock already depends on the new lock.
+
+
+the existing dependency chain (in reverse order) is:
+
+-> #6 (&lo->lo_mutex){+.+.}-{3:3}:
+       __mutex_lock_common kernel/locking/mutex.c:952 [inline]
+       __mutex_lock+0x139/0x1120 kernel/locking/mutex.c:1099
+       lo_open drivers/block/loop.c:1983 [inline]
+       lo_open+0xa1/0x130 drivers/block/loop.c:1965
+       __blkdev_get+0x135/0xa30 fs/block_dev.c:1302
+       blkdev_get_by_dev fs/block_dev.c:1454 [inline]
+       blkdev_get_by_dev+0x26c/0x600 fs/block_dev.c:1422
+       blkdev_open+0x154/0x2b0 fs/block_dev.c:1551
+       do_dentry_open+0x4b9/0x11b0 fs/open.c:826
+       do_open fs/namei.c:3365 [inline]
+       path_openat+0x1c0e/0x27e0 fs/namei.c:3498
+       do_filp_open+0x17e/0x3c0 fs/namei.c:3525
+       do_sys_openat2+0x16d/0x420 fs/open.c:1187
+       do_sys_open fs/open.c:1203 [inline]
+       __do_sys_open fs/open.c:1211 [inline]
+       __se_sys_open fs/open.c:1207 [inline]
+       __x64_sys_open+0x119/0x1c0 fs/open.c:1207
+       do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
+       entry_SYSCALL_64_after_hwframe+0x44/0xae
+
+-> #5 (loop_ctl_mutex){+.+.}-{3:3}:
+       __mutex_lock_common kernel/locking/mutex.c:952 [inline]
+       __mutex_lock+0x139/0x1120 kernel/locking/mutex.c:1099
+       loop_probe+0xc7/0x150 drivers/block/loop.c:2407
+       blk_request_module+0x111/0x1d0 block/genhd.c:769
+       blkdev_get_no_open+0x225/0x2b0 fs/block_dev.c:1368
+       blkdev_get_by_dev fs/block_dev.c:1440 [inline]
+       blkdev_get_by_dev+0x1f9/0x600 fs/block_dev.c:1422
+       blkdev_open+0x154/0x2b0 fs/block_dev.c:1551
+       do_dentry_open+0x4b9/0x11b0 fs/open.c:826
+       do_open fs/namei.c:3365 [inline]
+       path_openat+0x1c0e/0x27e0 fs/namei.c:3498
+       do_filp_open+0x17e/0x3c0 fs/namei.c:3525
+       do_sys_openat2+0x16d/0x420 fs/open.c:1187
+       do_sys_open fs/open.c:1203 [inline]
+       __do_sys_openat fs/open.c:1219 [inline]
+       __se_sys_openat fs/open.c:1214 [inline]
+       __x64_sys_openat+0x13f/0x1f0 fs/open.c:1214
+       do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
+       entry_SYSCALL_64_after_hwframe+0x44/0xae
+
+-> #4 (major_names_lock){+.+.}-{3:3}:
+       __mutex_lock_common kernel/locking/mutex.c:952 [inline]
+       __mutex_lock+0x139/0x1120 kernel/locking/mutex.c:1099
+       blkdev_show+0x27/0x160 block/genhd.c:263
+       devinfo_show+0xc1/0xf0 fs/proc/devices.c:22
+       seq_read_iter+0xb66/0x1220 fs/seq_file.c:269
+       proc_reg_read_iter+0x1fb/0x2d0 fs/proc/inode.c:310
+       call_read_iter include/linux/fs.h:1969 [inline]
+       new_sync_read+0x41e/0x6e0 fs/read_write.c:415
+       vfs_read+0x35c/0x570 fs/read_write.c:496
+       ksys_read+0x12d/0x250 fs/read_write.c:634
+       do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
+       entry_SYSCALL_64_after_hwframe+0x44/0xae
+
+-> #3 (&p->lock){+.+.}-{3:3}:
+       __mutex_lock_common kernel/locking/mutex.c:952 [inline]
+       __mutex_lock+0x139/0x1120 kernel/locking/mutex.c:1099
+       seq_read_iter+0xdf/0x1220 fs/seq_file.c:179
+       call_read_iter include/linux/fs.h:1969 [inline]
+       generic_file_splice_read+0x450/0x6c0 fs/splice.c:311
+       do_splice_to+0x1bf/0x250 fs/splice.c:796
+       splice_direct_to_actor+0x2c2/0x8c0 fs/splice.c:870
+       do_splice_direct+0x1b3/0x280 fs/splice.c:979
+       do_sendfile+0x9f0/0x1110 fs/read_write.c:1260
+       __do_sys_sendfile64 fs/read_write.c:1325 [inline]
+       __se_sys_sendfile64 fs/read_write.c:1311 [inline]
+       __x64_sys_sendfile64+0x1cc/0x210 fs/read_write.c:1311
+       do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
+       entry_SYSCALL_64_after_hwframe+0x44/0xae
+
+-> #2 (sb_writers#3){.+.+}-{0:0}:
+       percpu_down_read include/linux/percpu-rwsem.h:51 [inline]
+       __sb_start_write include/linux/fs.h:1638 [inline]
+       sb_start_write include/linux/fs.h:1708 [inline]
+       file_start_write include/linux/fs.h:2891 [inline]
+       lo_write_bvec+0x3ed/0x6c0 drivers/block/loop.c:286
+       lo_write_simple drivers/block/loop.c:309 [inline]
+       do_req_filebacked drivers/block/loop.c:627 [inline]
+       loop_handle_cmd drivers/block/loop.c:2143 [inline]
+       loop_process_work+0xc60/0x25a0 drivers/block/loop.c:2183
+       process_one_work+0x98d/0x1600 kernel/workqueue.c:2275
+       worker_thread+0x64c/0x1120 kernel/workqueue.c:2421
+       kthread+0x3b1/0x4a0 kernel/kthread.c:292
+       ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:294
+
+-> #1 ((work_completion)(&worker->work)){+.+.}-{0:0}:
+       process_one_work+0x8fc/0x1600 kernel/workqueue.c:2251
+       worker_thread+0x64c/0x1120 kernel/workqueue.c:2421
+       kthread+0x3b1/0x4a0 kernel/kthread.c:292
+       ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:294
+
+-> #0 ((wq_completion)loop292057088){+.+.}-{0:0}:
+       check_prev_add kernel/locking/lockdep.c:2937 [inline]
+       check_prevs_add kernel/locking/lockdep.c:3060 [inline]
+       validate_chain kernel/locking/lockdep.c:3675 [inline]
+       __lock_acquire+0x2a17/0x5230 kernel/locking/lockdep.c:4901
+       lock_acquire kernel/locking/lockdep.c:5511 [inline]
+       lock_acquire+0x1ab/0x740 kernel/locking/lockdep.c:5476
+       flush_workqueue+0x110/0x13e0 kernel/workqueue.c:2786
+       drain_workqueue+0x1a5/0x3c0 kernel/workqueue.c:2951
+       destroy_workqueue+0x71/0x760 kernel/workqueue.c:4382
+       __loop_clr_fd+0x1f8/0x14a0 drivers/block/loop.c:1296
+       loop_clr_fd drivers/block/loop.c:1422 [inline]
+       lo_ioctl+0x3b9/0x1620 drivers/block/loop.c:1780
+       blkdev_ioctl+0x2a1/0x6d0 block/ioctl.c:583
+       block_ioctl+0xf9/0x140 fs/block_dev.c:1667
+       vfs_ioctl fs/ioctl.c:48 [inline]
+       __do_sys_ioctl fs/ioctl.c:753 [inline]
+       __se_sys_ioctl fs/ioctl.c:739 [inline]
+       __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:739
+       do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
+       entry_SYSCALL_64_after_hwframe+0x44/0xae
+
+other info that might help us debug this:
+
+Chain exists of:
+  (wq_completion)loop292057088 --> loop_ctl_mutex --> &lo->lo_mutex
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(&lo->lo_mutex);
+                               lock(loop_ctl_mutex);
+                               lock(&lo->lo_mutex);
+  lock((wq_completion)loop292057088);
+
+ *** DEADLOCK ***
+
+1 lock held by syz-executor.4/13936:
+ #0: ffff88801a730468 (&lo->lo_mutex){+.+.}-{3:3}, at: __loop_clr_fd+0x95/0x14a0 drivers/block/loop.c:1278
+
+stack backtrace:
+CPU: 0 PID: 13936 Comm: syz-executor.4 Not tainted 5.12.0-rc3-next-20210318-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Call Trace:
+ __dump_stack lib/dump_stack.c:79 [inline]
+ dump_stack+0x141/0x1d7 lib/dump_stack.c:120
+ check_noncircular+0x25f/0x2e0 kernel/locking/lockdep.c:2128
+ check_prev_add kernel/locking/lockdep.c:2937 [inline]
+ check_prevs_add kernel/locking/lockdep.c:3060 [inline]
+ validate_chain kernel/locking/lockdep.c:3675 [inline]
+ __lock_acquire+0x2a17/0x5230 kernel/locking/lockdep.c:4901
+ lock_acquire kernel/locking/lockdep.c:5511 [inline]
+ lock_acquire+0x1ab/0x740 kernel/locking/lockdep.c:5476
+ flush_workqueue+0x110/0x13e0 kernel/workqueue.c:2786
+ drain_workqueue+0x1a5/0x3c0 kernel/workqueue.c:2951
+ destroy_workqueue+0x71/0x760 kernel/workqueue.c:4382
+ __loop_clr_fd+0x1f8/0x14a0 drivers/block/loop.c:1296
+ loop_clr_fd drivers/block/loop.c:1422 [inline]
+ lo_ioctl+0x3b9/0x1620 drivers/block/loop.c:1780
+ blkdev_ioctl+0x2a1/0x6d0 block/ioctl.c:583
+ block_ioctl+0xf9/0x140 fs/block_dev.c:1667
+ vfs_ioctl fs/ioctl.c:48 [inline]
+ __do_sys_ioctl fs/ioctl.c:753 [inline]
+ __se_sys_ioctl fs/ioctl.c:739 [inline]
+ __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:739
+ do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x466217
+Code: 3c 1c 48 f7 d8 49 39 c4 72 b8 e8 a4 48 02 00 85 c0 78 bd 48 83 c4 08 4c 89 e0 5b 41 5c c3 0f 1f 44 00 00 b8 10 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 bc ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f4df82a3fa8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 0000000020001600 RCX: 0000000000466217
+RDX: 0000000000000000 RSI: 0000000000004c01 RDI: 0000000000000005
+RBP: 00007f4df82a46bc R08: 00007f4df82a4040 R09: 0000000020001440
+R10: 0000000000000000 R11: 0000000000000246 R12: ffffffffffffffff
+R13: 0000000000000016 R14: 00007f4df82a4000 R15: 0000000020001640
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
