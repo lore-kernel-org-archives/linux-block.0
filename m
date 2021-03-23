@@ -2,99 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-13.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CB49C433E0
-	for <linux-block@archiver.kernel.org>; Tue, 23 Mar 2021 17:28:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9253FC433C1
+	for <linux-block@archiver.kernel.org>; Tue, 23 Mar 2021 17:45:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 613B6619C0
-	for <linux-block@archiver.kernel.org>; Tue, 23 Mar 2021 17:28:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 590FC619B8
+	for <linux-block@archiver.kernel.org>; Tue, 23 Mar 2021 17:45:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230247AbhCWR2V (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Mar 2021 13:28:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59732 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230226AbhCWR1v (ORCPT
+        id S230391AbhCWRon (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Mar 2021 13:44:43 -0400
+Received: from linux.microsoft.com ([13.77.154.182]:33980 "EHLO
+        linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230076AbhCWRoL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Mar 2021 13:27:51 -0400
-Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAC34C061574
-        for <linux-block@vger.kernel.org>; Tue, 23 Mar 2021 10:27:50 -0700 (PDT)
-Received: by mail-io1-xd32.google.com with SMTP id n198so18534415iod.0
-        for <linux-block@vger.kernel.org>; Tue, 23 Mar 2021 10:27:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=HeqUxpw67GUtG8xohzxQIj1PzhT3kGyB+k7vjdvIyxQ=;
-        b=tO0RdXD3HzTKx65xOHct/Oaac5lN+TwBFu1cZU6ZbMJEjDAA0QpZ6BLpePaXMoHBeG
-         AoPjKkVtXPYmqjQcZzL95IrcJG7je6M5XalF3b3uFh2CpQbMjJ4U2Oe4iZtq8Ea+fgIp
-         NTtvSCyk+26XObFWg8v3Y48d7/4kL6mOe0mVR4kKZTR2tkUygAPD185BiTmdKPmE+gyJ
-         PF94Tnn283npgzss6yD97+zsav7PG2KsvgdOw9UwB1h+p9kCbECu3Qxh9hHL3WMLv9/c
-         Y0nqzJ01nVMtNoHnduk9RzPcfBxYpSWs9jf5VR8+kArqvEjI9BBF73qGHmL4X8HmoZJg
-         fFtA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=HeqUxpw67GUtG8xohzxQIj1PzhT3kGyB+k7vjdvIyxQ=;
-        b=VNr4rUzZkE1BAbYC1Ifd7jQWVxmc09hvJCAUsFAcLEKUSPCnvKZFxsnUDwqp5tubc9
-         KUHPAR2dSjyNoq9y9IPWpTKP8282yXETouE4xKdnZbNKiumB44r+lTxeDDT1zk5+P+Np
-         Q8TuvJWQdAt3dsGR0nWCD6R6XMY862ND3/0zbukNoQ/gInIGvf36ixlJ8E3TyHvhCcFl
-         dl9XeK1SOKvG93POl99vSblmx0nhLYXEQJUvI+ODmrGqhbhZJHMaVt/610rkmZzLZJiw
-         R38CrCrAFi1WpGZlrIkhia/0t6JQLVhTj4/u6IRQnDoXcfcGiObchzsLiO/WeTIKhJAq
-         rZHg==
-X-Gm-Message-State: AOAM533RdX3Quss/LnSR/hlVf8Yyzit29F/Kuud7cKcsnnmqKeX/gFt8
-        1J+Juvc4dVrBU52Wg5xxejjYKyfj5QwYAw==
-X-Google-Smtp-Source: ABdhPJwLwiXGn9Vq7IXdEmorOoB/+QyO1pIg+nEB4rjswWkjpATzbY3SbS0r99PDOoF6QMcuPo7x8g==
-X-Received: by 2002:a5d:8b09:: with SMTP id k9mr5098007ion.185.1616520470339;
-        Tue, 23 Mar 2021 10:27:50 -0700 (PDT)
-Received: from [192.168.1.30] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id e12sm9566148ilm.85.2021.03.23.10.27.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 23 Mar 2021 10:27:50 -0700 (PDT)
-Subject: Re: [PATCH] block/umem: convert tasklet to threaded irq
-To:     Christoph Hellwig <hch@infradead.org>,
-        Davidlohr Bueso <dave@stgolabs.net>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Davidlohr Bueso <dbueso@suse.de>
-References: <20210323004856.10206-1-dave@stgolabs.net>
- <20210323172437.GA2463754@infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <0d26434e-36e2-58f2-16b4-ef0fa4292c6e@kernel.dk>
-Date:   Tue, 23 Mar 2021 11:27:49 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Tue, 23 Mar 2021 13:44:11 -0400
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+        by linux.microsoft.com (Postfix) with ESMTPSA id 25EA020B5687;
+        Tue, 23 Mar 2021 10:44:11 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 25EA020B5687
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1616521451;
+        bh=G7iciegtRvKppYPYJPauE2IorhaqFayxqE/yzKwzn88=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=kDTg5d9RTPxy1Mfp4rWpK1Q4IdRB+dl+unYwdT0itz0xewY5lRAay+WgiuRWVF0CQ
+         Z4zrbZIkWTITwZ93Rus+zk7Zc0hrhdjyhQU1X06d2fJl64Q08ZWg7vX2YEk+dNy/vq
+         Rny9xfKOcPG8kJfdWD+MBhjWLvMSQQ/GgIjmtYHY=
+Received: by mail-pg1-f170.google.com with SMTP id i22so925013pgl.4;
+        Tue, 23 Mar 2021 10:44:11 -0700 (PDT)
+X-Gm-Message-State: AOAM532dDF9bkHRqb7lULm0hCTVi8i024ru6s4M92k+aTdw6SIHBgzNx
+        tAkMJrM329UCwQk/dusHJAIu2M+ibxzTIdFBG6Q=
+X-Google-Smtp-Source: ABdhPJyoxMVW+rRjABv+KDN/Kbo5Gw98D4A5VsOkK8yQv98ZRKj6D9fQY4srWZEiM4ohAm6aeEwxZ6ewoj61y0h7m5E=
+X-Received: by 2002:a17:902:e80a:b029:e6:c4c4:1f05 with SMTP id
+ u10-20020a170902e80ab02900e6c4c41f05mr7002419plg.33.1616521450618; Tue, 23
+ Mar 2021 10:44:10 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20210323172437.GA2463754@infradead.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20210315200242.67355-1-mcroce@linux.microsoft.com>
+ <20210315200242.67355-2-mcroce@linux.microsoft.com> <7358d5ae-afd6-f0d9-5535-b1d7ecfbd785@linux.alibaba.com>
+In-Reply-To: <7358d5ae-afd6-f0d9-5535-b1d7ecfbd785@linux.alibaba.com>
+From:   Matteo Croce <mcroce@linux.microsoft.com>
+Date:   Tue, 23 Mar 2021 18:43:34 +0100
+X-Gmail-Original-Message-ID: <CAFnufp2E8ky_q10R5=zXsU+2ca53yQ=W+XOtKAq-c654xHCoEA@mail.gmail.com>
+Message-ID: <CAFnufp2E8ky_q10R5=zXsU+2ca53yQ=W+XOtKAq-c654xHCoEA@mail.gmail.com>
+Subject: Re: [PATCH -next 1/5] block: add disk sequence number
+To:     JeffleXu <jefflexu@linux.alibaba.com>
+Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Lennart Poettering <lennart@poettering.net>,
+        Luca Boccassi <bluca@debian.org>, Jens Axboe <axboe@kernel.dk>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Tejun Heo <tj@kernel.org>,
+        =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>,
+        Niklas Cassel <niklas.cassel@wdc.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Hannes Reinecke <hare@suse.de>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/23/21 11:24 AM, Christoph Hellwig wrote:
-> On Mon, Mar 22, 2021 at 05:48:56PM -0700, Davidlohr Bueso wrote:
->> Tasklets have long been deprecated as being too heavy on the system
->> by running in irq context - and this is not a performance critical
->> path. If a higher priority process wants to run, it must wait for
->> the tasklet to finish before doing so. A more suitable equivalent
->> is to converted to threaded irq instead and deal with the async
->> processing in task context.
-> 
-> I'm really curious if this driver is still in use at all, or if we
-> can drop it.
+On Tue, Mar 16, 2021 at 2:44 AM JeffleXu <jefflexu@linux.alibaba.com> wrote:
+>
+> On 3/16/21 4:02 AM, Matteo Croce wrote:
+> > From: Matteo Croce <mcroce@microsoft.com>
+> >
+> > Add a sequence number to the disk devices. This number is put in the
+> > uevent so userspace can correlate events when a driver reuses a device,
+> > like the loop one.
+>
+> Hi, I'm quite interested in this 'seqnum'. Actually I'm also planing to
+> add support for some sort of 'seqnum' when supporting IO polling for dm
+> devices, so that every time dm device changes its dm table, the seqnum
+> will be increased.
+>
 
-Me too, I'd be surprised if anyone has used it in... forever. We can
-probably drop it - I really dislike making core changes to something
-that can't even be tested. Davidlohr, assuming you had no way of
-testing this change?
+Interesting, thanks!
 
--- 
-Jens Axboe
+> As for your patch, @diskseq is declared as one static variable in
+> inc_diskseq(). Then I doubt if all callers of inc_diskseq() will share
+> *one* counting when inc_diskseq() is compiled as the separate call entry
+> rather than inlined.
+>
 
+That would be true if the static declaration was in the .h, but being
+in genhd.c it goes in vmlinux once.
+Maybe you get confused by the inc_diskseq prototype in the header
+file, but the function body is in the .c
+
+Regards,
+
+
+
+--
+per aspera ad upstream
