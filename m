@@ -2,96 +2,122 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF801C433DB
-	for <linux-block@archiver.kernel.org>; Wed, 24 Mar 2021 17:38:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDC69C433DB
+	for <linux-block@archiver.kernel.org>; Wed, 24 Mar 2021 17:42:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8F0B661A19
-	for <linux-block@archiver.kernel.org>; Wed, 24 Mar 2021 17:38:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A223F61A1A
+	for <linux-block@archiver.kernel.org>; Wed, 24 Mar 2021 17:42:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237130AbhCXRht (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Mar 2021 13:37:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34600 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237216AbhCXRhR (ORCPT
+        id S237192AbhCXRle (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Mar 2021 13:41:34 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55050 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S237166AbhCXRlE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Mar 2021 13:37:17 -0400
-Received: from mail-il1-x131.google.com (mail-il1-x131.google.com [IPv6:2607:f8b0:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A43FC061763
-        for <linux-block@vger.kernel.org>; Wed, 24 Mar 2021 10:37:17 -0700 (PDT)
-Received: by mail-il1-x131.google.com with SMTP id r8so22120900ilo.8
-        for <linux-block@vger.kernel.org>; Wed, 24 Mar 2021 10:37:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=EmnkWePYaAItneKkQnUFMVxIWLNwljAU7TsjdgztSlc=;
-        b=11vMgQu+1TuSIfQIDrbDYrANrli/PbJozHFwuKEjzo8C3C6nHyiiJHECq52mF8xh+s
-         fPDamH9ydfVbtkpEuZrfoKza2p6u9DZrkxEL9Z+c4p+uc+sSQr9vXle/KsE0ePw79HuS
-         P69UscKBZZubvd+BuSNwQxCesjnoHBo+mBE5ys6g6XyUaOw01F/UZQnJsTz5YyMhVOGk
-         tUnezdUFydsM+ktGviEZDSnob77IBeSGjJ4UbENd0/QzmAqxyrfSnXXv36IQnV2OOJba
-         1OfL6L0rxkLFOAF75n0M79Qimpg1Hh3PTOQyvENLXwIibRQPismmWYJU8gditYN4Q+xN
-         7LBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=EmnkWePYaAItneKkQnUFMVxIWLNwljAU7TsjdgztSlc=;
-        b=Puv2XXkIaBQHSPho2BSd/eu5y8HrxJx/oCBpvcSv4Lxk8PgWvG3oAN1ULojhpr1rQq
-         TuG1o3x1M0B2nwdu5eEH6dTBn90mFxTAZ+3aCS9UntoPJ6XMz+TCHD+RCxZXRgs1pP6F
-         cwK/8iAfq/kV04xADgC1HHkoyNEk+1TJ4BDYCEQjyzzJdYGP2Q22oz+Uye69Wun0hSTS
-         dOdj841B/9NgyueQ/FMxExIUy/zLm5/GRGxs6wPGbRO4eHdm4ckMvuoYLX8Imt2bqBue
-         5m8oIuk9TmpX23FsCalzrnwKE+LhIflPZMCLTVd1Eo2KcaxFbv2PWBWs80ykV3LtXSqJ
-         TLbg==
-X-Gm-Message-State: AOAM533zypCNFyPQdm7SIIt1Lr4xaAbkVEE3Lju4wxwIehGilWSqllf9
-        xP9IL4KRWmsUk8pILnSNgPWczNnOrszP9Q==
-X-Google-Smtp-Source: ABdhPJxNizclbnGvS/9RUhpI0CA3DY+feQhWofTcKhuIt6lmq7CFarQCL41Cw6sPweRT8XSFBfT7gA==
-X-Received: by 2002:a92:6712:: with SMTP id b18mr3772217ilc.181.1616607436498;
-        Wed, 24 Mar 2021 10:37:16 -0700 (PDT)
-Received: from [192.168.1.30] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id u5sm1374554iob.8.2021.03.24.10.37.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 24 Mar 2021 10:37:16 -0700 (PDT)
-Subject: Re: [PATCH v2] block: support zone append bvecs
-To:     Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Cc:     linux-block@vger.kernel.org,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Naohiro Aota <naohiro.aota@wdc.com>,
-        Christoph Hellwig <hch@lst.de>
-References: <10bd414d9326c90cd69029077db63b363854eee5.1616600835.git.johannes.thumshirn@wdc.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <54d9e538-bd9c-6feb-a9b1-fea1e5d459a8@kernel.dk>
-Date:   Wed, 24 Mar 2021 11:37:15 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Wed, 24 Mar 2021 13:41:04 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 12OHWX73036488;
+        Wed, 24 Mar 2021 13:40:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : content-type : in-reply-to : sender :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=sM2Zpv+QbiAr2QX5diIifb9tShx8b9JrKzHNWZQvc10=;
+ b=amRu3HtDtJ21978sB2g8ruYDc5i+gpF5P/8ASUX5iXTz+Iw0oJ4pq0hQIX3H3/GWfppj
+ uECSoNrpSbTJ2h1t6Rq6ceuT4iSARRyRveqOPpisx6bGL5pR6PeEWaYOvqkhu/JkyG4P
+ VBZSTHz1JLC0+EX8RSLwG/evUPI8yo3Z82EJrF/FRHQ3tEB9cE6gss/bmnA/lMVDws9C
+ 8n5Lu07JMkAgpMqsPqmzKRYq4qtdmXZ5fAKgHejn/7WHkkI8ocCXLWV8ENnrBS0+EESj
+ KX665h2rDt5PiC2eXtOwayGwzrHXVeB/4LVv6/78nvJd84kTNSiB6Lnq1jWDo/RsKiSE JQ== 
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 37g8t0j7dj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 24 Mar 2021 13:40:36 -0400
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 12OHRXL6022442;
+        Wed, 24 Mar 2021 17:40:35 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma01fra.de.ibm.com with ESMTP id 37d99xjdhc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 24 Mar 2021 17:40:35 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 12OHeWll30802416
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 24 Mar 2021 17:40:32 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B810452054;
+        Wed, 24 Mar 2021 17:40:32 +0000 (GMT)
+Received: from t480-pf1aa2c2.fritz.box (unknown [9.145.149.73])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTPS id A4A2052052;
+        Wed, 24 Mar 2021 17:40:32 +0000 (GMT)
+Received: from bblock by t480-pf1aa2c2.fritz.box with local (Exim 4.94)
+        (envelope-from <bblock@linux.ibm.com>)
+        id 1lP7Ue-000CZr-4J; Wed, 24 Mar 2021 18:40:32 +0100
+Date:   Wed, 24 Mar 2021 18:40:32 +0100
+From:   Benjamin Block <bblock@linux.ibm.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Matthew Wilcox <willy@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+        Khalid Aziz <khalid@gonehiking.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Ondrej Zary <linux@rainbow-software.org>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
+Subject: Re: [PATCH 7/8] block: refactor the bounce buffering code
+Message-ID: <YFt5kPs30x4kPu77@t480-pf1aa2c2.linux.ibm.com>
+References: <20210318063923.302738-1-hch@lst.de>
+ <20210318063923.302738-8-hch@lst.de>
+ <20210318112950.GL3420@casper.infradead.org>
+ <20210318125340.GA21262@lst.de>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20210318125340.GA21262@lst.de>
+Sender: Benjamin Block <bblock@linux.ibm.com>
+X-TM-AS-GCONF: 00
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-In-Reply-To: <10bd414d9326c90cd69029077db63b363854eee5.1616600835.git.johannes.thumshirn@wdc.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.369,18.0.761
+ definitions=2021-03-24_13:2021-03-24,2021-03-24 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011
+ priorityscore=1501 impostorscore=0 spamscore=0 malwarescore=0
+ suspectscore=0 mlxlogscore=972 adultscore=0 mlxscore=0 phishscore=0
+ lowpriorityscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2009150000 definitions=main-2103240127
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/24/21 9:47 AM, Johannes Thumshirn wrote:
-> Christoph reported that we'll likely trigger the WARN_ON_ONCE() checking
-> that we're not submitting a bvec with REQ_OP_ZONE_APPEND in
-> bio_iov_iter_get_pages() some time ago using zoned btrfs, but I couldn't
-> reproduce it back then.
+On Thu, Mar 18, 2021 at 01:53:40PM +0100, Christoph Hellwig wrote:
+> On Thu, Mar 18, 2021 at 11:29:50AM +0000, Matthew Wilcox wrote:
+> > On Thu, Mar 18, 2021 at 07:39:22AM +0100, Christoph Hellwig wrote:
+> > > @@ -536,7 +518,7 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
+> > >  					b->max_write_zeroes_sectors);
+> > >  	t->max_zone_append_sectors = min(t->max_zone_append_sectors,
+> > >  					b->max_zone_append_sectors);
+> > > -	t->bounce_pfn = min_not_zero(t->bounce_pfn, b->bounce_pfn);
+> > > +	t->bounce = min_not_zero(t->bounce, b->bounce);
+> > 
+> > I see how min_not_zero() made sense when it was a pfn.  Does it still
+> > make sense now it's an enum?  I would have thought it'd now be 'max()',
+> > given the definitions later on.
 > 
-> Now Naohiro was able to trigger the bug as well with xfstests generic/095
-> on a zoned btrfs.
+> Actually, blk_stack_limits should not look at ->bounce_pfn / ->bounce
+> at all.  blk_queue_bounce is only called my blk_mq_submit_bio, and
+> the only stacked blk-mq driver (dm-mpath) does not need bouncing.
 > 
-> There is nothing that prevents bvec submissions via REQ_OP_ZONE_APPEND if
-> the hardware's zone append limit is met.
+> I'll add a patch to fix this up to the front of the series.
 
-Applied, thanks.
+Is blk_queue_bounce() called again when mpath submits the request to the
+lower device? I thought when I looked at this code some time ago
+bouncing would only be checked the first time a request is created
+(dm-mpath), and then not again, so when we don't check for whether
+bouncing is necessary in mpath, we still might screw the LLD - hence why
+we might inherit this via the limits.
 
 -- 
-Jens Axboe
-
+Best Regards, Benjamin Block  / Linux on IBM Z Kernel Development / IBM Systems
+IBM Deutschland Research & Development GmbH    /    https://www.ibm.com/privacy
+Vorsitz. AufsR.: Gregor Pillen         /        Geschäftsführung: Dirk Wittkopp
+Sitz der Gesellschaft: Böblingen / Registergericht: AmtsG Stuttgart, HRB 243294
