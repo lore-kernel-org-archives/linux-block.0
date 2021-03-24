@@ -2,85 +2,134 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6FA0C433E2
-	for <linux-block@archiver.kernel.org>; Tue, 23 Mar 2021 21:58:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B338AC433C1
+	for <linux-block@archiver.kernel.org>; Wed, 24 Mar 2021 00:12:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 77B8361931
-	for <linux-block@archiver.kernel.org>; Tue, 23 Mar 2021 21:58:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 73B18619A4
+	for <linux-block@archiver.kernel.org>; Wed, 24 Mar 2021 00:12:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233663AbhCWV6Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Mar 2021 17:58:16 -0400
-Received: from mail.kernel.org ([198.145.29.99]:34800 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233630AbhCWV55 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Mar 2021 17:57:57 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 87955619D1;
-        Tue, 23 Mar 2021 21:57:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1616536677;
-        bh=8EtGiHDV0aGfT6JHT+y8795nI5qrUiRVp2/1aJHgw3Y=;
-        h=From:To:Cc:Subject:Date:From;
-        b=Y6HWEAfJnMhDMS30qt92NgDTbvw6z2SvltX0zWvOBGC+Aq4XD42KCSK9aYwjYALH9
-         7N5oQUlCAXsNln2A6HUuZH5spYzMZEPaQVm6mKYwjBNmADVqF7QOpucHszg8oirOsL
-         h7hrD+8gENTosITtjfpQ2Jzh93nIazoQ6rO+uMfF0aDAP3AGf/D92uRdt1cjIMn2VS
-         pQP071aW3wTtLePyD6hS/qkn6zZte2vp/Gj8T2iE4pLRo/n4/LQIU9GQYOz0w6eNjS
-         Tc0mXVoopoVuprZmhLQ8kuqFlC9cxH8Dq++C9NUD88z8n9pMeCXg7B2rd0e5EYtRMp
-         X81FOjyEq92lg==
-From:   Arnd Bergmann <arnd@kernel.org>
-To:     Joshua Morris <josh.h.morris@us.ibm.com>,
-        Philip Kelleher <pjk1939@linux.ibm.com>,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     Arnd Bergmann <arnd@arndb.de>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Nathan Chancellor <nathan@kernel.org>,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Philip J Kelleher <pjk1939@linux.vnet.ibm.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        clang-built-linux@googlegroups.com
-Subject: [PATCH] rsxx: remove extraneous 'const' qualifier
-Date:   Tue, 23 Mar 2021 22:57:26 +0100
-Message-Id: <20210323215753.281668-1-arnd@kernel.org>
-X-Mailer: git-send-email 2.29.2
+        id S234339AbhCXALw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Mar 2021 20:11:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28560 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231535AbhCXAKd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 23 Mar 2021 20:10:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1616544630;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=nUMW97mUE/mOzpAy2Ox0F8J7K0mMzQfU1Gcf+0CRFII=;
+        b=BvlHTntn/JmhBrwFbUODzgx3gD7lmagGdpnLpWDbXIH+6eTzqPiSZG/LzX8an5VA9i1qyo
+        QS+SHxxDnIFU3vSrX5bg5fXxzZopV828+yNuLxeSWddKNIARZ5mkToRksb0M6pZlXlpu2H
+        WUbijihq5cQ2/8V4Qj6CzsnAr4f+lG4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-173-VHBRTS8fO52vI7H03DxWrA-1; Tue, 23 Mar 2021 20:10:26 -0400
+X-MC-Unique: VHBRTS8fO52vI7H03DxWrA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D18C5101371F;
+        Wed, 24 Mar 2021 00:10:23 +0000 (UTC)
+Received: from T590 (ovpn-12-85.pek2.redhat.com [10.72.12.85])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D219F18B84;
+        Wed, 24 Mar 2021 00:10:10 +0000 (UTC)
+Date:   Wed, 24 Mar 2021 08:10:05 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Sagi Grimberg <sagi@grimberg.me>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        Jeffle Xu <jefflexu@linux.alibaba.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
+Subject: Re: [RFC PATCH V2 09/13] block: use per-task poll context to
+ implement bio based io poll
+Message-ID: <YFqDXeEsDNBfoWqW@T590>
+References: <20210318164827.1481133-1-ming.lei@redhat.com>
+ <20210318164827.1481133-10-ming.lei@redhat.com>
+ <522a2c87-e9f3-e62a-e09b-084821c698a0@grimberg.me>
+ <YFnYhBIiFhiyX8Wb@T590>
+ <713f2a27-4a2c-8723-3dfd-de6d68956eb2@grimberg.me>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <713f2a27-4a2c-8723-3dfd-de6d68956eb2@grimberg.me>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Arnd Bergmann <arnd@arndb.de>
+On Tue, Mar 23, 2021 at 09:54:36AM -0700, Sagi Grimberg wrote:
+> 
+> > > > +static void blk_bio_poll_post_submit(struct bio *bio, blk_qc_t cookie)
+> > > > +{
+> > > > +	bio->bi_iter.bi_private_data = cookie;
+> > > > +}
+> > > > +
+> > > 
+> > > Hey Ming, thinking about nvme-mpath, I'm thinking that this should be
+> > > an exported function for failover. nvme-mpath updates bio.bi_dev
+> > > when re-submitting I/Os to an alternate path, so I'm thinking
+> > > that if this function is exported then nvme-mpath could do as little
+> > > as the below to allow polling?
+> > > 
+> > > --
+> > > diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
+> > > index 92adebfaf86f..e562e296153b 100644
+> > > --- a/drivers/nvme/host/multipath.c
+> > > +++ b/drivers/nvme/host/multipath.c
+> > > @@ -345,6 +345,7 @@ static void nvme_requeue_work(struct work_struct *work)
+> > >          struct nvme_ns_head *head =
+> > >                  container_of(work, struct nvme_ns_head, requeue_work);
+> > >          struct bio *bio, *next;
+> > > +       blk_qc_t cookie;
+> > > 
+> > >          spin_lock_irq(&head->requeue_lock);
+> > >          next = bio_list_get(&head->requeue_list);
+> > > @@ -359,7 +360,8 @@ static void nvme_requeue_work(struct work_struct *work)
+> > >                   * path.
+> > >                   */
+> > >                  bio_set_dev(bio, head->disk->part0);
+> > > -               submit_bio_noacct(bio);
+> > > +               cookie = submit_bio_noacct(bio);
+> > > +               blk_bio_poll_post_submit(bio, cookie);
+> > >          }
+> > >   }
+> > > --
+> > > 
+> > > I/O failover will create misalignment from the polling context cpu and
+> > > the submission cpu (running requeue_work), but I don't see if there is
+> > > something that would break here...
+> > 
+> > I understand requeue shouldn't be one usual event, and I guess it is just
+> > fine to fallback to IRQ based mode?
+> 
+> Well, when it will failover, it will probably be directed to the poll
+> queues. Maybe I'm missing something...
 
-The returned string from rsxx_card_state_to_str is 'const',
-but the other qualifier doesn't change anything here except
-causing a warning with 'clang -Wextra':
+In this patchset, because it isn't submitted directly from FS, there
+isn't one polling context associated with this bio, so its HIPRI flag
+will be cleared, then fallback to irq mode.
 
-drivers/block/rsxx/core.c:393:21: warning: 'const' type qualifier on return type has no effect [-Wignored-qualifiers]
-static const char * const rsxx_card_state_to_str(unsigned int state)
+> 
+> > This patchset actually doesn't cover such bio submission from kernel context.
+> 
+> What is the difference?
 
-Fixes: f37912039eb0 ("block: IBM RamSan 70/80 trivial changes.")
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- drivers/block/rsxx/core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+So far upper layer(io_uring, or dio, ..) needs to get the returned cookie, then
+pass it to blk_poll().
 
-diff --git a/drivers/block/rsxx/core.c b/drivers/block/rsxx/core.c
-index 5ac1881396af..813b0a554d4a 100644
---- a/drivers/block/rsxx/core.c
-+++ b/drivers/block/rsxx/core.c
-@@ -392,7 +392,7 @@ static irqreturn_t rsxx_isr(int irq, void *pdata)
- }
- 
- /*----------------- Card Event Handler -------------------*/
--static const char * const rsxx_card_state_to_str(unsigned int state)
-+static const char *rsxx_card_state_to_str(unsigned int state)
- {
- 	static const char * const state_strings[] = {
- 		"Unknown", "Shutdown", "Starting", "Formatting",
--- 
-2.29.2
+For this case, the cookie can't be passed to FS caller of submit_bio(FS bio), so
+it can't be polled by in-tree's code.
+
+
+
+Thanks,
+Ming
 
