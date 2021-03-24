@@ -2,134 +2,82 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B338AC433C1
-	for <linux-block@archiver.kernel.org>; Wed, 24 Mar 2021 00:12:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0C73C433DB
+	for <linux-block@archiver.kernel.org>; Wed, 24 Mar 2021 02:41:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 73B18619A4
-	for <linux-block@archiver.kernel.org>; Wed, 24 Mar 2021 00:12:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9490861580
+	for <linux-block@archiver.kernel.org>; Wed, 24 Mar 2021 02:41:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234339AbhCXALw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 23 Mar 2021 20:11:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28560 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231535AbhCXAKd (ORCPT
+        id S234921AbhCXCkm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 23 Mar 2021 22:40:42 -0400
+Received: from relay.corp-email.com ([222.73.234.233]:10895 "EHLO
+        relay.corp-email.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234933AbhCXCkP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 23 Mar 2021 20:10:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1616544630;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=nUMW97mUE/mOzpAy2Ox0F8J7K0mMzQfU1Gcf+0CRFII=;
-        b=BvlHTntn/JmhBrwFbUODzgx3gD7lmagGdpnLpWDbXIH+6eTzqPiSZG/LzX8an5VA9i1qyo
-        QS+SHxxDnIFU3vSrX5bg5fXxzZopV828+yNuLxeSWddKNIARZ5mkToRksb0M6pZlXlpu2H
-        WUbijihq5cQ2/8V4Qj6CzsnAr4f+lG4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-173-VHBRTS8fO52vI7H03DxWrA-1; Tue, 23 Mar 2021 20:10:26 -0400
-X-MC-Unique: VHBRTS8fO52vI7H03DxWrA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D18C5101371F;
-        Wed, 24 Mar 2021 00:10:23 +0000 (UTC)
-Received: from T590 (ovpn-12-85.pek2.redhat.com [10.72.12.85])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id D219F18B84;
-        Wed, 24 Mar 2021 00:10:10 +0000 (UTC)
-Date:   Wed, 24 Mar 2021 08:10:05 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Sagi Grimberg <sagi@grimberg.me>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        Jeffle Xu <jefflexu@linux.alibaba.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
-Subject: Re: [RFC PATCH V2 09/13] block: use per-task poll context to
- implement bio based io poll
-Message-ID: <YFqDXeEsDNBfoWqW@T590>
-References: <20210318164827.1481133-1-ming.lei@redhat.com>
- <20210318164827.1481133-10-ming.lei@redhat.com>
- <522a2c87-e9f3-e62a-e09b-084821c698a0@grimberg.me>
- <YFnYhBIiFhiyX8Wb@T590>
- <713f2a27-4a2c-8723-3dfd-de6d68956eb2@grimberg.me>
+        Tue, 23 Mar 2021 22:40:15 -0400
+X-Greylist: delayed 365 seconds by postgrey-1.27 at vger.kernel.org; Tue, 23 Mar 2021 22:40:15 EDT
+Received: from ([183.47.25.45])
+        by relay.corp-email.com ((LNX1044)) with ASMTP (SSL) id RVF00057;
+        Wed, 24 Mar 2021 10:33:57 +0800
+Received: from GCY-EXS-15.TCL.com (10.74.128.165) by GCY-EXS-08.TCL.com
+ (10.74.128.158) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2106.2; Wed, 24 Mar
+ 2021 10:33:56 +0800
+Received: from localhost.localdomain (172.16.34.11) by GCY-EXS-15.TCL.com
+ (10.74.128.165) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2106.2; Wed, 24 Mar
+ 2021 10:33:56 +0800
+From:   Rokudo Yan <wu-yan@tcl.com>
+To:     <paolo.valente@linaro.org>, <axboe@kernel.dk>,
+        <linux-block@vger.kernel.org>
+CC:     <wu-yan@tcl.com>
+Subject: [PATCH] block,bfq: fix the timeout calculation in bfq_bfqq_charge_time
+Date:   Wed, 24 Mar 2021 10:33:41 +0800
+Message-ID: <20210324023341.1545234-1-wu-yan@tcl.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <713f2a27-4a2c-8723-3dfd-de6d68956eb2@grimberg.me>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [172.16.34.11]
+X-ClientProxiedBy: GCY-EXS-04.TCL.com (10.74.128.154) To GCY-EXS-15.TCL.com
+ (10.74.128.165)
+tUid:   20213241033573bc190bfe2d245a8b4fab6964b1eb80d
+X-Abuse-Reports-To: service@corp-email.com
+Abuse-Reports-To: service@corp-email.com
+X-Complaints-To: service@corp-email.com
+X-Report-Abuse-To: service@corp-email.com
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Mar 23, 2021 at 09:54:36AM -0700, Sagi Grimberg wrote:
-> 
-> > > > +static void blk_bio_poll_post_submit(struct bio *bio, blk_qc_t cookie)
-> > > > +{
-> > > > +	bio->bi_iter.bi_private_data = cookie;
-> > > > +}
-> > > > +
-> > > 
-> > > Hey Ming, thinking about nvme-mpath, I'm thinking that this should be
-> > > an exported function for failover. nvme-mpath updates bio.bi_dev
-> > > when re-submitting I/Os to an alternate path, so I'm thinking
-> > > that if this function is exported then nvme-mpath could do as little
-> > > as the below to allow polling?
-> > > 
-> > > --
-> > > diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
-> > > index 92adebfaf86f..e562e296153b 100644
-> > > --- a/drivers/nvme/host/multipath.c
-> > > +++ b/drivers/nvme/host/multipath.c
-> > > @@ -345,6 +345,7 @@ static void nvme_requeue_work(struct work_struct *work)
-> > >          struct nvme_ns_head *head =
-> > >                  container_of(work, struct nvme_ns_head, requeue_work);
-> > >          struct bio *bio, *next;
-> > > +       blk_qc_t cookie;
-> > > 
-> > >          spin_lock_irq(&head->requeue_lock);
-> > >          next = bio_list_get(&head->requeue_list);
-> > > @@ -359,7 +360,8 @@ static void nvme_requeue_work(struct work_struct *work)
-> > >                   * path.
-> > >                   */
-> > >                  bio_set_dev(bio, head->disk->part0);
-> > > -               submit_bio_noacct(bio);
-> > > +               cookie = submit_bio_noacct(bio);
-> > > +               blk_bio_poll_post_submit(bio, cookie);
-> > >          }
-> > >   }
-> > > --
-> > > 
-> > > I/O failover will create misalignment from the polling context cpu and
-> > > the submission cpu (running requeue_work), but I don't see if there is
-> > > something that would break here...
-> > 
-> > I understand requeue shouldn't be one usual event, and I guess it is just
-> > fine to fallback to IRQ based mode?
-> 
-> Well, when it will failover, it will probably be directed to the poll
-> queues. Maybe I'm missing something...
+in bfq_bfqq_charge_time, timeout_ms is calculated with global
+constant bfq_timeout(HZ/8), which is not correct. It should be
+bfqd->bfq_timeout here as per-device bfq_timeout can be modified
+through /sys/block/<disk/queue/iosched/timeout_sync.
 
-In this patchset, because it isn't submitted directly from FS, there
-isn't one polling context associated with this bio, so its HIPRI flag
-will be cleared, then fallback to irq mode.
+Signed-off-by: Rokudo Yan <wu-yan@tcl.com>
+---
+ block/bfq-wf2q.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> 
-> > This patchset actually doesn't cover such bio submission from kernel context.
-> 
-> What is the difference?
-
-So far upper layer(io_uring, or dio, ..) needs to get the returned cookie, then
-pass it to blk_poll().
-
-For this case, the cookie can't be passed to FS caller of submit_bio(FS bio), so
-it can't be polled by in-tree's code.
-
-
-
-Thanks,
-Ming
+diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
+index 070e34a7feb1..48f540a5ee6a 100644
+--- a/block/bfq-wf2q.c
++++ b/block/bfq-wf2q.c
+@@ -872,7 +872,7 @@ void bfq_bfqq_charge_time(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ 			  unsigned long time_ms)
+ {
+ 	struct bfq_entity *entity = &bfqq->entity;
+-	unsigned long timeout_ms = jiffies_to_msecs(bfq_timeout);
++	unsigned long timeout_ms = jiffies_to_msecs(bfqd->bfq_timeout);
+ 	unsigned long bounded_time_ms = min(time_ms, timeout_ms);
+ 	int serv_to_charge_for_time =
+ 		(bfqd->bfq_max_budget * bounded_time_ms) / timeout_ms;
+-- 
+2.25.1
 
