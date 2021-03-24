@@ -7,50 +7,50 @@ X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39C6CC433E0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E645C433E3
 	for <linux-block@archiver.kernel.org>; Wed, 24 Mar 2021 12:23:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 183EE61A0D
+	by mail.kernel.org (Postfix) with ESMTP id 3FB3361A06
 	for <linux-block@archiver.kernel.org>; Wed, 24 Mar 2021 12:23:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230093AbhCXMWi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Mar 2021 08:22:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:35379 "EHLO
+        id S231177AbhCXMWl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Mar 2021 08:22:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:36544 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231375AbhCXMWQ (ORCPT
+        by vger.kernel.org with ESMTP id S232207AbhCXMW2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Mar 2021 08:22:16 -0400
+        Wed, 24 Mar 2021 08:22:28 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1616588535;
+        s=mimecast20190719; t=1616588547;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=v7MCRj+XzAAAhXvAqJiUqcJD8ynnu9FYQLckkkcwm/w=;
-        b=byyvGtxxWw9dBdUCZBQ/wqgBai7eF1/4C0N3AwwVAAe/Z/ddTyzotPeybVdQnf28YA7laI
-        SF8oF6atjEoLFTpAdoj2bkcvCMd5tToJkd29Bp7pmp0CQ64EklQUS3ei875OFTCjmpCNUy
-        6wlWZUmIWyO1xOoqNCYXneUJLLDtNEI=
+        bh=8Pi4isQ4p1z5in4o0Y+/H4NZqFcKCveDzivrRliTjko=;
+        b=Pv6lJyBuGl+SG0QO6iC9Cyw7nSlq9TgGfTE/19FMNRz/ps+7i3znDeOnUyQOALxoq4FJRi
+        QNb4Mq44Nd5TAFmatGZeI6EUyLYVMSloay9UGVYfLbTyW5usVdraXZdtA+8jAiXgAB6TsK
+        CEvF7yVbFpFsElMwOjpV1+E+tBwVqqQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-446-8ct5SsPqNFGfwTlMxebd7g-1; Wed, 24 Mar 2021 08:22:11 -0400
-X-MC-Unique: 8ct5SsPqNFGfwTlMxebd7g-1
+ us-mta-338-7J3ba_gNMKOu983LQulmgA-1; Wed, 24 Mar 2021 08:22:23 -0400
+X-MC-Unique: 7J3ba_gNMKOu983LQulmgA-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 90B1E83DBFB;
-        Wed, 24 Mar 2021 12:21:40 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 395EC8E416;
+        Wed, 24 Mar 2021 12:21:50 +0000 (UTC)
 Received: from localhost (ovpn-13-127.pek2.redhat.com [10.72.13.127])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CA5EE19C71;
-        Wed, 24 Mar 2021 12:21:39 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3CB342B3C8;
+        Wed, 24 Mar 2021 12:21:48 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org,
         Jeffle Xu <jefflexu@linux.alibaba.com>,
         Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
         Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V3 10/13] blk-mq: limit hw queues to be polled in each blk_poll()
-Date:   Wed, 24 Mar 2021 20:19:24 +0800
-Message-Id: <20210324121927.362525-11-ming.lei@redhat.com>
+Subject: [PATCH V3 13/13] dm: support IO polling for bio-based dm device
+Date:   Wed, 24 Mar 2021 20:19:27 +0800
+Message-Id: <20210324121927.362525-14-ming.lei@redhat.com>
 In-Reply-To: <20210324121927.362525-1-ming.lei@redhat.com>
 References: <20210324121927.362525-1-ming.lei@redhat.com>
 MIME-Version: 1.0
@@ -60,123 +60,115 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Limit at most 8 queues are polled in each blk_pull(), avoid to
-add extra latency when queue depth is high.
+From: Jeffle Xu <jefflexu@linux.alibaba.com>
 
+IO polling is enabled when all underlying target devices are capable
+of IO polling. The sanity check supports the stacked device model, in
+which one dm device may be build upon another dm device. In this case,
+the mapped device will check if the underlying dm target device
+supports IO polling.
+
+Signed-off-by: Jeffle Xu <jefflexu@linux.alibaba.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-mq.c | 73 ++++++++++++++++++++++++++++++++++++--------------
- 1 file changed, 53 insertions(+), 20 deletions(-)
+ drivers/md/dm-table.c         | 24 ++++++++++++++++++++++++
+ drivers/md/dm.c               | 14 ++++++++++++++
+ include/linux/device-mapper.h |  1 +
+ 3 files changed, 39 insertions(+)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 76a90da83d9c..65fe6a2bad43 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -3865,32 +3865,31 @@ static inline int blk_mq_poll_hctx(struct request_queue *q,
- 	return ret;
+diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
+index 95391f78b8d5..a8f3575fb118 100644
+--- a/drivers/md/dm-table.c
++++ b/drivers/md/dm-table.c
+@@ -1509,6 +1509,12 @@ struct dm_target *dm_table_find_target(struct dm_table *t, sector_t sector)
+ 	return &t->targets[(KEYS_PER_NODE * n) + k];
  }
  
--static int blk_mq_poll_io(struct bio *bio)
-+#define POLL_HCTX_MAX_CNT 8
++static int device_not_poll_capable(struct dm_target *ti, struct dm_dev *dev,
++				   sector_t start, sector_t len, void *data)
++{
++	return !blk_queue_poll(bdev_get_queue(dev->bdev));
++}
 +
-+static bool blk_add_unique_hctx(struct blk_mq_hw_ctx **data, int *cnt,
-+		struct blk_mq_hw_ctx *hctx)
- {
--	struct request_queue *q = bio->bi_bdev->bd_disk->queue;
--	blk_qc_t cookie = bio_get_private_data(bio);
--	int ret = 0;
-+	int i;
+ /*
+  * type->iterate_devices() should be called when the sanity check needs to
+  * iterate and check all underlying data devices. iterate_devices() will
+@@ -1559,6 +1565,11 @@ static int count_device(struct dm_target *ti, struct dm_dev *dev,
+ 	return 0;
+ }
  
--	if (!bio_flagged(bio, BIO_DONE) && blk_qc_t_valid(cookie)) {
--		struct blk_mq_hw_ctx *hctx =
--			q->queue_hw_ctx[blk_qc_t_to_queue_num(cookie)];
-+	for (i = 0; i < *cnt; i++) {
-+		if (data[i] == hctx)
-+			goto exit;
++int dm_table_supports_poll(struct dm_table *t)
++{
++	return !dm_table_any_dev_attr(t, device_not_poll_capable, NULL);
++}
++
+ /*
+  * Check whether a table has no data devices attached using each
+  * target's iterate_devices method.
+@@ -2079,6 +2090,19 @@ void dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
+ 
+ 	dm_update_keyslot_manager(q, t);
+ 	blk_queue_update_readahead(q);
++
++	/*
++	 * Check for request-based device is remained to
++	 * dm_mq_init_request_queue()->blk_mq_init_allocated_queue().
++	 * For bio-based device, only set QUEUE_FLAG_POLL when all underlying
++	 * devices supporting polling.
++	 */
++	if (__table_type_bio_based(t->type)) {
++		if (dm_table_supports_poll(t))
++			blk_queue_flag_set(QUEUE_FLAG_POLL, q);
++		else
++			blk_queue_flag_clear(QUEUE_FLAG_POLL, q);
 +	}
- 
--		ret += blk_mq_poll_hctx(q, hctx);
-+	if (i < POLL_HCTX_MAX_CNT) {
-+		data[i] = hctx;
-+		(*cnt)++;
- 	}
--	return ret;
-+ exit:
-+	return *cnt == POLL_HCTX_MAX_CNT;
  }
  
--static int blk_bio_poll_and_end_io(struct bio_grp_list *grps)
-+static void blk_build_poll_queues(struct bio_grp_list *grps,
-+		struct blk_mq_hw_ctx **data, int *cnt)
- {
--	int ret = 0;
- 	int i;
- 
--	/*
--	 * Poll hw queue first.
--	 *
--	 * TODO: limit max poll times and make sure to not poll same
--	 * hw queue one more time.
--	 */
- 	for (i = 0; i < grps->nr_grps; i++) {
- 		struct bio_grp_list_data *grp = &grps->head[i];
- 		struct bio *bio;
-@@ -3898,11 +3897,29 @@ static int blk_bio_poll_and_end_io(struct bio_grp_list *grps)
- 		if (bio_grp_list_grp_empty(grp))
- 			continue;
- 
--		for (bio = grp->list.head; bio; bio = bio->bi_poll)
--			ret += blk_mq_poll_io(bio);
-+		for (bio = grp->list.head; bio; bio = bio->bi_poll) {
-+			blk_qc_t  cookie;
-+			struct blk_mq_hw_ctx *hctx;
-+			struct request_queue *q;
-+
-+			if (bio_flagged(bio, BIO_DONE))
-+				continue;
-+			cookie = bio_get_private_data(bio);
-+			if (!blk_qc_t_valid(cookie))
-+				continue;
-+
-+			q = bio->bi_bdev->bd_disk->queue;
-+			hctx = q->queue_hw_ctx[blk_qc_t_to_queue_num(cookie)];
-+			if (blk_add_unique_hctx(data, cnt, hctx))
-+				return;
-+		}
- 	}
-+}
-+
-+static void blk_bio_poll_reap_ios(struct bio_grp_list *grps)
-+{
-+	int i;
- 
--	/* reap bios */
- 	for (i = 0; i < grps->nr_grps; i++) {
- 		struct bio_grp_list_data *grp = &grps->head[i];
- 		struct bio *bio;
-@@ -3927,6 +3944,22 @@ static int blk_bio_poll_and_end_io(struct bio_grp_list *grps)
- 		}
- 		__bio_grp_list_merge(&grp->list, &bl);
- 	}
-+}
-+
-+static int blk_bio_poll_and_end_io(struct bio_grp_list *grps)
-+{
-+	int ret = 0;
-+	int i;
-+	struct blk_mq_hw_ctx *hctx[POLL_HCTX_MAX_CNT];
-+	int cnt = 0;
-+
-+	blk_build_poll_queues(grps, hctx, &cnt);
-+
-+	for (i = 0; i < cnt; i++)
-+		ret += blk_mq_poll_hctx(hctx[i]->queue, hctx[i]);
-+
-+	blk_bio_poll_reap_ios(grps);
-+
+ unsigned int dm_table_get_num_targets(struct dm_table *t)
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 50b693d776d6..fe6893b078dc 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -1720,6 +1720,19 @@ static blk_qc_t dm_submit_bio(struct bio *bio)
  	return ret;
  }
  
++static bool dm_bio_poll_capable(struct gendisk *disk)
++{
++	int ret, srcu_idx;
++	struct mapped_device *md = disk->private_data;
++	struct dm_table *t;
++
++	t = dm_get_live_table(md, &srcu_idx);
++	ret = dm_table_supports_poll(t);
++	dm_put_live_table(md, srcu_idx);
++
++	return ret;
++}
++
+ /*-----------------------------------------------------------------
+  * An IDR is used to keep track of allocated minor numbers.
+  *---------------------------------------------------------------*/
+@@ -3132,6 +3145,7 @@ static const struct pr_ops dm_pr_ops = {
+ };
+ 
+ static const struct block_device_operations dm_blk_dops = {
++	.poll_capable = dm_bio_poll_capable,
+ 	.submit_bio = dm_submit_bio,
+ 	.open = dm_blk_open,
+ 	.release = dm_blk_close,
+diff --git a/include/linux/device-mapper.h b/include/linux/device-mapper.h
+index 7f4ac87c0b32..31bfd6f70013 100644
+--- a/include/linux/device-mapper.h
++++ b/include/linux/device-mapper.h
+@@ -538,6 +538,7 @@ unsigned int dm_table_get_num_targets(struct dm_table *t);
+ fmode_t dm_table_get_mode(struct dm_table *t);
+ struct mapped_device *dm_table_get_md(struct dm_table *t);
+ const char *dm_table_device_name(struct dm_table *t);
++int dm_table_supports_poll(struct dm_table *t);
+ 
+ /*
+  * Trigger an event.
 -- 
 2.29.2
 
