@@ -2,52 +2,62 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFDD3C433C1
-	for <linux-block@archiver.kernel.org>; Wed, 24 Mar 2021 18:13:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D079FC433C1
+	for <linux-block@archiver.kernel.org>; Wed, 24 Mar 2021 18:17:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7A72A61A25
-	for <linux-block@archiver.kernel.org>; Wed, 24 Mar 2021 18:13:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9CACA61A1E
+	for <linux-block@archiver.kernel.org>; Wed, 24 Mar 2021 18:17:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237397AbhCXSN1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Mar 2021 14:13:27 -0400
-Received: from verein.lst.de ([213.95.11.211]:38199 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S237432AbhCXSNL (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Mar 2021 14:13:11 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id DE2FE68B05; Wed, 24 Mar 2021 19:13:07 +0100 (CET)
-Date:   Wed, 24 Mar 2021 19:13:07 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Benjamin Block <bblock@linux.ibm.com>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Matthew Wilcox <willy@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Khalid Aziz <khalid@gonehiking.org>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Ondrej Zary <linux@rainbow-software.org>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
-Subject: Re: [PATCH 7/8] block: refactor the bounce buffering code
-Message-ID: <20210324181307.GA15902@lst.de>
-References: <20210318063923.302738-1-hch@lst.de> <20210318063923.302738-8-hch@lst.de> <20210318112950.GL3420@casper.infradead.org> <20210318125340.GA21262@lst.de> <YFt5kPs30x4kPu77@t480-pf1aa2c2.linux.ibm.com> <20210324174458.GA13589@lst.de> <YFt/7BdzecUmdySU@t480-pf1aa2c2.linux.ibm.com>
+        id S237281AbhCXSRM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Mar 2021 14:17:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43184 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237364AbhCXSRH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 24 Mar 2021 14:17:07 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07CA0C061763
+        for <linux-block@vger.kernel.org>; Wed, 24 Mar 2021 11:17:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=eyWlq2aUMFVFlF2E21fr1Z0V82kVrvCRVem/G6BMweM=; b=qFnyd4V8WTbz8VVdV+PT23tCo5
+        UA0d518Ws0ErgbCQOYD+zxK2nQqBpbxd1pwcCsD6WHmiaB0TR91A8LlmUAnfCh0RVuLDGr9onl/Sf
+        SfAHmQvd2pFOJ5xsxCsucZefUIMl0igrEjd1C4gs3w2muzfEuF9Ns6hH9DrF6VCetGPiW4iQ1tLU0
+        Or8IJEJRNahMM0TuUTubPbxjfQTDSVMlix6iAB4H6nubvfKQkMvmYThD/0hcYk2IQz3jH6Orgykzo
+        gkc/JosOQw3pD0SYFmCW/JOkz0cJlX9GuTqe8RhMSU1Zd9DXAQ7ErzjLpiLqZo99iO9nQXAHEgImR
+        xYTCf2dQ==;
+Received: from [2001:4bb8:191:f692:b499:58dc:411a:54d1] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
+        id 1lP840-004EHV-Cd; Wed, 24 Mar 2021 18:17:04 +0000
+Date:   Wed, 24 Mar 2021 19:17:02 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Jeffle Xu <jefflexu@linux.alibaba.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
+Subject: Re: [PATCH V3 03/13] block: add helper of blk_create_io_context
+Message-ID: <YFuCHvUFwhYRNa6Z@infradead.org>
+References: <20210324121927.362525-1-ming.lei@redhat.com>
+ <20210324121927.362525-4-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YFt/7BdzecUmdySU@t480-pf1aa2c2.linux.ibm.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20210324121927.362525-4-ming.lei@redhat.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 24, 2021 at 07:07:40PM +0100, Benjamin Block wrote:
-> But map_request() -> multipath_clone_and_map() -> dm_dispatch_clone_request() 
-> doesn't call blk_mq_submit_bio() for requests that have been queued in a
-> request based mpath device. The requests gets cloned and then dispatched
-> on the lower queue. Or am I missing something?
+On Wed, Mar 24, 2021 at 08:19:17PM +0800, Ming Lei wrote:
+> Add one helper for creating io context and prepare for supporting
+> efficient bio based io poll.
 
-Indeed.  I keep forgetting about the fact that dm-mpath bypassed
-the normal submit_bio_noacct path.
+Looking at what gets added later here I do not think this helper is
+a good idea.  Having a separate one for creating any needed poll-only
+context is a lot more clear.
