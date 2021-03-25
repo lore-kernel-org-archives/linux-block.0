@@ -2,113 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB441C433DB
-	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 16:24:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBA19C433C1
+	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 16:51:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8DD1861A28
-	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 16:24:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8415E61A1E
+	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 16:51:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229576AbhCYQYF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Mar 2021 12:24:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48244 "EHLO
+        id S229547AbhCYQub (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Mar 2021 12:50:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54056 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229629AbhCYQXv (ORCPT
+        with ESMTP id S229642AbhCYQub (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Mar 2021 12:23:51 -0400
-Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDB36C06175F
-        for <linux-block@vger.kernel.org>; Thu, 25 Mar 2021 09:23:50 -0700 (PDT)
-Received: by mail-ej1-x631.google.com with SMTP id e14so3858749ejz.11
-        for <linux-block@vger.kernel.org>; Thu, 25 Mar 2021 09:23:50 -0700 (PDT)
+        Thu, 25 Mar 2021 12:50:31 -0400
+Received: from mail-il1-x12e.google.com (mail-il1-x12e.google.com [IPv6:2607:f8b0:4864:20::12e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14739C06174A
+        for <linux-block@vger.kernel.org>; Thu, 25 Mar 2021 09:50:31 -0700 (PDT)
+Received: by mail-il1-x12e.google.com with SMTP id z9so2686328ilb.4
+        for <linux-block@vger.kernel.org>; Thu, 25 Mar 2021 09:50:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=omq8bBLBDy7uYQDOJRAFAv3BusCdmAfBms7xhT9LCCE=;
-        b=ZITvLlzMAfOwwuOmTCQlw71uJiuOKqNVezPBzBqw3lZef32A8GOAZliGQ57tmrnPoA
-         7lUSWdjpFcSbaaqr8WPDgvxAyuT9I4Bc5S5CYVhD5rmcSIjbli2k/kXsxWVAxitB9+eI
-         YLTW1nclGq6mjpixVpiDv7ckex53FG9C0Ue7v/FNeQI/B9eVfWvuiHFM1eX1cthO1O8y
-         86sFjMMiiVUZfYCMgeJhMeJjSQGN41AyElVRvNbRAXARrxjqEuqoTLmX2p1RT/OXRVi8
-         BX4hcTYhN4/m4sBznRFFAKPwoCM+G0QI3K99/fO/JJNDRKqfuw9RnUxfW6o5iWsJR8vH
-         +KFA==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=eGM+Wb+P5x3c9noHsnTuN/hj/s8DPZX00U0JLAeymJ8=;
+        b=iqsccfzlZru7D/SzBxZSQV6V8nNiKAD6l2/EWpgaUa1obvKDk7301p63rga1nxatXt
+         ASDt6GWHWiONj/FqhnazOKXO9DuAlid931fdQlD/Vt3/JMmD4Xqnx05a5iWrSF5AlWrw
+         ot9g4QBq44RmXw2n0mZ1w+KaHeuE6gKcTtgLcYC6zuQIw+4QmtWdrq3OyhEQfgkVRLC/
+         wZCzf8o402FaOBB4ErsZIHClOdXIVR71s2JQmogVasfU9fBO7wjBDcQ7xsgk/FpUJJ9s
+         LIiw6YnWtig16v2xxq/7KM5UeLLxguky6T9HmSCH8G4a0hRc4hHaU/Gv7pJq63fkOl8U
+         /XAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=omq8bBLBDy7uYQDOJRAFAv3BusCdmAfBms7xhT9LCCE=;
-        b=rmLSOTdKUqE8A4NayFnhu7v9OADXrARtxVvtMFPhAFN5Cynb9tn/NerkcrmUSdrBFD
-         tpGIdr/dqAFDm/XVMXyYbyNiW88P/IIRLTgvIUwyw6hGR3GJvtEgwfW23tq8A/zuZoLB
-         Tt3Nqu4QG6K4XGs0LJquWTo86wSVRWhQMOlt1wxK1MH4sFd0FNHY/sdAZJ+o4pHqVOxz
-         3TFpWQaNDAe+C0j0fI3DIbGwl/ifJSZBfVJFzQJoAwJ9kJL/7oteuAvgIxI9xOqJSCL+
-         ORw5R/rDM0r2q/g3QDo3vMY4vZQUQAy2Ht7R7DNUreBSRPmk+3GCZvl/xZau+e9CbbSh
-         Kz5g==
-X-Gm-Message-State: AOAM531aTQhbOWDeHI3YK5sK/J9Yyboofg88PuK1w/AXEqzP8fnxm+ff
-        JLYgvWb8QhomEBKGnJQd0pQEsQu9D7uR0p2I+vWWNw==
-X-Google-Smtp-Source: ABdhPJzaeXaxAXQnO/MwgJNjFLE2eEUWsGGUBUclmbJGLwTS+0OJjAkbjLuaEl0/o3w4q+aAh0TaCxHr5V2I3DvxW7Q=
-X-Received: by 2002:a17:906:c102:: with SMTP id do2mr10372624ejc.305.1616689429647;
- Thu, 25 Mar 2021 09:23:49 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=eGM+Wb+P5x3c9noHsnTuN/hj/s8DPZX00U0JLAeymJ8=;
+        b=iDQEDQrv2Gleckl1OHQFPabDTLvwn4/M1Gw9Dh0f7uxcNee0iHBDH+SYgwqi1qjdX6
+         dSSyh997xa+5hasWAiwsgmq22LxZCrQ0EqfhJ0BK3uMs7WroiFR3SrGbnhAntiHnuyyo
+         QkV+etThyDX8ejSMpdLP1g38JJDxUBFTw/+CMDy1Dj4oObeGZItxtsAFo1EC5EUUZQoH
+         qSyxb8YtkxIFnEeAhEQ27OaNQ79swwK4o/HhaV/Gcrp7nt1bOksRex6dYns0Ovp23psm
+         9sIFdHjfW4c5xXBN2gutJAo2HKVqQxRWM3lEFMioDiw7JKCyoaxk8ZSDUd7HteEnFwIV
+         75Vw==
+X-Gm-Message-State: AOAM532Z5GVUNWUedTxK5mM9NX2ax1RPpfJep5kz4+vyjWkzBedcrSq6
+        8t2MFFnknBgC4rkYcdsr5zwtpA==
+X-Google-Smtp-Source: ABdhPJxK2Y+ZDGrbyjvV8N8vjntGzKY/hZmvzOaSKdaSY7GDlqdJYuPjJVZ2yCIvDVEZRDNchtNZxg==
+X-Received: by 2002:a92:d783:: with SMTP id d3mr7712362iln.256.1616691030522;
+        Thu, 25 Mar 2021 09:50:30 -0700 (PDT)
+Received: from [192.168.1.30] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id q8sm2902491ilv.55.2021.03.25.09.50.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 25 Mar 2021 09:50:30 -0700 (PDT)
+Subject: Re: [PATCH BUGFIX/IMPROVEMENT V2 0/6] revised version of third and
+ last batch of patches
+To:     Paolo Valente <paolo.valente@linaro.org>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20210304174627.161-1-paolo.valente@linaro.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <96b5c1f4-2814-2d88-6e05-6bfb10c8e9e2@kernel.dk>
+Date:   Thu, 25 Mar 2021 10:50:29 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <20210325152911.1213627-1-gi-oh.kim@ionos.com> <20210325152911.1213627-14-gi-oh.kim@ionos.com>
- <YFy2WJEpOpjBxx7f@unreal>
-In-Reply-To: <YFy2WJEpOpjBxx7f@unreal>
-From:   Gioh Kim <gi-oh.kim@ionos.com>
-Date:   Thu, 25 Mar 2021 17:23:14 +0100
-Message-ID: <CAJX1YtYgLMsV+PUxxPt6fEtgk3sNPui64iAs4VDy8n44_vq7Ag@mail.gmail.com>
-Subject: Re: [PATCH for-rc 13/24] block/rnbd-clt: Replace {NO_WAIT,WAIT} with RTRS_PERMIT_{WAIT,NOWAIT}
-To:     Leon Romanovsky <leonro@nvidia.com>
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        hch@infradead.org, sagi@grimberg.me, bvanassche@acm.org,
-        Haris Iqbal <haris.iqbal@ionos.com>,
-        Jinpu Wang <jinpu.wang@ionos.com>,
-        Gioh Kim <gi-oh.kim@cloud.ionos.com>,
-        Jason Gunthorpe <jgg@mellanox.com>, linux-rdma@vger.kernel.org,
-        Guoqing Jiang <guoqing.jiang@ionos.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20210304174627.161-1-paolo.valente@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 25, 2021 at 5:12 PM Leon Romanovsky <leonro@nvidia.com> wrote:
->
-> On Thu, Mar 25, 2021 at 04:29:00PM +0100, Gioh Kim wrote:
-> > From: Gioh Kim <gi-oh.kim@cloud.ionos.com>
-> >
-> > They are defined with the same value and similar meaning, let's remove
-> > one of them, then we can remove {WAIT,NOWAIT}.
-> >
-> > Also change the type of 'wait' from 'int' to 'enum wait_type' to make
-> > it clear.
-> >
-> > Cc: Jason Gunthorpe <jgg@mellanox.com>
-> > Cc: Leon Romanovsky <leonro@nvidia.com>
-> > Cc: linux-rdma@vger.kernel.org
-> > Signed-off-by: Guoqing Jiang <guoqing.jiang@ionos.com>
-> > Reviewed-by: Md Haris Iqbal <haris.iqbal@ionos.com>
-> > Signed-off-by: Gioh Kim <gi-oh.kim@ionos.com>
-> > Signed-off-by: Jack Wang <jinpu.wang@ionos.com>
-> > ---
-> >  drivers/block/rnbd/rnbd-clt.c          | 42 +++++++++++---------------
-> >  drivers/infiniband/ulp/rtrs/rtrs-clt.c |  4 +--
-> >  drivers/infiniband/ulp/rtrs/rtrs.h     |  6 ++--
-> >  3 files changed, 22 insertions(+), 30 deletions(-)
->
-> <...>
->
-> > @@ -535,7 +527,7 @@ static void msg_open_conf(struct work_struct *work)
-> >                        * If server thinks its fine, but we fail to process
-> >                        * then be nice and send a close to server.
-> >                        */
-> > -                     (void)send_msg_close(dev, device_id, NO_WAIT);
-> > +                     (void)send_msg_close(dev, device_id, RTRS_PERMIT_NOWAIT);
->
-> This (void) casting is not needed.
-I will fix them.
-Thank you.
+On 3/4/21 10:46 AM, Paolo Valente wrote:
+> Hi,
+> this is the V2 for the third and last batches of patches that I
+> proposed recently [1].
+> 
+> I've tried to address all issues raised in [1].
+> 
+> In more detail, main changes for V1 are:
+> 1. I've improved code as requested in "block, bfq: merge bursts of
+> newly-created queues"
+> 2. I've improved comments as requested in "block, bfq: put reqs of
+> waker and woken in dispatch list"
 
->
-> Thanks
+Applied, thanks.
+
+-- 
+Jens Axboe
+
