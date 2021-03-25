@@ -3,108 +3,98 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 467EDC433E0
-	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 07:12:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FFF2C433E0
+	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 08:04:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1D0EE61A26
-	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 07:12:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2080A619DC
+	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 08:04:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230107AbhCYG6x (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Mar 2021 02:58:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37752 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229988AbhCYG6Y (ORCPT
+        id S229508AbhCYIEX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Mar 2021 04:04:23 -0400
+Received: from vulcan.natalenko.name ([104.207.131.136]:34846 "EHLO
+        vulcan.natalenko.name" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229664AbhCYIEF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Mar 2021 02:58:24 -0400
-Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96A3EC06174A;
-        Wed, 24 Mar 2021 23:58:24 -0700 (PDT)
-Received: by mail-pg1-x529.google.com with SMTP id m7so846449pgj.8;
-        Wed, 24 Mar 2021 23:58:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :in-reply-to:references;
-        bh=Qko9xgJWdOHvuiNbVOg4Moyiw5zlG2MS/A0wr9gMovI=;
-        b=gPAx01xm/r3iBawJ1NuBPdBcHS3OM1cuHtXiXwjkO9IJTncPqMSyYWAyOPZovOy7+M
-         HKXJZuHXPuOl/J9elmeo6iMwBmeyFrz00y071+NCTvU1nq1hj/j/84H6Oa4uwPQ9/+Ae
-         IqfRId9AUwEcQaNy0eow2CeBabWIFg6tAS2jOAs3kAnJshCm9bwwS/uWGs15p/bgKvhG
-         5bCKxZEFicPLPckJHicYsivZIHUpFKQeDmMOPVnwV42vWhPnBQ5dWejb4wD2klnEdx7i
-         YHerNeGnF96sZM7WaDwpZ5MgykN+gp4OWExqZxgwT7LLZB30esjasWGaanZ3mwDbmoMP
-         S3Vg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:in-reply-to:references;
-        bh=Qko9xgJWdOHvuiNbVOg4Moyiw5zlG2MS/A0wr9gMovI=;
-        b=TI1SeYN4vqwHxlzmXW7qkWgfPEf8mWSDTu9woPOu44hnMrdsmALj4SNIUcgp7t35b2
-         FsTAAASCZEhoIe4gLg+bm/w3NM8b7unDd0lpXevntcwok0exWMrSsGDiSe+kEuj9M2ZM
-         1jbpVPtVu7fe/hbaJCIiUuH3MrQCEtRNW9CoWz30l0sesYAb+EpawVLRUaMXiL8OV0a5
-         4CWM2ZcCDR5F1Qnq7R0tT5bwVzNOFxxr6gOCuWgfLsogRvfshNHX4s5SdQzqQPaWFbwe
-         vxEo5/4UUkukeFqCDZniA8k/JDEYDUhwtz3HmjTEIQIiIiGt0fWNffeYyppFgGlSCSdN
-         GMqg==
-X-Gm-Message-State: AOAM533+FQS2Hay4Lx7NaJ/xmQWNCSpLkgA87qXKej4gvi2T7DYyySf6
-        Es/kWdZJ9r7MXH3rruB9HXD9E2Z4VOVStw==
-X-Google-Smtp-Source: ABdhPJyvhVqGOfV5uRqb8z7mZY7SdpvMDKbWrtNxGfRzie10U+0EXk5nqLEsRcmHe2i8BUxnvddegA==
-X-Received: by 2002:a63:d17:: with SMTP id c23mr6496803pgl.251.1616655504283;
-        Wed, 24 Mar 2021 23:58:24 -0700 (PDT)
-Received: from VM-0-3-centos.localdomain ([101.32.213.191])
-        by smtp.gmail.com with ESMTPSA id x19sm4470202pfc.152.2021.03.24.23.58.22
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 24 Mar 2021 23:58:24 -0700 (PDT)
-From:   brookxu <brookxu.cn@gmail.com>
-To:     paolo.valente@linaro.org, axboe@kernel.dk, tj@kernel.org
-Cc:     linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+        Thu, 25 Mar 2021 04:04:05 -0400
+Received: from localhost (kaktus.kanapka.ml [151.237.229.131])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by vulcan.natalenko.name (Postfix) with ESMTPSA id C647B9F8952;
+        Thu, 25 Mar 2021 09:03:49 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=natalenko.name;
+        s=dkim-20170712; t=1616659429;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=y+CNu6WHVjo3O2a9yzLiBEhOnf++0pR8/mDBhwQbchg=;
+        b=oETMIZRxJL1+sdBMVCGoT19fmKwxBB/1fZEbktxqZetMXHItWtsLzAvCAYznfF7DPgY6C3
+        urPOfIXHqMsld49GeLeU4QBD4ADD3mdmEylSggbiJUUCqK2qhv4nUDb2oolJqbHnPJnPRZ
+        w0t+hP2sb1Qww8Ls3e2wddlAM70vvn4=
+Date:   Thu, 25 Mar 2021 09:03:49 +0100
+From:   Oleksandr Natalenko <oleksandr@natalenko.name>
+To:     Paolo Valente <paolo.valente@linaro.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v3 13/14] bfq: remove unnecessary initialization logic
-Date:   Thu, 25 Mar 2021 14:57:57 +0800
-Message-Id: <e26a3b14976a833e1350799f84f49c10a50e3705.1616649216.git.brookxu@tencent.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <cover.1616649216.git.brookxu@tencent.com>
-References: <cover.1616649216.git.brookxu@tencent.com>
-In-Reply-To: <cover.1616649216.git.brookxu@tencent.com>
-References: <cover.1616649216.git.brookxu@tencent.com>
+Subject: Re: [PATCH BUGFIX/IMPROVEMENT V2 0/6] revised version of third and
+ last batch of patches
+Message-ID: <20210325080349.3sism2hvkoboartp@spock.localdomain>
+References: <20210304174627.161-1-paolo.valente@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210304174627.161-1-paolo.valente@linaro.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Chunguang Xu <brookxu@tencent.com>
+Hello.
 
-Since we will initialize sched_data.service_tree[] in
-bfq_init_root_group(), bfq_create_group_hierarchy() can
-ignore this part of the initialization, which can avoid
-repeated initialization.
+On Thu, Mar 04, 2021 at 06:46:21PM +0100, Paolo Valente wrote:
+> Hi,
+> this is the V2 for the third and last batches of patches that I
+> proposed recently [1].
+> 
+> I've tried to address all issues raised in [1].
+> 
+> In more detail, main changes for V1 are:
+> 1. I've improved code as requested in "block, bfq: merge bursts of
+> newly-created queues"
+> 2. I've improved comments as requested in "block, bfq: put reqs of
+> waker and woken in dispatch list"
+> 
+> Thanks,
+> Paolo
+> 
+> [1] https://www.spinics.net/lists/linux-block/msg64333.html
+> 
+> Paolo Valente (6):
+>   block, bfq: always inject I/O of queues blocked by wakers
+>   block, bfq: put reqs of waker and woken in dispatch list
+>   block, bfq: make shared queues inherit wakers
+>   block, bfq: fix weight-raising resume with !low_latency
+>   block, bfq: keep shared queues out of the waker mechanism
+>   block, bfq: merge bursts of newly-created queues
+> 
+>  block/bfq-cgroup.c  |   2 +
+>  block/bfq-iosched.c | 399 +++++++++++++++++++++++++++++++++++++++++---
+>  block/bfq-iosched.h |  15 ++
+>  block/bfq-wf2q.c    |   8 +
+>  4 files changed, 402 insertions(+), 22 deletions(-)
+> 
+> --
+> 2.20.1
 
-Signed-off-by: Chunguang Xu <brookxu@tencent.com>
----
- block/bfq-cgroup.c | 4 ----
- 1 file changed, 4 deletions(-)
+I'm running the kernel with this submission applied on multiple machines
+for 3 weeks now and haven't encountered any visible issues.
 
-diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-index ab4bc41..05054e1 100644
---- a/block/bfq-cgroup.c
-+++ b/block/bfq-cgroup.c
-@@ -1514,15 +1514,11 @@ void bfqg_and_blkg_put(struct bfq_group *bfqg) {}
- struct bfq_group *bfq_create_group_hierarchy(struct bfq_data *bfqd, int node)
- {
- 	struct bfq_group *bfqg;
--	int i;
- 
- 	bfqg = kmalloc_node(sizeof(*bfqg), GFP_KERNEL | __GFP_ZERO, node);
- 	if (!bfqg)
- 		return NULL;
- 
--	for (i = 0; i < BFQ_IOPRIO_CLASSES; i++)
--		bfqg->sched_data.service_tree[i] = BFQ_SERVICE_TREE_INIT;
--
- 	return bfqg;
- }
- #endif	/* CONFIG_BFQ_GROUP_IOSCHED */
+Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
+
+Thanks.
+
 -- 
-1.8.3.1
-
+  Oleksandr Natalenko (post-factum)
