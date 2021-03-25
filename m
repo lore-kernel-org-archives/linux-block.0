@@ -2,168 +2,285 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86DCBC433DB
-	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 02:10:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4B4AC433DB
+	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 02:35:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 55BE261A21
-	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 02:10:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A82DF61A1A
+	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 02:35:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231757AbhCYCKJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Mar 2021 22:10:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60762 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234257AbhCYCJz (ORCPT
+        id S232725AbhCYCee (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Mar 2021 22:34:34 -0400
+Received: from out4436.biz.mail.alibaba.com ([47.88.44.36]:17325 "EHLO
+        out4436.biz.mail.alibaba.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232495AbhCYCeP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Mar 2021 22:09:55 -0400
-Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA793C06174A
-        for <linux-block@vger.kernel.org>; Wed, 24 Mar 2021 19:09:55 -0700 (PDT)
-Received: by mail-pg1-x529.google.com with SMTP id l1so270508pgb.5
-        for <linux-block@vger.kernel.org>; Wed, 24 Mar 2021 19:09:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to
-         :user-agent;
-        bh=GnPkrUWVHgQAkE7X9Q+gS1Rm0hw8IZfxa51KQLQaH2w=;
-        b=APFhGsnvbabBnyPJKGOX/84vrQW9EE5xS06+iv5qV4t5nvQXqDViUjmAOjrVJiQj2J
-         Cwk+AkMAfN0PR8vAIY4ARrwsy01cSc8001Z/eiEnv4CMGx1Sle1hJjyRaI5MwvmcdUV+
-         jwb7leeD0C8/Dncxzlsp3Qip4Xy8WCg9HhV5axzjsXIFNNB4xxz0AYT4sI6EUrK95bKy
-         FUnkX3OT5sJJBF0Uaz23lAJeBGJ1hD5XM+icNGNHkdOR8RHuOtovNLF3Veas4WXp2QNv
-         HMQTB85iKg+HFOq4gS2TQCnMWMAG9ebH2mUWblX3DMNFJdLP/T/HOxkoReTfwUpKQVH8
-         /97w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=GnPkrUWVHgQAkE7X9Q+gS1Rm0hw8IZfxa51KQLQaH2w=;
-        b=fYNvKVJRWHt+ELazMgz95cmQ9w1qyFAZsfFNRfF41Uqr6TM4PZhLt3MCVdK9anHday
-         +kzaR3l4jJZjWtzZSoLEopRqbA03x2WoEpubH1sCFSovyZyBXe3SvwhuRc0XnrdXLHTg
-         tNPsMuMKNZw3dfhFvW3PvXU2SS0mIjcqAFRLj1XVNMP+m1CIzX+jb9JXdj1aM7cDrNzw
-         r2sCx8PsaAWFpGVfYRIBOgN3GTSvMS+EqDvAidOarX0CFrtI7D6GVnBxU5DufxQBQgqR
-         HXWuVVV6ZEtiyz8kOUsjJEG51cwbQJKTgrqL1zWJrQCyWk4PIQH5mwA3cRiA/GvHYlEq
-         pP9Q==
-X-Gm-Message-State: AOAM533gw0C/iV4+cPSRZiPnHNQiL347ktpoUGidT4DyH4TGdU3GrUNl
-        jPMrnx0TmFX4mb0DLwF5oRTN7jp+/gTpCw==
-X-Google-Smtp-Source: ABdhPJxU2KB058XE51CYUcSMipnPvf0Qk5VzTZS8EsUwLZjX4qc3Y6n8xujrzD2lZFufpuw3Huu37w==
-X-Received: by 2002:a17:902:d4cc:b029:e4:9cd9:f189 with SMTP id o12-20020a170902d4ccb02900e49cd9f189mr6587626plg.53.1616638194758;
-        Wed, 24 Mar 2021 19:09:54 -0700 (PDT)
-Received: from localhost ([58.127.46.74])
-        by smtp.gmail.com with ESMTPSA id i8sm3706537pjl.32.2021.03.24.19.09.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Mar 2021 19:09:54 -0700 (PDT)
-Date:   Thu, 25 Mar 2021 11:09:51 +0900
-From:   Minwoo Im <minwoo.im.dev@gmail.com>
-To:     Niklas Cassel <Niklas.Cassel@wdc.com>
-Cc:     "javier@javigon.com" <javier@javigon.com>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "sagi@grimberg.me" <sagi@grimberg.me>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "kbusch@kernel.org" <kbusch@kernel.org>,
-        Javier =?utf-8?B?R29uesOhbGV6?= <javier.gonz@samsung.com>,
-        "hch@lst.de" <hch@lst.de>
-Subject: Re: [PATCH V6 1/2] nvme: enable char device per namespace
-Message-ID: <20210325020951.GA2105@localhost>
-References: <20210301192452.16770-1-javier.gonz@samsung.com>
- <20210301192452.16770-2-javier.gonz@samsung.com>
- <YFswq8pgzg9y00GO@x1-carbon.lan>
+        Wed, 24 Mar 2021 22:34:15 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04423;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=5;SR=0;TI=SMTPD_---0UTDnjuT_1616639642;
+Received: from admindeMacBook-Pro-2.local(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0UTDnjuT_1616639642)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Thu, 25 Mar 2021 10:34:03 +0800
+Subject: Re: [PATCH V3 04/13] block: create io poll context for submission and
+ poll task
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Mike Snitzer <snitzer@redhat.com>,
+        dm-devel@redhat.com
+References: <20210324121927.362525-1-ming.lei@redhat.com>
+ <20210324121927.362525-5-ming.lei@redhat.com>
+From:   JeffleXu <jefflexu@linux.alibaba.com>
+Message-ID: <0bc4e13a-53ba-5f29-5a6d-5cda1aea098a@linux.alibaba.com>
+Date:   Thu, 25 Mar 2021 10:34:02 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.7.1
 MIME-Version: 1.0
+In-Reply-To: <20210324121927.362525-5-ming.lei@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <YFswq8pgzg9y00GO@x1-carbon.lan>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 21-03-24 12:29:32, Niklas Cassel wrote:
-> On Mon, Mar 01, 2021 at 08:24:51PM +0100, javier@javigon.com wrote:
-> > From: Javier González <javier.gonz@samsung.com>
-> > 
-> > Create a char device per NVMe namespace. This char device is always
-> > initialized, independently of whether the features implemented by the
-> > device are supported by the kernel. User-space can therefore always
-> > issue IOCTLs to the NVMe driver using the char device.
-> > 
-> > The char device is presented as /dev/nvme-generic-XcYnZ. This naming
-> > scheme follows the convention of the hidden device (nvmeXcYnZ). Support
-> > for multipath will follow.
-> > 
-> 
-> Hello all,
-> 
-> Looking at the discussion that led up to the current design:
-> https://lore.kernel.org/linux-block/20201102185851.GA21349@lst.de/
-> 
-> Keith initially suggested:
-> 
-> a) Set up the existing controller character device with a generic
->    disk-less request_queue to the IO queues accepting IO commands to
->    arbitrary NSIDs.
-> 
-> However Christoph replied:
-> 
-> The problem with a) is that it can't be used to give users or groups
-> access to just one namespaces, so it causes a real access control
-> nightmare.
-> 
-> c) Each namespace gets its own character device, period.
 
-Thanks for summarizing this up!
 
-> However, testing this patch series out:
+On 3/24/21 8:19 PM, Ming Lei wrote:
+> Create per-task io poll context for both IO submission and poll task
+> if the queue is bio based and supports polling.
 > 
-> crw------- 1 root root 249,   0 Mar 24 11:32 /dev/nvme-generic-0c0n1
-> crw------- 1 root root 249,   1 Mar 24 11:32 /dev/nvme-generic-0c0n2
-> crw------- 1 root root 250,   0 Mar 24 11:32 /dev/nvme0
-> brw-rw---- 1 root disk 259,   1 Mar 24 11:32 /dev/nvme0n2
+> This io polling context includes two queues:
 > 
-> NSID1 has been rejected (because of ZNS ZOC, which kernel does not support).
+> 1) submission queue(sq) for storing HIPRI bio, written by submission task
+>    and read by poll task.
+> 2) polling queue(pq) for holding data moved from sq, only used in poll
+>    context for running bio polling.
 > 
-> However, if I use the new char device for NSID1, but specify NSID2 to nvme-cli:
+> Following patches will support bio based io polling.
 > 
-> sudo nvme write-zeroes -s 0 -c 0 --namespace-id=2 /dev/nvme-generic-0c0n1
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  block/blk-core.c          | 71 ++++++++++++++++++++++++++++++++-------
+>  block/blk-ioc.c           |  1 +
+>  block/blk-mq.c            | 14 ++++++++
+>  block/blk.h               | 45 +++++++++++++++++++++++++
+>  include/linux/iocontext.h |  2 ++
+>  5 files changed, 121 insertions(+), 12 deletions(-)
 > 
-> I was still allowed to write to NSID2:
-> 
-> sudo nvme zns report-zones -d 1 /dev/nvme0n2
-> SLBA: 0x0        WP: 0x1        Cap: 0x3e000    State: IMP_OPENED   Type: SEQWRITE_REQ   Attrs: 0x0
-> 
-> Should this really be allowed?
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index d58f8a0c80de..4671bbf31fd3 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -792,16 +792,59 @@ static inline blk_status_t blk_check_zone_append(struct request_queue *q,
+>  	return BLK_STS_OK;
+>  }
+>  
+> -static inline void blk_create_io_context(struct request_queue *q)
+> +static inline struct blk_bio_poll_ctx *blk_get_bio_poll_ctx(void)
+>  {
+> -	/*
+> -	 * Various block parts want %current->io_context, so allocate it up
+> -	 * front rather than dealing with lots of pain to allocate it only
+> -	 * where needed. This may fail and the block layer knows how to live
+> -	 * with it.
+> -	 */
+> -	if (unlikely(!current->io_context))
+> -		create_task_io_context(current, GFP_ATOMIC, q->node);
+> +	struct io_context *ioc = current->io_context;
+> +
+> +	return ioc ? ioc->data : NULL;
+> +}
+> +
+> +static inline unsigned int bio_grp_list_size(unsigned int nr_grps)
+> +{
+> +	return sizeof(struct bio_grp_list) + nr_grps *
+> +		sizeof(struct bio_grp_list_data);
+> +}
+> +
+> +static void bio_poll_ctx_init(struct blk_bio_poll_ctx *pc)
+> +{
+> +	pc->sq = (void *)pc + sizeof(*pc);
+> +	pc->sq->max_nr_grps = BLK_BIO_POLL_SQ_SZ;
+> +
+> +	pc->pq = (void *)pc->sq + bio_grp_list_size(BLK_BIO_POLL_SQ_SZ);
+> +	pc->pq->max_nr_grps = BLK_BIO_POLL_PQ_SZ;
+> +
+> +	spin_lock_init(&pc->sq_lock);
+> +	spin_lock_init(&pc->pq_lock);
+> +}
+> +
+> +void bio_poll_ctx_alloc(struct io_context *ioc)
+> +{
+> +	struct blk_bio_poll_ctx *pc;
+> +	unsigned int size = sizeof(*pc) +
+> +		bio_grp_list_size(BLK_BIO_POLL_SQ_SZ) +
+> +		bio_grp_list_size(BLK_BIO_POLL_PQ_SZ);
+> +
+> +	pc = kzalloc(GFP_ATOMIC, size);
+> +	if (pc) {
+> +		bio_poll_ctx_init(pc);
+> +		if (cmpxchg(&ioc->data, NULL, (void *)pc))
+> +			kfree(pc);
+> +	}
 
-I think this should not be allowed at all.  Thanks for the testing!
+Why don't put these in blk-ioc.c?
 
+
+> +}
+> +
+> +static inline bool blk_queue_support_bio_poll(struct request_queue *q)
+> +{
+> +	return !queue_is_mq(q) && blk_queue_poll(q);
+> +}
+> +
+> +static inline void blk_bio_poll_preprocess(struct request_queue *q,
+> +		struct bio *bio)
+> +{
+> +	if (!(bio->bi_opf & REQ_HIPRI))
+> +		return;
+> +
+> +	if (!blk_queue_poll(q) || (!queue_is_mq(q) && !blk_get_bio_poll_ctx()))
+> +		bio->bi_opf &= ~REQ_HIPRI;
+>  }
+>  
+>  static noinline_for_stack bool submit_bio_checks(struct bio *bio)
+> @@ -848,10 +891,14 @@ static noinline_for_stack bool submit_bio_checks(struct bio *bio)
+>  		}
+>  	}
+>  
+> -	blk_create_io_context(q);
+> +	/*
+> +	 * Create per-task io poll ctx if bio polling supported and HIPRI
+> +	 * set.
+> +	 */
+> +	blk_create_io_context(q, blk_queue_support_bio_poll(q) &&
+> +			(bio->bi_opf & REQ_HIPRI));
+>  
+> -	if (!blk_queue_poll(q))
+> -		bio->bi_opf &= ~REQ_HIPRI;
+> +	blk_bio_poll_preprocess(q, bio);
+>  
+>  	switch (bio_op(bio)) {
+>  	case REQ_OP_DISCARD:
+> diff --git a/block/blk-ioc.c b/block/blk-ioc.c
+> index b0cde18c4b8c..5574c398eff6 100644
+> --- a/block/blk-ioc.c
+> +++ b/block/blk-ioc.c
+> @@ -19,6 +19,7 @@ static struct kmem_cache *iocontext_cachep;
+>  
+>  static inline void free_io_context(struct io_context *ioc)
+>  {
+> +	kfree(ioc->data);
+>  	kmem_cache_free(iocontext_cachep, ioc);
+>  }
+>  
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 63c81df3b8b5..c832faa52ca0 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -3852,6 +3852,17 @@ static bool blk_mq_poll_hybrid(struct request_queue *q,
+>  	return blk_mq_poll_hybrid_sleep(q, rq);
+>  }
+>  
+> +static int blk_bio_poll(struct request_queue *q, blk_qc_t cookie, bool spin)
+> +{
+> +	/*
+> +	 * Create poll queue for storing poll bio and its cookie from
+> +	 * submission queue
+> +	 */
+> +	blk_create_io_context(q, true);
+> +
+> +	return 0;
+> +}
+> +
+>  /**
+>   * blk_poll - poll for IO completions
+>   * @q:  the queue
+> @@ -3875,6 +3886,9 @@ int blk_poll(struct request_queue *q, blk_qc_t cookie, bool spin)
+>  	if (current->plug)
+>  		blk_flush_plug_list(current->plug, false);
+>  
+> +	if (!queue_is_mq(q))
+> +		return blk_bio_poll(q, cookie, spin);
+> +
+>  	hctx = q->queue_hw_ctx[blk_qc_t_to_queue_num(cookie)];
+>  
+>  	/*
+> diff --git a/block/blk.h b/block/blk.h
+> index 3b53e44b967e..424949f2226d 100644
+> --- a/block/blk.h
+> +++ b/block/blk.h
+> @@ -357,4 +357,49 @@ int bio_add_hw_page(struct request_queue *q, struct bio *bio,
+>  		struct page *page, unsigned int len, unsigned int offset,
+>  		unsigned int max_sectors, bool *same_page);
+>  
+> +/* Grouping bios that share same data into one list */
+> +struct bio_grp_list_data {
+> +	void *grp_data;
+> +
+> +	/* all bios in this list share same 'grp_data' */
+> +	struct bio_list list;
+> +};
+> +
+> +struct bio_grp_list {
+> +	unsigned int max_nr_grps, nr_grps;
+> +	struct bio_grp_list_data head[0];
+> +};
+> +
+> +struct blk_bio_poll_ctx {
+> +	spinlock_t sq_lock;
+> +	struct bio_grp_list *sq;
+> +
+> +	spinlock_t pq_lock;
+> +	struct bio_grp_list *pq;
+> +};
+> +
+> +#define BLK_BIO_POLL_SQ_SZ		16U
+> +#define BLK_BIO_POLL_PQ_SZ		(BLK_BIO_POLL_SQ_SZ * 2)
+
+And these in iocontext.h?
+
+
+> +
+> +void bio_poll_ctx_alloc(struct io_context *ioc);
+> +
+> +static inline void blk_create_io_context(struct request_queue *q,
+> +		bool need_poll_ctx)
+> +{
+> +	struct io_context *ioc;
+> +
+> +	/*
+> +	 * Various block parts want %current->io_context, so allocate it up
+> +	 * front rather than dealing with lots of pain to allocate it only
+> +	 * where needed. This may fail and the block layer knows how to live
+> +	 * with it.
+> +	 */
+> +	if (unlikely(!current->io_context))
+> +		create_task_io_context(current, GFP_ATOMIC, q->node);
+> +
+> +	ioc = current->io_context;
+> +	if (need_poll_ctx && unlikely(ioc && !ioc->data))
+> +		bio_poll_ctx_alloc(ioc);
+> +}
+> +
+>  #endif /* BLK_INTERNAL_H */
+> diff --git a/include/linux/iocontext.h b/include/linux/iocontext.h
+> index 0a9dc40b7be8..f9a467571356 100644
+> --- a/include/linux/iocontext.h
+> +++ b/include/linux/iocontext.h
+> @@ -110,6 +110,8 @@ struct io_context {
+>  	struct io_cq __rcu	*icq_hint;
+>  	struct hlist_head	icq_list;
+>  
+> +	void			*data;
+> +
+>  	struct work_struct release_work;
+>  };
+>  
 > 
-> I was under the impression that Christoph's argument for implementing per
-> namespace char devices, was that you should be able to do access control.
-> Doesn't that mean that for the new char devices, we need to reject ioctls
-> that specify a nvme_passthru_cmd.nsid != the NSID that the char device
-> represents?
-> 
-> 
-> Although, this is not really something new, as we already have the same
-> behavior when it comes ioctls and the block devices. Perhaps we want to
-> add the same verification there?
 
-I think there should be verifications.
-
-> 
-> Regardless if we want to add a verification for block devices or not,
-> it just seemed to me that the whole argument for introducing new char
-> devices was to allow access control per namespace, which doesn't seem
-> to have been taken into account, but perhaps I'm missing something.
-
-Any other points that you think it's not been taken account?  I think it
-should map to previous blkdev operations, but with some verfications
-there.  It would be great if you can share any other points supposed to
-be supported here :)
-
-> Kind regards,
-> Niklas
+-- 
+Thanks,
+Jeffle
