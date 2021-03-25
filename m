@@ -4,69 +4,67 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8D99C433E6
-	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 15:31:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8389C433F4
+	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 15:31:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C7BC161A28
-	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 15:31:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 96AD861A42
+	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 15:31:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230182AbhCYPad (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Mar 2021 11:30:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36290 "EHLO
+        id S231177AbhCYPah (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Mar 2021 11:30:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36330 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230394AbhCYP37 (ORCPT
+        with ESMTP id S231178AbhCYPaF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Mar 2021 11:29:59 -0400
-Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 908F5C06174A
-        for <linux-block@vger.kernel.org>; Thu, 25 Mar 2021 08:29:58 -0700 (PDT)
-Received: by mail-ej1-x629.google.com with SMTP id u9so3592408ejj.7
-        for <linux-block@vger.kernel.org>; Thu, 25 Mar 2021 08:29:58 -0700 (PDT)
+        Thu, 25 Mar 2021 11:30:05 -0400
+Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E396C06174A
+        for <linux-block@vger.kernel.org>; Thu, 25 Mar 2021 08:30:05 -0700 (PDT)
+Received: by mail-ej1-x62c.google.com with SMTP id kt15so3555912ejb.12
+        for <linux-block@vger.kernel.org>; Thu, 25 Mar 2021 08:30:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=ionos.com; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=EdgX4znbSbRT87gcC/hvyjTwqemHSW7vhlSYDeMUDTc=;
-        b=IFLk+3wFj3mqBv1fPVZiujR90GnqvE1imlSz1F+fkiYs9DjomyVHuDj63XRPRjSPfO
-         5MvWaoL5sydCM9OW3o92pR1GPMzDYvCyIebvdKLP5XhG2dJjuZpf0H23xEYTvlGNUrLs
-         BNZaY9SlcYlw/hL+wMpWzh53s5skpKVQaTyZSlrORaznB7BnNokQNxXmTjp12TIHUV53
-         SahzKUQ8EzbUTeuNyc0AF89RZ60M6FtPwj5DZMyZlnN6yMpMojyGSS431pRrtgZ3UwFq
-         rXUwDwP0RutPgTPDks8Pr7ZvStsfwMNjER2ltpILzHfRjzNAbyW30wQa++4EuWndFrsA
-         InHA==
+        bh=0w1fRI368Vhqwr68IvgBQDB9m3lTg5l6TH+c+9pCq5Y=;
+        b=X26JgmxU0/mTKLWHlHEKbRxMF7YkaLg89ogJXlvDRC/Mn5PjWVy/f4uA/RsXU2pkNb
+         DJShuGxGj7FFkiqz+AAYAZMV1W2d3FR+oO1NjC7r2M7XkjoJ8iwbqUDIPmJH4maULt/J
+         FWuzpCKMObi4wNb2YMEb4aVLBL7/VHOQXsOfXfBfRL1nt2yFuQ1i7lQy90m/v31RQt00
+         D2bDJj5IPkwqW9BweSZ9nVXhrvfBdsRUmXfQqwpjf5yezCqK+KCihP2m0w3gj9nMGKgB
+         +V9zTE7UVEmjMA91oUKOv+/dhlI2SP3yjERGegMpa36Mjhc9aIEygAOSMs4pyFL1Dq9Q
+         r6vw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=EdgX4znbSbRT87gcC/hvyjTwqemHSW7vhlSYDeMUDTc=;
-        b=YlEl4gX+kQ9lShFbPNUc97u/UsMhb0aIwaPAFjEdaJc+PNsP0rlfP2YsLQNBRQsnWV
-         j4IElj621Q/z1xpBrGY8ALmT1CGYsGyuszHDmNaILSJ4+lriBdt7vNb6eSg/9iljHeyX
-         xWzcbUBy+6DJ3zm5fL+TajRLTZLbczJpkRKFx2GMIhW3Y/qdn/r2pxRBGrwasCNPUVqy
-         4wR63BQ1zxiHWgsdQ774wJWQIyGntDpNuCI2jBSCJF3tUBKyaEx9UePVyzzS0W0HeKk6
-         GDZ1UOkVojnPsZdwqGL8wY19mCvvGfNa70ISXwvhche1mdSURCMvu1qHG9tO7anMdkB8
-         tEfA==
-X-Gm-Message-State: AOAM5328SRl290Y1JUPP7WzWWtOHEyQUPsIWVSfxaMaQxXYzKACxPgn3
-        LSPZ7zQgF4FwCX41JpKp8XQHmJVNZ9jirQ==
-X-Google-Smtp-Source: ABdhPJxc4yV+tJyK8r+w6lFIdhu2U1nYXCzCqkI/QJoCd64OjROObhMmc/TPrMb/k8TIJdeCWQblYw==
-X-Received: by 2002:a17:907:8323:: with SMTP id mq35mr186720ejc.109.1616686197219;
-        Thu, 25 Mar 2021 08:29:57 -0700 (PDT)
+        bh=0w1fRI368Vhqwr68IvgBQDB9m3lTg5l6TH+c+9pCq5Y=;
+        b=kaDm407MEAhDeHq1YB79Ok27QXU4YDNqwCx/8gd5OEFoYrMk8K2NVAoZlwk+Vtp+AY
+         AUNtQ2mHoDrUc/F6pmwy/tI7HjvnbreWKWHDHidVDEPZFvStg/nNqdNHMhsvZv8bGgqC
+         Y3kwRnzrlCKVmxRkvRfQkumps3Flt1M/vmSX34KgX9owR8Ty9WlsOfnaNRsxE4h8s9xI
+         fSfHC0cB3IYdLK5pz8erKLuJLgsyqlTZxYC83R1IjfCN9xVG811q5hWflFCdvCbQDq64
+         1/7hQzk/L8J1O+GxVhlMacMYszAwnDCulgG7G1/v/ST/vqLndOdLAoanPFs/LwuipgVh
+         TZNg==
+X-Gm-Message-State: AOAM533o5ZzOGwFvBFQl88pmqABTRahMD2wCwCDUkSPZ4Tq+JY1+Dcj3
+        AXY4vcwp7eCRu5E1MfZ21Ei8fDB5m2vmtkaA
+X-Google-Smtp-Source: ABdhPJwIteApUoE0ElIlRWxnyKYviyGxpNVqKdiiwyEiqld/BjL3cyg2t0HJNVYLRgAPIF2l3VwOPw==
+X-Received: by 2002:a17:907:3d87:: with SMTP id he7mr3159446ejc.26.1616686203921;
+        Thu, 25 Mar 2021 08:30:03 -0700 (PDT)
 Received: from gkim-laptop.fkb.profitbricks.net (ip5f5aeee5.dynamic.kabel-deutschland.de. [95.90.238.229])
-        by smtp.googlemail.com with ESMTPSA id b18sm2574837ejb.77.2021.03.25.08.29.56
+        by smtp.googlemail.com with ESMTPSA id b18sm2574837ejb.77.2021.03.25.08.30.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Mar 2021 08:29:57 -0700 (PDT)
+        Thu, 25 Mar 2021 08:30:03 -0700 (PDT)
 From:   Gioh Kim <gi-oh.kim@ionos.com>
 To:     linux-block@vger.kernel.org
 Cc:     axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
         bvanassche@acm.org, haris.iqbal@ionos.com, jinpu.wang@ionos.com,
-        Guoqing Jiang <guoqing.jiang@gmx.com>,
-        Danil Kipnis <danil.kipnis@cloud.ionos.com>,
         Gioh Kim <gi-oh.kim@cloud.ionos.com>,
-        Jack Wang <jinpu.wang@cloud.ionos.com>
-Subject: [PATCH for-rc 08/24] block/rnbd-clt: Remove some arguments from insert_dev_if_not_exists_devpath
-Date:   Thu, 25 Mar 2021 16:28:55 +0100
-Message-Id: <20210325152911.1213627-9-gi-oh.kim@ionos.com>
+        Gioh Kim <gi-oh.kim@ionos.com>
+Subject: [PATCH for-rc 17/24] block/rnbd-clt: Fix missing a memory free when unloading the module
+Date:   Thu, 25 Mar 2021 16:29:04 +0100
+Message-Id: <20210325152911.1213627-18-gi-oh.kim@ionos.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210325152911.1213627-1-gi-oh.kim@ionos.com>
 References: <20210325152911.1213627-1-gi-oh.kim@ionos.com>
@@ -76,49 +74,53 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Guoqing Jiang <guoqing.jiang@gmx.com>
+From: Gioh Kim <gi-oh.kim@cloud.ionos.com>
 
-Remove 'pathname' and 'sess' since we can dereference it from 'dev'.
+When unloading the rnbd-clt module, it does not free a memory
+including the filename of the symbolic link to /sys/block/rnbdX.
 
-Signed-off-by: Guoqing Jiang <guoqing.jiang@gmx.com>
-Reviewed-by: Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Signed-off-by: Gioh Kim <gi-oh.kim@cloud.ionos.com>
-Signed-off-by: Jack Wang <jinpu.wang@cloud.ionos.com>
+It is found by kmemleak as below.
+
+unreferenced object 0xffff9f1a83d3c740 (size 16):
+  comm "bash", pid 736, jiffies 4295179665 (age 9841.310s)
+  hex dump (first 16 bytes):
+    21 64 65 76 21 6e 75 6c 6c 62 30 40 62 6c 61 00  !dev!nullb0@bla.
+  backtrace:
+    [<0000000039f0c55e>] 0xffffffffc0456c24
+    [<000000001aab9513>] kernfs_fop_write+0xcf/0x1c0
+    [<00000000db5aa4b3>] vfs_write+0xdb/0x1d0
+    [<000000007a2e2207>] ksys_write+0x65/0xe0
+    [<00000000055e280a>] do_syscall_64+0x50/0x1b0
+    [<00000000c2b51831>] entry_SYSCALL_64_after_hwframe+0x49/0xbe
+
+Signed-off-by: Gioh Kim <gi-oh.kim@ionos.com>
+Signed-off-by: Jack Wang <jinpu.wang@ionos.com>
 ---
- drivers/block/rnbd/rnbd-clt.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ drivers/block/rnbd/rnbd-clt-sysfs.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.c
-index 8c9a02c8b8bd..c8de016553a9 100644
---- a/drivers/block/rnbd/rnbd-clt.c
-+++ b/drivers/block/rnbd/rnbd-clt.c
-@@ -1477,14 +1477,13 @@ static bool exists_devpath(const char *pathname, const char *sessname)
- 	return found;
+diff --git a/drivers/block/rnbd/rnbd-clt-sysfs.c b/drivers/block/rnbd/rnbd-clt-sysfs.c
+index 2452eb67547c..885074f2f734 100644
+--- a/drivers/block/rnbd/rnbd-clt-sysfs.c
++++ b/drivers/block/rnbd/rnbd-clt-sysfs.c
+@@ -432,10 +432,14 @@ void rnbd_clt_remove_dev_symlink(struct rnbd_clt_dev *dev)
+ 	 * i.e. rnbd_clt_unmap_dev_store() leading to a sysfs warning because
+ 	 * of sysfs link already was removed already.
+ 	 */
+-	if (dev->blk_symlink_name && try_module_get(THIS_MODULE)) {
+-		sysfs_remove_link(rnbd_devs_kobj, dev->blk_symlink_name);
++	if (dev->blk_symlink_name) {
++		if (try_module_get(THIS_MODULE)) {
++			sysfs_remove_link(rnbd_devs_kobj, dev->blk_symlink_name);
++			module_put(THIS_MODULE);
++		}
++		/* It should be freed always. */
+ 		kfree(dev->blk_symlink_name);
+-		module_put(THIS_MODULE);
++		dev->blk_symlink_name = NULL;
+ 	}
  }
  
--static bool insert_dev_if_not_exists_devpath(const char *pathname,
--					     struct rnbd_clt_session *sess,
--					     struct rnbd_clt_dev *dev)
-+static bool insert_dev_if_not_exists_devpath(struct rnbd_clt_dev *dev)
- {
- 	bool found;
-+	struct rnbd_clt_session *sess = dev->sess;
- 
- 	mutex_lock(&sess_lock);
--	found = __exists_dev(pathname, sess->sessname);
-+	found = __exists_dev(dev->pathname, sess->sessname);
- 	if (!found) {
- 		mutex_lock(&sess->lock);
- 		list_add_tail(&dev->list, &sess->devs_list);
-@@ -1528,7 +1527,7 @@ struct rnbd_clt_dev *rnbd_clt_map_device(const char *sessname,
- 		ret = PTR_ERR(dev);
- 		goto put_sess;
- 	}
--	if (insert_dev_if_not_exists_devpath(pathname, sess, dev)) {
-+	if (insert_dev_if_not_exists_devpath(dev)) {
- 		ret = -EEXIST;
- 		goto put_dev;
- 	}
 -- 
 2.25.1
 
