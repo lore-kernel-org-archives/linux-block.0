@@ -2,186 +2,271 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F2BAC433C1
-	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 02:51:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 054BDC433E0
+	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 02:52:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CAA0A61A16
-	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 02:51:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D129E61A18
+	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 02:52:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229592AbhCYCun (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 24 Mar 2021 22:50:43 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:58564 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229548AbhCYCud (ORCPT
+        id S236324AbhCYCwV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 24 Mar 2021 22:52:21 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:22668 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233097AbhCYCwP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 24 Mar 2021 22:50:33 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 12P2nx1s013956;
-        Thu, 25 Mar 2021 02:50:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- from : message-id : references : date : in-reply-to : content-type :
- mime-version; s=corp-2020-01-29;
- bh=45oemXee9CG2oNhERRI01hqIv+k0PRtH49ViIeIG2q0=;
- b=hsk3wB8Kwq3qL9KdkCd3x/b2GcPBsvipb0swx6U0hSTyidrivJK5oPIVf8wmXDiV4Iwk
- 6BM/AB/s4X+mq9U7hWTHNJ68/baCHPWb/JVyJvZlf0PzPjUEKigTtBtw2VF6CjOGQ7To
- tKxBBFYIqbVWSeO93WWAk5JbAbCfQG+3ZZjNQfNpVLAhGjCk/wAi2ZQoh1AzX3djclKT
- pX3bNt9X7PySxXVR0guGV5rmIiWOdNeBzBLFOvDDmyPY/S0K+zgdLBqz/Yfcs/3WvGYl
- Qr4JutiUSq7DRJQvtdnS4tjEeBfFKDD+c0h+DysYa1+Ee0PphgmKzMnm51aBMTBgkNIT tw== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by aserp2120.oracle.com with ESMTP id 37d90mmssr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 25 Mar 2021 02:50:14 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 12P2ivgK181572;
-        Thu, 25 Mar 2021 02:50:13 GMT
-Received: from nam12-bn8-obe.outbound.protection.outlook.com (mail-bn8nam12lp2175.outbound.protection.outlook.com [104.47.55.175])
-        by userp3030.oracle.com with ESMTP id 37du00mcdc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 25 Mar 2021 02:50:13 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fmzlL2wonqPVigrdE/B6MWeWkVlODHFnWe+YWVE2Io7wgRpSyxTZ6CoWdgJ4z3juwJjHIT75swL/KZ1ZMZA3fqutKYSHqTwW5uUlhLKqLPEH6XoJpIsoUQD1wUjyZfnObO3yOJeGanbgeLpobmqr2Bbm+GVUIDyZyI7+i9BrBlHa4iTYqulRh3Y+N5WcVzrTNEGcJezUmJJk4bNWTXkm/+WJZsRC7xQ9q2PB722wy+cskkJZQNJ6rgsX4UyvFya0buHuQ1hiRXB+IzJ5zkMnHjxioGiBT+0mojMoWv7iDPOyMZmmEmuMhRpIXTjOEAP+ZG3SoLaruEEBYh/n1TyqAQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=45oemXee9CG2oNhERRI01hqIv+k0PRtH49ViIeIG2q0=;
- b=IvgktLp3UzZ84hwCFPxiYrycLFMU9I5M/whowd71jxWuFMbaZiMpJdZ833dv+kW0t3vv19DQzdwt6qy4xgpIx/XijZ6HfhPBEJ8a5SIotPLwcF5wkLq2S9LFemjb6OR1wYjhUhm4wLBDisnNwuC4SxtFodj54R+iTCNpYV/Edr9e5wLCzoi0TzApPN6ZGaf/53l2tZPJ8YeLHrid6YAVaV+oLt+IbxlpsZ9yuMR3fM5xDVw7jWMmXlnO0Xt3aVw2JJTbE5xG4sU1DaoaDd0sjW5QuLZ/TgrBnGkgS8N1mXrvjBPZgbeV3+feoRRh4FWpJUvZwXAlmZSyaoe6+hahdw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=45oemXee9CG2oNhERRI01hqIv+k0PRtH49ViIeIG2q0=;
- b=cyGhwut0Jo1O0ZYGLJH/mMbnSzsd2N5cWuQovZt6jiat1mjhOaILkfT2QgY0TZqKS8oPdQXYxBl+RV6mZ8kY6WUuCBAET3G2+blXcq225ei920PMXuoq7cF7NbKBleYmEeqZJY55bpJ9VZB6IdU5qsoTo/+6cRJ1gI3r86K2vyI=
-Authentication-Results: huawei.com; dkim=none (message not signed)
- header.d=none;huawei.com; dmarc=none action=none header.from=oracle.com;
-Received: from PH0PR10MB4759.namprd10.prod.outlook.com (2603:10b6:510:3d::12)
- by PH0PR10MB4728.namprd10.prod.outlook.com (2603:10b6:510:3b::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3977.25; Thu, 25 Mar
- 2021 02:50:11 +0000
-Received: from PH0PR10MB4759.namprd10.prod.outlook.com
- ([fe80::dc39:c9fa:7365:8c8e]) by PH0PR10MB4759.namprd10.prod.outlook.com
- ([fe80::dc39:c9fa:7365:8c8e%5]) with mapi id 15.20.3977.025; Thu, 25 Mar 2021
- 02:50:11 +0000
-To:     Jason Yan <yanaijie@huawei.com>
-Cc:     <axboe@kernel.dk>, <ming.lei@redhat.com>, <hch@lst.de>,
-        <keescook@chromium.org>, <kbusch@kernel.org>,
-        <linux-block@vger.kernel.org>, <martin.petersen@oracle.com>,
-        <jejb@linux.vnet.ibm.com>, <linux-scsi@vger.kernel.org>
-Subject: Re: [PATCH 1/3] scsi: check the whole result for reading write
- protect flag
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <yq1a6qskl3j.fsf@ca-mkp.ca.oracle.com>
-References: <20210319030128.1345061-1-yanaijie@huawei.com>
-        <20210319030128.1345061-2-yanaijie@huawei.com>
-Date:   Wed, 24 Mar 2021 22:50:07 -0400
-In-Reply-To: <20210319030128.1345061-2-yanaijie@huawei.com> (Jason Yan's
-        message of "Fri, 19 Mar 2021 11:01:26 +0800")
-Content-Type: text/plain
-X-Originating-IP: [138.3.200.58]
-X-ClientProxiedBy: MWHPR19CA0082.namprd19.prod.outlook.com
- (2603:10b6:320:1f::20) To PH0PR10MB4759.namprd10.prod.outlook.com
- (2603:10b6:510:3d::12)
+        Wed, 24 Mar 2021 22:52:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1616640734;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=PulifEm4i60Din01GnFvZDAAqxMie1o4qsJggnPOa34=;
+        b=bZsbhHHByisrYZZ3cJgjD13e5k2t91S6DxvZE4pOssgFjHW0+vh/NiZUhdipA0LOLrOjFy
+        Omq5bjvQ6NmQGtTlcuRRD1wIA7P0e2RhiKDgMmi/58iahbfhIIccedHexLj7A51a43rdWi
+        5NZml5eiKP5P7rSrgPGkwVZRCBbA6/c=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-138-Lj71Qq65PM2wCeXd_akqAg-1; Wed, 24 Mar 2021 22:52:12 -0400
+X-MC-Unique: Lj71Qq65PM2wCeXd_akqAg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 53F8B8189C6;
+        Thu, 25 Mar 2021 02:52:11 +0000 (UTC)
+Received: from T590 (ovpn-12-137.pek2.redhat.com [10.72.12.137])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5E80E63BA7;
+        Thu, 25 Mar 2021 02:51:57 +0000 (UTC)
+Date:   Thu, 25 Mar 2021 10:51:54 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     JeffleXu <jefflexu@linux.alibaba.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
+Subject: Re: [PATCH V3 04/13] block: create io poll context for submission
+ and poll task
+Message-ID: <YFv6yvj/mGytuFhC@T590>
+References: <20210324121927.362525-1-ming.lei@redhat.com>
+ <20210324121927.362525-5-ming.lei@redhat.com>
+ <0bc4e13a-53ba-5f29-5a6d-5cda1aea098a@linux.alibaba.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from ca-mkp.ca.oracle.com (138.3.200.58) by MWHPR19CA0082.namprd19.prod.outlook.com (2603:10b6:320:1f::20) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3977.29 via Frontend Transport; Thu, 25 Mar 2021 02:50:10 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 0e4038ab-8282-4c77-7eb6-08d8ef38b535
-X-MS-TrafficTypeDiagnostic: PH0PR10MB4728:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <PH0PR10MB472874FB5FB87E9B812F66FD8E629@PH0PR10MB4728.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:5516;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: vnJ09ZnFuGxwROumUF1ieLOXnPew/uZSH6pOUxb84lYWJGskig1UYglDmWNvlslhKHn9VgEWBtclZA/oI/jNQufOpmbQAxDlxUfZvNqdsNb2HxbWMJZkRc4xhUdEw4tKgYiuldP2UJZWbje44Kgk32IKl9oO57kJFB9KXGrF3w+tzDbmSabyp2o/Z0HLyGzdb6U5I23XUJsHq953fkOF8yQxJZIctICNcyhXgdZqUzcYaT9tE9hQIEbghOc5MbyCYSSwye31wMVuOWlsHxlfzNKIZ9mdqUdKAK0azSRUZIEAql1miJpL0rkuVtyn3+VrFZ0ZewN9XrCGOB5hLWV5oxLu+dbwFH03m2+DcLx3dex2LPW7b/0YI//MQdK9X0XnBb6m0j/4ssaSyhK2rn/MrIKhu3DjukKMofCgo9Ci8J83rzwLjWSQI81Ff3J3yeudIVnFBmi3UkI/8AsL+xVyiJzXIj3K3hOgg6r/AK2tWiKf7hzhYGh3cmq4Oe13+MayffFbxIIkIorquxYU4OrBPG0+xrr7yXU/jQDDLXUDUnOg203D3IOhRvN9Ciyn/y3xuo5iGeCJl4Vii5hfoc7eMihAs8rp/dav7/RgK5XpZMN3RgMRHytabFGD+dVDzXpKT42If2S+RRIkG6OSdnRn6200GM+tLV6zZ6PyYpGislQ=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR10MB4759.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(346002)(39860400002)(366004)(396003)(376002)(136003)(55016002)(52116002)(66556008)(956004)(6666004)(86362001)(66476007)(186003)(16526019)(66946007)(26005)(2906002)(36916002)(7696005)(38100700001)(54906003)(8936002)(6916009)(4326008)(4744005)(478600001)(8676002)(316002)(5660300002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?us-ascii?Q?/mCXjEe7YgYmYT7b5l0M8UxiJih/EVvDOtkZ2Klu0mj+Cet8nt/x6DbGUUJA?=
- =?us-ascii?Q?P8mFrm2GfYF9kT+tpdARbAUbUA/qgpmK8qhsuC7eRjmIE9VvwMqsj8gxQHOi?=
- =?us-ascii?Q?yEiD3sGzD2IYeTBi4McRIXgRTtCQTPciGwndbRrN3uCmEcrahGPUdCL++ev3?=
- =?us-ascii?Q?guPqdpNqDBwJqRzH4QfxSPwlFD4Pe/K16POHkCwpAnpWnaqLcy6/jL7exWTx?=
- =?us-ascii?Q?Q2Nv71DObww8r3GEa1KxRDj4BWY7HNWPeqGsgNl2EhQFKHQNtJSAbHhLxEes?=
- =?us-ascii?Q?MwntNKEIs/GgsqlSMLSdAyXn50Q1trtYeQFuVz+spNlkHvk72E7Qa5ZnvTQy?=
- =?us-ascii?Q?o/5c3QexjAXpcXJ900t/AYWP8aWITagzM4u+zJHhrJiv3YXz7uvgMgwUfj/Y?=
- =?us-ascii?Q?MSt7tOEyQpD6rXaK6HhkN4TUL2hrHrTonyVDZ0A1DQx9FhRIo2OfRR5rzZvq?=
- =?us-ascii?Q?yUIvLZza2loPbT/HSffOJkJzVfUwsP40nQA0qNQkdZI8Ovu2F6nHN1sDAVu4?=
- =?us-ascii?Q?jNXqVLGpy0vA3QamSJpMy/vL+Q8sTAOjtaDa3YCCWKxu5+UPnEQcgDbnMm1M?=
- =?us-ascii?Q?yBbY8oDppRa578XlisjiOYi4CMTB6u0jiQwgvdwarcnG2BKLnwuJY3mZRfcz?=
- =?us-ascii?Q?YeON7PykX5VV251ceDb0TGDPJY6zFtDaX3D0fCL9/pfyPITlNxXbaDAG/NP+?=
- =?us-ascii?Q?7NqUASzc8pT8Az3nZxhUb2UhgGvzXMU9kS5oNBuXJjUJXfaaopfBAzOluPet?=
- =?us-ascii?Q?B+LVSZ9JluAQJUN/JnHWkX7erAWAq5aJsHAt13IM/Q539dOnBb8JMjS0kJH+?=
- =?us-ascii?Q?IodKkWV+8yiT4DQ5HkuJJA4gvoA42Az760V0qtax0CLHeHzuaiaXmo4B6R2i?=
- =?us-ascii?Q?9nAtMk034H7Ol4ltIVPORKfQB49wy3qJivspXw9gQRE1OxvZRqQyCH6WsfOj?=
- =?us-ascii?Q?LUXr9IkvUQF3EfqBUo5OvG7cg1M4PT49Gi13vcorp5Kqua2DC3hE+6G60IMW?=
- =?us-ascii?Q?WK/z4cyX/IlsvuLmmrULmKlqlc7Cvy0geeBJZ4cum33OpYpaKGjMT/SGsXtW?=
- =?us-ascii?Q?NziTk2wJf5OIdbDuELDuRNRMqSFgRVY5yT89FSB3GKRQ7mb6D5+oC2NmER/b?=
- =?us-ascii?Q?J6Px7YTC6rGvFit+z2xTG7K4qs061fiXNO/yKeRFtO6lCxeIPuIljlJ5XFNX?=
- =?us-ascii?Q?DdmgSm4t9NKIn3TKKLdTLNuoYkYyzvp7Jnv9kjwAv0AQUxz9nWswhJb1MB3C?=
- =?us-ascii?Q?CkUFyiLs9GCBKR0k9gFM/Irutuc5gohZFJr0BuHJHYCbHX7sZpG3fV53OV2P?=
- =?us-ascii?Q?BwsDtbqMShvH8x6tRvIG7qzz?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0e4038ab-8282-4c77-7eb6-08d8ef38b535
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR10MB4759.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Mar 2021 02:50:11.2006
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: QF0RVYv9/+0alEpDCxEoF4K9OCgwBwAZHgXrz33tsG99Tk/i9Vlt90ooanxZLekfErwHZcp1kw9aJSndYLop38fnvrLYeJ7/YewwkGP748s=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR10MB4728
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9933 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 bulkscore=0 phishscore=0
- mlxlogscore=999 suspectscore=0 spamscore=0 malwarescore=0 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2103250020
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9933 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 malwarescore=0 mlxscore=0
- priorityscore=1501 bulkscore=0 impostorscore=0 lowpriorityscore=0
- phishscore=0 mlxlogscore=999 suspectscore=0 clxscore=1011 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2103250020
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0bc4e13a-53ba-5f29-5a6d-5cda1aea098a@linux.alibaba.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Thu, Mar 25, 2021 at 10:34:02AM +0800, JeffleXu wrote:
+> 
+> 
+> On 3/24/21 8:19 PM, Ming Lei wrote:
+> > Create per-task io poll context for both IO submission and poll task
+> > if the queue is bio based and supports polling.
+> > 
+> > This io polling context includes two queues:
+> > 
+> > 1) submission queue(sq) for storing HIPRI bio, written by submission task
+> >    and read by poll task.
+> > 2) polling queue(pq) for holding data moved from sq, only used in poll
+> >    context for running bio polling.
+> > 
+> > Following patches will support bio based io polling.
+> > 
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > ---
+> >  block/blk-core.c          | 71 ++++++++++++++++++++++++++++++++-------
+> >  block/blk-ioc.c           |  1 +
+> >  block/blk-mq.c            | 14 ++++++++
+> >  block/blk.h               | 45 +++++++++++++++++++++++++
+> >  include/linux/iocontext.h |  2 ++
+> >  5 files changed, 121 insertions(+), 12 deletions(-)
+> > 
+> > diff --git a/block/blk-core.c b/block/blk-core.c
+> > index d58f8a0c80de..4671bbf31fd3 100644
+> > --- a/block/blk-core.c
+> > +++ b/block/blk-core.c
+> > @@ -792,16 +792,59 @@ static inline blk_status_t blk_check_zone_append(struct request_queue *q,
+> >  	return BLK_STS_OK;
+> >  }
+> >  
+> > -static inline void blk_create_io_context(struct request_queue *q)
+> > +static inline struct blk_bio_poll_ctx *blk_get_bio_poll_ctx(void)
+> >  {
+> > -	/*
+> > -	 * Various block parts want %current->io_context, so allocate it up
+> > -	 * front rather than dealing with lots of pain to allocate it only
+> > -	 * where needed. This may fail and the block layer knows how to live
+> > -	 * with it.
+> > -	 */
+> > -	if (unlikely(!current->io_context))
+> > -		create_task_io_context(current, GFP_ATOMIC, q->node);
+> > +	struct io_context *ioc = current->io_context;
+> > +
+> > +	return ioc ? ioc->data : NULL;
+> > +}
+> > +
+> > +static inline unsigned int bio_grp_list_size(unsigned int nr_grps)
+> > +{
+> > +	return sizeof(struct bio_grp_list) + nr_grps *
+> > +		sizeof(struct bio_grp_list_data);
+> > +}
+> > +
+> > +static void bio_poll_ctx_init(struct blk_bio_poll_ctx *pc)
+> > +{
+> > +	pc->sq = (void *)pc + sizeof(*pc);
+> > +	pc->sq->max_nr_grps = BLK_BIO_POLL_SQ_SZ;
+> > +
+> > +	pc->pq = (void *)pc->sq + bio_grp_list_size(BLK_BIO_POLL_SQ_SZ);
+> > +	pc->pq->max_nr_grps = BLK_BIO_POLL_PQ_SZ;
+> > +
+> > +	spin_lock_init(&pc->sq_lock);
+> > +	spin_lock_init(&pc->pq_lock);
+> > +}
+> > +
+> > +void bio_poll_ctx_alloc(struct io_context *ioc)
+> > +{
+> > +	struct blk_bio_poll_ctx *pc;
+> > +	unsigned int size = sizeof(*pc) +
+> > +		bio_grp_list_size(BLK_BIO_POLL_SQ_SZ) +
+> > +		bio_grp_list_size(BLK_BIO_POLL_PQ_SZ);
+> > +
+> > +	pc = kzalloc(GFP_ATOMIC, size);
+> > +	if (pc) {
+> > +		bio_poll_ctx_init(pc);
+> > +		if (cmpxchg(&ioc->data, NULL, (void *)pc))
+> > +			kfree(pc);
+> > +	}
+> 
+> Why don't put these in blk-ioc.c?
 
-Hi Jason!
+It is for implementing bio polling, not necessary for moving it to
+blk-ioc.c.
 
-> @@ -55,6 +55,19 @@ static inline int scsi_status_is_good(int status)
->  		(status == SAM_STAT_COMMAND_TERMINATED));
->  }
->  
-> +/** scsi_result_is_good - check the result return.
-> + *
-> + * @result: the result passed up from the driver (including host and
-> + *          driver components)
-> + *
-> + * Drivers may only set other bytes but not status byte.
-> + * This checks both the status byte and other bytes.
-> + */
-> +static inline int scsi_result_is_good(int result)
-> +{
-> +	return scsi_status_is_good(result) && (result & ~0xff) == 0;
-> +}
-> +
->  
->  /*
->   * standard mode-select header prepended to all mode-select commands
+> 
+> 
+> > +}
+> > +
+> > +static inline bool blk_queue_support_bio_poll(struct request_queue *q)
+> > +{
+> > +	return !queue_is_mq(q) && blk_queue_poll(q);
+> > +}
+> > +
+> > +static inline void blk_bio_poll_preprocess(struct request_queue *q,
+> > +		struct bio *bio)
+> > +{
+> > +	if (!(bio->bi_opf & REQ_HIPRI))
+> > +		return;
+> > +
+> > +	if (!blk_queue_poll(q) || (!queue_is_mq(q) && !blk_get_bio_poll_ctx()))
+> > +		bio->bi_opf &= ~REQ_HIPRI;
+> >  }
+> >  
+> >  static noinline_for_stack bool submit_bio_checks(struct bio *bio)
+> > @@ -848,10 +891,14 @@ static noinline_for_stack bool submit_bio_checks(struct bio *bio)
+> >  		}
+> >  	}
+> >  
+> > -	blk_create_io_context(q);
+> > +	/*
+> > +	 * Create per-task io poll ctx if bio polling supported and HIPRI
+> > +	 * set.
+> > +	 */
+> > +	blk_create_io_context(q, blk_queue_support_bio_poll(q) &&
+> > +			(bio->bi_opf & REQ_HIPRI));
+> >  
+> > -	if (!blk_queue_poll(q))
+> > -		bio->bi_opf &= ~REQ_HIPRI;
+> > +	blk_bio_poll_preprocess(q, bio);
+> >  
+> >  	switch (bio_op(bio)) {
+> >  	case REQ_OP_DISCARD:
+> > diff --git a/block/blk-ioc.c b/block/blk-ioc.c
+> > index b0cde18c4b8c..5574c398eff6 100644
+> > --- a/block/blk-ioc.c
+> > +++ b/block/blk-ioc.c
+> > @@ -19,6 +19,7 @@ static struct kmem_cache *iocontext_cachep;
+> >  
+> >  static inline void free_io_context(struct io_context *ioc)
+> >  {
+> > +	kfree(ioc->data);
+> >  	kmem_cache_free(iocontext_cachep, ioc);
+> >  }
+> >  
+> > diff --git a/block/blk-mq.c b/block/blk-mq.c
+> > index 63c81df3b8b5..c832faa52ca0 100644
+> > --- a/block/blk-mq.c
+> > +++ b/block/blk-mq.c
+> > @@ -3852,6 +3852,17 @@ static bool blk_mq_poll_hybrid(struct request_queue *q,
+> >  	return blk_mq_poll_hybrid_sleep(q, rq);
+> >  }
+> >  
+> > +static int blk_bio_poll(struct request_queue *q, blk_qc_t cookie, bool spin)
+> > +{
+> > +	/*
+> > +	 * Create poll queue for storing poll bio and its cookie from
+> > +	 * submission queue
+> > +	 */
+> > +	blk_create_io_context(q, true);
+> > +
+> > +	return 0;
+> > +}
+> > +
+> >  /**
+> >   * blk_poll - poll for IO completions
+> >   * @q:  the queue
+> > @@ -3875,6 +3886,9 @@ int blk_poll(struct request_queue *q, blk_qc_t cookie, bool spin)
+> >  	if (current->plug)
+> >  		blk_flush_plug_list(current->plug, false);
+> >  
+> > +	if (!queue_is_mq(q))
+> > +		return blk_bio_poll(q, cookie, spin);
+> > +
+> >  	hctx = q->queue_hw_ctx[blk_qc_t_to_queue_num(cookie)];
+> >  
+> >  	/*
+> > diff --git a/block/blk.h b/block/blk.h
+> > index 3b53e44b967e..424949f2226d 100644
+> > --- a/block/blk.h
+> > +++ b/block/blk.h
+> > @@ -357,4 +357,49 @@ int bio_add_hw_page(struct request_queue *q, struct bio *bio,
+> >  		struct page *page, unsigned int len, unsigned int offset,
+> >  		unsigned int max_sectors, bool *same_page);
+> >  
+> > +/* Grouping bios that share same data into one list */
+> > +struct bio_grp_list_data {
+> > +	void *grp_data;
+> > +
+> > +	/* all bios in this list share same 'grp_data' */
+> > +	struct bio_list list;
+> > +};
+> > +
+> > +struct bio_grp_list {
+> > +	unsigned int max_nr_grps, nr_grps;
+> > +	struct bio_grp_list_data head[0];
+> > +};
+> > +
+> > +struct blk_bio_poll_ctx {
+> > +	spinlock_t sq_lock;
+> > +	struct bio_grp_list *sq;
+> > +
+> > +	spinlock_t pq_lock;
+> > +	struct bio_grp_list *pq;
+> > +};
+> > +
+> > +#define BLK_BIO_POLL_SQ_SZ		16U
+> > +#define BLK_BIO_POLL_PQ_SZ		(BLK_BIO_POLL_SQ_SZ * 2)
+> 
+> And these in iocontext.h?
 
-Instead of introducing a "don't be broken" variant of
-scsi_status_is_good(), I'd prefer you to fix the latter to do the right
-thing wrt. offline devices.
+All are internal definition for bio polling, not necessary to put
+it into one public header.
 
-There aren't a ton of scsi_result_is_good() call sites to check. And I
-suspect that most of them wouldn't actually consider the DID_NO_CONNECT
-scenario to be "good".
 
--- 
-Martin K. Petersen	Oracle Linux Engineering
+Thanks, 
+Ming
+
