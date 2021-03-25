@@ -2,70 +2,69 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83187C433E4
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95022C433E8
 	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 15:31:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6EC4661A2D
+	by mail.kernel.org (Postfix) with ESMTP id 7FBCB61A27
 	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 15:31:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230095AbhCYPab (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Mar 2021 11:30:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36266 "EHLO
+        id S229547AbhCYPac (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Mar 2021 11:30:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36270 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230377AbhCYP3z (ORCPT
+        with ESMTP id S230113AbhCYP34 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Mar 2021 11:29:55 -0400
-Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D430C06174A
-        for <linux-block@vger.kernel.org>; Thu, 25 Mar 2021 08:29:54 -0700 (PDT)
-Received: by mail-ej1-x629.google.com with SMTP id w3so3608072ejc.4
-        for <linux-block@vger.kernel.org>; Thu, 25 Mar 2021 08:29:54 -0700 (PDT)
+        Thu, 25 Mar 2021 11:29:56 -0400
+Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC8C9C061760
+        for <linux-block@vger.kernel.org>; Thu, 25 Mar 2021 08:29:55 -0700 (PDT)
+Received: by mail-ej1-x62d.google.com with SMTP id hq27so3577420ejc.9
+        for <linux-block@vger.kernel.org>; Thu, 25 Mar 2021 08:29:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=ionos.com; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=f2DinE7fVr8sYCc9qcGvfMu7UAlB1mcRN2WeeCFznEc=;
-        b=AmfMoC96ytS5s9Iis5USSyujC8SkZmpx3eToG6kkJEFhdM6lhhZ/ck8KVUjeVJacI8
-         5EgkTA5Tv9mVFtouZwbI1qIDUaJysIPN3/9xkQ3URJ57u21+JRA61D5KdiyRTAOT8cJY
-         h2Yh1dNnuEk6YE3jlt1lw5dAjR16SVo9MWoRCWu5e/p+LmrjI3Ku87mVJYX/J0zsJAXU
-         KRma5YcUU1M7yOzMrYvyNJ/Ki1J8lIfUqTqCubDq+wCK3p1QmMuSp1ZeHRD7yG1QA+uk
-         6oTM1QF0p81WCADBHD1qey61ksLdjZN6/PYCBv/JPw0LD1okPHtEuLxXmUaCY6JDm2pj
-         8WCw==
+        bh=Pr6f4CgNg/vO7af8Lnbc0By2HHIYCME5N2QMNGWGV18=;
+        b=UYolRj/kYl3LX/DN9bISl2/a5v4MxTJOyiSYSbboN0cvZLJC/cNiHHfMeJm4c+bSul
+         KCE4ibIYfGLFcrAa6S+et73RxFi9DN8Er1DsyQIFkAymFAk+tRnZW0VtGBhY+CZYR9Gb
+         6Ni9kkF3MEhMSvQc+NbwW//zoXHuqA4IT000rj15p4NPRd5IvX04mMmkwOGg6hNyPrPO
+         xPDMfYcdcCvpdnNPbbVD+eHImgih2aAyj40XadXQcQITT2J9rWwTtLJlrqXQ625/sf66
+         BCFCq23cApSRf/C1j+iHS3XmmIwfan1uvvUUZJeZqy7zPLOIasHFEfvLvxbYeWMR3BGV
+         o2lw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=f2DinE7fVr8sYCc9qcGvfMu7UAlB1mcRN2WeeCFznEc=;
-        b=JMGR6zqs37aZrP2hKIjsvk6jFo4g5pfHFTzOgigiSXt2MPE/S9+UIlILpPCw/lbFl5
-         jCgI70h7gE6Xk8p7UEMTZJvdPvabXVWANl4alb7EFMsQKqP10lO4ljtLjdeFYhM87yL5
-         o1MbIc8TieEEYQWOIrp/cJ9Bhj8dLFSxnWm7BDCCKm1n+jNcEeM+Bhw2BYLqETa55jz0
-         FTiQCBLXGVWcvica0/AOp2smM6sijz06XqmohH6afMBXkqbH6urqnPJBdBoFQN4dcidn
-         Yhs3UvvFCbxMv921K5y/79Hv6ziaft7Cdrj/GZRxGzLJdUmbEJbPIL9Zwh8ZIdWoYT2f
-         UeTA==
-X-Gm-Message-State: AOAM531EDUymjyG0oD/FhMNdXy3A3aDVMNkpeggA+ILonsLBuYREBy/f
-        sR7WqPxlBPmlAtZX+VONF0NI9tZUfqkqGQ==
-X-Google-Smtp-Source: ABdhPJz4nJWE+C0oKsPcTIIUUezeGO2k+dR0pvqnQeLh7ke1fVANsRIB1liiKgEeVJqu/qITMHX9Bg==
-X-Received: by 2002:a17:906:71c3:: with SMTP id i3mr10088587ejk.391.1616686192819;
-        Thu, 25 Mar 2021 08:29:52 -0700 (PDT)
+        bh=Pr6f4CgNg/vO7af8Lnbc0By2HHIYCME5N2QMNGWGV18=;
+        b=b8tdqq5kBkqlg/y/UzyfZbmcUAhomC5vu4NcZK/cLFrF65SMH2j+yNrYSea57LkFv0
+         2F3gtdEwnKHAclouy+UUHYyGVvwaDhKpS68DwrFK/PUMstpcyrOfrUdQ90RXWexItuFL
+         o6I2ZkD8BMmOMhIOvCiMs19s0XeK92uSBv7xDDLFrflIe1gS4Uim0OhUNbcyXpTpwpnb
+         FSgaY2O5MPOBAywJ5t4PmpqV87LwAen2YwDNU6PbZ5vxBhq+psb+blH5/u1ZaUHbOC3Z
+         crCb629EOiGw8bh8McPinrhInb6ZkSUDGzF8EjeNp3XrgGLyrf3HK9ufXfG0NktBqn9a
+         rghg==
+X-Gm-Message-State: AOAM532VRxqDxEvLxYDNEdPYlpx5wdv8nd4qfMZnLx4uq7KHfRoY/rj0
+        pTkg/7OUIL+dZ7tokv+FmcoAhAYRxyAGGw==
+X-Google-Smtp-Source: ABdhPJwSom8y+aaNb2TO3PEGXzJbH2UWwUjrtcmDsgZHXyH36grpTgJe2BtBGjlY50i5NtFifHijLA==
+X-Received: by 2002:a17:906:e84:: with SMTP id p4mr10003639ejf.248.1616686194507;
+        Thu, 25 Mar 2021 08:29:54 -0700 (PDT)
 Received: from gkim-laptop.fkb.profitbricks.net (ip5f5aeee5.dynamic.kabel-deutschland.de. [95.90.238.229])
-        by smtp.googlemail.com with ESMTPSA id b18sm2574837ejb.77.2021.03.25.08.29.52
+        by smtp.googlemail.com with ESMTPSA id b18sm2574837ejb.77.2021.03.25.08.29.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Mar 2021 08:29:52 -0700 (PDT)
+        Thu, 25 Mar 2021 08:29:54 -0700 (PDT)
 From:   Gioh Kim <gi-oh.kim@ionos.com>
 To:     linux-block@vger.kernel.org
 Cc:     axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
         bvanassche@acm.org, haris.iqbal@ionos.com, jinpu.wang@ionos.com,
         Gioh Kim <gi-oh.kim@cloud.ionos.com>,
         Jack Wang <jinpu.wang@cloud.ionos.com>
-Subject: [PATCH for-rc 03/24] block/rnbd: Enable the fault-injection
-Date:   Thu, 25 Mar 2021 16:28:50 +0100
-Message-Id: <20210325152911.1213627-4-gi-oh.kim@ionos.com>
+Subject: [PATCH for-rc 05/24] block/rnbd-clt: Inject some fault points
+Date:   Thu, 25 Mar 2021 16:28:52 +0100
+Message-Id: <20210325152911.1213627-6-gi-oh.kim@ionos.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210325152911.1213627-1-gi-oh.kim@ionos.com>
 References: <20210325152911.1213627-1-gi-oh.kim@ionos.com>
@@ -77,103 +76,175 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Gioh Kim <gi-oh.kim@cloud.ionos.com>
 
-This patch introduces functions to enable the fault-injection for RTRS.
-* rnbd_fault_inject_init/final: initialize the fault-injection
-and create a debugfs directory.
-* rnbd_fault_inject_add: create a debugfs entry to enable
-the fault-injection point.
+This patch injects two fault points:
+1. generate an IO error
+2. generate a unmap failure
 
 Signed-off-by: Gioh Kim <gi-oh.kim@cloud.ionos.com>
 Signed-off-by: Jack Wang <jinpu.wang@cloud.ionos.com>
 ---
- drivers/block/rnbd/rnbd-common.c | 44 ++++++++++++++++++++++++++++++++
- drivers/block/rnbd/rnbd-proto.h  | 14 ++++++++++
- 2 files changed, 58 insertions(+)
+ drivers/block/rnbd/rnbd-clt-sysfs.c | 53 +++++++++++++++++++++++++++++
+ drivers/block/rnbd/rnbd-clt.c       | 17 +++++++++
+ drivers/block/rnbd/rnbd-clt.h       | 15 ++++++++
+ 3 files changed, 85 insertions(+)
 
-diff --git a/drivers/block/rnbd/rnbd-common.c b/drivers/block/rnbd/rnbd-common.c
-index 596c3f732403..84bfbf015f6d 100644
---- a/drivers/block/rnbd/rnbd-common.c
-+++ b/drivers/block/rnbd/rnbd-common.c
-@@ -21,3 +21,47 @@ const char *rnbd_access_mode_str(enum rnbd_access_mode mode)
- 		return "unknown";
- 	}
+diff --git a/drivers/block/rnbd/rnbd-clt-sysfs.c b/drivers/block/rnbd/rnbd-clt-sysfs.c
+index d4aa6bfc9555..d83415875960 100644
+--- a/drivers/block/rnbd/rnbd-clt-sysfs.c
++++ b/drivers/block/rnbd/rnbd-clt-sysfs.c
+@@ -651,3 +651,56 @@ void rnbd_clt_destroy_sysfs_files(void)
+ 	device_destroy(rnbd_dev_class, MKDEV(0, 0));
+ 	class_destroy(rnbd_dev_class);
  }
 +
 +#ifdef CONFIG_FAULT_INJECTION_DEBUG_FS
-+static DECLARE_FAULT_ATTR(fail_default_attr);
-+
-+void rnbd_fault_inject_init(struct rnbd_fault_inject *fj,
-+			    const char *dir_name,
-+			    u32 err_status)
++void rnbd_clt_fault_inject_init(struct rnbd_clt_fault_inject *fault_inject,
++				const char *dev_name)
 +{
-+	struct dentry *dir, *parent;
-+	struct fault_attr *attr = &fj->attr;
-+
-+	/* create debugfs directory and attribute */
-+	parent = debugfs_create_dir(dir_name, NULL);
-+	if (!parent) {
-+		pr_warn("%s: failed to create debugfs directory\n", dir_name);
-+		return;
-+	}
-+
-+	*attr = fail_default_attr;
-+	dir = fault_create_debugfs_attr("fault_inject", parent, attr);
-+	if (IS_ERR(dir)) {
-+		pr_warn("%s: failed to create debugfs attr\n", dir_name);
-+		debugfs_remove_recursive(parent);
-+		return;
-+	}
-+	fj->parent = parent;
-+	fj->dir = dir;
-+
-+	/* create debugfs for status code */
-+	fj->status = err_status;
-+	debugfs_create_u32("status", 0600, dir,	&fj->status);
++	rnbd_fault_inject_init(&fault_inject->fj, dev_name, -EBUSY);
++	/* injection points */
++	rnbd_fault_inject_add(fault_inject->fj.dir,
++			      "fail-request", &fault_inject->fail_request);
++	rnbd_fault_inject_add(fault_inject->fj.dir,
++			      "fail-unmap", &fault_inject->fail_unmap);
 +}
 +
-+void rnbd_fault_inject_add(struct dentry *dir, const char *fname, bool *value)
++void rnbd_clt_fault_inject_final(struct rnbd_clt_fault_inject *fault_inject)
 +{
-+	debugfs_create_bool(fname, 0600, dir, value);
++	rnbd_fault_inject_final(&fault_inject->fj);
 +}
 +
-+void rnbd_fault_inject_final(struct rnbd_fault_inject *fj)
++int rnbd_clt_should_fail_request(struct request *req)
 +{
-+	/* remove debugfs directories */
-+	debugfs_remove_recursive(fj->parent);
++	struct rnbd_clt_dev *dev = req->rq_disk->private_data;
++	struct rnbd_clt_fault_inject *fault_inject = &dev->fault_inject;
++
++	if (fault_inject->fail_request && should_fail(&fault_inject->fj.attr, 1))
++		return fault_inject->fj.status;
++	return 0;
++}
++
++int rnbd_clt_should_fail_unmap(struct rnbd_clt_dev *dev)
++{
++	struct rnbd_clt_fault_inject *fault_inject = &dev->fault_inject;
++
++	if (fault_inject->fail_unmap && should_fail(&fault_inject->fj.attr, 1))
++		return fault_inject->fj.status;
++	return 0;
++}
++#else
++void rnbd_clt_fault_inject_init(struct rnbd_clt_fault_inject *fault_inj,
++				const char *dev_name)
++{
++}
++void rnbd_clt_fault_inject_final(struct rnbd_clt_fault_inject *fault_inject)
++{
++}
++int rnbd_clt_should_fail_request(struct request *req)
++{
++	return 0;
++}
++int rnbd_clt_should_fail_unmap(struct rnbd_clt_dev *dev)
++{
++	return 0;
 +}
 +#endif
-diff --git a/drivers/block/rnbd/rnbd-proto.h b/drivers/block/rnbd/rnbd-proto.h
-index c1bc5c0fef71..d13dc1d3a00e 100644
---- a/drivers/block/rnbd/rnbd-proto.h
-+++ b/drivers/block/rnbd/rnbd-proto.h
-@@ -15,6 +15,7 @@
- #include <linux/inet.h>
- #include <linux/in.h>
- #include <linux/in6.h>
-+#include <linux/fault-inject.h>
- #include <rdma/ib.h>
+diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.c
+index 45a470076652..8c9a02c8b8bd 100644
+--- a/drivers/block/rnbd/rnbd-clt.c
++++ b/drivers/block/rnbd/rnbd-clt.c
+@@ -411,6 +411,11 @@ static void msg_io_conf(void *priv, int errno)
+ 	struct rnbd_clt_dev *dev = iu->dev;
+ 	struct request *rq = iu->rq;
+ 	int rw = rq_data_dir(rq);
++	int fail_err = 0;
++
++	fail_err = rnbd_clt_should_fail_request(rq);
++	if (unlikely(fail_err)) /* over-write error */
++		errno = fail_err;
  
- #define RNBD_PROTO_VER_MAJOR 2
-@@ -305,6 +306,19 @@ static inline u32 rq_to_rnbd_flags(struct request *rq)
- 	return rnbd_opf;
- }
+ 	iu->errno = errno;
  
-+struct rnbd_fault_inject {
+@@ -1161,6 +1166,7 @@ static blk_status_t rnbd_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	}
+ 
+ 	blk_mq_start_request(rq);
++
+ 	err = rnbd_client_xfer_request(dev, rq, iu);
+ 	if (likely(err == 0))
+ 		return BLK_STS_OK;
+@@ -1545,6 +1551,8 @@ struct rnbd_clt_dev *rnbd_clt_map_device(const char *sessname,
+ 		goto send_close;
+ 	}
+ 
++	rnbd_clt_fault_inject_init(&dev->fault_inject, dev->gd->disk_name);
++
+ 	rnbd_clt_info(dev,
+ 		       "map_device: Device mapped as %s (nsectors: %zu, logical_block_size: %d, physical_block_size: %d, max_write_same_sectors: %d, max_discard_sectors: %d, discard_granularity: %d, discard_alignment: %d, secure_discard: %d, max_segments: %d, max_hw_sectors: %d, rotational: %d, wc: %d, fua: %d)\n",
+ 		       dev->gd->disk_name, dev->nsectors,
+@@ -1599,8 +1607,16 @@ int rnbd_clt_unmap_device(struct rnbd_clt_dev *dev, bool force,
+ 	struct rnbd_clt_session *sess = dev->sess;
+ 	int refcount, ret = 0;
+ 	bool was_mapped;
++	int fail_err = 0;
+ 
+ 	mutex_lock(&dev->lock);
++
++	fail_err = rnbd_clt_should_fail_unmap(dev);
++	if (unlikely(fail_err)) {
++		ret = fail_err;
++		goto err;
++	}
++
+ 	if (dev->dev_state == DEV_STATE_UNMAPPED) {
+ 		rnbd_clt_info(dev, "Device is already being unmapped\n");
+ 		ret = -EALREADY;
+@@ -1618,6 +1634,7 @@ int rnbd_clt_unmap_device(struct rnbd_clt_dev *dev, bool force,
+ 	dev->dev_state = DEV_STATE_UNMAPPED;
+ 	mutex_unlock(&dev->lock);
+ 
++	rnbd_clt_fault_inject_final(&dev->fault_inject);
+ 	delete_dev(dev);
+ 	destroy_sysfs(dev, sysfs_self);
+ 	destroy_gen_disk(dev);
+diff --git a/drivers/block/rnbd/rnbd-clt.h b/drivers/block/rnbd/rnbd-clt.h
+index 537d499dad3b..5ecbe8dedf24 100644
+--- a/drivers/block/rnbd/rnbd-clt.h
++++ b/drivers/block/rnbd/rnbd-clt.h
+@@ -107,6 +107,14 @@ struct rnbd_queue {
+ 	struct blk_mq_hw_ctx	*hctx;
+ };
+ 
++struct rnbd_clt_fault_inject {
 +#ifdef CONFIG_FAULT_INJECTION_DEBUG_FS
-+	struct fault_attr attr;
-+	struct dentry *parent;
-+	struct dentry *dir;
-+	u32 status;
++	struct rnbd_fault_inject fj;
++	bool fail_unmap;
++	bool fail_request;
 +#endif
 +};
 +
- const char *rnbd_access_mode_str(enum rnbd_access_mode mode);
+ struct rnbd_clt_dev {
+ 	struct rnbd_clt_session	*sess;
+ 	struct request_queue	*queue;
+@@ -139,6 +147,7 @@ struct rnbd_clt_dev {
+ 	char			*blk_symlink_name;
+ 	refcount_t		refcount;
+ 	struct work_struct	unmap_on_rmmod_work;
++	struct rnbd_clt_fault_inject fault_inject;
+ };
  
-+void rnbd_fault_inject_init(struct rnbd_fault_inject *fj,
-+			    const char *dev_name, u32 err_status);
-+void rnbd_fault_inject_add(struct dentry *dir, const char *fname, bool *value);
-+void rnbd_fault_inject_final(struct rnbd_fault_inject *fj);
- #endif /* RNBD_PROTO_H */
+ /* rnbd-clt.c */
+@@ -163,4 +172,10 @@ void rnbd_clt_destroy_default_group(void);
+ 
+ void rnbd_clt_remove_dev_symlink(struct rnbd_clt_dev *dev);
+ 
++void rnbd_clt_fault_inject_init(struct rnbd_clt_fault_inject *fault_inj,
++			    const char *dev_name);
++void rnbd_clt_fault_inject_final(struct rnbd_clt_fault_inject *fault_inject);
++int rnbd_clt_should_fail_request(struct request *req);
++int rnbd_clt_should_fail_unmap(struct rnbd_clt_dev *dev);
++int rnbd_clt_should_fail_request_timeout(struct request *req);
+ #endif /* RNBD_CLT_H */
 -- 
 2.25.1
 
