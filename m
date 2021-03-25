@@ -2,127 +2,124 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37821C433DB
-	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 18:46:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E289FC433C1
+	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 20:53:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DFDEF61A3E
-	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 18:46:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AC31B61A3C
+	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 20:53:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229989AbhCYSpp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Mar 2021 14:45:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:51058 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229670AbhCYSpa (ORCPT
+        id S230009AbhCYUwa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Mar 2021 16:52:30 -0400
+Received: from gardel.0pointer.net ([85.214.157.71]:43152 "EHLO
+        gardel.0pointer.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230140AbhCYUw0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Mar 2021 14:45:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1616697930;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=bCAqCNGzNfOldSFqoi8GAW6s9xnIg83pgEh6OZd8lLQ=;
-        b=g+kib3LmxJhHrcahmdKz7TQrbgAnfo3UHrYY0RdZ1zXaODuL0qOf3ht8V9FBXIGY0YLhLj
-        yYJVfc5ERt0kMeZJCn+WzfdRz6WySnatSqAwqrhDe6SadtofOIK9Xt6CQrPKxjbHdEobKQ
-        UBZyUZwtG8p6YJcNLUEzng5WjQpotw8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-182-PampCmZ-Mfmso2j8u-3JDg-1; Thu, 25 Mar 2021 14:45:26 -0400
-X-MC-Unique: PampCmZ-Mfmso2j8u-3JDg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3967E1007467;
-        Thu, 25 Mar 2021 18:45:25 +0000 (UTC)
-Received: from localhost (unknown [10.18.25.174])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7506E77520;
-        Thu, 25 Mar 2021 18:45:19 +0000 (UTC)
-Date:   Thu, 25 Mar 2021 14:45:19 -0400
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Jeffle Xu <jefflexu@linux.alibaba.com>, dm-devel@redhat.com
-Subject: Re: [PATCH V3 13/13] dm: support IO polling for bio-based dm device
-Message-ID: <20210325184519.GB17820@redhat.com>
-References: <20210324121927.362525-1-ming.lei@redhat.com>
- <20210324121927.362525-14-ming.lei@redhat.com>
+        Thu, 25 Mar 2021 16:52:26 -0400
+Received: from gardel-login.0pointer.net (gardel-mail [85.214.157.71])
+        by gardel.0pointer.net (Postfix) with ESMTP id 8B60CE80932;
+        Thu, 25 Mar 2021 21:52:22 +0100 (CET)
+Received: by gardel-login.0pointer.net (Postfix, from userid 1000)
+        id E49031608A1; Thu, 25 Mar 2021 21:52:21 +0100 (CET)
+Date:   Thu, 25 Mar 2021 21:52:21 +0100
+From:   Lennart Poettering <mzxreary@0pointer.de>
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     Matteo Croce <mcroce@linux.microsoft.com>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Luca Boccassi <bluca@debian.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Tejun Heo <tj@kernel.org>,
+        Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier@javigon.com>,
+        Niklas Cassel <niklas.cassel@wdc.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH -next 1/5] block: add disk sequence number
+Message-ID: <YFz4BabOiNDcnHIm@gardel-login>
+References: <20210315200242.67355-1-mcroce@linux.microsoft.com>
+ <20210315200242.67355-2-mcroce@linux.microsoft.com>
+ <20210315201824.GB2577561@casper.infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20210324121927.362525-14-ming.lei@redhat.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210315201824.GB2577561@casper.infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 24 2021 at  8:19am -0400,
-Ming Lei <ming.lei@redhat.com> wrote:
+On Mo, 15.03.21 20:18, Matthew Wilcox (willy@infradead.org) wrote:
+65;6203;1c
+> On Mon, Mar 15, 2021 at 09:02:38PM +0100, Matteo Croce wrote:
+> > From: Matteo Croce <mcroce@microsoft.com>
+> >
+> > Add a sequence number to the disk devices. This number is put in the
+> > uevent so userspace can correlate events when a driver reuses a device,
+> > like the loop one.
+>
+> Should this be documented as monotonically increasing?
 
-> From: Jeffle Xu <jefflexu@linux.alibaba.com>
-> 
-> IO polling is enabled when all underlying target devices are capable
-> of IO polling. The sanity check supports the stacked device model, in
-> which one dm device may be build upon another dm device. In this case,
-> the mapped device will check if the underlying dm target device
-> supports IO polling.
-> 
-> Signed-off-by: Jeffle Xu <jefflexu@linux.alibaba.com>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  drivers/md/dm-table.c         | 24 ++++++++++++++++++++++++
->  drivers/md/dm.c               | 14 ++++++++++++++
->  include/linux/device-mapper.h |  1 +
->  3 files changed, 39 insertions(+)
-> 
+I think this would be great. My usecase for this would be to match up
+uevents with loopback block device attachments, because that's
+basically impossible right now: you attach a loopback device to a
+file, and then wait for the relevant uevents to happen, for all
+partitions but you cannot do this safely right now, since loopback
+block devices are heavily reused in many scenarios so you never know
+if a uevent is from the attachment you created yourself or from a
+previous one — or even already for the next.
 
-...
+If this would be documented as being monotonic this would be excellent
+for this usecase: if you know that your own use of a specific loopback
+device got seqno x then you know that if you see uevents for seqno < x
+it makes sense to wait longer, but when you see seqno > x then you
+know it's too late, somehow you lost uevents and hsould abort.
 
-> diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-> index 50b693d776d6..fe6893b078dc 100644
-> --- a/drivers/md/dm.c
-> +++ b/drivers/md/dm.c
-> @@ -1720,6 +1720,19 @@ static blk_qc_t dm_submit_bio(struct bio *bio)
->  	return ret;
->  }
->  
-> +static bool dm_bio_poll_capable(struct gendisk *disk)
-> +{
-> +	int ret, srcu_idx;
-> +	struct mapped_device *md = disk->private_data;
-> +	struct dm_table *t;
-> +
-> +	t = dm_get_live_table(md, &srcu_idx);
-> +	ret = dm_table_supports_poll(t);
-> +	dm_put_live_table(md, srcu_idx);
-> +
-> +	return ret;
-> +}
-> +
+Hence: for my usecase having this strictly monotonic, and thus being
+able to *order* attachments across all areas where the seqno appears
+would be absolutely excellent and make this as robust as it possibly
+could be.
 
-I know this code will only get called by blk-core if bio-based but there
-isn't anything about this method's implementation that is inherently
-bio-based only.
+> I think this is actually a media identifier.  Consider (if you will)
+> a floppy disc.  Back when such things were common, it was possible
+> with personal computers of the era to have multiple floppy discs "in
+> play" and be prompted to insert them as needed.  So shouldn't it be
+> possible to support something similar here -- you're really removing
+> the media from the loop device.  With a monotonically increasing
+> number, you're always destroying the media when you remove it, but
+> in principle, it should be possible to reinsert the same media and
+> have the same media identifier number.
 
-So please rename from dm_bio_poll_capable to dm_poll_capable
+This would be useless for my usecase, we don't really care for the
+precise file being attached (which is queriable via sysfs anyway), but
+we want to match up our use of the device with the uevents it
+generates on itself and decendend partition block devices.
 
-Other than that:
+Hence: for my usecase I want something that recognizes *attachments*
+and not media. If i attach the same media 3 times i want to be able to
+discern the three times. And more importantly: if I attach it once and
+someone else also once, then I don't want to get confused by that and
+be able ti distinguish both attachments.
 
-Reviewed-by: Mike Snitzer <snitzer@redhat.com>
+Morevoer, I am not even sure what media identifier would mean: if you
+have one image and then copy it, is that still the same image? in your
+model, should that have distinct ids? or the same, because it is from
+the same common original version? and if i then modify one, what
+happens then?
 
->  /*-----------------------------------------------------------------
->   * An IDR is used to keep track of allocated minor numbers.
->   *---------------------------------------------------------------*/
-> @@ -3132,6 +3145,7 @@ static const struct pr_ops dm_pr_ops = {
->  };
->  
->  static const struct block_device_operations dm_blk_dops = {
-> +	.poll_capable = dm_bio_poll_capable,
->  	.submit_bio = dm_submit_bio,
->  	.open = dm_blk_open,
->  	.release = dm_blk_close,
+Finally, media usually comes with ids anyway. i.e. file systems have
+uuids, GPT partition tables have meda uuids. The infrastructure for
+that already exists. What we need really is something that allows us
+to track attachments, not media.
 
+(That said, I think it would make sense to bump the IDs not only on
+explicit user-induced reattachments, but also when media is replaced,
+i.e. bump it more often than not)
+
+Lennart
+
+--
+Lennart Poettering, Berlin
