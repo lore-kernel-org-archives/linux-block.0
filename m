@@ -2,123 +2,127 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D6FDC433DB
-	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 17:30:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37821C433DB
+	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 18:46:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0FD3861A1E
-	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 17:30:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DFDEF61A3E
+	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 18:46:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229547AbhCYRaE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Mar 2021 13:30:04 -0400
-Received: from linux.microsoft.com ([13.77.154.182]:38202 "EHLO
-        linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229592AbhCYR3r (ORCPT
+        id S229989AbhCYSpp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Mar 2021 14:45:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:51058 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229670AbhCYSpa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Mar 2021 13:29:47 -0400
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
-        by linux.microsoft.com (Postfix) with ESMTPSA id 3EA4F20B5680;
-        Thu, 25 Mar 2021 10:29:47 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 3EA4F20B5680
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1616693387;
-        bh=QQfTkgsngBop3Tqx5XH9+idTDW0MUYe7P31vACwHE+c=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=amHaVZJM1c5uXjhVYTo1ubPgMMCmhg7sk0AYbM2TwoJexCKPlsCBxPg5aIu/Xr74Y
-         Ho8vOLLIQ/uLTDkZDeSpQNlJ0pUe67rMR2ezdDBWAbX+Bl6jfzXKGgfqhZs6hGU8qV
-         C6H0nihmJnvbvScDzYPRlWZiC9RLxBI9rLWC0f7o=
-Received: by mail-pg1-f180.google.com with SMTP id l76so2503211pga.6;
-        Thu, 25 Mar 2021 10:29:47 -0700 (PDT)
-X-Gm-Message-State: AOAM530KulwDei525WfPzMBROGGaGcqv9IMZ5cjw9RogW3Wr64SgcDwP
-        njLJ9F77ldByc3JeAQFqa5T/kdVdzFFDkaXBCPc=
-X-Google-Smtp-Source: ABdhPJzVxhv7vNQD2GeuO08lyQfBGF5bActoAR1gprqbd95MFicosMvJ611Zv3COVovE4mXPWbeaCVmXSm16zCJ6QGY=
-X-Received: by 2002:a63:2345:: with SMTP id u5mr8857421pgm.326.1616693386792;
- Thu, 25 Mar 2021 10:29:46 -0700 (PDT)
+        Thu, 25 Mar 2021 14:45:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1616697930;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=bCAqCNGzNfOldSFqoi8GAW6s9xnIg83pgEh6OZd8lLQ=;
+        b=g+kib3LmxJhHrcahmdKz7TQrbgAnfo3UHrYY0RdZ1zXaODuL0qOf3ht8V9FBXIGY0YLhLj
+        yYJVfc5ERt0kMeZJCn+WzfdRz6WySnatSqAwqrhDe6SadtofOIK9Xt6CQrPKxjbHdEobKQ
+        UBZyUZwtG8p6YJcNLUEzng5WjQpotw8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-182-PampCmZ-Mfmso2j8u-3JDg-1; Thu, 25 Mar 2021 14:45:26 -0400
+X-MC-Unique: PampCmZ-Mfmso2j8u-3JDg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3967E1007467;
+        Thu, 25 Mar 2021 18:45:25 +0000 (UTC)
+Received: from localhost (unknown [10.18.25.174])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7506E77520;
+        Thu, 25 Mar 2021 18:45:19 +0000 (UTC)
+Date:   Thu, 25 Mar 2021 14:45:19 -0400
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Jeffle Xu <jefflexu@linux.alibaba.com>, dm-devel@redhat.com
+Subject: Re: [PATCH V3 13/13] dm: support IO polling for bio-based dm device
+Message-ID: <20210325184519.GB17820@redhat.com>
+References: <20210324121927.362525-1-ming.lei@redhat.com>
+ <20210324121927.362525-14-ming.lei@redhat.com>
 MIME-Version: 1.0
-References: <20210315200242.67355-1-mcroce@linux.microsoft.com>
- <20210315200242.67355-2-mcroce@linux.microsoft.com> <20210315201824.GB2577561@casper.infradead.org>
- <20210315210452.GC2577561@casper.infradead.org>
-In-Reply-To: <20210315210452.GC2577561@casper.infradead.org>
-From:   Matteo Croce <mcroce@linux.microsoft.com>
-Date:   Thu, 25 Mar 2021 18:29:10 +0100
-X-Gmail-Original-Message-ID: <CAFnufp3zKa+9K-hsV5vRkv-w8y-1nZioq_bFAnzaxs9RoP+sDA@mail.gmail.com>
-Message-ID: <CAFnufp3zKa+9K-hsV5vRkv-w8y-1nZioq_bFAnzaxs9RoP+sDA@mail.gmail.com>
-Subject: Re: [PATCH -next 1/5] block: add disk sequence number
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Lennart Poettering <lennart@poettering.net>,
-        Luca Boccassi <bluca@debian.org>, Jens Axboe <axboe@kernel.dk>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Tejun Heo <tj@kernel.org>,
-        =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>,
-        Niklas Cassel <niklas.cassel@wdc.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Hannes Reinecke <hare@suse.de>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210324121927.362525-14-ming.lei@redhat.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Mar 15, 2021 at 10:05 PM Matthew Wilcox <willy@infradead.org> wrote:
->
-> On Mon, Mar 15, 2021 at 08:18:24PM +0000, Matthew Wilcox wrote:
-> > On Mon, Mar 15, 2021 at 09:02:38PM +0100, Matteo Croce wrote:
-> > > From: Matteo Croce <mcroce@microsoft.com>
-> > >
-> > > Add a sequence number to the disk devices. This number is put in the
-> > > uevent so userspace can correlate events when a driver reuses a device,
-> > > like the loop one.
-> >
-> > Should this be documented as monotonically increasing?  I think this
-> > is actually a media identifier.  Consider (if you will) a floppy disc.
-> > Back when such things were common, it was possible with personal computers
-> > of the era to have multiple floppy discs "in play" and be prompted to
-> > insert them as needed.  So shouldn't it be possible to support something
-> > similar here -- you're really removing the media from the loop device.
-> > With a monotonically increasing number, you're always destroying the
-> > media when you remove it, but in principle, it should be possible to
-> > reinsert the same media and have the same media identifier number.
->
-> So ... a lot of devices have UUIDs or similar.  eg:
->
-> $ cat /sys/block/nvme0n1/uuid
-> e8238fa6-bf53-0001-001b-448b49cec94f
->
-> https://linux.die.net/man/8/scsi_id (for scsi)
->
+On Wed, Mar 24 2021 at  8:19am -0400,
+Ming Lei <ming.lei@redhat.com> wrote:
 
-Hi,
+> From: Jeffle Xu <jefflexu@linux.alibaba.com>
+> 
+> IO polling is enabled when all underlying target devices are capable
+> of IO polling. The sanity check supports the stacked device model, in
+> which one dm device may be build upon another dm device. In this case,
+> the mapped device will check if the underlying dm target device
+> supports IO polling.
+> 
+> Signed-off-by: Jeffle Xu <jefflexu@linux.alibaba.com>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  drivers/md/dm-table.c         | 24 ++++++++++++++++++++++++
+>  drivers/md/dm.c               | 14 ++++++++++++++
+>  include/linux/device-mapper.h |  1 +
+>  3 files changed, 39 insertions(+)
+> 
 
-I don't have uuid anywhere:
+...
 
-matteo@saturno:~$ ll /dev/sd?
-brw-rw---- 1 root disk 8,  0 feb 16 13:24 /dev/sda
-brw-rw---- 1 root disk 8, 16 feb 16 13:24 /dev/sdb
-brw-rw---- 1 root disk 8, 32 feb 16 13:24 /dev/sdc
-brw-rw---- 1 root disk 8, 48 feb 16 13:24 /dev/sdd
-brw-rw---- 1 root disk 8, 64 mar  4 06:26 /dev/sde
-brw-rw---- 1 root disk 8, 80 feb 16 13:24 /dev/sdf
-matteo@saturno:~$ ll /sys/block/*/uuid
-ls: cannot access '/sys/block/*/uuid': No such file or directory
+> diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+> index 50b693d776d6..fe6893b078dc 100644
+> --- a/drivers/md/dm.c
+> +++ b/drivers/md/dm.c
+> @@ -1720,6 +1720,19 @@ static blk_qc_t dm_submit_bio(struct bio *bio)
+>  	return ret;
+>  }
+>  
+> +static bool dm_bio_poll_capable(struct gendisk *disk)
+> +{
+> +	int ret, srcu_idx;
+> +	struct mapped_device *md = disk->private_data;
+> +	struct dm_table *t;
+> +
+> +	t = dm_get_live_table(md, &srcu_idx);
+> +	ret = dm_table_supports_poll(t);
+> +	dm_put_live_table(md, srcu_idx);
+> +
+> +	return ret;
+> +}
+> +
 
-mcroce@t490s:~$ ll /dev/nvme0n1
-brw-rw----. 1 root disk 259, 0 25 mar 14.22 /dev/nvme0n1
-mcroce@t490s:~$ ll /sys/block/*/uuid
-ls: cannot access '/sys/block/*/uuid': No such file or directory
+I know this code will only get called by blk-core if bio-based but there
+isn't anything about this method's implementation that is inherently
+bio-based only.
 
-I find it only on a mdraid array:
+So please rename from dm_bio_poll_capable to dm_poll_capable
 
-$ cat /sys/devices/virtual/block/md127/md/uuid
-26117338-4f54-f14e-b5d4-93feb7fe825d
+Other than that:
 
-I'm using a vanilla 5.11 kernel.
+Reviewed-by: Mike Snitzer <snitzer@redhat.com>
 
-Regards,
--- 
-per aspera ad upstream
+>  /*-----------------------------------------------------------------
+>   * An IDR is used to keep track of allocated minor numbers.
+>   *---------------------------------------------------------------*/
+> @@ -3132,6 +3145,7 @@ static const struct pr_ops dm_pr_ops = {
+>  };
+>  
+>  static const struct block_device_operations dm_blk_dops = {
+> +	.poll_capable = dm_bio_poll_capable,
+>  	.submit_bio = dm_submit_bio,
+>  	.open = dm_blk_open,
+>  	.release = dm_blk_close,
+
