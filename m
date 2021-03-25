@@ -7,66 +7,63 @@ X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13D74C433EB
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D45A0C433FC
 	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 15:31:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0235D61A1A
-	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 15:31:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AD15C61A28
+	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 15:31:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230394AbhCYPae (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Mar 2021 11:30:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36292 "EHLO
+        id S231363AbhCYPah (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Mar 2021 11:30:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230406AbhCYPaA (ORCPT
+        with ESMTP id S231177AbhCYPaF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Mar 2021 11:30:00 -0400
-Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E520C06175F
-        for <linux-block@vger.kernel.org>; Thu, 25 Mar 2021 08:29:59 -0700 (PDT)
-Received: by mail-ej1-x629.google.com with SMTP id jy13so3622136ejc.2
-        for <linux-block@vger.kernel.org>; Thu, 25 Mar 2021 08:29:59 -0700 (PDT)
+        Thu, 25 Mar 2021 11:30:05 -0400
+Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1DE9C06174A
+        for <linux-block@vger.kernel.org>; Thu, 25 Mar 2021 08:30:04 -0700 (PDT)
+Received: by mail-ed1-x535.google.com with SMTP id l18so2866147edc.9
+        for <linux-block@vger.kernel.org>; Thu, 25 Mar 2021 08:30:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=ionos.com; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=nb98K5yr7Hr81H1xM1HbveTdnjGZy9hyYyfNIs0ucDU=;
-        b=WnD4lSj/Emowr6dXNt2FsbXHKG9b43biD6ypdKw5w9gzQh9A1dLF/bYhLUAOA4ye3n
-         c44VJ+SwaC6MrkjD4Y+7+wXxRCWZcSh7Cv+5quPE6PIuUZg64+jV7lM9LBfTBXcSEGlV
-         +mTdrcTfGy5kTq4iBPbKXXoVKlsJHe6zfvnUZwbKga51qOY9kguvMZDUr164HsKUaCz+
-         5ByW58k45N+jCwY1Pz2/o7PRY/s9vbniEAsYKPSJWiC/YHPILf6gLqxuzMC1GCyKHdfA
-         cVTq4Ak2lDOSNohw11on0jYWEQ3o2kXggZtkfT+geNFqbunpWCd2lO052fQKBptZ9d5w
-         jL9g==
+        bh=NYrKVjesVD1IcOvr0jp+YRcYHhKoOXOE75IsHPsZDFE=;
+        b=XLzlZ6cuiNoXMt0vpFQKcjWrteYRJuPHE/CumV0u5W3LaGcZul3OkoY/C+8CUqKULg
+         BO9IF7CZbpAr7clk/FJzJ9imQS+WMv0T4biaQ4Thf14vflxIXlt+4HI6yrX4Xf468eli
+         EnnTB0r5gNEzt8dNQcLqiCHGIgZhCCpLRVy+dHUo2Z1lL3ZSD0+exgnVtg73xF1jMkFA
+         eQpv0E5rWVtM4LNzR/oRSvp66FHWU0J7igXzAotWXmr9nOgYnfK27PqLPYg1F9NBc2DQ
+         0vUxFCbthCd/mHyltONRf3O8mJwQWy9kK609tt6KMp2rOstiK28rcTabCEoa0Ctz/jLR
+         pFBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=nb98K5yr7Hr81H1xM1HbveTdnjGZy9hyYyfNIs0ucDU=;
-        b=hbha0pP45xVOerr1IzU5DUQr9Q3RNstNjBFKQ2BShEtI9l3vubbY02WStlxNqvjfNa
-         IgTcgtd1QWwZRFE2FRVDVcIkgNaeYfBnenHwrNO+QdEFCrcGUr37K5TJqLWKRFNMhvig
-         8tr1KOjxp/v02WDBz36bv2TB+89oLW3cB/xQvfqd30NQBcnFdxmHfLrGSeMrPya+q8kh
-         cv7OCOSR0kV6H5WM/tSNSx86ZoU3tLo9mjK0A66swW4NkC5vs5shJBZkxSzWDzh3gZPe
-         FTuPm17fPJFdKOU64p+UX6JtWO5hJTqKi+3aBvf4VaZHIsBnvUuDmV9E0ewg8igFH0tZ
-         DX6Q==
-X-Gm-Message-State: AOAM531RXGIsNETt1+Tu6hiP6qIn4Y7Fw3uilpeJXler0+ejsLDSMnra
-        XpQmwY0ymavHc+oLUhO9V+a05WdrzyeQkQ==
-X-Google-Smtp-Source: ABdhPJygOr1zSzrJrHMgx+fl7LMsr5BYRlCJpiMsVkDgqhNhfNXmVA/OPzkFM5VqLA4BHmTte8oYBQ==
-X-Received: by 2002:a17:907:2112:: with SMTP id qn18mr9840281ejb.220.1616686198043;
-        Thu, 25 Mar 2021 08:29:58 -0700 (PDT)
+        bh=NYrKVjesVD1IcOvr0jp+YRcYHhKoOXOE75IsHPsZDFE=;
+        b=OPyYUw1CwmhIyUGJnjMefiB5IkvfOciUAXkyBx/EsuKbqgryyO2VjWxYdqlrh+3ieu
+         K9uFCvGY4uBr8YLBScfwXDJcFrnym/dllB9UUscYu8Mfhpe5oxvjddISaSNBFI4EduGy
+         ngvH/OCiI+B/nETV1Z1LE3uJKvE7pog5okDCx9zJDilLreafRyaEandV0d33YThP2zeK
+         SQgkRMwQx29fIYyzjaXZ9bWiboJgHP04xN1hK12EDO8zT1WtW94Ek8cP+4NlPPw/0Fz+
+         W4MJu5+O3k/08Q+NFBeqrx1aVdn6IvXiBMtYyVG8x6kW4U5fACFdJkGPTszhMvdmwdki
+         1wHg==
+X-Gm-Message-State: AOAM531+LHXlSwVZxn7dhOy6x7tLMXe84fHxt/qyxj4x3V9GZ+YW+jg5
+        pO+LKn/zQe93Xq1I+YacFGLtTvEBguEtJNOP
+X-Google-Smtp-Source: ABdhPJwlx+fEkS3xWkhHL+BPM2x+eoD1ayZUh1b9oFgn7h6f3S+9neELL6Gq8Fdqr2z7o0bG/wqiDw==
+X-Received: by 2002:a05:6402:31e9:: with SMTP id dy9mr9933323edb.186.1616686203203;
+        Thu, 25 Mar 2021 08:30:03 -0700 (PDT)
 Received: from gkim-laptop.fkb.profitbricks.net (ip5f5aeee5.dynamic.kabel-deutschland.de. [95.90.238.229])
-        by smtp.googlemail.com with ESMTPSA id b18sm2574837ejb.77.2021.03.25.08.29.57
+        by smtp.googlemail.com with ESMTPSA id b18sm2574837ejb.77.2021.03.25.08.30.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Mar 2021 08:29:57 -0700 (PDT)
+        Thu, 25 Mar 2021 08:30:02 -0700 (PDT)
 From:   Gioh Kim <gi-oh.kim@ionos.com>
 To:     linux-block@vger.kernel.org
 Cc:     axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
         bvanassche@acm.org, haris.iqbal@ionos.com, jinpu.wang@ionos.com,
-        Guoqing Jiang <guoqing.jiang@gmx.com>,
-        Danil Kipnis <danil.kipnis@cloud.ionos.com>,
-        Gioh Kim <gi-oh.kim@cloud.ionos.com>,
-        Jack Wang <jinpu.wang@cloud.ionos.com>
-Subject: [PATCH for-rc 09/24] block/rnbd-clt: Remove some arguments from rnbd_client_setup_device
-Date:   Thu, 25 Mar 2021 16:28:56 +0100
-Message-Id: <20210325152911.1213627-10-gi-oh.kim@ionos.com>
+        Tom Rix <trix@redhat.com>, Gioh Kim <gi-oh.kim@ionos.com>
+Subject: [PATCH for-rc 16/24] block/rnbd-clt: Improve find_or_create_sess() return check
+Date:   Thu, 25 Mar 2021 16:29:03 +0100
+Message-Id: <20210325152911.1213627-17-gi-oh.kim@ionos.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210325152911.1213627-1-gi-oh.kim@ionos.com>
 References: <20210325152911.1213627-1-gi-oh.kim@ionos.com>
@@ -76,45 +73,81 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Guoqing Jiang <guoqing.jiang@gmx.com>
+From: Tom Rix <trix@redhat.com>
 
-Remove them since both sess and idx can be dereferenced from dev. And
-sess is not used in the function.
+clang static analysis reports this problem
 
-Signed-off-by: Guoqing Jiang <guoqing.jiang@gmx.com>
-Reviewed-by: Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Signed-off-by: Gioh Kim <gi-oh.kim@cloud.ionos.com>
-Signed-off-by: Jack Wang <jinpu.wang@cloud.ionos.com>
+rnbd-clt.c:1212:11: warning: Branch condition evaluates to a
+  garbage value
+        else if (!first)
+                 ^~~~~~
+
+This is triggered in the find_and_get_or_create_sess() call
+because the variable first is not initialized and the
+earlier check is specifically for
+
+	if (sess == ERR_PTR(-ENOMEM))
+
+This is false positive.
+
+But the if-check can be reduced by initializing first to
+false and then returning if the call to find_or_creat_sess()
+does not set it to true.  When it remains false, either
+sess will be valid or not.  The not case is caught by
+find_and_get_or_create_sess()'s caller rnbd_clt_map_device()
+
+	sess = find_and_get_or_create_sess(...);
+	if (IS_ERR(sess))
+		return ERR_CAST(sess);
+
+Since find_and_get_or_create_sess() initializes first to false
+setting it in find_or_create_sess() is not needed.
+
+Signed-off-by: Tom Rix <trix@redhat.com>
+Signed-off-by: Jack Wang <jinpu.wang@ionos.com>
+Signed-off-by: Gioh Kim <gi-oh.kim@ionos.com>
 ---
- drivers/block/rnbd/rnbd-clt.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ drivers/block/rnbd/rnbd-clt.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
 
 diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.c
-index c8de016553a9..5d085bc80e24 100644
+index 1a1c57b51fd8..8fda94460a88 100644
 --- a/drivers/block/rnbd/rnbd-clt.c
 +++ b/drivers/block/rnbd/rnbd-clt.c
-@@ -1360,10 +1360,9 @@ static void rnbd_clt_setup_gen_disk(struct rnbd_clt_dev *dev, int idx)
- 		blk_queue_flag_set(QUEUE_FLAG_NONROT, dev->queue);
+@@ -915,6 +915,7 @@ static struct rnbd_clt_session *__find_and_get_sess(const char *sessname)
+ 	return NULL;
  }
  
--static int rnbd_client_setup_device(struct rnbd_clt_session *sess,
--				     struct rnbd_clt_dev *dev, int idx)
-+static int rnbd_client_setup_device(struct rnbd_clt_dev *dev)
++/* caller is responsible for initializing 'first' to false */
+ static struct
+ rnbd_clt_session *find_or_create_sess(const char *sessname, bool *first)
  {
--	int err;
-+	int err, idx = dev->clt_device_id;
+@@ -930,8 +931,7 @@ rnbd_clt_session *find_or_create_sess(const char *sessname, bool *first)
+ 		}
+ 		list_add(&sess->list, &sess_list);
+ 		*first = true;
+-	} else
+-		*first = false;
++	}
+ 	mutex_unlock(&sess_lock);
  
- 	dev->size = dev->nsectors * dev->logical_block_size;
+ 	return sess;
+@@ -1200,13 +1200,11 @@ find_and_get_or_create_sess(const char *sessname,
+ 	struct rnbd_clt_session *sess;
+ 	struct rtrs_attrs attrs;
+ 	int err;
+-	bool first;
++	bool first = false;
+ 	struct rtrs_clt_ops rtrs_ops;
  
-@@ -1541,7 +1540,7 @@ struct rnbd_clt_dev *rnbd_clt_map_device(const char *sessname,
- 	mutex_lock(&dev->lock);
- 	pr_debug("Opened remote device: session=%s, path='%s'\n",
- 		 sess->sessname, pathname);
--	ret = rnbd_client_setup_device(sess, dev, dev->clt_device_id);
-+	ret = rnbd_client_setup_device(dev);
- 	if (ret) {
- 		rnbd_clt_err(dev,
- 			      "map_device: Failed to configure device, err: %d\n",
+ 	sess = find_or_create_sess(sessname, &first);
+-	if (sess == ERR_PTR(-ENOMEM))
+-		return ERR_PTR(-ENOMEM);
+-	else if (!first)
++	if (!first)
+ 		return sess;
+ 
+ 	if (!path_cnt) {
 -- 
 2.25.1
 
