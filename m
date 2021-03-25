@@ -2,191 +2,642 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	PDS_BAD_THREAD_QP_64,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F3E9C433DB
-	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 08:41:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 987D5C433E0
+	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 09:19:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2C8A461A1A
-	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 08:41:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4C1A561963
+	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 09:19:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229832AbhCYIk2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Mar 2021 04:40:28 -0400
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:20515 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229676AbhCYIkI (ORCPT
+        id S229871AbhCYJSu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Mar 2021 05:18:50 -0400
+Received: from out30-45.freemail.mail.aliyun.com ([115.124.30.45]:37993 "EHLO
+        out30-45.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229962AbhCYJSo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Mar 2021 04:40:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1616661609; x=1648197609;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=s4ua/SUdZlvVBmMNtnXduHxuENC5pWUUvXjp2ubAR4E=;
-  b=F6npPxECBhn0GLOMDtpfRzFT+PnJ9vblW8yPwDz4xudfjaTvNUBV3VgE
-   aAyygxjfkhg3sIVzyzUQKgM3EsDF1qka4NXppfsAk+lZqKBUTQW1API30
-   7EW8bCSyLpjSqklPFa6Sgq3mvgNfVeQPLp1DjBrzI06+g/CosIdA0EOTH
-   mTAKC18sh4vlV5ASX0DRLfAZ1Sd7IEVapd8uaVcPhkESMQU0eu6OhnU0K
-   5KoR9eIm5Od8FwIeG4TEj5OpF3h1NaQ4J7aWJ5R1yN4ffFVfTKd10npRq
-   7Mk2HCoS45TXOvpTMzjIbreHAOqwY+R9HDFqnU8O99GbwzLMLQJl3LVkT
-   w==;
-IronPort-SDR: ycfCMRLGRsDpBoi9h8wX5A0ViCNKZe7LZr4yZrzOf37b9jxIcci4FffLPxPH8Tsb/hMfGj7efI
- z1IkRzf7rFGQYGR41RSr/RMvxYZI5ZXVXVMZiIAO8WssSqlo9ZLT+VijI7zKDMXIAT3agU4qNv
- xwj8zltfh9Uok2/Yb43gbDiEXH1dprJS4tIgp1oCbdWbSFjfJZPNXpm8PSBIbH3tquCsNJkL8c
- iShkxADaIn6KGHMqKv/1aO69bktfli3pbRJMLvW4IIT375V+zmqZ/H2VR5To103ZnKoNoyACyI
- lRA=
-X-IronPort-AV: E=Sophos;i="5.81,277,1610380800"; 
-   d="scan'208";a="164087671"
-Received: from mail-bn8nam12lp2177.outbound.protection.outlook.com (HELO NAM12-BN8-obe.outbound.protection.outlook.com) ([104.47.55.177])
-  by ob1.hgst.iphmx.com with ESMTP; 25 Mar 2021 16:39:46 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UrTKHBo2npjGMbDfuNrHoOeadB6rpc7DUAPw9NCt1w690qws0EAZf0hxiGcgOpZK672MqDdByUBLX8TO6QOXdr4QMWaYPiN9gDs5RjQn6XW/K1TihtG/E487DrCUZN+QTqeJup4x6UpI8dqvKjY+r4xVWXe5AV2uvPsbst5hH9/SNpwc4fyLrmlVLTDvr2246Phs97HGzbPkqp+VkzMlXVj1c0ALS90zcy+NbrtpZWayoLcTorD0QpJIezrtrmEwWWrUMHXpYLd4HS7JvncVkrmR1wnctOH6oGc/8gh//uxSEP1iHlkm7tg6OhvyzBanVDgBX0pkW0wH49fIJdn1OA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ILYyEbx/5gHbPLvMFdJhDiL40katfg6s79VymdE5jb8=;
- b=NKctgpA/Q4rT73L/6OKdGZdi21zeqnApg+iK28r59lNF5j5NApjbx5NTiOKDwfafOpmjPLkEJGGDDYjkk7KWs4fvxNC1LYuBWcSxD4LySo1zSADSvwltE+cs8F8O+avbmhEca+yYE/jYxZRQLl8rVWQbuJvBOaDbEgXas61bxUoVcJwO/AVofFQuj/EDle10O6VwYWMnzIn6YSUMnYst3aCMtwx7n6CmZSQ7Aj+PQK15vLcBXs7f895U6aP21i3CErZfRZD00PtTaRptGsgXfHm6D3ri7YUNndJvJETT9ZrvvwHEa45AGR1yVFxXtGPye1xEeupslIl9SqNFBCqlbQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ILYyEbx/5gHbPLvMFdJhDiL40katfg6s79VymdE5jb8=;
- b=L4OIP/1P/edslYrsslP1FjtE56FZPud72KIO8WOI4Mvr1D4lS/CbFDv6qZm1GSWd2hvoyDeXYqfcenBxOBEmOIDnxaDTjDk2ZFCbRHYaO/usEyLFtx5JoHUNxjfn8ymMMo6HXeu/Gw+67L1ytq0AIPNzEV3icAzW8VfjUj6eib0=
-Received: from DM5PR04MB0684.namprd04.prod.outlook.com (2603:10b6:3:f3::20) by
- DM5PR0401MB3509.namprd04.prod.outlook.com (2603:10b6:4:78::13) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3955.18; Thu, 25 Mar 2021 08:39:40 +0000
-Received: from DM5PR04MB0684.namprd04.prod.outlook.com
- ([fe80::f0ed:1983:98c8:3046]) by DM5PR04MB0684.namprd04.prod.outlook.com
- ([fe80::f0ed:1983:98c8:3046%12]) with mapi id 15.20.3955.027; Thu, 25 Mar
- 2021 08:39:40 +0000
-From:   Niklas Cassel <Niklas.Cassel@wdc.com>
-To:     "hch@lst.de" <hch@lst.de>
-CC:     Minwoo Im <minwoo.im.dev@gmail.com>,
-        "javier@javigon.com" <javier@javigon.com>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "sagi@grimberg.me" <sagi@grimberg.me>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "kbusch@kernel.org" <kbusch@kernel.org>,
-        =?iso-8859-1?Q?Javier_Gonz=E1lez?= <javier.gonz@samsung.com>
-Subject: Re: [PATCH V6 1/2] nvme: enable char device per namespace
-Thread-Topic: [PATCH V6 1/2] nvme: enable char device per namespace
-Thread-Index: AQHXIKlX58TcqiDl90OEMALlWkZSkqqT9o2AgABpUYCAAAOYgA==
-Date:   Thu, 25 Mar 2021 08:39:40 +0000
-Message-ID: <YFxMSzjJMqdUiqxm@x1-carbon.lan>
-References: <20210301192452.16770-1-javier.gonz@samsung.com>
- <20210301192452.16770-2-javier.gonz@samsung.com>
- <YFswq8pgzg9y00GO@x1-carbon.lan> <20210325020951.GA2105@localhost>
- <20210325082647.GA27622@lst.de>
-In-Reply-To: <20210325082647.GA27622@lst.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: lst.de; dkim=none (message not signed)
- header.d=none;lst.de; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [85.226.244.4]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 8244cd65-6537-4897-ee3f-08d8ef69880d
-x-ms-traffictypediagnostic: DM5PR0401MB3509:
-x-microsoft-antispam-prvs: <DM5PR0401MB35094D477513ADB956661530F2629@DM5PR0401MB3509.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: ArUpwmJpm6IxkFYXDKuYN1WrE7RDpjSnoZwCvLTRhBa4mPV9sNK1pWuiPQV5tn7xLI2rGaock9eFDLbRzD/HKFWS2giAYE6VuKHojmZYwOfNEPQyQ+7RbUDE2fBaCcetHh6/n1flwvVKvYBEg853UHbUNHDGq99Y7smSTxBqRG8xv9T9p7U4PPsL5nhly+uIfozWvnWcf0hUsPn3Ab9/ZaCYtefTR7+qUO9NmsepBqhS/w9kBlpy1i6Sxkq0VfhnpIgd8H8fqsgL5AxfeBspmk8EhXaiIX1t8O5eA1LoTMj/0d7C0l10Or0Lhvn/eaZf4pE5eFkEGonCBx1TGT9Zol+CIHhzeNLriNo9tVtX9e6SkSEjbeMl17BP7fU/MxG65RWB2jQXIGFjf63FHfRIqs0gVHycGLZlpSNa4b6juhofC/vI8YhK0SwIVDt6fRk/10vRbGdWFXcFYEVjyqNxiVtWOOeaKPV8SZ2p0aL+cx2L+aNsYKUkgcCEDxJxzvmV5e9H8R1cM/Ic6sZc5cI2faT5xzUkK49aFsWFJm0UpuYBcJ4Az55qEh8GGEURS+zVgq/KshSn7jEax0/S5NbqJphcli0jbqpdMGUqhbpZCDw+lOn7b676z/kTjdr0CUMz34UzoGqFNsSHjbhnmE+Mm31sjH4vzM6iFgEV1a0a/MI=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR04MB0684.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(366004)(136003)(39860400002)(376002)(396003)(2906002)(83380400001)(186003)(66446008)(6506007)(6512007)(478600001)(9686003)(316002)(36756003)(26005)(66476007)(6486002)(71200400001)(76116006)(6916009)(8676002)(54906003)(4326008)(91956017)(66946007)(86362001)(64756008)(38100700001)(5660300002)(66556008)(8936002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: =?iso-8859-1?Q?540ci0FF4AWamyKQSl8RjMb8tUWAUiX8aAuTkmn4RHFde6SM8oZ0f3sc+J?=
- =?iso-8859-1?Q?OT+BfcmIUuRwq7xBu2xQt30OhVlBzEF5bfYs9hLAfhiE7a2iOF36QcPEYA?=
- =?iso-8859-1?Q?fU0LEWLRp36QBmyYKkYH/IQxnzykVInwMJcc9PSuiOISbuTp5n48bwCiKV?=
- =?iso-8859-1?Q?Lav+c7KjcjShej6yzlkHIhFOhTylTAkeN9Eqqc7yr9yXJe+foUBdU6U2AU?=
- =?iso-8859-1?Q?bgDsIDn/UbZlUvl+Ms9rmcB8igJEG27TaOJFIvbxd3jdJsUafw6W0RB5Am?=
- =?iso-8859-1?Q?onnIH+ca9uGSOLcyIDYhgL8ZV4wUxBgWHT3R3+soTadVJlHl+GJzDc3Ed/?=
- =?iso-8859-1?Q?8boubzglJ94x2OJWBBQngtYPJ1Kum7jh9fphRk2Fgtv4VxPT7WNMlNYWhI?=
- =?iso-8859-1?Q?vzm11U9fbwKLr342NzJwfnjhZdzlYWbDl3fEYodiGQxOnuIVM/Z3xJsl+Z?=
- =?iso-8859-1?Q?/KT1Cer4v7r9C02gUWvAdVppXy6kyGxpjxZjku4Bl8pjvdF74/IF4O81Tg?=
- =?iso-8859-1?Q?5P8Wzn1Bf0Dad4ptfAPwF1HUuvt7gMuGAYkJkkcd/MamGMQ6+VtXMvcD+Y?=
- =?iso-8859-1?Q?7ryYVTXJYGt0ReMIdDI3ePRHJ8/gY4RJd2TfygmFeRbQKnOdXc3yv98ayc?=
- =?iso-8859-1?Q?URqwwcQWFGvHFQu6CSrk6oFl3hbAtCEsgAftJFUjZ0OjHbE0PCAlzbny48?=
- =?iso-8859-1?Q?gph9Jf2ivoSDjvRRdmwzjXPVdyPK6cVx5xGPVfC3hcdRN/FFEdQxu8ugpY?=
- =?iso-8859-1?Q?s4GTekL9XL80kaD8FBN9NcmEC1YmJmb/YbG05z6rKMyroiTFciB6wyKR4z?=
- =?iso-8859-1?Q?lbUooKXY+4uHVOrRvFQP/qvHUnsliHM0YXGSzddrlQcpNuM0DVnWLsTAQC?=
- =?iso-8859-1?Q?hLu5tknZ7uSJ2HbKJa7+YucgO/ykl+0axlTRGXZr207Yd2adamUcNgeiR7?=
- =?iso-8859-1?Q?A0bgnB5zr/KG1GJipWDyA/JbpSS7bVkbw51bTF50Xk6Ged6F+S8vUZ5t8R?=
- =?iso-8859-1?Q?1DTtTSvpNhRjt0fyqEdnPOY/US5RtSl0GMCwvCJQuKifXpXJ6TzYhRonx8?=
- =?iso-8859-1?Q?FFSurd61HS4TMgxGP5oiCnoptcWbAi/6iIf2cnRdpuRqoiIj1d+/1A8NzD?=
- =?iso-8859-1?Q?qUJj9DCLWI4DR66MaJc/PP+pFyJ3+5PkHcCUBTqc73vlRbDZvz1JMPiQfM?=
- =?iso-8859-1?Q?h9avZLJn/R2cJ8qMXPXXW7+RkZ8120Qub+RxaktHkzuaAZYJ2RyAoR/xC5?=
- =?iso-8859-1?Q?S9/HW0AIC1FXEEficIggMfA1Oth/WYCG9SfBuEFVvezUPFj4OlgDHGR97Q?=
- =?iso-8859-1?Q?iy+FqjD3rAZmP9QjZu9FI4c8zkuOsnGYxnL+YSV2lK/UEwwfqy1gssjba+?=
- =?iso-8859-1?Q?4rPVhDlA27?=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="iso-8859-1"
-Content-ID: <41FE56A43AF3FE4B9961EB359C3BF831@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+        Thu, 25 Mar 2021 05:18:44 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04420;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=5;SR=0;TI=SMTPD_---0UTGLcSY_1616663921;
+Received: from admindeMacBook-Pro-2.local(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0UTGLcSY_1616663921)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Thu, 25 Mar 2021 17:18:42 +0800
+Subject: Re: [PATCH V3 09/13] block: use per-task poll context to implement
+ bio based io polling
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
+References: <20210324121927.362525-1-ming.lei@redhat.com>
+ <20210324121927.362525-10-ming.lei@redhat.com>
+ <48b34bad-ee08-7c49-a89a-1614d13cdd9a@linux.alibaba.com>
+ <YFxD4BvPTNC1y63w@T590>
+From:   JeffleXu <jefflexu@linux.alibaba.com>
+Message-ID: <a132abc6-cdc9-cbce-f194-081beb07e229@linux.alibaba.com>
+Date:   Thu, 25 Mar 2021 17:18:41 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.7.1
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM5PR04MB0684.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8244cd65-6537-4897-ee3f-08d8ef69880d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Mar 2021 08:39:40.4694
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 50LC1baa5y3XEDIrrU0hp73gQhPvx1KCqHdLS7PJCKfza25EkAB2EbiTSBdLpoUefBdpg0HJr4cnSluTrWHV2A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR0401MB3509
+In-Reply-To: <YFxD4BvPTNC1y63w@T590>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 25, 2021 at 09:26:47AM +0100, hch@lst.de wrote:
-> On Thu, Mar 25, 2021 at 11:09:51AM +0900, Minwoo Im wrote:
-> > > I was still allowed to write to NSID2:
-> > >=20
-> > > sudo nvme zns report-zones -d 1 /dev/nvme0n2
-> > > SLBA: 0x0        WP: 0x1        Cap: 0x3e000    State: IMP_OPENED   T=
-ype: SEQWRITE_REQ   Attrs: 0x0
-> > >=20
-> > > Should this really be allowed?
-> >=20
-> > I think this should not be allowed at all.  Thanks for the testing!
->=20
-> It should not be allowed, but it seems like a pre-existing problem
-> as nvme_user_cmd does not verify the nsid.
->=20
-> > > I was under the impression that Christoph's argument for implementing=
- per
-> > > namespace char devices, was that you should be able to do access cont=
-rol.
-> > > Doesn't that mean that for the new char devices, we need to reject io=
-ctls
-> > > that specify a nvme_passthru_cmd.nsid !=3D the NSID that the char dev=
-ice
-> > > represents?
-> > >=20
-> > >=20
-> > > Although, this is not really something new, as we already have the sa=
-me
-> > > behavior when it comes ioctls and the block devices. Perhaps we want =
-to
-> > > add the same verification there?
-> >=20
-> > I think there should be verifications.
->=20
-> Yes.
-
-Thanks Minwoo, Christoph,
-
-I'll cook up a patch based on nvme/nvme-5.13.
 
 
-Kind regards,
-Niklas=
+On 3/25/21 4:05 PM, Ming Lei wrote:
+> On Thu, Mar 25, 2021 at 02:34:18PM +0800, JeffleXu wrote:
+>>
+>>
+>> On 3/24/21 8:19 PM, Ming Lei wrote:
+>>> Currently bio based IO polling needs to poll all hw queue blindly, this
+>>> way is very inefficient, and one big reason is that we can't pass any
+>>> bio submission result to blk_poll().
+>>>
+>>> In IO submission context, track associated underlying bios by per-task
+>>> submission queue and store returned 'cookie' in
+>>> bio->bi_iter.bi_private_data, and return current->pid to caller of
+>>> submit_bio() for any bio based driver's IO, which is submitted from FS.
+>>>
+>>> In IO poll context, the passed cookie tells us the PID of submission
+>>> context, then we can find bios from the per-task io pull context of
+>>> submission context. Moving bios from submission queue to poll queue of
+>>> the poll context, and keep polling until these bios are ended. Remove
+>>> bio from poll queue if the bio is ended. Add bio flags of BIO_DONE and
+>>> BIO_END_BY_POLL for such purpose.
+>>>
+>>> In was found in Jeffle Xu's test that kfifo doesn't scale well for a
+>>> submission queue as queue depth is increased, so a new mechanism for
+>>> tracking bios is needed. So far bio's size is close to 2 cacheline size,
+>>> and it may not be accepted to add new field into bio for solving the
+>>> scalability issue by tracking bios via linked list, switch to bio group
+>>> list for tracking bio, the idea is to reuse .bi_end_io for linking bios
+>>> into a linked list for all sharing same .bi_end_io(call it bio group),
+>>> which is recovered before ending bio really, since BIO_END_BY_POLL is
+>>> added for enhancing this point. Usually .bi_end_bio is same for all
+>>> bios in same layer, so it is enough to provide very limited groups, such
+>>> as 16 or less for fixing the scalability issue.
+>>>
+>>> Usually submission shares context with io poll. The per-task poll context
+>>> is just like stack variable, and it is cheap to move data between the two
+>>> per-task queues.
+>>>
+>>> Also when the submission task is exiting, drain pending IOs in the context
+>>> until all are done.
+>>>
+>>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+>>> ---
+>>>  block/bio.c               |   5 +
+>>>  block/blk-core.c          | 154 ++++++++++++++++++++++++-
+>>>  block/blk-ioc.c           |   2 +
+>>>  block/blk-mq.c            | 234 +++++++++++++++++++++++++++++++++++++-
+>>>  block/blk.h               |  10 ++
+>>>  include/linux/blk_types.h |  18 ++-
+>>>  6 files changed, 419 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/block/bio.c b/block/bio.c
+>>> index 26b7f721cda8..04c043dc60fc 100644
+>>> --- a/block/bio.c
+>>> +++ b/block/bio.c
+>>> @@ -1402,6 +1402,11 @@ static inline bool bio_remaining_done(struct bio *bio)
+>>>   **/
+>>>  void bio_endio(struct bio *bio)
+>>>  {
+>>> +	/* BIO_END_BY_POLL has to be set before calling submit_bio */
+>>> +	if (bio_flagged(bio, BIO_END_BY_POLL)) {
+>>> +		bio_set_flag(bio, BIO_DONE);
+>>> +		return;
+>>> +	}
+>>>  again:
+>>>  	if (!bio_remaining_done(bio))
+>>>  		return;
+>>> diff --git a/block/blk-core.c b/block/blk-core.c
+>>> index eb07d61cfdc2..95f7e36c8759 100644
+>>> --- a/block/blk-core.c
+>>> +++ b/block/blk-core.c
+>>> @@ -805,6 +805,81 @@ static inline unsigned int bio_grp_list_size(unsigned int nr_grps)
+>>>  		sizeof(struct bio_grp_list_data);
+>>>  }
+>>>  
+>>> +static inline void *bio_grp_data(struct bio *bio)
+>>> +{
+>>> +	return bio->bi_poll;
+>>> +}
+>>> +
+>>> +/* add bio into bio group list, return true if it is added */
+>>> +static bool bio_grp_list_add(struct bio_grp_list *list, struct bio *bio)
+>>> +{
+>>> +	int i;
+>>> +	struct bio_grp_list_data *grp;
+>>> +
+>>> +	for (i = 0; i < list->nr_grps; i++) {
+>>> +		grp = &list->head[i];
+>>> +		if (grp->grp_data == bio_grp_data(bio)) {
+>>> +			__bio_grp_list_add(&grp->list, bio);
+>>> +			return true;
+>>> +		}
+>>> +	}
+>>> +
+>>> +	if (i == list->max_nr_grps)
+>>> +		return false;
+>>> +
+>>> +	/* create a new group */
+>>> +	grp = &list->head[i];
+>>> +	bio_list_init(&grp->list);
+>>> +	grp->grp_data = bio_grp_data(bio);
+>>> +	__bio_grp_list_add(&grp->list, bio);
+>>> +	list->nr_grps++;
+>>> +
+>>> +	return true;
+>>> +}
+>>> +
+>>> +static int bio_grp_list_find_grp(struct bio_grp_list *list, void *grp_data)
+>>> +{
+>>> +	int i;
+>>> +	struct bio_grp_list_data *grp;
+>>> +
+>>> +	for (i = 0; i < list->nr_grps; i++) {
+>>> +		grp = &list->head[i];
+>>> +		if (grp->grp_data == grp_data)
+>>> +			return i;
+>>> +	}
+>>> +
+>>> +	if (i < list->max_nr_grps) {
+>>> +		grp = &list->head[i];
+>>> +		bio_list_init(&grp->list);
+>>> +		return i;
+>>> +	}
+>>> +
+>>> +	return -1;
+>>> +}
+>>> +
+>>> +/* Move as many as possible groups from 'src' to 'dst' */
+>>> +void bio_grp_list_move(struct bio_grp_list *dst, struct bio_grp_list *src)
+>>> +{
+>>> +	int i, j, cnt = 0;
+>>> +	struct bio_grp_list_data *grp;
+>>> +
+>>> +	for (i = src->nr_grps - 1; i >= 0; i--) {
+>>> +		grp = &src->head[i];
+>>> +		j = bio_grp_list_find_grp(dst, grp->grp_data);
+>>> +		if (j < 0)
+>>> +			break;
+>>> +		if (bio_grp_list_grp_empty(&dst->head[j])) {
+>>> +			dst->head[j].grp_data = grp->grp_data;
+>>> +			dst->nr_grps++;
+>>> +		}
+>>> +		__bio_grp_list_merge(&dst->head[j].list, &grp->list);
+>>> +		bio_list_init(&grp->list);
+>>> +		cnt++;
+>>> +	}
+>>> +
+>>> +	src->nr_grps -= cnt;
+>>> +}
+>>> +
+>>>  static void bio_poll_ctx_init(struct blk_bio_poll_ctx *pc)
+>>>  {
+>>>  	pc->sq = (void *)pc + sizeof(*pc);
+>>> @@ -866,6 +941,45 @@ static inline void blk_bio_poll_preprocess(struct request_queue *q,
+>>>  		bio->bi_opf |= REQ_POLL_CTX;
+>>>  }
+>>>  
+>>> +static inline void blk_bio_poll_mark_queued(struct bio *bio, bool queued)
+>>> +{
+>>> +	/*
+>>> +	 * The bio has been added to per-task poll queue, mark it as
+>>> +	 * END_BY_POLL, so that this bio is always completed from
+>>> +	 * blk_poll() which is provided with cookied from this bio's
+>>> +	 * submission.
+>>> +	 */
+>>> +	if (!queued)
+>>> +		bio->bi_opf &= ~(REQ_HIPRI | REQ_POLL_CTX);
+>>> +	else
+>>> +		bio_set_flag(bio, BIO_END_BY_POLL);
+>>> +}
+>>> +
+>>> +static bool blk_bio_poll_prep_submit(struct io_context *ioc, struct bio *bio)
+>>> +{
+>>> +	struct blk_bio_poll_ctx *pc = ioc->data;
+>>> +	unsigned int queued;
+>>> +
+>>> +	/*
+>>> +	 * We rely on immutable .bi_end_io between blk-mq bio submission
+>>> +	 * and completion. However, bio crypt may update .bi_end_io during
+>>> +	 * submission, so simply don't support bio based polling for this
+>>> +	 * setting.
+>>> +	 */
+>>> +	if (likely(!bio_has_crypt_ctx(bio))) {
+>>> +		/* track this bio via bio group list */
+>>> +		spin_lock(&pc->sq_lock);
+>>> +		queued = bio_grp_list_add(pc->sq, bio);
+>>> +		blk_bio_poll_mark_queued(bio, queued);
+>>> +		spin_unlock(&pc->sq_lock);
+>>> +	} else {
+>>> +		queued = false;
+>>> +		blk_bio_poll_mark_queued(bio, false);
+>>> +	}
+>>> +
+>>> +	return queued;
+>>> +}
+>>> +
+>>>  static noinline_for_stack bool submit_bio_checks(struct bio *bio)
+>>>  {
+>>>  	struct block_device *bdev = bio->bi_bdev;
+>>> @@ -1018,7 +1132,7 @@ static blk_qc_t __submit_bio(struct bio *bio)
+>>>   * bio_list_on_stack[1] contains bios that were submitted before the current
+>>>   *	->submit_bio_bio, but that haven't been processed yet.
+>>>   */
+>>> -static blk_qc_t __submit_bio_noacct(struct bio *bio)
+>>> +static blk_qc_t __submit_bio_noacct_ctx(struct bio *bio, struct io_context *ioc)
+>>>  {
+>>>  	struct bio_list bio_list_on_stack[2];
+>>>  	blk_qc_t ret = BLK_QC_T_NONE;
+>>> @@ -1041,7 +1155,16 @@ static blk_qc_t __submit_bio_noacct(struct bio *bio)
+>>>  		bio_list_on_stack[1] = bio_list_on_stack[0];
+>>>  		bio_list_init(&bio_list_on_stack[0]);
+>>>  
+>>> -		ret = __submit_bio(bio);
+>>> +		if (ioc && queue_is_mq(q) &&
+>>> +				(bio->bi_opf & (REQ_HIPRI | REQ_POLL_CTX))) {
+>>
+>>
+>> I can see no sense to enqueue the bio into the context->sq when
+>> REQ_HIPRI is cleared while REQ_POLL_CTX is set for the bio.
+>> BLK_QC_T_NONE is returned in this case. This is possible since commit
+>> cc29e1bf0d63 ("block: disable iopoll for split bio").
+> 
+> bio has to be enqueued before submission, and once it is enqueued, it has
+> to be ended by blk_poll(), this way actually simplifies polled bio lifetime
+> a lot, no matter if this bio is really completed via poll or irq.
+> 
+> When submit_bio() is returning BLK_QC_T_NONE, this bio may have been
+> completed already, and we shouldn't touch that bio any more, otherwise
+> things can become quite complicated.
+
+I mean if the following is adequate?
+
+if (ioc && queue_is_mq(q) &&(bio->bi_opf & REQ_HIPRI)) {
+    queued = blk_bio_poll_prep_submit(ioc, bio);
+    ret = __submit_bio(bio);
+    if (queued)
+        bio_set_private_data(bio, ret);
+}
+
+
+Only REQ_HIPRI is checked here, thus bios with REQ_POLL_CTX but without
+REQ_HIPRI needn't be enqueued into poll_context->sq.
+
+For the original bio (with REQ_HIPRI | REQ_POLL_CTX), it's enqueued into
+poll_context->sq, while the following split bios (only with
+REQ_POLL_CTX, REQ_POLL_CTX is cleared by commit cc29e1bf0d63 ("block:
+disable iopoll for split bio")) needn't be enqueued into
+poll_context->sq. Since these bios (only with REQ_POLL_CTX) are not
+enqueued, you won't touch them anymore and you needn't care their lifetime.
+
+Your original code works, and my optimization here could make the code
+be more clear and faster. However I'm not sure the effect of the
+optimization, since the scenario of commit cc29e1bf0d63 ("block: disable
+iopoll for split bio") should be rare.
+
+
+> 
+>>
+>>
+>>> +			bool queued = blk_bio_poll_prep_submit(ioc, bio);
+>>> +
+>>> +			ret = __submit_bio(bio);
+>>> +			if (queued)
+>>> +				bio_set_private_data(bio, ret);
+>>> +		} else {
+>>> +			ret = __submit_bio(bio);
+>>> +		}
+>>>  
+>>>  		/*
+>>>  		 * Sort new bios into those for a lower level and those for the
+>>> @@ -1067,6 +1190,33 @@ static blk_qc_t __submit_bio_noacct(struct bio *bio)
+>>>  	return ret;
+>>>  }
+>>>  
+>>> +static inline blk_qc_t __submit_bio_noacct_poll(struct bio *bio,
+>>> +		struct io_context *ioc)
+>>> +{
+>>> +	struct blk_bio_poll_ctx *pc = ioc->data;
+>>> +
+>>> +	__submit_bio_noacct_ctx(bio, ioc);
+>>> +
+>>> +	/* bio submissions queued to per-task poll context */
+>>> +	if (READ_ONCE(pc->sq->nr_grps))
+>>> +		return current->pid;
+>>> +
+>>> +	/* swapper's pid is 0, but it can't submit poll IO for us */
+>>> +	return BLK_QC_T_BIO_NONE;
+>>> +}
+>>> +
+>>> +static inline blk_qc_t __submit_bio_noacct(struct bio *bio)
+>>> +{
+>>> +	struct io_context *ioc = current->io_context;
+>>> +
+>>> +	if (ioc && ioc->data && (bio->bi_opf & REQ_HIPRI))
+>>> +		return __submit_bio_noacct_poll(bio, ioc);
+>>> +
+>>> +	__submit_bio_noacct_ctx(bio, NULL);
+>>> +
+>>> +	return BLK_QC_T_BIO_NONE;
+>>> +}
+>>> +
+>>>  static blk_qc_t __submit_bio_noacct_mq(struct bio *bio)
+>>>  {
+>>>  	struct bio_list bio_list[2] = { };
+>>> diff --git a/block/blk-ioc.c b/block/blk-ioc.c
+>>> index 5574c398eff6..b9a512f066f8 100644
+>>> --- a/block/blk-ioc.c
+>>> +++ b/block/blk-ioc.c
+>>> @@ -19,6 +19,8 @@ static struct kmem_cache *iocontext_cachep;
+>>>  
+>>>  static inline void free_io_context(struct io_context *ioc)
+>>>  {
+>>> +	blk_bio_poll_io_drain(ioc);
+>>> +
+>>
+>> There may be a time window between the IO submission process detaches
+>> the io_context and the io_context's refcount finally decreased to zero,
+>> when there'are multiple processes sharing one io_context. I don't know
+>> if it is possible that the other process sharing the io_context won't
+>> submit any IO, in which case the bios remained in the io_context won't
+>> be reaped for a long time.
+>>
+>> If the above case is possible, then is it possible to drain the sq once
+>> the process detaches the io_context?
+> 
+> free_io_context() is called after the ioc's refcount drops to zero, so
+> any process sharing this ioc has to be exited.
+
+Just like what I said, when the process, to which the returned cookie
+refers, has exited, while the corresponding io_context exist there for a
+long time (since it's shared by other processes and thus the refcount is
+greater than zero), the bios in io_context->sq have no chance be reaped,
+if the following two conditions are required at the same time
+
+1) the process, to which the returned cookie refers, has exited
+2) the io_context is shared by other processes, while these processes
+dont's submit HIPRI IO, thus blk_poll() won't be called for this io_context.
+
+Though the case may be rare.
+
+> 
+>>
+>>
+>>>  	kfree(ioc->data);
+>>>  	kmem_cache_free(iocontext_cachep, ioc);
+>>>  }
+>>> diff --git a/block/blk-mq.c b/block/blk-mq.c
+>>> index 03f59915fe2c..76a90da83d9c 100644
+>>> --- a/block/blk-mq.c
+>>> +++ b/block/blk-mq.c
+>>> @@ -3865,14 +3865,246 @@ static inline int blk_mq_poll_hctx(struct request_queue *q,
+>>>  	return ret;
+>>>  }
+>>>  
+>>> +static int blk_mq_poll_io(struct bio *bio)
+>>> +{
+>>> +	struct request_queue *q = bio->bi_bdev->bd_disk->queue;
+>>> +	blk_qc_t cookie = bio_get_private_data(bio);
+>>> +	int ret = 0;
+>>> +
+>>> +	if (!bio_flagged(bio, BIO_DONE) && blk_qc_t_valid(cookie)) {
+>>> +		struct blk_mq_hw_ctx *hctx =
+>>> +			q->queue_hw_ctx[blk_qc_t_to_queue_num(cookie)];
+>>> +
+>>> +		ret += blk_mq_poll_hctx(q, hctx);
+>>> +	}
+>>> +	return ret;
+>>> +}
+>>> +
+>>> +static int blk_bio_poll_and_end_io(struct bio_grp_list *grps)
+>>> +{
+>>> +	int ret = 0;
+>>> +	int i;
+>>> +
+>>> +	/*
+>>> +	 * Poll hw queue first.
+>>> +	 *
+>>> +	 * TODO: limit max poll times and make sure to not poll same
+>>> +	 * hw queue one more time.
+>>> +	 */
+>>> +	for (i = 0; i < grps->nr_grps; i++) {
+>>> +		struct bio_grp_list_data *grp = &grps->head[i];
+>>> +		struct bio *bio;
+>>> +
+>>> +		if (bio_grp_list_grp_empty(grp))
+>>> +			continue;
+>>> +
+>>> +		for (bio = grp->list.head; bio; bio = bio->bi_poll)
+>>> +			ret += blk_mq_poll_io(bio);
+>>> +	}
+>>> +
+>>> +	/* reap bios */
+>>> +	for (i = 0; i < grps->nr_grps; i++) {
+>>> +		struct bio_grp_list_data *grp = &grps->head[i];
+>>> +		struct bio *bio;
+>>> +		struct bio_list bl;
+>>> +
+>>> +		if (bio_grp_list_grp_empty(grp))
+>>> +			continue;
+>>> +
+>>> +		bio_list_init(&bl);
+>>> +
+>>> +		while ((bio = __bio_grp_list_pop(&grp->list))) {
+>>> +			if (bio_flagged(bio, BIO_DONE)) {
+>>> +				/* now recover original data */
+>>> +				bio->bi_poll = grp->grp_data;
+>>> +
+>>> +				/* clear BIO_END_BY_POLL and end me really */
+>>> +				bio_clear_flag(bio, BIO_END_BY_POLL);
+>>> +				bio_endio(bio);
+>>> +			} else {
+>>> +				__bio_grp_list_add(&bl, bio);
+>>> +			}
+>>> +		}
+>>> +		__bio_grp_list_merge(&grp->list, &bl);
+>>> +	}
+>>> +	return ret;
+>>> +}
+>>> +
+>>> +static void blk_bio_poll_pack_groups(struct bio_grp_list *grps)
+>>> +{
+>>> +	int i, j, k = 0;
+>>> +	int cnt = 0;
+>>> +
+>>> +	for (i = grps->nr_grps - 1; i >= 0; i--) {
+>>> +		struct bio_grp_list_data *grp = &grps->head[i];
+>>> +		struct bio_grp_list_data *hole = NULL;
+>>> +
+>>> +		if (bio_grp_list_grp_empty(grp)) {
+>>> +			cnt++;
+>>> +			continue;
+>>> +		}
+>>> +
+>>
+>>> +		for (j = k; j < i; j++) {
+>>> +			hole = &grps->head[j];
+>>> +			if (bio_grp_list_grp_empty(hole))
+>>> +				break;
+>>> +		}
+>>
+>> Shoule be
+>>
+>>> +		for (j = k; j < i; j++) {
+>>> +			tmp = &grps->head[j];
+>>> +			if (bio_grp_list_grp_empty(tmp)) {
+>>> +                             hole = tmp;
+>>> +				break;
+>>> +                     }
+>>> +		}
+> 
+> Good catch!
+> 
+>>
+>>> +		if (hole == NULL)
+>>> +			break;
+>>> +		*hole = *grp;
+>>> +		cnt++;
+>>> +		k = j;
+>>> +	}
+>>> +
+>>> +	grps->nr_grps -= cnt;
+>>> +}
+>>> +
+>>> +#define  MAX_BIO_GRPS_ON_STACK  8
+>>> +struct bio_grp_list_stack {
+>>> +	unsigned int max_nr_grps, nr_grps;
+>>> +	struct bio_grp_list_data head[MAX_BIO_GRPS_ON_STACK];
+>>> +};
+>>> +
+>>> +static int blk_bio_poll_io(struct io_context *submit_ioc,
+>>> +		struct io_context *poll_ioc)
+>>> +
+>>> +{
+>>> +	struct bio_grp_list_stack _bio_grps = {
+>>> +		.max_nr_grps	= ARRAY_SIZE(_bio_grps.head),
+>>> +		.nr_grps	= 0
+>>> +	};
+>>> +	struct bio_grp_list *bio_grps = (struct bio_grp_list *)&_bio_grps;
+>>> +	struct blk_bio_poll_ctx *submit_ctx = submit_ioc->data;
+>>> +	struct blk_bio_poll_ctx *poll_ctx = poll_ioc ?
+>>> +		poll_ioc->data : NULL;
+>>> +	int ret = 0;
+>>> +
+>>> +	/*
+>>> +	 * Move IO submission result from submission queue in submission
+>>> +	 * context to poll queue of poll context.
+>>> +	 */
+>>> +	spin_lock(&submit_ctx->sq_lock);
+>>> +	bio_grp_list_move(bio_grps, submit_ctx->sq);
+>>> +	spin_unlock(&submit_ctx->sq_lock);
+>>> +
+>>> +	/* merge new bios first, then start to poll bios from pq */
+>>> +	if (poll_ctx) {
+>>> +		spin_lock(&poll_ctx->pq_lock);
+>>> +		bio_grp_list_move(poll_ctx->pq, bio_grps);
+>>> +		bio_grp_list_move(bio_grps, poll_ctx->pq);
+>>
+>> What's the purpose of this two-step merge? Is that for new bios (from
+>> sq) is at the tail of the bio_list, and thus old bios (from pq) is
+>> polled first?
+> 
+> Yeah, so we can poll old bios first. Also the following bio polling can
+> cover new bios just from submission context too.
+> 
+>>
+>>> +		spin_unlock(&poll_ctx->pq_lock);
+>>> +	}
+>>> +
+>>> +	do {
+>>> +		ret += blk_bio_poll_and_end_io(bio_grps);
+>>> +		blk_bio_poll_pack_groups(bio_grps);
+>>> +
+>>> +		if (bio_grps->nr_grps) {
+>>> +			/*
+>>> +			 * move back, and keep polling until all can be
+>>> +			 * held in either poll queue or submission queue.
+>>> +			 */
+>>> +			if (poll_ctx) {
+>>> +				spin_lock(&poll_ctx->pq_lock);
+>>> +				bio_grp_list_move(poll_ctx->pq, bio_grps);
+>>> +				spin_unlock(&poll_ctx->pq_lock);
+>>> +			} else {
+>>> +				spin_lock(&submit_ctx->sq_lock);
+>>> +				bio_grp_list_move(submit_ctx->sq, bio_grps);
+>>> +				spin_unlock(&submit_ctx->sq_lock);
+>>> +			}
+>>> +		}
+>>> +	} while (bio_grps->nr_grps > 0);
+>>> +
+>>> +	return ret;
+>>> +}
+>>> +
+>>> +void blk_bio_poll_io_drain(struct io_context *submit_ioc)
+>>> +{
+>>> +	struct blk_bio_poll_ctx *submit_ctx = submit_ioc->data;
+>>> +
+>>> +	if (!submit_ctx)
+>>> +		return;
+>>> +
+>>> +	while (submit_ctx->sq->nr_grps > 0) {
+>>> +		blk_bio_poll_io(submit_ioc, NULL);
+>>> +		cpu_relax();
+>>> +	}
+>>> +}
+>>> +
+>>> +static bool blk_bio_ioc_valid(struct task_struct *t)
+>>> +{
+>>> +	if (!t)
+>>> +		return false;
+>>> +
+>>> +	if (!t->io_context)
+>>> +		return false;
+>>> +
+>>> +	if (!t->io_context->data)
+>>> +		return false;
+>>> +
+>>> +	return true;
+>>> +}
+>>> +
+>>> +static int __blk_bio_poll(blk_qc_t cookie)
+>>> +{
+>>> +	struct io_context *poll_ioc = current->io_context;
+>>> +	pid_t pid;
+>>> +	struct task_struct *submit_task;
+>>> +	int ret;
+>>> +
+>>> +	pid = (pid_t)cookie;
+>>> +
+>>> +	/* io poll often share io submission context */
+>>> +	if (likely(current->pid == pid && blk_bio_ioc_valid(current)))
+>>> +		return blk_bio_poll_io(poll_ioc, poll_ioc);
+>>> +
+>>> +	submit_task = find_get_task_by_vpid(pid);
+>>> +	if (likely(blk_bio_ioc_valid(submit_task)))
+>>> +		ret = blk_bio_poll_io(submit_task->io_context, poll_ioc);
+>>> +	else
+>>> +		ret = 0;
+>>> +
+>>> +	put_task_struct(submit_task);
+>>
+>> put_task_struct() is not needed when @submit_task is NULL.
+> 
+> Good catch, usually submit_task shouldn't be NULL, but it can be exited
+> already.
+> 
+> 
+> Thanks, 
+> Ming
+> 
+
+-- 
+Thanks,
+Jeffle
