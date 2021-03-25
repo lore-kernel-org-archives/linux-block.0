@@ -2,117 +2,166 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84572C433C1
-	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 12:34:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9607DC433C1
+	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 13:10:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 58BE161A17
-	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 12:34:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 63DE6619EE
+	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 13:10:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230208AbhCYMdv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Mar 2021 08:33:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53886 "EHLO
+        id S230093AbhCYNKX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Mar 2021 09:10:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33704 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229524AbhCYMdd (ORCPT
+        with ESMTP id S230078AbhCYNKW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Mar 2021 08:33:33 -0400
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1122C06174A
-        for <linux-block@vger.kernel.org>; Thu, 25 Mar 2021 05:33:31 -0700 (PDT)
-Received: by mail-pf1-x432.google.com with SMTP id q5so1892373pfh.10
-        for <linux-block@vger.kernel.org>; Thu, 25 Mar 2021 05:33:31 -0700 (PDT)
+        Thu, 25 Mar 2021 09:10:22 -0400
+Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD03EC06175F
+        for <linux-block@vger.kernel.org>; Thu, 25 Mar 2021 06:10:21 -0700 (PDT)
+Received: by mail-ej1-x62f.google.com with SMTP id b7so2831835ejv.1
+        for <linux-block@vger.kernel.org>; Thu, 25 Mar 2021 06:10:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to
-         :user-agent;
-        bh=KktxKyKGelQgcFPIDO5e1S/J3rfhBJ49hV8MaJBU4dk=;
-        b=rWEIbq+++v1UuZrd75mrg1rmM+nvqDsfDOn2UKyVzY0XZGG7oRPKUQjiD8KOh3nw3z
-         P1Gr1L/K7L7sk4ESPJ5XW5OYXJfXLNRe6vpw00a8HKpEkHLnU1q1LEAdkMrSJw+IYo3h
-         NFLVq4bC5rigCjyE8+k1Z5/vBG8k9065Nb6qAF9FiL7ftor8PWuySMUgyPOTDG6z+fD1
-         KlmdKEGPu8IHpVXOUKZXxT7JUD6K6IDDwmvhO/kghTvBjArl2UAeTEj+sPMGmUk8jZgM
-         qqtQatiE8ZFE3FWcUpxqFetkxziDMWVAak9gcUtYUIG0rn5f8b73F+bMc/piG3/4ZBc1
-         Rl0Q==
+        d=soleen.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=zxzcvSpuW5BzO5KFJl2Jtm9u8hATZIardWi4yi/tUdw=;
+        b=dhpkGEz7F7VPrF8qt11YAdUTNN38LDOuNBbwCKRx2c85T7s4WhMdIbYl94FrwIJ4/4
+         xcNrf+3rO8Y2AdkQago6LnTWOk+7BYbz9kXaVU1QUL+3dK19s0KpfORr+a/TcQJz0SQk
+         2laK69ap1j96hgTefznUvFGAUInNLKiCdgVVicYTwiyva5nYgqQTJoY3gr+EeqVe1nVw
+         FaIvqAqf6+CzlYR5cvkR4Juf9AXHo92HOZhumHRmHVK8tu2VVOP+7CeZdzdAQzj4tkUg
+         lj0MxLolDyCuuxH3vOdmAHHChDeUOoDeMrlN6udNiA33yLoq+yc/9lw7OXRTiSPjE111
+         LkEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=KktxKyKGelQgcFPIDO5e1S/J3rfhBJ49hV8MaJBU4dk=;
-        b=Wje5PICx/WN6KTsNVq4Cge3GBWkH/Y7S8c6Ql7QH3yVfhszRHmDv5LhR7me5dBktiY
-         AWzEnlAbkTls8/BcXl4qKZDrcs+UB/WYIirwohvpPjH1CxnyBYqGONQ91M98OvTGaTDD
-         pK3/Z2c83AeORk5Ofr+IfGHfrD6nksK1QILdbMEOKy+0bPojRckFJhpkEj7Jav+q0EYE
-         33NY/cKddDE/liVy8W/LTHTW46TsMJE9SLv7rXbeIIY5p2tvNazjLJQPUOOKKm7wzU4M
-         BAmmMNiEwHGOJ9NdlsaUuLnHWTsEYVevdswrBcM2vfHZO2zLh9Y070dtWj48xc9vZWyg
-         EGoA==
-X-Gm-Message-State: AOAM533twlcHbOgdPvPWltOi6DYn/dQoaSFCtcVerERjjSnneY8u9YK+
-        QGNw1nnHH3b9395AfFBPAvM=
-X-Google-Smtp-Source: ABdhPJyc15D3EFn6gprEFDfqD/4hhRaU92zL/wilIwXfEsQZ+kkBiBNoig6lvtUuPDqyFUmm7roqYQ==
-X-Received: by 2002:a17:902:8685:b029:e6:5ff6:f7df with SMTP id g5-20020a1709028685b02900e65ff6f7dfmr9426404plo.40.1616675611172;
-        Thu, 25 Mar 2021 05:33:31 -0700 (PDT)
-Received: from localhost ([58.127.46.74])
-        by smtp.gmail.com with ESMTPSA id d11sm6388387pfd.43.2021.03.25.05.33.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Mar 2021 05:33:30 -0700 (PDT)
-Date:   Thu, 25 Mar 2021 21:33:29 +0900
-From:   Minwoo Im <minwoo.im.dev@gmail.com>
-To:     Niklas Cassel <Niklas.Cassel@wdc.com>
-Cc:     "javier@javigon.com" <javier@javigon.com>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "sagi@grimberg.me" <sagi@grimberg.me>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "kbusch@kernel.org" <kbusch@kernel.org>,
-        Javier =?utf-8?B?R29uesOhbGV6?= <javier.gonz@samsung.com>,
-        "hch@lst.de" <hch@lst.de>
-Subject: Re: [PATCH V6 1/2] nvme: enable char device per namespace
-Message-ID: <20210325123329.GA3850@localhost>
-References: <20210301192452.16770-1-javier.gonz@samsung.com>
- <20210301192452.16770-2-javier.gonz@samsung.com>
- <YFyBM1qq+AmYQvdl@x1-carbon.lan>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=zxzcvSpuW5BzO5KFJl2Jtm9u8hATZIardWi4yi/tUdw=;
+        b=EcZhyulBjJXZh7eixgrhsRhSwf1lReNOK6XHy0joVJvATaW/BLYcxaDGnCr2moS6Iy
+         XLomPmFUja/U89ySIElg3CFSKX9OVWIFNqqIvMEZvHQ+YAEdv7pAflbybESkMRrVTQJU
+         qMel4PGTV0gyngYMirPah24xVjHOxgT9gZL6aHqx6/+UpKp3x5wn0yZqw7O57BspJZf9
+         8MdARSX26rN7Wkbj0FJqappR25Ha7GEb73niJIUqUkrrdrwJAyVYWGejWAWgjimu2zvq
+         wGwwdBJ7vP7qnwBimYk/1CTQsNddCK50Ul7j4K7BGTuQi+C7+pflTaLWEhtqK68yLn4+
+         Im/A==
+X-Gm-Message-State: AOAM531T36harkcvzuxNIRgZlUnfECeY0Ne4XyB3cRsrZp18PIBXfiGc
+        ScqAhCqBM/Nxw6R7QJZMDfpq2HKpsmZUQglA6QkBCQ==
+X-Google-Smtp-Source: ABdhPJxmOrGZbR5jfPwo23eClqK/B4EIJuvV/F2TH8vBmojVqBN7770nnzNKZZa+b3hqNNvrrPmTHy0HqErHFzSFD2w=
+X-Received: by 2002:a17:906:3409:: with SMTP id c9mr9284256ejb.314.1616677815208;
+ Thu, 25 Mar 2021 06:10:15 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <YFyBM1qq+AmYQvdl@x1-carbon.lan>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+References: <20210325092203.10251-1-qiang.zhang@windriver.com>
+In-Reply-To: <20210325092203.10251-1-qiang.zhang@windriver.com>
+From:   Pavel Tatashin <pasha.tatashin@soleen.com>
+Date:   Thu, 25 Mar 2021 09:09:39 -0400
+Message-ID: <CA+CK2bCS9Ab+F9gzGEJejW6J3R26j1JNBOV3tvcR6+fz2uRfpw@mail.gmail.com>
+Subject: Re: [PATCH] loop: Fix use of unsafe lo->lo_mutex locks
+To:     qiang.zhang@windriver.com
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 21-03-25 12:25:24, Niklas Cassel wrote:
-> On Mon, Mar 01, 2021 at 08:24:51PM +0100, javier@javigon.com wrote:
-> > From: Javier González <javier.gonz@samsung.com>
-> > 
-> > Create a char device per NVMe namespace. This char device is always
-> > initialized, independently of whether the features implemented by the
-> > device are supported by the kernel. User-space can therefore always
-> > issue IOCTLs to the NVMe driver using the char device.
-> > 
-> > The char device is presented as /dev/nvme-generic-XcYnZ. This naming
-> > scheme follows the convention of the hidden device (nvmeXcYnZ). Support
-> > for multipath will follow.
-> 
-> Do we perhaps want to put these new character devices inside a subdir?
-> e.g. /dev/nvme/nvme-generic-XcYnZ ?
-> 
-> Otherwise it feels like doing such a simple thing as ls -al /dev/nvme*
-> will show a lot of devices because of these new specialized char devices.
+Hi Qiang,
 
-Good point.  If we have thousands of namespaces, it will create 2 times
-of the blkdevs.  I would hear what maintainers say about this :)
+Thank you for root causing this issue. Did you encounter this issue or
+found by inspection?
 
-FYI: new version has been posted with V1 by re-create this series with
-Javier.  Please have a discuss there:
+I would change the title to what actually being changed, something like:
 
-    https://lore.kernel.org/linux-nvme/20210325123048.94784-1-minwoo.im.dev@gmail.com/T/#u
+loop: call __loop_clr_fd() with lo_mutex locked to avoid autoclear race
 
-Thanks!
 
-> 
-> 
-> Kind regards,
-> Niklas
+>   ......                                       kfree(lo)
+>        UAF
+>
+> When different tasks on two CPUs perform the above operations on the same
+> lo device, UAF may occur.
+
+Please also explain the fix:
+
+Do not drop lo->lo_mutex before calling __loop_clr_fd(), so refcnt and
+LO_FLAGS_AUTOCLEAR check in lo_release stay in sync.
+
+>
+> Fixes: 6cc8e7430801 ("loop: scale loop device by introducing per device lock")
+> Signed-off-by: Zqiang <qiang.zhang@windriver.com>
+> ---
+>  drivers/block/loop.c | 11 ++++-------
+>  1 file changed, 4 insertions(+), 7 deletions(-)
+>
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index d58d68f3c7cd..5712f1698a66 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -1201,7 +1201,6 @@ static int __loop_clr_fd(struct loop_device *lo, bool release)
+>         bool partscan = false;
+>         int lo_number;
+>
+> -       mutex_lock(&lo->lo_mutex);
+>         if (WARN_ON_ONCE(lo->lo_state != Lo_rundown)) {
+>                 err = -ENXIO;
+>                 goto out_unlock;
+> @@ -1257,7 +1256,6 @@ static int __loop_clr_fd(struct loop_device *lo, bool release)
+>         lo_number = lo->lo_number;
+>         loop_unprepare_queue(lo);
+>  out_unlock:
+> -       mutex_unlock(&lo->lo_mutex);
+>         if (partscan) {
+>                 /*
+>                  * bd_mutex has been held already in release path, so don't
+> @@ -1288,12 +1286,11 @@ static int __loop_clr_fd(struct loop_device *lo, bool release)
+>          * protects us from all the other places trying to change the 'lo'
+>          * device.
+>          */
+> -       mutex_lock(&lo->lo_mutex);
+> +
+>         lo->lo_flags = 0;
+>         if (!part_shift)
+>                 lo->lo_disk->flags |= GENHD_FL_NO_PART_SCAN;
+>         lo->lo_state = Lo_unbound;
+> -       mutex_unlock(&lo->lo_mutex);
+>
+>         /*
+>          * Need not hold lo_mutex to fput backing file. Calling fput holding
+> @@ -1332,9 +1329,10 @@ static int loop_clr_fd(struct loop_device *lo)
+>                 return 0;
+>         }
+>         lo->lo_state = Lo_rundown;
+> +       err = __loop_clr_fd(lo, false);
+>         mutex_unlock(&lo->lo_mutex);
+>
+> -       return __loop_clr_fd(lo, false);
+> +       return err;
+>  }
+>
+>  static int
+> @@ -1916,13 +1914,12 @@ static void lo_release(struct gendisk *disk, fmode_t mode)
+>                 if (lo->lo_state != Lo_bound)
+>                         goto out_unlock;
+>                 lo->lo_state = Lo_rundown;
+> -               mutex_unlock(&lo->lo_mutex);
+>                 /*
+>                  * In autoclear mode, stop the loop thread
+>                  * and remove configuration after last close.
+>                  */
+>                 __loop_clr_fd(lo, true);
+> -               return;
+> +               goto out_unlock;
+>         } else if (lo->lo_state == Lo_bound) {
+>                 /*
+>                  * Otherwise keep thread (if running) and config,
+> --
+> 2.17.1
+>
+
+LGTM
+Reviewed-by: Pavel Tatashin <pasha.tatashin@soleen.com>
+
+Thank you,
+Pasha
