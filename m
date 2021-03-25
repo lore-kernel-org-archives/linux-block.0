@@ -2,76 +2,76 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3223C433DB
-	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 15:11:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1622C433C1
+	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 15:15:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9623D61A2A
-	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 15:11:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C13CA61A2A
+	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 15:15:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230406AbhCYPLC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Mar 2021 11:11:02 -0400
-Received: from mga06.intel.com ([134.134.136.31]:23427 "EHLO mga06.intel.com"
+        id S230241AbhCYPOt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Mar 2021 11:14:49 -0400
+Received: from mail.kernel.org ([198.145.29.99]:35698 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230113AbhCYPKt (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Mar 2021 11:10:49 -0400
-IronPort-SDR: zZoJS4eICzrYsv76NatE7PzRA54ekUwnFIzPXXN1huSP4fvb2cPrFwyii8XUw6KgJ7BmzE9MiN
- hJbBZxkkEVRg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9934"; a="252305246"
-X-IronPort-AV: E=Sophos;i="5.81,277,1610438400"; 
-   d="scan'208";a="252305246"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2021 08:10:48 -0700
-IronPort-SDR: dPvFJNBPXz+6hB+ecIHrgxpLZawb8lLhygnp4vUuH4RjI/fPMOirG8taFHfKyYVt+tqxrpbPgs
- xtVQhWYMifZA==
-X-IronPort-AV: E=Sophos;i="5.81,277,1610438400"; 
-   d="scan'208";a="416044528"
-Received: from iweiny-desk2.sc.intel.com (HELO localhost) ([10.3.52.147])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2021 08:10:48 -0700
-Date:   Thu, 25 Mar 2021 08:10:48 -0700
-From:   Ira Weiny <ira.weiny@intel.com>
-To:     Theodore Ts'o <tytso@mit.edu>
-Cc:     Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
-        linux-block@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net,
-        linux-fsdevel@vger.kernel.org, axboe@kernel.dk,
-        adilger.kernel@dilger.ca, jaegeuk@kernel.org, chao@kernel.org,
-        johannes.thumshirn@wdc.com, damien.lemoal@wdc.com,
-        bvanassche@acm.org, dongli.zhang@oracle.com, clm@fb.com,
-        dsterba@suse.com, ebiggers@kernel.org, hch@infradead.org,
-        dave.hansen@intel.com
-Subject: Re: [RFC PATCH 6/8] ext4: use memcpy_to_page() in pagecache_write()
-Message-ID: <20210325151047.GX3014244@iweiny-DESK2.sc.intel.com>
-References: <20210207190425.38107-1-chaitanya.kulkarni@wdc.com>
- <20210207190425.38107-7-chaitanya.kulkarni@wdc.com>
- <YFycvk4aMoPAZcwJ@mit.edu>
+        id S231375AbhCYPOi (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 25 Mar 2021 11:14:38 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 92E8861879;
+        Thu, 25 Mar 2021 15:14:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1616685278;
+        bh=EbycO/deHFM530+ruOu412p0Jfev3nG2KiWakLqetXo=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=dxlUVWMHYwvolg6D/CjQEqHhZ1nmoq17qMz33zAghoiiqto221fGWVmcGAplrNtoK
+         FMSy00KeLMdiGsAQkfde4zgyl6QTJgk33R1t190q5furIs2W41ujDs+DRFrGr5FGbU
+         m8BO7nNGIIhfTf8GFvPbvvmHYI67E5vQHhIY2ZGeqi8DxwMFvRHgCE0meXUhJ86VE7
+         qBmQx363VMisDJL0QFDNfS9915xjXpvXdz723YeODrCj7KTtWBafBLOlGL/vQADyR0
+         ZZVxpdDCmqNK/bDFLdD7VzSP/gau4R5mOOOfwgXovYPyYkDE6zcKEgcVQaf1bzVRhw
+         HVyAzyDbCYWYQ==
+Date:   Fri, 26 Mar 2021 00:14:33 +0900
+From:   Keith Busch <kbusch@kernel.org>
+To:     Niklas Cassel <Niklas.Cassel@wdc.com>
+Cc:     "javier@javigon.com" <javier@javigon.com>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "sagi@grimberg.me" <sagi@grimberg.me>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "minwoo.im.dev@gmail.com" <minwoo.im.dev@gmail.com>,
+        Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier.gonz@samsung.com>,
+        "hch@lst.de" <hch@lst.de>
+Subject: Re: [PATCH V6 1/2] nvme: enable char device per namespace
+Message-ID: <20210325151433.GA31394@redsun51.ssa.fujisawa.hgst.com>
+References: <20210301192452.16770-1-javier.gonz@samsung.com>
+ <20210301192452.16770-2-javier.gonz@samsung.com>
+ <YFyBM1qq+AmYQvdl@x1-carbon.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <YFycvk4aMoPAZcwJ@mit.edu>
-User-Agent: Mutt/1.11.1 (2018-12-01)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <YFyBM1qq+AmYQvdl@x1-carbon.lan>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 25, 2021 at 10:22:54AM -0400, Theodore Y. Ts'o wrote:
-> On Sun, Feb 07, 2021 at 11:04:23AM -0800, Chaitanya Kulkarni wrote:
-> > Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-> > ---
-> >  fs/ext4/verity.c | 5 +----
-> >  1 file changed, 1 insertion(+), 4 deletions(-)
+On Thu, Mar 25, 2021 at 12:25:24PM +0000, Niklas Cassel wrote:
+> On Mon, Mar 01, 2021 at 08:24:51PM +0100, javier@javigon.com wrote:
+> > From: Javier González <javier.gonz@samsung.com>
+> > 
+> > Create a char device per NVMe namespace. This char device is always
+> > initialized, independently of whether the features implemented by the
+> > device are supported by the kernel. User-space can therefore always
+> > issue IOCTLs to the NVMe driver using the char device.
+> > 
+> > The char device is presented as /dev/nvme-generic-XcYnZ. This naming
+> > scheme follows the convention of the hidden device (nvmeXcYnZ). Support
+> > for multipath will follow.
 > 
-> Hi, were you expecting to have file system maintainers take these
-> patches into their own trees?  The ext4 patches look good, and unless
-> you have any objections, I can take them through the ext4 tree.
+> Do we perhaps want to put these new character devices inside a subdir?
+> e.g. /dev/nvme/nvme-generic-XcYnZ ?
 
-I should have sent the lore link to the fix:
-
-https://lore.kernel.org/linux-f2fs-devel/BYAPR04MB496564B786E293FDA21D06E6868F9@BYAPR04MB4965.namprd04.prod.outlook.com/
-
-Sorry,
-Ira
+I actually suggested the same hierarchy, but that was rejected.
+ 
+> Otherwise it feels like doing such a simple thing as ls -al /dev/nvme*
+> will show a lot of devices because of these new specialized char devices.
