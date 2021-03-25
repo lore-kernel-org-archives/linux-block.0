@@ -8,60 +8,60 @@ X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E1A5C433C1
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDF1DC433E3
 	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 21:28:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5176961A45
+	by mail.kernel.org (Postfix) with ESMTP id 9473761A45
 	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 21:28:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230470AbhCYV1e (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Mar 2021 17:27:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57168 "EHLO
+        id S230509AbhCYV1h (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Mar 2021 17:27:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57232 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230493AbhCYV1N (ORCPT
+        with ESMTP id S230512AbhCYV1Y (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Mar 2021 17:27:13 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED0EBC06175F
-        for <linux-block@vger.kernel.org>; Thu, 25 Mar 2021 14:27:12 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id a19so1843422ybg.10
-        for <linux-block@vger.kernel.org>; Thu, 25 Mar 2021 14:27:12 -0700 (PDT)
+        Thu, 25 Mar 2021 17:27:24 -0400
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42080C061761
+        for <linux-block@vger.kernel.org>; Thu, 25 Mar 2021 14:27:23 -0700 (PDT)
+Received: by mail-pf1-x44a.google.com with SMTP id r18so5023809pfc.17
+        for <linux-block@vger.kernel.org>; Thu, 25 Mar 2021 14:27:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=sXfRUgmRe7kH6AU5n/x2XWTuNQDYYUL8f3DAKwSKEzw=;
-        b=AnRR1mnKpdEoFdG1gN035lAY93R2KGeI6lEzSv4jdsznjZwNgsmypdE7iioWFPasJ9
-         kkpo9QDUQhkLE5C/7Im6GCZo6xSTN4rTX93pOPcxYDT55LOOCRgw0oZ5Hl6+jy62ShYu
-         6OutHCkIzXZoEU0+M0hWhBgE/PbHpI0Tv3Xc20Z50n1j891rZd1mijgvr8lVeuv649yP
-         JGok9RRTZQ8m/AoapgbgajjfTsU+JR+/E5B0C6KuqYkzh7Vh5vYDsWGyARRnQ1bLwF9n
-         7YhbC+dut7xa7s27Pv/EkiHvBju9UKIIgcaFyDyeJk6LvSYkF5dQX8znbwtFWD0PsWGi
-         6/1A==
+        bh=VeqQSH4BAMfamuR0TIVDu2q/mURjw8ysmtF95aAYc5g=;
+        b=iIB/QotjWVxSDIpkUJeHf+48IT7EqDCP7QaLJh6PM3Hv3F8UcFt/7c1mQhoByWDg5w
+         B2UHGD+Tl9Jx/foLXk869SWCL5TI84wfOoQSFaRrWF8nQOV3EMqGDt+FmZ/tEnUhSPDn
+         dgB6JKaUs1NSogJqeqWeQkD6m8ftwSRvlxURDFlo1NDdyLDvyE5DXiI5J53iDrAptWQS
+         OV/7OVzexzU9nL3RGuwfSIuKvdbmnYl+8c2s29BlAUm6jjERXmfoRskDwEwnjldkUvM1
+         2w/0N6UamJghZiBZyvA5CCsmECbqiSwczQZsiXPOHg+gUaSDmxCwJsP2uznjv7L2nkS5
+         UwDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=sXfRUgmRe7kH6AU5n/x2XWTuNQDYYUL8f3DAKwSKEzw=;
-        b=thu2ff8MXv1VYnx43djvmISHnDvWYxlQkaA9KRrVdj/1wiQuPkb1oMOj8ZInwNsSwZ
-         Mz+zmjigY41q6DHO6jvLuAm8hmdFiOBrGGapNdYHM3Q8zsb39DwryEaODwLRc++2/8hY
-         mry4FV7JyDWGXuQMkxKJcfHVbiAaBv14ceQRf1Ofn79HufdsFt8WPoxdM0voeXHNdPug
-         PvDP0wUTvoaPLjjSVBv5ojvuh0TIOPTcULETAkArndxf0GOF15yjFcuxDDwk9l/OZS/H
-         pctqQDx7W4qyFWEkFfq0yK2rKHmZg+e8dI++P+8xrqhSBLJ/B7d7OuLZsZ9TUMCJJic5
-         xrpg==
-X-Gm-Message-State: AOAM5320kMioPeZsT3LNrEGvzBHlq+a/GezX0jkVvUltX7atA3dAUWht
-        s2Tl92UXbhWfX8bbMN0Nxx6K638hxLXQ/A/wq+n6jOSXhxq31eCIV5if+H5a639QRCQ/+gki3uS
-        GMC5bH0W1qeHOe32BwZZbp5pysbozD8uGV9j0FEp/IW2UJnDMmCQ7+dEmDT5kHPVdIJPj
-X-Google-Smtp-Source: ABdhPJz7DN29DrVMX+YcK1AWw6+N8szReisPV6zaP6Y2M4RZL7AZWIt95VSCM5um9M2HM8lBbP8Iet4DGCA=
+        bh=VeqQSH4BAMfamuR0TIVDu2q/mURjw8ysmtF95aAYc5g=;
+        b=T1qnHzPuKM1TsMcbJsrPp6zr/Q0rUJowXC/25+5xPMHx2tmNIuHA1GgtBz47wYaG/u
+         7fZoj4FLMO6P5f/LS7KDUBmq38p3XAZIv4UhQbw2k//RcKX/SDt/lMra9WoBxROuNHVF
+         AR5FMsFkR9T9OAvnE1YJXIZ0kQkNLHt2SSAwPZFb2Ua4/lsexmBQ0le2a24z+43XEEDs
+         PeVvam9t4wEwlA5lbOflwbOLRSBV/rPwJdEKSz9JKGYWphclFgxWyd4mMjyz7vqyl5aj
+         7LDNtJpI6sz1F36wmswXh8RVuVhXybzy7zJbEQbWZXkOBqpEYGnL/jmvTxvMxbQo+Qp4
+         sgHg==
+X-Gm-Message-State: AOAM531VfSz7bhD74KrYj9DVLU06YVllzDTKTGXJiut4GGFGoMQmIioQ
+        tNQ3PF1gj5cv3xJ4LdXKcufZhDMFVGGPyftk+FG2qAzEuqWM0uUPHCyLMcALnjQhZAMj+R+xN2u
+        VhuXCZsZQfhw9V8l/yodRUrr4kozcy1xmoB0exYS/AIoKQoz8V4gyksdUJiFMxKWyXwmi
+X-Google-Smtp-Source: ABdhPJx8aHEdvXlb3UgvsOScmw6EfBXxYY/yM5TkRR0f5jYmkvclrzvTBWVREz+Lt00OU3rQNPW32DXzrfk=
 X-Received: from satyaprateek.c.googlers.com ([fda3:e722:ac3:10:24:72f4:c0a8:1092])
- (user=satyat job=sendgmr) by 2002:a25:a0cd:: with SMTP id i13mr15307478ybm.302.1616707632232;
- Thu, 25 Mar 2021 14:27:12 -0700 (PDT)
-Date:   Thu, 25 Mar 2021 21:26:03 +0000
+ (user=satyat job=sendgmr) by 2002:a63:c84a:: with SMTP id l10mr9146122pgi.159.1616707642540;
+ Thu, 25 Mar 2021 14:27:22 -0700 (PDT)
+Date:   Thu, 25 Mar 2021 21:26:09 +0000
 In-Reply-To: <20210325212609.492188-1-satyat@google.com>
-Message-Id: <20210325212609.492188-3-satyat@google.com>
+Message-Id: <20210325212609.492188-9-satyat@google.com>
 Mime-Version: 1.0
 References: <20210325212609.492188-1-satyat@google.com>
 X-Mailer: git-send-email 2.31.0.291.g576ba9dcdaf-goog
-Subject: [PATCH v2 2/8] dm,mmc,ufshcd: handle error from blk_ksm_register()
+Subject: [PATCH v2 8/8] block: add WARN() in bio_split() for sector alignment
 From:   Satya Tangirala <satyat@google.com>
 To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     Jens Axboe <axboe@kernel.dk>, Eric Biggers <ebiggers@google.com>,
@@ -71,65 +71,29 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Handle any error from blk_ksm_register() in the callers. Previously,
-the callers ignored the return value because blk_ksm_register() wouldn't
-fail as long as the request_queue didn't have integrity support too, but
-as this is no longer the case, it's safer for the callers to just handle
-the return value appropriately.
+The number of sectors passed to bio_split() should be aligned to
+bio_required_sector_alignment(). All callers (other than bounce.c) have
+been updated to ensure this, so add a WARN() if the number of sectors is
+not aligned. (bounce.c was not updated since it's legacy code that
+won't interact with inline encryption).
 
 Signed-off-by: Satya Tangirala <satyat@google.com>
 ---
- drivers/md/dm-table.c            | 3 ++-
- drivers/mmc/core/crypto.c        | 6 ++++--
- drivers/scsi/ufs/ufshcd-crypto.c | 6 ++++--
- 3 files changed, 10 insertions(+), 5 deletions(-)
+ block/bio.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
-index db18a58adad7..1225b9050f29 100644
---- a/drivers/md/dm-table.c
-+++ b/drivers/md/dm-table.c
-@@ -1372,7 +1372,8 @@ static void dm_update_keyslot_manager(struct request_queue *q,
+diff --git a/block/bio.c b/block/bio.c
+index 26b7f721cda8..cb348f134a15 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1458,6 +1458,7 @@ struct bio *bio_split(struct bio *bio, int sectors,
  
- 	/* Make the ksm less restrictive */
- 	if (!q->ksm) {
--		blk_ksm_register(t->ksm, q);
-+		if (WARN_ON(!blk_ksm_register(t->ksm, q)))
-+			dm_destroy_keyslot_manager(t->ksm);
- 	} else {
- 		blk_ksm_update_capabilities(q->ksm, t->ksm);
- 		dm_destroy_keyslot_manager(t->ksm);
-diff --git a/drivers/mmc/core/crypto.c b/drivers/mmc/core/crypto.c
-index 419a368f8402..616103393557 100644
---- a/drivers/mmc/core/crypto.c
-+++ b/drivers/mmc/core/crypto.c
-@@ -21,8 +21,10 @@ void mmc_crypto_set_initial_state(struct mmc_host *host)
+ 	BUG_ON(sectors <= 0);
+ 	BUG_ON(sectors >= bio_sectors(bio));
++	WARN_ON(!IS_ALIGNED(sectors, bio_required_sector_alignment(bio)));
  
- void mmc_crypto_setup_queue(struct request_queue *q, struct mmc_host *host)
- {
--	if (host->caps2 & MMC_CAP2_CRYPTO)
--		blk_ksm_register(&host->ksm, q);
-+	if (host->caps2 & MMC_CAP2_CRYPTO) {
-+		if (WARN_ON(!blk_ksm_register(&host->ksm, q)))
-+			host->caps2 &= ~MMC_CAP2_CRYPTO;
-+	}
- }
- EXPORT_SYMBOL_GPL(mmc_crypto_setup_queue);
- 
-diff --git a/drivers/scsi/ufs/ufshcd-crypto.c b/drivers/scsi/ufs/ufshcd-crypto.c
-index d70cdcd35e43..f47a72fefe9e 100644
---- a/drivers/scsi/ufs/ufshcd-crypto.c
-+++ b/drivers/scsi/ufs/ufshcd-crypto.c
-@@ -233,6 +233,8 @@ void ufshcd_init_crypto(struct ufs_hba *hba)
- void ufshcd_crypto_setup_rq_keyslot_manager(struct ufs_hba *hba,
- 					    struct request_queue *q)
- {
--	if (hba->caps & UFSHCD_CAP_CRYPTO)
--		blk_ksm_register(&hba->ksm, q);
-+	if (hba->caps & UFSHCD_CAP_CRYPTO) {
-+		if (WARN_ON(!blk_ksm_register(&hba->ksm, q)))
-+			hba->caps &= ~UFSHCD_CAP_CRYPTO;
-+	}
- }
+ 	/* Zone append commands cannot be split */
+ 	if (WARN_ON_ONCE(bio_op(bio) == REQ_OP_ZONE_APPEND))
 -- 
 2.31.0.291.g576ba9dcdaf-goog
 
