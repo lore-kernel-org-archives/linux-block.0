@@ -2,95 +2,123 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-13.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBA19C433C1
-	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 16:51:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D6FDC433DB
+	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 17:30:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8415E61A1E
-	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 16:51:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0FD3861A1E
+	for <linux-block@archiver.kernel.org>; Thu, 25 Mar 2021 17:30:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229547AbhCYQub (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 25 Mar 2021 12:50:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54056 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229642AbhCYQub (ORCPT
+        id S229547AbhCYRaE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 25 Mar 2021 13:30:04 -0400
+Received: from linux.microsoft.com ([13.77.154.182]:38202 "EHLO
+        linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229592AbhCYR3r (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 25 Mar 2021 12:50:31 -0400
-Received: from mail-il1-x12e.google.com (mail-il1-x12e.google.com [IPv6:2607:f8b0:4864:20::12e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14739C06174A
-        for <linux-block@vger.kernel.org>; Thu, 25 Mar 2021 09:50:31 -0700 (PDT)
-Received: by mail-il1-x12e.google.com with SMTP id z9so2686328ilb.4
-        for <linux-block@vger.kernel.org>; Thu, 25 Mar 2021 09:50:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=eGM+Wb+P5x3c9noHsnTuN/hj/s8DPZX00U0JLAeymJ8=;
-        b=iqsccfzlZru7D/SzBxZSQV6V8nNiKAD6l2/EWpgaUa1obvKDk7301p63rga1nxatXt
-         ASDt6GWHWiONj/FqhnazOKXO9DuAlid931fdQlD/Vt3/JMmD4Xqnx05a5iWrSF5AlWrw
-         ot9g4QBq44RmXw2n0mZ1w+KaHeuE6gKcTtgLcYC6zuQIw+4QmtWdrq3OyhEQfgkVRLC/
-         wZCzf8o402FaOBB4ErsZIHClOdXIVR71s2JQmogVasfU9fBO7wjBDcQ7xsgk/FpUJJ9s
-         LIiw6YnWtig16v2xxq/7KM5UeLLxguky6T9HmSCH8G4a0hRc4hHaU/Gv7pJq63fkOl8U
-         /XAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=eGM+Wb+P5x3c9noHsnTuN/hj/s8DPZX00U0JLAeymJ8=;
-        b=iDQEDQrv2Gleckl1OHQFPabDTLvwn4/M1Gw9Dh0f7uxcNee0iHBDH+SYgwqi1qjdX6
-         dSSyh997xa+5hasWAiwsgmq22LxZCrQ0EqfhJ0BK3uMs7WroiFR3SrGbnhAntiHnuyyo
-         QkV+etThyDX8ejSMpdLP1g38JJDxUBFTw/+CMDy1Dj4oObeGZItxtsAFo1EC5EUUZQoH
-         qSyxb8YtkxIFnEeAhEQ27OaNQ79swwK4o/HhaV/Gcrp7nt1bOksRex6dYns0Ovp23psm
-         9sIFdHjfW4c5xXBN2gutJAo2HKVqQxRWM3lEFMioDiw7JKCyoaxk8ZSDUd7HteEnFwIV
-         75Vw==
-X-Gm-Message-State: AOAM532Z5GVUNWUedTxK5mM9NX2ax1RPpfJep5kz4+vyjWkzBedcrSq6
-        8t2MFFnknBgC4rkYcdsr5zwtpA==
-X-Google-Smtp-Source: ABdhPJxK2Y+ZDGrbyjvV8N8vjntGzKY/hZmvzOaSKdaSY7GDlqdJYuPjJVZ2yCIvDVEZRDNchtNZxg==
-X-Received: by 2002:a92:d783:: with SMTP id d3mr7712362iln.256.1616691030522;
-        Thu, 25 Mar 2021 09:50:30 -0700 (PDT)
-Received: from [192.168.1.30] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id q8sm2902491ilv.55.2021.03.25.09.50.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Mar 2021 09:50:30 -0700 (PDT)
-Subject: Re: [PATCH BUGFIX/IMPROVEMENT V2 0/6] revised version of third and
- last batch of patches
-To:     Paolo Valente <paolo.valente@linaro.org>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210304174627.161-1-paolo.valente@linaro.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <96b5c1f4-2814-2d88-6e05-6bfb10c8e9e2@kernel.dk>
-Date:   Thu, 25 Mar 2021 10:50:29 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Thu, 25 Mar 2021 13:29:47 -0400
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+        by linux.microsoft.com (Postfix) with ESMTPSA id 3EA4F20B5680;
+        Thu, 25 Mar 2021 10:29:47 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 3EA4F20B5680
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1616693387;
+        bh=QQfTkgsngBop3Tqx5XH9+idTDW0MUYe7P31vACwHE+c=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=amHaVZJM1c5uXjhVYTo1ubPgMMCmhg7sk0AYbM2TwoJexCKPlsCBxPg5aIu/Xr74Y
+         Ho8vOLLIQ/uLTDkZDeSpQNlJ0pUe67rMR2ezdDBWAbX+Bl6jfzXKGgfqhZs6hGU8qV
+         C6H0nihmJnvbvScDzYPRlWZiC9RLxBI9rLWC0f7o=
+Received: by mail-pg1-f180.google.com with SMTP id l76so2503211pga.6;
+        Thu, 25 Mar 2021 10:29:47 -0700 (PDT)
+X-Gm-Message-State: AOAM530KulwDei525WfPzMBROGGaGcqv9IMZ5cjw9RogW3Wr64SgcDwP
+        njLJ9F77ldByc3JeAQFqa5T/kdVdzFFDkaXBCPc=
+X-Google-Smtp-Source: ABdhPJzVxhv7vNQD2GeuO08lyQfBGF5bActoAR1gprqbd95MFicosMvJ611Zv3COVovE4mXPWbeaCVmXSm16zCJ6QGY=
+X-Received: by 2002:a63:2345:: with SMTP id u5mr8857421pgm.326.1616693386792;
+ Thu, 25 Mar 2021 10:29:46 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20210304174627.161-1-paolo.valente@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20210315200242.67355-1-mcroce@linux.microsoft.com>
+ <20210315200242.67355-2-mcroce@linux.microsoft.com> <20210315201824.GB2577561@casper.infradead.org>
+ <20210315210452.GC2577561@casper.infradead.org>
+In-Reply-To: <20210315210452.GC2577561@casper.infradead.org>
+From:   Matteo Croce <mcroce@linux.microsoft.com>
+Date:   Thu, 25 Mar 2021 18:29:10 +0100
+X-Gmail-Original-Message-ID: <CAFnufp3zKa+9K-hsV5vRkv-w8y-1nZioq_bFAnzaxs9RoP+sDA@mail.gmail.com>
+Message-ID: <CAFnufp3zKa+9K-hsV5vRkv-w8y-1nZioq_bFAnzaxs9RoP+sDA@mail.gmail.com>
+Subject: Re: [PATCH -next 1/5] block: add disk sequence number
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Lennart Poettering <lennart@poettering.net>,
+        Luca Boccassi <bluca@debian.org>, Jens Axboe <axboe@kernel.dk>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Tejun Heo <tj@kernel.org>,
+        =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>,
+        Niklas Cassel <niklas.cassel@wdc.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Hannes Reinecke <hare@suse.de>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/4/21 10:46 AM, Paolo Valente wrote:
-> Hi,
-> this is the V2 for the third and last batches of patches that I
-> proposed recently [1].
-> 
-> I've tried to address all issues raised in [1].
-> 
-> In more detail, main changes for V1 are:
-> 1. I've improved code as requested in "block, bfq: merge bursts of
-> newly-created queues"
-> 2. I've improved comments as requested in "block, bfq: put reqs of
-> waker and woken in dispatch list"
+On Mon, Mar 15, 2021 at 10:05 PM Matthew Wilcox <willy@infradead.org> wrote:
+>
+> On Mon, Mar 15, 2021 at 08:18:24PM +0000, Matthew Wilcox wrote:
+> > On Mon, Mar 15, 2021 at 09:02:38PM +0100, Matteo Croce wrote:
+> > > From: Matteo Croce <mcroce@microsoft.com>
+> > >
+> > > Add a sequence number to the disk devices. This number is put in the
+> > > uevent so userspace can correlate events when a driver reuses a device,
+> > > like the loop one.
+> >
+> > Should this be documented as monotonically increasing?  I think this
+> > is actually a media identifier.  Consider (if you will) a floppy disc.
+> > Back when such things were common, it was possible with personal computers
+> > of the era to have multiple floppy discs "in play" and be prompted to
+> > insert them as needed.  So shouldn't it be possible to support something
+> > similar here -- you're really removing the media from the loop device.
+> > With a monotonically increasing number, you're always destroying the
+> > media when you remove it, but in principle, it should be possible to
+> > reinsert the same media and have the same media identifier number.
+>
+> So ... a lot of devices have UUIDs or similar.  eg:
+>
+> $ cat /sys/block/nvme0n1/uuid
+> e8238fa6-bf53-0001-001b-448b49cec94f
+>
+> https://linux.die.net/man/8/scsi_id (for scsi)
+>
 
-Applied, thanks.
+Hi,
 
+I don't have uuid anywhere:
+
+matteo@saturno:~$ ll /dev/sd?
+brw-rw---- 1 root disk 8,  0 feb 16 13:24 /dev/sda
+brw-rw---- 1 root disk 8, 16 feb 16 13:24 /dev/sdb
+brw-rw---- 1 root disk 8, 32 feb 16 13:24 /dev/sdc
+brw-rw---- 1 root disk 8, 48 feb 16 13:24 /dev/sdd
+brw-rw---- 1 root disk 8, 64 mar  4 06:26 /dev/sde
+brw-rw---- 1 root disk 8, 80 feb 16 13:24 /dev/sdf
+matteo@saturno:~$ ll /sys/block/*/uuid
+ls: cannot access '/sys/block/*/uuid': No such file or directory
+
+mcroce@t490s:~$ ll /dev/nvme0n1
+brw-rw----. 1 root disk 259, 0 25 mar 14.22 /dev/nvme0n1
+mcroce@t490s:~$ ll /sys/block/*/uuid
+ls: cannot access '/sys/block/*/uuid': No such file or directory
+
+I find it only on a mdraid array:
+
+$ cat /sys/devices/virtual/block/md127/md/uuid
+26117338-4f54-f14e-b5d4-93feb7fe825d
+
+I'm using a vanilla 5.11 kernel.
+
+Regards,
 -- 
-Jens Axboe
-
+per aspera ad upstream
