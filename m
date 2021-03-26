@@ -2,198 +2,107 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EEC3C433C1
-	for <linux-block@archiver.kernel.org>; Fri, 26 Mar 2021 21:42:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C941AC433C1
+	for <linux-block@archiver.kernel.org>; Fri, 26 Mar 2021 23:16:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 62D38619F9
-	for <linux-block@archiver.kernel.org>; Fri, 26 Mar 2021 21:42:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AFF5D61A18
+	for <linux-block@archiver.kernel.org>; Fri, 26 Mar 2021 23:16:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230210AbhCZVmA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 Mar 2021 17:42:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60284 "EHLO
+        id S230138AbhCZXPv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 Mar 2021 19:15:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52188 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230213AbhCZVlk (ORCPT
+        with ESMTP id S230026AbhCZXPe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 Mar 2021 17:41:40 -0400
-Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 085ECC0613AA
-        for <linux-block@vger.kernel.org>; Fri, 26 Mar 2021 14:41:39 -0700 (PDT)
-Received: by mail-ej1-x62f.google.com with SMTP id u9so10496346ejj.7
-        for <linux-block@vger.kernel.org>; Fri, 26 Mar 2021 14:41:38 -0700 (PDT)
+        Fri, 26 Mar 2021 19:15:34 -0400
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF076C0613AA
+        for <linux-block@vger.kernel.org>; Fri, 26 Mar 2021 16:15:33 -0700 (PDT)
+Received: by mail-pl1-x62d.google.com with SMTP id y2so1641872plg.5
+        for <linux-block@vger.kernel.org>; Fri, 26 Mar 2021 16:15:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=soleen.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=WV7WEOwlzxCsF73+pI7k12EgmOoMiHqyTVgC0XnzDUM=;
-        b=ecstEGFfBqs91yppIM+HaNt8s4h4q+ZO5S3+/XFI0UuJvwNLMSWwuUOprfEF59aLlz
-         u4SK3abvmWXSsdyDHCJHy36n6byqXsYuAP9VeejcjjK61FDk+mMMliL++TtAovpAGpZy
-         HjEiN2eXkaYItfs7tHfWO9/2HKHmvRjoLWk331UbJ8sRL8r0WamBXwFrBgD4IVua7UlE
-         rgBhFq+nP2tGK55C/wl0iSHQ0MA2tTRurDaII6kXXOuAgNC3fQ23ch72261RT3GVuJ4y
-         TSZTNni+7G/lGONUh2Z1fxFKJolQilZOCkA4hLZh0zvLUUXUShkpRK47nevseIX6qo6M
-         dfzw==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=HZIBNhtHl+xCLaB+L/AxMk/nJWRocX0er656vj3kfNQ=;
+        b=OsQz//KivuHAiCY0nvyPC7jgLCNtrvHf3FNx0UdeEpzZ7mD0igAIIJrCHIU7okpFTa
+         vlzuxMLY9s7phpNgK/iL3u4/tEOMadC7vsztzpwsV+mcaETw6VAxNLT1s5OV3zEn5H+C
+         fXt5lUPquptTWKfl/IbHsMNDpXTkzHJqskiReA8AXj+QPBofKfL2tCBVZY+9oZ0jwVg9
+         49cxH68EsatWykEEZEPSgxIVDjZe7GpG4s0OVtkGWOWxP82MlpfHPFoMTxUhcF21Gvvw
+         K4MH78EWg0STiaFxupZ9gfpLavqYhSR7lVHLVyWkfMo75dOPOCNPtzbuPBiqfMB9RfrG
+         mhyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=WV7WEOwlzxCsF73+pI7k12EgmOoMiHqyTVgC0XnzDUM=;
-        b=JWlBlRSWfCndtuls1Eebo46Xzy+aDCrguu0V8XrNfOc2eUYZ4sq0Pl00hnKDSRFffX
-         kBVU0MuxuuBXKzpQxeLTqLpIzFo72GqrXab6SsSV4nBSn/l0UtKcBZNWE+eTHBDTNXXR
-         +dmQ24GF4LysuwAJmkCGE7vliy8m43qfQdX5P50i6AKcVxz/ZvkDCt6IpsUiB1ATFCXv
-         P7mAyKtb1qiEgHyTzXGVdtU8YMGvj3QnNoljR+8uggtabnjmqcTRaAdQkxsuT3rdqHLb
-         4awk7xkH2nmQS1mOMCT9MClSNABK9Tdo7u0MlQWJdE3yKL1jv0/konB1+cPg01THflnw
-         ncwg==
-X-Gm-Message-State: AOAM5328VvuMi5gSwEg3jQ/DFHDhF2FT+8Z7up+aFuDK6YYJli+Hg7B2
-        g90FtV6Jh8n5agcivL/e7ZDTeuzM2fMQs2fU0zEPBQ==
-X-Google-Smtp-Source: ABdhPJwyo7W0HT2r9p3wOC9IW5hOPQv6e730/N1Nx6z6ALymJ15Nwl83Xd++RfcdTLtckA4tUKqBYytDRnWmAgKLg0E=
-X-Received: by 2002:a17:906:3c50:: with SMTP id i16mr17752791ejg.175.1616794897749;
- Fri, 26 Mar 2021 14:41:37 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=HZIBNhtHl+xCLaB+L/AxMk/nJWRocX0er656vj3kfNQ=;
+        b=rKH1GeMGAprR+aKCB6plTyCnGWk5bW2eQ9xQX5bfJ4eJCbtsN5MJqdd3GjkdKS7+uK
+         VcsEwxvIWTbW4A0Z7ZRY4HvJZG9/ZOVFDMp9A70031OA73cVPteijhd+TtIg/vXuqu6o
+         u5X9na1bKsvPsuquP/dHaHRvMOAuaqjVFi9ZsQ4VXLnqjdtAaYbSfXE2arq3zWcRa8LP
+         kVvsbHdKQsJxWxOqEg+rYTXAsWBP1pzH8Qri2pLEAUY0renXMYxAME5Pm5f9BOAMHNV+
+         dPL92PJEDon5QN1ORcdra3n8mI8AIDFlXgpUdKLgJZ5MiJQLf8EAQs4RqjHGzJOivZrM
+         crsg==
+X-Gm-Message-State: AOAM532UUjEdFzm/AqN9wYAeWXLW6Srr+wOPSe+215xWWhs7QM5NBovm
+        BcwjAPTJ24vA1AjWyDIJJxVBWA==
+X-Google-Smtp-Source: ABdhPJzCRiysG9fK3eIi7Snq4O/FISqWHQU3VeWMfZQzPdAVx70bQgNmasONk4y9sTw/BTWiEt2qfw==
+X-Received: by 2002:a17:902:da81:b029:e5:de44:af5b with SMTP id j1-20020a170902da81b02900e5de44af5bmr17309713plx.27.1616800533444;
+        Fri, 26 Mar 2021 16:15:33 -0700 (PDT)
+Received: from ?IPv6:2620:10d:c085:21cf::141d? ([2620:10d:c090:400::5:4d27])
+        by smtp.gmail.com with ESMTPSA id n10sm8947101pjo.15.2021.03.26.16.15.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 26 Mar 2021 16:15:32 -0700 (PDT)
+Subject: Re: start removing block bounce buffering support v2
+To:     Christoph Hellwig <hch@lst.de>,
+        Khalid Aziz <khalid@gonehiking.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Ondrej Zary <linux@rainbow-software.org>
+Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
+References: <20210326055822.1437471-1-hch@lst.de>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <5dad4408-7539-6edd-7aa8-6ddf9af38c9e@kernel.dk>
+Date:   Fri, 26 Mar 2021 17:15:31 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <20210326090057.30499-1-qiang.zhang@windriver.com>
-In-Reply-To: <20210326090057.30499-1-qiang.zhang@windriver.com>
-From:   Pavel Tatashin <pasha.tatashin@soleen.com>
-Date:   Fri, 26 Mar 2021 17:41:01 -0400
-Message-ID: <CA+CK2bADeLiFChUxx6jvUe7rb_hNZ_oz_1cFmLwqPCmhgxOTYA@mail.gmail.com>
-Subject: Re: [PATCH v2] loop: call __loop_clr_fd() with lo_mutex locked to
- avoid autoclear race
-To:     qiang.zhang@windriver.com
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20210326055822.1437471-1-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Mar 26, 2021 at 5:00 AM <qiang.zhang@windriver.com> wrote:
->
-> From: Zqiang <qiang.zhang@windriver.com>
->
-> lo->lo_refcnt = 0
->
->             CPU0                                 CPU1
-> lo_open()                                    lo_open()
->  mutex_lock(&lo->lo_mutex)
->  atomic_inc(&lo->lo_refcnt)
->  lo_refcnt == 1
->  mutex_unlock(&lo->lo_mutex)
->                                              mutex_lock(&lo->lo_mutex)
->                                              atomic_inc(&lo->lo_refcnt)
->                                              lo_refcnt == 2
->                                              mutex_unlock(&lo->lo_mutex)
-> loop_clr_fd()
->  mutex_lock(&lo->lo_mutex)
->  atomic_read(&lo->lo_refcnt) > 1
->  lo->lo_flags |= LO_FLAGS_AUTOCLEAR        lo_release()
->  mutex_unlock(&lo->lo_mutex)
->  return                                      mutex_lock(&lo->lo_mutex)
->                                            atomic_dec_return(&lo->lo_refcnt)
->                                              lo_refcnt == 1
->                                              mutex_unlock(&lo->lo_mutex)
->                                              return
->
-> lo_release()
->  mutex_lock(&lo->lo_mutex)
->  atomic_dec_return(&lo->lo_refcnt)
->  lo_refcnt == 0
->  lo->lo_flags & LO_FLAGS_AUTOCLEAR
->   == true
->  mutex_unlock(&lo->lo_mutex)              loop_control_ioctl()
->                                            case LOOP_CTL_REMOVE:
->                                             mutex_lock(&lo->lo_mutex)
->                                             atomic_read(&lo->lo_refcnt)==0
->   __loop_clr_fd(lo, true)                   mutex_unlock(&lo->lo_mutex)
->     mutex_lock(&lo->lo_mutex)                loop_remove(lo)
->                                                mutex_destroy(&lo->lo_mutex)
->   ......                                       kfree(lo)
->        data race
->
-> When different tasks on two CPUs perform the above operations on the same
-> lo device, data race may be occur, Do not drop lo->lo_mutex before calling
->  __loop_clr_fd(), so refcnt and LO_FLAGS_AUTOCLEAR check in lo_release
-> stay in sync.
+On 3/25/21 11:58 PM, Christoph Hellwig wrote:
+> Hi all,
+> 
+> this series starts to clean up and remove the impact of the legacy old
+> block layer bounce buffering code.
+> 
+> First it removes support for ISA bouncing.  This was used by three SCSI
+> drivers.  One of them actually had an active user and developer 5 years
+> ago so I've converted it to use a local bounce buffer - Ondrej, can you
+> test the coversion?  The next one has been known broken for years, and
+> the third one looks like it has no users for the ISA support so they
+> are just dropped.
+> 
+> It then removes support for dealing with bounce buffering highmem pages
+> for passthrough requests as we can just use the copy instead of the map
+> path for them.  This will reduce efficiency for such setups on highmem
+> systems (e.g. usb-storage attached DVD drives), but then again that is
+> what you get for using a driver not using modern interfaces on a 32-bit
+> highmem system.  It does allow to streamline the common path pretty nicely.
 
-There is a race with autoclear logic where use after free may occur as
-shown in the above scenario. Do not drop lo->lo_mutex before calling
-__loop_clr_fd(), so refcnt and LO_FLAGS_AUTOCLEAR check in lo_release
-stay in sync.
+The core parts look good to me. If we can get the SCSI side to sign off
+on those changes, I can take it for 5.13.
 
-Reviewed-by: Pavel Tatashin <pasha.tatashin@soleen.com>
+-- 
+Jens Axboe
 
->
-> Fixes: 6cc8e7430801 ("loop: scale loop device by introducing per device lock")
-> Signed-off-by: Zqiang <qiang.zhang@windriver.com>
-> ---
->  v1->v2:
->  Modify the title and commit message.
->
->  drivers/block/loop.c | 11 ++++-------
->  1 file changed, 4 insertions(+), 7 deletions(-)
->
-> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-> index d58d68f3c7cd..5712f1698a66 100644
-> --- a/drivers/block/loop.c
-> +++ b/drivers/block/loop.c
-> @@ -1201,7 +1201,6 @@ static int __loop_clr_fd(struct loop_device *lo, bool release)
->         bool partscan = false;
->         int lo_number;
->
-> -       mutex_lock(&lo->lo_mutex);
->         if (WARN_ON_ONCE(lo->lo_state != Lo_rundown)) {
->                 err = -ENXIO;
->                 goto out_unlock;
-> @@ -1257,7 +1256,6 @@ static int __loop_clr_fd(struct loop_device *lo, bool release)
->         lo_number = lo->lo_number;
->         loop_unprepare_queue(lo);
->  out_unlock:
-> -       mutex_unlock(&lo->lo_mutex);
->         if (partscan) {
->                 /*
->                  * bd_mutex has been held already in release path, so don't
-> @@ -1288,12 +1286,11 @@ static int __loop_clr_fd(struct loop_device *lo, bool release)
->          * protects us from all the other places trying to change the 'lo'
->          * device.
->          */
-> -       mutex_lock(&lo->lo_mutex);
-> +
->         lo->lo_flags = 0;
->         if (!part_shift)
->                 lo->lo_disk->flags |= GENHD_FL_NO_PART_SCAN;
->         lo->lo_state = Lo_unbound;
-> -       mutex_unlock(&lo->lo_mutex);
->
->         /*
->          * Need not hold lo_mutex to fput backing file. Calling fput holding
-> @@ -1332,9 +1329,10 @@ static int loop_clr_fd(struct loop_device *lo)
->                 return 0;
->         }
->         lo->lo_state = Lo_rundown;
-> +       err = __loop_clr_fd(lo, false);
->         mutex_unlock(&lo->lo_mutex);
->
-> -       return __loop_clr_fd(lo, false);
-> +       return err;
->  }
->
->  static int
-> @@ -1916,13 +1914,12 @@ static void lo_release(struct gendisk *disk, fmode_t mode)
->                 if (lo->lo_state != Lo_bound)
->                         goto out_unlock;
->                 lo->lo_state = Lo_rundown;
-> -               mutex_unlock(&lo->lo_mutex);
->                 /*
->                  * In autoclear mode, stop the loop thread
->                  * and remove configuration after last close.
->                  */
->                 __loop_clr_fd(lo, true);
-> -               return;
-> +               goto out_unlock;
->         } else if (lo->lo_state == Lo_bound) {
->                 /*
->                  * Otherwise keep thread (if running) and config,
-> --
-> 2.17.1
->
