@@ -2,79 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB74AC433C1
-	for <linux-block@archiver.kernel.org>; Fri, 26 Mar 2021 13:03:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 911EEC433DB
+	for <linux-block@archiver.kernel.org>; Fri, 26 Mar 2021 14:00:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 98746619F8
-	for <linux-block@archiver.kernel.org>; Fri, 26 Mar 2021 13:03:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 548E661A1E
+	for <linux-block@archiver.kernel.org>; Fri, 26 Mar 2021 14:00:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229671AbhCZNDS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 Mar 2021 09:03:18 -0400
-Received: from verein.lst.de ([213.95.11.211]:45633 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230094AbhCZNCv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 Mar 2021 09:02:51 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 00E4267373; Fri, 26 Mar 2021 14:02:48 +0100 (CET)
-Date:   Fri, 26 Mar 2021 14:02:48 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>,
-        syzbot+8fede7e30c7cee0de139@syzkaller.appspotmail.com
-Subject: Re: [PATCH] block: not create too many partitions
-Message-ID: <20210326130248.GA18275@lst.de>
-References: <20210326085954.474119-1-ming.lei@redhat.com>
+        id S229945AbhCZOAU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 Mar 2021 10:00:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45054 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230003AbhCZN7y (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 26 Mar 2021 09:59:54 -0400
+Received: from mail-qk1-x72c.google.com (mail-qk1-x72c.google.com [IPv6:2607:f8b0:4864:20::72c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 910A9C0613AA;
+        Fri, 26 Mar 2021 06:59:54 -0700 (PDT)
+Received: by mail-qk1-x72c.google.com with SMTP id i9so5259413qka.2;
+        Fri, 26 Mar 2021 06:59:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=x0s7LJER70w2bSiwwTpjAxpJj5S5Wt0DwDx2zogXdYE=;
+        b=n+foT8+06n779+ymsgAN7XHmY9phYxAQcmR3n3IAmvnwuV9WCvK4h382O7+6r8KxWl
+         TMr6pRDl+InbWTMRl/KabrbFXlxnt4we7WbvI0EgROP3EJtHWcB5kiJbRj+cNhxZSIiF
+         PBS6oOS92b1i2xCrsQSGHxriv2UqLAP6jZihwMOacl6bdXRPJGh8/BheL/nl53J4ghr1
+         MJnDJiEDH13PZ4hFu1dypVI4989oyJQKRJUnrzz+PjsMzoVN2NP+na3OMAOlwfjJj9pB
+         xj1LeYuCyRvKX+Y7CqiVMmbiOBGh0NaMfQkPhtKap71LOqEYh4wxB3Rj7j4d93RfORC/
+         lxOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=x0s7LJER70w2bSiwwTpjAxpJj5S5Wt0DwDx2zogXdYE=;
+        b=m2iwreK9I0xJO24SA17uoEVgaC512JJa3gS2Qh7Su6bqIlb/m3zg/vFZo/fxqJOdIa
+         WT1CbCaAf+EnZqzcabN04z0d70fQ4Wjn4BHO7bJxHjVqXFOZBEGmk3824YuzLkbGU8hz
+         lJCFcqxan1o6iGEQsjPZR43jc7dKy4zU+4mVSiNZcCUdKA5dxq7kGwsNxRTVMGaSWFrF
+         obUif0aItfljE3hvNMz7PcuuKdATLCm2tMR6xwzTnkzUOTusI/Qnzh+l7jvXkWUCx7Ib
+         T03ci/SWJ4+di+FACh8ECzUdej5V/fOh8dYqLPNmZllbyoRMeNwxXSZsx/DuJUqNZEjC
+         GIqA==
+X-Gm-Message-State: AOAM531xUrrYg9NKW0R8sT1NXnyMt6XaUhqCBZVzzwmo7oTvbskcQBOQ
+        8vOSQ7sIsubJTIk0N63QqC2Qjf6TFfCyHBWY
+X-Google-Smtp-Source: ABdhPJwxui/7YiRZ9ijL0SMcy1jYD4hzFKZCNA4A413XhqNgHJNr+nKi0NPriqxWfstAt+DZ01jbQQ==
+X-Received: by 2002:ae9:f312:: with SMTP id p18mr11538849qkg.162.1616767193781;
+        Fri, 26 Mar 2021 06:59:53 -0700 (PDT)
+Received: from localhost.localdomain ([156.146.55.149])
+        by smtp.gmail.com with ESMTPSA id q125sm6644710qkf.68.2021.03.26.06.59.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 Mar 2021 06:59:52 -0700 (PDT)
+From:   Bhaskar Chowdhury <unixbhaskar@gmail.com>
+To:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     rdunlap@infradead.org, Bhaskar Chowdhury <unixbhaskar@gmail.com>
+Subject: [PATCH] blk-settings: Fix a typo
+Date:   Fri, 26 Mar 2021 19:27:15 +0530
+Message-Id: <20210326135715.28434-1-unixbhaskar@gmail.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210326085954.474119-1-ming.lei@redhat.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Mar 26, 2021 at 04:59:54PM +0800, Ming Lei wrote:
-> Commit a33df75c6328 ("block: use an xarray for disk->part_tbl") drops
-> check on max supported partitions number, and allows partition with
-> bigger partition number to be added. However, ->bd_partno is defined
-> as u8, so partition index of xarray table may not match with ->bd_partno.
-> Then delete_partition() may delete one unmatched partition, and caused
-> use-after-free.
-> 
-> Cc: Bart Van Assche <bvanassche@acm.org>
-> Reported-by: syzbot+8fede7e30c7cee0de139@syzkaller.appspotmail.com
-> Fixes: a33df75c6328 ("block: use an xarray for disk->part_tbl")
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
-> Another fix is to define ->bd_partno as u32, not sure if we need to
-> support so many partitions.
-> 
->  block/partitions/core.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/block/partitions/core.c b/block/partitions/core.c
-> index 1a7558917c47..933d47105b64 100644
-> --- a/block/partitions/core.c
-> +++ b/block/partitions/core.c
-> @@ -322,6 +322,10 @@ static struct block_device *add_partition(struct gendisk *disk, int partno,
->  	const char *dname;
->  	int err;
->  
-> +	/* disk_max_parts() is zero during initialization, ignore if so */
-> +	if (disk_max_parts(disk) && (partno + 1) > disk_max_parts(disk))
-> +		return ERR_PTR(-EINVAL);
+s/idential/identical/
 
-disk->minors is set in __alloc_disk_node, so AFAICS it can't ever be 0
-when add_partition is called.  So I think this should be just:
+Signed-off-by: Bhaskar Chowdhury <unixbhaskar@gmail.com>
+---
+ block/blk-settings.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-	if (partno >= disk_max_parts(disk))
-		return ERR_PTR(-EINVAL);
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index b4aa2f37fab6..63168b529360 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -749,7 +749,7 @@ void blk_queue_virt_boundary(struct request_queue *q, unsigned long mask)
+ 	/*
+ 	 * Devices that require a virtual boundary do not support scatter/gather
+ 	 * I/O natively, but instead require a descriptor list entry for each
+-	 * page (which might not be idential to the Linux PAGE_SIZE).  Because
++	 * page (which might not be identical to the Linux PAGE_SIZE).  Because
+ 	 * of that they are not limited by our notion of "segment size".
+ 	 */
+ 	if (mask)
+--
+2.26.2
 
-otherwise this looks good.
