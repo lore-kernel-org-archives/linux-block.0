@@ -2,119 +2,133 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CC47C433DB
-	for <linux-block@archiver.kernel.org>; Fri, 26 Mar 2021 07:57:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2DD3C433C1
+	for <linux-block@archiver.kernel.org>; Fri, 26 Mar 2021 08:01:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 08DF661A38
-	for <linux-block@archiver.kernel.org>; Fri, 26 Mar 2021 07:57:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B8D0761A3F
+	for <linux-block@archiver.kernel.org>; Fri, 26 Mar 2021 08:01:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229738AbhCZH4y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 26 Mar 2021 03:56:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51152 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229779AbhCZH4Y (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 26 Mar 2021 03:56:24 -0400
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BA35C0613AA
-        for <linux-block@vger.kernel.org>; Fri, 26 Mar 2021 00:56:21 -0700 (PDT)
-Received: by mail-pf1-x431.google.com with SMTP id x126so4302416pfc.13
-        for <linux-block@vger.kernel.org>; Fri, 26 Mar 2021 00:56:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=mUQq3PrJMaz6NYH8VwmJQgPfisiTwShGx9McnxTXhnk=;
-        b=wU82PSmZV07gFEZKyLCCeXzVDsQs8Hqfi+cXYpmpwOyqBWVPErNZp3a2QbDRpj27QS
-         sDs/HvLo+7bTcF7cnAwCMiUcLIh7dbL4gDaU65+pnOURKh0FDjJR92Cq/wOmWFlQrk8i
-         vp6OPrsPXZ+W8gh8UMQZgR1mHmaUG/BGOrkQZ/MrePIKHIuOx+QN+QncNvKB4QZkrRrW
-         55ZzxwjmQg9EJTFS8CdO034PUNA9AYdKKKUnKC9mhD8qS3SShpQQkt2vLVZQXZOiAkdc
-         SvvRLAhFEBVWjBGgs6vNBNyKgf8hYZe3tdAe/wNbEBsNG6Cy+p+YhiPhFfMGmJr4D/Hu
-         CXsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=mUQq3PrJMaz6NYH8VwmJQgPfisiTwShGx9McnxTXhnk=;
-        b=nUmUR8If18CNLzaFQ5q7w9sRPebVEvhYOSbW64ZAI226pimt3rjqwP0KdfexUpw37u
-         ULMAoCol1J5Hlv3knHH58EAVkdZyfYvFUCJb8xrpXiqnP8G/84o6HQkUKDNRHuYyMtgc
-         CU+FjYpZ6k6sL9hHfmxc4ns3NtZk4bb1i4NdrOJtcnWEQ4Al94mLDIkgmnHzQN3xa4Bs
-         DZ7UnTgRbp3awaow77M5ZdN+swOQ+rkOKZgIofTdFwkwnEnO2DWh/6K9gKP8FbMQwx1s
-         sO1cBVVSnjUIABAm0g9ElA9vGjgdJDsArwtSt+4kRwGRmJ92m4M9QG3TpgxPbChSywY+
-         qqyQ==
-X-Gm-Message-State: AOAM5313WDNvFgoVEPx3bwYltlJfiX2ZcjbXG/kwVK6HnhII6Cc5tlUl
-        tm82KILoMGgAQ7n2nmCAJ9jemw==
-X-Google-Smtp-Source: ABdhPJwkWJNou8M1+ZA0i2uVUDhWftzEHtGUA6UHxvMpCCKXo5K1Txwvv9aZTWEvZKra+PXCw/NVWw==
-X-Received: by 2002:a62:ddd2:0:b029:1f1:533b:b1cf with SMTP id w201-20020a62ddd20000b02901f1533bb1cfmr11411355pff.56.1616745380129;
-        Fri, 26 Mar 2021 00:56:20 -0700 (PDT)
-Received: from google.com (139.60.82.34.bc.googleusercontent.com. [34.82.60.139])
-        by smtp.gmail.com with ESMTPSA id z22sm7985530pfa.41.2021.03.26.00.56.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Mar 2021 00:56:19 -0700 (PDT)
-Date:   Fri, 26 Mar 2021 07:56:16 +0000
-From:   Satya Tangirala <satyat@google.com>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        Eric Biggers <ebiggers@google.com>
-Subject: Re: [PATCH v2 0/8] ensure bios aren't split in middle of crypto data
- unit
-Message-ID: <YF2ToMDxIpVpKftI@google.com>
-References: <20210325212609.492188-1-satyat@google.com>
- <e0248d93-e880-6a6d-92d6-dfcfb6f9d661@acm.org>
- <YF07bqQ1NvPxPNrh@google.com>
- <4694766c-8d95-1ad3-cb0c-d1ba8b7fe7ad@acm.org>
+        id S229528AbhCZIAj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 26 Mar 2021 04:00:39 -0400
+Received: from mx2.suse.de ([195.135.220.15]:38634 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229573AbhCZIAP (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 26 Mar 2021 04:00:15 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 6B349ADEF;
+        Fri, 26 Mar 2021 08:00:13 +0000 (UTC)
+Subject: Re: [PATCH -next 1/5] block: add disk sequence number
+To:     Matteo Croce <mcroce@linux.microsoft.com>,
+        Matthew Wilcox <willy@infradead.org>
+Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Lennart Poettering <lennart@poettering.net>,
+        Luca Boccassi <bluca@debian.org>, Jens Axboe <axboe@kernel.dk>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Tejun Heo <tj@kernel.org>,
+        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@javigon.com>,
+        Niklas Cassel <niklas.cassel@wdc.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>
+References: <20210315200242.67355-1-mcroce@linux.microsoft.com>
+ <20210315200242.67355-2-mcroce@linux.microsoft.com>
+ <20210315201824.GB2577561@casper.infradead.org>
+ <20210315210452.GC2577561@casper.infradead.org>
+ <CAFnufp3zKa+9K-hsV5vRkv-w8y-1nZioq_bFAnzaxs9RoP+sDA@mail.gmail.com>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <bf5478c7-e026-846c-3bb0-fd4c6c38372f@suse.de>
+Date:   Fri, 26 Mar 2021 09:00:12 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4694766c-8d95-1ad3-cb0c-d1ba8b7fe7ad@acm.org>
+In-Reply-To: <CAFnufp3zKa+9K-hsV5vRkv-w8y-1nZioq_bFAnzaxs9RoP+sDA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 25, 2021 at 08:46:20PM -0700, Bart Van Assche wrote:
-> On 3/25/21 6:39 PM, Satya Tangirala wrote:
-> > On Thu, Mar 25, 2021 at 02:51:31PM -0700, Bart Van Assche wrote:
-> >> Are you sure that the block layer core splits bios at logical block
-> >> boundaries? Commit 9cc5169cd478 ("block: Improve physical block
-> >> alignment of split bios") should have changed the behavior from
-> >> splitting at logical block boundaries into splitting at physical block
-> >> boundaries.
-> >
-> > Ah, what I really meant with that sentence was "Currently, if a bio is
-> > split, the size of the resulting bio is guaranteed to be aligned to a
-> > the lbs. The endpoint of the bio might also be aligned to a physical
-> > block boundary (which 9cc5169cd478 tries to achieve if possible), but
-> > the bio's size (and hence also its endpoint since the start of the bio
-> > is always lbs aligned) is *at least* lbs aligned". Does that sound
-> > accurate?
-> That sounds better to me :-)
+On 3/25/21 6:29 PM, Matteo Croce wrote:
+> On Mon, Mar 15, 2021 at 10:05 PM Matthew Wilcox <willy@infradead.org> wrote:
+>>
+>> On Mon, Mar 15, 2021 at 08:18:24PM +0000, Matthew Wilcox wrote:
+>>> On Mon, Mar 15, 2021 at 09:02:38PM +0100, Matteo Croce wrote:
+>>>> From: Matteo Croce <mcroce@microsoft.com>
+>>>>
+>>>> Add a sequence number to the disk devices. This number is put in the
+>>>> uevent so userspace can correlate events when a driver reuses a device,
+>>>> like the loop one.
+>>>
+>>> Should this be documented as monotonically increasing?  I think this
+>>> is actually a media identifier.  Consider (if you will) a floppy disc.
+>>> Back when such things were common, it was possible with personal computers
+>>> of the era to have multiple floppy discs "in play" and be prompted to
+>>> insert them as needed.  So shouldn't it be possible to support something
+>>> similar here -- you're really removing the media from the loop device.
+>>> With a monotonically increasing number, you're always destroying the
+>>> media when you remove it, but in principle, it should be possible to
+>>> reinsert the same media and have the same media identifier number.
+>>
+>> So ... a lot of devices have UUIDs or similar.  eg:
+>>
+>> $ cat /sys/block/nvme0n1/uuid
+>> e8238fa6-bf53-0001-001b-448b49cec94f
+>>
+>> https://linux.die.net/man/8/scsi_id (for scsi)
+>>
 > 
-> >> Without having looked at this patch series, can the same
-> >> effect be achieved by reporting the crypto data unit size as the
-> >> physical block size?
-> >
-> > That would've been awesome, but I don't think we can do that :(
-> > 1) There isn't only one crypto data unit size. A device can support,
-> >    and upper layers are free to use, many different data unit sizes.
-> > 2) IIUC 9cc5169cd478 (or more accurately get_max_io_size() since the
-> >    function has been changed slightly since your original patch)
-> >    doesn't align the size of the bio to the pbs - it only aligns the
-> >    endpoint of the bio to the pbs (and it may actually not even do
-> >    that if it turns out to not be possible). Is that right? If so,
-> >    that means that if the startpoint of the bio isn't pbs aligned, the
-> >    size of the bio won't be pbs aligned either.
+> Hi,
 > 
-> Hmm ... if the start of a bio is not aligned to the physical block size
-> I don't think that the block layer can do anything about the start of
-> the bio. Anyway, I have taken a quick look at this patch series and the
-> patch series looks pretty clean to me. I will let Christoph review this
-> patch series since he already reviewed the previous version of this series.
-Sounds good. Thanks for looking through the series!
+> I don't have uuid anywhere:
 > 
-> Bart.
+> matteo@saturno:~$ ll /dev/sd?
+> brw-rw---- 1 root disk 8,  0 feb 16 13:24 /dev/sda
+> brw-rw---- 1 root disk 8, 16 feb 16 13:24 /dev/sdb
+> brw-rw---- 1 root disk 8, 32 feb 16 13:24 /dev/sdc
+> brw-rw---- 1 root disk 8, 48 feb 16 13:24 /dev/sdd
+> brw-rw---- 1 root disk 8, 64 mar  4 06:26 /dev/sde
+> brw-rw---- 1 root disk 8, 80 feb 16 13:24 /dev/sdf
+> matteo@saturno:~$ ll /sys/block/*/uuid
+> ls: cannot access '/sys/block/*/uuid': No such file or directory
+> 
+> mcroce@t490s:~$ ll /dev/nvme0n1
+> brw-rw----. 1 root disk 259, 0 25 mar 14.22 /dev/nvme0n1
+> mcroce@t490s:~$ ll /sys/block/*/uuid
+> ls: cannot access '/sys/block/*/uuid': No such file or directory
+> 
+> I find it only on a mdraid array:
+> 
+> $ cat /sys/devices/virtual/block/md127/md/uuid
+> 26117338-4f54-f14e-b5d4-93feb7fe825d
+> 
+> I'm using a vanilla 5.11 kernel.
+> 
+The 'uuid' is optional for NVMe devices, and indeed not even present for 
+other device types.
+Use the 'wwid' attribute, which contains a unique identifier for all 
+nvme devices:
+
+# cat /sys/block/nvme*/wwid
+nvme.8086-4356504436343735303034323430304e474e-564f303430304b45464a42-00000001
+nvme.8086-4356504436343735303034363430304e474e-564f303430304b45464a42-00000001
+uuid.3c6500ee-a775-4c89-b223-e9551f5a9f7a
+
+and for SCSI the wwid is part of the SCSI device:
+# cat /sys/block/sd*/device/wwid
+naa.600508b1001ce2e648a35b6ec14a3996
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
