@@ -2,92 +2,97 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31D1AC433C1
-	for <linux-block@archiver.kernel.org>; Sat, 27 Mar 2021 06:58:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A1AEC433DB
+	for <linux-block@archiver.kernel.org>; Sat, 27 Mar 2021 07:14:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F39FB6197C
-	for <linux-block@archiver.kernel.org>; Sat, 27 Mar 2021 06:58:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4969E619BA
+	for <linux-block@archiver.kernel.org>; Sat, 27 Mar 2021 07:14:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231511AbhC0G6Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 27 Mar 2021 02:58:16 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:14629 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230427AbhC0G5p (ORCPT
+        id S230198AbhC0HNn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 27 Mar 2021 03:13:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:36175 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230195AbhC0HNa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 27 Mar 2021 02:57:45 -0400
-Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.60])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4F6qNt4Xknz1BJr5;
-        Sat, 27 Mar 2021 14:55:42 +0800 (CST)
-Received: from [10.174.179.92] (10.174.179.92) by
- DGGEMS403-HUB.china.huawei.com (10.3.19.203) with Microsoft SMTP Server id
- 14.3.498.0; Sat, 27 Mar 2021 14:57:43 +0800
-Subject: Re: [PATCH 1/3] scsi: check the whole result for reading write
- protect flag
-To:     "Martin K. Petersen" <martin.petersen@oracle.com>
-CC:     <axboe@kernel.dk>, <ming.lei@redhat.com>, <hch@lst.de>,
-        <keescook@chromium.org>, <kbusch@kernel.org>,
-        <linux-block@vger.kernel.org>, <jejb@linux.vnet.ibm.com>,
-        <linux-scsi@vger.kernel.org>
-References: <20210319030128.1345061-1-yanaijie@huawei.com>
- <20210319030128.1345061-2-yanaijie@huawei.com>
- <yq1a6qskl3j.fsf@ca-mkp.ca.oracle.com>
-From:   Jason Yan <yanaijie@huawei.com>
-Message-ID: <5fc4fa59-cbdc-190b-8c7b-4be1a4f37557@huawei.com>
-Date:   Sat, 27 Mar 2021 14:57:43 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.2
+        Sat, 27 Mar 2021 03:13:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1616829209;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=NN9H+E5nsi8FFWKFc8ZnNr235pTqhDDHF7D9hA5SFS0=;
+        b=OcBstZC8CiEMU0ti+VyWikwV2Ff40GiS4uESakqMZ7U6+8pGevFdoS5PEMBxpQwXeSYcXY
+        txSFOAuZHm6/Cw+Eo+7e7h+O7GgzlpKYe1Q6vpdzDALVe4bMSBGfEXZH9142O7b0PtrjQa
+        vw78BwOzaOBOpNZHmIOGG0fpikWZySc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-420-lMIM7vRUPRSsXPHQ0kRgHA-1; Sat, 27 Mar 2021 03:13:24 -0400
+X-MC-Unique: lMIM7vRUPRSsXPHQ0kRgHA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4D3CF180FCA6;
+        Sat, 27 Mar 2021 07:13:21 +0000 (UTC)
+Received: from localhost (ovpn-12-65.pek2.redhat.com [10.72.12.65])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 623F11869D;
+        Sat, 27 Mar 2021 07:13:15 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Ming Lei <ming.lei@redhat.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        syzbot+8fede7e30c7cee0de139@syzkaller.appspotmail.com
+Subject: [PATCH V2] block: not create too many partitions
+Date:   Sat, 27 Mar 2021 15:13:09 +0800
+Message-Id: <20210327071309.553557-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <yq1a6qskl3j.fsf@ca-mkp.ca.oracle.com>
-Content-Type: text/plain; charset="gbk"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.179.92]
-X-CFilter-Loop: Reflected
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Martin,
+Commit a33df75c6328 ("block: use an xarray for disk->part_tbl") drops
+check on max supported partitions number, and allows partition with
+bigger partition number to be added. However, ->bd_partno is defined
+as u8, so partition index of xarray table may not match with ->bd_partno.
+Then delete_partition() may delete one unmatched partition, and caused
+use-after-free.
 
-ÔÚ 2021/3/25 10:50, Martin K. Petersen Ð´µÀ:
-> 
-> Hi Jason!
-> 
->> @@ -55,6 +55,19 @@ static inline int scsi_status_is_good(int status)
->>   		(status == SAM_STAT_COMMAND_TERMINATED));
->>   }
->>   
->> +/** scsi_result_is_good - check the result return.
->> + *
->> + * @result: the result passed up from the driver (including host and
->> + *          driver components)
->> + *
->> + * Drivers may only set other bytes but not status byte.
->> + * This checks both the status byte and other bytes.
->> + */
->> +static inline int scsi_result_is_good(int result)
->> +{
->> +	return scsi_status_is_good(result) && (result & ~0xff) == 0;
->> +}
->> +
->>   
->>   /*
->>    * standard mode-select header prepended to all mode-select commands
-> 
-> Instead of introducing a "don't be broken" variant of
-> scsi_status_is_good(), I'd prefer you to fix the latter to do the right
-> thing wrt. offline devices.
-> 
-> There aren't a ton of scsi_result_is_good() call sites to check. And I
-> suspect that most of them wouldn't actually consider the DID_NO_CONNECT
-> scenario to be "good".
-> 
+Cc: Bart Van Assche <bvanassche@acm.org>
+Reported-by: syzbot+8fede7e30c7cee0de139@syzkaller.appspotmail.com
+Fixes: a33df75c6328 ("block: use an xarray for disk->part_tbl")
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+V2:
+	- don't check disk_max_parts() which is supposed to not zero
 
-OK, I'll have a try and check if it works for most of the call sites.
+ block/partitions/core.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-Thanks,
-Jason
+diff --git a/block/partitions/core.c b/block/partitions/core.c
+index 1a7558917c47..46f055bc7ecb 100644
+--- a/block/partitions/core.c
++++ b/block/partitions/core.c
+@@ -322,6 +322,13 @@ static struct block_device *add_partition(struct gendisk *disk, int partno,
+ 	const char *dname;
+ 	int err;
+ 
++	/*
++	 * disk_max_parts() won't be zero, either GENHD_FL_EXT_DEVT is set
++	 * or 'minors' is passed to alloc_disk().
++	 */
++	if (partno >= disk_max_parts(disk))
++		return ERR_PTR(-EINVAL);
++
+ 	/*
+ 	 * Partitions are not supported on zoned block devices that are used as
+ 	 * such.
+-- 
+2.29.2
+
