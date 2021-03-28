@@ -7,128 +7,277 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51DF4C433DB
-	for <linux-block@archiver.kernel.org>; Sun, 28 Mar 2021 23:13:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DED57C433E0
+	for <linux-block@archiver.kernel.org>; Sun, 28 Mar 2021 23:13:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 206B061948
-	for <linux-block@archiver.kernel.org>; Sun, 28 Mar 2021 23:13:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AC94861949
+	for <linux-block@archiver.kernel.org>; Sun, 28 Mar 2021 23:13:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231643AbhC1XMr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 28 Mar 2021 19:12:47 -0400
-Received: from mail-pf1-f174.google.com ([209.85.210.174]:43662 "EHLO
-        mail-pf1-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231634AbhC1XMR (ORCPT
+        id S231634AbhC1XMs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 28 Mar 2021 19:12:48 -0400
+Received: from mail-pj1-f41.google.com ([209.85.216.41]:36530 "EHLO
+        mail-pj1-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231635AbhC1XMT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 28 Mar 2021 19:12:17 -0400
-Received: by mail-pf1-f174.google.com with SMTP id q5so8665454pfh.10
-        for <linux-block@vger.kernel.org>; Sun, 28 Mar 2021 16:12:17 -0700 (PDT)
+        Sun, 28 Mar 2021 19:12:19 -0400
+Received: by mail-pj1-f41.google.com with SMTP id f2-20020a17090a4a82b02900c67bf8dc69so6827787pjh.1
+        for <linux-block@vger.kernel.org>; Sun, 28 Mar 2021 16:12:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=47jvXGcqX6hLdNjYkHs2tuipAkJFTgLSciFhcwyAcHk=;
-        b=JaDq3J9fJ03xfKaz5gbVWdGBYSBU3Jq9jO52Id1W4Bd/4EXYK+0WG9HWk1ttt9vOm3
-         ZEMaYNWf+Vt6jguDe+TfK++0slXsdUrHyb0n5MtaFvPwhZ5LKJSuy2njvcUVF3FdjzGS
-         N7Q3j9vO16jfAdeg8GQGq86M0hG5BhM0FWd01Em/0L49lZdshsOl+8QDHWGmZvZN1yx5
-         g0DcP9LJyMJs64AK5JH0hBXOvUVR9Yfbas72xAabokyRmsN9NcOG6b25f7dPpo9W08p7
-         q01OwdIVMkHvLGbRDPSya+JUYGdPOEuVMUcAUGBNgLD0jJgyUjhn3/QDCnpXagDRqQu4
-         X9gQ==
-X-Gm-Message-State: AOAM5326g7rrwXfV0nVwANcqlTHGpUVTkwxGGqbmT3qNJ7yyQN/vLp5Q
-        AmkcWQW6Sm13TaQy/OkU9jo=
-X-Google-Smtp-Source: ABdhPJxr/x8l+3WThMBz9vIen+GQzg1lJA+9yFo5qz2jMjg7Or6YF/XhWTVT7Molw7SSZmE4zsskqA==
-X-Received: by 2002:a63:c348:: with SMTP id e8mr2982896pgd.36.1616973137280;
-        Sun, 28 Mar 2021 16:12:17 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=G5WWiLJomX7i3yrkzKTngzjD7jIgrvyY0E/8sBaMa5s=;
+        b=kEp4/b8z/nZqgo1P6mECvKIijJ2JTtW+CdRz09zpVzsVlrzNpt4pf4sqwHo0HPknJJ
+         Uxir1/cmt9RIqxMccRthF3vsT/SdlqEos1hcleqWJ+hTGY4voqNKebCY+zSlQHXATHKM
+         /ii6l4btIGa680rBQ1tzyR5EsE5zBZv7RbDgCh6Ak5CUExOchDjvZiSQI2LGlulNtIMw
+         msVt5KErqp7lPigvdAhq5ndCC6jpc2mPrlA/kfAtvfVF6ExdgoNoyyBtdPPHXH52EteQ
+         VpbLe7qUc9+wrlm7J19XLeEwX3/RkDTI2gx9Tp17dMPj7T2fSGd9Vip/AaKIjQdlKhOR
+         xQYw==
+X-Gm-Message-State: AOAM530EpsCFWdBh1m2q6kLGXXffPCjz+zwiJGabxRvvBEOm33ta4wme
+        Gl4xa3J6PM7kCQdz6eXUl1k=
+X-Google-Smtp-Source: ABdhPJyKIem07hauHIU8dQCjAvZtFXPaFrJiei8SyOFack2KzhTUZL3rXh4ZZyxZVhC+Uhjrct7ASw==
+X-Received: by 2002:a17:902:c204:b029:e7:32fd:bc8f with SMTP id 4-20020a170902c204b02900e732fdbc8fmr12875367pll.43.1616973138814;
+        Sun, 28 Mar 2021 16:12:18 -0700 (PDT)
 Received: from asus.hsd1.ca.comcast.net ([2601:647:4000:d7:7123:9470:fec5:1a3a])
-        by smtp.gmail.com with ESMTPSA id gg22sm14305622pjb.20.2021.03.28.16.12.15
+        by smtp.gmail.com with ESMTPSA id gg22sm14305622pjb.20.2021.03.28.16.12.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 28 Mar 2021 16:12:16 -0700 (PDT)
+        Sun, 28 Mar 2021 16:12:18 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Omar Sandoval <osandov@fb.com>
 Cc:     linux-block@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
         John Garry <john.garry@huawei.com>,
         Don Brace <don.brace@microsemi.com>,
-        Douglas Gilbert <dgilbert@interlog.com>
-Subject: [PATCH blktests] tests/block/031: Add a test for sharing a tag set across hardware queues
-Date:   Sun, 28 Mar 2021 16:12:09 -0700
-Message-Id: <20210328231210.3707-1-bvanassche@acm.org>
+        Douglas Gilbert <dgilbert@interlog.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Yi Zhang <yi.zhang@redhat.com>
+Subject: [PATCH blktests v2] rdma: Use rdma link instead of /sys/class/infiniband/*/parent
+Date:   Sun, 28 Mar 2021 16:12:10 -0700
+Message-Id: <20210328231210.3707-2-bvanassche@acm.org>
 X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20210328231210.3707-1-bvanassche@acm.org>
+References: <20210328231210.3707-1-bvanassche@acm.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Support for sharing a tag set across hardware queues has been added
-recently to the Linux kernel. See also the BLK_MQ_F_TAG_HCTX_SHARED flag,
-Linux kernel commit 32bc15afed04 ("blk-mq: Facilitate a shared sbitmap per
-tagset"; v5.10) and commit 0905053bdb5b ("null_blk: Support shared tag
-bitmap"; v5.10). Add a test that triggers the shared tag set code in the
-block layer core.
+The approach of verifying whether or not an RDMA interface is associated
+with the rdma_rxe interface by looking up its parent device is deprecated
+and will be removed soon from the Linux kernel. Hence this patch that uses
+the rdma link command instead.
 
-Cc: John Garry <john.garry@huawei.com>
-Cc: Don Brace<don.brace@microsemi.com>
-Cc: Douglas Gilbert <dgilbert@interlog.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Yi Zhang <yi.zhang@redhat.com>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- tests/block/031     | 43 +++++++++++++++++++++++++++++++++++++++++++
- tests/block/031.out |  1 +
- 2 files changed, 44 insertions(+)
- create mode 100755 tests/block/031
- create mode 100644 tests/block/031.out
+v2: Added a _have_program check for 'rdma' as requested by Omar.
+---
+ common/multipath-over-rdma | 111 +++++++++++--------------------------
+ tests/nvmeof-mp/rc         |   2 +-
+ tests/srp/rc               |  12 +---
+ 3 files changed, 35 insertions(+), 90 deletions(-)
 
-diff --git a/tests/block/031 b/tests/block/031
-new file mode 100755
-index 000000000000..7940f9fa1114
---- /dev/null
-+++ b/tests/block/031
-@@ -0,0 +1,43 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+# Copyright 2021 Google LLC
-+#
-+# Test support for sharing a tag set across hardware queues ("host tag set").
-+
-+. tests/block/rc
-+. common/null_blk
-+
-+DESCRIPTION="test host tagset support"
-+TIMED=1
-+
-+requires() {
-+	_have_null_blk && _have_module_param null_blk shared_tag_bitmap
-+}
-+
-+test() {
-+	local fio_status bs=512
-+
-+	: "${TIMEOUT:=30}"
-+	if ! _init_null_blk nr_devices=0 queue_mode=2 shared_tag_bitmap=1; then
-+		echo "Loading null_blk failed"
-+		return 1
+diff --git a/common/multipath-over-rdma b/common/multipath-over-rdma
+index 9d9d2b27af83..9e68189b56fd 100644
+--- a/common/multipath-over-rdma
++++ b/common/multipath-over-rdma
+@@ -57,6 +57,9 @@ _multipathd_version_ge() {
+ }
+ 
+ get_ipv4_addr() {
++	if [ ! -e "/sys/class/net/$1" ]; then
++		echo "get_ipv4_addr(): $1 is not a network interface" 1>&2
 +	fi
-+	if ! _configure_null_blk nullb0 completion_nsec=0 blocksize=$bs size=1\
-+	     submit_queues="$(nproc)" memory_backed=1 power=1; then
-+		echo "Configuring null_blk failed"
-+		return 1
-+	fi
-+	fio --verify=md5 --rw=randwrite --bs=$bs --loops=$((10**6)) \
-+		--iodepth=64 --group_reporting --sync=1 --direct=1 \
-+		--ioengine=libaio --runtime="${TIMEOUT}" --thread \
-+		--name=block-031 --filename=/dev/nullb0 \
-+		--output="${RESULTS_DIR}/block/fio-output-031.txt" \
-+		>>"$FULL"
-+	fio_status=$?
-+	rmdir /sys/kernel/config/nullb/nullb0
-+	_exit_null_blk
-+	case $fio_status in
-+		0) echo "Passed";;
-+		*) echo "Failed (fio status = $fio_status)";;
-+	esac
-+}
-diff --git a/tests/block/031.out b/tests/block/031.out
-new file mode 100644
-index 000000000000..863339fb8ced
---- /dev/null
-+++ b/tests/block/031.out
-@@ -0,0 +1 @@
-+Passed
+ 	ip -4 -o addr show dev "$1" |
+ 		sed -n 's/.*[[:blank:]]inet[[:blank:]]*\([^[:blank:]/]*\).*/\1/p'
+ }
+@@ -76,41 +79,11 @@ is_number() {
+ 	[ "$1" -eq "0$1" ] 2>/dev/null
+ }
+ 
+-# Check whether a device is an RDMA device. An example argument:
+-# /sys/devices/pci0000:00/0000:00:03.0/0000:04:00.0
+-is_rdma_device() {
+-	local d i inode1 inode2
+-
+-	inode1=$(stat -c %i "$1")
+-	# echo "inode1 = $inode1"
+-	for i in /sys/class/infiniband/*; do
+-		d=/sys/class/infiniband/"$(readlink "$i")"
+-		d=$(dirname "$(dirname "$d")")
+-		inode2=$(stat -c %i "$d")
+-		# echo "inode2 = $inode2"
+-		if [ "$inode1" = "$inode2" ]; then
+-			return
+-		fi
+-	done
+-	false
+-}
+-
+ # Lists RDMA capable network interface names, e.g. ib0 ib1.
+ rdma_network_interfaces() {
+-	(
+-		cd /sys/class/net &&
+-			for i in *; do
+-				[ -e "$i" ] || continue
+-				# Skip IPoIB (ARPHRD_INFINIBAND) network
+-				# interfaces.
+-				[ "$(<"$i"/type)" = 32 ] && continue
+-				[ -L "$i/device" ] || continue
+-				d=$(readlink "$i/device" 2>/dev/null)
+-				if [ -n "$d" ] && is_rdma_device "$i/$d"; then
+-					echo "$i"
+-				fi
+-			done
+-	)
++	rdma link show |
++		sed -n 's/^.*[[:blank:]]netdev[[:blank:]]\+\([^[:blank:]]*\)[[:blank:]]*/\1/p' |
++		sort -u
+ }
+ 
+ # Check whether any stacked block device holds block device $1. If so, echo
+@@ -411,47 +384,36 @@ all_primary_gids() {
+ 	done
+ }
+ 
+-# Check whether or not an rdma_rxe instance has been associated with network
+-# interface $1.
+-has_rdma_rxe() {
+-	local f
+-
+-	for f in /sys/class/infiniband/*/parent; do
+-		if [ -e "$f" ] && [ "$(<"$f")" = "$1" ]; then
+-			return 0
+-		fi
+-	done
+-
+-	return 1
++# Check whether or not an rdma_rxe or siw instance has been associated with
++# network interface $1.
++has_soft_rdma() {
++	rdma link | grep -q " netdev $1[[:blank:]]*\$"
+ }
+ 
+ # Load the rdma_rxe or siw kernel module and associate it with all network
+ # interfaces.
+ start_soft_rdma() {
++	local type
++
+ 	{
+ 	if [ -n "$use_siw" ]; then
+ 		modprobe siw || return $?
+-		(
+-			cd /sys/class/net &&
+-				for i in *; do
+-					[ -e "$i" ] || continue
+-					[ -e "/sys/class/infiniband/${i}_siw" ] && continue
+-					rdma link add "${i}_siw" type siw netdev "$i" ||
+-						echo "Failed to bind the siw driver to $i"
+-				done
+-		)
++		type=siw
+ 	else
+ 		modprobe rdma_rxe || return $?
+-		(
+-			cd /sys/class/net &&
+-				for i in *; do
+-					if [ -e "$i" ] && ! has_rdma_rxe "$i"; then
+-						echo "$i" > /sys/module/rdma_rxe/parameters/add ||
+-							echo "Failed to bind the rdma_rxe driver to $i"
+-					fi
+-				done
+-		)
++		type=rxe
+ 	fi
++	(
++		cd /sys/class/net &&
++			for i in *; do
++				[ -e "$i" ] || continue
++				[ "$i" = "lo" ] && continue
++				[ "$(<"$i/addr_len")" = 6 ] || continue
++				has_soft_rdma "$i" && continue
++				rdma link add "${i}_$type" type $type netdev "$i" ||
++				echo "Failed to bind the $type driver to $i"
++			done
++	)
+ 	} >>"$FULL"
+ }
+ 
+@@ -459,27 +421,16 @@ start_soft_rdma() {
+ # unload the rdma_rxe kernel module.
+ stop_soft_rdma() {
+ 	{
+-	(
+-		cd /sys/class/net &&
+-			for i in *; do
+-				if [ -e "$i" ] && has_rdma_rxe "$i"; then
+-					{ echo "$i" > /sys/module/rdma_rxe/parameters/remove; } \
+-						2>/dev/null
+-				fi
+-			done
+-	)
++	rdma link |
++		sed -n 's,^link[[:blank:]]*\([^/]*\)/.* netdev .*,\1,p' |
++		while read -r i; do
++		      echo "$i ..."
++		      rdma link del "${i}" || echo "Failed to remove ${i}"
++		done
+ 	if ! unload_module rdma_rxe 10; then
+ 		echo "Unloading rdma_rxe failed"
+ 		return 1
+ 	fi
+-	(
+-		cd /sys/class/net &&
+-			for i in *_siw; do
+-				[ -e "$i" ] || continue
+-				rdma link del "${i}" ||
+-					echo "Failed to unbind the siw driver from ${i%_siw}"
+-			done
+-	)
+ 	if ! unload_module siw 10; then
+ 		echo "Unloading siw failed"
+ 		return 1
+diff --git a/tests/nvmeof-mp/rc b/tests/nvmeof-mp/rc
+index ab7770f6aac0..0a12825e2c11 100755
+--- a/tests/nvmeof-mp/rc
++++ b/tests/nvmeof-mp/rc
+@@ -42,7 +42,7 @@ and multipathing has been enabled in the nvme_core kernel module"
+ 	)
+ 	_have_modules "${required_modules[@]}" || return
+ 
+-	for p in mkfs.ext4 mkfs.xfs multipath multipathd pidof; do
++	for p in mkfs.ext4 mkfs.xfs multipath multipathd pidof rdma; do
+ 		_have_program "$p" || return
+ 	done
+ 
+diff --git a/tests/srp/rc b/tests/srp/rc
+index 700cd71ea155..2986bfd5439d 100755
+--- a/tests/srp/rc
++++ b/tests/srp/rc
+@@ -59,7 +59,8 @@ group_requires() {
+ 	)
+ 	_have_modules "${required_modules[@]}" || return
+ 
+-	for p in mkfs.ext4 mkfs.xfs multipath multipathd pidof sg_reset; do
++	for p in mkfs.ext4 mkfs.xfs multipath multipathd pidof rdma \
++		 sg_reset; do
+ 		_have_program "$p" || return
+ 	done
+ 
+@@ -142,14 +143,7 @@ do_ib_cm_login() {
+ }
+ 
+ rdma_dev_to_net_dev() {
+-	local b d rdma_dev=$1
+-
+-	b=/sys/class/infiniband/$rdma_dev/parent
+-	if [ -e "$b" ]; then
+-		echo "$(<"$b")"
+-	else
+-		echo "${rdma_dev%_siw}"
+-	fi
++	rdma link show "$1/1" | sed 's/.* netdev //;s/[[:blank:]]*$//'
+ }
+ 
+ # Tell the SRP initiator to log in to an SRP target using the RDMA/CM.
