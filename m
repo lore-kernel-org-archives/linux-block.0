@@ -2,82 +2,96 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3471C433C1
-	for <linux-block@archiver.kernel.org>; Mon, 29 Mar 2021 09:24:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BB7DC433DB
+	for <linux-block@archiver.kernel.org>; Mon, 29 Mar 2021 13:02:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 89EFB6195A
-	for <linux-block@archiver.kernel.org>; Mon, 29 Mar 2021 09:24:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D676061932
+	for <linux-block@archiver.kernel.org>; Mon, 29 Mar 2021 13:02:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231533AbhC2JYU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 29 Mar 2021 05:24:20 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:15089 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231661AbhC2JXs (ORCPT
+        id S231422AbhC2NCL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 29 Mar 2021 09:02:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54626 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230334AbhC2NB7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 Mar 2021 05:23:48 -0400
-Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.59])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4F86XP5cJYz19JwG;
-        Mon, 29 Mar 2021 17:21:41 +0800 (CST)
-Received: from huawei.com (10.175.113.32) by DGGEMS410-HUB.china.huawei.com
- (10.3.19.210) with Microsoft SMTP Server id 14.3.498.0; Mon, 29 Mar 2021
- 17:23:34 +0800
-From:   Shixin Liu <liushixin2@huawei.com>
-To:     Jens Axboe <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        Shixin Liu <liushixin2@huawei.com>
-Subject: [PATCH -next 2/2] mtip32xx: use LIST_HEAD() for list_head
-Date:   Mon, 29 Mar 2021 17:53:49 +0800
-Message-ID: <20210329095349.4170870-2-liushixin2@huawei.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20210329095349.4170870-1-liushixin2@huawei.com>
-References: <20210329095349.4170870-1-liushixin2@huawei.com>
+        Mon, 29 Mar 2021 09:01:59 -0400
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C88CC061574
+        for <linux-block@vger.kernel.org>; Mon, 29 Mar 2021 06:01:59 -0700 (PDT)
+Received: by mail-pg1-x529.google.com with SMTP id f3so160899pgv.0
+        for <linux-block@vger.kernel.org>; Mon, 29 Mar 2021 06:01:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=+f9NbANnAGvNKLuXbSw8Wy8fK8ZUuswF9eo4r7SgnkU=;
+        b=dbhrBBYDiRdzUHEruDNXkA/xXXADd5eppqp9zq43QXOPt3mvYuFMBBPrtOo3dcP7sD
+         vUb7OkPpUG+oxHKhwwP8Irrj/D7LIDQR84cFlZMHqK1I04WN4dmThg5bHFwOZCqCA8Mp
+         dBLqnO2axpVJ2rzllJwNlck51w2FFjNQc7MpzDJkXINrrgLevqW9SyIxkB8sy9hAYrFB
+         Nh1J2p0WKkRtZNvN/RGcp6un4MIHjS1KAKT0SEj1788VhQG3Tk9SDUXfxsGNYeyPi7n5
+         gC37Wlm9hoS+oTEVQmaHy61S497yjTJJIqyUboyyOEFVSxWxcV5hyenQynfcSkzRZQhG
+         6sKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=+f9NbANnAGvNKLuXbSw8Wy8fK8ZUuswF9eo4r7SgnkU=;
+        b=XbGFU5uO7wcfunAGa8tIZEGim0rQfIEn2EzkOxqqiPIkCDsTyzho0oRUnZ3rxLcIBf
+         Pznzibj9RxhSt/9W+TIGxHRAvovBrmUVgLKuPfx7yQLevy6UJXBfegB/NHmyxyfAob13
+         IfC/HxVuZcyWc1r3noVVRzQ26VI7Ph4gbNumRxoTlmvzGn2rLNfJ4j7uxmrgcgtmqueD
+         tA+X5QTOLa47YCJO+csfCKV8Wb30sawQRYuLf8MJ6iUWCSTQjhuRC2QqioXkKo2nQljo
+         CpjTHqqhcp9D8DpGZ80pgZAA3TezUcXrF5sIufgcnFoorpxjwI5+v3s+E1SD8moloURf
+         mvmg==
+X-Gm-Message-State: AOAM533EGTr1Af9733t52kckO+z7KlrFxQLDgbgsoeX9xyrhaptyJFkR
+        fLfCmGVO+4wlWOG0ktu3hHwwm+QR9OlOzw==
+X-Google-Smtp-Source: ABdhPJzK1V26Ke6tGhjHi9thqYRlPFNUTEKDFh83JcApPQiAkl/Af35Y1sJE1zeo42ULpkrAx1x+9w==
+X-Received: by 2002:a63:f247:: with SMTP id d7mr23039502pgk.112.1617022917890;
+        Mon, 29 Mar 2021 06:01:57 -0700 (PDT)
+Received: from [192.168.1.134] ([66.219.217.173])
+        by smtp.gmail.com with ESMTPSA id y9sm15286052pja.50.2021.03.29.06.01.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 29 Mar 2021 06:01:56 -0700 (PDT)
+Subject: Re: remove ->revalidate_disk (resend)
+To:     Christoph Hellwig <hch@lst.de>, Tim Waugh <tim@cyberelk.net>
+Cc:     linux-block@vger.kernel.org
+References: <20210308074550.422714-1-hch@lst.de>
+ <20210329055540.GA27177@lst.de>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <465891ab-0633-2ee3-b51a-fe2e7be5f9ca@kernel.dk>
+Date:   Mon, 29 Mar 2021 07:01:54 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.113.32]
-X-CFilter-Loop: Reflected
+In-Reply-To: <20210329055540.GA27177@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-There's no need to declare a list and then init it manually,
-just use the LIST_HEAD() macro.
+On 3/28/21 11:55 PM, Christoph Hellwig wrote:
+> On Mon, Mar 08, 2021 at 08:45:47AM +0100, Christoph Hellwig wrote:
+>> Hi Jens,
+>>
+>> with the previously merged patches all real users of ->revalidate_disk
+>> are gone.  This series removes the two remaining not actually required
+>> instances and the method itself.
+> 
+> Jens,
+> 
+> can you consider this for the 5.13 tree?
 
-Signed-off-by: Shixin Liu <liushixin2@huawei.com>
----
- drivers/block/mtip32xx/mtip32xx.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+Looks fine to me, we just need to drop the umem change as it was
+removed. And paride really should be as well... But in any case,
+I'll queue up the other two or 5.13.
 
-diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
-index 39e3280030d6..07c8b99b88c1 100644
---- a/drivers/block/mtip32xx/mtip32xx.c
-+++ b/drivers/block/mtip32xx/mtip32xx.c
-@@ -95,8 +95,8 @@
- /* Device instance number, incremented each time a device is probed. */
- static int instance;
- 
--static struct list_head online_list;
--static struct list_head removing_list;
-+static LIST_HEAD(online_list);
-+static LIST_HEAD(removing_list);
- static DEFINE_SPINLOCK(dev_lock);
- 
- /*
-@@ -4363,9 +4363,6 @@ static int __init mtip_init(void)
- 
- 	pr_info(MTIP_DRV_NAME " Version " MTIP_DRV_VERSION "\n");
- 
--	INIT_LIST_HEAD(&online_list);
--	INIT_LIST_HEAD(&removing_list);
--
- 	/* Allocate a major block device number to use with this driver. */
- 	error = register_blkdev(0, MTIP_DRV_NAME);
- 	if (error <= 0) {
 -- 
-2.25.1
+Jens Axboe
 
