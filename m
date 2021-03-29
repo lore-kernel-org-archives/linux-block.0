@@ -2,96 +2,130 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BB7DC433DB
-	for <linux-block@archiver.kernel.org>; Mon, 29 Mar 2021 13:02:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67F48C433E0
+	for <linux-block@archiver.kernel.org>; Mon, 29 Mar 2021 13:08:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D676061932
-	for <linux-block@archiver.kernel.org>; Mon, 29 Mar 2021 13:02:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2943A61932
+	for <linux-block@archiver.kernel.org>; Mon, 29 Mar 2021 13:08:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231422AbhC2NCL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 29 Mar 2021 09:02:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54626 "EHLO
+        id S231643AbhC2NIH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 29 Mar 2021 09:08:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55906 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230334AbhC2NB7 (ORCPT
+        with ESMTP id S231624AbhC2NHn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 Mar 2021 09:01:59 -0400
-Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C88CC061574
-        for <linux-block@vger.kernel.org>; Mon, 29 Mar 2021 06:01:59 -0700 (PDT)
-Received: by mail-pg1-x529.google.com with SMTP id f3so160899pgv.0
-        for <linux-block@vger.kernel.org>; Mon, 29 Mar 2021 06:01:59 -0700 (PDT)
+        Mon, 29 Mar 2021 09:07:43 -0400
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BF10C061574;
+        Mon, 29 Mar 2021 06:07:43 -0700 (PDT)
+Received: by mail-lf1-x130.google.com with SMTP id 12so7953856lfq.13;
+        Mon, 29 Mar 2021 06:07:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        d=gmail.com; s=20161025;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=+f9NbANnAGvNKLuXbSw8Wy8fK8ZUuswF9eo4r7SgnkU=;
-        b=dbhrBBYDiRdzUHEruDNXkA/xXXADd5eppqp9zq43QXOPt3mvYuFMBBPrtOo3dcP7sD
-         vUb7OkPpUG+oxHKhwwP8Irrj/D7LIDQR84cFlZMHqK1I04WN4dmThg5bHFwOZCqCA8Mp
-         dBLqnO2axpVJ2rzllJwNlck51w2FFjNQc7MpzDJkXINrrgLevqW9SyIxkB8sy9hAYrFB
-         Nh1J2p0WKkRtZNvN/RGcp6un4MIHjS1KAKT0SEj1788VhQG3Tk9SDUXfxsGNYeyPi7n5
-         gC37Wlm9hoS+oTEVQmaHy61S497yjTJJIqyUboyyOEFVSxWxcV5hyenQynfcSkzRZQhG
-         6sKw==
+        bh=stYWrf6XqmrqozR7EKI3OutzUa6M7NoWU7A27SKipUk=;
+        b=SO+Aaeu9h/qX5vUuAAEYjKxeugr3j+fLh6zztUyNzyi35/YzGozj9NFHkMugfYMOsn
+         hdbv3HRDktcqJNqeX+ijxHZoxVvEkOENq0xC0WyMD9dDbQMoodsthWjQ56dlduRZor2W
+         7jwNtyLcg5SPtnU/K86SsMKQD2TVgvCxTmIUZffGadAf/UXpy/pPisA0xCqlg5tcsAEb
+         OZDUEV8ffqUtEgEK109F4W9emCj2mjL7OCbY+GoAX4eyYXNpQgsf5QCbLryfrUFsP1+b
+         uU2PPtfLddgx/Td7vWsHfVIIkWAJYgkW78K94EyEgzFdXf0XcSq1gDah3tjlvvzLPFae
+         F5iA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=+f9NbANnAGvNKLuXbSw8Wy8fK8ZUuswF9eo4r7SgnkU=;
-        b=XbGFU5uO7wcfunAGa8tIZEGim0rQfIEn2EzkOxqqiPIkCDsTyzho0oRUnZ3rxLcIBf
-         Pznzibj9RxhSt/9W+TIGxHRAvovBrmUVgLKuPfx7yQLevy6UJXBfegB/NHmyxyfAob13
-         IfC/HxVuZcyWc1r3noVVRzQ26VI7Ph4gbNumRxoTlmvzGn2rLNfJ4j7uxmrgcgtmqueD
-         tA+X5QTOLa47YCJO+csfCKV8Wb30sawQRYuLf8MJ6iUWCSTQjhuRC2QqioXkKo2nQljo
-         CpjTHqqhcp9D8DpGZ80pgZAA3TezUcXrF5sIufgcnFoorpxjwI5+v3s+E1SD8moloURf
-         mvmg==
-X-Gm-Message-State: AOAM533EGTr1Af9733t52kckO+z7KlrFxQLDgbgsoeX9xyrhaptyJFkR
-        fLfCmGVO+4wlWOG0ktu3hHwwm+QR9OlOzw==
-X-Google-Smtp-Source: ABdhPJzK1V26Ke6tGhjHi9thqYRlPFNUTEKDFh83JcApPQiAkl/Af35Y1sJE1zeo42ULpkrAx1x+9w==
-X-Received: by 2002:a63:f247:: with SMTP id d7mr23039502pgk.112.1617022917890;
-        Mon, 29 Mar 2021 06:01:57 -0700 (PDT)
-Received: from [192.168.1.134] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id y9sm15286052pja.50.2021.03.29.06.01.56
+        bh=stYWrf6XqmrqozR7EKI3OutzUa6M7NoWU7A27SKipUk=;
+        b=OC5QK9OJU79GMKBXN726ZKNu1FFrRf33g0TuqLgVU6o0eagFJN1iCpicH2iR3/nf+k
+         lYkieeDGMlX00Iabw1fUXORzuj4A0jVvKTqABrOiiqYDRFgDJTRNrZkoD82HGvSL5yjq
+         zHDcjaibKIKoScwBVH04pwUpMeNZfXAWwjyuV6T+qy1wRqOHgsa8Fw5epMw7HCwVGFFF
+         XP9WLdluwNdBYhxLOnYTngGRxULrvZC2YDSaiW1p5gQzjo9EiMR5+kGKlFUtdUiRSnOJ
+         NUJ03vh8/oM2GqDu8EyD9ffL+fd5uPJ5wgsspp2CzXrqaEx1Q76QP3RPiyw1gAiW+6NU
+         hqkQ==
+X-Gm-Message-State: AOAM5318HNiu3eei87+XvRHT8BIsg7px5HFXcTFgaLT0vt1XiNhOKqdq
+        VciMN6Bvldr4XgusCO/9fxwpTGCYkiU=
+X-Google-Smtp-Source: ABdhPJwDjWcRRWvvdt96aIeYPGRR0KJHG7TVqzSKddHHCzlbLMyz4bjc82k80czSwB5ZBsLM2cx8Wg==
+X-Received: by 2002:ac2:4245:: with SMTP id m5mr16850937lfl.168.1617023261449;
+        Mon, 29 Mar 2021 06:07:41 -0700 (PDT)
+Received: from ?IPv6:2a00:1370:814d:b259:a10:76ff:fe69:21b6? ([2a00:1370:814d:b259:a10:76ff:fe69:21b6])
+        by smtp.googlemail.com with ESMTPSA id d22sm1828163lfm.267.2021.03.29.06.07.39
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 29 Mar 2021 06:01:56 -0700 (PDT)
-Subject: Re: remove ->revalidate_disk (resend)
-To:     Christoph Hellwig <hch@lst.de>, Tim Waugh <tim@cyberelk.net>
-Cc:     linux-block@vger.kernel.org
-References: <20210308074550.422714-1-hch@lst.de>
- <20210329055540.GA27177@lst.de>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <465891ab-0633-2ee3-b51a-fe2e7be5f9ca@kernel.dk>
-Date:   Mon, 29 Mar 2021 07:01:54 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Mon, 29 Mar 2021 06:07:40 -0700 (PDT)
+Subject: Re: [PATCH v1 3/3] partitions/efi: Support gpt_sector parameter
+ needed by NVIDIA Tegra devices
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        Micha?? Miros??aw <mirq-linux@rere.qmqm.pl>,
+        David Heidelberg <david@ixit.cz>,
+        Peter Geis <pgwipeout@gmail.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Davidlohr Bueso <dave@stgolabs.net>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Ion Agorria <AG0RRIA@yahoo.com>,
+        Svyatoslav Ryhel <clamor95@gmail.com>,
+        linux-tegra@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-efi <linux-efi@vger.kernel.org>
+References: <20210327212100.3834-1-digetx@gmail.com>
+ <20210327212100.3834-4-digetx@gmail.com>
+ <20210329061850.GA258398@infradead.org>
+From:   Dmitry Osipenko <digetx@gmail.com>
+Message-ID: <4666087a-05a5-1065-da17-8dc86248b338@gmail.com>
+Date:   Mon, 29 Mar 2021 16:07:39 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-In-Reply-To: <20210329055540.GA27177@lst.de>
+In-Reply-To: <20210329061850.GA258398@infradead.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/28/21 11:55 PM, Christoph Hellwig wrote:
-> On Mon, Mar 08, 2021 at 08:45:47AM +0100, Christoph Hellwig wrote:
->> Hi Jens,
+29.03.2021 09:18, Christoph Hellwig пишет:
+> On Sun, Mar 28, 2021 at 12:21:00AM +0300, Dmitry Osipenko wrote:
+>> All NVIDIA Tegra20..124 Android devices use proprietary bootloader
+>> which supplies the gpt_sector=<sector> kernel cmdline parameter that
+>> should be used for looking up the EFI partition table on internal EMMC
+>> storage.  If the kernel cmdline parameter isn't supplied, then the
+>> partition is expected to be placed around the last but one sector of EMMC.
 >>
->> with the previously merged patches all real users of ->revalidate_disk
->> are gone.  This series removes the two remaining not actually required
->> instances and the method itself.
+>> Apparently this was done in order to hide the PT from a usual userspace
+>> tools since EFI entry exists only for compatibility with a Linux kernel,
 > 
-> Jens,
+> That's weird, because nothin in Linux relies in EFI partition tables.
 > 
-> can you consider this for the 5.13 tree?
+>> while a custom proprietary partition table is what is really used by
+>> these Android devices, thus these tools may corrupt the real PT, making
+>> device unbootable and very difficult to restore.
+>>
+>> Add support for the gpt_sector cmdline parameter which will be used
+>> for finding EFI entry on internal EMMC storage of NVIDIA Tegra20+ devices.
+> 
+> Didn't we plan to just support the actual partition table format insted?
+> 
 
-Looks fine to me, we just need to drop the umem change as it was
-removed. And paride really should be as well... But in any case,
-I'll queue up the other two or 5.13.
+Ideally we need to support both forced-gpt and tegra-partition.  At
+first we should check whether GPT entry exists and use it on success,
+otherwise fall back to tegra-partition.  This will allow to properly
+support all kind of devices.  The majority of devices have the GPT
+entry, so will be good to support it at least.
 
--- 
-Jens Axboe
+My understanding that this all require involvement from Jens Axboe in
+order to get the patches merged.  Previously he didn't show interest to
+any of the patches and my assumption was that he didn't want to have
+another partition, although I don't know for sure because he never answered.
 
+If you could help with reviewing and applying of the patches, then I
+will be happy to try again with re-sending a full patchset, which
+includes the tegra-partition support.
