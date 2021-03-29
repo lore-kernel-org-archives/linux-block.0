@@ -7,176 +7,226 @@ X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CCF2C433E1
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8ADF3C433E4
 	for <linux-block@archiver.kernel.org>; Mon, 29 Mar 2021 15:28:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1637261970
+	by mail.kernel.org (Postfix) with ESMTP id 549316196E
 	for <linux-block@archiver.kernel.org>; Mon, 29 Mar 2021 15:28:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230229AbhC2P2T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 29 Mar 2021 11:28:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:49518 "EHLO
+        id S231244AbhC2P2S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 29 Mar 2021 11:28:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:20671 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230516AbhC2P2F (ORCPT
+        by vger.kernel.org with ESMTP id S231270AbhC2P15 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 Mar 2021 11:28:05 -0400
+        Mon, 29 Mar 2021 11:27:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617031684;
+        s=mimecast20190719; t=1617031676;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=/XWBRGeLiCgYP4XRDpEtok71EzVPi94F6vd9vLonjGo=;
-        b=GEKN2dlmbiaaxj/43UJzWposojkaDJWO7wFNfQs22TZLc7Fo69jQrHmba8AJAODApvl+DE
-        TSLVkG75rhNpA7x+z2cnnAcCZCzmnkaXpvGgCoiA50CbLKtJlft/X+G7XJoAKy40+NBy3y
-        ql0JuEFSryCu4ZU8UHE3XRdQ1fKbSBc=
+        bh=fNlG+3ho3blgJVyFVypZc5c3TnkhPbJk0ckqheigCu8=;
+        b=DJeaqRz+bhmKXKte+4pa601xC2xvi9ydbYrJauroVB7c2JzwzDchy7GO+ez5civnDi4JUf
+        BZOC4HPmyOQHAZu/BxFmaM8TGaIaGFKFQjh7JlHQ6t6u2Dzq63OZrAYEJr6Kp7WIRZKUzJ
+        o1sllRYrQo+0/Of3DbhtbiphFH7GdcY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-58-a-4fAjFkMW-prs5P8coPpQ-1; Mon, 29 Mar 2021 11:28:02 -0400
-X-MC-Unique: a-4fAjFkMW-prs5P8coPpQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+ us-mta-358-LGej-2lTNAWJ_5UslOIKxQ-1; Mon, 29 Mar 2021 11:27:54 -0400
+X-MC-Unique: LGej-2lTNAWJ_5UslOIKxQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1B23818C8C01;
-        Mon, 29 Mar 2021 15:28:01 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 574D287A83B;
+        Mon, 29 Mar 2021 15:27:53 +0000 (UTC)
 Received: from localhost (ovpn-12-50.pek2.redhat.com [10.72.12.50])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5A8225C5DF;
-        Mon, 29 Mar 2021 15:28:00 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 622EA5D6A1;
+        Mon, 29 Mar 2021 15:27:52 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org,
         Jeffle Xu <jefflexu@linux.alibaba.com>,
         Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
         Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V4 09/12] blk-mq: limit hw queues to be polled in each blk_poll()
-Date:   Mon, 29 Mar 2021 23:26:19 +0800
-Message-Id: <20210329152622.173035-10-ming.lei@redhat.com>
+Subject: [PATCH V4 07/12] block: prepare for supporting bio_list via other link
+Date:   Mon, 29 Mar 2021 23:26:17 +0800
+Message-Id: <20210329152622.173035-8-ming.lei@redhat.com>
 In-Reply-To: <20210329152622.173035-1-ming.lei@redhat.com>
 References: <20210329152622.173035-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Limit at most 8 queues are polled in each blk_pull(), avoid to
-add extra latency when queue depth is high.
+So far bio list helpers always use .bi_next to traverse the list, we
+will support to link bios by other bio field.
 
+Prepare for such support by adding a macro so that users can define
+another helpers for linking bios by other bio field.
+
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-mq.c | 73 ++++++++++++++++++++++++++++++++++++--------------
- 1 file changed, 53 insertions(+), 20 deletions(-)
+ include/linux/bio.h | 132 +++++++++++++++++++++++---------------------
+ 1 file changed, 68 insertions(+), 64 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index b65f2c170fb0..414f5d99d9de 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -3865,32 +3865,31 @@ static inline int blk_mq_poll_hctx(struct request_queue *q,
- 	return ret;
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index d0246c92a6e8..619edd26a6c0 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -608,75 +608,11 @@ static inline unsigned bio_list_size(const struct bio_list *bl)
+ 	return sz;
  }
  
--static int blk_mq_poll_io(struct bio *bio)
-+#define POLL_HCTX_MAX_CNT 8
-+
-+static bool blk_add_unique_hctx(struct blk_mq_hw_ctx **data, int *cnt,
-+		struct blk_mq_hw_ctx *hctx)
+-static inline void bio_list_add(struct bio_list *bl, struct bio *bio)
+-{
+-	bio->bi_next = NULL;
+-
+-	if (bl->tail)
+-		bl->tail->bi_next = bio;
+-	else
+-		bl->head = bio;
+-
+-	bl->tail = bio;
+-}
+-
+-static inline void bio_list_add_head(struct bio_list *bl, struct bio *bio)
+-{
+-	bio->bi_next = bl->head;
+-
+-	bl->head = bio;
+-
+-	if (!bl->tail)
+-		bl->tail = bio;
+-}
+-
+-static inline void bio_list_merge(struct bio_list *bl, struct bio_list *bl2)
+-{
+-	if (!bl2->head)
+-		return;
+-
+-	if (bl->tail)
+-		bl->tail->bi_next = bl2->head;
+-	else
+-		bl->head = bl2->head;
+-
+-	bl->tail = bl2->tail;
+-}
+-
+-static inline void bio_list_merge_head(struct bio_list *bl,
+-				       struct bio_list *bl2)
+-{
+-	if (!bl2->head)
+-		return;
+-
+-	if (bl->head)
+-		bl2->tail->bi_next = bl->head;
+-	else
+-		bl->tail = bl2->tail;
+-
+-	bl->head = bl2->head;
+-}
+-
+ static inline struct bio *bio_list_peek(struct bio_list *bl)
  {
--	struct request_queue *q = bio->bi_bdev->bd_disk->queue;
--	blk_qc_t cookie = bio_get_private_data(bio);
--	int ret = 0;
-+	int i;
- 
--	if (!bio_flagged(bio, BIO_DONE) && blk_qc_t_valid(cookie)) {
--		struct blk_mq_hw_ctx *hctx =
--			q->queue_hw_ctx[blk_qc_t_to_queue_num(cookie)];
-+	for (i = 0; i < *cnt; i++) {
-+		if (data[i] == hctx)
-+			goto exit;
-+	}
- 
--		ret += blk_mq_poll_hctx(q, hctx);
-+	if (i < POLL_HCTX_MAX_CNT) {
-+		data[i] = hctx;
-+		(*cnt)++;
- 	}
--	return ret;
-+ exit:
-+	return *cnt == POLL_HCTX_MAX_CNT;
+ 	return bl->head;
  }
  
--static int blk_bio_poll_and_end_io(struct bio_grp_list *grps)
-+static void blk_build_poll_queues(struct bio_grp_list *grps,
-+		struct blk_mq_hw_ctx **data, int *cnt)
+-static inline struct bio *bio_list_pop(struct bio_list *bl)
+-{
+-	struct bio *bio = bl->head;
+-
+-	if (bio) {
+-		bl->head = bl->head->bi_next;
+-		if (!bl->head)
+-			bl->tail = NULL;
+-
+-		bio->bi_next = NULL;
+-	}
+-
+-	return bio;
+-}
+-
+ static inline struct bio *bio_list_get(struct bio_list *bl)
  {
--	int ret = 0;
- 	int i;
- 
--	/*
--	 * Poll hw queue first.
--	 *
--	 * TODO: limit max poll times and make sure to not poll same
--	 * hw queue one more time.
--	 */
- 	for (i = 0; i < grps->nr_grps; i++) {
- 		struct bio_grp_list_data *grp = &grps->head[i];
- 		struct bio *bio;
-@@ -3898,11 +3897,29 @@ static int blk_bio_poll_and_end_io(struct bio_grp_list *grps)
- 		if (bio_grp_list_grp_empty(grp))
- 			continue;
- 
--		for (bio = grp->list.head; bio; bio = bio->bi_poll)
--			ret += blk_mq_poll_io(bio);
-+		for (bio = grp->list.head; bio; bio = bio->bi_poll) {
-+			blk_qc_t  cookie;
-+			struct blk_mq_hw_ctx *hctx;
-+			struct request_queue *q;
-+
-+			if (bio_flagged(bio, BIO_DONE))
-+				continue;
-+			cookie = bio_get_private_data(bio);
-+			if (!blk_qc_t_valid(cookie))
-+				continue;
-+
-+			q = bio->bi_bdev->bd_disk->queue;
-+			hctx = q->queue_hw_ctx[blk_qc_t_to_queue_num(cookie)];
-+			if (blk_add_unique_hctx(data, cnt, hctx))
-+				return;
-+		}
- 	}
-+}
-+
-+static void blk_bio_poll_reap_ios(struct bio_grp_list *grps)
-+{
-+	int i;
- 
--	/* reap bios */
- 	for (i = 0; i < grps->nr_grps; i++) {
- 		struct bio_grp_list_data *grp = &grps->head[i];
- 		struct bio *bio;
-@@ -3927,6 +3944,22 @@ static int blk_bio_poll_and_end_io(struct bio_grp_list *grps)
- 		}
- 		__bio_grp_list_merge(&grp->list, &bl);
- 	}
-+}
-+
-+static int blk_bio_poll_and_end_io(struct bio_grp_list *grps)
-+{
-+	int ret = 0;
-+	int i;
-+	struct blk_mq_hw_ctx *hctx[POLL_HCTX_MAX_CNT];
-+	int cnt = 0;
-+
-+	blk_build_poll_queues(grps, hctx, &cnt);
-+
-+	for (i = 0; i < cnt; i++)
-+		ret += blk_mq_poll_hctx(hctx[i]->queue, hctx[i]);
-+
-+	blk_bio_poll_reap_ios(grps);
-+
- 	return ret;
+ 	struct bio *bio = bl->head;
+@@ -686,6 +622,74 @@ static inline struct bio *bio_list_get(struct bio_list *bl)
+ 	return bio;
  }
  
++#define BIO_LIST_HELPERS(_pre, link)					\
++									\
++static inline void _pre##_add(struct bio_list *bl, struct bio *bio)	\
++{									\
++	bio->bi_##link = NULL;						\
++									\
++	if (bl->tail)							\
++		bl->tail->bi_##link = bio;				\
++	else								\
++		bl->head = bio;						\
++									\
++	bl->tail = bio;							\
++}									\
++									\
++static inline void _pre##_add_head(struct bio_list *bl, struct bio *bio) \
++{									\
++	bio->bi_##link = bl->head;					\
++									\
++	bl->head = bio;							\
++									\
++	if (!bl->tail)							\
++		bl->tail = bio;						\
++}									\
++									\
++static inline void _pre##_merge(struct bio_list *bl, struct bio_list *bl2) \
++{									\
++	if (!bl2->head)							\
++		return;							\
++									\
++	if (bl->tail)							\
++		bl->tail->bi_##link = bl2->head;			\
++	else								\
++		bl->head = bl2->head;					\
++									\
++	bl->tail = bl2->tail;						\
++}									\
++									\
++static inline void _pre##_merge_head(struct bio_list *bl,		\
++				       struct bio_list *bl2)		\
++{									\
++	if (!bl2->head)							\
++		return;							\
++									\
++	if (bl->head)							\
++		bl2->tail->bi_##link = bl->head;			\
++	else								\
++		bl->tail = bl2->tail;					\
++									\
++	bl->head = bl2->head;						\
++}									\
++									\
++static inline struct bio *_pre##_pop(struct bio_list *bl)		\
++{									\
++	struct bio *bio = bl->head;					\
++									\
++	if (bio) {							\
++		bl->head = bl->head->bi_##link;				\
++		if (!bl->head)						\
++			bl->tail = NULL;				\
++									\
++		bio->bi_##link = NULL;					\
++	}								\
++									\
++	return bio;							\
++}									\
++
++BIO_LIST_HELPERS(bio_list, next);
++
+ /*
+  * Increment chain count for the bio. Make sure the CHAIN flag update
+  * is visible before the raised count.
 -- 
 2.29.2
 
