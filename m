@@ -7,119 +7,169 @@ X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8AAFC433E9
-	for <linux-block@archiver.kernel.org>; Mon, 29 Mar 2021 15:28:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D92C4C433E0
+	for <linux-block@archiver.kernel.org>; Mon, 29 Mar 2021 15:29:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AB14C61994
-	for <linux-block@archiver.kernel.org>; Mon, 29 Mar 2021 15:28:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9FD23617ED
+	for <linux-block@archiver.kernel.org>; Mon, 29 Mar 2021 15:29:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231354AbhC2P2V (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 29 Mar 2021 11:28:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53653 "EHLO
+        id S231363AbhC2P2t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 29 Mar 2021 11:28:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24313 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231312AbhC2P2P (ORCPT
+        by vger.kernel.org with ESMTP id S231404AbhC2P2R (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 Mar 2021 11:28:15 -0400
+        Mon, 29 Mar 2021 11:28:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617031695;
+        s=mimecast20190719; t=1617031696;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Jhriek1NirfToS7eI8Q/r2pkPUKbNKEQOu9gH5WO164=;
-        b=X1Em1a3NHoenmjD6ARZKCHF8jQ8lrwszK681cxsKzLRQXZVReDNO+U/UPe2N8rFIuNw0ph
-        ivmwBrcBAm8fQ0YoC6EPo0tqqf4ai8q95eB30HKGA9IMz6BeMw/33sFSQaAeOJqXEI8Q4R
-        USV4lrMp9kdYrDxY/YBW62qlwZvX2WE=
+        bh=WprMeSTUBlNB0D+G5/hB14w1VWfRCDMbMSxpzet0DV8=;
+        b=BtMDd17h5fgepGN558wqUEldEvtif5+rf4Xf2rrIsF6LIRdQiAtlkprgnVC6NJdqX9ot0l
+        xM67qtE1G3iVywi5C3vkUk+oGDNYc5BatnDPChh5CXqxFOdUHUdGzgg8/vgJns/BGg9HYL
+        gwgw7nbR8ufTpcjuHB3xSmLp26fqcNs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-427-d58ADUwyOaGHz2Ev90G6pQ-1; Mon, 29 Mar 2021 11:28:08 -0400
-X-MC-Unique: d58ADUwyOaGHz2Ev90G6pQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-399-sO36VVkNOW6ELDhlNeFBrw-1; Mon, 29 Mar 2021 11:28:11 -0400
+X-MC-Unique: sO36VVkNOW6ELDhlNeFBrw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5BE40108BD07;
-        Mon, 29 Mar 2021 15:28:07 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6F7C4A0C04;
+        Mon, 29 Mar 2021 15:28:10 +0000 (UTC)
 Received: from localhost (ovpn-12-50.pek2.redhat.com [10.72.12.50])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9A5111349A;
-        Mon, 29 Mar 2021 15:28:06 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B181F5D9F0;
+        Mon, 29 Mar 2021 15:28:09 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org,
         Jeffle Xu <jefflexu@linux.alibaba.com>,
         Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Hannes Reinecke <hare@suse.de>
-Subject: [PATCH V4 11/12] block: add poll_capable method to support bio-based IO polling
-Date:   Mon, 29 Mar 2021 23:26:21 +0800
-Message-Id: <20210329152622.173035-12-ming.lei@redhat.com>
+        Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V4 12/12] dm: support IO polling for bio-based dm device
+Date:   Mon, 29 Mar 2021 23:26:22 +0800
+Message-Id: <20210329152622.173035-13-ming.lei@redhat.com>
 In-Reply-To: <20210329152622.173035-1-ming.lei@redhat.com>
 References: <20210329152622.173035-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 From: Jeffle Xu <jefflexu@linux.alibaba.com>
 
-This method can be used to check if bio-based device supports IO polling
-or not. For mq devices, checking for hw queue in polling mode is
-adequate, while the sanity check shall be implementation specific for
-bio-based devices. For example, dm device needs to check if all
-underlying devices are capable of IO polling.
+IO polling is enabled when all underlying target devices are capable
+of IO polling. The sanity check supports the stacked device model, in
+which one dm device may be build upon another dm device. In this case,
+the mapped device will check if the underlying dm target device
+supports IO polling.
 
-Though bio-based device may have done the sanity check during the
-device initialization phase, cacheing the result of this sanity check
-(such as by cacheing in the queue_flags) may not work. Because for dm
-devices, users could change the state of the underlying devices through
-'/sys/block/<dev>/io_poll', bypassing the dm device above. In this case,
-the cached result of the very beginning sanity check could be
-out-of-date. Thus the sanity check needs to be done every time 'io_poll'
-is to be modified.
-
+Reviewed-by: Mike Snitzer <snitzer@redhat.com>
 Signed-off-by: Jeffle Xu <jefflexu@linux.alibaba.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-sysfs.c      | 14 +++++++++++---
- include/linux/blkdev.h |  1 +
- 2 files changed, 12 insertions(+), 3 deletions(-)
+ drivers/md/dm-table.c         | 24 ++++++++++++++++++++++++
+ drivers/md/dm.c               | 14 ++++++++++++++
+ include/linux/device-mapper.h |  1 +
+ 3 files changed, 39 insertions(+)
 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index db3268d41274..c8e7e4af66cb 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -426,9 +426,17 @@ static ssize_t queue_poll_store(struct request_queue *q, const char *page,
- 	unsigned long poll_on;
- 	ssize_t ret;
+diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
+index 95391f78b8d5..a8f3575fb118 100644
+--- a/drivers/md/dm-table.c
++++ b/drivers/md/dm-table.c
+@@ -1509,6 +1509,12 @@ struct dm_target *dm_table_find_target(struct dm_table *t, sector_t sector)
+ 	return &t->targets[(KEYS_PER_NODE * n) + k];
+ }
  
--	if (!q->tag_set || q->tag_set->nr_maps <= HCTX_TYPE_POLL ||
--	    !q->tag_set->map[HCTX_TYPE_POLL].nr_queues)
--		return -EINVAL;
-+	if (queue_is_mq(q)) {
-+		if (!q->tag_set || q->tag_set->nr_maps <= HCTX_TYPE_POLL ||
-+		    !q->tag_set->map[HCTX_TYPE_POLL].nr_queues)
-+			return -EINVAL;
-+	} else {
-+		struct gendisk *disk = queue_to_disk(q);
++static int device_not_poll_capable(struct dm_target *ti, struct dm_dev *dev,
++				   sector_t start, sector_t len, void *data)
++{
++	return !blk_queue_poll(bdev_get_queue(dev->bdev));
++}
 +
-+		if (!disk->fops->poll_capable ||
-+		    !disk->fops->poll_capable(disk))
-+			return -EINVAL;
-+	}
+ /*
+  * type->iterate_devices() should be called when the sanity check needs to
+  * iterate and check all underlying data devices. iterate_devices() will
+@@ -1559,6 +1565,11 @@ static int count_device(struct dm_target *ti, struct dm_dev *dev,
+ 	return 0;
+ }
  
- 	ret = queue_var_store(&poll_on, page, count);
- 	if (ret < 0)
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index bfab74b45f15..a46f975f2a2f 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1881,6 +1881,7 @@ struct block_device_operations {
- 	int (*report_zones)(struct gendisk *, sector_t sector,
- 			unsigned int nr_zones, report_zones_cb cb, void *data);
- 	char *(*devnode)(struct gendisk *disk, umode_t *mode);
-+	bool (*poll_capable)(struct gendisk *disk);
- 	struct module *owner;
- 	const struct pr_ops *pr_ops;
++int dm_table_supports_poll(struct dm_table *t)
++{
++	return !dm_table_any_dev_attr(t, device_not_poll_capable, NULL);
++}
++
+ /*
+  * Check whether a table has no data devices attached using each
+  * target's iterate_devices method.
+@@ -2079,6 +2090,19 @@ void dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
+ 
+ 	dm_update_keyslot_manager(q, t);
+ 	blk_queue_update_readahead(q);
++
++	/*
++	 * Check for request-based device is remained to
++	 * dm_mq_init_request_queue()->blk_mq_init_allocated_queue().
++	 * For bio-based device, only set QUEUE_FLAG_POLL when all underlying
++	 * devices supporting polling.
++	 */
++	if (__table_type_bio_based(t->type)) {
++		if (dm_table_supports_poll(t))
++			blk_queue_flag_set(QUEUE_FLAG_POLL, q);
++		else
++			blk_queue_flag_clear(QUEUE_FLAG_POLL, q);
++	}
+ }
+ 
+ unsigned int dm_table_get_num_targets(struct dm_table *t)
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 50b693d776d6..dacc988045c9 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -1720,6 +1720,19 @@ static blk_qc_t dm_submit_bio(struct bio *bio)
+ 	return ret;
+ }
+ 
++static bool dm_poll_capable(struct gendisk *disk)
++{
++	int ret, srcu_idx;
++	struct mapped_device *md = disk->private_data;
++	struct dm_table *t;
++
++	t = dm_get_live_table(md, &srcu_idx);
++	ret = dm_table_supports_poll(t);
++	dm_put_live_table(md, srcu_idx);
++
++	return ret;
++}
++
+ /*-----------------------------------------------------------------
+  * An IDR is used to keep track of allocated minor numbers.
+  *---------------------------------------------------------------*/
+@@ -3132,6 +3145,7 @@ static const struct pr_ops dm_pr_ops = {
  };
+ 
+ static const struct block_device_operations dm_blk_dops = {
++	.poll_capable = dm_poll_capable,
+ 	.submit_bio = dm_submit_bio,
+ 	.open = dm_blk_open,
+ 	.release = dm_blk_close,
+diff --git a/include/linux/device-mapper.h b/include/linux/device-mapper.h
+index 7f4ac87c0b32..31bfd6f70013 100644
+--- a/include/linux/device-mapper.h
++++ b/include/linux/device-mapper.h
+@@ -538,6 +538,7 @@ unsigned int dm_table_get_num_targets(struct dm_table *t);
+ fmode_t dm_table_get_mode(struct dm_table *t);
+ struct mapped_device *dm_table_get_md(struct dm_table *t);
+ const char *dm_table_device_name(struct dm_table *t);
++int dm_table_supports_poll(struct dm_table *t);
+ 
+ /*
+  * Trigger an event.
 -- 
 2.29.2
 
