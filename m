@@ -7,226 +7,121 @@ X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8ADF3C433E4
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2718C433E6
 	for <linux-block@archiver.kernel.org>; Mon, 29 Mar 2021 15:28:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 549316196E
+	by mail.kernel.org (Postfix) with ESMTP id 89AEA6196C
 	for <linux-block@archiver.kernel.org>; Mon, 29 Mar 2021 15:28:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231244AbhC2P2S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 29 Mar 2021 11:28:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:20671 "EHLO
+        id S229479AbhC2P2U (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 29 Mar 2021 11:28:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39393 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231270AbhC2P15 (ORCPT
+        by vger.kernel.org with ESMTP id S231379AbhC2P2I (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 Mar 2021 11:27:57 -0400
+        Mon, 29 Mar 2021 11:28:08 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617031676;
+        s=mimecast20190719; t=1617031688;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=fNlG+3ho3blgJVyFVypZc5c3TnkhPbJk0ckqheigCu8=;
-        b=DJeaqRz+bhmKXKte+4pa601xC2xvi9ydbYrJauroVB7c2JzwzDchy7GO+ez5civnDi4JUf
-        BZOC4HPmyOQHAZu/BxFmaM8TGaIaGFKFQjh7JlHQ6t6u2Dzq63OZrAYEJr6Kp7WIRZKUzJ
-        o1sllRYrQo+0/Of3DbhtbiphFH7GdcY=
+        bh=+D7R0dmx1EexdXy1yf5Y6TiIr7C7M/actiCutRe5+Uw=;
+        b=RBn0ikkcfeEL5LkwxRWgxilAdoBzsoTmdHrxrm9X0bP8oie00Q6/Bj4vlg6Ezp7GKwkCh9
+        hHAWd0hBTGraF26jwOBcCLo77grAUdzzrLaUYNvCVPbR0ltlxCGTaI34tO2PEqqkDxF2mT
+        Amwg8lwjroPgfu1aAeJQvzGZ7xEYJWo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-358-LGej-2lTNAWJ_5UslOIKxQ-1; Mon, 29 Mar 2021 11:27:54 -0400
-X-MC-Unique: LGej-2lTNAWJ_5UslOIKxQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-501-LBtM8QJPO5Gtnj3rJt5SCw-1; Mon, 29 Mar 2021 11:28:05 -0400
+X-MC-Unique: LBtM8QJPO5Gtnj3rJt5SCw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 574D287A83B;
-        Mon, 29 Mar 2021 15:27:53 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DEFF8A0C25;
+        Mon, 29 Mar 2021 15:28:03 +0000 (UTC)
 Received: from localhost (ovpn-12-50.pek2.redhat.com [10.72.12.50])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 622EA5D6A1;
-        Mon, 29 Mar 2021 15:27:52 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 24968196E3;
+        Mon, 29 Mar 2021 15:28:02 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org,
         Jeffle Xu <jefflexu@linux.alibaba.com>,
         Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V4 07/12] block: prepare for supporting bio_list via other link
-Date:   Mon, 29 Mar 2021 23:26:17 +0800
-Message-Id: <20210329152622.173035-8-ming.lei@redhat.com>
+        Hannes Reinecke <hare@suse.de>
+Subject: [PATCH V4 10/12] block: add queue_to_disk() to get gendisk from request_queue
+Date:   Mon, 29 Mar 2021 23:26:20 +0800
+Message-Id: <20210329152622.173035-11-ming.lei@redhat.com>
 In-Reply-To: <20210329152622.173035-1-ming.lei@redhat.com>
 References: <20210329152622.173035-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-So far bio list helpers always use .bi_next to traverse the list, we
-will support to link bios by other bio field.
+From: Jeffle Xu <jefflexu@linux.alibaba.com>
 
-Prepare for such support by adding a macro so that users can define
-another helpers for linking bios by other bio field.
+Sometimes we need to get the corresponding gendisk from request_queue.
 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+It is preferred that block drivers store private data in
+gendisk->private_data rather than request_queue->queuedata, e.g. see:
+commit c4a59c4e5db3 ("dm: stop using ->queuedata").
+
+So if only request_queue is given, we need to get its corresponding
+gendisk to get the private data stored in that gendisk.
+
+Signed-off-by: Jeffle Xu <jefflexu@linux.alibaba.com>
+Reviewed-by: Mike Snitzer <snitzer@redhat.com>
 ---
- include/linux/bio.h | 132 +++++++++++++++++++++++---------------------
- 1 file changed, 68 insertions(+), 64 deletions(-)
+ include/linux/blkdev.h       | 2 ++
+ include/trace/events/kyber.h | 6 +++---
+ 2 files changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index d0246c92a6e8..619edd26a6c0 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -608,75 +608,11 @@ static inline unsigned bio_list_size(const struct bio_list *bl)
- 	return sz;
- }
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 89a01850cf12..bfab74b45f15 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -686,6 +686,8 @@ static inline bool blk_account_rq(struct request *rq)
+ 	dma_map_page_attrs(dev, (bv)->bv_page, (bv)->bv_offset, (bv)->bv_len, \
+ 	(dir), (attrs))
  
--static inline void bio_list_add(struct bio_list *bl, struct bio *bio)
--{
--	bio->bi_next = NULL;
--
--	if (bl->tail)
--		bl->tail->bi_next = bio;
--	else
--		bl->head = bio;
--
--	bl->tail = bio;
--}
--
--static inline void bio_list_add_head(struct bio_list *bl, struct bio *bio)
--{
--	bio->bi_next = bl->head;
--
--	bl->head = bio;
--
--	if (!bl->tail)
--		bl->tail = bio;
--}
--
--static inline void bio_list_merge(struct bio_list *bl, struct bio_list *bl2)
--{
--	if (!bl2->head)
--		return;
--
--	if (bl->tail)
--		bl->tail->bi_next = bl2->head;
--	else
--		bl->head = bl2->head;
--
--	bl->tail = bl2->tail;
--}
--
--static inline void bio_list_merge_head(struct bio_list *bl,
--				       struct bio_list *bl2)
--{
--	if (!bl2->head)
--		return;
--
--	if (bl->head)
--		bl2->tail->bi_next = bl->head;
--	else
--		bl->tail = bl2->tail;
--
--	bl->head = bl2->head;
--}
--
- static inline struct bio *bio_list_peek(struct bio_list *bl)
- {
- 	return bl->head;
- }
- 
--static inline struct bio *bio_list_pop(struct bio_list *bl)
--{
--	struct bio *bio = bl->head;
--
--	if (bio) {
--		bl->head = bl->head->bi_next;
--		if (!bl->head)
--			bl->tail = NULL;
--
--		bio->bi_next = NULL;
--	}
--
--	return bio;
--}
--
- static inline struct bio *bio_list_get(struct bio_list *bl)
- {
- 	struct bio *bio = bl->head;
-@@ -686,6 +622,74 @@ static inline struct bio *bio_list_get(struct bio_list *bl)
- 	return bio;
- }
- 
-+#define BIO_LIST_HELPERS(_pre, link)					\
-+									\
-+static inline void _pre##_add(struct bio_list *bl, struct bio *bio)	\
-+{									\
-+	bio->bi_##link = NULL;						\
-+									\
-+	if (bl->tail)							\
-+		bl->tail->bi_##link = bio;				\
-+	else								\
-+		bl->head = bio;						\
-+									\
-+	bl->tail = bio;							\
-+}									\
-+									\
-+static inline void _pre##_add_head(struct bio_list *bl, struct bio *bio) \
-+{									\
-+	bio->bi_##link = bl->head;					\
-+									\
-+	bl->head = bio;							\
-+									\
-+	if (!bl->tail)							\
-+		bl->tail = bio;						\
-+}									\
-+									\
-+static inline void _pre##_merge(struct bio_list *bl, struct bio_list *bl2) \
-+{									\
-+	if (!bl2->head)							\
-+		return;							\
-+									\
-+	if (bl->tail)							\
-+		bl->tail->bi_##link = bl2->head;			\
-+	else								\
-+		bl->head = bl2->head;					\
-+									\
-+	bl->tail = bl2->tail;						\
-+}									\
-+									\
-+static inline void _pre##_merge_head(struct bio_list *bl,		\
-+				       struct bio_list *bl2)		\
-+{									\
-+	if (!bl2->head)							\
-+		return;							\
-+									\
-+	if (bl->head)							\
-+		bl2->tail->bi_##link = bl->head;			\
-+	else								\
-+		bl->tail = bl2->tail;					\
-+									\
-+	bl->head = bl2->head;						\
-+}									\
-+									\
-+static inline struct bio *_pre##_pop(struct bio_list *bl)		\
-+{									\
-+	struct bio *bio = bl->head;					\
-+									\
-+	if (bio) {							\
-+		bl->head = bl->head->bi_##link;				\
-+		if (!bl->head)						\
-+			bl->tail = NULL;				\
-+									\
-+		bio->bi_##link = NULL;					\
-+	}								\
-+									\
-+	return bio;							\
-+}									\
++#define queue_to_disk(q)	(dev_to_disk(kobj_to_dev((q)->kobj.parent)))
 +
-+BIO_LIST_HELPERS(bio_list, next);
-+
- /*
-  * Increment chain count for the bio. Make sure the CHAIN flag update
-  * is visible before the raised count.
+ static inline bool queue_is_mq(struct request_queue *q)
+ {
+ 	return q->mq_ops;
+diff --git a/include/trace/events/kyber.h b/include/trace/events/kyber.h
+index c0e7d24ca256..f9802562edf6 100644
+--- a/include/trace/events/kyber.h
++++ b/include/trace/events/kyber.h
+@@ -30,7 +30,7 @@ TRACE_EVENT(kyber_latency,
+ 	),
+ 
+ 	TP_fast_assign(
+-		__entry->dev		= disk_devt(dev_to_disk(kobj_to_dev(q->kobj.parent)));
++		__entry->dev		= disk_devt(queue_to_disk(q));
+ 		strlcpy(__entry->domain, domain, sizeof(__entry->domain));
+ 		strlcpy(__entry->type, type, sizeof(__entry->type));
+ 		__entry->percentile	= percentile;
+@@ -59,7 +59,7 @@ TRACE_EVENT(kyber_adjust,
+ 	),
+ 
+ 	TP_fast_assign(
+-		__entry->dev		= disk_devt(dev_to_disk(kobj_to_dev(q->kobj.parent)));
++		__entry->dev		= disk_devt(queue_to_disk(q));
+ 		strlcpy(__entry->domain, domain, sizeof(__entry->domain));
+ 		__entry->depth		= depth;
+ 	),
+@@ -81,7 +81,7 @@ TRACE_EVENT(kyber_throttled,
+ 	),
+ 
+ 	TP_fast_assign(
+-		__entry->dev		= disk_devt(dev_to_disk(kobj_to_dev(q->kobj.parent)));
++		__entry->dev		= disk_devt(queue_to_disk(q));
+ 		strlcpy(__entry->domain, domain, sizeof(__entry->domain));
+ 	),
+ 
 -- 
 2.29.2
 
