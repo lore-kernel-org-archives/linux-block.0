@@ -6,59 +6,62 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 332E6C433DB
-	for <linux-block@archiver.kernel.org>; Sun, 28 Mar 2021 23:43:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 910FEC433DB
+	for <linux-block@archiver.kernel.org>; Mon, 29 Mar 2021 01:34:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 00EC761949
-	for <linux-block@archiver.kernel.org>; Sun, 28 Mar 2021 23:43:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 501986146B
+	for <linux-block@archiver.kernel.org>; Mon, 29 Mar 2021 01:34:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229950AbhC1Xm2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 28 Mar 2021 19:42:28 -0400
-Received: from mail-pl1-f171.google.com ([209.85.214.171]:45823 "EHLO
-        mail-pl1-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229504AbhC1Xl6 (ORCPT
+        id S229822AbhC2Bd2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 28 Mar 2021 21:33:28 -0400
+Received: from mail-pg1-f178.google.com ([209.85.215.178]:34454 "EHLO
+        mail-pg1-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229645AbhC2BdU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 28 Mar 2021 19:41:58 -0400
-Received: by mail-pl1-f171.google.com with SMTP id l1so3536870plg.12
-        for <linux-block@vger.kernel.org>; Sun, 28 Mar 2021 16:41:57 -0700 (PDT)
+        Sun, 28 Mar 2021 21:33:20 -0400
+Received: by mail-pg1-f178.google.com with SMTP id i6so1239186pgs.1
+        for <linux-block@vger.kernel.org>; Sun, 28 Mar 2021 18:33:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=kByb82zAltIstv+fhdtULSMCk+fIiHp04zpaqq1qzmw=;
-        b=Q7Q9ZHp15+Ka/YBX+mDlHJrityQUNI7lMPVGNWG8vj/hjoXNBqlGQPXRs+HmJZiDoP
-         nrvmm0RXI98DDIciAKuqZBPIhebA/0XEjdbR9eJKd3BXNT+pM3Fq9hO9qaFe7rIxDReV
-         00pJwDxhFAKeUzY1dkhc9oU5oTMV26LpY8AqFZNAyiop/bKMYZVO0VHQGMG0mFkwa5TE
-         tWlCw+lJyIbegUrbBczPTE4HZVzCtUKP8D6OcR+OofMS2UIXTY5RkLc5LaIXQwqM1Yik
-         SXmIWnsDfUrUS938JAeVOuqIJAGJ8MNorArFivvY7lBB8mwAC2+PdSjnI5BNLNveXHWV
-         31oQ==
-X-Gm-Message-State: AOAM531yEZvVoQ+lPBU9JrTgVppfdLSNsFMPF9Adomw52/qq5jNzAKh7
-        +1ThjPwnLl23WlblfQFQ5QH0PtW2T5c=
-X-Google-Smtp-Source: ABdhPJygo9dDTBjpVQJEGKm7vN0mJyCJTctzqyYCf75PTKz8Eh92vDKwgGQpmZxaJJi+1LMKEdM/Rw==
-X-Received: by 2002:a17:902:968d:b029:e6:faf5:8d0f with SMTP id n13-20020a170902968db02900e6faf58d0fmr25139013plp.71.1616974917397;
-        Sun, 28 Mar 2021 16:41:57 -0700 (PDT)
+        bh=MOJf8hKhe/Ue0c4xf4oxRzQ+S8na3cKxiLXrfqEaMsE=;
+        b=XgV7sDV9YLUARnL9Gpp+YryL13wiw6YMR0I3Vb1Tgt7vRCBXLMpHbCOpLJL0r6LtpW
+         +Rll2WATWIuu0pc5LeynEpNMeXzACdvJo1yCFnSx+9MR61X3Qi97N1pt8sVPjIYlYvT3
+         DfmJC4NPet/UI7l1VtwvDeLG4VA3W9bVuS1MTsTOtEni0MuG5fAXNpYcnT/wLoIETO+V
+         vrW7eAvFhXbspjtFIjMfdvsSnrwBW9xXjoWREPE0kiBWl9FL8psvpZaygddaIxbYBA1D
+         ma1ZJWk1zIuYwhDU/qte92/rbbCkhdiFMzCOxajsChJBdpupGVPmXqBDz9H/nJIxWGSv
+         hkoA==
+X-Gm-Message-State: AOAM533vemuY+1h7Y37H3iQI1qve5sbfQ7cPnKyRMuJ12130v8YRVOa7
+        aut/+Tgl/G+/FQ5hwJr/59UH4hQf0Ec=
+X-Google-Smtp-Source: ABdhPJw1Mkd5u8Sr+PXaLo2ECk2OPT8deqv3QzdSvgOTgoDGjhRqvhrRBzqX5l3Q1t7Izrec3yqfqA==
+X-Received: by 2002:a63:5c1e:: with SMTP id q30mr21323745pgb.259.1616981599881;
+        Sun, 28 Mar 2021 18:33:19 -0700 (PDT)
 Received: from ?IPv6:2601:647:4000:d7:7123:9470:fec5:1a3a? ([2601:647:4000:d7:7123:9470:fec5:1a3a])
-        by smtp.gmail.com with ESMTPSA id fv9sm15889429pjb.23.2021.03.28.16.41.55
+        by smtp.gmail.com with ESMTPSA id 76sm15892419pfw.156.2021.03.28.18.33.17
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 28 Mar 2021 16:41:56 -0700 (PDT)
-Subject: Re: [PATCH blktests v2] rdma: Use rdma link instead of
- /sys/class/infiniband/*/parent
-To:     Omar Sandoval <osandov@fb.com>
-Cc:     linux-block@vger.kernel.org, John Garry <john.garry@huawei.com>,
-        Don Brace <don.brace@microsemi.com>,
-        Douglas Gilbert <dgilbert@interlog.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Yi Zhang <yi.zhang@redhat.com>
-References: <20210328231210.3707-1-bvanassche@acm.org>
- <20210328231210.3707-2-bvanassche@acm.org>
+        Sun, 28 Mar 2021 18:33:18 -0700 (PDT)
+Subject: Re: [PATCH v3 3/3] blk-mq: Fix a race between iterating over requests
+ and freeing requests
+To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        John Garry <john.garry@huawei.com>,
+        Khazhy Kumykov <khazhy@google.com>
+References: <20210326022919.19638-1-bvanassche@acm.org>
+ <20210326022919.19638-4-bvanassche@acm.org>
+ <20210326084456.tymobjbpy2oh7vx3@shindev.dhcp.fujisawa.hgst.com>
 From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <ab74e069-15fb-f1d3-e5e5-fbec8989d14e@acm.org>
-Date:   Sun, 28 Mar 2021 16:41:55 -0700
+Message-ID: <4453d38d-3369-f32a-dd21-0c5899c02211@acm.org>
+Date:   Sun, 28 Mar 2021 18:33:16 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.8.1
 MIME-Version: 1.0
-In-Reply-To: <20210328231210.3707-2-bvanassche@acm.org>
+In-Reply-To: <20210326084456.tymobjbpy2oh7vx3@shindev.dhcp.fujisawa.hgst.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -66,12 +69,18 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/28/21 4:12 PM, Bart Van Assche wrote:
-> The approach of verifying whether or not an RDMA interface is associated
-> with the rdma_rxe interface by looking up its parent device is deprecated
-> and will be removed soon from the Linux kernel. Hence this patch that uses
-> the rdma link command instead.
+On 3/26/21 1:44 AM, Shinichiro Kawasaki wrote:
+> I applied this series on v5.12-rc4 and ran blktests block/005 with a HDD behind
+> SAS-HBA, and I observed kernel INFO and WARNING [1]. It looks like that
+> tags->iter_rwsem is not initialized. I found blk_mq_init_tags() has two paths
+> to "return tags". I think when blk_mq_init_tags() returns at the first path to
+> "return tags", tags->iter_rwsem misses the initialization. To confirm it, I
+> moved the init_rwsem() before the first "return tags", then saw the kernel
+> messages disappeared (use-after-free disappeared also).
 
-Please ignore this patch - it has already been applied.
+Hi Shinichiro,
+
+Thanks for the quick feedback. I agree with your analysis and will fix
+this in v4 of this patch series.
 
 Bart.
