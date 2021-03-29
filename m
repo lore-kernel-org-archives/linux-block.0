@@ -2,85 +2,227 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67AE7C433E1
-	for <linux-block@archiver.kernel.org>; Mon, 29 Mar 2021 13:40:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCC74C433C1
+	for <linux-block@archiver.kernel.org>; Mon, 29 Mar 2021 14:49:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3428E61969
-	for <linux-block@archiver.kernel.org>; Mon, 29 Mar 2021 13:40:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9CF1261932
+	for <linux-block@archiver.kernel.org>; Mon, 29 Mar 2021 14:49:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231796AbhC2Njg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 29 Mar 2021 09:39:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34526 "EHLO
+        id S231191AbhC2OtW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 29 Mar 2021 10:49:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231253AbhC2NjL (ORCPT
+        with ESMTP id S231311AbhC2Osz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 Mar 2021 09:39:11 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0B3DC061574
-        for <linux-block@vger.kernel.org>; Mon, 29 Mar 2021 06:39:10 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id a22-20020a17090aa516b02900c1215e9b33so7702094pjq.5
-        for <linux-block@vger.kernel.org>; Mon, 29 Mar 2021 06:39:10 -0700 (PDT)
+        Mon, 29 Mar 2021 10:48:55 -0400
+Received: from mail-qt1-x836.google.com (mail-qt1-x836.google.com [IPv6:2607:f8b0:4864:20::836])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B085C061574;
+        Mon, 29 Mar 2021 07:48:55 -0700 (PDT)
+Received: by mail-qt1-x836.google.com with SMTP id 1so8820731qtb.0;
+        Mon, 29 Mar 2021 07:48:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=PTI+L6ax+/N+yMG1MXdvXBKRXCBtboFyHdTE1wtJx+k=;
-        b=pWIp11nHFW7KdnNAiA9K1BL1Od6BgMAM7GRbTXqtMPyZ7gtqHQXCOkLdSG3wcT5UJE
-         aj2G6x+OC5ELOVlMUvospOx5QDhace1cy5WW2FUoRbaZaR4/HCepnU+gIuH1c2TuEhVL
-         zFN+UEnXJikrfluMdBrX6+RTs8xYNzSJNUR7fTnFypB8a892d27IAYuTudTMWxB8dteU
-         mkABKWFlCP8rzp1OI1TAimg+bL9zTuKU9vcLC31IYPzWTZGvXkmeacqdy1Qh7Qt/MAlL
-         Y7GrMMkjCj8hIP9UtDRnsCcyXjdQ9ObiX0sZEq2PlNof1lR62WjpGp1rOGY3PC5EFnXn
-         AlSg==
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=+SrhRYacxLlj/HDLWdt9e70QVg4KZ/37qGsIxhEHOfQ=;
+        b=bnloEp7HixUEx2GuoGaWnZPs0X9sobCEVYM4s55n8xs4VmBDp22IYYkoENeEFjLtoe
+         afVNeOtlv8I3d91sVOWjFY+8RIfZ9PWxoFiLwMeLWdfcK3XAiq4AlTn+wx86Pgc/c0j9
+         gPzpuyqrOYTUw8n/MeEwdu//hnwJHzz4ocoIg7Bw1kF3CkOCMOU2BRENZTmuWJ2hAhkn
+         9WpAwe2jBIIbXX5EVz/Jm26JifmlRwzsxmJnlpBOBRKkMC9qgnmaCseCcUaVYiiKK7Hv
+         UnnyBtjWHJJtsyHJ7LNZbIgSMhEHvww4GIRBKJIYlrXFV3lK0AczOsSiD6fR77uwfJ5I
+         F+WA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=PTI+L6ax+/N+yMG1MXdvXBKRXCBtboFyHdTE1wtJx+k=;
-        b=FWegPXfm+o8P4BwX/ssO/OUeqIoqBt0O2+GA+j2V97NHiaGSym+Ejac5WStJ0/wSL4
-         Lv5Jap3SqRjpyEdcuKhRMiDuPx/CIxoiTWggZ8TayC/Q0UhxCNvLG75eCNHmvjkDvtd3
-         8P/+NADHqxv61bwc75UnEC9MPUde1n2/WwEUBEDLNaO+WoD4M/8+MSIcfqMGRUXoyhd1
-         ONFs1D3QKQb+HJ8NRP/bvvveocta9Sc466XWOX/2f8zdrwHvm5z4rTkFUlhuq/Yi6ndf
-         PV08YsQtbUYCxWt9dgii7tEnFEh9hPuu2akc1RuQl5Q3AcnUC2sZKjwPF0Uar5xfC+h8
-         ppRg==
-X-Gm-Message-State: AOAM532ceglCmbWHkJyI0iPp42W8J3K2Rnl0zYT39iFuZIsslaouBdUQ
-        PPCqGeKRJOAq0SKXqVnGwmK6vA==
-X-Google-Smtp-Source: ABdhPJzuj3M/DsqXiV9zd8IxnhRo608IcZgTiobsDDdPzYZif5V8Z1u24W8jhK9cloHgqxbQJPdjAQ==
-X-Received: by 2002:a17:90a:9f43:: with SMTP id q3mr26582711pjv.50.1617025150517;
-        Mon, 29 Mar 2021 06:39:10 -0700 (PDT)
-Received: from [192.168.1.134] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id 8sm15739525pjj.53.2021.03.29.06.39.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 29 Mar 2021 06:39:10 -0700 (PDT)
-Subject: Re: [PATCH -next 1/2] mtip32xx: use DEFINE_SPINLOCK() for spinlock
-To:     Shixin Liu <liushixin2@huawei.com>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210329095349.4170870-1-liushixin2@huawei.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <11e068c7-0022-8c7e-23d9-c1bd8ee90896@kernel.dk>
-Date:   Mon, 29 Mar 2021 07:39:09 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        bh=+SrhRYacxLlj/HDLWdt9e70QVg4KZ/37qGsIxhEHOfQ=;
+        b=djzVc47YyomxCz24egrc6OWUNlaKUgisaFzFQlIzzY+S43md21wVc1/E8Fcnddab6W
+         yj+kUOCLyvGjdWonx9R54xO0zdRMxsmT6IcsPGSZj2IHjz5nzuu8drWoWPSyS0Gh7z/+
+         7cK59umbi9YMBDVE2vYmD0wR5j7USKEDzLxWXLx+SYelDudAIOLlcl1y0J6cpNpJ2u9b
+         SQXhigrokqu1vK1mVMGRjX9sO3cMxJ4a8bSN74L2P9XxbKaVTeZXL2MmsroaT9hDrdFs
+         Q2fyRqUkU5hvLYQ2c7Q+x1Ish0AV+uvhzKSaibyRdmAK4EuQOStWZNb0Ff7hPA/Bk4CA
+         MwuQ==
+X-Gm-Message-State: AOAM533miUV9mY64HaxgRj3+SdR40miORMHqpCmji4ULI8LQ8l4FV9TW
+        e0DqqyF3n91fgefZu2xVscc=
+X-Google-Smtp-Source: ABdhPJwbrme1KH7Nk2u72pH+gk3PhRmgaJmwTfVNx6y49YRCRk3O0LqCiHcT/4+IUaa8utO1fVZcvQ==
+X-Received: by 2002:ac8:7b4b:: with SMTP id m11mr23567641qtu.276.1617029334613;
+        Mon, 29 Mar 2021 07:48:54 -0700 (PDT)
+Received: from localhost ([2620:10d:c091:480::1:6ffc])
+        by smtp.gmail.com with ESMTPSA id q24sm13156066qki.120.2021.03.29.07.48.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Mar 2021 07:48:54 -0700 (PDT)
+From:   Dan Schatzberg <schatzberg.dan@gmail.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        Zefan Li <lizefan.x@bytedance.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        Vladimir Davydov <vdavydov.dev@gmail.com>,
+        Hugh Dickins <hughd@google.com>,
+        Shakeel Butt <shakeelb@google.com>,
+        Roman Gushchin <guro@fb.com>, Yang Shi <shy828301@gmail.com>,
+        Muchun Song <songmuchun@bytedance.com>,
+        Alex Shi <alex.shi@linux.alibaba.com>,
+        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+        Yafang Shao <laoar.shao@gmail.com>,
+        Wei Yang <richard.weiyang@gmail.com>,
+        linux-block@vger.kernel.org (open list:BLOCK LAYER),
+        linux-kernel@vger.kernel.org (open list),
+        cgroups@vger.kernel.org (open list:CONTROL GROUP (CGROUP)),
+        linux-mm@kvack.org (open list:MEMORY MANAGEMENT)
+Subject: [PATCH V11 0/3] Charge loop device i/o to issuing cgroup
+Date:   Mon, 29 Mar 2021 07:48:22 -0700
+Message-Id: <20210329144829.1834347-1-schatzberg.dan@gmail.com>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-In-Reply-To: <20210329095349.4170870-1-liushixin2@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/29/21 3:53 AM, Shixin Liu wrote:
-> spinlock can be initialized automatically with DEFINE_SPINLOCK()
-> rather than explicitly calling spin_lock_init().
+No major changes, rebased on top of latest mm tree
 
-Applied both, thanks.
+Changes since V11:
+
+* Removed WQ_MEM_RECLAIM flag from loop workqueue. Technically, this
+  can be driven by writeback, but this was causing a warning in xfs
+  and likely other filesystems aren't equipped to be driven by reclaim
+  at the VFS layer.
+* Included a small fix from Colin Ian King.
+* reworked get_mem_cgroup_from_mm to institute the necessary charge
+  priority.
+
+Changes since V10:
+
+* Added page-cache charging to mm: Charge active memcg when no mm is set
+
+Changes since V9:
+
+* Rebased against linus's branch which now includes Roman Gushchin's
+  patch this series is based off of
+
+Changes since V8:
+
+* Rebased on top of Roman Gushchin's patch
+  (https://lkml.org/lkml/2020/8/21/1464) which provides the nesting
+  support for setting active memcg. Dropped the patch from this series
+  that did the same thing.
+
+Changes since V7:
+
+* Rebased against linus's branch
+
+Changes since V6:
+
+* Added separate spinlock for worker synchronization
+* Minor style changes
+
+Changes since V5:
+
+* Fixed a missing css_put when failing to allocate a worker
+* Minor style changes
+
+Changes since V4:
+
+Only patches 1 and 2 have changed.
+
+* Fixed irq lock ordering bug
+* Simplified loop detach
+* Added support for nesting memalloc_use_memcg
+
+Changes since V3:
+
+* Fix race on loop device destruction and deferred worker cleanup
+* Ensure charge on shmem_swapin_page works just like getpage
+* Minor style changes
+
+Changes since V2:
+
+* Deferred destruction of workqueue items so in the common case there
+  is no allocation needed
+
+Changes since V1:
+
+* Split out and reordered patches so cgroup charging changes are
+  separate from kworker -> workqueue change
+
+* Add mem_css to struct loop_cmd to simplify logic
+
+The loop device runs all i/o to the backing file on a separate kworker
+thread which results in all i/o being charged to the root cgroup. This
+allows a loop device to be used to trivially bypass resource limits
+and other policy. This patch series fixes this gap in accounting.
+
+A simple script to demonstrate this behavior on cgroupv2 machine:
+
+'''
+#!/bin/bash
+set -e
+
+CGROUP=/sys/fs/cgroup/test.slice
+LOOP_DEV=/dev/loop0
+
+if [[ ! -d $CGROUP ]]
+then
+    sudo mkdir $CGROUP
+fi
+
+grep oom_kill $CGROUP/memory.events
+
+# Set a memory limit, write more than that limit to tmpfs -> OOM kill
+sudo unshare -m bash -c "
+echo \$\$ > $CGROUP/cgroup.procs;
+echo 0 > $CGROUP/memory.swap.max;
+echo 64M > $CGROUP/memory.max;
+mount -t tmpfs -o size=512m tmpfs /tmp;
+dd if=/dev/zero of=/tmp/file bs=1M count=256" || true
+
+grep oom_kill $CGROUP/memory.events
+
+# Set a memory limit, write more than that limit through loopback
+# device -> no OOM kill
+sudo unshare -m bash -c "
+echo \$\$ > $CGROUP/cgroup.procs;
+echo 0 > $CGROUP/memory.swap.max;
+echo 64M > $CGROUP/memory.max;
+mount -t tmpfs -o size=512m tmpfs /tmp;
+truncate -s 512m /tmp/backing_file
+losetup $LOOP_DEV /tmp/backing_file
+dd if=/dev/zero of=$LOOP_DEV bs=1M count=256;
+losetup -D $LOOP_DEV" || true
+
+grep oom_kill $CGROUP/memory.events
+'''
+
+Naively charging cgroups could result in priority inversions through
+the single kworker thread in the case where multiple cgroups are
+reading/writing to the same loop device. This patch series does some
+minor modification to the loop driver so that each cgroup can make
+forward progress independently to avoid this inversion.
+
+With this patch series applied, the above script triggers OOM kills
+when writing through the loop device as expected.
+
+Dan Schatzberg (3):
+  loop: Use worker per cgroup instead of kworker
+  mm: Charge active memcg when no mm is set
+  loop: Charge i/o to mem and blk cg
+
+ drivers/block/loop.c       | 248 ++++++++++++++++++++++++++++++-------
+ drivers/block/loop.h       |  15 ++-
+ include/linux/memcontrol.h |   6 +
+ kernel/cgroup/cgroup.c     |   1 +
+ mm/filemap.c               |   2 +-
+ mm/memcontrol.c            |  73 ++++++-----
+ mm/shmem.c                 |   4 +-
+ 7 files changed, 267 insertions(+), 82 deletions(-)
 
 -- 
-Jens Axboe
+2.30.2
 
