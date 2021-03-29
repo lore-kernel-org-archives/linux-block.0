@@ -2,174 +2,304 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D92C4C433E0
-	for <linux-block@archiver.kernel.org>; Mon, 29 Mar 2021 15:29:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 114F9C433DB
+	for <linux-block@archiver.kernel.org>; Mon, 29 Mar 2021 16:14:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9FD23617ED
-	for <linux-block@archiver.kernel.org>; Mon, 29 Mar 2021 15:29:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D9BCE6196C
+	for <linux-block@archiver.kernel.org>; Mon, 29 Mar 2021 16:14:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231363AbhC2P2t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 29 Mar 2021 11:28:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24313 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231404AbhC2P2R (ORCPT
+        id S229689AbhC2QNu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 29 Mar 2021 12:13:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39834 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231341AbhC2QNj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 29 Mar 2021 11:28:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617031696;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=WprMeSTUBlNB0D+G5/hB14w1VWfRCDMbMSxpzet0DV8=;
-        b=BtMDd17h5fgepGN558wqUEldEvtif5+rf4Xf2rrIsF6LIRdQiAtlkprgnVC6NJdqX9ot0l
-        xM67qtE1G3iVywi5C3vkUk+oGDNYc5BatnDPChh5CXqxFOdUHUdGzgg8/vgJns/BGg9HYL
-        gwgw7nbR8ufTpcjuHB3xSmLp26fqcNs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-399-sO36VVkNOW6ELDhlNeFBrw-1; Mon, 29 Mar 2021 11:28:11 -0400
-X-MC-Unique: sO36VVkNOW6ELDhlNeFBrw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6F7C4A0C04;
-        Mon, 29 Mar 2021 15:28:10 +0000 (UTC)
-Received: from localhost (ovpn-12-50.pek2.redhat.com [10.72.12.50])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B181F5D9F0;
-        Mon, 29 Mar 2021 15:28:09 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org,
-        Jeffle Xu <jefflexu@linux.alibaba.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V4 12/12] dm: support IO polling for bio-based dm device
-Date:   Mon, 29 Mar 2021 23:26:22 +0800
-Message-Id: <20210329152622.173035-13-ming.lei@redhat.com>
-In-Reply-To: <20210329152622.173035-1-ming.lei@redhat.com>
-References: <20210329152622.173035-1-ming.lei@redhat.com>
+        Mon, 29 Mar 2021 12:13:39 -0400
+Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 393CCC061762
+        for <linux-block@vger.kernel.org>; Mon, 29 Mar 2021 09:13:39 -0700 (PDT)
+Received: by mail-pg1-x530.google.com with SMTP id p12so5069196pgj.10
+        for <linux-block@vger.kernel.org>; Mon, 29 Mar 2021 09:13:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=iwgqrSQ7OtcTD6Kmq+G2j4+SoTiaaT1H8kRq2h2aVwg=;
+        b=B9aWLAKZAcMxqzTDYkFoN6eV0fA9YoPBu44LBrfz1T4nCQajwJ1+96uuUowCoffKP7
+         MBg0CU2oSAFSCKP0UMxIFoaCf8MgRmHFgZ7w4sCHhaHykw5JmWgJZSohSe4SVtfP8lx3
+         2BK6kH92QLkrAsORbl2SG85f70wbzRu95WMoIyW9+Ci/QgcNuz5se6sTzgaWUnAr2v5V
+         S913EZLQMV3S20eRdWWJ40lcdNl+T0T96Wl44fH9J7mbgaPeVwj0PmfTEoSyD5a+f6fL
+         sVSU06qRWs+2PQvOE/d6zfVul1SWs3lkSBX4GkdKDi1XGP84/Ms+8vrYWqdpPd0NI3zz
+         JcRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=iwgqrSQ7OtcTD6Kmq+G2j4+SoTiaaT1H8kRq2h2aVwg=;
+        b=MliSbQkK+b2GyL0VVpyxBdxDR/fqhQoo66mpwmUZT0r4ZH2GrrJSLiz2PrTEdBm4gC
+         YJUFeAI8xYpicYN5Vwyapzd+BQ6Hm29P1AJu6AeqLsanUjhCAfsnV2KGhJRFm7+WaTv1
+         8qboFSQV8Qv8tWARwt/hR77tqOiBm01jwa7vw6YQDRK4Z1UyG8wCGa7g76sYBlPHt/VH
+         N6hswu0WaGh52Jiohrp9Sm3BZ0uPHWZDovuiBlrWVGONORcYohOCH80OwdpzOaroQOOK
+         ItAgvtB+M6vGbb8LpKQ3kovYQnZL82q6QOV0yma6U8YPdF0Ga/wTX9tDIrVxsWA7en1h
+         49dA==
+X-Gm-Message-State: AOAM531KahGTBp5AlsKcPwUaI+eAf8ZJTBXZOkzosaDYA8eZ6mEnDs/z
+        mscUVFOyRDD1Qco5CIeonU1EUz/IsHMAntAREjJ1bw==
+X-Google-Smtp-Source: ABdhPJzDdNHn7lMvpiWlglXJdENyPLTvYYnykndFE+76WwdSXAzELmjvsy99r2VOdgLpipcV5gwxvwvJ7dxByTXMd6U=
+X-Received: by 2002:aa7:9614:0:b029:1fa:e77b:722 with SMTP id
+ q20-20020aa796140000b02901fae77b0722mr26913282pfg.2.1617034418611; Mon, 29
+ Mar 2021 09:13:38 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+References: <20210329144829.1834347-1-schatzberg.dan@gmail.com> <20210329144829.1834347-3-schatzberg.dan@gmail.com>
+In-Reply-To: <20210329144829.1834347-3-schatzberg.dan@gmail.com>
+From:   Muchun Song <songmuchun@bytedance.com>
+Date:   Tue, 30 Mar 2021 00:13:01 +0800
+Message-ID: <CAMZfGtVT85+1_Bu9LBaG6DUsr1kYsepQ-1-K7BDD0Wn3L+BQgg@mail.gmail.com>
+Subject: Re: [External] [PATCH 2/3] mm: Charge active memcg when no mm is set
+To:     Dan Schatzberg <schatzberg.dan@gmail.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        Zefan Li <lizefan.x@bytedance.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        Vladimir Davydov <vdavydov.dev@gmail.com>,
+        Hugh Dickins <hughd@google.com>,
+        Shakeel Butt <shakeelb@google.com>,
+        Roman Gushchin <guro@fb.com>, Yang Shi <shy828301@gmail.com>,
+        Alex Shi <alex.shi@linux.alibaba.com>,
+        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+        Yafang Shao <laoar.shao@gmail.com>,
+        Wei Yang <richard.weiyang@gmail.com>,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        "open list:CONTROL GROUP (CGROUP)" <cgroups@vger.kernel.org>,
+        "open list:MEMORY MANAGEMENT" <linux-mm@kvack.org>,
+        Chris Down <chris@chrisdown.name>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Jeffle Xu <jefflexu@linux.alibaba.com>
+On Mon, Mar 29, 2021 at 10:49 PM Dan Schatzberg
+<schatzberg.dan@gmail.com> wrote:
+>
+> set_active_memcg() worked for kernel allocations but was silently
+> ignored for user pages.
+>
+> This patch establishes a precedence order for who gets charged:
+>
+> 1. If there is a memcg associated with the page already, that memcg is
+>    charged. This happens during swapin.
+>
+> 2. If an explicit mm is passed, mm->memcg is charged. This happens
+>    during page faults, which can be triggered in remote VMs (eg gup).
+>
+> 3. Otherwise consult the current process context. If there is an
+>    active_memcg, use that. Otherwise, current->mm->memcg.
+>
+> Previously, if a NULL mm was passed to mem_cgroup_charge (case 3) it
+> would always charge the root cgroup. Now it looks up the active_memcg
+> first (falling back to charging the root cgroup if not set).
+>
+> Signed-off-by: Dan Schatzberg <schatzberg.dan@gmail.com>
+> Acked-by: Johannes Weiner <hannes@cmpxchg.org>
+> Acked-by: Tejun Heo <tj@kernel.org>
+> Acked-by: Chris Down <chris@chrisdown.name>
+> Reviewed-by: Shakeel Butt <shakeelb@google.com>
+> ---
+>  mm/filemap.c    |  2 +-
+>  mm/memcontrol.c | 72 ++++++++++++++++++++++++++++---------------------
+>  mm/shmem.c      |  4 +--
+>  3 files changed, 44 insertions(+), 34 deletions(-)
+>
+> diff --git a/mm/filemap.c b/mm/filemap.c
+> index eeeb8e2cc36a..63fd980e863a 100644
+> --- a/mm/filemap.c
+> +++ b/mm/filemap.c
+> @@ -872,7 +872,7 @@ noinline int __add_to_page_cache_locked(struct page *=
+page,
+>         page->index =3D offset;
+>
+>         if (!huge) {
+> -               error =3D mem_cgroup_charge(page, current->mm, gfp);
+> +               error =3D mem_cgroup_charge(page, NULL, gfp);
+>                 if (error)
+>                         goto error;
+>                 charged =3D true;
+> diff --git a/mm/memcontrol.c b/mm/memcontrol.c
+> index 668d1d7c2645..adc618814fd2 100644
+> --- a/mm/memcontrol.c
+> +++ b/mm/memcontrol.c
+> @@ -884,13 +884,38 @@ struct mem_cgroup *mem_cgroup_from_task(struct task=
+_struct *p)
+>  }
+>  EXPORT_SYMBOL(mem_cgroup_from_task);
+>
+> +static __always_inline struct mem_cgroup *active_memcg(void)
+> +{
+> +       if (in_interrupt())
+> +               return this_cpu_read(int_active_memcg);
+> +       else
+> +               return current->active_memcg;
+> +}
+> +
+> +static __always_inline struct mem_cgroup *get_active_memcg(void)
+> +{
+> +       struct mem_cgroup *memcg;
+> +
+> +       rcu_read_lock();
+> +       memcg =3D active_memcg();
+> +       /* remote memcg must hold a ref. */
+> +       if (memcg && WARN_ON_ONCE(!css_tryget(&memcg->css)))
+> +               memcg =3D root_mem_cgroup;
+> +       rcu_read_unlock();
+> +
+> +       return memcg;
+> +}
 
-IO polling is enabled when all underlying target devices are capable
-of IO polling. The sanity check supports the stacked device model, in
-which one dm device may be build upon another dm device. In this case,
-the mapped device will check if the underlying dm target device
-supports IO polling.
+This function is already removed since the patchset below.
 
-Reviewed-by: Mike Snitzer <snitzer@redhat.com>
-Signed-off-by: Jeffle Xu <jefflexu@linux.alibaba.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/md/dm-table.c         | 24 ++++++++++++++++++++++++
- drivers/md/dm.c               | 14 ++++++++++++++
- include/linux/device-mapper.h |  1 +
- 3 files changed, 39 insertions(+)
+  Use obj_cgroup APIs to charge kmem pages
+  https://lore.kernel.org/patchwork/cover/1399132/
 
-diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
-index 95391f78b8d5..a8f3575fb118 100644
---- a/drivers/md/dm-table.c
-+++ b/drivers/md/dm-table.c
-@@ -1509,6 +1509,12 @@ struct dm_target *dm_table_find_target(struct dm_table *t, sector_t sector)
- 	return &t->targets[(KEYS_PER_NODE * n) + k];
- }
- 
-+static int device_not_poll_capable(struct dm_target *ti, struct dm_dev *dev,
-+				   sector_t start, sector_t len, void *data)
-+{
-+	return !blk_queue_poll(bdev_get_queue(dev->bdev));
-+}
-+
- /*
-  * type->iterate_devices() should be called when the sanity check needs to
-  * iterate and check all underlying data devices. iterate_devices() will
-@@ -1559,6 +1565,11 @@ static int count_device(struct dm_target *ti, struct dm_dev *dev,
- 	return 0;
- }
- 
-+int dm_table_supports_poll(struct dm_table *t)
-+{
-+	return !dm_table_any_dev_attr(t, device_not_poll_capable, NULL);
-+}
-+
- /*
-  * Check whether a table has no data devices attached using each
-  * target's iterate_devices method.
-@@ -2079,6 +2090,19 @@ void dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
- 
- 	dm_update_keyslot_manager(q, t);
- 	blk_queue_update_readahead(q);
-+
-+	/*
-+	 * Check for request-based device is remained to
-+	 * dm_mq_init_request_queue()->blk_mq_init_allocated_queue().
-+	 * For bio-based device, only set QUEUE_FLAG_POLL when all underlying
-+	 * devices supporting polling.
-+	 */
-+	if (__table_type_bio_based(t->type)) {
-+		if (dm_table_supports_poll(t))
-+			blk_queue_flag_set(QUEUE_FLAG_POLL, q);
-+		else
-+			blk_queue_flag_clear(QUEUE_FLAG_POLL, q);
-+	}
- }
- 
- unsigned int dm_table_get_num_targets(struct dm_table *t)
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index 50b693d776d6..dacc988045c9 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -1720,6 +1720,19 @@ static blk_qc_t dm_submit_bio(struct bio *bio)
- 	return ret;
- }
- 
-+static bool dm_poll_capable(struct gendisk *disk)
-+{
-+	int ret, srcu_idx;
-+	struct mapped_device *md = disk->private_data;
-+	struct dm_table *t;
-+
-+	t = dm_get_live_table(md, &srcu_idx);
-+	ret = dm_table_supports_poll(t);
-+	dm_put_live_table(md, srcu_idx);
-+
-+	return ret;
-+}
-+
- /*-----------------------------------------------------------------
-  * An IDR is used to keep track of allocated minor numbers.
-  *---------------------------------------------------------------*/
-@@ -3132,6 +3145,7 @@ static const struct pr_ops dm_pr_ops = {
- };
- 
- static const struct block_device_operations dm_blk_dops = {
-+	.poll_capable = dm_poll_capable,
- 	.submit_bio = dm_submit_bio,
- 	.open = dm_blk_open,
- 	.release = dm_blk_close,
-diff --git a/include/linux/device-mapper.h b/include/linux/device-mapper.h
-index 7f4ac87c0b32..31bfd6f70013 100644
---- a/include/linux/device-mapper.h
-+++ b/include/linux/device-mapper.h
-@@ -538,6 +538,7 @@ unsigned int dm_table_get_num_targets(struct dm_table *t);
- fmode_t dm_table_get_mode(struct dm_table *t);
- struct mapped_device *dm_table_get_md(struct dm_table *t);
- const char *dm_table_device_name(struct dm_table *t);
-+int dm_table_supports_poll(struct dm_table *t);
- 
- /*
-  * Trigger an event.
--- 
-2.29.2
+I also suggest not reintroducing get_active_memcg.
+There is only one user of it, just inline it into
+get_mem_cgroup_from_mm(). Actually we don=E2=80=99t
+need get_active_memcg() either.
 
+> +
+>  /**
+>   * get_mem_cgroup_from_mm: Obtain a reference on given mm_struct's memcg=
+.
+>   * @mm: mm from which memcg should be extracted. It can be NULL.
+>   *
+> - * Obtain a reference on mm->memcg and returns it if successful. Otherwi=
+se
+> - * root_mem_cgroup is returned. However if mem_cgroup is disabled, NULL =
+is
+> - * returned.
+> + * Obtain a reference on mm->memcg and returns it if successful. If mm
+> + * is NULL, then the memcg is chosen as follows:
+> + * 1) The active memcg, if set.
+> + * 2) current->mm->memcg, if available
+> + * 3) root memcg
+> + * If mem_cgroup is disabled, NULL is returned.
+>   */
+>  struct mem_cgroup *get_mem_cgroup_from_mm(struct mm_struct *mm)
+>  {
+> @@ -899,13 +924,19 @@ struct mem_cgroup *get_mem_cgroup_from_mm(struct mm=
+_struct *mm)
+>         if (mem_cgroup_disabled())
+>                 return NULL;
+>
+> +       /*
+> +        * Page cache insertions can happen without an
+> +        * actual mm context, e.g. during disk probing
+> +        * on boot, loopback IO, acct() writes etc.
+> +        */
+> +       if (unlikely(!mm)) {
+> +               if (unlikely(active_memcg()))
+> +                       return get_active_memcg();
+
+Since remote memcg must hold a reference, we do not
+need to do something like get_active_memcg() does.
+Just use css_get to obtain a ref, it is simpler. Just
+Like below.
+
++       if (unlikely(!mm)) {
++               memcg =3D active_memcg();
++               if (unlikely(memcg)) {
++                       /* remote memcg must hold a ref. */
++                       css_get(memcg);
++                       return memcg;
++               }
+
+Thanks.
+
+> +               mm =3D current->mm;
+> +       }
+> +
+>         rcu_read_lock();
+>         do {
+> -               /*
+> -                * Page cache insertions can happen withou an
+> -                * actual mm context, e.g. during disk probing
+> -                * on boot, loopback IO, acct() writes etc.
+> -                */
+>                 if (unlikely(!mm))
+>                         memcg =3D root_mem_cgroup;
+>                 else {
+> @@ -919,28 +950,6 @@ struct mem_cgroup *get_mem_cgroup_from_mm(struct mm_=
+struct *mm)
+>  }
+>  EXPORT_SYMBOL(get_mem_cgroup_from_mm);
+>
+> -static __always_inline struct mem_cgroup *active_memcg(void)
+> -{
+> -       if (in_interrupt())
+> -               return this_cpu_read(int_active_memcg);
+> -       else
+> -               return current->active_memcg;
+> -}
+> -
+> -static __always_inline struct mem_cgroup *get_active_memcg(void)
+> -{
+> -       struct mem_cgroup *memcg;
+> -
+> -       rcu_read_lock();
+> -       memcg =3D active_memcg();
+> -       /* remote memcg must hold a ref. */
+> -       if (memcg && WARN_ON_ONCE(!css_tryget(&memcg->css)))
+> -               memcg =3D root_mem_cgroup;
+> -       rcu_read_unlock();
+> -
+> -       return memcg;
+> -}
+> -
+>  static __always_inline bool memcg_kmem_bypass(void)
+>  {
+>         /* Allow remote memcg charging from any context. */
+> @@ -6549,7 +6558,8 @@ static int __mem_cgroup_charge(struct page *page, s=
+truct mem_cgroup *memcg,
+>   * @gfp_mask: reclaim mode
+>   *
+>   * Try to charge @page to the memcg that @mm belongs to, reclaiming
+> - * pages according to @gfp_mask if necessary.
+> + * pages according to @gfp_mask if necessary. if @mm is NULL, try to
+> + * charge to the active memcg.
+>   *
+>   * Do not use this for pages allocated for swapin.
+>   *
+> diff --git a/mm/shmem.c b/mm/shmem.c
+> index 78ab81a62b29..7c09276125d5 100644
+> --- a/mm/shmem.c
+> +++ b/mm/shmem.c
+> @@ -1694,7 +1694,7 @@ static int shmem_swapin_page(struct inode *inode, p=
+goff_t index,
+>  {
+>         struct address_space *mapping =3D inode->i_mapping;
+>         struct shmem_inode_info *info =3D SHMEM_I(inode);
+> -       struct mm_struct *charge_mm =3D vma ? vma->vm_mm : current->mm;
+> +       struct mm_struct *charge_mm =3D vma ? vma->vm_mm : NULL;
+>         struct page *page;
+>         swp_entry_t swap;
+>         int error;
+> @@ -1815,7 +1815,7 @@ static int shmem_getpage_gfp(struct inode *inode, p=
+goff_t index,
+>         }
+>
+>         sbinfo =3D SHMEM_SB(inode->i_sb);
+> -       charge_mm =3D vma ? vma->vm_mm : current->mm;
+> +       charge_mm =3D vma ? vma->vm_mm : NULL;
+>
+>         page =3D pagecache_get_page(mapping, index,
+>                                         FGP_ENTRY | FGP_HEAD | FGP_LOCK, =
+0);
+> --
+> 2.30.2
+>
