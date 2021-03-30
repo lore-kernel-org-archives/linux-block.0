@@ -2,153 +2,206 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74705C433E0
-	for <linux-block@archiver.kernel.org>; Tue, 30 Mar 2021 07:38:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D612CC433C1
+	for <linux-block@archiver.kernel.org>; Tue, 30 Mar 2021 07:39:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2CB4761957
-	for <linux-block@archiver.kernel.org>; Tue, 30 Mar 2021 07:38:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9BBDE61989
+	for <linux-block@archiver.kernel.org>; Tue, 30 Mar 2021 07:39:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231246AbhC3HiD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 Mar 2021 03:38:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40788 "EHLO
+        id S231305AbhC3Hij (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 Mar 2021 03:38:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40810 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229530AbhC3Hh6 (ORCPT
+        with ESMTP id S231187AbhC3HiC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Mar 2021 03:37:58 -0400
-Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D52F0C061762
-        for <linux-block@vger.kernel.org>; Tue, 30 Mar 2021 00:37:57 -0700 (PDT)
-Received: by mail-ej1-x631.google.com with SMTP id ce10so23337669ejb.6
-        for <linux-block@vger.kernel.org>; Tue, 30 Mar 2021 00:37:57 -0700 (PDT)
+        Tue, 30 Mar 2021 03:38:02 -0400
+Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5CA1C061762
+        for <linux-block@vger.kernel.org>; Tue, 30 Mar 2021 00:38:00 -0700 (PDT)
+Received: by mail-ed1-x529.google.com with SMTP id l18so17031519edc.9
+        for <linux-block@vger.kernel.org>; Tue, 30 Mar 2021 00:38:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=ionos.com; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=SpCsfsh5k4XDGQoyhZbcRXga5RIB1LROTe/1Fl1GftQ=;
-        b=SXIqfezlT2jLed6NVR4JyPQUPR3dmHxHAtY1jDw7OSs5ydMrf8Kl3H6xHZSoRKNCb8
-         y/lpfqgtWE7Vp47V22vBVO57YYV1oPD+6MRz1TGuXqOldws4zt6XYTaBEkEgTe1920H7
-         +j9TR4PUCny1mD+84duyDHKqxYrjDLTjPmQD4xVZwvAm9ezXrDS0KH9C6vAABbDOUsgR
-         oF2Ud1GYXf8iqVb9XNw4vMsh8sLi3caJF4q75k1unxX+MbTXD732BgJ8vOHrIRyHLlkD
-         8d1DnMG4KVhzhYXvt7hGbcS5Xr1ptyq4pT/74C6hyVWbbULpITNiQ0BvajhC8z9wNlhb
-         Fucg==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=f9NQ10bkMHujduDKkZT6Q+c0cfGdFOh0Rt1Prtp1wAk=;
+        b=Tre7V6mWBDYQ36iTgRO2T5UKnYqIbEwlL+0KkVDL8+gl5OttmRxO0NhXyJYLVkJJEe
+         dmPkrZFZ4fzH2jY5dTaYgPGcbv3TSp2fgVChHy2KhjXVEZml6oQ0K1JWMI2gRD7BpEV2
+         PhpJ8YvVDeR6QSfPvj3b7dREKZYUuhU6gxnsGSRgEpbm67iwwiWdIMVIajVX4F6LoQTQ
+         /imLe+q4OvRQ7pgwCrnPHVkqX2MUEXQKDX6a/b8OeTdXn3vqznFj9PpzmbZbUewwlJQ3
+         1mVSb8dRYwBLGqvcmwSQ/ko+5kKqPinR3zpcokwtZqnt9k9NTcwmGi7R5HgCCpd2ztfc
+         E6Cg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=SpCsfsh5k4XDGQoyhZbcRXga5RIB1LROTe/1Fl1GftQ=;
-        b=q1rkDtQN9sdnSaHpy1Merw5SkpfS4jEMYDv0DP5NlhUxVi/P9R57x3KEurrwRmhYY/
-         Nq1QAi/OsSYwD6RjxhxcCVMawHcU6XcPOkXNVUXR3/3J8kRwnvFtsOvrVZ9sn/Oi53tq
-         DFFdUA45iIvlIla6sdEWoRgFrgFk6fAdxksfjhvcl0f99A6JDVueW8iqcq95FgHA4EwI
-         x/bCh/Z0wogz6pFOBqSkJ40jLa+nQ3Y4qNzex7KLomE9DEW530tx7GLbKqDy9MKX68t6
-         P6ECx3YSnGx2x+D65iFMeDaHTpWKNX3peNURqClJAk2D8yMkNM7+mMbZDrx7+nF+yxtf
-         +ozw==
-X-Gm-Message-State: AOAM530hjgQ/O1puGT/7H6pXTSQJsHOFJQLeTPpplq+qu37mMdNdII46
-        Y2VSCE0o5oDDLzA6voeYKS6VAJGMwjhfvQ==
-X-Google-Smtp-Source: ABdhPJwSHEINxW24tbPb4+jZz6CQWnhrS8I9kjoHL21aj2zxGpksrxTrFK1NU10rcHXW+vkJhIxlpg==
-X-Received: by 2002:a17:907:204c:: with SMTP id pg12mr21625380ejb.225.1617089876474;
-        Tue, 30 Mar 2021 00:37:56 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=f9NQ10bkMHujduDKkZT6Q+c0cfGdFOh0Rt1Prtp1wAk=;
+        b=TR4dLxcU2fyyTrsnateAS5tzWFjRGmb77CHhQ4/BqGSVwU2rFV4ignqBqTPjra8qLw
+         Kc27aOVnACPnYRfc0sjXSWVimOm39t9qYHi+fsCBpM0I1bESFhBEEQcBJ25/J3g0KusL
+         3xgqPbH+6+iWF6TDUa6SjRUsrXOWxBt/bxQ5b1d14Uw7GEkXt9qVD1t9uccwIRRKBjM2
+         7yMtglSJq3QWonGL8TWOnCHZ2aMbbmpUI1hY2OHpi+fLJq6/cR5v16QOhFisz6mxmXWW
+         2cwmfFKcBDLGD3ZLRyB453DIGwTmt4NAoA48ARPfobfTpkHVOGzvCUTe01EHQoRCKdkp
+         LFtA==
+X-Gm-Message-State: AOAM5312w1/CBkwGK/5Y3D0X13RkmcXIn9SC33gxluSI0Ue+TI9xEKjn
+        cFPVB+jCtXUmO1usLpTeFch+VVY0USwPDQ==
+X-Google-Smtp-Source: ABdhPJyebXeX1Hv0ZUhF+QQeHa7kq31E1Mqjz5ZGzprMKdBlSJaIlkiZaCjODJz4nyFmqsCJMQhRxw==
+X-Received: by 2002:aa7:c497:: with SMTP id m23mr32027227edq.74.1617089879589;
+        Tue, 30 Mar 2021 00:37:59 -0700 (PDT)
 Received: from gkim-laptop.fkb.profitbricks.net (ip5f5aeee5.dynamic.kabel-deutschland.de. [95.90.238.229])
-        by smtp.googlemail.com with ESMTPSA id a3sm9556180ejv.40.2021.03.30.00.37.55
+        by smtp.googlemail.com with ESMTPSA id a3sm9556180ejv.40.2021.03.30.00.37.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Mar 2021 00:37:56 -0700 (PDT)
+        Tue, 30 Mar 2021 00:37:59 -0700 (PDT)
 From:   Gioh Kim <gi-oh.kim@ionos.com>
 To:     linux-block@vger.kernel.org
 Cc:     axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
         bvanassche@acm.org, haris.iqbal@ionos.com, jinpu.wang@ionos.com,
-        Gioh Kim <gi-oh.kim@ionos.com>
-Subject: [PATCHv2 for-next 00/24] Misc update for rnbd
-Date:   Tue, 30 Mar 2021 09:37:28 +0200
-Message-Id: <20210330073752.1465613-1-gi-oh.kim@ionos.com>
+        Gioh Kim <gi-oh.kim@cloud.ionos.com>,
+        Jack Wang <jinpu.wang@cloud.ionos.com>
+Subject: [PATCHv2 for-next 04/24] block/rnbd-srv: Inject a fault at bio processing
+Date:   Tue, 30 Mar 2021 09:37:32 +0200
+Message-Id: <20210330073752.1465613-5-gi-oh.kim@ionos.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20210330073752.1465613-1-gi-oh.kim@ionos.com>
+References: <20210330073752.1465613-1-gi-oh.kim@ionos.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This is the misc update for rnbd. It inlcudes:
-- Change maintainer
-- Change domain address of maintainers' email: from cloud.ionos.com to ionos.com
-- Add polling IO mode and document update
-- Add some fault-injection points and document update
-- Fix memory leak and some bug detected by static code analysis tools
-- Code refactoring
+From: Gioh Kim <gi-oh.kim@cloud.ionos.com>
 
-V2->V1
-- Change the title: for-rc -> for-next
-- Remove unnecessary (void) casting requested by Leon
+If the fault is enabled, it sends an error to the client
+so that the client thinks the target device on the server has failed.
 
-Best regards
+Signed-off-by: Gioh Kim <gi-oh.kim@cloud.ionos.com>
+Signed-off-by: Jack Wang <jinpu.wang@cloud.ionos.com>
+---
+ drivers/block/rnbd/rnbd-srv-sysfs.c | 36 +++++++++++++++++++++++++++++
+ drivers/block/rnbd/rnbd-srv.c       |  7 ++++++
+ drivers/block/rnbd/rnbd-srv.h       | 13 +++++++++++
+ 3 files changed, 56 insertions(+)
 
-Danil Kipnis (1):
-  MAINTAINERS: Change maintainer for rnbd module
-
-Dima Stepanov (2):
-  block/rnbd-clt-sysfs: Remove copy buffer overlap in
-    rnbd_clt_get_path_name
-  block/rnbd: Use strscpy instead of strlcpy
-
-Gioh Kim (13):
-  Documentation/sysfs-block-rnbd: Add descriptions for remap_device and
-    resize
-  block/rnbd: Enable the fault-injection
-  block/rnbd-srv: Inject a fault at bio processing
-  block/rnbd-clt: Inject some fault points
-  docs: fault-injection: Add fault-injection manual of RNBD
-  docs: Add RTRS/RNBD to the index of fault-injection
-  block/rnbd-clt: Replace {NO_WAIT,WAIT} with RTRS_PERMIT_{WAIT,NOWAIT}
-  block/rnbd-srv: Prevent a deadlock generated by accessing sysfs in
-    parallel
-  block/rnbd-srv: Remove force_close file after holding a lock
-  block/rnbd-clt: Fix missing a memory free when unloading the module
-  block/rnbd-clt: Support polling mode for IO latency optimization
-  Documentation/ABI/rnbd-clt: Add description for nr_poll_queues
-  block/rnbd-srv: Remove unused arguments of rnbd_srv_rdma_ev
-
-Guoqing Jiang (5):
-  block/rnbd-clt: Remove some arguments from
-    insert_dev_if_not_exists_devpath
-  block/rnbd-clt: Remove some arguments from rnbd_client_setup_device
-  block/rnbd-clt: Move add_disk(dev->gd) to rnbd_clt_setup_gen_disk
-  block/rnbd: Kill rnbd_clt_destroy_default_group
-  block/rnbd: Kill destroy_device_cb
-
-Jack Wang (1):
-  block/rnbd-clt: Remove max_segment_size
-
-Md Haris Iqbal (1):
-  block/rnbd-clt: Generate kobject_uevent when the rnbd device state
-    changes
-
-Tom Rix (1):
-  block/rnbd-clt: Improve find_or_create_sess() return check
-
- Documentation/ABI/testing/sysfs-block-rnbd    |  18 ++
- .../ABI/testing/sysfs-class-rnbd-client       |  13 ++
- Documentation/fault-injection/index.rst       |   2 +
- .../fault-injection/rnbd-fault-injection.rst  | 208 ++++++++++++++++++
- MAINTAINERS                                   |   4 +-
- drivers/block/rnbd/rnbd-clt-sysfs.c           | 138 +++++++++---
- drivers/block/rnbd/rnbd-clt.c                 | 184 +++++++++++-----
- drivers/block/rnbd/rnbd-clt.h                 |  21 +-
- drivers/block/rnbd/rnbd-common.c              |  44 ++++
- drivers/block/rnbd/rnbd-proto.h               |  14 ++
- drivers/block/rnbd/rnbd-srv-sysfs.c           |  41 +++-
- drivers/block/rnbd/rnbd-srv.c                 |  76 +++----
- drivers/block/rnbd/rnbd-srv.h                 |  16 +-
- drivers/infiniband/ulp/rtrs/rtrs-clt.c        |  75 +++++--
- drivers/infiniband/ulp/rtrs/rtrs-clt.h        |   1 -
- drivers/infiniband/ulp/rtrs/rtrs-pri.h        |   1 +
- drivers/infiniband/ulp/rtrs/rtrs-srv.c        |   4 +-
- drivers/infiniband/ulp/rtrs/rtrs.h            |  13 +-
- 18 files changed, 712 insertions(+), 161 deletions(-)
- create mode 100644 Documentation/fault-injection/rnbd-fault-injection.rst
-
+diff --git a/drivers/block/rnbd/rnbd-srv-sysfs.c b/drivers/block/rnbd/rnbd-srv-sysfs.c
+index 05ffe488ddc6..278a981302b9 100644
+--- a/drivers/block/rnbd/rnbd-srv-sysfs.c
++++ b/drivers/block/rnbd/rnbd-srv-sysfs.c
+@@ -253,3 +253,39 @@ void rnbd_srv_destroy_sysfs_files(void)
+ 	device_destroy(rnbd_dev_class, MKDEV(0, 0));
+ 	class_destroy(rnbd_dev_class);
+ }
++
++#ifdef CONFIG_FAULT_INJECTION_DEBUG_FS
++void rnbd_srv_fault_inject_init(struct rnbd_srv_fault_inject *fault_inject,
++				const char *dev_name)
++{
++	rnbd_fault_inject_init(&fault_inject->fj, dev_name, -EBUSY);
++	/* injection points */
++	rnbd_fault_inject_add(fault_inject->fj.dir,
++			      "fail-bio", &fault_inject->fail_bio);
++}
++
++void rnbd_srv_fault_inject_fini(struct rnbd_srv_fault_inject *fault_inject)
++{
++	rnbd_fault_inject_final(&fault_inject->fj);
++}
++
++int rnbd_should_fail_bio(struct rnbd_srv_sess_dev *sess_dev)
++{
++	struct rnbd_srv_fault_inject *fault_inject = &sess_dev->fault_inject;
++	if (fault_inject->fail_bio && should_fail(&fault_inject->fj.attr, 1))
++		return fault_inject->fj.status;
++	return 0;
++}
++#else
++void rnbd_srv_fault_inject_init(struct rnbd_srv_fault_inject *fault_inj,
++				const char *dev_name)
++{
++}
++void rnbd_srv_fault_inject_fini(struct rnbd_srv_fault_inject *fault_inject)
++{
++}
++int rnbd_should_fail_bio(struct rnbd_srv_sess_dev *sess_dev)
++{
++	return 0;
++}
++#endif
+diff --git a/drivers/block/rnbd/rnbd-srv.c b/drivers/block/rnbd/rnbd-srv.c
+index a6a68d44f517..447fb0718525 100644
+--- a/drivers/block/rnbd/rnbd-srv.c
++++ b/drivers/block/rnbd/rnbd-srv.c
+@@ -88,9 +88,14 @@ void rnbd_endio(void *priv, int error)
+ {
+ 	struct rnbd_io_private *rnbd_priv = priv;
+ 	struct rnbd_srv_sess_dev *sess_dev = rnbd_priv->sess_dev;
++	int fail_err = 0;
+ 
+ 	rnbd_put_sess_dev(sess_dev);
+ 
++	fail_err = rnbd_should_fail_bio(sess_dev);
++	if (unlikely(fail_err)) /* over-write error which will be sent to client */
++		error = fail_err;
++
+ 	rtrs_srv_resp_rdma(rnbd_priv->id, error);
+ 
+ 	kfree(priv);
+@@ -230,6 +235,7 @@ void rnbd_destroy_sess_dev(struct rnbd_srv_sess_dev *sess_dev, bool keep_id)
+ 	rnbd_put_sess_dev(sess_dev);
+ 	wait_for_completion(&dc); /* wait for inflights to drop to zero */
+ 
++	rnbd_srv_fault_inject_fini(&sess_dev->fault_inject);
+ 	rnbd_dev_close(sess_dev->rnbd_dev);
+ 	list_del(&sess_dev->sess_list);
+ 	mutex_lock(&sess_dev->dev->lock);
+@@ -811,6 +817,7 @@ static int process_msg_open(struct rtrs_srv *rtrs,
+ 	rnbd_srv_info(srv_sess_dev, "Opened device '%s'\n", srv_dev->id);
+ 
+ 	kfree(full_path);
++	rnbd_srv_fault_inject_init(&srv_sess_dev->fault_inject, kbasename(srv_sess_dev->pathname));
+ 
+ fill_response:
+ 	rnbd_srv_fill_msg_open_rsp(rsp, srv_sess_dev);
+diff --git a/drivers/block/rnbd/rnbd-srv.h b/drivers/block/rnbd/rnbd-srv.h
+index b157371c25ed..120e6d64cb82 100644
+--- a/drivers/block/rnbd/rnbd-srv.h
++++ b/drivers/block/rnbd/rnbd-srv.h
+@@ -45,6 +45,13 @@ struct rnbd_srv_dev {
+ 	int				open_write_cnt;
+ };
+ 
++struct rnbd_srv_fault_inject {
++#ifdef CONFIG_FAULT_INJECTION_DEBUG_FS
++	struct rnbd_fault_inject fj;
++	bool fail_bio;
++#endif
++};
++
+ /* Structure which binds N devices and N sessions */
+ struct rnbd_srv_sess_dev {
+ 	/* Entry inside rnbd_srv_dev struct */
+@@ -62,6 +69,7 @@ struct rnbd_srv_sess_dev {
+ 	struct completion               *destroy_comp;
+ 	char				pathname[NAME_MAX];
+ 	enum rnbd_access_mode		access_mode;
++	struct rnbd_srv_fault_inject    fault_inject;
+ };
+ 
+ void rnbd_srv_sess_dev_force_close(struct rnbd_srv_sess_dev *sess_dev);
+@@ -77,4 +85,9 @@ int rnbd_srv_create_sysfs_files(void);
+ void rnbd_srv_destroy_sysfs_files(void);
+ void rnbd_destroy_sess_dev(struct rnbd_srv_sess_dev *sess_dev, bool keep_id);
+ 
++void rnbd_srv_fault_inject_init(struct rnbd_srv_fault_inject *fault_inj,
++				const char *dev_name);
++void rnbd_srv_fault_inject_fini(struct rnbd_srv_fault_inject *fault_inject);
++int rnbd_should_fail_bio(struct rnbd_srv_sess_dev *sess_dev);
++
+ #endif /* RNBD_SRV_H */
 -- 
 2.25.1
 
