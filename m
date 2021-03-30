@@ -7,66 +7,66 @@ X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6C53C433E9
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB103C433EC
 	for <linux-block@archiver.kernel.org>; Tue, 30 Mar 2021 07:39:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C2FB16199A
+	by mail.kernel.org (Postfix) with ESMTP id D94EC61959
 	for <linux-block@archiver.kernel.org>; Tue, 30 Mar 2021 07:39:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230248AbhC3Hik (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 Mar 2021 03:38:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40810 "EHLO
+        id S231336AbhC3Him (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 Mar 2021 03:38:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40812 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231304AbhC3HiF (ORCPT
+        with ESMTP id S231311AbhC3HiI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Mar 2021 03:38:05 -0400
-Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF600C061762
-        for <linux-block@vger.kernel.org>; Tue, 30 Mar 2021 00:38:04 -0700 (PDT)
-Received: by mail-ed1-x534.google.com with SMTP id e7so16991937edu.10
-        for <linux-block@vger.kernel.org>; Tue, 30 Mar 2021 00:38:04 -0700 (PDT)
+        Tue, 30 Mar 2021 03:38:08 -0400
+Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C93CDC0613DC
+        for <linux-block@vger.kernel.org>; Tue, 30 Mar 2021 00:38:07 -0700 (PDT)
+Received: by mail-ej1-x633.google.com with SMTP id hq27so23297594ejc.9
+        for <linux-block@vger.kernel.org>; Tue, 30 Mar 2021 00:38:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=ionos.com; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=nb98K5yr7Hr81H1xM1HbveTdnjGZy9hyYyfNIs0ucDU=;
-        b=Hug8apLsGdflPUJT5Gyc9Ti7pTmviziJ2UiK6uSwGxXH4eRS8OGvRPJRYM9lgIJk6B
-         QkQrVzoUENN5X6Ut4L44ZG4EzpdSF8NtfHapOvWmJnTHFxHx1bYim0DgpiSEy+4tHYbN
-         Z/YUx7ZlJD1pDj7e3nDIMgTWMNJazJlqJh27PCaR6FLVNwoqwjl3uTsWGwskY3Ls1129
-         ve47dNKYN5u0vSN3EklPgSM/HLH18DmQSnvkTa+xrZr6g29NFYA3uU8T17uPUt/oxUtg
-         De68nB7KKP/0v+16Yp3PohKJspT9jyejzXU7zcfaum3l0cpnNlyM4RLMEKLccRauML6d
-         Ud0w==
+        bh=tFSHDt2a4UMse8UCqMOLtSx70A+SNRfPmGCXQKYuQAY=;
+        b=faceGjifndcv1IRDoE48i5dDQkGM+fMgsgFlgzHevrjPnx6HzRoDhfuNDIJcrAtqdk
+         3jOqzkRdQmCG5RmfWhD7Yu6oT0b+ZtDiLBx9rzEbgQKuhDEs325jnjoL3923p9JWrR4e
+         zkOLf7yCgt0dvduwcTmBMjXOyWBRZtP1QKWGrSKJhvlUNn3I0UkEyBJsJ3CjUwi6hEx7
+         KQ7skCTRuBzXBX5ROxKsXjsLYTKc7Lk+3is1jc6kpxgCy8O3Mu4xThTcOa7v0G3X0Wcr
+         6PcYBIvounywtcX5VOpWTpoF5RsV30+1MjTBqQUVUxJ97JyyO8EnqemetzNP9RLToO7N
+         XASQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=nb98K5yr7Hr81H1xM1HbveTdnjGZy9hyYyfNIs0ucDU=;
-        b=FGQ7Jv5Jz5bExDsY9Yb4sIrTepHpDBVw2haPcqimEwhhbKDlwBTekZrZPRDdeGZDzd
-         m+IQbZ3hUqv9aViAkPPq7/6R3+Os20cnOG6Xl/196WgXA0ZuOn90bjQdgWzHP2SvExwk
-         hz7f3TMXgy57eS8FW0PCl8n882SFLjJKfuN/uI+qb+qH9eXa4cZg/6ka5Bl2l1rrQPta
-         V8lOiuWr2ky4lcUU/WjDlNuQEmmHynsRtRcRnNKnAgIbNjMLtLJ1CRf8blLucpWzZgDS
-         ZOHmeyPehF2UwgMQTGiARWkdoz8B3EUdJVCEOQAhjQlI1yrVzv6oMsmTKaG99SJfgssE
-         z2Jg==
-X-Gm-Message-State: AOAM530mlvK1jK75fvNqsRXwKR3trXa6w05L2RVmPvA+Rxk4lwKjaepy
-        RGwh9qbuui0k8k+jCYYfw8hgGGvPJziB93MA
-X-Google-Smtp-Source: ABdhPJzeruynk0sLA/xtToJf28maRiWsuPEjqfOZ+6pU0qUruRFH2womp0cMcnWxXYzFDAGmavNraQ==
-X-Received: by 2002:a05:6402:2076:: with SMTP id bd22mr31761449edb.378.1617089883350;
-        Tue, 30 Mar 2021 00:38:03 -0700 (PDT)
+        bh=tFSHDt2a4UMse8UCqMOLtSx70A+SNRfPmGCXQKYuQAY=;
+        b=XEnbbGFyxlffMyX3C9R1W9AapZA2emrJJq1Fk9AtkJ8nlNBk2+6eiC1RL2wn+/6FlA
+         a2lPXVfXNgKwcxfzhlHU/R0uEk0isNKFMNGQw2sPuS9uxuNXUQ3QrSWDwKM2KqTkZknR
+         DKIm5A1jjTJ8gpklBTPwCDTZjj/vbdZzaIUJHyn1oCUJ6QVkJJ6Ozdhn8zyefI75wmpK
+         r/8zTwZ7D+/BFE1HjX6d0sLvekhlfxC0whATHhsMAhcbbDcJQUMwu7flQs9EHmaCLhfe
+         9ef/LYZoclKkBD4DswoHWgGRtWMB0S2QUNmAY610y8nZ29so/HlKmZYiXMov5tbUnFcI
+         XyWg==
+X-Gm-Message-State: AOAM533L4Gfo9nfUANXa0uzMRFzdRJWwf8d3UxtvRwfLL4RCpxVq1kOE
+        hm8FNFJUvlLg0S8+LFRTIdF6Pv4llQ841Liq
+X-Google-Smtp-Source: ABdhPJwWRICxQjoTNQvgwrEe5cBMwNa8uNHj48wmkcz7RT+1C5//6GEPPJ+w6ewG6KdS/aSvhea6sA==
+X-Received: by 2002:a17:906:3b48:: with SMTP id h8mr31778644ejf.261.1617089886501;
+        Tue, 30 Mar 2021 00:38:06 -0700 (PDT)
 Received: from gkim-laptop.fkb.profitbricks.net (ip5f5aeee5.dynamic.kabel-deutschland.de. [95.90.238.229])
-        by smtp.googlemail.com with ESMTPSA id a3sm9556180ejv.40.2021.03.30.00.38.02
+        by smtp.googlemail.com with ESMTPSA id a3sm9556180ejv.40.2021.03.30.00.38.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Mar 2021 00:38:03 -0700 (PDT)
+        Tue, 30 Mar 2021 00:38:06 -0700 (PDT)
 From:   Gioh Kim <gi-oh.kim@ionos.com>
 To:     linux-block@vger.kernel.org
 Cc:     axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
         bvanassche@acm.org, haris.iqbal@ionos.com, jinpu.wang@ionos.com,
-        Guoqing Jiang <guoqing.jiang@gmx.com>,
-        Danil Kipnis <danil.kipnis@cloud.ionos.com>,
-        Gioh Kim <gi-oh.kim@cloud.ionos.com>,
-        Jack Wang <jinpu.wang@cloud.ionos.com>
-Subject: [PATCHv2 for-next 09/24] block/rnbd-clt: Remove some arguments from rnbd_client_setup_device
-Date:   Tue, 30 Mar 2021 09:37:37 +0200
-Message-Id: <20210330073752.1465613-10-gi-oh.kim@ionos.com>
+        Guoqing Jiang <guoqing.jiang@cloud.ionos.com>,
+        Guoqing Jiang <guoqing.jiang@ionos.com>,
+        Danil Kipnis <danil.kipnis@ionos.com>,
+        Gioh Kim <gi-oh.kim@ionos.com>
+Subject: [PATCHv2 for-next 12/24] block/rnbd: Kill destroy_device_cb
+Date:   Tue, 30 Mar 2021 09:37:40 +0200
+Message-Id: <20210330073752.1465613-13-gi-oh.kim@ionos.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210330073752.1465613-1-gi-oh.kim@ionos.com>
 References: <20210330073752.1465613-1-gi-oh.kim@ionos.com>
@@ -76,45 +76,55 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Guoqing Jiang <guoqing.jiang@gmx.com>
+From: Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
 
-Remove them since both sess and idx can be dereferenced from dev. And
-sess is not used in the function.
+We can use destroy_device directly since destroy_device_cb is just the
+wrapper of destroy_device.
 
-Signed-off-by: Guoqing Jiang <guoqing.jiang@gmx.com>
-Reviewed-by: Danil Kipnis <danil.kipnis@cloud.ionos.com>
-Signed-off-by: Gioh Kim <gi-oh.kim@cloud.ionos.com>
-Signed-off-by: Jack Wang <jinpu.wang@cloud.ionos.com>
+Signed-off-by: Guoqing Jiang <guoqing.jiang@ionos.com>
+Reviewed-by: Danil Kipnis <danil.kipnis@ionos.com>
+Signed-off-by: Gioh Kim <gi-oh.kim@ionos.com>
+Signed-off-by: Jack Wang <jinpu.wang@ionos.com>
 ---
- drivers/block/rnbd/rnbd-clt.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ drivers/block/rnbd/rnbd-srv.c | 15 ++++-----------
+ 1 file changed, 4 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.c
-index c8de016553a9..5d085bc80e24 100644
---- a/drivers/block/rnbd/rnbd-clt.c
-+++ b/drivers/block/rnbd/rnbd-clt.c
-@@ -1360,10 +1360,9 @@ static void rnbd_clt_setup_gen_disk(struct rnbd_clt_dev *dev, int idx)
- 		blk_queue_flag_set(QUEUE_FLAG_NONROT, dev->queue);
+diff --git a/drivers/block/rnbd/rnbd-srv.c b/drivers/block/rnbd/rnbd-srv.c
+index 447fb0718525..895e9c313ff0 100644
+--- a/drivers/block/rnbd/rnbd-srv.c
++++ b/drivers/block/rnbd/rnbd-srv.c
+@@ -183,8 +183,10 @@ static int process_rdma(struct rtrs_srv *sess,
+ 	return err;
  }
  
--static int rnbd_client_setup_device(struct rnbd_clt_session *sess,
--				     struct rnbd_clt_dev *dev, int idx)
-+static int rnbd_client_setup_device(struct rnbd_clt_dev *dev)
+-static void destroy_device(struct rnbd_srv_dev *dev)
++static void destroy_device(struct kref *kref)
  {
--	int err;
-+	int err, idx = dev->clt_device_id;
++	struct rnbd_srv_dev *dev = container_of(kref, struct rnbd_srv_dev, kref);
++
+ 	WARN_ONCE(!list_empty(&dev->sess_dev_list),
+ 		  "Device %s is being destroyed but still in use!\n",
+ 		  dev->id);
+@@ -203,18 +205,9 @@ static void destroy_device(struct rnbd_srv_dev *dev)
+ 		kfree(dev);
+ }
  
- 	dev->size = dev->nsectors * dev->logical_block_size;
+-static void destroy_device_cb(struct kref *kref)
+-{
+-	struct rnbd_srv_dev *dev;
+-
+-	dev = container_of(kref, struct rnbd_srv_dev, kref);
+-
+-	destroy_device(dev);
+-}
+-
+ static void rnbd_put_srv_dev(struct rnbd_srv_dev *dev)
+ {
+-	kref_put(&dev->kref, destroy_device_cb);
++	kref_put(&dev->kref, destroy_device);
+ }
  
-@@ -1541,7 +1540,7 @@ struct rnbd_clt_dev *rnbd_clt_map_device(const char *sessname,
- 	mutex_lock(&dev->lock);
- 	pr_debug("Opened remote device: session=%s, path='%s'\n",
- 		 sess->sessname, pathname);
--	ret = rnbd_client_setup_device(sess, dev, dev->clt_device_id);
-+	ret = rnbd_client_setup_device(dev);
- 	if (ret) {
- 		rnbd_clt_err(dev,
- 			      "map_device: Failed to configure device, err: %d\n",
+ void rnbd_destroy_sess_dev(struct rnbd_srv_sess_dev *sess_dev, bool keep_id)
 -- 
 2.25.1
 
