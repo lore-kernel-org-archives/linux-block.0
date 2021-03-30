@@ -7,64 +7,66 @@ X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46627C433F1
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 079EDC433EB
 	for <linux-block@archiver.kernel.org>; Tue, 30 Mar 2021 07:39:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2D2B861990
-	for <linux-block@archiver.kernel.org>; Tue, 30 Mar 2021 07:39:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EA597619BB
+	for <linux-block@archiver.kernel.org>; Tue, 30 Mar 2021 07:39:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231337AbhC3Him (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 Mar 2021 03:38:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40860 "EHLO
+        id S229530AbhC3Hil (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 Mar 2021 03:38:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40844 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231341AbhC3HiL (ORCPT
+        with ESMTP id S231133AbhC3HiH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Mar 2021 03:38:11 -0400
-Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9275EC061762
-        for <linux-block@vger.kernel.org>; Tue, 30 Mar 2021 00:38:09 -0700 (PDT)
-Received: by mail-ej1-x632.google.com with SMTP id kt15so23282308ejb.12
-        for <linux-block@vger.kernel.org>; Tue, 30 Mar 2021 00:38:09 -0700 (PDT)
+        Tue, 30 Mar 2021 03:38:07 -0400
+Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01C64C0613DB
+        for <linux-block@vger.kernel.org>; Tue, 30 Mar 2021 00:38:07 -0700 (PDT)
+Received: by mail-ed1-x534.google.com with SMTP id o19so17039447edc.3
+        for <linux-block@vger.kernel.org>; Tue, 30 Mar 2021 00:38:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=ionos.com; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=SoMSIcCp8+AqPcP3Tord2AzO8LTHhNxNANk75Scwquk=;
-        b=ITFd70WEYwdOvjemh4iTNpEczrRqBt1NDOlkhgunqsWoHahUkm8TodeNTi5GypuQhN
-         wrPtqU7l0MbgtK5gsHjRFMvAn9/3/afe73NUYM4XxmlmCnGVGC109612VlaFp4nCR9oJ
-         qaJ7lxpU6p70FySP74iNxuQ3Fdukc49MTk3HGr2g1I2xkgRfWWHZNsvNn1HkhUovbURf
-         YTvp7ynX1wKjzSYhgVvcANvHqNgwUNssbT6lROxmX6MDssNIk0X/EtgBdS1D8W2+U4/R
-         OADz8I5RqWjHRz63voYCniM95aINh/pWZLvrTu3Shf113C54r1RAeUGWGK/nx8CcGmKB
-         0T3g==
+        bh=CnARvf2OVorx0aWtIbfM1m/ZXt63MvsBP7Ym4cjRdv4=;
+        b=WZ0QBYBa3XXBbh3tval7m1MJ0is9okRYJzU7+PbRvqDtWn5y5tt2/AelU3yS5e+ibo
+         9Ec6CNhHwIrgNjKAF8NoifRbEhg47QRz5TBzxHsVe/SqXbOKhmcU2N6fx49p7dMHFJnE
+         +XSfLJchg2Q9qr1peDCw/r4rjDef0u7R/YSCZwyupeFRm8Ak2T+m0QswLDVf1sMBPsDE
+         gvFx5nha8396OD7YkLAJBF/v+7PJ9Mf6A1fNIK8RbB6+/t5N+YOt4ajqK5fQ8D8+UY8F
+         DCaAo1UlS4TTl7F0NReY0pdeGrG0djtkqWx149idVM8rlsHTkEJofrS4+kj5IbI1yyOj
+         XvkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=SoMSIcCp8+AqPcP3Tord2AzO8LTHhNxNANk75Scwquk=;
-        b=apq6RQvyPaAAArtxhOtohcOxM+G8+qn1goFa6DXn4biMuhCEfpYc99qH2647oHey/4
-         Q/p9NPmy49KpQ32wcuO/Dfc78I5xN/YbgwvZGoyviPgDe+YFH0w5R8HedtWp1Xo6/iKX
-         7JVX2D64oxBA3Y0Xfr+vY6+D9SBGwKlMPjqTO463Ofi5yvF0//3bPAuXZDCKZAjUB0dN
-         v4+NXdg8qtUBsylAi0YS2Sd0j/xvMwzMO2LX28UG5YU6om+YK0JnC7wYuFkuXgCytNHm
-         c1ShjXYTK7wq2EpX/S/7koHyHpP/vxT1uN3JFxKouge3xMzFpS6+Kj1LNYT5Ys8LuLtR
-         w+Qg==
-X-Gm-Message-State: AOAM532zVQvfqPgMT4Qe8l2E5tTESiKv430CK89TmaIvlgLGX+JYRU2i
-        nnrqGef721nB7wtmwujzGz8/OBvz0ipYpxiJ
-X-Google-Smtp-Source: ABdhPJxpN6jUprFr0lhe7Y6m7AVLX6BZuXwf+zjXZUTHGkpXjuPemXdbLpbBHNiqZ5tud1tMHdsT2g==
-X-Received: by 2002:a17:906:85b:: with SMTP id f27mr32597212ejd.414.1617089888132;
-        Tue, 30 Mar 2021 00:38:08 -0700 (PDT)
+        bh=CnARvf2OVorx0aWtIbfM1m/ZXt63MvsBP7Ym4cjRdv4=;
+        b=HLb+9kXPeW5E0R2s4PpkekJKcYUZMiv07g60nB18r2IYoChFW9697rqYofmGGlnlBf
+         tsEbNlQc9B8bflvl959v4M10S83zs4Crq3YU4NesGEF9fYpwD6vYo06J2IAAkczuW5c1
+         oLD+7dy4Og92yDL2dezBu4l7x6rHyEkIj/AqVhWvw72ibYqBKU3g8SXo6QbAQNEu0ZG3
+         9fjy730UqQO9L/GNbyhHwOm0dRtgZmZKQkucNMmOx5IhUxmNwno9/EzO0eiz5KyI8oie
+         uVzM2ryDVOZcfERten/QwQMLPJ1/70S1oIMukBwAllogHYGybYHheW6TzWxwfVcrghcQ
+         sWMA==
+X-Gm-Message-State: AOAM533dBWztN5C+kujBNbfXqlGFy4AD9Odl6PoggUgEH0MseuXfBxR7
+        1b1vB5gobaaYvwb0PUWjOvdEd/W+RnI7vBFC
+X-Google-Smtp-Source: ABdhPJyX7Jaa7KtBPyoJdhBEHjb/GGFrHdci5RBF9hjG4JuzCHsIJMuSHKTj3+N641l5l7g7RUWMFA==
+X-Received: by 2002:a50:fe08:: with SMTP id f8mr31943019edt.217.1617089885700;
+        Tue, 30 Mar 2021 00:38:05 -0700 (PDT)
 Received: from gkim-laptop.fkb.profitbricks.net (ip5f5aeee5.dynamic.kabel-deutschland.de. [95.90.238.229])
-        by smtp.googlemail.com with ESMTPSA id a3sm9556180ejv.40.2021.03.30.00.38.07
+        by smtp.googlemail.com with ESMTPSA id a3sm9556180ejv.40.2021.03.30.00.38.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Mar 2021 00:38:07 -0700 (PDT)
+        Tue, 30 Mar 2021 00:38:05 -0700 (PDT)
 From:   Gioh Kim <gi-oh.kim@ionos.com>
 To:     linux-block@vger.kernel.org
 Cc:     axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
         bvanassche@acm.org, haris.iqbal@ionos.com, jinpu.wang@ionos.com,
-        Gioh Kim <gi-oh.kim@cloud.ionos.com>,
+        Guoqing Jiang <guoqing.jiang@cloud.ionos.com>,
+        Guoqing Jiang <guoqing.jiang@ionos.com>,
+        Danil Kipnis <danil.kipnis@ionos.com>,
         Gioh Kim <gi-oh.kim@ionos.com>
-Subject: [PATCHv2 for-next 14/24] block/rnbd-srv: Prevent a deadlock generated by accessing sysfs in parallel
-Date:   Tue, 30 Mar 2021 09:37:42 +0200
-Message-Id: <20210330073752.1465613-15-gi-oh.kim@ionos.com>
+Subject: [PATCHv2 for-next 11/24] block/rnbd: Kill rnbd_clt_destroy_default_group
+Date:   Tue, 30 Mar 2021 09:37:39 +0200
+Message-Id: <20210330073752.1465613-12-gi-oh.kim@ionos.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210330073752.1465613-1-gi-oh.kim@ionos.com>
 References: <20210330073752.1465613-1-gi-oh.kim@ionos.com>
@@ -74,144 +76,67 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Gioh Kim <gi-oh.kim@cloud.ionos.com>
+From: Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
 
-We got a warning message below.
-When server tries to close one session by force, it locks the sysfs
-interface and locks the srv_sess lock.
-The problem is that client can send a request to close at the same time.
-By close request, server locks the srv_sess lock and locks the sysfs
-to remove the sysfs interfaces.
+No need to have it since we can call sysfs_remove_group in the
+rnbd_clt_destroy_sysfs_files.
 
-The simplest way to prevent that situation could be just use
-mutex_trylock.
+Then rnbd_clt_destroy_sysfs_files is paired with it's counterpart
+rnbd_clt_create_sysfs_files.
 
-[  234.153965] ======================================================
-[  234.154093] WARNING: possible circular locking dependency detected
-[  234.154219] 5.4.84-storage #5.4.84-1+feature+linux+5.4.y+dbg+20201216.1319+b6b887b~deb10 Tainted: G           O
-[  234.154381] ------------------------------------------------------
-[  234.154531] kworker/1:1H/618 is trying to acquire lock:
-[  234.154651] ffff8887a09db0a8 (kn->count#132){++++}, at: kernfs_remove_by_name_ns+0x40/0x80
-[  234.154819]
-               but task is already holding lock:
-[  234.154965] ffff8887ae5f6518 (&srv_sess->lock){+.+.}, at: rnbd_srv_rdma_ev+0x144/0x1590 [rnbd_server]
-[  234.155132]
-               which lock already depends on the new lock.
-
-[  234.155311]
-               the existing dependency chain (in reverse order) is:
-[  234.155462]
-               -> #1 (&srv_sess->lock){+.+.}:
-[  234.155614]        __mutex_lock+0x134/0xcb0
-[  234.155761]        rnbd_srv_sess_dev_force_close+0x36/0x50 [rnbd_server]
-[  234.155889]        rnbd_srv_dev_session_force_close_store+0x69/0xc0 [rnbd_server]
-[  234.156042]        kernfs_fop_write+0x13f/0x240
-[  234.156162]        vfs_write+0xf3/0x280
-[  234.156278]        ksys_write+0xba/0x150
-[  234.156395]        do_syscall_64+0x62/0x270
-[  234.156513]        entry_SYSCALL_64_after_hwframe+0x49/0xbe
-[  234.156632]
-               -> #0 (kn->count#132){++++}:
-[  234.156782]        __lock_acquire+0x129e/0x23a0
-[  234.156900]        lock_acquire+0xf3/0x210
-[  234.157043]        __kernfs_remove+0x42b/0x4c0
-[  234.157161]        kernfs_remove_by_name_ns+0x40/0x80
-[  234.157282]        remove_files+0x3f/0xa0
-[  234.157399]        sysfs_remove_group+0x4a/0xb0
-[  234.157519]        rnbd_srv_destroy_dev_session_sysfs+0x19/0x30 [rnbd_server]
-[  234.157648]        rnbd_srv_rdma_ev+0x14c/0x1590 [rnbd_server]
-[  234.157775]        process_io_req+0x29a/0x6a0 [rtrs_server]
-[  234.157924]        __ib_process_cq+0x8c/0x100 [ib_core]
-[  234.158709]        ib_cq_poll_work+0x31/0xb0 [ib_core]
-[  234.158834]        process_one_work+0x4e5/0xaa0
-[  234.158958]        worker_thread+0x65/0x5c0
-[  234.159078]        kthread+0x1e0/0x200
-[  234.159194]        ret_from_fork+0x24/0x30
-[  234.159309]
-               other info that might help us debug this:
-
-[  234.159513]  Possible unsafe locking scenario:
-
-[  234.159658]        CPU0                    CPU1
-[  234.159775]        ----                    ----
-[  234.159891]   lock(&srv_sess->lock);
-[  234.160005]                                lock(kn->count#132);
-[  234.160128]                                lock(&srv_sess->lock);
-[  234.160250]   lock(kn->count#132);
-[  234.160364]
-                *** DEADLOCK ***
-
-[  234.160536] 3 locks held by kworker/1:1H/618:
-[  234.160677]  #0: ffff8883ca1ed528 ((wq_completion)ib-comp-wq){+.+.}, at: process_one_work+0x40a/0xaa0
-[  234.160840]  #1: ffff8883d2d5fe10 ((work_completion)(&cq->work)){+.+.}, at: process_one_work+0x40a/0xaa0
-[  234.161003]  #2: ffff8887ae5f6518 (&srv_sess->lock){+.+.}, at: rnbd_srv_rdma_ev+0x144/0x1590 [rnbd_server]
-[  234.161168]
-               stack backtrace:
-[  234.161312] CPU: 1 PID: 618 Comm: kworker/1:1H Tainted: G           O      5.4.84-storage #5.4.84-1+feature+linux+5.4.y+dbg+20201216.1319+b6b887b~deb10
-[  234.161490] Hardware name: Supermicro H8QG6/H8QG6, BIOS 3.00       09/04/2012
-[  234.161643] Workqueue: ib-comp-wq ib_cq_poll_work [ib_core]
-[  234.161765] Call Trace:
-[  234.161910]  dump_stack+0x96/0xe0
-[  234.162028]  check_noncircular+0x29e/0x2e0
-[  234.162148]  ? print_circular_bug+0x100/0x100
-[  234.162267]  ? register_lock_class+0x1ad/0x8a0
-[  234.162385]  ? __lock_acquire+0x68e/0x23a0
-[  234.162505]  ? trace_event_raw_event_lock+0x190/0x190
-[  234.162626]  __lock_acquire+0x129e/0x23a0
-[  234.162746]  ? register_lock_class+0x8a0/0x8a0
-[  234.162866]  lock_acquire+0xf3/0x210
-[  234.162982]  ? kernfs_remove_by_name_ns+0x40/0x80
-[  234.163127]  __kernfs_remove+0x42b/0x4c0
-[  234.163243]  ? kernfs_remove_by_name_ns+0x40/0x80
-[  234.163363]  ? kernfs_fop_readdir+0x3b0/0x3b0
-[  234.163482]  ? strlen+0x1f/0x40
-[  234.163596]  ? strcmp+0x30/0x50
-[  234.163712]  kernfs_remove_by_name_ns+0x40/0x80
-[  234.163832]  remove_files+0x3f/0xa0
-[  234.163948]  sysfs_remove_group+0x4a/0xb0
-[  234.164068]  rnbd_srv_destroy_dev_session_sysfs+0x19/0x30 [rnbd_server]
-[  234.164196]  rnbd_srv_rdma_ev+0x14c/0x1590 [rnbd_server]
-[  234.164345]  ? _raw_spin_unlock_irqrestore+0x43/0x50
-[  234.164466]  ? lockdep_hardirqs_on+0x1a8/0x290
-[  234.164597]  ? mlx4_ib_poll_cq+0x927/0x1280 [mlx4_ib]
-[  234.164732]  ? rnbd_get_sess_dev+0x270/0x270 [rnbd_server]
-[  234.164859]  process_io_req+0x29a/0x6a0 [rtrs_server]
-[  234.164982]  ? rnbd_get_sess_dev+0x270/0x270 [rnbd_server]
-[  234.165130]  __ib_process_cq+0x8c/0x100 [ib_core]
-[  234.165279]  ib_cq_poll_work+0x31/0xb0 [ib_core]
-[  234.165404]  process_one_work+0x4e5/0xaa0
-[  234.165550]  ? pwq_dec_nr_in_flight+0x160/0x160
-[  234.165675]  ? do_raw_spin_lock+0x119/0x1d0
-[  234.165796]  worker_thread+0x65/0x5c0
-[  234.165914]  ? process_one_work+0xaa0/0xaa0
-[  234.166031]  kthread+0x1e0/0x200
-[  234.166147]  ? kthread_create_worker_on_cpu+0xc0/0xc0
-[  234.166268]  ret_from_fork+0x24/0x30
-[  234.251591] rnbd_server L243: </dev/loop1@close_device_session>: Device closed
-[  234.604221] rnbd_server L264: RTRS Session close_device_session disconnected
-
+Signed-off-by: Guoqing Jiang <guoqing.jiang@ionos.com>
+Reviewed-by: Danil Kipnis <danil.kipnis@ionos.com>
 Signed-off-by: Gioh Kim <gi-oh.kim@ionos.com>
-Signed-off-by: Md Haris Iqbal <haris.iqbal@ionos.com>
 Signed-off-by: Jack Wang <jinpu.wang@ionos.com>
 ---
- drivers/block/rnbd/rnbd-srv.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ drivers/block/rnbd/rnbd-clt-sysfs.c | 6 +-----
+ drivers/block/rnbd/rnbd-clt.c       | 1 -
+ drivers/block/rnbd/rnbd-clt.h       | 1 -
+ 3 files changed, 1 insertion(+), 7 deletions(-)
 
-diff --git a/drivers/block/rnbd/rnbd-srv.c b/drivers/block/rnbd/rnbd-srv.c
-index 895e9c313ff0..f284620ef0d3 100644
---- a/drivers/block/rnbd/rnbd-srv.c
-+++ b/drivers/block/rnbd/rnbd-srv.c
-@@ -340,7 +340,9 @@ void rnbd_srv_sess_dev_force_close(struct rnbd_srv_sess_dev *sess_dev)
- 	struct rnbd_srv_session	*sess = sess_dev->sess;
- 
- 	sess_dev->keep_id = true;
--	mutex_lock(&sess->lock);
-+	/* It is already started to close by client's close message. */
-+	if (!mutex_trylock(&sess->lock))
-+		return;
- 	rnbd_srv_destroy_dev_session_sysfs(sess_dev);
- 	mutex_unlock(&sess->lock);
+diff --git a/drivers/block/rnbd/rnbd-clt-sysfs.c b/drivers/block/rnbd/rnbd-clt-sysfs.c
+index d83415875960..2452eb67547c 100644
+--- a/drivers/block/rnbd/rnbd-clt-sysfs.c
++++ b/drivers/block/rnbd/rnbd-clt-sysfs.c
+@@ -639,13 +639,9 @@ int rnbd_clt_create_sysfs_files(void)
+ 	return err;
  }
+ 
+-void rnbd_clt_destroy_default_group(void)
+-{
+-	sysfs_remove_group(&rnbd_dev->kobj, &default_attr_group);
+-}
+-
+ void rnbd_clt_destroy_sysfs_files(void)
+ {
++	sysfs_remove_group(&rnbd_dev->kobj, &default_attr_group);
+ 	kobject_del(rnbd_devs_kobj);
+ 	kobject_put(rnbd_devs_kobj);
+ 	device_destroy(rnbd_dev_class, MKDEV(0, 0));
+diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.c
+index d8b9c552271c..fce0f345f796 100644
+--- a/drivers/block/rnbd/rnbd-clt.c
++++ b/drivers/block/rnbd/rnbd-clt.c
+@@ -1692,7 +1692,6 @@ static void rnbd_destroy_sessions(void)
+ 	struct rnbd_clt_dev *dev, *tn;
+ 
+ 	/* Firstly forbid access through sysfs interface */
+-	rnbd_clt_destroy_default_group();
+ 	rnbd_clt_destroy_sysfs_files();
+ 
+ 	/*
+diff --git a/drivers/block/rnbd/rnbd-clt.h b/drivers/block/rnbd/rnbd-clt.h
+index 5ecbe8dedf24..d2a709f5d7ed 100644
+--- a/drivers/block/rnbd/rnbd-clt.h
++++ b/drivers/block/rnbd/rnbd-clt.h
+@@ -168,7 +168,6 @@ int rnbd_clt_resize_disk(struct rnbd_clt_dev *dev, size_t newsize);
+ int rnbd_clt_create_sysfs_files(void);
+ 
+ void rnbd_clt_destroy_sysfs_files(void);
+-void rnbd_clt_destroy_default_group(void);
+ 
+ void rnbd_clt_remove_dev_symlink(struct rnbd_clt_dev *dev);
+ 
 -- 
 2.25.1
 
