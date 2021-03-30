@@ -2,201 +2,76 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0CF3C433C1
-	for <linux-block@archiver.kernel.org>; Tue, 30 Mar 2021 21:46:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06E1EC433C1
+	for <linux-block@archiver.kernel.org>; Tue, 30 Mar 2021 22:31:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BC09C614A7
-	for <linux-block@archiver.kernel.org>; Tue, 30 Mar 2021 21:46:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A09FA619CF
+	for <linux-block@archiver.kernel.org>; Tue, 30 Mar 2021 22:31:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232700AbhC3Vpz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 Mar 2021 17:45:55 -0400
-Received: from mail-io1-f70.google.com ([209.85.166.70]:44540 "EHLO
-        mail-io1-f70.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232607AbhC3VpU (ORCPT
+        id S232825AbhC3Wa1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 Mar 2021 18:30:27 -0400
+Received: from mail-pl1-f179.google.com ([209.85.214.179]:41864 "EHLO
+        mail-pl1-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232953AbhC3WaF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Mar 2021 17:45:20 -0400
-Received: by mail-io1-f70.google.com with SMTP id e11so115993ioh.11
-        for <linux-block@vger.kernel.org>; Tue, 30 Mar 2021 14:45:20 -0700 (PDT)
+        Tue, 30 Mar 2021 18:30:05 -0400
+Received: by mail-pl1-f179.google.com with SMTP id g10so6897204plt.8
+        for <linux-block@vger.kernel.org>; Tue, 30 Mar 2021 15:30:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=j4vHEfDUIWjWWNIt1cQZKz6843+yacPTPceNoi6dp+k=;
-        b=V7PVK9ZyqEMCyamZpSGPpyUdgfEkAD8jdbUduot8u5Earpz9429NnaGyF/nDeofMjq
-         k0kTzx77PJarEKoNXKiV5/F+KSiGXEEZtJ0AbxtYe9pe1CGRpWmw9UrnmKuhCMj0SO15
-         jdXBmol/Kx2AKfIkfh9t2R6tDIsZRvw5ujeqJVb8bb4zLxwohQdI6fWBzMguCBjcej64
-         sowZHfg/u10eIbuZXsJyOyQShjX3a8aO6NQLBfbUYuW1/K2gT58aj/1BNWwvfdNPPVIF
-         ZpHRt69SHiWvHdVkru9Auuibmfh9cD2tTSiib7OUrwkDhCmuYG0NDAefe+UNY1mQK/dY
-         CZ7g==
-X-Gm-Message-State: AOAM532HuFkALR2dHTedL/ngbjdrDYoZlxifExnIx+oXawkWnaYCLP3f
-        XggR/rmx8SyZ3K+j4mfpk/NickAb3+dIxIo/Zd+gVwfRyF+r
-X-Google-Smtp-Source: ABdhPJwbZG8CxUnZpgNu4ctFbqDKv1aLG61zPSABCRei5ok9bZu6sVpVSlJX/3U7bcHWX6JFtWEbSmNCJU5aBOhXjccoJFgbUv6I
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=7EhgC9AF7Eb6VrdQlSiQTMdtnS4ZprO5uIJV4PSUBPU=;
+        b=myv9wg1vBg7jxIomnpGy8+dfRTPTAI3ywWZeclWQAth9F78GhHl2iiwR4uoPdrs81R
+         DFXZmhJff3bBUkTpgmRtBK/MRc2Q1mqGhBd4kMigSgA4yAG5zzzBeuqyIy8vj/rtfwn+
+         PkNVHqJ0A52GJaiNUDjrOnvsAA9ud8ImzIYt6DkXW0bSkK27dSeifOOgbHSKw8yt4lhT
+         4rqfC+KVqBUJJnhw8hKMt0wnhyw0vQ05o44WrqgXvhcgyuGM1xbV8rF/PbIhxEZB4Tg1
+         Tb+FZFL4ITbQffe1XC1a5JpEmx9n8vApayNkzOMWOZMf10KzxPU1NwBEu9Yf9KwHe09d
+         h4NQ==
+X-Gm-Message-State: AOAM531Z1ji8k9v+hh1FivfAGeYb7P1xedBVsOClycrD0UpXtR3qV3+t
+        0PtdBd1e37qN5RcwI8IllabBNTZ6bmI=
+X-Google-Smtp-Source: ABdhPJzC3ZM1Vi83D8BNooowXCY/nNkkst72z2DmJmwoZBdjp+9VWO3p0MlSZAzhlzO9siGatpsWNg==
+X-Received: by 2002:a17:90a:1509:: with SMTP id l9mr460416pja.163.1617143405203;
+        Tue, 30 Mar 2021 15:30:05 -0700 (PDT)
+Received: from [192.168.51.110] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
+        by smtp.gmail.com with ESMTPSA id s19sm48300pfh.168.2021.03.30.15.30.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 30 Mar 2021 15:30:04 -0700 (PDT)
+Subject: Re: [PATCH v4 0/3] blk-mq: Fix a race between iterating over requests
+ and freeing requests
+To:     Christoph Hellwig <hch@lst.de>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>
+Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+References: <20210329020028.18241-1-bvanassche@acm.org>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <deedbe3f-0236-26fe-97ef-000c317687d8@acm.org>
+Date:   Tue, 30 Mar 2021 15:30:02 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.0
 MIME-Version: 1.0
-X-Received: by 2002:a92:d784:: with SMTP id d4mr272151iln.184.1617140719719;
- Tue, 30 Mar 2021 14:45:19 -0700 (PDT)
-Date:   Tue, 30 Mar 2021 14:45:19 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000269d0705bec7ea73@google.com>
-Subject: [syzbot] KASAN: use-after-free Read in delete_partition (2)
-From:   syzbot <syzbot+7d6c5587ec9cff5be65c@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, davem@davemloft.net, hare@suse.de, hch@lst.de,
-        jack@suse.cz, johannes.thumshirn@edc.com,
-        johannes@sipsolutions.net, kuba@kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-        richard@nod.at, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20210329020028.18241-1-bvanassche@acm.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+On 3/28/21 7:00 PM, Bart Van Assche wrote:
+> This patch series fixes the race between iterating over requests and
+> freeing requests that has been reported by multiple different users over
+> the past two years. Please consider this patch series for kernel v5.13.
 
-syzbot found the following issue on:
+Hi Christoph and Martin,
 
-HEAD commit:    93129492 Add linux-next specific files for 20210326
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=1372ce62d00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=4c9322cd4e3b7a16
-dashboard link: https://syzkaller.appspot.com/bug?extid=7d6c5587ec9cff5be65c
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1433834ed00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=149c71aad00000
+Since this patch series makes significant changes in the NVMe core and 
+also in the SCSI core, your feedback would be appreciated.
 
-The issue was bisected to:
+Thanks,
 
-commit daaedb820ad716e00210af8859b194c404202b78
-Author: Christoph Hellwig <hch@lst.de>
-Date:   Tue Nov 3 10:00:09 2020 +0000
-
-    mtd_blkdevs: don't override BLKFLSBUF
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=102c6ddcd00000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=122c6ddcd00000
-console output: https://syzkaller.appspot.com/x/log.txt?x=142c6ddcd00000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+7d6c5587ec9cff5be65c@syzkaller.appspotmail.com
-Fixes: daaedb820ad7 ("mtd_blkdevs: don't override BLKFLSBUF")
-
-==================================================================
-BUG: KASAN: use-after-free in kobject_put+0x493/0x540 lib/kobject.c:749
-Read of size 1 at addr ffff8880135d453c by task syz-executor372/8533
-
-CPU: 0 PID: 8533 Comm: syz-executor372 Not tainted 5.12.0-rc4-next-20210326-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Call Trace:
- __dump_stack lib/dump_stack.c:79 [inline]
- dump_stack+0x141/0x1d7 lib/dump_stack.c:120
- print_address_description.constprop.0.cold+0x5b/0x2f8 mm/kasan/report.c:232
- __kasan_report mm/kasan/report.c:399 [inline]
- kasan_report.cold+0x7c/0xd8 mm/kasan/report.c:416
- kobject_put+0x493/0x540 lib/kobject.c:749
- delete_partition+0xa4/0x170 block/partitions/core.c:291
- bdev_del_partition+0xf5/0x110 block/partitions/core.c:474
- blkpg_do_ioctl+0x2e8/0x340 block/ioctl.c:33
- blkpg_ioctl block/ioctl.c:60 [inline]
- blkdev_ioctl+0x577/0x6d0 block/ioctl.c:548
- block_ioctl+0xf9/0x140 fs/block_dev.c:1667
- vfs_ioctl fs/ioctl.c:48 [inline]
- __do_sys_ioctl fs/ioctl.c:753 [inline]
- __se_sys_ioctl fs/ioctl.c:739 [inline]
- __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:739
- do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x444329
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 b1 14 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffdd8945e58 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 0000000000487072 RCX: 0000000000444329
-RDX: 0000000020000240 RSI: 0000000000001269 RDI: 0000000000000004
-RBP: 0000000000000000 R08: 0023706f6f6c2f76 R09: 0000000000000001
-R10: 000000000000001f R11: 0000000000000246 R12: 0000000000012734
-R13: 00007ffdd8945e6c R14: 00007ffdd8945e80 R15: 00007ffdd8945e70
-
-Allocated by task 8534:
- kasan_save_stack+0x1b/0x40 mm/kasan/common.c:38
- kasan_set_track mm/kasan/common.c:46 [inline]
- set_alloc_info mm/kasan/common.c:428 [inline]
- ____kasan_kmalloc mm/kasan/common.c:507 [inline]
- ____kasan_kmalloc mm/kasan/common.c:466 [inline]
- __kasan_kmalloc+0x9b/0xd0 mm/kasan/common.c:516
- kmalloc include/linux/slab.h:556 [inline]
- kzalloc include/linux/slab.h:686 [inline]
- kobject_create lib/kobject.c:784 [inline]
- kobject_create_and_add+0x42/0xb0 lib/kobject.c:810
- add_partition+0x56c/0x880 block/partitions/core.c:384
- bdev_add_partition+0xb6/0x130 block/partitions/core.c:449
- blkpg_do_ioctl+0x2d0/0x340 block/ioctl.c:43
- blkpg_ioctl block/ioctl.c:60 [inline]
- blkdev_ioctl+0x577/0x6d0 block/ioctl.c:548
- block_ioctl+0xf9/0x140 fs/block_dev.c:1667
- vfs_ioctl fs/ioctl.c:48 [inline]
- __do_sys_ioctl fs/ioctl.c:753 [inline]
- __se_sys_ioctl fs/ioctl.c:739 [inline]
- __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:739
- do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-
-Freed by task 8534:
- kasan_save_stack+0x1b/0x40 mm/kasan/common.c:38
- kasan_set_track+0x1c/0x30 mm/kasan/common.c:46
- kasan_set_free_info+0x20/0x30 mm/kasan/generic.c:357
- ____kasan_slab_free mm/kasan/common.c:360 [inline]
- ____kasan_slab_free mm/kasan/common.c:325 [inline]
- __kasan_slab_free+0xfb/0x130 mm/kasan/common.c:368
- kasan_slab_free include/linux/kasan.h:212 [inline]
- slab_free_hook mm/slub.c:1578 [inline]
- slab_free_freelist_hook+0xdf/0x240 mm/slub.c:1603
- slab_free mm/slub.c:3163 [inline]
- kfree+0xe5/0x7f0 mm/slub.c:4230
- kobject_cleanup lib/kobject.c:705 [inline]
- kobject_release lib/kobject.c:736 [inline]
- kref_put include/linux/kref.h:65 [inline]
- kobject_put+0x1c8/0x540 lib/kobject.c:753
- delete_partition+0xa4/0x170 block/partitions/core.c:291
- bdev_del_partition+0xf5/0x110 block/partitions/core.c:474
- blkpg_do_ioctl+0x2e8/0x340 block/ioctl.c:33
- blkpg_ioctl block/ioctl.c:60 [inline]
- blkdev_ioctl+0x577/0x6d0 block/ioctl.c:548
- block_ioctl+0xf9/0x140 fs/block_dev.c:1667
- vfs_ioctl fs/ioctl.c:48 [inline]
- __do_sys_ioctl fs/ioctl.c:753 [inline]
- __se_sys_ioctl fs/ioctl.c:739 [inline]
- __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:739
- do_syscall_64+0x2d/0x70 arch/x86/entry/common.c:46
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-
-The buggy address belongs to the object at ffff8880135d4500
- which belongs to the cache kmalloc-64 of size 64
-The buggy address is located 60 bytes inside of
- 64-byte region [ffff8880135d4500, ffff8880135d4540)
-The buggy address belongs to the page:
-page:ffffea00004d7500 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x135d4
-flags: 0xfff00000000200(slab|node=0|zone=1|lastcpupid=0x7ff)
-raw: 00fff00000000200 0000000000000000 0000000100000001 ffff888010841640
-raw: 0000000000000000 0000000000200020 00000001ffffffff 0000000000000000
-page dumped because: kasan: bad access detected
-
-Memory state around the buggy address:
- ffff8880135d4400: fa fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
- ffff8880135d4480: fa fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
->ffff8880135d4500: fa fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
-                                        ^
- ffff8880135d4580: 00 00 00 00 00 00 00 00 fc fc fc fc fc fc fc fc
- ffff8880135d4600: fa fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
-==================================================================
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-syzbot can test patches for this issue, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+Bart.
