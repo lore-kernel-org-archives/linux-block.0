@@ -7,63 +7,64 @@ X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88509C433F4
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B084EC433F8
 	for <linux-block@archiver.kernel.org>; Tue, 30 Mar 2021 07:39:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5D8E261883
+	by mail.kernel.org (Postfix) with ESMTP id 96CDD61883
 	for <linux-block@archiver.kernel.org>; Tue, 30 Mar 2021 07:39:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231329AbhC3Hip (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 Mar 2021 03:38:45 -0400
+        id S231359AbhC3Hio (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 Mar 2021 03:38:44 -0400
 Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40844 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231338AbhC3HiO (ORCPT
+        with ESMTP id S231340AbhC3HiL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Mar 2021 03:38:14 -0400
-Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91F13C061762
-        for <linux-block@vger.kernel.org>; Tue, 30 Mar 2021 00:38:13 -0700 (PDT)
-Received: by mail-ed1-x530.google.com with SMTP id h10so16998460edt.13
-        for <linux-block@vger.kernel.org>; Tue, 30 Mar 2021 00:38:13 -0700 (PDT)
+        Tue, 30 Mar 2021 03:38:11 -0400
+Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EBDAC061765
+        for <linux-block@vger.kernel.org>; Tue, 30 Mar 2021 00:38:10 -0700 (PDT)
+Received: by mail-ed1-x533.google.com with SMTP id y6so17067927eds.1
+        for <linux-block@vger.kernel.org>; Tue, 30 Mar 2021 00:38:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=ionos.com; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=tsqeH5MSM4WbTb4VKhs81+DKBsJLqPP/9bH4vGe5fWs=;
-        b=DMc/khhH7OoDWL0/7S4ob7huNbmxVOL9Rn+xY21KkTFiWafuieOmN3bFtc1flNLQxd
-         JjFrU0Fl32RStbdCVKWCIPO3bPj0/v2QrVEB3KRUsXW0wwvrjL95ag222a2OIP6xoV/n
-         q2ZtR9EgjA/6XFhSrUKn1Rl9LTKJqeuqJ79Fd5fve1FZVxlAFJm+Mr7c4GJUROTa76U2
-         li4Fwqk3yYtxMbjjiRn03P1TEW7R7S5wRCJlE1oOH8TKznmkfky7AlXK/AEMvqJhQACw
-         dj0sbz8J8AmJYFMxeEQdiNRVJPf3LXHNTPFA/kZQRW50xnOKowUUpO6Ao0vh8hqOjQcd
-         vReg==
+        bh=+fPRExy/th2Wxi81rNTwbnWXQ+KI4WdiMLN79pZ5LSY=;
+        b=QySgObKFhq+YYsvXa7tHvjm8IGZV0mRsvwysN+8OIXE7er/UJ3RVgHjD2nxiTyZMYv
+         hS2jnN9tklMnVYmMxtAcYXJGZw2djHOTrp4DyNRa7SRwwxZkqAPN1YSC2jJkpj7Zx1Pe
+         ++cEJx6P6gwY6NiTzl3zTfIaAo9laVOWA2IlP5ENNiI4K19zfUwOJgsZnYBayL2FKOpu
+         HacYk1OFwA5PzsPP+3B+R1fVxbQMzsgdOU442BH8KQfdOZddqC0A9Vz4a7rRBgXnwnuQ
+         tn1DaVR5PzyCLvnyL+YyG96k9y/vHjL4lOWH8z1iq4OmWRSwmJFLzLR5ilmyN+JC8XMP
+         8arA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=tsqeH5MSM4WbTb4VKhs81+DKBsJLqPP/9bH4vGe5fWs=;
-        b=GSXtk3K6wHjP3LNITYsYJVTaHGB0jGIgDQUsmNclubeclNDMcpvz0pztwOtcVRcju+
-         I933BZgJwARlYxusRa09wRcQryeJOyVMX18Se/0ohstDeUTVfiOZBJC6g6Y9B0LZw0fE
-         iFq3pqMx1EoWZj8Qu5/nf+4sAou8dd8i2Iww5WRb7M14dMXemiXOLo7TaDPwHbl63Ynh
-         O+cd4SUqfZ5QCUbniAdGkq4+UuPidE38QG5vdqTL+9H7nzUiYlIW/Ed6SUQBGiF2RvO2
-         2dTBwc9+9kSpI2DdxyYdcPfxEbcKZKp76O0UjA8tdxpGIrkrKA4A9ywz2NtslHlNh/q7
-         fvuw==
-X-Gm-Message-State: AOAM533fnBqxn5HFa4OwiP0SvRCNM7RvT78YrKj42w7Kme3gGvd4ogka
-        +j2vP0MFXGygcO/R6eOLRTRSxa3wIWqIzHPT
-X-Google-Smtp-Source: ABdhPJyGFpcXeQYZsMyqXNZ1BmY1bb/qSdJgaf0tZTVDQucaAD/Iueem1rfRz/Mdrfur8YbBFBmu5w==
-X-Received: by 2002:a50:d84e:: with SMTP id v14mr21692722edj.357.1617089892172;
-        Tue, 30 Mar 2021 00:38:12 -0700 (PDT)
+        bh=+fPRExy/th2Wxi81rNTwbnWXQ+KI4WdiMLN79pZ5LSY=;
+        b=FU059FkXA2qL17im8Cyx3m/XJc2xBVEsCoJTiB+pTUK+utBnLwKgGJpzqVmK4I4viH
+         l/V9tQ5+0nU3ub8D6AhpHtsUzYsfPjl/JaDhZY49qABAyGt0LMg5wKsJg1FNtZMUvw9f
+         N+v9dcpb+NWCGOibv5z0U0k+kiiFNmuIDF+yLM4NbSI953K5HHl28ff8OGRTkEeaNxJk
+         JVBLTf7fF8X2GD7ZRAEgxNERysjXR6H4kNZrZWFAdBHlV8Q/U/S+pgSDu7BTZ2r5o8KE
+         GGw64Fr57XKBSG2LKlFb9ASNfidhBXkM14OLyZjUJR+XaPZ9gU+ebU/vMkekb9Wc1iNd
+         oq4w==
+X-Gm-Message-State: AOAM530crMI9X7D1cye8Wnt/Ee3PMF31XMtU/bch9lQTtlunbJx2ln9T
+        1RUc4aayrgi/uBq3I0dHfoZks75sW2ixECfB
+X-Google-Smtp-Source: ABdhPJzds/SbUvrD1Wn7gGVlnmL6XVEbS0hEVtaYiBvT/ZE1YeFLq6kzaDDiR67HnLbUmdWJy/ERTg==
+X-Received: by 2002:a05:6402:19a:: with SMTP id r26mr31833190edv.44.1617089889143;
+        Tue, 30 Mar 2021 00:38:09 -0700 (PDT)
 Received: from gkim-laptop.fkb.profitbricks.net (ip5f5aeee5.dynamic.kabel-deutschland.de. [95.90.238.229])
-        by smtp.googlemail.com with ESMTPSA id a3sm9556180ejv.40.2021.03.30.00.38.11
+        by smtp.googlemail.com with ESMTPSA id a3sm9556180ejv.40.2021.03.30.00.38.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Mar 2021 00:38:11 -0700 (PDT)
+        Tue, 30 Mar 2021 00:38:08 -0700 (PDT)
 From:   Gioh Kim <gi-oh.kim@ionos.com>
 To:     linux-block@vger.kernel.org
 Cc:     axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
         bvanassche@acm.org, haris.iqbal@ionos.com, jinpu.wang@ionos.com,
+        Gioh Kim <gi-oh.kim@cloud.ionos.com>,
         Gioh Kim <gi-oh.kim@ionos.com>
-Subject: [PATCHv2 for-next 19/24] Documentation/ABI/rnbd-clt: Add description for nr_poll_queues
-Date:   Tue, 30 Mar 2021 09:37:47 +0200
-Message-Id: <20210330073752.1465613-20-gi-oh.kim@ionos.com>
+Subject: [PATCHv2 for-next 15/24] block/rnbd-srv: Remove force_close file after holding a lock
+Date:   Tue, 30 Mar 2021 09:37:43 +0200
+Message-Id: <20210330073752.1465613-16-gi-oh.kim@ionos.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210330073752.1465613-1-gi-oh.kim@ionos.com>
 References: <20210330073752.1465613-1-gi-oh.kim@ionos.com>
@@ -73,52 +74,79 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-describe how to set nr_poll_queues and enable the polling
+From: Gioh Kim <gi-oh.kim@cloud.ionos.com>
+
+We changed the rnbd_srv_sess_dev_force_close to use try-lock
+because rnbd_srv_sess_dev_force_close and process_msg_close
+can generate a deadlock.
+
+Now rnbd_srv_sess_dev_force_close would do nothing
+if it fails to get the lock. So removing the force_close
+file should be moved to after the lock. Or the force_close
+file is removed but the others are not removed.
 
 Signed-off-by: Gioh Kim <gi-oh.kim@ionos.com>
+Signed-off-by: Md Haris Iqbal <haris.iqbal@ionos.com>
+Signed-off-by: Jack Wang <jinpu.wang@ionos.com>
 ---
- Documentation/ABI/testing/sysfs-block-rnbd        |  6 ++++++
- Documentation/ABI/testing/sysfs-class-rnbd-client | 13 +++++++++++++
- 2 files changed, 19 insertions(+)
+ drivers/block/rnbd/rnbd-srv-sysfs.c | 5 +----
+ drivers/block/rnbd/rnbd-srv.c       | 5 ++++-
+ drivers/block/rnbd/rnbd-srv.h       | 3 ++-
+ 3 files changed, 7 insertions(+), 6 deletions(-)
 
-diff --git a/Documentation/ABI/testing/sysfs-block-rnbd b/Documentation/ABI/testing/sysfs-block-rnbd
-index ec716e1c31a8..80b420b5d6b8 100644
---- a/Documentation/ABI/testing/sysfs-block-rnbd
-+++ b/Documentation/ABI/testing/sysfs-block-rnbd
-@@ -56,3 +56,9 @@ Date:		Feb 2020
- KernelVersion:	5.7
- Contact:	Jack Wang <jinpu.wang@cloud.ionos.com> Danil Kipnis <danil.kipnis@cloud.ionos.com>
- Description:	Remap the disconnected device if the session is not destroyed yet.
-+
-+What:		/sys/block/rnbd<N>/rnbd/nr_poll_queues
-+Date:		Feb 2020
-+KernelVersion:	5.7
-+Contact:	Jack Wang <jinpu.wang@cloud.ionos.com> Danil Kipnis <danil.kipnis@cloud.ionos.com>
-+Description:	Contains the number of poll-mode queues
-diff --git a/Documentation/ABI/testing/sysfs-class-rnbd-client b/Documentation/ABI/testing/sysfs-class-rnbd-client
-index 2aa05b3e348e..0b5997ab3365 100644
---- a/Documentation/ABI/testing/sysfs-class-rnbd-client
-+++ b/Documentation/ABI/testing/sysfs-class-rnbd-client
-@@ -85,6 +85,19 @@ Description:	Expected format is the following::
+diff --git a/drivers/block/rnbd/rnbd-srv-sysfs.c b/drivers/block/rnbd/rnbd-srv-sysfs.c
+index 278a981302b9..76f9c08f611f 100644
+--- a/drivers/block/rnbd/rnbd-srv-sysfs.c
++++ b/drivers/block/rnbd/rnbd-srv-sysfs.c
+@@ -147,10 +147,7 @@ static ssize_t rnbd_srv_dev_session_force_close_store(struct kobject *kobj,
+ 	}
  
- 		By default "rw" is used.
+ 	rnbd_srv_info(sess_dev, "force close requested\n");
+-
+-	/* first remove sysfs itself to avoid deadlock */
+-	sysfs_remove_file_self(&sess_dev->kobj, &attr->attr);
+-	rnbd_srv_sess_dev_force_close(sess_dev);
++	rnbd_srv_sess_dev_force_close(sess_dev, attr);
  
-+		nr_poll_queues
-+		  specifies the number of poll-mode queues. If the IO has HIPRI flag,
-+		  the block-layer will send the IO via the poll-mode queue.
-+		  For fast network and device the polling is faster than interrupt-base
-+		  IO handling because it saves time for context switching, switching to
-+		  another process, handling the interrupt and switching back to the
-+		  issuing process.
-+
-+		  Set -1 if you want to set it as the number of CPUs
-+		  By default rnbd client creates only irq-mode queues.
-+
-+		  NOTICE: MUST make a unique session for a device using the poll-mode queues.
-+
- 		Exit Codes:
+ 	return count;
+ }
+diff --git a/drivers/block/rnbd/rnbd-srv.c b/drivers/block/rnbd/rnbd-srv.c
+index f284620ef0d3..a71b6f7662f5 100644
+--- a/drivers/block/rnbd/rnbd-srv.c
++++ b/drivers/block/rnbd/rnbd-srv.c
+@@ -335,7 +335,8 @@ static int rnbd_srv_link_ev(struct rtrs_srv *rtrs,
+ 	}
+ }
  
- 		If the device is already mapped it will fail with EEXIST. If the input
+-void rnbd_srv_sess_dev_force_close(struct rnbd_srv_sess_dev *sess_dev)
++void rnbd_srv_sess_dev_force_close(struct rnbd_srv_sess_dev *sess_dev,
++				   struct kobj_attribute *attr)
+ {
+ 	struct rnbd_srv_session	*sess = sess_dev->sess;
+ 
+@@ -343,6 +344,8 @@ void rnbd_srv_sess_dev_force_close(struct rnbd_srv_sess_dev *sess_dev)
+ 	/* It is already started to close by client's close message. */
+ 	if (!mutex_trylock(&sess->lock))
+ 		return;
++	/* first remove sysfs itself to avoid deadlock */
++	sysfs_remove_file_self(&sess_dev->kobj, &attr->attr);
+ 	rnbd_srv_destroy_dev_session_sysfs(sess_dev);
+ 	mutex_unlock(&sess->lock);
+ }
+diff --git a/drivers/block/rnbd/rnbd-srv.h b/drivers/block/rnbd/rnbd-srv.h
+index 120e6d64cb82..b513021efc92 100644
+--- a/drivers/block/rnbd/rnbd-srv.h
++++ b/drivers/block/rnbd/rnbd-srv.h
+@@ -72,7 +72,8 @@ struct rnbd_srv_sess_dev {
+ 	struct rnbd_srv_fault_inject    fault_inject;
+ };
+ 
+-void rnbd_srv_sess_dev_force_close(struct rnbd_srv_sess_dev *sess_dev);
++void rnbd_srv_sess_dev_force_close(struct rnbd_srv_sess_dev *sess_dev,
++				   struct kobj_attribute *attr);
+ /* rnbd-srv-sysfs.c */
+ 
+ int rnbd_srv_create_dev_sysfs(struct rnbd_srv_dev *dev,
 -- 
 2.25.1
 
