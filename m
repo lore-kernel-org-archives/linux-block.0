@@ -4,38 +4,38 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23221C43331
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82092C4332E
 	for <linux-block@archiver.kernel.org>; Wed, 31 Mar 2021 07:31:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0A54561A05
+	by mail.kernel.org (Postfix) with ESMTP id 70DC5619DF
 	for <linux-block@archiver.kernel.org>; Wed, 31 Mar 2021 07:31:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234177AbhCaHat (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 31 Mar 2021 03:30:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39544 "EHLO
+        id S234183AbhCaHau (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 31 Mar 2021 03:30:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39550 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234138AbhCaHaf (ORCPT
+        with ESMTP id S234141AbhCaHaf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Wed, 31 Mar 2021 03:30:35 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4439FC06174A;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4430C061761;
         Wed, 31 Mar 2021 00:30:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=fESjTUJpvhMOXG+wJOUnuseXsguNdZXS/sAi/ci6qs8=; b=aOVImDl+P9bvwDVYUU5hGogvx+
-        1Q+BbNfD30NwyGjslH4TXSFVTY+6Iq3Yk/K3t6CAV239862VLLqgDzxL1zpT2C1Lo5yTn2CbeHdnu
-        RXTh5ouQoF2cux68QHhnkbBP+vbtwNvKuXF5uXZb73zk7F6kHJW1aZyxDSUYjrrB1s/cbV4vKz8RS
-        +PKogVWGYUQFpRWsbvw1aGNN3G/yBqQCWZaMXOscScZbqdnue6MYp7e5Ce5aA9SUHymUWsPME8UAl
-        PuJFDTa1ymmst2SugqBsg7h0WVrA8RwCpxZ3KMrUdXhzbjYS9lSg/zfT8AvGBNllzIudkNfRSHT27
-        qZ9VhSfg==;
+        bh=+8sqlz6UDxice4fpNhBHxr6Uk/iH10JvyahxIew8J9c=; b=SwZqtz5sLTZgX61AjgmB0eZD/L
+        s/znPYg5EgR+jXZnOHreurqcJruZ8Z5lztKNbXEFCzi0hlR903ZE3j2Pq9C4z69PvNEUU3kFSkpmY
+        +VVtLkK94HGbjVvLWFeqnn+oJSHOeRx2uQaXtX+5p/eKuefeUnLeicMGTbOOq60QdV0QtrJpm9ZPB
+        O14KJrcjJ58/iBTkvMCq9LurameybEU3bQ+k7LM/Sw3xNU3NIYR6t7sIW/PhDFwwp56vAeC332pb8
+        v+spFIkuldVj/kSqRY2QGlp4/yIdO+dizh2HvvRrmQbxXWy/SOlafKs004Vwd2t9ZwUUGzSSPuDs3
+        GrwhNrFg==;
 Received: from [2001:4bb8:180:7517:3f75:91d7:136b:f8e1] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
-        id 1lRVIn-009dEb-ST; Wed, 31 Mar 2021 07:30:10 +0000
+        id 1lRVIy-009dFE-8A; Wed, 31 Mar 2021 07:30:20 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>, Khalid Aziz <khalid@gonehiking.org>,
         "Martin K. Petersen" <martin.petersen@oracle.com>,
@@ -44,9 +44,9 @@ To:     Jens Axboe <axboe@kernel.dk>, Khalid Aziz <khalid@gonehiking.org>,
         Ondrej Zary <linux@rainbow-software.org>
 Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
         Hannes Reinecke <hare@suse.de>
-Subject: [PATCH 2/8] Buslogic: remove ISA support
-Date:   Wed, 31 Mar 2021 09:29:55 +0200
-Message-Id: <20210331073001.46776-3-hch@lst.de>
+Subject: [PATCH 6/8] block: remove BLK_BOUNCE_ISA support
+Date:   Wed, 31 Mar 2021 09:29:59 +0200
+Message-Id: <20210331073001.46776-7-hch@lst.de>
 X-Mailer: git-send-email 2.30.1
 In-Reply-To: <20210331073001.46776-1-hch@lst.de>
 References: <20210331073001.46776-1-hch@lst.de>
@@ -57,418 +57,398 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The ISA support in Buslogic has been broken for a long time, as all
-the I/O path expects a struct device for DMA mapping that is derived from
-the PCI device, which would simply crash for ISA adapters.
+Remove the BLK_BOUNCE_ISA support now that all users are gone.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 Acked-by: Martin K. Petersen <martin.petersen@oracle.com>
 Reviewed-by: Hannes Reinecke <hare@suse.de>
 ---
- Documentation/scsi/BusLogic.rst |  26 +----
- drivers/scsi/BusLogic.c         | 184 +-------------------------------
- drivers/scsi/BusLogic.h         |  10 --
- drivers/scsi/Kconfig            |   2 +-
- 4 files changed, 7 insertions(+), 215 deletions(-)
+ block/bio-integrity.c     |   3 +-
+ block/blk-map.c           |   4 +-
+ block/blk-settings.c      |  11 ----
+ block/blk.h               |   5 --
+ block/bounce.c            | 124 ++++++++------------------------------
+ block/scsi_ioctl.c        |   2 +-
+ drivers/ata/libata-scsi.c |   3 +-
+ include/linux/blkdev.h    |   7 ---
+ mm/Kconfig                |   9 ++-
+ 9 files changed, 35 insertions(+), 133 deletions(-)
 
-diff --git a/Documentation/scsi/BusLogic.rst b/Documentation/scsi/BusLogic.rst
-index b6016981235820..d7d4d56981ca23 100644
---- a/Documentation/scsi/BusLogic.rst
-+++ b/Documentation/scsi/BusLogic.rst
-@@ -251,8 +251,6 @@ BT-445C	    VLB		Fast SCSI-2
- BT-747C	    EISA	Fast SCSI-2
- BT-757C	    EISA	Wide Fast SCSI-2
- BT-757CD    EISA	Wide Differential Fast SCSI-2
--BT-545C	    ISA		Fast SCSI-2
--BT-540CF    ISA		Fast SCSI-2
- ========    ====	==============================
+diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+index dfa652122a2dc8..4b4eb8964a6f98 100644
+--- a/block/bio-integrity.c
++++ b/block/bio-integrity.c
+@@ -204,7 +204,6 @@ bool bio_integrity_prep(struct bio *bio)
+ {
+ 	struct bio_integrity_payload *bip;
+ 	struct blk_integrity *bi = blk_get_integrity(bio->bi_bdev->bd_disk);
+-	struct request_queue *q = bio->bi_bdev->bd_disk->queue;
+ 	void *buf;
+ 	unsigned long start, end;
+ 	unsigned int len, nr_pages;
+@@ -238,7 +237,7 @@ bool bio_integrity_prep(struct bio *bio)
  
- MultiMaster "S" Series Host Adapters:
-@@ -263,17 +261,13 @@ BT-747S	    EISA	Fast SCSI-2
- BT-747D	    EISA	Differential Fast SCSI-2
- BT-757S	    EISA	Wide Fast SCSI-2
- BT-757D	    EISA	Wide Differential Fast SCSI-2
--BT-545S	    ISA		Fast SCSI-2
--BT-542D	    ISA		Differential Fast SCSI-2
- BT-742A	    EISA	SCSI-2 (742A revision H)
--BT-542B	    ISA		SCSI-2 (542B revision H)
- =======     ====	==============================
+ 	/* Allocate kernel buffer for protection data */
+ 	len = intervals * bi->tuple_size;
+-	buf = kmalloc(len, GFP_NOIO | q->bounce_gfp);
++	buf = kmalloc(len, GFP_NOIO);
+ 	status = BLK_STS_RESOURCE;
+ 	if (unlikely(buf == NULL)) {
+ 		printk(KERN_ERR "could not allocate integrity buffer\n");
+diff --git a/block/blk-map.c b/block/blk-map.c
+index 1ffef782fcf2dd..b62b52dcb61d97 100644
+--- a/block/blk-map.c
++++ b/block/blk-map.c
+@@ -181,7 +181,7 @@ static int bio_copy_user_iov(struct request *rq, struct rq_map_data *map_data,
  
- MultiMaster "A" Series Host Adapters:
+ 			i++;
+ 		} else {
+-			page = alloc_page(rq->q->bounce_gfp | gfp_mask);
++			page = alloc_page(GFP_NOIO | gfp_mask);
+ 			if (!page) {
+ 				ret = -ENOMEM;
+ 				goto cleanup;
+@@ -486,7 +486,7 @@ static struct bio *bio_copy_kern(struct request_queue *q, void *data,
+ 		if (bytes > len)
+ 			bytes = len;
  
- =======     ====	==============================
- BT-742A	    EISA	SCSI-2 (742A revisions A - G)
--BT-542B	    ISA		SCSI-2 (542B revisions A - G)
- =======     ====	==============================
+-		page = alloc_page(q->bounce_gfp | gfp_mask);
++		page = alloc_page(GFP_NOIO | gfp_mask);
+ 		if (!page)
+ 			goto cleanup;
  
- AMI FastDisk Host Adapters that are true BusLogic MultiMaster clones are also
-@@ -400,26 +394,11 @@ selected host adapter.
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index b4aa2f37fab6f5..f9937dd2810e25 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -103,28 +103,17 @@ EXPORT_SYMBOL(blk_set_stacking_limits);
+ void blk_queue_bounce_limit(struct request_queue *q, u64 max_addr)
+ {
+ 	unsigned long b_pfn = max_addr >> PAGE_SHIFT;
+-	int dma = 0;
  
- The BusLogic Driver Probing Options comprise the following:
- 
--IO:<integer>
--
--  The "IO:" option specifies an ISA I/O Address to be probed for a non-PCI
--  MultiMaster Host Adapter.  If neither "IO:" nor "NoProbeISA" options are
--  specified, then the standard list of BusLogic MultiMaster ISA I/O Addresses
--  will be probed (0x330, 0x334, 0x230, 0x234, 0x130, and 0x134).  Multiple
--  "IO:" options may be specified to precisely determine the I/O Addresses to
--  be probed, but the probe order will always follow the standard list.
--
- NoProbe
- 
-   The "NoProbe" option disables all probing and therefore no BusLogic Host
-   Adapters will be detected.
- 
--NoProbeISA
--
--  The "NoProbeISA" option disables probing of the standard BusLogic ISA I/O
--  Addresses and therefore only PCI MultiMaster and FlashPoint Host Adapters
--  will be detected.
--
- NoProbePCI
- 
-   The "NoProbePCI" options disables the interrogation of PCI Configuration
-@@ -464,10 +443,7 @@ QueueDepth:<integer>
-   Depth for devices that do not support Tagged Queuing.  If no Queue Depth
-   option is provided, the Queue Depth will be determined automatically based
-   on the Host Adapter's Total Queue Depth and the number, type, speed, and
--  capabilities of the detected Target Devices.  For Host Adapters that
--  require ISA Bounce Buffers, the Queue Depth is automatically set by default
--  to BusLogic_TaggedQueueDepthBB or BusLogic_UntaggedQueueDepthBB to avoid
--  excessive preallocation of DMA Bounce Buffer memory.  Target Devices that
-+  capabilities of the detected Target Devices.  Target Devices that
-   do not support Tagged Queuing always have their Queue Depth set to
-   BusLogic_UntaggedQueueDepth or BusLogic_UntaggedQueueDepthBB, unless a
-   lower Queue Depth option is provided.  A Queue Depth of 1 automatically
-diff --git a/drivers/scsi/BusLogic.c b/drivers/scsi/BusLogic.c
-index ccb061ab0a0ad2..25ca2f9383462c 100644
---- a/drivers/scsi/BusLogic.c
-+++ b/drivers/scsi/BusLogic.c
-@@ -561,60 +561,6 @@ static int blogic_cmd(struct blogic_adapter *adapter, enum blogic_opcode opcode,
+-	q->bounce_gfp = GFP_NOIO;
+ #if BITS_PER_LONG == 64
+ 	/*
+ 	 * Assume anything <= 4GB can be handled by IOMMU.  Actually
+ 	 * some IOMMUs can handle everything, but I don't know of a
+ 	 * way to test this here.
+ 	 */
+-	if (b_pfn < (min_t(u64, 0xffffffffUL, BLK_BOUNCE_HIGH) >> PAGE_SHIFT))
+-		dma = 1;
+ 	q->limits.bounce_pfn = max(max_low_pfn, b_pfn);
+ #else
+-	if (b_pfn < blk_max_low_pfn)
+-		dma = 1;
+ 	q->limits.bounce_pfn = b_pfn;
+ #endif
+-	if (dma) {
+-		init_emergency_isa_pool();
+-		q->bounce_gfp = GFP_NOIO | GFP_DMA;
+-		q->limits.bounce_pfn = b_pfn;
+-	}
  }
+ EXPORT_SYMBOL(blk_queue_bounce_limit);
  
+diff --git a/block/blk.h b/block/blk.h
+index 3b53e44b967e4e..895c9f4a5182a7 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -312,13 +312,8 @@ static inline void blk_throtl_stat_add(struct request *rq, u64 time) { }
+ #endif
+ 
+ #ifdef CONFIG_BOUNCE
+-extern int init_emergency_isa_pool(void);
+ extern void blk_queue_bounce(struct request_queue *q, struct bio **bio);
+ #else
+-static inline int init_emergency_isa_pool(void)
+-{
+-	return 0;
+-}
+ static inline void blk_queue_bounce(struct request_queue *q, struct bio **bio)
+ {
+ }
+diff --git a/block/bounce.c b/block/bounce.c
+index 6c441f4f1cd4aa..debd5b0bd31890 100644
+--- a/block/bounce.c
++++ b/block/bounce.c
+@@ -29,7 +29,7 @@
+ #define ISA_POOL_SIZE	16
+ 
+ static struct bio_set bounce_bio_set, bounce_bio_split;
+-static mempool_t page_pool, isa_page_pool;
++static mempool_t page_pool;
+ 
+ static void init_bounce_bioset(void)
+ {
+@@ -89,41 +89,6 @@ static void bounce_copy_vec(struct bio_vec *to, unsigned char *vfrom)
+ 
+ #endif /* CONFIG_HIGHMEM */
  
 -/*
--  blogic_add_probeaddr_isa appends a single ISA I/O Address to the list
--  of I/O Address and Bus Probe Information to be checked for potential BusLogic
--  Host Adapters.
--*/
--
--static void __init blogic_add_probeaddr_isa(unsigned long io_addr)
+- * allocate pages in the DMA region for the ISA pool
+- */
+-static void *mempool_alloc_pages_isa(gfp_t gfp_mask, void *data)
 -{
--	struct blogic_probeinfo *probeinfo;
--	if (blogic_probeinfo_count >= BLOGIC_MAX_ADAPTERS)
--		return;
--	probeinfo = &blogic_probeinfo_list[blogic_probeinfo_count++];
--	probeinfo->adapter_type = BLOGIC_MULTIMASTER;
--	probeinfo->adapter_bus_type = BLOGIC_ISA_BUS;
--	probeinfo->io_addr = io_addr;
--	probeinfo->pci_device = NULL;
+-	return mempool_alloc_pages(gfp_mask | GFP_DMA, data);
 -}
 -
+-static DEFINE_MUTEX(isa_mutex);
 -
 -/*
--  blogic_init_probeinfo_isa initializes the list of I/O Address and
--  Bus Probe Information to be checked for potential BusLogic SCSI Host Adapters
--  only from the list of standard BusLogic MultiMaster ISA I/O Addresses.
--*/
--
--static void __init blogic_init_probeinfo_isa(struct blogic_adapter *adapter)
+- * gets called "every" time someone init's a queue with BLK_BOUNCE_ISA
+- * as the max address, so check if the pool has already been created.
+- */
+-int init_emergency_isa_pool(void)
 -{
--	/*
--	   If BusLogic Driver Options specifications requested that ISA
--	   Bus Probes be inhibited, do not proceed further.
--	 */
--	if (blogic_probe_options.noprobe_isa)
--		return;
--	/*
--	   Append the list of standard BusLogic MultiMaster ISA I/O Addresses.
--	 */
--	if (!blogic_probe_options.limited_isa || blogic_probe_options.probe330)
--		blogic_add_probeaddr_isa(0x330);
--	if (!blogic_probe_options.limited_isa || blogic_probe_options.probe334)
--		blogic_add_probeaddr_isa(0x334);
--	if (!blogic_probe_options.limited_isa || blogic_probe_options.probe230)
--		blogic_add_probeaddr_isa(0x230);
--	if (!blogic_probe_options.limited_isa || blogic_probe_options.probe234)
--		blogic_add_probeaddr_isa(0x234);
--	if (!blogic_probe_options.limited_isa || blogic_probe_options.probe130)
--		blogic_add_probeaddr_isa(0x130);
--	if (!blogic_probe_options.limited_isa || blogic_probe_options.probe134)
--		blogic_add_probeaddr_isa(0x134);
+-	int ret;
+-
+-	mutex_lock(&isa_mutex);
+-
+-	if (mempool_initialized(&isa_page_pool)) {
+-		mutex_unlock(&isa_mutex);
+-		return 0;
+-	}
+-
+-	ret = mempool_init(&isa_page_pool, ISA_POOL_SIZE, mempool_alloc_pages_isa,
+-			   mempool_free_pages, (void *) 0);
+-	BUG_ON(ret);
+-
+-	pr_info("isa pool size: %d pages\n", ISA_POOL_SIZE);
+-	init_bounce_bioset();
+-	mutex_unlock(&isa_mutex);
+-	return 0;
 -}
--
--
--#ifdef CONFIG_PCI
--
 -
  /*
-   blogic_sort_probeinfo sorts a section of blogic_probeinfo_list in order
-   of increasing PCI Bus and Device Number.
-@@ -667,14 +613,11 @@ static int __init blogic_init_mm_probeinfo(struct blogic_adapter *adapter)
- 	int nonpr_mmcount = 0, mmcount = 0;
- 	bool force_scan_order = false;
- 	bool force_scan_order_checked = false;
--	bool addr_seen[6];
- 	struct pci_dev *pci_device = NULL;
- 	int i;
- 	if (blogic_probeinfo_count >= BLOGIC_MAX_ADAPTERS)
- 		return 0;
- 	blogic_probeinfo_count++;
--	for (i = 0; i < 6; i++)
--		addr_seen[i] = false;
- 	/*
- 	   Iterate over the MultiMaster PCI Host Adapters.  For each
- 	   enumerated host adapter, determine whether its ISA Compatible
-@@ -744,11 +687,8 @@ static int __init blogic_init_mm_probeinfo(struct blogic_adapter *adapter)
- 		host_adapter->io_addr = io_addr;
- 		blogic_intreset(host_adapter);
- 		if (blogic_cmd(host_adapter, BLOGIC_INQ_PCI_INFO, NULL, 0,
--				&adapter_info, sizeof(adapter_info)) ==
--				sizeof(adapter_info)) {
--			if (adapter_info.isa_port < 6)
--				addr_seen[adapter_info.isa_port] = true;
--		} else
-+				&adapter_info, sizeof(adapter_info)) !=
-+				sizeof(adapter_info))
- 			adapter_info.isa_port = BLOGIC_IO_DISABLE;
- 		/*
- 		   Issue the Modify I/O Address command to disable the
-@@ -835,45 +775,6 @@ static int __init blogic_init_mm_probeinfo(struct blogic_adapter *adapter)
- 	if (force_scan_order)
- 		blogic_sort_probeinfo(&blogic_probeinfo_list[nonpr_mmindex],
- 					nonpr_mmcount);
--	/*
--	   If no PCI MultiMaster Host Adapter is assigned the Primary
--	   I/O Address, then the Primary I/O Address must be probed
--	   explicitly before any PCI host adapters are probed.
--	 */
--	if (!blogic_probe_options.noprobe_isa)
--		if (pr_probeinfo->io_addr == 0 &&
--				(!blogic_probe_options.limited_isa ||
--				 blogic_probe_options.probe330)) {
--			pr_probeinfo->adapter_type = BLOGIC_MULTIMASTER;
--			pr_probeinfo->adapter_bus_type = BLOGIC_ISA_BUS;
--			pr_probeinfo->io_addr = 0x330;
--		}
--	/*
--	   Append the list of standard BusLogic MultiMaster ISA I/O Addresses,
--	   omitting the Primary I/O Address which has already been handled.
--	 */
--	if (!blogic_probe_options.noprobe_isa) {
--		if (!addr_seen[1] &&
--				(!blogic_probe_options.limited_isa ||
--				 blogic_probe_options.probe334))
--			blogic_add_probeaddr_isa(0x334);
--		if (!addr_seen[2] &&
--				(!blogic_probe_options.limited_isa ||
--				 blogic_probe_options.probe230))
--			blogic_add_probeaddr_isa(0x230);
--		if (!addr_seen[3] &&
--				(!blogic_probe_options.limited_isa ||
--				 blogic_probe_options.probe234))
--			blogic_add_probeaddr_isa(0x234);
--		if (!addr_seen[4] &&
--				(!blogic_probe_options.limited_isa ||
--				 blogic_probe_options.probe130))
--			blogic_add_probeaddr_isa(0x130);
--		if (!addr_seen[5] &&
--				(!blogic_probe_options.limited_isa ||
--				 blogic_probe_options.probe134))
--			blogic_add_probeaddr_isa(0x134);
--	}
- 	/*
- 	   Iterate over the older non-compliant MultiMaster PCI Host Adapters,
- 	   noting the PCI bus location and assigned IRQ Channel.
-@@ -1078,18 +979,10 @@ static void __init blogic_init_probeinfo_list(struct blogic_adapter *adapter)
- 				}
- 			}
+  * Simple bounce buffer support for highmem pages. Depending on the
+  * queue gfp mask set, *to may or may not be a highmem page. kmap it
+@@ -159,7 +124,7 @@ static void copy_to_high_bio_irq(struct bio *to, struct bio *from)
+ 	}
+ }
+ 
+-static void bounce_end_io(struct bio *bio, mempool_t *pool)
++static void bounce_end_io(struct bio *bio)
+ {
+ 	struct bio *bio_orig = bio->bi_private;
+ 	struct bio_vec *bvec, orig_vec;
+@@ -173,7 +138,7 @@ static void bounce_end_io(struct bio *bio, mempool_t *pool)
+ 		orig_vec = bio_iter_iovec(bio_orig, orig_iter);
+ 		if (bvec->bv_page != orig_vec.bv_page) {
+ 			dec_zone_page_state(bvec->bv_page, NR_BOUNCE);
+-			mempool_free(bvec->bv_page, pool);
++			mempool_free(bvec->bv_page, &page_pool);
  		}
--	} else {
--		blogic_init_probeinfo_isa(adapter);
+ 		bio_advance_iter(bio_orig, &orig_iter, orig_vec.bv_len);
  	}
+@@ -185,33 +150,17 @@ static void bounce_end_io(struct bio *bio, mempool_t *pool)
+ 
+ static void bounce_end_io_write(struct bio *bio)
+ {
+-	bounce_end_io(bio, &page_pool);
+-}
+-
+-static void bounce_end_io_write_isa(struct bio *bio)
+-{
+-
+-	bounce_end_io(bio, &isa_page_pool);
++	bounce_end_io(bio);
  }
  
+-static void __bounce_end_io_read(struct bio *bio, mempool_t *pool)
++static void bounce_end_io_read(struct bio *bio)
+ {
+ 	struct bio *bio_orig = bio->bi_private;
  
--#else
--#define blogic_init_probeinfo_list(adapter) \
--		blogic_init_probeinfo_isa(adapter)
--#endif				/* CONFIG_PCI */
+ 	if (!bio->bi_status)
+ 		copy_to_high_bio_irq(bio_orig, bio);
+ 
+-	bounce_end_io(bio, pool);
+-}
 -
+-static void bounce_end_io_read(struct bio *bio)
+-{
+-	__bounce_end_io_read(bio, &page_pool);
+-}
 -
- /*
-   blogic_failure prints a standardized error message, and then returns false.
- */
-@@ -1539,14 +1432,6 @@ static bool __init blogic_rdconfig(struct blogic_adapter *adapter)
- 		else if (config.irq_ch15)
- 			adapter->irq_ch = 15;
- 	}
--	if (adapter->adapter_bus_type == BLOGIC_ISA_BUS) {
--		if (config.dma_ch5)
--			adapter->dma_ch = 5;
--		else if (config.dma_ch6)
--			adapter->dma_ch = 6;
--		else if (config.dma_ch7)
--			adapter->dma_ch = 7;
+-static void bounce_end_io_read_isa(struct bio *bio)
+-{
+-	__bounce_end_io_read(bio, &isa_page_pool);
++	bounce_end_io(bio);
+ }
+ 
+ static struct bio *bounce_clone_bio(struct bio *bio_src)
+@@ -287,8 +236,8 @@ static struct bio *bounce_clone_bio(struct bio *bio_src)
+ 	return NULL;
+ }
+ 
+-static void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig,
+-			       mempool_t *pool)
++
++void blk_queue_bounce(struct request_queue *q, struct bio **bio_orig)
+ {
+ 	struct bio *bio;
+ 	int rw = bio_data_dir(*bio_orig);
+@@ -298,6 +247,20 @@ static void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig,
+ 	bool bounce = false;
+ 	int sectors = 0;
+ 
++	/*
++	 * Data-less bio, nothing to bounce
++	 */
++	if (!bio_has_data(*bio_orig))
++		return;
++
++	/*
++	 * Just check if the bounce pfn is equal to or bigger than the highest
++	 * pfn in the system -- in that case, don't waste time iterating over
++	 * bio segments
++	 */
++	if (q->limits.bounce_pfn >= blk_max_pfn)
++		return;
++
+ 	bio_for_each_segment(from, *bio_orig, iter) {
+ 		if (i++ < BIO_MAX_VECS)
+ 			sectors += from.bv_len >> 9;
+@@ -327,7 +290,7 @@ static void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig,
+ 		if (page_to_pfn(page) <= q->limits.bounce_pfn)
+ 			continue;
+ 
+-		to->bv_page = mempool_alloc(pool, q->bounce_gfp);
++		to->bv_page = mempool_alloc(&page_pool, GFP_NOIO);
+ 		inc_zone_page_state(to->bv_page, NR_BOUNCE);
+ 
+ 		if (rw == WRITE) {
+@@ -346,46 +309,11 @@ static void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig,
+ 
+ 	bio->bi_flags |= (1 << BIO_BOUNCED);
+ 
+-	if (pool == &page_pool) {
++	if (rw == READ)
++		bio->bi_end_io = bounce_end_io_read;
++	else
+ 		bio->bi_end_io = bounce_end_io_write;
+-		if (rw == READ)
+-			bio->bi_end_io = bounce_end_io_read;
+-	} else {
+-		bio->bi_end_io = bounce_end_io_write_isa;
+-		if (rw == READ)
+-			bio->bi_end_io = bounce_end_io_read_isa;
 -	}
- 	/*
- 	   Determine whether Extended Translation is enabled and save it in
- 	   the Host Adapter structure.
-@@ -1686,8 +1571,7 @@ static bool __init blogic_rdconfig(struct blogic_adapter *adapter)
- 	if (adapter->fw_ver[0] == '5')
- 		adapter->adapter_qdepth = 192;
- 	else if (adapter->fw_ver[0] == '4')
--		adapter->adapter_qdepth = (adapter->adapter_bus_type !=
--						BLOGIC_ISA_BUS ? 100 : 50);
-+		adapter->adapter_qdepth = 100;
- 	else
- 		adapter->adapter_qdepth = 30;
- 	if (strcmp(adapter->fw_ver, "3.31") >= 0) {
-@@ -1727,13 +1611,6 @@ static bool __init blogic_rdconfig(struct blogic_adapter *adapter)
- 	   bios_addr is 0.
- 	 */
- 	adapter->bios_addr = ext_setupinfo.bios_addr << 12;
+ 
+ 	bio->bi_private = *bio_orig;
+ 	*bio_orig = bio;
+ }
+-
+-void blk_queue_bounce(struct request_queue *q, struct bio **bio_orig)
+-{
+-	mempool_t *pool;
+-
 -	/*
--	   ISA Host Adapters require Bounce Buffers if there is more than
--	   16MB memory.
+-	 * Data-less bio, nothing to bounce
 -	 */
--	if (adapter->adapter_bus_type == BLOGIC_ISA_BUS &&
--			(void *) high_memory > (void *) MAX_DMA_ADDRESS)
--		adapter->need_bouncebuf = true;
- 	/*
- 	   BusLogic BT-445S Host Adapters prior to board revision E have a
- 	   hardware bug whereby when the BIOS is enabled, transfers to/from
-@@ -1839,11 +1716,7 @@ static bool __init blogic_reportconfig(struct blogic_adapter *adapter)
- 	blogic_info("Configuring BusLogic Model %s %s%s%s%s SCSI Host Adapter\n", adapter, adapter->model, blogic_adapter_busnames[adapter->adapter_bus_type], (adapter->wide ? " Wide" : ""), (adapter->differential ? " Differential" : ""), (adapter->ultra ? " Ultra" : ""));
- 	blogic_info("  Firmware Version: %s, I/O Address: 0x%lX, IRQ Channel: %d/%s\n", adapter, adapter->fw_ver, adapter->io_addr, adapter->irq_ch, (adapter->level_int ? "Level" : "Edge"));
- 	if (adapter->adapter_bus_type != BLOGIC_PCI_BUS) {
--		blogic_info("  DMA Channel: ", adapter);
--		if (adapter->dma_ch > 0)
--			blogic_info("%d, ", adapter, adapter->dma_ch);
--		else
--			blogic_info("None, ", adapter);
-+		blogic_info("  DMA Channel: None, ", adapter);
- 		if (adapter->bios_addr > 0)
- 			blogic_info("BIOS Address: 0x%lX, ", adapter,
- 					adapter->bios_addr);
-@@ -1995,18 +1868,6 @@ static bool __init blogic_getres(struct blogic_adapter *adapter)
- 		return false;
- 	}
- 	adapter->irq_acquired = true;
+-	if (!bio_has_data(*bio_orig))
+-		return;
+-
 -	/*
--	   Acquire exclusive access to the DMA Channel.
+-	 * for non-isa bounce case, just check if the bounce pfn is equal
+-	 * to or bigger than the highest pfn in the system -- in that case,
+-	 * don't waste time iterating over bio segments
 -	 */
--	if (adapter->dma_ch > 0) {
--		if (request_dma(adapter->dma_ch, adapter->full_model) < 0) {
--			blogic_err("UNABLE TO ACQUIRE DMA CHANNEL %d - DETACHING\n", adapter, adapter->dma_ch);
--			return false;
--		}
--		set_dma_mode(adapter->dma_ch, DMA_MODE_CASCADE);
--		enable_dma(adapter->dma_ch);
--		adapter->dma_chan_acquired = true;
+-	if (!(q->bounce_gfp & GFP_DMA)) {
+-		if (q->limits.bounce_pfn >= blk_max_pfn)
+-			return;
+-		pool = &page_pool;
+-	} else {
+-		BUG_ON(!mempool_initialized(&isa_page_pool));
+-		pool = &isa_page_pool;
 -	}
- 	/*
- 	   Indicate the System Resource Acquisition completed successfully,
- 	 */
-@@ -2026,11 +1887,6 @@ static void blogic_relres(struct blogic_adapter *adapter)
- 	 */
- 	if (adapter->irq_acquired)
- 		free_irq(adapter->irq_ch, adapter);
+-
 -	/*
--	   Release exclusive access to the DMA Channel.
+-	 * slow path
 -	 */
--	if (adapter->dma_chan_acquired)
--		free_dma(adapter->dma_ch);
- 	/*
- 	   Release any allocated memory structs not released elsewhere
+-	__blk_queue_bounce(q, bio_orig, pool);
+-}
+diff --git a/block/scsi_ioctl.c b/block/scsi_ioctl.c
+index 6599bac0a78cb0..1048b09255678c 100644
+--- a/block/scsi_ioctl.c
++++ b/block/scsi_ioctl.c
+@@ -431,7 +431,7 @@ int sg_scsi_ioctl(struct request_queue *q, struct gendisk *disk, fmode_t mode,
+ 
+ 	bytes = max(in_len, out_len);
+ 	if (bytes) {
+-		buffer = kzalloc(bytes, q->bounce_gfp | GFP_USER| __GFP_NOWARN);
++		buffer = kzalloc(bytes, GFP_NOIO | GFP_USER | __GFP_NOWARN);
+ 		if (!buffer)
+ 			return -ENOMEM;
+ 
+diff --git a/drivers/ata/libata-scsi.c b/drivers/ata/libata-scsi.c
+index 48b8934970f36a..fd8b6febbf70c4 100644
+--- a/drivers/ata/libata-scsi.c
++++ b/drivers/ata/libata-scsi.c
+@@ -1043,8 +1043,7 @@ int ata_scsi_dev_config(struct scsi_device *sdev, struct ata_device *dev)
+ 		blk_queue_max_segments(q, queue_max_segments(q) - 1);
+ 
+ 		sdev->dma_drain_len = ATAPI_MAX_DRAIN;
+-		sdev->dma_drain_buf = kmalloc(sdev->dma_drain_len,
+-				q->bounce_gfp | GFP_KERNEL);
++		sdev->dma_drain_buf = kmalloc(sdev->dma_drain_len, GFP_NOIO);
+ 		if (!sdev->dma_drain_buf) {
+ 			ata_dev_err(dev, "drain buffer allocation failed\n");
+ 			return -ENOMEM;
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index bc6bc8383b434e..0dbb72ea373529 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -436,11 +436,6 @@ struct request_queue {
  	 */
-@@ -3666,37 +3522,7 @@ static int __init blogic_parseopts(char *options)
+ 	int			id;
  
- 		memset(drvr_opts, 0, sizeof(struct blogic_drvr_options));
- 		while (*options != '\0' && *options != ';') {
--			/* Probing Options. */
--			if (blogic_parse(&options, "IO:")) {
--				unsigned long io_addr = simple_strtoul(options,
--								&options, 0);
--				blogic_probe_options.limited_isa = true;
--				switch (io_addr) {
--				case 0x330:
--					blogic_probe_options.probe330 = true;
--					break;
--				case 0x334:
--					blogic_probe_options.probe334 = true;
--					break;
--				case 0x230:
--					blogic_probe_options.probe230 = true;
--					break;
--				case 0x234:
--					blogic_probe_options.probe234 = true;
--					break;
--				case 0x130:
--					blogic_probe_options.probe130 = true;
--					break;
--				case 0x134:
--					blogic_probe_options.probe134 = true;
--					break;
--				default:
--					blogic_err("BusLogic: Invalid Driver Options (invalid I/O Address 0x%lX)\n", NULL, io_addr);
--					return 0;
--				}
--			} else if (blogic_parse(&options, "NoProbeISA"))
--				blogic_probe_options.noprobe_isa = true;
--			else if (blogic_parse(&options, "NoProbePCI"))
-+			if (blogic_parse(&options, "NoProbePCI"))
- 				blogic_probe_options.noprobe_pci = true;
- 			else if (blogic_parse(&options, "NoProbe"))
- 				blogic_probe_options.noprobe = true;
-diff --git a/drivers/scsi/BusLogic.h b/drivers/scsi/BusLogic.h
-index 6182cc8a0344a8..2eedeaa47970f0 100644
---- a/drivers/scsi/BusLogic.h
-+++ b/drivers/scsi/BusLogic.h
-@@ -237,18 +237,10 @@ struct blogic_probeinfo {
+-	/*
+-	 * queue needs bounce pages for pages above this limit
+-	 */
+-	gfp_t			bounce_gfp;
+-
+ 	spinlock_t		queue_lock;
  
- struct blogic_probe_options {
- 	bool noprobe:1;			/* Bit 0 */
--	bool noprobe_isa:1;		/* Bit 1 */
- 	bool noprobe_pci:1;		/* Bit 2 */
- 	bool nosort_pci:1;		/* Bit 3 */
- 	bool multimaster_first:1;	/* Bit 4 */
- 	bool flashpoint_first:1;	/* Bit 5 */
--	bool limited_isa:1;		/* Bit 6 */
--	bool probe330:1;		/* Bit 7 */
--	bool probe334:1;		/* Bit 8 */
--	bool probe230:1;		/* Bit 9 */
--	bool probe234:1;		/* Bit 10 */
--	bool probe130:1;		/* Bit 11 */
--	bool probe134:1;		/* Bit 12 */
- };
+ 	/*
+@@ -847,7 +842,6 @@ extern unsigned long blk_max_low_pfn, blk_max_pfn;
+  *
+  * BLK_BOUNCE_HIGH	: bounce all highmem pages
+  * BLK_BOUNCE_ANY	: don't bounce anything
+- * BLK_BOUNCE_ISA	: bounce pages above ISA DMA boundary
+  */
+ 
+ #if BITS_PER_LONG == 32
+@@ -856,7 +850,6 @@ extern unsigned long blk_max_low_pfn, blk_max_pfn;
+ #define BLK_BOUNCE_HIGH		-1ULL
+ #endif
+ #define BLK_BOUNCE_ANY		(-1ULL)
+-#define BLK_BOUNCE_ISA		(DMA_BIT_MASK(24))
  
  /*
-@@ -997,10 +989,8 @@ struct blogic_adapter {
- 	unsigned char bus;
- 	unsigned char dev;
- 	unsigned char irq_ch;
--	unsigned char dma_ch;
- 	unsigned char scsi_id;
- 	bool irq_acquired:1;
--	bool dma_chan_acquired:1;
- 	bool ext_trans_enable:1;
- 	bool parity:1;
- 	bool reset_enabled:1;
-diff --git a/drivers/scsi/Kconfig b/drivers/scsi/Kconfig
-index 06b87c7f6babd3..3d114be5b662df 100644
---- a/drivers/scsi/Kconfig
-+++ b/drivers/scsi/Kconfig
-@@ -497,7 +497,7 @@ config SCSI_HPTIOP
- 
- config SCSI_BUSLOGIC
- 	tristate "BusLogic SCSI support"
--	depends on (PCI || ISA) && SCSI && ISA_DMA_API && VIRT_TO_BUS
-+	depends on PCI && SCSI && VIRT_TO_BUS
+  * default timeout for SG_IO if none specified
+diff --git a/mm/Kconfig b/mm/Kconfig
+index 24c045b24b9506..d0808a23e54bc8 100644
+--- a/mm/Kconfig
++++ b/mm/Kconfig
+@@ -283,12 +283,11 @@ config PHYS_ADDR_T_64BIT
+ config BOUNCE
+ 	bool "Enable bounce buffers"
+ 	default y
+-	depends on BLOCK && MMU && (ZONE_DMA || HIGHMEM)
++	depends on BLOCK && MMU && HIGHMEM
  	help
- 	  This is support for BusLogic MultiMaster and FlashPoint SCSI Host
- 	  Adapters. Consult the SCSI-HOWTO, available from
+-	  Enable bounce buffers for devices that cannot access
+-	  the full range of memory available to the CPU. Enabled
+-	  by default when ZONE_DMA or HIGHMEM is selected, but you
+-	  may say n to override this.
++	  Enable bounce buffers for devices that cannot access the full range of
++	  memory available to the CPU. Enabled by default when HIGHMEM is
++	  selected, but you may say n to override this.
+ 
+ config VIRT_TO_BUS
+ 	bool
 -- 
 2.30.1
 
