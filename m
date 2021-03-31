@@ -2,85 +2,181 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BFB1C433DB
-	for <linux-block@archiver.kernel.org>; Wed, 31 Mar 2021 00:17:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72B1BC433DB
+	for <linux-block@archiver.kernel.org>; Wed, 31 Mar 2021 00:27:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2F1BA619CA
-	for <linux-block@archiver.kernel.org>; Wed, 31 Mar 2021 00:17:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4269F619C0
+	for <linux-block@archiver.kernel.org>; Wed, 31 Mar 2021 00:27:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232809AbhCaARS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 30 Mar 2021 20:17:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:59380 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232805AbhCaARJ (ORCPT
+        id S232789AbhCaA0m (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 30 Mar 2021 20:26:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33448 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232589AbhCaA0l (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 30 Mar 2021 20:17:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617149828;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=jpzj3I1Cp4N4TRFAijczwqSsbB26ItTieKnqXo2KsP0=;
-        b=LA3l3etU3Hz/KrAtSlqLnmqKp1Fg4z5Dv9T+bjhFHX/dmggiQQRg6FytE9iORgLh2X0+KG
-        rlgikri5IxE+Fqf2SjlfSfVcbyCh/kmo5ooDPzSmP0hMnRGRxYkSlncsmlbxVy1lW2cgKI
-        iLvOMoHRPCpjDrKuOPBalKCz5tnSmeQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-550-HW9HcCmpOymkbY2AsFs2EQ-1; Tue, 30 Mar 2021 20:17:03 -0400
-X-MC-Unique: HW9HcCmpOymkbY2AsFs2EQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9991C83DD20;
-        Wed, 31 Mar 2021 00:17:02 +0000 (UTC)
-Received: from T590 (ovpn-12-104.pek2.redhat.com [10.72.12.104])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 157FF19C59;
-        Wed, 31 Mar 2021 00:16:54 +0000 (UTC)
-Date:   Wed, 31 Mar 2021 08:16:50 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] block: shutdown blktrace in case of fatal signal
- pending
-Message-ID: <YGO/cpalyGevAJjn@T590>
-References: <20210323081440.81343-1-ming.lei@redhat.com>
- <20210323081440.81343-2-ming.lei@redhat.com>
- <20210330165330.GA13829@lst.de>
+        Tue, 30 Mar 2021 20:26:41 -0400
+Received: from mail-ot1-x333.google.com (mail-ot1-x333.google.com [IPv6:2607:f8b0:4864:20::333])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5819DC061574;
+        Tue, 30 Mar 2021 17:26:41 -0700 (PDT)
+Received: by mail-ot1-x333.google.com with SMTP id k14-20020a9d7dce0000b02901b866632f29so17378255otn.1;
+        Tue, 30 Mar 2021 17:26:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:subject:to:cc:references:from:autocrypt:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=A3/p+2wdiqENyYUtU71W73gJVlvDw7pvzFfTfd6nkdU=;
+        b=u2qQCchGEvQzg+Ig6EjUgXpu0fMKvuw26dQ8En71ewUDKh2NdKYHj/pyFaUWmbzEW/
+         +adjkEd1V3nxZbL8LMievROoqjfBrgBPAIvjTk0yDqEYnVEU6S6/ShF0gLNIhJzXa2+2
+         ZC8yrTeeUBjx8pMRXw6gttKyLJIa2L5CiYB4vIu29/wDQJKoNMQzkW5hheMcqTOrzSMG
+         b7G/efJrwmM26eRviNWoCNNVqLAoe3tFenThznJW4t9rPSu5slA0q+JmLPB/RmQ02Lb7
+         /IE5+a68kmtKFfPGpBhyxzwPbkUbMlATvYFsGfnIz2BH3R/CgIbRt5guxwmBsQqfxLxp
+         PrPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:subject:to:cc:references:from:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=A3/p+2wdiqENyYUtU71W73gJVlvDw7pvzFfTfd6nkdU=;
+        b=SGc15JYD59Ngq8fbdd5RaJqMKG7mkjzAigQbJ6507iTRsm50M02AHMkyYcgYD//ioq
+         W3LztGOHAdXz1Z75DItJMk/SqU7NrZWkT7YRdTK0mFelzY9oL5SucyUlys6JDCOoTlex
+         8rhOyPwyCYF8T/EaaQakdWihkXGek1Q4aCApwo7TVIEKd6yp42m/IJfjQmNxdI0W/dJc
+         6DEofEiYEy73i+11UFVUri7VGZr7LguvLmrVjY0bv6kAqDZs1xBOx4QQ15xh0mW5K8lE
+         P0hwTv1GKiAtkikrQ7yc6yGiASA9xQuDjKpEC4MK+AmbWKXTPoimpqwE67Klop96ms0B
+         Zmxg==
+X-Gm-Message-State: AOAM532XqDd66US/Pc8KRF9jBgwdGT2YzkznzYUaF2w/louxzlmBIJVU
+        So8E7hkiUCiCHKKAGXtDGLchzGc39rw=
+X-Google-Smtp-Source: ABdhPJzAuAJsGm4rNyPEK4mOWvEWR5pJI+fJpVMhviuqwzAZrvdDl4kpgpSXawsyDNr6a5Z8iv5cmQ==
+X-Received: by 2002:a05:6830:c1:: with SMTP id x1mr419827oto.87.1617150400539;
+        Tue, 30 Mar 2021 17:26:40 -0700 (PDT)
+Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+        by smtp.gmail.com with ESMTPSA id w199sm130255oif.41.2021.03.30.17.26.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 30 Mar 2021 17:26:39 -0700 (PDT)
+Sender: Guenter Roeck <groeck7@gmail.com>
+Subject: Re: [PATCH] blk-mq: fix alignment mismatch.
+To:     Nathan Chancellor <nathan@kernel.org>,
+        Jian Cai <jiancai@google.com>
+Cc:     cjdb@google.com, manojgupta@google.com, llozano@google.com,
+        clang-built-linux@googlegroups.com, Jens Axboe <axboe@kernel.dk>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20210330230249.709221-1-jiancai@google.com>
+ <20210330232946.m5p7426macyjduzm@archlinux-ax161>
+From:   Guenter Roeck <linux@roeck-us.net>
+Autocrypt: addr=linux@roeck-us.net; keydata=
+ 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
+ mDW4+i+XlNFUPUYMrIKi9joBhu18ssf5i5Q=
+Message-ID: <114a5697-9b5c-daf1-f0fc-dc190d4db74d@roeck-us.net>
+Date:   Tue, 30 Mar 2021 17:26:37 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210330165330.GA13829@lst.de>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <20210330232946.m5p7426macyjduzm@archlinux-ax161>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Mar 30, 2021 at 06:53:30PM +0200, Christoph Hellwig wrote:
-> On Tue, Mar 23, 2021 at 04:14:39PM +0800, Ming Lei wrote:
-> > blktrace may allocate lots of memory, if the process is terminated
-> > by user or OOM, we need to provide one chance to remove the trace
-> > buffer, otherwise memory leak may be caused.
-> > 
-> > Fix the issue by shutdown blktrace in case of task exiting in
-> > blkdev_close().
-> > 
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+On 3/30/21 4:29 PM, Nathan Chancellor wrote:
+> Hi Jian,
 > 
-> This just seems weird.  blktrace has no relationship to open
-> block device instances.
+> On Tue, Mar 30, 2021 at 04:02:49PM -0700, Jian Cai wrote:
+>> This fixes the mismatch of alignments between csd and its use as an
+>> argument to smp_call_function_single_async, which causes build failure
+>> when -Walign-mismatch in Clang is used.
+>>
+>> Link:
+>> http://crrev.com/c/1193732
+>>
+>> Suggested-by: Guenter Roeck <linux@roeck-us.net>
+>> Signed-off-by: Jian Cai <jiancai@google.com>
+> 
+> Thanks for the patch. This is effectively a revert of commit
+> 4ccafe032005 ("block: unalign call_single_data in struct request"),
+> which I had brought up in this thread:
+> 
+> https://lore.kernel.org/r/20210310182307.zzcbi5w5jrmveld4@archlinux-ax161/
+> 
+> This is obviously a correct fix, I am not just sure what the impact to
+> 'struct request' will be.
+> 
 
-blktrace still needs to open one blkdev, then send its own ioctl
-commands to block layer. In case of OOM, the allocated memory in
-these ioctl commands won't be released.
+As commit 4ccafe032005 states, it increases the request structure size.
+Given the exchange referenced above, I think we'll need to disable
+the warning in the block code.
 
-Or any other suggestion?
+Thanks,
+Guenter
 
--- 
-Ming
+> Cheers,
+> Nathan
+> 
+>> ---
+>>  include/linux/blkdev.h | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+>> index bc6bc8383b43..3b92330d95ad 100644
+>> --- a/include/linux/blkdev.h
+>> +++ b/include/linux/blkdev.h
+>> @@ -231,7 +231,7 @@ struct request {
+>>  	unsigned long deadline;
+>>  
+>>  	union {
+>> -		struct __call_single_data csd;
+>> +		call_single_data_t csd;
+>>  		u64 fifo_time;
+>>  	};
+>>  
+>> -- 
+>> 2.31.0.291.g576ba9dcdaf-goog
+>>
 
