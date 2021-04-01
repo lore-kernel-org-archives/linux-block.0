@@ -2,145 +2,144 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A782DC433ED
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB55EC43461
 	for <linux-block@archiver.kernel.org>; Thu,  1 Apr 2021 02:21:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8625161041
+	by mail.kernel.org (Postfix) with ESMTP id A58F161055
 	for <linux-block@archiver.kernel.org>; Thu,  1 Apr 2021 02:21:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233143AbhDACUV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 31 Mar 2021 22:20:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42167 "EHLO
+        id S233131AbhDACUX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 31 Mar 2021 22:20:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:32892 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233131AbhDACT4 (ORCPT
+        by vger.kernel.org with ESMTP id S233136AbhDACUV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 31 Mar 2021 22:19:56 -0400
+        Wed, 31 Mar 2021 22:20:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617243596;
+        s=mimecast20190719; t=1617243620;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=ErDdkcFsJQKYgBqSgbmniSPhhhlVKC5FIXAEKrQICZ8=;
-        b=P4re2lxQV4ziaZqiNK3vHnEnlp4aosnMUCAYLDHOO5qj8g7TfYTsDviZQNiZP/ZadVOVHU
-        liRZ51DGF1ZF/Y+bbYjxAJBSawWE+5hxhSvlLkC0g7raWspZsODG9XdmfKoFcy4CZqppRz
-        Z3S7oW2NZgHdI9W8SA3qpXAuPqm2foM=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=zeLuhTKZTjrPFVwDSbBTuK0mDGAAolQpa4vkOauA5k8=;
+        b=DSaU4ekAWbgmk0SY0w65qXtDbObtIIEIqNyEdmN69V1OL7fNSKOt2v34e04FwTNj7hJpTw
+        csjKXpSjvli0s1ilFWoRqtuobhE6baDefv5z5H3zqv5HNwcHFgxBNtHaGKb9ltvneprFOF
+        KF4pyQ7QiCJojJ6iZmBLuTijMFP6pKI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-347-gERIIbICM3adaOPVFhDG7A-1; Wed, 31 Mar 2021 22:19:52 -0400
-X-MC-Unique: gERIIbICM3adaOPVFhDG7A-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-490-IvIJXIrfN6uRbWyzHgbv6g-1; Wed, 31 Mar 2021 22:20:18 -0400
+X-MC-Unique: IvIJXIrfN6uRbWyzHgbv6g-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 45307801814;
-        Thu,  1 Apr 2021 02:19:51 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AAEA71853021;
+        Thu,  1 Apr 2021 02:20:17 +0000 (UTC)
 Received: from localhost (ovpn-12-93.pek2.redhat.com [10.72.12.93])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4EF5D5944D;
-        Thu,  1 Apr 2021 02:19:40 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D78EE60CCD;
+        Thu,  1 Apr 2021 02:19:53 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org,
         Jeffle Xu <jefflexu@linux.alibaba.com>,
         Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V5 00/12] block: support bio based io polling
-Date:   Thu,  1 Apr 2021 10:19:15 +0800
-Message-Id: <20210401021927.343727-1-ming.lei@redhat.com>
+        Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Subject: [PATCH V5 01/12] block: add helper of blk_queue_poll
+Date:   Thu,  1 Apr 2021 10:19:16 +0800
+Message-Id: <20210401021927.343727-2-ming.lei@redhat.com>
+In-Reply-To: <20210401021927.343727-1-ming.lei@redhat.com>
+References: <20210401021927.343727-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
+There has been 3 users, and will be more, so add one such helper.
 
-Add per-task io poll context for holding HIPRI blk-mq/underlying bios
-queued from bio based driver's io submission context, and reuse one bio
-padding field for storing 'cookie' returned from submit_bio() for these
-bios. Also explicitly end these bios in poll context by adding two
-new bio flags.
+Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Reviewed-by: Jeffle Xu <jefflexu@linux.alibaba.com>
+Reviewed-by: Hannes Reinecke <hare@suse.de>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-core.c         | 2 +-
+ block/blk-mq.c           | 3 +--
+ block/blk-sysfs.c        | 2 +-
+ drivers/nvme/host/core.c | 2 +-
+ include/linux/blkdev.h   | 1 +
+ 5 files changed, 5 insertions(+), 5 deletions(-)
 
-In this way, we needn't to poll all underlying hw queues any more,
-which is implemented in Jeffle's patches. And we can just poll hw queues
-in which there is HIPRI IO queued.
-
-Usually io submission and io poll share same context, so the added io
-poll context data is just like one stack variable, and the cost for
-saving bios is cheap.
-
-V5:
-	- fix one use-after-free issue in case that polling is from another
-	context: adds one new cookie of BLK_QC_T_NOT_READY for preventing
-	this issue in patch 8/12
-	- add reviewed-by & tested-by tag
-
-V4:
-	- cover one more test_bit(QUEUE_FLAG_POLL, ...) suggested by
-	  Jeffle(01/12)
-	- drop patch of 'block: add helper of blk_create_io_context'
-	- add new helper of blk_create_io_poll_context() (03/12)
-	- drain submission queues in exit_io_context(), suggested by
-	  Jeffle(08/13)
-	- considering shared io context case for blk_bio_poll_io_drain()
-	(08/13)
-	- fix one issue in blk_bio_poll_pack_groups() as suggested by
-	Jeffle(08/13)
-	- add reviewed-by tag
-V3:
-	- fix cookie returned for bio based driver, as suggested by Jeffle Xu
-	- draining pending bios when submission context is exiting
-	- patch style and comment fix, as suggested by Mike
-	- allow poll context data to be NULL by always polling on submission queue
-	- remove RFC, and reviewed-by
-
-V2:
-	- address queue depth scalability issue reported by Jeffle via bio
-	group list. Reuse .bi_end_io for linking bios which share same
-	.bi_end_io, and support 32 such groups in submit queue. With this way,
-	the scalability issue caused by kfifio is solved. Before really
-	ending bio, .bi_end_io is recovered from the group head.
-
-
-
-Jeffle Xu (4):
-  block/mq: extract one helper function polling hw queue
-  block: add queue_to_disk() to get gendisk from request_queue
-  block: add poll_capable method to support bio-based IO polling
-  dm: support IO polling for bio-based dm device
-
-Ming Lei (8):
-  block: add helper of blk_queue_poll
-  block: add one helper to free io_context
-  block: create io poll context for submission and poll task
-  block: add req flag of REQ_POLL_CTX
-  block: add new field into 'struct bvec_iter'
-  block: prepare for supporting bio_list via other link
-  block: use per-task poll context to implement bio based io polling
-  blk-mq: limit hw queues to be polled in each blk_poll()
-
- block/bio.c                   |   5 +
- block/blk-core.c              | 258 ++++++++++++++++++++++++++--
- block/blk-ioc.c               |  15 +-
- block/blk-mq.c                | 308 +++++++++++++++++++++++++++++++++-
- block/blk-sysfs.c             |  16 +-
- block/blk.h                   |  58 +++++++
- drivers/md/dm-table.c         |  24 +++
- drivers/md/dm.c               |  14 ++
- drivers/nvme/host/core.c      |   2 +-
- include/linux/bio.h           | 132 ++++++++-------
- include/linux/blk_types.h     |  30 +++-
- include/linux/blkdev.h        |   4 +
- include/linux/bvec.h          |   8 +
- include/linux/device-mapper.h |   1 +
- include/linux/iocontext.h     |   2 +
- include/trace/events/kyber.h  |   6 +-
- 16 files changed, 788 insertions(+), 95 deletions(-)
-
+diff --git a/block/blk-core.c b/block/blk-core.c
+index fc60ff208497..a31371d55b9d 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -836,7 +836,7 @@ static noinline_for_stack bool submit_bio_checks(struct bio *bio)
+ 		}
+ 	}
+ 
+-	if (!test_bit(QUEUE_FLAG_POLL, &q->queue_flags))
++	if (!blk_queue_poll(q))
+ 		bio->bi_opf &= ~REQ_HIPRI;
+ 
+ 	switch (bio_op(bio)) {
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index d4d7c1caa439..63c81df3b8b5 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -3869,8 +3869,7 @@ int blk_poll(struct request_queue *q, blk_qc_t cookie, bool spin)
+ 	struct blk_mq_hw_ctx *hctx;
+ 	long state;
+ 
+-	if (!blk_qc_t_valid(cookie) ||
+-	    !test_bit(QUEUE_FLAG_POLL, &q->queue_flags))
++	if (!blk_qc_t_valid(cookie) || !blk_queue_poll(q))
+ 		return 0;
+ 
+ 	if (current->plug)
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 0f4f0c8a7825..db3268d41274 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -417,7 +417,7 @@ static ssize_t queue_poll_delay_store(struct request_queue *q, const char *page,
+ 
+ static ssize_t queue_poll_show(struct request_queue *q, char *page)
+ {
+-	return queue_var_show(test_bit(QUEUE_FLAG_POLL, &q->queue_flags), page);
++	return queue_var_show(blk_queue_poll(q), page);
+ }
+ 
+ static ssize_t queue_poll_store(struct request_queue *q, const char *page,
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 0896e21642be..34b8c78f88e0 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -956,7 +956,7 @@ static void nvme_execute_rq_polled(struct request_queue *q,
+ {
+ 	DECLARE_COMPLETION_ONSTACK(wait);
+ 
+-	WARN_ON_ONCE(!test_bit(QUEUE_FLAG_POLL, &q->queue_flags));
++	WARN_ON_ONCE(!blk_queue_poll(q));
+ 
+ 	rq->cmd_flags |= REQ_HIPRI;
+ 	rq->end_io_data = &wait;
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index bc6bc8383b43..89a01850cf12 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -665,6 +665,7 @@ bool blk_queue_flag_test_and_set(unsigned int flag, struct request_queue *q);
+ #define blk_queue_fua(q)	test_bit(QUEUE_FLAG_FUA, &(q)->queue_flags)
+ #define blk_queue_registered(q)	test_bit(QUEUE_FLAG_REGISTERED, &(q)->queue_flags)
+ #define blk_queue_nowait(q)	test_bit(QUEUE_FLAG_NOWAIT, &(q)->queue_flags)
++#define blk_queue_poll(q)	test_bit(QUEUE_FLAG_POLL, &(q)->queue_flags)
+ 
+ extern void blk_set_pm_only(struct request_queue *q);
+ extern void blk_clear_pm_only(struct request_queue *q);
 -- 
 2.29.2
 
