@@ -4,124 +4,186 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D93C0C43462
-	for <linux-block@archiver.kernel.org>; Thu,  1 Apr 2021 02:22:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04F2CC43600
+	for <linux-block@archiver.kernel.org>; Thu,  1 Apr 2021 02:22:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B7E6D6108F
+	by mail.kernel.org (Postfix) with ESMTP id E80DA610C7
 	for <linux-block@archiver.kernel.org>; Thu,  1 Apr 2021 02:22:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232994AbhDACWL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S233102AbhDACWL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Wed, 31 Mar 2021 22:22:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:25573 "EHLO
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:36086 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233270AbhDACWF (ORCPT
+        by vger.kernel.org with ESMTP id S233155AbhDACVt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 31 Mar 2021 22:22:05 -0400
+        Wed, 31 Mar 2021 22:21:49 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617243725;
+        s=mimecast20190719; t=1617243708;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=qZBz/lwUN7sysV5reUtkb4K99jWjYmMS9GKht1lqI4U=;
-        b=fc0LPy3YFpT8pQDVeT3vSUi1qMief+sTg/Va1JlkwU1iCT0CKrecH2e+2H/5ttR2INmnvC
-        aidVnPYkNiKx4ev23Pl0+x7EBntf9BP0MDRajnQSp1tv2lHVWa8kiemMuvW1gd70pO4PvX
-        PnmR6BYAAjG5Paa8uavNvOUrTVmVgwE=
+        bh=4PtUUiOR+GA8RordYFGfCjb74c0aCLBg8hc9ijEhfWk=;
+        b=JaX/abCVcK1CMnRyqThY5TjekJUxk/Oh1PUUVzoAk9fxojCFHo+EX0Qp4igL/aW7lPHGor
+        W4zv9Cxu5SRq+sVNywG1tfqmzg57HAGjYAjoS/8dbEnAE8E0y8ih0KjLQGIF4E1n5RBfWH
+        9SpFPrziC1DNUHSQb+tYVxFlqW1+wLI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-468-pDj9nvnyMqKbDKr1vlNc-g-1; Wed, 31 Mar 2021 22:22:02 -0400
-X-MC-Unique: pDj9nvnyMqKbDKr1vlNc-g-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-74--Z-BmyiWMJquXcPllKv-fw-1; Wed, 31 Mar 2021 22:21:46 -0400
+X-MC-Unique: -Z-BmyiWMJquXcPllKv-fw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B20F8107ACCD;
-        Thu,  1 Apr 2021 02:22:01 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D16871084C83;
+        Thu,  1 Apr 2021 02:21:45 +0000 (UTC)
 Received: from localhost (ovpn-12-93.pek2.redhat.com [10.72.12.93])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0E0E55944D;
-        Thu,  1 Apr 2021 02:22:00 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C0F795D720;
+        Thu,  1 Apr 2021 02:21:38 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org,
         Jeffle Xu <jefflexu@linux.alibaba.com>,
         Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
         Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V5 11/12] block: add poll_capable method to support bio-based IO polling
-Date:   Thu,  1 Apr 2021 10:19:26 +0800
-Message-Id: <20210401021927.343727-12-ming.lei@redhat.com>
+Subject: [PATCH V5 09/12] blk-mq: limit hw queues to be polled in each blk_poll()
+Date:   Thu,  1 Apr 2021 10:19:24 +0800
+Message-Id: <20210401021927.343727-10-ming.lei@redhat.com>
 In-Reply-To: <20210401021927.343727-1-ming.lei@redhat.com>
 References: <20210401021927.343727-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Jeffle Xu <jefflexu@linux.alibaba.com>
+Limit at most 8 queues are polled in each blk_pull(), avoid to
+add extra latency when queue depth is high.
 
-This method can be used to check if bio-based device supports IO polling
-or not. For mq devices, checking for hw queue in polling mode is
-adequate, while the sanity check shall be implementation specific for
-bio-based devices. For example, dm device needs to check if all
-underlying devices are capable of IO polling.
-
-Though bio-based device may have done the sanity check during the
-device initialization phase, cacheing the result of this sanity check
-(such as by cacheing in the queue_flags) may not work. Because for dm
-devices, users could change the state of the underlying devices through
-'/sys/block/<dev>/io_poll', bypassing the dm device above. In this case,
-the cached result of the very beginning sanity check could be
-out-of-date. Thus the sanity check needs to be done every time 'io_poll'
-is to be modified.
-
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-Signed-off-by: Jeffle Xu <jefflexu@linux.alibaba.com>
+Reviewed-by: Jeffle Xu <jefflexu@linux.alibaba.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-sysfs.c      | 14 +++++++++++---
- include/linux/blkdev.h |  1 +
- 2 files changed, 12 insertions(+), 3 deletions(-)
+ block/blk-mq.c | 79 +++++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 55 insertions(+), 24 deletions(-)
 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index db3268d41274..c8e7e4af66cb 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -426,9 +426,17 @@ static ssize_t queue_poll_store(struct request_queue *q, const char *page,
- 	unsigned long poll_on;
- 	ssize_t ret;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 20bfc8c2d02e..e2701d502e51 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -3865,36 +3865,31 @@ static inline int blk_mq_poll_hctx(struct request_queue *q,
+ 	return ret;
+ }
  
--	if (!q->tag_set || q->tag_set->nr_maps <= HCTX_TYPE_POLL ||
--	    !q->tag_set->map[HCTX_TYPE_POLL].nr_queues)
--		return -EINVAL;
-+	if (queue_is_mq(q)) {
-+		if (!q->tag_set || q->tag_set->nr_maps <= HCTX_TYPE_POLL ||
-+		    !q->tag_set->map[HCTX_TYPE_POLL].nr_queues)
-+			return -EINVAL;
-+	} else {
-+		struct gendisk *disk = queue_to_disk(q);
-+
-+		if (!disk->fops->poll_capable ||
-+		    !disk->fops->poll_capable(disk))
-+			return -EINVAL;
+-static int blk_mq_poll_io(struct bio *bio)
+-{
+-	struct request_queue *q = bio->bi_bdev->bd_disk->queue;
+-	blk_qc_t cookie = bio_get_private_data(bio);
+-	int ret = 0;
++#define POLL_HCTX_MAX_CNT 8
+ 
+-	/* wait until the bio is submitted really */
+-	if (!blk_qc_t_ready(cookie))
+-		return 0;
++static bool blk_add_unique_hctx(struct blk_mq_hw_ctx **data, int *cnt,
++		struct blk_mq_hw_ctx *hctx)
++{
++	int i;
+ 
+-	if (!bio_flagged(bio, BIO_DONE) && blk_qc_t_valid(cookie)) {
+-		struct blk_mq_hw_ctx *hctx =
+-			q->queue_hw_ctx[blk_qc_t_to_queue_num(cookie)];
++	for (i = 0; i < *cnt; i++) {
++		if (data[i] == hctx)
++			goto exit;
 +	}
  
- 	ret = queue_var_store(&poll_on, page, count);
- 	if (ret < 0)
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index bfab74b45f15..a46f975f2a2f 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1881,6 +1881,7 @@ struct block_device_operations {
- 	int (*report_zones)(struct gendisk *, sector_t sector,
- 			unsigned int nr_zones, report_zones_cb cb, void *data);
- 	char *(*devnode)(struct gendisk *disk, umode_t *mode);
-+	bool (*poll_capable)(struct gendisk *disk);
- 	struct module *owner;
- 	const struct pr_ops *pr_ops;
- };
+-		ret += blk_mq_poll_hctx(q, hctx);
++	if (i < POLL_HCTX_MAX_CNT) {
++		data[i] = hctx;
++		(*cnt)++;
+ 	}
+-	return ret;
++ exit:
++	return *cnt == POLL_HCTX_MAX_CNT;
+ }
+ 
+-static int blk_bio_poll_and_end_io(struct bio_grp_list *grps)
++static void blk_build_poll_queues(struct bio_grp_list *grps,
++		struct blk_mq_hw_ctx **data, int *cnt)
+ {
+-	int ret = 0;
+ 	int i;
+ 
+-	/*
+-	 * Poll hw queue first.
+-	 *
+-	 * TODO: limit max poll times and make sure to not poll same
+-	 * hw queue one more time.
+-	 */
+ 	for (i = 0; i < grps->nr_grps; i++) {
+ 		struct bio_grp_list_data *grp = &grps->head[i];
+ 		struct bio *bio;
+@@ -3902,11 +3897,31 @@ static int blk_bio_poll_and_end_io(struct bio_grp_list *grps)
+ 		if (bio_grp_list_grp_empty(grp))
+ 			continue;
+ 
+-		for (bio = grp->list.head; bio; bio = bio->bi_poll)
+-			ret += blk_mq_poll_io(bio);
++		for (bio = grp->list.head; bio; bio = bio->bi_poll) {
++			blk_qc_t  cookie;
++			struct blk_mq_hw_ctx *hctx;
++			struct request_queue *q;
++
++			if (bio_flagged(bio, BIO_DONE))
++				continue;
++
++			/* wait until the bio is submitted really */
++			cookie = bio_get_private_data(bio);
++			if (!blk_qc_t_ready(cookie) || !blk_qc_t_valid(cookie))
++				continue;
++
++			q = bio->bi_bdev->bd_disk->queue;
++			hctx = q->queue_hw_ctx[blk_qc_t_to_queue_num(cookie)];
++			if (blk_add_unique_hctx(data, cnt, hctx))
++				return;
++		}
+ 	}
++}
++
++static void blk_bio_poll_reap_ios(struct bio_grp_list *grps)
++{
++	int i;
+ 
+-	/* reap bios */
+ 	for (i = 0; i < grps->nr_grps; i++) {
+ 		struct bio_grp_list_data *grp = &grps->head[i];
+ 		struct bio *bio;
+@@ -3931,6 +3946,22 @@ static int blk_bio_poll_and_end_io(struct bio_grp_list *grps)
+ 		}
+ 		__bio_grp_list_merge(&grp->list, &bl);
+ 	}
++}
++
++static int blk_bio_poll_and_end_io(struct bio_grp_list *grps)
++{
++	int ret = 0;
++	int i;
++	struct blk_mq_hw_ctx *hctx[POLL_HCTX_MAX_CNT];
++	int cnt = 0;
++
++	blk_build_poll_queues(grps, hctx, &cnt);
++
++	for (i = 0; i < cnt; i++)
++		ret += blk_mq_poll_hctx(hctx[i]->queue, hctx[i]);
++
++	blk_bio_poll_reap_ios(grps);
++
+ 	return ret;
+ }
+ 
 -- 
 2.29.2
 
