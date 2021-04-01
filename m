@@ -2,126 +2,99 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91659C43470
-	for <linux-block@archiver.kernel.org>; Thu,  1 Apr 2021 18:03:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3363CC433B4
+	for <linux-block@archiver.kernel.org>; Thu,  1 Apr 2021 18:03:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 626C96112E
+	by mail.kernel.org (Postfix) with ESMTP id E8FEB610C7
 	for <linux-block@archiver.kernel.org>; Thu,  1 Apr 2021 18:03:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236308AbhDASDN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 1 Apr 2021 14:03:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60894 "EHLO
+        id S235737AbhDASDO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 1 Apr 2021 14:03:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33034 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236288AbhDAR5l (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Apr 2021 13:57:41 -0400
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D0AAC05BD33
-        for <linux-block@vger.kernel.org>; Thu,  1 Apr 2021 06:04:09 -0700 (PDT)
-Received: by mail-pl1-x634.google.com with SMTP id f17so1014347plr.0
-        for <linux-block@vger.kernel.org>; Thu, 01 Apr 2021 06:04:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=02h3yuYtCDeLrFtLERehN2koHoxziGpmS6QEtH714RU=;
-        b=c9P77fxGGLlXuO1I1cSLHtXkwUM5dXul4sy1noUL2RhzIQsqc7bVRe1jjr9Pr0d0qK
-         IQWIHcwWqSgEojqw4knzoSr5J4j0QqbAwc39gN5bowgOP1OiMT+OxMJZITVsvK7QBgoa
-         t3LTysUxug2yRB8IQ9fS+QAX2IGqJtk7yUHR5mZEt9PHZjQKUUX4Q8mf/6grd03NGNFH
-         QU6jT2ZEKbU26yqSdlNLzpn0Q6143V0khY12A7pLWsWFS/C1DiS2HbThguKM56Nzaw/K
-         15vrqRqwtQM0+cvg6ME70S9ZSlDUTCM51yb2ASu4oB57bRQrxlYSM5dlMXUNvSHq3RcU
-         G7ww==
+        with ESMTP id S237047AbhDAR7V (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Apr 2021 13:59:21 -0400
+Received: from mail-ot1-x32e.google.com (mail-ot1-x32e.google.com [IPv6:2607:f8b0:4864:20::32e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DFC2C08EADA;
+        Thu,  1 Apr 2021 06:32:10 -0700 (PDT)
+Received: by mail-ot1-x32e.google.com with SMTP id v24-20020a9d69d80000b02901b9aec33371so2138321oto.2;
+        Thu, 01 Apr 2021 06:32:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=02h3yuYtCDeLrFtLERehN2koHoxziGpmS6QEtH714RU=;
-        b=KyirKLh8dPkxmjb0ZOz+jDxjy2KOQuj74a15vLJ9YnQGOy+b0n4UQsYI9xpdCeNkzn
-         PVL5EQHh5Qk5a9BF10/9pHQAWLLe6+LB+Kt0IZS8Whpe2j4MQqn+H5SfLX9w/CmpMZ0B
-         raG5QmpcXFn1Flox0lY8/yBT230BN4Kj0cpqz8qX5ZXZvs1ziKebZXBwMs+xFEaEKlok
-         m65Noo/Eu9g8zqL5MaGF1eestsYf41mQzVhHvtN1W+pTrfwmUakRbwsEjDleqYNVnxkR
-         pmPIgtKAw7IH/bCuLfgukJYSP7g6lDjuWAO0f1blvb14gO47fYFuu/UqJ8wmZKu2Zonr
-         6aDg==
-X-Gm-Message-State: AOAM532wYQ0VJyk+c+giTsCHwagabm5CvS5wyI4RGM5VZwHROMGKKswy
-        k9oswCZzI+LaTO4zNb97MZuBiGdHYsMLWQ==
-X-Google-Smtp-Source: ABdhPJzLwMrkCL7oi6nmY9pT+fmHMLiQPQFmeMGnz3yBvJ/Z7O05ATkXWC22XrJ4P3VCb1QTVVS8rg==
-X-Received: by 2002:a17:902:c389:b029:e7:1029:8ba5 with SMTP id g9-20020a170902c389b02900e710298ba5mr7894337plg.55.1617282248993;
-        Thu, 01 Apr 2021 06:04:08 -0700 (PDT)
-Received: from [192.168.1.134] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id y15sm6942053pgi.31.2021.04.01.06.04.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 01 Apr 2021 06:04:07 -0700 (PDT)
-Subject: Re: [PATCH] null_blk: fix command timeout completion handling
-To:     Damien Le Moal <damien.lemoal@wdc.com>, linux-block@vger.kernel.org
-Cc:     Johannes Thumshirn <johannes.thumshirn@wdc.com>
-References: <20210331225244.126426-1-damien.lemoal@wdc.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <5993cd68-2e5a-af12-ed22-a2602c8ad6c3@kernel.dk>
-Date:   Thu, 1 Apr 2021 07:04:06 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=D15YRcEUCjfq7EWQOO7TKl7m2YFXC98HVx6M41I7s3I=;
+        b=WTU3P7XCoIgCm2V9V1l7AGVKxB97sdRdXPK8FC7u/gf9iO2rA4j40yrk36j0JR525D
+         NGEPSQtCIDnZX8RBzZZQCdxv6ryoSVyBRaZqliIizPEcN/5dGqMIg5mxd0KzRpunULzF
+         fY3Lyqh32sKpmcVGqUlgyy+KYr17qUyRTatmL0SWR6O44TrGBby+HIC6TVb2MYkTPSn1
+         DUs/vnEQb6BCNql5OVA9eQQk+H9P8rY1Inyx5Ok+03/3R0X64hqmmDfbnOIe6V2AbLHg
+         Owf1kQ7fsxBJQ/SfOy6CNFyA9KdmGQD+hGiv9xQfeVxLU/mbk1bhBqR1niGzn2gtHW0W
+         /tqw==
+X-Gm-Message-State: AOAM530B7/KxD/aiwwC2X3pkaFRt0ZSVctKcC+RocWvbd8y8uBwxI8qN
+        zOTYu9Wm6RxFuqV2+S4s2okB0rYcufPPVBnY2QU=
+X-Google-Smtp-Source: ABdhPJzzQ49TNZkbu1Jslr5W0ro3FdLCPHYWklO/x0qvqwljg5dZ9XMMMabbgkgmaz7sXXbjQCW8Sal0tBiVKjZd3eQ=
+X-Received: by 2002:a05:6830:55b:: with SMTP id l27mr6299744otb.260.1617283929839;
+ Thu, 01 Apr 2021 06:32:09 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20210331225244.126426-1-damien.lemoal@wdc.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20210401130138.2164928-1-yuyufen@huawei.com>
+In-Reply-To: <20210401130138.2164928-1-yuyufen@huawei.com>
+From:   "Rafael J. Wysocki" <rafael@kernel.org>
+Date:   Thu, 1 Apr 2021 15:31:56 +0200
+Message-ID: <CAJZ5v0j1-AA2fWmB0Cr=pr6d+qt_J7Vxr=RPnbvVBfqQYY3KuQ@mail.gmail.com>
+Subject: Re: [PATCH] drivers core: don't do anything in device_del() when
+ device_add() fail
+To:     Yufen Yu <yuyufen@huawei.com>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/31/21 4:52 PM, Damien Le Moal wrote:
-> Memory backed or zoned null block devices may generate actual request
-> timeout errors due to the submission path being blocked on memory
-> allocation or zone locking. Unlike fake timeouts or injected timeouts,
-> the request submission path will call blk_mq_complete_request() or
-> blk_mq_end_request() for these real timeout errors, causing a double
-> completion and use after free situation as the block layer timeout
-> handler executes blk_mq_rq_timed_out() and __blk_mq_free_request() in
-> blk_mq_check_expired(). This problem often triggers a NULL pointer
-> dereference such as:
-> 
-> BUG: kernel NULL pointer dereference, address: 0000000000000050
-> RIP: 0010:blk_mq_sched_mark_restart_hctx+0x5/0x20
-> ...
-> Call Trace:
->   dd_finish_request+0x56/0x80
->   blk_mq_free_request+0x37/0x130
->   null_handle_cmd+0xbf/0x250 [null_blk]
->   ? null_queue_rq+0x67/0xd0 [null_blk]
->   blk_mq_dispatch_rq_list+0x122/0x850
->   __blk_mq_do_dispatch_sched+0xbb/0x2c0
->   __blk_mq_sched_dispatch_requests+0x13d/0x190
->   blk_mq_sched_dispatch_requests+0x30/0x60
->   __blk_mq_run_hw_queue+0x49/0x90
->   process_one_work+0x26c/0x580
->   worker_thread+0x55/0x3c0
->   ? process_one_work+0x580/0x580
->   kthread+0x134/0x150
->   ? kthread_create_worker_on_cpu+0x70/0x70
->   ret_from_fork+0x1f/0x30
-> 
-> This problem very often triggers when running the full btrfs xfstests
-> on a memory-backed zoned null block device in a VM with limited amount
-> of memory.
-> 
-> Avoid this by executing blk_mq_complete_request() in null_timeout_rq()
-> only for commands that are marked for a fake timeout completion using
-> the fake_timeout boolean in struct null_cmd. For timeout errors injected
-> through debugfs, the timeout handler will execute
-> blk_mq_complete_request()i as before. This is safe as the submission
-> path does not execute complete requests in this case.
-> 
-> In null_timeout_rq(), also make sure to set the command error field to
-> BLK_STS_TIMEOUT and to propagate this error through to the request
-> completion.
+On Thu, Apr 1, 2021 at 2:56 PM Yufen Yu <yuyufen@huawei.com> wrote:
+>
+> Recently, our syzbot test reported NULL pointer dereference in
+> device_del() by injecting memory allocation fail in device_add().
+>
+> For now, callers of device_add(), such as add_disk(), may ignore
+> device_add()'s fail and go on working. In unregister path, it will
+> call device_del() from del_gendisk(). That can cause various NULL
+> pointer dereference, including dev->p is NULL in kill_device(),
+> 'name' is NULL in sysfs_remove_link(), kobj->sd is 'NULL' when call
+> dpm_sysfs_remove(), and so on.
+>
+> To avoid these kernel panic, we call device_del() only when device_add()
+> is success.
 
-Applied, thanks.
+The patch looks reasonable to me, but the above is not what it does.
 
--- 
-Jens Axboe
+It causes device_del() to be a no-op for devices that have not been
+successfully added.
 
+> Signed-off-by: Yufen Yu <yuyufen@huawei.com>
+> ---
+>  drivers/base/core.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/drivers/base/core.c b/drivers/base/core.c
+> index f29839382f81..a10ec5dbc577 100644
+> --- a/drivers/base/core.c
+> +++ b/drivers/base/core.c
+> @@ -3380,6 +3380,9 @@ void device_del(struct device *dev)
+>         struct class_interface *class_intf;
+>         unsigned int noio_flag;
+>
+> +       if (!dev->p)
+> +               return;
+> +
+>         device_lock(dev);
+>         kill_device(dev);
+>         device_unlock(dev);
+> --
