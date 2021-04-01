@@ -2,130 +2,126 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 310FCC43461
-	for <linux-block@archiver.kernel.org>; Thu,  1 Apr 2021 17:58:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91659C43470
+	for <linux-block@archiver.kernel.org>; Thu,  1 Apr 2021 18:03:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 101866112F
-	for <linux-block@archiver.kernel.org>; Thu,  1 Apr 2021 17:58:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 626C96112E
+	for <linux-block@archiver.kernel.org>; Thu,  1 Apr 2021 18:03:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236819AbhDAR6p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 1 Apr 2021 13:58:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60882 "EHLO
+        id S236308AbhDASDN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 1 Apr 2021 14:03:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236890AbhDARzg (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Apr 2021 13:55:36 -0400
-Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 660A6C05BD20
-        for <linux-block@vger.kernel.org>; Thu,  1 Apr 2021 06:01:23 -0700 (PDT)
-Received: by mail-ej1-x632.google.com with SMTP id jy13so2770752ejc.2
-        for <linux-block@vger.kernel.org>; Thu, 01 Apr 2021 06:01:23 -0700 (PDT)
+        with ESMTP id S236288AbhDAR5l (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 1 Apr 2021 13:57:41 -0400
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D0AAC05BD33
+        for <linux-block@vger.kernel.org>; Thu,  1 Apr 2021 06:04:09 -0700 (PDT)
+Received: by mail-pl1-x634.google.com with SMTP id f17so1014347plr.0
+        for <linux-block@vger.kernel.org>; Thu, 01 Apr 2021 06:04:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linbit-com.20150623.gappssmtp.com; s=20150623;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=DKucwrvqnS4ht56NCdJBx9ixTsgm/R5Veio9TkNchd4=;
-        b=vU5K+nMRwdzl1ovjDPA/LcNRYNCAK+kL3SOr5YE4ZFIgc2bgUQofJFw3K1pi8nCj/F
-         5usKW5GoZ19gPKAuTc49VuOwyGi9u6ao6UbCdpVYGc8F47h7ELB+tD3TQoQkuA3O47kL
-         x5OYsOLIzkX4tHnmQeQ3RgiVrNCzpxsF8l0Ic1GwaYD8SKOL1TKHFvfv1j+ECET85lun
-         jxTE3qQy0/4whF7B8RWXot/WDWrAVWXsMSJ44NrXCRFULgLQr/d4rgfoQDYEtvVrLIqg
-         wTF6OpHP7wxFFCort23WIr1aqPZn2bnlUQItRt4/H/fy3oA0cC4dnETDFnatvlS6u7rS
-         rEnA==
+        bh=02h3yuYtCDeLrFtLERehN2koHoxziGpmS6QEtH714RU=;
+        b=c9P77fxGGLlXuO1I1cSLHtXkwUM5dXul4sy1noUL2RhzIQsqc7bVRe1jjr9Pr0d0qK
+         IQWIHcwWqSgEojqw4knzoSr5J4j0QqbAwc39gN5bowgOP1OiMT+OxMJZITVsvK7QBgoa
+         t3LTysUxug2yRB8IQ9fS+QAX2IGqJtk7yUHR5mZEt9PHZjQKUUX4Q8mf/6grd03NGNFH
+         QU6jT2ZEKbU26yqSdlNLzpn0Q6143V0khY12A7pLWsWFS/C1DiS2HbThguKM56Nzaw/K
+         15vrqRqwtQM0+cvg6ME70S9ZSlDUTCM51yb2ASu4oB57bRQrxlYSM5dlMXUNvSHq3RcU
+         G7ww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=DKucwrvqnS4ht56NCdJBx9ixTsgm/R5Veio9TkNchd4=;
-        b=O2BVQa6vBGI0wIxg6ixiNhvSBJ7HT/3RFLAOCSuF9mRBbdud12k2XcTgCgc8gUJkfb
-         WeJWsmaZcwGQ4bY2URQP+hMjePTrdiQ/XYDqEQnz4okt/fImtMugPme93044dEpj7a5D
-         XRiMAb+hEt7DneQajnzsz0j8zBp2eTURl3rrYIX3UkMFCKl84/6GfqRGDyltee/8kReZ
-         42paZVEs++HDftnmkxhM+OTI1IixDe2rXJ9pSITYYKK84pIXM6dFt/5V8qj1+Yc6wkxR
-         dHW7pRrY4A5Og2COzxKep6/4LuaNokZREvGLGuWLEt49SZMae0w4AMvq/FwUCNZq2yy/
-         QOEg==
-X-Gm-Message-State: AOAM533WBUwOYt7k2O18lnNeHDiU1rkxPbGXFv4VxVMj+DH7V3VaC2PF
-        mRmjIKCYpeDPdiH7RXnmUl4MhA==
-X-Google-Smtp-Source: ABdhPJw0Q0FmAEQV3rWyMyG72YjzxQat9aGGgn5eiai9dSLSwA7qAsnC7lnjcZuTYBRQB3d8XNHq0Q==
-X-Received: by 2002:a17:907:7683:: with SMTP id jv3mr8912633ejc.450.1617282082032;
-        Thu, 01 Apr 2021 06:01:22 -0700 (PDT)
-Received: from linux.fritz.box (85-127-190-169.dsl.dynamic.surfer.at. [85.127.190.169])
-        by smtp.gmail.com with ESMTPSA id k12sm3467494edo.50.2021.04.01.06.01.21
+        bh=02h3yuYtCDeLrFtLERehN2koHoxziGpmS6QEtH714RU=;
+        b=KyirKLh8dPkxmjb0ZOz+jDxjy2KOQuj74a15vLJ9YnQGOy+b0n4UQsYI9xpdCeNkzn
+         PVL5EQHh5Qk5a9BF10/9pHQAWLLe6+LB+Kt0IZS8Whpe2j4MQqn+H5SfLX9w/CmpMZ0B
+         raG5QmpcXFn1Flox0lY8/yBT230BN4Kj0cpqz8qX5ZXZvs1ziKebZXBwMs+xFEaEKlok
+         m65Noo/Eu9g8zqL5MaGF1eestsYf41mQzVhHvtN1W+pTrfwmUakRbwsEjDleqYNVnxkR
+         pmPIgtKAw7IH/bCuLfgukJYSP7g6lDjuWAO0f1blvb14gO47fYFuu/UqJ8wmZKu2Zonr
+         6aDg==
+X-Gm-Message-State: AOAM532wYQ0VJyk+c+giTsCHwagabm5CvS5wyI4RGM5VZwHROMGKKswy
+        k9oswCZzI+LaTO4zNb97MZuBiGdHYsMLWQ==
+X-Google-Smtp-Source: ABdhPJzLwMrkCL7oi6nmY9pT+fmHMLiQPQFmeMGnz3yBvJ/Z7O05ATkXWC22XrJ4P3VCb1QTVVS8rg==
+X-Received: by 2002:a17:902:c389:b029:e7:1029:8ba5 with SMTP id g9-20020a170902c389b02900e710298ba5mr7894337plg.55.1617282248993;
+        Thu, 01 Apr 2021 06:04:08 -0700 (PDT)
+Received: from [192.168.1.134] ([66.219.217.173])
+        by smtp.gmail.com with ESMTPSA id y15sm6942053pgi.31.2021.04.01.06.04.07
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 01 Apr 2021 06:01:21 -0700 (PDT)
-Subject: Re: [Drbd-dev] [PATCH] drbd: Fix a use after free in
- get_initial_state
-To:     Lv Yunlong <lyl2019@mail.ustc.edu.cn>
-Cc:     philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
-        axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, drbd-dev@lists.linbit.com
-References: <20210401115753.3684-1-lyl2019@mail.ustc.edu.cn>
-From:   =?UTF-8?Q?Christoph_B=c3=b6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>
-Message-ID: <cb0f43e4-bfde-ac77-5153-f2f3cbed0172@linbit.com>
-Date:   Thu, 1 Apr 2021 15:01:20 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.0
+        Thu, 01 Apr 2021 06:04:07 -0700 (PDT)
+Subject: Re: [PATCH] null_blk: fix command timeout completion handling
+To:     Damien Le Moal <damien.lemoal@wdc.com>, linux-block@vger.kernel.org
+Cc:     Johannes Thumshirn <johannes.thumshirn@wdc.com>
+References: <20210331225244.126426-1-damien.lemoal@wdc.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <5993cd68-2e5a-af12-ed22-a2602c8ad6c3@kernel.dk>
+Date:   Thu, 1 Apr 2021 07:04:06 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210401115753.3684-1-lyl2019@mail.ustc.edu.cn>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20210331225244.126426-1-damien.lemoal@wdc.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/1/21 1:57 PM, Lv Yunlong wrote:
-> In get_initial_state, it calls notify_initial_state_done(skb,..) if
-> cb->args[5]==1. I see that if genlmsg_put() failed in
-> notify_initial_state_done(), the skb will be freed by nlmsg_free(skb).
-> Then get_initial_state will goto out and the freed skb will be used by
-> return value skb->len.
+On 3/31/21 4:52 PM, Damien Le Moal wrote:
+> Memory backed or zoned null block devices may generate actual request
+> timeout errors due to the submission path being blocked on memory
+> allocation or zone locking. Unlike fake timeouts or injected timeouts,
+> the request submission path will call blk_mq_complete_request() or
+> blk_mq_end_request() for these real timeout errors, causing a double
+> completion and use after free situation as the block layer timeout
+> handler executes blk_mq_rq_timed_out() and __blk_mq_free_request() in
+> blk_mq_check_expired(). This problem often triggers a NULL pointer
+> dereference such as:
 > 
-> My patch lets skb_len = skb->len and return the skb_len to avoid the uaf.
+> BUG: kernel NULL pointer dereference, address: 0000000000000050
+> RIP: 0010:blk_mq_sched_mark_restart_hctx+0x5/0x20
+> ...
+> Call Trace:
+>   dd_finish_request+0x56/0x80
+>   blk_mq_free_request+0x37/0x130
+>   null_handle_cmd+0xbf/0x250 [null_blk]
+>   ? null_queue_rq+0x67/0xd0 [null_blk]
+>   blk_mq_dispatch_rq_list+0x122/0x850
+>   __blk_mq_do_dispatch_sched+0xbb/0x2c0
+>   __blk_mq_sched_dispatch_requests+0x13d/0x190
+>   blk_mq_sched_dispatch_requests+0x30/0x60
+>   __blk_mq_run_hw_queue+0x49/0x90
+>   process_one_work+0x26c/0x580
+>   worker_thread+0x55/0x3c0
+>   ? process_one_work+0x580/0x580
+>   kthread+0x134/0x150
+>   ? kthread_create_worker_on_cpu+0x70/0x70
+>   ret_from_fork+0x1f/0x30
 > 
-> Fixes: a29728463b254 ("drbd: Backport the "events2" command")
-> Signed-off-by: Lv Yunlong <lyl2019@mail.ustc.edu.cn>
-> ---
->   drivers/block/drbd/drbd_nl.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
+> This problem very often triggers when running the full btrfs xfstests
+> on a memory-backed zoned null block device in a VM with limited amount
+> of memory.
 > 
-> diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c
-> index bf7de4c7b96c..474f84675d0a 100644
-> --- a/drivers/block/drbd/drbd_nl.c
-> +++ b/drivers/block/drbd/drbd_nl.c
-> @@ -4905,6 +4905,7 @@ static int get_initial_state(struct sk_buff *skb, struct netlink_callback *cb)
->   	struct drbd_state_change *state_change = (struct drbd_state_change *)cb->args[0];
->   	unsigned int seq = cb->args[2];
->   	unsigned int n;
-> +	unsigned int skb_len = skb->len;
->   	enum drbd_notification_type flags = 0;
->   
->   	/* There is no need for taking notification_mutex here: it doesn't
-> @@ -4915,7 +4916,7 @@ static int get_initial_state(struct sk_buff *skb, struct netlink_callback *cb)
->   	cb->args[5]--;
->   	if (cb->args[5] == 1) {
->   		notify_initial_state_done(skb, seq);
-> -		goto out;
-> +		return skb_len;
->   	}
->   	n = cb->args[4]++;
->   	if (cb->args[4] < cb->args[3])
+> Avoid this by executing blk_mq_complete_request() in null_timeout_rq()
+> only for commands that are marked for a fake timeout completion using
+> the fake_timeout boolean in struct null_cmd. For timeout errors injected
+> through debugfs, the timeout handler will execute
+> blk_mq_complete_request()i as before. This is safe as the submission
+> path does not execute complete requests in this case.
 > 
+> In null_timeout_rq(), also make sure to set the command error field to
+> BLK_STS_TIMEOUT and to propagate this error through to the request
+> completion.
 
-Thanks for the patch!
-
-I think the problem goes even further: skb can also be freed in the 
-notify_*_state_change -> notify_*_state calls below.
-
-Also, at the point where we save skb->len into skb_len, skb is not 
-initialized yet. Maybe it makes more sense to not return a length in the 
-first place here, but an error code instead.
+Applied, thanks.
 
 -- 
-Christoph Böhmwalder
-LINBIT | Keeping the Digital World Running
-DRBD HA —  Disaster Recovery — Software defined Storage
+Jens Axboe
+
