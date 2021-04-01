@@ -2,63 +2,81 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDAB3C433ED
-	for <linux-block@archiver.kernel.org>; Thu,  1 Apr 2021 00:55:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 138EFC433ED
+	for <linux-block@archiver.kernel.org>; Thu,  1 Apr 2021 01:19:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8CF50610CB
-	for <linux-block@archiver.kernel.org>; Thu,  1 Apr 2021 00:55:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B479961077
+	for <linux-block@archiver.kernel.org>; Thu,  1 Apr 2021 01:19:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232789AbhDAAzV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 31 Mar 2021 20:55:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23243 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232782AbhDAAzG (ORCPT
+        id S231620AbhDABS5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 31 Mar 2021 21:18:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45018 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229486AbhDABS0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 31 Mar 2021 20:55:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617238506;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=WpC/+2DCWYSR48tBQKKUf11MkuPyQvJ3mEtYtH3+QPo=;
-        b=HOYFR1nmxTY0N1PnAcv30rLT2W5Ap9r0g/VaZMGfWB6meueb+IH+YBC7tdFUKj+bcVNSUY
-        AtOKasBHwWokexNfxBED5pwVxsZvwIA9g1STkP1+tXAapW4dOd+7Lxjpm8dcoMvGGPgu9d
-        rtjNy2NLnnhPf42m8qrY428hOoHjMGQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-484-KyIrvTB8PAytMXAafZPTrg-1; Wed, 31 Mar 2021 20:55:03 -0400
-X-MC-Unique: KyIrvTB8PAytMXAafZPTrg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 73AF7107ACCA;
-        Thu,  1 Apr 2021 00:55:02 +0000 (UTC)
-Received: from T590 (ovpn-12-93.pek2.redhat.com [10.72.12.93])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id AFCC45C1BB;
-        Thu,  1 Apr 2021 00:54:54 +0000 (UTC)
-Date:   Thu, 1 Apr 2021 08:54:49 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Yufen Yu <yuyufen@huawei.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org, hch@lst.de,
-        bvanassche@acm.org, kbusch@kernel.org
+        Wed, 31 Mar 2021 21:18:26 -0400
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03861C061574
+        for <linux-block@vger.kernel.org>; Wed, 31 Mar 2021 18:18:26 -0700 (PDT)
+Received: by mail-pg1-x52f.google.com with SMTP id h25so534427pgm.3
+        for <linux-block@vger.kernel.org>; Wed, 31 Mar 2021 18:18:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=gwm6IUe1wkh4SgCMiSRN9banOffkLbnFdJqYNato/r4=;
+        b=Hqvun3EvAgEXKcsG8/6rRia9Pya6VpGRX/xNVC53epbEGAczD0tZllnWOjwdJG+vAP
+         MZW525b8knsFgyy+fwQ0mbrwj3Tb4buEzfcFsW5pbyTMEVarQso+P5DpvdQiDpltoGnk
+         6oRnZMYyxrlgmxByK0kP2PzGstn+LLz1eNPYhYHMnqotUv1Edjr8StsLJpKZyYCUcptt
+         cu/jtxP40Zlz7+zq4mg6CV9qxhpcKPfuJFROvEePIfH7yUzUARmp8qBibSqRISbpMCSM
+         Svtasw0KrCGq5wTqJUyScILAWkwmSNJrUV2lLNop7+9PjGyPVNuBmUbVPRMwi6pefY7t
+         oE3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=gwm6IUe1wkh4SgCMiSRN9banOffkLbnFdJqYNato/r4=;
+        b=BpT7yI8X1tdAmNb1rpZbvhmOaMD1qvhUOWwORdAH6vxqGJPTZ7N18l2L+56f07UOBv
+         TMiGqH6pi9w+2sjWG2lKLI5oBVxKxacWpRAMKVlrzPrSV21my/SueOHoZfm0ZaGhjMWp
+         XWghEfIuN94mbkco1Q6LrOImfp4qnfKeux4OU8+eAo5000B3InoU5Om84vm65cjuggsR
+         GWn/aZtndyC2ZWvUqqcjMHzX8jwTPKUqmCBA58VIkLVhKIGAfFKym/AdHCRgqmU4Q+ob
+         zpb+gMsK+2YGck71Pg3NRU0dM+poktAxk5vChY75raTsqIKZJukDzcRIz/XJgb4nKCC8
+         5O5g==
+X-Gm-Message-State: AOAM533YoFOhzID/Yo6ma7OJqN6s+5Lc6QdppR1eOiocxMkAmFkIFDCt
+        HemaEXeKarO4OziDCpo0oGyiDw==
+X-Google-Smtp-Source: ABdhPJwA9DdJMRLSNQcHBU+zM8VrjFuY19gkVCAtaqySxpDzCumHHq00j5jGqxDvZnHy6cZJZLNDhw==
+X-Received: by 2002:a63:2318:: with SMTP id j24mr5641005pgj.134.1617239905554;
+        Wed, 31 Mar 2021 18:18:25 -0700 (PDT)
+Received: from [192.168.1.134] ([66.219.217.173])
+        by smtp.gmail.com with ESMTPSA id r1sm3917519pfh.153.2021.03.31.18.18.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 31 Mar 2021 18:18:25 -0700 (PDT)
 Subject: Re: [PATCH] block: only update parent bi_status when bio fail
-Message-ID: <YGUZ2SYCi1EkNcvh@T590>
+To:     Yufen Yu <yuyufen@huawei.com>
+Cc:     linux-block@vger.kernel.org, hch@lst.de, ming.lei@redhat.com,
+        bvanassche@acm.org, kbusch@kernel.org
 References: <20210331115359.1125679-1-yuyufen@huawei.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <3afcc0a1-d01b-5007-2621-231e7d8143e9@kernel.dk>
+Date:   Wed, 31 Mar 2021 19:18:23 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 In-Reply-To: <20210331115359.1125679-1-yuyufen@huawei.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 31, 2021 at 07:53:59AM -0400, Yufen Yu wrote:
+On 3/31/21 5:53 AM, Yufen Yu wrote:
 > For multiple split bios, if one of the bio is fail, the whole
 > should return error to application. But we found there is a race
 > between bio_integrity_verify_fn and bio complete, which return
@@ -102,34 +120,9 @@ On Wed, Mar 31, 2021 at 07:53:59AM -0400, Yufen Yu wrote:
 > bios, these bios may complete on different hw queue and different
 > irq vector. Then the concurrency update parent bi_status may
 > cause the final status error.
-> 
-> Suggested-by: Keith Busch <kbusch@kernel.org>
-> Signed-off-by: Yufen Yu <yuyufen@huawei.com>
-> ---
->  block/bio.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/block/bio.c b/block/bio.c
-> index 26b7f721cda8..f49713ff8ad3 100644
-> --- a/block/bio.c
-> +++ b/block/bio.c
-> @@ -277,7 +277,7 @@ static struct bio *__bio_chain_endio(struct bio *bio)
->  {
->  	struct bio *parent = bio->bi_private;
->  
-> -	if (!parent->bi_status)
-> +	if (bio->bi_status && !parent->bi_status)
->  		parent->bi_status = bio->bi_status;
->  	bio_put(bio);
->  	return parent;
-> -- 
-> 2.25.4
-> 
 
-Looks fine:
-
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Applied, thanks.
 
 -- 
-Ming
+Jens Axboe
 
