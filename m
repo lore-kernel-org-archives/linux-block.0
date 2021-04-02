@@ -2,88 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12C38C433B4
-	for <linux-block@archiver.kernel.org>; Fri,  2 Apr 2021 14:34:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 375B6C433ED
+	for <linux-block@archiver.kernel.org>; Fri,  2 Apr 2021 15:06:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BDAA6610D1
-	for <linux-block@archiver.kernel.org>; Fri,  2 Apr 2021 14:34:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0FDE66112F
+	for <linux-block@archiver.kernel.org>; Fri,  2 Apr 2021 15:06:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235550AbhDBOeG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 2 Apr 2021 10:34:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46910 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235522AbhDBOeF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 2 Apr 2021 10:34:05 -0400
-Received: from mail-il1-x131.google.com (mail-il1-x131.google.com [IPv6:2607:f8b0:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B79EFC0613E6
-        for <linux-block@vger.kernel.org>; Fri,  2 Apr 2021 07:34:04 -0700 (PDT)
-Received: by mail-il1-x131.google.com with SMTP id f5so859682ilr.9
-        for <linux-block@vger.kernel.org>; Fri, 02 Apr 2021 07:34:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=AjhyAVgGqryXaOV6wEyhg6s+f795iKTiiY0ZANnHEuI=;
-        b=0+aP60MmXh/lyIkFPbC/qBTX2//RFk6NSzglhgEuuIW0z+OUXTJk+J8Qq0BSoTmZ8w
-         9VDBHN/Jww8Ws9B7ocx072oB3refdGHZgHjXXfOpncXsqM0tdQBteyVeHdUo1bKuuyPU
-         CxGmY38EsQ5xms7JuxpJhI3/4TQdBCFATKWE2nE68vSZmwTBRtO1Yb1Zq3uoBZ95D+Wt
-         NIJAPl+NCUs7Qw191UACDqQ2zGmGOOT+6r3Pp20Oyh9EFQPcKpl3dzZlpfQry6sdlC5Y
-         RSv36MfBmzRwXaFb55xTQPpXe8tTBR/msIR7/Od3WEgR7De9Us2f65Mj1d47ASe4OlmS
-         WN1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=AjhyAVgGqryXaOV6wEyhg6s+f795iKTiiY0ZANnHEuI=;
-        b=OfoblQyGwDMlhDuun1fJr9SI7UixwCPCcAboAAat7xIRjtQhLXZK0QJW1zewymQp8k
-         HuzdHOWaj5gpH73d2KLydKVks35mqOcE60RYGjpEanc+K+JdQ7Ctsk6aNEyT7fa5dnXy
-         CQh77tdGRxPVjQYKkqn4szVGdKtNDsC4NGHrsijGERjPX49i/0/0rDfJorJdFcJ+wcKJ
-         MiQ2eUITTh3xAE0vlNNwFGjLAEXuVCHxUtWArCRBfgU31Mx1hwwiln3BwXuT3lOO5sbZ
-         2Bm3Dl4hyuIl5p95lbbro+sDYomwyU9z74Bs88mzEe4r6iJ8o2C3MbM9z7PkIVXo0rO+
-         GYhA==
-X-Gm-Message-State: AOAM532EYwpIbKR5jJbknyC1h3Inr0kJqvhPdNe6kb/RScqeHGFGQV+b
-        tuCTNUM2J6muJXzL02dvFdHs/Q==
-X-Google-Smtp-Source: ABdhPJzNU0PkHrmtkKATLk7AzsZsYJSh7nSsorriwppzp/uRJhf4RxRg+sizqjI3CL575b056Nvd+Q==
-X-Received: by 2002:a05:6e02:1522:: with SMTP id i2mr11132952ilu.252.1617374044096;
-        Fri, 02 Apr 2021 07:34:04 -0700 (PDT)
-Received: from [192.168.1.30] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id b9sm4586573iob.4.2021.04.02.07.34.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 02 Apr 2021 07:34:03 -0700 (PDT)
-Subject: Re: [PATCH] block: don't ignore REQ_NOWAIT for direct IO
-To:     Pavel Begunkov <asml.silence@gmail.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <546c66d26ae71abc151aa2074c3dd75ff5efb529.1605892141.git.asml.silence@gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <76ea3635-f750-4628-cfa0-1659a3a9376b@kernel.dk>
-Date:   Fri, 2 Apr 2021 08:34:03 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S231160AbhDBPG3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 2 Apr 2021 11:06:29 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57734 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229553AbhDBPG3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 2 Apr 2021 11:06:29 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 3409361103;
+        Fri,  2 Apr 2021 15:06:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1617375987;
+        bh=Zz61+Zv+0eQq6UNIJIIuqH0bH3OpUwYDc4oQL8V3jq8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Px4srRQ2HP1H9cR723OYPVptqskOEl4eynqXNC2SML4LPE6/1Oiom0rTq429gBMmc
+         j/De5i4vBBE9pDUO7BRkOT6/ZaNfj+8NtymcedhKh2QOYuYDzV5uELhG03kG6nVQBV
+         JJkxxrAc0hmSRito8+UeHuFMFRtnU73npB+nozgU=
+Date:   Fri, 2 Apr 2021 17:06:25 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Yufen Yu <yuyufen@huawei.com>
+Cc:     linux-kernel@vger.kernel.org, rafael@kernel.org, axboe@kernel.dk,
+        hch@lst.de, linux-block@vger.kernel.org
+Subject: Re: [PATCH] drivers core: don't do anything in device_del() when
+ device_add() fail
+Message-ID: <YGcy8amoQiYX48xL@kroah.com>
+References: <20210401130138.2164928-1-yuyufen@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <546c66d26ae71abc151aa2074c3dd75ff5efb529.1605892141.git.asml.silence@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210401130138.2164928-1-yuyufen@huawei.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/20/20 10:10 AM, Pavel Begunkov wrote:
-> io_uring's direct nowait requests end up waiting on io_schedule() in
-> sbitmap, that's seems to be so because blkdev_direct_IO() fails to
-> propagate IOCB_NOWAIT to a bio and hence to blk-mq.
+On Thu, Apr 01, 2021 at 09:01:38AM -0400, Yufen Yu wrote:
+> Recently, our syzbot test reported NULL pointer dereference in
+> device_del() by injecting memory allocation fail in device_add().
 
-Thanks, applied. This slipped through the cracks, and I didn't notice
-until I went and directly tested some of this...
+Don't do that :)
 
-iomap suffers from the same issue, fwiw.
+> For now, callers of device_add(), such as add_disk(), may ignore
+> device_add()'s fail and go on working.
 
--- 
-Jens Axboe
+Please fix up those users, if device_add() fails there is no need to
+call device_del().
 
+> In unregister path, it will
+> call device_del() from del_gendisk(). That can cause various NULL
+> pointer dereference, including dev->p is NULL in kill_device(),
+> 'name' is NULL in sysfs_remove_link(), kobj->sd is 'NULL' when call
+> dpm_sysfs_remove(), and so on.
+> 
+> To avoid these kernel panic, we call device_del() only when device_add()
+> is success.
+
+As Rafael said, that's not what you are doing here, so even if I wanted
+to take this patch, I can't.
+
+> 
+> Signed-off-by: Yufen Yu <yuyufen@huawei.com>
+> ---
+>  drivers/base/core.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/drivers/base/core.c b/drivers/base/core.c
+> index f29839382f81..a10ec5dbc577 100644
+> --- a/drivers/base/core.c
+> +++ b/drivers/base/core.c
+> @@ -3380,6 +3380,9 @@ void device_del(struct device *dev)
+>  	struct class_interface *class_intf;
+>  	unsigned int noio_flag;
+>  
+> +	if (!dev->p)
+> +		return;
+
+Also, this isn't a good test as it's not obvious what you are trying to
+check for here.
+
+thanks,
+
+greg k-h
