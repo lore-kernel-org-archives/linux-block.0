@@ -2,197 +2,123 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03100C433ED
-	for <linux-block@archiver.kernel.org>; Sat,  3 Apr 2021 09:05:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD206C433B4
+	for <linux-block@archiver.kernel.org>; Sat,  3 Apr 2021 16:58:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C26DF61210
-	for <linux-block@archiver.kernel.org>; Sat,  3 Apr 2021 09:05:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9872661220
+	for <linux-block@archiver.kernel.org>; Sat,  3 Apr 2021 16:58:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235604AbhDCJFF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 3 Apr 2021 05:05:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:60091 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236440AbhDCJFF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sat, 3 Apr 2021 05:05:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617440702;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=GHdvJGYwSTRvs/+kkZxZ2UvghQjRHwXsjaQRu47DCMY=;
-        b=YPHKbbo2Q16BHjOGPnPtOQO1IzTIQpRw9rkUepfak46DVjxS0s2PziWK3CKxP+mwqIDwaG
-        1sI3uw2XDAGCAjg29PhSzjICMvMu6BO2Zz7PsH5V1yLlmYw8GnuRc2+udyMiOZWG1CaTME
-        AenDm0vCfhmCFVq2bG+19l+xUP8ejgg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-568-l4C8PxvPN9yU2QMMY8PFUA-1; Sat, 03 Apr 2021 05:04:59 -0400
-X-MC-Unique: l4C8PxvPN9yU2QMMY8PFUA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1F122107ACCA;
-        Sat,  3 Apr 2021 09:04:58 +0000 (UTC)
-Received: from T590 (ovpn-12-28.pek2.redhat.com [10.72.12.28])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id CECDD19D61;
-        Sat,  3 Apr 2021 09:04:51 +0000 (UTC)
-Date:   Sat, 3 Apr 2021 17:04:47 +0800
-From:   Ming Lei <ming.lei@redhat.com>
+        id S236809AbhDCQ6d (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 3 Apr 2021 12:58:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48226 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236364AbhDCQ6c (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 3 Apr 2021 12:58:32 -0400
+Received: from angie.orcam.me.uk (angie.orcam.me.uk [IPv6:2001:4190:8020::4])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B4BB2C0613E6;
+        Sat,  3 Apr 2021 09:58:29 -0700 (PDT)
+Received: by angie.orcam.me.uk (Postfix, from userid 500)
+        id A2F3692009C; Sat,  3 Apr 2021 18:58:24 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+        by angie.orcam.me.uk (Postfix) with ESMTP id 9644A92009B;
+        Sat,  3 Apr 2021 18:58:24 +0200 (CEST)
+Date:   Sat, 3 Apr 2021 18:58:24 +0200 (CEST)
+From:   "Maciej W. Rozycki" <macro@orcam.me.uk>
 To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] block: shutdown blktrace in case of fatal signal
- pending
-Message-ID: <YGgvrxiQUTQMfUeN@T590>
-References: <20210323081440.81343-1-ming.lei@redhat.com>
- <20210323081440.81343-2-ming.lei@redhat.com>
- <20210330165330.GA13829@lst.de>
- <YGO/cpalyGevAJjn@T590>
- <20210402172730.GA22923@lst.de>
- <YGgi6FOr6cEiei+7@T590>
+cc:     Jens Axboe <axboe@kernel.dk>, Khalid Aziz <khalid@gonehiking.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Hannes Reinecke <hare@suse.com>,
+        Ondrej Zary <linux@rainbow-software.org>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH 2/8] Buslogic: remove ISA support
+In-Reply-To: <20210331073001.46776-3-hch@lst.de>
+Message-ID: <alpine.DEB.2.21.2104031805520.18977@angie.orcam.me.uk>
+References: <20210331073001.46776-1-hch@lst.de> <20210331073001.46776-3-hch@lst.de>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YGgi6FOr6cEiei+7@T590>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Apr 03, 2021 at 04:10:16PM +0800, Ming Lei wrote:
-> On Fri, Apr 02, 2021 at 07:27:30PM +0200, Christoph Hellwig wrote:
-> > On Wed, Mar 31, 2021 at 08:16:50AM +0800, Ming Lei wrote:
-> > > On Tue, Mar 30, 2021 at 06:53:30PM +0200, Christoph Hellwig wrote:
-> > > > On Tue, Mar 23, 2021 at 04:14:39PM +0800, Ming Lei wrote:
-> > > > > blktrace may allocate lots of memory, if the process is terminated
-> > > > > by user or OOM, we need to provide one chance to remove the trace
-> > > > > buffer, otherwise memory leak may be caused.
-> > > > > 
-> > > > > Fix the issue by shutdown blktrace in case of task exiting in
-> > > > > blkdev_close().
-> > > > > 
-> > > > > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > > > 
-> > > > This just seems weird.  blktrace has no relationship to open
-> > > > block device instances.
-> > > 
-> > > blktrace still needs to open one blkdev, then send its own ioctl
-> > > commands to block layer. In case of OOM, the allocated memory in
-> > > these ioctl commands won't be released.
-> > > 
-> > > Or any other suggestion?
-> > 
-> > Not much we can do there I think.  If we want to autorelease memory
-> > it needs to be an API that ties the memory allocation to an FD.
-> 
-> We still may shutdown blktrace if current is the last opener, otherwise
-> new blktrace can't be started and memory should be leaked forever, and
-> what do you think of the revised version?
+On Wed, 31 Mar 2021, Christoph Hellwig wrote:
 
-This way seems not good enough, another better one is to use
-file->private_data for such purpose since blkdev fs doesn't use
-file->privete_data, then we can shutdown blktrace just for the
-blktrace FD:
+> The ISA support in Buslogic has been broken for a long time, as all
+> the I/O path expects a struct device for DMA mapping that is derived from
+> the PCI device, which would simply crash for ISA adapters.
 
-From 191dff30abfd48c38a78dec78e011a39a3b606ca Mon Sep 17 00:00:00 2001
-From: Ming Lei <ming.lei@redhat.com>
-Date: Tue, 23 Mar 2021 10:32:23 +0800
-Subject: [PATCH] block: shutdown blktrace in case of task exiting
+ With my new server in place I can experiment more with the old one, so I 
+have decided to upgrade it from venerable 2.6.18 and give your change a 
+try with the BT-958 to verify it does not cause a regression, but there is 
+something wrong even without it:
 
-blktrace may allocate lots of memory, if the process is terminated
-by user or OOM, we need to provide one chance to remove the trace
-buffer, otherwise memory leak may be caused. Also new blktrace
-instance can't be started too.
+pci 0000:00:13.0: PCI->APIC IRQ transform: INT A -> IRQ 17
+scsi: ***** BusLogic SCSI Driver Version 2.1.17 of 12 September 2013 *****
+scsi: Copyright 1995-1998 by Leonard N. Zubkoff <lnz@dandelion.com>
+scsi0: Configuring BusLogic Model BT-958 PCI Wide Ultra SCSI Host Adapter
+scsi0:   Firmware Version: 5.07B, I/O Address: 0x7000, IRQ Channel: 17/Level
+scsi0:   PCI Bus: 0, Device: 19, Address:
+0xE0012000,
+Host Adapter SCSI ID: 7
+scsi0:   Parity Checking: Enabled, Extended Translation: Enabled
+scsi0:   Synchronous Negotiation: Ultra, Wide Negotiation: Enabled
+scsi0:   Disconnect/Reconnect: Enabled, Tagged Queuing: Enabled
+scsi0:   Scatter/Gather Limit: 128 of 8192 segments, Mailboxes: 211
+scsi0:   Driver Queue Depth: 211, Host Adapter Queue Depth: 192
+scsi0:   Tagged Queue Depth:
+Automatic
+, Untagged Queue Depth: 3
+scsi0:   SCSI Bus Termination: Both Enabled
+, SCAM: Disabled
 
-Fix the issue by shutdown blktrace in bdev_close() if blktrace
-was setup on this FD.
+scsi0: *** BusLogic BT-958 Initialized Successfully ***
+scsi host0: BusLogic BT-958
+scsi 0:0:0:0: Direct-Access     IBM      DDYS-T18350M     SA5A PQ: 0 ANSI: 3
+scsi 0:0:1:0: Direct-Access     SEAGATE  ST336607LW       0006 PQ: 0 ANSI: 3
+scsi 0:0:5:0: Direct-Access     IOMEGA   ZIP 100          E.08 PQ: 0 ANSI: 2
+st: Version 20160209, fixed bufsize 32768, s/g segs 256
+sd 0:0:0:0: [sda] 35843670 512-byte logical blocks: (18.4 GB/17.1 GiB)
+sd 0:0:1:0: [sdb] 71687372 512-byte logical blocks: (36.7 GB/34.2 GiB)
+sd 0:0:0:0: [sda] Write Protect is off
+sd 0:0:5:0: [sdc] Attached SCSI removable disk
+sd 0:0:1:0: [sdb] Write Protect is off
+sd 0:0:0:0: [sda] Write cache: enabled, read cache: enabled, doesn't support DPO or FUA
+sd 0:0:1:0: [sdb] Write cache: enabled, read cache: enabled, supports DPO and FUA
+scsi0: *** BusLogic BT-958 Initialized Successfully ***
+scsi0: *** BusLogic BT-958 Initialized Successfully ***
+scsi0: *** BusLogic BT-958 Initialized Successfully ***
+scsi0: *** BusLogic BT-958 Initialized Successfully ***
+sd 0:0:0:0: Device offlined - not ready after error recovery
+sd 0:0:1:0: Device offlined - not ready after error recovery
+sd 0:0:1:0: [sdb] Attached SCSI disk
+sd 0:0:0:0: [sda] Attached SCSI disk
+sd 0:0:0:0: Attached scsi generic sg0 type 0
+sd 0:0:1:0: Attached scsi generic sg1 type 0
+sd 0:0:5:0: Attached scsi generic sg2 type 0
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/ioctl.c                |  2 ++
- fs/block_dev.c               | 12 ++++++++++++
- include/linux/blktrace_api.h | 11 +++++++++++
- 3 files changed, 25 insertions(+)
+and obviously the system does not complete booting (root is on /dev/sda2).  
+I'll see if I can bisect the problem and report back.  I don't have a 
+FlashPoint adapter to verify that part of the driver, but I guess for your 
+change alone a MultiMaster one such as mine will suffice.
 
-diff --git a/block/ioctl.c b/block/ioctl.c
-index ff241e663c01..7dad4a546db3 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -611,6 +611,8 @@ long compat_blkdev_ioctl(struct file *file, unsigned cmd, unsigned long arg)
- 	else
- 		mode &= ~FMODE_NDELAY;
- 
-+	blkdev_mark_blktrace(file, cmd);
-+
- 	switch (cmd) {
- 	/* These need separate implementations for the data structure */
- 	case HDIO_GETGEO:
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 92ed7d5df677..aaa7d7d1e5a4 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -34,6 +34,7 @@
- #include <linux/part_stat.h>
- #include <linux/uaccess.h>
- #include <linux/suspend.h>
-+#include <linux/blktrace_api.h>
- #include "internal.h"
- 
- struct bdev_inode {
-@@ -1646,6 +1647,15 @@ EXPORT_SYMBOL(blkdev_put);
- static int blkdev_close(struct inode * inode, struct file * filp)
- {
- 	struct block_device *bdev = I_BDEV(bdev_file_inode(filp));
-+
-+	/*
-+	 * The task running blktrace is supposed to shutdown blktrace
-+	 * by ioctl. If they forget to shutdown or can't do it because
-+	 * of OOM or sort of situation, we shutdown for them.
-+	 */
-+	if (blkdev_has_run_blktrace(filp))
-+		blk_trace_shutdown(bdev->bd_disk->queue);
-+
- 	blkdev_put(bdev, filp->f_mode);
- 	return 0;
- }
-@@ -1664,6 +1674,8 @@ static long block_ioctl(struct file *file, unsigned cmd, unsigned long arg)
- 	else
- 		mode &= ~FMODE_NDELAY;
- 
-+	blkdev_mark_blktrace(file, cmd);
-+
- 	return blkdev_ioctl(bdev, mode, cmd, arg);
- }
- 
-diff --git a/include/linux/blktrace_api.h b/include/linux/blktrace_api.h
-index a083e15df608..754058c1965c 100644
---- a/include/linux/blktrace_api.h
-+++ b/include/linux/blktrace_api.h
-@@ -135,4 +135,15 @@ static inline unsigned int blk_rq_trace_nr_sectors(struct request *rq)
- 	return blk_rq_is_passthrough(rq) ? 0 : blk_rq_sectors(rq);
- }
- 
-+static inline void blkdev_mark_blktrace(struct file *file, unsigned int cmd)
-+{
-+	if (cmd == BLKTRACESETUP)
-+		file->private_data = (void *)-1;
-+}
-+
-+static inline bool blkdev_has_run_blktrace(struct file *file)
-+{
-+	return file->private_data == (void *)-1;
-+}
-+
- #endif
--- 
-2.29.2
+ Also `pr_cont' has not been applied here when `printk' handling was 
+reworked causing messy output, so I'll fix it too on this occasion.
 
+ Last but not least I do hope you do not plan to retire ISA DMA bounce 
+buffering support for drivers/block/floppy.c, as there is hardly an 
+alternative available (I do have a single SCSI<->FDD interface built 
+around an Intel 8080 CPU, in the half-height 5.25" drive form factor, but 
+such devices are exceedingly rare, and then you need a suitable parallel 
+SCSI host too).
 
--- 
-Ming
+ Would it be feasible to convert it and any other drivers for ISA DMA 
+devices (like those support for which you propose to remove here) still 
+have users who could verify operation to the IOMMU framework?
 
+  Maciej
