@@ -7,40 +7,40 @@ X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44906C433ED
-	for <linux-block@archiver.kernel.org>; Mon,  5 Apr 2021 00:28:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C55AC433B4
+	for <linux-block@archiver.kernel.org>; Mon,  5 Apr 2021 00:28:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 23B8361396
+	by mail.kernel.org (Postfix) with ESMTP id EC33161396
 	for <linux-block@archiver.kernel.org>; Mon,  5 Apr 2021 00:28:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231683AbhDEA2y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 4 Apr 2021 20:28:54 -0400
-Received: from mail-pj1-f44.google.com ([209.85.216.44]:44994 "EHLO
-        mail-pj1-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231693AbhDEA2u (ORCPT
+        id S231539AbhDEA2z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 4 Apr 2021 20:28:55 -0400
+Received: from mail-pl1-f173.google.com ([209.85.214.173]:38449 "EHLO
+        mail-pl1-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231695AbhDEA2u (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Sun, 4 Apr 2021 20:28:50 -0400
-Received: by mail-pj1-f44.google.com with SMTP id kk2-20020a17090b4a02b02900c777aa746fso5016951pjb.3
+Received: by mail-pl1-f173.google.com with SMTP id y2so4889018plg.5
         for <linux-block@vger.kernel.org>; Sun, 04 Apr 2021 17:28:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=LaA8KIZ0VXcqVdDQj/0DydbRr9sSS3NXDKIoT3VuFuo=;
-        b=QaxyypayYv5kD+8CFtgynI5CkiPSvC8dcqwBAA6kprcQAusXHHcXnBrlWZcJMtzhfh
-         N8Ib4YZoQrIT1LN7K8yjn/Zw/U2UBTudxg866kiRzyYeAfcUR0wW7/a6FUtp94svmwPv
-         JvSdG4KgfG7Il08ZjrLU38nB6nhsWukygaSs+Hpium+2kZ6tL54aTAtCLh2fUMTAgpVU
-         sSWc0nXHhfC09iMqw5jLe9EY62TpkycP801PCeT3oe5isMeYW2H8iEgQegA3YCcOy0Vc
-         AGc9Y+SgyB1tSNbrq5z4jKDwhw+lx0tfZpM0bBQiGxJXZkYUNAe8PvqafWzE6ePynMn1
-         noPQ==
-X-Gm-Message-State: AOAM530gLNLTevyi7jXShiDagw/itg9V/r24dwyyGV4q2DSi1PsLTrsp
-        h1yMdeGGxzYulrqKeUTUf54=
-X-Google-Smtp-Source: ABdhPJxvAvHAVFT70qQAKtjUWPwcqvXmxTzVMpL43kR0wlMGmfiLen7DHzALBkS9/4HX1og/84b1vQ==
-X-Received: by 2002:a17:902:a406:b029:e6:78c4:71c8 with SMTP id p6-20020a170902a406b02900e678c471c8mr21677497plq.17.1617582523912;
-        Sun, 04 Apr 2021 17:28:43 -0700 (PDT)
+        bh=Gnk/0AxCRdkfnGc9ZWUX0eDmBtldQUJ+EQrskQly+64=;
+        b=X8T0tWXXAojnNb2b6uF2g0+Es2aIXd3wPlL7nLUClnUBXxRojpYpEzVDo0kdNZ/0t8
+         6XbOvR3WX1e+8jhvGbPNLuZixvXr4McsvHAOHMn1r4BN4tttGvVnGyg44gdRXZ4jvN4X
+         d9KkQ6xOl0r75EuUz38pqAs71UpHmRa8pgFnqJA0/QlWNc7Bdc/cGM+mDfpX1N70SrlL
+         vLuQHrtiy7wlUOF0pI9Vi+E2cgihwvTUFxLHizmqpzIx01nZIuuc/xkam5tDpY8/PpCm
+         mVNYlLqmf8vuDFBERJrq655Qyop8Kgnia61c5JCEL0R54sSSqVL55Y3pkXZHqr3OFxtY
+         C20g==
+X-Gm-Message-State: AOAM5313NzMIlZPbZUtBFOUO9Pph2/ouEVqdRqM89SpX3phUfGofKhLD
+        l+uNj339BhPEqIIpCJ26rULKXK5FEhI=
+X-Google-Smtp-Source: ABdhPJzKyxtfuBJFIEUlOLr6CXlYJB+M3Fen/rJqt3O3ybbgbaVI4x7zEv6uOPOgCOXCjKVA6qVmJQ==
+X-Received: by 2002:a17:902:23:b029:e7:32b7:e760 with SMTP id 32-20020a1709020023b02900e732b7e760mr21618201pla.55.1617582525361;
+        Sun, 04 Apr 2021 17:28:45 -0700 (PDT)
 Received: from asus.hsd1.ca.comcast.net ([2601:647:4000:d7:91b0:bd58:a9d0:2f54])
-        by smtp.gmail.com with ESMTPSA id x4sm13444254pfn.134.2021.04.04.17.28.42
+        by smtp.gmail.com with ESMTPSA id x4sm13444254pfn.134.2021.04.04.17.28.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 04 Apr 2021 17:28:43 -0700 (PDT)
+        Sun, 04 Apr 2021 17:28:44 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
@@ -51,9 +51,9 @@ Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Johannes Thumshirn <johannes.thumshirn@wdc.com>,
         John Garry <john.garry@huawei.com>,
         Khazhy Kumykov <khazhy@google.com>
-Subject: [PATCH v5 2/3] blk-mq: Introduce atomic variants of the tag iteration functions
-Date:   Sun,  4 Apr 2021 17:28:33 -0700
-Message-Id: <20210405002834.32339-3-bvanassche@acm.org>
+Subject: [PATCH v5 3/3] blk-mq: Fix a race between iterating over requests and freeing requests
+Date:   Sun,  4 Apr 2021 17:28:34 -0700
+Message-Id: <20210405002834.32339-4-bvanassche@acm.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210405002834.32339-1-bvanassche@acm.org>
 References: <20210405002834.32339-1-bvanassche@acm.org>
@@ -63,27 +63,57 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Since in the next patch knowledge is required of whether or not it is
-allowed to sleep inside the tag iteration functions, pass this context
-information to the tag iteration functions. I have reviewed all callers of
-tag iteration functions to verify these annotations by starting from the
-output of the following grep command:
+When multiple request queues share a tag set and when switching the I/O
+scheduler for one of the request queues associated with that tag set, the
+following race can happen:
+* blk_mq_tagset_busy_iter() calls bt_tags_iter() and bt_tags_iter() assigns
+  a pointer to a scheduler request to the local variable 'rq'.
+* blk_mq_sched_free_requests() is called to free hctx->sched_tags.
+* blk_mq_tagset_busy_iter() dereferences 'rq' and triggers a use-after-free.
 
-    git grep -nHE 'blk_mq_(all_tag|tagset_busy)_iter'
+Fix this race as follows:
+* Use rcu_assign_pointer() and rcu_dereference() to access hctx->tags->rqs[].
+  The performance impact of the assignments added to the hot path is minimal
+  (about 1% according to one particular test).
+* Protect hctx->tags->rqs[] reads with an RCU read-side lock or with a
+  semaphore. Which mechanism is used depends on whether or not it is allowed
+  to sleep and also on whether or not the callback function may sleep.
+* Wait for all preexisting readers to finish before freeing scheduler
+  requests.
 
-My conclusions from that analysis are as follows:
-- Sleeping is allowed in the blk-mq-debugfs code that iterates over tags.
-- Since the blk_mq_tagset_busy_iter() calls in the mtip32xx driver are
-  preceded by a function that sleeps (blk_mq_quiesce_queue()), sleeping is
-  safe in the context of the blk_mq_tagset_busy_iter() calls.
-- The same reasoning also applies to the nbd driver.
-- All blk_mq_tagset_busy_iter() calls in the NVMe drivers are followed by a
-  call to a function that sleeps so sleeping inside blk_mq_tagset_busy_iter()
-  when called from the NVMe driver is fine.
-- scsi_host_busy(), scsi_host_complete_all_commands() and
-  scsi_host_busy_iter() are used by multiple SCSI LLDs so analyzing whether
-  or not these functions may sleep is hard. Instead of performing that
-  analysis, make it safe to call these functions from atomic context.
+Multiple users have reported use-after-free complaints similar to the
+following (from https://lore.kernel.org/linux-block/1545261885.185366.488.camel@acm.org/ ):
+
+BUG: KASAN: use-after-free in bt_iter+0x86/0xf0
+Read of size 8 at addr ffff88803b335240 by task fio/21412
+
+CPU: 0 PID: 21412 Comm: fio Tainted: G        W         4.20.0-rc6-dbg+ #3
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1 04/01/2014
+Call Trace:
+ dump_stack+0x86/0xca
+ print_address_description+0x71/0x239
+ kasan_report.cold.5+0x242/0x301
+ __asan_load8+0x54/0x90
+ bt_iter+0x86/0xf0
+ blk_mq_queue_tag_busy_iter+0x373/0x5e0
+ blk_mq_in_flight+0x96/0xb0
+ part_in_flight+0x40/0x140
+ part_round_stats+0x18e/0x370
+ blk_account_io_start+0x3d7/0x670
+ blk_mq_bio_to_request+0x19c/0x3a0
+ blk_mq_make_request+0x7a9/0xcb0
+ generic_make_request+0x41d/0x960
+ submit_bio+0x9b/0x250
+ do_blockdev_direct_IO+0x435c/0x4c70
+ __blockdev_direct_IO+0x79/0x88
+ ext4_direct_IO+0x46c/0xc00
+ generic_file_direct_write+0x119/0x210
+ __generic_file_write_iter+0x11c/0x280
+ ext4_file_write_iter+0x1b8/0x6f0
+ aio_write+0x204/0x310
+ io_submit_one+0x9d3/0xe80
+ __x64_sys_io_submit+0x115/0x340
+ do_syscall_64+0x71/0x210
 
 Reviewed-by: Christoph Hellwig <hch@lst.de>
 Acked-by: Martin K. Petersen <martin.petersen@oracle.com>
@@ -95,200 +125,261 @@ Cc: John Garry <john.garry@huawei.com>
 Cc: Khazhy Kumykov <khazhy@google.com>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/blk-mq-tag.c        | 38 +++++++++++++++++++++++++++++++++-----
- block/blk-mq-tag.h        |  2 +-
- block/blk-mq.c            |  2 +-
- drivers/scsi/hosts.c      | 16 ++++++++--------
- drivers/scsi/ufs/ufshcd.c |  4 ++--
- include/linux/blk-mq.h    |  2 ++
- 6 files changed, 47 insertions(+), 17 deletions(-)
+ block/blk-core.c   | 34 +++++++++++++++++++++++++++++++++-
+ block/blk-mq-tag.c | 41 +++++++++++++++++++++++++++++++++++++----
+ block/blk-mq-tag.h |  4 +++-
+ block/blk-mq.c     | 21 +++++++++++++++++----
+ block/blk-mq.h     |  1 +
+ block/blk.h        |  2 ++
+ block/elevator.c   |  1 +
+ 7 files changed, 94 insertions(+), 10 deletions(-)
 
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index e5bfecf2940d..116c3691b104 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -322,18 +322,19 @@ static void __blk_mq_all_tag_iter(struct blk_mq_tags *tags,
+diff --git a/block/blk-core.c b/block/blk-core.c
+index fc60ff208497..400537dde675 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -279,6 +279,36 @@ void blk_dump_rq_flags(struct request *rq, char *msg)
  }
- 
- /**
-- * blk_mq_all_tag_iter - iterate over all requests in a tag map
-+ * blk_mq_all_tag_iter_atomic - iterate over all requests in a tag map
-  * @tags:	Tag map to iterate over.
-  * @fn:		Pointer to the function that will be called for each
-  *		request. @fn will be called as follows: @fn(rq, @priv,
-  *		reserved) where rq is a pointer to a request. 'reserved'
-  *		indicates whether or not @rq is a reserved request. Return
-- *		true to continue iterating tags, false to stop.
-+ *		true to continue iterating tags, false to stop. Must not
-+ *		sleep.
-  * @priv:	Will be passed as second argument to @fn.
-  *
-- * Caller has to pass the tag map from which requests are allocated.
-+ * Does not sleep.
-  */
--void blk_mq_all_tag_iter(struct blk_mq_tags *tags, busy_tag_iter_fn *fn,
-+void blk_mq_all_tag_iter_atomic(struct blk_mq_tags *tags, busy_tag_iter_fn *fn,
- 		void *priv)
- {
- 	__blk_mq_all_tag_iter(tags, fn, priv, BT_TAG_ITER_STATIC_RQS);
-@@ -348,6 +349,8 @@ void blk_mq_all_tag_iter(struct blk_mq_tags *tags, busy_tag_iter_fn *fn,
-  *		indicates whether or not @rq is a reserved request. Return
-  *		true to continue iterating tags, false to stop.
-  * @priv:	Will be passed as second argument to @fn.
-+ *
-+ * May sleep.
-  */
- void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
- 		busy_tag_iter_fn *fn, void *priv)
-@@ -362,6 +365,31 @@ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
- }
- EXPORT_SYMBOL(blk_mq_tagset_busy_iter);
+ EXPORT_SYMBOL(blk_dump_rq_flags);
  
 +/**
-+ * blk_mq_tagset_busy_iter_atomic - iterate over all started requests in a tag set
-+ * @tagset:	Tag set to iterate over.
-+ * @fn:		Pointer to the function that will be called for each started
-+ *		request. @fn will be called as follows: @fn(rq, @priv,
-+ *		reserved) where rq is a pointer to a request. 'reserved'
-+ *		indicates whether or not @rq is a reserved request. Return
-+ *		true to continue iterating tags, false to stop. Must not sleep.
-+ * @priv:	Will be passed as second argument to @fn.
++ * blk_mq_wait_for_tag_iter - wait for preexisting __blk_mq_all_tag_iter() calls to finish
++ * @set: Tag set to wait on.
 + *
-+ * Does not sleep.
++ * Waits for preexisting __blk_mq_all_tag_iter() calls to finish accessing
++ * hctx->tags->rqs[]. New readers may start while this function is in progress
++ * or after this function has returned. Use this function to make sure that
++ * hctx->tags->rqs[] changes have become globally visible.
++ *
++ * Accesses of hctx->tags->rqs[] by blk_mq_queue_tag_busy_iter() calls are out
++ * of scope for this function. The caller can pause blk_mq_queue_tag_busy_iter()
++ * calls for a request queue by freezing that request queue.
 + */
-+void blk_mq_tagset_busy_iter_atomic(struct blk_mq_tag_set *tagset,
-+		busy_tag_iter_fn *fn, void *priv)
++void blk_mq_wait_for_tag_iter(struct blk_mq_tag_set *set)
 +{
++	struct blk_mq_tags *tags;
 +	int i;
 +
-+	for (i = 0; i < tagset->nr_hw_queues; i++) {
-+		if (tagset->tags && tagset->tags[i])
-+			__blk_mq_all_tag_iter(tagset->tags[i], fn, priv,
-+					      BT_TAG_ITER_STARTED);
++	if (set->tags) {
++		for (i = 0; i < set->nr_hw_queues; i++) {
++			tags = set->tags[i];
++			if (!tags)
++				continue;
++			down_write(&tags->iter_rwsem);
++			up_write(&tags->iter_rwsem);
++		}
 +	}
++	synchronize_rcu();
 +}
-+EXPORT_SYMBOL(blk_mq_tagset_busy_iter_atomic);
 +
- static bool blk_mq_tagset_count_completed_rqs(struct request *rq,
- 		void *data, bool reserved)
- {
-@@ -384,7 +412,7 @@ void blk_mq_tagset_wait_completed_request(struct blk_mq_tag_set *tagset)
- 	while (true) {
- 		unsigned count = 0;
+ /**
+  * blk_sync_queue - cancel any pending callbacks on a queue
+  * @q: the queue
+@@ -412,8 +442,10 @@ void blk_cleanup_queue(struct request_queue *q)
+ 	 * it is safe to free requests now.
+ 	 */
+ 	mutex_lock(&q->sysfs_lock);
+-	if (q->elevator)
++	if (q->elevator) {
++		blk_mq_wait_for_tag_iter(q->tag_set);
+ 		blk_mq_sched_free_requests(q);
++	}
+ 	mutex_unlock(&q->sysfs_lock);
  
--		blk_mq_tagset_busy_iter(tagset,
-+		blk_mq_tagset_busy_iter_atomic(tagset,
- 				blk_mq_tagset_count_completed_rqs, &count);
- 		if (!count)
- 			break;
+ 	percpu_ref_exit(&q->q_usage_counter);
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index 116c3691b104..e7a6a114d216 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -209,7 +209,11 @@ static bool bt_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
+ 
+ 	if (!reserved)
+ 		bitnr += tags->nr_reserved_tags;
+-	rq = tags->rqs[bitnr];
++	/*
++	 * Protected by rq->q->q_usage_counter. See also
++	 * blk_mq_queue_tag_busy_iter().
++	 */
++	rq = rcu_dereference_check(tags->rqs[bitnr], true);
+ 
+ 	/*
+ 	 * We can hit rq == NULL here, because the tagging functions
+@@ -254,11 +258,17 @@ struct bt_tags_iter_data {
+ 	unsigned int flags;
+ };
+ 
++/* Include reserved tags. */
+ #define BT_TAG_ITER_RESERVED		(1 << 0)
++/* Only include started requests. */
+ #define BT_TAG_ITER_STARTED		(1 << 1)
++/* Iterate over tags->static_rqs[] instead of tags->rqs[]. */
+ #define BT_TAG_ITER_STATIC_RQS		(1 << 2)
++/* The callback function may sleep. */
++#define BT_TAG_ITER_MAY_SLEEP		(1 << 3)
+ 
+-static bool bt_tags_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
++static bool __bt_tags_iter(struct sbitmap *bitmap, unsigned int bitnr,
++			   void *data)
+ {
+ 	struct bt_tags_iter_data *iter_data = data;
+ 	struct blk_mq_tags *tags = iter_data->tags;
+@@ -275,7 +285,8 @@ static bool bt_tags_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
+ 	if (iter_data->flags & BT_TAG_ITER_STATIC_RQS)
+ 		rq = tags->static_rqs[bitnr];
+ 	else
+-		rq = tags->rqs[bitnr];
++		rq = rcu_dereference_check(tags->rqs[bitnr],
++					   lockdep_is_held(&tags->iter_rwsem));
+ 	if (!rq)
+ 		return true;
+ 	if ((iter_data->flags & BT_TAG_ITER_STARTED) &&
+@@ -284,6 +295,25 @@ static bool bt_tags_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
+ 	return iter_data->fn(rq, iter_data->data, reserved);
+ }
+ 
++static bool bt_tags_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
++{
++	struct bt_tags_iter_data *iter_data = data;
++	struct blk_mq_tags *tags = iter_data->tags;
++	bool res;
++
++	if (iter_data->flags & BT_TAG_ITER_MAY_SLEEP) {
++		down_read(&tags->iter_rwsem);
++		res = __bt_tags_iter(bitmap, bitnr, data);
++		up_read(&tags->iter_rwsem);
++	} else {
++		rcu_read_lock();
++		res = __bt_tags_iter(bitmap, bitnr, data);
++		rcu_read_unlock();
++	}
++
++	return res;
++}
++
+ /**
+  * bt_tags_for_each - iterate over the requests in a tag map
+  * @tags:	Tag map to iterate over.
+@@ -357,10 +387,12 @@ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
+ {
+ 	int i;
+ 
++	might_sleep();
++
+ 	for (i = 0; i < tagset->nr_hw_queues; i++) {
+ 		if (tagset->tags && tagset->tags[i])
+ 			__blk_mq_all_tag_iter(tagset->tags[i], fn, priv,
+-					      BT_TAG_ITER_STARTED);
++				BT_TAG_ITER_STARTED | BT_TAG_ITER_MAY_SLEEP);
+ 	}
+ }
+ EXPORT_SYMBOL(blk_mq_tagset_busy_iter);
+@@ -544,6 +576,7 @@ struct blk_mq_tags *blk_mq_init_tags(unsigned int total_tags,
+ 
+ 	tags->nr_tags = total_tags;
+ 	tags->nr_reserved_tags = reserved_tags;
++	init_rwsem(&tags->iter_rwsem);
+ 
+ 	if (flags & BLK_MQ_F_TAG_HCTX_SHARED)
+ 		return tags;
 diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
-index 7d3e6b333a4a..0290c308ece9 100644
+index 0290c308ece9..d1d73d7cc7df 100644
 --- a/block/blk-mq-tag.h
 +++ b/block/blk-mq-tag.h
-@@ -43,7 +43,7 @@ extern void blk_mq_tag_resize_shared_sbitmap(struct blk_mq_tag_set *set,
- extern void blk_mq_tag_wakeup_all(struct blk_mq_tags *tags, bool);
- void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn *fn,
- 		void *priv);
--void blk_mq_all_tag_iter(struct blk_mq_tags *tags, busy_tag_iter_fn *fn,
-+void blk_mq_all_tag_iter_atomic(struct blk_mq_tags *tags, busy_tag_iter_fn *fn,
- 		void *priv);
+@@ -17,9 +17,11 @@ struct blk_mq_tags {
+ 	struct sbitmap_queue __bitmap_tags;
+ 	struct sbitmap_queue __breserved_tags;
  
- static inline struct sbq_wait_state *bt_wait_ptr(struct sbitmap_queue *bt,
+-	struct request **rqs;
++	struct request __rcu **rqs;
+ 	struct request **static_rqs;
+ 	struct list_head page_list;
++
++	struct rw_semaphore iter_rwsem;
+ };
+ 
+ extern struct blk_mq_tags *blk_mq_init_tags(unsigned int nr_tags,
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index d4d7c1caa439..5b170faa6318 100644
+index 5b170faa6318..d6c9b655c0f5 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -2483,7 +2483,7 @@ static bool blk_mq_hctx_has_requests(struct blk_mq_hw_ctx *hctx)
- 		.hctx	= hctx,
- 	};
+@@ -495,8 +495,10 @@ static void __blk_mq_free_request(struct request *rq)
+ 	blk_crypto_free_request(rq);
+ 	blk_pm_mark_last_busy(rq);
+ 	rq->mq_hctx = NULL;
+-	if (rq->tag != BLK_MQ_NO_TAG)
++	if (rq->tag != BLK_MQ_NO_TAG) {
+ 		blk_mq_put_tag(hctx->tags, ctx, rq->tag);
++		rcu_assign_pointer(hctx->tags->rqs[rq->tag], NULL);
++	}
+ 	if (sched_tag != BLK_MQ_NO_TAG)
+ 		blk_mq_put_tag(hctx->sched_tags, ctx, sched_tag);
+ 	blk_mq_sched_restart(hctx);
+@@ -838,9 +840,20 @@ EXPORT_SYMBOL(blk_mq_delay_kick_requeue_list);
  
--	blk_mq_all_tag_iter(tags, blk_mq_has_request, &data);
-+	blk_mq_all_tag_iter_atomic(tags, blk_mq_has_request, &data);
- 	return data.has_rq;
- }
- 
-diff --git a/drivers/scsi/hosts.c b/drivers/scsi/hosts.c
-index 2f162603876f..f09e1520a241 100644
---- a/drivers/scsi/hosts.c
-+++ b/drivers/scsi/hosts.c
-@@ -578,8 +578,8 @@ int scsi_host_busy(struct Scsi_Host *shost)
+ struct request *blk_mq_tag_to_rq(struct blk_mq_tags *tags, unsigned int tag)
  {
- 	int cnt = 0;
++	struct request *rq;
++
+ 	if (tag < tags->nr_tags) {
+-		prefetch(tags->rqs[tag]);
+-		return tags->rqs[tag];
++		/*
++		 * Freeing tags happens with the request queue frozen so the
++		 * rcu dereference below is protected by the request queue
++		 * usage count. We can only verify that usage count after
++		 * having read the request pointer.
++		 */
++		rq = rcu_dereference_check(tags->rqs[tag], true);
++		WARN_ON_ONCE(IS_ENABLED(CONFIG_PROVE_RCU) && rq &&
++			     percpu_ref_is_zero(&rq->q->q_usage_counter));
++		prefetch(rq);
++		return rq;
+ 	}
  
--	blk_mq_tagset_busy_iter(&shost->tag_set,
--				scsi_host_check_in_flight, &cnt);
-+	blk_mq_tagset_busy_iter_atomic(&shost->tag_set,
-+				       scsi_host_check_in_flight, &cnt);
- 	return cnt;
+ 	return NULL;
+@@ -1111,7 +1124,7 @@ static bool blk_mq_get_driver_tag(struct request *rq)
+ 		rq->rq_flags |= RQF_MQ_INFLIGHT;
+ 		__blk_mq_inc_active_requests(hctx);
+ 	}
+-	hctx->tags->rqs[rq->tag] = rq;
++	rcu_assign_pointer(hctx->tags->rqs[rq->tag], rq);
+ 	return true;
  }
- EXPORT_SYMBOL(scsi_host_busy);
-@@ -677,8 +677,8 @@ static bool complete_all_cmds_iter(struct request *rq, void *data, bool rsvd)
+ 
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 3616453ca28c..9ccb1818303b 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -226,6 +226,7 @@ static inline void __blk_mq_put_driver_tag(struct blk_mq_hw_ctx *hctx,
+ 					   struct request *rq)
+ {
+ 	blk_mq_put_tag(hctx->tags, rq->mq_ctx, rq->tag);
++	rcu_assign_pointer(hctx->tags->rqs[rq->tag], NULL);
+ 	rq->tag = BLK_MQ_NO_TAG;
+ 
+ 	if (rq->rq_flags & RQF_MQ_INFLIGHT) {
+diff --git a/block/blk.h b/block/blk.h
+index e0a4a7577f6c..85e0a59ef954 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -184,6 +184,8 @@ bool blk_bio_list_merge(struct request_queue *q, struct list_head *list,
+ void blk_account_io_start(struct request *req);
+ void blk_account_io_done(struct request *req, u64 now);
+ 
++void blk_mq_wait_for_tag_iter(struct blk_mq_tag_set *set);
++
+ /*
+  * Internal elevator interface
   */
- void scsi_host_complete_all_commands(struct Scsi_Host *shost, int status)
+diff --git a/block/elevator.c b/block/elevator.c
+index 4b20d1ab29cc..70a10e31b336 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -201,6 +201,7 @@ static void elevator_exit(struct request_queue *q, struct elevator_queue *e)
  {
--	blk_mq_tagset_busy_iter(&shost->tag_set, complete_all_cmds_iter,
--				&status);
-+	blk_mq_tagset_busy_iter_atomic(&shost->tag_set, complete_all_cmds_iter,
-+				       &status);
+ 	lockdep_assert_held(&q->sysfs_lock);
+ 
++	blk_mq_wait_for_tag_iter(q->tag_set);
+ 	blk_mq_sched_free_requests(q);
+ 	__elevator_exit(q, e);
  }
- EXPORT_SYMBOL_GPL(scsi_host_complete_all_commands);
- 
-@@ -699,11 +699,11 @@ static bool __scsi_host_busy_iter_fn(struct request *req, void *priv,
- /**
-  * scsi_host_busy_iter - Iterate over all busy commands
-  * @shost:	Pointer to Scsi_Host.
-- * @fn:		Function to call on each busy command
-+ * @fn:		Function to call on each busy command. Must not sleep.
-  * @priv:	Data pointer passed to @fn
-  *
-  * If locking against concurrent command completions is required
-- * ithas to be provided by the caller
-+ * it has to be provided by the caller.
-  **/
- void scsi_host_busy_iter(struct Scsi_Host *shost,
- 			 bool (*fn)(struct scsi_cmnd *, void *, bool),
-@@ -714,7 +714,7 @@ void scsi_host_busy_iter(struct Scsi_Host *shost,
- 		.priv = priv,
- 	};
- 
--	blk_mq_tagset_busy_iter(&shost->tag_set, __scsi_host_busy_iter_fn,
--				&iter_data);
-+	blk_mq_tagset_busy_iter_atomic(&shost->tag_set,
-+				       __scsi_host_busy_iter_fn, &iter_data);
- }
- EXPORT_SYMBOL_GPL(scsi_host_busy_iter);
-diff --git a/drivers/scsi/ufs/ufshcd.c b/drivers/scsi/ufs/ufshcd.c
-index c86760788c72..6d2f8f18e2a3 100644
---- a/drivers/scsi/ufs/ufshcd.c
-+++ b/drivers/scsi/ufs/ufshcd.c
-@@ -1380,7 +1380,7 @@ static bool ufshcd_any_tag_in_use(struct ufs_hba *hba)
- 	struct request_queue *q = hba->cmd_queue;
- 	int busy = 0;
- 
--	blk_mq_tagset_busy_iter(q->tag_set, ufshcd_is_busy, &busy);
-+	blk_mq_tagset_busy_iter_atomic(q->tag_set, ufshcd_is_busy, &busy);
- 	return busy;
- }
- 
-@@ -6269,7 +6269,7 @@ static irqreturn_t ufshcd_tmc_handler(struct ufs_hba *hba)
- 		.pending = ufshcd_readl(hba, REG_UTP_TASK_REQ_DOOR_BELL),
- 	};
- 
--	blk_mq_tagset_busy_iter(q->tag_set, ufshcd_compl_tm, &ci);
-+	blk_mq_tagset_busy_iter_atomic(q->tag_set, ufshcd_compl_tm, &ci);
- 	return ci.ncpl ? IRQ_HANDLED : IRQ_NONE;
- }
- 
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 2c473c9b8990..dfa0114a49fd 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -526,6 +526,8 @@ void blk_mq_run_hw_queues(struct request_queue *q, bool async);
- void blk_mq_delay_run_hw_queues(struct request_queue *q, unsigned long msecs);
- void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
- 		busy_tag_iter_fn *fn, void *priv);
-+void blk_mq_tagset_busy_iter_atomic(struct blk_mq_tag_set *tagset,
-+		busy_tag_iter_fn *fn, void *priv);
- void blk_mq_tagset_wait_completed_request(struct blk_mq_tag_set *tagset);
- void blk_mq_freeze_queue(struct request_queue *q);
- void blk_mq_unfreeze_queue(struct request_queue *q);
