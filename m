@@ -7,38 +7,39 @@ X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0109C4360C
-	for <linux-block@archiver.kernel.org>; Mon,  5 Apr 2021 16:04:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A6B3C001BE
+	for <linux-block@archiver.kernel.org>; Mon,  5 Apr 2021 16:04:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B99B7613CE
-	for <linux-block@archiver.kernel.org>; Mon,  5 Apr 2021 16:04:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CE97E613CA
+	for <linux-block@archiver.kernel.org>; Mon,  5 Apr 2021 16:04:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242060AbhDEQEc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 5 Apr 2021 12:04:32 -0400
-Received: from mail.kernel.org ([198.145.29.99]:55822 "EHLO mail.kernel.org"
+        id S237964AbhDEQEj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Apr 2021 12:04:39 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56022 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S242058AbhDEQE2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 5 Apr 2021 12:04:28 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id A8F26613AD;
-        Mon,  5 Apr 2021 16:04:21 +0000 (UTC)
+        id S241883AbhDEQEd (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 5 Apr 2021 12:04:33 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 0C373613C7;
+        Mon,  5 Apr 2021 16:04:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1617638662;
-        bh=bb6G4/tgL8twi5M/n3KBZaCphx+Z6wDxQSpR+GOAvW4=;
+        s=k20201202; t=1617638666;
+        bh=ccyQP+6I1vEkbRqttbNW6yMUbXUI93U+OiRwV2py3c8=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=qfaOU1sA6Ufm4iWj9xJRGu/vRYd0z+onL6H7do09DnHyqge4+ZKOk5FuBftOANsKe
-         l/Z+JbV8rJBv4uUb6mdIqa18ZkCR+L9ZEf6w8esxCqW/jqL0XcFhDnrD4ZwyjwYKxj
-         egk8OseY0Kd9tqrFg3jED6BAJh8Kpf0AnvVRFHTMC29zoHKA9274urFTjnPEw9LtSK
-         e/M8lV+S1d1bJrGCMxa8h+ZEpm929KoEyiAw8hQo5wsp/R6o5QZ+LD5QcEa/7WRXtt
-         mWJ8DwsU60raixJMhaJcD2f2KXJKJiR/sJjlsrPO1fSuEbVBxytAYXXi94Lphcrhg8
-         fmrAlS5H1lp9g==
+        b=JmUx7e0lPZAzX8FAmFLVl3dJY3DvetXkh75M5xyqgVGLw5YS5hoxR3Ldl93749lje
+         +HH5GhMzWssOoGQA2jlRuPvJ7BJMkGGaRyvmJ9wM6nFmzmomIpVYVUUj73C/T2UUZN
+         m/RlB0xdv0AEVgCUSMD8DH6/CtbQsiG5bhV+jz3+YQmX2cTkNFVmM89B96lnol5gW/
+         pjEetIdIgmWMm8dL/rE+Um4RK9gZgo8ojoiL8C8MlImTtFa2DUMnrjrBgy3yqTyFAC
+         wyZ/iCcqkoz7rpohkJZzbdPWC5TrMsWsA477lrdg5d7Vlkib+aZdG643BhZcKQCP9D
+         RsmXyNac6fjCQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Yufen Yu <yuyufen@huawei.com>, Keith Busch <kbusch@kernel.org>,
-        Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.11 14/22] block: only update parent bi_status when bio fail
-Date:   Mon,  5 Apr 2021 12:03:57 -0400
-Message-Id: <20210405160406.268132-14-sashal@kernel.org>
+Cc:     Damien Le Moal <damien.lemoal@wdc.com>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
+        linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.11 18/22] null_blk: fix command timeout completion handling
+Date:   Mon,  5 Apr 2021 12:04:01 -0400
+Message-Id: <20210405160406.268132-18-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210405160406.268132-1-sashal@kernel.org>
 References: <20210405160406.268132-1-sashal@kernel.org>
@@ -50,77 +51,139 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Yufen Yu <yuyufen@huawei.com>
+From: Damien Le Moal <damien.lemoal@wdc.com>
 
-[ Upstream commit 3edf5346e4f2ce2fa0c94651a90a8dda169565ee ]
+[ Upstream commit de3510e52b0a398261271455562458003b8eea62 ]
 
-For multiple split bios, if one of the bio is fail, the whole
-should return error to application. But we found there is a race
-between bio_integrity_verify_fn and bio complete, which return
-io success to application after one of the bio fail. The race as
-following:
+Memory backed or zoned null block devices may generate actual request
+timeout errors due to the submission path being blocked on memory
+allocation or zone locking. Unlike fake timeouts or injected timeouts,
+the request submission path will call blk_mq_complete_request() or
+blk_mq_end_request() for these real timeout errors, causing a double
+completion and use after free situation as the block layer timeout
+handler executes blk_mq_rq_timed_out() and __blk_mq_free_request() in
+blk_mq_check_expired(). This problem often triggers a NULL pointer
+dereference such as:
 
-split bio(READ)          kworker
+BUG: kernel NULL pointer dereference, address: 0000000000000050
+RIP: 0010:blk_mq_sched_mark_restart_hctx+0x5/0x20
+...
+Call Trace:
+  dd_finish_request+0x56/0x80
+  blk_mq_free_request+0x37/0x130
+  null_handle_cmd+0xbf/0x250 [null_blk]
+  ? null_queue_rq+0x67/0xd0 [null_blk]
+  blk_mq_dispatch_rq_list+0x122/0x850
+  __blk_mq_do_dispatch_sched+0xbb/0x2c0
+  __blk_mq_sched_dispatch_requests+0x13d/0x190
+  blk_mq_sched_dispatch_requests+0x30/0x60
+  __blk_mq_run_hw_queue+0x49/0x90
+  process_one_work+0x26c/0x580
+  worker_thread+0x55/0x3c0
+  ? process_one_work+0x580/0x580
+  kthread+0x134/0x150
+  ? kthread_create_worker_on_cpu+0x70/0x70
+  ret_from_fork+0x1f/0x30
 
-nvme_complete_rq
-blk_update_request //split error=0
-  bio_endio
-    bio_integrity_endio
-      queue_work(kintegrityd_wq, &bip->bip_work);
+This problem very often triggers when running the full btrfs xfstests
+on a memory-backed zoned null block device in a VM with limited amount
+of memory.
 
-                         bio_integrity_verify_fn
-                         bio_endio //split bio
-                          __bio_chain_endio
-                             if (!parent->bi_status)
+Avoid this by executing blk_mq_complete_request() in null_timeout_rq()
+only for commands that are marked for a fake timeout completion using
+the fake_timeout boolean in struct null_cmd. For timeout errors injected
+through debugfs, the timeout handler will execute
+blk_mq_complete_request()i as before. This is safe as the submission
+path does not execute complete requests in this case.
 
-                               <interrupt entry>
-                               nvme_irq
-                                 blk_update_request //parent error=7
-                                 req_bio_endio
-                                    bio->bi_status = 7 //parent bio
-                               <interrupt exit>
+In null_timeout_rq(), also make sure to set the command error field to
+BLK_STS_TIMEOUT and to propagate this error through to the request
+completion.
 
-                               parent->bi_status = 0
-                        parent->bi_end_io() // return bi_status=0
-
-The bio has been split as two: split and parent. When split
-bio completed, it depends on kworker to do endio, while
-bio_integrity_verify_fn have been interrupted by parent bio
-complete irq handler. Then, parent bio->bi_status which have
-been set in irq handler will overwrite by kworker.
-
-In fact, even without the above race, we also need to conside
-the concurrency beteen mulitple split bio complete and update
-the same parent bi_status. Normally, multiple split bios will
-be issued to the same hctx and complete from the same irq
-vector. But if we have updated queue map between multiple split
-bios, these bios may complete on different hw queue and different
-irq vector. Then the concurrency update parent bi_status may
-cause the final status error.
-
-Suggested-by: Keith Busch <kbusch@kernel.org>
-Signed-off-by: Yufen Yu <yuyufen@huawei.com>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Link: https://lore.kernel.org/r/20210331115359.1125679-1-yuyufen@huawei.com
+Reported-by: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+Tested-by: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+Reviewed-by: Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+Link: https://lore.kernel.org/r/20210331225244.126426-1-damien.lemoal@wdc.com
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- block/bio.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/block/null_blk/main.c     | 26 +++++++++++++++++++++-----
+ drivers/block/null_blk/null_blk.h |  1 +
+ 2 files changed, 22 insertions(+), 5 deletions(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index 1f2cc1fbe283..3209d865828a 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -313,7 +313,7 @@ static struct bio *__bio_chain_endio(struct bio *bio)
- {
- 	struct bio *parent = bio->bi_private;
+diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
+index 5357c3a4a36f..4f6af7a5921e 100644
+--- a/drivers/block/null_blk/main.c
++++ b/drivers/block/null_blk/main.c
+@@ -1369,10 +1369,13 @@ static blk_status_t null_handle_cmd(struct nullb_cmd *cmd, sector_t sector,
+ 	}
  
--	if (!parent->bi_status)
-+	if (bio->bi_status && !parent->bi_status)
- 		parent->bi_status = bio->bi_status;
- 	bio_put(bio);
- 	return parent;
+ 	if (dev->zoned)
+-		cmd->error = null_process_zoned_cmd(cmd, op,
+-						    sector, nr_sectors);
++		sts = null_process_zoned_cmd(cmd, op, sector, nr_sectors);
+ 	else
+-		cmd->error = null_process_cmd(cmd, op, sector, nr_sectors);
++		sts = null_process_cmd(cmd, op, sector, nr_sectors);
++
++	/* Do not overwrite errors (e.g. timeout errors) */
++	if (cmd->error == BLK_STS_OK)
++		cmd->error = sts;
+ 
+ out:
+ 	nullb_complete_cmd(cmd);
+@@ -1451,8 +1454,20 @@ static bool should_requeue_request(struct request *rq)
+ 
+ static enum blk_eh_timer_return null_timeout_rq(struct request *rq, bool res)
+ {
++	struct nullb_cmd *cmd = blk_mq_rq_to_pdu(rq);
++
+ 	pr_info("rq %p timed out\n", rq);
+-	blk_mq_complete_request(rq);
++
++	/*
++	 * If the device is marked as blocking (i.e. memory backed or zoned
++	 * device), the submission path may be blocked waiting for resources
++	 * and cause real timeouts. For these real timeouts, the submission
++	 * path will complete the request using blk_mq_complete_request().
++	 * Only fake timeouts need to execute blk_mq_complete_request() here.
++	 */
++	cmd->error = BLK_STS_TIMEOUT;
++	if (cmd->fake_timeout)
++		blk_mq_complete_request(rq);
+ 	return BLK_EH_DONE;
+ }
+ 
+@@ -1473,6 +1488,7 @@ static blk_status_t null_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	cmd->rq = bd->rq;
+ 	cmd->error = BLK_STS_OK;
+ 	cmd->nq = nq;
++	cmd->fake_timeout = should_timeout_request(bd->rq);
+ 
+ 	blk_mq_start_request(bd->rq);
+ 
+@@ -1489,7 +1505,7 @@ static blk_status_t null_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 			return BLK_STS_OK;
+ 		}
+ 	}
+-	if (should_timeout_request(bd->rq))
++	if (cmd->fake_timeout)
+ 		return BLK_STS_OK;
+ 
+ 	return null_handle_cmd(cmd, sector, nr_sectors, req_op(bd->rq));
+diff --git a/drivers/block/null_blk/null_blk.h b/drivers/block/null_blk/null_blk.h
+index 83504f3cc9d6..4876d5adb12d 100644
+--- a/drivers/block/null_blk/null_blk.h
++++ b/drivers/block/null_blk/null_blk.h
+@@ -22,6 +22,7 @@ struct nullb_cmd {
+ 	blk_status_t error;
+ 	struct nullb_queue *nq;
+ 	struct hrtimer timer;
++	bool fake_timeout;
+ };
+ 
+ struct nullb_queue {
 -- 
 2.30.2
 
