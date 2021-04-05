@@ -2,101 +2,122 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A33FC433B4
-	for <linux-block@archiver.kernel.org>; Mon,  5 Apr 2021 00:28:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E827DC43460
+	for <linux-block@archiver.kernel.org>; Mon,  5 Apr 2021 00:28:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 55C5661396
-	for <linux-block@archiver.kernel.org>; Mon,  5 Apr 2021 00:28:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BF48A61396
+	for <linux-block@archiver.kernel.org>; Mon,  5 Apr 2021 00:28:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231696AbhDEA2w (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 4 Apr 2021 20:28:52 -0400
-Received: from mail-pj1-f44.google.com ([209.85.216.44]:36362 "EHLO
-        mail-pj1-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231539AbhDEA2r (ORCPT
+        id S231697AbhDEA2x (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 4 Apr 2021 20:28:53 -0400
+Received: from mail-pg1-f176.google.com ([209.85.215.176]:45651 "EHLO
+        mail-pg1-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231683AbhDEA2r (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Sun, 4 Apr 2021 20:28:47 -0400
-Received: by mail-pj1-f44.google.com with SMTP id f2-20020a17090a4a82b02900c67bf8dc69so7047217pjh.1
-        for <linux-block@vger.kernel.org>; Sun, 04 Apr 2021 17:28:41 -0700 (PDT)
+Received: by mail-pg1-f176.google.com with SMTP id d10so2264306pgf.12
+        for <linux-block@vger.kernel.org>; Sun, 04 Apr 2021 17:28:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=9/sUi89FP9CquLftW4U1hYfqJ8K9UAzgnKAAV2PkmZA=;
-        b=rI0I01yML0V8ENS+0QL/1dobfFXlwjeFhabNfh9h1INt9najIFpaqBaJlWyDhCIh53
-         Nq5n8QIMY8aEhT3MZIPsmcC27HeUbcsY33slz1sm3j0bVZhNH4pEtTcP23hirvnfjK5K
-         Eo+iEgywO1RjM0BknpX9TzdbVtVdSE7wrBufYsJgdSzgo2+b30cT9u2Qvt8l+xBB8ASY
-         NhZFv6qmKEKO5XKvx+M29jPOrqIwKAUaREvw70/3YfOK5qz286h+8aLckwD440kOeUN3
-         Ne41vRYsSoMFlU9mR4agzD1aEkQVwm0dWoEPdJAlSbTzvOpHqlDBnugkv17YqPlo2HZS
-         E9og==
-X-Gm-Message-State: AOAM53015ag68UrHBffK01v9JaEMcw/ftwanP1XYh+1nlzs7wTtmXXbg
-        aaPFHNW48mUu2vutG03k3PE=
-X-Google-Smtp-Source: ABdhPJw7deuBOEjqAuAtO4j3TG9KlxXMbH7wm/1TiVND8lO86ZdaYsLU8767TKkBPjzv1U7onzhlZQ==
-X-Received: by 2002:a17:90a:890f:: with SMTP id u15mr4662758pjn.25.1617582521104;
-        Sun, 04 Apr 2021 17:28:41 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=Jdw7IUbjEHsW4gVeAnRemrrLcSamlKgxgELWUtZYqK8=;
+        b=kBSVzNxVaO/mJQZ1XujRDpHw+AoN90uvO88jbqHinq7vPoeINPuDqIL72YgyqOKotR
+         ZPm/mh/rp3CI2204MGYYF9IevpBV5PhbjhJU8MkXQvwSnf1s4rLwVe5U0kyiBtK6uAdx
+         GP9lWUlY6ymKRAb5Qb/mdF46DiWF4LsXCa1aKaWVaQwm0TTOnOybhIyRi+6XJYLeJJbS
+         w8b3Lt/4u9iqN+RHUEPYWat1Rzc+huz/wbAXGHTgZBt132BMUu1UyO8+z1WMbKiB4Ynu
+         42WN10HOYV8m5Lg8uf5I0Z7SqBddfGx/T5G/qc0g7wSC+QspDz1h7J1pTemLH6mr9XRl
+         UP8w==
+X-Gm-Message-State: AOAM530ID1dsQEURcbqy2Ewf2QU2wkxtMyMxvjGZRbc9aKvBnrOgmHFX
+        W4pQhhu4aed2KSAACXa3fjk=
+X-Google-Smtp-Source: ABdhPJz2zqmmKwgizwaTrw8homQffSqgP32rYjZHGfBMcY/OC7B4eu+SU9ifnexjzoAfibazcOGBWg==
+X-Received: by 2002:a63:d815:: with SMTP id b21mr20943691pgh.217.1617582522565;
+        Sun, 04 Apr 2021 17:28:42 -0700 (PDT)
 Received: from asus.hsd1.ca.comcast.net ([2601:647:4000:d7:91b0:bd58:a9d0:2f54])
-        by smtp.gmail.com with ESMTPSA id x4sm13444254pfn.134.2021.04.04.17.28.39
+        by smtp.gmail.com with ESMTPSA id x4sm13444254pfn.134.2021.04.04.17.28.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 04 Apr 2021 17:28:40 -0700 (PDT)
+        Sun, 04 Apr 2021 17:28:41 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH v5 0/3] blk-mq: Fix a race between iterating over requests and freeing requests
-Date:   Sun,  4 Apr 2021 17:28:31 -0700
-Message-Id: <20210405002834.32339-1-bvanassche@acm.org>
+        Bart Van Assche <bvanassche@acm.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.de>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        John Garry <john.garry@huawei.com>,
+        Khazhy Kumykov <khazhy@google.com>
+Subject: [PATCH v5 1/3] blk-mq: Move the elevator_exit() definition
+Date:   Sun,  4 Apr 2021 17:28:32 -0700
+Message-Id: <20210405002834.32339-2-bvanassche@acm.org>
 X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20210405002834.32339-1-bvanassche@acm.org>
+References: <20210405002834.32339-1-bvanassche@acm.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
+Since elevator_exit() has only one caller, move its definition from
+block/blk.h into block/elevator.c. Remove the inline keyword since modern
+compilers are smart enough to decide when to inline functions that occur
+in the same compilation unit.
 
-This patch series fixes the race between iterating over requests and
-freeing requests that has been reported by multiple different users over
-the past two years. Please consider this patch series for kernel v5.13.
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Acked-by: Martin K. Petersen <martin.petersen@oracle.com>
+Tested-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Cc: John Garry <john.garry@huawei.com>
+Cc: Khazhy Kumykov <khazhy@google.com>
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+---
+ block/blk.h      | 9 ---------
+ block/elevator.c | 8 ++++++++
+ 2 files changed, 8 insertions(+), 9 deletions(-)
 
-Thank you,
-
-Bart.
-
-Changes between v4 and v5:
-- Addressed Khazhy's review comments. Note: the changes that have been made
-  in v5 only change behavior in case CONFIG_PROVE_RCU=y.
-
-Changes between v3 and v4:
-- Fixed support for tag sets shared across hardware queues.
-- Renamed blk_mq_wait_for_tag_readers() into blk_mq_wait_for_tag_iter().
-- Removed the fourth argument of blk_mq_queue_tag_busy_iter() again.
-
-Changes between v2 and v3:
-- Converted the single v2 patch into a series of three patches.
-- Switched from SRCU to a combination of RCU and semaphores.
-
-Changes between v1 and v2:
-- Reformatted patch description.
-- Added Tested-by/Reviewed-by tags.
-- Changed srcu_barrier() calls into synchronize_srcu() calls.
-
-Bart Van Assche (3):
-  blk-mq: Move the elevator_exit() definition
-  blk-mq: Introduce atomic variants of the tag iteration functions
-  blk-mq: Fix a race between iterating over requests and freeing
-    requests
-
- block/blk-core.c          | 34 ++++++++++++++++-
- block/blk-mq-tag.c        | 79 ++++++++++++++++++++++++++++++++++-----
- block/blk-mq-tag.h        |  6 ++-
- block/blk-mq.c            | 23 +++++++++---
- block/blk-mq.h            |  1 +
- block/blk.h               | 11 +-----
- block/elevator.c          |  9 +++++
- drivers/scsi/hosts.c      | 16 ++++----
- drivers/scsi/ufs/ufshcd.c |  4 +-
- include/linux/blk-mq.h    |  2 +
- 10 files changed, 149 insertions(+), 36 deletions(-)
-
+diff --git a/block/blk.h b/block/blk.h
+index 3b53e44b967e..e0a4a7577f6c 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -198,15 +198,6 @@ void __elevator_exit(struct request_queue *, struct elevator_queue *);
+ int elv_register_queue(struct request_queue *q, bool uevent);
+ void elv_unregister_queue(struct request_queue *q);
+ 
+-static inline void elevator_exit(struct request_queue *q,
+-		struct elevator_queue *e)
+-{
+-	lockdep_assert_held(&q->sysfs_lock);
+-
+-	blk_mq_sched_free_requests(q);
+-	__elevator_exit(q, e);
+-}
+-
+ ssize_t part_size_show(struct device *dev, struct device_attribute *attr,
+ 		char *buf);
+ ssize_t part_stat_show(struct device *dev, struct device_attribute *attr,
+diff --git a/block/elevator.c b/block/elevator.c
+index 293c5c81397a..4b20d1ab29cc 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -197,6 +197,14 @@ void __elevator_exit(struct request_queue *q, struct elevator_queue *e)
+ 	kobject_put(&e->kobj);
+ }
+ 
++static void elevator_exit(struct request_queue *q, struct elevator_queue *e)
++{
++	lockdep_assert_held(&q->sysfs_lock);
++
++	blk_mq_sched_free_requests(q);
++	__elevator_exit(q, e);
++}
++
+ static inline void __elv_rqhash_del(struct request *rq)
+ {
+ 	hash_del(&rq->hash);
