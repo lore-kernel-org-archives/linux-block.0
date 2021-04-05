@@ -5,43 +5,43 @@ X-Spam-Level:
 X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6BBFC43611
-	for <linux-block@archiver.kernel.org>; Mon,  5 Apr 2021 16:05:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2798EC43462
+	for <linux-block@archiver.kernel.org>; Mon,  5 Apr 2021 16:05:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 913F9613C5
-	for <linux-block@archiver.kernel.org>; Mon,  5 Apr 2021 16:05:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0853E613C5
+	for <linux-block@archiver.kernel.org>; Mon,  5 Apr 2021 16:05:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242002AbhDEQFs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 5 Apr 2021 12:05:48 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58772 "EHLO mail.kernel.org"
+        id S239257AbhDEQF4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Apr 2021 12:05:56 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57904 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S239140AbhDEQFk (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 5 Apr 2021 12:05:40 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 1CC01613E1;
-        Mon,  5 Apr 2021 16:05:33 +0000 (UTC)
+        id S238994AbhDEQFQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 5 Apr 2021 12:05:16 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 6ECCA613F3;
+        Mon,  5 Apr 2021 16:05:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1617638733;
-        bh=KYAN3BxRm/d45qQPO+VJEPD+cFCDPf1hNxi5Ys+0qpg=;
+        s=k20201202; t=1617638709;
+        bh=8dX0nKeBPMPFDBL15Iezv+br/Y1ueaIaFrJnbJY55H4=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=h92QLovv6yxv98kykkoj2uXOxV3D4/DMS5Xblt2+8i94wS+e5AehFAOCNRUF7P/Qq
-         9KqZaxmO8+og+FbH6lGedQhZDggxIuL0QJr+oqfUdBFt9IwkOIzEOTLqXpYjyRe7oc
-         FLsnx22Y0/oo4GH4VNZuzZN3X4XVsIGlKX0//UOWTvhTwuoEuEePp7i4dHMhIdSZGw
-         8SwPyQL4Qr+QM5eLPZUyeBN0uju2a6qrObOgYXlFJX44SZN/obdyCofPrXbBopdPj/
-         OBqvVtIVizbTtUD5DrEdP11JvqzGQDiNSAXLMdtfs0Rl0MASbEG1uEXciJtO8PcbYg
-         JqTCIlnMqc88A==
+        b=Rkedb5h7TfFxqD86Ju1eVIMtV5xe8CZVMrOXE6tRzCOS2jxmL6b14SBDKoq65obbb
+         /Oeg4gdiEqB4SMwhRvDtq95hxMjx2KKdDLt6bzmafd6Au2SgGG0mjUV9aav2q/wlM7
+         OQXep6wYN7kiZ3NmvwBNy1nQP0zeYK6upXOlnbEs9blQD3lZBFhoSDG+MOEXm9ORfC
+         ouS7GcH1FZNsXpK8Qny2rPlqEIKmKXiMmOYwUq+k3iig6FpNz17T9ILOuAwriqYCy8
+         65OTqxCPgu7VZaFY6ZlX9celRpmtTKBVilnPz06voyN91PfLtnlJzS/6eQyp0+7dht
+         4zyqyOTuWg0GQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Yufen Yu <yuyufen@huawei.com>, Keith Busch <kbusch@kernel.org>,
         Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
         Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 5/5] block: only update parent bi_status when bio fail
-Date:   Mon,  5 Apr 2021 12:05:26 -0400
-Message-Id: <20210405160526.269140-5-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 08/13] block: only update parent bi_status when bio fail
+Date:   Mon,  5 Apr 2021 12:04:53 -0400
+Message-Id: <20210405160459.268794-8-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210405160526.269140-1-sashal@kernel.org>
-References: <20210405160526.269140-1-sashal@kernel.org>
+In-Reply-To: <20210405160459.268794-1-sashal@kernel.org>
+References: <20210405160459.268794-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -109,10 +109,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/block/bio.c b/block/bio.c
-index 1384f9790882..30df1b45dde8 100644
+index 24704bc2ad6f..cb38d6f3acce 100644
 --- a/block/bio.c
 +++ b/block/bio.c
-@@ -312,7 +312,7 @@ static struct bio *__bio_chain_endio(struct bio *bio)
+@@ -305,7 +305,7 @@ static struct bio *__bio_chain_endio(struct bio *bio)
  {
  	struct bio *parent = bio->bi_private;
  
