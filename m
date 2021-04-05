@@ -2,217 +2,142 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	PDS_BAD_THREAD_QP_64,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 205AFC433B4
-	for <linux-block@archiver.kernel.org>; Mon,  5 Apr 2021 17:07:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5911AC433B4
+	for <linux-block@archiver.kernel.org>; Mon,  5 Apr 2021 17:41:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D3781613B5
-	for <linux-block@archiver.kernel.org>; Mon,  5 Apr 2021 17:07:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2469561396
+	for <linux-block@archiver.kernel.org>; Mon,  5 Apr 2021 17:41:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232821AbhDERHh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 5 Apr 2021 13:07:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46960 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232733AbhDERHg (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Apr 2021 13:07:36 -0400
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA11BC061756;
-        Mon,  5 Apr 2021 10:07:28 -0700 (PDT)
-Received: by mail-pl1-x62f.google.com with SMTP id h8so5967843plt.7;
-        Mon, 05 Apr 2021 10:07:28 -0700 (PDT)
+        id S238879AbhDERlG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Apr 2021 13:41:06 -0400
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:56398 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234136AbhDERlF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Apr 2021 13:41:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1617644460; x=1649180460;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=lG4z5D6sQXIZPmRtiEsqI6nlAjR2pRRLW/GaLY+Z1GA=;
+  b=ZGzMH/6xQaHjQb2FO9eIwY4Cqw9JglXqcitRlwUlyFAMjGUkj6Q4Dpmp
+   DRqTF/A1PUnV9twRekcNK3K5yG6xSPVo9OMGZn2z3sgkroFK+qh1lzViE
+   6ZBsGG0XF63X9nTi3SeWxj+kMufltS2aZM7CUrWE1y4i/Su4ott9z6YRb
+   1fi919xRchWUGfEOP0+Cag1+UESip5iiU9zerNbtC1nEcX7DCOs2BP/qk
+   Hf2KjGcAGmNweYwHlEBwDSXD3mxdAyMoiU/etHQebmyH7ydRFXcCwnvVj
+   zsDe3AoGspKoLaYgTE6Ld3ivIKZHM+OapL2my0Ts+FRqAw7yDms1jKctC
+   A==;
+IronPort-SDR: B9upPskGgcDHxD0pnvauc27VOQCQSoiYJkLkasWRPesHCnsHAAbesUiuQdOrdI5VVGyqZHwoCo
+ 9ueK2knVRXdj5k4mu3qonLl8equyAW4v+9tzWVVOZqw4OGn65ipljVSgLXkYV4DpcG2xbvkyNr
+ FN568oi4EO72APYsD3eVNHtC5eNt3s9PcM7bcUO12YwpRnNOKGBtkSA3Yd+gK0mZT68c4V6+CP
+ O2MfjNKQketIq0rlIE+wa4eTCn7IcL1KPVUoVzSPzGeP/6HF+289WomnEDZmrI8iURSY2/sjU8
+ Sjo=
+X-IronPort-AV: E=Sophos;i="5.81,307,1610380800"; 
+   d="scan'208";a="268240188"
+Received: from mail-bn7nam10lp2101.outbound.protection.outlook.com (HELO NAM10-BN7-obe.outbound.protection.outlook.com) ([104.47.70.101])
+  by ob1.hgst.iphmx.com with ESMTP; 06 Apr 2021 01:40:24 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=axd1ADyTChE1eu75FvhMer17CcweZMQ8vPH8hgNdOgX2s2XgX5I0CBL+0FGGU3ipHXKp2c27Lftz0i9G6Vi7UfFE1Ajfjtn24gcZG4rfwBS7uNUP+FDG1FvmTIp+HDxFsChrE2Uk1mQPrzlaP6cfF2df1AfIe1Xc1v3w+JW9/JVjwuJy9N0a30r8sQrFVr2HaGqdEHoRvNOPjzSjX/+YBUFTLN/01IChNZly+4qsB6PsWfA8rW3b/Gg5vLEFTtSM8LdBEwCpL/2N3htdW1GLR0SRXQ9qB4Zky8Pgsyyye69c7o9VBSMilnB0q1s84UoRq15EWKLawnvv4zKFKrqI7g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zrq60Uo+NgjvNwFk8/zghgkmF+3x80xsN7U5V9hn0HQ=;
+ b=QpHWSb9yp4gnMjoaVjlkfNmuRIIgZUmIGBlgHTXx9H2cYmKn/OBVb1oUkP22dRzlm7QzxNZcvH0bie6OssuOZd22H+on8IB4tcBKRK4QgKPCZKfVr2BajrRlvMnRv0RONJiFIxRRlfEaWHETqeJ3xVs5+ysRHbKFgbcks3jqijbcat5HKuHngxcXDzV51N0HB9xBpDTRepnYcQ6kvYDwm+qgvTtyUjLviCsVV8F0eiJseDptR9O3ootMDCVUJXxMkOed8zMeJDQfvXaGkMmGiiY04kN8ztcp/+y4uWsX2Ov3/Yq4dZLHvHeF6jvxpjkrdcS70WRX0w2haPRc9Qvulg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=RLfqM/4YIXZIGygat9vmW8mY7gaObgItiX8qoqBUvFM=;
-        b=vKScQsi48K81cCQB3BArJMMXH64fEPo6XNMxfDYOdDm7Hr+2nx1ABrak2wk6LP1qt4
-         AN1MHQaKcEa+nDGHFCY1xf5+6N5etpWKp5C+zq1TtU9VEQg5JXB+QeDFy2oYTklPlVYL
-         J8Ld45pQiIlVKmhHGzrlUPgdHONwyTu8XztYZ9985gXFLi3Xgqc1gui6F2Iqtfy1AgbQ
-         WbIL8r19uU4fOY+6ns45J9vVWra9ATh/7bIt2Eo9ulziV6iUZWWDoXN5BjEDCVZ7XATB
-         qhHvCSPd7xRDn+3HsOIVJDc7fwrVXWQzz47m1ybBSCou7R+n57/Mr/8/dGhpXStf1SHR
-         5gBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=RLfqM/4YIXZIGygat9vmW8mY7gaObgItiX8qoqBUvFM=;
-        b=Xw5awSFcbyQpiBf5CqTy8Exy8U9KSG4Hm9+KWCGHtiK5JvBL7gQXEEXK/VyUxdxDxl
-         wpLPvszVEfTdHSPEt242m82SuxkivOdNTiWDyQHW+tYN7iEwgPwFETMpa+wPteqt2bOi
-         +BVT3h4+XyNvbTIsPMntohMa+qYeLVXqNhoZ3MsicvdFdiJ20oEMiHtE3RomiSpykpg/
-         EGgllBF3NOgHvOCYfutLQBWfZWr7OUxhDX80vqrg102yzigk4VUvL1+y6SfPyk0+aF1x
-         7ywsCyiQpu/hygmMB7EojZDbup+VkNiB9Pt1ieSi+Bzgis7w4tv5GNK/x3S5ekRY+2/m
-         mABg==
-X-Gm-Message-State: AOAM532E87aq4ECZas/4PS9NYmefS8My27XKm9Y+Dc6KelrVH7xl/KHO
-        R9qLDxRruS0Ut7EczyZbd3Q=
-X-Google-Smtp-Source: ABdhPJyGSiFR05Bhvb/JuonUQqVWP6LEo2ZFxM4pFWlWuLFuRzOAIxqzzmm4i6WU9PMLSmDnL6Mc/w==
-X-Received: by 2002:a17:90a:e7d0:: with SMTP id kb16mr111631pjb.206.1617642447981;
-        Mon, 05 Apr 2021 10:07:27 -0700 (PDT)
-Received: from google.com ([2620:15c:211:201:30d6:b5a3:92ae:5a02])
-        by smtp.gmail.com with ESMTPSA id w23sm16270541pgi.63.2021.04.05.10.07.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Apr 2021 10:07:26 -0700 (PDT)
-Sender: Minchan Kim <minchan.kim@gmail.com>
-Date:   Mon, 5 Apr 2021 10:07:24 -0700
-From:   Minchan Kim <minchan@kernel.org>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     keescook@chromium.org, dhowells@redhat.com, hch@infradead.org,
-        mbenes@suse.com, gregkh@linuxfoundation.org, ngupta@vflare.org,
-        sergey.senozhatsky.work@gmail.com, axboe@kernel.dk,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] zram: fix crashes due to use of cpu hotplug
- multistate
-Message-ID: <YGtDzH0dEfEngCij@google.com>
-References: <YEbjom8FIclEgRYv@google.com>
- <20210310212128.GR4332@42.do-not-panic.com>
- <YErOkGrvtQODXtB0@google.com>
- <20210312183238.GW4332@42.do-not-panic.com>
- <YEvA1dzDsFOuKdZ/@google.com>
- <20210319190924.GK4332@42.do-not-panic.com>
- <YFjHvUolScp3btJ9@google.com>
- <20210322204156.GM4332@42.do-not-panic.com>
- <YFkWMZ0m9nKCT69T@google.com>
- <20210401235925.GR4332@42.do-not-panic.com>
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zrq60Uo+NgjvNwFk8/zghgkmF+3x80xsN7U5V9hn0HQ=;
+ b=YTn4DmgM25PcFmY1o6f1heVMwIwOMYhWSNf2PNPSYmjBOcp1Mwvei6jMgPWCVXkRSaLalhOilW13GBIEY1+8uVnr4Xr+U6l/zOGH+Ut75tM3Q8OIPQsEdCPk1cWi8uuQLClOWJrbaXoj5XNECdgAagLLq8lRnqEFDbn9GKswl5o=
+Received: from BYAPR04MB4965.namprd04.prod.outlook.com (2603:10b6:a03:4d::25)
+ by BYAPR04MB6101.namprd04.prod.outlook.com (2603:10b6:a03:f1::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3999.27; Mon, 5 Apr
+ 2021 17:40:28 +0000
+Received: from BYAPR04MB4965.namprd04.prod.outlook.com
+ ([fe80::c897:a1f8:197a:706b]) by BYAPR04MB4965.namprd04.prod.outlook.com
+ ([fe80::c897:a1f8:197a:706b%5]) with mapi id 15.20.3999.032; Mon, 5 Apr 2021
+ 17:40:28 +0000
+From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>
+Subject: Re: [PATCH 1/1] block: add sysfs entry for virt boundary mask
+Thread-Topic: [PATCH 1/1] block: add sysfs entry for virt boundary mask
+Thread-Index: AQHXKh5w9wH9mlHQI0S4J6hC39P1ww==
+Date:   Mon, 5 Apr 2021 17:40:28 +0000
+Message-ID: <BYAPR04MB496587F8FD4C96FEE418E78286779@BYAPR04MB4965.namprd04.prod.outlook.com>
+References: <20210405132012.12504-1-mgurtovoy@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: nvidia.com; dkim=none (message not signed)
+ header.d=none;nvidia.com; dmarc=none action=none header.from=wdc.com;
+x-originating-ip: [199.255.45.62]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 3e399846-d138-4d12-6425-08d8f859e6e0
+x-ms-traffictypediagnostic: BYAPR04MB6101:
+x-microsoft-antispam-prvs: <BYAPR04MB610166AD6ED212223001852686779@BYAPR04MB6101.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:1728;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: uC1H4OW7DeIUGCpw69Sak2NeJHhsG4K8FLRXGZdRb1bGXnrK4b5xnF/t2sfhj1wDqa1LSTXywm2kgfdUBdxI030zaCgpkOOsnLnAytcG31pR1U3d1GvXffAukyaCi7i+vkR63l5tQVmCq8hlhS7ZTg19qM8kbs686y9JNA/1Eo1/HoyIK4xEV3hhAgnK6gFoIdRTwjQGHWuR529etXusbsm14GRz6TCwoorJuxu1qcaYPEglkBJEXJVtJCjnzHKsxFx2bGCGDGEIaOYVbCnCXBOZgIYMQy9OCVpBBT/ahBt+ousKfXkw8SG2xi24XAWi+lq8baA0Mslyt6aBQgGALm1eO6VY4gL5ftWjoV+41Ko5oJou3SkAk0Vze6jIhfMQoWMbto8VGPE7namVCwjwZZdLQJG73c910rf+RK54xui7ocGRVXj68tgo2fIld0cH12vXyqFe7Ha6ZLACl/Q5cQ8OtJiZyJyUslX8fXqzPys0uDiJvQfjAcXO9dv1fnIw9dxlfuBeOu3vBPqyn/H9Dm2Nf6YSVOTZCQJxH3y1Cyca52P1PKEyrIHL+CFmqhaRAW38muH+J99pR0+c7tJweO5l5fa/TLJmMWFRHSlPGMYlaR1u6Ksp8k8U/rDBh7slH5wd+Yldz+DGayjvgO8NkpaGoPfiSx7qpx/lCSTbHqM=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR04MB4965.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(39860400002)(136003)(376002)(366004)(396003)(26005)(316002)(478600001)(186003)(5660300002)(66946007)(2906002)(8936002)(6506007)(71200400001)(52536014)(83380400001)(64756008)(38100700001)(33656002)(66556008)(86362001)(66476007)(7696005)(54906003)(4326008)(55016002)(66446008)(53546011)(6916009)(76116006)(8676002)(558084003)(9686003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: =?us-ascii?Q?Kp9KPu7oyvUJiNbGPMSvmtAGH2kRBPHWquQeaghpaZxsFdOmwB2C7Nqjz8U7?=
+ =?us-ascii?Q?FciQIHCorxVAP5LF9HCKGLUpRyXymokb3Ex5hX0OneIMhUixTE7sVo0ztysA?=
+ =?us-ascii?Q?WylqW12eaDghhsNNO8lJub3ortdmPedxz+hDaZxscHFSoau/jMU8g/KS661p?=
+ =?us-ascii?Q?nhWFRwRCk6oOgvgmy4LAa9XfnWDII9eDf+WNEmEIbwl9G2Tlci8W115APMsr?=
+ =?us-ascii?Q?j+qkvF69BoLl4gnCsAqC1i55SFSrR9xsm/sbUDHtzfAtrNSpGI4m3B/a5JG7?=
+ =?us-ascii?Q?Oq928zHs/dfNS9Md1kufcNhFG4ZdAVRJsejAm4XRwSJFAEuZ7c40Kgx5/n9h?=
+ =?us-ascii?Q?SF8Eun+X2GfDQgUodNhBnoYPGRwjZnCn/OqZRVlQgCWwkMCiKXKjnuIg5wES?=
+ =?us-ascii?Q?tSEpogNPiBZzDfu/HiJ9zjL/l9hOSzxSdxilNmcjuv0e/qzls/XEYBad7yF2?=
+ =?us-ascii?Q?dECHaviQhF6iS2U1Zi6NKedVUnVwBYAjJkXKdZrY2kcmBEsiT+SIrSPVo4Wc?=
+ =?us-ascii?Q?kUpD8aj8PFK6oPcZ1uSAoE81lj6CJR3UT8so1mqZcL2BMTBZgUAQAlk+d9qo?=
+ =?us-ascii?Q?0jrlyX2qB72TY4M0o12dNp8pmU5Pxg1FCB+MoNoM4XY4ohAoCOh8kXCjVehe?=
+ =?us-ascii?Q?NDhjnqjYtuBCQllNK7LhXgD4gOZnUoXmhTk9lNHh3Rqh8ufevazOh69UmP7q?=
+ =?us-ascii?Q?7qCYFgcSuAsuQdEqFNWDpADQYVZGhcsktKdz68JigiG7mZUnrebqWof3c2V3?=
+ =?us-ascii?Q?ysn8mzIBW/OkcbP2uDFBOFK8cMLZfpAZ1iueCEgQKTL6Yn/eEnLcSanSzABt?=
+ =?us-ascii?Q?2cmNvvH/VgNUtLKprZSd1cq/AzYS70rtjNfhG1F7MF9weANyyXC5Sqy8OEb0?=
+ =?us-ascii?Q?Qb+phV+0pholV9X5VGPcXT0KoN/+iyVtF2AmUj9nrCSWNSl/KtQMeRrpoyIC?=
+ =?us-ascii?Q?8vYr/qfS2Vw1Vzk6zQ8cMzlR14Kq7eIbnKpQHKYHE9xsci2VDaQ8mWY+S7bX?=
+ =?us-ascii?Q?eImI8XJfAZqxSvHbA+hXmSsxwvgA9CaNXBAPtr4mZDQvikB/x4ZDOunCGhIt?=
+ =?us-ascii?Q?jOl6q+ASmDn9/v/wmBTluZ1tuiRmTym5io0mw3E5V7ipHxpEHrGny0Z2scrA?=
+ =?us-ascii?Q?l/D+sTkoA9B6F73TvilZUTcWNNhg7ZMg7Q8K7aewqk7zHV1nturHF7l8cdm+?=
+ =?us-ascii?Q?NobMzO1MadUROFYhso2YbUeoZM8C0oz+VoBLZMMDL4Q3aDs7+BDehGwl18eb?=
+ =?us-ascii?Q?sEkV35+W6IMuqM+g+ww58xtmprMSl0WpMWzTQyY+culxwgTFIqRMjvPX/jr0?=
+ =?us-ascii?Q?3VGyd8FNlKDI2ggqX9In/TR0?=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210401235925.GR4332@42.do-not-panic.com>
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR04MB4965.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3e399846-d138-4d12-6425-08d8f859e6e0
+X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Apr 2021 17:40:28.0819
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: kcsLRje6ev3abuoyDTZ2kAmOk076gsv2O6f2te3utXL6fEP6CeB1I6Ap4LC5LHuYQSjUx/T+sCqQGCvKCVUqVloaq3EE3neMtZ19y9y/NBo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB6101
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Apr 01, 2021 at 11:59:25PM +0000, Luis Chamberlain wrote:
-> On Mon, Mar 22, 2021 at 03:12:01PM -0700, Minchan Kim wrote:
-> > On Mon, Mar 22, 2021 at 08:41:56PM +0000, Luis Chamberlain wrote:
-> > > 
-> > > I would not call it *every* syfs knob as not all deal with things which
-> > > are related to CPU hotplug multistate, right? Note that using just
-> > > try_module_get() alone (that is the second patch only, does not fix the
-> > > race I am describing above).
-> > 
-> > It wouldn't be CPU hotplug multistate issue but I'd like to call it
-> > as more "zram instance race" bug.
-> > What happens in this case?
-> > 
-> >         CPU 1                            CPU 2
-> > 
-> > destroy_devices
-> > ..
-> >                                  compact_store()
-> >                                  zram = dev_to_zram(dev);
-> > idr_for_each(zram_remove_cb
-> >   zram_remove
-> >   ..
-> >   kfree(zram)
-> >                                  down_read(&zram->init_lock);
-> > 
-> > 
-> >         CPU 1                            CPU 2
-> > 
-> > hot_remove_store
-> >                                  compact_store()
-> >                                  zram = dev_to_zram(dev);
-> >   zram_remove
-> >     kfree(zram)
-> >                                  down_read(&zram->init_lock);
-> >     				
-> > So, for me we need to close the zram instance create/removal
-> > with sysfs rather than focusing on CPU hotplug issue.
-> 
-> Sure, that's a good point.
-> 
-> The issue which I noted for the race which ends up in a deadlock is only
-> possible if a shared lock is used on removal but also on sysfs knobs.
-> 
-> At first glance, the issue you describe above *seems* to be just proper
-> care driver developers must take with structures used. It is certainly
-> yet another issue we need to address, and if we can generalize a
-> solution even better. I now recall I *think* I spotted that race a while
-> ago and mentioned it to Kees and David Howells but I didn't have a
-> solution for it yet. More on this below.
-> 
-> The issue you point out is real, however you cannot disregard the
-> CPU hoplug possible race as well, it is a design consideration which
-> the CPU hotplug multistate support warns for -- consider driver removal.
-> I agree that perhaps solving this "zram instance race" can fix he
-> hotplug race as well. If we can solves all 3 issues in one shot even
-> better. But let's evaluate that prospect...
-> 
-> > Maybe, we could reuse zram_index_mutex with modifying it with
-> > rw_semaphore. What do you think?
-> 
-> Although ideal given it would knock 3 birds with 1 stone, it ends up
-> actually making the sysfs attributes rather useless in light of the
-> requirements for each of the races. Namely, the sysfs deadlock race
-> *must* use a try lock approach, just as the try_module_get() case.
-> It must use this approach so to immediately just bail out if we have
-> our module being removed, and so on our __exit path. By trying to
-> repurpose zram_index_mutex we end up then just doing too much with it
-> and making the syfs attributes rather fragile for most uses:
-> 
-> Consider disksize_show(), that would have to become:
-> 
-> static ssize_t disksize_show(struct device *dev, struct device_attribute *attr, char *buf)
-> {
-> 	struct zram *zram = dev_to_zram(dev);
-> +	size_t disksize;
-> 
-> +	down_read(&zram_index_rwlock);
-> +	disksize = zram->disksize;
-> +	up_read(&zram_index_rwlock);
-> -	return scnprintf(buf, PAGE_SIZE, "%llu\n", zram->disksize);
-> +	return scnprintf(buf, PAGE_SIZE, "%llu\n", disksize);
-> }
-> 
-> What's wrong with this?
-> 
-> It can block during a write, yes, but there is a type of write which
-> will make this crash after the read lock is acquired. When the instance
-> is removed. What if we try down_read_trylock()?
-> 
-> static ssize_t disksize_show(struct device *dev, struct device_attribute *attr, char *buf)
-> {
-> 	struct zram *zram = dev_to_zram(dev);
-> +	size_t disksize;
-> 
-> +	if (!down_read_trylock(&zram_index_rwlock))
-> +		return -ENODEV;
-> +
-> +	disksize = zram->disksize;
-> +	up_read(&zram_index_rwlock);
-> -	return scnprintf(buf, PAGE_SIZE, "%llu\n", zram->disksize);
-> +	return scnprintf(buf, PAGE_SIZE, "%llu\n", disksize);
-> }
-> 
-> What's wrong with this?
-> 
-> If it got the lock, it should be OK as it is preventing writes from
-> taking the lock for a bit. But then this just becomes pretty fragile,
-> it will fail whenever another read or write is happening, triggering
-> perhaps quite a bit of regressions on tests.
-> 
-> And if we use write_trylock() we end up with the same fragile nature
-> of failing the read with ENODEV for any silly thing going on with the
-> driver.
-> 
-> And come to think of it the last patch I had sent with a new
-> DECLARE_RWSEM(zram_unload) also has this same issue making most
-> sysfs attributes rather fragile.
-
-Thanks for looking the way. I agree the single zram_index_rwlock is
-not the right approach to fix it. However, I still hope we find more
-generic solution to fix them at once since I see it's zram instance
-racing problem.
-
-A approach I am considering is to make struct zram include kobject
-and then make zram sysfs auto populated under the kobject. So, zram/sysfs
-lifetime should be under the kobject. With it, sysfs race probem I
-mentioned above should be gone. Furthermore, zram_remove should fail
-if one of the alive zram objects is existing
-(i.e., zram->kobject->refcount > 1) so module_exit will fail, too.
-
-I see one of the problems is how I could make new zram object's
-attribute group for zram knobs under /sys/block/zram0 since block
-layer already made zram0 kobject via device_add_disk.
+On 4/5/21 06:20, Max Gurtovoy wrote:=0A=
+> +	return queue_var_show(q->limits.virt_boundary_mask, (page));=0A=
+=0A=
+'s/(page)/page/' ?=0A=
+=0A=
+=0A=
