@@ -2,125 +2,217 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2798EC43462
-	for <linux-block@archiver.kernel.org>; Mon,  5 Apr 2021 16:05:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 205AFC433B4
+	for <linux-block@archiver.kernel.org>; Mon,  5 Apr 2021 17:07:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0853E613C5
-	for <linux-block@archiver.kernel.org>; Mon,  5 Apr 2021 16:05:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D3781613B5
+	for <linux-block@archiver.kernel.org>; Mon,  5 Apr 2021 17:07:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239257AbhDEQF4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 5 Apr 2021 12:05:56 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57904 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238994AbhDEQFQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 5 Apr 2021 12:05:16 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 6ECCA613F3;
-        Mon,  5 Apr 2021 16:05:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1617638709;
-        bh=8dX0nKeBPMPFDBL15Iezv+br/Y1ueaIaFrJnbJY55H4=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Rkedb5h7TfFxqD86Ju1eVIMtV5xe8CZVMrOXE6tRzCOS2jxmL6b14SBDKoq65obbb
-         /Oeg4gdiEqB4SMwhRvDtq95hxMjx2KKdDLt6bzmafd6Au2SgGG0mjUV9aav2q/wlM7
-         OQXep6wYN7kiZ3NmvwBNy1nQP0zeYK6upXOlnbEs9blQD3lZBFhoSDG+MOEXm9ORfC
-         ouS7GcH1FZNsXpK8Qny2rPlqEIKmKXiMmOYwUq+k3iig6FpNz17T9ILOuAwriqYCy8
-         65OTqxCPgu7VZaFY6ZlX9celRpmtTKBVilnPz06voyN91PfLtnlJzS/6eQyp0+7dht
-         4zyqyOTuWg0GQ==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Yufen Yu <yuyufen@huawei.com>, Keith Busch <kbusch@kernel.org>,
-        Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 08/13] block: only update parent bi_status when bio fail
-Date:   Mon,  5 Apr 2021 12:04:53 -0400
-Message-Id: <20210405160459.268794-8-sashal@kernel.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210405160459.268794-1-sashal@kernel.org>
-References: <20210405160459.268794-1-sashal@kernel.org>
+        id S232821AbhDERHh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Apr 2021 13:07:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46960 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232733AbhDERHg (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Apr 2021 13:07:36 -0400
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA11BC061756;
+        Mon,  5 Apr 2021 10:07:28 -0700 (PDT)
+Received: by mail-pl1-x62f.google.com with SMTP id h8so5967843plt.7;
+        Mon, 05 Apr 2021 10:07:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=RLfqM/4YIXZIGygat9vmW8mY7gaObgItiX8qoqBUvFM=;
+        b=vKScQsi48K81cCQB3BArJMMXH64fEPo6XNMxfDYOdDm7Hr+2nx1ABrak2wk6LP1qt4
+         AN1MHQaKcEa+nDGHFCY1xf5+6N5etpWKp5C+zq1TtU9VEQg5JXB+QeDFy2oYTklPlVYL
+         J8Ld45pQiIlVKmhHGzrlUPgdHONwyTu8XztYZ9985gXFLi3Xgqc1gui6F2Iqtfy1AgbQ
+         WbIL8r19uU4fOY+6ns45J9vVWra9ATh/7bIt2Eo9ulziV6iUZWWDoXN5BjEDCVZ7XATB
+         qhHvCSPd7xRDn+3HsOIVJDc7fwrVXWQzz47m1ybBSCou7R+n57/Mr/8/dGhpXStf1SHR
+         5gBA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=RLfqM/4YIXZIGygat9vmW8mY7gaObgItiX8qoqBUvFM=;
+        b=Xw5awSFcbyQpiBf5CqTy8Exy8U9KSG4Hm9+KWCGHtiK5JvBL7gQXEEXK/VyUxdxDxl
+         wpLPvszVEfTdHSPEt242m82SuxkivOdNTiWDyQHW+tYN7iEwgPwFETMpa+wPteqt2bOi
+         +BVT3h4+XyNvbTIsPMntohMa+qYeLVXqNhoZ3MsicvdFdiJ20oEMiHtE3RomiSpykpg/
+         EGgllBF3NOgHvOCYfutLQBWfZWr7OUxhDX80vqrg102yzigk4VUvL1+y6SfPyk0+aF1x
+         7ywsCyiQpu/hygmMB7EojZDbup+VkNiB9Pt1ieSi+Bzgis7w4tv5GNK/x3S5ekRY+2/m
+         mABg==
+X-Gm-Message-State: AOAM532E87aq4ECZas/4PS9NYmefS8My27XKm9Y+Dc6KelrVH7xl/KHO
+        R9qLDxRruS0Ut7EczyZbd3Q=
+X-Google-Smtp-Source: ABdhPJyGSiFR05Bhvb/JuonUQqVWP6LEo2ZFxM4pFWlWuLFuRzOAIxqzzmm4i6WU9PMLSmDnL6Mc/w==
+X-Received: by 2002:a17:90a:e7d0:: with SMTP id kb16mr111631pjb.206.1617642447981;
+        Mon, 05 Apr 2021 10:07:27 -0700 (PDT)
+Received: from google.com ([2620:15c:211:201:30d6:b5a3:92ae:5a02])
+        by smtp.gmail.com with ESMTPSA id w23sm16270541pgi.63.2021.04.05.10.07.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Apr 2021 10:07:26 -0700 (PDT)
+Sender: Minchan Kim <minchan.kim@gmail.com>
+Date:   Mon, 5 Apr 2021 10:07:24 -0700
+From:   Minchan Kim <minchan@kernel.org>
+To:     Luis Chamberlain <mcgrof@kernel.org>
+Cc:     keescook@chromium.org, dhowells@redhat.com, hch@infradead.org,
+        mbenes@suse.com, gregkh@linuxfoundation.org, ngupta@vflare.org,
+        sergey.senozhatsky.work@gmail.com, axboe@kernel.dk,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] zram: fix crashes due to use of cpu hotplug
+ multistate
+Message-ID: <YGtDzH0dEfEngCij@google.com>
+References: <YEbjom8FIclEgRYv@google.com>
+ <20210310212128.GR4332@42.do-not-panic.com>
+ <YErOkGrvtQODXtB0@google.com>
+ <20210312183238.GW4332@42.do-not-panic.com>
+ <YEvA1dzDsFOuKdZ/@google.com>
+ <20210319190924.GK4332@42.do-not-panic.com>
+ <YFjHvUolScp3btJ9@google.com>
+ <20210322204156.GM4332@42.do-not-panic.com>
+ <YFkWMZ0m9nKCT69T@google.com>
+ <20210401235925.GR4332@42.do-not-panic.com>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210401235925.GR4332@42.do-not-panic.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Yufen Yu <yuyufen@huawei.com>
+On Thu, Apr 01, 2021 at 11:59:25PM +0000, Luis Chamberlain wrote:
+> On Mon, Mar 22, 2021 at 03:12:01PM -0700, Minchan Kim wrote:
+> > On Mon, Mar 22, 2021 at 08:41:56PM +0000, Luis Chamberlain wrote:
+> > > 
+> > > I would not call it *every* syfs knob as not all deal with things which
+> > > are related to CPU hotplug multistate, right? Note that using just
+> > > try_module_get() alone (that is the second patch only, does not fix the
+> > > race I am describing above).
+> > 
+> > It wouldn't be CPU hotplug multistate issue but I'd like to call it
+> > as more "zram instance race" bug.
+> > What happens in this case?
+> > 
+> >         CPU 1                            CPU 2
+> > 
+> > destroy_devices
+> > ..
+> >                                  compact_store()
+> >                                  zram = dev_to_zram(dev);
+> > idr_for_each(zram_remove_cb
+> >   zram_remove
+> >   ..
+> >   kfree(zram)
+> >                                  down_read(&zram->init_lock);
+> > 
+> > 
+> >         CPU 1                            CPU 2
+> > 
+> > hot_remove_store
+> >                                  compact_store()
+> >                                  zram = dev_to_zram(dev);
+> >   zram_remove
+> >     kfree(zram)
+> >                                  down_read(&zram->init_lock);
+> >     				
+> > So, for me we need to close the zram instance create/removal
+> > with sysfs rather than focusing on CPU hotplug issue.
+> 
+> Sure, that's a good point.
+> 
+> The issue which I noted for the race which ends up in a deadlock is only
+> possible if a shared lock is used on removal but also on sysfs knobs.
+> 
+> At first glance, the issue you describe above *seems* to be just proper
+> care driver developers must take with structures used. It is certainly
+> yet another issue we need to address, and if we can generalize a
+> solution even better. I now recall I *think* I spotted that race a while
+> ago and mentioned it to Kees and David Howells but I didn't have a
+> solution for it yet. More on this below.
+> 
+> The issue you point out is real, however you cannot disregard the
+> CPU hoplug possible race as well, it is a design consideration which
+> the CPU hotplug multistate support warns for -- consider driver removal.
+> I agree that perhaps solving this "zram instance race" can fix he
+> hotplug race as well. If we can solves all 3 issues in one shot even
+> better. But let's evaluate that prospect...
+> 
+> > Maybe, we could reuse zram_index_mutex with modifying it with
+> > rw_semaphore. What do you think?
+> 
+> Although ideal given it would knock 3 birds with 1 stone, it ends up
+> actually making the sysfs attributes rather useless in light of the
+> requirements for each of the races. Namely, the sysfs deadlock race
+> *must* use a try lock approach, just as the try_module_get() case.
+> It must use this approach so to immediately just bail out if we have
+> our module being removed, and so on our __exit path. By trying to
+> repurpose zram_index_mutex we end up then just doing too much with it
+> and making the syfs attributes rather fragile for most uses:
+> 
+> Consider disksize_show(), that would have to become:
+> 
+> static ssize_t disksize_show(struct device *dev, struct device_attribute *attr, char *buf)
+> {
+> 	struct zram *zram = dev_to_zram(dev);
+> +	size_t disksize;
+> 
+> +	down_read(&zram_index_rwlock);
+> +	disksize = zram->disksize;
+> +	up_read(&zram_index_rwlock);
+> -	return scnprintf(buf, PAGE_SIZE, "%llu\n", zram->disksize);
+> +	return scnprintf(buf, PAGE_SIZE, "%llu\n", disksize);
+> }
+> 
+> What's wrong with this?
+> 
+> It can block during a write, yes, but there is a type of write which
+> will make this crash after the read lock is acquired. When the instance
+> is removed. What if we try down_read_trylock()?
+> 
+> static ssize_t disksize_show(struct device *dev, struct device_attribute *attr, char *buf)
+> {
+> 	struct zram *zram = dev_to_zram(dev);
+> +	size_t disksize;
+> 
+> +	if (!down_read_trylock(&zram_index_rwlock))
+> +		return -ENODEV;
+> +
+> +	disksize = zram->disksize;
+> +	up_read(&zram_index_rwlock);
+> -	return scnprintf(buf, PAGE_SIZE, "%llu\n", zram->disksize);
+> +	return scnprintf(buf, PAGE_SIZE, "%llu\n", disksize);
+> }
+> 
+> What's wrong with this?
+> 
+> If it got the lock, it should be OK as it is preventing writes from
+> taking the lock for a bit. But then this just becomes pretty fragile,
+> it will fail whenever another read or write is happening, triggering
+> perhaps quite a bit of regressions on tests.
+> 
+> And if we use write_trylock() we end up with the same fragile nature
+> of failing the read with ENODEV for any silly thing going on with the
+> driver.
+> 
+> And come to think of it the last patch I had sent with a new
+> DECLARE_RWSEM(zram_unload) also has this same issue making most
+> sysfs attributes rather fragile.
 
-[ Upstream commit 3edf5346e4f2ce2fa0c94651a90a8dda169565ee ]
+Thanks for looking the way. I agree the single zram_index_rwlock is
+not the right approach to fix it. However, I still hope we find more
+generic solution to fix them at once since I see it's zram instance
+racing problem.
 
-For multiple split bios, if one of the bio is fail, the whole
-should return error to application. But we found there is a race
-between bio_integrity_verify_fn and bio complete, which return
-io success to application after one of the bio fail. The race as
-following:
+A approach I am considering is to make struct zram include kobject
+and then make zram sysfs auto populated under the kobject. So, zram/sysfs
+lifetime should be under the kobject. With it, sysfs race probem I
+mentioned above should be gone. Furthermore, zram_remove should fail
+if one of the alive zram objects is existing
+(i.e., zram->kobject->refcount > 1) so module_exit will fail, too.
 
-split bio(READ)          kworker
-
-nvme_complete_rq
-blk_update_request //split error=0
-  bio_endio
-    bio_integrity_endio
-      queue_work(kintegrityd_wq, &bip->bip_work);
-
-                         bio_integrity_verify_fn
-                         bio_endio //split bio
-                          __bio_chain_endio
-                             if (!parent->bi_status)
-
-                               <interrupt entry>
-                               nvme_irq
-                                 blk_update_request //parent error=7
-                                 req_bio_endio
-                                    bio->bi_status = 7 //parent bio
-                               <interrupt exit>
-
-                               parent->bi_status = 0
-                        parent->bi_end_io() // return bi_status=0
-
-The bio has been split as two: split and parent. When split
-bio completed, it depends on kworker to do endio, while
-bio_integrity_verify_fn have been interrupted by parent bio
-complete irq handler. Then, parent bio->bi_status which have
-been set in irq handler will overwrite by kworker.
-
-In fact, even without the above race, we also need to conside
-the concurrency beteen mulitple split bio complete and update
-the same parent bi_status. Normally, multiple split bios will
-be issued to the same hctx and complete from the same irq
-vector. But if we have updated queue map between multiple split
-bios, these bios may complete on different hw queue and different
-irq vector. Then the concurrency update parent bi_status may
-cause the final status error.
-
-Suggested-by: Keith Busch <kbusch@kernel.org>
-Signed-off-by: Yufen Yu <yuyufen@huawei.com>
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-Link: https://lore.kernel.org/r/20210331115359.1125679-1-yuyufen@huawei.com
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- block/bio.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/block/bio.c b/block/bio.c
-index 24704bc2ad6f..cb38d6f3acce 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -305,7 +305,7 @@ static struct bio *__bio_chain_endio(struct bio *bio)
- {
- 	struct bio *parent = bio->bi_private;
- 
--	if (!parent->bi_status)
-+	if (bio->bi_status && !parent->bi_status)
- 		parent->bi_status = bio->bi_status;
- 	bio_put(bio);
- 	return parent;
--- 
-2.30.2
-
+I see one of the problems is how I could make new zram object's
+attribute group for zram knobs under /sys/block/zram0 since block
+layer already made zram0 kobject via device_add_disk.
