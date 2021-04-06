@@ -2,95 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B70CAC433ED
-	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 03:23:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBC89C433ED
+	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 03:23:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6D8216124B
-	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 03:23:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 89F156128A
+	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 03:23:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240277AbhDFDXK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 5 Apr 2021 23:23:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:58810 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230364AbhDFDXK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 5 Apr 2021 23:23:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617679382;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=xZtS9exMV0Q/o8g3fCz5HcTaKQTbu2EFynNJ1+xwKEo=;
-        b=R0NYj4dQpUONDZA7gmL80rxUb4C92HivjMYKHNlwDsOGo5MPt+t8x5rtYnpA5nDrv6gcAp
-        6c3Z2zWdGHxBrlBS1piwDleSeUiJ6zM2aeGI40WElvwXHyPc9BMJuIc0UHp68sRYpfCRS2
-        Zi1g0JP3udnxWzCqWS9R0q8LyZis5xY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-445-sn6jPURDMWK-gfw0Pn2mUQ-1; Mon, 05 Apr 2021 23:19:44 -0400
-X-MC-Unique: sn6jPURDMWK-gfw0Pn2mUQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E40AC1084C8C;
-        Tue,  6 Apr 2021 03:19:42 +0000 (UTC)
-Received: from localhost (ovpn-12-144.pek2.redhat.com [10.72.12.144])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 21C1E5C729;
-        Tue,  6 Apr 2021 03:19:38 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Yanhui Ma <yama@redhat.com>,
-        John Garry <john.garry@huawei.com>,
-        Hannes Reinecke <hare@suse.de>
-Subject: [PATCH] blk-mq: set default elevator as deadline in case of hctx shared tagset
-Date:   Tue,  6 Apr 2021 11:19:33 +0800
-Message-Id: <20210406031933.767228-1-ming.lei@redhat.com>
+        id S239596AbhDFDXV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Apr 2021 23:23:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38942 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230364AbhDFDXV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Apr 2021 23:23:21 -0400
+Received: from mail-yb1-xb29.google.com (mail-yb1-xb29.google.com [IPv6:2607:f8b0:4864:20::b29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 211A3C061574;
+        Mon,  5 Apr 2021 20:23:14 -0700 (PDT)
+Received: by mail-yb1-xb29.google.com with SMTP id 185so9100880ybf.3;
+        Mon, 05 Apr 2021 20:23:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=xyUOqQqREwsmvr/dLosqt/ckIIZfER6FkNAdfyxy9uY=;
+        b=t5E2hut5WjKDzvQgOPwKuWQEq9EGSvzfR4OC4bI5V7kIwUyaF3zmDBhabi5rJR82dg
+         AnGwqHeGRP6h3UESEig0+hJQB2IBOmiRAmBgURVaoyk9vQ0O+woNrdMk1LV+16lPeea9
+         ddoNDVZmu9CcAZMMK2ApcYu/kApWdEpBz5/sCv9FDAU/SHYE3FAlPSazpvvjzTTuA1EL
+         xnupfEfwm7VYjfIRK0SYocYabKzWKVNtQlgnuLJNQTgozntliBKA4h8F1xT+wBcDd9HJ
+         tnLb9D7qBtuLEFYr8XYbWepN3ak3DdRi/t+G/Ye5MQ4cl/lwY5UPsDjFasIKY1QxCrua
+         5yZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=xyUOqQqREwsmvr/dLosqt/ckIIZfER6FkNAdfyxy9uY=;
+        b=k62D7rngSctpHmswl7V4oKhicWgLiVSCvLUp7xNXwmEPOI13MJvukLO+fJOGuF+1Gg
+         ctdPU2aQYXBoaAAIgzcXciLcwavYWpykUVAzy0/dY2TA2qRJ/JyUPNHZm3V9NDMCvqSl
+         ZR1F5jMhU/ILk7fCmLeF4gCWOM4dXDyt108RGLTcO8s2r5mukxFlK1ppIZdzF31GSya4
+         dSyfQR3iAIsIc9/jMUx99COyUwH8IF13iP0JTJ30MZUB3+mrSwXlpA6Rko42vvHI8btR
+         /eh7czErjq+IRkhpb+l5bPzHLbdztGRFWQSjx0IUGIkDp/0unAk7ULplHHPrMy0b/6f4
+         nBtA==
+X-Gm-Message-State: AOAM530vg3v+cJdFFqncHBTIyKxiiGlFMyvn85Q1YrW0Ht9WEXFLAmp+
+        r/pArvdbVJoR+QY8LuFCV2qSzNHezjklH2CIcMU=
+X-Google-Smtp-Source: ABdhPJwvn+9Sqt3YJDnBD6ITBf4KlJ8hnzi2asfm8VH645X8R3lzJQEeiZnNvEqxwztwH9Us5YonBxjhBrBHABgLnkQ=
+X-Received: by 2002:a25:238a:: with SMTP id j132mr17675039ybj.117.1617679393333;
+ Mon, 05 Apr 2021 20:23:13 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+References: <20210402191638.3249835-1-schatzberg.dan@gmail.com> <20210402191638.3249835-4-schatzberg.dan@gmail.com>
+In-Reply-To: <20210402191638.3249835-4-schatzberg.dan@gmail.com>
+From:   Ming Lei <tom.leiming@gmail.com>
+Date:   Tue, 6 Apr 2021 11:23:01 +0800
+Message-ID: <CACVXFVPR+OLtPc6G-PTHNm+ro6LpzcHxxuCoFTcWHb6fmyRbKQ@mail.gmail.com>
+Subject: Re: [PATCH 3/3] loop: Charge i/o to mem and blk cg
+To:     Dan Schatzberg <schatzberg.dan@gmail.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        Zefan Li <lizefan.x@bytedance.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Michal Hocko <mhocko@kernel.org>,
+        Vladimir Davydov <vdavydov.dev@gmail.com>,
+        Hugh Dickins <hughd@google.com>,
+        Shakeel Butt <shakeelb@google.com>,
+        Roman Gushchin <guro@fb.com>,
+        Muchun Song <songmuchun@bytedance.com>,
+        Yang Shi <shy828301@gmail.com>,
+        Alex Shi <alex.shi@linux.alibaba.com>,
+        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+        Wei Yang <richard.weiyang@gmail.com>,
+        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        "open list:CONTROL GROUP (CGROUP)" <cgroups@vger.kernel.org>,
+        "open list:MEMORY MANAGEMENT" <linux-mm@kvack.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Yanhui found that write performance is degraded a lot after applying
-hctx shared tagset on one test machine with megaraid_sas. And turns out
-it is caused by none scheduler which becomes default elevator caused by
-hctx shared tagset patchset.
+On Sat, Apr 3, 2021 at 3:18 AM Dan Schatzberg <schatzberg.dan@gmail.com> wrote:
+>
+> The current code only associates with the existing blkcg when aio is
+> used to access the backing file. This patch covers all types of i/o to
+> the backing file and also associates the memcg so if the backing file is
+> on tmpfs, memory is charged appropriately.
+>
+> This patch also exports cgroup_get_e_css and int_active_memcg so it
+> can be used by the loop module.
+>
+> Signed-off-by: Dan Schatzberg <schatzberg.dan@gmail.com>
+> Acked-by: Johannes Weiner <hannes@cmpxchg.org>
 
-Given more scsi HBAs will apply hctx shared tagset, and the similar
-performance exists for them too.
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-So keep previous behavior by still using default mq-deadline for queues
-which apply hctx shared tagset, just like before.
-
-Fixes: 32bc15afed04 ("blk-mq: Facilitate a shared sbitmap per tagset")
-Reported-by: Yanhui Ma <yama@redhat.com>
-Cc: John Garry <john.garry@huawei.com>
-Cc: Hannes Reinecke <hare@suse.de>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/elevator.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/block/elevator.c b/block/elevator.c
-index 293c5c81397a..440699c28119 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -621,7 +621,8 @@ static inline bool elv_support_iosched(struct request_queue *q)
-  */
- static struct elevator_type *elevator_get_default(struct request_queue *q)
- {
--	if (q->nr_hw_queues != 1)
-+	if (q->nr_hw_queues != 1 &&
-+			!blk_mq_is_sbitmap_shared(q->tag_set->flags))
- 		return NULL;
- 
- 	return elevator_get(q, "mq-deadline", false);
 -- 
-2.29.2
-
+Ming Lei
