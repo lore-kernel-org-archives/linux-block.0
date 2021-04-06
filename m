@@ -2,78 +2,122 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A93EBC433ED
-	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 15:42:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C21E7C433B4
+	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 15:54:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5EFC06124B
-	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 15:42:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 94F2F610CC
+	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 15:54:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345901AbhDFPmq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Apr 2021 11:42:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59628 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345903AbhDFPmn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Apr 2021 11:42:43 -0400
-Received: from angie.orcam.me.uk (angie.orcam.me.uk [IPv6:2001:4190:8020::4])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 53BC4C06174A;
-        Tue,  6 Apr 2021 08:42:35 -0700 (PDT)
-Received: by angie.orcam.me.uk (Postfix, from userid 500)
-        id 43EC592009D; Tue,  6 Apr 2021 17:42:33 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-        by angie.orcam.me.uk (Postfix) with ESMTP id 3E08F92009B;
-        Tue,  6 Apr 2021 17:42:33 +0200 (CEST)
-Date:   Tue, 6 Apr 2021 17:42:33 +0200 (CEST)
-From:   "Maciej W. Rozycki" <macro@orcam.me.uk>
-To:     Christoph Hellwig <hch@lst.de>
-cc:     Jens Axboe <axboe@kernel.dk>, Khalid Aziz <khalid@gonehiking.org>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Hannes Reinecke <hare@suse.com>,
-        Ondrej Zary <linux@rainbow-software.org>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCH 2/8] Buslogic: remove ISA support
-In-Reply-To: <20210406062750.GA6277@lst.de>
-Message-ID: <alpine.DEB.2.21.2104061722220.65251@angie.orcam.me.uk>
-References: <20210331073001.46776-1-hch@lst.de> <20210331073001.46776-3-hch@lst.de> <alpine.DEB.2.21.2104031805520.18977@angie.orcam.me.uk> <20210406062750.GA6277@lst.de>
-User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
+        id S1346059AbhDFPyn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Apr 2021 11:54:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53279 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1345862AbhDFPym (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 6 Apr 2021 11:54:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1617724474;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=GECg07lP5wsIqbFA2Q0Bw1H5A4ajMexc9b0QUtiEUWY=;
+        b=cI2GLgvon9l6hRkwem95ROnHMUL7bW2cNgEzkDXSVnzsQ17pAnpgejx0EtKygdbrB0gsT8
+        lbMNGLvo/gqXqBzc2+tAc84LgDXvyNcI6K9y8W2JtZXXKclVTCxNrwyncZTL95u3LgqtJT
+        awSHfEVxZYEI4JR9nLgU1R3jz0DqW9o=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-215-CUodGpTdMkqgH90ht6jzIw-1; Tue, 06 Apr 2021 11:54:30 -0400
+X-MC-Unique: CUodGpTdMkqgH90ht6jzIw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 94AA2800D53;
+        Tue,  6 Apr 2021 15:54:27 +0000 (UTC)
+Received: from treble (ovpn-116-68.rdu2.redhat.com [10.10.116.68])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6F97310016FC;
+        Tue,  6 Apr 2021 15:54:25 +0000 (UTC)
+Date:   Tue, 6 Apr 2021 10:54:23 -0500
+From:   Josh Poimboeuf <jpoimboe@redhat.com>
+To:     Miroslav Benes <mbenes@suse.cz>
+Cc:     Greg KH <gregkh@linuxfoundation.org>,
+        Luis Chamberlain <mcgrof@kernel.org>, mbenes@suse.com,
+        Minchan Kim <minchan@kernel.org>, keescook@chromium.org,
+        dhowells@redhat.com, hch@infradead.org, ngupta@vflare.org,
+        sergey.senozhatsky.work@gmail.com, axboe@kernel.dk,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        live-patching@vger.kernel.org, Jessica Yu <jeyu@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>
+Subject: Re: [PATCH 1/2] zram: fix crashes due to use of cpu hotplug
+ multistate
+Message-ID: <20210406155423.t7dagp24bupudv3p@treble>
+References: <20210319190924.GK4332@42.do-not-panic.com>
+ <YFjHvUolScp3btJ9@google.com>
+ <20210322204156.GM4332@42.do-not-panic.com>
+ <YFkWMZ0m9nKCT69T@google.com>
+ <20210401235925.GR4332@42.do-not-panic.com>
+ <YGbNpLKXfWpy0ZZa@kroah.com>
+ <20210402183016.GU4332@42.do-not-panic.com>
+ <YGgHg7XCHD3rATIK@kroah.com>
+ <20210406003152.GZ4332@42.do-not-panic.com>
+ <alpine.LSU.2.21.2104061354110.10372@pobox.suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <alpine.LSU.2.21.2104061354110.10372@pobox.suse.cz>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 6 Apr 2021, Christoph Hellwig wrote:
-
-> >  Last but not least I do hope you do not plan to retire ISA DMA bounce 
-> > buffering support for drivers/block/floppy.c, as there is hardly an 
-> > alternative available (I do have a single SCSI<->FDD interface built 
-> > around an Intel 8080 CPU, in the half-height 5.25" drive form factor, but 
-> > such devices are exceedingly rare, and then you need a suitable parallel 
-> > SCSI host too).
+On Tue, Apr 06, 2021 at 02:00:19PM +0200, Miroslav Benes wrote:
+> Hi,
 > 
-> The floppy driver already uses its own bounce buffering for addressing
-> limitations, and only the kernel bounce buffering to avoid getting
-> fed highmem patches.  Please take a look at this series to clean up the
-> latter:
+> > > Driver developers will simply have to open code these protections. In
+> > > light of what I see on LTP / fuzzing, I suspect the use case will grow
+> > > and we'll have to revisit this in the future. But for now, sure, we can
+> > > just open code the required protections everywhere to not crash on module
+> > > removal.
+> > 
+> > LTP and fuzzing too do not remove modules.  So I do not understand the
+> > root problem here, that's just something that does not happen on a real
+> > system.
 > 
-> https://lore.kernel.org/linux-block/20210406061755.811522-1-hch@lst.de/T/#u
-
- Great, thanks!
-
-> >  Would it be feasible to convert it and any other drivers for ISA DMA 
-> > devices (like those support for which you propose to remove here) still 
-> > have users who could verify operation to the IOMMU framework?
+> If I am not mistaken, the issue that Luis tries to solve here was indeed 
+> found by running LTP.
 > 
-> I've converted the only once that still has signs of having users in
-> the last 10 or so years.
+> > On Sat, Apr 03, 2021 at 08:13:23AM +0200, Greg KH wrote:
+> > > On Fri, Apr 02, 2021 at 06:30:16PM +0000, Luis Chamberlain wrote:
+> > > > On Fri, Apr 02, 2021 at 09:54:12AM +0200, Greg KH wrote:
+> > > > > No, please no.  Module removal is a "best effort",
+> > > > 
+> > > > Not for live patching. I am not sure if I am missing any other valid
+> > > > use case?
+> > > 
+> > > live patching removes modules?  We have so many code paths that are
+> > > "best effort" when it comes to module unloading, trying to resolve this
+> > > one is a valiant try, but not realistic.
+> > 
+> > Miroslav, your input / help here would be valuable. I did the
+> > generalization work because you said it would be worthy for you too...
+> 
+> Yes, we have the option to revert and remove the existing live patch from 
+> the system. I am not sure how (if) it is used in practice.
+> 
+> At least at SUSE we do not support the option. But we are only one of the 
+> many downstream users. So yes, there is the option.
 
- I infer the answer is "yes" then.  Of course it makes no sense to waste 
-time and speculatively convert code nobody has expressed interest in and 
-there's no immediate way to verify.
+Same for Red Hat.  Unloading livepatch modules seems to work fine, but
+isn't officially supported.
 
-  Maciej
+That said, if rmmod is just considered a development aid, and we're
+going to be ignoring bugs, we should make it official with a new
+TAINT_RMMOD.
+
+-- 
+Josh
+
