@@ -7,71 +7,66 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA6CEC433ED
-	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 15:28:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B89B7C433ED
+	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 15:30:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B08E761380
-	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 15:28:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 81113613CA
+	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 15:30:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230019AbhDFP24 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Apr 2021 11:28:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56482 "EHLO
+        id S239916AbhDFPaf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Apr 2021 11:30:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56842 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229648AbhDFP24 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Apr 2021 11:28:56 -0400
-Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D6EDC06174A
-        for <linux-block@vger.kernel.org>; Tue,  6 Apr 2021 08:28:48 -0700 (PDT)
-Received: by mail-pg1-x533.google.com with SMTP id b17so6966306pgh.7
-        for <linux-block@vger.kernel.org>; Tue, 06 Apr 2021 08:28:48 -0700 (PDT)
+        with ESMTP id S229790AbhDFPaf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Apr 2021 11:30:35 -0400
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 293BFC06174A
+        for <linux-block@vger.kernel.org>; Tue,  6 Apr 2021 08:30:27 -0700 (PDT)
+Received: by mail-pj1-x1034.google.com with SMTP id ha17so8133863pjb.2
+        for <linux-block@vger.kernel.org>; Tue, 06 Apr 2021 08:30:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=tF6CUcXpDbuAErZj+N46Yk25H9mtpHvG+8qfiMxKbKU=;
-        b=Bn2+6Kr/JILCfY9KCOAIzAHAOAGagzdl2B5myfm9+iNCnlqdBNKLt0Utw/vwFi2BOw
-         +Y/3JeiL3hPpByyQ6U+n158Az5HijEuoMx1kM/9D6tLX4IheCNv3ecUZuGqvqZYwZV4/
-         kOZawMX9OBQ3uj5m6tYiGG21KkIa4IKXFUuUzn+91NMLOtRW76pwvGGdqo+OiCYL8Lrb
-         VW37guDHBJBPpUYMqr9wl5IRGh4AHr7UTLAmD26OPUiYQhXAqkPkydC98zEKISO7wgnH
-         M8JBKFao74fizTutzYEHHQwbBMbGNlLglmLRkG7aANcbDOGcS8G3Q8Sz3DbfZsBl9pZy
-         enBA==
+        bh=BQTCy5ijyyViRaAjyIy/PYwacbW1UlGpqylY/UiiSJQ=;
+        b=m0L1YmnP/tNmFLfM1zrmNAWM0spVul4zMFWtOnEmzckpxHb6ptLBEKk9lm+KAJo7dd
+         Vz/D9y2IokFu0F7FTEA8CCAecKhbRuW4joM5VaN55lpZvezBkZmBtdA05filU+4KBL13
+         5RniQsfyiJMiUr4w/87OzEUV86tGMgX1lGIYBFPW4T2TiKYTDXIVbarQs1NZUgqZeSip
+         bbYdceozz0wAgmoHbx6iNh8O361mqNwrvcadsVwrjMq/T4rNVjpnpByi8iDUW2lcnRN3
+         J897lzSyjnkrm3IFSHHhw2ijXIjW0m7UktbuFAjDQi+vH7rKcc+7CvgLPSROjQkydPJ5
+         1v5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=tF6CUcXpDbuAErZj+N46Yk25H9mtpHvG+8qfiMxKbKU=;
-        b=Dr+ZTOkx863TB5iYKdJyMC6Av2T5LugLnKrqKLUpmR3J9/svUOE9f1TKAN7ygoSrUg
-         bAlHYt6uCRAEIYDpUaOr9My1QAxwBCE3lXrrzmb7RWZ0x+iAy1h0w6D/fTjEd/0LKgeS
-         KeGRVMn1rgoI+e1YBkn7woa3zXwqa+yNdcQiMiFfNUJpSLWcJXZ7m2TVLuyPPoLYYHNr
-         fLX+AeQk2l9cD9q4NRDgPX6ht4pPZWPs66asULeJ4l8g6SDQJJyut6QonTvuF/kDGyw0
-         3ClVDo7LB72mqlgzzHrbXKfuqEXPZmjbzl5uubOSIaeVOa8btTnmKzigO69/SoeKT9Pg
-         Akug==
-X-Gm-Message-State: AOAM533ITspTifASjNiD7BDTmo2hYtr589g7dUYUXoDz4F+b6kfsb5Ew
-        /xdmfvQ8dQ7jUaZzF3nHcfeRlw==
-X-Google-Smtp-Source: ABdhPJx2qHg/FttuBAn2osLaKJ1OJTMxTAM4fMtZXL0k+4IEXtlKOhbPcpdi1h48369ylF8Q/VFQAw==
-X-Received: by 2002:a63:e63:: with SMTP id 35mr27016911pgo.27.1617722927995;
-        Tue, 06 Apr 2021 08:28:47 -0700 (PDT)
+        bh=BQTCy5ijyyViRaAjyIy/PYwacbW1UlGpqylY/UiiSJQ=;
+        b=CliUIFfbPkOv4VDDvqMZuK8q8m2ZCvQXTsWrFtegJuzvLQQfCVdAVoWTTHb00r7Zdf
+         VozW5AD6r41gGcags5AQJIpNIYqhiqVZnQazxCiCkRV6D/o+Sfnm386s+/92hBK15VRi
+         GC/Izfo+IRwEE0yHiYjZV4zRoW6kA7hVsBlL3TF3lWFGiIYTa/agv009izQD3KM203yf
+         mrYnoxCTl2SS+onGvOKPtJmCj2A6AreeYyNsS9g04BwJKXoNT9XhNTDyqYNMMmLg44z+
+         1A57XEYb8vuoIs5xauXX34nlawLxTMb1jYiQDp0E9Z/urteyWvrRQkc7fRLY7JtRcYi7
+         wixA==
+X-Gm-Message-State: AOAM530CGs5+Qt9U7z6lHoK5qnvyIUMyddFtQiCG09IbOq43RnP6cR0n
+        7B2XGzDEzJ7Y14ZyeYavbEXB5TRPMSas9g==
+X-Google-Smtp-Source: ABdhPJyQ0rg0aNhRPfV4x1SaMuFIH6BUnqWcvkJ+tcA669yQ5CiLANcaYO/FNoDoehLeL0hA18LVEQ==
+X-Received: by 2002:a17:90a:f3d0:: with SMTP id ha16mr4753222pjb.5.1617723026501;
+        Tue, 06 Apr 2021 08:30:26 -0700 (PDT)
 Received: from [192.168.4.41] (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
-        by smtp.gmail.com with ESMTPSA id h7sm19254868pfo.45.2021.04.06.08.28.46
+        by smtp.gmail.com with ESMTPSA id y15sm22000339pgi.31.2021.04.06.08.30.25
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 06 Apr 2021 08:28:47 -0700 (PDT)
-Subject: Re: start removing block bounce buffering support v3
-To:     Christoph Hellwig <hch@lst.de>,
-        Khalid Aziz <khalid@gonehiking.org>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Hannes Reinecke <hare@suse.com>,
-        Ondrej Zary <linux@rainbow-software.org>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
-References: <20210331073001.46776-1-hch@lst.de>
+        Tue, 06 Apr 2021 08:30:26 -0700 (PDT)
+Subject: Re: [PATCH] gdrom: support highmem
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     linux-block@vger.kernel.org
+References: <20210406061648.811275-1-hch@lst.de>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <11664576-758d-7e8e-bf95-ff9c82cab927@kernel.dk>
-Date:   Tue, 6 Apr 2021 09:28:48 -0600
+Message-ID: <728fc6f5-d9e1-ca17-2c24-8d4929449983@kernel.dk>
+Date:   Tue, 6 Apr 2021 09:30:27 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210331073001.46776-1-hch@lst.de>
+In-Reply-To: <20210406061648.811275-1-hch@lst.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -79,25 +74,11 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/31/21 1:29 AM, Christoph Hellwig wrote:
-> Hi all,
-> 
-> this series starts to clean up and remove the impact of the legacy old
-> block layer bounce buffering code.
-> 
-> First it removes support for ISA bouncing.  This was used by three SCSI
-> drivers.  One of them actually had an active user and developer 5 years
-> ago so I've converted it to use a local bounce buffer - Ondrej, can you
-> test the coversion?  The next one has been known broken for years, and
-> the third one looks like it has no users for the ISA support so they
-> are just dropped.
-> 
-> It then removes support for dealing with bounce buffering highmem pages
-> for passthrough requests as we can just use the copy instead of the map
-> path for them.  This will reduce efficiency for such setups on highmem
-> systems (e.g. usb-storage attached DVD drives), but then again that is
-> what you get for using a driver not using modern interfaces on a 32-bit
-> highmem system.  It does allow to streamline the common path pretty nicely.
+On 4/6/21 12:16 AM, Christoph Hellwig wrote:
+> The gdrom driver only has a single reference to the virtual address of
+> the bio data, and uses that only to get the physical address.  Switch
+> to deriving the physical address from the page directly and thus avoid
+> bounce buffering highmem data.
 
 Applied, thanks.
 
