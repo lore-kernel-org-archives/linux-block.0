@@ -4,70 +4,68 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61BA5C43461
-	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 08:25:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 264D5C433B4
+	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 08:26:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 21CB86128D
-	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 08:25:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D7BBE613BE
+	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 08:26:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240048AbhDFIZt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Apr 2021 04:25:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47818 "EHLO
+        id S234429AbhDFI0Y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Apr 2021 04:26:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47938 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240035AbhDFIZr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Apr 2021 04:25:47 -0400
-Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23C68C061756
-        for <linux-block@vger.kernel.org>; Tue,  6 Apr 2021 01:25:40 -0700 (PDT)
-Received: by mail-ej1-x62e.google.com with SMTP id qo10so10153140ejb.6
-        for <linux-block@vger.kernel.org>; Tue, 06 Apr 2021 01:25:40 -0700 (PDT)
+        with ESMTP id S233333AbhDFI0U (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Apr 2021 04:26:20 -0400
+Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75076C06174A
+        for <linux-block@vger.kernel.org>; Tue,  6 Apr 2021 01:26:13 -0700 (PDT)
+Received: by mail-ej1-x629.google.com with SMTP id w3so20536394ejc.4
+        for <linux-block@vger.kernel.org>; Tue, 06 Apr 2021 01:26:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=ionos.com; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=kPEC7Z0C1S3CtWI0bKM/SzVawZ4wVR7pzA9z9+9Y4iM=;
-        b=TAPlMWUf9wyJ1Ary1eORH0Gp1bNpfZlB8U6NIfCM1dosXsTjrczuqhzvn5ekHLSCTv
-         eb0r6QDRGZibtoVu/pGVkg8JeMGF0mWlEeE2IlL56/hEBjC4f2Nu8XQQvTtgvpfPOhb7
-         kj6SY05e/LDbasYYbIwUfqbqPoCmrQPMTleY6TE+JaKSY0QnergmXj6AlwwdzOxm3EbP
-         nhReUCb2yqFcYaNeIb6XAAQ+Ksp49y/FAqsWXrdBo54BJ67lPoMxXArOJOvrf4rJFq0F
-         +p/et9C9/nQLft64XKI1E1pGbyOqFK+dqneN1Cthz4Nxf3cpyE+FpUL/E38HkaPiqCIo
-         HuEw==
+        bh=Ahi/D8bf8CpBOvALvKxRw7lvvFdMQkT7+2MN/XWfTKM=;
+        b=Cv79ims9QHjo8Nxb4Dj/si7IGo6FqIFZozqePjtOKFMQ2LYXBHHRIK1bJFatR5TS5G
+         itE06G3XusaN+sVPp6oiilbl7cc+a1G8ZdSSF9ldlUP9YMa2xUB/FCFY3h0SeIOId7Rs
+         ZTmQAEOhduXcGjANS+/DaW6tipH0JxLen7UiGIk/8gL3lGpiWwH6JMl5DPmn2X7ts7ii
+         imQfq044GkMIc58w/awL7DGMaE7/jJ0ztiEBiOGh6QjQKA8DJ6ERX9xvDyaKcXUvc6Jc
+         mc3X5LR6hDqOL58u+vB5yz8pI/pVaKHzWhmdZiV5/V4ZBh35KutQmfM0iXBu0U+Wohrw
+         X8GA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=kPEC7Z0C1S3CtWI0bKM/SzVawZ4wVR7pzA9z9+9Y4iM=;
-        b=rXB8SDNHHeJn/ZlRH5yfSZtn12am/Z2BCR+pZKi4KiKYK+qelBkD7CAH3f571aVwUf
-         F5sEos60z5wzgOExNw8JRPEaXgYPRVp4C2kPakYoJB6+culKXIeLrMizVNcgiXB6AoI0
-         VyfqqVwbB1+1uK1KIdCJdKUYDOhG3zHwauusf2jAInhUcKEXhLYHCr0lxBcltdFYAdHP
-         3GbMSb72yJ6X+5IRzD9xpRfiz7wJB8tTG6H0lduRM0i8qsVcXKdvG/C+teuX/6F2w5M5
-         oh5XtQXxesGlVPSsAF2lvbXgU05UPacEaOprtZskhGCZSUualNn6Y/Ku59XSFYUHNuOs
-         zOIQ==
-X-Gm-Message-State: AOAM530E1G1C+pcjpHJtt+epAcURIV4lRYjGuwzX1LruezcE6w7nVyDM
-        J1LOyKqE6ShC2mQ2e6u6yGHVRz7J5GdY2DRVbL9ZZ8xeoGaBEk4R
-X-Google-Smtp-Source: ABdhPJwmE+Rv+h+sBNkMZQXshRB8p3H+2i1cWVJipfBKRd4UYNIZmk0m303Nqzs9u17F5vVs0OJV3jwu7pw3X0xtRqQ=
-X-Received: by 2002:a17:906:190d:: with SMTP id a13mr10839476eje.330.1617697538688;
- Tue, 06 Apr 2021 01:25:38 -0700 (PDT)
+        bh=Ahi/D8bf8CpBOvALvKxRw7lvvFdMQkT7+2MN/XWfTKM=;
+        b=Z3iJC8o1rlyOK1GKIqs+joNuo8My8R/b/VQrIa5pvKq1YMUh7A07XBFWLJQjBW/Dnj
+         3Vng7j4zAu++glcN0kAaiC+QaYyw5okzsE8f7ebIX3W2rMoQHZN45FuUrqvzvIjZL5MR
+         UVAbBExRUwc6oHaw+Vx1A/o7U6y0R0MxFYvtDoyuCgwigInTfrg79yxS7IYMOB3jYHXB
+         eFmokbnqfn0c/8/NZKN94wH7H6UwWuDnwW5QnLgALnHUqjG3mXXESf1hPAeI2/yAZwIs
+         AalI4GY0fOzn1SbGT0S82OQrkDpxFK8WPQfYFojfqJszWu1wBVESXWf4u6qPGamVZVtX
+         zQqw==
+X-Gm-Message-State: AOAM533bdwhpkiXkszGntdgWdkRuJ7YgmWEdujvr1U8CmbWEGwTDONem
+        pEXIhU3dkklngIb7u/iQqnq/t3IWpsQV1W6qEEz7NZ8hZci4GBZV
+X-Google-Smtp-Source: ABdhPJwIJ0IYWZUmFrOT7dbiZ9Nr/Y4h+KsMo48XsQmIS0xNFocApbhlakJZgWLOPNMMUkv89i/pVsGZVxHVaWePwSw=
+X-Received: by 2002:a17:906:4a98:: with SMTP id x24mr8774214eju.238.1617697572147;
+ Tue, 06 Apr 2021 01:26:12 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210406070716.168541-1-gi-oh.kim@ionos.com> <20210406070716.168541-16-gi-oh.kim@ionos.com>
-In-Reply-To: <20210406070716.168541-16-gi-oh.kim@ionos.com>
+References: <20210406070716.168541-1-gi-oh.kim@ionos.com> <20210406070716.168541-19-gi-oh.kim@ionos.com>
+In-Reply-To: <20210406070716.168541-19-gi-oh.kim@ionos.com>
 From:   Gioh Kim <gi-oh.kim@ionos.com>
-Date:   Tue, 6 Apr 2021 10:25:03 +0200
-Message-ID: <CAJX1YtZLHppqWbgOTneuhQm1jBsKpXqux-1+K5t_GoGZ-SDAJw@mail.gmail.com>
-Subject: Re: [PATCHv3 for-next 15/19] block/rnbd-srv: Remove unused arguments
- of rnbd_srv_rdma_ev
+Date:   Tue, 6 Apr 2021 10:25:36 +0200
+Message-ID: <CAJX1YtaA=RccBa=JT9=Bf9+bh3K2A4o_YWFUkMWqz6PEvdGP5A@mail.gmail.com>
+Subject: Re: [PATCHv3 for-next 18/19] block/rnbd-clt-sysfs: Remove copy buffer
+ overlap in rnbd_clt_get_path_name
 To:     linux-block@vger.kernel.org
 Cc:     Jens Axboe <axboe@kernel.dk>, hch@infradead.org, sagi@grimberg.me,
         bvanassche@acm.org, Haris Iqbal <haris.iqbal@ionos.com>,
         Jinpu Wang <jinpu.wang@ionos.com>,
-        Gioh Kim <gi-oh.kim@cloud.ionos.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Leon Romanovsky <leonro@nvidia.com>,
-        linux-rdma@vger.kernel.org,
-        Aleksei Marov <aleksei.marov@ionos.com>,
+        Dima Stepanov <dmitrii.stepanov@cloud.ionos.com>,
+        Dima Stepanov <dmitrii.stepanov@ionos.com>,
+        Arnd Bergmann <arnd@arndb.de>,
         Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
@@ -76,16 +74,21 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 On Tue, Apr 6, 2021 at 9:07 AM Gioh Kim <gi-oh.kim@ionos.com> wrote:
 >
-> From: Gioh Kim <gi-oh.kim@cloud.ionos.com>
+> From: Dima Stepanov <dmitrii.stepanov@cloud.ionos.com>
 >
-> struct rtrs_srv is not used when handling rnbd_srv_rdma_ev messages, so
-> cleaned up
-> rdma_ev function pointer in rtrs_srv_ops also is changed.
+> cppcheck report the following error:
+>   rnbd/rnbd-clt-sysfs.c:522:36: error: The variable 'buf' is used both
+>   as a parameter and as destination in snprintf(). The origin and
+>   destination buffers overlap. Quote from glibc (C-library)
+>   documentation
+>   (http://www.gnu.org/software/libc/manual/html_mono/libc.html#Formatted-Output-Functions):
+>   "If copying takes place between objects that overlap as a result of a
+>   call to sprintf() or snprintf(), the results are undefined."
+>   [sprintfOverlappingData]
+> Fix it by initializing the buf variable in the first snprintf call.
 >
-> Cc: Jason Gunthorpe <jgg@nvidia.com>
-> Cc: Leon Romanovsky <leonro@nvidia.com>
-> Cc: linux-rdma@vger.kernel.org
-> Signed-off-by: Aleksei Marov <aleksei.marov@ionos.com>
+> Fixes: 91f4acb2801c ("block/rnbd-clt: support mapping two devices")
+> Signed-off-by: Dima Stepanov <dmitrii.stepanov@ionos.com>
+> Cc: Arnd Bergmann <arnd@arndb.de>
 > Signed-off-by: Jack Wang <jinpu.wang@ionos.com>
-> Signed-off-by: Gioh Kim <gi-oh.kim@ionos.com>
 + Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
