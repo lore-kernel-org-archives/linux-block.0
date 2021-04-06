@@ -7,54 +7,54 @@ X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4C89C43462
-	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 07:37:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAB2CC433ED
+	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 07:37:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 81609613C2
-	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 07:37:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8FA8F613C4
+	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 07:37:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234686AbhDFHhx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S235053AbhDFHhx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Tue, 6 Apr 2021 03:37:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37374 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37378 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235053AbhDFHhw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Apr 2021 03:37:52 -0400
-Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F459C061756
-        for <linux-block@vger.kernel.org>; Tue,  6 Apr 2021 00:37:45 -0700 (PDT)
-Received: by mail-ed1-x534.google.com with SMTP id r22so2813095edq.9
-        for <linux-block@vger.kernel.org>; Tue, 06 Apr 2021 00:37:45 -0700 (PDT)
+        with ESMTP id S235179AbhDFHhx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Apr 2021 03:37:53 -0400
+Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A0D4C061756
+        for <linux-block@vger.kernel.org>; Tue,  6 Apr 2021 00:37:46 -0700 (PDT)
+Received: by mail-ej1-x62c.google.com with SMTP id mh7so10350717ejb.12
+        for <linux-block@vger.kernel.org>; Tue, 06 Apr 2021 00:37:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=ionos.com; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=QW9SvoK7tPGzupur6oNug9PQ17U1PYn+uokhnisEorg=;
-        b=dByXFrv99kSKwmUdwZJqXGxKM6jB108zGixyLCXnDZTC4OPfYaIzA+ziGjBNHBnDCG
-         lcy6onPWK+VDgqaxyi66RBTnXgDVQRPSnBRTP+vJwEv/41eCMmnaVEYSZhFsj6G4ZzYo
-         jxDZVFYA7t1Z9oHRlNgetRwSbrlLmY910SB3ZLQi9XPCK5mpM8sq0u1IiL+W+QYD09rG
-         XgBnvB7UmAP76aTS54pNvIFqYI1jHQMRWQwwEBHIgi4+HRORTkZJKkcg+ghSfPMpMynF
-         /b2TiJPLQU1ePN2kEkalhhgmBW0eyLlCGPaIkk7NtGgb4eh6fPJquU8/IEHxAJPCDp+g
-         NCjA==
+        bh=Pr6f4CgNg/vO7af8Lnbc0By2HHIYCME5N2QMNGWGV18=;
+        b=QNGflsDu121Be1+y9fmBcBzZBBqRf09KL7HUyjNkq7pRN9BQTOZI8dJ3bHQT6g2mWM
+         qV3pEY37UU7H1bjr5amEY3hbJu1i9cEvj+e/YVFPXatwuK36B/UV6jHjbODV+8de4MS8
+         d8sQYeUjyq+/XosEbMSazgaex9tq5ImOYFPUiA1ij3ohzU3MuwoENe5ZYgrwNy5pJYGP
+         Qu7nAZK1V22IqdiV1NHKb9MJYsuFj2d4t8kQTqKIHqz7Z7Xo4TpPNinrlxZx4XZ8TxYZ
+         cgHQomuaKtn0mrx7thRnHy03WO4vgJ3hgMVACWd9TZifO+6iPdWda5u/2XMtWrI9YfhD
+         rsmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=QW9SvoK7tPGzupur6oNug9PQ17U1PYn+uokhnisEorg=;
-        b=N21YwE1Z2WTNaxaymHc7yNekO6P79MyyLR+ZHZoyT6ntliqYlq8xMwuLd3S/KsAQ5Z
-         l5mdTdvAFK/8Mv+RG7mvHRIBlEvdAkUDlqLqSc/bQxBVcemCpPZidz4wdBopbMaUW8hW
-         g+MThPK1GhhuWrhdtQR7FBvfWrs0QmC6QNN/Trr+gjAHYIZZUxUbfoGQBtz3eRHM5Ubu
-         4+Wt2msFAlOfan0p56/t5q3a1rsSUQAKK/ZjM4e2IROBB52q6l8nseZohds7Bd8TADTu
-         9ihLpLzI9Sd2dDJVSmHmMbM06nqndIRIHPWgNTJAbZ2twUA4rFS7cNIlgTJbhv7TW8zs
-         V2wQ==
-X-Gm-Message-State: AOAM533Wog2wGaVGUEYhjlHJXqi7YcG49RwuiBhlsQWELgD0TeZ7SqCt
-        KRL4k1dh+9jTwzuYPtFI4PNj8QurNYRpPiFx
-X-Google-Smtp-Source: ABdhPJwl6076rO8C4xyJTe2l6wy/X5Ef3SxZagDWFYPLMUJsA/xwn1cBju0dw+ViiuoKe/KB33qxfQ==
-X-Received: by 2002:a50:ee10:: with SMTP id g16mr35689573eds.215.1617694663984;
-        Tue, 06 Apr 2021 00:37:43 -0700 (PDT)
+        bh=Pr6f4CgNg/vO7af8Lnbc0By2HHIYCME5N2QMNGWGV18=;
+        b=dfAYG2UdDxUNgEhRLaCKtiQiflOlAs4XDoQtyUfgErJ7Bq2KKukRG3YwDt0kQxElEW
+         xVJWGL8ls64B/Ttm3EgLqaRBE9a4p7v8Jcgu4qjtiiTvEdAjdOOdXXZc5SKlZvuWlY9W
+         54u6K7rLhNwzHcLSw1wDjh5TVYJUYpiBsH4C7euYE4Y5mL1yvYH1j1l1bZlauk5WAjpd
+         0XoCj4oI2sQYWt4m/1clQDxVC6wQkArzMCNtrm1pt0WRVxZJPzhAma68DiPR5+5R+VJd
+         GairfhYcLBQyAJwp/lXszt7846jwtvRxiu8giiRwsC5zuY+cBvCal+ihIc3tUh7SjBnf
+         iHBA==
+X-Gm-Message-State: AOAM532AyNEAukoYhj265BqWVHcnBIVF25Vw6LeJBM399W2IS1DaHPNz
+        vP9WP9jNoNSG8mqxJCqj/iwc4pHaOP7lmt7C
+X-Google-Smtp-Source: ABdhPJzvt9H6SSr55xEkCNfddBwDAZA98e1KM1sqVHN8GOpOF8btQCeyH7vWhMknR0jLpS8h26GsYw==
+X-Received: by 2002:a17:906:5906:: with SMTP id h6mr3095904ejq.288.1617694664682;
+        Tue, 06 Apr 2021 00:37:44 -0700 (PDT)
 Received: from gkim-laptop.fkb.profitbricks.net (ip5f5aeee5.dynamic.kabel-deutschland.de. [95.90.238.229])
-        by smtp.googlemail.com with ESMTPSA id o6sm12843305edw.24.2021.04.06.00.37.43
+        by smtp.googlemail.com with ESMTPSA id o6sm12843305edw.24.2021.04.06.00.37.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Apr 2021 00:37:43 -0700 (PDT)
+        Tue, 06 Apr 2021 00:37:44 -0700 (PDT)
 From:   Gioh Kim <gi-oh.kim@ionos.com>
 To:     linux-block@vger.kernel.org, linux-doc@vger.kernel.org
 Cc:     axboe@kernel.dk, akinobu.mita@gmail.com, corbet@lwn.net,
@@ -62,9 +62,9 @@ Cc:     axboe@kernel.dk, akinobu.mita@gmail.com, corbet@lwn.net,
         haris.iqbal@ionos.com, jinpu.wang@ionos.com,
         Gioh Kim <gi-oh.kim@cloud.ionos.com>,
         Jack Wang <jinpu.wang@cloud.ionos.com>
-Subject: [PATCH for-next 2/5] block/rnbd-srv: Inject a fault at bio processing
-Date:   Tue,  6 Apr 2021 09:37:24 +0200
-Message-Id: <20210406073727.172380-3-gi-oh.kim@ionos.com>
+Subject: [PATCH for-next 3/5] block/rnbd-clt: Inject some fault points
+Date:   Tue,  6 Apr 2021 09:37:25 +0200
+Message-Id: <20210406073727.172380-4-gi-oh.kim@ionos.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210406073727.172380-1-gi-oh.kim@ionos.com>
 References: <20210406073727.172380-1-gi-oh.kim@ionos.com>
@@ -76,133 +76,175 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Gioh Kim <gi-oh.kim@cloud.ionos.com>
 
-If the fault is enabled, it sends an error to the client
-so that the client thinks the target device on the server has failed.
+This patch injects two fault points:
+1. generate an IO error
+2. generate a unmap failure
 
 Signed-off-by: Gioh Kim <gi-oh.kim@cloud.ionos.com>
 Signed-off-by: Jack Wang <jinpu.wang@cloud.ionos.com>
 ---
- drivers/block/rnbd/rnbd-srv-sysfs.c | 37 +++++++++++++++++++++++++++++
- drivers/block/rnbd/rnbd-srv.c       |  7 ++++++
- drivers/block/rnbd/rnbd-srv.h       | 13 ++++++++++
- 3 files changed, 57 insertions(+)
+ drivers/block/rnbd/rnbd-clt-sysfs.c | 53 +++++++++++++++++++++++++++++
+ drivers/block/rnbd/rnbd-clt.c       | 17 +++++++++
+ drivers/block/rnbd/rnbd-clt.h       | 15 ++++++++
+ 3 files changed, 85 insertions(+)
 
-diff --git a/drivers/block/rnbd/rnbd-srv-sysfs.c b/drivers/block/rnbd/rnbd-srv-sysfs.c
-index 05ffe488ddc6..03fb26ac435e 100644
---- a/drivers/block/rnbd/rnbd-srv-sysfs.c
-+++ b/drivers/block/rnbd/rnbd-srv-sysfs.c
-@@ -253,3 +253,40 @@ void rnbd_srv_destroy_sysfs_files(void)
+diff --git a/drivers/block/rnbd/rnbd-clt-sysfs.c b/drivers/block/rnbd/rnbd-clt-sysfs.c
+index d4aa6bfc9555..d83415875960 100644
+--- a/drivers/block/rnbd/rnbd-clt-sysfs.c
++++ b/drivers/block/rnbd/rnbd-clt-sysfs.c
+@@ -651,3 +651,56 @@ void rnbd_clt_destroy_sysfs_files(void)
  	device_destroy(rnbd_dev_class, MKDEV(0, 0));
  	class_destroy(rnbd_dev_class);
  }
 +
 +#ifdef CONFIG_FAULT_INJECTION_DEBUG_FS
-+void rnbd_srv_fault_inject_init(struct rnbd_srv_fault_inject *fault_inject,
++void rnbd_clt_fault_inject_init(struct rnbd_clt_fault_inject *fault_inject,
 +				const char *dev_name)
 +{
 +	rnbd_fault_inject_init(&fault_inject->fj, dev_name, -EBUSY);
 +	/* injection points */
 +	rnbd_fault_inject_add(fault_inject->fj.dir,
-+			      "fail-bio", &fault_inject->fail_bio);
++			      "fail-request", &fault_inject->fail_request);
++	rnbd_fault_inject_add(fault_inject->fj.dir,
++			      "fail-unmap", &fault_inject->fail_unmap);
 +}
 +
-+void rnbd_srv_fault_inject_fini(struct rnbd_srv_fault_inject *fault_inject)
++void rnbd_clt_fault_inject_final(struct rnbd_clt_fault_inject *fault_inject)
 +{
 +	rnbd_fault_inject_final(&fault_inject->fj);
 +}
 +
-+int rnbd_should_fail_bio(struct rnbd_srv_sess_dev *sess_dev)
++int rnbd_clt_should_fail_request(struct request *req)
 +{
-+	struct rnbd_srv_fault_inject *fault_inject = &sess_dev->fault_inject;
++	struct rnbd_clt_dev *dev = req->rq_disk->private_data;
++	struct rnbd_clt_fault_inject *fault_inject = &dev->fault_inject;
 +
-+	if (fault_inject->fail_bio && should_fail(&fault_inject->fj.attr, 1))
++	if (fault_inject->fail_request && should_fail(&fault_inject->fj.attr, 1))
++		return fault_inject->fj.status;
++	return 0;
++}
++
++int rnbd_clt_should_fail_unmap(struct rnbd_clt_dev *dev)
++{
++	struct rnbd_clt_fault_inject *fault_inject = &dev->fault_inject;
++
++	if (fault_inject->fail_unmap && should_fail(&fault_inject->fj.attr, 1))
 +		return fault_inject->fj.status;
 +	return 0;
 +}
 +#else
-+void rnbd_srv_fault_inject_init(struct rnbd_srv_fault_inject *fault_inj,
++void rnbd_clt_fault_inject_init(struct rnbd_clt_fault_inject *fault_inj,
 +				const char *dev_name)
 +{
 +}
-+void rnbd_srv_fault_inject_fini(struct rnbd_srv_fault_inject *fault_inject)
++void rnbd_clt_fault_inject_final(struct rnbd_clt_fault_inject *fault_inject)
 +{
 +}
-+int rnbd_should_fail_bio(struct rnbd_srv_sess_dev *sess_dev)
++int rnbd_clt_should_fail_request(struct request *req)
++{
++	return 0;
++}
++int rnbd_clt_should_fail_unmap(struct rnbd_clt_dev *dev)
 +{
 +	return 0;
 +}
 +#endif
-diff --git a/drivers/block/rnbd/rnbd-srv.c b/drivers/block/rnbd/rnbd-srv.c
-index a6a68d44f517..447fb0718525 100644
---- a/drivers/block/rnbd/rnbd-srv.c
-+++ b/drivers/block/rnbd/rnbd-srv.c
-@@ -88,9 +88,14 @@ void rnbd_endio(void *priv, int error)
- {
- 	struct rnbd_io_private *rnbd_priv = priv;
- 	struct rnbd_srv_sess_dev *sess_dev = rnbd_priv->sess_dev;
+diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.c
+index 45a470076652..8c9a02c8b8bd 100644
+--- a/drivers/block/rnbd/rnbd-clt.c
++++ b/drivers/block/rnbd/rnbd-clt.c
+@@ -411,6 +411,11 @@ static void msg_io_conf(void *priv, int errno)
+ 	struct rnbd_clt_dev *dev = iu->dev;
+ 	struct request *rq = iu->rq;
+ 	int rw = rq_data_dir(rq);
++	int fail_err = 0;
++
++	fail_err = rnbd_clt_should_fail_request(rq);
++	if (unlikely(fail_err)) /* over-write error */
++		errno = fail_err;
+ 
+ 	iu->errno = errno;
+ 
+@@ -1161,6 +1166,7 @@ static blk_status_t rnbd_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	}
+ 
+ 	blk_mq_start_request(rq);
++
+ 	err = rnbd_client_xfer_request(dev, rq, iu);
+ 	if (likely(err == 0))
+ 		return BLK_STS_OK;
+@@ -1545,6 +1551,8 @@ struct rnbd_clt_dev *rnbd_clt_map_device(const char *sessname,
+ 		goto send_close;
+ 	}
+ 
++	rnbd_clt_fault_inject_init(&dev->fault_inject, dev->gd->disk_name);
++
+ 	rnbd_clt_info(dev,
+ 		       "map_device: Device mapped as %s (nsectors: %zu, logical_block_size: %d, physical_block_size: %d, max_write_same_sectors: %d, max_discard_sectors: %d, discard_granularity: %d, discard_alignment: %d, secure_discard: %d, max_segments: %d, max_hw_sectors: %d, rotational: %d, wc: %d, fua: %d)\n",
+ 		       dev->gd->disk_name, dev->nsectors,
+@@ -1599,8 +1607,16 @@ int rnbd_clt_unmap_device(struct rnbd_clt_dev *dev, bool force,
+ 	struct rnbd_clt_session *sess = dev->sess;
+ 	int refcount, ret = 0;
+ 	bool was_mapped;
 +	int fail_err = 0;
  
- 	rnbd_put_sess_dev(sess_dev);
- 
-+	fail_err = rnbd_should_fail_bio(sess_dev);
-+	if (unlikely(fail_err)) /* over-write error which will be sent to client */
-+		error = fail_err;
+ 	mutex_lock(&dev->lock);
 +
- 	rtrs_srv_resp_rdma(rnbd_priv->id, error);
++	fail_err = rnbd_clt_should_fail_unmap(dev);
++	if (unlikely(fail_err)) {
++		ret = fail_err;
++		goto err;
++	}
++
+ 	if (dev->dev_state == DEV_STATE_UNMAPPED) {
+ 		rnbd_clt_info(dev, "Device is already being unmapped\n");
+ 		ret = -EALREADY;
+@@ -1618,6 +1634,7 @@ int rnbd_clt_unmap_device(struct rnbd_clt_dev *dev, bool force,
+ 	dev->dev_state = DEV_STATE_UNMAPPED;
+ 	mutex_unlock(&dev->lock);
  
- 	kfree(priv);
-@@ -230,6 +235,7 @@ void rnbd_destroy_sess_dev(struct rnbd_srv_sess_dev *sess_dev, bool keep_id)
- 	rnbd_put_sess_dev(sess_dev);
- 	wait_for_completion(&dc); /* wait for inflights to drop to zero */
- 
-+	rnbd_srv_fault_inject_fini(&sess_dev->fault_inject);
- 	rnbd_dev_close(sess_dev->rnbd_dev);
- 	list_del(&sess_dev->sess_list);
- 	mutex_lock(&sess_dev->dev->lock);
-@@ -811,6 +817,7 @@ static int process_msg_open(struct rtrs_srv *rtrs,
- 	rnbd_srv_info(srv_sess_dev, "Opened device '%s'\n", srv_dev->id);
- 
- 	kfree(full_path);
-+	rnbd_srv_fault_inject_init(&srv_sess_dev->fault_inject, kbasename(srv_sess_dev->pathname));
- 
- fill_response:
- 	rnbd_srv_fill_msg_open_rsp(rsp, srv_sess_dev);
-diff --git a/drivers/block/rnbd/rnbd-srv.h b/drivers/block/rnbd/rnbd-srv.h
-index b157371c25ed..120e6d64cb82 100644
---- a/drivers/block/rnbd/rnbd-srv.h
-+++ b/drivers/block/rnbd/rnbd-srv.h
-@@ -45,6 +45,13 @@ struct rnbd_srv_dev {
- 	int				open_write_cnt;
++	rnbd_clt_fault_inject_final(&dev->fault_inject);
+ 	delete_dev(dev);
+ 	destroy_sysfs(dev, sysfs_self);
+ 	destroy_gen_disk(dev);
+diff --git a/drivers/block/rnbd/rnbd-clt.h b/drivers/block/rnbd/rnbd-clt.h
+index 537d499dad3b..5ecbe8dedf24 100644
+--- a/drivers/block/rnbd/rnbd-clt.h
++++ b/drivers/block/rnbd/rnbd-clt.h
+@@ -107,6 +107,14 @@ struct rnbd_queue {
+ 	struct blk_mq_hw_ctx	*hctx;
  };
  
-+struct rnbd_srv_fault_inject {
++struct rnbd_clt_fault_inject {
 +#ifdef CONFIG_FAULT_INJECTION_DEBUG_FS
 +	struct rnbd_fault_inject fj;
-+	bool fail_bio;
++	bool fail_unmap;
++	bool fail_request;
 +#endif
 +};
 +
- /* Structure which binds N devices and N sessions */
- struct rnbd_srv_sess_dev {
- 	/* Entry inside rnbd_srv_dev struct */
-@@ -62,6 +69,7 @@ struct rnbd_srv_sess_dev {
- 	struct completion               *destroy_comp;
- 	char				pathname[NAME_MAX];
- 	enum rnbd_access_mode		access_mode;
-+	struct rnbd_srv_fault_inject    fault_inject;
+ struct rnbd_clt_dev {
+ 	struct rnbd_clt_session	*sess;
+ 	struct request_queue	*queue;
+@@ -139,6 +147,7 @@ struct rnbd_clt_dev {
+ 	char			*blk_symlink_name;
+ 	refcount_t		refcount;
+ 	struct work_struct	unmap_on_rmmod_work;
++	struct rnbd_clt_fault_inject fault_inject;
  };
  
- void rnbd_srv_sess_dev_force_close(struct rnbd_srv_sess_dev *sess_dev);
-@@ -77,4 +85,9 @@ int rnbd_srv_create_sysfs_files(void);
- void rnbd_srv_destroy_sysfs_files(void);
- void rnbd_destroy_sess_dev(struct rnbd_srv_sess_dev *sess_dev, bool keep_id);
+ /* rnbd-clt.c */
+@@ -163,4 +172,10 @@ void rnbd_clt_destroy_default_group(void);
  
-+void rnbd_srv_fault_inject_init(struct rnbd_srv_fault_inject *fault_inj,
-+				const char *dev_name);
-+void rnbd_srv_fault_inject_fini(struct rnbd_srv_fault_inject *fault_inject);
-+int rnbd_should_fail_bio(struct rnbd_srv_sess_dev *sess_dev);
-+
- #endif /* RNBD_SRV_H */
+ void rnbd_clt_remove_dev_symlink(struct rnbd_clt_dev *dev);
+ 
++void rnbd_clt_fault_inject_init(struct rnbd_clt_fault_inject *fault_inj,
++			    const char *dev_name);
++void rnbd_clt_fault_inject_final(struct rnbd_clt_fault_inject *fault_inject);
++int rnbd_clt_should_fail_request(struct request *req);
++int rnbd_clt_should_fail_unmap(struct rnbd_clt_dev *dev);
++int rnbd_clt_should_fail_request_timeout(struct request *req);
+ #endif /* RNBD_CLT_H */
 -- 
 2.25.1
 
