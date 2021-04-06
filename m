@@ -7,54 +7,54 @@ X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C36BC43462
-	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 07:07:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09413C433B4
+	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 07:07:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 015A4613B7
-	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 07:07:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D80DD613BC
+	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 07:07:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244154AbhDFHHb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Apr 2021 03:07:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58900 "EHLO
+        id S244155AbhDFHHc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Apr 2021 03:07:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244153AbhDFHHa (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Apr 2021 03:07:30 -0400
-Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F53CC06174A
-        for <linux-block@vger.kernel.org>; Tue,  6 Apr 2021 00:07:23 -0700 (PDT)
-Received: by mail-ed1-x532.google.com with SMTP id k8so7792400edn.6
-        for <linux-block@vger.kernel.org>; Tue, 06 Apr 2021 00:07:23 -0700 (PDT)
+        with ESMTP id S244153AbhDFHHb (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Apr 2021 03:07:31 -0400
+Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30524C06174A
+        for <linux-block@vger.kernel.org>; Tue,  6 Apr 2021 00:07:24 -0700 (PDT)
+Received: by mail-ed1-x530.google.com with SMTP id h10so15176411edt.13
+        for <linux-block@vger.kernel.org>; Tue, 06 Apr 2021 00:07:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=ionos.com; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=0PDpwO5lWof601MDA4aFO5d06aw+1og0zuKo6oNDR1E=;
-        b=NR50vUPRhiH7XgucRRHk2mO0U6XDutBNEq5+DZaR8wvGog/+gFdzjlYXN+IqTb5/Qo
-         x+uIBA4Yw2h/VIiD9cHXnHByOVG2i2+ogLF+2Tes39Ep6oXMZvcLSexhFfXwmyjml+vM
-         r3/HNLcjkCRkpT3RLgDjbEWXPyq57gcGVRMhsdBEUQMC0RjSFdbXmXUece80iV64QRNI
-         LT9O9/bzAIYfQ3QtKCrbMR5eaY3E5AzsU91Qz0WO2WtX9+CWQrMWr58E3rWHn10bcHJ4
-         X9BylBuu/0gGxaYhKrUTxpA1FXaFbvpHhx/f3cS/ScvPXarKwbt+XRouR783r1nYU2BG
-         FU1A==
+        bh=W+pSKG5MeazyVQaTM4wjfbORD6labF71XC9KX+IrgJ8=;
+        b=bdZbLthootjqO5AA271H3cqOI/4UBsiIM2Csmkc+Dj6Fuqi0r0SvOEp6myS3tGOke2
+         YK+o6zCapleg+DPUdPposPN9bP4RFGJhYYj1QArb51S+2nGEWu4vpOIGJpBhLQWONSfE
+         3W43RSN8C2Gnyh5bbf9Uwt0qSg0ljEZEf0RuSG/2AfzyzK9ymS0uscCtaB0be5DpFc3p
+         1WXhetnMtIKjwitcqzfif280hlEkSNvbkgVdZhGxWEschcNNBqob6kyR2/CygdhjOaFf
+         Z17d61a0c3F8SgczctJHabIbRykihDn0yzbEWecZyNTQ/XN8BXzI7XRtDsW2knb3HMem
+         Qprg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=0PDpwO5lWof601MDA4aFO5d06aw+1og0zuKo6oNDR1E=;
-        b=FAJTiAMhoaLCw8Uk4kSWxL79PeJfVbjOu/u/G6BMhl3FvCn6i57TsvtHlgdLoPNHlC
-         2lG0vlXpS5D3i0e4UMYW3dPAl3XRficR1BeOAtGyxTfubDYYFY/4Yzr6l2wXZ9AuG0l1
-         3Ceqpx/UukKAv7sZEQ146U5ocZWiSeHv1ei1a4pgoIUPyH9faMTe8+66nx/r9yVlJG6I
-         vOQpXOFYZJFWEoXDQNyo0g6uzG6TGy19Ik8SQ62VfyFeoUfjlPsqQOGxWuNw3EcxIul+
-         wWCidoQhhvMNaHSUE8wa3UXdO5PxqoB55PTI5q7nYtFLi7RU5IHKEktMzyqpSZW5AGJc
-         yZDQ==
-X-Gm-Message-State: AOAM531qSvb0XhKTq6D9YyEP09LE6iHkxRkJKyN6PjUOGT1wNqfqjr4J
-        EFtMcyUAz8QJxGxafR3Eb9rLdhbVGw1qgQ==
-X-Google-Smtp-Source: ABdhPJzOI0s0h1Q4q0iKx95xmaqbzUzTBltX2svFwSteFbDuv4es82g5Vcra85HemMUoOHMUcRv/yQ==
-X-Received: by 2002:a05:6402:274d:: with SMTP id z13mr22880910edd.344.1617692842220;
+        bh=W+pSKG5MeazyVQaTM4wjfbORD6labF71XC9KX+IrgJ8=;
+        b=E/wuaOpVcwL6i7VxTnsxjJSjMdSi9n9OfZ1PNWV1jB3BS19zIPfZ2I818IqRgdlAF5
+         54HYSgNZziNekB+aTkhnBMMRbhc4t4wudzjpvOpKReO59gSHr0hXoMkc8pla9Ktnx+ps
+         uGGjpbPSQijvOpu1m7L+MgSCr8v4VhaO7Rg4nIST2l/xbJdsWWA8+zm6CerHbNojYryH
+         gqgEOGliOxMe3zZ8OB5HQLpkm5k2sJhVXyUp9Q+c/JAmm3H2UbR8va68kura01/h0Oq4
+         ClzuoulhAxmI2juKjYhVxRKkY1wRrCRJRBEZvMmhmlLQE5So7y923ReWNQ8RJzZAnAFS
+         LMhg==
+X-Gm-Message-State: AOAM53079u5vZJRrICwSIku+5aqpAfva/Q5e3nY071Lem7nrJ0PuTXxW
+        uIeT5XZvqgMCoUoqnyJQZAfxPE5nkN9QIw==
+X-Google-Smtp-Source: ABdhPJxjVtgMbsmRf2HTqiJTFrJ1NT17FLSd8KkMeGZZ3HVN+31Ulw7m0+0QOHmpwUKsYfUsxPwFOg==
+X-Received: by 2002:aa7:c3c1:: with SMTP id l1mr36565024edr.208.1617692842911;
         Tue, 06 Apr 2021 00:07:22 -0700 (PDT)
 Received: from gkim-laptop.fkb.profitbricks.net (ip5f5aeee5.dynamic.kabel-deutschland.de. [95.90.238.229])
-        by smtp.googlemail.com with ESMTPSA id rh6sm3976566ejb.39.2021.04.06.00.07.21
+        by smtp.googlemail.com with ESMTPSA id rh6sm3976566ejb.39.2021.04.06.00.07.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Apr 2021 00:07:21 -0700 (PDT)
+        Tue, 06 Apr 2021 00:07:22 -0700 (PDT)
 From:   Gioh Kim <gi-oh.kim@ionos.com>
 To:     linux-block@vger.kernel.org
 Cc:     axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
@@ -63,9 +63,9 @@ Cc:     axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
         Danil Kipnis <danil.kipnis@cloud.ionos.com>,
         Gioh Kim <gi-oh.kim@cloud.ionos.com>,
         Jack Wang <jinpu.wang@cloud.ionos.com>
-Subject: [PATCHv3 for-next 03/19] block/rnbd-clt: Remove some arguments from insert_dev_if_not_exists_devpath
-Date:   Tue,  6 Apr 2021 09:07:00 +0200
-Message-Id: <20210406070716.168541-4-gi-oh.kim@ionos.com>
+Subject: [PATCHv3 for-next 04/19] block/rnbd-clt: Remove some arguments from rnbd_client_setup_device
+Date:   Tue,  6 Apr 2021 09:07:01 +0200
+Message-Id: <20210406070716.168541-5-gi-oh.kim@ionos.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210406070716.168541-1-gi-oh.kim@ionos.com>
 References: <20210406070716.168541-1-gi-oh.kim@ionos.com>
@@ -77,47 +77,43 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Guoqing Jiang <guoqing.jiang@gmx.com>
 
-Remove 'pathname' and 'sess' since we can dereference it from 'dev'.
+Remove them since both sess and idx can be dereferenced from dev. And
+sess is not used in the function.
 
 Signed-off-by: Guoqing Jiang <guoqing.jiang@gmx.com>
 Reviewed-by: Danil Kipnis <danil.kipnis@cloud.ionos.com>
 Signed-off-by: Gioh Kim <gi-oh.kim@cloud.ionos.com>
 Signed-off-by: Jack Wang <jinpu.wang@cloud.ionos.com>
 ---
- drivers/block/rnbd/rnbd-clt.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ drivers/block/rnbd/rnbd-clt.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.c
-index 45a470076652..5a5c8dea38dc 100644
+index 5a5c8dea38dc..ecb83c10013d 100644
 --- a/drivers/block/rnbd/rnbd-clt.c
 +++ b/drivers/block/rnbd/rnbd-clt.c
-@@ -1471,14 +1471,13 @@ static bool exists_devpath(const char *pathname, const char *sessname)
- 	return found;
+@@ -1354,10 +1354,9 @@ static void rnbd_clt_setup_gen_disk(struct rnbd_clt_dev *dev, int idx)
+ 		blk_queue_flag_set(QUEUE_FLAG_NONROT, dev->queue);
  }
  
--static bool insert_dev_if_not_exists_devpath(const char *pathname,
--					     struct rnbd_clt_session *sess,
--					     struct rnbd_clt_dev *dev)
-+static bool insert_dev_if_not_exists_devpath(struct rnbd_clt_dev *dev)
+-static int rnbd_client_setup_device(struct rnbd_clt_session *sess,
+-				     struct rnbd_clt_dev *dev, int idx)
++static int rnbd_client_setup_device(struct rnbd_clt_dev *dev)
  {
- 	bool found;
-+	struct rnbd_clt_session *sess = dev->sess;
+-	int err;
++	int err, idx = dev->clt_device_id;
  
- 	mutex_lock(&sess_lock);
--	found = __exists_dev(pathname, sess->sessname);
-+	found = __exists_dev(dev->pathname, sess->sessname);
- 	if (!found) {
- 		mutex_lock(&sess->lock);
- 		list_add_tail(&dev->list, &sess->devs_list);
-@@ -1522,7 +1521,7 @@ struct rnbd_clt_dev *rnbd_clt_map_device(const char *sessname,
- 		ret = PTR_ERR(dev);
- 		goto put_sess;
- 	}
--	if (insert_dev_if_not_exists_devpath(pathname, sess, dev)) {
-+	if (insert_dev_if_not_exists_devpath(dev)) {
- 		ret = -EEXIST;
- 		goto put_dev;
- 	}
+ 	dev->size = dev->nsectors * dev->logical_block_size;
+ 
+@@ -1535,7 +1534,7 @@ struct rnbd_clt_dev *rnbd_clt_map_device(const char *sessname,
+ 	mutex_lock(&dev->lock);
+ 	pr_debug("Opened remote device: session=%s, path='%s'\n",
+ 		 sess->sessname, pathname);
+-	ret = rnbd_client_setup_device(sess, dev, dev->clt_device_id);
++	ret = rnbd_client_setup_device(dev);
+ 	if (ret) {
+ 		rnbd_clt_err(dev,
+ 			      "map_device: Failed to configure device, err: %d\n",
 -- 
 2.25.1
 
