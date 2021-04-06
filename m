@@ -7,78 +7,66 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29274C433B4
-	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 15:22:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11473C433B4
+	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 15:23:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DB35F61394
-	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 15:22:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C82BF613CB
+	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 15:23:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229970AbhDFPW0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Apr 2021 11:22:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55060 "EHLO
+        id S1345615AbhDFPXl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Apr 2021 11:23:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55340 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230049AbhDFPWZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Apr 2021 11:22:25 -0400
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8E55C061756
-        for <linux-block@vger.kernel.org>; Tue,  6 Apr 2021 08:22:16 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id nh5so5895900pjb.5
-        for <linux-block@vger.kernel.org>; Tue, 06 Apr 2021 08:22:16 -0700 (PDT)
+        with ESMTP id S232532AbhDFPXl (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Apr 2021 11:23:41 -0400
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76244C06174A
+        for <linux-block@vger.kernel.org>; Tue,  6 Apr 2021 08:23:33 -0700 (PDT)
+Received: by mail-pl1-x632.google.com with SMTP id p10so2562360pld.0
+        for <linux-block@vger.kernel.org>; Tue, 06 Apr 2021 08:23:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=E6z5kWwAl+1QNK1u0OVgaasZnxxYZm0UhtDBQU9NQyM=;
-        b=Mv8FIUEgsM18zskQs7tY7B/k0o7lz07YKooRJA46pT3T4Fujs2+EngigMWz1SeXxk2
-         408Wr1wqz8H6xFLG9imGxTklpi19vPMezpxq7NkXPUKoqZtcOp236xq6iXS6PZgoWnSY
-         u9svYa3oMjpxZyz71mbTc+/G0S+PY7LxLoupiSd3xqQjmTjJNd/QITXAcJMPpdI9cmuN
-         0v2+mgf65BG6o1u6vK2WY1mJSCLMXdZxysUQKoCdJcdHM3Q/Zv0GKV1ct2mwjmxokKcW
-         NPW3PoCso53PC6Np4rG6b49qINu/V7X4j/Wi0lAHyHKj84Z+mD17W0DnEuxRS/v2fLyy
-         mQTA==
+        bh=MfFf/98q40uDaDC3s5dBDadxudtK5f15xA3Kd03jsbQ=;
+        b=HEUR4qP4YKjNgemehB/URA5app8TZBaHWMyTqDA/xHOFE24f/j1oTEVpcakXAsT85Y
+         j1Bb63EATcp92CInSVqzDnndjMZFQAlYA5OKzt54XAFTSY/N06kDS9R3b/17jqoQ4J9o
+         UYw5v3dwDwyTj8N6I7Fpsy/RCTx/a3rUTOIRKA47vBoNw8Jtv8yJanMo1qkgGkx1hKwA
+         lsNaB/hSA47vjf80R+anEsEZSjVcXxA8GBxWi20ms+azi5NNzatoswANoaij1dSdZC7/
+         8jAV7QuqCw+SEbZRgAZfouhpOyMd8UKxOnqUABeHM3tcsj+3o4wYA/dTauPAsCFQIasJ
+         eM0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=E6z5kWwAl+1QNK1u0OVgaasZnxxYZm0UhtDBQU9NQyM=;
-        b=kspQKgp7KO7aXvPUg/bYaNpLFoytfbzzeMWw/lB1JytxOuq1gSJj/k0esQrGYCRQOb
-         5hDFb0x+q2NsdhoSNgKE8Yq0JS830PizMQA8VOu6jhoLTbRlYfnabSFTcBW9BlfxtYgG
-         O/3rgwFmKLdZrl+Y25A3iSQHuWbtVPel1ncPMJ5swWVuSSr/6lC3O8/b/G+iHiSe2VD2
-         1EObKOg6Q6MqhmNCI3B6o1atXLYcFPEJ7nl2GdmSaQGhdJWQ8SLe4SPKOUzqX/nuGdEq
-         hVNxTdukwykNee9tELenYY92sJByyeAPltptMO1n5u0iYZU0UCL7NFbXarlFOlxlH0NL
-         yACA==
-X-Gm-Message-State: AOAM532vjTve6E3fDOOxqkgSKedeNuAS+/uVJEngSlPNcFMofn3qql+2
-        6OPLm/j1sfoI4CVDAu3LnwSsWA==
-X-Google-Smtp-Source: ABdhPJwN5ZKGULvml9xEQa+VKvFePdAogoclt6woGJtjAIRk5kqlNGGROJTag2OMaBAe3myOkBprWA==
-X-Received: by 2002:a17:90b:a0c:: with SMTP id gg12mr4750699pjb.184.1617722536134;
-        Tue, 06 Apr 2021 08:22:16 -0700 (PDT)
+        bh=MfFf/98q40uDaDC3s5dBDadxudtK5f15xA3Kd03jsbQ=;
+        b=DU4fipaH4HgfoHVtrQc901dgLgJdTHGqS5FrTSzrcAmoPCld2tKn3aybrJPEMB63bR
+         l6jJTXmTS5AvbU0PwBGLOY9o8vK2+tfBmKV8ip7paB2tyc2lhdldFnRCahrOHHoStCYa
+         JLeR+qjpsaycj6AJPSNxQySRrsXgoEE2rs6Zq7swBM1kHrpbVSM0L/iD0TGXioJ6QS2X
+         MXVqA9jC05e5q7IqcsQrhdBdW4IcfkTEKIWKh42S/M4OfAYDfDxQEwwIvTRoTEDf1iz4
+         BDXNAY833YdfhZhfZd7/odM3uael3eLWNS5Z5ihin7v4V1DcypUoxe9HUo6uqZr79AdM
+         s4GA==
+X-Gm-Message-State: AOAM531DLMSTj9gM5hE4/RdlWoUwZkDPkTSB8r9Sy+rB9nBK3b0smTlE
+        mfC7FrJz/HfDftmA2VeWHQiQTQ==
+X-Google-Smtp-Source: ABdhPJwDBJIVLl+ZGgwLX+V/X4M5jI7GmFRnTR7uOXiCkZEMeBmjvzfKCdk46XgycamP9VjuMXTwIg==
+X-Received: by 2002:a17:902:a406:b029:e6:78c4:71c8 with SMTP id p6-20020a170902a406b02900e678c471c8mr29018477plq.17.1617722613018;
+        Tue, 06 Apr 2021 08:23:33 -0700 (PDT)
 Received: from [192.168.4.41] (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
-        by smtp.gmail.com with ESMTPSA id q22sm17686696pfk.2.2021.04.06.08.22.14
+        by smtp.gmail.com with ESMTPSA id d6sm18599405pfn.197.2021.04.06.08.23.32
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 06 Apr 2021 08:22:15 -0700 (PDT)
-Subject: Re: [PATCH 00/11] Rid W=1 warnings from Block
-To:     Lee Jones <lee.jones@linaro.org>
-Cc:     linux-kernel@vger.kernel.org,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        drbd-dev@lists.linbit.com,
-        Joshua Morris <josh.h.morris@us.ibm.com>,
-        Juergen Gross <jgross@suse.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        linux-block@vger.kernel.org,
-        Philip Kelleher <pjk1939@linux.ibm.com>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        xen-devel@lists.xenproject.org
-References: <20210312105530.2219008-1-lee.jones@linaro.org>
+        Tue, 06 Apr 2021 08:23:32 -0700 (PDT)
+Subject: Re: [PATCH 1/1] block: add sysfs entry for virt boundary mask
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>, linux-block@vger.kernel.org
+Cc:     martin.petersen@oracle.com
+References: <20210405132012.12504-1-mgurtovoy@nvidia.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <33a06c9d-58b6-c9bf-a119-6d2a3e37b955@kernel.dk>
-Date:   Tue, 6 Apr 2021 09:22:16 -0600
+Message-ID: <fe2f2229-0bd1-ef9b-b4fd-12c736414e13@kernel.dk>
+Date:   Tue, 6 Apr 2021 09:23:34 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210312105530.2219008-1-lee.jones@linaro.org>
+In-Reply-To: <20210405132012.12504-1-mgurtovoy@nvidia.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -86,12 +74,11 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/12/21 3:55 AM, Lee Jones wrote:
-> This set is part of a larger effort attempting to clean-up W=1
-> kernel builds, which are currently overwhelmingly riddled with
-> niggly little warnings.
+On 4/5/21 7:20 AM, Max Gurtovoy wrote:
+> This entry will expose the bio vector alignment mask for a specific
+> block device.
 
-Applied 2-11, 1 is already in the my tree.
+Applied with page fixup.
 
 -- 
 Jens Axboe
