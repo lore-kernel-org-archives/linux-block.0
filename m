@@ -2,122 +2,102 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C21E7C433B4
-	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 15:54:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CE29C433B4
+	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 17:49:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 94F2F610CC
-	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 15:54:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 03675613C6
+	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 17:49:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346059AbhDFPyn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Apr 2021 11:54:43 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53279 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1345862AbhDFPym (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 6 Apr 2021 11:54:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617724474;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=GECg07lP5wsIqbFA2Q0Bw1H5A4ajMexc9b0QUtiEUWY=;
-        b=cI2GLgvon9l6hRkwem95ROnHMUL7bW2cNgEzkDXSVnzsQ17pAnpgejx0EtKygdbrB0gsT8
-        lbMNGLvo/gqXqBzc2+tAc84LgDXvyNcI6K9y8W2JtZXXKclVTCxNrwyncZTL95u3LgqtJT
-        awSHfEVxZYEI4JR9nLgU1R3jz0DqW9o=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-215-CUodGpTdMkqgH90ht6jzIw-1; Tue, 06 Apr 2021 11:54:30 -0400
-X-MC-Unique: CUodGpTdMkqgH90ht6jzIw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 94AA2800D53;
-        Tue,  6 Apr 2021 15:54:27 +0000 (UTC)
-Received: from treble (ovpn-116-68.rdu2.redhat.com [10.10.116.68])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6F97310016FC;
-        Tue,  6 Apr 2021 15:54:25 +0000 (UTC)
-Date:   Tue, 6 Apr 2021 10:54:23 -0500
-From:   Josh Poimboeuf <jpoimboe@redhat.com>
-To:     Miroslav Benes <mbenes@suse.cz>
-Cc:     Greg KH <gregkh@linuxfoundation.org>,
-        Luis Chamberlain <mcgrof@kernel.org>, mbenes@suse.com,
-        Minchan Kim <minchan@kernel.org>, keescook@chromium.org,
-        dhowells@redhat.com, hch@infradead.org, ngupta@vflare.org,
-        sergey.senozhatsky.work@gmail.com, axboe@kernel.dk,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        live-patching@vger.kernel.org, Jessica Yu <jeyu@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>
-Subject: Re: [PATCH 1/2] zram: fix crashes due to use of cpu hotplug
- multistate
-Message-ID: <20210406155423.t7dagp24bupudv3p@treble>
-References: <20210319190924.GK4332@42.do-not-panic.com>
- <YFjHvUolScp3btJ9@google.com>
- <20210322204156.GM4332@42.do-not-panic.com>
- <YFkWMZ0m9nKCT69T@google.com>
- <20210401235925.GR4332@42.do-not-panic.com>
- <YGbNpLKXfWpy0ZZa@kroah.com>
- <20210402183016.GU4332@42.do-not-panic.com>
- <YGgHg7XCHD3rATIK@kroah.com>
- <20210406003152.GZ4332@42.do-not-panic.com>
- <alpine.LSU.2.21.2104061354110.10372@pobox.suse.cz>
+        id S240611AbhDFRtS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Apr 2021 13:49:18 -0400
+Received: from mail-pl1-f180.google.com ([209.85.214.180]:33337 "EHLO
+        mail-pl1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234159AbhDFRtR (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Apr 2021 13:49:17 -0400
+Received: by mail-pl1-f180.google.com with SMTP id p10so2789523pld.0
+        for <linux-block@vger.kernel.org>; Tue, 06 Apr 2021 10:49:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:subject:to:cc:references:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=2hIgX1t40yIC/NbmviNeT4VNtq7DWucpE4INElJm/iA=;
+        b=BCfcZWGGpcmVvrJvxh1t2F6dPqv0MRheGJzvmv7EZgp7TsJDwXZujt6KCA60ovUTaG
+         YpAOgP5/l9xFoASziakubJC9L4uT5j6Rl5Kd/1NYqNdD2A6oiI8xSI0Nq1Y2TLbMuFSV
+         vib36QfXA/VyShlbMtFuDjGL26htXOum228QSmfVBGaqNI/P108eygDhIyMuPIDSslJ6
+         N/vINSZxfWKwPZgSn+s9z9yqAHV7/n8K9BMIcqjJkt9xCcUzkRdDPQUwdn0UHqNyHZaN
+         0lw4khmb1p5RCP0lkPxzEWA8mljW76sz161+k94stUGMMbWVoWSiC7hiKW/xE8WaeEs5
+         qeEg==
+X-Gm-Message-State: AOAM533hDzV+jhmCqWIkLMdT7iTPeCFot107WBs0MHaf5FnrIqjAM/TJ
+        Me9AfLin5wyyx5+J9sgntfA=
+X-Google-Smtp-Source: ABdhPJyW+8vPO26+gY31KerfyQ39Ks35dcSgFUewcyJb1n0dICB3P1jig92DggIaV94/EeYjtMYSQA==
+X-Received: by 2002:a17:90b:1b44:: with SMTP id nv4mr1721776pjb.228.1617731349233;
+        Tue, 06 Apr 2021 10:49:09 -0700 (PDT)
+Received: from ?IPv6:2601:647:4000:d7:277d:764e:de23:a2e8? ([2601:647:4000:d7:277d:764e:de23:a2e8])
+        by smtp.gmail.com with ESMTPSA id y2sm3068745pji.22.2021.04.06.10.49.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 06 Apr 2021 10:49:08 -0700 (PDT)
+From:   Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [PATCH v5 0/3] blk-mq: Fix a race between iterating over requests
+ and freeing requests
+To:     John Garry <john.garry@huawei.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
+References: <20210405002834.32339-1-bvanassche@acm.org>
+ <a4ffb3f0-414d-ba7b-db49-1660faa37873@huawei.com>
+Message-ID: <fd0359fd-37a5-1e60-0a2b-4e27d1d3ee33@acm.org>
+Date:   Tue, 6 Apr 2021 10:49:06 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
+In-Reply-To: <a4ffb3f0-414d-ba7b-db49-1660faa37873@huawei.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <alpine.LSU.2.21.2104061354110.10372@pobox.suse.cz>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Apr 06, 2021 at 02:00:19PM +0200, Miroslav Benes wrote:
-> Hi,
+On 4/6/21 1:00 AM, John Garry wrote:
+> Hi Bart,
 > 
-> > > Driver developers will simply have to open code these protections. In
-> > > light of what I see on LTP / fuzzing, I suspect the use case will grow
-> > > and we'll have to revisit this in the future. But for now, sure, we can
-> > > just open code the required protections everywhere to not crash on module
-> > > removal.
-> > 
-> > LTP and fuzzing too do not remove modules.  So I do not understand the
-> > root problem here, that's just something that does not happen on a real
-> > system.
+>> Changes between v2 and v3:
+>> - Converted the single v2 patch into a series of three patches.
+>> - Switched from SRCU to a combination of RCU and semaphores.
 > 
-> If I am not mistaken, the issue that Luis tries to solve here was indeed 
-> found by running LTP.
+> But can you mention why we made to changes from v3 onwards (versus
+> v2)?
 > 
-> > On Sat, Apr 03, 2021 at 08:13:23AM +0200, Greg KH wrote:
-> > > On Fri, Apr 02, 2021 at 06:30:16PM +0000, Luis Chamberlain wrote:
-> > > > On Fri, Apr 02, 2021 at 09:54:12AM +0200, Greg KH wrote:
-> > > > > No, please no.  Module removal is a "best effort",
-> > > > 
-> > > > Not for live patching. I am not sure if I am missing any other valid
-> > > > use case?
-> > > 
-> > > live patching removes modules?  We have so many code paths that are
-> > > "best effort" when it comes to module unloading, trying to resolve this
-> > > one is a valiant try, but not realistic.
-> > 
-> > Miroslav, your input / help here would be valuable. I did the
-> > generalization work because you said it would be worthy for you too...
-> 
-> Yes, we have the option to revert and remove the existing live patch from 
-> the system. I am not sure how (if) it is used in practice.
-> 
-> At least at SUSE we do not support the option. But we are only one of the 
-> many downstream users. So yes, there is the option.
+> The v2 patch just used SRCU as the sync mechanism, and the impression
+> I got from Jens was that the marginal performance drop was tolerable.
+> And the issues it tries to address seem to be solved. So why change?
+> Maybe my impression of the performance drop being acceptable was
+> wrong.
 
-Same for Red Hat.  Unloading livepatch modules seems to work fine, but
-isn't officially supported.
+Hi John,
 
-That said, if rmmod is just considered a development aid, and we're
-going to be ignoring bugs, we should make it official with a new
-TAINT_RMMOD.
+It seems like I should have done a better job of explaining that change.
+On v2 I received the following feedback from Hannes: "What I don't
+particularly like is the global blk_sched_srcu here; can't
+we make it per tagset?". My reply was as follows: "I'm concerned about
+the additional memory required for one srcu_struct per tag set." Hence
+the switch from SRCU to RCU + rwsem. See also
+https://lore.kernel.org/linux-block/d1627890-fb10-7ebe-d805-621f925f80e7@suse.de/.
 
--- 
-Josh
+Regarding the 1% performance drop measured by Jens: with debugging
+disabled srcu_dereference() is translated into READ_ONCE() and
+rcu_assign_pointer() is translated into smp_store_release(). On x86
+smp_store_release() is translated into a compiler barrier +
+WRITE_ONCE(). In other words, I do not expect that the performance
+difference came from the switch to SRCU but rather from the two new
+hctx->tags->rqs[] assignments.
 
+I think that the switch to READ_ONCE() / WRITE_ONCE() is unavoidable.
+Even if cmpxchg() would be used to clear hctx->tags->rqs[] pointers then
+we would need to convert all other hctx->tags->rqs[] accesses into
+READ_ONCE() / WRITE_ONCE() to make that cmpxchg() call safe.
+
+Bart.
