@@ -7,53 +7,53 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E406FC433ED
-	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 21:49:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B05E0C433B4
+	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 21:49:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B945361262
-	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 21:49:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 89EBA6120E
+	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 21:49:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239517AbhDFVtZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Apr 2021 17:49:25 -0400
-Received: from mail-pl1-f173.google.com ([209.85.214.173]:33521 "EHLO
-        mail-pl1-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239293AbhDFVtZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Apr 2021 17:49:25 -0400
-Received: by mail-pl1-f173.google.com with SMTP id p10so3137618pld.0
-        for <linux-block@vger.kernel.org>; Tue, 06 Apr 2021 14:49:16 -0700 (PDT)
+        id S232623AbhDFVt3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Apr 2021 17:49:29 -0400
+Received: from mail-pl1-f180.google.com ([209.85.214.180]:34506 "EHLO
+        mail-pl1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S243161AbhDFVt1 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Apr 2021 17:49:27 -0400
+Received: by mail-pl1-f180.google.com with SMTP id a6so4938831pls.1
+        for <linux-block@vger.kernel.org>; Tue, 06 Apr 2021 14:49:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=13kP3iYajUPF1gdCA46eYKhRnxztFc/t6rLAjj9NS5w=;
-        b=PePZoChTp2a7a+JAW+VOwJ1AdQsKwvO1nEXJEDjoC2ivathChjU3Sf8ooeN2IJ9Joi
-         T1F4bJSj2PecpvLfkn3iH9HC8O8bg49cpuyLq4jmHEKbOD0FBhbwYTjExSOgK/+zRu84
-         xvKdiWzrI7igJO4vbNV/r8Uee7RCs80TPme0SGhuHpdtPSP7Xm9gcp0CpoaIpwAe3CyF
-         ywt0pSXNW4c/2Dn9aeo8V6m6GQBkEJ9QRHjCY+Y6CIxS7CjepzKdWgMpB6zBgr8MeJAe
-         pJu+hKDHVv4m2EiGQyTvi1Oa71sYH8ndGNiSkSazF6EDTys2fSS1TSqVWwq5FhJSIx0R
-         Br9Q==
-X-Gm-Message-State: AOAM5328gb/gzduD627++jV6xf1S48FL9/SXt1W9W2g+0uB0Qz5xwmor
-        1CkBH+hONbb6VrbUCuJvEXo=
-X-Google-Smtp-Source: ABdhPJw3tiVqjivosiSko9AWaO7HyXzgY/vSEU2zAcaSzlb8CI7tlNX+mq4bJrrPjJasJK1RLv+dzg==
-X-Received: by 2002:a17:903:208b:b029:e9:8c2:4da with SMTP id d11-20020a170903208bb02900e908c204damr276172plc.68.1617745756337;
-        Tue, 06 Apr 2021 14:49:16 -0700 (PDT)
+        bh=ESEEdwJwAJytm9mSDnVfnLBhohmbk4CAX/QvKz8v7mU=;
+        b=luhIDX4QOHX2T82kluJdYPVDcEOjpVCSuz4HtZyZ1nq1hhBpgdD10Mp32ksNxh+UVK
+         XPf33gvBNmpbT+Dsepn2ecZVtN1FX8TEng3bhzUl3xVpilR6GjEPn4El+lc042jWxqr9
+         5bSTrTdMrOLZfDhCNpasYRuqRW48YAybEiBQ9wVhjdgFXE9v7JGC1gcpib1w+3dgtMkS
+         lMlDKK66dFes73YhxeuNhDXyan5AeENsj7J05xQ+RvoPH5YwZrITu8b8NElCBL7eUy4b
+         cPj1f5wjpRVgUxpqs4jdypC53gdAMJuP92gumuSiyqTXhJ8t3gPqbAIxgQmwlpgnUmik
+         JUcA==
+X-Gm-Message-State: AOAM531m4fLvHCkfcvTIRW5FvcUx/qsJ0w4grsI7nqx3Cv7ogEsrQ9Dk
+        tF2PTYiWfK8FQHylXV2GEnI=
+X-Google-Smtp-Source: ABdhPJySFBxoFVeE/CBYL9O3mG+LfBSe+uPpUeBNbS1asF82HkoMKsx28JTmBSG3qZHXAPSNYT/OmQ==
+X-Received: by 2002:a17:902:263:b029:e7:35d8:4554 with SMTP id 90-20020a1709020263b02900e735d84554mr242356plc.83.1617745757604;
+        Tue, 06 Apr 2021 14:49:17 -0700 (PDT)
 Received: from asus.hsd1.ca.comcast.net ([2601:647:4000:d7:277d:764e:de23:a2e8])
-        by smtp.gmail.com with ESMTPSA id my18sm2866062pjb.38.2021.04.06.14.49.15
+        by smtp.gmail.com with ESMTPSA id my18sm2866062pjb.38.2021.04.06.14.49.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Apr 2021 14:49:15 -0700 (PDT)
+        Tue, 06 Apr 2021 14:49:17 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Bart Van Assche <bvanassche@acm.org>,
+        Khazhy Kumykov <khazhy@google.com>,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
         Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
         Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.de>,
         Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        John Garry <john.garry@huawei.com>,
-        Daniel Wagner <dwagner@suse.de>
-Subject: [PATCH v6 4/5] blk-mq: Make it safe to use RCU to iterate over blk_mq_tag_set.tag_list
-Date:   Tue,  6 Apr 2021 14:49:04 -0700
-Message-Id: <20210406214905.21622-5-bvanassche@acm.org>
+        John Garry <john.garry@huawei.com>
+Subject: [PATCH v6 5/5] blk-mq: Fix races between blk_mq_update_nr_hw_queues() and iterating over tags
+Date:   Tue,  6 Apr 2021 14:49:05 -0700
+Message-Id: <20210406214905.21622-6-bvanassche@acm.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210406214905.21622-1-bvanassche@acm.org>
 References: <20210406214905.21622-1-bvanassche@acm.org>
@@ -63,18 +63,11 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Since the next patch in this series will use RCU to iterate over tag_list,
-make this safe. Note: call_rcu() is already used to free the request queue.
-From blk-sysfs.c:
+Serialize the tag set modifications performed by blk_mq_update_nr_hw_queues()
+and iterating over a tag set to prevent that iterating over a tag set crashes
+due to a tag set being examined while it is being modified.
 
-	call_rcu(&q->rcu_head, blk_free_queue_rcu);
-
-See also:
-* Commit 705cda97ee3a ("blk-mq: Make it safe to use RCU to iterate over
-  blk_mq_tag_set.tag_list"; v4.12).
-* Commit 08c875cbf481 ("block: Use non _rcu version of list functions for
-  tag_set_list"; v5.9).
-
+Reported-by: Khazhy Kumykov <khazhy@google.com>
 Cc: Christoph Hellwig <hch@lst.de>
 Cc: Martin K. Petersen <martin.petersen@oracle.com>
 Cc: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
@@ -82,35 +75,89 @@ Cc: Ming Lei <ming.lei@redhat.com>
 Cc: Hannes Reinecke <hare@suse.de>
 Cc: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 Cc: John Garry <john.garry@huawei.com>
-Cc: Daniel Wagner <dwagner@suse.de>
+Cc: Khazhy Kumykov <khazhy@google.com>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/blk-mq.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ block/blk-mq-tag.c | 39 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 39 insertions(+)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index d6c9b655c0f5..ee98ce03fdc9 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2946,7 +2946,7 @@ static void blk_mq_del_queue_tag_set(struct request_queue *q)
- 	struct blk_mq_tag_set *set = q->tag_set;
- 
- 	mutex_lock(&set->tag_list_lock);
--	list_del(&q->tag_set_list);
-+	list_del_rcu(&q->tag_set_list);
- 	if (list_is_singular(&set->tag_list)) {
- 		/* just transitioned to unshared */
- 		set->flags &= ~BLK_MQ_F_TAG_QUEUE_SHARED;
-@@ -2954,7 +2954,11 @@ static void blk_mq_del_queue_tag_set(struct request_queue *q)
- 		blk_mq_update_tag_set_shared(set, false);
- 	}
- 	mutex_unlock(&set->tag_list_lock);
--	INIT_LIST_HEAD(&q->tag_set_list);
-+	/*
-+	 * Calling synchronize_rcu() and INIT_LIST_HEAD(&q->tag_set_list) is
-+	 * not necessary since blk_mq_del_queue_tag_set() is only called from
-+	 * blk_cleanup_queue().
-+	 */
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index a73e81d75fb8..bb2b9d412c41 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -376,6 +376,31 @@ void blk_mq_all_tag_iter_atomic(struct blk_mq_tags *tags, busy_tag_iter_fn *fn,
+ 	__blk_mq_all_tag_iter(tags, fn, priv, BT_TAG_ITER_STATIC_RQS);
  }
  
- static void blk_mq_add_queue_tag_set(struct blk_mq_tag_set *set,
++/*
++ * Iterate over all request queues in a tag set, find the first queue with a
++ * non-zero usage count, increment its usage count and return the pointer to
++ * that request queue. This prevents that blk_mq_update_nr_hw_queues() will
++ * modify @set->nr_hw_queues while iterating over tags since
++ * blk_mq_update_nr_hw_queues() only modifies @set->nr_hw_queues while the
++ * usage count of all queues associated with a tag set is zero.
++ */
++static struct request_queue *
++blk_mq_get_any_tagset_queue(struct blk_mq_tag_set *set)
++{
++	struct request_queue *q;
++
++	rcu_read_lock();
++	list_for_each_entry_rcu(q, &set->tag_list, tag_set_list) {
++		if (percpu_ref_tryget(&q->q_usage_counter)) {
++			rcu_read_unlock();
++			return q;
++		}
++	}
++	rcu_read_unlock();
++
++	return NULL;
++}
++
+ /**
+  * blk_mq_tagset_busy_iter - iterate over all started requests in a tag set
+  * @tagset:	Tag set to iterate over.
+@@ -391,15 +416,22 @@ void blk_mq_all_tag_iter_atomic(struct blk_mq_tags *tags, busy_tag_iter_fn *fn,
+ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
+ 		busy_tag_iter_fn *fn, void *priv)
+ {
++	struct request_queue *q;
+ 	int i;
+ 
+ 	might_sleep();
+ 
++	q = blk_mq_get_any_tagset_queue(tagset);
++	if (!q)
++		return;
++
+ 	for (i = 0; i < tagset->nr_hw_queues; i++) {
+ 		if (tagset->tags && tagset->tags[i])
+ 			__blk_mq_all_tag_iter(tagset->tags[i], fn, priv,
+ 				BT_TAG_ITER_STARTED | BT_TAG_ITER_MAY_SLEEP);
+ 	}
++
++	blk_queue_exit(q);
+ }
+ EXPORT_SYMBOL(blk_mq_tagset_busy_iter);
+ 
+@@ -418,13 +450,20 @@ EXPORT_SYMBOL(blk_mq_tagset_busy_iter);
+ void blk_mq_tagset_busy_iter_atomic(struct blk_mq_tag_set *tagset,
+ 		busy_tag_iter_fn *fn, void *priv)
+ {
++	struct request_queue *q;
+ 	int i;
+ 
++	q = blk_mq_get_any_tagset_queue(tagset);
++	if (!q)
++		return;
++
+ 	for (i = 0; i < tagset->nr_hw_queues; i++) {
+ 		if (tagset->tags && tagset->tags[i])
+ 			__blk_mq_all_tag_iter(tagset->tags[i], fn, priv,
+ 					      BT_TAG_ITER_STARTED);
+ 	}
++
++	blk_queue_exit(q);
+ }
+ EXPORT_SYMBOL(blk_mq_tagset_busy_iter_atomic);
+ 
