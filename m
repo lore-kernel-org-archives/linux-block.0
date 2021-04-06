@@ -7,66 +7,66 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0944C433B4
-	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 15:31:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA8EBC433B4
+	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 15:31:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B654B6139C
-	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 15:31:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9B12F613CA
+	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 15:31:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345668AbhDFPbJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Apr 2021 11:31:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56978 "EHLO
+        id S1345651AbhDFPbW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Apr 2021 11:31:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57032 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229790AbhDFPbJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Apr 2021 11:31:09 -0400
-Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84D54C06174A
-        for <linux-block@vger.kernel.org>; Tue,  6 Apr 2021 08:31:01 -0700 (PDT)
-Received: by mail-pg1-x52c.google.com with SMTP id q10so10626830pgj.2
-        for <linux-block@vger.kernel.org>; Tue, 06 Apr 2021 08:31:01 -0700 (PDT)
+        with ESMTP id S229741AbhDFPbW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Apr 2021 11:31:22 -0400
+Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 817DFC06174A
+        for <linux-block@vger.kernel.org>; Tue,  6 Apr 2021 08:31:14 -0700 (PDT)
+Received: by mail-pg1-x52d.google.com with SMTP id y32so7432616pga.11
+        for <linux-block@vger.kernel.org>; Tue, 06 Apr 2021 08:31:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=gWpNTfiTpVy/WA8PqoSAnaQcafoOOwxhfZoskSOFjEw=;
-        b=SCrUEAovq5NbMnLqaAjN6u41J1B1+Ruf4M/ZH1ZnzHeepRuPHaSKN+TQaHpPmHimn0
-         v+wb2fSokk+65NkYYfn3pSgjt1VvnZQ3oRL4O2FtBmPjMgaSY07AcWmNmtKbQvhL1MDa
-         vdcyK+kxoVqiwz9QSEj56QcMVqTh0nlvzo+u6qxdb9/9lgK5VZGAQirHB60gJAlDSYPy
-         mUyVY2OIzRSLZUIrVV5cUOUp6yn7RqCOEqSIk63s6Ig686TGpf1wjf6zXg3ed3ceOXGg
-         ygjxFl1bcS0u1a4Pb8P01Ww4hxzo6ArMDI/G15p81EodaFkFwMsvhFboRF0fi9qhRfcX
-         HcbQ==
+        bh=FVR8clygzLUFKEPmLFMXFMAq/CEtkPBvYlQe7K+S0wM=;
+        b=DVtq8pczW0+cPS/j2Z4qsIjU8D6sXeTAZp0sJuYcGT//v+pcWVzgzeggqfSOCHIP7M
+         rILDfEGbGmafL7JwZawTzoIZs7GVAmY+weY26PDox6YhskP0OXFCki0ccJxwlH8TV/kx
+         mir+4UQvTB5mzWtJmbASNka+wqB5sSusIK8SSFmaMuxMjsxbmqJ6/P1YvUGX2YNhjdJ4
+         +lwAkcGy3ZyV76N3M6c36RLCdfpMOi9BXUqRqgDJlyzLGbgYj7Z5IVh1B2jCEBxmDwae
+         rqO3dknEyTTrdxNTd/y0KLOMds3UPKl49Q6kTuqMt47SDlIlXVAY5njn5Jwsq2SBTuXN
+         UBgQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=gWpNTfiTpVy/WA8PqoSAnaQcafoOOwxhfZoskSOFjEw=;
-        b=cCSG0pHpcbN9JL9EOkMArEcGA9Bd3axr/kcv99bmjTE4pSUgP7clhmPu20DEFK3Ysl
-         bM0reTXaoWdL+TNkX6Ow0/fT4p9igH2pcx5AHviPLx4J1jHW/82lF4og5G8CtzKjMTTO
-         ZsKqTGcDXMIHlZ95Q+q6EN9l5cTMor59SLF4WBmiLW7A5mkJcNiEB6HhrwLVUXcOThNm
-         qdHnRKJV7uO7ZwdbU9Lw0PujLjf0ao3XyYRbpn/Z7tkFYkDGBJ4DWCSLRHXZ8hL4tbhg
-         Dsyo7zjnnWqYRw4TeFyKZEYsv9rT/PYv9+92JhwCEorMpDJqGCq4mFiOohDcALANqOud
-         JNug==
-X-Gm-Message-State: AOAM532hgasQjUl7VWeGpDG39xl8Z+LsCdAWHlnnKJtQ41dkW0xtyhbl
-        /95WWPGwt2iavjQVFPMQoxpYXoz5XtFdqw==
-X-Google-Smtp-Source: ABdhPJxN3uIyAuxYacScxp31xlInS/p5jCUAcM2JlseAQZxbfBNfGlKApMj/Huj3Db2ynHaz2XMTjg==
-X-Received: by 2002:a65:5584:: with SMTP id j4mr27796826pgs.356.1617723060892;
-        Tue, 06 Apr 2021 08:31:00 -0700 (PDT)
+        bh=FVR8clygzLUFKEPmLFMXFMAq/CEtkPBvYlQe7K+S0wM=;
+        b=eoy55xOZPx8rXogWvOH15pV08Clg3tKA53jRO6UxP33SS4eBczP4DeMH6ud3RcnFcf
+         M0kMFADldVP7atgr75FS83BVfwcPttJwoJhsrxLT/iHjyAW/aHPPdzCWEmytttMGioSz
+         SAmcTK/XvUDsW+I43C/zhSHsNyMWvtcCHamYBuQEf63e5vTt/oCdFQCVm/PCLy8EiFxd
+         a1gzli1ajhldku6d4WAIlxfLQkEAZD0C5Yi6Oc+sLEPspP80dmHVDKiMNKU8CT20ru64
+         1rjc+H5PecBuIIxmSTbUyxgwdenVZfAWqmw3tO+IvTX55UQO6Y92UIgjanME005oVAHB
+         l9zA==
+X-Gm-Message-State: AOAM530E0HPaaLGEQSDoklZ+9f0LwnSns9TcQg/GTEnKnGYpyF2PHPyP
+        rTrpYq3VAOSzoO7ksAmKtsfOhn6gR21Fgg==
+X-Google-Smtp-Source: ABdhPJwLy6+3XFFIb/kUj2Zi2Kpcjuq1vEVWRCe2DwIsxwTXQsvD7YkWlZhyg7Rnv+jccqvyAm8stg==
+X-Received: by 2002:aa7:8d4c:0:b029:21c:104b:f6cb with SMTP id s12-20020aa78d4c0000b029021c104bf6cbmr27683675pfe.26.1617723074063;
+        Tue, 06 Apr 2021 08:31:14 -0700 (PDT)
 Received: from [192.168.4.41] (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
-        by smtp.gmail.com with ESMTPSA id t8sm2090007pfq.59.2021.04.06.08.31.00
+        by smtp.gmail.com with ESMTPSA id kk6sm2953044pjb.51.2021.04.06.08.31.13
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 06 Apr 2021 08:31:00 -0700 (PDT)
-Subject: Re: [PATCH] floppy: always use the track buffer
-To:     Christoph Hellwig <hch@lst.de>, efremov@linux.com
-Cc:     linux-block@vger.kernel.org
-References: <20210406061755.811522-1-hch@lst.de>
+        Tue, 06 Apr 2021 08:31:13 -0700 (PDT)
+Subject: Re: [PATCH] swim3: support highmem
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     linux-block@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+References: <20210406061839.811588-1-hch@lst.de>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <879e9ac5-7e31-efbb-bb53-1587b678fc30@kernel.dk>
-Date:   Tue, 6 Apr 2021 09:31:02 -0600
+Message-ID: <5b1e84c0-afbf-389d-2929-d92e914e2613@kernel.dk>
+Date:   Tue, 6 Apr 2021 09:31:15 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210406061755.811522-1-hch@lst.de>
+In-Reply-To: <20210406061839.811588-1-hch@lst.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -74,13 +74,12 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/6/21 12:17 AM, Christoph Hellwig wrote:
-> Always use the track buffer that is already used for addresses outside
-> the 16MB address capability of the floppy controller.  This allows to
-> remove a lot of code that relies on kernel virtual addresses.  With
-> this gone there is just a single place left that looks at the bio,
-> which can be converted to memcpy_{from,to}_page, thus removing the need
-> for the extra block-layer bounce buffering for highmem pages.
+On 4/6/21 12:18 AM, Christoph Hellwig wrote:
+> swim3 only uses the virtual address of a bio to stash it into the data
+> transfer using virt_to_bus.  But the ppc32 virt_to_bus just uses the
+> physical address with an offset.  Replace virt_to_bus with a local hack
+> that performs the equivalent transformation and stop asking for block
+> layer bounce buffering.
 
 Applied, thanks.
 
