@@ -2,147 +2,173 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.2 required=3.0 tests=BAYES_00,DATE_IN_PAST_06_12,
+	DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04091C433ED
-	for <linux-block@archiver.kernel.org>; Wed,  7 Apr 2021 05:43:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A90F0C43460
+	for <linux-block@archiver.kernel.org>; Wed,  7 Apr 2021 05:58:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BCCD861184
-	for <linux-block@archiver.kernel.org>; Wed,  7 Apr 2021 05:43:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6D382613C2
+	for <linux-block@archiver.kernel.org>; Wed,  7 Apr 2021 05:58:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239916AbhDGFnW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 7 Apr 2021 01:43:22 -0400
-Received: from mail.kernel.org ([198.145.29.99]:40384 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229558AbhDGFnW (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 7 Apr 2021 01:43:22 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 40CF7610D0;
-        Wed,  7 Apr 2021 05:43:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1617774191;
-        bh=E1AdJJuv6qohtYvGButFiib/HiQBnklU6WNRjFNV50k=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=TnuQo2Ic9BtrG8CgitohlzV61GQcYEFAKie68LnwM1skObKLXHC7dv26wayM76902
-         KXtaGNAV3eKpUehIycdH3gOx3HQaN1t1FScb6Xif9Sq/Xasy0mdf4dHCEuUsHc8WTH
-         nFENttRRFtHwhLov7XfMzwLsjbubyAMtCHMTibjY=
-Date:   Wed, 7 Apr 2021 07:43:08 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Changheun Lee <nanich.lee@samsung.com>
-Cc:     bvanassche@acm.org, Johannes.Thumshirn@wdc.com,
-        asml.silence@gmail.com, axboe@kernel.dk, damien.lemoal@wdc.com,
-        hch@infradead.org, jisoo2146.oh@samsung.com,
-        junho89.kim@samsung.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, ming.lei@redhat.com,
-        mj0123.lee@samsung.com, osandov@fb.com, patchwork-bot@kernel.org,
-        seunghwan.hyun@samsung.com, sookwan7.kim@samsung.com,
-        tj@kernel.org, tom.leiming@gmail.com, woosung2.lee@samsung.com,
-        yt0928.kim@samsung.com
-Subject: Re: [RESEND PATCH v5 2/2] bio: add limit_bio_size sysfs
-Message-ID: <YG1GbFOqaq3wAnfZ@kroah.com>
-References: <7c8d9787-f0eb-9ef1-6ebf-f383c27b599a@acm.org>
- <CGME20210407013850epcas1p2d305f138c9fa1431abba1ec44a382de9@epcas1p2.samsung.com>
- <20210407012117.21122-1-nanich.lee@samsung.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210407012117.21122-1-nanich.lee@samsung.com>
+        id S1345024AbhDGF7H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 7 Apr 2021 01:59:07 -0400
+Received: from saphodev.broadcom.com ([192.19.232.172]:39154 "EHLO
+        relay.smtp-ext.broadcom.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S243610AbhDGF7H (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 7 Apr 2021 01:59:07 -0400
+Received: from localhost.localdomain (unknown [10.157.2.20])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by relay.smtp-ext.broadcom.com (Postfix) with ESMTPS id 4A285828A;
+        Tue,  6 Apr 2021 22:58:55 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 relay.smtp-ext.broadcom.com 4A285828A
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=broadcom.com;
+        s=dkimrelay; t=1617775137;
+        bh=nT3x3+hl0h44eCepYM/vCImNksgt2ni3AeJu7f6pqY8=;
+        h=From:To:Cc:Subject:Date:From;
+        b=IXoF4Us+Whx7wbBrf1F9Cohrk4PmJ7+1QFX614n6HgA/Y2BTGe70oKdU/IgL1Ixdh
+         2eTmyvRqJ8ufMpvM0SJmHxYL7MoE5nNFctYsSdfj1MFYp5iK1w7gGc2PTv2pvlOWCs
+         GOi8AZ34Wp55WusM3/T2NjRtx39z5qHEvu1I5qjg=
+From:   Muneendra <muneendra.kumar@broadcom.com>
+To:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        tj@kernel.org, linux-nvme@lists.infradead.org, hare@suse.de
+Cc:     jsmart2021@gmail.com, emilne@redhat.com, mkumar@redhat.com,
+        Muneendra <muneendra.kumar@broadcom.com>
+Subject: [PATCH v9 00/13] blkcg:Support to track FC storage blk io traffic
+Date:   Wed,  7 Apr 2021 04:36:24 +0530
+Message-Id: <1617750397-26466-1-git-send-email-muneendra.kumar@broadcom.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Apr 07, 2021 at 10:21:17AM +0900, Changheun Lee wrote:
-> > On 3/16/21 12:44 AM, Changheun Lee wrote:
-> > > Add limit_bio_size block sysfs node to limit bio size.
-> > > Queue flag QUEUE_FLAG_LIMIT_BIO_SIZE will be set if limit_bio_size is set.
-> > > And bio max size will be limited by queue max sectors via
-> > > QUEUE_FLAG_LIMIT_BIO_SIZE set.
-> > > 
-> > > Signed-off-by: Changheun Lee <nanich.lee@samsung.com>
-> > > ---
-> > >  Documentation/ABI/testing/sysfs-block | 10 ++++++++++
-> > >  Documentation/block/queue-sysfs.rst   |  7 +++++++
-> > >  block/blk-sysfs.c                     |  3 +++
-> > >  3 files changed, 20 insertions(+)
-> > > 
-> > > diff --git a/Documentation/ABI/testing/sysfs-block b/Documentation/ABI/testing/sysfs-block
-> > > index e34cdeeeb9d4..86a7b15410cf 100644
-> > > --- a/Documentation/ABI/testing/sysfs-block
-> > > +++ b/Documentation/ABI/testing/sysfs-block
-> > > @@ -316,3 +316,13 @@ Description:
-> > >  		does not complete in this time then the block driver timeout
-> > >  		handler is invoked. That timeout handler can decide to retry
-> > >  		the request, to fail it or to start a device recovery strategy.
-> > > +
-> > > +What:		/sys/block/<disk>/queue/limit_bio_size
-> > > +Date:		Feb, 2021
-> > > +Contact:	Changheun Lee <nanich.lee@samsung.com>
-> > > +Description:
-> > > +		(RW) Toggle for set/clear QUEUE_FLAG_LIMIT_BIO_SIZE queue flag.
-> > > +		Queue flag QUEUE_FLAG_LIMIT_BIO_SIZE will be set if limit_bio_size
-> > > +		is set. And bio max size will be limited by queue max sectors.
-> > > +		QUEUE_FLAG_LIMIT_BIO_SIZE will be cleared if limit_bio_size is
-> > > +		cleard. And limit of bio max size will be cleard.
-> > > diff --git a/Documentation/block/queue-sysfs.rst b/Documentation/block/queue-sysfs.rst
-> > > index 2638d3446b79..cd371a821855 100644
-> > > --- a/Documentation/block/queue-sysfs.rst
-> > > +++ b/Documentation/block/queue-sysfs.rst
-> > > @@ -273,4 +273,11 @@ devices are described in the ZBC (Zoned Block Commands) and ZAC
-> > >  do not support zone commands, they will be treated as regular block devices
-> > >  and zoned will report "none".
-> > >  
-> > > +limit_bio_size (RW)
-> > > +-------------------
-> > > +This indicates QUEUE_FLAG_LIMIT_BIO_SIZE queue flag value. And
-> > > +QUEUE_FLAG_LIMIT_BIO_SIZE can be changed via set(1)/clear(0) this node.
-> > > +bio max size will be limited by queue max sectors via set this node. And
-> > > +limit of bio max size will be cleard via clear this node.
-> > > +
-> > >  Jens Axboe <jens.axboe@oracle.com>, February 2009
-> > > diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-> > > index b513f1683af0..840d97f427e6 100644
-> > > --- a/block/blk-sysfs.c
-> > > +++ b/block/blk-sysfs.c
-> > > @@ -288,6 +288,7 @@ QUEUE_SYSFS_BIT_FNS(nonrot, NONROT, 1);
-> > >  QUEUE_SYSFS_BIT_FNS(random, ADD_RANDOM, 0);
-> > >  QUEUE_SYSFS_BIT_FNS(iostats, IO_STAT, 0);
-> > >  QUEUE_SYSFS_BIT_FNS(stable_writes, STABLE_WRITES, 0);
-> > > +QUEUE_SYSFS_BIT_FNS(limit_bio_size, LIMIT_BIO_SIZE, 0);
-> > >  #undef QUEUE_SYSFS_BIT_FNS
-> > >  
-> > >  static ssize_t queue_zoned_show(struct request_queue *q, char *page)
-> > > @@ -615,6 +616,7 @@ QUEUE_RW_ENTRY(queue_nonrot, "rotational");
-> > >  QUEUE_RW_ENTRY(queue_iostats, "iostats");
-> > >  QUEUE_RW_ENTRY(queue_random, "add_random");
-> > >  QUEUE_RW_ENTRY(queue_stable_writes, "stable_writes");
-> > > +QUEUE_RW_ENTRY(queue_limit_bio_size, "limit_bio_size");
-> > >  
-> > >  static struct attribute *queue_attrs[] = {
-> > >  	&queue_requests_entry.attr,
-> > > @@ -648,6 +650,7 @@ static struct attribute *queue_attrs[] = {
-> > >  	&queue_rq_affinity_entry.attr,
-> > >  	&queue_iostats_entry.attr,
-> > >  	&queue_stable_writes_entry.attr,
-> > > +	&queue_limit_bio_size_entry.attr,
-> > >  	&queue_random_entry.attr,
-> > >  	&queue_poll_entry.attr,
-> > >  	&queue_wc_entry.attr,
-> > 
-> > Has it been considered to introduce a function to set the BIO size limit
-> > instead of introducing a new sysfs attribute? See also
-> > blk_queue_max_hw_sectors().
-> 
-> A function to set has been not considered yet.
-> But sysfs attribute should be supported I think. Because it can be
-> different depending on each system environment including policy.
+This Patch added a unique application identifier i.e
+app_id  knob to  blkcg which allows identification of traffic
+sources at an individual cgroup based Applications
+(ex:virtual machine (VM))level in both host and
+fabric infrastructure.
 
-But what tool is now responsible for setting this new value?  Where will
-it get that information from?  And why can't the kernel just
-automatically set this correctly in the first place without any need for
-userspace interaction?
+Added a new sysfs attribute appid_store to set the application identfier
+in  the blkcg associted with cgroup id under
+/sys/class/fc/fc_udev_device/*
 
-thanks,
+With this new interface the user can set the application identfier
+in  the blkcg associted with cgroup id.
 
-greg k-h
+This capability can be utilized by multiple block transport infrastructure
+like fc,iscsi,roce.
+
+Existing FC fabric will use this feature and the description of
+the use case is below.
+
+Various virtualization technologies used in Fibre Channel
+SAN deployments have created the opportunity to identify
+and associate traffic with specific virtualized applications.
+The concepts behind the T11 Application Services standard is
+to provide the general mechanisms needed to identify
+virtualized services.
+It enables the Fabric and the storage targets to
+identify, monitor, and handle FC traffic
+based on vm tags by inserting application specific identification
+into the FC frame.
+
+The patches were cut against  5.13/scsi-queue tree
+
+v9:
+Addressed the issues reported by kernel test robot
+Replaced lpfc_get_vmid_from_hashtable with the
+generic kernel based hashtable (include/linux/hashtable.h)
+and made the changes in the code accordingly.
+Addressed the locking issue and also merged few patches
+
+v8:
+Modified the structure member,log messages and function declarations
+Added proper error codes and return values
+
+v7:
+Modified the Kconfig comments
+
+v6:
+Addressed the issues reported by kernel test robot
+Modified the Kconfig files as per standard
+
+v5:
+Renamed the function cgroup_get_from_kernfs_id to
+cgroup_get_from_id.
+
+Moved the input validation at the beginning of the function in 
+Renamed the arguments appropriatley.
+
+Changed Return code to non-numeric/SymbolChanged Return code
+to non-numeric/Symbol
+
+Modified the comments.
+
+v4:
+Addressed the error reported by  kernel test robot
+
+v3:
+removed RFC.
+
+Renamed the functions and app_id to more specific
+Addressed the reference leaks in blkcg_set_app_identifier
+Added a new config BLK_CGROUP_FC_APPID and made changes to 
+select the same under SCSI_FC_ATTRS
+
+V2:
+renamed app_identifier to app_id.
+removed the  sysfs interface blkio.app_identifie under
+/sys/fs/cgroup/blkio
+Ported the patch on top of 5.10/scsi-queue.
+Removed redundant code due to changes since last submit.
+Added a fix for issuing QFPA command.
+
+
+
+Gaurav Srivastava (10):
+  lpfc: vmid: Add the datastructure for supporting VMID in lpfc
+  lpfc: vmid: VMID params initialization
+  lpfc: vmid: Add support for vmid in mailbox command, does vmid
+    resource allocation and vmid cleanup
+  lpfc: vmid: Implements ELS commands for appid patch
+  lpfc: vmid: Functions to manage vmids
+  lpfc: vmid: Implements CT commands for appid.
+  lpfc: vmid: Appends the vmid in the wqe before sending
+  lpfc: vmid: Timeout implementation for vmid
+  lpfc: vmid: Adding qfpa and vmid timeout check in worker thread
+  lpfc: vmid: Introducing vmid in io path.
+
+Muneendra (3):
+  cgroup: Added cgroup_get_from_id
+  blkcg: Added a app identifier support for blkcg
+  nvme: Added a newsysfs attribute appid_store
+
+ block/Kconfig                    |   9 +
+ drivers/nvme/host/fc.c           |  73 +++++-
+ drivers/scsi/Kconfig             |  13 ++
+ drivers/scsi/lpfc/lpfc.h         | 122 +++++++++++
+ drivers/scsi/lpfc/lpfc_attr.c    |  48 ++++
+ drivers/scsi/lpfc/lpfc_crtn.h    |  11 +
+ drivers/scsi/lpfc/lpfc_ct.c      | 257 +++++++++++++++++++++-
+ drivers/scsi/lpfc/lpfc_disc.h    |   1 +
+ drivers/scsi/lpfc/lpfc_els.c     | 366 ++++++++++++++++++++++++++++++-
+ drivers/scsi/lpfc/lpfc_hbadisc.c | 147 +++++++++++++
+ drivers/scsi/lpfc/lpfc_hw.h      | 124 ++++++++++-
+ drivers/scsi/lpfc/lpfc_hw4.h     |  12 +
+ drivers/scsi/lpfc/lpfc_init.c    | 104 +++++++++
+ drivers/scsi/lpfc/lpfc_mbox.c    |   6 +
+ drivers/scsi/lpfc/lpfc_scsi.c    | 316 ++++++++++++++++++++++++++
+ drivers/scsi/lpfc/lpfc_sli.c     |  63 ++++++
+ drivers/scsi/lpfc/lpfc_sli.h     |   8 +
+ include/linux/blk-cgroup.h       |  56 +++++
+ include/linux/cgroup.h           |   6 +
+ kernel/cgroup/cgroup.c           |  26 +++
+ 20 files changed, 1758 insertions(+), 10 deletions(-)
+
+-- 
+2.26.2
+
