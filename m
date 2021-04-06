@@ -2,145 +2,206 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94DA1C433ED
-	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 01:06:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72BC8C433B4
+	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 01:28:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5829C613ED
-	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 01:06:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 41A43613EE
+	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 01:28:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235801AbhDFBGh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 5 Apr 2021 21:06:37 -0400
-Received: from mail-pf1-f180.google.com ([209.85.210.180]:43611 "EHLO
-        mail-pf1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235769AbhDFBGf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Apr 2021 21:06:35 -0400
-Received: by mail-pf1-f180.google.com with SMTP id q5so9246570pfh.10
-        for <linux-block@vger.kernel.org>; Mon, 05 Apr 2021 18:06:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=igNT9D8YeF7E2iWuyfm7MFvc2XArR0IXMGftmPnzEx0=;
-        b=qYyOXtr7k/ioqB24la8i5UOI6JjugdBScZVVNTFlPZvfmfWko4H7z7wtj1HXADu/lr
-         /LBlIPz9xAVYrZk031JxtMNJCxIoRBvbYoPZFUAPG6mwd52iOUKKSKLscKwZLzswErGu
-         RzLTq+C2eJ6zLHq+GVbWSSqRLYm+MuFi9BJpPVC0wOrTbIA6DzzM/A3ZRKdUNztdge1P
-         5ZUkW84htT/Us7zTVQmRED4+X521VyzIDbN7INqZy4yPYEN+6bme7Ju1DE7EM/Tcm7/0
-         pos4BhmPtEwhTMyGz0qmojbMCq+8nkN1v4u2Yc0DTnrCLT57YSLms3C/ebUDk6eJ5ekd
-         8cJQ==
-X-Gm-Message-State: AOAM532QQ7IIJaRxs8p0o9NIPL1B7dNbL1gG0VpSozC67BGuAXX1d+42
-        s9V8+KbX0RVzyG0uUpTAyG47lmfg+ys5qw==
-X-Google-Smtp-Source: ABdhPJxeMKqVGoCsuXw7ili7a1oxyNVUjiVZW9NX9iVQPCe4Bp2cTgpn9r1owAkqdEHNtkm/eJcrRA==
-X-Received: by 2002:a63:1b5c:: with SMTP id b28mr25753626pgm.186.1617671188146;
-        Mon, 05 Apr 2021 18:06:28 -0700 (PDT)
-Received: from ?IPv6:2601:647:4000:d7:b918:89d2:aae7:e643? ([2601:647:4000:d7:b918:89d2:aae7:e643])
-        by smtp.gmail.com with ESMTPSA id my18sm371885pjb.38.2021.04.05.18.06.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 Apr 2021 18:06:27 -0700 (PDT)
-Subject: Re: [PATCH v5 3/3] blk-mq: Fix a race between iterating over requests
- and freeing requests
-To:     Jens Axboe <axboe@kernel.dk>, Khazhy Kumykov <khazhy@google.com>,
-        John Garry <john.garry@huawei.com>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.de>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>
-References: <20210405002834.32339-1-bvanassche@acm.org>
- <20210405002834.32339-4-bvanassche@acm.org>
- <CACGdZYJh6ZvVekC8eBvz3SmN-TH8hTAmMQrvHtLJsKyL3R_fLw@mail.gmail.com>
- <54474b65-ffa4-9335-f7a2-5b49ccf169d4@kernel.dk>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <2e8e4954-5e28-5f04-52c0-5f48424b4532@acm.org>
-Date:   Mon, 5 Apr 2021 18:06:25 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+        id S239083AbhDFB26 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 5 Apr 2021 21:28:58 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:15600 "EHLO
+        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230476AbhDFB25 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Apr 2021 21:28:57 -0400
+Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.60])
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4FDqcb002Rz17QKx;
+        Tue,  6 Apr 2021 09:26:38 +0800 (CST)
+Received: from [10.174.176.73] (10.174.176.73) by
+ DGGEMS404-HUB.china.huawei.com (10.3.19.204) with Microsoft SMTP Server id
+ 14.3.498.0; Tue, 6 Apr 2021 09:28:44 +0800
+Subject: Re: [PATCH] block: reexpand iov_iter after read/write
+To:     <viro@zeniv.linux.org.uk>, <axboe@kernel.dk>,
+        <asml.silence@gmail.com>
+CC:     <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <io-uring@vger.kernel.org>
+References: <20210401071807.3328235-1-yangerkun@huawei.com>
+From:   yangerkun <yangerkun@huawei.com>
+Message-ID: <3bd14a60-b259-377b-38d5-907780bc2416@huawei.com>
+Date:   Tue, 6 Apr 2021 09:28:44 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-In-Reply-To: <54474b65-ffa4-9335-f7a2-5b49ccf169d4@kernel.dk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20210401071807.3328235-1-yangerkun@huawei.com>
+Content-Type: text/plain; charset="gbk"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.73]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/5/21 2:34 PM, Jens Axboe wrote:
-> For something out of left field, we can check if the page that the rq
-> belongs to is still part of the tag set. If it isn't, then don't
-> deref it.
+Ping...
+
+ÔÚ 2021/4/1 15:18, yangerkun Ð´µÀ:
+> We get a bug:
 > 
-> Totally untested.
+> BUG: KASAN: slab-out-of-bounds in iov_iter_revert+0x11c/0x404
+> lib/iov_iter.c:1139
+> Read of size 8 at addr ffff0000d3fb11f8 by task
 > 
-> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-> index e5bfecf2940d..6209c465e884 100644
-> --- a/block/blk-mq-tag.c
-> +++ b/block/blk-mq-tag.c
-> @@ -196,9 +196,35 @@ struct bt_iter_data {
->  	struct blk_mq_hw_ctx *hctx;
->  	busy_iter_fn *fn;
->  	void *data;
-> +	struct page *last_lookup;
->  	bool reserved;
->  };
->  
-> +static bool rq_from_queue(struct bt_iter_data *iter_data, struct request *rq)
-> +{
-> +	struct blk_mq_hw_ctx *hctx = iter_data->hctx;
-> +	struct page *rq_page, *page;
-> +
-> +	/*
-> +	 * We can hit rq == NULL here, because the tagging functions
-> +	 * test and set the bit before assigning ->rqs[].
-> +	 */
-> +	if (!rq)
-> +		return false;
-> +	rq_page = virt_to_page(rq);
-> +	if (rq_page == iter_data->last_lookup)
-> +		goto check_queue;
-> +	list_for_each_entry(page, &hctx->tags->page_list, lru) {
-> +		if (page == rq_page) {
-> +			iter_data->last_lookup = page;
-> +			goto check_queue;
-> +		}
+> CPU: 0 PID: 12582 Comm: syz-executor.2 Not tainted
+> 5.10.0-00843-g352c8610ccd2 #2
+> Hardware name: linux,dummy-virt (DT)
+> Call trace:
+>   dump_backtrace+0x0/0x2d0 arch/arm64/kernel/stacktrace.c:132
+>   show_stack+0x28/0x34 arch/arm64/kernel/stacktrace.c:196
+>   __dump_stack lib/dump_stack.c:77 [inline]
+>   dump_stack+0x110/0x164 lib/dump_stack.c:118
+>   print_address_description+0x78/0x5c8 mm/kasan/report.c:385
+>   __kasan_report mm/kasan/report.c:545 [inline]
+>   kasan_report+0x148/0x1e4 mm/kasan/report.c:562
+>   check_memory_region_inline mm/kasan/generic.c:183 [inline]
+>   __asan_load8+0xb4/0xbc mm/kasan/generic.c:252
+>   iov_iter_revert+0x11c/0x404 lib/iov_iter.c:1139
+>   io_read fs/io_uring.c:3421 [inline]
+>   io_issue_sqe+0x2344/0x2d64 fs/io_uring.c:5943
+>   __io_queue_sqe+0x19c/0x520 fs/io_uring.c:6260
+>   io_queue_sqe+0x2a4/0x590 fs/io_uring.c:6326
+>   io_submit_sqe fs/io_uring.c:6395 [inline]
+>   io_submit_sqes+0x4c0/0xa04 fs/io_uring.c:6624
+>   __do_sys_io_uring_enter fs/io_uring.c:9013 [inline]
+>   __se_sys_io_uring_enter fs/io_uring.c:8960 [inline]
+>   __arm64_sys_io_uring_enter+0x190/0x708 fs/io_uring.c:8960
+>   __invoke_syscall arch/arm64/kernel/syscall.c:36 [inline]
+>   invoke_syscall arch/arm64/kernel/syscall.c:48 [inline]
+>   el0_svc_common arch/arm64/kernel/syscall.c:158 [inline]
+>   do_el0_svc+0x120/0x290 arch/arm64/kernel/syscall.c:227
+>   el0_svc+0x1c/0x28 arch/arm64/kernel/entry-common.c:367
+>   el0_sync_handler+0x98/0x170 arch/arm64/kernel/entry-common.c:383
+>   el0_sync+0x140/0x180 arch/arm64/kernel/entry.S:670
+> 
+> Allocated by task 12570:
+>   stack_trace_save+0x80/0xb8 kernel/stacktrace.c:121
+>   kasan_save_stack mm/kasan/common.c:48 [inline]
+>   kasan_set_track mm/kasan/common.c:56 [inline]
+>   __kasan_kmalloc+0xdc/0x120 mm/kasan/common.c:461
+>   kasan_kmalloc+0xc/0x14 mm/kasan/common.c:475
+>   __kmalloc+0x23c/0x334 mm/slub.c:3970
+>   kmalloc include/linux/slab.h:557 [inline]
+>   __io_alloc_async_data+0x68/0x9c fs/io_uring.c:3210
+>   io_setup_async_rw fs/io_uring.c:3229 [inline]
+>   io_read fs/io_uring.c:3436 [inline]
+>   io_issue_sqe+0x2954/0x2d64 fs/io_uring.c:5943
+>   __io_queue_sqe+0x19c/0x520 fs/io_uring.c:6260
+>   io_queue_sqe+0x2a4/0x590 fs/io_uring.c:6326
+>   io_submit_sqe fs/io_uring.c:6395 [inline]
+>   io_submit_sqes+0x4c0/0xa04 fs/io_uring.c:6624
+>   __do_sys_io_uring_enter fs/io_uring.c:9013 [inline]
+>   __se_sys_io_uring_enter fs/io_uring.c:8960 [inline]
+>   __arm64_sys_io_uring_enter+0x190/0x708 fs/io_uring.c:8960
+>   __invoke_syscall arch/arm64/kernel/syscall.c:36 [inline]
+>   invoke_syscall arch/arm64/kernel/syscall.c:48 [inline]
+>   el0_svc_common arch/arm64/kernel/syscall.c:158 [inline]
+>   do_el0_svc+0x120/0x290 arch/arm64/kernel/syscall.c:227
+>   el0_svc+0x1c/0x28 arch/arm64/kernel/entry-common.c:367
+>   el0_sync_handler+0x98/0x170 arch/arm64/kernel/entry-common.c:383
+>   el0_sync+0x140/0x180 arch/arm64/kernel/entry.S:670
+> 
+> Freed by task 12570:
+>   stack_trace_save+0x80/0xb8 kernel/stacktrace.c:121
+>   kasan_save_stack mm/kasan/common.c:48 [inline]
+>   kasan_set_track+0x38/0x6c mm/kasan/common.c:56
+>   kasan_set_free_info+0x20/0x40 mm/kasan/generic.c:355
+>   __kasan_slab_free+0x124/0x150 mm/kasan/common.c:422
+>   kasan_slab_free+0x10/0x1c mm/kasan/common.c:431
+>   slab_free_hook mm/slub.c:1544 [inline]
+>   slab_free_freelist_hook mm/slub.c:1577 [inline]
+>   slab_free mm/slub.c:3142 [inline]
+>   kfree+0x104/0x38c mm/slub.c:4124
+>   io_dismantle_req fs/io_uring.c:1855 [inline]
+>   __io_free_req+0x70/0x254 fs/io_uring.c:1867
+>   io_put_req_find_next fs/io_uring.c:2173 [inline]
+>   __io_queue_sqe+0x1fc/0x520 fs/io_uring.c:6279
+>   __io_req_task_submit+0x154/0x21c fs/io_uring.c:2051
+>   io_req_task_submit+0x2c/0x44 fs/io_uring.c:2063
+>   task_work_run+0xdc/0x128 kernel/task_work.c:151
+>   get_signal+0x6f8/0x980 kernel/signal.c:2562
+>   do_signal+0x108/0x3a4 arch/arm64/kernel/signal.c:658
+>   do_notify_resume+0xbc/0x25c arch/arm64/kernel/signal.c:722
+>   work_pending+0xc/0x180
+> 
+> blkdev_read_iter can truncate iov_iter's count since the count + pos may
+> exceed the size of the blkdev. This will confuse io_read that we have
+> consume the iovec. And once we do the iov_iter_revert in io_read, we
+> will trigger the slab-out-of-bounds. Fix it by reexpand the count with
+> size has been truncated.
+> 
+> blkdev_write_iter can trigger the problem too.
+> 
+> Signed-off-by: yangerkun <yangerkun@huawei.com>
+> ---
+>   fs/block_dev.c | 20 +++++++++++++++++---
+>   1 file changed, 17 insertions(+), 3 deletions(-)
+> 
+> diff --git a/fs/block_dev.c b/fs/block_dev.c
+> index 92ed7d5df677..788e1014576f 100644
+> --- a/fs/block_dev.c
+> +++ b/fs/block_dev.c
+> @@ -1680,6 +1680,7 @@ ssize_t blkdev_write_iter(struct kiocb *iocb, struct iov_iter *from)
+>   	struct inode *bd_inode = bdev_file_inode(file);
+>   	loff_t size = i_size_read(bd_inode);
+>   	struct blk_plug plug;
+> +	size_t shorted = 0;
+>   	ssize_t ret;
+>   
+>   	if (bdev_read_only(I_BDEV(bd_inode)))
+> @@ -1697,12 +1698,17 @@ ssize_t blkdev_write_iter(struct kiocb *iocb, struct iov_iter *from)
+>   	if ((iocb->ki_flags & (IOCB_NOWAIT | IOCB_DIRECT)) == IOCB_NOWAIT)
+>   		return -EOPNOTSUPP;
+>   
+> -	iov_iter_truncate(from, size - iocb->ki_pos);
+> +	size -= iocb->ki_pos;
+> +	if (iov_iter_count(from) > size) {
+> +		shorted = iov_iter_count(from) - size;
+> +		iov_iter_truncate(from, size);
 > +	}
-> +	return false;
-> +check_queue:
-> +	return rq->q == hctx->queue && rq->mq_hctx == hctx;
-> +}
+>   
+>   	blk_start_plug(&plug);
+>   	ret = __generic_file_write_iter(iocb, from);
+>   	if (ret > 0)
+>   		ret = generic_write_sync(iocb, ret);
+> +	iov_iter_reexpand(from, iov_iter_count(from) + shorted);
+>   	blk_finish_plug(&plug);
+>   	return ret;
+>   }
+> @@ -1714,13 +1720,21 @@ ssize_t blkdev_read_iter(struct kiocb *iocb, struct iov_iter *to)
+>   	struct inode *bd_inode = bdev_file_inode(file);
+>   	loff_t size = i_size_read(bd_inode);
+>   	loff_t pos = iocb->ki_pos;
+> +	size_t shorted = 0;
+> +	ssize_t ret;
+>   
+>   	if (pos >= size)
+>   		return 0;
+>   
+>   	size -= pos;
+> -	iov_iter_truncate(to, size);
+> -	return generic_file_read_iter(iocb, to);
+> +	if (iov_iter_count(to) > size) {
+> +		shorted = iov_iter_count(to) - size;
+> +		iov_iter_truncate(to, size);
+> +	}
 > +
->  static bool bt_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
->  {
->  	struct bt_iter_data *iter_data = data;
-> @@ -211,11 +237,7 @@ static bool bt_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
->  		bitnr += tags->nr_reserved_tags;
->  	rq = tags->rqs[bitnr];
->  
-> -	/*
-> -	 * We can hit rq == NULL here, because the tagging functions
-> -	 * test and set the bit before assigning ->rqs[].
-> -	 */
-> -	if (rq && rq->q == hctx->queue && rq->mq_hctx == hctx)
-> +	if (rq_from_queue(iter_data, rq))
->  		return iter_data->fn(hctx, rq, iter_data->data, reserved);
->  	return true;
->  }
-
-Hi Jens,
-
-That's a very interesting suggestion. However, it seems to me that Khazhy's
-suggestion will result in shorter and faster code?
-
-Khazhy pointed out another race to me off-list, namely a race between updating
-the number of hardware queues and iterating over the tags in a tag set. I'm
-currently analyzing how to fix that race too.
-
-Thanks,
-
-Bart.
-
-
+> +	ret = generic_file_read_iter(iocb, to);
+> +	iov_iter_reexpand(to, iov_iter_count(to) + shorted);
+> +	return ret;
+>   }
+>   EXPORT_SYMBOL_GPL(blkdev_read_iter);
+>   
+> 
