@@ -7,64 +7,63 @@ X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAB2CC433ED
-	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 07:37:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1441C43603
+	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 07:37:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8FA8F613C4
-	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 07:37:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8DC77613C3
+	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 07:37:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235053AbhDFHhx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Apr 2021 03:37:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37378 "EHLO
+        id S235179AbhDFHhy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Apr 2021 03:37:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37388 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235179AbhDFHhx (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Apr 2021 03:37:53 -0400
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A0D4C061756
-        for <linux-block@vger.kernel.org>; Tue,  6 Apr 2021 00:37:46 -0700 (PDT)
-Received: by mail-ej1-x62c.google.com with SMTP id mh7so10350717ejb.12
+        with ESMTP id S235258AbhDFHhy (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Apr 2021 03:37:54 -0400
+Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DBEDC061756
+        for <linux-block@vger.kernel.org>; Tue,  6 Apr 2021 00:37:47 -0700 (PDT)
+Received: by mail-ej1-x634.google.com with SMTP id l4so20304741ejc.10
         for <linux-block@vger.kernel.org>; Tue, 06 Apr 2021 00:37:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=ionos.com; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=Pr6f4CgNg/vO7af8Lnbc0By2HHIYCME5N2QMNGWGV18=;
-        b=QNGflsDu121Be1+y9fmBcBzZBBqRf09KL7HUyjNkq7pRN9BQTOZI8dJ3bHQT6g2mWM
-         qV3pEY37UU7H1bjr5amEY3hbJu1i9cEvj+e/YVFPXatwuK36B/UV6jHjbODV+8de4MS8
-         d8sQYeUjyq+/XosEbMSazgaex9tq5ImOYFPUiA1ij3ohzU3MuwoENe5ZYgrwNy5pJYGP
-         Qu7nAZK1V22IqdiV1NHKb9MJYsuFj2d4t8kQTqKIHqz7Z7Xo4TpPNinrlxZx4XZ8TxYZ
-         cgHQomuaKtn0mrx7thRnHy03WO4vgJ3hgMVACWd9TZifO+6iPdWda5u/2XMtWrI9YfhD
-         rsmg==
+        bh=i3m1ZLIUbsmjdhyhdmher/khBF18PienCGDpXwk+t7E=;
+        b=eBusAapNuP10Cao2wPBuNCfcgf30yfcJ29F/VeAcalySScoz8pKoUcz+yXC9xNjsLy
+         WFt9CI7N/NIK91uO3qrWdrC7CTYy5VnslPxxELCGAFscgJVgli7KflkCbhmV7LDdD1Zo
+         k3io08kG8n+VBuJSCxnlUqbTfyszzb3s54U1OH2lKsT0OLPP8MwsVZsaBAQcb2pe9Tsb
+         oQn1ZavEd8aKSKM8ZQj6NZWfPVNdXl4s7TLRNe6lnZFTz22FNXCMQrEJZ0yoE3iBVACl
+         uEKXmvpJxa0PSymNLOSMhcGzM1sJvqJONf7bmzLy1epX4Jy0T/JT4+nvWbl94rV92MhF
+         i2aA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=Pr6f4CgNg/vO7af8Lnbc0By2HHIYCME5N2QMNGWGV18=;
-        b=dfAYG2UdDxUNgEhRLaCKtiQiflOlAs4XDoQtyUfgErJ7Bq2KKukRG3YwDt0kQxElEW
-         xVJWGL8ls64B/Ttm3EgLqaRBE9a4p7v8Jcgu4qjtiiTvEdAjdOOdXXZc5SKlZvuWlY9W
-         54u6K7rLhNwzHcLSw1wDjh5TVYJUYpiBsH4C7euYE4Y5mL1yvYH1j1l1bZlauk5WAjpd
-         0XoCj4oI2sQYWt4m/1clQDxVC6wQkArzMCNtrm1pt0WRVxZJPzhAma68DiPR5+5R+VJd
-         GairfhYcLBQyAJwp/lXszt7846jwtvRxiu8giiRwsC5zuY+cBvCal+ihIc3tUh7SjBnf
-         iHBA==
-X-Gm-Message-State: AOAM532AyNEAukoYhj265BqWVHcnBIVF25Vw6LeJBM399W2IS1DaHPNz
-        vP9WP9jNoNSG8mqxJCqj/iwc4pHaOP7lmt7C
-X-Google-Smtp-Source: ABdhPJzvt9H6SSr55xEkCNfddBwDAZA98e1KM1sqVHN8GOpOF8btQCeyH7vWhMknR0jLpS8h26GsYw==
-X-Received: by 2002:a17:906:5906:: with SMTP id h6mr3095904ejq.288.1617694664682;
-        Tue, 06 Apr 2021 00:37:44 -0700 (PDT)
+        bh=i3m1ZLIUbsmjdhyhdmher/khBF18PienCGDpXwk+t7E=;
+        b=d/ZUg31ogTEhmZCCb+R2lZDBKeoExBjmrYeOINs08RXjXSxjLrU90z2WFNxOV003aN
+         Co4TEz5zvXFfEqjLjnWylYaKrhR3ifMVR/UgUQBhsAN7xcrB1uN7vKZPGgKlmWdxFmzO
+         9ZDvADnqHKoJf7OVQuNOK/WDqrsUEhiFz0KlslgJLrBrNxgj2n3j2JHqUxluG3PjVwrr
+         uhm8fPIKpjZ+K5pYJLFFxB4oH918wSLhW03/aNTcCs2zr8D+t77bjikQgJkvsH349XFS
+         TFnjvD1h92hAYFTbrlcJiPP+kvnmMfkZrKj9C073X8275Dju6iiMBbThz5oVgrks4d/N
+         WV1A==
+X-Gm-Message-State: AOAM531FTgY3F6MXJl9Nmhzjq0P+/4F1xTmgmMhjZxqBRGerWh1C2Bkt
+        VNFPt18a2iagHkx/ZbN/jZ9TQfeD6dzym1H5
+X-Google-Smtp-Source: ABdhPJwC37FX2a2JFSr38pMUmsB5XreScm+8qdv4N77r1vD0iN+VGIYNMVVvfShbWAaaamSoRSEITA==
+X-Received: by 2002:a17:907:689:: with SMTP id wn9mr32403158ejb.485.1617694665447;
+        Tue, 06 Apr 2021 00:37:45 -0700 (PDT)
 Received: from gkim-laptop.fkb.profitbricks.net (ip5f5aeee5.dynamic.kabel-deutschland.de. [95.90.238.229])
         by smtp.googlemail.com with ESMTPSA id o6sm12843305edw.24.2021.04.06.00.37.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Apr 2021 00:37:44 -0700 (PDT)
+        Tue, 06 Apr 2021 00:37:45 -0700 (PDT)
 From:   Gioh Kim <gi-oh.kim@ionos.com>
 To:     linux-block@vger.kernel.org, linux-doc@vger.kernel.org
 Cc:     axboe@kernel.dk, akinobu.mita@gmail.com, corbet@lwn.net,
         hch@infradead.org, sagi@grimberg.me, bvanassche@acm.org,
         haris.iqbal@ionos.com, jinpu.wang@ionos.com,
-        Gioh Kim <gi-oh.kim@cloud.ionos.com>,
-        Jack Wang <jinpu.wang@cloud.ionos.com>
-Subject: [PATCH for-next 3/5] block/rnbd-clt: Inject some fault points
-Date:   Tue,  6 Apr 2021 09:37:25 +0200
-Message-Id: <20210406073727.172380-4-gi-oh.kim@ionos.com>
+        Gioh Kim <gi-oh.kim@cloud.ionos.com>
+Subject: [PATCH for-next 4/5] docs: fault-injection: Add fault-injection manual of RNBD
+Date:   Tue,  6 Apr 2021 09:37:26 +0200
+Message-Id: <20210406073727.172380-5-gi-oh.kim@ionos.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210406073727.172380-1-gi-oh.kim@ionos.com>
 References: <20210406073727.172380-1-gi-oh.kim@ionos.com>
@@ -76,175 +75,228 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Gioh Kim <gi-oh.kim@cloud.ionos.com>
 
-This patch injects two fault points:
-1. generate an IO error
-2. generate a unmap failure
+It describes how to use the fault-injection of RNBD.
 
 Signed-off-by: Gioh Kim <gi-oh.kim@cloud.ionos.com>
-Signed-off-by: Jack Wang <jinpu.wang@cloud.ionos.com>
 ---
- drivers/block/rnbd/rnbd-clt-sysfs.c | 53 +++++++++++++++++++++++++++++
- drivers/block/rnbd/rnbd-clt.c       | 17 +++++++++
- drivers/block/rnbd/rnbd-clt.h       | 15 ++++++++
- 3 files changed, 85 insertions(+)
+ .../fault-injection/rnbd-fault-injection.rst  | 208 ++++++++++++++++++
+ 1 file changed, 208 insertions(+)
+ create mode 100644 Documentation/fault-injection/rnbd-fault-injection.rst
 
-diff --git a/drivers/block/rnbd/rnbd-clt-sysfs.c b/drivers/block/rnbd/rnbd-clt-sysfs.c
-index d4aa6bfc9555..d83415875960 100644
---- a/drivers/block/rnbd/rnbd-clt-sysfs.c
-+++ b/drivers/block/rnbd/rnbd-clt-sysfs.c
-@@ -651,3 +651,56 @@ void rnbd_clt_destroy_sysfs_files(void)
- 	device_destroy(rnbd_dev_class, MKDEV(0, 0));
- 	class_destroy(rnbd_dev_class);
- }
+diff --git a/Documentation/fault-injection/rnbd-fault-injection.rst b/Documentation/fault-injection/rnbd-fault-injection.rst
+new file mode 100644
+index 000000000000..21594e5e3c91
+--- /dev/null
++++ b/Documentation/fault-injection/rnbd-fault-injection.rst
+@@ -0,0 +1,208 @@
++RNBD (RDMA Network Block Device) Fault Injection
++================================================
++This document introduces how to enable and use the error injection of RNBD
++via debugfs in the /sys/kernel/debug directory. When enabled, users can
++enable specific error injection point and change the default status code
++via the debugfs.
 +
-+#ifdef CONFIG_FAULT_INJECTION_DEBUG_FS
-+void rnbd_clt_fault_inject_init(struct rnbd_clt_fault_inject *fault_inject,
-+				const char *dev_name)
-+{
-+	rnbd_fault_inject_init(&fault_inject->fj, dev_name, -EBUSY);
-+	/* injection points */
-+	rnbd_fault_inject_add(fault_inject->fj.dir,
-+			      "fail-request", &fault_inject->fail_request);
-+	rnbd_fault_inject_add(fault_inject->fj.dir,
-+			      "fail-unmap", &fault_inject->fail_unmap);
-+}
++Following examples show how to inject an error into the RNBD.
 +
-+void rnbd_clt_fault_inject_final(struct rnbd_clt_fault_inject *fault_inject)
-+{
-+	rnbd_fault_inject_final(&fault_inject->fj);
-+}
++First, enable CONFIG_FAULT_INJECTION_DEBUG_FS kernel config,
++recompile the kernel. After booting up the kernel, map a target device.
 +
-+int rnbd_clt_should_fail_request(struct request *req)
-+{
-+	struct rnbd_clt_dev *dev = req->rq_disk->private_data;
-+	struct rnbd_clt_fault_inject *fault_inject = &dev->fault_inject;
++On client, /sys/kernel/debug/rnbdX directory is created after mapping.
++And /sys/kernel/debug/<mapped-device> directory is created on server.
 +
-+	if (fault_inject->fail_request && should_fail(&fault_inject->fj.attr, 1))
-+		return fault_inject->fj.status;
-+	return 0;
-+}
++Example 1: Inject an error into request processing of rnbd-client
++-----------------------------------------------------------------
 +
-+int rnbd_clt_should_fail_unmap(struct rnbd_clt_dev *dev)
-+{
-+	struct rnbd_clt_fault_inject *fault_inject = &dev->fault_inject;
++::
 +
-+	if (fault_inject->fail_unmap && should_fail(&fault_inject->fj.attr, 1))
-+		return fault_inject->fj.status;
-+	return 0;
-+}
-+#else
-+void rnbd_clt_fault_inject_init(struct rnbd_clt_fault_inject *fault_inj,
-+				const char *dev_name)
-+{
-+}
-+void rnbd_clt_fault_inject_final(struct rnbd_clt_fault_inject *fault_inject)
-+{
-+}
-+int rnbd_clt_should_fail_request(struct request *req)
-+{
-+	return 0;
-+}
-+int rnbd_clt_should_fail_unmap(struct rnbd_clt_dev *dev)
-+{
-+	return 0;
-+}
-+#endif
-diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.c
-index 45a470076652..8c9a02c8b8bd 100644
---- a/drivers/block/rnbd/rnbd-clt.c
-+++ b/drivers/block/rnbd/rnbd-clt.c
-@@ -411,6 +411,11 @@ static void msg_io_conf(void *priv, int errno)
- 	struct rnbd_clt_dev *dev = iu->dev;
- 	struct request *rq = iu->rq;
- 	int rw = rq_data_dir(rq);
-+	int fail_err = 0;
++  echo 1 > /sys/kernel/debug/rnbd0/fault_inject/times
++  echo 100 > /sys/kernel/debug/rnbd0/fault_inject/probability
++  echo 1 > /sys/kernel/debug/rnbd0/fault_inject/fail-request
++  dd if=/dev/rnbd0 of=./dd bs=1k count=10
 +
-+	fail_err = rnbd_clt_should_fail_request(rq);
-+	if (unlikely(fail_err)) /* over-write error */
-+		errno = fail_err;
- 
- 	iu->errno = errno;
- 
-@@ -1161,6 +1166,7 @@ static blk_status_t rnbd_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	}
- 
- 	blk_mq_start_request(rq);
++Expected Result::
 +
- 	err = rnbd_client_xfer_request(dev, rq, iu);
- 	if (likely(err == 0))
- 		return BLK_STS_OK;
-@@ -1545,6 +1551,8 @@ struct rnbd_clt_dev *rnbd_clt_map_device(const char *sessname,
- 		goto send_close;
- 	}
- 
-+	rnbd_clt_fault_inject_init(&dev->fault_inject, dev->gd->disk_name);
++  dd succeeds but generates an IO error
 +
- 	rnbd_clt_info(dev,
- 		       "map_device: Device mapped as %s (nsectors: %zu, logical_block_size: %d, physical_block_size: %d, max_write_same_sectors: %d, max_discard_sectors: %d, discard_granularity: %d, discard_alignment: %d, secure_discard: %d, max_segments: %d, max_hw_sectors: %d, rotational: %d, wc: %d, fua: %d)\n",
- 		       dev->gd->disk_name, dev->nsectors,
-@@ -1599,8 +1607,16 @@ int rnbd_clt_unmap_device(struct rnbd_clt_dev *dev, bool force,
- 	struct rnbd_clt_session *sess = dev->sess;
- 	int refcount, ret = 0;
- 	bool was_mapped;
-+	int fail_err = 0;
- 
- 	mutex_lock(&dev->lock);
++Message from dmesg::
 +
-+	fail_err = rnbd_clt_should_fail_unmap(dev);
-+	if (unlikely(fail_err)) {
-+		ret = fail_err;
-+		goto err;
-+	}
++  FAULT_INJECTION: forcing a failure.
++  name fault_inject, interval 1, probability 100, space 0, times 1
++  CPU: 4 PID: 0 Comm: swapper/4 Tainted: G           O      5.4.77-pserver+ #167
++  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.13.0-1ubuntu1.1 04/01/2014
++  Call Trace:
++    <IRQ>
++    dump_stack+0x97/0xe0
++    should_fail.cold+0x5/0x11
++    rnbd_clt_should_fail_request+0x5e/0x80 [rnbd_client]
++    msg_io_conf+0x42/0xb0 [rnbd_client]
++    complete_rdma_req+0x264/0x600 [rtrs_client]
++    rtrs_clt_rdma_done+0x4a2/0x690 [rtrs_client]
++    __ib_process_cq+0x94/0x100 [ib_core]
++    ib_poll_handler+0x3f/0xa0 [ib_core]
++    irq_poll_softirq+0xf8/0x280
++    __do_softirq+0x122/0x550
++    irq_exit+0xfb/0x100
++    do_IRQ+0x8a/0x170
++    common_interrupt+0xf/0xf
++    </IRQ>
++  RIP: 0010:default_idle+0x2b/0x1d0
++  Code: 1f 44 00 00 41 55 41 54 65 44 8b 25 7f fe 0a 5a 55 53 0f 1f 44 00 00 e8 53 65 30 ff e9 07 00 00 00 0f 00 2d b7 59 4b 00 fb f4 <65> 44 8b 25 5d fe 0a 5a 0f 1f 44 00 00 5b 5d 41 5c 41 5d c3 65 8b
++  RSP: 0018:ffff88811963fdc8 EFLAGS: 00000246 ORIG_RAX: ffffffffffffffdd
++  RAX: 0000000000000000 RBX: ffff888119633240 RCX: dffffc0000000000
++  RDX: 0000000000000007 RSI: 0000000000000006 RDI: ffff888119633ad4
++  RBP: 0000000000000004 R08: ffffffffa516d49d R09: 0000000000000000
++  R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000004
++  R13: 0000000000000000 R14: ffff888119633240 R15: 0000000000000000
++    do_idle+0x314/0x370
++    cpu_startup_entry+0x19/0x20
++    start_secondary+0x212/0x280
++    secondary_startup_64+0xa4/0xb0
++  rnbd_client L432: </dev/nullb0@bla> read I/O failed with err: -16
++  blk_update_request: device resource error, dev rnbd0, sector 0 op 0x0:(READ) flags 0x80700 phys_seg 4 prio class 0
 +
- 	if (dev->dev_state == DEV_STATE_UNMAPPED) {
- 		rnbd_clt_info(dev, "Device is already being unmapped\n");
- 		ret = -EALREADY;
-@@ -1618,6 +1634,7 @@ int rnbd_clt_unmap_device(struct rnbd_clt_dev *dev, bool force,
- 	dev->dev_state = DEV_STATE_UNMAPPED;
- 	mutex_unlock(&dev->lock);
- 
-+	rnbd_clt_fault_inject_final(&dev->fault_inject);
- 	delete_dev(dev);
- 	destroy_sysfs(dev, sysfs_self);
- 	destroy_gen_disk(dev);
-diff --git a/drivers/block/rnbd/rnbd-clt.h b/drivers/block/rnbd/rnbd-clt.h
-index 537d499dad3b..5ecbe8dedf24 100644
---- a/drivers/block/rnbd/rnbd-clt.h
-+++ b/drivers/block/rnbd/rnbd-clt.h
-@@ -107,6 +107,14 @@ struct rnbd_queue {
- 	struct blk_mq_hw_ctx	*hctx;
- };
- 
-+struct rnbd_clt_fault_inject {
-+#ifdef CONFIG_FAULT_INJECTION_DEBUG_FS
-+	struct rnbd_fault_inject fj;
-+	bool fail_unmap;
-+	bool fail_request;
-+#endif
-+};
++Example 2: Inject an error into unmapping of rnbd-client
++--------------------------------------------------------
 +
- struct rnbd_clt_dev {
- 	struct rnbd_clt_session	*sess;
- 	struct request_queue	*queue;
-@@ -139,6 +147,7 @@ struct rnbd_clt_dev {
- 	char			*blk_symlink_name;
- 	refcount_t		refcount;
- 	struct work_struct	unmap_on_rmmod_work;
-+	struct rnbd_clt_fault_inject fault_inject;
- };
- 
- /* rnbd-clt.c */
-@@ -163,4 +172,10 @@ void rnbd_clt_destroy_default_group(void);
- 
- void rnbd_clt_remove_dev_symlink(struct rnbd_clt_dev *dev);
- 
-+void rnbd_clt_fault_inject_init(struct rnbd_clt_fault_inject *fault_inj,
-+			    const char *dev_name);
-+void rnbd_clt_fault_inject_final(struct rnbd_clt_fault_inject *fault_inject);
-+int rnbd_clt_should_fail_request(struct request *req);
-+int rnbd_clt_should_fail_unmap(struct rnbd_clt_dev *dev);
-+int rnbd_clt_should_fail_request_timeout(struct request *req);
- #endif /* RNBD_CLT_H */
++::
++
++  echo 100 > /sys/kernel/debug/rnbd0/fault_inject/probability
++  echo 1 > /sys/kernel/debug/rnbd0/fault_inject/times
++  echo 1 > /sys/kernel/debug/rnbd0/fault_inject/fail-unmap
++  echo normal > /sys/block/rnbd0/rnbd/unmap_device
++
++Expected Result::
++
++  echo: write error: Device or resource busy
++
++Message from dmesg::
++
++  FAULT_INJECTION: forcing a failure.
++  name fault_inject, interval 1, probability 100, space 0, times 1
++  CPU: 2 PID: 648 Comm: bash Tainted: G           O      5.4.77-pserver+ #169
++  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.13.0-1ubuntu1.1 04/01/2014
++  Call Trace:
++    dump_stack+0x97/0xe0
++    should_fail.cold+0x5/0x11
++    rnbd_clt_should_fail_unmap+0x38/0x60 [rnbd_client]
++    rnbd_clt_unmap_device+0x3c/0x1c0 [rnbd_client]
++    rnbd_clt_unmap_dev_store.cold+0xe5/0x13f [rnbd_client]
++    kernfs_fop_write+0x141/0x240
++    vfs_write+0xf2/0x250
++    ksys_write+0xc3/0x160
++    do_syscall_64+0x68/0x260
++    entry_SYSCALL_64_after_hwframe+0x49/0xbe
++  RIP: 0033:0x7ff883091504
++  Code: 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b3 0f 1f 80 00 00 00 00 48 8d 05 f9 61 0d 00 8b 00 85 c0 75 13 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 54 c3 0f 1f 00 41 54 49 89 d4 55 48 89 f5 53
++  RSP: 002b:00007ffe1bc91458 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
++  RAX: ffffffffffffffda RBX: 0000000000000007 RCX: 00007ff883091504
++  RDX: 0000000000000007 RSI: 000056389b73a180 RDI: 0000000000000001
++  RBP: 000056389b73a180 R08: 000000000000000a R09: 00007ff883121e80
++  R10: 000000000000000a R11: 0000000000000246 R12: 00007ff883163760
++  R13: 0000000000000007 R14: 00007ff88315e760 R15: 0000000000000007
++  rnbd_client L335: </dev/nullb0@bla> unmap_device: -16
++  rnbd_client L321: </dev/nullb0@bla> Unmapping device, option: normal.
++
++Example 3: Inject an error into bio process of rnbd-server
++----------------------------------------------------------
++
++After client maps null0b, you can see /sys/kernel/debug/nullb0 directory on server::
++
++  echo 100 > /sys/kernel/debug/nullb0/fault_inject/probability
++  echo 1 > /sys/kernel/debug/nullb0/fault_inject/times
++  echo 1 > /sys/kernel/debug/nullb0/fault_inject/fail-bio
++
++Then you can generate IO on client::
++
++  dd if=/dev/rnbd0 of=./dd bs=1k count=10
++
++Expected Result on client::
++
++  dd succeeds but generates an IO error
++
++Message from dmesg on client::
++
++  rtrs_client L453: <bla>: IO request failed: error=-16 path=ip:192.168.122.142@ip:192.168.122.130 [mlx4_0:1] notify=1
++  rnbd_client L432: </dev/nullb0@bla> read I/O failed with err: -16
++  blk_update_request: device resource error, dev rnbd0, sector 0 op 0x0:(READ) flags 0x80700 phys_seg 4 prio class 0
++
++Message from dmesg on server::
++
++  FAULT_INJECTION: forcing a failure.
++  name fault_inject, interval 1, probability 100, space 0, times 1
++  CPU: 4 PID: 31 Comm: ksoftirqd/4 Tainted: G           O      5.4.77-pserver+ #169
++  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.13.0-1ubuntu1.1 04/01/2014
++  Call Trace:
++    dump_stack+0x97/0xe0
++    should_fail.cold+0x5/0x11
++    rnbd_should_fail_bio+0x38/0x51 [rnbd_server]
++    rnbd_endio+0x41/0x70 [rnbd_server]
++    rnbd_dev_bi_end_io+0x43/0x50 [rnbd_server]
++    blk_update_request+0x1af/0x520
++    blk_mq_end_request+0x2e/0x200
++    blk_done_softirq+0x16e/0x1c0
++    __do_softirq+0x122/0x550
++    run_ksoftirqd+0x24/0x30
++    smpboot_thread_fn+0x1a2/0x2d0
++    kthread+0x191/0x1e0
++    ret_from_fork+0x3a/0x50
++
++Example 4: Change the status code
++---------------------------------
++
++The default status code is -16 (-EBUSY) but you can change it::
++
++  echo 1 > /sys/kernel/debug/rnbd0/fault_inject/times
++  echo 100 > /sys/kernel/debug/rnbd0/fault_inject/probability
++  echo 1 > /sys/kernel/debug/rnbd0/fault_inject/fail-request
++  echo -10 > /sys/kernel/debug/rnbd0/fault_inject/status
++  dd if=/dev/rnbd0 of=./dd bs=1k count=10
++
++Expected Result::
++
++  The error value is -10
++
++Message from dmesg::
++
++  FAULT_INJECTION: forcing a failure.
++  name fault_inject, interval 1, probability 100, space 0, times 1
++  CPU: 4 PID: 0 Comm: swapper/4 Tainted: G           O      5.4.77-pserver+ #170
++  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.13.0-1ubuntu1.1 04/01/2014
++  Call Trace:
++  <IRQ>
++    dump_stack+0x97/0xe0
++    should_fail.cold+0x5/0x11
++    rnbd_clt_should_fail_request+0x5e/0x80 [rnbd_client]
++    msg_io_conf+0x42/0xb0 [rnbd_client]
++    complete_rdma_req+0x264/0x600 [rtrs_client]
++    rtrs_clt_rdma_done+0x4a2/0x690 [rtrs_client]
++    __ib_process_cq+0x94/0x100 [ib_core]
++    ib_poll_handler+0x3f/0xa0 [ib_core]
++    irq_poll_softirq+0xf8/0x280
++    __do_softirq+0x122/0x550
++    irq_exit+0xfb/0x100
++    do_IRQ+0x8a/0x170
++    common_interrupt+0xf/0xf
++    </IRQ>
++  RIP: 0010:default_idle+0x2b/0x1d0
++  Code: 1f 44 00 00 41 55 41 54 65 44 8b 25 7f fe 0a 7c 55 53 0f 1f 44 00 00 e8 53 65 30 ff e9 07 00 00 00 0f 00 2d b7 59 4b 00 fb f4 <65> 44 8b 25 5d fe 0a 7c 0f 1f 44 00 00 5b 5d 41 5c 41 5d c3 65 8b
++  RSP: 0018:ffff888114e2fdc8 EFLAGS: 00000246 ORIG_RAX: ffffffffffffffdd
++  RAX: 0000000000000000 RBX: ffff888114e26440 RCX: dffffc0000000000
++  RDX: 0000000000000007 RSI: 0000000000000006 RDI: ffff888114e26cd4
++  RBP: 0000000000000004 R08: ffffffff8316d49d R09: 0000000000000000
++  R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000004
++  R13: 0000000000000000 R14: ffff888114e26440 R15: 0000000000000000
++    ? lockdep_hardirqs_on+0x17d/0x250
++    ? default_idle+0x1d/0x1d0
++    do_idle+0x314/0x370
++    ? arch_cpu_idle_exit+0x40/0x40
++    ? schedule_idle+0x46/0x60
++    cpu_startup_entry+0x19/0x20
++    start_secondary+0x212/0x280
++    ? set_cpu_sibling_map+0xcb0/0xcb0
++    secondary_startup_64+0xa4/0xb0
++  rnbd_client L432: </dev/nullb0@bla> read I/O failed with err: -10
++  blk_update_request: I/O error, dev rnbd0, sector 0 op 0x0:(READ) flags 0x80700 phys_seg 3 prio class 0
 -- 
 2.25.1
 
