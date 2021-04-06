@@ -2,144 +2,107 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44731C433B4
-	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 07:07:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D2EEC43461
+	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 07:07:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0AB1C613BC
+	by mail.kernel.org (Postfix) with ESMTP id 03F5D613BC
 	for <linux-block@archiver.kernel.org>; Tue,  6 Apr 2021 07:07:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244151AbhDFHH3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 6 Apr 2021 03:07:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58886 "EHLO
+        id S244152AbhDFHHa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 6 Apr 2021 03:07:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58890 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244150AbhDFHH3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Apr 2021 03:07:29 -0400
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 708FCC06174A
-        for <linux-block@vger.kernel.org>; Tue,  6 Apr 2021 00:07:21 -0700 (PDT)
-Received: by mail-ed1-x535.google.com with SMTP id s15so242245edd.4
-        for <linux-block@vger.kernel.org>; Tue, 06 Apr 2021 00:07:21 -0700 (PDT)
+        with ESMTP id S244153AbhDFHHa (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Apr 2021 03:07:30 -0400
+Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDCF7C06174A
+        for <linux-block@vger.kernel.org>; Tue,  6 Apr 2021 00:07:22 -0700 (PDT)
+Received: by mail-ed1-x52e.google.com with SMTP id h10so15176340edt.13
+        for <linux-block@vger.kernel.org>; Tue, 06 Apr 2021 00:07:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=ionos.com; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=2N0ZP7s5Jfqcw+X8iq+ovVa79kHmgXVDctYYOv1/Ksk=;
-        b=fc4rS7J5ry39JFtNh8AMTfvldBTlOg0/PAuAm15NscuhyNT4IHlh5XUZZ+VEBL2cTL
-         AK/CoU6/QaFGeKPuZoPwbSk7UMFG2eyWDn3wjTmYiQtHA5s663ygzRojRX1inb7sPWPo
-         3Z2L+UjOPkaUgZeSfdSkWPiS8LAWTZxp1IIaei2tOCVNoAvYC662LrspC4GsCfbrtEHL
-         y1O5Vxh/wZj/irMLeCvg9LMJ+lsKO164/8F/LJKK6HTA2TRRroXW0y52EsNvPhVTm7oL
-         HP1geG22kLWajbejzhs73sTU2r5PaYNg74kqGzNpNsr2sJulxxOX/sUP03pXCPK3OHcc
-         rq8g==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=Kipd4FaBQ5PXB3dpojcZn5niu7bqNibIYxBeruWL79Q=;
+        b=ADWipWJZQisqEZZVWrg6KcEkCEK5XnhrPQQYTUVfnuG5I2aOB1W9MYHAKSPpZ6oCRs
+         YrzJXsjF1yL4t9V7b2o+19qMZ0rqnv6xPYKpHl+27OflQIbb9dl5ZdBmVHOhQTOSH5SV
+         ozGV9KsZsZ69SHldylIi4MU12hAAX6wryhS1YNN6Petn252VlNXSRKGliHV5lSBXwcIm
+         hm624emLCn8AtzOKcWEoIrhwnRwnQeIr8Ljwjb/55YYAlg8IwYP/HuSqi4gNjL9TJRm3
+         AqgeZPoqRFNJ0xsrI5GTaco7VB2A8xOBcG3rwQWUngNa7tKom6vG+jC1pUSjR2oK9rpw
+         aSEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=2N0ZP7s5Jfqcw+X8iq+ovVa79kHmgXVDctYYOv1/Ksk=;
-        b=OarYA/nuH8vb4SZtvmPLgklP7hOVnngbavyHuqRFaOAR6Ip3Dx45mEmz9HxvVAgfIv
-         fV2PxZgrWgWGGoG78er8dGGK+Oj7NtvaKHQG+HhH4qaJcC9iT3Lhiv12AamMR2zB52Z8
-         WPLQk/NNFy8kui8Rydyx6IwuQyB6cJSbydEekF2t+AFdGQoD4KuqXE4WFFs07CtFrVYd
-         acDQW0bBBFrUw13yFvsntuIIaOb+a7JzvXeOlrjnn+HEYt+Yk9ovKO7ahC0kpJxyuiUw
-         4KEdk02HKpT7DXbfLYao9DSH/r0+f1Xj1VVSn4/cjaDHkRc2U3jxwEN3lFdBJeyb6pMF
-         GnPQ==
-X-Gm-Message-State: AOAM533UDHmvTDccIjV2Sx0iDZs842U76oYSw3FvKv2KweW/gahOSqJz
-        /ZLplvF59oo5w1wLlOGS95jFt487JgwCWg==
-X-Google-Smtp-Source: ABdhPJwUFBeX3yz4wagEK85SEoAgILa3pOOkVgyFBqzFCtzvmc8atJGntoVxc64WTCx2OUp24pcMmw==
-X-Received: by 2002:a05:6402:3092:: with SMTP id de18mr4047075edb.96.1617692840110;
-        Tue, 06 Apr 2021 00:07:20 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=Kipd4FaBQ5PXB3dpojcZn5niu7bqNibIYxBeruWL79Q=;
+        b=gYOd8ti/oAfD+Cq/JvZfL5VOXVONlGi21rpsQwxm7K3hUrD/Uio/hGC9kAj3oe+4Mn
+         l4Oy4lPk9jQtUGKlUWhURy8eSEJ4a4wIaQaQzz79NNot6vM46BCwAgwE4eZ390FEXbgI
+         X3nKjjy+Ednj/9wmfMrcCX8dfBcs3dlxV/2fS5k4XfxuKYJtd8qy2mvTBasMnys0YsQq
+         P7p66EqkE0uFUofvLnJZnhK1V3OdiwLAdUJvz0akWgs/J+wGqYeoIUv2OZZ9stdEcfFA
+         mmokJ39Y7dM27fadfrR/obthMinIQwKQNW8HT5iFUaQ54IkfdGt5SZNSZJ6ckP7q0NpC
+         xABA==
+X-Gm-Message-State: AOAM532eCpHZ6of+fJ2tM7vDnfcpzLPR1ZJjmmJoeaHPqA24ThxhS+U2
+        MOhlGkc3I6zSdEG4gdEu9LfzSs0NkpqkHg==
+X-Google-Smtp-Source: ABdhPJz/QBDNCrM0uhn81hWJ3H+PG8z0+hubLapnTJPcFn7NX4PZyyc/EzfXZI/8H3tYupsySBRLkg==
+X-Received: by 2002:a05:6402:27ce:: with SMTP id c14mr7266551ede.263.1617692841406;
+        Tue, 06 Apr 2021 00:07:21 -0700 (PDT)
 Received: from gkim-laptop.fkb.profitbricks.net (ip5f5aeee5.dynamic.kabel-deutschland.de. [95.90.238.229])
-        by smtp.googlemail.com with ESMTPSA id rh6sm3976566ejb.39.2021.04.06.00.07.19
+        by smtp.googlemail.com with ESMTPSA id rh6sm3976566ejb.39.2021.04.06.00.07.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Apr 2021 00:07:19 -0700 (PDT)
+        Tue, 06 Apr 2021 00:07:21 -0700 (PDT)
 From:   Gioh Kim <gi-oh.kim@ionos.com>
 To:     linux-block@vger.kernel.org
 Cc:     axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
         bvanassche@acm.org, haris.iqbal@ionos.com, jinpu.wang@ionos.com,
-        Gioh Kim <gi-oh.kim@ionos.com>
-Subject: [PATCHv3 for-next 00/19] Misc update for rnbd
-Date:   Tue,  6 Apr 2021 09:06:57 +0200
-Message-Id: <20210406070716.168541-1-gi-oh.kim@ionos.com>
+        Gioh Kim <gi-oh.kim@cloud.ionos.com>,
+        Jack Wang <jinpu.wang@cloud.ionos.com>
+Subject: [PATCHv3 for-next 02/19] Documentation/sysfs-block-rnbd: Add descriptions for remap_device and resize
+Date:   Tue,  6 Apr 2021 09:06:59 +0200
+Message-Id: <20210406070716.168541-3-gi-oh.kim@ionos.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20210406070716.168541-1-gi-oh.kim@ionos.com>
+References: <20210406070716.168541-1-gi-oh.kim@ionos.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This is the misc update for rnbd. It inlcudes:
-- Change maintainer
-- Change domain address of maintainers' email: from cloud.ionos.com to ionos.com
-- Add polling IO mode and document update
-- Fix memory leak and some bug detected by static code analysis tools
-- Code refactoring
+From: Gioh Kim <gi-oh.kim@cloud.ionos.com>
 
-V3->V2
-- Exclude patches relevant the Fault-injection feature
+Two sysfs entries, remap_device and resize, are missing.
 
-V2->V1
-- Change the title: for-rc -> for-next
-- Remove unnecessary (void) casting requested by Leon
+Signed-off-by: Gioh Kim <gi-oh.kim@cloud.ionos.com>
+Signed-off-by: Jack Wang <jinpu.wang@cloud.ionos.com>
+---
+ Documentation/ABI/testing/sysfs-block-rnbd | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-Best regards
-
-Danil Kipnis (1):
-  MAINTAINERS: Change maintainer for rnbd module
-
-Dima Stepanov (2):
-  block/rnbd-clt-sysfs: Remove copy buffer overlap in
-    rnbd_clt_get_path_name
-  block/rnbd: Use strscpy instead of strlcpy
-
-Gioh Kim (8):
-  Documentation/sysfs-block-rnbd: Add descriptions for remap_device and
-    resize
-  block/rnbd-clt: Replace {NO_WAIT,WAIT} with RTRS_PERMIT_{WAIT,NOWAIT}
-  block/rnbd-srv: Prevent a deadlock generated by accessing sysfs in
-    parallel
-  block/rnbd-srv: Remove force_close file after holding a lock
-  block/rnbd-clt: Fix missing a memory free when unloading the module
-  block/rnbd-clt: Support polling mode for IO latency optimization
-  Documentation/ABI/rnbd-clt: Add description for nr_poll_queues
-  block/rnbd-srv: Remove unused arguments of rnbd_srv_rdma_ev
-
-Guoqing Jiang (5):
-  block/rnbd-clt: Remove some arguments from
-    insert_dev_if_not_exists_devpath
-  block/rnbd-clt: Remove some arguments from rnbd_client_setup_device
-  block/rnbd-clt: Move add_disk(dev->gd) to rnbd_clt_setup_gen_disk
-  block/rnbd: Kill rnbd_clt_destroy_default_group
-  block/rnbd: Kill destroy_device_cb
-
-Jack Wang (1):
-  block/rnbd-clt: Remove max_segment_size
-
-Md Haris Iqbal (1):
-  block/rnbd-clt: Generate kobject_uevent when the rnbd device state
-    changes
-
-Tom Rix (1):
-  block/rnbd-clt: Improve find_or_create_sess() return check
-
- Documentation/ABI/testing/sysfs-block-rnbd    |  18 ++
- .../ABI/testing/sysfs-class-rnbd-client       |  13 ++
- MAINTAINERS                                   |   4 +-
- drivers/block/rnbd/rnbd-clt-sysfs.c           |  85 ++++++---
- drivers/block/rnbd/rnbd-clt.c                 | 167 ++++++++++++------
- drivers/block/rnbd/rnbd-clt.h                 |   6 +-
- drivers/block/rnbd/rnbd-srv-sysfs.c           |   5 +-
- drivers/block/rnbd/rnbd-srv.c                 |  69 +++-----
- drivers/block/rnbd/rnbd-srv.h                 |   3 +-
- drivers/infiniband/ulp/rtrs/rtrs-clt.c        |  75 +++++---
- drivers/infiniband/ulp/rtrs/rtrs-clt.h        |   1 -
- drivers/infiniband/ulp/rtrs/rtrs-pri.h        |   1 +
- drivers/infiniband/ulp/rtrs/rtrs-srv.c        |   4 +-
- drivers/infiniband/ulp/rtrs/rtrs.h            |  13 +-
- 14 files changed, 303 insertions(+), 161 deletions(-)
-
+diff --git a/Documentation/ABI/testing/sysfs-block-rnbd b/Documentation/ABI/testing/sysfs-block-rnbd
+index 14a6fe9422b3..ec716e1c31a8 100644
+--- a/Documentation/ABI/testing/sysfs-block-rnbd
++++ b/Documentation/ABI/testing/sysfs-block-rnbd
+@@ -44,3 +44,15 @@ Date:		Feb 2020
+ KernelVersion:	5.7
+ Contact:	Jack Wang <jinpu.wang@cloud.ionos.com> Danil Kipnis <danil.kipnis@cloud.ionos.com>
+ Description:	Contains the device access mode: ro, rw or migration.
++
++What:		/sys/block/rnbd<N>/rnbd/resize
++Date:		Feb 2020
++KernelVersion:	5.7
++Contact:	Jack Wang <jinpu.wang@cloud.ionos.com> Danil Kipnis <danil.kipnis@cloud.ionos.com>
++Description:	Write the number of sectors to change the size of the disk.
++
++What:		/sys/block/rnbd<N>/rnbd/remap_device
++Date:		Feb 2020
++KernelVersion:	5.7
++Contact:	Jack Wang <jinpu.wang@cloud.ionos.com> Danil Kipnis <danil.kipnis@cloud.ionos.com>
++Description:	Remap the disconnected device if the session is not destroyed yet.
 -- 
 2.25.1
 
