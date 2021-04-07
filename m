@@ -2,124 +2,125 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47AC3C433B4
-	for <linux-block@archiver.kernel.org>; Wed,  7 Apr 2021 18:03:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E849C433ED
+	for <linux-block@archiver.kernel.org>; Wed,  7 Apr 2021 18:42:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 154C66124C
-	for <linux-block@archiver.kernel.org>; Wed,  7 Apr 2021 18:03:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DF54561245
+	for <linux-block@archiver.kernel.org>; Wed,  7 Apr 2021 18:42:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355067AbhDGSDX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 7 Apr 2021 14:03:23 -0400
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:62754 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232163AbhDGSDW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 7 Apr 2021 14:03:22 -0400
-Received: from pps.filterd (m0109333.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 137HtIBq030161
-        for <linux-block@vger.kernel.org>; Wed, 7 Apr 2021 11:03:12 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding :
- content-type; s=facebook; bh=1CcQ9x5X2Jkfw8Q9bvOrtQpSZ6g4vQz7LGnG3UaOiBk=;
- b=lc7yeooO73SXdOyiueqQ886L1sJ5lVmuxg8SLucML2Zw7vSa8pmmVOsf92I0PFF5JJsr
- XOFw33Wj+8U6cJVqR2zNTi5laTK8MmRf7/FdcLZP6YX11yux+3CltiqR6yTMRq8OrfL1
- g4SZgwc+N7snGtNPzyGMic6bgvGL6wTLoNo= 
-Received: from mail.thefacebook.com ([163.114.132.120])
-        by mx0a-00082601.pphosted.com with ESMTP id 37seq89h2p-5
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-        for <linux-block@vger.kernel.org>; Wed, 07 Apr 2021 11:03:12 -0700
-Received: from intmgw001.37.frc1.facebook.com (2620:10d:c085:108::8) by
- mail.thefacebook.com (2620:10d:c085:21d::4) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Wed, 7 Apr 2021 11:00:09 -0700
-Received: from devvm1945.atn0.facebook.com (localhost [127.0.0.1])
-        by devvm1945.atn0.facebook.com (Postfix) with ESMTP id 50F1351ACC2D;
-        Wed,  7 Apr 2021 11:00:06 -0700 (PDT)
-Received: (from saravanand@localhost)
-        by devvm1945.atn0.facebook.com (8.15.2/8.15.2/Submit) id 137I05lP4130564;
-        Wed, 7 Apr 2021 11:00:05 -0700
-X-Authentication-Warning: devvm1945.atn0.facebook.com: saravanand set sender to saravanand@fb.com using -f
-From:   Saravanan D <saravanand@fb.com>
-To:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-CC:     <tj@kernel.org>, <kernel-team@fb.com>,
-        Saravanan D <saravanand@fb.com>
-Subject: [PATCH] blk-mq: Fix spurious debugfs directory creation during initialization
-Date:   Wed, 7 Apr 2021 10:59:58 -0700
-Message-ID: <20210407175958.4129976-1-saravanand@fb.com>
-X-Mailer: git-send-email 2.30.2
+        id S233202AbhDGSnF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 7 Apr 2021 14:43:05 -0400
+Received: from mail-pl1-f180.google.com ([209.85.214.180]:38877 "EHLO
+        mail-pl1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232823AbhDGSnE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Apr 2021 14:43:04 -0400
+Received: by mail-pl1-f180.google.com with SMTP id y2so9800170plg.5
+        for <linux-block@vger.kernel.org>; Wed, 07 Apr 2021 11:42:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=cgCGcQ+QJl8AIKGEDZ1APMyvOOeQntXyn/Tdt7c6+Xk=;
+        b=ZLX+UQ2yXnLTJL1/q7+2/zm6xP3fHZsAu1Yz2KUNfLfyydAVwI46MajyijPVK60a9u
+         tuqu28yebYovdnx4olyGvPf3l44gFGYK2L+utJ5NFFRm7Rn/ydMIIdxdLehHKbii3CFi
+         W260bw0uJmTYI+NvoqoOvzIuBSrxlf9E3nLfRrN3QwTNjH8kY/tPx4jt2SkJpQxg3ZPa
+         mBqmJjiCaQKVGHBxJUFvNLgoA132bJyu+5K7fIDhpDnV75Silab0/tOlWy6s3OyvYXBH
+         ZI5qvdwZ1m4vPYrf8yPvuZlRzrcdPyXj9zX6WA1YVyXmjy/fFODBe41778S90+wjqFBN
+         1/uw==
+X-Gm-Message-State: AOAM533cOMqZRHfQuLtG1Pt4XdQXEoUKqpJ9hEzGV5FyHGXL5hD86Rcz
+        jHBEDrXpbs94FZ+Zt6gIa54=
+X-Google-Smtp-Source: ABdhPJxus5STLd3feb1P9jZLg27Ex1g6icTntRaJo8w/kYSEA3goEs9mP9mNKfq+M2pXtOD6ydj3/A==
+X-Received: by 2002:a17:902:a610:b029:e6:5eda:c39e with SMTP id u16-20020a170902a610b02900e65edac39emr4116749plq.11.1617820974341;
+        Wed, 07 Apr 2021 11:42:54 -0700 (PDT)
+Received: from [192.168.50.110] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
+        by smtp.gmail.com with ESMTPSA id y8sm22386432pfp.140.2021.04.07.11.42.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 07 Apr 2021 11:42:53 -0700 (PDT)
+Subject: Re: [PATCH v6 2/5] blk-mq: Introduce atomic variants of
+ blk_mq_(all_tag|tagset_busy)_iter
+To:     John Garry <john.garry@huawei.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.de>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Khazhy Kumykov <khazhy@google.com>
+References: <20210406214905.21622-1-bvanassche@acm.org>
+ <20210406214905.21622-3-bvanassche@acm.org>
+ <31402243-57ca-8fa5-473a-d5ce20774c50@huawei.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <1610af81-ce46-26c4-5aae-d84aba5cf1f5@acm.org>
+Date:   Wed, 7 Apr 2021 11:42:51 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-GUID: 7MbEPmIeMHSKZn6oySWxe8j89wul9CEC
-X-Proofpoint-ORIG-GUID: 7MbEPmIeMHSKZn6oySWxe8j89wul9CEC
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
- definitions=2021-04-07_09:2021-04-07,2021-04-07 signatures=0
-X-Proofpoint-Spam-Details: rule=fb_default_notspam policy=fb_default score=0 lowpriorityscore=0
- bulkscore=0 spamscore=0 clxscore=1011 mlxlogscore=999 priorityscore=1501
- mlxscore=0 impostorscore=0 adultscore=0 suspectscore=0 malwarescore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104060000 definitions=main-2104070124
-X-FB-Internal: deliver
+In-Reply-To: <31402243-57ca-8fa5-473a-d5ce20774c50@huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-blk_mq_debugfs_register_sched_hctx() called from
-device_add_disk()->elevator_init_mq()->blk_mq_init_sched()
-initialization sequence does not have relevant parent directory
-setup and thus spuriously attempts "sched" directory creation
-from root mount of debugfs for every hw queue detected on the
-block device
+On 4/7/21 9:57 AM, John Garry wrote:
+> On 06/04/2021 22:49, Bart Van Assche wrote:
+>> Since in the next patch knowledge is required of whether or not it is
+>> allowed to sleep inside the tag iteration functions, pass this context
+>> information to the tag iteration functions. I have reviewed all 
+>> callers of
+>> tag iteration functions to verify these annotations by starting from the
+>> output of the following grep command:
+>>
+>>      git grep -nHE 'blk_mq_(all_tag|tagset_busy)_iter'
+>>
+>> My conclusions from that analysis are as follows:
+>> - Sleeping is allowed in the blk-mq-debugfs code that iterates over tags.
+>> - Since the blk_mq_tagset_busy_iter() calls in the mtip32xx driver are
+>>    preceded by a function that sleeps (blk_mq_quiesce_queue()), 
+>> sleeping is
+>>    safe in the context of the blk_mq_tagset_busy_iter() calls.
+>> - The same reasoning also applies to the nbd driver.
+>> - All blk_mq_tagset_busy_iter() calls in the NVMe drivers are followed 
+>> by a
+>>    call to a function that sleeps so sleeping inside 
+>> blk_mq_tagset_busy_iter()
+>>    when called from the NVMe driver is fine.
+> 
+> Hi Bart,
+> 
+>> - scsi_host_busy(), scsi_host_complete_all_commands() and
+>>    scsi_host_busy_iter() are used by multiple SCSI LLDs so analyzing 
+>> whether
+>>    or not these functions may sleep is hard. Instead of performing that
+>>    analysis, make it safe to call these functions from atomic context.
+> 
+> Please help me understand this solution. The background is that we are 
+> unsure if the SCSI iters callback functions may sleep. So we use the 
+> blk_mq_all_tag_iter_atomic() iter, which tells us that we must not 
+> sleep. And internally, it uses rcu read lock protection mechanism, which 
+> relies on not sleeping. So it seems that we're making the SCSI iter 
+> functions being safe in atomic context, and, as such, rely on the iter 
+> callbacks not to sleep.
+> 
+> But if we call the SCSI iter function from non-atomic context and the 
+> iter callback may sleep, then that is a problem, right? We're still 
+> using rcu.
 
-dmesg
-...
-debugfs: Directory 'sched' with parent '/' already present!
-debugfs: Directory 'sched' with parent '/' already present!
-.
-.
-debugfs: Directory 'sched' with parent '/' already present!
-...
+Hi John,
 
-The parent debugfs directory for hw queues get properly setup
-device_add_disk()->blk_register_queue()->blk_mq_debugfs_register()
-->blk_mq_debugfs_register_hctx() later in the block device
-initialization sequence.
+Please take a look at the output of the following grep command:
 
-A simple check for debugfs_dir has been added to thwart premature
-debugfs directory/file creation attempts.
+git grep -nHEw 'blk_mq_tagset_busy_iter|scsi_host_busy_iter'\ drivers/scsi
 
-Signed-off-by: Saravanan D <saravanand@fb.com>
----
- block/blk-mq-debugfs.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+Do you agree with me that it is safe to call all the callback functions 
+passed to blk_mq_tagset_busy_iter() and scsi_host_busy_iter() from an 
+atomic context?
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 271f6596435b..2a75bc7401df 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -972,6 +972,14 @@ void blk_mq_debugfs_register_sched_hctx(struct reque=
-st_queue *q,
- {
- 	struct elevator_type *e =3D q->elevator->type;
-=20
-+	/*
-+	 * If the parent debugfs directory has not been created yet, return;
-+	 * We will be called again later on with appropriate parent debugfs
-+	 * directory from blk_register_queue()
-+	 */
-+	if (!hctx->debugfs_dir)
-+		return;
-+
- 	if (!e->hctx_debugfs_attrs)
- 		return;
-=20
---=20
-2.30.2
+Thanks,
 
+Bart.
