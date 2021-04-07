@@ -2,390 +2,1031 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,PDS_BAD_THREAD_QP_64,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89E19C433ED
-	for <linux-block@archiver.kernel.org>; Wed,  7 Apr 2021 10:30:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF51EC433B4
+	for <linux-block@archiver.kernel.org>; Wed,  7 Apr 2021 11:33:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3C2F3613A7
-	for <linux-block@archiver.kernel.org>; Wed,  7 Apr 2021 10:30:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8C0BE611BD
+	for <linux-block@archiver.kernel.org>; Wed,  7 Apr 2021 11:33:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233490AbhDGKag (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 7 Apr 2021 06:30:36 -0400
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:22781 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233988AbhDGKaf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Apr 2021 06:30:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1617791427; x=1649327427;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=YHLwIt2Q8k0dD/J8cY4zElBwN+MrLdvGevZMoriFsGg=;
-  b=DA99CeHKExnapLt7OqLpzeXWb2GwDcP+/Cio8/2SEO+t6iBim5A3JvxB
-   pooCVkAazCmPBcKTHeIDh/Jg4PWrMA8tGzOcxUNT9kzW9DtLdb1wvsySV
-   xNKkxPPAQKtsjnFIWAwU2NLHGT8miDLwWyjNxRy+25BxXgbaBwpJTSKPa
-   +MYsdUebyigs/lBnp/yXUUBPKqNh9X4137stLz9ou/mRPe7XJO82akpCY
-   0Xvwe7gWi9NNq/JZUV6FqkFKvtnw9OrRtgRX/xs5JAjk9bBzNuKFqwQ10
-   eb8xgxejJ9WM2FjDaVnuifCbiHF98naMoLOri/HYFKEHySn6mfS/2SC1d
-   Q==;
-IronPort-SDR: KiIVsBYGoZ/J2+VOoGnGMAI6/zOtZNLmFkQirrQnLxRqe6zA6QkJTSG98lrjqZYFFZVVgGeVcE
- 2tDAMECyq6rV5vmHzAQa63N+a1FTmegOXQvgi2mefV88eNtd1ZhE42oMc3JcfopZl/pEcn3bBM
- D4kgkNxT+8NDGv/fcv7NnSlNIklBkncrFKXdnigtR5zUGPkqmKMItlEIzAaME3OxcZYahdqO/p
- mNvTBJqRiPdolp9eoeRRDv7QM/WDM5HPIv8/MUiEq1JG9H8F8zGg00mDn6fLxkYOyDy/E4TnX6
- 5/o=
-X-IronPort-AV: E=Sophos;i="5.82,203,1613404800"; 
-   d="scan'208";a="164994607"
-Received: from mail-co1nam11lp2172.outbound.protection.outlook.com (HELO NAM11-CO1-obe.outbound.protection.outlook.com) ([104.47.56.172])
-  by ob1.hgst.iphmx.com with ESMTP; 07 Apr 2021 18:28:10 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LaETmIMHMbFbT/Yh9mToXw/8U3bDmZTt1gpYqAAOTftOORu4qRTUOSTFck3Zz6MF8+OiM4S4LKB68rwMhYsISpyQOuAwX0X62GpYbGlkioKTTiZtrQRwM0oYaJY5INFq1H2y6E/HRtb86Ct08+pe0H9GDseGN8YaTNo9XzxBHv3ms/ECCooQgdbyye5Zf94Lts4EfY03EhGs8ffOJhdcNwxm0XNuA5zvyutYvPZUkonaKvldrTvmjGum3lGcuHQZzD6nU4QKE8NFGO+/vOCSszdJrnFC0JNiuPLMqkcKSP/wPieU7YiPiJn/Qoli3pWuUw11A9/4BtNyWc/tACN5Dg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9P8ceVyc1G36KsOPhhyZfx2KMkAAVyzoI0D4NyurVs8=;
- b=msOOyckTrQZ+oMmba+u4HHFdQI53hmjXygnaOU/e2QaNWxFHrP476uIEN7TBSP/Vd6axzJmsndk8Iyp44KZiT83YsCulkKYnqe4BhOdgMqNj+T6h6hQTf3gDKZybLxY9xaPw7WzcLgBLFkVkbvRD/0hX1sjtKx0i8JkGfxERIV7tjf8W/DjpVVhMJUaTWI9j9GsquvHlQVQbgNYt8DY8XzdafCFeDuPiA7o++tWbVK683dbKKVDSZ+Fj4XYdFkUhCH1R8UmWlAGknhTKGsqNhBRRaOkRcAk83eKrj0NGCinyZNjfv3ixMvLu9Wjiwr/a8M+AA9YTKnrffKCJ1JeZTw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
+        id S1343676AbhDGLdN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 7 Apr 2021 07:33:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37264 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1343672AbhDGLdM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Apr 2021 07:33:12 -0400
+Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A805DC061756;
+        Wed,  7 Apr 2021 04:33:01 -0700 (PDT)
+Received: by mail-ej1-x62f.google.com with SMTP id b7so27116616ejv.1;
+        Wed, 07 Apr 2021 04:33:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9P8ceVyc1G36KsOPhhyZfx2KMkAAVyzoI0D4NyurVs8=;
- b=aB6vaYcMVvfAGQTYiRGjFWh+TgBBs8OklZpe83juipFjtE3ZIPgjQ71OK3Zw6kEV7vxe4MgjG/K0w2ockXZ1YXxLcTRwujXpMX42eKgssKlGj0nD9UVOIYaQL24w7irWzucy6UrfLCbPxmDxHuViToUUYGGD34kr9DDnW+TAv8A=
-Received: from BL0PR04MB6514.namprd04.prod.outlook.com (2603:10b6:208:1ca::23)
- by MN2PR04MB6446.namprd04.prod.outlook.com (2603:10b6:208:1aa::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3999.32; Wed, 7 Apr
- 2021 10:27:57 +0000
-Received: from BL0PR04MB6514.namprd04.prod.outlook.com
- ([fe80::e9c5:588:89e:6887]) by BL0PR04MB6514.namprd04.prod.outlook.com
- ([fe80::e9c5:588:89e:6887%3]) with mapi id 15.20.3999.032; Wed, 7 Apr 2021
- 10:27:57 +0000
-From:   Damien Le Moal <Damien.LeMoal@wdc.com>
-To:     Changheun Lee <nanich.lee@samsung.com>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>
-CC:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        "asml.silence@gmail.com" <asml.silence@gmail.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "hch@infradead.org" <hch@infradead.org>,
-        "jisoo2146.oh@samsung.com" <jisoo2146.oh@samsung.com>,
-        "junho89.kim@samsung.com" <junho89.kim@samsung.com>,
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=igApDUlpCeCEweoCqg22t/B3MoQOPZ9NvMZmM26l5kk=;
+        b=o2NFHNvesDb3O8KuZFkQr+4Dnv7siCRgFNdsd/iC5NtpFRMigSBYB6M6QwVpNW5Ooa
+         kfum0JtmQKE/rkzfU2BKmHxUcCIlrFSayIvzYmK0QTuqBamEDyjNvBdIQ4qUgDNr8M/B
+         Cik0IgB9DOlEel24Sg/jQvamZIXqV+2QnMswfAgR45unpO5/QdNhDspaYXxjEM6ekcbA
+         z48SEDh5VDpW35uZB4RQhcnu9GjF8JT15lhyqbpUJk2YrDmp1JEKwSkJrtaoUz9kanaj
+         0nhdTqFmWcP/3OWBECj1WR/KtIqQwj0hK47IfaKKumELK2N04wpC0odg4zidoIHegvCg
+         Fhyg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=igApDUlpCeCEweoCqg22t/B3MoQOPZ9NvMZmM26l5kk=;
+        b=prjtgEX5xikkLS2QlP6htKIbXsA/0LBoYHvn9w7zSxo1Jb1Tq87k1Shb1DH/0NRkYs
+         Tzmt9giYbngV9dXAOBlM+dfRvsAIwMeMTTnGxMezpp7oYBGEBBJCKqIAzE/ZwMkRcZxN
+         BGygQh1caXwovaNHsQRLTKU8XjUxmEipdMtf8DhU8j9GI6HDSCX/s5YDcmTDlxxbX9J+
+         g2SGtjaskVsNtXQYEd81QtD/IUrQ6/IX/DPq7mFjQ2lJywp4H/F6OpU6ahmBXn7njoVI
+         2de3QDQi0bq4A3iWTybE9PH1dBnnMCqMZpnU9o/IlTanOsM6HBGvsYRaI1472jiaulbP
+         cxXA==
+X-Gm-Message-State: AOAM530H4agRkFrfg+coUBWDtqE6NzJgGlXKfGOWWhBU1w81IpjOI/J0
+        jHegQ2uPgL2nZ8cm8ebtb0qxjFQjkPWjkKRMBGQ=
+X-Google-Smtp-Source: ABdhPJzc/YwNumqv2Y9xVfgysBRWlCYkcsd5UT93ZQ8MucuaZJeEd1d9j3pK91td8dANc0HUggHjMUzh+6Z+kkv+nsg=
+X-Received: by 2002:a17:906:f953:: with SMTP id ld19mr3083534ejb.164.1617795180009;
+ Wed, 07 Apr 2021 04:33:00 -0700 (PDT)
+MIME-Version: 1.0
+References: <20210219124517.79359-1-selvakuma.s1@samsung.com>
+ <CGME20210219124603epcas5p33add0f2c1781b2a4d71bf30c9e1ac647@epcas5p3.samsung.com>
+ <20210219124517.79359-3-selvakuma.s1@samsung.com> <BL0PR04MB6514EA91680D33A5890ECE16E7839@BL0PR04MB6514.namprd04.prod.outlook.com>
+In-Reply-To: <BL0PR04MB6514EA91680D33A5890ECE16E7839@BL0PR04MB6514.namprd04.prod.outlook.com>
+From:   Selva Jove <selvajove@gmail.com>
+Date:   Wed, 7 Apr 2021 17:02:48 +0530
+Message-ID: <CAHqX9vb6GgaU9QdTQaq3=dGuoNCuWorLrGCF8gC5LEdFBESFcA@mail.gmail.com>
+Subject: Re: [RFC PATCH v5 2/4] block: add simple copy support
+To:     Damien Le Moal <Damien.LeMoal@wdc.com>
+Cc:     SelvaKumar S <selvakuma.s1@samsung.com>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "kbusch@kernel.org" <kbusch@kernel.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>, "hch@lst.de" <hch@lst.de>,
+        "sagi@grimberg.me" <sagi@grimberg.me>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>,
-        "mj0123.lee@samsung.com" <mj0123.lee@samsung.com>,
-        "osandov@fb.com" <osandov@fb.com>,
-        "patchwork-bot@kernel.org" <patchwork-bot@kernel.org>,
-        "seunghwan.hyun@samsung.com" <seunghwan.hyun@samsung.com>,
-        "sookwan7.kim@samsung.com" <sookwan7.kim@samsung.com>,
-        "tj@kernel.org" <tj@kernel.org>,
-        "tom.leiming@gmail.com" <tom.leiming@gmail.com>,
-        "woosung2.lee@samsung.com" <woosung2.lee@samsung.com>,
-        "yt0928.kim@samsung.com" <yt0928.kim@samsung.com>
-Subject: Re: [RESEND,v5,1/2] bio: limit bio max size
-Thread-Topic: [RESEND,v5,1/2] bio: limit bio max size
-Thread-Index: AQHXK5LimbigZS3dMEyF4qJ0Ir0lcg==
-Date:   Wed, 7 Apr 2021 10:27:57 +0000
-Message-ID: <BL0PR04MB65146F70831B61CB6B9AFE7CE7759@BL0PR04MB6514.namprd04.prod.outlook.com>
-References: <YG1iC944hUkBniDM@kroah.com>
- <CGME20210407094610epcas1p472207e8d3ca0e5e697974c993a2a34f7@epcas1p4.samsung.com>
- <20210407092836.13016-1-nanich.lee@samsung.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: samsung.com; dkim=none (message not signed)
- header.d=none;samsung.com; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [2400:2411:43c0:6000:f060:aa0a:9ee0:dfa8]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 4b29dc3b-80af-4e58-d037-08d8f9afcff7
-x-ms-traffictypediagnostic: MN2PR04MB6446:
-x-ld-processed: b61c8803-16f3-4c35-9b17-6f65f441df86,ExtAddr
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MN2PR04MB6446188549278B92D9BD8D5AE7759@MN2PR04MB6446.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: euxLMjcZciVy6oNk0MMivOvbTRy8faaUAxBn2tGzgkbPu8gZaq/IBPsJCsypk6Kk0v3LnMqqtXF539N48UG0fXPQGJDXwS5gWULZORfESieXINa4F55HXRVm0aaVun9EASlB4Sjrev2qXuDziy8GFyHjnfN+sIgFzO+/tlNb3sUXUW03wTJ9tszRwcqvuz9MZVjZuO6No+wF0DhHX0RRMbo6u8KqCh7vuQQivlrp/63X7gafWxTyHZL1KyqGoVEEj9WkmhJA/YYEqIxlNGWwJXP4OHguFTIgvDsnqdtj1sPyrvoL/xsGzROR+WlJfzZcu2V5SdklRRRc+r3fHuzHSyJ9of0sgO2GunafpPClniVab5iluxuJREq7VkAIXg4i5JfL52evb21F71P2hHUsIcbwMNM4yzR9yndLqGlmQ283JBt2dSP1Hpe7v2bCwCzTDtPoDXMt8t7e5lwOhIinRAf6680+tXSZU0MIcBy5o3PIkt+docbOvVFQ504ge8cnourwItKALhkjuiq/9Diu0NElyGn4iwEM+JR+AtrPzd1KM45b5P0Tv54q6hbHA9OlHQdb8YQKwsfN4Xgjk/phza3CYX1M2QVnQL7khyYsiERaguQSSf5OlwHgDXdiSSuFuzYh9hSgwyg5+S9nwHXUNR6L4QG1NkpuuJ9H5k4tcg0=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR04MB6514.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(136003)(376002)(346002)(39860400002)(366004)(71200400001)(6506007)(478600001)(53546011)(110136005)(64756008)(8936002)(7416002)(7696005)(186003)(66556008)(66946007)(52536014)(33656002)(86362001)(316002)(9686003)(54906003)(4326008)(2906002)(55016002)(91956017)(76116006)(83380400001)(38100700001)(8676002)(66446008)(5660300002)(66476007);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: =?us-ascii?Q?f/3B02F/gCp///mD4R8Gg1kembuFk5MZM/jGeJlhk9DRcu23jArWD0py9rsi?=
- =?us-ascii?Q?mP2SjvDTmCbQ4DL/nDI86ln9+2dcUNzVjF0OpC6CVl47A/E9s8AVjFkvBOtX?=
- =?us-ascii?Q?UIa2UuHQ1SLtTMedJNl8aud700HOlmuP2hkFYY615mhE7RJOo2HW7LHK+KEt?=
- =?us-ascii?Q?6Om42ftGBXfcU3h6kl1WhzsB6OO9yTMcdb03vGLIfTcD3yyA50TmYdllF1K8?=
- =?us-ascii?Q?f+s0LO0VFjxfOO6V2mVQ7IEl1iKszqXb+FPdJRbfswfGsgO6/seB4vm1Cozc?=
- =?us-ascii?Q?BCDKEGGPjLCgplFokqK+plD49tc7WdRrLAMQaoZ/jS2eWTTqjqVPtlsG+LS/?=
- =?us-ascii?Q?lR4YK5tVcG7Q4TXKOKw8f3bwahFWlVkJzOS09wlJxTCokJdDJUHaY/A+C5lu?=
- =?us-ascii?Q?gV/WOe0xxgVq/dfM7JmIVoaKKpOh20MfQ3LeVPelAAHjxNeK+e3TTthPk2hA?=
- =?us-ascii?Q?ikQtVrM+wlZG3Olh3ydroSFOU6MTVG9/9BkBp+3Na7DZX3LmVsOJfnTtKmqd?=
- =?us-ascii?Q?+gLYUfUoWwKlJFHiYOE7HHwKzPJao8RXpdMLQRmfneGAazANttyUk8tQarAr?=
- =?us-ascii?Q?lK+OMLl1p2nf8prwQ+hFb891eVFPdlZNOL+7wqnreeHWkbVxle5hzDo51s3O?=
- =?us-ascii?Q?hYpXeTe88303kn6y4dx0/jFQFfOPlYHmw+79vD8CSlhJi7lk9kUfbk7yTct5?=
- =?us-ascii?Q?zD/xbF8sc3i6zUEaOUJvTffvsyd5GiUHQfwHhnbnh6EiqMb3x3wTWYyvT19m?=
- =?us-ascii?Q?yWuqtoVKSWwnQQSW9VmbsWWcs8dbt9ouKzT/KpGmidY8yTNMB2GmcWNOinTn?=
- =?us-ascii?Q?CXurPo+xJjJ+HPJMbOdYzggI3KtX20sS1DPplu+RuU9C8mwq99J92pYZ/Xu2?=
- =?us-ascii?Q?YXv7EyOkR3KPoVbzZtcWFkWNF4rxAkdeJWFKPtNVyIAd1wsa51xJm9eDIFxY?=
- =?us-ascii?Q?BagOADe8+HVbK2B8QvrOP4jVZCo6ZT+H0S26U9Hby3PEoKLH4OPs2+R/ioAW?=
- =?us-ascii?Q?wUP+s5nbkJ/CwB94Wk4dnSJdDtgIPLfxCgc/pSc6l5H7TaFmh8shmDbgoJlG?=
- =?us-ascii?Q?kgGg+zlyL9sXuJmHChV7lcGB09oCMmR63sGB1Lja+PK+ziGXjemPPLXZvxHd?=
- =?us-ascii?Q?lNOIBa0DGxTWLV+YOVTsXkVhgODagTW6q+2zbaXkSA9WusaL0ujvBhunQEh1?=
- =?us-ascii?Q?sGRHQ9muGeVOjCtBaDcWi6z/XiAmD7vIII0M5lYhmypii5hbJkfht3HhS9yF?=
- =?us-ascii?Q?zvqbtO9T+Ss4bIh7nexffu1i66+yOMhJUtdeR+97VSYg38yuHU3wx3eEWnjK?=
- =?us-ascii?Q?Zb0D4fKuEL/eK+kLP+4443ODgx22Ayjf8Tmdvwse1/PsrVeH+ZdSIRRY+ERg?=
- =?us-ascii?Q?2h2DhfBP2ekfKJE34dkaAQuL97mPKXdTyKmjWVDDxgrCHTKHaQ=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "snitzer@redhat.com" <snitzer@redhat.com>,
+        "joshiiitr@gmail.com" <joshiiitr@gmail.com>,
+        "nj.shetty@samsung.com" <nj.shetty@samsung.com>,
+        "joshi.k@samsung.com" <joshi.k@samsung.com>,
+        "javier.gonz@samsung.com" <javier.gonz@samsung.com>,
+        "kch@kernel.org" <kch@kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR04MB6514.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4b29dc3b-80af-4e58-d037-08d8f9afcff7
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Apr 2021 10:27:57.4342
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Cn0uKrAqVuWGzsujX+1Tu3bvOiagW1wapCe6UOruV6Evw0WicF8MA/fV6sM0AukCvgIOiDFy6tJYIX80VhG6zw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR04MB6446
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2021/04/07 18:46, Changheun Lee wrote:=0A=
->> On Wed, Apr 07, 2021 at 03:55:07PM +0900, Changheun Lee wrote:=0A=
->>>> On Wed, Apr 07, 2021 at 02:06:33PM +0900, Changheun Lee wrote:=0A=
->>>>>> On Wed, Apr 07, 2021 at 09:16:12AM +0900, Changheun Lee wrote:=0A=
->>>>>>>> On Tue, Apr 06, 2021 at 10:31:28AM +0900, Changheun Lee wrote:=0A=
->>>>>>>>>> bio size can grow up to 4GB when muli-page bvec is enabled.=0A=
->>>>>>>>>> but sometimes it would lead to inefficient behaviors.=0A=
->>>>>>>>>> in case of large chunk direct I/O, - 32MB chunk read in user spa=
-ce -=0A=
->>>>>>>>>> all pages for 32MB would be merged to a bio structure if the pag=
-es=0A=
->>>>>>>>>> physical addresses are contiguous. it makes some delay to submit=
-=0A=
->>>>>>>>>> until merge complete. bio max size should be limited to a proper=
- size.=0A=
->>>>>>>>>>=0A=
->>>>>>>>>> When 32MB chunk read with direct I/O option is coming from users=
-pace,=0A=
->>>>>>>>>> kernel behavior is below now in do_direct_IO() loop. it's timeli=
-ne.=0A=
->>>>>>>>>>=0A=
->>>>>>>>>>  | bio merge for 32MB. total 8,192 pages are merged.=0A=
->>>>>>>>>>  | total elapsed time is over 2ms.=0A=
->>>>>>>>>>  |------------------ ... ----------------------->|=0A=
->>>>>>>>>>                                                  | 8,192 pages m=
-erged a bio.=0A=
->>>>>>>>>>                                                  | at this time,=
- first bio submit is done.=0A=
->>>>>>>>>>                                                  | 1 bio is spli=
-t to 32 read request and issue.=0A=
->>>>>>>>>>                                                  |--------------=
-->=0A=
->>>>>>>>>>                                                   |-------------=
--->=0A=
->>>>>>>>>>                                                    |------------=
---->=0A=
->>>>>>>>>>                                                               ..=
-....=0A=
->>>>>>>>>>                                                                 =
-   |--------------->=0A=
->>>>>>>>>>                                                                 =
-    |--------------->|=0A=
->>>>>>>>>>                           total 19ms elapsed to complete 32MB re=
-ad done from device. |=0A=
->>>>>>>>>>=0A=
->>>>>>>>>> If bio max size is limited with 1MB, behavior is changed below.=
-=0A=
->>>>>>>>>>=0A=
->>>>>>>>>>  | bio merge for 1MB. 256 pages are merged for each bio.=0A=
->>>>>>>>>>  | total 32 bio will be made.=0A=
->>>>>>>>>>  | total elapsed time is over 2ms. it's same.=0A=
->>>>>>>>>>  | but, first bio submit timing is fast. about 100us.=0A=
->>>>>>>>>>  |--->|--->|--->|---> ... -->|--->|--->|--->|--->|=0A=
->>>>>>>>>>       | 256 pages merged a bio.=0A=
->>>>>>>>>>       | at this time, first bio submit is done.=0A=
->>>>>>>>>>       | and 1 read request is issued for 1 bio.=0A=
->>>>>>>>>>       |--------------->=0A=
->>>>>>>>>>            |--------------->=0A=
->>>>>>>>>>                 |--------------->=0A=
->>>>>>>>>>                                       ......=0A=
->>>>>>>>>>                                                  |--------------=
-->=0A=
->>>>>>>>>>                                                   |-------------=
--->|=0A=
->>>>>>>>>>         total 17ms elapsed to complete 32MB read done from devic=
-e. |=0A=
->>>>>>>>>>=0A=
->>>>>>>>>> As a result, read request issue timing is faster if bio max size=
- is limited.=0A=
->>>>>>>>>> Current kernel behavior with multipage bvec, super large bio can=
- be created.=0A=
->>>>>>>>>> And it lead to delay first I/O request issue.=0A=
->>>>>>>>>>=0A=
->>>>>>>>>> Signed-off-by: Changheun Lee <nanich.lee@samsung.com>=0A=
->>>>>>>>>> ---=0A=
->>>>>>>>>>  block/bio.c            | 13 ++++++++++++-=0A=
->>>>>>>>>>  include/linux/bio.h    |  2 +-=0A=
->>>>>>>>>>  include/linux/blkdev.h |  3 +++=0A=
->>>>>>>>>>  3 files changed, 16 insertions(+), 2 deletions(-)=0A=
->>>>>>>>>>=0A=
->>>>>>>>>> diff --git a/block/bio.c b/block/bio.c=0A=
->>>>>>>>>> index 1f2cc1fbe283..c528e1f944c7 100644=0A=
->>>>>>>>>> --- a/block/bio.c=0A=
->>>>>>>>>> +++ b/block/bio.c=0A=
->>>>>>>>>> @@ -287,6 +287,17 @@ void bio_init(struct bio *bio, struct bio_v=
-ec *table,=0A=
->>>>>>>>>>  }=0A=
->>>>>>>>>>  EXPORT_SYMBOL(bio_init);=0A=
->>>>>>>>>>  =0A=
->>>>>>>>>> +unsigned int bio_max_size(struct bio *bio)=0A=
->>>>>>>>>> +{=0A=
->>>>>>>>>> +	struct request_queue *q =3D bio->bi_disk->queue;=0A=
->>>>>>>>>> +=0A=
->>>>>>>>>> +	if (blk_queue_limit_bio_size(q))=0A=
->>>>>>>>>> +		return blk_queue_get_max_sectors(q, bio_op(bio))=0A=
->>>>>>>>>> +			<< SECTOR_SHIFT;=0A=
->>>>>>>>>> +=0A=
->>>>>>>>>> +	return UINT_MAX;=0A=
->>>>>>>>>> +}=0A=
->>>>>>>>>> +=0A=
->>>>>>>>>>  /**=0A=
->>>>>>>>>>   * bio_reset - reinitialize a bio=0A=
->>>>>>>>>>   * @bio:	bio to reset=0A=
->>>>>>>>>> @@ -877,7 +888,7 @@ bool __bio_try_merge_page(struct bio *bio, s=
-truct page *page,=0A=
->>>>>>>>>>  		struct bio_vec *bv =3D &bio->bi_io_vec[bio->bi_vcnt - 1];=0A=
->>>>>>>>>>  =0A=
->>>>>>>>>>  		if (page_is_mergeable(bv, page, len, off, same_page)) {=0A=
->>>>>>>>>> -			if (bio->bi_iter.bi_size > UINT_MAX - len) {=0A=
->>>>>>>>>> +			if (bio->bi_iter.bi_size > bio_max_size(bio) - len) {=0A=
->>>>>>>>>>  				*same_page =3D false;=0A=
->>>>>>>>>>  				return false;=0A=
->>>>>>>>>>  			}=0A=
->>>>>>>>>> diff --git a/include/linux/bio.h b/include/linux/bio.h=0A=
->>>>>>>>>> index 1edda614f7ce..13b6f6562a5b 100644=0A=
->>>>>>>>>> --- a/include/linux/bio.h=0A=
->>>>>>>>>> +++ b/include/linux/bio.h=0A=
->>>>>>>>>> @@ -113,7 +113,7 @@ static inline bool bio_full(struct bio *bio,=
- unsigned len)=0A=
->>>>>>>>>>  	if (bio->bi_vcnt >=3D bio->bi_max_vecs)=0A=
->>>>>>>>>>  		return true;=0A=
->>>>>>>>>>  =0A=
->>>>>>>>>> -	if (bio->bi_iter.bi_size > UINT_MAX - len)=0A=
->>>>>>>>>> +	if (bio->bi_iter.bi_size > bio_max_size(bio) - len)=0A=
->>>>>>>>>>  		return true;=0A=
->>>>>>>>>>  =0A=
->>>>>>>>>>  	return false;=0A=
->>>>>>>>>> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h=0A=
->>>>>>>>>> index f94ee3089e01..3aeab9e7e97b 100644=0A=
->>>>>>>>>> --- a/include/linux/blkdev.h=0A=
->>>>>>>>>> +++ b/include/linux/blkdev.h=0A=
->>>>>>>>>> @@ -621,6 +621,7 @@ struct request_queue {=0A=
->>>>>>>>>>  #define QUEUE_FLAG_RQ_ALLOC_TIME 27	/* record rq->alloc_time_ns=
- */=0A=
->>>>>>>>>>  #define QUEUE_FLAG_HCTX_ACTIVE	28	/* at least one blk-mq hctx i=
-s active */=0A=
->>>>>>>>>>  #define QUEUE_FLAG_NOWAIT       29	/* device supports NOWAIT */=
-=0A=
->>>>>>>>>> +#define QUEUE_FLAG_LIMIT_BIO_SIZE 30	/* limit bio size */=0A=
->>>>>>>>>>  =0A=
->>>>>>>>>>  #define QUEUE_FLAG_MQ_DEFAULT	((1 << QUEUE_FLAG_IO_STAT) |		\=
-=0A=
->>>>>>>>>>  				 (1 << QUEUE_FLAG_SAME_COMP) |		\=0A=
->>>>>>>>>> @@ -667,6 +668,8 @@ bool blk_queue_flag_test_and_set(unsigned in=
-t flag, struct request_queue *q);=0A=
->>>>>>>>>>  #define blk_queue_fua(q)	test_bit(QUEUE_FLAG_FUA, &(q)->queue_f=
-lags)=0A=
->>>>>>>>>>  #define blk_queue_registered(q)	test_bit(QUEUE_FLAG_REGISTERED,=
- &(q)->queue_flags)=0A=
->>>>>>>>>>  #define blk_queue_nowait(q)	test_bit(QUEUE_FLAG_NOWAIT, &(q)->q=
-ueue_flags)=0A=
->>>>>>>>>> +#define blk_queue_limit_bio_size(q)	\=0A=
->>>>>>>>>> +	test_bit(QUEUE_FLAG_LIMIT_BIO_SIZE, &(q)->queue_flags)=0A=
->>>>>>>>>>  =0A=
->>>>>>>>>>  extern void blk_set_pm_only(struct request_queue *q);=0A=
->>>>>>>>>>  extern void blk_clear_pm_only(struct request_queue *q);=0A=
->>>>>>>>>> -- =0A=
->>>>>>>>>> 2.28.0=0A=
->>>>>>>>>>=0A=
->>>>>>>>>=0A=
->>>>>>>>> Please feedback to me if more modification is needed to apply. :)=
-=0A=
->>>>>>>>=0A=
->>>>>>>> You are adding code that tests for a value to be set, yet you neve=
-r set=0A=
->>>>>>>> it in this code so why is it needed at all?=0A=
->>>>>>>=0A=
->>>>>>> This patch is a solution for some inefficient case of multipage bve=
-c like=0A=
->>>>>>> as current DIO scenario. So it's not set as a default.=0A=
->>>>>>> It will be set when bio size limitation is needed in runtime.=0A=
->>>>>>=0A=
->>>>>> Set where?=0A=
->>>>>=0A=
->>>>> In my environment, set it on init.rc file like as below.=0A=
->>>>> "echo 1 > /sys/block/sda/queue/limit_bio_size"=0A=
->>>>=0A=
->>>> I do not see any sysfs file in this patch, and why would you ever want=
-=0A=
->>>> to be forced to manually do this?  The hardware should know the limits=
-=0A=
->>>> itself, and should automatically tune things like this, do not force a=
-=0A=
->>>> user to do it as that's just not going to go well at all.=0A=
->>>=0A=
->>> Patch for sysfs is sent "[RESEND,v5,2/2] bio: add limit_bio_size sysfs"=
-.=0A=
->>> Actually I just suggested constant - 1MB - value to limit bio size at f=
-irst.=0A=
->>> But I got a feedback that patch will be better if it's optional, and=0A=
->>> getting meaningful value from device queue on patchwork.=0A=
->>> There are some differences for each system environment I think.=0A=
->>>=0A=
->>> But there are inefficient logic obviously by applying of multipage bvec=
-.=0A=
->>> So it will be shown in several system environment.=0A=
->>> Currently providing this patch as a option would be better to select=0A=
->>> according to each system environment, and policy I think.=0A=
->>>=0A=
->>> Please, revisit applying this patch.=0A=
->>>=0A=
->>>>=0A=
->>>> So if this patch series is forcing a new option to be configured by=0A=
->>>> sysfs only, that's not acceptable, sorry.=0A=
->>>=0A=
->>> If it is not acceptable ever with current, may I progress review again=
-=0A=
->>> with default enabled?=0A=
->>=0A=
->> I am sorry, I can not parse this, can you rephrase this?=0A=
->>=0A=
->> thanks,=0A=
->>=0A=
->> greg k-h=0A=
->>=0A=
-> =0A=
-> I'll prepare new patch as you recommand. It will be added setting of=0A=
-> limit_bio_size automatically when queue max sectors is determined.=0A=
-=0A=
-Please do that in the driver for the HW that benefits from it. Do not do th=
-is=0A=
-for all block devices.=0A=
-=0A=
-> =0A=
-> =0A=
-> Thanks,=0A=
-> =0A=
-> Changheun Lee=0A=
-> =0A=
-=0A=
-=0A=
--- =0A=
-Damien Le Moal=0A=
-Western Digital Research=0A=
+Initially I started moving the dm-kcopyd interface to the block layer
+as a generic interface.
+Once I dig deeper in dm-kcopyd code, I figured that dm-kcopyd is
+tightly coupled with dm_io()
+
+To move dm-kcopyd to block layer, it would also require dm_io code to
+be moved to block layer.
+It would cause havoc in dm layer, as it is the backbone of the
+dm-layer and needs complete
+rewriting of dm-layer. Do you see any other way of doing this without
+having to move dm_io code
+or to have redundant code ?
+
+
+On Sat, Feb 20, 2021 at 10:29 AM Damien Le Moal <Damien.LeMoal@wdc.com> wro=
+te:
+>
+> On 2021/02/20 11:01, SelvaKumar S wrote:
+> > Add new BLKCOPY ioctl that offloads copying of one or more sources
+> > ranges to a destination in the device. Accepts a 'copy_range' structure
+> > that contains destination (in sectors), no of sources and pointer to th=
+e
+> > array of source ranges. Each source range is represented by 'range_entr=
+y'
+> > that contains start and length of source ranges (in sectors).
+> >
+> > Introduce REQ_OP_COPY, a no-merge copy offload operation. Create
+> > bio with control information as payload and submit to the device.
+> > REQ_OP_COPY(19) is a write op and takes zone_write_lock when submitted
+> > to zoned device.
+> >
+> > If the device doesn't support copy or copy offload is disabled, then
+> > copy operation is emulated by default. However, the copy-emulation is a=
+n
+> > opt-in feature. Caller can choose not to use the copy-emulation by
+> > specifying a flag 'BLKDEV_COPY_NOEMULATION'.
+> >
+> > Copy-emulation is implemented by allocating memory of total copy size.
+> > The source ranges are read into memory by chaining bio for each source
+> > ranges and submitting them async and the last bio waits for completion.
+> > After data is read, it is written to the destination.
+> >
+> > bio_map_kern() is used to allocate bio and add pages of copy buffer to
+> > bio. As bio->bi_private and bio->bi_end_io are needed for chaining the
+> > bio and gets over-written, invalidate_kernel_vmap_range() for read is
+> > called in the caller.
+> >
+> > Introduce queue limits for simple copy and other helper functions.
+> > Add device limits as sysfs entries.
+> >       - copy_offload
+> >       - max_copy_sectors
+> >       - max_copy_ranges_sectors
+> >       - max_copy_nr_ranges
+> >
+> > copy_offload(=3D 0) is disabled by default. This needs to be enabled if
+> > copy-offload needs to be used.
+> > max_copy_sectors =3D 0 indicates the device doesn't support native copy=
+.
+> >
+> > Native copy offload is not supported for stacked devices and is done vi=
+a
+> > copy emulation.
+> >
+> > Signed-off-by: SelvaKumar S <selvakuma.s1@samsung.com>
+> > Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
+> > Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
+> > Signed-off-by: Javier Gonz=C3=A1lez <javier.gonz@samsung.com>
+> > Signed-off-by: Chaitanya Kulkarni <kch@kernel.org>
+> > ---
+> >  block/blk-core.c          | 102 ++++++++++++++++--
+> >  block/blk-lib.c           | 222 ++++++++++++++++++++++++++++++++++++++
+> >  block/blk-merge.c         |   2 +
+> >  block/blk-settings.c      |  10 ++
+> >  block/blk-sysfs.c         |  47 ++++++++
+> >  block/blk-zoned.c         |   1 +
+> >  block/bounce.c            |   1 +
+> >  block/ioctl.c             |  33 ++++++
+> >  include/linux/bio.h       |   1 +
+> >  include/linux/blk_types.h |  14 +++
+> >  include/linux/blkdev.h    |  15 +++
+> >  include/uapi/linux/fs.h   |  13 +++
+> >  12 files changed, 453 insertions(+), 8 deletions(-)
+> >
+> > diff --git a/block/blk-core.c b/block/blk-core.c
+> > index 7663a9b94b80..23e646e5ae43 100644
+> > --- a/block/blk-core.c
+> > +++ b/block/blk-core.c
+> > @@ -720,6 +720,17 @@ static noinline int should_fail_bio(struct bio *bi=
+o)
+> >  }
+> >  ALLOW_ERROR_INJECTION(should_fail_bio, ERRNO);
+> >
+> > +static inline int bio_check_copy_eod(struct bio *bio, sector_t start,
+> > +             sector_t nr_sectors, sector_t max_sect)
+> > +{
+> > +     if (nr_sectors && max_sect &&
+> > +         (nr_sectors > max_sect || start > max_sect - nr_sectors)) {
+> > +             handle_bad_sector(bio, max_sect);
+> > +             return -EIO;
+> > +     }
+> > +     return 0;
+> > +}
+> > +
+> >  /*
+> >   * Check whether this bio extends beyond the end of the device or part=
+ition.
+> >   * This may well happen - the kernel calls bread() without checking th=
+e size of
+> > @@ -738,6 +749,75 @@ static inline int bio_check_eod(struct bio *bio, s=
+ector_t maxsector)
+> >       return 0;
+> >  }
+> >
+> > +/*
+> > + * Check for copy limits and remap source ranges if needed.
+> > + */
+> > +static int blk_check_copy(struct bio *bio)
+> > +{
+> > +     struct blk_copy_payload *payload =3D bio_data(bio);
+> > +     struct request_queue *q =3D bio->bi_disk->queue;
+> > +     sector_t max_sect, start_sect, copy_size =3D 0;
+> > +     sector_t src_max_sect, src_start_sect;
+> > +     struct block_device *bd_part;
+> > +     int i, ret =3D -EIO;
+> > +
+> > +     rcu_read_lock();
+> > +
+> > +     bd_part =3D __disk_get_part(bio->bi_disk, bio->bi_partno);
+> > +     if (unlikely(!bd_part)) {
+> > +             rcu_read_unlock();
+> > +             goto out;
+> > +     }
+> > +
+> > +     max_sect =3D  bdev_nr_sectors(bd_part);
+> > +     start_sect =3D bd_part->bd_start_sect;
+> > +
+> > +     src_max_sect =3D bdev_nr_sectors(payload->src_bdev);
+> > +     src_start_sect =3D payload->src_bdev->bd_start_sect;
+> > +
+> > +     if (unlikely(should_fail_request(bd_part, bio->bi_iter.bi_size)))
+> > +             goto out;
+> > +
+> > +     if (unlikely(bio_check_ro(bio, bd_part)))
+> > +             goto out;
+>
+> There is no rcu_unlock() in that out label. Did you test ?
+>
+> > +
+> > +     rcu_read_unlock();
+> > +
+> > +     /* cannot handle copy crossing nr_ranges limit */
+> > +     if (payload->copy_nr_ranges > q->limits.max_copy_nr_ranges)
+> > +             goto out;
+> > +
+> > +     for (i =3D 0; i < payload->copy_nr_ranges; i++) {
+> > +             ret =3D bio_check_copy_eod(bio, payload->range[i].src,
+> > +                             payload->range[i].len, src_max_sect);
+> > +             if (unlikely(ret))
+> > +                     goto out;
+> > +
+> > +             /* single source range length limit */
+> > +             if (payload->range[i].len > q->limits.max_copy_range_sect=
+ors)
+> > +                     goto out;
+>
+> ret is not set. You will return success with this.
+>
+> > +
+> > +             payload->range[i].src +=3D src_start_sect;
+> > +             copy_size +=3D payload->range[i].len;
+> > +     }
+> > +
+> > +     /* check if copy length crosses eod */
+> > +     ret =3D bio_check_copy_eod(bio, bio->bi_iter.bi_sector,
+> > +                             copy_size, max_sect);
+> > +     if (unlikely(ret))
+> > +             goto out;
+> > +
+> > +     /* cannot handle copy more than copy limits */
+> > +     if (copy_size > q->limits.max_copy_sectors)
+> > +             goto out;
+>
+> Again ret is not set... No error return ?
+>
+> > +
+> > +     bio->bi_iter.bi_sector +=3D start_sect;
+> > +     bio->bi_partno =3D 0;
+> > +     ret =3D 0;
+> > +out:
+> > +     return ret;
+> > +}
+> > +
+> >  /*
+> >   * Remap block n of partition p to block n+start(p) of the disk.
+> >   */
+> > @@ -827,14 +907,16 @@ static noinline_for_stack bool submit_bio_checks(=
+struct bio *bio)
+> >       if (should_fail_bio(bio))
+> >               goto end_io;
+> >
+> > -     if (bio->bi_partno) {
+> > -             if (unlikely(blk_partition_remap(bio)))
+> > -                     goto end_io;
+> > -     } else {
+> > -             if (unlikely(bio_check_ro(bio, bio->bi_disk->part0)))
+> > -                     goto end_io;
+> > -             if (unlikely(bio_check_eod(bio, get_capacity(bio->bi_disk=
+))))
+> > -                     goto end_io;
+> > +     if (likely(!op_is_copy(bio->bi_opf))) {
+> > +             if (bio->bi_partno) {
+> > +                     if (unlikely(blk_partition_remap(bio)))
+> > +                             goto end_io;
+> > +             } else {
+> > +                     if (unlikely(bio_check_ro(bio, bio->bi_disk->part=
+0)))
+> > +                             goto end_io;
+> > +                     if (unlikely(bio_check_eod(bio, get_capacity(bio-=
+>bi_disk))))
+> > +                             goto end_io;
+> > +             }
+> >       }
+> >
+> >       /*
+> > @@ -858,6 +940,10 @@ static noinline_for_stack bool submit_bio_checks(s=
+truct bio *bio)
+> >               if (!blk_queue_discard(q))
+> >                       goto not_supported;
+> >               break;
+> > +     case REQ_OP_COPY:
+> > +             if (unlikely(blk_check_copy(bio)))
+> > +                     goto end_io;
+> > +             break;
+> >       case REQ_OP_SECURE_ERASE:
+> >               if (!blk_queue_secure_erase(q))
+> >                       goto not_supported;
+> > diff --git a/block/blk-lib.c b/block/blk-lib.c
+> > index 752f9c722062..97ba58d8d9a1 100644
+> > --- a/block/blk-lib.c
+> > +++ b/block/blk-lib.c
+> > @@ -150,6 +150,228 @@ int blkdev_issue_discard(struct block_device *bde=
+v, sector_t sector,
+> >  }
+> >  EXPORT_SYMBOL(blkdev_issue_discard);
+> >
+> > +int blk_copy_offload(struct block_device *dest_bdev, struct blk_copy_p=
+ayload *payload,
+> > +             sector_t dest, gfp_t gfp_mask)
+>
+> Simple copy is only over the same device, right ? So the name "dest_bdev"=
+ is a
+> little strange.
+>
+> > +{
+> > +     struct request_queue *q =3D bdev_get_queue(dest_bdev);
+> > +     struct bio *bio;
+> > +     int ret, payload_size;
+> > +
+> > +     payload_size =3D struct_size(payload, range, payload->copy_nr_ran=
+ges);
+> > +     bio =3D bio_map_kern(q, payload, payload_size, gfp_mask);
+> > +     if (IS_ERR(bio)) {
+> > +             ret =3D PTR_ERR(bio);
+> > +             goto err;
+>
+> This will do a bio_put() on a non existent bio...
+>
+> > +     }
+> > +
+> > +     bio->bi_iter.bi_sector =3D dest;
+> > +     bio->bi_opf =3D REQ_OP_COPY | REQ_NOMERGE;
+> > +     bio_set_dev(bio, dest_bdev);
+> > +
+> > +     ret =3D submit_bio_wait(bio);
+> > +err:
+> > +     bio_put(bio);
+> > +     return ret;
+> > +}
+> > +
+> > +int blk_read_to_buf(struct block_device *src_bdev, struct blk_copy_pay=
+load *payload,
+> > +             gfp_t gfp_mask, sector_t copy_size, void **buf_p)
+> > +{
+> > +     struct request_queue *q =3D bdev_get_queue(src_bdev);
+> > +     struct bio *bio, *parent =3D NULL;
+> > +     void *buf =3D NULL;
+> > +     int copy_len =3D copy_size << SECTOR_SHIFT;
+> > +     int i, nr_srcs, ret, cur_size, t_len =3D 0;
+> > +     bool is_vmalloc;
+> > +
+> > +     nr_srcs =3D payload->copy_nr_ranges;
+> > +
+> > +     buf =3D kvmalloc(copy_len, gfp_mask);
+> > +     if (!buf)
+> > +             return -ENOMEM;
+> > +     is_vmalloc =3D is_vmalloc_addr(buf);
+> > +
+> > +     for (i =3D 0; i < nr_srcs; i++) {
+> > +             cur_size =3D payload->range[i].len << SECTOR_SHIFT;
+> > +
+> > +             bio =3D bio_map_kern(q, buf + t_len, cur_size, gfp_mask);
+> > +             if (IS_ERR(bio)) {
+> > +                     ret =3D PTR_ERR(bio);
+> > +                     goto out;
+> > +             }
+> > +
+> > +             bio->bi_iter.bi_sector =3D payload->range[i].src;
+> > +             bio->bi_opf =3D REQ_OP_READ;
+> > +             bio_set_dev(bio, src_bdev);
+> > +             bio->bi_end_io =3D NULL;
+> > +             bio->bi_private =3D NULL;
+> > +
+> > +             if (parent) {
+> > +                     bio_chain(parent, bio);
+> > +                     submit_bio(parent);
+> > +             }
+> > +
+> > +             parent =3D bio;
+> > +             t_len +=3D cur_size;
+> > +     }
+> > +
+> > +     ret =3D submit_bio_wait(bio);
+> > +     bio_put(bio);
+> > +     if (is_vmalloc)
+> > +             invalidate_kernel_vmap_range(buf, copy_len);
+>
+> But blk_write_from_buf() will use the buffer right after this.. Is this r=
+eally OK ?
+>
+
+As we are over-writing bio->private adn bi->bi_endio during
+submit_bio_wait(), the original
+bio_map_kern_endio() can't be used to invalidate_kernel_vmap_range().
+So we are doing it
+here explicitly. invalidate_kernel_vmap_range() is only necessary for
+data reads and the buf
+is safe to be used in blk_write_from_buf().
+
+>
+> > +     if (ret)
+> > +             goto out;
+> > +
+> > +     *buf_p =3D buf;
+> > +     return 0;
+> > +out:
+> > +     kvfree(buf);
+> > +     return ret;
+> > +}
+> > +
+> > +int blk_write_from_buf(struct block_device *dest_bdev, void *buf, sect=
+or_t dest,
+> > +             sector_t copy_size, gfp_t gfp_mask)
+> > +{
+> > +     struct request_queue *q =3D bdev_get_queue(dest_bdev);
+> > +     struct bio *bio;
+> > +     int ret, copy_len =3D copy_size << SECTOR_SHIFT;
+> > +
+> > +     bio =3D bio_map_kern(q, buf, copy_len, gfp_mask);
+> > +     if (IS_ERR(bio)) {
+> > +             ret =3D PTR_ERR(bio);
+> > +             goto out;
+> > +     }
+> > +     bio_set_dev(bio, dest_bdev);
+> > +     bio->bi_opf =3D REQ_OP_WRITE;
+> > +     bio->bi_iter.bi_sector =3D dest;
+> > +
+> > +     bio->bi_end_io =3D NULL;
+> > +     ret =3D submit_bio_wait(bio);
+> > +     bio_put(bio);
+> > +out:
+> > +     return ret;
+> > +}
+> > +
+> > +int blk_prepare_payload(struct block_device *src_bdev, int nr_srcs, st=
+ruct range_entry *rlist,
+> > +             gfp_t gfp_mask, struct blk_copy_payload **payload_p, sect=
+or_t *copy_size)
+> > +{
+> > +
+> > +     struct request_queue *q =3D bdev_get_queue(src_bdev);
+> > +     struct blk_copy_payload *payload;
+> > +     sector_t bs_mask, total_len =3D 0;
+> > +     int i, ret, payload_size;
+> > +
+> > +     if (!q)
+> > +             return -ENXIO;
+> > +
+> > +     if (!nr_srcs)
+> > +             return -EINVAL;
+> > +
+> > +     if (bdev_read_only(src_bdev))
+> > +             return -EPERM;
+> > +
+> > +     bs_mask =3D (bdev_logical_block_size(src_bdev) >> 9) - 1;
+> > +
+> > +     payload_size =3D struct_size(payload, range, nr_srcs);
+> > +     payload =3D kmalloc(payload_size, gfp_mask);
+> > +     if (!payload)
+> > +             return -ENOMEM;
+> > +
+> > +     for (i =3D 0; i < nr_srcs; i++) {
+> > +             if (rlist[i].src & bs_mask || rlist[i].len & bs_mask) {
+> > +                     ret =3D -EINVAL;
+> > +                     goto err;
+> > +             }
+> > +
+> > +             payload->range[i].src =3D rlist[i].src;
+> > +             payload->range[i].len =3D rlist[i].len;
+> > +
+> > +             total_len +=3D rlist[i].len;
+> > +     }
+> > +
+> > +     payload->copy_nr_ranges =3D i;
+> > +     payload->src_bdev =3D src_bdev;
+> > +     *copy_size =3D total_len;
+> > +
+> > +     *payload_p =3D payload;
+> > +     return 0;
+> > +err:
+> > +     kfree(payload);
+> > +     return ret;
+> > +}
+> > +
+> > +int blk_copy_emulate(struct block_device *src_bdev, struct blk_copy_pa=
+yload *payload,
+> > +                     struct block_device *dest_bdev, sector_t dest,
+> > +                     sector_t copy_size, gfp_t gfp_mask)
+> > +{
+> > +     void *buf =3D NULL;
+> > +     int ret;
+> > +
+> > +     ret =3D blk_read_to_buf(src_bdev, payload, gfp_mask, copy_size, &=
+buf);
+> > +     if (ret)
+> > +             goto out;
+> > +
+> > +     ret =3D blk_write_from_buf(dest_bdev, buf, dest, copy_size, gfp_m=
+ask);
+> > +     if (buf)
+> > +             kvfree(buf);
+> > +out:
+> > +     return ret;
+> > +}
+>
+> I already commented that this should better use the dm-kcopyd design, whi=
+ch
+> would be far more efficient than this. This will be slow...
+>
+> Your function blkdev_issue_copy() below should deal only with issuing sim=
+ple
+> copy (amd later scsi xcopy) for devices that support it. Bring the dm-kco=
+pyd
+> interface in the block layer as a generic interface for hadling emulation=
+.
+> Otherwise you are repeating what dm does, but not as efficiently.
+>
+> > +
+> > +/**
+> > + * blkdev_issue_copy - queue a copy
+> > + * @src_bdev:        source block device
+> > + * @nr_srcs: number of source ranges to copy
+> > + * @rlist:   array of source ranges in sector
+> > + * @dest_bdev:       destination block device
+> > + * @dest:    destination in sector
+> > + * @gfp_mask:   memory allocation flags (for bio_alloc)
+> > + * @flags:   BLKDEV_COPY_* flags to control behaviour
+> > + *
+> > + * Description:
+> > + *   Copy array of source ranges from source block device to
+> > + *   destination block devcie. All source must belong to same bdev and
+> > + *   length of a source range cannot be zero.
+> > + */
+> > +
+> > +int blkdev_issue_copy(struct block_device *src_bdev, int nr_srcs,
+> > +             struct range_entry *src_rlist, struct block_device *dest_=
+bdev,
+> > +             sector_t dest, gfp_t gfp_mask, int flags)
+> > +{
+> > +     struct request_queue *q =3D bdev_get_queue(src_bdev);
+> > +     struct request_queue *dest_q =3D bdev_get_queue(dest_bdev);
+> > +     struct blk_copy_payload *payload;
+> > +     sector_t bs_mask, copy_size;
+> > +     int ret;
+> > +
+> > +     ret =3D blk_prepare_payload(src_bdev, nr_srcs, src_rlist, gfp_mas=
+k,
+> > +                     &payload, &copy_size);
+> > +     if (ret)
+> > +             return ret;
+> > +
+> > +     bs_mask =3D (bdev_logical_block_size(dest_bdev) >> 9) - 1;
+> > +     if (dest & bs_mask) {
+> > +             return -EINVAL;
+> > +             goto out;
+> > +     }
+> > +
+> > +     if (q =3D=3D dest_q && q->limits.copy_offload) {
+> > +             ret =3D blk_copy_offload(src_bdev, payload, dest, gfp_mas=
+k);
+> > +             if (ret)
+> > +                     goto out;
+> > +     } else if (flags & BLKDEV_COPY_NOEMULATION) {
+>
+> Why ? whoever calls blkdev_issue_copy() wants a copy to be done. Why woul=
+d that
+> user say "Fail on me if the device does not support copy" ??? This is a w=
+eird
+> interface in my opinion.
+>
+
+BLKDEV_COPY_NOEMULATION flag was introduced to allow blkdev_issue_copy() ca=
+llers
+to use their native copying method instead of the emulated copy that I
+added. This way we
+ensure that dm uses the hw-assisted copy and if that is not present,
+it falls back to existing
+copy method.
+
+The other users who don't have their native emulation can use this
+emulated-copy implementation.
+
+>
+> > +             ret =3D -EIO;
+> > +             goto out;
+> > +     } else
+>
+> Missing braces. By you do not need all these else after the gotos anyway.
+>
+> > +             ret =3D blk_copy_emulate(src_bdev, payload, dest_bdev, de=
+st,
+> > +                             copy_size, gfp_mask);
+> > +
+> > +out:
+> > +     kvfree(payload);
+> > +     return ret;
+> > +}
+> > +EXPORT_SYMBOL(blkdev_issue_copy);
+> > +
+> >  /**
+> >   * __blkdev_issue_write_same - generate number of bios with same page
+> >   * @bdev:    target blockdev
+> > diff --git a/block/blk-merge.c b/block/blk-merge.c
+> > index 808768f6b174..4e04f24e13c1 100644
+> > --- a/block/blk-merge.c
+> > +++ b/block/blk-merge.c
+> > @@ -309,6 +309,8 @@ void __blk_queue_split(struct bio **bio, unsigned i=
+nt *nr_segs)
+> >       struct bio *split =3D NULL;
+> >
+> >       switch (bio_op(*bio)) {
+> > +     case REQ_OP_COPY:
+> > +                     break;
+>
+> Why would this even be called ? Copy BIOs cannot be split, right ?
+>
+> >       case REQ_OP_DISCARD:
+> >       case REQ_OP_SECURE_ERASE:
+> >               split =3D blk_bio_discard_split(q, *bio, &q->bio_split, n=
+r_segs);
+> > diff --git a/block/blk-settings.c b/block/blk-settings.c
+> > index 43990b1d148b..93c15ba45a69 100644
+> > --- a/block/blk-settings.c
+> > +++ b/block/blk-settings.c
+> > @@ -60,6 +60,10 @@ void blk_set_default_limits(struct queue_limits *lim=
+)
+> >       lim->io_opt =3D 0;
+> >       lim->misaligned =3D 0;
+> >       lim->zoned =3D BLK_ZONED_NONE;
+> > +     lim->copy_offload =3D 0;
+> > +     lim->max_copy_sectors =3D 0;
+> > +     lim->max_copy_nr_ranges =3D 0;
+> > +     lim->max_copy_range_sectors =3D 0;
+> >  }
+> >  EXPORT_SYMBOL(blk_set_default_limits);
+> >
+> > @@ -565,6 +569,12 @@ int blk_stack_limits(struct queue_limits *t, struc=
+t queue_limits *b,
+> >       if (b->chunk_sectors)
+> >               t->chunk_sectors =3D gcd(t->chunk_sectors, b->chunk_secto=
+rs);
+> >
+> > +     /* simple copy not supported in stacked devices */
+> > +     t->copy_offload =3D 0;
+> > +     t->max_copy_sectors =3D 0;
+> > +     t->max_copy_range_sectors =3D 0;
+> > +     t->max_copy_nr_ranges =3D 0;
+>
+> You do not need this. Limits not explicitely initialized are 0 already.
+> But I do not see why you can't support copy on stacked devices. That shou=
+ld be
+> feasible taking the min() for each of the above limit.
+>
+
+Disabling stacked device support was feedback from v2.
+
+https://patchwork.kernel.org/project/linux-block/patch/20201204094659.12732=
+-2-selvakuma.s1@samsung.com/
+
+>
+> > +
+> >       /* Physical block size a multiple of the logical block size? */
+> >       if (t->physical_block_size & (t->logical_block_size - 1)) {
+> >               t->physical_block_size =3D t->logical_block_size;
+> > diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+> > index b513f1683af0..625a72541263 100644
+> > --- a/block/blk-sysfs.c
+> > +++ b/block/blk-sysfs.c
+> > @@ -166,6 +166,44 @@ static ssize_t queue_discard_granularity_show(stru=
+ct request_queue *q, char *pag
+> >       return queue_var_show(q->limits.discard_granularity, page);
+> >  }
+> >
+> > +static ssize_t queue_copy_offload_show(struct request_queue *q, char *=
+page)
+> > +{
+> > +     return queue_var_show(q->limits.copy_offload, page);
+> > +}
+> > +
+> > +static ssize_t queue_copy_offload_store(struct request_queue *q,
+> > +                                    const char *page, size_t count)
+> > +{
+> > +     unsigned long copy_offload;
+> > +     ssize_t ret =3D queue_var_store(&copy_offload, page, count);
+> > +
+> > +     if (ret < 0)
+> > +             return ret;
+> > +
+> > +     if (copy_offload && q->limits.max_copy_sectors =3D=3D 0)
+> > +             return -EINVAL;
+> > +
+> > +     q->limits.copy_offload =3D copy_offload;
+> > +     return ret;
+> > +}
+>
+> This is weird. If you want to allow a user to disable copy offload, then =
+use
+> max_copy_sectors. This one should be read-only and only indicate if the d=
+evice
+> supports it or not. I also would actually change this one into
+> max_copy_hw_sectors, immutable, indicating the max copy sectors that the =
+device
+> supports, and 0 for no support. That would allow an easy implementation o=
+f
+> max_copy_sectors being red/write for controlling enable/disable.
+>
+> > +
+> > +static ssize_t queue_max_copy_sectors_show(struct request_queue *q, ch=
+ar *page)
+> > +{
+> > +     return queue_var_show(q->limits.max_copy_sectors, page);
+> > +}
+> > +
+> > +static ssize_t queue_max_copy_range_sectors_show(struct request_queue =
+*q,
+> > +             char *page)
+> > +{
+> > +     return queue_var_show(q->limits.max_copy_range_sectors, page);
+> > +}
+> > +
+> > +static ssize_t queue_max_copy_nr_ranges_show(struct request_queue *q,
+> > +             char *page)
+> > +{
+> > +     return queue_var_show(q->limits.max_copy_nr_ranges, page);
+> > +}
+> > +
+> >  static ssize_t queue_discard_max_hw_show(struct request_queue *q, char=
+ *page)
+> >  {
+> >
+> > @@ -591,6 +629,11 @@ QUEUE_RO_ENTRY(queue_nr_zones, "nr_zones");
+> >  QUEUE_RO_ENTRY(queue_max_open_zones, "max_open_zones");
+> >  QUEUE_RO_ENTRY(queue_max_active_zones, "max_active_zones");
+> >
+> > +QUEUE_RW_ENTRY(queue_copy_offload, "copy_offload");
+> > +QUEUE_RO_ENTRY(queue_max_copy_sectors, "max_copy_sectors");
+> > +QUEUE_RO_ENTRY(queue_max_copy_range_sectors, "max_copy_range_sectors")=
+;
+> > +QUEUE_RO_ENTRY(queue_max_copy_nr_ranges, "max_copy_nr_ranges");
+> > +
+> >  QUEUE_RW_ENTRY(queue_nomerges, "nomerges");
+> >  QUEUE_RW_ENTRY(queue_rq_affinity, "rq_affinity");
+> >  QUEUE_RW_ENTRY(queue_poll, "io_poll");
+> > @@ -636,6 +679,10 @@ static struct attribute *queue_attrs[] =3D {
+> >       &queue_discard_max_entry.attr,
+> >       &queue_discard_max_hw_entry.attr,
+> >       &queue_discard_zeroes_data_entry.attr,
+> > +     &queue_copy_offload_entry.attr,
+> > +     &queue_max_copy_sectors_entry.attr,
+> > +     &queue_max_copy_range_sectors_entry.attr,
+> > +     &queue_max_copy_nr_ranges_entry.attr,
+> >       &queue_write_same_max_entry.attr,
+> >       &queue_write_zeroes_max_entry.attr,
+> >       &queue_zone_append_max_entry.attr,
+> > diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+> > index 7a68b6e4300c..02069178d51e 100644
+> > --- a/block/blk-zoned.c
+> > +++ b/block/blk-zoned.c
+> > @@ -75,6 +75,7 @@ bool blk_req_needs_zone_write_lock(struct request *rq=
+)
+> >       case REQ_OP_WRITE_ZEROES:
+> >       case REQ_OP_WRITE_SAME:
+> >       case REQ_OP_WRITE:
+> > +     case REQ_OP_COPY:
+> >               return blk_rq_zone_is_seq(rq);
+> >       default:
+> >               return false;
+> > diff --git a/block/bounce.c b/block/bounce.c
+> > index d3f51acd6e3b..5e052afe8691 100644
+> > --- a/block/bounce.c
+> > +++ b/block/bounce.c
+> > @@ -254,6 +254,7 @@ static struct bio *bounce_clone_bio(struct bio *bio=
+_src, gfp_t gfp_mask,
+> >       bio->bi_iter.bi_size    =3D bio_src->bi_iter.bi_size;
+> >
+> >       switch (bio_op(bio)) {
+> > +     case REQ_OP_COPY:
+> >       case REQ_OP_DISCARD:
+> >       case REQ_OP_SECURE_ERASE:
+> >       case REQ_OP_WRITE_ZEROES:
+> > diff --git a/block/ioctl.c b/block/ioctl.c
+> > index d61d652078f4..0e52181657a4 100644
+> > --- a/block/ioctl.c
+> > +++ b/block/ioctl.c
+> > @@ -133,6 +133,37 @@ static int blk_ioctl_discard(struct block_device *=
+bdev, fmode_t mode,
+> >                                   GFP_KERNEL, flags);
+> >  }
+> >
+> > +static int blk_ioctl_copy(struct block_device *bdev, fmode_t mode,
+> > +             unsigned long arg, unsigned long flags)
+> > +{
+> > +     struct copy_range crange;
+> > +     struct range_entry *rlist;
+> > +     int ret;
+> > +
+> > +     if (!(mode & FMODE_WRITE))
+> > +             return -EBADF;
+> > +
+> > +     if (copy_from_user(&crange, (void __user *)arg, sizeof(crange)))
+> > +             return -EFAULT;
+> > +
+> > +     rlist =3D kmalloc_array(crange.nr_range, sizeof(*rlist),
+> > +                     GFP_KERNEL);
+> > +     if (!rlist)
+> > +             return -ENOMEM;
+> > +
+> > +     if (copy_from_user(rlist, (void __user *)crange.range_list,
+> > +                             sizeof(*rlist) * crange.nr_range)) {
+> > +             ret =3D -EFAULT;
+> > +             goto out;
+> > +     }
+> > +
+> > +     ret =3D blkdev_issue_copy(bdev, crange.nr_range, rlist, bdev, cra=
+nge.dest,
+> > +                     GFP_KERNEL, flags);
+> > +out:
+> > +     kfree(rlist);
+> > +     return ret;
+> > +}
+> > +
+> >  static int blk_ioctl_zeroout(struct block_device *bdev, fmode_t mode,
+> >               unsigned long arg)
+> >  {
+> > @@ -458,6 +489,8 @@ static int blkdev_common_ioctl(struct block_device =
+*bdev, fmode_t mode,
+> >       case BLKSECDISCARD:
+> >               return blk_ioctl_discard(bdev, mode, arg,
+> >                               BLKDEV_DISCARD_SECURE);
+> > +     case BLKCOPY:
+> > +             return blk_ioctl_copy(bdev, mode, arg, 0);
+> >       case BLKZEROOUT:
+> >               return blk_ioctl_zeroout(bdev, mode, arg);
+> >       case BLKREPORTZONE:
+> > diff --git a/include/linux/bio.h b/include/linux/bio.h
+> > index 1edda614f7ce..164313bdfb35 100644
+> > --- a/include/linux/bio.h
+> > +++ b/include/linux/bio.h
+> > @@ -71,6 +71,7 @@ static inline bool bio_has_data(struct bio *bio)
+> >  static inline bool bio_no_advance_iter(const struct bio *bio)
+> >  {
+> >       return bio_op(bio) =3D=3D REQ_OP_DISCARD ||
+> > +            bio_op(bio) =3D=3D REQ_OP_COPY ||
+> >              bio_op(bio) =3D=3D REQ_OP_SECURE_ERASE ||
+> >              bio_op(bio) =3D=3D REQ_OP_WRITE_SAME ||
+> >              bio_op(bio) =3D=3D REQ_OP_WRITE_ZEROES;
+> > diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+> > index 866f74261b3b..5a35c02ac0a8 100644
+> > --- a/include/linux/blk_types.h
+> > +++ b/include/linux/blk_types.h
+> > @@ -380,6 +380,8 @@ enum req_opf {
+> >       REQ_OP_ZONE_RESET       =3D 15,
+> >       /* reset all the zone present on the device */
+> >       REQ_OP_ZONE_RESET_ALL   =3D 17,
+> > +     /* copy ranges within device */
+> > +     REQ_OP_COPY             =3D 19,
+> >
+> >       /* SCSI passthrough using struct scsi_request */
+> >       REQ_OP_SCSI_IN          =3D 32,
+> > @@ -506,6 +508,11 @@ static inline bool op_is_discard(unsigned int op)
+> >       return (op & REQ_OP_MASK) =3D=3D REQ_OP_DISCARD;
+> >  }
+> >
+> > +static inline bool op_is_copy(unsigned int op)
+> > +{
+> > +     return (op & REQ_OP_MASK) =3D=3D REQ_OP_COPY;
+> > +}
+> > +
+> >  /*
+> >   * Check if a bio or request operation is a zone management operation,=
+ with
+> >   * the exception of REQ_OP_ZONE_RESET_ALL which is treated as a specia=
+l case
+> > @@ -565,4 +572,11 @@ struct blk_rq_stat {
+> >       u64 batch;
+> >  };
+> >
+> > +struct blk_copy_payload {
+> > +     sector_t        dest;
+> > +     int             copy_nr_ranges;
+> > +     struct block_device *src_bdev;
+> > +     struct  range_entry     range[];
+> > +};
+> > +
+> >  #endif /* __LINUX_BLK_TYPES_H */
+> > diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> > index 699ace6b25ff..2bb4513d4bb8 100644
+> > --- a/include/linux/blkdev.h
+> > +++ b/include/linux/blkdev.h
+> > @@ -337,10 +337,14 @@ struct queue_limits {
+> >       unsigned int            max_zone_append_sectors;
+> >       unsigned int            discard_granularity;
+> >       unsigned int            discard_alignment;
+> > +     unsigned int            copy_offload;
+> > +     unsigned int            max_copy_sectors;
+> >
+> >       unsigned short          max_segments;
+> >       unsigned short          max_integrity_segments;
+> >       unsigned short          max_discard_segments;
+> > +     unsigned short          max_copy_range_sectors;
+> > +     unsigned short          max_copy_nr_ranges;
+> >
+> >       unsigned char           misaligned;
+> >       unsigned char           discard_misaligned;
+> > @@ -621,6 +625,7 @@ struct request_queue {
+> >  #define QUEUE_FLAG_RQ_ALLOC_TIME 27  /* record rq->alloc_time_ns */
+> >  #define QUEUE_FLAG_HCTX_ACTIVE       28      /* at least one blk-mq hc=
+tx is active */
+> >  #define QUEUE_FLAG_NOWAIT       29   /* device supports NOWAIT */
+> > +#define QUEUE_FLAG_SIMPLE_COPY       30      /* supports simple copy *=
+/
+> >
+> >  #define QUEUE_FLAG_MQ_DEFAULT        ((1 << QUEUE_FLAG_IO_STAT) |     =
+       \
+> >                                (1 << QUEUE_FLAG_SAME_COMP) |          \
+> > @@ -643,6 +648,7 @@ bool blk_queue_flag_test_and_set(unsigned int flag,=
+ struct request_queue *q);
+> >  #define blk_queue_io_stat(q) test_bit(QUEUE_FLAG_IO_STAT, &(q)->queue_=
+flags)
+> >  #define blk_queue_add_random(q)      test_bit(QUEUE_FLAG_ADD_RANDOM, &=
+(q)->queue_flags)
+> >  #define blk_queue_discard(q) test_bit(QUEUE_FLAG_DISCARD, &(q)->queue_=
+flags)
+> > +#define blk_queue_copy(q)    test_bit(QUEUE_FLAG_SIMPLE_COPY, &(q)->qu=
+eue_flags)
+> >  #define blk_queue_zone_resetall(q)   \
+> >       test_bit(QUEUE_FLAG_ZONE_RESETALL, &(q)->queue_flags)
+> >  #define blk_queue_secure_erase(q) \
+> > @@ -1069,6 +1075,9 @@ static inline unsigned int blk_queue_get_max_sect=
+ors(struct request_queue *q,
+> >               return min(q->limits.max_discard_sectors,
+> >                          UINT_MAX >> SECTOR_SHIFT);
+> >
+> > +     if (unlikely(op =3D=3D REQ_OP_COPY))
+> > +             return q->limits.max_copy_sectors;
+> > +
+>
+> I would agreee with this if a copy BIO was always a single range, but tha=
+t is
+> not the case. So I am not sure this makes sense at all.
+>
+> >       if (unlikely(op =3D=3D REQ_OP_WRITE_SAME))
+> >               return q->limits.max_write_same_sectors;
+> >
+> > @@ -1343,6 +1352,12 @@ extern int __blkdev_issue_discard(struct block_d=
+evice *bdev, sector_t sector,
+> >               sector_t nr_sects, gfp_t gfp_mask, int flags,
+> >               struct bio **biop);
+> >
+> > +#define BLKDEV_COPY_NOEMULATION      (1 << 0)        /* do not emulate=
+ if copy offload not supported */
+> > +
+> > +extern int blkdev_issue_copy(struct block_device *src_bdev, int nr_src=
+s,
+> > +             struct range_entry *src_rlist, struct block_device *dest_=
+bdev,
+> > +             sector_t dest, gfp_t gfp_mask, int flags);
+>
+> No need for extern.
+>
+> > +
+> >  #define BLKDEV_ZERO_NOUNMAP  (1 << 0)  /* do not free blocks */
+> >  #define BLKDEV_ZERO_NOFALLBACK       (1 << 1)  /* don't write explicit=
+ zeroes */
+> >
+> > diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
+> > index f44eb0a04afd..5cadb176317a 100644
+> > --- a/include/uapi/linux/fs.h
+> > +++ b/include/uapi/linux/fs.h
+> > @@ -64,6 +64,18 @@ struct fstrim_range {
+> >       __u64 minlen;
+> >  };
+> >
+> > +struct range_entry {
+> > +     __u64 src;
+> > +     __u64 len;
+> > +};
+> > +
+> > +struct copy_range {
+> > +     __u64 dest;
+> > +     __u64 nr_range;
+> > +     __u64 range_list;
+> > +     __u64 rsvd;
+> > +};
+> > +
+> >  /* extent-same (dedupe) ioctls; these MUST match the btrfs ioctl defin=
+itions */
+> >  #define FILE_DEDUPE_RANGE_SAME               0
+> >  #define FILE_DEDUPE_RANGE_DIFFERS    1
+> > @@ -184,6 +196,7 @@ struct fsxattr {
+> >  #define BLKSECDISCARD _IO(0x12,125)
+> >  #define BLKROTATIONAL _IO(0x12,126)
+> >  #define BLKZEROOUT _IO(0x12,127)
+> > +#define BLKCOPY _IOWR(0x12, 128, struct copy_range)
+> >  /*
+> >   * A jump here: 130-131 are reserved for zoned block devices
+> >   * (see uapi/linux/blkzoned.h)
+> >
+>
+> Please test your code more thoroughly. It is full of problems that you sh=
+ould
+> have detected with better testing including RO devices, partitions and er=
+ror
+> path coverage.
+>
+> --
+> Damien Le Moal
+> Western Digital Research
