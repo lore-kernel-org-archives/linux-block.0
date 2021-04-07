@@ -2,97 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07CB6C433ED
-	for <linux-block@archiver.kernel.org>; Wed,  7 Apr 2021 08:01:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 111C6C433B4
+	for <linux-block@archiver.kernel.org>; Wed,  7 Apr 2021 08:07:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CC218611C1
-	for <linux-block@archiver.kernel.org>; Wed,  7 Apr 2021 08:01:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CB69C61222
+	for <linux-block@archiver.kernel.org>; Wed,  7 Apr 2021 08:07:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235660AbhDGIBK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 7 Apr 2021 04:01:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46596 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229529AbhDGIBK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Apr 2021 04:01:10 -0400
-Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C67A6C061756
-        for <linux-block@vger.kernel.org>; Wed,  7 Apr 2021 01:00:59 -0700 (PDT)
-Received: by mail-ej1-x62f.google.com with SMTP id s21so1345863eju.8
-        for <linux-block@vger.kernel.org>; Wed, 07 Apr 2021 01:00:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=0q2Zvg2ZRyPTOxL3mrhu4veJpz9kXed+0KYyX9N+YTQ=;
-        b=isFXxKtPVgwQ9QXaSnhC+UCeyjZvj1kmTFE1wvgDHdzfsnsFalAL71p8FNLJAejuJO
-         NeUXC4HZEfK9N2U9Y/hvJADU3evkK2Bv4BWPJ2hocd7VZtbpXXo2vOk0Ntiwi/5FDOtC
-         oCKhjzvz8gY6whyryjkCbsP+qZNoTsOglPuz7fYtwMkFPHOz2Cx/5+FaMGLe/w1xOe9a
-         VCFGD+MjYmASPUGuXm+4+PSWwFFnn941tsOzqvlwRXU4VWe3eYyzSm9G/9E3Dg4PtH74
-         B4RyEYhc53NBKGaO4pRt03Zj4QmKXxdHAMe/EIYWqixcMqpCD22X6vChg390z4++ij4E
-         XWiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=0q2Zvg2ZRyPTOxL3mrhu4veJpz9kXed+0KYyX9N+YTQ=;
-        b=Hajg1OqVi051TjG0dJYplRTjnVXBGUCyDz9AWhAmRlKAbZmcmTeDAqDJSx0vs/0Iqw
-         RYr8IO9cEk0gNNEG+yAAlawRl3pc/PmWHFyc1CNj+pWkaCfzOWMt1rOgfcenrnV9SCM+
-         NEoxtLYb1NIxZsSwlyR6Fq/+6s9Hdbt1QFuIHJMPnusQU4dQvNx//Z7WJZJAJE3jj02D
-         8+29TGxN/lvhagtPz9VYBzeEEwZ8p5J6VQe+vOWGVEqj704JtipuEFSp38qkyOvEU3Xn
-         b8lrCuj8zOVYDPgjVnP9FDrQalkqZ+HevXetRU0w6OIOfGpJODlfjPrv0kFr4TJPxrmG
-         X6nA==
-X-Gm-Message-State: AOAM531otj/9F8LAxPAJS8A2qn1Qz1VX1Aeuy6+ev2QJqjnyhAHUh1Rp
-        jxNCeZZmRXsbFqNb9QvQfOfBFUxjoMTaiA==
-X-Google-Smtp-Source: ABdhPJykjBsZCEiRWzfJ/ZfRR3+kO3TdB05SBBr/NgMlhjRXvikzkxWBd2h9PjamvsLkByWOwE/IiA==
-X-Received: by 2002:a17:906:1519:: with SMTP id b25mr2275874ejd.254.1617782458394;
-        Wed, 07 Apr 2021 01:00:58 -0700 (PDT)
-Received: from dell ([91.110.221.225])
-        by smtp.gmail.com with ESMTPSA id h20sm5766358ejk.110.2021.04.07.01.00.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Apr 2021 01:00:57 -0700 (PDT)
-Date:   Wed, 7 Apr 2021 09:00:56 +0100
-From:   Lee Jones <lee.jones@linaro.org>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     linux-kernel@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH 03/11] block: mtip32xx: mtip32xx: Mark debugging variable
- 'start' as __maybe_unused
-Message-ID: <20210407080056.GY2916463@dell>
-References: <20210312105530.2219008-1-lee.jones@linaro.org>
- <20210312105530.2219008-4-lee.jones@linaro.org>
- <3d04bf40-a614-18f2-b003-a9786ceca1fc@acm.org>
+        id S236643AbhDGIHJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 7 Apr 2021 04:07:09 -0400
+Received: from frasgout.his.huawei.com ([185.176.79.56]:2779 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233970AbhDGIHJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Apr 2021 04:07:09 -0400
+Received: from fraeml737-chm.china.huawei.com (unknown [172.18.147.226])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4FFcHy74fYz6873F;
+        Wed,  7 Apr 2021 15:59:58 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml737-chm.china.huawei.com (10.206.15.218) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Wed, 7 Apr 2021 10:06:58 +0200
+Received: from [10.210.168.126] (10.210.168.126) by
+ lhreml724-chm.china.huawei.com (10.201.108.75) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2106.2; Wed, 7 Apr 2021 09:06:57 +0100
+Subject: Re: [PATCH] blk-mq: set default elevator as deadline in case of hctx
+ shared tagset
+To:     Ming Lei <ming.lei@redhat.com>
+CC:     Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+        Yanhui Ma <yama@redhat.com>, Hannes Reinecke <hare@suse.de>,
+        Kashyap Desai <kashyap.desai@broadcom.com>
+References: <20210406031933.767228-1-ming.lei@redhat.com>
+ <d081eb6a-ace7-c9b2-7374-7f05a31551a0@huawei.com> <YG0BTVsCNKZHD3/T@T590>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <6c346805-a7b1-f66d-af16-b1da03d77fc0@huawei.com>
+Date:   Wed, 7 Apr 2021 09:04:30 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <3d04bf40-a614-18f2-b003-a9786ceca1fc@acm.org>
+In-Reply-To: <YG0BTVsCNKZHD3/T@T590>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.210.168.126]
+X-ClientProxiedBy: lhreml703-chm.china.huawei.com (10.201.108.52) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 06 Apr 2021, Bart Van Assche wrote:
+Reviewed-by: John Garry <john.garry@huawei.com>
 
-> On 3/12/21 2:55 AM, Lee Jones wrote:
-> > Fixes the following W=1 kernel build warning(s):
-> > 
-> >  drivers/block/mtip32xx/mtip32xx.c: In function ‘mtip_standby_immediate’:
-> >  drivers/block/mtip32xx/mtip32xx.c:1216:16: warning: variable ‘start’ set but not used [-Wunused-but-set-variable]
-> 
-> Has it been verified that the compiler is wrong, or in other words that
-> this patch does not suppress a useful warning?
 
-Neither is true.
+> On Tue, Apr 06, 2021 at 11:25:08PM +0100, John Garry wrote:
+>> On 06/04/2021 04:19, Ming Lei wrote:
+>>
+>> Hi Ming,
+>>
+>>> Yanhui found that write performance is degraded a lot after applying
+>>> hctx shared tagset on one test machine with megaraid_sas. And turns out
+>>> it is caused by none scheduler which becomes default elevator caused by
+>>> hctx shared tagset patchset.
+>>>
+>>> Given more scsi HBAs will apply hctx shared tagset, and the similar
+>>> performance exists for them too.
+>>>
+>>> So keep previous behavior by still using default mq-deadline for queues
+>>> which apply hctx shared tagset, just like before.
+>> I think that there a some SCSI HBAs which have nr_hw_queues > 1 and don't
+>> use shared sbitmap - do you think that they want want this as well (without
+>> knowing it)?
+> I don't know but none has been used for them since the beginning, so not
+> an regression of shared tagset, but this one is really.
 
-'start' is used, but only when debug is enabled.
+It seems fine to revert to previous behavior when host_tagset is set. I 
+didn't check the results for this recently, but for the original shared 
+tagset patchset [0] I had:
 
--- 
-Lee Jones [李琼斯]
-Senior Technical Lead - Developer Services
-Linaro.org │ Open source software for Arm SoCs
-Follow Linaro: Facebook | Twitter | Blog
+none sched:		2132K IOPS					
+mq-deadline sched:	2145K IOPS			
+
+A quick audit of other SCSI HBA drivers in drivers/scsi which set 
+nr_hw_queues and don't set host_tagset gives lpfc, qla2xxx, qedi 
+(nr_hw_queues seems to be getting unset), storvsc_drv (host_tagset might 
+be getting set), virtio_scsi, and then mpi3mr
+
+Thanks,
+John
+
+
+[0] 
+https://lore.kernel.org/linux-scsi/1597850436-116171-1-git-send-email-john.garry@huawei.com/
+
