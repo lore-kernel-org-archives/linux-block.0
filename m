@@ -2,125 +2,109 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E849C433ED
-	for <linux-block@archiver.kernel.org>; Wed,  7 Apr 2021 18:42:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DDD7C433B4
+	for <linux-block@archiver.kernel.org>; Wed,  7 Apr 2021 20:18:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DF54561245
-	for <linux-block@archiver.kernel.org>; Wed,  7 Apr 2021 18:42:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4200B61158
+	for <linux-block@archiver.kernel.org>; Wed,  7 Apr 2021 20:18:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233202AbhDGSnF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 7 Apr 2021 14:43:05 -0400
-Received: from mail-pl1-f180.google.com ([209.85.214.180]:38877 "EHLO
-        mail-pl1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232823AbhDGSnE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Apr 2021 14:43:04 -0400
-Received: by mail-pl1-f180.google.com with SMTP id y2so9800170plg.5
-        for <linux-block@vger.kernel.org>; Wed, 07 Apr 2021 11:42:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=cgCGcQ+QJl8AIKGEDZ1APMyvOOeQntXyn/Tdt7c6+Xk=;
-        b=ZLX+UQ2yXnLTJL1/q7+2/zm6xP3fHZsAu1Yz2KUNfLfyydAVwI46MajyijPVK60a9u
-         tuqu28yebYovdnx4olyGvPf3l44gFGYK2L+utJ5NFFRm7Rn/ydMIIdxdLehHKbii3CFi
-         W260bw0uJmTYI+NvoqoOvzIuBSrxlf9E3nLfRrN3QwTNjH8kY/tPx4jt2SkJpQxg3ZPa
-         mBqmJjiCaQKVGHBxJUFvNLgoA132bJyu+5K7fIDhpDnV75Silab0/tOlWy6s3OyvYXBH
-         ZI5qvdwZ1m4vPYrf8yPvuZlRzrcdPyXj9zX6WA1YVyXmjy/fFODBe41778S90+wjqFBN
-         1/uw==
-X-Gm-Message-State: AOAM533cOMqZRHfQuLtG1Pt4XdQXEoUKqpJ9hEzGV5FyHGXL5hD86Rcz
-        jHBEDrXpbs94FZ+Zt6gIa54=
-X-Google-Smtp-Source: ABdhPJxus5STLd3feb1P9jZLg27Ex1g6icTntRaJo8w/kYSEA3goEs9mP9mNKfq+M2pXtOD6ydj3/A==
-X-Received: by 2002:a17:902:a610:b029:e6:5eda:c39e with SMTP id u16-20020a170902a610b02900e65edac39emr4116749plq.11.1617820974341;
-        Wed, 07 Apr 2021 11:42:54 -0700 (PDT)
-Received: from [192.168.50.110] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
-        by smtp.gmail.com with ESMTPSA id y8sm22386432pfp.140.2021.04.07.11.42.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 07 Apr 2021 11:42:53 -0700 (PDT)
-Subject: Re: [PATCH v6 2/5] blk-mq: Introduce atomic variants of
- blk_mq_(all_tag|tagset_busy)_iter
-To:     John Garry <john.garry@huawei.com>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.de>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Khazhy Kumykov <khazhy@google.com>
-References: <20210406214905.21622-1-bvanassche@acm.org>
- <20210406214905.21622-3-bvanassche@acm.org>
- <31402243-57ca-8fa5-473a-d5ce20774c50@huawei.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <1610af81-ce46-26c4-5aae-d84aba5cf1f5@acm.org>
-Date:   Wed, 7 Apr 2021 11:42:51 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.0
+        id S234693AbhDGUSL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 7 Apr 2021 16:18:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30345 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232929AbhDGUSJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 7 Apr 2021 16:18:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1617826678;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=aQknNtkrD3GHg+E4N/uth2eOy0S3ZwiKhVq/VQGmwhM=;
+        b=MzWFZc7DTswGljIlCW6cGoU9iHl4xLVC0pKWF4IA1niBW469xcJAp23wlHvE2IL7/mtIqL
+        zhuBi0veWGEHGJgftarbkivJa/zH0i/hqWjuijquPxDk0o0q5upuGsXjxTI7p/rQVLvgKX
+        Na20vTpkWdsSFgjcbtq/9pBiHR3cZVs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-249-_Ff8sjcSNDalXMd_Kh6KAw-1; Wed, 07 Apr 2021 16:17:53 -0400
+X-MC-Unique: _Ff8sjcSNDalXMd_Kh6KAw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D7A07881276;
+        Wed,  7 Apr 2021 20:17:50 +0000 (UTC)
+Received: from treble (ovpn-119-205.rdu2.redhat.com [10.10.119.205])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6A275610AE;
+        Wed,  7 Apr 2021 20:17:48 +0000 (UTC)
+Date:   Wed, 7 Apr 2021 15:17:46 -0500
+From:   Josh Poimboeuf <jpoimboe@redhat.com>
+To:     Greg KH <gregkh@linuxfoundation.org>
+Cc:     Luis Chamberlain <mcgrof@kernel.org>,
+        Minchan Kim <minchan@kernel.org>, keescook@chromium.org,
+        dhowells@redhat.com, hch@infradead.org, mbenes@suse.com,
+        ngupta@vflare.org, sergey.senozhatsky.work@gmail.com,
+        axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Steven Rostedt <rostedt@goodmis.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jessica Yu <jeyu@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: [PATCH 1/2] zram: fix crashes due to use of cpu hotplug
+ multistate
+Message-ID: <20210407201746.ueijmegmpbyq5quv@treble>
+References: <20210310212128.GR4332@42.do-not-panic.com>
+ <YErOkGrvtQODXtB0@google.com>
+ <20210312183238.GW4332@42.do-not-panic.com>
+ <YEvA1dzDsFOuKdZ/@google.com>
+ <20210319190924.GK4332@42.do-not-panic.com>
+ <YFjHvUolScp3btJ9@google.com>
+ <20210322204156.GM4332@42.do-not-panic.com>
+ <YFkWMZ0m9nKCT69T@google.com>
+ <20210401235925.GR4332@42.do-not-panic.com>
+ <YGbNpLKXfWpy0ZZa@kroah.com>
 MIME-Version: 1.0
-In-Reply-To: <31402243-57ca-8fa5-473a-d5ce20774c50@huawei.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <YGbNpLKXfWpy0ZZa@kroah.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/7/21 9:57 AM, John Garry wrote:
-> On 06/04/2021 22:49, Bart Van Assche wrote:
->> Since in the next patch knowledge is required of whether or not it is
->> allowed to sleep inside the tag iteration functions, pass this context
->> information to the tag iteration functions. I have reviewed all 
->> callers of
->> tag iteration functions to verify these annotations by starting from the
->> output of the following grep command:
->>
->>      git grep -nHE 'blk_mq_(all_tag|tagset_busy)_iter'
->>
->> My conclusions from that analysis are as follows:
->> - Sleeping is allowed in the blk-mq-debugfs code that iterates over tags.
->> - Since the blk_mq_tagset_busy_iter() calls in the mtip32xx driver are
->>    preceded by a function that sleeps (blk_mq_quiesce_queue()), 
->> sleeping is
->>    safe in the context of the blk_mq_tagset_busy_iter() calls.
->> - The same reasoning also applies to the nbd driver.
->> - All blk_mq_tagset_busy_iter() calls in the NVMe drivers are followed 
->> by a
->>    call to a function that sleeps so sleeping inside 
->> blk_mq_tagset_busy_iter()
->>    when called from the NVMe driver is fine.
+On Fri, Apr 02, 2021 at 09:54:12AM +0200, Greg KH wrote:
+> On Thu, Apr 01, 2021 at 11:59:25PM +0000, Luis Chamberlain wrote:
+> > As for the syfs deadlock possible with drivers, this fixes it in a generic way:
+> > 
+> > commit fac43d8025727a74f80a183cc5eb74ed902a5d14
+> > Author: Luis Chamberlain <mcgrof@kernel.org>
+> > Date:   Sat Mar 27 14:58:15 2021 +0000
+> > 
+> >     sysfs: add optional module_owner to attribute
+> >     
+> >     This is needed as otherwise the owner of the attribute
+> >     or group read/store might have a shared lock used on driver removal,
+> >     and deadlock if we race with driver removal.
+> >     
+> >     Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
 > 
-> Hi Bart,
-> 
->> - scsi_host_busy(), scsi_host_complete_all_commands() and
->>    scsi_host_busy_iter() are used by multiple SCSI LLDs so analyzing 
->> whether
->>    or not these functions may sleep is hard. Instead of performing that
->>    analysis, make it safe to call these functions from atomic context.
-> 
-> Please help me understand this solution. The background is that we are 
-> unsure if the SCSI iters callback functions may sleep. So we use the 
-> blk_mq_all_tag_iter_atomic() iter, which tells us that we must not 
-> sleep. And internally, it uses rcu read lock protection mechanism, which 
-> relies on not sleeping. So it seems that we're making the SCSI iter 
-> functions being safe in atomic context, and, as such, rely on the iter 
-> callbacks not to sleep.
-> 
-> But if we call the SCSI iter function from non-atomic context and the 
-> iter callback may sleep, then that is a problem, right? We're still 
-> using rcu.
+> No, please no.  Module removal is a "best effort", if the system dies
+> when it happens, that's on you.  I am not willing to expend extra energy
+> and maintance of core things like sysfs for stuff like this that does
+> not matter in any system other than a developer's box.
 
-Hi John,
+So I mentioned this on IRC, and some folks were surprised to hear that
+module unloading is unsupported and is just a development aid.
 
-Please take a look at the output of the following grep command:
+Is this stance documented anywhere?
 
-git grep -nHEw 'blk_mq_tagset_busy_iter|scsi_host_busy_iter'\ drivers/scsi
+If we really believe this to be true, we should make rmmod taint the
+kernel.
 
-Do you agree with me that it is safe to call all the callback functions 
-passed to blk_mq_tagset_busy_iter() and scsi_host_busy_iter() from an 
-atomic context?
+-- 
+Josh
 
-Thanks,
-
-Bart.
