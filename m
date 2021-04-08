@@ -2,99 +2,68 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.2 required=3.0 tests=BAYES_00,DATE_IN_PAST_06_12,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55AA6C433B4
-	for <linux-block@archiver.kernel.org>; Thu,  8 Apr 2021 16:47:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5772C433ED
+	for <linux-block@archiver.kernel.org>; Thu,  8 Apr 2021 16:52:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1EAF96113D
-	for <linux-block@archiver.kernel.org>; Thu,  8 Apr 2021 16:47:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 95211610A2
+	for <linux-block@archiver.kernel.org>; Thu,  8 Apr 2021 16:52:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232336AbhDHQrT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 8 Apr 2021 12:47:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54396 "EHLO
+        id S231480AbhDHQwf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 8 Apr 2021 12:52:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55576 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232281AbhDHQrS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Apr 2021 12:47:18 -0400
+        with ESMTP id S230522AbhDHQwe (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Apr 2021 12:52:34 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95854C061760;
-        Thu,  8 Apr 2021 09:47:07 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AB3EC061760
+        for <linux-block@vger.kernel.org>; Thu,  8 Apr 2021 09:52:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Type:MIME-Version:Message-ID:
-        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=VAaxG7DlA7LeEZLGQT4kdCo/q34NW8YrEoeuVr25p5M=; b=Gyj3FrmnULP7lQRybm7S3yj4qD
-        B/GaTufZN+kEXewgtAMcVD5ukz5ql3LJH2LRk8yQJtH/tcLW92dQgcS2BUQPZ5qwsXD84ZcRymulN
-        QV3ZUjwut8tGZcEVwBo7hUIADrNyFsQ9UmZV1wsW3dGPbw3XkhGuhl/o4WQzVF9MbN6BrL4/AwtLW
-        2Dq977YtYltmFn8usn+2hTEsfBY44EfX4YDOerl9gFwppM48r8Hdzten93iYQL4jrygYCWApr6grV
-        /ffjNwN3TR+348ifDNwvnDT3RVy/1TbR8qfx/0blAISMoYwaQRc/8SkmcRExUKV86tWvWlEBIeWNn
-        Zd0rQBLA==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
-        id 1lUXna-00GXc3-SG; Thu, 08 Apr 2021 16:46:43 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 4CD4A3001CD;
-        Thu,  8 Apr 2021 18:46:30 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id E90432BE57BBA; Thu,  8 Apr 2021 11:46:12 +0200 (CEST)
-Date:   Thu, 8 Apr 2021 11:46:12 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Jens Axboe <axboe@kernel.dk>, Oleg Nesterov <oleg@redhat.com>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] block: Fix sys_ioprio_set(.which=IOPRIO_WHO_PGRP) task
- iteration
-Message-ID: <YG7Q5C4Rb5dx5GFx@hirez.programming.kicks-ass.net>
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=Q29oYU7+PgQv3ImQdZEytRCH3GU1GnkRUKQuVZW+bJQ=; b=B5D+DmP9E0SNV1OcJ3g5AD9/6X
+        atRPiTH8PjYJjtWbnYbT1VQsmGYvd62WWatBFl7n0iuEoQijEGpz6PR7yyLFJcfIMMbyFUGXxFJqm
+        WROt1IMYokuXgRTzxiSYQo+o2keQgJ3YSo2wleBrgsynwdlhidlZLuwATsz+ssaBoPl8mkti+gBDh
+        6tqJbsOIxrGsqce4AD+yrsIXFv7gAFREfHO7AmFmajn9lINKM5PXqMaNKXzlig85O7lTmSm5ZTAbU
+        YzSjEiezYMBAmkDNyWYu4s5s1pMI1NFNG/riaupYuZ23iGcAxIJ/kdqDLqQ8X1YkzdHHODHI9HJG6
+        Fqrj52vQ==;
+Received: from hch by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
+        id 1lUXt2-00GY4z-4c; Thu, 08 Apr 2021 16:52:10 +0000
+Date:   Thu, 8 Apr 2021 17:52:08 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Md Haris Iqbal <haris.iqbal@ionos.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org, jinpu.wang@ionos.com,
+        danil.kipnis@ionos.com, Guoqing Jiang <guoqing.jiang@ionos.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Guoqing Jiang <jgq516@gmail.com>
+Subject: Re: [PATCH V5 2/3] block: add a statistic table for io latency
+Message-ID: <20210408165208.GA3944028@infradead.org>
+References: <20210408135840.386076-1-haris.iqbal@ionos.com>
+ <20210408135840.386076-3-haris.iqbal@ionos.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20210408135840.386076-3-haris.iqbal@ionos.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+> +static ssize_t io_latency_show(struct device *dev, struct device_attribute *attr, char *buf)
+> +{
+> +	struct block_device *bdev = dev_to_bdev(dev);
+> +	size_t count = 0;
+> +	int i, sgrp;
+> +
+> +	for (i = 0; i < ADD_STAT_NUM; i++) {
+> +		unsigned int from, to;
+> +
+> +		if (i == ADD_STAT_NUM - 1) {
+> +			count += scnprintf(buf + count, PAGE_SIZE - count, "      >= %5d  ms: ",
 
-do_each_pid_thread() { } while_each_pid_thread() is a double loop and
-thus break doesn't work as expected. Also, it should be used under
-tasklist_lock because otherwise we can race against change_pid() for
-PGID/SID.
+Please fix your overly long lines all over this code.
 
-Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
----
- block/ioprio.c |   11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
-
---- a/block/ioprio.c
-+++ b/block/ioprio.c
-@@ -119,11 +119,17 @@ SYSCALL_DEFINE3(ioprio_set, int, which,
- 				pgrp = task_pgrp(current);
- 			else
- 				pgrp = find_vpid(who);
-+
-+			read_lock(&tasklist_lock);
- 			do_each_pid_thread(pgrp, PIDTYPE_PGID, p) {
- 				ret = set_task_ioprio(p, ioprio);
--				if (ret)
--					break;
-+				if (ret) {
-+					read_unlock(&tasklist_lock);
-+					goto out;
-+				}
- 			} while_each_pid_thread(pgrp, PIDTYPE_PGID, p);
-+			read_unlock(&tasklist_lock);
-+
- 			break;
- 		case IOPRIO_WHO_USER:
- 			uid = make_kuid(current_user_ns(), who);
-@@ -153,6 +159,7 @@ SYSCALL_DEFINE3(ioprio_set, int, which,
- 			ret = -EINVAL;
- 	}
- 
-+out:
- 	rcu_read_unlock();
- 	return ret;
- }
