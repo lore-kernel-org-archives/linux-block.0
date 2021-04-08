@@ -2,83 +2,139 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB19DC433ED
-	for <linux-block@archiver.kernel.org>; Wed,  7 Apr 2021 21:54:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEBABC433B4
+	for <linux-block@archiver.kernel.org>; Thu,  8 Apr 2021 01:37:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B123161205
-	for <linux-block@archiver.kernel.org>; Wed,  7 Apr 2021 21:54:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 907AB61157
+	for <linux-block@archiver.kernel.org>; Thu,  8 Apr 2021 01:37:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232942AbhDGVzG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 7 Apr 2021 17:55:06 -0400
-Received: from mail-pg1-f169.google.com ([209.85.215.169]:39504 "EHLO
-        mail-pg1-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231545AbhDGVzF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Apr 2021 17:55:05 -0400
-Received: by mail-pg1-f169.google.com with SMTP id l76so14039005pga.6
-        for <linux-block@vger.kernel.org>; Wed, 07 Apr 2021 14:54:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=gHQF+n6puTnpDxt07iX+IaztncwFS/gobS9+DpvhRbk=;
-        b=Rdr/SOSQiBrbLILPcyNMIJZ2l9FEfgPoCCNtXBYSoJigy471iZZ1opEoM8l0gJnp/V
-         wQNP9UCG6yyXaZqo513ulPr3SW4onMy41dzDYGWxTrs8N9vkmqf08AfPY2pcGlltwiuo
-         ImV0s700TIVCUvPmQ4G9wNThsOAy+QHCilVeAc33MSxA1EGao0DEdj+l69ngWKJX97gt
-         F96foovO65DKddz0622VIKyuTRMvpHyL1pvZof9/9HFXduZR41IaKG0gwEAoXt9UcXqM
-         IVXiFKYs8npqWs7q6h6TVNvtv5+MrKzlORdG2ayPHmWboyAK7u2etoOrEy8EGlBMGNNj
-         zf9Q==
-X-Gm-Message-State: AOAM532sB3uIc1m7PoOsEL+UD0MYsNqZSuxBvLaw8HUW9xH4zhnx4NhG
-        NCGWzqpJaXh/ZWSGX+zmivc=
-X-Google-Smtp-Source: ABdhPJwUh7VsLHURi2/A9Op8ZcrfMVAiLvmVO9mU9uQ2rk9LWrZxqmQFJBg67BPbGGzXrBzEYm3fWQ==
-X-Received: by 2002:a63:1b10:: with SMTP id b16mr5131551pgb.308.1617832495477;
-        Wed, 07 Apr 2021 14:54:55 -0700 (PDT)
-Received: from [192.168.50.110] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
-        by smtp.gmail.com with ESMTPSA id w16sm5845704pfj.87.2021.04.07.14.54.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 07 Apr 2021 14:54:54 -0700 (PDT)
-Subject: Re: [PATCH v6 3/5] blk-mq: Fix races between iterating over requests
- and freeing requests
-To:     Khazhy Kumykov <khazhy@google.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.de>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        John Garry <john.garry@huawei.com>
-References: <20210406214905.21622-1-bvanassche@acm.org>
- <20210406214905.21622-4-bvanassche@acm.org>
- <CACGdZYKALg4GiXza+hnhay=XbBif3v5fV7Q=AJNUE-imw=t2yQ@mail.gmail.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <a5566d91-a9e8-d22e-36f0-dd69b22bc73e@acm.org>
-Date:   Wed, 7 Apr 2021 14:54:53 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.0
+        id S230099AbhDHBiI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 7 Apr 2021 21:38:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53156 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229529AbhDHBiI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 7 Apr 2021 21:38:08 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99202C061760;
+        Wed,  7 Apr 2021 18:37:56 -0700 (PDT)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1617845873;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=a1BCSKnRJSmnulmmzbhuhAMxM+/DLB/JexNDahjWLa0=;
+        b=xuBVbUs3z9Bnm4bh7y9nkiDZwIYlBMsdlf/6VTYRSMuAlVZIGT30/+gSx4OxNMrEjqJHZE
+        xOZql7/EzwQ3Y+kiHFxsy1M/BW9vCBJM8GZIkWYbJOgraCd78LABhQjhtzMS4wTNU9ENog
+        e/XToar/ufqgQPiR0KCkgltsSa2NpDG2evP0RNHiQCWzZSVJ9PnAes/twUtA+MluCXKrXG
+        Ihn+GcTTrVGdEi45YqHiCHvqVvYVT8TsYyuf5rOYwvsOqGv3mRMLgbxhBq0RD5VO+eHjEJ
+        1Gq/PJUw95nSgYoZFg3YSsdyWGF9zOA2YvNSBCYr+aYScGTgLvioiQYr4SaY1Q==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1617845873;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=a1BCSKnRJSmnulmmzbhuhAMxM+/DLB/JexNDahjWLa0=;
+        b=HsoOFep9I3XJmkK8n7opatm/BF8jqrGSOa/mmqXOAoutNdwnOvBIxNs8ojSoJtK5Q0DM3e
+        vjFwUgr3XEOO5MCg==
+To:     Greg KH <gregkh@linuxfoundation.org>,
+        Luis Chamberlain <mcgrof@kernel.org>
+Cc:     Minchan Kim <minchan@kernel.org>, keescook@chromium.org,
+        dhowells@redhat.com, hch@infradead.org, mbenes@suse.com,
+        ngupta@vflare.org, sergey.senozhatsky.work@gmail.com,
+        axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] zram: fix crashes due to use of cpu hotplug multistate
+In-Reply-To: <YGbNpLKXfWpy0ZZa@kroah.com>
+References: <YEbjom8FIclEgRYv@google.com> <20210310212128.GR4332@42.do-not-panic.com> <YErOkGrvtQODXtB0@google.com> <20210312183238.GW4332@42.do-not-panic.com> <YEvA1dzDsFOuKdZ/@google.com> <20210319190924.GK4332@42.do-not-panic.com> <YFjHvUolScp3btJ9@google.com> <20210322204156.GM4332@42.do-not-panic.com> <YFkWMZ0m9nKCT69T@google.com> <20210401235925.GR4332@42.do-not-panic.com> <YGbNpLKXfWpy0ZZa@kroah.com>
+Date:   Thu, 08 Apr 2021 03:37:53 +0200
+Message-ID: <87blap4kum.ffs@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-In-Reply-To: <CACGdZYKALg4GiXza+hnhay=XbBif3v5fV7Q=AJNUE-imw=t2yQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/6/21 5:02 PM, Khazhy Kumykov wrote:
-> On Tue, Apr 6, 2021 at 2:49 PM Bart Van Assche <bvanassche@acm.org> wrote:
->> +       /*
->> +        * The request 'rq' points at is protected by an RCU read lock until
->> +        * its queue pointer has been verified and by q_usage_count while the
->> +        * callback function is being invoked. an See also the
- >
-> extra "an"?
+Greg,
 
-Thanks for having reported this. I will fix this before I repost this 
-patch series.
+On Fri, Apr 02 2021 at 09:54, Greg KH wrote:
+> On Thu, Apr 01, 2021 at 11:59:25PM +0000, Luis Chamberlain wrote:
+>> As for the syfs deadlock possible with drivers, this fixes it in a generic way:
+>> 
+>> commit fac43d8025727a74f80a183cc5eb74ed902a5d14
+>> Author: Luis Chamberlain <mcgrof@kernel.org>
+>> Date:   Sat Mar 27 14:58:15 2021 +0000
+>> 
+>>     sysfs: add optional module_owner to attribute
+>>     
+>>     This is needed as otherwise the owner of the attribute
+>>     or group read/store might have a shared lock used on driver removal,
+>>     and deadlock if we race with driver removal.
+>>     
+>>     Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+>
+> No, please no.  Module removal is a "best effort", if the system dies
+> when it happens, that's on you.  I am not willing to expend extra energy
+> and maintance of core things like sysfs for stuff like this that does
+> not matter in any system other than a developer's box.
+>
+> Lock data, not code please.  Trying to tie data structure's lifespans
+> to the lifespan of code is a tangled mess, and one that I do not want to
+> add to in any form.
+>
+> sorry,
 
-Bart.
+Sorry, but you are fundamentaly off track here. This has absolutely
+nothing to do with module removal.
+
+The point is that module removal is the reverse operation of module
+insertion. So far so good.
+
+But module insertion can fail. So if you have nested functionalities
+which hang off or are enabled by moduled insertion then any fail in that
+sequence has to be able to roll back and clean up properly no matter
+what.
+
+Which it turn makes modules removal a reverse operation of module
+insertion.
+
+If you think otherwise, then please provide a proper plan how nested
+operations like sysfs - not to talk about more complex things like multi
+instance discovery which can happen inside a module insertion sequence
+can be properly rolled back.
+
+Just declaring that rmmod is evil does not cut it. rmmod is the least of
+the problems. If that fails, then a lot of rollback, failure handling
+mechanisms are missing in the setup path already.
+
+Anything which cannot cleanly rollback no matter whether the fail or
+rollback request happens at insertion time or later is broken by design.
+
+So either you declare module removal as disfunctional or you stop making
+up semantically ill defined and therefore useless claims about it.
+
+Your argument in:
+
+ https://lore.kernel.org/linux-block/YGbNpLKXfWpy0ZZa@kroah.com/
+
+ "Lock data, not code please.  Trying to tie data structure's lifespans
+  to the lifespan of code is a tangled mess, and one that I do not want to
+  add to in any form"
+
+is just useless blurb because the fundamental purpose of discovery code
+is to create the data structures which are tied to the code which is
+associated to it.
+
+Please stop this 'module removal' is not supported nonsense unless you
+can prove a complete indepenence of module init/discovery code to
+subsequent discovered entities depending on it.
+
+Thanks,
+
+        tglx
+
