@@ -2,41 +2,43 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29F4EC43461
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3454C43470
 	for <linux-block@archiver.kernel.org>; Thu,  8 Apr 2021 08:34:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D89E961176
-	for <linux-block@archiver.kernel.org>; Thu,  8 Apr 2021 08:34:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 672A661178
+	for <linux-block@archiver.kernel.org>; Thu,  8 Apr 2021 08:34:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229845AbhDHIfC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S229877AbhDHIfC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Thu, 8 Apr 2021 04:35:02 -0400
-Received: from mx2.suse.de ([195.135.220.15]:41982 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:41990 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229603AbhDHIfB (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        id S229689AbhDHIfB (ORCPT <rfc822;linux-block@vger.kernel.org>);
         Thu, 8 Apr 2021 04:35:01 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id C37FCB0E6;
+        by mx2.suse.de (Postfix) with ESMTP id C94BFB10B;
         Thu,  8 Apr 2021 08:34:49 +0000 (UTC)
-Subject: Re: [PATCH v9 02/13] blkcg: Added a app identifier support for blkcg
+Subject: Re: [PATCH v9 04/13] lpfc: vmid: Add the datastructure for supporting
+ VMID in lpfc
 To:     Muneendra <muneendra.kumar@broadcom.com>,
         linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
         tj@kernel.org, linux-nvme@lists.infradead.org
-Cc:     jsmart2021@gmail.com, emilne@redhat.com, mkumar@redhat.com
+Cc:     jsmart2021@gmail.com, emilne@redhat.com, mkumar@redhat.com,
+        Gaurav Srivastava <gaurav.srivastava@broadcom.com>
 References: <1617750397-26466-1-git-send-email-muneendra.kumar@broadcom.com>
- <1617750397-26466-3-git-send-email-muneendra.kumar@broadcom.com>
+ <1617750397-26466-5-git-send-email-muneendra.kumar@broadcom.com>
 From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <db9da780-56f8-b33a-eb4c-49380297f8a8@suse.de>
-Date:   Thu, 8 Apr 2021 10:26:44 +0200
+Message-ID: <8bfcafe4-d116-62d5-4f6f-049f6c9fe260@suse.de>
+Date:   Thu, 8 Apr 2021 10:28:34 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.7.0
 MIME-Version: 1.0
-In-Reply-To: <1617750397-26466-3-git-send-email-muneendra.kumar@broadcom.com>
+In-Reply-To: <1617750397-26466-5-git-send-email-muneendra.kumar@broadcom.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -45,69 +47,50 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 4/7/21 1:06 AM, Muneendra wrote:
-> This Patch added a unique application identifier i.e
-> fc_app_id  member in blkcg which allows identification of traffic
-> sources at an individual cgroup based Applications
-> (ex:virtual machine (VM))level in both host and
-> fabric infrastructure.
+> From: Gaurav Srivastava <gaurav.srivastava@broadcom.com>
 > 
-> Added a new function blkcg_get_fc_appid to
-> grab the app identifier associated with a bio.
+> This patch adds the primary datastructures needed to implement VMID
+> in lpfc driver. It maintains the capability, current state,
+> hash table for the vmid/appid along with other information.
+> The implementation supports the two versions of vmid implementation
+> (app header and priority tagging)
 > 
-> Added a new function blkcg_set_fc_appid to
-> set the app identifier in a blkcgrp associated with cgroup id
-> 
-> Added a new config BLK_CGROUP_FC_APPID and moved the changes
-> under this config
-> 
-> Merged the patch 16 of previous version in which we
-> added a new config FC_APPID to select BLK_CGROUP_FC_APPID which Enable
-> support to track FC io Traffic.
-> 
-> Signed-off-by: Muneendra <muneendra.kumar@broadcom.com>
+> Signed-off-by: Gaurav Srivastava <gaurav.srivastava@broadcom.com>
+> Signed-off-by: James Smart <jsmart2021@gmail.com>
 > 
 > ---
 > v9:
-> Merged patch16 of previosu version to this patch
-> where we are using Kconfig settings
+> Updated the data structures
+> Merged patch 5 and 6 of previous version v8 to this patch
 > 
 > v8:
-> No change
+> modify structure member to uniform data type naming scheme
 > 
 > v7:
-> Modified the Kconfig file
+> No change
 > 
 > v6:
-> Modified the Kconfig file as per standard specified
-> in Documentation/process/coding-style.rst
+> No change
 > 
 > v5:
-> Renamed the arguments appropriatley
-> Renamed APPID_LEN  to FC_APPID_LEN
-> Moved the input validation at the begining of the function
-> Modified the comments
+> No Change
 > 
 > v4:
 > No change
 > 
 > v3:
-> Renamed the functions and app_id to more specific
-> 
-> Addressed the reference leaks in blkcg_set_app_identifier
-> 
-> Added a new config BLK_CGROUP_FC_APPID and moved the changes
-> under this config
-> 
-> Added blkcg_get_fc_appid,blkcg_set_fc_appid as inline functions
+> No change
 > 
 > v2:
-> renamed app_identifier to app_id
-> removed the  sysfs interface blkio.app_identifie under
+> Ported the patch on top of 5.10/scsi-queue
+> Removed unused variable.
 > ---
->   block/Kconfig              |  9 ++++++
->   drivers/scsi/Kconfig       | 13 +++++++++
->   include/linux/blk-cgroup.h | 56 ++++++++++++++++++++++++++++++++++++++
->   3 files changed, 78 insertions(+)
+>   drivers/scsi/lpfc/lpfc.h      | 122 +++++++++++++++++++++++++++++++++
+>   drivers/scsi/lpfc/lpfc_crtn.h |  11 +++
+>   drivers/scsi/lpfc/lpfc_disc.h |   1 +
+>   drivers/scsi/lpfc/lpfc_hw.h   | 124 ++++++++++++++++++++++++++++++++--
+>   drivers/scsi/lpfc/lpfc_sli.h  |   8 +++
+>   5 files changed, 262 insertions(+), 4 deletions(-)
 > 
 Reviewed-by: Hannes Reinecke <hare@suse.de>
 
