@@ -2,68 +2,152 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5772C433ED
-	for <linux-block@archiver.kernel.org>; Thu,  8 Apr 2021 16:52:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54E54C433ED
+	for <linux-block@archiver.kernel.org>; Thu,  8 Apr 2021 17:01:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 95211610A2
-	for <linux-block@archiver.kernel.org>; Thu,  8 Apr 2021 16:52:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2FA7B610CC
+	for <linux-block@archiver.kernel.org>; Thu,  8 Apr 2021 17:01:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231480AbhDHQwf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 8 Apr 2021 12:52:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55576 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230522AbhDHQwe (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Apr 2021 12:52:34 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AB3EC061760
-        for <linux-block@vger.kernel.org>; Thu,  8 Apr 2021 09:52:23 -0700 (PDT)
+        id S231875AbhDHRBo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 8 Apr 2021 13:01:44 -0400
+Received: from ale.deltatee.com ([204.191.154.188]:35990 "EHLO
+        ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230522AbhDHRBn (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 8 Apr 2021 13:01:43 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=Q29oYU7+PgQv3ImQdZEytRCH3GU1GnkRUKQuVZW+bJQ=; b=B5D+DmP9E0SNV1OcJ3g5AD9/6X
-        atRPiTH8PjYJjtWbnYbT1VQsmGYvd62WWatBFl7n0iuEoQijEGpz6PR7yyLFJcfIMMbyFUGXxFJqm
-        WROt1IMYokuXgRTzxiSYQo+o2keQgJ3YSo2wleBrgsynwdlhidlZLuwATsz+ssaBoPl8mkti+gBDh
-        6tqJbsOIxrGsqce4AD+yrsIXFv7gAFREfHO7AmFmajn9lINKM5PXqMaNKXzlig85O7lTmSm5ZTAbU
-        YzSjEiezYMBAmkDNyWYu4s5s1pMI1NFNG/riaupYuZ23iGcAxIJ/kdqDLqQ8X1YkzdHHODHI9HJG6
-        Fqrj52vQ==;
-Received: from hch by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1lUXt2-00GY4z-4c; Thu, 08 Apr 2021 16:52:10 +0000
-Date:   Thu, 8 Apr 2021 17:52:08 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Md Haris Iqbal <haris.iqbal@ionos.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org, jinpu.wang@ionos.com,
-        danil.kipnis@ionos.com, Guoqing Jiang <guoqing.jiang@ionos.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Guoqing Jiang <jgq516@gmail.com>
-Subject: Re: [PATCH V5 2/3] block: add a statistic table for io latency
-Message-ID: <20210408165208.GA3944028@infradead.org>
-References: <20210408135840.386076-1-haris.iqbal@ionos.com>
- <20210408135840.386076-3-haris.iqbal@ionos.com>
+        d=deltatee.com; s=20200525; h=Subject:MIME-Version:References:In-Reply-To:
+        Message-Id:Date:Cc:To:From:content-disposition;
+        bh=iSq2Wla16I0EwxIW4Pg1yf1bMgKpM0FYpfWiFtNqs7w=; b=rR8DAPvX19UEk5/HXMkfdOt7Uq
+        JZZUtTjQdQLiA6ZsARzAVhUd/qyWJ+1ueNIw8BEjht46pmkpRGlprqdehWnTom6lrM06RYrYFDERj
+        04fvSttGiBCnQMyfHxxIy6UWaowAWO4qEgQa7mOAV+S9Z7Bn0iU8MZKsqr56pxtAqxEB9xt6nIeIY
+        kuKrq+iiQHSxhwO4dZ4pG32QX9+aMgfsiG+b3m0FyIfrp6ms2+txCbAYtqIoSuMAiaXDIsyTgiabv
+        T707gBge1je59IJJJIAgVxKW987sBi++rH3N8rq8Kw94HBel2wQpUVzHLAMt1IRBowOqnYKnTxhJd
+        KEWsWn+A==;
+Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
+        by ale.deltatee.com with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <gunthorp@deltatee.com>)
+        id 1lUY26-0002Ln-Kj; Thu, 08 Apr 2021 11:01:31 -0600
+Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.92)
+        (envelope-from <gunthorp@deltatee.com>)
+        id 1lUY25-0002Iu-Ee; Thu, 08 Apr 2021 11:01:29 -0600
+From:   Logan Gunthorpe <logang@deltatee.com>
+To:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-mm@kvack.org, iommu@lists.linux-foundation.org
+Cc:     Stephen Bates <sbates@raithlin.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        =?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Don Dutile <ddutile@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Jakowski Andrzej <andrzej.jakowski@intel.com>,
+        Minturn Dave B <dave.b.minturn@intel.com>,
+        Jason Ekstrand <jason@jlekstrand.net>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Xiong Jianxin <jianxin.xiong@intel.com>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Logan Gunthorpe <logang@deltatee.com>
+Date:   Thu,  8 Apr 2021 11:01:11 -0600
+Message-Id: <20210408170123.8788-5-logang@deltatee.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20210408170123.8788-1-logang@deltatee.com>
+References: <20210408170123.8788-1-logang@deltatee.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210408135840.386076-3-haris.iqbal@ionos.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 172.16.1.31
+X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, iommu@lists.linux-foundation.org, sbates@raithlin.com, hch@lst.de, jgg@ziepe.ca, christian.koenig@amd.com, jhubbard@nvidia.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, jason@jlekstrand.net, dave.hansen@linux.intel.com, helgaas@kernel.org, dan.j.williams@intel.com, andrzej.jakowski@intel.com, dave.b.minturn@intel.com, jianxin.xiong@intel.com, ira.weiny@intel.com, robin.murphy@arm.com, logang@deltatee.com
+X-SA-Exim-Mail-From: gunthorp@deltatee.com
+Subject: [PATCH 04/16] PCI/P2PDMA: Refactor pci_p2pdma_map_type() to take pagmap and device
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> +static ssize_t io_latency_show(struct device *dev, struct device_attribute *attr, char *buf)
-> +{
-> +	struct block_device *bdev = dev_to_bdev(dev);
-> +	size_t count = 0;
-> +	int i, sgrp;
-> +
-> +	for (i = 0; i < ADD_STAT_NUM; i++) {
-> +		unsigned int from, to;
-> +
-> +		if (i == ADD_STAT_NUM - 1) {
-> +			count += scnprintf(buf + count, PAGE_SIZE - count, "      >= %5d  ms: ",
+All callers of pci_p2pdma_map_type() have a struct dev_pgmap and a
+struct device (of the client doing the DMA transfer). Thus move the
+conversion to struct pci_devs for the provider and client into this
+function.
 
-Please fix your overly long lines all over this code.
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+---
+ drivers/pci/p2pdma.c | 29 +++++++++++------------------
+ 1 file changed, 11 insertions(+), 18 deletions(-)
+
+diff --git a/drivers/pci/p2pdma.c b/drivers/pci/p2pdma.c
+index 2574a062a255..bcb1a6d6119d 100644
+--- a/drivers/pci/p2pdma.c
++++ b/drivers/pci/p2pdma.c
+@@ -822,14 +822,21 @@ void pci_p2pmem_publish(struct pci_dev *pdev, bool publish)
+ }
+ EXPORT_SYMBOL_GPL(pci_p2pmem_publish);
+ 
+-static enum pci_p2pdma_map_type pci_p2pdma_map_type(struct pci_dev *provider,
+-						    struct pci_dev *client)
++static enum pci_p2pdma_map_type pci_p2pdma_map_type(struct dev_pagemap *pgmap,
++						    struct device *dev)
+ {
++	struct pci_dev *provider = to_p2p_pgmap(pgmap)->provider;
+ 	enum pci_p2pdma_map_type ret;
++	struct pci_dev *client;
+ 
+ 	if (!provider->p2pdma)
+ 		return PCI_P2PDMA_MAP_NOT_SUPPORTED;
+ 
++	if (!dev_is_pci(dev))
++		return PCI_P2PDMA_MAP_NOT_SUPPORTED;
++
++	client = to_pci_dev(dev);
++
+ 	ret = xa_to_value(xa_load(&provider->p2pdma->map_types,
+ 				  map_types_idx(client)));
+ 	if (ret != PCI_P2PDMA_MAP_UNKNOWN)
+@@ -871,14 +878,8 @@ int pci_p2pdma_map_sg_attrs(struct device *dev, struct scatterlist *sg,
+ {
+ 	struct pci_p2pdma_pagemap *p2p_pgmap =
+ 		to_p2p_pgmap(sg_page(sg)->pgmap);
+-	struct pci_dev *client;
+-
+-	if (WARN_ON_ONCE(!dev_is_pci(dev)))
+-		return 0;
+ 
+-	client = to_pci_dev(dev);
+-
+-	switch (pci_p2pdma_map_type(p2p_pgmap->provider, client)) {
++	switch (pci_p2pdma_map_type(sg_page(sg)->pgmap, dev)) {
+ 	case PCI_P2PDMA_MAP_THRU_HOST_BRIDGE:
+ 		return dma_map_sg_attrs(dev, sg, nents, dir, attrs);
+ 	case PCI_P2PDMA_MAP_BUS_ADDR:
+@@ -901,17 +902,9 @@ EXPORT_SYMBOL_GPL(pci_p2pdma_map_sg_attrs);
+ void pci_p2pdma_unmap_sg_attrs(struct device *dev, struct scatterlist *sg,
+ 		int nents, enum dma_data_direction dir, unsigned long attrs)
+ {
+-	struct pci_p2pdma_pagemap *p2p_pgmap =
+-		to_p2p_pgmap(sg_page(sg)->pgmap);
+ 	enum pci_p2pdma_map_type map_type;
+-	struct pci_dev *client;
+-
+-	if (WARN_ON_ONCE(!dev_is_pci(dev)))
+-		return;
+-
+-	client = to_pci_dev(dev);
+ 
+-	map_type = pci_p2pdma_map_type(p2p_pgmap->provider, client);
++	map_type = pci_p2pdma_map_type(sg_page(sg)->pgmap, dev);
+ 
+ 	if (map_type == PCI_P2PDMA_MAP_THRU_HOST_BRIDGE)
+ 		dma_unmap_sg_attrs(dev, sg, nents, dir, attrs);
+-- 
+2.20.1
 
