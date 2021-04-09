@@ -2,109 +2,219 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD606C43460
-	for <linux-block@archiver.kernel.org>; Fri,  9 Apr 2021 10:10:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57B28C433B4
+	for <linux-block@archiver.kernel.org>; Fri,  9 Apr 2021 11:48:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9F1B2611BE
-	for <linux-block@archiver.kernel.org>; Fri,  9 Apr 2021 10:10:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 32E5961181
+	for <linux-block@archiver.kernel.org>; Fri,  9 Apr 2021 11:48:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233932AbhDIKK7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 9 Apr 2021 06:10:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:29456 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233161AbhDIKI5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 9 Apr 2021 06:08:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617962923;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=oNMVN+ZpLxOlEBrMndSNgg2ueOW5AUOLMBDhmanRFKI=;
-        b=EOpafZs0sjzV4H25fYRBZMptjwvk5TgwxrzAOID/fQyePCn9dQ7xECr2NxGdE5/576Deo+
-        opRvNo2c/ArLRMCSrMzLVqXgU1+1r3aH95NAiMyjjmnRbQoykReDVMg+ej3Cv8LQn5ZAwg
-        BDkrnB3SUi1+bG7n9rNwUbLN379+Maw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-540-ZV6ab0s8PwejAxmhCgL-cQ-1; Fri, 09 Apr 2021 06:08:41 -0400
-X-MC-Unique: ZV6ab0s8PwejAxmhCgL-cQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S233362AbhDILsg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 9 Apr 2021 07:48:36 -0400
+Received: from mx2.veeam.com ([64.129.123.6]:50192 "EHLO mx2.veeam.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233153AbhDILsg (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 9 Apr 2021 07:48:36 -0400
+Received: from mail.veeam.com (prgmbx01.amust.local [172.24.0.171])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9CC11189C441;
-        Fri,  9 Apr 2021 10:08:40 +0000 (UTC)
-Received: from dhcp-27-174.brq.redhat.com (unknown [10.40.195.207])
-        by smtp.corp.redhat.com (Postfix) with SMTP id 1466218400;
-        Fri,  9 Apr 2021 10:08:38 +0000 (UTC)
-Received: by dhcp-27-174.brq.redhat.com (nbSMTP-1.00) for uid 1000
-        oleg@redhat.com; Fri,  9 Apr 2021 12:08:40 +0200 (CEST)
-Date:   Fri, 9 Apr 2021 12:08:37 +0200
-From:   Oleg Nesterov <oleg@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Peter Zijlstra <peterz@infradead.org>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] block: Fix sys_ioprio_set(.which=IOPRIO_WHO_PGRP) task
- iteration
-Message-ID: <20210409100836.GB10447@redhat.com>
-References: <YG7Q5C4Rb5dx5GFx@hirez.programming.kicks-ass.net>
- <e8579a4e-2456-a89b-b750-892d265ba053@kernel.dk>
+        by mx2.veeam.com (Postfix) with ESMTPS id EA95F4031D;
+        Fri,  9 Apr 2021 07:48:18 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com; s=mx2;
+        t=1617968899; bh=+2bPtzUzVtQpEC7fz562SgI0kxywzXxLV22LRhp0aV8=;
+        h=From:To:CC:Subject:Date:In-Reply-To:References:From;
+        b=bGioDGFC4vYO9Kw7IENWqkl83hoPIRbfgkGl43DlVtL41g1K5aw1qFJbPFNXnDiLV
+         utbTxsaUj8QkBQ+y1b8W8P14BLWqGWyxlr4kFIHJsp6CgkQixftfncqXs6gvK/Puy/
+         CsyvkbjxziPKG2smA5sKl2du5GnSKfC42NC44rAg=
+Received: from prgdevlinuxpatch01.amust.local (172.24.14.5) by
+ prgmbx01.amust.local (172.24.0.171) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.721.2;
+ Fri, 9 Apr 2021 13:48:17 +0200
+From:   Sergei Shtepa <sergei.shtepa@veeam.com>
+To:     Christoph Hellwig <hch@infradead.org>,
+        Hannes Reinecke <hare@suse.de>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, <dm-devel@redhat.com>,
+        <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+CC:     <sergei.shtepa@veeam.com>, <pavel.tide@veeam.com>
+Subject: [PATCH v8 1/4] Adds blk_interposer. It allows to redirect bio requests to another block device.
+Date:   Fri, 9 Apr 2021 14:48:01 +0300
+Message-ID: <1617968884-15149-2-git-send-email-sergei.shtepa@veeam.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1617968884-15149-1-git-send-email-sergei.shtepa@veeam.com>
+References: <1617968884-15149-1-git-send-email-sergei.shtepa@veeam.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e8579a4e-2456-a89b-b750-892d265ba053@kernel.dk>
-User-Agent: Mutt/1.5.24 (2015-08-30)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Type: text/plain
+X-Originating-IP: [172.24.14.5]
+X-ClientProxiedBy: prgmbx01.amust.local (172.24.0.171) To prgmbx01.amust.local
+ (172.24.0.171)
+X-EsetResult: clean, is OK
+X-EsetId: 37303A29D2A50B59657262
+X-Veeam-MMEX: True
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 04/08, Jens Axboe wrote:
->
-> On 4/8/21 3:46 AM, Peter Zijlstra wrote:
-> >
-> > do_each_pid_thread() { } while_each_pid_thread() is a double loop and
-> > thus break doesn't work as expected. Also, it should be used under
-> > tasklist_lock because otherwise we can race against change_pid() for
-> > PGID/SID.
->
-> Applied, thanks.
+Signed-off-by: Sergei Shtepa <sergei.shtepa@veeam.com>
+---
+ block/genhd.c             | 51 +++++++++++++++++++++++++++++++++++++++
+ fs/block_dev.c            |  3 +++
+ include/linux/blk_types.h |  6 +++++
+ include/linux/blkdev.h    | 32 ++++++++++++++++++++++++
+ 4 files changed, 92 insertions(+)
 
-Agreed, but can't resist. We can move the "out" label up and avoid the extra
-read_unlock(tasklist_lock). IOW, something like below on top of this patch.
-
-Quite possibly this won't change the generated code, gcc is smart enough, but
-this makes the code a bit more readable.
-
-Oleg.
-
---- x/block/ioprio.c~	2021-04-09 12:00:28.066145563 +0200
-+++ x/block/ioprio.c	2021-04-09 12:02:01.817849618 +0200
-@@ -123,11 +123,10 @@
- 			read_lock(&tasklist_lock);
- 			do_each_pid_thread(pgrp, PIDTYPE_PGID, p) {
- 				ret = set_task_ioprio(p, ioprio);
--				if (ret) {
--					read_unlock(&tasklist_lock);
--					goto out;
--				}
-+				if (ret)
-+					goto out_pgrp;
- 			} while_each_pid_thread(pgrp, PIDTYPE_PGID, p);
-+out_pgrp:
- 			read_unlock(&tasklist_lock);
- 
- 			break;
-@@ -159,7 +158,6 @@
- 			ret = -EINVAL;
- 	}
- 
--out:
- 	rcu_read_unlock();
- 	return ret;
+diff --git a/block/genhd.c b/block/genhd.c
+index 8c8f543572e6..533b33897187 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -1938,3 +1938,54 @@ static void disk_release_events(struct gendisk *disk)
+ 	WARN_ON_ONCE(disk->ev && disk->ev->block != 1);
+ 	kfree(disk->ev);
  }
++
++/**
++ * bdev_interposer_attach - Attach interposer block device to original
++ * @original: original block device
++ * @interposer: interposer block device
++ *
++ * Before attaching the interposer, it is necessary to lock the processing
++ * of bio requests of the original device by calling the bdev_interposer_lock().
++ *
++ * The bdev_interposer_detach() function allows to detach the interposer
++ * from original block device.
++ */
++int bdev_interposer_attach(struct block_device *original,
++			   struct block_device *interposer)
++{
++	struct block_device *bdev;
++
++	WARN_ON(!original);
++	if (original->bd_interposer)
++		return -EBUSY;
++
++	bdev = bdgrab(interposer);
++	if (!bdev)
++		return -ENODEV;
++
++	original->bd_interposer = bdev;
++	return 0;
++}
++EXPORT_SYMBOL_GPL(bdev_interposer_attach);
++
++/**
++ * bdev_interposer_detach - Detach interposer from block device
++ * @original: original block device
++ *
++ * Before detaching the interposer, it is necessary to lock the processing
++ * of bio requests of the original device by calling the bdev_interposer_lock().
++ *
++ * The interposer should be attached using function bdev_interposer_attach().
++ */
++void bdev_interposer_detach(struct block_device *original)
++{
++	if (WARN_ON(!original))
++		return;
++
++	if (!original->bd_interposer)
++		return;
++
++	bdput(original->bd_interposer);
++	original->bd_interposer = NULL;
++}
++EXPORT_SYMBOL_GPL(bdev_interposer_detach);
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 09d6f7229db9..a98a56cc634f 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -809,6 +809,7 @@ static void bdev_free_inode(struct inode *inode)
+ {
+ 	struct block_device *bdev = I_BDEV(inode);
+ 
++	percpu_free_rwsem(&bdev->bd_interposer_lock);
+ 	free_percpu(bdev->bd_stats);
+ 	kfree(bdev->bd_meta_info);
+ 
+@@ -909,6 +910,8 @@ struct block_device *bdev_alloc(struct gendisk *disk, u8 partno)
+ 		iput(inode);
+ 		return NULL;
+ 	}
++	bdev->bd_interposer = NULL;
++	percpu_init_rwsem(&bdev->bd_interposer_lock);
+ 	return bdev;
+ }
+ 
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index db026b6ec15a..8e4309eb3b18 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -46,6 +46,11 @@ struct block_device {
+ 	spinlock_t		bd_size_lock; /* for bd_inode->i_size updates */
+ 	struct gendisk *	bd_disk;
+ 	struct backing_dev_info *bd_bdi;
++	/* The interposer allows to redirect bio to another device */
++	struct block_device	*bd_interposer;
++	/* Lock the queue of block device to attach or detach interposer.
++	 * Allows to safely suspend and flush interposer. */
++	struct percpu_rw_semaphore bd_interposer_lock;
+ 
+ 	/* The counter of freeze processes */
+ 	int			bd_fsfreeze_count;
+@@ -304,6 +309,7 @@ enum {
+ 	BIO_CGROUP_ACCT,	/* has been accounted to a cgroup */
+ 	BIO_TRACKED,		/* set if bio goes through the rq_qos path */
+ 	BIO_REMAPPED,
++	BIO_INTERPOSED,		/* bio was reassigned to another block device */
+ 	BIO_FLAG_LAST
+ };
+ 
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 158aefae1030..9e376ee34e19 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -2029,4 +2029,36 @@ int fsync_bdev(struct block_device *bdev);
+ int freeze_bdev(struct block_device *bdev);
+ int thaw_bdev(struct block_device *bdev);
+ 
++/**
++ * bdev_interposer_lock - Lock bio processing
++ * @bdev: locking block device
++ *
++ * Lock the bio processing in submit_bio_noacct() for the new requests in the
++ * original block device. Requests from interposer will not be locked.
++ *
++ * To unlock, use the function bdev_interposer_unlock().
++ *
++ * This lock should be used to attach/detach interposer to the device.
++ */
++static inline void bdev_interposer_lock(struct block_device *bdev)
++{
++	percpu_down_write(&bdev->bd_interposer_lock);
++}
++
++/**
++ * bdev_interposer_unlock - Unlock bio processing
++ * @bdev: locked block device
++ *
++ * Unlock the bio processing that was locked by function bdev_interposer_lock().
++ *
++ * This lock should be used to attach/detach interposer to the device.
++ */
++static inline void bdev_interposer_unlock(struct block_device *bdev)
++{
++	percpu_up_write(&bdev->bd_interposer_lock);
++}
++
++int bdev_interposer_attach(struct block_device *original,
++			   struct block_device *interposer);
++void bdev_interposer_detach(struct block_device *original);
+ #endif /* _LINUX_BLKDEV_H */
+-- 
+2.20.1
 
