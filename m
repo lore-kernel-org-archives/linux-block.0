@@ -2,155 +2,253 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,PDS_BAD_THREAD_QP_64,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F6FFC433ED
-	for <linux-block@archiver.kernel.org>; Fri,  9 Apr 2021 21:05:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3701C433B4
+	for <linux-block@archiver.kernel.org>; Sat, 10 Apr 2021 00:22:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BB36061181
-	for <linux-block@archiver.kernel.org>; Fri,  9 Apr 2021 21:05:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 999006113A
+	for <linux-block@archiver.kernel.org>; Sat, 10 Apr 2021 00:22:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234079AbhDIVF4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 9 Apr 2021 17:05:56 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:23935 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233687AbhDIVF4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Apr 2021 17:05:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1618002342; x=1649538342;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=m+OzlR8a7Bhy0iScniw5yn71i5a2X+ld8zYLpHW2l3g=;
-  b=o7eiyb9UhEJm4CsZZgOyn0NJkd7gviLrGl167V9ZnRPPISnZ91HapgtZ
-   Nc4HqpdAF6YcQo06XaD0AU+50Gpcotzr3cS9R3Qza2u5DEoc83St8lj4I
-   GNxP1ENvvUp/+FshSTFjttVjKl+1KovaNCpLZT+9FOmPJ9iHE7BI1a1wE
-   T2j3mjCl/X+QtonH7l7IEsnfOvdimAiUf3dWwHoGbkSOHXw0YXx3okjXZ
-   NMGHnXSPyS23/l8hfP3B/HVYtK2Ma1vOBJMBKbhmMtfS3gdbTLCMXBrCf
-   JYkog63LSryTDHiM/WvyDj6nxjmIzopvjRYO+Uvni1GBamMZF7Bn4q+vc
-   A==;
-IronPort-SDR: BzPRSZTXrEn9D6xV2UzezBWkRigIoatoACXl65s76hPZ+tGGEm/tA6XF4UuEi9auw0kSGIxdoc
- XYX91HXQ8nNZunqr8C7EaFU8/FzfrjLCit18qsbIXWVxymJubzsKi27tNej5RQGUH/akzC6FLJ
- bUCa9DdrdqS4kpBiOvrPNR7ONrwy97TlX+AIaUtra1CCHcMG+gF3DSK8gZ/iHIa+dostwTcQKR
- QpdTO1ljAYtMnF4jQMMdLJ1m654v+viWXOrc4ARQmnBvXZ0e2pkL7K3PbA2KgX4+3L1sOCi1Pm
- nVo=
-X-IronPort-AV: E=Sophos;i="5.82,210,1613404800"; 
-   d="scan'208";a="168838965"
-Received: from mail-mw2nam08lp2175.outbound.protection.outlook.com (HELO NAM04-MW2-obe.outbound.protection.outlook.com) ([104.47.73.175])
-  by ob1.hgst.iphmx.com with ESMTP; 10 Apr 2021 05:05:42 +0800
+        id S235231AbhDJAWW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 9 Apr 2021 20:22:22 -0400
+Received: from mail-mw2nam12on2042.outbound.protection.outlook.com ([40.107.244.42]:7328
+        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S235215AbhDJAWV (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 9 Apr 2021 20:22:21 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lr4Ws3KOzHhdKzGwHy+ZCNk3hL0uWGs/7EsE4EKsBX5SkM0cj9mO27DyQgJ5tDClwrhTsp1clxQ026Oiz4VBQIYh/2dKqGK5pSx0SI4eI203UkHAgoc3BOlmYxzNyjib0gBLoLICGY3BeDYJ/y83JGoR4M6f6fxjdzLclEmF0Zurv50yU7C0QHRoEQcPpqQirKKOsKQRAaP1g6cbGeHua4LDg9ItCB2w3BNiHoeh02s8qIHb+S3wT6nlk6gMqswVC3zSX152MgBdF98uTWRDtVsRb6TYBDB6kftcMOXRQlU2HdLgcJFdVhbfJVSncpCPcO7esp17tZwKBzb5Dt+eGQ==
+ b=GlxEfLzrhaPdoQosaNtbcTNs59up3rdx52tgXQIloxfIkIZwgPPEIYOTyfvOSikhxfZTHztmJkK7/L+NlOqaqYebkZ8zQrqIaSEwCCo1c0GaH3yhmOiCrSyw4DKcC+2rQyZA26+kiBkVeatQQAxkCf7o8gOHTsn9xoYwUZkaVh+TXkU1nlI5i+/c0iilE4qdKCAINjuTTwLD4B3UeO9PYZab8cmug/9cXDVLlCDZ4UA6uFicOxu0qbkoyoDczqWtE6SP/vKx2XPzIWktHhKKgyHTf4PHLb081e62Wdvqoab+llc1aVthtPKt+fCRmkMGwOH7X6h5Jo1I9X201JUhUQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=m+OzlR8a7Bhy0iScniw5yn71i5a2X+ld8zYLpHW2l3g=;
- b=gtaSB1qlpbAgQ/NG1QbF8AFa1vor//Xf7RMWc+yDNcaVZ/ilyyRw/eCsbkvwzqKwDY0yWBPEPzExaeQdu12w2Dht5gbwjXONXHkP12nBnCZKV/QdoAIH8VKXpd2i6o8QdOd+sAXC8C92k6styoYmB9W+QMQ76PZHZXuOinr+WMFhlXu8TXhi5vW+qu8Au2fqqp86LbIDWCLMVNepyRZaHT7HvACbscRiMn6OBXvSpLe31K/qQfft9MtW6/m420iUDEVjmSzB6Tf98JOMsh25KI1TtBG1aEsgKYUs9ihqsn+kWzMyCwuQ8vdUX7Xny4FEZC9WAm0PfDBP/vWXUcUOsg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ bh=qTNVcLQfO3+hLDF1G2Bydtq6ipe4vouwA42qltinQO8=;
+ b=KNYzT2WQEwP3Dwkxiu4PG2gkGHqBTTdO0jtgbfsw1A/qn6UoJI9akXAx500VEr/VxOBM3MbbNYpDhpKnS28d6zrE37OyKHcxjZoLPGieyKXzvHb15FwYNY1fnmmgGz+/5c4id6utuL6023KgszgWqIyU3Wh9mLk8gkssUYqJHvZudtnK7iBPZpnmjP/snSXsJ8jH8Sa6gWlJ7cugal4Ms+M0ODGOhaHQCt854ifGkhlEUIyxGA2eiCi0IVGRguXyeO1lJszAYnTe7uq8ZETSFuMlp9MfNZ88RGXm8VXs5+t9ut0Hi2U+WP/omtuWaDrZgF1GznsNaqqCzC/x085jUA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.112.34) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=none sp=none pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=m+OzlR8a7Bhy0iScniw5yn71i5a2X+ld8zYLpHW2l3g=;
- b=tChoEnvDJ5egthuJtPAzDVQhcwGLVstXND8CCitwQBceQRsCu9bvzgLKE6FFLfnvcUzhtsSusP45HGvzsd1Mbev2DJJkDdVHLLsmBt1WF0uIXmLOXsDhtDdh9qRH0qk3ZukHuUWKWhEU51EQnuedbEQra+A1YpzEmfjoQZfVEHw=
-Received: from BYAPR04MB4965.namprd04.prod.outlook.com (2603:10b6:a03:4d::25)
- by BYAPR04MB4983.namprd04.prod.outlook.com (2603:10b6:a03:41::29) with
+ bh=qTNVcLQfO3+hLDF1G2Bydtq6ipe4vouwA42qltinQO8=;
+ b=NRj2vuU1DS2kU8yTG675GzuEqtx6QWirEZIWvHSJIM43yTPsWAYqq80ea/Rj77Im3FSxGMredLtwvf+xvej9XUI0tV4/w9aYbZ9EnQmMIF0+dx0wxovcRTdb937DMAB5/p9PV1p2qrI1Ll4bhJb/K2EoinPQJfI7MSZ5hCitFVstzMO+9IusJHLEg/tRqQEhGZLd+dYpLjvkXtPeYd/T2bHcqpw+r1109ZvzmoNI7ZRFg6VXJljm1w5LRhnv5KSgNZ4JctohgBvtRJmSTC5YtTFxhvBfwYShNT2OUtus4s9XAxR+A7TMh0D1aomxNfrmj075Qz5aIBLqWRWiYlRo7w==
+Received: from MW4PR03CA0100.namprd03.prod.outlook.com (2603:10b6:303:b7::15)
+ by MN2PR12MB3760.namprd12.prod.outlook.com (2603:10b6:208:158::33) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3999.32; Fri, 9 Apr
- 2021 21:05:41 +0000
-Received: from BYAPR04MB4965.namprd04.prod.outlook.com
- ([fe80::c897:a1f8:197a:706b]) by BYAPR04MB4965.namprd04.prod.outlook.com
- ([fe80::c897:a1f8:197a:706b%5]) with mapi id 15.20.4020.018; Fri, 9 Apr 2021
- 21:05:41 +0000
-From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-To:     Christoph Hellwig <hch@lst.de>, "axboe@kernel.dk" <axboe@kernel.dk>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Guenter Roeck <linux@roeck-us.net>
-Subject: Re: [PATCH] block: remove an incorrect check from blk_rq_append_bio
-Thread-Topic: [PATCH] block: remove an incorrect check from blk_rq_append_bio
-Thread-Index: AQHXLVIhnbAUCrjeUEWRiLlw2HVagA==
-Date:   Fri, 9 Apr 2021 21:05:41 +0000
-Message-ID: <BYAPR04MB49650B2BA566ADC01F4323BE86739@BYAPR04MB4965.namprd04.prod.outlook.com>
-References: <20210409150447.1977410-1-hch@lst.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: lst.de; dkim=none (message not signed)
- header.d=none;lst.de; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [199.255.45.62]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: f3791c23-0bed-4c1d-6562-08d8fb9b3bc2
-x-ms-traffictypediagnostic: BYAPR04MB4983:
-x-microsoft-antispam-prvs: <BYAPR04MB4983642E637ABDE17099D4CF86739@BYAPR04MB4983.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:669;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: UdJeKza3SDG3WLZ3Q5C2OPenHKbnzRjo6AGbR0HqT/0fkwO4U/Y6j2aN2chLa6BRWPDFGNSRoyzZeM7C60c1bmbAmsHFQ96vVXDBfh8LDFT882wvaqWPIc6co4dQw/2uUT525JFXQ9NDGZYYtv48xxkPlS1/B0+NxmOlX5VpSfgRXNeKZJeMoa3PQ1CCPT8lNp3h90XDFH4TlGU49C8coz6eHr7sbUWUczJiQIKrxMng0IT87v3OUnkb39jbxQzf4CUVOP/AtNcfsTjo/hVALZm0Qrr4R516JTDdLnSVwUB9J6epTJe4qjy4Q6QBaS8vxjxRNM614zJaPndj9qsDp4O+zrt3hkr51IuGUsOqsowDwHFL5KH2ZIO1K4gs4zD2tMUWd6HT+wt2to4W4qbf84dkkBv04iYLTPjyn5O6HB8/Vi5WQAKpN6R5YirR+Dh4FBWA7EXcFwUPMnMiMC3HlWQ38tQTeBZI7aXmuBQ6O8g6UjhqsgD1bfsUAtbQm5xmc3udgJwYwzHNSnakApPLuq9CVNjLvZrwSBTEBEYZIqC117AGMkspqn9Z9wIeM/4OujCEeyBsxvj/KQ68XC6wFNmmGbrOHaJItWDO74wLtJJYEV0xCas2CoOvoQsIDGxWgU/+gvLBdIl5VRn4OpmGvA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR04MB4965.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(346002)(366004)(39860400002)(136003)(396003)(8676002)(33656002)(76116006)(66476007)(55016002)(66946007)(4744005)(64756008)(66446008)(186003)(2906002)(66556008)(38100700001)(478600001)(83380400001)(53546011)(110136005)(8936002)(52536014)(7696005)(6506007)(4326008)(5660300002)(54906003)(9686003)(71200400001)(86362001)(26005)(316002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: =?us-ascii?Q?Kf1hoi/IlpDphvn5AYCO0Qo/sLonso7d7uzWugk0CiY/COpnFLD7dD86vnV9?=
- =?us-ascii?Q?oTm0zKaTa07DpmiHF8TrgCd/WousV+xxrsWeWD8ZNbMZdvZXPVbrwQGkxk6e?=
- =?us-ascii?Q?5XNgh8pUt2vMDllN8ZOhdlv90LvyQki3ESSlL50g6tJ6s9/5QqmKSFf/gsVc?=
- =?us-ascii?Q?fnYth2bfjp3jgK2YalhBLmQgjjpLyCHVQC/uLepbE+STmdQcrIBo+PeQ8eSV?=
- =?us-ascii?Q?8dKIOpYFCxMx8+41MWpUI2kC7a672aw5MH4tZjzlTPBW82qs3nCBHQoWBGAk?=
- =?us-ascii?Q?UNBlaNTN/EkTxhg57nEVTQO3NVXDwHi4g9XRWd4fNxft2bFZH1Ts/RnbOn39?=
- =?us-ascii?Q?PBx/Os1BCs7lJWtJDjS6YBAImIPsn0H87E1a/Q06EoRsXqyozLnBNDRkU37P?=
- =?us-ascii?Q?nk704+w9BfWU3CqquT9+hKRykViHmrVX/ahohGSPfjsvw2UDAV9OdDl8uy1D?=
- =?us-ascii?Q?aX6S+T3klpvUW/eBR/zvk8kXAxyvr58eELhKat5KctYXq221+9KtR/pam3oy?=
- =?us-ascii?Q?5SGaqqEZKfxjngI+i/3SijkWehLusU41m2SJKfi0uLCb5MWnOGZbkLcQg/Mi?=
- =?us-ascii?Q?+8w6ckRSzIsaLOsH25+Bg2NvhnCby5rH0htpq2RIKGkBV0VfKZFyzz3cSpH8?=
- =?us-ascii?Q?IHmqUb8BlNFYzUa1yZvcUn9fdgZtOpzbacegSuZImLpEz3pV881tYLgLwvQu?=
- =?us-ascii?Q?d7N8ly0yXRTQluKKgtNBN3QprHyIUV3fqzs0pQ/ZUxsV9yxdjIMBU7uRKEms?=
- =?us-ascii?Q?rfmdg6YIXPd34CcpHdvcblJ9fjqd2/+l5XqkD0VEywwLL7wvpIJNWlJSKq9e?=
- =?us-ascii?Q?EoqBp8cxBAY5REO18kzZ4BS/kC08ouTBOFrzeADlQILKOtU/oBnEnAlRGgba?=
- =?us-ascii?Q?OhNViJpRRmQaAL9LRmSwe/6DNoFgkEDFtQdZtDsivy3f3oMbVlc+qBqmSBx2?=
- =?us-ascii?Q?IoU0fkDK6MmuJohQFNsnP/YyIQvwHhQfruk2Oxl694DH1GTu50zNNcAmVvaH?=
- =?us-ascii?Q?ufiM3XChEDYe/fMM5i3nwiWbSzUm9i96Q8WxymLR3YhS+N7VQKh8D8+UqkAo?=
- =?us-ascii?Q?EXI/SFQQkx2nYNGYFNWnWWpQF5iZobfBVpB8o+/dwnr+lnjMf3QUkPVH8Qmy?=
- =?us-ascii?Q?omRfDh7eyLqrDwHSm5y1FJ8+MLXpsqTUmy6WYL86kBFlmvH359+25Zct8bGa?=
- =?us-ascii?Q?BpEdySPiDi5JM7LgzTrsTx4+t3YgbmPfgT9a8T7DKQEb1KC0BQRbHTbAhleI?=
- =?us-ascii?Q?1zm7dFEkje3O5fBTSJRuX97XVluo8TC9+TaCMdLQQBAEKQNXytiRbu/U3cYQ?=
- =?us-ascii?Q?Aofis3Yn5AZa44pvu/+voXpX5I3p+AdWJkr0Ewly+b/GXg=3D=3D?=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4020.16; Sat, 10 Apr
+ 2021 00:22:05 +0000
+Received: from CO1NAM11FT032.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:303:b7::4) by MW4PR03CA0100.outlook.office365.com
+ (2603:10b6:303:b7::15) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4020.16 via Frontend
+ Transport; Sat, 10 Apr 2021 00:22:05 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
+ smtp.mailfrom=nvidia.com; redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.34; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.34) by
+ CO1NAM11FT032.mail.protection.outlook.com (10.13.174.218) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.4020.17 via Frontend Transport; Sat, 10 Apr 2021 00:22:05 +0000
+Received: from [172.27.0.23] (172.20.145.6) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Sat, 10 Apr
+ 2021 00:22:00 +0000
+Subject: Re: [RFC PATCH v5 0/4] add simple copy support
+To:     SelvaKumar S <selvakuma.s1@samsung.com>,
+        <linux-nvme@lists.infradead.org>
+CC:     <axboe@kernel.dk>, <damien.lemoal@wdc.com>, <kch@kernel.org>,
+        <sagi@grimberg.me>, <snitzer@redhat.com>, <selvajove@gmail.com>,
+        <linux-kernel@vger.kernel.org>, <nj.shetty@samsung.com>,
+        <linux-block@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+        <dm-devel@redhat.com>, <joshi.k@samsung.com>,
+        <javier.gonz@samsung.com>, <kbusch@kernel.org>,
+        <joshiiitr@gmail.com>, <hch@lst.de>
+References: <CGME20210219124555epcas5p1334e7c4d64ada5dc4a2ca0feb48c1d44@epcas5p1.samsung.com>
+ <20210219124517.79359-1-selvakuma.s1@samsung.com>
+From:   Max Gurtovoy <mgurtovoy@nvidia.com>
+Message-ID: <b56a18a0-facc-edb3-c809-7436f1b1c15a@nvidia.com>
+Date:   Sat, 10 Apr 2021 03:21:57 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.9.0
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR04MB4965.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f3791c23-0bed-4c1d-6562-08d8fb9b3bc2
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Apr 2021 21:05:41.1944
+In-Reply-To: <20210219124517.79359-1-selvakuma.s1@samsung.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [172.20.145.6]
+X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 9c6b6fc5-c84c-4c8b-760e-08d8fbb6abc0
+X-MS-TrafficTypeDiagnostic: MN2PR12MB3760:
+X-Microsoft-Antispam-PRVS: <MN2PR12MB376038DB67663D780AAF3F98DE729@MN2PR12MB3760.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:5516;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: IXIQ1Y9S2hrdwTPcTmnwVJrmz4tqrXFi2Kw9wCdqwQR+01ULjcjNJQ9wc5N3ISPaNPEYKFBVOptWkvQW3jnR42W0pj4+y7KmJQpv7AMNA51brNY7InQKkTugB0lW/Fr/rOJBbwO1RU5tyYTtb5vX/Ywuo8w1/qQZVFK+fb/FtxIqp7KIAoMaLuoHTPpET3O0ghIycGMME0kx5U+JrU8s1NsMVB4a5QsTgMmaxBVcQ+HozMFnGB2Gk4QJZFjh8oS0Yp9HO7MExX/U4xifhgC3p1xeHY6rQTgQkuVnV8sVsOqnns0dRH8hryCMc+dTZ19fu+Z6oSrvwm6i2kuomVgY2p+VdLEula9LCa7ggaFS0RsdjccxG51PsUST24XHgQDnZhB1kmAxjXJNuklX5DHWTzhfQhUlGHgFDswt6bEde72Mp6fKeBQj5L5QzNtdsXMeMFHllf/oZtX0PIKViVwMJAGkQpaqh0DAD2WRsie1yQnmlUGDrjvUCx5k2VmlT9WWQBm02YtZO8GQeK0kJ0x123mJay7SmEUDmj7zw6xrmwJKjfZIEeb1w6mImTWCAG/7bRGHqKKOQrjD5IPzGu/r8M1McglVB0bulE4PiFww9/0Jw366rhCEgTxQ1Bokroc3W6bhDlNH4fd8SmzHoscTDto9eyNi5Pf3eLBO6+zkqvqKM5gmwHXtD1go4eP13uuVkSykqw6t8yQ05hD4NBCWkZkXa4DT/8vzPiWKrYTUOeGtCfy+s1bCPtLTD7Bxvv/QA/skONlPsI+kc1xLeC6mzFIFOVT+YrQ4JG0an2Lf+DcXkUzrMOIPGe7QRN8FNoLbrk44gOa5yE63BVaJj4EOtA==
+X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(346002)(136003)(376002)(396003)(39860400002)(46966006)(36840700001)(36756003)(2616005)(82740400003)(16526019)(6666004)(478600001)(82310400003)(966005)(31686004)(186003)(2906002)(26005)(36860700001)(70206006)(110136005)(356005)(70586007)(31696002)(54906003)(53546011)(83380400001)(7416002)(7636003)(5660300002)(16576012)(8676002)(47076005)(336012)(8936002)(4326008)(86362001)(316002)(36906005)(426003)(43740500002)(43620500001)(15398625002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Apr 2021 00:22:05.6022
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: OQbBSSzU9V0QMaKfjV1FgyvXoSl6aDwRyCRgs/l3Z0U2K7X33uAJgm/z4QmAGN6UZpL7iQLcU/mX0QqCFr6a0TjfxMrgzQrxtClhS1KQOuc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB4983
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9c6b6fc5-c84c-4c8b-760e-08d8fbb6abc0
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT032.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB3760
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/9/21 08:08, Christoph Hellwig wrote:=0A=
-> blk_rq_append_bio is also used for the copy case, not just the map case,=
-=0A=
-> so tis debug check is not correct.=0A=
->=0A=
-> Fixes: 393bb12e0058 ("block: stop calling blk_queue_bounce for passthroug=
-h requests")=0A=
-> Reported-by: Guenter Roeck <linux@roeck-us.net>=0A=
-> Signed-off-by: Christoph Hellwig <hch@lst.de>=0A=
-> Tested-by: Guenter Roeck <linux@roeck-us.net>=0A=
-=0A=
-With 's/tis/this/' can be done at the time of applying patch.=0A=
-=0A=
-The commit 393bb12e0058 does add check in question here.=0A=
-=0A=
-Looks good.=0A=
-=0A=
-Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>=0A=
-=0A=
-=0A=
+
+On 2/19/2021 2:45 PM, SelvaKumar S wrote:
+> This patchset tries to add support for TP4065a ("Simple Copy Command"),
+> v2020.05.04 ("Ratified")
+>
+> The Specification can be found in following link.
+> https://nvmexpress.org/wp-content/uploads/NVM-Express-1.4-Ratified-TPs-1.zip
+>
+> Simple copy command is a copy offloading operation and is  used to copy
+> multiple contiguous ranges (source_ranges) of LBA's to a single destination
+> LBA within the device reducing traffic between host and device.
+>
+> This implementation doesn't add native copy offload support for stacked
+> devices rather copy offload is done through emulation. Possible use
+> cases are F2FS gc and BTRFS relocation/balance.
+>
+> *blkdev_issue_copy* takes source bdev, no of sources, array of source
+> ranges (in sectors), destination bdev and destination offset(in sectors).
+> If both source and destination block devices are same and copy_offload = 1,
+> then copy is done through native copy offloading. Copy emulation is used
+> in other cases.
+>
+> As SCSI XCOPY can take two different block devices and no of source range is
+> equal to 1, this interface can be extended in future to support SCSI XCOPY.
+
+Any idea why this TP wasn't designed for copy offload between 2 
+different namespaces in the same controller ?
+
+And a simple copy will be the case where the src_nsid == dst_nsid ?
+
+Also why there are multiple source ranges and only one dst range ? We 
+could add a bit to indicate if this range is src or dst..
+
+
+>
+> For devices supporting native simple copy, attach the control information
+> as payload to the bio and submit to the device. For devices without native
+> copy support, copy emulation is done by reading each source range into memory
+> and writing it to the destination. Caller can choose not to try
+> emulation if copy offload is not supported by setting
+> BLKDEV_COPY_NOEMULATION flag.
+>
+> Following limits are added to queue limits and are exposed in sysfs
+> to userspace
+> 	- *copy_offload* controls copy_offload. set 0 to disable copy
+> 		offload, 1 to enable native copy offloading support.
+> 	- *max_copy_sectors* limits the sum of all source_range length
+> 	- *max_copy_nr_ranges* limits the number of source ranges
+> 	- *max_copy_range_sectors* limit the maximum number of sectors
+> 		that can constitute a single source range.
+>
+> 	max_copy_sectors = 0 indicates the device doesn't support copy
+> offloading.
+>
+> 	*copy offload* sysfs entry is configurable and can be used toggle
+> between emulation and native support depending upon the usecase.
+>
+> Changes from v4
+>
+> 1. Extend dm-kcopyd to leverage copy-offload, while copying within the
+> same device. The other approach was to have copy-emulation by moving
+> dm-kcopyd to block layer. But it also required moving core dm-io infra,
+> causing a massive churn across multiple dm-targets.
+>
+> 2. Remove export in bio_map_kern()
+> 3. Change copy_offload sysfs to accept 0 or else
+> 4. Rename copy support flag to QUEUE_FLAG_SIMPLE_COPY
+> 5. Rename payload entries, add source bdev field to be used while
+> partition remapping, remove copy_size
+> 6. Change the blkdev_issue_copy() interface to accept destination and
+> source values in sector rather in bytes
+> 7. Add payload to bio using bio_map_kern() for copy_offload case
+> 8. Add check to return error if one of the source range length is 0
+> 9. Add BLKDEV_COPY_NOEMULATION flag to allow user to not try copy
+> emulation incase of copy offload is not supported. Caller can his use
+> his existing copying logic to complete the io.
+> 10. Bug fix copy checks and reduce size of rcu_lock()
+>
+> Planned for next:
+> - adding blktests
+> - handling larger (than device limits) copy
+> - decide on ioctl interface (man-page etc.)
+>
+> Changes from v3
+>
+> 1. gfp_flag fixes.
+> 2. Export bio_map_kern() and use it to allocate and add pages to bio.
+> 3. Move copy offload, reading to buf, writing from buf to separate functions.
+> 4. Send read bio of copy offload by chaining them and submit asynchronously.
+> 5. Add gendisk->part0 and part->bd_start_sect changes to blk_check_copy().
+> 6. Move single source range limit check to blk_check_copy()
+> 7. Rename __blkdev_issue_copy() to blkdev_issue_copy and remove old helper.
+> 8. Change blkdev_issue_copy() interface generic to accepts destination bdev
+> 	to support XCOPY as well.
+> 9. Add invalidate_kernel_vmap_range() after reading data for vmalloc'ed memory.
+> 10. Fix buf allocoation logic to allocate buffer for the total size of copy.
+> 11. Reword patch commit description.
+>
+> Changes from v2
+>
+> 1. Add emulation support for devices not supporting copy.
+> 2. Add *copy_offload* sysfs entry to enable and disable copy_offload
+> 	in devices supporting simple copy.
+> 3. Remove simple copy support for stacked devices.
+>
+> Changes from v1:
+>
+> 1. Fix memory leak in __blkdev_issue_copy
+> 2. Unmark blk_check_copy inline
+> 3. Fix line break in blk_check_copy_eod
+> 4. Remove p checks and made code more readable
+> 5. Don't use bio_set_op_attrs and remove op and set
+>     bi_opf directly
+> 6. Use struct_size to calculate total_size
+> 7. Fix partition remap of copy destination
+> 8. Remove mcl,mssrl,msrc from nvme_ns
+> 9. Initialize copy queue limits to 0 in nvme_config_copy
+> 10. Remove return in QUEUE_FLAG_COPY check
+> 11. Remove unused OCFS
+>
+> SelvaKumar S (4):
+>    block: make bio_map_kern() non static
+>    block: add simple copy support
+>    nvme: add simple copy support
+>    dm kcopyd: add simple copy offload support
+>
+>   block/blk-core.c          | 102 +++++++++++++++--
+>   block/blk-lib.c           | 223 ++++++++++++++++++++++++++++++++++++++
+>   block/blk-map.c           |   2 +-
+>   block/blk-merge.c         |   2 +
+>   block/blk-settings.c      |  10 ++
+>   block/blk-sysfs.c         |  47 ++++++++
+>   block/blk-zoned.c         |   1 +
+>   block/bounce.c            |   1 +
+>   block/ioctl.c             |  33 ++++++
+>   drivers/md/dm-kcopyd.c    |  49 ++++++++-
+>   drivers/nvme/host/core.c  |  87 +++++++++++++++
+>   include/linux/bio.h       |   1 +
+>   include/linux/blk_types.h |  14 +++
+>   include/linux/blkdev.h    |  17 +++
+>   include/linux/nvme.h      |  43 +++++++-
+>   include/uapi/linux/fs.h   |  13 +++
+>   16 files changed, 627 insertions(+), 18 deletions(-)
+>
