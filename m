@@ -2,196 +2,163 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	PDS_BAD_THREAD_QP_64,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16255C433B4
-	for <linux-block@archiver.kernel.org>; Sun, 11 Apr 2021 22:13:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 008DAC433B4
+	for <linux-block@archiver.kernel.org>; Sun, 11 Apr 2021 22:13:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E0FD56008E
-	for <linux-block@archiver.kernel.org>; Sun, 11 Apr 2021 22:13:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C89F1610CB
+	for <linux-block@archiver.kernel.org>; Sun, 11 Apr 2021 22:13:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235790AbhDKWNY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 11 Apr 2021 18:13:24 -0400
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:15173 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235718AbhDKWNY (ORCPT
+        id S235818AbhDKWNb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 11 Apr 2021 18:13:31 -0400
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:35937 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235718AbhDKWNb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 11 Apr 2021 18:13:24 -0400
+        Sun, 11 Apr 2021 18:13:31 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1618179187; x=1649715187;
+  t=1618179194; x=1649715194;
   h=from:to:cc:subject:date:message-id:references:
    content-transfer-encoding:mime-version;
-  bh=P1MEMR0klfudMEJjbukBW8jN1d34g5ykvcgdC+uRh4w=;
-  b=aXW3V+kCyiZP9JUIKJf9eTontcwID0zHaZKaAUpxtC/o8s9IoduluJwa
-   T9zFCYfxlC1oQQo2cUucLgLOuSJ9dLz59tThS9gx2agjY3VRsBCjsfXVD
-   0O88sSIdfDBB1LdIGYh+iXGUppAGSuHDCp28IBnGgvt2WQXDPZC/iz4CF
-   jUeK6FxEFVDDe94EN9Rw5CZfHecCXq7jRDn5Ayzh+oQ/nBnOZxFWIhAPy
-   58qsaH4pzRmolzs8nhaJN+/R80nueCRqVdE14bSt2B76coMsCwl09CQux
-   Y/s1VpCKIY+6yEJAxBVU4ytLvW48y1iXh55Pq8sXtfKmX9Ctok6IPnsAZ
-   g==;
-IronPort-SDR: QYGPWUUEkY3XiwdPYNqkQXpjpTS1NSDqsDbvAwobXCZndpOsDUIrgU4aL/ugK6zi57o0cMg3sN
- 1pOFOGDlpsEejgat3KboFdAbHS6WyZKFn5ONlaeHilnULgl840koePinc4tbVAcI/6KbryhzVE
- RUPpuRoMLciBb5R3QYkZ87z3yjowdE8PKhl3oQ9ix8ThTisYwE55X7+wVSUvjdpemj6DoA2ohG
- imSV6LNeh5px651CnnvV9BZY5Ufm0DsT4pE1UV8pSkOXYZtuPWt2NBPGO36GqMZMNIadt3QjUQ
- YY4=
+  bh=hgMMVTAXh/2u6pFhXTjn8tag6Nm2vAmvjr8uDyZ7bnU=;
+  b=Iz7Zb1WBbGuHacF0ORjpCheMU54DQnJjWPSrina14x16IgwL5yLRLcc/
+   jG6QBDx3YpofeWCvRHg1pD63Y86R6j/iNZLhCZ3OCn4O8IvbzOww04qc0
+   e3WLmUOb/24TLt7fsccWyICFuOZvqAju+MDphp4b7LLqcgwOr+56mNTeK
+   F/vUBBWgIqW2DVbPQy2IoE51FiBPssftpUsAzVzIA/aZSmHQblJydX7f+
+   UsSnG7lEBA3c1GXC7k0tv09prPZpuBtx1ZwgJHc6Svsg5CRrwIpzEzm2U
+   yZt4lDDKM8palwxKWdca6hiXqVD4w/33zJVk+D7smYlqJM4dLFgU3xi5L
+   A==;
+IronPort-SDR: IYuB9PNIx2OyI5D9bpJJsClhEP0sD1kZm3qJlsYYR9CjyFlwBhtjUzufuxbhZS6LYau7LWRP3T
+ 5fQs5smoOpcs8f30bhAC+beJ2vr2uZELH2mMw810Rgg8cUtUBWJbnVplFWTVGNvTJbLjV5azXG
+ rQlFPmBnD/m29PddEPWzf+Fv12s+uzGgwpe+HND3OoIEDEGGRS8LwV6FCmXP9qvISqSlyD+utR
+ +rwYSy37i9Ry5S2Elxt94UtlX9PS7qm6IoOL164FGXWbPnMdO/+ozS8LOkh7URcNWrhGVU6wBu
+ Vko=
 X-IronPort-AV: E=Sophos;i="5.82,214,1613404800"; 
-   d="scan'208";a="164433262"
-Received: from mail-co1nam11lp2171.outbound.protection.outlook.com (HELO NAM11-CO1-obe.outbound.protection.outlook.com) ([104.47.56.171])
-  by ob1.hgst.iphmx.com with ESMTP; 12 Apr 2021 06:13:04 +0800
+   d="scan'208";a="275329337"
+Received: from mail-dm6nam11lp2168.outbound.protection.outlook.com (HELO NAM11-DM6-obe.outbound.protection.outlook.com) ([104.47.57.168])
+  by ob1.hgst.iphmx.com with ESMTP; 12 Apr 2021 06:13:12 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gLSIvSUG15flLYNWimHlCeArRvQUsR0tpIIPc3dqMsWLRJJnLXPSFxbIe3FD1bWotnsupBm54l1ULeu7oPTfufmzfwbZKTkYGVOHoWMiLjmkV+owToS0RJbjxxTQkOhfrG/+W+vsZW5/MHB1/4rewwEmSl5XdcZlZq7na0LzZu0AbnTITCLLDuUxiTJhjWsDmvU1Rdk3DLdRTo7ioU79ZTU+ckqaAqQs9tSqJq7H6WPhgcml/R5DAdRSPTY7kFUPUsE0COtKs1TsdfNDh0aR4bl2BI4wq2BYYh4UbbzbnbExkHuethGPGVP6+aYiKBW7wnjkxwgcitXR/9vzvvJuEg==
+ b=oAFcGclDcTyuG9IOaQU+yPE0j+Y+t+I+YvdI82Iz1ySmJWJLGkwlpuhPALZMHvqDnfSLieuYpmcqaABAeCiyok/eIBb0VVoYGQu+dlqMo4Jfm0LEFxZcyRTaPqjaTVmmMmRFd5tkB6Y76ihw63OytuOMIt/6xKKQnex2Ze1XCevFKgRSRNpaJMlxvy2FNPiwcl9fA14v4G8xvi8MrxvDWA7WBcud5hKfzUGghbyUGU3SGeMRidilIo4/zrgBMsY8fdw0i+UOMVoJxaPS/6MyN/znWF+Cq3dMJE0WdrqMZSoFy4wWbWOFvIFV/fhRSENWFyP2400DKF6PyQe11IvrDQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=P1MEMR0klfudMEJjbukBW8jN1d34g5ykvcgdC+uRh4w=;
- b=hCCK08sqFCPhGdqTmbzzeaDC0K1wCocGwRSSbQANy+zeLgKMqdfb8sBTrGumGZ/EwACOhFni4WWYolPoGO139Gfxakt1dwIRFgjNdkK2QQZKpqmvtdYpHjsWfgeh/Aw9EVbHJ8iEvr64/SzOxVWhmm9xnmHv00k0k800/os+/lLEpGNiGfVRiC7RZ/aCg6bRFumSnfNYDgk+YPanC0tz0osQYaAovRFmclGh9riniAaa+QlCNHCiVY27G9fyEbcrdkzZcuNe6xrSBpJAW5AOyLcPayvmOAceELiWaoN+IeDjJ0C/rRI4rHJO5R+5PCVmrDZMrdriBaJqFMZPn/j1Gg==
+ bh=c1K903H7lmk4kh6jpRrkgBtmueh0OC4OuG1MWtXg4aQ=;
+ b=NOGY0R1pUivxMQ/BGaQsnXPat8FJqvgoOI+8NA1ecJ/k+phr3V4JQdltzu6+tTwKpLnx+wyP3ujW6NbGURewk3NY4u91owaJ/L/NWj7/iJju3SXrz6MXgQftfI6pb6ilt4ku3ESQwyW9ACj0uFj8jRdvn9L2zO+wkEfKL+2OiRq0VijBDdLQG7tj417nhDfdUrcaIn0U2oFAsd6Z8+N366UXGEAtYT9g849Bp6mlIFh8uIGlvs+npoIosD57q7lyKq4cDrkU4oiFdJ4z1E34nTvVcrIsBJ04KhkKE5vbYfw4bPRQcX/khnR3nZlIJ1PKFFXxqd5SuNTJ7jbBjFU3ng==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
  header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=P1MEMR0klfudMEJjbukBW8jN1d34g5ykvcgdC+uRh4w=;
- b=kYklxofweThRjRuw27tJFUpMbXevhH0Slb69VqLLvBKQLnYKraLbs2PUwDJuDKOunUATWwQzBQIy98q/lIqXw+JhGofTI9rfdYyBtZLBqUU3YGXHYR9Wq6iyZz4bo7kcMWT7PeZWRmxE9CfpYoOYelBHMB/M5RqrrLIS55+GGus=
-Received: from BL0PR04MB6514.namprd04.prod.outlook.com (2603:10b6:208:1ca::23)
- by MN2PR04MB6415.namprd04.prod.outlook.com (2603:10b6:208:1a4::21) with
+ bh=c1K903H7lmk4kh6jpRrkgBtmueh0OC4OuG1MWtXg4aQ=;
+ b=eL6aUqgZSUU1bvM9NeMGtWZZa3PD4Y0rakpfrBe5bXglolwB1VloW7IwY16TgMektplfopddU2gwIo7g7dS8g1IOXPU1DLUlmaRnOgMDNC5r52uSNg6sn30lnaO4eZHD1pBHwagC1jcxp3zLm0NVxwd3JhQcWa4iEjlzZi4Wvww=
+Received: from BYAPR04MB4965.namprd04.prod.outlook.com (2603:10b6:a03:4d::25)
+ by BYAPR04MB5333.namprd04.prod.outlook.com (2603:10b6:a03:c2::27) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4020.17; Sun, 11 Apr
- 2021 22:13:01 +0000
-Received: from BL0PR04MB6514.namprd04.prod.outlook.com
- ([fe80::8557:ab07:8b6b:da78]) by BL0PR04MB6514.namprd04.prod.outlook.com
- ([fe80::8557:ab07:8b6b:da78%3]) with mapi id 15.20.4020.022; Sun, 11 Apr 2021
- 22:13:01 +0000
-From:   Damien Le Moal <Damien.LeMoal@wdc.com>
-To:     Bart Van Assche <bvanassche@acm.org>,
-        Changheun Lee <nanich.lee@samsung.com>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>
-CC:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        "asml.silence@gmail.com" <asml.silence@gmail.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "hch@infradead.org" <hch@infradead.org>,
-        "jisoo2146.oh@samsung.com" <jisoo2146.oh@samsung.com>,
-        "junho89.kim@samsung.com" <junho89.kim@samsung.com>,
+ 2021 22:13:11 +0000
+Received: from BYAPR04MB4965.namprd04.prod.outlook.com
+ ([fe80::c897:a1f8:197a:706b]) by BYAPR04MB4965.namprd04.prod.outlook.com
+ ([fe80::c897:a1f8:197a:706b%5]) with mapi id 15.20.4020.018; Sun, 11 Apr 2021
+ 22:13:11 +0000
+From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>,
-        "mj0123.lee@samsung.com" <mj0123.lee@samsung.com>,
-        "osandov@fb.com" <osandov@fb.com>,
-        "patchwork-bot@kernel.org" <patchwork-bot@kernel.org>,
-        "seunghwan.hyun@samsung.com" <seunghwan.hyun@samsung.com>,
-        "sookwan7.kim@samsung.com" <sookwan7.kim@samsung.com>,
-        "tj@kernel.org" <tj@kernel.org>,
-        "tom.leiming@gmail.com" <tom.leiming@gmail.com>,
-        "woosung2.lee@samsung.com" <woosung2.lee@samsung.com>,
-        "yt0928.kim@samsung.com" <yt0928.kim@samsung.com>
-Subject: Re: [RESEND,v5,1/2] bio: limit bio max size
-Thread-Topic: [RESEND,v5,1/2] bio: limit bio max size
-Thread-Index: AQHXK5LimbigZS3dMEyF4qJ0Ir0lcg==
-Date:   Sun, 11 Apr 2021 22:13:01 +0000
-Message-ID: <BL0PR04MB65148B0629FF23847341BAE8E7719@BL0PR04MB6514.namprd04.prod.outlook.com>
-References: <YG1iC944hUkBniDM@kroah.com>
- <CGME20210407094610epcas1p472207e8d3ca0e5e697974c993a2a34f7@epcas1p4.samsung.com>
- <20210407092836.13016-1-nanich.lee@samsung.com>
- <BL0PR04MB65146F70831B61CB6B9AFE7CE7759@BL0PR04MB6514.namprd04.prod.outlook.com>
- <cdd26ed3-2013-7edd-b25e-557a56397614@acm.org>
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>
+CC:     "oren@nvidia.com" <oren@nvidia.com>,
+        "idanb@nvidia.com" <idanb@nvidia.com>,
+        "yossike@nvidia.com" <yossike@nvidia.com>
+Subject: Re: [PATCH 1/1] null_blk: add option for managing virtual boundary
+Thread-Topic: [PATCH 1/1] null_blk: add option for managing virtual boundary
+Thread-Index: AQHXLu/rAbrjsWm4B0Od2SoOOt1rEg==
+Date:   Sun, 11 Apr 2021 22:13:11 +0000
+Message-ID: <BYAPR04MB4965A0C75CD1F8AE3F73472F86719@BYAPR04MB4965.namprd04.prod.outlook.com>
+References: <20210411162658.251456-1-mgurtovoy@nvidia.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
-authentication-results: acm.org; dkim=none (message not signed)
- header.d=none;acm.org; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [2400:2411:43c0:6000:1134:9421:2151:4ee3]
+authentication-results: nvidia.com; dkim=none (message not signed)
+ header.d=none;nvidia.com; dmarc=none action=none header.from=wdc.com;
+x-originating-ip: [199.255.45.62]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 97d91cda-3a1d-4e7c-80f6-08d8fd36f8bf
-x-ms-traffictypediagnostic: MN2PR04MB6415:
-x-ld-processed: b61c8803-16f3-4c35-9b17-6f65f441df86,ExtAddr
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MN2PR04MB641543100CBCA32CE3746261E7719@MN2PR04MB6415.namprd04.prod.outlook.com>
+x-ms-office365-filtering-correlation-id: 05bf8a20-b351-45f3-bbb9-08d8fd36fea5
+x-ms-traffictypediagnostic: BYAPR04MB5333:
+x-microsoft-antispam-prvs: <BYAPR04MB53334A3BC0AE5BBA8C9E53D986719@BYAPR04MB5333.namprd04.prod.outlook.com>
 wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:8273;
+x-ms-oob-tlc-oobclassifiers: OLM:4941;
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: J+7Q0CbWxU6IekS7/iXvI31LGuhfrLcJjdFP4sBNMih+s3zSXh+cIjYABo1HiqqDlpV3z67ou/nhavDGE44WIgpBI2KkYNqtilxej3kmGRRNPBLmLGB8zWXG4B1Z+TEaZvFjRxCTErvnJ6sxy32D+8xTmT1Q+r0RV7PPFk8nhDkt59vvsgu+UZB9sYQRoLwRgqoKil29X1Rkdn7f/ZUHixV726M4VgdVX5fqOsqPp+yJVQW40xSIQqZ6v5r1jLSJbIpLapPQRX1gvdsF61JN88ETggs7FdYp1fPct6WzgvfQDojKOJiANyzVhx7aJGiL0vzjKuea2WsJL8SsqCB1ioaTl02OKBNJ3/KRRL+Nj0MNTQceUL75Me07RRPUWroXFgdL91QGnk0jJUXfB1+1vdqumJWXahe1nwMGoZ4CIhGBV1SAMDBOSAaOtZJx0IjTE0xUW2NfYj1lVLGFwx3RYN//EwFFUk7ivck2UEhJ8SYL8fyJRYPEUJR9pV43MVJP193wuBZmRWPgZ/xWdBc9nTicb4oCo/xWuoAWjKrj8zlBo3nC6oT6dHGobBxAbHDF928JF1nu4Qs3Vsr6htUXE6IzE2rzGJArRaNI9l3p+rU=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR04MB6514.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(376002)(396003)(346002)(136003)(366004)(8936002)(54906003)(71200400001)(8676002)(7696005)(38100700002)(52536014)(7416002)(5660300002)(186003)(53546011)(9686003)(478600001)(2906002)(6506007)(66946007)(55016002)(66556008)(316002)(66476007)(110136005)(76116006)(91956017)(66446008)(64756008)(4326008)(83380400001)(86362001)(33656002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: =?us-ascii?Q?v7rbXX5A5lD2v1O1TyJUmUALhbLtf5RJf3654sqB8VOPf5tcr9UdcfuJM/gT?=
- =?us-ascii?Q?iE36U7bFGaGdsft5t/gNqmplrLnGCOZAC0BycyuAWJlZ/It8hdCH/7mlFVb0?=
- =?us-ascii?Q?1FAJObedc/5iCR6jXG6o5o7PItZqV52ZT8iO4Vq74t+x5e6Lim5lWqgfjxcY?=
- =?us-ascii?Q?8ws1iTMTxKzkzUnjuCgwkgT8yFgojXm1dk3nAXzsxKGlvMtsS20oUO9oMZ6J?=
- =?us-ascii?Q?fXOdUBA2RYd0ySy/cvZZLLX8BiNC8WaBix59UWyKJYEO7bLSJCH9UVjrbtQR?=
- =?us-ascii?Q?JjqQNxOoa3gZqyQ8IqjriIwvBzUqIppZ3pxMKvxPnRXbbyqEjmIfeIHbaueW?=
- =?us-ascii?Q?diylFebNg0lI6fp6ZtDqFtR+OqktiWfLN2SrbJ1pJStsJXYSaq38/9bqJ8By?=
- =?us-ascii?Q?eVHWe/cikBqyoXqoXSAETeZR4Csxzt0agNr8QU3HRW2XrxKnYJ1dYCpU3cu6?=
- =?us-ascii?Q?XYMKJ5+ji0S2RTf21oOCfEq1tcR3WuH7Ks6hRWHu+0tCw9J5HvQv0aeD2ei+?=
- =?us-ascii?Q?47JRUBGOKpTtSObWnerQa4O5YrXls2Py2+9BsT7cjZHI1eYPa/YtUmPkPM2C?=
- =?us-ascii?Q?Ms0JZBapmPcUyhnFXgmKx14mk4ubbkB5LKchKZNwlNKqC7oKmA0OiaZqdcjk?=
- =?us-ascii?Q?I/iZh1b3wJo70e7Mtj6mlOedJckyRjGJxutAX9eUHTV/u3CGhTgFLiQHuruU?=
- =?us-ascii?Q?7PJl4O6uTr4/7mY1zaDCCwkX7xuDwfg0A8aQY3pxYAhqHx9iTJOIWAhEjFGL?=
- =?us-ascii?Q?kP9F5vFxvvs5zj15wzqRPmi51hFJzQpmijSQEb7pdxthczwDMW68fVfTG+5Q?=
- =?us-ascii?Q?auX3voYurrfMe/F5vBleFPWa002SGTRSOzEgMvnw71mE1EtxjTron9Xz02Vn?=
- =?us-ascii?Q?/cOLLcKiTjqkhUa0jDwyyWHIWuvhT401n372ehBTuQ0IaQwVkTFjVLq3pGW6?=
- =?us-ascii?Q?nqlbYLJpi1k+KNbXspRgwONsBbd8Maxy7wjmYOV8j6ndxsPRSOAdXeX9ZBwz?=
- =?us-ascii?Q?22chVpkfzo0l693QjR6Jg63NCaLPBFdQDoCoyOfrCEDtymVV7lNxA6FM4CMd?=
- =?us-ascii?Q?Vua3nf0qdKdv9eOES2ZZYxozX4+jO2uR2ZPfWnxCNEtak1Juk/4hVLwx5YXN?=
- =?us-ascii?Q?3yybZTxjKKQpFSfZI4415d3bOVtExD2oLqGO7vojozSHZYb+wEDcuTYgEpd9?=
- =?us-ascii?Q?eVH9opYa8eXBzPDa+Dw++9eqPgtGbl0MIQ9FUNqAbmJGmVZPfo5ATs8FWUvc?=
- =?us-ascii?Q?4c/3pBYfDsEQ33ThZSQHCfkV5gxUO+0yKK7Vv9mTcEKVdhXeV8CPCarhgVC+?=
- =?us-ascii?Q?etAapv7eQ31IHTqmXlbpJ0EhPKVo22S6L0cd14qfltuJf6BXSHyHG/H8PzKX?=
- =?us-ascii?Q?XC8kueSjKBO2PlNwglm9sShLfsj0Nj8Jx39H6HssCodwzYk0/Q=3D=3D?=
+x-microsoft-antispam-message-info: j7qROCFAP99w6p9s0/JCPgX9zbk9IuSlMedm8Zgf9r5Egk0CwBxHkeyID3kvIwk8L5PkiLpFstRe/o/sy2Qguod/u2dZL+mQUSrxhDNkiYfcpUIIajb77iqyjlsx1xAWrC/sLacuq9lGZ/bJv3+j/0NoDNls866e/cSf3itaLj+9VQeGzl4StkaxSPKGuRcsz6lv4O/DgkA3FlCYtc/EhgslEQ/jTsvXRsvnTnmf9Pct1U9/4TmGynmUvX7C8732hcMJ+G6CwX1THxhX2lH/nltZVh2hwmoMLKhmO2byvx9aTJMcepf3ccPsEuuYG/j7yHlooEpFBHIti5shTpaQGZPzVl4Fcw4JeaelWxWr9V5KQVKKUEU+35xoXkAp8imNlWf10pZic4fJvFDhMDflNUXsddX2WsOKJpjyMCJQBKDbYXL6Ipghsw59K6rCRyBJXY156KCx+2NMxc9J4bETNbv9oz9n6icuUVHG01f/eghMD4XFQBsOe6ZLCDdUvjXmhRnvMYy1rzVYpAnzArPsYq42WGX6zZZPdv+j4j15QagMICE7Bt/RGEXLFDK2hCVyH5OtSAJiuj89r+rKzHlhh57DmXEOquRdpx2xIMh3lfk=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR04MB4965.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(396003)(346002)(39860400002)(376002)(366004)(38100700002)(7696005)(316002)(71200400001)(2906002)(26005)(52536014)(66946007)(66556008)(186003)(76116006)(110136005)(54906003)(8936002)(86362001)(83380400001)(4326008)(478600001)(33656002)(53546011)(5660300002)(6506007)(55016002)(4744005)(66446008)(64756008)(9686003)(8676002)(66476007);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: =?us-ascii?Q?+F11pJ/ngqKTNVbhoesb75I1mTSMYjncHYVAAFVp2LGYrnOpozn1iH26kAIt?=
+ =?us-ascii?Q?GHRs62gdGceyCDIH+7uGns/QGOh5Z8OPDgR14pGkjb/MAlJcsuJuVByoGdi4?=
+ =?us-ascii?Q?IJpuLYP9yAjWN92upCRsouk0wb/Ze8oynnpJeOyUkgBEsp/wiYdie+sJsvJj?=
+ =?us-ascii?Q?91jcmuJdzN7sEHbjebbv/djvpSSuWy7Fvutr8IGM27PcNMWfWknWUi+N7u8V?=
+ =?us-ascii?Q?lxQodjOsCb6QWO58pQY7CxrS1dYRzt5QI9k+WM4lottMXQdwHE9qvL1GSpIx?=
+ =?us-ascii?Q?oAgMhjASxk/EZOt3zuXLY5EffsytrE5IqAss5vETDBnO2SXcd9DlH0p8PwWK?=
+ =?us-ascii?Q?f0XI+a/Vlqmq4liH/qbbPL3G0tnjOtTmgooDQb/OmolFegq+M2qEehTqM7ve?=
+ =?us-ascii?Q?3tjhDqlsH3L/A1PBWNYooV6GO8XJ/J9MHYmLQS5OrwP7aLFxqfe5YV6+Lvyb?=
+ =?us-ascii?Q?tT6wUrTW2MfehfaIubLfW49XtVNxJfa/ClitHzTvob9kAY6qEjTpWNDHuPif?=
+ =?us-ascii?Q?J5+Qd8xSykgL5lU/vW+DhQh81wX1P4Wi9IJAFnzDMf6MWDt2dRz50giEyJzv?=
+ =?us-ascii?Q?6eyJA2LNNR7+GceKfS7NpbgMLgf8jXvb5hOhj3IlaPBp6OfrmIEl7dyN87ID?=
+ =?us-ascii?Q?0eVSkFNg1fsA1G2aGRCyAfIb1cXvvPszhvRVrjrIkPbVLaIXso1U/Himyppj?=
+ =?us-ascii?Q?P/KxWxQf/2ZSoM2rgee6ZTAGJnHrqlcM/vf0UCQ4k47sSC/4H728PlK/m+8K?=
+ =?us-ascii?Q?c5GkEaaNnn/Dm/EZWD12pXfrL4PMOReccjj/Nhmh4SVGDHeHTg+ziE4ym8SO?=
+ =?us-ascii?Q?ck5NXhjB2SsZZWcL79GjP2WAHlQSDs7RuEQxhhmocaD+LSYg+Wrz6xpP19rb?=
+ =?us-ascii?Q?EgorZgtnzbNz8dgyarZQ1CNqOsEG5MNo3bsIPNP7XeYhm04PgKXheuAwlZij?=
+ =?us-ascii?Q?aPYU3FHSyqzELVIel0b2e8VionsW4Ogzc9rEesrbglS5aJICx6JULXHeut8h?=
+ =?us-ascii?Q?Iqm6NYEylJYO58xQXRaLN3E4L+wZv3g3YF4mONkF3KZ3qqOk/5Q2EDOq4E58?=
+ =?us-ascii?Q?P6qFf33KAh7KbG8IbFCn1Dxmk0d0rf8figGMa6FtfAJSZ61z+QMT/WZVtEXk?=
+ =?us-ascii?Q?YKwiQ36Ohyv87x+M4jacIR076Ju6vYTQgKHd8lj1E9Qr1h/08oxPiD086/xH?=
+ =?us-ascii?Q?4ReHn1AxKN8sg4Jnn7UDStic7PFBIY7ndPj/sC4NVnlYpIgrsdVozkjds544?=
+ =?us-ascii?Q?6OHnC1CVZEAc5P+7Ks4trv+s9y3IiFKZaMXRVm/21fjeHhZK7rumE3/Tsv0J?=
+ =?us-ascii?Q?tNqBXlJ2VEYB/xhOh1WGdHrP?=
+x-ms-exchange-transport-forked: True
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: wdc.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR04MB6514.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 97d91cda-3a1d-4e7c-80f6-08d8fd36f8bf
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Apr 2021 22:13:01.3877
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR04MB4965.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 05bf8a20-b351-45f3-bbb9-08d8fd36fea5
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Apr 2021 22:13:11.3341
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: cGNrjNVzQxy99Ajxu0QL7Wjx9grNFoufFnhZDPX84WIcVdzcKrwwRG68gCIiuk5jJoVdilRFLmeKyhz1WZIk8w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR04MB6415
+X-MS-Exchange-CrossTenant-userprincipalname: imVRbm3EXItxPJj/l6QHzRVjnNdLKuBv8KwLTdM7ooA219f7KVCoTuHz2OKtPzJep/1xQ4WEPIWU5IrkyX0QTlrg6GU8zQrHZUSiB2gwy/w=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB5333
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2021/04/09 23:47, Bart Van Assche wrote:=0A=
-> On 4/7/21 3:27 AM, Damien Le Moal wrote:=0A=
->> On 2021/04/07 18:46, Changheun Lee wrote:=0A=
->>> I'll prepare new patch as you recommand. It will be added setting of=0A=
->>> limit_bio_size automatically when queue max sectors is determined.=0A=
->>=0A=
->> Please do that in the driver for the HW that benefits from it. Do not do=
- this=0A=
->> for all block devices.=0A=
-> =0A=
-> Hmm ... is it ever useful to build a bio with a size that exceeds =0A=
-> max_hw_sectors when submitting a bio directly to a block device, or in =
+On 4/11/21 09:30, Max Gurtovoy wrote:=0A=
+> diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.=
+c=0A=
+> index d6c821d48090..9ca80e38f7e5 100644=0A=
+> --- a/drivers/block/null_blk/main.c=0A=
+> +++ b/drivers/block/null_blk/main.c=0A=
+> @@ -84,6 +84,10 @@ enum {=0A=
+>  	NULL_Q_MQ		=3D 2,=0A=
+>  };=0A=
+>  =0A=
+> +static bool g_virt_boundary =3D false;=0A=
+> +module_param_named(virt_boundary, g_virt_boundary, bool, 0444);=0A=
+> +MODULE_PARM_DESC(virt_boundary, "Require a virtual boundary for the devi=
+ce. Default: False");=0A=
+> +=0A=
 =0A=
-> other words, if no stacked block driver sits between the submitter and =
-=0A=
-> the block device? Am I perhaps missing something?=0A=
-=0A=
-Device performance wise, the benefits are certainly not obvious to me eithe=
-r.=0A=
-But for very fast block devices, I think the CPU overhead of building more=
-=0A=
-smaller BIOs may be significant compared to splitting a large BIO into mult=
-iple=0A=
-requests. Though it may be good to revisit this with some benchmark numbers=
-.=0A=
-=0A=
-> =0A=
-> Thanks,=0A=
-> =0A=
-> Bart.=0A=
-> =0A=
+The patch looks useful to me. But this will unconditionally enable=0A=
+the virt boundry for all the devices created from configfs based on=0A=
+the module param. Such enforcing will create an inflexibility when=0A=
+user wants to create different devices for testing with different=0A=
+configuration (e.g. virt bouncry on/off) with single modprobe.=0A=
 =0A=
 =0A=
--- =0A=
-Damien Le Moal=0A=
-Western Digital Research=0A=
