@@ -7,42 +7,44 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ACE2C433ED
-	for <linux-block@archiver.kernel.org>; Mon, 12 Apr 2021 13:47:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4337C433B4
+	for <linux-block@archiver.kernel.org>; Mon, 12 Apr 2021 13:47:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D1C956128B
-	for <linux-block@archiver.kernel.org>; Mon, 12 Apr 2021 13:47:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 77B686128C
+	for <linux-block@archiver.kernel.org>; Mon, 12 Apr 2021 13:47:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239682AbhDLNrT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Apr 2021 09:47:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45640 "EHLO
+        id S240694AbhDLNrV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Apr 2021 09:47:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45648 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238881AbhDLNrT (ORCPT
+        with ESMTP id S238881AbhDLNrV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Apr 2021 09:47:19 -0400
+        Mon, 12 Apr 2021 09:47:21 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B685C061574
-        for <linux-block@vger.kernel.org>; Mon, 12 Apr 2021 06:47:01 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3EE0C061574
+        for <linux-block@vger.kernel.org>; Mon, 12 Apr 2021 06:47:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-        Content-ID:Content-Description:In-Reply-To:References;
-        bh=RJwWlUuntGJu9dP/0ZitYZKI+BkhwkgTc5pA0FYErEk=; b=PlAFcpHgWouYIAdSVGdtuqrjPj
-        KWAf52KVsf8aJn7vLGHmA3bdXrT2DXp6Rd2imbYo7BLO8RnHHerx/kyfdrqtl48pik7D3l/HAHGE2
-        a8wmzDJF8RnuwU/Xo3jtHJgpSbROmRUoMFS6SiouuC/EdOqby1d4h5YEhXbXOKonMWgzmDE3D8i2M
-        pMd/joORaSm3pxwW9E4Kx8TxGF+tPlTr3RkJvy5ZZqcs3Oz2zCBY4Jm/rtfwCTwhqSLTcjbVUUJAH
-        rkQbe0gWX2C6lFUH7MxHatlg2pWB1cAneYqplbrlIfgVULcmXO7HcCSLUoyMG80wKt9TINYegIst9
-        FRLOVRzw==;
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
+        :Reply-To:Content-Type:Content-ID:Content-Description;
+        bh=+KPOzbRovCWWdcOVpH+J8XXS1zZ8AMcVTA8H/cCHtuU=; b=iB0qMduX9vFo5z8Rqx6PW86pVg
+        WVgA95T35WtvN66KAuiLA80CtMe9rH/nV78GPBcKGa8pNMsr+HHxyf6YhUlPc5dMT7nok9s/pi7k8
+        sipsyLfYLMKIzFXMoNybgHs4Iy4P4PgGzJVHGiHWykAP72TczxjkrljxVpUfzBabAKcmD/+iZHo6l
+        592ZKAfXEvLvZDLBxkYvOZ6S+S5Wt5GOBU4EcwD7nE4yoTKCAuFPegGfsdbPjG/Z2FRmxq06b3Ywx
+        PEyAjzvmqe0mPTxrdyMvuWzKFtjC2QxjZ+YJNBqNRxZEVYet5U8wGL3qUxzlnh7OcU8ogPsnARar6
+        0SZ1w2xA==;
 Received: from [2001:4bb8:199:e2bd:3218:1918:85d1:2852] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
-        id 1lVwu4-006HHi-DN; Mon, 12 Apr 2021 13:47:00 +0000
+        id 1lVwu6-006HHm-UW; Mon, 12 Apr 2021 13:47:03 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org
-Subject: [PATCH 1/2] block: remove zero_fill_bio_iter
-Date:   Mon, 12 Apr 2021 15:46:57 +0200
-Message-Id: <20210412134658.2623190-1-hch@lst.de>
+Subject: [PATCH 2/2] block: move bio_list_copy_data to pktcdvd
+Date:   Mon, 12 Apr 2021 15:46:58 +0200
+Message-Id: <20210412134658.2623190-2-hch@lst.de>
 X-Mailer: git-send-email 2.30.1
+In-Reply-To: <20210412134658.2623190-1-hch@lst.de>
+References: <20210412134658.2623190-1-hch@lst.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
@@ -50,63 +52,122 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-zero_fill_bio_iter is only used to implement zero_fill_bio, so
-remove the indirection.
+bio_list_copy_data is only used by pktcdvd, so move it there.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/bio.c         | 6 +++---
- include/linux/bio.h | 7 +------
- 2 files changed, 4 insertions(+), 9 deletions(-)
+ block/bio.c             | 37 -------------------------------------
+ drivers/block/pktcdvd.c | 36 ++++++++++++++++++++++++++++++++++++
+ include/linux/bio.h     |  1 -
+ 3 files changed, 36 insertions(+), 38 deletions(-)
 
 diff --git a/block/bio.c b/block/bio.c
-index 26b7f721cda88b..0fecb80872c23f 100644
+index 0fecb80872c23f..303298996afeb4 100644
 --- a/block/bio.c
 +++ b/block/bio.c
-@@ -493,20 +493,20 @@ struct bio *bio_kmalloc(gfp_t gfp_mask, unsigned short nr_iovecs)
+@@ -1221,43 +1221,6 @@ void bio_copy_data(struct bio *dst, struct bio *src)
  }
- EXPORT_SYMBOL(bio_kmalloc);
+ EXPORT_SYMBOL(bio_copy_data);
  
--void zero_fill_bio_iter(struct bio *bio, struct bvec_iter start)
-+void zero_fill_bio(struct bio *bio)
+-/**
+- * bio_list_copy_data - copy contents of data buffers from one chain of bios to
+- * another
+- * @src: source bio list
+- * @dst: destination bio list
+- *
+- * Stops when it reaches the end of either the @src list or @dst list - that is,
+- * copies min(src->bi_size, dst->bi_size) bytes (or the equivalent for lists of
+- * bios).
+- */
+-void bio_list_copy_data(struct bio *dst, struct bio *src)
+-{
+-	struct bvec_iter src_iter = src->bi_iter;
+-	struct bvec_iter dst_iter = dst->bi_iter;
+-
+-	while (1) {
+-		if (!src_iter.bi_size) {
+-			src = src->bi_next;
+-			if (!src)
+-				break;
+-
+-			src_iter = src->bi_iter;
+-		}
+-
+-		if (!dst_iter.bi_size) {
+-			dst = dst->bi_next;
+-			if (!dst)
+-				break;
+-
+-			dst_iter = dst->bi_iter;
+-		}
+-
+-		bio_copy_data_iter(dst, &dst_iter, src, &src_iter);
+-	}
+-}
+-EXPORT_SYMBOL(bio_list_copy_data);
+-
+ void bio_free_pages(struct bio *bio)
  {
- 	unsigned long flags;
- 	struct bio_vec bv;
- 	struct bvec_iter iter;
- 
--	__bio_for_each_segment(bv, bio, iter, start) {
-+	bio_for_each_segment(bv, bio, iter) {
- 		char *data = bvec_kmap_irq(&bv, &flags);
- 		memset(data, 0, bv.bv_len);
- 		flush_dcache_page(bv.bv_page);
- 		bvec_kunmap_irq(data, &flags);
- 	}
+ 	struct bio_vec *bvec;
+diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
+index fc4b0f1aa86dfb..bd35565851224f 100644
+--- a/drivers/block/pktcdvd.c
++++ b/drivers/block/pktcdvd.c
+@@ -1199,6 +1199,42 @@ static int pkt_handle_queue(struct pktcdvd_device *pd)
+ 	return 1;
  }
--EXPORT_SYMBOL(zero_fill_bio_iter);
-+EXPORT_SYMBOL(zero_fill_bio);
  
- /**
-  * bio_truncate - truncate the bio to small size of @new_size
++/**
++ * bio_list_copy_data - copy contents of data buffers from one chain of bios to
++ * another
++ * @src: source bio list
++ * @dst: destination bio list
++ *
++ * Stops when it reaches the end of either the @src list or @dst list - that is,
++ * copies min(src->bi_size, dst->bi_size) bytes (or the equivalent for lists of
++ * bios).
++ */
++static void bio_list_copy_data(struct bio *dst, struct bio *src)
++{
++	struct bvec_iter src_iter = src->bi_iter;
++	struct bvec_iter dst_iter = dst->bi_iter;
++
++	while (1) {
++		if (!src_iter.bi_size) {
++			src = src->bi_next;
++			if (!src)
++				break;
++
++			src_iter = src->bi_iter;
++		}
++
++		if (!dst_iter.bi_size) {
++			dst = dst->bi_next;
++			if (!dst)
++				break;
++
++			dst_iter = dst->bi_iter;
++		}
++
++		bio_copy_data_iter(dst, &dst_iter, src, &src_iter);
++	}
++}
++
+ /*
+  * Assemble a bio to write one packet and queue the bio for processing
+  * by the underlying block device.
 diff --git a/include/linux/bio.h b/include/linux/bio.h
-index d0246c92a6e865..a8021d79d45d1f 100644
+index a8021d79d45d1f..a0b4cfdf62a434 100644
 --- a/include/linux/bio.h
 +++ b/include/linux/bio.h
-@@ -485,14 +485,9 @@ extern void bio_copy_data_iter(struct bio *dst, struct bvec_iter *dst_iter,
+@@ -483,7 +483,6 @@ extern void bio_check_pages_dirty(struct bio *bio);
+ extern void bio_copy_data_iter(struct bio *dst, struct bvec_iter *dst_iter,
+ 			       struct bio *src, struct bvec_iter *src_iter);
  extern void bio_copy_data(struct bio *dst, struct bio *src);
- extern void bio_list_copy_data(struct bio *dst, struct bio *src);
+-extern void bio_list_copy_data(struct bio *dst, struct bio *src);
  extern void bio_free_pages(struct bio *bio);
--void zero_fill_bio_iter(struct bio *bio, struct bvec_iter iter);
  void bio_truncate(struct bio *bio, unsigned new_size);
  void guard_bio_eod(struct bio *bio);
--
--static inline void zero_fill_bio(struct bio *bio)
--{
--	zero_fill_bio_iter(bio, bio->bi_iter);
--}
-+void zero_fill_bio(struct bio *bio);
- 
- extern const char *bio_devname(struct bio *bio, char *buffer);
- 
 -- 
 2.30.1
 
