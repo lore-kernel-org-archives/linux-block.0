@@ -7,72 +7,68 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E75F9C433ED
-	for <linux-block@archiver.kernel.org>; Mon, 12 Apr 2021 12:52:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B244C433ED
+	for <linux-block@archiver.kernel.org>; Mon, 12 Apr 2021 12:56:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B9DD161261
-	for <linux-block@archiver.kernel.org>; Mon, 12 Apr 2021 12:52:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D2B0A61246
+	for <linux-block@archiver.kernel.org>; Mon, 12 Apr 2021 12:55:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239364AbhDLMxM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Apr 2021 08:53:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33648 "EHLO
+        id S241374AbhDLM4Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Apr 2021 08:56:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34344 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239262AbhDLMxM (ORCPT
+        with ESMTP id S241271AbhDLM4Q (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Apr 2021 08:53:12 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 518B3C061574
-        for <linux-block@vger.kernel.org>; Mon, 12 Apr 2021 05:52:54 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id s14so1751695pjl.5
-        for <linux-block@vger.kernel.org>; Mon, 12 Apr 2021 05:52:54 -0700 (PDT)
+        Mon, 12 Apr 2021 08:56:16 -0400
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92E5BC061574
+        for <linux-block@vger.kernel.org>; Mon, 12 Apr 2021 05:55:58 -0700 (PDT)
+Received: by mail-pl1-x62a.google.com with SMTP id k21so329239pll.10
+        for <linux-block@vger.kernel.org>; Mon, 12 Apr 2021 05:55:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=OCA7mv5qC5017rl8fdArjmg8eI3IwufSfeA2oRPttk8=;
-        b=pzfBAdpTyoa1uq+1q/lrhlCZ3v4zkbFz9OqQxAuBQb2zdVJM0sjYIadd2zKCUE1Sfh
-         UeMmAeSSwnNJgYyeJsOImC9nlKhQsro+/vuBVRsFHQZYD5WzVP2FvQIMdXfHNkYMPGfm
-         oElP9Wea45bqWAONfvk4kwKrsdPM2B7cNYwVj7dFR2wozBaOXRoOelCbB65PE4GlteSP
-         RUnhkuWfL8/eajHFn6M2vYO03A6K1nTKgm3Dtt02bU2E33qddbkkD8e6EqqiJmYgXD/q
-         443sgQsGDaanLXeQi+9i9z1XxMfV+6/SehwiWD6EXrhQxxOeOEWF3YNFJjGF+1Dsyz+F
-         cliw==
+        bh=DEN7UWxU5iFQpUftfSPZicbN3DjnaYsTaEPzAYV3xeM=;
+        b=CHcl6XTBgCY7rmOsqf15PHLM6f83nEN8N3JezvATOzNrLlwWwm7ivLSp1uHF6FXYFO
+         zdz4dKLGgvQ1XrXzbgKKQPjnWQw7PGqdkQhyQ8dVMkIIdrHesQhYWcr+BezC1HEOqVxx
+         CjEuAoTyTsbfL34x5IbCsoZ/EAiI1OZ2aXhbXf8+8L1xOKh2ej85pGsJjYYWdthtGGi1
+         1W82iK/BhV/f5vaiupyYa62Xa4D+R2kJf2DPzQJFqjd4h6FTuqBBDqdS42nqqqMyq935
+         1cL9D1g/2ZaLHFdk5OemotMlOmkc4yCBLmJuaxg5BBvmQNL3Kn7v1fHHURl7agNuhcjQ
+         TAoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=OCA7mv5qC5017rl8fdArjmg8eI3IwufSfeA2oRPttk8=;
-        b=DGAHai8dQH2JRq6y1eeDqt7X5DarEU8Ty73cQD/7QCrJFd6WEFbprC4gWFqBXIys8e
-         vMBBs7d4MPl+txja02S2LLmkxjjZed8e5QppMUzez+xA5jqgz3rWnOZkEr/Q4K1EW9so
-         rwSBwwiRaa89znHS5Chc63bd2DUIdjNz4AVE5Uu+p4dk9NrKlwsRjmdeECY6eXxsHVzA
-         FDgZAv9fRyPwFUZnM8LFCUQ5V0gG2/7Rk1eMarXlKeG1RGCwK1bpecGCmUoW4UytSJFh
-         LE2VNleb80lr2ciuX+d0r4XJ9LRnJoTnh+wV72HshC8l67+u5ovO51tQdDA3zykQnk35
-         kXeA==
-X-Gm-Message-State: AOAM533taoAPscBr0clQljuMB8MxMh8ZVE9jbMc9U628fW2N1AgkMwpP
-        wbqKnAaGMhBP0AOqZCiM5RRong==
-X-Google-Smtp-Source: ABdhPJzLeLhBK66Nk4wwr1Qi+u5TGbrkSfojT0jims78QJOK4i1N/PgGldHlpVMOayemChkC/u0Vvw==
-X-Received: by 2002:a17:90a:e54c:: with SMTP id ei12mr21732716pjb.164.1618231973836;
-        Mon, 12 Apr 2021 05:52:53 -0700 (PDT)
+        bh=DEN7UWxU5iFQpUftfSPZicbN3DjnaYsTaEPzAYV3xeM=;
+        b=S6O7ZeLYG521REKCR3Q0Eh0A3zFAdaj3MdzmTpoX2cVAPE32+62ZfnK2vyAvod5aHK
+         BFAYzetJz7CIIgFBr70OZ1ZcfgrT3sOy3X8vxRzZ1SaGFtmRggY2GfCNfbfSHzcuvP93
+         6FfsZw5vqNSsYABC1l/10c5VDEqDpy2J1+zqSUVejd6kypUjxk5De1NM8USbYRK9P5mR
+         7kAwW5B0gJrWny4pgx2axgXvjNZUBJA8Kk4gNzT1xUsqV076GleRfk16u2vHP8r68chX
+         0bpA06cIfmD0oF+/hdsOl4mqk984R7Ho3EH8W84FF0Qa2QKexSss4/oE8G/KjlY7jqlZ
+         j/cQ==
+X-Gm-Message-State: AOAM5300KeNmkVh5nf6TIffs24ERGX0tuAUJ6DuU3vBkPO00RXD3EwvH
+        IGpC9sgA3j8O72LX8vDuCcLlFlG87c0I6Q==
+X-Google-Smtp-Source: ABdhPJwQal0GpA5BltPe+eAawSZQNR05clMs/QjGBddIMnOrFX3/msc2TYzsy5ppDeUKinXny5hu4g==
+X-Received: by 2002:a17:90a:e510:: with SMTP id t16mr22678453pjy.224.1618232157942;
+        Mon, 12 Apr 2021 05:55:57 -0700 (PDT)
 Received: from [192.168.1.134] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id t12sm11687259pga.85.2021.04.12.05.52.52
+        by smtp.gmail.com with ESMTPSA id k13sm8114823pji.14.2021.04.12.05.55.57
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 Apr 2021 05:52:53 -0700 (PDT)
-Subject: Re: [PATCH V5 10/12] block: add queue_to_disk() to get gendisk from
- request_queue
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org,
-        Jeffle Xu <jefflexu@linux.alibaba.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Hannes Reinecke <hare@suse.de>
-References: <20210401021927.343727-1-ming.lei@redhat.com>
- <20210401021927.343727-11-ming.lei@redhat.com>
+        Mon, 12 Apr 2021 05:55:57 -0700 (PDT)
+Subject: Re: [PATCH for-5.13/drivers] block: remove the -ERESTARTSYS handling
+ in blkdev_get_by_dev
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     linux-block@vger.kernel.org
+References: <20210412080318.2583748-1-hch@lst.de>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <8ba2f989-8294-cdf1-09a8-11cae5f4f03e@kernel.dk>
-Date:   Mon, 12 Apr 2021 06:52:52 -0600
+Message-ID: <1e67afac-d41f-f9a6-81e1-294dfb81d0dd@kernel.dk>
+Date:   Mon, 12 Apr 2021 06:55:57 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210401021927.343727-11-ming.lei@redhat.com>
+In-Reply-To: <20210412080318.2583748-1-hch@lst.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -80,19 +76,10 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/31/21 8:19 PM, Ming Lei wrote:
-> From: Jeffle Xu <jefflexu@linux.alibaba.com>
-> 
-> Sometimes we need to get the corresponding gendisk from request_queue.
-> 
-> It is preferred that block drivers store private data in
-> gendisk->private_data rather than request_queue->queuedata, e.g. see:
-> commit c4a59c4e5db3 ("dm: stop using ->queuedata").
-> 
-> So if only request_queue is given, we need to get its corresponding
-> gendisk to get the private data stored in that gendisk.
+On 4/12/21 2:03 AM, Christoph Hellwig wrote:
+> Now that md has been cleaned up we can get rid of this hack.
 
-Applied this one as a separate cleanup/helper.
+Applied, thanks.
 
 -- 
 Jens Axboe
