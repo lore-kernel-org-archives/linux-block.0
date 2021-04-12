@@ -2,95 +2,111 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C188FC433B4
-	for <linux-block@archiver.kernel.org>; Mon, 12 Apr 2021 13:14:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ACE2C433ED
+	for <linux-block@archiver.kernel.org>; Mon, 12 Apr 2021 13:47:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8E68C611CE
-	for <linux-block@archiver.kernel.org>; Mon, 12 Apr 2021 13:14:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D1C956128B
+	for <linux-block@archiver.kernel.org>; Mon, 12 Apr 2021 13:47:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241680AbhDLNOS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Apr 2021 09:14:18 -0400
-Received: from mx2.suse.de ([195.135.220.15]:58274 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S241101AbhDLNOR (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Apr 2021 09:14:17 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id F2837AC6A;
-        Mon, 12 Apr 2021 13:13:58 +0000 (UTC)
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-bcache@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        linux-block@vger.kernel.org
-References: <20210411134316.80274-1-colyli@suse.de>
- <20210411134316.80274-8-colyli@suse.de> <20210412090600.GA8026@lst.de>
- <902e1ba6-cd73-b0e8-6c17-75fccbaeb9b4@suse.de>
- <caf688de-19f6-925e-3059-966fe0d8ce42@kernel.dk>
-From:   Coly Li <colyli@suse.de>
-Subject: Re: [PATCH 7/7] bcache: fix a regression of code compiling failure in
- debug.c
-Message-ID: <254414c0-8f5d-753e-edb1-e9d3805e7bfb@suse.de>
-Date:   Mon, 12 Apr 2021 21:13:55 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.9.1
+        id S239682AbhDLNrT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Apr 2021 09:47:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45640 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238881AbhDLNrT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 12 Apr 2021 09:47:19 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B685C061574
+        for <linux-block@vger.kernel.org>; Mon, 12 Apr 2021 06:47:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=RJwWlUuntGJu9dP/0ZitYZKI+BkhwkgTc5pA0FYErEk=; b=PlAFcpHgWouYIAdSVGdtuqrjPj
+        KWAf52KVsf8aJn7vLGHmA3bdXrT2DXp6Rd2imbYo7BLO8RnHHerx/kyfdrqtl48pik7D3l/HAHGE2
+        a8wmzDJF8RnuwU/Xo3jtHJgpSbROmRUoMFS6SiouuC/EdOqby1d4h5YEhXbXOKonMWgzmDE3D8i2M
+        pMd/joORaSm3pxwW9E4Kx8TxGF+tPlTr3RkJvy5ZZqcs3Oz2zCBY4Jm/rtfwCTwhqSLTcjbVUUJAH
+        rkQbe0gWX2C6lFUH7MxHatlg2pWB1cAneYqplbrlIfgVULcmXO7HcCSLUoyMG80wKt9TINYegIst9
+        FRLOVRzw==;
+Received: from [2001:4bb8:199:e2bd:3218:1918:85d1:2852] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
+        id 1lVwu4-006HHi-DN; Mon, 12 Apr 2021 13:47:00 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org
+Subject: [PATCH 1/2] block: remove zero_fill_bio_iter
+Date:   Mon, 12 Apr 2021 15:46:57 +0200
+Message-Id: <20210412134658.2623190-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.1
 MIME-Version: 1.0
-In-Reply-To: <caf688de-19f6-925e-3059-966fe0d8ce42@kernel.dk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/12/21 8:50 PM, Jens Axboe wrote:
-> On 4/12/21 3:53 AM, Coly Li wrote:
->> On 4/12/21 5:06 PM, Christoph Hellwig wrote:
->>> On Sun, Apr 11, 2021 at 09:43:16PM +0800, Coly Li wrote:
->>>> The patch "bcache: remove PTR_CACHE" introduces a compiling failure in
->>>> debug.c with following error message,
->>>>   In file included from drivers/md/bcache/bcache.h:182:0,
->>>>                    from drivers/md/bcache/debug.c:9:
->>>>   drivers/md/bcache/debug.c: In function 'bch_btree_verify':
->>>>   drivers/md/bcache/debug.c:53:19: error: 'c' undeclared (first use in
->>>>   this function)
->>>>     bio_set_dev(bio, c->cache->bdev);
->>>>                      ^
->>>> This patch fixes the regression by replacing c->cache->bdev by b->c->
->>>> cache->bdev.
->>>
->>> Why not fold this into the offending patch?
->>>
->>
->> I don't know whether I can do it without authorization or agreement from
->> original author. And I see other maintainers handling similar situation
->> by either re-write whole patch or appending an extra fix.
->>
->> If you have a suggested process, I can try it out next time for similar
->> situation.
-> 
-> What I generally do is just add a line between the SOB's for cases
-> like this, ala:
-> 
-> commit 70aacfe66136809d7f080f89c492c278298719f4
-> Author: Pavel Begunkov <asml.silence@gmail.com>
-> Date:   Mon Mar 1 13:02:15 2021 +0000
-> 
->     io_uring: kill sqo_dead and sqo submission halting
->     
->     As SQPOLL task doesn't poke into ->sqo_task anymore, there is no need to
->     kill the sqo when the master task exits. Before it was necessary to
->     avoid races accessing sqo_task->files with removing them.
->     
->     Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
->     [axboe: don't forget to enable SQPOLL before exit, if started disabled]
->     Signed-off-by: Jens Axboe <axboe@kernel.dk>
-> 
+zero_fill_bio_iter is only used to implement zero_fill_bio, so
+remove the indirection.
 
-This is a new skill to me. Thanks for the hint, I will use such method
-to handle similar situation next time.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/bio.c         | 6 +++---
+ include/linux/bio.h | 7 +------
+ 2 files changed, 4 insertions(+), 9 deletions(-)
 
-Coly Li
+diff --git a/block/bio.c b/block/bio.c
+index 26b7f721cda88b..0fecb80872c23f 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -493,20 +493,20 @@ struct bio *bio_kmalloc(gfp_t gfp_mask, unsigned short nr_iovecs)
+ }
+ EXPORT_SYMBOL(bio_kmalloc);
+ 
+-void zero_fill_bio_iter(struct bio *bio, struct bvec_iter start)
++void zero_fill_bio(struct bio *bio)
+ {
+ 	unsigned long flags;
+ 	struct bio_vec bv;
+ 	struct bvec_iter iter;
+ 
+-	__bio_for_each_segment(bv, bio, iter, start) {
++	bio_for_each_segment(bv, bio, iter) {
+ 		char *data = bvec_kmap_irq(&bv, &flags);
+ 		memset(data, 0, bv.bv_len);
+ 		flush_dcache_page(bv.bv_page);
+ 		bvec_kunmap_irq(data, &flags);
+ 	}
+ }
+-EXPORT_SYMBOL(zero_fill_bio_iter);
++EXPORT_SYMBOL(zero_fill_bio);
+ 
+ /**
+  * bio_truncate - truncate the bio to small size of @new_size
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index d0246c92a6e865..a8021d79d45d1f 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -485,14 +485,9 @@ extern void bio_copy_data_iter(struct bio *dst, struct bvec_iter *dst_iter,
+ extern void bio_copy_data(struct bio *dst, struct bio *src);
+ extern void bio_list_copy_data(struct bio *dst, struct bio *src);
+ extern void bio_free_pages(struct bio *bio);
+-void zero_fill_bio_iter(struct bio *bio, struct bvec_iter iter);
+ void bio_truncate(struct bio *bio, unsigned new_size);
+ void guard_bio_eod(struct bio *bio);
+-
+-static inline void zero_fill_bio(struct bio *bio)
+-{
+-	zero_fill_bio_iter(bio, bio->bi_iter);
+-}
++void zero_fill_bio(struct bio *bio);
+ 
+ extern const char *bio_devname(struct bio *bio, char *buffer);
+ 
+-- 
+2.30.1
+
