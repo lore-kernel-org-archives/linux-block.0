@@ -2,257 +2,99 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA57CC433ED
-	for <linux-block@archiver.kernel.org>; Mon, 12 Apr 2021 05:27:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBAF3C433B4
+	for <linux-block@archiver.kernel.org>; Mon, 12 Apr 2021 05:35:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 956E2610C8
-	for <linux-block@archiver.kernel.org>; Mon, 12 Apr 2021 05:27:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8AE6961207
+	for <linux-block@archiver.kernel.org>; Mon, 12 Apr 2021 05:35:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229574AbhDLF1e (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Apr 2021 01:27:34 -0400
-Received: from mx2.suse.de ([195.135.220.15]:57750 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229448AbhDLF1d (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Apr 2021 01:27:33 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 5CD92ACC5;
-        Mon, 12 Apr 2021 05:27:15 +0000 (UTC)
-Subject: Re: [PATCH v9 13/13] lpfc: vmid: Introducing vmid in io path.
-To:     James Smart <jsmart2021@gmail.com>,
-        Muneendra <muneendra.kumar@broadcom.com>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        tj@kernel.org, linux-nvme@lists.infradead.org
-Cc:     emilne@redhat.com, mkumar@redhat.com,
-        Gaurav Srivastava <gaurav.srivastava@broadcom.com>
-References: <1617750397-26466-1-git-send-email-muneendra.kumar@broadcom.com>
- <1617750397-26466-14-git-send-email-muneendra.kumar@broadcom.com>
- <91b0c309-6908-8fd9-ac60-a8572500c3ed@suse.de>
- <201c6604-8e9d-bfcb-f39e-be507f8b02d6@gmail.com>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <edbcc321-fba1-e908-7932-ecb6b70ffc50@suse.de>
-Date:   Mon, 12 Apr 2021 07:27:14 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
+        id S230255AbhDLFgA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Apr 2021 01:36:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50312 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230082AbhDLFgA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 12 Apr 2021 01:36:00 -0400
+Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98368C061574
+        for <linux-block@vger.kernel.org>; Sun, 11 Apr 2021 22:35:42 -0700 (PDT)
+Received: by mail-ej1-x631.google.com with SMTP id a7so18205198eju.1
+        for <linux-block@vger.kernel.org>; Sun, 11 Apr 2021 22:35:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=B9whVOjYLNtz/N21mjeKtcvhO5IVOCd2iAu/rBorEB8=;
+        b=doh5Eo4wZ9Hm8tN8np3R/2fkACpxz9WKI+S63Jvg7PZXJs1wWmrFiykiccocODAVJz
+         QXwTKSTYf58zm+5T14iQHu7HQ4STzZBMj1KoRgMYnSwz36rPdXf3Ki9p/mpPX+bc1D0A
+         6rFG2Uv3gUauw52/2nGHNExJFRFcRWS4G+XiXLhiPeO3QQ1us7LOWfHUzz+3LAW6urez
+         I3LljSkkv1P29vFsDMDbfXeiZ9k8XuhEnquQW6pmTrYZfaI54gFY+TNCUL6z9fRFpLds
+         GJoDlVJDiJgt4wriPbZl2idmx2LobjeQhADpyt96D2W2u+jV6v5K57Zh5g3DIJgw2YtV
+         VRhg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=B9whVOjYLNtz/N21mjeKtcvhO5IVOCd2iAu/rBorEB8=;
+        b=dja82H93TI4uONkiy355OZD4mDoBynB3XVzqM2tqhkavRjLA6x3T/z3TYrgIXZ5Hvo
+         P8P2OUPfogQIDG+KUZPdHxjg5NEhuWoXuLqb2wTN7s7U1cfXb+swx4HBEe8VIx0dlCVw
+         JILpWkfoPfRzwGghPPDXIoCYBT0aSyvw2OGkj4UnP5WfUrH2t3/dzmDPR2GU54UJfxBb
+         r+dxbjE6ilsTNdMUEv50iAy5VMB0tV4U1h5ZdI9triueZRTYtghxHX0L5JdxO2AQyPnQ
+         sJCwFyIraVJXBaq/p2Hq81sI5UqZOrgmmeahsIphBwbB4LXmyz40JHJKA9OH2pdk3afN
+         nZJQ==
+X-Gm-Message-State: AOAM531jz3oVck10NTxB7m9jvIsQjwMamG9Qp0npD0lspBLGOkJEYQrW
+        J+5QBUDLuM+qOYRNGZZcK1jqKMuRPNnlccebpB2jj4ql090=
+X-Google-Smtp-Source: ABdhPJyS/CFuvyuLubgivS0yA5o0TCKBtuNYKedcR3zizntArGO261T0PSbh7Q1RdFXR1ffyo8PsP1NzO4EjrIyo4r4=
+X-Received: by 2002:a17:906:fb81:: with SMTP id lr1mr222748ejb.62.1618205741381;
+ Sun, 11 Apr 2021 22:35:41 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <201c6604-8e9d-bfcb-f39e-be507f8b02d6@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20210409160305.711318-1-haris.iqbal@ionos.com> <ef59e838-4d7f-cab4-e1ac-26944cb7db75@kernel.dk>
+In-Reply-To: <ef59e838-4d7f-cab4-e1ac-26944cb7db75@kernel.dk>
+From:   Jinpu Wang <jinpu.wang@ionos.com>
+Date:   Mon, 12 Apr 2021 07:35:30 +0200
+Message-ID: <CAMGffE=ZdCUc_HABY3_F_aK6pqCt8maB4yi9Qu4gKoox6ub6QQ@mail.gmail.com>
+Subject: Re: [PATCH V6 0/3] block: add two statistic tables
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Md Haris Iqbal <haris.iqbal@ionos.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        Danil Kipnis <danil.kipnis@ionos.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/10/21 5:00 PM, James Smart wrote:
-> On 4/8/2021 1:46 AM, Hannes Reinecke wrote:
->> On 4/7/21 1:06 AM, Muneendra wrote:
->>> From: Gaurav Srivastava <gaurav.srivastava@broadcom.com>
-> ...
->>> +        /* while the read lock was released, in case the entry was */
->>> +        /* added by other context or is in process of being added */
->>> +        if (vmp && vmp->flag & LPFC_VMID_REGISTERED) {
->>> +            lpfc_vmid_update_entry(vport, cmd, vmp, tag);
->>> +            write_unlock(&vport->vmid_lock);
->>> +            return 0;
->>> +        } else if (vmp && vmp->flag & LPFC_VMID_REQ_REGISTER) {
->>> +            write_unlock(&vport->vmid_lock);
->>> +            return -EBUSY;
->>> +        }
->>> +
->>> +        /* else search and allocate a free slot in the hash table */
->>> +        if (vport->cur_vmid_cnt < vport->max_vmid) {
->>> +            for (i = 0; i < vport->max_vmid; ++i) {
->>> +                vmp = vport->vmid + i;
->>> +                if (vmp->flag == LPFC_VMID_SLOT_FREE) {
->>> +                    vmp = vport->vmid + i;
-> 
-> delete this last line and adjust parens - really odd that it replicates 
-> the assignment 2 lines earlier.
-> 
->>> +                    break;
->>> +                }
->>> +            }
-> 
-> I would prefer that if the table is expended and no slots free, that 
-> -ENOMEM is returned here. Rather than falling down below and qualifying 
-> by slot free, then by pending (set only if slot free).  I can't believe 
-> there is a reason the idle timer has to be started if no slots free as 
-> all the other fail cases don't bother with it.
-> 
-> This also helps indentation levels below.
-> 
->>> +        } else {
->>> +            write_unlock(&vport->vmid_lock);
->>> +            return -ENOMEM;
->>> +        }
->>> +
->>> +        if (vmp && (vmp->flag == LPFC_VMID_SLOT_FREE)) {
->>> +            /* Add the vmid and register  */
->>> +            lpfc_put_vmid_in_hashtable(vport, hash, vmp);
->>> +            vmp->vmid_len = len;
->>> +            memcpy(vmp->host_vmid, uuid, vmp->vmid_len);
->>> +            vmp->io_rd_cnt = 0;
->>> +            vmp->io_wr_cnt = 0;
->>> +            vmp->flag = LPFC_VMID_SLOT_USED;
->>> +
->>> +            vmp->delete_inactive =
->>> +                vport->vmid_inactivity_timeout ? 1 : 0;
->>> +
->>> +            /* if type priority tag, get next available vmid */
->>> +            if (lpfc_vmid_is_type_priority_tag(vport))
->>> +                lpfc_vmid_assign_cs_ctl(vport, vmp);
->>> +
->>> +            /* allocate the per cpu variable for holding */
->>> +            /* the last access time stamp only if vmid is enabled */
->>> +            if (!vmp->last_io_time)
->>> +                vmp->last_io_time =
->>> +                    __alloc_percpu(sizeof(u64),
->>> +                           __alignof__(struct
->>> +                                   lpfc_vmid));
->>> +
->>> +            /* registration pending */
->>> +            pending = 1;
->>> +        } else {
->>> +            rc = -ENOMEM;
->>> +        }
->>> +        write_unlock(&vport->vmid_lock);
->>> +
->>> +        /* complete transaction with switch */
->>> +        if (pending) {
->>> +            if (lpfc_vmid_is_type_priority_tag(vport))
->>> +                rc = lpfc_vmid_uvem(vport, vmp, true);
->>> +            else
->>> +                rc = lpfc_vmid_cmd(vport,
->>> +                           SLI_CTAS_RAPP_IDENT,
->>> +                           vmp);
->>> +            if (!rc) {
->>> +                write_lock(&vport->vmid_lock);
->>> +                vport->cur_vmid_cnt++;
->>> +                vmp->flag |= LPFC_VMID_REQ_REGISTER;
->>> +                write_unlock(&vport->vmid_lock);
->>> +            }
->>> +        }
->>> +
->>> +        /* finally, enable the idle timer once */
->>> +        if (!(vport->phba->pport->vmid_flag & LPFC_VMID_TIMER_ENBLD)) {
->>> +            mod_timer(&vport->phba->inactive_vmid_poll,
->>> +                  jiffies +
->>> +                  msecs_to_jiffies(1000 * LPFC_VMID_TIMER));
->>> +            vport->phba->pport->vmid_flag |= LPFC_VMID_TIMER_ENBLD;
->>> +        }
->>> +    }
->>> +    return rc;
->>> +}
->>> +
->>> +/*
->>> + * lpfc_is_command_vm_io - get the uuid from blk cgroup
->>> + * @cmd:Pointer to scsi_cmnd data structure
->>> + * Returns uuid if present if not null
->>> + */
->>> +static char *lpfc_is_command_vm_io(struct scsi_cmnd *cmd)
->>> +{
->>> +    char *uuid = NULL;
->>> +
->>> +    if (cmd->request) {
->>> +        if (cmd->request->bio)
->>> +            uuid = blkcg_get_fc_appid(cmd->request->bio);
->>> +    }
->>> +    return uuid;
->>> +}
->>> +
->>>   /**
->>>    * lpfc_queuecommand - scsi_host_template queuecommand entry point
->>>    * @shost: kernel scsi host pointer.
->>> @@ -5288,6 +5437,7 @@ lpfc_queuecommand(struct Scsi_Host *shost, 
->>> struct scsi_cmnd *cmnd)
->>>       int err, idx;
->>>   #ifdef CONFIG_SCSI_LPFC_DEBUG_FS
->>>       uint64_t start = 0L;
->>> +    u8 *uuid = NULL;
->>>       if (phba->ktime_on)
->>>           start = ktime_get_ns();
->>> @@ -5415,6 +5565,25 @@ lpfc_queuecommand(struct Scsi_Host *shost, 
->>> struct scsi_cmnd *cmnd)
->>>       }
->>> +    /* check the necessary and sufficient condition to support VMID */
->>> +    if (lpfc_is_vmid_enabled(phba) &&
->>> +        (ndlp->vmid_support ||
->>> +         phba->pport->vmid_priority_tagging ==
->>> +         LPFC_VMID_PRIO_TAG_ALL_TARGETS)) {
->>> +        /* is the IO generated by a VM, get the associated virtual */
->>> +        /* entity id */
->>> +        uuid = lpfc_is_command_vm_io(cmnd);
->>> +
->>> +        if (uuid) {
->>> +            err = lpfc_vmid_get_appid(vport, uuid, cmnd,
->>> +                (union lpfc_vmid_io_tag *)
->>> +                    &lpfc_cmd->cur_iocbq.vmid_tag);
->>> +            if (!err)
->>> +                lpfc_cmd->cur_iocbq.iocb_flag |= LPFC_IO_VMID;
->>> +        }
->>> +    }
->>> +
->>> +    atomic_inc(&ndlp->cmd_pending);
->>>   #ifdef CONFIG_SCSI_LPFC_DEBUG_FS
->>>       if (unlikely(phba->hdwqstat_on & LPFC_CHECK_SCSI_IO))
->>>           this_cpu_inc(phba->sli4_hba.c_stat->xmt_io);
->>>
->> And that's the bit which I don't particular like.
->>
->> Essentially we'll have to inject additional ELS commands _on each I/O_ 
->> to get a valid VMID.
->> Where there are _so_ many things which might get wrong, causing an I/O 
->> stall.
-> 
-> I don't follow you - yes ELS's are injected when there isn't an entry 
-> for the VM, but once there is, there isn't further ELS's. That is the 
-> cost. as we don't know what uuid's I/O will be sent to before hand, so 
-> it has to be siphoned off during the I/O flow.  I/O's can be sent 
-> non-tagged while the ELS's are completing (and there aren't multiple 
-> sets of ELS's as long as it's the same uuid), which is fine.
-> 
-> so I disagree with "_on each I/O_".
-> 
-Yeah, that was an exaggeration.
-Not on each I/O; I should've said 'on each unregistered I/O'.
+On Fri, Apr 9, 2021 at 11:03 PM Jens Axboe <axboe@kernel.dk> wrote:
+>
+> On 4/9/21 10:03 AM, Md Haris Iqbal wrote:
+> > Hi Jens,
+> >
+> > This version fixes the long lines in the code as per Christoph's comment.
+>
+> I'd really like to see some solid justification for the addition,
+> though. I clicked the v1 link and it's got details on what you get out
+> of it, but not really the 'why' of reasoning for the feature. I mean,
+> you could feasibly have a blktrace based userspace solution. Just
+> wondering if that has been tried, I know that's what we do at Facebook
+> for example.
+>
+Hi Jens,
 
-This really is my unhappiness with the entire VMID specification,
-where you can time out VMIDs after a certain period, and hence never
-be sure if any particular I/O really _is_ registered.
+Thanks for the reply.
+For the use case of the additional stats, as a cloud provider, we
+often need to handle report from the customers regarding
+performance problem in a period of time in the past, so it's not
+feasible for us to run blktrace, customer workload could change from
+time to time, with the additional stats, we gather through all metrics
+using Prometheus, we can navigate to the period of time interested,
+to check if the performance matches the SLA, it also helps us to find
+the user IO pattern,  we can more easily reproduce.
 
->> I would have vastly preferred if we could _avoid_ having to do 
->> additional ELS commands for VMID registration in the I/O path
->> (ie only allow for I/O with a valid VMID), and reject the I/O 
->> otherwise until VMID registration is complete.
->>
->> IE return 'BUSY' (or even a command retry?) when no valid VMID for 
->> this particular I/O is found, register the VMID (preferably in another 
->> thread), and restart the queue once the VMID is registered.
-> 
-> Why does it bother you with the I/O path ?  It's actually happening in 
-> parallel with no real relation between the two.
-> 
-> I seriously disagree with reject if no vmid tag. Why?  what do you gain 
-> ? This actually introduces more disruption than the parallel flow with 
-> the ELSs.   Also, after link bounce, where all VMID's have to be done, 
-> it adds a stall window after link up right when things are trying to 
-> resume after rports rejoin. Why add the i/o rebouncing ? There no real 
-> benefit. Issuing a few untagged I/O doesn't hurt.
-> 
-That indeed is a valid point. I retract my objection.
+We do use blktrace from time to time too if it's not too late (when IO
+pattern has not changed.)
 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
+Thanks!
+Jack
