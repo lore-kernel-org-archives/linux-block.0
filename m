@@ -2,202 +2,155 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,PDS_BAD_THREAD_QP_64,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DAC3C433ED
-	for <linux-block@archiver.kernel.org>; Mon, 12 Apr 2021 14:35:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FE12C433ED
+	for <linux-block@archiver.kernel.org>; Mon, 12 Apr 2021 15:17:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 480316134F
-	for <linux-block@archiver.kernel.org>; Mon, 12 Apr 2021 14:35:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D552660C3E
+	for <linux-block@archiver.kernel.org>; Mon, 12 Apr 2021 15:17:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238029AbhDLOf1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Apr 2021 10:35:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56220 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237558AbhDLOf1 (ORCPT
+        id S240372AbhDLPRv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Apr 2021 11:17:51 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:57499 "EHLO
+        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239412AbhDLPRv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Apr 2021 10:35:27 -0400
-Received: from mail-il1-x12a.google.com (mail-il1-x12a.google.com [IPv6:2607:f8b0:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35E90C061574;
-        Mon, 12 Apr 2021 07:35:09 -0700 (PDT)
-Received: by mail-il1-x12a.google.com with SMTP id b17so11182653ilh.6;
-        Mon, 12 Apr 2021 07:35:09 -0700 (PDT)
+        Mon, 12 Apr 2021 11:17:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1618240653; x=1649776653;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=G8FZ0D3PP/OudJ5uuxCAz/C/vBHo8wESZoPwxTWqVEI=;
+  b=CHX+QQNdfG7I//dYYOUlkR7/1fyDANpZ+oU1XbGmIr3UDqMuGqPDwPdL
+   FB+b2ruk1Dq5FV/+xAU3ld7qZxQP6Bk2xW0bUEPJYTDuvDs0uJXkJoKGt
+   Z6hMy2ZnpWmO9w8SIO5k1duGdBLLkbzvWqY76UyPXYtX6CHVKOq6jw3DL
+   PIXfgK0zmYa/M7enghvyoEeCaX9lv4nLnzl5lZlTEPAxyP9AWgOUHR7G7
+   gDAyj+8C7shCyWQW8q+otmuSgRMhiXIJRfgiwRhlf2qKkAjqqtsnRRiV7
+   i6nOozgUCgLr7iQFunGqS9sQmeokQGFWIG/T2oo1rhXJeSIPP60VNvpzp
+   g==;
+IronPort-SDR: OqjVdNQQy61gOfZiKKYS8mEJt9Nz6pYtHipEQUvT2ry+PqPvenizWLAv0NXo40M6BCGRToogRU
+ Io/VseKfI/02ohRgxS0t1Cc5BchXP94tQr17sGwEa0a5/S4AfL5wqk34WBfZGRSiRMTzH0CYYw
+ sKhfbGFwgMsToaGBDiWSAV1JsIhqZh59z4PAlpMZVTaq6Id+tXrmybL3xmhBtJYUUwoAI8K1Fn
+ ytATcMxFDYXNZ9Wmb1kvbCtvKkm2QwoWsb8a+d7JTuwppxYZXrs7vVN0+Z3qrlR0Q8BSjwQn5e
+ few=
+X-IronPort-AV: E=Sophos;i="5.82,216,1613404800"; 
+   d="scan'208";a="164149977"
+Received: from mail-cys01nam02lp2054.outbound.protection.outlook.com (HELO NAM02-CY1-obe.outbound.protection.outlook.com) ([104.47.37.54])
+  by ob1.hgst.iphmx.com with ESMTP; 12 Apr 2021 23:17:30 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=NOYj1jqofatmw/M/bv+AjGLFX1Yk38X8dfrg0ERmnBeoJ3/S8E0/6xYbFCjUtzWmSroKCFsbm9rfAS5Gsu7zwkCwmplnNpOGeJjfMza+g97koCp03u1Um2k2jO66rmUlkK5OssCEKIi4Xc7RcyHj+VOfr21sww0pq4OiH3+4xxcUHdHOg38acBEwsjQFvQWFkerb9IiDy3jVRvIiv2sdlrnEd2Q4DiwtGvLW8bDiRHwaixkSAu7DcoweAB6eGCamdNwrv9ebcSUupD5g3SSlRxa0tzm0pO2qqyao7bCnLs5sIJSMvDDfernbgcBgbCC0eMBqWIrPSgSy/AaqIWGNlA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=G8FZ0D3PP/OudJ5uuxCAz/C/vBHo8wESZoPwxTWqVEI=;
+ b=mKUUo+2IgQ/Dkv2Cc2IBrSyDsUEreQeU2eqhR/1F/hDDLcnlb7CbaldyRxN+gNQchOOzvM5NbVS1jNVsI0w7bz0k59BpsBTO+UpPhV6fHhsWjfUBgWoyQLxNWpZhxw7dmsgN5UJ+jTdunkO7LH0yGAzKh0eoj4cOUzdgI4BhBLCrHa9TTmCJkaDCCAX9rPy28lPBwiZyXTVoXvF7EolzhzHxFATQCHJVZ7b5eE4qoHU8o6IE7aLrlSjYIR78qPo2z1Dux2ESoeQDOhqUOWGTzNclJtn6Db7v+Dp8PTI04QZXs3gpae5JjKKnjqaihvq2LoKnMV4F0+YXpKW5Up13KQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=nl+e8gruZE2jm3U6Sm5K1rbed6F1G7jwfaUBg/d7wnQ=;
-        b=GEMfpQ63psb9h6jsOfJpCEamzHSC5KM6k6vvRkDUI9IH9wYf2vk0LAaZkhrDP5uqJP
-         9re2EwPVlFlea8z1dP7DMq08Hkb4+lj/tUSRLs/1bu+vp5kF+WEOn/bASDlbEvfJ7qhW
-         TlWimpek6XvxG+fPQApyWIlsa4gY3UMXD0CGekbaxI2O9nC2BkaWssIiIgM1Ko9hug7C
-         up/g+Ahu5aAAgcAOkP9rxOVRJINfo5vYUVYAr32YtS3Cn/Y/qD5hCyLC7Q/RxewJ26OE
-         4dWVYcA6NZn12wcJSGE7iUpBUs02nrhr/MQn5bid2/JRu4tb3w1285QRXJUb0EEhZTko
-         bhxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=nl+e8gruZE2jm3U6Sm5K1rbed6F1G7jwfaUBg/d7wnQ=;
-        b=F+xQW/Pe5r1XMdqRR/xSv/fb0FsgHNCHzzuEE+Arx5O4X4ntfYor1yQK9I7HbyT34a
-         Tv2r2If/8Ep+rQC2aNdvn+/VbNB2pW/npXiQJpvB4QSkCyfu9Huo03WQwwSISSBMy8Wo
-         /l+CDHezXQ4CVZOD0fYk1OpMlVnGYdkGprfN+77TVidDGPWqb4o/EJkQyupHs+9gv5fn
-         EDHDcZdKrv57ZxEVnEBa9VA6VoGjERnglcwMfUIEtOWkdNzCSkYkllF8uDd5se1LWknz
-         B5iqVrW4UavVq5DrS1n/63CMtEUnRXuekUqHlcSPACi6aDKUugIJt18xEWSG76e5aMo1
-         DxGw==
-X-Gm-Message-State: AOAM531JsO1wa49hkx5D9r8KhkXE0HqtGAiV21vIYos2dgcp8bxFzS0v
-        O3R6H5ONe4fFv6JGeNQzNFMYsnUuXPsA/WGY7ao=
-X-Google-Smtp-Source: ABdhPJzIyljg2UrVufiKLCV4AtEnX0lojUYHBV69oqiVNW99rdpYudFQX35/feDopBRdXXdq5MJ1SOwFrLXrR9vCLQU=
-X-Received: by 2002:a05:6e02:11a9:: with SMTP id 9mr13004896ilj.288.1618238107878;
- Mon, 12 Apr 2021 07:35:07 -0700 (PDT)
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=G8FZ0D3PP/OudJ5uuxCAz/C/vBHo8wESZoPwxTWqVEI=;
+ b=CF/PiHyyA85MZsrMtR9MJ6YZ6hI7juUSDR1/5G8O4F0ksB1QZesjD1VgEofr7cOIGsGmvVOtP1QkZCT8jWw4nbcPsXxyyvuiHHtxSAyK8rlvfkrfEf+09XTeBWhvEX3N4YALCjubsd+WmMppAn5XoDhoR2sOBPPNWx1HaWrini8=
+Received: from PH0PR04MB7416.namprd04.prod.outlook.com (2603:10b6:510:12::17)
+ by PH0PR04MB7494.namprd04.prod.outlook.com (2603:10b6:510:5b::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4020.18; Mon, 12 Apr
+ 2021 15:17:21 +0000
+Received: from PH0PR04MB7416.namprd04.prod.outlook.com
+ ([fe80::695f:800e:9f0c:1a4d]) by PH0PR04MB7416.namprd04.prod.outlook.com
+ ([fe80::695f:800e:9f0c:1a4d%6]) with mapi id 15.20.4020.022; Mon, 12 Apr 2021
+ 15:17:21 +0000
+From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+To:     Christoph Hellwig <hch@lst.de>, "axboe@kernel.dk" <axboe@kernel.dk>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH 2/2] block: move bio_list_copy_data to pktcdvd
+Thread-Topic: [PATCH 2/2] block: move bio_list_copy_data to pktcdvd
+Thread-Index: AQHXL6JUp15MqIsaLkqtnxeIM6EXbg==
+Date:   Mon, 12 Apr 2021 15:17:21 +0000
+Message-ID: <PH0PR04MB7416836C6C44F25659B216159B709@PH0PR04MB7416.namprd04.prod.outlook.com>
+References: <20210412134658.2623190-1-hch@lst.de>
+ <20210412134658.2623190-2-hch@lst.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: lst.de; dkim=none (message not signed)
+ header.d=none;lst.de; dmarc=none action=none header.from=wdc.com;
+x-originating-ip: [129.253.240.74]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: db47e631-8a61-45e6-f70f-08d8fdc611ae
+x-ms-traffictypediagnostic: PH0PR04MB7494:
+x-microsoft-antispam-prvs: <PH0PR04MB7494EF48875A87A3B55002CB9B709@PH0PR04MB7494.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:1728;
+x-ms-exchange-senderadcheck: 1
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:5;SRV:;IPV:NLI;SFV:SPM;H:PH0PR04MB7416.namprd04.prod.outlook.com;PTR:;CAT:OSPM;SFS:(4636009)(346002)(366004)(39860400002)(376002)(396003)(136003)(26005)(66446008)(64756008)(86362001)(186003)(66556008)(38100700002)(19618925003)(478600001)(66946007)(55016002)(5660300002)(4326008)(9686003)(76116006)(52536014)(2906002)(66476007)(316002)(8936002)(7696005)(8676002)(6506007)(4270600006)(33656002)(71200400001)(110136005)(558084003)(3593001)(17423001)(156123004);DIR:OUT;SFP:1501;
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: =?us-ascii?Q?F6hCj8FmWIdcNn89tpc54EDE6EfQSkU8RsYknaml00v0IdKs9hRZRm23DQEO?=
+ =?us-ascii?Q?qH3UWG+8PDkgvhXW05EgJMnyq5ah/zJkz0mgnKYokHORJWYW49LDENsRxKH4?=
+ =?us-ascii?Q?vthOWUEOBFYPBPUtSZcqI8MR5klE0W4W55xFI+vDUpIpfvGTpV147b3W5ay+?=
+ =?us-ascii?Q?H9OukZdSE+seuz1fRzjxl3kUIQe/fcw/fLcXa3zl6k0djDByJlLpxR7wYLsO?=
+ =?us-ascii?Q?kjSoHg/La1ZORWhbpdGvfFJbZmJqdWRuFivxzYdJbZqIFXt1w4yv0qqiOtSv?=
+ =?us-ascii?Q?kIoYCdvPzp61xOAJfaebft8EwM5ce5u6xn50WqXlGUCo3nxodyxBCUbkvfiA?=
+ =?us-ascii?Q?ukltoBtaSNmm9UzuvCbHoX5le1XajbpYt3ttwsaDzUhX+yqb7naLiIeQtgwH?=
+ =?us-ascii?Q?pbIl8sHrxcpTf866722ms0u1mnqQulFqPB+ktq3nlxgvVO6JAmM2OE7eHhBP?=
+ =?us-ascii?Q?j815Wt4sR7CEZrPWlUN0dJnbg2D7oaGt5bUOMzjQcpnDtGmScCznbfE7Kr2N?=
+ =?us-ascii?Q?nrno54/kqatTMOJp1Gy/jLN5GG+RVqkqOHbCRf+kukyywQUeWoi0iWqkdt3R?=
+ =?us-ascii?Q?P7bvtmtUNvzeIINziL1SNPaYbRlbaS3TLvHT4twxEgIKXgoTkgdP+onjrUQx?=
+ =?us-ascii?Q?pN3Sp/DQFghJJWPZ9C7kwAuR+q4UWC3N0XanKcqC8ZmO+beY9CIs7N64vKCK?=
+ =?us-ascii?Q?pRM/OR36eN60K8Qyn8IfaIoTw1PFqdy4XGs1kG9NytDNVpWzh/JLM6OdUhzH?=
+ =?us-ascii?Q?Rb2jht0wXeEwwHo/JHOMagRAr15kCQ/j04yTlPaNF2lkDrLsrbqv44RPGTTN?=
+ =?us-ascii?Q?PYPTvq8GraQUQb7uV3w2ZL6cDoGUQJxKB7jLeO4jb2iMploHkGxrv2ZwTaKD?=
+ =?us-ascii?Q?wQy/nhXtnv57MNQkNyqeZBUJLtX9Ap44bLoGd9ibIJu/kyWuCWuCLQADnwgJ?=
+ =?us-ascii?Q?BYOYdlFDplrsWOVEFUU/gQf68LnQ4t5oH/sTVI+IvThQwh92P2Q4jKLLhjSQ?=
+ =?us-ascii?Q?jUTr?=
+x-ms-exchange-antispam-messagedata: =?us-ascii?Q?5KX3SryfE8RYG/yILZjJGuHUAB6616tJMzs3I2Hg5KN4TNHuD1BR751Isipz?=
+ =?us-ascii?Q?laXztniur1IXXh1b6tPyTk32UB+H3X+Nc03fkmA8oJsz762qnspoMQPZbTgc?=
+ =?us-ascii?Q?zxbXLSuZR79ZZlgsAMtMkOYEPimKrAL+xMqpMKz0u0A2luKzWD+MkznZ9fU3?=
+ =?us-ascii?Q?NFuDteGbSX44NfcnoTO0NgTYvKrnIAR6K90rEXZAi3tEB8ttNPboAKP//Uyj?=
+ =?us-ascii?Q?KW1YR0L3gMY0e1l77OROd4NinwHk6ngECi71lllLq+XlMYb5TIRNGYlSYL+i?=
+ =?us-ascii?Q?wykNnn1ZgsvHBk/p9OIEBeDFnNtuA1+oLAs7aQINeQyMbgHa/aZl2bpmj0lD?=
+ =?us-ascii?Q?9i8aP85p8fm60PFSHmKxWijolpztpyrOwlpauw2osC58P7qCQ9vVJ3n2SiFq?=
+ =?us-ascii?Q?ONkWPlcBGRQRboEyF9OsDFox0pnzRMV7SrVVZnqjZZdPWPGlmVWOQSls7pw9?=
+ =?us-ascii?Q?/9PeJRKwXP+Iyok3iA1Nakn2dmEXd8+D7qZH3vrK0bbpIU8W4o83C3TGUVf7?=
+ =?us-ascii?Q?6ymIywUrcmvDV6xabtceOCi9mMDQLEhOhFTQ/jkP0g09YLSmh0i335kIWt86?=
+ =?us-ascii?Q?ASpu3HBu3EFu546FIEYqfxxypmHdgXfQ7IgOml7qXh2NB2WbTrl+1Ks0WEDp?=
+ =?us-ascii?Q?vJv/CXgvRDCS1n+aajP5gNPYCwgl8+n6wbM1NSwjCDMnYyJPt4HX0dhIJ1RF?=
+ =?us-ascii?Q?W1kbD6rEFnr6u+5KPP7R7ZjYhroQ21OHnkUBIUaoaBgT0YxQPd2aq9hibQlV?=
+ =?us-ascii?Q?0ggirO0Zx01MA34+GWyiKVOFJXxl4xDggSu1sXjVFQQ8lv9JMWtmjhZtbttW?=
+ =?us-ascii?Q?U7jtk0juAxNNAW6kWCROxxpYSnfQ+4jJwUAUrKObko/3lDtekS+TmQCtY0vG?=
+ =?us-ascii?Q?nzrvTx3SANC6xwAPpokpuN4UxZyoEJOGUr0OWZDaQ76bOmlOk3bVAt4A+LV2?=
+ =?us-ascii?Q?WxgL7/7SkiM4FKWdZcyEVruzOnhryTJGV9N7V0ULWUvyjFV4hiyIqkBwx4FW?=
+ =?us-ascii?Q?W/20s+EdYcvgtg7P8s9Fx1O80yWP1U94tnHz/QnlYmLRDMkMyWaN9Gvk4rCM?=
+ =?us-ascii?Q?d2wvevNg6L+YfRO62/J+PKOH49j58pG4i0hGINtx0q201igB66z6ZH3qJo2y?=
+ =?us-ascii?Q?uEIM8B6NbJqjyiIlzNIvcBFbpL+HhOaidSjnA53Vk9yODfaje8HmvW4c2CrE?=
+ =?us-ascii?Q?g4sISTH45r3BgEFPdw6OhmEQNbNw8c6bBe3OhpBuEUArtrgCePx1OqgGxQCD?=
+ =?us-ascii?Q?e2MNXdmKETxFnoHIh8GbLEgqcAosu98w7C8spZsnf2Kn6iOuuDvL7iphT50W?=
+ =?us-ascii?Q?3dNT2e8nHihqqCDFDCSX4qEehguSH3v01v77j2Y/zkFgJQ=3D=3D?=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-References: <20210219124517.79359-1-selvakuma.s1@samsung.com>
- <CGME20210219124603epcas5p33add0f2c1781b2a4d71bf30c9e1ac647@epcas5p3.samsung.com>
- <20210219124517.79359-3-selvakuma.s1@samsung.com> <BL0PR04MB6514EA91680D33A5890ECE16E7839@BL0PR04MB6514.namprd04.prod.outlook.com>
- <CAHqX9vb6GgaU9QdTQaq3=dGuoNCuWorLrGCF8gC5LEdFBESFcA@mail.gmail.com> <BL0PR04MB6514B34000467FABFD6BF385E7709@BL0PR04MB6514.namprd04.prod.outlook.com>
-In-Reply-To: <BL0PR04MB6514B34000467FABFD6BF385E7709@BL0PR04MB6514.namprd04.prod.outlook.com>
-From:   Selva Jove <selvajove@gmail.com>
-Date:   Mon, 12 Apr 2021 20:04:55 +0530
-Message-ID: <CAHqX9vYvtOaVL4LG0gAGCMz+a8uha8czH==Dgg3eG+TWA+xeVQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v5 2/4] block: add simple copy support
-To:     Damien Le Moal <Damien.LeMoal@wdc.com>
-Cc:     SelvaKumar S <selvakuma.s1@samsung.com>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "kbusch@kernel.org" <kbusch@kernel.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>, "hch@lst.de" <hch@lst.de>,
-        "sagi@grimberg.me" <sagi@grimberg.me>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "snitzer@redhat.com" <snitzer@redhat.com>,
-        "joshiiitr@gmail.com" <joshiiitr@gmail.com>,
-        "nj.shetty@samsung.com" <nj.shetty@samsung.com>,
-        "joshi.k@samsung.com" <joshi.k@samsung.com>,
-        "javier.gonz@samsung.com" <javier.gonz@samsung.com>,
-        "kch@kernel.org" <kch@kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR04MB7416.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: db47e631-8a61-45e6-f70f-08d8fdc611ae
+X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Apr 2021 15:17:21.3781
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: O5VNrZI3CyHfG0v+Ofy4nLonCMJkdqLWNybwBx2wpFSemAeIAEISw+QL2OnP7l7tB2pNtETZ+ga0BA+i0pUAjuRRyt8zvKh25B8I3/0zmbU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR04MB7494
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Apr 12, 2021 at 5:55 AM Damien Le Moal <Damien.LeMoal@wdc.com> wrote:
->
-> On 2021/04/07 20:33, Selva Jove wrote:
-> > Initially I started moving the dm-kcopyd interface to the block layer
-> > as a generic interface.
-> > Once I dig deeper in dm-kcopyd code, I figured that dm-kcopyd is
-> > tightly coupled with dm_io()
-> >
-> > To move dm-kcopyd to block layer, it would also require dm_io code to
-> > be moved to block layer.
-> > It would cause havoc in dm layer, as it is the backbone of the
-> > dm-layer and needs complete
-> > rewriting of dm-layer. Do you see any other way of doing this without
-> > having to move dm_io code
-> > or to have redundant code ?
->
-> Right. Missed that. So reusing dm-kcopyd and making it a common interface will
-> take some more efforts. OK, then. For the first round of commits, let's forget
-> about this. But I still think that your emulation could be a lot better than a
-> loop doing blocking writes after blocking reads.
->
-
-Current implementation issues read asynchronously and once all the reads are
-completed, then the write is issued as whole to reduce the IO traffic
-in the queue.
-I agree that things can be better. Will explore another approach of
-sending writes
-immediately once reads are completed and with  plugging to increase the chances
-of merging.
-
-> [...]
-> >>> +int blkdev_issue_copy(struct block_device *src_bdev, int nr_srcs,
-> >>> +             struct range_entry *src_rlist, struct block_device *dest_bdev,
-> >>> +             sector_t dest, gfp_t gfp_mask, int flags)
-> >>> +{
-> >>> +     struct request_queue *q = bdev_get_queue(src_bdev);
-> >>> +     struct request_queue *dest_q = bdev_get_queue(dest_bdev);
-> >>> +     struct blk_copy_payload *payload;
-> >>> +     sector_t bs_mask, copy_size;
-> >>> +     int ret;
-> >>> +
-> >>> +     ret = blk_prepare_payload(src_bdev, nr_srcs, src_rlist, gfp_mask,
-> >>> +                     &payload, &copy_size);
-> >>> +     if (ret)
-> >>> +             return ret;
-> >>> +
-> >>> +     bs_mask = (bdev_logical_block_size(dest_bdev) >> 9) - 1;
-> >>> +     if (dest & bs_mask) {
-> >>> +             return -EINVAL;
-> >>> +             goto out;
-> >>> +     }
-> >>> +
-> >>> +     if (q == dest_q && q->limits.copy_offload) {
-> >>> +             ret = blk_copy_offload(src_bdev, payload, dest, gfp_mask);
-> >>> +             if (ret)
-> >>> +                     goto out;
-> >>> +     } else if (flags & BLKDEV_COPY_NOEMULATION) {
-> >>
-> >> Why ? whoever calls blkdev_issue_copy() wants a copy to be done. Why would that
-> >> user say "Fail on me if the device does not support copy" ??? This is a weird
-> >> interface in my opinion.
-> >>
-> >
-> > BLKDEV_COPY_NOEMULATION flag was introduced to allow blkdev_issue_copy() callers
-> > to use their native copying method instead of the emulated copy that I
-> > added. This way we
-> > ensure that dm uses the hw-assisted copy and if that is not present,
-> > it falls back to existing
-> > copy method.
-> >
-> > The other users who don't have their native emulation can use this
-> > emulated-copy implementation.
->
-> I do not understand. Emulation or not should be entirely driven by the device
-> reporting support for simple copy (or not). It does not matter which component
-> is issuing the simple copy call: an FS to a real device, and FS to a DM device
-> or a DM target driver. If the underlying device reported support for simple
-> copy, use that. Otherwise, emulate with read/write. What am I missing here ?
->
-
-blkdev_issue_copy() api will generally complete the copy-operation,
-either by using
-offloaded-copy or by using emulated-copy. The caller of the api is not
-required to
-figure the type of support. However, it can opt out of emulated-copy
-by specifying
-the flag BLKDEV_NOEMULATION. This is helpful for the case when the
-caller already
-has got a sophisticated emulation (e.g. dm-kcopyd users).
-
->
-> [...]
-> >>> @@ -565,6 +569,12 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
-> >>>       if (b->chunk_sectors)
-> >>>               t->chunk_sectors = gcd(t->chunk_sectors, b->chunk_sectors);
-> >>>
-> >>> +     /* simple copy not supported in stacked devices */
-> >>> +     t->copy_offload = 0;
-> >>> +     t->max_copy_sectors = 0;
-> >>> +     t->max_copy_range_sectors = 0;
-> >>> +     t->max_copy_nr_ranges = 0;
-> >>
-> >> You do not need this. Limits not explicitely initialized are 0 already.
-> >> But I do not see why you can't support copy on stacked devices. That should be
-> >> feasible taking the min() for each of the above limit.
-> >>
-> >
-> > Disabling stacked device support was feedback from v2.
-> >
-> > https://patchwork.kernel.org/project/linux-block/patch/20201204094659.12732-2-selvakuma.s1@samsung.com/
->
-> Right. But the initialization to 0 is still not needed. The fields are already
-> initialized to 0.
->
->
-> --
-> Damien Le Moal
-> Western Digital Research
+Looks good,=0A=
+Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>=0A=
