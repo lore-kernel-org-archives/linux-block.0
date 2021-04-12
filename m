@@ -2,85 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B244C433ED
-	for <linux-block@archiver.kernel.org>; Mon, 12 Apr 2021 12:56:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C188FC433B4
+	for <linux-block@archiver.kernel.org>; Mon, 12 Apr 2021 13:14:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D2B0A61246
-	for <linux-block@archiver.kernel.org>; Mon, 12 Apr 2021 12:55:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8E68C611CE
+	for <linux-block@archiver.kernel.org>; Mon, 12 Apr 2021 13:14:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241374AbhDLM4Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Apr 2021 08:56:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34344 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241271AbhDLM4Q (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Apr 2021 08:56:16 -0400
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92E5BC061574
-        for <linux-block@vger.kernel.org>; Mon, 12 Apr 2021 05:55:58 -0700 (PDT)
-Received: by mail-pl1-x62a.google.com with SMTP id k21so329239pll.10
-        for <linux-block@vger.kernel.org>; Mon, 12 Apr 2021 05:55:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=DEN7UWxU5iFQpUftfSPZicbN3DjnaYsTaEPzAYV3xeM=;
-        b=CHcl6XTBgCY7rmOsqf15PHLM6f83nEN8N3JezvATOzNrLlwWwm7ivLSp1uHF6FXYFO
-         zdz4dKLGgvQ1XrXzbgKKQPjnWQw7PGqdkQhyQ8dVMkIIdrHesQhYWcr+BezC1HEOqVxx
-         CjEuAoTyTsbfL34x5IbCsoZ/EAiI1OZ2aXhbXf8+8L1xOKh2ej85pGsJjYYWdthtGGi1
-         1W82iK/BhV/f5vaiupyYa62Xa4D+R2kJf2DPzQJFqjd4h6FTuqBBDqdS42nqqqMyq935
-         1cL9D1g/2ZaLHFdk5OemotMlOmkc4yCBLmJuaxg5BBvmQNL3Kn7v1fHHURl7agNuhcjQ
-         TAoQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=DEN7UWxU5iFQpUftfSPZicbN3DjnaYsTaEPzAYV3xeM=;
-        b=S6O7ZeLYG521REKCR3Q0Eh0A3zFAdaj3MdzmTpoX2cVAPE32+62ZfnK2vyAvod5aHK
-         BFAYzetJz7CIIgFBr70OZ1ZcfgrT3sOy3X8vxRzZ1SaGFtmRggY2GfCNfbfSHzcuvP93
-         6FfsZw5vqNSsYABC1l/10c5VDEqDpy2J1+zqSUVejd6kypUjxk5De1NM8USbYRK9P5mR
-         7kAwW5B0gJrWny4pgx2axgXvjNZUBJA8Kk4gNzT1xUsqV076GleRfk16u2vHP8r68chX
-         0bpA06cIfmD0oF+/hdsOl4mqk984R7Ho3EH8W84FF0Qa2QKexSss4/oE8G/KjlY7jqlZ
-         j/cQ==
-X-Gm-Message-State: AOAM5300KeNmkVh5nf6TIffs24ERGX0tuAUJ6DuU3vBkPO00RXD3EwvH
-        IGpC9sgA3j8O72LX8vDuCcLlFlG87c0I6Q==
-X-Google-Smtp-Source: ABdhPJwQal0GpA5BltPe+eAawSZQNR05clMs/QjGBddIMnOrFX3/msc2TYzsy5ppDeUKinXny5hu4g==
-X-Received: by 2002:a17:90a:e510:: with SMTP id t16mr22678453pjy.224.1618232157942;
-        Mon, 12 Apr 2021 05:55:57 -0700 (PDT)
-Received: from [192.168.1.134] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id k13sm8114823pji.14.2021.04.12.05.55.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 Apr 2021 05:55:57 -0700 (PDT)
-Subject: Re: [PATCH for-5.13/drivers] block: remove the -ERESTARTSYS handling
- in blkdev_get_by_dev
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org
-References: <20210412080318.2583748-1-hch@lst.de>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <1e67afac-d41f-f9a6-81e1-294dfb81d0dd@kernel.dk>
-Date:   Mon, 12 Apr 2021 06:55:57 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S241680AbhDLNOS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Apr 2021 09:14:18 -0400
+Received: from mx2.suse.de ([195.135.220.15]:58274 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S241101AbhDLNOR (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 12 Apr 2021 09:14:17 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id F2837AC6A;
+        Mon, 12 Apr 2021 13:13:58 +0000 (UTC)
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-bcache@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        linux-block@vger.kernel.org
+References: <20210411134316.80274-1-colyli@suse.de>
+ <20210411134316.80274-8-colyli@suse.de> <20210412090600.GA8026@lst.de>
+ <902e1ba6-cd73-b0e8-6c17-75fccbaeb9b4@suse.de>
+ <caf688de-19f6-925e-3059-966fe0d8ce42@kernel.dk>
+From:   Coly Li <colyli@suse.de>
+Subject: Re: [PATCH 7/7] bcache: fix a regression of code compiling failure in
+ debug.c
+Message-ID: <254414c0-8f5d-753e-edb1-e9d3805e7bfb@suse.de>
+Date:   Mon, 12 Apr 2021 21:13:55 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.9.1
 MIME-Version: 1.0
-In-Reply-To: <20210412080318.2583748-1-hch@lst.de>
+In-Reply-To: <caf688de-19f6-925e-3059-966fe0d8ce42@kernel.dk>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/12/21 2:03 AM, Christoph Hellwig wrote:
-> Now that md has been cleaned up we can get rid of this hack.
+On 4/12/21 8:50 PM, Jens Axboe wrote:
+> On 4/12/21 3:53 AM, Coly Li wrote:
+>> On 4/12/21 5:06 PM, Christoph Hellwig wrote:
+>>> On Sun, Apr 11, 2021 at 09:43:16PM +0800, Coly Li wrote:
+>>>> The patch "bcache: remove PTR_CACHE" introduces a compiling failure in
+>>>> debug.c with following error message,
+>>>>   In file included from drivers/md/bcache/bcache.h:182:0,
+>>>>                    from drivers/md/bcache/debug.c:9:
+>>>>   drivers/md/bcache/debug.c: In function 'bch_btree_verify':
+>>>>   drivers/md/bcache/debug.c:53:19: error: 'c' undeclared (first use in
+>>>>   this function)
+>>>>     bio_set_dev(bio, c->cache->bdev);
+>>>>                      ^
+>>>> This patch fixes the regression by replacing c->cache->bdev by b->c->
+>>>> cache->bdev.
+>>>
+>>> Why not fold this into the offending patch?
+>>>
+>>
+>> I don't know whether I can do it without authorization or agreement from
+>> original author. And I see other maintainers handling similar situation
+>> by either re-write whole patch or appending an extra fix.
+>>
+>> If you have a suggested process, I can try it out next time for similar
+>> situation.
+> 
+> What I generally do is just add a line between the SOB's for cases
+> like this, ala:
+> 
+> commit 70aacfe66136809d7f080f89c492c278298719f4
+> Author: Pavel Begunkov <asml.silence@gmail.com>
+> Date:   Mon Mar 1 13:02:15 2021 +0000
+> 
+>     io_uring: kill sqo_dead and sqo submission halting
+>     
+>     As SQPOLL task doesn't poke into ->sqo_task anymore, there is no need to
+>     kill the sqo when the master task exits. Before it was necessary to
+>     avoid races accessing sqo_task->files with removing them.
+>     
+>     Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+>     [axboe: don't forget to enable SQPOLL before exit, if started disabled]
+>     Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> 
 
-Applied, thanks.
+This is a new skill to me. Thanks for the hint, I will use such method
+to handle similar situation next time.
 
--- 
-Jens Axboe
-
+Coly Li
