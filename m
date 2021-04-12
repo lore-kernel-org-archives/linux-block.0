@@ -7,67 +7,69 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11934C433B4
-	for <linux-block@archiver.kernel.org>; Mon, 12 Apr 2021 12:45:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E80DC433ED
+	for <linux-block@archiver.kernel.org>; Mon, 12 Apr 2021 12:47:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CB1E561246
-	for <linux-block@archiver.kernel.org>; Mon, 12 Apr 2021 12:45:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DC1DB61263
+	for <linux-block@archiver.kernel.org>; Mon, 12 Apr 2021 12:47:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238374AbhDLMpx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Apr 2021 08:45:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60188 "EHLO
+        id S241213AbhDLMsF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 12 Apr 2021 08:48:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60724 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237283AbhDLMpw (ORCPT
+        with ESMTP id S239855AbhDLMsF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Apr 2021 08:45:52 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4A5CC06174A
-        for <linux-block@vger.kernel.org>; Mon, 12 Apr 2021 05:45:34 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id kk2-20020a17090b4a02b02900c777aa746fso7028441pjb.3
-        for <linux-block@vger.kernel.org>; Mon, 12 Apr 2021 05:45:34 -0700 (PDT)
+        Mon, 12 Apr 2021 08:48:05 -0400
+Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A31FFC061574
+        for <linux-block@vger.kernel.org>; Mon, 12 Apr 2021 05:47:47 -0700 (PDT)
+Received: by mail-pg1-x533.google.com with SMTP id p12so9273407pgj.10
+        for <linux-block@vger.kernel.org>; Mon, 12 Apr 2021 05:47:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=8aDVNfXoIF5XPU+6/Ppxn9gxD4WX9+pA2AtuzcQRxUI=;
-        b=TLUfENejvCj7xl7DF1FRmMlQOhpRzSSMNznkPnW99D181qC9CyTVzIt4cQpDLIHpbJ
-         pX2t5BdtYlbF7Y3W/eRPYcMtIhK9IgvzGSqzpU+TmLcu5DQ4OeQlmpL4vtEhIy5b11+2
-         o6bLFB6B1wtvfnPcegv0R1s2bU4ivOoOAZyozSKMp1GaJBnMhoJwJBmINJLvMHRI+smt
-         qWVMw6PxNbw9Q/bw4/HsMukxrtMnse9ux2Toi76TrELC8UAAe7ziuAtPlKys3uFhFY7a
-         nK3BTrWwNUK1vYBKI0RiWlM8/IFR0gBcL+Qy/Kpss7BY4pCUkO8cEwXzBP6gofZWNnCg
-         LGGQ==
+        bh=SiZZmAGFJzNh1NTL9Ov9JrR8e1WGoFVfaLzDg2PWcPw=;
+        b=SoINPW/HFJ7/YFi/BYThiKZ2W703vfAcxnxpm75zubpI521zcgrYMQWxRcAzbZKoi7
+         427QQytY913I57pwvR+ofB5BEH+y7Hc/z3r21OcMTPTByU14r63usABVFyH3/xJGPq/l
+         Za9QlZfCupBRILSJ3urNTRcMyg7nKm2CJU1twrGBhQp3PHBeT+WV/iQCkojjJrUmh1Po
+         6sPcXCPshkXY5lDdyRxLemNm7BE1u5Ia5ZQGHlyqEeusYe8pXuvaQtYSKp1zdQ8WLArH
+         gMXifNMzYAUWB9YrF3W61FcWeVe6HwDhHNxPxadrzAGuA9gU7c7eAXLal2lIisoHLwao
+         PWuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=8aDVNfXoIF5XPU+6/Ppxn9gxD4WX9+pA2AtuzcQRxUI=;
-        b=bRP0ybJTQ/IYxeJnrFQ4ThyGVJEwgQf/XtGc4XPX/XTRWnLyUyRTZExvw15UZdTINH
-         +CWO6LdrSVfiYmW1u2/U6/VyYKMHKTqsmlN09svvkiULIEK4ucNUdEyjTKXr/TLNMqQd
-         ZpGAQmJ0EdhCIorHLHPW8epGnIC1h5lCQjkPkVJVf1BtJNL9TRhgvfciT+HLmsDyPHG1
-         H+BFzy2vv1kd1bJn5u8UCti5kDmuWo/zaQp/pf6oYFLP9m/J2ZmGE67qC7Kl1zPKes9g
-         Rpkfi9HW5mLdPxoH3IVKLYcwkGsEKnF2wHBwpAyyhUoozi2qJZACjBjMj8f2rsHkA7Bv
-         cW3Q==
-X-Gm-Message-State: AOAM533iEUu/Tc/cIXWKyG1CZKSoBIbyz5nuKK0HaVNvGWM822ruNKIQ
-        mVqItt/ctTeM80WB2L8idTdDpueGmblLXA==
-X-Google-Smtp-Source: ABdhPJx4eWH3dv1t5oFBjHS+MBD7mUH4E6Ywg8kSUY0Jz6aA35Yu3H4XogfTjAjNRzY3Me2gprr4Ig==
-X-Received: by 2002:a17:902:ed14:b029:eb:8e3:bfc9 with SMTP id b20-20020a170902ed14b02900eb08e3bfc9mr2547591pld.54.1618231534394;
-        Mon, 12 Apr 2021 05:45:34 -0700 (PDT)
+        bh=SiZZmAGFJzNh1NTL9Ov9JrR8e1WGoFVfaLzDg2PWcPw=;
+        b=AnFAvd7tDWO0EsTKcAp2UP+FDXlcLKGA8DGoKXLM0vOydsXh+iEOO8tqMB9KkPYqGx
+         e5OU60pC9XM279XukWEtScw9O376ncx8PnOJJGo19jsDjDYfhEvklaROZbmsHKWZtFu6
+         v+6QhgPcLSkWHgddPM10tYWDCGgbWMEacwmFVBKE9E3oD5zy1k/vQAH4OQOxr9Bd8Rqd
+         KcHFA2k5YTTnRMUakutgu/atnnyLufZXTrxIBXDMFwb5O3LXciLJTSA4gJOOZ7ov2lzI
+         GR3EwO7V3f+DL9I/MRrQMpnc658UI1OLBqnx8HpZGI6TNh+tU2HYxu0zj1XH+C3VLf1r
+         bNHw==
+X-Gm-Message-State: AOAM530B5DGUcG3WcR9TA4RreC/0ySRjzSWXp4diRFjnYeUwUsBLuuzP
+        bPpOnUQ2lX8QaG2Uq6Ww2jgRTw==
+X-Google-Smtp-Source: ABdhPJySvSK6xalouznjEu6BAAZOUZsTf7n80eytcPTrV5KIoI+9UFDpEAq6DXp6xsYc99wJM7XbSg==
+X-Received: by 2002:a63:174e:: with SMTP id 14mr26227020pgx.125.1618231667179;
+        Mon, 12 Apr 2021 05:47:47 -0700 (PDT)
 Received: from [192.168.1.134] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id t23sm7474894pju.15.2021.04.12.05.45.33
+        by smtp.gmail.com with ESMTPSA id q17sm10911871pfq.171.2021.04.12.05.47.46
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 Apr 2021 05:45:33 -0700 (PDT)
-Subject: Re: [PATCH] block: remove an incorrect check from blk_rq_append_bio
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org, Guenter Roeck <linux@roeck-us.net>
-References: <20210409150447.1977410-1-hch@lst.de>
+        Mon, 12 Apr 2021 05:47:46 -0700 (PDT)
+Subject: Re: [PATCH v2 1/1] null_blk: add option for managing virtual boundary
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>, linux-block@vger.kernel.org,
+        martin.petersen@oracle.com
+Cc:     oren@nvidia.com, idanb@nvidia.com, yossike@nvidia.com,
+        Damien.LeMoal@wdc.com, Chaitanya.Kulkarni@wdc.com
+References: <20210412095523.278632-1-mgurtovoy@nvidia.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <7ddbd92c-bfb4-017e-e00a-1bde201a3571@kernel.dk>
-Date:   Mon, 12 Apr 2021 06:45:34 -0600
+Message-ID: <af599b5f-0e1f-99c8-8d59-73fc48227d9c@kernel.dk>
+Date:   Mon, 12 Apr 2021 06:47:46 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210409150447.1977410-1-hch@lst.de>
+In-Reply-To: <20210412095523.278632-1-mgurtovoy@nvidia.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -75,9 +77,13 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/9/21 9:04 AM, Christoph Hellwig wrote:
-> blk_rq_append_bio is also used for the copy case, not just the map case,
-> so tis debug check is not correct.
+On 4/12/21 3:55 AM, Max Gurtovoy wrote:
+> This will enable changing the virtual boundary of null blk devices. For
+> now, null blk devices didn't have any restriction on the scatter/gather
+> elements received from the block layer. Add a module parameter and a
+> configfs option that will control the virtual boundary. This will
+> enable testing the efficiency of the block layer bounce buffer in case
+> a suitable application will send discontiguous IO to the given device.
 
 Applied, thanks.
 
