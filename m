@@ -5,69 +5,71 @@ X-Spam-Level:
 X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03A21C433ED
-	for <linux-block@archiver.kernel.org>; Tue, 13 Apr 2021 10:54:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 556EBC433B4
+	for <linux-block@archiver.kernel.org>; Tue, 13 Apr 2021 10:55:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DB88A613C0
-	for <linux-block@archiver.kernel.org>; Tue, 13 Apr 2021 10:54:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 25BDA61278
+	for <linux-block@archiver.kernel.org>; Tue, 13 Apr 2021 10:55:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245302AbhDMKyl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Apr 2021 06:54:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39802 "EHLO
+        id S230500AbhDMKz7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Apr 2021 06:55:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40064 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245261AbhDMKyk (ORCPT
+        with ESMTP id S230223AbhDMKzu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Apr 2021 06:54:40 -0400
-Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74DBDC061574
-        for <linux-block@vger.kernel.org>; Tue, 13 Apr 2021 03:54:21 -0700 (PDT)
-Received: by mail-ej1-x62f.google.com with SMTP id mh2so3617663ejb.8
-        for <linux-block@vger.kernel.org>; Tue, 13 Apr 2021 03:54:21 -0700 (PDT)
+        Tue, 13 Apr 2021 06:55:50 -0400
+Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D24DEC061574
+        for <linux-block@vger.kernel.org>; Tue, 13 Apr 2021 03:55:30 -0700 (PDT)
+Received: by mail-ed1-x536.google.com with SMTP id z1so18852361edb.8
+        for <linux-block@vger.kernel.org>; Tue, 13 Apr 2021 03:55:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=lightnvm-io.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=kWM6YWNw3sQhkBrGWvR8Yt+o+cd1hxdL2Pb6mH6ok+g=;
-        b=UeC2bcUTGYwxKp3JQVhGg3kAN8lLguvIhfDLnRVoqf4wh+bbiDukYGK0lGLtzEr7LY
-         8w/NzMotvf0DfR/Fb7OLD5nloHvLBI7G7dR48q6FnKnWQMl04B4XiXoXS9ZPl4T0kBY8
-         t5kWgTf5Xqg7PfFMYogmSDUQpfY3epNjgAu/odEn3JMTNZG4os4hiWvytrPAWRVnCLpe
-         jN4PgJStr8h8/hecpUB1iQ89XglijD8cg5zbCftBb+CrcMATuCO4tdaPOLzAkXy1O3Ue
-         NqrmK4FhDE01sk+vVLeXKt5WJGgTvCXglY7/m4yrGKP3CIBgDDFpl+5YS5DcO6HHiq1U
-         Jg6w==
+        bh=va658DcvB9VpnT6zlnFssN11/Tnxxz2cyGv/gA71ftU=;
+        b=PiMHislXz8pJmhPvsAadDi9Af9yqHMe9WvfMofA7+gE1OX1pmd8JjyMOKWHD0Joxrg
+         PjvCVV/3Wuhu3p/0wtwZwnNwMrvQL/m/4y3yC1sc6huJOjz9IyScytwhU3oNAZ3pxDqZ
+         7aNdc6stSrFBgIgGQLraCV9y0fQM6laXBDRCSdDDXABOL4oB9MPJjtLrZgTAhQijRM6J
+         elvfq0oYphGCsW9of6JatFhrbdfPLyiNrShfY52tNXE8nizFdivXNOUKskKPJooolXRS
+         PiT174veyORmFaD5QrpQyoZaoF/A5aq2PHj0liQvQMh64XIyp8Qrt9bLrYkp2/XvffHy
+         GGHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-transfer-encoding
          :content-language;
-        bh=kWM6YWNw3sQhkBrGWvR8Yt+o+cd1hxdL2Pb6mH6ok+g=;
-        b=rc9Wa5CojG4BQ3Z3h+0F1sj5+Zji/uRYhDxpLigdqwPJGIRVOEhODNvfMBy9OEx2Tk
-         WM+EflHkHdlps6Uq9lcLHxp2SOGGHTcAB9L8LKXt7FTzSpIHahyvgVxeQZ2+XejdJi+O
-         wOXFVXs9RliWaSD5PA0hPDjtYxxmYt6hH+xNE2SH/3l8MjxAblrpD+oLT91feawNAUbQ
-         agubsbl5wXaumfLanNyC8XzLcwAhLLT2EJZm39EYzKTRy2CUGZ1qu8xHv7I9xi2Jjjqs
-         C+RgZ1239bTLciyoyFvDdH0nhqpYsdAo6E2AVyBHz480jsDql2mbKeJPmwaM1V3jcjXn
-         WJJw==
-X-Gm-Message-State: AOAM531TskDSkTNp8wSvpUPuUl+lHkthi9yWYgWtcLxpSXjCXbQukxgV
-        tZBJLahWd9HYE2fcg7SsraWAISJCXqRPCB70CCA=
-X-Google-Smtp-Source: ABdhPJxfo6D5gIm697PZkk6Yornq7nPxIYMhVfpMxTmc71hNXm7N7sEvx0go6+WqL3rEe1mWgSEWUg==
-X-Received: by 2002:a17:907:2d0c:: with SMTP id gs12mr17800725ejc.443.1618311260212;
-        Tue, 13 Apr 2021 03:54:20 -0700 (PDT)
+        bh=va658DcvB9VpnT6zlnFssN11/Tnxxz2cyGv/gA71ftU=;
+        b=AfUBK2h/IPA5mCZjPkon/6aSpy1IL6qXf4Qze2yZY7suHqFQpN7rPCZ+R8WtwxT0gY
+         5uK29coasXMX6Us+6rfbnHMxpG4zG3UC2Gwl5JhGrVXehd+T7SkTekpmeFANKXMB0UzM
+         Y6BTKJ+fMfFurBow4JrAwdbWEE7wqIEE6/hlfvqmCDQcrRLy1OF72BPcOfRtYYi9S4Sl
+         fi4ZdQ6LhquCpPLg0XQEj37b5iCA7177aDV/RnwjwpUmZ+x8nkXQzZn6NXtJ5AO4wdmj
+         jg1jGtwyni112SAlo4vnR/qvorGaOvoZcfybXsMg7ovPUIFu4+V9wQA1cfTWyKzSoe6w
+         OBiA==
+X-Gm-Message-State: AOAM530y5PHhOWZ6qJkhY8AJRi0S2XFrc8mucmKmQsP0RI1gi8gJftGL
+        s9x6aSkvVH2kSNllXtpzM9AbJQ==
+X-Google-Smtp-Source: ABdhPJxWfmjVMmbjEfL5HaZ4mDwT3aOXbcswowPXw2Y8I4NhukX8Jh/zNINPeg2SYyvtfVwfjBNGfA==
+X-Received: by 2002:a50:fb8c:: with SMTP id e12mr35068851edq.295.1618311329613;
+        Tue, 13 Apr 2021 03:55:29 -0700 (PDT)
 Received: from [10.0.0.62] (xb932c246.cust.hiper.dk. [185.50.194.70])
-        by smtp.gmail.com with ESMTPSA id cy5sm9259959edb.46.2021.04.13.03.54.19
+        by smtp.gmail.com with ESMTPSA id t1sm9087230eds.53.2021.04.13.03.55.28
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 13 Apr 2021 03:54:19 -0700 (PDT)
-Subject: Re: [PATCH] lightnvm: Return the correct return value
-To:     Tian Tao <tiantao6@hisilicon.com>
-Cc:     linux-block@vger.kernel.org
-References: <1618213134-21099-1-git-send-email-tiantao6@hisilicon.com>
+        Tue, 13 Apr 2021 03:55:29 -0700 (PDT)
+Subject: Re: [PATCH] lightnvm: remove duplicate include in lightnvm.h
+To:     menglong8.dong@gmail.com
+Cc:     linux-block@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Zhang Yunkai <zhang.yunkai@zte.com.cn>
+References: <20210313112241.366786-1-zhang.yunkai@zte.com.cn>
 From:   =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
-Message-ID: <0e4c8c3e-921b-0e49-c671-647dc09692e4@lightnvm.io>
-Date:   Tue, 13 Apr 2021 12:54:18 +0200
+Message-ID: <e2bd4734-959c-4505-7e1c-ccc04185e4d3@lightnvm.io>
+Date:   Tue, 13 Apr 2021 12:55:28 +0200
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
  Thunderbird/78.9.1
 MIME-Version: 1.0
-In-Reply-To: <1618213134-21099-1-git-send-email-tiantao6@hisilicon.com>
+In-Reply-To: <20210313112241.366786-1-zhang.yunkai@zte.com.cn>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
@@ -75,26 +77,28 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/04/2021 09.38, Tian Tao wrote:
-> When memdup_user returns an error, memdup_user has two different return
-> values, use PTR_ERR to get the correct return value.
+On 13/03/2021 12.22, menglong8.dong@gmail.com wrote:
+> From: Zhang Yunkai <zhang.yunkai@zte.com.cn>
 >
-> Signed-off-by: Tian Tao <tiantao6@hisilicon.com>
+> 'linux/ioctl.h' included in 'lightnvm.h' is duplicated.
+> It is also included in the 33th line.
+>
+> Signed-off-by: Zhang Yunkai <zhang.yunkai@zte.com.cn>
 > ---
->   drivers/lightnvm/core.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+>   include/uapi/linux/lightnvm.h | 1 -
+>   1 file changed, 1 deletion(-)
 >
-> diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-> index 28ddcaa..42774be 100644
-> --- a/drivers/lightnvm/core.c
-> +++ b/drivers/lightnvm/core.c
-> @@ -1257,7 +1257,7 @@ static long nvm_ioctl_info(struct file *file, void __user *arg)
+> diff --git a/include/uapi/linux/lightnvm.h b/include/uapi/linux/lightnvm.h
+> index ead2e72e5c88..2745afd9b8fa 100644
+> --- a/include/uapi/linux/lightnvm.h
+> +++ b/include/uapi/linux/lightnvm.h
+> @@ -22,7 +22,6 @@
 >   
->   	info = memdup_user(arg, sizeof(struct nvm_ioctl_info));
->   	if (IS_ERR(info))
-> -		return -EFAULT;
-> +		return PTR_ERR(info);
->   
->   	info->version[0] = NVM_VERSION_MAJOR;
->   	info->version[1] = NVM_VERSION_MINOR;
-Thanks, Tian. It has been pulled.
+>   #ifdef __KERNEL__
+>   #include <linux/const.h>
+> -#include <linux/ioctl.h>
+>   #else /* __KERNEL__ */
+>   #include <stdio.h>
+>   #include <sys/ioctl.h>
+Thanks, Yunkai. I've pulled it. Note that I've merged your two patches 
+into one.
