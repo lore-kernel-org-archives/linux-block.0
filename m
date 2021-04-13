@@ -2,86 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A7A3C433B4
-	for <linux-block@archiver.kernel.org>; Tue, 13 Apr 2021 07:50:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FAF8C433B4
+	for <linux-block@archiver.kernel.org>; Tue, 13 Apr 2021 09:36:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 556A361244
-	for <linux-block@archiver.kernel.org>; Tue, 13 Apr 2021 07:50:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 40BAF613B6
+	for <linux-block@archiver.kernel.org>; Tue, 13 Apr 2021 09:36:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230336AbhDMHuq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Apr 2021 03:50:46 -0400
-Received: from mx2.suse.de ([195.135.220.15]:55710 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238190AbhDMHup (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Apr 2021 03:50:45 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 287BFAFD2;
-        Tue, 13 Apr 2021 07:50:25 +0000 (UTC)
-Date:   Tue, 13 Apr 2021 09:50:24 +0200
-From:   Daniel Wagner <dwagner@suse.de>
-To:     Bart Van Assche <bvanassche@acm.org>
+        id S229446AbhDMJhJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Apr 2021 05:37:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:54219 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229573AbhDMJhJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 13 Apr 2021 05:37:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1618306609;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=xZtiYxndyvrgRiioNGZHGj1zKctLULruJBTNpZ12M30=;
+        b=Bu6BD9vTTznlSeYfMJX1RDAZEWP7ZDGx5RFdGAvXJSk2N12XZyHh8qXO2JzsvaaOId7/Wu
+        tnDaw1qPQkNgfVFEjwtzD4N0Vu3L2pAIgCEt2fSGL4MFy7CHYldvvzDdWRCg+OkooCtY3S
+        LGIQzysVt6czqvfQWlMXOtYqcVlI/Bk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-228-cHL0jHROMuCFWGrL6Pfuhg-1; Tue, 13 Apr 2021 05:36:45 -0400
+X-MC-Unique: cHL0jHROMuCFWGrL6Pfuhg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A593D88127C;
+        Tue, 13 Apr 2021 09:36:44 +0000 (UTC)
+Received: from T590 (ovpn-12-66.pek2.redhat.com [10.72.12.66])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 05D916F98A;
+        Tue, 13 Apr 2021 09:36:30 +0000 (UTC)
+Date:   Tue, 13 Apr 2021 17:36:26 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@infradead.org>
 Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.de>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        John Garry <john.garry@huawei.com>,
-        Khazhy Kumykov <khazhy@google.com>
-Subject: Re: [PATCH v6 2/5] blk-mq: Introduce atomic variants of
- blk_mq_(all_tag|tagset_busy)_iter
-Message-ID: <20210413075024.xivnj3jy6olaqglc@beryllium.lan>
-References: <20210406214905.21622-1-bvanassche@acm.org>
- <20210406214905.21622-3-bvanassche@acm.org>
+        Jeffle Xu <jefflexu@linux.alibaba.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH V5 05/12] block: add new field into 'struct bvec_iter'
+Message-ID: <YHVmGggTOkqZYOM+@T590>
+References: <20210401021927.343727-1-ming.lei@redhat.com>
+ <20210401021927.343727-6-ming.lei@redhat.com>
+ <20210412092653.GA972763@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210406214905.21622-3-bvanassche@acm.org>
+In-Reply-To: <20210412092653.GA972763@infradead.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Apr 06, 2021 at 02:49:02PM -0700, Bart Van Assche wrote:
-> Since in the next patch knowledge is required of whether or not it is
-> allowed to sleep inside the tag iteration functions, pass this context
-> information to the tag iteration functions. I have reviewed all callers of
-> tag iteration functions to verify these annotations by starting from the
-> output of the following grep command:
+On Mon, Apr 12, 2021 at 10:26:53AM +0100, Christoph Hellwig wrote:
+> I don't like where this is going.
 > 
->     git grep -nHE 'blk_mq_(all_tag|tagset_busy)_iter'
+> I think the model of storing the polling cookie in the bio is useful,
+> but:
 > 
-> My conclusions from that analysis are as follows:
-> - Sleeping is allowed in the blk-mq-debugfs code that iterates over tags.
-> - Since the blk_mq_tagset_busy_iter() calls in the mtip32xx driver are
->   preceded by a function that sleeps (blk_mq_quiesce_queue()), sleeping is
->   safe in the context of the blk_mq_tagset_busy_iter() calls.
-> - The same reasoning also applies to the nbd driver.
-> - All blk_mq_tagset_busy_iter() calls in the NVMe drivers are followed by a
->   call to a function that sleeps so sleeping inside blk_mq_tagset_busy_iter()
->   when called from the NVMe driver is fine.
-> - scsi_host_busy(), scsi_host_complete_all_commands() and
->   scsi_host_busy_iter() are used by multiple SCSI LLDs so analyzing whether
->   or not these functions may sleep is hard. Instead of performing that
->   analysis, make it safe to call these functions from atomic context.
-> 
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Acked-by: Martin K. Petersen <martin.petersen@oracle.com>
-> Tested-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-> Cc: Ming Lei <ming.lei@redhat.com>
-> Cc: Hannes Reinecke <hare@suse.de>
-> Cc: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-> Cc: John Garry <john.garry@huawei.com>
-> Cc: Khazhy Kumykov <khazhy@google.com>
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+>  (1) I think having this in the iter is a mess.  Can you measure if
+>      just marking bvec_iter __packed will generate much worse code
+>      at all anymore?  If not we can just move this into the bio
 
-Maybe you could also annotate blk_mq_all_tag_iter() with a
-might_sleep(). This would help to find API abusers more easily.
+Just test with packed 'struct bvec_iter' by running io_uring/libaio over
+nvme/null_blk with different bs size, not see obvious difference
+compared with unpacked bvec_iter.
 
-Reviewed-by: Daniel Wagner <dwagner@suse.de>
+So will switch to packed bvec_iter in next version.
+
+>      If it really generates much worse code I think you need to pick
+>      a different name as  as that i really confusing vs the bio field
+>      of the same name that is used entirely differenly.  Similarly
+>      the bio_get_private_data and bio_set_private_data helpers are
+>      entirely misnamed, as the names suggest they deal with the
+>      bi_private field in struct bio.  I actually suspect not having
+>      these helpers would be much preferable
+
+OK, how about naming it as .bi_poll_data?
+
+
+Thanks,
+Ming
 
