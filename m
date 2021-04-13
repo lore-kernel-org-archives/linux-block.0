@@ -2,110 +2,191 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09A8FC433B4
-	for <linux-block@archiver.kernel.org>; Tue, 13 Apr 2021 18:24:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44AF6C433ED
+	for <linux-block@archiver.kernel.org>; Tue, 13 Apr 2021 18:26:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C1C8B613C0
-	for <linux-block@archiver.kernel.org>; Tue, 13 Apr 2021 18:24:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 130CB613C1
+	for <linux-block@archiver.kernel.org>; Tue, 13 Apr 2021 18:26:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232764AbhDMSYe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Apr 2021 14:24:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54078 "EHLO
+        id S1346209AbhDMS0V (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Apr 2021 14:26:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54492 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232604AbhDMSYe (ORCPT
+        with ESMTP id S237742AbhDMS0V (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Apr 2021 14:24:34 -0400
-Received: from mail-qv1-xf29.google.com (mail-qv1-xf29.google.com [IPv6:2607:f8b0:4864:20::f29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02F0EC061574
-        for <linux-block@vger.kernel.org>; Tue, 13 Apr 2021 11:24:13 -0700 (PDT)
-Received: by mail-qv1-xf29.google.com with SMTP id dp18so3925832qvb.5
-        for <linux-block@vger.kernel.org>; Tue, 13 Apr 2021 11:24:13 -0700 (PDT)
+        Tue, 13 Apr 2021 14:26:21 -0400
+Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F04B1C061756
+        for <linux-block@vger.kernel.org>; Tue, 13 Apr 2021 11:26:00 -0700 (PDT)
+Received: by mail-ed1-x532.google.com with SMTP id bx20so19380141edb.12
+        for <linux-block@vger.kernel.org>; Tue, 13 Apr 2021 11:26:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=kOiJzunVd05mqamt/5TGLR6Y6fd83AHptXCwJ4Xqk20=;
-        b=XFVCecc5SaXMXkEtMSOm6hS5wZ10POOPoNVf6wtWlKfFJsuYEYKWxhzSt0+b/fVFg5
-         j70FPau57jAGTGNQ3+9tA9h9ZoO7yhMw9fFhKY3ccf2fbxJjT4KC68lzeAS+4cn3HMGB
-         wp5PzotUQA4HOmRLYGnF6lGyWvjkDUaH9c4W68ZoCoNauDoc4V9TStZcf3ER3GSgi2B8
-         TAKRg/N1syJIMdjgHR6v6YGmBieKFHBRue3kOx9W/YALVuUYFVfV04eS3w2NY9xdW8aO
-         3ft/9Hvx7suI6YOOuwBV33K9HKwN2ojD3DmQGMoZB4GKqS/qhxJBAMFiF7xo1WSXfU70
-         peYQ==
+        d=javigon-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=gUmzsxIe9Usd79B4Ol6Ovwj7y0RVrVcb5f5DujLhjr4=;
+        b=MVR0RaulAxRTS3KavGFiJnMRa4rOOhLGMpz5Oyx0Spl9UpUeonzmqZCqqUUmm/Vsl1
+         1NH7MNR6MpB3mJNmBa+Xj5uO7rqSbqKovC/DqB24g8v7o2FMPgAjSGGg8Oc83fMfiQSo
+         CLtjw2fWWPHU0zS7/7TMN0CivdY+ncE0f1V3EIv8hbU/hYbkcjN0PIPLWgJwCTsXjAzx
+         oDT6sYIP4BmoUCXP+kyjPwaJ3o1hGpgjsXFga2Z/u18pL4smKnTh/1S4aZrmLszdri25
+         2ceicyt/UnGdHZm9KTLaH08dvaBeCXM4S8na0V5cz5fDiYNSa25qve1VajGyhzTn0AKA
+         KFjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=kOiJzunVd05mqamt/5TGLR6Y6fd83AHptXCwJ4Xqk20=;
-        b=XnYwjUKhQTNe8MQgn+pz30ytJO4SXUnWU4N+qgnvmZwpc277BV5CaKk9BPNmf1nMwW
-         v0PjpPzfLOOYsBlhW2wnQgacTnGBdpaaglQmrnnriEhXht/yOZGCQWQG5+aQOAdQN5Wf
-         bjIYsrcUipH9WHTY6/HqSwHcMlrtxpFRijbKAGCkAj0g39X2EICfQ7hyT9HgHS5iUosm
-         C0JEtUqGc6JO5JiQOhsZdz7uhg2gRuKFZOJUlAu3/hYKxHn91pB9xoTmjBHtkIKemCLZ
-         30ZnLK4b7dYEEJqYGCgZhovUiuvP5N7uxvLWvhQYSZb0uGD30z6qBc6j3cP3o+IqzybK
-         0M4w==
-X-Gm-Message-State: AOAM533aMpTitEf0rvMJJgBfuohMK+JFMOe3oI4KjHZ7uIDPjLgYCpNm
-        2uWFc00Rw9wOdjBvN+MPEaOLHMRVa5oWy/4iHHPUmw==
-X-Google-Smtp-Source: ABdhPJw6yF83WYbBJZbmO8yDMBaKSylZ7lchp4a3dBmw4v5MoYL6NrNQOEUYGEgo1fjifejUv/nkR/RD81DbNlucA38=
-X-Received: by 2002:a0c:8421:: with SMTP id l30mr21579057qva.23.1618338252752;
- Tue, 13 Apr 2021 11:24:12 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=gUmzsxIe9Usd79B4Ol6Ovwj7y0RVrVcb5f5DujLhjr4=;
+        b=HfAXsW/3UOmbwZPoKdcdtqVdtP+7tz9QHR00t9s8xpdTgpbMDgl1FH+LPKgFs4N1pF
+         GE5yOA6tBLAlMpoWaOWTdEZ1MA8dEpyarB6qrgszZgnmblV3Nd4Z+5sciP4VmWv0UcgI
+         F2AZal1bebgd4b5nc5QuIzmNs0Cm0Sh++nUC+rUwakIT/ywabdOEAP0qntSifbXJNue2
+         ffkTsFrFz5B/vd6aTRM9sYP3icpPJZg/qQrf2N3Bkxoo8A0jdtiGFllvzpkW4jG/wp2u
+         zkc/SiFM599t2DiWIsJ4cSG+FvUBDzNI2AhglQA5P3N3pllVHZNyMgXYkq1AUYCNGNVp
+         unQg==
+X-Gm-Message-State: AOAM530cQFeqrT9SVvF8YWWPugqdiIEmPIRegTuSVLoXvgSnsJth7swP
+        bgt0rybCx3AbGVp59GQCaxDBkw==
+X-Google-Smtp-Source: ABdhPJy7SvyslbxUDaNLIDv1BBMpbhsvXcAeoi5qDTCEQdBe4vv+UqkCJh1ZRD5tvlU1eL4u4IyrjA==
+X-Received: by 2002:a05:6402:35cd:: with SMTP id z13mr36855014edc.21.1618338359704;
+        Tue, 13 Apr 2021 11:25:59 -0700 (PDT)
+Received: from localhost (5.186.124.214.cgn.fibianet.dk. [5.186.124.214])
+        by smtp.gmail.com with ESMTPSA id g20sm181363edu.91.2021.04.13.11.25.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 13 Apr 2021 11:25:59 -0700 (PDT)
+Date:   Tue, 13 Apr 2021 20:25:58 +0200
+From:   Javier =?utf-8?B?R29uesOhbGV6?= <javier@javigon.com>
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>
+Cc:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
+        SelvaKumar S <selvakuma.s1@samsung.com>,
+        linux-nvme@lists.infradead.org, axboe@kernel.dk,
+        Damien Le Moal <damien.lemoal@wdc.com>, kch@kernel.org,
+        sagi@grimberg.me, snitzer@redhat.com, selvajove@gmail.com,
+        linux-kernel@vger.kernel.org, nj.shetty@samsung.com,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        dm-devel@redhat.com, joshi.k@samsung.com, kbusch@kernel.org,
+        joshiiitr@gmail.com, hch@lst.de
+Subject: Re: [RFC PATCH v5 0/4] add simple copy support
+Message-ID: <20210413182558.v2lynge6aleazgbv@mpHalley.localdomain>
+References: <BYAPR04MB49652982D00724001AE758C986729@BYAPR04MB4965.namprd04.prod.outlook.com>
+ <5BE5E1D9-675F-4122-A845-B0A29BB74447@javigon.com>
+ <c7848f1c-c2c1-6955-bf20-f413a44f9969@nvidia.com>
+ <20210411192641.ya6ntxannk3gjyl5@mpHalley.localdomain>
+ <3a52cc06-27ce-96a4-b180-60fc269719ba@nvidia.com>
 MIME-Version: 1.0
-References: <000000000000ae236f05bfde0678@google.com> <20210413134147.54556d9d@gandalf.local.home>
- <20210413134314.16068eeb@gandalf.local.home>
-In-Reply-To: <20210413134314.16068eeb@gandalf.local.home>
-From:   Dmitry Vyukov <dvyukov@google.com>
-Date:   Tue, 13 Apr 2021 20:24:00 +0200
-Message-ID: <CACT4Y+ZrkE=ZKKncTOJRJgOTNfU8PGz=k+8V+0602ftTCHkc6Q@mail.gmail.com>
-Subject: Re: [syzbot] possible deadlock in del_gendisk
-To:     Steven Rostedt <rostedt@goodmis.org>,
-        syzkaller <syzkaller@googlegroups.com>
-Cc:     syzbot <syzbot+61e04e51b7ac86930589@syzkaller.appspotmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Jens Axboe <axboe@kernel.dk>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, KVM list <kvm@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>, masahiroy@kernel.org,
-        Ingo Molnar <mingo@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        rafael.j.wysocki@intel.com,
-        Sean Christopherson <seanjc@google.com>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Will Deacon <will@kernel.org>,
-        "the arch/x86 maintainers" <x86@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <3a52cc06-27ce-96a4-b180-60fc269719ba@nvidia.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Apr 13, 2021 at 7:43 PM Steven Rostedt <rostedt@goodmis.org> wrote:
+On 13.04.2021 18:38, Max Gurtovoy wrote:
 >
-> On Tue, 13 Apr 2021 13:41:47 -0400
-> Steven Rostedt <rostedt@goodmis.org> wrote:
+>On 4/11/2021 10:26 PM, Javier González wrote:
+>>On 11.04.2021 12:10, Max Gurtovoy wrote:
+>>>
+>>>On 4/10/2021 9:32 AM, Javier González wrote:
+>>>>>On 10 Apr 2021, at 02.30, Chaitanya Kulkarni 
+>>>>><Chaitanya.Kulkarni@wdc.com> wrote:
+>>>>>
+>>>>>﻿On 4/9/21 17:22, Max Gurtovoy wrote:
+>>>>>>>On 2/19/2021 2:45 PM, SelvaKumar S wrote:
+>>>>>>>This patchset tries to add support for TP4065a ("Simple 
+>>>>>>>Copy Command"),
+>>>>>>>v2020.05.04 ("Ratified")
+>>>>>>>
+>>>>>>>The Specification can be found in following link.
+>>>>>>>https://nvmexpress.org/wp-content/uploads/NVM-Express-1.4-Ratified-TPs-1.zip
+>>>>>>>
+>>>>>>>
+>>>>>>>Simple copy command is a copy offloading operation and is  
+>>>>>>>used to copy
+>>>>>>>multiple contiguous ranges (source_ranges) of LBA's to a 
+>>>>>>>single destination
+>>>>>>>LBA within the device reducing traffic between host and device.
+>>>>>>>
+>>>>>>>This implementation doesn't add native copy offload 
+>>>>>>>support for stacked
+>>>>>>>devices rather copy offload is done through emulation. Possible use
+>>>>>>>cases are F2FS gc and BTRFS relocation/balance.
+>>>>>>>
+>>>>>>>*blkdev_issue_copy* takes source bdev, no of sources, 
+>>>>>>>array of source
+>>>>>>>ranges (in sectors), destination bdev and destination 
+>>>>>>>offset(in sectors).
+>>>>>>>If both source and destination block devices are same and 
+>>>>>>>copy_offload = 1,
+>>>>>>>then copy is done through native copy offloading. Copy 
+>>>>>>>emulation is used
+>>>>>>>in other cases.
+>>>>>>>
+>>>>>>>As SCSI XCOPY can take two different block devices and no 
+>>>>>>>of source range is
+>>>>>>>equal to 1, this interface can be extended in future to 
+>>>>>>>support SCSI XCOPY.
+>>>>>>Any idea why this TP wasn't designed for copy offload between 2
+>>>>>>different namespaces in the same controller ?
+>>>>>Yes, it was the first attempt so to keep it simple.
+>>>>>
+>>>>>Further work is needed to add incremental TP so that we can 
+>>>>>also do a copy
+>>>>>between the name-spaces of same controller (if we can't 
+>>>>>already) and to the
+>>>>>namespaces that belongs to the different controller.
+>>>>>
+>>>>>>And a simple copy will be the case where the src_nsid == dst_nsid ?
+>>>>>>
+>>>>>>Also why there are multiple source ranges and only one dst range ? We
+>>>>>>could add a bit to indicate if this range is src or dst..
+>>>>One of the target use cases was ZNS in order to avoid fabric 
+>>>>transfers during host GC. You can see how this plays well with 
+>>>>several zone ranges and a single zone destination.
+>>>>
+>>>>If we start getting support in Linux through the different past 
+>>>>copy offload efforts, I’m sure we can extend this TP in the 
+>>>>future.
+>>>
+>>>But the "copy" command IMO is more general than the ZNS GC case, 
+>>>that can be a private case of copy, isn't it ?
+>>
+>>It applies to any namespace type, so yes. I just wanted to give you the
+>>background for the current "simple" scope through one of the use cases
+>>that was in mind.
+>>
+>>>We can get a big benefit of offloading the data copy from one ns 
+>>>to another in the same controller and even in different 
+>>>controllers in the same subsystem.
+>>
+>>Definitely.
+>>
+>>>
+>>>Do you think the extension should be to "copy" command or to 
+>>>create a new command "x_copy" for copying to different destination 
+>>>ns ?
+>>
+>>I believe there is space for extensions to simple copy. But given the
+>>experience with XCOPY, I can imagine that changes will be incremental,
+>>based on very specific use cases.
+>>
+>>I think getting support upstream and bringing deployed cases is a very
+>>good start.
 >
-> > As the below splats look like it has nothing to do with this patch, and
-> > this patch will add a WARN() if there's broken logic somewhere, I bet the
-> > bisect got confused (if it is automated and does a panic_on_warning),
-> > because it will panic for broken code that his patch detects.
-> >
-> > That is, the bisect was confused because it was triggering on two different
-> > issues. One that triggered the reported splat below, and another that this
-> > commit detects and warns on.
+>Copying data (files) within the controller/subsystem from ns_A to ns_B 
+>using NVMf will reduce network BW and memory BW in the host server.
 >
-> Is it possible to update the the bisect to make sure that if it is failing
-> on warnings, to make sure the warnings are somewhat related, before decided
-> that its the same bug?
+>This feature is well known and the use case is well known.
 
-It does not seem to be feasible, bugs manifest differently in both
-space and time. Also even if we somehow conclude the crash we see is
-different, it says nothing about the original bug. For more data see:
-https://groups.google.com/g/syzkaller/c/sR8aAXaWEF4/m/tTWYRgvmAwAJ
+Definitely.
+
+>
+>The question whether we implement it in vendor specific manner of we 
+>add it to the specification.
+>
+>I prefer adding it to the spec :)
+
+Agree. Let's build up on top of Simple Copy. We can talk about it
+offline in the context of the NVMe TWG.
