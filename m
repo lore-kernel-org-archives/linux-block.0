@@ -2,89 +2,154 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-22.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB464C433B4
-	for <linux-block@archiver.kernel.org>; Wed, 14 Apr 2021 18:40:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 728AAC433B4
+	for <linux-block@archiver.kernel.org>; Wed, 14 Apr 2021 19:40:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7D99D61107
-	for <linux-block@archiver.kernel.org>; Wed, 14 Apr 2021 18:40:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4A52B61132
+	for <linux-block@archiver.kernel.org>; Wed, 14 Apr 2021 19:40:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348850AbhDNSk7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 14 Apr 2021 14:40:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28991 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234497AbhDNSk5 (ORCPT
+        id S233349AbhDNTkX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 14 Apr 2021 15:40:23 -0400
+Received: from mail-1.ca.inter.net ([208.85.220.69]:35538 "EHLO
+        mail-1.ca.inter.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231869AbhDNTkX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Apr 2021 14:40:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1618425635;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-        bh=Kb6pl84RYbuABJ8TS43zZhYd/BdsMqVTZ8MQq2oc0eY=;
-        b=Y+rhxI3AdWyyOdwp/YC76GK03Z3G9+joxTr3BdnZJ2201KMaAIbP1IjQsy8Ibr3zVue696
-        76cQqtc3Z+T2IZdfl6n7OeGbRqRmjQularZNFxOU3SInLxJWS4JkXYnmFs9Y87hvEArO7u
-        37wsqeF7aTQeDu9c0QPVAWy3XE/jJqk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-283-_g9salM4NfeuxlOrfD4sQw-1; Wed, 14 Apr 2021 14:40:34 -0400
-X-MC-Unique: _g9salM4NfeuxlOrfD4sQw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Wed, 14 Apr 2021 15:40:23 -0400
+Received: from localhost (offload-3.ca.inter.net [208.85.220.70])
+        by mail-1.ca.inter.net (Postfix) with ESMTP id 8778B2EA2F6;
+        Wed, 14 Apr 2021 15:40:00 -0400 (EDT)
+Received: from mail-1.ca.inter.net ([208.85.220.69])
+        by localhost (offload-3.ca.inter.net [208.85.220.70]) (amavisd-new, port 10024)
+        with ESMTP id R3KQy05Q+BWi; Wed, 14 Apr 2021 15:20:42 -0400 (EDT)
+Received: from [192.168.48.23] (host-45-58-219-4.dyn.295.ca [45.58.219.4])
+        (using TLSv1 with cipher DHE-RSA-AES128-SHA (128/128 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4F24D802B78;
-        Wed, 14 Apr 2021 18:40:08 +0000 (UTC)
-Received: from localhost (unknown [10.18.25.174])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1F3415D9DE;
-        Wed, 14 Apr 2021 18:40:08 +0000 (UTC)
-Date:   Wed, 14 Apr 2021 14:40:07 -0400
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
-        Alasdair G Kergon <agk@redhat.com>,
-        Jaegeuk Kim <jaegeuk@google.com>
-Subject: [git pull] device mapper fix for 5.12 final
-Message-ID: <20210414184007.GA8824@redhat.com>
+        (Authenticated sender: dgilbert@interlog.com)
+        by mail-1.ca.inter.net (Postfix) with ESMTPSA id 4860C2EA23C;
+        Wed, 14 Apr 2021 15:39:59 -0400 (EDT)
+Reply-To: dgilbert@interlog.com
+Subject: Re: [bug report] shared tags causes IO hang and performance drop
+To:     John Garry <john.garry@huawei.com>,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
+        Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>
+References: <YHaez6iN2HHYxYOh@T590>
+ <9a6145a5-e6ac-3d33-b52a-0823bfc3b864@huawei.com>
+ <cb326d404c6e0785d03a7dfadc42832c@mail.gmail.com> <YHbOOfGNHwO4SMS7@T590>
+ <b41586781cffea03c5fd6b0849e2b9e4@mail.gmail.com>
+ <75ac498d-763c-e52b-a870-e3a91b930624@interlog.com>
+ <074f40aa-68c3-8580-bf36-bd4ea2aff0b9@huawei.com>
+From:   Douglas Gilbert <dgilbert@interlog.com>
+Message-ID: <103cc513-1b82-d41b-7c65-a5be8b43b0ca@interlog.com>
+Date:   Wed, 14 Apr 2021 15:39:59 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <074f40aa-68c3-8580-bf36-bd4ea2aff0b9@huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-CA
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+On 2021-04-14 2:19 p.m., John Garry wrote:
+> On 14/04/2021 18:03, Douglas Gilbert wrote:
+>> On 2021-04-14 9:59 a.m., Kashyap Desai wrote:
+>>>>> I tried both - 5.12.0-rc1 and 5.11.0-rc2+ and there is a same
+>>> behavior.
+>>>>> Let me also check  megaraid_sas and see if anything generic or this is
+>>>>> a special case of scsi_debug.
+>>>>
+>>>> As I mentioned, it could be one generic issue wrt. SCHED_RESTART.
+>>>> shared tags might have to restart all hctx since all share same tags.
+>>>
+>>> Ming - I tried many combination on MR shared host tag driver but there is
+>>> no single instance of IO hang.
+>>> I will keep trying, but when I look at scsi_debug driver code I found
+>>> below odd settings in scsi_debug driver.
+>>> can_queue of adapter is set to 128 but queue_depth of sdev is set to 255.
+>>>
+>>> If I apply below patch, scsi_debug driver's hang is also resolved. Ideally
+>>> sdev->queue depth cannot exceed shost->can_queue.
+>>> Not sure why cmd_per_lun is 255 in scsi_debug driver which can easily
+>>> exceed can_queue.  I will simulate something similar in MR driver and see
+>>> how it behaves w.r.t IO hang issue.
+>>>
+>>> diff --git a/drivers/scsi/scsi_debug.c b/drivers/scsi/scsi_debug.c
+>>> index 70165be10f00..dded762540ee 100644
+>>> --- a/drivers/scsi/scsi_debug.c
+>>> +++ b/drivers/scsi/scsi_debug.c
+>>> @@ -218,7 +218,7 @@ static const char *sdebug_version_date = "20200710";
+>>>    */
+>>>   #define SDEBUG_CANQUEUE_WORDS  3       /* a WORD is bits in a long */
+>>>   #define SDEBUG_CANQUEUE  (SDEBUG_CANQUEUE_WORDS * BITS_PER_LONG)
+>>
+>> So SDEBUG_CANQUEUE is 3*64 = 192 and is a hard limit (it is used to
+>> dimension an array). Should it be upped to 4, say? [That will slow things
+>> down a bit if that is an issue.]
+> 
+> sdev_store_queue_depth() enforces that the sdev queue depth cannot exceed 
+> can_queue.
 
-The following changes since commit d434405aaab7d0ebc516b68a8fc4100922d7f5ef:
+That is only invoked by the user doing:
+     echo [qdepth] > /sys/class/scsi_device/[hctl]/device/queue_depth
 
-  Linux 5.12-rc7 (2021-04-11 15:16:13 -0700)
+For scsi_debug that sysfs store leads to sdebug_change_qdepth() being
+invoked. That function currently contains this hack:
 
-are available in the Git repository at:
+         /* allow to exceed max host qc_arr elements for testing */
+         if (qdepth > SDEBUG_CANQUEUE + 10)
+                 qdepth = SDEBUG_CANQUEUE + 10;
+         scsi_change_queue_depth(sdev, qdepth);
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-5.12/dm-fixes-3
+Maybe that hack should be replaced with:
+	if (qdepth <= SDEBUG_CANQUEUE)
+		scsi_change_queue_depth(sdev, qdepth);
+	else
+		<print warning>
+	return sdev->queue_depth;
 
-for you to fetch changes up to 8ca7cab82bda4eb0b8064befeeeaa38106cac637:
+That hack has been useful in my testing (e.g. currently I'm tracking down
+an oops caused by it in my sg driver rewrite) but it may confuse others.
+There are more clear cut ways to make the scsi_debug driver inject errors.
 
-  dm verity fec: fix misaligned RS roots IO (2021-04-14 14:28:29 -0400)
+Doug Gilbert
 
-Please pull, thanks.
-Mike
-
-----------------------------------------------------------------
-Fix DM verity target FEC support's RS roots IO to always be
-aligned. This fixes a previous stable@ fix that overcorrected for a
-different configuration that also resulted in misaligned roots IO.
-
-----------------------------------------------------------------
-Jaegeuk Kim (1):
-      dm verity fec: fix misaligned RS roots IO
-
- drivers/md/dm-verity-fec.c | 11 ++++++++---
- drivers/md/dm-verity-fec.h |  1 +
- 2 files changed, 9 insertions(+), 3 deletions(-)
+> I don't know why this is not also enforced in scsi_alloc_sdev(), or even when 
+> registering the shost (for cmd_per_lun)
+> 
+>>
+>>> -#define DEF_CMD_PER_LUN  255
+>>> +#define DEF_CMD_PER_LUN  SDEBUG_CANQUEUE
+>>>
+>>>   /* UA - Unit Attention; SA - Service Action; SSU - Start Stop Unit */
+>>>   #define F_D_IN                 1       /* Data-in command (e.g. READ) */
+>>> @@ -7558,6 +7558,7 @@ static int sdebug_driver_probe(struct device *dev)
+>>>          sdbg_host = to_sdebug_host(dev);
+>>>
+>>>          sdebug_driver_template.can_queue = sdebug_max_queue;
+>>> +       sdebug_driver_template.cmd_per_lun = sdebug_max_queue;
+>>
+>> I'll  push out a patch shortly.
+>>
+>> Doug Gilbert
+>>
+>>
+>>>          if (!sdebug_clustering)
+>>>                  sdebug_driver_template.dma_boundary = PAGE_SIZE - 1;
+>>>>
+>>>>
+>>>> Thanks,
+>>>> Ming
+>>
+>> .
+> 
 
