@@ -2,194 +2,105 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DB5BC433ED
-	for <linux-block@archiver.kernel.org>; Wed, 14 Apr 2021 06:59:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1EB5C433B4
+	for <linux-block@archiver.kernel.org>; Wed, 14 Apr 2021 07:50:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F408F61220
-	for <linux-block@archiver.kernel.org>; Wed, 14 Apr 2021 06:59:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 70B8B613C7
+	for <linux-block@archiver.kernel.org>; Wed, 14 Apr 2021 07:50:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232557AbhDNG72 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 14 Apr 2021 02:59:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47720 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349591AbhDNG7N (ORCPT
+        id S1347626AbhDNHvQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 14 Apr 2021 03:51:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20125 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231802AbhDNHvP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Apr 2021 02:59:13 -0400
-Received: from mail-io1-xd31.google.com (mail-io1-xd31.google.com [IPv6:2607:f8b0:4864:20::d31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76B11C061574;
-        Tue, 13 Apr 2021 23:58:52 -0700 (PDT)
-Received: by mail-io1-xd31.google.com with SMTP id j26so19636423iog.13;
-        Tue, 13 Apr 2021 23:58:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=iPvXMTpUNl3IxdG2GdqWLZcBOjF3pDi559BGFj5cKe8=;
-        b=e5PSEGY9BDrjmpgpr1JDTixtaSfJ7lUkQfQofKGJFTaxWSf77oTAkZfVa/2O+TS5dW
-         eKoMP9B+vnaz4hLpdAQWXWwhO25xpQs7hfZJKyS4+7XL71K5E2369zyC/5JZMUDY2/0G
-         rcsd5BOHW/WDdWXnB60fXErG4m7mKCiymxzKVlqItMnrhqaF2na8AprV+mUZSSfD2XdZ
-         j/XMXdcInl4r0vsmy0rtFemZRTCl8mDtEV0kYcRVD+xDrt45g2qUNZIJr3f4P1dreG8r
-         0bCmU1FuJE2EZQsl5ACajy0rLM7hsKYhA6JgpY896xMy/C+GuqNMkUYjIj3itjHf1RRm
-         DQpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=iPvXMTpUNl3IxdG2GdqWLZcBOjF3pDi559BGFj5cKe8=;
-        b=LKj0mosX6lmQYsSQHd0aUlaX3DjyBFM4ZSF/LzXyLCDQC1GhUFGSVU2ja1pOI0HFRp
-         1T/G1kebf64Oaxk9haGIB4SR6uqIQCWD/D30TMxhY1yUQ8gLPylI1B/TFCgmd3QOFjA3
-         QAOUEXchxg25B5clcs0JXCmSei6bsbAO/Ilbko0hvwt2/MlE5o3FICvrYEIYKsiclZ7x
-         gIJ0MjSULSmCLCXGQ15q/vK/PkPfVq7t0daK6KElSaYACkLk1vOn2jwszKJPVEV0OLUy
-         oWRWG5mG3EcmPVHvlEnf5/ehV2nhy/mN7RceKpQxt646Z8cVZp4gAICOCha5NQDsFGEY
-         A0gg==
-X-Gm-Message-State: AOAM5301NQH0xR4wthgCBtNNRHu/QCYF/YJa6g+2QcpuGfL+kcFMVbP+
-        IHBKg5HbVwg0+DOPKTNWLwe85S+S5Svzq68GeyA=
-X-Google-Smtp-Source: ABdhPJxVn0379a/e+lrGuK9nJvBnaVZRkG+95gHH+6KyBvsrtfKcHhnhaQQ04D+xJ04y9zRQrXsU7onZw/arekICxKA=
-X-Received: by 2002:a6b:f909:: with SMTP id j9mr30365082iog.138.1618383531741;
- Tue, 13 Apr 2021 23:58:51 -0700 (PDT)
+        Wed, 14 Apr 2021 03:51:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1618386654;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=Ef1Sgck7C7ei8wcm3LP4xa8AJido8YxLjfgnN0FEIhE=;
+        b=LWXXiKKrupFIE3kNKyq+3/hoDnOLJ3TLGAyhh0G+u941SwjvoMRHg04+YNtKQ0jxRBjRwG
+        MOH4q+g3rdSj9SLB2yN0MtQLom0va37RzjjXlovhrLUqmoTfUL0eLkVbbdw+buPdvS7Ws9
+        ImaoW9JiB4lxY18SqBwwzkdMXcc5pDU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-355-1_ACkP7UNYK5jny4Q3nhCg-1; Wed, 14 Apr 2021 03:50:52 -0400
+X-MC-Unique: 1_ACkP7UNYK5jny4Q3nhCg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0FBD719251A2;
+        Wed, 14 Apr 2021 07:50:51 +0000 (UTC)
+Received: from T590 (ovpn-13-221.pek2.redhat.com [10.72.13.221])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 15B6D51DCB;
+        Wed, 14 Apr 2021 07:50:43 +0000 (UTC)
+Date:   Wed, 14 Apr 2021 15:50:39 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     John Garry <john.garry@huawei.com>
+Cc:     ming.lei@redhat.com, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>
+Subject: [bug report] shared tags causes IO hang and performance drop
+Message-ID: <YHaez6iN2HHYxYOh@T590>
 MIME-Version: 1.0
-References: <20210219124517.79359-1-selvakuma.s1@samsung.com>
- <CGME20210219124603epcas5p33add0f2c1781b2a4d71bf30c9e1ac647@epcas5p3.samsung.com>
- <20210219124517.79359-3-selvakuma.s1@samsung.com> <BL0PR04MB6514EA91680D33A5890ECE16E7839@BL0PR04MB6514.namprd04.prod.outlook.com>
- <CAHqX9vb6GgaU9QdTQaq3=dGuoNCuWorLrGCF8gC5LEdFBESFcA@mail.gmail.com>
- <BL0PR04MB6514B34000467FABFD6BF385E7709@BL0PR04MB6514.namprd04.prod.outlook.com>
- <CAHqX9vYvtOaVL4LG0gAGCMz+a8uha8czH==Dgg3eG+TWA+xeVQ@mail.gmail.com> <BL0PR04MB65146169A9C7527280C15D4AE74F9@BL0PR04MB6514.namprd04.prod.outlook.com>
-In-Reply-To: <BL0PR04MB65146169A9C7527280C15D4AE74F9@BL0PR04MB6514.namprd04.prod.outlook.com>
-From:   Selva Jove <selvajove@gmail.com>
-Date:   Wed, 14 Apr 2021 12:28:39 +0530
-Message-ID: <CAHqX9vYPVwYLT5Bdk_GqKZWxpJNib9fYidEmT0j+bRikwyLgKw@mail.gmail.com>
-Subject: Re: [RFC PATCH v5 2/4] block: add simple copy support
-To:     Damien Le Moal <Damien.LeMoal@wdc.com>
-Cc:     SelvaKumar S <selvakuma.s1@samsung.com>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "kbusch@kernel.org" <kbusch@kernel.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>, "hch@lst.de" <hch@lst.de>,
-        "sagi@grimberg.me" <sagi@grimberg.me>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "snitzer@redhat.com" <snitzer@redhat.com>,
-        "joshiiitr@gmail.com" <joshiiitr@gmail.com>,
-        "nj.shetty@samsung.com" <nj.shetty@samsung.com>,
-        "joshi.k@samsung.com" <joshi.k@samsung.com>,
-        "javier.gonz@samsung.com" <javier.gonz@samsung.com>,
-        "kch@kernel.org" <kch@kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-I agree with you. Will remove BLKDEV_COPY_NOEMULATION.
+Hi John,
 
-On Tue, Apr 13, 2021 at 6:03 AM Damien Le Moal <Damien.LeMoal@wdc.com> wrote:
->
-> On 2021/04/12 23:35, Selva Jove wrote:
-> > On Mon, Apr 12, 2021 at 5:55 AM Damien Le Moal <Damien.LeMoal@wdc.com> wrote:
-> >>
-> >> On 2021/04/07 20:33, Selva Jove wrote:
-> >>> Initially I started moving the dm-kcopyd interface to the block layer
-> >>> as a generic interface.
-> >>> Once I dig deeper in dm-kcopyd code, I figured that dm-kcopyd is
-> >>> tightly coupled with dm_io()
-> >>>
-> >>> To move dm-kcopyd to block layer, it would also require dm_io code to
-> >>> be moved to block layer.
-> >>> It would cause havoc in dm layer, as it is the backbone of the
-> >>> dm-layer and needs complete
-> >>> rewriting of dm-layer. Do you see any other way of doing this without
-> >>> having to move dm_io code
-> >>> or to have redundant code ?
-> >>
-> >> Right. Missed that. So reusing dm-kcopyd and making it a common interface will
-> >> take some more efforts. OK, then. For the first round of commits, let's forget
-> >> about this. But I still think that your emulation could be a lot better than a
-> >> loop doing blocking writes after blocking reads.
-> >>
-> >
-> > Current implementation issues read asynchronously and once all the reads are
-> > completed, then the write is issued as whole to reduce the IO traffic
-> > in the queue.
-> > I agree that things can be better. Will explore another approach of
-> > sending writes
-> > immediately once reads are completed and with  plugging to increase the chances
-> > of merging.
-> >
-> >> [...]
-> >>>>> +int blkdev_issue_copy(struct block_device *src_bdev, int nr_srcs,
-> >>>>> +             struct range_entry *src_rlist, struct block_device *dest_bdev,
-> >>>>> +             sector_t dest, gfp_t gfp_mask, int flags)
-> >>>>> +{
-> >>>>> +     struct request_queue *q = bdev_get_queue(src_bdev);
-> >>>>> +     struct request_queue *dest_q = bdev_get_queue(dest_bdev);
-> >>>>> +     struct blk_copy_payload *payload;
-> >>>>> +     sector_t bs_mask, copy_size;
-> >>>>> +     int ret;
-> >>>>> +
-> >>>>> +     ret = blk_prepare_payload(src_bdev, nr_srcs, src_rlist, gfp_mask,
-> >>>>> +                     &payload, &copy_size);
-> >>>>> +     if (ret)
-> >>>>> +             return ret;
-> >>>>> +
-> >>>>> +     bs_mask = (bdev_logical_block_size(dest_bdev) >> 9) - 1;
-> >>>>> +     if (dest & bs_mask) {
-> >>>>> +             return -EINVAL;
-> >>>>> +             goto out;
-> >>>>> +     }
-> >>>>> +
-> >>>>> +     if (q == dest_q && q->limits.copy_offload) {
-> >>>>> +             ret = blk_copy_offload(src_bdev, payload, dest, gfp_mask);
-> >>>>> +             if (ret)
-> >>>>> +                     goto out;
-> >>>>> +     } else if (flags & BLKDEV_COPY_NOEMULATION) {
-> >>>>
-> >>>> Why ? whoever calls blkdev_issue_copy() wants a copy to be done. Why would that
-> >>>> user say "Fail on me if the device does not support copy" ??? This is a weird
-> >>>> interface in my opinion.
-> >>>>
-> >>>
-> >>> BLKDEV_COPY_NOEMULATION flag was introduced to allow blkdev_issue_copy() callers
-> >>> to use their native copying method instead of the emulated copy that I
-> >>> added. This way we
-> >>> ensure that dm uses the hw-assisted copy and if that is not present,
-> >>> it falls back to existing
-> >>> copy method.
-> >>>
-> >>> The other users who don't have their native emulation can use this
-> >>> emulated-copy implementation.
-> >>
-> >> I do not understand. Emulation or not should be entirely driven by the device
-> >> reporting support for simple copy (or not). It does not matter which component
-> >> is issuing the simple copy call: an FS to a real device, and FS to a DM device
-> >> or a DM target driver. If the underlying device reported support for simple
-> >> copy, use that. Otherwise, emulate with read/write. What am I missing here ?
-> >>
-> >
-> > blkdev_issue_copy() api will generally complete the copy-operation,
-> > either by using
-> > offloaded-copy or by using emulated-copy. The caller of the api is not
-> > required to
-> > figure the type of support. However, it can opt out of emulated-copy
-> > by specifying
-> > the flag BLKDEV_NOEMULATION. This is helpful for the case when the
-> > caller already
-> > has got a sophisticated emulation (e.g. dm-kcopyd users).
->
-> This does not make any sense to me. If the user has already another mean of
-> doing copies, then that user will not call blkdev_issue_copy(). So I really do
-> not understand what the "opting out of emulated copy" would be useful for. That
-> user can check the simple copy support glag in the device request queue and act
-> accordingly: use its own block copy code when simple copy is not supported or
-> use blkdev_issue_copy() when the device has simple copy. Adding that
-> BLKDEV_COPY_NOEMULATION does not serve any purpose at all.
->
->
->
-> --
-> Damien Le Moal
-> Western Digital Research
+It is reported inside RH that CPU utilization is increased ~20% when
+running simple FIO test inside VM which disk is built on image stored
+on XFS/megaraid_sas.
+
+When I try to investigate by reproducing the issue via scsi_debug, I found
+IO hang when running randread IO(8k, direct IO, libaio) on scsi_debug disk
+created by the following command:
+
+	modprobe scsi_debug host_max_queue=128 submit_queues=$NR_CPUS virtual_gb=256
+
+Looks it is caused by SCHED_RESTART because current RESTART is just done
+on current hctx, and we may need to restart all hctxs for shared tags, and the
+issue can be fixed by the append patch. However, IOPS drops more than 10% with
+the patch.
+
+So any idea for this issue and the original performance drop?
+
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index e1e997af89a0..45188f7aa789 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -59,10 +59,18 @@ EXPORT_SYMBOL_GPL(blk_mq_sched_mark_restart_hctx);
+ 
+ void blk_mq_sched_restart(struct blk_mq_hw_ctx *hctx)
+ {
++	bool shared_tag = blk_mq_is_sbitmap_shared(hctx->flags);
++
++	if (shared_tag)
++		blk_mq_run_hw_queues(hctx->queue, true);
++
+ 	if (!test_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state))
+ 		return;
+ 	clear_bit(BLK_MQ_S_SCHED_RESTART, &hctx->state);
+ 
++	if (shared_tag)
++		return;
++
+ 	/*
+ 	 * Order clearing SCHED_RESTART and list_empty_careful(&hctx->dispatch)
+ 	 * in blk_mq_run_hw_queue(). Its pair is the barrier in
+
+Thanks, 
+Ming
+
