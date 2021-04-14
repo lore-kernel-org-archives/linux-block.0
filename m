@@ -2,61 +2,140 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE0B8C433ED
-	for <linux-block@archiver.kernel.org>; Wed, 14 Apr 2021 03:05:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A234C43460
+	for <linux-block@archiver.kernel.org>; Wed, 14 Apr 2021 05:47:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 96E9861164
-	for <linux-block@archiver.kernel.org>; Wed, 14 Apr 2021 03:05:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EB9BA613A9
+	for <linux-block@archiver.kernel.org>; Wed, 14 Apr 2021 05:47:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345324AbhDNDGF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Apr 2021 23:06:05 -0400
-Received: from mailgw02.mediatek.com ([210.61.82.184]:41496 "EHLO
-        mailgw02.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S232009AbhDNDGA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Apr 2021 23:06:00 -0400
-X-UUID: fc60bbea1456446faa5ac9499d2fdc9b-20210414
-X-UUID: fc60bbea1456446faa5ac9499d2fdc9b-20210414
-Received: from mtkcas10.mediatek.inc [(172.21.101.39)] by mailgw02.mediatek.com
-        (envelope-from <mark-pk.tsai@mediatek.com>)
-        (Cellopoint E-mail Firewall v4.1.14 Build 0819 with TLSv1.2 ECDHE-RSA-AES256-SHA384 256/256)
-        with ESMTP id 1816240359; Wed, 14 Apr 2021 11:05:35 +0800
-Received: from mtkcas10.mediatek.inc (172.21.101.39) by
- mtkmbs02n2.mediatek.inc (172.21.101.101) with Microsoft SMTP Server (TLS) id
- 15.0.1497.2; Wed, 14 Apr 2021 11:05:33 +0800
-Received: from mtksdccf07.mediatek.inc (172.21.84.99) by mtkcas10.mediatek.inc
- (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Wed, 14 Apr 2021 11:05:33 +0800
-From:   Mark-PK Tsai <mark-pk.tsai@mediatek.com>
-To:     <mkubecek@suse.cz>, <linux-kernel@vger.kernel.org>
-CC:     <axboe@kernel.dk>, <emamd001@umn.edu>, <josef@toxicpanda.com>,
-        <kjlu@umn.edu>, <linux-block@vger.kernel.org>,
-        <navid.emamdoost@gmail.com>, <nbd@other.debian.org>,
-        <smccaman@umn.edu>, <mark-pk.tsai@mediatek.com>,
-        <jy.ho@mediatek.com>, <yj.chiang@mediatek.com>
-Subject: Re: [PATCH v3] nbd_genl_status: null check for nla_nest_start
-Date:   Wed, 14 Apr 2021 11:05:32 +0800
-Message-ID: <20210414030532.22451-1-mark-pk.tsai@mediatek.com>
-X-Mailer: git-send-email 2.18.0
-In-Reply-To: <20191021064210.GD27784@unicorn.suse.cz>
-References: <20191021064210.GD27784@unicorn.suse.cz>
+        id S1347433AbhDNFr1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 14 Apr 2021 01:47:27 -0400
+Received: from mx2.suse.de ([195.135.220.15]:43104 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S236918AbhDNFrZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 14 Apr 2021 01:47:25 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 043ADB036;
+        Wed, 14 Apr 2021 05:47:04 +0000 (UTC)
+From:   Coly Li <colyli@suse.de>
+To:     axboe@kernel.dk
+Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        jianpeng.ma@intel.com, qiaowei.ren@intel.com,
+        Coly Li <colyli@suse.de>
+Subject: [PATCH 00/13] bcache patches for Linux v5.13 -- 2nd wave
+Date:   Wed, 14 Apr 2021 13:46:35 +0800
+Message-Id: <20210414054648.24098-1-colyli@suse.de>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain
-X-TM-SNTS-SMTP: 4A00A68432B36DCE715F97B2FDE1AB765143FFB8F4A5D93CA4CA4541DAEAFCC62000:8
-X-MTK:  N
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Michal Kubecek <mkubecek@suse.cz>
+Hi Jens,
 
-Hi,
+This is the 2nd wave of bcache patches for Linux v5.13. This series are
+patches to use NVDIMM to store bcache journal, which is the first effort
+to support NVDIMM for bcache [EXPERIMENTAL].
 
-I found that CVE-2019-16089 still exist in upstream kernel.
-Does anyone know why this patch was not merged?
+All concerns from Linux v5.12 merge window are fixed, especially the
+data type defined in include/uapi/linux/bcache-nvm.h. And in this
+series, all the lists defined in bcache-nvm.h uapi file are stored and
+accessed directly on NVDIMM as memory objects.
 
+Intel developers Jianpeng Ma and Qiaowei Ren compose the initial code of
+nvm-pages, the related patches are,
+- bcache: initialize the nvm pages allocator
+- bcache: initialization of the buddy
+- bcache: bch_nvm_alloc_pages() of the buddy
+- bcache: bch_nvm_free_pages() of the buddy
+- bcache: get allocated pages from specific owner
+All the code depends on Linux libnvdimm and dax drivers, the bcache nvm-
+pages allocator can be treated as user of these two drivers.
+
+The nvm-pages allocator is a buddy-like allocator, which allocates size
+in power-of-2 pages from the NVDIMM namespace. User space tool 'bcache'
+has a new added '-M' option to format a NVDIMM namespace and register it
+via sysfs interface as a bcache meta device. The nvm-pages kernel code
+does a DAX mapping to map the whole namespace into system's memory
+address range, and allocating the pages to requestion like typical buddy
+allocator does. The major difference is nvm-pages allocator maintains
+the pages allocated to each requester by a owner list which stored on
+NVDIMM too. Owner list of different requester is tracked by a pre-
+defined UUID, all the pages tracked in all owner lists are treated as
+allocated busy pages and won't be initialized into buddy system after
+the system reboot.
+
+I modify the bcache code to recognize the nvm meta device feature,
+initialize journal on NVDIMM, and do journal I/Os on NVDIMM in the
+following patches,
+- bcache: add initial data structures for nvm pages
+- bcache: use bucket index to set GC_MARK_METADATA for journal buckets
+  in bch_btree_gc_finish()
+- bcache: add BCH_FEATURE_INCOMPAT_NVDIMM_META into incompat feature set
+- bcache: initialize bcache journal for NVDIMM meta device
+- bcache: support storing bcache journal into NVDIMM meta device
+- bcache: read jset from NVDIMM pages for journal replay
+- bcache: add sysfs interface register_nvdimm_meta to register NVDIMM
+  meta device
+- bcache: use div_u64() in init_owner_info()
+
+The bcache journal code may request a block of power-of-2 size pages
+from the nvm-pages allocator, normally it is a range of 256MB or 512MB
+continuous pages range. During meta data journaling, the in-memory jsets
+go into the calculated nvdimm pages location by kernel memcpy routine.
+So the journaling I/Os won't go into block device (e.g. SSD) anymore,
+the write and read for journal jsets happen on NVDIMM.
+
+The whole series is testing for a while and all addressed issues are
+verified to be fixed. Now it is time to consider this series as an
+initial code base of a commnity cooperation and have them in bcache
+upstream for future development.
+
+Thanks in advance for taking this. 
+
+Coly Li
+---
+
+Coly Li (8):
+  bcache: add initial data structures for nvm pages
+  bcache: use bucket index to set GC_MARK_METADATA for journal buckets
+    in bch_btree_gc_finish()
+  bcache: add BCH_FEATURE_INCOMPAT_NVDIMM_META into incompat feature set
+  bcache: initialize bcache journal for NVDIMM meta device
+  bcache: support storing bcache journal into NVDIMM meta device
+  bcache: read jset from NVDIMM pages for journal replay
+  bcache: add sysfs interface register_nvdimm_meta to register NVDIMM
+    meta device
+  bcache: use div_u64() in init_owner_info()
+
+Jianpeng Ma (5):
+  bcache: initialize the nvm pages allocator
+  bcache: initialization of the buddy
+  bcache: bch_nvm_alloc_pages() of the buddy
+  bcache: bch_nvm_free_pages() of the buddy
+  bcache: get allocated pages from specific owner
+
+ drivers/md/bcache/Kconfig       |   9 +
+ drivers/md/bcache/Makefile      |   2 +-
+ drivers/md/bcache/btree.c       |   6 +-
+ drivers/md/bcache/features.h    |   9 +
+ drivers/md/bcache/journal.c     | 317 +++++++++++---
+ drivers/md/bcache/journal.h     |   2 +-
+ drivers/md/bcache/nvm-pages.c   | 747 ++++++++++++++++++++++++++++++++
+ drivers/md/bcache/nvm-pages.h   |  93 ++++
+ drivers/md/bcache/super.c       |  73 +++-
+ include/uapi/linux/bcache-nvm.h | 207 +++++++++
+ 10 files changed, 1392 insertions(+), 73 deletions(-)
+ create mode 100644 drivers/md/bcache/nvm-pages.c
+ create mode 100644 drivers/md/bcache/nvm-pages.h
+ create mode 100644 include/uapi/linux/bcache-nvm.h
+
+-- 
+2.26.2
 
