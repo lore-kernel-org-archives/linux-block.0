@@ -2,103 +2,105 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8ED94C43460
-	for <linux-block@archiver.kernel.org>; Wed, 14 Apr 2021 08:40:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B528C433B4
+	for <linux-block@archiver.kernel.org>; Wed, 14 Apr 2021 08:44:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 767DD613CD
-	for <linux-block@archiver.kernel.org>; Wed, 14 Apr 2021 08:40:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0968E613CD
+	for <linux-block@archiver.kernel.org>; Wed, 14 Apr 2021 08:44:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232453AbhDNIkm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 14 Apr 2021 04:40:42 -0400
-Received: from out30-43.freemail.mail.aliyun.com ([115.124.30.43]:33838 "EHLO
-        out30-43.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1350186AbhDNIit (ORCPT
+        id S232628AbhDNIpH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 14 Apr 2021 04:45:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:32414 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232468AbhDNIpG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Apr 2021 04:38:49 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04400;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0UVX9aPU_1618389505;
-Received: from admindeMacBook-Pro-2.local(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0UVX9aPU_1618389505)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Wed, 14 Apr 2021 16:38:26 +0800
-Subject: Re: [PATCH V5 11/12] block: add poll_capable method to support
- bio-based IO polling
-To:     Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Hannes Reinecke <hare@suse.de>
-References: <20210401021927.343727-1-ming.lei@redhat.com>
- <20210401021927.343727-12-ming.lei@redhat.com>
- <20210412093856.GA978201@infradead.org>
-From:   JeffleXu <jefflexu@linux.alibaba.com>
-Message-ID: <a6d46979-810e-bc53-bc19-8acd449e3718@linux.alibaba.com>
-Date:   Wed, 14 Apr 2021 16:38:25 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.7.1
+        Wed, 14 Apr 2021 04:45:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1618389885;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=PI0biHAjtioVE9nE4bLO2UBKn34udcJDNDQVnJSXI5I=;
+        b=Mb5U7BK13kO11IeFmvKwJqaVdYVQwror+dkDhbUXM7B4zu7kq4XEx1RUbT/g5A7Qq3M+8v
+        7hrOctgG+6dx1QBtoVpkyW135ey/0I8F+El0+T9xX3ES3KdYYSR5EamC/tDvzUVHkzxTOb
+        WpKzB5Ol/2SJWE76iFEMlJJ6jzPA6Xw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-504-pGt2yJp0Puqc60dY4e2B9Q-1; Wed, 14 Apr 2021 04:44:41 -0400
+X-MC-Unique: pGt2yJp0Puqc60dY4e2B9Q-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 009788030A0;
+        Wed, 14 Apr 2021 08:44:40 +0000 (UTC)
+Received: from localhost (ovpn-114-209.ams2.redhat.com [10.36.114.209])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3FD5E51298;
+        Wed, 14 Apr 2021 08:44:36 +0000 (UTC)
+Date:   Wed, 14 Apr 2021 09:44:35 +0100
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Enrico Granata <egranata@google.com>, mst@redhat.com,
+        jasowang@redhat.com, pbonzini@redhat.com, axboe@kernel.dk,
+        virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] virtio_blk: Add support for lifetime feature
+Message-ID: <YHarc5gGgjyQOaA+@stefanha-x1.localdomain>
+References: <20210330231602.1223216-1-egranata@google.com>
+ <YHQQL1OTOdnuOYUW@stefanha-x1.localdomain>
+ <20210412094217.GA981912@infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <20210412093856.GA978201@infradead.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="bauiO0UMhevZr0So"
+Content-Disposition: inline
+In-Reply-To: <20210412094217.GA981912@infradead.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
+--bauiO0UMhevZr0So
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On 4/12/21 5:38 PM, Christoph Hellwig wrote:
-> On Thu, Apr 01, 2021 at 10:19:26AM +0800, Ming Lei wrote:
->> From: Jeffle Xu <jefflexu@linux.alibaba.com>
->>
->> This method can be used to check if bio-based device supports IO polling
->> or not. For mq devices, checking for hw queue in polling mode is
->> adequate, while the sanity check shall be implementation specific for
->> bio-based devices. For example, dm device needs to check if all
->> underlying devices are capable of IO polling.
->>
->> Though bio-based device may have done the sanity check during the
->> device initialization phase, cacheing the result of this sanity check
->> (such as by cacheing in the queue_flags) may not work. Because for dm
->> devices, users could change the state of the underlying devices through
->> '/sys/block/<dev>/io_poll', bypassing the dm device above. In this case,
->> the cached result of the very beginning sanity check could be
->> out-of-date. Thus the sanity check needs to be done every time 'io_poll'
->> is to be modified.
-> 
-> I really don't think thi should be a method, and I really do dislike
-> how we have all this "if (is_mq)" junk.  Why can't we have a flag on
-> the gendisk that signals if the device can support polling that
-> is autoamtically set for blk-mq and as-needed by bio based drivers?
+On Mon, Apr 12, 2021 at 10:42:17AM +0100, Christoph Hellwig wrote:
+> A note to the virtio committee:  eMMC is the worst of all the currently
+> active storage standards by a large margin.  It defines very strange
+> ad-hoc interfaces that expose very specific internals and often provides
+> very poor abstractions.  It would be great it you could reach out to the
+> wider storage community before taking bad ideas from the eMMC standard
+> and putting it into virtio.
 
-That would consume one more bit of queue->queue_flags.
+As Michael mentioned, there is still time to change the virtio-blk spec
+since this feature hasn't been released yet.
 
-Besides, DM/MD is somehow special here that when one of the underlying
-devices is disabled polling through '/sys/block/<dev>/io_poll',
-currently there's no mechanism notifying the above MD/DM to clear the
-previously set queue_flags. Thus the outdated queue_flags still
-indicates this DM/MD is capable of polling, while in fact one of the
-underlying device has been disabled for polling.
+Why exactly is exposing eMMC-style lifetime information problematic?
 
-Mike had ever suggested that we can trust the queue_flag, and clear the
-outdated queue_flags when later the IO submission or polling routine
-finally finds that the device is not capable of polling. Currently
-submit_bio_checks() will silently clear the REQ_HIPRI flag and still
-submit the bio when the device is actually not capable of polling. To
-fix the issue, could we break the submission and return an error code in
-submit_bio_checks() if the device is not capable of polling when
-submitting HIPRI bio?
+Can you and Enrico discuss the use case to figure out an alternative
+interface?
 
-
-> And please move everything that significantly hanges things for the
-> mq based path to separate prep patches early in th series.
-> 
-
-
-
--- 
 Thanks,
-Jeffle
+Stefan
+
+--bauiO0UMhevZr0So
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmB2q3MACgkQnKSrs4Gr
+c8iCWQf/XiM3VgPA1Zs4wDtPYzkWMh607Ajshz1zQnvTv/pJs17WdQ2XSjJAdXxS
+46IZ7lThbydBkeAaO0liAnBadJGipfv0MWQpkoWRVGvYH868k37bdtE/ypMeAL+b
+sUXF0BKNur+PMwV643QM04oGlYnEecvbNSFH1C2tADROJC7S9uEcZYK6pC9wKhap
+gKmDBhR+3qSRihK8d8aK2Bp4sUrZRGpsTnI9OZNCbZhRMGwvzGox0ffumvX0j1dA
+zPpSFesL+ytUmhAT695CAW/lPlcDwCP84GXAt2uaPvA4unZSzkbk4SN9Zx8zaKqu
+kiofNkpquHkH8V4R2QdBvLbK590Ixw==
+=DTBm
+-----END PGP SIGNATURE-----
+
+--bauiO0UMhevZr0So--
+
