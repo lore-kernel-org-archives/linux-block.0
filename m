@@ -2,314 +2,147 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43A26C433ED
-	for <linux-block@archiver.kernel.org>; Thu, 15 Apr 2021 10:34:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AA31C433ED
+	for <linux-block@archiver.kernel.org>; Thu, 15 Apr 2021 10:44:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 236C06137D
-	for <linux-block@archiver.kernel.org>; Thu, 15 Apr 2021 10:34:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 40DFB61249
+	for <linux-block@archiver.kernel.org>; Thu, 15 Apr 2021 10:44:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231610AbhDOKej (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Apr 2021 06:34:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:39066 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231534AbhDOKei (ORCPT
+        id S230260AbhDOKoy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Apr 2021 06:44:54 -0400
+Received: from frasgout.his.huawei.com ([185.176.79.56]:2866 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230056AbhDOKox (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Apr 2021 06:34:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1618482855;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=QZlC/yFRAzpA3qKEw9fTVKuwam05UecbY6LxriES8ZU=;
-        b=O9U5NdpXzpjVECsuB6OJKcAyi0dq8DALf5oICPCb3bREVlH/2uQx6LjaqZL/iBBp0X1HeF
-        vnR6KNc7nMM/fBMxKi/A/P0XeLN/ijaZjzm5dIgV3FuG498ULOUGG5gD9TAcBENShWYmBO
-        NVZ8ITO7HFfVWSxjGiTrjyhApaTcynE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-414-xKThsBeAOx2-DtOpqVgIRQ-1; Thu, 15 Apr 2021 06:34:11 -0400
-X-MC-Unique: xKThsBeAOx2-DtOpqVgIRQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6DF8218B9F42;
-        Thu, 15 Apr 2021 10:34:10 +0000 (UTC)
-Received: from localhost (ovpn-13-200.pek2.redhat.com [10.72.13.200])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A5DDB5D76F;
-        Thu, 15 Apr 2021 10:34:09 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org,
-        Jeffle Xu <jefflexu@linux.alibaba.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        linux-raid@vger.kernel.org, Song Liu <song@kernel.org>,
-        linux-nvme@lists.infradead.org, Ming Lei <ming.lei@redhat.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>
-Subject: [RFC PATCH 2/2] block: support to freeze bio based request queue
-Date:   Thu, 15 Apr 2021 18:33:10 +0800
-Message-Id: <20210415103310.1513841-3-ming.lei@redhat.com>
-In-Reply-To: <20210415103310.1513841-1-ming.lei@redhat.com>
-References: <20210415103310.1513841-1-ming.lei@redhat.com>
+        Thu, 15 Apr 2021 06:44:53 -0400
+Received: from fraeml741-chm.china.huawei.com (unknown [172.18.147.226])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4FLbRx1gVfz68BSk;
+        Thu, 15 Apr 2021 18:39:09 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml741-chm.china.huawei.com (10.206.15.222) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Thu, 15 Apr 2021 12:44:27 +0200
+Received: from [10.47.83.117] (10.47.83.117) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2106.2; Thu, 15 Apr
+ 2021 11:44:26 +0100
+Subject: Re: [bug report] shared tags causes IO hang and performance drop
+To:     Ming Lei <ming.lei@redhat.com>
+CC:     Kashyap Desai <kashyap.desai@broadcom.com>,
+        <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Douglas Gilbert <dgilbert@interlog.com>
+References: <YHaez6iN2HHYxYOh@T590>
+ <9a6145a5-e6ac-3d33-b52a-0823bfc3b864@huawei.com>
+ <cb326d404c6e0785d03a7dfadc42832c@mail.gmail.com> <YHbOOfGNHwO4SMS7@T590>
+ <87ceccf2-287b-9bd1-899a-f15026c9e65b@huawei.com> <YHe3M62agQET6o6O@T590>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <3e76ffc7-1d71-83b6-ef5b-3986e947e372@huawei.com>
+Date:   Thu, 15 Apr 2021 11:41:52 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <YHe3M62agQET6o6O@T590>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.47.83.117]
+X-ClientProxiedBy: lhreml721-chm.china.huawei.com (10.201.108.72) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-For bio based request queue, the queue usage refcnt is only grabbed
-during submission, which isn't consistent with request base queue.
+Hi Ming,
 
-Queue freezing has been used widely, and turns out it is very useful
-to quiesce queue activity.
+I'll have a look.
 
-Support to freeze bio based request queue by the following approach:
+BTW, are you intentionally using scsi_debug over null_blk? null_blk 
+supports shared sbitmap as well, and performance figures there are 
+generally higher than scsi_debug for similar fio settings.
 
-1) grab two queue usage refcount for blk-mq before submitting blk-mq
-bio, one is for bio, anther is for request;
+Thanks,
+john
 
-2) add bio flag of BIO_QUEUE_REFFED for making sure that only one
-refcnt is grabbed for each bio, so we can put the refcnt when the
-bio is going away
+EOM
 
-3) nvme mpath is a bit special, because same bio is used for both
-mpath queue and underlying nvme queue. So we put the mpath queue's
-usage refcnt before completing the nvme request.
 
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Bart Van Assche <bvanassche@acm.org>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/bio.c                   | 12 ++++++++++--
- block/blk-core.c              | 23 +++++++++++++++++------
- drivers/nvme/host/core.c      | 16 ++++++++++++++++
- drivers/nvme/host/multipath.c |  6 ++++++
- include/linux/blk-mq.h        |  2 ++
- include/linux/blk_types.h     |  1 +
- include/linux/blkdev.h        |  7 ++++++-
- 7 files changed, 58 insertions(+), 9 deletions(-)
+>> 		IOPs
+>> mq-deadline	usr=21.72%, sys=44.18%,		423K
+>> none		usr=23.15%, sys=74.01%		450K
+> Today I re-run the scsi_debug test on two server hardwares(32cores, dual
+> numa nodes), and the CPU utilization issue can be reproduced, follow
+> the test result:
+> 
+> 1) randread test on ibm-x3850x6[*] with deadline
+> 
+>                |IOPS    | FIO CPU util
+> ------------------------------------------------
+> hosttags      | 94k    | usr=1.13%, sys=14.75%
+> ------------------------------------------------
+> non hosttags  | 124k   | usr=1.12%, sys=10.65%,
+> 
+> 
+> 2) randread test on ibm-x3850x6[*] with none
+>                |IOPS    | FIO CPU util
+> ------------------------------------------------
+> hosttags      | 120k   | usr=0.89%, sys=6.55%
+> ------------------------------------------------
+> non hosttags  | 121k   | usr=1.07%, sys=7.35%
+> ------------------------------------------------
+> 
+>   *:
+>   	- that is the machine Yanhui reported VM cpu utilization increased by 20%
+> 	- kernel: latest linus tree(v5.12-rc7, commit: 7f75285ca57)
+> 	- also run same test on another 32cores machine, IOPS drop isn't
+> 	  observed, but CPU utilization is increased obviously
+> 
+> 3) test script
+> #/bin/bash
+> 
+> run_fio() {
+> 	RTIME=$1
+> 	JOBS=$2
+> 	DEVS=$3
+> 	BS=$4
+> 
+> 	QD=64
+> 	BATCH=16
+> 
+> 	fio --bs=$BS --ioengine=libaio \
+> 		--iodepth=$QD \
+> 	    --iodepth_batch_submit=$BATCH \
+> 		--iodepth_batch_complete_min=$BATCH \
+> 		--filename=$DEVS \
+> 		--direct=1 --runtime=$RTIME --numjobs=$JOBS --rw=randread \
+> 		--name=test --group_reporting
+> }
+> 
+> SCHED=$1
+> 
+> NRQS=`getconf _NPROCESSORS_ONLN`
+> 
+> rmmod scsi_debug
+> modprobe scsi_debug host_max_queue=128 submit_queues=$NRQS virtual_gb=256
+> sleep 2
+> DEV=`lsscsi | grep scsi_debug | awk '{print $6}'`
+> echo $SCHED >/sys/block/`basename $DEV`/queue/scheduler
+> echo 128 >/sys/block/`basename $DEV`/device/queue_depth
+> run_fio 20 16 $DEV 8K
+> 
+> 
+> rmmod scsi_debug
+> modprobe scsi_debug max_queue=128 submit_queues=1 virtual_gb=256
+> sleep 2
+> DEV=`lsscsi | grep scsi_debug | awk '{print $6}'`
+> echo $SCHED >/sys/block/`basename $DEV`/queue/scheduler
+> echo 128 >/sys/block/`basename $DEV`/device/queue_depth
+> run_fio 20 16 $DEV 8k
 
-diff --git a/block/bio.c b/block/bio.c
-index 303298996afe..941a306e390b 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1365,14 +1365,18 @@ static inline bool bio_remaining_done(struct bio *bio)
-  **/
- void bio_endio(struct bio *bio)
- {
-+	struct block_device *bdev;
-+	bool put_queue;
- again:
-+	bdev = bio->bi_bdev;
-+	put_queue = bio_flagged(bio, BIO_QUEUE_REFFED);
- 	if (!bio_remaining_done(bio))
- 		return;
- 	if (!bio_integrity_endio(bio))
- 		return;
- 
--	if (bio->bi_bdev)
--		rq_qos_done_bio(bio->bi_bdev->bd_disk->queue, bio);
-+	if (bdev)
-+		rq_qos_done_bio(bdev->bd_disk->queue, bio);
- 
- 	/*
- 	 * Need to have a real endio function for chained bios, otherwise
-@@ -1384,6 +1388,8 @@ void bio_endio(struct bio *bio)
- 	 */
- 	if (bio->bi_end_io == bio_chain_endio) {
- 		bio = __bio_chain_endio(bio);
-+		if (bdev && put_queue)
-+			blk_queue_exit(bdev->bd_disk->queue);
- 		goto again;
- 	}
- 
-@@ -1397,6 +1403,8 @@ void bio_endio(struct bio *bio)
- 	bio_uninit(bio);
- 	if (bio->bi_end_io)
- 		bio->bi_end_io(bio);
-+	if (bdev && put_queue)
-+		blk_queue_exit(bdev->bd_disk->queue);
- }
- EXPORT_SYMBOL(bio_endio);
- 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 09f774e7413d..f71e4b433030 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -431,12 +431,13 @@ EXPORT_SYMBOL(blk_cleanup_queue);
- int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
- {
- 	const bool pm = flags & BLK_MQ_REQ_PM;
-+	const unsigned int nr = (flags & BLK_MQ_REQ_DOUBLE_REF) ? 2 : 1;
- 
- 	while (true) {
- 		bool success = false;
- 
- 		rcu_read_lock();
--		if (percpu_ref_tryget_live(&q->q_usage_counter)) {
-+		if (percpu_ref_tryget_many_live(&q->q_usage_counter, nr)) {
- 			/*
- 			 * The code that increments the pm_only counter is
- 			 * responsible for ensuring that that counter is
-@@ -446,7 +447,7 @@ int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags)
- 			    !blk_queue_pm_only(q)) {
- 				success = true;
- 			} else {
--				percpu_ref_put(&q->q_usage_counter);
-+				percpu_ref_put_many(&q->q_usage_counter, nr);
- 			}
- 		}
- 		rcu_read_unlock();
-@@ -480,8 +481,18 @@ static inline int bio_queue_enter(struct bio *bio)
- 	struct request_queue *q = bio->bi_bdev->bd_disk->queue;
- 	bool nowait = bio->bi_opf & REQ_NOWAIT;
- 	int ret;
-+	blk_mq_req_flags_t flags = nowait ? BLK_MQ_REQ_NOWAIT : 0;
-+	bool reffed = bio_flagged(bio, BIO_QUEUE_REFFED);
- 
--	ret = blk_queue_enter(q, nowait ? BLK_MQ_REQ_NOWAIT : 0);
-+	if (!reffed)
-+		bio_set_flag(bio, BIO_QUEUE_REFFED);
-+
-+	/*
-+	 * Grab two queue references for blk-mq, one is for bio, and
-+	 * another is for blk-mq request.
-+	 */
-+	ret = blk_queue_enter(q, q->mq_ops && !reffed ?
-+			(flags | BLK_MQ_REQ_DOUBLE_REF) : flags);
- 	if (unlikely(ret)) {
- 		if (nowait && !blk_queue_dying(q))
- 			bio_wouldblock_error(bio);
-@@ -492,10 +503,11 @@ static inline int bio_queue_enter(struct bio *bio)
- 	return ret;
- }
- 
--void blk_queue_exit(struct request_queue *q)
-+void __blk_queue_exit(struct request_queue *q, unsigned int nr)
- {
--	percpu_ref_put(&q->q_usage_counter);
-+	percpu_ref_put_many(&q->q_usage_counter, nr);
- }
-+EXPORT_SYMBOL_GPL(__blk_queue_exit);
- 
- static void blk_queue_usage_counter_release(struct percpu_ref *ref)
- {
-@@ -920,7 +932,6 @@ static blk_qc_t __submit_bio(struct bio *bio)
- 			return blk_mq_submit_bio(bio);
- 		ret = disk->fops->submit_bio(bio);
- 	}
--	blk_queue_exit(disk->queue);
- 	return ret;
- }
- 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 34b8c78f88e0..791638a7164b 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -323,14 +323,30 @@ static inline enum nvme_disposition nvme_decide_disposition(struct request *req)
- static inline void nvme_end_req(struct request *req)
- {
- 	blk_status_t status = nvme_error_status(nvme_req(req)->status);
-+	const bool mpath = req->cmd_flags & REQ_NVME_MPATH;
-+	unsigned int nr = 0;
-+	struct bio *bio;
-+	struct nvme_ns *ns;
- 
- 	if (IS_ENABLED(CONFIG_BLK_DEV_ZONED) &&
- 	    req_op(req) == REQ_OP_ZONE_APPEND)
- 		req->__sector = nvme_lba_to_sect(req->q->queuedata,
- 			le64_to_cpu(nvme_req(req)->result.u64));
- 
-+	if (mpath) {
-+		ns = req->q->queuedata;
-+		__rq_for_each_bio(bio, req)
-+			nr++;
-+	}
- 	nvme_trace_bio_complete(req);
- 	blk_mq_end_request(req, status);
-+
-+	/*
-+	 * We changed multipath bio->bi_bdev, so have to drop the queue
-+	 * reference manually
-+	 */
-+	if (mpath && nr)
-+		__blk_queue_exit(ns->head->disk->queue, nr);
- }
- 
- void nvme_complete_rq(struct request *req)
-diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
-index a1d476e1ac02..017487c835fb 100644
---- a/drivers/nvme/host/multipath.c
-+++ b/drivers/nvme/host/multipath.c
-@@ -312,6 +312,12 @@ blk_qc_t nvme_ns_head_submit_bio(struct bio *bio)
- 	srcu_idx = srcu_read_lock(&head->srcu);
- 	ns = nvme_find_path(head);
- 	if (likely(ns)) {
-+		/*
-+		 * this bio's ownership is transferred to underlying queue, so
-+		 * clear the queue reffed flag and let underlying queue to put
-+		 * the multipath queue for us.
-+		 */
-+		bio_clear_flag(bio, BIO_QUEUE_REFFED);
- 		bio_set_dev(bio, ns->disk->part0);
- 		bio->bi_opf |= REQ_NVME_MPATH;
- 		trace_block_bio_remap(bio, disk_devt(ns->head->disk),
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 2c473c9b8990..b96ac162e703 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -445,6 +445,8 @@ enum {
- 	BLK_MQ_REQ_RESERVED	= (__force blk_mq_req_flags_t)(1 << 1),
- 	/* set RQF_PM */
- 	BLK_MQ_REQ_PM		= (__force blk_mq_req_flags_t)(1 << 2),
-+	/* double queue reference */
-+	BLK_MQ_REQ_DOUBLE_REF	= (__force blk_mq_req_flags_t)(1 << 3),
- };
- 
- struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 57099b37ef3a..e7f7d67198cc 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -305,6 +305,7 @@ enum {
- 	BIO_CGROUP_ACCT,	/* has been accounted to a cgroup */
- 	BIO_TRACKED,		/* set if bio goes through the rq_qos path */
- 	BIO_REMAPPED,
-+	BIO_QUEUE_REFFED,	/* need to put queue refcnt */
- 	BIO_FLAG_LAST
- };
- 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 62944d06a80f..6ad09b2ff2d1 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -925,7 +925,7 @@ extern int get_sg_io_hdr(struct sg_io_hdr *hdr, const void __user *argp);
- extern int put_sg_io_hdr(const struct sg_io_hdr *hdr, void __user *argp);
- 
- extern int blk_queue_enter(struct request_queue *q, blk_mq_req_flags_t flags);
--extern void blk_queue_exit(struct request_queue *q);
-+extern void __blk_queue_exit(struct request_queue *q, unsigned int nr);
- extern void blk_sync_queue(struct request_queue *q);
- extern int blk_rq_map_user(struct request_queue *, struct request *,
- 			   struct rq_map_data *, void __user *, unsigned long,
-@@ -947,6 +947,11 @@ blk_status_t errno_to_blk_status(int errno);
- 
- int blk_poll(struct request_queue *q, blk_qc_t cookie, bool spin);
- 
-+static inline void blk_queue_exit(struct request_queue *q)
-+{
-+	__blk_queue_exit(q, 1);
-+}
-+
- static inline struct request_queue *bdev_get_queue(struct block_device *bdev)
- {
- 	return bdev->bd_disk->queue;	/* this is never NULL */
--- 
-2.29.2
 
