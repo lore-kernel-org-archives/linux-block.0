@@ -2,74 +2,68 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2517C433B4
-	for <linux-block@archiver.kernel.org>; Thu, 15 Apr 2021 18:16:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CF8CC433B4
+	for <linux-block@archiver.kernel.org>; Thu, 15 Apr 2021 19:18:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9EA78610EA
-	for <linux-block@archiver.kernel.org>; Thu, 15 Apr 2021 18:16:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F053461139
+	for <linux-block@archiver.kernel.org>; Thu, 15 Apr 2021 19:18:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233923AbhDOSRP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Apr 2021 14:17:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60388 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233551AbhDOSRO (ORCPT
+        id S234792AbhDOTTV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Apr 2021 15:19:21 -0400
+Received: from mail-pg1-f173.google.com ([209.85.215.173]:36678 "EHLO
+        mail-pg1-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234505AbhDOTTT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Apr 2021 14:17:14 -0400
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C73AFC061574
-        for <linux-block@vger.kernel.org>; Thu, 15 Apr 2021 11:16:50 -0700 (PDT)
-Received: by mail-pf1-x42b.google.com with SMTP id a12so16603517pfc.7
-        for <linux-block@vger.kernel.org>; Thu, 15 Apr 2021 11:16:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=EmddyHEcT+NsvuTUCO/46rQDysacIjAC5yzv7qkl4H8=;
-        b=DiSuzCu7p5LOVQb1enqyFF8sF2CvJpyL75hzdVH46hpe7J75yM5jC5x8PZXBRb4Grr
-         AHzVJJKdqsVDjHYcFcsyTRqV9Wi+SDjcG2XqSYrRqv+Z1Xbx/utNB6M5BXfH3LFaJfUP
-         agWHO18GBKboiEQ7YYN2Nr1g16s5ZIImC9XK3iyiQdbwscXROEb6ARR1qP2RW4PlLTHM
-         nRf/adis8WzMh/VdYj6TMaq+r5Xw7yUEzmM4cKL8JSD3vc+1AWzOkdOlOTY3ffEUTVO2
-         n/YD2tXm0WXer8njO+F+k5uAC+1m0TJ4MvZL9X+Hcr3Eqfq1a1M2MCgZd2QyEXSpKSy9
-         DONg==
+        Thu, 15 Apr 2021 15:19:19 -0400
+Received: by mail-pg1-f173.google.com with SMTP id j7so8158195pgi.3;
+        Thu, 15 Apr 2021 12:18:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=EmddyHEcT+NsvuTUCO/46rQDysacIjAC5yzv7qkl4H8=;
-        b=a2dM9YqwOU5kzFss7gykt6UrDgbFax7TT4uWLtMHCXLNnNKqC5nA/eLYuBkM5bHJz0
-         luW+iUZxmVPrlVrQxU+gAANz4OjUmRRCs7xHykD2lD6VnBDc+sa61k8duQKNrspdI2H1
-         qFedbqrrtq4nJotkAi8XA/4E5Rqp+GvTml9f1k+9TWloM01oj0j0hb4I5s+kVINQrdPx
-         GtpycZNkqdIsOnW9FTjAPwq/aqBImmXZiB5yl2XQzqa99E1zDWHf+IQTh9F8S27T80+3
-         ZlAGJlQWnhHf4RIyi4nhv0OWtLkzJFgbhbg3mxx/Q0rAjpYyYan9UtJADlEuBJOKO4oz
-         zTjA==
-X-Gm-Message-State: AOAM533TfHNj/VC2TCXLuPVOCQfoEXC1dtvdyjDh4JwnxzlGSSpaK6x9
-        c3SP+PWEw9fAMZt/F6thn50DXA==
-X-Google-Smtp-Source: ABdhPJzTUF9dDEKKdhXPG7UohtSD6ib3Kqkry2sYMGrjzMn2nPwEHYuoqcQVjwPLskstYV5ak3SCdA==
-X-Received: by 2002:a05:6a00:2303:b029:249:b91e:72f0 with SMTP id h3-20020a056a002303b0290249b91e72f0mr4328105pfh.80.1618510610047;
-        Thu, 15 Apr 2021 11:16:50 -0700 (PDT)
-Received: from ?IPv6:2620:10d:c085:21e8::1638? ([2620:10d:c090:400::5:6df0])
-        by smtp.gmail.com with ESMTPSA id g12sm2671670pfo.114.2021.04.15.11.16.49
+        bh=2/mLy6Qs38Bvj+YcPWXxnazVy7EEcqhvZh36iJtGe/k=;
+        b=RnVSwskXBY+Tw3xUCKBZDp7ZakDj+QRRP4bwpoeVxqDc5ROd9oMlD1MaPpbzoOAurl
+         p6WmJTtMLuH9SowsSK2PpDZpQJ+R0VgOu6oO2h6uvB3HgsEeMs1xfXXTxmofQ0ULX9pA
+         ZJrPcwHWk7E4jI8zFS3SHfNHydLV+MD7nTwl/pzsbEaCaf4Bt6jwHKzR7l/YqbkL2EOY
+         TObDuanFtLGmAlUcvyXxOjd+PWXYjakdOsCBOLvTCoqz4GeF7ZQcuAlRofuqEXeESTrF
+         MqU73vCze2gaecim0JnCkikWG7pOqXO+ZWqFXLmdcQ7tD7otAR9mxPWACF1yh6vSz/NF
+         bo2Q==
+X-Gm-Message-State: AOAM533XG8ZGUxDUftEWpyjsTEcI/iYiYfkbnCzSITGngzFNJR4B2QxE
+        X2QQsyYlR6S3DghLr7X9HgI=
+X-Google-Smtp-Source: ABdhPJxcEkFOz6ufalkpcUWU6vIEZxqym/3RNh3KzZq4gpOTNmEEkp/ON7d1ksaDya0GjnK/kkOxWg==
+X-Received: by 2002:a65:6704:: with SMTP id u4mr4763609pgf.169.1618514335629;
+        Thu, 15 Apr 2021 12:18:55 -0700 (PDT)
+Received: from ?IPv6:2601:647:4000:d7:f031:1d3a:7e95:2876? ([2601:647:4000:d7:f031:1d3a:7e95:2876])
+        by smtp.gmail.com with ESMTPSA id p22sm3154516pjg.39.2021.04.15.12.18.53
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 15 Apr 2021 11:16:49 -0700 (PDT)
-Subject: Re: [GIT PULL] second round of nvme updates for Linux 5.13
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
-        Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org
-References: <YHhVrZD7/Q4qtFjL@infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <01993453-41bf-8e1a-4b26-cb194e6b8e86@kernel.dk>
-Date:   Thu, 15 Apr 2021 12:16:48 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Thu, 15 Apr 2021 12:18:54 -0700 (PDT)
+Subject: Re: [PATCH v7 1/3] bio: limit bio max size
+To:     Changheun Lee <nanich.lee@samsung.com>
+Cc:     Johannes.Thumshirn@wdc.com, asml.silence@gmail.com,
+        axboe@kernel.dk, damien.lemoal@wdc.com, gregkh@linuxfoundation.org,
+        hch@infradead.org, jisoo2146.oh@samsung.com,
+        junho89.kim@samsung.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, ming.lei@redhat.com,
+        mj0123.lee@samsung.com, osandov@fb.com, patchwork-bot@kernel.org,
+        seunghwan.hyun@samsung.com, sookwan7.kim@samsung.com,
+        tj@kernel.org, tom.leiming@gmail.com, woosung2.lee@samsung.com,
+        yt0928.kim@samsung.com
+References: <2e54f27a-ae4c-af65-34ba-18b43bd4815d@acm.org>
+ <CGME20210415105608epcas1p269bae87b8a7dab133753f7916420251e@epcas1p2.samsung.com>
+ <20210415103820.23272-1-nanich.lee@samsung.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <bb8f7127-edff-4a32-2d5c-4343002bda19@acm.org>
+Date:   Thu, 15 Apr 2021 12:18:52 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.9.0
 MIME-Version: 1.0
-In-Reply-To: <YHhVrZD7/Q4qtFjL@infradead.org>
+In-Reply-To: <20210415103820.23272-1-nanich.lee@samsung.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -77,17 +71,49 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/15/21 9:03 AM, Christoph Hellwig wrote:
-> The following changes since commit f8ee34a929a4adf6d29a7ef2145393e6865037ad:
-> 
->   lightnvm: deprecated OCSSD support and schedule it for removal in Linux 5.15 (2021-04-13 09:16:12 -0600)
-> 
-> are available in the Git repository at:
-> 
->   git://git.infradead.org/nvme.git tags/nvme-5.13-2021-04-15
+On 4/15/21 3:38 AM, Changheun Lee wrote:
+> @@ -167,6 +168,7 @@ void blk_queue_max_hw_sectors(struct request_queue *q, unsigned int max_hw_secto
+>  	max_sectors = round_down(max_sectors,
+>  				 limits->logical_block_size >> SECTOR_SHIFT);
+>  	limits->max_sectors = max_sectors;
+> +	limits->bio_max_bytes = max_sectors << SECTOR_SHIFT;
+>  
+>  	q->backing_dev_info->io_pages = max_sectors >> (PAGE_SHIFT - 9);
+>  }
 
-Pulled, thanks.
+Can the new shift operation overflow? If so, how about using
+check_shl_overflow()?
 
--- 
-Jens Axboe
+> @@ -538,6 +540,8 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
+>  {
+>  	unsigned int top, bottom, alignment, ret = 0;
+>  
+> +	t->bio_max_bytes = min_not_zero(t->bio_max_bytes, b->bio_max_bytes);
+> +
+>  	t->max_sectors = min_not_zero(t->max_sectors, b->max_sectors);
+>  	t->max_hw_sectors = min_not_zero(t->max_hw_sectors, b->max_hw_sectors);
+>  	t->max_dev_sectors = min_not_zero(t->max_dev_sectors, b->max_dev_sectors);
+
+The above will limit bio_max_bytes for all stacked block devices, which
+is something we do not want. I propose to set t->bio_max_bytes to
+UINT_MAX in blk_stack_limits() and to let the stacked driver (e.g.
+dm-crypt) decide whether or not to lower that value.
+
+> diff --git a/include/linux/bio.h b/include/linux/bio.h
+> index d0246c92a6e8..e5add63da3af 100644
+> --- a/include/linux/bio.h
+> +++ b/include/linux/bio.h
+> @@ -106,6 +106,8 @@ static inline void *bio_data(struct bio *bio)
+>  	return NULL;
+>  }
+>  
+> +extern unsigned int bio_max_size(struct bio *bio);
+
+You may want to define bio_max_size() as an inline function in bio.h
+such that no additional function calls are introduced in the hot path.
+
+Thanks,
+
+Bart.
+
 
