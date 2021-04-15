@@ -2,280 +2,178 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E115C433ED
-	for <linux-block@archiver.kernel.org>; Thu, 15 Apr 2021 05:02:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 844FCC433ED
+	for <linux-block@archiver.kernel.org>; Thu, 15 Apr 2021 07:43:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EA4556101D
-	for <linux-block@archiver.kernel.org>; Thu, 15 Apr 2021 05:02:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 421826113B
+	for <linux-block@archiver.kernel.org>; Thu, 15 Apr 2021 07:43:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229503AbhDOFCp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Apr 2021 01:02:45 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:44048 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229523AbhDOFCo (ORCPT
+        id S230090AbhDOHoG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Apr 2021 03:44:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:48144 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231326AbhDOHoG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Apr 2021 01:02:44 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 13F4wdZA001629;
-        Thu, 15 Apr 2021 05:02:05 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=corp-2020-01-29;
- bh=ltxT882Mx0QgzRqsC/MVGyHmsWJPQxVNdfz7jR2pvco=;
- b=xrkkATByh/+a8yHRLB2L8c8DKjte6Eu4/lbAfKitpj5viAx7Tn0gC+aK2jeQfxud+cIp
- NBu9GF6TaLDDq8AAzGGPlSPLrhuR1BgNlrCDVVIGykOgINVGf5MONFdHzvicCAWE/JLV
- 2VoInbNRDr/zIcr3Mt+YRwAmM4zrSgYP0tzcvXEPT+GdUZBWVcU0UQlnSuYamsJqtK5t
- 27yzwIxVXhKMXTuTWR9Fgw0nH0alRulysUPRGxfPOnKrc0/rAb0HXFxdiko3JB4M6th/
- XGMba9XdiSUSBKIxY+1SBAAqKj4UsAN8e/NVkXVb8P3EAYiPlZY2xyf3sV/WfYIbUxB0 Jg== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by aserp2120.oracle.com with ESMTP id 37u3ymmfxq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 15 Apr 2021 05:02:05 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 13F50ZMJ109040;
-        Thu, 15 Apr 2021 05:02:05 GMT
-Received: from nam11-bn8-obe.outbound.protection.outlook.com (mail-bn8nam11lp2176.outbound.protection.outlook.com [104.47.58.176])
-        by aserp3030.oracle.com with ESMTP id 37unks1nk1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 15 Apr 2021 05:02:04 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Gm53J7m5TJmXTZar8B8Tw/8+pji93DGsOp51+iyLdNUnmlhDjACO94NNfseiaDtBOClFmo9Ng+pAdCm31fxh654POIscjRJuvveTuZVo6iz5UZnPKPCMMSeNzN3pZ/9/L6aWzrT0kFp8DkKLCHAQ7AqPLyUwdbErUAW4dvb/jiHmDMy49GKc1+pUc85EpWZjx5WX+woTbe77twimvAuJACwVEi1/RJFC320gxPCVPzr8laigFdwI8CB9xp6qrb2NpBlcbgTN6vS8PP+DXIdGSZDl8/6QNQqVr9HClc8xvduB8wKI007l6kC5mVxetf2jLI8TIqLxF66Ulk4PmQsevA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ltxT882Mx0QgzRqsC/MVGyHmsWJPQxVNdfz7jR2pvco=;
- b=Cg9zOSckAYLJK5bwu56ypR41tvSesqaGtwX5YGIuMCVwr+62xTnZTJdkKfwnzBGlt6ntIhqlxgOqBHE8tl1gw5NwvICAKgc++s7E1wrwZW9Qt8Fut/MEUqav+fXs6KIiJPi1dD2A1PnB5b0aQFwcmPmJSZAw14wbj27LQmzXhasClx/Twl7uBs0cOLGM7nf6xhwW1AJDTCIKW7kmEVCWcGS50qmBKGMpq/Jjsvkm7sqoxkL7pCZTSfhoipssVWA09bfbp4NtZP30IfmOoXcOChegqb5aLrOSM4XIMy3Gv4z+TKeh7Ckf8VgQbLFdDvBX/YtmPfeipvz5W0Pr8cyxoA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ltxT882Mx0QgzRqsC/MVGyHmsWJPQxVNdfz7jR2pvco=;
- b=RZWEMJYRL0J4GP3jD+j19g8D0P3uIOJxeocH85Pxs8XsSzNP889qgQHK4UuVJ25JDPKXfdRPWlX9NIBl0tkOihNhXqOiO0CJ3+jjPY06HEodw43mdrRGtPXJPJYZWZKk3QyGlOGF/HKZGAVjGMMhVxDTtNqBnHD/6rKqZ1HWZms=
-Authentication-Results: kernel.dk; dkim=none (message not signed)
- header.d=none;kernel.dk; dmarc=none action=none header.from=oracle.com;
-Received: from SJ0PR10MB4752.namprd10.prod.outlook.com (2603:10b6:a03:2d7::19)
- by SJ0PR10MB4576.namprd10.prod.outlook.com (2603:10b6:a03:2ae::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4042.16; Thu, 15 Apr
- 2021 05:02:02 +0000
-Received: from SJ0PR10MB4752.namprd10.prod.outlook.com
- ([fe80::7865:7d35:9cee:363f]) by SJ0PR10MB4752.namprd10.prod.outlook.com
- ([fe80::7865:7d35:9cee:363f%5]) with mapi id 15.20.4042.016; Thu, 15 Apr 2021
- 05:02:02 +0000
-Subject: Re: [PATCH] block: fix io hung by block throttle
-To:     Hillf Danton <hdanton@sina.com>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        axboe@kernel.dk
-References: <20210414211830.5720-1-junxiao.bi@oracle.com>
- <20210415041153.577-1-hdanton@sina.com>
-From:   Junxiao Bi <junxiao.bi@oracle.com>
-Message-ID: <583320af-7fc8-b788-7b17-dbef7a476667@oracle.com>
-Date:   Wed, 14 Apr 2021 22:01:10 -0700
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.9.0
-In-Reply-To: <20210415041153.577-1-hdanton@sina.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [73.231.9.254]
-X-ClientProxiedBy: SA0PR11CA0164.namprd11.prod.outlook.com
- (2603:10b6:806:1bb::19) To SJ0PR10MB4752.namprd10.prod.outlook.com
- (2603:10b6:a03:2d7::19)
+        Thu, 15 Apr 2021 03:44:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1618472623;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Dpy1wqaiNbmbjWwjN/sMSXOWeJqICR8ysUNboTmF7fY=;
+        b=MJ6jLqeh/YnDN5EjZbp7RHvfEeeUuAWHWZv2zK7NAu1a0rME7dQnF67I+ymp2ZWbP8+UEn
+        WzrT0zR0uYOpQdddpaNMvC+3AnZs4/GqC/pcRq0DNKTWhjwFwn4K5Mkf1oFWAdNgh8dqpH
+        fl/NNHueLh7whSuqpe7csGn+rigDys4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-448-MNjOzgr7OVW-J-D8-DG_0A-1; Thu, 15 Apr 2021 03:43:39 -0400
+X-MC-Unique: MNjOzgr7OVW-J-D8-DG_0A-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 30320800FEA;
+        Thu, 15 Apr 2021 07:43:38 +0000 (UTC)
+Received: from T590 (ovpn-13-200.pek2.redhat.com [10.72.13.200])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id B613816C70;
+        Thu, 15 Apr 2021 07:43:26 +0000 (UTC)
+Date:   Thu, 15 Apr 2021 15:43:22 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     JeffleXu <jefflexu@linux.alibaba.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH V5 11/12] block: add poll_capable method to support
+ bio-based IO polling
+Message-ID: <YHfumsTKHuvPGp47@T590>
+References: <20210401021927.343727-1-ming.lei@redhat.com>
+ <20210401021927.343727-12-ming.lei@redhat.com>
+ <20210412093856.GA978201@infradead.org>
+ <a6d46979-810e-bc53-bc19-8acd449e3718@linux.alibaba.com>
+ <YHbQ/rZUPoTFUMDs@T590>
+ <5f30059d-6650-8268-b681-d8567ac1c509@linux.alibaba.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from dhcp-10-159-253-187.vpn.oracle.com (73.231.9.254) by SA0PR11CA0164.namprd11.prod.outlook.com (2603:10b6:806:1bb::19) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4042.16 via Frontend Transport; Thu, 15 Apr 2021 05:02:01 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: c4ce7a63-a322-4c4e-5e4f-08d8ffcb9b85
-X-MS-TrafficTypeDiagnostic: SJ0PR10MB4576:
-X-Microsoft-Antispam-PRVS: <SJ0PR10MB45760F03395C7CCDBF2EA8A0E84D9@SJ0PR10MB4576.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: +CCYq2FyZh4PsZpc7CnSI60WnFvPjimy6delyctCICmg3pJrNJ5vgRucOKMA213UniP2evPm1mt05BTmgazH6CRQ4sbL6aN4rxyXHSx7f2f4rK0oNWB/VU7t8eXJguS6X39McKNBvSaT6GPvP45dF4HrMZ906xcm7CPrJTO9P98KaAHMaz1YoePUXBnbGbaSlsN4+y6B8AFOTGgwxnVsUwfJ86ukxAFU1E2oDHLPVAZlTCqS8SJMElc5PTFaffNOktwWxHCdjvurUnF/FXlb5MqqkqM2pe6TNgkrIKTsUTmHz3d/CjaXdjAu4jGod9F3nuZlbm7n6J6EA7+GZFDEhy9NwSrwXYfxWBhYaxBWKxJaWEr+yt1vTIVcodMAs5Bfj5dDSU2cJH1rwxKxePP/0KWigdni/95UUnCDUkVITq5jdUSIGGYSi/eCJf8bIlW1/eqvRwcV+r8rLOZ6pDAsIuftGX3B/6n+1vPKtwtLx69OIgO04VBAwmfHAzEzyFzPFGmJnCg2/et3gt83sqsmFxl42tfWdCy+Q3+OHPw4JU0Bhlw48HsuOLX3SP5EYujgHWT+rU08G6W8dW6RYQXK/OJR2TXNT+12XmDcoP48d6PmKBWOzugBX6ZJdPj2Bk5L5u/s/iIDiJhmt/at9mWEi7vPfPIhnk0pA5axNXDx8KoHDlRuPOBBFCVu9tul9E7l
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR10MB4752.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(136003)(346002)(376002)(366004)(396003)(39860400002)(6916009)(16526019)(8936002)(66556008)(66946007)(53546011)(316002)(66476007)(956004)(186003)(86362001)(83380400001)(8676002)(26005)(36756003)(478600001)(38100700002)(6486002)(31686004)(31696002)(2906002)(44832011)(2616005)(4326008)(7696005)(5660300002)(6666004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: =?utf-8?B?bUlVaE4vTkN0RE1keHB6dmZhMHNzVjlGRUg5bGdwUm4yM2VYZTI4RllNcTVp?=
- =?utf-8?B?eDFpQlJGVnBtL3U0L3FLUFM3RkJGMHJOekFaN3NEMTlFemlhWG1tUU9VcVIw?=
- =?utf-8?B?cCtZSUJxdm1nbXdlZmtKa0J2d0pyWWRHcmVmL3JJV2FhYjNlY3NIQ2lsMm5N?=
- =?utf-8?B?U0V3aXRZTHN5aEszYnpNUWNuQm05R1Fsb3VDMWtaMFppUzdCTDRJV1RkYkZ2?=
- =?utf-8?B?aURFcDFXTUpLYjZnMGtCWkkwZ0Znam00bktBWG5nRlpXOHY3bkZHNm5RYXZX?=
- =?utf-8?B?QlFmbVMyc1ZwZlZlTmJPNkMxK3UxcU51S2MzRDdIdjVweUJwY2Q2TXlubUwy?=
- =?utf-8?B?dzVtU2I3SkkxcjNpdFZDek9BQllkRDZ0elF4aVh0QTZiV2JHUkl4L283cHZo?=
- =?utf-8?B?elQ1dVdqeC8vR2w0N1BtT0xMOEtidmtGY0tlSHpUcGJxaTNmZkgwRjZ1RGE1?=
- =?utf-8?B?cmJpb3g4TE5mN2lsa0F2RnQ1M2Ira2twcDUyUzRzdldoTER4YUZ5cnoxb2dx?=
- =?utf-8?B?elF3MVYybGxQZkpMbk9JL3FzLzBBQUZDekEyTWg3SnU5ZGlKTFdxYzNIMzNR?=
- =?utf-8?B?SlBDbndYT3gyZ3RtNmo0UkNpTkY3bDFINGVMemxScWJaYkl2ckVqSUFxMnFX?=
- =?utf-8?B?M3doSzJmdld1UjVNZ0JsRkR4WUFSNTB2M1NYWGhVRWUySTRkMVBWTXE2QUJr?=
- =?utf-8?B?a1hvc2FyWmZ2T0xDN1h0VHFOR0ZVNHUyNUZMRnpSc3BKbVFENDBjR0U1eE1R?=
- =?utf-8?B?NWdVZGdIZVdkWnl3UGVXaUgvMzlHNDFFU2hxS3o4UjJzNG9mdjVFTzJpREt0?=
- =?utf-8?B?R1lKZXBUQnV3enJ6djFKdit3N21tZkxQclhTZU5tQ2hyS0w1aGs4NVc5VUtV?=
- =?utf-8?B?STZISnZxTkJGU08vMEtuQ3c5SmUxZmREN3llaEJ4dStVWHNUTnJHVGQvdXly?=
- =?utf-8?B?a0FTcE5TdkZ0N1p5MkFJNWZRcFd6SU1Ud3hhNVB3d1Yya0hFeEE3Z0hDVENj?=
- =?utf-8?B?TVJmT3ZSMjZzOHJaWUtVK1E0SG8wR0pRcGxFaWRiYWtMN09NUnk0RytNOUVr?=
- =?utf-8?B?MnNTREo5dEVTd3dEaUVabVdJckVta0FFcnp0aDZXVHZXZjc2blJCTUpicmtU?=
- =?utf-8?B?a1VBck01LzFaMjFSOHNtL1RMVDZUZlI4SW1rQjJhUElMVXpkZWVsTStqZUJ5?=
- =?utf-8?B?Z1kzMmUrcDVTNkdwTXVjREh4bnluSlpkbXBvVXN0SVVxb1hUamRLUkhjUG1G?=
- =?utf-8?B?QlpSSVdOTnFySjNVMkdweFFVWmlaR2FQU3NsV3hiQ3hCS1hXTnFTWW9idG9D?=
- =?utf-8?B?amw4UGJFamllMDZJSUs2NE1VaHBhYlNxcVNaQyt6K1hwV0tQUTdDd2VpS1Bx?=
- =?utf-8?B?T1lwNFRYSTJHTGNoTTJtQ3JBVGlKZ1Z0b3Q2Yko0M1F4L0l5c3RzQyttQTNM?=
- =?utf-8?B?ZkozVXBoQjJyaHNhdTFxc2QvQ3BDTDNtbmZGQ2Z5RmVINy9LUnJyK09Vc1Vw?=
- =?utf-8?B?d2hRVTQ0NStyOTlzc2dqSWpCLzc3b0l2QVhYWk4wczNQeWh5UmNVbVpNWUxq?=
- =?utf-8?B?WktCbG43MU0wQUlxajQ2aVFmYzdUcUhFcnMyT1ZHZ29EN3VTUUp6QTlidStB?=
- =?utf-8?B?UnlRTDB6QjM0UGhxb2Z2eW9oRmNKdWppTmJqRS9mdmVxemo0NS9FR3lKZkdP?=
- =?utf-8?B?c1pCNXo5NE1ROHpBa2VEaXFKUkozZlhsd1ZjNFlaWW9VcmIzWVZmdlYvbDJr?=
- =?utf-8?Q?f4++1vsTYD3BMMFGhBz8R5jl+vGkf3UBUgyFxOU?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c4ce7a63-a322-4c4e-5e4f-08d8ffcb9b85
-X-MS-Exchange-CrossTenant-AuthSource: SJ0PR10MB4752.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Apr 2021 05:02:02.6364
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: OpGUlgS3WzJYuX5oO8aGak7rwwK74+t2k4GpYGdl0xbU8MCqKC1j772VNkHbjnZHqryL4GRrzj3dxgsc0HgFmQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR10MB4576
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9954 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxlogscore=999
- adultscore=0 phishscore=0 malwarescore=0 mlxscore=0 bulkscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104060000 definitions=main-2104150034
-X-Proofpoint-GUID: -jKW1N0F6vwKZHYwM9c99xyLXgfSTM0Y
-X-Proofpoint-ORIG-GUID: -jKW1N0F6vwKZHYwM9c99xyLXgfSTM0Y
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9954 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 mlxlogscore=999 spamscore=0
- impostorscore=0 priorityscore=1501 lowpriorityscore=0 adultscore=0
- bulkscore=0 phishscore=0 suspectscore=0 malwarescore=0 clxscore=1011
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104060000
- definitions=main-2104150034
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5f30059d-6650-8268-b681-d8567ac1c509@linux.alibaba.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/14/21 9:11 PM, Hillf Danton wrote:
+On Thu, Apr 15, 2021 at 09:34:36AM +0800, JeffleXu wrote:
+> 
+> 
+> On 4/14/21 7:24 PM, Ming Lei wrote:
+> > On Wed, Apr 14, 2021 at 04:38:25PM +0800, JeffleXu wrote:
+> >>
+> >>
+> >> On 4/12/21 5:38 PM, Christoph Hellwig wrote:
+> >>> On Thu, Apr 01, 2021 at 10:19:26AM +0800, Ming Lei wrote:
+> >>>> From: Jeffle Xu <jefflexu@linux.alibaba.com>
+> >>>>
+> >>>> This method can be used to check if bio-based device supports IO polling
+> >>>> or not. For mq devices, checking for hw queue in polling mode is
+> >>>> adequate, while the sanity check shall be implementation specific for
+> >>>> bio-based devices. For example, dm device needs to check if all
+> >>>> underlying devices are capable of IO polling.
+> >>>>
+> >>>> Though bio-based device may have done the sanity check during the
+> >>>> device initialization phase, cacheing the result of this sanity check
+> >>>> (such as by cacheing in the queue_flags) may not work. Because for dm
+> >>>> devices, users could change the state of the underlying devices through
+> >>>> '/sys/block/<dev>/io_poll', bypassing the dm device above. In this case,
+> >>>> the cached result of the very beginning sanity check could be
+> >>>> out-of-date. Thus the sanity check needs to be done every time 'io_poll'
+> >>>> is to be modified.
+> >>>
+> >>> I really don't think thi should be a method, and I really do dislike
+> >>> how we have all this "if (is_mq)" junk.  Why can't we have a flag on
+> >>> the gendisk that signals if the device can support polling that
+> >>> is autoamtically set for blk-mq and as-needed by bio based drivers?
+> >>
+> >> That would consume one more bit of queue->queue_flags.
+> >>
+> >> Besides, DM/MD is somehow special here that when one of the underlying
+> >> devices is disabled polling through '/sys/block/<dev>/io_poll',
+> >> currently there's no mechanism notifying the above MD/DM to clear the
+> >> previously set queue_flags. Thus the outdated queue_flags still
+> >> indicates this DM/MD is capable of polling, while in fact one of the
+> >> underlying device has been disabled for polling.
+> > 
+> > Right, just like there isn't queue limit progagation.
+> > 
+> > Another blocker could be that bio based queue doesn't support queue
+> > freezing.
+> 
+> Do you mean the queue freezing is called in the following code snippet?
+> 
+> ```
+> static ssize_t queue_poll_store(struct request_queue *q, const char
+> *page, size_t count)
+> {
+> 	...
+> 	if (poll_on) {
+> 		blk_queue_flag_set(QUEUE_FLAG_POLL, q);
+> 	} else {
+> 		blk_mq_freeze_queue(q);
+> 		blk_queue_flag_clear(QUEUE_FLAG_POLL, q);
+> 		blk_mq_unfreeze_queue(q);
+> 	}
+> ```
 
-> On Wed, 14 Apr 2021 14:18:30 Junxiao Bi wrote:
->> There is a race bug which can cause io hung when multiple processes
->> run parallel in rq_qos_wait().
->> Let assume there were 4 processes P1/P2/P3/P4, P1/P2 were at the entry
->> of rq_qos_wait, and P3/P4 were waiting for io done, 2 io were inflight,
->> the inflight io limit was 2. See race below.
->>
->> void rq_qos_wait()
->> {
->> 	...
->>      bool has_sleeper;
->>
->> 	>>>> P3/P4 were in sleeper list, has_sleeper was true for both P1 and P2.
->>      has_sleeper = wq_has_sleeper(&rqw->wait);
->>      if (!has_sleeper && acquire_inflight_cb(rqw, private_data))
->>          return;
->>
->> 	>>>> 2 inflight io done, P3/P4 were waken up to issue 2 new io.
->> 	>>>> 2 new io done, no inflight io.
->>
->> 	>>>> P1/P2 were added to the sleeper list, 2 entry in the list
->>      prepare_to_wait_exclusive(&rqw->wait, &data.wq, TASK_UNINTERRUPTIBLE);
->>
->> 	>>>> P1/P2 were in the sleeper list, has_sleeper was true for P1/P2.
->>      has_sleeper = !wq_has_single_sleeper(&rqw->wait);
->>      do {
->>          /* The memory barrier in set_task_state saves us here. */
->>          if (data.got_token)
->>              break;
->>          if (!has_sleeper && acquire_inflight_cb(rqw, private_data)) {
->>              finish_wait(&rqw->wait, &data.wq);
->>
->>              /*
->>               * We raced with wbt_wake_function() getting a token,
->>               * which means we now have two. Put our local token
->>               * and wake anyone else potentially waiting for one.
->>               */
->>              smp_rmb();
->>              if (data.got_token)
->>                  cleanup_cb(rqw, private_data);
->>              break;
->>          }
->>
->> 	>>>> P1/P2 hung here forever. New io requests will also hung here.
->>          io_schedule();
->>          has_sleeper = true;
->>          set_current_state(TASK_UNINTERRUPTIBLE);
->>      } while (1);
->>      finish_wait(&rqw->wait, &data.wq);
->> }
->>
->> Cc: stable@vger.kernel.org
->> Signed-off-by: Junxiao Bi <junxiao.bi@oracle.com>
->> ---
->>   block/blk-rq-qos.c | 9 +++------
->>   1 file changed, 3 insertions(+), 6 deletions(-)
->>
->> diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
->> index 656460636ad3..04d888c99bc0 100644
->> --- a/block/blk-rq-qos.c
->> +++ b/block/blk-rq-qos.c
->> @@ -260,19 +260,17 @@ void rq_qos_wait(struct rq_wait *rqw, void *private_data,
->>   		.cb = acquire_inflight_cb,
->>   		.private_data = private_data,
->>   	};
->> -	bool has_sleeper;
->>   
->> -	has_sleeper = wq_has_sleeper(&rqw->wait);
->> -	if (!has_sleeper && acquire_inflight_cb(rqw, private_data))
->> +	if (!wq_has_sleeper(&rqw->wait)
->> +		&& acquire_inflight_cb(rqw, private_data))
->>   		return;
->>   
->>   	prepare_to_wait_exclusive(&rqw->wait, &data.wq, TASK_UNINTERRUPTIBLE);
->> -	has_sleeper = !wq_has_single_sleeper(&rqw->wait);
->>   	do {
->>   		/* The memory barrier in set_task_state saves us here. */
->>   		if (data.got_token)
->>   			break;
->> -		if (!has_sleeper && acquire_inflight_cb(rqw, private_data)) {
->> +		if (acquire_inflight_cb(rqw, private_data)) {
->>   			finish_wait(&rqw->wait, &data.wq);
->>   
->>   			/*
->> @@ -286,7 +284,6 @@ void rq_qos_wait(struct rq_wait *rqw, void *private_data,
->>   			break;
->>   		}
->>   		io_schedule();
->> -		has_sleeper = true;
->>   		set_current_state(TASK_UNINTERRUPTIBLE);
->>   	} while (1);
->>   	finish_wait(&rqw->wait, &data.wq);
->> -- 
->> 2.24.3 (Apple Git-128)
->>
-> No wakeup may cause the hang.
->
-> --- a/block/blk-rq-qos.c
-> +++ b/block/blk-rq-qos.c
-> @@ -287,7 +287,8 @@ void rq_qos_wait(struct rq_wait *rqw, vo
->   		}
->   		io_schedule();
->   		has_sleeper = true;
-> -		set_current_state(TASK_UNINTERRUPTIBLE);
-> +		prepare_to_wait_exclusive(&rqw->wait, &data.wq,
-> +						TASK_UNINTERRUPTIBLE);
+Yes, if it is a bio based queue. Or bio queued queue(DM, MD or others) may
+use freeze_queue to do similar thing.
 
- From rq_qos_wake_function(), the process can be waken up and removed 
-from the sleeper list only when it get the budget. Looks not necessary 
-to re-add it to sleeper list again.
+> 
+> And I can't understand how bio-based queue doesn't support queue freezing.
+> 
+> ```
+> submit_bio_noacct
+> 	__submit_bio_noacct
+> 		bio_queue_enter
+> ```
+> 
+> Every time submitting a bio, bio_queue_enter() will be called, and once
+> the queue has been frozen, bio_queue_enter() will wait there until the
+> queue is unfrozen.
+
+Not like blk-mq, the refcount is just grabbed during submission for bio based
+queue. I will research a bit and see if we can extend freeze queue for
+covering bio based queue. One trouble is that bio is ended before
+freeing request.
+
+> 
+> > 
+> >>
+> >> Mike had ever suggested that we can trust the queue_flag, and clear the
+> >> outdated queue_flags when later the IO submission or polling routine
+> >> finally finds that the device is not capable of polling. Currently
+> >> submit_bio_checks() will silently clear the REQ_HIPRI flag and still
+> >> submit the bio when the device is actually not capable of polling. To
+> >> fix the issue, could we break the submission and return an error code in
+> >> submit_bio_checks() if the device is not capable of polling when
+> >> submitting HIPRI bio?
+> > 
+> > I think we may just leave it alone, if underlying queue becomes not pollable,
+> > the bio still can be submitted & completed via IRQ, just not efficient enough.
+> 
+> Yes it still works. I agree if there's no better solution...
+> 
+> And what about the issue Christoph originally concerned? Do we use one
+> more flag bit indicating if the queue capable of polling, or the
+> poll_capable() method way?
+
+Just wondering why we can't use QUEUE_FLAG_POLL simply? If user wants to
+enable it, let's do it for them. And bio driver can start with default poll
+state by checking underlying queues.
+
 
 Thanks,
+Ming
 
-Junxiao.
-
->   	} while (1);
->   	finish_wait(&rqw->wait, &data.wq);
->   }
