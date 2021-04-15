@@ -2,166 +2,67 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B917C433B4
-	for <linux-block@archiver.kernel.org>; Thu, 15 Apr 2021 12:19:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1FB2C433B4
+	for <linux-block@archiver.kernel.org>; Thu, 15 Apr 2021 13:06:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 453856137D
-	for <linux-block@archiver.kernel.org>; Thu, 15 Apr 2021 12:19:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9A089610CE
+	for <linux-block@archiver.kernel.org>; Thu, 15 Apr 2021 13:06:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232642AbhDOMTj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Apr 2021 08:19:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30442 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231391AbhDOMTf (ORCPT
+        id S233119AbhDONGY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Apr 2021 09:06:24 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:48594 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233102AbhDONGX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Apr 2021 08:19:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1618489152;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=+nSR8Fdn/QFee9fygyqORQIyEydWILjxfded0NRyhqc=;
-        b=Xrg6GBrt4iCpo/3yIXFUZu01qPQ/2V+2shNQd73zNg7k+KkKEtQZE7bd9ruEzGb8zxnenV
-        Rv70w+8h5NIEfOjX7rmAK6t13s9ZUNwS9wCNj3Ufg2+yVngWmTL5ccsWyVQ6YWjQfmwpYX
-        AxfzYxDFkxrv95GRR0kdANn9PK219E8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-586-6wCv39xSO6eqsS-E4o6z4g-1; Thu, 15 Apr 2021 08:19:07 -0400
-X-MC-Unique: 6wCv39xSO6eqsS-E4o6z4g-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 40F2664149;
-        Thu, 15 Apr 2021 12:19:06 +0000 (UTC)
-Received: from T590 (ovpn-12-95.pek2.redhat.com [10.72.12.95])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3C38D60CC5;
-        Thu, 15 Apr 2021 12:19:01 +0000 (UTC)
-Date:   Thu, 15 Apr 2021 20:18:56 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     John Garry <john.garry@huawei.com>
-Cc:     Kashyap Desai <kashyap.desai@broadcom.com>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Douglas Gilbert <dgilbert@interlog.com>
-Subject: Re: [bug report] shared tags causes IO hang and performance drop
-Message-ID: <YHgvMAHqIq9f6pQn@T590>
-References: <YHaez6iN2HHYxYOh@T590>
- <9a6145a5-e6ac-3d33-b52a-0823bfc3b864@huawei.com>
- <cb326d404c6e0785d03a7dfadc42832c@mail.gmail.com>
- <YHbOOfGNHwO4SMS7@T590>
- <87ceccf2-287b-9bd1-899a-f15026c9e65b@huawei.com>
- <YHe3M62agQET6o6O@T590>
- <3e76ffc7-1d71-83b6-ef5b-3986e947e372@huawei.com>
+        Thu, 15 Apr 2021 09:06:23 -0400
+Received: from 1.general.cking.uk.vpn ([10.172.193.212] helo=localhost)
+        by youngberry.canonical.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.86_2)
+        (envelope-from <colin.king@canonical.com>)
+        id 1lX1h1-0000Dq-Bl; Thu, 15 Apr 2021 13:05:59 +0000
+From:   Colin King <colin.king@canonical.com>
+To:     Richard Russon <ldm@flatcap.org>, Jens Axboe <axboe@kernel.dk>,
+        linux-ntfs-dev@lists.sourceforge.net, linux-block@vger.kernel.org
+Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] partitions/ldm: remove redundant assignment to variable r_index
+Date:   Thu, 15 Apr 2021 14:05:59 +0100
+Message-Id: <20210415130559.1960198-1-colin.king@canonical.com>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3e76ffc7-1d71-83b6-ef5b-3986e947e372@huawei.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Apr 15, 2021 at 11:41:52AM +0100, John Garry wrote:
-> Hi Ming,
-> 
-> I'll have a look.
-> 
-> BTW, are you intentionally using scsi_debug over null_blk? null_blk supports
-> shared sbitmap as well, and performance figures there are generally higher
-> than scsi_debug for similar fio settings.
+From: Colin Ian King <colin.king@canonical.com>
 
-I use both, but scsi_debug can cover scsi stack test.
+The variable r_index is being assigned a value that is never read,
+the assignment is redundant and can be removed.
 
-Thanks,
-Ming
+Addresses-Coverity: ("Unused value")
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
+---
+ block/partitions/ldm.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-> 
-> Thanks,
-> john
-> 
-> EOM
-> 
-> 
-> > > 		IOPs
-> > > mq-deadline	usr=21.72%, sys=44.18%,		423K
-> > > none		usr=23.15%, sys=74.01%		450K
-> > Today I re-run the scsi_debug test on two server hardwares(32cores, dual
-> > numa nodes), and the CPU utilization issue can be reproduced, follow
-> > the test result:
-> > 
-> > 1) randread test on ibm-x3850x6[*] with deadline
-> > 
-> >                |IOPS    | FIO CPU util
-> > ------------------------------------------------
-> > hosttags      | 94k    | usr=1.13%, sys=14.75%
-> > ------------------------------------------------
-> > non hosttags  | 124k   | usr=1.12%, sys=10.65%,
-> > 
-> > 
-> > 2) randread test on ibm-x3850x6[*] with none
-> >                |IOPS    | FIO CPU util
-> > ------------------------------------------------
-> > hosttags      | 120k   | usr=0.89%, sys=6.55%
-> > ------------------------------------------------
-> > non hosttags  | 121k   | usr=1.07%, sys=7.35%
-> > ------------------------------------------------
-> > 
-> >   *:
-> >   	- that is the machine Yanhui reported VM cpu utilization increased by 20%
-> > 	- kernel: latest linus tree(v5.12-rc7, commit: 7f75285ca57)
-> > 	- also run same test on another 32cores machine, IOPS drop isn't
-> > 	  observed, but CPU utilization is increased obviously
-> > 
-> > 3) test script
-> > #/bin/bash
-> > 
-> > run_fio() {
-> > 	RTIME=$1
-> > 	JOBS=$2
-> > 	DEVS=$3
-> > 	BS=$4
-> > 
-> > 	QD=64
-> > 	BATCH=16
-> > 
-> > 	fio --bs=$BS --ioengine=libaio \
-> > 		--iodepth=$QD \
-> > 	    --iodepth_batch_submit=$BATCH \
-> > 		--iodepth_batch_complete_min=$BATCH \
-> > 		--filename=$DEVS \
-> > 		--direct=1 --runtime=$RTIME --numjobs=$JOBS --rw=randread \
-> > 		--name=test --group_reporting
-> > }
-> > 
-> > SCHED=$1
-> > 
-> > NRQS=`getconf _NPROCESSORS_ONLN`
-> > 
-> > rmmod scsi_debug
-> > modprobe scsi_debug host_max_queue=128 submit_queues=$NRQS virtual_gb=256
-> > sleep 2
-> > DEV=`lsscsi | grep scsi_debug | awk '{print $6}'`
-> > echo $SCHED >/sys/block/`basename $DEV`/queue/scheduler
-> > echo 128 >/sys/block/`basename $DEV`/device/queue_depth
-> > run_fio 20 16 $DEV 8K
-> > 
-> > 
-> > rmmod scsi_debug
-> > modprobe scsi_debug max_queue=128 submit_queues=1 virtual_gb=256
-> > sleep 2
-> > DEV=`lsscsi | grep scsi_debug | awk '{print $6}'`
-> > echo $SCHED >/sys/block/`basename $DEV`/queue/scheduler
-> > echo 128 >/sys/block/`basename $DEV`/device/queue_depth
-> > run_fio 20 16 $DEV 8k
-> 
-> 
-
+diff --git a/block/partitions/ldm.c b/block/partitions/ldm.c
+index d333786b5c7e..b40c0ac9022c 100644
+--- a/block/partitions/ldm.c
++++ b/block/partitions/ldm.c
+@@ -964,7 +964,6 @@ static bool ldm_parse_prt3(const u8 *buffer, int buflen, struct vblk *vb)
+ 		}
+ 		len = r_index;
+ 	} else {
+-		r_index = 0;
+ 		len = r_diskid;
+ 	}
+ 	if (len < 0) {
 -- 
-Ming
+2.30.2
 
