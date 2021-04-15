@@ -2,89 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6EDDC43461
-	for <linux-block@archiver.kernel.org>; Thu, 15 Apr 2021 13:56:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66CD6C433B4
+	for <linux-block@archiver.kernel.org>; Thu, 15 Apr 2021 14:22:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B5B6461153
-	for <linux-block@archiver.kernel.org>; Thu, 15 Apr 2021 13:56:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 36C1E613C0
+	for <linux-block@archiver.kernel.org>; Thu, 15 Apr 2021 14:22:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232954AbhDON5F (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Apr 2021 09:57:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:32944 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232993AbhDON5D (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Apr 2021 09:57:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1618495000;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=t6k+KJHgh4qNKstVz2JZFL9ECTTreUR+oV6XNzdagBg=;
-        b=d6oryWbPbhB5r0J8TuMMi8hcBYTcBpl05VhUj35OW1sOxOd/EyqGbI54wyAAVbsN5ElCnd
-        T+XQTW4Vy2F3tHmPFBImjV1q0lep2kDHi7Wc87upeaPFmctm8YyO/CXZQzkAQ/o/GXcQ7a
-        graL74tQB3wPle+S3KknQhO/65355J4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-490-pZdUGFrCMOSb0PZnU_PH-g-1; Thu, 15 Apr 2021 09:56:32 -0400
-X-MC-Unique: pZdUGFrCMOSb0PZnU_PH-g-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 167CB6D4EE;
-        Thu, 15 Apr 2021 13:56:31 +0000 (UTC)
-Received: from T590 (ovpn-12-95.pek2.redhat.com [10.72.12.95])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7CB685D71F;
-        Thu, 15 Apr 2021 13:56:16 +0000 (UTC)
-Date:   Thu, 15 Apr 2021 21:56:11 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org,
-        Jeffle Xu <jefflexu@linux.alibaba.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        linux-raid@vger.kernel.org, Song Liu <song@kernel.org>,
-        linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>
-Subject: Re: [RFC PATCH 2/2] block: support to freeze bio based request queue
-Message-ID: <YHhF+3Qw4Y+hv5X4@T590>
-References: <20210415103310.1513841-1-ming.lei@redhat.com>
- <20210415103310.1513841-3-ming.lei@redhat.com>
+        id S233013AbhDOOW4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Apr 2021 10:22:56 -0400
+Received: from mga03.intel.com ([134.134.136.65]:63233 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230056AbhDOOWx (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Apr 2021 10:22:53 -0400
+IronPort-SDR: mrBXYCiDd6dRUG+e4YQaMDMGc5xu9AxxKezIS0vdHtv7CaCK5GtsnwhT9gz3FxuoNjS4UimBxP
+ MuVs5WedLRkw==
+X-IronPort-AV: E=McAfee;i="6200,9189,9955"; a="194887836"
+X-IronPort-AV: E=Sophos;i="5.82,225,1613462400"; 
+   d="scan'208";a="194887836"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2021 07:22:30 -0700
+IronPort-SDR: sEfe0e2ntfJe/dGEupn1dyAC04ikRLO/cPwNTV8GqIWdBCXJszRXKVmogNHhHCiePGD0XkO9PB
+ lWAdC2KtWtfQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.82,225,1613462400"; 
+   d="scan'208";a="615654923"
+Received: from black.fi.intel.com ([10.237.72.28])
+  by fmsmga005.fm.intel.com with ESMTP; 15 Apr 2021 07:22:29 -0700
+Received: by black.fi.intel.com (Postfix, from userid 1003)
+        id BE8E0BA; Thu, 15 Apr 2021 17:22:45 +0300 (EEST)
+From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Matias Bjorling <mb@lightnvm.io>
+Subject: [PATCH v1 1/1] lightnvm: pblk: Import GUID before use
+Date:   Thu, 15 Apr 2021 17:22:27 +0300
+Message-Id: <20210415142227.84408-1-andriy.shevchenko@linux.intel.com>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210415103310.1513841-3-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Apr 15, 2021 at 06:33:10PM +0800, Ming Lei wrote:
-> For bio based request queue, the queue usage refcnt is only grabbed
-> during submission, which isn't consistent with request base queue.
-> 
-> Queue freezing has been used widely, and turns out it is very useful
-> to quiesce queue activity.
-> 
-> Support to freeze bio based request queue by the following approach:
-> 
-> 1) grab two queue usage refcount for blk-mq before submitting blk-mq
-> bio, one is for bio, anther is for request;
-> 
-> 2) add bio flag of BIO_QUEUE_REFFED for making sure that only one
-> refcnt is grabbed for each bio, so we can put the refcnt when the
-> bio is going away
-> 
-> 3) nvme mpath is a bit special, because same bio is used for both
-> mpath queue and underlying nvme queue. So we put the mpath queue's
-> usage refcnt before completing the nvme request.
+Strictly speaking the comparison between guid_t and raw buffer
+is not correct. Import GUID to variable of guid_t type and then
+compare.
 
-RAID needs similar handling too, but it is easy to do, see md_end_io().
+Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+---
+ drivers/lightnvm/pblk-recovery.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
+diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
+index 0e6f0c76e930..81b1b751d8c4 100644
+--- a/drivers/lightnvm/pblk-recovery.c
++++ b/drivers/lightnvm/pblk-recovery.c
+@@ -661,6 +661,7 @@ struct pblk_line *pblk_recov_l2p(struct pblk *pblk)
+ 	int meta_line;
+ 	int i, valid_uuid = 0;
+ 	LIST_HEAD(recov_list);
++	guid_t guid;
+ 
+ 	/* TODO: Implement FTL snapshot */
+ 
+@@ -704,14 +705,15 @@ struct pblk_line *pblk_recov_l2p(struct pblk *pblk)
+ 			return ERR_PTR(-EINVAL);
+ 		}
+ 
++		import_guid(&guid, smeta_buf->header.uuid);
++
+ 		/* The first valid instance uuid is used for initialization */
+ 		if (!valid_uuid) {
+-			import_guid(&pblk->instance_uuid, smeta_buf->header.uuid);
++			guid_copy(&pblk->instance_uuid, &guid);
+ 			valid_uuid = 1;
+ 		}
+ 
+-		if (!guid_equal(&pblk->instance_uuid,
+-				(guid_t *)&smeta_buf->header.uuid)) {
++		if (!guid_equal(&pblk->instance_uuid, &guid)) {
+ 			pblk_debug(pblk, "ignore line %u due to uuid mismatch\n",
+ 					i);
+ 			continue;
 -- 
-Ming
+2.30.2
 
