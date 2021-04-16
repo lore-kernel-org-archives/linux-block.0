@@ -7,47 +7,47 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D704FC433ED
-	for <linux-block@archiver.kernel.org>; Fri, 16 Apr 2021 08:35:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DACFC433B4
+	for <linux-block@archiver.kernel.org>; Fri, 16 Apr 2021 08:35:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B68F761166
-	for <linux-block@archiver.kernel.org>; Fri, 16 Apr 2021 08:35:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4547C61166
+	for <linux-block@archiver.kernel.org>; Fri, 16 Apr 2021 08:35:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240086AbhDPIgJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Apr 2021 04:36:09 -0400
-Received: from mail-qt1-f172.google.com ([209.85.160.172]:43602 "EHLO
-        mail-qt1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240464AbhDPIgG (ORCPT
+        id S240513AbhDPIgM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Apr 2021 04:36:12 -0400
+Received: from mail-qt1-f180.google.com ([209.85.160.180]:46725 "EHLO
+        mail-qt1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240500AbhDPIgL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Apr 2021 04:36:06 -0400
-Received: by mail-qt1-f172.google.com with SMTP id i6so10642946qti.10;
-        Fri, 16 Apr 2021 01:35:42 -0700 (PDT)
+        Fri, 16 Apr 2021 04:36:11 -0400
+Received: by mail-qt1-f180.google.com with SMTP id d6so1973078qtx.13;
+        Fri, 16 Apr 2021 01:35:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=w+SWBg6vyMpiCnh+pmxIKMewgtfrKgyoDu1G+uKhgXY=;
-        b=Gvd5U83C5yAmbzFGgWs3hrDnIXYi4wszHRWe15B1/4Saig01uy+40zvG2c+htkZgsA
-         NeksPHgm4s7xOXGhkmX2IKW3h6QFiqQPgYTn18Aaj+PhBpGQzDbgIPSfm+3d74AfZSPQ
-         7k1l+ltc3rnR7ozh4C3w1RMSClRfYTOgjG8Zuyo/Mh7c6K7/vmhUg7aVkiawsMPsldYj
-         8IVDetaMYM40i3QkBo4Dk9dFZ3wsohpVvg2A9GKkscSlndrIbaOSry5hZQ4UFf3GaHXs
-         HmQ1qIb7h1Ws7J0XJQM+V34FNabld5krLsN8gedTMmsi5ax6Lf8lkdg+sBR6qwiT9XIq
-         0h+g==
-X-Gm-Message-State: AOAM533S8v8RDoo4zgZ32yZEo14050rBB07/rjKvvLoVIsi9/YDGhkDM
-        LIaM4wON67NNV8IGM50oBedQv9qG1BI3jg==
-X-Google-Smtp-Source: ABdhPJzjExvhu/I5GIUQUhSCBRi2Pixy4GZxIyjyqNjqh5gIXeoJtku2qLNwqK2NG6sZkq485CcydQ==
-X-Received: by 2002:ac8:5cc5:: with SMTP id s5mr6854950qta.15.1618562141372;
-        Fri, 16 Apr 2021 01:35:41 -0700 (PDT)
+        bh=DXu78L1cWa3O40BlxHBypy2EDCIHUvn4ujVswlz20VI=;
+        b=EjJFyQJ9oxWiw+2qNf7HZfImIc4SLSDSlyG4j528th4CdufdvCT9Bi/wAzXklmr7lY
+         84mjfMM0AYk/IMat0Qv/UwFY30rOLihYEzT34fA5LwFX5oF+gEewK5SbhYfiZxn4QM2B
+         HN29gyfYHHhybxVdHQrXJiPREUvEWxEb+rnE0L1yn5Blc/sJwS4TfoeT4IpDDSN1qXmG
+         wKZAYFt7jMmNq4fsfpCL8jXRfT+qSQuIOYtEIY+WSZknCc/FvqAIij0j6Z01AQ3a56eC
+         cIwRD2qTnkUdwIYV0Rr+rHncwwhJm6JXJ6Dx0Pd/OR8f0840Z6qAkIEautl/kt+sswQI
+         pvHQ==
+X-Gm-Message-State: AOAM533H1oYilk7dRZhaJMRNcWXSzvWOyE574pvJLHJLUea3vlcrsauk
+        ttOo7QNdV/oewuPfSWbEOngIn2NCXiW4bQ==
+X-Google-Smtp-Source: ABdhPJzqIpQ2leik764+IfGqMOAd+ma6XX7Ib4BJS+Ow4/ke/cXs5QjDWaLsxMOVD+F1T6msW49eZQ==
+X-Received: by 2002:ac8:594d:: with SMTP id 13mr6940953qtz.151.1618562145427;
+        Fri, 16 Apr 2021 01:35:45 -0700 (PDT)
 Received: from black.ru.oracle.com (broadband-188-32-236-56.ip.moscow.rt.ru. [188.32.236.56])
-        by smtp.googlemail.com with ESMTPSA id k17sm3363778qtp.26.2021.04.16.01.35.40
+        by smtp.googlemail.com with ESMTPSA id k17sm3363778qtp.26.2021.04.16.01.35.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Apr 2021 01:35:41 -0700 (PDT)
+        Fri, 16 Apr 2021 01:35:45 -0700 (PDT)
 From:   Denis Efremov <efremov@linux.com>
 To:     linux-block@vger.kernel.org
 Cc:     Denis Efremov <efremov@linux.com>, linux-kernel@vger.kernel.org
-Subject: [PATCH 4/5] floppy: cleanups: use memcpy() to copy reply_buffer
-Date:   Fri, 16 Apr 2021 11:34:48 +0300
-Message-Id: <20210416083449.72700-5-efremov@linux.com>
+Subject: [PATCH 5/5] floppy: cleanups: remove FLOPPY_SILENT_DCL_CLEAR undef
+Date:   Fri, 16 Apr 2021 11:34:49 +0300
+Message-Id: <20210416083449.72700-6-efremov@linux.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210416083449.72700-1-efremov@linux.com>
 References: <20210416083449.72700-1-efremov@linux.com>
@@ -57,37 +57,28 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use memcpy() in raw_cmd_done() to copy reply_buffer instead
-of a for loop.
+FLOPPY_SILENT_DCL_CLEAR is not defined anywhere and comes from pre-git
+era. Just drop this undef. There is FD_SILENT_DCL_CLEAR which is really
+used.
 
 Signed-off-by: Denis Efremov <efremov@linux.com>
 ---
- drivers/block/floppy.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+ drivers/block/floppy.c | 2 --
+ 1 file changed, 2 deletions(-)
 
 diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
-index c58b0b079afc..c584657bacab 100644
+index c584657bacab..678ea45f2388 100644
 --- a/drivers/block/floppy.c
 +++ b/drivers/block/floppy.c
-@@ -2988,8 +2988,6 @@ static const char *drive_name(int type, int drive)
- /* raw commands */
- static void raw_cmd_done(int flag)
- {
--	int i;
--
- 	if (!flag) {
- 		raw_cmd->flags |= FD_RAW_FAILURE;
- 		raw_cmd->flags |= FD_RAW_HARDFAILURE;
-@@ -2997,8 +2995,7 @@ static void raw_cmd_done(int flag)
- 		raw_cmd->reply_count = inr;
- 		if (raw_cmd->reply_count > FD_RAW_REPLY_SIZE)
- 			raw_cmd->reply_count = 0;
--		for (i = 0; i < raw_cmd->reply_count; i++)
--			raw_cmd->reply[i] = reply_buffer[i];
-+		memcpy(raw_cmd->reply, reply_buffer, raw_cmd->reply_count);
+@@ -145,8 +145,6 @@
+  * Better audit of register_blkdev.
+  */
  
- 		if (raw_cmd->flags & (FD_RAW_READ | FD_RAW_WRITE)) {
- 			unsigned long flags;
+-#undef  FLOPPY_SILENT_DCL_CLEAR
+-
+ #define REALLY_SLOW_IO
+ 
+ #define DEBUGT 2
 -- 
 2.30.2
 
