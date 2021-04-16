@@ -7,116 +7,107 @@ X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68A49C43460
-	for <linux-block@archiver.kernel.org>; Fri, 16 Apr 2021 02:10:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 768FBC433B4
+	for <linux-block@archiver.kernel.org>; Fri, 16 Apr 2021 02:15:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 19F856115B
-	for <linux-block@archiver.kernel.org>; Fri, 16 Apr 2021 02:10:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4001061002
+	for <linux-block@archiver.kernel.org>; Fri, 16 Apr 2021 02:15:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238079AbhDPCKy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Apr 2021 22:10:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43605 "EHLO
+        id S235110AbhDPCP3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Apr 2021 22:15:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:46418 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235058AbhDPCKx (ORCPT
+        by vger.kernel.org with ESMTP id S235057AbhDPCP3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Apr 2021 22:10:53 -0400
+        Thu, 15 Apr 2021 22:15:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1618539029;
+        s=mimecast20190719; t=1618539305;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=mlRPn97nJzfL/YSQqBED+cxJcSwhch861xmnBFyG2xw=;
-        b=Bbh2C09VrkEPWXaBiKW+xmx8Pr+my9rqbUaazWVq/sHY/p7ou1MX7/y65vi9To5bv7tZTm
-        9vQiZM3VJt0bkSeFagQh8XRncid8/VsLMvxPcW3ifF82zzTXe9NjqwLN4/IxZPyGoy/w6n
-        saoMZLTvJ+o6akokrsEDcpdGFiWaxJA=
+        bh=NtUYVy/xaclh6IHTZhhHN0cvRVFfOsj+jeNxCiXaxeg=;
+        b=Gkwr5HVz/X8F/9NXx4YapnmOsgaaopiofoGsYZzvJfItnr2yFXdaGZ7gEURXciLpLw++6F
+        6+3cGg+TyF9LYPs5zd82QKp5KJTvUB7ZINdBj8bYfcNSLtjcVNJRneCdM84uk8VKRFhtxC
+        IaAqr/xdj1RVvDbKqZ0rKEAjccuLlfg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-393-JwJVUmrsMj6vRwQM4pEi8w-1; Thu, 15 Apr 2021 22:10:25 -0400
-X-MC-Unique: JwJVUmrsMj6vRwQM4pEi8w-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-428-Z-eyIDWeMbKlSmag4j7wtA-1; Thu, 15 Apr 2021 22:15:01 -0400
+X-MC-Unique: Z-eyIDWeMbKlSmag4j7wtA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 533CC107ACED;
-        Fri, 16 Apr 2021 02:10:22 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9B5FF881D72;
+        Fri, 16 Apr 2021 02:15:00 +0000 (UTC)
 Received: from T590 (ovpn-12-36.pek2.redhat.com [10.72.12.36])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4586C62677;
-        Fri, 16 Apr 2021 02:10:19 +0000 (UTC)
-Date:   Fri, 16 Apr 2021 10:10:15 +0800
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 234DA5D9DE;
+        Fri, 16 Apr 2021 02:14:52 +0000 (UTC)
+Date:   Fri, 16 Apr 2021 10:14:48 +0800
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Lin Feng <linf@wangsu.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] blk-mq: bypass IO scheduler's limit_depth for
+Cc:     axboe@kernel.dk, paolo.valente@linaro.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 2/2] bfq/mq-deadline: remove redundant check for
  passthrough request
-Message-ID: <YHjyB4UhmzUcH+c1@T590>
-References: <20210415033920.213963-1-linf@wangsu.com>
+Message-ID: <YHjzGPO+SoHMEghy@T590>
+References: <20210415034326.214227-1-linf@wangsu.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210415033920.213963-1-linf@wangsu.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <20210415034326.214227-1-linf@wangsu.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Apr 15, 2021 at 11:39:20AM +0800, Lin Feng wrote:
-> Commit 01e99aeca39796003 ("blk-mq: insert passthrough request into
-> hctx->dispatch directly") gives high priority to passthrough requests and
-> bypass underlying IO scheduler. But as we allocate tag for such request it
-> still runs io-scheduler's callback limit_depth, while we really want is to
-> give full sbitmap-depth capabity to such request for acquiring available
-> tag.
-> blktrace shows PC requests(dmraid -s -c -i) hit bfq's limit_depth:
->   8,0    2        0     0.000000000 39952 1,0  m   N bfq [bfq_limit_depth] wr_busy 0 sync 0 depth 8
->   8,0    2        1     0.000008134 39952  D   R 4 [dmraid]
->   8,0    2        2     0.000021538    24  C   R [0]
->   8,0    2        0     0.000035442 39952 1,0  m   N bfq [bfq_limit_depth] wr_busy 0 sync 0 depth 8
->   8,0    2        3     0.000038813 39952  D   R 24 [dmraid]
->   8,0    2        4     0.000044356    24  C   R [0]
+On Thu, Apr 15, 2021 at 11:43:26AM +0800, Lin Feng wrote:
+> Since commit 01e99aeca39796003 'blk-mq: insert passthrough request into
+> hctx->dispatch directly', passthrough request should not appear in
+> IO-scheduler any more, so blk_rq_is_passthrough checking in addon IO
+> schedulers is redundant.
 > 
-> This patch introduce a new wrapper to make code not that ugly.
+> (Notes: this patch passes generic IO load test with hdds under SAS
+> controller and hdds under AHCI controller but obviously not covers all.
+> Not sure if passthrough request can still escape into IO scheduler from
+> blk_mq_sched_insert_requests, which is used by blk_mq_flush_plug_list and
+> has lots of indirect callers.)
 > 
 > Signed-off-by: Lin Feng <linf@wangsu.com>
 > ---
->  block/blk-mq.c         | 3 ++-
->  include/linux/blkdev.h | 6 ++++++
->  2 files changed, 8 insertions(+), 1 deletion(-)
+>  block/bfq-iosched.c | 2 +-
+>  block/mq-deadline.c | 7 ++-----
+>  2 files changed, 3 insertions(+), 6 deletions(-)
 > 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index d4d7c1caa439..927189a55575 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -361,11 +361,12 @@ static struct request *__blk_mq_alloc_request(struct blk_mq_alloc_data *data)
+> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+> index 95586137194e..b827c9212b02 100644
+> --- a/block/bfq-iosched.c
+> +++ b/block/bfq-iosched.c
+> @@ -5627,7 +5627,7 @@ static void bfq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
 >  
->  	if (e) {
->  		/*
-> -		 * Flush requests are special and go directly to the
-> +		 * Flush/passthrough requests are special and go directly to the
->  		 * dispatch list. Don't include reserved tags in the
->  		 * limiting, as it isn't useful.
->  		 */
->  		if (!op_is_flush(data->cmd_flags) &&
-> +		    !blk_op_is_passthrough(data->cmd_flags) &&
->  		    e->type->ops.limit_depth &&
->  		    !(data->flags & BLK_MQ_REQ_RESERVED))
->  			e->type->ops.limit_depth(data->cmd_flags, data);
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> index 158aefae1030..0d81eed39833 100644
-> --- a/include/linux/blkdev.h
-> +++ b/include/linux/blkdev.h
-> @@ -272,6 +272,12 @@ static inline bool bio_is_passthrough(struct bio *bio)
->  	return blk_op_is_scsi(op) || blk_op_is_private(op);
->  }
+>  	spin_lock_irq(&bfqd->lock);
+>  	bfqq = bfq_init_rq(rq);
+> -	if (!bfqq || at_head || blk_rq_is_passthrough(rq)) {
+> +	if (!bfqq || at_head) {
+>  		if (at_head)
+>  			list_add(&rq->queuelist, &bfqd->dispatch);
+>  		else
+> diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+> index f3631a287466..04aded71ead2 100644
+> --- a/block/mq-deadline.c
+> +++ b/block/mq-deadline.c
+> @@ -500,11 +500,8 @@ static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
 >  
-> +static inline bool blk_op_is_passthrough(unsigned int op)
-> +{
-> +	return (blk_op_is_scsi(op & REQ_OP_MASK) ||
-> +			blk_op_is_private(op & REQ_OP_MASK));
-> +}
-> +
->  static inline unsigned short req_get_ioprio(struct request *req)
->  {
->  	return req->ioprio;
+>  	trace_block_rq_insert(rq);
+>  
+> -	if (at_head || blk_rq_is_passthrough(rq)) {
+> -		if (at_head)
+> -			list_add(&rq->queuelist, &dd->dispatch);
+> -		else
+> -			list_add_tail(&rq->queuelist, &dd->dispatch);
+> +	if (at_head) {
+> +		list_add(&rq->queuelist, &dd->dispatch);
+>  	} else {
+>  		deadline_add_rq_rb(dd, rq);
+>  
 > -- 
 > 2.30.2
 > 
@@ -125,6 +116,6 @@ Looks fine:
 
 Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-Thanks, 
+Thanks,
 Ming
 
