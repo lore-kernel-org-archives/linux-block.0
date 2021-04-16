@@ -2,62 +2,76 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FE9DC433B4
-	for <linux-block@archiver.kernel.org>; Fri, 16 Apr 2021 12:29:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A729C433B4
+	for <linux-block@archiver.kernel.org>; Fri, 16 Apr 2021 12:30:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6B640611AB
-	for <linux-block@archiver.kernel.org>; Fri, 16 Apr 2021 12:29:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 18965611AE
+	for <linux-block@archiver.kernel.org>; Fri, 16 Apr 2021 12:30:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235300AbhDPM3e (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Apr 2021 08:29:34 -0400
-Received: from mail-qv1-f46.google.com ([209.85.219.46]:45592 "EHLO
-        mail-qv1-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235074AbhDPM3c (ORCPT
+        id S241097AbhDPMbI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Apr 2021 08:31:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44998 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240778AbhDPMbC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Apr 2021 08:29:32 -0400
-Received: by mail-qv1-f46.google.com with SMTP id bs7so12798320qvb.12;
-        Fri, 16 Apr 2021 05:29:06 -0700 (PDT)
+        Fri, 16 Apr 2021 08:31:02 -0400
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B177C061761
+        for <linux-block@vger.kernel.org>; Fri, 16 Apr 2021 05:30:34 -0700 (PDT)
+Received: by mail-pj1-x1033.google.com with SMTP id ot17-20020a17090b3b51b0290109c9ac3c34so16279284pjb.4
+        for <linux-block@vger.kernel.org>; Fri, 16 Apr 2021 05:30:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=5iDQ+n5O+yKXMjT+TRIf4eZ4wu1n263xyTGUJyOMGZk=;
+        b=poaug3sfihBK/PNZlpnWudeGAAaaZGqBflAJqkGlUdZOkob3Rlj+kRbCgHuXqrGxfU
+         9bH/OsiNwI4rE8Vyh8E0eI+fBJiZW6S5L6MDSTSHLTQIrKPvGA5XJFdJKL0BRDFFO9uZ
+         +bEA+KMj6VmchABU9cEWhLJqky38zZHnzlHJl1mATVroUHQ906GtpZpAGLc91o1uGxDk
+         NIRVH/vM0cBnPZ9qW8xCdtXBHlhhOeXjhJyGEFCNRjrpCn5c/qlXpGUYB+LCqw6Q5lvy
+         hNsOt34tkvimsHY5eCftYUJNtyh1JkbMpLRUOMcBYgOQRV0R0gtEUfppI/YbR3Qtp+9E
+         QizQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=Jk36eYtLMeyJSNx9XAqpGadjjqtLtgy4AzBa+/tMpFM=;
-        b=Zpe5v4E7EYU6air29l/BM29JKksJFfh9vfHwspuoGq6W00a+jorMUNp+g3IYImlBGO
-         UN+76APSHYkP/ZnHU8HgpC1J1ERCixQIRheqfRivSj0R1u1R8/IGOdZTQ/nc5qYfvKKg
-         Gfg4y7Xq/KSE/CYvrPDjbYP4h2J99MkjBpdjSwbu4gNAPSRvRJVW06LDQbcI58yyEiAt
-         PnMhwOihj3V68SseXC3iQVzCBOnHCMd7u98UKa9ikwWmmJLNoeEYiWRG62tVnOHjJcu/
-         cZJnDJhqEDB1Fv1exuhvKnsg067dStoHothZ3pEdRH7vS6n0mKy63hKIV2sPEmfzZQ9M
-         aowA==
-X-Gm-Message-State: AOAM531T1+hZHodiegzNxthdNFiCTCp06YjlnSxx7Bm1agu7+pH2GjOC
-        FmkwT3SFGDqMSw89FuShegx5JmXoTwAF/Q==
-X-Google-Smtp-Source: ABdhPJxNGyjLKZ/oS+9/Xqx9fNqI3kp0gsMjlfVpsCvcZyjzS5RvBT0qdtCEk2bYWJMjJfdNy8JpFg==
-X-Received: by 2002:a0c:fbac:: with SMTP id m12mr8087022qvp.52.1618576146247;
-        Fri, 16 Apr 2021 05:29:06 -0700 (PDT)
-Received: from [10.68.32.192] (broadband-188-32-236-56.ip.moscow.rt.ru. [188.32.236.56])
-        by smtp.gmail.com with ESMTPSA id b15sm3986102qtg.82.2021.04.16.05.29.04
+        bh=5iDQ+n5O+yKXMjT+TRIf4eZ4wu1n263xyTGUJyOMGZk=;
+        b=kM1ilGf66XzQx045u9Mnp42Xmk6YSRr/2JobuOZgiXA/0xVapJCPzrgdhmtD2CsNLz
+         hPVzZeXzq9ExibyBu4neTV1UIWqlDhR2PwGC1zm7vR6LQuRZgzmP5OQZEtHGCIzMADli
+         GlEXkAZ5vLoVRnGwUjyn2UJsDbIYW7JW3CbQ7yHFh7AZq2+hbRtxxkYHTDY9C7yqLfMe
+         5HW68eFxa9YXdiPSbFIbKkueFn5WH9UVVTwdWI1bZP0M/4/0T0CXOmAc7AkXMKobEHvJ
+         WI4loDpN4f69l7gP4PL6qqwFkzoTibI1BvPMmCTnhbmvbYWH7ZxaaS5tG8BZQXQP88ZQ
+         /nbg==
+X-Gm-Message-State: AOAM533XFY7uBRa1GVyANBI6TCywssKhvp7vYZ/ZsWFqudfpehve/GTb
+        jYwuIbwEu+JK+Wv+1h5ymRAD05we3HQgpA==
+X-Google-Smtp-Source: ABdhPJw9rE4NqIus0mK7zt2Ef16XnLgBz/gbAgkWlhy2LAvQdKD98QnKkKd465mwQJSXov69gYu8Zg==
+X-Received: by 2002:a17:90a:7f95:: with SMTP id m21mr9850212pjl.174.1618576233554;
+        Fri, 16 Apr 2021 05:30:33 -0700 (PDT)
+Received: from [192.168.1.134] ([66.219.217.173])
+        by smtp.gmail.com with ESMTPSA id i10sm1668126pfo.37.2021.04.16.05.30.32
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 16 Apr 2021 05:29:05 -0700 (PDT)
+        Fri, 16 Apr 2021 05:30:33 -0700 (PDT)
 Subject: Re: [PATCH] floppy: remove redundant assignment to variable st
-To:     Jens Axboe <axboe@kernel.dk>
+To:     Denis Efremov <efremov@linux.com>
 Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org,
         Colin King <colin.king@canonical.com>,
         Willy Tarreau <w@1wt.eu>,
-        linux-block <linux-block@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+        linux-block <linux-block@vger.kernel.org>
 References: <20210415130020.1959951-1-colin.king@canonical.com>
-From:   Denis Efremov <efremov@linux.com>
-Message-ID: <d6c29628-be82-c812-e021-fd0f0ab02172@linux.com>
-Date:   Fri, 16 Apr 2021 15:29:01 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+ <d6c29628-be82-c812-e021-fd0f0ab02172@linux.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <a61c6976-0035-d562-6059-d8ae0c6d2425@kernel.dk>
+Date:   Fri, 16 Apr 2021 06:30:32 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210415130020.1959951-1-colin.king@canonical.com>
+In-Reply-To: <d6c29628-be82-c812-e021-fd0f0ab02172@linux.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -65,40 +79,14 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Jens, could you please take this one? I thought to send it to you with other
-cleanup patches in a merge request, but you already applied rest of the
-patches. If you prefer to take it as merge request, it's ok I'll send it
-based on your branch for-5.13/drivers.
+On 4/16/21 6:29 AM, Denis Efremov wrote:
+> Jens, could you please take this one? I thought to send it to you with other
+> cleanup patches in a merge request, but you already applied rest of the
+> patches. If you prefer to take it as merge request, it's ok I'll send it
+> based on your branch for-5.13/drivers.
 
-On 4/15/21 4:00 PM, Colin King wrote:
-> From: Colin Ian King <colin.king@canonical.com>
-> 
-> The variable st is being assigned a value that is never read and
-> it is being updated later with a new value. The initialization is
-> redundant and can be removed.
-> 
-> Addresses-Coverity: ("Unused value")
-> Signed-off-by: Colin Ian King <colin.king@canonical.com>
+I have applied it, thanks.
 
-Reviewed-by: Denis Efremov <efremov@linux.com>
+-- 
+Jens Axboe
 
-Thanks,
-Denis
-
-> ---
->  arch/x86/include/asm/floppy.h | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/arch/x86/include/asm/floppy.h b/arch/x86/include/asm/floppy.h
-> index d43717b423cb..6ec3fc969ad5 100644
-> --- a/arch/x86/include/asm/floppy.h
-> +++ b/arch/x86/include/asm/floppy.h
-> @@ -74,7 +74,6 @@ static irqreturn_t floppy_hardint(int irq, void *dev_id)
->  		int lcount;
->  		char *lptr;
->  
-> -		st = 1;
->  		for (lcount = virtual_dma_count, lptr = virtual_dma_addr;
->  		     lcount; lcount--, lptr++) {
->  			st = inb(virtual_dma_port + FD_STATUS);
-> 
