@@ -7,47 +7,47 @@ X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F5D7C433ED
-	for <linux-block@archiver.kernel.org>; Fri, 16 Apr 2021 08:35:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7837C43460
+	for <linux-block@archiver.kernel.org>; Fri, 16 Apr 2021 08:35:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D99A86117A
-	for <linux-block@archiver.kernel.org>; Fri, 16 Apr 2021 08:35:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8FD3661184
+	for <linux-block@archiver.kernel.org>; Fri, 16 Apr 2021 08:35:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238766AbhDPIgC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Apr 2021 04:36:02 -0400
-Received: from mail-qv1-f42.google.com ([209.85.219.42]:45686 "EHLO
-        mail-qv1-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240059AbhDPIgB (ORCPT
+        id S240059AbhDPIgE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Apr 2021 04:36:04 -0400
+Received: from mail-qk1-f180.google.com ([209.85.222.180]:41828 "EHLO
+        mail-qk1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240464AbhDPIgE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Apr 2021 04:36:01 -0400
-Received: by mail-qv1-f42.google.com with SMTP id bs7so12553769qvb.12;
-        Fri, 16 Apr 2021 01:35:37 -0700 (PDT)
+        Fri, 16 Apr 2021 04:36:04 -0400
+Received: by mail-qk1-f180.google.com with SMTP id f19so10362059qka.8;
+        Fri, 16 Apr 2021 01:35:39 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=Hw31C33PILT3DamWMHDgiiU6OjaR9sNFohiSgOeE+jE=;
-        b=ozEtyBG3Phl6/wQE87UCOyHyzQHL9VRexGmg6ly4iNAUWgCJUmF2XOSJhJI98gSGGG
-         5MRGy7N+pLvj4uf1gYWjDYP6fZjnlxxohnIpyUyHcBNi2wOHFw5iCXc7Ha+lOunJoqxI
-         7erPW6KtNusZN3qKybhi4E03C+l1iaarlsjICLVIECGmbon6K/993joniEhlZcfOAkgA
-         a0YYOo7cLfpg8pWSobq2ic+WxTVEAAwdihsH5GdRrqNUJFz4gepsPDhUYjivEJupM26Q
-         Do/LhshPjeio4SfJR/TDiTQkBidn1W4txs0smrI6XnyaGMo9NyVbXW9BUdICUHL2WgHC
-         7A8w==
-X-Gm-Message-State: AOAM530BpNtNsRAHrWBJnOIQu6MFX7WXNtATo0Dlr6iXqclSsGaSZ/5I
-        FhexyBi2oEbG5SthebaWQu6qrQoDsLea+g==
-X-Google-Smtp-Source: ABdhPJxRjSNka1nHBJAG5Ilk39BekLvA8FURwLp7GDLBxBmAS6hbvbK9p7BYEXeabZ+VHaR0jEi/KQ==
-X-Received: by 2002:a0c:a045:: with SMTP id b63mr1251841qva.19.1618562136393;
-        Fri, 16 Apr 2021 01:35:36 -0700 (PDT)
+        bh=iaWCqAz1Lh0K+YMS2Sm/+2KskMbWPrmtR34tefX2FCk=;
+        b=iyVx6eVu2hf25UrvagyrvhCGGIwedPrpvdGcALNQumi2a5lYx18aAvRxraDTIz5SyC
+         RE4AXtr1Lomo8kfpiVCwGlHn7/ujJeRypo8i7II0AjkW/+c7+Kw+8XaM29EFKK5L15ti
+         ZTlURXeJiaIpF4r6IOhFiOElQrFCEsLJZNACJn6rfCgH9Aq5DgFAMCPnWDFt20wGovgI
+         XY3CLXoSJEsrcDkCEKawvIjsknFYueZ8w2+Wjt6pslChbvEBG1ppKHVWrIZB1538Ta2Q
+         XaiN0BywTNY2OYgaBQJEdAXaYcAyjRlf1eNLzGkWMHVTw0S8lqgo1WexmV/mthhFGSh+
+         UZJQ==
+X-Gm-Message-State: AOAM533DfO5VCg6w4FD4mFIz5TJR1mNdWlcKhcRjZmRYy7Ibh1JVCCRf
+        cxD7dYuWOnve+TJFMO32EJA5hWPs6wFGQg==
+X-Google-Smtp-Source: ABdhPJwUeNyXNj6qXFhTLMemljhm2jc4jmR8wxvXhsR6AeYO1w7BNv9NKzzyqEJRet2A85qmSizz6A==
+X-Received: by 2002:a37:695:: with SMTP id 143mr8039369qkg.217.1618562138773;
+        Fri, 16 Apr 2021 01:35:38 -0700 (PDT)
 Received: from black.ru.oracle.com (broadband-188-32-236-56.ip.moscow.rt.ru. [188.32.236.56])
-        by smtp.googlemail.com with ESMTPSA id k17sm3363778qtp.26.2021.04.16.01.35.34
+        by smtp.googlemail.com with ESMTPSA id k17sm3363778qtp.26.2021.04.16.01.35.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Apr 2021 01:35:36 -0700 (PDT)
+        Fri, 16 Apr 2021 01:35:38 -0700 (PDT)
 From:   Denis Efremov <efremov@linux.com>
 To:     linux-block@vger.kernel.org
 Cc:     Denis Efremov <efremov@linux.com>, linux-kernel@vger.kernel.org
-Subject: [PATCH 2/5] floppy: cleanups: use ST0 as reply_buffer index 0
-Date:   Fri, 16 Apr 2021 11:34:46 +0300
-Message-Id: <20210416083449.72700-3-efremov@linux.com>
+Subject: [PATCH 3/5] floppy: cleanups: use memset() to zero reply_buffer
+Date:   Fri, 16 Apr 2021 11:34:47 +0300
+Message-Id: <20210416083449.72700-4-efremov@linux.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210416083449.72700-1-efremov@linux.com>
 References: <20210416083449.72700-1-efremov@linux.com>
@@ -57,65 +57,36 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use ST0 as 0 index for reply_buffer array. get_fdc_version() is the only
-function that uses index 0 directly instead of the ST0 define.
+Use memset() to zero reply buffer in raw_cmd_copyin() instead
+of a for loop.
 
 Signed-off-by: Denis Efremov <efremov@linux.com>
 ---
- drivers/block/floppy.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ drivers/block/floppy.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
 diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
-index 960e5791d6f5..df5c32900539 100644
+index df5c32900539..c58b0b079afc 100644
 --- a/drivers/block/floppy.c
 +++ b/drivers/block/floppy.c
-@@ -4232,7 +4232,7 @@ static char __init get_fdc_version(int fdc)
- 	r = result(fdc);
- 	if (r <= 0x00)
- 		return FDC_NONE;	/* No FDC present ??? */
--	if ((r == 1) && (reply_buffer[0] == 0x80)) {
-+	if ((r == 1) && (reply_buffer[ST0] == 0x80)) {
- 		pr_info("FDC %d is an 8272A\n", fdc);
- 		return FDC_8272A;	/* 8272a/765 don't know DUMPREGS */
- 	}
-@@ -4257,12 +4257,12 @@ static char __init get_fdc_version(int fdc)
+@@ -3090,7 +3090,6 @@ static int raw_cmd_copyin(int cmd, void __user *param,
+ {
+ 	struct floppy_raw_cmd *ptr;
+ 	int ret;
+-	int i;
  
- 	output_byte(fdc, FD_UNLOCK);
- 	r = result(fdc);
--	if ((r == 1) && (reply_buffer[0] == 0x80)) {
-+	if ((r == 1) && (reply_buffer[ST0] == 0x80)) {
- 		pr_info("FDC %d is a pre-1991 82077\n", fdc);
- 		return FDC_82077_ORIG;	/* Pre-1991 82077, doesn't know
- 					 * LOCK/UNLOCK */
- 	}
--	if ((r != 1) || (reply_buffer[0] != 0x00)) {
-+	if ((r != 1) || (reply_buffer[ST0] != 0x00)) {
- 		pr_info("FDC %d init: UNLOCK: unexpected return of %d bytes.\n",
- 			fdc, r);
- 		return FDC_UNKNOWN;
-@@ -4274,11 +4274,11 @@ static char __init get_fdc_version(int fdc)
- 			fdc, r);
- 		return FDC_UNKNOWN;
- 	}
--	if (reply_buffer[0] == 0x80) {
-+	if (reply_buffer[ST0] == 0x80) {
- 		pr_info("FDC %d is a post-1991 82077\n", fdc);
- 		return FDC_82077;	/* Revised 82077AA passes all the tests */
- 	}
--	switch (reply_buffer[0] >> 5) {
-+	switch (reply_buffer[ST0] >> 5) {
- 	case 0x0:
- 		/* Either a 82078-1 or a 82078SL running at 5Volt */
- 		pr_info("FDC %d is an 82078.\n", fdc);
-@@ -4294,7 +4294,7 @@ static char __init get_fdc_version(int fdc)
- 		return FDC_87306;
- 	default:
- 		pr_info("FDC %d init: 82078 variant with unknown PARTID=%d.\n",
--			fdc, reply_buffer[0] >> 5);
-+			fdc, reply_buffer[ST0] >> 5);
- 		return FDC_82078_UNKN;
- 	}
- }				/* get_fdc_version */
+ 	*rcmd = NULL;
+ 
+@@ -3109,8 +3108,7 @@ static int raw_cmd_copyin(int cmd, void __user *param,
+ 	if (ptr->cmd_count > FD_RAW_CMD_FULLSIZE)
+ 		return -EINVAL;
+ 
+-	for (i = 0; i < FD_RAW_REPLY_SIZE; i++)
+-		ptr->reply[i] = 0;
++	memset(ptr->reply, 0, FD_RAW_REPLY_SIZE);
+ 	ptr->resultcode = 0;
+ 
+ 	if (ptr->flags & (FD_RAW_READ | FD_RAW_WRITE)) {
 -- 
 2.30.2
 
