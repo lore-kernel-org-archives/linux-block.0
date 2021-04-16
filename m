@@ -2,184 +2,152 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,PDS_BAD_THREAD_QP_64,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55FFBC433B4
-	for <linux-block@archiver.kernel.org>; Fri, 16 Apr 2021 06:08:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FDC7C433ED
+	for <linux-block@archiver.kernel.org>; Fri, 16 Apr 2021 06:51:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2EDB16113D
-	for <linux-block@archiver.kernel.org>; Fri, 16 Apr 2021 06:08:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 24C79610FC
+	for <linux-block@archiver.kernel.org>; Fri, 16 Apr 2021 06:51:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238690AbhDPGI5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Apr 2021 02:08:57 -0400
-Received: from mailout1.samsung.com ([203.254.224.24]:47661 "EHLO
-        mailout1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233387AbhDPGI5 (ORCPT
+        id S237264AbhDPGwN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Apr 2021 02:52:13 -0400
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:57250 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235140AbhDPGwM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Apr 2021 02:08:57 -0400
-Received: from epcas1p3.samsung.com (unknown [182.195.41.47])
-        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20210416060830epoutp01ecf1c4938e8089e64c95eec08ece01b1~2QakivR4V2418524185epoutp01B
-        for <linux-block@vger.kernel.org>; Fri, 16 Apr 2021 06:08:30 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20210416060830epoutp01ecf1c4938e8089e64c95eec08ece01b1~2QakivR4V2418524185epoutp01B
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1618553310;
-        bh=TVR2NG8Dla8sUBALdtzvQt19CiAXv7/CBvFbD/vfHuE=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ba/7jgl+Bmpbaum/c4so8ozz8pDkfErerUohQVKeIBTgXP1kWZyBeGnNR5O2JgW+9
-         sP6OVyutReRI8QSbGV8HyIvXfhG+v4+uw86rOGxWg1R+CzbSyYAsAnk8LDtnfAcYlV
-         6MsxIXt7eOLc0h7yB4JRDKRR7RplLxHB5r6RFRII=
-Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
-        epcas1p1.samsung.com (KnoxPortal) with ESMTP id
-        20210416060829epcas1p1f2aca6faecc6e2dd8098d2b93bb3738c~2QajgKAqv3073230732epcas1p15;
-        Fri, 16 Apr 2021 06:08:29 +0000 (GMT)
-Received: from epsmges1p1.samsung.com (unknown [182.195.40.165]) by
-        epsnrtp3.localdomain (Postfix) with ESMTP id 4FM5P81hp3z4x9Q9; Fri, 16 Apr
-        2021 06:08:28 +0000 (GMT)
-Received: from epcas1p4.samsung.com ( [182.195.41.48]) by
-        epsmges1p1.samsung.com (Symantec Messaging Gateway) with SMTP id
-        BE.3B.07927.CD929706; Fri, 16 Apr 2021 15:08:28 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-        epcas1p3.samsung.com (KnoxPortal) with ESMTPA id
-        20210416060827epcas1p39350d45cef64c91be681b76180b63140~2QahhMA5_0256402564epcas1p3W;
-        Fri, 16 Apr 2021 06:08:27 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
-        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20210416060827epsmtrp2ad5489f2cafc2395104e3858cbfada6f~2QahfyNHe0969609696epsmtrp2W;
-        Fri, 16 Apr 2021 06:08:27 +0000 (GMT)
-X-AuditID: b6c32a35-f4c0da8000011ef7-82-607929dc0434
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        A1.B5.33967.BD929706; Fri, 16 Apr 2021 15:08:27 +0900 (KST)
-Received: from localhost.localdomain (unknown [10.253.99.105]) by
-        epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-        20210416060827epsmtip102808d4f8ed04bb94b0896ddbd207681~2QahQvFMt0913309133epsmtip1d;
-        Fri, 16 Apr 2021 06:08:27 +0000 (GMT)
-From:   Changheun Lee <nanich.lee@samsung.com>
-To:     bvanassche@acm.org
-Cc:     Johannes.Thumshirn@wdc.com, asml.silence@gmail.com,
-        axboe@kernel.dk, damien.lemoal@wdc.com, gregkh@linuxfoundation.org,
-        hch@infradead.org, jisoo2146.oh@samsung.com,
-        junho89.kim@samsung.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, ming.lei@redhat.com,
-        mj0123.lee@samsung.com, nanich.lee@samsung.com, osandov@fb.com,
-        patchwork-bot@kernel.org, seunghwan.hyun@samsung.com,
-        sookwan7.kim@samsung.com, tj@kernel.org, tom.leiming@gmail.com,
-        woosung2.lee@samsung.com, yt0928.kim@samsung.com
-Subject: Re: [PATCH v7 1/3] bio: limit bio max size
-Date:   Fri, 16 Apr 2021 14:50:39 +0900
-Message-Id: <20210416055039.20126-1-nanich.lee@samsung.com>
-X-Mailer: git-send-email 2.29.0
-In-Reply-To: <bb8f7127-edff-4a32-2d5c-4343002bda19@acm.org>
+        Fri, 16 Apr 2021 02:52:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1618555908; x=1650091908;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=G8FZ0D3PP/OudJ5uuxCAz/C/vBHo8wESZoPwxTWqVEI=;
+  b=qwRVCfNM0z34lB9qO2kcZBTx1m/glrlyfJrGBCiVls2eKmwHhxkxRG5L
+   yE2omUB8H3HTzGIWmMM1/x50GHh0tjNsryxrqfWg50fPIViBiY/7/qA4G
+   l/Ma4V4fPV9ouXIGAooKFJSvy2pAr9Xe2Hr+yI1ADQyUhbWW3YkLTcWrv
+   IXwdr3pmT3NnmmO2WpNXDIy6ydkAhE8ANh49CvYgyI9L9hBggRonVZPdU
+   UILxLK04l8H0cArTwYv8l1oOR/Ji5Inp99X/OPhZmORxgaknUd2ob8Pos
+   j+ToXlv7XCZDkSomjubUqKJjQcijCQsrF0+ul7+T2hT9N7BwM4K/IZ9ij
+   w==;
+IronPort-SDR: bgWh6DPrNkqBT3Iyaj/kYXgihbOd8qpHH8eDilIcLRl9l5yJalaP7Uu/Mkki7fWgjYvMz2qDH/
+ ZSzun7FPWrc9cqZ+plxWL2P9E89DR65K6tr4n1XZpQRbKHG5tNLuTCwk+RBE5qSt6kRy9DAwai
+ mTKw+Hi1Ni+/gebdf6kZjZgjTTqfpcodYPZrL3pRANeSkkBgFa40Kpv+3xqgwC/EpzOHl4/jUi
+ bSb2r4ZjnwB/z/EtOvr0ZtoOuEkhAm4zPotHR/mPTX3irlG3YXEAFWuSREXC3x0Q5M1jP9psdr
+ gCQ=
+X-IronPort-AV: E=Sophos;i="5.82,226,1613404800"; 
+   d="scan'208";a="275974625"
+Received: from mail-dm6nam12lp2176.outbound.protection.outlook.com (HELO NAM12-DM6-obe.outbound.protection.outlook.com) ([104.47.59.176])
+  by ob1.hgst.iphmx.com with ESMTP; 16 Apr 2021 14:51:46 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=FWu7HyRu4STi5iXdIJe2hN29SGxt4jw5iDKNBc2nA1b+yHdyBLiK95VITBl+RkCheZ8KBH/Q81fvUTc62S9JT930S6h7fi5TxROt+FXFWBqMVoOZ1YR2Ti74AYH55JYDgKH/Il+XvJDpqwBJUiVMG24deFjDbaB9TUnIhSyupEPhQgzi+bQyBHA4vDE5gb5VyJ5g6im+1eAeVV1h6fYP+X1gB2rEuV0WDeB0HIpulr14CbAhr6TQxpBPXluIBuIky1q3QfA+YfueU5SiGrZHMie79e39OFXL+UGON35EO1DUi5tMUKaizoiCs2U0mAmzUgtR+BGFlxsujchLD5LcqA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=G8FZ0D3PP/OudJ5uuxCAz/C/vBHo8wESZoPwxTWqVEI=;
+ b=nMCXx+mMXKjQwUv2XKu+Yxe/vZA1K6OCZOwx52on7+VC+DUo243v5Uf4eZDjuf/6JsOFPc70g2VJIvH3a+5lHbb8U0Z9s4in3x7Yh60a3CjpL+OTsGUYwjMEmSyu/5C1eUDf+1qrU1SUZk4n+YtD6Nk8NuSH+MJyBhLdaLalizlIxURQOKbeG2/HyjBvX2+ynpI7doZ+ZfDb5lP6BL2vOoMHIq1Mxjm3bPD4mb/Lr8eXYrzYf4UXdyX0G1eGd6MJ+q1Zw+EzIrXBXExovFHSPdsdphYw7Pau9jGznpno8eq9RFtP2WpEvmDY78PvM8LsOKdFQYlIzHVyQmDZK1eRRw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=G8FZ0D3PP/OudJ5uuxCAz/C/vBHo8wESZoPwxTWqVEI=;
+ b=LqGbMPBATNYZ4RqFW6D96lVtaiwyheDViT+hWw2l21tn0ZtB8LC37UD2MrlchfeUXKx1QenneiWH7KL7EckoS2ttAXZE8gq+sa4bpBGk7vj1UmPaAPvMwsO9sK/8ZuzIj/ziA+bVvADqFTDRfxJKYcZvA/5k5/xuL21T1FJS1Gw=
+Received: from PH0PR04MB7416.namprd04.prod.outlook.com (2603:10b6:510:12::17)
+ by PH0PR04MB7334.namprd04.prod.outlook.com (2603:10b6:510:b::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4020.21; Fri, 16 Apr
+ 2021 06:51:45 +0000
+Received: from PH0PR04MB7416.namprd04.prod.outlook.com
+ ([fe80::99a5:9eaa:4863:3ef3]) by PH0PR04MB7416.namprd04.prod.outlook.com
+ ([fe80::99a5:9eaa:4863:3ef3%4]) with mapi id 15.20.4042.018; Fri, 16 Apr 2021
+ 06:51:45 +0000
+From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+To:     Damien Le Moal <Damien.LeMoal@wdc.com>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        Christoph Hellwig <hch@lst.de>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
+        David Sterba <dsterba@suse.com>,
+        Josef Bacik <josef@toxicpanda.com>
+CC:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        Naohiro Aota <Naohiro.Aota@wdc.com>
+Subject: Re: [PATCH 1/4] dm: Introduce zone append support control
+Thread-Topic: [PATCH 1/4] dm: Introduce zone append support control
+Thread-Index: AQHXMm1gL8WU7E5fp06Z3hjUVfsrGg==
+Date:   Fri, 16 Apr 2021 06:51:45 +0000
+Message-ID: <PH0PR04MB741615DD316F6B22E1A4D8929B4C9@PH0PR04MB7416.namprd04.prod.outlook.com>
+References: <20210416030528.757513-1-damien.lemoal@wdc.com>
+ <20210416030528.757513-2-damien.lemoal@wdc.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: wdc.com; dkim=none (message not signed)
+ header.d=none;wdc.com; dmarc=none action=none header.from=wdc.com;
+x-originating-ip: [2001:a62:15ab:1:e10b:72a5:d443:5e5c]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 56402fca-d0ac-4eec-8aaf-08d900a4198b
+x-ms-traffictypediagnostic: PH0PR04MB7334:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <PH0PR04MB7334515AAC714D814DB51B3D9B4C9@PH0PR04MB7334.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:1728;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: nWXKf3vsSAWGMZ0YfJZg3U3AW87jFpLJunl7aiUVltj9piGfyTvGlQT0ZNeozBG74OnrqeIWlZQ4qV5gyUZHyTkWST4nMB/c5DvKX4Odifi9TnGBvGmICGjb7+jXW7uQS9IOUs/VQddNr6SlVxlQcyF9qjzGtzP7jzjV1RK0/eoix+0dZe7NIZwm5iNkTZdwEYxFhucwA/JmxLK+DOXUHTj25JvRG5jUHnhuqKQHE7esshm/aRUOiEbAakFzKm6jVv1XZ5k3I6IMKqLYSKIWPrpMlkC0vQjEmZTJxuPVtpldjxC4guVihtcuvJ5ZDm+z/y3nLcBpsMmU0jBub36gyUAop0LJvX/JQRSSjI52zPZ8vMDsqqjvSiRgy+epkvrzXt2DOz4hcttthaPtCKEPYF+7IlPPqhnqm1fS2fC2dskNC9Zuby0s/lUcWJQv2+ajQ2aJvysZJ5aEHCpRstwBk8q5UV1OC5PNTrOMbaDbjpPlOvLdpewmnyBxpurSAhb69hsp5hsKWKf9KFdvGqK3YFcPSnO3fiF6lOyq2DwDNscTaVnQeHKLUrHF8S/2y38KSdtgoX60wda+oCXKgiaO2yDFkoaTxdQ5AZfexY8rITLq8yOF4Kh7O4KpUSAqDW4ojl9YHEeVKw9KGmXBW2gtuA==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR04MB7416.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(366004)(396003)(136003)(346002)(39860400002)(316002)(66476007)(66946007)(558084003)(122000001)(19618925003)(76116006)(91956017)(66446008)(8936002)(64756008)(8676002)(921005)(6506007)(110136005)(9686003)(2906002)(71200400001)(4326008)(7696005)(54906003)(86362001)(66556008)(52536014)(478600001)(7416002)(55016002)(4270600006)(186003)(38100700002)(5660300002)(33656002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: =?us-ascii?Q?pMyEPy4tuVErH5BMrTvk00eAsVBaBA4QX9cJ5F5IJOdyR7qY/em2NeI0cn/O?=
+ =?us-ascii?Q?i/zbkajtYoITGM9gzrSHCKnjT5Z40bHATGGhUJ19YxXU10fAtZ7rTT1oVE5s?=
+ =?us-ascii?Q?DUclRtGY5kRqfzGQTdBm/0ei5b/vQTdL4ucGV5Jc68uC59BygtdQpBrbVldJ?=
+ =?us-ascii?Q?pMPsAzJ0Pl+vS0oYii+f92ASdzcqv1RJMKbwqBRXP68IAwo3T68Cil61uZ0e?=
+ =?us-ascii?Q?i8Tiqe1BZcpYJhf740MugGUxRGDRSSZC/ZcuENqM6PdeZbZTc2LW5cul+xOJ?=
+ =?us-ascii?Q?Zx+iSxKMDBln+zY7wgDJGZ//4Pqo8A5nKP76Lq+861u3LhIFUZbkRCZd+s9p?=
+ =?us-ascii?Q?XAUnlrz5T9VPsNZwkp26wyIIylNp9b+GkkZcSzA1rnZ09S9NVea8nzIjcX49?=
+ =?us-ascii?Q?fAHhQ/daMlOYFBSfxjCdQYAbwUIhVopMszLa81y6075/LPCaw+z35Jc5fKCC?=
+ =?us-ascii?Q?8oIOLaJr4W/o5zn1HUZutah+6gcmerlK8Et9M+tIKtoCXpG1+2b2SVzZTnZZ?=
+ =?us-ascii?Q?WtdB1vE8uk5K6wMDrGH7SdkRBg+js0OtC/CwxLaaumfp2dtAjUmiZgQnES62?=
+ =?us-ascii?Q?XsKk/Ta/lZzqIwm+h7AsDXE204Hmq9gW/KPeblojVp/DgHV112tYoGoCEf3s?=
+ =?us-ascii?Q?jFhHc7A2yEOpIb1+b7Z817lOSoe31aXmU0YEcNyDbf7LOLU9cX/gypjjxmO2?=
+ =?us-ascii?Q?/GsF/ucdIiByWUUm8E3YNxymrU0ol0cixF7okVEefuPYZwWmZFOMaGp0+lkO?=
+ =?us-ascii?Q?owgH4bwZmLOjvF9dap8W4hxY/CmKQ1cr8HCWSsZbYEeA65+8UMhSr4xVnROj?=
+ =?us-ascii?Q?bV1fqh/IKvFW0iQRqzop2bO1ECAXFWAAzGAng/v9pUvRWdGxD51QS0Oh1qbd?=
+ =?us-ascii?Q?4YYhpQHTGL6T7n5jmw0kux8wJvUvSPF5UiPSRUunc+/zUsRy6PHLOxYeUub3?=
+ =?us-ascii?Q?2yXt9xxuWyJzhB6bkOOsCs7F2hSi9JoAkWnfIL6/7ELse3CBK3QsA8qnBHH+?=
+ =?us-ascii?Q?MISjHSTWe96GpcbyKhqZlkEG0RvFr6CbSaCYuVBLw0XmSZyt1Uw8NzTsLzkj?=
+ =?us-ascii?Q?/5HUak4dRFM64TpRUeMUDDBKHXHlKi/kFENSG4LFHcoFH/F50ZVZIIWJjyKL?=
+ =?us-ascii?Q?H+xWOMnxWda9QRh5+rDasP7hH1ZJNHWsio4DFio69QIpwHYZ+Ls8CjMTUjiw?=
+ =?us-ascii?Q?Rrk/Q5ZITGhcfHx18wNMTyUou3xdjmeKIhIlTWt3XwNogc7aVEsHVbVpJg5h?=
+ =?us-ascii?Q?pAPrJPys173465W5m2TIKn06/LhULh5ibMhRKFAVPwQqmwXhF1wGVmYrQnkm?=
+ =?us-ascii?Q?h6d2hhU4GJN9L8aPLk+RUYF9qh39qHTfupMp5bQgbH7O5zhbwKcednDEm5bs?=
+ =?us-ascii?Q?p17umDkpJNdV+1N+bz0ETdrg1I83?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Te0xbVRzHc+5tbwumUB6DIz6GDYuhW6GlKzuOR0ZclhtxhggqYYa2wg1F
-        S1t7y2RqCFsp2woyOhiEx8aGOLbOifISKs9OVASXDYQJwgAlG4wAkwIZwyWWXoj89/v+zuf3
-        +57feXBxbwcRwE3XGCi9RqkWEO6sllvBYtF48AmFuHHWDVVZWwC6MXGOQKWP13FkOr2GIeOX
-        9QTqL6rBUMHMKTZ6Zr6PodVpGnWM7UVDtioC2YuNGCprrMLRyOQAB926P8xC07UWHN3uW2aj
-        S38fQk/regFaenKPg35tLcZRfcc6cciPHPo9lrQYFzlkW8UEh2y8JiSHfsskG6xnCbLr4tcc
-        cqlzmCALm6yAdDS8TJ7uzsfinktSR6ooZSqlD6Q0KdrUdE1alCA2Xv66XBYulogkr6EDgkCN
-        MoOKEhx+M050JF3tnFQQeFypznSm4pQ0LQiNjtRrMw1UoEpLG6IElC5VrZOIdSG0MoPO1KSF
-        pGgzDkrE4jCZk1SoVXXVUyzdiFdWw2ATJweUe5iBGxfy98OGm/c4ZuDO9ea3Atiz2r0llgGc
-        P/kUZ8QagKVjJvZ2yfg3doxZ6ADw0Y07gBEOAO9cb+ZsUgR/HyxcGCM2Y1++HxxaWXNBOD+P
-        BcdyR1wLPnwp/P7ZFVcBi78Hbty2u/I8fgS0mWoJxm43/HeyAN+M3Zz5uooVNsN4wb7yGdZm
-        jDsZY3Ola6+Q/4QLfzJecEJcpzgM2+8eZ/r4wEc/N3GYOAA6FjsIhs8H0JhXDRhRBGDtw6sY
-        Q0nhssMBNhvh/GBYbwtl0q/Ato2LgDH2gIurBVtePHgmz5tBguBA7iS+7fXwZttWRxKaRs1b
-        B1wIYJ81hygCgRU75qnYMU/F/86XAW4FfpSOzkijaIlOsvOSG4Dr9QtlrcCy8DjEDjAusAPI
-        xQW+POnZLIU3L1V54lNKr5XrM9UUbQcy52lb8IBdKVrn99EY5BJZmFQqRfvDD4TLpAJ/3gfi
-        Kbk3P01poD6iKB2l367DuG4BOdhVqmRgFu8q93wJP+bfsrG+W/Xjqla1UHKsU/JOP/vjr1TJ
-        oQ9W3vZyT7fEy9XtWQnZZRKRvZ/97Z97tW4tPX3tMW9gjbbeF7N1pXMKu29EdOUVhemP1n1B
-        uUueuYmfF13769QDVJeYHxTqI6z0jS9E4tFm81uiV8uq8yrbYpM4a8NJu56vKT5jEQoSvK5/
-        Nn/JQ9xp76Wzvzga9kPP3Q+V8UcvnEvgcf/pHxIOjtYcebdtxtMrfO6k9RPb6HS3RVNSn2Dj
-        LOPt7OmuyKkJ0XzMd4nR7MGY8vOFitIXDra/n7zH4B+RnozEwhjfX8yz44ZIz+JQxeUllc00
-        9h5cc4+ZE7BolVIixPW08j93SaykhgQAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrJIsWRmVeSWpSXmKPExsWy7bCSnO5tzcoEg7k7JCzmrNrGaLH6bj+b
-        xbQPP5ktWtu/MVk0L17PZnF6wiImi54nTawWf7vuMVl8fVhssfeWtsXlXXPYLA5NbmaymL55
-        DrPFtftn2C0O37vKYvFwyURmi3MnP7FazHvsYPFr+VFGi/c/rrNbnNoxmdli/d6fbA5iHpev
-        eHtMbH7H7rFz1l12j80rtDwuny312LSqk81j/9w17B7v911l8+jbsorR4/MmOY/2A91MAdxR
-        XDYpqTmZZalF+nYJXBnL5z9gKbgmWLHp0hb2BsaZfF2MnBwSAiYSd9YdYgKxhQR2M0rsP84J
-        EZeSOH7iLWsXIweQLSxx+HBxFyMXUMlHRom23iNg9WwCOhJ9b2+xgdgiAmISl798YwQpYhZY
-        wCJxcOcJdpCEsICxxPa/C8FsFgFVid/nDoE18ApYS+xqXcIGsUxe4s/9HmYQmxMovnzWF1aI
-        g6wk/jXNYYGoF5Q4OfMJmM0MVN+8dTbzBEaBWUhSs5CkFjAyrWKUTC0ozk3PLTYsMMxLLdcr
-        TswtLs1L10vOz93ECI5NLc0djNtXfdA7xMjEwXiIUYKDWUmE17izIkGINyWxsiq1KD++qDQn
-        tfgQozQHi5I474Wuk/FCAumJJanZqakFqUUwWSYOTqkGJsXri21+OWj0L9TuljjVt25ZhqbQ
-        RdeCpM3fLUWvVee8uGA2+d6/m49fam0X9Ny52KL49GXOkiqLzq4D3dqvokujn4Q/WfuKccnP
-        wPvrzXgs6x50NTsphq01X8MT517N+Sc240G834+FG878aGB3rDYKdTRrrL70cTnD4SsHVV8y
-        R07seJW+P2bBfeULXg/nfbawnWEhnBITmRFq6pf24V1TZefNSe7X7J4aVYlyBVgXpUZKhtn5
-        urDbuLcU77hYlLnqW8vcSj/TL6lsIe/bvly7cHOxmbbH49mfEk+t7Fy34krPi8D8sqnJyWcV
-        8yNllivFzlt9cO9c1S81X1wKXomZqq5oz09c7ZOgYnRSiaU4I9FQi7moOBEA+/FzrDwDAAA=
-X-CMS-MailID: 20210416060827epcas1p39350d45cef64c91be681b76180b63140
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: SVC_REQ_APPROVE
-CMS-TYPE: 101P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20210416060827epcas1p39350d45cef64c91be681b76180b63140
-References: <bb8f7127-edff-4a32-2d5c-4343002bda19@acm.org>
-        <CGME20210416060827epcas1p39350d45cef64c91be681b76180b63140@epcas1p3.samsung.com>
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR04MB7416.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 56402fca-d0ac-4eec-8aaf-08d900a4198b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Apr 2021 06:51:45.0776
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: yvmZnU6qTLkVYUsaKzL4kF8NkKKABmGOBtPKyt8Cz8HoIyelKYXWQf0JgzwrGr4/vIyWeqGN48tXo2LYUY8EyjjFSaeT5bhk6e3JGEYKPK4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR04MB7334
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> On 4/15/21 3:38 AM, Changheun Lee wrote:
-> > @@ -167,6 +168,7 @@ void blk_queue_max_hw_sectors(struct request_queue *q, unsigned int max_hw_secto
-> >  	max_sectors = round_down(max_sectors,
-> >  				 limits->logical_block_size >> SECTOR_SHIFT);
-> >  	limits->max_sectors = max_sectors;
-> > +	limits->bio_max_bytes = max_sectors << SECTOR_SHIFT;
-> >  
-> >  	q->backing_dev_info->io_pages = max_sectors >> (PAGE_SHIFT - 9);
-> >  }
-> 
-> Can the new shift operation overflow? If so, how about using
-> check_shl_overflow()?
-
-OK, I'll check.
-
-> 
-> > @@ -538,6 +540,8 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
-> >  {
-> >  	unsigned int top, bottom, alignment, ret = 0;
-> >  
-> > +	t->bio_max_bytes = min_not_zero(t->bio_max_bytes, b->bio_max_bytes);
-> > +
-> >  	t->max_sectors = min_not_zero(t->max_sectors, b->max_sectors);
-> >  	t->max_hw_sectors = min_not_zero(t->max_hw_sectors, b->max_hw_sectors);
-> >  	t->max_dev_sectors = min_not_zero(t->max_dev_sectors, b->max_dev_sectors);
-> 
-> The above will limit bio_max_bytes for all stacked block devices, which
-> is something we do not want. I propose to set t->bio_max_bytes to
-> UINT_MAX in blk_stack_limits() and to let the stacked driver (e.g.
-> dm-crypt) decide whether or not to lower that value.
-> 
-
-Actually, bio size should be limited in dm-crypt too. Because almost I/O
-from user space will be gone to dm-crypt first. I/O issue timing will be
-delayed if bio size is not limited in dm-crypt.
-Do you have any idea to decide whether takes lower bio max size, or not
-in the stacked driver?
-Add a flag to decide this in driver layer like before?
-Or insert code manually in each stacked driver if it is needed?
-
-> > diff --git a/include/linux/bio.h b/include/linux/bio.h
-> > index d0246c92a6e8..e5add63da3af 100644
-> > --- a/include/linux/bio.h
-> > +++ b/include/linux/bio.h
-> > @@ -106,6 +106,8 @@ static inline void *bio_data(struct bio *bio)
-> >  	return NULL;
-> >  }
-> >  
-> > +extern unsigned int bio_max_size(struct bio *bio);
-> 
-> You may want to define bio_max_size() as an inline function in bio.h
-> such that no additional function calls are introduced in the hot path.
-
-Thanks, I'll try.
-
-> 
-> Thanks,
-> 
-> Bart.
+Looks good,=0A=
+Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>=0A=
