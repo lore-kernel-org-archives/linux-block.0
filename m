@@ -2,171 +2,108 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98D93C433B4
-	for <linux-block@archiver.kernel.org>; Fri, 16 Apr 2021 20:52:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2C3CC433B4
+	for <linux-block@archiver.kernel.org>; Fri, 16 Apr 2021 21:17:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 605B9613CF
-	for <linux-block@archiver.kernel.org>; Fri, 16 Apr 2021 20:52:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8CCDD613CD
+	for <linux-block@archiver.kernel.org>; Fri, 16 Apr 2021 21:17:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236026AbhDPUxV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Apr 2021 16:53:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:43231 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234312AbhDPUxU (ORCPT
+        id S240303AbhDPVRv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Apr 2021 17:17:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49694 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240288AbhDPVRv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Apr 2021 16:53:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1618606375;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=QIz+7zTMpg5KYL5d7MD5C8AtmRz+4MZutLOb6AL1uNY=;
-        b=cwYhk47Rbn22JBjHSLw+YJXYcRDnLEEdNUaPibNzHeRb9DOYl+HAJwF+Lqf9sukMPlmh+2
-        A9v7LDqZL8ABT8ygW2Ng5mHb45znUMOFq8G2ZX9jI3mOuIG2C8sKHlN7UjrYt7wsBRZpdK
-        AJA4gLEU0asJSELKyTbMGZX0uQ7PiVY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-82-O2gbqR5mOBWpjC-tSQtMGw-1; Fri, 16 Apr 2021 16:52:38 -0400
-X-MC-Unique: O2gbqR5mOBWpjC-tSQtMGw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1FED018397A6;
-        Fri, 16 Apr 2021 20:52:37 +0000 (UTC)
-Received: from ovpn-112-203.phx2.redhat.com (ovpn-112-203.phx2.redhat.com [10.3.112.203])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6963F5D9C6;
-        Fri, 16 Apr 2021 20:52:31 +0000 (UTC)
-Message-ID: <d679b46e86ee719deb87bd151f01563b2af223d3.camel@redhat.com>
-Subject: Re: [PATCH v2 3/4] nvme: introduce FAILUP handling for
- REQ_FAILFAST_TRANSPORT
-From:   "Ewan D. Milne" <emilne@redhat.com>
-To:     Mike Snitzer <snitzer@redhat.com>, Christoph Hellwig <hch@lst.de>,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org
-Date:   Fri, 16 Apr 2021 16:52:31 -0400
-In-Reply-To: <20210415231530.95464-4-snitzer@redhat.com>
-References: <20210415231530.95464-1-snitzer@redhat.com>
-         <20210415231530.95464-4-snitzer@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+        Fri, 16 Apr 2021 17:17:51 -0400
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 784D8C061756
+        for <linux-block@vger.kernel.org>; Fri, 16 Apr 2021 14:17:26 -0700 (PDT)
+Received: by mail-pj1-x1031.google.com with SMTP id z22-20020a17090a0156b029014d4056663fso15301705pje.0
+        for <linux-block@vger.kernel.org>; Fri, 16 Apr 2021 14:17:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=gqseJO9CGkz4pjTNjpt/nx0Gv1B/seEPYR8+YldK4DQ=;
+        b=J+QPCrpx5ys3um23Pc3yHQNgbQBS4103CCl2Za2cJAFOtNUQmPpsfEQ74i71MpZBQC
+         2bYZNMCARMNZx4TEkbh+Gj5F6SWwVPT/WHUl6u0TXoUh4VeK1IXyW4zVQDg5MoZgsMx4
+         QBngws+jfRZ3sC63TPG+cOd6pcVqR0Xwcc9Fvc3cZruLBUpbtsN5XrIMkNAzXKR3IhHs
+         dkPkQ35otebcIopwyk+vV+f5YmNYkDJ7dqYJnrgn+sBYC5CfBGnHzWsSVo1laofykT2G
+         Q4N/UBuipQMC0Pzcxnl0zgyPYDXZyJEmryh+Yt5fb4MrcEjly7AGOpdfe30uAGvL4hm6
+         6Q7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=gqseJO9CGkz4pjTNjpt/nx0Gv1B/seEPYR8+YldK4DQ=;
+        b=ZkHRtteMoUdEtDf6FuWnuf1epeeP7kVnSB34lQJyU8o6czDI4rnrEkCfTFHXQjCcOC
+         97m69b+WeC85rO2+wy5lh7sO1c7C6OXvoQh2mds/q0M2hC+ckOMFYFsws3wEgDFLo4mp
+         QdleW8LMe2aJC/gcW8siken7drmbzONOX9cVc9cpc7ipbp/0++ZfUpZEczC6JJTEYpPl
+         cGv1Fkp44WA28s17NMovQ+5Wrn1bY5ZFcRIANbM3rR5fm//MyMuYUZqIy7InbCjOlflH
+         sXdmkCtm5DXKEhl3nA94TurOhqWtIPZkAi9fn/dXztuVwKwkGmUxBQJCxfxYkNth8o0D
+         mv8Q==
+X-Gm-Message-State: AOAM533enbVh4LX8893VKiyp5B9HuU02g3WLgNoeCGlDr7H6bcEyXf0O
+        u8p97mQvgmMc2OsKkk4rnsH03A==
+X-Google-Smtp-Source: ABdhPJycKk0fhXKxdfx45MkKO7GBaFwkMCNnqoM4DLdWSYUjMpfakDZWHaWqmCxWKbXspyPy9TVsow==
+X-Received: by 2002:a17:90a:7e03:: with SMTP id i3mr11562361pjl.234.1618607845801;
+        Fri, 16 Apr 2021 14:17:25 -0700 (PDT)
+Received: from [192.168.1.134] ([66.219.217.173])
+        by smtp.gmail.com with ESMTPSA id u18sm5444862pfm.4.2021.04.16.14.17.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 16 Apr 2021 14:17:25 -0700 (PDT)
+Subject: Re: [PATCH] blk-mq: Fix spurious debugfs directory creation during
+ initialization
+To:     Saravanan D <saravanand@fb.com>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     tj@kernel.org, kernel-team@fb.com
+References: <20210407175958.4129976-1-saravanand@fb.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <ab220998-cd24-e8e9-6694-f7143efc744a@kernel.dk>
+Date:   Fri, 16 Apr 2021 15:17:24 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+MIME-Version: 1.0
+In-Reply-To: <20210407175958.4129976-1-saravanand@fb.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 2021-04-15 at 19:15 -0400, Mike Snitzer wrote:
-> If REQ_FAILFAST_TRANSPORT is set it means the driver should not retry
-> IO that completed with transport errors. REQ_FAILFAST_TRANSPORT is
-> set by multipathing software (e.g. dm-multipath) before it issues IO.
+On 4/7/21 11:59 AM, Saravanan D wrote:
+> blk_mq_debugfs_register_sched_hctx() called from
+> device_add_disk()->elevator_init_mq()->blk_mq_init_sched()
+> initialization sequence does not have relevant parent directory
+> setup and thus spuriously attempts "sched" directory creation
+> from root mount of debugfs for every hw queue detected on the
+> block device
 > 
-> Update NVMe to allow failover of requests marked with either
-> REQ_NVME_MPATH or REQ_FAILFAST_TRANSPORT. This allows such requests
-> to be given a disposition of either FAILOVER or FAILUP respectively.
-> FAILUP handling ensures a retryable error is returned up from NVMe.
+> dmesg
+> ...
+> debugfs: Directory 'sched' with parent '/' already present!
+> debugfs: Directory 'sched' with parent '/' already present!
+> .
+> .
+> debugfs: Directory 'sched' with parent '/' already present!
+> ...
 > 
-> Introduce nvme_failup_req() for use in nvme_complete_rq() if
-> nvme_decide_disposition() returns FAILUP. nvme_failup_req() ensures
-> the request is completed with a retryable IO error when appropriate.
-> __nvme_end_req() was factored out for use by both nvme_end_req() and
-> nvme_failup_req().
+> The parent debugfs directory for hw queues get properly setup
+> device_add_disk()->blk_register_queue()->blk_mq_debugfs_register()
+> ->blk_mq_debugfs_register_hctx() later in the block device
+> initialization sequence.
 > 
-> Signed-off-by: Mike Snitzer <snitzer@redhat.com>
-> ---
->  drivers/nvme/host/core.c | 31 ++++++++++++++++++++++++++-----
->  1 file changed, 26 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-> index 4134cf3c7e48..10375197dd53 100644
-> --- a/drivers/nvme/host/core.c
-> +++ b/drivers/nvme/host/core.c
-> @@ -299,6 +299,7 @@ enum nvme_disposition {
->  	COMPLETE,
->  	RETRY,
->  	FAILOVER,
-> +	FAILUP,
->  };
->  
->  static inline enum nvme_disposition nvme_decide_disposition(struct
-> request *req)
-> @@ -318,10 +319,11 @@ static inline enum nvme_disposition
-> nvme_decide_disposition(struct request *req)
->  	    nvme_req(req)->retries >= nvme_max_retries)
->  		return COMPLETE;
->  
-> -	if (req->cmd_flags & REQ_NVME_MPATH) {
-> +	if (req->cmd_flags & (REQ_NVME_MPATH | REQ_FAILFAST_TRANSPORT))
-> {
->  		if (nvme_is_path_error(nvme_req(req)->status) ||
->  		    blk_queue_dying(req->q))
-> -			return FAILOVER;
-> +			return (req->cmd_flags & REQ_NVME_MPATH) ?
-> +				FAILOVER : FAILUP;
->  	} else {
->  		if (blk_queue_dying(req->q))
->  			return COMPLETE;
-> @@ -330,10 +332,8 @@ static inline enum nvme_disposition
-> nvme_decide_disposition(struct request *req)
->  	return RETRY;
->  }
->  
-> -static inline void nvme_end_req(struct request *req)
-> +static inline void __nvme_end_req(struct request *req, blk_status_t
-> status)
->  {
-> -	blk_status_t status = nvme_error_status(nvme_req(req)->status);
-> -
->  	if (IS_ENABLED(CONFIG_BLK_DEV_ZONED) &&
->  	    req_op(req) == REQ_OP_ZONE_APPEND)
->  		req->__sector = nvme_lba_to_sect(req->q->queuedata,
-> @@ -343,6 +343,24 @@ static inline void nvme_end_req(struct request
-> *req)
->  	blk_mq_end_request(req, status);
->  }
->  
-> +static inline void nvme_end_req(struct request *req)
-> +{
-> +	__nvme_end_req(req, nvme_error_status(nvme_req(req)->status));
-> +}
-> +
-> +static void nvme_failup_req(struct request *req)
-> +{
-> +	blk_status_t status = nvme_error_status(nvme_req(req)->status);
-> +
-> +	if (WARN_ON_ONCE(!blk_path_error(status))) {
-> +		pr_debug("Request meant for failover but blk_status_t
-> (errno=%d) was not retryable.\n",
-> +			 blk_status_to_errno(status));
-> +		status = BLK_STS_IOERR;
-> +	}
-> +
-> +	__nvme_end_req(req, status);
+> A simple check for debugfs_dir has been added to thwart premature
+> debugfs directory/file creation attempts.
 
-It seems like adding __nvme_end_req() was unnecessary, since
-nvme_end_req() just calls it and does nothing else?
+Applied, thanks.
 
--Ewan
-
-> +}
-> +
->  void nvme_complete_rq(struct request *req)
->  {
->  	trace_nvme_complete_rq(req);
-> @@ -361,6 +379,9 @@ void nvme_complete_rq(struct request *req)
->  	case FAILOVER:
->  		nvme_failover_req(req);
->  		return;
-> +	case FAILUP:
-> +		nvme_failup_req(req);
-> +		return;
->  	}
->  }
->  EXPORT_SYMBOL_GPL(nvme_complete_rq);
+-- 
+Jens Axboe
 
