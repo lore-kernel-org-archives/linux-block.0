@@ -2,120 +2,151 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 768FBC433B4
-	for <linux-block@archiver.kernel.org>; Fri, 16 Apr 2021 02:15:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86395C43460
+	for <linux-block@archiver.kernel.org>; Fri, 16 Apr 2021 03:05:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4001061002
-	for <linux-block@archiver.kernel.org>; Fri, 16 Apr 2021 02:15:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6AD0161152
+	for <linux-block@archiver.kernel.org>; Fri, 16 Apr 2021 03:05:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235110AbhDPCP3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Apr 2021 22:15:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:46418 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235057AbhDPCP3 (ORCPT
+        id S234768AbhDPDFz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Apr 2021 23:05:55 -0400
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:63371 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234751AbhDPDFz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Apr 2021 22:15:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1618539305;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=NtUYVy/xaclh6IHTZhhHN0cvRVFfOsj+jeNxCiXaxeg=;
-        b=Gkwr5HVz/X8F/9NXx4YapnmOsgaaopiofoGsYZzvJfItnr2yFXdaGZ7gEURXciLpLw++6F
-        6+3cGg+TyF9LYPs5zd82QKp5KJTvUB7ZINdBj8bYfcNSLtjcVNJRneCdM84uk8VKRFhtxC
-        IaAqr/xdj1RVvDbKqZ0rKEAjccuLlfg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-428-Z-eyIDWeMbKlSmag4j7wtA-1; Thu, 15 Apr 2021 22:15:01 -0400
-X-MC-Unique: Z-eyIDWeMbKlSmag4j7wtA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9B5FF881D72;
-        Fri, 16 Apr 2021 02:15:00 +0000 (UTC)
-Received: from T590 (ovpn-12-36.pek2.redhat.com [10.72.12.36])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 234DA5D9DE;
-        Fri, 16 Apr 2021 02:14:52 +0000 (UTC)
-Date:   Fri, 16 Apr 2021 10:14:48 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Lin Feng <linf@wangsu.com>
-Cc:     axboe@kernel.dk, paolo.valente@linaro.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 2/2] bfq/mq-deadline: remove redundant check for
- passthrough request
-Message-ID: <YHjzGPO+SoHMEghy@T590>
-References: <20210415034326.214227-1-linf@wangsu.com>
+        Thu, 15 Apr 2021 23:05:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1618542330; x=1650078330;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=vUztHQeoC7q+dlfBS4+pbWv7aImp+UXJRbacb2BFxI8=;
+  b=DqNG00SIyRf5dUHR46SUfQZXuQVOwuY2+kATozprSlGw0ax3NRa8hKjW
+   ZRUdEfTJqQ65qDsNxTZPqyaofawIHXYEfnWmNnTfD6ruXF1x4r9pHmKl6
+   GdZx2EtJDWeuzj1k85SAs6KbzqjKWwINPeqdBVJhAtvNN4+NMozSlSNfK
+   kY86hGSah7Hld25qLt91ra56Wl8X63TKXHcRj8Aa8Pien8eEmXx+4KGa6
+   S+G5gxOuRu8fRi7sRoju2thqd/04+NCb1nGn/fCeJmldlHxJHtssqYb8e
+   kzPACSSOvFZsiUYscIVeILz9YMzGOOypZPlHQjq+M/UirrCj0YkamcVmR
+   g==;
+IronPort-SDR: BlLgXTtMDWfeVwZUUPg2+J3v5fhkcbdHXJ5N017M7Ar9ucFN1ynHUyTFGxF6OhodK5gZCcT204
+ 9UOd37heNlCeFiF67xDuj6dxAMCv2HpL+gRh28thl27Qdry2pcs+bQ3zulBb5t2uBLv5c7pYuz
+ trkhFAd/KGuo6bf2g+99YsF4YnhavvmKOI8VB6yPqK8+69LhLajDr76Wvn3s1qgBrf2kST6yIv
+ iJyHR6jiKtzKGEpwLEqzWQvrnkxt6/QM/Kb3pSUyNB9uvGOqwwCdRSZVCDNwJbom7ls3J9qLwm
+ 9rc=
+X-IronPort-AV: E=Sophos;i="5.82,226,1613404800"; 
+   d="scan'208";a="169567850"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 16 Apr 2021 11:05:29 +0800
+IronPort-SDR: 4hIfWk7dqM1i6o8CppCZiRBg+JyZk0DZ0y9DXTzSl4da20/Doi1EWrYf6F03TfFRyHr/Wc7v9u
+ X1KRPm9Tkk2+2sVUrjQn+vmcgDOFttHK1qCsXjS836YFLnUwO9NKeU7w6N/VN33bbqH2EUJGZG
+ 4bWwQ+6smbMegX2hQQjyehB/t+hyKorOpX5JUO3Szs1aNP3fllqhbF8n/j2UHgbzz/m1Z4B1rM
+ YI/11ukia/3ylImRsA2APdOomTYbuWfc7M2zT8Zpjp9Icld7NYhSsnfXt27O9EvEC5S8WERpN8
+ DauQ5ZxEYMjfkWkoJ8qfY6oH
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2021 19:44:48 -0700
+IronPort-SDR: 5uaHx0ME4yfxIf/TiutCrTMnLjb2kBOpJtRTKSLg4tH5AbhRWHekMEEGKLa3AXqEYy3a31snCo
+ ElUXAQxKJQa6aOhWFDCPzlc/IpBsAx5KR6EDXe2ZmlnAA88cCbpAMSRLACPaVf/fHSYLQd8IgO
+ DxavW3RSuugPmrGUFvYDSFHbIBbCHilMvHw4PQpzJEgqusd0uGMzfwXRxK2a2urB4I+6r1cg8f
+ s/TX9LXikk5YOZaAYTcUE+pTyB5gwDGLNtSP+JbbsKm5Z1xjY+x4TV2Bu/ZpK3jUK5XA0aSsC7
+ IoM=
+WDCIronportException: Internal
+Received: from washi.fujisawa.hgst.com ([10.149.53.254])
+  by uls-op-cesaip02.wdc.com with ESMTP; 15 Apr 2021 20:05:29 -0700
+From:   Damien Le Moal <damien.lemoal@wdc.com>
+To:     dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-fsdevel@vger.kernel.org, linux-btrfs@vger.kernel.org,
+        David Sterba <dsterba@suse.com>,
+        Josef Bacik <josef@toxicpanda.com>
+Cc:     Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        Naohiro Aota <naohiro.aota@wdc.com>
+Subject: [PATCH 0/4] Fix dm-crypt zoned block device support
+Date:   Fri, 16 Apr 2021 12:05:24 +0900
+Message-Id: <20210416030528.757513-1-damien.lemoal@wdc.com>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210415034326.214227-1-linf@wangsu.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Apr 15, 2021 at 11:43:26AM +0800, Lin Feng wrote:
-> Since commit 01e99aeca39796003 'blk-mq: insert passthrough request into
-> hctx->dispatch directly', passthrough request should not appear in
-> IO-scheduler any more, so blk_rq_is_passthrough checking in addon IO
-> schedulers is redundant.
-> 
-> (Notes: this patch passes generic IO load test with hdds under SAS
-> controller and hdds under AHCI controller but obviously not covers all.
-> Not sure if passthrough request can still escape into IO scheduler from
-> blk_mq_sched_insert_requests, which is used by blk_mq_flush_plug_list and
-> has lots of indirect callers.)
-> 
-> Signed-off-by: Lin Feng <linf@wangsu.com>
-> ---
->  block/bfq-iosched.c | 2 +-
->  block/mq-deadline.c | 7 ++-----
->  2 files changed, 3 insertions(+), 6 deletions(-)
-> 
-> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-> index 95586137194e..b827c9212b02 100644
-> --- a/block/bfq-iosched.c
-> +++ b/block/bfq-iosched.c
-> @@ -5627,7 +5627,7 @@ static void bfq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
->  
->  	spin_lock_irq(&bfqd->lock);
->  	bfqq = bfq_init_rq(rq);
-> -	if (!bfqq || at_head || blk_rq_is_passthrough(rq)) {
-> +	if (!bfqq || at_head) {
->  		if (at_head)
->  			list_add(&rq->queuelist, &bfqd->dispatch);
->  		else
-> diff --git a/block/mq-deadline.c b/block/mq-deadline.c
-> index f3631a287466..04aded71ead2 100644
-> --- a/block/mq-deadline.c
-> +++ b/block/mq-deadline.c
-> @@ -500,11 +500,8 @@ static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
->  
->  	trace_block_rq_insert(rq);
->  
-> -	if (at_head || blk_rq_is_passthrough(rq)) {
-> -		if (at_head)
-> -			list_add(&rq->queuelist, &dd->dispatch);
-> -		else
-> -			list_add_tail(&rq->queuelist, &dd->dispatch);
-> +	if (at_head) {
-> +		list_add(&rq->queuelist, &dd->dispatch);
->  	} else {
->  		deadline_add_rq_rb(dd, rq);
->  
-> -- 
-> 2.30.2
-> 
+Mike,
 
-Looks fine:
+Zone append BIOs (REQ_OP_ZONE_APPEND) always specify the start sector
+of the zone to be written instead of the actual location sector to
+write. The write location is determined by the device and returned to
+the host upon completion of the operation.
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+This interface, while simple and efficient for writing into sequential
+zones of a zoned block device, is incompatible with the use of sector
+values to calculate a cypher block IV. All data written in a zone is
+encrypted using an IV calculated from the first sectors of the zone,
+but read operation will specify any sector within the zone, resulting
+in an IV mismatch between encryption and decryption. Reads fail in that
+case.
 
-Thanks,
-Ming
+Using a single sector value (e.g. the zone start sector) for all read
+and writes into a zone can solve this problem, but at the cost of
+weakening the cypher chosen by the user. Emulating zone append using
+regular writes would be another potential solution, but it is complex
+and would add a lot of overhead.
+
+Instead, to solve this problem, explicitly disable support for zone
+append operations in dm-crypt if the target was setup using a cypher IV
+mode using sector values. The null and random IV modes can still be used
+with zone append operations. This lack of support for zone append is
+exposed to the user by setting the dm-crypt target queue limit
+max_zone_append_sectors to 0. This change is done in patch 1 and 2.
+
+Patch 3 addresses btrfs-zoned case. Zone append write are used for all
+file data blocks write. The change introduced fails mounting a zoned
+btrfs volume if the underlying device max_zone_append_sectors limit is
+0.
+
+Patch 4 fixes zonefs to fall back to using regular write when
+max_zone_append_sectors is 0.
+
+Overall, these changes do not break user space:
+1) There is no interface allowing a user to use zone append write
+without a file system. So applications using directly a raw dm-crypt
+device will continue working using regular write operations.
+2) btrfs zoned support was added in 5.12. Anybody trying btrfs-zoned on
+top of dm-crypt would have faced the read failures already. So there
+are no existing deployments to preserve. Same for zonefs.
+
+For file systems, using zone append with encryption will need to be
+supported within the file system (e.g. fscrypt). In this case, cypher IV
+calculation can rely for instance on file block offsets as these are
+known before a zone append operation write these blocks to disk at
+unknown locations.
+
+Reviews and comments are very much welcome.
+
+Damien Le Moal (3):
+  dm: Introduce zone append support control
+  dm crypt: Fix zoned block device support
+  zonefs: fix synchronous write to sequential zone files
+
+Johannes Thumshirn (1):
+  btrfs: zoned: fail mount if the device does not support zone append
+
+ drivers/md/dm-crypt.c         | 48 ++++++++++++++++++++++++++++-------
+ drivers/md/dm-table.c         | 41 ++++++++++++++++++++++++++++++
+ fs/btrfs/zoned.c              |  7 +++++
+ fs/zonefs/super.c             | 16 +++++++++---
+ fs/zonefs/zonefs.h            |  2 ++
+ include/linux/device-mapper.h |  6 +++++
+ 6 files changed, 107 insertions(+), 13 deletions(-)
+
+-- 
+2.30.2
 
