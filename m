@@ -2,43 +2,43 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23A0EC433ED
-	for <linux-block@archiver.kernel.org>; Fri, 16 Apr 2021 13:51:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CFB5C433B4
+	for <linux-block@archiver.kernel.org>; Fri, 16 Apr 2021 14:01:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 01CB361152
-	for <linux-block@archiver.kernel.org>; Fri, 16 Apr 2021 13:51:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 348926117A
+	for <linux-block@archiver.kernel.org>; Fri, 16 Apr 2021 14:01:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240732AbhDPNwA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Apr 2021 09:52:00 -0400
-Received: from mx2.suse.de ([195.135.220.15]:38118 "EHLO mx2.suse.de"
+        id S235796AbhDPOB1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Apr 2021 10:01:27 -0400
+Received: from mx2.suse.de ([195.135.220.15]:52300 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S240498AbhDPNwA (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Apr 2021 09:52:00 -0400
+        id S235196AbhDPOB0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 16 Apr 2021 10:01:26 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 88BDFB12D;
-        Fri, 16 Apr 2021 13:51:34 +0000 (UTC)
-Subject: Re: [PATCH v2 1/4] nvme: return BLK_STS_DO_NOT_RETRY if the DNR bit
- is set
+        by mx2.suse.de (Postfix) with ESMTP id 0484EB12D;
+        Fri, 16 Apr 2021 14:01:01 +0000 (UTC)
 To:     Mike Snitzer <snitzer@redhat.com>, Christoph Hellwig <hch@lst.de>,
         Jens Axboe <axboe@kernel.dk>
 Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org
+        linux-nvme@lists.infradead.org, Chao Leng <lengchao@huawei.com>
 References: <20210415231530.95464-1-snitzer@redhat.com>
- <20210415231530.95464-2-snitzer@redhat.com>
+ <20210415231530.95464-3-snitzer@redhat.com>
 From:   Hannes Reinecke <hare@suse.de>
 Organization: SUSE Linux GmbH
-Message-ID: <afeb4a15-eed3-9544-439e-f69b9eff5ad7@suse.de>
-Date:   Fri, 16 Apr 2021 15:51:33 +0200
+Subject: Re: [PATCH v2 2/4] nvme: allow local retry for requests with
+ REQ_FAILFAST_TRANSPORT set
+Message-ID: <da184561-2c97-5807-5c5b-9cc6593693c6@suse.de>
+Date:   Fri, 16 Apr 2021 16:01:00 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.8.0
 MIME-Version: 1.0
-In-Reply-To: <20210415231530.95464-2-snitzer@redhat.com>
+In-Reply-To: <20210415231530.95464-3-snitzer@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -47,65 +47,65 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 4/16/21 1:15 AM, Mike Snitzer wrote:
-> If the DNR bit is set we should not retry the command.
+> From: Chao Leng <lengchao@huawei.com>
 > 
-> We care about the retryable vs not retryable distinction at the block
-> layer so propagate the equivalent of the DNR bit by introducing
-> BLK_STS_DO_NOT_RETRY. Update blk_path_error() to _not_ retry if it
-> is set.
+> REQ_FAILFAST_TRANSPORT was designed for SCSI, because the SCSI protocol
+> does not define the local retry mechanism. SCSI implements a fuzzy
+> local retry mechanism, so REQ_FAILFAST_TRANSPORT is needed to allow
+> higher-level multipathing software to perform failover/retry.
 > 
-> This change runs with the suggestion made here:
-> https://lore.kernel.org/linux-nvme/20190813170144.GA10269@lst.de/
+> NVMe is different with SCSI about this. It defines a local retry
+> mechanism and path error codes, so NVMe should retry local for non
+> path error. If path related error, whether to retry and how to retry
+> is still determined by higher-level multipathing's failover.
 > 
-> Suggested-by: Christoph Hellwig <hch@lst.de>
+> Unlike SCSI, NVMe shouldn't prevent retry if REQ_FAILFAST_TRANSPORT
+> because NVMe's local retry is needed -- as is NVMe specific logic to
+> categorize whether an error is path related.
+> 
+> In this way, the mechanism of NVMe multipath or other multipath are
+> now equivalent. The mechanism is: non path related error will be
+> retried locally, path related error is handled by multipath.
+> 
+> Signed-off-by: Chao Leng <lengchao@huawei.com>
+> [snitzer: edited header for grammar and clarity, also added code comment]
 > Signed-off-by: Mike Snitzer <snitzer@redhat.com>
 > ---
->  drivers/nvme/host/core.c  | 3 +++
->  include/linux/blk_types.h | 8 ++++++++
->  2 files changed, 11 insertions(+)
+>  drivers/nvme/host/core.c | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
 > 
 > diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-> index 0896e21642be..540d6fd8ffef 100644
+> index 540d6fd8ffef..4134cf3c7e48 100644
 > --- a/drivers/nvme/host/core.c
 > +++ b/drivers/nvme/host/core.c
-> @@ -237,6 +237,9 @@ static void nvme_delete_ctrl_sync(struct nvme_ctrl *ctrl)
+> @@ -306,7 +306,14 @@ static inline enum nvme_disposition nvme_decide_disposition(struct request *req)
+>  	if (likely(nvme_req(req)->status == 0))
+>  		return COMPLETE;
 >  
->  static blk_status_t nvme_error_status(u16 status)
->  {
-> +	if (unlikely(status & NVME_SC_DNR))
-> +		return BLK_STS_DO_NOT_RETRY;
-> +
->  	switch (status & 0x7ff) {
->  	case NVME_SC_SUCCESS:
->  		return BLK_STS_OK;
-> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-> index db026b6ec15a..1ca724948c56 100644
-> --- a/include/linux/blk_types.h
-> +++ b/include/linux/blk_types.h
-> @@ -142,6 +142,13 @@ typedef u8 __bitwise blk_status_t;
->   */
->  #define BLK_STS_ZONE_ACTIVE_RESOURCE	((__force blk_status_t)16)
->  
-> +/*
-> + * BLK_STS_DO_NOT_RETRY is returned from the driver in the completion path
-> + * if the device returns a status indicating that if the same command is
-> + * re-submitted it is expected to fail.
-> + */
-> +#define BLK_STS_DO_NOT_RETRY	((__force blk_status_t)17)
-> +
->  /**
->   * blk_path_error - returns true if error may be path related
->   * @error: status the request was completed with
-> @@ -157,6 +164,7 @@ typedef u8 __bitwise blk_status_t;
->  static inline bool blk_path_error(blk_status_t error)
->  {
->  	switch (error) {
-> +	case BLK_STS_DO_NOT_RETRY:
->  	case BLK_STS_NOTSUPP:
->  	case BLK_STS_NOSPC:
->  	case BLK_STS_TARGET:
+> -	if (blk_noretry_request(req) ||
+> +	/*
+> +	 * REQ_FAILFAST_TRANSPORT is set by upper layer software that
+> +	 * handles multipathing. Unlike SCSI, NVMe's error handling was
+> +	 * specifically designed to handle local retry for non-path errors.
+> +	 * As such, allow NVMe's local retry mechanism to be used for
+> +	 * requests marked with REQ_FAILFAST_TRANSPORT.
+> +	 */
+> +	if ((req->cmd_flags & (REQ_FAILFAST_DEV | REQ_FAILFAST_DRIVER)) ||
+>  	    (nvme_req(req)->status & NVME_SC_DNR) ||
+>  	    nvme_req(req)->retries >= nvme_max_retries)
+>  		return COMPLETE;
 > 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+Huh?
+
+#define blk_noretry_request(rq) \
+        ((rq)->cmd_flags & (REQ_FAILFAST_DEV|REQ_FAILFAST_TRANSPORT| \
+                             REQ_FAILFAST_DRIVER))
+
+making the only _actual_ change in your patch _not_ evaluating the
+REQ_FAILFAST_DRIVER, which incidentally is only used by the NVMe core.
+So what is it you're trying to solve?
+
+Cheers,
 
 Hannes
 -- 
