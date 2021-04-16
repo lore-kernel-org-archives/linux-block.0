@@ -2,41 +2,75 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD493C433B4
-	for <linux-block@archiver.kernel.org>; Fri, 16 Apr 2021 10:20:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 417E7C433ED
+	for <linux-block@archiver.kernel.org>; Fri, 16 Apr 2021 12:01:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ACDF36115B
-	for <linux-block@archiver.kernel.org>; Fri, 16 Apr 2021 10:20:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 11879611AB
+	for <linux-block@archiver.kernel.org>; Fri, 16 Apr 2021 12:01:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235192AbhDPKUs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Apr 2021 06:20:48 -0400
-Received: from out30-131.freemail.mail.aliyun.com ([115.124.30.131]:46971 "EHLO
-        out30-131.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235167AbhDPKUs (ORCPT
+        id S234774AbhDPMCV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Apr 2021 08:02:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38648 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233955AbhDPMCV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Apr 2021 06:20:48 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R171e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e01424;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=5;SR=0;TI=SMTPD_---0UVk99mh_1618568422;
-Received: from admindeMacBook-Pro-2.local(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0UVk99mh_1618568422)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Fri, 16 Apr 2021 18:20:22 +0800
-Subject: Re: [PATCH] block: introduce QUEUE_FLAG_POLL_CAP flag
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     snitzer@redhat.com, axboe@kernel.dk, linux-block@vger.kernel.org,
-        dm-devel@redhat.com
-References: <20210401021927.343727-12-ming.lei@redhat.com>
- <20210416080037.26335-1-jefflexu@linux.alibaba.com> <YHlTtVtTEBpxa8Gh@T590>
-From:   JeffleXu <jefflexu@linux.alibaba.com>
-Message-ID: <bb95d78b-9924-7c4c-5314-f221af524619@linux.alibaba.com>
-Date:   Fri, 16 Apr 2021 18:20:22 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.7.1
+        Fri, 16 Apr 2021 08:02:21 -0400
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6468C061756
+        for <linux-block@vger.kernel.org>; Fri, 16 Apr 2021 05:01:56 -0700 (PDT)
+Received: by mail-pf1-x42d.google.com with SMTP id o123so18203445pfb.4
+        for <linux-block@vger.kernel.org>; Fri, 16 Apr 2021 05:01:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=Nlwm5oBPcozztWhDnHBmZ3FOanUvUsMljuyTpGmR4ak=;
+        b=Lmpmjo2CV2hkepVmKNkD6XFT9/9ZMWi3NS8ObapbH6ftHjCkMuQLE63erPALRtJCVu
+         Eb7Oob3jBF92AfrEswgvy06yykWNXV6n0zxGo3hp/+B8pKUURpzQNqR+8O/PByHJ1Agz
+         hBzu2sMeQNQjI4hRx6HmxAbwzKT9aDoEvlQphT+xF8PSrShyPD9dAoSCvScixdhIkqze
+         6/vy6ItBm8jmZEBeDYryiP9D7j491JaNweew05S3P7kvIMwXaGBD101burPrhkqRVtPG
+         8rVkQj7I+Lu6stcizt4GrD+WmC19tv3UxYMJs1S7WOeZ+0yko14tPFFxpZj9aCdWWEm9
+         4H3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Nlwm5oBPcozztWhDnHBmZ3FOanUvUsMljuyTpGmR4ak=;
+        b=MLQZm/k+7/3wdm1IpnUjkGGPB5NBkqstSDLT1k6paIsVQsMfpts6/W/MNHwhbkSkmc
+         /hqXTGoc8gpbvPHr3nx8zDaW9xd492XuJGm/kM/+kAk+tVmAC3xu2WgWEWNvC4aL8e/3
+         o4ucSO2VKwgGPYOZekdC4Cew2RIFfxIOuJ59Y9q+zaY24n9V4LIhMZqHxnCrszOSXwYH
+         xGqyDx9J8rAx/hnkldojc+khEX5G0s4y5Bo0XgOwXuVIlKogaZt95OiBF8dD+CeeMlsq
+         IwjwueDjPPZARkevjw4kBxkOV4+dqGw1Kxoy/oWcvUnIGZVtN66ggvHxz0tjOpDLezc1
+         4gOw==
+X-Gm-Message-State: AOAM532S52U8pbUjJVRtKcAajsokZhRymWf95SpHkPHXAFkI8ZCO230D
+        eWQB5doYg6Lbu4HQdN9tQtfmjw==
+X-Google-Smtp-Source: ABdhPJzB+9D4aQd7geRA/NwytFHoQqtPSJP7j5IwK3OjxGy15FDgUc3wFp+r/XFeBuUIEh1yNbj6fQ==
+X-Received: by 2002:a63:4f59:: with SMTP id p25mr7719908pgl.21.1618574516094;
+        Fri, 16 Apr 2021 05:01:56 -0700 (PDT)
+Received: from [192.168.1.134] ([66.219.217.173])
+        by smtp.gmail.com with ESMTPSA id t67sm4917308pfb.210.2021.04.16.05.01.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 16 Apr 2021 05:01:55 -0700 (PDT)
+Subject: Re: [PATCH 13/13] bcache: use div_u64() in init_owner_info()
+To:     Coly Li <colyli@suse.de>
+Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        jianpeng.ma@intel.com, qiaowei.ren@intel.com,
+        kernel test robot <lkp@intel.com>
+References: <20210414054648.24098-1-colyli@suse.de>
+ <20210414054648.24098-14-colyli@suse.de>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <5fb40457-e1d1-cf45-e8a3-c4c88f575221@kernel.dk>
+Date:   Fri, 16 Apr 2021 06:01:55 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <YHlTtVtTEBpxa8Gh@T590>
+In-Reply-To: <20210414054648.24098-14-colyli@suse.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -44,54 +78,18 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 4/16/21 5:07 PM, Ming Lei wrote:
-> On Fri, Apr 16, 2021 at 04:00:37PM +0800, Jeffle Xu wrote:
->> Hi,
->> How about this patch to remove the extra poll_capable() method?
->>
->> And the following 'dm: support IO polling for bio-based dm device' needs
->> following change.
->>
->> ```
->> +       /*
->> +        * Check for request-based device is remained to
->> +        * dm_mq_init_request_queue()->blk_mq_init_allocated_queue().
->> +        * For bio-based device, only set QUEUE_FLAG_POLL when all underlying
->> +        * devices supporting polling.
->> +        */
->> +       if (__table_type_bio_based(t->type)) {
->> +               if (dm_table_supports_poll(t)) {
->> +                       blk_queue_flag_set(QUEUE_FLAG_POLL_CAP, q);
->> +                       blk_queue_flag_set(QUEUE_FLAG_POLL, q);
->> +               }
->> +               else {
->> +                       blk_queue_flag_clear(QUEUE_FLAG_POLL, q);
->> +                       blk_queue_flag_clear(QUEUE_FLAG_POLL_CAP, q);
->> +               }
->> +       }
->> ```
+On 4/13/21 11:46 PM, Coly Li wrote:
+> Kernel test robot reports the built-in u64/u32 in init_owner_info()
+> doesn't work for m68k arch, the explicit div_u64() should be used.
 > 
-> Frankly speaking, I don't see any value of using QUEUE_FLAG_POLL_CAP for
-> DM, and the result is basically subset of treating DM as always being capable
-> of polling.
-> 
-> Also underlying queue change(either limits or flag) won't be propagated
-> to DM/MD automatically. Strictly speaking it doesn't matter if all underlying
-> queues are capable of supporting polling at the exact time of 'write sysfs/poll',
-> cause any of them may change in future.
+> This patch explicit uses div_u64() to do the u64/u32 division on
+> 32bit m68k arch.
 
-Yes it is.
-
-> 
-> So why not start with the simplest approach(always capable of polling)
-> which does meet normal bio based polling requirement?
-> 
-
-I agree if we have no better way. Though the handling of "sysfs/io_poll"
-is somehow inconsistent between blk-mq and bio-based device then.
+This should just be folded into `bcache: initialization of the buddy`
+instead of being a separate patch. This is basically identical to what
+we talked about for the 1st series, just fold in patches that fix
+issues in that very series. No point in having them separate.
 
 -- 
-Thanks,
-Jeffle
+Jens Axboe
+
