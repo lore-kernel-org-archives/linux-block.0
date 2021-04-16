@@ -2,138 +2,110 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4D89C433B4
-	for <linux-block@archiver.kernel.org>; Fri, 16 Apr 2021 14:53:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F2E6C433B4
+	for <linux-block@archiver.kernel.org>; Fri, 16 Apr 2021 15:01:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A768561166
-	for <linux-block@archiver.kernel.org>; Fri, 16 Apr 2021 14:53:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F37E661184
+	for <linux-block@archiver.kernel.org>; Fri, 16 Apr 2021 15:01:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235877AbhDPOyP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Apr 2021 10:54:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:25537 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233916AbhDPOyP (ORCPT
+        id S244855AbhDPPCL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Apr 2021 11:02:11 -0400
+Received: from frasgout.his.huawei.com ([185.176.79.56]:2874 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236384AbhDPPCL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Apr 2021 10:54:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1618584830;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=EpMX9YVvuW9vjoyNtTGCOLzykDR5ZQD680fLHRs3kog=;
-        b=VkBW3uF+XaN7+/TQCJndy5R2v7rxIygCvUR5vKNIT4O1LZ8HjOj1ZqPWqO1jxw4uN8wun1
-        rQ6sLwCkof3P6/rT5sIcikL3gLXVQ26jDYWMWO18WqaA/0fI3I4djkLCVZCqZVCL4XYw+s
-        +FetqkmbSbRTME+/R4pcfOqDnZIzKEc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-374-EFLytdQcMEa8zICGLZ5Wcw-1; Fri, 16 Apr 2021 10:53:45 -0400
-X-MC-Unique: EFLytdQcMEa8zICGLZ5Wcw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CB3C1501E1;
-        Fri, 16 Apr 2021 14:53:44 +0000 (UTC)
-Received: from localhost (unknown [10.18.25.174])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 274AE5D9C0;
-        Fri, 16 Apr 2021 14:53:41 +0000 (UTC)
-Date:   Fri, 16 Apr 2021 10:53:40 -0400
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        dm-devel@redhat.com, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org, Chao Leng <lengchao@huawei.com>
-Subject: Re: [PATCH v2 2/4] nvme: allow local retry for requests with
- REQ_FAILFAST_TRANSPORT set
-Message-ID: <20210416145340.GB16047@redhat.com>
-References: <20210415231530.95464-1-snitzer@redhat.com>
- <20210415231530.95464-3-snitzer@redhat.com>
- <da184561-2c97-5807-5c5b-9cc6593693c6@suse.de>
+        Fri, 16 Apr 2021 11:02:11 -0400
+Received: from fraeml707-chm.china.huawei.com (unknown [172.18.147.226])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4FMK4106jLz689yY;
+        Fri, 16 Apr 2021 22:54:25 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml707-chm.china.huawei.com (10.206.15.35) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Fri, 16 Apr 2021 17:01:45 +0200
+Received: from [10.47.83.179] (10.47.83.179) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2106.2; Fri, 16 Apr
+ 2021 16:01:44 +0100
+Subject: Re: [bug report] shared tags causes IO hang and performance drop
+To:     Ming Lei <ming.lei@redhat.com>
+CC:     Kashyap Desai <kashyap.desai@broadcom.com>,
+        <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Douglas Gilbert <dgilbert@interlog.com>
+References: <9a6145a5-e6ac-3d33-b52a-0823bfc3b864@huawei.com>
+ <cb326d404c6e0785d03a7dfadc42832c@mail.gmail.com> <YHbOOfGNHwO4SMS7@T590>
+ <87ceccf2-287b-9bd1-899a-f15026c9e65b@huawei.com> <YHe3M62agQET6o6O@T590>
+ <3e76ffc7-1d71-83b6-ef5b-3986e947e372@huawei.com> <YHgvMAHqIq9f6pQn@T590>
+ <f66f9204-83ff-48d4-dbf4-4a5e1dc100b7@huawei.com> <YHjeUrCTbrSft18t@T590>
+ <217e4cc1-c915-0e95-1d1c-4a11496080d6@huawei.com> <YHlNS3RqsYDMA3jQ@T590>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <89ebc37c-21d6-c57e-4267-cac49a3e5953@huawei.com>
+Date:   Fri, 16 Apr 2021 15:59:08 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <da184561-2c97-5807-5c5b-9cc6593693c6@suse.de>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <YHlNS3RqsYDMA3jQ@T590>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.47.83.179]
+X-ClientProxiedBy: lhreml727-chm.china.huawei.com (10.201.108.78) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Apr 16 2021 at 10:01am -0400,
-Hannes Reinecke <hare@suse.de> wrote:
+On 16/04/2021 09:39, Ming Lei wrote:
+> On Fri, Apr 16, 2021 at 09:29:37AM +0100, John Garry wrote:
+>> On 16/04/2021 01:46, Ming Lei wrote:
+>>>> I can't seem to recreate your same issue. Are you mainline defconfig, or a
+>>>> special disto config?
+>>> The config is rhel8 config.
+>>>
+>> Can you share that? Has anyone tested against mainline x86 config?
+> Sure, see the attachment.
 
-> On 4/16/21 1:15 AM, Mike Snitzer wrote:
-> > From: Chao Leng <lengchao@huawei.com>
-> > 
-> > REQ_FAILFAST_TRANSPORT was designed for SCSI, because the SCSI protocol
-> > does not define the local retry mechanism. SCSI implements a fuzzy
-> > local retry mechanism, so REQ_FAILFAST_TRANSPORT is needed to allow
-> > higher-level multipathing software to perform failover/retry.
-> > 
-> > NVMe is different with SCSI about this. It defines a local retry
-> > mechanism and path error codes, so NVMe should retry local for non
-> > path error. If path related error, whether to retry and how to retry
-> > is still determined by higher-level multipathing's failover.
-> > 
-> > Unlike SCSI, NVMe shouldn't prevent retry if REQ_FAILFAST_TRANSPORT
-> > because NVMe's local retry is needed -- as is NVMe specific logic to
-> > categorize whether an error is path related.
-> > 
-> > In this way, the mechanism of NVMe multipath or other multipath are
-> > now equivalent. The mechanism is: non path related error will be
-> > retried locally, path related error is handled by multipath.
-> > 
-> > Signed-off-by: Chao Leng <lengchao@huawei.com>
-> > [snitzer: edited header for grammar and clarity, also added code comment]
-> > Signed-off-by: Mike Snitzer <snitzer@redhat.com>
-> > ---
-> >  drivers/nvme/host/core.c | 9 ++++++++-
-> >  1 file changed, 8 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-> > index 540d6fd8ffef..4134cf3c7e48 100644
-> > --- a/drivers/nvme/host/core.c
-> > +++ b/drivers/nvme/host/core.c
-> > @@ -306,7 +306,14 @@ static inline enum nvme_disposition nvme_decide_disposition(struct request *req)
-> >  	if (likely(nvme_req(req)->status == 0))
-> >  		return COMPLETE;
-> >  
-> > -	if (blk_noretry_request(req) ||
-> > +	/*
-> > +	 * REQ_FAILFAST_TRANSPORT is set by upper layer software that
-> > +	 * handles multipathing. Unlike SCSI, NVMe's error handling was
-> > +	 * specifically designed to handle local retry for non-path errors.
-> > +	 * As such, allow NVMe's local retry mechanism to be used for
-> > +	 * requests marked with REQ_FAILFAST_TRANSPORT.
-> > +	 */
-> > +	if ((req->cmd_flags & (REQ_FAILFAST_DEV | REQ_FAILFAST_DRIVER)) ||
-> >  	    (nvme_req(req)->status & NVME_SC_DNR) ||
-> >  	    nvme_req(req)->retries >= nvme_max_retries)
-> >  		return COMPLETE;
-> > 
-> Huh?
-> 
-> #define blk_noretry_request(rq) \
->         ((rq)->cmd_flags & (REQ_FAILFAST_DEV|REQ_FAILFAST_TRANSPORT| \
->                              REQ_FAILFAST_DRIVER))
-> 
-> making the only _actual_ change in your patch _not_ evaluating the
-> REQ_FAILFAST_DRIVER, which incidentally is only used by the NVMe core.
+Thanks. I assume that this is not seen on mainline x86 defconfig.
 
-No, not sure how you got there. I'd have thought the 5 references to
-"REQ_FAILFAST_TRANSPORT" would've been sufficient ;)
+Unfortunately it's anything but easy for me to install an x86 kernel ATM.
 
-This patch makes it so requests marked with REQ_FAILFAST_TRANSPORT are
-allowed to use NVMe's local retry (that is required for non-transport
-errors).
+And I am still seeing this on hisi_sas v2 hw with 5.12-rc7:
 
-> So what is it you're trying to solve?
+[  214.448368] rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
+[  214.454468] rcu:Tasks blocked on level-1 rcu_node (CPUs 0-15):
+[  214.460474]  (detected by 40, t=5255 jiffies, g=2229, q=1110)
+[  214.466208] rcu: All QSes seen, last rcu_preempt kthread activity 1 
+(4294945760-4294945759), jiffies_till_next_fqs=1, root ->qsmask 0x1
+[  214.478466] BUG: scheduling while atomic: 
+irq/151-hisi_sa/503/0x00000004
+[  214.485162] Modules linked in:
+[  214.488208] CPU: 40 PID: 503 Comm: irq/151-hisi_sa Not tainted 5.11.0 
+#75
+[  214.494985] Hardware name: Huawei Taishan 2280 /D05, BIOS Hisilicon 
+D05 IT21 Nemo 2.0 RC0 04/18/2018
+[  214.504105] Call trace:
+[  214.506540]  dump_backtrace+0x0/0x1b0
+[  214.510208]  show_stack+0x18/0x68
+[  214.513513]  dump_stack+0xd8/0x134
+[  214.516907]  __schedule_bug+0x60/0x78
+[  214.520560]  __schedule+0x620/0x6d8
+[  214.524039]  schedule+0x70/0x108
+[  214.527256]  irq_thread+0xdc/0x230
+[  214.530648]  kthread+0x154/0x158
+[  214.533866]  ret_from_fork+0x10/0x30
+john@ubuntu:~$
 
-What the patch header, code and code comment detail.
+For rw=randread and mq-deadline only, it seems. v5.11 has the same. Not 
+sure if this is a driver or other issue.
 
-Mike
+Today I don't have access to other boards with enough disks to get a 
+decent throughput to test against :(
 
+Thanks,
+John
