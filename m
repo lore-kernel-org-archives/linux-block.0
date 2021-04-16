@@ -2,110 +2,133 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20B54C433B4
-	for <linux-block@archiver.kernel.org>; Fri, 16 Apr 2021 23:53:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74AB7C433B4
+	for <linux-block@archiver.kernel.org>; Fri, 16 Apr 2021 23:53:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E37C761166
-	for <linux-block@archiver.kernel.org>; Fri, 16 Apr 2021 23:53:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 441A0611C2
+	for <linux-block@archiver.kernel.org>; Fri, 16 Apr 2021 23:53:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231363AbhDPXx5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Apr 2021 19:53:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55624 "EHLO
+        id S231958AbhDPXyA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Apr 2021 19:54:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55630 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229719AbhDPXx5 (ORCPT
+        with ESMTP id S229719AbhDPXx7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Apr 2021 19:53:57 -0400
-Received: from mail-qk1-x733.google.com (mail-qk1-x733.google.com [IPv6:2607:f8b0:4864:20::733])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4633C061574
-        for <linux-block@vger.kernel.org>; Fri, 16 Apr 2021 16:53:31 -0700 (PDT)
-Received: by mail-qk1-x733.google.com with SMTP id o5so30695522qkb.0
-        for <linux-block@vger.kernel.org>; Fri, 16 Apr 2021 16:53:31 -0700 (PDT)
+        Fri, 16 Apr 2021 19:53:59 -0400
+Received: from mail-qv1-xf36.google.com (mail-qv1-xf36.google.com [IPv6:2607:f8b0:4864:20::f36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0AA6C061574
+        for <linux-block@vger.kernel.org>; Fri, 16 Apr 2021 16:53:32 -0700 (PDT)
+Received: by mail-qv1-xf36.google.com with SMTP id h15so4492490qvu.4
+        for <linux-block@vger.kernel.org>; Fri, 16 Apr 2021 16:53:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id;
-        bh=QyhvZCSvtA03X8xN6o/W0M+lSp8c9SWEUE8ZmCr9STo=;
-        b=JsIEI4hnfM7XZkx0kTFWX29u6sKY++3HK8McTuBMTVIMLBa6jL+mSdtBeE+BE1z6+e
-         AVHycaL0mhnCcrXLL/9YR9rVoEY8n4Ps1Ur+22FPY3X2J7jvjSjxYtE5Q6N4nfR8VCql
-         y6blXYg3nrIsFQzLJzx0T3WfT2Gk9d8mmQleZ874dAgkIfBnK7VkfSdu2uhaoza8ceWv
-         sjMXCEEhXTTrSsPda3lTABiS0I12Nhqpm/YJK7Mw1lYHh/Tyf4Smv/rGXd4MTNR8A4MD
-         1h8yYplpqCSUNTz04c9B4bXbZ0OooekkrWyg0MxZKdDTOkAMplGpc980Bq59RCT4jZpW
-         zIZQ==
+        h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=TPYpDSq8Mf6GV23A4rg39jSHse9EX5i3mfgaOsbHzoU=;
+        b=ha/P7mAF80uD2DCWBuD7cEf0koTIbyLMQrHYlG+ZU/QEW4lsNqilMzcDUqE0lS19Vg
+         zxbnXv/bKTtHtl5lR31XDYKi+AFVsKgP7z7Z8zAiKlRCsx9qfOv7IaI48Oj9OPXAE2Qd
+         ZYR3wqRxDXNi6H9DIfnQwsYzSSW7Spg5gJeSg3jYJJIIMwZLEoohww7jq4Inve6K9JMp
+         X9cwoqysjNxzBva5jaH+RKu7XgLa/pmkH4iL8Evwvc9mAsomBSqD28JL5Q+ljnAcrYpd
+         a3G5nNNSGci4QPRiPPYZ0F5yGlSQHJH9X8ux9IHZLUqCOCqAOr2Ay+MP182+vsgWGkOf
+         F+Gw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
-        bh=QyhvZCSvtA03X8xN6o/W0M+lSp8c9SWEUE8ZmCr9STo=;
-        b=jH7iBR2AO6dvXR6q9ZQG769JEXd08ZXRqSYpq2OrsdYKhU9vHM7VG0/DugNBJ3eySw
-         kgrzRvSdr/bdchu49zi/h4vZF+cPTXUd66EDEGfT5Sl9nUiZ1s6e2jRQi/JS5AWyI6y6
-         q2/f5Pegikfzxjy5sNm9XyUz3hwjTWzl+zCYmFSaDhi3kiPeyh7Jq6SykQle9P1St1cN
-         ZXxvkoCLblOARrDrSy66cffPqs0truYZSt3uUJI8SR00sUCbqWlQ/oEwQdzkNmask5Yz
-         T7E2u02h/BqslVxco+eHWHA61IcUnNPTq3Zo1GOr2OlLYPjRCsR6rmOQ0lvKoWlR5gOz
-         VGEw==
-X-Gm-Message-State: AOAM530/Mk7TNEFmxssGvUps6o0pMSDKVNKjfkZk88tEl82lF97z+nNH
-        AbFVeNrU6t7qSPfZgjp3s70=
-X-Google-Smtp-Source: ABdhPJyxfAxWmx5hFRT5ylJQlPp9g7ESFqO4NhBYv63c6HS/QO0qUMBxMVRjxTlMTrV+x8HDbBMqNA==
-X-Received: by 2002:a37:390:: with SMTP id 138mr406655qkd.136.1618617210999;
-        Fri, 16 Apr 2021 16:53:30 -0700 (PDT)
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+         :in-reply-to:references;
+        bh=TPYpDSq8Mf6GV23A4rg39jSHse9EX5i3mfgaOsbHzoU=;
+        b=oEJ7xYR2TIIrP9NQvKjUe4/qBM4y09BtPd4U6yKbq/I5A8PgFkZmERB4hKb6EFyIXe
+         ibncdosyJ4k+CBED8nbo88OArAXqvy+QXJdyMEXnSlB/7AGpZeeCUDfRMBkGY9YXmkTU
+         EcxY7ubBya9hm+ep0c9V2s6rgTNrMTtkHnNop8uqQfghtToqxURE3MdsiH7fedHYvs8w
+         v70xxjRFN7GNK9SAhPUgIoZy+eQbauOhvaKTOLS+y+zz+gE88Ca6CokXUIlUXPz5LdD+
+         c437xneuDfWd/528WabTbK6etPBYwrKl5jyu/Cjn/yEYTfutszFuCyLmaxgtlRTeGUB+
+         RVZQ==
+X-Gm-Message-State: AOAM533bVVr6zMFGe9SrZi1ZC1G3VOfQ0EnJ2zwZhFfUkJ0cpb4lmijn
+        YACAa5JbTXVs2t0VxVSrZSc=
+X-Google-Smtp-Source: ABdhPJwbSaN8dqhGfKHuFj1wuJyFMhfU+pYxWICW3qhsOj3SwzeXkdQVt1y3wjQ6z92Mt6gOTZGp7w==
+X-Received: by 2002:a05:6214:1470:: with SMTP id c16mr11115642qvy.60.1618617212158;
+        Fri, 16 Apr 2021 16:53:32 -0700 (PDT)
 Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
-        by smtp.gmail.com with ESMTPSA id 2sm5164675qko.134.2021.04.16.16.53.29
+        by smtp.gmail.com with ESMTPSA id o23sm5037866qtp.55.2021.04.16.16.53.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Apr 2021 16:53:30 -0700 (PDT)
+        Fri, 16 Apr 2021 16:53:31 -0700 (PDT)
 Sender: Mike Snitzer <snitzer@gmail.com>
 From:   Mike Snitzer <snitzer@redhat.com>
 To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
 Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
         linux-nvme@lists.infradead.org
-Subject: [PATCH v3 0/4] nvme: improve error handling and ana_state to work well with dm-multipath
-Date:   Fri, 16 Apr 2021 19:53:26 -0400
-Message-Id: <20210416235329.49234-1-snitzer@redhat.com>
+Subject: [PATCH v4 1/3] nvme: return BLK_STS_DO_NOT_RETRY if the DNR bit is set
+Date:   Fri, 16 Apr 2021 19:53:27 -0400
+Message-Id: <20210416235329.49234-2-snitzer@redhat.com>
 X-Mailer: git-send-email 2.15.0
+In-Reply-To: <20210416235329.49234-1-snitzer@redhat.com>
+References: <20210416235329.49234-1-snitzer@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+If the DNR bit is set we should not retry the command.
 
-This patchset reflects changes needed to make NVMe error handling and
-ANA state updates work well with dm-multipath (which always sets
-REQ_FAILFAST_TRANSPORT).
+We care about the retryable vs not retryable distinction at the block
+layer so propagate the equivalent of the DNR bit by introducing
+BLK_STS_DO_NOT_RETRY. Update blk_path_error() to _not_ retry if it
+is set.
 
-RHEL8 has been carrying an older ~5.9 based version of this patchset
-(since RHEL8.3, August 2020).
+This change runs with the suggestion made here:
+https://lore.kernel.org/linux-nvme/20190813170144.GA10269@lst.de/
 
-RHEL9 is coming, would really prefer that these changes land upstream
-rather than carry them within RHEL.
+Suggested-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Mike Snitzer <snitzer@redhat.com>
+Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Reviewed-by: Hannes Reinecke <hare@suse.de>
+---
+ drivers/nvme/host/core.c  | 3 +++
+ include/linux/blk_types.h | 8 ++++++++
+ 2 files changed, 11 insertions(+)
 
-All review/feedback welcome.
-
-Thanks,
-Mike
-
-v3 -> v4, less is more:
-- folded REQ_FAILFAST_TRANSPORT local retry and FAILUP patches
-- simplified nvme_failup_req(), removes needless blk_path_error() et al
-- removed comment block in nvme_decide_disposition()
-
-v2 -> v3:
-- Added Reviewed-by tags to BLK_STS_DO_NOT_RETRY patch.
-- Eliminated __nvme_end_req() and added code comment to
-  nvme_failup_req() in FAILUP handling patch.
-
-Mike Snitzer (3):
-  nvme: return BLK_STS_DO_NOT_RETRY if the DNR bit is set
-  nvme: allow local retry and proper failover for REQ_FAILFAST_TRANSPORT
-  nvme: decouple basic ANA log page re-read support from native
-    multipathing
-
- drivers/nvme/host/core.c      | 22 +++++++++++++++++++---
- drivers/nvme/host/multipath.c | 16 +++++++++++-----
- drivers/nvme/host/nvme.h      |  4 ++++
- include/linux/blk_types.h     |  8 ++++++++
- 4 files changed, 42 insertions(+), 8 deletions(-)
-
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 0896e21642be..540d6fd8ffef 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -237,6 +237,9 @@ static void nvme_delete_ctrl_sync(struct nvme_ctrl *ctrl)
+ 
+ static blk_status_t nvme_error_status(u16 status)
+ {
++	if (unlikely(status & NVME_SC_DNR))
++		return BLK_STS_DO_NOT_RETRY;
++
+ 	switch (status & 0x7ff) {
+ 	case NVME_SC_SUCCESS:
+ 		return BLK_STS_OK;
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index db026b6ec15a..1ca724948c56 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -142,6 +142,13 @@ typedef u8 __bitwise blk_status_t;
+  */
+ #define BLK_STS_ZONE_ACTIVE_RESOURCE	((__force blk_status_t)16)
+ 
++/*
++ * BLK_STS_DO_NOT_RETRY is returned from the driver in the completion path
++ * if the device returns a status indicating that if the same command is
++ * re-submitted it is expected to fail.
++ */
++#define BLK_STS_DO_NOT_RETRY	((__force blk_status_t)17)
++
+ /**
+  * blk_path_error - returns true if error may be path related
+  * @error: status the request was completed with
+@@ -157,6 +164,7 @@ typedef u8 __bitwise blk_status_t;
+ static inline bool blk_path_error(blk_status_t error)
+ {
+ 	switch (error) {
++	case BLK_STS_DO_NOT_RETRY:
+ 	case BLK_STS_NOTSUPP:
+ 	case BLK_STS_NOSPC:
+ 	case BLK_STS_TARGET:
 -- 
 2.15.0
 
