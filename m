@@ -2,116 +2,170 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 378DAC43461
-	for <linux-block@archiver.kernel.org>; Fri, 16 Apr 2021 23:53:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51FEEC433ED
+	for <linux-block@archiver.kernel.org>; Sat, 17 Apr 2021 00:02:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0CE0A61166
-	for <linux-block@archiver.kernel.org>; Fri, 16 Apr 2021 23:53:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 277816115B
+	for <linux-block@archiver.kernel.org>; Sat, 17 Apr 2021 00:02:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231997AbhDPXyF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Apr 2021 19:54:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55644 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229719AbhDPXyB (ORCPT
+        id S231958AbhDQACg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Apr 2021 20:02:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:46348 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229719AbhDQACg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Apr 2021 19:54:01 -0400
-Received: from mail-qv1-xf2a.google.com (mail-qv1-xf2a.google.com [IPv6:2607:f8b0:4864:20::f2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A77AC061574
-        for <linux-block@vger.kernel.org>; Fri, 16 Apr 2021 16:53:35 -0700 (PDT)
-Received: by mail-qv1-xf2a.google.com with SMTP id d1so2728474qvy.11
-        for <linux-block@vger.kernel.org>; Fri, 16 Apr 2021 16:53:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=6W4dFuQZFZDxrcjNEtMiTx3DGVpbYyuLvbl05NbuH68=;
-        b=iCDnN0TcD52pcBDWvZyNoGF+BkPDWGIe5uDS4cKKGP9YY2a4hlr0Z4q4Y3d75SNPvL
-         ubKGKLnjxaJ2YsNM+A9O0JzXzsvM7k85bTCUQwKPPc/HeTPbd9b9tSizDy81e/yvakuy
-         3lh2DUBiUsLxj6yn5qDz95ZMXw/WpAECviYxGuCdxgN8la/cJHygPOaYvYn0A+vbL0KT
-         iktznhNE3ErCMkc5uxGwSbVThavjgQ1gGIPSPycjmgkSQYTt/rkzL49pIeMQqPiFfPGy
-         NDSKmSC+SqwQhFE03WCCHB8LC1mz+nlZvidwljqPMMa5kUcJwRarhH/ifunqIPRiBv6K
-         gTsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-         :in-reply-to:references;
-        bh=6W4dFuQZFZDxrcjNEtMiTx3DGVpbYyuLvbl05NbuH68=;
-        b=oh6BuHGhavErzftzMvJ3rOvtCR7sbh4cGbI791hUZg+Y/TK66zYRCjZU61T/sgBErD
-         lBmBmxsoiZDHAxGF5G20IyHKNxn7LioZMF93mNeUFw/w/ukS0tgBHbgt3cdrbOuvK7Op
-         GxCMP0NkZkjA9yyFhqjWJySWvAmGiyYfvq3JRF/wZe6i4/BT8Kt+diIqk1SXv79jQnF+
-         ihQwcGgs0EMfiIGW172uRrYkjrf0mKVEjUKiJWxAjAfEQvZSnJP6lkrE2UsJbmoduBLs
-         LCektwUzKKzMm4Gcv0SLMoiWioO21igZO89+FhsS6W9TC5QPE/pkGueVoRFOEirm2dxt
-         8ngA==
-X-Gm-Message-State: AOAM532m7Msfm8mNpmpRiPLgi0KTDD/Cig201b3Jgfx470gegYeMQio5
-        eQN6oR/kF26bjkTW5viC0pA=
-X-Google-Smtp-Source: ABdhPJwh6XHQ4W/sFJBzn//P5eE+pQK3iiAapSkSAHYWj127GoJpxUHJsFoe6ImvSyp0IpaHo7CJxA==
-X-Received: by 2002:a0c:b38b:: with SMTP id t11mr11025259qve.25.1618617214793;
-        Fri, 16 Apr 2021 16:53:34 -0700 (PDT)
-Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
-        by smtp.gmail.com with ESMTPSA id l199sm768557qke.118.2021.04.16.16.53.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Apr 2021 16:53:34 -0700 (PDT)
-Sender: Mike Snitzer <snitzer@gmail.com>
+        Fri, 16 Apr 2021 20:02:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1618617730;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=E28myxiZn1blaS13N56nvXLMFnB30qTzlnI725pXZWY=;
+        b=IvgZdxjzKtAvPNMxTY7Vve+UrPFzh+/g0nRbfTvfHe5RLw+JSNrRoFyG9fOfGiZL6xJYXu
+        mkbDjEdwrrBrjJlP091FM8QcDYzXeVmGQr1d4doC1s7lxUx1ZP9vSBXtqfNYeoAr7mfEwq
+        G+aYRMAY+/hHicYdsq9RwV7sfwObpwc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-518-AUTfOdcqOSWRan_r0QW4Ww-1; Fri, 16 Apr 2021 20:02:08 -0400
+X-MC-Unique: AUTfOdcqOSWRan_r0QW4Ww-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D6D5A10054F6;
+        Sat, 17 Apr 2021 00:02:07 +0000 (UTC)
+Received: from localhost (unknown [10.18.25.174])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id E7D4C5D6D3;
+        Sat, 17 Apr 2021 00:02:03 +0000 (UTC)
+Date:   Fri, 16 Apr 2021 20:02:03 -0400
 From:   Mike Snitzer <snitzer@redhat.com>
 To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
 Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
         linux-nvme@lists.infradead.org
-Subject: [PATCH v4 3/3] nvme: decouple basic ANA log page re-read support from native multipathing
-Date:   Fri, 16 Apr 2021 19:53:29 -0400
-Message-Id: <20210416235329.49234-4-snitzer@redhat.com>
-X-Mailer: git-send-email 2.15.0
-In-Reply-To: <20210416235329.49234-1-snitzer@redhat.com>
+Subject: Re: [PATCH v4 0/4] nvme: improve error handling and ana_state to
+ work well with dm-multipath
+Message-ID: <20210417000203.GA22241@redhat.com>
 References: <20210416235329.49234-1-snitzer@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210416235329.49234-1-snitzer@redhat.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Whether or not ANA is present is a choice of the target implementation;
-the host (and whether it supports multipathing) has _zero_ influence on
-this. If the target declares a path as 'inaccessible' the path _is_
-inaccessible to the host. As such, ANA support should be functional
-even if native multipathing is not.
+On Fri, Apr 16 2021 at  7:53pm -0400,
+Mike Snitzer <snitzer@redhat.com> wrote:
 
-Introduce ability to always re-read ANA log page as required due to ANA
-error and make current ANA state available via sysfs -- even if native
-multipathing is disabled on the host (e.g. nvme_core.multipath=N).
-This is achieved by factoring out nvme_update_ana() and calling it in
-nvme_complete_rq() for all FAILOVER requests.
+> Hi,
+> 
+> This patchset reflects changes needed to make NVMe error handling and
+> ANA state updates work well with dm-multipath (which always sets
+> REQ_FAILFAST_TRANSPORT).
+> 
+> RHEL8 has been carrying an older ~5.9 based version of this patchset
+> (since RHEL8.3, August 2020).
+> 
+> RHEL9 is coming, would really prefer that these changes land upstream
+> rather than carry them within RHEL.
+> 
+> All review/feedback welcome.
+> 
+> Thanks,
+> Mike
+> 
+> v3 -> v4, less is more:
+> - folded REQ_FAILFAST_TRANSPORT local retry and FAILUP patches
+> - simplified nvme_failup_req(), removes needless blk_path_error() et al
+> - removed comment block in nvme_decide_disposition()
+> 
+> v2 -> v3:
+> - Added Reviewed-by tags to BLK_STS_DO_NOT_RETRY patch.
+> - Eliminated __nvme_end_req() and added code comment to
+>   nvme_failup_req() in FAILUP handling patch.
+> 
+> Mike Snitzer (3):
+>   nvme: return BLK_STS_DO_NOT_RETRY if the DNR bit is set
+>   nvme: allow local retry and proper failover for REQ_FAILFAST_TRANSPORT
+>   nvme: decouple basic ANA log page re-read support from native
+>     multipathing
+> 
+>  drivers/nvme/host/core.c      | 22 +++++++++++++++++++---
+>  drivers/nvme/host/multipath.c | 16 +++++++++++-----
+>  drivers/nvme/host/nvme.h      |  4 ++++
+>  include/linux/blk_types.h     |  8 ++++++++
+>  4 files changed, 42 insertions(+), 8 deletions(-)
 
-This affords userspace access to the current ANA state independent of
-which layer might be doing multipathing. This makes 'nvme list-subsys'
-show ANA state for all NVMe subsystems with multiple controllers. It
-also allows userspace multipath-tools to rely on the NVMe driver for
-ANA support while dm-multipath takes care of multipathing.
+Sorry for all the noise, but I had a cut-and-paste issue with this cover
+letter; should've said "[PATCH v4 0/4] ..."
 
-And as always, if embedded NVMe users do not want any performance
-overhead associated with ANA or native NVMe multipathing they can
-disable CONFIG_NVME_MULTIPATH.
-
-Signed-off-by: Mike Snitzer <snitzer@redhat.com>
----
- drivers/nvme/host/core.c      |  2 ++
- drivers/nvme/host/multipath.c | 16 +++++++++++-----
- drivers/nvme/host/nvme.h      |  4 ++++
- 3 files changed, 17 insertions(+), 5 deletions(-)
+While I'm replying, I _think_ there is consensus that patch 1 is
+worthwile and acceptable. Here is a combined diff of patches 2+3 to
+illustrate just how minimalist these proposed changes are:
 
 diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index a12b10a1383c..83ca96292157 100644
+index 540d6fd8ffef..83ca96292157 100644
 --- a/drivers/nvme/host/core.c
 +++ b/drivers/nvme/host/core.c
-@@ -340,6 +340,8 @@ static inline void nvme_end_req(struct request *req)
+@@ -299,6 +299,7 @@ enum nvme_disposition {
+ 	COMPLETE,
+ 	RETRY,
+ 	FAILOVER,
++	FAILUP,
+ };
  
- static inline void nvme_failup_req(struct request *req)
- {
+ static inline enum nvme_disposition nvme_decide_disposition(struct request *req)
+@@ -306,15 +307,16 @@ static inline enum nvme_disposition nvme_decide_disposition(struct request *req)
+ 	if (likely(nvme_req(req)->status == 0))
+ 		return COMPLETE;
+ 
+-	if (blk_noretry_request(req) ||
++	if ((req->cmd_flags & (REQ_FAILFAST_DEV | REQ_FAILFAST_DRIVER)) ||
+ 	    (nvme_req(req)->status & NVME_SC_DNR) ||
+ 	    nvme_req(req)->retries >= nvme_max_retries)
+ 		return COMPLETE;
+ 
+-	if (req->cmd_flags & REQ_NVME_MPATH) {
++	if (req->cmd_flags & (REQ_NVME_MPATH | REQ_FAILFAST_TRANSPORT)) {
+ 		if (nvme_is_path_error(nvme_req(req)->status) ||
+ 		    blk_queue_dying(req->q))
+-			return FAILOVER;
++			return (req->cmd_flags & REQ_NVME_MPATH) ?
++				FAILOVER : FAILUP;
+ 	} else {
+ 		if (blk_queue_dying(req->q))
+ 			return COMPLETE;
+@@ -336,6 +338,14 @@ static inline void nvme_end_req(struct request *req)
+ 	blk_mq_end_request(req, status);
+ }
+ 
++static inline void nvme_failup_req(struct request *req)
++{
 +	nvme_update_ana(req);
 +
- 	nvme_req(req)->status = NVME_SC_HOST_PATH_ERROR;
- 	nvme_end_req(req);
++	nvme_req(req)->status = NVME_SC_HOST_PATH_ERROR;
++	nvme_end_req(req);
++}
++
+ void nvme_complete_rq(struct request *req)
+ {
+ 	trace_nvme_complete_rq(req);
+@@ -354,6 +364,9 @@ void nvme_complete_rq(struct request *req)
+ 	case FAILOVER:
+ 		nvme_failover_req(req);
+ 		return;
++	case FAILUP:
++		nvme_failup_req(req);
++		return;
+ 	}
  }
+ EXPORT_SYMBOL_GPL(nvme_complete_rq);
 diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
 index a1d476e1ac02..7d94250264aa 100644
 --- a/drivers/nvme/host/multipath.c
@@ -173,6 +227,4 @@ index 07b34175c6ce..4eed8536625c 100644
  static inline void nvme_kick_requeue_lists(struct nvme_ctrl *ctrl)
  {
  }
--- 
-2.15.0
 
