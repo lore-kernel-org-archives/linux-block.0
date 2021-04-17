@@ -2,163 +2,75 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A17D8C43600
-	for <linux-block@archiver.kernel.org>; Sat, 17 Apr 2021 02:33:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E611DC433B4
+	for <linux-block@archiver.kernel.org>; Sat, 17 Apr 2021 02:39:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 839F5613B4
-	for <linux-block@archiver.kernel.org>; Sat, 17 Apr 2021 02:33:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9B1BC61107
+	for <linux-block@archiver.kernel.org>; Sat, 17 Apr 2021 02:39:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235516AbhDQCd6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Apr 2021 22:33:58 -0400
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:17957 "EHLO
-        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235502AbhDQCd5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Apr 2021 22:33:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1618626812; x=1650162812;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=1bt8pdRaO5fUcGqSEgkOZzZgAvMQ4pvkgiTI/HOypSk=;
-  b=HE+6rLF3zUS3FAkqXJtiUoPTGDT4XOsThUwuo2Pd0tiDZGGMk/Sv91LY
-   sBzmgHDN/b9sns7Ld+C+nlPsvXnHhdZteQ6EvVJlrW04nJffK/WyGvk1D
-   sLWAfthg2fNWsHDTL2N4sjlOF64Hg/PfegRveoiXJElk0QlVflNxeLZQ/
-   TJWmwdLCdO2lgPyKxfe7XGbFFt0JklEO9ye483WcVcd4wuIeMtBYsyXjO
-   jkYKhVsWZnwyEpuJYekAqcg5lgEHOYCDVVYIy6WdajlsUkhgmHgP2ynoY
-   AMjdK1c/BkXkeb9FDvk2pBNpP+92q0loXmz7Fnj4LrqsWz2RYy4vc/Amm
-   Q==;
-IronPort-SDR: eQFqlBTv+6YqQHs8SD2OxFSGsCIeL22Vns0GZmM68nilCN4ee3LixawNMknP+mjsSPizpP1fxN
- XqqzfEgLwn2/X7iP+cL4bqjDZteJ6qlCPzcnCo0ysHG946TlCGkb9MnScf5ORXPce7W7RuFfZ6
- x5ClhlUiAILrqyDcIkfMFHC0d2NyjoIHo1bQPe9/Brmbsm+J3x4GkZVndDITtoDo5uZv3195ae
- oofvJsChf3ZrmcAmMpvewPADauSJXJxPptuQb3eUkl3gJX2mFLeCUI756hmDBcbzuwwB9Ovb1f
- s/A=
-X-IronPort-AV: E=Sophos;i="5.82,228,1613404800"; 
-   d="scan'208";a="165193277"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 17 Apr 2021 10:33:31 +0800
-IronPort-SDR: EA0GwqVOc5QzZUO4660rt9CIAk4Rmg/yzraTuABX8mJl7FAFMM/sCgouVAoQOhniLP4gx8aCVm
- yaBvjbf0s6vLSgEyuDE1m5O4Cd+yR3Ak7LmhcE3sj9fH+8osHSDaf113VE4BwqauDJG8D9dR5k
- q3+sHxneEbPTmVpLgi2Z1qejtx1Nw6Hk+I0typO8DhqkMU0Qxy3we0DdHmgf3ImAZoMqNZ6AVC
- TO+Na131IKoD4T5Ubg+WEJQtDLdpAPGrIBAd60J5phM4mV83ej/pHftZaul3/TMQpry8Ko0gVX
- wsNPzu9MbL8fXVD+aBbm7hDY
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2021 19:12:45 -0700
-IronPort-SDR: ffwDuNJdgpDyZs+F+I7hb5tSfdWh7H3NQY/F8KVBqjx1K+WoPrmksYPHiqq3maw5NfYpqZctE9
- gWv+C7z7BiidjMOBh+0BeZRwHA5xPSD1s6Kg3GUZiliiyyBB0i0Uv2nQz0774FLe8UiAoCUSqt
- e+5ZqS22Z3zk1jmc+G8LVLkZJk8bruBBF+amRb69DmiJ5Lq6G3GvG7tTV6S+KC5sTAewBEgA84
- hAnkDYwYNQCOL+1UEM6V12/EMZYtLQG3IrKQoLYYc5WTTO5MKtF+ZIu3Pf8XRj1vqGFTTgE1HH
- LWc=
-WDCIronportException: Internal
-Received: from washi.fujisawa.hgst.com ([10.149.53.254])
-  by uls-op-cesaip01.wdc.com with ESMTP; 16 Apr 2021 19:33:31 -0700
-From:   Damien Le Moal <damien.lemoal@wdc.com>
-To:     dm-devel@redhat.com, Mike Snitzer <snitzer@redhat.com>,
-        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-fsdevel@vger.kernel.org
-Cc:     Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [PATCH v2 3/3] zonefs: fix synchronous write to sequential zone files
-Date:   Sat, 17 Apr 2021 11:33:23 +0900
-Message-Id: <20210417023323.852530-4-damien.lemoal@wdc.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210417023323.852530-1-damien.lemoal@wdc.com>
-References: <20210417023323.852530-1-damien.lemoal@wdc.com>
+        id S233061AbhDQCj6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Apr 2021 22:39:58 -0400
+Received: from mail.kernel.org ([198.145.29.99]:54112 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231997AbhDQCj6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 16 Apr 2021 22:39:58 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id BA8A161003;
+        Sat, 17 Apr 2021 02:39:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1618627172;
+        bh=pSDKr/liJyVbO63YqO2P1N7S8zwfLxAGDsxPHIyOWNo=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=jNEBNTAwlPifNx9srHY82kEe1rEG5u2s3TDCy2+kZ0ghCMaJzK4lLDBc7ZuOVuxk1
+         tWH7XBIDUk80UmK5Ae3t7JFHwSCGFoAWWIPEDJWBXdtRXY3LgLacyA7Q2QKWD/UIIJ
+         B04WXlt44f8TTrbZ57y1rdYxhhfusbSDIYHTqvGwusqC58ScbhbRW/0DOJOzuhFwHe
+         rHVYHbSnOBIom0Qrw4YFSLDIdxjVSBXKFqHpvyTKwLmYkKMxfKjRMQCR5PSQk/JOvR
+         /cSbfg10aJ1z5S0Tfb83OYPxGanri3VTxGHgtVg5ivWd8vCSMg17pgHIt4WeehIrlI
+         heeGrWqrmaJIg==
+Date:   Sat, 17 Apr 2021 11:39:29 +0900
+From:   Keith Busch <kbusch@kernel.org>
+To:     Casey Chen <cachen@purestorage.com>
+Cc:     axboe@kernel.dk, hch@lst.de, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, sagi@grimberg.me,
+        yzhong@purestorage.com
+Subject: Re: [PATCH 2/2] nvme: use return value from blk_execute_rq()
+Message-ID: <20210417023929.GD32082@redsun51.ssa.fujisawa.hgst.com>
+References: <CALCePG0y1REA8xXX1ymTwAZhrbSyUh41zfpOmFQViuyPGf5ePg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALCePG0y1REA8xXX1ymTwAZhrbSyUh41zfpOmFQViuyPGf5ePg@mail.gmail.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Synchronous writes to sequential zone files cannot use zone append
-operations if the underlying zoned device queue limit
-max_zone_append_sectors is 0, indicating that the device does not
-support this operation. In this case, fall back to using regular write
-operations.
+On Fri, Apr 16, 2021 at 07:04:34PM -0700, Casey Chen wrote:
+> > On Fri, Apr 16, 2021 at 10:12:11AM -0700, Yuanyuan Zhong wrote:
+> > > >         if (poll)
+> > > >                 nvme_execute_rq_polled(req->q, NULL, req, at_head);
+> > > You may need to audit other completion handlers for blk_execute_rq_nowait().
+> >
+> > Why? Those callers already provide their own callback that directly get
+> > the error.
+> 
+> We should make sure all callbacks provided to blk_execute_rq_nowait()
+> carry error back. i.e. by reusing rq->end_io_data.
+>
+> > > How to get error ret from polled rq?
+> >
+> > Please see nvme_end_sync_rq() for that driver's polled handler callback.
+> > It already has the error.
+> 
+> nvme_end_sync_rq() currently doesn't store error in rq->end_io_data as
+> you proposed in patch 1.
 
-Fixes: 02ef12a663c7 ("zonefs: use REQ_OP_ZONE_APPEND for sync DIO")
-Cc: stable@vger.kernel.org
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
-Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
----
- fs/zonefs/super.c  | 16 ++++++++++++----
- fs/zonefs/zonefs.h |  2 ++
- 2 files changed, 14 insertions(+), 4 deletions(-)
+The question was how the error gets back to the caller, and they already
+have it.
 
-diff --git a/fs/zonefs/super.c b/fs/zonefs/super.c
-index 049e36c69ed7..b97566b9dff7 100644
---- a/fs/zonefs/super.c
-+++ b/fs/zonefs/super.c
-@@ -689,14 +689,15 @@ static ssize_t zonefs_file_dio_append(struct kiocb *iocb, struct iov_iter *from)
- {
- 	struct inode *inode = file_inode(iocb->ki_filp);
- 	struct zonefs_inode_info *zi = ZONEFS_I(inode);
--	struct block_device *bdev = inode->i_sb->s_bdev;
--	unsigned int max;
-+	struct super_block *sb = inode->i_sb;
-+	struct zonefs_sb_info *sbi = ZONEFS_SB(sb);
-+	struct block_device *bdev = sb->s_bdev;
-+	sector_t max = sbi->s_max_zone_append_sectors;
- 	struct bio *bio;
- 	ssize_t size;
- 	int nr_pages;
- 	ssize_t ret;
- 
--	max = queue_max_zone_append_sectors(bdev_get_queue(bdev));
- 	max = ALIGN_DOWN(max << SECTOR_SHIFT, inode->i_sb->s_blocksize);
- 	iov_iter_truncate(from, max);
- 
-@@ -853,6 +854,8 @@ static ssize_t zonefs_file_dio_write(struct kiocb *iocb, struct iov_iter *from)
- 
- 	/* Enforce sequential writes (append only) in sequential zones */
- 	if (zi->i_ztype == ZONEFS_ZTYPE_SEQ) {
-+		struct zonefs_sb_info *sbi = ZONEFS_SB(sb);
-+
- 		mutex_lock(&zi->i_truncate_mutex);
- 		if (iocb->ki_pos != zi->i_wpoffset) {
- 			mutex_unlock(&zi->i_truncate_mutex);
-@@ -860,7 +863,7 @@ static ssize_t zonefs_file_dio_write(struct kiocb *iocb, struct iov_iter *from)
- 			goto inode_unlock;
- 		}
- 		mutex_unlock(&zi->i_truncate_mutex);
--		append = sync;
-+		append = sync && sbi->s_max_zone_append_sectors;
- 	}
- 
- 	if (append)
-@@ -1683,6 +1686,11 @@ static int zonefs_fill_super(struct super_block *sb, void *data, int silent)
- 		sbi->s_mount_opts &= ~ZONEFS_MNTOPT_EXPLICIT_OPEN;
- 	}
- 
-+	sbi->s_max_zone_append_sectors =
-+		queue_max_zone_append_sectors(bdev_get_queue(sb->s_bdev));
-+	if (!sbi->s_max_zone_append_sectors)
-+		zonefs_info(sb, "Zone append is not supported: falling back to using regular writes\n");
-+
- 	ret = zonefs_read_super(sb);
- 	if (ret)
- 		return ret;
-diff --git a/fs/zonefs/zonefs.h b/fs/zonefs/zonefs.h
-index 51141907097c..2b8c3b1a32ea 100644
---- a/fs/zonefs/zonefs.h
-+++ b/fs/zonefs/zonefs.h
-@@ -185,6 +185,8 @@ struct zonefs_sb_info {
- 
- 	unsigned int		s_max_open_zones;
- 	atomic_t		s_open_zones;
-+
-+	sector_t		s_max_zone_append_sectors;
- };
- 
- static inline struct zonefs_sb_info *ZONEFS_SB(struct super_block *sb)
--- 
-2.30.2
-
+Patch 1 is specific to the sync execution. All the async users' handling
+of the provided error are implementation specific. If they're not using
+it correctly, then they can be fixed too.
