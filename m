@@ -2,183 +2,616 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	PDS_BAD_THREAD_QP_64,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42B1FC433B4
-	for <linux-block@archiver.kernel.org>; Sun, 18 Apr 2021 04:49:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0389C433B4
+	for <linux-block@archiver.kernel.org>; Sun, 18 Apr 2021 08:36:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0E61F61352
-	for <linux-block@archiver.kernel.org>; Sun, 18 Apr 2021 04:49:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B27B36102A
+	for <linux-block@archiver.kernel.org>; Sun, 18 Apr 2021 08:36:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230385AbhDREuF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 18 Apr 2021 00:50:05 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:30669 "EHLO
-        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229671AbhDREuF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Apr 2021 00:50:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1618721377; x=1650257377;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=TwJh6cNpegw8wkBCra20nyUF+qhtHJ6iw11phtNOo1A=;
-  b=fBlVUyxs9U9EV+61BG1usQUqYpN1/h+fojxXw8cA2kTdVnW6DCz1SwhK
-   uqCzeFxAn5jOmZWVwti552k1k1bUWy9qo9my/kLgSfe/vhyJkMsGJV5ub
-   oFO4olbURE2s1uROTBdTWJFhL+BMnEs8gEM4MlqQqsIJrQriCHFTMxASo
-   V98Ud8MqbaX1RVghFz1GBW8evzJpNcZFHJDshRx5XeVKibHnoKnp8bbP+
-   aTLkc+qG+cU1Ay7xoqM43GLGhS+V3WyKriTLWMJDNv3H/g0uMwb1W4MGf
-   OmHgz7KRr0Y8iCRnFk99HUCNwJS7q3VqbUf7zHp/RlDsxhjxorBSHvDLJ
-   w==;
-IronPort-SDR: bipNP1urK8NpySqAGtmntTxmAXMna08fbxFew+MMzKva56e7lYkKDEk5pU1wS0xr0u/B9y0i5U
- hicLSOM+ZGLsXb2XyHHSx0xfLs65PngyIxjZonCl1NDPv1zMo37D5Gi22rEE2oQ6ZaXudeGvr+
- klzcTFY9DnVt6IpaSiURet12hFuA+VbGYKsuLLQTE5J4R8ULPQ+KN/CSTrxqNHK5gL/kgZZsx9
- 9GXeg5BmgKnO3sNmRJJjG5FfmX4OSB83LXaGz5hYVubG4Ak+iQmscaX67RpN7ExFFeV/Ecgtfw
- Bm8=
-X-IronPort-AV: E=Sophos;i="5.82,231,1613404800"; 
-   d="scan'208";a="169856838"
-Received: from mail-mw2nam12lp2042.outbound.protection.outlook.com (HELO NAM12-MW2-obe.outbound.protection.outlook.com) ([104.47.66.42])
-  by ob1.hgst.iphmx.com with ESMTP; 18 Apr 2021 12:49:37 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=D6Vnl76Bzjy9yBxQohRBpoogbNZqgToYRxOl2l6EYr043YMbpwXlcgrw3trAaxstC29/6KBIyEfhvICAVvTqd/2iFfcPDqMSseSPVDBiq+UUSmFoxIgsQKt3MNleQXztq7SCmpLQwUexs9bVk2jENkyW0GBIC3jjnz+kmXnYK73MYD6Ru1zkQMe/hgfahDb7+5hXcNvAaElem0T//FPAkrpJG061PhiA79e2rTOdmJLyQvtwUJbW9n0BTtmzyxQkGxiwU1EquSj83Qvfc/ErOY4vlsvYCe+I72T1Eho343+xQul/2zYDLYdiLbcwOm+IjGpLZ+w04dxRvfybSMWK0w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SbyzyM6C7UFn4SnLwAAthb4MLgRZf8OB7In6mt0rNP0=;
- b=HvFBufmOp7jOSsopKiH8NYY20lqqUzX/SNFgpNfxw5YEuolxfPjhZE+XMVe5Wcppp0uSwp4sujK+LMR+y4R7JOjb48uRlwLeUxIdUsBTEeszmq9+GMyIGnzWLFfMQwH4oqg6XNWvA8w8qLKco27ojytNtfRYc1QC22QxDTUWMrVQZNpY72a2ngKDB/z2/Pe+NNuRQErsCPk4bfo5I/ApNzjtFceLhcgngYsj6fOAlEMouXsx3zFPPK8SN1JWb87qIRjuRvJxD1r00ZP1b3hH5xKrx+47xbYcfRDrnwz2Az9fb98v+4sMTLJy/nDlBbe/uhtznigrZxslvAS8Ggeh1w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SbyzyM6C7UFn4SnLwAAthb4MLgRZf8OB7In6mt0rNP0=;
- b=PplVXVfstGgGh8VM7AO8mrkmqqNibLSgf1Lbg8Fve+P7aCf4ysFTmxRGSW1C9nBGjUJQweLqK4fsdErjxg0sAqTA5reXJhKwI7jumvz1X+uNZxDqQCWrQKeczG5ms0FSnBmdj+7mJZniZUDaofK6+UQSFEVq+hPaii+W3tVySUY=
-Received: from BYAPR04MB4965.namprd04.prod.outlook.com (2603:10b6:a03:4d::25)
- by BYAPR04MB4325.namprd04.prod.outlook.com (2603:10b6:a02:fe::33) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4042.21; Sun, 18 Apr
- 2021 04:49:36 +0000
-Received: from BYAPR04MB4965.namprd04.prod.outlook.com
- ([fe80::c897:a1f8:197a:706b]) by BYAPR04MB4965.namprd04.prod.outlook.com
- ([fe80::c897:a1f8:197a:706b%5]) with mapi id 15.20.4042.019; Sun, 18 Apr 2021
- 04:49:36 +0000
-From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-To:     Jens Axboe <axboe@kernel.dk>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH] null_blk: poll queue support
-Thread-Topic: [PATCH] null_blk: poll queue support
-Thread-Index: AQHXM56KmL6kCanFwEqXUyQ/m0BBrQ==
-Date:   Sun, 18 Apr 2021 04:49:36 +0000
-Message-ID: <BYAPR04MB49654A1D4AC52FA3A8110240864A9@BYAPR04MB4965.namprd04.prod.outlook.com>
-References: <baca710d-0f2a-16e2-60bd-b105b854e0ae@kernel.dk>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: kernel.dk; dkim=none (message not signed)
- header.d=none;kernel.dk; dmarc=none action=none header.from=wdc.com;
-x-originating-ip: [199.255.45.62]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 891f05af-ce84-41ab-3542-08d902255e41
-x-ms-traffictypediagnostic: BYAPR04MB4325:
-x-microsoft-antispam-prvs: <BYAPR04MB4325309549A3A4415ED7F1A2864A9@BYAPR04MB4325.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-oob-tlc-oobclassifiers: OLM:2449;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 6wL91ORPz7ooYsC0wVckWRPrh8G/DkoLEgDTNKgBk8ZbbYoemHtkAeFzWpSf1hKWNctR2/tPIsZjQ30BLlPp1/8oHxYsdm4AfjB8+QFNX0JM/vdQ4s5V9LkxZh/GFQbI4uJbbhQ2RGQqLCIp4/3zi9/f+sQa2hCFl1F7NqwniSIuPgzbcoeNNUjBDJxn4CsAh09HR8M+Ftxe//5N3Aco9fhsPkYp/hNu9I6ENWigN7jsOL5p6slEwQ1C/RCYiZ9DJUuOoMhGTxgX76/tyZsN+5RJGgBHuenW8rffcU/XKtwxqzxynxY0Qtz15eWA47Yc513QYpyDn/8m/W584/Fgc97I/phZKjHWrks4ISUoXt4Kmex+2w3uXvL30ULKDglYiKHqUKi2gTrVWR++mC/sytnQRCsl5OssDLSzp8AUW8iTEU38ZiXYL/mgjp7KCXGOp2BDTH8zx/y9Xz8lQCLyaXji5Z5PfXdZAnpfFiVknCOSVuzAeQPqmDovW7lgEUT1cg5NIqRRIgdtvfiKs5Kij6gUdq7tcoCeTFsb9f4BkYeU8YJBjhOIKu72ZQvKUd5n1O6gKvjJv/TyU4O2TT3AbU8i6vUEQ60FWP0qN+6CqRo=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR04MB4965.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(346002)(376002)(366004)(396003)(136003)(39860400002)(26005)(186003)(38100700002)(122000001)(6916009)(86362001)(66946007)(7696005)(66556008)(66476007)(33656002)(76116006)(2906002)(6506007)(53546011)(66446008)(316002)(64756008)(478600001)(71200400001)(55016002)(8936002)(4326008)(9686003)(8676002)(5660300002)(52536014)(83380400001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: =?us-ascii?Q?pEPJW0VF/2aaHqYpdmVj1bL9f5V1zavv/3MF3gZ4rlY2FBwU41nD0+zVsIMD?=
- =?us-ascii?Q?RtjLo+N05KU51FLUvkn7PILmh7SjwJQnY0ewXqnAAXuI5sQdB1bf8+3SEhZg?=
- =?us-ascii?Q?gIyJX5es77hYeOW4ioOIfzhWvlOdahxQUQFmkDPtuzk2WVTU5iXmF1H4RjuQ?=
- =?us-ascii?Q?EPsGDgJo3Pw6zINXfrhynb6EyC6Ewx+J8UbD+GBI/MNxXUeR1mpUfHlwdj5U?=
- =?us-ascii?Q?Kx/IgzkBEGcc4ILvnkS2ojJqPHK0+l5SyJoQAMrZUP/2WFEp3xZdfI/fc3B+?=
- =?us-ascii?Q?hH6W0lioR04V9TGr0/qjQD6YwM9aw2E8XPvwxDvZFW5XSMNaGcvzcp/mOI0F?=
- =?us-ascii?Q?xFHjmS3TXgaP/acYJ6W7oYCU0MPuE/YmoTCEC6uiOwRP9L9iWVJZEUEAXOdx?=
- =?us-ascii?Q?44oRuIEKCSvXz02sVlM5CBW4fIhxC+TMulldGrOOIMibC2ZLUEfbQgpsG0TP?=
- =?us-ascii?Q?fz/zm1WHv+w/AqnEfG9/NNCNq73eV/6XQMIy5zIZN9zEjO6msTVis9uZU+On?=
- =?us-ascii?Q?3RZq1bExkvPVYoohy6WnAX0BqmV296L2k/KiunBo5DkiRUwAJHw50Z9bGujn?=
- =?us-ascii?Q?rqKXkhgoxqEskL2w0v7BJeNVMMCJszRyohRJ2APFWv4gUzDVQYTj81312/j3?=
- =?us-ascii?Q?N7/0419YwSrG0MA+AofghP+QRDNukf+mi1tZOnpkMjDtbBwl8hbahEwolwHG?=
- =?us-ascii?Q?eUvtACyxCbdpBgsHwTuZslLTkOAIEZGy9GYD/FHmytwGyZmQIgZPnaz2DzUs?=
- =?us-ascii?Q?2Zdk8J8khDzjORTLEZgxkIe3MDc0CoFz8fNru+D0wwSDIbiVlFdhktpgMLZg?=
- =?us-ascii?Q?0XuyCDwcRbhgmMh0uQVQaG/GeKC+g06Bizdd9Yr27qCd4/Iars2fj0zuxipb?=
- =?us-ascii?Q?fU6w9BOyrm5ScIpy1EHeJiS9H81cVQJqPFVT1zhSIFjfItEta9gxivG63wMO?=
- =?us-ascii?Q?OE1B3kj+qjpdLyPFrvcpCwJOpaiA4LhptDWNErahl2KdotXgVv7CaZqZGUlJ?=
- =?us-ascii?Q?E/4fCbejan+Vg7puHZlKzDt/Ysd7vGa1sDUxbL1ymcA1YMIrBWwjnkyHxA5o?=
- =?us-ascii?Q?xH98eSvsb+WiD+KwtuG7tsnA0K4Pcd7CPFwtl+K+17H1klqOIUcowitnY9O2?=
- =?us-ascii?Q?68PnALfBZM2tIPx95uesrXGy2Tp/whOd11HizPmvAfP3o992gc4X/PqO8mpQ?=
- =?us-ascii?Q?rehTHUy1iBEu0zIDfDelVQqhV74hGYTsdA+AgLB7UsepW5L9E3ODhBifVDJw?=
- =?us-ascii?Q?DUnOAVR/Jsv87r6sCxEyfSLBIa4StAupPxLHKnriOt/j4UxkeE2IrZ0DYQGl?=
- =?us-ascii?Q?PQJ6xY5iDptdaYHiqT7twYVL?=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S229871AbhDRIgi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 18 Apr 2021 04:36:38 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57030 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229868AbhDRIgi (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 18 Apr 2021 04:36:38 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id CCADD610EA;
+        Sun, 18 Apr 2021 08:36:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1618734970;
+        bh=OQrHVa8POjQMxEDLh7B7YyPVCuHZqA/5zuEpkt1O6uE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=mkrzPeleqv053MeNkp7g7h1hofBRHg4izH13HJByuU9PJcsFAbIQXaxX+Hub85F2G
+         T8HeoQRK3/czSRn1VHaNKUn58EYnW03xjeZJLAAUQ0RlfBePMDh4MGcHJA2EUahF+o
+         sjA+9w8AY96902Rm5A3YhOTPEJBR7Gab8gqxaA7GVXLO9ULIOZRP+vZEPmlg2oLCME
+         j8f8DmLwC20VmoxwpgPr9aCS5BCvXARP9jxabqBfK1EYVpFAC7asOuwbmiETh04mBm
+         VJbx0fZVoksAbyyQFkhde922/Sqa4mEfIxJPrd8ABcrlkq4byaM4RA+N19wDv2eIlz
+         0kL0jPPhtvyZg==
+Date:   Sun, 18 Apr 2021 11:36:06 +0300
+From:   Leon Romanovsky <leon@kernel.org>
+To:     Gioh Kim <gi-oh.kim@ionos.com>
+Cc:     linux-block@vger.kernel.org, axboe@kernel.dk, hch@infradead.org,
+        sagi@grimberg.me, bvanassche@acm.org, haris.iqbal@ionos.com,
+        jinpu.wang@ionos.com, Gioh Kim <gi-oh.kim@cloud.ionos.com>,
+        linux-rdma@vger.kernel.org, Jason Gunthorpe <jgg@nvidia.com>
+Subject: Re: [PATCHv4 for-next 13/19] block/rnbd-clt: Support polling mode
+ for IO latency optimization
+Message-ID: <YHvvdskHgQe9gX09@unreal>
+References: <20210414122402.203388-1-gi-oh.kim@ionos.com>
+ <20210414122402.203388-14-gi-oh.kim@ionos.com>
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR04MB4965.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 891f05af-ce84-41ab-3542-08d902255e41
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Apr 2021 04:49:36.6703
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: hIHcJWjYVrUz+A7B/lFs//90UuAvJn64LHj9WxSVDvcleF6deuQybX5XLX+jqeXLk+cQP5pgYhGOD0TT727LBlbBDRXSEdsZd4qYfu56evI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB4325
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210414122402.203388-14-gi-oh.kim@ionos.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/17/21 08:30, Jens Axboe wrote:=0A=
-> +		cmd->error =3D null_process_cmd(cmd, req_op(req), blk_rq_pos(req),=0A=
-> +						blk_rq_sectors(req));=0A=
-=0A=
-How about following on the top of this patch ?=0A=
-=0A=
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c=
-=0A=
-index 8efaf21cc053..4c27e37ccc51 100644=0A=
---- a/drivers/block/null_blk/main.c=0A=
-+++ b/drivers/block/null_blk/main.c=0A=
-@@ -1496,6 +1496,7 @@ static int null_map_queues(struct blk_mq_tag_set *set=
-)=0A=
- static int null_poll(struct blk_mq_hw_ctx *hctx)=0A=
- {=0A=
-        struct nullb_queue *nq =3D hctx->driver_data;=0A=
-+       blk_status_t sts;=0A=
-        LIST_HEAD(list);=0A=
-        int nr =3D 0;=0A=
- =0A=
-@@ -1510,8 +1511,16 @@ static int null_poll(struct blk_mq_hw_ctx *hctx)=0A=
-                req =3D list_first_entry(&list, struct request, queuelist);=
-=0A=
-                list_del_init(&req->queuelist);=0A=
-                cmd =3D blk_mq_rq_to_pdu(req);=0A=
--               cmd->error =3D null_process_cmd(cmd, req_op(req),=0A=
-blk_rq_pos(req),=0A=
--                                               blk_rq_sectors(req));=0A=
-+               if (cmd->nq->dev->zoned)=0A=
-+                       sts =3D null_process_zoned_cmd(cmd, req_op(req),=0A=
-+                                                    blk_rq_pos(req),=0A=
-+                                                    blk_rq_sectors(req));=
-=0A=
-+               else=0A=
-+                       sts =3D null_process_cmd(cmd, req_op(req),=0A=
-blk_rq_pos(req),=0A=
-+                                              blk_rq_sectors(req));=0A=
-+=0A=
-+               cmd->error =3D sts;=0A=
-+=0A=
-                nullb_complete_cmd(cmd);=0A=
-                nr++;=0A=
-        }=0A=
-=0A=
-If you are okay I can send a well tested patch with little bit code=0A=
-cleanup once this is in the tree.=0A=
-=0A=
-=0A=
+On Wed, Apr 14, 2021 at 02:23:56PM +0200, Gioh Kim wrote:
+> From: Gioh Kim <gi-oh.kim@cloud.ionos.com>
+> 
+> RNBD can make double-queues for irq-mode and poll-mode.
+> For example, on 4-CPU system 8 request-queues are created,
+> 4 for irq-mode and 4 for poll-mode.
+> If the IO has HIPRI flag, the block-layer will call .poll function
+> of RNBD. Then IO is sent to the poll-mode queue.
+> Add optional nr_poll_queues argument for map_devices interface.
+> 
+> To support polling of RNBD, RTRS client creates connections
+> for both of irq-mode and direct-poll-mode.
+> 
+> For example, on 4-CPU system it could've create 5 connections:
+> con[0] => user message (softirq cq)
+> con[1:4] => softirq cq
+> 
+> After this patch, it can create 9 connections:
+> con[0] => user message (softirq cq)
+> con[1:4] => softirq cq
+> con[5:8] => DIRECT-POLL cq
+> 
+> Cc: Leon Romanovsky <leonro@nvidia.com>
+> Cc: linux-rdma@vger.kernel.org
+> Signed-off-by: Gioh Kim <gi-oh.kim@ionos.com>
+> Signed-off-by: Jack Wang <jinpu.wang@ionos.com>
+> Acked-by: Jason Gunthorpe <jgg@nvidia.com>
+> ---
+>  drivers/block/rnbd/rnbd-clt-sysfs.c    | 56 +++++++++++++----
+>  drivers/block/rnbd/rnbd-clt.c          | 85 +++++++++++++++++++++++---
+>  drivers/block/rnbd/rnbd-clt.h          |  5 +-
+>  drivers/infiniband/ulp/rtrs/rtrs-clt.c | 62 +++++++++++++++----
+>  drivers/infiniband/ulp/rtrs/rtrs-pri.h |  1 +
+>  drivers/infiniband/ulp/rtrs/rtrs.h     |  3 +-
+>  6 files changed, 178 insertions(+), 34 deletions(-)
+> 
+> diff --git a/drivers/block/rnbd/rnbd-clt-sysfs.c b/drivers/block/rnbd/rnbd-clt-sysfs.c
+> index 49015f428e67..bd111ebceb75 100644
+> --- a/drivers/block/rnbd/rnbd-clt-sysfs.c
+> +++ b/drivers/block/rnbd/rnbd-clt-sysfs.c
+> @@ -34,6 +34,7 @@ enum {
+>  	RNBD_OPT_DEV_PATH	= 1 << 2,
+>  	RNBD_OPT_ACCESS_MODE	= 1 << 3,
+>  	RNBD_OPT_SESSNAME	= 1 << 6,
+> +	RNBD_OPT_NR_POLL_QUEUES	= 1 << 7,
+>  };
+>  
+>  static const unsigned int rnbd_opt_mandatory[] = {
+> @@ -42,12 +43,13 @@ static const unsigned int rnbd_opt_mandatory[] = {
+>  };
+>  
+>  static const match_table_t rnbd_opt_tokens = {
+> -	{RNBD_OPT_PATH,		"path=%s"	},
+> -	{RNBD_OPT_DEV_PATH,	"device_path=%s"},
+> -	{RNBD_OPT_DEST_PORT,	"dest_port=%d"  },
+> -	{RNBD_OPT_ACCESS_MODE,	"access_mode=%s"},
+> -	{RNBD_OPT_SESSNAME,	"sessname=%s"	},
+> -	{RNBD_OPT_ERR,		NULL		},
+> +	{RNBD_OPT_PATH,			"path=%s"		},
+> +	{RNBD_OPT_DEV_PATH,		"device_path=%s"	},
+> +	{RNBD_OPT_DEST_PORT,		"dest_port=%d"		},
+> +	{RNBD_OPT_ACCESS_MODE,		"access_mode=%s"	},
+> +	{RNBD_OPT_SESSNAME,		"sessname=%s"		},
+> +	{RNBD_OPT_NR_POLL_QUEUES,	"nr_poll_queues=%d"	},
+> +	{RNBD_OPT_ERR,			NULL			},
+>  };
+>  
+>  struct rnbd_map_options {
+> @@ -57,6 +59,7 @@ struct rnbd_map_options {
+>  	char *pathname;
+>  	u16 *dest_port;
+>  	enum rnbd_access_mode *access_mode;
+> +	u32 *nr_poll_queues;
+>  };
+>  
+>  static int rnbd_clt_parse_map_options(const char *buf, size_t max_path_cnt,
+> @@ -68,7 +71,7 @@ static int rnbd_clt_parse_map_options(const char *buf, size_t max_path_cnt,
+>  	int opt_mask = 0;
+>  	int token;
+>  	int ret = -EINVAL;
+> -	int i, dest_port;
+> +	int i, dest_port, nr_poll_queues;
+>  	int p_cnt = 0;
+>  
+>  	options = kstrdup(buf, GFP_KERNEL);
+> @@ -178,6 +181,19 @@ static int rnbd_clt_parse_map_options(const char *buf, size_t max_path_cnt,
+>  			kfree(p);
+>  			break;
+>  
+> +		case RNBD_OPT_NR_POLL_QUEUES:
+> +			if (match_int(args, &nr_poll_queues) || nr_poll_queues < -1 ||
+> +			    nr_poll_queues > (int)nr_cpu_ids) {
+> +				pr_err("bad nr_poll_queues parameter '%d'\n",
+> +				       nr_poll_queues);
+> +				ret = -EINVAL;
+> +				goto out;
+> +			}
+> +			if (nr_poll_queues == -1)
+> +				nr_poll_queues = nr_cpu_ids;
+> +			*opt->nr_poll_queues = nr_poll_queues;
+> +			break;
+> +
+>  		default:
+>  			pr_err("map_device: Unknown parameter or missing value '%s'\n",
+>  			       p);
+> @@ -227,6 +243,20 @@ static ssize_t state_show(struct kobject *kobj,
+>  
+>  static struct kobj_attribute rnbd_clt_state_attr = __ATTR_RO(state);
+>  
+> +static ssize_t nr_poll_queues_show(struct kobject *kobj,
+> +				   struct kobj_attribute *attr, char *page)
+> +{
+> +	struct rnbd_clt_dev *dev;
+> +
+> +	dev = container_of(kobj, struct rnbd_clt_dev, kobj);
+> +
+> +	return snprintf(page, PAGE_SIZE, "%d\n",
+> +			dev->nr_poll_queues);
+> +}
+
+Didn't Greg ask you to use sysfs_emit() here?
+
+> +
+> +static struct kobj_attribute rnbd_clt_nr_poll_queues =
+> +	__ATTR_RO(nr_poll_queues);
+> +
+>  static ssize_t mapping_path_show(struct kobject *kobj,
+>  				 struct kobj_attribute *attr, char *page)
+>  {
+> @@ -421,6 +451,7 @@ static struct attribute *rnbd_dev_attrs[] = {
+>  	&rnbd_clt_state_attr.attr,
+>  	&rnbd_clt_session_attr.attr,
+>  	&rnbd_clt_access_mode.attr,
+> +	&rnbd_clt_nr_poll_queues.attr,
+>  	NULL,
+>  };
+>  
+> @@ -469,7 +500,7 @@ static ssize_t rnbd_clt_map_device_show(struct kobject *kobj,
+>  					 char *page)
+>  {
+>  	return scnprintf(page, PAGE_SIZE,
+> -			 "Usage: echo \"[dest_port=server port number] sessname=<name of the rtrs session> path=<[srcaddr@]dstaddr> [path=<[srcaddr@]dstaddr>] device_path=<full path on remote side> [access_mode=<ro|rw|migration>]\" > %s\n\naddr ::= [ ip:<ipv4> | ip:<ipv6> | gid:<gid> ]\n",
+> +			 "Usage: echo \"[dest_port=server port number] sessname=<name of the rtrs session> path=<[srcaddr@]dstaddr> [path=<[srcaddr@]dstaddr>] device_path=<full path on remote side> [access_mode=<ro|rw|migration>] [nr_poll_queues=<number of queues>]\" > %s\n\naddr ::= [ ip:<ipv4> | ip:<ipv6> | gid:<gid> ]\n",
+>  			 attr->attr.name);
+>  }
+>  
+> @@ -541,6 +572,7 @@ static ssize_t rnbd_clt_map_device_store(struct kobject *kobj,
+>  	char sessname[NAME_MAX];
+>  	enum rnbd_access_mode access_mode = RNBD_ACCESS_RW;
+>  	u16 port_nr = RTRS_PORT;
+> +	u32 nr_poll_queues = 0;
+>  
+>  	struct sockaddr_storage *addrs;
+>  	struct rtrs_addr paths[6];
+> @@ -552,6 +584,7 @@ static ssize_t rnbd_clt_map_device_store(struct kobject *kobj,
+>  	opt.pathname = pathname;
+>  	opt.dest_port = &port_nr;
+>  	opt.access_mode = &access_mode;
+> +	opt.nr_poll_queues = &nr_poll_queues;
+>  	addrs = kcalloc(ARRAY_SIZE(paths) * 2, sizeof(*addrs), GFP_KERNEL);
+>  	if (!addrs)
+>  		return -ENOMEM;
+> @@ -565,12 +598,13 @@ static ssize_t rnbd_clt_map_device_store(struct kobject *kobj,
+>  	if (ret)
+>  		goto out;
+>  
+> -	pr_info("Mapping device %s on session %s, (access_mode: %s)\n",
+> +	pr_info("Mapping device %s on session %s, (access_mode: %s, nr_poll_queues: %d)\n",
+>  		pathname, sessname,
+> -		rnbd_access_mode_str(access_mode));
+> +		rnbd_access_mode_str(access_mode),
+> +		nr_poll_queues);
+>  
+>  	dev = rnbd_clt_map_device(sessname, paths, path_cnt, port_nr, pathname,
+> -				  access_mode);
+> +				  access_mode, nr_poll_queues);
+>  	if (IS_ERR(dev)) {
+>  		ret = PTR_ERR(dev);
+>  		goto out;
+> diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.c
+> index 9b44aac680d5..63719ec04d58 100644
+> --- a/drivers/block/rnbd/rnbd-clt.c
+> +++ b/drivers/block/rnbd/rnbd-clt.c
+> @@ -1165,9 +1165,54 @@ static blk_status_t rnbd_queue_rq(struct blk_mq_hw_ctx *hctx,
+>  	return ret;
+>  }
+>  
+> +static int rnbd_rdma_poll(struct blk_mq_hw_ctx *hctx)
+> +{
+> +	struct rnbd_queue *q = hctx->driver_data;
+> +	struct rnbd_clt_dev *dev = q->dev;
+> +	int cnt;
+> +
+> +	cnt = rtrs_clt_rdma_cq_direct(dev->sess->rtrs, hctx->queue_num);
+> +	return cnt;
+> +}
+> +
+> +static int rnbd_rdma_map_queues(struct blk_mq_tag_set *set)
+> +{
+> +	struct rnbd_clt_session *sess = set->driver_data;
+> +
+> +	/* shared read/write queues */
+> +	set->map[HCTX_TYPE_DEFAULT].nr_queues = num_online_cpus();
+> +	set->map[HCTX_TYPE_DEFAULT].queue_offset = 0;
+> +	set->map[HCTX_TYPE_READ].nr_queues = num_online_cpus();
+> +	set->map[HCTX_TYPE_READ].queue_offset = 0;
+> +	blk_mq_map_queues(&set->map[HCTX_TYPE_DEFAULT]);
+> +	blk_mq_map_queues(&set->map[HCTX_TYPE_READ]);
+> +
+> +	if (sess->nr_poll_queues) {
+> +		/* dedicated queue for poll */
+> +		set->map[HCTX_TYPE_POLL].nr_queues = sess->nr_poll_queues;
+> +		set->map[HCTX_TYPE_POLL].queue_offset = set->map[HCTX_TYPE_READ].queue_offset +
+> +			set->map[HCTX_TYPE_READ].nr_queues;
+> +		blk_mq_map_queues(&set->map[HCTX_TYPE_POLL]);
+> +		pr_info("[session=%s] mapped %d/%d/%d default/read/poll queues.\n",
+> +			sess->sessname,
+> +			set->map[HCTX_TYPE_DEFAULT].nr_queues,
+> +			set->map[HCTX_TYPE_READ].nr_queues,
+> +			set->map[HCTX_TYPE_POLL].nr_queues);
+> +	} else {
+> +		pr_info("[session=%s] mapped %d/%d default/read queues.\n",
+> +			sess->sessname,
+> +			set->map[HCTX_TYPE_DEFAULT].nr_queues,
+> +			set->map[HCTX_TYPE_READ].nr_queues);
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>  static struct blk_mq_ops rnbd_mq_ops = {
+>  	.queue_rq	= rnbd_queue_rq,
+>  	.complete	= rnbd_softirq_done_fn,
+> +	.map_queues     = rnbd_rdma_map_queues,
+> +	.poll           = rnbd_rdma_poll,
+>  };
+>  
+>  static int setup_mq_tags(struct rnbd_clt_session *sess)
+> @@ -1181,7 +1226,15 @@ static int setup_mq_tags(struct rnbd_clt_session *sess)
+>  	tag_set->flags		= BLK_MQ_F_SHOULD_MERGE |
+>  				  BLK_MQ_F_TAG_QUEUE_SHARED;
+>  	tag_set->cmd_size	= sizeof(struct rnbd_iu) + RNBD_RDMA_SGL_SIZE;
+> -	tag_set->nr_hw_queues	= num_online_cpus();
+> +
+> +	/* for HCTX_TYPE_DEFAULT, HCTX_TYPE_READ, HCTX_TYPE_POLL */
+> +	tag_set->nr_maps        = sess->nr_poll_queues ? HCTX_MAX_TYPES : 2;
+> +	/*
+> +	 * HCTX_TYPE_DEFAULT and HCTX_TYPE_READ share one set of queues
+> +	 * others are for HCTX_TYPE_POLL
+> +	 */
+> +	tag_set->nr_hw_queues	= num_online_cpus() + sess->nr_poll_queues;
+> +	tag_set->driver_data    = sess;
+>  
+>  	return blk_mq_alloc_tag_set(tag_set);
+>  }
+> @@ -1189,7 +1242,7 @@ static int setup_mq_tags(struct rnbd_clt_session *sess)
+>  static struct rnbd_clt_session *
+>  find_and_get_or_create_sess(const char *sessname,
+>  			    const struct rtrs_addr *paths,
+> -			    size_t path_cnt, u16 port_nr)
+> +			    size_t path_cnt, u16 port_nr, u32 nr_poll_queues)
+>  {
+>  	struct rnbd_clt_session *sess;
+>  	struct rtrs_attrs attrs;
+> @@ -1198,6 +1251,17 @@ find_and_get_or_create_sess(const char *sessname,
+>  	struct rtrs_clt_ops rtrs_ops;
+>  
+>  	sess = find_or_create_sess(sessname, &first);
+> +	if (sess == ERR_PTR(-ENOMEM))
+> +		return ERR_PTR(-ENOMEM);
+> +	else if ((nr_poll_queues && !first) ||  (!nr_poll_queues && sess->nr_poll_queues)) {
+> +		/*
+> +		 * A device MUST have its own session to use the polling-mode.
+> +		 * It must fail to map new device with the same session.
+> +		 */
+> +		err = -EINVAL;
+> +		goto put_sess;
+> +	}
+> +
+>  	if (!first)
+>  		return sess;
+>  
+> @@ -1219,7 +1283,7 @@ find_and_get_or_create_sess(const char *sessname,
+>  				   0, /* Do not use pdu of rtrs */
+>  				   RECONNECT_DELAY, BMAX_SEGMENTS,
+>  				   BLK_MAX_SEGMENT_SIZE,
+> -				   MAX_RECONNECTS);
+> +				   MAX_RECONNECTS, nr_poll_queues);
+>  	if (IS_ERR(sess->rtrs)) {
+>  		err = PTR_ERR(sess->rtrs);
+>  		goto wake_up_and_put;
+> @@ -1227,6 +1291,7 @@ find_and_get_or_create_sess(const char *sessname,
+>  	rtrs_clt_query(sess->rtrs, &attrs);
+>  	sess->max_io_size = attrs.max_io_size;
+>  	sess->queue_depth = attrs.queue_depth;
+> +	sess->nr_poll_queues = nr_poll_queues;
+>  
+>  	err = setup_mq_tags(sess);
+>  	if (err)
+> @@ -1370,7 +1435,8 @@ static int rnbd_client_setup_device(struct rnbd_clt_dev *dev)
+>  
+>  static struct rnbd_clt_dev *init_dev(struct rnbd_clt_session *sess,
+>  				      enum rnbd_access_mode access_mode,
+> -				      const char *pathname)
+> +				      const char *pathname,
+> +				      u32 nr_poll_queues)
+>  {
+>  	struct rnbd_clt_dev *dev;
+>  	int ret;
+> @@ -1379,7 +1445,8 @@ static struct rnbd_clt_dev *init_dev(struct rnbd_clt_session *sess,
+>  	if (!dev)
+>  		return ERR_PTR(-ENOMEM);
+>  
+> -	dev->hw_queues = kcalloc(nr_cpu_ids, sizeof(*dev->hw_queues),
+> +	dev->hw_queues = kcalloc(nr_cpu_ids /* softirq */ + nr_poll_queues /* poll */,
+
+Please don't add comments in the middle of function call.
+
+> +				 sizeof(*dev->hw_queues),
+>  				 GFP_KERNEL);
+>  	if (!dev->hw_queues) {
+>  		ret = -ENOMEM;
+> @@ -1405,6 +1472,7 @@ static struct rnbd_clt_dev *init_dev(struct rnbd_clt_session *sess,
+>  	dev->clt_device_id	= ret;
+>  	dev->sess		= sess;
+>  	dev->access_mode	= access_mode;
+> +	dev->nr_poll_queues	= nr_poll_queues;
+>  	mutex_init(&dev->lock);
+>  	refcount_set(&dev->refcount, 1);
+>  	dev->dev_state = DEV_STATE_INIT;
+> @@ -1491,7 +1559,8 @@ struct rnbd_clt_dev *rnbd_clt_map_device(const char *sessname,
+>  					   struct rtrs_addr *paths,
+>  					   size_t path_cnt, u16 port_nr,
+>  					   const char *pathname,
+> -					   enum rnbd_access_mode access_mode)
+> +					   enum rnbd_access_mode access_mode,
+> +					   u32 nr_poll_queues)
+>  {
+>  	struct rnbd_clt_session *sess;
+>  	struct rnbd_clt_dev *dev;
+> @@ -1500,11 +1569,11 @@ struct rnbd_clt_dev *rnbd_clt_map_device(const char *sessname,
+>  	if (unlikely(exists_devpath(pathname, sessname)))
+>  		return ERR_PTR(-EEXIST);
+>  
+> -	sess = find_and_get_or_create_sess(sessname, paths, path_cnt, port_nr);
+> +	sess = find_and_get_or_create_sess(sessname, paths, path_cnt, port_nr, nr_poll_queues);
+>  	if (IS_ERR(sess))
+>  		return ERR_CAST(sess);
+>  
+> -	dev = init_dev(sess, access_mode, pathname);
+> +	dev = init_dev(sess, access_mode, pathname, nr_poll_queues);
+>  	if (IS_ERR(dev)) {
+>  		pr_err("map_device: failed to map device '%s' from session %s, can't initialize device, err: %ld\n",
+>  		       pathname, sess->sessname, PTR_ERR(dev));
+> diff --git a/drivers/block/rnbd/rnbd-clt.h b/drivers/block/rnbd/rnbd-clt.h
+> index 714d426b449b..451e7383738f 100644
+> --- a/drivers/block/rnbd/rnbd-clt.h
+> +++ b/drivers/block/rnbd/rnbd-clt.h
+> @@ -90,6 +90,7 @@ struct rnbd_clt_session {
+>  	int			queue_depth;
+>  	u32			max_io_size;
+>  	struct blk_mq_tag_set	tag_set;
+> +	u32			nr_poll_queues;
+>  	struct mutex		lock; /* protects state and devs_list */
+>  	struct list_head        devs_list; /* list of struct rnbd_clt_dev */
+>  	refcount_t		refcount;
+> @@ -118,6 +119,7 @@ struct rnbd_clt_dev {
+>  	enum rnbd_clt_dev_state	dev_state;
+>  	char			*pathname;
+>  	enum rnbd_access_mode	access_mode;
+> +	u32			nr_poll_queues;
+>  	bool			read_only;
+>  	bool			rotational;
+>  	bool			wc;
+> @@ -147,7 +149,8 @@ struct rnbd_clt_dev *rnbd_clt_map_device(const char *sessname,
+>  					   struct rtrs_addr *paths,
+>  					   size_t path_cnt, u16 port_nr,
+>  					   const char *pathname,
+> -					   enum rnbd_access_mode access_mode);
+> +					   enum rnbd_access_mode access_mode,
+> +					   u32 nr_poll_queues);
+>  int rnbd_clt_unmap_device(struct rnbd_clt_dev *dev, bool force,
+>  			   const struct attribute *sysfs_self);
+>  
+> diff --git a/drivers/infiniband/ulp/rtrs/rtrs-clt.c b/drivers/infiniband/ulp/rtrs/rtrs-clt.c
+> index 7efd49bdc78c..467d135a82cf 100644
+> --- a/drivers/infiniband/ulp/rtrs/rtrs-clt.c
+> +++ b/drivers/infiniband/ulp/rtrs/rtrs-clt.c
+> @@ -174,7 +174,7 @@ struct rtrs_clt_con *rtrs_permit_to_clt_con(struct rtrs_clt_sess *sess,
+>  	int id = 0;
+>  
+>  	if (likely(permit->con_type == RTRS_IO_CON))
+> -		id = (permit->cpu_id % (sess->s.con_num - 1)) + 1;
+> +		id = (permit->cpu_id % (sess->s.irq_con_num - 1)) + 1;
+>  
+>  	return to_clt_con(sess->s.con[id]);
+>  }
+> @@ -1400,23 +1400,29 @@ static void rtrs_clt_close_work(struct work_struct *work);
+>  static struct rtrs_clt_sess *alloc_sess(struct rtrs_clt *clt,
+>  					 const struct rtrs_addr *path,
+>  					 size_t con_num, u16 max_segments,
+> -					 size_t max_segment_size)
+> +					 size_t max_segment_size, u32 nr_poll_queues)
+>  {
+>  	struct rtrs_clt_sess *sess;
+>  	int err = -ENOMEM;
+>  	int cpu;
+> +	size_t total_con;
+>  
+>  	sess = kzalloc(sizeof(*sess), GFP_KERNEL);
+>  	if (!sess)
+>  		goto err;
+>  
+> -	/* Extra connection for user messages */
+> -	con_num += 1;
+> -
+> -	sess->s.con = kcalloc(con_num, sizeof(*sess->s.con), GFP_KERNEL);
+> +	/*
+> +	 * irqmode and poll
+> +	 * +1: Extra connection for user messages
+> +	 */
+> +	total_con = con_num + nr_poll_queues + 1;
+> +	sess->s.con = kcalloc(total_con, sizeof(*sess->s.con), GFP_KERNEL);
+>  	if (!sess->s.con)
+>  		goto err_free_sess;
+>  
+> +	sess->s.con_num = total_con;
+> +	sess->s.irq_con_num = con_num + 1;
+> +
+>  	sess->stats = kzalloc(sizeof(*sess->stats), GFP_KERNEL);
+>  	if (!sess->stats)
+>  		goto err_free_con;
+> @@ -1435,7 +1441,6 @@ static struct rtrs_clt_sess *alloc_sess(struct rtrs_clt *clt,
+>  		memcpy(&sess->s.src_addr, path->src,
+>  		       rdma_addr_size((struct sockaddr *)path->src));
+>  	strlcpy(sess->s.sessname, clt->sessname, sizeof(sess->s.sessname));
+> -	sess->s.con_num = con_num;
+>  	sess->clt = clt;
+>  	sess->max_pages_per_mr = max_segments * max_segment_size >> 12;
+>  	init_waitqueue_head(&sess->state_wq);
+> @@ -1576,9 +1581,14 @@ static int create_con_cq_qp(struct rtrs_clt_con *con)
+>  	}
+>  	cq_size = max_send_wr + max_recv_wr;
+>  	cq_vector = con->cpu % sess->s.dev->ib_dev->num_comp_vectors;
+> -	err = rtrs_cq_qp_create(&sess->s, &con->c, sess->max_send_sge,
+> -				 cq_vector, cq_size, max_send_wr,
+> -				 max_recv_wr, IB_POLL_SOFTIRQ);
+> +	if (con->c.cid >= sess->s.irq_con_num)
+> +		err = rtrs_cq_qp_create(&sess->s, &con->c, sess->max_send_sge,
+> +					cq_vector, cq_size, max_send_wr,
+> +					max_recv_wr, IB_POLL_DIRECT);
+> +	else
+> +		err = rtrs_cq_qp_create(&sess->s, &con->c, sess->max_send_sge,
+> +					cq_vector, cq_size, max_send_wr,
+> +					max_recv_wr, IB_POLL_SOFTIRQ);
+>  	/*
+>  	 * In case of error we do not bother to clean previous allocations,
+>  	 * since destroy_con_cq_qp() must be called.
+> @@ -2631,6 +2641,7 @@ static void free_clt(struct rtrs_clt *clt)
+>   * @max_segment_size: Max. size of one segment
+>   * @max_reconnect_attempts: Number of times to reconnect on error before giving
+>   *			    up, 0 for * disabled, -1 for forever
+> + * @nr_poll_queues: number of polling mode connection using IB_POLL_DIRECT flag
+>   *
+>   * Starts session establishment with the rtrs_server. The function can block
+>   * up to ~2000ms before it returns.
+> @@ -2644,7 +2655,7 @@ struct rtrs_clt *rtrs_clt_open(struct rtrs_clt_ops *ops,
+>  				 size_t pdu_sz, u8 reconnect_delay_sec,
+>  				 u16 max_segments,
+>  				 size_t max_segment_size,
+> -				 s16 max_reconnect_attempts)
+> +				 s16 max_reconnect_attempts, u32 nr_poll_queues)
+>  {
+>  	struct rtrs_clt_sess *sess, *tmp;
+>  	struct rtrs_clt *clt;
+> @@ -2662,7 +2673,7 @@ struct rtrs_clt *rtrs_clt_open(struct rtrs_clt_ops *ops,
+>  		struct rtrs_clt_sess *sess;
+>  
+>  		sess = alloc_sess(clt, &paths[i], nr_cpu_ids,
+> -				  max_segments, max_segment_size);
+> +				  max_segments, max_segment_size, nr_poll_queues);
+>  		if (IS_ERR(sess)) {
+>  			err = PTR_ERR(sess);
+>  			goto close_all_sess;
+> @@ -2887,6 +2898,31 @@ int rtrs_clt_request(int dir, struct rtrs_clt_req_ops *ops,
+>  }
+>  EXPORT_SYMBOL(rtrs_clt_request);
+>  
+> +int rtrs_clt_rdma_cq_direct(struct rtrs_clt *clt, unsigned int index)
+> +{
+> +	int cnt;
+> +	struct rtrs_con *con;
+> +	struct rtrs_clt_sess *sess;
+> +	struct path_it it;
+> +
+> +	rcu_read_lock();
+> +	for (path_it_init(&it, clt);
+> +	     (sess = it.next_path(&it)) && it.i < it.clt->paths_num; it.i++) {
+> +		if (unlikely(READ_ONCE(sess->state) != RTRS_CLT_CONNECTED))
+
+We talked about useless likely/unlikely in your workloads.
+
+> +			continue;
+> +
+> +		con = sess->s.con[index + 1];
+> +		cnt = ib_process_cq_direct(con->cq, -1);
+> +		if (likely(cnt))
+> +			break;
+> +	}
+> +	path_it_deinit(&it);
+> +	rcu_read_unlock();
+> +
+> +	return cnt;
+> +}
+> +EXPORT_SYMBOL(rtrs_clt_rdma_cq_direct);
+> +
+>  /**
+>   * rtrs_clt_query() - queries RTRS session attributes
+>   *@clt: session pointer
+> @@ -2916,7 +2952,7 @@ int rtrs_clt_create_path_from_sysfs(struct rtrs_clt *clt,
+>  	int err;
+>  
+>  	sess = alloc_sess(clt, addr, nr_cpu_ids, clt->max_segments,
+> -			  clt->max_segment_size);
+> +			  clt->max_segment_size, 0);
+>  	if (IS_ERR(sess))
+>  		return PTR_ERR(sess);
+>  
+> diff --git a/drivers/infiniband/ulp/rtrs/rtrs-pri.h b/drivers/infiniband/ulp/rtrs/rtrs-pri.h
+> index 8caad0a2322b..00eb45053339 100644
+> --- a/drivers/infiniband/ulp/rtrs/rtrs-pri.h
+> +++ b/drivers/infiniband/ulp/rtrs/rtrs-pri.h
+> @@ -101,6 +101,7 @@ struct rtrs_sess {
+>  	uuid_t			uuid;
+>  	struct rtrs_con	**con;
+>  	unsigned int		con_num;
+> +	unsigned int		irq_con_num;
+>  	unsigned int		recon_cnt;
+>  	struct rtrs_ib_dev	*dev;
+>  	int			dev_ref;
+> diff --git a/drivers/infiniband/ulp/rtrs/rtrs.h b/drivers/infiniband/ulp/rtrs/rtrs.h
+> index 2db1b5eb3ab0..f891fbe7abe6 100644
+> --- a/drivers/infiniband/ulp/rtrs/rtrs.h
+> +++ b/drivers/infiniband/ulp/rtrs/rtrs.h
+> @@ -59,7 +59,7 @@ struct rtrs_clt *rtrs_clt_open(struct rtrs_clt_ops *ops,
+>  				 size_t pdu_sz, u8 reconnect_delay_sec,
+>  				 u16 max_segments,
+>  				 size_t max_segment_size,
+> -				 s16 max_reconnect_attempts);
+> +				 s16 max_reconnect_attempts, u32 nr_poll_queues);
+>  
+>  void rtrs_clt_close(struct rtrs_clt *sess);
+>  
+> @@ -103,6 +103,7 @@ int rtrs_clt_request(int dir, struct rtrs_clt_req_ops *ops,
+>  		     struct rtrs_clt *sess, struct rtrs_permit *permit,
+>  		     const struct kvec *vec, size_t nr, size_t len,
+>  		     struct scatterlist *sg, unsigned int sg_cnt);
+> +int rtrs_clt_rdma_cq_direct(struct rtrs_clt *clt, unsigned int index);
+>  
+>  /**
+>   * rtrs_attrs - RTRS session attributes
+> -- 
+> 2.25.1
+> 
