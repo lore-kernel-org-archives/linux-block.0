@@ -7,55 +7,55 @@ X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C3ECC4363F
-	for <linux-block@archiver.kernel.org>; Mon, 19 Apr 2021 07:38:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07B13C433ED
+	for <linux-block@archiver.kernel.org>; Mon, 19 Apr 2021 07:38:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 177FB61166
-	for <linux-block@archiver.kernel.org>; Mon, 19 Apr 2021 07:38:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DD9F16102A
+	for <linux-block@archiver.kernel.org>; Mon, 19 Apr 2021 07:37:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237932AbhDSHi3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 19 Apr 2021 03:38:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39598 "EHLO
+        id S237895AbhDSHi2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 19 Apr 2021 03:38:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39582 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237892AbhDSHi3 (ORCPT
+        with ESMTP id S237892AbhDSHi1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 19 Apr 2021 03:38:29 -0400
-Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0461C061760
-        for <linux-block@vger.kernel.org>; Mon, 19 Apr 2021 00:37:59 -0700 (PDT)
-Received: by mail-ed1-x52e.google.com with SMTP id o20so13142697edc.7
-        for <linux-block@vger.kernel.org>; Mon, 19 Apr 2021 00:37:59 -0700 (PDT)
+        Mon, 19 Apr 2021 03:38:27 -0400
+Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6841C06138A
+        for <linux-block@vger.kernel.org>; Mon, 19 Apr 2021 00:37:57 -0700 (PDT)
+Received: by mail-ej1-x630.google.com with SMTP id r9so51346819ejj.3
+        for <linux-block@vger.kernel.org>; Mon, 19 Apr 2021 00:37:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=ionos.com; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=kudgbHD2vmKiyqxiiVxPOr/XbfnTQZ5BaCjcZ6vN5kA=;
-        b=cAEMqMoFRRxpYABu7CT6sZywZZzoCwlm11yelZns/FpQ4KTs1FaxNIOZtyURy3Qa4A
-         dc2p5yparElIgfCYC+F867aLypZ/vM1V/tUCpo3kXYLqrEk6XEn7cPRKynBmWHnlEar7
-         +/UEOUgsGs1mzjfEq7VttaWlXzVNXzKeIk8HzhB0wtFauNN74XPetX45K/Uj3nuJ1Mkr
-         3+yk7tmZEqfwGAbXcOZJEdvnA+9YByVYgoV0BMhw8yavn5XlW1IsHyAUbpTnm9fURKAR
-         H90XAijS4edGboSGm1XMK7UfM4rsDS0IJ7BNj7EnQLtmqQmEueXlWRwiMbzGHtiJcyPf
-         LqPQ==
+        bh=+WusjvsYw5StKARzVGPy5VqECBTOsgPT1toBxn5pBW8=;
+        b=JaGUwUc7DZcoVAKStUGSmkYCT1j9dizx+39l2WdQ/2t+57x3hjcpUV48bobxlTWBPu
+         LdJ5t2oyyVtX33xrvKnW0ozFXzQXkfFgei/PhwrLvBcTgpz0FJ0hGQDL2ramb8SaAgVv
+         FtXOJQBSpPW8LgAnf1ZldHeSQwXZL0mRhaO/2FRwIdEwMTb12DI1Hd8BwymrQ7AiwZEB
+         7GyxxDzHufU6D40Ew44ygOPvAnCW/mVhXiTAkkHoSZWvXIBw4GO9y8nNQi+Nm8IWaeI0
+         9Jbf52+T5QF1FeC8tnJ/viVEKqvVB5Q6UGB01RD7olUQySMt8TXiq9nq293AdcOzFym8
+         qgxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=kudgbHD2vmKiyqxiiVxPOr/XbfnTQZ5BaCjcZ6vN5kA=;
-        b=TmhA0QHqXh4lw2oMkIZ9otN8NZn0KJyCEW3SpNbYryCg4/UzHN9Opkh/evvJwQwC1M
-         CQnbFy3qkfpDtjiVWRcHsnt5A5tUafNJ5s3PrLBoiGQm8PkDIREBmW8UIJQJAXal3Q4X
-         8372hAYiVOWV/+bHWi8mw4gRcWODXv4mu9UpSxJYxCd0MBbQQk+Q2lGfQnz/U2uK/TBF
-         TRYT1tkQKUN/LJr5hRlZEgMG1vtUlp8qSz9zgY4JccUSsakrqtaAclNO/JeHQ1ck+n2h
-         k2xmHW9e/7V0raFnpuiYCWaZIU4GowYmeklA34QFZHTyM2XqBLOKpi+DtjymKbGyvqL5
-         VoeA==
-X-Gm-Message-State: AOAM531M5JvA8aMK7tiN1wozLonglKIJoXeH6VoaktP02JTSHblmRhjZ
-        a4jrxsnNUIYlwm8Rr541BZrHQA9p1d6WQcbq
-X-Google-Smtp-Source: ABdhPJwTR00kqaO1TnkeeWVWRbaGdbptxVLaJJA68SypwcteftRyqTU0tVhdYBOLFQb7fN6WzK/Uaw==
-X-Received: by 2002:aa7:c7c5:: with SMTP id o5mr23756133eds.31.1618817878464;
-        Mon, 19 Apr 2021 00:37:58 -0700 (PDT)
+        bh=+WusjvsYw5StKARzVGPy5VqECBTOsgPT1toBxn5pBW8=;
+        b=adKGqJFt7kAU3rIqE9F2sTMXjA0FB/bS48uf9VWN9aIQ3N0Zb/zMdMSCLr/KBqASjq
+         9x2OmbPmteM73cKTD3qry43scgFPuDPmzr+8sTGtlLZvq/9qBGr03w8us/+NHQsVTVx9
+         5h79FNm0rAc9xSrHwLBLisLcwaqLpIAmqM0TkD07Cuv5FqZNRK6/5Jm+41YreyYTvjd4
+         XidOVZOh/Ce4QOFGvSTNR4LRjj/RIMj0raUxR5mscXrcb3Eh2eX7tEfv/ajuGAYRNfcj
+         KozhBgK5MfS7Xu8FnkQuip2W043JgNNc8BbtJ9c00vqqP/IRtandA8y29wLz9kD32ilj
+         3fRA==
+X-Gm-Message-State: AOAM532/lMw1bFouE74A/1boV8ZZmoPL4JazdPlr+ZPquFu2gIl7hsu6
+        GTKqoezLhdEo9Pz7ZMHf7HPfbfDtSUlAXjeA
+X-Google-Smtp-Source: ABdhPJz/FXoP87ls7wj41eFRH3KmzHOkLpD6Taj5U1m5reU2lo5QVYEqAMc8yeAgkMAjxbUKfkxFxA==
+X-Received: by 2002:a17:906:430f:: with SMTP id j15mr20706135ejm.543.1618817876556;
+        Mon, 19 Apr 2021 00:37:56 -0700 (PDT)
 Received: from localhost.localdomain (ip5f5aeee5.dynamic.kabel-deutschland.de. [95.90.238.229])
-        by smtp.googlemail.com with ESMTPSA id g22sm8701833ejz.46.2021.04.19.00.37.57
+        by smtp.googlemail.com with ESMTPSA id g22sm8701833ejz.46.2021.04.19.00.37.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Apr 2021 00:37:58 -0700 (PDT)
+        Mon, 19 Apr 2021 00:37:56 -0700 (PDT)
 From:   Gioh Kim <gi-oh.kim@ionos.com>
 To:     linux-block@vger.kernel.org, linux-doc@vger.kernel.org
 Cc:     axboe@kernel.dk, akinobu.mita@gmail.com, corbet@lwn.net,
@@ -63,9 +63,9 @@ Cc:     axboe@kernel.dk, akinobu.mita@gmail.com, corbet@lwn.net,
         haris.iqbal@ionos.com, jinpu.wang@ionos.com,
         Gioh Kim <gi-oh.kim@cloud.ionos.com>,
         Gioh Kim <gi-oh.kim@ionos.com>
-Subject: [PATCHv5 for-next 12/19] block/rnbd-clt: Fix missing a memory free when unloading the module
-Date:   Mon, 19 Apr 2021 09:37:15 +0200
-Message-Id: <20210419073722.15351-13-gi-oh.kim@ionos.com>
+Subject: [PATCHv5 for-next 10/19] block/rnbd-srv: Remove force_close file after holding a lock
+Date:   Mon, 19 Apr 2021 09:37:13 +0200
+Message-Id: <20210419073722.15351-11-gi-oh.kim@ionos.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210419073722.15351-1-gi-oh.kim@ionos.com>
 References: <20210419073722.15351-1-gi-oh.kim@ionos.com>
@@ -77,51 +77,77 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Gioh Kim <gi-oh.kim@cloud.ionos.com>
 
-When unloading the rnbd-clt module, it does not free a memory
-including the filename of the symbolic link to /sys/block/rnbdX.
+We changed the rnbd_srv_sess_dev_force_close to use try-lock
+because rnbd_srv_sess_dev_force_close and process_msg_close
+can generate a deadlock.
 
-It is found by kmemleak as below.
-
-unreferenced object 0xffff9f1a83d3c740 (size 16):
-  comm "bash", pid 736, jiffies 4295179665 (age 9841.310s)
-  hex dump (first 16 bytes):
-    21 64 65 76 21 6e 75 6c 6c 62 30 40 62 6c 61 00  !dev!nullb0@bla.
-  backtrace:
-    [<0000000039f0c55e>] 0xffffffffc0456c24
-    [<000000001aab9513>] kernfs_fop_write+0xcf/0x1c0
-    [<00000000db5aa4b3>] vfs_write+0xdb/0x1d0
-    [<000000007a2e2207>] ksys_write+0x65/0xe0
-    [<00000000055e280a>] do_syscall_64+0x50/0x1b0
-    [<00000000c2b51831>] entry_SYSCALL_64_after_hwframe+0x49/0xbe
+Now rnbd_srv_sess_dev_force_close would do nothing
+if it fails to get the lock. So removing the force_close
+file should be moved to after the lock. Or the force_close
+file is removed but the others are not removed.
 
 Signed-off-by: Gioh Kim <gi-oh.kim@ionos.com>
+Signed-off-by: Md Haris Iqbal <haris.iqbal@ionos.com>
 Signed-off-by: Jack Wang <jinpu.wang@ionos.com>
 ---
- drivers/block/rnbd/rnbd-clt-sysfs.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+ drivers/block/rnbd/rnbd-srv-sysfs.c | 5 +----
+ drivers/block/rnbd/rnbd-srv.c       | 5 ++++-
+ drivers/block/rnbd/rnbd-srv.h       | 3 ++-
+ 3 files changed, 7 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/block/rnbd/rnbd-clt-sysfs.c b/drivers/block/rnbd/rnbd-clt-sysfs.c
-index 58c2cc0725b6..49015f428e67 100644
---- a/drivers/block/rnbd/rnbd-clt-sysfs.c
-+++ b/drivers/block/rnbd/rnbd-clt-sysfs.c
-@@ -432,10 +432,14 @@ void rnbd_clt_remove_dev_symlink(struct rnbd_clt_dev *dev)
- 	 * i.e. rnbd_clt_unmap_dev_store() leading to a sysfs warning because
- 	 * of sysfs link already was removed already.
- 	 */
--	if (dev->blk_symlink_name && try_module_get(THIS_MODULE)) {
--		sysfs_remove_link(rnbd_devs_kobj, dev->blk_symlink_name);
-+	if (dev->blk_symlink_name) {
-+		if (try_module_get(THIS_MODULE)) {
-+			sysfs_remove_link(rnbd_devs_kobj, dev->blk_symlink_name);
-+			module_put(THIS_MODULE);
-+		}
-+		/* It should be freed always. */
- 		kfree(dev->blk_symlink_name);
--		module_put(THIS_MODULE);
-+		dev->blk_symlink_name = NULL;
+diff --git a/drivers/block/rnbd/rnbd-srv-sysfs.c b/drivers/block/rnbd/rnbd-srv-sysfs.c
+index 05ffe488ddc6..acf5fced11ef 100644
+--- a/drivers/block/rnbd/rnbd-srv-sysfs.c
++++ b/drivers/block/rnbd/rnbd-srv-sysfs.c
+@@ -147,10 +147,7 @@ static ssize_t rnbd_srv_dev_session_force_close_store(struct kobject *kobj,
+ 	}
+ 
+ 	rnbd_srv_info(sess_dev, "force close requested\n");
+-
+-	/* first remove sysfs itself to avoid deadlock */
+-	sysfs_remove_file_self(&sess_dev->kobj, &attr->attr);
+-	rnbd_srv_sess_dev_force_close(sess_dev);
++	rnbd_srv_sess_dev_force_close(sess_dev, attr);
+ 
+ 	return count;
+ }
+diff --git a/drivers/block/rnbd/rnbd-srv.c b/drivers/block/rnbd/rnbd-srv.c
+index 1549a6361630..a9bb414f7442 100644
+--- a/drivers/block/rnbd/rnbd-srv.c
++++ b/drivers/block/rnbd/rnbd-srv.c
+@@ -329,7 +329,8 @@ static int rnbd_srv_link_ev(struct rtrs_srv *rtrs,
  	}
  }
  
+-void rnbd_srv_sess_dev_force_close(struct rnbd_srv_sess_dev *sess_dev)
++void rnbd_srv_sess_dev_force_close(struct rnbd_srv_sess_dev *sess_dev,
++				   struct kobj_attribute *attr)
+ {
+ 	struct rnbd_srv_session	*sess = sess_dev->sess;
+ 
+@@ -337,6 +338,8 @@ void rnbd_srv_sess_dev_force_close(struct rnbd_srv_sess_dev *sess_dev)
+ 	/* It is already started to close by client's close message. */
+ 	if (!mutex_trylock(&sess->lock))
+ 		return;
++	/* first remove sysfs itself to avoid deadlock */
++	sysfs_remove_file_self(&sess_dev->kobj, &attr->attr);
+ 	rnbd_srv_destroy_dev_session_sysfs(sess_dev);
+ 	mutex_unlock(&sess->lock);
+ }
+diff --git a/drivers/block/rnbd/rnbd-srv.h b/drivers/block/rnbd/rnbd-srv.h
+index b157371c25ed..98ddc31eb408 100644
+--- a/drivers/block/rnbd/rnbd-srv.h
++++ b/drivers/block/rnbd/rnbd-srv.h
+@@ -64,7 +64,8 @@ struct rnbd_srv_sess_dev {
+ 	enum rnbd_access_mode		access_mode;
+ };
+ 
+-void rnbd_srv_sess_dev_force_close(struct rnbd_srv_sess_dev *sess_dev);
++void rnbd_srv_sess_dev_force_close(struct rnbd_srv_sess_dev *sess_dev,
++				   struct kobj_attribute *attr);
+ /* rnbd-srv-sysfs.c */
+ 
+ int rnbd_srv_create_dev_sysfs(struct rnbd_srv_dev *dev,
 -- 
 2.25.1
 
