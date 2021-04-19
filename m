@@ -2,129 +2,160 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	PDS_BAD_THREAD_QP_64,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55D9CC433ED
-	for <linux-block@archiver.kernel.org>; Mon, 19 Apr 2021 22:17:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57235C433B4
+	for <linux-block@archiver.kernel.org>; Mon, 19 Apr 2021 22:19:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 373FE613AF
-	for <linux-block@archiver.kernel.org>; Mon, 19 Apr 2021 22:17:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2DCC461008
+	for <linux-block@archiver.kernel.org>; Mon, 19 Apr 2021 22:19:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231831AbhDSWRa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 19 Apr 2021 18:17:30 -0400
-Received: from mail-pj1-f41.google.com ([209.85.216.41]:35838 "EHLO
-        mail-pj1-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229597AbhDSWR3 (ORCPT
+        id S230213AbhDSWUX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 19 Apr 2021 18:20:23 -0400
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:29566 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230160AbhDSWUX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 19 Apr 2021 18:17:29 -0400
-Received: by mail-pj1-f41.google.com with SMTP id j21-20020a17090ae615b02901505b998b45so5901097pjy.0;
-        Mon, 19 Apr 2021 15:16:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:subject:to:cc:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=KgvHm+BppNn8A4YRtexdxltV8Bme6nRBg7d+mgFCzqA=;
-        b=cHS170fT+we6vbtouDufMoe6rjoFbEmIfOBkEwbjVLK1Sgsg9gisR0RCYvcFkjJ0J3
-         M4nGed+980mmb/NfQIgMB8Vnf57FwradoDtwBcJfsc3S4E9OWJm70HUOy80X9x2q6RgZ
-         67FH/VdqtGui6G4fzb9BQEyqTpwA2FqN4cqbaFvoahhy1gFzBrvy7Dcr8x2J+jok0Beg
-         hCIFqZGtGam9Wd96VSM7e2QODBTP8bJPq7VgUzurz+kZPAWj7l+ztWBTNSfWsQ5THp8D
-         X5GAPzD3Kopb2Do1xganWX2w6BVPzpE7/6c37DidEW8NT6AAzS1v55FJvsztzKMABPud
-         LELA==
-X-Gm-Message-State: AOAM532pE4AbRuewyhHiL/sNYBlDWRjizOSrQeVbhJEoz1Pzz0rFtuJw
-        /9NuKnwKx8t+rKkYrYpcYt8=
-X-Google-Smtp-Source: ABdhPJz4WR2Xk+bXFX/eldRezIHEh6Q5lQJ+4EVjhhLkJLi25bzV4aKal8Pqf8UXcuSE+U6r17zdbQ==
-X-Received: by 2002:a17:90a:5d17:: with SMTP id s23mr1337566pji.44.1618870619245;
-        Mon, 19 Apr 2021 15:16:59 -0700 (PDT)
-Received: from ?IPv6:2601:647:4000:d7:3e77:56a4:910b:42a9? ([2601:647:4000:d7:3e77:56a4:910b:42a9])
-        by smtp.gmail.com with ESMTPSA id e1sm14036997pgl.25.2021.04.19.15.16.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 19 Apr 2021 15:16:58 -0700 (PDT)
-From:   Bart Van Assche <bvanassche@acm.org>
-Subject: Re: [PATCH v7 1/3] bio: limit bio max size
-To:     Changheun Lee <nanich.lee@samsung.com>
-Cc:     Johannes.Thumshirn@wdc.com, asml.silence@gmail.com,
-        axboe@kernel.dk, damien.lemoal@wdc.com, gregkh@linuxfoundation.org,
-        hch@infradead.org, jisoo2146.oh@samsung.com,
-        junho89.kim@samsung.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, ming.lei@redhat.com,
-        mj0123.lee@samsung.com, osandov@fb.com, patchwork-bot@kernel.org,
-        seunghwan.hyun@samsung.com, sookwan7.kim@samsung.com,
-        tj@kernel.org, tom.leiming@gmail.com, woosung2.lee@samsung.com,
-        yt0928.kim@samsung.com
-References: <9ad8ef3f-905c-543e-d2af-7bf2f43ea04c@acm.org>
- <CGME20210419060745epcas1p220138a5de8e08201a6bcd9193c37fc51@epcas1p2.samsung.com>
- <20210419054951.6244-1-nanich.lee@samsung.com>
-Message-ID: <918e0d57-ffbc-7dcd-6eba-87d22aceb9d6@acm.org>
-Date:   Mon, 19 Apr 2021 15:16:56 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.9.1
-MIME-Version: 1.0
-In-Reply-To: <20210419054951.6244-1-nanich.lee@samsung.com>
-Content-Type: text/plain; charset=utf-8
+        Mon, 19 Apr 2021 18:20:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1618870793; x=1650406793;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=eH0CuN1lNET1oC/UrH7mVvlY7Ln9Nn84+Rm52+I3Ntw=;
+  b=F/OVM9uoR2N3l9OBZ7CdW5k3YYO2OqZJZHUEQ3qjZprxrHXxdPplmwYg
+   K5ykYBkBhlkgydaliapxYKCAapRxUNPnc7ca42GcNAIWEmPEQa/IcICcC
+   kTpnxIf4RhXtX6YESiyzZwtZfC5SwAKqg+fYscL14U1aAEa+C4P2ygYHX
+   g548jgG2MfHJZfqi4II+P0GmrMvUkYEM+nFZpsnYV1KaGGu9kqPW0MsRl
+   2aCoxeEixbr9MFbfjekDJnjaXyZOZ06h4yCKaocaQj7YrunmO7m1X+26A
+   z27wB0RmaADzjwHyxrfmpOran/ZrQ0tIyCc/KzUdgKyuqCqtUZU+2hIF7
+   A==;
+IronPort-SDR: iyDlGO8GJfLFb7+t7ZlxUJDOABxQxp0T8yifInCaxMJWV+/bgwNnUh8KeVKKQoLyKROY+N185f
+ 7J305Wk+mzdN0m467Vj4bYcsXELNsWPypr/eSOcXFFhT6lzlgjHExO+Yl7ikXP6Bvv30H/2jLO
+ HrJHZyROazaPrBYKem+0k0TbG5bDoIz7grtiiVt4LuhC0yRRJNLvA6vyraLMU4gqXev/iNssob
+ hO8D5zu9OSDpKfe13eqPj90u745Jlnl7DvBsLLPFEVudlhVSwctz9Jd+WRv+mwBVIrHEh3FkzZ
+ WAQ=
+X-IronPort-AV: E=Sophos;i="5.82,235,1613404800"; 
+   d="scan'208";a="170013069"
+Received: from mail-dm6nam11lp2172.outbound.protection.outlook.com (HELO NAM11-DM6-obe.outbound.protection.outlook.com) ([104.47.57.172])
+  by ob1.hgst.iphmx.com with ESMTP; 20 Apr 2021 06:19:52 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=MRBHwtRPE3sYGvE4CyKbC/eTBr16mKB5T8DXWkLmuqcepjcEmu+y08zNveAL8yJuVhYvvQG8kLXHbcRjYJocz4MmuoulMJ5SXuoio12eqpfa3LzLlxyNByVnzpPrc7h7IjtbXOAqSTzIj7RmaWbJlQIvxjor6TpPQBQ8AxXzYEzsGBE4FuOY9LoBLGTTr3bktIcQI/cRT6QFNbecR+DWS4KsQ5BeGPB9GIGm+4wzdhl7Y4CMzF3kzeN1PsNxQ9IQRvXsHxRuCNlfu6d7Ymh+VxWwqHd8fHOn6yFoIT52FrquLFRwfME4dIbx8VxkGuFpz6ZiWwtRn3lkVI6gVAVoZg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SiEjacOmPlRc9Hfh4HCd19MmSIFUK4QV7204TK+SMOw=;
+ b=jLaKUGl3rx7n46VcrO/q2hpXEgGd9H7VHV95ZyCBw0xw+2D7kLqsQM2XXNgU6Q81nNfezVE6y1BHh2Xi1DxAZpyTTmGu2vYA1DyqscT4b/9l64l9QuiHEJc8hedxo2rYfcZ4ItxOtbzrEkfi6F3azT9lpeV9X3yXSEmNGvOYfcXfihTa3/wt4r22j6BfeXVbDyvCphEZTx/SWDKJ3SQ0GwDu4XxJJtApTCdLvIjYCctybabv0w6Y6Gd76NHR5zsxBEKu/dOa6H1O03Rp3WFzILzMsHIUt1R/wb0ZkOxpCq9gaF77yNGXMTG7XdcjRncqbWHikW7kWoRVYhBlMtewWw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SiEjacOmPlRc9Hfh4HCd19MmSIFUK4QV7204TK+SMOw=;
+ b=AuLds7HwuEdLPM0AyIhGvzXW5xEUx8HlbiFtTQGQ5eBIkSy7nEsTU0HIlW948YbuSNDhxLPiiZK7fJpBR3sm5iyFtKLOUM5YXc2fOcOQlk3pT+oK7OsB6pZiKNLvj5+KjBOOWpjJ1Ob1CNoKpsgriYhtfseQ1WDbYGaZ/T9TORs=
+Received: from BYAPR04MB4965.namprd04.prod.outlook.com (2603:10b6:a03:4d::25)
+ by BYAPR04MB4232.namprd04.prod.outlook.com (2603:10b6:a02:fd::29) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4042.16; Mon, 19 Apr
+ 2021 22:19:51 +0000
+Received: from BYAPR04MB4965.namprd04.prod.outlook.com
+ ([fe80::c897:a1f8:197a:706b]) by BYAPR04MB4965.namprd04.prod.outlook.com
+ ([fe80::c897:a1f8:197a:706b%5]) with mapi id 15.20.4042.024; Mon, 19 Apr 2021
+ 22:19:51 +0000
+From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+To:     Jens Axboe <axboe@kernel.dk>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH] null_blk: poll queue support
+Thread-Topic: [PATCH] null_blk: poll queue support
+Thread-Index: AQHXM56KmL6kCanFwEqXUyQ/m0BBrQ==
+Date:   Mon, 19 Apr 2021 22:19:51 +0000
+Message-ID: <BYAPR04MB496554C1F67A051A11FAB48A86499@BYAPR04MB4965.namprd04.prod.outlook.com>
+References: <baca710d-0f2a-16e2-60bd-b105b854e0ae@kernel.dk>
+ <BYAPR04MB49654A1D4AC52FA3A8110240864A9@BYAPR04MB4965.namprd04.prod.outlook.com>
+ <68a28d55-8c50-31e3-505a-2de330914942@kernel.dk>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: kernel.dk; dkim=none (message not signed)
+ header.d=none;kernel.dk; dmarc=none action=none header.from=wdc.com;
+x-originating-ip: [199.255.45.62]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: a3099db3-c508-44c4-c4be-08d903814049
+x-ms-traffictypediagnostic: BYAPR04MB4232:
+x-microsoft-antispam-prvs: <BYAPR04MB4232C5C931CD06DAC6AA75DC86499@BYAPR04MB4232.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:7691;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: mjWDgev14IwQUmZ6xpbieQx76oHN+2qmGMDA0HtZQfUIox90QGzCtHq8KQ3g9jMCXV7lKrGfa+ftTX0Em9FMgJg3zpwVXxd3OlUH82qAzY8h437tZZAC2ps/ao/zN37yDh27ilaqgcGozysBOFQOQTR4+Z0OybtJblDUrfFwZdTMIRLNvMn7k6S6WVzgkzcX1D0DFpjYsdZZ4ef0rQXIkNv/t3tpG39Z+c9zzpOg/cTUL6JK7L2uj//YKoiffi2KRkN6JvAQ9LeNgFDRz5EzYaT1Ux/ZD108iMyiFTRM60lBpy9o/oy61mVVdZygl/31R9fksp3b6uPvUkpeTW53tuWNnqcitdUQ6lyDU/R7H37BFmhUCqeD4mgdnbLjamMpxncnLIKQEos+fkjz9QyizogQRKqO7XAcZRmR+35Hi+I7Q0AV9OEYNkdxdRCXGaHn/ui7iskdjXVqkf2kSQ281eovOhAcAEFxLK3DTv4F/eJfhppNMtXecNoR3XkJmHzbtwDCr0f2qiPWeklVrl1XwOxmf2kRrYnES26ZSMCk5QZk69fqdXIcCgcdGoLx3fuifq4KqvYaVjx+JBtXEgX9NEhaWJTeLDUvTqcV9fisHi4=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR04MB4965.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(396003)(39860400002)(366004)(346002)(376002)(136003)(4326008)(53546011)(6506007)(66476007)(9686003)(55016002)(26005)(4744005)(5660300002)(6916009)(71200400001)(122000001)(8936002)(478600001)(316002)(66446008)(33656002)(186003)(86362001)(8676002)(52536014)(64756008)(66946007)(2906002)(7696005)(66556008)(76116006)(38100700002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: =?us-ascii?Q?1IyvT3CEjcvJV33FDoPjl5JWT6Q7U5LC7Rr2rcqdPI6kv4YTWj7lhG+myxhG?=
+ =?us-ascii?Q?Lyc1JkseNPAyExv1earwq0yH+ExCUN2kOw4ySul7Z8g7oWePGgG4d0aSluis?=
+ =?us-ascii?Q?3iZKu3UWTeOWH7r4cubcVvV0m1GZ8duSAFx+cmyZeKbI36ttZwQVQ2+giihn?=
+ =?us-ascii?Q?LoUdaJqxekMvJiMUysWkBqlGfsTdvRlxRJ0EutFOzXNPgsonrUSnC0pnFQf7?=
+ =?us-ascii?Q?yhcc6TX2DDGfpcfjnWpVOojx56EMXFco9bcsBuzf+jsqLU73c3K+hmQ8gyTu?=
+ =?us-ascii?Q?551Do0lF6DlABkcuhUC+XY4/uN1HUizYzlT1xmyV4Cfgrdde8EEqst09jHI7?=
+ =?us-ascii?Q?//n8QtE8cTrNyV5pmWbDUrfAS8rsSVpWreIToo8FhM1lKLKydpKkxZ+kYjyM?=
+ =?us-ascii?Q?ns7POm3FggsVKit4VwUJURI7yKAMtgPh5ygTAygObB3bMhxgcil0wjoOTOhO?=
+ =?us-ascii?Q?2BhZLtH52jUu+gBgQii0wKX+Fn7Jeb2idzgNaYbKszpUY7yqY5LYbdsAt3PF?=
+ =?us-ascii?Q?VgE32qoLYBy94Sub4FDvFqWpUWjvslhvZAEwT2Ytrs+gYe8F8Hr9OrvN+VWf?=
+ =?us-ascii?Q?poy4QxuDEDw6JuFlbce1mdaGa+dU5T3/vONn1TmJb4V9f2I0vvmUP6s/QZbY?=
+ =?us-ascii?Q?cSSfhFzJoMxB63kN+cQqJMxKeaBt+2Ep7o9QAXzPAt+IndEtpXlW6jOkiSL2?=
+ =?us-ascii?Q?P5NPNcT/8cmkmy4/ezbj526Czg/bHOc1eC4brwnL354NSXvAM4AeWigR73Wj?=
+ =?us-ascii?Q?tJgla8+IguIHriE8T/xvKkElDsoSvtRanNB4tSMnXdLfQH1XKuuTn+/6lXWy?=
+ =?us-ascii?Q?D/pVPhUcyqnpQWM11r/wn3ihc+K2VuSSMO3naFS2NpW8VwDXa/qZU+HStfd8?=
+ =?us-ascii?Q?l3y3dtBMhB5q5n3+OCx0C96Fb0LOCd186Zs05vZ3TzlWetavAmFwOkoUsZt8?=
+ =?us-ascii?Q?9tNcR0j92bgc9PJnOAxbRUKT598V0FeS0ZbwYCBJJRpTXd+uYaH8gx1TIkGx?=
+ =?us-ascii?Q?0+oy94DcUel6IR9bmbG4ap4zFw+UIEmOUPe4yiLOx7sa2KyO7vYWdPvQ36Hz?=
+ =?us-ascii?Q?u4GXP5XLhQV2MlWpeR8WQf8f9hfDflKCBIG9RQehuM4ZaQMjd9O/HvpniHw2?=
+ =?us-ascii?Q?IPwsKoYj+FDzGh1ILicJ2xuYLRBT/PT+Vvz91Hv7KuBtRgDq/F1vHGuSTsPE?=
+ =?us-ascii?Q?SdESqPvIV+cwRUQ+s9O/qpxvFYeR7hYf4mRjcN94WoDm3Bpkn7k3UYZmVB/M?=
+ =?us-ascii?Q?wqfH35DYxcE5xzBCsbWjtyJ002SOo1KNq9448p3zMIpVb5gNr+CjyTl6Kqcs?=
+ =?us-ascii?Q?pyev+qNIgVauaU19bT/xKX7q?=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR04MB4965.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a3099db3-c508-44c4-c4be-08d903814049
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Apr 2021 22:19:51.2407
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: WZsx6LFZCg01GSUn0GeZM9OylouMoLW2vba+ot9ePzrqsCPr4H4EEWso9mvIKCoGur3aY2DlFHeBy59IrP8W85GZGr/l5GBDh2UYO3a/M5U=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB4232
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/18/21 10:49 PM, Changheun Lee wrote:
->>> @@ -167,6 +168,7 @@ void blk_queue_max_hw_sectors(struct request_queue *q, unsigned int max_hw_secto
->>>  	max_sectors = round_down(max_sectors,
->>>  				 limits->logical_block_size >> SECTOR_SHIFT);
->>>  	limits->max_sectors = max_sectors;
->>> +	limits->bio_max_bytes = max_sectors << SECTOR_SHIFT;
->>>  
->>>  	q->backing_dev_info->io_pages = max_sectors >> (PAGE_SHIFT - 9);
->>>  }
->>
->> Can the new shift operation overflow? If so, how about using
->> check_shl_overflow()?
-> 
-> Actually, overflow might be not heppen in case of physical device.
-> But I modified as below. feedback about this.
-> 
-> @@ -168,6 +169,9 @@ void blk_queue_max_hw_sectors(struct request_queue *q, unsigned int max_hw_secto
->  				 limits->logical_block_size >> SECTOR_SHIFT);
->  	limits->max_sectors = max_sectors;
->  
-> +	limits->bio_max_bytes = check_shl_overflow(max_sectors, SECTOR_SHIFT,
-> +		&limits->bio_max_bytes) ? UINT_MAX : max_sectors << SECTOR_SHIFT;
-> +
->  	q->backing_dev_info->io_pages = max_sectors >> (PAGE_SHIFT - 9);
->  }
->  EXPORT_SYMBOL(blk_queue_max_hw_sectors);
-
-If no overflow occurs, check_shl_overflow() stores the result in the
-memory location the third argument points at. So the above expression
-can be simplified into the following:
-
-if (check_shl_overflow(max_sectors, SECTOR_SHIFT, &limits->bio_max_bytes)) {
-	limits->bio_max_bytes = UINT_MAX;
-}
-
->>> diff --git a/include/linux/bio.h b/include/linux/bio.h
->>> index d0246c92a6e8..e5add63da3af 100644
->>> --- a/include/linux/bio.h
->>> +++ b/include/linux/bio.h
->>> @@ -106,6 +106,8 @@ static inline void *bio_data(struct bio *bio)
->>>  	return NULL;
->>>  }
->>>  
->>> +extern unsigned int bio_max_size(struct bio *bio);
->>
->> You may want to define bio_max_size() as an inline function in bio.h
->> such that no additional function calls are introduced in the hot path.
-> 
-> I tried, but it is not easy. because request_queue structure of blkdev.h
-> should be referred in bio.h. I think it's not good to apply as a inline function.
-
-Please don't worry about this. Inlining bio_max_size() is not a big
-concern to me.
-
-Thanks,
-
-Bart.
+Jens,=0A=
+=0A=
+On 4/19/21 12:48, Jens Axboe wrote:=0A=
+>> +=0A=
+>> +               cmd->error =3D sts;=0A=
+>> +=0A=
+>>                 nullb_complete_cmd(cmd);=0A=
+>>                 nr++;=0A=
+>>         }=0A=
+>>=0A=
+>> If you are okay I can send a well tested patch with little bit code=0A=
+>> cleanup once this is in the tree.=0A=
+> Yes, that might be a good idea. I'll just fold it in, I've got it=0A=
+> sitting separately so far. Just let me know when you've tested it.=0A=
+>=0A=
+> -- Jens Axboe=0A=
+=0A=
+I'm OOO, won't be able to do the testing for couple of days.=0A=
+=0A=
+Meanwhile if you apply your patch, I'll send ZBD patch with testing=0A=
+in couple of days.=0A=
+=0A=
+=0A=
