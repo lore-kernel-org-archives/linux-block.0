@@ -2,144 +2,134 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B54CC43462
-	for <linux-block@archiver.kernel.org>; Mon, 19 Apr 2021 07:37:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96AECC433ED
+	for <linux-block@archiver.kernel.org>; Mon, 19 Apr 2021 07:47:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6BD886102A
-	for <linux-block@archiver.kernel.org>; Mon, 19 Apr 2021 07:37:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 626FD6102A
+	for <linux-block@archiver.kernel.org>; Mon, 19 Apr 2021 07:47:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237915AbhDSHiZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 19 Apr 2021 03:38:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39548 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237882AbhDSHiY (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 19 Apr 2021 03:38:24 -0400
-Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C78DC061763
-        for <linux-block@vger.kernel.org>; Mon, 19 Apr 2021 00:37:54 -0700 (PDT)
-Received: by mail-ej1-x635.google.com with SMTP id l4so51315507ejc.10
-        for <linux-block@vger.kernel.org>; Mon, 19 Apr 2021 00:37:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ionos.com; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=zL6gQYZ5yMQsIXTOxSRsFVO1XenlLGr+TV3FCZ4q0tY=;
-        b=aVp3V2QEidHmsDKKeDoP/IX+pQfya8dzvZJAHzhYp6Ums2++UwvB3YiK2+gYQ1XRgP
-         bkaJBx5bEhVx+JkJ1+qmLR5SXrSzDzmHrffS1l/2k0OYJgpDf6jVuGNsHB194yoGEqez
-         wj0PlKT+FZSt1sw+pdOn7IlLQRqSUhsh7FkRr4lXugxzSJ/LOFtZtub3FNljsMdbrQOm
-         oP8x7H7ipqxzHDJ+5b1iXyfJqhAEnUsIYdBUn64d2XqPrqhwbqqAna6GUFSv6WtUuRde
-         gJQXSCIAO8PiiXr1jLyQu4HqItAGfq6SV/ffBjpmvXMN+azy969dJ7fRtCsTCbnxGjmI
-         OT4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=zL6gQYZ5yMQsIXTOxSRsFVO1XenlLGr+TV3FCZ4q0tY=;
-        b=FQwjd99yYXnuJEWkulbleF/USdPBmk+1ZCOqa8GIEGoLQGExf+6xkXH7aVQLts5B2O
-         gIrVEelFD88gQKSuwVrscSf+0KZklmqU8wgWNp7eVPGIu0Ua3fy6SDXv7hMvGHbOgYAK
-         EL+p/bMCUiNs5cP8aQ0If77MMGwI27TRZ7M0W1c0dEXkyftwrGaPlpH063BLgWHLjwo1
-         P1M5U8DUnfuSwgpx42ajg3UpUY7SnrkIjHm93+cKFxAUdOwRx+16FwtkmOhennzD8eTL
-         LQUOzlLHTf1Zn1vwfLY8xjxYoYoD2/MZrHfocA0zUv3sUF85lfGltC4Go3q8Lr2fyV1g
-         Wenw==
-X-Gm-Message-State: AOAM532KhDvjpexmnTSwXr5zGwCstdJYsHT1q38tMrz8M5sge22fj/J7
-        pMiQl654qKs4fAI0Fm3cZgPbjUHkKPlvme7d
-X-Google-Smtp-Source: ABdhPJw9oNWPwSdEbiMmOtXy2vufk1fqTp0BMBlfuJFVVXg64SZmEhh+NsJ5jxpzAqY1VrmG6y5dSw==
-X-Received: by 2002:a17:906:32cb:: with SMTP id k11mr21144705ejk.158.1618817873171;
-        Mon, 19 Apr 2021 00:37:53 -0700 (PDT)
-Received: from localhost.localdomain (ip5f5aeee5.dynamic.kabel-deutschland.de. [95.90.238.229])
-        by smtp.googlemail.com with ESMTPSA id g22sm8701833ejz.46.2021.04.19.00.37.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Apr 2021 00:37:52 -0700 (PDT)
-From:   Gioh Kim <gi-oh.kim@ionos.com>
-To:     linux-block@vger.kernel.org, linux-doc@vger.kernel.org
-Cc:     axboe@kernel.dk, akinobu.mita@gmail.com, corbet@lwn.net,
-        hch@infradead.org, sagi@grimberg.me, bvanassche@acm.org,
-        haris.iqbal@ionos.com, jinpu.wang@ionos.com,
-        Guoqing Jiang <guoqing.jiang@cloud.ionos.com>,
+        id S237937AbhDSHrd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 19 Apr 2021 03:47:33 -0400
+Received: from mail-dm6nam08on2041.outbound.protection.outlook.com ([40.107.102.41]:39265
+        "EHLO NAM04-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S237895AbhDSHrd (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 19 Apr 2021 03:47:33 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=CgBVfa1u+qFkOYCtg7esAVx1SeQVFazGR6rv+A9WI56ebYTDRTBq6ztZEITNioWPgOoB80BQ3clYOEBkppzTj6birfvfRFj0mX0B6SZJAZZmOVV7wRPeQdjLM+66yX9g23pIyNm0iUorpSIQhW9+XZtukgfclbX85fygOmXxzcp0s0jYWv2zF0AeaZzoSHTAxJ8gjFMYNYOPssM03MUsvtS/T/Akxbtob2x9fI7WEn/kospdCuER67ntvNUFjM+uc4mVSkR7Sa34KZN9zE0FozeXs6utLUFJ2iTmttTuC0gvcCo0nYN5MU0dfv5m1BvYZms0GKK6D0b1TuYaKmKFNQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6I9sOkmxN1NXQf6UemQxx9sLypH914o0KvHa35ZAHcA=;
+ b=MfeKQRWQTWj81eLMoK1ohZQGowx7deeTCRfOTrn6lt3y90foRjWwJiNNuA+a2NWskTSUF+xZK60RsR95KOvG0AmL+xMAfCNLtdcfiBZvNbNSg5WiYD1PozukuMTY3Br0xCHoXTzeqWFjwApwIt+65LkEuk7QO+y7yJynWuB1m7bjfhnNP8j+a/allskPnwWQoohw79Ffj66HRvpKkQNI/fRIJM7Fj//t8j0TJyc2yDEbUDx3t1135sEfbVS1S9tYGRtPZqbYsYya4Cl/Elh4AMrMa7Qh6B21uKLRXJ76tlbrtV7glFGk4CDdJCfCZBoaQZ4kf5Gu22fHBQc9Elt6zw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.112.34) smtp.rcpttodomain=ionos.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=none sp=none pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6I9sOkmxN1NXQf6UemQxx9sLypH914o0KvHa35ZAHcA=;
+ b=aqesMWh5kaY9MmujtVuO+GKJMMifaxIyn2wamn56R4/cY6KXKxZwD5ZcQ5MYtYkQUcChj5r3RZbVuf206mUpmjhlARCCMK3XZmPefYMwRaCXwPxam0n5okH7UXMzBel0BuHFsC30qKhPdV47W+jf4wWCVzZouuGQOqqkSfsrXwP09+vAfUVxfq4hCzB2c3RGLZfceDDE4k5brO34YnJ6El8mffQBIv35T7D9XdbygBUSpCsK7EF1n5vWPFeqlBYLeLAZNkZ3K+PsuRuM8P8NywboWZA0us6YY9SJBkTfvk7OO2zoCUxOgp8MRzCyJNXFeT2EphPjDbhmd8+3v+Fn2Q==
+Received: from BN6PR16CA0002.namprd16.prod.outlook.com (2603:10b6:404:f5::12)
+ by DM6PR12MB3354.namprd12.prod.outlook.com (2603:10b6:5:11f::33) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4042.24; Mon, 19 Apr
+ 2021 07:47:01 +0000
+Received: from BN8NAM11FT026.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:404:f5:cafe::3) by BN6PR16CA0002.outlook.office365.com
+ (2603:10b6:404:f5::12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4042.16 via Frontend
+ Transport; Mon, 19 Apr 2021 07:47:01 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
+ smtp.mailfrom=nvidia.com; ionos.com; dkim=none (message not signed)
+ header.d=none;ionos.com; dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.112.34; helo=mail.nvidia.com;
+Received: from mail.nvidia.com (216.228.112.34) by
+ BN8NAM11FT026.mail.protection.outlook.com (10.13.177.51) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.4042.16 via Frontend Transport; Mon, 19 Apr 2021 07:47:00 +0000
+Received: from localhost (172.20.145.6) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Mon, 19 Apr
+ 2021 07:46:59 +0000
+Date:   Mon, 19 Apr 2021 10:46:56 +0300
+From:   Leon Romanovsky <leonro@nvidia.com>
+To:     Gioh Kim <gi-oh.kim@ionos.com>
+CC:     <linux-block@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <axboe@kernel.dk>, <akinobu.mita@gmail.com>, <corbet@lwn.net>,
+        <hch@infradead.org>, <sagi@grimberg.me>, <bvanassche@acm.org>,
+        <haris.iqbal@ionos.com>, <jinpu.wang@ionos.com>,
+        Gioh Kim <gi-oh.kim@cloud.ionos.com>,
+        <linux-rdma@vger.kernel.org>,
         Guoqing Jiang <guoqing.jiang@ionos.com>,
-        Danil Kipnis <danil.kipnis@ionos.com>,
-        Gioh Kim <gi-oh.kim@ionos.com>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [PATCHv5 for-next 06/19] block/rnbd: Kill rnbd_clt_destroy_default_group
-Date:   Mon, 19 Apr 2021 09:37:09 +0200
-Message-Id: <20210419073722.15351-7-gi-oh.kim@ionos.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20210419073722.15351-1-gi-oh.kim@ionos.com>
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>,
+        Jason Gunthorpe <jgg@nvidia.com>
+Subject: Re: [PATCHv5 for-next 08/19] block/rnbd-clt: Replace {NO_WAIT,WAIT}
+ with RTRS_PERMIT_{WAIT,NOWAIT}
+Message-ID: <YH01cJefECbRDZLl@unreal>
 References: <20210419073722.15351-1-gi-oh.kim@ionos.com>
+ <20210419073722.15351-9-gi-oh.kim@ionos.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20210419073722.15351-9-gi-oh.kim@ionos.com>
+X-Originating-IP: [172.20.145.6]
+X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 2fc2847e-c6ca-4506-6e6f-08d9030750fc
+X-MS-TrafficTypeDiagnostic: DM6PR12MB3354:
+X-Microsoft-Antispam-PRVS: <DM6PR12MB33548EEF6182E995FDE26E13BD499@DM6PR12MB3354.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:639;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: T+5nUJVelGkvmcVybpjr5srHE5xlUVyItwY003b6dXZNHTzUbMZ5288Ue8qYh7Z6vI4R/1rk7SOhPbWg71fMujwFTjRdonMdcW0EvFQH8qAS3HAyfK1brX6VoihLT344TNpy22RqFfajV1j0Z1F3vt36AS54uMotaKCo8gNHtyVgK1sLY26dPSFBAP4Mg/ek4w9AplMx29J9/lBcxNKv1OXrcJ0NONi10etX2URXZuxG5+FijoosAduxp4d8C55IPmxRKSvr79m6JtpX9cTEqcxqT1NULZM39z7um/x1xnldB9iC/tfrlSniLbGqdYSnI9BsY5YvVip0dtb19qqqW/VIXMlQgT5hQ3UhoCC9wDgAsg9WiPdhti7s+jhp6FmS1DjNOPCPK2A4JSqQ7Yvcx78pQaWqatU37a3Hd9jzAsiMszG7O1mCTQIR5DmMm5w5ziTYgsXCZIcSBvf8ops2RTRoOBLzt9KNIZYhTxZ3ZQmLjrCu1nruOaI8SXYarjsCa9o/lfbnemmPZ7FYlo8QxADERX200d29Ak1BIMeLDiiJL8C9Gzfv+ZwLLLlIE/Z0H0wHuya2/AZTB/AbU0D6rPMLIsmeigqT5rJBWaRtF/TpaEyD3fb9E01BnrX+qa6Ky+LjYzWnhVPF0BZ8orHESQ==
+X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(7916004)(346002)(376002)(39860400002)(396003)(136003)(36840700001)(46966006)(426003)(5660300002)(82310400003)(107886003)(54906003)(6916009)(316002)(4326008)(70206006)(478600001)(2906002)(47076005)(33716001)(83380400001)(26005)(186003)(7636003)(70586007)(36860700001)(8936002)(82740400003)(6666004)(336012)(356005)(9686003)(16526019)(86362001)(4744005)(8676002)(7416002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Apr 2021 07:47:00.6321
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2fc2847e-c6ca-4506-6e6f-08d9030750fc
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT026.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3354
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Guoqing Jiang <guoqing.jiang@cloud.ionos.com>
+On Mon, Apr 19, 2021 at 09:37:11AM +0200, Gioh Kim wrote:
+> From: Gioh Kim <gi-oh.kim@cloud.ionos.com>
+> 
+> They are defined with the same value and similar meaning, let's remove
+> one of them, then we can remove {WAIT,NOWAIT}.
+> 
+> Also change the type of 'wait' from 'int' to 'enum wait_type' to make
+> it clear.
+> 
+> Cc: Leon Romanovsky <leonro@nvidia.com>
+> Cc: linux-rdma@vger.kernel.org
+> Signed-off-by: Guoqing Jiang <guoqing.jiang@ionos.com>
+> Reviewed-by: Md Haris Iqbal <haris.iqbal@ionos.com>
+> Signed-off-by: Gioh Kim <gi-oh.kim@ionos.com>
+> Signed-off-by: Jack Wang <jinpu.wang@ionos.com>
+> Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+> Acked-by: Jason Gunthorpe <jgg@nvidia.com>
+> ---
+>  drivers/block/rnbd/rnbd-clt.c          | 42 +++++++++++---------------
+>  drivers/infiniband/ulp/rtrs/rtrs-clt.c |  4 +--
+>  drivers/infiniband/ulp/rtrs/rtrs.h     |  6 ++--
+>  3 files changed, 22 insertions(+), 30 deletions(-)
+> 
 
-No need to have it since we can call sysfs_remove_group in the
-rnbd_clt_destroy_sysfs_files.
-
-Then rnbd_clt_destroy_sysfs_files is paired with it's counterpart
-rnbd_clt_create_sysfs_files.
-
-Signed-off-by: Guoqing Jiang <guoqing.jiang@ionos.com>
-Reviewed-by: Danil Kipnis <danil.kipnis@ionos.com>
-Signed-off-by: Gioh Kim <gi-oh.kim@ionos.com>
-Signed-off-by: Jack Wang <jinpu.wang@ionos.com>
-Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
----
- drivers/block/rnbd/rnbd-clt-sysfs.c | 6 +-----
- drivers/block/rnbd/rnbd-clt.c       | 1 -
- drivers/block/rnbd/rnbd-clt.h       | 1 -
- 3 files changed, 1 insertion(+), 7 deletions(-)
-
-diff --git a/drivers/block/rnbd/rnbd-clt-sysfs.c b/drivers/block/rnbd/rnbd-clt-sysfs.c
-index d4aa6bfc9555..58c2cc0725b6 100644
---- a/drivers/block/rnbd/rnbd-clt-sysfs.c
-+++ b/drivers/block/rnbd/rnbd-clt-sysfs.c
-@@ -639,13 +639,9 @@ int rnbd_clt_create_sysfs_files(void)
- 	return err;
- }
- 
--void rnbd_clt_destroy_default_group(void)
--{
--	sysfs_remove_group(&rnbd_dev->kobj, &default_attr_group);
--}
--
- void rnbd_clt_destroy_sysfs_files(void)
- {
-+	sysfs_remove_group(&rnbd_dev->kobj, &default_attr_group);
- 	kobject_del(rnbd_devs_kobj);
- 	kobject_put(rnbd_devs_kobj);
- 	device_destroy(rnbd_dev_class, MKDEV(0, 0));
-diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.c
-index f864f06a49b3..4e687ec88721 100644
---- a/drivers/block/rnbd/rnbd-clt.c
-+++ b/drivers/block/rnbd/rnbd-clt.c
-@@ -1675,7 +1675,6 @@ static void rnbd_destroy_sessions(void)
- 	struct rnbd_clt_dev *dev, *tn;
- 
- 	/* Firstly forbid access through sysfs interface */
--	rnbd_clt_destroy_default_group();
- 	rnbd_clt_destroy_sysfs_files();
- 
- 	/*
-diff --git a/drivers/block/rnbd/rnbd-clt.h b/drivers/block/rnbd/rnbd-clt.h
-index 537d499dad3b..714d426b449b 100644
---- a/drivers/block/rnbd/rnbd-clt.h
-+++ b/drivers/block/rnbd/rnbd-clt.h
-@@ -159,7 +159,6 @@ int rnbd_clt_resize_disk(struct rnbd_clt_dev *dev, size_t newsize);
- int rnbd_clt_create_sysfs_files(void);
- 
- void rnbd_clt_destroy_sysfs_files(void);
--void rnbd_clt_destroy_default_group(void);
- 
- void rnbd_clt_remove_dev_symlink(struct rnbd_clt_dev *dev);
- 
--- 
-2.25.1
-
+Thanks,
+Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
