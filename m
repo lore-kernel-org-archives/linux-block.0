@@ -2,99 +2,105 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A941C433B4
-	for <linux-block@archiver.kernel.org>; Mon, 19 Apr 2021 16:40:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF1B2C433B4
+	for <linux-block@archiver.kernel.org>; Mon, 19 Apr 2021 16:50:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 273C96100B
-	for <linux-block@archiver.kernel.org>; Mon, 19 Apr 2021 16:40:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9858C61166
+	for <linux-block@archiver.kernel.org>; Mon, 19 Apr 2021 16:50:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232897AbhDSQlC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 19 Apr 2021 12:41:02 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:51424 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232344AbhDSQlC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 19 Apr 2021 12:41:02 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 13JGYlrK130227;
-        Mon, 19 Apr 2021 16:40:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : from : to :
- cc : references : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2020-01-29;
- bh=cjjprptH8XWae5Iq/kct1mx5Xc07DNe0yIzTBqI/D4U=;
- b=OtFCA+nOlNm6tH/JuUZFY48+5pkDrk/Hk5IaoP0qe0R/PQzdO49b2bTnydeAcbtGYbgJ
- /Ad0r/O8WLg5LViCXl8W6ke/W/4sd2wVFT49/WpDZ14nAUJ1Cf+ZzOqXCLQ73C4mnGxU
- uWksdIa5bvBMfurUd4CzDH86M9M31oerNBBt/BHzxj0zRjCPJuzn7tH2pB/pWOylXQ3D
- ty19qd4NP5JtLKQJJJs7OYDUYiaYuoRB1F6VdLOTIb5YZGJoQIF3ShTylaM+wd6YS5J2
- qeIKDEYq8EMdOx7FCxXcao733Wk/qtZho7A1Dt8jyTuyH2gRW9pW51+IBir78gJZTDLx tw== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2130.oracle.com with ESMTP id 37yveac0ee-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 19 Apr 2021 16:40:26 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 13JGa5XQ177018;
-        Mon, 19 Apr 2021 16:40:25 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3020.oracle.com with ESMTP id 3809jy32jv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 19 Apr 2021 16:40:25 +0000
-Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 13JGeNQM017811;
-        Mon, 19 Apr 2021 16:40:23 GMT
-Received: from dhcp-10-159-154-74.vpn.oracle.com (/10.159.154.74)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 19 Apr 2021 09:40:23 -0700
-Subject: Re: [PATCH] block: fix io hung by block throttle
-From:   Junxiao Bi <junxiao.bi@oracle.com>
-To:     Hillf Danton <hdanton@sina.com>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        axboe@kernel.dk
-References: <20210414211830.5720-1-junxiao.bi@oracle.com>
- <20210417101008.4132-1-hdanton@sina.com>
- <20210418123342.13740-1-hdanton@sina.com>
- <1c3a2874-35bd-3ff0-3088-1a6ea968d016@oracle.com>
-Message-ID: <9f02eb4d-4832-9f84-9df9-364f2000dd29@oracle.com>
-Date:   Mon, 19 Apr 2021 09:39:30 -0700
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.9.1
+        id S232598AbhDSQvP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 19 Apr 2021 12:51:15 -0400
+Received: from mx2.suse.de ([195.135.220.15]:33116 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231674AbhDSQvO (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 19 Apr 2021 12:51:14 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 10B3BB30F;
+        Mon, 19 Apr 2021 16:50:41 +0000 (UTC)
+Received: by ds.suse.cz (Postfix, from userid 10065)
+        id 45999DA732; Mon, 19 Apr 2021 18:48:22 +0200 (CEST)
+Date:   Mon, 19 Apr 2021 18:48:22 +0200
+From:   David Sterba <dsterba@suse.cz>
+To:     Damien Le Moal <Damien.LeMoal@wdc.com>
+Cc:     "hch@infradead.org" <hch@infradead.org>,
+        "dsterba@suse.cz" <dsterba@suse.cz>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        Christoph Hellwig <hch@lst.de>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
+        David Sterba <dsterba@suse.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        Naohiro Aota <Naohiro.Aota@wdc.com>
+Subject: Re: [PATCH 3/4] btrfs: zoned: fail mount if the device does not
+ support zone append
+Message-ID: <20210419164822.GN7604@twin.jikos.cz>
+Reply-To: dsterba@suse.cz
+Mail-Followup-To: dsterba@suse.cz, Damien Le Moal <Damien.LeMoal@wdc.com>,
+        "hch@infradead.org" <hch@infradead.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        Christoph Hellwig <hch@lst.de>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
+        David Sterba <dsterba@suse.com>, Josef Bacik <josef@toxicpanda.com>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        Naohiro Aota <Naohiro.Aota@wdc.com>
+References: <20210416030528.757513-1-damien.lemoal@wdc.com>
+ <20210416030528.757513-4-damien.lemoal@wdc.com>
+ <20210416161720.GA7604@twin.jikos.cz>
+ <20210419092855.GA3223318@infradead.org>
+ <BL0PR04MB651459AE484861FD4EA20669E7499@BL0PR04MB6514.namprd04.prod.outlook.com>
+ <20210419093921.GA3226573@infradead.org>
+ <BL0PR04MB65145DA8B6252C452EAA8BC9E7499@BL0PR04MB6514.namprd04.prod.outlook.com>
 MIME-Version: 1.0
-In-Reply-To: <1c3a2874-35bd-3ff0-3088-1a6ea968d016@oracle.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9959 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 bulkscore=0 malwarescore=0
- suspectscore=0 phishscore=0 spamscore=0 mlxlogscore=999 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104060000
- definitions=main-2104190113
-X-Proofpoint-GUID: XQ3G561llKYoy5KGI1q-LxblaCQL0ez-
-X-Proofpoint-ORIG-GUID: XQ3G561llKYoy5KGI1q-LxblaCQL0ez-
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9959 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 impostorscore=0 phishscore=0 mlxscore=0
- suspectscore=0 lowpriorityscore=0 mlxlogscore=999 spamscore=0 bulkscore=0
- adultscore=0 malwarescore=0 clxscore=1015 priorityscore=1501
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104060000
- definitions=main-2104190113
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BL0PR04MB65145DA8B6252C452EAA8BC9E7499@BL0PR04MB6514.namprd04.prod.outlook.com>
+User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Mon, Apr 19, 2021 at 09:46:36AM +0000, Damien Le Moal wrote:
+> On 2021/04/19 18:41, hch@infradead.org wrote:
+> > On Mon, Apr 19, 2021 at 09:35:37AM +0000, Damien Le Moal wrote:
+> >> This is only to avoid someone from running zoned-btrfs on top of dm-crypt.
+> >> Without this patch, mount will be OK and file data writes will also actually be
+> >> OK. But all reads will miserably fail... I would rather have this patch in than
+> >> deal with the "bug reports" about btrfs failing to read files. No ?
+> >>
+> >> Note that like you, I dislike having to add such code. But it was my oversight
+> >> when I worked on getting dm-crypt to work on zoned drives. Zone append was
+> >> overlooked at that time... My bad, really.
+> > 
+> > dm-crypt needs to stop pretending it supports zoned devices if it
+> > doesn't.  Note that dm-crypt could fairly trivially support zone append
+> > by doing the same kind of emulation that the sd driver does.
+> 
+> I am not so sure about the "trivial" but yes, it is feasible. Let me think about
+> something then. Whatever we do, performance with ZNS will no be great, for
+> sure... But for SMR HDDs, we likely will not notice any difference in performance.
 
-On 4/18/21 11:09 PM, Junxiao Bi wrote:
->> - finish_wait(&rqw->wait, &data.wq);
->> +    mutex_lock(&rqw->throttle_mutex);
->> +    wait_event(rqw->wait, acquire_inflight_cb(rqw, private_data));
->> +    mutex_unlock(&rqw->throttle_mutex);
->
-> This will break the throttle? There is a inflight io limitation. With 
-> this change, there can be only one io inflight whatever the limit is.
-Sorry, ignore this. I should go sleep that time.
->
-> Thanks,
->
-> Junxiao.
+So this needs to be fixed outside of btrfs. The fix in btrfs would make
+sense in case we can't sync the dm-crypt and btrfs in a released kernel.
+Having a mount check sounds like a better option to me than to fail
+reads, we can revert it in a release once everything woks as expected.
