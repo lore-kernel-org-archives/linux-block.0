@@ -2,72 +2,127 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4435C433ED
-	for <linux-block@archiver.kernel.org>; Mon, 19 Apr 2021 15:14:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF517C433B4
+	for <linux-block@archiver.kernel.org>; Mon, 19 Apr 2021 15:28:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B833761007
-	for <linux-block@archiver.kernel.org>; Mon, 19 Apr 2021 15:14:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9A23C61007
+	for <linux-block@archiver.kernel.org>; Mon, 19 Apr 2021 15:28:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240802AbhDSPPO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 19 Apr 2021 11:15:14 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47542 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229661AbhDSPPN (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 19 Apr 2021 11:15:13 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 0AC3A6113C;
-        Mon, 19 Apr 2021 15:14:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1618845283;
-        bh=LrNpik8Y2ml8d+eZ/R4YPtQ3IQkIX/0PFipEgNZK50I=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=mWnDWAAbh+G1F4FOukkgenPnQVbzS/40e9ufPYW6VW7SNxTZpHdJJBlS+YG4k/xYp
-         HpH+TEtNiFyibpFhB5QRrDZOKmh1H/EA09LvUmc9sPY5dVWFnPZh0XmRqsJ8B59siT
-         m3KuhgF22gx8pQhtXyGMtqqyRBEsnhdt3rLtQFUJ7gBossoofA1VVgvYqdZtb30YbV
-         5kZvrfiRLY7bjqgPcxqSuFWe0h+ow7LsCrInBoLYXMdZai+M3McnU6qt0f6PB39bxc
-         miy1sLzABtalncB6PKiFzgEI+z4r7fsYvzVGxdU/KAwm21ucp3s4eKHs/SdjPPGniO
-         Ay+YC4ZRYe/Yw==
-Date:   Tue, 20 Apr 2021 00:14:37 +0900
-From:   Keith Busch <kbusch@kernel.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Yuanyuan Zhong <yzhong@purestorage.com>,
-        linux-nvme@lists.infradead.org, sagi@grimberg.me, axboe@kernel.dk,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH 2/2] nvme: use return value from blk_execute_rq()
-Message-ID: <20210419151437.GA12999@redsun51.ssa.fujisawa.hgst.com>
-References: <20210416165353.3088547-1-kbusch@kernel.org>
- <20210416165353.3088547-2-kbusch@kernel.org>
- <CA+AMecG=8TTdsdYtaV=H+hKm2poKYhyh_Tvf0Tc0PZvbVXf_iA@mail.gmail.com>
- <20210416171735.GA32082@redsun51.ssa.fujisawa.hgst.com>
- <20210419071605.GA19658@lst.de>
+        id S240641AbhDSP32 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 19 Apr 2021 11:29:28 -0400
+Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:45120 "EHLO
+        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S233733AbhDSP31 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 19 Apr 2021 11:29:27 -0400
+Received: from cwcc.thunk.org (pool-72-74-133-215.bstnma.fios.verizon.net [72.74.133.215])
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 13JFSplv032708
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 19 Apr 2021 11:28:51 -0400
+Received: by cwcc.thunk.org (Postfix, from userid 15806)
+        id 3695315C3B0D; Mon, 19 Apr 2021 11:28:51 -0400 (EDT)
+Date:   Mon, 19 Apr 2021 11:28:51 -0400
+From:   "Theodore Ts'o" <tytso@mit.edu>
+To:     ksummit@lists.linux.dev, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-mm@kvack.org, netdev@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-api@vger.kernel.org
+Subject: Maintainers / Kernel Summit 2021 planning kick-off
+Message-ID: <YH2hs6EsPTpDAqXc@mit.edu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210419071605.GA19658@lst.de>
-User-Agent: Mutt/1.12.1 (2019-06-15)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Apr 19, 2021 at 09:16:05AM +0200, Christoph Hellwig wrote:
-> On Sat, Apr 17, 2021 at 02:17:35AM +0900, Keith Busch wrote:
-> > On Fri, Apr 16, 2021 at 10:12:11AM -0700, Yuanyuan Zhong wrote:
-> > > >         if (poll)
-> > > >                 nvme_execute_rq_polled(req->q, NULL, req, at_head);
-> > > You may need to audit other completion handlers for blk_execute_rq_nowait().
-> > 
-> > Why? Those callers already provide their own callback that directly get
-> > the error.
-> > 
-> > > How to get error ret from polled rq?
-> > 
-> > Please see nvme_end_sync_rq() for that driver's polled handler callback.
-> > It already has the error.
-> 
-> But it never looks at it..
+[ Feel free to forward this to other Linux kernel mailing lists as
+  appropriate -- Ted ]
 
-The question was how to get ret. I didn't mean to imply the example was
-actually using it. :)
+This year, the Maintainers and Kernel Summit is currently planned to
+be held in Dublin, Ireland, September 27 -- 29th.  Of course, this is
+subject to change depending on how much progress the world makes
+towards vaccinating the population against the COVID-19 virus, and
+whether employers are approving conference travel.  At this point,
+there's a fairly good chance that we will need to move to a virtual
+conference format, either for one or both of the summits.
+
+As in previous years, the Maintainers Summit is invite-only, where the
+primary focus will be process issues around Linux Kernel Development.
+It will be limited to 30 invitees and a handful of sponsored
+attendees.
+
+The Kernel Summit is organized as a track which is run in parallel
+with the other tracks at the Linux Plumbers Conference (LPC), and is
+open to all registered attendees of LPC.
+
+Linus has generated a core list of people to be invited to the
+Maintainers Summit, and the program committee will be using that list
+a starting point of people to be considered.  People who suggest
+topics that should be discussed at the Maintainers Summit will also be
+added to the list for consideration.  To make topic suggestions for
+the Maintainers Summit, please send e-mail to the
+ksummit@lists.linux.dev with a subject prefix of [MAINTAINERS SUMMIT].
+
+(Note: The older ksummit-discuss@lists.linuxfoundation.org list has
+been migrated to lists.linux.dev, with the subscriber list and
+archives preserved.)
+
+The other job of the program committee will be to organize the program
+for the Kernel Summit.  The goal of the Kernel Summit track will be to
+provide a forum to discuss specific technical issues that would be
+easier to resolve in person than over e-mail.  The program committee
+will also consider "information sharing" topics if they are clearly of
+interest to the wider development community (i.e., advanced training
+in topics that would be useful to kernel developers).
+
+To suggest a topic for the Kernel Summit, please do two things.
+First, please tag your e-mail with [TECH TOPIC].  As before, please
+use a separate e-mail for each topic, and send the topic suggestions
+to the ksummit-discuss list.
+
+Secondly, please create a topic at the Linux Plumbers Conference
+proposal submission site and target it to the Kernel Summit track.
+For your convenience you can use:
+
+	https://bit.ly/lpc21-summit
+
+Please do both steps.  I'll try to notice if someone forgets one or
+the other, but your chances of making sure your proposal gets the
+necessary attention and consideration are maximized by submitting both
+to the mailing list and the web site.
+
+People who submit topic suggestions before June 12th and which are
+accepted, will be given free admission to the Linux Plumbers
+Conference.
+
+We will be reserving roughly half of the Kernel Summit slots for
+last-minute discussions that will be scheduled during the week of
+Plumbers, in an "unconference style".  This allows last-minute ideas
+that come up to be given given slots for discussion.
+
+If you were not subscribed on to the kernel@lists.linux-dev mailing
+list from last year (or if you had removed yourself from the
+ksummit-discuss@lists.linux-foundation.org mailing list after the
+previous year's kernel and maintainers' summit summit), you can
+subscribe sending an e-mail to:
+
+	ksummit+subscribe@lists.linux.dev
+
+The mailing list archive is available at:
+
+	https://lore.kernel.org/ksummit
+
+The program committee this year is composed of the following people:
+
+Jens Axboe
+Arnd Bergmann
+Jon Corbet
+Greg Kroah-Hartman
+Ted Ts'o
