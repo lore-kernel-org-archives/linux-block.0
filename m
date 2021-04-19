@@ -2,242 +2,171 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED698C433ED
-	for <linux-block@archiver.kernel.org>; Mon, 19 Apr 2021 14:56:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99FD6C433ED
+	for <linux-block@archiver.kernel.org>; Mon, 19 Apr 2021 15:14:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CD1CE6113C
-	for <linux-block@archiver.kernel.org>; Mon, 19 Apr 2021 14:56:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 814B761285
+	for <linux-block@archiver.kernel.org>; Mon, 19 Apr 2021 15:14:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234040AbhDSO5R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 19 Apr 2021 10:57:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20491 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232318AbhDSO5R (ORCPT
+        id S240755AbhDSPOg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 19 Apr 2021 11:14:36 -0400
+Received: from frasgout.his.huawei.com ([185.176.79.56]:2879 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240740AbhDSPOf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 19 Apr 2021 10:57:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1618844207;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ObVjZYSIxyI5J/di0bqmYZr2dcRunTHj/u9twcOFJzA=;
-        b=g10m42v1LQKW/tGsufgPqTkIrjzpNTIBeG5vNxb8tb++meh6Ep/G6rqiwvFtxja9aQPwb7
-        MQb5uKZb0dFDgJ5ZvFDU7qK5OgYqq/3tve8F8etWRLOVjwZ6sCZ+zhzncA8jDlHc3VMnNB
-        E3NWxst6xRmvyKetH2l0jv6fa45vUmk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-281-QmVUcXs1MYyqoQOMnPEpfw-1; Mon, 19 Apr 2021 10:56:43 -0400
-X-MC-Unique: QmVUcXs1MYyqoQOMnPEpfw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3FA218143FE;
-        Mon, 19 Apr 2021 14:56:42 +0000 (UTC)
-Received: from localhost (unknown [10.18.25.174])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 527255D742;
-        Mon, 19 Apr 2021 14:56:31 +0000 (UTC)
-Date:   Mon, 19 Apr 2021 10:56:30 -0400
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org
-Subject: Re: [PATCH v4 0/4] nvme: improve error handling and ana_state to
- work well with dm-multipath
-Message-ID: <20210419145630.GA5792@redhat.com>
-References: <20210416235329.49234-1-snitzer@redhat.com>
- <20210417000203.GA22241@redhat.com>
+        Mon, 19 Apr 2021 11:14:35 -0400
+Received: from fraeml740-chm.china.huawei.com (unknown [172.18.147.206])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4FP9F30l4vz70gcf;
+        Mon, 19 Apr 2021 23:08:39 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml740-chm.china.huawei.com (10.206.15.221) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Mon, 19 Apr 2021 17:14:03 +0200
+Received: from [10.47.84.228] (10.47.84.228) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.2; Mon, 19 Apr
+ 2021 16:14:02 +0100
+Subject: Re: [bug report] scsi host hang when running fio
+To:     Kashyap Desai <kashyap.desai@broadcom.com>,
+        Ming Lei <ming.lei@redhat.com>, <linux-scsi@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, Hannes Reinecke <hare@suse.com>
+CC:     chenxiang <chenxiang66@hisilicon.com>, <luojiaxing@huawei.com>
+References: <0dda71da-4119-2e40-b8e9-ab2b3ee8e96a@huawei.com>
+ <f934ca65fa55345c360c944dd0fc2239@mail.gmail.com>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <2bd9adf9-7766-687a-2510-eb6a058f00d8@huawei.com>
+Date:   Mon, 19 Apr 2021 16:11:23 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210417000203.GA22241@redhat.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <f934ca65fa55345c360c944dd0fc2239@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.47.84.228]
+X-ClientProxiedBy: lhreml733-chm.china.huawei.com (10.201.108.84) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Apr 16 2021 at  8:02pm -0400,
-Mike Snitzer <snitzer@redhat.com> wrote:
+Hi Kashyap,
 
-> On Fri, Apr 16 2021 at  7:53pm -0400,
-> Mike Snitzer <snitzer@redhat.com> wrote:
-> 
-> > Hi,
-> > 
-> > This patchset reflects changes needed to make NVMe error handling and
-> > ANA state updates work well with dm-multipath (which always sets
-> > REQ_FAILFAST_TRANSPORT).
-> > 
-> > RHEL8 has been carrying an older ~5.9 based version of this patchset
-> > (since RHEL8.3, August 2020).
-> > 
-> > RHEL9 is coming, would really prefer that these changes land upstream
-> > rather than carry them within RHEL.
-> > 
-> > All review/feedback welcome.
-> > 
-> > Thanks,
-> > Mike
-> > 
-> > v3 -> v4, less is more:
-> > - folded REQ_FAILFAST_TRANSPORT local retry and FAILUP patches
-> > - simplified nvme_failup_req(), removes needless blk_path_error() et al
-> > - removed comment block in nvme_decide_disposition()
-> > 
-> > v2 -> v3:
-> > - Added Reviewed-by tags to BLK_STS_DO_NOT_RETRY patch.
-> > - Eliminated __nvme_end_req() and added code comment to
-> >   nvme_failup_req() in FAILUP handling patch.
-> > 
-> > Mike Snitzer (3):
-> >   nvme: return BLK_STS_DO_NOT_RETRY if the DNR bit is set
-> >   nvme: allow local retry and proper failover for REQ_FAILFAST_TRANSPORT
-> >   nvme: decouple basic ANA log page re-read support from native
-> >     multipathing
-> > 
-> >  drivers/nvme/host/core.c      | 22 +++++++++++++++++++---
-> >  drivers/nvme/host/multipath.c | 16 +++++++++++-----
-> >  drivers/nvme/host/nvme.h      |  4 ++++
-> >  include/linux/blk_types.h     |  8 ++++++++
-> >  4 files changed, 42 insertions(+), 8 deletions(-)
-> 
-> Sorry for all the noise, but I had a cut-and-paste issue with this cover
-> letter; should've said "[PATCH v4 0/4] ..."
-> 
-> While I'm replying, I _think_ there is consensus that patch 1 is
-> worthwile and acceptable. Here is a combined diff of patches 2+3 to
-> illustrate just how minimalist these proposed changes are:
-> 
-> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-> index 540d6fd8ffef..83ca96292157 100644
-> --- a/drivers/nvme/host/core.c
-> +++ b/drivers/nvme/host/core.c
-> @@ -299,6 +299,7 @@ enum nvme_disposition {
->  	COMPLETE,
->  	RETRY,
->  	FAILOVER,
-> +	FAILUP,
->  };
->  
->  static inline enum nvme_disposition nvme_decide_disposition(struct request *req)
-> @@ -306,15 +307,16 @@ static inline enum nvme_disposition nvme_decide_disposition(struct request *req)
->  	if (likely(nvme_req(req)->status == 0))
->  		return COMPLETE;
->  
-> -	if (blk_noretry_request(req) ||
-> +	if ((req->cmd_flags & (REQ_FAILFAST_DEV | REQ_FAILFAST_DRIVER)) ||
->  	    (nvme_req(req)->status & NVME_SC_DNR) ||
->  	    nvme_req(req)->retries >= nvme_max_retries)
->  		return COMPLETE;
->  
-> -	if (req->cmd_flags & REQ_NVME_MPATH) {
-> +	if (req->cmd_flags & (REQ_NVME_MPATH | REQ_FAILFAST_TRANSPORT)) {
->  		if (nvme_is_path_error(nvme_req(req)->status) ||
->  		    blk_queue_dying(req->q))
-> -			return FAILOVER;
-> +			return (req->cmd_flags & REQ_NVME_MPATH) ?
-> +				FAILOVER : FAILUP;
->  	} else {
->  		if (blk_queue_dying(req->q))
->  			return COMPLETE;
-> @@ -336,6 +338,14 @@ static inline void nvme_end_req(struct request *req)
->  	blk_mq_end_request(req, status);
->  }
->  
-> +static inline void nvme_failup_req(struct request *req)
-> +{
-> +	nvme_update_ana(req);
-> +
-> +	nvme_req(req)->status = NVME_SC_HOST_PATH_ERROR;
-> +	nvme_end_req(req);
-> +}
-> +
->  void nvme_complete_rq(struct request *req)
->  {
->  	trace_nvme_complete_rq(req);
-> @@ -354,6 +364,9 @@ void nvme_complete_rq(struct request *req)
->  	case FAILOVER:
->  		nvme_failover_req(req);
->  		return;
-> +	case FAILUP:
-> +		nvme_failup_req(req);
-> +		return;
->  	}
->  }
->  EXPORT_SYMBOL_GPL(nvme_complete_rq);
-> diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
-> index a1d476e1ac02..7d94250264aa 100644
-> --- a/drivers/nvme/host/multipath.c
-> +++ b/drivers/nvme/host/multipath.c
-> @@ -65,23 +65,29 @@ void nvme_set_disk_name(char *disk_name, struct nvme_ns *ns,
->  	}
->  }
->  
-> -void nvme_failover_req(struct request *req)
-> +void nvme_update_ana(struct request *req)
->  {
->  	struct nvme_ns *ns = req->q->queuedata;
->  	u16 status = nvme_req(req)->status & 0x7ff;
-> -	unsigned long flags;
-> -
-> -	nvme_mpath_clear_current_path(ns);
->  
->  	/*
->  	 * If we got back an ANA error, we know the controller is alive but not
-> -	 * ready to serve this namespace.  Kick of a re-read of the ANA
-> +	 * ready to serve this namespace.  Kick off a re-read of the ANA
->  	 * information page, and just try any other available path for now.
->  	 */
->  	if (nvme_is_ana_error(status) && ns->ctrl->ana_log_buf) {
->  		set_bit(NVME_NS_ANA_PENDING, &ns->flags);
->  		queue_work(nvme_wq, &ns->ctrl->ana_work);
->  	}
-> +}
-> +
-> +void nvme_failover_req(struct request *req)
-> +{
-> +	struct nvme_ns *ns = req->q->queuedata;
-> +	unsigned long flags;
-> +
-> +	nvme_mpath_clear_current_path(ns);
-> +	nvme_update_ana(req);
->  
->  	spin_lock_irqsave(&ns->head->requeue_lock, flags);
->  	blk_steal_bios(&ns->head->requeue_list, req);
-> diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-> index 07b34175c6ce..4eed8536625c 100644
-> --- a/drivers/nvme/host/nvme.h
-> +++ b/drivers/nvme/host/nvme.h
-> @@ -664,6 +664,7 @@ void nvme_mpath_start_freeze(struct nvme_subsystem *subsys);
->  void nvme_set_disk_name(char *disk_name, struct nvme_ns *ns,
->  			struct nvme_ctrl *ctrl, int *flags);
->  void nvme_failover_req(struct request *req);
-> +void nvme_update_ana(struct request *req);
->  void nvme_kick_requeue_lists(struct nvme_ctrl *ctrl);
->  int nvme_mpath_alloc_disk(struct nvme_ctrl *ctrl,struct nvme_ns_head *head);
->  void nvme_mpath_add_disk(struct nvme_ns *ns, struct nvme_id_ns *id);
-> @@ -714,6 +715,9 @@ static inline void nvme_set_disk_name(char *disk_name, struct nvme_ns *ns,
->  static inline void nvme_failover_req(struct request *req)
->  {
->  }
-> +static inline void nvme_update_ana(struct request *req)
-> +{
-> +}
->  static inline void nvme_kick_requeue_lists(struct nvme_ctrl *ctrl)
->  {
->  }
+> John - I have not seen such issue on megaraid_sas driver.
 
-Since I sent these changes late on Friday I figured I'd try to get them
-on your radar.
+I could try to test megaraid SAS also, but the system with that card has 
+only 1x SATA disk, so pointless really.
 
-I would really appreciate timely review of this series for 5.13:
-https://patchwork.kernel.org/project/dm-devel/list/?series=468905
+> Is this something
+> to do with CPU lock up ?
+
+Seems to be.
+
+JFYI, Enabling configs RCU_EXPERT, DEBUG_ATOMIC_SLEEP, and 
+DEBUG_SPINLOCK gives:
+
+job1: (g=0): rw=randread, bs=(R) 4096B-4096B, (W) 4096B-4096B, (T) 
+4096B-4096B, ioengine=libaio, iodepth=128
+job1: (g=0): rw=randread, bs=(R) 4096B-4096B, (W) 4096B-4096B, (T) 
+4096B-4096B, ioengine=libaio, iodepth=128
+job1: (g=0): rw=randread, bs=(R) 4096B-4096B, (W) 4096B-4096B, (T) 
+4096B-4096B, ioengine=libaio, iodepth=128
+fio-3.1
+Starting 6 processes
+[  196.342724] rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:ta 
+01h:12m:22s]
+[  196.348816] rcu:     Tasks blocked on level-1 rcu_node (CPUs 32-47):
+[  196.354913] rcu: All QSes seen, last rcu_preempt kthread activity 1 
+(4294941135-4294941134), jiffies_till_next_fqs=1, root ->qsmask 0x4
+[  196.367089] BUG: sleeping function called from invalid context at 
+include/linux/uaccess.h:174
+[  196.375605] in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 
+1893, name: fio
+[  196.383502] BUG: scheduling while atomic: fio/1893/0x00000004
+[  196.389312] BUG: spinlock recursion on CPU#11, fio/1893
+[  196.394527]  lock: rcu_state+0x280/0x2d00, .magic: dead4ead, .owner: 
+fio/1893, .owner_cpu: 11
+[  196.403046] CPU: 11 PID: 1893 Comm: fio Tainted: G W 
+5.12.0-rc7-00001-g3ae18ff9e445 #219
+[  196.412426] Hardware name: Huawei Taishan 2280 /D05, BIOS Hisilicon 
+D05 IT21 Nemo 2.0 RC0 04/18/2018
+[  196.421544] Call trace:
+[  196.423977]  dump_backtrace+0x0/0x1b0
+[  196.427629]  show_stack+0x18/0x68
+[  196.430932]  dump_stack+0xd8/0x134
+[  196.434322]  spin_dump+0x84/0x94
+[  196.437539]  do_raw_spin_lock+0x108/0x120
+[  196.441539]  _raw_spin_lock+0x20/0x30
+[  196.445191]  rcu_note_context_switch+0xbc/0x348
+[  196.449710]  __schedule+0xc8/0x6e8
+[  196.453100]  preempt_schedule_notrace+0x50/0x70
+[  196.457618]  __arm64_sys_io_submit+0x188/0x240
+[  196.462051]  el0_svc_common.constprop.2+0x8c/0x128
+[  196.466829]  do_el0_svc+0x24/0x90
+[  196.470133]  el0_svc+0x24/0x38
+[  196.473175]  el0_sync_handler+0x90/0xb8
+[  196.476999]  el0_sync+0x154/0x180
+^Cbs: 6 (f=6): [r(6)][4.2%][r=0KiB/s,w=0KiB/s][r=0,w=0 IOPS][eta 
+01h:11m:54s]
+fio: terminating on signal 2
+
+> Can you try your test with "rq_affinity=2" ? 
+
+I cannot see the issue with this setting.
+
+> megaraid_sas driver detect CPU
+> lockup (flood of completion on single CPU) and it use irq_poll interface to
+> avoid such loop.
+
+Can you turn it off? I guess that this is what happens to me, but the 
+system should not hang.
+
+> Since you mentioned you noticed issue with hisi_sas v2 without hostwide tag
+> I can think of similar stuffs in this case.
+> 
+> How cpus to irq affinity settled in your case. ? Is it 1-1 mapping ?
+
+We have a 4-1 CPU-HW queue mapping.
+
+Disabling CONFIG_PREEMPT makes the issue go away for me also, so it 
+would be useful to try enabling it to recreate (if disabled), like:
+
+  more .config| grep PREEMPT
+# CONFIG_PREEMPT_NONE is not set
+# CONFIG_PREEMPT_VOLUNTARY is not set
+CONFIG_PREEMPT=y
+CONFIG_PREEMPT_COUNT=y
+CONFIG_PREEMPTION=y
+CONFIG_PREEMPT_RCU=y
+CONFIG_PREEMPT_NOTIFIERS=y
+# CONFIG_DEBUG_PREEMPT is not set
 
 Thanks,
-Mike
+John
+
+> 
+> Kashyap
+> 
+>>
+>> scsi debug or null_blk don't seem to load the system heavily enough to
+>> recreate.
+>>
+>> I have seen it on 5.11 also. I see it on hisi_sas v2 and v3 hw drivers,
+>> And I don't
+>> think it's related to hostwide tags, as for hisi_sas v2 hw driver, I unset
+>> that flag
+>> and can still see it.
+>>
+>> Thanks,
+>> John
+>>
+>> [0]
+>> https://lore.kernel.org/linux-scsi/89ebc37c-21d6-c57e-4267-
+>> cac49a3e5953@huawei.com/T/#t
 
