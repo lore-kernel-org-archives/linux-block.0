@@ -2,117 +2,127 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6B93C433B4
-	for <linux-block@archiver.kernel.org>; Mon, 19 Apr 2021 18:38:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24C36C433B4
+	for <linux-block@archiver.kernel.org>; Mon, 19 Apr 2021 19:48:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ACFCD61245
-	for <linux-block@archiver.kernel.org>; Mon, 19 Apr 2021 18:38:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CEF1161369
+	for <linux-block@archiver.kernel.org>; Mon, 19 Apr 2021 19:48:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241161AbhDSSjO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 19 Apr 2021 14:39:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45222 "EHLO
+        id S232305AbhDSTsn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 19 Apr 2021 15:48:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60536 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233942AbhDSSjN (ORCPT
+        with ESMTP id S239346AbhDSTsn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 19 Apr 2021 14:39:13 -0400
-Received: from mail-ot1-x32a.google.com (mail-ot1-x32a.google.com [IPv6:2607:f8b0:4864:20::32a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1CA2C06174A
-        for <linux-block@vger.kernel.org>; Mon, 19 Apr 2021 11:38:43 -0700 (PDT)
-Received: by mail-ot1-x32a.google.com with SMTP id 5-20020a9d09050000b029029432d8d8c5so7577650otp.11
-        for <linux-block@vger.kernel.org>; Mon, 19 Apr 2021 11:38:43 -0700 (PDT)
+        Mon, 19 Apr 2021 15:48:43 -0400
+Received: from mail-il1-x12b.google.com (mail-il1-x12b.google.com [IPv6:2607:f8b0:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 154E2C06174A
+        for <linux-block@vger.kernel.org>; Mon, 19 Apr 2021 12:48:11 -0700 (PDT)
+Received: by mail-il1-x12b.google.com with SMTP id c4so3580796ilq.9
+        for <linux-block@vger.kernel.org>; Mon, 19 Apr 2021 12:48:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=FfwCKpFu+KZSiZGRhLsDEaWnJCMxD66Q3cGmOFACWNo=;
-        b=VVu0gpiJqae8kMOBe3aDoFrfxAJ3CsuWnw/mVM0x2Z7j9Kh1L+a5E/FDbWgD6rgsVm
-         xWkAw3UyDrgeEodgkivfkgeWUpFIZj3cv0PmNYBSTH+belJAxn5QW2PlLRt0UgoTrDv5
-         0x5nDJ1N/+aRG0EgnyT6c++v3qNrGPxcxXxRTZvXpMyHLin7GgDgqj4r7LI1VqOL0RQv
-         ocM2LSAu5c5RloYOUUTO8qKnT7g1GEjeBBaLKI+Cbqu56ssKJDDwlmPPVgoVfysj5TR7
-         hx8nLvlSeJC0XW45MYQ79CM4QHh+WODF74bdw1UhZAdSKKVE11zugbKcQLUSOXTRC7JE
-         8X2Q==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=wgtxZSflAiWmJVLCzDmdLgAcLUJmwymHsDoF35ncDkc=;
+        b=qeRSc7+N1olXx5kZ8Uo/rOwAHJQiLP5/DzqsBbxcVuOS+WkkQPzZltJQriDu90FbR/
+         qMDvu22Hr0S9XxPiL8DoIt9a2FM/plXTWsvoSbT4+B83IEu4Wh2eM90fJkFd5+zziXMp
+         wWFWi4bwm95PgJA1F0TrphaiR1QgJJeYvu1wXWgYnXQLkuKKliQgfGRNSG81MIWUFnWA
+         QrQqxdDWnnLSsyjx/+EMk9ywCb6Mk6aRbRgRsJkOshm711HYgOWWrYBdYG0g/OODhNyM
+         Usgz5gKU5ACszgSWy3gdJLsmfkoq+iKA9bs0dlrBnBGQv5oONbKGfKw7RkjAM3PeR4Kn
+         /vZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=FfwCKpFu+KZSiZGRhLsDEaWnJCMxD66Q3cGmOFACWNo=;
-        b=o0IgivuSEz7aS/UDs1aDopInLXYD4ulPa81Vm3QQow37P6tffs1JuDGtsFbM3OsTwm
-         0MBF/vmZskEnHDmdsMpuv75gtF2Y5V3mnBJoGDPOAVnuaU5JSiFkQydm3/xKc7SzgvDF
-         tHcxqIJVNSVWII/ADupl6xGwuqNEaX1S04AQ9MBzvf39/WV8HtiwXndVydB6X0Ryuk8n
-         97INFhi0Af1Y3pS7W9wqePdruoypGOaziFskLNcRjOmnM6LqnWgun7ELyPScDlyF8LXF
-         qLXsu6Aj/FTLhudpf+8mTSmV+opyOOXfcmzQgVC6X5thM1ieAZztlViP8Ml9JHrsjcfU
-         tXPg==
-X-Gm-Message-State: AOAM532gVkEwU6DZRT2Ll/rUyj7G9UTfFLQn1hk2cIVajgOrWMuS7FK4
-        LiVJSqRL1JbiE2G11bcQsZKCFmMubbpxRx1XdQw=
-X-Google-Smtp-Source: ABdhPJx2CALHMdl0YTYheEWUOspDwJAYIiUnXjQC1cHydsMuDCE23XQKA+W65BYcjCq7gm4tbCWTdvidw9HXnc7VGLI=
-X-Received: by 2002:a9d:12e:: with SMTP id 43mr16342012otu.90.1618857523078;
- Mon, 19 Apr 2021 11:38:43 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=wgtxZSflAiWmJVLCzDmdLgAcLUJmwymHsDoF35ncDkc=;
+        b=FV0AayFdhL98I6UNUBV4A1tbt8JJdYyCB/VBVe4vzHhG/IEKdTyWUD2yJUD4j80maL
+         zM59/oEKLCQQ8WBDO9fXQ5JZpyp0b5njMuIwTQ5jFUA4ybONlZ6uLLjRGRfs3RlJGUri
+         zR3nbgMhftT4LL+GcUNAc+pua84OP7jvi4bP2WmRjNgeRSDHVX2X3Q17tKEj5xCjWnLF
+         aoTLySgo3wZDz2jd+UETv4hm5i966O2E8Sqs5gbvGnNzrdt1+zYxLZ3tkF5knmPECZ0z
+         ocCYZo8nI+iQk65vOj/eGflmgmNPK2L8ajTztR9rKysNPFKZOulMvyMvH6ZPO7AWJdLU
+         Jhww==
+X-Gm-Message-State: AOAM531eJgr3unzXs4UN053N1V7UpBj2COrkaCY/Z8fhY3h0ItfQlwO/
+        aQZjfia1HdcJipPqBSJBiuu2dRnTKTJLgw==
+X-Google-Smtp-Source: ABdhPJxLJd3SlMLpkPeMlAHqsczTgCUzOs/WnRe9F+XNXtFnPxzgLdhFU1ipFIltQlIyjCcAGwB6ZA==
+X-Received: by 2002:a05:6e02:1488:: with SMTP id n8mr20048398ilk.158.1618861690229;
+        Mon, 19 Apr 2021 12:48:10 -0700 (PDT)
+Received: from [192.168.1.30] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id k14sm7017498iov.35.2021.04.19.12.48.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 19 Apr 2021 12:48:09 -0700 (PDT)
+Subject: Re: [PATCH] null_blk: poll queue support
+To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <baca710d-0f2a-16e2-60bd-b105b854e0ae@kernel.dk>
+ <BYAPR04MB49654A1D4AC52FA3A8110240864A9@BYAPR04MB4965.namprd04.prod.outlook.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <68a28d55-8c50-31e3-505a-2de330914942@kernel.dk>
+Date:   Mon, 19 Apr 2021 13:48:09 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <20210413150319.764600-1-stefanha@redhat.com> <YH2VE2RdcH0ISvxH@stefanha-x1.localdomain>
-In-Reply-To: <YH2VE2RdcH0ISvxH@stefanha-x1.localdomain>
-From:   "H.J. Lu" <hjl.tools@gmail.com>
-Date:   Mon, 19 Apr 2021 11:38:07 -0700
-Message-ID: <CAMe9rOpK08CJ5TdQ1fZJ2sGUVjHqoTHS2kT8EzDEejuodu8Ksg@mail.gmail.com>
-Subject: Re: [PATCH liburing] examples/ucontext-cp.c: cope with variable SIGSTKSZ
-To:     Stefan Hajnoczi <stefanha@redhat.com>
-Cc:     libc-alpha@sourceware.org, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <BYAPR04MB49654A1D4AC52FA3A8110240864A9@BYAPR04MB4965.namprd04.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Apr 19, 2021 at 7:35 AM Stefan Hajnoczi <stefanha@redhat.com> wrote=
-:
->
-> On Tue, Apr 13, 2021 at 04:03:19PM +0100, Stefan Hajnoczi wrote:
-> > The size of C arrays at file scope must be constant. The following
-> > compiler error occurs with recent upstream glibc (2.33.9000):
-> >
-> >   CC ucontext-cp
-> >   ucontext-cp.c:31:23: error: variably modified =E2=80=98stack_buf=E2=
-=80=99 at file scope
-> >   31 |         unsigned char stack_buf[SIGSTKSZ];
-> >      |                       ^~~~~~~~~
-> >   make[1]: *** [Makefile:26: ucontext-cp] Error 1
-> >
-> > The following glibc commit changed SIGSTKSZ from a constant value to a
-> > variable:
-> >
-> >   commit 6c57d320484988e87e446e2e60ce42816bf51d53
-> >   Author: H.J. Lu <hjl.tools@gmail.com>
-> >   Date:   Mon Feb 1 11:00:38 2021 -0800
-> >
-> >     sysconf: Add _SC_MINSIGSTKSZ/_SC_SIGSTKSZ [BZ #20305]
-> >   ...
-> >   +# define SIGSTKSZ sysconf (_SC_SIGSTKSZ)
-> >
-> > Allocate the stack buffer explicitly to avoid declaring an array at fil=
-e
-> > scope.
-> >
-> > Cc: H.J. Lu <hjl.tools@gmail.com>
-> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> > ---
-> > Perhaps the glibc change needs to be revised before releasing glibc 2.3=
-4
-> > since it might break applications. That's up to the glibc folks. It
-> > doesn't hurt for liburing to take a safer approach that copes with the
-> > SIGSTKSZ change in any case.
->
-> glibc folks, please take a look. The commit referenced above broke
-> compilation of liburing's tests. It's possible that applications will
-> hit similar issues. Can you check whether the SIGSTKSZ change needs to
-> be reverted/fixed before releasing glibc 2.34?
->
+On 4/17/21 10:49 PM, Chaitanya Kulkarni wrote:
+> On 4/17/21 08:30, Jens Axboe wrote:
+>> +		cmd->error = null_process_cmd(cmd, req_op(req), blk_rq_pos(req),
+>> +						blk_rq_sectors(req));
+> 
+> How about following on the top of this patch ?
+> 
+> diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
+> index 8efaf21cc053..4c27e37ccc51 100644
+> --- a/drivers/block/null_blk/main.c
+> +++ b/drivers/block/null_blk/main.c
+> @@ -1496,6 +1496,7 @@ static int null_map_queues(struct blk_mq_tag_set *set)
+>  static int null_poll(struct blk_mq_hw_ctx *hctx)
+>  {
+>         struct nullb_queue *nq = hctx->driver_data;
+> +       blk_status_t sts;
+>         LIST_HEAD(list);
+>         int nr = 0;
+>  
+> @@ -1510,8 +1511,16 @@ static int null_poll(struct blk_mq_hw_ctx *hctx)
+>                 req = list_first_entry(&list, struct request, queuelist);
+>                 list_del_init(&req->queuelist);
+>                 cmd = blk_mq_rq_to_pdu(req);
+> -               cmd->error = null_process_cmd(cmd, req_op(req),
+> blk_rq_pos(req),
+> -                                               blk_rq_sectors(req));
+> +               if (cmd->nq->dev->zoned)
+> +                       sts = null_process_zoned_cmd(cmd, req_op(req),
+> +                                                    blk_rq_pos(req),
+> +                                                    blk_rq_sectors(req));
+> +               else
+> +                       sts = null_process_cmd(cmd, req_op(req),
+> blk_rq_pos(req),
+> +                                              blk_rq_sectors(req));
+> +
+> +               cmd->error = sts;
+> +
+>                 nullb_complete_cmd(cmd);
+>                 nr++;
+>         }
+> 
+> If you are okay I can send a well tested patch with little bit code
+> cleanup once this is in the tree.
 
-It won't be changed for glibc 2.34.
+Yes, that might be a good idea. I'll just fold it in, I've got it
+sitting separately so far. Just let me know when you've tested it.
 
---=20
-H.J.
+-- 
+Jens Axboe
+
