@@ -7,147 +7,102 @@ X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51008C433B4
-	for <linux-block@archiver.kernel.org>; Mon, 19 Apr 2021 06:16:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF0EBC433ED
+	for <linux-block@archiver.kernel.org>; Mon, 19 Apr 2021 06:37:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1F89861104
-	for <linux-block@archiver.kernel.org>; Mon, 19 Apr 2021 06:16:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7BC2061104
+	for <linux-block@archiver.kernel.org>; Mon, 19 Apr 2021 06:37:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237411AbhDSGQt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 19 Apr 2021 02:16:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49856 "EHLO
+        id S229652AbhDSGiY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 19 Apr 2021 02:38:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54526 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229840AbhDSGQp (ORCPT
+        with ESMTP id S229630AbhDSGiY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 19 Apr 2021 02:16:45 -0400
-Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA91DC061760
-        for <linux-block@vger.kernel.org>; Sun, 18 Apr 2021 23:16:15 -0700 (PDT)
-Received: by mail-ej1-x630.google.com with SMTP id w23so35242766ejb.9
-        for <linux-block@vger.kernel.org>; Sun, 18 Apr 2021 23:16:15 -0700 (PDT)
+        Mon, 19 Apr 2021 02:38:24 -0400
+Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06F66C06174A
+        for <linux-block@vger.kernel.org>; Sun, 18 Apr 2021 23:37:55 -0700 (PDT)
+Received: by mail-ej1-x629.google.com with SMTP id n2so51086202ejy.7
+        for <linux-block@vger.kernel.org>; Sun, 18 Apr 2021 23:37:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=ionos.com; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=4V00X4g8iTi3YjRqFiUXK8A9Z5ApFoZoEKZaxGIZdCo=;
-        b=UXGaQjQrhGIz6uKTETg91SeCbEVU4WWaYT+Jvjgw6Y8ofSPvqR2p3Hu0p9PloZWwEk
-         VpsNH5fcfnzKIyza7kkxmGgWLE2fJ3qXDnHzdtkpo59t3gDypGkHNt0bptcTMpg59rFN
-         TG2+tBlCQnYfMYcABVYsPmNs4Jdcx60xGpC08g3nYWK8CsPitvxcA7In5kyzJAXHUSXj
-         areRnL0VaDhHYVfF5wtTuMejzOjf2q/6vU+wIQ9aqXiGNAvbLG66Sw3/6FaSrHyQGp17
-         nym9TXyM489PxSKfPpXuujfNGdJFL91OlOgFrOOfLDxOTQ3ehSq3ZVmrmGO4114MCOz3
-         eucA==
+        bh=5PDXy/9Y/FcTdSRegonFGq/cV3kr8MsnTdhmYheEH7w=;
+        b=iZKKZqWXEwEJYuyS4GVwN97yAB9OMoCAKiyRWtMFiHPEj97aL44E14HjxSUYRec82t
+         ueRfvDAPQeh20LZ3dn6o76QajV+8jCxbtrslt8IQAHhfr5yxCO8+JDFthvx9gynSZbMf
+         enERyJ4MfDCTaVhoLtrHKLawLixVdDi+6J7/Zn3qYjIOA3hxM2acwenCChuw9rGexHF4
+         3b0oBqdWJDpDmXC4fi5VfhEIP4jNizLqkbntjmc+zTlDU5I271IN3sOiETyKTXosj/Y+
+         GYr0OJoiexP5Y/KMWkxqBKpeughCNURsnCScsYAcZ9pjYgtx6EsqSyDCSMiUDRpYG96c
+         34rw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=4V00X4g8iTi3YjRqFiUXK8A9Z5ApFoZoEKZaxGIZdCo=;
-        b=lOmJQKyBertxsKbtnDvrY6ftMQAEa0eUQi67O/19v7xskgEw6dSIqFdQOXejTERGM3
-         myKU6yj1s8zXCsTE/9h3lOAMfc733+EIH2EuOTfSBBCOYzAWsM6ah3ZEM3YokJ+SO4bE
-         t935K9gxZiGK94vIzgXggn2TGy99M9LyY4jEhVmydK3ArS54QI0X+S9KrFAtvCiVqZnI
-         Kg+DH2WvEms784HE4k/JZ0w2ANS5FQwB5rQvN3H5NTwpWkgNNLmbHPsgfm0NgQci0Il+
-         639K8Krkm4dyeC0ym0o6WgcsLLyyglMMDx3lnot7lXTMii9m/wNKJwmwIfF4VCXsNaW5
-         Wp+Q==
-X-Gm-Message-State: AOAM532ODKcpDgGopffVFQ/fHcipAeRl+ew4FcOeH89PfWo+VrrPOkPX
-        jcZN1DKw49FdZmdzAuj8U7+vJv6/x1ivXbTkDRbxcg==
-X-Google-Smtp-Source: ABdhPJxCLB66739zHIBl2ICVISKVfMONe+7lmGXEGA3LuDx50Sy7t44Bt+3LJaN5d6FrQdGCHuPoGHddDCvLWls7weM=
-X-Received: by 2002:a17:906:f42:: with SMTP id h2mr20872722ejj.317.1618812974396;
- Sun, 18 Apr 2021 23:16:14 -0700 (PDT)
+        bh=5PDXy/9Y/FcTdSRegonFGq/cV3kr8MsnTdhmYheEH7w=;
+        b=aOAypXaO1ABiy+UhYkiVBrzkvxMiAmVJjxPEl+Z0boCqYXzH89v6qK2Q7rr3JERUT8
+         jBVWJ2BftNFlZh6wJ7U70IsWNEMJb2UuFnj18h84m63o+iU5udVwGACgI2jd2m/luGNk
+         tURhSr0Hg/OKKQahh7dhpJo+heBZgt9HLbyCzSkhqRLEQf7J/nv7rSCxg5pyJnCdJH8y
+         7cE1fso5eGF2rzj8pt3jYlhkTYfZIQuyOlLzGiJ3p/V1Tr3+CxDz2qhU+KTJyZpfTheJ
+         /Juo9WSQeIo+5n53Y44pkPfq4MjaIV4EZz78/AObcP3qturkgzrl5dwWUAnP6k0Tvfjk
+         wkSw==
+X-Gm-Message-State: AOAM531rAXrfh8VqKlSJDyKOXqPKP90Gb++mOygeceewukzlYXzw33NW
+        Xaw4SLHSbYe2Dv4JMRKRpSby6YOLfvsnT0SAhP0p7g==
+X-Google-Smtp-Source: ABdhPJyFH5TiK2kctLROT48iODF2bpqb94Bq8jbtU4QpWvrK7vjeNdfOSTNSqOZ0SP9cL44itLvVgRPHmJBCFP9ivgM=
+X-Received: by 2002:a17:906:fca1:: with SMTP id qw1mr20094855ejb.478.1618814273733;
+ Sun, 18 Apr 2021 23:37:53 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210414122402.203388-1-gi-oh.kim@ionos.com> <20210414122402.203388-14-gi-oh.kim@ionos.com>
- <YHvvdskHgQe9gX09@unreal> <CAJX1YtaN3TmwdOE_8UrRuUU=3cCvtQRBX+DmwvU0Tj3nw-knyg@mail.gmail.com>
- <YH0TBlXxU5cq2eO4@unreal> <CAJX1Ytb=nFvfy4KNgHDxHaSp+4z3_Wh5EHXXVgg-dcNU39LAwQ@mail.gmail.com>
- <YH0ej9ZplTrkA156@unreal>
-In-Reply-To: <YH0ej9ZplTrkA156@unreal>
-From:   Gioh Kim <gi-oh.kim@ionos.com>
-Date:   Mon, 19 Apr 2021 08:15:38 +0200
-Message-ID: <CAJX1YtbLB2SqPPr8Oh6hHc26QHq7LAL5YyZajbA_s_Rp9PMU=Q@mail.gmail.com>
-Subject: Re: [PATCHv4 for-next 13/19] block/rnbd-clt: Support polling mode for
- IO latency optimization
-To:     Leon Romanovsky <leon@kernel.org>
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        hch@infradead.org, sagi@grimberg.me,
-        Bart Van Assche <bvanassche@acm.org>,
-        Haris Iqbal <haris.iqbal@ionos.com>,
-        Jinpu Wang <jinpu.wang@ionos.com>,
-        Gioh Kim <gi-oh.kim@cloud.ionos.com>,
-        linux-rdma <linux-rdma@vger.kernel.org>,
-        Jason Gunthorpe <jgg@nvidia.com>
+References: <20210409160305.711318-1-haris.iqbal@ionos.com>
+ <ef59e838-4d7f-cab4-e1ac-26944cb7db75@kernel.dk> <CAMGffE=ZdCUc_HABY3_F_aK6pqCt8maB4yi9Qu4gKoox6ub6QQ@mail.gmail.com>
+In-Reply-To: <CAMGffE=ZdCUc_HABY3_F_aK6pqCt8maB4yi9Qu4gKoox6ub6QQ@mail.gmail.com>
+From:   Jinpu Wang <jinpu.wang@ionos.com>
+Date:   Mon, 19 Apr 2021 08:37:43 +0200
+Message-ID: <CAMGffEmVhXepdmMJcb6F2jYOqO8OGgS0xeuUXpLPcWh+r1RxiA@mail.gmail.com>
+Subject: Re: [PATCH V6 0/3] block: add two statistic tables
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Md Haris Iqbal <haris.iqbal@ionos.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        Danil Kipnis <danil.kipnis@ionos.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Apr 19, 2021 at 8:09 AM Leon Romanovsky <leon@kernel.org> wrote:
+On Mon, Apr 12, 2021 at 7:35 AM Jinpu Wang <jinpu.wang@ionos.com> wrote:
 >
-> On Mon, Apr 19, 2021 at 07:51:34AM +0200, Gioh Kim wrote:
-> > On Mon, Apr 19, 2021 at 7:46 AM Leon Romanovsky <leon@kernel.org> wrote:
-> > >
-> > > On Mon, Apr 19, 2021 at 07:12:09AM +0200, Gioh Kim wrote:
-> > > > On Sun, Apr 18, 2021 at 10:36 AM Leon Romanovsky <leon@kernel.org> wrote:
-> > > > >
-> > > > > On Wed, Apr 14, 2021 at 02:23:56PM +0200, Gioh Kim wrote:
-> > > > > > From: Gioh Kim <gi-oh.kim@cloud.ionos.com>
-> > > > > >
-> > > > > > RNBD can make double-queues for irq-mode and poll-mode.
-> > > > > > For example, on 4-CPU system 8 request-queues are created,
-> > > > > > 4 for irq-mode and 4 for poll-mode.
-> > > > > > If the IO has HIPRI flag, the block-layer will call .poll function
-> > > > > > of RNBD. Then IO is sent to the poll-mode queue.
-> > > > > > Add optional nr_poll_queues argument for map_devices interface.
-> > > > > >
-> > > > > > To support polling of RNBD, RTRS client creates connections
-> > > > > > for both of irq-mode and direct-poll-mode.
-> > > > > >
-> > > > > > For example, on 4-CPU system it could've create 5 connections:
-> > > > > > con[0] => user message (softirq cq)
-> > > > > > con[1:4] => softirq cq
-> > > > > >
-> > > > > > After this patch, it can create 9 connections:
-> > > > > > con[0] => user message (softirq cq)
-> > > > > > con[1:4] => softirq cq
-> > > > > > con[5:8] => DIRECT-POLL cq
-> > >
-> > > <...>
+> On Fri, Apr 9, 2021 at 11:03 PM Jens Axboe <axboe@kernel.dk> wrote:
 > >
-> > I am sorry that I don't understand exactly.
-> > Do I need to change them to "con<5..8>"?
+> > On 4/9/21 10:03 AM, Md Haris Iqbal wrote:
+> > > Hi Jens,
+> > >
+> > > This version fixes the long lines in the code as per Christoph's comment.
+> >
+> > I'd really like to see some solid justification for the addition,
+> > though. I clicked the v1 link and it's got details on what you get out
+> > of it, but not really the 'why' of reasoning for the feature. I mean,
+> > you could feasibly have a blktrace based userspace solution. Just
+> > wondering if that has been tried, I know that's what we do at Facebook
+> > for example.
+> >
+> Hi Jens,
 >
-> No, I just removed not relevant text and replaced it with <...> in
-> automatic way :).
+> Thanks for the reply.
+> For the use case of the additional stats, as a cloud provider, we
+> often need to handle report from the customers regarding
+> performance problem in a period of time in the past, so it's not
+> feasible for us to run blktrace, customer workload could change from
+> time to time, with the additional stats, we gather through all metrics
+> using Prometheus, we can navigate to the period of time interested,
+> to check if the performance matches the SLA, it also helps us to find
+> the user IO pattern,  we can more easily reproduce.
+>
+> We do use blktrace from time to time too if it's not too late (when IO
+> pattern has not changed.)
+>
+> Thanks!
+> Jack
 
-Oh ;-)
+Hi Jens,
 
->
-> >
-> >
-> > >
-> > > > > > +int rtrs_clt_rdma_cq_direct(struct rtrs_clt *clt, unsigned int index)
-> > > > > > +{
-> > > > > > +     int cnt;
-> > > > > > +     struct rtrs_con *con;
-> > > > > > +     struct rtrs_clt_sess *sess;
-> > > > > > +     struct path_it it;
-> > > > > > +
-> > > > > > +     rcu_read_lock();
-> > > > > > +     for (path_it_init(&it, clt);
-> > > > > > +          (sess = it.next_path(&it)) && it.i < it.clt->paths_num; it.i++) {
-> > > > > > +             if (unlikely(READ_ONCE(sess->state) != RTRS_CLT_CONNECTED))
-> > > > >
-> > > > > We talked about useless likely/unlikely in your workloads.
-> > > >
-> > > > Right, I've made a patch to remove all likely/unlikely
-> > > > and will send with the next patch set.
-> > >
-> > > This specific line is "brand new". We don't add code that will be
-> > > removed in next patch.
-> >
-> > Ah, ok. So you mean,
-> > 1. remove unlikely from that line
-> > 2. send a patch to remove all likely/unlikely for next round
-> >
-> > Am I right?
->
-> Right
-
-Thank you very much.
-I will send V5 soon.
+A gentle ping!
