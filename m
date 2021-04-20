@@ -2,97 +2,342 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6571C433B4
-	for <linux-block@archiver.kernel.org>; Tue, 20 Apr 2021 11:20:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1859C433B4
+	for <linux-block@archiver.kernel.org>; Tue, 20 Apr 2021 12:38:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ADBD9613AE
-	for <linux-block@archiver.kernel.org>; Tue, 20 Apr 2021 11:20:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A9D7D613C1
+	for <linux-block@archiver.kernel.org>; Tue, 20 Apr 2021 12:38:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231805AbhDTLVT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Apr 2021 07:21:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37822 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231918AbhDTLVN (ORCPT
+        id S231526AbhDTMjO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Apr 2021 08:39:14 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49070 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231393AbhDTMjN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Apr 2021 07:21:13 -0400
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDA1AC06138A;
-        Tue, 20 Apr 2021 04:20:39 -0700 (PDT)
-Received: by mail-pf1-x42c.google.com with SMTP id 10so16439379pfl.1;
-        Tue, 20 Apr 2021 04:20:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :in-reply-to:references;
-        bh=qyBuZeZX6dtvZpGO9NcSkjgX81PiW8wDc10wk8ErfMI=;
-        b=NU0gWB3bLQ/YvHQsoTXeQe3pmYJZZl1J/jfFrLtU2wvFbkpH3hXsng9vbM/vRpqXG3
-         OiUkRcwNMKrHCRqai8Sl1pD4hzAE9dOpESZHBiusyaT12PTasOqQPYpinnRENhqCX9nh
-         6bcXJVi0szFfSL3VLc2QGi4RWOTQJXCNP0ALeoYq2nTe23olNwdAVu7osIYlmbWRvH5h
-         uWWqPhk1Y+XnjoOopFweN/nxn59T9yIm84UDOtuc7ubZjO6+15bCokaZvdxguOaxQA5W
-         YJUkEHv4FsoqqO+WzwO4kF+zDfJrp/pmdjLvAfBGHPeZO4nAju/CHGMWjh/d04ne743X
-         s42g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:in-reply-to:references;
-        bh=qyBuZeZX6dtvZpGO9NcSkjgX81PiW8wDc10wk8ErfMI=;
-        b=uFguUPFyXGQRz8PUoLdaimVkafybe/YvaG8enHnAqmsi3rA1ypKE6JdWE2qs9lfK0r
-         +cc2NmdrbFzBvVDMUY49ElhfB+OL03y1+co7Bj6jk5iKZzO1sJ09RHdyzRfNceAPtTjC
-         43vK0ccBHmDodxlmSASb/Vi8oOSpSK7ouUHf1/73EG+K4htjvWpfWraF3rB5nHalhHNg
-         vqlMriCypP7o6ueWC/9yqsfRfHaDbjdWrWzYPgLecuXTWr2Wc3JhZdxRRPS/NGwhoKaN
-         Oog3MHQjwgGY8WB3sOOV+OuX7UUO4GGAF5ULsugliiUO6PzawICBoasWN7XYRMHp+Bzx
-         mNVQ==
-X-Gm-Message-State: AOAM531F5k9PCQaeJpRtR1ocgKPmfiPxdaAsYXfncXL3F0qS7XUDQxCz
-        3wRtfOu1022gRNDnVgWC0cI=
-X-Google-Smtp-Source: ABdhPJwhOxy0VK8F9MrLulaJA9BdFiF57r0Uaq1SQynmOi1loZJ5nVr1scbbkEP5nCfAKKwNFD6Oig==
-X-Received: by 2002:a63:d552:: with SMTP id v18mr16318729pgi.313.1618917639488;
-        Tue, 20 Apr 2021 04:20:39 -0700 (PDT)
-Received: from VM-0-3-centos.localdomain ([101.32.213.191])
-        by smtp.gmail.com with ESMTPSA id s40sm14187367pfw.100.2021.04.20.04.20.38
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 20 Apr 2021 04:20:39 -0700 (PDT)
-From:   brookxu <brookxu.cn@gmail.com>
-To:     paolo.valente@linaro.org, axboe@kernel.dk, tj@kernel.org
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 8/8] bfq: remove unnecessary BFQ_DEFAULT_GRP_IOPRIO
-Date:   Tue, 20 Apr 2021 19:20:25 +0800
-Message-Id: <86124148b8364995021f8c53737c68b04b524421.1618916839.git.brookxu@tencent.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <cover.1618916839.git.brookxu@tencent.com>
-References: <cover.1618916839.git.brookxu@tencent.com>
-In-Reply-To: <cover.1618916839.git.brookxu@tencent.com>
-References: <cover.1618916839.git.brookxu@tencent.com>
+        Tue, 20 Apr 2021 08:39:13 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13KCX1Ko062622;
+        Tue, 20 Apr 2021 08:38:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : content-type : in-reply-to : sender :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=cM4snMEz3w5B344j6o8ruCX/KOxW+0D1o/cVs+oTAgs=;
+ b=lXEXYXfcWgLLeofHV9N05ChSaNSn9eN6FadHO7nlCyzpdq2YYSnX2plXeHa7o8Lp/RtY
+ G8EerqXNdnS6M8if9FRXDNxGCh5d5MNhRfmFqEK9osasSNMX4kl3DcCOcYS5IyZDlraZ
+ wyLEJRXPxlDIBwdQlLFyBa2THuQCG58rzE73TCH8N673w0J+8d5ThLG58lJIg7mZRef6
+ yhsQX7lRIN7zTYtQkTeYWR90Q4GYdX4V+lr7/oEjUcOy+a1zY1DgUPwtvuVElkWZe4Ef
+ wL6g51RMRmZbZ4ncWtZdK7oJYx6bl+CKQslzS/X5Oaq3D1Aop9JyUuT1QsWTl1hD+OD0 DQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 381xebse58-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 20 Apr 2021 08:38:29 -0400
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13KCXwww068288;
+        Tue, 20 Apr 2021 08:38:29 -0400
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 381xebse3k-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 20 Apr 2021 08:38:29 -0400
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13KCUppn031437;
+        Tue, 20 Apr 2021 12:38:25 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma06fra.de.ibm.com with ESMTP id 37ypxh8xk6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 20 Apr 2021 12:38:25 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13KCcMWO29557032
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 20 Apr 2021 12:38:22 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A218A5204F;
+        Tue, 20 Apr 2021 12:38:22 +0000 (GMT)
+Received: from t480-pf1aa2c2.fritz.box (unknown [9.145.82.95])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTPS id 8D1875204E;
+        Tue, 20 Apr 2021 12:38:22 +0000 (GMT)
+Received: from bblock by t480-pf1aa2c2.fritz.box with local (Exim 4.94)
+        (envelope-from <bblock@linux.ibm.com>)
+        id 1lYpe2-003M5U-1e; Tue, 20 Apr 2021 14:38:22 +0200
+Date:   Tue, 20 Apr 2021 14:38:21 +0200
+From:   Benjamin Block <bblock@linux.ibm.com>
+To:     Muneendra <muneendra.kumar@broadcom.com>, hare@suse.de,
+        jsmart2021@gmail.com
+Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        tj@kernel.org, linux-nvme@lists.infradead.org, emilne@redhat.com,
+        mkumar@redhat.com,
+        Gaurav Srivastava <gaurav.srivastava@broadcom.com>,
+        Steffen Maier <maier@linux.ibm.com>
+Subject: Re: [PATCH v9 07/13] lpfc: vmid: Implements ELS commands for appid
+ patch
+Message-ID: <YH7LPd8c4PZa1qFC@t480-pf1aa2c2.linux.ibm.com>
+References: <1617750397-26466-1-git-send-email-muneendra.kumar@broadcom.com>
+ <1617750397-26466-8-git-send-email-muneendra.kumar@broadcom.com>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <1617750397-26466-8-git-send-email-muneendra.kumar@broadcom.com>
+Sender: Benjamin Block <bblock@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: _rjTI-pF-XsAwhb3IRamnLhqEsdnOb7U
+X-Proofpoint-GUID: FF29OEsVyztW4zseUeyliYReET61WUrV
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-04-20_06:2021-04-20,2021-04-20 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 adultscore=0
+ mlxlogscore=999 mlxscore=0 priorityscore=1501 bulkscore=0
+ lowpriorityscore=0 suspectscore=0 clxscore=1011 malwarescore=0
+ impostorscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2104060000 definitions=main-2104200095
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Chunguang Xu <brookxu@tencent.com>
+Hey,
 
-BFQ_DEFAULT_GRP_IOPRIO seems to be unused, maybe we can remove it.
+On Wed, Apr 07, 2021 at 04:36:31AM +0530, Muneendra wrote:
+> From: Gaurav Srivastava <gaurav.srivastava@broadcom.com>
+> 
+> This patch implements ELS command like QFPA and UVEM for the priority
+> tagging appid support. Other supporting functions are also part of this
+> patch.
+> 
+> Signed-off-by: Gaurav Srivastava  <gaurav.srivastava@broadcom.com>
+> Signed-off-by: James Smart <jsmart2021@gmail.com>
+> 
+> ---
+> v9:
+> Added a lock while accessing a flag
+> 
+> v8:
+> Added log messages modifications, memory allocation API changes,
+> return error codes
+> 
+> v7:
+> No change
+> 
+> v6:
+> Added Forward declarations, static functions and
+> removed unused variables
+> 
+> v5:
+> Changed Return code to non-numeric/Symbol.
+> Addressed the review comments by Hannes
+> 
+> v4:
+> No change
+> 
+> v3:
+> No change
+> 
+> v2:
+> Ported the patch on top of 5.10/scsi-queue
+> ---
+>  drivers/scsi/lpfc/lpfc_els.c | 366 ++++++++++++++++++++++++++++++++++-
+>  1 file changed, 362 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/scsi/lpfc/lpfc_els.c b/drivers/scsi/lpfc/lpfc_els.c
+> index a04546eca18f..22a87559f62d 100644
+> --- a/drivers/scsi/lpfc/lpfc_els.c
+> +++ b/drivers/scsi/lpfc/lpfc_els.c
+> @@ -10260,3 +10309,312 @@ lpfc_sli_abts_recover_port(struct lpfc_vport *vport,
+>  	lpfc_unreg_rpi(vport, ndlp);
+>  }
+>  
+> +static void lpfc_init_cs_ctl_bitmap(struct lpfc_vport *vport)
+> +{
+> +	bitmap_zero(vport->vmid_priority_range, LPFC_VMID_MAX_PRIORITY_RANGE);
+> +}
+> +
+> +static void
+> +lpfc_vmid_set_cs_ctl_range(struct lpfc_vport *vport, u32 min, u32 max)
+> +{
+> +	u32 i;
+> +
+> +	if ((min > max) || (max > LPFC_VMID_MAX_PRIORITY_RANGE))
+> +		return;
+> +
+> +	for (i = min; i <= max; i++)
+> +		set_bit(i, vport->vmid_priority_range);
+> +}
+> +
+> +static void lpfc_vmid_put_cs_ctl(struct lpfc_vport *vport, u32 ctcl_vmid)
+> +{
+> +	set_bit(ctcl_vmid, vport->vmid_priority_range);
+> +}
+> +
+> +u32 lpfc_vmid_get_cs_ctl(struct lpfc_vport *vport)
+> +{
+> +	u32 i;
+> +
+> +	i = find_first_bit(vport->vmid_priority_range,
+> +			   LPFC_VMID_MAX_PRIORITY_RANGE);
+> +
+> +	if (i == LPFC_VMID_MAX_PRIORITY_RANGE)
+> +		return 0;
+> +
+> +	clear_bit(i, vport->vmid_priority_range);
+> +	return i;
+> +}
+> +
+> +#define MAX_PRIORITY_DESC	255
+> +
+> +static void
+> +lpfc_cmpl_els_qfpa(struct lpfc_hba *phba, struct lpfc_iocbq *cmdiocb,
+> +		   struct lpfc_iocbq *rspiocb)
+> +{
+> +	struct lpfc_vport *vport = cmdiocb->vport;
+> +	struct priority_range_desc *desc;
+> +	struct lpfc_dmabuf *prsp = NULL;
+> +	struct lpfc_vmid_priority_range *vmid_range = NULL;
+> +	u32 *data;
+> +	struct lpfc_dmabuf *dmabuf = cmdiocb->context2;
+> +	IOCB_t *irsp = &rspiocb->iocb;
+> +	u8 *pcmd, max_desc;
+> +	u32 len, i;
+> +	struct lpfc_nodelist *ndlp = (struct lpfc_nodelist *)cmdiocb->context1;
+> +
+> +	prsp = list_get_first(&dmabuf->list, struct lpfc_dmabuf, list);
+> +	if (!prsp)
+> +		goto out;
+> +
+> +	pcmd = prsp->virt;
+> +	data = (u32 *)pcmd;
+> +	if (data[0] == ELS_CMD_LS_RJT) {
+> +		lpfc_printf_vlog(vport, KERN_WARNING, LOG_SLI,
+> +				 "3277 QFPA LS_RJT x%x  x%x\n",
+> +				 data[0], data[1]);
+> +		goto out;
+> +	}
+> +	if (irsp->ulpStatus) {
+> +		lpfc_printf_vlog(vport, KERN_ERR, LOG_SLI,
+> +				 "6529 QFPA failed with status x%x  x%x\n",
+> +				 irsp->ulpStatus, irsp->un.ulpWord[4]);
+> +		goto out;
+> +	}
+> +
+> +	if (!vport->qfpa_res) {
+> +		max_desc = FCELSSIZE / sizeof(*vport->qfpa_res);
+> +		vport->qfpa_res = kcalloc(max_desc, sizeof(*vport->qfpa_res),
+> +					  GFP_KERNEL);
+> +		if (!vport->qfpa_res)
+> +			goto out;
+> +	}
+> +
+> +	len = *((u32 *)(pcmd + 4));
+> +	len = be32_to_cpu(len);
+> +	memcpy(vport->qfpa_res, pcmd, len + 8);
+> +	len = len / LPFC_PRIORITY_RANGE_DESC_SIZE;
+> +
+> +	desc = (struct priority_range_desc *)(pcmd + 8);
+> +	vmid_range = vport->vmid_priority.vmid_range;
+> +	if (!vmid_range) {
+> +		vmid_range = kcalloc(MAX_PRIORITY_DESC, sizeof(*vmid_range),
+> +				     GFP_KERNEL);
+> +		if (!vmid_range) {
+> +			kfree(vport->qfpa_res);
+> +			goto out;
+> +		}
+> +		vport->vmid_priority.vmid_range = vmid_range;
+> +	}
+> +	vport->vmid_priority.num_descriptors = len;
+> +
+> +	for (i = 0; i < len; i++, vmid_range++, desc++) {
+> +		lpfc_printf_vlog(vport, KERN_DEBUG, LOG_ELS,
+> +				 "6539 vmid values low=%d, high=%d, qos=%d, "
+> +				 "local ve id=%d\n", desc->lo_range,
+> +				 desc->hi_range, desc->qos_priority,
+> +				 desc->local_ve_id);
+> +
+> +		vmid_range->low = desc->lo_range << 1;
+> +		if (desc->local_ve_id == QFPA_ODD_ONLY)
+> +			vmid_range->low++;
+> +		if (desc->qos_priority)
+> +			vport->vmid_flag |= LPFC_VMID_QOS_ENABLED;
+> +		vmid_range->qos = desc->qos_priority;
 
-Signed-off-by: Chunguang Xu <brookxu@tencent.com>
----
- block/bfq-iosched.h | 1 -
- 1 file changed, 1 deletion(-)
+I'm curios, if the FC-switch signals it supports QoS for a range here, how
+exactly interacts this with the VM IDs that you seem to allocate
+dynamically during runtime for cgroups that request specific App IDs?
+You don't seem to use `LPFC_VMID_QOS_ENABLED` anywhere else in the
+series.
 
-diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-index da636a8..91c8654 100644
---- a/block/bfq-iosched.h
-+++ b/block/bfq-iosched.h
-@@ -22,7 +22,6 @@
- #define BFQ_DEFAULT_QUEUE_IOPRIO	4
- 
- #define BFQ_WEIGHT_LEGACY_DFL	100
--#define BFQ_DEFAULT_GRP_IOPRIO	0
- #define BFQ_DEFAULT_GRP_CLASS	IOPRIO_CLASS_BE
- 
- #define MAX_PID_STR_LENGTH 12
+Would different cgroups get different QoS classes/guarantees depending
+on the selected VM ID (higher VM ID gets better QoS class, or something
+like that?)? Would the tagged traffic be handled differently than the
+ordinary traffic in the fabric?
+
+I tried to get something from FC-LS (-5) or FC-FS (-6), but they are extremely
+sparse somehow. FC-LS-5 just says "QoS priority provided" for the
+field.. and FC-FS doesn't say anything regarding QoS if the tagging
+extension in CS_CTL is used.
+
+> +
+> +		vmid_range->high = desc->hi_range << 1;
+> +		if ((desc->local_ve_id == QFPA_ODD_ONLY) ||
+> +		    (desc->local_ve_id == QFPA_EVEN_ODD))
+> +			vmid_range->high++;
+> +	}
+> +	lpfc_init_cs_ctl_bitmap(vport);
+> +	for (i = 0; i < vport->vmid_priority.num_descriptors; i++) {
+> +		lpfc_vmid_set_cs_ctl_range(vport,
+> +				vport->vmid_priority.vmid_range[i].low,
+> +				vport->vmid_priority.vmid_range[i].high);
+> +	}
+> +
+> +	vport->vmid_flag |= LPFC_VMID_QFPA_CMPL;
+> + out:
+> +	lpfc_els_free_iocb(phba, cmdiocb);
+> +	lpfc_nlp_put(ndlp);
+> +}
+> +
+> +int lpfc_issue_els_qfpa(struct lpfc_vport *vport)
+> +{
+> +	struct lpfc_hba *phba = vport->phba;
+> +	struct lpfc_nodelist *ndlp;
+> +	struct lpfc_iocbq *elsiocb;
+> +	u8 *pcmd;
+> +	int ret;
+> +
+> +	ndlp = lpfc_findnode_did(phba->pport, Fabric_DID);
+> +	if (!ndlp || ndlp->nlp_state != NLP_STE_UNMAPPED_NODE)
+> +		return -ENXIO;
+> +
+> +	elsiocb = lpfc_prep_els_iocb(vport, 1, LPFC_QFPA_SIZE, 2, ndlp,
+> +				     ndlp->nlp_DID, ELS_CMD_QFPA);
+> +	if (!elsiocb)
+> +		return -ENOMEM;
+> +
+> +	pcmd = (u8 *)(((struct lpfc_dmabuf *)elsiocb->context2)->virt);
+> +
+> +	*((u32 *)(pcmd)) = ELS_CMD_QFPA;
+> +	pcmd += 4;
+> +
+> +	elsiocb->iocb_cmpl = lpfc_cmpl_els_qfpa;
+> +
+> +	elsiocb->context1 = lpfc_nlp_get(ndlp);
+> +	if (!elsiocb->context1) {
+> +		lpfc_els_free_iocb(vport->phba, elsiocb);
+> +		return -ENXIO;
+> +	}
+> +
+> +	ret = lpfc_sli_issue_iocb(phba, LPFC_ELS_RING, elsiocb, 2);
+> +	if (ret != IOCB_SUCCESS) {
+> +		lpfc_els_free_iocb(phba, elsiocb);
+> +		lpfc_nlp_put(ndlp);
+> +		return -EIO;
+> +	}
+> +	vport->vmid_flag &= ~LPFC_VMID_QOS_ENABLED;
+> +	return 0;
+> +}
+
 -- 
-1.8.3.1
-
+Best Regards, Benjamin Block  / Linux on IBM Z Kernel Development / IBM Systems
+IBM Deutschland Research & Development GmbH    /    https://www.ibm.com/privacy
+Vorsitz. AufsR.: Gregor Pillen         /        Geschäftsführung: Dirk Wittkopp
+Sitz der Gesellschaft: Böblingen / Registergericht: AmtsG Stuttgart, HRB 243294
