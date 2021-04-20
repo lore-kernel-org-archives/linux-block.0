@@ -2,63 +2,132 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A08A9C433ED
-	for <linux-block@archiver.kernel.org>; Tue, 20 Apr 2021 07:02:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12186C433B4
+	for <linux-block@archiver.kernel.org>; Tue, 20 Apr 2021 07:22:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6A4B761354
-	for <linux-block@archiver.kernel.org>; Tue, 20 Apr 2021 07:02:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C445B60238
+	for <linux-block@archiver.kernel.org>; Tue, 20 Apr 2021 07:22:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230245AbhDTHD0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Apr 2021 03:03:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37360 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229577AbhDTHDZ (ORCPT
+        id S229658AbhDTHWa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Apr 2021 03:22:30 -0400
+Received: from out30-130.freemail.mail.aliyun.com ([115.124.30.130]:41315 "EHLO
+        out30-130.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229718AbhDTHWa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Apr 2021 03:03:25 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7417C06174A;
-        Tue, 20 Apr 2021 00:02:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=8Oihx25ixLmgK896s6BkBU4Zy4ZTSxg7BY07q9IT2hQ=; b=hFqirIfh+nlo9lCAUemEoOwmcU
-        ZMdFNj8RgdzR2qM5APmrrVtR2OeTcERwNN38u6nFxezVx5GJo/xAtYA7HD2DxH0kqehLO52bXBwLe
-        4/yxCWMoy1FXMYDGSBjvTS3E9tGAd58v9GOpMqgE+YHl2Vwv1VS5Gu+Zq+IQHvZlk/l2dqxTnG4FG
-        MHw2JbqYRC17ffhqd08MnBFxZTB/JNwajHFljefrZWjdnheFvlycOhNYNrNFZHVPMf0UJTWMTKfYK
-        P8u11hg1IsH0zaSL1KL7F3EnxipCucT9Xw4ZAr0PB8sF+LfvSOvdTbzuzkN4XE+OubYIRqGoz37Mw
-        Jw7zA3AA==;
-Received: from hch by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1lYkO1-00Eplv-KX; Tue, 20 Apr 2021 07:01:54 +0000
-Date:   Tue, 20 Apr 2021 08:01:29 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Enrico Granata <egranata@google.com>
-Cc:     mst@redhat.com, jasowang@redhat.com, pbonzini@redhat.com,
-        stefanha@redhat.com, axboe@kernel.dk,
-        virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] virtio_blk: Add support for lifetime feature
-Message-ID: <20210420070129.GA3534874@infradead.org>
-References: <20210416194709.155497-1-egranata@google.com>
+        Tue, 20 Apr 2021 03:22:30 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04400;MF=jefflexu@linux.alibaba.com;NM=1;PH=DS;RN=10;SR=0;TI=SMTPD_---0UWBJ92o_1618903315;
+Received: from admindeMacBook-Pro-2.local(mailfrom:jefflexu@linux.alibaba.com fp:SMTPD_---0UWBJ92o_1618903315)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Tue, 20 Apr 2021 15:21:57 +0800
+Subject: Re: [dm-devel] [RFC PATCH 2/2] block: support to freeze bio based
+ request queue
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-raid@vger.kernel.org,
+        Bart Van Assche <bvanassche@acm.org>,
+        Mike Snitzer <snitzer@redhat.com>,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        Song Liu <song@kernel.org>, dm-devel@redhat.com,
+        Christoph Hellwig <hch@lst.de>
+References: <20210415103310.1513841-1-ming.lei@redhat.com>
+ <20210415103310.1513841-3-ming.lei@redhat.com>
+ <b1db72f3-f0a1-72f2-be12-6fd50c29e231@linux.alibaba.com>
+ <YH2Kr8ZIn2fWKFyl@T590>
+From:   JeffleXu <jefflexu@linux.alibaba.com>
+Message-ID: <42c79dce-ad99-4e59-6566-727fa08a66bc@linux.alibaba.com>
+Date:   Tue, 20 Apr 2021 15:21:55 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
+ Gecko/20100101 Thunderbird/78.7.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210416194709.155497-1-egranata@google.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <YH2Kr8ZIn2fWKFyl@T590>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Just to despit my 2 cents again:  I think the way this is specified
-in the virtio spec is actively harmful and we should not suport it in
-Linux.
 
-If others override me we at least need to require a detailed
-documentation of these fields as the virto spec does not provide it.
 
-Please also do not add pointless over 80 character lines, and follow
-the one value per sysfs file rule.
+On 4/19/21 9:50 PM, Ming Lei wrote:
+> On Mon, Apr 19, 2021 at 08:05:46PM +0800, JeffleXu wrote:
+>>
+>>
+>> On 4/15/21 6:33 PM, Ming Lei wrote:
+>>> For bio based request queue, the queue usage refcnt is only grabbed
+>>> during submission, which isn't consistent with request base queue.
+>>>
+>>> Queue freezing has been used widely, and turns out it is very useful
+>>> to quiesce queue activity.
+>>>
+>>> Support to freeze bio based request queue by the following approach:
+>>>
+>>> 1) grab two queue usage refcount for blk-mq before submitting blk-mq
+>>> bio, one is for bio, anther is for request;
+>>
+>>
+>> Hi, I can't understand the sense of grabbing two refcounts on the
+>> @q_usage_count of the underlying blk-mq device, while
+>> @q_usage_count of the MD/DM device is kept untouched.
+> 
+> Follows the point:
+> 
+> 1) for blk-mq, we hold one refcount for bio and another for request, and
+> release one after ending bio or completing request.
+
+Blk-mq has already implemented queue freezing semantics, even without
+this 'grabbing two refcount'. So is this just for the code consisdency
+with the bio-based queue?
+
+
+> 
+> 2) for bio based queue, just holding one refcount for bio, and release it
+> after the bio is ended.
+
+OK.
+
+> 
+> As I mentioned to you, the current in-tree code only grabs the refcount
+> during submitting bio for bio base queue, and the refcount is released
+> after returning from submission, see __submit_bio().
+
+Yes. I ignored that the refcount grabbed in the entry of bio submission
+has been returned back when the submission completes for bio-based queue.
+
+> 
+>>
+>> In the following calling stack
+>>
+>> ```
+>> queue_poll_store
+>> 	blk_mq_freeze_queue(q)
+>> ```
+>>
+>> Is the input @q still the request queue of MD/DM device?
+> 
+> It can be either one after bio based io polling is supported,
+> queue/io_poll is exposed for both blk-mq and bio based queue.
+> 
+> However, I guess bio based polling doesn't need such strict bio queue
+> freezing, cause QUEUE_FLAG_POLL is only read in submission path, so
+> looks current freezing just during submission is enough.
+
+Not actually.
+
+blk_poll(struct request_queue *q, blk_qc_t cookie, bool spin)
+ 	struct blk_mq_hw_ctx *hctx;
+ 	long state;
+
+-	if (!blk_qc_t_valid(cookie) || !blk_queue_poll(q))
++	if (!blk_queue_poll(q) || (queue_is_mq(q) && !blk_qc_t_valid(cookie)))
+
+Here QUEUE_FLAG_POLL is still checked in blk_poll() for bio-based queue,
+at least in your latest patch for bio-based polling.
+
+-- 
+Thanks,
+Jeffle
