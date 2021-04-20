@@ -2,95 +2,146 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60158C433B4
-	for <linux-block@archiver.kernel.org>; Tue, 20 Apr 2021 10:08:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2001DC433B4
+	for <linux-block@archiver.kernel.org>; Tue, 20 Apr 2021 11:09:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 26BEF613AE
-	for <linux-block@archiver.kernel.org>; Tue, 20 Apr 2021 10:08:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D57D961363
+	for <linux-block@archiver.kernel.org>; Tue, 20 Apr 2021 11:09:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231431AbhDTKJI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Apr 2021 06:09:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34536 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231313AbhDTKJH (ORCPT
+        id S231815AbhDTLKC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Apr 2021 07:10:02 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:16778 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231837AbhDTLKC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Apr 2021 06:09:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1618913316;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=a1pYqsNDnaImaveZt19WFrefpysHdoYlJwKJGNtTNq4=;
-        b=AcHYZmXYqbeEh4cX5cSX0Z4yYp6A7Ns0ZkqGEEZYCLN3stlRASx5jEyXL3d1sp/Dag+WBO
-        T/WsXj90eUTuPgo6b+Jb1BnmN8KrA16qoJ8bFnUzF37C4LYlE/7qNIGDgxoV+/arstHLXX
-        7hJ9Keja2FbZVLxxZTeFqqn9P29+L4A=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-217-WU_c-e7kOtqDaih1Jr0ECQ-1; Tue, 20 Apr 2021 06:08:34 -0400
-X-MC-Unique: WU_c-e7kOtqDaih1Jr0ECQ-1
-Received: by mail-wr1-f71.google.com with SMTP id h60-20020adf90420000b029010418c4cd0cso9763730wrh.12
-        for <linux-block@vger.kernel.org>; Tue, 20 Apr 2021 03:08:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=a1pYqsNDnaImaveZt19WFrefpysHdoYlJwKJGNtTNq4=;
-        b=W2hjRyJNVnihL9+5Mpx5F0ryZNaG3zG1H/O/3ygt3zdmGlcDvN7ELDDEYA2Mz7rLA5
-         ArElp+E4XR8fEyiON+drglXvz2wVsnRatKTKkZKDfu91AapsZAUVVqW1LPf63SyD+P6G
-         Y/6g2ZYUHYb9O/J07Um//PGf2VhFYlsEWEJvBOgmcFP3cAJUvScl3LYRO8wP3ovLxVuH
-         elItkO7fVtbOz1eM2K9TOcedORLtQsPS25kXetXakhXfnDveM1T/BE0DkePVlNMrLvd8
-         pkcZcqOpKSzk3HJ9ZzIC4LInC89agqTd93L40fbdD7ag3CvBUs85GrdKxhM9OrVe2sP1
-         MUsQ==
-X-Gm-Message-State: AOAM530OmYImTltc9Uq794R5fyZHzPNMopiJX/rpgYukQ+pyMnIWDdDM
-        Ufqj4yCMFlXsbrXWRElPXpZ6nTJ16xrU4yDWR1mX51CBlukHBs3MJ42HKi0nypJb5ugiHp4KeSN
-        mxYOyf9TZJl0VKVXhuj9TYp8=
-X-Received: by 2002:adf:bbd2:: with SMTP id z18mr19583497wrg.274.1618913313338;
-        Tue, 20 Apr 2021 03:08:33 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwiOVtXxYFOUh6+eZ32xEpHAEZlXERzd+C/fJVENNgoKL6Wlrxpy9j9zC3V92YoEbuatNntfw==
-X-Received: by 2002:adf:bbd2:: with SMTP id z18mr19583476wrg.274.1618913313205;
-        Tue, 20 Apr 2021 03:08:33 -0700 (PDT)
-Received: from redhat.com ([2a10:800a:cdef:0:114d:2085:61e4:7b41])
-        by smtp.gmail.com with ESMTPSA id u8sm26806244wrr.42.2021.04.20.03.08.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Apr 2021 03:08:32 -0700 (PDT)
-Date:   Tue, 20 Apr 2021 06:08:29 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Enrico Granata <egranata@google.com>, jasowang@redhat.com,
-        pbonzini@redhat.com, stefanha@redhat.com, axboe@kernel.dk,
-        virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] virtio_blk: Add support for lifetime feature
-Message-ID: <20210420060807-mutt-send-email-mst@kernel.org>
-References: <20210416194709.155497-1-egranata@google.com>
- <20210420070129.GA3534874@infradead.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+        Tue, 20 Apr 2021 07:10:02 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13KB3aO8104884;
+        Tue, 20 Apr 2021 07:09:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : content-type : in-reply-to : sender :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=ZhWvtftjOrH2GeCDWVLlc2mk4GkaRut3/FuTuUHI3Nc=;
+ b=nWAJj74eFZDjS3CjkAO/VEFLcS7IihY+A2kNfHNRsPRJJQ+BcCaLyZmZ4EHYukD825qx
+ xwa3jzWnUGtNAsjMQUOE9nS5rgjaFfvBmFaWF72/4NCXV3/f/97SryqtESBwAYU70uAU
+ 6/xTOwicG/eEYcAZmV0QpLNgbCSSJJeot4DDptzvZscFoCsiihjv9vx4zEg0nbhOvgfC
+ LTQW0nYGOVRFVli/spfjekerxnmtt5EkuxOnwkfi71rpHgitRD/D5n6g5D0uFblqrumq
+ SwNnEA0IFupVVn2yoPsN4rT0LlA++VVcRoQ8RGHQ2J9Hg0WpmpWPz+lmBopFPWjagmxL 5w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 381vu6244s-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 20 Apr 2021 07:09:16 -0400
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13KB52oL112340;
+        Tue, 20 Apr 2021 07:09:15 -0400
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 381vu6241s-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 20 Apr 2021 07:09:15 -0400
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13KB7r62023998;
+        Tue, 20 Apr 2021 11:09:12 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma03fra.de.ibm.com with ESMTP id 37yqa88wk4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 20 Apr 2021 11:09:11 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13KB8jHr37552580
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 20 Apr 2021 11:08:45 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BEE3211C058;
+        Tue, 20 Apr 2021 11:09:08 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AC20811C04A;
+        Tue, 20 Apr 2021 11:09:08 +0000 (GMT)
+Received: from t480-pf1aa2c2.fritz.box (unknown [9.145.82.95])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Tue, 20 Apr 2021 11:09:08 +0000 (GMT)
+Received: from bblock by t480-pf1aa2c2.fritz.box with local (Exim 4.94)
+        (envelope-from <bblock@linux.ibm.com>)
+        id 1lYoFg-003KHD-4o; Tue, 20 Apr 2021 13:09:08 +0200
+Date:   Tue, 20 Apr 2021 13:09:08 +0200
+From:   Benjamin Block <bblock@linux.ibm.com>
+To:     Muneendra Kumar M <muneendra.kumar@broadcom.com>
+Cc:     Benjamin Block <lkml@mageta.org>, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, tj@kernel.org,
+        linux-nvme@lists.infradead.org, hare@suse.de, jsmart2021@gmail.com,
+        emilne@redhat.com, mkumar@redhat.com,
+        Steffen Maier <maier@linux.ibm.com>
+Subject: Re: [PATCH v9 03/13] nvme: Added a newsysfs attribute appid_store
+Message-ID: <YH62VB+SVfnG+GoI@t480-pf1aa2c2.linux.ibm.com>
+References: <1617750397-26466-1-git-send-email-muneendra.kumar@broadcom.com>
+ <1617750397-26466-4-git-send-email-muneendra.kumar@broadcom.com>
+ <YHxRK33kf7OSVlxf@chlorum.ategam.org>
+ <a6497bd924795a5a9279b893b0d83baf@mail.gmail.com>
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20210420070129.GA3534874@infradead.org>
+In-Reply-To: <a6497bd924795a5a9279b893b0d83baf@mail.gmail.com>
+Sender: Benjamin Block <bblock@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: zcptgf3ihHXFLAETO78_af4mW8pN6rea
+X-Proofpoint-GUID: 8hHrwkPl_tvoHfnwBMJtC7wYNo-cY0e1
+Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-04-20_02:2021-04-19,2021-04-20 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 suspectscore=0
+ priorityscore=1501 mlxscore=0 phishscore=0 lowpriorityscore=0 adultscore=0
+ mlxlogscore=999 spamscore=0 clxscore=1011 bulkscore=0 impostorscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104060000
+ definitions=main-2104200085
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Apr 20, 2021 at 08:01:29AM +0100, Christoph Hellwig wrote:
-> Just to despit my 2 cents again:  I think the way this is specified
-> in the virtio spec is actively harmful and we should not suport it in
-> Linux.
-> 
-> If others override me we at least need to require a detailed
-> documentation of these fields as the virto spec does not provide it.
-> 
-> Please also do not add pointless over 80 character lines, and follow
-> the one value per sysfs file rule.
+On Tue, Apr 20, 2021 at 12:24:41PM +0530, Muneendra Kumar M wrote:
+> Hi Benjamin,
+>=20
+> >> ---
+> >>  drivers/nvme/host/fc.c | 73
+> >> +++++++++++++++++++++++++++++++++++++++++-
+> >>  1 file changed, 72 insertions(+), 1 deletion(-)
+>=20
+> > Hmm, I wonder why only NVMe-FC? Or is this just for the moment? We also
+> > have the FC transport class for SCSI; I assume this could feed the same
+> > IDs into the LLDs.
+>
+> At present it supports only for SCSI-FC .
 
-Enrico would you like to raise the issues with the virtio TC
-for resolution?
+It does? By adding it to the implementation under `drivers/nvme/host/`?
+I am confused.
 
--- 
-MST
+I see it adds the sysfs-attribute to `nvme_fc_attrs`, how would that be
+added to a FC Host that does not have a NVMe 'personality'? I was
+assuming this only ever appears under `/sys/class/fc` if the LLDD
+registers itself with the NVMe subsystem (presumably via
+`nvme_fc_register_localport()`).
 
+zFCP, for example, does not do that, but we do implement the SCSI FC
+transport class in `drivers/scsi/scsi_transport_fc.c`.
+
+> In future we are adding the support for NVMe-FC
+> But to make it generic and avoid duplication we added this under
+> /sys/class/fc .
+>=20
+> Ewan was mentioning that at some point there is a plan  to decouple
+> the FC transport somewhat so that there is a layer that represents the
+> FC stuff regardless of the FC4 type (SCSI, NVMe). When we have this
+> layer we can move the things accordingly.
+>=20
+
+--=20
+Best Regards, Benjamin Block  / Linux on IBM Z Kernel Development / IBM Sys=
+tems
+IBM Deutschland Research & Development GmbH    /    https://www.ibm.com/pri=
+vacy
+Vorsitz. AufsR.: Gregor Pillen         /        Gesch=E4ftsf=FChrung: Dirk =
+Wittkopp
+Sitz der Gesellschaft: B=F6blingen / Registergericht: AmtsG Stuttgart, HRB =
+243294
