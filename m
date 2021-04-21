@@ -2,93 +2,78 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 451FAC433B4
-	for <linux-block@archiver.kernel.org>; Wed, 21 Apr 2021 15:45:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4804C433B4
+	for <linux-block@archiver.kernel.org>; Wed, 21 Apr 2021 16:05:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F0146613D5
-	for <linux-block@archiver.kernel.org>; Wed, 21 Apr 2021 15:45:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8C2D06144D
+	for <linux-block@archiver.kernel.org>; Wed, 21 Apr 2021 16:05:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239521AbhDUPqK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Apr 2021 11:46:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21821 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238880AbhDUPqJ (ORCPT
+        id S243936AbhDUQFk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Apr 2021 12:05:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50840 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235921AbhDUQFk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Apr 2021 11:46:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619019936;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=j3DI/4Geichl/TbrPjnTy999JUzvhPwYbEhTyaEY468=;
-        b=Loaq9wS/EllCdAEQAkRmPDuKWLPRjretegwje6NqSDuqDd9GsOGjrFNjGsdXuPZ3VDyARd
-        HV7je5fB/l9dBqRICd9yEodw6VDxqTJYVv0xVy5NATCKsjFjSksfzVAsHbt1CAN3UxwV5P
-        OpB+Boo+BfhAaiQiPLzj2wtQINTqBiI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-347-VJRPhCXoNtiooLSIbIe5aw-1; Wed, 21 Apr 2021 11:45:34 -0400
-X-MC-Unique: VJRPhCXoNtiooLSIbIe5aw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B09E9107ACFE;
-        Wed, 21 Apr 2021 15:45:32 +0000 (UTC)
-Received: from localhost (ovpn-12-35.pek2.redhat.com [10.72.12.35])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A580E6091B;
-        Wed, 21 Apr 2021 15:45:31 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-scsi@vger.kernel.org
-Cc:     Ming Lei <ming.lei@redhat.com>,
-        Stephen Rothwell <sfr@canb.auug.org.au>
-Subject: [PATCH] blk-mq: fix build warning when making htmldocs
-Date:   Wed, 21 Apr 2021 23:45:26 +0800
-Message-Id: <20210421154526.1954174-1-ming.lei@redhat.com>
+        Wed, 21 Apr 2021 12:05:40 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63A30C06174A
+        for <linux-block@vger.kernel.org>; Wed, 21 Apr 2021 09:05:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=htUpHJwJqX+Z9jK5xH9qtxTOtPB/kKgeHlpEOwU21qE=; b=DI6FrRGvuNmsbUcHgh31OtAItk
+        tYgtHAU/SIpCs3DDfaxf+Bg3/Umln1tjtb/sHuaxcLOocfRhmBUjs9rhapsLg0U4aLfbYxuRsyLCN
+        vXKIEppljNoeOeLXfQnmuLa9LPlOBMYKnDnfcNLCnQ9rpaSuL5L4/w+gg1hJCkNb4wpQ4VmGlwzyN
+        siltum74ciG3Bo0Iz5jy68YZBR6RouvIC8WDuXAMvF/Am+gxIeeoKN1H0IsQhRgRnoKTyAcDe6lRj
+        5Au0RsY81DxWmVaVu+tHBv0KUnx80i5sUwkRmfNfy2JLzJl0XAI9m1/22mCMpAMC/O9ZHVp6os7W1
+        WBjwc6nA==;
+Received: from [2001:4bb8:19b:f845:3a02:1dd5:15f8:f374] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
+        id 1lZFLe-00D143-7q; Wed, 21 Apr 2021 16:05:06 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, Karel Zak <kzak@redhat.com>
+Subject: [PATCH] block: return -EBUSY when there are open partitions in blkdev_reread_part
+Date:   Wed, 21 Apr 2021 18:05:02 +0200
+Message-Id: <20210421160502.447418-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Fixes the following warning when running 'make htmldocs'.
+The switch to go through blkdev_get_by_dev means we now ignore the
+return value from bdev_disk_changed in __blkdev_get.  Add a manual
+check to restore the old semantics.
 
-Fixes: d022d18c045f ("scsi: blk-mq: Add callbacks for storing & retrieving budget token")
-Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Fixes: 4601b4b130de ("block: reopen the device in blkdev_reread_part")
+Reported-by: Karel Zak <kzak@redhat.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
-Martin, please apply it against 5.13/scsi-queue.
+ block/ioctl.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
- include/linux/blk-mq.h | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 3bd3ee651143..359486940fa0 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -313,12 +313,12 @@ struct blk_mq_ops {
- 	 */
- 	void (*put_budget)(struct request_queue *, int);
+diff --git a/block/ioctl.c b/block/ioctl.c
+index ff241e663c018f..8ba1ed8defd0bb 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -89,6 +89,8 @@ static int blkdev_reread_part(struct block_device *bdev, fmode_t mode)
+ 		return -EINVAL;
+ 	if (!capable(CAP_SYS_ADMIN))
+ 		return -EACCES;
++	if (bdev->bd_part_count)
++		return -EBUSY;
  
--	/*
--	 * @set_rq_budget_toekn: store rq's budget token
-+	/**
-+	 * @set_rq_budget_token: store rq's budget token
- 	 */
- 	void (*set_rq_budget_token)(struct request *, int);
--	/*
--	 * @get_rq_budget_toekn: retrieve rq's budget token
-+	/**
-+	 * @get_rq_budget_token: retrieve rq's budget token
- 	 */
- 	int (*get_rq_budget_token)(struct request *);
- 
+ 	/*
+ 	 * Reopen the device to revalidate the driver state and force a
 -- 
-2.29.2
+2.30.1
 
