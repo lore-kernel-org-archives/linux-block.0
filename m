@@ -2,214 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99D1FC433ED
-	for <linux-block@archiver.kernel.org>; Wed, 21 Apr 2021 16:46:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE143C433B4
+	for <linux-block@archiver.kernel.org>; Wed, 21 Apr 2021 16:50:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 684A961029
-	for <linux-block@archiver.kernel.org>; Wed, 21 Apr 2021 16:46:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 86E0D6144C
+	for <linux-block@archiver.kernel.org>; Wed, 21 Apr 2021 16:50:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241550AbhDUQrS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Apr 2021 12:47:18 -0400
-Received: from mx2.veeam.com ([64.129.123.6]:42390 "EHLO mx2.veeam.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S244429AbhDUQq4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Apr 2021 12:46:56 -0400
-Received: from mail.veeam.com (prgmbx01.amust.local [172.24.0.171])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mx2.veeam.com (Postfix) with ESMTPS id 55116424B9;
-        Wed, 21 Apr 2021 12:46:16 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com; s=mx2;
-        t=1619023576; bh=+8+0fKeMJvrXulCBXhw1N6zV3TO5UJB7NtBUlKBwUWY=;
-        h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-        b=dBMT7IY86FudF1J3JjVsTJ+Jc5bLVGSH1vPpSQrvcKJ2xg36jpAsLmq/zMFsJt4ih
-         M7tT5fIeCgS4ThRvCUo5kUuEXX732/p3BLxLRIHR4MT//DCo2we26s5Qtr4cPx19IK
-         pnzo7Ko+HC0I11KhGTn4+NmWBjcezgbCKDYGsPSI=
-Received: from prgdevlinuxpatch01.amust.local (172.24.14.5) by
- prgmbx01.amust.local (172.24.0.171) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.858.5;
- Wed, 21 Apr 2021 18:46:00 +0200
-From:   Sergei Shtepa <sergei.shtepa@veeam.com>
-To:     Christoph Hellwig <hch@infradead.org>,
-        Hannes Reinecke <hare@suse.de>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>, <dm-devel@redhat.com>,
-        <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-CC:     <sergei.shtepa@veeam.com>, <pavel.tide@veeam.com>
-Subject: [PATCH v9 4/4] Using dm_get_device_ex() instead of dm_get_device()
-Date:   Wed, 21 Apr 2021 19:45:45 +0300
-Message-ID: <1619023545-23431-5-git-send-email-sergei.shtepa@veeam.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1619023545-23431-1-git-send-email-sergei.shtepa@veeam.com>
-References: <1619023545-23431-1-git-send-email-sergei.shtepa@veeam.com>
+        id S237358AbhDUQuq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Apr 2021 12:50:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60950 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236724AbhDUQuq (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 21 Apr 2021 12:50:46 -0400
+Received: from mail-io1-xd31.google.com (mail-io1-xd31.google.com [IPv6:2607:f8b0:4864:20::d31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF7E8C06174A
+        for <linux-block@vger.kernel.org>; Wed, 21 Apr 2021 09:50:11 -0700 (PDT)
+Received: by mail-io1-xd31.google.com with SMTP id z14so9224047ioc.12
+        for <linux-block@vger.kernel.org>; Wed, 21 Apr 2021 09:50:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=yGqCexpFuGR9LLielbhXKnfOcJAEBpHm0Ib4c2gARxQ=;
+        b=NApz4+N+yH2J7oktqEtQ9T4IYJIFiZoCK7BmUqJstzQ2pevszQ3/CXoHIrmk/HDl0e
+         MkNclseGLnA9VgU7hFi5qRbLYR1M6JNTEEwQSKSXBtGQb6xZoZ1dEAozbxlDxcdo6ezO
+         O8lY1Si0BZJn4PQG+vW/ybiyfZONwRyeVLznOEtidfikd1qoDpLAjXJStsvQbwnXXn2t
+         aCpISALVpuGKn7vYNGSn6n5ElywPbWiJMwO0gga2wV5zxSFN0AnyJKWYPNw97Q5seJku
+         6eXZsPVXN+RjqLl6I66G6xQBaNh3BeDd8fKeF7U5/QJcJyVFDIJj4Ws9vsVxaiit1cZH
+         8f7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=yGqCexpFuGR9LLielbhXKnfOcJAEBpHm0Ib4c2gARxQ=;
+        b=SZncRxnsXdcTVhKB42y/qvV1vjUE1F1rCR9sHCY4GxIlpNtAOZzCnVxwmlcd2gbO4p
+         VTjGSQwysq0xvMfz2RSr2g0/zXMKTdl5TmwXmbUeje0+czJFAlBoPhkR9V5o/hLHjF2C
+         9nTjqQwpYCLf3xKx1x18aj13ZDozb+LiJt2pxDj9PjvM0yK/ApNPgxk7mlDSAqvM4I/8
+         W4kZ7zZ3hk/vZjgxR2Nvxre4JTvDzq36YelvlNinac7xjQ9YUiwqI+pIiZrkfRc9zwou
+         dilXKfX1X6EBF6AWEX+MZt00Ug7i2CWdXOT68rWYHKDxyJ6JpGG1Pr/dhBZQc6I7rWqE
+         8F6g==
+X-Gm-Message-State: AOAM530sY6tRXsl7l5hOHq9BBd1XU9cURQ428h5j5cyGH4tjjYPiZGC5
+        bAT0pKVTbJkHAT7F/rL/yu+RHGvU3MgeDg==
+X-Google-Smtp-Source: ABdhPJxuXHw+abIlD9Thcjyb2kOA7ibvWI0DmHXa3evhKtanM3Ssmw8nwkWHz+r/nzc9F1A7qvFrmQ==
+X-Received: by 2002:a5e:d907:: with SMTP id n7mr25239566iop.177.1619023811274;
+        Wed, 21 Apr 2021 09:50:11 -0700 (PDT)
+Received: from [192.168.1.30] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id v10sm1243913ilg.26.2021.04.21.09.50.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 21 Apr 2021 09:50:10 -0700 (PDT)
+Subject: Re: [PATCH] block: return -EBUSY when there are open partitions in
+ blkdev_reread_part
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     linux-block@vger.kernel.org, Karel Zak <kzak@redhat.com>
+References: <20210421160502.447418-1-hch@lst.de>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <965792bf-441c-95b5-88cb-b176196cc373@kernel.dk>
+Date:   Wed, 21 Apr 2021 10:50:10 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [172.24.14.5]
-X-ClientProxiedBy: prgmbx02.amust.local (172.24.0.172) To prgmbx01.amust.local
- (172.24.0.171)
-X-EsetResult: clean, is OK
-X-EsetId: 37303A29D2A50B59677566
-X-Veeam-MMEX: True
+In-Reply-To: <20210421160502.447418-1-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Not every DM target needs the ability to attach via blk_interposer.
-A DM target can attach and detach 'on the fly' only if the DM
-target works as a filter without changing the location of the blocks
-on the block device.
+On 4/21/21 10:05 AM, Christoph Hellwig wrote:
+> The switch to go through blkdev_get_by_dev means we now ignore the
+> return value from bdev_disk_changed in __blkdev_get.  Add a manual
+> check to restore the old semantics.
 
-Signed-off-by: Sergei Shtepa <sergei.shtepa@veeam.com>
----
- drivers/md/dm-cache-target.c | 5 +++--
- drivers/md/dm-delay.c        | 3 ++-
- drivers/md/dm-dust.c         | 3 ++-
- drivers/md/dm-era-target.c   | 4 +++-
- drivers/md/dm-flakey.c       | 3 ++-
- drivers/md/dm-linear.c       | 3 ++-
- drivers/md/dm-log-writes.c   | 3 ++-
- drivers/md/dm-snap.c         | 3 ++-
- drivers/md/dm-writecache.c   | 3 ++-
- 9 files changed, 20 insertions(+), 10 deletions(-)
+Applied, thanks.
 
-diff --git a/drivers/md/dm-cache-target.c b/drivers/md/dm-cache-target.c
-index 541c45027cc8..885a6fde1b9b 100644
---- a/drivers/md/dm-cache-target.c
-+++ b/drivers/md/dm-cache-target.c
-@@ -2140,8 +2140,9 @@ static int parse_origin_dev(struct cache_args *ca, struct dm_arg_set *as,
- 	if (!at_least_one_arg(as, error))
- 		return -EINVAL;
- 
--	r = dm_get_device(ca->ti, dm_shift_arg(as), FMODE_READ | FMODE_WRITE,
--			  &ca->origin_dev);
-+	r = dm_get_device_ex(ca->ti, dm_shift_arg(as), FMODE_READ | FMODE_WRITE,
-+			     dm_table_is_interposer(ca->ti->table),
-+			     &ca->origin_dev);
- 	if (r) {
- 		*error = "Error opening origin device";
- 		return r;
-diff --git a/drivers/md/dm-delay.c b/drivers/md/dm-delay.c
-index 2628a832787b..1b051a023a5d 100644
---- a/drivers/md/dm-delay.c
-+++ b/drivers/md/dm-delay.c
-@@ -153,7 +153,8 @@ static int delay_class_ctr(struct dm_target *ti, struct delay_class *c, char **a
- 		return -EINVAL;
- 	}
- 
--	ret = dm_get_device(ti, argv[0], dm_table_get_mode(ti->table), &c->dev);
-+	ret = dm_get_device_ex(ti, argv[0], dm_table_get_mode(ti->table),
-+			       dm_table_is_interposer(ti->table), &c->dev);
- 	if (ret) {
- 		ti->error = "Device lookup failed";
- 		return ret;
-diff --git a/drivers/md/dm-dust.c b/drivers/md/dm-dust.c
-index cbe1058ee589..5eb930ea8034 100644
---- a/drivers/md/dm-dust.c
-+++ b/drivers/md/dm-dust.c
-@@ -366,7 +366,8 @@ static int dust_ctr(struct dm_target *ti, unsigned int argc, char **argv)
- 		return -ENOMEM;
- 	}
- 
--	if (dm_get_device(ti, argv[0], dm_table_get_mode(ti->table), &dd->dev)) {
-+	if (dm_get_device_ex(ti, argv[0], dm_table_get_mode(ti->table),
-+			     dm_table_is_interposer(ti->table), &dd->dev)) {
- 		ti->error = "Device lookup failed";
- 		kfree(dd);
- 		return -EINVAL;
-diff --git a/drivers/md/dm-era-target.c b/drivers/md/dm-era-target.c
-index d9ac7372108c..db8791981605 100644
---- a/drivers/md/dm-era-target.c
-+++ b/drivers/md/dm-era-target.c
-@@ -1462,7 +1462,9 @@ static int era_ctr(struct dm_target *ti, unsigned argc, char **argv)
- 		return -EINVAL;
- 	}
- 
--	r = dm_get_device(ti, argv[1], FMODE_READ | FMODE_WRITE, &era->origin_dev);
-+	r = dm_get_device_ex(ti, argv[1], FMODE_READ | FMODE_WRITE,
-+			     dm_table_is_interposer(ti->table),
-+			     &era->origin_dev);
- 	if (r) {
- 		ti->error = "Error opening data device";
- 		era_destroy(era);
-diff --git a/drivers/md/dm-flakey.c b/drivers/md/dm-flakey.c
-index b7fee9936f05..89bb77545757 100644
---- a/drivers/md/dm-flakey.c
-+++ b/drivers/md/dm-flakey.c
-@@ -243,7 +243,8 @@ static int flakey_ctr(struct dm_target *ti, unsigned int argc, char **argv)
- 	if (r)
- 		goto bad;
- 
--	r = dm_get_device(ti, devname, dm_table_get_mode(ti->table), &fc->dev);
-+	r = dm_get_device_ex(ti, devname, dm_table_get_mode(ti->table),
-+			     dm_table_is_interposer(ti->table), &fc->dev);
- 	if (r) {
- 		ti->error = "Device lookup failed";
- 		goto bad;
-diff --git a/drivers/md/dm-linear.c b/drivers/md/dm-linear.c
-index 92db0f5e7f28..1301b11dd2af 100644
---- a/drivers/md/dm-linear.c
-+++ b/drivers/md/dm-linear.c
-@@ -51,7 +51,8 @@ static int linear_ctr(struct dm_target *ti, unsigned int argc, char **argv)
- 	}
- 	lc->start = tmp;
- 
--	ret = dm_get_device(ti, argv[0], dm_table_get_mode(ti->table), &lc->dev);
-+	ret = dm_get_device_ex(ti, argv[0], dm_table_get_mode(ti->table),
-+			       dm_table_is_interposer(ti->table), &lc->dev);
- 	if (ret) {
- 		ti->error = "Device lookup failed";
- 		goto bad;
-diff --git a/drivers/md/dm-log-writes.c b/drivers/md/dm-log-writes.c
-index 57882654ffee..32a389ea4eb1 100644
---- a/drivers/md/dm-log-writes.c
-+++ b/drivers/md/dm-log-writes.c
-@@ -554,7 +554,8 @@ static int log_writes_ctr(struct dm_target *ti, unsigned int argc, char **argv)
- 	atomic_set(&lc->pending_blocks, 0);
- 
- 	devname = dm_shift_arg(&as);
--	ret = dm_get_device(ti, devname, dm_table_get_mode(ti->table), &lc->dev);
-+	ret = dm_get_device_ex(ti, devname, dm_table_get_mode(ti->table),
-+			       dm_table_is_interposer(ti->table), &lc->dev);
- 	if (ret) {
- 		ti->error = "Device lookup failed";
- 		goto bad;
-diff --git a/drivers/md/dm-snap.c b/drivers/md/dm-snap.c
-index 11890db71f3f..eab96db253e1 100644
---- a/drivers/md/dm-snap.c
-+++ b/drivers/md/dm-snap.c
-@@ -2646,7 +2646,8 @@ static int origin_ctr(struct dm_target *ti, unsigned int argc, char **argv)
- 		goto bad_alloc;
- 	}
- 
--	r = dm_get_device(ti, argv[0], dm_table_get_mode(ti->table), &o->dev);
-+	r = dm_get_device_ex(ti, argv[0], dm_table_get_mode(ti->table),
-+			     dm_table_is_interposer(ti->table), &o->dev);
- 	if (r) {
- 		ti->error = "Cannot get target device";
- 		goto bad_open;
-diff --git a/drivers/md/dm-writecache.c b/drivers/md/dm-writecache.c
-index 4f72b6f66c3a..bb0801fe4c63 100644
---- a/drivers/md/dm-writecache.c
-+++ b/drivers/md/dm-writecache.c
-@@ -2169,7 +2169,8 @@ static int writecache_ctr(struct dm_target *ti, unsigned argc, char **argv)
- 	string = dm_shift_arg(&as);
- 	if (!string)
- 		goto bad_arguments;
--	r = dm_get_device(ti, string, dm_table_get_mode(ti->table), &wc->dev);
-+	r = dm_get_device_ex(ti, string, dm_table_get_mode(ti->table),
-+			     dm_table_is_interposer(ti->table), &wc->dev);
- 	if (r) {
- 		ti->error = "Origin data device lookup failed";
- 		goto bad;
 -- 
-2.20.1
+Jens Axboe
 
