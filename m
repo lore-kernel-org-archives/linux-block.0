@@ -2,184 +2,302 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ABCCC43611
-	for <linux-block@archiver.kernel.org>; Wed, 21 Apr 2021 10:32:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1299CC433ED
+	for <linux-block@archiver.kernel.org>; Wed, 21 Apr 2021 11:50:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DD8A661450
-	for <linux-block@archiver.kernel.org>; Wed, 21 Apr 2021 10:32:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D5254613F5
+	for <linux-block@archiver.kernel.org>; Wed, 21 Apr 2021 11:50:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235335AbhDUKcy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Apr 2021 06:32:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33074 "EHLO
+        id S238197AbhDULvF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Apr 2021 07:51:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50138 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235099AbhDUKct (ORCPT
+        with ESMTP id S238216AbhDULvE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Apr 2021 06:32:49 -0400
-Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C052C06138D
-        for <linux-block@vger.kernel.org>; Wed, 21 Apr 2021 03:32:15 -0700 (PDT)
-Received: by mail-lf1-x12d.google.com with SMTP id d27so9264424lfv.9
-        for <linux-block@vger.kernel.org>; Wed, 21 Apr 2021 03:32:14 -0700 (PDT)
+        Wed, 21 Apr 2021 07:51:04 -0400
+Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79CD0C06174A
+        for <linux-block@vger.kernel.org>; Wed, 21 Apr 2021 04:50:31 -0700 (PDT)
+Received: by mail-ej1-x633.google.com with SMTP id w23so47277970ejb.9
+        for <linux-block@vger.kernel.org>; Wed, 21 Apr 2021 04:50:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=bcsktzE2LmD65+1hOHiSw/mP2z1mU2lSfJMjIjsWTl8=;
-        b=MeDREFOXhXuJmdNkZlfNo6r09BtFQhtpatiA2dLOAjjAx9WJX57MEqtOeMptwJzzxg
-         KcFM8UVx0SBV4dYxGqW+lMn/XOuElbSINB3SPmjzyeEr36jWpVyIwgfPxwa8ssflH2mJ
-         Oxolx5TZP8FqxdkDpcOeNYrs4SB5XroN/kGPdRGF9BF/qijCo8EDgYg6VMySHJfVq2hA
-         z29f+TyFBf1pCEfF7kx9mvQBUWc32kJJuNY5XG87OR7ZsqmuKlJ0GbDGfTS98sSe2gAb
-         i8ZRbFepki5l8v/b9AHTV32HDeKv1wZbpuFH0314bcqBTpdBW9PE+iVZ4ltSbO6R/x/G
-         M/Pw==
+        d=ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=cy1PIXS3bYPCxk8Vi6D4m4cgYcws19GuLUD9W0LG2AY=;
+        b=OkIq0LRKEPD1cbWe2XzpAHtqYjXppRpuGopg/TPeCrMBvH57OVQ5V7nq/N3WijxlHa
+         gcM5UAy9BTKFFY4ysAcDUNsMo0oJy6vNCUtThvS4k2cNUHIsqWwQCJv9762mifIBnOGD
+         qkaDzYpQy12lmbYlmEKKhSP65VK0vmopppZw0a0mSToEkayhJm6CZKC2QZgv8FDq2btL
+         5RWyFBN83m4BHqW/Xb6VAp7oIhI5wdAHmrpnI2HCySJFSbXcpSv1ahU8Om8iGVRzLJH6
+         +3IMLOJ3/uFyAjMNPgiu7xwn04XayOqmvNYvNXbTfA+2/y4a9kBY3UCYiAw8xWiBnYhq
+         ehJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=bcsktzE2LmD65+1hOHiSw/mP2z1mU2lSfJMjIjsWTl8=;
-        b=sSLG7v9vy4cMsJWQJp2/bpPg7CnLd7oclICG2P4ZPlf+JTDFW0R3Z1EtbKZDg5Ahdy
-         8N3brxzHe3pN6nvgPvXUfBSj+doYAI1SP65jRwMX3dKbP96yGL3Q4fGQtwfw+Fzwiai0
-         w2qGmWVQBGA5bSwypW+ollJxgnKSZjShuuZxOaDtdSp4ILoQswtjt7ClCw/3wSGkgeic
-         gKX6cEzMxJnADnpzvmRn1gFq+L6lgxFy2OqnFOUlOSJFhWYFx8pcBKzkqEPRV/Ikozsb
-         1Fu1QHGSsZDzFp6Wd+egxI4qZJBCD5gb1yLjRXflSB7PfoDFLzpKoqRekdMnrOJoiR8Q
-         KzRw==
-X-Gm-Message-State: AOAM532+pbbUbjT1TI/9i5iYY1wEuG9Ofbbq5ejSHmlXxKY2m2EnpVfC
-        PIFsonKVVQblDIhJpXzhr0Vmwg==
-X-Google-Smtp-Source: ABdhPJxV6dxPVTt9qygoUmgvT6O4ATvKPQcYo7j/3FM4lE7OAyE15x7FJ/923njgXMQ0S3Iy0/lpcQ==
-X-Received: by 2002:a05:6512:12c3:: with SMTP id p3mr12128089lfg.595.1619001133570;
-        Wed, 21 Apr 2021 03:32:13 -0700 (PDT)
-Received: from localhost.localdomain (h-155-4-129-234.NA.cust.bahnhof.se. [155.4.129.234])
-        by smtp.gmail.com with ESMTPSA id u13sm170603lfg.139.2021.04.21.03.32.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Apr 2021 03:32:12 -0700 (PDT)
-From:   Ulf Hansson <ulf.hansson@linaro.org>
-To:     linux-mmc@vger.kernel.org, Ulf Hansson <ulf.hansson@linaro.org>,
-        Adrian Hunter <adrian.hunter@intel.com>
-Cc:     Shawn Lin <shawn.lin@rock-chips.com>,
-        Avri Altman <avri.altman@wdc.com>,
-        Masami Hiramatsu <masami.hiramatsu@linaro.org>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 4/4] mmc: core: Read performance enhancements registers for SD cards
-Date:   Wed, 21 Apr 2021 12:31:54 +0200
-Message-Id: <20210421103154.169410-5-ulf.hansson@linaro.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20210421103154.169410-1-ulf.hansson@linaro.org>
-References: <20210421103154.169410-1-ulf.hansson@linaro.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=cy1PIXS3bYPCxk8Vi6D4m4cgYcws19GuLUD9W0LG2AY=;
+        b=sPwBUolyn9zi4UlWR626YFaWBw2p7snBu15FhGBslcA3YcmmIPUjZd/9tVTxwezpmm
+         UUU0NnoS1NE/W+HZ7FjpldHPd7BCOQ82SCVtdqaWQ8mZO5lorsZbqEOTCl39JkR/lXO4
+         1bi7Ox/+AB68vSrb9iMPIzaI+EFJ0qGN+Pt1GAZKoiVJwFEgvxKXVD3nuuHNmZrX3GZ2
+         XhrZN/WtDsCbAtfMpIEhPgR5IndfGDml1hdowy764CJlBA1SuSuFCVvuGnqG0oRCqKqe
+         vjkYyICbWezyOstE2biGnyiF2363kVhFHe34DRIwldkffSygs1PlTzqLM48R9EPqto8O
+         Keag==
+X-Gm-Message-State: AOAM533cvFHeqemp8WZtUDP/mNAVPCOYeKmuFA510DcmvawoJB+tHOW/
+        Uv7+efQwIeg10AoT8FCZqoIgHwTmZ4y5MCSfMFgJ8kkVD1cT7w==
+X-Google-Smtp-Source: ABdhPJw0dNB9xshopPT9epWBNZnsjYPeYGA8MXTIMi/i7F0/SJcE6MPRJvUF9/Z6uKRGrW5v3RsZimDqWTn2IwPi1MQ=
+X-Received: by 2002:a17:906:fb81:: with SMTP id lr1mr30843285ejb.62.1619005830191;
+ Wed, 21 Apr 2021 04:50:30 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20210409160305.711318-1-haris.iqbal@ionos.com>
+ <ef59e838-4d7f-cab4-e1ac-26944cb7db75@kernel.dk> <CAMGffE=ZdCUc_HABY3_F_aK6pqCt8maB4yi9Qu4gKoox6ub6QQ@mail.gmail.com>
+ <16182211-0e85-540d-1061-6411ec3351a5@kernel.dk> <CAMGffE=t85WAgpzHu5zaM+NAa4hrBYcUEOo=z2jNkkr9ZSc0bg@mail.gmail.com>
+ <967e1953-6eb7-4a63-f5f4-91d99a6a7f5a@gmail.com>
+In-Reply-To: <967e1953-6eb7-4a63-f5f4-91d99a6a7f5a@gmail.com>
+From:   Jinpu Wang <jinpu.wang@ionos.com>
+Date:   Wed, 21 Apr 2021 13:50:19 +0200
+Message-ID: <CAMGffEnnhbPje7bB-W3jaMUF-JGBT0w0jCWeupsU8mwFFOHwSA@mail.gmail.com>
+Subject: Re: [PATCH V6 0/3] block: add two statistic tables
+To:     Pavel Begunkov <asml.silence@gmail.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Md Haris Iqbal <haris.iqbal@ionos.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        Danil Kipnis <danil.kipnis@ionos.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In SD spec v6.x the SD function extension registers for performance
-enhancements were introduced. These registers let the SD card announce
-supports for various performance related features, like "self-maintenance",
-"cache" and "command queuing".
+On Wed, Apr 21, 2021 at 12:20 PM Pavel Begunkov <asml.silence@gmail.com> wrote:
+>
+> On 4/21/21 8:49 AM, Jinpu Wang wrote:
+> > On Mon, Apr 19, 2021 at 7:57 PM Jens Axboe <axboe@kernel.dk> wrote:
+> >>
+> >> On 4/11/21 11:35 PM, Jinpu Wang wrote:
+> >>> On Fri, Apr 9, 2021 at 11:03 PM Jens Axboe <axboe@kernel.dk> wrote:
+> >>>>
+> >>>> On 4/9/21 10:03 AM, Md Haris Iqbal wrote:
+> >>>>> Hi Jens,
+> >>>>>
+> >>>>> This version fixes the long lines in the code as per Christoph's comment.
+> >>>>
+> >>>> I'd really like to see some solid justification for the addition,
+> >>>> though. I clicked the v1 link and it's got details on what you get out
+> >>>> of it, but not really the 'why' of reasoning for the feature. I mean,
+> >>>> you could feasibly have a blktrace based userspace solution. Just
+> >>>> wondering if that has been tried, I know that's what we do at Facebook
+> >>>> for example.
+> >>>>
+> >>> Hi Jens,
+> >>>
+> >>> Thanks for the reply.
+> >>> For the use case of the additional stats, as a cloud provider, we
+> >>> often need to handle report from the customers regarding
+> >>> performance problem in a period of time in the past, so it's not
+> >>> feasible for us to run blktrace, customer workload could change from
+> >>> time to time, with the additional stats, we gather through all metrics
+> >>> using Prometheus, we can navigate to the period of time interested,
+> >>> to check if the performance matches the SLA, it also helps us to find
+> >>> the user IO pattern,  we can more easily reproduce.
+> >>
+> >> My suggestion isn't to run just blktrace all the time, rather collect
+> >> the tracing info from there and store them away. Then you can go back
+> >> in time and see what is going on. Hence my questioning on adding this
+> >> new stat tracking, when it's already readily available to be consumed
+> >> by a small daemon that can continually track it in userspace.
+> >>
+> >> --
+> >> Jens Axboe
+> >>
+> > Hi Jens,
+> > The problem with using blktrace at production may cause a performance
+> > drop ~30%. while with the block stats here, we only see ~3% when
+> > enabled.
+>
+> It's probably was asked before, but let's refresh as the discussion
+> erupted again.
+>
+> I get your problem with blktrace(8), IIRC it definitely can deteriorate
+> performance if run constantly, but did you try to write a bpf program
+> that does smarter accumulation in the kernel? Like making bpf to collect
+> a latency table (right as in your patches do) and flushing it to the
+> disk periodically?
+Hi Pavel,
 
-Let's extend the parsing of SD function extension registers and store the
-information in the struct mmc_card. This allows subsequent changes to
-easier implement the complete support for new the performance enhancement
-features.
+Thanks for the suggestion.
 
-Signed-off-by: Ulf Hansson <ulf.hansson@linaro.org>
----
- drivers/mmc/core/sd.c    | 46 ++++++++++++++++++++++++++++++++++++++++
- include/linux/mmc/card.h |  7 ++++++
- 2 files changed, 53 insertions(+)
+We did test with ebpf with kprobe in the past (~kernel 4.4/4.14), we
+saw 10% performance drop, that's the reason we develop this
+stats patches.
 
-diff --git a/drivers/mmc/core/sd.c b/drivers/mmc/core/sd.c
-index d6e838b7c895..0e946afd6d22 100644
---- a/drivers/mmc/core/sd.c
-+++ b/drivers/mmc/core/sd.c
-@@ -1063,6 +1063,48 @@ static int sd_decode_ext_reg_power(struct mmc_card *card, u8 fno, u32 reg_addr)
- 	return 0;
- }
- 
-+static int sd_decode_ext_reg_perf(struct mmc_card *card, u8 fno, u32 reg_addr)
-+{
-+	int err;
-+	u8 *reg_buf;
-+
-+	err = sd_read_ext_reg_fno(card, fno, reg_addr, &reg_buf);
-+	if (err) {
-+		pr_warn("%s: error %d reading PERF func of ext reg\n",
-+			mmc_hostname(card->host), err);
-+		return err;
-+	}
-+
-+	/* PERF revision. */
-+	card->ext_perf.rev = reg_buf[0];
-+
-+	/* FX_EVENT support at bit 0. */
-+	if (reg_buf[1] & 0x1)
-+		card->ext_perf.feature_support |= SD_EXT_PERF_FX_EVENT;
-+
-+	/* Card initiated self-maintenance support at bit 0. */
-+	if (reg_buf[2] & 0x1)
-+		card->ext_perf.feature_support |= SD_EXT_PERF_CARD_MAINT;
-+
-+	/* Host initiated self-maintenance support at bit 1. */
-+	if (reg_buf[2] & 0x2)
-+		card->ext_perf.feature_support |= SD_EXT_PERF_HOST_MAINT;
-+
-+	/* Cache support at bit 0. */
-+	if (reg_buf[4] & 0x1)
-+		card->ext_perf.feature_support |= SD_EXT_PERF_CACHE;
-+
-+	/* Command queue support indicated via queue depth bits (0 to 4). */
-+	if (reg_buf[6] & 0x1f)
-+		card->ext_perf.feature_support |= SD_EXT_PERF_CMD_QUEUE;
-+
-+	card->ext_perf.reg_addr = reg_addr;
-+	card->ext_perf.fno = fno;
-+
-+	kfree(reg_buf);
-+	return 0;
-+}
-+
- static int sd_decode_ext_reg(struct mmc_card *card, u8 *gen_info_buf,
- 			     u16 *next_ext_addr)
- {
-@@ -1103,6 +1145,10 @@ static int sd_decode_ext_reg(struct mmc_card *card, u8 *gen_info_buf,
- 	if (sfc == 0x1)
- 		return sd_decode_ext_reg_power(card, fno, reg_addr);
- 
-+	/* Standard Function Code for performance enhancement. */
-+	if (sfc == 0x2)
-+		return sd_decode_ext_reg_perf(card, fno, reg_addr);
-+
- 	return 0;
- }
- 
-diff --git a/include/linux/mmc/card.h b/include/linux/mmc/card.h
-index 6a1d64fba0f3..8e21eebe704d 100644
---- a/include/linux/mmc/card.h
-+++ b/include/linux/mmc/card.h
-@@ -200,6 +200,12 @@ struct sd_ext_reg {
- #define SD_EXT_POWER_OFF_NOTIFY	(1<<0)
- #define SD_EXT_POWER_SUSTENANCE	(1<<1)
- #define SD_EXT_POWER_DOWN_MODE	(1<<2)
-+/* Performance Enhancement Function. */
-+#define SD_EXT_PERF_FX_EVENT	(1<<0)
-+#define SD_EXT_PERF_CARD_MAINT	(1<<1)
-+#define SD_EXT_PERF_HOST_MAINT	(1<<2)
-+#define SD_EXT_PERF_CACHE	(1<<3)
-+#define SD_EXT_PERF_CMD_QUEUE	(1<<4)
- };
- 
- struct sdio_cccr {
-@@ -304,6 +310,7 @@ struct mmc_card {
- 	struct sd_ssr		ssr;		/* yet more SD information */
- 	struct sd_switch_caps	sw_caps;	/* switch (CMD6) caps */
- 	struct sd_ext_reg	ext_power;	/* SD extension reg for PM */
-+	struct sd_ext_reg	ext_perf;	/* SD extension reg for PERF */
- 
- 	unsigned int		sdio_funcs;	/* number of SDIO functions */
- 	atomic_t		sdio_funcs_probed; /* number of probed SDIO funcs */
--- 
-2.25.1
+But I just did another test with bpftrace on k 5.10.30, I do not see
+performance lost.
+It must be ebpf is improving very much since then.
 
+So to summarize, we can use bpftrace to do the drop in latest kernel,
+there is no need to have it build into the kernel.
+
+Thanks!
+
+the bpftrace I used during testing:
+root@x4-left:~# cat /usr/sbin/biolatency.bt
+#!/usr/bin/env bpftrace
+/*
+ * biolatency.bt Block I/O latency as a histogram.
+ * For Linux, uses bpftrace, eBPF.
+ *
+ * This is a bpftrace version of the bcc tool of the same name.
+ *
+ * Copyright 2018 Netflix, Inc.
+ * Licensed under the Apache License, Version 2.0 (the "License")
+ *
+ * 13-Sep-2018 Brendan Gregg Created this.
+ */
+
+BEGIN
+{
+printf("Tracing block device I/O... Hit Ctrl-C to end.\n");
+}
+
+kprobe:blk_account_io_start
+{
+@start[arg0] = nsecs;
+}
+
+kprobe:blk_account_io_done
+/@start[arg0]/
+
+{
+@usecs = hist((nsecs - @start[arg0]) / 1000);
+delete(@start[arg0]);
+}
+
+
+
+>
+>
+> > We did a benchmark with rnbd.
+> >
+> > Fio config:
+> > [global]
+> > description=Emulation of Storage Server Access Pattern
+> > bssplit=512/20:1k/16:2k/9:4k/12:8k/19:16k/10:32k/8:64k/4
+> > fadvise_hint=0
+> > rw=randrw:2
+> > direct=1
+> > random_distribution=zipf:1.2
+> > #size=1G
+> > time_based=1
+> > runtime=10
+> > ramp_time=1
+> > ioengine=libaio
+> > iodepth=128
+> > iodepth_batch_submit=128
+> > iodepth_batch_complete=128
+> > numjobs=1
+> > #gtod_reduce=1
+> > group_reporting
+> >
+> > [job1]
+> > filename=/dev/rnbd0
+> >
+> > blktrace command:
+> > # blktrace -a read -a write -d /dev/rnbd0
+> >
+> > read IOPS drops 35%, similar for write IOPS.
+> >
+> > RNBD-No-blktrace  RNBD-With-blktrace
+> >
+> >  102056.894311               -35.5%
+> >
+> > The tests are done with v5.4.30.
+> > Test hardware is
+> > root@x4-left:~/haris/sds-perf# uname -a
+> > Linux x4-left 5.10.30-pserver
+> > #5.10.30-1+feature+linux+5.10.y+20210414.1233+e3dd267~deb10 SMP
+> > x86_64 GNU/Linux
+> > root@x4-left:~/haris/sds-perf# lscpu
+> > Architecture:        x86_64
+> > CPU op-mode(s):      32-bit, 64-bit
+> > Byte Order:          Little Endian
+> > Address sizes:       46 bits physical, 48 bits virtual
+> > CPU(s):              40
+> > On-line CPU(s) list: 0-39
+> > Thread(s) per core:  2
+> > Core(s) per socket:  10
+> > Socket(s):           2
+> > NUMA node(s):        2
+> > Vendor ID:           GenuineIntel
+> > CPU family:          6
+> > Model:               85
+> > Model name:          Intel(R) Xeon(R) Silver 4114 CPU @ 2.20GHz
+> > Stepping:            4
+> > CPU MHz:             800.571
+> > CPU max MHz:         3000.0000
+> > CPU min MHz:         800.0000
+> > BogoMIPS:            4400.00
+> > Virtualization:      VT-x
+> > L1d cache:           32K
+> > L1i cache:           32K
+> > L2 cache:            1024K
+> > L3 cache:            14080K
+> > NUMA node0 CPU(s):   0-9,20-29
+> > NUMA node1 CPU(s):   10-19,30-39
+> > Flags:               fpu vme de pse tsc msr pae mce cx8 apic sep mtrr
+> > pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe
+> > syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts
+> > rep_good nopl xtopology nonstop_tsc cpuid aperfmperf pni pclmulqdq
+> > dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm
+> > pcid dca sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes
+> > xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb cat_l3
+> > cdp_l3 invpcid_single intel_ppin mba ibrs ibpb stibp tpr_shadow vnmi
+> > flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 hle avx2 smep
+> > bmi2 erms invpcid rtm cqm mpx rdt_a avx512f avx512dq rdseed adx smap
+> > clflushopt clwb intel_pt avx512cd avx512bw avx512vl xsaveopt xsavec
+> > xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local
+> > dtherm ida arat pln pts pku ospke
+> > root@x4-left:~/haris/sds-perf# ibstat
+> > CA 'mlx5_0'
+> > CA type: MT4115
+> > Number of ports: 1
+> > Firmware version: 12.26.4012
+> > Hardware version: 0
+> > Node GUID: 0xec0d9a0300c5fffc
+> > System image GUID: 0xec0d9a0300c5fffc
+> > Port 1:
+> > State: Active
+> > Physical state: LinkUp
+> > Rate: 100
+> > Base lid: 3
+> > LMC: 0
+> > SM lid: 3
+> > Capability mask: 0x2651e84a
+> > Port GUID: 0xec0d9a0300c5fffc
+> > Link layer: InfiniBand
+> > CA 'mlx5_1'
+> > CA type: MT4115
+> > Number of ports: 1
+> > Firmware version: 12.26.4012
+> > Hardware version: 0
+> > Node GUID: 0xec0d9a0300c5fffd
+> > System image GUID: 0xec0d9a0300c5fffc
+> > Port 1:
+> > State: Active
+> > Physical state: LinkUp
+> > Rate: 100
+> > Base lid: 1
+> > LMC: 0
+> > SM lid: 1
+> > Capability mask: 0x2651e84a
+> > Port GUID: 0xec0d9a0300c5fffd
+> > Link layer: InfiniBand
+> >
+> > Thanks!
+> >
+>
+> --
+> Pavel Begunkov
