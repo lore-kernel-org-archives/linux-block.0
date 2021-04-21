@@ -2,99 +2,116 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A199C43460
-	for <linux-block@archiver.kernel.org>; Tue, 20 Apr 2021 22:41:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 139F5C433B4
+	for <linux-block@archiver.kernel.org>; Wed, 21 Apr 2021 00:02:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BADDF61408
-	for <linux-block@archiver.kernel.org>; Tue, 20 Apr 2021 22:41:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E3D2B61418
+	for <linux-block@archiver.kernel.org>; Wed, 21 Apr 2021 00:02:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234195AbhDTWlj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Apr 2021 18:41:39 -0400
-Received: from gateway32.websitewelcome.com ([192.185.145.187]:18169 "EHLO
-        gateway32.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233964AbhDTWlj (ORCPT
+        id S234186AbhDUADP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Apr 2021 20:03:15 -0400
+Received: from mail-pg1-f172.google.com ([209.85.215.172]:35541 "EHLO
+        mail-pg1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233992AbhDUADP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Apr 2021 18:41:39 -0400
-X-Greylist: delayed 1361 seconds by postgrey-1.27 at vger.kernel.org; Tue, 20 Apr 2021 18:41:39 EDT
-Received: from cm17.websitewelcome.com (cm17.websitewelcome.com [100.42.49.20])
-        by gateway32.websitewelcome.com (Postfix) with ESMTP id 1BC867EDDB
-        for <linux-block@vger.kernel.org>; Tue, 20 Apr 2021 17:17:27 -0500 (CDT)
-Received: from gator4166.hostgator.com ([108.167.133.22])
-        by cmsmtp with SMTP
-        id YygRlQiIZMGeEYygRlnDpc; Tue, 20 Apr 2021 17:17:27 -0500
-X-Authority-Reason: nr=8
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
-        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=IqU1MVnkdAvu7/gdvMsvZ0UoM0R9qMbLSGUvD8bDyo0=; b=t25+aD0FWGgg1MTsiBu8RqM+6u
-        XuNDC1IGpHeaMXQ/FDcbBb9MwHAKKXpa2IIp5FdKlC8j7gx/qpEGLOMJaAQ9IIh1dRTeNIL+GHg5D
-        z/LOitlLpayD8MIOy43peMioMdQ10hUNqBoUve7nB1PQk4caMZgHhiTu6EM+It4TtfBZrdwh/qAVd
-        vXLfSVS8p6F3dZAD8VJinwbA200XXf0hQj8m+ydrEL1gZpK4uFCZSy2fkuxIsjIn8Bs0DcPyemfjT
-        Cg+K5Mm5OUI7GORV80LtOux+35CHIg2z9zqZP4h8lIsThqBNdGAg3INIlQfcj+4jFFEE7UJy7QBEA
-        ScAJRZBQ==;
-Received: from 187-162-31-110.static.axtel.net ([187.162.31.110]:50542 helo=[192.168.15.8])
-        by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94)
-        (envelope-from <gustavo@embeddedor.com>)
-        id 1lYygN-001kpE-J7; Tue, 20 Apr 2021 17:17:23 -0500
-Subject: Re: [PATCH 027/141] drbd: Fix fall-through warnings for Clang
-To:     Jens Axboe <axboe@kernel.dk>,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>
-Cc:     drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-References: <cover.1605896059.git.gustavoars@kernel.org>
- <44663f18fb12e39c53b0e69039c98505b7c6d5da.1605896059.git.gustavoars@kernel.org>
- <ba77fcbe-8770-d234-509b-7dc5ac079319@embeddedor.com>
- <2c942833-ae0f-bda5-b023-e2a1860be50f@kernel.dk>
-From:   "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Message-ID: <6610a212-6095-0527-c260-49bb2637b7f4@embeddedor.com>
-Date:   Tue, 20 Apr 2021 17:17:39 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.1
+        Tue, 20 Apr 2021 20:03:15 -0400
+Received: by mail-pg1-f172.google.com with SMTP id q10so28004470pgj.2
+        for <linux-block@vger.kernel.org>; Tue, 20 Apr 2021 17:02:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=CsjTF/SyMZ66uE1gHZVzl2El46Tz+5pGkG/io2k1Ki0=;
+        b=SJ54t2JOvxuvffcvAgis5E2i1ItGU//tnEjQicJyC7I9O7A+cuHs84ZePjjMUlOOA7
+         N1OTjeWeyuFLEHZ2hPivDKcE6BMYw4rpuajXyOF36daD3xDG0ULn4PQJALMD6b9hsUcA
+         StKaindb1R4dRYf0s9BGg1zemgqrGuC7BZKbH3j45fF6X/ElcTfMLI1ckN2yyJ1gYkdf
+         0YWPHNI2UKFLLTBhOPi/xhK2VyFXQgFQfxtMPAldR4bVuKXZseFwJtmQMc5cyzMImB50
+         sM7n5/hAB4iVlLLfq+81he8ZYPGbeP+EuB3IibbZyXRc8GcxKga72wvdSCH+xWFrqET0
+         MHDQ==
+X-Gm-Message-State: AOAM533PuS+yeziSO9SoVDfGpDkwOOi+hC9pcrCzQrEbOy4LQ/9taOgo
+        EzoBZvBNWgQ7KsFQSJrcvKk=
+X-Google-Smtp-Source: ABdhPJywD5z9Zd2AdJfBW9sBJE81FaIQcEYaKa4TfvM4L1VzwuAS10NmvzE69WBPSKp1zj+St84e7w==
+X-Received: by 2002:a65:584e:: with SMTP id s14mr18896341pgr.229.1618963363115;
+        Tue, 20 Apr 2021 17:02:43 -0700 (PDT)
+Received: from asus.hsd1.ca.comcast.net ([2601:647:4000:d7:6cb:4566:9005:c2af])
+        by smtp.gmail.com with ESMTPSA id 33sm149560pgq.21.2021.04.20.17.02.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Apr 2021 17:02:42 -0700 (PDT)
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Daniel Wagner <dwagner@suse.de>,
+        Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH v7 0/5] blk-mq: Fix a race between iterating over requests and freeing requests
+Date:   Tue, 20 Apr 2021 17:02:30 -0700
+Message-Id: <20210421000235.2028-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-In-Reply-To: <2c942833-ae0f-bda5-b023-e2a1860be50f@kernel.dk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - embeddedor.com
-X-BWhitelist: no
-X-Source-IP: 187.162.31.110
-X-Source-L: No
-X-Exim-ID: 1lYygN-001kpE-J7
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: 187-162-31-110.static.axtel.net ([192.168.15.8]) [187.162.31.110]:50542
-X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 24
-X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
-X-Local-Domain: yes
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi Jens,
 
+This patch series fixes the race between iterating over requests and
+freeing requests that has been reported by multiple different users over
+the past two years. Please consider this patch series for kernel v5.13.
 
-On 4/20/21 16:23, Jens Axboe wrote:
+Thanks,
 
-> Applied, thanks.
+Bart.
 
-Awesome. :)
+Changes between v6 and v7:
+- Changed one comment.
+- Updated Reviewed-by / Tested-by tags.
 
-Thanks
---
-Gustavo
+Changes between v5 and v6:
+- Fixed an additional race between iterating over tags and freeing scheduler
+  requests that was spotted by Khazhy.
+- Added two patches to fix the race conditions between updating the number of
+  hardware queues and iterating over a tag set.
+
+Changes between v4 and v5:
+- Addressed Khazhy's review comments. Note: the changes that have been made
+  in v5 only change behavior in case CONFIG_PROVE_RCU=y.
+
+Changes between v3 and v4:
+- Fixed support for tag sets shared across hardware queues.
+- Renamed blk_mq_wait_for_tag_readers() into blk_mq_wait_for_tag_iter().
+- Removed the fourth argument of blk_mq_queue_tag_busy_iter() again.
+
+Changes between v2 and v3:
+- Converted the single v2 patch into a series of three patches.
+- Switched from SRCU to a combination of RCU and semaphores.
+
+Changes between v1 and v2:
+- Reformatted patch description.
+- Added Tested-by/Reviewed-by tags.
+- Changed srcu_barrier() calls into synchronize_srcu() calls.
+
+Bart Van Assche (5):
+  blk-mq: Move the elevator_exit() definition
+  blk-mq: Introduce atomic variants of blk_mq_(all_tag|tagset_busy)_iter
+  blk-mq: Fix races between iterating over requests and freeing requests
+  blk-mq: Make it safe to use RCU to iterate over
+    blk_mq_tag_set.tag_list
+  blk-mq: Fix races between blk_mq_update_nr_hw_queues() and iterating
+    over tags
+
+ block/blk-core.c          |  34 +++++++++-
+ block/blk-mq-tag.c        | 128 ++++++++++++++++++++++++++++++++++----
+ block/blk-mq-tag.h        |   6 +-
+ block/blk-mq.c            |  31 ++++++---
+ block/blk-mq.h            |   1 +
+ block/blk.h               |  11 +---
+ block/elevator.c          |   9 +++
+ drivers/scsi/hosts.c      |  16 ++---
+ drivers/scsi/ufs/ufshcd.c |   4 +-
+ include/linux/blk-mq.h    |   2 +
+ 10 files changed, 202 insertions(+), 40 deletions(-)
+
