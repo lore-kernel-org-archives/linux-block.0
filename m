@@ -2,86 +2,178 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2D7FC433B4
-	for <linux-block@archiver.kernel.org>; Wed, 21 Apr 2021 16:29:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94514C433B4
+	for <linux-block@archiver.kernel.org>; Wed, 21 Apr 2021 16:46:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7FEA661409
-	for <linux-block@archiver.kernel.org>; Wed, 21 Apr 2021 16:29:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5EFFA6144E
+	for <linux-block@archiver.kernel.org>; Wed, 21 Apr 2021 16:46:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238604AbhDUQaK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Apr 2021 12:30:10 -0400
-Received: from mail-pf1-f180.google.com ([209.85.210.180]:39868 "EHLO
-        mail-pf1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235145AbhDUQaJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Apr 2021 12:30:09 -0400
-Received: by mail-pf1-f180.google.com with SMTP id c17so29360660pfn.6;
-        Wed, 21 Apr 2021 09:29:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=tdBzVFIF/DPj5kbx7GhM1WCivnxc+70C6D8b8ZMfgmY=;
-        b=L6N2izgSg3LZsX4wK4hXy9Sj4/KdERx/GtNhBuGF53xAKlZHULxuzhrANZisN1GOj4
-         6QOpRoN/9fjd2TCs+0KqrWbpxrD6e2nrjGpESFY384fi7nJ3zyfW4ClMDR8WVj72fXav
-         noM4GmfKhJVnFeYR/iO5RDicR2E/ZpsGmS+JtPGLDsb97PHXubPq+Hmaxje0ZtxXbTO9
-         rPEFhPSkJe7QpIgPre8JgrTL5L6wHeARqpmnkId+W6LbVFTIW0ZQQNu6ic9NN/L8aW1u
-         YvXsMSUD1eTE/P2O9LYH2uJgFfjEYbufABKyDkDhYqW1KCehPWhIXHfc0n6VgHHYj+Ho
-         x/UA==
-X-Gm-Message-State: AOAM533pAltunC+7dzeaV3yt/pJZb7jnVyHB36vgwEqkiQTBY3hrzoyy
-        tCjtl3rDcWxrNeIUy1kwydmP3NxKp/tHD1/v
-X-Google-Smtp-Source: ABdhPJzhTf4hM1Q4ATSIeN7fJ/jFcF9h/9gIblfr0Cu5BY9riuV7Q2SbOH6p1aA5h5vMueg8v3W3qA==
-X-Received: by 2002:a17:90a:aa15:: with SMTP id k21mr12359134pjq.115.1619022575060;
-        Wed, 21 Apr 2021 09:29:35 -0700 (PDT)
-Received: from [192.168.51.110] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
-        by smtp.gmail.com with ESMTPSA id h8sm2700352pjt.17.2021.04.21.09.29.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 21 Apr 2021 09:29:34 -0700 (PDT)
-Subject: Re: [PATCH v8] bio: limit bio max size
-To:     Changheun Lee <nanich.lee@samsung.com>, Johannes.Thumshirn@wdc.com,
-        asml.silence@gmail.com, axboe@kernel.dk, damien.lemoal@wdc.com,
-        gregkh@linuxfoundation.org, hch@infradead.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        ming.lei@redhat.com, osandov@fb.com, patchwork-bot@kernel.org,
-        tj@kernel.org, tom.leiming@gmail.com
-Cc:     jisoo2146.oh@samsung.com, junho89.kim@samsung.com,
-        mj0123.lee@samsung.com, seunghwan.hyun@samsung.com,
-        sookwan7.kim@samsung.com, woosung2.lee@samsung.com,
-        yt0928.kim@samsung.com
-References: <CGME20210421100544epcas1p13c2c86e84102f0955dd591f72e45756a@epcas1p1.samsung.com>
- <20210421094745.29660-1-nanich.lee@samsung.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <55adfb07-7f10-7ad6-e05d-7aeb7d9c3b29@acm.org>
-Date:   Wed, 21 Apr 2021 09:29:27 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.9.0
+        id S241220AbhDUQqk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Apr 2021 12:46:40 -0400
+Received: from mx2.veeam.com ([64.129.123.6]:41916 "EHLO mx2.veeam.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S244347AbhDUQqj (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 21 Apr 2021 12:46:39 -0400
+Received: from mail.veeam.com (prgmbx01.amust.local [172.24.0.171])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mx2.veeam.com (Postfix) with ESMTPS id 5EBE742406;
+        Wed, 21 Apr 2021 12:45:55 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com; s=mx2;
+        t=1619023555; bh=h41nYawhFuIkEKobo2LpVytJxoNFHzzj229eHud/Mao=;
+        h=From:To:CC:Subject:Date:From;
+        b=AIixUZHGmo+HZI8/mBT9Jyka2qBirNEsUiFr0ZNXQWEAEpkw0owg9Zthc60rcGMPc
+         t2kC+i5K8uAHmV0ydIiixsQRHdFZ+OnAglYLP/Wb1RBw0p376hlrWcJo1InAMCFLTy
+         tFApGARHJ4c0a8f55gHvN9aoqZZwxMXQjWYiq4K4=
+Received: from prgdevlinuxpatch01.amust.local (172.24.14.5) by
+ prgmbx01.amust.local (172.24.0.171) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.858.5;
+ Wed, 21 Apr 2021 18:45:53 +0200
+From:   Sergei Shtepa <sergei.shtepa@veeam.com>
+To:     Christoph Hellwig <hch@infradead.org>,
+        Hannes Reinecke <hare@suse.de>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, <dm-devel@redhat.com>,
+        <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+CC:     <sergei.shtepa@veeam.com>, <pavel.tide@veeam.com>
+Subject: [PATCH v9 0/4] block device interposer
+Date:   Wed, 21 Apr 2021 19:45:41 +0300
+Message-ID: <1619023545-23431-1-git-send-email-sergei.shtepa@veeam.com>
+X-Mailer: git-send-email 1.8.3.1
 MIME-Version: 1.0
-In-Reply-To: <20210421094745.29660-1-nanich.lee@samsung.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Originating-IP: [172.24.14.5]
+X-ClientProxiedBy: prgmbx02.amust.local (172.24.0.172) To prgmbx01.amust.local
+ (172.24.0.171)
+X-EsetResult: clean, is OK
+X-EsetId: 37303A29D2A50B59677566
+X-Veeam-MMEX: True
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/21/21 2:47 AM, Changheun Lee wrote:
-> bio size can grow up to 4GB when muli-page bvec is enabled.
-> but sometimes it would lead to inefficient behaviors.
-> in case of large chunk direct I/O, - 32MB chunk read in user space -
+A new version of a block device interposer (blk_interposer).
 
-This patch looks good to me, hence:
+In this series of patches,  I have tried to take into account the comments
+made by Mike to the previous version.
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+First of all, this applies to more detailed explanations of the commits.
+Indeed, the changes in blk-core.c and dm.c may seem complicated, but they
+are no more complicated than the rest of the code in these files.
 
-Do you plan to submit a dm-crypt patch that limits the bio size when 
-using dm-crypt to the bio size of the underling device?
+Removed the [interpose] option for block devices opened by the DM target.
+Instead, the dm_get_device_ex() function is added, which allows to
+explicitly specify which devices can be used for the interposer and which
+can not.
 
-Thanks,
+Additional testing has revealed a problem with suspending and resuming DM
+targets attached via blk_interposer. This has been fixed.
 
-Bart.
+History:
+v8 - https://patchwork.kernel.org/project/linux-block/cover/1617968884-15149-1-git-send-email-sergei.shtepa@veeam.com/
+  * The attaching and detaching to interposed device moved to
+    __dm_suspend() and __dm_resume() functions.
+  * Redesigned the submit_bio_noacct() function and added a lock for the
+    block device interposer.
+  * Adds [interpose] option to block device patch in dm table.
+  * Fix origin_map() then o->split_binary value is zero.
+
+v7 - https://patchwork.kernel.org/project/linux-block/cover/1615563895-28565-1-git-send-email-sergei.shtepa@veeam.com/
+  * the request interception mechanism. Now the interposer is
+    a block device that receives requests instead of the original device;
+  * code design fixes.
+
+v6 - https://patchwork.kernel.org/project/linux-block/cover/1614774618-22410-1-git-send-email-sergei.shtepa@veeam.com/
+  * designed for 5.12;
+  * thanks to the new design of the bio structure in v5.12, it is
+    possible to perform interception not for the entire disk, but
+    for each block device;
+  * instead of the new ioctl DM_DEV_REMAP_CMD and the 'noexcl' option,
+    the DM_INTERPOSED_FLAG flag for the ioctl DM_TABLE_LOAD_CMD is
+    applied.
+
+v5 - https://patchwork.kernel.org/project/linux-block/cover/1612881028-7878-1-git-send-email-sergei.shtepa@veeam.com/
+ * rebase for v5.11-rc7;
+ * patch set organization;
+ * fix defects in documentation;
+ * add some comments;
+ * change mutex names for better code readability;
+ * remove calling bd_unlink_disk_holder() for targets with non-exclusive
+   flag;
+ * change type for struct dm_remap_param from uint8_t to __u8.
+
+v4 - https://patchwork.kernel.org/project/linux-block/cover/1612367638-3794-1-git-send-email-sergei.shtepa@veeam.com/
+Mostly changes were made, due to Damien's comments:
+ * on the design of the code;
+ * by the patch set organization;
+ * bug with passing a wrong parameter to dm_get_device();
+ * description of the 'noexcl' parameter in the linear.rst.
+Also added remap_and_filter.rst.
+
+v3 - https://patchwork.kernel.org/project/linux-block/cover/1611853955-32167-1-git-send-email-sergei.shtepa@veeam.com/
+In this version, I already suggested blk_interposer to apply to dm-linear.
+Problems were solved:
+ * Interception of bio requests from a specific device on the disk, not
+   from the entire disk. To do this, we added the dm_interposed_dev
+   structure and an interval tree to store these structures.
+ * Implemented ioctl DM_DEV_REMAP_CMD. A patch with changes in the lvm2
+   project was sent to the team lvm-devel@redhat.com.
+ * Added the 'noexcl' option for dm-linear, which allows you to open
+   the underlying block-device without FMODE_EXCL mode.
+
+v2 - https://patchwork.kernel.org/project/linux-block/cover/1607518911-30692-1-git-send-email-sergei.shtepa@veeam.com/
+I tried to suggest blk_interposer without using it in device mapper,
+but with the addition of a sample of its use. It was then that I learned
+about the maintainers' attitudes towards the samples directory :).
+
+v1 - https://lwn.net/ml/linux-block/20201119164924.74401-1-hare@suse.de/
+This Hannes's patch can be considered as a starting point, since this is
+where the interception mechanism and the term blk_interposer itself
+appeared. It became clear that blk_interposer can be useful for
+device mapper.
+
+before v1 - https://patchwork.kernel.org/project/linux-block/cover/1603271049-20681-1-git-send-email-sergei.shtepa@veeam.com/
+I tried to offer a rather cumbersome blk-filter and a monster-like
+blk-snap module for creating snapshots.
+
+Sergei Shtepa (4):
+  Adds blk_interposer
+  Applying the blk_interposer in the block device layer
+  Add blk_interposer in DM
+  Using dm_get_device_ex() instead of dm_get_device()
+
+ block/bio.c                   |   2 +
+ block/blk-core.c              | 194 ++++++++++++++-------------
+ block/genhd.c                 |  52 ++++++++
+ drivers/md/dm-cache-target.c  |   5 +-
+ drivers/md/dm-core.h          |   1 +
+ drivers/md/dm-delay.c         |   3 +-
+ drivers/md/dm-dust.c          |   3 +-
+ drivers/md/dm-era-target.c    |   4 +-
+ drivers/md/dm-flakey.c        |   3 +-
+ drivers/md/dm-ioctl.c         |  59 ++++++++-
+ drivers/md/dm-linear.c        |   3 +-
+ drivers/md/dm-log-writes.c    |   3 +-
+ drivers/md/dm-snap.c          |   3 +-
+ drivers/md/dm-table.c         |  21 ++-
+ drivers/md/dm-writecache.c    |   3 +-
+ drivers/md/dm.c               | 242 ++++++++++++++++++++++++++++++----
+ drivers/md/dm.h               |   8 +-
+ fs/block_dev.c                |   3 +
+ include/linux/blk_types.h     |   6 +
+ include/linux/blkdev.h        |  32 +++++
+ include/linux/device-mapper.h |  11 +-
+ include/uapi/linux/dm-ioctl.h |   6 +
+ 22 files changed, 530 insertions(+), 137 deletions(-)
+
+--
+2.20.1
+
