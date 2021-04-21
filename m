@@ -2,230 +2,151 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF20EC433ED
-	for <linux-block@archiver.kernel.org>; Wed, 21 Apr 2021 07:50:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EA11C433B4
+	for <linux-block@archiver.kernel.org>; Wed, 21 Apr 2021 08:15:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 71D8861436
-	for <linux-block@archiver.kernel.org>; Wed, 21 Apr 2021 07:50:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4FF8361437
+	for <linux-block@archiver.kernel.org>; Wed, 21 Apr 2021 08:15:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237361AbhDUHua (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Apr 2021 03:50:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53438 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229536AbhDUHu3 (ORCPT
+        id S234107AbhDUIQA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Apr 2021 04:16:00 -0400
+Received: from mailout2.samsung.com ([203.254.224.25]:46414 "EHLO
+        mailout2.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230343AbhDUIP4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Apr 2021 03:50:29 -0400
-Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C73BAC06174A
-        for <linux-block@vger.kernel.org>; Wed, 21 Apr 2021 00:49:56 -0700 (PDT)
-Received: by mail-ej1-x62b.google.com with SMTP id u17so62146084ejk.2
-        for <linux-block@vger.kernel.org>; Wed, 21 Apr 2021 00:49:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=t26OytBYDk6fmq9DuUEUz82ZViLW9M1JTs8z3dZP51Y=;
-        b=I5hpM41/GHQy6152SoWBEG8yS8SvY1Ay0ImdN/rbUsYhuJZa+8vOF4O6PKWT3pmz1T
-         YkncNIsj6vRj6PJWaBFLCZIG6mvs9wWOaLvTOFSr7EBJW/xixi/piIUrU6tUAEq+m25H
-         NlRqPVWAIbsw7seS1cyCKV0xFoekVr0shDzDu07BKXNtRvnLx7YylAmneWqUg7XbHoUW
-         IW55mBnpbwq73dR6zvfPU6DAVGtzTMWBXtxuWI+DnAQHcjfOJ3Yzy7NCC8Rz1wMHuaFG
-         nN/+U9arhherop4qIWFW+z/rzEZ4sw/yiSbwY0blu9ved1HnLRWR8/cdojPKeOhsY5KD
-         kS2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=t26OytBYDk6fmq9DuUEUz82ZViLW9M1JTs8z3dZP51Y=;
-        b=UevvuTTDV7z0xrdHG2rP9sue9AVgc0hBANWjzh0b2yiSW07x5ClOPPdM/c43m4f1Bf
-         Jo7jCghMUkoOLyYDd0rwXzW5HcHa9PBKjnahzVNubJQE+RyvL4BDHHvkiUx+SGQSsWTN
-         eG5T/3KjWebtB+cYvj2u1ntE8juwt1Bc/dcjA0sBSymvuTe9u/YuHCt0nMoW6x+A2zJd
-         tWlYNAQZMYhNEk1W9RtEdc0gTQggpQ1+gC9BuEt7l9EPKr7OB/Wc+8oPUQKToIbhEgO6
-         U+qsTLdjGqOsvk5vwCwxpKLU+RddnDm0fI3SC1OrR48Fpp6UzKxqJIgNBsfXh3R9PGjU
-         HkrA==
-X-Gm-Message-State: AOAM533ab7iQcBJFo7UuzwQ2OLyP8T/EyD7Enym789Fsy3rz6wluIOc9
-        3KEJz3PEsvQEOBqf39YcpQIZYoiw8URjMnc5BgEEcb8I0ojgDA==
-X-Google-Smtp-Source: ABdhPJwKjQfqguUj22+S977FguVkaAgIKL3amnnTdXDsZXavDQyKS6NpHnovjxH8gYzx2poJz8Aib/iB4cwLPNlLzag=
-X-Received: by 2002:a17:906:c04a:: with SMTP id bm10mr31444993ejb.521.1618991395498;
- Wed, 21 Apr 2021 00:49:55 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210409160305.711318-1-haris.iqbal@ionos.com>
- <ef59e838-4d7f-cab4-e1ac-26944cb7db75@kernel.dk> <CAMGffE=ZdCUc_HABY3_F_aK6pqCt8maB4yi9Qu4gKoox6ub6QQ@mail.gmail.com>
- <16182211-0e85-540d-1061-6411ec3351a5@kernel.dk>
-In-Reply-To: <16182211-0e85-540d-1061-6411ec3351a5@kernel.dk>
-From:   Jinpu Wang <jinpu.wang@ionos.com>
-Date:   Wed, 21 Apr 2021 09:49:44 +0200
-Message-ID: <CAMGffE=t85WAgpzHu5zaM+NAa4hrBYcUEOo=z2jNkkr9ZSc0bg@mail.gmail.com>
-Subject: Re: [PATCH V6 0/3] block: add two statistic tables
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Md Haris Iqbal <haris.iqbal@ionos.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        Danil Kipnis <danil.kipnis@ionos.com>
-Content-Type: text/plain; charset="UTF-8"
+        Wed, 21 Apr 2021 04:15:56 -0400
+Received: from epcas2p3.samsung.com (unknown [182.195.41.55])
+        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20210421081521epoutp02d0aa614be7f5962f857e7c4a1be27a18~30XvuJxTZ2634026340epoutp02o
+        for <linux-block@vger.kernel.org>; Wed, 21 Apr 2021 08:15:21 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20210421081521epoutp02d0aa614be7f5962f857e7c4a1be27a18~30XvuJxTZ2634026340epoutp02o
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1618992921;
+        bh=HS4J43y+tg5ufiqDn6go8vMT66WmpgWbwxk48ryxnhc=;
+        h=Subject:Reply-To:From:To:CC:Date:References:From;
+        b=u2odaMOptHW+nq6fnkpXv5tmCQ+wSmz6TnHTMTn4ZJb2YaqO70pZk3IdaV/g23HHp
+         UWM1CEGr+GXK3+zyCsVNtJj27bIbNo8PPOAljmk79t4BYScf6RP15RqoBmFVayOoJm
+         wHKqRCy2LEWOk49/9fgMN/9t0q/PeXM3V8WWWdsQ=
+Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
+        epcas2p4.samsung.com (KnoxPortal) with ESMTP id
+        20210421081520epcas2p4f782116aa51acd0be403561e7cd7e84b~30Xum733o1037210372epcas2p4d;
+        Wed, 21 Apr 2021 08:15:20 +0000 (GMT)
+Received: from epsmges2p2.samsung.com (unknown [182.195.40.183]) by
+        epsnrtp1.localdomain (Postfix) with ESMTP id 4FQCzB5pCXz4x9QR; Wed, 21 Apr
+        2021 08:15:18 +0000 (GMT)
+X-AuditID: b6c32a46-e01ff700000025de-b9-607fdf16b39f
+Received: from epcas2p4.samsung.com ( [182.195.41.56]) by
+        epsmges2p2.samsung.com (Symantec Messaging Gateway) with SMTP id
+        E6.42.09694.61FDF706; Wed, 21 Apr 2021 17:15:18 +0900 (KST)
+Mime-Version: 1.0
+Subject: [PATCH] block: remove redundant check in blk_attempt_plug_merge
+Reply-To: daejun7.park@samsung.com
+Sender: Daejun Park <daejun7.park@samsung.com>
+From:   Daejun Park <daejun7.park@samsung.com>
+To:     "axboe@kernel.dk" <axboe@kernel.dk>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Sung-Jun Park <sungjun07.park@samsung.com>,
+        Daejun Park <daejun7.park@samsung.com>,
+        Jinyoung CHOI <j-young.choi@samsung.com>,
+        Jieon Seol <jieon.seol@samsung.com>,
+        Jaemyung Lee <jaemyung.lee@samsung.com>,
+        Keoseong Park <keosung.park@samsung.com>,
+        Dukhyun Kwon <d_hyun.kwon@samsung.com>,
+        JinHwan Park <jh.i.park@samsung.com>
+X-Priority: 3
+X-Content-Kind-Code: NORMAL
+X-CPGS-Detection: blocking_info_exchange
+X-Drm-Type: N,general
+X-Msg-Generator: Mail
+X-Msg-Type: PERSONAL
+X-Reply-Demand: N
+Message-ID: <20210421081517epcms2p75252b49900647146260b4f3c18cfd7c5@epcms2p7>
+Date:   Wed, 21 Apr 2021 17:15:17 +0900
+X-CMS-MailID: 20210421081517epcms2p75252b49900647146260b4f3c18cfd7c5
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: AUTO_CONFIDENTIAL
+X-CPGSPASS: Y
+X-CPGSPASS: Y
+CMS-TYPE: 102P
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprAJsWRmVeSWpSXmKPExsWy7bCmha7Y/foEg8nfhSxW3+1ns3h5SNNi
+        18GDbBarHoRb9PZvZbPYfHADs0X/v3YWi22fBS2On3zHaLH3lrbF5V1z2Cw6p69hceDxuHy2
+        1KNvyypGj8+b5AKYo3JsMlITU1KLFFLzkvNTMvPSbZW8g+Od403NDAx1DS0tzJUU8hJzU22V
+        XHwCdN0yc4AOUlIoS8wpBQoFJBYXK+nb2RTll5akKmTkF5fYKqUWpOQUGBoW6BUn5haX5qXr
+        JefnWhkaGBiZAlUm5GRMuGJccIS3YtKU1SwNjBe4uhg5OSQETCQObZnE2MXIxSEksINRYsLl
+        +SxdjBwcvAKCEn93CIPUCAt4SLy+uoYRxBYSUJJYf3EWO0RcT+LWQ4g4m4COxPQT98HiIgLq
+        ErOPb2cGmckscI5Z4vyKjywQy3glZrQ/hbKlJbYv38oIYWtI/FjWywxhi0rcXP2WHcZ+f2w+
+        VI2IROu9s1A1ghIPfu6GiktKHNv9gQnCrpfYeucX2DMSAj2MEod33mKFSOhLXOvYCLaYV8BX
+        on3WXLA4i4CqxKMFHVDLXCS+HbkBFmcWkJfY/nYOMyggmAU0Jdbv0gcxJQSUJY7cgnulYeNv
+        dnQ2swCfRMfhv3DxHfOeQJ2mJrHu53omiDEyErfmMU5gVJqFCOhZSNbOQli7gJF5FaNYakFx
+        bnpqsVGBEXLUbmIEJ00ttx2MU95+0DvEyMTBeIhRgoNZSYT3fm1NghBvSmJlVWpRfnxRaU5q
+        8SFGU6CHJzJLiSbnA9N2Xkm8oamRmZmBpamFqZmRhZI478/UugQhgfTEktTs1NSC1CKYPiYO
+        TqkGJlWb7t1rsrgPdNbzfYzdd3jKqejPy7+mX/M85RV2q/FpwZtN0p9uz+Zf9lYs1vRCSNrL
+        12fy15xTfbGsj0f8/OSd2e9Vm/29Lir4dwt5fdAVi1PL3S7iaHNy8aS5YXf8sl4+aVpf7Tj9
+        RprKkgDeMwFJvVGi8ldyJ1yQlV/JcPtNZ++538rbbxm9f7vBIm3FpykfN8cl8Ah4TZJ3VEhR
+        u3r+9NU5j6XnOVxuuuG0amFLgFPEeW77ub+szlzirH2asC93c488u+0kIZuLv4+HTnYwKmeI
+        nSMX4zjl17v7es97NKbn7P8sobatrWTWwjfRkk1tbz57zkp1e/XJ8lls2G1pt4yztl7vnp4Q
+        Osws6abEUpyRaKjFXFScCADLfDqYIwQAAA==
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20210421081517epcms2p75252b49900647146260b4f3c18cfd7c5
+References: <CGME20210421081517epcms2p75252b49900647146260b4f3c18cfd7c5@epcms2p7>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Apr 19, 2021 at 7:57 PM Jens Axboe <axboe@kernel.dk> wrote:
->
-> On 4/11/21 11:35 PM, Jinpu Wang wrote:
-> > On Fri, Apr 9, 2021 at 11:03 PM Jens Axboe <axboe@kernel.dk> wrote:
-> >>
-> >> On 4/9/21 10:03 AM, Md Haris Iqbal wrote:
-> >>> Hi Jens,
-> >>>
-> >>> This version fixes the long lines in the code as per Christoph's comment.
-> >>
-> >> I'd really like to see some solid justification for the addition,
-> >> though. I clicked the v1 link and it's got details on what you get out
-> >> of it, but not really the 'why' of reasoning for the feature. I mean,
-> >> you could feasibly have a blktrace based userspace solution. Just
-> >> wondering if that has been tried, I know that's what we do at Facebook
-> >> for example.
-> >>
-> > Hi Jens,
-> >
-> > Thanks for the reply.
-> > For the use case of the additional stats, as a cloud provider, we
-> > often need to handle report from the customers regarding
-> > performance problem in a period of time in the past, so it's not
-> > feasible for us to run blktrace, customer workload could change from
-> > time to time, with the additional stats, we gather through all metrics
-> > using Prometheus, we can navigate to the period of time interested,
-> > to check if the performance matches the SLA, it also helps us to find
-> > the user IO pattern,  we can more easily reproduce.
->
-> My suggestion isn't to run just blktrace all the time, rather collect
-> the tracing info from there and store them away. Then you can go back
-> in time and see what is going on. Hence my questioning on adding this
-> new stat tracking, when it's already readily available to be consumed
-> by a small daemon that can continually track it in userspace.
->
-> --
-> Jens Axboe
->
-Hi Jens,
-The problem with using blktrace at production may cause a performance
-drop ~30%. while with the block stats here, we only see ~3% when
-enabled.
-We did a benchmark with rnbd.
+blk_attempt_plug_merge is only called by blk_mq_submit_bio and the
+parameter of same_queue_rq is not NULL. This patch remove redundant
+check for same_queue_rq is not NULL in list_for_each_entry_reverse.
 
-Fio config:
-[global]
-description=Emulation of Storage Server Access Pattern
-bssplit=512/20:1k/16:2k/9:4k/12:8k/19:16k/10:32k/8:64k/4
-fadvise_hint=0
-rw=randrw:2
-direct=1
-random_distribution=zipf:1.2
-#size=1G
-time_based=1
-runtime=10
-ramp_time=1
-ioengine=libaio
-iodepth=128
-iodepth_batch_submit=128
-iodepth_batch_complete=128
-numjobs=1
-#gtod_reduce=1
-group_reporting
+Signed-off-by: Daejun Park <daejun7.park@samsung.com>
+---
+ block/blk-merge.c | 17 +++++++----------
+ 1 file changed, 7 insertions(+), 10 deletions(-)
 
-[job1]
-filename=/dev/rnbd0
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index ffb4aa0ea68b..0af8a276de09 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -1030,7 +1030,6 @@ static enum bio_merge_status blk_attempt_bio_merge(struct request_queue *q,
+  * @nr_segs: number of segments in @bio
+  * @same_queue_rq: pointer to &struct request that gets filled in when
+  * another request associated with @q is found on the plug list
+- * (optional, may be %NULL)
+  *
+  * Determine whether @bio being queued on @q can be merged with a request
+  * on %current's plugged list.  Returns %true if merge was successful,
+@@ -1059,18 +1058,16 @@ bool blk_attempt_plug_merge(struct request_queue *q, struct bio *bio,
+ 	plug_list = &plug->mq_list;
+ 
+ 	list_for_each_entry_reverse(rq, plug_list, queuelist) {
+-		if (rq->q == q && same_queue_rq) {
+-			/*
+-			 * Only blk-mq multiple hardware queues case checks the
+-			 * rq in the same queue, there should be only one such
+-			 * rq in a queue
+-			 **/
+-			*same_queue_rq = rq;
+-		}
+-
+ 		if (rq->q != q)
+ 			continue;
+ 
++		/*
++		 * Only blk-mq multiple hardware queues case checks the
++		 * rq in the same queue, there should be only one such
++		 * rq in a queue
++		 **/
++		*same_queue_rq = rq;
++
+ 		if (blk_attempt_bio_merge(q, rq, bio, nr_segs, false) ==
+ 		    BIO_MERGE_OK)
+ 			return true;
+-- 
+2.25.1
 
-blktrace command:
-# blktrace -a read -a write -d /dev/rnbd0
-
-read IOPS drops 35%, similar for write IOPS.
-
-RNBD-No-blktrace  RNBD-With-blktrace
-
- 102056.894311               -35.5%
-
-The tests are done with v5.4.30.
-Test hardware is
-root@x4-left:~/haris/sds-perf# uname -a
-Linux x4-left 5.10.30-pserver
-#5.10.30-1+feature+linux+5.10.y+20210414.1233+e3dd267~deb10 SMP
-x86_64 GNU/Linux
-root@x4-left:~/haris/sds-perf# lscpu
-Architecture:        x86_64
-CPU op-mode(s):      32-bit, 64-bit
-Byte Order:          Little Endian
-Address sizes:       46 bits physical, 48 bits virtual
-CPU(s):              40
-On-line CPU(s) list: 0-39
-Thread(s) per core:  2
-Core(s) per socket:  10
-Socket(s):           2
-NUMA node(s):        2
-Vendor ID:           GenuineIntel
-CPU family:          6
-Model:               85
-Model name:          Intel(R) Xeon(R) Silver 4114 CPU @ 2.20GHz
-Stepping:            4
-CPU MHz:             800.571
-CPU max MHz:         3000.0000
-CPU min MHz:         800.0000
-BogoMIPS:            4400.00
-Virtualization:      VT-x
-L1d cache:           32K
-L1i cache:           32K
-L2 cache:            1024K
-L3 cache:            14080K
-NUMA node0 CPU(s):   0-9,20-29
-NUMA node1 CPU(s):   10-19,30-39
-Flags:               fpu vme de pse tsc msr pae mce cx8 apic sep mtrr
-pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe
-syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts
-rep_good nopl xtopology nonstop_tsc cpuid aperfmperf pni pclmulqdq
-dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm
-pcid dca sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes
-xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb cat_l3
-cdp_l3 invpcid_single intel_ppin mba ibrs ibpb stibp tpr_shadow vnmi
-flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 hle avx2 smep
-bmi2 erms invpcid rtm cqm mpx rdt_a avx512f avx512dq rdseed adx smap
-clflushopt clwb intel_pt avx512cd avx512bw avx512vl xsaveopt xsavec
-xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local
-dtherm ida arat pln pts pku ospke
-root@x4-left:~/haris/sds-perf# ibstat
-CA 'mlx5_0'
-CA type: MT4115
-Number of ports: 1
-Firmware version: 12.26.4012
-Hardware version: 0
-Node GUID: 0xec0d9a0300c5fffc
-System image GUID: 0xec0d9a0300c5fffc
-Port 1:
-State: Active
-Physical state: LinkUp
-Rate: 100
-Base lid: 3
-LMC: 0
-SM lid: 3
-Capability mask: 0x2651e84a
-Port GUID: 0xec0d9a0300c5fffc
-Link layer: InfiniBand
-CA 'mlx5_1'
-CA type: MT4115
-Number of ports: 1
-Firmware version: 12.26.4012
-Hardware version: 0
-Node GUID: 0xec0d9a0300c5fffd
-System image GUID: 0xec0d9a0300c5fffc
-Port 1:
-State: Active
-Physical state: LinkUp
-Rate: 100
-Base lid: 1
-LMC: 0
-SM lid: 1
-Capability mask: 0x2651e84a
-Port GUID: 0xec0d9a0300c5fffd
-Link layer: InfiniBand
-
-Thanks!
