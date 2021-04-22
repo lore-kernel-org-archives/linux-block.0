@@ -2,183 +2,139 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D5EBC433ED
-	for <linux-block@archiver.kernel.org>; Thu, 22 Apr 2021 09:29:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1BF3C433B4
+	for <linux-block@archiver.kernel.org>; Thu, 22 Apr 2021 09:59:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 41F896145A
-	for <linux-block@archiver.kernel.org>; Thu, 22 Apr 2021 09:29:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8134F6145A
+	for <linux-block@archiver.kernel.org>; Thu, 22 Apr 2021 09:59:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230341AbhDVJ3o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Apr 2021 05:29:44 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59528 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230285AbhDVJ3o (ORCPT
+        id S234773AbhDVKAY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Apr 2021 06:00:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42226 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230365AbhDVKAY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Apr 2021 05:29:44 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13M94TWx003221;
-        Thu, 22 Apr 2021 05:28:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : references : content-type : in-reply-to : sender :
- content-transfer-encoding : mime-version; s=pp1;
- bh=1JbWzdjefGN7j20B212xQP5JZi21xzHeI+2btflqab4=;
- b=WFkq3n9APitCPuva54jPcTYCmnePWaaMVJgYzRQrmHEh1G27IjHWWLtVKeOql14RXnJC
- Qr6DU4xdA5D8mpnSS1HuLRNw+BdyGyeh/CLMjrTd+FZiNqCQzsbzfXJAsWGA+nhT4Jx9
- 1IvTFngZo+IT+0P5yyVZh2pUS7wydrzwpKnHQLZcSWAWB3R8QKzoczX/71B7wdUOQ2Ec
- Zon6ND/3l/61/eaoJ/wTHzP9lqoMuwRF1P1uXZgnQNPsVyhea+oGKhTZdnoxUF2Hwkf3
- c8Owd5gvUTaEwCe+IusFZtIqnM2XnYg0xP8Wik0lezM4UZDJDUgSMoNZKvrSV6ahhnvz Sg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3835xxh2wh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 22 Apr 2021 05:28:58 -0400
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13M9QbHL094162;
-        Thu, 22 Apr 2021 05:28:57 -0400
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3835xxh2vs-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 22 Apr 2021 05:28:57 -0400
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13M9SSSN002294;
-        Thu, 22 Apr 2021 09:28:55 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma06fra.de.ibm.com with ESMTP id 37ypxh9hgp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 22 Apr 2021 09:28:55 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13M9Sq6o33751446
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 22 Apr 2021 09:28:52 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 630EEAE04D;
-        Thu, 22 Apr 2021 09:28:52 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4F99CAE045;
-        Thu, 22 Apr 2021 09:28:52 +0000 (GMT)
-Received: from t480-pf1aa2c2.fritz.box (unknown [9.145.88.229])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Thu, 22 Apr 2021 09:28:52 +0000 (GMT)
-Received: from bblock by t480-pf1aa2c2.fritz.box with local (Exim 4.94)
-        (envelope-from <bblock@linux.ibm.com>)
-        id 1lZVdj-003dTV-Nv; Thu, 22 Apr 2021 11:28:51 +0200
-Date:   Thu, 22 Apr 2021 11:28:51 +0200
-From:   Benjamin Block <bblock@linux.ibm.com>
-To:     James Smart <jsmart2021@gmail.com>
-Cc:     Muneendra <muneendra.kumar@broadcom.com>, hare@suse.de,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        tj@kernel.org, linux-nvme@lists.infradead.org, emilne@redhat.com,
-        mkumar@redhat.com,
-        Gaurav Srivastava <gaurav.srivastava@broadcom.com>,
-        Steffen Maier <maier@linux.ibm.com>
-Subject: Re: [PATCH v9 07/13] lpfc: vmid: Implements ELS commands for appid
- patch
-Message-ID: <YIFB03mLWw+kwNmS@t480-pf1aa2c2.linux.ibm.com>
-References: <1617750397-26466-1-git-send-email-muneendra.kumar@broadcom.com>
- <1617750397-26466-8-git-send-email-muneendra.kumar@broadcom.com>
- <YH7LPd8c4PZa1qFC@t480-pf1aa2c2.linux.ibm.com>
- <d9d57857-83f5-9ff7-a427-0817d37f5f84@gmail.com>
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <d9d57857-83f5-9ff7-a427-0817d37f5f84@gmail.com>
-Sender: Benjamin Block <bblock@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: dd4WCXQNUVMu7dc2I3PMVWH1kjJ0BYpp
-X-Proofpoint-ORIG-GUID: vGnu596I2-D4GZlAZJx2yQqbIsamp9_O
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        Thu, 22 Apr 2021 06:00:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1619085589;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=3JC+FrC8kW9yjI+xSNFebXalDnxoffxG/hAMeMUBYHk=;
+        b=B2yeGfFMIdnQvh3INlFyBXgpriHLp73vxEULt3DO5uqDmnHxHlPqOwn8BWvxobDgBAhCEO
+        sAQKmPaPi4NBeRZzwId5zLYPPpyMbQTtUatjpyeGUNmmANP9sJEr2kZqbfvAcGD3UTScOj
+        9z3TZ41QQ3TG9qbRmZmtn0dtQ7wiR/M=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-379-FJmPCfs4MCuipEOwC6wgzQ-1; Thu, 22 Apr 2021 05:59:45 -0400
+X-MC-Unique: FJmPCfs4MCuipEOwC6wgzQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4DF7984BA40;
+        Thu, 22 Apr 2021 09:59:44 +0000 (UTC)
+Received: from localhost (ovpn-115-28.ams2.redhat.com [10.36.115.28])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E972F5D9C6;
+        Thu, 22 Apr 2021 09:59:43 +0000 (UTC)
+Date:   Thu, 22 Apr 2021 10:59:42 +0100
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     "H.J. Lu" <hjl.tools@gmail.com>
+Cc:     libc-alpha@sourceware.org, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH liburing] examples/ucontext-cp.c: cope with variable
+ SIGSTKSZ
+Message-ID: <YIFJDgno7deI5syK@stefanha-x1.localdomain>
+References: <20210413150319.764600-1-stefanha@redhat.com>
+ <YH2VE2RdcH0ISvxH@stefanha-x1.localdomain>
+ <CAMe9rOpK08CJ5TdQ1fZJ2sGUVjHqoTHS2kT8EzDEejuodu8Ksg@mail.gmail.com>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
- definitions=2021-04-22_01:2021-04-21,2021-04-21 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0 mlxscore=0
- bulkscore=0 clxscore=1015 suspectscore=0 impostorscore=0 adultscore=0
- phishscore=0 spamscore=0 mlxlogscore=999 malwarescore=0 priorityscore=1501
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104060000
- definitions=main-2104220076
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="tTB7Fo7YtaBGELxr"
+Content-Disposition: inline
+In-Reply-To: <CAMe9rOpK08CJ5TdQ1fZJ2sGUVjHqoTHS2kT8EzDEejuodu8Ksg@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Apr 21, 2021 at 03:55:15PM -0700, James Smart wrote:
-> On 4/20/2021 5:38 AM, Benjamin Block wrote:
-> ...
-> > > +	len = *((u32 *)(pcmd + 4));
-> > > +	len = be32_to_cpu(len);
-> > > +	memcpy(vport->qfpa_res, pcmd, len + 8);
-> > > +	len = len / LPFC_PRIORITY_RANGE_DESC_SIZE;
-> > > +
-> > > +	desc = (struct priority_range_desc *)(pcmd + 8);
-> > > +	vmid_range = vport->vmid_priority.vmid_range;
-> > > +	if (!vmid_range) {
-> > > +		vmid_range = kcalloc(MAX_PRIORITY_DESC, sizeof(*vmid_range),
-> > > +				     GFP_KERNEL);
-> > > +		if (!vmid_range) {
-> > > +			kfree(vport->qfpa_res);
-> > > +			goto out;
-> > > +		}
-> > > +		vport->vmid_priority.vmid_range = vmid_range;
-> > > +	}
-> > > +	vport->vmid_priority.num_descriptors = len;
-> > > +
-> > > +	for (i = 0; i < len; i++, vmid_range++, desc++) {
-> > > +		lpfc_printf_vlog(vport, KERN_DEBUG, LOG_ELS,
-> > > +				 "6539 vmid values low=%d, high=%d, qos=%d, "
-> > > +				 "local ve id=%d\n", desc->lo_range,
-> > > +				 desc->hi_range, desc->qos_priority,
-> > > +				 desc->local_ve_id);
-> > > +
-> > > +		vmid_range->low = desc->lo_range << 1;
-> > > +		if (desc->local_ve_id == QFPA_ODD_ONLY)
-> > > +			vmid_range->low++;
-> > > +		if (desc->qos_priority)
-> > > +			vport->vmid_flag |= LPFC_VMID_QOS_ENABLED;
-> > > +		vmid_range->qos = desc->qos_priority;
-> > 
-> > I'm curios, if the FC-switch signals it supports QoS for a range here, how
-> > exactly interacts this with the VM IDs that you seem to allocate
-> > dynamically during runtime for cgroups that request specific App IDs?
-> > You don't seem to use `LPFC_VMID_QOS_ENABLED` anywhere else in the
-> > series. >
-> > Would different cgroups get different QoS classes/guarantees depending
-> > on the selected VM ID (higher VM ID gets better QoS class, or something
-> > like that?)? Would the tagged traffic be handled differently than the
-> > ordinary traffic in the fabric?
-> 
-> The simple answer is there is no interaction w/ the cgroup on priority.
-> And no- we really don't look or use it.  The ranges don't really have hard
-> priority values. The way it works is that all values within a range is
-> equal; a value in the first range is "higher priority" than a value in the
-> second range; and a value in the second range is higher than those in the
-> third range, and so on. 
 
-Ah. That's interesting. I thought it is like that, but wasn't sure from
-the spec. Thanks for clarifying.
+--tTB7Fo7YtaBGELxr
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> Doesn't really matter whether the range was marked
-> Best Effort or H/M/L. There's no real "weight".
-> 
-> What you see is the driver simply recording the different ranges so that it
-> knows what to allocate from later on. The driver creates a flat bitmap of
-> all possible values (max of 255) from all ranges - then will allocate values
-> on a first bit set basis.  I know at one point we were going to only
-> auto-assign if there was 1 range, and if multiple range was going to defer a
-> mgmt authority to tell us which range, but this obviously doesn't do that.
+On Mon, Apr 19, 2021 at 11:38:07AM -0700, H.J. Lu wrote:
+> On Mon, Apr 19, 2021 at 7:35 AM Stefan Hajnoczi <stefanha@redhat.com> wro=
+te:
+> >
+> > On Tue, Apr 13, 2021 at 04:03:19PM +0100, Stefan Hajnoczi wrote:
+> > > The size of C arrays at file scope must be constant. The following
+> > > compiler error occurs with recent upstream glibc (2.33.9000):
+> > >
+> > >   CC ucontext-cp
+> > >   ucontext-cp.c:31:23: error: variably modified =E2=80=98stack_buf=E2=
+=80=99 at file scope
+> > >   31 |         unsigned char stack_buf[SIGSTKSZ];
+> > >      |                       ^~~~~~~~~
+> > >   make[1]: *** [Makefile:26: ucontext-cp] Error 1
+> > >
+> > > The following glibc commit changed SIGSTKSZ from a constant value to a
+> > > variable:
+> > >
+> > >   commit 6c57d320484988e87e446e2e60ce42816bf51d53
+> > >   Author: H.J. Lu <hjl.tools@gmail.com>
+> > >   Date:   Mon Feb 1 11:00:38 2021 -0800
+> > >
+> > >     sysconf: Add _SC_MINSIGSTKSZ/_SC_SIGSTKSZ [BZ #20305]
+> > >   ...
+> > >   +# define SIGSTKSZ sysconf (_SC_SIGSTKSZ)
+> > >
+> > > Allocate the stack buffer explicitly to avoid declaring an array at f=
+ile
+> > > scope.
+> > >
+> > > Cc: H.J. Lu <hjl.tools@gmail.com>
+> > > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > > ---
+> > > Perhaps the glibc change needs to be revised before releasing glibc 2=
+=2E34
+> > > since it might break applications. That's up to the glibc folks. It
+> > > doesn't hurt for liburing to take a safer approach that copes with the
+> > > SIGSTKSZ change in any case.
+> >
+> > glibc folks, please take a look. The commit referenced above broke
+> > compilation of liburing's tests. It's possible that applications will
+> > hit similar issues. Can you check whether the SIGSTKSZ change needs to
+> > be reverted/fixed before releasing glibc 2.34?
+> >
+>=20
+> It won't be changed for glibc 2.34.
 
-I was worrying a bit whether this would create some hard to debug
-problems in the wild, when QoS essentially depends on the order in which
-Applications/Containers are started and get IDs assigned accordingly -
-assuming there is multiple priority ranges.
+Thanks for the response, H.J. and Paul.
 
-> Also... although this is coded to support the full breadth of what the
-> standard allows, it may well be the switch only implements 1 range in
-> practice.
-> 
+In that case liburing needs this patch.
 
--- 
-Best Regards, Benjamin Block  / Linux on IBM Z Kernel Development / IBM Systems
-IBM Deutschland Research & Development GmbH    /    https://www.ibm.com/privacy
-Vorsitz. AufsR.: Gregor Pillen         /        Geschäftsführung: Dirk Wittkopp
-Sitz der Gesellschaft: Böblingen / Registergericht: AmtsG Stuttgart, HRB 243294
+Stefan
+
+--tTB7Fo7YtaBGELxr
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmCBSQ4ACgkQnKSrs4Gr
+c8g8tQf/eZkYU0VK1+vqZXkq7OGFswziLeF9lAtl8YIt40yIHVyLKq18nSArBUPP
+ee0RHJZ8HH1T5PJct2SZAF1r5LyndGxngBX61LpOkIizjRNDQKrr0sf5fEp84cvF
+mry2p5++FnOGWTLvJZz2pboJ5YYbUNSb1Z6sTZHuXx8nack5uZFG6sjk9uJS5ZP0
+yKvSYEqKLh6w1iSCWI5Oojw7HusAo2erRuIF3vjTTVceNiSQkGUsXvbTkaSerpVh
+MjgIhcmdkUmEczKq4I7UzEyDHG2sZoW6JeIYX70IZ3iSRB3rkRAMtD5uGjeRVYsq
+hhxbX0BFCqHhuNXr0k+w9nel3kLHhA==
+=7suT
+-----END PGP SIGNATURE-----
+
+--tTB7Fo7YtaBGELxr--
+
