@@ -2,365 +2,183 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67F58C433B4
-	for <linux-block@archiver.kernel.org>; Thu, 22 Apr 2021 07:24:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D5EBC433ED
+	for <linux-block@archiver.kernel.org>; Thu, 22 Apr 2021 09:29:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2A8B76142F
-	for <linux-block@archiver.kernel.org>; Thu, 22 Apr 2021 07:24:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 41F896145A
+	for <linux-block@archiver.kernel.org>; Thu, 22 Apr 2021 09:29:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230206AbhDVHYr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Apr 2021 03:24:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:22002 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229962AbhDVHYq (ORCPT
+        id S230341AbhDVJ3o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Apr 2021 05:29:44 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59528 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230285AbhDVJ3o (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Apr 2021 03:24:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619076252;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=gKKQy244SB4J7Gqvwm12Nv3HrkQjKaYC0SwZCGCWpXA=;
-        b=XuRft2u/hjD5X0rXveOUohG8KAtst2Tf7/bmhf2xK0Ng91ImqaXjvLjiQMr87KdYMfXynu
-        kBLT24t6gXLZLtVEr0bBl1ZYNDhZy7QuuY+/5v7yCxMBsAc6GSZWWC+nqL6m5IpHOqnvOq
-        5sHy64uVHtLefsYMoxX5ymWSZu9/keQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-44-s_WqcYHIPm-JV3vRp93GNg-1; Thu, 22 Apr 2021 03:24:08 -0400
-X-MC-Unique: s_WqcYHIPm-JV3vRp93GNg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A45101006C82;
-        Thu, 22 Apr 2021 07:24:06 +0000 (UTC)
-Received: from T590 (ovpn-13-243.pek2.redhat.com [10.72.13.243])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5F0485DDAD;
-        Thu, 22 Apr 2021 07:23:57 +0000 (UTC)
-Date:   Thu, 22 Apr 2021 15:23:58 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        Daniel Wagner <dwagner@suse.de>,
-        Khazhismel Kumykov <khazhy@google.com>,
-        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        John Garry <john.garry@huawei.com>
-Subject: Re: [PATCH v7 3/5] blk-mq: Fix races between iterating over requests
- and freeing requests
-Message-ID: <YIEkjh2NaiLVCCK8@T590>
-References: <20210421000235.2028-1-bvanassche@acm.org>
- <20210421000235.2028-4-bvanassche@acm.org>
- <YIDegAPz+17BA/9x@T590>
- <67442b28-3b08-1704-fff3-6f0e6a23465e@acm.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+        Thu, 22 Apr 2021 05:29:44 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 13M94TWx003221;
+        Thu, 22 Apr 2021 05:28:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : content-type : in-reply-to : sender :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=1JbWzdjefGN7j20B212xQP5JZi21xzHeI+2btflqab4=;
+ b=WFkq3n9APitCPuva54jPcTYCmnePWaaMVJgYzRQrmHEh1G27IjHWWLtVKeOql14RXnJC
+ Qr6DU4xdA5D8mpnSS1HuLRNw+BdyGyeh/CLMjrTd+FZiNqCQzsbzfXJAsWGA+nhT4Jx9
+ 1IvTFngZo+IT+0P5yyVZh2pUS7wydrzwpKnHQLZcSWAWB3R8QKzoczX/71B7wdUOQ2Ec
+ Zon6ND/3l/61/eaoJ/wTHzP9lqoMuwRF1P1uXZgnQNPsVyhea+oGKhTZdnoxUF2Hwkf3
+ c8Owd5gvUTaEwCe+IusFZtIqnM2XnYg0xP8Wik0lezM4UZDJDUgSMoNZKvrSV6ahhnvz Sg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3835xxh2wh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 22 Apr 2021 05:28:58 -0400
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 13M9QbHL094162;
+        Thu, 22 Apr 2021 05:28:57 -0400
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3835xxh2vs-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 22 Apr 2021 05:28:57 -0400
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.16.0.43/8.16.0.43) with SMTP id 13M9SSSN002294;
+        Thu, 22 Apr 2021 09:28:55 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma06fra.de.ibm.com with ESMTP id 37ypxh9hgp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 22 Apr 2021 09:28:55 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 13M9Sq6o33751446
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 22 Apr 2021 09:28:52 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 630EEAE04D;
+        Thu, 22 Apr 2021 09:28:52 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4F99CAE045;
+        Thu, 22 Apr 2021 09:28:52 +0000 (GMT)
+Received: from t480-pf1aa2c2.fritz.box (unknown [9.145.88.229])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Thu, 22 Apr 2021 09:28:52 +0000 (GMT)
+Received: from bblock by t480-pf1aa2c2.fritz.box with local (Exim 4.94)
+        (envelope-from <bblock@linux.ibm.com>)
+        id 1lZVdj-003dTV-Nv; Thu, 22 Apr 2021 11:28:51 +0200
+Date:   Thu, 22 Apr 2021 11:28:51 +0200
+From:   Benjamin Block <bblock@linux.ibm.com>
+To:     James Smart <jsmart2021@gmail.com>
+Cc:     Muneendra <muneendra.kumar@broadcom.com>, hare@suse.de,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        tj@kernel.org, linux-nvme@lists.infradead.org, emilne@redhat.com,
+        mkumar@redhat.com,
+        Gaurav Srivastava <gaurav.srivastava@broadcom.com>,
+        Steffen Maier <maier@linux.ibm.com>
+Subject: Re: [PATCH v9 07/13] lpfc: vmid: Implements ELS commands for appid
+ patch
+Message-ID: <YIFB03mLWw+kwNmS@t480-pf1aa2c2.linux.ibm.com>
+References: <1617750397-26466-1-git-send-email-muneendra.kumar@broadcom.com>
+ <1617750397-26466-8-git-send-email-muneendra.kumar@broadcom.com>
+ <YH7LPd8c4PZa1qFC@t480-pf1aa2c2.linux.ibm.com>
+ <d9d57857-83f5-9ff7-a427-0817d37f5f84@gmail.com>
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <67442b28-3b08-1704-fff3-6f0e6a23465e@acm.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <d9d57857-83f5-9ff7-a427-0817d37f5f84@gmail.com>
+Sender: Benjamin Block <bblock@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: dd4WCXQNUVMu7dc2I3PMVWH1kjJ0BYpp
+X-Proofpoint-ORIG-GUID: vGnu596I2-D4GZlAZJx2yQqbIsamp9_O
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.761
+ definitions=2021-04-22_01:2021-04-21,2021-04-21 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0 mlxscore=0
+ bulkscore=0 clxscore=1015 suspectscore=0 impostorscore=0 adultscore=0
+ phishscore=0 spamscore=0 mlxlogscore=999 malwarescore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104060000
+ definitions=main-2104220076
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Apr 21, 2021 at 09:01:50PM -0700, Bart Van Assche wrote:
-> On 4/21/21 7:25 PM, Ming Lei wrote:
-> > On Tue, Apr 20, 2021 at 05:02:33PM -0700, Bart Van Assche wrote:
-> >> When multiple request queues share a tag set and when switching the I/O
-> >> scheduler for one of the request queues associated with that tag set, the
-> >> following race can happen:
-> >> * blk_mq_tagset_busy_iter() calls bt_tags_iter() and bt_tags_iter() assigns
-> >>   a pointer to a scheduler request to the local variable 'rq'.
-> >> * blk_mq_sched_free_requests() is called to free hctx->sched_tags.
-> >> * blk_mq_tagset_busy_iter() dereferences 'rq' and triggers a use-after-free.
-> >>
-> >> Fix this race as follows:
-> >> * Use rcu_assign_pointer() and rcu_dereference() to access hctx->tags->rqs[].
-> >>   The performance impact of the assignments added to the hot path is minimal
-> >>   (about 1% according to one particular test).
-> >> * Protect hctx->tags->rqs[] reads with an RCU read-side lock or with a
-> >>   semaphore. Which mechanism is used depends on whether or not it is allowed
-> >>   to sleep and also on whether or not the callback function may sleep.
-> >> * Wait for all preexisting readers to finish before freeing scheduler
-> >>   requests.
-> >>
-> >> Another race is as follows:
-> >> * blk_mq_sched_free_requests() is called to free hctx->sched_tags.
-> >> * blk_mq_queue_tag_busy_iter() iterates over the same tag set but for another
-> >>   request queue than the queue for which scheduler tags are being freed.
-> >> * bt_iter() examines rq->q after *rq has been freed.
-> >>
-> >> Fix this race by protecting the rq->q read in bt_iter() with an RCU read
-> >> lock and by calling synchronize_rcu() before freeing scheduler tags.
-> >>
-> >> Multiple users have reported use-after-free complaints similar to the
-> >> following (from https://lore.kernel.org/linux-block/1545261885.185366.488.camel@acm.org/ ):
-> >>
-> >> BUG: KASAN: use-after-free in bt_iter+0x86/0xf0
-> >> Read of size 8 at addr ffff88803b335240 by task fio/21412
-> >>
-> >> CPU: 0 PID: 21412 Comm: fio Tainted: G        W         4.20.0-rc6-dbg+ #3
-> >> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1 04/01/2014
-> >> Call Trace:
-> >>  dump_stack+0x86/0xca
-> >>  print_address_description+0x71/0x239
-> >>  kasan_report.cold.5+0x242/0x301
-> >>  __asan_load8+0x54/0x90
-> >>  bt_iter+0x86/0xf0
-> >>  blk_mq_queue_tag_busy_iter+0x373/0x5e0
-> >>  blk_mq_in_flight+0x96/0xb0
-> >>  part_in_flight+0x40/0x140
-> >>  part_round_stats+0x18e/0x370
-> >>  blk_account_io_start+0x3d7/0x670
-> >>  blk_mq_bio_to_request+0x19c/0x3a0
-> >>  blk_mq_make_request+0x7a9/0xcb0
-> >>  generic_make_request+0x41d/0x960
-> >>  submit_bio+0x9b/0x250
-> >>  do_blockdev_direct_IO+0x435c/0x4c70
-> >>  __blockdev_direct_IO+0x79/0x88
-> >>  ext4_direct_IO+0x46c/0xc00
-> >>  generic_file_direct_write+0x119/0x210
-> >>  __generic_file_write_iter+0x11c/0x280
-> >>  ext4_file_write_iter+0x1b8/0x6f0
-> >>  aio_write+0x204/0x310
-> >>  io_submit_one+0x9d3/0xe80
-> >>  __x64_sys_io_submit+0x115/0x340
-> >>  do_syscall_64+0x71/0x210
-> >>
-> >> Reviewed-by: Khazhismel Kumykov <khazhy@google.com>
-> >> Tested-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-> >> Cc: Christoph Hellwig <hch@lst.de>
-> >> Cc: Martin K. Petersen <martin.petersen@oracle.com>
-> >> Cc: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-> >> Cc: Ming Lei <ming.lei@redhat.com>
-> >> Cc: Hannes Reinecke <hare@suse.de>
-> >> Cc: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-> >> Cc: John Garry <john.garry@huawei.com>
-> >> Cc: Khazhy Kumykov <khazhy@google.com>
-> >> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-> >> ---
-> >>  block/blk-core.c   | 34 ++++++++++++++++++++++++++++++-
-> >>  block/blk-mq-tag.c | 51 ++++++++++++++++++++++++++++++++++++++++------
-> >>  block/blk-mq-tag.h |  4 +++-
-> >>  block/blk-mq.c     | 21 +++++++++++++++----
-> >>  block/blk-mq.h     |  1 +
-> >>  block/blk.h        |  2 ++
-> >>  block/elevator.c   |  1 +
-> >>  7 files changed, 102 insertions(+), 12 deletions(-)
-> >>
-> >> diff --git a/block/blk-core.c b/block/blk-core.c
-> >> index 9bcdae93f6d4..ca7f833e25a8 100644
-> >> --- a/block/blk-core.c
-> >> +++ b/block/blk-core.c
-> >> @@ -279,6 +279,36 @@ void blk_dump_rq_flags(struct request *rq, char *msg)
-> >>  }
-> >>  EXPORT_SYMBOL(blk_dump_rq_flags);
-> >>  
-> >> +/**
-> >> + * blk_mq_wait_for_tag_iter - wait for preexisting tag iteration functions to finish
-> >> + * @set: Tag set to wait on.
-> >> + *
-> >> + * Waits for preexisting calls of blk_mq_all_tag_iter(),
-> >> + * blk_mq_tagset_busy_iter() and also for their atomic variants to finish
-> >> + * accessing hctx->tags->rqs[]. New readers may start while this function is
-> >> + * in progress or after this function has returned. Use this function to make
-> >> + * sure that hctx->tags->rqs[] changes have become globally visible.
-> >> + *
-> >> + * Waits for preexisting blk_mq_queue_tag_busy_iter(q, fn, priv) calls to
-> >> + * finish accessing requests associated with other request queues than 'q'.
-> >> + */
-> >> +void blk_mq_wait_for_tag_iter(struct blk_mq_tag_set *set)
-> >> +{
-> >> +	struct blk_mq_tags *tags;
-> >> +	int i;
-> >> +
-> >> +	if (set->tags) {
-> >> +		for (i = 0; i < set->nr_hw_queues; i++) {
-> >> +			tags = set->tags[i];
-> >> +			if (!tags)
-> >> +				continue;
-> >> +			down_write(&tags->iter_rwsem);
-> >> +			up_write(&tags->iter_rwsem);
-> >> +		}
-> >> +	}
-> >> +	synchronize_rcu();
-> >> +}
-> >> +
-> >>  /**
-> >>   * blk_sync_queue - cancel any pending callbacks on a queue
-> >>   * @q: the queue
-> >> @@ -412,8 +442,10 @@ void blk_cleanup_queue(struct request_queue *q)
-> >>  	 * it is safe to free requests now.
-> >>  	 */
-> >>  	mutex_lock(&q->sysfs_lock);
-> >> -	if (q->elevator)
-> >> +	if (q->elevator) {
-> >> +		blk_mq_wait_for_tag_iter(q->tag_set);
-> >>  		blk_mq_sched_free_requests(q);
-> >> +	}
-> >>  	mutex_unlock(&q->sysfs_lock);
-> >>  
-> >>  	percpu_ref_exit(&q->q_usage_counter);
-> >> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-> >> index d8eaa38a1bd1..39d5c9190a6b 100644
-> >> --- a/block/blk-mq-tag.c
-> >> +++ b/block/blk-mq-tag.c
-> >> @@ -209,14 +209,24 @@ static bool bt_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
-> >>  
-> >>  	if (!reserved)
-> >>  		bitnr += tags->nr_reserved_tags;
-> >> -	rq = tags->rqs[bitnr];
-> >> -
-> >> +	rcu_read_lock();
-> >> +	/*
-> >> +	 * The request 'rq' points at is protected by an RCU read lock until
-> >> +	 * its queue pointer has been verified and by q_usage_count while the
-> >> +	 * callback function is being invoked. See also the
-> >> +	 * percpu_ref_tryget() and blk_queue_exit() calls in
-> >> +	 * blk_mq_queue_tag_busy_iter().
-> >> +	 */
-> >> +	rq = rcu_dereference(tags->rqs[bitnr]);
-> >>  	/*
-> >>  	 * We can hit rq == NULL here, because the tagging functions
-> >>  	 * test and set the bit before assigning ->rqs[].
-> >>  	 */
-> >> -	if (rq && rq->q == hctx->queue && rq->mq_hctx == hctx)
-> >> +	if (rq && rq->q == hctx->queue && rq->mq_hctx == hctx) {
-> >> +		rcu_read_unlock();
-> >>  		return iter_data->fn(hctx, rq, iter_data->data, reserved);
-> >> +	}
-> >> +	rcu_read_unlock();
-> >>  	return true;
-> >>  }
-> >>  
-> >> @@ -254,11 +264,17 @@ struct bt_tags_iter_data {
-> >>  	unsigned int flags;
-> >>  };
-> >>  
-> >> +/* Include reserved tags. */
-> >>  #define BT_TAG_ITER_RESERVED		(1 << 0)
-> >> +/* Only include started requests. */
-> >>  #define BT_TAG_ITER_STARTED		(1 << 1)
-> >> +/* Iterate over tags->static_rqs[] instead of tags->rqs[]. */
-> >>  #define BT_TAG_ITER_STATIC_RQS		(1 << 2)
-> >> +/* The callback function may sleep. */
-> >> +#define BT_TAG_ITER_MAY_SLEEP		(1 << 3)
-> >>  
-> >> -static bool bt_tags_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
-> >> +static bool __bt_tags_iter(struct sbitmap *bitmap, unsigned int bitnr,
-> >> +			   void *data)
-> >>  {
-> >>  	struct bt_tags_iter_data *iter_data = data;
-> >>  	struct blk_mq_tags *tags = iter_data->tags;
-> >> @@ -275,7 +291,8 @@ static bool bt_tags_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
-> >>  	if (iter_data->flags & BT_TAG_ITER_STATIC_RQS)
-> >>  		rq = tags->static_rqs[bitnr];
-> >>  	else
-> >> -		rq = tags->rqs[bitnr];
-> >> +		rq = rcu_dereference_check(tags->rqs[bitnr],
-> >> +					   lockdep_is_held(&tags->iter_rwsem));
-> >>  	if (!rq)
-> >>  		return true;
-> >>  	if ((iter_data->flags & BT_TAG_ITER_STARTED) &&
-> >> @@ -284,6 +301,25 @@ static bool bt_tags_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
-> >>  	return iter_data->fn(rq, iter_data->data, reserved);
-> >>  }
-> >>  
-> >> +static bool bt_tags_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
-> >> +{
-> >> +	struct bt_tags_iter_data *iter_data = data;
-> >> +	struct blk_mq_tags *tags = iter_data->tags;
-> >> +	bool res;
-> >> +
-> >> +	if (iter_data->flags & BT_TAG_ITER_MAY_SLEEP) {
-> >> +		down_read(&tags->iter_rwsem);
-> >> +		res = __bt_tags_iter(bitmap, bitnr, data);
-> >> +		up_read(&tags->iter_rwsem);
-> >> +	} else {
-> >> +		rcu_read_lock();
-> >> +		res = __bt_tags_iter(bitmap, bitnr, data);
-> >> +		rcu_read_unlock();
-> >> +	}
-> >> +
-> >> +	return res;
-> >> +}
-> >> +
-> >>  /**
-> >>   * bt_tags_for_each - iterate over the requests in a tag map
-> >>   * @tags:	Tag map to iterate over.
-> >> @@ -357,10 +393,12 @@ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
-> >>  {
-> >>  	int i;
-> >>  
-> >> +	might_sleep();
-> >> +
-> >>  	for (i = 0; i < tagset->nr_hw_queues; i++) {
-> >>  		if (tagset->tags && tagset->tags[i])
-> >>  			__blk_mq_all_tag_iter(tagset->tags[i], fn, priv,
-> >> -					      BT_TAG_ITER_STARTED);
-> >> +				BT_TAG_ITER_STARTED | BT_TAG_ITER_MAY_SLEEP);
-> >>  	}
-> >>  }
-> >>  EXPORT_SYMBOL(blk_mq_tagset_busy_iter);
-> >> @@ -544,6 +582,7 @@ struct blk_mq_tags *blk_mq_init_tags(unsigned int total_tags,
-> >>  
-> >>  	tags->nr_tags = total_tags;
-> >>  	tags->nr_reserved_tags = reserved_tags;
-> >> +	init_rwsem(&tags->iter_rwsem);
-> >>  
-> >>  	if (blk_mq_is_sbitmap_shared(flags))
-> >>  		return tags;
-> >> diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
-> >> index 0290c308ece9..d1d73d7cc7df 100644
-> >> --- a/block/blk-mq-tag.h
-> >> +++ b/block/blk-mq-tag.h
-> >> @@ -17,9 +17,11 @@ struct blk_mq_tags {
-> >>  	struct sbitmap_queue __bitmap_tags;
-> >>  	struct sbitmap_queue __breserved_tags;
-> >>  
-> >> -	struct request **rqs;
-> >> +	struct request __rcu **rqs;
-> >>  	struct request **static_rqs;
-> >>  	struct list_head page_list;
-> >> +
-> >> +	struct rw_semaphore iter_rwsem;
-> >>  };
-> >>  
-> >>  extern struct blk_mq_tags *blk_mq_init_tags(unsigned int nr_tags,
-> >> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> >> index 79c01b1f885c..8b59f6b4ec8e 100644
-> >> --- a/block/blk-mq.c
-> >> +++ b/block/blk-mq.c
-> >> @@ -496,8 +496,10 @@ static void __blk_mq_free_request(struct request *rq)
-> >>  	blk_crypto_free_request(rq);
-> >>  	blk_pm_mark_last_busy(rq);
-> >>  	rq->mq_hctx = NULL;
-> >> -	if (rq->tag != BLK_MQ_NO_TAG)
-> >> +	if (rq->tag != BLK_MQ_NO_TAG) {
-> >>  		blk_mq_put_tag(hctx->tags, ctx, rq->tag);
-> >> +		rcu_assign_pointer(hctx->tags->rqs[rq->tag], NULL);
+On Wed, Apr 21, 2021 at 03:55:15PM -0700, James Smart wrote:
+> On 4/20/2021 5:38 AM, Benjamin Block wrote:
+> ...
+> > > +	len = *((u32 *)(pcmd + 4));
+> > > +	len = be32_to_cpu(len);
+> > > +	memcpy(vport->qfpa_res, pcmd, len + 8);
+> > > +	len = len / LPFC_PRIORITY_RANGE_DESC_SIZE;
+> > > +
+> > > +	desc = (struct priority_range_desc *)(pcmd + 8);
+> > > +	vmid_range = vport->vmid_priority.vmid_range;
+> > > +	if (!vmid_range) {
+> > > +		vmid_range = kcalloc(MAX_PRIORITY_DESC, sizeof(*vmid_range),
+> > > +				     GFP_KERNEL);
+> > > +		if (!vmid_range) {
+> > > +			kfree(vport->qfpa_res);
+> > > +			goto out;
+> > > +		}
+> > > +		vport->vmid_priority.vmid_range = vmid_range;
+> > > +	}
+> > > +	vport->vmid_priority.num_descriptors = len;
+> > > +
+> > > +	for (i = 0; i < len; i++, vmid_range++, desc++) {
+> > > +		lpfc_printf_vlog(vport, KERN_DEBUG, LOG_ELS,
+> > > +				 "6539 vmid values low=%d, high=%d, qos=%d, "
+> > > +				 "local ve id=%d\n", desc->lo_range,
+> > > +				 desc->hi_range, desc->qos_priority,
+> > > +				 desc->local_ve_id);
+> > > +
+> > > +		vmid_range->low = desc->lo_range << 1;
+> > > +		if (desc->local_ve_id == QFPA_ODD_ONLY)
+> > > +			vmid_range->low++;
+> > > +		if (desc->qos_priority)
+> > > +			vport->vmid_flag |= LPFC_VMID_QOS_ENABLED;
+> > > +		vmid_range->qos = desc->qos_priority;
 > > 
-> > After the tag is released, it can be re-allocated from another context
-> > immediately. And the above rcu_assign_pointer(NULL) could be run after
-> > the re-allocation and new ->rqs[rq->tag] assignment in submission path,
-> > is it one issue?
+> > I'm curios, if the FC-switch signals it supports QoS for a range here, how
+> > exactly interacts this with the VM IDs that you seem to allocate
+> > dynamically during runtime for cgroups that request specific App IDs?
+> > You don't seem to use `LPFC_VMID_QOS_ENABLED` anywhere else in the
+> > series. >
+> > Would different cgroups get different QoS classes/guarantees depending
+> > on the selected VM ID (higher VM ID gets better QoS class, or something
+> > like that?)? Would the tagged traffic be handled differently than the
+> > ordinary traffic in the fabric?
 > 
-> How about swapping the rcu_assign_pointer() and blk_mq_put_tag() calls?
-> That should be safe since the tag iteration functions check whether or
-> not hctx->tags->rqs[] is NULL.
+> The simple answer is there is no interaction w/ the cgroup on priority.
+> And no- we really don't look or use it.  The ranges don't really have hard
+> priority values. The way it works is that all values within a range is
+> equal; a value in the first range is "higher priority" than a value in the
+> second range; and a value in the second range is higher than those in the
+> third range, and so on. 
+
+Ah. That's interesting. I thought it is like that, but wasn't sure from
+the spec. Thanks for clarifying.
+
+> Doesn't really matter whether the range was marked
+> Best Effort or H/M/L. There's no real "weight".
 > 
-> There are already barriers in sbitmap_queue_clear() so I don't think
-> that any new barriers would need to be added.
+> What you see is the driver simply recording the different ranges so that it
+> knows what to allocate from later on. The driver creates a flat bitmap of
+> all possible values (max of 255) from all ranges - then will allocate values
+> on a first bit set basis.  I know at one point we were going to only
+> auto-assign if there was 1 range, and if multiple range was going to defer a
+> mgmt authority to tell us which range, but this obviously doesn't do that.
 
-That looks fine, since the barrier pair is implied between allocating tag
-and assigning ->tags[tag] too.
+I was worrying a bit whether this would create some hard to debug
+problems in the wild, when QoS essentially depends on the order in which
+Applications/Containers are started and get IDs assigned accordingly -
+assuming there is multiple priority ranges.
 
-Thanks,
-Ming
+> Also... although this is coded to support the full breadth of what the
+> standard allows, it may well be the switch only implements 1 range in
+> practice.
+> 
 
+-- 
+Best Regards, Benjamin Block  / Linux on IBM Z Kernel Development / IBM Systems
+IBM Deutschland Research & Development GmbH    /    https://www.ibm.com/privacy
+Vorsitz. AufsR.: Gregor Pillen         /        Geschäftsführung: Dirk Wittkopp
+Sitz der Gesellschaft: Böblingen / Registergericht: AmtsG Stuttgart, HRB 243294
