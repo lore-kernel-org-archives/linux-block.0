@@ -5,52 +5,53 @@ X-Spam-Level:
 X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55383C43460
-	for <linux-block@archiver.kernel.org>; Thu, 22 Apr 2021 12:22:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1501DC433B4
+	for <linux-block@archiver.kernel.org>; Thu, 22 Apr 2021 12:22:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 15D2261164
-	for <linux-block@archiver.kernel.org>; Thu, 22 Apr 2021 12:22:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D5FC260E0C
+	for <linux-block@archiver.kernel.org>; Thu, 22 Apr 2021 12:22:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235875AbhDVMWq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Apr 2021 08:22:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:38300 "EHLO
+        id S236185AbhDVMWv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Apr 2021 08:22:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:43705 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236285AbhDVMWq (ORCPT
+        by vger.kernel.org with ESMTP id S236183AbhDVMWt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Apr 2021 08:22:46 -0400
+        Thu, 22 Apr 2021 08:22:49 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619094131;
+        s=mimecast20190719; t=1619094134;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=tiKaRtnn5GupBAvGVt1pblFAJ8x71wEGKup9vPQ8GkY=;
-        b=g+5w5dFTkhta27a0A11DfzGl9j+d09FZC2PIcFAWHb1ZcJd2m4QEYHWzUXLcYdVNFYHHhJ
-        Y6elNLb+WcnsDDEwPL4AwMZoMWIJeW5cNW6ExdnP/qzEdch/0lhieDJpNV31/7JgmXOJbL
-        UlUA5HuM48rshUSe6Pt16Khv+qcW8VU=
+        bh=wBRiPuY6I22372ChkUssaZmh1WEQKQC5uGMgC5a9KW0=;
+        b=G6sbGnEpxQrQGrzghZ+ets6wsN7IxEyCO9UAZy3u0yduRRxiNHOtU3TU3QeqJQMTPrB4ZG
+        DVJaOL1cKbnG+BbMh6g3B3p35oXzyjBMzlot3dLFYkDUdUJg8nY0n9VtKlEg3qn2J7HBUU
+        cezwHmvKmqB3C/EU4H0KZ9AFqrY02cs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-394-oaiSwZE8PMetcyLmySfRNw-1; Thu, 22 Apr 2021 08:22:09 -0400
-X-MC-Unique: oaiSwZE8PMetcyLmySfRNw-1
+ us-mta-300-8t9GJVHONjm-yZsKuldr5g-1; Thu, 22 Apr 2021 08:21:35 -0400
+X-MC-Unique: 8t9GJVHONjm-yZsKuldr5g-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E9B6E10866A4;
-        Thu, 22 Apr 2021 12:22:08 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6DC4A107ACE3;
+        Thu, 22 Apr 2021 12:21:34 +0000 (UTC)
 Received: from localhost (ovpn-13-243.pek2.redhat.com [10.72.13.243])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3F8655C1D5;
-        Thu, 22 Apr 2021 12:21:56 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E3AD45C1D5;
+        Thu, 22 Apr 2021 12:21:25 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org,
         Jeffle Xu <jefflexu@linux.alibaba.com>,
         Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V6 07/12] block: create io poll context for submission and poll task
-Date:   Thu, 22 Apr 2021 20:20:33 +0800
-Message-Id: <20210422122038.2192933-8-ming.lei@redhat.com>
+        Hannes Reinecke <hare@suse.de>, Ming Lei <ming.lei@redhat.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH V6 04/12] block: move block polling code into one dedicated source file
+Date:   Thu, 22 Apr 2021 20:20:30 +0800
+Message-Id: <20210422122038.2192933-5-ming.lei@redhat.com>
 In-Reply-To: <20210422122038.2192933-1-ming.lei@redhat.com>
 References: <20210422122038.2192933-1-ming.lei@redhat.com>
 MIME-Version: 1.0
@@ -60,243 +61,534 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Create per-task io poll context for both IO submission and poll task
-if the queue is bio based and supports polling.
+Prepare for supporting bio based io polling, and move blk polling
+code into one dedicated source file. And three shared functions are
+put into private header of blk-mq.h
 
-This io polling context includes two queues:
-
-1) submission queue(sq) for storing HIPRI bio, written by submission task
-   and read by poll task.
-2) polling queue(pq) for holding data moved from sq, only used in poll
-   context for running bio polling.
-
-Following patches will support bio based io polling.
-
-Reviewed-by: Jeffle Xu <jefflexu@linux.alibaba.com>
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+Suggested-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-core.c          | 24 +++++++++-------
- block/blk-ioc.c           |  1 +
- block/blk-poll.c          | 51 +++++++++++++++++++++++++++++++++
- block/blk.h               | 60 +++++++++++++++++++++++++++++++++++++++
- include/linux/iocontext.h |  2 ++
- 5 files changed, 127 insertions(+), 11 deletions(-)
+ block/Makefile   |   3 +-
+ block/blk-mq.c   | 230 -----------------------------------------------
+ block/blk-mq.h   |  40 +++++++++
+ block/blk-poll.c | 196 ++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 238 insertions(+), 231 deletions(-)
+ create mode 100644 block/blk-poll.c
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index d44a8b934608..5830ef4d733e 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -868,8 +868,19 @@ static noinline_for_stack bool submit_bio_checks(struct bio *bio)
- 		}
- 	}
+diff --git a/block/Makefile b/block/Makefile
+index 8d841f5f986f..d7abe2333407 100644
+--- a/block/Makefile
++++ b/block/Makefile
+@@ -8,7 +8,8 @@ obj-$(CONFIG_BLOCK) := bio.o elevator.o blk-core.o blk-sysfs.o \
+ 			blk-exec.o blk-merge.o blk-timeout.o \
+ 			blk-lib.o blk-mq.o blk-mq-tag.o blk-stat.o \
+ 			blk-mq-sysfs.o blk-mq-cpumap.o blk-mq-sched.o ioctl.o \
+-			genhd.o ioprio.o badblocks.o partitions/ blk-rq-qos.o
++			genhd.o ioprio.o badblocks.o partitions/ blk-rq-qos.o \
++			blk-poll.o
  
--	if (!blk_queue_poll(q))
--		bio->bi_opf &= ~REQ_HIPRI;
-+	/*
-+	 * Various block parts want %current->io_context, so allocate it up
-+	 * front rather than dealing with lots of pain to allocate it only
-+	 * where needed. This may fail and the block layer knows how to live
-+	 * with it.
-+	 */
-+	if (unlikely(!current->io_context))
-+		create_task_io_context(current, GFP_ATOMIC, q->node);
-+
-+	if ((bio->bi_opf & REQ_HIPRI) && blk_queue_support_bio_poll(q))
-+		blk_create_io_poll_context(q);
-+
-+	blk_poll_prepare(q, bio);
+ obj-$(CONFIG_BOUNCE)		+= bounce.o
+ obj-$(CONFIG_BLK_SCSI_REQUEST)	+= scsi_ioctl.o
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 47e650bb836b..f9162295f4f2 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -43,26 +43,6 @@
  
- 	switch (bio_op(bio)) {
- 	case REQ_OP_DISCARD:
-@@ -908,15 +919,6 @@ static noinline_for_stack bool submit_bio_checks(struct bio *bio)
- 		break;
- 	}
+ static DEFINE_PER_CPU(struct llist_head, blk_cpu_done);
  
--	/*
--	 * Various block parts want %current->io_context, so allocate it up
--	 * front rather than dealing with lots of pain to allocate it only
--	 * where needed. This may fail and the block layer knows how to live
--	 * with it.
--	 */
--	if (unlikely(!current->io_context))
--		create_task_io_context(current, GFP_ATOMIC, q->node);
+-static void blk_mq_poll_stats_start(struct request_queue *q);
+-static void blk_mq_poll_stats_fn(struct blk_stat_callback *cb);
 -
- 	if (blk_throtl_bio(bio)) {
- 		blkcg_bio_issue_init(bio);
- 		return false;
-diff --git a/block/blk-ioc.c b/block/blk-ioc.c
-index b0cde18c4b8c..5574c398eff6 100644
---- a/block/blk-ioc.c
-+++ b/block/blk-ioc.c
-@@ -19,6 +19,7 @@ static struct kmem_cache *iocontext_cachep;
+-static int blk_mq_poll_stats_bkt(const struct request *rq)
+-{
+-	int ddir, sectors, bucket;
+-
+-	ddir = rq_data_dir(rq);
+-	sectors = blk_rq_stats_sectors(rq);
+-
+-	bucket = ddir + 2 * ilog2(sectors);
+-
+-	if (bucket < 0)
+-		return -1;
+-	else if (bucket >= BLK_MQ_POLL_STATS_BKTS)
+-		return ddir + BLK_MQ_POLL_STATS_BKTS - 2;
+-
+-	return bucket;
+-}
+-
+ /*
+  * Check if any of the ctx, dispatch list or elevator
+  * have pending work in this hardware queue.
+@@ -3726,216 +3706,6 @@ void blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set, int nr_hw_queues)
+ }
+ EXPORT_SYMBOL_GPL(blk_mq_update_nr_hw_queues);
  
- static inline void free_io_context(struct io_context *ioc)
+-/* Enable polling stats and return whether they were already enabled. */
+-static bool blk_poll_stats_enable(struct request_queue *q)
+-{
+-	if (test_bit(QUEUE_FLAG_POLL_STATS, &q->queue_flags) ||
+-	    blk_queue_flag_test_and_set(QUEUE_FLAG_POLL_STATS, q))
+-		return true;
+-	blk_stat_add_callback(q, q->poll_cb);
+-	return false;
+-}
+-
+-static void blk_mq_poll_stats_start(struct request_queue *q)
+-{
+-	/*
+-	 * We don't arm the callback if polling stats are not enabled or the
+-	 * callback is already active.
+-	 */
+-	if (!test_bit(QUEUE_FLAG_POLL_STATS, &q->queue_flags) ||
+-	    blk_stat_is_active(q->poll_cb))
+-		return;
+-
+-	blk_stat_activate_msecs(q->poll_cb, 100);
+-}
+-
+-static void blk_mq_poll_stats_fn(struct blk_stat_callback *cb)
+-{
+-	struct request_queue *q = cb->data;
+-	int bucket;
+-
+-	for (bucket = 0; bucket < BLK_MQ_POLL_STATS_BKTS; bucket++) {
+-		if (cb->stat[bucket].nr_samples)
+-			q->poll_stat[bucket] = cb->stat[bucket];
+-	}
+-}
+-
+-static unsigned long blk_mq_poll_nsecs(struct request_queue *q,
+-				       struct request *rq)
+-{
+-	unsigned long ret = 0;
+-	int bucket;
+-
+-	/*
+-	 * If stats collection isn't on, don't sleep but turn it on for
+-	 * future users
+-	 */
+-	if (!blk_poll_stats_enable(q))
+-		return 0;
+-
+-	/*
+-	 * As an optimistic guess, use half of the mean service time
+-	 * for this type of request. We can (and should) make this smarter.
+-	 * For instance, if the completion latencies are tight, we can
+-	 * get closer than just half the mean. This is especially
+-	 * important on devices where the completion latencies are longer
+-	 * than ~10 usec. We do use the stats for the relevant IO size
+-	 * if available which does lead to better estimates.
+-	 */
+-	bucket = blk_mq_poll_stats_bkt(rq);
+-	if (bucket < 0)
+-		return ret;
+-
+-	if (q->poll_stat[bucket].nr_samples)
+-		ret = (q->poll_stat[bucket].mean + 1) / 2;
+-
+-	return ret;
+-}
+-
+-static bool blk_mq_poll_hybrid_sleep(struct request_queue *q,
+-				     struct request *rq)
+-{
+-	struct hrtimer_sleeper hs;
+-	enum hrtimer_mode mode;
+-	unsigned int nsecs;
+-	ktime_t kt;
+-
+-	if (rq->rq_flags & RQF_MQ_POLL_SLEPT)
+-		return false;
+-
+-	/*
+-	 * If we get here, hybrid polling is enabled. Hence poll_nsec can be:
+-	 *
+-	 *  0:	use half of prev avg
+-	 * >0:	use this specific value
+-	 */
+-	if (q->poll_nsec > 0)
+-		nsecs = q->poll_nsec;
+-	else
+-		nsecs = blk_mq_poll_nsecs(q, rq);
+-
+-	if (!nsecs)
+-		return false;
+-
+-	rq->rq_flags |= RQF_MQ_POLL_SLEPT;
+-
+-	/*
+-	 * This will be replaced with the stats tracking code, using
+-	 * 'avg_completion_time / 2' as the pre-sleep target.
+-	 */
+-	kt = nsecs;
+-
+-	mode = HRTIMER_MODE_REL;
+-	hrtimer_init_sleeper_on_stack(&hs, CLOCK_MONOTONIC, mode);
+-	hrtimer_set_expires(&hs.timer, kt);
+-
+-	do {
+-		if (blk_mq_rq_state(rq) == MQ_RQ_COMPLETE)
+-			break;
+-		set_current_state(TASK_UNINTERRUPTIBLE);
+-		hrtimer_sleeper_start_expires(&hs, mode);
+-		if (hs.task)
+-			io_schedule();
+-		hrtimer_cancel(&hs.timer);
+-		mode = HRTIMER_MODE_ABS;
+-	} while (hs.task && !signal_pending(current));
+-
+-	__set_current_state(TASK_RUNNING);
+-	destroy_hrtimer_on_stack(&hs.timer);
+-	return true;
+-}
+-
+-static bool blk_mq_poll_hybrid(struct request_queue *q,
+-			       struct blk_mq_hw_ctx *hctx, blk_qc_t cookie)
+-{
+-	struct request *rq;
+-
+-	if (q->poll_nsec == BLK_MQ_POLL_CLASSIC)
+-		return false;
+-
+-	if (!blk_qc_t_is_internal(cookie))
+-		rq = blk_mq_tag_to_rq(hctx->tags, blk_qc_t_to_tag(cookie));
+-	else {
+-		rq = blk_mq_tag_to_rq(hctx->sched_tags, blk_qc_t_to_tag(cookie));
+-		/*
+-		 * With scheduling, if the request has completed, we'll
+-		 * get a NULL return here, as we clear the sched tag when
+-		 * that happens. The request still remains valid, like always,
+-		 * so we should be safe with just the NULL check.
+-		 */
+-		if (!rq)
+-			return false;
+-	}
+-
+-	return blk_mq_poll_hybrid_sleep(q, rq);
+-}
+-
+-/**
+- * blk_poll - poll for IO completions
+- * @q:  the queue
+- * @cookie: cookie passed back at IO submission time
+- * @spin: whether to spin for completions
+- *
+- * Description:
+- *    Poll for completions on the passed in queue. Returns number of
+- *    completed entries found. If @spin is true, then blk_poll will continue
+- *    looping until at least one completion is found, unless the task is
+- *    otherwise marked running (or we need to reschedule).
+- */
+-int blk_poll(struct request_queue *q, blk_qc_t cookie, bool spin)
+-{
+-	struct blk_mq_hw_ctx *hctx;
+-	long state;
+-
+-	if (!blk_qc_t_valid(cookie) || !blk_queue_poll(q))
+-		return 0;
+-
+-	if (current->plug)
+-		blk_flush_plug_list(current->plug, false);
+-
+-	hctx = q->queue_hw_ctx[blk_qc_t_to_queue_num(cookie)];
+-
+-	/*
+-	 * If we sleep, have the caller restart the poll loop to reset
+-	 * the state. Like for the other success return cases, the
+-	 * caller is responsible for checking if the IO completed. If
+-	 * the IO isn't complete, we'll get called again and will go
+-	 * straight to the busy poll loop. If specified not to spin,
+-	 * we also should not sleep.
+-	 */
+-	if (spin && blk_mq_poll_hybrid(q, hctx, cookie))
+-		return 1;
+-
+-	hctx->poll_considered++;
+-
+-	state = current->state;
+-	do {
+-		int ret;
+-
+-		hctx->poll_invoked++;
+-
+-		ret = q->mq_ops->poll(hctx);
+-		if (ret > 0) {
+-			hctx->poll_success++;
+-			__set_current_state(TASK_RUNNING);
+-			return ret;
+-		}
+-
+-		if (signal_pending_state(state, current))
+-			__set_current_state(TASK_RUNNING);
+-
+-		if (current->state == TASK_RUNNING)
+-			return 1;
+-		if (ret < 0 || !spin)
+-			break;
+-		cpu_relax();
+-	} while (!need_resched());
+-
+-	__set_current_state(TASK_RUNNING);
+-	return 0;
+-}
+-EXPORT_SYMBOL_GPL(blk_poll);
+-
+ unsigned int blk_mq_rq_cpu(struct request *rq)
  {
-+	kfree(ioc->data);
- 	kmem_cache_free(iocontext_cachep, ioc);
+ 	return rq->mq_ctx->cpu;
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 9ccb1818303b..2eea38cd8048 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -324,5 +324,45 @@ static inline bool hctx_may_queue(struct blk_mq_hw_ctx *hctx,
+ 	return __blk_mq_active_requests(hctx) < depth;
  }
  
-diff --git a/block/blk-poll.c b/block/blk-poll.c
-index 0a38c25bcee5..8e4bec55293e 100644
---- a/block/blk-poll.c
-+++ b/block/blk-poll.c
-@@ -4,11 +4,14 @@
- #include <linux/blkdev.h>
- #include <linux/sched.h>
- #include <linux/hrtimer.h>
-+#include <linux/bio.h>
- 
- #include <linux/blk-mq.h>
- #include "blk.h"
- #include "blk-mq.h"
- 
-+static int blk_bio_poll(struct request_queue *q, blk_qc_t cookie, bool spin);
++static inline int blk_mq_poll_stats_bkt(const struct request *rq)
++{
++	int ddir, sectors, bucket;
 +
- /* Enable polling stats and return whether they were already enabled. */
- static bool blk_poll_stats_enable(struct request_queue *q)
- {
-@@ -165,6 +168,9 @@ int blk_poll(struct request_queue *q, blk_qc_t cookie, bool spin)
- 	if (current->plug)
- 		blk_flush_plug_list(current->plug, false);
- 
-+	if (!queue_is_mq(q))
-+		return blk_bio_poll(q, cookie, spin);
++	ddir = rq_data_dir(rq);
++	sectors = blk_rq_stats_sectors(rq);
 +
- 	hctx = q->queue_hw_ctx[blk_qc_t_to_queue_num(cookie)];
- 
- 	/*
-@@ -204,3 +210,48 @@ int blk_poll(struct request_queue *q, blk_qc_t cookie, bool spin)
- 	return 0;
- }
- EXPORT_SYMBOL_GPL(blk_poll);
++	bucket = ddir + 2 * ilog2(sectors);
 +
-+/* bio base io polling  */
-+static int blk_bio_poll(struct request_queue *q, blk_qc_t cookie, bool spin)
++	if (bucket < 0)
++		return -1;
++	else if (bucket >= BLK_MQ_POLL_STATS_BKTS)
++		return ddir + BLK_MQ_POLL_STATS_BKTS - 2;
++
++	return bucket;
++}
++
++static inline void blk_mq_poll_stats_start(struct request_queue *q)
 +{
 +	/*
-+	 * Create poll queue for storing poll bio and its cookie from
-+	 * submission queue
++	 * We don't arm the callback if polling stats are not enabled or the
++	 * callback is already active.
 +	 */
-+	blk_create_io_poll_context(q);
-+
-+	return 0;
-+}
-+
-+static inline unsigned int bio_grp_list_size(unsigned int nr_grps)
-+{
-+	return sizeof(struct bio_grp_list) + nr_grps *
-+		sizeof(struct bio_grp_list_data);
-+}
-+
-+static void bio_poll_ctx_init(struct blk_bio_poll_ctx *pc)
-+{
-+	pc->sq = (void *)pc + sizeof(*pc);
-+	pc->sq->max_nr_grps = BLK_BIO_POLL_SQ_SZ;
-+
-+	pc->pq = (void *)pc->sq + bio_grp_list_size(BLK_BIO_POLL_SQ_SZ);
-+	pc->pq->max_nr_grps = BLK_BIO_POLL_PQ_SZ;
-+
-+	spin_lock_init(&pc->sq_lock);
-+	spin_lock_init(&pc->pq_lock);
-+}
-+
-+void bio_poll_ctx_alloc(struct io_context *ioc)
-+{
-+	struct blk_bio_poll_ctx *pc;
-+	unsigned int size = sizeof(*pc) +
-+		bio_grp_list_size(BLK_BIO_POLL_SQ_SZ) +
-+		bio_grp_list_size(BLK_BIO_POLL_PQ_SZ);
-+
-+	pc = kzalloc(GFP_ATOMIC, size);
-+	if (pc) {
-+		bio_poll_ctx_init(pc);
-+		if (cmpxchg(&ioc->data, NULL, (void *)pc))
-+			kfree(pc);
-+	}
-+}
-diff --git a/block/blk.h b/block/blk.h
-index d88b0823738c..bc6d63ae36b7 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -352,4 +352,64 @@ int bio_add_hw_page(struct request_queue *q, struct bio *bio,
- 		struct page *page, unsigned int len, unsigned int offset,
- 		unsigned int max_sectors, bool *same_page);
- 
-+/* Grouping bios that share same data into one list */
-+struct bio_grp_list_data {
-+	void *grp_data;
-+
-+	/* all bios in this list share same 'grp_data' */
-+	struct bio_list list;
-+};
-+
-+struct bio_grp_list {
-+	unsigned int max_nr_grps, nr_grps;
-+	struct bio_grp_list_data head[0];
-+};
-+
-+struct blk_bio_poll_ctx {
-+	spinlock_t sq_lock;
-+	struct bio_grp_list *sq;
-+
-+	spinlock_t pq_lock;
-+	struct bio_grp_list *pq;
-+};
-+
-+#define BLK_BIO_POLL_SQ_SZ		16U
-+#define BLK_BIO_POLL_PQ_SZ		(BLK_BIO_POLL_SQ_SZ * 2)
-+
-+void bio_poll_ctx_alloc(struct io_context *ioc);
-+
-+static inline bool blk_queue_support_bio_poll(struct request_queue *q)
-+{
-+	return !queue_is_mq(q) && blk_queue_poll(q);
-+}
-+
-+static inline struct blk_bio_poll_ctx *blk_get_bio_poll_ctx(void)
-+{
-+	struct io_context *ioc = current->io_context;
-+
-+	return ioc ? ioc->data : NULL;
-+}
-+
-+static inline void blk_poll_prepare(struct request_queue *q,
-+		struct bio *bio)
-+{
-+	if (!(bio->bi_opf & REQ_HIPRI))
++	if (!test_bit(QUEUE_FLAG_POLL_STATS, &q->queue_flags) ||
++	    blk_stat_is_active(q->poll_cb))
 +		return;
 +
-+	if (!blk_queue_poll(q) || (!queue_is_mq(q) && !blk_get_bio_poll_ctx()))
-+		bio->bi_opf &= ~REQ_HIPRI;
++	blk_stat_activate_msecs(q->poll_cb, 100);
 +}
 +
-+static inline void blk_create_io_poll_context(struct request_queue *q)
++static inline void blk_mq_poll_stats_fn(struct blk_stat_callback *cb)
 +{
-+	struct io_context *ioc;
++	struct request_queue *q = cb->data;
++	int bucket;
 +
-+	if (unlikely(!current->io_context))
-+		create_task_io_context(current, GFP_ATOMIC, q->node);
++	for (bucket = 0; bucket < BLK_MQ_POLL_STATS_BKTS; bucket++) {
++		if (cb->stat[bucket].nr_samples)
++			q->poll_stat[bucket] = cb->stat[bucket];
++	}
++}
+ 
+ #endif
+diff --git a/block/blk-poll.c b/block/blk-poll.c
+new file mode 100644
+index 000000000000..daa307f84792
+--- /dev/null
++++ b/block/blk-poll.c
+@@ -0,0 +1,196 @@
++// SPDX-License-Identifier: GPL-2.0
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/blkdev.h>
++#include <linux/sched.h>
++#include <linux/hrtimer.h>
 +
-+	ioc = current->io_context;
-+	if (unlikely(ioc && !ioc->data))
-+		bio_poll_ctx_alloc(ioc);
++#include <linux/blk-mq.h>
++#include "blk.h"
++#include "blk-mq.h"
++
++/* Enable polling stats and return whether they were already enabled. */
++static bool blk_poll_stats_enable(struct request_queue *q)
++{
++	if (test_bit(QUEUE_FLAG_POLL_STATS, &q->queue_flags) ||
++	    blk_queue_flag_test_and_set(QUEUE_FLAG_POLL_STATS, q))
++		return true;
++	blk_stat_add_callback(q, q->poll_cb);
++	return false;
 +}
 +
- #endif /* BLK_INTERNAL_H */
-diff --git a/include/linux/iocontext.h b/include/linux/iocontext.h
-index 0a9dc40b7be8..f9a467571356 100644
---- a/include/linux/iocontext.h
-+++ b/include/linux/iocontext.h
-@@ -110,6 +110,8 @@ struct io_context {
- 	struct io_cq __rcu	*icq_hint;
- 	struct hlist_head	icq_list;
- 
-+	void			*data;
++static unsigned long blk_mq_poll_nsecs(struct request_queue *q,
++				       struct request *rq)
++{
++	unsigned long ret = 0;
++	int bucket;
 +
- 	struct work_struct release_work;
- };
- 
++	/*
++	 * If stats collection isn't on, don't sleep but turn it on for
++	 * future users
++	 */
++	if (!blk_poll_stats_enable(q))
++		return 0;
++
++	/*
++	 * As an optimistic guess, use half of the mean service time
++	 * for this type of request. We can (and should) make this smarter.
++	 * For instance, if the completion latencies are tight, we can
++	 * get closer than just half the mean. This is especially
++	 * important on devices where the completion latencies are longer
++	 * than ~10 usec. We do use the stats for the relevant IO size
++	 * if available which does lead to better estimates.
++	 */
++	bucket = blk_mq_poll_stats_bkt(rq);
++	if (bucket < 0)
++		return ret;
++
++	if (q->poll_stat[bucket].nr_samples)
++		ret = (q->poll_stat[bucket].mean + 1) / 2;
++
++	return ret;
++}
++
++static bool blk_mq_poll_hybrid_sleep(struct request_queue *q,
++				     struct request *rq)
++{
++	struct hrtimer_sleeper hs;
++	enum hrtimer_mode mode;
++	unsigned int nsecs;
++	ktime_t kt;
++
++	if (rq->rq_flags & RQF_MQ_POLL_SLEPT)
++		return false;
++
++	/*
++	 * If we get here, hybrid polling is enabled. Hence poll_nsec can be:
++	 *
++	 *  0:	use half of prev avg
++	 * >0:	use this specific value
++	 */
++	if (q->poll_nsec > 0)
++		nsecs = q->poll_nsec;
++	else
++		nsecs = blk_mq_poll_nsecs(q, rq);
++
++	if (!nsecs)
++		return false;
++
++	rq->rq_flags |= RQF_MQ_POLL_SLEPT;
++
++	/*
++	 * This will be replaced with the stats tracking code, using
++	 * 'avg_completion_time / 2' as the pre-sleep target.
++	 */
++	kt = nsecs;
++
++	mode = HRTIMER_MODE_REL;
++	hrtimer_init_sleeper_on_stack(&hs, CLOCK_MONOTONIC, mode);
++	hrtimer_set_expires(&hs.timer, kt);
++
++	do {
++		if (blk_mq_rq_state(rq) == MQ_RQ_COMPLETE)
++			break;
++		set_current_state(TASK_UNINTERRUPTIBLE);
++		hrtimer_sleeper_start_expires(&hs, mode);
++		if (hs.task)
++			io_schedule();
++		hrtimer_cancel(&hs.timer);
++		mode = HRTIMER_MODE_ABS;
++	} while (hs.task && !signal_pending(current));
++
++	__set_current_state(TASK_RUNNING);
++	destroy_hrtimer_on_stack(&hs.timer);
++	return true;
++}
++
++static bool blk_mq_poll_hybrid(struct request_queue *q,
++			       struct blk_mq_hw_ctx *hctx, blk_qc_t cookie)
++{
++	struct request *rq;
++
++	if (q->poll_nsec == BLK_MQ_POLL_CLASSIC)
++		return false;
++
++	if (!blk_qc_t_is_internal(cookie))
++		rq = blk_mq_tag_to_rq(hctx->tags, blk_qc_t_to_tag(cookie));
++	else {
++		rq = blk_mq_tag_to_rq(hctx->sched_tags, blk_qc_t_to_tag(cookie));
++		/*
++		 * With scheduling, if the request has completed, we'll
++		 * get a NULL return here, as we clear the sched tag when
++		 * that happens. The request still remains valid, like always,
++		 * so we should be safe with just the NULL check.
++		 */
++		if (!rq)
++			return false;
++	}
++
++	return blk_mq_poll_hybrid_sleep(q, rq);
++}
++
++/**
++ * blk_poll - poll for IO completions
++ * @q:  the queue
++ * @cookie: cookie passed back at IO submission time
++ * @spin: whether to spin for completions
++ *
++ * Description:
++ *    Poll for completions on the passed in queue. Returns number of
++ *    completed entries found. If @spin is true, then blk_poll will continue
++ *    looping until at least one completion is found, unless the task is
++ *    otherwise marked running (or we need to reschedule).
++ */
++int blk_poll(struct request_queue *q, blk_qc_t cookie, bool spin)
++{
++	struct blk_mq_hw_ctx *hctx;
++	long state;
++
++	if (!blk_qc_t_valid(cookie) || !blk_queue_poll(q))
++		return 0;
++
++	if (current->plug)
++		blk_flush_plug_list(current->plug, false);
++
++	hctx = q->queue_hw_ctx[blk_qc_t_to_queue_num(cookie)];
++
++	/*
++	 * If we sleep, have the caller restart the poll loop to reset
++	 * the state. Like for the other success return cases, the
++	 * caller is responsible for checking if the IO completed. If
++	 * the IO isn't complete, we'll get called again and will go
++	 * straight to the busy poll loop. If specified not to spin,
++	 * we also should not sleep.
++	 */
++	if (spin && blk_mq_poll_hybrid(q, hctx, cookie))
++		return 1;
++
++	hctx->poll_considered++;
++
++	state = current->state;
++	do {
++		int ret;
++
++		hctx->poll_invoked++;
++
++		ret = q->mq_ops->poll(hctx);
++		if (ret > 0) {
++			hctx->poll_success++;
++			__set_current_state(TASK_RUNNING);
++			return ret;
++		}
++
++		if (signal_pending_state(state, current))
++			__set_current_state(TASK_RUNNING);
++
++		if (current->state == TASK_RUNNING)
++			return 1;
++		if (ret < 0 || !spin)
++			break;
++		cpu_relax();
++	} while (!need_resched());
++
++	__set_current_state(TASK_RUNNING);
++	return 0;
++}
++EXPORT_SYMBOL_GPL(blk_poll);
 -- 
 2.29.2
 
