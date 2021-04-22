@@ -7,91 +7,91 @@ X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA47EC433ED
-	for <linux-block@archiver.kernel.org>; Thu, 22 Apr 2021 17:27:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2460C433ED
+	for <linux-block@archiver.kernel.org>; Thu, 22 Apr 2021 17:49:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 86CF0613E6
-	for <linux-block@archiver.kernel.org>; Thu, 22 Apr 2021 17:27:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7AAB7613B8
+	for <linux-block@archiver.kernel.org>; Thu, 22 Apr 2021 17:49:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238305AbhDVR1s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Apr 2021 13:27:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47720 "EHLO
+        id S236459AbhDVRtf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Apr 2021 13:49:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236058AbhDVR1o (ORCPT
+        with ESMTP id S236058AbhDVRtf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Apr 2021 13:27:44 -0400
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8CBBC06174A
-        for <linux-block@vger.kernel.org>; Thu, 22 Apr 2021 10:27:07 -0700 (PDT)
-Received: by mail-pl1-x62a.google.com with SMTP id g16so7023003plq.3
-        for <linux-block@vger.kernel.org>; Thu, 22 Apr 2021 10:27:07 -0700 (PDT)
+        Thu, 22 Apr 2021 13:49:35 -0400
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D6F4C06174A
+        for <linux-block@vger.kernel.org>; Thu, 22 Apr 2021 10:48:59 -0700 (PDT)
+Received: by mail-pj1-x1033.google.com with SMTP id j14-20020a17090a694eb0290152d92c205dso1403870pjm.0
+        for <linux-block@vger.kernel.org>; Thu, 22 Apr 2021 10:48:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=osandov-com.20150623.gappssmtp.com; s=20150623;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=dxeJjC8xaA28k+BF1hGx31II1NdXhhjzduC0otju5aY=;
-        b=bp2rjjtUFFVO9QSTi04ChUtq95jVgalQvzVqXeuLPn90lgjPiRLA6YYE1r9czQyfVl
-         5Dyyu/BKCmvNYAVn1ueS4inqGR49t0f5oZ2e16+M1zuGMR2A7aVO681u6xeXpxeWDI2n
-         4ZrCWT4sMhpWFRPElIyl2tV6BLVxmPrqHj/tpjX4gTLLQa3PgFXugSe1soucUiQtdp8i
-         HJ8gQBlsyU5JPYLgADYPkomY/PqZDzByaugmv1l9StjUJ03eGCCVnXJza4Qtp+AoxPGn
-         /jn/GdgkP457S2qre8LZHjsnE+cCc5V6QLJQmvTTeR2pnBF5DSAGQc8NyStc2gqq8WZI
-         7bZA==
+        bh=VvbUFSEIQSRhOiiC3opsx0f7VTdAXH0Ya6f9Uf6c7Ss=;
+        b=0/c39k6LIrRAphiROsQMJQJWHQy7N0r6TWb84qLGZniZcaJwZFV/7jVJ6336E3ozG4
+         1gBfaHVKIZwno7XjL6wJ7EeQxix/8Kbo8fddoaob8cXY0rpPeLbei7h04am7nK7XNKl5
+         RVPp7qVROlDcJzuIleZy7wiYi02ffLztfV7BPd2M+zNLwlPVrK3h5HBpY/B+w7kAaR4b
+         GWLdlSQB41SXLikUE3PVYCf/ATPf1K236BD08gDKDiagtVO6IZ3qtLuuC7CN5OhYM4g3
+         zd9PldFjy9SDRBzzIV3UweFUtRH6OG5eqAkYNiTegqDOSbOY1dIvuApvrlf/Aa3PGsTp
+         2Avg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=dxeJjC8xaA28k+BF1hGx31II1NdXhhjzduC0otju5aY=;
-        b=RphNghCE8WLKweloFjQ+g3aVpFnZTeR3JzmpcirkWooVFJC6qFPORVUhoAKgwqgOXy
-         NV+NIFvpcba2YYQ164QncQGj/jYKGKOWcwGsX66FFhiLYND9bL+xXn3Tb/UuueTKMp0K
-         lRg0daw4rghXirYKmw0ue1NT47OGQrbRHykZ78Y+6aMfIXQNVz46gkQNqDrCFN9XtiEz
-         RqNMRVs8k6QMz5JxwE80T7gsuxcal8bcBkeiTPdblKIvWRlIeDOb9usxU1E2nBTcDxH9
-         Y9dbI36Lt7tiY0EzeXs6bNBGnChVoDUB35J8hBKN53doGcrftmvJTv+qLwRgvJ3fFthT
-         zwtg==
-X-Gm-Message-State: AOAM532BX66ov20XW71l1F9YO0n2ms4UqTqz8TbaxmdIZuLGjeq3+Mq0
-        v8R/GUe4OOtChYFVPieEpsLQ1g==
-X-Google-Smtp-Source: ABdhPJwRKVK0pjzyWYqS6K+XwiHZeEsApp8eAMjpaBaIpLGwpeffyPdHMaTyzZlgeX4oX8mCGpbnoQ==
-X-Received: by 2002:a17:902:c40d:b029:ec:9f20:72b5 with SMTP id k13-20020a170902c40db02900ec9f2072b5mr4757345plk.22.1619112427215;
-        Thu, 22 Apr 2021 10:27:07 -0700 (PDT)
+        bh=VvbUFSEIQSRhOiiC3opsx0f7VTdAXH0Ya6f9Uf6c7Ss=;
+        b=S0oZn/2PgGLUX66zWK6X/Gmvnf3aS/8rDylB9uFX/1pFkexI0aFkjZ2kOcB2ypf9cb
+         kbf4C/SCkknVNwQic6jTKklu7xO802atpNF0gF5SbNfTnqadQE4e5Ds2INEwo43oZ1Fh
+         xcizr8uaZvwBVxS0EF94WaF/F53AVU1kLlc0ENuVeElJ9CBpeMRI5mUGfBfsbaTxzpSG
+         ZgTZOpIp4Z+XilMY+sNJB1nvMHJ3B8wZdDK3G55sLGjQT3XproWIew15irGcyCrBqo8g
+         9On9IXZcFdnkdY6uQEmfMjzWyUUOxdVKUWhq75bWgNinhqRdEGgAdd6pRw7JxRNl8hAX
+         v8rA==
+X-Gm-Message-State: AOAM531GlUTkvfUk/3s5JO7CMCM9V+GnMsdrr54+mSkOL1KnmIci6oDb
+        gZrpGCFmbuDOnkDs1u7MDDPUuw==
+X-Google-Smtp-Source: ABdhPJyR7z/s5UlnSuzckh10Jttzvybhah5XrQevFbH++7BienzFkLWmNQCr7tO9lc585Sw8Gflh9A==
+X-Received: by 2002:a17:90a:a895:: with SMTP id h21mr5322410pjq.13.1619113738732;
+        Thu, 22 Apr 2021 10:48:58 -0700 (PDT)
 Received: from relinquished.localdomain ([2620:10d:c090:400::5:54b2])
-        by smtp.gmail.com with ESMTPSA id c13sm2916956pgw.42.2021.04.22.10.27.05
+        by smtp.gmail.com with ESMTPSA id m20sm2373693pfk.133.2021.04.22.10.48.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Apr 2021 10:27:06 -0700 (PDT)
-Date:   Thu, 22 Apr 2021 10:27:05 -0700
+        Thu, 22 Apr 2021 10:48:57 -0700 (PDT)
+Date:   Thu, 22 Apr 2021 10:48:56 -0700
 From:   Omar Sandoval <osandov@osandov.com>
-To:     Damien Le Moal <damien.lemoal@wdc.com>
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH blktests v2] tests/block/014: ignore dd error messages
-Message-ID: <YIGx6ZnleZ4E0SCy@relinquished.localdomain>
-References: <20210408043918.4265-1-damien.lemoal@wdc.com>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Omar Sandoval <osandov@fb.com>, linux-block@vger.kernel.org,
+        John Garry <john.garry@huawei.com>,
+        Don Brace <don.brace@microsemi.com>,
+        Douglas Gilbert <dgilbert@interlog.com>
+Subject: Re: [PATCH blktests] tests/block/031: Add a test for sharing a tag
+ set across hardware queues
+Message-ID: <YIG3CK5Qs/YoZaB6@relinquished.localdomain>
+References: <20210328231210.3707-1-bvanassche@acm.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210408043918.4265-1-damien.lemoal@wdc.com>
+In-Reply-To: <20210328231210.3707-1-bvanassche@acm.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Apr 08, 2021 at 01:39:18PM +0900, Damien Le Moal wrote:
-> The kernel commit de3510e52b0a ("null_blk: fix command timeout
-> completion handling") fixed null_blk driver to report ETIMEDOUT errors
-> for IO operations failed with a timeout. This change causes the dd call
-> in block/014 case to print the following error message:
+On Sun, Mar 28, 2021 at 04:12:09PM -0700, Bart Van Assche wrote:
+> Support for sharing a tag set across hardware queues has been added
+> recently to the Linux kernel. See also the BLK_MQ_F_TAG_HCTX_SHARED flag,
+> Linux kernel commit 32bc15afed04 ("blk-mq: Facilitate a shared sbitmap per
+> tagset"; v5.10) and commit 0905053bdb5b ("null_blk: Support shared tag
+> bitmap"; v5.10). Add a test that triggers the shared tag set code in the
+> block layer core.
 > 
-> dd: error reading '/dev/nullb0': Connection timed out
-> 
-> The presence of this message result in a failure of the test case even
-> without a kernel crash or hang, which is what the block/014 case is
-> testing. Avoid this failure by ignoring dd error messages using a
-> redirection of dd stderr to /dev/null.
-> 
-> Reported-by: kernel test robot <oliver.sang@intel.com>
-> Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+> Cc: John Garry <john.garry@huawei.com>
+> Cc: Don Brace<don.brace@microsemi.com>
+> Cc: Douglas Gilbert <dgilbert@interlog.com>
+> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 > ---
-> 
-> Changes from v1:
-> * Add Reported-by tag
-> 
->  tests/block/014 | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  tests/block/031     | 43 +++++++++++++++++++++++++++++++++++++++++++
+>  tests/block/031.out |  1 +
+>  2 files changed, 44 insertions(+)
+>  create mode 100755 tests/block/031
+>  create mode 100644 tests/block/031.out
 
-Sorry about the delay, I was out for a couple of weeks. Applied.
+Thanks, Bart, applied.
