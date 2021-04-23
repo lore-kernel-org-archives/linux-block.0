@@ -2,122 +2,164 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D52D1C433B4
-	for <linux-block@archiver.kernel.org>; Fri, 23 Apr 2021 08:04:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABD83C433ED
+	for <linux-block@archiver.kernel.org>; Fri, 23 Apr 2021 08:46:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A0072611C1
-	for <linux-block@archiver.kernel.org>; Fri, 23 Apr 2021 08:04:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 87DAA61425
+	for <linux-block@archiver.kernel.org>; Fri, 23 Apr 2021 08:46:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241316AbhDWIFb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Apr 2021 04:05:31 -0400
-Received: from mail.synology.com ([211.23.38.101]:56580 "EHLO synology.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229917AbhDWIFa (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Apr 2021 04:05:30 -0400
-Subject: Re: [PATCH v2] block: fix trace completion for chained bio
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=synology.com; s=123;
-        t=1619165093; bh=KD2DEUbUs/MuymN+RMyXMiyFHNjxQu60kGtFI97ART0=;
-        h=Subject:To:Cc:References:From:Date:In-Reply-To;
-        b=myaTybs+xgX1giHiS+cTjzfjEz+aAyKT//zpKLYKHK8WBEXU3wfJ6QpxnF4ImCwsS
-         0VTsRaLsIC09/z1Z53E0/01JWyWRJsLw5fgSeTdCiot3ykjmYZL+eoIP+dXMMNkBha
-         bRNywAebMqWK9sHW1HLn8p0jbu9VQkXAX1wlMyy0=
-To:     NeilBrown <neilb@suse.de>, axboe@kernel.dk, neilb@suse.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        s3t@synology.com, bingjingc@synology.com, cccheng@synology.com
-References: <1614741726-28074-1-git-send-email-edwardh@synology.com>
- <87zgyudgss.fsf@notabene.neil.brown.name>
-From:   Edward Hsieh <edwardh@synology.com>
-Message-ID: <fb8620bf-f4e9-5787-ab79-6e0a5d79d26d@synology.com>
-Date:   Fri, 23 Apr 2021 16:04:49 +0800
+        id S230125AbhDWIqh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Apr 2021 04:46:37 -0400
+Received: from frasgout.his.huawei.com ([185.176.79.56]:2911 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230007AbhDWIqh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 23 Apr 2021 04:46:37 -0400
+Received: from fraeml734-chm.china.huawei.com (unknown [172.18.147.226])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4FRSKl02bdz77b2F;
+        Fri, 23 Apr 2021 16:35:39 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml734-chm.china.huawei.com (10.206.15.215) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Fri, 23 Apr 2021 10:45:58 +0200
+Received: from [10.47.95.78] (10.47.95.78) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.2; Fri, 23 Apr
+ 2021 09:45:57 +0100
+Subject: Re: [bug report] shared tags causes IO hang and performance drop
+To:     Ming Lei <ming.lei@redhat.com>
+CC:     Kashyap Desai <kashyap.desai@broadcom.com>,
+        <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Douglas Gilbert <dgilbert@interlog.com>
+References: <YHaez6iN2HHYxYOh@T590>
+ <9a6145a5-e6ac-3d33-b52a-0823bfc3b864@huawei.com>
+ <cb326d404c6e0785d03a7dfadc42832c@mail.gmail.com> <YHbOOfGNHwO4SMS7@T590>
+ <87ceccf2-287b-9bd1-899a-f15026c9e65b@huawei.com> <YHe3M62agQET6o6O@T590>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <0c85fe52-ebc7-68b3-2dbe-dfad5d604346@huawei.com>
+Date:   Fri, 23 Apr 2021 09:43:09 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-In-Reply-To: <87zgyudgss.fsf@notabene.neil.brown.name>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <YHe3M62agQET6o6O@T590>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Synology-MCP-Status: no
-X-Synology-Spam-Flag: no
-X-Synology-Spam-Status: score=0, required 6, WHITELIST_FROM_ADDRESS 0
-X-Synology-Virus-Status: no
+X-Originating-IP: [10.47.95.78]
+X-ClientProxiedBy: lhreml748-chm.china.huawei.com (10.201.108.198) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/23/2021 5:22 AM, NeilBrown wrote:
-> On Wed, Mar 03 2021, edwardh wrote:
-> 
->> From: Edward Hsieh <edwardh@synology.com>
->>
->> For chained bio, trace_block_bio_complete in bio_endio is currently called
->> only by the parent bio once upon all chained bio completed.
->> However, the sector and size for the parent bio are modified in bio_split.
->> Therefore, the size and sector of the complete events might not match the
->> queue events in blktrace.
->>
->> The original fix of bio completion trace <fbbaf700e7b1> ("block: trace
->> completion of all bios.") wants multiple complete events to correspond
->> to one queue event but missed this.
->>
->> md/raid5 read with bio cross chunks can reproduce this issue.
->>
->> To fix, move trace completion into the loop for every chained bio to call.
-> 
-> Thanks.  I think this is correct as far as tracing goes.
-> However the code still looks a bit odd.
-> 
-> The comment for the handling of bio_chain_endio suggests that the *only*
-> purpose for that is to avoid deep recursion.  That suggests it should be
-> at the end of the function.
-> As it is blk_throtl_bio_endio() and bio_unint() are only called on the
-> last bio in a chain.
-> That seems wrong.
-> 
-> I'd be more comfortable if the patch moved the bio_chain_endio()
-> handling to the end, after all of that.
-> So the function would end.
-> 
-> if (bio->bi_end_io == bio_chain_endio) {
->     bio = __bio_chain_endio(bio);
->     goto again;
-> } else if (bio->bi_end_io)
->     bio->bi_end_io(bio);
-> 
-> Jens:  can you see any reason why that functions must only be called on
-> the last bio in the chain?
-> 
-> Thanks,
-> NeilBrown
+On 15/04/2021 04:46, Ming Lei wrote:
+>> CPU util			IOPs
+>> mq-deadline	usr=21.72%, sys=44.18%,		423K
+>> none		usr=23.15%, sys=74.01%		450K
+> Today I re-run the scsi_debug test on two server hardwares(32cores, dual
+> numa nodes), and the CPU utilization issue can be reproduced, follow
+> the test result:
 > 
 
-Hi Neil and Jens,
+I haven't forgotten about this.
 
- From the commit message, bio_uninit is put here for bio allocated in 
-special ways (e.g., on stack), that will not be release by bio_free. For 
-chained bio, __bio_chain_endio invokes bio_put and release the 
-resources, so it seems that we don't need to call bio_uninit for chained 
-bio.
+I finally got your .config working in x86 qemu with only a 4-CPU system.
 
-The blk_throtl_bio_endio is used to update the latency for the throttle 
-group. I think the latency should only be updated after the whole bio is 
-finished?
+> 1) randread test on ibm-x3850x6[*] with deadline
+> 
+>                |IOPS    | FIO CPU util
+> ------------------------------------------------
+> hosttags      | 94k    | usr=1.13%, sys=14.75%
+> ------------------------------------------------
+> non hosttags  | 124k   | usr=1.12%, sys=10.65%,
+> 
 
-To make sense for the "tail call optimization" in the comment, I'll 
-suggest to wrap the whole statement with an else. What do you think?
+Getting these results for mq-deadline:
 
-if (bio->bi_end_io == bio_chain_endio) {
-	bio = __bio_chain_endio(bio);
-	goto again;
-} else {
-	blk_throtl_bio_endio(bio);
-	/* release cgroup info */
-	bio_uninit(bio);
-	if (bio->bi_end_io)
-		bio->bi_end_io(bio);
-}
+hosttags
+100K cpu 1.52 4.47
+
+non-hosttags
+109K cpu 1.74 5.49
+
+So I still don't see the same CPU usage increase for hosttags.
+
+But throughput is down, so at least I can check on that...
+
+> 
+> 2) randread test on ibm-x3850x6[*] with none
+>                |IOPS    | FIO CPU util
+> ------------------------------------------------
+> hosttags      | 120k   | usr=0.89%, sys=6.55%
+> ------------------------------------------------
+> non hosttags  | 121k   | usr=1.07%, sys=7.35%
+> ------------------------------------------------
+> 
+
+Here I get:
+hosttags
+113K cpu 2.04 5.83
+
+non-hosttags
+108K cpu 1.71 5.05
 
 Thanks,
-Edward Hsieh
+John
+
+
+
+>   *:
+>   	- that is the machine Yanhui reported VM cpu utilization increased by 20%
+> 	- kernel: latest linus tree(v5.12-rc7, commit: 7f75285ca57)
+> 	- also run same test on another 32cores machine, IOPS drop isn't
+> 	  observed, but CPU utilization is increased obviously
+> 
+> 3) test script
+> #/bin/bash
+> 
+> run_fio() {
+> 	RTIME=$1
+> 	JOBS=$2
+> 	DEVS=$3
+> 	BS=$4
+> 
+> 	QD=64
+> 	BATCH=16
+> 
+> 	fio --bs=$BS --ioengine=libaio \
+> 		--iodepth=$QD \
+> 	    --iodepth_batch_submit=$BATCH \
+> 		--iodepth_batch_complete_min=$BATCH \
+> 		--filename=$DEVS \
+> 		--direct=1 --runtime=$RTIME --numjobs=$JOBS --rw=randread \
+> 		--name=test --group_reporting
+> }
+> 
+> SCHED=$1
+> 
+> NRQS=`getconf _NPROCESSORS_ONLN`
+> 
+> rmmod scsi_debug
+> modprobe scsi_debug host_max_queue=128 submit_queues=$NRQS virtual_gb=256
+> sleep 2
+> DEV=`lsscsi | grep scsi_debug | awk '{print $6}'`
+> echo $SCHED >/sys/block/`basename $DEV`/queue/scheduler
+> echo 128 >/sys/block/`basename $DEV`/device/queue_depth
+> run_fio 20 16 $DEV 8K
+> 
+> 
+> rmmod scsi_debug
+> modprobe scsi_debug max_queue=128 submit_queues=1 virtual_gb=256
+> sleep 2
+> DEV=`lsscsi | grep scsi_debug | awk '{print $6}'`
+> echo $SCHED >/sys/block/`basename $DEV`/queue/scheduler
+> echo 128 >/sys/block/`basename $DEV`/device/queue_depth
+> run_fio 20 16 $DEV 8k
+
