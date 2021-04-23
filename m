@@ -7,51 +7,50 @@ X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1207C433B4
-	for <linux-block@archiver.kernel.org>; Fri, 23 Apr 2021 20:00:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A892DC433B4
+	for <linux-block@archiver.kernel.org>; Fri, 23 Apr 2021 20:01:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8F8DD61452
-	for <linux-block@archiver.kernel.org>; Fri, 23 Apr 2021 20:00:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6FAFD6144A
+	for <linux-block@archiver.kernel.org>; Fri, 23 Apr 2021 20:01:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243797AbhDWUBE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Apr 2021 16:01:04 -0400
-Received: from mail-pl1-f175.google.com ([209.85.214.175]:36520 "EHLO
-        mail-pl1-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230028AbhDWUBC (ORCPT
+        id S231337AbhDWUBy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Apr 2021 16:01:54 -0400
+Received: from mail-pf1-f180.google.com ([209.85.210.180]:33752 "EHLO
+        mail-pf1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230028AbhDWUBx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Apr 2021 16:01:02 -0400
-Received: by mail-pl1-f175.google.com with SMTP id g16so8891287plq.3
-        for <linux-block@vger.kernel.org>; Fri, 23 Apr 2021 13:00:25 -0700 (PDT)
+        Fri, 23 Apr 2021 16:01:53 -0400
+Received: by mail-pf1-f180.google.com with SMTP id h11so3725557pfn.0
+        for <linux-block@vger.kernel.org>; Fri, 23 Apr 2021 13:01:16 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=96GSoPoAS6WElItgBd52a15eEHpxNMWd4HWaUvxWQvo=;
-        b=TjJkZYemeXtXk6Rl4+mchnN/y2IoTNLQ9D2Wwz9Y3wwzJ2LArleNUq8VRnEx+oqnjf
-         qkWUDBJRb+Kk4EPvmhrfqoBua3cTKs4SEhLsmzvLFkZ3RClBb1DsE9cEipR/E05+n2Tg
-         RAuM/eodNeNth1qGiNKVBf5c091Xftqm/mNxdruHpKJRJ7Ik8GKV5xu3Wql8Ctbl7Feh
-         vfXahHgco6Uy1VjOP6TYknnSM8icFCE20f9ItyvwxA6TtMcVBFIccIp65yZz34/Irdc+
-         imunHfm7lEVmfATSkyf3Xxi7WiXHTVftA29hiooRiWNnzi4yqgRwUl0gAyJuvOZvdnsY
-         DKHw==
-X-Gm-Message-State: AOAM533T/WKpZ/HJZteF/0WWt6wZz0Y88s8GnS7hXeOhQsLAxY2Q3jNt
-        MwK36sFGT78G26qJ9rXSSq7/j2u5PI0=
-X-Google-Smtp-Source: ABdhPJx86qD7ZeWC91pl60zYiUg3RLSKiyPRCjqGVPuZerfjw0sEBfy+TGIwdpj9Z58zRgtrhYoBrA==
-X-Received: by 2002:a17:90a:9503:: with SMTP id t3mr6175899pjo.220.1619208024507;
-        Fri, 23 Apr 2021 13:00:24 -0700 (PDT)
+        bh=65ztGkUjmMwJn+e+QOQva4w/D+JwPNVGsneM6eljFAI=;
+        b=KP19ek7mhSMJ6sd+7v+yU1CH30z1CaGt9VXCjxMFrGIfbrouHZUIhNvLeSx6Ky2107
+         aNvyEdkYMiyTrXj3ohg5THdkU0LIskWskaBtHbWf6QsIwQ6tFPOakvI+2UiLAAfdqrBa
+         sd1nAHbitWYdrnSo5O4trKROlOtalMFu11dqfG4VlP0Z1LZOz2ETzesnUDz3QsuMEGTg
+         g0FyXTzChNKOBWxG60sWgiTVwfbxURKqInpp1c27GC6o7kVVv8wMdTSjLDIZ1GQPDKoO
+         ODl9pSUdmFqSm404JDA9Vvt88kyLkRNvRkeBPSom9UJ4ifYZNs5MxtBI5Zd7dgmqO34S
+         c0Iw==
+X-Gm-Message-State: AOAM530OmJHgQ52eshwXP4TjxCFm3D7NFEe6QCxihp4cq5v8di6pqpag
+        gJfLKEGCzRT4Tkb8ondX9p86qhNOWtU=
+X-Google-Smtp-Source: ABdhPJy8cG5EfKGeIZwM6SKIfiPS5CAUi9EKzRv6HJOIx3gj+jeImxckpmmvvu7gkRbbTM3qyO6VRA==
+X-Received: by 2002:aa7:88c6:0:b029:250:bf78:a4a3 with SMTP id k6-20020aa788c60000b0290250bf78a4a3mr5270599pff.70.1619208076485;
+        Fri, 23 Apr 2021 13:01:16 -0700 (PDT)
 Received: from asus.hsd1.ca.comcast.net ([2601:647:4000:d7:a976:f332:ee26:584f])
-        by smtp.gmail.com with ESMTPSA id j123sm5427082pfg.111.2021.04.23.13.00.23
+        by smtp.gmail.com with ESMTPSA id m7sm5502129pfd.52.2021.04.23.13.01.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Apr 2021 13:00:23 -0700 (PDT)
+        Fri, 23 Apr 2021 13:01:15 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Bart Van Assche <bvanassche@acm.org>,
-        Ming Lei <ming.lei@redhat.com>,
-        Changheun Lee <nanich.lee@samsung.com>,
-        Jaegeuk Kim <jaegeuk@kernel.org>
-Subject: [PATCH] block: Fix bio_max_size()
-Date:   Fri, 23 Apr 2021 13:00:17 -0700
-Message-Id: <20210423200017.18308-1-bvanassche@acm.org>
+        Ming Lei <ming.lei@redhat.com>, Hannes Reinecke <hare@suse.de>,
+        John Garry <john.garry@huawei.com>
+Subject: [PATCH] blk-mq: Fix two racy hctx->tags->rqs[] assignments
+Date:   Fri, 23 Apr 2021 13:01:09 -0700
+Message-Id: <20210423200109.18430-1-bvanassche@acm.org>
 X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -59,61 +58,48 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The SCSI core sends the REPORT LUNS and INQUIRY commands before calling
-device_add_disk(). This patch prevents that bio_max_size() triggers the
-following kernel crash during a SCSI LUN scan:
+hctx->tags->rqs[] must be cleared before releasing a request tag because
+otherwise clearing that pointer races with the following assignment in
+blk_mq_get_driver_tag():
 
-BUG: KASAN: null-ptr-deref in bio_add_hw_page+0xa6/0x310
-Read of size 8 at addr 00000000000005a8 by task kworker/u16:0/7
+	rcu_assign_pointer(hctx->tags->rqs[rq->tag], rq);
 
-CPU: 0 PID: 7 Comm: kworker/u16:0 Not tainted 5.12.0-rc8-dbg+ #18
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.14.0-0-g155821a-rebuilt.opensuse.org 04/01/2014
-Workqueue: events_unbound async_run_entry_fn
-Call Trace:
- show_stack+0x52/0x58
- dump_stack+0x9d/0xcf
- kasan_report.cold+0x4b/0x50
- __asan_load8+0x69/0x90
- bio_add_hw_page+0xa6/0x310
- bio_add_pc_page+0xaa/0xe0
- bio_map_kern+0xdc/0x1a0
- blk_rq_map_kern+0xcd/0x2d0
- __scsi_execute+0x9a/0x290 [scsi_mod]
- scsi_probe_lun.constprop.0+0x17c/0x660 [scsi_mod]
- scsi_probe_and_add_lun+0x178/0x750 [scsi_mod]
- __scsi_add_device+0x18c/0x1a0 [scsi_mod]
- ata_scsi_scan_host+0xe5/0x260 [libata]
- async_port_probe+0x94/0xb0 [libata]
- async_run_entry_fn+0x7d/0x2d0
- process_one_work+0x582/0xac0
- worker_thread+0x8f/0x5a0
- kthread+0x222/0x250
- ret_from_fork+0x1f/0x30
-
+Reported-by: Ming Lei <ming.lei@redhat.com>
 Cc: Christoph Hellwig <hch@lst.de>
 Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Changheun Lee <nanich.lee@samsung.com>
-Cc: Jaegeuk Kim <jaegeuk@kernel.org>
-Fixes: 15050b63567c ("bio: limit bio max size")
+Cc: Hannes Reinecke <hare@suse.de>
+Cc: John Garry <john.garry@huawei.com>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/bio.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ block/blk-mq.c | 2 +-
+ block/blk-mq.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index d718c63b3533..a8879ee6c59a 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -257,9 +257,10 @@ EXPORT_SYMBOL(bio_init);
- 
- unsigned int bio_max_size(struct bio *bio)
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 06d204796c43..1ffaab7c9b11 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -501,8 +501,8 @@ static void __blk_mq_free_request(struct request *rq)
+ 	blk_pm_mark_last_busy(rq);
+ 	rq->mq_hctx = NULL;
+ 	if (rq->tag != BLK_MQ_NO_TAG) {
+-		blk_mq_put_tag(hctx->tags, ctx, rq->tag);
+ 		rcu_assign_pointer(hctx->tags->rqs[rq->tag], NULL);
++		blk_mq_put_tag(hctx->tags, ctx, rq->tag);
+ 	}
+ 	if (sched_tag != BLK_MQ_NO_TAG)
+ 		blk_mq_put_tag(hctx->sched_tags, ctx, sched_tag);
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 9ccb1818303b..f73cd659eb81 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -225,8 +225,8 @@ static inline int __blk_mq_active_requests(struct blk_mq_hw_ctx *hctx)
+ static inline void __blk_mq_put_driver_tag(struct blk_mq_hw_ctx *hctx,
+ 					   struct request *rq)
  {
--	struct request_queue *q = bio->bi_bdev->bd_disk->queue;
-+	if (!bio->bi_bdev)
-+		return UINT_MAX;
+-	blk_mq_put_tag(hctx->tags, rq->mq_ctx, rq->tag);
+ 	rcu_assign_pointer(hctx->tags->rqs[rq->tag], NULL);
++	blk_mq_put_tag(hctx->tags, rq->mq_ctx, rq->tag);
+ 	rq->tag = BLK_MQ_NO_TAG;
  
--	return q->limits.bio_max_bytes;
-+	return bio->bi_bdev->bd_disk->queue->limits.bio_max_bytes;
- }
- 
- /**
+ 	if (rq->rq_flags & RQF_MQ_INFLIGHT) {
