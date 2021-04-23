@@ -2,150 +2,137 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCE8CC43460
-	for <linux-block@archiver.kernel.org>; Fri, 23 Apr 2021 14:13:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6D09C433B4
+	for <linux-block@archiver.kernel.org>; Fri, 23 Apr 2021 14:38:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8D03C61460
-	for <linux-block@archiver.kernel.org>; Fri, 23 Apr 2021 14:13:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9E6DF6144D
+	for <linux-block@archiver.kernel.org>; Fri, 23 Apr 2021 14:38:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239066AbhDWOOH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Apr 2021 10:14:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38536 "EHLO
+        id S231169AbhDWOjD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Apr 2021 10:39:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44046 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231362AbhDWOOE (ORCPT
+        with ESMTP id S231478AbhDWOjC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Apr 2021 10:14:04 -0400
-Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A2DAC061574;
-        Fri, 23 Apr 2021 07:13:27 -0700 (PDT)
-Received: by mail-wm1-x331.google.com with SMTP id y204so24724629wmg.2;
-        Fri, 23 Apr 2021 07:13:27 -0700 (PDT)
+        Fri, 23 Apr 2021 10:39:02 -0400
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83725C06174A
+        for <linux-block@vger.kernel.org>; Fri, 23 Apr 2021 07:38:25 -0700 (PDT)
+Received: by mail-pl1-x632.google.com with SMTP id 20so21367985pll.7
+        for <linux-block@vger.kernel.org>; Fri, 23 Apr 2021 07:38:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=+xcvu/qUqC379ECYMecXBCghxgPo0LkCVkt2Sha9gI0=;
-        b=gQgwCnTzceuYX9YXXn/QOmHMV11y2gRdZn+SaqQAqce3IYcX2Wu6DPsa2XTyXMwA8c
-         Vcs5xo5CfyzTiBEG8jBLci4gkAg46lPW9wOna7DHauPVw3xZ76hVSl8aOT2RQITKOgag
-         SJ3JbPnHe9P+PWd+SODYhml/XsWppDUqCEI64TzAToDrmy9IB1D5Oi9nQanNpAzb6LLu
-         9vOF32avT/iwL3ShCQdjSqnrC5tBgNGMHi9dhlHorSlIX4yLXMvjGkb+JbIZW/I0L9UD
-         n0nou87Fi8LkD1W1jeng96D6VgE+9vAvuhe2nYqHoqTQBnPWkBDqqBhFRZdjVr5jCwKj
-         2wbQ==
+        bh=jZFgm5N6/Y10vZ8zzUrUrLAgBX0ZnJqU/nldAdzP3yo=;
+        b=H/nmXg8/E0ixgUmYWTeY4T7YAZm8nJu/6lIcOOdwl6T70IErQa+C+/nmEvciFrZODG
+         AsJ4tFpgqQ0PTC2/cmPf/j1lvnz9r0WpuqObAFthhmfELinTytl4QuQNEyuwUGjvWA/0
+         nOl/T3edHRIK2QAMCfIfwK8Vd1o0YrK9nBFdK4lHBYD7qwdS5Yi9SxWX+JZXJaU33uqG
+         I7mmdZMntHU3YYNNDVftRW88zuQlsa0R7sLuEdNNQodd5OsvPDyri0OPxpnx/xfEq+xL
+         oUvlsRtVT5woum7/h3hOovTdLgRYFbDYkrFKHhvv10+VmkEV83Jtpw17XVFnDrbpy/ck
+         wr3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=+xcvu/qUqC379ECYMecXBCghxgPo0LkCVkt2Sha9gI0=;
-        b=Avu4Hly2pnTL4//HJpe/jOoxGDmBauAJvgyvy/x3mLkeoo6WLvpuz1MU30+BmuHkE/
-         zV9yADX5exXcrseMjZ+cCliub3Eva02iMv0IkzvDi34AaZIiqim1qN3rEugZ+BIqa8md
-         +JWmnfKWV+vVvRGn2LdRlImS0CEM9acy+IlCrGWicA6cVVe11RWcy7lKWLvTjQWtjAcn
-         qZAIWay9k4ieLh08Gahe0CawPsijtG2XoxkVJ7CtK7Xoq5xTXpkMnJhfphFagAFjh/Hg
-         Rs1VjZtCD17yRZcCwPzvSE+dYaCDhLjNlEIxhh4acCOYqTwdPEskMNtPHZcN4vKLlsZK
-         T2VA==
-X-Gm-Message-State: AOAM5325oqdvhBYv/jB72PxfZ6vA2uhq1yMdzYAC7oGRJ6ffG6U/3E/b
-        SKTgq80CdpNtS+lwBgXbN3rapsYu7iY6LA==
-X-Google-Smtp-Source: ABdhPJwGYKqIZGrnrk6Gs4g9YAaDa7qDHh64cpdd7i8Xm82tWJs9djKmU8ZbylX1l5Vqc6GiYhAgWg==
-X-Received: by 2002:a05:600c:6d4:: with SMTP id b20mr5806496wmn.99.1619187206018;
-        Fri, 23 Apr 2021 07:13:26 -0700 (PDT)
-Received: from [192.168.8.197] ([148.252.128.225])
-        by smtp.gmail.com with ESMTPSA id j12sm9135705wro.29.2021.04.23.07.13.25
+        bh=jZFgm5N6/Y10vZ8zzUrUrLAgBX0ZnJqU/nldAdzP3yo=;
+        b=mk4ZN63OiKmvzQbZogNrWLHKdW4YRoG3Llhp8NWulUpjGbEulvw9UJ2vYc7uz8h5tK
+         G7Wgc98isuW32MxpB5L+UNYxlUCz/SGqqfBDtR5AmYLxYEKFJCCqkZIHLESI8hk05e5/
+         5ai6JJBl8lyPDIdY3KOGe8ATcNr3qMc/5mihgy6Q6eExxxX/QzYNMRl+YbHpoPTW5Rdq
+         tsFdbEd+9u9KWypq7ymAw33wSFfYnEAdUziLIjFVmGG3RaXwQQx72pPAwSTVCusTuAf2
+         8I5BZa+H7kfcCIpOUc3fSzuK0NhwJNRCPiNkeDh9PdISXBKuiuorRhmTcydy6z+Q4vvu
+         QfcQ==
+X-Gm-Message-State: AOAM531HnA073wJ1OhB7zhxWxdzemWwg1DUVw8aLAh/Gd8reHpuwxA7r
+        KJ63sWkD/ciWe5Y0D2Y7sxx81g==
+X-Google-Smtp-Source: ABdhPJyApPsxtWTYYWCXzKz557925Zf6L63RYJC9BWvrJOHfmAHWI1srr7XxQ0QJxLF8UJlCjNCjtA==
+X-Received: by 2002:a17:902:c14d:b029:ec:acd9:d5a0 with SMTP id 13-20020a170902c14db02900ecacd9d5a0mr4006024plj.60.1619188704858;
+        Fri, 23 Apr 2021 07:38:24 -0700 (PDT)
+Received: from ?IPv6:2600:380:497c:70df:6bb6:caf7:996c:9229? ([2600:380:497c:70df:6bb6:caf7:996c:9229])
+        by smtp.gmail.com with ESMTPSA id ms9sm7952480pjb.32.2021.04.23.07.38.22
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 23 Apr 2021 07:13:25 -0700 (PDT)
-Subject: Re: [PATCH liburing] examples/ucontext-cp.c: cope with variable
- SIGSTKSZ
-To:     Stefano Garzarella <sgarzare@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>
-Cc:     io-uring@vger.kernel.org, "H.J. Lu" <hjl.tools@gmail.com>,
-        libc-alpha@sourceware.org, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org
-References: <20210413150319.764600-1-stefanha@redhat.com>
- <YH2VE2RdcH0ISvxH@stefanha-x1.localdomain>
- <CAMe9rOpK08CJ5TdQ1fZJ2sGUVjHqoTHS2kT8EzDEejuodu8Ksg@mail.gmail.com>
- <YIFJDgno7deI5syK@stefanha-x1.localdomain>
- <20210422142245.evlxjvfw3emh7ivw@steredhat>
-From:   Pavel Begunkov <asml.silence@gmail.com>
-Message-ID: <89aaba8e-9a39-5269-201f-83d1f96e1ec0@gmail.com>
-Date:   Fri, 23 Apr 2021 15:13:21 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.9.1
+        Fri, 23 Apr 2021 07:38:24 -0700 (PDT)
+Subject: Re: [PATCH v8] bio: limit bio max size
+To:     Changheun Lee <nanich.lee@samsung.com>, bvanassche@acm.org,
+        Johannes.Thumshirn@wdc.com, asml.silence@gmail.com,
+        damien.lemoal@wdc.com, gregkh@linuxfoundation.org,
+        hch@infradead.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, ming.lei@redhat.com, osandov@fb.com,
+        patchwork-bot@kernel.org, tj@kernel.org, tom.leiming@gmail.com
+Cc:     jisoo2146.oh@samsung.com, junho89.kim@samsung.com,
+        mj0123.lee@samsung.com, seunghwan.hyun@samsung.com,
+        sookwan7.kim@samsung.com, woosung2.lee@samsung.com,
+        yt0928.kim@samsung.com
+References: <CGME20210421100544epcas1p13c2c86e84102f0955dd591f72e45756a@epcas1p1.samsung.com>
+ <20210421094745.29660-1-nanich.lee@samsung.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <2f881b00-e434-d713-8cfc-18162a16f7f7@kernel.dk>
+Date:   Fri, 23 Apr 2021 08:38:25 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210422142245.evlxjvfw3emh7ivw@steredhat>
+In-Reply-To: <20210421094745.29660-1-nanich.lee@samsung.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/22/21 3:22 PM, Stefano Garzarella wrote:
-> +Cc: io-uring@vger.kernel.org
-> +Cc: Pavel Begunkov <asml.silence@gmail.com>
+On 4/21/21 3:47 AM, Changheun Lee wrote:
+> bio size can grow up to 4GB when muli-page bvec is enabled.
+> but sometimes it would lead to inefficient behaviors.
+> in case of large chunk direct I/O, - 32MB chunk read in user space -
+> all pages for 32MB would be merged to a bio structure if the pages
+> physical addresses are contiguous. it makes some delay to submit
+> until merge complete. bio max size should be limited to a proper size.
 > 
-> Original message: https://www.spinics.net/lists/linux-block/msg67077.html
+> When 32MB chunk read with direct I/O option is coming from userspace,
+> kernel behavior is below now in do_direct_IO() loop. it's timeline.
 > 
-> On Thu, Apr 22, 2021 at 10:59:42AM +0100, Stefan Hajnoczi wrote:
->> On Mon, Apr 19, 2021 at 11:38:07AM -0700, H.J. Lu wrote:
->>> On Mon, Apr 19, 2021 at 7:35 AM Stefan Hajnoczi <stefanha@redhat.com> wrote:
->>> >
->>> > On Tue, Apr 13, 2021 at 04:03:19PM +0100, Stefan Hajnoczi wrote:
->>> > > The size of C arrays at file scope must be constant. The following
->>> > > compiler error occurs with recent upstream glibc (2.33.9000):
->>> > >
->>> > >   CC ucontext-cp
->>> > >   ucontext-cp.c:31:23: error: variably modified ‘stack_buf’ at file scope
->>> > >   31 |         unsigned char stack_buf[SIGSTKSZ];
->>> > >      |                       ^~~~~~~~~
->>> > >   make[1]: *** [Makefile:26: ucontext-cp] Error 1
->>> > >
->>> > > The following glibc commit changed SIGSTKSZ from a constant value to a
->>> > > variable:
->>> > >
->>> > >   commit 6c57d320484988e87e446e2e60ce42816bf51d53
->>> > >   Author: H.J. Lu <hjl.tools@gmail.com>
->>> > >   Date:   Mon Feb 1 11:00:38 2021 -0800
->>> > >
->>> > >     sysconf: Add _SC_MINSIGSTKSZ/_SC_SIGSTKSZ [BZ #20305]
->>> > >   ...
->>> > >   +# define SIGSTKSZ sysconf (_SC_SIGSTKSZ)
->>> > >
->>> > > Allocate the stack buffer explicitly to avoid declaring an array at file
->>> > > scope.
->>> > >
->>> > > Cc: H.J. Lu <hjl.tools@gmail.com>
->>> > > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
->>> > > ---
->>> > > Perhaps the glibc change needs to be revised before releasing glibc 2.34
->>> > > since it might break applications. That's up to the glibc folks. It
->>> > > doesn't hurt for liburing to take a safer approach that copes with the
->>> > > SIGSTKSZ change in any case.
->>> >
->>> > glibc folks, please take a look. The commit referenced above broke
->>> > compilation of liburing's tests. It's possible that applications will
->>> > hit similar issues. Can you check whether the SIGSTKSZ change needs to
->>> > be reverted/fixed before releasing glibc 2.34?
->>> >
->>>
->>> It won't be changed for glibc 2.34.
->>
->> Thanks for the response, H.J. and Paul.
->>
->> In that case liburing needs this patch.
->>
+>  | bio merge for 32MB. total 8,192 pages are merged.
+>  | total elapsed time is over 2ms.
+>  |------------------ ... ----------------------->|
+>                                                  | 8,192 pages merged a bio.
+>                                                  | at this time, first bio submit is done.
+>                                                  | 1 bio is split to 32 read request and issue.
+>                                                  |--------------->
+>                                                   |--------------->
+>                                                    |--------------->
+>                                                               ......
+>                                                                    |--------------->
+>                                                                     |--------------->|
+>                           total 19ms elapsed to complete 32MB read done from device. |
 > 
-> I think so:
+> If bio max size is limited with 1MB, behavior is changed below.
 > 
-> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+>  | bio merge for 1MB. 256 pages are merged for each bio.
+>  | total 32 bio will be made.
+>  | total elapsed time is over 2ms. it's same.
+>  | but, first bio submit timing is fast. about 100us.
+>  |--->|--->|--->|---> ... -->|--->|--->|--->|--->|
+>       | 256 pages merged a bio.
+>       | at this time, first bio submit is done.
+>       | and 1 read request is issued for 1 bio.
+>       |--------------->
+>            |--------------->
+>                 |--------------->
+>                                       ......
+>                                                  |--------------->
+>                                                   |--------------->|
+>         total 17ms elapsed to complete 32MB read done from device. |
+> 
+> As a result, read request issue timing is faster if bio max size is limited.
+> Current kernel behavior with multipage bvec, super large bio can be created.
+> And it lead to delay first I/O request issue.
 
-Right, and there are already people complaining
-https://github.com/axboe/liburing/issues/320
-
+Applied, thanks.
 
 -- 
-Pavel Begunkov
+Jens Axboe
+
