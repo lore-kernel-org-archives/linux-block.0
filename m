@@ -2,164 +2,153 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABD83C433ED
-	for <linux-block@archiver.kernel.org>; Fri, 23 Apr 2021 08:46:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAD3FC433B4
+	for <linux-block@archiver.kernel.org>; Fri, 23 Apr 2021 09:45:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 87DAA61425
-	for <linux-block@archiver.kernel.org>; Fri, 23 Apr 2021 08:46:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 987186145A
+	for <linux-block@archiver.kernel.org>; Fri, 23 Apr 2021 09:45:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230125AbhDWIqh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Apr 2021 04:46:37 -0400
-Received: from frasgout.his.huawei.com ([185.176.79.56]:2911 "EHLO
-        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230007AbhDWIqh (ORCPT
+        id S241737AbhDWJps (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Apr 2021 05:45:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35934 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230418AbhDWJpr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Apr 2021 04:46:37 -0400
-Received: from fraeml734-chm.china.huawei.com (unknown [172.18.147.226])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4FRSKl02bdz77b2F;
-        Fri, 23 Apr 2021 16:35:39 +0800 (CST)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- fraeml734-chm.china.huawei.com (10.206.15.215) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Fri, 23 Apr 2021 10:45:58 +0200
-Received: from [10.47.95.78] (10.47.95.78) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.2; Fri, 23 Apr
- 2021 09:45:57 +0100
-Subject: Re: [bug report] shared tags causes IO hang and performance drop
-To:     Ming Lei <ming.lei@redhat.com>
-CC:     Kashyap Desai <kashyap.desai@broadcom.com>,
-        <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Douglas Gilbert <dgilbert@interlog.com>
-References: <YHaez6iN2HHYxYOh@T590>
- <9a6145a5-e6ac-3d33-b52a-0823bfc3b864@huawei.com>
- <cb326d404c6e0785d03a7dfadc42832c@mail.gmail.com> <YHbOOfGNHwO4SMS7@T590>
- <87ceccf2-287b-9bd1-899a-f15026c9e65b@huawei.com> <YHe3M62agQET6o6O@T590>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <0c85fe52-ebc7-68b3-2dbe-dfad5d604346@huawei.com>
-Date:   Fri, 23 Apr 2021 09:43:09 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
+        Fri, 23 Apr 2021 05:45:47 -0400
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6748C061756
+        for <linux-block@vger.kernel.org>; Fri, 23 Apr 2021 02:45:10 -0700 (PDT)
+Received: by mail-pf1-x434.google.com with SMTP id i190so33716358pfc.12
+        for <linux-block@vger.kernel.org>; Fri, 23 Apr 2021 02:45:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=21FONuv9wf/TBhMMknh0pxEkH4v3trVm0zK1vzeowo0=;
+        b=oV4cV4Jfo4lrnkTRW2sRKtuG05gpYFkk3Tt0jAzYkKRIU6A0Otu4LPSWAWNZ7ljbih
+         nEe+jjEcR1MNp3iRotAIhFB1xgkoZ5SXxXmJ0hOV37p+F6BS/QsWvj+FjReLzTHUIpWP
+         VUmqswJDUVMT6Qyn3ZdJQ+4vd6CuOaot30d4S0PeT+kr38ZNsDXzrDuYW8qnhcpDxAgB
+         HBzV7ybbeC0kYiOYrvZ/fHnVoSTSlmWrQODt4fNAd/Vv8LR20P0L+ZgxhYE6Hvkv77gw
+         uK322bQ1bzVXjXx9PurRUGc38NozHe0R1KiYxIZ4C15TH37D8fUvM8iNAkc1pV5CFrfe
+         VpSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=21FONuv9wf/TBhMMknh0pxEkH4v3trVm0zK1vzeowo0=;
+        b=bEynHBjAVDyfoYb+Pj0jO0SPVIgcHAmHrh+vScfgi8In7bnEAv9T+DDAFa+bQX+dVR
+         2Zgyh28y9XXHrmGlvT/MVoFJaUJqoaYyoFkFfVUDocrNppZEMQ8/5agFwxEf4OS4/n9e
+         vs572kJlpE+opLWkFPL30VUBS7NH30rUgb6vgQSl6mc0WaqGoJKB5TZZCZF58g/4cPgn
+         4qVxC48Ouc8tsSRJxfWAfK9RN9mOyZ8u35gFukht+Yw/MjnkqPUfvMaVkO+OIC3wsIET
+         PmCCByo7F/rIqxYqFgV9T+SSXPP31bbp0SHShFx/LLJLSIy6NwRACZ2hyYrTcuKyk2Zo
+         K86w==
+X-Gm-Message-State: AOAM532TAEPHQhisznqe9hrUeqUjmjYPax0UOu9/GtMugeO9318K4utj
+        bOR1RnwtJ31OAxHIt/MeQ8Zhq9u/42rxOw==
+X-Google-Smtp-Source: ABdhPJy7gj088WmvtP2n6iaI5e7hW05Cqk/g+r4zf53cCy+6ANKYDf4b8Oa5ZEkt2EjBgQ2UKGBrlA==
+X-Received: by 2002:a62:1c0f:0:b029:25f:ba3c:9cc0 with SMTP id c15-20020a621c0f0000b029025fba3c9cc0mr2866796pfc.56.1619171110271;
+        Fri, 23 Apr 2021 02:45:10 -0700 (PDT)
+Received: from C02CV1DAMD6P.bytedance.net ([139.177.225.233])
+        by smtp.gmail.com with ESMTPSA id a6sm4510611pfh.135.2021.04.23.02.45.07
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 23 Apr 2021 02:45:09 -0700 (PDT)
+From:   Chengming Zhou <zhouchengming@bytedance.com>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        zhouchengming@bytedance.com, stable@vger.kernel.org
+Subject: [PATCH] blk-wbt: fix scale logic when disable wbt
+Date:   Fri, 23 Apr 2021 17:45:03 +0800
+Message-Id: <20210423094503.25733-1-zhouchengming@bytedance.com>
+X-Mailer: git-send-email 2.24.3 (Apple Git-128)
 MIME-Version: 1.0
-In-Reply-To: <YHe3M62agQET6o6O@T590>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.47.95.78]
-X-ClientProxiedBy: lhreml748-chm.china.huawei.com (10.201.108.198) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 15/04/2021 04:46, Ming Lei wrote:
->> CPU util			IOPs
->> mq-deadline	usr=21.72%, sys=44.18%,		423K
->> none		usr=23.15%, sys=74.01%		450K
-> Today I re-run the scsi_debug test on two server hardwares(32cores, dual
-> numa nodes), and the CPU utilization issue can be reproduced, follow
-> the test result:
-> 
+We encountered kernel crash when disable wbt through min_lat_nsec
+setting to zero, found the problem is the reset of wb_max to zero in
+calc_wb_limits() would break the normal scale logic, caused the
+scale_step value overflow and kernel crash. Below is the crash backtrace:
 
-I haven't forgotten about this.
+[43061417.487135] task: ffff9250828d6540 task.stack: ffffbc8b839f0000
+[43061417.487331] RIP: 0010:rwb_arm_timer+0x52/0x60
+[43061417.487472] RSP: 0000:ffff9250bfec3ea8 EFLAGS: 00010206
+[43061417.487646] RAX: 000000005f5e1000 RBX: ffff9250ab6113c0 RCX: 0000000000000000
+[43061417.487877] RDX: 0000000000000000 RSI: ffffffff9fe4a484 RDI: 000000005f5e1000
+[43061417.488109] RBP: 0000000000000100 R08: ffffffff00000000 R09: 00000000ffffffff
+[43061417.488343] R10: 0000000000000000 R11: ffffdc8b3fdcf938 R12: ffff9250a9324d90
+[43061417.488575] R13: ffffffff9f3583a0 R14: ffff9250a9324d80 R15: 0000000000000000
+[43061417.488808] FS:  00007f7aadbee700(0000) GS:ffff9250bfec0000(0000) knlGS:0000000000000000
+[43061417.489069] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[43061417.489258] CR2: 00007f43b7c809b8 CR3: 0000007e42994006 CR4: 00000000007606e0
+[43061417.489490] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+[43061417.489722] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+[43061417.489952] PKRU: 55555554
+[43061417.490046] Call Trace:
+[43061417.490136]  <IRQ>
+[43061417.490206]  call_timer_fn+0x2e/0x130
+[43061417.490328]  run_timer_softirq+0x1d4/0x420
+[43061417.490466]  ? timerqueue_add+0x54/0x80
+[43061417.490593]  ? enqueue_hrtimer+0x38/0x80
+[43061417.490722]  __do_softirq+0x108/0x2a9
+[43061417.490846]  irq_exit+0xc2/0xd0
+[43061417.490953]  smp_apic_timer_interrupt+0x6c/0x120
+[43061417.491106]  apic_timer_interrupt+0x7d/0x90
+[43061417.491245]  </IRQ>
 
-I finally got your .config working in x86 qemu with only a 4-CPU system.
+Seen from the crash dump, the scale_step became a very big value and
+overflow to zero divisor in div_u64, so kernel crash happened.
 
-> 1) randread test on ibm-x3850x6[*] with deadline
-> 
->                |IOPS    | FIO CPU util
-> ------------------------------------------------
-> hosttags      | 94k    | usr=1.13%, sys=14.75%
-> ------------------------------------------------
-> non hosttags  | 124k   | usr=1.12%, sys=10.65%,
-> 
+Since wbt use wb_max == 1 and scaled_max flag as the scale min/max
+point, we only reset wb_normal and wb_background when set min_lat_nsec
+to zero, leave wb_max and scaled_max to be driven by the scale timer.
 
-Getting these results for mq-deadline:
+Higher version kernels than v4.18 include a code refactor patchset that
+split the scale up/down logic and calc_wb_limits(), so disable wbt by
+setting min_lat_nsec to zero will NOT affect the normal scale logic.
 
-hosttags
-100K cpu 1.52 4.47
+But we don't want to backport that patchset because of very big code
+changes, may introduce other problems. So just fix the crash bug in
+this patch.
 
-non-hosttags
-109K cpu 1.74 5.49
+Fixes: e34cbd307477 ("blk-wbt: add general throttling mechanism")
+Cc: <stable@vger.kernel.org> # 4.9.x
+Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
+---
+ block/blk-wbt.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
-So I still don't see the same CPU usage increase for hosttags.
-
-But throughput is down, so at least I can check on that...
-
-> 
-> 2) randread test on ibm-x3850x6[*] with none
->                |IOPS    | FIO CPU util
-> ------------------------------------------------
-> hosttags      | 120k   | usr=0.89%, sys=6.55%
-> ------------------------------------------------
-> non hosttags  | 121k   | usr=1.07%, sys=7.35%
-> ------------------------------------------------
-> 
-
-Here I get:
-hosttags
-113K cpu 2.04 5.83
-
-non-hosttags
-108K cpu 1.71 5.05
-
-Thanks,
-John
-
-
-
->   *:
->   	- that is the machine Yanhui reported VM cpu utilization increased by 20%
-> 	- kernel: latest linus tree(v5.12-rc7, commit: 7f75285ca57)
-> 	- also run same test on another 32cores machine, IOPS drop isn't
-> 	  observed, but CPU utilization is increased obviously
-> 
-> 3) test script
-> #/bin/bash
-> 
-> run_fio() {
-> 	RTIME=$1
-> 	JOBS=$2
-> 	DEVS=$3
-> 	BS=$4
-> 
-> 	QD=64
-> 	BATCH=16
-> 
-> 	fio --bs=$BS --ioengine=libaio \
-> 		--iodepth=$QD \
-> 	    --iodepth_batch_submit=$BATCH \
-> 		--iodepth_batch_complete_min=$BATCH \
-> 		--filename=$DEVS \
-> 		--direct=1 --runtime=$RTIME --numjobs=$JOBS --rw=randread \
-> 		--name=test --group_reporting
-> }
-> 
-> SCHED=$1
-> 
-> NRQS=`getconf _NPROCESSORS_ONLN`
-> 
-> rmmod scsi_debug
-> modprobe scsi_debug host_max_queue=128 submit_queues=$NRQS virtual_gb=256
-> sleep 2
-> DEV=`lsscsi | grep scsi_debug | awk '{print $6}'`
-> echo $SCHED >/sys/block/`basename $DEV`/queue/scheduler
-> echo 128 >/sys/block/`basename $DEV`/device/queue_depth
-> run_fio 20 16 $DEV 8K
-> 
-> 
-> rmmod scsi_debug
-> modprobe scsi_debug max_queue=128 submit_queues=1 virtual_gb=256
-> sleep 2
-> DEV=`lsscsi | grep scsi_debug | awk '{print $6}'`
-> echo $SCHED >/sys/block/`basename $DEV`/queue/scheduler
-> echo 128 >/sys/block/`basename $DEV`/device/queue_depth
-> run_fio 20 16 $DEV 8k
+diff --git a/block/blk-wbt.c b/block/blk-wbt.c
+index 5c105514bca7..24c84ee39029 100644
+--- a/block/blk-wbt.c
++++ b/block/blk-wbt.c
+@@ -194,11 +194,6 @@ static bool calc_wb_limits(struct rq_wb *rwb)
+ 	unsigned int depth;
+ 	bool ret = false;
+ 
+-	if (!rwb->min_lat_nsec) {
+-		rwb->wb_max = rwb->wb_normal = rwb->wb_background = 0;
+-		return false;
+-	}
+-
+ 	/*
+ 	 * For QD=1 devices, this is a special case. It's important for those
+ 	 * to have one request ready when one completes, so force a depth of
+@@ -244,6 +239,9 @@ static bool calc_wb_limits(struct rq_wb *rwb)
+ 		rwb->wb_background = (rwb->wb_max + 3) / 4;
+ 	}
+ 
++	if (!rwb->min_lat_nsec)
++		rwb->wb_normal = rwb->wb_background = 0;
++
+ 	return ret;
+ }
+ 
+-- 
+2.11.0
 
