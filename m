@@ -7,39 +7,39 @@ X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87696C43461
-	for <linux-block@archiver.kernel.org>; Fri, 23 Apr 2021 22:06:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B7C6C43470
+	for <linux-block@archiver.kernel.org>; Fri, 23 Apr 2021 22:06:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 65ACB61468
-	for <linux-block@archiver.kernel.org>; Fri, 23 Apr 2021 22:06:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4D94E61468
+	for <linux-block@archiver.kernel.org>; Fri, 23 Apr 2021 22:06:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232429AbhDWWGm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Apr 2021 18:06:42 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50380 "EHLO mail.kernel.org"
+        id S232657AbhDWWGn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Apr 2021 18:06:43 -0400
+Received: from mail.kernel.org ([198.145.29.99]:50340 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232657AbhDWWGl (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        id S231218AbhDWWGl (ORCPT <rfc822;linux-block@vger.kernel.org>);
         Fri, 23 Apr 2021 18:06:41 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 8B8B76146D;
-        Fri, 23 Apr 2021 22:06:03 +0000 (UTC)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 6639F61467;
+        Fri, 23 Apr 2021 22:06:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1619215564;
-        bh=0DSvxqZxeybLVLkBKLwRn//YdD8ZMmnsCFzoyFW8puk=;
+        s=k20201202; t=1619215565;
+        bh=WC6okdkJnyksxo1ofAM6rL0O0NwmX0aGwFuZnSXTAUk=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=f/9fYTDlxoomU7IzKPtRk0iI/v55bCqtXtY3sIHGK/RSK9V5RbLpONaFwWIGP0LRO
-         1YGoHykmdvvMgX+lHgXohFPKSUjiPBu94KT9dIfHKwlO/SqJMkXOgezs4Fk0560ANa
-         FScoQCxc84cdSROmIJhYoCl1H+5VySfhnDnNFOY1y4CO+8fXMlL0V3vKuSF53acg9L
-         D35ChJ+HZDSp61wpQsyiCjeAlFaltSlULlyl/+czIA7T0do0ilW7MEAFEa4IOkcqCE
-         UV8RHe+a5faZhiOtxNdkbn5OrOr1ngeUxD7iLqClmOaELyRnw7oGRZV/eNV5IfHhx6
-         LLK7BSbYvn1Pw==
+        b=HdSfy/uIWAf1yIlih3WjihzORgyH4AwsLPzBK7QeJoK/uRkFwkygoWM/wgd9x+v3o
+         7xwuE8VHwYQikH4hzbJ6Dxov8sOqa1QrwYzH8tjBrKdchDKUp0k7W7UmhhXG4OOB3G
+         6zrnIF9qZG2viAmRd7u+mIWDZeHnRi5I0zhxlzpNlf2nyn4CEMfVnvu4GVR63RKY+4
+         h/mAFMn1WwdnRblVKflA8oNqnVwqqpaWkpIAN3KGNMX7Oz2XZlp4JSoqhiRC1f8q3L
+         +LBA5BRZuXd5Q/NZMrkcykUNEScGj8Bnro1/myHlT1nos92a2V/A/vJBkMD8WIbvqt
+         pplYWL47nb/Kg==
 From:   Keith Busch <kbusch@kernel.org>
 To:     linux-nvme@lists.infradead.org, sagi@grimberg.me, hch@lst.de,
         axboe@kernel.dk, linux-block@vger.kernel.org
 Cc:     Yuanyuan Zhong <yzhong@purestorage.com>,
         Casey Chen <cachen@purestorage.com>,
         Keith Busch <kbusch@kernel.org>
-Subject: [PATCHv2 4/5] nvme: use return value from blk_execute_rq()
-Date:   Fri, 23 Apr 2021 15:05:57 -0700
-Message-Id: <20210423220558.40764-5-kbusch@kernel.org>
+Subject: [PATCHv2 5/5] nvme: allow user passthrough commands to poll
+Date:   Fri, 23 Apr 2021 15:05:58 -0700
+Message-Id: <20210423220558.40764-6-kbusch@kernel.org>
 X-Mailer: git-send-email 2.25.4
 In-Reply-To: <20210423220558.40764-1-kbusch@kernel.org>
 References: <20210423220558.40764-1-kbusch@kernel.org>
@@ -49,129 +49,277 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We don't have an nvme status to report if the driver's .queue_rq()
-returns an error without dispatching the requested nvme command. Use the
-return value from blk_execute_rq() for all passthrough commands so the
-caller may know their command was not successful.
-
-If the command is from the target passthrough interface and fails to
-dispatch, synthesize the response back to the host as a internal target
-error.
+The block layer knows how to deal with polled requests. Let the NVMe
+driver use the previously reserved user "flags" fields to define an
+option to allocate the request from the polled hardware contexts. If
+polling is not enabled, then the block layer will automatically fallback
+to a non-polled request.
 
 Signed-off-by: Keith Busch <kbusch@kernel.org>
 ---
- drivers/nvme/host/core.c       | 16 ++++++++++++----
- drivers/nvme/host/ioctl.c      |  6 +-----
- drivers/nvme/host/nvme.h       |  2 +-
- drivers/nvme/target/passthru.c |  8 ++++----
- 4 files changed, 18 insertions(+), 14 deletions(-)
+ drivers/nvme/host/core.c        | 10 ++++++----
+ drivers/nvme/host/ioctl.c       | 32 ++++++++++++++++++--------------
+ drivers/nvme/host/lightnvm.c    |  4 ++--
+ drivers/nvme/host/nvme.h        |  3 ++-
+ drivers/nvme/host/pci.c         |  4 ++--
+ drivers/nvme/target/passthru.c  |  2 +-
+ include/uapi/linux/nvme_ioctl.h |  4 ++++
+ 7 files changed, 35 insertions(+), 24 deletions(-)
 
 diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index 10bb8406e067..62af5fe7a0ce 100644
+index 62af5fe7a0ce..3af4d955405b 100644
 --- a/drivers/nvme/host/core.c
 +++ b/drivers/nvme/host/core.c
-@@ -972,12 +972,12 @@ int __nvme_submit_sync_cmd(struct request_queue *q, struct nvme_command *cmd,
- 			goto out;
- 	}
- 
--	blk_execute_rq(NULL, req, at_head);
-+	ret = blk_execute_rq(NULL, req, at_head);
- 	if (result)
- 		*result = nvme_req(req)->result;
- 	if (nvme_req(req)->flags & NVME_REQ_CANCELLED)
- 		ret = -EINTR;
--	else
-+	else if (nvme_req(req)->status)
- 		ret = nvme_req(req)->status;
-  out:
- 	blk_mq_free_request(req);
-@@ -1066,18 +1066,26 @@ static void nvme_passthru_end(struct nvme_ctrl *ctrl, u32 effects)
- 	}
+@@ -610,11 +610,13 @@ static inline void nvme_init_request(struct request *req,
  }
  
--void nvme_execute_passthru_rq(struct request *rq)
-+int nvme_execute_passthru_rq(struct request *rq)
+ struct request *nvme_alloc_request(struct request_queue *q,
+-		struct nvme_command *cmd, blk_mq_req_flags_t flags)
++		struct nvme_command *cmd, blk_mq_req_flags_t flags,
++		unsigned rq_flags)
  {
- 	struct nvme_command *cmd = nvme_req(rq)->cmd;
- 	struct nvme_ctrl *ctrl = nvme_req(rq)->ctrl;
- 	struct nvme_ns *ns = rq->q->queuedata;
- 	struct gendisk *disk = ns ? ns->disk : NULL;
- 	u32 effects;
-+	int ret;
++	unsigned cmd_flags = nvme_req_op(cmd) | rq_flags;
+ 	struct request *req;
  
- 	effects = nvme_passthru_start(ctrl, ns, cmd->common.opcode);
--	blk_execute_rq(disk, rq, 0);
-+	ret = blk_execute_rq(disk, rq, 0);
- 	if (effects) /* nothing to be done for zero cmd effects */
- 		nvme_passthru_end(ctrl, effects);
-+
-+	if (nvme_req(rq)->flags & NVME_REQ_CANCELLED)
-+		ret = -EINTR;
-+	else if (nvme_req(rq)->status)
-+		ret = nvme_req(rq)->status;
-+
-+	return ret;
- }
- EXPORT_SYMBOL_NS_GPL(nvme_execute_passthru_rq, NVME_TARGET_PASSTHRU);
+-	req = blk_mq_alloc_request(q, nvme_req_op(cmd), flags);
++	req = blk_mq_alloc_request(q, cmd_flags, flags);
+ 	if (!IS_ERR(req))
+ 		nvme_init_request(req, cmd);
+ 	return req;
+@@ -957,7 +959,7 @@ int __nvme_submit_sync_cmd(struct request_queue *q, struct nvme_command *cmd,
+ 	int ret;
  
+ 	if (qid == NVME_QID_ANY)
+-		req = nvme_alloc_request(q, cmd, flags);
++		req = nvme_alloc_request(q, cmd, flags, 0);
+ 	else
+ 		req = nvme_alloc_request_qid(q, cmd, flags, qid);
+ 	if (IS_ERR(req))
+@@ -1130,7 +1132,7 @@ static void nvme_keep_alive_work(struct work_struct *work)
+ 	}
+ 
+ 	rq = nvme_alloc_request(ctrl->admin_q, &ctrl->ka_cmd,
+-				BLK_MQ_REQ_RESERVED | BLK_MQ_REQ_NOWAIT);
++				BLK_MQ_REQ_RESERVED | BLK_MQ_REQ_NOWAIT, 0);
+ 	if (IS_ERR(rq)) {
+ 		/* allocation failure, reset the controller */
+ 		dev_err(ctrl->device, "keep-alive failed: %ld\n", PTR_ERR(rq));
 diff --git a/drivers/nvme/host/ioctl.c b/drivers/nvme/host/ioctl.c
-index 8e05d65c9e93..9cdd8bfebb80 100644
+index 9cdd8bfebb80..79fc90f010b0 100644
 --- a/drivers/nvme/host/ioctl.c
 +++ b/drivers/nvme/host/ioctl.c
-@@ -93,11 +93,7 @@ static int nvme_submit_user_cmd(struct request_queue *q,
- 		}
- 	}
+@@ -56,7 +56,7 @@ static void *nvme_add_user_metadata(struct bio *bio, void __user *ubuf,
+ static int nvme_submit_user_cmd(struct request_queue *q,
+ 		struct nvme_command *cmd, void __user *ubuffer,
+ 		unsigned bufflen, void __user *meta_buffer, unsigned meta_len,
+-		u32 meta_seed, u64 *result, unsigned timeout)
++		u32 meta_seed, u64 *result, unsigned timeout, unsigned rq_flags)
+ {
+ 	bool write = nvme_is_write(cmd);
+ 	struct nvme_ns *ns = q->queuedata;
+@@ -66,7 +66,7 @@ static int nvme_submit_user_cmd(struct request_queue *q,
+ 	void *meta = NULL;
+ 	int ret;
  
--	nvme_execute_passthru_rq(req);
--	if (nvme_req(req)->flags & NVME_REQ_CANCELLED)
--		ret = -EINTR;
--	else
--		ret = nvme_req(req)->status;
-+	ret = nvme_execute_passthru_rq(req);
- 	if (result)
- 		*result = le64_to_cpu(nvme_req(req)->result.u64);
- 	if (meta && !ret && !write) {
+-	req = nvme_alloc_request(q, cmd, 0);
++	req = nvme_alloc_request(q, cmd, 0, rq_flags);
+ 	if (IS_ERR(req))
+ 		return PTR_ERR(req);
+ 
+@@ -116,11 +116,12 @@ static int nvme_submit_io(struct nvme_ns *ns, struct nvme_user_io __user *uio)
+ 	struct nvme_command c;
+ 	unsigned length, meta_len;
+ 	void __user *metadata;
++	unsigned rq_flags = 0;
+ 
+ 	if (copy_from_user(&io, uio, sizeof(io)))
+ 		return -EFAULT;
+-	if (io.flags)
+-		return -EINVAL;
++	if (io.flags & NVME_HIPRI)
++		rq_flags |= REQ_HIPRI;
+ 
+ 	switch (io.opcode) {
+ 	case nvme_cmd_write:
+@@ -158,7 +159,7 @@ static int nvme_submit_io(struct nvme_ns *ns, struct nvme_user_io __user *uio)
+ 
+ 	memset(&c, 0, sizeof(c));
+ 	c.rw.opcode = io.opcode;
+-	c.rw.flags = io.flags;
++	c.rw.flags = 0;
+ 	c.rw.nsid = cpu_to_le32(ns->head->ns_id);
+ 	c.rw.slba = cpu_to_le64(io.slba);
+ 	c.rw.length = cpu_to_le16(io.nblocks);
+@@ -170,7 +171,8 @@ static int nvme_submit_io(struct nvme_ns *ns, struct nvme_user_io __user *uio)
+ 
+ 	return nvme_submit_user_cmd(ns->queue, &c,
+ 			nvme_to_user_ptr(io.addr), length,
+-			metadata, meta_len, lower_32_bits(io.slba), NULL, 0);
++			metadata, meta_len, lower_32_bits(io.slba), NULL, 0,
++			rq_flags);
+ }
+ 
+ static int nvme_user_cmd(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
+@@ -178,6 +180,7 @@ static int nvme_user_cmd(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
+ {
+ 	struct nvme_passthru_cmd cmd;
+ 	struct nvme_command c;
++	unsigned rq_flags = 0;
+ 	unsigned timeout = 0;
+ 	u64 result;
+ 	int status;
+@@ -186,8 +189,8 @@ static int nvme_user_cmd(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
+ 		return -EACCES;
+ 	if (copy_from_user(&cmd, ucmd, sizeof(cmd)))
+ 		return -EFAULT;
+-	if (cmd.flags)
+-		return -EINVAL;
++	if (cmd.flags & NVME_HIPRI)
++		rq_flags |= REQ_HIPRI;
+ 	if (ns && cmd.nsid != ns->head->ns_id) {
+ 		dev_err(ctrl->device,
+ 			"%s: nsid (%u) in cmd does not match nsid (%u) of namespace\n",
+@@ -197,7 +200,7 @@ static int nvme_user_cmd(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
+ 
+ 	memset(&c, 0, sizeof(c));
+ 	c.common.opcode = cmd.opcode;
+-	c.common.flags = cmd.flags;
++	c.common.flags = 0;
+ 	c.common.nsid = cpu_to_le32(cmd.nsid);
+ 	c.common.cdw2[0] = cpu_to_le32(cmd.cdw2);
+ 	c.common.cdw2[1] = cpu_to_le32(cmd.cdw3);
+@@ -214,7 +217,7 @@ static int nvme_user_cmd(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
+ 	status = nvme_submit_user_cmd(ns ? ns->queue : ctrl->admin_q, &c,
+ 			nvme_to_user_ptr(cmd.addr), cmd.data_len,
+ 			nvme_to_user_ptr(cmd.metadata), cmd.metadata_len,
+-			0, &result, timeout);
++			0, &result, timeout, rq_flags);
+ 
+ 	if (status >= 0) {
+ 		if (put_user(result, &ucmd->result))
+@@ -229,6 +232,7 @@ static int nvme_user_cmd64(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
+ {
+ 	struct nvme_passthru_cmd64 cmd;
+ 	struct nvme_command c;
++	unsigned rq_flags = 0;
+ 	unsigned timeout = 0;
+ 	int status;
+ 
+@@ -236,8 +240,8 @@ static int nvme_user_cmd64(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
+ 		return -EACCES;
+ 	if (copy_from_user(&cmd, ucmd, sizeof(cmd)))
+ 		return -EFAULT;
+-	if (cmd.flags)
+-		return -EINVAL;
++	if (cmd.flags & NVME_HIPRI)
++		rq_flags |= REQ_HIPRI;
+ 	if (ns && cmd.nsid != ns->head->ns_id) {
+ 		dev_err(ctrl->device,
+ 			"%s: nsid (%u) in cmd does not match nsid (%u) of namespace\n",
+@@ -247,7 +251,7 @@ static int nvme_user_cmd64(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
+ 
+ 	memset(&c, 0, sizeof(c));
+ 	c.common.opcode = cmd.opcode;
+-	c.common.flags = cmd.flags;
++	c.common.flags = 0;
+ 	c.common.nsid = cpu_to_le32(cmd.nsid);
+ 	c.common.cdw2[0] = cpu_to_le32(cmd.cdw2);
+ 	c.common.cdw2[1] = cpu_to_le32(cmd.cdw3);
+@@ -264,7 +268,7 @@ static int nvme_user_cmd64(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
+ 	status = nvme_submit_user_cmd(ns ? ns->queue : ctrl->admin_q, &c,
+ 			nvme_to_user_ptr(cmd.addr), cmd.data_len,
+ 			nvme_to_user_ptr(cmd.metadata), cmd.metadata_len,
+-			0, &cmd.result, timeout);
++			0, &cmd.result, timeout, rq_flags);
+ 
+ 	if (status >= 0) {
+ 		if (put_user(cmd.result, &ucmd->result))
+diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
+index e9d9ad47f70f..a7fff633cdee 100644
+--- a/drivers/nvme/host/lightnvm.c
++++ b/drivers/nvme/host/lightnvm.c
+@@ -653,7 +653,7 @@ static struct request *nvme_nvm_alloc_request(struct request_queue *q,
+ 
+ 	nvme_nvm_rqtocmd(rqd, ns, cmd);
+ 
+-	rq = nvme_alloc_request(q, (struct nvme_command *)cmd, 0);
++	rq = nvme_alloc_request(q, (struct nvme_command *)cmd, 0, 0);
+ 	if (IS_ERR(rq))
+ 		return rq;
+ 
+@@ -766,7 +766,7 @@ static int nvme_nvm_submit_user_cmd(struct request_queue *q,
+ 	DECLARE_COMPLETION_ONSTACK(wait);
+ 	int ret = 0;
+ 
+-	rq = nvme_alloc_request(q, (struct nvme_command *)vcmd, 0);
++	rq = nvme_alloc_request(q, (struct nvme_command *)vcmd, 0, 0);
+ 	if (IS_ERR(rq)) {
+ 		ret = -ENOMEM;
+ 		goto err_cmd;
 diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index c8f6ec5b8d2b..76a7ed0728b9 100644
+index 76a7ed0728b9..6005a61c7f4c 100644
 --- a/drivers/nvme/host/nvme.h
 +++ b/drivers/nvme/host/nvme.h
-@@ -847,7 +847,7 @@ static inline void nvme_hwmon_exit(struct nvme_ctrl *ctrl)
+@@ -629,7 +629,8 @@ void nvme_start_freeze(struct nvme_ctrl *ctrl);
  
- u32 nvme_command_effects(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
- 			 u8 opcode);
--void nvme_execute_passthru_rq(struct request *rq);
-+int nvme_execute_passthru_rq(struct request *rq);
- struct nvme_ctrl *nvme_ctrl_from_file(struct file *file);
- struct nvme_ns *nvme_find_get_ns(struct nvme_ctrl *ctrl, unsigned nsid);
- void nvme_put_ns(struct nvme_ns *ns);
+ #define NVME_QID_ANY -1
+ struct request *nvme_alloc_request(struct request_queue *q,
+-		struct nvme_command *cmd, blk_mq_req_flags_t flags);
++		struct nvme_command *cmd, blk_mq_req_flags_t flags,
++		unsigned rq_flags);
+ void nvme_cleanup_cmd(struct request *req);
+ blk_status_t nvme_setup_cmd(struct nvme_ns *ns, struct request *req);
+ int nvme_submit_sync_cmd(struct request_queue *q, struct nvme_command *cmd,
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index 09d4c5f99fc3..0400ac53964f 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -1344,7 +1344,7 @@ static enum blk_eh_timer_return nvme_timeout(struct request *req, bool reserved)
+ 		 req->tag, nvmeq->qid);
+ 
+ 	abort_req = nvme_alloc_request(dev->ctrl.admin_q, &cmd,
+-			BLK_MQ_REQ_NOWAIT);
++			BLK_MQ_REQ_NOWAIT, 0);
+ 	if (IS_ERR(abort_req)) {
+ 		atomic_inc(&dev->ctrl.abort_limit);
+ 		return BLK_EH_RESET_TIMER;
+@@ -2268,7 +2268,7 @@ static int nvme_delete_queue(struct nvme_queue *nvmeq, u8 opcode)
+ 	cmd.delete_queue.opcode = opcode;
+ 	cmd.delete_queue.qid = cpu_to_le16(nvmeq->qid);
+ 
+-	req = nvme_alloc_request(q, &cmd, BLK_MQ_REQ_NOWAIT);
++	req = nvme_alloc_request(q, &cmd, BLK_MQ_REQ_NOWAIT, 0);
+ 	if (IS_ERR(req))
+ 		return PTR_ERR(req);
+ 
 diff --git a/drivers/nvme/target/passthru.c b/drivers/nvme/target/passthru.c
-index 2798944899b7..d9a649d9903b 100644
+index d9a649d9903b..be7c6d50d23a 100644
 --- a/drivers/nvme/target/passthru.c
 +++ b/drivers/nvme/target/passthru.c
-@@ -153,11 +153,10 @@ static void nvmet_passthru_execute_cmd_work(struct work_struct *w)
- {
- 	struct nvmet_req *req = container_of(w, struct nvmet_req, p.work);
- 	struct request *rq = req->p.rq;
--	u16 status;
-+	int status;
+@@ -244,7 +244,7 @@ static void nvmet_passthru_execute_cmd(struct nvmet_req *req)
+ 		timeout = nvmet_req_subsys(req)->admin_timeout;
+ 	}
  
--	nvme_execute_passthru_rq(rq);
-+	status = nvme_execute_passthru_rq(rq);
+-	rq = nvme_alloc_request(q, req->cmd, 0);
++	rq = nvme_alloc_request(q, req->cmd, 0, 0);
+ 	if (IS_ERR(rq)) {
+ 		status = NVME_SC_INTERNAL;
+ 		goto out_put_ns;
+diff --git a/include/uapi/linux/nvme_ioctl.h b/include/uapi/linux/nvme_ioctl.h
+index d99b5a772698..683d33c37a96 100644
+--- a/include/uapi/linux/nvme_ioctl.h
++++ b/include/uapi/linux/nvme_ioctl.h
+@@ -9,6 +9,10 @@
  
--	status = nvme_req(rq)->status;
- 	if (status == NVME_SC_SUCCESS &&
- 	    req->cmd->common.opcode == nvme_admin_identify) {
- 		switch (req->cmd->identify.cns) {
-@@ -168,7 +167,8 @@ static void nvmet_passthru_execute_cmd_work(struct work_struct *w)
- 			nvmet_passthru_override_id_ns(req);
- 			break;
- 		}
--	}
-+	} else if (status < 0)
-+		status = NVME_SC_INTERNAL;
+ #include <linux/types.h>
  
- 	req->cqe->result = nvme_req(rq)->result;
- 	nvmet_req_complete(req, status);
++enum nvme_io_flags {
++	NVME_HIPRI	= 1 << 0, /* use polling queue if available */
++};
++
+ struct nvme_user_io {
+ 	__u8	opcode;
+ 	__u8	flags;
 -- 
 2.25.4
 
