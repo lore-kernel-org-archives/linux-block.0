@@ -2,97 +2,109 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5799FC433ED
-	for <linux-block@archiver.kernel.org>; Mon, 26 Apr 2021 06:32:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E072C433ED
+	for <linux-block@archiver.kernel.org>; Mon, 26 Apr 2021 06:34:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2D84D61263
-	for <linux-block@archiver.kernel.org>; Mon, 26 Apr 2021 06:32:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E63E061249
+	for <linux-block@archiver.kernel.org>; Mon, 26 Apr 2021 06:34:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231907AbhDZGdW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Apr 2021 02:33:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47647 "EHLO
+        id S231879AbhDZGff (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 26 Apr 2021 02:35:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53294 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231816AbhDZGdV (ORCPT
+        by vger.kernel.org with ESMTP id S231616AbhDZGff (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Apr 2021 02:33:21 -0400
+        Mon, 26 Apr 2021 02:35:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619418759;
+        s=mimecast20190719; t=1619418894;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=1ZMGb2xqKw5kC3fxalGJHU2xVz4gwBTJicM9Dy18l+E=;
-        b=J7hzG+4YVN9PcWfvMGzjQCYCIixGwm5XfZFmcoWfaIK6BUOc22bP8tOWdVX/YzoiL5homS
-        y3SnOp2JZ0KBCMTOMmJH3qViSJ1jkiHWFNDmPUrxdYbLZQrfoa1za/K/1uyje+lPQIL/Qk
-        JeiEg4LH/vAyjO7dQ3x9ID0gLcyPR4g=
-Received: from mail-yb1-f200.google.com (mail-yb1-f200.google.com
- [209.85.219.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-579-G3y_ybkTPC-AEcA-N0TtMw-1; Mon, 26 Apr 2021 02:32:37 -0400
-X-MC-Unique: G3y_ybkTPC-AEcA-N0TtMw-1
-Received: by mail-yb1-f200.google.com with SMTP id c8-20020a25a2c80000b02904eda0a22b5dso5691777ybn.17
-        for <linux-block@vger.kernel.org>; Sun, 25 Apr 2021 23:32:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=1ZMGb2xqKw5kC3fxalGJHU2xVz4gwBTJicM9Dy18l+E=;
-        b=X4LfPPMpk77eIIwRGfEGSvpivrTO6txkYU9dsu1ZIhYV7E1bck8DOSv80b1tbG05pb
-         rnOHxZ9Y/6eOLwlq0kCsGU3cnWfJjfjB0uSKzmDo3y7iZiiEfNk2PvSHkplJ0afd9rtn
-         C0iJTtQyWzPGTFDdIBj1qhkmK/B193U9IF5Dw+tdSpMu8fN8Arfv/AkI2++O0o1nyKWs
-         MWL/VWVByX3Lg+CloSe7407mMRCMTQgJHeoPyFtFkJ5TSSAwXJoqboncJvOuA7sivcxL
-         lTywQjDt5uNKi2orwvQMbkGJTnB2UDqjbemLyHtGx5fX4Pkwklk/TO+OdFLN2gdUsxvr
-         VxSQ==
-X-Gm-Message-State: AOAM53166v9pkzSCCLg9L1uJyZ/nZ/j/h5+slUhNB+AARWr3PciwH103
-        OMpMVTLLaiZwvBt3aMSdlK/v7ALr2X0LqjtFdlhYWsYYG29SlBLWdSpp13C5k5QYLaVXdj9F8tt
-        oNJPGu6Gj+YeaBeMehs/REAWaDNLCylRlIYyhAzo=
-X-Received: by 2002:a25:24f:: with SMTP id 76mr23038916ybc.124.1619418757231;
-        Sun, 25 Apr 2021 23:32:37 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyTBuQDbrgExEF/QLECRrb98F0nnwbw0+SgdKl89YhgEjwxct1jsWjgPfvCDND2ON2yusFI4CLnja3KtGH6dDI=
-X-Received: by 2002:a25:24f:: with SMTP id 76mr23038895ybc.124.1619418756959;
- Sun, 25 Apr 2021 23:32:36 -0700 (PDT)
+        bh=b0//KiwrXJCAQEbZh6v7UYUMFjngDAQ0xEhOxI4LuvE=;
+        b=D4NhT1sQJiOB/+JYbY5QBRBnEcQk97lQRCNtqDeatpDiQ1AdKU1KK15a0GRUtYaWSFb0uO
+        3Tb+9wzBiKn2fSkMxT1aPr1F6j+275gwFtBtMZ0f5iNuNZhLmdX72nXxT3jM8jVahnrOAe
+        J/GDAaqcE36sekoi0DO1mnfHYlDx1Tc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-387-RMzoaL0fPCCLtl3TPtgv4Q-1; Mon, 26 Apr 2021 02:34:52 -0400
+X-MC-Unique: RMzoaL0fPCCLtl3TPtgv4Q-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A63BC343AA;
+        Mon, 26 Apr 2021 06:34:50 +0000 (UTC)
+Received: from T590 (ovpn-13-194.pek2.redhat.com [10.72.13.194])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6748D61F38;
+        Mon, 26 Apr 2021 06:34:43 +0000 (UTC)
+Date:   Mon, 26 Apr 2021 14:34:48 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Keith Busch <kbusch@kernel.org>
+Cc:     linux-nvme@lists.infradead.org, sagi@grimberg.me, hch@lst.de,
+        axboe@kernel.dk, linux-block@vger.kernel.org,
+        Yuanyuan Zhong <yzhong@purestorage.com>,
+        Casey Chen <cachen@purestorage.com>
+Subject: Re: [PATCHv2 1/5] block: support polling through blk_execute_rq
+Message-ID: <YIZfCBYvH1hm+QM4@T590>
+References: <20210423220558.40764-1-kbusch@kernel.org>
+ <20210423220558.40764-2-kbusch@kernel.org>
 MIME-Version: 1.0
-References: <20210425043020.30065-1-bvanassche@acm.org> <a6d1b5a0-01ca-5f17-d7f1-31257457c13f@kernel.dk>
-In-Reply-To: <a6d1b5a0-01ca-5f17-d7f1-31257457c13f@kernel.dk>
-From:   Yi Zhang <yi.zhang@redhat.com>
-Date:   Mon, 26 Apr 2021 14:32:26 +0800
-Message-ID: <CAHj4cs9E+9n9M6W59LuTWQbbhTzMGgi8KBPaN+cAYC3ypC3dCg@mail.gmail.com>
-Subject: Re: [PATCH v2] block: Improve limiting the bio size
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
-        Changheun Lee <nanich.lee@samsung.com>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Bruno Goncalves <bgoncalv@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210423220558.40764-2-kbusch@kernel.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens/Bart
-CKI reproduced the boot panic issue again with the latest
-linux-block/for-next[1] today, then I checked the patch 'bio: limit
-bio max size'[2] found Bart's fix patch does not fold in that commit,
-could you help recheck it, thanks.
+On Fri, Apr 23, 2021 at 03:05:54PM -0700, Keith Busch wrote:
+> Poll for completions if the request's hctx is a polling type.
+> 
+> Signed-off-by: Keith Busch <kbusch@kernel.org>
+> ---
+>  block/blk-exec.c | 12 +++++++++++-
+>  1 file changed, 11 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/blk-exec.c b/block/blk-exec.c
+> index beae70a0e5e5..b960ad187ba5 100644
+> --- a/block/blk-exec.c
+> +++ b/block/blk-exec.c
+> @@ -63,6 +63,11 @@ void blk_execute_rq_nowait(struct gendisk *bd_disk, struct request *rq,
+>  }
+>  EXPORT_SYMBOL_GPL(blk_execute_rq_nowait);
+>  
+> +static bool blk_rq_is_poll(struct request *rq)
+> +{
+> +	return rq->mq_hctx && rq->mq_hctx->type == HCTX_TYPE_POLL;
+> +}
+> +
+>  /**
+>   * blk_execute_rq - insert a request into queue for execution
+>   * @bd_disk:	matching gendisk
+> @@ -83,7 +88,12 @@ void blk_execute_rq(struct gendisk *bd_disk, struct request *rq, int at_head)
+>  
+>  	/* Prevent hang_check timer from firing at us during very long I/O */
+>  	hang_check = sysctl_hung_task_timeout_secs;
+> -	if (hang_check)
+> +	if (blk_rq_is_poll(rq)) {
+> +		do {
+> +			blk_poll(rq->q, request_to_qc_t(rq->mq_hctx, rq), true);
+> +			cond_resched();
+> +		} while (!completion_done(&wait));
+> +	} else if (hang_check)
+>  		while (!wait_for_completion_io_timeout(&wait, hang_check * (HZ/2)));
+>  	else
+>  		wait_for_completion_io(&wait);
+> -- 
+> 2.25.4
+> 
 
-[1]
-Kernel repo: https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git
-            Commit: ffa77af5731d - Merge branch 'for-5.13/io_uring'
-into for-next
-[2] bio: limit bio max size
-https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/commit/?h=for-next&id=42fb54fbc7072da505c1c59cbe9f8417feb37c27
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-Thanks
-Yi
->
-> Since I had to shuffle patches anyway, I folded in this fix. Thanks
-> Bart.
->
-> --
-> Jens Axboe
->
+-- 
+Ming
 
