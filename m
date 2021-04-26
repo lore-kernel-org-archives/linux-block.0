@@ -3,57 +3,85 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE300C433ED
-	for <linux-block@archiver.kernel.org>; Mon, 26 Apr 2021 16:15:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70C3AC433ED
+	for <linux-block@archiver.kernel.org>; Mon, 26 Apr 2021 16:18:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A474D6115C
-	for <linux-block@archiver.kernel.org>; Mon, 26 Apr 2021 16:15:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 39C686105A
+	for <linux-block@archiver.kernel.org>; Mon, 26 Apr 2021 16:18:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234173AbhDZQPv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Apr 2021 12:15:51 -0400
-Received: from verein.lst.de ([213.95.11.211]:41988 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233736AbhDZQPu (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Apr 2021 12:15:50 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id C97DE68CFE; Mon, 26 Apr 2021 18:15:04 +0200 (CEST)
-Date:   Mon, 26 Apr 2021 18:15:03 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Jeffle Xu <jefflexu@linux.alibaba.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: Re: switch block layer polling to a bio based model
-Message-ID: <20210426161503.GA30994@lst.de>
-References: <20210426134821.2191160-1-hch@lst.de> <2d229167-f56d-583b-569c-166c97ce2e71@kernel.dk> <20210426150638.GA24618@lst.de> <6b7e3ba0-aa09-b86d-8ea1-dc2e78c7529e@kernel.dk>
+        id S234229AbhDZQSk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 26 Apr 2021 12:18:40 -0400
+Received: from mail-pl1-f177.google.com ([209.85.214.177]:44711 "EHLO
+        mail-pl1-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233934AbhDZQSk (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 26 Apr 2021 12:18:40 -0400
+Received: by mail-pl1-f177.google.com with SMTP id y1so13553569plg.11
+        for <linux-block@vger.kernel.org>; Mon, 26 Apr 2021 09:17:58 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=s9IpppjAuBICscbaBctnC573VoyQtmC1p003HYACVC0=;
+        b=TndigRAikcI5QCAYbdNy8RnPDMnyya1K/bQQoN9CsJyRwHpl0Ndqt8ygO6AkvmbKu8
+         HLGRSSyouTppYcM7OOGXayb8I5MiB8YJFmqvw23tssUBSzkvPYJ2EKA5eg4SxnJhrv1+
+         jKbwsTheEorGbZPvGqjPdYnCsLIzm58RFS4d5RViM9TDPzeYsEUBy03KiIEzoM0wbVp7
+         QJU9E5M0tlVSXhfTaGlgxXg3O6S7KZeNdYspBMFy+IifWYX5etZPAr//FLlbNIjSlExe
+         KDrYfAnetLrVzz9unhANFHCCbdP5QVi2k1m+5518UcGlLzjlQXnDwJ2q1BNGYB7QtzRo
+         UiFA==
+X-Gm-Message-State: AOAM531UTkdqMl+aXiq26pRNVrYomAiuXima7Ni2/XqIym1K1SNAZLpm
+        k9EKtKeUcr9aisGq/6ubMGo=
+X-Google-Smtp-Source: ABdhPJyk+BgKgOHrI5FEebK7gVvqlpKgWMHn5Ipr1Ed/mxWdaRBWnyGQDVRUIMcvPeKwI+4nkKc/hA==
+X-Received: by 2002:a17:903:2285:b029:eb:d7b:7687 with SMTP id b5-20020a1709032285b02900eb0d7b7687mr18985057plh.82.1619453878353;
+        Mon, 26 Apr 2021 09:17:58 -0700 (PDT)
+Received: from [192.168.3.219] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
+        by smtp.gmail.com with ESMTPSA id c23sm11811268pgj.50.2021.04.26.09.17.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 26 Apr 2021 09:17:57 -0700 (PDT)
+Subject: Re: [PATCH v2] block: Improve limiting the bio size
+To:     Changheun Lee <nanich.lee@samsung.com>
+Cc:     yi.zhang@redhat.com, axboe@kernel.dk, bgoncalv@redhat.com,
+        hch@lst.de, jaegeuk@kernel.org, linux-block@vger.kernel.org,
+        ming.lei@redhat.com
+References: <CAHj4cs9E+9n9M6W59LuTWQbbhTzMGgi8KBPaN+cAYC3ypC3dCg@mail.gmail.com>
+ <CGME20210426085241epcas1p46ed8de18a98c40218dacd58fc4b25ff9@epcas1p4.samsung.com>
+ <20210426083442.5831-1-nanich.lee@samsung.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <34286266-1c03-35bc-94e8-08bd0ac3400a@acm.org>
+Date:   Mon, 26 Apr 2021 09:17:56 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6b7e3ba0-aa09-b86d-8ea1-dc2e78c7529e@kernel.dk>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20210426083442.5831-1-nanich.lee@samsung.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Apr 26, 2021 at 09:12:09AM -0600, Jens Axboe wrote:
-> Here's the series. It's not super clean (yet), but basically allows
-> users like io_uring to setup a bio cache, and pass that in through
-> iocb->ki_bi_cache. With that, we can recycle them instead of going
-> through free+alloc continually. If you look at profiles for high iops,
-> we're spending more time than desired doing just that.
+On 4/26/21 1:34 AM, Changheun Lee wrote:
+> Should we check queue point in bio_max_size()?
+> __device_add_disk() can be called with "register_queue=false" like as
+> device_add_disk_no_queue_reg(). How about below?
 > 
-> https://git.kernel.dk/cgit/linux-block/log/?h=io_uring-bio-cache
+> unsigned int bio_max_size(struct bio *bio)
+> {
+> 	struct request_queue *q;
+> 
+> 	q = (bio->bi_bdev) ? bio->bi_bdev->bd_disk->queue : NULL;
+> 	return q ? q->limits.bio_max_bytes : UINT_MAX;
+> }
 
-So where do you spend the cycles?  The do not memset the whole bio
-optimization is pretty obvious and is someting we should do independent
-of the allocator.
+How could bio_max_size() get called from inside __device_add_disk() if
+no request queue is registered? Did I perhaps miss something?
 
-The other thing that sucks is the mempool implementation, as it forces
-each allocation and free to do an indirect call.  I think it might be
-worth to try to frontend it with a normal slab cache and only fall back
-to the mempool if that fails.
+Thanks,
+
+Bart.
+
+
