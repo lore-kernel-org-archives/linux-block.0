@@ -2,199 +2,150 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 621A8C433ED
-	for <linux-block@archiver.kernel.org>; Mon, 26 Apr 2021 09:05:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0C0CC433ED
+	for <linux-block@archiver.kernel.org>; Mon, 26 Apr 2021 10:56:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1C24F6117A
-	for <linux-block@archiver.kernel.org>; Mon, 26 Apr 2021 09:05:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AC7F061077
+	for <linux-block@archiver.kernel.org>; Mon, 26 Apr 2021 10:56:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232078AbhDZJGU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Apr 2021 05:06:20 -0400
-Received: from mx2.suse.de ([195.135.220.15]:51190 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232068AbhDZJGT (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Apr 2021 05:06:19 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 6DF1BB029;
-        Mon, 26 Apr 2021 09:05:37 +0000 (UTC)
-Subject: Re: [PATCH V6 10/12] block: limit hw queues to be polled in each
- blk_poll()
+        id S232452AbhDZK50 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 26 Apr 2021 06:57:26 -0400
+Received: from frasgout.his.huawei.com ([185.176.79.56]:2915 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232266AbhDZK50 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 26 Apr 2021 06:57:26 -0400
+Received: from fraeml736-chm.china.huawei.com (unknown [172.18.147.201])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4FTM516nkrz73dSS;
+        Mon, 26 Apr 2021 18:46:13 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml736-chm.china.huawei.com (10.206.15.217) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Mon, 26 Apr 2021 12:56:42 +0200
+Received: from [10.47.89.145] (10.47.89.145) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.2176.2; Mon, 26 Apr
+ 2021 11:56:41 +0100
+Subject: Re: [bug report] shared tags causes IO hang and performance drop
+From:   John Garry <john.garry@huawei.com>
 To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Jeffle Xu <jefflexu@linux.alibaba.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com
-References: <20210422122038.2192933-1-ming.lei@redhat.com>
- <20210422122038.2192933-11-ming.lei@redhat.com>
- <b6a1f1fa-bad2-e072-6292-363510fc7017@suse.de> <YIZzGAxaNnNE0Ipa@T590>
-From:   Hannes Reinecke <hare@suse.de>
-Organization: SUSE Linux GmbH
-Message-ID: <f1a13439-9ea7-9cdd-7489-2da4abd7256f@suse.de>
-Date:   Mon, 26 Apr 2021 11:05:31 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.9.1
+CC:     Kashyap Desai <kashyap.desai@broadcom.com>,
+        <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Douglas Gilbert <dgilbert@interlog.com>,
+        Hannes Reinecke <hare@suse.com>
+References: <YHaez6iN2HHYxYOh@T590>
+ <9a6145a5-e6ac-3d33-b52a-0823bfc3b864@huawei.com>
+ <cb326d404c6e0785d03a7dfadc42832c@mail.gmail.com> <YHbOOfGNHwO4SMS7@T590>
+ <87ceccf2-287b-9bd1-899a-f15026c9e65b@huawei.com> <YHe3M62agQET6o6O@T590>
+ <0c85fe52-ebc7-68b3-2dbe-dfad5d604346@huawei.com>
+Message-ID: <c1d5abaa-c460-55f8-5351-16f09d6aa81f@huawei.com>
+Date:   Mon, 26 Apr 2021 11:53:45 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-In-Reply-To: <YIZzGAxaNnNE0Ipa@T590>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <0c85fe52-ebc7-68b3-2dbe-dfad5d604346@huawei.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.47.89.145]
+X-ClientProxiedBy: lhreml702-chm.china.huawei.com (10.201.108.51) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/26/21 10:00 AM, Ming Lei wrote:
-> On Mon, Apr 26, 2021 at 09:19:20AM +0200, Hannes Reinecke wrote:
->> On 4/22/21 2:20 PM, Ming Lei wrote:
->>> Limit at most 8 queues are polled in each blk_pull(), avoid to
->>> add extra latency when queue depth is high.
->>>
->>> Reviewed-by: Jeffle Xu <jefflexu@linux.alibaba.com>
->>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
->>> ---
->>>  block/blk-poll.c | 78 ++++++++++++++++++++++++++++++++++--------------
->>>  1 file changed, 55 insertions(+), 23 deletions(-)
->>>
->>> diff --git a/block/blk-poll.c b/block/blk-poll.c
->>> index 249d73ff6f81..20e7c47cc984 100644
->>> --- a/block/blk-poll.c
->>> +++ b/block/blk-poll.c
->>> @@ -288,36 +288,32 @@ static void bio_grp_list_move(struct bio_grp_list *dst,
->>>  	src->nr_grps -= cnt;
->>>  }
->>>  
->>> -static int blk_mq_poll_io(struct bio *bio)
->>> +#define POLL_HCTX_MAX_CNT 8
->>> +
->>> +static bool blk_add_unique_hctx(struct blk_mq_hw_ctx **data, int *cnt,
->>> +		struct blk_mq_hw_ctx *hctx)
->>>  {
->>> -	struct request_queue *q = bio->bi_bdev->bd_disk->queue;
->>> -	blk_qc_t cookie = bio_get_poll_data(bio);
->>> -	int ret = 0;
->>> +	int i;
->>>  
->>> -	/* wait until the bio is submitted really */
->>> -	if (!blk_qc_t_ready(cookie))
->>> -		return 0;
->>>  
->>> -	if (!bio_flagged(bio, BIO_DONE) && blk_qc_t_valid(cookie)) {
->>> -		struct blk_mq_hw_ctx *hctx =
->>> -			q->queue_hw_ctx[blk_qc_t_to_queue_num(cookie)];
->>> +	for (i = 0; i < *cnt; i++) {
->>> +		if (data[i] == hctx)
->>> +			goto exit;
->>> +	}
->>>  
->>> -		ret += blk_mq_poll_hctx(q, hctx);
->>> +	if (i < POLL_HCTX_MAX_CNT) {
->>> +		data[i] = hctx;
->>> +		(*cnt)++;
->>>  	}
->>> -	return ret;
->>> + exit:
->>> +	return *cnt == POLL_HCTX_MAX_CNT;
->>>  }
->>>  
->>> -static int blk_bio_poll_and_end_io(struct bio_grp_list *grps)
->>> +static void blk_build_poll_queues(struct bio_grp_list *grps,
->>> +		struct blk_mq_hw_ctx **data, int *cnt)
->>>  {
->>> -	int ret = 0;
->>>  	int i;
->>>  
->>> -	/*
->>> -	 * Poll hw queue first.
->>> -	 *
->>> -	 * TODO: limit max poll times and make sure to not poll same
->>> -	 * hw queue one more time.
->>> -	 */
->>>  	for (i = 0; i < grps->nr_grps; i++) {
->>>  		struct bio_grp_list_data *grp = &grps->head[i];
->>>  		struct bio *bio;
->>> @@ -325,11 +321,31 @@ static int blk_bio_poll_and_end_io(struct bio_grp_list *grps)
->>>  		if (bio_grp_list_grp_empty(grp))
->>>  			continue;
->>>  
->>> -		for (bio = grp->list.head; bio; bio = bio->bi_poll)
->>> -			ret += blk_mq_poll_io(bio);
->>> +		for (bio = grp->list.head; bio; bio = bio->bi_poll) {
->>> +			blk_qc_t  cookie;
->>> +			struct blk_mq_hw_ctx *hctx;
->>> +			struct request_queue *q;
->>> +
->>> +			if (bio_flagged(bio, BIO_DONE))
->>> +				continue;
->>> +
->>> +			/* wait until the bio is submitted really */
->>> +			cookie = bio_get_poll_data(bio);
->>> +			if (!blk_qc_t_ready(cookie) || !blk_qc_t_valid(cookie))
->>> +				continue;
->>> +
->>> +			q = bio->bi_bdev->bd_disk->queue;
->>> +			hctx = q->queue_hw_ctx[blk_qc_t_to_queue_num(cookie)];
->>> +			if (blk_add_unique_hctx(data, cnt, hctx))
->>> +				return;
->>> +		}
->>>  	}
->>> +}
->>> +
->>> +static void blk_bio_poll_reap_ios(struct bio_grp_list *grps)
->>> +{
->>> +	int i;
->>>  
->>> -	/* reap bios */
->>>  	for (i = 0; i < grps->nr_grps; i++) {
->>>  		struct bio_grp_list_data *grp = &grps->head[i];
->>>  		struct bio *bio;
->>> @@ -354,6 +370,22 @@ static int blk_bio_poll_and_end_io(struct bio_grp_list *grps)
->>>  		}
->>>  		__bio_grp_list_merge(&grp->list, &bl);
->>>  	}
->>> +}
->>> +
->>> +static int blk_bio_poll_and_end_io(struct bio_grp_list *grps)
->>> +{
->>> +	int ret = 0;
->>> +	int i;
->>> +	struct blk_mq_hw_ctx *hctx[POLL_HCTX_MAX_CNT];
->>> +	int cnt = 0;
->>> +
->>> +	blk_build_poll_queues(grps, hctx, &cnt);
->>> +
->>> +	for (i = 0; i < cnt; i++)
->>> +		ret += blk_mq_poll_hctx(hctx[i]->queue, hctx[i]);
->>> +
->>> +	blk_bio_poll_reap_ios(grps);
->>> +
->>>  	return ret;
->>>  }
->>>  
->>>
->> Can't we make it a sysfs attribute instead of hard-coding it?
->> '8' seems a bit arbitrary to me, I'd rather have the ability to modify it...
+On 23/04/2021 09:43, John Garry wrote:
+>> 1) randread test on ibm-x3850x6[*] with deadline
+>>
+>>                |IOPS    | FIO CPU util
+>> ------------------------------------------------
+>> hosttags      | 94k    | usr=1.13%, sys=14.75%
+>> ------------------------------------------------
+>> non hosttags  | 124k   | usr=1.12%, sys=10.65%,
+>>
 > 
-> I'd rather not add such code in the feature 'enablement' stage since I doesn't
-> observe the number plays a big role yet. It is added for holding hw queues to
-> be polled on stack variables, also avoid to add too much latency if there is
-> too many bios from too many hw queues to be reaped.
+> Getting these results for mq-deadline:
 > 
-> Also the actual polled hw queues can be observed easily via bpftrace, so debug
-> purpose from sysfs isn't necessary too.
+> hosttags
+> 100K cpu 1.52 4.47
 > 
-Okay. You can add my
+> non-hosttags
+> 109K cpu 1.74 5.49
+> 
+> So I still don't see the same CPU usage increase for hosttags.
+> 
+> But throughput is down, so at least I can check on that...
+> 
+>>
+>> 2) randread test on ibm-x3850x6[*] with none
+>>                |IOPS    | FIO CPU util
+>> ------------------------------------------------
+>> hosttags      | 120k   | usr=0.89%, sys=6.55%
+>> ------------------------------------------------
+>> non hosttags  | 121k   | usr=1.07%, sys=7.35%
+>> ------------------------------------------------
+>>
+> 
+> Here I get:
+> hosttags
+> 113K cpu 2.04 5.83
+> 
+> non-hosttags
+> 108K cpu 1.71 5.05
 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+Hi Ming,
 
-Cheers,
+One thing I noticed is that for the non-hosttags scenario is that I am 
+hitting the IO scheduler tag exhaustion path in blk_mq_get_tag() often; 
+here's some perf output:
 
-Hannes
--- 
-Dr. Hannes Reinecke		        Kernel Storage Architect
-hare@suse.de			               +49 911 74053 688
-SUSE Software Solutions Germany GmbH, 90409 Nürnberg
-GF: F. Imendörffer, HRB 36809 (AG Nürnberg)
+|--15.88%--blk_mq_submit_bio
+|     |
+|     |--11.27%--__blk_mq_alloc_request
+|     |      |
+|     |       --11.19%--blk_mq_get_tag
+|     |      |
+|     |      |--6.00%--__blk_mq_delay_run_hw_queue
+|     |      |     |
+
+...
+
+|     |      |
+|     |      |--3.29%--io_schedule
+|     |      |     |
+
+....
+
+|     |      |     |
+|     |      |     --1.32%--io_schedule_prepare
+|     |      |
+
+...
+
+|     |      |
+|     |      |--0.60%--sbitmap_finish_wait
+|     |      |
+      --0.56%--sbitmap_get
+
+I don't see this for hostwide tags - this may be because we have 
+multiple hctx, and the IO sched tags are per hctx, so less chance of 
+exhaustion. But this is not from hostwide tags specifically, but for 
+multiple HW queues in general. As I understood, sched tags were meant to 
+be per request queue, right? I am reading this correctly?
+
+I can barely remember some debate on this, but could not find the 
+thread. Hannes did have a patch related to topic, but was dropped:
+https://lore.kernel.org/linux-scsi/20191202153914.84722-7-hare@suse.de/#t
+
+Thanks,
+John
+
+
+
