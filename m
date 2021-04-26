@@ -2,112 +2,104 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37384C433B4
-	for <linux-block@archiver.kernel.org>; Mon, 26 Apr 2021 17:05:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54EDBC433ED
+	for <linux-block@archiver.kernel.org>; Mon, 26 Apr 2021 17:10:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 05932613AA
-	for <linux-block@archiver.kernel.org>; Mon, 26 Apr 2021 17:05:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2651861103
+	for <linux-block@archiver.kernel.org>; Mon, 26 Apr 2021 17:10:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235098AbhDZRGa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Apr 2021 13:06:30 -0400
-Received: from frasgout.his.huawei.com ([185.176.79.56]:2917 "EHLO
-        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235532AbhDZRGN (ORCPT
+        id S235279AbhDZRLE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 26 Apr 2021 13:11:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55040 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235424AbhDZRLC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Apr 2021 13:06:13 -0400
-Received: from fraeml715-chm.china.huawei.com (unknown [172.18.147.206])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4FTWGW57Nnz680L7;
-        Tue, 27 Apr 2021 00:54:59 +0800 (CST)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- fraeml715-chm.china.huawei.com (10.206.15.34) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Mon, 26 Apr 2021 19:05:29 +0200
-Received: from [10.47.94.234] (10.47.94.234) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.2; Mon, 26 Apr
- 2021 18:05:28 +0100
-Subject: Re: [bug report] shared tags causes IO hang and performance drop
-To:     Ming Lei <ming.lei@redhat.com>
-CC:     Kashyap Desai <kashyap.desai@broadcom.com>,
-        <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Douglas Gilbert <dgilbert@interlog.com>,
-        Hannes Reinecke <hare@suse.com>
-References: <YHaez6iN2HHYxYOh@T590>
- <9a6145a5-e6ac-3d33-b52a-0823bfc3b864@huawei.com>
- <cb326d404c6e0785d03a7dfadc42832c@mail.gmail.com> <YHbOOfGNHwO4SMS7@T590>
- <87ceccf2-287b-9bd1-899a-f15026c9e65b@huawei.com> <YHe3M62agQET6o6O@T590>
- <0c85fe52-ebc7-68b3-2dbe-dfad5d604346@huawei.com>
- <c1d5abaa-c460-55f8-5351-16f09d6aa81f@huawei.com> <YIbS1dgSYrsAeGvZ@T590>
- <55743a51-4d6f-f481-cebf-e2af9c657911@huawei.com> <YIbkX2G0+dp3PV+u@T590>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <9ad15067-ba7b-a335-ae71-8c4328856b91@huawei.com>
-Date:   Mon, 26 Apr 2021 18:02:31 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
+        Mon, 26 Apr 2021 13:11:02 -0400
+Received: from mail-oi1-x22b.google.com (mail-oi1-x22b.google.com [IPv6:2607:f8b0:4864:20::22b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6386EC061760
+        for <linux-block@vger.kernel.org>; Mon, 26 Apr 2021 10:10:20 -0700 (PDT)
+Received: by mail-oi1-x22b.google.com with SMTP id z7so4897246oix.9
+        for <linux-block@vger.kernel.org>; Mon, 26 Apr 2021 10:10:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=eo5gmhYwD5sVKrcVF5GNYF0YYnYlBgHP6BRS3D74YoE=;
+        b=GPw1xKitvwGmyWq/ZcCbFojhlg7PpjTPrNz9w8X//20S5tD3/S3DKwuFtKXp/IxohX
+         i0EYyHezVeSfUvGZDw48bgo/aZrqsMT5p/Ni9zAniIK/f6B7w4WDs8J36pjKVc8/9cG5
+         erC+wzD2S8mdRu9hl0Or2GLawn1iXM0Yker8Q=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=eo5gmhYwD5sVKrcVF5GNYF0YYnYlBgHP6BRS3D74YoE=;
+        b=S0xVkEI4VnF2UOIA5g+cssCubGzO1TTPp83TGGIi0K/gBw6zBRH52UNb6+EAH57lm5
+         Bxxz9ATklT/4hVfwdWHaV2c29Q93smEYaLcEjM+OU05umEHaRGxfPqo3K2g8CA3LK1gi
+         3ciq5FQSNtdzYVnAhM0mpebo7s4LYRRXNS0T8s+9RDE81oi83HM0M8TNwCWtXwxhFt1q
+         aEfE0VOc6f/a0RxSsXyfzpR+yIq6ngIBw0UgADkRhJGeGHEq/wKvFYJNj1XqcF3pXvpu
+         S/kJohZq8pUVt8SFbJAGxotCDRcrzXT8fc7yffa8lYblHghvcK7sMz+xR/0LBH3/hmTo
+         NvkQ==
+X-Gm-Message-State: AOAM531RNbaPMKjnFa5Ee4iIBjdtM66ak/YOdyC5iRKZ+5gU9d7+tnLW
+        6sB+M6Jb01H3RDf9mD6TPHdnmBfH+5NJgU8xRjmZdw==
+X-Google-Smtp-Source: ABdhPJyKCnqjd8rFzzXlpg/8c39CgYoVfclNiK/pBOeWWt28b4Po8FC1FuVbU0zVrHhWpYEjIT3hHcBdqKdfxGRNCmo=
+X-Received: by 2002:aca:31cf:: with SMTP id x198mr45382oix.71.1619457019700;
+ Mon, 26 Apr 2021 10:10:19 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <YIbkX2G0+dp3PV+u@T590>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.47.94.234]
-X-ClientProxiedBy: lhreml745-chm.china.huawei.com (10.201.108.195) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+References: <20210423220558.40764-1-kbusch@kernel.org> <20210423220558.40764-5-kbusch@kernel.org>
+In-Reply-To: <20210423220558.40764-5-kbusch@kernel.org>
+From:   Yuanyuan Zhong <yzhong@purestorage.com>
+Date:   Mon, 26 Apr 2021 10:10:09 -0700
+Message-ID: <CA+AMecF+n+xVk8HcQn12oiO=YMJM08aC0AG3iM_3h8SgNxURow@mail.gmail.com>
+Subject: Re: [PATCHv2 4/5] nvme: use return value from blk_execute_rq()
+To:     Keith Busch <kbusch@kernel.org>
+Cc:     linux-nvme@lists.infradead.org, sagi@grimberg.me,
+        Christoph Hellwig <hch@lst.de>, axboe@kernel.dk,
+        linux-block@vger.kernel.org, Casey Chen <cachen@purestorage.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 26/04/2021 17:03, Ming Lei wrote:
->> For both hostwide and non-hostwide tags, we have standalone sched tags and
->> request pool per hctx when q->nr_hw_queues > 1.
-> driver tags is shared for hostwide tags.
-> 
->>> That is why you observe that scheduler tag exhaustion
->>> is easy to trigger in case of non-hostwide tags.
->>>
->>> I'd suggest to add one per-request-queue sched tags, and make all hctxs
->>> sharing it, just like what you did for driver tag.
->>>
->> That sounds reasonable.
->>
->> But I don't see how this is related to hostwide tags specifically, but
->> rather just having q->nr_hw_queues > 1, which NVMe PCI and some other SCSI
->> MQ HBAs have (without using hostwide tags).
-> Before hostwide tags, the whole scheduler queue depth should be 256.
-> After hostwide tags, the whole scheduler queue depth becomes 256 *
-> nr_hw_queues. But the driver tag queue depth is_not_  changed.
+On Fri, Apr 23, 2021 at 3:06 PM Keith Busch <kbusch@kernel.org> wrote:
+>
+> We don't have an nvme status to report if the driver's .queue_rq()
+> returns an error without dispatching the requested nvme command. Use the
+> return value from blk_execute_rq() for all passthrough commands so the
+> caller may know their command was not successful.
+>
+> If the command is from the target passthrough interface and fails to
+> dispatch, synthesize the response back to the host as a internal target
+> error.
+>
+> Signed-off-by: Keith Busch <kbusch@kernel.org>
+> ---
+>  drivers/nvme/host/core.c       | 16 ++++++++++++----
+>  drivers/nvme/host/ioctl.c      |  6 +-----
+>  drivers/nvme/host/nvme.h       |  2 +-
+>  drivers/nvme/target/passthru.c |  8 ++++----
+>  4 files changed, 18 insertions(+), 14 deletions(-)
+>
+> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+> index 10bb8406e067..62af5fe7a0ce 100644
+> --- a/drivers/nvme/host/core.c
+> +++ b/drivers/nvme/host/core.c
+> @@ -972,12 +972,12 @@ int __nvme_submit_sync_cmd(struct request_queue *q, struct nvme_command *cmd,
+>                         goto out;
+>         }
+>
+> -       blk_execute_rq(NULL, req, at_head);
+> +       ret = blk_execute_rq(NULL, req, at_head);
+>         if (result)
+>                 *result = nvme_req(req)->result;
+>         if (nvme_req(req)->flags & NVME_REQ_CANCELLED)
+>                 ret = -EINTR;
+> -       else
+> +       else if (nvme_req(req)->status)
 
-Fine.
-
-> 
-> More requests come and are tried to dispatch to LLD and can't succeed
-> because of limited driver tag depth, and CPU utilization could be increased.
-
-Right, maybe this is a problem.
-
-I quickly added some debug, and see that 
-__blk_mq_get_driver_tag()->__sbitmap_queue_get() fails ~7% for hostwide 
-tags and 3% for non-hostwide tags.
-
-Having it fail at all for non-hostwide tags seems a bit dubious... 
-here's the code for deciding the rq sched tag depth:
-
-q->nr_requests = 2 * min(q->tags_set->queue_depth [128], BLK_DEV_MAX_RQ 
-[128])
-
-So we get 256 for our test scenario, which is appreciably bigger than 
-q->tags_set->queue_depth, so the failures make sense.
-
-Anyway, I'll look at adding code for a per-request queue sched tags to 
-see if it helps. But I would plan to continue to use a per hctx sched 
-request pool.
-
-Thanks,
-John
-
+Since nvme_req(req)->status is uninitialized for a command failed to dispatch,
+it's valid only if ret from blk_execute_rq() is 0.
