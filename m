@@ -2,132 +2,123 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1343CC433B4
-	for <linux-block@archiver.kernel.org>; Mon, 26 Apr 2021 20:37:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1F96C43460
+	for <linux-block@archiver.kernel.org>; Mon, 26 Apr 2021 23:59:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D2447613AC
-	for <linux-block@archiver.kernel.org>; Mon, 26 Apr 2021 20:37:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BD06461009
+	for <linux-block@archiver.kernel.org>; Mon, 26 Apr 2021 23:59:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241593AbhDZUiA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Apr 2021 16:38:00 -0400
-Received: from mail-il1-f200.google.com ([209.85.166.200]:56873 "EHLO
-        mail-il1-f200.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237180AbhDZUh7 (ORCPT
+        id S235026AbhDZX74 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 26 Apr 2021 19:59:56 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35474 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234929AbhDZX74 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Apr 2021 16:37:59 -0400
-Received: by mail-il1-f200.google.com with SMTP id u5-20020a92da850000b0290167339353beso28897352iln.23
-        for <linux-block@vger.kernel.org>; Mon, 26 Apr 2021 13:37:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=gD0jePeeRSuW3Us7tJA17C2eKRmazht2OsZnhiR008g=;
-        b=A8pvmqWb47Nc7VjHC7JgGwKitxqoEB5W9O423xQJpCD9PZEtBXg6uUGtm6GjZNQ2zF
-         nHFr+dX419XsW3sLp5arUbwpgFoh4JeuAqvp+Dvbv9OX5qCNlbLBD27+Mb9ztY5ulLjW
-         8yIXqGlhU9mjBU1qkrpvNa9jsy8HRolE2b54cOHEf+lZdpNIy7kfd0VCtbrHBY13Mgh5
-         FZn5J0OY5emhJQKady6EYtHhqbVDwMJkp+iFGl/xKThAVRbz8Ark8Q6uslbXJFKP1FwJ
-         zLXQrnNit7DuQlNCKPafQdMdXxoxQ+PDGJSJSXpL8LkhVhRmjotbj4Q+XHLJtabT1gH7
-         ftlw==
-X-Gm-Message-State: AOAM531ex3SO0z3lZR4ICrZH5pLW/B5GG8KFHiagTRYjtfrk06eCDjss
-        Mszk7TJltqrA4UkG59i3fDiEuLrt7DOrUDYFllU+9WzHngsD
-X-Google-Smtp-Source: ABdhPJxmcKChZ8aU2DWkS8AvpQu4OvKO9n2rt9jxvTP2OwD1YA9e6tmmDV+ZyorD7ARAA9gOsIyEVPjDi2itWvt7Nw2jndkvU64O
+        Mon, 26 Apr 2021 19:59:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1619481553;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=b3cF+pS/mZsuqO7vvgN0TXnQDB9Cd3N+SkueR7G1oCQ=;
+        b=danyDJnCs+V+WflJE3scgI8d2ZxurP6oJ/+3PntUFCI0LCK+jijCSrl3XzBVG7yL+s2q2L
+        xhg2qzTwHAMmCHs2lbBXz0DNhXt758GZTIYigqsbVtg4FIeRVEx/SOf03OfvRt0v/kprYu
+        TzhfxYEbP176OwYR23P2OLXFohK0RW4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-97-7EfImAquOvmGr0vHzeIuEQ-1; Mon, 26 Apr 2021 19:59:11 -0400
+X-MC-Unique: 7EfImAquOvmGr0vHzeIuEQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0AD3510073AC;
+        Mon, 26 Apr 2021 23:59:10 +0000 (UTC)
+Received: from T590 (ovpn-12-63.pek2.redhat.com [10.72.12.63])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 17A8F69FB4;
+        Mon, 26 Apr 2021 23:59:01 +0000 (UTC)
+Date:   Tue, 27 Apr 2021 07:59:07 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     John Garry <john.garry@huawei.com>
+Cc:     Kashyap Desai <kashyap.desai@broadcom.com>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Douglas Gilbert <dgilbert@interlog.com>,
+        Hannes Reinecke <hare@suse.com>
+Subject: Re: [bug report] shared tags causes IO hang and performance drop
+Message-ID: <YIdTyyVE5azlYwtO@T590>
+References: <cb326d404c6e0785d03a7dfadc42832c@mail.gmail.com>
+ <YHbOOfGNHwO4SMS7@T590>
+ <87ceccf2-287b-9bd1-899a-f15026c9e65b@huawei.com>
+ <YHe3M62agQET6o6O@T590>
+ <0c85fe52-ebc7-68b3-2dbe-dfad5d604346@huawei.com>
+ <c1d5abaa-c460-55f8-5351-16f09d6aa81f@huawei.com>
+ <YIbS1dgSYrsAeGvZ@T590>
+ <55743a51-4d6f-f481-cebf-e2af9c657911@huawei.com>
+ <YIbkX2G0+dp3PV+u@T590>
+ <9ad15067-ba7b-a335-ae71-8c4328856b91@huawei.com>
 MIME-Version: 1.0
-X-Received: by 2002:a02:c908:: with SMTP id t8mr18533787jao.78.1619469437584;
- Mon, 26 Apr 2021 13:37:17 -0700 (PDT)
-Date:   Mon, 26 Apr 2021 13:37:17 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000008d4a9d05c0e61cb2@google.com>
-Subject: [syzbot] linux-next boot error: general protection fault in bio_add_hw_page
-From:   syzbot <syzbot+27916005c4a9d0d06bce@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-next@vger.kernel.org,
-        sfr@canb.auug.org.au, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9ad15067-ba7b-a335-ae71-8c4328856b91@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+On Mon, Apr 26, 2021 at 06:02:31PM +0100, John Garry wrote:
+> On 26/04/2021 17:03, Ming Lei wrote:
+> > > For both hostwide and non-hostwide tags, we have standalone sched tags and
+> > > request pool per hctx when q->nr_hw_queues > 1.
+> > driver tags is shared for hostwide tags.
+> > 
+> > > > That is why you observe that scheduler tag exhaustion
+> > > > is easy to trigger in case of non-hostwide tags.
+> > > > 
+> > > > I'd suggest to add one per-request-queue sched tags, and make all hctxs
+> > > > sharing it, just like what you did for driver tag.
+> > > > 
+> > > That sounds reasonable.
+> > > 
+> > > But I don't see how this is related to hostwide tags specifically, but
+> > > rather just having q->nr_hw_queues > 1, which NVMe PCI and some other SCSI
+> > > MQ HBAs have (without using hostwide tags).
+> > Before hostwide tags, the whole scheduler queue depth should be 256.
+> > After hostwide tags, the whole scheduler queue depth becomes 256 *
+> > nr_hw_queues. But the driver tag queue depth is_not_  changed.
+> 
+> Fine.
+> 
+> > 
+> > More requests come and are tried to dispatch to LLD and can't succeed
+> > because of limited driver tag depth, and CPU utilization could be increased.
+> 
+> Right, maybe this is a problem.
+> 
+> I quickly added some debug, and see that
+> __blk_mq_get_driver_tag()->__sbitmap_queue_get() fails ~7% for hostwide tags
+> and 3% for non-hostwide tags.
+> 
+> Having it fail at all for non-hostwide tags seems a bit dubious... here's
+> the code for deciding the rq sched tag depth:
+> 
+> q->nr_requests = 2 * min(q->tags_set->queue_depth [128], BLK_DEV_MAX_RQ
+> [128])
+> 
+> So we get 256 for our test scenario, which is appreciably bigger than
+> q->tags_set->queue_depth, so the failures make sense.
+> 
+> Anyway, I'll look at adding code for a per-request queue sched tags to see
+> if it helps. But I would plan to continue to use a per hctx sched request
+> pool.
 
-syzbot found the following issue on:
+Why not switch to per hctx sched request pool?
 
-HEAD commit:    3f1fee3e Add linux-next specific files for 20210426
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=12103059d00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=286cd40bcb4d1f3a
-dashboard link: https://syzkaller.appspot.com/bug?extid=27916005c4a9d0d06bce
+Thanks,
+Ming
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+27916005c4a9d0d06bce@syzkaller.appspotmail.com
-
-general protection fault, probably for non-canonical address 0xdffffc00000000c5: 0000 [#1] PREEMPT SMP KASAN
-KASAN: null-ptr-deref in range [0x0000000000000628-0x000000000000062f]
-CPU: 0 PID: 86 Comm: kworker/u4:2 Not tainted 5.12.0-next-20210426-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Workqueue: events_unbound async_run_entry_fn
-RIP: 0010:bio_max_size block/bio.c:260 [inline]
-RIP: 0010:bio_full include/linux/bio.h:124 [inline]
-RIP: 0010:bio_full include/linux/bio.h:119 [inline]
-RIP: 0010:bio_add_hw_page+0x198/0x830 block/bio.c:778
-Code: 48 c1 e9 03 80 3c 01 00 0f 85 b1 05 00 00 48 b9 00 00 00 00 00 fc ff df 48 8b 43 08 48 8d b8 28 06 00 00 48 89 fe 48 c1 ee 03 <80> 3c 0e 00 0f 85 9d 05 00 00 48 8b 80 28 06 00 00 48 b9 00 00 00
-RSP: 0000:ffffc900010cf6a8 EFLAGS: 00010206
-RAX: 0000000000000000 RBX: ffff8880133ffc00 RCX: dffffc0000000000
-RDX: 0000000000000000 RSI: 00000000000000c5 RDI: 0000000000000628
-RBP: 0000000000000024 R08: 0000000000000000 R09: 0000000000000000
-R10: ffffffff83b75207 R11: 0000000000000001 R12: 0000000000000000
-R13: ffff88801b594560 R14: 0000000000000000 R15: ffffea00050de340
-FS:  0000000000000000(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000000 CR3: 000000000bc8e000 CR4: 00000000001506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- bio_add_pc_page+0xb8/0x100 block/bio.c:812
- bio_map_kern block/blk-map.c:374 [inline]
- blk_rq_map_kern+0x2bd/0x750 block/blk-map.c:642
- __scsi_execute+0x4c1/0x600 drivers/scsi/scsi_lib.c:224
- scsi_execute_req include/scsi/scsi_device.h:462 [inline]
- scsi_probe_lun drivers/scsi/scsi_scan.c:610 [inline]
- scsi_probe_and_add_lun+0x521/0x34e0 drivers/scsi/scsi_scan.c:1104
- __scsi_scan_target+0x21f/0xdb0 drivers/scsi/scsi_scan.c:1578
- scsi_scan_channel drivers/scsi/scsi_scan.c:1666 [inline]
- scsi_scan_channel+0x148/0x1e0 drivers/scsi/scsi_scan.c:1642
- scsi_scan_host_selected+0x2df/0x3b0 drivers/scsi/scsi_scan.c:1695
- do_scsi_scan_host+0x1e8/0x260 drivers/scsi/scsi_scan.c:1834
- do_scan_async+0x3e/0x500 drivers/scsi/scsi_scan.c:1844
- async_run_entry_fn+0x9d/0x550 kernel/async.c:127
- process_one_work+0x98d/0x1600 kernel/workqueue.c:2275
- worker_thread+0x64c/0x1120 kernel/workqueue.c:2421
- kthread+0x3b1/0x4a0 kernel/kthread.c:313
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:294
-Modules linked in:
----[ end trace a9f7e41e48b80dca ]---
-RIP: 0010:bio_max_size block/bio.c:260 [inline]
-RIP: 0010:bio_full include/linux/bio.h:124 [inline]
-RIP: 0010:bio_full include/linux/bio.h:119 [inline]
-RIP: 0010:bio_add_hw_page+0x198/0x830 block/bio.c:778
-Code: 48 c1 e9 03 80 3c 01 00 0f 85 b1 05 00 00 48 b9 00 00 00 00 00 fc ff df 48 8b 43 08 48 8d b8 28 06 00 00 48 89 fe 48 c1 ee 03 <80> 3c 0e 00 0f 85 9d 05 00 00 48 8b 80 28 06 00 00 48 b9 00 00 00
-RSP: 0000:ffffc900010cf6a8 EFLAGS: 00010206
-RAX: 0000000000000000 RBX: ffff8880133ffc00 RCX: dffffc0000000000
-RDX: 0000000000000000 RSI: 00000000000000c5 RDI: 0000000000000628
-RBP: 0000000000000024 R08: 0000000000000000 R09: 0000000000000000
-R10: ffffffff83b75207 R11: 0000000000000001 R12: 0000000000000000
-R13: ffff88801b594560 R14: 0000000000000000 R15: ffffea00050de340
-FS:  0000000000000000(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000000 CR3: 000000000bc8e000 CR4: 00000000001506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
