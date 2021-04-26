@@ -2,153 +2,127 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85E50C433B4
-	for <linux-block@archiver.kernel.org>; Mon, 26 Apr 2021 16:30:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2395C433B4
+	for <linux-block@archiver.kernel.org>; Mon, 26 Apr 2021 16:48:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 600C3611CE
-	for <linux-block@archiver.kernel.org>; Mon, 26 Apr 2021 16:30:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 71B3161104
+	for <linux-block@archiver.kernel.org>; Mon, 26 Apr 2021 16:48:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234400AbhDZQba (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Apr 2021 12:31:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45918 "EHLO
+        id S234551AbhDZQss (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 26 Apr 2021 12:48:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234385AbhDZQb3 (ORCPT
+        with ESMTP id S233736AbhDZQsr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Apr 2021 12:31:29 -0400
-Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91E7FC06175F
-        for <linux-block@vger.kernel.org>; Mon, 26 Apr 2021 09:30:46 -0700 (PDT)
-Received: by mail-ed1-x530.google.com with SMTP id i24so6884611edy.8
-        for <linux-block@vger.kernel.org>; Mon, 26 Apr 2021 09:30:46 -0700 (PDT)
+        Mon, 26 Apr 2021 12:48:47 -0400
+Received: from mail-il1-x130.google.com (mail-il1-x130.google.com [IPv6:2607:f8b0:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AB81C061574
+        for <linux-block@vger.kernel.org>; Mon, 26 Apr 2021 09:48:06 -0700 (PDT)
+Received: by mail-il1-x130.google.com with SMTP id c3so968123ils.5
+        for <linux-block@vger.kernel.org>; Mon, 26 Apr 2021 09:48:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linbit-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=sY7pwJ5XUrAgwm6qxLiYO/Kvi5B35cZY3vNXeQfDpAM=;
-        b=Mhnn9Sqg4R0YVY6mscnaoTlrM7x3U9DbcTy9UdrV0GQC389ZTI/taRj5CkWIv8C3ao
-         4Zho3We6JccxVbi47DrX5C3bAyLqEl+20uEaVP4PzUEb3EOQ3glpoFmSNrKg2ZwbqQjU
-         hooRn9fHo+AtPJb9NaTmDF1WgFAqRPyl2pgPfgdJkfwXdpYZspHAF0Bcru7+FxI62tiD
-         0XmaDoHB4aKXQUJ0Ukyu/DsHh615F9bRotbFdhO7Y74g+et+XewMPhKiuD4I6p7G85g+
-         4xjNz34UtHSjwDzVhO3H6Qovmvdc+OJ3EUjiMeY5R5a/RgqBu1UVjhwPvIlZPOxYkQge
-         kMjw==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=puGzBLwZv++5HHjd7fY19pEjsXMx9goCdL3lunTxYdQ=;
+        b=J3hDuQRym59MuVErqE8iq0UtDP+T7SI07BCrWQ3p4KTcFE2Q29lkGYxa/J88Mu8034
+         YgIZto9R9JjsVvzVbYma7W6GsD5vm7L4lZzmUi94q8y4d5jgVXGVtRr0Uo2itlDt7JrN
+         gWDgQ5bUQwl5tPSCG2L2lY+85ia/nVgHRYK/M5SMoMEPLngjOzRWl4pa09GZk+QDgpBe
+         i8cNUQ/4NVngRynvEnqgGPCaGI0CzNMoF0QTyQT8XJ1sxBEFSFOvuyk/FViLzXEpfH8V
+         NBZpWe9YD+xElbx9cot5VbAuh83JCr3xV9okQpnHN5FLGA0voaSdWnSpqS/gEmBcytIf
+         KstQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=sY7pwJ5XUrAgwm6qxLiYO/Kvi5B35cZY3vNXeQfDpAM=;
-        b=HcdZ41vccHurC5PYrDAF21rEEPWj4dWUKDx0pRA93CTd+Xw7XbFF8RkdY2eQI7Xu9L
-         KiDp7n1T7J8b3nwpAaz9y188yGF+xVb8OvJPhTl4TCrGR8qKp/LMj8EmgyNTecBEUgJ7
-         ZN4mGhpIVIGa929EGsFcYOXjelZM1d9NKM1G45K25oPam/E7UaBMot6rIRppPsVp/ly5
-         jlQVWltsYsYG/CdJ/Pt8Gc8xE5gLHqWeCm91UZLBuUZS+YAjVU2/SJdadvdWHtSa+noe
-         P7StS22UxYNzaJKX51BNrmAQ5DqlEY7wyog/bDXVmASu4dCc/Mb1kav8SBRDewWtUdnK
-         NOHA==
-X-Gm-Message-State: AOAM530ZrzQgktA/I7ae6Pi9SNWxN1r7kerQ/6KR82aPd3NpMSK5B9q+
-        nqglgmZDVQsxm1hYFDqno9HYEJuzFGWsS84hVUM=
-X-Google-Smtp-Source: ABdhPJydqvL5CYnnJgS8/QIp6pHbsixoj+Uw/m4nB4dtt/U5awp7VfdALWcLY2epud1bqGyXI0dAbg==
-X-Received: by 2002:a05:6402:617:: with SMTP id n23mr10260006edv.45.1619454645350;
-        Mon, 26 Apr 2021 09:30:45 -0700 (PDT)
-Received: from localhost.localdomain (85-127-190-169.dsl.dynamic.surfer.at. [85.127.190.169])
-        by smtp.gmail.com with ESMTPSA id gt33sm11688479ejc.89.2021.04.26.09.30.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Apr 2021 09:30:44 -0700 (PDT)
-Received: from localhost.localdomain (localhost [127.0.0.1])
-        by localhost.localdomain (8.15.2/8.15.2) with ESMTPS id 13QGUiXp3454465
-        (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-        Mon, 26 Apr 2021 18:30:44 +0200
-Received: (from christoph@localhost)
-        by localhost.localdomain (8.15.2/8.15.2/Submit) id 13QGUh403454464;
-        Mon, 26 Apr 2021 18:30:43 +0200
-From:   =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>
-To:     drbd-dev@tron.linbit.com
-Cc:     Philipp Reisner <philipp.reisner@linbit.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>, stable@vger.kernel.org
-Subject: [PATCH] drbd: fix potential silent data corruption
-Date:   Mon, 26 Apr 2021 18:30:32 +0200
-Message-Id: <20210426163032.3454129-1-christoph.boehmwalder@linbit.com>
-X-Mailer: git-send-email 2.26.3
+        bh=puGzBLwZv++5HHjd7fY19pEjsXMx9goCdL3lunTxYdQ=;
+        b=MTwkh2q2GbEvY6EAM3B15laUS4v7BQPGeW/dQ/D1iYrh4SB5MH4Yht7tfKR+8/dQR4
+         F516dJlaP3aTE4ZIi1V3Ufff2sjREWzEUPwBbX/8iDgJEDhUELE9N26hA7Fpnf75YZ4v
+         t9FZyJ6h8dRY1wwi7EFV2JjVuGq+9A8ZBFCbdct7pyZd/8iGWLoaKunVpCHZNVwMHoow
+         UNyvW4CGrK9NjO2RajaQxOs7pBcDXMSi9gkMplLbmZWD1QWW2S8aEyU6TYazvmKrEagC
+         u8tZG1ejXrpOn3PGHAqG48JSuKQ7IH4zTbfNBYxYezGr9GhkEX94LzAqhPTd+5FYFt/n
+         GZnA==
+X-Gm-Message-State: AOAM530NMK5cHj1a3SGrm+E38AyX2wCqrEjbJPeumk3k3+UQWETjA2jA
+        vu2HgwMZIjLdaFXXR6dpIB1Wtg==
+X-Google-Smtp-Source: ABdhPJyz84UTTivuvf7p9WHBWJPdNtTnBqQ9MVSQ0iwDxMl87Xhp7DRqTHJVVCrqyJShe3XjXtWP/Q==
+X-Received: by 2002:a92:d3c4:: with SMTP id c4mr13648591ilh.50.1619455685329;
+        Mon, 26 Apr 2021 09:48:05 -0700 (PDT)
+Received: from [192.168.1.30] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id m8sm182147ilc.13.2021.04.26.09.48.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 26 Apr 2021 09:48:04 -0700 (PDT)
+Subject: Re: switch block layer polling to a bio based model
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jeffle Xu <jefflexu@linux.alibaba.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+References: <20210426134821.2191160-1-hch@lst.de>
+ <2d229167-f56d-583b-569c-166c97ce2e71@kernel.dk>
+ <20210426150638.GA24618@lst.de>
+ <6b7e3ba0-aa09-b86d-8ea1-dc2e78c7529e@kernel.dk>
+ <20210426161503.GA30994@lst.de>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <3c77394a-c6fc-8f58-302e-8e997adc8620@kernel.dk>
+Date:   Mon, 26 Apr 2021 10:48:04 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210426161503.GA30994@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Lars Ellenberg <lars.ellenberg@linbit.com>
+On 4/26/21 10:15 AM, Christoph Hellwig wrote:
+> On Mon, Apr 26, 2021 at 09:12:09AM -0600, Jens Axboe wrote:
+>> Here's the series. It's not super clean (yet), but basically allows
+>> users like io_uring to setup a bio cache, and pass that in through
+>> iocb->ki_bi_cache. With that, we can recycle them instead of going
+>> through free+alloc continually. If you look at profiles for high iops,
+>> we're spending more time than desired doing just that.
+>>
+>> https://git.kernel.dk/cgit/linux-block/log/?h=io_uring-bio-cache
+> 
+> So where do you spend the cycles?  The do not memset the whole bio
+> optimization is pretty obvious and is someting we should do independent
+> of the allocator.
 
-Scenario:
----------
+memset is just a small optimization on top. If we look at current
+profiles, the alloc+free looks something ala:
 
-bio chain generated by blk_queue_split().
-Some split bio fails and propagates its error status to the "parent" bio.
-But then the (last part of the) parent bio itself completes without error.
++    2.71%  io_uring  [kernel.vmlinux]  [k] bio_alloc_bioset
++    2.03%  io_uring  [kernel.vmlinux]  [k] kmem_cache_alloc
 
-We would clobber the already recorded error status with BLK_STS_OK,
-causing silent data corruption.
+and
 
-Reproducer:
------------
++    2.82%  io_uring  [kernel.vmlinux]  [k] __slab_free
++    1.73%  io_uring  [kernel.vmlinux]  [k] kmem_cache_free
+     0.36%  io_uring  [kernel.vmlinux]  [k] mempool_free_slab
+     0.27%  io_uring  [kernel.vmlinux]  [k] mempool_free
 
-How to trigger this in the real world within seconds:
+Which is a substantial amount of cycles that is needed just to
+repeatedly use the same set of bios for doing IO. Using the caching
+patchset, all of the above are completely eliminated, and the only thing
+we dynamically allocate is a request which is a lot cheaper (ends up
+being 1-2% for either kernel).
 
-DRBD on top of degraded parity raid,
-small stripe_cache_size, large read_ahead setting.
-Drop page cache (sysctl vm.drop_caches=1, fadvise "DONTNEED",
-umount and mount again, "reboot").
+> The other thing that sucks is the mempool implementation, as it forces
+> each allocation and free to do an indirect call.  I think it might be
+> worth to try to frontend it with a normal slab cache and only fall back
+> to the mempool if that fails.
 
-Cause significant read ahead.
+Also minor I believe, but yes it'll eat cycles too. FWIW, the testing
+above is done without RETPOLINE.
 
-Large read ahead request is split by blk_queue_split().
-Parts of the read ahead that are already in the stripe cache,
-or find an available stripe cache to use, can be serviced.
-Parts of the read ahead that would need "too much work",
-would need to wait for a "stripe_head" to become available,
-are rejected immediately.
-
-For larger read ahead requests that are split in many pieces, it is very
-likely that some "splits" will be serviced, but then the stripe cache is
-exhausted/busy, and the remaining ones will be rejected.
-
-Signed-off-by: Lars Ellenberg <lars.ellenberg@linbit.com>
-Signed-off-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
-Cc: <stable@vger.kernel.org> # 4.13.x
----
-
-Note: this will need to be backported to versions prior to 4.13 too, but
-the API changed in the meantime (from the new bio->bi_status to the old
-bio->bi_error). I will send a separate patch for these older versions.
-
-In addition, the generic bio_endio/bio_chain_endio has to be fixed in
-a similar way for versions before 4.6. This equates to a backport of
-upstream commit af3e3a5259e3 ("block: don't unecessarily clobber bi_error
-for chained bios").
-
- drivers/block/drbd/drbd_req.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/block/drbd/drbd_req.c b/drivers/block/drbd/drbd_req.c
-index 9398c2c2cb2d..a384a58de1fd 100644
---- a/drivers/block/drbd/drbd_req.c
-+++ b/drivers/block/drbd/drbd_req.c
-@@ -180,7 +180,8 @@ void start_new_tl_epoch(struct drbd_connection *connection)
- void complete_master_bio(struct drbd_device *device,
- 		struct bio_and_error *m)
- {
--	m->bio->bi_status = errno_to_blk_status(m->error);
-+	if (unlikely(m->error))
-+		m->bio->bi_status = errno_to_blk_status(m->error);
- 	bio_endio(m->bio);
- 	dec_ap_bio(device);
- }
 -- 
-2.26.3
+Jens Axboe
 
