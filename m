@@ -2,123 +2,132 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1F96C43460
-	for <linux-block@archiver.kernel.org>; Mon, 26 Apr 2021 23:59:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9171DC433ED
+	for <linux-block@archiver.kernel.org>; Tue, 27 Apr 2021 00:01:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BD06461009
-	for <linux-block@archiver.kernel.org>; Mon, 26 Apr 2021 23:59:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 68E9F61040
+	for <linux-block@archiver.kernel.org>; Tue, 27 Apr 2021 00:01:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235026AbhDZX74 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Apr 2021 19:59:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35474 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234929AbhDZX74 (ORCPT
+        id S234084AbhD0ACD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 26 Apr 2021 20:02:03 -0400
+Received: from mailout2.samsung.com ([203.254.224.25]:19448 "EHLO
+        mailout2.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232022AbhD0ACD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Apr 2021 19:59:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619481553;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=b3cF+pS/mZsuqO7vvgN0TXnQDB9Cd3N+SkueR7G1oCQ=;
-        b=danyDJnCs+V+WflJE3scgI8d2ZxurP6oJ/+3PntUFCI0LCK+jijCSrl3XzBVG7yL+s2q2L
-        xhg2qzTwHAMmCHs2lbBXz0DNhXt758GZTIYigqsbVtg4FIeRVEx/SOf03OfvRt0v/kprYu
-        TzhfxYEbP176OwYR23P2OLXFohK0RW4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-97-7EfImAquOvmGr0vHzeIuEQ-1; Mon, 26 Apr 2021 19:59:11 -0400
-X-MC-Unique: 7EfImAquOvmGr0vHzeIuEQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0AD3510073AC;
-        Mon, 26 Apr 2021 23:59:10 +0000 (UTC)
-Received: from T590 (ovpn-12-63.pek2.redhat.com [10.72.12.63])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 17A8F69FB4;
-        Mon, 26 Apr 2021 23:59:01 +0000 (UTC)
-Date:   Tue, 27 Apr 2021 07:59:07 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     John Garry <john.garry@huawei.com>
-Cc:     Kashyap Desai <kashyap.desai@broadcom.com>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Douglas Gilbert <dgilbert@interlog.com>,
-        Hannes Reinecke <hare@suse.com>
-Subject: Re: [bug report] shared tags causes IO hang and performance drop
-Message-ID: <YIdTyyVE5azlYwtO@T590>
-References: <cb326d404c6e0785d03a7dfadc42832c@mail.gmail.com>
- <YHbOOfGNHwO4SMS7@T590>
- <87ceccf2-287b-9bd1-899a-f15026c9e65b@huawei.com>
- <YHe3M62agQET6o6O@T590>
- <0c85fe52-ebc7-68b3-2dbe-dfad5d604346@huawei.com>
- <c1d5abaa-c460-55f8-5351-16f09d6aa81f@huawei.com>
- <YIbS1dgSYrsAeGvZ@T590>
- <55743a51-4d6f-f481-cebf-e2af9c657911@huawei.com>
- <YIbkX2G0+dp3PV+u@T590>
- <9ad15067-ba7b-a335-ae71-8c4328856b91@huawei.com>
+        Mon, 26 Apr 2021 20:02:03 -0400
+Received: from epcas1p1.samsung.com (unknown [182.195.41.45])
+        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20210427000119epoutp02715ac1799440edfc650d58b77d859e13~5jgHAVbTG2169621696epoutp02L
+        for <linux-block@vger.kernel.org>; Tue, 27 Apr 2021 00:01:19 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20210427000119epoutp02715ac1799440edfc650d58b77d859e13~5jgHAVbTG2169621696epoutp02L
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1619481679;
+        bh=MNgDHKlVDksTKgzBFTI1KrpslHHnhsmPeed6h7/2oYI=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=Cas33J4i8gnKA6ywjaMOO6L3A1jxJx66QpfNnnetH2ayrSY8LMJtx9WgIukrk46+q
+         8zs/c5MyoDXzItHI7ektN4D4sA5dN702wDWMEwB/UDI2qy8hgNXM3U2tqGlvkjByjk
+         PYDtRz7YzNOHc+dSOUF7lGGYOoJwn+pfhbAnlVFA=
+Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
+        epcas1p3.samsung.com (KnoxPortal) with ESMTP id
+        20210427000114epcas1p37797e4b6c0ba4c851dbc2a04371edaa2~5jgCjVYkp2065220652epcas1p3d;
+        Tue, 27 Apr 2021 00:01:14 +0000 (GMT)
+Received: from epsmges1p2.samsung.com (unknown [182.195.40.161]) by
+        epsnrtp2.localdomain (Postfix) with ESMTP id 4FThkK0XZPz4x9Py; Tue, 27 Apr
+        2021 00:01:13 +0000 (GMT)
+Received: from epcas1p3.samsung.com ( [182.195.41.47]) by
+        epsmges1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
+        86.86.09701.54457806; Tue, 27 Apr 2021 09:01:09 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas1p3.samsung.com (KnoxPortal) with ESMTPA id
+        20210427000106epcas1p3f39e318e9211bf3378b3e4afad2de56e~5jf7moaiE2307623076epcas1p30;
+        Tue, 27 Apr 2021 00:01:06 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20210427000106epsmtrp23d4676e645b26f4fd5fe035792bde5a5~5jf7l8fKD0689006890epsmtrp2q;
+        Tue, 27 Apr 2021 00:01:06 +0000 (GMT)
+X-AuditID: b6c32a36-647ff700000025e5-b1-608754452508
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        26.4C.08637.24457806; Tue, 27 Apr 2021 09:01:06 +0900 (KST)
+Received: from localhost.localdomain (unknown [10.253.99.105]) by
+        epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+        20210427000106epsmtip1d3671dddcf0717d99dd754ab9e3c39b2~5jf7Zk-SD3023530235epsmtip1s;
+        Tue, 27 Apr 2021 00:01:06 +0000 (GMT)
+From:   Changheun Lee <nanich.lee@samsung.com>
+To:     axboe@kernel.dk
+Cc:     bgoncalv@redhat.com, bvanassche@acm.org, hch@lst.de,
+        jaegeuk@kernel.org, linux-block@vger.kernel.org,
+        ming.lei@redhat.com, nanich.lee@samsung.com, yi.zhang@redhat.com
+Subject: Re: [PATCH v2] block: Improve limiting the bio size
+Date:   Tue, 27 Apr 2021 08:43:07 +0900
+Message-Id: <20210426234307.7871-1-nanich.lee@samsung.com>
+X-Mailer: git-send-email 2.29.0
+In-Reply-To: <0f078c05-b212-3877-fa64-77fd79cc50ce@kernel.dk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9ad15067-ba7b-a335-ae71-8c4328856b91@huawei.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrIJsWRmVeSWpSXmKPExsWy7bCmvq5rSHuCwZYv4har7/azWey6OJ/R
+        YtqHn8wWK1cfZbJ4sn4Ws8XeW9oWhyY3M1lcu3+G3eL6uWlsDpwel694e1w+W+qxaVUnm8fu
+        mw1sHu/3XWXz6NuyitHj8ya5APaoHJuM1MSU1CKF1Lzk/JTMvHRbJe/geOd4UzMDQ11DSwtz
+        JYW8xNxUWyUXnwBdt8wcoLuUFMoSc0qBQgGJxcVK+nY2RfmlJakKGfnFJbZKqQUpOQWGBgV6
+        xYm5xaV56XrJ+blWhgYGRqZAlQk5GZ/ubGAs2MBS8ePfY9YGxk3MXYycHBICJhJzHjWzdzFy
+        cQgJ7GCUmPSggRnC+cQosWfZKkYI5xujxP9H25hgWhZens0EkdjLKNH/ZiIrhPOZUeLH3QYW
+        kCo2AR2Jvre32EBsEQFhif0drWBxZoF1jBIvLyeB2MICNhLLX+5iB7FZBFQlPv2bCFbDK2Al
+        sfrpDqht8hJ/7veAHcspYCuxcel7qBpBiZMzn0DNlJdo3job7G4JgUYOies/l7JANLtILDh9
+        ih3CFpZ4dXwLlC0l8fndXjaIhm5Giea2+YwQzgRGiSXPl0GtNpb49PkzUIIDaIWmxPpd+hBh
+        RYmdv+cyQmzmk3j3tYcVpERCgFeio00IokRF4kzLfWaYXc/X7oSa6CHR3fQVGtpAq17c7GWb
+        wKgwC8lDs5A8NAth8wJG5lWMYqkFxbnpqcWGBUbIkbyJEZxWtcx2ME56+0HvECMTB+MhRgkO
+        ZiURXrZdrQlCvCmJlVWpRfnxRaU5qcWHGE2BwT2RWUo0OR+Y2PNK4g1NjYyNjS1MzMzNTI2V
+        xHnTnasThATSE0tSs1NTC1KLYPqYODilGph89lYwWG3cWKDAtDlM6caVcE9h95IWy1iWPcbq
+        ihpxpaeufboaylIR0Npw+Y2CnZmdhI221zJh1mvGylmv3VjuCe4pNa7pvVAjVhVysGedUrPw
+        z607Uw7bl8XZfTCKTj090aBr05dp+o/fvvfJZnj1dQu3X4XjY91FEx7NjHLatcTzV5bQluma
+        ORkr6s7e97H5dsQ04s3W2k2fDigGX5y2QXt3qNOchM/qE256Pm38KibIpdepU6+jrVr7N0Te
+        Kmq6aPqCVQwynhO2OkvZLVlpzpi+7HR3Xsm29fu+q9tyvMqenTDjj0Ru/jR3q0czZl28vCOh
+        MHtvkMB+36qlxkuMczoak/YEvV3TyMaYpMRSnJFoqMVcVJwIAODazU40BAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrOLMWRmVeSWpSXmKPExsWy7bCSnK5TSHuCwYQZphar7/azWey6OJ/R
+        YtqHn8wWK1cfZbJ4sn4Ws8XeW9oWhyY3M1lcu3+G3eL6uWlsDpwel694e1w+W+qxaVUnm8fu
+        mw1sHu/3XWXz6NuyitHj8ya5APYoLpuU1JzMstQifbsEroxPdzYwFmxgqfjx7zFrA+Mm5i5G
+        Tg4JAROJhZdnM4HYQgK7GSXm/LGGiEtJHD/xlrWLkQPIFpY4fLi4i5ELqOQjo8T9TZ3sIDVs
+        AjoSfW9vsYHYIkA1+ztaWUCKmAV2MEp0T9gFtkBYwEZi+ctdYA0sAqoSn/5NZAGxeQWsJFY/
+        3cEEsUxe4s/9HrB6TgFbiY1L37NAHGQj0fB4CytEvaDEyZlPwOLMQPXNW2czT2AUmIUkNQtJ
+        agEj0ypGydSC4tz03GLDAsO81HK94sTc4tK8dL3k/NxNjOCw19Lcwbh91Qe9Q4xMHIyHGCU4
+        mJVEeNl2tSYI8aYkVlalFuXHF5XmpBYfYpTmYFES573QdTJeSCA9sSQ1OzW1ILUIJsvEwSnV
+        wJS3mql1vdvVPY4zfM5cDKsw+qt4wUci4lV72wftm+nMG2rmMf2WquTbzNxz5USR8tOZuQ9m
+        NVR4cTX7fRbvCLDXF3mU1vW3sDpbYLqd7y6phcVdTbZPZNNUONviXnjK71GeX3ijLIWVkVl5
+        S7iwvZf53kWNps8jKi5zL3/81TLypXbdTZu6zCiX1D0/LZUy7Iq/Kt2Rb/vx45RI1j8Z38+r
+        b3lZvytyjzF3TjqgsVtnddW/ki/pOpVV5Ts8Hu7oOTjjyu5+jZlad32ijHwOvVm77274c67g
+        UHUhLRdV+Zs3mP5H7ooT2dZ7b8nHmDPGszXnzLysb8bHOMPsZuHTK+oXXCPYa/5URVma+2oo
+        sRRnJBpqMRcVJwIAnKygQOoCAAA=
+X-CMS-MailID: 20210427000106epcas1p3f39e318e9211bf3378b3e4afad2de56e
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: SVC_REQ_APPROVE
+CMS-TYPE: 101P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20210427000106epcas1p3f39e318e9211bf3378b3e4afad2de56e
+References: <0f078c05-b212-3877-fa64-77fd79cc50ce@kernel.dk>
+        <CGME20210427000106epcas1p3f39e318e9211bf3378b3e4afad2de56e@epcas1p3.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Apr 26, 2021 at 06:02:31PM +0100, John Garry wrote:
-> On 26/04/2021 17:03, Ming Lei wrote:
-> > > For both hostwide and non-hostwide tags, we have standalone sched tags and
-> > > request pool per hctx when q->nr_hw_queues > 1.
-> > driver tags is shared for hostwide tags.
-> > 
-> > > > That is why you observe that scheduler tag exhaustion
-> > > > is easy to trigger in case of non-hostwide tags.
-> > > > 
-> > > > I'd suggest to add one per-request-queue sched tags, and make all hctxs
-> > > > sharing it, just like what you did for driver tag.
-> > > > 
-> > > That sounds reasonable.
-> > > 
-> > > But I don't see how this is related to hostwide tags specifically, but
-> > > rather just having q->nr_hw_queues > 1, which NVMe PCI and some other SCSI
-> > > MQ HBAs have (without using hostwide tags).
-> > Before hostwide tags, the whole scheduler queue depth should be 256.
-> > After hostwide tags, the whole scheduler queue depth becomes 256 *
-> > nr_hw_queues. But the driver tag queue depth is_not_  changed.
+> On 4/26/21 12:32 AM, Yi Zhang wrote:
+> > Hi Jens/Bart
+> > CKI reproduced the boot panic issue again with the latest
+> > linux-block/for-next[1] today, then I checked the patch 'bio: limit
+> > bio max size'[2] found Bart's fix patch does not fold in that commit,
+> > could you help recheck it, thanks.
 > 
-> Fine.
+> Hmm, maybe I botched it. But a bit too much churn around this patch,
+> Changheun maybe you can resend a fully tested version?
 > 
-> > 
-> > More requests come and are tried to dispatch to LLD and can't succeed
-> > because of limited driver tag depth, and CPU utilization could be increased.
-> 
-> Right, maybe this is a problem.
-> 
-> I quickly added some debug, and see that
-> __blk_mq_get_driver_tag()->__sbitmap_queue_get() fails ~7% for hostwide tags
-> and 3% for non-hostwide tags.
-> 
-> Having it fail at all for non-hostwide tags seems a bit dubious... here's
-> the code for deciding the rq sched tag depth:
-> 
-> q->nr_requests = 2 * min(q->tags_set->queue_depth [128], BLK_DEV_MAX_RQ
-> [128])
-> 
-> So we get 256 for our test scenario, which is appreciably bigger than
-> q->tags_set->queue_depth, so the failures make sense.
-> 
-> Anyway, I'll look at adding code for a per-request queue sched tags to see
-> if it helps. But I would plan to continue to use a per hctx sched request
-> pool.
+> -- 
+> Jens Axboe
 
-Why not switch to per hctx sched request pool?
+I'm really sorry Jens, and to all. I'll check and resend. Sorry again.
 
-Thanks,
-Ming
-
+Changheun Lee.
