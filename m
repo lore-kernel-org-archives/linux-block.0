@@ -2,378 +2,97 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB3CCC433ED
-	for <linux-block@archiver.kernel.org>; Mon, 26 Apr 2021 15:27:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53EEAC433ED
+	for <linux-block@archiver.kernel.org>; Mon, 26 Apr 2021 15:55:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 887256135D
-	for <linux-block@archiver.kernel.org>; Mon, 26 Apr 2021 15:27:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2573B6105A
+	for <linux-block@archiver.kernel.org>; Mon, 26 Apr 2021 15:55:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233919AbhDZP2P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Apr 2021 11:28:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:45744 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233736AbhDZP2O (ORCPT
+        id S234123AbhDZP4V (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 26 Apr 2021 11:56:21 -0400
+Received: from frasgout.his.huawei.com ([185.176.79.56]:2916 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234224AbhDZP4L (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Apr 2021 11:28:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619450852;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=oYm6s7pNYd6O8onb5kD82cZdiZxfOGydPD7lvHhTzpY=;
-        b=Zh/d3tKnGbM8c7Y68T+zOrPrYxRFGtaV1PS9yLYBfcLTAGsfteMgkHoY15IpfPNOrXLFJ8
-        7KI+FC3hSXasevIimKXy6fpqtb7zIeZ0LxjILSJrf4QJBj+PSAhecaGLZQ0Gfn8ow+tOkr
-        J1Ya9/K5Hq3XM1+AdOOSxjVKitrLqS4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-392-ZYv6uZpdNPGR1bAuH4txUQ-1; Mon, 26 Apr 2021 11:27:30 -0400
-X-MC-Unique: ZYv6uZpdNPGR1bAuH4txUQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 744216D4F9;
-        Mon, 26 Apr 2021 15:27:29 +0000 (UTC)
-Received: from T590 (ovpn-12-94.pek2.redhat.com [10.72.12.94])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 42E28687DA;
-        Mon, 26 Apr 2021 15:27:21 +0000 (UTC)
-Date:   Mon, 26 Apr 2021 23:27:28 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Jeffle Xu <jefflexu@linux.alibaba.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH 12/12] block: switch polling to be bio based
-Message-ID: <YIbb4BFg/j36HlgD@T590>
-References: <20210426134821.2191160-1-hch@lst.de>
- <20210426134821.2191160-13-hch@lst.de>
+        Mon, 26 Apr 2021 11:56:11 -0400
+Received: from fraeml706-chm.china.huawei.com (unknown [172.18.147.206])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4FTTjh6J8Qz77b2h;
+        Mon, 26 Apr 2021 23:44:56 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml706-chm.china.huawei.com (10.206.15.55) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2176.2; Mon, 26 Apr 2021 17:55:26 +0200
+Received: from [10.47.94.234] (10.47.94.234) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.2; Mon, 26 Apr
+ 2021 16:55:25 +0100
+Subject: Re: [bug report] shared tags causes IO hang and performance drop
+To:     Ming Lei <ming.lei@redhat.com>
+CC:     Kashyap Desai <kashyap.desai@broadcom.com>,
+        <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Douglas Gilbert <dgilbert@interlog.com>,
+        Hannes Reinecke <hare@suse.com>
+References: <YHaez6iN2HHYxYOh@T590>
+ <9a6145a5-e6ac-3d33-b52a-0823bfc3b864@huawei.com>
+ <cb326d404c6e0785d03a7dfadc42832c@mail.gmail.com> <YHbOOfGNHwO4SMS7@T590>
+ <87ceccf2-287b-9bd1-899a-f15026c9e65b@huawei.com> <YHe3M62agQET6o6O@T590>
+ <0c85fe52-ebc7-68b3-2dbe-dfad5d604346@huawei.com>
+ <c1d5abaa-c460-55f8-5351-16f09d6aa81f@huawei.com> <YIbS1dgSYrsAeGvZ@T590>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <55743a51-4d6f-f481-cebf-e2af9c657911@huawei.com>
+Date:   Mon, 26 Apr 2021 16:52:28 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210426134821.2191160-13-hch@lst.de>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <YIbS1dgSYrsAeGvZ@T590>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.47.94.234]
+X-ClientProxiedBy: lhreml745-chm.china.huawei.com (10.201.108.195) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Apr 26, 2021 at 03:48:21PM +0200, Christoph Hellwig wrote:
-> Replace the blk_poll interface that requires the caller to keep a queue
-> and cookie from the submissions with polling based on the bio.
+On 26/04/2021 15:48, Ming Lei wrote:
+>>       --0.56%--sbitmap_get
+>>
+>> I don't see this for hostwide tags - this may be because we have multiple
+>> hctx, and the IO sched tags are per hctx, so less chance of exhaustion. But
+>> this is not from hostwide tags specifically, but for multiple HW queues in
+>> general. As I understood, sched tags were meant to be per request queue,
+>> right? I am reading this correctly?
+> sched tags is still per-hctx.
 > 
-> Polling for the bio itself leads to a few advantages:
-> 
->  - the cookie construction can made entirely private in blk-mq.c
->  - the caller does not need to remember the request_queue and cookie
->    separately and thus sidesteps their lifetime issues
->  - keeping the device and the cookie inside the bio allows to trivially
->    support polling BIOs remapping by stacking drivers
->  - a lot of code to propagate the cookie back up the submission path can
->    be removed entirely.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  arch/m68k/emu/nfblock.c             |   3 +-
->  arch/xtensa/platforms/iss/simdisk.c |   3 +-
->  block/bio.c                         |   1 +
->  block/blk-core.c                    | 103 +++++++++++++++++++---------
->  block/blk-mq.c                      |  75 +++++++-------------
->  block/blk-mq.h                      |   2 +
->  drivers/block/brd.c                 |  12 ++--
->  drivers/block/drbd/drbd_int.h       |   2 +-
->  drivers/block/drbd/drbd_req.c       |   3 +-
->  drivers/block/n64cart.c             |  12 ++--
->  drivers/block/null_blk/main.c       |   3 +-
->  drivers/block/pktcdvd.c             |   7 +-
->  drivers/block/ps3vram.c             |   6 +-
->  drivers/block/rsxx/dev.c            |   7 +-
->  drivers/block/umem.c                |   4 +-
->  drivers/block/zram/zram_drv.c       |  10 +--
->  drivers/lightnvm/pblk-init.c        |   6 +-
->  drivers/md/bcache/request.c         |  13 ++--
->  drivers/md/bcache/request.h         |   4 +-
->  drivers/md/dm.c                     |  28 +++-----
->  drivers/md/md.c                     |  10 ++-
->  drivers/nvdimm/blk.c                |   5 +-
->  drivers/nvdimm/btt.c                |   5 +-
->  drivers/nvdimm/pmem.c               |   3 +-
->  drivers/nvme/host/core.c            |   2 +-
->  drivers/nvme/host/multipath.c       |   6 +-
->  drivers/nvme/host/nvme.h            |   2 +-
->  drivers/s390/block/dcssblk.c        |   7 +-
->  drivers/s390/block/xpram.c          |   5 +-
->  fs/block_dev.c                      |  25 +++----
->  fs/btrfs/inode.c                    |   8 +--
->  fs/ext4/file.c                      |   2 +-
->  fs/gfs2/file.c                      |   4 +-
->  fs/iomap/direct-io.c                |  39 ++++-------
->  fs/xfs/xfs_file.c                   |   2 +-
->  fs/zonefs/super.c                   |   2 +-
->  include/linux/bio.h                 |   2 +-
->  include/linux/blk-mq.h              |  15 +---
->  include/linux/blk_types.h           |  12 ++--
->  include/linux/blkdev.h              |   8 ++-
->  include/linux/fs.h                  |   6 +-
->  include/linux/iomap.h               |   3 +-
->  mm/page_io.c                        |   8 +--
->  43 files changed, 208 insertions(+), 277 deletions(-)
-> 
-> diff --git a/arch/m68k/emu/nfblock.c b/arch/m68k/emu/nfblock.c
-> index ba808543161a..dd36808f0d5e 100644
-> --- a/arch/m68k/emu/nfblock.c
-> +++ b/arch/m68k/emu/nfblock.c
-> @@ -59,7 +59,7 @@ struct nfhd_device {
->  	struct gendisk *disk;
->  };
->  
-> -static blk_qc_t nfhd_submit_bio(struct bio *bio)
-> +static void nfhd_submit_bio(struct bio *bio)
->  {
->  	struct nfhd_device *dev = bio->bi_bdev->bd_disk->private_data;
->  	struct bio_vec bvec;
-> @@ -77,7 +77,6 @@ static blk_qc_t nfhd_submit_bio(struct bio *bio)
->  		sec += len;
->  	}
->  	bio_endio(bio);
-> -	return BLK_QC_T_NONE;
->  }
->  
->  static int nfhd_getgeo(struct block_device *bdev, struct hd_geometry *geo)
-> diff --git a/arch/xtensa/platforms/iss/simdisk.c b/arch/xtensa/platforms/iss/simdisk.c
-> index fc09be7b1347..182825d639e2 100644
-> --- a/arch/xtensa/platforms/iss/simdisk.c
-> +++ b/arch/xtensa/platforms/iss/simdisk.c
-> @@ -101,7 +101,7 @@ static void simdisk_transfer(struct simdisk *dev, unsigned long sector,
->  	spin_unlock(&dev->lock);
->  }
->  
-> -static blk_qc_t simdisk_submit_bio(struct bio *bio)
-> +static void simdisk_submit_bio(struct bio *bio)
->  {
->  	struct simdisk *dev = bio->bi_bdev->bd_disk->private_data;
->  	struct bio_vec bvec;
-> @@ -119,7 +119,6 @@ static blk_qc_t simdisk_submit_bio(struct bio *bio)
->  	}
->  
->  	bio_endio(bio);
-> -	return BLK_QC_T_NONE;
->  }
->  
->  static int simdisk_open(struct block_device *bdev, fmode_t mode)
-> diff --git a/block/bio.c b/block/bio.c
-> index 7296abe293de..484b6d786857 100644
-> --- a/block/bio.c
-> +++ b/block/bio.c
-> @@ -259,6 +259,7 @@ void bio_init(struct bio *bio, struct bio_vec *table,
->  	memset(bio, 0, sizeof(*bio));
->  	atomic_set(&bio->__bi_remaining, 1);
->  	atomic_set(&bio->__bi_cnt, 1);
-> +	bio->bi_cookie = BLK_QC_T_NONE;
->  
->  	bio->bi_io_vec = table;
->  	bio->bi_max_vecs = max_vecs;
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index adfab5976be0..77fdb00fcad3 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -910,18 +910,18 @@ static noinline_for_stack bool submit_bio_checks(struct bio *bio)
->  	return false;
->  }
->  
-> -static blk_qc_t __submit_bio(struct bio *bio)
-> +static void __submit_bio(struct bio *bio)
->  {
->  	struct gendisk *disk = bio->bi_bdev->bd_disk;
-> -	blk_qc_t ret = BLK_QC_T_NONE;
->  
->  	if (blk_crypto_bio_prep(&bio)) {
-> -		if (!disk->fops->submit_bio)
-> -			return blk_mq_submit_bio(bio);
-> -		ret = disk->fops->submit_bio(bio);
-> +		if (!disk->fops->submit_bio) {
-> +			blk_mq_submit_bio(bio);
-> +			return;
-> +		}
-> +		disk->fops->submit_bio(bio);
->  	}
->  	blk_queue_exit(disk->queue);
-> -	return ret;
->  }
->  
->  /*
-> @@ -943,10 +943,9 @@ static blk_qc_t __submit_bio(struct bio *bio)
->   * bio_list_on_stack[1] contains bios that were submitted before the current
->   *	->submit_bio_bio, but that haven't been processed yet.
->   */
-> -static blk_qc_t __submit_bio_noacct(struct bio *bio)
-> +static void __submit_bio_noacct(struct bio *bio)
->  {
->  	struct bio_list bio_list_on_stack[2];
-> -	blk_qc_t ret = BLK_QC_T_NONE;
->  
->  	BUG_ON(bio->bi_next);
->  
-> @@ -966,7 +965,7 @@ static blk_qc_t __submit_bio_noacct(struct bio *bio)
->  		bio_list_on_stack[1] = bio_list_on_stack[0];
->  		bio_list_init(&bio_list_on_stack[0]);
->  
-> -		ret = __submit_bio(bio);
-> +		__submit_bio(bio);
->  
->  		/*
->  		 * Sort new bios into those for a lower level and those for the
-> @@ -989,13 +988,11 @@ static blk_qc_t __submit_bio_noacct(struct bio *bio)
->  	} while ((bio = bio_list_pop(&bio_list_on_stack[0])));
->  
->  	current->bio_list = NULL;
-> -	return ret;
->  }
->  
-> -static blk_qc_t __submit_bio_noacct_mq(struct bio *bio)
-> +static void __submit_bio_noacct_mq(struct bio *bio)
->  {
->  	struct bio_list bio_list[2] = { };
-> -	blk_qc_t ret = BLK_QC_T_NONE;
->  
->  	current->bio_list = bio_list;
->  
-> @@ -1007,15 +1004,13 @@ static blk_qc_t __submit_bio_noacct_mq(struct bio *bio)
->  
->  		if (!blk_crypto_bio_prep(&bio)) {
->  			blk_queue_exit(disk->queue);
-> -			ret = BLK_QC_T_NONE;
->  			continue;
->  		}
->  
-> -		ret = blk_mq_submit_bio(bio);
-> +		blk_mq_submit_bio(bio);
->  	} while ((bio = bio_list_pop(&bio_list[0])));
->  
->  	current->bio_list = NULL;
-> -	return ret;
->  }
->  
->  /**
-> @@ -1027,10 +1022,10 @@ static blk_qc_t __submit_bio_noacct_mq(struct bio *bio)
->   * systems and other upper level users of the block layer should use
->   * submit_bio() instead.
->   */
-> -blk_qc_t submit_bio_noacct(struct bio *bio)
-> +void submit_bio_noacct(struct bio *bio)
->  {
->  	if (!submit_bio_checks(bio))
-> -		return BLK_QC_T_NONE;
-> +		return;
->  
->  	/*
->  	 * We only want one ->submit_bio to be active at a time, else stack
-> @@ -1038,14 +1033,12 @@ blk_qc_t submit_bio_noacct(struct bio *bio)
->  	 * to collect a list of requests submited by a ->submit_bio method while
->  	 * it is active, and then process them after it returned.
->  	 */
-> -	if (current->bio_list) {
-> +	if (current->bio_list)
->  		bio_list_add(&current->bio_list[0], bio);
-> -		return BLK_QC_T_NONE;
-> -	}
-> -
-> -	if (!bio->bi_bdev->bd_disk->fops->submit_bio)
-> -		return __submit_bio_noacct_mq(bio);
-> -	return __submit_bio_noacct(bio);
-> +	else if (!bio->bi_bdev->bd_disk->fops->submit_bio)
-> +		__submit_bio_noacct_mq(bio);
-> +	else
-> +		__submit_bio_noacct(bio);
->  }
->  EXPORT_SYMBOL(submit_bio_noacct);
->  
-> @@ -1062,10 +1055,10 @@ EXPORT_SYMBOL(submit_bio_noacct);
->   * in @bio.  The bio must NOT be touched by thecaller until ->bi_end_io() has
->   * been called.
->   */
-> -blk_qc_t submit_bio(struct bio *bio)
-> +void submit_bio(struct bio *bio)
->  {
->  	if (blkcg_punt_bio_submit(bio))
-> -		return BLK_QC_T_NONE;
-> +		return;
->  
->  	/*
->  	 * If it's a regular read/write or a barrier with data attached,
-> @@ -1106,19 +1099,67 @@ blk_qc_t submit_bio(struct bio *bio)
->  	if (unlikely(bio_op(bio) == REQ_OP_READ &&
->  	    bio_flagged(bio, BIO_WORKINGSET))) {
->  		unsigned long pflags;
-> -		blk_qc_t ret;
->  
->  		psi_memstall_enter(&pflags);
-> -		ret = submit_bio_noacct(bio);
-> +		submit_bio_noacct(bio);
->  		psi_memstall_leave(&pflags);
-> -
-> -		return ret;
-> +		return;
->  	}
->  
-> -	return submit_bio_noacct(bio);
-> +	submit_bio_noacct(bio);
->  }
->  EXPORT_SYMBOL(submit_bio);
->  
-> +/**
-> + * bio_poll - poll for BIO completions
-> + * @bio: bio to poll for
-> + *
-> + * Poll for completions on queue associated with the bio. Returns number of
-> + * completed entries found. If @spin is true, then bio_poll will continue
-> + * looping until at least one completion is found, unless the task is
-> + * otherwise marked running (or we need to reschedule).
-> + *
-> + * Note: the caller must either be the context that submitted @bio, or
-> + * be in a RCU critical section to prevent freeing of @bio.
-> + */
-> +int bio_poll(struct bio *bio, bool spin)
-> +{
-> +	struct request_queue *q = bio->bi_bdev->bd_disk->queue;
-> +	blk_qc_t cookie = READ_ONCE(bio->bi_cookie);
-> +
-> +	if (cookie == BLK_QC_T_NONE ||
-> +	    !test_bit(QUEUE_FLAG_POLL, &q->queue_flags))
-> +		return 0;
-> +
-> +	if (current->plug)
-> +		blk_flush_plug_list(current->plug, false);
-> +
-> +	/* not yet implemented, so this should not happen */
-> +	if (WARN_ON_ONCE(!queue_is_mq(q)))
-> +		return 0;
-> +	return blk_mq_poll(q, cookie, spin);
-> +}
-> +EXPORT_SYMBOL_GPL(bio_poll);
-> +
-> +/*
-> + * Helper to implements file_operations.iopoll.  Requires the bio to be stored
-> + * in iocb->private, and cleared before freeing the bio.
-> + */
-> +int iocb_bio_iopoll(struct kiocb *kiocb, bool spin)
-> +{
-> +	struct bio *bio;
-> +	int ret = 0;
-> +
-> +	rcu_read_lock();
-> +	bio = READ_ONCE(kiocb->private);
-> +	if (bio)
-> +		ret = bio_poll(bio, spin);
-> +	rcu_read_unlock();
+> I just found that you didn't change sched tags into per-request-queue
+> shared tags. 
+> Then for hostwide tags, each hctx still has its own
+> standalone sched tags and request pool, that is one big difference with
+> non hostwide tags. 
 
-If bio_poll() sleeps in case of 'spin', rcu_read_lock() can't be used.
-And the POLLED bio may be ended by iocb_bio_iopoll() explicitly via
-one bio flag.
+For both hostwide and non-hostwide tags, we have standalone sched tags 
+and request pool per hctx when q->nr_hw_queues > 1.
+
+> That is why you observe that scheduler tag exhaustion
+> is easy to trigger in case of non-hostwide tags.
+> 
+> I'd suggest to add one per-request-queue sched tags, and make all hctxs
+> sharing it, just like what you did for driver tag.
+> 
+
+That sounds reasonable.
+
+But I don't see how this is related to hostwide tags specifically, but 
+rather just having q->nr_hw_queues > 1, which NVMe PCI and some other 
+SCSI MQ HBAs have (without using hostwide tags).
 
 Thanks,
-Ming
-
+John
