@@ -7,35 +7,35 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEEC6C4360C
-	for <linux-block@archiver.kernel.org>; Tue, 27 Apr 2021 16:20:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BC0DC43470
+	for <linux-block@archiver.kernel.org>; Tue, 27 Apr 2021 16:20:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7E7CD61151
-	for <linux-block@archiver.kernel.org>; Tue, 27 Apr 2021 16:20:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5EE42613D8
+	for <linux-block@archiver.kernel.org>; Tue, 27 Apr 2021 16:20:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237865AbhD0QV3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Apr 2021 12:21:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50882 "EHLO
+        id S237702AbhD0QVh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Apr 2021 12:21:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51014 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237503AbhD0QTc (ORCPT
+        with ESMTP id S237693AbhD0QUD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Apr 2021 12:19:32 -0400
+        Tue, 27 Apr 2021 12:20:03 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22322C061574;
-        Tue, 27 Apr 2021 09:18:48 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D43DCC061761;
+        Tue, 27 Apr 2021 09:19:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=o5zGnmhRQBVMOFTbkoOK4C6A9eTSah00I6u2NMKUqBo=; b=sYzCoxyyNGvmiZFWjQJwOl3HZu
-        Qepx+XmERJTR4Mz+5wqIqxDrohcmc+XgyoJdo7dSDRPdawcyvrfeTIBic03RMWl4hDMdxn4P4gs+c
-        OdodF3UMXb41RY8+PW8CK/AIHFo/lsDpKjk+Z4uKrb4KEgSAOHEhWrX5GZln5rTQVFSR8FmQCsBqj
-        o+Z7noib3iflBRAZ8slLtgrATGX8E8sOx9COJsjlgsQMNOPCVUwaGJXWN+ED8SZoZib9VR58rXecX
-        F5Q4Byt4Z45sfXIkHb/BhI+dZ3/7KBvCoGN7OJaXbUh6aM+lK7d6+IHzpFHHHG+id98/qwtanFRMP
-        SeX7hJNg==;
+        bh=ng4KGhTuRpeTyKKImesR+zTWZGj6X96YYP6xXXnEO2Q=; b=IQdLE4T5hOodA7mLeV+EzNRgZL
+        NUt3TNL19PcNbqVu/y8bDO5zPxdjM4WM46Q+6oAGJ3Wn3z7L04UIsf/eyMCmcjHnERERZLJILoEMe
+        BU2eVd9LDhgXwLpyA/wFAHP6ieGguD1gNA7zT3U95b6XPTlI1wlFe6iZ23G826gReehN47Rr95Z7y
+        GpHtimD3b/UQXae3CqTU+8h7G167vYx2/JNXkSBUMUkqxy8AMZa/lYP1Tdm+9w+A/EF0xlDRZPVAo
+        Cj/QXK6RNKEzHOYFsUbT8CjkVYoI7Wkn7HrbE5wkUaDCyduQqLaubN/D3n9/fVsRgyKS5ry0u/ECV
+        VjNsqzpg==;
 Received: from [2001:4bb8:18c:28b2:c772:7205:2aa4:840d] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
-        id 1lbQQ4-00Gr47-2P; Tue, 27 Apr 2021 16:18:40 +0000
+        id 1lbQQa-00Gr6K-Ra; Tue, 27 Apr 2021 16:19:13 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Jeffle Xu <jefflexu@linux.alibaba.com>,
@@ -46,9 +46,9 @@ Cc:     Jeffle Xu <jefflexu@linux.alibaba.com>,
         "Wunderlich, Mark" <mark.wunderlich@intel.com>,
         "Vasudevan, Anil" <anil.vasudevan@intel.com>,
         linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: [PATCH 02/15] block: don't try to poll multi-bio I/Os in __blkdev_direct_IO
-Date:   Tue, 27 Apr 2021 18:16:06 +0200
-Message-Id: <20210427161619.1294399-3-hch@lst.de>
+Subject: [PATCH 13/15] block: add a QUEUE_FLAG_POLL_CAPABLE flag
+Date:   Tue, 27 Apr 2021 18:16:17 +0200
+Message-Id: <20210427161619.1294399-14-hch@lst.de>
 X-Mailer: git-send-email 2.30.1
 In-Reply-To: <20210427161619.1294399-1-hch@lst.de>
 References: <20210427161619.1294399-1-hch@lst.de>
@@ -59,84 +59,58 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If an iocb is split into multiple bios we can't poll for both.  So don't
-bother to even try to poll in that case.
+Add a new flag to prepare for bio based stacking drivers that support
+polling.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- fs/block_dev.c | 37 ++++++++++++++-----------------------
- 1 file changed, 14 insertions(+), 23 deletions(-)
+ block/blk-mq.c         | 4 +++-
+ block/blk-sysfs.c      | 3 +--
+ include/linux/blkdev.h | 1 +
+ 3 files changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index a5244e08b6c8..df651f468e11 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -375,7 +375,7 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter,
- 	struct blk_plug plug;
- 	struct blkdev_dio *dio;
- 	struct bio *bio;
--	bool is_poll = (iocb->ki_flags & IOCB_HIPRI) != 0;
-+	bool is_poll = (iocb->ki_flags & IOCB_HIPRI), do_poll = false;
- 	bool is_read = (iov_iter_rw(iter) == READ), is_sync;
- 	loff_t pos = iocb->ki_pos;
- 	blk_qc_t qc = BLK_QC_T_NONE;
-@@ -437,22 +437,9 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter,
- 		pos += bio->bi_iter.bi_size;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index c26df1f68e5b..45e69eea2788 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -3236,8 +3236,10 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
  
- 		nr_pages = bio_iov_vecs_to_alloc(iter, BIO_MAX_VECS);
--		if (!nr_pages) {
--			bool polled = false;
--
--			if (iocb->ki_flags & IOCB_HIPRI) {
--				bio_set_polled(bio, iocb);
--				polled = true;
--			}
--
--			qc = submit_bio(bio);
--
--			if (polled)
--				WRITE_ONCE(iocb->ki_cookie, qc);
--			break;
--		}
--
--		if (!dio->multi_bio) {
-+		if (dio->multi_bio) {
-+			atomic_inc(&dio->ref);
-+		} else if (nr_pages) {
- 			/*
- 			 * AIO needs an extra reference to ensure the dio
- 			 * structure which is embedded into the first bio
-@@ -462,11 +449,16 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter,
- 				bio_get(bio);
- 			dio->multi_bio = true;
- 			atomic_set(&dio->ref, 2);
--		} else {
--			atomic_inc(&dio->ref);
-+		} else if (is_poll) {
-+			bio_set_polled(bio, iocb);
-+			do_poll = true;
-+		}
-+		qc = submit_bio(bio);
-+		if (!nr_pages) {
-+			if (do_poll)
-+				WRITE_ONCE(iocb->ki_cookie, qc);
-+			break;
- 		}
--
--		submit_bio(bio);
- 		bio = bio_alloc(GFP_KERNEL, nr_pages);
- 	}
+ 	q->queue_flags |= QUEUE_FLAG_MQ_DEFAULT;
+ 	if (set->nr_maps > HCTX_TYPE_POLL &&
+-	    set->map[HCTX_TYPE_POLL].nr_queues)
++	    set->map[HCTX_TYPE_POLL].nr_queues) {
++		blk_queue_flag_set(QUEUE_FLAG_POLL_CAPABLE, q);
+ 		blk_queue_flag_set(QUEUE_FLAG_POLL, q);
++	}
  
-@@ -481,8 +473,7 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter,
- 		if (!READ_ONCE(dio->waiter))
- 			break;
+ 	q->sg_reserved_size = INT_MAX;
  
--		if (!(iocb->ki_flags & IOCB_HIPRI) ||
--		    !blk_poll(bdev_get_queue(bdev), qc, true))
-+		if (!do_poll || !blk_poll(bdev_get_queue(bdev), qc, true))
- 			blk_io_schedule();
- 	}
- 	__set_current_state(TASK_RUNNING);
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index e03bedf180ab..258468a3ab9c 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -431,8 +431,7 @@ static ssize_t queue_poll_store(struct request_queue *q, const char *page,
+ 	unsigned long poll_on;
+ 	ssize_t ret;
+ 
+-	if (!q->tag_set || q->tag_set->nr_maps <= HCTX_TYPE_POLL ||
+-	    !q->tag_set->map[HCTX_TYPE_POLL].nr_queues)
++	if (!test_bit(QUEUE_FLAG_POLL_CAPABLE, &q->queue_flags))
+ 		return -EINVAL;
+ 
+ 	ret = queue_var_store(&poll_on, page, count);
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index bb5ed5cf57b4..366cf2a6d2e8 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -600,6 +600,7 @@ struct request_queue {
+ /* Keep blk_queue_flag_name[] in sync with the definitions below */
+ #define QUEUE_FLAG_STOPPED	0	/* queue is stopped */
+ #define QUEUE_FLAG_DYING	1	/* queue being torn down */
++#define QUEUE_FLAG_POLL_CAPABLE	2	/* IO polling supported */
+ #define QUEUE_FLAG_NOMERGES     3	/* disable merge attempts */
+ #define QUEUE_FLAG_SAME_COMP	4	/* complete on same CPU-group */
+ #define QUEUE_FLAG_FAIL_IO	5	/* fake timeout */
 -- 
 2.30.1
 
