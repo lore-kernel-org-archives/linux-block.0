@@ -2,129 +2,172 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0C01C433B4
-	for <linux-block@archiver.kernel.org>; Tue, 27 Apr 2021 09:53:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09AD1C433ED
+	for <linux-block@archiver.kernel.org>; Tue, 27 Apr 2021 10:13:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A8F3F613C5
-	for <linux-block@archiver.kernel.org>; Tue, 27 Apr 2021 09:53:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B3B686101D
+	for <linux-block@archiver.kernel.org>; Tue, 27 Apr 2021 10:13:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235433AbhD0JyB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Apr 2021 05:54:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:58400 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235306AbhD0Jxs (ORCPT
+        id S235249AbhD0KOH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Apr 2021 06:14:07 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:38020 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230341AbhD0KOF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Apr 2021 05:53:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619517184;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=m5+c/+BZ4gIa5hUEWa4KddJnHEAW8qm6OVHAdVDDGUE=;
-        b=GYRVd48Ab2JZ4M1NCc7XTlpOEXhrrmsavMFKo1DLVa2Iar164lfRmZu1qosE5LXb64SxPd
-        VU1WBkuITr8dw2ws028Ue0Vx+fEvGc6h4Df8MYNVZOIKBEplc0XKuM8Xg+HAgHHsozXEC2
-        kc6u2e2RxTHVKHGY3a/PhzGNLNnB5xY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-552-CX21mRDHPRC0STOasSqEuQ-1; Tue, 27 Apr 2021 05:52:59 -0400
-X-MC-Unique: CX21mRDHPRC0STOasSqEuQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9ABEE501E0;
-        Tue, 27 Apr 2021 09:52:58 +0000 (UTC)
-Received: from T590 (ovpn-13-248.pek2.redhat.com [10.72.13.248])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1D33F19704;
-        Tue, 27 Apr 2021 09:52:50 +0000 (UTC)
-Date:   Tue, 27 Apr 2021 17:52:58 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     John Garry <john.garry@huawei.com>
-Cc:     Kashyap Desai <kashyap.desai@broadcom.com>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Douglas Gilbert <dgilbert@interlog.com>,
-        Hannes Reinecke <hare@suse.com>
-Subject: Re: [bug report] shared tags causes IO hang and performance drop
-Message-ID: <YIfe+mpcV17XsHuL@T590>
-References: <0c85fe52-ebc7-68b3-2dbe-dfad5d604346@huawei.com>
- <c1d5abaa-c460-55f8-5351-16f09d6aa81f@huawei.com>
- <YIbS1dgSYrsAeGvZ@T590>
- <55743a51-4d6f-f481-cebf-e2af9c657911@huawei.com>
- <YIbkX2G0+dp3PV+u@T590>
- <9ad15067-ba7b-a335-ae71-8c4328856b91@huawei.com>
- <YIdTyyVE5azlYwtO@T590>
- <ab83eec4-20f1-ad74-7f43-52a4a87a8aa9@huawei.com>
- <YIfVVRheF9ZWjzbh@T590>
- <cb81d990-e5a6-49b1-5d96-8079a80c73f5@huawei.com>
+        Tue, 27 Apr 2021 06:14:05 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 13RA3U4b065909;
+        Tue, 27 Apr 2021 10:13:21 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : subject :
+ date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2020-01-29; bh=hgctH0oSitkyxZDTbkS3bn45JVyf//Hvn92WkrPimiU=;
+ b=mn/FCFOgtveSR2nqHssMlqtA6VGUwrZYRzuU3K51iDxvfPZFhnheZxY55i54OPZlj8ju
+ d2qFc87l990WaJyP12bD6+hj6eoMxPa8b17/F2kuFX09g1DETmAQg57m5osKQ8GZ9ILr
+ B11rgg8A7gbH4xN0YXd/sTjUkXODt+Rlwjv069+PEEadgBapHBYemsjap64jUwkl5gmi
+ DDcg5TMZ9ywY0m9CF1CKZwdWwuSSKz8cOflOBTP+DOZ0Jr39A8LAW7SXO/cx8sYX+Jb+
+ 7N+Fl7hfDWT4XcuTFWMdS4PCl5P4Bqmq9Uo/bXDTWiu58IQJ34oy3SY+wBgVT+bfWCq+ 0g== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by aserp2120.oracle.com with ESMTP id 385ahbn07y-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 27 Apr 2021 10:13:21 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 13RAAhE6167338;
+        Tue, 27 Apr 2021 10:13:20 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by userp3030.oracle.com with ESMTP id 3848ewtcxy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 27 Apr 2021 10:13:20 +0000
+Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 13RADIGt026622;
+        Tue, 27 Apr 2021 10:13:19 GMT
+Received: from gms-ol8-2.osdevelopmeniad.oraclevcn.com (/100.100.234.63)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 27 Apr 2021 03:13:17 -0700
+From:   Gulam Mohamed <gulam.mohamed@oracle.com>
+To:     viro@zeniv.linux.org.uk, axboe@kernel.dk,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH V1 1/1] Fix race between iscsi logout and systemd-udevd
+Date:   Tue, 27 Apr 2021 10:13:07 +0000
+Message-Id: <20210427101307.4164118-1-gulam.mohamed@oracle.com>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cb81d990-e5a6-49b1-5d96-8079a80c73f5@huawei.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9966 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 phishscore=0 spamscore=0
+ mlxlogscore=999 malwarescore=0 bulkscore=0 adultscore=0 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104060000
+ definitions=main-2104270074
+X-Proofpoint-GUID: YPPwUht4zCZKzQGQiH8K1GBTsZizOoOl
+X-Proofpoint-ORIG-GUID: YPPwUht4zCZKzQGQiH8K1GBTsZizOoOl
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9966 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 bulkscore=0 mlxlogscore=999
+ priorityscore=1501 clxscore=1011 adultscore=0 suspectscore=0 spamscore=0
+ phishscore=0 malwarescore=0 lowpriorityscore=0 impostorscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104060000
+ definitions=main-2104270073
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Apr 27, 2021 at 10:37:39AM +0100, John Garry wrote:
-> On 27/04/2021 10:11, Ming Lei wrote:
-> > On Tue, Apr 27, 2021 at 08:52:53AM +0100, John Garry wrote:
-> > > On 27/04/2021 00:59, Ming Lei wrote:
-> > > > > Anyway, I'll look at adding code for a per-request queue sched tags to see
-> > > > > if it helps. But I would plan to continue to use a per hctx sched request
-> > > > > pool.
-> > > > Why not switch to per hctx sched request pool?
-> > > I don't understand. The current code uses a per-hctx sched request pool, and
-> > > I said that I don't plan to change that.
-> > I forget why you didn't do that, because for hostwide tags, request
-> > is always 1:1 for either sched tags(real io sched) or driver tags(none).
-> > 
-> > Maybe you want to keep request local to hctx, but never see related
-> > performance data for supporting the point, sbitmap queue allocator has
-> > been intelligent enough to allocate tag freed from native cpu.
-> > 
-> > Then you just waste lots of memory, I remember that scsi request payload
-> > is a bit big.
-> 
-> It's true that we waste much memory for regular static requests for when
-> using hostwide tags today.
-> 
-> One problem in trying to use a single set of "hostwide" static requests is
-> that we call blk_mq_init_request(..., hctx_idx, ...) ->
-> set->ops->init_request(.., hctx_idx, ...) for each static rq, and this would
-> not work for a single set of "hostwide" requests.
-> 
-> And I see a similar problem for a "request queue-wide" sched static
-> requests.
-> 
-> Maybe we can improve this in future.
+Problem description:
 
-OK, fair enough.
+During the kernel patching, customer was switching between the iscsi
+disks. To switch between the iscsi disks, it was logging out the
+currently connected iscsi disk and then logging in to the new iscsi
+disk. This was being done using a script. Customer was also using the
+"parted" command in the script to list the partition details just
+before the iscsi logout. This usage of "parted" command was creating
+an issue and we were seeing stale links of the
+disks in /sys/class/block.
 
-> 
-> BTW, for the performance issue which Yanhui witnessed with megaraid sas, do
-> you think it may because of the IO sched tags issue of total sched tag depth
-> growing vs driver tags?
+Analysis:
 
-I think it is highly possible. Will you work a patch to convert to
-per-request-queue sched tag?
+As part of iscsi logout, the partitions and the disk will be removed
+in the function del_gendisk() which is done through a kworker. The
+parted command, used to list the partitions, will open the disk in
+RW mode which results in systemd-udevd re-reading the partitions. The
+ioctl used to re-read partitions is BLKRRPART. This will trigger the
+rescanning of partitions which will also delete and re-add the
+partitions. So, both iscsi logout processing (through kworker) and the
+"parted" command (through systemd-udevd) will be involved in
+add/delete of partitions. In our case, the following sequence of
+operations happened (the iscsi device is /dev/sdb with partition sdb1):
 
-> Are there lots of LUNs? I can imagine that megaraid
-> sas has much larger can_queue than scsi_debug :)
+1. sdb1 was removed by PARTED
+2. kworker, as part of iscsi logout, couldn't remove sdb1 as it was
+   already removed by PARTED
+3. sdb1 was added by parted
+4. sdb was NOW removed as part of iscsi logout (the last part of the
+   device removal after remoing the partitions)
 
-No, there are just two LUNs, the 1st LUN is one commodity SSD(queue
-depth is 32) and the performance issue is reported on this LUN, another is one
-HDD(queue depth is 256) which is root disk, but the megaraid host tag depth is
-228, another weird setting. But the issue still can be reproduced after we set
-2nd LUN's depth as 64 for avoiding driver tag contention.
+Since the symlink /sys/class/block/sdb1 points to
+/sys/class/devices/platform/hostx/sessionx/targetx:x/block/sdb/sdb1
+and since sdb is already removed, the symlink /sys/class/block/sdb1
+will be orphan and stale. So, this stale link is a result of the race
+condition in kernel between the systemd-udevd and iscsi-logout
+processing as described above. We were able to reproduce this even
+with latest upstream kernel.
 
+Fix:
 
+While Dropping/Adding partitions as part of BLKRRPART ioctl, take the
+read lock for "bdev_lookup_sem" to sync with del_gendisk().
 
-Thanks,
-Ming
+Signed-off-by: Gulam Mohamed <gulam.mohamed@oracle.com>
+---
+ fs/block_dev.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
+
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 09d6f7229db9..e903a7edfd63 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -1245,9 +1245,17 @@ int bdev_disk_changed(struct block_device *bdev, bool invalidate)
+ 	lockdep_assert_held(&bdev->bd_mutex);
+ 
+ rescan:
++	down_read(&bdev_lookup_sem);
++	if (!(disk->flags & GENHD_FL_UP)) {
++		up_read(&bdev_lookup_sem);
++		return -ENXIO;
++	}
++
+ 	ret = blk_drop_partitions(bdev);
+-	if (ret)
++	if (ret) {
++		up_read(&bdev_lookup_sem);
+ 		return ret;
++	}
+ 
+ 	clear_bit(GD_NEED_PART_SCAN, &disk->state);
+ 
+@@ -1270,8 +1278,10 @@ int bdev_disk_changed(struct block_device *bdev, bool invalidate)
+ 
+ 	if (get_capacity(disk)) {
+ 		ret = blk_add_partitions(disk, bdev);
+-		if (ret == -EAGAIN)
++		if (ret == -EAGAIN) {
++			up_read(&bdev_lookup_sem);
+ 			goto rescan;
++		}
+ 	} else if (invalidate) {
+ 		/*
+ 		 * Tell userspace that the media / partition table may have
+@@ -1280,6 +1290,7 @@ int bdev_disk_changed(struct block_device *bdev, bool invalidate)
+ 		kobject_uevent(&disk_to_dev(disk)->kobj, KOBJ_CHANGE);
+ 	}
+ 
++	up_read(&bdev_lookup_sem);
+ 	return ret;
+ }
+ /*
+-- 
+2.27.0
 
