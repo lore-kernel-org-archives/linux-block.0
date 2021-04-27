@@ -2,96 +2,137 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F296BC433ED
-	for <linux-block@archiver.kernel.org>; Tue, 27 Apr 2021 10:19:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C585DC433B4
+	for <linux-block@archiver.kernel.org>; Tue, 27 Apr 2021 14:53:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C60D3613C3
-	for <linux-block@archiver.kernel.org>; Tue, 27 Apr 2021 10:19:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 99FE6613DD
+	for <linux-block@archiver.kernel.org>; Tue, 27 Apr 2021 14:53:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235488AbhD0KUa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Apr 2021 06:20:30 -0400
-Received: from frasgout.his.huawei.com ([185.176.79.56]:2924 "EHLO
-        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238178AbhD0KSy (ORCPT
+        id S237169AbhD0Ox5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Apr 2021 10:53:57 -0400
+Received: from mail-pg1-f178.google.com ([209.85.215.178]:44580 "EHLO
+        mail-pg1-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236226AbhD0Ox4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Apr 2021 06:18:54 -0400
-Received: from fraeml743-chm.china.huawei.com (unknown [172.18.147.201])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4FTyB14YMhz73dSD;
-        Tue, 27 Apr 2021 18:07:37 +0800 (CST)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- fraeml743-chm.china.huawei.com (10.206.15.224) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Tue, 27 Apr 2021 12:18:09 +0200
-Received: from [10.47.94.234] (10.47.94.234) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.2; Tue, 27 Apr
- 2021 11:18:08 +0100
-Subject: Re: [bug report] shared tags causes IO hang and performance drop
+        Tue, 27 Apr 2021 10:53:56 -0400
+Received: by mail-pg1-f178.google.com with SMTP id y32so42494189pga.11
+        for <linux-block@vger.kernel.org>; Tue, 27 Apr 2021 07:53:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=rrMGqRkXlKTde4vfnnDwZ1geedRg0DPkvUF5DXLWZW8=;
+        b=h2wd4lPUpG3s0cpoluxUv8QoRzIBjDRuCsfEk1Mx6+LhNEDHok/yoWCjkDDEYth0tU
+         XMKzkYn2XwYxHKymvej4SFkSvXO2QIK9tfQi/8xfUDIjvK0T8r7wTIS9VAdBp7w1+ZXo
+         3CwDU5vbLD0KJKZWzyzddpo/AVI1vyKbViotx+u17wcTEEgZe2UEyuAcoq65RTLREy6x
+         9DwfLcsKrBZOqNQzsGOjO5pDjHhGOxZS7wA7cnL6BC3vioJgrmBmnMfkOah06OWRsQBi
+         r3S34MYsXCTP/PeqdLXYZG/abJFug3Owm6wCzGs4b9m3wFcVJbsznERqBKizcMzDi21C
+         Ab/A==
+X-Gm-Message-State: AOAM5322h2URGhYjzOSeCcZYXexMBAocLn1UPaQYEQwkzjTUUSPYWfbC
+        Sq+Cec5t/Q8HhR+mX6EFjNs=
+X-Google-Smtp-Source: ABdhPJxuPHlT+j5r++u81HUM1U++LPPBzQMAdltWAvi0HkdbOlFwDeupC+b4F2WQYxmQSJcV6oLNMA==
+X-Received: by 2002:a05:6a00:150d:b029:27a:ce95:bb0e with SMTP id q13-20020a056a00150db029027ace95bb0emr3039022pfu.64.1619535192453;
+        Tue, 27 Apr 2021 07:53:12 -0700 (PDT)
+Received: from [192.168.3.219] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
+        by smtp.gmail.com with ESMTPSA id c129sm2911412pfb.141.2021.04.27.07.53.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 27 Apr 2021 07:53:11 -0700 (PDT)
+Subject: Re: [PATCH V2 2/3] blk-mq: complete request locally if the completion
+ is from tagset iterator
 To:     Ming Lei <ming.lei@redhat.com>
-CC:     Kashyap Desai <kashyap.desai@broadcom.com>,
-        <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Douglas Gilbert <dgilbert@interlog.com>,
-        Hannes Reinecke <hare@suse.com>
-References: <0c85fe52-ebc7-68b3-2dbe-dfad5d604346@huawei.com>
- <c1d5abaa-c460-55f8-5351-16f09d6aa81f@huawei.com> <YIbS1dgSYrsAeGvZ@T590>
- <55743a51-4d6f-f481-cebf-e2af9c657911@huawei.com> <YIbkX2G0+dp3PV+u@T590>
- <9ad15067-ba7b-a335-ae71-8c4328856b91@huawei.com> <YIdTyyVE5azlYwtO@T590>
- <ab83eec4-20f1-ad74-7f43-52a4a87a8aa9@huawei.com> <YIfVVRheF9ZWjzbh@T590>
- <cb81d990-e5a6-49b1-5d96-8079a80c73f5@huawei.com> <YIfe+mpcV17XsHuL@T590>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <440dfcfc-1a2c-bd98-1161-cec4d78c6dfc@huawei.com>
-Date:   Tue, 27 Apr 2021 11:15:09 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Khazhy Kumykov <khazhy@google.com>,
+        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        Hannes Reinecke <hare@suse.de>,
+        John Garry <john.garry@huawei.com>,
+        David Jeffery <djeffery@redhat.com>
+References: <20210427014540.2747282-1-ming.lei@redhat.com>
+ <20210427014540.2747282-3-ming.lei@redhat.com>
+ <c122e2bc-2e03-3890-bc7a-be1470bee1d5@acm.org> <YIe4CzfUDX4yCCNO@T590>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <023a5045-bc1d-ecf4-784d-6de9adda85ba@acm.org>
+Date:   Tue, 27 Apr 2021 07:53:09 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.0
 MIME-Version: 1.0
-In-Reply-To: <YIfe+mpcV17XsHuL@T590>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <YIe4CzfUDX4yCCNO@T590>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.47.94.234]
-X-ClientProxiedBy: lhreml745-chm.china.huawei.com (10.201.108.195) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 27/04/2021 10:52, Ming Lei wrote:
->> BTW, for the performance issue which Yanhui witnessed with megaraid sas, do
->> you think it may because of the IO sched tags issue of total sched tag depth
->> growing vs driver tags?
-> I think it is highly possible. Will you work a patch to convert to
-> per-request-queue sched tag?
+On 4/27/21 12:06 AM, Ming Lei wrote:
+> On Mon, Apr 26, 2021 at 07:30:51PM -0700, Bart Van Assche wrote:
+>> On 4/26/21 6:45 PM, Ming Lei wrote:
+>>> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+>>> index 100fa44d52a6..773aea4db90c 100644
+>>> --- a/block/blk-mq-tag.c
+>>> +++ b/block/blk-mq-tag.c
+>>> @@ -284,8 +284,11 @@ static bool bt_tags_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
+>>>  	if ((iter_data->flags & BT_TAG_ITER_STARTED) &&
+>>>  	    !blk_mq_request_started(rq))
+>>>  		ret = true;
+>>> -	else
+>>> +	else {
+>>> +		rq->rq_flags |= RQF_ITERATING;
+>>>  		ret = iter_data->fn(rq, iter_data->data, reserved);
+>>> +		rq->rq_flags &= ~RQF_ITERATING;
+>>> +	}
+>>>  	if (!iter_static_rqs)
+>>>  		blk_mq_put_rq_ref(rq);
+>>>  	return ret;
+>>
+>> All existing rq->rq_flags modifications are serialized. The above change
+>> adds code that may change rq_flags concurrently with regular request
+>> processing. I think that counts as a race condition.
 > 
-
-Sure, I'm just hacking now to see what difference it can make to 
-performance. Early results look promising...
-
->> Are there lots of LUNs? I can imagine that megaraid
->> sas has much larger can_queue than scsi_debug:)
-> No, there are just two LUNs, the 1st LUN is one commodity SSD(queue
-> depth is 32) and the performance issue is reported on this LUN, another is one
-> HDD(queue depth is 256) which is root disk, but the megaraid host tag depth is
-> 228, another weird setting. But the issue still can be reproduced after we set
-> 2nd LUN's depth as 64 for avoiding driver tag contention.
+> Good catch, but we still can change .rq_flags via atomic op, such as:
 > 
+> 	do {
+> 		old = rq->rq_flags;
+> 		new = old | RQF_ITERATING;
+> 	} while (cmpxchg(&rq->rq_flags, old, new) != old);
+
+That's not sufficient because the above would not work correctly in
+combination with statements like the following:
+
+	rq->rq_flags &= ~RQF_MQ_INFLIGHT;
+	req->rq_flags |= RQF_TIMED_OUT;
+
+How about setting a flag in 'current', just like the memalloc_noio_*()
+functions set or clear PF_MEMALLOC_NOIO to indicate whether or not
+GFP_NOIO should be used? That should work fine in thread context and
+also in interrupt context.
+
+>> Additionally, the
+>> RQF_ITERATING flag won't be set correctly in the (unlikely) case that
+>> two concurrent bt_tags_iter() calls examine the same request at the same
+>> time.
 > 
+> If the driver completes request from two concurrent bt_tags_iter(), there has
+> been big trouble of double completion, so I'd rather not to consider this case.
 
-BTW, one more thing which Kashyap and I looked at when initially 
-developing the hostwide tag support was the wait struct usage in tag 
-exhaustion scenario:
+bt_tags_iter() may be used for other purposes than completing requests.
+Here is an example of a blk_mq_tagset_busy_iter() call (from debugfs)
+that may run concurrently with other calls of that function:
 
-https://lore.kernel.org/linux-block/ecaeccf029c6fe377ebd4f30f04df9f1@mail.gmail.com/
+static int hctx_busy_show(void *data, struct seq_file *m)
+{
+	struct blk_mq_hw_ctx *hctx = data;
+	struct show_busy_params params = { .m = m, .hctx = hctx };
 
-IIRC, we looked at a "hostwide" wait_index - it didn't seem to make a 
-difference then, and we didn't end up make any changes here, but still 
-worth remembering.
+	blk_mq_tagset_busy_iter(hctx->queue->tag_set, hctx_show_busy_rq,
+				&params);
 
-Thanks,
-John
+	return 0;
+}
+
+Bart.
