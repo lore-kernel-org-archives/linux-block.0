@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03D4EC433B4
-	for <linux-block@archiver.kernel.org>; Tue, 27 Apr 2021 15:11:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D5A0C433B4
+	for <linux-block@archiver.kernel.org>; Tue, 27 Apr 2021 15:11:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CA750613C1
-	for <linux-block@archiver.kernel.org>; Tue, 27 Apr 2021 15:11:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CFD15613DD
+	for <linux-block@archiver.kernel.org>; Tue, 27 Apr 2021 15:11:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235974AbhD0PLy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Apr 2021 11:11:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60789 "EHLO
+        id S236512AbhD0PL5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Apr 2021 11:11:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:40056 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235466AbhD0PLx (ORCPT
+        by vger.kernel.org with ESMTP id S235466AbhD0PL4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Apr 2021 11:11:53 -0400
+        Tue, 27 Apr 2021 11:11:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619536270;
+        s=mimecast20190719; t=1619536273;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=IUkMNPgSRxsQpQnzl5iNntxxa5OYWKJ2UBgTtKX54ws=;
-        b=isF+7ALsBgbpgVxi06UsjCCjEVG7iHvYmMTLpf6nNKFEqV2otUc/B/nuR/q6GyL3Qf2/ia
-        g0TH4JnN0pFWl73HirDrAVJ+nUWoZPcJihTKfYu8sN198bDryJ+raLXC8EIfhD5gFbG2/W
-        FXABdxicrcGbdYgm3zoeYs9NSCRnBU0=
+        bh=VDh9wS3jss8fWGInb7YcjAdKBf4lUubnuKTnTwvKyL4=;
+        b=hW6NPw/VW0GFuOjjZx/qD1mEItgdy3PdzZf/gTVSBGqe4ma5TAHfiJ2sJzAksxS7iRTnH1
+        b8tqY9YKD64Gx61XFA+V7c762pBB/hrE8IC92XzZqy/bToEFc3JGd7IY888PyasQ2EXnko
+        mxmyIQ77UZqB458gzKAG2MzHDW/mYXI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-559-CE9xpnzYOPGPVUSHmZCNLA-1; Tue, 27 Apr 2021 11:11:06 -0400
-X-MC-Unique: CE9xpnzYOPGPVUSHmZCNLA-1
+ us-mta-200-PC1HauYMNYCsJ_QGuOoXnQ-1; Tue, 27 Apr 2021 11:11:09 -0400
+X-MC-Unique: PC1HauYMNYCsJ_QGuOoXnQ-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C3977107ACC7;
-        Tue, 27 Apr 2021 15:11:04 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D51DE1922963;
+        Tue, 27 Apr 2021 15:11:07 +0000 (UTC)
 Received: from localhost (ovpn-12-67.pek2.redhat.com [10.72.12.67])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8ADEB5C260;
-        Tue, 27 Apr 2021 15:11:00 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 04FC95C3F8;
+        Tue, 27 Apr 2021 15:11:06 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
@@ -51,9 +51,9 @@ Cc:     linux-block@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
         John Garry <john.garry@huawei.com>,
         David Jeffery <djeffery@redhat.com>,
         Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V3 1/3] block: avoid double io accounting for flush request
-Date:   Tue, 27 Apr 2021 23:10:56 +0800
-Message-Id: <20210427151058.2833168-2-ming.lei@redhat.com>
+Subject: [PATCH V3 2/3] blk-mq: grab rq->refcount before calling ->fn in blk_mq_tagset_busy_iter
+Date:   Tue, 27 Apr 2021 23:10:57 +0800
+Message-Id: <20210427151058.2833168-3-ming.lei@redhat.com>
 In-Reply-To: <20210427151058.2833168-1-ming.lei@redhat.com>
 References: <20210427151058.2833168-1-ming.lei@redhat.com>
 MIME-Version: 1.0
@@ -63,39 +63,123 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-For flush request, rq->end_io() may be called two times, one is from
-timeout handling(blk_mq_check_expired()), another is from normal
-completion(__blk_mq_end_request()).
+Grab rq->refcount before calling ->fn in blk_mq_tagset_busy_iter(), and
+this way will prevent the request from being re-used when ->fn is
+running. The approach is same as what we do during handling timeout.
 
-Move blk_account_io_flush() after flush_rq->ref drops to zero, so
-io accounting can be done just once for flush request.
+Fix request UAF related with completion race or queue releasing:
+
+- If one rq is referred before rq->q is frozen, then queue won't be
+frozen before the request is released during iteration.
+
+- If one rq is referred after rq->q is frozen, refcount_inc_not_zero()
+will return false, and we won't iterate over this request.
+
+However, still one request UAF not covered: refcount_inc_not_zero() may
+read one freed request, and it will be handled in next patch.
 
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-flush.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ block/blk-mq-tag.c | 22 ++++++++++++++++------
+ block/blk-mq.c     | 14 +++++++++-----
+ block/blk-mq.h     |  1 +
+ 3 files changed, 26 insertions(+), 11 deletions(-)
 
-diff --git a/block/blk-flush.c b/block/blk-flush.c
-index 7942ca6ed321..1002f6c58181 100644
---- a/block/blk-flush.c
-+++ b/block/blk-flush.c
-@@ -219,8 +219,6 @@ static void flush_end_io(struct request *flush_rq, blk_status_t error)
- 	unsigned long flags = 0;
- 	struct blk_flush_queue *fq = blk_get_flush_queue(q, flush_rq->mq_ctx);
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index 2a37731e8244..9329b94a9743 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -264,6 +264,8 @@ static bool bt_tags_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
+ 	struct blk_mq_tags *tags = iter_data->tags;
+ 	bool reserved = iter_data->flags & BT_TAG_ITER_RESERVED;
+ 	struct request *rq;
++	bool ret;
++	bool iter_static_rqs = !!(iter_data->flags & BT_TAG_ITER_STATIC_RQS);
  
--	blk_account_io_flush(flush_rq);
+ 	if (!reserved)
+ 		bitnr += tags->nr_reserved_tags;
+@@ -272,16 +274,21 @@ static bool bt_tags_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
+ 	 * We can hit rq == NULL here, because the tagging functions
+ 	 * test and set the bit before assigning ->rqs[].
+ 	 */
+-	if (iter_data->flags & BT_TAG_ITER_STATIC_RQS)
++	if (iter_static_rqs)
+ 		rq = tags->static_rqs[bitnr];
+-	else
++	else {
+ 		rq = tags->rqs[bitnr];
+-	if (!rq)
+-		return true;
++		if (!rq || !refcount_inc_not_zero(&rq->ref))
++			return true;
++	}
+ 	if ((iter_data->flags & BT_TAG_ITER_STARTED) &&
+ 	    !blk_mq_request_started(rq))
+-		return true;
+-	return iter_data->fn(rq, iter_data->data, reserved);
++		ret = true;
++	else
++		ret = iter_data->fn(rq, iter_data->data, reserved);
++	if (!iter_static_rqs)
++		blk_mq_put_rq_ref(rq);
++	return ret;
+ }
+ 
+ /**
+@@ -348,6 +355,9 @@ void blk_mq_all_tag_iter(struct blk_mq_tags *tags, busy_tag_iter_fn *fn,
+  *		indicates whether or not @rq is a reserved request. Return
+  *		true to continue iterating tags, false to stop.
+  * @priv:	Will be passed as second argument to @fn.
++ *
++ * We grab one request reference before calling @fn and release it after
++ * @fn returns.
+  */
+ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
+ 		busy_tag_iter_fn *fn, void *priv)
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 927189a55575..4bd6c11bd8bc 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -909,6 +909,14 @@ static bool blk_mq_req_expired(struct request *rq, unsigned long *next)
+ 	return false;
+ }
+ 
++void blk_mq_put_rq_ref(struct request *rq)
++{
++	if (is_flush_rq(rq, rq->mq_hctx))
++		rq->end_io(rq, 0);
++	else if (refcount_dec_and_test(&rq->ref))
++		__blk_mq_free_request(rq);
++}
++
+ static bool blk_mq_check_expired(struct blk_mq_hw_ctx *hctx,
+ 		struct request *rq, void *priv, bool reserved)
+ {
+@@ -942,11 +950,7 @@ static bool blk_mq_check_expired(struct blk_mq_hw_ctx *hctx,
+ 	if (blk_mq_req_expired(rq, next))
+ 		blk_mq_rq_timed_out(rq, reserved);
+ 
+-	if (is_flush_rq(rq, hctx))
+-		rq->end_io(rq, 0);
+-	else if (refcount_dec_and_test(&rq->ref))
+-		__blk_mq_free_request(rq);
 -
- 	/* release the tag's ownership to the req cloned from */
- 	spin_lock_irqsave(&fq->mq_flush_lock, flags);
++	blk_mq_put_rq_ref(rq);
+ 	return true;
+ }
  
-@@ -230,6 +228,7 @@ static void flush_end_io(struct request *flush_rq, blk_status_t error)
- 		return;
- 	}
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 3616453ca28c..143afe42c63a 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -47,6 +47,7 @@ void blk_mq_add_to_requeue_list(struct request *rq, bool at_head,
+ void blk_mq_flush_busy_ctxs(struct blk_mq_hw_ctx *hctx, struct list_head *list);
+ struct request *blk_mq_dequeue_from_ctx(struct blk_mq_hw_ctx *hctx,
+ 					struct blk_mq_ctx *start);
++void blk_mq_put_rq_ref(struct request *rq);
  
-+	blk_account_io_flush(flush_rq);
- 	/*
- 	 * Flush request has to be marked as IDLE when it is really ended
- 	 * because its .end_io() is called from timeout code path too for
+ /*
+  * Internal helpers for allocating/freeing the request map
 -- 
 2.29.2
 
