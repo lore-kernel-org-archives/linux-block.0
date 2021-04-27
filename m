@@ -2,37 +2,38 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A2FFC43461
-	for <linux-block@archiver.kernel.org>; Tue, 27 Apr 2021 22:59:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9770CC433ED
+	for <linux-block@archiver.kernel.org>; Tue, 27 Apr 2021 23:00:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ED7E1613F9
-	for <linux-block@archiver.kernel.org>; Tue, 27 Apr 2021 22:59:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 77DF9611ED
+	for <linux-block@archiver.kernel.org>; Tue, 27 Apr 2021 23:00:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236547AbhD0XAd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Apr 2021 19:00:33 -0400
-Received: from ale.deltatee.com ([204.191.154.188]:42800 "EHLO
+        id S239164AbhD0XAw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Apr 2021 19:00:52 -0400
+Received: from ale.deltatee.com ([204.191.154.188]:42848 "EHLO
         ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235382AbhD0XAd (ORCPT
+        with ESMTP id S235382AbhD0XAv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Apr 2021 19:00:33 -0400
+        Tue, 27 Apr 2021 19:00:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=deltatee.com; s=20200525; h=Subject:In-Reply-To:MIME-Version:Date:
         Message-ID:From:References:Cc:To:content-disposition;
-        bh=yfDJcXRXLcFqUpWKFnDEug6ObcuKDigbRQxLqk4fhDY=; b=sbQMyumPhi9BO3PW7BbH7jx3Mv
-        vyQd71v56wBfsn24nwtkY+oIQgX3d3l1Ef2xR/D7FmPPejRkZzxHW3lZYylXqntM3wayVT8xUbSON
-        pRu0g92wUrYkY4mSSqIOYl5nF3ZdzT0niosmL6qBWRsJuD7/K/AvnuHQmjnHK7oloxX99WCDjqOI0
-        cg5+SNiz8HchO6MM165oba4v51OTzr/KDIokovNCY/DFWZ7sMQFW03g7hYFCoWTz3ocn/dosmVMEZ
-        sGBSFJDc2fGekrXGh7GNV2q3EeYZREtOFpzZ4vfUtHADST8VMXbeGXWLL0y5KZxGTJ2ejJzeaB2up
-        1+e2wlfw==;
+        bh=RGdRC5FBlsTWfpWtOgCpYwh/6l+bY/lLU227Fr0Oa7w=; b=e1cQkHUii+OnXHxuzyVnv2FOWU
+        yRhslccFTPCSUZBHv6r9i2BtLYMYFFuNX+vj1xNOq/lXobsZ3eYFuedGTORJxwDIMCEh7Qthqs1Q7
+        RVxgzfvWzK3UWw1HMRbfVYTe3vQzXRIV/ILbih4akY/evNrEaGCAlfgG+L3AXOME+jur1eJqyKhD1
+        TMGSqOXU7r9XcMpgA/2JBpdbNNP7X3lLSbdPwHl2H10OkRWO75ot4KGzAuXd2ZJB/tmfOyTGaMv6M
+        ae+aEYfgGtkGVcUSMzK45Ps6AhzhkNnGarVg7/1Ky1Fn+SEciywNHOIOcE/kvvy4C616xFskQ500w
+        hxifV8fg==;
 Received: from guinness.priv.deltatee.com ([172.16.1.162])
         by ale.deltatee.com with esmtp (Exim 4.92)
         (envelope-from <logang@deltatee.com>)
-        id 1lbWg7-0002nw-DI; Tue, 27 Apr 2021 16:59:40 -0600
+        id 1lbWgQ-0002oO-8N; Tue, 27 Apr 2021 16:59:59 -0600
 To:     Jason Gunthorpe <jgg@ziepe.ca>
 Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
@@ -54,23 +55,22 @@ Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
         Ira Weiny <ira.weiny@intel.com>,
         Robin Murphy <robin.murphy@arm.com>
 References: <20210408170123.8788-1-logang@deltatee.com>
- <20210408170123.8788-12-logang@deltatee.com>
- <20210427194337.GT2047089@ziepe.ca>
+ <20210408170123.8788-15-logang@deltatee.com>
+ <20210427194753.GU2047089@ziepe.ca>
 From:   Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <4e2537b1-21f3-f726-07bb-91d086e6d124@deltatee.com>
-Date:   Tue, 27 Apr 2021 16:59:38 -0600
+Message-ID: <6e78cdc8-8189-b778-20b4-7a108e28e557@deltatee.com>
+Date:   Tue, 27 Apr 2021 16:59:57 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.9.0
 MIME-Version: 1.0
-In-Reply-To: <20210427194337.GT2047089@ziepe.ca>
+In-Reply-To: <20210427194753.GU2047089@ziepe.ca>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-CA
 Content-Transfer-Encoding: 7bit
 X-SA-Exim-Connect-IP: 172.16.1.162
 X-SA-Exim-Rcpt-To: robin.murphy@arm.com, ira.weiny@intel.com, helgaas@kernel.org, jianxin.xiong@intel.com, dave.hansen@linux.intel.com, jason@jlekstrand.net, dave.b.minturn@intel.com, andrzej.jakowski@intel.com, daniel.vetter@ffwll.ch, willy@infradead.org, ddutile@redhat.com, jhubbard@nvidia.com, christian.koenig@amd.com, dan.j.williams@intel.com, hch@lst.de, sbates@raithlin.com, iommu@lists.linux-foundation.org, linux-mm@kvack.org, linux-pci@vger.kernel.org, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, jgg@ziepe.ca
 X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: [PATCH 11/16] iommu/dma: Support PCI P2PDMA pages in dma-iommu
- map_sg
+Subject: Re: [PATCH 14/16] nvme-rdma: Ensure dma support when using p2pdma
 X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
 X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
@@ -79,21 +79,33 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 
 
-On 2021-04-27 1:43 p.m., Jason Gunthorpe wrote:
-> On Thu, Apr 08, 2021 at 11:01:18AM -0600, Logan Gunthorpe wrote:
->> When a PCI P2PDMA page is seen, set the IOVA length of the segment
->> to zero so that it is not mapped into the IOVA. Then, in finalise_sg(),
->> apply the appropriate bus address to the segment. The IOVA is not
->> created if the scatterlist only consists of P2PDMA pages.
+On 2021-04-27 1:47 p.m., Jason Gunthorpe wrote:
+> On Thu, Apr 08, 2021 at 11:01:21AM -0600, Logan Gunthorpe wrote:
+>> Ensure the dma operations support p2pdma before using the RDMA
+>> device for P2PDMA. This allows switching the RDMA driver from
+>> pci_p2pdma_map_sg() to dma_map_sg_p2pdma().
+>>
+>> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+>>  drivers/nvme/target/rdma.c | 3 ++-
+>>  1 file changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/nvme/target/rdma.c b/drivers/nvme/target/rdma.c
+>> index 6c1f3ab7649c..3ec7e77e5416 100644
+>> +++ b/drivers/nvme/target/rdma.c
+>> @@ -414,7 +414,8 @@ static int nvmet_rdma_alloc_rsp(struct nvmet_rdma_device *ndev,
+>>  	if (ib_dma_mapping_error(ndev->device, r->send_sge.addr))
+>>  		goto out_free_rsp;
+>>  
+>> -	if (!ib_uses_virt_dma(ndev->device))
+>> +	if (!ib_uses_virt_dma(ndev->device) &&
+>> +	    dma_pci_p2pdma_supported(&ndev->device->dev))
 > 
-> I expect P2P to work with systems that use ATS, so we'd want to see
-> those systems have the IOMMU programmed with the bus address.
+> ib_uses_virt_dma() should not be called by nvme and this is using the
+> wrong device pointer to query for DMA related properties.
+> 
+> I suspect this wants a ib_dma_pci_p2p_dma_supported() wrapper like
+> everything else.
 
-Oh, the paragraph you quote isn't quite as clear as it could be. The bus
-address is only used in specific circumstances depending on how the
-P2PDMA core code figures the addresses should be mapped (see the
-documentation for (upstream_bridge_distance()). The P2PDMA code
-currently doesn't have any provisions for ATS (I haven't had access to
-any such hardware) but I'm sure it wouldn't be too hard to add.
+Makes sense. Will add for v2.
 
 Logan
