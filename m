@@ -8,40 +8,40 @@ X-Spam-Status: No, score=-17.4 required=3.0 tests=BAYES_00,DATE_IN_PAST_06_12,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5274FC43462
-	for <linux-block@archiver.kernel.org>; Wed, 28 Apr 2021 05:35:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 891B8C433B4
+	for <linux-block@archiver.kernel.org>; Wed, 28 Apr 2021 05:35:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 204A461424
-	for <linux-block@archiver.kernel.org>; Wed, 28 Apr 2021 05:35:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6F9FE6141F
+	for <linux-block@archiver.kernel.org>; Wed, 28 Apr 2021 05:35:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235793AbhD1FgU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Apr 2021 01:36:20 -0400
-Received: from saphodev.broadcom.com ([192.19.11.229]:58634 "EHLO
+        id S235869AbhD1FgY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Apr 2021 01:36:24 -0400
+Received: from relay.smtp-ext.broadcom.com ([192.19.11.229]:58628 "EHLO
         relay.smtp-ext.broadcom.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229464AbhD1FgU (ORCPT
+        by vger.kernel.org with ESMTP id S231600AbhD1FgV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Apr 2021 01:36:20 -0400
+        Wed, 28 Apr 2021 01:36:21 -0400
 Received: from localhost.localdomain (unknown [10.157.2.20])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by relay.smtp-ext.broadcom.com (Postfix) with ESMTPS id 4059138921;
-        Tue, 27 Apr 2021 22:27:43 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 relay.smtp-ext.broadcom.com 4059138921
+        by relay.smtp-ext.broadcom.com (Postfix) with ESMTPS id 488F330E77;
+        Tue, 27 Apr 2021 22:27:30 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 relay.smtp-ext.broadcom.com 488F330E77
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=broadcom.com;
-        s=dkimrelay; t=1619587665;
-        bh=www+yUAWLJnG4YC7dK+zI+rHVJ4wXm3hbZswV+4too0=;
+        s=dkimrelay; t=1619587652;
+        bh=im7P3RH4dkVu8OSSeKv++WoZuS+aoAUFiOVCMcidLJ8=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Z8TZkcU8w2AZNOCl+u+j+cNrGhzsLNZbLd0q1Zup64TNV7MshPedHJ4y7tgioDYqT
-         WZSZ20L1PPA/g4GtFYzSbAV3wZK9RwVpkOL+z/1h2AE/1AW4WDBKMIQW+JfLUxqUNH
-         /YUUMw0+JSSgVsbeqrw2uraVFkjj2sK5EUF0Ekas=
+        b=LrVtLNqIKI2W97auBWHa0+ZzQhhRxJLlMnq0kmFfX2oEh28fPBpEeLT49erjJmPVW
+         MOTPvnV/ugDACsKcEowmzNmsCXiHbvycI5kTGLFdmKBr/dYKcSRSshikjzMXK6anuI
+         qGRKXt/yQEd0pqZ9jafJlcuq9tbVe5RPXiVmDZ70=
 From:   Muneendra <muneendra.kumar@broadcom.com>
 To:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
         tj@kernel.org, linux-nvme@lists.infradead.org, hare@suse.de
 Cc:     jsmart2021@gmail.com, emilne@redhat.com, mkumar@redhat.com,
         Gaurav Srivastava <gaurav.srivastava@broadcom.com>
-Subject: [PATCH v10 13/13] lpfc: vmid: Introducing vmid in io path.
-Date:   Wed, 28 Apr 2021 04:04:57 +0530
-Message-Id: <1619562897-14062-14-git-send-email-muneendra.kumar@broadcom.com>
+Subject: [PATCH v10 08/13] lpfc: vmid: Functions to manage vmids
+Date:   Wed, 28 Apr 2021 04:04:52 +0530
+Message-Id: <1619562897-14062-9-git-send-email-muneendra.kumar@broadcom.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1619562897-14062-1-git-send-email-muneendra.kumar@broadcom.com>
 References: <1619562897-14062-1-git-send-email-muneendra.kumar@broadcom.com>
@@ -51,247 +51,187 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Gaurav Srivastava <gaurav.srivastava@broadcom.com>
 
-The patch introduces the vmid in the io path. It checks if the vmid is
-enabled and if io belongs to a vm or not and acts accordingly. Other
-supporing APIs are also included in the patch.
+This patch contains the routines to save, retrieve and remove the vmids
+from the data structure. A hash table is used to save the vmids and
+the corresponding UUIDs associated with the application/VMs.
 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
 Signed-off-by: Gaurav Srivastava  <gaurav.srivastava@broadcom.com>
 Signed-off-by: James Smart <jsmart2021@gmail.com>
 
 ---
 v10:
-Remove redundant code and function name correction
+Fixed the Function name correction
 
 v9:
-Added changes related to locking and new hashtable implementation
+Added changes for implementing kernel based hashtable
 
 v8:
-Added proper error codes
-updated logic while handling vmid
+Added correct return value and error codes
 
 v7:
 No change
 
 v6:
-No change
+Added Forward declarations and functions to static
 
 v5:
-No change
+Changed Return code to non-numeric/Symbol
 
 v4:
 No change
 
 v3:
-Replaced blkcg_get_app_identifier with blkcg_get_fc_appid
+No change
 
 v2:
 Ported the patch on top of 5.10/scsi-queue
-Added a fix for issuing QFPA command which was not included in the
-last submit
 ---
- drivers/scsi/lpfc/lpfc_scsi.c | 174 ++++++++++++++++++++++++++++++++++
- 1 file changed, 174 insertions(+)
+ drivers/scsi/lpfc/lpfc_scsi.c | 118 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 118 insertions(+)
 
 diff --git a/drivers/scsi/lpfc/lpfc_scsi.c b/drivers/scsi/lpfc/lpfc_scsi.c
-index 0b35cab90627..1bc6ecf3ec61 100644
+index 578d38de0f48..0b35cab90627 100644
 --- a/drivers/scsi/lpfc/lpfc_scsi.c
 +++ b/drivers/scsi/lpfc/lpfc_scsi.c
-@@ -5263,6 +5263,160 @@ static void lpfc_vmid_assign_cs_ctl(struct lpfc_vport *vport,
+@@ -28,6 +28,7 @@
+ #include <asm/unaligned.h>
+ #include <linux/t10-pi.h>
+ #include <linux/crc-t10dif.h>
++#include <linux/blk-cgroup.h>
+ #include <net/checksum.h>
+ 
+ #include <scsi/scsi.h>
+@@ -86,6 +87,14 @@ static void
+ lpfc_release_scsi_buf_s3(struct lpfc_hba *phba, struct lpfc_io_buf *psb);
+ static int
+ lpfc_prot_group_type(struct lpfc_hba *phba, struct scsi_cmnd *sc);
++static void
++lpfc_put_vmid_in_hashtable(struct lpfc_vport *vport, u32 hash,
++			   struct lpfc_vmid *vmp);
++static void lpfc_vmid_update_entry(struct lpfc_vport *vport, struct scsi_cmnd
++				   *cmd, struct lpfc_vmid *vmp,
++				   union lpfc_vmid_io_tag *tag);
++static void lpfc_vmid_assign_cs_ctl(struct lpfc_vport *vport,
++				    struct lpfc_vmid *vmid);
+ 
+ static inline unsigned
+ lpfc_cmd_blksize(struct scsi_cmnd *sc)
+@@ -5145,6 +5154,115 @@ void lpfc_poll_timeout(struct timer_list *t)
  	}
  }
  
 +/*
-+ * lpfc_vmid_get_appid- get the vmid associated with the uuid
++ * lpfc_get_vmid_from_hashtable - search the UUID in the hash table
 + * @vport: The virtual port for which this call is being executed.
-+ * @uuid: uuid associated with the VE
-+ * @cmd: address of scsi cmmd descriptor
-+ * @tag: VMID tag
-+ * Returns status of the function
++ * @hash: calculated hash value
++ * @buf: uuid associated with the VE
++ * Returns the vmid entry associated with the UUID
++ * Make sure to acquire the appropriate lock before invoking this routine.
 + */
-+static int lpfc_vmid_get_appid(struct lpfc_vport *vport, char *uuid, struct
-+			       scsi_cmnd * cmd, union lpfc_vmid_io_tag *tag)
++struct lpfc_vmid *lpfc_get_vmid_from_hashtable(struct lpfc_vport *vport,
++					      u32 hash, u8 *buf)
 +{
-+	struct lpfc_vmid *vmp = NULL;
-+	int hash, len, rc, i;
++	struct lpfc_vmid *vmp;
 +
-+	/* check if QFPA is complete */
-+	if (lpfc_vmid_is_type_priority_tag(vport) && !(vport->vmid_flag &
-+	      LPFC_VMID_QFPA_CMPL)) {
-+		vport->work_port_events |= WORKER_CHECK_VMID_ISSUE_QFPA;
-+		return -EAGAIN;
++	hash_for_each_possible(vport->hash_table, vmp, hnode, hash) {
++		if (memcmp(&vmp->host_vmid[0], buf, 16) == 0)
++			return vmp;
 +	}
-+
-+	/* search if the uuid has already been mapped to the vmid */
-+	len = strlen(uuid);
-+	hash = lpfc_vmid_hash_fn(uuid, len);
-+
-+	/* search for the VMID in the table */
-+	read_lock(&vport->vmid_lock);
-+	vmp = lpfc_get_vmid_from_hashtable(vport, hash, uuid);
-+
-+	/* if found, check if its already registered  */
-+	if (vmp  && vmp->flag & LPFC_VMID_REGISTERED) {
-+		read_unlock(&vport->vmid_lock);
-+		lpfc_vmid_update_entry(vport, cmd, vmp, tag);
-+		rc = 0;
-+	} else if (vmp && (vmp->flag & LPFC_VMID_REQ_REGISTER ||
-+			   vmp->flag & LPFC_VMID_DE_REGISTER)) {
-+		/* else if register or dereg request has already been sent */
-+		/* Hence vmid tag will not be added for this IO */
-+		read_unlock(&vport->vmid_lock);
-+		rc = -EBUSY;
-+	} else {
-+		/* The vmid was not found in the hashtable. At this point, */
-+		/* drop the read lock first before proceeding further */
-+		read_unlock(&vport->vmid_lock);
-+		/* start the process to obtain one as per the */
-+		/* type of the vmid indicated */
-+		write_lock(&vport->vmid_lock);
-+		vmp = lpfc_get_vmid_from_hashtable(vport, hash, uuid);
-+
-+		/* while the read lock was released, in case the entry was */
-+		/* added by other context or is in process of being added */
-+		if (vmp && vmp->flag & LPFC_VMID_REGISTERED) {
-+			lpfc_vmid_update_entry(vport, cmd, vmp, tag);
-+			write_unlock(&vport->vmid_lock);
-+			return 0;
-+		} else if (vmp && vmp->flag & LPFC_VMID_REQ_REGISTER) {
-+			write_unlock(&vport->vmid_lock);
-+			return -EBUSY;
-+		}
-+
-+		/* else search and allocate a free slot in the hash table */
-+		if (vport->cur_vmid_cnt < vport->max_vmid) {
-+			for (i = 0; i < vport->max_vmid; i++) {
-+				vmp = vport->vmid + i;
-+				if (vmp->flag == LPFC_VMID_SLOT_FREE)
-+					break;
-+			}
-+			if (i == vport->max_vmid)
-+				vmp = NULL;
-+		} else {
-+			vmp = NULL;
-+		}
-+
-+		if (!vmp) {
-+			write_unlock(&vport->vmid_lock);
-+			return -ENOMEM;
-+		}
-+
-+		/* Add the vmid and register  */
-+		lpfc_put_vmid_in_hashtable(vport, hash, vmp);
-+		vmp->vmid_len = len;
-+		memcpy(vmp->host_vmid, uuid, vmp->vmid_len);
-+		vmp->io_rd_cnt = 0;
-+		vmp->io_wr_cnt = 0;
-+		vmp->flag = LPFC_VMID_SLOT_USED;
-+
-+		vmp->delete_inactive =
-+			vport->vmid_inactivity_timeout ? 1 : 0;
-+
-+		/* if type priority tag, get next available vmid */
-+		if (lpfc_vmid_is_type_priority_tag(vport))
-+			lpfc_vmid_assign_cs_ctl(vport, vmp);
-+
-+		/* allocate the per cpu variable for holding */
-+		/* the last access time stamp only if vmid is enabled */
-+		if (!vmp->last_io_time)
-+			vmp->last_io_time = __alloc_percpu(sizeof(u64),
-+							   __alignof__(struct
-+							   lpfc_vmid));
-+		if (!vmp->last_io_time) {
-+			hash_del(&vmp->hnode);
-+			vmp->flag = LPFC_VMID_SLOT_FREE;
-+			write_unlock(&vport->vmid_lock);
-+			return -EIO;
-+		}
-+
-+		write_unlock(&vport->vmid_lock);
-+
-+		/* complete transaction with switch */
-+		if (lpfc_vmid_is_type_priority_tag(vport))
-+			rc = lpfc_vmid_uvem(vport, vmp, true);
-+		else
-+			rc = lpfc_vmid_cmd(vport, SLI_CTAS_RAPP_IDENT, vmp);
-+		if (!rc) {
-+			write_lock(&vport->vmid_lock);
-+			vport->cur_vmid_cnt++;
-+			vmp->flag |= LPFC_VMID_REQ_REGISTER;
-+			write_unlock(&vport->vmid_lock);
-+		} else {
-+			write_lock(&vport->vmid_lock);
-+			hash_del(&vmp->hnode);
-+			vmp->flag = LPFC_VMID_SLOT_FREE;
-+			free_percpu(vmp->last_io_time);
-+			write_unlock(&vport->vmid_lock);
-+			return -EIO;
-+		}
-+
-+		/* finally, enable the idle timer once */
-+		if (!(vport->phba->pport->vmid_flag & LPFC_VMID_TIMER_ENBLD)) {
-+			mod_timer(&vport->phba->inactive_vmid_poll,
-+				  jiffies +
-+				  msecs_to_jiffies(1000 * LPFC_VMID_TIMER));
-+			vport->phba->pport->vmid_flag |= LPFC_VMID_TIMER_ENBLD;
-+		}
-+	}
-+	return rc;
++	return NULL;
 +}
 +
 +/*
-+ * lpfc_is_command_vm_io - get the uuid from blk cgroup
-+ * @cmd:Pointer to scsi_cmnd data structure
-+ * Returns uuid if present if not null
++ * lpfc_put_vmid_in_hashtable - put the VMID in the hash table
++ * @vport: The virtual port for which this call is being executed.
++ * @hash - calculated hash value
++ * @vmp: Pointer to a VMID entry representing a VM sending IO
++ *
++ * This routine will insert the newly acquired vmid entity in the hash table.
++ * Make sure to acquire the appropriate lock before invoking this routine.
 + */
-+static char *lpfc_is_command_vm_io(struct scsi_cmnd *cmd)
++static void
++lpfc_put_vmid_in_hashtable(struct lpfc_vport *vport, u32 hash,
++			   struct lpfc_vmid *vmp)
 +{
-+	char *uuid = NULL;
++	hash_add(vport->hash_table, &vmp->hnode, hash);
++}
 +
-+	if (cmd->request) {
-+		if (cmd->request->bio)
-+			uuid = blkcg_get_fc_appid(cmd->request->bio);
++/*
++ * lpfc_vmid_hash_fn - creates a hash value of the UUID
++ * @vmid: uuid associated with the VE
++ * @len: length of the vmid string
++ * Returns the calculated hash value
++ */
++int lpfc_vmid_hash_fn(const char *vmid, int len)
++{
++	int c;
++	int hash = 0;
++
++	if (len == 0)
++		return 0;
++	while (len--) {
++		c = *vmid++;
++		if (c >= 'A' && c <= 'Z')
++			c += 'a' - 'A';
++
++		hash = (hash + (c << LPFC_VMID_HASH_SHIFT) +
++			(c >> LPFC_VMID_HASH_SHIFT)) * 19;
 +	}
-+	return uuid;
++
++	return hash & LPFC_VMID_HASH_MASK;
++}
++
++/*
++ * lpfc_vmid_update_entry - update the vmid entry in the hash table
++ * @vport: The virtual port for which this call is being executed.
++ * @cmd: address of scsi cmmd descriptor
++ * @vmp: Pointer to a VMID entry representing a VM sending IO
++ * @tag: VMID tag
++ */
++static void lpfc_vmid_update_entry(struct lpfc_vport *vport, struct scsi_cmnd
++				   *cmd, struct lpfc_vmid *vmp,
++				   union lpfc_vmid_io_tag *tag)
++{
++	u64 *lta;
++
++	if (vport->vmid_priority_tagging)
++		tag->cs_ctl_vmid = vmp->un.cs_ctl_vmid;
++	else
++		tag->app_id = vmp->un.app_id;
++
++	if (cmd->sc_data_direction == DMA_TO_DEVICE)
++		vmp->io_wr_cnt++;
++	else
++		vmp->io_rd_cnt++;
++
++	/* update the last access timestamp in the table */
++	lta = per_cpu_ptr(vmp->last_io_time, raw_smp_processor_id());
++	*lta = jiffies;
++}
++
++static void lpfc_vmid_assign_cs_ctl(struct lpfc_vport *vport,
++				    struct lpfc_vmid *vmid)
++{
++	u32 hash;
++	struct lpfc_vmid *pvmid;
++
++	if (vport->port_type == LPFC_PHYSICAL_PORT) {
++		vmid->un.cs_ctl_vmid = lpfc_vmid_get_cs_ctl(vport);
++	} else {
++		hash = lpfc_vmid_hash_fn(vmid->host_vmid, vmid->vmid_len);
++		pvmid =
++		    lpfc_get_vmid_from_hashtable(vport->phba->pport, hash,
++						vmid->host_vmid);
++		if (pvmid)
++			vmid->un.cs_ctl_vmid = pvmid->un.cs_ctl_vmid;
++		else
++			vmid->un.cs_ctl_vmid = lpfc_vmid_get_cs_ctl(vport);
++	}
 +}
 +
  /**
   * lpfc_queuecommand - scsi_host_template queuecommand entry point
   * @shost: kernel scsi host pointer.
-@@ -5288,6 +5442,7 @@ lpfc_queuecommand(struct Scsi_Host *shost, struct scsi_cmnd *cmnd)
- 	int err, idx;
- #ifdef CONFIG_SCSI_LPFC_DEBUG_FS
- 	uint64_t start = 0L;
-+	u8 *uuid = NULL;
- 
- 	if (phba->ktime_on)
- 		start = ktime_get_ns();
-@@ -5415,6 +5570,25 @@ lpfc_queuecommand(struct Scsi_Host *shost, struct scsi_cmnd *cmnd)
- 	}
- 
- 
-+	/* check the necessary and sufficient condition to support VMID */
-+	if (lpfc_is_vmid_enabled(phba) &&
-+	    (ndlp->vmid_support ||
-+	     phba->pport->vmid_priority_tagging ==
-+	     LPFC_VMID_PRIO_TAG_ALL_TARGETS)) {
-+		/* is the IO generated by a VM, get the associated virtual */
-+		/* entity id */
-+		uuid = lpfc_is_command_vm_io(cmnd);
-+
-+		if (uuid) {
-+			err = lpfc_vmid_get_appid(vport, uuid, cmnd,
-+				(union lpfc_vmid_io_tag *)
-+					&lpfc_cmd->cur_iocbq.vmid_tag);
-+			if (!err)
-+				lpfc_cmd->cur_iocbq.iocb_flag |= LPFC_IO_VMID;
-+		}
-+	}
-+
-+	atomic_inc(&ndlp->cmd_pending);
- #ifdef CONFIG_SCSI_LPFC_DEBUG_FS
- 	if (unlikely(phba->hdwqstat_on & LPFC_CHECK_SCSI_IO))
- 		this_cpu_inc(phba->sli4_hba.c_stat->xmt_io);
 -- 
 2.26.2
 
