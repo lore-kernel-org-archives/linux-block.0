@@ -2,121 +2,129 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB56DC433ED
-	for <linux-block@archiver.kernel.org>; Tue, 27 Apr 2021 09:45:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0C01C433B4
+	for <linux-block@archiver.kernel.org>; Tue, 27 Apr 2021 09:53:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A93C1613B1
-	for <linux-block@archiver.kernel.org>; Tue, 27 Apr 2021 09:45:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A8F3F613C5
+	for <linux-block@archiver.kernel.org>; Tue, 27 Apr 2021 09:53:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235132AbhD0JqA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Apr 2021 05:46:00 -0400
-Received: from frasgout.his.huawei.com ([185.176.79.56]:2923 "EHLO
-        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235133AbhD0Jph (ORCPT
+        id S235433AbhD0JyB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Apr 2021 05:54:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:58400 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235306AbhD0Jxs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Apr 2021 05:45:37 -0400
-Received: from fraeml715-chm.china.huawei.com (unknown [172.18.147.226])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4FTxRc46BVz686GP;
-        Tue, 27 Apr 2021 17:34:20 +0800 (CST)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- fraeml715-chm.china.huawei.com (10.206.15.34) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Tue, 27 Apr 2021 11:44:52 +0200
-Received: from [10.47.94.234] (10.47.94.234) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.2; Tue, 27 Apr
- 2021 10:44:51 +0100
-Subject: Re: [bug report] scsi host hang when running fio
-To:     Kashyap Desai <kashyap.desai@broadcom.com>,
-        Ming Lei <ming.lei@redhat.com>, <linux-scsi@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, Hannes Reinecke <hare@suse.com>
-CC:     chenxiang <chenxiang66@hisilicon.com>, <luojiaxing@huawei.com>
-References: <0dda71da-4119-2e40-b8e9-ab2b3ee8e96a@huawei.com>
- <f934ca65fa55345c360c944dd0fc2239@mail.gmail.com>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <3d72d64d-314f-9d34-e039-7e508b2abe1b@huawei.com>
-Date:   Tue, 27 Apr 2021 10:41:52 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
+        Tue, 27 Apr 2021 05:53:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1619517184;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=m5+c/+BZ4gIa5hUEWa4KddJnHEAW8qm6OVHAdVDDGUE=;
+        b=GYRVd48Ab2JZ4M1NCc7XTlpOEXhrrmsavMFKo1DLVa2Iar164lfRmZu1qosE5LXb64SxPd
+        VU1WBkuITr8dw2ws028Ue0Vx+fEvGc6h4Df8MYNVZOIKBEplc0XKuM8Xg+HAgHHsozXEC2
+        kc6u2e2RxTHVKHGY3a/PhzGNLNnB5xY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-552-CX21mRDHPRC0STOasSqEuQ-1; Tue, 27 Apr 2021 05:52:59 -0400
+X-MC-Unique: CX21mRDHPRC0STOasSqEuQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9ABEE501E0;
+        Tue, 27 Apr 2021 09:52:58 +0000 (UTC)
+Received: from T590 (ovpn-13-248.pek2.redhat.com [10.72.13.248])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1D33F19704;
+        Tue, 27 Apr 2021 09:52:50 +0000 (UTC)
+Date:   Tue, 27 Apr 2021 17:52:58 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     John Garry <john.garry@huawei.com>
+Cc:     Kashyap Desai <kashyap.desai@broadcom.com>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Douglas Gilbert <dgilbert@interlog.com>,
+        Hannes Reinecke <hare@suse.com>
+Subject: Re: [bug report] shared tags causes IO hang and performance drop
+Message-ID: <YIfe+mpcV17XsHuL@T590>
+References: <0c85fe52-ebc7-68b3-2dbe-dfad5d604346@huawei.com>
+ <c1d5abaa-c460-55f8-5351-16f09d6aa81f@huawei.com>
+ <YIbS1dgSYrsAeGvZ@T590>
+ <55743a51-4d6f-f481-cebf-e2af9c657911@huawei.com>
+ <YIbkX2G0+dp3PV+u@T590>
+ <9ad15067-ba7b-a335-ae71-8c4328856b91@huawei.com>
+ <YIdTyyVE5azlYwtO@T590>
+ <ab83eec4-20f1-ad74-7f43-52a4a87a8aa9@huawei.com>
+ <YIfVVRheF9ZWjzbh@T590>
+ <cb81d990-e5a6-49b1-5d96-8079a80c73f5@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <f934ca65fa55345c360c944dd0fc2239@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.47.94.234]
-X-ClientProxiedBy: lhreml745-chm.china.huawei.com (10.201.108.195) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cb81d990-e5a6-49b1-5d96-8079a80c73f5@huawei.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 19/04/2021 12:43, Kashyap Desai wrote:
->> Hi guys,
->>
->> While investigating the performance issue reported by Ming [0], I am
->> seeing
->> this hang in certain scenarios:
->>
->> tivated0KB /s] [0/0/0 iops] [eta 1158048815d:13h:31m:49s] [ 740.499917]
->> rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:ops] [eta
->> 34722d:05h:17m:25s] [ 740.505994] rcu: Tasks blocked on level-1 rcu_node
->> (CPUs 0-15):
->> [ 740.511982] (detected by 64, t=5255 jiffies, g=6105, q=6697) [
->> 740.517703]
->> rcu: All QSes seen, last rcu_preempt kthread activity 0 (4295075897-
->> 4295075897), jiffies_till_next_fqs=1, root ->qsmask 0x1 [ 740.723625] BUG:
->> scheduling while atomic: swapper/64/0/0x00000008 [ 740.729692] Modules
->> linked in:
->> [ 740.732737] CPU: 64 PID: 0 Comm: swapper/64 Tainted: G W 5.12.0-rc7-
->> g7589ed97c1da-dirty #322 [ 740.742432] Hardware name: Huawei TaiShan
->> 2280 V2/BC82AMDC, BIOS
->> 2280-V2 CS V5.B133.01 03/25/2021
->> [ 740.751264] Call trace:
->> [ 740.753699] dump_backtrace+0x0/0x1b0
->> [ 740.757353] show_stack+0x18/0x68
->> [ 740.760654] dump_stack+0xd8/0x134
->> [ 740.764046] __schedule_bug+0x60/0x78
->> [ 740.767694] __schedule+0x620/0x6d8
->> [ 740.771168] schedule_idle+0x20/0x40
->> [ 740.774730] do_idle+0x19c/0x278
->> [ 740.777945] cpu_startup_entry+0x24/0x68 [ 740.781850]
->> secondary_start_kernel+0x178/0x188
->> [ 740.786362] 0x0
->> ^Cbs: 12 (f=12): [r(12)] [0.0% done] [1626MB/0KB/0KB /s] [416K/0/0 iops]
->> [eta
->> 34722d:05h:16m:28s]
->> fio: terminating on signal 2
->>
->> I thought it merited a separate thread.
->>
->> [ 740.723625] BUG: scheduling while atomic: swapper/64/0/0x00000008
->> Looks bad ...
->>
->> The scenario to create seems to be running fio with rw=randread and mq-
->> deadline IO scheduler. And heavily loading the system - running fio on a
->> subset of available CPUs seems to help (recreate).
->>
->> When it occurs, the system becomes totally unresponsive.
->>
->> It could be a LLDD bug, but I am doubtful.
->>
->> Has anyone else seen this or help try to recreate?
-> John - I have not seen such issue on megaraid_sas driver. Is this something
-> to do with CPU lock up ?
+On Tue, Apr 27, 2021 at 10:37:39AM +0100, John Garry wrote:
+> On 27/04/2021 10:11, Ming Lei wrote:
+> > On Tue, Apr 27, 2021 at 08:52:53AM +0100, John Garry wrote:
+> > > On 27/04/2021 00:59, Ming Lei wrote:
+> > > > > Anyway, I'll look at adding code for a per-request queue sched tags to see
+> > > > > if it helps. But I would plan to continue to use a per hctx sched request
+> > > > > pool.
+> > > > Why not switch to per hctx sched request pool?
+> > > I don't understand. The current code uses a per-hctx sched request pool, and
+> > > I said that I don't plan to change that.
+> > I forget why you didn't do that, because for hostwide tags, request
+> > is always 1:1 for either sched tags(real io sched) or driver tags(none).
+> > 
+> > Maybe you want to keep request local to hctx, but never see related
+> > performance data for supporting the point, sbitmap queue allocator has
+> > been intelligent enough to allocate tag freed from native cpu.
+> > 
+> > Then you just waste lots of memory, I remember that scsi request payload
+> > is a bit big.
+> 
+> It's true that we waste much memory for regular static requests for when
+> using hostwide tags today.
+> 
+> One problem in trying to use a single set of "hostwide" static requests is
+> that we call blk_mq_init_request(..., hctx_idx, ...) ->
+> set->ops->init_request(.., hctx_idx, ...) for each static rq, and this would
+> not work for a single set of "hostwide" requests.
+> 
+> And I see a similar problem for a "request queue-wide" sched static
+> requests.
+> 
+> Maybe we can improve this in future.
 
-JFYI, this appears to be an issue of combination of threaded irq handler 
-and managed interrupts. I raised the issue with Thomas:
+OK, fair enough.
 
-https://lore.kernel.org/lkml/874kfxw9zv.ffs@nanos.tec.linutronix.de/
+> 
+> BTW, for the performance issue which Yanhui witnessed with megaraid sas, do
+> you think it may because of the IO sched tags issue of total sched tag depth
+> growing vs driver tags?
 
-Maybe NVMe PCI could have the same issue.
+I think it is highly possible. Will you work a patch to convert to
+per-request-queue sched tag?
+
+> Are there lots of LUNs? I can imagine that megaraid
+> sas has much larger can_queue than scsi_debug :)
+
+No, there are just two LUNs, the 1st LUN is one commodity SSD(queue
+depth is 32) and the performance issue is reported on this LUN, another is one
+HDD(queue depth is 256) which is root disk, but the megaraid host tag depth is
+228, another weird setting. But the issue still can be reproduced after we set
+2nd LUN's depth as 64 for avoiding driver tag contention.
+
+
 
 Thanks,
-John
-
+Ming
 
