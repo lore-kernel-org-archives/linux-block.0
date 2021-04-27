@@ -3,39 +3,39 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB9E9C43616
-	for <linux-block@archiver.kernel.org>; Tue, 27 Apr 2021 16:20:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEEC6C4360C
+	for <linux-block@archiver.kernel.org>; Tue, 27 Apr 2021 16:20:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AF703613F3
-	for <linux-block@archiver.kernel.org>; Tue, 27 Apr 2021 16:20:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7E7CD61151
+	for <linux-block@archiver.kernel.org>; Tue, 27 Apr 2021 16:20:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237724AbhD0QV2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Apr 2021 12:21:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50884 "EHLO
+        id S237865AbhD0QV3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Apr 2021 12:21:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50882 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237493AbhD0QTc (ORCPT
+        with ESMTP id S237503AbhD0QTc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Tue, 27 Apr 2021 12:19:32 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 482FBC061756;
-        Tue, 27 Apr 2021 09:18:49 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22322C061574;
+        Tue, 27 Apr 2021 09:18:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-        Content-ID:Content-Description:In-Reply-To:References;
-        bh=sUaMl88hnaMnobQcmCcDUIj4nQUOb9OqnC8xCsa7oqc=; b=CzRsmoLNhdCinfU7qbt92eD1yE
-        NZ+/ekeudRzjFLtmRiGSZqXIkqODYJc4PdJtqdPOQkWTLyBYfgDbVJ/13AKBVACLg/Gawj5rVWvf5
-        vz6AkLS25BWK/CzmBXpb+Pa/gi+70PX6gEAwc4ggIj0LmgfDnrRltIE5xuGO2DFykCPQ8rPxD2Y2D
-        fdqeU1O5owEajBU3LHc9Sn50Odqq2CnKm+Bt5NTxJuR8bANihEG8X7brEU5DupV/jBGZUiu/pHMTm
-        ekRMDk1tYbVahQx34rG0mz2NQdjJtlW+470B+VKC3jMFj6dXBfpKADy2nXZCdzAiAC5FdOWs/bxlW
-        lrvQsDVw==;
-Received: from 089144202077.atnat0011.highway.a1.net ([89.144.202.77] helo=localhost)
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
+        :Reply-To:Content-Type:Content-ID:Content-Description;
+        bh=o5zGnmhRQBVMOFTbkoOK4C6A9eTSah00I6u2NMKUqBo=; b=sYzCoxyyNGvmiZFWjQJwOl3HZu
+        Qepx+XmERJTR4Mz+5wqIqxDrohcmc+XgyoJdo7dSDRPdawcyvrfeTIBic03RMWl4hDMdxn4P4gs+c
+        OdodF3UMXb41RY8+PW8CK/AIHFo/lsDpKjk+Z4uKrb4KEgSAOHEhWrX5GZln5rTQVFSR8FmQCsBqj
+        o+Z7noib3iflBRAZ8slLtgrATGX8E8sOx9COJsjlgsQMNOPCVUwaGJXWN+ED8SZoZib9VR58rXecX
+        F5Q4Byt4Z45sfXIkHb/BhI+dZ3/7KBvCoGN7OJaXbUh6aM+lK7d6+IHzpFHHHG+id98/qwtanFRMP
+        SeX7hJNg==;
+Received: from [2001:4bb8:18c:28b2:c772:7205:2aa4:840d] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
-        id 1lbQPy-00Gr3m-4j; Tue, 27 Apr 2021 16:18:34 +0000
+        id 1lbQQ4-00Gr47-2P; Tue, 27 Apr 2021 16:18:40 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Jeffle Xu <jefflexu@linux.alibaba.com>,
@@ -46,10 +46,12 @@ Cc:     Jeffle Xu <jefflexu@linux.alibaba.com>,
         "Wunderlich, Mark" <mark.wunderlich@intel.com>,
         "Vasudevan, Anil" <anil.vasudevan@intel.com>,
         linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: switch block layer polling to a bio based model v2
-Date:   Tue, 27 Apr 2021 18:16:04 +0200
-Message-Id: <20210427161619.1294399-1-hch@lst.de>
+Subject: [PATCH 02/15] block: don't try to poll multi-bio I/Os in __blkdev_direct_IO
+Date:   Tue, 27 Apr 2021 18:16:06 +0200
+Message-Id: <20210427161619.1294399-3-hch@lst.de>
 X-Mailer: git-send-email 2.30.1
+In-Reply-To: <20210427161619.1294399-1-hch@lst.de>
+References: <20210427161619.1294399-1-hch@lst.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
@@ -57,87 +59,84 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi all,
+If an iocb is split into multiple bios we can't poll for both.  So don't
+bother to even try to poll in that case.
 
-This series clean up the block polling code a bit and changes the interface
-to poll for a specific bio instead of a request_queue and cookie pair.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ fs/block_dev.c | 37 ++++++++++++++-----------------------
+ 1 file changed, 14 insertions(+), 23 deletions(-)
 
-Polling for the bio itself leads to a few advantages:
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index a5244e08b6c8..df651f468e11 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -375,7 +375,7 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter,
+ 	struct blk_plug plug;
+ 	struct blkdev_dio *dio;
+ 	struct bio *bio;
+-	bool is_poll = (iocb->ki_flags & IOCB_HIPRI) != 0;
++	bool is_poll = (iocb->ki_flags & IOCB_HIPRI), do_poll = false;
+ 	bool is_read = (iov_iter_rw(iter) == READ), is_sync;
+ 	loff_t pos = iocb->ki_pos;
+ 	blk_qc_t qc = BLK_QC_T_NONE;
+@@ -437,22 +437,9 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter,
+ 		pos += bio->bi_iter.bi_size;
+ 
+ 		nr_pages = bio_iov_vecs_to_alloc(iter, BIO_MAX_VECS);
+-		if (!nr_pages) {
+-			bool polled = false;
+-
+-			if (iocb->ki_flags & IOCB_HIPRI) {
+-				bio_set_polled(bio, iocb);
+-				polled = true;
+-			}
+-
+-			qc = submit_bio(bio);
+-
+-			if (polled)
+-				WRITE_ONCE(iocb->ki_cookie, qc);
+-			break;
+-		}
+-
+-		if (!dio->multi_bio) {
++		if (dio->multi_bio) {
++			atomic_inc(&dio->ref);
++		} else if (nr_pages) {
+ 			/*
+ 			 * AIO needs an extra reference to ensure the dio
+ 			 * structure which is embedded into the first bio
+@@ -462,11 +449,16 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter,
+ 				bio_get(bio);
+ 			dio->multi_bio = true;
+ 			atomic_set(&dio->ref, 2);
+-		} else {
+-			atomic_inc(&dio->ref);
++		} else if (is_poll) {
++			bio_set_polled(bio, iocb);
++			do_poll = true;
++		}
++		qc = submit_bio(bio);
++		if (!nr_pages) {
++			if (do_poll)
++				WRITE_ONCE(iocb->ki_cookie, qc);
++			break;
+ 		}
+-
+-		submit_bio(bio);
+ 		bio = bio_alloc(GFP_KERNEL, nr_pages);
+ 	}
+ 
+@@ -481,8 +473,7 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter,
+ 		if (!READ_ONCE(dio->waiter))
+ 			break;
+ 
+-		if (!(iocb->ki_flags & IOCB_HIPRI) ||
+-		    !blk_poll(bdev_get_queue(bdev), qc, true))
++		if (!do_poll || !blk_poll(bdev_get_queue(bdev), qc, true))
+ 			blk_io_schedule();
+ 	}
+ 	__set_current_state(TASK_RUNNING);
+-- 
+2.30.1
 
-  - the cookie construction can made entirely private in blk-mq.c
-  - the caller does not need to remember the request_queue and cookie
-    separately and thus sidesteps their lifetime issues
-  - keeping the device and the cookie inside the bio allows to trivially
-    support polling BIOs remapping by stacking drivers
-  - a lot of code to propagate the cookie back up the submission path can
-    removed entirely
-
-The one major caveat is that this requires RCU freeing polled BIOs to make
-sure the bio that contains the polling information is still alive when
-io_uring tries to poll it through the iocb. For synchronous polling all the
-callers have a bio reference anyway, so this is not an issue.
-
-Git tree:
-
-   git://git.infradead.org/users/hch/block.git bio-poll
-
-Gitweb:
-
-    http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/bio-poll
-
-Chances since v1:
- - use SLAB_TYPESAFE_BY_RCU to only free the pages backing the bio
-   slabs bio RCU
- - split the spin argument to bio_poll to avoid sleeping under RCU from
-   io_uring
- - add support for polling nvme multipath devices
-
-Diffstat:
- arch/m68k/emu/nfblock.c             |    3 
- arch/xtensa/platforms/iss/simdisk.c |    3 
- block/bio.c                         |    4 
- block/blk-core.c                    |  118 +++++++++++++++++-------
- block/blk-merge.c                   |    2 
- block/blk-mq-debugfs.c              |    2 
- block/blk-mq.c                      |  177 +++++++++++++++---------------------
- block/blk-mq.h                      |    6 -
- block/blk-sysfs.c                   |    3 
- drivers/block/brd.c                 |   12 +-
- drivers/block/drbd/drbd_int.h       |    2 
- drivers/block/drbd/drbd_req.c       |    3 
- drivers/block/n64cart.c             |   12 +-
- drivers/block/null_blk/main.c       |    3 
- drivers/block/pktcdvd.c             |    7 -
- drivers/block/ps3vram.c             |    6 -
- drivers/block/rsxx/dev.c            |    7 -
- drivers/block/zram/zram_drv.c       |   10 --
- drivers/lightnvm/pblk-init.c        |    6 -
- drivers/md/bcache/request.c         |   13 +-
- drivers/md/bcache/request.h         |    4 
- drivers/md/dm.c                     |   28 ++---
- drivers/md/md.c                     |   10 --
- drivers/nvdimm/blk.c                |    5 -
- drivers/nvdimm/btt.c                |    5 -
- drivers/nvdimm/pmem.c               |    3 
- drivers/nvme/host/core.c            |    4 
- drivers/nvme/host/multipath.c       |   10 +-
- drivers/s390/block/dcssblk.c        |    7 -
- drivers/s390/block/xpram.c          |    5 -
- fs/block_dev.c                      |   54 +++-------
- fs/btrfs/inode.c                    |    8 -
- fs/direct-io.c                      |   14 --
- fs/ext4/file.c                      |    2 
- fs/gfs2/file.c                      |    4 
- fs/io_uring.c                       |   14 +-
- fs/iomap/direct-io.c                |   56 ++++++-----
- fs/xfs/xfs_file.c                   |    2 
- fs/zonefs/super.c                   |    2 
- include/linux/bio.h                 |    4 
- include/linux/blk-mq.h              |   15 ---
- include/linux/blk_types.h           |   34 +-----
- include/linux/blkdev.h              |   13 ++
- include/linux/bvec.h                |    2 
- include/linux/fs.h                  |    8 -
- include/linux/iomap.h               |    3 
- mm/page_io.c                        |   10 --
- 47 files changed, 332 insertions(+), 393 deletions(-)
