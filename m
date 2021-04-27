@@ -2,45 +2,46 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D905C433ED
-	for <linux-block@archiver.kernel.org>; Tue, 27 Apr 2021 15:11:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03D4EC433B4
+	for <linux-block@archiver.kernel.org>; Tue, 27 Apr 2021 15:11:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 67AA9613E5
-	for <linux-block@archiver.kernel.org>; Tue, 27 Apr 2021 15:11:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CA750613C1
+	for <linux-block@archiver.kernel.org>; Tue, 27 Apr 2021 15:11:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236501AbhD0PLr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Apr 2021 11:11:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25393 "EHLO
+        id S235974AbhD0PLy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Apr 2021 11:11:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60789 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235466AbhD0PLp (ORCPT
+        by vger.kernel.org with ESMTP id S235466AbhD0PLx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Apr 2021 11:11:45 -0400
+        Tue, 27 Apr 2021 11:11:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619536261;
+        s=mimecast20190719; t=1619536270;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=h001Afg41x838JMLVP3PGKAhiYpbjWeOdD90pJNr9Sc=;
-        b=i/M5yozoG9G2tMgFqYeGSx+shnvDOBAriULXW2csTfyssbTMRsSaaZp0mboJbNOGoapHjL
-        yWKhh+IhmFsjq/LD6EJWhRJrBtcG1dJKFJPvrDwkQJJ+uN+6r9xz/1RpT9FyQIZyKQpu5x
-        EG7PqzLR5yXEM4FIsP8TEGNQlCzk6vU=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=IUkMNPgSRxsQpQnzl5iNntxxa5OYWKJ2UBgTtKX54ws=;
+        b=isF+7ALsBgbpgVxi06UsjCCjEVG7iHvYmMTLpf6nNKFEqV2otUc/B/nuR/q6GyL3Qf2/ia
+        g0TH4JnN0pFWl73HirDrAVJ+nUWoZPcJihTKfYu8sN198bDryJ+raLXC8EIfhD5gFbG2/W
+        FXABdxicrcGbdYgm3zoeYs9NSCRnBU0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-37-sFAOSSQtMLuvS2iB4uAypg-1; Tue, 27 Apr 2021 11:10:59 -0400
-X-MC-Unique: sFAOSSQtMLuvS2iB4uAypg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-559-CE9xpnzYOPGPVUSHmZCNLA-1; Tue, 27 Apr 2021 11:11:06 -0400
+X-MC-Unique: CE9xpnzYOPGPVUSHmZCNLA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3EEE7107ACCD;
-        Tue, 27 Apr 2021 15:10:58 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C3977107ACC7;
+        Tue, 27 Apr 2021 15:11:04 +0000 (UTC)
 Received: from localhost (ovpn-12-67.pek2.redhat.com [10.72.12.67])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 39CD45D6D5;
-        Tue, 27 Apr 2021 15:10:53 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8ADEB5C260;
+        Tue, 27 Apr 2021 15:11:00 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
@@ -50,59 +51,51 @@ Cc:     linux-block@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
         John Garry <john.garry@huawei.com>,
         David Jeffery <djeffery@redhat.com>,
         Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V3 0/3] blk-mq: fix request UAF related with iterating over tagset requests
-Date:   Tue, 27 Apr 2021 23:10:55 +0800
-Message-Id: <20210427151058.2833168-1-ming.lei@redhat.com>
+Subject: [PATCH V3 1/3] block: avoid double io accounting for flush request
+Date:   Tue, 27 Apr 2021 23:10:56 +0800
+Message-Id: <20210427151058.2833168-2-ming.lei@redhat.com>
+In-Reply-To: <20210427151058.2833168-1-ming.lei@redhat.com>
+References: <20210427151058.2833168-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
+For flush request, rq->end_io() may be called two times, one is from
+timeout handling(blk_mq_check_expired()), another is from normal
+completion(__blk_mq_end_request()).
 
-This patchset fixes the request UAF issue by one simple approach,
-without clearing ->rqs[] in fast path.
+Move blk_account_io_flush() after flush_rq->ref drops to zero, so
+io accounting can be done just once for flush request.
 
-1) grab request's ref before calling ->fn in blk_mq_tagset_busy_iter,
-and release it after calling ->fn, so ->fn won't be called for one
-request if its queue is frozen, done in 2st patch
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-flush.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-2) clearing any stale request referred in ->rqs[] before freeing the
-request pool, one per-tags spinlock is added for protecting
-grabbing request ref vs. clearing ->rqs[tag], so UAF by refcount_inc_not_zero
-in bt_tags_iter() is avoided, done in 3rd patch.
-
-V3:
-	- drop patches for completing requests started in iterator ->fn,
-	  because blk-mq guarantees that valid request is passed to ->fn,
-	  and it is driver's responsibility for avoiding double completion.
-	  And drivers works well for not completing rq twice.
-	- add one patch for avoiding double accounting of flush rq 
-
-V2:
-	- take Bart's suggestion to not add blk-mq helper for completing
-	  requests when it is being iterated
-	- don't grab rq->ref if the iterator is over static rqs because
-	the use case do require to iterate over all requests no matter if
-	the request is initialized or not
-
-
-Ming Lei (3):
-  block: avoid double io accounting for flush request
-  blk-mq: grab rq->refcount before calling ->fn in
-    blk_mq_tagset_busy_iter
-  blk-mq: clear stale request in tags->rq[] before freeing one request
-    pool
-
- block/blk-flush.c  |  3 +--
- block/blk-mq-tag.c | 29 +++++++++++++++++++------
- block/blk-mq-tag.h |  3 +++
- block/blk-mq.c     | 53 +++++++++++++++++++++++++++++++++++++---------
- block/blk-mq.h     |  1 +
- 5 files changed, 71 insertions(+), 18 deletions(-)
-
+diff --git a/block/blk-flush.c b/block/blk-flush.c
+index 7942ca6ed321..1002f6c58181 100644
+--- a/block/blk-flush.c
++++ b/block/blk-flush.c
+@@ -219,8 +219,6 @@ static void flush_end_io(struct request *flush_rq, blk_status_t error)
+ 	unsigned long flags = 0;
+ 	struct blk_flush_queue *fq = blk_get_flush_queue(q, flush_rq->mq_ctx);
+ 
+-	blk_account_io_flush(flush_rq);
+-
+ 	/* release the tag's ownership to the req cloned from */
+ 	spin_lock_irqsave(&fq->mq_flush_lock, flags);
+ 
+@@ -230,6 +228,7 @@ static void flush_end_io(struct request *flush_rq, blk_status_t error)
+ 		return;
+ 	}
+ 
++	blk_account_io_flush(flush_rq);
+ 	/*
+ 	 * Flush request has to be marked as IDLE when it is really ended
+ 	 * because its .end_io() is called from timeout code path too for
 -- 
 2.29.2
 
