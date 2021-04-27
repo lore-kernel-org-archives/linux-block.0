@@ -2,203 +2,507 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-20.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D058C433ED
-	for <linux-block@archiver.kernel.org>; Tue, 27 Apr 2021 15:11:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49522C433B4
+	for <linux-block@archiver.kernel.org>; Tue, 27 Apr 2021 15:13:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 697CC613E5
-	for <linux-block@archiver.kernel.org>; Tue, 27 Apr 2021 15:11:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1837D613DE
+	for <linux-block@archiver.kernel.org>; Tue, 27 Apr 2021 15:13:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236663AbhD0PL7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Apr 2021 11:11:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31642 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235466AbhD0PL7 (ORCPT
+        id S236928AbhD0PO3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Apr 2021 11:14:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36540 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236861AbhD0PO3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Apr 2021 11:11:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619536275;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=QUALiv462pd8bUAZAYwbus+sWH52xa0bCT//lSsqvEw=;
-        b=IPjVs2R92Ui7JFEPOQpnzJG6rOYM3A6iRgccocEzUw6LOIxPVTF1pkRwnCcQqAtas+Xd4c
-        Kha+rT4iK9eyNkMXOWvOYubHAsYTkecC1tuXG9dKm1w7lEp8cGgDe9PDDlxWcHkFvNdpYA
-        iBgeYTpriN4BMWRQKuPpSkiECVOUMj0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-25-hlPi8993Ofi3stbsu8TnWw-1; Tue, 27 Apr 2021 11:11:13 -0400
-X-MC-Unique: hlPi8993Ofi3stbsu8TnWw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 03AF18049CB;
-        Tue, 27 Apr 2021 15:11:11 +0000 (UTC)
-Received: from localhost (ovpn-12-67.pek2.redhat.com [10.72.12.67])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 16DA85C3F8;
-        Tue, 27 Apr 2021 15:11:09 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
-        Khazhy Kumykov <khazhy@google.com>,
-        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        Hannes Reinecke <hare@suse.de>,
-        John Garry <john.garry@huawei.com>,
-        David Jeffery <djeffery@redhat.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V3 3/3] blk-mq: clear stale request in tags->rq[] before freeing one request pool
-Date:   Tue, 27 Apr 2021 23:10:58 +0800
-Message-Id: <20210427151058.2833168-4-ming.lei@redhat.com>
-In-Reply-To: <20210427151058.2833168-1-ming.lei@redhat.com>
-References: <20210427151058.2833168-1-ming.lei@redhat.com>
+        Tue, 27 Apr 2021 11:14:29 -0400
+Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9B31C061574
+        for <linux-block@vger.kernel.org>; Tue, 27 Apr 2021 08:13:45 -0700 (PDT)
+Received: by mail-io1-xd34.google.com with SMTP id k25so16905815iob.6
+        for <linux-block@vger.kernel.org>; Tue, 27 Apr 2021 08:13:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=to:cc:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=noFSycE0Hm2IZbaH5yDmqSb0Cz34KR7M0k42Ey+jGpY=;
+        b=u+7AG/D4VHbJ7PmnkUuFrYEk77LVf53HcPaHMRm5qI8CBPnj7CbJVsLt4go3krJrIz
+         mR2N2Km89Rwf6ivO8JuZKfiehyvtvxrHEm7KIvivflhtpjgcMSQShf+LE//SxNukRLZL
+         l4HAzSyZhNbL46CsMgQFy2zM6t0TfbWaNx+ZW9dNgzUxkKCyM5XWW33uIRmDhEOpLtpY
+         mvt7PothEIh5sR8UgGVwRIz5vpVnYu31GsNv/JUul8XjTU09z3coqyTP60DjoVg15P6a
+         P+tcd7x6HM6gFvwT3zEtqx5A55dBEjhoYP39560Fe6vaqoc6Q5E7bE8T/SNxtO3B8+FF
+         GtGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=noFSycE0Hm2IZbaH5yDmqSb0Cz34KR7M0k42Ey+jGpY=;
+        b=SNd02m/mg5swQhKyLIGmM9PtREXxgNgiU3ConvMordRCsrNWKDYzxluE9hzkLL5MWw
+         WX+SlP/MObRV7D6YhXHIBRdfEHUg5R1WXVD0h6jP7mG7tG/UdWYZ6I30NTRQZjIci2nq
+         NftqLcnuesSuLWAGWBeNp7k9mTJ9UTjZNNfavhWn2mfo+RxzKGdSbZgVV5DDgVg5dGDA
+         f3onhhEWy/tpZVTmsLsRMl5fc7Ps5VC2zbUqYA/7burKU/AxWBqxaI/nRSy9AouXTc4h
+         9vfmv2rt7zACTkA0mmToOnXu+LE69zHChdlw6YALJe/rrBl9VIE9pAS7h0msI6AQzjql
+         2vgg==
+X-Gm-Message-State: AOAM532oBkvFTAKu7XF0GjvXgDja6S4byqn8Aatf3d5Ch7icZwPB1gqe
+        vzmkDLGFaXprR/XcOl4XG7A6hiem0ERasg==
+X-Google-Smtp-Source: ABdhPJxEuO8wcTL+FZ5F4arWEfzDHNG2yvc2/okzg0QlpMUKtpLVAJf1gXxE2RZWGyR+/2+CtpvtaA==
+X-Received: by 2002:a02:c912:: with SMTP id t18mr22059818jao.100.1619536424736;
+        Tue, 27 Apr 2021 08:13:44 -0700 (PDT)
+Received: from [192.168.1.30] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id b79sm75493iof.15.2021.04.27.08.13.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 27 Apr 2021 08:13:44 -0700 (PDT)
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block driver changes for 5.13-rc
+Message-ID: <f332f5e8-8c45-7d20-de68-ea8f706a2350@kernel.dk>
+Date:   Tue, 27 Apr 2021 09:13:43 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-refcount_inc_not_zero() in bt_tags_iter() still may read one freed
-request.
+Hi Linus,
 
-Fix the issue by the following approach:
+Here are the block driver changes queued up for 5.13-rc1:
 
-1) hold a per-tags spinlock when reading ->rqs[tag] and calling
-refcount_inc_not_zero in bt_tags_iter()
+- MD changes via Song:
+	- raid5 POWER fix
+	- raid1 failure fix
+	- UAF fix for md cluster
+	- mddev_find_or_alloc() clean up
+	- Fix NULL pointer deref with external bitmap
+	- Performance improvement for raid10 discard requests
+	- Fix missing information of /proc/mdstat
 
-2) clearing stale request referred via ->rqs[tag] before freeing
-request pool, the per-tags spinlock is held for clearing stale
-->rq[tag]
+- rsxx const qualifier removal (Arnd)
 
-So after we cleared stale requests, bt_tags_iter() won't observe
-freed request any more, also the clearing will wait for pending
-request reference.
+- Expose allocated brd pages (Calvin)
 
-The idea of clearing ->rqs[] is borrowed from John Garry's previous
-patch and one recent David's patch.
+- rnbd via Gioh Kim:
+	- Change maintainer
+	- Change domain address of maintainers' email
+	- Add polling IO mode and document update
+	- Fix memory leak and some bug detected by static code analysis
+	  tools
+	- Code refactoring
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
-Cc: John Garry <john.garry@huawei.com>
-Cc: David Jeffery <djeffery@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq-tag.c |  9 ++++++++-
- block/blk-mq-tag.h |  3 +++
- block/blk-mq.c     | 39 ++++++++++++++++++++++++++++++++++-----
- 3 files changed, 45 insertions(+), 6 deletions(-)
+- Series of floppy cleanups/fixes (Denis)
 
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index 9329b94a9743..a3be267212b9 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -277,9 +277,15 @@ static bool bt_tags_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
- 	if (iter_static_rqs)
- 		rq = tags->static_rqs[bitnr];
- 	else {
-+		unsigned long flags;
-+
-+		spin_lock_irqsave(&tags->lock, flags);
- 		rq = tags->rqs[bitnr];
--		if (!rq || !refcount_inc_not_zero(&rq->ref))
-+		if (!rq || !refcount_inc_not_zero(&rq->ref)) {
-+			spin_unlock_irqrestore(&tags->lock, flags);
- 			return true;
-+		}
-+		spin_unlock_irqrestore(&tags->lock, flags);
- 	}
- 	if ((iter_data->flags & BT_TAG_ITER_STARTED) &&
- 	    !blk_mq_request_started(rq))
-@@ -526,6 +532,7 @@ struct blk_mq_tags *blk_mq_init_tags(unsigned int total_tags,
- 
- 	tags->nr_tags = total_tags;
- 	tags->nr_reserved_tags = reserved_tags;
-+	spin_lock_init(&tags->lock);
- 
- 	if (blk_mq_is_sbitmap_shared(flags))
- 		return tags;
-diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
-index 7d3e6b333a4a..f942a601b5ef 100644
---- a/block/blk-mq-tag.h
-+++ b/block/blk-mq-tag.h
-@@ -20,6 +20,9 @@ struct blk_mq_tags {
- 	struct request **rqs;
- 	struct request **static_rqs;
- 	struct list_head page_list;
-+
-+	/* used to clear rqs[] before one request pool is freed */
-+	spinlock_t lock;
- };
- 
- extern struct blk_mq_tags *blk_mq_init_tags(unsigned int nr_tags,
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 4bd6c11bd8bc..abd0f7a9d052 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2291,6 +2291,38 @@ blk_qc_t blk_mq_submit_bio(struct bio *bio)
- 	return BLK_QC_T_NONE;
- }
- 
-+static size_t order_to_size(unsigned int order)
-+{
-+	return (size_t)PAGE_SIZE << order;
-+}
-+
-+/* called before freeing request pool in @tags */
-+static void blk_mq_clear_rq_mapping(struct blk_mq_tag_set *set,
-+		struct blk_mq_tags *tags, unsigned int hctx_idx)
-+{
-+	struct blk_mq_tags *drv_tags = set->tags[hctx_idx];
-+	struct page *page;
-+	unsigned long flags;
-+
-+	spin_lock_irqsave(&drv_tags->lock, flags);
-+	list_for_each_entry(page, &tags->page_list, lru) {
-+		unsigned long start = (unsigned long)page_address(page);
-+		unsigned long end = start + order_to_size(page->private);
-+		int i;
-+
-+		for (i = 0; i < set->queue_depth; i++) {
-+			struct request *rq = drv_tags->rqs[i];
-+			unsigned long rq_addr = (unsigned long)rq;
-+
-+			if (rq_addr >= start && rq_addr < end) {
-+				WARN_ON_ONCE(refcount_read(&rq->ref) != 0);
-+				cmpxchg(&drv_tags->rqs[i], rq, NULL);
-+			}
-+		}
-+	}
-+	spin_unlock_irqrestore(&drv_tags->lock, flags);
-+}
-+
- void blk_mq_free_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
- 		     unsigned int hctx_idx)
- {
-@@ -2309,6 +2341,8 @@ void blk_mq_free_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
- 		}
- 	}
- 
-+	blk_mq_clear_rq_mapping(set, tags, hctx_idx);
-+
- 	while (!list_empty(&tags->page_list)) {
- 		page = list_first_entry(&tags->page_list, struct page, lru);
- 		list_del_init(&page->lru);
-@@ -2368,11 +2402,6 @@ struct blk_mq_tags *blk_mq_alloc_rq_map(struct blk_mq_tag_set *set,
- 	return tags;
- }
- 
--static size_t order_to_size(unsigned int order)
--{
--	return (size_t)PAGE_SIZE << order;
--}
--
- static int blk_mq_init_request(struct blk_mq_tag_set *set, struct request *rq,
- 			       unsigned int hctx_idx, int node)
- {
+- s390 dasd fixes (Julian)
+
+- kerneldoc fixes (Lee)
+
+- null_blk double free (Lv)
+
+- null_blk virtual boundary addition (Max)
+
+- Remove xsysace driver (Michal)
+
+- umem driver removal (Davidlohr)
+
+- ataflop fixes (Dan)
+
+- Revalidate disk removal (Christoph)
+
+- Bounce buffer cleanups (Christoph)
+
+- Mark lightnvm as deprecated (Christoph)
+
+- mtip32xx init cleanups (Shixin)
+
+- Various fixes (Tian, Gustavo, Coly, Yang, Zhang, Zhiqiang)
+
+You'll get a trivial merge conflict in drivers/nvme/host/core.c, and the
+resolution is to use the write zeroes part from my tree (eg killing
+nvme_config_write_zeroes() and ensuring the other hunk uses
+blk_queue_max_write_zeroes_sectors().
+
+Please pull!
+
+
+The following changes since commit 1e28eed17697bcf343c6743f0028cc3b5dd88bf0:
+
+  Linux 5.12-rc3 (2021-03-14 14:41:02 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux-block.git tags/for-5.13/drivers-2021-04-27
+
+for you to fetch changes up to 8324fbae75ce65fc2eb960a8434799dca48248ac:
+
+  Merge branch 'md-next' of https://git.kernel.org/pub/scm/linux/kernel/git/song/md into for-5.13/drivers (2021-04-26 11:20:54 -0600)
+
+----------------------------------------------------------------
+for-5.13/drivers-2021-04-27
+
+----------------------------------------------------------------
+Amit Engel (1):
+      nvmet-fc: simplify nvmet_fc_alloc_hostport
+
+Arnd Bergmann (2):
+      rsxx: remove extraneous 'const' qualifier
+      md: bcache: avoid -Wempty-body warnings
+
+Bart Van Assche (1):
+      nvme: fix handling of large MDTS values
+
+Bhaskar Chowdhury (1):
+      md: bcache: Trivial typo fixes in the file journal.c
+
+Calvin Owens (1):
+      brd: expose number of allocated pages in debugfs
+
+Chaitanya Kulkarni (16):
+      nvme-pci: remove the barriers in nvme_irq()
+      nvme-pci: cleanup nvme_irq()
+      nvmet: remove a duplicate status assignment in nvmet_alloc_ctrl
+      nvmet: update error log page in nvmet_alloc_ctrl()
+      nvmet: remove an unnecessary function parameter to nvmet_check_ctrl_status
+      nvmet: replace white spaces with tabs
+      nvme: rename nvme_init_identify()
+      nvme: split init identify into helper
+      nvme: mark nvme_setup_passsthru() inline
+      nvme: don't check nvme_req flags for new req
+      nvme: add new line after variable declatation
+      nvme-fc: fix the function documentation comment
+      nvmet-fc: update function documentation
+      nvmet: remove unnecessary ctrl parameter
+      gdrom: fix compilation error
+      lightnvm: use kobj_to_dev()
+
+Christoph Hellwig (27):
+      paride/pd: remove ->revalidate_disk
+      block: remove the revalidate_disk method
+      gdrom: support highmem
+      swim: don't call blk_queue_bounce_limit
+      floppy: always use the track buffer
+      swim3: support highmem
+      md: factor out a mddev_find_locked helper from mddev_find
+      md: split mddev_find
+      bcache: remove PTR_CACHE
+      block: remove the -ERESTARTSYS handling in blkdev_get_by_dev
+      lightnvm: deprecated OCSSD support and schedule it for removal in Linux 5.15
+      nvme: cleanup setting the disk name
+      nvme: pass a user pointer to nvme_nvm_ioctl
+      nvme: factor out a nvme_ns_ioctl helper
+      nvme: simplify the compat ioctl handling
+      nvme: simplify block device ioctl handling for the !multipath case
+      nvme: don't bother to look up a namespace for controller ioctls
+      nvme: move the ioctl code to a separate file
+      nvme: factor out a nvme_tryget_ns_head helper
+      nvme: move nvme_ns_head_ops to multipath.c
+      nvme: factor out nvme_ns_open and nvme_ns_release helpers
+      nvme: let namespace probing continue for unsupported features
+      md: factor out a mddev_alloc_unit helper from mddev_find
+      md: refactor mddev_find_or_alloc
+      md: do not return existing mddevs from mddev_find_or_alloc
+      nvme: do not try to reconfigure APST when the controller is not live
+      nvme: cleanup nvme_configure_apst
+
+Colin Ian King (2):
+      nvmet: fix a spelling mistake "nubmer" -> "number"
+      floppy: remove redundant assignment to variable st
+
+Coly Li (1):
+      bcache: fix a regression of code compiling failure in debug.c
+
+Dan Carpenter (2):
+      ataflop: potential out of bounds in do_format()
+      ataflop: fix off by one in ataflop_probe()
+
+Daniel Wagner (3):
+      nvme: use sysfs_emit instead of sprintf
+      nvme: remove superfluous else in nvme_ctrl_loss_tmo_store
+      nvme: export fast_io_fail_tmo to sysfs
+
+Danil Kipnis (1):
+      MAINTAINERS: Change maintainer for rnbd module
+
+Davidlohr Bueso (1):
+      drivers/block: remove the umem driver
+
+Denis Efremov (5):
+      floppy: cleanups: remove trailing whitespaces
+      floppy: cleanups: use ST0 as reply_buffer index 0
+      floppy: cleanups: use memset() to zero reply_buffer
+      floppy: cleanups: use memcpy() to copy reply_buffer
+      floppy: cleanups: remove FLOPPY_SILENT_DCL_CLEAR undef
+
+Dima Stepanov (2):
+      block/rnbd-clt-sysfs: Remove copy buffer overlap in rnbd_clt_get_path_name
+      block/rnbd: Use strscpy instead of strlcpy
+
+Elad Grupi (1):
+      nvmet-tcp: fix a segmentation fault during io parsing error
+
+Gioh Kim (8):
+      Documentation/sysfs-block-rnbd: Add descriptions for remap_device and resize
+      block/rnbd-clt: Replace {NO_WAIT,WAIT} with RTRS_PERMIT_{WAIT,NOWAIT}
+      block/rnbd-srv: Prevent a deadlock generated by accessing sysfs in parallel
+      block/rnbd-srv: Remove force_close file after holding a lock
+      block/rnbd-clt: Fix missing a memory free when unloading the module
+      block/rnbd-clt: Support polling mode for IO latency optimization
+      Documentation/ABI/rnbd-clt: Add description for nr_poll_queues
+      block/rnbd-srv: Remove unused arguments of rnbd_srv_rdma_ev
+
+Gopal Tiwari (1):
+      nvme: fix NULL derefence in nvme_ctrl_fast_io_fail_tmo_show/store
+
+Guobin Huang (1):
+      drbd: use DEFINE_SPINLOCK() for spinlock
+
+Guoqing Jiang (5):
+      block/rnbd-clt: Remove some arguments from insert_dev_if_not_exists_devpath
+      block/rnbd-clt: Remove some arguments from rnbd_client_setup_device
+      block/rnbd-clt: Move add_disk(dev->gd) to rnbd_clt_setup_gen_disk
+      block/rnbd: Kill rnbd_clt_destroy_default_group
+      block/rnbd: Kill destroy_device_cb
+
+Gustavo A. R. Silva (2):
+      bcache: Use 64-bit arithmetic instead of 32-bit
+      drbd: Fix fall-through warnings for Clang
+
+Hannes Reinecke (3):
+      nvme: retrigger ANA log update if group descriptor isn't found
+      nvme: sanitize KATO setting
+      nvme: add 'kato' sysfs attribute
+
+Heming Zhao (1):
+      md-cluster: fix use-after-free issue when removing rdev
+
+Hou Pu (2):
+      nvmet: return proper error code from discovery ctrl
+      nvmet: avoid queuing keep-alive timer if it is disabled
+
+Jack Wang (1):
+      block/rnbd-clt: Remove max_segment_size
+
+Jan Glauber (1):
+      md: Fix missing unused status line of /proc/mdstat
+
+Jens Axboe (8):
+      Merge branch 'md-next' of https://git.kernel.org/pub/scm/linux/kernel/git/song/md into for-5.13/drivers
+      Merge tag 'nvme-5.13-2021-04-06' of git://git.infradead.org/nvme into for-5.13/drivers
+      Merge branch 'md-next' of https://git.kernel.org/pub/scm/linux/kernel/git/song/md into for-5.13/drivers
+      Merge tag 'nvme-5.13-2021-04-15' of git://git.infradead.org/nvme into for-5.13/drivers
+      Merge branch 'md-next' of https://git.kernel.org/pub/scm/linux/kernel/git/song/md into for-5.13/drivers
+      Merge tag 'nvme-5.13-2021-04-22' of git://git.infradead.org/nvme into for-5.13/drivers
+      Merge branch 'md-next' of https://git.kernel.org/pub/scm/linux/kernel/git/song/md into for-5.13/drivers
+      Merge branch 'md-next' of https://git.kernel.org/pub/scm/linux/kernel/git/song/md into for-5.13/drivers
+
+Julian Wiedmann (2):
+      s390/dasd: remove dasd_fba_probe() wrapper
+      s390/dasd: let driver core manage the sysfs attributes
+
+Kanchan Joshi (2):
+      nvme: use NVME_CTRL_CMIC_ANA macro
+      nvme: reduce checks for zero command effects
+
+Keith Busch (4):
+      nvme-pci: allocate nvme_command within driver pdu
+      nvme: use driver pdu command for passthrough
+      nvme: warn of unhandled effects only once
+      nvme: implement non-mdts command limits
+
+Lee Jones (10):
+      block: drbd: drbd_interval: Demote some kernel-doc abuses and fix another header
+      block: mtip32xx: mtip32xx: Mark debugging variable 'start' as __maybe_unused
+      block: drbd: drbd_state: Fix some function documentation issues
+      block: drbd: drbd_receiver: Demote non-conformant kernel-doc headers
+      block: drbd: drbd_main: Remove duplicate field initialisation
+      block: drbd: drbd_nl: Make conversion to 'enum drbd_ret_code' explicit
+      block: drbd: drbd_main: Fix a bunch of function documentation discrepancies
+      block: drbd: drbd_receiver: Demote less than half complete kernel-doc header
+      block: xen-blkfront: Demote kernel-doc abuses
+      block: drbd: drbd_nl: Demote half-complete kernel-doc headers
+
+Lv Yunlong (1):
+      drivers/block/null_blk/main: Fix a double free in null_init.
+
+Max Gurtovoy (3):
+      nvme-tcp: check sgl supported by target
+      nvme-fc: check sgl supported by target
+      null_blk: add option for managing virtual boundary
+
+Md Haris Iqbal (1):
+      block/rnbd-clt: Generate kobject_uevent when the rnbd device state changes
+
+Michal Simek (1):
+      xsysace: Remove SYSACE driver
+
+Minwoo Im (2):
+      nvme: add a nvme_ns_head_multipath helper
+      nvme: introduce generic per-namespace chardev
+
+Niklas Cassel (5):
+      nvme: disallow passthru cmd from targeting a nsid != nsid of the block dev
+      nvme-pci: don't simple map sgl when sgls are disabled
+      nvme-pci: remove single trailing whitespace
+      nvme-multipath: remove single trailing whitespace
+      nvme: remove single trailing whitespace
+
+Noam Gottlieb (1):
+      nvmet: do not allow model_number exceed 40 bytes
+
+Paul Clements (1):
+      md/raid1: properly indicate failure when ending a failed write request
+
+Sagi Grimberg (2):
+      nvme-tcp: block BH in sk state_change sk callback
+      nvmet-tcp: fix incorrect locking in state_change sk callback
+
+Shixin Liu (2):
+      mtip32xx: use DEFINE_SPINLOCK() for spinlock
+      mtip32xx: use LIST_HEAD() for list_head
+
+Sudhakar Panneerselvam (1):
+      md/bitmap: wait for external bitmap writes to complete during tear down
+
+Tian Tao (1):
+      lightnvm: return the correct return value
+
+Tom Rix (1):
+      block/rnbd-clt: Improve find_or_create_sess() return check
+
+Wunderlich, Mark (1):
+      nvmet-tcp: enable optional queue idle period tracking
+
+Xiao Ni (6):
+      md: add md_submit_discard_bio() for submitting discard bio
+      md/raid10: extend r10bio devs to raid disks
+      md/raid10: pull the code that wait for blocked dev into one function
+      md/raid10: improve raid10 discard request
+      md/raid10: improve discard request for far layout
+      async_xor: increase src_offs when dropping destination page
+
+Yang Li (1):
+      bcache: use NULL instead of using plain integer as pointer
+
+Zhang Yunkai (1):
+      lightnvm: remove duplicate include in lightnvm.h
+
+Zhao Heming (1):
+      md: md_open returns -EBUSY when entering racing area
+
+Zhiqiang Liu (1):
+      bcache: reduce redundant code in bch_cached_dev_run()
+
+ Documentation/ABI/testing/sysfs-block-rnbd        |   18 +
+ Documentation/ABI/testing/sysfs-class-rnbd-client |   13 +
+ Documentation/filesystems/locking.rst             |    2 -
+ MAINTAINERS                                       |    5 +-
+ arch/microblaze/boot/dts/system.dts               |    8 -
+ arch/mips/configs/malta_defconfig                 |    1 -
+ arch/mips/configs/malta_kvm_defconfig             |    1 -
+ arch/mips/configs/maltaup_xpa_defconfig           |    1 -
+ arch/powerpc/boot/dts/icon.dts                    |    7 -
+ arch/powerpc/configs/44x/icon_defconfig           |    1 -
+ arch/x86/include/asm/floppy.h                     |    1 -
+ crypto/async_tx/async_xor.c                       |    1 +
+ drivers/block/Kconfig                             |   25 +-
+ drivers/block/Makefile                            |    2 -
+ drivers/block/ataflop.c                           |   16 +-
+ drivers/block/brd.c                               |   19 +-
+ drivers/block/drbd/drbd_interval.c                |    8 +-
+ drivers/block/drbd/drbd_main.c                    |   35 +-
+ drivers/block/drbd/drbd_nl.c                      |   17 +-
+ drivers/block/drbd/drbd_receiver.c                |   27 +-
+ drivers/block/drbd/drbd_req.c                     |    1 +
+ drivers/block/drbd/drbd_state.c                   |    7 +-
+ drivers/block/floppy.c                            |  159 +--
+ drivers/block/mtip32xx/mtip32xx.c                 |   13 +-
+ drivers/block/null_blk/main.c                     |   12 +-
+ drivers/block/null_blk/null_blk.h                 |    1 +
+ drivers/block/null_blk/zoned.c                    |    1 +
+ drivers/block/paride/pd.c                         |   11 -
+ drivers/block/rnbd/rnbd-clt-sysfs.c               |   84 +-
+ drivers/block/rnbd/rnbd-clt.c                     |  171 ++-
+ drivers/block/rnbd/rnbd-clt.h                     |    6 +-
+ drivers/block/rnbd/rnbd-srv-sysfs.c               |    5 +-
+ drivers/block/rnbd/rnbd-srv.c                     |   69 +-
+ drivers/block/rnbd/rnbd-srv.h                     |    3 +-
+ drivers/block/rsxx/core.c                         |    2 +-
+ drivers/block/swim.c                              |    2 -
+ drivers/block/swim3.c                             |   34 +-
+ drivers/block/umem.c                              | 1130 ------------------
+ drivers/block/umem.h                              |  132 ---
+ drivers/block/xen-blkfront.c                      |    6 +-
+ drivers/block/xsysace.c                           | 1273 ---------------------
+ drivers/cdrom/gdrom.c                             |    5 +-
+ drivers/infiniband/ulp/rtrs/rtrs-clt.c            |   75 +-
+ drivers/infiniband/ulp/rtrs/rtrs-clt.h            |    1 -
+ drivers/infiniband/ulp/rtrs/rtrs-pri.h            |    1 +
+ drivers/infiniband/ulp/rtrs/rtrs-srv.c            |    4 +-
+ drivers/infiniband/ulp/rtrs/rtrs.h                |   13 +-
+ drivers/lightnvm/Kconfig                          |    4 +-
+ drivers/lightnvm/core.c                           |    4 +-
+ drivers/md/bcache/alloc.c                         |    5 +-
+ drivers/md/bcache/bcache.h                        |   11 +-
+ drivers/md/bcache/btree.c                         |    4 +-
+ drivers/md/bcache/debug.c                         |    2 +-
+ drivers/md/bcache/extents.c                       |    4 +-
+ drivers/md/bcache/features.c                      |    2 +-
+ drivers/md/bcache/io.c                            |    4 +-
+ drivers/md/bcache/journal.c                       |    6 +-
+ drivers/md/bcache/super.c                         |   25 +-
+ drivers/md/bcache/util.h                          |    2 +-
+ drivers/md/bcache/writeback.c                     |   11 +-
+ drivers/md/md-bitmap.c                            |    2 +
+ drivers/md/md.c                                   |  206 ++--
+ drivers/md/md.h                                   |    2 +
+ drivers/md/raid0.c                                |   14 +-
+ drivers/md/raid1.c                                |    2 +
+ drivers/md/raid10.c                               |  434 ++++++-
+ drivers/md/raid10.h                               |    1 +
+ drivers/nvme/host/Makefile                        |    2 +-
+ drivers/nvme/host/core.c                          | 1088 +++++++-----------
+ drivers/nvme/host/fabrics.c                       |    4 +-
+ drivers/nvme/host/fc.c                            |   14 +-
+ drivers/nvme/host/ioctl.c                         |  481 ++++++++
+ drivers/nvme/host/lightnvm.c                      |   10 +-
+ drivers/nvme/host/multipath.c                     |  114 +-
+ drivers/nvme/host/nvme.h                          |   64 +-
+ drivers/nvme/host/pci.c                           |   30 +-
+ drivers/nvme/host/rdma.c                          |    7 +-
+ drivers/nvme/host/tcp.c                           |   16 +-
+ drivers/nvme/host/zns.c                           |    4 +-
+ drivers/nvme/target/admin-cmd.c                   |   14 +-
+ drivers/nvme/target/configfs.c                    |    6 +
+ drivers/nvme/target/core.c                        |   33 +-
+ drivers/nvme/target/discovery.c                   |    6 +-
+ drivers/nvme/target/fabrics-cmd.c                 |   17 +-
+ drivers/nvme/target/fc.c                          |   78 +-
+ drivers/nvme/target/loop.c                        |    6 +-
+ drivers/nvme/target/nvmet.h                       |    8 +-
+ drivers/nvme/target/tcp.c                         |   79 +-
+ drivers/s390/block/dasd.c                         |   17 +-
+ drivers/s390/block/dasd_devmap.c                  |   15 +-
+ drivers/s390/block/dasd_eckd.c                    |    1 +
+ drivers/s390/block/dasd_fba.c                     |   10 +-
+ drivers/s390/block/dasd_int.h                     |    3 +-
+ fs/block_dev.c                                    |    9 -
+ include/linux/blkdev.h                            |    1 -
+ include/linux/lightnvm.h                          |    2 -
+ include/linux/nvme.h                              |   10 +
+ include/uapi/linux/fd.h                           |   46 +-
+ include/uapi/linux/lightnvm.h                     |    1 -
+ 99 files changed, 2303 insertions(+), 4067 deletions(-)
+ delete mode 100644 drivers/block/umem.c
+ delete mode 100644 drivers/block/umem.h
+ delete mode 100644 drivers/block/xsysace.c
+ create mode 100644 drivers/nvme/host/ioctl.c
+
 -- 
-2.29.2
+Jens Axboe
 
