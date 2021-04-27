@@ -2,111 +2,94 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A9E2C433B4
-	for <linux-block@archiver.kernel.org>; Tue, 27 Apr 2021 09:00:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E3C9C433B4
+	for <linux-block@archiver.kernel.org>; Tue, 27 Apr 2021 09:12:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3E58161107
-	for <linux-block@archiver.kernel.org>; Tue, 27 Apr 2021 09:00:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 08C46613B1
+	for <linux-block@archiver.kernel.org>; Tue, 27 Apr 2021 09:12:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230354AbhD0JBk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Apr 2021 05:01:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:36658 "EHLO
+        id S230354AbhD0JNW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Apr 2021 05:13:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:48585 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229629AbhD0JBj (ORCPT
+        by vger.kernel.org with ESMTP id S235088AbhD0JNS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Apr 2021 05:01:39 -0400
+        Tue, 27 Apr 2021 05:13:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619514056;
+        s=mimecast20190719; t=1619514718;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=KIIzjeOHjKtTFTVlb9QQyiLqMYT4ZC1THS8Jrsfrv8s=;
-        b=Sgry8d+1Y+KCpKzm76fLJSFqnu2hklAsEcrumyGFIIA5l5GCgpK2No9WKmbbSkyzQW49Oz
-        NDlPsZuuFpu809NtYB+BuuCHnqpMv7jlJo6tec7r6uIbzxtRVBgaln+OVFgVxHJuk9stmP
-        0boKTBhn2kHUAqDtjqbsqLWPFz4MoWg=
+        bh=NnYQaX86Fcj9dAhMK+QIJGBc66dkfVgpeHVX/OOPAyQ=;
+        b=g9NrL/iHydOugIglKFxSzA484US+Ni5z3LyYToiHpr3PtFh8Wf+WgAcyO/7yZA7wki/flf
+        51toa+K3A4mNXobHJHm9LNlIzmK+pBCqz3LYRPXMsId5jqklbVQy0pOLII9VvWeN4hZZHP
+        3Y0+693W8vVFr/AMMVUl+uMtuXV86w8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-24-ytNDgpjFOVKbCYso-3EpTg-1; Tue, 27 Apr 2021 05:00:53 -0400
-X-MC-Unique: ytNDgpjFOVKbCYso-3EpTg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+ us-mta-334-IUbn19S9MYCpzssk2HszLw-1; Tue, 27 Apr 2021 05:11:54 -0400
+X-MC-Unique: IUbn19S9MYCpzssk2HszLw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6F516100AA2E;
-        Tue, 27 Apr 2021 09:00:28 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A81D6106BAE8;
+        Tue, 27 Apr 2021 09:11:52 +0000 (UTC)
 Received: from T590 (ovpn-13-248.pek2.redhat.com [10.72.13.248])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5426019801;
-        Tue, 27 Apr 2021 09:00:24 +0000 (UTC)
-Date:   Tue, 27 Apr 2021 17:00:31 +0800
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 722C06E50A;
+        Tue, 27 Apr 2021 09:11:41 +0000 (UTC)
+Date:   Tue, 27 Apr 2021 17:11:49 +0800
 From:   Ming Lei <ming.lei@redhat.com>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Khazhy Kumykov <khazhy@google.com>,
-        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        Hannes Reinecke <hare@suse.de>,
-        John Garry <john.garry@huawei.com>,
-        David Jeffery <djeffery@redhat.com>
-Subject: Re: [PATCH V2 2/3] blk-mq: complete request locally if the
- completion is from tagset iterator
-Message-ID: <YIfSr5JTMexUSGL6@T590>
-References: <20210427014540.2747282-1-ming.lei@redhat.com>
- <20210427014540.2747282-3-ming.lei@redhat.com>
- <c122e2bc-2e03-3890-bc7a-be1470bee1d5@acm.org>
- <YIe4CzfUDX4yCCNO@T590>
+To:     John Garry <john.garry@huawei.com>
+Cc:     Kashyap Desai <kashyap.desai@broadcom.com>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Douglas Gilbert <dgilbert@interlog.com>,
+        Hannes Reinecke <hare@suse.com>
+Subject: Re: [bug report] shared tags causes IO hang and performance drop
+Message-ID: <YIfVVRheF9ZWjzbh@T590>
+References: <87ceccf2-287b-9bd1-899a-f15026c9e65b@huawei.com>
+ <YHe3M62agQET6o6O@T590>
+ <0c85fe52-ebc7-68b3-2dbe-dfad5d604346@huawei.com>
+ <c1d5abaa-c460-55f8-5351-16f09d6aa81f@huawei.com>
+ <YIbS1dgSYrsAeGvZ@T590>
+ <55743a51-4d6f-f481-cebf-e2af9c657911@huawei.com>
+ <YIbkX2G0+dp3PV+u@T590>
+ <9ad15067-ba7b-a335-ae71-8c4328856b91@huawei.com>
+ <YIdTyyVE5azlYwtO@T590>
+ <ab83eec4-20f1-ad74-7f43-52a4a87a8aa9@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YIe4CzfUDX4yCCNO@T590>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <ab83eec4-20f1-ad74-7f43-52a4a87a8aa9@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Apr 27, 2021 at 03:06:51PM +0800, Ming Lei wrote:
-> On Mon, Apr 26, 2021 at 07:30:51PM -0700, Bart Van Assche wrote:
-> > On 4/26/21 6:45 PM, Ming Lei wrote:
-> > > diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-> > > index 100fa44d52a6..773aea4db90c 100644
-> > > --- a/block/blk-mq-tag.c
-> > > +++ b/block/blk-mq-tag.c
-> > > @@ -284,8 +284,11 @@ static bool bt_tags_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
-> > >  	if ((iter_data->flags & BT_TAG_ITER_STARTED) &&
-> > >  	    !blk_mq_request_started(rq))
-> > >  		ret = true;
-> > > -	else
-> > > +	else {
-> > > +		rq->rq_flags |= RQF_ITERATING;
-> > >  		ret = iter_data->fn(rq, iter_data->data, reserved);
-> > > +		rq->rq_flags &= ~RQF_ITERATING;
-> > > +	}
-> > >  	if (!iter_static_rqs)
-> > >  		blk_mq_put_rq_ref(rq);
-> > >  	return ret;
-> > 
-> > All existing rq->rq_flags modifications are serialized. The above change
-> > adds code that may change rq_flags concurrently with regular request
-> > processing. I think that counts as a race condition.
+On Tue, Apr 27, 2021 at 08:52:53AM +0100, John Garry wrote:
+> On 27/04/2021 00:59, Ming Lei wrote:
+> > > Anyway, I'll look at adding code for a per-request queue sched tags to see
+> > > if it helps. But I would plan to continue to use a per hctx sched request
+> > > pool.
+> > Why not switch to per hctx sched request pool?
 > 
-> Good catch, but we still can change .rq_flags via atomic op, such as:
-> 
-> 	do {
-> 		old = rq->rq_flags;
-> 		new = old | RQF_ITERATING;
-> 	} while (cmpxchg(&rq->rq_flags, old, new) != old);
+> I don't understand. The current code uses a per-hctx sched request pool, and
+> I said that I don't plan to change that.
 
-oops, this way can't work because other .rq_flags modification still may
-clear RQF_ITERATING.
+I forget why you didn't do that, because for hostwide tags, request
+is always 1:1 for either sched tags(real io sched) or driver tags(none).
 
-As I mentioned in another thread, blk-mq needn't to consider the double
-completion[1] any more, which is covered by driver. blk-mq just needs to
-make sure that valid request is passed to ->fn(), and it is driver's
-responsibility to avoid double completion.
+Maybe you want to keep request local to hctx, but never see related
+performance data for supporting the point, sbitmap queue allocator has
+been intelligent enough to allocate tag freed from native cpu.
 
-[1] https://lore.kernel.org/linux-block/YIdWz8C5eklPvEiV@T590/T/#u
+Then you just waste lots of memory, I remember that scsi request payload
+is a bit big.
 
 
 Thanks,
