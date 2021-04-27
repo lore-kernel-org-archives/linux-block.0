@@ -5,37 +5,37 @@ X-Spam-Level:
 X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B160FC43461
-	for <linux-block@archiver.kernel.org>; Tue, 27 Apr 2021 16:19:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73067C433B4
+	for <linux-block@archiver.kernel.org>; Tue, 27 Apr 2021 16:20:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 71EE961158
-	for <linux-block@archiver.kernel.org>; Tue, 27 Apr 2021 16:19:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 45A39613C2
+	for <linux-block@archiver.kernel.org>; Tue, 27 Apr 2021 16:20:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236449AbhD0QTz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Apr 2021 12:19:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50970 "EHLO
+        id S237516AbhD0QT5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Apr 2021 12:19:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50936 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234809AbhD0QTw (ORCPT
+        with ESMTP id S233501AbhD0QTp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Apr 2021 12:19:52 -0400
+        Tue, 27 Apr 2021 12:19:45 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 209DCC06138F;
-        Tue, 27 Apr 2021 09:19:08 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E26C0C06138B;
+        Tue, 27 Apr 2021 09:19:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        Content-Type:MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:
-        To:From:Sender:Reply-To:Content-ID:Content-Description;
-        bh=lVkqHvIReOfSGmbD3L2sxnze/zU0iVpfY87YMi4utY8=; b=4En+QniWZdNJCjj+qgXh64u4n8
-        L0jitySbi7DUWePMBcBBQFnkczNeK5IqT/6Dp1XtB8xp5AL3Fm9hAz3FIOeIbhkbe1OqehuYCVwIn
-        ZYTvxmWmmEmahxDMXHvWLCviqXNMcappo50uNu9hUpz2AKpsWixxvJ0cMZhXkN20cavmIw0wQbtvz
-        IhVoMbo5Ymnxmmo9cns9Mx0tBkANGGs3FDvuXoNJttQqpzrMUml1B7FPtYn4MfaXlZwfL/io8kI9G
-        Qcsq8i/H95eLTFzfvjcA3aA98fslapl4d7WiIHpKV7NkJyUb8+dygbsCJpWLyoiYZVekYx3naMfDI
-        xq3pk5gw==;
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
+        :Reply-To:Content-Type:Content-ID:Content-Description;
+        bh=zIhmXZ/vFd6CtYYyxjA6xYDFiwZe/UbTM7HWeEPtD6I=; b=Tfu5eVCvVCyocsZbSdcDz902W5
+        BZqGOsNe1SOZEk3EVNVkbDY15GIoIziFtZai5U7XOxSswsfpE/0wIbooPtuQXAqINg/O+fSuQ8klz
+        AIGJzwZiqe1Gvy1u+d03ZeDdjdv9fsV6HzZ2MNKryYatW1iAuKrFedJm4Aa2GiTiZyC1t45Yh8F7Z
+        50L0taUC/5n3o/gkuu7WYqwoPYvts4hFQDA2JEovzQfzUFlcY+DbRyij81wf3lBttsPzHgkKSPot2
+        uuFBwnthCa0m2LdLckTNLMr8LRBQ66RoGJZ8oqgY2L+0B2U6OxB6LLYUMiWPMcOfFFqP4vEBWJ7yF
+        qYkHpcaQ==;
 Received: from [2001:4bb8:18c:28b2:c772:7205:2aa4:840d] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
-        id 1lbQQO-00Gr5I-Of; Tue, 27 Apr 2021 16:19:01 +0000
+        id 1lbQQF-00Gr4p-VD; Tue, 27 Apr 2021 16:18:52 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Jeffle Xu <jefflexu@linux.alibaba.com>,
@@ -46,175 +46,68 @@ Cc:     Jeffle Xu <jefflexu@linux.alibaba.com>,
         "Wunderlich, Mark" <mark.wunderlich@intel.com>,
         "Vasudevan, Anil" <anil.vasudevan@intel.com>,
         linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: [PATCH 09/15] block: rename REQ_HIPRI to REQ_POLLED
-Date:   Tue, 27 Apr 2021 18:16:13 +0200
-Message-Id: <20210427161619.1294399-10-hch@lst.de>
+Subject: [PATCH 06/15] blk-mq: remove blk_qc_t_to_tag and blk_qc_t_is_internal
+Date:   Tue, 27 Apr 2021 18:16:10 +0200
+Message-Id: <20210427161619.1294399-7-hch@lst.de>
 X-Mailer: git-send-email 2.30.1
 In-Reply-To: <20210427161619.1294399-1-hch@lst.de>
 References: <20210427161619.1294399-1-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Unlike the RWF_HIPRI userspace ABI which is intentionally kept vague,
-the bio flag is specіfic to the polling implementation, so rename and
-document it properly.
+Merge both functions into their only caller to keep the blk-mq tag to
+blk_qc_t mapping as private as possible in blk-mq.c.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-core.c          | 2 +-
- block/blk-merge.c         | 2 +-
- block/blk-mq-debugfs.c    | 2 +-
- block/blk-mq.c            | 4 ++--
- block/blk-mq.h            | 4 ++--
- drivers/nvme/host/core.c  | 2 +-
- include/linux/bio.h       | 2 +-
- include/linux/blk_types.h | 4 ++--
- mm/page_io.c              | 2 +-
- 9 files changed, 12 insertions(+), 12 deletions(-)
+ block/blk-mq.c            |  8 +++++---
+ include/linux/blk_types.h | 10 ----------
+ 2 files changed, 5 insertions(+), 13 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 9bcdae93f6d4..adfab5976be0 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -837,7 +837,7 @@ static noinline_for_stack bool submit_bio_checks(struct bio *bio)
- 	}
- 
- 	if (!test_bit(QUEUE_FLAG_POLL, &q->queue_flags))
--		bio->bi_opf &= ~REQ_HIPRI;
-+		bio->bi_opf &= ~REQ_POLLED;
- 
- 	switch (bio_op(bio)) {
- 	case REQ_OP_DISCARD:
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 4d97fb6dd226..5c9d2a4ece86 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -285,7 +285,7 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 	 * iopoll in direct IO routine. Given performance gain of iopoll for
- 	 * big IO can be trival, disable iopoll when split needed.
- 	 */
--	bio->bi_opf &= ~REQ_HIPRI;
-+	bio->bi_opf &= ~REQ_POLLED;
- 
- 	return bio_split(bio, sectors, GFP_NOIO, bs);
- }
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 2a75bc7401df..0b821b369ffd 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -286,7 +286,7 @@ static const char *const cmd_flag_name[] = {
- 	CMD_FLAG_NAME(BACKGROUND),
- 	CMD_FLAG_NAME(NOWAIT),
- 	CMD_FLAG_NAME(NOUNMAP),
--	CMD_FLAG_NAME(HIPRI),
-+	CMD_FLAG_NAME(POLLED),
- };
- #undef CMD_FLAG_NAME
- 
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 2e8a38618ebb..b35700710ef9 100644
+index ba563ca57bd9..726f9dae5b54 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -667,7 +667,7 @@ bool blk_mq_complete_request_remote(struct request *rq)
- 	 * For a polled request, always complete locallly, it's pointless
- 	 * to redirect the completion.
- 	 */
--	if (rq->cmd_flags & REQ_HIPRI)
-+	if (rq->cmd_flags & REQ_POLLED)
- 		return false;
- 
- 	if (blk_mq_complete_need_ipi(rq)) {
-@@ -2201,7 +2201,7 @@ blk_qc_t blk_mq_submit_bio(struct bio *bio)
- 
- 	rq_qos_throttle(q, bio);
- 
--	hipri = bio->bi_opf & REQ_HIPRI;
-+	hipri = bio->bi_opf & REQ_POLLED;
- 
- 	data.cmd_flags = bio->bi_opf;
- 	rq = __blk_mq_alloc_request(&data);
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 3616453ca28c..38eac0434a52 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -108,9 +108,9 @@ static inline struct blk_mq_hw_ctx *blk_mq_map_queue(struct request_queue *q,
- 	enum hctx_type type = HCTX_TYPE_DEFAULT;
- 
- 	/*
--	 * The caller ensure that if REQ_HIPRI, poll must be enabled.
-+	 * The caller ensure that if REQ_POLLED, poll must be enabled.
- 	 */
--	if (flags & REQ_HIPRI)
-+	if (flags & REQ_POLLED)
- 		type = HCTX_TYPE_POLL;
- 	else if ((flags & REQ_OP_MASK) == REQ_OP_READ)
- 		type = HCTX_TYPE_READ;
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index f736fd36147c..0a8592f916cc 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -963,7 +963,7 @@ static void nvme_execute_rq_polled(struct request_queue *q,
- 
- 	WARN_ON_ONCE(!test_bit(QUEUE_FLAG_POLL, &q->queue_flags));
- 
--	rq->cmd_flags |= REQ_HIPRI;
-+	rq->cmd_flags |= REQ_POLLED;
- 	rq->end_io_data = &wait;
- 	blk_execute_rq_nowait(bd_disk, rq, at_head, nvme_end_sync_rq);
- 
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index a0b4cfdf62a4..439a70bc42e2 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -817,7 +817,7 @@ static inline int bio_integrity_add_page(struct bio *bio, struct page *page,
-  */
- static inline void bio_set_polled(struct bio *bio, struct kiocb *kiocb)
+@@ -72,9 +72,11 @@ static inline struct blk_mq_hw_ctx *blk_qc_to_hctx(struct request_queue *q,
+ static inline struct request *blk_qc_to_rq(struct blk_mq_hw_ctx *hctx,
+ 		blk_qc_t qc)
  {
--	bio->bi_opf |= REQ_HIPRI;
-+	bio->bi_opf |= REQ_POLLED;
- 	if (!is_sync_kiocb(kiocb))
- 		bio->bi_opf |= REQ_NOWAIT;
+-	if (blk_qc_t_is_internal(qc))
+-		return blk_mq_tag_to_rq(hctx->sched_tags, blk_qc_t_to_tag(qc));
+-	return blk_mq_tag_to_rq(hctx->tags, blk_qc_t_to_tag(qc));
++	unsigned int tag = qc & ((1U << BLK_QC_T_SHIFT) - 1);
++
++	if (qc & BLK_QC_T_INTERNAL)
++		return blk_mq_tag_to_rq(hctx->sched_tags, tag);
++	return blk_mq_tag_to_rq(hctx->tags, tag);
  }
+ 
+ /*
 diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index d0cf835d3b50..ac60432752e3 100644
+index ed71a8d968f2..4c28ab22f93d 100644
 --- a/include/linux/blk_types.h
 +++ b/include/linux/blk_types.h
-@@ -392,7 +392,7 @@ enum req_flag_bits {
- 	/* command specific flags for REQ_OP_WRITE_ZEROES: */
- 	__REQ_NOUNMAP,		/* do not free blocks when zeroing */
+@@ -515,16 +515,6 @@ static inline bool blk_qc_t_valid(blk_qc_t cookie)
+ 	return cookie != BLK_QC_T_NONE;
+ }
  
--	__REQ_HIPRI,
-+	__REQ_POLLED,		/* caller polls for completion using blk_poll */
- 
- 	/* for driver use */
- 	__REQ_DRV,
-@@ -417,7 +417,7 @@ enum req_flag_bits {
- #define REQ_CGROUP_PUNT		(1ULL << __REQ_CGROUP_PUNT)
- 
- #define REQ_NOUNMAP		(1ULL << __REQ_NOUNMAP)
--#define REQ_HIPRI		(1ULL << __REQ_HIPRI)
-+#define REQ_POLLED		(1ULL << __REQ_POLLED)
- 
- #define REQ_DRV			(1ULL << __REQ_DRV)
- #define REQ_SWAP		(1ULL << __REQ_SWAP)
-diff --git a/mm/page_io.c b/mm/page_io.c
-index 5d5543fcefa4..ed2eded74f3a 100644
---- a/mm/page_io.c
-+++ b/mm/page_io.c
-@@ -416,7 +416,7 @@ int swap_readpage(struct page *page, bool synchronous)
- 	 * attempt to access it in the page fault retry time check.
- 	 */
- 	if (synchronous) {
--		bio->bi_opf |= REQ_HIPRI;
-+		bio->bi_opf |= REQ_POLLED;
- 		get_task_struct(current);
- 		bio->bi_private = current;
- 	}
+-static inline unsigned int blk_qc_t_to_tag(blk_qc_t cookie)
+-{
+-	return cookie & ((1u << BLK_QC_T_SHIFT) - 1);
+-}
+-
+-static inline bool blk_qc_t_is_internal(blk_qc_t cookie)
+-{
+-	return (cookie & BLK_QC_T_INTERNAL) != 0;
+-}
+-
+ struct blk_rq_stat {
+ 	u64 mean;
+ 	u64 min;
 -- 
 2.30.1
 
