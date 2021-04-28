@@ -2,165 +2,102 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10D3BC433ED
-	for <linux-block@archiver.kernel.org>; Wed, 28 Apr 2021 20:08:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7559C433B4
+	for <linux-block@archiver.kernel.org>; Wed, 28 Apr 2021 20:54:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C6B236143D
-	for <linux-block@archiver.kernel.org>; Wed, 28 Apr 2021 20:08:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 84F976140C
+	for <linux-block@archiver.kernel.org>; Wed, 28 Apr 2021 20:54:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230218AbhD1UJN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Apr 2021 16:09:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52914 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241862AbhD1UJM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Apr 2021 16:09:12 -0400
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10500C061573
-        for <linux-block@vger.kernel.org>; Wed, 28 Apr 2021 13:08:27 -0700 (PDT)
-Received: by mail-pj1-x1029.google.com with SMTP id l10-20020a17090a850ab0290155b06f6267so3516903pjn.5
-        for <linux-block@vger.kernel.org>; Wed, 28 Apr 2021 13:08:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=DB7MZoU3HMVpsUlzpXDqKdOJ0sh2qyOLWTaTCi65oJs=;
-        b=u/E393em5DeeTD24WLcw8rJh6lhERt8Nv6Q0Y+xVuRjEaCOmQ8k+rq26igaB5YfLg9
-         9jGccToW88HJYDZdOJ8aamx/TGE3xs9Cm2iHQ8GDBCWR/VDkkRfg9r9GRlXyZRNQ1txa
-         ZFfvR+1os00O5Q7/jZN/cEScPfB9a+CF7DajIkbVB2AZYSrGE/6LWSm2G54C1dCQOPhV
-         AGVtYpmzNUOsxaym/rtgL/NE9Lms7kq7H/EJ/LLfAIfkVY49Tz0v/dlYnmuYcfaORtN1
-         C4H2r5rx5fy0/Nbvtz2mvgDaFkiqdOYdAb/B3eS5EgYpgn3MhxcCpAHK2H5+sNgwiEzu
-         iiXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=DB7MZoU3HMVpsUlzpXDqKdOJ0sh2qyOLWTaTCi65oJs=;
-        b=C/hm7Gj+QXFJdbLdBzFgOpVyCXJp+vR4yEWWaszI4jJRFLkWzGynupAX3Bk0b/76sW
-         C9FIpgDSWvwUtPdTZaMiWa34pNLEEbPuCuX6VMKZvGflruhXBb5aJMKd+/YJo9ZpJ2Jo
-         KIiWvW1TfQQoyKOIKU3rH9HTp+bl7PUpINDzc0oxcF0vaYjSN10rPaQcoIzza+R7gxq4
-         MUxdtVRJwpJeebNuycC2ctDANyyKM5X8MXHz7QBcCcIJ9UVr/oAn/vsblx6h/66Q/Anm
-         z9iQGik0WcvLtTZE4Cm2vgwlciW5uIDxsPQZNl9WaTTvl4E7yl2iTR/1XP6dFX7rXlqO
-         wfTw==
-X-Gm-Message-State: AOAM530JOPzPHg5STKku47QxFR6U+DhfuJpW/6WW/PGb2U1ObzyKIbl/
-        E+lJPLBwSEmvWvTeuehjc4wBtA==
-X-Google-Smtp-Source: ABdhPJyh8ikd6mVH5vSQd8zxzacNwo/y1i1vrW+6JQZDkQy92abhXm3LzgBmmb3J9MR8vbj9ICrbPw==
-X-Received: by 2002:a17:902:a582:b029:ec:d002:623b with SMTP id az2-20020a170902a582b02900ecd002623bmr31842309plb.36.1619640506474;
-        Wed, 28 Apr 2021 13:08:26 -0700 (PDT)
-Received: from [192.168.1.134] ([66.219.217.173])
-        by smtp.gmail.com with ESMTPSA id s19sm506862pfh.18.2021.04.28.13.08.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 Apr 2021 13:08:26 -0700 (PDT)
-Subject: Re: bio_add_folio argument order
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
-References: <20210428165044.GB1847222@casper.infradead.org>
- <7be8f00a-1444-d614-267f-1477289e4f62@kernel.dk>
- <20210428200032.GC1847222@casper.infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <e7109944-fbc9-80af-10d2-ba7e841bc67d@kernel.dk>
-Date:   Wed, 28 Apr 2021 14:08:24 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S229995AbhD1Uzn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Apr 2021 16:55:43 -0400
+Received: from mx2.suse.de ([195.135.220.15]:42548 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229993AbhD1Uzn (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 28 Apr 2021 16:55:43 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1619643296; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=abLiDSv2N89jhGRyaxZH56+tP1PcAmuXSHlaG22UQn0=;
+        b=fjva+nEd+KY4/Bgvs7FRzrXK9xeqxA6dHuq8iOeHXVkYN3bGe7TAqr+JWfm7IRPI3pWFrj
+        ZLCfAuCQVq5b4wujNpjh0wY/N3673Pld3p1vKYmG9gEUq1T0szFDJJ1FGooODK27UYMeON
+        EfQsS+ziepuUUBg37M6hmLFFlNLV/Uw=
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 2F966AF75;
+        Wed, 28 Apr 2021 20:54:56 +0000 (UTC)
+Message-ID: <3719d0b8ab39d1008030e8f4e462fb4ee98952ac.camel@suse.com>
+Subject: Re: dm: dm_blk_ioctl(): implement failover for SG_IO on dm-multipath
+From:   Martin Wilck <mwilck@suse.com>
+To:     Mike Snitzer <snitzer@redhat.com>
+Cc:     Alasdair G Kergon <agk@redhat.com>, dm-devel@redhat.com,
+        Hannes Reinecke <hare@suse.de>,
+        Daniel Wagner <dwagner@suse.de>, linux-block@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Christoph Hellwig <hch@lst.de>, linux-scsi@vger.kernel.org
+Date:   Wed, 28 Apr 2021 22:54:55 +0200
+In-Reply-To: <20210428195457.GA46518@lobo>
+References: <20210422202130.30906-1-mwilck@suse.com>
+         <20210428195457.GA46518@lobo>
+Content-Type: text/plain; charset="ISO-8859-15"
+User-Agent: Evolution 3.38.4 
 MIME-Version: 1.0
-In-Reply-To: <20210428200032.GC1847222@casper.infradead.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/28/21 2:00 PM, Matthew Wilcox wrote:
-> On Wed, Apr 28, 2021 at 10:58:44AM -0600, Jens Axboe wrote:
->> On 4/28/21 10:50 AM, Matthew Wilcox wrote:
->>> bio_add_page() has its arguments in the wrong order:
->>>
->>> extern int bio_add_page(struct bio *, struct page *, unsigned int,unsigned int);
->>>
->>> Oh, right, and the prototype commits the cardinal sin of just giving you
->>> a pair of unsigned ints and doesn't bother to tell you what they mean.
->>> I'll send a patch for that ... anyway:
->>>
->>> int bio_add_page(struct bio *bio, struct page *page,
->>>                  unsigned int len, unsigned int offset)
->>>
->>> This fails to follow #4: https://ozlabs.org/~rusty/index.cgi/tech/2008-03-30.html
->>>
->>> Here's what I want to do for the folio equivalent:
->>>
->>> size_t bio_add_folio(struct bio *bio, struct folio *folio, size_t off,
->>>                 size_t len)
->>>
->>> This will make the transition more painful, but it does remove an irritant
->>> for the future.  Any objections?
->>
->> What's the point in shuffling len and offset around?
+On Wed, 2021-04-28 at 15:54 -0400, Mike Snitzer wrote:
 > 
-> That almost everything else does (off, len).  Grepping include, here's
-> the (object, len, off) examples I found (will miss multi-line examples,
-> tried to use my best judgement, tried to exclude loff_t):
-> 
-> bio_add_zone_append_page
-> __bio_try_merge_page
-> __bio_add_page
-> bio_integrity_add_page
-> fscrypt_encrypt_block_inplace
-> fscrypt_decrypt_block_inplace
-> sg_set_page
-> sg_copy_buffer
-> sg_pcopy_from_buffer
-> sg_pcopy_to_buffer
-> sg_zero_buffer
-> copy_linear_skb
-> 
-> versus (object, off, len):
-> 
-> bpf_ctx_copy_t
-> ->is_partially_uptodate
-> memcpy_from_page
-> memcpy_to_page
-> memzero_page
-> (basically all of the iomap functions)
-> kvm_write_guest_page
-> kvm_vcpu_write_guest_page
-> skb_gro_remcsum_process
-> nf_checksum_partial
-> perf_copy_f
-> read_module_eeprom
-> skb_frag_foreach_page
-> skb_to_sgvec_nomark
-> skb_to_sgvec
-> skb_send_sock
-> various skb_checksum_ops
-> sk_msg_clone
-> various gss_krb functions
-> xdr_process_buf
-> usercopy_warn
-> various network getfrag functions
-> 
-> Not _quite_ as one-sided as I thought, but there are basically three
-> families of functions (bio, fscrypt, sg) that are len-first (plus
-> copy_linear_skb() is out-of-family), then networking, filesystems,
-> highmem, perf, bpf, kvm are off-first.
-> 
-> So, you're the maintainer, it's your call ... do you want
-> bio_add_folio() to resemble the bio_add_page() calls as much as
-> possible, or do you want to migrate towards how the rest of the world
-> works?
+> Ngh... not loving this at all.  
 
-Given that, I'd rather stick with the current ordering. The risk of
-mistakes is much smaller that way. And not sure 'rest of world' is
-really that applicable here in the kernel, the list above seems only
-slightly skewed to one side. Hence I'd rather keep it safe and just
-retain it.
+I'm not surprised :-) I infer from your reply that you acknowledge this
+is something that should be done one way or the other, and I'm glad
+about that.
 
--- 
-Jens Axboe
+> But here is a patch (that I didn't
+> compile test) that should be folded in, still have to think about how
+> this could be made cleaner in general though.
+
+Thanks, much appreciated.
+
+> Also, dm_sg_io_ioctl should probably be in dm-rq.c (maybe even dm-
+> mpath.c!?)
+> 
+> From: Mike Snitzer <snitzer@redhat.com>
+> Date: Wed, 28 Apr 2021 15:03:20 -0400
+> Subject: [PATCH] dm: use scsi_result_to_blk_status rather than open-
+> coding it
+> 
+> Other small cleanups/nits.
+> 
+> BUT the fact that dm.c now #includes <scsi/scsi.h> and <scsi/sg.h>
+> leaves a very bitter taste.
+> 
+> Also, hardcoding the issuing of a "fail_path" message (assumes tgt is
+> dm-mpath) but still having checks like !tgt->type->message.. its all
+> very contrived and awkward!
+
+This I can explain. I need to check t->type->message because not all
+targets define it. If I didn't, yet used message(), the kernel might
+crash. I would have avoided the hard-coded "fail_path", too, if I had
+found a way to figure out which messages a given target supports, or
+whether the target in question is the multipath target in the first
+place. But I couldn't figure it out. If it's possible, please tell me
+how. 
+
+Wrt "fail_path", the assumption is that other rq-based targets would
+either not support "fail_path" and thus return an error, or implement
+it with the same semantics as multipath. In both cases, my patch would
+do the "right thing" (falling back to standard behavior in the error
+case).
+
+Thanks,
+Martin
+
 
