@@ -2,77 +2,68 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3575AC433B4
-	for <linux-block@archiver.kernel.org>; Wed, 28 Apr 2021 15:52:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C511C43460
+	for <linux-block@archiver.kernel.org>; Wed, 28 Apr 2021 16:51:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ED5EC613BF
-	for <linux-block@archiver.kernel.org>; Wed, 28 Apr 2021 15:52:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3772F61400
+	for <linux-block@archiver.kernel.org>; Wed, 28 Apr 2021 16:51:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229961AbhD1Pxj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Apr 2021 11:53:39 -0400
-Received: from mail-pg1-f182.google.com ([209.85.215.182]:37720 "EHLO
-        mail-pg1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240526AbhD1Pww (ORCPT
+        id S241320AbhD1Qvv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Apr 2021 12:51:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37570 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S241291AbhD1Qvt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Apr 2021 11:52:52 -0400
-Received: by mail-pg1-f182.google.com with SMTP id p2so29577808pgh.4
-        for <linux-block@vger.kernel.org>; Wed, 28 Apr 2021 08:52:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=h/zzIdjrrUl2/UsHr5TrYaDhKtxFkcdK0O2dKUqUAKY=;
-        b=AiaVUiyjwspVxQWN/zO2yWIaGRxUSD74tK1dSirpU+ziUP98/mzDUE4T6yOAbhKvfO
-         z+U5lOewED4Wq2h3dRXt7ydJvZllNLIUEqXv+Sj+PqMb/Pf1LgBOoty6G32GLBvICdu/
-         l2BwVk+UufA1ZHuEkTPuak1vl5fxUa0zMxXm3BQr1o0eDrEZsGRDuGSCVUA0gLTzC78R
-         1HUawnZrcG+gzFuMG3jUBbhnB4AXIzMjb/yHCPecdQo8RR2xrsLiTCS+CqhGoNy4I1ZY
-         1G05yjgsNjyaPsBfDwdSod3iO0rPxAzjby33VKPrKEt2CkwHeIcNIAwco4q3MrZovAZY
-         dTrw==
-X-Gm-Message-State: AOAM533Cph5Im/L3mN82qARbHWM3gazpF2CEOYxjLNeC37ho1k/PWfSp
-        U4iUH9KMZh0jfEho+FvfdcI=
-X-Google-Smtp-Source: ABdhPJz0qbFjLyXMAhWlltGK8rjKklwLlr9+2dkUYEbKgKgjvb7OPmRU1rKF7wCXQbHq0nsWxAFJew==
-X-Received: by 2002:a63:a16:: with SMTP id 22mr27343770pgk.345.1619625125372;
-        Wed, 28 Apr 2021 08:52:05 -0700 (PDT)
-Received: from [192.168.3.219] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
-        by smtp.gmail.com with ESMTPSA id k8sm132821pfk.189.2021.04.28.08.52.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 Apr 2021 08:52:04 -0700 (PDT)
-Subject: Re: [PATCH v2] block: Improve limiting the bio size
-To:     Changheun Lee <nanich.lee@samsung.com>
-Cc:     axboe@kernel.dk, bgoncalv@redhat.com, hch@lst.de,
-        jaegeuk@kernel.org, linux-block@vger.kernel.org,
-        ming.lei@redhat.com, yi.zhang@redhat.com
-References: <c5f47617-f06a-d598-1794-118447e8e2b0@acm.org>
- <CGME20210428073921epcas1p2b161b5ccc9d7ec61c1200155da95c5b9@epcas1p2.samsung.com>
- <20210428072123.3155-1-nanich.lee@samsung.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <a1759842-eb14-e477-fdf6-b6844e5aa29f@acm.org>
-Date:   Wed, 28 Apr 2021 08:52:03 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.0
+        Wed, 28 Apr 2021 12:51:49 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87231C061573
+        for <linux-block@vger.kernel.org>; Wed, 28 Apr 2021 09:51:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Type:MIME-Version:Message-ID:
+        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=jjtZK79DrB4Nv89UYctUJuPuhcipyTFrzsVZ/GZ0Ev4=; b=J2OOKPpeqhw1nltO3lCAK4NsH2
+        b7xi6CkdwAn8X9HtsmoDc/+1MIUnK7dHAsB4fz1C9kxOHvqlnQavCmVECojpgG+yDtUX7mL7uLRVh
+        HWWn/ZwJfA+PpDvyPP0l7MpVSDs02GqwJeDiEXvPzuSdt3kOmwD5+Or1T+DA8Zv2NQEunxOPtYZuX
+        W+I0V42qiZFgOmxTGfTyZlkyqymopd0h/kH9GbaVA7h9kbIxmzPnERB1QzQNcUPhwzZtBj19PZr27
+        EPv9RjV1MPgkMi13mtpGwL5TzCKdKlEhM3S3a8ZeGySOGeHQB/TnHlfq1qzzjEcxoM1s18H1UHpQD
+        qvM6JyhQ==;
+Received: from willy by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
+        id 1lbnOe-008ZGe-7p; Wed, 28 Apr 2021 16:50:49 +0000
+Date:   Wed, 28 Apr 2021 17:50:44 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     linux-block@vger.kernel.org
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Subject: bio_add_folio argument order
+Message-ID: <20210428165044.GB1847222@casper.infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <20210428072123.3155-1-nanich.lee@samsung.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/28/21 12:21 AM, Changheun Lee wrote:
-> Actually I don't know why NULL pointer dereference is occurred with Bart's
-> patch in blk_rq_map_kern(). And same problem have not occured yet in my
-> test environment with Bart's patch.
-> Maybe I missed something, or missunderstood?
+bio_add_page() has its arguments in the wrong order:
 
-The call trace that I shared on the linux-block mailing list was
-encountered inside a VM that has a SATA disk attached to it and also a
-SATA CD-ROM. Does replicating that setup allow to reproduce the NULL
-pointer dereference that I reported?
+extern int bio_add_page(struct bio *, struct page *, unsigned int,unsigned int);
 
-Bart.
+Oh, right, and the prototype commits the cardinal sin of just giving you
+a pair of unsigned ints and doesn't bother to tell you what they mean.
+I'll send a patch for that ... anyway:
+
+int bio_add_page(struct bio *bio, struct page *page,
+                 unsigned int len, unsigned int offset)
+
+This fails to follow #4: https://ozlabs.org/~rusty/index.cgi/tech/2008-03-30.html
+
+Here's what I want to do for the folio equivalent:
+
+size_t bio_add_folio(struct bio *bio, struct folio *folio, size_t off,
+                size_t len)
+
+This will make the transition more painful, but it does remove an irritant
+for the future.  Any objections?
