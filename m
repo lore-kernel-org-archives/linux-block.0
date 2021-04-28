@@ -2,162 +2,67 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 952FAC433ED
-	for <linux-block@archiver.kernel.org>; Wed, 28 Apr 2021 06:16:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7441AC433B4
+	for <linux-block@archiver.kernel.org>; Wed, 28 Apr 2021 06:40:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 796B26141E
-	for <linux-block@archiver.kernel.org>; Wed, 28 Apr 2021 06:16:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3891461422
+	for <linux-block@archiver.kernel.org>; Wed, 28 Apr 2021 06:40:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236213AbhD1GRF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Apr 2021 02:17:05 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:16162 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229464AbhD1GRF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Apr 2021 02:17:05 -0400
-Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.60])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4FVSx304jwzpbqd;
-        Wed, 28 Apr 2021 14:13:11 +0800 (CST)
-Received: from [10.174.176.73] (10.174.176.73) by
- DGGEMS406-HUB.china.huawei.com (10.3.19.206) with Microsoft SMTP Server id
- 14.3.498.0; Wed, 28 Apr 2021 14:16:13 +0800
-Subject: Re: [PATCH] block: reexpand iov_iter after read/write
-To:     Pavel Begunkov <asml.silence@gmail.com>, <axboe@kernel.dk>
-CC:     <viro@zeniv.linux.org.uk>, <linux-fsdevel@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <io-uring@vger.kernel.org>
-References: <20210401071807.3328235-1-yangerkun@huawei.com>
- <a2e97190-936d-ebe0-2adc-748328076f31@gmail.com>
- <7ff7d1b7-8b6d-a684-1740-6a62565f77b6@gmail.com>
- <3368729f-e61d-d4b6-f2ae-e17ebe59280e@gmail.com>
-From:   yangerkun <yangerkun@huawei.com>
-Message-ID: <3d6904c0-9719-8569-2ae8-dd9694da046b@huawei.com>
-Date:   Wed, 28 Apr 2021 14:16:13 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+        id S233399AbhD1Gkx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Apr 2021 02:40:53 -0400
+Received: from mx2.suse.de ([195.135.220.15]:52922 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S236297AbhD1Gir (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 28 Apr 2021 02:38:47 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 16A94AF31;
+        Wed, 28 Apr 2021 06:38:02 +0000 (UTC)
+Subject: Re: [PATCH v10 08/13] lpfc: vmid: Functions to manage vmids
+To:     Muneendra <muneendra.kumar@broadcom.com>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        tj@kernel.org, linux-nvme@lists.infradead.org
+Cc:     jsmart2021@gmail.com, emilne@redhat.com, mkumar@redhat.com,
+        Gaurav Srivastava <gaurav.srivastava@broadcom.com>
+References: <1619562897-14062-1-git-send-email-muneendra.kumar@broadcom.com>
+ <1619562897-14062-9-git-send-email-muneendra.kumar@broadcom.com>
+From:   Hannes Reinecke <hare@suse.de>
+Organization: SUSE Linux GmbH
+Message-ID: <c1d2551e-a70a-37f9-81d2-7bff9068f61d@suse.de>
+Date:   Wed, 28 Apr 2021 08:38:00 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.9.1
 MIME-Version: 1.0
-In-Reply-To: <3368729f-e61d-d4b6-f2ae-e17ebe59280e@gmail.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <1619562897-14062-9-git-send-email-muneendra.kumar@broadcom.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.176.73]
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+On 4/28/21 12:34 AM, Muneendra wrote:
+> From: Gaurav Srivastava <gaurav.srivastava@broadcom.com>
+> 
+> This patch contains the routines to save, retrieve and remove the vmids
+> from the data structure. A hash table is used to save the vmids and
+> the corresponding UUIDs associated with the application/VMs.
+> 
+> Signed-off-by: Gaurav Srivastava  <gaurav.srivastava@broadcom.com>
+> Signed-off-by: James Smart <jsmart2021@gmail.com>
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-Should we pick this patch for 5.13?
+Cheers,
 
-在 2021/4/16 1:39, Pavel Begunkov 写道:
-> On 15/04/2021 18:37, Pavel Begunkov wrote:
->> On 09/04/2021 15:49, Pavel Begunkov wrote:
->>> On 01/04/2021 08:18, yangerkun wrote:
->>>> We get a bug:
->>>>
->>>> BUG: KASAN: slab-out-of-bounds in iov_iter_revert+0x11c/0x404
->>>> lib/iov_iter.c:1139
->>>> Read of size 8 at addr ffff0000d3fb11f8 by task
->>>>
->>>> CPU: 0 PID: 12582 Comm: syz-executor.2 Not tainted
->>>> 5.10.0-00843-g352c8610ccd2 #2
->>>> Hardware name: linux,dummy-virt (DT)
->>>> Call trace:
->> ...
->>>>   __asan_load8+0xb4/0xbc mm/kasan/generic.c:252
->>>>   iov_iter_revert+0x11c/0x404 lib/iov_iter.c:1139
->>>>   io_read fs/io_uring.c:3421 [inline]
->>>>   io_issue_sqe+0x2344/0x2d64 fs/io_uring.c:5943
->>>>   __io_queue_sqe+0x19c/0x520 fs/io_uring.c:6260
->>>>   io_queue_sqe+0x2a4/0x590 fs/io_uring.c:6326
->>>>   io_submit_sqe fs/io_uring.c:6395 [inline]
->>>>   io_submit_sqes+0x4c0/0xa04 fs/io_uring.c:6624
->> ...
->>>>
->>>> blkdev_read_iter can truncate iov_iter's count since the count + pos may
->>>> exceed the size of the blkdev. This will confuse io_read that we have
->>>> consume the iovec. And once we do the iov_iter_revert in io_read, we
->>>> will trigger the slab-out-of-bounds. Fix it by reexpand the count with
->>>> size has been truncated.
->>>
->>> Looks right,
->>>
->>> Acked-by: Pavel Begunkov <asml.silencec@gmail.com>
->>
->> Fwiw, we need to forget to drag it through 5.13 + stable
-> 
-> Err, yypo, to _not_ forget to 5.13 + stable...
-> 
->>
->>
->>>>
->>>> blkdev_write_iter can trigger the problem too.
->>>>
->>>> Signed-off-by: yangerkun <yangerkun@huawei.com>
->>>> ---
->>>>   fs/block_dev.c | 20 +++++++++++++++++---
->>>>   1 file changed, 17 insertions(+), 3 deletions(-)
->>>>
->>>> diff --git a/fs/block_dev.c b/fs/block_dev.c
->>>> index 92ed7d5df677..788e1014576f 100644
->>>> --- a/fs/block_dev.c
->>>> +++ b/fs/block_dev.c
->>>> @@ -1680,6 +1680,7 @@ ssize_t blkdev_write_iter(struct kiocb *iocb, struct iov_iter *from)
->>>>   	struct inode *bd_inode = bdev_file_inode(file);
->>>>   	loff_t size = i_size_read(bd_inode);
->>>>   	struct blk_plug plug;
->>>> +	size_t shorted = 0;
->>>>   	ssize_t ret;
->>>>   
->>>>   	if (bdev_read_only(I_BDEV(bd_inode)))
->>>> @@ -1697,12 +1698,17 @@ ssize_t blkdev_write_iter(struct kiocb *iocb, struct iov_iter *from)
->>>>   	if ((iocb->ki_flags & (IOCB_NOWAIT | IOCB_DIRECT)) == IOCB_NOWAIT)
->>>>   		return -EOPNOTSUPP;
->>>>   
->>>> -	iov_iter_truncate(from, size - iocb->ki_pos);
->>>> +	size -= iocb->ki_pos;
->>>> +	if (iov_iter_count(from) > size) {
->>>> +		shorted = iov_iter_count(from) - size;
->>>> +		iov_iter_truncate(from, size);
->>>> +	}
->>>>   
->>>>   	blk_start_plug(&plug);
->>>>   	ret = __generic_file_write_iter(iocb, from);
->>>>   	if (ret > 0)
->>>>   		ret = generic_write_sync(iocb, ret);
->>>> +	iov_iter_reexpand(from, iov_iter_count(from) + shorted);
->>>>   	blk_finish_plug(&plug);
->>>>   	return ret;
->>>>   }
->>>> @@ -1714,13 +1720,21 @@ ssize_t blkdev_read_iter(struct kiocb *iocb, struct iov_iter *to)
->>>>   	struct inode *bd_inode = bdev_file_inode(file);
->>>>   	loff_t size = i_size_read(bd_inode);
->>>>   	loff_t pos = iocb->ki_pos;
->>>> +	size_t shorted = 0;
->>>> +	ssize_t ret;
->>>>   
->>>>   	if (pos >= size)
->>>>   		return 0;
->>>>   
->>>>   	size -= pos;
->>>> -	iov_iter_truncate(to, size);
->>>> -	return generic_file_read_iter(iocb, to);
->>>> +	if (iov_iter_count(to) > size) {
->>>> +		shorted = iov_iter_count(to) - size;
->>>> +		iov_iter_truncate(to, size);
->>>> +	}
->>>> +
->>>> +	ret = generic_file_read_iter(iocb, to);
->>>> +	iov_iter_reexpand(to, iov_iter_count(to) + shorted);
->>>> +	return ret;
->>>>   }
->>>>   EXPORT_SYMBOL_GPL(blkdev_read_iter);
->>>>   
->>>>
->>>
->>
-> 
+Hannes
+-- 
+Dr. Hannes Reinecke		        Kernel Storage Architect
+hare@suse.de			               +49 911 74053 688
+SUSE Software Solutions Germany GmbH, 90409 Nürnberg
+GF: F. Imendörffer, HRB 36809 (AG Nürnberg)
