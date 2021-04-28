@@ -2,65 +2,88 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05F91C43461
-	for <linux-block@archiver.kernel.org>; Wed, 28 Apr 2021 10:30:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DD31C433ED
+	for <linux-block@archiver.kernel.org>; Wed, 28 Apr 2021 14:04:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CBCF661436
-	for <linux-block@archiver.kernel.org>; Wed, 28 Apr 2021 10:29:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3CD1C61443
+	for <linux-block@archiver.kernel.org>; Wed, 28 Apr 2021 14:04:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239453AbhD1Kan (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Apr 2021 06:30:43 -0400
-Received: from mail.kernel.org ([198.145.29.99]:46632 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230057AbhD1Kam (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Apr 2021 06:30:42 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id A9162613FF;
-        Wed, 28 Apr 2021 10:29:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1619605797;
-        bh=8C+OErcF42crulhtmpO3zOoSt0k/g7nGDTskXCzZBv0=;
-        h=Date:From:To:cc:Subject:In-Reply-To:References:From;
-        b=Da432CDk5RTSR+1+b85H4jxdY4rw0w2r+IVM2U59jpCTLGTuuTqyHcKD+gHDkWs5s
-         tlCQdDuWIM5amEuBPZEbZLEp/8zF4A8Wa6bog/pzz6xY8HWmkIQY3eda4xcWV72zQH
-         0EyDKY6foSXFcEVQPphyRgCCTiBLRlbfyUDJ5rDF5W3Hyh027BmMdsfRge//6oblO9
-         DPxgUcmWFPah1k4/aNdkLDh46k+nRSKasC4vhxisUbFof6Cu4iKEpPNHwUn32INzIy
-         sFCrJiflrUZfOAkZmrYkK8IwQm5hO2H2YfopdfozwyNX3WYNLIhxL2gxM99LWQx49C
-         8CG1MeO321bMQ==
-Date:   Wed, 28 Apr 2021 12:29:52 +0200 (CEST)
-From:   Jiri Kosina <jikos@kernel.org>
-To:     Theodore Ts'o <tytso@mit.edu>
-cc:     ksummit@lists.linux.dev, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, netdev@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-api@vger.kernel.org
-Subject: Re: Maintainers / Kernel Summit 2021 planning kick-off
-In-Reply-To: <YH2hs6EsPTpDAqXc@mit.edu>
-Message-ID: <nycvar.YFH.7.76.2104281228350.18270@cbobk.fhfr.pm>
-References: <YH2hs6EsPTpDAqXc@mit.edu>
-User-Agent: Alpine 2.21 (LSU 202 2017-01-01)
+        id S230057AbhD1OEs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Apr 2021 10:04:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56424 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239147AbhD1OEp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 28 Apr 2021 10:04:45 -0400
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DEB5C061573
+        for <linux-block@vger.kernel.org>; Wed, 28 Apr 2021 07:03:58 -0700 (PDT)
+Received: by mail-pj1-x1036.google.com with SMTP id gj14so979430pjb.5
+        for <linux-block@vger.kernel.org>; Wed, 28 Apr 2021 07:03:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=HVK6sJ5rAmqrn0m6H37k3y2DXcZyJR6beBYIZ8OR3Hc=;
+        b=KBGKiJAr4PdtXa9ZUCmpliMzck+/5Ni7d9gGfqlDlfwg4V+5EFdQ+GQb7in+Y1+MD4
+         WU8NKVpjLK3CsNmi2qH3YS6a6UeGtehc1FWjCQym9t+cn+2mgrUldvToS5G7G2ndeBoK
+         z0li6pcpv6GjFuQF8PiJBsskuMVG5ne5XBYdmUvRv711nbpOcZQdD9chXuIsDSpewREb
+         2gYBAHMr4jsR8UMNrMYRzTbVPfB7h/jPFB1heD0c8RFegftF69tos9UqasUDM5NgWzd2
+         uKnxKYYxXX6rXs7c2AYn7FL0KxrNZ2UDHlM21FS642ZZzTRgo66ErCFxzG2q0JL/+ai/
+         n/Yg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=HVK6sJ5rAmqrn0m6H37k3y2DXcZyJR6beBYIZ8OR3Hc=;
+        b=gJQf1qi3WFLrDnSezldl//GDuow2mUaMtLFi9ivqPr8e+HiOv7cDUsHiCxIdAtdjYM
+         84p+fxczb8TyeybuBd89LmnPAwbU97GAEBQimKy0fpSz89A8X2cC8k82zpGipFf/nwHC
+         XemeRPIQDRL52PgjNkQVoGILcJJRovw6u60uVD05h9ODktXPJ05vAyHg7IFn/MOBLhhp
+         ZNd+esQdRUEKjc4uLrdXZfvRrmyCEc+tUsvZMgTwaIKsyrm743X/WmVrU8pkwa7xD88X
+         iiUpxfCOCwPEHNejf1GEl/kZROeOpJomttHvMBfQwa3VeFPorcJ8UwAfMIRBP6cpHLjj
+         eKFQ==
+X-Gm-Message-State: AOAM533Ke43o3aCglEpiTXVJJRhs/FScWeLeDZqhW2Jc8IstXLhOe0sL
+        1rUDKldrqe1ZvFzCATH5VbitDg==
+X-Google-Smtp-Source: ABdhPJxwp0J+/qWhc1PIJ0D+RgPMEGdLcjroqLMMDin+tWhOJFbCPI+iuSbdbMsMF5jUseVNb6FTqQ==
+X-Received: by 2002:a17:90a:540c:: with SMTP id z12mr4145834pjh.42.1619618637803;
+        Wed, 28 Apr 2021 07:03:57 -0700 (PDT)
+Received: from [192.168.1.134] ([66.219.217.173])
+        by smtp.gmail.com with ESMTPSA id b4sm4700058pfv.188.2021.04.28.07.03.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 28 Apr 2021 07:03:57 -0700 (PDT)
+Subject: Re: [PATCH for-next 0/4] Misc update for RNBD
+To:     Gioh Kim <gi-oh.kim@ionos.com>, linux-block@vger.kernel.org
+Cc:     hch@infradead.org, sagi@grimberg.me, bvanassche@acm.org,
+        haris.iqbal@ionos.com, jinpu.wang@ionos.com
+References: <20210428061359.206794-1-gi-oh.kim@ionos.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <a198997f-9bc0-4ffa-9d62-33aa9511629f@kernel.dk>
+Date:   Wed, 28 Apr 2021 08:03:57 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20210428061359.206794-1-gi-oh.kim@ionos.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 19 Apr 2021, Theodore Ts'o wrote:
+On 4/28/21 12:13 AM, Gioh Kim wrote:
+> Some misc updates for RNBD:
+> * Remove unnecessary likely/unlikely macro from if-else statement
+> * Fix coding style issues reported by checkpatch.pl
+> * Add error check
 
-> This year, the Maintainers and Kernel Summit is currently planned to
-> be held in Dublin, Ireland, September 27 -- 29th.  
-
-Hi Ted,
-
-given the fact that OSS is being relocated from Dublin to Washington [1], 
-is Kernel Summit following that direction?
-
-[1] https://www.linuxfoundation.org/en/press-release/the-linux-foundation-announces-open-source-summit-embedded-linux-conference-2021-will-move-from-dublin-ireland-to-seattle-washington/
+Applied for post initial merge, thanks.
 
 -- 
-Jiri Kosina
-SUSE Labs
+Jens Axboe
 
