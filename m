@@ -7,65 +7,65 @@ X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20367C433ED
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B23DC433B4
 	for <linux-block@archiver.kernel.org>; Wed, 28 Apr 2021 06:14:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EBC0A61418
-	for <linux-block@archiver.kernel.org>; Wed, 28 Apr 2021 06:14:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 28BD461418
+	for <linux-block@archiver.kernel.org>; Wed, 28 Apr 2021 06:14:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231600AbhD1GO6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S235977AbhD1GO6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Wed, 28 Apr 2021 02:14:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36092 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36102 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235977AbhD1GO6 (ORCPT
+        with ESMTP id S235863AbhD1GO6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Wed, 28 Apr 2021 02:14:58 -0400
-Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F61DC061574
-        for <linux-block@vger.kernel.org>; Tue, 27 Apr 2021 23:14:13 -0700 (PDT)
-Received: by mail-ej1-x630.google.com with SMTP id n2so92827589ejy.7
+Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A4ACC061763
+        for <linux-block@vger.kernel.org>; Tue, 27 Apr 2021 23:14:14 -0700 (PDT)
+Received: by mail-ej1-x62b.google.com with SMTP id gx5so752773ejb.11
         for <linux-block@vger.kernel.org>; Tue, 27 Apr 2021 23:14:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=ionos.com; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=LdCRKoX+xuUkB22a7Io1lxLMTt7m0TByGtjMv3RTyrg=;
-        b=ELksowDicNNOCWG16xfEzZBpBAIYLfJaOrLpCO8okNpTNIi48yqFBN3N1CHhdl+DQi
-         AXg6S89k/3nYK4qaCUqpO8+jvH/ZSWffGGp2Po8YM9DSeR05ripP5fbpk1QuEn4I+BPW
-         2LgmtLT5qESprami2ilBkzm0svJJVP5mzRD3LaJHDQDnazKujCIQpsmW3awY8wbgOHfn
-         O2ZdXg5m81M3/aqU+vjlokHxes+IAQIftldH2/BlKGba8vDRJmNq96yQZA30ZQvG3gqC
-         y3Tmpq+9DhcI3x3e1lXQsKNRh44YqECGsL1UrTwENWC0ApsNCzkVdHb4GWviKpx7Utf+
-         7eEg==
+        bh=HN76YNCopOUfvfBy/lksY+1E2cxekdLf/6fjdkK043U=;
+        b=hERUOW+J5ug2xAvXyJrhYW+M2xFohVRto1G9pYwpoDIG5cZ0nhZv7r3wglOrWZWk+D
+         nYZkHYckQxDLMXFZfeYVZtsSSJF4gd+TxPA1pEnwH8BaE/kFTTjoHP9JNTn1Sbi4KZsI
+         nip+2zf6YYJRqhAYnmy9VKrnNkF7DZ59Kuy1BsfAwWcwHVLBVUC62cnIoUwKmoh2H2Jq
+         lkD/EuPpEcGpATbF9qzAr/ubqhrfqRwqzJEOzPewprY6hZLSLh1F/O6zkkm/JeTX6SdQ
+         BG35K4moBmwTwnLKIHoRscDs0uG0RNgx1gFDaGpE1YAxDokk69IjzAW2ZZ6qb4hZzXiH
+         PfvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=LdCRKoX+xuUkB22a7Io1lxLMTt7m0TByGtjMv3RTyrg=;
-        b=gVsQjMogcMlba2G+MWVH2wTm12k64aY8XELYr7M0rd6FD/jG4JLnNEljKQfBFskUjo
-         mux1pGnaTXHT9mp1gDgT7KomP65A63Ydu8iyrAEl4S57/a2QKSvSV70A8xcdcRo6do0S
-         pkVBfGVBqMCjFjgoeepyK/vtFSDeMQViunIWNHjocyV7FzSQJaPrStghLb/El1/an3Ac
-         E4fZn7qU9dqORQFHMo0rzLr4GkSJBFQeEo7ipYrtrEVI+C5fiROIxnhZLPA1uii906wt
-         xqQSuL2ij4nx08NIc3roTKEBtnXNcAGgNJEx81fmajNtKAeiw9BhPDtLrurkPix0SSMK
-         mIiQ==
-X-Gm-Message-State: AOAM533jAhnfAVHC09soh9RDynaCCp7+sX2Z/D5TtwMCO62bbVzwYHz8
-        DloCmWsqa9KdctI64L5JC0/pEpPls9sukQ==
-X-Google-Smtp-Source: ABdhPJxoP8104/RU2hNpkLs0ZKSu1Lx2ot6WPRmbMPADTT2EUd+Syo9x7/4q7b5p0oDAh93yddqvAw==
-X-Received: by 2002:a17:906:564f:: with SMTP id v15mr16159958ejr.96.1619590452041;
+        bh=HN76YNCopOUfvfBy/lksY+1E2cxekdLf/6fjdkK043U=;
+        b=Vh+QQN1Bm5kUItHTiZxbCQCnTIltSiCgN2k2/UIoVXAk4xw3BNEXAWfha2D996s2Ew
+         BrONm7vdZcSJKai5+XFcY7Hn3OmBkBktGuKziq9yPDWEPdxUG3rMGEYDYbhZrhcpbEV6
+         MoBierIGcny9q7FcbKoYxYLTnVIunT3gaJMMHGptFvhfJROeeRi94D7AdLNY5JB7loCy
+         khRfXQbf5NJQ65Fop3LnJ4KM4Xzn2o2oqZ7kd2xpRh1R3gHkj8RJrikMLyOgNMsfpv+C
+         SRc+7kwMKRgoxISZ2tJXY7aJRsb6Iu05+J0yewA5WvBkRVlH/A9AIjMaEN6XqqBjfCfR
+         aKbA==
+X-Gm-Message-State: AOAM530btInzvtfOnZbeeD4jwtfxcUdlIiWNPIBYl5MX+Hfe6M3oCW0B
+        Xj6o6WeVH15ymfjLswfaWacWmskZMf0VDg==
+X-Google-Smtp-Source: ABdhPJw280wLG65bMjbT4bjeZulTXoATrvsKQqD+rUXLUaMcnBuNcoNX36QkShYeMPpbwfDY7gofKQ==
+X-Received: by 2002:a17:906:4486:: with SMTP id y6mr10435953ejo.466.1619590452644;
         Tue, 27 Apr 2021 23:14:12 -0700 (PDT)
 Received: from gkim-laptop.fkb.profitbricks.net (ip5f5ae8b9.dynamic.kabel-deutschland.de. [95.90.232.185])
-        by smtp.googlemail.com with ESMTPSA id t4sm3970322edd.6.2021.04.27.23.14.11
+        by smtp.googlemail.com with ESMTPSA id t4sm3970322edd.6.2021.04.27.23.14.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Apr 2021 23:14:11 -0700 (PDT)
+        Tue, 27 Apr 2021 23:14:12 -0700 (PDT)
 From:   Gioh Kim <gi-oh.kim@ionos.com>
 To:     linux-block@vger.kernel.org
 Cc:     axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
         bvanassche@acm.org, haris.iqbal@ionos.com, jinpu.wang@ionos.com,
-        Dima Stepanov <dmitrii.stepanov@cloud.ionos.com>,
-        Dima Stepanov <dmitrii.stepanov@ionos.com>,
+        Md Haris Iqbal <haris.iqbal@cloud.ionos.com>,
+        Guoqing Jiang <guoqing.jiang@ionos.com>,
         Gioh Kim <gi-oh.kim@ionos.com>
-Subject: [PATCH for-next 2/4] block/rnbd: Fix style issues
-Date:   Wed, 28 Apr 2021 08:13:57 +0200
-Message-Id: <20210428061359.206794-3-gi-oh.kim@ionos.com>
+Subject: [PATCH for-next 3/4] block/rnbd-clt: Check the return value of the function rtrs_clt_query
+Date:   Wed, 28 Apr 2021 08:13:58 +0200
+Message-Id: <20210428061359.206794-4-gi-oh.kim@ionos.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210428061359.206794-1-gi-oh.kim@ionos.com>
 References: <20210428061359.206794-1-gi-oh.kim@ionos.com>
@@ -75,65 +75,51 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Dima Stepanov <dmitrii.stepanov@cloud.ionos.com>
+From: Md Haris Iqbal <haris.iqbal@cloud.ionos.com>
 
-This patch fixes some style issues detected by scripts/checkpatch.pl
-* Resolve spacing and tab issues
-* Remove extra braces in rnbd_get_iu
-* Use num_possible_cpus() instead of NR_CPUS in alloc_sess
-* Fix the comments styling in rnbd_queue_rq
+In case none of the paths are in connected state, the function
+rtrs_clt_query returns an error. In such a case, error out since the
+values in the rtrs_attrs structure would be garbage.
 
-Signed-off-by: Dima Stepanov <dmitrii.stepanov@ionos.com>
-Signed-off-by: Gioh Kim <gi-oh.kim@ionos.com>
+Fixes: f7a7a5c228d45 ("block/rnbd: client: main functionality")
 Signed-off-by: Md Haris Iqbal <haris.iqbal@ionos.com>
+Reviewed-by: Guoqing Jiang <guoqing.jiang@ionos.com>
 Signed-off-by: Jack Wang <jinpu.wang@ionos.com>
+Signed-off-by: Gioh Kim <gi-oh.kim@ionos.com>
 ---
- drivers/block/rnbd/rnbd-clt.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ drivers/block/rnbd/rnbd-clt.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.c
-index c01786afe1b1..15f831159c31 100644
+index 15f831159c31..f855bf1fa8d5 100644
 --- a/drivers/block/rnbd/rnbd-clt.c
 +++ b/drivers/block/rnbd/rnbd-clt.c
-@@ -88,7 +88,7 @@ static int rnbd_clt_set_dev_attr(struct rnbd_clt_dev *dev,
- 	dev->discard_alignment	    = le32_to_cpu(rsp->discard_alignment);
- 	dev->secure_discard	    = le16_to_cpu(rsp->secure_discard);
- 	dev->rotational		    = rsp->rotational;
--	dev->wc 		    = !!(rsp->cache_policy & RNBD_WRITEBACK);
-+	dev->wc			    = !!(rsp->cache_policy & RNBD_WRITEBACK);
- 	dev->fua		    = !!(rsp->cache_policy & RNBD_FUA);
+@@ -691,7 +691,11 @@ static void remap_devs(struct rnbd_clt_session *sess)
+ 		return;
+ 	}
  
- 	dev->max_hw_sectors = sess->max_io_size / SECTOR_SIZE;
-@@ -351,9 +351,8 @@ static struct rnbd_iu *rnbd_get_iu(struct rnbd_clt_session *sess,
- 	struct rtrs_permit *permit;
+-	rtrs_clt_query(sess->rtrs, &attrs);
++	err = rtrs_clt_query(sess->rtrs, &attrs);
++	if (err) {
++		pr_err("rtrs_clt_query(\"%s\"): %d\n", sess->sessname, err);
++		return;
++	}
+ 	mutex_lock(&sess->lock);
+ 	sess->max_io_size = attrs.max_io_size;
  
- 	iu = kzalloc(sizeof(*iu), GFP_KERNEL);
--	if (!iu) {
-+	if (!iu)
- 		return NULL;
--	}
- 
- 	permit = rnbd_get_permit(sess, con_type, wait);
- 	if (unlikely(!permit)) {
-@@ -805,7 +804,7 @@ static struct rnbd_clt_session *alloc_sess(const char *sessname)
- 	mutex_init(&sess->lock);
- 	INIT_LIST_HEAD(&sess->devs_list);
- 	INIT_LIST_HEAD(&sess->list);
--	bitmap_zero(sess->cpu_queues_bm, NR_CPUS);
-+	bitmap_zero(sess->cpu_queues_bm, num_possible_cpus());
- 	init_waitqueue_head(&sess->rtrs_waitq);
- 	refcount_set(&sess->refcount, 1);
- 
-@@ -1148,7 +1147,8 @@ static blk_status_t rnbd_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	iu->sgt.sgl = iu->first_sgl;
- 	err = sg_alloc_table_chained(&iu->sgt,
- 				     /* Even-if the request has no segment,
--				      * sglist must have one entry at least */
-+				      * sglist must have one entry at least.
-+				      */
- 				     blk_rq_nr_phys_segments(rq) ? : 1,
- 				     iu->sgt.sgl,
- 				     RNBD_INLINE_SG_CNT);
+@@ -1294,7 +1298,11 @@ find_and_get_or_create_sess(const char *sessname,
+ 		err = PTR_ERR(sess->rtrs);
+ 		goto wake_up_and_put;
+ 	}
+-	rtrs_clt_query(sess->rtrs, &attrs);
++
++	err = rtrs_clt_query(sess->rtrs, &attrs);
++	if (err)
++		goto close_rtrs;
++
+ 	sess->max_io_size = attrs.max_io_size;
+ 	sess->queue_depth = attrs.queue_depth;
+ 	sess->nr_poll_queues = nr_poll_queues;
 -- 
 2.25.1
 
