@@ -2,167 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.4 required=3.0 tests=BAYES_00,DATE_IN_PAST_06_12,
-	DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07F54C43603
-	for <linux-block@archiver.kernel.org>; Wed, 28 Apr 2021 05:35:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B19AC433B4
+	for <linux-block@archiver.kernel.org>; Wed, 28 Apr 2021 06:14:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E5D8B6103E
-	for <linux-block@archiver.kernel.org>; Wed, 28 Apr 2021 05:35:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2E35461411
+	for <linux-block@archiver.kernel.org>; Wed, 28 Apr 2021 06:14:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236021AbhD1Fgm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Apr 2021 01:36:42 -0400
-Received: from saphodev.broadcom.com ([192.19.11.229]:58708 "EHLO
-        relay.smtp-ext.broadcom.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235881AbhD1Fgb (ORCPT
+        id S235970AbhD1GOy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Apr 2021 02:14:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36074 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229464AbhD1GOy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Apr 2021 01:36:31 -0400
-Received: from localhost.localdomain (unknown [10.157.2.20])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by relay.smtp-ext.broadcom.com (Postfix) with ESMTPS id 5F73CE927F;
-        Tue, 27 Apr 2021 22:27:22 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 relay.smtp-ext.broadcom.com 5F73CE927F
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=broadcom.com;
-        s=dkimrelay; t=1619587644;
-        bh=GwqqbqUaXlgRIum8rW5bucsuUv5+HN8geDLAf8yJJ2M=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=C4Yhb6zuc0n8u3nyFX352Yfoj095kbm/117Y0zzhhQgROtor4armLcy0Fdt+ime1n
-         NivAZ+vc7vOwieixsgb0VMHRj+09fbtCGqKmMU4lHsEIuBbIFKqtKoWMGMpQzpGFCl
-         7Kadpmn7oWd3N/r7HdphwwI6nPE0T9PX886tMuy4=
-From:   Muneendra <muneendra.kumar@broadcom.com>
-To:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        tj@kernel.org, linux-nvme@lists.infradead.org, hare@suse.de
-Cc:     jsmart2021@gmail.com, emilne@redhat.com, mkumar@redhat.com,
-        Gaurav Srivastava <gaurav.srivastava@broadcom.com>
-Subject: [PATCH v10 05/13] lpfc: vmid: VMID params initialization
-Date:   Wed, 28 Apr 2021 04:04:49 +0530
-Message-Id: <1619562897-14062-6-git-send-email-muneendra.kumar@broadcom.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1619562897-14062-1-git-send-email-muneendra.kumar@broadcom.com>
-References: <1619562897-14062-1-git-send-email-muneendra.kumar@broadcom.com>
+        Wed, 28 Apr 2021 02:14:54 -0400
+Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1F2CC061574
+        for <linux-block@vger.kernel.org>; Tue, 27 Apr 2021 23:14:09 -0700 (PDT)
+Received: by mail-ej1-x632.google.com with SMTP id w3so92888308ejc.4
+        for <linux-block@vger.kernel.org>; Tue, 27 Apr 2021 23:14:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ionos.com; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=vAs0GtEOvs8uARxFT+1JD+buu8xhLde1VOWSmhnnggs=;
+        b=b4rNF8HawvUaB1WVzNy7njpfatTRjPrXXd2AmyothbZHbky9Z0JCDvAIJSPOgCD9lk
+         ecO4RRqq+qQzdK6jzolGXj7X9RqKXHYJ0lA34XRcxideMC04Oih0LKMHu4L2NJXpfT0J
+         IxBD+xRIFMoFC59yyL/pjUCcF5ftwBTnNP0cArNIEA+9ijOeT40ip/R9dNp2RlWkeN1N
+         9vsYxtkztcIp657aL7WxaAJVXz84LcCLjd0gRuBxQRrndKxM/lvinhGbBfPNzR/Hqymm
+         AYTUNbQ6XCDMyU5yToNlvfzRXCzZWjp1sSgljwnWU28nOAtHQAi3gny5NW17w/p6kRzE
+         S6kg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=vAs0GtEOvs8uARxFT+1JD+buu8xhLde1VOWSmhnnggs=;
+        b=P4M/157xCVvr+1fFd97aPo6UNbMzHit+16pA16ZQ8dsjUmp4PfhcZsKrhhoBBdr2vF
+         m6r6nW3Wsn3tVZx9LkH9k2tSs63SjzIrS+EmusoBqc21hVPpLIso+g/kAb3LSXntwlf4
+         soXsS4PMSf2Ravk3adfJEFAsbSKcka4dP+DvZyb6GhS43lcrvWUphpHIvXHW83pyFpKq
+         dwP0v0WrwtFdKUPSH0MASW58V4tftNCkqsvGMX3aZtEwXCEcbOJUezLPuvJA1A1aoNDL
+         SpW8ixkIHGSEdXW97By4MNXVLhjkQt1WtoszRVt8UHC3KVyjiNhRCySfFH89XtiGoqjG
+         5VSA==
+X-Gm-Message-State: AOAM532Uzh+pbrBr4fAuxNw+pxYYbbK/Fyz4PELACsPsyfsP/xpssYJk
+        q+jV0UlkiGVC/FlWwOomOtzTpVeWDyXNnQ==
+X-Google-Smtp-Source: ABdhPJwG3AYKjyCCOi8Y33eJxOp8E4pvfNFaGVTrguYv+M5eFyaesPvIzlu5RMjC7AG7O1vGQyv0SA==
+X-Received: by 2002:a17:906:1fca:: with SMTP id e10mr14825359ejt.486.1619590448450;
+        Tue, 27 Apr 2021 23:14:08 -0700 (PDT)
+Received: from gkim-laptop.fkb.profitbricks.net (ip5f5ae8b9.dynamic.kabel-deutschland.de. [95.90.232.185])
+        by smtp.googlemail.com with ESMTPSA id t4sm3970322edd.6.2021.04.27.23.14.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Apr 2021 23:14:08 -0700 (PDT)
+From:   Gioh Kim <gi-oh.kim@ionos.com>
+To:     linux-block@vger.kernel.org
+Cc:     axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
+        bvanassche@acm.org, haris.iqbal@ionos.com, jinpu.wang@ionos.com,
+        Gioh Kim <gi-oh.kim@ionos.com>
+Subject: [PATCH for-next 0/4] Misc update for RNBD
+Date:   Wed, 28 Apr 2021 08:13:55 +0200
+Message-Id: <20210428061359.206794-1-gi-oh.kim@ionos.com>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Gaurav Srivastava <gaurav.srivastava@broadcom.com>
+Some misc updates for RNBD:
+* Remove unnecessary likely/unlikely macro from if-else statement
+* Fix coding style issues reported by checkpatch.pl
+* Add error check
 
-This patch initializes the VMID parameters like the type of vmid, max
-number of vmids supported and timeout value for the vmid registration
-based on the user input.
+Dima Stepanov (1):
+  block/rnbd: Fix style issues
 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-Signed-off-by: Gaurav Srivastava <gaurav.srivastava@broadcom.com>
-Signed-off-by: James Smart <jsmart2021@gmail.com>
+Gioh Kim (1):
+  block/rnbd: Remove all likely and unlikely
 
----
-v10:
-No change
+Md Haris Iqbal (2):
+  block/rnbd-clt: Change queue_depth type in rnbd_clt_session to size_t
+  block/rnbd-clt: Check the return value of the function rtrs_clt_query
 
-v9:
-updated comments
+ drivers/block/rnbd/rnbd-clt.c | 46 ++++++++++++++++++++---------------
+ drivers/block/rnbd/rnbd-clt.h |  2 +-
+ drivers/block/rnbd/rnbd-srv.c |  2 +-
+ 3 files changed, 29 insertions(+), 21 deletions(-)
 
-v8:
-No change
-
-v7:
-No change
-
-v6:
-No change
-
-v5:
-No change
-
-v4:
-No change
-
-v3:
-No change
-
-v2:
-Ported the patch on top of 5.10/scsi-queue
----
- drivers/scsi/lpfc/lpfc_attr.c | 48 +++++++++++++++++++++++++++++++++++
- 1 file changed, 48 insertions(+)
-
-diff --git a/drivers/scsi/lpfc/lpfc_attr.c b/drivers/scsi/lpfc/lpfc_attr.c
-index 0975a8b252a0..21646af8eafd 100644
---- a/drivers/scsi/lpfc/lpfc_attr.c
-+++ b/drivers/scsi/lpfc/lpfc_attr.c
-@@ -6153,6 +6153,45 @@ LPFC_ATTR_RW(enable_dpp, 1, 0, 1, "Enable Direct Packet Push");
-  */
- LPFC_ATTR_R(enable_mi, 1, 0, 1, "Enable MI");
- 
-+/*
-+ * lpfc_max_vmid: Maximum number of VMs to be tagged. This is valid only if
-+ * either vmid_app_header or vmid_priority_tagging is enabled.
-+ *       4 - 255  = vmid support enabled for 4-255 VMs
-+ *       Value range is [4,255].
-+ */
-+LPFC_ATTR_RW(max_vmid, LPFC_MIN_VMID, LPFC_MIN_VMID, LPFC_MAX_VMID,
-+	     "Maximum number of VMs supported");
-+
-+/*
-+ * lpfc_vmid_inactivity_timeout: Inactivity timeout duration in hours
-+ *       0  = Timeout is disabled
-+ * Value range is [0,24].
-+ */
-+LPFC_ATTR_RW(vmid_inactivity_timeout, 4, 0, 24,
-+	     "Inactivity timeout in hours");
-+
-+/*
-+ * lpfc_vmid_app_header: Enable App Header VMID support
-+ *       0  = Support is disabled (default)
-+ *       1  = Support is enabled
-+ * Value range is [0,1].
-+ */
-+LPFC_ATTR_RW(vmid_app_header, LPFC_VMID_APP_HEADER_DISABLE,
-+	     LPFC_VMID_APP_HEADER_DISABLE, LPFC_VMID_APP_HEADER_ENABLE,
-+	     "Enable App Header VMID support");
-+
-+/*
-+ * lpfc_vmid_priority_tagging: Enable Priority Tagging VMID support
-+ *       0  = Support is disabled (default)
-+ *       1  = Allow supported targets only
-+ *       2  = Allow all targets
-+ * Value range is [0,2].
-+ */
-+LPFC_ATTR_RW(vmid_priority_tagging, LPFC_VMID_PRIO_TAG_DISABLE,
-+	     LPFC_VMID_PRIO_TAG_DISABLE,
-+	     LPFC_VMID_PRIO_TAG_ALL_TARGETS,
-+	     "Enable Priority Tagging VMID support");
-+
- struct device_attribute *lpfc_hba_attrs[] = {
- 	&dev_attr_nvme_info,
- 	&dev_attr_scsi_stat,
-@@ -6271,6 +6310,10 @@ struct device_attribute *lpfc_hba_attrs[] = {
- 	&dev_attr_lpfc_enable_bbcr,
- 	&dev_attr_lpfc_enable_dpp,
- 	&dev_attr_lpfc_enable_mi,
-+	&dev_attr_lpfc_max_vmid,
-+	&dev_attr_lpfc_vmid_inactivity_timeout,
-+	&dev_attr_lpfc_vmid_app_header,
-+	&dev_attr_lpfc_vmid_priority_tagging,
- 	NULL,
- };
- 
-@@ -7346,6 +7389,11 @@ lpfc_get_cfgparam(struct lpfc_hba *phba)
- 	lpfc_enable_hba_heartbeat_init(phba, lpfc_enable_hba_heartbeat);
- 
- 	lpfc_EnableXLane_init(phba, lpfc_EnableXLane);
-+	/* VMID Inits */
-+	lpfc_max_vmid_init(phba, lpfc_max_vmid);
-+	lpfc_vmid_inactivity_timeout_init(phba, lpfc_vmid_inactivity_timeout);
-+	lpfc_vmid_app_header_init(phba, lpfc_vmid_app_header);
-+	lpfc_vmid_priority_tagging_init(phba, lpfc_vmid_priority_tagging);
- 	if (phba->sli_rev != LPFC_SLI_REV4)
- 		phba->cfg_EnableXLane = 0;
- 	lpfc_XLanePriority_init(phba, lpfc_XLanePriority);
 -- 
-2.26.2
+2.25.1
 
