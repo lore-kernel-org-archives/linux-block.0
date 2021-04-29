@@ -2,47 +2,102 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_NONE,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45B13C433ED
-	for <linux-block@archiver.kernel.org>; Thu, 29 Apr 2021 07:32:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C17A0C43462
+	for <linux-block@archiver.kernel.org>; Thu, 29 Apr 2021 07:37:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0CABB6143E
-	for <linux-block@archiver.kernel.org>; Thu, 29 Apr 2021 07:32:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 90E2D613BD
+	for <linux-block@archiver.kernel.org>; Thu, 29 Apr 2021 07:37:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230174AbhD2Hc5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 29 Apr 2021 03:32:57 -0400
-Received: from verein.lst.de ([213.95.11.211]:52107 "EHLO verein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229814AbhD2Hcy (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Apr 2021 03:32:54 -0400
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 4823967373; Thu, 29 Apr 2021 09:32:06 +0200 (CEST)
-Date:   Thu, 29 Apr 2021 09:32:06 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org
-Subject: Can we make the io_poll queue attibute read-only
-Message-ID: <20210429073206.GA3925@lst.de>
+        id S229814AbhD2HiM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Apr 2021 03:38:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27285 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232041AbhD2HiK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 29 Apr 2021 03:38:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1619681787;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=UGPeB0oPu7QqJ34l/K46kw94SL7UJPriwj0KM6YFO5w=;
+        b=YMylXDa4Oi2gEdpsaJLRFtBnjl+klKIBGUxqa6pSGv9pFs7FYlJms6JzWqp52kY5ZHxDRH
+        nUe9mV3Aao/FN6aNmLzAPmnf0Cbe7cyIQQJL6xYLMxu5agkiCN5uoIIJ9fAHKMFA2tG9V+
+        5hvyTFGZeRlkOj90NEwoMxz87A2Juhg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-535-835luwuLOA2_zlKMLQmZQw-1; Thu, 29 Apr 2021 03:36:15 -0400
+X-MC-Unique: 835luwuLOA2_zlKMLQmZQw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F0EA7501E3;
+        Thu, 29 Apr 2021 07:36:13 +0000 (UTC)
+Received: from T590 (ovpn-13-18.pek2.redhat.com [10.72.13.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 382FD610DF;
+        Thu, 29 Apr 2021 07:36:04 +0000 (UTC)
+Date:   Thu, 29 Apr 2021 15:36:14 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Jeffle Xu <jefflexu@linux.alibaba.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Keith Busch <kbusch@kernel.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        "Wunderlich, Mark" <mark.wunderlich@intel.com>,
+        "Vasudevan, Anil" <anil.vasudevan@intel.com>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH 12/15] block: switch polling to be bio based
+Message-ID: <YIph7qLu4wL5QEXK@T590>
+References: <20210427161619.1294399-1-hch@lst.de>
+ <20210427161619.1294399-13-hch@lst.de>
+ <YIjIOgYS29GvcoIm@T590>
+ <20210429072028.GA3682@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20210429072028.GA3682@lst.de>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
+On Thu, Apr 29, 2021 at 09:20:28AM +0200, Christoph Hellwig wrote:
+> On Wed, Apr 28, 2021 at 10:28:10AM +0800, Ming Lei wrote:
+> 
+> > ...
+> 
+> Can you please avoid the full quote?
+> 
+> > > +	 *  1) the bio is beeing initialized and bi_bdev is NULL.  We can just
+> > > +	 *     simply nothing in this case
+> > > +	 *  2) the bio points to a not poll enabled device.  bio_poll will catch
+> > > +	 *     this and return 0
+> > > +	 *  3) the bio points to a poll capable device, including but not
+> > > +	 *     limited to the one that the original bio pointed to.  In this
+> > > +	 *     case we will call into the actual poll method and poll for I/O,
+> > > +	 *     even if we don't need to, but it won't cause harm either.
+> > > +	 */
+> > > +	rcu_read_lock();
+> > > +	bio = READ_ONCE(kiocb->private);
+> > > +	if (bio && bio->bi_bdev)
+> > 
+> > ->bi_bdev and associated disk/request_queue/hctx/... refrerred in bio_poll()
+> > may have being freed now, so there is UAF risk.
+> 
+> the block device is RCU freed, so we are fine there.  There rest OTOH
+> is more interesting.  Let me think of a good defense using some kind
+> of liveness check.
 
-while looking at the polling code I wonder if we have to keep supporting
-the change of the io_poll attribute and thus the poll flag on a live
-queue.  The support to change this goes back to before supporting the
-explicit poll queues, and was used as the prime interface to enable
-polling.  Now that we use explicit poll queues the driver specific
-paramters to set them up work as the prime interface to enable polling.
-They can still be changed at runtime, although much more invasively
-(i.e. controller reset in nvme).  The upside is that we don't need
-to bother with draining the bios and two queue flags, and don't have
-a confusing duplicated user interface.
+Or hold gendisk reference in bdev lifetime, then everything referred
+won't be released until bdev is freed.
+
+
+Thanks,
+Ming
+
