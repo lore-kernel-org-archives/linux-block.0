@@ -2,96 +2,96 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72D47C433B4
-	for <linux-block@archiver.kernel.org>; Thu, 29 Apr 2021 07:37:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84FDDC433B4
+	for <linux-block@archiver.kernel.org>; Thu, 29 Apr 2021 08:33:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4164961449
-	for <linux-block@archiver.kernel.org>; Thu, 29 Apr 2021 07:37:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5122C6144B
+	for <linux-block@archiver.kernel.org>; Thu, 29 Apr 2021 08:33:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239628AbhD2Hij (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 29 Apr 2021 03:38:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:34010 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239620AbhD2Hih (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Apr 2021 03:38:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619681871;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        id S233500AbhD2Id5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Apr 2021 04:33:57 -0400
+Received: from mx2.suse.de ([195.135.220.15]:53716 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229963AbhD2Id5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 29 Apr 2021 04:33:57 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1619685190; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=XQq6HQYt2KRjmeddb0bfJBsySmGjBP/o+T78t28weow=;
-        b=AYSNRH6BzxVmMeB69TEDc9a86sx+LDqUh7Ltqk2rxhe1w3mMnakbLVBfvHtB3mJJVoQCx0
-        IsPx5rrpzfczipEUWjU6iTmJXhwH8xTA4tVLlZius9qu0DVOz0lN65cUuXx7ptL+U58YRB
-        s7gUJPRi31wyoKOmiP9S6YJiP8q75e0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-92-sQzD-JKHPo2u51Wi4EQpVA-1; Thu, 29 Apr 2021 03:37:47 -0400
-X-MC-Unique: sQzD-JKHPo2u51Wi4EQpVA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5D9E610054F6;
-        Thu, 29 Apr 2021 07:37:46 +0000 (UTC)
-Received: from T590 (ovpn-13-18.pek2.redhat.com [10.72.13.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 98FA519714;
-        Thu, 29 Apr 2021 07:37:37 +0000 (UTC)
-Date:   Thu, 29 Apr 2021 15:37:47 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Jeffle Xu <jefflexu@linux.alibaba.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Keith Busch <kbusch@kernel.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        "Wunderlich, Mark" <mark.wunderlich@intel.com>,
-        "Vasudevan, Anil" <anil.vasudevan@intel.com>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH 14/15] nvme-multipath: set QUEUE_FLAG_NOWAIT
-Message-ID: <YIpiS0d1NeoX6p0H@T590>
-References: <20210427161619.1294399-1-hch@lst.de>
- <20210427161619.1294399-15-hch@lst.de>
- <YIjJRiyA26gELV+d@T590>
- <20210429072737.GA3873@lst.de>
+        bh=qak55GfNaKxIGtgsOFH5doKuWUhF4eaklkmtwDAOwtU=;
+        b=IB4ZzRukWMYhQGmtKKe3341NMIIwiDKQVVGEjAsbdV3bf7g/jcEoaRBhDreJB0qkrTcFPI
+        kweyBhtvO0dQ7Tj/nrvFcZtnagjNQYHB5jhI+rIcbCsDIO1jnAUtgCSJJh8spgBcODZiU4
+        QWZ6pPYpSLTvqA8gaIcANANO43mLEUw=
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id 0D247B2BF;
+        Thu, 29 Apr 2021 08:33:10 +0000 (UTC)
+Message-ID: <26ac367a5a09ff5de628717721425fbc03018f44.camel@suse.com>
+Subject: Re: dm: dm_blk_ioctl(): implement failover for SG_IO on dm-multipath
+From:   Martin Wilck <mwilck@suse.com>
+To:     Mike Snitzer <snitzer@redhat.com>
+Cc:     Alasdair G Kergon <agk@redhat.com>, dm-devel@redhat.com,
+        Hannes Reinecke <hare@suse.de>,
+        Daniel Wagner <dwagner@suse.de>, linux-block@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Christoph Hellwig <hch@lst.de>, linux-scsi@vger.kernel.org
+Date:   Thu, 29 Apr 2021 10:33:09 +0200
+In-Reply-To: <20210428195457.GA46518@lobo>
+References: <20210422202130.30906-1-mwilck@suse.com>
+         <20210428195457.GA46518@lobo>
+Content-Type: text/plain; charset="ISO-8859-15"
+User-Agent: Evolution 3.38.4 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210429072737.GA3873@lst.de>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Apr 29, 2021 at 09:27:37AM +0200, Christoph Hellwig wrote:
-> On Wed, Apr 28, 2021 at 10:32:38AM +0800, Ming Lei wrote:
-> > > diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
-> > > index 4e2c3a6787e9..1d17b2387884 100644
-> > > --- a/drivers/nvme/host/multipath.c
-> > > +++ b/drivers/nvme/host/multipath.c
-> > > @@ -442,6 +442,8 @@ int nvme_mpath_alloc_disk(struct nvme_ctrl *ctrl, struct nvme_ns_head *head)
-> > >  	if (!q)
-> > >  		goto out;
-> > >  	blk_queue_flag_set(QUEUE_FLAG_NONROT, q);
-> > > +	blk_queue_flag_set(QUEUE_FLAG_NOWAIT, q);
-> > 
-> > BLK_MQ_F_BLOCKING is set for nvme-tcp, and the blocking may be done inside
-> > nvme_ns_head_submit_bio(), is that one problem?
+On Wed, 2021-04-28 at 15:54 -0400, Mike Snitzer wrote:
 > 
-> The point of BLK_MQ_F_BLOCKING is that ->queue_rq can block, and
-> because of that it is not called from the submitting context but in
-> a work queue.  nvme-tcp also sets QUEUE_FLAG_NOWAIT, just like all blk-mq
-> drivers.
+> @@ -626,32 +626,16 @@ static int dm_sg_io_ioctl(struct block_device
+> *bdev, fmode_t mode,
+>                 }
+>  
+>                 if (rhdr.info & SG_INFO_CHECK) {
+> -                       /*
+> -                        * See if this is a target or path error.
+> -                        * Compare blk_path_error(),
+> scsi_result_to_blk_status(),
+> -                        * blk_errors[].
+> -                        */
+> -                       switch (rhdr.host_status) {
+> -                       case DID_OK:
+> -                               if (scsi_status_is_good(rhdr.status))
+> -                                       rc = 0;
+> -                               break;
+> -                       case DID_TARGET_FAILURE:
+> -                               rc = -EREMOTEIO;
+> -                               goto out;
+> -                       case DID_NEXUS_FAILURE:
+> -                               rc = -EBADE;
+> -                               goto out;
+> -                       case DID_ALLOC_FAILURE:
+> -                               rc = -ENOSPC;
+> -                               goto out;
+> -                       case DID_MEDIUM_ERROR:
+> -                               rc = -ENODATA;
+> -                               goto out;
+> -                       default:
+> -                               /* Everything else is a path error */
+> +                       blk_status_t sts =
+> scsi_result_to_blk_status(rhdr.host_status, NULL);
 
-BLK_MQ_F_BLOCKING can be called from submitting context, see
-blk_mq_try_issue_directly().
+This change makes dm_mod depend on scsi_mod. 
+Would you seriously prefer that over a re-implementation of the logic?
 
+Regards
+Martin
 
-
-Thanks,
-Ming
 
