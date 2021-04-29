@@ -2,196 +2,138 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5A7CC433B4
-	for <linux-block@archiver.kernel.org>; Thu, 29 Apr 2021 06:02:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86DF1C433ED
+	for <linux-block@archiver.kernel.org>; Thu, 29 Apr 2021 06:57:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8772761434
-	for <linux-block@archiver.kernel.org>; Thu, 29 Apr 2021 06:02:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5228161453
+	for <linux-block@archiver.kernel.org>; Thu, 29 Apr 2021 06:57:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230309AbhD2GDA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 29 Apr 2021 02:03:00 -0400
-Received: from mx2.suse.de ([195.135.220.15]:33318 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229814AbhD2GC7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Apr 2021 02:02:59 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id CE8ECAF16;
-        Thu, 29 Apr 2021 06:02:12 +0000 (UTC)
-Subject: Re: dm: dm_blk_ioctl(): implement failover for SG_IO on dm-multipath
-To:     Mike Snitzer <snitzer@redhat.com>, mwilck@suse.com
-Cc:     Alasdair G Kergon <agk@redhat.com>, dm-devel@redhat.com,
-        Daniel Wagner <dwagner@suse.de>, linux-block@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Christoph Hellwig <hch@lst.de>, linux-scsi@vger.kernel.org
-References: <20210422202130.30906-1-mwilck@suse.com>
- <20210428195457.GA46518@lobo>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <7124009b-1ea5-61eb-419f-956e659a0996@suse.de>
-Date:   Thu, 29 Apr 2021 08:02:12 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.0
+        id S234443AbhD2G5w (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Apr 2021 02:57:52 -0400
+Received: from mailout3.samsung.com ([203.254.224.33]:10710 "EHLO
+        mailout3.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230174AbhD2G5v (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 29 Apr 2021 02:57:51 -0400
+Received: from epcas1p4.samsung.com (unknown [182.195.41.48])
+        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20210429065703epoutp032b9779e32798249ba01308022b07b8a3~6Qdq4LiGd1509215092epoutp03N
+        for <linux-block@vger.kernel.org>; Thu, 29 Apr 2021 06:57:03 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20210429065703epoutp032b9779e32798249ba01308022b07b8a3~6Qdq4LiGd1509215092epoutp03N
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1619679423;
+        bh=G79yVibCe2K55l+NgP4yOi1BUZxF76594HnvvKnDoYE=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=ncQUsxgVnamnzBAPozVdFTbj6X5wFWIM0nRfkE4e2jPZq37zp80+1yif9Bmg/t7+l
+         A+2Q/fZcWglcCTdqzZ5yPLZ0K35pfjxeVx8hnCDgF/yj76xCqTzpbqVrg9+e4Ob88Y
+         d64B9lbbrCD/BHRELCSoLsTpvjrPo4tJwuUgRpfY=
+Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
+        epcas1p2.samsung.com (KnoxPortal) with ESMTP id
+        20210429065703epcas1p2e3b4717b78dba073cb85c47b68771896~6QdqXfSVO1806918069epcas1p2F;
+        Thu, 29 Apr 2021 06:57:03 +0000 (GMT)
+Received: from epsmges1p5.samsung.com (unknown [182.195.40.161]) by
+        epsnrtp2.localdomain (Postfix) with ESMTP id 4FW5sB0d9Gz4x9Q3; Thu, 29 Apr
+        2021 06:57:02 +0000 (GMT)
+Received: from epcas1p3.samsung.com ( [182.195.41.47]) by
+        epsmges1p5.samsung.com (Symantec Messaging Gateway) with SMTP id
+        F6.04.09736.DB85A806; Thu, 29 Apr 2021 15:57:01 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas1p3.samsung.com (KnoxPortal) with ESMTPA id
+        20210429065701epcas1p363667a6f0c598f27bb5afde32473ea39~6Qdo62nif2155021550epcas1p3c;
+        Thu, 29 Apr 2021 06:57:01 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20210429065701epsmtrp25a102e7ddb8bcaa0a68b51d968ad184d~6Qdo6CzmP2997629976epsmtrp24;
+        Thu, 29 Apr 2021 06:57:01 +0000 (GMT)
+X-AuditID: b6c32a39-8d9ff70000002608-4d-608a58bd21d5
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        AC.0A.08637.DB85A806; Thu, 29 Apr 2021 15:57:01 +0900 (KST)
+Received: from localhost.localdomain (unknown [10.253.99.105]) by
+        epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+        20210429065701epsmtip1f2c3898c9370c1cea000764e4c38371a~6Qdor_YNe2132421324epsmtip1e;
+        Thu, 29 Apr 2021 06:57:01 +0000 (GMT)
+From:   Changheun Lee <nanich.lee@samsung.com>
+To:     bvanassche@acm.org
+Cc:     axboe@kernel.dk, bgoncalv@redhat.com, hch@lst.de,
+        jaegeuk@kernel.org, linux-block@vger.kernel.org,
+        ming.lei@redhat.com, nanich.lee@samsung.com, yi.zhang@redhat.com
+Subject: Re: [PATCH v2] block: Improve limiting the bio size
+Date:   Thu, 29 Apr 2021 15:39:01 +0900
+Message-Id: <20210429063901.9593-1-nanich.lee@samsung.com>
+X-Mailer: git-send-email 2.29.0
+In-Reply-To: <a1759842-eb14-e477-fdf6-b6844e5aa29f@acm.org>
 MIME-Version: 1.0
-In-Reply-To: <20210428195457.GA46518@lobo>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprPJsWRmVeSWpSXmKPExsWy7bCmvu7eiK4Eg7PbrSxW3+1ns9h1cT6j
+        xbQPP5ktVq4+ymTxZP0sZou9t7QtDk1uZrK4dv8Mu8X1c9PYHDg9Ll/x9rh8ttRj06pONo/d
+        NxvYPN7vu8rm0bdlFaPH501yAexROTYZqYkpqUUKqXnJ+SmZeem2St7B8c7xpmYGhrqGlhbm
+        Sgp5ibmptkouPgG6bpk5QHcpKZQl5pQChQISi4uV9O1sivJLS1IVMvKLS2yVUgtScgoMDQr0
+        ihNzi0vz0vWS83OtDA0MjEyBKhNyMhZ+MCk4w1bx9cEu9gbGOaxdjJwcEgImEnsWrAGyuTiE
+        BHYwSry/Oo8dwvnEKHHzbwcTSJWQwDdGib+3bbsYOcA69q81h6jZyyhx4MddqO7PjBJtjw6A
+        NbAJ6Ej0vb3FBmKLCIhJXP7yjRGkiFlgNaNE683tYAlhARuJ5S93sYPYLAKqEod+3wZr5hWw
+        ktjzfzkbxH3yEn/u9zCD2JwC1hJn9+xkg6gRlDg58wkLiM0MVNO8dTYzyAIJgVYOibmdz9kh
+        ml0kjt+5zghhC0u8Or4FKi4l8fndXjaIhm5Giea2+YwQzgRGiSXPlzFBVBlLfPr8mRHkaWYB
+        TYn1u/QhwooSO3/PZYTYzCfx7msPKyRceCU62oQgSlQkzrTcZ4bZ9XztTqiJHhJ7ri1hgQRX
+        H6NEx8+fTBMYFWYheWgWkodmIWxewMi8ilEstaA4Nz212LDAFDmKNzGCU6qW5Q7G6W8/6B1i
+        ZOJgPMQowcGsJML7e11nghBvSmJlVWpRfnxRaU5q8SFGU2BwT2SWEk3OByb1vJJ4Q1MjY2Nj
+        CxMzczNTYyVx3nTn6gQhgfTEktTs1NSC1CKYPiYOTqkGJp4p/r2/1VVd/ktU1z+PNT9m/1TP
+        0f3j0+SdOyd/Evt51sjgx37uzRbbXuRtjVj5uaIlorXk4TkbjrKD9ySrBPYee/LsrBfbJGeH
+        n9cNWrp+Bot9PqXx82zlnL3th/aWPwxddvX15bjenKVT2bxclp3fPWWawYq66Iapifd2FH6Z
+        cDtRcsKDB0srN27ovN32xDfkjOP1sLcXfpnGTupsOfLdInOmjK/B0gkFfvb8Uyyy69OmxWfn
+        OXVumRCwm9NurX96UuQi6fJvSz+zp7AVlRtMcer42mdwoG7BU6Hp1xnyuSQW5ycdvlGlURtj
+        sGv3wbgp4XtO2PDM5g589Me6W+7etIzlk79sYb0cHnIrjkmJpTgj0VCLuag4EQB8V0R7MgQA
+        AA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrKLMWRmVeSWpSXmKPExsWy7bCSnO7eiK4Eg3/bpCxW3+1ns9h1cT6j
+        xbQPP5ktVq4+ymTxZP0sZou9t7QtDk1uZrK4dv8Mu8X1c9PYHDg9Ll/x9rh8ttRj06pONo/d
+        NxvYPN7vu8rm0bdlFaPH501yAexRXDYpqTmZZalF+nYJXBkLP5gUnGGr+PpgF3sD4xzWLkYO
+        DgkBE4n9a827GLk4hAR2M0pMe/2GuYuREyguJXH8xFuoGmGJw4eLIWo+MkocP3uIDaSGTUBH
+        ou/tLTBbREBM4vKXb4wgRcwCWxkl3v5bygiSEBawkVj+chc7iM0ioCpx6PdtJhCbV8BKYs//
+        5WwQy+Ql/tzvAVvMKWAtcXbPTjaQxUJANT/P+EOUC0qcnPmEBcRmBipv3jqbeQKjwCwkqVlI
+        UgsYmVYxSqYWFOem5xYbFhjmpZbrFSfmFpfmpesl5+duYgSHvJbmDsbtqz7oHWJk4mA8xCjB
+        wawkwvt7XWeCEG9KYmVValF+fFFpTmrxIUZpDhYlcd4LXSfjhQTSE0tSs1NTC1KLYLJMHJxS
+        DUy20V+nvbtx0r5q2ZeYEHbVXo7Qa+/Tp/Fs5FtpWHO+6OunGJ2VRt+LGxc7/PWTtXBWU02J
+        yQpkDk0PnflIfM2D6Y7CZhWPjbSKeizjYhYmx7f+rp778Oj15J+Op4yYNZTN1tyNTV5wZmuD
+        QxSHz2xOk8Vaxi++3Nq1d2bgrB87L18+Pf1inb30au+b3z7N3aeo9q7ulnBN56/p2YdKe7YL
+        yq6d1XBr8+ObjtsDm822yVoc9D5/d9WPLdNCDP67f0gp+nk5dfOC0Mkx14ROWe9PnXWGi0Nv
+        S8HprYKWa0zj1NvClKsenMg0fcKzdNdRvetlZwLc7BpTF14+d2PVxcdPaz8eTT+7q/jRqdPG
+        3GFcSizFGYmGWsxFxYkAMAQBkugCAAA=
+X-CMS-MailID: 20210429065701epcas1p363667a6f0c598f27bb5afde32473ea39
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: SVC_REQ_APPROVE
+CMS-TYPE: 101P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20210429065701epcas1p363667a6f0c598f27bb5afde32473ea39
+References: <a1759842-eb14-e477-fdf6-b6844e5aa29f@acm.org>
+        <CGME20210429065701epcas1p363667a6f0c598f27bb5afde32473ea39@epcas1p3.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/28/21 9:54 PM, Mike Snitzer wrote:
-> On Thu, Apr 22 2021 at  4:21P -0400,
-> mwilck@suse.com <mwilck@suse.com> wrote:
+> On 4/28/21 12:21 AM, Changheun Lee wrote:
+> > Actually I don't know why NULL pointer dereference is occurred with Bart's
+> > patch in blk_rq_map_kern(). And same problem have not occured yet in my
+> > test environment with Bart's patch.
+> > Maybe I missed something, or missunderstood?
 > 
->> From: Martin Wilck <mwilck@suse.com>
->>
->> In virtual deployments, SCSI passthrough over dm-multipath devices is a
->> common setup. The qemu "pr-helper" was specifically invented for it. I
->> believe that this is the most important real-world scenario for sending
->> SG_IO ioctls to device-mapper devices.
->>
->> In this configuration, guests send SCSI IO to the hypervisor in the form of
->> SG_IO ioctls issued by qemu. But on the device-mapper level, these SCSI
->> ioctls aren't treated like regular IO. Until commit 2361ae595352 ("dm mpath:
->> switch paths in dm_blk_ioctl() code path"), no path switching was done at
->> all. Worse though, if an SG_IO call fails because of a path error,
->> dm-multipath doesn't retry the IO on a another path; rather, the failure is
->> passed back to the guest, and paths are not marked as faulty.  This is in
->> stark contrast with regular block IO of guests on dm-multipath devices, and
->> certainly comes as a surprise to users who switch to SCSI passthrough in
->> qemu. In general, users of dm-multipath devices would probably expect failover
->> to work at least in a basic way.
->>
->> This patch fixes this by taking a special code path for SG_IO on request-
->> based device mapper targets. Rather then just choosing a single path,
->> sending the IO to it, and failing to the caller if the IO on the path
->> failed, it retries the same IO on another path for certain error codes,
->> using the same logic as blk_path_error() to determine if a retry would make
->> sense for the given error code. Moreover, it sends a message to the
->> multipath target to mark the path as failed.
->>
->> I am aware that this looks sort of hack-ish. I'm submitting it here as an
->> RFC, asking for guidance how to reach a clean implementation that would be
->> acceptable in mainline. I believe that it fixes an important problem.
->> Actually, it fixes the qemu SCSI-passthrough use case on dm-multipath,
->> which is non-functional without it.
->>
->> One problem remains open: if all paths in a multipath map are failed,
->> normal multipath IO may switch to queueing mode (depending on
->> configuration). This isn't possible for SG_IO, as SG_IO requests can't
->> easily be queued like regular block I/O. Thus in the "no path" case, the
->> guest will still see an error. If anybody can conceive of a solution for
->> that, I'd be interested.
->>
->> Signed-off-by: Martin Wilck <mwilck@suse.com>
->> ---
->>   block/scsi_ioctl.c     |   5 +-
->>   drivers/md/dm.c        | 134 ++++++++++++++++++++++++++++++++++++++++-
->>   include/linux/blkdev.h |   2 +
->>   3 files changed, 137 insertions(+), 4 deletions(-)
->>
->> diff --git a/block/scsi_ioctl.c b/block/scsi_ioctl.c
->> index 6599bac0a78c..bcc60552f7b1 100644
->> --- a/block/scsi_ioctl.c
->> +++ b/block/scsi_ioctl.c
->> @@ -279,8 +279,8 @@ static int blk_complete_sghdr_rq(struct request *rq, struct sg_io_hdr *hdr,
->>   	return ret;
->>   }
->>   
->> -static int sg_io(struct request_queue *q, struct gendisk *bd_disk,
->> -		struct sg_io_hdr *hdr, fmode_t mode)
->> +int sg_io(struct request_queue *q, struct gendisk *bd_disk,
->> +	  struct sg_io_hdr *hdr, fmode_t mode)
->>   {
->>   	unsigned long start_time;
->>   	ssize_t ret = 0;
->> @@ -369,6 +369,7 @@ static int sg_io(struct request_queue *q, struct gendisk *bd_disk,
->>   	blk_put_request(rq);
->>   	return ret;
->>   }
->> +EXPORT_SYMBOL_GPL(sg_io);
->>   
->>   /**
->>    * sg_scsi_ioctl  --  handle deprecated SCSI_IOCTL_SEND_COMMAND ioctl
->> diff --git a/drivers/md/dm.c b/drivers/md/dm.c
->> index 50b693d776d6..443ac5e5406c 100644
->> --- a/drivers/md/dm.c
->> +++ b/drivers/md/dm.c
->> @@ -29,6 +29,8 @@
->>   #include <linux/part_stat.h>
->>   #include <linux/blk-crypto.h>
->>   #include <linux/keyslot-manager.h>
->> +#include <scsi/sg.h>
->> +#include <scsi/scsi.h>
->>   
->>   #define DM_MSG_PREFIX "core"
->>   
+> The call trace that I shared on the linux-block mailing list was
+> encountered inside a VM that has a SATA disk attached to it and also a
+> SATA CD-ROM. Does replicating that setup allow to reproduce the NULL
+> pointer dereference that I reported?
 > 
-> Ngh... not loving this at all.  But here is a patch (that I didn't
-> compile test) that should be folded in, still have to think about how
-> this could be made cleaner in general though.
-> 
-> Also, dm_sg_io_ioctl should probably be in dm-rq.c (maybe even dm-mpath.c!?)
-> 
-I fully share your sentiments; this just feels so awkward, having to 
-redo the logic in scsi_cmd_ioctl().
+> Bart.
 
-My original idea to that was to _use_ scsi_cmd_ioctl() directly from 
-dm_blk_ioctl:
+I can reproduce and see NULL pointer dereference in same call path without
+your patch. But I can't reproduced it with your patch.
+I tested in ubuntu via grub. SATA disk is attached only in my environment.
+Actually I didn't test in VM yet. I'll try.
 
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index 50b693d776d6..007ff981f888 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -567,6 +567,9 @@ static int dm_blk_ioctl(struct block_device *bdev, 
-fmode_t mode,
-         struct mapped_device *md = bdev->bd_disk->private_data;
-         int r, srcu_idx;
+Thanks,
 
-+       if (cmd == SG_IO)
-+               return scsi_cmd_blk_ioctl(bdev, mode, cmd, arg);
-+
-         r = dm_prepare_ioctl(md, &srcu_idx, &bdev);
-         if (r < 0)
-                 goto out;
-
-
-But that crashes horribly as sg_io() expects the request pdu to be of 
-type 'scsi_request', which it definitely isn't here.
-
-We _could_ prepend struct dm_rq_target_io with a struct scsi_request, 
-seeing that basically _all_ dm-rq installations are on SCSI devices:
-
-diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
-index 13b4385f4d5a..aa7856621f83 100644
---- a/drivers/md/dm-rq.c
-+++ b/drivers/md/dm-rq.c
-@@ -16,6 +16,7 @@
-   * One of these is allocated per request.
-   */
-  struct dm_rq_target_io {
-+       struct scsi_request scsi_req;
-         struct mapped_device *md;
-         struct dm_target *ti;
-         struct request *orig, *clone;
-
-Then the above should work, but we would increase the size of 
-dm_rq_target_io by quite a lot. Although, given the current size of it, 
-question is whether it matters...
-
-Hmm?
-
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
+Changheun.
