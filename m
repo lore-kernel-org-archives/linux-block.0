@@ -2,123 +2,196 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F11CC433B4
-	for <linux-block@archiver.kernel.org>; Thu, 29 Apr 2021 02:35:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5A7CC433B4
+	for <linux-block@archiver.kernel.org>; Thu, 29 Apr 2021 06:02:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1CCE561450
-	for <linux-block@archiver.kernel.org>; Thu, 29 Apr 2021 02:35:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8772761434
+	for <linux-block@archiver.kernel.org>; Thu, 29 Apr 2021 06:02:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236041AbhD2CgN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Apr 2021 22:36:13 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38473 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230072AbhD2CgM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Apr 2021 22:36:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619663726;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=XQXeoS+XaQ76hbsBjxk9BFiNKkyWO53pTF0K8Fb40zY=;
-        b=SSFPctuBmlfgjYiIFUleZVo8p8bXNeiEeKca2zYcCFmrvxcei5EECZtSJqyGvUE6nF/XKJ
-        5FrVTEuhdiptfvrza067+mk2cw75TH0MsE3qfkw4D2i5ntEmCWxKdfIs79bbJb2xPsKbE7
-        WIrXeEE7/sqzfsCIJZwTtjVzqewG0Kw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-263-Rj56b4DFMYSuzICu-qcWDA-1; Wed, 28 Apr 2021 22:35:23 -0400
-X-MC-Unique: Rj56b4DFMYSuzICu-qcWDA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7D019801106;
-        Thu, 29 Apr 2021 02:35:21 +0000 (UTC)
-Received: from localhost (ovpn-12-135.pek2.redhat.com [10.72.12.135])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5EC842E09A;
-        Thu, 29 Apr 2021 02:35:17 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
-        Khazhy Kumykov <khazhy@google.com>,
-        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        Hannes Reinecke <hare@suse.de>,
-        John Garry <john.garry@huawei.com>,
-        David Jeffery <djeffery@redhat.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V4 4/4] blk-mq: clearing flush request reference in tags->rqs[]
-Date:   Thu, 29 Apr 2021 10:34:58 +0800
-Message-Id: <20210429023458.3044317-5-ming.lei@redhat.com>
-In-Reply-To: <20210429023458.3044317-1-ming.lei@redhat.com>
-References: <20210429023458.3044317-1-ming.lei@redhat.com>
+        id S230309AbhD2GDA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Apr 2021 02:03:00 -0400
+Received: from mx2.suse.de ([195.135.220.15]:33318 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229814AbhD2GC7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 29 Apr 2021 02:02:59 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id CE8ECAF16;
+        Thu, 29 Apr 2021 06:02:12 +0000 (UTC)
+Subject: Re: dm: dm_blk_ioctl(): implement failover for SG_IO on dm-multipath
+To:     Mike Snitzer <snitzer@redhat.com>, mwilck@suse.com
+Cc:     Alasdair G Kergon <agk@redhat.com>, dm-devel@redhat.com,
+        Daniel Wagner <dwagner@suse.de>, linux-block@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Christoph Hellwig <hch@lst.de>, linux-scsi@vger.kernel.org
+References: <20210422202130.30906-1-mwilck@suse.com>
+ <20210428195457.GA46518@lobo>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <7124009b-1ea5-61eb-419f-956e659a0996@suse.de>
+Date:   Thu, 29 Apr 2021 08:02:12 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.0
 MIME-Version: 1.0
+In-Reply-To: <20210428195457.GA46518@lobo>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Before we free request queue, clearing flush request reference in
-tags->rqs[], so that potential UAF can be avoided.
+On 4/28/21 9:54 PM, Mike Snitzer wrote:
+> On Thu, Apr 22 2021 at  4:21P -0400,
+> mwilck@suse.com <mwilck@suse.com> wrote:
+> 
+>> From: Martin Wilck <mwilck@suse.com>
+>>
+>> In virtual deployments, SCSI passthrough over dm-multipath devices is a
+>> common setup. The qemu "pr-helper" was specifically invented for it. I
+>> believe that this is the most important real-world scenario for sending
+>> SG_IO ioctls to device-mapper devices.
+>>
+>> In this configuration, guests send SCSI IO to the hypervisor in the form of
+>> SG_IO ioctls issued by qemu. But on the device-mapper level, these SCSI
+>> ioctls aren't treated like regular IO. Until commit 2361ae595352 ("dm mpath:
+>> switch paths in dm_blk_ioctl() code path"), no path switching was done at
+>> all. Worse though, if an SG_IO call fails because of a path error,
+>> dm-multipath doesn't retry the IO on a another path; rather, the failure is
+>> passed back to the guest, and paths are not marked as faulty.  This is in
+>> stark contrast with regular block IO of guests on dm-multipath devices, and
+>> certainly comes as a surprise to users who switch to SCSI passthrough in
+>> qemu. In general, users of dm-multipath devices would probably expect failover
+>> to work at least in a basic way.
+>>
+>> This patch fixes this by taking a special code path for SG_IO on request-
+>> based device mapper targets. Rather then just choosing a single path,
+>> sending the IO to it, and failing to the caller if the IO on the path
+>> failed, it retries the same IO on another path for certain error codes,
+>> using the same logic as blk_path_error() to determine if a retry would make
+>> sense for the given error code. Moreover, it sends a message to the
+>> multipath target to mark the path as failed.
+>>
+>> I am aware that this looks sort of hack-ish. I'm submitting it here as an
+>> RFC, asking for guidance how to reach a clean implementation that would be
+>> acceptable in mainline. I believe that it fixes an important problem.
+>> Actually, it fixes the qemu SCSI-passthrough use case on dm-multipath,
+>> which is non-functional without it.
+>>
+>> One problem remains open: if all paths in a multipath map are failed,
+>> normal multipath IO may switch to queueing mode (depending on
+>> configuration). This isn't possible for SG_IO, as SG_IO requests can't
+>> easily be queued like regular block I/O. Thus in the "no path" case, the
+>> guest will still see an error. If anybody can conceive of a solution for
+>> that, I'd be interested.
+>>
+>> Signed-off-by: Martin Wilck <mwilck@suse.com>
+>> ---
+>>   block/scsi_ioctl.c     |   5 +-
+>>   drivers/md/dm.c        | 134 ++++++++++++++++++++++++++++++++++++++++-
+>>   include/linux/blkdev.h |   2 +
+>>   3 files changed, 137 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/block/scsi_ioctl.c b/block/scsi_ioctl.c
+>> index 6599bac0a78c..bcc60552f7b1 100644
+>> --- a/block/scsi_ioctl.c
+>> +++ b/block/scsi_ioctl.c
+>> @@ -279,8 +279,8 @@ static int blk_complete_sghdr_rq(struct request *rq, struct sg_io_hdr *hdr,
+>>   	return ret;
+>>   }
+>>   
+>> -static int sg_io(struct request_queue *q, struct gendisk *bd_disk,
+>> -		struct sg_io_hdr *hdr, fmode_t mode)
+>> +int sg_io(struct request_queue *q, struct gendisk *bd_disk,
+>> +	  struct sg_io_hdr *hdr, fmode_t mode)
+>>   {
+>>   	unsigned long start_time;
+>>   	ssize_t ret = 0;
+>> @@ -369,6 +369,7 @@ static int sg_io(struct request_queue *q, struct gendisk *bd_disk,
+>>   	blk_put_request(rq);
+>>   	return ret;
+>>   }
+>> +EXPORT_SYMBOL_GPL(sg_io);
+>>   
+>>   /**
+>>    * sg_scsi_ioctl  --  handle deprecated SCSI_IOCTL_SEND_COMMAND ioctl
+>> diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+>> index 50b693d776d6..443ac5e5406c 100644
+>> --- a/drivers/md/dm.c
+>> +++ b/drivers/md/dm.c
+>> @@ -29,6 +29,8 @@
+>>   #include <linux/part_stat.h>
+>>   #include <linux/blk-crypto.h>
+>>   #include <linux/keyslot-manager.h>
+>> +#include <scsi/sg.h>
+>> +#include <scsi/scsi.h>
+>>   
+>>   #define DM_MSG_PREFIX "core"
+>>   
+> 
+> Ngh... not loving this at all.  But here is a patch (that I didn't
+> compile test) that should be folded in, still have to think about how
+> this could be made cleaner in general though.
+> 
+> Also, dm_sg_io_ioctl should probably be in dm-rq.c (maybe even dm-mpath.c!?)
+> 
+I fully share your sentiments; this just feels so awkward, having to 
+redo the logic in scsi_cmd_ioctl().
 
-Based on one patch written by David Jeffery.
+My original idea to that was to _use_ scsi_cmd_ioctl() directly from 
+dm_blk_ioctl:
 
-Cc: John Garry <john.garry@huawei.com>
-Cc: David Jeffery <djeffery@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c | 24 +++++++++++++++++++++++-
- 1 file changed, 23 insertions(+), 1 deletion(-)
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 50b693d776d6..007ff981f888 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -567,6 +567,9 @@ static int dm_blk_ioctl(struct block_device *bdev, 
+fmode_t mode,
+         struct mapped_device *md = bdev->bd_disk->private_data;
+         int r, srcu_idx;
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index abd0f7a9d052..e320d9798715 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2620,16 +2620,38 @@ static void blk_mq_remove_cpuhp(struct blk_mq_hw_ctx *hctx)
- 					    &hctx->cpuhp_dead);
- }
- 
-+/*
-+ * Before freeing hw queue, clearing the flush request reference in
-+ * tags->rqs[] for avoiding potential UAF.
-+ */
-+static void blk_mq_clear_flush_rq_mapping(struct blk_mq_tags *tags,
-+		unsigned int queue_depth, struct request *flush_rq)
-+{
-+	int i;
-+	unsigned long flags;
++       if (cmd == SG_IO)
++               return scsi_cmd_blk_ioctl(bdev, mode, cmd, arg);
 +
-+	WARN_ON_ONCE(refcount_read(&flush_rq->ref) != 0);
-+
-+	spin_lock_irqsave(&tags->lock, flags);
-+	for (i = 0; i < queue_depth; i++)
-+		cmpxchg(&tags->rqs[i], flush_rq, NULL);
-+	spin_unlock_irqrestore(&tags->lock, flags);
-+}
-+
- /* hctx->ctxs will be freed in queue's release handler */
- static void blk_mq_exit_hctx(struct request_queue *q,
- 		struct blk_mq_tag_set *set,
- 		struct blk_mq_hw_ctx *hctx, unsigned int hctx_idx)
- {
-+	struct request *flush_rq = hctx->fq->flush_rq;
-+
- 	if (blk_mq_hw_queue_mapped(hctx))
- 		blk_mq_tag_idle(hctx);
- 
-+	blk_mq_clear_flush_rq_mapping(set->tags[hctx_idx],
-+			set->queue_depth, flush_rq);
- 	if (set->ops->exit_request)
--		set->ops->exit_request(set, hctx->fq->flush_rq, hctx_idx);
-+		set->ops->exit_request(set, flush_rq, hctx_idx);
- 
- 	if (set->ops->exit_hctx)
- 		set->ops->exit_hctx(hctx, hctx_idx);
+         r = dm_prepare_ioctl(md, &srcu_idx, &bdev);
+         if (r < 0)
+                 goto out;
+
+
+But that crashes horribly as sg_io() expects the request pdu to be of 
+type 'scsi_request', which it definitely isn't here.
+
+We _could_ prepend struct dm_rq_target_io with a struct scsi_request, 
+seeing that basically _all_ dm-rq installations are on SCSI devices:
+
+diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
+index 13b4385f4d5a..aa7856621f83 100644
+--- a/drivers/md/dm-rq.c
++++ b/drivers/md/dm-rq.c
+@@ -16,6 +16,7 @@
+   * One of these is allocated per request.
+   */
+  struct dm_rq_target_io {
++       struct scsi_request scsi_req;
+         struct mapped_device *md;
+         struct dm_target *ti;
+         struct request *orig, *clone;
+
+Then the above should work, but we would increase the size of 
+dm_rq_target_io by quite a lot. Although, given the current size of it, 
+question is whether it matters...
+
+Hmm?
+
+Cheers,
+
+Hannes
 -- 
-2.29.2
-
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
