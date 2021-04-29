@@ -2,39 +2,39 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25BCFC433B4
-	for <linux-block@archiver.kernel.org>; Thu, 29 Apr 2021 20:33:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D6E5C433B4
+	for <linux-block@archiver.kernel.org>; Thu, 29 Apr 2021 21:08:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DED9C61424
-	for <linux-block@archiver.kernel.org>; Thu, 29 Apr 2021 20:33:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 356B16143F
+	for <linux-block@archiver.kernel.org>; Thu, 29 Apr 2021 21:08:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237003AbhD2UeR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 29 Apr 2021 16:34:17 -0400
-Received: from mx2.suse.de ([195.135.220.15]:42044 "EHLO mx2.suse.de"
+        id S233357AbhD2VJM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Apr 2021 17:09:12 -0400
+Received: from mx2.suse.de ([195.135.220.15]:59594 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236983AbhD2UeQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Apr 2021 16:34:16 -0400
+        id S233284AbhD2VJM (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 29 Apr 2021 17:09:12 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1619728408; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1619730504; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=nXujdk0LEa7B6Wqz6rZ0sXsyUgIYETxsrGPYGr700lo=;
-        b=AwpJ5T2EWB26uU24akQ1F4yc04MbZvggMwr0zpPLmxxM6w1HOkmyhA+4p2/9rwtC/wKMEq
-        Lb47voCIKXb2vLvrSldy0Bdf1V51Td8K0a7bNA8o8QUGZT0bIDpjVkUt32kYQOfR/yHOrV
-        NDhPcZphb40uMAJAHN9muGj1VlFozMI=
+        bh=NciCyiZPbzmP9EScIm/d+xm3xtaz9st0CdLXaGyBKAA=;
+        b=bApUfTXPm/wI2imdS+EWNVSHT9FhuAD8easnpdKfveQU7U/CVv5lzGOwSzrWx6DlcQYJGd
+        Tlva44Ae2NbHP+ldNvBZRofz55QGL/5NP4kSBtALg5PZq2eSwAzJMOyIxkUK/Kpnhbl4jg
+        SGmJ4/R91TIzL/7zsQFA6ugLSz6uvvo=
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 7AA47ADD7;
-        Thu, 29 Apr 2021 20:33:28 +0000 (UTC)
-Message-ID: <bb30875e11913a33bcaf491d0f752132ebb9ce5e.camel@suse.com>
-Subject: Re: [dm-devel] [RFC PATCH v2 1/2] scsi: convert
- scsi_result_to_blk_status() to inline
+        by mx2.suse.de (Postfix) with ESMTP id 6B6BFB20E;
+        Thu, 29 Apr 2021 21:08:24 +0000 (UTC)
+Message-ID: <413c998fd75f6bc9c7f70d8a1a2b107b443a75a0.camel@suse.com>
+Subject: Re: [dm-devel] [RFC PATCH v2 2/2] dm: add CONFIG_DM_MULTIPATH_SG_IO
+ - failover for SG_IO on dm-multipath
 From:   Martin Wilck <mwilck@suse.com>
 To:     Bart Van Assche <bvanassche@acm.org>,
         Mike Snitzer <snitzer@redhat.com>,
@@ -43,11 +43,11 @@ To:     Bart Van Assche <bvanassche@acm.org>,
 Cc:     Daniel Wagner <dwagner@suse.de>, linux-block@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
         Christoph Hellwig <hch@lst.de>
-Date:   Thu, 29 Apr 2021 22:33:27 +0200
-In-Reply-To: <08440651-6e8f-734a-ef43-561d9c2596a6@acm.org>
+Date:   Thu, 29 Apr 2021 23:08:23 +0200
+In-Reply-To: <5d1967f2-8017-c711-dec0-3ffe751974de@acm.org>
 References: <20210429155024.4947-1-mwilck@suse.com>
-         <20210429155024.4947-2-mwilck@suse.com>
-         <08440651-6e8f-734a-ef43-561d9c2596a6@acm.org>
+         <20210429155024.4947-3-mwilck@suse.com>
+         <5d1967f2-8017-c711-dec0-3ffe751974de@acm.org>
 Content-Type: text/plain; charset="ISO-8859-15"
 User-Agent: Evolution 3.38.4 
 MIME-Version: 1.0
@@ -56,97 +56,91 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Bart,
-
-thanks for looking at this.
-
-On Thu, 2021-04-29 at 09:20 -0700, Bart Van Assche wrote:
+On Thu, 2021-04-29 at 09:32 -0700, Bart Van Assche wrote:
 > On 4/29/21 8:50 AM, mwilck@suse.com wrote:
-> > This makes it possible to use scsi_result_to_blk_status() from
-> > code that shouldn't depend on scsi_mod (e.g. device mapper).
+> > +       if (hdr.dxfer_len > (queue_max_hw_sectors(bdev->bd_disk-
+> > >queue) << 9))
+> > +               return -EIO;
 > 
-> I think that's the wrong reason to make a function inline. Please
-> consider moving scsi_result_to_blk_status() into one of the block
-> layer
-> source code files that already deals with SG I/O, e.g.
-> block/scsi_ioctl.c.
+> How about using SECTOR_SHIFT instead of the number 9?
 
-scsi_ioctl.c, are you certain? scsi_result_to_blk_status() is an
-important part of the block/scsi interface... You're right that that
-this function is not a prime candidate for inlining, but I'm still
-wondering where it belongs if we don't.
-
-Looking forward to see what others think.
+no problem. That line was just copied from the scsi_ioctl code.
 
 > 
-> > diff --git a/include/scsi/scsi_cmnd.h b/include/scsi/scsi_cmnd.h
-> > index 83f7e520be48..ba1e69d3bed9 100644
-> > --- a/include/scsi/scsi_cmnd.h
-> > +++ b/include/scsi/scsi_cmnd.h
-> > @@ -311,24 +311,44 @@ static inline struct scsi_data_buffer
-> > *scsi_prot(struct scsi_cmnd *cmd)
-> >  #define scsi_for_each_prot_sg(cmd, sg, nseg, __i)              \
-> >         for_each_sg(scsi_prot_sglist(cmd), sg, nseg, __i)
-> >  
-> > +static inline void __set_status_byte(int *result, char status)
-> > +{
-> > +       *result = (*result & 0xffffff00) | status;
-> > +}
-> > +
-> >  static inline void set_status_byte(struct scsi_cmnd *cmd, char
-> > status)
-> >  {
-> > -       cmd->result = (cmd->result & 0xffffff00) | status;
-> > +       __set_status_byte(&cmd->result, status);
-> > +}
-> > +
-> > +static inline void __set_msg_byte(int *result, char status)
-> > +{
-> > +       *result = (*result & 0xffff00ff) | (status << 8);
-> >  }
-> >  
-> >  static inline void set_msg_byte(struct scsi_cmnd *cmd, char
-> > status)
-> >  {
-> > -       cmd->result = (cmd->result & 0xffff00ff) | (status << 8);
-> > +       __set_msg_byte(&cmd->result, status);
-> > +}
-> > +
-> > +static inline void __set_host_byte(int *result, char status)
-> > +{
-> > +       *result = (*result & 0xff00ffff) | (status << 16);
-> >  }
-> >  
-> >  static inline void set_host_byte(struct scsi_cmnd *cmd, char
-> > status)
-> >  {
-> > -       cmd->result = (cmd->result & 0xff00ffff) | (status << 16);
-> > +       __set_host_byte(&cmd->result, status);
-> > +}
-> > +
-> > +static inline void __set_driver_byte(int *result, char status)
-> > +{
-> > +       *result = (*result & 0x00ffffff) | (status << 24);
-> >  }
-> >  
-> >  static inline void set_driver_byte(struct scsi_cmnd *cmd, char
-> > status)
-> >  {
-> > -       cmd->result = (cmd->result & 0x00ffffff) | (status << 24);
-> > +       __set_driver_byte(&cmd->result, status);
-> >  }
+> > +               /*
+> > +                * Errors resulting from invalid parameters
+> > shouldn't be retried
+> > +                * on another path.
+> > +                */
+> > +               switch (rc) {
+> > +               case -ENOIOCTLCMD:
+> > +               case -EFAULT:
+> > +               case -EINVAL:
+> > +               case -EPERM:
+> > +                       goto out;
+> > +               default:
+> > +                       break;
+> > +               }
 > 
-> The layout of the SCSI result won't change since it is used in
-> multiple
-> UAPI data structures. I'd prefer to open-code host_byte() in
-> scsi_result_to_blk_status() instead of making the above changes.
+> Will -ENOMEM result in an immediate retry? Is that what's desired?
 
-OK. I'm generally no fan of hard-coding but I guess you're right
-in this case.
+No, I overlooked that case. Thanks for pointing this out. 
 
-Thanks,
+> 
+> > +               if (rhdr.info & SG_INFO_CHECK) {
+> > +                       int result;
+> > +                       blk_status_t sts;
+> > +
+> > +                       __set_status_byte(&result, rhdr.status);
+> > +                       __set_msg_byte(&result, rhdr.msg_status);
+> > +                       __set_host_byte(&result, rhdr.host_status);
+> > +                       __set_driver_byte(&result,
+> > rhdr.driver_status);
+> > +
+> > +                       sts = __scsi_result_to_blk_status(&result,
+> > result);
+> > +                       rhdr.host_status = host_byte(result);
+> > +
+> > +                       /* See if this is a target or path error.
+> > */
+> > +                       if (sts == BLK_STS_OK)
+> > +                               rc = 0;
+> > +                       else if (blk_path_error(sts))
+> > +                               rc = -EIO;
+> > +                       else {
+> > +                               rc = blk_status_to_errno(sts);
+> > +                               goto out;
+> > +                       }
+> > +               }
+> 
+> Will SAM_STAT_CHECK_CONDITION be treated as an I/O error? Is that
+> what's
+> desired? If not, does that mean that scsi_result_to_blk_status()
+> shouldn't be used but instead that a custom SCSI result conversion is
+> needed?
+
+This mimics the logic for regular SCSI block I/O. By default, CHECK
+CONDITION indeed maps to a BLK_STS_IO_ERR, and will be treated as a
+path error. As you probably know, there are some exceptions that are
+handled in the SCSI mid-layer beforehand. For example, check_sense()
+sets DID_TARGET_FAILURE or DID_MEDIUM_ERROR for certain sense codes,
+which map to target errors. So yes, I think this is correct.
+
+> If __scsi_result_to_blk_status() is the right function to call, how
+> about making that function accept the driver status, host status, msg
+> and SAM status as four separate arguments such that the
+> __set_*_byte()
+> calls can be left out?
+> 
+> > +                       char *argv[2] = { "fail_path", bdbuf };
+> 
+> Can the above array be declared static?
+
+How would that work? The function needs to be reentrant, and bdbuf is
+on the stack. I don't see an issue here, it's really just two pointers
+on the stack.
+
+Regards,
 Martin
-
-
 
 
