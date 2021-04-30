@@ -2,66 +2,62 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E6A2C433B4
-	for <linux-block@archiver.kernel.org>; Fri, 30 Apr 2021 14:36:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8F57C433ED
+	for <linux-block@archiver.kernel.org>; Fri, 30 Apr 2021 18:32:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 02291613CA
-	for <linux-block@archiver.kernel.org>; Fri, 30 Apr 2021 14:36:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CBC08613FA
+	for <linux-block@archiver.kernel.org>; Fri, 30 Apr 2021 18:32:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230379AbhD3Og4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Apr 2021 10:36:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48730 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230351AbhD3Ogz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Apr 2021 10:36:55 -0400
-Received: from zeniv-ca.linux.org.uk (zeniv-ca.linux.org.uk [IPv6:2607:5300:60:148a::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01A38C06174A;
-        Fri, 30 Apr 2021 07:36:06 -0700 (PDT)
-Received: from viro by zeniv-ca.linux.org.uk with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1lcUFJ-009cvD-7B; Fri, 30 Apr 2021 14:35:57 +0000
-Date:   Fri, 30 Apr 2021 14:35:57 +0000
-From:   Al Viro <viro@zeniv.linux.org.uk>
-To:     Pavel Begunkov <asml.silence@gmail.com>
-Cc:     yangerkun <yangerkun@huawei.com>, axboe@kernel.dk,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        io-uring@vger.kernel.org
-Subject: Re: [PATCH] block: reexpand iov_iter after read/write
-Message-ID: <YIwVzWEU97BylYK1@zeniv-ca.linux.org.uk>
-References: <20210401071807.3328235-1-yangerkun@huawei.com>
- <a2e97190-936d-ebe0-2adc-748328076f31@gmail.com>
- <7ff7d1b7-8b6d-a684-1740-6a62565f77b6@gmail.com>
- <3368729f-e61d-d4b6-f2ae-e17ebe59280e@gmail.com>
- <3d6904c0-9719-8569-2ae8-dd9694da046b@huawei.com>
- <05803db5-c6de-e115-3db2-476454b20668@gmail.com>
+        id S230363AbhD3SdN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Apr 2021 14:33:13 -0400
+Received: from mx2.suse.de ([195.135.220.15]:59008 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229750AbhD3SdN (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 30 Apr 2021 14:33:13 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id B923FB0BE;
+        Fri, 30 Apr 2021 18:32:23 +0000 (UTC)
+From:   Enzo Matsumiya <ematsumiya@suse.de>
+To:     linux-leds@vger.kernel.org, linux-block@vger.kernel.org
+Cc:     u.kleine-koenig@pengutronix.de,
+        Enzo Matsumiya <ematsumiya@suse.de>,
+        Jens Axboe <axboe@kernel.dk>, Pavel Machek <pavel@ucw.cz>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-kernel@vger.kernel.org
+Subject: [RFC PATCH 0/2] leds: trigger: introduce block trigger
+Date:   Fri, 30 Apr 2021 15:32:09 -0300
+Message-Id: <20210430183216.27458-1-ematsumiya@suse.de>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <05803db5-c6de-e115-3db2-476454b20668@gmail.com>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Apr 30, 2021 at 01:57:22PM +0100, Pavel Begunkov wrote:
-> On 4/28/21 7:16 AM, yangerkun wrote:
-> > Hi,
-> > 
-> > Should we pick this patch for 5.13?
-> 
-> Looks ok to me
+Inspired by https://lore.kernel.org/linux-leds/20190817145509.GA18381@amd/T/
+and the ledtrig-usbport implementation.
+    
+This patch series introduce a new LED trigger for block devices.
 
-	Looks sane.  BTW, Pavel, could you go over #untested.iov_iter
-and give it some beating?  Ideally - with per-commit profiling to see
-what speedups/slowdowns do they come with...
+Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
 
-	It's not in the final state (if nothing else, it needs to be
-rebased on top of xarray stuff, and there will be followup cleanups
-as well), but I'd appreciate testing and profiling data...
+Enzo Matsumiya (2):
+  block: export block_class and disk_type symbols
+  leds: trigger: implement block trigger
 
-	It does survive xfstests + LTP syscall tests, but that's about
-it.
+ block/genhd.c                        |   2 +
+ drivers/leds/trigger/Kconfig         |  10 +
+ drivers/leds/trigger/Makefile        |   1 +
+ drivers/leds/trigger/ledtrig-block.c | 293 +++++++++++++++++++++++++++
+ 4 files changed, 306 insertions(+)
+ create mode 100644 drivers/leds/trigger/ledtrig-block.c
+
+-- 
+2.31.1
+
