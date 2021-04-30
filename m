@@ -2,27 +2,27 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8F57C433ED
-	for <linux-block@archiver.kernel.org>; Fri, 30 Apr 2021 18:32:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CFE9C433ED
+	for <linux-block@archiver.kernel.org>; Fri, 30 Apr 2021 18:32:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CBC08613FA
-	for <linux-block@archiver.kernel.org>; Fri, 30 Apr 2021 18:32:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3454C6145A
+	for <linux-block@archiver.kernel.org>; Fri, 30 Apr 2021 18:32:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230363AbhD3SdN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Apr 2021 14:33:13 -0400
-Received: from mx2.suse.de ([195.135.220.15]:59008 "EHLO mx2.suse.de"
+        id S231267AbhD3SdZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Apr 2021 14:33:25 -0400
+Received: from mx2.suse.de ([195.135.220.15]:59076 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229750AbhD3SdN (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Apr 2021 14:33:13 -0400
+        id S229750AbhD3SdZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 30 Apr 2021 14:33:25 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id B923FB0BE;
-        Fri, 30 Apr 2021 18:32:23 +0000 (UTC)
+        by mx2.suse.de (Postfix) with ESMTP id 65157AFD5;
+        Fri, 30 Apr 2021 18:32:35 +0000 (UTC)
 From:   Enzo Matsumiya <ematsumiya@suse.de>
 To:     linux-leds@vger.kernel.org, linux-block@vger.kernel.org
 Cc:     u.kleine-koenig@pengutronix.de,
@@ -30,34 +30,46 @@ Cc:     u.kleine-koenig@pengutronix.de,
         Jens Axboe <axboe@kernel.dk>, Pavel Machek <pavel@ucw.cz>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         linux-kernel@vger.kernel.org
-Subject: [RFC PATCH 0/2] leds: trigger: introduce block trigger
-Date:   Fri, 30 Apr 2021 15:32:09 -0300
-Message-Id: <20210430183216.27458-1-ematsumiya@suse.de>
+Subject: [RFC PATCH 1/2] block: export block_class and disk_type symbols
+Date:   Fri, 30 Apr 2021 15:32:10 -0300
+Message-Id: <20210430183216.27458-2-ematsumiya@suse.de>
 X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20210430183216.27458-1-ematsumiya@suse.de>
+References: <20210430183216.27458-1-ematsumiya@suse.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Inspired by https://lore.kernel.org/linux-leds/20190817145509.GA18381@amd/T/
-and the ledtrig-usbport implementation.
-    
-This patch series introduce a new LED trigger for block devices.
+Export symbols to be used by _for_each_blk() helper in LED block
+trigger.
 
 Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
+---
+ block/genhd.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Enzo Matsumiya (2):
-  block: export block_class and disk_type symbols
-  leds: trigger: implement block trigger
-
- block/genhd.c                        |   2 +
- drivers/leds/trigger/Kconfig         |  10 +
- drivers/leds/trigger/Makefile        |   1 +
- drivers/leds/trigger/ledtrig-block.c | 293 +++++++++++++++++++++++++++
- 4 files changed, 306 insertions(+)
- create mode 100644 drivers/leds/trigger/ledtrig-block.c
-
+diff --git a/block/genhd.c b/block/genhd.c
+index 8c8f543572e6..516495179230 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -1218,6 +1218,7 @@ static void disk_release(struct device *dev)
+ struct class block_class = {
+ 	.name		= "block",
+ };
++EXPORT_SYMBOL(block_class);
+ 
+ static char *block_devnode(struct device *dev, umode_t *mode,
+ 			   kuid_t *uid, kgid_t *gid)
+@@ -1235,6 +1236,7 @@ const struct device_type disk_type = {
+ 	.release	= disk_release,
+ 	.devnode	= block_devnode,
+ };
++EXPORT_SYMBOL(disk_type);
+ 
+ #ifdef CONFIG_PROC_FS
+ /*
 -- 
 2.31.1
 
