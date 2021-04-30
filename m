@@ -2,249 +2,110 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7796C433B4
-	for <linux-block@archiver.kernel.org>; Fri, 30 Apr 2021 02:14:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D946CC433B4
+	for <linux-block@archiver.kernel.org>; Fri, 30 Apr 2021 02:51:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7B116613ED
-	for <linux-block@archiver.kernel.org>; Fri, 30 Apr 2021 02:14:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AA354611F1
+	for <linux-block@archiver.kernel.org>; Fri, 30 Apr 2021 02:51:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229609AbhD3CPL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 29 Apr 2021 22:15:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39274 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229582AbhD3CPK (ORCPT
+        id S229708AbhD3Cw3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Apr 2021 22:52:29 -0400
+Received: from mail-pl1-f170.google.com ([209.85.214.170]:36539 "EHLO
+        mail-pl1-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229577AbhD3Cw2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Apr 2021 22:15:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1619748862;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=NUTIYOFEPxTqf3W1ZjVpAvouBr+rrqIQNqoBXwi/aIU=;
-        b=K1ZW/uLZczlttkO+RCDe9frb3mYoxuDH4SlSEZucX1sXQ8QhzxtJetaoD1psZ0M9DM+wHX
-        XUxGwkQKYwKMwEi8ftihdllV8cUJrexe9urcjPus4wD5v/nMLQX3qF/uWCBc4PwVxVhJdH
-        xrDjCS8E28hZQCCDO5kk/WBNPXD/lkI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-195-fdv95TynM-SZC3bHF_ZjFQ-1; Thu, 29 Apr 2021 22:14:20 -0400
-X-MC-Unique: fdv95TynM-SZC3bHF_ZjFQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 74C258186E8;
-        Fri, 30 Apr 2021 02:14:19 +0000 (UTC)
-Received: from [10.72.12.188] (ovpn-12-188.pek2.redhat.com [10.72.12.188])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4F2E617177;
-        Fri, 30 Apr 2021 02:14:13 +0000 (UTC)
-Subject: Re: [PATCH] nbd: provide a way for userspace processes to identify
- device backends
-To:     Prasanna Kumar Kalever <prasanna.kalever@redhat.com>,
-        linux-kernel@vger.kernel.org
-Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
-        josef@toxicpanda.com, axboe@kernel.dk, idryomov@redhat.com
-References: <20210429102828.31248-1-prasanna.kalever@redhat.com>
-From:   Xiubo Li <xiubli@redhat.com>
-Message-ID: <a1c36274-954f-198e-d221-ea4d092aee6e@redhat.com>
-Date:   Fri, 30 Apr 2021 10:14:09 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+        Thu, 29 Apr 2021 22:52:28 -0400
+Received: by mail-pl1-f170.google.com with SMTP id a11so4960030plh.3
+        for <linux-block@vger.kernel.org>; Thu, 29 Apr 2021 19:51:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=OEst/G1P2xE1Q3iha5k7NOrX/KxfjM8gNCm7Fv5EZ3w=;
+        b=k+qWCZAVXaP86sXWboh7WdbpvfYwDveGkrduGjOz3A54iIlFLuvz7i0SmpE6SVFq54
+         YAOv4J3g3r0lqU/MPI1pf1LWH4DoDxWQBSG5220asiOaw92w7HTK28sOjB7INdND2qJO
+         tBLRwewPL3JmNK6ZPKOJlfik1Ca7UQgusAnUjh5ntHO6Xj/ehMkuopqXUtksbG3d8cDk
+         LIDXLttTgZHhjZMF/MbTYxdE+kt4/7a7WM6o78arzKVVFLcewJK47PKXtFWLwgQzBy7T
+         Pjck4uAzUfTPCZ78PDSshoEIE56XhqSdgHARcMu+azSMhiYQwjQUWYJVyuKvY2/l8/0h
+         iX2A==
+X-Gm-Message-State: AOAM533mwfhI9XpVKnX88gN0NNQ13LfeWDI93zgfwEx9wfM7NYxCrlu5
+        tNKLLL604lM1iwNQb+P+eg8=
+X-Google-Smtp-Source: ABdhPJw3k3wG8fcKy5vuGE3BRIykjjdzB7bcWCuTxstnqyEXYddkNrlKAjlUUj3ct/WK5rbget2cXQ==
+X-Received: by 2002:a17:902:c943:b029:ee:8f40:6225 with SMTP id i3-20020a170902c943b02900ee8f406225mr2878636pla.52.1619751101051;
+        Thu, 29 Apr 2021 19:51:41 -0700 (PDT)
+Received: from [192.168.3.219] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
+        by smtp.gmail.com with ESMTPSA id 205sm387516pfc.201.2021.04.29.19.51.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 29 Apr 2021 19:51:40 -0700 (PDT)
+Subject: Re: [PATCH V4 1/4] block: avoid double io accounting for flush
+ request
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Khazhy Kumykov <khazhy@google.com>,
+        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        Hannes Reinecke <hare@suse.de>,
+        John Garry <john.garry@huawei.com>,
+        David Jeffery <djeffery@redhat.com>
+References: <20210429023458.3044317-1-ming.lei@redhat.com>
+ <20210429023458.3044317-2-ming.lei@redhat.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <254e529e-f07c-b87a-e117-07dbb02312af@acm.org>
+Date:   Thu, 29 Apr 2021 19:51:37 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210429102828.31248-1-prasanna.kalever@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20210429023458.3044317-2-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2021/4/29 18:28, Prasanna Kumar Kalever wrote:
-> Problem:
-> On reconfigure of device, there is no way to defend if the backend
-> storage is matching with the initial backend storage.
->
-> Say, if an initial connect request for backend "pool1/image1" got
-> mapped to /dev/nbd0 and the userspace process is terminated. A next
-> reconfigure request within NBD_ATTR_DEAD_CONN_TIMEOUT is allowed to
-> use /dev/nbd0 for a different backend "pool1/image2"
->
-> For example, an operation like below could be dangerous:
->
-> $ sudo rbd-nbd map --try-netlink rbd-pool/ext4-image
-> /dev/nbd0
-> $ sudo blkid /dev/nbd0
-> /dev/nbd0: UUID="bfc444b4-64b1-418f-8b36-6e0d170cfc04" TYPE="ext4"
-> $ sudo pkill -9 rbd-nbd
-> $ sudo rbd-nbd attach --try-netlink --device /dev/nbd0 rbd-pool/xfs-image
-> /dev/nbd0
-> $ sudo blkid /dev/nbd0
-> /dev/nbd0: UUID="d29bf343-6570-4069-a9ea-2fa156ced908" TYPE="xfs"
->
-> Solution:
-> Provide a way for userspace processes to keep some metadata to identify
-> between the device and the backend, so that when a reconfigure request is
-> made, we can compare and avoid such dangerous operations.
->
-> With this solution, as part of the initial connect request, backend
-> path can be stored in the sysfs per device config, so that on a reconfigure
-> request it's easy to check if the backend path matches with the initial
-> connect backend path.
->
-> Please note, ioctl interface to nbd will not have these changes, as there
-> won't be any reconfigure.
->
-> Signed-off-by: Prasanna Kumar Kalever <prasanna.kalever@redhat.com>
+On 4/28/21 7:34 PM, Ming Lei wrote:
+> For flush request, rq->end_io() may be called two times, one is from
+> timeout handling(blk_mq_check_expired()), another is from normal
+> completion(__blk_mq_end_request()).
+> 
+> Move blk_account_io_flush() after flush_rq->ref drops to zero, so
+> io accounting can be done just once for flush request.
+> 
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
 > ---
->   drivers/block/nbd.c              | 60 +++++++++++++++++++++++++++++++-
->   include/uapi/linux/nbd-netlink.h |  1 +
->   2 files changed, 60 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-> index 4ff71b579cfc..b5022187ad9c 100644
-> --- a/drivers/block/nbd.c
-> +++ b/drivers/block/nbd.c
-> @@ -79,6 +79,7 @@ struct link_dead_args {
->   #define NBD_RT_HAS_CONFIG_REF		4
->   #define NBD_RT_BOUND			5
->   #define NBD_RT_DISCONNECT_ON_CLOSE	6
-> +#define NBD_RT_HAS_BACKEND_FILE		7
->   
->   #define NBD_DESTROY_ON_DISCONNECT	0
->   #define NBD_DISCONNECT_REQUESTED	1
-> @@ -119,6 +120,8 @@ struct nbd_device {
->   
->   	struct completion *destroy_complete;
->   	unsigned long flags;
-> +
-> +	char *backend;
->   };
->   
->   #define NBD_CMD_REQUEUED	1
-> @@ -216,6 +219,20 @@ static const struct device_attribute pid_attr = {
->   	.show = pid_show,
->   };
->   
-> +static ssize_t backend_show(struct device *dev,
-> +		struct device_attribute *attr, char *buf)
-> +{
-> +	struct gendisk *disk = dev_to_disk(dev);
-> +	struct nbd_device *nbd = (struct nbd_device *)disk->private_data;
-> +
-> +	return sprintf(buf, "%s\n", nbd->backend ?: "");
-> +}
-> +
-> +static const struct device_attribute backend_attr = {
-> +	.attr = { .name = "backend", .mode = 0444},
-> +	.show = backend_show,
-> +};
-> +
->   static void nbd_dev_remove(struct nbd_device *nbd)
->   {
->   	struct gendisk *disk = nbd->disk;
-> @@ -1215,6 +1232,12 @@ static void nbd_config_put(struct nbd_device *nbd)
->   				       &config->runtime_flags))
->   			device_remove_file(disk_to_dev(nbd->disk), &pid_attr);
->   		nbd->task_recv = NULL;
-> +		if (test_and_clear_bit(NBD_RT_HAS_BACKEND_FILE,
-> +				       &config->runtime_flags)) {
-> +			device_remove_file(disk_to_dev(nbd->disk), &backend_attr);
-> +			kfree(nbd->backend);
-> +			nbd->backend = NULL;
-> +		}
->   		nbd_clear_sock(nbd);
->   		if (config->num_connections) {
->   			int i;
-> @@ -1274,7 +1297,7 @@ static int nbd_start_device(struct nbd_device *nbd)
->   
->   	error = device_create_file(disk_to_dev(nbd->disk), &pid_attr);
->   	if (error) {
-> -		dev_err(disk_to_dev(nbd->disk), "device_create_file failed!\n");
-> +		dev_err(disk_to_dev(nbd->disk), "device_create_file failed for pid!\n");
->   		return error;
->   	}
->   	set_bit(NBD_RT_HAS_PID_FILE, &config->runtime_flags);
-> @@ -1681,6 +1704,7 @@ static int nbd_dev_add(int index)
->   		BLK_MQ_F_BLOCKING;
->   	nbd->tag_set.driver_data = nbd;
->   	nbd->destroy_complete = NULL;
-> +	nbd->backend = NULL;
->   
->   	err = blk_mq_alloc_tag_set(&nbd->tag_set);
->   	if (err)
-> @@ -1754,6 +1778,7 @@ static const struct nla_policy nbd_attr_policy[NBD_ATTR_MAX + 1] = {
->   	[NBD_ATTR_SOCKETS]		=	{ .type = NLA_NESTED},
->   	[NBD_ATTR_DEAD_CONN_TIMEOUT]	=	{ .type = NLA_U64 },
->   	[NBD_ATTR_DEVICE_LIST]		=	{ .type = NLA_NESTED},
-> +	[NBD_ATTR_BACKEND_IDENTIFIER]	=	{ .type = NLA_STRING},
->   };
->   
->   static const struct nla_policy nbd_sock_policy[NBD_SOCK_MAX + 1] = {
-> @@ -1956,6 +1981,23 @@ static int nbd_genl_connect(struct sk_buff *skb, struct genl_info *info)
->   		}
->   	}
->   	ret = nbd_start_device(nbd);
-> +	if (ret)
-> +		goto out;
-> +	if (info->attrs[NBD_ATTR_BACKEND_IDENTIFIER]) {
-> +		nbd->backend = nla_strdup(info->attrs[NBD_ATTR_BACKEND_IDENTIFIER],
-> +					  GFP_KERNEL);
-> +		if (!nbd->backend) {
-> +			ret = -ENOMEM;
-> +			goto out;
-> +		}
-> +	}
-> +	ret = device_create_file(disk_to_dev(nbd->disk), &backend_attr);
-> +	if (ret) {
-> +		dev_err(disk_to_dev(nbd->disk),
-> +			"device_create_file failed for backend!\n");
-> +		goto out;
-> +	}
-> +	set_bit(NBD_RT_HAS_BACKEND_FILE, &config->runtime_flags);
->   out:
->   	mutex_unlock(&nbd->config_lock);
->   	if (!ret) {
-> @@ -2048,6 +2090,22 @@ static int nbd_genl_reconfigure(struct sk_buff *skb, struct genl_info *info)
->   		       index);
->   		return -EINVAL;
->   	}
-> +	if (nbd->backend) {
-> +		if (info->attrs[NBD_ATTR_BACKEND_IDENTIFIER]) {
-> +			if (nla_strcmp(info->attrs[NBD_ATTR_BACKEND_IDENTIFIER],
-> +				       nbd->backend)) {
-> +				mutex_unlock(&nbd_index_mutex);
-> +				dev_err(nbd_to_dev(nbd),
-> +					"backend image doesn't match with %s\n",
-> +					nbd->backend);
-> +				return -EINVAL;
-> +			}
-> +		} else {
-> +			mutex_unlock(&nbd_index_mutex);
-> +			dev_err(nbd_to_dev(nbd), "must specify backend\n");
-> +			return -EINVAL;
-> +		}
-> +	}
->   	if (!refcount_inc_not_zero(&nbd->refs)) {
->   		mutex_unlock(&nbd_index_mutex);
->   		printk(KERN_ERR "nbd: device at index %d is going down\n",
-> diff --git a/include/uapi/linux/nbd-netlink.h b/include/uapi/linux/nbd-netlink.h
-> index c5d0ef7aa7d5..2d0b90964227 100644
-> --- a/include/uapi/linux/nbd-netlink.h
-> +++ b/include/uapi/linux/nbd-netlink.h
-> @@ -35,6 +35,7 @@ enum {
->   	NBD_ATTR_SOCKETS,
->   	NBD_ATTR_DEAD_CONN_TIMEOUT,
->   	NBD_ATTR_DEVICE_LIST,
-> +	NBD_ATTR_BACKEND_IDENTIFIER,
->   	__NBD_ATTR_MAX,
->   };
->   #define NBD_ATTR_MAX (__NBD_ATTR_MAX - 1)
+>  block/blk-flush.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/block/blk-flush.c b/block/blk-flush.c
+> index 7942ca6ed321..1002f6c58181 100644
+> --- a/block/blk-flush.c
+> +++ b/block/blk-flush.c
+> @@ -219,8 +219,6 @@ static void flush_end_io(struct request *flush_rq, blk_status_t error)
+>  	unsigned long flags = 0;
+>  	struct blk_flush_queue *fq = blk_get_flush_queue(q, flush_rq->mq_ctx);
+>  
+> -	blk_account_io_flush(flush_rq);
+> -
+>  	/* release the tag's ownership to the req cloned from */
+>  	spin_lock_irqsave(&fq->mq_flush_lock, flags);
+>  
+> @@ -230,6 +228,7 @@ static void flush_end_io(struct request *flush_rq, blk_status_t error)
+>  		return;
+>  	}
+>  
+> +	blk_account_io_flush(flush_rq);
+>  	/*
+>  	 * Flush request has to be marked as IDLE when it is really ended
+>  	 * because its .end_io() is called from timeout code path too for
 
-Reviewed-by: Xiubo Li <xiubli@redhat.com>
+How about adding the following:
 
+Fixes: b68663186577 ("block: add iostat counters for flush requests")
+
+Anyway:
+
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
