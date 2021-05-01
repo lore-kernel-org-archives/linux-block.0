@@ -2,85 +2,84 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E338EC43461
-	for <linux-block@archiver.kernel.org>; Fri, 30 Apr 2021 21:49:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22E20C433B4
+	for <linux-block@archiver.kernel.org>; Sat,  1 May 2021 06:24:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B883961476
-	for <linux-block@archiver.kernel.org>; Fri, 30 Apr 2021 21:49:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EF97C613ED
+	for <linux-block@archiver.kernel.org>; Sat,  1 May 2021 06:24:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231205AbhD3Vt7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Apr 2021 17:49:59 -0400
-Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:56210 "EHLO
-        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S229915AbhD3Vt7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Apr 2021 17:49:59 -0400
-Received: from cwcc.thunk.org (pool-72-74-133-215.bstnma.fios.verizon.net [72.74.133.215])
-        (authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 13ULmu1e024684
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 30 Apr 2021 17:48:56 -0400
-Received: by cwcc.thunk.org (Postfix, from userid 15806)
-        id E6B1F15C39C4; Fri, 30 Apr 2021 17:48:55 -0400 (EDT)
-Date:   Fri, 30 Apr 2021 17:48:55 -0400
-From:   "Theodore Ts'o" <tytso@mit.edu>
-To:     Jiri Kosina <jikos@kernel.org>
-Cc:     ksummit@lists.linux.dev, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, netdev@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-api@vger.kernel.org
-Subject: Re: Maintainers / Kernel Summit 2021 planning kick-off
-Message-ID: <YIx7R6tmcRRCl/az@mit.edu>
-References: <YH2hs6EsPTpDAqXc@mit.edu>
- <nycvar.YFH.7.76.2104281228350.18270@cbobk.fhfr.pm>
+        id S229546AbhEAGZM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 1 May 2021 02:25:12 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46940 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229505AbhEAGZM (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 1 May 2021 02:25:12 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id F033D613C2;
+        Sat,  1 May 2021 06:24:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1619850261;
+        bh=X9cYeVXcga7kObVA/p1U0zrIolbkSZQkyIvB3ZJbuEc=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=vvKskF8A3MqcJvyaMlaBzRiSpwXUFgxqqJHthqQW9syCx4jeqsxXZHSR1s7Lbyw4E
+         3wPyrmR6mxInIoxNzLFq+tNhN931Q2HKNpucp9/6KjWh2+M+2IKcnJ5MVnKZseGzHY
+         rENlfN6cHDZgqqutaby3B12wsgoThhqjMiCCfzPs=
+Date:   Sat, 1 May 2021 08:24:16 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Enzo Matsumiya <ematsumiya@suse.de>
+Cc:     linux-leds@vger.kernel.org, linux-block@vger.kernel.org,
+        u.kleine-koenig@pengutronix.de, Jens Axboe <axboe@kernel.dk>,
+        Pavel Machek <pavel@ucw.cz>, linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 1/2] block: export block_class and disk_type symbols
+Message-ID: <YIz0EBqKTHhB+n8N@kroah.com>
+References: <20210430183216.27458-1-ematsumiya@suse.de>
+ <20210430183216.27458-2-ematsumiya@suse.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <nycvar.YFH.7.76.2104281228350.18270@cbobk.fhfr.pm>
+In-Reply-To: <20210430183216.27458-2-ematsumiya@suse.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Apr 28, 2021 at 12:29:52PM +0200, Jiri Kosina wrote:
-> On Mon, 19 Apr 2021, Theodore Ts'o wrote:
+On Fri, Apr 30, 2021 at 03:32:10PM -0300, Enzo Matsumiya wrote:
+> Export symbols to be used by _for_each_blk() helper in LED block
+> trigger.
 > 
-> > This year, the Maintainers and Kernel Summit is currently planned to
-> > be held in Dublin, Ireland, September 27 -- 29th.  
+> Signed-off-by: Enzo Matsumiya <ematsumiya@suse.de>
+> ---
+>  block/genhd.c | 2 ++
+>  1 file changed, 2 insertions(+)
 > 
-> Given the fact that OSS is being relocated from Dublin to Washington [1], 
-> is Kernel Summit following that direction?
-> 
-> [1] https://www.linuxfoundation.org/en/press-release/the-linux-foundation-announces-open-source-summit-embedded-linux-conference-2021-will-move-from-dublin-ireland-to-seattle-washington/
+> diff --git a/block/genhd.c b/block/genhd.c
+> index 8c8f543572e6..516495179230 100644
+> --- a/block/genhd.c
+> +++ b/block/genhd.c
+> @@ -1218,6 +1218,7 @@ static void disk_release(struct device *dev)
+>  struct class block_class = {
+>  	.name		= "block",
+>  };
+> +EXPORT_SYMBOL(block_class);
+>  
+>  static char *block_devnode(struct device *dev, umode_t *mode,
+>  			   kuid_t *uid, kgid_t *gid)
+> @@ -1235,6 +1236,7 @@ const struct device_type disk_type = {
+>  	.release	= disk_release,
+>  	.devnode	= block_devnode,
+>  };
+> +EXPORT_SYMBOL(disk_type);
+>  
+>  #ifdef CONFIG_PROC_FS
+>  /*
 
-Apologies for the delay in responding; I wasiting for the LPC to post
-its announcement that the LPC will be going 100% virtual:
+Please please no.  These should not be needed by anything.
 
-   https://www.linuxplumbersconf.org/blog/2021/index.php/2021/04/30/linux-plumbers-goes-fully-virtual/
+And if they really do, they must be EXPORT_SYMBOL_GPL().
 
-As the LPC planning committee stated,
+thanks,
 
-   "Unfortunately, the safety protocols imposed by event venues in the
-   US require masks and social distancing which make it impossible to
-   hold the interactive part of Plumbers (the Microconferences)."
-
-The Maintainer's Summit is even more interactive and discussion
-focused than most of the Microconferences.  In addition, for the last
-few years, the Kernel Summit is run as a track at the LPC.  As a
-result, both the Maintainer's and Kernel Summit will be held virtually
-this year, using the LPC infrastructure, and will not be colocated
-with OSS to Seattle.  We'll make sure the dates (plus some buffer for
-travel) won't overlap to avoid creating conflicts for those who are
-planning to attend OSS in Seattle.
-
-I know we're all really hungry for some in-person meetups and
-discussions, but at least for LPC, Kernel Summit, and Maintainer's
-Summit, we're going to have to wait for another year,
-
-Cheers,
-
-					- Ted
+greg k-h
