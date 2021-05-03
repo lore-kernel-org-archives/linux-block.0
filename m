@@ -2,37 +2,36 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A63D8C433ED
-	for <linux-block@archiver.kernel.org>; Mon,  3 May 2021 17:18:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D4CBC43460
+	for <linux-block@archiver.kernel.org>; Mon,  3 May 2021 17:19:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6FED461155
-	for <linux-block@archiver.kernel.org>; Mon,  3 May 2021 17:18:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1D9E7611C9
+	for <linux-block@archiver.kernel.org>; Mon,  3 May 2021 17:19:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231321AbhECRTA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 3 May 2021 13:19:00 -0400
-Received: from ale.deltatee.com ([204.191.154.188]:58914 "EHLO
+        id S231443AbhECRUi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 3 May 2021 13:20:38 -0400
+Received: from ale.deltatee.com ([204.191.154.188]:58958 "EHLO
         ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231388AbhECRS7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 3 May 2021 13:18:59 -0400
+        with ESMTP id S231562AbhECRUg (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 3 May 2021 13:20:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=deltatee.com; s=20200525; h=Subject:In-Reply-To:MIME-Version:Date:
         Message-ID:From:References:Cc:To:content-disposition;
-        bh=SAQ4S+jSIpU03o924OYwfD9SEbxJ72ZyqTFfTksfdhA=; b=aHvkXNhJC0Th2xBJKUmBj+YFHL
-        UzUUk1ISTbtYsp83553YSXXGRA++kbSiJtSN05jEXVqt9VEX+wniOJS1RplCEqtuDD5dEX6odZ4Kq
-        cu222eZYaQudBjSH8A2rSJDXWW+51r3qeRWafwKoGAm6AVx0/RQ21Pp4Domc5hgQYrYZGJC3acctI
-        oDyhQ6cbTWTz+4TBfHuPIS5Ncok4vJKWmc5qIIjxy5BONLC07sANEe9vDy3pqahAl0m4DRp8PkoaL
-        1+iVIZ7RcwI7jzxYjW8Dkp9JZw0qq1u+WTSwK8ErzNEhrqQw5/H+bDo+O6nCitRx5LdA8d9D7PVCk
-        nOiYSZ1A==;
+        bh=Xgskyepw/lHRcKmwXdhV8lu3qVd1TfZZh6M74Jlngas=; b=QqAwmeJngpzHhZ/sdMQj3UlLTL
+        rC/1Y3ph6DV1kkJjARvToJ6QRKEfJDGAt2iQpPoawvtTM+fMCs6n5bVz+292DJzzv2C+T87D91M2V
+        4wQ42/crm5YKsUUkp1hzvaTN17qEVQ+9oQ5Geo3ecq6vpk8odJrImqmZK5cpK3vHJJj9E+WmPg9Vq
+        PNjtWNXdgJrO7pQU42Bzcn/2z9aPF7saV5+TkwUTbLKY2ssS41V1zdma+gltt/IQ92sPJS4wSu9fA
+        qs7uDvdjdZjyuEC+dg4iSsxKIllszekl4Ujify/+NQ8fbP/N5UrU3OAn3vie0yC4GaRvbbT11kmeF
+        NOTlVoCw==;
 Received: from guinness.priv.deltatee.com ([172.16.1.162])
         by ale.deltatee.com with esmtp (Exim 4.92)
         (envelope-from <logang@deltatee.com>)
-        id 1ldcCd-0005A2-F7; Mon, 03 May 2021 11:17:52 -0600
+        id 1ldcEG-0005Bx-Lz; Mon, 03 May 2021 11:19:33 -0600
 To:     John Hubbard <jhubbard@nvidia.com>, linux-kernel@vger.kernel.org,
         linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
         linux-pci@vger.kernel.org, linux-mm@kvack.org,
@@ -54,23 +53,23 @@ Cc:     Stephen Bates <sbates@raithlin.com>,
         Ira Weiny <ira.weiny@intel.com>,
         Robin Murphy <robin.murphy@arm.com>
 References: <20210408170123.8788-1-logang@deltatee.com>
- <20210408170123.8788-13-logang@deltatee.com>
- <f8bdf85c-2302-890e-7f77-e11fe6f29d6e@nvidia.com>
+ <20210408170123.8788-14-logang@deltatee.com>
+ <78a165e1-657b-c284-d31a-adc8c9ded55d@nvidia.com>
 From:   Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <f33a9cff-82d0-7a05-070a-8c6018fbaba9@deltatee.com>
-Date:   Mon, 3 May 2021 11:17:50 -0600
+Message-ID: <4ad9c1d9-ec2a-1fe1-c5d9-19d2053da912@deltatee.com>
+Date:   Mon, 3 May 2021 11:19:32 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.9.0
 MIME-Version: 1.0
-In-Reply-To: <f8bdf85c-2302-890e-7f77-e11fe6f29d6e@nvidia.com>
+In-Reply-To: <78a165e1-657b-c284-d31a-adc8c9ded55d@nvidia.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-CA
 Content-Transfer-Encoding: 7bit
 X-SA-Exim-Connect-IP: 172.16.1.162
 X-SA-Exim-Rcpt-To: robin.murphy@arm.com, ira.weiny@intel.com, helgaas@kernel.org, jianxin.xiong@intel.com, dave.hansen@linux.intel.com, jason@jlekstrand.net, dave.b.minturn@intel.com, andrzej.jakowski@intel.com, daniel.vetter@ffwll.ch, willy@infradead.org, ddutile@redhat.com, christian.koenig@amd.com, jgg@ziepe.ca, dan.j.williams@intel.com, hch@lst.de, sbates@raithlin.com, iommu@lists.linux-foundation.org, linux-mm@kvack.org, linux-pci@vger.kernel.org, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, jhubbard@nvidia.com
 X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: [PATCH 12/16] nvme-pci: Check DMA ops when indicating support for
- PCI P2PDMA
+Subject: Re: [PATCH 13/16] nvme-pci: Convert to using dma_map_sg_p2pdma for
+ p2pdma pages
 X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
 X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
@@ -79,47 +78,33 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 
 
-On 2021-05-02 7:29 p.m., John Hubbard wrote:
-> On 4/8/21 10:01 AM, Logan Gunthorpe wrote:
->> Introduce a supports_pci_p2pdma() operation in nvme_ctrl_ops to
->> replace the fixed NVME_F_PCI_P2PDMA flag such that the dma_map_ops
->> flags can be checked for PCI P2PDMA support.
->>
->> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
->> ---
->>   drivers/nvme/host/core.c |  3 ++-
->>   drivers/nvme/host/nvme.h |  2 +-
->>   drivers/nvme/host/pci.c  | 11 +++++++++--
->>   3 files changed, 12 insertions(+), 4 deletions(-)
->>
->> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
->> index 0896e21642be..223419454516 100644
->> --- a/drivers/nvme/host/core.c
->> +++ b/drivers/nvme/host/core.c
->> @@ -3907,7 +3907,8 @@ static void nvme_alloc_ns(struct nvme_ctrl *ctrl, unsigned nsid,
->>   		blk_queue_flag_set(QUEUE_FLAG_STABLE_WRITES, ns->queue);
+On 2021-05-02 7:34 p.m., John Hubbard wrote:
+>>   	if (iod->npages == 0)
+>>   		dma_pool_free(dev->prp_small_pool, nvme_pci_iod_list(req)[0],
+>>   			      iod->first_dma);
+>> @@ -868,14 +857,13 @@ static blk_status_t nvme_map_data(struct nvme_dev *dev, struct request *req,
+>>   	if (!iod->nents)
+>>   		goto out_free_sg;
 >>   
->>   	blk_queue_flag_set(QUEUE_FLAG_NONROT, ns->queue);
->> -	if (ctrl->ops->flags & NVME_F_PCI_P2PDMA)
->> +	if (ctrl->ops->supports_pci_p2pdma &&
->> +	    ctrl->ops->supports_pci_p2pdma(ctrl))
+>> -	if (is_pci_p2pdma_page(sg_page(iod->sg)))
+>> -		nr_mapped = pci_p2pdma_map_sg_attrs(dev->dev, iod->sg,
+>> -				iod->nents, rq_dma_dir(req), DMA_ATTR_NO_WARN);
+>> -	else
+>> -		nr_mapped = dma_map_sg_attrs(dev->dev, iod->sg, iod->nents,
+>> -					     rq_dma_dir(req), DMA_ATTR_NO_WARN);
+>> -	if (!nr_mapped)
+>> +	nr_mapped = dma_map_sg_p2pdma_attrs(dev->dev, iod->sg, iod->nents,
+>> +				     rq_dma_dir(req), DMA_ATTR_NO_WARN);
+>> +	if (nr_mapped < 0) {
+>> +		if (nr_mapped != -ENOMEM)
+>> +			ret = BLK_STS_TARGET;
+>>   		goto out_free_sg;
+>> +	}
 > 
-> This is a little excessive, as I suspected. How about providing a
-> default .supports_pci_p2pdma routine that returns false, so that
-> the op is always available (non-null)? By "default", maybe that
-> means either requiring an init_the_ops_struct() routine to be
-> used, and/or checking all the users of struct nvme_ctrl_ops.
+> But now the "nr_mapped == 0" case is no longer doing an early out_free_sg.
+> Is that OK?
 
-Honestly that sounds much more messy to me than simply checking if it's
-NULL before using it (which is a common, accepted pattern for ops).
-
-> Another idea: maybe you don't really need a bool .supports_pci_p2pdma()
-> routine at all, because the existing .flags really is about right.
-> You just need the flags to be filled in dynamically. So, do that
-> during nvme_pci setup/init time: that's when this module would call
-> dma_pci_p2pdma_supported().
-
-If the flag is filled in dynamically, then the ops struct would have to
-be non-constant. Ops structs should be constant for security reasons.
+dma_map_sg_p2pdma_attrs() never returns zero. It will return -ENOMEM in
+the same situation and results in the same goto out_free_sg.
 
 Logan
