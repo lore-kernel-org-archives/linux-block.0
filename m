@@ -2,109 +2,130 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D4CBC43460
-	for <linux-block@archiver.kernel.org>; Mon,  3 May 2021 17:19:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31456C433B4
+	for <linux-block@archiver.kernel.org>; Mon,  3 May 2021 17:42:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1D9E7611C9
-	for <linux-block@archiver.kernel.org>; Mon,  3 May 2021 17:19:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EF58561182
+	for <linux-block@archiver.kernel.org>; Mon,  3 May 2021 17:42:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231443AbhECRUi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 3 May 2021 13:20:38 -0400
-Received: from ale.deltatee.com ([204.191.154.188]:58958 "EHLO
-        ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231562AbhECRUg (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 3 May 2021 13:20:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:MIME-Version:Date:
-        Message-ID:From:References:Cc:To:content-disposition;
-        bh=Xgskyepw/lHRcKmwXdhV8lu3qVd1TfZZh6M74Jlngas=; b=QqAwmeJngpzHhZ/sdMQj3UlLTL
-        rC/1Y3ph6DV1kkJjARvToJ6QRKEfJDGAt2iQpPoawvtTM+fMCs6n5bVz+292DJzzv2C+T87D91M2V
-        4wQ42/crm5YKsUUkp1hzvaTN17qEVQ+9oQ5Geo3ecq6vpk8odJrImqmZK5cpK3vHJJj9E+WmPg9Vq
-        PNjtWNXdgJrO7pQU42Bzcn/2z9aPF7saV5+TkwUTbLKY2ssS41V1zdma+gltt/IQ92sPJS4wSu9fA
-        qs7uDvdjdZjyuEC+dg4iSsxKIllszekl4Ujify/+NQ8fbP/N5UrU3OAn3vie0yC4GaRvbbT11kmeF
-        NOTlVoCw==;
-Received: from guinness.priv.deltatee.com ([172.16.1.162])
-        by ale.deltatee.com with esmtp (Exim 4.92)
-        (envelope-from <logang@deltatee.com>)
-        id 1ldcEG-0005Bx-Lz; Mon, 03 May 2021 11:19:33 -0600
-To:     John Hubbard <jhubbard@nvidia.com>, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        linux-pci@vger.kernel.org, linux-mm@kvack.org,
-        iommu@lists.linux-foundation.org
-Cc:     Stephen Bates <sbates@raithlin.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
-        Don Dutile <ddutile@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Jakowski Andrzej <andrzej.jakowski@intel.com>,
-        Minturn Dave B <dave.b.minturn@intel.com>,
-        Jason Ekstrand <jason@jlekstrand.net>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Xiong Jianxin <jianxin.xiong@intel.com>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Robin Murphy <robin.murphy@arm.com>
-References: <20210408170123.8788-1-logang@deltatee.com>
- <20210408170123.8788-14-logang@deltatee.com>
- <78a165e1-657b-c284-d31a-adc8c9ded55d@nvidia.com>
-From:   Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <4ad9c1d9-ec2a-1fe1-c5d9-19d2053da912@deltatee.com>
-Date:   Mon, 3 May 2021 11:19:32 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.9.0
+        id S231523AbhECRnC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 3 May 2021 13:43:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36752 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231664AbhECRnB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 3 May 2021 13:43:01 -0400
+Received: from mail-il1-x131.google.com (mail-il1-x131.google.com [IPv6:2607:f8b0:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49791C06174A
+        for <linux-block@vger.kernel.org>; Mon,  3 May 2021 10:42:08 -0700 (PDT)
+Received: by mail-il1-x131.google.com with SMTP id v13so4271224ilj.8
+        for <linux-block@vger.kernel.org>; Mon, 03 May 2021 10:42:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:references:from:message-id:date:user-agent:mime-version
+         :in-reply-to:content-language:content-transfer-encoding;
+        bh=B8c8UcKOabNygb4slUhxb1MpWvtXEu3qUQwNJzJoOaQ=;
+        b=0isSJrE2PQT8gl8Anglx6z1zpID0Zx4kRe2z/kwTKAnI+UPEEGGn7eLeehS4tVYjUP
+         njsQwPayHOSBCRBrKHE3PM8AuJod93XUGteWeDiDvzVVb2E9JxMWP5mAydQVDwXnh/lq
+         v0JcHY8QX1REhbMwR/y01Au8DVKcerGQjXs/ISLbjGBLkE4/nhCnRx3DJhNRHOESrT90
+         S76tD99zgcwZiMznshS4/GgOnGIYFDg+tk9cuypjZ/hdb54cW2w/M+fXyM3J6aROGx8F
+         ZAx9q6gSNYHmV7Ri3wpmYAQxdY+HArqawNd//tfnbIaYpRHdlNKHG//Q3HmNY6Q2sdSy
+         jrlg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=B8c8UcKOabNygb4slUhxb1MpWvtXEu3qUQwNJzJoOaQ=;
+        b=rmuQqzFqVBH9hvGgnz2JeZ9FM1a7tzoHzRTVoS3U4nn3LDiJh2794JrpXzRUiRFj/G
+         xVNr97/D3eAobZv51GpnhssPh67mwu7EzGw0oXxGbsaZ2pBnU9AC6+JeI3voGcGvkQ8T
+         oDMa9AOusilZ4gGo7DHQ4tTdQh/7P6SxoOwQEGKdnLps5Skt/aXODK3UlsjMH4xU1OV4
+         McQvYhODCV9HR/fobQPVxqT5Hpq0Owgr3kTK6XZfAoNBDlxQRkCOELtpeZzH9P50CS4m
+         a4ne3J6rovr0F+STkzZT7croptGvvAhSqI7ipmdh6LGpQKhSjRC9rctt5oCFnv8bAUrc
+         8NeQ==
+X-Gm-Message-State: AOAM531+ClSC5BNpsQuQa23xc8OULHOVDu+avaCra+Nem/X7J3HkCpw8
+        jVttdqh2c1rx+GGqzbOjMlwrKw==
+X-Google-Smtp-Source: ABdhPJzNT5cwZpkJtm0q8ZvU8NX5NQwW4/WZfbEKBrzi+F7XlegU0PUEb28qIZxXi163Kc8lYpEvhw==
+X-Received: by 2002:a05:6e02:1a21:: with SMTP id g1mr17471600ile.108.1620063727706;
+        Mon, 03 May 2021 10:42:07 -0700 (PDT)
+Received: from [192.168.1.30] ([65.144.74.34])
+        by smtp.gmail.com with ESMTPSA id w6sm5824312ilq.64.2021.05.03.10.42.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 03 May 2021 10:42:07 -0700 (PDT)
+Subject: Re: [PATCH v9] bio: limit bio max size
+To:     Changheun Lee <nanich.lee@samsung.com>, bvanassche@acm.org,
+        yi.zhang@redhat.com, ming.lei@redhat.com, bgoncalv@redhat.com,
+        hch@lst.de, jaegeuk@kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, patchwork-bot@kernel.org
+References: <CGME20210503101008epcas1p25d6b727dafcf9ff24db6aa41a3f611fa@epcas1p2.samsung.com>
+ <20210503095203.29076-1-nanich.lee@samsung.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <c2951dc5-18bc-6c99-7cdc-21e6a8a12f9c@kernel.dk>
+Date:   Mon, 3 May 2021 11:42:06 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <78a165e1-657b-c284-d31a-adc8c9ded55d@nvidia.com>
+In-Reply-To: <20210503095203.29076-1-nanich.lee@samsung.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-CA
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 172.16.1.162
-X-SA-Exim-Rcpt-To: robin.murphy@arm.com, ira.weiny@intel.com, helgaas@kernel.org, jianxin.xiong@intel.com, dave.hansen@linux.intel.com, jason@jlekstrand.net, dave.b.minturn@intel.com, andrzej.jakowski@intel.com, daniel.vetter@ffwll.ch, willy@infradead.org, ddutile@redhat.com, christian.koenig@amd.com, jgg@ziepe.ca, dan.j.williams@intel.com, hch@lst.de, sbates@raithlin.com, iommu@lists.linux-foundation.org, linux-mm@kvack.org, linux-pci@vger.kernel.org, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, jhubbard@nvidia.com
-X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: [PATCH 13/16] nvme-pci: Convert to using dma_map_sg_p2pdma for
- p2pdma pages
-X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 2021-05-02 7:34 p.m., John Hubbard wrote:
->>   	if (iod->npages == 0)
->>   		dma_pool_free(dev->prp_small_pool, nvme_pci_iod_list(req)[0],
->>   			      iod->first_dma);
->> @@ -868,14 +857,13 @@ static blk_status_t nvme_map_data(struct nvme_dev *dev, struct request *req,
->>   	if (!iod->nents)
->>   		goto out_free_sg;
->>   
->> -	if (is_pci_p2pdma_page(sg_page(iod->sg)))
->> -		nr_mapped = pci_p2pdma_map_sg_attrs(dev->dev, iod->sg,
->> -				iod->nents, rq_dma_dir(req), DMA_ATTR_NO_WARN);
->> -	else
->> -		nr_mapped = dma_map_sg_attrs(dev->dev, iod->sg, iod->nents,
->> -					     rq_dma_dir(req), DMA_ATTR_NO_WARN);
->> -	if (!nr_mapped)
->> +	nr_mapped = dma_map_sg_p2pdma_attrs(dev->dev, iod->sg, iod->nents,
->> +				     rq_dma_dir(req), DMA_ATTR_NO_WARN);
->> +	if (nr_mapped < 0) {
->> +		if (nr_mapped != -ENOMEM)
->> +			ret = BLK_STS_TARGET;
->>   		goto out_free_sg;
->> +	}
+On 5/3/21 3:52 AM, Changheun Lee wrote:
+> bio size can grow up to 4GB when muli-page bvec is enabled.
+> but sometimes it would lead to inefficient behaviors.
+> in case of large chunk direct I/O, - 32MB chunk read in user space -
+> all pages for 32MB would be merged to a bio structure if the pages
+> physical addresses are contiguous. it makes some delay to submit
+> until merge complete. bio max size should be limited to a proper size.
 > 
-> But now the "nr_mapped == 0" case is no longer doing an early out_free_sg.
-> Is that OK?
+> When 32MB chunk read with direct I/O option is coming from userspace,
+> kernel behavior is below now in do_direct_IO() loop. it's timeline.
+> 
+>  | bio merge for 32MB. total 8,192 pages are merged.
+>  | total elapsed time is over 2ms.
+>  |------------------ ... ----------------------->|
+>                                                  | 8,192 pages merged a bio.
+>                                                  | at this time, first bio submit is done.
+>                                                  | 1 bio is split to 32 read request and issue.
+>                                                  |--------------->
+>                                                   |--------------->
+>                                                    |--------------->
+>                                                               ......
+>                                                                    |--------------->
+>                                                                     |--------------->|
+>                           total 19ms elapsed to complete 32MB read done from device. |
+> 
+> If bio max size is limited with 1MB, behavior is changed below.
+> 
+>  | bio merge for 1MB. 256 pages are merged for each bio.
+>  | total 32 bio will be made.
+>  | total elapsed time is over 2ms. it's same.
+>  | but, first bio submit timing is fast. about 100us.
+>  |--->|--->|--->|---> ... -->|--->|--->|--->|--->|
+>       | 256 pages merged a bio.
+>       | at this time, first bio submit is done.
+>       | and 1 read request is issued for 1 bio.
+>       |--------------->
+>            |--------------->
+>                 |--------------->
+>                                       ......
+>                                                  |--------------->
+>                                                   |--------------->|
+>         total 17ms elapsed to complete 32MB read done from device. |
+> 
+> As a result, read request issue timing is faster if bio max size is limited.
+> Current kernel behavior with multipage bvec, super large bio can be created.
+> And it lead to delay first I/O request issue.
 
-dma_map_sg_p2pdma_attrs() never returns zero. It will return -ENOMEM in
-the same situation and results in the same goto out_free_sg.
+Applied, thanks.
 
-Logan
+-- 
+Jens Axboe
+
