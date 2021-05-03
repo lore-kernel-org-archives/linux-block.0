@@ -2,226 +2,80 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5D02C4360C
-	for <linux-block@archiver.kernel.org>; Mon,  3 May 2021 16:58:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F1BFC43462
+	for <linux-block@archiver.kernel.org>; Mon,  3 May 2021 17:01:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8BD24610A5
-	for <linux-block@archiver.kernel.org>; Mon,  3 May 2021 16:58:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 645C7601FC
+	for <linux-block@archiver.kernel.org>; Mon,  3 May 2021 17:01:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234740AbhECQ6u (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 3 May 2021 12:58:50 -0400
-Received: from ale.deltatee.com ([204.191.154.188]:57990 "EHLO
-        ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235329AbhECQ4M (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 3 May 2021 12:56:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:MIME-Version:Date:
-        Message-ID:From:References:Cc:To:content-disposition;
-        bh=h9d5zovbtXKtO9TZYvlu4xL+neDJxYxd4FL4V4x+RQk=; b=XA3VMJFHu22LiuYRgV7sx4Rs8c
-        3591aoMHNv/NjUeysIvMIemFNGQvvxhSeVFLCIfBFEcN01AnLU0454DR7x9i5+KbkpS9wQvmvTDlB
-        wmDUyJnbQ8AY0II0FjrcE9U2lfVByEIa3k4pk83kSjB2pgdejDq3f35QdxYnU45zXwOvnAdMTmYRD
-        sEhVGLAwVXWpBZYAFJ1g4iWMaNWdT8a2zstO8bergFsL7t06RcmqF22XWsu1q8nTiQZBV3QbpBlvX
-        aEpoRPohuyyWFgct68cZTIlU40n9PYIaNeseQ9Io2WJOjCS7wWDIUSo6hGwSJE0qOa2JxxSZtGHpi
-        RmunKpRw==;
-Received: from guinness.priv.deltatee.com ([172.16.1.162])
-        by ale.deltatee.com with esmtp (Exim 4.92)
-        (envelope-from <logang@deltatee.com>)
-        id 1ldbqc-0004SZ-Bi; Mon, 03 May 2021 10:55:07 -0600
-To:     John Hubbard <jhubbard@nvidia.com>, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        linux-pci@vger.kernel.org, linux-mm@kvack.org,
-        iommu@lists.linux-foundation.org
-Cc:     Stephen Bates <sbates@raithlin.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
-        Don Dutile <ddutile@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Jakowski Andrzej <andrzej.jakowski@intel.com>,
-        Minturn Dave B <dave.b.minturn@intel.com>,
-        Jason Ekstrand <jason@jlekstrand.net>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Xiong Jianxin <jianxin.xiong@intel.com>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Robin Murphy <robin.murphy@arm.com>
-References: <20210408170123.8788-1-logang@deltatee.com>
- <20210408170123.8788-10-logang@deltatee.com>
- <37fa46c7-2c24-1808-16e9-e543f4601279@nvidia.com>
-From:   Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <aa0698ba-abad-8c07-2962-d66b6a7affd9@deltatee.com>
-Date:   Mon, 3 May 2021 10:55:02 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.9.0
+        id S234351AbhECRB7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 3 May 2021 13:01:59 -0400
+Received: from mx2.suse.de ([195.135.220.15]:44850 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234000AbhECQ5O (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 3 May 2021 12:57:14 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+        by mx2.suse.de (Postfix) with ESMTP id A80B6AF0F;
+        Mon,  3 May 2021 16:56:18 +0000 (UTC)
+Date:   Mon, 3 May 2021 13:56:15 -0300
+From:   Enzo Matsumiya <ematsumiya@suse.de>
+To:     Pavel Machek <pavel@ucw.cz>
+Cc:     Hannes Reinecke <hare@suse.de>, linux-leds@vger.kernel.org,
+        linux-block@vger.kernel.org, u.kleine-koenig@pengutronix.de,
+        Jens Axboe <axboe@kernel.dk>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 2/2] leds: trigger: implement block trigger
+Message-ID: <20210503165615.maqgm5e2gq554hcm@hyori>
+References: <20210430183216.27458-1-ematsumiya@suse.de>
+ <20210430183216.27458-3-ematsumiya@suse.de>
+ <7e8da9ec-b3e3-0329-d54c-bb44c4064f0d@suse.de>
+ <20210503101134.GB6621@amd>
 MIME-Version: 1.0
-In-Reply-To: <37fa46c7-2c24-1808-16e9-e543f4601279@nvidia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-CA
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 172.16.1.162
-X-SA-Exim-Rcpt-To: robin.murphy@arm.com, ira.weiny@intel.com, helgaas@kernel.org, jianxin.xiong@intel.com, dave.hansen@linux.intel.com, jason@jlekstrand.net, dave.b.minturn@intel.com, andrzej.jakowski@intel.com, daniel.vetter@ffwll.ch, willy@infradead.org, ddutile@redhat.com, christian.koenig@amd.com, jgg@ziepe.ca, dan.j.williams@intel.com, hch@lst.de, sbates@raithlin.com, iommu@lists.linux-foundation.org, linux-mm@kvack.org, linux-pci@vger.kernel.org, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, jhubbard@nvidia.com
-X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: [PATCH 09/16] dma-direct: Support PCI P2PDMA pages in dma-direct
- map_sg
-X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20210503101134.GB6621@amd>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 05/03, Pavel Machek wrote:
+>> As already commented on, this for_each_blk() construct is not a good idea.
+>> Infact, I guess it would be better if you could invert the logic:
+>> Not having the block trigger enumerating all devices, but rather let the
+>> devices register with the block trigger.
+>> That would have the benefit that one could choose which block device should
+>> be handled by the LED trigger subsystem, _and_ you would avoid the need for
+>> a for_each_blk() construct.
+>> Thing is, I don't think that all block devices should be handled by the LED
+>> trigger; eg for things like 'loop' or 'ramdisk' it is very
+>> >questionable.
+>
+>> Downside is that you would need to modify the drivers, but realistically
+>> there are only very few drivers which should be modified; I would go for
+>> nvme-pci and the sd driver for starters. Maybe floppy, but arguably that can
+>> omitted as one has a very good audio indicator for floppy accesses
+>> :-)
+>
+>And we already have disk activity trigger. Maybe NVMe and SD needs to
+>be modified to use it?
+>
+>Best regards,
+>								Pavel
+
+TBH I haven't thought of that. My initial idea was to actually offer
+maximum flexibility to the user, so exposing all block devices on the
+system [*], being able to set any LED available as an indicator for each
+of those.
+
+But, indeed, just using ledtrig-disk in NVMe and SD might just be
+simpler.
 
 
-On 2021-05-02 5:28 p.m., John Hubbard wrote:
->> @@ -387,19 +388,37 @@ void dma_direct_unmap_sg(struct device *dev, struct scatterlist *sgl,
-> 
-> This routine now deserves a little bit of commenting, now that it is
-> doing less obvious things. How about something like this:
-> 
-> /*
->   * Unmaps pages, except for PCI_P2PDMA pages, which were never mapped in the
->   * first place. Instead of unmapping PCI_P2PDMA entries, simply remove the
->   * SG_PCI_P2PDMA mark
->   */
-> void dma_direct_unmap_sg(struct device *dev, struct scatterlist *sgl,
-> 		int nents, enum dma_data_direction dir, unsigned long attrs)
-> {
-> 
-
-Ok.
-
->>   	struct scatterlist *sg;
->>   	int i;
->>   
->> -	for_each_sg(sgl, sg, nents, i)
->> +	for_each_sg(sgl, sg, nents, i) {
->> +		if (sg_is_pci_p2pdma(sg)) {
->> +			sg_unmark_pci_p2pdma(sg);
->> +			continue;
->> +		}
->> +
->>   		dma_direct_unmap_page(dev, sg->dma_address, sg_dma_len(sg), dir,
->>   			     attrs);
->> +	}
-> 
-> The same thing can be achieved with fewer lines and a bit more clarity.
-> Can we please do it like this instead:
-> 
-> 	for_each_sg(sgl, sg, nents, i) {
-> 		if (sg_is_pci_p2pdma(sg))
-> 			sg_unmark_pci_p2pdma(sg);
-> 		else
-> 			dma_direct_unmap_page(dev, sg->dma_address,
-> 					      sg_dma_len(sg), dir, attrs);
-> 	}
-> 
-> 
-
-That's debatable (the way I did it emphasizes the common case). But I'll
-consider changing it.
-
-> 
-> Also here, a block comment for the function would be nice. How about
-> approximately this:
-> 
-> /*
->   * Maps each SG segment. Returns the number of entries mapped, or 0 upon
->   * failure. If any entry could not be mapped, then no entries are mapped.
->   */
-> 
-> I'll stop complaining about the pre-existing return code conventions,
-> since by now you know what I was thinking of saying. :)
-
-Not really part of this patchset... Seems like if you think there should
-be a comment like that here, you should send a patch. But this patch
-starts returning a negative value here.
-
->>   int dma_direct_map_sg(struct device *dev, struct scatterlist *sgl, int nents,
->>   		enum dma_data_direction dir, unsigned long attrs)
->>   {
->> -	int i;
->> +	struct pci_p2pdma_map_state p2pdma_state = {};
-> 
-> Is it worth putting this stuff on the stack--is there a noticeable
-> performance improvement from caching the state? Because if it's
-> invisible, then simplicity is better. I suspect you're right, and that
-> it *is* worth it, but it's good to know for real.
-> 
->>   	struct scatterlist *sg;
->> +	int i, ret = 0;
->>   
->>   	for_each_sg(sgl, sg, nents, i) {
->> +		if (is_pci_p2pdma_page(sg_page(sg))) {
->> +			ret = pci_p2pdma_map_segment(&p2pdma_state, dev, sg,
->> +						     attrs);
->> +			if (ret < 0) {
->> +				goto out_unmap;
->> +			} else if (ret) {
->> +				ret = 0;
->> +				continue;
-> 
-> Is this a bug? If neither of those "if" branches fires (ret == 0), then
-> the code (probably unintentionally) falls through and continues on to
-> attempt to call dma_direct_map_page()--despite being a PCI_P2PDMA page!
-
-No, it's not a bug. Per the documentation of pci_p2pdma_map_segment(),
-if it returns zero the segment should be mapped normally. P2PDMA pages
-must be mapped with physical addresses (or IOVA addresses) if the TLPS
-for the transaction will go through the host bridge.
-
-> See below for suggestions:
-> 
->> +			}
->> +		}
->> +
->>   		sg->dma_address = dma_direct_map_page(dev, sg_page(sg),
->>   				sg->offset, sg->length, dir, attrs);
->>   		if (sg->dma_address == DMA_MAPPING_ERROR)
-> 
-> This is another case in which "continue" is misleading and not as good
-> as "else". Because unless I'm wrong above, you really only want to take
-> one path *or* the other.
-
-No, per above, it's not one path or the other. If it's a P2PDMA page it
-may still need to be mapped normally.
-
-> Also, the "else if (ret)" can be simplified to just setting ret = 0
-> unconditionally.
-
-I don't follow. If ret is set, we need to unset it before the end of the
-loop.
-
-> Given all that, here's a suggested alternative, which is both shorter
-> and clearer, IMHO:
-> 
-> 	for_each_sg(sgl, sg, nents, i) {
-> 		if (is_pci_p2pdma_page(sg_page(sg))) {
-> 			ret = pci_p2pdma_map_segment(&p2pdma_state, dev, sg,
-> 						     attrs);
-> 			if (ret < 0)
-> 				goto out_unmap;
-> 			else
-> 				ret = 0;
-> 		} else {
-> 			sg->dma_address = dma_direct_map_page(dev, sg_page(sg),
-> 					sg->offset, sg->length, dir, attrs);
-> 			if (sg->dma_address == DMA_MAPPING_ERROR)
-> 				goto out_unmap;
-> 			sg_dma_len(sg) = sg->length;
-> 		}
-> 	}
-
-No, per the comments above, this does not accomplish the same thing and
-is not correct.
-
-I'll try to add a comment to the code to make it more clearer. But the
-kernel doc on pci_p2pdma_map_segment() does mention what must be done
-for different return values explicitly.
-
-Logan
+[*] - again, I see now this was a bad idea and will be changed in a
+possible next version
