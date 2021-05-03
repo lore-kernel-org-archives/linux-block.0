@@ -2,76 +2,57 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EE31C433ED
-	for <linux-block@archiver.kernel.org>; Mon,  3 May 2021 14:59:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94F79C43460
+	for <linux-block@archiver.kernel.org>; Mon,  3 May 2021 15:47:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5826061166
-	for <linux-block@archiver.kernel.org>; Mon,  3 May 2021 14:59:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 604E961283
+	for <linux-block@archiver.kernel.org>; Mon,  3 May 2021 15:47:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230134AbhECPAh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 3 May 2021 11:00:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56236 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229899AbhECPAg (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 3 May 2021 11:00:36 -0400
-Received: from mail-io1-xd2b.google.com (mail-io1-xd2b.google.com [IPv6:2607:f8b0:4864:20::d2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72F4EC06174A
-        for <linux-block@vger.kernel.org>; Mon,  3 May 2021 07:59:42 -0700 (PDT)
-Received: by mail-io1-xd2b.google.com with SMTP id t21so4329043iob.2
-        for <linux-block@vger.kernel.org>; Mon, 03 May 2021 07:59:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=6egtxTN5q4QLPOJLRd3y+Z0fKzalIDR3UohhkwtOCM8=;
-        b=rMzOccYnjQjJTQplZd4m5b4GYay4fmSvBEXQ0cyrH9TWKEEaxSW7ofFPCXRs6iV6ZV
-         gn73VPb/MX5vg1btYyq2Gj38MRIouiIJ+j4GMlahaOcMMPBIAXqGfHAvFgbZPraXTR1Y
-         +WcV4bAqr2poTCc3OMyAQpdso+VA272r2vwbSwj368IFnfgMBk7pUWjQ4YYZfWRO/7Xs
-         H1rDmVrdkjETcygVtzVSBfcngngQLovheZLeGdIPvPJWR0sR+z2l52KuNSmNoMVppLNR
-         AvjKs1NTEeLXCGjD0BIUOLk7xVt68zMFFQACW9XAzHC4MNaclyET0PVR8awjabSMexKU
-         vVSg==
+        id S230362AbhECPsC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 3 May 2021 11:48:02 -0400
+Received: from mail-pj1-f46.google.com ([209.85.216.46]:54235 "EHLO
+        mail-pj1-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230468AbhECPsA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 3 May 2021 11:48:00 -0400
+Received: by mail-pj1-f46.google.com with SMTP id p17so3353184pjz.3
+        for <linux-block@vger.kernel.org>; Mon, 03 May 2021 08:47:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
+        h=x-gm-message-state:from:subject:to:references:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=6egtxTN5q4QLPOJLRd3y+Z0fKzalIDR3UohhkwtOCM8=;
-        b=Fh6zpPYXBYgPCXyc+gDXwMSahziUnnga6ECWuXYYBO+wQroCtKvnoal6e0fKc8A+5i
-         ujjIJZkLR1RYM1FA4yWInEeLqXlC9xTnM/bUEEguRaqMwhYhgkqGa4nqRtEYY8NIZumB
-         KiTzmwrnbZ9ElzrMPgTPauBeDbCm92PWDo++fDU9spMaAHycNEAhUayQPP52Fd/7F5q/
-         DmTEk95aEuQTPtIxV3eLjU4H5Sczs6qNYiU7JWBZBH36V3qx9RqQ0bFLMiPXpnOr1DF0
-         7Mk4Kp7l+S6Li2lAQc3NVeCErQyst1pi4RvPp6XCjjYjSYPUDNAGJ6ZD3tiT8LVTQj4z
-         oyVw==
-X-Gm-Message-State: AOAM532rqEbnnF8VvR43xOS9zGBqzmDlfL+enOIMLhiWcGkrv/fNmZJj
-        n71X92qOOoLrb9u/bTlSy/QIWQ==
-X-Google-Smtp-Source: ABdhPJwI1R2aI/WV1VcSccFj48I+dXgpwOXLiCW3REwd2nVuBgcj93isKO595yRlv6MPq97L7l7nBw==
-X-Received: by 2002:a05:6602:81e:: with SMTP id z30mr15264730iow.90.1620053981968;
-        Mon, 03 May 2021 07:59:41 -0700 (PDT)
-Received: from [192.168.1.30] ([65.144.74.34])
-        by smtp.gmail.com with ESMTPSA id q26sm273508ioh.42.2021.05.03.07.59.41
+        bh=Zi4uyI00rNr+GDZE8rWnfF5BEO93We/Xiia9K4ugR3w=;
+        b=GdT087+o8ual0CKPNa1wL8jwp12BnLy8S6xd2RtkMpn6eIQyM0qdtMofbrde184XLB
+         07L4UvYEd4vL1Ttkqxm0iaT1f9MkiiTLmO/YGCLscxsiBBK+vp/UdUAHRa4Gl7mcwtoR
+         Q5D+sWqNp7FCRfo9VWbVuwTGVA/LEE1L8mZ0eKhsQNXKRGzXdE8gSpBvzSjZH73lVpL8
+         rmyFmT8pd2+RHtIZ7g4wOXmDA2kB2vNkpGwJk4O8QCP8bFLPWC+8DwC3r/TQR/e0rsAo
+         tvMdElAIh22L30nONq7vGfqCZtA9RSIOLLgAsvhT/ZAJ1z3D3Nik2JsAoG/zjF1Ct4nA
+         W4Rg==
+X-Gm-Message-State: AOAM531ov7jlTmVsbx2QCpQBGxi7sVgxYOSdsZcBd0ESU7A3kS1zQrm9
+        8L17Z5hwoIEWn/hzOKywFvJRSKKd74w=
+X-Google-Smtp-Source: ABdhPJxpv6S2884Z5X/xsmqLdZ3OUi+Eqqlm04FnPzWtgwi9vOjio9M//k/1m1cWPpBBco7D7UtCZg==
+X-Received: by 2002:a17:902:e807:b029:ee:c73b:9fc4 with SMTP id u7-20020a170902e807b02900eec73b9fc4mr10073666plg.72.1620056826534;
+        Mon, 03 May 2021 08:47:06 -0700 (PDT)
+Received: from ?IPv6:2601:647:4000:d7:e960:31db:6b4:8ca7? ([2601:647:4000:d7:e960:31db:6b4:8ca7])
+        by smtp.gmail.com with ESMTPSA id c4sm9164695pfn.48.2021.05.03.08.47.05
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 03 May 2021 07:59:41 -0700 (PDT)
-Subject: Re: [PATCH v9] bio: limit bio max size
-To:     Bart Van Assche <bvanassche@acm.org>,
-        Changheun Lee <nanich.lee@samsung.com>, yi.zhang@redhat.com,
-        ming.lei@redhat.com, bgoncalv@redhat.com, hch@lst.de,
-        jaegeuk@kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, patchwork-bot@kernel.org
-References: <CGME20210503101008epcas1p25d6b727dafcf9ff24db6aa41a3f611fa@epcas1p2.samsung.com>
- <20210503095203.29076-1-nanich.lee@samsung.com>
- <72a0b4e7-a374-97fb-ae73-ed24f719da98@acm.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <c48d45cc-9c4f-0b6c-51d0-3044e7cdf7f5@kernel.dk>
-Date:   Mon, 3 May 2021 08:59:41 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Mon, 03 May 2021 08:47:05 -0700 (PDT)
+From:   Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [PATCH] null_blk: poll queue support
+To:     Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <baca710d-0f2a-16e2-60bd-b105b854e0ae@kernel.dk>
+Message-ID: <725ea863-c754-addf-f143-71d7e2f273de@acm.org>
+Date:   Mon, 3 May 2021 08:47:01 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.0
 MIME-Version: 1.0
-In-Reply-To: <72a0b4e7-a374-97fb-ae73-ed24f719da98@acm.org>
+In-Reply-To: <baca710d-0f2a-16e2-60bd-b105b854e0ae@kernel.dk>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -79,26 +60,53 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/3/21 8:54 AM, Bart Van Assche wrote:
-> On 5/3/21 2:52 AM, Changheun Lee wrote:
->>  struct queue_limits {
->> +	unsigned int		bio_max_bytes;
->> +
->>  	enum blk_bounce		bounce;
->>  	unsigned long		seg_boundary_mask;
->>  	unsigned long		virt_boundary_mask;
+On 4/17/21 8:29 AM, Jens Axboe wrote:
+> There's currently no way to experiment with polled IO with null_blk,
+> which seems like an oversight. This patch adds support for polled IO.
+> We keep a list of issued IOs on submit, and then process that list
+> when mq_ops->poll() is invoked.
 > 
-> On April 23 Damien Le Moal posted the following comment about the
-> bio_max_bytes member: "Please move this below in the structure together
-> with all other fields that are unsigned int too." Making that change
-> sounds like a good idea to me.
+> A new parameter is added, poll_queues. It defaults to 1 like the
+> submit queues, meaning we'll have 1 poll queue available.
 
-Why? It's next to an enum, so the patch (as it stands) actually fills a
-hole in the struct. Moving it would be a mistake and waste more space.
+Has anyone run blktests against blk-for-next since this patch got
+queued? The following appears in the kernel log if I run blktests:
 
-If anything, we should move the bounce member below virt_boundary_mask,
-but since this one fills a hole, that's better left as a separate patch.
+root[5563]: run blktests block/010
+null_blk: module loaded
+==================================================================
+BUG: KASAN: null-ptr-deref in null_map_queues+0x131/0x1a0 [null_blk]
+Read of size 8 at addr 0000000000000000 by task modprobe/5612
 
--- 
-Jens Axboe
+CPU: 7 PID: 5612 Comm: modprobe Not tainted 5.12.0-dbg+ #33
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.14.0-0-g155821a-rebuilt.opensuse.org 04/01/2014
+Call Trace:
+ show_stack+0x52/0x58
+ dump_stack+0x9d/0xcf
+ kasan_report.cold+0x4b/0x50
+ __asan_load8+0x69/0x90
+ null_map_queues+0x131/0x1a0 [null_blk]
+ blk_mq_update_queue_map+0x122/0x1a0
+ blk_mq_alloc_tag_set+0x1c8/0x480
+ null_init_tag_set+0x19c/0x220 [null_blk]
+ null_init+0x1ac/0x1000 [null_blk]
+ do_one_initcall+0xd3/0x460
+ do_init_module+0x10a/0x400
+ load_module+0xbe2/0xc50
+ __do_sys_finit_module+0x131/0x1c0
+ __x64_sys_finit_module+0x43/0x50
+ do_syscall_64+0x3a/0xb0
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x7f51f7fd367d
+Code: 00 c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d bb f7 0c 00 f7 d8 64 89 01 48
+RSP: 002b:00007ffd4a668728 EFLAGS: 00000246 ORIG_RAX: 0000000000000139
+RAX: ffffffffffffffda RBX: 00005609718ddbe0 RCX: 00007f51f7fd367d
+RDX: 0000000000000000 RSI: 00005609718ddfe0 RDI: 0000000000000003
+RBP: 0000000000040000 R08: 0000000000000000 R09: 000000000000003a
+R10: 0000000000000003 R11: 0000000000000246 R12: 00005609718ddfe0
+R13: 0000000000000000 R14: 00005609718ddd70 R15: 00005609718ddbe0
+==================================================================
 
+Thanks,
+
+Bart.
