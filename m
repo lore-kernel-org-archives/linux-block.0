@@ -2,86 +2,81 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58986C433ED
-	for <linux-block@archiver.kernel.org>; Mon,  3 May 2021 12:42:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAADAC433ED
+	for <linux-block@archiver.kernel.org>; Mon,  3 May 2021 14:54:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0E269611C9
-	for <linux-block@archiver.kernel.org>; Mon,  3 May 2021 12:42:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A84B6611BF
+	for <linux-block@archiver.kernel.org>; Mon,  3 May 2021 14:54:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233693AbhECMmu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 3 May 2021 08:42:50 -0400
-Received: from mout.gmx.net ([212.227.17.20]:47431 "EHLO mout.gmx.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233683AbhECMmu (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 3 May 2021 08:42:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
-        s=badeba3b8450; t=1620045715;
-        bh=MgDjGj9W7AftKzP2PEOO/fWBeRFeC5Rr2QPkxBrpCAo=;
-        h=X-UI-Sender-Class:Subject:From:To:Cc:Date:In-Reply-To:References;
-        b=PsgzlFJ3WJl7vp/jTBhLPwPyFVnpjdbOO3n3URd6Fe2Hf5RvmpAMsS5te9ZH6geaj
-         lZFFM1o+/zQCnjzAIzr4FFDoQzkhjPkfDGG6g844D6ciQI9cMZOh0qVrZAj/JANp7A
-         mJTBEGgWDMC8jibzMksQhlkhQoF9ifG9+KojGKUA=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from homer.fritz.box ([185.221.149.135]) by mail.gmx.net (mrgmx104
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1N1fii-1lSITz0ZxI-011xvo; Mon, 03
- May 2021 14:41:55 +0200
-Message-ID: <e0ece2e6349e92adc3da6d8c2ae6ff8a4172e4ad.camel@gmx.de>
-Subject: Re: block, bfq: NULL pointer dereference in bfq_rq_pos_tree_lookup()
-From:   Mike Galbraith <efault@gmx.de>
-To:     Paolo Valente <paolo.valente@linaro.org>
-Cc:     lkml <linux-kernel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>
-Date:   Mon, 03 May 2021 14:41:54 +0200
-In-Reply-To: <9732EA9F-E15B-48E1-9B92-2D74F75C6331@linaro.org>
-References: <8c38408d27f1032f2a664838e523376c5da09a80.camel@gmx.de>
-         <9732EA9F-E15B-48E1-9B92-2D74F75C6331@linaro.org>
-Content-Type: text/plain; charset="ISO-8859-15"
-User-Agent: Evolution 3.34.4 
+        id S229976AbhECOza (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 3 May 2021 10:55:30 -0400
+Received: from mail-pj1-f51.google.com ([209.85.216.51]:38585 "EHLO
+        mail-pj1-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229959AbhECOza (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 3 May 2021 10:55:30 -0400
+Received: by mail-pj1-f51.google.com with SMTP id f11-20020a17090a638bb02901524d3a3d48so5886090pjj.3;
+        Mon, 03 May 2021 07:54:37 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ub/LErhdbHR7AtDCQwrZWioyDIzI1kev/KhOCF9bYpo=;
+        b=FdFvEgOiRyr4RAGCP0eAtNK9emfbLXw9KeSEfEvMXRKSq3Vhd8ANzGwbmbl9HGL/Zv
+         KRfvCgaFNrnycIfH5WM6Qsvv6PLB1lw1W9TVg37FsdTUAZ0u3xaxyJWqZ5NSAOcAYkqp
+         rNmILmJykTZ5qCjJhMthH5hz0kEFTky9IS3FdVBbJHPt6IFrYkJcsWThhcpqstyQI+Ip
+         HSRFzjfZJAmyaN4AfimTiOkEdA0wLUU1yYW1U46PG3TKr7v+vR6zgX0J4DWkeGGSIb9E
+         YQT4y3Nw3G1YTf72IWZuxzioB869Q+I6rjP6EBTV1eoAvQ95prbDtFKa70zzh7G7GxRg
+         LZlw==
+X-Gm-Message-State: AOAM530fOv4Elk2eQHZpjQ3cvYncnUQXwMT1hmdxVjf0W9APrEdlsWiq
+        vV9z3t11fVTr/EZchSAFQms=
+X-Google-Smtp-Source: ABdhPJyvf1ENO6i+mxvDHfzZpFnn92lB5ZvZJ/ZWYb8nGFjlNZEvhbytQ5xqWaHwfbnMUJH3XG6l0g==
+X-Received: by 2002:a17:90a:7e92:: with SMTP id j18mr10703282pjl.231.1620053676675;
+        Mon, 03 May 2021 07:54:36 -0700 (PDT)
+Received: from ?IPv6:2601:647:4000:d7:e960:31db:6b4:8ca7? ([2601:647:4000:d7:e960:31db:6b4:8ca7])
+        by smtp.gmail.com with ESMTPSA id g35sm5097128pjg.17.2021.05.03.07.54.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 03 May 2021 07:54:35 -0700 (PDT)
+Subject: Re: [PATCH v9] bio: limit bio max size
+To:     Changheun Lee <nanich.lee@samsung.com>, axboe@kernel.dk,
+        yi.zhang@redhat.com, ming.lei@redhat.com, bgoncalv@redhat.com,
+        hch@lst.de, jaegeuk@kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, patchwork-bot@kernel.org
+References: <CGME20210503101008epcas1p25d6b727dafcf9ff24db6aa41a3f611fa@epcas1p2.samsung.com>
+ <20210503095203.29076-1-nanich.lee@samsung.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <72a0b4e7-a374-97fb-ae73-ed24f719da98@acm.org>
+Date:   Mon, 3 May 2021 07:54:33 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:/imrIJ5eJDQMTerBLZpi1T65wqIRlO7L71vz8GpusocRzO7mcNH
- GuWuLaxhXpgqWAIOblRWf2eG/yBttNO/gRBsIfnr1a2sk3BlcFgNUNwAm/Fbe7qkF/NhXBl
- 4youAWSC5tGzrVC3RCBuIfsepY4zHt0XXROZNHFoW7cb5yQlPhWzHs8J+oyNuMQjG//b7qH
- O+WdNpZlNeEqw/6o4w+rA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:2Vzkgk2lTPY=:HGj2eoEPDLNCvYS2Rpc9gN
- yf5sLrpi4v+sFRQkFIH1CeIm6GASGQ0zFFF9zglH+58adZwzNZBa5nGTJEx8Dp3nJLcYZLgfG
- BeHbb6DGSMEd9iryJIUj1TIl+rcMUdQ1g73G9EbeLD+EMT46Wi4moUyzhIVK5CAch/tYES7A+
- nLoS3U9uNa9kVe4TSi+sU5te72D4FH/4euRA5Jq4kecmzq0vPwQzW36G9Cwd9oNmqm56Svo8V
- 4sNaQ+xbZeevLqi3bDp0jOUdHk2AIN10/OVXQS5GWpZa/cyBdreLye5OisfDmI5Yc99FO0goq
- cOt5Fn7SCCOSDRfVE7HPQAMccBg0niAPgJIHvs9fLswqz+IJ+02zXzR6pomfnJOryJ2ysFhbf
- m1qCtKM3JXH9FbOeAVUFhlh+WUGQb+eLEitv/C0VKgb4Z/4tlztlTOAu1bH1Gezb+JE/xf1Nf
- 5RlOOGSIOM8L5me6Ti4CvRUkC09GqtHZDZrZrVIuCuE5QP3BAGY00GXaOiQvD7oHEY5CYtqYP
- kRof7eU5mhMwoFYwDHelAAGngI04s64Z3lnQPLn6YieUOlTBYQWi+/onfhB06qUOYv+vQMMj1
- cKh4R89TuMg1XY0WL31C5nSWLTuJdonxCvdmUlPtn0n3Z7zJDjwmFUEWPaS8Sz2ROXp7YBl2h
- 5/SkZHUkTcNEWcdGrO04XJWsLNyn/Ep0UJ6m+61TyO/z31ehtjairS34AHzCC47rXssCJF/01
- mhA5P67VPgK8QZk+m6AvKrWCWNQMd6H1X9S7bc5XTA+ospY1MZA+RdA9tUE5Qs0SgeQhlu3pt
- Iyfw7K3SXrLJZ9RQ2zNyqLG43s8oG0NLB17HJDbN3D8Ank14xVGbgiPaC21z2tQwLmI8NJPhl
- 8a7sdnJFYX1g7Noub600HjqjjctKsMGkVYhcXPUM6Qw3Vta4WdyIrzbBHUAAaXZ/4fF0XxN+P
- WMxzQhcghXKTbuy0oyjvvru4eJrfflMX07TQ1i96P52Bs0xIpUs7FWw2QYv2FbE81j1AP2oxD
- gcWypf524Q2vleJihH9sswhl4af+woVJZxrZJbemdAQyJY7rCxLzkkoJTjTXsNYHMV/nOlgQH
- zT6KSFL6/sHXu+frGyywLhP0OxPTjlrnahrWOsQBXa72UDVagdgahR/6N+8hj6swH0BIpPkcg
- Gb0oly1V8t64PyfYsMwRSDMwSD5GS0bwMtBIrNM752gAdM3BFQYKYy3As/znfex6wWybg=
+In-Reply-To: <20210503095203.29076-1-nanich.lee@samsung.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 2021-05-03 at 11:52 +0200, Paolo Valente wrote:
-> Hi Mike,
-> I've waited a little bit before replying, because I've worked on a dev
-> patch series, for debugging another crash. I'd like to use
-> this series for your failure too, as the OOPS you report
-> unfortunately does not ring any bell :(
->
-> So, could you please try to apply this patch series?  If it doesn't
-> apply, I'll rebase it.
+On 5/3/21 2:52 AM, Changheun Lee wrote:
+>  struct queue_limits {
+> +	unsigned int		bio_max_bytes;
+> +
+>  	enum blk_bounce		bounce;
+>  	unsigned long		seg_boundary_mask;
+>  	unsigned long		virt_boundary_mask;
 
-This bug isn't deterministic, but I can wedge your set into my devel
-trees, and see if anything falls out.
+On April 23 Damien Le Moal posted the following comment about the
+bio_max_bytes member: "Please move this below in the structure together
+with all other fields that are unsigned int too." Making that change
+sounds like a good idea to me.
 
-	-Mike
+Thanks,
+
+Bart.
+
 
