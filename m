@@ -7,54 +7,54 @@ X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36223C43462
-	for <linux-block@archiver.kernel.org>; Tue,  4 May 2021 16:12:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6699C43460
+	for <linux-block@archiver.kernel.org>; Tue,  4 May 2021 16:12:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0184C613BA
-	for <linux-block@archiver.kernel.org>; Tue,  4 May 2021 16:12:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 95229613BE
+	for <linux-block@archiver.kernel.org>; Tue,  4 May 2021 16:12:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231796AbhEDQNl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 May 2021 12:13:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53116 "EHLO
+        id S231808AbhEDQNs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 May 2021 12:13:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231783AbhEDQNk (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 May 2021 12:13:40 -0400
-Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90322C061763
-        for <linux-block@vger.kernel.org>; Tue,  4 May 2021 09:12:44 -0700 (PDT)
-Received: by mail-lf1-x132.google.com with SMTP id c11so14080386lfi.9
-        for <linux-block@vger.kernel.org>; Tue, 04 May 2021 09:12:44 -0700 (PDT)
+        with ESMTP id S231782AbhEDQNm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 May 2021 12:13:42 -0400
+Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DD1BC06174A
+        for <linux-block@vger.kernel.org>; Tue,  4 May 2021 09:12:46 -0700 (PDT)
+Received: by mail-lf1-x12a.google.com with SMTP id 2so14110550lft.4
+        for <linux-block@vger.kernel.org>; Tue, 04 May 2021 09:12:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=BD0REsdi9mYrsTQHgnQYm8ynmTMvDhWbCRyzYdtenaE=;
-        b=BNrJU8ETwTzMQmDoewcwRrwdt+JF/8bPFkNqC9iSYX8GmcOdxoZUPWw9E4k0cnGKvk
-         77PhDK128+Z1d73zP2zPsDGLqcOZA04MD5Ys3wFNpOmsNZv1z0Yak4clljxF8NwEiVdY
-         y93x/3Sx8ITu7wIKkkWw5t/QHsdQzwokdnLWsU4akPfRIFxjPS6u6rNGB9xbC6z4Rhvi
-         PdxHhC34fXzWlJpQGf92/0W5QoV76LROJ3y3ExKR0XPlE2ByVMXKdaclarn5RP7OSIb6
-         5vrWZawduBZ9kpPE+YYKSt5n9MKaPfD65yTIMiZvkIGJb9mEJhqntqAbw9r+PTdPsM1i
-         mtAA==
+        bh=TbWXoJHQ0uWHFVcBWf57QwZSLHYhmQWZi0APC0CkQ08=;
+        b=gExKlqDoKgJalaIZaU8BM2x89Hb4Dohp9KedfOXruDPXVcWDkbMIubEXRTev60u9Th
+         HcZRM3d7e8VDENDbx9lfI6MezGAisJxM1un5F/Yi1e2NR23HxAFVr0MsR2xpmDyh/tL8
+         AEeIZn3rjHu66iBNPk3Dxe0fZ1LYs5keoyuEWGyNZAnb2ica6U0UeMr3NXzO35CiwVxi
+         tsEszOaRd4F+OAR65+/pPl8pDiWdMZHW3pk+2xZOqB9Vp0l/GgNuBNWLE499L+A9Q+LJ
+         Ku+PuQzagL5cp1qjHyUWmkt8mhIVkYt/L+FCAgIga1xTunlbn3N3Z9DAQwIJpighfA8X
+         567A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=BD0REsdi9mYrsTQHgnQYm8ynmTMvDhWbCRyzYdtenaE=;
-        b=ueru8FXIJ3EVRiJRsKLuTPC6uInvEVHl3BEJo0cyN6t3MpVa3HBDhYiceMn3TKmFup
-         ealqw+L+VNZBVhuHPfqtl2tJ0KzxTf87e3oR2Cvs8mRdyr6pxMGd57WS6tdbNDac7fph
-         CcHi972aUHzbKnIr+BmaVo3K8HPAIdpmF45eEgNmfb2Md1un3QQerZ1PUnA8n7G20s9q
-         rK/d+U6f4I/u9KowjeSzB6/CLwbTKPTdxYwkSKix6upzRZ4aKa+GfUJDsYSA0prdgRS0
-         g9ocj666A1kEAJ+ixp5GuAC76vZyBcqmbNsslJTlejd/yBQjzGUwf2zf+TOpqt62aiD6
-         esvQ==
-X-Gm-Message-State: AOAM531eFHWLNhvtORy9zUnXxX45nDKzivMVVmbsHdoGrF9z8ikDm3HK
-        1YDH9vTzZql4VXb+i7tgt1Ctsg==
-X-Google-Smtp-Source: ABdhPJzTWescUDGeNdcqNOKmn/4NYKWiyZROmOnTzqAYSbKve6znLgTJKGetZjhuqJS77CByg7cxeQ==
-X-Received: by 2002:a19:48d7:: with SMTP id v206mr17301695lfa.629.1620144763115;
-        Tue, 04 May 2021 09:12:43 -0700 (PDT)
+        bh=TbWXoJHQ0uWHFVcBWf57QwZSLHYhmQWZi0APC0CkQ08=;
+        b=A1TCObqyC5N7wj6RgXezAh9HbhRwhy3Gg6qP3EhsdEXwPixBkarCkXUbaThnDeOXeb
+         FIrFzOuICJulHEiazvZ4j8st7Olo6yIC9/uvoexNA3GKb6XxLiFpxv0paEBrjeRWz4Yg
+         2aeU2Ej16rba4W66vPy90i5e+1VUEWIAiE7px7JANU3U/PgmDKaIU8Tf4Nqb+K9MErs4
+         ryG7edSfOah1ZuIF54xvCr43PC4wLeZeq9zqcOKSZwdq3ZL6ug8Ag8n/zqPcUN4goSih
+         o6N2Lbub72q2w7X6cABqP5J7aq9m8Z4NqxEkhi+gU79/GExMIZIekyIYoiwy4bq/QD0p
+         XYag==
+X-Gm-Message-State: AOAM530zByRx7PqbsC80Q1Mb11aakyBePpFJkEE+rNFJFgZ5SmApcuzW
+        +EEcQX7/i2m5iVGiutGdU1SjMw==
+X-Google-Smtp-Source: ABdhPJyvMw01Rzrp2T1AFFthQkcduusLKNZ1Zsiz/LYkrImYWZ59EDKdnOxO8rE7EoDsNLHKgHvDrA==
+X-Received: by 2002:a19:ac4a:: with SMTP id r10mr17287804lfc.112.1620144765023;
+        Tue, 04 May 2021 09:12:45 -0700 (PDT)
 Received: from localhost.localdomain (h-98-128-180-197.NA.cust.bahnhof.se. [98.128.180.197])
-        by smtp.gmail.com with ESMTPSA id s20sm164193ljs.116.2021.05.04.09.12.40
+        by smtp.gmail.com with ESMTPSA id s20sm164193ljs.116.2021.05.04.09.12.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 May 2021 09:12:41 -0700 (PDT)
+        Tue, 04 May 2021 09:12:44 -0700 (PDT)
 From:   Ulf Hansson <ulf.hansson@linaro.org>
 To:     linux-mmc@vger.kernel.org, Ulf Hansson <ulf.hansson@linaro.org>,
         Adrian Hunter <adrian.hunter@intel.com>
@@ -64,9 +64,9 @@ Cc:     Linus Walleij <linus.walleij@linaro.org>,
         Avri Altman <avri.altman@wdc.com>,
         Masami Hiramatsu <masami.hiramatsu@linaro.org>,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 05/11] mmc: core: Enable eMMC sleep commands to use HW busy polling
-Date:   Tue,  4 May 2021 18:12:16 +0200
-Message-Id: <20210504161222.101536-6-ulf.hansson@linaro.org>
+Subject: [PATCH 06/11] mmc: core: Prepare mmc_send_cxd_data() to be re-used for additional cmds
+Date:   Tue,  4 May 2021 18:12:17 +0200
+Message-Id: <20210504161222.101536-7-ulf.hansson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210504161222.101536-1-ulf.hansson@linaro.org>
 References: <20210504161222.101536-1-ulf.hansson@linaro.org>
@@ -76,69 +76,77 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-After the eMMC sleep command (CMD5) has been sent, the card start signals
-busy on the DAT0 line, which can be monitored to understand when it's
-allowed to proceed to power off the VCC regulator.
+The function mmc_send_cxd_data() sends a data read command of ADTC type and
+prepares to receive an R1 response. To make it even more re-usable, let's
+extend it with another in-parameter for the command argument. While at it,
+let's also rename the function to mmc_send_adtc_data() as it better
+describes its purpose.
 
-When MMC_CAP_WAIT_WHILE_BUSY isn't supported by the host the DAT0 line
-isn't being monitored for busy completion, but instead we are waiting a
-fixed period of time. The time corresponds to the sleep timeout that is
-specified in the EXT_CSD register of the eMMC card. This is many cases
-suboptimal, as the timeout corresponds to the worst case scenario.
-
-To improve the situation add support for HW busy polling through the
-->card_busy() host ops, when the host supports this.
+Note that, this change doesn't add any new users of the function. Instead
+that is done from subsequent changes.
 
 Signed-off-by: Ulf Hansson <ulf.hansson@linaro.org>
 ---
- drivers/mmc/core/mmc.c | 25 ++++++++++++++++++++-----
- 1 file changed, 20 insertions(+), 5 deletions(-)
+ drivers/mmc/core/mmc_ops.c | 11 +++++------
+ drivers/mmc/core/mmc_ops.h |  2 ++
+ 2 files changed, 7 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/mmc/core/mmc.c b/drivers/mmc/core/mmc.c
-index 63a7bd0b239c..13074aa1f605 100644
---- a/drivers/mmc/core/mmc.c
-+++ b/drivers/mmc/core/mmc.c
-@@ -1905,6 +1905,14 @@ static int mmc_can_sleep(struct mmc_card *card)
- 	return card->ext_csd.rev >= 3;
- }
- 
-+static int mmc_sleep_busy_cb(void *cb_data, bool *busy)
-+{
-+	struct mmc_host *host = cb_data;
-+
-+	*busy = host->ops->card_busy(host);
-+	return 0;
-+}
-+
- static int mmc_sleep(struct mmc_host *host)
+diff --git a/drivers/mmc/core/mmc_ops.c b/drivers/mmc/core/mmc_ops.c
+index 653627fe02a3..b1da8f1950ee 100644
+--- a/drivers/mmc/core/mmc_ops.c
++++ b/drivers/mmc/core/mmc_ops.c
+@@ -252,9 +252,8 @@ mmc_send_cxd_native(struct mmc_host *host, u32 arg, u32 *cxd, int opcode)
+  * NOTE: void *buf, caller for the buf is required to use DMA-capable
+  * buffer or on-stack buffer (with some overhead in callee).
+  */
+-static int
+-mmc_send_cxd_data(struct mmc_card *card, struct mmc_host *host,
+-		u32 opcode, void *buf, unsigned len)
++int mmc_send_adtc_data(struct mmc_card *card, struct mmc_host *host, u32 opcode,
++		       u32 args, void *buf, unsigned len)
  {
+ 	struct mmc_request mrq = {};
  	struct mmc_command cmd = {};
-@@ -1930,13 +1938,20 @@ static int mmc_sleep(struct mmc_host *host)
- 		goto out_release;
+@@ -265,7 +264,7 @@ mmc_send_cxd_data(struct mmc_card *card, struct mmc_host *host,
+ 	mrq.data = &data;
  
- 	/*
--	 * If the host does not wait while the card signals busy, then we will
--	 * will have to wait the sleep/awake timeout.  Note, we cannot use the
--	 * SEND_STATUS command to poll the status because that command (and most
--	 * others) is invalid while the card sleeps.
-+	 * If the host does not wait while the card signals busy, then we can
-+	 * try to poll, but only if the host supports HW polling, as the
-+	 * SEND_STATUS cmd is not allowed. If we can't poll, then we simply need
-+	 * to wait the sleep/awake timeout.
- 	 */
--	if (!use_r1b_resp || !(host->caps & MMC_CAP_WAIT_WHILE_BUSY))
-+	if (host->caps & MMC_CAP_WAIT_WHILE_BUSY && use_r1b_resp)
-+		goto out_release;
-+
-+	if (!host->ops->card_busy) {
- 		mmc_delay(timeout_ms);
-+		goto out_release;
-+	}
-+
-+	err = __mmc_poll_for_busy(card, timeout_ms, &mmc_sleep_busy_cb, host);
+ 	cmd.opcode = opcode;
+-	cmd.arg = 0;
++	cmd.arg = args;
  
- out_release:
- 	mmc_retune_release(host);
+ 	/* NOTE HACK:  the MMC_RSP_SPI_R1 is always correct here, but we
+ 	 * rely on callers to never use this with "native" calls for reading
+@@ -311,7 +310,7 @@ static int mmc_spi_send_cxd(struct mmc_host *host, u32 *cxd, u32 opcode)
+ 	if (!cxd_tmp)
+ 		return -ENOMEM;
+ 
+-	ret = mmc_send_cxd_data(NULL, host, opcode, cxd_tmp, 16);
++	ret = mmc_send_adtc_data(NULL, host, opcode, 0, cxd_tmp, 16);
+ 	if (ret)
+ 		goto err;
+ 
+@@ -359,7 +358,7 @@ int mmc_get_ext_csd(struct mmc_card *card, u8 **new_ext_csd)
+ 	if (!ext_csd)
+ 		return -ENOMEM;
+ 
+-	err = mmc_send_cxd_data(card, card->host, MMC_SEND_EXT_CSD, ext_csd,
++	err = mmc_send_adtc_data(card, card->host, MMC_SEND_EXT_CSD, 0, ext_csd,
+ 				512);
+ 	if (err)
+ 		kfree(ext_csd);
+diff --git a/drivers/mmc/core/mmc_ops.h b/drivers/mmc/core/mmc_ops.h
+index aca66c128804..2b1d730e56bf 100644
+--- a/drivers/mmc/core/mmc_ops.h
++++ b/drivers/mmc/core/mmc_ops.h
+@@ -26,6 +26,8 @@ int mmc_set_dsr(struct mmc_host *host);
+ int mmc_go_idle(struct mmc_host *host);
+ int mmc_send_op_cond(struct mmc_host *host, u32 ocr, u32 *rocr);
+ int mmc_set_relative_addr(struct mmc_card *card);
++int mmc_send_adtc_data(struct mmc_card *card, struct mmc_host *host, u32 opcode,
++		       u32 args, void *buf, unsigned len);
+ int mmc_send_csd(struct mmc_card *card, u32 *csd);
+ int __mmc_send_status(struct mmc_card *card, u32 *status, unsigned int retries);
+ int mmc_send_status(struct mmc_card *card, u32 *status);
 -- 
 2.25.1
 
