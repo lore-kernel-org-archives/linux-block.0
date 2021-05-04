@@ -5,56 +5,56 @@ X-Spam-Level:
 X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3472FC43470
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98041C43603
 	for <linux-block@archiver.kernel.org>; Tue,  4 May 2021 16:13:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 03EB1613B3
-	for <linux-block@archiver.kernel.org>; Tue,  4 May 2021 16:13:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7BDC2611AD
+	for <linux-block@archiver.kernel.org>; Tue,  4 May 2021 16:13:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231817AbhEDQOM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 May 2021 12:14:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53204 "EHLO
+        id S231866AbhEDQON (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 May 2021 12:14:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53214 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231825AbhEDQNw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 May 2021 12:13:52 -0400
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14E67C061574
-        for <linux-block@vger.kernel.org>; Tue,  4 May 2021 09:12:54 -0700 (PDT)
-Received: by mail-lf1-x129.google.com with SMTP id c3so10057824lfs.7
-        for <linux-block@vger.kernel.org>; Tue, 04 May 2021 09:12:53 -0700 (PDT)
+        with ESMTP id S231877AbhEDQNz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 May 2021 12:13:55 -0400
+Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27D31C06138B
+        for <linux-block@vger.kernel.org>; Tue,  4 May 2021 09:12:56 -0700 (PDT)
+Received: by mail-lj1-x22f.google.com with SMTP id y9so6839272ljn.6
+        for <linux-block@vger.kernel.org>; Tue, 04 May 2021 09:12:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=TugmmnMP6RDSPp2L8UfvdmsSklrTobWCwgxHv2Rsq4s=;
-        b=x7LwYTyyiO5EtiSTP/BPjhP9eQrFZqFYpQLS2CmnQjKkQZw4od7tGy8UXuFTWYv1LQ
-         1Axih3agolSFgjjMtieA8LhbmKveLqqkx5XbcK+qoBgaBQB8Km0sjqPpvYzXMF9aHi2f
-         JhAqdotYH9n0s1TDaRyNsaE8b/1ATss11DSsIgcD26G4DjKvY2baR2fT9odGyuA6LTcl
-         340q7sfFGMR7IgOHASR52aooO9vkXQOFFBJY61X/SRRV6toD1cPUn5AVW9Pe7pzT1rTW
-         jXcUO9592B8NdUvOJ0SUPZVCNjvtKn+MYADQ62S3NIHlCRxN472YCmfEQRyefBJqiy5M
-         F47w==
+        bh=xyxXmo/h/dfhEx4WikBIp+kaYZCmt7Npv/WLTwwg9eE=;
+        b=B/8bDkEWNw9lcVCx0PtUoNt7PqWM7Aqe72ivfqWbaPh/eRdVEWPCMbeBiURN09vtPv
+         eaLYG1oyLwLPVMdxeXNeKPyW05JULHoQwN3dH6snp0j1X19uxyrqUwx6HaVGZBoMD9xu
+         nFmncr3Kqjzwlcv+yI2wJkwzznLVr11iLd/je9Z99ASGJ4voNXdXTYGdTFevulbCj1z9
+         fxiI3xiIaZktMJ9K2TUEi7421g/Zer+60ExIyh+lQH5B/govXJXoc51+OAFt02P/PtUW
+         j5NIOgCMyKbHK7fcgHnLaMOdwTCSqJnuHfZCe/mKb19n8PFe4YugrbhJVmK8W6qWGXBN
+         iS/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=TugmmnMP6RDSPp2L8UfvdmsSklrTobWCwgxHv2Rsq4s=;
-        b=jd7VCjIVH4/sO0gIooKkOJ5dvZKMMgeNzOmtVeMVaPoQ7nB0ivW/MnpNeZSb1p520X
-         ROYiujMJRDioLd7yTIKhH9oSlmAFikXo8zZYDxbbPM34kd+MiKYqTeHvANMz2gU7aR9W
-         SR/AQUZ2NjCcGQIvkJT1AlWW1l/4Q2fxgGi+y1s+XyorO68glXIyz7po9loUaAWD0sKu
-         DTQZ6utAWLSCPs6upxVfY6G+M3bjOt/RQeujwxeUVJn/K04gtpGosEKGvUh8e5Iyv8jU
-         5mBrdfOXC+MHRdXn0RJPI79eNXikhUXQmnr9xMOq1matv4FvD5kWXElXt0BOvQQ2UCje
-         9QfA==
-X-Gm-Message-State: AOAM531zJDePmXhN2Ktn22bSnxFCQoKAnZ9l91NLyNIqSoNyatdNDvqB
-        NpmcfikXh4vIvIyxNiRjEl09XA==
-X-Google-Smtp-Source: ABdhPJwRcHKF0j+XAEQinX49FLpArbd5Qu9pJndUnwAUxs9SZ+chNoCiFzzPoZIAt3hnQZ4HTmyIXw==
-X-Received: by 2002:a19:48d3:: with SMTP id v202mr15024111lfa.315.1620144772586;
-        Tue, 04 May 2021 09:12:52 -0700 (PDT)
+        bh=xyxXmo/h/dfhEx4WikBIp+kaYZCmt7Npv/WLTwwg9eE=;
+        b=GumwT542LDwXx+YADq1J7vlQzPff/cTPMlw4PfJupCOgu1QU/kMxqCK74Rwt5Y75Hu
+         +u76maGfxsw6MrgJOHWNeceGJVSZNrP1xkW8Ku+R7N0U9jOS5pVVU03pGKvxxLHTOjZS
+         FGwUeaPCRIpyo7/FtOXyx29XgiQE/MiK/q7UTsG8wOQEl+7srpsgSH0R0BG681hsm14r
+         3fZyvIsJgr/j3w0/QVkXBGm+v+JXOH0nVgGAIyLS90PuUTu0qOWNMwUaLb/zMTYPca5N
+         YT20WeG2EBQqS0I/jHBvZQunHv2zQeSwDLWb73yukXQ/R/Oz8JwKya7Akm2Ui98zxpQu
+         sqfA==
+X-Gm-Message-State: AOAM532GE7NZojC/Yg8q2bo17vKxeNJ+M4n/q+z/FRtNhnUQGWOYwVbs
+        GF/GXFesgV/EI4z0gFUt/Xls1U+1DfKsWGsa
+X-Google-Smtp-Source: ABdhPJzDqhFP0LwJ32oqCrgAn+o3dx2QbgOiI/z/xlyYdNewtvYHfnYoBbUK3lz6+2cgvEPXHgckJA==
+X-Received: by 2002:a2e:a544:: with SMTP id e4mr18016480ljn.452.1620144774558;
+        Tue, 04 May 2021 09:12:54 -0700 (PDT)
 Received: from localhost.localdomain (h-98-128-180-197.NA.cust.bahnhof.se. [98.128.180.197])
-        by smtp.gmail.com with ESMTPSA id s20sm164193ljs.116.2021.05.04.09.12.50
+        by smtp.gmail.com with ESMTPSA id s20sm164193ljs.116.2021.05.04.09.12.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 May 2021 09:12:51 -0700 (PDT)
+        Tue, 04 May 2021 09:12:53 -0700 (PDT)
 From:   Ulf Hansson <ulf.hansson@linaro.org>
 To:     linux-mmc@vger.kernel.org, Ulf Hansson <ulf.hansson@linaro.org>,
         Adrian Hunter <adrian.hunter@intel.com>
@@ -64,9 +64,9 @@ Cc:     Linus Walleij <linus.walleij@linaro.org>,
         Avri Altman <avri.altman@wdc.com>,
         Masami Hiramatsu <masami.hiramatsu@linaro.org>,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 10/11] mmc: core: Read performance enhancements registers for SD cards
-Date:   Tue,  4 May 2021 18:12:21 +0200
-Message-Id: <20210504161222.101536-11-ulf.hansson@linaro.org>
+Subject: [PATCH 11/11] mmc: core: Add support for Power Off Notification for SD cards
+Date:   Tue,  4 May 2021 18:12:22 +0200
+Message-Id: <20210504161222.101536-12-ulf.hansson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210504161222.101536-1-ulf.hansson@linaro.org>
 References: <20210504161222.101536-1-ulf.hansson@linaro.org>
@@ -76,118 +76,208 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In SD spec v6.x the SD function extension registers for performance
-enhancements were introduced. These registers let the SD card announce
-supports for various performance related features, like "self-maintenance",
-"cache" and "command queuing".
+Rather than only deselecting the SD card via a CMD7, before we cut power to
+it at system suspend, at runtime suspend or at shutdown, let's add support
+for a graceful power off sequence via enabling the SD Power Off
+Notification feature.
 
-Let's extend the parsing of SD function extension registers and store the
-information in the struct mmc_card. This prepares for subsequent changes to
-implement the complete support for new the performance enhancement
-features.
+Note that, the Power Off Notification feature was added in the SD spec
+v4.x, which is several years ago. However, it's still a bit unclear how
+often the SD card vendors decides to implement support for it. To validate
+these changes a Sandisk Extreme PRO A2 64GB has been used, which seems to
+work nicely.
 
 Signed-off-by: Ulf Hansson <ulf.hansson@linaro.org>
 ---
- drivers/mmc/core/sd.c    | 53 ++++++++++++++++++++++++++++++++++++++++
- include/linux/mmc/card.h |  7 ++++++
- 2 files changed, 60 insertions(+)
+ drivers/mmc/core/sd.c  | 136 ++++++++++++++++++++++++++++++++++++++++-
+ include/linux/mmc/sd.h |   1 +
+ 2 files changed, 134 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/mmc/core/sd.c b/drivers/mmc/core/sd.c
-index cb5e8b2fc32f..702d7c1a0aec 100644
+index 702d7c1a0aec..760aa86bd54d 100644
 --- a/drivers/mmc/core/sd.c
 +++ b/drivers/mmc/core/sd.c
-@@ -1058,6 +1058,55 @@ static int sd_parse_ext_reg_power(struct mmc_card *card, u8 fno, u8 page,
- 	return err;
+@@ -66,6 +66,13 @@ static const unsigned int sd_au_size[] = {
+ 		__res & __mask;						\
+ 	})
+ 
++#define SD_POWEROFF_NOTIFY_TIMEOUT_MS 2000
++
++struct sd_busy_data {
++	struct mmc_card *card;
++	u8 *reg_buf;
++};
++
+ /*
+  * Given the decoded CSD structure, decode the raw CID to our CID structure.
+  */
+@@ -996,6 +1003,66 @@ static bool mmc_sd_card_using_v18(struct mmc_card *card)
+ 	       (SD_MODE_UHS_SDR50 | SD_MODE_UHS_SDR104 | SD_MODE_UHS_DDR50);
  }
  
-+static int sd_parse_ext_reg_perf(struct mmc_card *card, u8 fno, u8 page,
-+				 u16 offset)
++static int sd_write_ext_reg(struct mmc_card *card, u8 fno, u8 page, u16 offset,
++			    u8 reg_data)
 +{
-+	int err;
++	struct mmc_host *host = card->host;
++	struct mmc_request mrq = {};
++	struct mmc_command cmd = {};
++	struct mmc_data data = {};
++	struct scatterlist sg;
 +	u8 *reg_buf;
 +
 +	reg_buf = kzalloc(512, GFP_KERNEL);
 +	if (!reg_buf)
 +		return -ENOMEM;
 +
-+	err = sd_read_ext_reg(card, fno, page, offset, 512, reg_buf);
++	mrq.cmd = &cmd;
++	mrq.data = &data;
++
++	/*
++	 * Arguments of CMD49:
++	 * [31:31] MIO (0 = memory).
++	 * [30:27] FNO (function number).
++	 * [26:26] MW - mask write mode (0 = disable).
++	 * [25:18] page number.
++	 * [17:9] offset address.
++	 * [8:0] length (0 = 1 byte).
++	 */
++	cmd.arg = fno << 27 | page << 18 | offset << 9;
++
++	/* The first byte in the buffer is the data to be written. */
++	reg_buf[0] = reg_data;
++
++	data.flags = MMC_DATA_WRITE;
++	data.blksz = 512;
++	data.blocks = 1;
++	data.sg = &sg;
++	data.sg_len = 1;
++	sg_init_one(&sg, reg_buf, 512);
++
++	cmd.opcode = SD_WRITE_EXTR_SINGLE;
++	cmd.flags = MMC_RSP_R1 | MMC_CMD_ADTC;
++
++	mmc_set_data_timeout(&data, card);
++	mmc_wait_for_req(host, &mrq);
++
++	kfree(reg_buf);
++
++	/*
++	 * Note that, the SD card is allowed to signal busy on DAT0 up to 1s
++	 * after the CMD49. Although, let's leave this to be managed by the
++	 * caller.
++	 */
++
++	if (cmd.error)
++		return cmd.error;
++	if (data.error)
++		return data.error;
++
++	return 0;
++}
++
+ static int sd_read_ext_reg(struct mmc_card *card, u8 fno, u8 page,
+ 			   u16 offset, u16 len, u8 *reg_buf)
+ {
+@@ -1446,21 +1513,84 @@ static void mmc_sd_detect(struct mmc_host *host)
+ 	}
+ }
+ 
++static int sd_can_poweroff_notify(struct mmc_card *card)
++{
++	return card->ext_power.feature_support & SD_EXT_POWER_OFF_NOTIFY;
++}
++
++static int sd_busy_poweroff_notify_cb(void *cb_data, bool *busy)
++{
++	struct sd_busy_data *data = cb_data;
++	struct mmc_card *card = data->card;
++	int err;
++
++	/*
++	 * Read the status register for the power management function. It's at
++	 * one byte offset and is one byte long. The Power Off Notification
++	 * Ready is bit 0.
++	 */
++	err = sd_read_ext_reg(card, card->ext_power.fno, card->ext_power.page,
++			      card->ext_power.offset + 1, 1, data->reg_buf);
 +	if (err) {
-+		pr_warn("%s: error %d reading PERF func of ext reg\n",
++		pr_warn("%s: error %d reading status reg of PM func\n",
++			mmc_hostname(card->host), err);
++		return err;
++	}
++
++	*busy = !(data->reg_buf[0] & 0x1);
++	return 0;
++}
++
++static int sd_poweroff_notify(struct mmc_card *card)
++{
++	struct sd_busy_data cb_data;
++	u8 *reg_buf;
++	int err;
++
++	reg_buf = kzalloc(512, GFP_KERNEL);
++	if (!reg_buf)
++		return -ENOMEM;
++
++	/*
++	 * Set the Power Off Notification bit in the power management settings
++	 * register at 2 bytes offset.
++	 */
++	err = sd_write_ext_reg(card, card->ext_power.fno, card->ext_power.page,
++			       card->ext_power.offset + 2, 0x1);
++	if (err) {
++		pr_warn("%s: error %d writing Power Off Notify bit\n",
 +			mmc_hostname(card->host), err);
 +		goto out;
 +	}
 +
-+	/* PERF revision. */
-+	card->ext_perf.rev = reg_buf[0];
-+
-+	/* FX_EVENT support at bit 0. */
-+	if (reg_buf[1] & 0x1)
-+		card->ext_perf.feature_support |= SD_EXT_PERF_FX_EVENT;
-+
-+	/* Card initiated self-maintenance support at bit 0. */
-+	if (reg_buf[2] & 0x1)
-+		card->ext_perf.feature_support |= SD_EXT_PERF_CARD_MAINT;
-+
-+	/* Host initiated self-maintenance support at bit 1. */
-+	if (reg_buf[2] & 0x2)
-+		card->ext_perf.feature_support |= SD_EXT_PERF_HOST_MAINT;
-+
-+	/* Cache support at bit 0. */
-+	if (reg_buf[4] & 0x1)
-+		card->ext_perf.feature_support |= SD_EXT_PERF_CACHE;
-+
-+	/* Command queue support indicated via queue depth bits (0 to 4). */
-+	if (reg_buf[6] & 0x1f)
-+		card->ext_perf.feature_support |= SD_EXT_PERF_CMD_QUEUE;
-+
-+	card->ext_perf.fno = fno;
-+	card->ext_perf.page = page;
-+	card->ext_perf.offset = offset;
++	cb_data.card = card;
++	cb_data.reg_buf = reg_buf;
++	err = __mmc_poll_for_busy(card, SD_POWEROFF_NOTIFY_TIMEOUT_MS,
++				  &sd_busy_poweroff_notify_cb, &cb_data);
 +
 +out:
 +	kfree(reg_buf);
 +	return err;
 +}
 +
- static int sd_parse_ext_reg(struct mmc_card *card, u8 *gen_info_buf,
- 			    u16 *next_ext_addr)
+ static int _mmc_sd_suspend(struct mmc_host *host)
  {
-@@ -1102,6 +1151,10 @@ static int sd_parse_ext_reg(struct mmc_card *card, u8 *gen_info_buf,
- 	if (sfc == 0x1)
- 		return sd_parse_ext_reg_power(card, fno, page, offset);
++	struct mmc_card *card = host->card;
+ 	int err = 0;
  
-+	/* Standard Function Code for performance enhancement. */
-+	if (sfc == 0x2)
-+		return sd_parse_ext_reg_perf(card, fno, page, offset);
-+
- 	return 0;
- }
+ 	mmc_claim_host(host);
  
-diff --git a/include/linux/mmc/card.h b/include/linux/mmc/card.h
-index 03a862e93594..2867af0635f8 100644
---- a/include/linux/mmc/card.h
-+++ b/include/linux/mmc/card.h
-@@ -201,6 +201,12 @@ struct sd_ext_reg {
- #define SD_EXT_POWER_OFF_NOTIFY	(1<<0)
- #define SD_EXT_POWER_SUSTENANCE	(1<<1)
- #define SD_EXT_POWER_DOWN_MODE	(1<<2)
-+/* Performance Enhancement Function. */
-+#define SD_EXT_PERF_FX_EVENT	(1<<0)
-+#define SD_EXT_PERF_CARD_MAINT	(1<<1)
-+#define SD_EXT_PERF_HOST_MAINT	(1<<2)
-+#define SD_EXT_PERF_CACHE	(1<<3)
-+#define SD_EXT_PERF_CMD_QUEUE	(1<<4)
- };
+-	if (mmc_card_suspended(host->card))
++	if (mmc_card_suspended(card))
+ 		goto out;
  
- struct sdio_cccr {
-@@ -305,6 +311,7 @@ struct mmc_card {
- 	struct sd_ssr		ssr;		/* yet more SD information */
- 	struct sd_switch_caps	sw_caps;	/* switch (CMD6) caps */
- 	struct sd_ext_reg	ext_power;	/* SD extension reg for PM */
-+	struct sd_ext_reg	ext_perf;	/* SD extension reg for PERF */
+-	if (!mmc_host_is_spi(host))
++	if (sd_can_poweroff_notify(card))
++		err = sd_poweroff_notify(card);
++	else if (!mmc_host_is_spi(host))
+ 		err = mmc_deselect_cards(host);
  
- 	unsigned int		sdio_funcs;	/* number of SDIO functions */
- 	atomic_t		sdio_funcs_probed; /* number of probed SDIO funcs */
+ 	if (!err) {
+ 		mmc_power_off(host);
+-		mmc_card_set_suspended(host->card);
++		mmc_card_set_suspended(card);
+ 	}
+ 
+ out:
+diff --git a/include/linux/mmc/sd.h b/include/linux/mmc/sd.h
+index 43bfc5c39ad4..6727576a8755 100644
+--- a/include/linux/mmc/sd.h
++++ b/include/linux/mmc/sd.h
+@@ -31,6 +31,7 @@
+ 
+   /* class 11 */
+ #define SD_READ_EXTR_SINGLE      48   /* adtc [31:0]             R1  */
++#define SD_WRITE_EXTR_SINGLE     49   /* adtc [31:0]             R1  */
+ 
+ /* OCR bit definitions */
+ #define SD_OCR_S18R		(1 << 24)    /* 1.8V switching request */
 -- 
 2.25.1
 
