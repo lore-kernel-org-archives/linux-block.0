@@ -5,199 +5,283 @@ X-Spam-Level:
 X-Spam-Status: No, score=-16.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D363AC433B4
-	for <linux-block@archiver.kernel.org>; Thu,  6 May 2021 07:34:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBEF0C433ED
+	for <linux-block@archiver.kernel.org>; Thu,  6 May 2021 08:32:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8DDD4611AD
-	for <linux-block@archiver.kernel.org>; Thu,  6 May 2021 07:34:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B33FF60E09
+	for <linux-block@archiver.kernel.org>; Thu,  6 May 2021 08:32:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233240AbhEFHfb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 May 2021 03:35:31 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:39152 "EHLO
+        id S233390AbhEFIdl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 May 2021 04:33:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25226 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233434AbhEFHfa (ORCPT
+        by vger.kernel.org with ESMTP id S233484AbhEFIdZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 6 May 2021 03:35:30 -0400
+        Thu, 6 May 2021 04:33:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620286472;
+        s=mimecast20190719; t=1620289945;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=hYbdphz8e2KBwElpraWrgIPtOFUWWU9FrPT6eAmWO38=;
-        b=eQHmd9Ak0xj+wR5IMN5j2kXzK3bnHTCVoh2mWOXtAAsKvVCs+0qad9zwzap44pt7yaSA96
-        uXqtTPnGy8OMIJ/8y2v4doTUTJWatA5a4XSN+Jzm+R62R13RFzFDXXnD3RdwDnivn+AFCX
-        6cJ0up0LaNS5D0RcZFicpF3F9KTbJ64=
+        bh=7JqjdR2kw/Cet6YKuUtlMslbFesxe737tHzI7djxdT8=;
+        b=bvSWWJh+6Uo030imw4e6+jMHtKvuEfJ/LmDk+D2pemHcRPWCREqqsAzSuaL2mS9+rOEyFb
+        0pC6zTeMAsEtdTI5CTefjM4aXFGNIb0xWUtHe5TVR39u60qUYL0QQocBw6RS5dDQHmWlc3
+        Ifsk67Q/98NjHgfBgxd7nYFaIWAZfAU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-308-2FVh-nYJOi2Kc0Y19o0n2Q-1; Thu, 06 May 2021 03:34:30 -0400
-X-MC-Unique: 2FVh-nYJOi2Kc0Y19o0n2Q-1
+ us-mta-507-SBCbzLB-PXOHSPRggJCGXA-1; Thu, 06 May 2021 04:32:21 -0400
+X-MC-Unique: SBCbzLB-PXOHSPRggJCGXA-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BF763107ACE4;
-        Thu,  6 May 2021 07:34:28 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1187F8014D8;
+        Thu,  6 May 2021 08:32:20 +0000 (UTC)
 Received: from T590 (ovpn-12-93.pek2.redhat.com [10.72.12.93])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 037F160C5C;
-        Thu,  6 May 2021 07:34:21 +0000 (UTC)
-Date:   Thu, 6 May 2021 15:34:17 +0800
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8841E687F2;
+        Thu,  6 May 2021 08:32:11 +0000 (UTC)
+Date:   Thu, 6 May 2021 16:32:07 +0800
 From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.de>,
-        John Garry <john.garry@huawei.com>,
-        David Jeffery <djeffery@redhat.com>
-Subject: Re: [PATCH V5 3/4] blk-mq: clear stale request in tags->rq[] before
- freeing one request pool
-Message-ID: <YJOb+a85Cpb56Mdz@T590>
-References: <20210505145855.174127-1-ming.lei@redhat.com>
- <20210505145855.174127-4-ming.lei@redhat.com>
- <20210506071256.GD328487@infradead.org>
+To:     John Garry <john.garry@huawei.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
+        kashyap.desai@broadcom.com, chenxiang66@hisilicon.com,
+        yama@redhat.com
+Subject: Re: [PATCH] blk-mq: Use request queue-wide tags for tagset-wide
+ sbitmap
+Message-ID: <YJOph1oI8CTJjzQx@T590>
+References: <1620037333-2495-1-git-send-email-john.garry@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20210506071256.GD328487@infradead.org>
+In-Reply-To: <1620037333-2495-1-git-send-email-john.garry@huawei.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 06, 2021 at 08:12:56AM +0100, Christoph Hellwig wrote:
-> On Wed, May 05, 2021 at 10:58:54PM +0800, Ming Lei wrote:
-> > refcount_inc_not_zero() in bt_tags_iter() still may read one freed
-> > request.
-> > 
-> > Fix the issue by the following approach:
-> > 
-> > 1) hold a per-tags spinlock when reading ->rqs[tag] and calling
-> > refcount_inc_not_zero in bt_tags_iter()
-> > 
-> > 2) clearing stale request referred via ->rqs[tag] before freeing
-> > request pool, the per-tags spinlock is held for clearing stale
-> > ->rq[tag]
-> > 
-> > So after we cleared stale requests, bt_tags_iter() won't observe
-> > freed request any more, also the clearing will wait for pending
-> > request reference.
-> > 
-> > The idea of clearing ->rqs[] is borrowed from John Garry's previous
-> > patch and one recent David's patch.
-> > 
-> > Tested-by: John Garry <john.garry@huawei.com>
-> > Reviewed-by: David Jeffery <djeffery@redhat.com>
-> > Reviewed-by: Bart Van Assche <bvanassche@acm.org>
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > ---
-> >  block/blk-mq-tag.c |  8 +++++++-
-> >  block/blk-mq-tag.h |  3 +++
-> >  block/blk-mq.c     | 39 ++++++++++++++++++++++++++++++++++-----
-> >  3 files changed, 44 insertions(+), 6 deletions(-)
-> > 
-> > diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-> > index 4a40d409f5dd..8b239dcce85f 100644
-> > --- a/block/blk-mq-tag.c
-> > +++ b/block/blk-mq-tag.c
-> > @@ -203,9 +203,14 @@ static struct request *blk_mq_find_and_get_req(struct blk_mq_tags *tags,
-> >  		unsigned int bitnr)
-> >  {
-> >  	struct request *rq = tags->rqs[bitnr];
-> > +	unsigned long flags;
-> >  
-> > -	if (!rq || !refcount_inc_not_zero(&rq->ref))
-> > +	spin_lock_irqsave(&tags->lock, flags);
-> > +	if (!rq || !refcount_inc_not_zero(&rq->ref)) {
-> > +		spin_unlock_irqrestore(&tags->lock, flags);
-> >  		return NULL;
-> > +	}
-> > +	spin_unlock_irqrestore(&tags->lock, flags);
-> >  	return rq;
-> >  }
-> >  
-> > @@ -538,6 +543,7 @@ struct blk_mq_tags *blk_mq_init_tags(unsigned int total_tags,
-> >  
-> >  	tags->nr_tags = total_tags;
-> >  	tags->nr_reserved_tags = reserved_tags;
-> > +	spin_lock_init(&tags->lock);
-> >  
-> >  	if (blk_mq_is_sbitmap_shared(flags))
-> >  		return tags;
-> > diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
-> > index 7d3e6b333a4a..f942a601b5ef 100644
-> > --- a/block/blk-mq-tag.h
-> > +++ b/block/blk-mq-tag.h
-> > @@ -20,6 +20,9 @@ struct blk_mq_tags {
-> >  	struct request **rqs;
-> >  	struct request **static_rqs;
-> >  	struct list_head page_list;
-> > +
-> > +	/* used to clear rqs[] before one request pool is freed */
-> > +	spinlock_t lock;
-> >  };
-> >  
-> >  extern struct blk_mq_tags *blk_mq_init_tags(unsigned int nr_tags,
-> > diff --git a/block/blk-mq.c b/block/blk-mq.c
-> > index d053e80fa6d7..c1b28e09a27e 100644
-> > --- a/block/blk-mq.c
-> > +++ b/block/blk-mq.c
-> > @@ -2306,6 +2306,38 @@ blk_qc_t blk_mq_submit_bio(struct bio *bio)
-> >  	return BLK_QC_T_NONE;
-> >  }
-> >  
-> > +static size_t order_to_size(unsigned int order)
-> > +{
-> > +	return (size_t)PAGE_SIZE << order;
-> > +}
-> > +
-> > +/* called before freeing request pool in @tags */
-> > +static void blk_mq_clear_rq_mapping(struct blk_mq_tag_set *set,
-> > +		struct blk_mq_tags *tags, unsigned int hctx_idx)
-> > +{
-> > +	struct blk_mq_tags *drv_tags = set->tags[hctx_idx];
-> > +	struct page *page;
-> > +	unsigned long flags;
-> > +
-> > +	spin_lock_irqsave(&drv_tags->lock, flags);
-> > +	list_for_each_entry(page, &tags->page_list, lru) {
-> > +		unsigned long start = (unsigned long)page_address(page);
-> > +		unsigned long end = start + order_to_size(page->private);
-> > +		int i;
-> > +
-> > +		for (i = 0; i < set->queue_depth; i++) {
-> > +			struct request *rq = drv_tags->rqs[i];
-> > +			unsigned long rq_addr = (unsigned long)rq;
-> > +
-> > +			if (rq_addr >= start && rq_addr < end) {
-> > +				WARN_ON_ONCE(refcount_read(&rq->ref) != 0);
-> > +				cmpxchg(&drv_tags->rqs[i], rq, NULL);
-> > +			}
-> > +		}
-> > +	}
-> > +	spin_unlock_irqrestore(&drv_tags->lock, flags);
+On Mon, May 03, 2021 at 06:22:13PM +0800, John Garry wrote:
+> The tags used for an IO scheduler are currently per hctx.
 > 
-> This looks really strange.  Why do we need the cmpxchg while under
-> the lock anyway?  Why iterate the allocated pages and not just clear
-
-Lock is for protecting free vs. iterating.
-
-> the drv_tags valus directly?
+> As such, when q->nr_hw_queues grows, so does the request queue total IO
+> scheduler tag depth.
 > 
-> static void blk_mq_clear_rq_mapping(struct blk_mq_tag_set *set,
-> 		struct blk_mq_tags *tags, unsigned int hctx_idx)
-> {
-> 	struct blk_mq_tags *drv_tags = set->tags[hctx_idx];
-> 	unsigned int i = 0;
-> 	unsigned long flags;
+> This may cause problems for SCSI MQ HBAs whose total driver depth is
+> fixed.
 > 
-> 	spin_lock_irqsave(&drv_tags->lock, flags);
-> 	for (i = 0; i < set->queue_depth; i++)
-> 		WARN_ON_ONCE(refcount_read(&drv_tags->rqs[i]->ref) != 0);
-> 		drv_tags->rqs[i] = NULL;
+> Ming and Yanhui report higher CPU usage and lower throughput in scenarios
+> where the fixed total driver tag depth is appreciably lower than the total
+> scheduler tag depth:
+> https://lore.kernel.org/linux-block/440dfcfc-1a2c-bd98-1161-cec4d78c6dfc@huawei.com/T/#mc0d6d4f95275a2743d1c8c3e4dc9ff6c9aa3a76b
+> 
+> In that scenario, since the scheduler tag is got first, much contention
+> is introduced since a driver tag may not be available after we have got
+> the sched tag.
+> 
+> Improve this scenario by introducing request queue-wide tags for when
+> a tagset-wide sbitmap is used. The static sched requests are still
+> allocated per hctx, as requests are initialised per hctx, as in
+> blk_mq_init_request(..., hctx_idx, ...) ->
+> set->ops->init_request(.., hctx_idx, ...).
+> 
+> For simplicity of resizing the request queue sbitmap when updating the
+> request queue depth, just init at the max possible size, so we don't need
+> to deal with the possibly with swapping out a new sbitmap for old if
+> we need to grow.
+> 
+> Signed-off-by: John Garry <john.garry@huawei.com>
+> 
+> diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+> index e1e997af89a0..121207abc026 100644
+> --- a/block/blk-mq-sched.c
+> +++ b/block/blk-mq-sched.c
+> @@ -497,11 +497,9 @@ static void blk_mq_sched_free_tags(struct blk_mq_tag_set *set,
+>  				   struct blk_mq_hw_ctx *hctx,
+>  				   unsigned int hctx_idx)
+>  {
+> -	unsigned int flags = set->flags & ~BLK_MQ_F_TAG_HCTX_SHARED;
+> -
+>  	if (hctx->sched_tags) {
+>  		blk_mq_free_rqs(set, hctx->sched_tags, hctx_idx);
+> -		blk_mq_free_rq_map(hctx->sched_tags, flags);
+> +		blk_mq_free_rq_map(hctx->sched_tags, set->flags);
+>  		hctx->sched_tags = NULL;
+>  	}
+>  }
+> @@ -511,12 +509,10 @@ static int blk_mq_sched_alloc_tags(struct request_queue *q,
+>  				   unsigned int hctx_idx)
+>  {
+>  	struct blk_mq_tag_set *set = q->tag_set;
+> -	/* Clear HCTX_SHARED so tags are init'ed */
+> -	unsigned int flags = set->flags & ~BLK_MQ_F_TAG_HCTX_SHARED;
+>  	int ret;
+>  
+>  	hctx->sched_tags = blk_mq_alloc_rq_map(set, hctx_idx, q->nr_requests,
+> -					       set->reserved_tags, flags);
+> +					       set->reserved_tags, set->flags);
+>  	if (!hctx->sched_tags)
+>  		return -ENOMEM;
+>  
+> @@ -534,11 +530,8 @@ static void blk_mq_sched_tags_teardown(struct request_queue *q)
+>  	int i;
+>  
+>  	queue_for_each_hw_ctx(q, hctx, i) {
+> -		/* Clear HCTX_SHARED so tags are freed */
+> -		unsigned int flags = hctx->flags & ~BLK_MQ_F_TAG_HCTX_SHARED;
+> -
+>  		if (hctx->sched_tags) {
+> -			blk_mq_free_rq_map(hctx->sched_tags, flags);
+> +			blk_mq_free_rq_map(hctx->sched_tags, hctx->flags);
+>  			hctx->sched_tags = NULL;
+>  		}
+>  	}
+> @@ -568,12 +561,25 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
+>  	queue_for_each_hw_ctx(q, hctx, i) {
+>  		ret = blk_mq_sched_alloc_tags(q, hctx, i);
+>  		if (ret)
+> -			goto err;
+> +			goto err_free_tags;
+> +	}
+> +
+> +	if (blk_mq_is_sbitmap_shared(q->tag_set->flags)) {
+> +		ret = blk_mq_init_sched_shared_sbitmap(q);
+> +		if (ret)
+> +			goto err_free_tags;
+> +
+> +		queue_for_each_hw_ctx(q, hctx, i) {
+> +			hctx->sched_tags->bitmap_tags =
+> +					q->sched_bitmap_tags;
+> +			hctx->sched_tags->breserved_tags =
+> +					q->sched_breserved_tags;
+> +		}
+>  	}
+>  
+>  	ret = e->ops.init_sched(q, e);
+>  	if (ret)
+> -		goto err;
+> +		goto err_free_sbitmap;
+>  
+>  	blk_mq_debugfs_register_sched(q);
+>  
+> @@ -584,6 +590,7 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
+>  				eq = q->elevator;
+>  				blk_mq_sched_free_requests(q);
+>  				blk_mq_exit_sched(q, eq);
+> +				blk_mq_exit_sched_shared_sbitmap(q);
 
-drv_tags->rqs[] may be assigned from another LUN at the same time, then
-the simple clearing will overwrite the active assignment. We just need
-to clear mapping iff the stored rq will be freed.
+blk_mq_exit_sched_shared_sbitmap() has been called in blk_mq_exit_sched() already.
+
+>  				kobject_put(&eq->kobj);
+>  				return ret;
+>  			}
+> @@ -593,7 +600,10 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
+>  
+>  	return 0;
+>  
+> -err:
+> +err_free_sbitmap:
+> +	if (blk_mq_is_sbitmap_shared(q->tag_set->flags))
+> +		blk_mq_exit_sched_shared_sbitmap(q);
+> +err_free_tags:
+>  	blk_mq_sched_free_requests(q);
+>  	blk_mq_sched_tags_teardown(q);
+>  	q->elevator = NULL;
+> @@ -631,5 +641,7 @@ void blk_mq_exit_sched(struct request_queue *q, struct elevator_queue *e)
+>  	if (e->type->ops.exit_sched)
+>  		e->type->ops.exit_sched(e);
+>  	blk_mq_sched_tags_teardown(q);
+> +	if (blk_mq_is_sbitmap_shared(q->tag_set->flags))
+> +		blk_mq_exit_sched_shared_sbitmap(q);
+>  	q->elevator = NULL;
+>  }
+> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+> index 2a37731e8244..734fedceca7d 100644
+> --- a/block/blk-mq-tag.c
+> +++ b/block/blk-mq-tag.c
+> @@ -466,19 +466,40 @@ static int blk_mq_init_bitmap_tags(struct blk_mq_tags *tags,
+>  	return -ENOMEM;
+>  }
+>  
+> -int blk_mq_init_shared_sbitmap(struct blk_mq_tag_set *set, unsigned int flags)
+> +static int __blk_mq_init_bitmaps(struct sbitmap_queue *bitmap_tags,
+> +				 struct sbitmap_queue *breserved_tags,
+> +				 struct blk_mq_tag_set *set,
+> +				 unsigned int queue_depth,
+> +				 unsigned int reserved)
+>  {
+> -	unsigned int depth = set->queue_depth - set->reserved_tags;
+> +	unsigned int depth = queue_depth - reserved;
+>  	int alloc_policy = BLK_MQ_FLAG_TO_ALLOC_POLICY(set->flags);
+>  	bool round_robin = alloc_policy == BLK_TAG_ALLOC_RR;
+> -	int i, node = set->numa_node;
+>  
+> -	if (bt_alloc(&set->__bitmap_tags, depth, round_robin, node))
+> +	if (bt_alloc(bitmap_tags, depth, round_robin, set->numa_node))
+>  		return -ENOMEM;
+> -	if (bt_alloc(&set->__breserved_tags, set->reserved_tags,
+> -		     round_robin, node))
+> +	if (bt_alloc(breserved_tags, set->reserved_tags,
+> +		     round_robin, set->numa_node))
+>  		goto free_bitmap_tags;
+>  
+> +	return 0;
+> +
+> +free_bitmap_tags:
+> +	sbitmap_queue_free(bitmap_tags);
+> +	return -ENOMEM;
+> +}
+> +
+> +int blk_mq_init_shared_sbitmap(struct blk_mq_tag_set *set)
+
+IMO, this function should be named as blk_mq_init_shared_tags
+and moved to blk-mq-sched.c
+
+> +{
+> +	int i, ret;
+> +
+> +	ret = __blk_mq_init_bitmaps(&set->__bitmap_tags,
+> +				    &set->__breserved_tags,
+> +				    set, set->queue_depth,
+> +				    set->reserved_tags);
+> +	if (ret)
+> +		return ret;
+> +
+>  	for (i = 0; i < set->nr_hw_queues; i++) {
+>  		struct blk_mq_tags *tags = set->tags[i];
+>  
+> @@ -487,9 +508,6 @@ int blk_mq_init_shared_sbitmap(struct blk_mq_tag_set *set, unsigned int flags)
+>  	}
+>  
+>  	return 0;
+> -free_bitmap_tags:
+> -	sbitmap_queue_free(&set->__bitmap_tags);
+> -	return -ENOMEM;
+>  }
+>  
+>  void blk_mq_exit_shared_sbitmap(struct blk_mq_tag_set *set)
+> @@ -498,6 +516,52 @@ void blk_mq_exit_shared_sbitmap(struct blk_mq_tag_set *set)
+>  	sbitmap_queue_free(&set->__breserved_tags);
+>  }
+>  
+> +#define MAX_SCHED_RQ (16 * BLKDEV_MAX_RQ)
+> +
+> +int blk_mq_init_sched_shared_sbitmap(struct request_queue *queue)
+> +{
+> +	struct blk_mq_tag_set *set = queue->tag_set;
+> +	int ret;
+> +
+> +	queue->sched_bitmap_tags =
+> +		kmalloc(sizeof(*queue->sched_bitmap_tags), GFP_KERNEL);
+> +	queue->sched_breserved_tags =
+> +		kmalloc(sizeof(*queue->sched_breserved_tags), GFP_KERNEL);
+> +	if (!queue->sched_bitmap_tags || !queue->sched_breserved_tags)
+> +		goto err;
+
+The two sbitmap queues can be embedded into 'request queue', so that
+we can avoid to re-allocation in every elevator switch.
+
+I will ask Yanhui to test the patch and see if it can make a difference.
 
 
 Thanks,
