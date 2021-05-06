@@ -2,61 +2,78 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4155AC433ED
-	for <linux-block@archiver.kernel.org>; Thu,  6 May 2021 15:02:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D52B8C43461
+	for <linux-block@archiver.kernel.org>; Thu,  6 May 2021 16:57:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 24B06610D2
-	for <linux-block@archiver.kernel.org>; Thu,  6 May 2021 15:02:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AF2EB610D2
+	for <linux-block@archiver.kernel.org>; Thu,  6 May 2021 16:57:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235025AbhEFPDz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 May 2021 11:03:55 -0400
-Received: from mail-pj1-f53.google.com ([209.85.216.53]:50709 "EHLO
-        mail-pj1-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235030AbhEFPDy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 May 2021 11:03:54 -0400
-Received: by mail-pj1-f53.google.com with SMTP id md17so3486667pjb.0
-        for <linux-block@vger.kernel.org>; Thu, 06 May 2021 08:02:56 -0700 (PDT)
+        id S236068AbhEFQ6J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 May 2021 12:58:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52660 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236044AbhEFQ6J (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 May 2021 12:58:09 -0400
+Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDC54C061574;
+        Thu,  6 May 2021 09:57:09 -0700 (PDT)
+Received: by mail-wm1-x330.google.com with SMTP id k4-20020a7bc4040000b02901331d89fb83so3409436wmi.5;
+        Thu, 06 May 2021 09:57:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=TCrHRZ7M/4fQ3bLi8NcN3V417Ett4REzgAAg8+rCpSM=;
+        b=MNP67Zc8AxV4T80Lt0Ez0ePYTj1itxDH/ZpPF0XgLwV7TPVq6BeCNE/wHqM7Pz8oHg
+         iQsUyFwNJe38Q8fngJXvkg0Sy+zpU1VzDOw44EnjMSBqrN4n9p1Rbuxe0Qy/NQpRkSoG
+         3gLdHth9/LvuXFxy2WMvkzQkXJTG6DXHK8qRK+ifStXJTYhhPIajUTFHekwykGZ2uRBO
+         Z7PeB4gYfjfoCGnwTjJ2VVMvk4IhPqwzkJiZKHnqiZ1c92doEsibUe32dC+PdzecMrrd
+         OVCDeu1EY2x8qHhrUsx+iU8PfL/53ONlxW/RZNDonFK4epR1BXkTll0BJikvOTjDEznf
+         u0yA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=bSUZJK+GiypPBzQmpQG4BZMhYH3gmtkds4Klia8lghk=;
-        b=B3u2MFxN+PkvuILPyK4v4h1UoyZROuUoYn32fWTNNLMmR1u+zfkHqerlBF7fKJaZhG
-         KXnaLB92XPOfLWdtXIMWjWfRJt2Zs3qV7h11p+FOguLwVYVEuZ3M0pLmE1XE30jum8WQ
-         93y6ltUWSk0Mm6/FX1fqgnyTtU5iaXDA4b93kPwyzUCaWqGwoVhIfklm/k+13R05LwqX
-         2FDrxQJX+wmgUq9D36tuWutaGWrXOcvc87F3yIyTR0W328KIIc87E1rgKrHshygNzVAI
-         bJLK8pWCcsaZwxJOop83UwU62p269WEdsxecLS5lN5b+w92wAxe8QUFLKmtuczi2ApF9
-         KRCg==
-X-Gm-Message-State: AOAM531GI3ljXfY0akCcXtaTosUSVt/w2JobZrh6DTof6MI3mJpy5zCg
-        KjssxFe/6gCExMjB0o7XECTqb40dGew=
-X-Google-Smtp-Source: ABdhPJy0jTB++Tr/05EuUyr3zlIlnQRWhsIgOC0QXRO3yy/2h9VYeklC+UPTOKHEmepQFNVDnO8T6g==
-X-Received: by 2002:a17:902:ba88:b029:ee:f232:d13a with SMTP id k8-20020a170902ba88b02900eef232d13amr4981516pls.44.1620313375901;
-        Thu, 06 May 2021 08:02:55 -0700 (PDT)
-Received: from ?IPv6:2601:647:4000:d7:c791:bbbb:380d:7882? ([2601:647:4000:d7:c791:bbbb:380d:7882])
-        by smtp.gmail.com with ESMTPSA id z126sm2402785pfz.130.2021.05.06.08.02.54
+        bh=TCrHRZ7M/4fQ3bLi8NcN3V417Ett4REzgAAg8+rCpSM=;
+        b=kVr4Bbx0VEwhaTkoOq3DhizNqCuUGZx6XbCutUq5Mbl0CDPAExxGlyGNF299fN1ZhW
+         aWYTS+R4zFuAOJBWEe+bxVPKjoJua3Uf3ClRrzds69RVwJpEHFwI/rb2gbdmjfT7pDSe
+         p1sLQgJnbm/ttLHnQ1g2a1VojBP+rgZzajc0wsIigV1g4gz3dT80JhVirCIM/M26GvEx
+         s2ruX05m2Oja3g7ngAyU8o9R3PwpV0cyHN5qh6fy6a/ewl3SvKLZxYIo7fMKVIPFWwyr
+         DbYOQQk4aSQGFP76ibheJdR1qlZmRHJiNY2l+eDdPFkgCAoJZyaOjr8TslMQQTF+vvuI
+         RcYQ==
+X-Gm-Message-State: AOAM530jkpvhK+t+SwCWirEhtyu/c57t7EpYIkmUeUnwA58u5a5/7Arw
+        aMXyyHszekz966bFU3Pz15WZMmXc8IY=
+X-Google-Smtp-Source: ABdhPJzxMTsnBRzkFIBu+NnK2wR0XFmyEhph0mpb4jj3HKhaEexoguCbklWgSgfO+1A624i4cyTRcQ==
+X-Received: by 2002:a1c:1dd5:: with SMTP id d204mr5041138wmd.21.1620320228360;
+        Thu, 06 May 2021 09:57:08 -0700 (PDT)
+Received: from [192.168.8.197] ([185.69.144.215])
+        by smtp.gmail.com with ESMTPSA id p10sm5404678wre.84.2021.05.06.09.57.07
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 06 May 2021 08:02:55 -0700 (PDT)
-Subject: Re: [PATCH V5 3/4] blk-mq: clear stale request in tags->rq[] before
- freeing one request pool
-To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.de>,
-        John Garry <john.garry@huawei.com>,
-        David Jeffery <djeffery@redhat.com>
-References: <20210505145855.174127-1-ming.lei@redhat.com>
- <20210505145855.174127-4-ming.lei@redhat.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <db8a5f29-46b6-42c3-72c0-7ac70509e5d6@acm.org>
-Date:   Thu, 6 May 2021 08:02:53 -0700
+        Thu, 06 May 2021 09:57:07 -0700 (PDT)
+Subject: Re: [PATCH] block: reexpand iov_iter after read/write
+To:     Al Viro <viro@zeniv.linux.org.uk>, Jens Axboe <axboe@kernel.dk>
+Cc:     yangerkun <yangerkun@huawei.com>, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, io-uring@vger.kernel.org
+References: <20210401071807.3328235-1-yangerkun@huawei.com>
+ <a2e97190-936d-ebe0-2adc-748328076f31@gmail.com>
+ <7ff7d1b7-8b6d-a684-1740-6a62565f77b6@gmail.com>
+ <3368729f-e61d-d4b6-f2ae-e17ebe59280e@gmail.com>
+ <3d6904c0-9719-8569-2ae8-dd9694da046b@huawei.com>
+ <05803db5-c6de-e115-3db2-476454b20668@gmail.com>
+ <YIwVzWEU97BylYK1@zeniv-ca.linux.org.uk>
+From:   Pavel Begunkov <asml.silence@gmail.com>
+Message-ID: <d7641b3d-0203-d913-d6ac-57de5c7c9747@gmail.com>
+Date:   Thu, 6 May 2021 17:57:02 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.0
 MIME-Version: 1.0
-In-Reply-To: <20210505145855.174127-4-ming.lei@redhat.com>
+In-Reply-To: <YIwVzWEU97BylYK1@zeniv-ca.linux.org.uk>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -64,33 +81,30 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/5/21 7:58 AM, Ming Lei wrote:
-> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-> index 4a40d409f5dd..8b239dcce85f 100644
-> --- a/block/blk-mq-tag.c
-> +++ b/block/blk-mq-tag.c
-> @@ -203,9 +203,14 @@ static struct request *blk_mq_find_and_get_req(struct blk_mq_tags *tags,
->  		unsigned int bitnr)
->  {
->  	struct request *rq = tags->rqs[bitnr];
-> +	unsigned long flags;
->  
-> -	if (!rq || !refcount_inc_not_zero(&rq->ref))
-> +	spin_lock_irqsave(&tags->lock, flags);
-> +	if (!rq || !refcount_inc_not_zero(&rq->ref)) {
-> +		spin_unlock_irqrestore(&tags->lock, flags);
->  		return NULL;
-> +	}
-> +	spin_unlock_irqrestore(&tags->lock, flags);
->  	return rq;
->  }
-Has it been considered to change the body of the if-statement into the
-following?
+On 4/30/21 3:35 PM, Al Viro wrote:
+> On Fri, Apr 30, 2021 at 01:57:22PM +0100, Pavel Begunkov wrote:
+>> On 4/28/21 7:16 AM, yangerkun wrote:
+>>> Hi,
+>>>
+>>> Should we pick this patch for 5.13?
+>>
+>> Looks ok to me
+> 
+> 	Looks sane.  BTW, Pavel, could you go over #untested.iov_iter
+> and give it some beating?  Ideally - with per-commit profiling to see
+> what speedups/slowdowns do they come with...
 
-		rq = NULL;
+I've heard Jens already tested it out. Jens, is that right? Can you
+share? especially since you have much more fitting hardware.
 
-That change would reduce the number of return statements from two to one.
+> 
+> 	It's not in the final state (if nothing else, it needs to be
+> rebased on top of xarray stuff, and there will be followup cleanups
+> as well), but I'd appreciate testing and profiling data...
+> 
+> 	It does survive xfstests + LTP syscall tests, but that's about
+> it.
+> 
 
-Thanks,
-
-Bart.
+-- 
+Pavel Begunkov
