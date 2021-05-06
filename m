@@ -4,61 +4,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B41EEC433B4
-	for <linux-block@archiver.kernel.org>; Thu,  6 May 2021 12:50:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6099DC433B4
+	for <linux-block@archiver.kernel.org>; Thu,  6 May 2021 12:51:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8A2C4613C2
-	for <linux-block@archiver.kernel.org>; Thu,  6 May 2021 12:50:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1B801610F7
+	for <linux-block@archiver.kernel.org>; Thu,  6 May 2021 12:51:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231830AbhEFMvc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 May 2021 08:51:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53034 "EHLO
+        id S231299AbhEFMwr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 May 2021 08:52:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53332 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231461AbhEFMvc (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 May 2021 08:51:32 -0400
-Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D3FAC06138A
-        for <linux-block@vger.kernel.org>; Thu,  6 May 2021 05:50:30 -0700 (PDT)
-Received: by mail-lf1-x132.google.com with SMTP id z13so7646631lft.1
-        for <linux-block@vger.kernel.org>; Thu, 06 May 2021 05:50:30 -0700 (PDT)
+        with ESMTP id S229622AbhEFMwr (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 May 2021 08:52:47 -0400
+Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE4ECC061761
+        for <linux-block@vger.kernel.org>; Thu,  6 May 2021 05:51:48 -0700 (PDT)
+Received: by mail-lj1-x22b.google.com with SMTP id u20so6849555lja.13
+        for <linux-block@vger.kernel.org>; Thu, 06 May 2021 05:51:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=8Ih4+p3zLbJgKbtyGHTBqIMZl1xrskHK8H9INh+Uv4Q=;
-        b=tOVCF1VosorbmnojI82fLeeHSIKUGSQH/nyYU/9ksMYfnCNNk2WPdG6ay/mpoSJmoM
-         LshYTzx//dMlid0bY/5z0+7Z7hG/1nZGsU1JgTerosNm2lPILJiPmxtQyBHTAK5K+1AU
-         A74pBMjCDOnEpS6zXJLq5N9YkF6B4uk790O6cby6esqWbZS2qIihy0rgkg/oL8j5lk9E
-         SERTcIDzkqSXuDPFC1z5cLQLpQYjgreb5Q4En7GoRGdQ4UnUpdKrZ8nmYj5yD6QA+fRQ
-         lfATfeTiCPEZnx7QJrwGjflZxs9eOb4FVSEGGuxPImV0SOsOayxsGZAL81ftjfobmfUy
-         LRQg==
+        bh=leGIz44I+FDaJitpl6Hc4zICX3i8IZYPExD5nafIx0I=;
+        b=DX3KA16LeSsMsghPZH82/XQtNlVzAV9W69bzaPNrsqbVgiv1x4Zll52FF33UWdCqmx
+         v61tH7eAe02qtR/+yfjvmAMhlpDhREKXiZAhMUuPkwQJSKa9P5MtAeCkSK1Uc7IwONt1
+         odhHvegaJCLPAsU+pJvsoUUxD5HjOHNAqTwmAPunac40efQGQrqLxmVG48bEFXmE94rW
+         oHZCKurLE6RHJ+h/+FBacZzZ1CLvgVdyhs+D3f6lLo+ggKwt5TEeF/ImX+Jm/NRK1Fko
+         4sNelfCaGh6qDCKy7HdaHxVn9LvJdUFQixA5BPwe9Gm0/jyPJHkg+j8Au7I2ZHcpcWKo
+         z/eA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=8Ih4+p3zLbJgKbtyGHTBqIMZl1xrskHK8H9INh+Uv4Q=;
-        b=QyjG74edlX8KW8SkxKdhXTYzrcE2RysA2S51xnRoreFzHDX8vidnh+KMqhcEnHE7w4
-         KIJw6mWB+IMG/Nfl2ETHIpsT++FwBH/wlA0KwqPR8syCdvzubcVCHxFOJPvYyGPMQ77P
-         utXAArwR/mNOQQuMBeLEKdl9GK/eZuMf25WkJtgN0TauLTiMdRUlb3zkoZm5F2s8MDJQ
-         zQf8PwTAp4eK/B9gie7SKtWXht36EN72yO2Q1FjnKN8IzOySh70fyv9uujqXNqq2jHC2
-         PtbDy4zSlH6AKKUTkPQs8PUsFWPrZ87vaT/ZajkZFGtvfW/26h76v6JhET5HM9UBcBJQ
-         jiBw==
-X-Gm-Message-State: AOAM531NCWdyhZuFrMy29uz/Pr9mebDAqj4yBcXgHNHY9TEcrLTdQWyP
-        QaD4gbKiF7/U8zdFJu/7vzxtU2EvVSt403MnlqjHFw==
-X-Google-Smtp-Source: ABdhPJzE0Z+zj23Q02inSzPqU6dizoYqkz7PVA6JO3I+kCwKxDGAnYJLv5iu6gj3sJSx5oylXPN9Gz/3NPn+3xWHDF8=
-X-Received: by 2002:a19:a418:: with SMTP id q24mr2665011lfc.649.1620305428769;
- Thu, 06 May 2021 05:50:28 -0700 (PDT)
+        bh=leGIz44I+FDaJitpl6Hc4zICX3i8IZYPExD5nafIx0I=;
+        b=a5E+bL2sMVCzXr3n7lahG2XODolseXO9tC7lw2SMd2C0yBpAzsseVmawhqjqKFrPB1
+         NIg9E+CQ49tUqC/ohf3FHrpaHuohjTe4EVMKsKUO/2zySEQjr6tm6S/5H2JCLC30KD65
+         ghMak6/aKmbgwoOwjTTWW4e4XyKxiExgwcIUDRg1Ura66eR9hHjEgE0zIxBuM4GlaahT
+         zdD5Ig3Cvpj3Ark6GvvRcXDXVISDZjtpHIvw2YpSIZE5R6qP83xCSVSaUfBUnTIhQ+Ce
+         a+zIBU2kIBE/5CSoQl9Za7Sxp3qTunDWApEVB2mLNzmEoFtNDyj/0waDnEwOofzo9V64
+         7x3A==
+X-Gm-Message-State: AOAM532vEPpxLWCD1UY+nii5qYEydVWxlJQn38esoyqYB+88hdFAEpf2
+        fQkUBaaIuhHMj+VELwHd6rlEftqOl4PfmC0IG+4Y/A==
+X-Google-Smtp-Source: ABdhPJwMpyg958RS71r2sEro18tQ0KNQqZLWBMMdyKHnmvXWnfmEhJ4zFsnA6TFQW0FHx+ilUWptjsL9/CwbB0ZZ0Fk=
+X-Received: by 2002:a2e:a54c:: with SMTP id e12mr3250389ljn.326.1620305507437;
+ Thu, 06 May 2021 05:51:47 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210504161222.101536-1-ulf.hansson@linaro.org> <20210504161222.101536-2-ulf.hansson@linaro.org>
-In-Reply-To: <20210504161222.101536-2-ulf.hansson@linaro.org>
+References: <20210504161222.101536-1-ulf.hansson@linaro.org> <20210504161222.101536-3-ulf.hansson@linaro.org>
+In-Reply-To: <20210504161222.101536-3-ulf.hansson@linaro.org>
 From:   Linus Walleij <linus.walleij@linaro.org>
-Date:   Thu, 6 May 2021 14:50:17 +0200
-Message-ID: <CACRpkdYbsfVDrTpMa6P8uia0McQD2KhSKQVA-jh84ZPwBS3C6Q@mail.gmail.com>
-Subject: Re: [PATCH 01/11] mmc: core: Drop open coding when preparing commands
- with busy signaling
+Date:   Thu, 6 May 2021 14:51:35 +0200
+Message-ID: <CACRpkdYf+ak=4S0FFQ2zKRTXd7rWMPcvPnrrdtdpVnEJHuiTYQ@mail.gmail.com>
+Subject: Re: [PATCH 02/11] mmc: core: Take into account MMC_CAP_NEED_RSP_BUSY
+ for eMMC HPI commands
 To:     Ulf Hansson <ulf.hansson@linaro.org>
 Cc:     linux-mmc <linux-mmc@vger.kernel.org>,
         Adrian Hunter <adrian.hunter@intel.com>,
@@ -75,13 +75,17 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 On Tue, May 4, 2021 at 6:12 PM Ulf Hansson <ulf.hansson@linaro.org> wrote:
 
-> Similar code for validating the host->max_busy_timeout towards the current
-> command's busy timeout, exists in mmc_do_erase(), mmc_sleep() and
-> __mmc_switch(). Let's move the common code into a helper function.
+> In mmc_send_hpi_cmd() the host->max_busy_timeout is being validated towards
+> the timeout for the eMMC HPI command, as to decide whether an R1 or R1B
+> response should be used.
+>
+> Although, it has turned out the some host can't cope with that conversion,
+> but needs R1B, which means MMC_CAP_NEED_RSP_BUSY is set for them. Let's
+> take this into account, via using the common mmc_prepare_busy_cmd() when
+> doing the validation, which also avoids some open coding.
 >
 > Signed-off-by: Ulf Hansson <ulf.hansson@linaro.org>
 
-This is a really nice refactoring in its own right.
 Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
 
 Yours,
