@@ -2,81 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EF78C433B4
-	for <linux-block@archiver.kernel.org>; Thu,  6 May 2021 12:21:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B41EEC433B4
+	for <linux-block@archiver.kernel.org>; Thu,  6 May 2021 12:50:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2E01561177
-	for <linux-block@archiver.kernel.org>; Thu,  6 May 2021 12:21:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8A2C4613C2
+	for <linux-block@archiver.kernel.org>; Thu,  6 May 2021 12:50:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230376AbhEFMWe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 May 2021 08:22:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46560 "EHLO
+        id S231830AbhEFMvc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 May 2021 08:51:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53034 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229733AbhEFMWd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 May 2021 08:22:33 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A261C061574
-        for <linux-block@vger.kernel.org>; Thu,  6 May 2021 05:21:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=0/F+By2/0rOY+/GbuQnN9Li3vHhcIf1Z++Inx131o78=; b=L2ORPbXOZEcmQNyXyAkePiQ/B1
-        u+Yt/CMAO1hXrmDpPBMas2IwqG4VkLPquYMlVaVGpbJIuQdGWnrXaA2cgEhMZg+RbwlpBcebyazXp
-        CrlzBXnW4Q4Ep5/BdraHLGodmaPavXH/q9hh36IXvGOhzuGDpSggQiKtFzQh/dyapbUKcp2QknFoG
-        r27ORwGmekgry0Q/vgo2I3qjjn7gwOMvep/DV9LVhnp0VhyQYPa18SSUPj8k6b0tNOSUT2+oN3uD+
-        MnfDg8p2oPicczpqzwi9pFjOlLfCP7CtOKAiNlxgtRuMo4hRImDJ5gLqy6MlwEpiWB7Q9OEbz3XIh
-        kK4X2lDA==;
-Received: from hch by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1lecxt-001goW-MN; Thu, 06 May 2021 12:19:10 +0000
-Date:   Thu, 6 May 2021 13:18:49 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.de>,
-        John Garry <john.garry@huawei.com>,
-        David Jeffery <djeffery@redhat.com>
-Subject: Re: [PATCH V5 3/4] blk-mq: clear stale request in tags->rq[] before
- freeing one request pool
-Message-ID: <20210506121849.GA400362@infradead.org>
-References: <20210505145855.174127-1-ming.lei@redhat.com>
- <20210505145855.174127-4-ming.lei@redhat.com>
- <20210506071256.GD328487@infradead.org>
- <YJOb+a85Cpb56Mdz@T590>
+        with ESMTP id S231461AbhEFMvc (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 May 2021 08:51:32 -0400
+Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D3FAC06138A
+        for <linux-block@vger.kernel.org>; Thu,  6 May 2021 05:50:30 -0700 (PDT)
+Received: by mail-lf1-x132.google.com with SMTP id z13so7646631lft.1
+        for <linux-block@vger.kernel.org>; Thu, 06 May 2021 05:50:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=8Ih4+p3zLbJgKbtyGHTBqIMZl1xrskHK8H9INh+Uv4Q=;
+        b=tOVCF1VosorbmnojI82fLeeHSIKUGSQH/nyYU/9ksMYfnCNNk2WPdG6ay/mpoSJmoM
+         LshYTzx//dMlid0bY/5z0+7Z7hG/1nZGsU1JgTerosNm2lPILJiPmxtQyBHTAK5K+1AU
+         A74pBMjCDOnEpS6zXJLq5N9YkF6B4uk790O6cby6esqWbZS2qIihy0rgkg/oL8j5lk9E
+         SERTcIDzkqSXuDPFC1z5cLQLpQYjgreb5Q4En7GoRGdQ4UnUpdKrZ8nmYj5yD6QA+fRQ
+         lfATfeTiCPEZnx7QJrwGjflZxs9eOb4FVSEGGuxPImV0SOsOayxsGZAL81ftjfobmfUy
+         LRQg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=8Ih4+p3zLbJgKbtyGHTBqIMZl1xrskHK8H9INh+Uv4Q=;
+        b=QyjG74edlX8KW8SkxKdhXTYzrcE2RysA2S51xnRoreFzHDX8vidnh+KMqhcEnHE7w4
+         KIJw6mWB+IMG/Nfl2ETHIpsT++FwBH/wlA0KwqPR8syCdvzubcVCHxFOJPvYyGPMQ77P
+         utXAArwR/mNOQQuMBeLEKdl9GK/eZuMf25WkJtgN0TauLTiMdRUlb3zkoZm5F2s8MDJQ
+         zQf8PwTAp4eK/B9gie7SKtWXht36EN72yO2Q1FjnKN8IzOySh70fyv9uujqXNqq2jHC2
+         PtbDy4zSlH6AKKUTkPQs8PUsFWPrZ87vaT/ZajkZFGtvfW/26h76v6JhET5HM9UBcBJQ
+         jiBw==
+X-Gm-Message-State: AOAM531NCWdyhZuFrMy29uz/Pr9mebDAqj4yBcXgHNHY9TEcrLTdQWyP
+        QaD4gbKiF7/U8zdFJu/7vzxtU2EvVSt403MnlqjHFw==
+X-Google-Smtp-Source: ABdhPJzE0Z+zj23Q02inSzPqU6dizoYqkz7PVA6JO3I+kCwKxDGAnYJLv5iu6gj3sJSx5oylXPN9Gz/3NPn+3xWHDF8=
+X-Received: by 2002:a19:a418:: with SMTP id q24mr2665011lfc.649.1620305428769;
+ Thu, 06 May 2021 05:50:28 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YJOb+a85Cpb56Mdz@T590>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+References: <20210504161222.101536-1-ulf.hansson@linaro.org> <20210504161222.101536-2-ulf.hansson@linaro.org>
+In-Reply-To: <20210504161222.101536-2-ulf.hansson@linaro.org>
+From:   Linus Walleij <linus.walleij@linaro.org>
+Date:   Thu, 6 May 2021 14:50:17 +0200
+Message-ID: <CACRpkdYbsfVDrTpMa6P8uia0McQD2KhSKQVA-jh84ZPwBS3C6Q@mail.gmail.com>
+Subject: Re: [PATCH 01/11] mmc: core: Drop open coding when preparing commands
+ with busy signaling
+To:     Ulf Hansson <ulf.hansson@linaro.org>
+Cc:     linux-mmc <linux-mmc@vger.kernel.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Wolfram Sang <wsa+renesas@sang-engineering.com>,
+        Shawn Lin <shawn.lin@rock-chips.com>,
+        Avri Altman <avri.altman@wdc.com>,
+        Masami Hiramatsu <masami.hiramatsu@linaro.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 06, 2021 at 03:34:17PM +0800, Ming Lei wrote:
-> > {
-> > 	struct blk_mq_tags *drv_tags = set->tags[hctx_idx];
-> > 	unsigned int i = 0;
-> > 	unsigned long flags;
-> > 
-> > 	spin_lock_irqsave(&drv_tags->lock, flags);
-> > 	for (i = 0; i < set->queue_depth; i++)
-> > 		WARN_ON_ONCE(refcount_read(&drv_tags->rqs[i]->ref) != 0);
-> > 		drv_tags->rqs[i] = NULL;
-> 
-> drv_tags->rqs[] may be assigned from another LUN at the same time, then
-> the simple clearing will overwrite the active assignment. We just need
-> to clear mapping iff the stored rq will be freed.
+On Tue, May 4, 2021 at 6:12 PM Ulf Hansson <ulf.hansson@linaro.org> wrote:
 
-So.  Even a different LUN shares the same tagset.  So I can see the
-need for the cmpxchg (please document it!), but I don't see the need
-for the complex iteration.  All the rqs are freed in one single loop,
-so we can just iterate through them sequentially.
+> Similar code for validating the host->max_busy_timeout towards the current
+> command's busy timeout, exists in mmc_do_erase(), mmc_sleep() and
+> __mmc_switch(). Let's move the common code into a helper function.
+>
+> Signed-off-by: Ulf Hansson <ulf.hansson@linaro.org>
 
-Btw, I think ->lock might better be named ->clear_lock to document its
-purpose better.
+This is a really nice refactoring in its own right.
+Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+
+Yours,
+Linus Walleij
