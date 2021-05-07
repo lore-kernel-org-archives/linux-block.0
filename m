@@ -2,148 +2,124 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FC6DC433ED
-	for <linux-block@archiver.kernel.org>; Fri,  7 May 2021 07:30:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAD02C43460
+	for <linux-block@archiver.kernel.org>; Fri,  7 May 2021 07:32:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4BED661157
-	for <linux-block@archiver.kernel.org>; Fri,  7 May 2021 07:30:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7FAD8613E3
+	for <linux-block@archiver.kernel.org>; Fri,  7 May 2021 07:32:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235345AbhEGHbu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 7 May 2021 03:31:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47263 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235341AbhEGHbt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 7 May 2021 03:31:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620372650;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=jT+Z3Xs7+Befb9ZFNwNI4ZrrBQQmO2XpPLA2/uirisE=;
-        b=SZBebTDKFZkqmVTDooAZ1PpPdVwkVr3YvqZUgOqqU31A/85RITgNxYvfkGpDwWP4jVbJux
-        yjFJ2bXXhQvyEcfZCqPfZJaduN9Z/XRrP26P0O4pZRW1+e8fDioKp0koSHOZfm/UqLxCzZ
-        vlnNjesEjyqDDpeXKHPm7vT7gKlWN+I=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-393-Tcn6T8I7N0-7Gg2WstqaxQ-1; Fri, 07 May 2021 03:30:47 -0400
-X-MC-Unique: Tcn6T8I7N0-7Gg2WstqaxQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4A5CE1936B61;
-        Fri,  7 May 2021 07:30:46 +0000 (UTC)
-Received: from T590 (ovpn-13-197.pek2.redhat.com [10.72.13.197])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 104B95D6AB;
-        Fri,  7 May 2021 07:30:38 +0000 (UTC)
-Date:   Fri, 7 May 2021 15:30:34 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.de>,
-        John Garry <john.garry@huawei.com>,
-        David Jeffery <djeffery@redhat.com>
-Subject: Re: [PATCH V5 3/4] blk-mq: clear stale request in tags->rq[] before
- freeing one request pool
-Message-ID: <YJTsmo2aleNakUUU@T590>
-References: <20210505145855.174127-1-ming.lei@redhat.com>
- <20210505145855.174127-4-ming.lei@redhat.com>
- <20210506071256.GD328487@infradead.org>
- <YJOb+a85Cpb56Mdz@T590>
- <20210506121849.GA400362@infradead.org>
- <YJPxYXCZ2j1r1my1@T590>
- <YJTk02/xqiO4Oy3n@infradead.org>
+        id S235078AbhEGHdS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 7 May 2021 03:33:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48280 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232268AbhEGHdQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 7 May 2021 03:33:16 -0400
+Received: from mail-vs1-xe33.google.com (mail-vs1-xe33.google.com [IPv6:2607:f8b0:4864:20::e33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E482EC061761
+        for <linux-block@vger.kernel.org>; Fri,  7 May 2021 00:32:16 -0700 (PDT)
+Received: by mail-vs1-xe33.google.com with SMTP id m17so4231534vsn.10
+        for <linux-block@vger.kernel.org>; Fri, 07 May 2021 00:32:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=ISEXijb9zAgrvpvMxtfDW4VYLgxl60uo+zvkmzN/jGE=;
+        b=pXhFA1jEqZJaRIZVlnRs0aUOrebek2H8j845n+HDFcVCw5vGyKpYYB+QFcL9wukt/C
+         B9qNi4HcSR+oT3ZfK3bzN9u5rwU6AUMGA3L7xYfXTLdUPWJKzuhdGIMSZ2iRWc5AHVvb
+         E6twcSMxbDPdf3jo4szNAq1kHmobM3cyE5XKWvfCVGej1ROstVdxPV7jAVC2C3Hdn1TL
+         B7nUtisJ2lQJOFkpeuvwYmxtkbwmSBBV4+usU4lV2WCF3kw4H1PUuvPh+kOeggh3c2IO
+         asWop5e/apV8/5IJlMysgfNTIeIF2SpwffIUpDk2R9XlnVLehZjrmswrCMbB+2AKCP0E
+         MYyQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=ISEXijb9zAgrvpvMxtfDW4VYLgxl60uo+zvkmzN/jGE=;
+        b=rQbJ7US9fDlPkGs3Lv91amDL8gxAvOYlSR3zzP5kgKnItqcvKgTuuhVNfrbm75s4mS
+         klbQG2SXZ6btVV8BCaTs6CpAw0q/8KNDC47GctuLaVgJfdXh/4vcRCzM2b3EeXUb60uy
+         JR+XlUWXyZ8134h+Y0BMm/cEl1q1w/pVJVLp7X2Wm64PTVcMq/iPCSZR5UCHI0/sdbm3
+         0PUHmSpQTOuSRiy+j9qFjGf1pDMtpCHpTkgShqmG7NdhScVBSgQX7EEvYZR/uvAgMCTn
+         +JZPqy4SLDG2HrwRHycznLj31YAJz/zZ4RBz6cl3hzhFWBT0B/OaOguSjd7eGD/QBHQy
+         85mQ==
+X-Gm-Message-State: AOAM5315bwqygTr5DORawcOMbquJc6bbuI33GgdraSDomVihgQQesj/N
+        rlyL3dKd8pHbfIwjUJcoeRunAlTn+N2drRf0364yuw==
+X-Google-Smtp-Source: ABdhPJwLuWMccR2AOfG9xSWs0t4E/w5MuX7GyZjU0lUjJwUaV2uz7yjaF801ZDGaifxU9CR+3Remi0hA4aEYUcsnuQs=
+X-Received: by 2002:a05:6102:7c1:: with SMTP id y1mr7177715vsg.34.1620372736198;
+ Fri, 07 May 2021 00:32:16 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YJTk02/xqiO4Oy3n@infradead.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+References: <20210504161222.101536-1-ulf.hansson@linaro.org> <DM6PR04MB65750A91FDC869FD3ABFE27AFC579@DM6PR04MB6575.namprd04.prod.outlook.com>
+In-Reply-To: <DM6PR04MB65750A91FDC869FD3ABFE27AFC579@DM6PR04MB6575.namprd04.prod.outlook.com>
+From:   Ulf Hansson <ulf.hansson@linaro.org>
+Date:   Fri, 7 May 2021 09:31:39 +0200
+Message-ID: <CAPDyKFoifq5Dv1HiHpF2QcfO8ZTuf+OL0Uyo7fGr1gDVfdw+Tw@mail.gmail.com>
+Subject: Re: [PATCH 00/11] Initital support for new power/perf features for SD cards
+To:     Avri Altman <Avri.Altman@wdc.com>
+Cc:     "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Wolfram Sang <wsa+renesas@sang-engineering.com>,
+        Shawn Lin <shawn.lin@rock-chips.com>,
+        Masami Hiramatsu <masami.hiramatsu@linaro.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 07, 2021 at 07:57:23AM +0100, Christoph Hellwig wrote:
-> On Thu, May 06, 2021 at 09:38:41PM +0800, Ming Lei wrote:
-> > > So.  Even a different LUN shares the same tagset.  So I can see the
-> > > need for the cmpxchg (please document it!), but I don't see the need
-> > > for the complex iteration.  All the rqs are freed in one single loop,
-> > > so we can just iterate through them sequentially.
-> > 
-> > That is exactly what the patch is doing, requests are stored in page
-> > list, so check if one request(covered in page list) reference in
-> > drv_tags->rq[i] exists, if yes, we clear the request reference.
-> > 
-> > The code is actually sort of self-document: before we free requests,
-> > clear the reference in hostwide drv->rqs[].
-> 
-> What the patch does it to do a completely pointless nested loop.
-> Instead of just looping through all requests which is simple and fast
-> it loops through each page, and then does another loop inside that,
-> just increasing complexity and runtime.  We should at least do something
-> like the incremental patch below instead which is simpler, faster and
-> easier to understand:
+On Fri, 7 May 2021 at 08:44, Avri Altman <Avri.Altman@wdc.com> wrote:
+>
+> >
+> > In the SD spec v4.x the SD function extension registers were introduced=
+,
+> > together with a new set of commands (CMD48/49 and CMD58/59) to read
+> > and write
+> > to them.
+> >
+> > Moreover, in v4.x a new standard function for power management features
+> > were
+> > added, while in v6.x a new standard function for performance
+> > enhancements
+> > features were added.
+> >
+> > This series implement the basics to add support for these new features =
+(and
+> > includes some additional preparations in patch 1->7), by adding support=
+ for
+> > reading and parsing these new SD registers. In the final patch we add
+> > support
+> > for the SD poweroff notification feature, which also add a function to =
+write
+> > to
+> > these registers.
+> >
+> > Note that, there are no HW updates need for the host to support
+> > reading/parsing
+> > of the these new SD registers. This has been tested with a 64GB Sandisk
+> > Extreme
+> > PRO UHS-I A2 card.
+> >
+> > Tests and reviews are of course greatly appreciated!
+> Echoing an internal discussion about this series:
+> "...
+> That is very good that there will be a support of the extension registers=
+ of SD spec .   It may allow existing and future features to be very easily=
+ supported by hosts (like existing power off control and future TCG/RPMB re=
+lated spec which is currently under definition and is going to use those re=
+gisters as well..).
 
-The pages to be freed may be from scheduler tags(set->sched_tags), which
-belongs to one request queue being shutdown, but set->tags->rqs[] is
-shared by all request queues in the host, and it can be actively assigned
-from other LUN/request queue.
+Thanks for sharing. I am happy to help!
 
-> 
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index c1b28e09a27e..598fe82cfbcf 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -2311,29 +2311,20 @@ static size_t order_to_size(unsigned int order)
->  	return (size_t)PAGE_SIZE << order;
->  }
->  
-> -/* called before freeing request pool in @tags */
-> +/* ensure that blk_mq_find_and_get_req can't find the tags any more */
->  static void blk_mq_clear_rq_mapping(struct blk_mq_tag_set *set,
->  		struct blk_mq_tags *tags, unsigned int hctx_idx)
->  {
->  	struct blk_mq_tags *drv_tags = set->tags[hctx_idx];
-> -	struct page *page;
->  	unsigned long flags;
-> +	int i;
->  
->  	spin_lock_irqsave(&drv_tags->lock, flags);
-> -	list_for_each_entry(page, &tags->page_list, lru) {
-> -		unsigned long start = (unsigned long)page_address(page);
-> -		unsigned long end = start + order_to_size(page->private);
-> -		int i;
-> +	for (i = 0; i < set->queue_depth; i++) {
-> +		struct request *rq = drv_tags->rqs[i];
->  
-> -		for (i = 0; i < set->queue_depth; i++) {
-> -			struct request *rq = drv_tags->rqs[i];
-> -			unsigned long rq_addr = (unsigned long)rq;
-> -
-> -			if (rq_addr >= start && rq_addr < end) {
-> -				WARN_ON_ONCE(refcount_read(&rq->ref) != 0);
-> -				cmpxchg(&drv_tags->rqs[i], rq, NULL);
-> -			}
-> -		}
-> +		WARN_ON_ONCE(refcount_read(&rq->ref) != 0);
-> +		cmpxchg(&drv_tags->rqs[i], rq, NULL);
+> ..."
+> Therefore for entire series: Acked-by: Avri Altman <avri.altman@wdc.com>
 
-set->tags->rqs[] is just one dynamic mapping between host-wide driver tag and
-request which may be allocated from sched tags which is per-request-queue,
-and set->tags->rqs[] is host wide.
+Thanks for reviewing!
 
-What if the request pointed by 'rq' is just assigned from another active LUN's
-sched tags?
-
-What we need to do is to make sure every reference to being freed request is
-cleared, that is all.
-
-Thanks,
-Ming
-
+Kind regards
+Uffe
