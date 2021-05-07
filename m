@@ -5,24 +5,23 @@ X-Spam-Level:
 X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 564ACC433B4
-	for <linux-block@archiver.kernel.org>; Fri,  7 May 2021 01:48:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9085C433B4
+	for <linux-block@archiver.kernel.org>; Fri,  7 May 2021 01:48:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 15F7F610C8
-	for <linux-block@archiver.kernel.org>; Fri,  7 May 2021 01:48:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A1AF461027
+	for <linux-block@archiver.kernel.org>; Fri,  7 May 2021 01:48:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234061AbhEGBtB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 May 2021 21:49:01 -0400
-Received: from regular1.263xmail.com ([211.150.70.203]:54670 "EHLO
+        id S233978AbhEGBtg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 May 2021 21:49:36 -0400
+Received: from regular1.263xmail.com ([211.150.70.195]:38524 "EHLO
         regular1.263xmail.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229801AbhEGBtA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 May 2021 21:49:00 -0400
-X-Greylist: delayed 319 seconds by postgrey-1.27 at vger.kernel.org; Thu, 06 May 2021 21:49:00 EDT
-Received: from localhost (unknown [192.168.167.16])
-        by regular1.263xmail.com (Postfix) with ESMTP id 90558776;
-        Fri,  7 May 2021 09:44:31 +0800 (CST)
+        with ESMTP id S229801AbhEGBtg (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 May 2021 21:49:36 -0400
+Received: from localhost (unknown [192.168.167.235])
+        by regular1.263xmail.com (Postfix) with ESMTP id EB0821BD6;
+        Fri,  7 May 2021 09:48:35 +0800 (CST)
 X-MAIL-GRAY: 0
 X-MAIL-DELIVERY: 1
 X-ADDR-CHECKED4: 1
@@ -30,10 +29,10 @@ X-ANTISPAM-LEVEL: 2
 X-SKE-CHECKED: 1
 X-ABS-CHECKED: 1
 Received: from [172.16.12.64] (unknown [58.22.7.114])
-        by smtp.263.net (postfix) whith ESMTP id P31917T139684137133824S1620351870407100_;
-        Fri, 07 May 2021 09:44:31 +0800 (CST)
+        by smtp.263.net (postfix) whith ESMTP id P2749T140649028380416S1620352112258338_;
+        Fri, 07 May 2021 09:48:34 +0800 (CST)
 X-IP-DOMAINF: 1
-X-UNIQUE-TAG: <418bceb8c99b1cc94bbf797774860f9e>
+X-UNIQUE-TAG: <3ec0d0c4447b4275db45ae7c2348390a>
 X-RL-SENDER: shawn.lin@rock-chips.com
 X-SENDER: lintao@rock-chips.com
 X-LOGIN-NAME: shawn.lin@rock-chips.com
@@ -42,8 +41,8 @@ X-RCPT-COUNT: 10
 X-SENDER-IP: 58.22.7.114
 X-ATTACHMENT-NUM: 0
 X-System-Flag: 0
-Message-ID: <6d528e02-dd27-65d3-0cd3-e764cc780a81@rock-chips.com>
-Date:   Fri, 7 May 2021 09:44:30 +0800
+Message-ID: <d16537da-8256-f7ed-677d-011654c62bd4@rock-chips.com>
+Date:   Fri, 7 May 2021 09:48:32 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:87.0) Gecko/20100101
  Thunderbird/87.0
@@ -52,14 +51,14 @@ Cc:     shawn.lin@rock-chips.com, Linus Walleij <linus.walleij@linaro.org>,
         Avri Altman <avri.altman@wdc.com>,
         Masami Hiramatsu <masami.hiramatsu@linaro.org>,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 02/11] mmc: core: Take into account MMC_CAP_NEED_RSP_BUSY
- for eMMC HPI commands
+Subject: Re: [PATCH 03/11] mmc: core: Re-structure some code in
+ __mmc_poll_for_busy()
 To:     Ulf Hansson <ulf.hansson@linaro.org>, linux-mmc@vger.kernel.org,
         Adrian Hunter <adrian.hunter@intel.com>
 References: <20210504161222.101536-1-ulf.hansson@linaro.org>
- <20210504161222.101536-3-ulf.hansson@linaro.org>
+ <20210504161222.101536-4-ulf.hansson@linaro.org>
 From:   Shawn Lin <shawn.lin@rock-chips.com>
-In-Reply-To: <20210504161222.101536-3-ulf.hansson@linaro.org>
+In-Reply-To: <20210504161222.101536-4-ulf.hansson@linaro.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
@@ -67,61 +66,82 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 2021/5/5 0:12, Ulf Hansson wrote:
-> In mmc_send_hpi_cmd() the host->max_busy_timeout is being validated towards
-> the timeout for the eMMC HPI command, as to decide whether an R1 or R1B
-> response should be used.
-> 
-> Although, it has turned out the some host can't cope with that conversion,
-> but needs R1B, which means MMC_CAP_NEED_RSP_BUSY is set for them. Let's
-> take this into account, via using the common mmc_prepare_busy_cmd() when
-> doing the validation, which also avoids some open coding.
+> To make the code a bit more understandable, let's move the check about
+> whether polling is allowed or not, out to the caller instead. In this way,
+> we can also drop the send_status in-parameter, so let's do that.
+
+Everytime I check the parameters for busy polling, I have to look very
+closely to make sure what the true or false stands for. So reducing the
+parameters here make sense.
 
 Reviewed-by: Shawn Lin <shawn.lin@rock-chips.com>
 
 > 
 > Signed-off-by: Ulf Hansson <ulf.hansson@linaro.org>
 > ---
->   drivers/mmc/core/mmc_ops.c | 21 +++++----------------
->   1 file changed, 5 insertions(+), 16 deletions(-)
+>   drivers/mmc/core/mmc_ops.c | 27 +++++++++++++--------------
+>   1 file changed, 13 insertions(+), 14 deletions(-)
 > 
 > diff --git a/drivers/mmc/core/mmc_ops.c b/drivers/mmc/core/mmc_ops.c
-> index 025a4134d5c7..66ae699a410f 100644
+> index 66ae699a410f..ccaee1cb7ff5 100644
 > --- a/drivers/mmc/core/mmc_ops.c
 > +++ b/drivers/mmc/core/mmc_ops.c
-> @@ -817,28 +817,17 @@ static int mmc_send_hpi_cmd(struct mmc_card *card)
->   {
->   	unsigned int busy_timeout_ms = card->ext_csd.out_of_int_time;
->   	struct mmc_host *host = card->host;
-> -	bool use_r1b_resp = true;
-> +	bool use_r1b_resp = false;
->   	struct mmc_command cmd = {};
->   	int err;
+> @@ -465,8 +465,7 @@ static int mmc_busy_status(struct mmc_card *card, bool retry_crc_err,
+>   }
 >   
->   	cmd.opcode = card->ext_csd.hpi_cmd;
->   	cmd.arg = card->rca << 16 | 1;
-> +	cmd.flags = MMC_RSP_R1 | MMC_CMD_AC;
+>   static int __mmc_poll_for_busy(struct mmc_card *card, unsigned int timeout_ms,
+> -			       bool send_status, bool retry_crc_err,
+> -			       enum mmc_busy_cmd busy_cmd)
+> +			       bool retry_crc_err, enum mmc_busy_cmd busy_cmd)
+>   {
+>   	struct mmc_host *host = card->host;
+>   	int err;
+> @@ -475,16 +474,6 @@ static int __mmc_poll_for_busy(struct mmc_card *card, unsigned int timeout_ms,
+>   	bool expired = false;
+>   	bool busy = false;
 >   
 > -	/*
-> -	 * Make sure the host's max_busy_timeout fit the needed timeout for HPI.
-> -	 * In case it doesn't, let's instruct the host to avoid HW busy
-> -	 * detection, by using a R1 response instead of R1B.
+> -	 * In cases when not allowed to poll by using CMD13 or because we aren't
+> -	 * capable of polling by using ->card_busy(), then rely on waiting the
+> -	 * stated timeout to be sufficient.
 > -	 */
-> -	if (host->max_busy_timeout && busy_timeout_ms > host->max_busy_timeout)
-> -		use_r1b_resp = false;
-> -
-> -	if (cmd.opcode == MMC_STOP_TRANSMISSION && use_r1b_resp) {
-> -		cmd.flags = MMC_RSP_R1B | MMC_CMD_AC;
-> -		cmd.busy_timeout = busy_timeout_ms;
-> -	} else {
-> -		cmd.flags = MMC_RSP_R1 | MMC_CMD_AC;
-> -		use_r1b_resp = false;
+> -	if (!send_status && !host->ops->card_busy) {
+> -		mmc_delay(timeout_ms);
+> -		return 0;
 > -	}
-> +	if (cmd.opcode == MMC_STOP_TRANSMISSION)
-> +		use_r1b_resp = mmc_prepare_busy_cmd(host, &cmd,
-> +						    busy_timeout_ms);
+> -
+>   	timeout = jiffies + msecs_to_jiffies(timeout_ms) + 1;
+>   	do {
+>   		/*
+> @@ -518,7 +507,7 @@ static int __mmc_poll_for_busy(struct mmc_card *card, unsigned int timeout_ms,
+>   int mmc_poll_for_busy(struct mmc_card *card, unsigned int timeout_ms,
+>   		      enum mmc_busy_cmd busy_cmd)
+>   {
+> -	return __mmc_poll_for_busy(card, timeout_ms, true, false, busy_cmd);
+> +	return __mmc_poll_for_busy(card, timeout_ms, false, busy_cmd);
+>   }
 >   
->   	err = mmc_wait_for_cmd(host, &cmd, 0);
->   	if (err) {
+>   bool mmc_prepare_busy_cmd(struct mmc_host *host, struct mmc_command *cmd,
+> @@ -591,8 +580,18 @@ int __mmc_switch(struct mmc_card *card, u8 set, u8 index, u8 value,
+>   		mmc_host_is_spi(host))
+>   		goto out_tim;
+>   
+> +	/*
+> +	 * If the host doesn't support HW polling via the ->card_busy() ops and
+> +	 * when it's not allowed to poll by using CMD13, then we need to rely on
+> +	 * waiting the stated timeout to be sufficient.
+> +	 */
+> +	if (!send_status && !host->ops->card_busy) {
+> +		mmc_delay(timeout_ms);
+> +		goto out_tim;
+> +	}
+> +
+>   	/* Let's try to poll to find out when the command is completed. */
+> -	err = __mmc_poll_for_busy(card, timeout_ms, send_status, retry_crc_err,
+> +	err = __mmc_poll_for_busy(card, timeout_ms, retry_crc_err,
+>   				  MMC_BUSY_CMD6);
+>   	if (err)
+>   		goto out;
 > 
 
 
