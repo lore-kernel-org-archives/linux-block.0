@@ -2,45 +2,46 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-16.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1067FC433B4
-	for <linux-block@archiver.kernel.org>; Fri,  7 May 2021 14:42:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DE44C433B4
+	for <linux-block@archiver.kernel.org>; Fri,  7 May 2021 14:42:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BC61B61026
-	for <linux-block@archiver.kernel.org>; Fri,  7 May 2021 14:42:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 43BF66142C
+	for <linux-block@archiver.kernel.org>; Fri,  7 May 2021 14:42:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234367AbhEGOn0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 7 May 2021 10:43:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38054 "EHLO
+        id S234493AbhEGOnf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 7 May 2021 10:43:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54888 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233545AbhEGOn0 (ORCPT
+        by vger.kernel.org with ESMTP id S233545AbhEGOne (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 7 May 2021 10:43:26 -0400
+        Fri, 7 May 2021 10:43:34 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620398546;
+        s=mimecast20190719; t=1620398554;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=IGVQZsQ/uznJDxSv7/vseNJU1hvIQkaqJDtE/W6EOGo=;
-        b=a4rUkFqk/EahU6EyfXgkrXsQSmrcvjWHhw71bO1/crMpkHeSSQlqN51WfGDnwlKaxVRiig
-        LgLGJIpq9ALDJax5gVQ1ZB+ZgkjjreauDEre4fLbgA8E+IrWan5LfH32N4I3Ovi1JwukuM
-        vl08uyfXRBtVetg4K08Lsp5xtNlxwrk=
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=1LpDi19SU3PFBkqaiQ+sTOnxlbtP/1KV4QwaoUVnAeY=;
+        b=iiSdRQOXDvooDIy+6tpSk5d4lEJ/GeSSQbakzC3DMRVFEz6fGbuHxvwxaov45R3n5eZkqF
+        Y72NU2o7FjAWwqjEc7QmOMe2wKJhUgt4msmARXRz6WX7wlRhU+yL/3iQIYCL15npu7xzvE
+        0d69NizqIP40KbCjZe9Oomw8NoVq1s4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-523-bdvkWK1rMI2TTu3iXWkf7g-1; Fri, 07 May 2021 10:42:24 -0400
-X-MC-Unique: bdvkWK1rMI2TTu3iXWkf7g-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-73-iVWt8FxnNpyD1CnzMjjDVA-1; Fri, 07 May 2021 10:42:30 -0400
+X-MC-Unique: iVWt8FxnNpyD1CnzMjjDVA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 29DD8100A605;
-        Fri,  7 May 2021 14:42:22 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 385147B9C;
+        Fri,  7 May 2021 14:42:29 +0000 (UTC)
 Received: from localhost (ovpn-12-110.pek2.redhat.com [10.72.12.110])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BC4FA5D6A1;
-        Fri,  7 May 2021 14:42:15 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DB29B60CCB;
+        Fri,  7 May 2021 14:42:24 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
@@ -49,76 +50,55 @@ Cc:     linux-block@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
         Christoph Hellwig <hch@lst.de>,
         David Jeffery <djeffery@redhat.com>,
         Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V6 0/4] blk-mq: fix request UAF related with iterating over tagset requests
-Date:   Fri,  7 May 2021 22:42:04 +0800
-Message-Id: <20210507144208.459139-1-ming.lei@redhat.com>
+Subject: [PATCH V6 1/4] block: avoid double io accounting for flush request
+Date:   Fri,  7 May 2021 22:42:05 +0800
+Message-Id: <20210507144208.459139-2-ming.lei@redhat.com>
+In-Reply-To: <20210507144208.459139-1-ming.lei@redhat.com>
+References: <20210507144208.459139-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
+For flush request, rq->end_io() may be called two times, one is from
+timeout handling(blk_mq_check_expired()), another is from normal
+completion(__blk_mq_end_request()).
 
-This patchset fixes the request UAF issue by one simple approach,
-without clearing ->rqs[] in fast path, please consider it for 5.13.
+Move blk_account_io_flush() after flush_rq->ref drops to zero, so
+io accounting can be done just once for flush request.
 
-1) grab request's ref before calling ->fn in blk_mq_tagset_busy_iter,
-and release it after calling ->fn, so ->fn won't be called for one
-request if its queue is frozen, done in 2st patch
+Fixes: b68663186577 ("block: add iostat counters for flush requests")
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Tested-by: John Garry <john.garry@huawei.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-flush.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-2) clearing any stale request referred in ->rqs[] before freeing the
-request pool, one per-tags spinlock is added for protecting
-grabbing request ref vs. clearing ->rqs[tag], so UAF by refcount_inc_not_zero
-in bt_tags_iter() is avoided, done in 3rd patch.
-
-V6:
-	- hold spin lock when reading rq via ->rq[tag_bit], the issue is
-	  added in V5
-	- make blk_mq_find_and_get_req() more clean, as suggested by Bart
-	- not hold tags->lock when clearing ->rqs[] for avoiding to disable
-	interrupt a bit long, as suggested by Bart
-	- code style change, as suggested by Christoph
-
-V5:
-	- cover bt_iter() by same approach taken in bt_tags_iter(), and pass
-	John's invasive test
-	- add tested-by/reviewed-by tag
-
-V4:
-	- remove hctx->fq-flush_rq from tags->rqs[] before freeing hw queue,
-	patch 4/4 is added, which is based on David's patch.
-
-V3:
-	- drop patches for completing requests started in iterator ->fn,
-	  because blk-mq guarantees that valid request is passed to ->fn,
-	  and it is driver's responsibility for avoiding double completion.
-	  And drivers works well for not completing rq twice.
-	- add one patch for avoiding double accounting of flush rq 
-
-V2:
-	- take Bart's suggestion to not add blk-mq helper for completing
-	  requests when it is being iterated
-	- don't grab rq->ref if the iterator is over static rqs because
-	the use case do require to iterate over all requests no matter if
-	the request is initialized or not
-
-Ming Lei (4):
-  block: avoid double io accounting for flush request
-  blk-mq: grab rq->refcount before calling ->fn in
-    blk_mq_tagset_busy_iter
-  blk-mq: clear stale request in tags->rq[] before freeing one request
-    pool
-  blk-mq: clearing flush request reference in tags->rqs[]
-
- block/blk-flush.c  |  3 +-
- block/blk-mq-tag.c | 49 +++++++++++++++++++------
- block/blk-mq-tag.h |  6 +++
- block/blk-mq.c     | 91 ++++++++++++++++++++++++++++++++++++++++------
- block/blk-mq.h     |  1 +
- 5 files changed, 126 insertions(+), 24 deletions(-)
-
+diff --git a/block/blk-flush.c b/block/blk-flush.c
+index 7942ca6ed321..1002f6c58181 100644
+--- a/block/blk-flush.c
++++ b/block/blk-flush.c
+@@ -219,8 +219,6 @@ static void flush_end_io(struct request *flush_rq, blk_status_t error)
+ 	unsigned long flags = 0;
+ 	struct blk_flush_queue *fq = blk_get_flush_queue(q, flush_rq->mq_ctx);
+ 
+-	blk_account_io_flush(flush_rq);
+-
+ 	/* release the tag's ownership to the req cloned from */
+ 	spin_lock_irqsave(&fq->mq_flush_lock, flags);
+ 
+@@ -230,6 +228,7 @@ static void flush_end_io(struct request *flush_rq, blk_status_t error)
+ 		return;
+ 	}
+ 
++	blk_account_io_flush(flush_rq);
+ 	/*
+ 	 * Flush request has to be marked as IDLE when it is really ended
+ 	 * because its .end_io() is called from timeout code path too for
 -- 
 2.29.2
 
