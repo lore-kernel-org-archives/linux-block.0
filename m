@@ -2,216 +2,113 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD84AC433ED
-	for <linux-block@archiver.kernel.org>; Fri,  7 May 2021 10:16:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E51CC43460
+	for <linux-block@archiver.kernel.org>; Fri,  7 May 2021 11:37:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 73EAE61451
-	for <linux-block@archiver.kernel.org>; Fri,  7 May 2021 10:16:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 02D916145E
+	for <linux-block@archiver.kernel.org>; Fri,  7 May 2021 11:37:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235817AbhEGKRC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 7 May 2021 06:17:02 -0400
-Received: from frasgout.his.huawei.com ([185.176.79.56]:3039 "EHLO
-        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229812AbhEGKRB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 7 May 2021 06:17:01 -0400
-Received: from fraeml713-chm.china.huawei.com (unknown [172.18.147.207])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Fc5jh2Bw7z71ffb;
-        Fri,  7 May 2021 18:07:52 +0800 (CST)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- fraeml713-chm.china.huawei.com (10.206.15.32) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Fri, 7 May 2021 12:15:58 +0200
-Received: from [10.47.82.108] (10.47.82.108) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.2; Fri, 7 May 2021
- 11:15:57 +0100
-Subject: Re: [PATCH] blk-mq: Use request queue-wide tags for tagset-wide
- sbitmap
-To:     Ming Lei <ming.lei@redhat.com>
-CC:     "axboe@kernel.dk" <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "kashyap.desai@broadcom.com" <kashyap.desai@broadcom.com>,
-        "chenxiang (M)" <chenxiang66@hisilicon.com>,
-        "yama@redhat.com" <yama@redhat.com>
-References: <1620037333-2495-1-git-send-email-john.garry@huawei.com>
- <YJOph1oI8CTJjzQx@T590>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <4d5893e2-13f0-ce6f-4fd7-44c7ecf8553f@huawei.com>
-Date:   Fri, 7 May 2021 11:15:28 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
+        id S234641AbhEGLiO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 7 May 2021 07:38:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46614 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234518AbhEGLiN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 7 May 2021 07:38:13 -0400
+Received: from mail-ua1-x932.google.com (mail-ua1-x932.google.com [IPv6:2607:f8b0:4864:20::932])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0C5CC061763
+        for <linux-block@vger.kernel.org>; Fri,  7 May 2021 04:37:12 -0700 (PDT)
+Received: by mail-ua1-x932.google.com with SMTP id 33so2724242uaa.7
+        for <linux-block@vger.kernel.org>; Fri, 07 May 2021 04:37:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=tyChXpuA/kSLwdeCBlyI+kJA5Xo8psj95tLmSt5tQDQ=;
+        b=v5LbZlXrh9EJ5XAwnkJG0BVtwXwBQGUaSCAF+FfH1jOKQjup501XDXXvWCO2XAJe1X
+         JJ36tUfHaSW4sfJ/GjtCqBdLb0nrFbvyx0dKp6uiY1UCVYjJFM2phclXesBeW/CPFkmP
+         q1UJQbEVwrL12Dxk7IZ0wsRH/YXp10GcQZs6kSjn9UiYs68rR+ZvgC741d1KaWXdgAMy
+         5oDzR/M77Mz60nKOhWL394U1o6gUQbbeodN1RojHtm9Ur8YQBYJj2f7kWJH5K6t+lumY
+         6xhv4BRa/n2Ao+Fgg09kxwX8gpJp4OVmLFDMNEuxnWRkGEsuo6snXxubI3Gfo9WyDJdc
+         oelA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=tyChXpuA/kSLwdeCBlyI+kJA5Xo8psj95tLmSt5tQDQ=;
+        b=fwd3951KTDCyIm760gzqxBQwqIsPuR5czpy6O4vgWRZa+eOXmoZPvFSxykd62Ae7tX
+         2lKBit3/OAXgecFcB7Md5iXlVn/A0rIQo5zmvAXRVZ8PG5OxT925MHf0/dNRgiPWP82p
+         QIaYFvStKlIpBK1FVLbL6bb2cMt2xP83dK0LM+OfwCiPagL0aqXLM34mCRmwWzCYGusu
+         MgvM+b2lhe0jF9rcXseXUz/u5A4zi7NZxc/Np9Wkc40T2KTWBz76pb+SibhhVE04f05j
+         i/A8aoFqmhviAtFnewnRlpHMMEZApiAT1xPEDpDnSM6JAvIeO5K7WKOFckgVvqTYy3PX
+         8urg==
+X-Gm-Message-State: AOAM532VYOjEG29KRQkjz7XxGz5EQw/sMCtwmPXoX3nAjGirKl+xQC/R
+        qGpafMLMFQVgniQ6imd7GOXmBZlgpuGXzutsXeZ4Vw==
+X-Google-Smtp-Source: ABdhPJwv8zOe31Be3NCYiFdqIeS6UkgQw+8Blad7NIo8x5T24NV9F1KesqSySUVg6Cq8XsJJezltksCfFV9siriNGjY=
+X-Received: by 2002:ab0:7002:: with SMTP id k2mr8193127ual.104.1620387431887;
+ Fri, 07 May 2021 04:37:11 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <YJOph1oI8CTJjzQx@T590>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.47.82.108]
-X-ClientProxiedBy: lhreml719-chm.china.huawei.com (10.201.108.70) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+References: <20210504161222.101536-1-ulf.hansson@linaro.org>
+ <20210504161222.101536-10-ulf.hansson@linaro.org> <1a4227c1-4d55-b55f-2fc6-9f9562ef02e5@rock-chips.com>
+ <CAPDyKFqVuuVnntRHQ-8hWjyJ5Kzj9DzkjQ=mknQxzRTH1og+xw@mail.gmail.com> <dc1d03ed-c8ab-468c-e602-938e92322fa8@rock-chips.com>
+In-Reply-To: <dc1d03ed-c8ab-468c-e602-938e92322fa8@rock-chips.com>
+From:   Ulf Hansson <ulf.hansson@linaro.org>
+Date:   Fri, 7 May 2021 13:36:35 +0200
+Message-ID: <CAPDyKFogv5j-UR=20nKVdSpCDSNb0tkH2shPrLcd1tFdOno6BA@mail.gmail.com>
+Subject: Re: [PATCH 09/11] mmc: core: Read the SD function extension registers
+ for power management
+To:     Shawn Lin <shawn.lin@rock-chips.com>
+Cc:     linux-mmc <linux-mmc@vger.kernel.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Wolfram Sang <wsa+renesas@sang-engineering.com>,
+        Avri Altman <avri.altman@wdc.com>,
+        Masami Hiramatsu <masami.hiramatsu@linaro.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 06/05/2021 09:32, Ming Lei wrote:
->> +	if (blk_mq_is_sbitmap_shared(q->tag_set->flags)) {
->> +		ret = blk_mq_init_sched_shared_sbitmap(q);
->> +		if (ret)
->> +			goto err_free_tags;
->> +
->> +		queue_for_each_hw_ctx(q, hctx, i) {
->> +			hctx->sched_tags->bitmap_tags =
->> +					q->sched_bitmap_tags;
->> +			hctx->sched_tags->breserved_tags =
->> +					q->sched_breserved_tags;
->> +		}
->>   	}
->>   
->>   	ret = e->ops.init_sched(q, e);
->>   	if (ret)
->> -		goto err;
->> +		goto err_free_sbitmap;
->>   
->>   	blk_mq_debugfs_register_sched(q);
->>   
->> @@ -584,6 +590,7 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
->>   				eq = q->elevator;
->>   				blk_mq_sched_free_requests(q);
->>   				blk_mq_exit_sched(q, eq);
->> +				blk_mq_exit_sched_shared_sbitmap(q);
-> blk_mq_exit_sched_shared_sbitmap() has been called in blk_mq_exit_sched() already.
+On Fri, 7 May 2021 at 09:48, Shawn Lin <shawn.lin@rock-chips.com> wrote:
+>
+> On 2021/5/7 15:27, Ulf Hansson wrote:
+> > On Fri, 7 May 2021 at 04:06, Shawn Lin <shawn.lin@rock-chips.com> wrote:
+> >>
+> >>
+> >> On 2021/5/5 0:12, Ulf Hansson wrote:
+> >>> In SD spec v4.x the SD function extension registers were introduced. A
+> >>
+> >> I have a v4.0 spec and it doesn't state that v4.0 suppports reading
+> >> extension registers but just says TBD instead.  So I guess v4.x doesn't
+> >> include v4.0 ?
+> >
+> > Good question. The v4.0 spec introduces the CMD48/49 and CMD58/59,
+> > while in v4.10 the spec adds the power management extensions.
+> >
+> > I can update the commit message to better reflect this, if you prefer!?
+>
+> It would be better.
 
-ah, yes
+Sure, let me amend the change when applying.
 
-> 
->>   				kobject_put(&eq->kobj);
->>   				return ret;
->>   			}
->> @@ -593,7 +600,10 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
->>   
->>   	return 0;
->>   
->> -err:
->> +err_free_sbitmap:
->> +	if (blk_mq_is_sbitmap_shared(q->tag_set->flags))
->> +		blk_mq_exit_sched_shared_sbitmap(q);
->> +err_free_tags:
->>   	blk_mq_sched_free_requests(q);
->>   	blk_mq_sched_tags_teardown(q);
->>   	q->elevator = NULL;
->> @@ -631,5 +641,7 @@ void blk_mq_exit_sched(struct request_queue *q, struct elevator_queue *e)
->>   	if (e->type->ops.exit_sched)
->>   		e->type->ops.exit_sched(e);
->>   	blk_mq_sched_tags_teardown(q);
->> +	if (blk_mq_is_sbitmap_shared(q->tag_set->flags))
->> +		blk_mq_exit_sched_shared_sbitmap(q);
->>   	q->elevator = NULL;
->>   }
->> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
->> index 2a37731e8244..734fedceca7d 100644
->> --- a/block/blk-mq-tag.c
->> +++ b/block/blk-mq-tag.c
->> @@ -466,19 +466,40 @@ static int blk_mq_init_bitmap_tags(struct blk_mq_tags *tags,
->>   	return -ENOMEM;
->>   }
->>   
->> -int blk_mq_init_shared_sbitmap(struct blk_mq_tag_set *set, unsigned int flags)
->> +static int __blk_mq_init_bitmaps(struct sbitmap_queue *bitmap_tags,
->> +				 struct sbitmap_queue *breserved_tags,
->> +				 struct blk_mq_tag_set *set,
->> +				 unsigned int queue_depth,
->> +				 unsigned int reserved)
->>   {
->> -	unsigned int depth = set->queue_depth - set->reserved_tags;
->> +	unsigned int depth = queue_depth - reserved;
->>   	int alloc_policy = BLK_MQ_FLAG_TO_ALLOC_POLICY(set->flags);
->>   	bool round_robin = alloc_policy == BLK_TAG_ALLOC_RR;
->> -	int i, node = set->numa_node;
->>   
->> -	if (bt_alloc(&set->__bitmap_tags, depth, round_robin, node))
->> +	if (bt_alloc(bitmap_tags, depth, round_robin, set->numa_node))
->>   		return -ENOMEM;
->> -	if (bt_alloc(&set->__breserved_tags, set->reserved_tags,
->> -		     round_robin, node))
->> +	if (bt_alloc(breserved_tags, set->reserved_tags,
->> +		     round_robin, set->numa_node))
->>   		goto free_bitmap_tags;
->>   
->> +	return 0;
->> +
->> +free_bitmap_tags:
->> +	sbitmap_queue_free(bitmap_tags);
->> +	return -ENOMEM;
->> +}
->> +
->> +int blk_mq_init_shared_sbitmap(struct blk_mq_tag_set *set)
-> IMO, this function should be named as blk_mq_init_shared_tags
-> and moved to blk-mq-sched.c
+>
+> And I downloaded the latest v8.00 spec, checked carefully with the new
+> features there to make sure we don't make any misinterpretations at
+> first.
+>
+> For patch 9 -11 as well,
+>
+> Reviewed-by: Shawn Lin <shawn.lin@rock-chips.con>
 
-But this is for regular tags.
+Thanks!
 
-I assume you mean blk_mq_init_sched_shared_sbitmap(), below.
+[...]
 
-If so, I can relocate it.
-
-As for "sbitmap" vs "tags" in the name, I'm just being consistent 
-between preexisting blk_mq_init_shared_sbitmap() and 
-blk_mq_sbitmap_shared(),  and new blk_mq_init_sched_shared_sbitmap()
-
-> 
->> +{
->> +	int i, ret;
->> +
->> +	ret = __blk_mq_init_bitmaps(&set->__bitmap_tags,
->> +				    &set->__breserved_tags,
->> +				    set, set->queue_depth,
->> +				    set->reserved_tags);
->> +	if (ret)
->> +		return ret;
->> +
->>   	for (i = 0; i < set->nr_hw_queues; i++) {
->>   		struct blk_mq_tags *tags = set->tags[i];
->>   
->> @@ -487,9 +508,6 @@ int blk_mq_init_shared_sbitmap(struct blk_mq_tag_set *set, unsigned int flags)
->>   	}
->>   
->>   	return 0;
->> -free_bitmap_tags:
->> -	sbitmap_queue_free(&set->__bitmap_tags);
->> -	return -ENOMEM;
->>   }
->>   
->>   void blk_mq_exit_shared_sbitmap(struct blk_mq_tag_set *set)
->> @@ -498,6 +516,52 @@ void blk_mq_exit_shared_sbitmap(struct blk_mq_tag_set *set)
->>   	sbitmap_queue_free(&set->__breserved_tags);
->>   }
->>   
->> +#define MAX_SCHED_RQ (16 * BLKDEV_MAX_RQ)
->> +
->> +int blk_mq_init_sched_shared_sbitmap(struct request_queue *queue)
->> +{
->> +	struct blk_mq_tag_set *set = queue->tag_set;
->> +	int ret;
->> +
->> +	queue->sched_bitmap_tags =
->> +		kmalloc(sizeof(*queue->sched_bitmap_tags), GFP_KERNEL);
->> +	queue->sched_breserved_tags =
->> +		kmalloc(sizeof(*queue->sched_breserved_tags), GFP_KERNEL);
->> +	if (!queue->sched_bitmap_tags || !queue->sched_breserved_tags)
->> +		goto err;
-> The two sbitmap queues can be embedded into 'request queue', so that
-> we can avoid to re-allocation in every elevator switch.
-
-ok
-
-> 
-> I will ask Yanhui to test the patch and see if it can make a difference.
-
-Thanks
+Kind regards
+Uffe
