@@ -2,64 +2,218 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-19.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 442A0C43461
-	for <linux-block@archiver.kernel.org>; Fri,  7 May 2021 19:07:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F36C5C433ED
+	for <linux-block@archiver.kernel.org>; Fri,  7 May 2021 22:09:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 24E776147D
-	for <linux-block@archiver.kernel.org>; Fri,  7 May 2021 19:07:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CC1A0611F1
+	for <linux-block@archiver.kernel.org>; Fri,  7 May 2021 22:09:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229754AbhEGTIp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 7 May 2021 15:08:45 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58714 "EHLO mail.kernel.org"
+        id S229758AbhEGWKF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 7 May 2021 18:10:05 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56016 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229724AbhEGTIn (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 7 May 2021 15:08:43 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id 6538A61004;
-        Fri,  7 May 2021 19:07:43 +0000 (UTC)
+        id S229713AbhEGWKE (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 7 May 2021 18:10:04 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id AA33B60BD3;
+        Fri,  7 May 2021 22:08:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1620414463;
-        bh=oqs/ZvbTJErmaz+MFkQAuPooEP0qPKkp/wpadcgdY6U=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=n4rT+KYhFlVwR/hThdlt79p/F4uyM3PIC80mAbke7FmNxKavX7KgfmEjL89Gj/P+G
-         WyGpEkMPitWy6t7PKfH35/adMlpC2uwUvi6uGQh1n9cZbBSITajT2E4zG/Bd0PpqoQ
-         sTu3ffon/eiKh/onAmtph/yert9sDBLU7FwOZyMjvU4SlEc2lzksUqXxH7NqGxed3S
-         z1cY3k98Egc1I9sS1V2Weq3d8oY8R+LOyJS7noxUJQS84CzhS24vNesWH9HEpj0eSt
-         0FvUWNmVRKHMwRiJWNUOzN3N+H7FvnjZv3Z3ERrouPnPU0DRC90fZm8G3QSY86gnuH
-         ID0Apn3u+3pTg==
-Subject: Re: [GIT PULL] Block fixes for 5.13-rc1
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <237ad54a-fa95-fbb7-a7b7-0a7540928289@kernel.dk>
-References: <237ad54a-fa95-fbb7-a7b7-0a7540928289@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <237ad54a-fa95-fbb7-a7b7-0a7540928289@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git tags/block-5.13-2021-05-07
-X-PR-Tracked-Commit-Id: cf7b39a0cbf6bf57aa07a008d46cf695add05b4c
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: bd313968fd22f9e20b858e80424fa04bbcca7467
-Message-Id: <162041446338.12532.6122425631562962096.pr-tracker-bot@kernel.org>
-Date:   Fri, 07 May 2021 19:07:43 +0000
-To:     Jens Axboe <axboe@kernel.dk>
+        s=k20201202; t=1620425342;
+        bh=pLN/AlAGxiGZnqtkHzoskF1g1y+Og1zx70nNd/gvob8=;
+        h=From:To:Cc:Subject:Date:From;
+        b=GZ13BdKpryifxhRwUeXYiDxMV+BWySTA7GY7/CWwvuCWkusUFDxkw2jKiOlfzjbCr
+         So4fZaGkAyPTwA8Q1TjLVhcTwgJc8xvHUXFTKFHcbAkEIqYdWcKh0axCM+T92qoOrQ
+         bkgNUSiGEeKqAdmwuN3qiVKoII2y7FbwOUX6mX301a6kiRL+VhsHKLQbMnh2CNRIHJ
+         HKxjre312EfivKKOz+Q2DN/Jdax+mgS6zOKiXtE7A5jQN2E+WeTOOh+m15wqAaIqSp
+         vmCijYogutqPzDP5KIogDPopYspUOizf4eB1toyhkfcE7uWw2BB6nwUsTEL9hofb0l
+         fr7hse6Wb3kJA==
+From:   Arnd Bergmann <arnd@kernel.org>
+To:     linux-arch@vger.kernel.org
 Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        Vineet Gupta <vgupta@synopsys.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Amitkumar Karwar <amitkarwar@gmail.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Borislav Petkov <bp@alien8.de>,
+        Eric Dumazet <edumazet@google.com>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Ganapathi Bhat <ganapathi017@gmail.com>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        James Morris <jmorris@namei.org>, Jens Axboe <axboe@kernel.dk>,
+        John Johansen <john.johansen@canonical.com>,
+        Jonas Bonn <jonas@southpole.se>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Paul Mackerras <paulus@samba.org>,
+        Rich Felker <dalias@libc.org>,
+        "Richard Russon (FlatCap)" <ldm@flatcap.org>,
+        Russell King <linux@armlinux.org.uk>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Sharvari Harisangam <sharvari.harisangam@nxp.com>,
+        Stafford Horne <shorne@gmail.com>,
+        Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Vladimir Oltean <vladimir.oltean@nxp.com>,
+        Xinming Hu <huxinming820@gmail.com>,
+        Yoshinori Sato <ysato@users.sourceforge.jp>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-m68k@lists.linux-m68k.org, linux-crypto@vger.kernel.org,
+        openrisc@lists.librecores.org, linuxppc-dev@lists.ozlabs.org,
+        linux-sh@vger.kernel.org, sparclinux@vger.kernel.org,
+        linux-ntfs-dev@lists.sourceforge.net, linux-block@vger.kernel.org,
+        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+        linux-security-module@vger.kernel.org
+Subject: [RFC 0/12] Unify asm/unaligned.h around struct helper
+Date:   Sat,  8 May 2021 00:07:45 +0200
+Message-Id: <20210507220813.365382-1-arnd@kernel.org>
+X-Mailer: git-send-email 2.29.2
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Fri, 7 May 2021 09:59:48 -0600:
+From: Arnd Bergmann <arnd@arndb.de>
 
-> git://git.kernel.dk/linux-block.git tags/block-5.13-2021-05-07
+The get_unaligned()/put_unaligned() helpers are traditionally architecture
+specific, with the two main variants being the "access-ok.h" version
+that assumes unaligned pointer accesses always work on a particular
+architecture, and the "le-struct.h" version that casts the data to a
+byte aligned type before dereferencing, for architectures that cannot
+always do unaligned accesses in hardware.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/bd313968fd22f9e20b858e80424fa04bbcca7467
+Based on the discussion linked below, it appears that the access-ok
+version is not realiable on any architecture, but the struct version
+probably has no downsides. This series changes the code to use the
+same implementation on all architectures, addressing the few exceptions
+separately.
 
-Thank you!
+I've pushed the patches to the asm-generic git tree for testing.
+
+	Arnd
+
+Link: https://lore.kernel.org/lkml/75d07691-1e4f-741f-9852-38c0b4f520bc@synopsys.com/
+Link: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=100363
+Link: git://git.kernel.org/pub/scm/linux/kernel/git/arnd/asm-generic.git unaligned-rework
+
+Arnd Bergmann (12):
+  asm-generic: use asm-generic/unaligned.h for most architectures
+  openrisc: always use unaligned-struct header
+  sh: remove unaligned access for sh4a
+  m68k: select CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
+  powerpc: use linux/unaligned/le_struct.h on LE power7
+  asm-generic: unaligned: remove byteshift helpers
+  asm-generic: unaligned always use struct helpers
+  partitions: msdos: fix one-byte get_unaligned()
+  apparmor: use get_unaligned() only for multi-byte words
+  mwifiex: re-fix for unaligned accesses
+  netpoll: avoid put_unaligned() on single character
+  asm-generic: simplify asm/unaligned.h
+
+ arch/alpha/include/asm/unaligned.h          |  12 --
+ arch/arm/include/asm/unaligned.h            |  27 ---
+ arch/ia64/include/asm/unaligned.h           |  12 --
+ arch/m68k/Kconfig                           |   1 +
+ arch/m68k/include/asm/unaligned.h           |  26 ---
+ arch/microblaze/include/asm/unaligned.h     |  27 ---
+ arch/mips/crypto/crc32-mips.c               |   2 +-
+ arch/openrisc/include/asm/unaligned.h       |  47 -----
+ arch/parisc/include/asm/unaligned.h         |   6 +-
+ arch/powerpc/include/asm/unaligned.h        |  22 ---
+ arch/sh/include/asm/unaligned-sh4a.h        | 199 --------------------
+ arch/sh/include/asm/unaligned.h             |  13 --
+ arch/sparc/include/asm/unaligned.h          |  11 --
+ arch/x86/include/asm/unaligned.h            |  15 --
+ arch/xtensa/include/asm/unaligned.h         |  29 ---
+ block/partitions/ldm.h                      |   2 +-
+ block/partitions/msdos.c                    |   2 +-
+ drivers/net/wireless/marvell/mwifiex/pcie.c |  10 +-
+ include/asm-generic/unaligned.h             | 149 ++++++++++++---
+ include/linux/unaligned/access_ok.h         |  68 -------
+ include/linux/unaligned/be_byteshift.h      |  71 -------
+ include/linux/unaligned/be_memmove.h        |  37 ----
+ include/linux/unaligned/be_struct.h         |  37 ----
+ include/linux/unaligned/generic.h           | 115 -----------
+ include/linux/unaligned/le_byteshift.h      |  71 -------
+ include/linux/unaligned/le_memmove.h        |  37 ----
+ include/linux/unaligned/le_struct.h         |  37 ----
+ include/linux/unaligned/memmove.h           |  46 -----
+ net/core/netpoll.c                          |   4 +-
+ security/apparmor/policy_unpack.c           |   2 +-
+ 30 files changed, 137 insertions(+), 1000 deletions(-)
+ delete mode 100644 arch/alpha/include/asm/unaligned.h
+ delete mode 100644 arch/arm/include/asm/unaligned.h
+ delete mode 100644 arch/ia64/include/asm/unaligned.h
+ delete mode 100644 arch/m68k/include/asm/unaligned.h
+ delete mode 100644 arch/microblaze/include/asm/unaligned.h
+ delete mode 100644 arch/openrisc/include/asm/unaligned.h
+ delete mode 100644 arch/powerpc/include/asm/unaligned.h
+ delete mode 100644 arch/sh/include/asm/unaligned-sh4a.h
+ delete mode 100644 arch/sh/include/asm/unaligned.h
+ delete mode 100644 arch/sparc/include/asm/unaligned.h
+ delete mode 100644 arch/x86/include/asm/unaligned.h
+ delete mode 100644 arch/xtensa/include/asm/unaligned.h
+ delete mode 100644 include/linux/unaligned/access_ok.h
+ delete mode 100644 include/linux/unaligned/be_byteshift.h
+ delete mode 100644 include/linux/unaligned/be_memmove.h
+ delete mode 100644 include/linux/unaligned/be_struct.h
+ delete mode 100644 include/linux/unaligned/generic.h
+ delete mode 100644 include/linux/unaligned/le_byteshift.h
+ delete mode 100644 include/linux/unaligned/le_memmove.h
+ delete mode 100644 include/linux/unaligned/le_struct.h
+ delete mode 100644 include/linux/unaligned/memmove.h
+
+Cc: Amitkumar Karwar <amitkarwar@gmail.com>
+Cc: Arnd Bergmann <arnd@arndb.de>
+Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Cc: Borislav Petkov <bp@alien8.de>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Florian Fainelli <f.fainelli@gmail.com>
+Cc: Ganapathi Bhat <ganapathi017@gmail.com>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: "H. Peter Anvin" <hpa@zytor.com>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: James Morris <jmorris@namei.org>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: John Johansen <john.johansen@canonical.com>
+Cc: Jonas Bonn <jonas@southpole.se>
+Cc: Kalle Valo <kvalo@codeaurora.org>
+Cc: Michael Ellerman <mpe@ellerman.id.au>
+Cc: Paul Mackerras <paulus@samba.org>
+Cc: Rich Felker <dalias@libc.org>
+Cc: "Richard Russon (FlatCap)" <ldm@flatcap.org>
+Cc: Russell King <linux@armlinux.org.uk>
+Cc: "Serge E. Hallyn" <serge@hallyn.com>
+Cc: Sharvari Harisangam <sharvari.harisangam@nxp.com>
+Cc: Stafford Horne <shorne@gmail.com>
+Cc: Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Xinming Hu <huxinming820@gmail.com>
+Cc: Yoshinori Sato <ysato@users.sourceforge.jp>
+Cc: x86@kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: linux-m68k@lists.linux-m68k.org
+Cc: linux-crypto@vger.kernel.org
+Cc: openrisc@lists.librecores.org
+Cc: linuxppc-dev@lists.ozlabs.org
+Cc: linux-sh@vger.kernel.org
+Cc: sparclinux@vger.kernel.org
+Cc: linux-ntfs-dev@lists.sourceforge.net
+Cc: linux-block@vger.kernel.org
+Cc: linux-wireless@vger.kernel.org
+Cc: netdev@vger.kernel.org
+Cc: linux-arch@vger.kernel.org
+Cc: linux-security-module@vger.kernel.org
 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+2.29.2
+
