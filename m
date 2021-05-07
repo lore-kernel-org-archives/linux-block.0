@@ -2,151 +2,216 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50F0CC433B4
-	for <linux-block@archiver.kernel.org>; Fri,  7 May 2021 08:30:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD84AC433ED
+	for <linux-block@archiver.kernel.org>; Fri,  7 May 2021 10:16:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1A7E461451
-	for <linux-block@archiver.kernel.org>; Fri,  7 May 2021 08:30:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 73EAE61451
+	for <linux-block@archiver.kernel.org>; Fri,  7 May 2021 10:16:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229492AbhEGIbT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 7 May 2021 04:31:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24707 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234688AbhEGIbT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 7 May 2021 04:31:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620376219;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=4+izLZibXyh+gT45+rH9M32lbhj5zaOlz/STXzGzx34=;
-        b=dkZIZsAtc88d18lLVRTbjXVVFkrZhKv0cVpTkWI6gatrI/Zlp3VXr/qBWINw4APq/21Z5h
-        kUEnaoQVbv6ehS/OwyaaLXnwnVL1SRs1JA964MXxDSS7Xet8QfP9wcUcmj/qpJk88CkvnX
-        dLuBJ6AHJ5zfbzqV91c/Gs1NIveH6QI=
-Received: from mail-yb1-f199.google.com (mail-yb1-f199.google.com
- [209.85.219.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-557-ymg9e5C8OpWrK6DVjEWNqQ-1; Fri, 07 May 2021 04:30:15 -0400
-X-MC-Unique: ymg9e5C8OpWrK6DVjEWNqQ-1
-Received: by mail-yb1-f199.google.com with SMTP id d89-20020a25a3620000b02904dc8d0450c6so9179794ybi.2
-        for <linux-block@vger.kernel.org>; Fri, 07 May 2021 01:30:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=4+izLZibXyh+gT45+rH9M32lbhj5zaOlz/STXzGzx34=;
-        b=lVGxKbuw/4YsXtfDeFD1EwE+OqaA6eYrQ+N+6j0XmmifqaAu4j2g05qAwUDyMFmMBf
-         V6/NmUdZJsvZyEOFRPQvaLdw9kwkxVpFmHkUvEMwAGiDKKP10NqP5ATtrHaWy9Sey2Gn
-         ytZjNY/4fm5vPs9OPRRfBVLNipJFgcO6PJ+eTdysnjWmh+kR9OGqzHkQAfE4VMmTiv8q
-         wkViQtr5A+qLHoObLLjy6X+azlJ5/nKNU5EXPTFLmHNfMDTxIxa2C95dF+CJFhxnNCa/
-         AGji+CahWvn9+KSatzhZ2+HlgOGiVzp2JFfCLkB9V8f7jT7RAtKSb+z3tUCuaKz8uDgR
-         ukrg==
-X-Gm-Message-State: AOAM531LzqZXmGwOsS9Rx+w8bV6bDUhCVDhT19qJ+kyrDw0BZlrvDW3d
-        uwYtafF8fUnrunbJeDbxUnb8O8Pwjk+14yN+sDWXF72VYccU6C7rsSE7R7FPjhkr4dg8e9UsJ7Y
-        buXAVpSWFBAn6QqLB4wM2EMZuY1N5nQk4DHx2DqQ=
-X-Received: by 2002:a25:cc8d:: with SMTP id l135mr10979198ybf.89.1620376214564;
-        Fri, 07 May 2021 01:30:14 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxE8YNq4xz19ukTpC18X74T5PVq9HBx7dUIJs5aicZppzNFPDVxQfGPughCAYRsUpW37yCKbORdt7nlxHVGzDU=
-X-Received: by 2002:a25:cc8d:: with SMTP id l135mr10979180ybf.89.1620376214338;
- Fri, 07 May 2021 01:30:14 -0700 (PDT)
+        id S235817AbhEGKRC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 7 May 2021 06:17:02 -0400
+Received: from frasgout.his.huawei.com ([185.176.79.56]:3039 "EHLO
+        frasgout.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229812AbhEGKRB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 7 May 2021 06:17:01 -0400
+Received: from fraeml713-chm.china.huawei.com (unknown [172.18.147.207])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Fc5jh2Bw7z71ffb;
+        Fri,  7 May 2021 18:07:52 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml713-chm.china.huawei.com (10.206.15.32) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Fri, 7 May 2021 12:15:58 +0200
+Received: from [10.47.82.108] (10.47.82.108) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.2; Fri, 7 May 2021
+ 11:15:57 +0100
+Subject: Re: [PATCH] blk-mq: Use request queue-wide tags for tagset-wide
+ sbitmap
+To:     Ming Lei <ming.lei@redhat.com>
+CC:     "axboe@kernel.dk" <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "kashyap.desai@broadcom.com" <kashyap.desai@broadcom.com>,
+        "chenxiang (M)" <chenxiang66@hisilicon.com>,
+        "yama@redhat.com" <yama@redhat.com>
+References: <1620037333-2495-1-git-send-email-john.garry@huawei.com>
+ <YJOph1oI8CTJjzQx@T590>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <4d5893e2-13f0-ce6f-4fd7-44c7ecf8553f@huawei.com>
+Date:   Fri, 7 May 2021 11:15:28 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-References: <1366443410.1203736.1617240454513.JavaMail.zimbra@redhat.com>
- <4F41414B-05F8-4E7D-A312-8A47B8468C78@linaro.org> <c7d23258-0890-f79f-cc6a-9cb24bbaa437@redhat.com>
- <CAHj4cs9+q-vH9qar+MTP-aECb2whT7O8J5OmR240yss1y=kWKw@mail.gmail.com>
- <B657F0B6-E999-467B-98CB-56C29B04B8F3@linaro.org> <F22E9AB1-06EE-4A66-833A-16C3AD1FFF18@linaro.org>
-In-Reply-To: <F22E9AB1-06EE-4A66-833A-16C3AD1FFF18@linaro.org>
-From:   Yi Zhang <yi.zhang@redhat.com>
-Date:   Fri, 7 May 2021 16:30:03 +0800
-Message-ID: <CAHj4cs_4jPzoZWcuio+jQig4GARVfMac9h=0TyYCiQYqXmXUyQ@mail.gmail.com>
-Subject: Re: [bisected] bfq regression on latest linux-block/for-next
-To:     Paolo Valente <paolo.valente@linaro.org>
-Cc:     linux-block <linux-block@vger.kernel.org>,
-        Xiong Zhou <xzhou@redhat.com>, Li Wang <liwan@redhat.com>,
-        Ming Lei <minlei@redhat.com>,
-        Bruno Goncalves <bgoncalv@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <YJOph1oI8CTJjzQx@T590>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.47.82.108]
+X-ClientProxiedBy: lhreml719-chm.china.huawei.com (10.201.108.70) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, May 3, 2021 at 5:35 PM Paolo Valente <paolo.valente@linaro.org> wro=
-te:
->
->
->
-> > Il giorno 20 apr 2021, alle ore 09:33, Paolo Valente <paolo.valente@lin=
-aro.org> ha scritto:
-> >
-> >
-> >
-> >> Il giorno 20 apr 2021, alle ore 04:00, Yi Zhang <yi.zhang@redhat.com> =
-ha scritto:
-> >>
-> >>
-> >> On Wed, Apr 7, 2021 at 11:15 PM Yi Zhang <yi.zhang@redhat.com> wrote:
-> >>
-> >>
-> >> On 4/2/21 9:39 PM, Paolo Valente wrote:
-> >>>
-> >>>> Il giorno 1 apr 2021, alle ore 03:27, Yi Zhang <yi.zhang@redhat.com>=
- ha scritto:
-> >>>>
-> >>>> Hi
-> >>> Hi
-> >>>
-> >>>> We reproduced this bfq regression[3] on ppc64le with blktests[2] on =
-the latest linux-block/for-next branch, seems it was introduced with [1] fr=
-om my bisecting, pls help check it. Let me know if you need any testing for=
- it, thanks.
-> >>>>
-> >>> Thanks for reporting this bug and finding the candidate offending com=
-mit. Could you try this test with my dev kernel, which might provide more i=
-nformation? The kernel is here:
-> >>> https://github.com/Algodev-github/bfq-mq
-> >>>
-> >>> Alternatively, I could try to provide you with patches to instrument =
-your kernel.
-> >> HI Paolo
-> >> I tried your dev kernel, but with no luck to reproduce it, could you
-> >> provide the debug patch based on latest linux-block/for-next?
-> >>
-> >> Hi Paolo
-> >> This issue has been consistently reproduced with LTP/fstests/blktests =
-on recent linux-block/for-next, do you have a chance to check it?
-> >
-> > Hi Yi, all,
-> > I've been working hard to port my code-instrumentation layer to the ker=
-nel in for-next. I seem I finished the porting yesterday. I tested it but t=
-he system crashed. I'm going to analyze the oops. Maybe this freeze is caus=
-ed by mistakes in this layer, maybe the instrumentation is already detectin=
-g a bug. In the first case, I'll fix the mistakes and try the tests suggest=
-ed in this thread.
-> >
->
-> Hi Yi, all,
-> I seem to have made it.  I've attached a patch series, which applies
-> on top of for-next, as it was when you reported this failure (i.e., on
-> top of 816e1d1c2f7d Merge branch 'for-5.13/io_uring' into for-next).
-> If patches are to be applied on top of a different HEAD, and they
-> don't apply cleanly, I'll take care of rebasing them.
->
-> Of course I've tried your test myself, but with no failure at all.
->
-> Looking forward to your feedback,
-> Paolo
->
-Hi Paolo
+On 06/05/2021 09:32, Ming Lei wrote:
+>> +	if (blk_mq_is_sbitmap_shared(q->tag_set->flags)) {
+>> +		ret = blk_mq_init_sched_shared_sbitmap(q);
+>> +		if (ret)
+>> +			goto err_free_tags;
+>> +
+>> +		queue_for_each_hw_ctx(q, hctx, i) {
+>> +			hctx->sched_tags->bitmap_tags =
+>> +					q->sched_bitmap_tags;
+>> +			hctx->sched_tags->breserved_tags =
+>> +					q->sched_breserved_tags;
+>> +		}
+>>   	}
+>>   
+>>   	ret = e->ops.init_sched(q, e);
+>>   	if (ret)
+>> -		goto err;
+>> +		goto err_free_sbitmap;
+>>   
+>>   	blk_mq_debugfs_register_sched(q);
+>>   
+>> @@ -584,6 +590,7 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
+>>   				eq = q->elevator;
+>>   				blk_mq_sched_free_requests(q);
+>>   				blk_mq_exit_sched(q, eq);
+>> +				blk_mq_exit_sched_shared_sbitmap(q);
+> blk_mq_exit_sched_shared_sbitmap() has been called in blk_mq_exit_sched() already.
 
-With the patch series, blktests nvme-tcp nvme/011 passed on
-linux-block/for-next, thanks.
+ah, yes
+
+> 
+>>   				kobject_put(&eq->kobj);
+>>   				return ret;
+>>   			}
+>> @@ -593,7 +600,10 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
+>>   
+>>   	return 0;
+>>   
+>> -err:
+>> +err_free_sbitmap:
+>> +	if (blk_mq_is_sbitmap_shared(q->tag_set->flags))
+>> +		blk_mq_exit_sched_shared_sbitmap(q);
+>> +err_free_tags:
+>>   	blk_mq_sched_free_requests(q);
+>>   	blk_mq_sched_tags_teardown(q);
+>>   	q->elevator = NULL;
+>> @@ -631,5 +641,7 @@ void blk_mq_exit_sched(struct request_queue *q, struct elevator_queue *e)
+>>   	if (e->type->ops.exit_sched)
+>>   		e->type->ops.exit_sched(e);
+>>   	blk_mq_sched_tags_teardown(q);
+>> +	if (blk_mq_is_sbitmap_shared(q->tag_set->flags))
+>> +		blk_mq_exit_sched_shared_sbitmap(q);
+>>   	q->elevator = NULL;
+>>   }
+>> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+>> index 2a37731e8244..734fedceca7d 100644
+>> --- a/block/blk-mq-tag.c
+>> +++ b/block/blk-mq-tag.c
+>> @@ -466,19 +466,40 @@ static int blk_mq_init_bitmap_tags(struct blk_mq_tags *tags,
+>>   	return -ENOMEM;
+>>   }
+>>   
+>> -int blk_mq_init_shared_sbitmap(struct blk_mq_tag_set *set, unsigned int flags)
+>> +static int __blk_mq_init_bitmaps(struct sbitmap_queue *bitmap_tags,
+>> +				 struct sbitmap_queue *breserved_tags,
+>> +				 struct blk_mq_tag_set *set,
+>> +				 unsigned int queue_depth,
+>> +				 unsigned int reserved)
+>>   {
+>> -	unsigned int depth = set->queue_depth - set->reserved_tags;
+>> +	unsigned int depth = queue_depth - reserved;
+>>   	int alloc_policy = BLK_MQ_FLAG_TO_ALLOC_POLICY(set->flags);
+>>   	bool round_robin = alloc_policy == BLK_TAG_ALLOC_RR;
+>> -	int i, node = set->numa_node;
+>>   
+>> -	if (bt_alloc(&set->__bitmap_tags, depth, round_robin, node))
+>> +	if (bt_alloc(bitmap_tags, depth, round_robin, set->numa_node))
+>>   		return -ENOMEM;
+>> -	if (bt_alloc(&set->__breserved_tags, set->reserved_tags,
+>> -		     round_robin, node))
+>> +	if (bt_alloc(breserved_tags, set->reserved_tags,
+>> +		     round_robin, set->numa_node))
+>>   		goto free_bitmap_tags;
+>>   
+>> +	return 0;
+>> +
+>> +free_bitmap_tags:
+>> +	sbitmap_queue_free(bitmap_tags);
+>> +	return -ENOMEM;
+>> +}
+>> +
+>> +int blk_mq_init_shared_sbitmap(struct blk_mq_tag_set *set)
+> IMO, this function should be named as blk_mq_init_shared_tags
+> and moved to blk-mq-sched.c
+
+But this is for regular tags.
+
+I assume you mean blk_mq_init_sched_shared_sbitmap(), below.
+
+If so, I can relocate it.
+
+As for "sbitmap" vs "tags" in the name, I'm just being consistent 
+between preexisting blk_mq_init_shared_sbitmap() and 
+blk_mq_sbitmap_shared(),  and new blk_mq_init_sched_shared_sbitmap()
+
+> 
+>> +{
+>> +	int i, ret;
+>> +
+>> +	ret = __blk_mq_init_bitmaps(&set->__bitmap_tags,
+>> +				    &set->__breserved_tags,
+>> +				    set, set->queue_depth,
+>> +				    set->reserved_tags);
+>> +	if (ret)
+>> +		return ret;
+>> +
+>>   	for (i = 0; i < set->nr_hw_queues; i++) {
+>>   		struct blk_mq_tags *tags = set->tags[i];
+>>   
+>> @@ -487,9 +508,6 @@ int blk_mq_init_shared_sbitmap(struct blk_mq_tag_set *set, unsigned int flags)
+>>   	}
+>>   
+>>   	return 0;
+>> -free_bitmap_tags:
+>> -	sbitmap_queue_free(&set->__bitmap_tags);
+>> -	return -ENOMEM;
+>>   }
+>>   
+>>   void blk_mq_exit_shared_sbitmap(struct blk_mq_tag_set *set)
+>> @@ -498,6 +516,52 @@ void blk_mq_exit_shared_sbitmap(struct blk_mq_tag_set *set)
+>>   	sbitmap_queue_free(&set->__breserved_tags);
+>>   }
+>>   
+>> +#define MAX_SCHED_RQ (16 * BLKDEV_MAX_RQ)
+>> +
+>> +int blk_mq_init_sched_shared_sbitmap(struct request_queue *queue)
+>> +{
+>> +	struct blk_mq_tag_set *set = queue->tag_set;
+>> +	int ret;
+>> +
+>> +	queue->sched_bitmap_tags =
+>> +		kmalloc(sizeof(*queue->sched_bitmap_tags), GFP_KERNEL);
+>> +	queue->sched_breserved_tags =
+>> +		kmalloc(sizeof(*queue->sched_breserved_tags), GFP_KERNEL);
+>> +	if (!queue->sched_bitmap_tags || !queue->sched_breserved_tags)
+>> +		goto err;
+> The two sbitmap queues can be embedded into 'request queue', so that
+> we can avoid to re-allocation in every elevator switch.
+
+ok
+
+> 
+> I will ask Yanhui to test the patch and see if it can make a difference.
 
 Thanks
-Yi
-
