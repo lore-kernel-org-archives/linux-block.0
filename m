@@ -2,64 +2,75 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9427C433B4
-	for <linux-block@archiver.kernel.org>; Mon, 10 May 2021 18:12:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5563DC433ED
+	for <linux-block@archiver.kernel.org>; Mon, 10 May 2021 19:49:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CCBA4611CE
-	for <linux-block@archiver.kernel.org>; Mon, 10 May 2021 18:12:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 244B261584
+	for <linux-block@archiver.kernel.org>; Mon, 10 May 2021 19:49:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230300AbhEJSNF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 May 2021 14:13:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57832 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230186AbhEJSNF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 May 2021 14:13:05 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 245E6C061574;
-        Mon, 10 May 2021 11:12:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Type:MIME-Version:Message-ID:
-        Subject:To:From:Date:Sender:Reply-To:Cc:Content-Transfer-Encoding:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=YL/AMILJQ/MhajJ8+fnwzdJVjELrW3Cc7diRHC8qblE=; b=PLqLn0j5PoKbrh6VvmUSIr6l8i
-        m8fa8nPq4gYXhF6Rn4dgILKWMjjl7o8SH9lg5SYTpcsggrmMHPyjsoeUpUNoNTR0oe/2nflr9voHC
-        mgd4g8Z7yyeIJ7q+nicXHEqYw5/hVDnntM06Is+SsQFVrdSv5ie1DvIWiwRc/g8IS2C6z+K+eFfMQ
-        bABMNr7fkPmtzTzDvG1cseklK17UAEAX/5Ap27q9PJnvy8h7UN4RI4MmiAq/tz4thtJ13v84IpOw0
-        XMMw3IEfcIDcHkuznaZj7wqb1rhPMwq94acK9NCfDzZKucYeUpXIsLo+5v5vi9+K2Rn2TY1i4Zidv
-        ROzmVcpA==;
-Received: from willy by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
-        id 1lgANT-006SNM-UC; Mon, 10 May 2021 18:11:43 +0000
-Date:   Mon, 10 May 2021 19:11:35 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     lsf-pc@lists.linux-foundation.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: [LSF/MM/BPF TOPIC] I/O completions in softirq context
-Message-ID: <YJl3V5q/+ovcSzJB@casper.infradead.org>
+        id S231518AbhEJTui (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 May 2021 15:50:38 -0400
+Received: from mga14.intel.com ([192.55.52.115]:39012 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231489AbhEJTuh (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 10 May 2021 15:50:37 -0400
+IronPort-SDR: t+DQSuiIOcHY5/rKDv88rZxhaBvvKArrageHTZxOgbpelKyJehgSpPWYfxiAtIouB+t8AmuQWN
+ +1Ym/Ha2vS2w==
+X-IronPort-AV: E=McAfee;i="6200,9189,9980"; a="198951468"
+X-IronPort-AV: E=Sophos;i="5.82,288,1613462400"; 
+   d="scan'208";a="198951468"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 May 2021 12:49:32 -0700
+IronPort-SDR: 9X8UdaOzsCJpo3/+LJoiS1E/Bb5vW/ytxdYL3PwWIOvxQYojGkBJSY0tPCv0qsOfTGol+Tu9LI
+ HEtxFGpqFP1A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.82,288,1613462400"; 
+   d="scan'208";a="468443102"
+Received: from apaszkie-desk.igk.intel.com ([10.102.102.225])
+  by fmsmga002.fm.intel.com with ESMTP; 10 May 2021 12:49:29 -0700
+From:   Artur Paszkiewicz <artur.paszkiewicz@intel.com>
+Subject: Re: [PATCH] md: don't account io stat for split bio
+To:     Guoqing Jiang <jgq516@gmail.com>,
+        Christoph Hellwig <hch@infradead.org>
+Cc:     song@kernel.org, linux-raid@vger.kernel.org,
+        linux-block@vger.kernel.org, pawel.wiejacha@rtbhouse.com
+References: <20210508034815.123565-1-jgq516@gmail.com>
+ <YJjL6AQ+mMgzmIqM@infradead.org>
+ <14a350ee-1ec9-6a15-dd76-fb01d8dd2235@gmail.com>
+Message-ID: <6ffb719e-bb56-8f61-9cd3-a0852c4acb7d@intel.com>
+Date:   Mon, 10 May 2021 21:49:16 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+In-Reply-To: <14a350ee-1ec9-6a15-dd76-fb01d8dd2235@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We have some reports of the interrupt hangcheck watchdog firing when
-completing I/Os that are millions of pages long.  While it doesn't
-really make sense to construct single I/Os that are that big, it does
-flag that even, say, a 16MB writeback I/O is going to spend a lot of time
-clearing the writeback bit from pages.  With 4kB pages, that's 4096
-pages.  At 2000 cycles per cache miss (and with just the struct pages
-being 256kB of data, they're not in L1 cache any more and probably not
-in L2 either), that's 8 million cycles with interrupts disabled.
+On 5/10/21 9:46 AM, Guoqing Jiang wrote:
+> On 5/10/21 2:00 PM, Christoph Hellwig wrote:
+>> On Sat, May 08, 2021 at 11:48:15AM +0800, Guoqing Jiang wrote:
+>>> It looks like stack overflow happened for split bio, to fix this,
+>>> let's keep split bio untouched in md_submit_bio.
+>>>
+>>> As a side effect, we need to export bio_chain_endio.
+>> Err, no.  The right answer is to not change ->bi_end_io of bios that
+>> you do not own instead of using a horrible hack to skip accounting for
+>> bios that have no more or less reason to be accounted than others bios.
+> 
+> Thanks for the reply. I suppose that md needs to revert current
+> implementation of accounting io stats, then re-implement it.
+> 
+> Song and Artur, what are your opinion?
 
-If we could guarantee that BIOs were always ended in softirq context,
-the page cache could use spin_lock_bh() instead of spin_lock_irq().
-I haven't done any measurements to quantify what kind of improvement
-that would be, but I suspect it could be seen on some workloads.
+In the initial version of the io accounting patch the bio was cloned instead
+of just overriding bi_end_io and bi_private. Would this be the right approach?
 
-(this is more of an attempt to induce conference driven development
-than necessarily a discussion topic for lsfmm)
+https://lore.kernel.org/linux-raid/20200601161256.27718-1-artur.paszkiewicz@intel.com/
