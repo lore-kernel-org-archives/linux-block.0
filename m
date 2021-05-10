@@ -2,178 +2,94 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15B1CC433ED
-	for <linux-block@archiver.kernel.org>; Mon, 10 May 2021 15:16:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FABEC433ED
+	for <linux-block@archiver.kernel.org>; Mon, 10 May 2021 15:29:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C5D4A61409
-	for <linux-block@archiver.kernel.org>; Mon, 10 May 2021 15:16:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E97D361139
+	for <linux-block@archiver.kernel.org>; Mon, 10 May 2021 15:29:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239243AbhEJPRD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 May 2021 11:17:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45420 "EHLO
+        id S236746AbhEJPaq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 May 2021 11:30:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47858 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241602AbhEJPQA (ORCPT
+        with ESMTP id S232090AbhEJPaH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 May 2021 11:16:00 -0400
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69ED5C08E9A6
-        for <linux-block@vger.kernel.org>; Mon, 10 May 2021 07:42:21 -0700 (PDT)
-Received: by mail-lf1-x136.google.com with SMTP id h4so23784322lfv.0
-        for <linux-block@vger.kernel.org>; Mon, 10 May 2021 07:42:21 -0700 (PDT)
+        Mon, 10 May 2021 11:30:07 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23B39C0611EB
+        for <linux-block@vger.kernel.org>; Mon, 10 May 2021 08:22:00 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id l10-20020a17090a850ab0290155b06f6267so10257338pjn.5
+        for <linux-block@vger.kernel.org>; Mon, 10 May 2021 08:22:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=nGZx3IHlZolc8cpiUp7UZIMaVX9aP3c8CsMB4Q5ljJQ=;
-        b=QQ51fpoXpyNz4qMgniyay13YXJ5B8HSlgu7JIjxKmsIZ+udNaVEPDeEocaZNmn+d9m
-         OdNcQWPnKD+TFmlwf+gA2nmWPYTnm32vb/fSV8YGs8EFYv9VrVQ4FaDm8pGRydg/22fd
-         Imn0FMzKzzfwxv+UHRncvPvwAdUWxgGkzScrQrbMq8zaGdfIqCcg4VHpMqvnIO3I0nAa
-         Tb6eJP8DPzFkIRBYglU7NjATrZtQ4YYG2wNFMnH2d5CzHWSLwlWMjzg5/YF0C2gCe3H2
-         raUHkfi/Z0VuD3JldFYqp9BSWbtqyZ9HBNLYWZ02P2acCIyLcPO/OyPp6HIqgs5Uzy7C
-         BDdQ==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=4kJjyEdKJSSJcbIYRx1gsC3Tm92r+WAm3xChSESK0DY=;
+        b=EwFGMVT/RquH9XWAorVf5LJnDWWm9i0AMvJhQVX23jF1tuP41qys8SSBNMRSkuRGsN
+         eoF8x6/4p37PPO/NzY0xpAo+SH7vu4mntn6WTH6x3DAl0uOyDB8PHsQBRfZUmbvWO9ld
+         gBK/MsdW3EZJvIMXj7GM3yRMh5UcuU3nVEtfP6ZzgS6tRtRdUeQiiuAS+ZuztRJnpgn4
+         i835A6slNz7wc1vEL2SyHRx0lZpE3oqq2iUE76rDetn27Jd/vAASw7cU8jlVj7wRVboN
+         o6Zym2GlM+pmPzRp5XY29VnPI30RoV6YfVO08SEGksyxD/nLQocesxDBk2vApsIB7FMG
+         tsXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=nGZx3IHlZolc8cpiUp7UZIMaVX9aP3c8CsMB4Q5ljJQ=;
-        b=pep3/fUvoLIGcxAoqSLWRuZtYGjsMA1RgmAShxmHnfVJARLH6u19F17qa2asTOcOzU
-         pLbyfpgLVVSmuq4UWWh75as2KnLu0Fis0xVzCL+hRjcs9Sk15OocGqq5SHS3kDI7AD1m
-         Hk6Takhi87AQDZ55ZxahWqnf6j7uDi38yX08ZcNVlTJEXIrOlPy2Rn9lsBAL5QChg1UN
-         dlRJCZ6DN7yjUNgcVFqzH53Y5CpiOqd4HDIUP1s7z60odBthmqPXJx22wrJunUvnbYjb
-         SxEYKdsHME5QLkx9rznMJzidkI7Vf/XiE18qoP9x7LqgMf+nO41lh4ee/Gym5pY0OuUC
-         BNMg==
-X-Gm-Message-State: AOAM530MwID2V+BVaGo5mhEbg3MvEULF8TQf2B+sE1g2iiqw+OwKu031
-        vh/GRc3tQOVcprUUjLH60w6fwz5jqvckURLSyQMafTwnJopVy94Y
-X-Google-Smtp-Source: ABdhPJyfG7JHyVEwZrQS2Vo/RcFCtBOHS0tLDhi9jJ1UCOrRbqTpbVKYkmsNQnjRFS/cLprDT3ykeyzmBFpXfguHMvY=
-X-Received: by 2002:a05:6512:3e14:: with SMTP id i20mr16631717lfv.142.1620657739885;
- Mon, 10 May 2021 07:42:19 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=4kJjyEdKJSSJcbIYRx1gsC3Tm92r+WAm3xChSESK0DY=;
+        b=MU9suMJNdVeTNQsqibvQHtqsAg7lF2mKZ4ggjcwapstBVIA8FrMZNEi4GQFrfmKkGq
+         e1jHUkCtI/xOn9DU8blTLbnU+qFMcgkZt4eo1C7DOjnODjoYnTgCR8JJwFdWSFeP0ZEV
+         IR/dtNeVM892cq2S2QwPEVWvFmkJ2v90EL6N18hr2ZY+5pOGb37X3o5N0W93863Skwfi
+         +jRYFV5t2OTAeaZv3vnC2aSCxGdCZxkak+0Qu/beVTZBIJBRdbFjDLA4O1mXQyo/Y5xr
+         ma+wu9RI7VRPL1iIiP32N6ZdiQaxFIKpdIOBqNCfY+rI22rgOmU7lAmOt0gZmigc8sEI
+         g6GQ==
+X-Gm-Message-State: AOAM5324+wew563nkI4ugFddp2FlopEa0to98LDzuizdorLnYy4noMno
+        ThrsUSz6oOROCZrRUhI8ygKDaQ==
+X-Google-Smtp-Source: ABdhPJxFDOJREynsD+t0qDXkJ8N0sfYWJnXjlJPZOiCIWUhfU/8Aux4zDCsk0nv0vqTiYdBS3VV2ZA==
+X-Received: by 2002:a17:902:c612:b029:ef:2ad3:8998 with SMTP id r18-20020a170902c612b02900ef2ad38998mr6128708plr.74.1620660119598;
+        Mon, 10 May 2021 08:21:59 -0700 (PDT)
+Received: from [192.168.4.41] (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
+        by smtp.gmail.com with ESMTPSA id 66sm11274986pfg.181.2021.05.10.08.21.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 10 May 2021 08:21:59 -0700 (PDT)
+Subject: Re: [RFC PATCH 0/3] block_dump: remove block dump
+To:     "zhangyi (F)" <yi.zhang@huawei.com>, linux-fsdevel@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-block@vger.kernel.org,
+        jack@suse.cz
+Cc:     tytso@mit.edu, viro@zeniv.linux.org.uk, hch@infradead.org,
+        mcgrof@kernel.org, keescook@chromium.org, yzaikin@google.com
+References: <20210313030146.2882027-1-yi.zhang@huawei.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <498fe074-709a-48d6-dfae-bb50ff69c290@kernel.dk>
+Date:   Mon, 10 May 2021 09:21:56 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <20210506145829.198823-1-ulf.hansson@linaro.org>
- <20210506145829.198823-3-ulf.hansson@linaro.org> <DM6PR04MB6575E3D63982278D2F1CA022FC549@DM6PR04MB6575.namprd04.prod.outlook.com>
-In-Reply-To: <DM6PR04MB6575E3D63982278D2F1CA022FC549@DM6PR04MB6575.namprd04.prod.outlook.com>
-From:   Ulf Hansson <ulf.hansson@linaro.org>
-Date:   Mon, 10 May 2021 16:41:43 +0200
-Message-ID: <CAPDyKFrvhNntCAWdyN5Kw8znq4RKE6yQS5G38XYY5iBhqMW0Pw@mail.gmail.com>
-Subject: Re: [PATCH 2/2] mmc: core: Add support for cache ctrl for SD cards
-To:     Avri Altman <Avri.Altman@wdc.com>
-Cc:     "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Wolfram Sang <wsa+renesas@sang-engineering.com>,
-        Shawn Lin <shawn.lin@rock-chips.com>,
-        Masami Hiramatsu <masami.hiramatsu@linaro.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20210313030146.2882027-1-yi.zhang@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 10 May 2021 at 11:10, Avri Altman <Avri.Altman@wdc.com> wrote:
->
-> > +static int sd_enable_cache(struct mmc_card *card)
-> > +{
-> > +       u8 *reg_buf;
-> > +       int err;
-> > +
-> > +       reg_buf = kzalloc(512, GFP_KERNEL);
-> > +       if (!reg_buf)
-> > +               return -ENOMEM;
-> > +
-> > +       /*
-> > +        * Set the Cache Enable bit in the performance enhancement register at
-> > +        * 260 bytes offset.
-> > +        */
-> > +       err = sd_write_ext_reg(card, card->ext_perf.fno, card->ext_perf.page,
-> > +                              card->ext_perf.offset + 260, 0x1);
-> > +       if (err) {
-> > +               pr_warn("%s: error %d writing Cache Enable bit\n",
-> > +                       mmc_hostname(card->host), err);
-> > +               goto out;
-> > +       }
-> > +
-> > +       err = mmc_poll_for_busy(card,
-> > SD_WRITE_EXTR_SINGLE_TIMEOUT_MS, false,
-> > +                               MMC_BUSY_EXTR_SINGLE);
-> I think 1sec is for flush cache, but I guess it makes sense to use it here as well.
+On 3/12/21 8:01 PM, zhangyi (F) wrote:
+> Hi,
+> 
+> block_dump is an old debugging interface and can be replaced by
+> tracepoints, and we also found a deadlock issue relate to it[1]. As Jan
+> suggested, this patch set delete the whole block_dump feature, we can
+> use tracepoints to get the similar information. If someone still using
+> this feature cannot switch to use tracepoints or any other suggestions,
+> please let us know.
 
-The spec talks about generic busy signaling time for CMD49 of one
-second. That's why I added this here.
+Applied for 5.14, thanks.
 
->
-> > +       if (!err)
-> > +               card->ext_perf.feature_enabled |= SD_EXT_PERF_CACHE;
-> Maybe
-> If (err)
->     card->ext_perf.feature_enabled &= ~SD_EXT_PERF_CACHE;
->
-> and move to out: to catch the sd_write_ext_reg err ?
->
-> > +
-> > +out:
-> > +       kfree(reg_buf);
-> > +       return err;
-> > +}
-> > +
-> >  /*
-> >   * Handle the detection and initialisation of a card.
-> >   *
-> > @@ -1442,6 +1531,13 @@ static int mmc_sd_init_card(struct mmc_host
-> > *host, u32 ocr,
-> >                         goto free_card;
-> >         }
-> >
-> > +       /* Enable internal SD cache if supported. */
-> > +       if (card->ext_perf.feature_support & SD_EXT_PERF_CACHE) {
-> > +               err = sd_enable_cache(card);
-> > +               if (err)
-> > +                       goto free_card;
-> If cache enablement failed, is it worthwhile to bail out?
-> Maybe disabling the cache with the appropriate message is enough?
+-- 
+Jens Axboe
 
-Right, good point.
-
-Let me also think about how we best reset the .feature_enabled field
-after a power cycle. Theoretically we could fail to enable a feature
-after the system has resumed, but then we would still have the
-correspond bits set.
-
->
-> > +       }
-> > +
-> >         if (host->cqe_ops && !host->cqe_enabled) {
-> >                 err = host->cqe_ops->cqe_enable(host, card);
-> >                 if (!err) {
-> > @@ -1694,6 +1790,8 @@ static const struct mmc_bus_ops mmc_sd_ops = {
-> >         .alive = mmc_sd_alive,
-> >         .shutdown = mmc_sd_suspend,
-> >         .hw_reset = mmc_sd_hw_reset,
-> > +       .cache_enabled = sd_cache_enabled,
-> > +       .flush_cache = sd_flush_cache,
-> >  };
->
-> I would expect 2 more patches in this series:
->  - flush cache on power down
-
-According to the spec that should not be needed, because that should
-be managed internally in the SD card when we send a poweroff
-notification.
-
-Did I get that wrong? Do you prefer to send a flush cache as well
-before the poweroff notification?
-
->  - cache disablement events?
-
-This I don't know about. Can you elaborate?
-
->
-> Thanks,
-> Avri
-
-Kind regards
-Uffe
