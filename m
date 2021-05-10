@@ -1,76 +1,77 @@
 Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: *
+X-Spam-Status: No, score=1.0 required=3.0 tests=BAYES_50,DKIMWL_BL,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5563DC433ED
-	for <linux-block@archiver.kernel.org>; Mon, 10 May 2021 19:49:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EFE3C433B4
+	for <linux-block@archiver.kernel.org>; Mon, 10 May 2021 20:44:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 244B261584
-	for <linux-block@archiver.kernel.org>; Mon, 10 May 2021 19:49:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 26DA1611F0
+	for <linux-block@archiver.kernel.org>; Mon, 10 May 2021 20:44:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231518AbhEJTui (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 May 2021 15:50:38 -0400
-Received: from mga14.intel.com ([192.55.52.115]:39012 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231489AbhEJTuh (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 May 2021 15:50:37 -0400
-IronPort-SDR: t+DQSuiIOcHY5/rKDv88rZxhaBvvKArrageHTZxOgbpelKyJehgSpPWYfxiAtIouB+t8AmuQWN
- +1Ym/Ha2vS2w==
-X-IronPort-AV: E=McAfee;i="6200,9189,9980"; a="198951468"
-X-IronPort-AV: E=Sophos;i="5.82,288,1613462400"; 
-   d="scan'208";a="198951468"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 May 2021 12:49:32 -0700
-IronPort-SDR: 9X8UdaOzsCJpo3/+LJoiS1E/Bb5vW/ytxdYL3PwWIOvxQYojGkBJSY0tPCv0qsOfTGol+Tu9LI
- HEtxFGpqFP1A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.82,288,1613462400"; 
-   d="scan'208";a="468443102"
-Received: from apaszkie-desk.igk.intel.com ([10.102.102.225])
-  by fmsmga002.fm.intel.com with ESMTP; 10 May 2021 12:49:29 -0700
-From:   Artur Paszkiewicz <artur.paszkiewicz@intel.com>
-Subject: Re: [PATCH] md: don't account io stat for split bio
-To:     Guoqing Jiang <jgq516@gmail.com>,
-        Christoph Hellwig <hch@infradead.org>
-Cc:     song@kernel.org, linux-raid@vger.kernel.org,
-        linux-block@vger.kernel.org, pawel.wiejacha@rtbhouse.com
-References: <20210508034815.123565-1-jgq516@gmail.com>
- <YJjL6AQ+mMgzmIqM@infradead.org>
- <14a350ee-1ec9-6a15-dd76-fb01d8dd2235@gmail.com>
-Message-ID: <6ffb719e-bb56-8f61-9cd3-a0852c4acb7d@intel.com>
-Date:   Mon, 10 May 2021 21:49:16 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.0
-MIME-Version: 1.0
-In-Reply-To: <14a350ee-1ec9-6a15-dd76-fb01d8dd2235@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+        id S229946AbhEJUpY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 May 2021 16:45:24 -0400
+Received: from flippiebeckerswealth.xyz ([62.173.147.206]:38584 "EHLO
+        host.flippiebeckerswealth.xyz" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231672AbhEJUpX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 10 May 2021 16:45:23 -0400
+Received: from flippiebeckerswealth.xyz (ec2-3-142-218-249.us-east-2.compute.amazonaws.com [3.142.218.249])
+        by host.flippiebeckerswealth.xyz (Postfix) with ESMTPA id 50F901DFF3A
+        for <linux-block@vger.kernel.org>; Mon, 10 May 2021 17:06:49 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 host.flippiebeckerswealth.xyz 50F901DFF3A
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=flippiebeckerswealth.xyz; s=default; t=1620655609;
+        bh=Lxx5rGQCX/MQzrwE9epz1Mb5yPYRqDyEupWj6GReobo=;
+        h=Reply-To:From:To:Subject:Date:From;
+        b=g8p9NEMa3Ecr7t+yLc/ZFveqst1USGjVBsWEga2xRtlKDWoNxA9t+tENCYePjTG5R
+         eQfKlMOE8GlJ4feKUnHkym/32/hrBbcXEKXYPzdU8qcENd0OvM/FRIJFCdNAHAlpGN
+         p0uL8wYUIodNNNRKhC+6GF4FHd+LYIifU78sEq7E=
+DKIM-Filter: OpenDKIM Filter v2.11.0 host.flippiebeckerswealth.xyz 50F901DFF3A
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=flippiebeckerswealth.xyz; s=default; t=1620655609;
+        bh=Lxx5rGQCX/MQzrwE9epz1Mb5yPYRqDyEupWj6GReobo=;
+        h=Reply-To:From:To:Subject:Date:From;
+        b=g8p9NEMa3Ecr7t+yLc/ZFveqst1USGjVBsWEga2xRtlKDWoNxA9t+tENCYePjTG5R
+         eQfKlMOE8GlJ4feKUnHkym/32/hrBbcXEKXYPzdU8qcENd0OvM/FRIJFCdNAHAlpGN
+         p0uL8wYUIodNNNRKhC+6GF4FHd+LYIifU78sEq7E=
+Reply-To: cpavlides@flippiebeckerwealthservices.com
+From:   Chris Pavlides <cpavlides@flippiebeckerswealth.xyz>
+To:     linux-block@vger.kernel.org
+Subject: Personal
+Date:   10 May 2021 14:06:48 +0000
+Message-ID: <20210510140648.DC3B1FE3D65A0B28@flippiebeckerswealth.xyz>
+Mime-Version: 1.0
+Content-Type: text/plain;
+        charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/10/21 9:46 AM, Guoqing Jiang wrote:
-> On 5/10/21 2:00 PM, Christoph Hellwig wrote:
->> On Sat, May 08, 2021 at 11:48:15AM +0800, Guoqing Jiang wrote:
->>> It looks like stack overflow happened for split bio, to fix this,
->>> let's keep split bio untouched in md_submit_bio.
->>>
->>> As a side effect, we need to export bio_chain_endio.
->> Err, no.  The right answer is to not change ->bi_end_io of bios that
->> you do not own instead of using a horrible hack to skip accounting for
->> bios that have no more or less reason to be accounted than others bios.
-> 
-> Thanks for the reply. I suppose that md needs to revert current
-> implementation of accounting io stats, then re-implement it.
-> 
-> Song and Artur, what are your opinion?
+Hello there,
 
-In the initial version of the io accounting patch the bio was cloned instead
-of just overriding bi_end_io and bi_private. Would this be the right approach?
+I hope this message finds you in good spirits especially during=20
+this challenging time of coronavirus pandemic. I hope you and=20
+your family are well and keeping safe. Anyway, I am Chris=20
+Pavlides, a broker working with Flippiebecker Wealth. I got your=20
+contact (along with few other contacts) through an online=20
+business directory and I thought I should contact you to see if=20
+you are interested in this opportunity. I am contacting you=20
+because one of my high profile clients is interested in investing=20
+abroad and has asked me to look for individuals and companies=20
+with interesting business ideas and projects that he can invest=20
+in. He wants to invest a substantial amount of asset abroad.
 
-https://lore.kernel.org/linux-raid/20200601161256.27718-1-artur.paszkiewicz@intel.com/
+Please kindly respond back to this email if you are interested in=20
+this opportunity. Once I receive your response, I will give you=20
+more details and we can plan a strategy that will be beneficial=20
+to all parties.
+
+Best regards
+
+C Pavlides
+Flippiebecker Wealth
