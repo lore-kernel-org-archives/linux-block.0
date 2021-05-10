@@ -6,132 +6,58 @@ X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC83DC433B4
-	for <linux-block@archiver.kernel.org>; Mon, 10 May 2021 02:07:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CC9EC433B4
+	for <linux-block@archiver.kernel.org>; Mon, 10 May 2021 06:00:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9A57E6101D
-	for <linux-block@archiver.kernel.org>; Mon, 10 May 2021 02:07:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 17DC461421
+	for <linux-block@archiver.kernel.org>; Mon, 10 May 2021 06:00:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230078AbhEJCID (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 9 May 2021 22:08:03 -0400
-Received: from mail.synology.com ([211.23.38.101]:42444 "EHLO synology.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S230038AbhEJCID (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 9 May 2021 22:08:03 -0400
-Subject: Re: [PATCH v2] block: fix trace completion for chained bio
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=synology.com; s=123;
-        t=1620612418; bh=aiIIs6RGEjdXhexQOGgZusHgo4xHZHZ4r2ou6nC6+hw=;
-        h=Subject:From:To:Cc:References:Date:In-Reply-To;
-        b=DxV6bSALuhocDfV7KPmmIyFWPXk9FYphOwyUZai2Ud06qqb4U8RlJK7DNXRcsF5M7
-         MBS43dQnZGYA09VLuTYjcYJUPU+6JIiekowRnqJO/e30zo389dmUG9kesAk8aE0gOY
-         ealUGSaVxDfZ+bwPZnqXabzscCUSbeeZxQn7WcXc=
-From:   Edward Hsieh <edwardh@synology.com>
-To:     NeilBrown <neilb@suse.de>, axboe@kernel.dk, neilb@suse.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        s3t@synology.com, bingjingc@synology.com, cccheng@synology.com
-References: <1614741726-28074-1-git-send-email-edwardh@synology.com>
- <87zgyudgss.fsf@notabene.neil.brown.name>
- <fb8620bf-f4e9-5787-ab79-6e0a5d79d26d@synology.com>
-Message-ID: <10f3e198-f34c-47e9-608a-e5f84e3379a1@synology.com>
-Date:   Mon, 10 May 2021 10:06:57 +0800
+        id S230029AbhEJGBq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 May 2021 02:01:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34510 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230009AbhEJGBp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 10 May 2021 02:01:45 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD347C061573;
+        Sun,  9 May 2021 23:00:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=s5VgDRE3fntx+hoST52zTcYHXWHwJgCurEHpr1TYTlQ=; b=jBgYS/NDAOaMoAlc7Ob9bSlOQ/
+        iXZ6ae+hLxfyQDJTI0yOegHx4Qgda5Kvz7hlmXDQuV9TB/LOtT8Be9rRrPYE+EY9+VzqmsvdivTIu
+        GYhTuEaav8q72Cwq7vZjN6BE+4bXSxCSPdMEY+Za0LRQBoKhfoGtbWk92PBu/PhSZzaQLPPtt8I8+
+        QvDRc4yYNKJIxG5uEhxq9DAyzKoN3LiECPSaFiXR7it2+MgdrfAeXNfAaW3MVrCggXHx2JeI0Nv7F
+        EyKuQBoGStIdirijICyNRA8cj3pjBCXktkiCutCAZxIEbnFyDClOTNnBXQ/VCxS3l5a1YHzfcdKts
+        UeEkyLoA==;
+Received: from hch by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
+        id 1lfyxc-005kui-ME; Mon, 10 May 2021 06:00:14 +0000
+Date:   Mon, 10 May 2021 07:00:08 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Guoqing Jiang <jgq516@gmail.com>
+Cc:     song@kernel.org, linux-raid@vger.kernel.org,
+        linux-block@vger.kernel.org, pawel.wiejacha@rtbhouse.com,
+        Guoqing Jiang <jiangguoqing@kylinos.cn>
+Subject: Re: [PATCH] md: don't account io stat for split bio
+Message-ID: <YJjL6AQ+mMgzmIqM@infradead.org>
+References: <20210508034815.123565-1-jgq516@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <fb8620bf-f4e9-5787-ab79-6e0a5d79d26d@synology.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Synology-MCP-Status: no
-X-Synology-Spam-Flag: no
-X-Synology-Spam-Status: score=0, required 6, WHITELIST_FROM_ADDRESS 0
-X-Synology-Virus-Status: no
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210508034815.123565-1-jgq516@gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Sat, May 08, 2021 at 11:48:15AM +0800, Guoqing Jiang wrote:
+> It looks like stack overflow happened for split bio, to fix this,
+> let's keep split bio untouched in md_submit_bio.
+> 
+> As a side effect, we need to export bio_chain_endio.
 
-On 4/23/2021 4:04 PM, Edward Hsieh wrote:
-> On 3/23/2021 5:22 AM, NeilBrown wrote:
->> On Wed, Mar 03 2021, edwardh wrote:
->>
->>> From: Edward Hsieh <edwardh@synology.com>
->>>
->>> For chained bio, trace_block_bio_complete in bio_endio is currently 
->>> called
->>> only by the parent bio once upon all chained bio completed.
->>> However, the sector and size for the parent bio are modified in 
->>> bio_split.
->>> Therefore, the size and sector of the complete events might not match 
->>> the
->>> queue events in blktrace.
->>>
->>> The original fix of bio completion trace <fbbaf700e7b1> ("block: trace
->>> completion of all bios.") wants multiple complete events to correspond
->>> to one queue event but missed this.
->>>
->>> md/raid5 read with bio cross chunks can reproduce this issue.
->>>
->>> To fix, move trace completion into the loop for every chained bio to 
->>> call.
->>
->> Thanks.  I think this is correct as far as tracing goes.
->> However the code still looks a bit odd.
->>
->> The comment for the handling of bio_chain_endio suggests that the *only*
->> purpose for that is to avoid deep recursion.  That suggests it should be
->> at the end of the function.
->> As it is blk_throtl_bio_endio() and bio_unint() are only called on the
->> last bio in a chain.
->> That seems wrong.
->>
->> I'd be more comfortable if the patch moved the bio_chain_endio()
->> handling to the end, after all of that.
->> So the function would end.
->>
->> if (bio->bi_end_io == bio_chain_endio) {
->>     bio = __bio_chain_endio(bio);
->>     goto again;
->> } else if (bio->bi_end_io)
->>     bio->bi_end_io(bio);
->>
->> Jens:  can you see any reason why that functions must only be called on
->> the last bio in the chain?
->>
->> Thanks,
->> NeilBrown
->>
-> 
-> Hi Neil and Jens,
-> 
->  From the commit message, bio_uninit is put here for bio allocated in
-> special ways (e.g., on stack), that will not be release by bio_free. For
-> chained bio, __bio_chain_endio invokes bio_put and release the
-> resources, so it seems that we don't need to call bio_uninit for chained
-> bio.
-> 
-> The blk_throtl_bio_endio is used to update the latency for the throttle
-> group. I think the latency should only be updated after the whole bio is
-> finished?
-> 
-> To make sense for the "tail call optimization" in the comment, I'll
-> suggest to wrap the whole statement with an else. What do you think?
-> 
-> if (bio->bi_end_io == bio_chain_endio) {
->      bio = __bio_chain_endio(bio);
->      goto again;
-> } else {
->      blk_throtl_bio_endio(bio);
->      /* release cgroup info */
->      bio_uninit(bio);
->      if (bio->bi_end_io)
->          bio->bi_end_io(bio);
-> }
-> 
-> Thanks,
-> Edward Hsieh
-
-Hi Neil and Jens,
-
-Any feedback on this one?
-
-Thank you,
-Edward Hsieh
-
+Err, no.  The right answer is to not change ->bi_end_io of bios that
+you do not own instead of using a horrible hack to skip accounting for
+bios that have no more or less reason to be accounted than others bios.
