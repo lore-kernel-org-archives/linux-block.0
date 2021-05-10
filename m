@@ -2,68 +2,136 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E1BDC433ED
-	for <linux-block@archiver.kernel.org>; Mon, 10 May 2021 01:29:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC83DC433B4
+	for <linux-block@archiver.kernel.org>; Mon, 10 May 2021 02:07:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4AE96613ED
-	for <linux-block@archiver.kernel.org>; Mon, 10 May 2021 01:29:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9A57E6101D
+	for <linux-block@archiver.kernel.org>; Mon, 10 May 2021 02:07:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230078AbhEJBaU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 9 May 2021 21:30:20 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:2420 "EHLO
-        szxga07-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230073AbhEJBaT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 9 May 2021 21:30:19 -0400
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.59])
-        by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4Fdk0p4TqgzCqt2;
-        Mon, 10 May 2021 09:26:34 +0800 (CST)
-Received: from [10.174.178.134] (10.174.178.134) by
- DGGEMS413-HUB.china.huawei.com (10.3.19.213) with Microsoft SMTP Server id
- 14.3.498.0; Mon, 10 May 2021 09:29:08 +0800
-Subject: Re: [RFC PATCH 0/3] block_dump: remove block dump
-To:     Jens Axboe <axboe@kernel.dk>, <linux-fsdevel@vger.kernel.org>,
-        <linux-ext4@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <jack@suse.cz>
-CC:     <tytso@mit.edu>, <viro@zeniv.linux.org.uk>, <hch@infradead.org>,
-        <mcgrof@kernel.org>, <keescook@chromium.org>, <yzaikin@google.com>
-References: <20210313030146.2882027-1-yi.zhang@huawei.com>
- <15f9c6ce-f22a-59cd-8ce7-eb908f663826@kernel.dk>
-From:   Zhang Yi <yi.zhang@huawei.com>
-Message-ID: <c432c9b0-cef1-123e-1fcd-0549b24e381e@huawei.com>
-Date:   Mon, 10 May 2021 09:29:08 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+        id S230078AbhEJCID (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 9 May 2021 22:08:03 -0400
+Received: from mail.synology.com ([211.23.38.101]:42444 "EHLO synology.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S230038AbhEJCID (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 9 May 2021 22:08:03 -0400
+Subject: Re: [PATCH v2] block: fix trace completion for chained bio
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=synology.com; s=123;
+        t=1620612418; bh=aiIIs6RGEjdXhexQOGgZusHgo4xHZHZ4r2ou6nC6+hw=;
+        h=Subject:From:To:Cc:References:Date:In-Reply-To;
+        b=DxV6bSALuhocDfV7KPmmIyFWPXk9FYphOwyUZai2Ud06qqb4U8RlJK7DNXRcsF5M7
+         MBS43dQnZGYA09VLuTYjcYJUPU+6JIiekowRnqJO/e30zo389dmUG9kesAk8aE0gOY
+         ealUGSaVxDfZ+bwPZnqXabzscCUSbeeZxQn7WcXc=
+From:   Edward Hsieh <edwardh@synology.com>
+To:     NeilBrown <neilb@suse.de>, axboe@kernel.dk, neilb@suse.com
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        s3t@synology.com, bingjingc@synology.com, cccheng@synology.com
+References: <1614741726-28074-1-git-send-email-edwardh@synology.com>
+ <87zgyudgss.fsf@notabene.neil.brown.name>
+ <fb8620bf-f4e9-5787-ab79-6e0a5d79d26d@synology.com>
+Message-ID: <10f3e198-f34c-47e9-608a-e5f84e3379a1@synology.com>
+Date:   Mon, 10 May 2021 10:06:57 +0800
 MIME-Version: 1.0
-In-Reply-To: <15f9c6ce-f22a-59cd-8ce7-eb908f663826@kernel.dk>
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <fb8620bf-f4e9-5787-ab79-6e0a5d79d26d@synology.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.178.134]
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
+X-Synology-MCP-Status: no
+X-Synology-Spam-Flag: no
+X-Synology-Spam-Status: score=0, required 6, WHITELIST_FROM_ADDRESS 0
+X-Synology-Virus-Status: no
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2021/3/13 11:37, Jens Axboe wrote:
-> On 3/12/21 8:01 PM, zhangyi (F) wrote:
->> Hi,
->>
->> block_dump is an old debugging interface and can be replaced by
->> tracepoints, and we also found a deadlock issue relate to it[1]. As Jan
->> suggested, this patch set delete the whole block_dump feature, we can
->> use tracepoints to get the similar information. If someone still using
->> this feature cannot switch to use tracepoints or any other suggestions,
->> please let us know.
-> 
-> Totally agree, that's long overdue. The feature is no longer useful
-> and has been deprecated by much better methods. Unless anyone objects,
-> I'll queue this up for 5.13.
-> 
-Hi, Jens. Could you please send these patches upstream ?
 
-Thanks,
-Yi.
+On 4/23/2021 4:04 PM, Edward Hsieh wrote:
+> On 3/23/2021 5:22 AM, NeilBrown wrote:
+>> On Wed, Mar 03 2021, edwardh wrote:
+>>
+>>> From: Edward Hsieh <edwardh@synology.com>
+>>>
+>>> For chained bio, trace_block_bio_complete in bio_endio is currently 
+>>> called
+>>> only by the parent bio once upon all chained bio completed.
+>>> However, the sector and size for the parent bio are modified in 
+>>> bio_split.
+>>> Therefore, the size and sector of the complete events might not match 
+>>> the
+>>> queue events in blktrace.
+>>>
+>>> The original fix of bio completion trace <fbbaf700e7b1> ("block: trace
+>>> completion of all bios.") wants multiple complete events to correspond
+>>> to one queue event but missed this.
+>>>
+>>> md/raid5 read with bio cross chunks can reproduce this issue.
+>>>
+>>> To fix, move trace completion into the loop for every chained bio to 
+>>> call.
+>>
+>> Thanks.  I think this is correct as far as tracing goes.
+>> However the code still looks a bit odd.
+>>
+>> The comment for the handling of bio_chain_endio suggests that the *only*
+>> purpose for that is to avoid deep recursion.  That suggests it should be
+>> at the end of the function.
+>> As it is blk_throtl_bio_endio() and bio_unint() are only called on the
+>> last bio in a chain.
+>> That seems wrong.
+>>
+>> I'd be more comfortable if the patch moved the bio_chain_endio()
+>> handling to the end, after all of that.
+>> So the function would end.
+>>
+>> if (bio->bi_end_io == bio_chain_endio) {
+>>     bio = __bio_chain_endio(bio);
+>>     goto again;
+>> } else if (bio->bi_end_io)
+>>     bio->bi_end_io(bio);
+>>
+>> Jens:  can you see any reason why that functions must only be called on
+>> the last bio in the chain?
+>>
+>> Thanks,
+>> NeilBrown
+>>
+> 
+> Hi Neil and Jens,
+> 
+>  From the commit message, bio_uninit is put here for bio allocated in
+> special ways (e.g., on stack), that will not be release by bio_free. For
+> chained bio, __bio_chain_endio invokes bio_put and release the
+> resources, so it seems that we don't need to call bio_uninit for chained
+> bio.
+> 
+> The blk_throtl_bio_endio is used to update the latency for the throttle
+> group. I think the latency should only be updated after the whole bio is
+> finished?
+> 
+> To make sense for the "tail call optimization" in the comment, I'll
+> suggest to wrap the whole statement with an else. What do you think?
+> 
+> if (bio->bi_end_io == bio_chain_endio) {
+>      bio = __bio_chain_endio(bio);
+>      goto again;
+> } else {
+>      blk_throtl_bio_endio(bio);
+>      /* release cgroup info */
+>      bio_uninit(bio);
+>      if (bio->bi_end_io)
+>          bio->bi_end_io(bio);
+> }
+> 
+> Thanks,
+> Edward Hsieh
+
+Hi Neil and Jens,
+
+Any feedback on this one?
+
+Thank you,
+Edward Hsieh
+
