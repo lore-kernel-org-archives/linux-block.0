@@ -2,291 +2,178 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 261E5C43460
-	for <linux-block@archiver.kernel.org>; Tue, 11 May 2021 16:35:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A5F0C433ED
+	for <linux-block@archiver.kernel.org>; Tue, 11 May 2021 17:08:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E3C9661919
-	for <linux-block@archiver.kernel.org>; Tue, 11 May 2021 16:35:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6125261361
+	for <linux-block@archiver.kernel.org>; Tue, 11 May 2021 17:08:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231329AbhEKQg4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 May 2021 12:36:56 -0400
-Received: from ale.deltatee.com ([204.191.154.188]:54682 "EHLO
-        ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230315AbhEKQg4 (ORCPT
+        id S231777AbhEKRJV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 May 2021 13:09:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56844 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231512AbhEKRJU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 May 2021 12:36:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:MIME-Version:Date:
-        Message-ID:From:References:Cc:To:content-disposition;
-        bh=069DpYy4tqGAUWXxeulYoTNkovf/OMYcYeYg3ZMGXCs=; b=fqIGHAu2ydIVFuAMCV/+TIPbr3
-        GDcSxLN3CTaD2jVFik2/89QVm6vrlQPFkQBcyFrq7IoPsou7gFYK6YhKVKc357IMSk7Z/UgqrKU/5
-        yfqjxHkpm5j2ugNHp6v8blzG9SUzsYA4jFnTbzpvWVr8tU/p58UdEfAVVCbALieeoLmyf9t1z1jIj
-        cFfcErE9gm+f8/IHn3DnyO31qAcnU5u8RebXKF0WzUXBViYSzhq77g2Pot/qGbcUnoA31Q2CxmJpy
-        x5S7LiQUO7YR5JYPWhkPnrHy3kSZqCTGziqhXHss2s2uaUl3zPWRhHT1WHlq0S0bZGpLLh4SgWmKo
-        qG6idSaA==;
-Received: from guinness.priv.deltatee.com ([172.16.1.162])
-        by ale.deltatee.com with esmtp (Exim 4.92)
-        (envelope-from <logang@deltatee.com>)
-        id 1lgVMA-0006xp-A6; Tue, 11 May 2021 10:35:39 -0600
-To:     Don Dutile <ddutile@redhat.com>, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        linux-pci@vger.kernel.org, linux-mm@kvack.org,
-        iommu@lists.linux-foundation.org
-Cc:     Stephen Bates <sbates@raithlin.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Jakowski Andrzej <andrzej.jakowski@intel.com>,
-        Minturn Dave B <dave.b.minturn@intel.com>,
-        Jason Ekstrand <jason@jlekstrand.net>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Xiong Jianxin <jianxin.xiong@intel.com>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Robin Murphy <robin.murphy@arm.com>
-References: <20210408170123.8788-1-logang@deltatee.com>
- <20210408170123.8788-12-logang@deltatee.com>
- <6003ed3d-5969-4201-3cbb-3bcf84385541@redhat.com>
-From:   Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <a8cad1ee-57c6-44ef-2539-499c13c66b5f@deltatee.com>
-Date:   Tue, 11 May 2021 10:35:36 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.0
-MIME-Version: 1.0
-In-Reply-To: <6003ed3d-5969-4201-3cbb-3bcf84385541@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-CA
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 172.16.1.162
-X-SA-Exim-Rcpt-To: robin.murphy@arm.com, ira.weiny@intel.com, helgaas@kernel.org, jianxin.xiong@intel.com, dave.hansen@linux.intel.com, jason@jlekstrand.net, dave.b.minturn@intel.com, andrzej.jakowski@intel.com, daniel.vetter@ffwll.ch, willy@infradead.org, jhubbard@nvidia.com, christian.koenig@amd.com, jgg@ziepe.ca, dan.j.williams@intel.com, hch@lst.de, sbates@raithlin.com, iommu@lists.linux-foundation.org, linux-mm@kvack.org, linux-pci@vger.kernel.org, linux-block@vger.kernel.org, linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, ddutile@redhat.com
-X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: [PATCH 11/16] iommu/dma: Support PCI P2PDMA pages in dma-iommu
- map_sg
-X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
+        Tue, 11 May 2021 13:09:20 -0400
+Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E250BC061574
+        for <linux-block@vger.kernel.org>; Tue, 11 May 2021 10:08:13 -0700 (PDT)
+Received: by mail-ej1-x62a.google.com with SMTP id s20so25334089ejr.9
+        for <linux-block@vger.kernel.org>; Tue, 11 May 2021 10:08:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=3zmcfRb1uJElYtXfgojT5h84reMoSiWpEZHR7ZUYa/c=;
+        b=aQdSkiqvee4KkfS8RFWgm+rjiOvJ8hqk4bEkSRtJhSg9G0nBpcojSpWp+XnspGj7U8
+         SQd4iHfBezijlAxbL41XGlOGs+LGBqpH0e2lFy0tHiJBe/oi+6bre5g99b0bpon3V/P/
+         L580ulFSivOhekn2LAOTiDjTCKvehBzxffDAAgXMHPnS1TH1A38seuwdvJnIpFSyE3VC
+         Z8Q3BJAN4ewSP5lJCs5BGKMeFEyCDsz2Mtm9bpqKIP95qNr0I65MnLYJEXyMCx0mZlTQ
+         l7cp6icnFOGT34nlql0+taOzVoAZQMgERhoeAsFieUtiypJzAG/Pds0HHJzmhExi/Uiy
+         yp1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=3zmcfRb1uJElYtXfgojT5h84reMoSiWpEZHR7ZUYa/c=;
+        b=NwusldQ624p1o2EDAlHRpxQ/i1jlHYFAQRLkETA1dJog8MMANMkerf+b562jFFD4iW
+         S6lv8Cy9KfTx3kw9XV30mV+uG/MZobFcrxqBnrUlNT2nMXiT9TqOvYfYHQUbs49gc8hR
+         cpY5xpw7qViFWOcqq11JKsN/7JVYZqaCN7YwnaTiIO48XIm+ETnl7tXV9sdpbDqMHLZ/
+         Jk6R2izD09tAT+WJJasm2hmWOQLqWFuRHM4/PVu/I7nFbCGmCgZ1CFezLjC9gUR8bJvX
+         5d3p0ZkVhYCgW1r1Dmh9gvumZir5/+z8f1wOpF8Pp2sFaUOlucSdeqsyrLHJWHhfY3qe
+         bLpw==
+X-Gm-Message-State: AOAM5317VSnASwJ5+EYIL7/31E/qDFJXYM4ced+Y4u0WDMOkccIss2sB
+        ikPIHySkaETdmSW1ZcRAkYRm/g==
+X-Google-Smtp-Source: ABdhPJy2X07bo4kK8O0opXu6MjSuY5Vr09im773qYHP6tf0/nXW61EBtntCWjeVHK8l57/D5uzIYOQ==
+X-Received: by 2002:a17:906:71d8:: with SMTP id i24mr32873908ejk.444.1620752892578;
+        Tue, 11 May 2021 10:08:12 -0700 (PDT)
+Received: from [192.168.0.13] ([83.216.184.132])
+        by smtp.gmail.com with ESMTPSA id v12sm15565125edb.81.2021.05.11.10.08.10
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 11 May 2021 10:08:11 -0700 (PDT)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: [bisected] bfq regression on latest linux-block/for-next
+From:   Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <CAHj4cs_4jPzoZWcuio+jQig4GARVfMac9h=0TyYCiQYqXmXUyQ@mail.gmail.com>
+Date:   Tue, 11 May 2021 19:10:22 +0200
+Cc:     linux-block <linux-block@vger.kernel.org>,
+        Xiong Zhou <xzhou@redhat.com>, Li Wang <liwan@redhat.com>,
+        Ming Lei <minlei@redhat.com>,
+        Bruno Goncalves <bgoncalv@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <AE809A3F-9AAA-4289-BED4-74F67361B71F@linaro.org>
+References: <1366443410.1203736.1617240454513.JavaMail.zimbra@redhat.com>
+ <4F41414B-05F8-4E7D-A312-8A47B8468C78@linaro.org>
+ <c7d23258-0890-f79f-cc6a-9cb24bbaa437@redhat.com>
+ <CAHj4cs9+q-vH9qar+MTP-aECb2whT7O8J5OmR240yss1y=kWKw@mail.gmail.com>
+ <B657F0B6-E999-467B-98CB-56C29B04B8F3@linaro.org>
+ <F22E9AB1-06EE-4A66-833A-16C3AD1FFF18@linaro.org>
+ <CAHj4cs_4jPzoZWcuio+jQig4GARVfMac9h=0TyYCiQYqXmXUyQ@mail.gmail.com>
+To:     Yi Zhang <yi.zhang@redhat.com>
+X-Mailer: Apple Mail (2.3445.104.11)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
 
-On 2021-05-11 10:06 a.m., Don Dutile wrote:
-> On 4/8/21 1:01 PM, Logan Gunthorpe wrote:
->> When a PCI P2PDMA page is seen, set the IOVA length of the segment
->> to zero so that it is not mapped into the IOVA. Then, in finalise_sg(),
->> apply the appropriate bus address to the segment. The IOVA is not
->> created if the scatterlist only consists of P2PDMA pages.
->>
->> Similar to dma-direct, the sg_mark_pci_p2pdma() flag is used to
->> indicate bus address segments. On unmap, P2PDMA segments are skipped
->> over when determining the start and end IOVA addresses.
->>
->> With this change, the flags variable in the dma_map_ops is
->> set to DMA_F_PCI_P2PDMA_SUPPORTED to indicate support for
->> P2PDMA pages.
->>
->> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-> So, this code prevents use of p2pdma using an IOMMU, which wasn't checked and
-> short-circuited by other checks to use dma-direct?
+> Il giorno 7 mag 2021, alle ore 10:30, Yi Zhang <yi.zhang@redhat.com> =
+ha scritto:
+>=20
+> On Mon, May 3, 2021 at 5:35 PM Paolo Valente =
+<paolo.valente@linaro.org> wrote:
+>>=20
+>>=20
+>>=20
+>>> Il giorno 20 apr 2021, alle ore 09:33, Paolo Valente =
+<paolo.valente@linaro.org> ha scritto:
+>>>=20
+>>>=20
+>>>=20
+>>>> Il giorno 20 apr 2021, alle ore 04:00, Yi Zhang =
+<yi.zhang@redhat.com> ha scritto:
+>>>>=20
+>>>>=20
+>>>> On Wed, Apr 7, 2021 at 11:15 PM Yi Zhang <yi.zhang@redhat.com> =
+wrote:
+>>>>=20
+>>>>=20
+>>>> On 4/2/21 9:39 PM, Paolo Valente wrote:
+>>>>>=20
+>>>>>> Il giorno 1 apr 2021, alle ore 03:27, Yi Zhang =
+<yi.zhang@redhat.com> ha scritto:
+>>>>>>=20
+>>>>>> Hi
+>>>>> Hi
+>>>>>=20
+>>>>>> We reproduced this bfq regression[3] on ppc64le with blktests[2] =
+on the latest linux-block/for-next branch, seems it was introduced with =
+[1] from my bisecting, pls help check it. Let me know if you need any =
+testing for it, thanks.
+>>>>>>=20
+>>>>> Thanks for reporting this bug and finding the candidate offending =
+commit. Could you try this test with my dev kernel, which might provide =
+more information? The kernel is here:
+>>>>> https://github.com/Algodev-github/bfq-mq
+>>>>>=20
+>>>>> Alternatively, I could try to provide you with patches to =
+instrument your kernel.
+>>>> HI Paolo
+>>>> I tried your dev kernel, but with no luck to reproduce it, could =
+you
+>>>> provide the debug patch based on latest linux-block/for-next?
+>>>>=20
+>>>> Hi Paolo
+>>>> This issue has been consistently reproduced with =
+LTP/fstests/blktests on recent linux-block/for-next, do you have a =
+chance to check it?
+>>>=20
+>>> Hi Yi, all,
+>>> I've been working hard to port my code-instrumentation layer to the =
+kernel in for-next. I seem I finished the porting yesterday. I tested it =
+but the system crashed. I'm going to analyze the oops. Maybe this freeze =
+is caused by mistakes in this layer, maybe the instrumentation is =
+already detecting a bug. In the first case, I'll fix the mistakes and =
+try the tests suggested in this thread.
+>>>=20
+>>=20
+>> Hi Yi, all,
+>> I seem to have made it.  I've attached a patch series, which applies
+>> on top of for-next, as it was when you reported this failure (i.e., =
+on
+>> top of 816e1d1c2f7d Merge branch 'for-5.13/io_uring' into for-next).
+>> If patches are to be applied on top of a different HEAD, and they
+>> don't apply cleanly, I'll take care of rebasing them.
+>>=20
+>> Of course I've tried your test myself, but with no failure at all.
+>>=20
+>> Looking forward to your feedback,
+>> Paolo
+>>=20
+> Hi Paolo
+>=20
+> With the patch series, blktests nvme-tcp nvme/011 passed on
+> linux-block/for-next, thanks.
+>=20
 
-No, not at all. This patch is adding support for p2pdma pages for IOMMUs
-that use the dma-iommu abstraction. Other arch specific IOMMUs that
-don't use the dma-iommu abstraction are left unsupported. Support would
-need to be added to them, or better yet; they should be ported to dma-iommu.
+Great!
 
-> 
-> So my overall comment to this code & related comments is that it should be sprinkled
-> with notes like "doesn't support IOMMU" and / or "TODO" when/if IOMMU is to be supported.
-> Or, if IOMMU-based p2pdma isn't supported in these routines directly, where/how they will be supported?
-> 
->> ---
->>   drivers/iommu/dma-iommu.c | 66 ++++++++++++++++++++++++++++++++++-----
->>   1 file changed, 58 insertions(+), 8 deletions(-)
->>
->> diff --git a/drivers/iommu/dma-iommu.c b/drivers/iommu/dma-iommu.c
->> index af765c813cc8..ef49635f9819 100644
->> --- a/drivers/iommu/dma-iommu.c
->> +++ b/drivers/iommu/dma-iommu.c
->> @@ -20,6 +20,7 @@
->>   #include <linux/mm.h>
->>   #include <linux/mutex.h>
->>   #include <linux/pci.h>
->> +#include <linux/pci-p2pdma.h>
->>   #include <linux/swiotlb.h>
->>   #include <linux/scatterlist.h>
->>   #include <linux/vmalloc.h>
->> @@ -864,6 +865,16 @@ static int __finalise_sg(struct device *dev, struct scatterlist *sg, int nents,
->>   		sg_dma_address(s) = DMA_MAPPING_ERROR;
->>   		sg_dma_len(s) = 0;
->>   
->> +		if (is_pci_p2pdma_page(sg_page(s)) && !s_iova_len) {
->> +			if (i > 0)
->> +				cur = sg_next(cur);
->> +
->> +			pci_p2pdma_map_bus_segment(s, cur);
->> +			count++;
->> +			cur_len = 0;
->> +			continue;
->> +		}
->> +
->>   		/*
->>   		 * Now fill in the real DMA data. If...
->>   		 * - there is a valid output segment to append to
->> @@ -961,10 +972,12 @@ static int iommu_dma_map_sg(struct device *dev, struct scatterlist *sg,
->>   	struct iova_domain *iovad = &cookie->iovad;
->>   	struct scatterlist *s, *prev = NULL;
->>   	int prot = dma_info_to_prot(dir, dev_is_dma_coherent(dev), attrs);
->> +	struct dev_pagemap *pgmap = NULL;
->> +	enum pci_p2pdma_map_type map_type;
->>   	dma_addr_t iova;
->>   	size_t iova_len = 0;
->>   	unsigned long mask = dma_get_seg_boundary(dev);
->> -	int i;
->> +	int i, ret = 0;
->>   
->>   	if (static_branch_unlikely(&iommu_deferred_attach_enabled) &&
->>   	    iommu_deferred_attach(dev, domain))
->> @@ -993,6 +1006,31 @@ static int iommu_dma_map_sg(struct device *dev, struct scatterlist *sg,
->>   		s_length = iova_align(iovad, s_length + s_iova_off);
->>   		s->length = s_length;
->>   
->> +		if (is_pci_p2pdma_page(sg_page(s))) {
->> +			if (sg_page(s)->pgmap != pgmap) {
->> +				pgmap = sg_page(s)->pgmap;
->> +				map_type = pci_p2pdma_map_type(pgmap, dev,
->> +							       attrs);
->> +			}
->> +
->> +			switch (map_type) {
->> +			case PCI_P2PDMA_MAP_BUS_ADDR:
->> +				/*
->> +				 * A zero length will be ignored by
->> +				 * iommu_map_sg() and then can be detected
->> +				 * in __finalise_sg() to actually map the
->> +				 * bus address.
->> +				 */
->> +				s->length = 0;
->> +				continue;
-> 
->> +			case PCI_P2PDMA_MAP_THRU_HOST_BRIDGE:
->> +				break;
-> So, this 'short-circuits' the use of the IOMMU, silently?
-> This seems ripe for users to enable IOMMU for secure computing reasons, and using/enabling p2pdma,
-> and not realizing that it isn't as secure as 1+1=2  appears to be.
-> If my understanding is wrong, please point me to the Documentation or code that corrects this mis-understanding.  I could have missed a warning when both are enabled in a past patch set.
+That series contained only one fix.  I do hope that it has been that
+fix to eliminate the failure.
 
+So I'm about to propose such a fix as an individual patch for
+mainline.  Please test it if you can.
 
-Yes, you've misunderstood this. Part of this dovetails with your comment
-about the documentation for PCI_P2PDMA_MAP_THRU_HOST_BRIDGE.
+Thanks,
+Paolo
 
-This does not short circuit the IOMMU in any way. THRU_HOST_BRIDGE mode
-means the TLPs for this transaction will hit the CPU/HOST BRIDGE and
-thus the IOMMU has to be involved. In this case the IOMMU is programmed
-with the physical address of the memory (which is normal) and everything
-works.
+> Thanks
+> Yi
 
-One could argue the PCI_P2PDMA_MAP_BUS_ADDR is short circuiting the
-IOMMU by using PCI bus address in the DMA transaction. But this requires
-the user to do special setup with the ACS bits ahead of time (not part
-of this series).
-
-For the user to use the BUS_ADDR with an IOMMU, they need to
-specifically disable the ACS redirect bits on specific PCI switch bridge
-ports using a kernel command line option. When they do this, the IOMMU
-code will put those devices in the same IOMMU group thus making it
-impossible for the user to use devices that can do P2PDMA transactions
-together in different security domains.
-
-This was all hashed out in the original P2PDMA patchset and does make sense.
-
->> +			default:
->> +				ret = -EREMOTEIO;
->> +				goto out_restore_sg;
->> +			}
->> +		}
->> +
->>   		/*
->>   		 * Due to the alignment of our single IOVA allocation, we can
->>   		 * depend on these assumptions about the segment boundary mask:
->> @@ -1015,6 +1053,9 @@ static int iommu_dma_map_sg(struct device *dev, struct scatterlist *sg,
->>   		prev = s;
->>   	}
->>   
->> +	if (!iova_len)
->> +		return __finalise_sg(dev, sg, nents, 0);
->> +
->>   	iova = iommu_dma_alloc_iova(domain, iova_len, dma_get_mask(dev), dev);
->>   	if (!iova)
->>   		goto out_restore_sg;
->> @@ -1032,13 +1073,13 @@ static int iommu_dma_map_sg(struct device *dev, struct scatterlist *sg,
->>   	iommu_dma_free_iova(cookie, iova, iova_len, NULL);
->>   out_restore_sg:
->>   	__invalidate_sg(sg, nents);
->> -	return 0;
->> +	return ret;
->>   }
->>   
->>   static void iommu_dma_unmap_sg(struct device *dev, struct scatterlist *sg,
->>   		int nents, enum dma_data_direction dir, unsigned long attrs)
->>   {
->> -	dma_addr_t start, end;
->> +	dma_addr_t end, start = DMA_MAPPING_ERROR;
->>   	struct scatterlist *tmp;
->>   	int i;
->>   
->> @@ -1054,14 +1095,22 @@ static void iommu_dma_unmap_sg(struct device *dev, struct scatterlist *sg,
->>   	 * The scatterlist segments are mapped into a single
->>   	 * contiguous IOVA allocation, so this is incredibly easy.
->>   	 */
->> -	start = sg_dma_address(sg);
->> -	for_each_sg(sg_next(sg), tmp, nents - 1, i) {
->> +	for_each_sg(sg, tmp, nents, i) {
->> +		if (sg_is_pci_p2pdma(tmp)) {
->> +			sg_unmark_pci_p2pdma(tmp);
->> +			continue;
->> +		}
->>   		if (sg_dma_len(tmp) == 0)
->>   			break;
->> -		sg = tmp;
->> +
->> +		if (start == DMA_MAPPING_ERROR)
->> +			start = sg_dma_address(tmp);
->> +
->> +		end = sg_dma_address(tmp) + sg_dma_len(tmp);
->>   	}
->> -	end = sg_dma_address(sg) + sg_dma_len(sg);
->> -	__iommu_dma_unmap(dev, start, end - start);
->> +
->> +	if (start != DMA_MAPPING_ERROR)
->> +		__iommu_dma_unmap(dev, start, end - start);
->>   }
->>   
-> overall, fiddling with the generic dma-iommu code instead of using a dma-ops-based, p2pdma function that has it carved out and separated/refactored out to be cleaner seems less complicated, but I'm guessing you tried that and it was too complicated to do?
-
-I don't think you've understood this code correctly. What it does can't
-be done in the dma-ops.
-
->>   static const struct dma_map_ops iommu_dma_ops = {
->> +	.flags			= DMA_F_PCI_P2PDMA_SUPPORTED,
-> wait, it's a const that's always turned on?
-> shouldn't the define for this flag be 0 for non-p2pdma configs?
-
-All this flag is saying is that iommu_dma_map_sg() has support for
-handling P2PDMA pages. Yes this is a const. The point is to reject it
-for map_sg implementations that have not done the above work (ie.
-arm_iommu_map_sg).
-
-Hopefully, more of the arch-specific implementations will convert to the
-generic dma-iommu code in time but those that don't simply won't support
-P2PDMA until they do (or add their own support).
-
-Logan
