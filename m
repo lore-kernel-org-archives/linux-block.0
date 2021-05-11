@@ -2,141 +2,103 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EF7BC433B4
-	for <linux-block@archiver.kernel.org>; Tue, 11 May 2021 18:58:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36C00C43460
+	for <linux-block@archiver.kernel.org>; Tue, 11 May 2021 19:39:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E4A3C613DE
-	for <linux-block@archiver.kernel.org>; Tue, 11 May 2021 18:58:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 051D561176
+	for <linux-block@archiver.kernel.org>; Tue, 11 May 2021 19:39:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232075AbhEKS7Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 May 2021 14:59:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53874 "EHLO
+        id S231808AbhEKTkS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 May 2021 15:40:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34878 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232265AbhEKS7O (ORCPT
+        with ESMTP id S232161AbhEKTkR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 May 2021 14:59:14 -0400
-Received: from mail-qt1-x833.google.com (mail-qt1-x833.google.com [IPv6:2607:f8b0:4864:20::833])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A25AC061574;
-        Tue, 11 May 2021 11:58:07 -0700 (PDT)
-Received: by mail-qt1-x833.google.com with SMTP id j11so15380541qtn.12;
-        Tue, 11 May 2021 11:58:07 -0700 (PDT)
+        Tue, 11 May 2021 15:40:17 -0400
+Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 182B6C061574
+        for <linux-block@vger.kernel.org>; Tue, 11 May 2021 12:39:11 -0700 (PDT)
+Received: by mail-pg1-x530.google.com with SMTP id y32so16483462pga.11
+        for <linux-block@vger.kernel.org>; Tue, 11 May 2021 12:39:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition;
-        bh=qrWx6sjrboqnBhgfkwaqiWCcjg2j1hn+sj/P7ANiDEQ=;
-        b=VhaL9ar4vHEFuRBodILW3Z9252xy4gbmzIwc5+HQoTYuHxHQZb8Tn86ySjUQWcfTxv
-         Jda1GCta3+RuqdKYgAza3hJzciwKLDHDLiAljKpc+FTQs5jKkIjpw3kMb8hWoav3DiJb
-         XKZdQ+XwerqLOCodGauVENdP1vynUmFtGMmJuemOZh0Wu7lhPvAfctk85ne+P/WaclIA
-         vvMR/MlsRNbyQAJC2dAQQgzjMtvZ8Wqh4y4H/N8xg8TqQqjTYs4ffY6thjYD90bqtEDe
-         p8WGQK1GMS7/15GSHhBcVyipZFVOXunx6rkvi/k0fAqguQEX3AQoHI/eeNFxbpG3j+6D
-         +v+A==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=PSahpPiUc5NKlDdMwb0qNt2ijCCQMz01ED1EXmqSDhI=;
+        b=RMj+4EQb/aRuO2A1yJ0dCHholXt9fKvAu8HwhU86akDazzDLxb4yDhKAxxKHGtAhO+
+         86FQBFH5Y82XbqNv6+iL++1iTewno1EvqwwIXvvWpRx8bWjTvpGNEx0udu4iE2NLwe/V
+         /3g4jmcVeyUigddLFMrO/tQkjF4YLDmQLRlAIOZHtnA8BmEjnAPVRda1uuMtc8uaATe6
+         2ROU6OWc2xLskRBiS4CqvEoYoQSwXGQAruOwoI/0Js8tYupLxAyVsTb5I4TFKNQYQBsH
+         O3npy1g2LZ3EXSY1q05D0N072coptdd6Vli/wBMF1lcDClwejZuDN0x3UNJL+Tadd3NY
+         BFWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :mime-version:content-disposition;
-        bh=qrWx6sjrboqnBhgfkwaqiWCcjg2j1hn+sj/P7ANiDEQ=;
-        b=M+Uij2Wk01fyA1bBzX4h98LFEu0Y4pse09HCAlwCb+tc4Za2dinHAldoI6OT9+LmOX
-         kptKfTTqB3khvE3N1ZuNgTC8jTGdbRXMapn/sEGmshng59M4LqZQWzIs/7b2jvlH3euv
-         HyXyd82TPAZwRHcqjPuyNeMG8SYiIJU+3X1QnEZKppcm9iKkhfgGNEMUZ9ekP9b4KdUH
-         FxXcBk6f9+/TavD66b3oCUSB/iFVpWLvuW0uOIHnf0n6pciXTa987dHONoM/odVN+JaR
-         F0dsyOyB/wh7q/sYgFhynJCYSWV4mLZhLRpvX/b1U4UUGxcZ9k1MAzi9O1PODahQ3lYo
-         EaCQ==
-X-Gm-Message-State: AOAM531QCD+R69FmQo9JION9AEvMD8KMd1JBgfYdcovseaqk+Rgfb0mT
-        6ClUuzBdooGF9C2btnT8iLo=
-X-Google-Smtp-Source: ABdhPJwePo0OHjxAzMWLKGdycYB9j73g7VcAfncP+Rr1cPoLt7oRcMwOt41qSK4oGjQrfRSPt00sVw==
-X-Received: by 2002:a05:622a:449:: with SMTP id o9mr9317315qtx.145.1620759486475;
-        Tue, 11 May 2021 11:58:06 -0700 (PDT)
-Received: from localhost (dhcp-6c-ae-f6-dc-d8-61.cpe.echoes.net. [199.96.183.179])
-        by smtp.gmail.com with ESMTPSA id b188sm14479099qkc.11.2021.05.11.11.58.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 May 2021 11:58:05 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Tue, 11 May 2021 14:58:04 -0400
-From:   Tejun Heo <tj@kernel.org>
-To:     Jens Axboe <axboe@kernel.dk>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=PSahpPiUc5NKlDdMwb0qNt2ijCCQMz01ED1EXmqSDhI=;
+        b=fTaj+IA2Z//KkuADASQnGEdGL5IZqR2yav3JhAAbCCkfJiBTMh/EfN/YesRK91ynVa
+         B5Hbj1lspQUdhg6fuE1xiDlxO6mg5MGsMa5J6B/rwU32kjJ439BKrutP8MlV8o4qFuNz
+         tc20WrOE4S2j8ToRfFAF3CC644pYHzxT/76ykTBKbGvffDQqrLB5ivK7AVaK1SJ0Xol3
+         AfBiTX7YEh7ARpn9vsQpDv82H/Vo2maZwA3gyr9v4isoLyVC7jhbnXTaIXyoom/k2wnc
+         kk7OKm4bk7vqNRpnGKiOC0CXGSJrzwRUQM8liIlrtS5IOKnBFHZB88GUcc6bVZ41ZOT+
+         7dFQ==
+X-Gm-Message-State: AOAM533otbFSHCE2MdH3GL0CBsgSp/L3W+Xn2GrDeg9qexVN94f5G88E
+        xovj0eIw0GKCzXGX/nYyYqHbGg==
+X-Google-Smtp-Source: ABdhPJy0QyoG/x4CMUJXHO5sAdjw2fW0Lb6xqTo+sdK0LLlv7pBZXhwhFqStH9BhS91SP8hhdlIYAw==
+X-Received: by 2002:aa7:908c:0:b029:250:b584:a406 with SMTP id i12-20020aa7908c0000b0290250b584a406mr31778622pfa.44.1620761950492;
+        Tue, 11 May 2021 12:39:10 -0700 (PDT)
+Received: from [192.168.4.41] (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
+        by smtp.gmail.com with ESMTPSA id i3sm2711436pjv.30.2021.05.11.12.39.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 11 May 2021 12:39:09 -0700 (PDT)
+Subject: Re: [PATCH for-5.14/block] blkcg: drop CLONE_IO check in
+ blkcg_can_attach()
+To:     Tejun Heo <tj@kernel.org>
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         Pavel Begunkov <asml.silence@gmail.com>
-Subject: [PATCH for-5.14/block] blkcg: drop CLONE_IO check in
- blkcg_can_attach()
-Message-ID: <YJrTvHbrRDbJjw+S@slm.duckdns.org>
+References: <YJrTvHbrRDbJjw+S@slm.duckdns.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <6f89d141-fc55-a41e-4783-649fbd7e34ee@kernel.dk>
+Date:   Tue, 11 May 2021 13:39:07 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+In-Reply-To: <YJrTvHbrRDbJjw+S@slm.duckdns.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-blkcg has always rejected to attach if any of the member tasks has shared
-io_context. The rationale was that io_contexts can be shared across
-different cgroups making it impossible to define what the appropriate
-control behavior should be. However, this check causes more problems than it
-solves:
+On 5/11/21 12:58 PM, Tejun Heo wrote:
+> blkcg has always rejected to attach if any of the member tasks has shared
+> io_context. The rationale was that io_contexts can be shared across
+> different cgroups making it impossible to define what the appropriate
+> control behavior should be. However, this check causes more problems than it
+> solves:
+> 
+> * The check prevents controller enable and migrations but not CLONE_IO
+>   itself, which can lead to surprises as the outcome changes depending on
+>   the order of operations.
+> 
+> * Sharing within a cgroup is fine but the check can't distinguish that. This
+>   leads to unnecessary conflicts with the recent CLONE_IO usage in io_uring.
+> 
+> io_context sharing doesn't make any difference for rq_qos based controllers
+> and the way it's used is safe as long as tasks aren't migrated dynamically
+> which is the vast majority of use cases. While we can try to make the check
+> more precise to avoid false positives, the added complexity doesn't seem
+> worthwhile. Let's just drop blkcg_can_attach().
 
-* The check prevents controller enable and migrations but not CLONE_IO
-  itself, which can lead to surprises as the outcome changes depending on
-  the order of operations.
+Applied, thanks.
 
-* Sharing within a cgroup is fine but the check can't distinguish that. This
-  leads to unnecessary conflicts with the recent CLONE_IO usage in io_uring.
+-- 
+Jens Axboe
 
-io_context sharing doesn't make any difference for rq_qos based controllers
-and the way it's used is safe as long as tasks aren't migrated dynamically
-which is the vast majority of use cases. While we can try to make the check
-more precise to avoid false positives, the added complexity doesn't seem
-worthwhile. Let's just drop blkcg_can_attach().
-
-Signed-off-by: Tejun Heo <tj@kernel.org>
----
- block/blk-cgroup.c |   27 ---------------------------
- 1 file changed, 27 deletions(-)
-
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 582d2f18717ee..d169e20551588 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -1217,32 +1217,6 @@ void blkcg_exit_queue(struct request_queue *q)
- 	blk_throtl_exit(q);
- }
- 
--/*
-- * We cannot support shared io contexts, as we have no mean to support
-- * two tasks with the same ioc in two different groups without major rework
-- * of the main cic data structures.  For now we allow a task to change
-- * its cgroup only if it's the only owner of its ioc.
-- */
--static int blkcg_can_attach(struct cgroup_taskset *tset)
--{
--	struct task_struct *task;
--	struct cgroup_subsys_state *dst_css;
--	struct io_context *ioc;
--	int ret = 0;
--
--	/* task_lock() is needed to avoid races with exit_io_context() */
--	cgroup_taskset_for_each(task, dst_css, tset) {
--		task_lock(task);
--		ioc = task->io_context;
--		if (ioc && atomic_read(&ioc->nr_tasks) > 1)
--			ret = -EINVAL;
--		task_unlock(task);
--		if (ret)
--			break;
--	}
--	return ret;
--}
--
- static void blkcg_bind(struct cgroup_subsys_state *root_css)
- {
- 	int i;
-@@ -1275,7 +1249,6 @@ struct cgroup_subsys io_cgrp_subsys = {
- 	.css_online = blkcg_css_online,
- 	.css_offline = blkcg_css_offline,
- 	.css_free = blkcg_css_free,
--	.can_attach = blkcg_can_attach,
- 	.css_rstat_flush = blkcg_rstat_flush,
- 	.bind = blkcg_bind,
- 	.dfl_cftypes = blkcg_files,
