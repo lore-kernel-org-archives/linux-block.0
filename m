@@ -2,176 +2,141 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6AABC433B4
-	for <linux-block@archiver.kernel.org>; Tue, 11 May 2021 18:16:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EF7BC433B4
+	for <linux-block@archiver.kernel.org>; Tue, 11 May 2021 18:58:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 83AAA61919
-	for <linux-block@archiver.kernel.org>; Tue, 11 May 2021 18:16:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E4A3C613DE
+	for <linux-block@archiver.kernel.org>; Tue, 11 May 2021 18:58:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231939AbhEKSRb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 May 2021 14:17:31 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:60422 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231793AbhEKSRb (ORCPT
+        id S232075AbhEKS7Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 May 2021 14:59:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53874 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232265AbhEKS7O (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 May 2021 14:17:31 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 14BIEMO7057702;
-        Tue, 11 May 2021 18:16:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding;
- s=corp-2020-01-29; bh=hgctH0oSitkyxZDTbkS3bn45JVyf//Hvn92WkrPimiU=;
- b=UUgI++rPmxv6cZ480QfwrUN5SzWvs2Fq8Oa8O+oXeHtDQ1WWqYeecrj6Lz6G4XJJCvDu
- +f/0uLGufR4Jjh/iEqZwggeqvVI0aeF7oAOZvRTSdvtbaCoP/WPB9laQLFPArEypikG+
- uekjNXrXRklZyfmDnvasg7tD0YNx/o7JamdW7Fgn76UIfcQ9f2LBre29sV7v7uqkIKPt
- 2E+dtrzumH817c0PZSEyhO6M+yYoGwn3VSZ9E3Y3ySZG0m5MewCSKciGj77uei0wLYC+
- sVoCfKiGT8sPcII8+yO6adWLrSI0feqHNV095/edWDbBfWT5y4iwQdaA2Uvm5+MNXJUr Bw== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by aserp2120.oracle.com with ESMTP id 38djkmfnk1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 11 May 2021 18:16:20 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 14BIG17J067879;
-        Tue, 11 May 2021 18:16:19 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-        by userp3020.oracle.com with ESMTP id 38fh3x4ejw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 11 May 2021 18:16:19 +0000
-Received: from userp3020.oracle.com (userp3020.oracle.com [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 14BIGI1W069108;
-        Tue, 11 May 2021 18:16:18 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3020.oracle.com with ESMTP id 38fh3x4eje-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 11 May 2021 18:16:18 +0000
-Received: from abhmp0006.oracle.com (abhmp0006.oracle.com [141.146.116.12])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 14BIGE9X020661;
-        Tue, 11 May 2021 18:16:14 GMT
-Received: from gms-ol8-2.osdevelopmeniad.oraclevcn.com (/100.100.234.63)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 11 May 2021 11:16:14 -0700
-From:   Gulam Mohamed <gulam.mohamed@oracle.com>
-To:     viro@zeniv.linux.org.uk, axboe@kernel.dk,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, hch@lst.de,
-        martin.petersen@oracle.com
-Cc:     junxiao.bi@oracle.com, gulam.mohamed@oracle.com
-Subject: [PATCH V1 1/1] Fix race between iscsi logout and systemd-udevd
-Date:   Tue, 11 May 2021 18:15:58 +0000
-Message-Id: <20210511181558.380764-1-gulam.mohamed@oracle.com>
-X-Mailer: git-send-email 2.27.0
+        Tue, 11 May 2021 14:59:14 -0400
+Received: from mail-qt1-x833.google.com (mail-qt1-x833.google.com [IPv6:2607:f8b0:4864:20::833])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A25AC061574;
+        Tue, 11 May 2021 11:58:07 -0700 (PDT)
+Received: by mail-qt1-x833.google.com with SMTP id j11so15380541qtn.12;
+        Tue, 11 May 2021 11:58:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition;
+        bh=qrWx6sjrboqnBhgfkwaqiWCcjg2j1hn+sj/P7ANiDEQ=;
+        b=VhaL9ar4vHEFuRBodILW3Z9252xy4gbmzIwc5+HQoTYuHxHQZb8Tn86ySjUQWcfTxv
+         Jda1GCta3+RuqdKYgAza3hJzciwKLDHDLiAljKpc+FTQs5jKkIjpw3kMb8hWoav3DiJb
+         XKZdQ+XwerqLOCodGauVENdP1vynUmFtGMmJuemOZh0Wu7lhPvAfctk85ne+P/WaclIA
+         vvMR/MlsRNbyQAJC2dAQQgzjMtvZ8Wqh4y4H/N8xg8TqQqjTYs4ffY6thjYD90bqtEDe
+         p8WGQK1GMS7/15GSHhBcVyipZFVOXunx6rkvi/k0fAqguQEX3AQoHI/eeNFxbpG3j+6D
+         +v+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :mime-version:content-disposition;
+        bh=qrWx6sjrboqnBhgfkwaqiWCcjg2j1hn+sj/P7ANiDEQ=;
+        b=M+Uij2Wk01fyA1bBzX4h98LFEu0Y4pse09HCAlwCb+tc4Za2dinHAldoI6OT9+LmOX
+         kptKfTTqB3khvE3N1ZuNgTC8jTGdbRXMapn/sEGmshng59M4LqZQWzIs/7b2jvlH3euv
+         HyXyd82TPAZwRHcqjPuyNeMG8SYiIJU+3X1QnEZKppcm9iKkhfgGNEMUZ9ekP9b4KdUH
+         FxXcBk6f9+/TavD66b3oCUSB/iFVpWLvuW0uOIHnf0n6pciXTa987dHONoM/odVN+JaR
+         F0dsyOyB/wh7q/sYgFhynJCYSWV4mLZhLRpvX/b1U4UUGxcZ9k1MAzi9O1PODahQ3lYo
+         EaCQ==
+X-Gm-Message-State: AOAM531QCD+R69FmQo9JION9AEvMD8KMd1JBgfYdcovseaqk+Rgfb0mT
+        6ClUuzBdooGF9C2btnT8iLo=
+X-Google-Smtp-Source: ABdhPJwePo0OHjxAzMWLKGdycYB9j73g7VcAfncP+Rr1cPoLt7oRcMwOt41qSK4oGjQrfRSPt00sVw==
+X-Received: by 2002:a05:622a:449:: with SMTP id o9mr9317315qtx.145.1620759486475;
+        Tue, 11 May 2021 11:58:06 -0700 (PDT)
+Received: from localhost (dhcp-6c-ae-f6-dc-d8-61.cpe.echoes.net. [199.96.183.179])
+        by smtp.gmail.com with ESMTPSA id b188sm14479099qkc.11.2021.05.11.11.58.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 May 2021 11:58:05 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Tue, 11 May 2021 14:58:04 -0400
+From:   Tejun Heo <tj@kernel.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Pavel Begunkov <asml.silence@gmail.com>
+Subject: [PATCH for-5.14/block] blkcg: drop CLONE_IO check in
+ blkcg_can_attach()
+Message-ID: <YJrTvHbrRDbJjw+S@slm.duckdns.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-GUID: 70ILg2-xPJRuhusHpsPZNpijzkulSzTZ
-X-Proofpoint-ORIG-GUID: 70ILg2-xPJRuhusHpsPZNpijzkulSzTZ
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9981 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 priorityscore=1501
- suspectscore=0 clxscore=1011 bulkscore=0 adultscore=0 impostorscore=0
- spamscore=0 phishscore=0 mlxlogscore=999 mlxscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2104190000
- definitions=main-2105110123
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Problem description:
+blkcg has always rejected to attach if any of the member tasks has shared
+io_context. The rationale was that io_contexts can be shared across
+different cgroups making it impossible to define what the appropriate
+control behavior should be. However, this check causes more problems than it
+solves:
 
-During the kernel patching, customer was switching between the iscsi
-disks. To switch between the iscsi disks, it was logging out the
-currently connected iscsi disk and then logging in to the new iscsi
-disk. This was being done using a script. Customer was also using the
-"parted" command in the script to list the partition details just
-before the iscsi logout. This usage of "parted" command was creating
-an issue and we were seeing stale links of the
-disks in /sys/class/block.
+* The check prevents controller enable and migrations but not CLONE_IO
+  itself, which can lead to surprises as the outcome changes depending on
+  the order of operations.
 
-Analysis:
+* Sharing within a cgroup is fine but the check can't distinguish that. This
+  leads to unnecessary conflicts with the recent CLONE_IO usage in io_uring.
 
-As part of iscsi logout, the partitions and the disk will be removed
-in the function del_gendisk() which is done through a kworker. The
-parted command, used to list the partitions, will open the disk in
-RW mode which results in systemd-udevd re-reading the partitions. The
-ioctl used to re-read partitions is BLKRRPART. This will trigger the
-rescanning of partitions which will also delete and re-add the
-partitions. So, both iscsi logout processing (through kworker) and the
-"parted" command (through systemd-udevd) will be involved in
-add/delete of partitions. In our case, the following sequence of
-operations happened (the iscsi device is /dev/sdb with partition sdb1):
+io_context sharing doesn't make any difference for rq_qos based controllers
+and the way it's used is safe as long as tasks aren't migrated dynamically
+which is the vast majority of use cases. While we can try to make the check
+more precise to avoid false positives, the added complexity doesn't seem
+worthwhile. Let's just drop blkcg_can_attach().
 
-1. sdb1 was removed by PARTED
-2. kworker, as part of iscsi logout, couldn't remove sdb1 as it was
-   already removed by PARTED
-3. sdb1 was added by parted
-4. sdb was NOW removed as part of iscsi logout (the last part of the
-   device removal after remoing the partitions)
-
-Since the symlink /sys/class/block/sdb1 points to
-/sys/class/devices/platform/hostx/sessionx/targetx:x/block/sdb/sdb1
-and since sdb is already removed, the symlink /sys/class/block/sdb1
-will be orphan and stale. So, this stale link is a result of the race
-condition in kernel between the systemd-udevd and iscsi-logout
-processing as described above. We were able to reproduce this even
-with latest upstream kernel.
-
-Fix:
-
-While Dropping/Adding partitions as part of BLKRRPART ioctl, take the
-read lock for "bdev_lookup_sem" to sync with del_gendisk().
-
-Signed-off-by: Gulam Mohamed <gulam.mohamed@oracle.com>
+Signed-off-by: Tejun Heo <tj@kernel.org>
 ---
- fs/block_dev.c | 15 +++++++++++++--
- 1 file changed, 13 insertions(+), 2 deletions(-)
+ block/blk-cgroup.c |   27 ---------------------------
+ 1 file changed, 27 deletions(-)
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 09d6f7229db9..e903a7edfd63 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -1245,9 +1245,17 @@ int bdev_disk_changed(struct block_device *bdev, bool invalidate)
- 	lockdep_assert_held(&bdev->bd_mutex);
- 
- rescan:
-+	down_read(&bdev_lookup_sem);
-+	if (!(disk->flags & GENHD_FL_UP)) {
-+		up_read(&bdev_lookup_sem);
-+		return -ENXIO;
-+	}
-+
- 	ret = blk_drop_partitions(bdev);
--	if (ret)
-+	if (ret) {
-+		up_read(&bdev_lookup_sem);
- 		return ret;
-+	}
- 
- 	clear_bit(GD_NEED_PART_SCAN, &disk->state);
- 
-@@ -1270,8 +1278,10 @@ int bdev_disk_changed(struct block_device *bdev, bool invalidate)
- 
- 	if (get_capacity(disk)) {
- 		ret = blk_add_partitions(disk, bdev);
--		if (ret == -EAGAIN)
-+		if (ret == -EAGAIN) {
-+			up_read(&bdev_lookup_sem);
- 			goto rescan;
-+		}
- 	} else if (invalidate) {
- 		/*
- 		 * Tell userspace that the media / partition table may have
-@@ -1280,6 +1290,7 @@ int bdev_disk_changed(struct block_device *bdev, bool invalidate)
- 		kobject_uevent(&disk_to_dev(disk)->kobj, KOBJ_CHANGE);
- 	}
- 
-+	up_read(&bdev_lookup_sem);
- 	return ret;
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 582d2f18717ee..d169e20551588 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -1217,32 +1217,6 @@ void blkcg_exit_queue(struct request_queue *q)
+ 	blk_throtl_exit(q);
  }
- /*
--- 
-2.27.0
-
+ 
+-/*
+- * We cannot support shared io contexts, as we have no mean to support
+- * two tasks with the same ioc in two different groups without major rework
+- * of the main cic data structures.  For now we allow a task to change
+- * its cgroup only if it's the only owner of its ioc.
+- */
+-static int blkcg_can_attach(struct cgroup_taskset *tset)
+-{
+-	struct task_struct *task;
+-	struct cgroup_subsys_state *dst_css;
+-	struct io_context *ioc;
+-	int ret = 0;
+-
+-	/* task_lock() is needed to avoid races with exit_io_context() */
+-	cgroup_taskset_for_each(task, dst_css, tset) {
+-		task_lock(task);
+-		ioc = task->io_context;
+-		if (ioc && atomic_read(&ioc->nr_tasks) > 1)
+-			ret = -EINVAL;
+-		task_unlock(task);
+-		if (ret)
+-			break;
+-	}
+-	return ret;
+-}
+-
+ static void blkcg_bind(struct cgroup_subsys_state *root_css)
+ {
+ 	int i;
+@@ -1275,7 +1249,6 @@ struct cgroup_subsys io_cgrp_subsys = {
+ 	.css_online = blkcg_css_online,
+ 	.css_offline = blkcg_css_offline,
+ 	.css_free = blkcg_css_free,
+-	.can_attach = blkcg_can_attach,
+ 	.css_rstat_flush = blkcg_rstat_flush,
+ 	.bind = blkcg_bind,
+ 	.dfl_cftypes = blkcg_files,
