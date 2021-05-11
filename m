@@ -2,95 +2,78 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80AF7C433B4
-	for <linux-block@archiver.kernel.org>; Tue, 11 May 2021 02:57:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 738A9C433ED
+	for <linux-block@archiver.kernel.org>; Tue, 11 May 2021 04:39:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 60E9A61464
-	for <linux-block@archiver.kernel.org>; Tue, 11 May 2021 02:57:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 41F026191D
+	for <linux-block@archiver.kernel.org>; Tue, 11 May 2021 04:39:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229807AbhEKC7A (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 May 2021 22:59:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:50494 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229637AbhEKC7A (ORCPT
+        id S229885AbhEKElE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 May 2021 00:41:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57098 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229586AbhEKElD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 May 2021 22:59:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620701873;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=HGTw574Zdl38Dm2r00fjJlfZvUmTvOBB3ISzyiZ0v14=;
-        b=HMMTzjeoDDhPvirbICtymRBcu6RX2lcNcHAl94LhrmlEaxNrX5OnDKq07z2LMlXCs/W1Su
-        YAb3XkbL2WU01+l/rOg3UX48Aoeo4fbWuKLPVxrE3Z/12WL+EhazgzuxkksQD3puu6nin8
-        8WfU7DyjQyXzv3HoYthS9OqyBtekwB0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-28-LEeC4-9OM2CkJTfhjHhQ5Q-1; Mon, 10 May 2021 22:57:51 -0400
-X-MC-Unique: LEeC4-9OM2CkJTfhjHhQ5Q-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 92F70800FF0;
-        Tue, 11 May 2021 02:57:50 +0000 (UTC)
-Received: from T590 (ovpn-12-106.pek2.redhat.com [10.72.12.106])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 335FF5D705;
-        Tue, 11 May 2021 02:57:42 +0000 (UTC)
-Date:   Tue, 11 May 2021 10:57:38 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     lsf-pc@lists.linux-foundation.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        Josh Hunt <johunt@akamai.com>
-Subject: Re: [LSF/MM/BPF TOPIC] Block device congestion
-Message-ID: <YJnyojvYN5PUc97A@T590>
-References: <YJlx9+FQUBu5HmcI@casper.infradead.org>
+        Tue, 11 May 2021 00:41:03 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 447A7C061574;
+        Mon, 10 May 2021 21:39:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=20LHnlnumNu0S4uklyLlpEJ56Pdr62kAvnnn+1GZFf4=; b=dH37xnoJgSLICkKar22gfCMZ20
+        OkRgim9SIXTsOt2j/3OU2+fYm/JVhbcihTtInwHHhnXdFMNHIuBIrjlv3XPjSTkiIiCU3kvUQ3RfH
+        DIc3nY3WPaqFYqMud4Nt7gakGCYSinQpa02PC0L1JZDP3wavh/g55dnUtF/N5u8XOSz2PEuIzzkE9
+        /ZV76LIvx2nKey/pkhYHZL+DRFEeNs2raD57ssgl8Flp5VLuzckTzZfRVxITHSzQ1YzpZgmdjKS+p
+        Rt9R0hD8b8NQ19FXKmnign77n3juHMxlc8NfdsZOHVllcf5lcdM6ofeLxglb+56ZChLhcVVz+y78j
+        2Qvc6/fg==;
+Received: from hch by casper.infradead.org with local (Exim 4.94 #2 (Red Hat Linux))
+        id 1lgK9x-006udr-Ej; Tue, 11 May 2021 04:38:25 +0000
+Date:   Tue, 11 May 2021 05:38:17 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Guoqing Jiang <jgq516@gmail.com>
+Cc:     Artur Paszkiewicz <artur.paszkiewicz@intel.com>,
+        Christoph Hellwig <hch@infradead.org>, song@kernel.org,
+        linux-raid@vger.kernel.org, linux-block@vger.kernel.org,
+        pawel.wiejacha@rtbhouse.com
+Subject: Re: [PATCH] md: don't account io stat for split bio
+Message-ID: <YJoKOT8U7+9fyraj@infradead.org>
+References: <20210508034815.123565-1-jgq516@gmail.com>
+ <YJjL6AQ+mMgzmIqM@infradead.org>
+ <14a350ee-1ec9-6a15-dd76-fb01d8dd2235@gmail.com>
+ <6ffb719e-bb56-8f61-9cd3-a0852c4acb7d@intel.com>
+ <c1bc42ff-eae7-d0ba-505d-9c6a19d60e93@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YJlx9+FQUBu5HmcI@casper.infradead.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <c1bc42ff-eae7-d0ba-505d-9c6a19d60e93@gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, May 10, 2021 at 06:48:39PM +0100, Matthew Wilcox wrote:
+On Tue, May 11, 2021 at 10:13:41AM +0800, Guoqing Jiang wrote:
+> > > Song and Artur, what are your opinion?
+> > In the initial version of the io accounting patch the bio was cloned instead
+> > of just overriding bi_end_io and bi_private. Would this be the right approach?
+> > 
+> > https://lore.kernel.org/linux-raid/20200601161256.27718-1-artur.paszkiewicz@intel.com/
 > 
-> I wish to re-nominate this topic from last year:
+> Maybe we can have different approach for different personality layers.
 > 
-> https://lore.kernel.org/linux-mm/20191231125908.GD6788@bombadil.infradead.org/
+> 1. raid1 and raid10 can do the accounting in their own layer since they
+> already
+> ?????? clone bio here.
+> 2. make the initial version handles other personality such as raid0 and
+> raid5
+> ?????? in the md layer.
 > 
-> I don't think we've made any progress on it, and likely won't until
-> everybody is forced into a room and the doors are locked.
-> 
+> Also a sysfs node which can enable/disable the accounting could be helpful.
 
-> >> Jens, is something supposed to be calling clear_bdi_congested() in the
-> >> block layer?  blk_clear_congested() used to exist until October 29th
-> >> last year.  Or is something else supposed to be waking up tasks that
-> >> are sleeping on congestion?
-> 
-> Congestion isn't there anymore. It was always broken as a concept imho,
-> since it was inherently racy. We used the old batching mechanism in the
-> legacy stack to signal it, and it only worked for some devices.
-
-The old batching and congestion was helpful for some slow devices, since
-batching can avoid to submit IOs from different tasks concurrently to
-same queue when queue is busy, so IO order in same task is maintained.
-
-I believe Josh is struggling with this issue, and we had one offline
-talk about this issue.
-
-And there was another such old discussion too:
-
-https://lore.kernel.org/linux-scsi/20191203022337.GE25002@ming.t460p/
-
-
-
-Thanks,
-Ming
-
+Yes.  Also if the original bi_end_io is restore before completing the
+bio you can still override it.
