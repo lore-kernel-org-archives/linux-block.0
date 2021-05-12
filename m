@@ -7,42 +7,42 @@ X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0784C43460
-	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 17:31:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED9CDC43462
+	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 17:31:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AFD956142D
-	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 17:31:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BA1B861422
+	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 17:31:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235530AbhELRc1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 May 2021 13:32:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37214 "EHLO
+        id S238384AbhELRc3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 May 2021 13:32:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37266 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238552AbhELQyc (ORCPT
+        with ESMTP id S238655AbhELQyk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 May 2021 12:54:32 -0400
+        Wed, 12 May 2021 12:54:40 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2516BC06134D
-        for <linux-block@vger.kernel.org>; Wed, 12 May 2021 09:50:58 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17AEEC06134E
+        for <linux-block@vger.kernel.org>; Wed, 12 May 2021 09:51:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=rQpKhARa4do/q2GK3W6QYyt9aq9PrNIGFIXW84FwRzQ=; b=Rm5sd8Z9CInnzNrirHu9AtFATP
-        MtUKPX2bWRwtn6m60NK58WxRaGzaeBsSk/YdYRcMZDgbK7cy38ULkfmG4pyK9OWiNYUZjtFFJSEVJ
-        jQJcjAumlaYEQwZzmyK8E89HYY52EnIB+rWsOa+hnlHTSeY88jhWe0I1sijhEySbeSdpFeWWsbJNA
-        WDaIYWJN2SzIIKT8MQSsfGpy+hI0jYTEVSZZz60sh+vThP+iLyQf57Af7IpW+PY9HnUH/kxOCQyOJ
-        gSg3zinBS2Xr4COAnJ+ToIGlj2bPfWE0GwIjFmFvTCKNMj2ksI1torJ6f3ZSw/5r0cjFA17hlkUg1
-        qflbc7gA==;
+        bh=LnOZdM199sgRBQAQQNQHEuJjslE5h07AOS56jCCV/lM=; b=SDxI592YIDOL7euX1Bm7qsFAOE
+        ai3jARlgeJAJdpk2K075d/Sbcro4BvtApwQ6/gKLFgh/y+fMzNSokaW3W4Y8A04sJTozy7Umqn92I
+        oq9RRSONwQBqgWZwlxojRevZfDLdlIyWmFuBo8GEN8D3qFX90B+9iXtSI76s16lsRXhHbKGTirMkG
+        yR5c/RvSwh+F3OWHWR/3CKGXLNM1XH0gX7c9hpALt0PZ67o87KPwiYPwsrl/9nqRrYIkwNaBRUYUc
+        w1SG2RrZu55Hw1XgWtqeCE0HNGFE7Pr7fm4Oz+RDZASCqHBN2xMuIG1mx1O+JTXjvLwRXJEBgwXXp
+        pe8CIH9Q==;
 Received: from [2001:4bb8:198:fbc8:1036:7ab9:f97a:adbc] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
-        id 1lgs4U-00AcHD-RZ; Wed, 12 May 2021 16:50:55 +0000
+        id 1lgs4X-00AcHK-BM; Wed, 12 May 2021 16:50:57 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     axboe@kernel.dk
 Cc:     Gulam Mohamed <gulam.mohamed@oracle.com>,
         Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org
-Subject: [PATCH 1/2] block: prevent block device lookups at the beginning of del_gendisk
-Date:   Wed, 12 May 2021 18:50:49 +0200
-Message-Id: <20210512165050.628550-2-hch@lst.de>
+Subject: [PATCH 2/2] block: fix a race between del_gendisk and BLKRRPART
+Date:   Wed, 12 May 2021 18:50:50 +0200
+Message-Id: <20210512165050.628550-3-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210512165050.628550-1-hch@lst.de>
 References: <20210512165050.628550-1-hch@lst.de>
@@ -53,114 +53,35 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-As an aritfact of how gendisk lookup used to work in earlier kernels,
-GENHD_FL_UP is only cleared very late in del_gendisk, and instead a
-global lock is used to prevent opens from actually succeeding.  Clear
-the flag, and remove the bdev inode from the inode hash earlier to
-ensure lookups fail from the very beginning of del_gendisk, and remove
-the now not needed bdev_lookup_sem.
+From: Gulam Mohamed <gulam.mohamed@oracle.com>
 
+When BLKRRPART is called concurrently with del_gendisk, the partitions
+rescan can create a stale partition that will never be be cleaned up.
+
+Fix this by checking the the disk is up before rescanning partitions
+while under bd_mutex.
+
+Signed-off-by: Gulam Mohamed <gulam.mohamed@oracle.com>
+[hch: split from a larger patch]
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/genhd.c         | 19 ++-----------------
- fs/block_dev.c        |  9 +--------
- include/linux/genhd.h |  2 --
- 3 files changed, 3 insertions(+), 27 deletions(-)
+ fs/block_dev.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 39ca97b0edc6..1693e520ec7d 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -29,8 +29,6 @@
- 
- static struct kobject *block_depr;
- 
--DECLARE_RWSEM(bdev_lookup_sem);
--
- /* for extended dynamic devt allocation, currently only one major is used */
- #define NR_EXT_DEVT		(1 << MINORBITS)
- static DEFINE_IDA(ext_devt_ida);
-@@ -609,28 +607,15 @@ void del_gendisk(struct gendisk *disk)
- 	blk_integrity_del(disk);
- 	disk_del_events(disk);
- 
--	/*
--	 * Block lookups of the disk until all bdevs are unhashed and the
--	 * disk is marked as dead (GENHD_FL_UP cleared).
--	 */
--	down_write(&bdev_lookup_sem);
--
- 	mutex_lock(&disk->part0->bd_mutex);
-+	disk->flags &= ~GENHD_FL_UP;
-+	remove_inode_hash(disk->part0->bd_inode);
- 	blk_drop_partitions(disk);
- 	mutex_unlock(&disk->part0->bd_mutex);
- 
- 	fsync_bdev(disk->part0);
- 	__invalidate_device(disk->part0, true);
--
--	/*
--	 * Unhash the bdev inode for this device so that it can't be looked
--	 * up any more even if openers still hold references to it.
--	 */
--	remove_inode_hash(disk->part0->bd_inode);
--
- 	set_capacity(disk, 0);
--	disk->flags &= ~GENHD_FL_UP;
--	up_write(&bdev_lookup_sem);
- 
- 	if (!(disk->flags & GENHD_FL_HIDDEN)) {
- 		sysfs_remove_link(&disk_to_dev(disk)->kobj, "bdi");
 diff --git a/fs/block_dev.c b/fs/block_dev.c
-index eb265d72fce8..de1a760da62d 100644
+index de1a760da62d..577f112c3818 100644
 --- a/fs/block_dev.c
 +++ b/fs/block_dev.c
-@@ -1364,16 +1364,12 @@ struct block_device *blkdev_get_no_open(dev_t dev)
- 	struct block_device *bdev;
- 	struct gendisk *disk;
+@@ -1244,6 +1244,9 @@ int bdev_disk_changed(struct block_device *bdev, bool invalidate)
  
--	down_read(&bdev_lookup_sem);
- 	bdev = bdget(dev);
- 	if (!bdev) {
--		up_read(&bdev_lookup_sem);
- 		blk_request_module(dev);
--		down_read(&bdev_lookup_sem);
--
- 		bdev = bdget(dev);
- 		if (!bdev)
--			goto unlock;
-+			return NULL;
- 	}
+ 	lockdep_assert_held(&bdev->bd_mutex);
  
- 	disk = bdev->bd_disk;
-@@ -1383,14 +1379,11 @@ struct block_device *blkdev_get_no_open(dev_t dev)
- 		goto put_disk;
- 	if (!try_module_get(bdev->bd_disk->fops->owner))
- 		goto put_disk;
--	up_read(&bdev_lookup_sem);
- 	return bdev;
- put_disk:
- 	put_disk(disk);
- bdput:
- 	bdput(bdev);
--unlock:
--	up_read(&bdev_lookup_sem);
- 	return NULL;
- }
- 
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index 7e9660ea967d..6fc26f7bdf71 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -306,8 +306,6 @@ static inline void bd_unlink_disk_holder(struct block_device *bdev,
- }
- #endif /* CONFIG_SYSFS */
- 
--extern struct rw_semaphore bdev_lookup_sem;
--
- dev_t blk_lookup_devt(const char *name, int partno);
- void blk_request_module(dev_t devt);
- #ifdef CONFIG_BLOCK
++	if (!(disk->flags & GENHD_FL_UP))
++		return -ENXIO;
++
+ rescan:
+ 	if (bdev->bd_part_count)
+ 		return -EBUSY;
 -- 
 2.30.2
 
