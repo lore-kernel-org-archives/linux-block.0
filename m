@@ -2,73 +2,137 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCE74C433B4
-	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 21:41:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A844DC433ED
+	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 21:41:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 97475613EB
-	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 21:41:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 727DE61352
+	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 21:41:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231610AbhELVm0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 May 2021 17:42:26 -0400
-Received: from mail-ot1-f42.google.com ([209.85.210.42]:41675 "EHLO
-        mail-ot1-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1389542AbhELVBC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 May 2021 17:01:02 -0400
-Received: by mail-ot1-f42.google.com with SMTP id 36-20020a9d0ba70000b02902e0a0a8fe36so15473942oth.8;
-        Wed, 12 May 2021 13:59:51 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Go7H7PwMWkBae4rrluCRBAjjPsYYEb0+NNdtXUfQr0s=;
-        b=rhUglgTVjLBtL9a8ksmET+cG8TPZXqmSG/3662HcZf1DSi0Ohdyjkg2mGjDOBN98Vs
-         ycmonx3R5NGVtci73trbH7KXvKaifETRPYTwZe0rnCMDfOcPlhLH946Yesgq81WAzFhl
-         Dgm09EcEHNwwDulG6Veowkl9PY8Sl5cUOrzinpCh8I3Wzkn1Ns7Sflc0yq+bOarbooOS
-         Md6YJ3AguqiInENOnNGUjWrkZ9IEofBZlH9W+8SHSYTgRFsRc8PWbC4oLQrYy9hC5PfG
-         sSsX/sqqcytB9j9QNdcFBzNdZwzpRP0Hpd2j3MG+IFDx/1stqRO+n8eAV4GvvP1ekYwm
-         J9iA==
-X-Gm-Message-State: AOAM5320IPjEl+PwHBJrv2P4c9W10reNLurkxXuIZhJIMvpwgXKDMFwo
-        k/cF20mP2rzk68GLq0uGqls=
-X-Google-Smtp-Source: ABdhPJwdgMe449USIr0N4Nta7Zk4lE57U8wQlyC8Xiflsdm4iW+ee9eDNncvOMiyal7GUqVTv/k+HA==
-X-Received: by 2002:a9d:625a:: with SMTP id i26mr2062767otk.326.1620853191148;
-        Wed, 12 May 2021 13:59:51 -0700 (PDT)
-Received: from ?IPv6:2600:1700:65a0:78e0:c65a:d038:3389:f848? ([2600:1700:65a0:78e0:c65a:d038:3389:f848])
-        by smtp.gmail.com with ESMTPSA id e20sm237794oot.11.2021.05.12.13.59.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 12 May 2021 13:59:50 -0700 (PDT)
-Subject: Re: [PATCH 05/15] blk-mq: factor out a "classic" poll helper
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc:     Jeffle Xu <jefflexu@linux.alibaba.com>,
+        id S240116AbhELVma (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 May 2021 17:42:30 -0400
+Received: from mail.kernel.org ([198.145.29.99]:55716 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1391865AbhELVdv (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 12 May 2021 17:33:51 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 539DD61352;
+        Wed, 12 May 2021 21:32:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1620855154;
+        bh=m4zYFt9qsjR5CpKrONf2H7NpIJ88zehjuQ/jbBnlStY=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=KxzzzZr3Di3w/5k8P8MV+P16/Tzk+8Mr8iJOrCqrTIWPf9DmRLy/oSYb7/yLO7Dfs
+         MIsLsylIYciGF1QUZZON5L5QjgLj1FJZ8L3LgmFW5vHdqJxHSJWF7x0orrHNOcX5t8
+         tgm9YcMUwc4WwyfotuRigZ9eWt1jokOv9K8NjKkVYv/+jja6ddVTRgGnenRW++g01u
+         dUeuamRTr+xRCKLKxHXUCNVGi7OnItKqLuVTeGZkhfYdiVQxnVbBiGKp5WZKxsUfJV
+         8A2hfF2u2T7JQyM6wslxE4X8ilYdUYLv9SrL/PLv0LzsNUKXIxTAYT4/bDQPjXUPiI
+         1wXF5j59KO8ow==
+Date:   Wed, 12 May 2021 14:32:30 -0700
+From:   "Darrick J. Wong" <djwong@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Jeffle Xu <jefflexu@linux.alibaba.com>,
         Ming Lei <ming.lei@redhat.com>,
         Damien Le Moal <Damien.LeMoal@wdc.com>,
         Keith Busch <kbusch@kernel.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
         "Wunderlich, Mark" <mark.wunderlich@intel.com>,
         "Vasudevan, Anil" <anil.vasudevan@intel.com>,
         linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         linux-nvme@lists.infradead.org
+Subject: Re: [PATCH 03/15] iomap: don't try to poll multi-bio I/Os in
+ __iomap_dio_rw
+Message-ID: <20210512213230.GB8543@magnolia>
 References: <20210512131545.495160-1-hch@lst.de>
- <20210512131545.495160-6-hch@lst.de>
-From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <b35e93ec-d9b4-89bb-9358-b76044e91f5b@grimberg.me>
-Date:   Wed, 12 May 2021 13:59:48 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
+ <20210512131545.495160-4-hch@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <20210512131545.495160-6-hch@lst.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210512131545.495160-4-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-A bit convoluted diff, but looks ok,
+On Wed, May 12, 2021 at 03:15:33PM +0200, Christoph Hellwig wrote:
+> If an iocb is split into multiple bios we can't poll for both.  So don't
+> bother to even try to poll in that case.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+Ahh the fun of reviewing things like iopoll that I'm not all /that/
+familiar with...
+
+> ---
+>  fs/iomap/direct-io.c | 17 +++++++++++++++++
+>  1 file changed, 17 insertions(+)
+> 
+> diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
+> index 9398b8c31323..d5637f467109 100644
+> --- a/fs/iomap/direct-io.c
+> +++ b/fs/iomap/direct-io.c
+> @@ -282,6 +282,13 @@ iomap_dio_bio_actor(struct inode *inode, loff_t pos, loff_t length,
+>  	if (!iov_iter_count(dio->submit.iter))
+>  		goto out;
+>  
+> +	/*
+> +	 * We can only poll for single bio I/Os.
+> +	 */
+> +	if (need_zeroout ||
+> +	    ((dio->flags & IOMAP_DIO_WRITE) && pos >= i_size_read(inode)))
+
+Hm, is this logic here to catch the second iomap_dio_zero below the
+zero_tail: label?  What happens if we have an unaligned direct write
+that starts below EOF but (for whatever reason) ends the loop with pos
+now above EOF but not on a block boundary?
+
+> +		dio->iocb->ki_flags &= ~IOCB_HIPRI;
+> +
+>  	if (need_zeroout) {
+>  		/* zero out from the start of the block to the write offset */
+>  		pad = pos & (fs_block_size - 1);
+> @@ -339,6 +346,11 @@ iomap_dio_bio_actor(struct inode *inode, loff_t pos, loff_t length,
+>  
+>  		nr_pages = bio_iov_vecs_to_alloc(dio->submit.iter,
+>  						 BIO_MAX_VECS);
+> +		/*
+> +		 * We can only poll for single bio I/Os.
+> +		 */
+> +		if (nr_pages)
+> +			dio->iocb->ki_flags &= ~IOCB_HIPRI;
+>  		iomap_dio_submit_bio(dio, iomap, bio, pos);
+>  		pos += n;
+>  	} while (nr_pages);
+> @@ -579,6 +591,11 @@ __iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
+>  			iov_iter_revert(iter, pos - dio->i_size);
+>  			break;
+>  		}
+> +
+> +		/*
+> +		 * We can only poll for single bio I/Os.
+> +		 */
+> +		iocb->ki_flags &= ~IOCB_HIPRI;
+
+Hmm, why is this here?  Won't this clear IOCB_HIPRI even if the first
+iomap_apply call successfully creates a polled bio for the entire iovec
+such that we exit the loop one line later because count becomes zero?
+How does the upper layer (io_uring, I surmise?) know that there's
+a bio that it should poll for?
+
+<shrug> Unless the only effect that this has is making it so that the
+subsequent calls to iomap_apply don't have the polling mode set?  I see
+enough places in io_uring.c that check (iocb->ki_flags & IOCB_HIPRI) to
+make me wonder if the lifetime of that flag ends as soon as we get to
+->{read,write}_iter?
+
+--D
+
+>  	} while ((count = iov_iter_count(iter)) > 0);
+>  	blk_finish_plug(&plug);
+>  
+> -- 
+> 2.30.2
+> 
