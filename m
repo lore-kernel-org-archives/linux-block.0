@@ -4,270 +4,175 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27F10C433B4
-	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 07:13:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3B70C43460
+	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 07:23:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E9ECA613DA
-	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 07:13:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BE5076162B
+	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 07:23:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230070AbhELHOe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 May 2021 03:14:34 -0400
-Received: from mailout1.w1.samsung.com ([210.118.77.11]:37302 "EHLO
-        mailout1.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230011AbhELHOd (ORCPT
+        id S230109AbhELHYd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 May 2021 03:24:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32532 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229627AbhELHYc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 May 2021 03:14:33 -0400
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20210512071322euoutp0188d120fad21d472815a2a08a2c45cbd7~_QEoKGcaJ0934709347euoutp01R
-        for <linux-block@vger.kernel.org>; Wed, 12 May 2021 07:13:22 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20210512071322euoutp0188d120fad21d472815a2a08a2c45cbd7~_QEoKGcaJ0934709347euoutp01R
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1620803602;
-        bh=XHSTq8qz3TLNkv4AcbF3e3lonEYzTBY9sMof/cA8cPQ=;
-        h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-        b=FMl6ELgZRDdpf3aOntPoZSABQAURhRNpoe84cFe36BILa5cKBQqYtx6QLqO6KuaIa
-         gecQTvN/idNRFZ1U9bvjStn9/i1E+KXM4a9YmYxfXXbKjHrStLfHgPm33ytkfvNyMH
-         AGY/w5cRt7Qe7/Z4Uztu9jL+TEk2UDp3jnM3iAQM=
-Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
-        20210512071322eucas1p2657b4d5c249ba14c3dde7105655880b7~_QEnyFQt61142111421eucas1p2e;
-        Wed, 12 May 2021 07:13:22 +0000 (GMT)
-Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
-        eusmges1new.samsung.com (EUCPMTA) with SMTP id D1.10.09452.2108B906; Wed, 12
-        May 2021 08:13:22 +0100 (BST)
-Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-        20210512071321eucas1p2ca2253e90449108b9f3e4689bf8e0512~_QEnPivnm0606706067eucas1p2K;
-        Wed, 12 May 2021 07:13:21 +0000 (GMT)
-Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
-        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20210512071321eusmtrp1d154eb7dc28942d10f16f02fca921391~_QEnOm2R92087720877eusmtrp1Q;
-        Wed, 12 May 2021 07:13:21 +0000 (GMT)
-X-AuditID: cbfec7f2-a9fff700000024ec-d4-609b801274f9
-Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
-        eusmgms2.samsung.com (EUCPMTA) with SMTP id C9.E5.08696.1108B906; Wed, 12
-        May 2021 08:13:21 +0100 (BST)
-Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
-        eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
-        20210512071321eusmtip1ddffca367e61938552a43c3235a4573d~_QEnCRiKp2705427054eusmtip1A;
-        Wed, 12 May 2021 07:13:21 +0000 (GMT)
-Received: from localhost (106.210.248.142) by CAMSVWEXC02.scsc.local
-        (2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
-        Wed, 12 May 2021 08:13:21 +0100
-Date:   Wed, 12 May 2021 09:13:19 +0200
-From:   Javier =?utf-8?B?R29uesOhbGV6?= <javier.gonz@samsung.com>
-To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "lsf-pc@lists.linux-foundation.org" 
-        <lsf-pc@lists.linux-foundation.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "msnitzer@redhat.com" <msnitzer@redhat.com>,
-        "bvanassche@acm.org" <bvanassche@acm.org>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "roland@purestorage.com" <roland@purestorage.com>,
-        "mpatocka@redhat.com" <mpatocka@redhat.com>,
-        "hare@suse.de" <hare@suse.de>,
-        "kbusch@kernel.org" <kbusch@kernel.org>,
-        "rwheeler@redhat.com" <rwheeler@redhat.com>,
-        "hch@lst.de" <hch@lst.de>,
-        "Frederick.Knight@netapp.com" <Frederick.Knight@netapp.com>,
-        "zach.brown@ni.com" <zach.brown@ni.com>,
-        "osandov@fb.com" <osandov@fb.com>,
-        Kanchan Joshi <joshi.k@samsung.com>,
-        SelvaKumar S <selvakuma.s1@samsung.com>
-Subject: Re: [LSF/MM/BFP ATTEND] [LSF/MM/BFP TOPIC] Storage: Copy Offload
-Message-ID: <20210512071319.x4wtf5uaknypoxrx@mpHalley.local>
+        Wed, 12 May 2021 03:24:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1620804204;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=vg/cll4jMfmP1m7tM5YSccYAw8vElQEoOqiM7v+Lw54=;
+        b=gV1qTN5zBhJItWDz/uKryN2+6nh7Pwul7vRVlsSYzlH7U6Z3cFCoTDrg4bnKidFWHg5xfW
+        ppZgh95wrdoms3JvmWeuGNN58S4bV22dH7MiJpxGL2q2h+srlYtAHB5R7ZK1IsrQpmBDzf
+        3PQpOZuZ+SJ3oMgNdScCmORsZnmPJXE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-593-FrlSMN87OIaCe4JumnKwJw-1; Wed, 12 May 2021 03:23:23 -0400
+X-MC-Unique: FrlSMN87OIaCe4JumnKwJw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A38411854E26;
+        Wed, 12 May 2021 07:23:21 +0000 (UTC)
+Received: from T590 (ovpn-13-214.pek2.redhat.com [10.72.13.214])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1800114103;
+        Wed, 12 May 2021 07:23:14 +0000 (UTC)
+Date:   Wed, 12 May 2021 15:23:10 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Gulam Mohamed <gulam.mohamed@oracle.com>, viro@zeniv.linux.org.uk,
+        axboe@kernel.dk, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        martin.petersen@oracle.com, junxiao.bi@oracle.com
+Subject: Re: [PATCH V1 1/1] Fix race between iscsi logout and systemd-udevd
+Message-ID: <YJuCXh2ykAuDcuTb@T590>
+References: <20210511181558.380764-1-gulam.mohamed@oracle.com>
+ <YJtKT7rLi2CFqDsV@T590>
+ <20210512063505.GA18367@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <BYAPR04MB49652C4B75E38F3716F3C06386539@BYAPR04MB4965.namprd04.prod.outlook.com>
-X-Originating-IP: [106.210.248.142]
-X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
-        CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrOKsWRmVeSWpSXmKPExsWy7djPc7pCDbMTDM5v4rRYfbefzWLah5/M
-        FrNuv2ax2PtuNqvF403/mSz2LJrEZLFy9VEmi0mHrjFa7L2lbTF/2VN2i+7rO9gs9r3ey2yx
-        /Pg/JouJHVeZLM7N+sNmcfjeVRaL1X8sLFY+Y7J4tT/OQdjj8hVvj4nN79g9Lp8t9di0qpPN
-        Y/OSeo/JN5Yzeuy+2cDmMePTFzaP62e2M3l8fHqLxWPbw152j/f7rgKVna72+LxJzqP9QDdT
-        AH8Ul01Kak5mWWqRvl0CV8abld9YC15oVyxZvZu5gbFVtYuRk0NCwERi8a2DbF2MXBxCAisY
-        Jb5/ncYC4XxhlHg4eSoThPOZUWLpwZ9MMC19fX9ZIRLLGSX2fVzCDJIAq3p+JA0isZVRYtn0
-        L2AdLAKqEttWfmQFsdkE7CUuLbsF1iAiYCwx/+ZcNhCbWeAcu8SLZ5kgtrCAp8SODf1gvbwC
-        NhL9V9+zQNiCEidnPmGBqLeS6PzQBDSTA8iWllj+jwMkzCkQK3H03RNmkLCEgLLE8um+EDfX
-        SpzacgvsGQmBX5wSK9c3Qj3jIrHyQjeULSzx6vgWdghbRuL05B4WiIZmRokza64wQzg9jBJ/
-        Jq1ghNhgLdF3JgeiwVFi1ZVmVogwn8SNt4IQZ/JJTNo2HeoeXomONiGIajWJHU1bGScwKs9C
-        8tgsJI/NQnhsASPzKkbx1NLi3PTUYsO81HK94sTc4tK8dL3k/NxNjMC0efrf8U87GOe++qh3
-        iJGJg/EQowQHs5IIr1jS7AQh3pTEyqrUovz4otKc1OJDjNIcLErivKtmr4kXEkhPLEnNTk0t
-        SC2CyTJxcEo1MInF++37xt0jtKFvwz2FQwyiE1lTU4IyUy++n/Ro38fMvR17rXaeufRU3j8t
-        tMdMc3qSy0VBmYldt2ZN7BedtyWi7NuptZb81/Y4fd8k9qY8tMN0h5in7qoVNd/+fBLhPXJj
-        bZhwXyyTXJetajL7S/m1JZp/HMOV9j1eJHQ4NIjpcMtTm8h3x3r1yy5GxFfG9Obr720TXefb
-        5mD4h1n2j7ugSemyrY8ez9fZMqdk9infK8JntHXvzJzEpTN3oWtJy2JF0yah+kbH0gbOm5qz
-        J4fl7q7b5fj/xsWFb3UcpsZfWFF+PiPt6doMd3e1ebV1nPJnhfkWP9huI3R86j72u2HBSVvX
-        aG1gXe8iHus0X4mlOCPRUIu5qDgRAF+sxm4KBAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprCKsWRmVeSWpSXmKPExsVy+t/xu7qCDbMTDPZfULBYfbefzWLah5/M
-        FrNuv2ax2PtuNqvF403/mSz2LJrEZLFy9VEmi0mHrjFa7L2lbTF/2VN2i+7rO9gs9r3ey2yx
-        /Pg/JouJHVeZLM7N+sNmcfjeVRaL1X8sLFY+Y7J4tT/OQdjj8hVvj4nN79g9Lp8t9di0qpPN
-        Y/OSeo/JN5Yzeuy+2cDmMePTFzaP62e2M3l8fHqLxWPbw152j/f7rgKVna72+LxJzqP9QDdT
-        AH+Unk1RfmlJqkJGfnGJrVK0oYWRnqGlhZ6RiaWeobF5rJWRqZK+nU1Kak5mWWqRvl2CXsab
-        ld9YC15oVyxZvZu5gbFVtYuRk0NCwESir+8vaxcjF4eQwFJGic4Jb9khEjISn658hLKFJf5c
-        62KDKPrIKLG+bz47hLOVUWLVxgZWkCoWAVWJbSs/gtlsAvYSl5bdYgaxRQSMJebfnMsGYjML
-        nGOXePEsE8QWFvCU2LGhnwnE5hWwkei/+p4FxBYSiJHY9molK0RcUOLkzCcsEL0WEjPnn2fs
-        YuQAsqUllv/jAAlzCsRKHH33hBkkLCGgLLF8ui/EzbUSn/8+Y5zAKDwLyaBZSAbNQhi0gJF5
-        FaNIamlxbnpusZFecWJucWleul5yfu4mRmDy2Hbs55YdjCtffdQ7xMjEwXiIUYKDWUmEVyxp
-        doIQb0piZVVqUX58UWlOavEhRlNgQExklhJNzgemr7ySeEMzA1NDEzNLA1NLM2MlcV6TI2vi
-        hQTSE0tSs1NTC1KLYPqYODilGpj2VL8rSbarul7584upaoVbn07009zpxo7rVnN+kNdbt1nK
-        VkrqhNj6m4L7BDuCYtk7du8WZN211ML4xBvR6n/3DyicZ9vAEBMzT1bgbWPk2/0VizI2Gtpq
-        96eaFH64JS6iUDeD1zYkZ39IyiHBLzUN+Q/v9GxYUsynZbjvqe421XmFq3XsQgx23Iz7Fb/6
-        eqfo/bdl2YbsxSt8nKoa8yW7W1R9pd6+3MMZ+Gkx95PkXvWDrLMbDnnmbIg6EfCQKS4gZun2
-        nFlcTHsvXt1s2/rw+o7Vq0QUQnRefrbXlf7eZ/OR6djhWTcM132dpiYXfcU/JPpj/qlXK5iV
-        2Wy5c55I859cfZrx9IWdds4y85RYijMSDbWYi4oTAfITnzGnAwAA
-X-CMS-MailID: 20210512071321eucas1p2ca2253e90449108b9f3e4689bf8e0512
-X-Msg-Generator: CA
-X-RootMTR: 20210512071321eucas1p2ca2253e90449108b9f3e4689bf8e0512
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20210512071321eucas1p2ca2253e90449108b9f3e4689bf8e0512
-References: <BYAPR04MB49652C4B75E38F3716F3C06386539@BYAPR04MB4965.namprd04.prod.outlook.com>
-        <CGME20210512071321eucas1p2ca2253e90449108b9f3e4689bf8e0512@eucas1p2.samsung.com>
+In-Reply-To: <20210512063505.GA18367@lst.de>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11.05.2021 00:15, Chaitanya Kulkarni wrote:
->Hi,
->
->* Background :-
->-----------------------------------------------------------------------
->
->Copy offload is a feature that allows file-systems or storage devices
->to be instructed to copy files/logical blocks without requiring
->involvement of the local CPU.
->
->With reference to the RISC-V summit keynote [1] single threaded
->performance is limiting due to Denard scaling and multi-threaded
->performance is slowing down due Moore's law limitations. With the rise
->of SNIA Computation Technical Storage Working Group (TWG) [2],
->offloading computations to the device or over the fabrics is becoming
->popular as there are several solutions available [2]. One of the common
->operation which is popular in the kernel and is not merged yet is Copy
->offload over the fabrics or on to the device.
->
->* Problem :-
->-----------------------------------------------------------------------
->
->The original work which is done by Martin is present here [3]. The
->latest work which is posted by Mikulas [4] is not merged yet. These two
->approaches are totally different from each other. Several storage
->vendors discourage mixing copy offload requests with regular READ/WRITE
->I/O. Also, the fact that the operation fails if a copy request ever
->needs to be split as it traverses the stack it has the unfortunate
->side-effect of preventing copy offload from working in pretty much
->every common deployment configuration out there.
->
->* Current state of the work :-
->-----------------------------------------------------------------------
->
->With [3] being hard to handle arbitrary DM/MD stacking without
->splitting the command in two, one for copying IN and one for copying
->OUT. Which is then demonstrated by the [4] why [3] it is not a suitable
->candidate. Also, with [4] there is an unresolved problem with the
->two-command approach about how to handle changes to the DM layout
->between an IN and OUT operations.
->
->* Why Linux Kernel Storage System needs Copy Offload support now ?
->-----------------------------------------------------------------------
->
->With the rise of the SNIA Computational Storage TWG and solutions [2],
->existing SCSI XCopy support in the protocol, recent advancement in the
->Linux Kernel File System for Zoned devices (Zonefs [5]), Peer to Peer
->DMA support in the Linux Kernel mainly for NVMe devices [7] and
->eventually NVMe Devices and subsystem (NVMe PCIe/NVMeOF) will benefit
->from Copy offload operation.
->
->With this background we have significant number of use-cases which are
->strong candidates waiting for outstanding Linux Kernel Block Layer Copy
->Offload support, so that Linux Kernel Storage subsystem can to address
->previously mentioned problems [1] and allow efficient offloading of the
->data related operations. (Such as move/copy etc.)
->
->For reference following is the list of the use-cases/candidates waiting
->for Copy Offload support :-
->
->1. SCSI-attached storage arrays.
->2. Stacking drivers supporting XCopy DM/MD.
->3. Computational Storage solutions.
->7. File systems :- Local, NFS and Zonefs.
->4. Block devices :- Distributed, local, and Zoned devices.
->5. Peer to Peer DMA support solutions.
->6. Potentially NVMe subsystem both NVMe PCIe and NVMeOF.
->
->* What we will discuss in the proposed session ?
->-----------------------------------------------------------------------
->
->I'd like to propose a session to go over this topic to understand :-
->
->1. What are the blockers for Copy Offload implementation ?
->2. Discussion about having a file system interface.
->3. Discussion about having right system call for user-space.
->4. What is the right way to move this work forward ?
->5. How can we help to contribute and move this work forward ?
->
->* Required Participants :-
->-----------------------------------------------------------------------
->
->I'd like to invite file system, block layer, and device drivers
->developers to:-
->
->1. Share their opinion on the topic.
->2. Share their experience and any other issues with [4].
->3. Uncover additional details that are missing from this proposal.
->
->Required attendees :-
->
->Martin K. Petersen
->Jens Axboe
->Christoph Hellwig
->Bart Van Assche
->Zach Brown
->Roland Dreier
->Ric Wheeler
->Trond Myklebust
->Mike Snitzer
->Keith Busch
->Sagi Grimberg
->Hannes Reinecke
->Frederick Knight
->Mikulas Patocka
->Keith Busch
->
->Regards,
->Chaitanya
->
->[1]https://content.riscv.org/wp-content/uploads/2018/12/A-New-Golden-Age-for-Computer-Architecture-History-Challenges-and-Opportunities-David-Patterson-.pdf
->[2] https://www.snia.org/computational
->https://www.napatech.com/support/resources/solution-descriptions/napatech-smartnic-solution-for-hardware-offload/
->      https://www.eideticom.com/products.html
->https://www.xilinx.com/applications/data-center/computational-storage.html
->[3] git://git.kernel.org/pub/scm/linux/kernel/git/mkp/linux.git xcopy
->[4] https://www.spinics.net/lists/linux-block/msg00599.html
->[5] https://lwn.net/Articles/793585/
->[6] https://nvmexpress.org/new-nvmetm-specification-defines-zoned-
->namespaces-zns-as-go-to-industry-technology/
->[7] https://github.com/sbates130272/linux-p2pmem
->[8] https://kernel.dk/io_uring.pdf
+On Wed, May 12, 2021 at 08:35:05AM +0200, Christoph Hellwig wrote:
+> On Wed, May 12, 2021 at 11:23:59AM +0800, Ming Lei wrote:
+> > 
+> > 1) code path BLKRRPART:
+> > 	mutex_lock(bdev->bd_mutex)
+> > 	down_read(&bdev_lookup_sem);
+> > 
+> > 2) del_gendisk():
+> > 	down_write(&bdev_lookup_sem);
+> > 	mutex_lock(&disk->part0->bd_mutex);
+> > 
+> > Given GENHD_FL_UP is only checked when opening one bdev, and
+> > fsync_bdev() and __invalidate_device() needn't to open bdev, so
+> > the following way may work for your issue:
+> 
+> If we move the clearing of GENHD_FL_UP earlier we can do away with
+> bdev_lookup_sem entirely I think.  Something like this untested patch:
+> 
+> diff --git a/block/genhd.c b/block/genhd.c
+> index a5847560719c..ef717084b343 100644
+> --- a/block/genhd.c
+> +++ b/block/genhd.c
+> @@ -29,8 +29,6 @@
+>  
+>  static struct kobject *block_depr;
+>  
+> -DECLARE_RWSEM(bdev_lookup_sem);
+> -
+>  /* for extended dynamic devt allocation, currently only one major is used */
+>  #define NR_EXT_DEVT		(1 << MINORBITS)
+>  static DEFINE_IDA(ext_devt_ida);
+> @@ -609,13 +607,8 @@ void del_gendisk(struct gendisk *disk)
+>  	blk_integrity_del(disk);
+>  	disk_del_events(disk);
+>  
+> -	/*
+> -	 * Block lookups of the disk until all bdevs are unhashed and the
+> -	 * disk is marked as dead (GENHD_FL_UP cleared).
+> -	 */
+> -	down_write(&bdev_lookup_sem);
+> -
+>  	mutex_lock(&disk->open_mutex);
+> +	disk->flags &= ~GENHD_FL_UP;
+>  	blk_drop_partitions(disk);
+>  	mutex_unlock(&disk->open_mutex);
+>  
+> @@ -627,10 +620,7 @@ void del_gendisk(struct gendisk *disk)
+>  	 * up any more even if openers still hold references to it.
+>  	 */
+>  	remove_inode_hash(disk->part0->bd_inode);
+> -
+>  	set_capacity(disk, 0);
+> -	disk->flags &= ~GENHD_FL_UP;
+> -	up_write(&bdev_lookup_sem);
+>  
+>  	if (!(disk->flags & GENHD_FL_HIDDEN)) {
+>  		sysfs_remove_link(&disk_to_dev(disk)->kobj, "bdi");
+> diff --git a/fs/block_dev.c b/fs/block_dev.c
+> index 8dd8e2fd1401..bde23940190f 100644
+> --- a/fs/block_dev.c
+> +++ b/fs/block_dev.c
+> @@ -1377,33 +1377,24 @@ struct block_device *blkdev_get_no_open(dev_t dev)
+>  	struct block_device *bdev;
+>  	struct gendisk *disk;
+>  
+> -	down_read(&bdev_lookup_sem);
+>  	bdev = bdget(dev);
+>  	if (!bdev) {
+> -		up_read(&bdev_lookup_sem);
+>  		blk_request_module(dev);
+> -		down_read(&bdev_lookup_sem);
+> -
+>  		bdev = bdget(dev);
+>  		if (!bdev)
+> -			goto unlock;
+> +			return NULL;
+>  	}
+>  
+>  	disk = bdev->bd_disk;
+>  	if (!kobject_get_unless_zero(&disk_to_dev(disk)->kobj))
+>  		goto bdput;
+> -	if ((disk->flags & (GENHD_FL_UP | GENHD_FL_HIDDEN)) != GENHD_FL_UP)
+> -		goto put_disk;
+>  	if (!try_module_get(bdev->bd_disk->fops->owner))
+>  		goto put_disk;
+> -	up_read(&bdev_lookup_sem);
+>  	return bdev;
+>  put_disk:
+>  	put_disk(disk);
+>  bdput:
+>  	bdput(bdev);
+> -unlock:
+> -	up_read(&bdev_lookup_sem);
+>  	return NULL;
+>  }
+>  
+> @@ -1462,7 +1453,10 @@ struct block_device *blkdev_get_by_dev(dev_t dev, fmode_t mode, void *holder)
+>  
+>  	disk_block_events(disk);
+>  
+> +	ret = -ENXIO;
+>  	mutex_lock(&disk->open_mutex);
+> +	if ((disk->flags & (GENHD_FL_UP | GENHD_FL_HIDDEN)) != GENHD_FL_UP)
+> +		goto abort_claiming;
+>  	if (bdev_is_partition(bdev))
+>  		ret = blkdev_get_part(bdev, mode);
+>  	else
 
+This patch looks fine, and new openers can be prevented really with help
+of ->open_mutex.
 
-I would like to participate in this discussion too.
-
-Cc'in Selva and Kanchan, who have been posting several series for NVMe
-Simple Copy (SCC). Even though SCC is a very narrow use-case of
-copy-offload, it seems like a good start to start getting generic code
-in the block layer.
-
-Javier
-
+Thanks, 
+Ming
 
