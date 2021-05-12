@@ -2,179 +2,85 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9033FC433B4
-	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 03:24:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4923AC433ED
+	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 06:19:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 68C79613A9
-	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 03:24:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 28CEF61421
+	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 06:19:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229951AbhELDZY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 May 2021 23:25:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:43596 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229848AbhELDZY (ORCPT
+        id S230017AbhELGUR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 May 2021 02:20:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36258 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229803AbhELGUQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 May 2021 23:25:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620789856;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=83RC2qtc5cEihhWItsXrcoyXmMoP0cw+w8BGnKZsq/4=;
-        b=cvxB5bD3p0hpnoyZraakfeUOMQI5TQpo0Hz2uWsvEw42Wx4E4xJwsjcD/ISPnCPLqXiuvJ
-        0X8gQggoOU169/VVHSU/Q+11AbRqc8eXmr2EiDK95JAwaOz92MHWXqy3YpHLxolERMZSL+
-        AOcYirzw40vNp3mcczKIU81/P7f8B64=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-506-L_Rd4dvCOzqELtSY7GHHIA-1; Tue, 11 May 2021 23:24:14 -0400
-X-MC-Unique: L_Rd4dvCOzqELtSY7GHHIA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EDF651883522;
-        Wed, 12 May 2021 03:24:12 +0000 (UTC)
-Received: from T590 (ovpn-12-110.pek2.redhat.com [10.72.12.110])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 648725D9D7;
-        Wed, 12 May 2021 03:24:04 +0000 (UTC)
-Date:   Wed, 12 May 2021 11:23:59 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Gulam Mohamed <gulam.mohamed@oracle.com>
-Cc:     viro@zeniv.linux.org.uk, axboe@kernel.dk,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, hch@lst.de,
-        martin.petersen@oracle.com, junxiao.bi@oracle.com
-Subject: Re: [PATCH V1 1/1] Fix race between iscsi logout and systemd-udevd
-Message-ID: <YJtKT7rLi2CFqDsV@T590>
-References: <20210511181558.380764-1-gulam.mohamed@oracle.com>
+        Wed, 12 May 2021 02:20:16 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79B9AC061574;
+        Tue, 11 May 2021 23:19:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=2Hcku9WH1R6lN5lySgrbxkpD4gGvCRJ06pwV1NlY4Os=; b=Zuq012MxGibe0ULswBnSIyJ+E3
+        EkcSUJy52I+VUGuitU2jY2jg7PpgryC3pUmhkHbCsLJ3OJ6ysJY6TA66VygihfbNxSgsN/gqT7vCh
+        qlTacFyA/nSs36k0IMhPusJAFUlbLXOY6apxExiIyolCCcR0y9NtA9GdKj5DlhHtw/xwAkdgJ/DFt
+        sHTcpQxSI/DKsWI95czBYXg8Z7BLfmetS7G5mI3cG7y+BulZo2x2R9kc9GOQh4Nsjv/bmZX75Rh9K
+        OdKyJNgorZXQx7ftSGbOn7H5hElycSYU+24N5LvwJ4Moxa/jxB9SeeELEqI3UoOwTA6uTv0E0664a
+        vtynsIBA==;
+Received: from [2001:4bb8:198:fbc8:1036:7ab9:f97a:adbc] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
+        id 1lgiCw-00A8rS-6r; Wed, 12 May 2021 06:18:58 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>, Song Liu <song@kernel.org>
+Cc:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Nitin Gupta <ngupta@vflare.org>,
+        Stefan Haberland <sth@linux.ibm.com>,
+        Jan Hoeppner <hoeppner@linux.ibm.com>,
+        linux-block@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org
+Subject: move bd_mutex to the gendisk (resend)
+Date:   Wed, 12 May 2021 08:18:48 +0200
+Message-Id: <20210512061856.47075-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210511181558.380764-1-gulam.mohamed@oracle.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, May 11, 2021 at 06:15:58PM +0000, Gulam Mohamed wrote:
-> Problem description:
-> 
-> During the kernel patching, customer was switching between the iscsi
-> disks. To switch between the iscsi disks, it was logging out the
-> currently connected iscsi disk and then logging in to the new iscsi
-> disk. This was being done using a script. Customer was also using the
-> "parted" command in the script to list the partition details just
-> before the iscsi logout. This usage of "parted" command was creating
-> an issue and we were seeing stale links of the
-> disks in /sys/class/block.
-> 
-> Analysis:
-> 
-> As part of iscsi logout, the partitions and the disk will be removed
-> in the function del_gendisk() which is done through a kworker. The
-> parted command, used to list the partitions, will open the disk in
-> RW mode which results in systemd-udevd re-reading the partitions. The
-> ioctl used to re-read partitions is BLKRRPART. This will trigger the
-> rescanning of partitions which will also delete and re-add the
-> partitions. So, both iscsi logout processing (through kworker) and the
-> "parted" command (through systemd-udevd) will be involved in
-> add/delete of partitions. In our case, the following sequence of
-> operations happened (the iscsi device is /dev/sdb with partition sdb1):
-> 
-> 1. sdb1 was removed by PARTED
-> 2. kworker, as part of iscsi logout, couldn't remove sdb1 as it was
->    already removed by PARTED
-> 3. sdb1 was added by parted
-> 4. sdb was NOW removed as part of iscsi logout (the last part of the
->    device removal after remoing the partitions)
-> 
-> Since the symlink /sys/class/block/sdb1 points to
-> /sys/class/devices/platform/hostx/sessionx/targetx:x/block/sdb/sdb1
-> and since sdb is already removed, the symlink /sys/class/block/sdb1
-> will be orphan and stale. So, this stale link is a result of the race
-> condition in kernel between the systemd-udevd and iscsi-logout
-> processing as described above. We were able to reproduce this even
-> with latest upstream kernel.
-> 
-> Fix:
-> 
-> While Dropping/Adding partitions as part of BLKRRPART ioctl, take the
-> read lock for "bdev_lookup_sem" to sync with del_gendisk().
-> 
-> Signed-off-by: Gulam Mohamed <gulam.mohamed@oracle.com>
-> ---
->  fs/block_dev.c | 15 +++++++++++++--
->  1 file changed, 13 insertions(+), 2 deletions(-)
-> 
-> diff --git a/fs/block_dev.c b/fs/block_dev.c
-> index 09d6f7229db9..e903a7edfd63 100644
-> --- a/fs/block_dev.c
-> +++ b/fs/block_dev.c
-> @@ -1245,9 +1245,17 @@ int bdev_disk_changed(struct block_device *bdev, bool invalidate)
->  	lockdep_assert_held(&bdev->bd_mutex);
->  
->  rescan:
-> +	down_read(&bdev_lookup_sem);
-> +	if (!(disk->flags & GENHD_FL_UP)) {
-> +		up_read(&bdev_lookup_sem);
-> +		return -ENXIO;
-> +	}
+Hi all,
 
-This way might cause deadlock:
+this series first cleans up gendisk allocation in the md driver to remove
+the ERESTARTSYS hack in blkdev_get, then further refactors blkdev_get
+and then finally moves bd_mutex into the gendisk as having separate locks
+for the whole device vs partitions just complicates locking in places that
+add an remove partitions a lot.
 
-1) code path BLKRRPART:
-	mutex_lock(bdev->bd_mutex)
-	down_read(&bdev_lookup_sem);
-
-2) del_gendisk():
-	down_write(&bdev_lookup_sem);
-	mutex_lock(&disk->part0->bd_mutex);
-
-Given GENHD_FL_UP is only checked when opening one bdev, and
-fsync_bdev() and __invalidate_device() needn't to open bdev, so
-the following way may work for your issue:
-
-
-diff --git a/block/genhd.c b/block/genhd.c
-index 39ca97b0edc6..5eb27995d4ab 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -617,6 +617,7 @@ void del_gendisk(struct gendisk *disk)
- 
- 	mutex_lock(&disk->part0->bd_mutex);
- 	blk_drop_partitions(disk);
-+	disk->flags &= ~GENHD_FL_UP;
- 	mutex_unlock(&disk->part0->bd_mutex);
- 
- 	fsync_bdev(disk->part0);
-@@ -629,7 +630,6 @@ void del_gendisk(struct gendisk *disk)
- 	remove_inode_hash(disk->part0->bd_inode);
- 
- 	set_capacity(disk, 0);
--	disk->flags &= ~GENHD_FL_UP;
- 	up_write(&bdev_lookup_sem);
- 
- 	if (!(disk->flags & GENHD_FL_HIDDEN)) {
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index b8abccd03e5d..06b70b8e3f67 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -1245,6 +1245,8 @@ int bdev_disk_changed(struct block_device *bdev, bool invalidate)
- 	lockdep_assert_held(&bdev->bd_mutex);
- 
- rescan:
-+	if(!(disk->flags & GENHD_FL_UP))
-+		return -ENXIO;
- 	if (bdev->bd_part_count)
- 		return -EBUSY;
- 	sync_blockdev(bdev);
-
-
-
-Thanks,
-Ming
-
+Diffstat:
+ Documentation/filesystems/locking.rst |    2 
+ block/genhd.c                         |   59 +++------
+ block/ioctl.c                         |    2 
+ block/partitions/core.c               |   45 +++----
+ drivers/block/loop.c                  |   14 +-
+ drivers/block/xen-blkfront.c          |    8 -
+ drivers/block/zram/zram_drv.c         |   18 +--
+ drivers/block/zram/zram_drv.h         |    2 
+ drivers/md/md.h                       |    6 -
+ drivers/s390/block/dasd_genhd.c       |    8 -
+ drivers/scsi/sd.c                     |    4 
+ fs/block_dev.c                        |  204 ++++++++++++++++------------------
+ fs/btrfs/volumes.c                    |    2 
+ fs/super.c                            |    8 -
+ include/linux/blk_types.h             |    4 
+ include/linux/genhd.h                 |    6 -
+ init/do_mounts.c                      |   10 -
+ 17 files changed, 184 insertions(+), 218 deletions(-)
