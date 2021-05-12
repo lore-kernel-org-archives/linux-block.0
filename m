@@ -2,209 +2,147 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_NONE,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 980C7C433ED
-	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 06:19:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5888EC433B4
+	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 06:35:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7EE6161432
-	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 06:19:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1CA6A61490
+	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 06:35:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230367AbhELGUm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 May 2021 02:20:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36338 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229654AbhELGUb (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 May 2021 02:20:31 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6407C06175F;
-        Tue, 11 May 2021 23:19:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=mausZijoKljrr3VV+8fZtfAAbWU2lD4443TTtkB+6I4=; b=cklApESAT+Bl6eiwX2eWH3rWtY
-        RNVT54bHzk+5kINJbAm8H0ZaxH9lUELMeRzSWdmfB00r9GMjhF4YZhUg72SGQTEsLbPJROYW5nBDx
-        o3cSDxl2eHwFSVmBxaEspo8uTp11FdTWght8Sq0y4E2YPUkh9SEg0SQJRJg3dNmeiKZlH6gNuXlCq
-        jCi+6rRQ2H8gwJn+TEorJQDYyQ8guDIq4ercX1Mda5iBp65pjFmp3TuR6jTZNTsa1+M22Q0xafvVA
-        W8WE36mKmfpVsxKLuAtT+xht1x1L/7cAI6vI9rk17OvoGyfmRJMvP6C/vmejYcwPjj38ZcekJKTp0
-        8tJ2JSqA==;
-Received: from [2001:4bb8:198:fbc8:1036:7ab9:f97a:adbc] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
-        id 1lgiDH-00A8tD-UO; Wed, 12 May 2021 06:19:20 +0000
+        id S229580AbhELGgQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 May 2021 02:36:16 -0400
+Received: from verein.lst.de ([213.95.11.211]:39900 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230114AbhELGgP (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 12 May 2021 02:36:15 -0400
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id CB5B967373; Wed, 12 May 2021 08:35:05 +0200 (CEST)
+Date:   Wed, 12 May 2021 08:35:05 +0200
 From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>, Song Liu <song@kernel.org>
-Cc:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-        Minchan Kim <minchan@kernel.org>,
-        Nitin Gupta <ngupta@vflare.org>,
-        Stefan Haberland <sth@linux.ibm.com>,
-        Jan Hoeppner <hoeppner@linux.ibm.com>,
-        linux-block@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org
-Subject: [PATCH 8/8] block: remove bdget_disk
-Date:   Wed, 12 May 2021 08:18:56 +0200
-Message-Id: <20210512061856.47075-9-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210512061856.47075-1-hch@lst.de>
-References: <20210512061856.47075-1-hch@lst.de>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Gulam Mohamed <gulam.mohamed@oracle.com>, viro@zeniv.linux.org.uk,
+        axboe@kernel.dk, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        hch@lst.de, martin.petersen@oracle.com, junxiao.bi@oracle.com
+Subject: Re: [PATCH V1 1/1] Fix race between iscsi logout and systemd-udevd
+Message-ID: <20210512063505.GA18367@lst.de>
+References: <20210511181558.380764-1-gulam.mohamed@oracle.com> <YJtKT7rLi2CFqDsV@T590>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YJtKT7rLi2CFqDsV@T590>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Just opencode the xa_load in the callers, as none of them actually
-needs a reference to the bdev.
+On Wed, May 12, 2021 at 11:23:59AM +0800, Ming Lei wrote:
+> 
+> 1) code path BLKRRPART:
+> 	mutex_lock(bdev->bd_mutex)
+> 	down_read(&bdev_lookup_sem);
+> 
+> 2) del_gendisk():
+> 	down_write(&bdev_lookup_sem);
+> 	mutex_lock(&disk->part0->bd_mutex);
+> 
+> Given GENHD_FL_UP is only checked when opening one bdev, and
+> fsync_bdev() and __invalidate_device() needn't to open bdev, so
+> the following way may work for your issue:
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/genhd.c           | 35 +++++------------------------------
- block/partitions/core.c | 25 ++++++++++++-------------
- include/linux/genhd.h   |  1 -
- 3 files changed, 17 insertions(+), 44 deletions(-)
+If we move the clearing of GENHD_FL_UP earlier we can do away with
+bdev_lookup_sem entirely I think.  Something like this untested patch:
 
 diff --git a/block/genhd.c b/block/genhd.c
-index 14fd777811fe..a5847560719c 100644
+index a5847560719c..ef717084b343 100644
 --- a/block/genhd.c
 +++ b/block/genhd.c
-@@ -701,32 +701,6 @@ void blk_request_module(dev_t devt)
- 		request_module("block-major-%d", MAJOR(devt));
- }
+@@ -29,8 +29,6 @@
  
--/**
-- * bdget_disk - do bdget() by gendisk and partition number
-- * @disk: gendisk of interest
-- * @partno: partition number
-- *
-- * Find partition @partno from @disk, do bdget() on it.
-- *
-- * CONTEXT:
-- * Don't care.
-- *
-- * RETURNS:
-- * Resulting block_device on success, NULL on failure.
-- */
--struct block_device *bdget_disk(struct gendisk *disk, int partno)
--{
--	struct block_device *bdev = NULL;
+ static struct kobject *block_depr;
+ 
+-DECLARE_RWSEM(bdev_lookup_sem);
 -
--	rcu_read_lock();
--	bdev = xa_load(&disk->part_tbl, partno);
--	if (bdev && !bdgrab(bdev))
--		bdev = NULL;
--	rcu_read_unlock();
+ /* for extended dynamic devt allocation, currently only one major is used */
+ #define NR_EXT_DEVT		(1 << MINORBITS)
+ static DEFINE_IDA(ext_devt_ida);
+@@ -609,13 +607,8 @@ void del_gendisk(struct gendisk *disk)
+ 	blk_integrity_del(disk);
+ 	disk_del_events(disk);
+ 
+-	/*
+-	 * Block lookups of the disk until all bdevs are unhashed and the
+-	 * disk is marked as dead (GENHD_FL_UP cleared).
+-	 */
+-	down_write(&bdev_lookup_sem);
 -
--	return bdev;
--}
+ 	mutex_lock(&disk->open_mutex);
++	disk->flags &= ~GENHD_FL_UP;
+ 	blk_drop_partitions(disk);
+ 	mutex_unlock(&disk->open_mutex);
+ 
+@@ -627,10 +620,7 @@ void del_gendisk(struct gendisk *disk)
+ 	 * up any more even if openers still hold references to it.
+ 	 */
+ 	remove_inode_hash(disk->part0->bd_inode);
 -
- /*
-  * print a full list of all partitions - intended for places where the root
-  * filesystem can't be mounted and thus to give the victim some idea of what
-@@ -1253,13 +1227,14 @@ module_init(proc_genhd_init);
+ 	set_capacity(disk, 0);
+-	disk->flags &= ~GENHD_FL_UP;
+-	up_write(&bdev_lookup_sem);
  
- dev_t part_devt(struct gendisk *disk, u8 partno)
- {
--	struct block_device *part = bdget_disk(disk, partno);
-+	struct block_device *part;
- 	dev_t devt = 0;
+ 	if (!(disk->flags & GENHD_FL_HIDDEN)) {
+ 		sysfs_remove_link(&disk_to_dev(disk)->kobj, "bdi");
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 8dd8e2fd1401..bde23940190f 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -1377,33 +1377,24 @@ struct block_device *blkdev_get_no_open(dev_t dev)
+ 	struct block_device *bdev;
+ 	struct gendisk *disk;
  
--	if (part) {
-+	rcu_read_lock();
-+	part = xa_load(&disk->part_tbl, partno);
-+	if (part)
- 		devt = part->bd_dev;
--		bdput(part);
--	}
-+	rcu_read_unlock();
- 
- 	return devt;
- }
-diff --git a/block/partitions/core.c b/block/partitions/core.c
-index 0d33f55a7d78..325368b9de29 100644
---- a/block/partitions/core.c
-+++ b/block/partitions/core.c
-@@ -325,6 +325,8 @@ static struct block_device *add_partition(struct gendisk *disk, int partno,
- 	const char *dname;
- 	int err;
- 
-+	lockdep_assert_held(&disk->open_mutex);
-+
- 	/*
- 	 * disk_max_parts() won't be zero, either GENHD_FL_EXT_DEVT is set
- 	 * or 'minors' is passed to alloc_disk().
-@@ -464,14 +466,13 @@ int bdev_add_partition(struct block_device *bdev, int partno,
- 
- int bdev_del_partition(struct block_device *bdev, int partno)
- {
--	struct block_device *part;
--	int ret;
+-	down_read(&bdev_lookup_sem);
+ 	bdev = bdget(dev);
+ 	if (!bdev) {
+-		up_read(&bdev_lookup_sem);
+ 		blk_request_module(dev);
+-		down_read(&bdev_lookup_sem);
 -
--	part = bdget_disk(bdev->bd_disk, partno);
--	if (!part)
--		return -ENXIO;
-+	struct block_device *part = NULL;
-+	int ret = -ENXIO;
+ 		bdev = bdget(dev);
+ 		if (!bdev)
+-			goto unlock;
++			return NULL;
+ 	}
  
- 	mutex_lock(&bdev->bd_disk->open_mutex);
-+	part = xa_load(&bdev->bd_disk->part_tbl, partno);
-+	if (!part)
-+		goto out_unlock;
- 
- 	ret = -EBUSY;
- 	if (part->bd_openers)
-@@ -481,21 +482,20 @@ int bdev_del_partition(struct block_device *bdev, int partno)
- 	ret = 0;
- out_unlock:
- 	mutex_unlock(&bdev->bd_disk->open_mutex);
--	bdput(part);
- 	return ret;
+ 	disk = bdev->bd_disk;
+ 	if (!kobject_get_unless_zero(&disk_to_dev(disk)->kobj))
+ 		goto bdput;
+-	if ((disk->flags & (GENHD_FL_UP | GENHD_FL_HIDDEN)) != GENHD_FL_UP)
+-		goto put_disk;
+ 	if (!try_module_get(bdev->bd_disk->fops->owner))
+ 		goto put_disk;
+-	up_read(&bdev_lookup_sem);
+ 	return bdev;
+ put_disk:
+ 	put_disk(disk);
+ bdput:
+ 	bdput(bdev);
+-unlock:
+-	up_read(&bdev_lookup_sem);
+ 	return NULL;
  }
  
- int bdev_resize_partition(struct block_device *bdev, int partno,
- 		sector_t start, sector_t length)
- {
--	struct block_device *part;
--	int ret = 0;
-+	struct block_device *part = NULL;
-+	int ret = -ENXIO;
+@@ -1462,7 +1453,10 @@ struct block_device *blkdev_get_by_dev(dev_t dev, fmode_t mode, void *holder)
  
--	part = bdget_disk(bdev->bd_disk, partno);
-+	mutex_lock(&bdev->bd_disk->open_mutex);
-+	part = xa_load(&bdev->bd_disk->part_tbl, partno);
- 	if (!part)
--		return -ENXIO;
-+		goto out_unlock;
+ 	disk_block_events(disk);
  
--	mutex_lock(&bdev->bd_disk->open_mutex);
- 	ret = -EINVAL;
- 	if (start != part->bd_start_sect)
- 		goto out_unlock;
-@@ -509,7 +509,6 @@ int bdev_resize_partition(struct block_device *bdev, int partno,
- 	ret = 0;
- out_unlock:
- 	mutex_unlock(&bdev->bd_disk->open_mutex);
--	bdput(part);
- 	return ret;
- }
- 
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index 4c4d903caa09..5043e5d9436a 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -222,7 +222,6 @@ static inline void add_disk_no_queue_reg(struct gendisk *disk)
- }
- 
- extern void del_gendisk(struct gendisk *gp);
--extern struct block_device *bdget_disk(struct gendisk *disk, int partno);
- 
- void set_disk_ro(struct gendisk *disk, bool read_only);
- 
--- 
-2.30.2
-
++	ret = -ENXIO;
+ 	mutex_lock(&disk->open_mutex);
++	if ((disk->flags & (GENHD_FL_UP | GENHD_FL_HIDDEN)) != GENHD_FL_UP)
++		goto abort_claiming;
+ 	if (bdev_is_partition(bdev))
+ 		ret = blkdev_get_part(bdev, mode);
+ 	else
