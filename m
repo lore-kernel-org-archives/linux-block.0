@@ -2,120 +2,148 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B972DC433B4
-	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 11:36:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4999C433B4
+	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 13:16:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 82867613D6
-	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 11:36:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9FB6B613CA
+	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 13:16:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230236AbhELLhU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 May 2021 07:37:20 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2715 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230218AbhELLhU (ORCPT
+        id S231305AbhELNRP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 May 2021 09:17:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45400 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230452AbhELNRK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 May 2021 07:37:20 -0400
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.58])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4FgCN96tLnz1BLb6;
-        Wed, 12 May 2021 19:33:29 +0800 (CST)
-Received: from huawei.com (10.175.127.227) by DGGEMS409-HUB.china.huawei.com
- (10.3.19.209) with Microsoft SMTP Server id 14.3.498.0; Wed, 12 May 2021
- 19:35:59 +0800
-From:   Sun Ke <sunke32@huawei.com>
-To:     <josef@toxicpanda.com>, <axboe@kernel.dk>, <Markus.Elfring@web.de>
-CC:     <linux-block@vger.kernel.org>, <nbd@other.debian.org>,
-        <linux-kernel@vger.kernel.org>, <sunke32@huawei.com>
-Subject: [PATCH 1/2] nbd: Fix NULL pointer in flush_workqueue
-Date:   Wed, 12 May 2021 19:43:30 +0800
-Message-ID: <20210512114331.1233964-2-sunke32@huawei.com>
-X-Mailer: git-send-email 2.25.4
-In-Reply-To: <20210512114331.1233964-1-sunke32@huawei.com>
-References: <20210512114331.1233964-1-sunke32@huawei.com>
+        Wed, 12 May 2021 09:17:10 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6314CC06175F;
+        Wed, 12 May 2021 06:16:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=1OCL/hRNShP+g+9KTCWxVijSB16WuFeB9C7Nlxg2oYA=; b=ClHGVYjhtaCjJViCCOY2Q3LX8h
+        ECzIdD0JW4nhG3NFaJWLQl8RghYQp3INYuWDjt2zmtIfhD06CyQIlMGVFjMedyZiTFTbsOyXv0woX
+        pXRzfKE7VBBd1OIOMqv0IrLqy56+Der1Dg4LWkya1ChyJwVi1Rv0fd6BktiqYOaTHuYEhZwgp52kI
+        tWzQubvVoen6aM7SDE/MMmXAyTAiTV/cwOOR9l8BU+40w+L0Ag1EuPwDmuSsP5LRbvh0bViZr3uyc
+        jQUbv05FjA73+JJ6nUZ7Wvxfw8pyf4ZU0Oa6Ip321+vG2bpUcvzMGm/11A6rSbacNP0Jq+XKpwihB
+        0CwR6K+w==;
+Received: from [2001:4bb8:198:fbc8:1036:7ab9:f97a:adbc] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
+        id 1lgoiJ-00AO1O-8l; Wed, 12 May 2021 13:15:47 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Jeffle Xu <jefflexu@linux.alibaba.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Keith Busch <kbusch@kernel.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        "Wunderlich, Mark" <mark.wunderlich@intel.com>,
+        "Vasudevan, Anil" <anil.vasudevan@intel.com>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-nvme@lists.infradead.org
+Subject: switch block layer polling to a bio based model v3
+Date:   Wed, 12 May 2021 15:15:30 +0200
+Message-Id: <20210512131545.495160-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.127.227]
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Open /dev/nbdX first, the config_refs will be 1 and
-the pointers in nbd_device are still null. Disconnect
-/dev/nbdX, then reference a null recv_workq. The
-protection by config_refs in nbd_genl_disconnect is useless.
+Hi all,
 
-[  656.366194] BUG: kernel NULL pointer dereference, address: 0000000000000020
-[  656.368943] #PF: supervisor write access in kernel mode
-[  656.369844] #PF: error_code(0x0002) - not-present page
-[  656.370717] PGD 10cc87067 P4D 10cc87067 PUD 1074b4067 PMD 0
-[  656.371693] Oops: 0002 [#1] SMP
-[  656.372242] CPU: 5 PID: 7977 Comm: nbd-client Not tainted 5.11.0-rc5-00040-g76c057c84d28 #1
-[  656.373661] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS ?-20190727_073836-buildvm-ppc64le-16.ppc.fedoraproject.org-3.fc31 04/01/2014
-[  656.375904] RIP: 0010:mutex_lock+0x29/0x60
-[  656.376627] Code: 00 0f 1f 44 00 00 55 48 89 fd 48 83 05 6f d7 fe 08 01 e8 7a c3 ff ff 48 83 05 6a d7 fe 08 01 31 c0 65 48 8b 14 25 00 6d 01 00 <f0> 48 0f b1 55 d
-[  656.378934] RSP: 0018:ffffc900005eb9b0 EFLAGS: 00010246
-[  656.379350] RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
-[  656.379915] RDX: ffff888104cf2600 RSI: ffffffffaae8f452 RDI: 0000000000000020
-[  656.380473] RBP: 0000000000000020 R08: 0000000000000000 R09: ffff88813bd6b318
-[  656.381039] R10: 00000000000000c7 R11: fefefefefefefeff R12: ffff888102710b40
-[  656.381599] R13: ffffc900005eb9e0 R14: ffffffffb2930680 R15: ffff88810770ef00
-[  656.382166] FS:  00007fdf117ebb40(0000) GS:ffff88813bd40000(0000) knlGS:0000000000000000
-[  656.382806] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  656.383261] CR2: 0000000000000020 CR3: 0000000100c84000 CR4: 00000000000006e0
-[  656.383819] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[  656.384370] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-[  656.384927] Call Trace:
-[  656.385111]  flush_workqueue+0x92/0x6c0
-[  656.385395]  nbd_disconnect_and_put+0x81/0xd0
-[  656.385716]  nbd_genl_disconnect+0x125/0x2a0
-[  656.386034]  genl_family_rcv_msg_doit.isra.0+0x102/0x1b0
-[  656.386422]  genl_rcv_msg+0xfc/0x2b0
-[  656.386685]  ? nbd_ioctl+0x490/0x490
-[  656.386954]  ? genl_family_rcv_msg_doit.isra.0+0x1b0/0x1b0
-[  656.387354]  netlink_rcv_skb+0x62/0x180
-[  656.387638]  genl_rcv+0x34/0x60
-[  656.387874]  netlink_unicast+0x26d/0x590
-[  656.388162]  netlink_sendmsg+0x398/0x6c0
-[  656.388451]  ? netlink_rcv_skb+0x180/0x180
-[  656.388750]  ____sys_sendmsg+0x1da/0x320
-[  656.389038]  ? ____sys_recvmsg+0x130/0x220
-[  656.389334]  ___sys_sendmsg+0x8e/0xf0
-[  656.389605]  ? ___sys_recvmsg+0xa2/0xf0
-[  656.389889]  ? handle_mm_fault+0x1671/0x21d0
-[  656.390201]  __sys_sendmsg+0x6d/0xe0
-[  656.390464]  __x64_sys_sendmsg+0x23/0x30
-[  656.390751]  do_syscall_64+0x45/0x70
-[  656.391017]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+This series clean up the block polling code a bit and changes the interface
+to poll for a specific bio instead of a request_queue and cookie pair.
 
-To fix it, just add if (nbd->recv_workq) to nbd_disconnect_and_put().
+Polling for the bio itself leads to a few advantages:
 
-Fixes: e9e006f5fcf2 ("nbd: fix max number of supported devs")
-Signed-off-by: Sun Ke <sunke32@huawei.com>
-Reviewed-by: Josef Bacik <josef@toxicpanda.com>
----
- drivers/block/nbd.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+  - the cookie construction can made entirely private in blk-mq.c
+  - the caller does not need to remember the request_queue and cookie
+    separately and thus sidesteps their lifetime issues
+  - keeping the device and the cookie inside the bio allows to trivially
+    support polling BIOs remapping by stacking drivers
+  - a lot of code to propagate the cookie back up the submission path can
+    removed entirely
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 4ff71b579cfc..974da561b8e5 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -1980,7 +1980,8 @@ static void nbd_disconnect_and_put(struct nbd_device *nbd)
- 	 * config ref and try to destroy the workqueue from inside the work
- 	 * queue.
- 	 */
--	flush_workqueue(nbd->recv_workq);
-+	if (nbd->recv_workq)
-+		flush_workqueue(nbd->recv_workq);
- 	if (test_and_clear_bit(NBD_RT_HAS_CONFIG_REF,
- 			       &nbd->config->runtime_flags))
- 		nbd_config_put(nbd);
--- 
-2.25.4
+The one major caveat is that this requires RCU freeing polled BIOs to make
+sure the bio that contains the polling information is still alive when
+io_uring tries to poll it through the iocb. For synchronous polling all the
+callers have a bio reference anyway, so this is not an issue.
 
+Git tree:
+
+   git://git.infradead.org/users/hch/block.git bio-poll
+
+Gitweb:
+
+    http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/bio-poll
+
+Chances since v2:
+ - remove support for writing to the poll attribute
+ - better document the block_device life time assumptions in bio_poll
+ - only set QUEUE_FLAG_POLL on nvme-multipath queues where it makes sense
+
+Chances since v1:
+ - use SLAB_TYPESAFE_BY_RCU to only free the pages backing the bio
+   slabs bio RCU
+ - split the spin argument to bio_poll to avoid sleeping under RCU from
+   io_uring
+ - add support for polling nvme multipath devices
+
+Diffstat:
+ arch/m68k/emu/nfblock.c             |    3 
+ arch/xtensa/platforms/iss/simdisk.c |    3 
+ block/bio.c                         |    4 
+ block/blk-core.c                    |  122 ++++++++++++++++++-------
+ block/blk-merge.c                   |    2 
+ block/blk-mq-debugfs.c              |    2 
+ block/blk-mq.c                      |  173 ++++++++++++++----------------------
+ block/blk-mq.h                      |    6 -
+ block/blk-sysfs.c                   |   23 ----
+ drivers/block/brd.c                 |   12 +-
+ drivers/block/drbd/drbd_int.h       |    2 
+ drivers/block/drbd/drbd_req.c       |    3 
+ drivers/block/n64cart.c             |   12 +-
+ drivers/block/null_blk/main.c       |    3 
+ drivers/block/pktcdvd.c             |    7 -
+ drivers/block/ps3vram.c             |    6 -
+ drivers/block/rsxx/dev.c            |    7 -
+ drivers/block/zram/zram_drv.c       |   10 --
+ drivers/lightnvm/pblk-init.c        |    6 -
+ drivers/md/bcache/request.c         |   13 +-
+ drivers/md/bcache/request.h         |    4 
+ drivers/md/dm.c                     |   28 ++---
+ drivers/md/md.c                     |   10 --
+ drivers/nvdimm/blk.c                |    5 -
+ drivers/nvdimm/btt.c                |    5 -
+ drivers/nvdimm/pmem.c               |    3 
+ drivers/nvme/host/core.c            |    4 
+ drivers/nvme/host/multipath.c       |   17 ++-
+ drivers/s390/block/dcssblk.c        |    7 -
+ drivers/s390/block/xpram.c          |    5 -
+ fs/block_dev.c                      |   54 +++--------
+ fs/btrfs/inode.c                    |    8 -
+ fs/direct-io.c                      |   14 --
+ fs/ext4/file.c                      |    2 
+ fs/gfs2/file.c                      |    4 
+ fs/io_uring.c                       |   14 +-
+ fs/iomap/direct-io.c                |   56 ++++++-----
+ fs/xfs/xfs_file.c                   |    2 
+ fs/zonefs/super.c                   |    2 
+ include/linux/bio.h                 |    4 
+ include/linux/blk-mq.h              |   15 ---
+ include/linux/blk_types.h           |   34 +------
+ include/linux/blkdev.h              |   12 +-
+ include/linux/bvec.h                |    2 
+ include/linux/fs.h                  |    8 -
+ include/linux/iomap.h               |    3 
+ mm/page_io.c                        |   10 --
+ 47 files changed, 342 insertions(+), 409 deletions(-)
