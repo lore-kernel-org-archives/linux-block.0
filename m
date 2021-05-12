@@ -2,85 +2,179 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 537FDC433B4
-	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 02:55:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9033FC433B4
+	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 03:24:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2F83061937
-	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 02:55:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 68C79613A9
+	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 03:24:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229973AbhELC4G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 May 2021 22:56:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48230 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229968AbhELC4G (ORCPT
+        id S229951AbhELDZY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 May 2021 23:25:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:43596 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229848AbhELDZY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 May 2021 22:56:06 -0400
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40C0AC061574
-        for <linux-block@vger.kernel.org>; Tue, 11 May 2021 19:54:59 -0700 (PDT)
-Received: by mail-pf1-x431.google.com with SMTP id 10so17639002pfl.1
-        for <linux-block@vger.kernel.org>; Tue, 11 May 2021 19:54:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=NYV3v2B5SOCRJ/sEBBuMPyQsLiSkHeAecHDVVcuPNII=;
-        b=M7UG3BnjOSVEhTF+Z05R1Z05XduD7s/mF0xiFT1ZOSZhZmuNo1y3bxg9wyPXPxbtv9
-         qufOW1Gw6p9RQVtKmzNy7+wTVlyOQOr1dApeRdoHVAbZNX2ZyMjDvMRMNtVje1prby+F
-         5Vcxw1EfeOO/6BbOpXkqKyQCKlMjLokJTSCyakfstNV+YZH7rOcObtgrtUtJYWzGS8dB
-         Sr2V3Ty1tHwvTwgD5uX4Vr7vmRJGBqHTLnPMogXYYMchCP04MRbSyHkakkZjfN9uOFbx
-         sIl/6eUOsUyMGN8VflBdQjsCmbOR114TEh5cGwK5Q8AwW8UwBIcfWhW3DmIr54r0+ddU
-         jWnQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=NYV3v2B5SOCRJ/sEBBuMPyQsLiSkHeAecHDVVcuPNII=;
-        b=kneduNQzvZybSP+a1BZz7Iv0ZeaAby+uEELmBRpJNuTfVyPnqIF5zrIcBm+Yvjxq35
-         Cgvr6NmMBHTctoTigoIwXzVIlu2BQLSNl0kIdcNfFwrHP0FxoAkc0h/VkvsL6sTN7Gw3
-         qh634+Z3081vwYS3lNFyWZlktbPHFGaQgjkV2FD43Rf2PS22stKq4LGpFJ9V9U4cU+VF
-         f0AvnLIbrWpGmNzuln+bLWKVPeIyV1OyqH0Ujr4HlI2xAXcoT+bxFhHk/9Y2mpVIRlL9
-         VVis9kmqL3vG7xOmbMDglu9YRKktTwksxogdXeZMwqUlL3OyJBSosXr5l1iB8VxgHTW/
-         5aqA==
-X-Gm-Message-State: AOAM531YIjK4oxLjbAuADrC/OE/+lHOH6XZLBsXRel9FF378kxtjs4j5
-        AFB5SK5GiEQJIjlB20CZ+K4mpw==
-X-Google-Smtp-Source: ABdhPJw0ILzs0xM8QxYf0JbnCtDwiyO2nX5p0ggJ3wZslisMyrQlKjbTyWna7BUBVLv2OQLQdCleoA==
-X-Received: by 2002:a62:8804:0:b029:253:6745:908c with SMTP id l4-20020a6288040000b02902536745908cmr33127774pfd.16.1620788098631;
-        Tue, 11 May 2021 19:54:58 -0700 (PDT)
-Received: from [192.168.4.41] (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
-        by smtp.gmail.com with ESMTPSA id j27sm15178516pgb.54.2021.05.11.19.54.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 May 2021 19:54:58 -0700 (PDT)
-Subject: Re: [PATCH 1/1] block: remove unneeded parenthesis from blk-sysfs
-To:     Max Gurtovoy <mgurtovoy@nvidia.com>, linux-block@vger.kernel.org,
-        martin.petersen@oracle.com
-References: <20210511155319.1885277-1-mgurtovoy@nvidia.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <2f339892-4d25-e870-258f-525c99f691e7@kernel.dk>
-Date:   Tue, 11 May 2021 20:54:56 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        Tue, 11 May 2021 23:25:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1620789856;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=83RC2qtc5cEihhWItsXrcoyXmMoP0cw+w8BGnKZsq/4=;
+        b=cvxB5bD3p0hpnoyZraakfeUOMQI5TQpo0Hz2uWsvEw42Wx4E4xJwsjcD/ISPnCPLqXiuvJ
+        0X8gQggoOU169/VVHSU/Q+11AbRqc8eXmr2EiDK95JAwaOz92MHWXqy3YpHLxolERMZSL+
+        AOcYirzw40vNp3mcczKIU81/P7f8B64=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-506-L_Rd4dvCOzqELtSY7GHHIA-1; Tue, 11 May 2021 23:24:14 -0400
+X-MC-Unique: L_Rd4dvCOzqELtSY7GHHIA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EDF651883522;
+        Wed, 12 May 2021 03:24:12 +0000 (UTC)
+Received: from T590 (ovpn-12-110.pek2.redhat.com [10.72.12.110])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 648725D9D7;
+        Wed, 12 May 2021 03:24:04 +0000 (UTC)
+Date:   Wed, 12 May 2021 11:23:59 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Gulam Mohamed <gulam.mohamed@oracle.com>
+Cc:     viro@zeniv.linux.org.uk, axboe@kernel.dk,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, hch@lst.de,
+        martin.petersen@oracle.com, junxiao.bi@oracle.com
+Subject: Re: [PATCH V1 1/1] Fix race between iscsi logout and systemd-udevd
+Message-ID: <YJtKT7rLi2CFqDsV@T590>
+References: <20210511181558.380764-1-gulam.mohamed@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <20210511155319.1885277-1-mgurtovoy@nvidia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210511181558.380764-1-gulam.mohamed@oracle.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/11/21 9:53 AM, Max Gurtovoy wrote:
-> Align to common code conventions.
+On Tue, May 11, 2021 at 06:15:58PM +0000, Gulam Mohamed wrote:
+> Problem description:
+> 
+> During the kernel patching, customer was switching between the iscsi
+> disks. To switch between the iscsi disks, it was logging out the
+> currently connected iscsi disk and then logging in to the new iscsi
+> disk. This was being done using a script. Customer was also using the
+> "parted" command in the script to list the partition details just
+> before the iscsi logout. This usage of "parted" command was creating
+> an issue and we were seeing stale links of the
+> disks in /sys/class/block.
+> 
+> Analysis:
+> 
+> As part of iscsi logout, the partitions and the disk will be removed
+> in the function del_gendisk() which is done through a kworker. The
+> parted command, used to list the partitions, will open the disk in
+> RW mode which results in systemd-udevd re-reading the partitions. The
+> ioctl used to re-read partitions is BLKRRPART. This will trigger the
+> rescanning of partitions which will also delete and re-add the
+> partitions. So, both iscsi logout processing (through kworker) and the
+> "parted" command (through systemd-udevd) will be involved in
+> add/delete of partitions. In our case, the following sequence of
+> operations happened (the iscsi device is /dev/sdb with partition sdb1):
+> 
+> 1. sdb1 was removed by PARTED
+> 2. kworker, as part of iscsi logout, couldn't remove sdb1 as it was
+>    already removed by PARTED
+> 3. sdb1 was added by parted
+> 4. sdb was NOW removed as part of iscsi logout (the last part of the
+>    device removal after remoing the partitions)
+> 
+> Since the symlink /sys/class/block/sdb1 points to
+> /sys/class/devices/platform/hostx/sessionx/targetx:x/block/sdb/sdb1
+> and since sdb is already removed, the symlink /sys/class/block/sdb1
+> will be orphan and stale. So, this stale link is a result of the race
+> condition in kernel between the systemd-udevd and iscsi-logout
+> processing as described above. We were able to reproduce this even
+> with latest upstream kernel.
+> 
+> Fix:
+> 
+> While Dropping/Adding partitions as part of BLKRRPART ioctl, take the
+> read lock for "bdev_lookup_sem" to sync with del_gendisk().
+> 
+> Signed-off-by: Gulam Mohamed <gulam.mohamed@oracle.com>
+> ---
+>  fs/block_dev.c | 15 +++++++++++++--
+>  1 file changed, 13 insertions(+), 2 deletions(-)
+> 
+> diff --git a/fs/block_dev.c b/fs/block_dev.c
+> index 09d6f7229db9..e903a7edfd63 100644
+> --- a/fs/block_dev.c
+> +++ b/fs/block_dev.c
+> @@ -1245,9 +1245,17 @@ int bdev_disk_changed(struct block_device *bdev, bool invalidate)
+>  	lockdep_assert_held(&bdev->bd_mutex);
+>  
+>  rescan:
+> +	down_read(&bdev_lookup_sem);
+> +	if (!(disk->flags & GENHD_FL_UP)) {
+> +		up_read(&bdev_lookup_sem);
+> +		return -ENXIO;
+> +	}
 
-I think this is a remnant from when they were macros. Applied for 5.14,
-thanks.
+This way might cause deadlock:
 
--- 
-Jens Axboe
+1) code path BLKRRPART:
+	mutex_lock(bdev->bd_mutex)
+	down_read(&bdev_lookup_sem);
+
+2) del_gendisk():
+	down_write(&bdev_lookup_sem);
+	mutex_lock(&disk->part0->bd_mutex);
+
+Given GENHD_FL_UP is only checked when opening one bdev, and
+fsync_bdev() and __invalidate_device() needn't to open bdev, so
+the following way may work for your issue:
+
+
+diff --git a/block/genhd.c b/block/genhd.c
+index 39ca97b0edc6..5eb27995d4ab 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -617,6 +617,7 @@ void del_gendisk(struct gendisk *disk)
+ 
+ 	mutex_lock(&disk->part0->bd_mutex);
+ 	blk_drop_partitions(disk);
++	disk->flags &= ~GENHD_FL_UP;
+ 	mutex_unlock(&disk->part0->bd_mutex);
+ 
+ 	fsync_bdev(disk->part0);
+@@ -629,7 +630,6 @@ void del_gendisk(struct gendisk *disk)
+ 	remove_inode_hash(disk->part0->bd_inode);
+ 
+ 	set_capacity(disk, 0);
+-	disk->flags &= ~GENHD_FL_UP;
+ 	up_write(&bdev_lookup_sem);
+ 
+ 	if (!(disk->flags & GENHD_FL_HIDDEN)) {
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index b8abccd03e5d..06b70b8e3f67 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -1245,6 +1245,8 @@ int bdev_disk_changed(struct block_device *bdev, bool invalidate)
+ 	lockdep_assert_held(&bdev->bd_mutex);
+ 
+ rescan:
++	if(!(disk->flags & GENHD_FL_UP))
++		return -ENXIO;
+ 	if (bdev->bd_part_count)
+ 		return -EBUSY;
+ 	sync_blockdev(bdev);
+
+
+
+Thanks,
+Ming
 
