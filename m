@@ -2,218 +2,150 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,PDS_BAD_THREAD_QP_64,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE91CC43600
-	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 19:44:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A488C433B4
+	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 21:40:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 84E0C613AA
-	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 19:44:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 281CA613BD
+	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 21:40:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239160AbhELTgU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 May 2021 15:36:20 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53142 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S243398AbhELSFm (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 May 2021 14:05:42 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 658C061469;
-        Wed, 12 May 2021 18:04:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1620842642;
-        bh=yUWvzWqsU4F6Oj06Y7fNVRyGoo2onls05eXIg9qfd+Q=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=IlU7MLPYHf8tO+EciTtt2xz3eQmsBWceyXYWNIfjtDFvghUIMbEdfRotBFACSY71Z
-         xDiCOJGX+FUbU0VBytouxKvXipLM0inHx4lh2JfD5OdT61/imvxu8+amuEFZN8vCdv
-         qrc9TO12I+b9jJXyDF5iBPQUaz1Nqmw99VnjMNw9nbo51Z2TwVyffe0yornFPCi0BV
-         pVPqpSqI1KJBIzarCXzDPk6ioVrc59Ha2bI+TVvVU80fLbW3ZXtIlgo92fTkDFeC9J
-         ajaj/n76VdRdz3b19fPvICursxjDQVtmvJb1L1IwA+lM1VR6UfM36ZPTkLJUzmBIb1
-         lDsV5SXt4b0bA==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     yangerkun <yangerkun@huawei.com>,
-        Pavel Begunkov <asml.silencec@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 32/34] block: reexpand iov_iter after read/write
-Date:   Wed, 12 May 2021 14:03:03 -0400
-Message-Id: <20210512180306.664925-32-sashal@kernel.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210512180306.664925-1-sashal@kernel.org>
-References: <20210512180306.664925-1-sashal@kernel.org>
+        id S239977AbhELVlu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 May 2021 17:41:50 -0400
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:26172 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238761AbhELUDG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 12 May 2021 16:03:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1620849716; x=1652385716;
+  h=from:to:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=iL99Xo4bmiUZMxTGwH3uL4UqlB/7p3VRJD+NYKEA9jw=;
+  b=cgqJy2BW5B5uBUTMfV+kwS2RaOSTf6cJPKrYwGB7ppLWsRO054CVUnWf
+   JUvhp6aVzWpu9LZ3dr3K05ZQmQQqcYrI3++7HI1+s4cjm9cmQZQ/JTSHk
+   vacDu9L32C1gjfI8ZWSJjl8C5KmS97tTVQO0m/uZ3OzjY017WZJJIyT5m
+   I7ASqeN9YNxuDJC4TWWbQoo1slSyAwEhGUxAEsh5caeum17aRQhDgtuWq
+   cqM6z3zGcytwmyq86TbOLo90YfMyelgg0axsE0Z2SaYXYqXiSQiJBFcqX
+   n+YQregxVWgytr9bVbtnVUO+tYWtATPrpXh4K9PJB9Uc+UJem8lqfsK1F
+   g==;
+IronPort-SDR: z+QexEgDcMxgH99+N516f6vpAxrqIMHOYZ2ans2OIWZ/XgtG61WCfLfUPIXYd6uDxK+JxcU++d
+ kT9/DhkDyK0En28JGDEtJsuj/BBQDmFHSyRh5oxLBpi7T6yb89Y7WQBSzaxtsYOcUQWJVPMk8t
+ Z1dSCqP851/5+OeO0OS+gyeAqexF/ZUhJLUAyQ30XsBSKp/kjNlKrJhvzZ9HSmrFTlRjLRfvZq
+ fSvXDDD3vb3gwnN4nd/GE4eVmc5dnnyv9+nEbFcutFcTwrRnxTO9+qpAqSh0Zb8/4cKy5jHWlZ
+ M5Y=
+X-IronPort-AV: E=Sophos;i="5.82,295,1613404800"; 
+   d="scan'208";a="168508053"
+Received: from mail-mw2nam12lp2048.outbound.protection.outlook.com (HELO NAM12-MW2-obe.outbound.protection.outlook.com) ([104.47.66.48])
+  by ob1.hgst.iphmx.com with ESMTP; 13 May 2021 04:01:46 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=kPbwKYdgHV3fO36o+e1byGTg7ojumMNQwWA2ggPAevEI7gpvCKiAGqvdIEkgWlHrKTRBkhWPtvppzlRUxsxkgnqV7jPOB633UYgDdU80MK2HURhZTURT/V54vEmJdqZGijMfKR0BuJQkq/31afMHdpQTeFnDesSQa9JeGtRu+GrjWwEjvAf4QrXloFGPkM18cEyD7TUGpWpkPfrSuEo0I75Cx2vLaApBdScKsvHXVk4wQ5ktSebjJGMBOJIaBmgQLf1vp/by/z9vscDeyE0hu/wrAyfaRKVxCvlHljNJwu38cauRHqn7PcrGw3Cuvadc9RjalVKioA4hrjp35/qO9g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=iL99Xo4bmiUZMxTGwH3uL4UqlB/7p3VRJD+NYKEA9jw=;
+ b=M+A2rwh3gC20ZL3Yte2daBlfFr5sIyaOYYKw/nT42zr65FOnoWsQZn6OtWmaJ7NgxmF98t2ZeES9N3MykMpLntgmTEQ1ICi+hqkC0VvSul9TXRex4xrh2EPHFEsttUMJydz81RhEUbqwXxU4eEEdWtQEgE1//3ypXC5o+ElDLnysJrgCQsL2r9inGRI+tl9p8gyWKD6IZUpQeJ7V/PsIMm7e3Bi3wGYtPFjuAR0nDq1phCwBjfXr+CC6G7v7HV/LF7CjEdEzP/Zrn7o2TbvfXLO7YT/GoexDsYY0hTo/y4JCy8KRueuS5KwMhHkBj+BzqH7GT2ycwdGs18bmpZ+jww==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=iL99Xo4bmiUZMxTGwH3uL4UqlB/7p3VRJD+NYKEA9jw=;
+ b=r8ONRogsSn4/n1xz+oOe2wq4278FBEZmB/pi1qXcjRLLWBw+ToqoHj95TxdyTXvqmbgiG9RLxY8M+QloscVqC09/o81WJWiXpYgDPuS3YbvO2YzL/6oFwB50Gtbeu/LPJqSLApBcY4QDJbBlji1uNwhevZPQm6UkO+JWjc2enFg=
+Received: from BYAPR04MB4965.namprd04.prod.outlook.com (2603:10b6:a03:4d::25)
+ by SJ0PR04MB7680.namprd04.prod.outlook.com (2603:10b6:a03:324::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4129.25; Wed, 12 May
+ 2021 20:01:44 +0000
+Received: from BYAPR04MB4965.namprd04.prod.outlook.com
+ ([fe80::6873:3d64:8f9f:faf0]) by BYAPR04MB4965.namprd04.prod.outlook.com
+ ([fe80::6873:3d64:8f9f:faf0%7]) with mapi id 15.20.4108.031; Wed, 12 May 2021
+ 20:01:44 +0000
+From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+To:     Nikolay Borisov <nborisov@suse.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>
+Subject: Re: [PATCH] blk-mq: Use helpers to access rq->state
+Thread-Topic: [PATCH] blk-mq: Use helpers to access rq->state
+Thread-Index: AQHXRxQ8ZTsafKwn90e/FGE2vjutDg==
+Date:   Wed, 12 May 2021 20:01:44 +0000
+Message-ID: <BYAPR04MB4965C9302E1CA6B144A6CD8586529@BYAPR04MB4965.namprd04.prod.outlook.com>
+References: <20210512095017.235295-1-nborisov@suse.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: suse.com; dkim=none (message not signed)
+ header.d=none;suse.com; dmarc=none action=none header.from=wdc.com;
+x-originating-ip: [199.255.45.62]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 71edd4a7-ae54-4402-85ce-08d91580c470
+x-ms-traffictypediagnostic: SJ0PR04MB7680:
+x-microsoft-antispam-prvs: <SJ0PR04MB7680A8B86EE8061AB6C948C586529@SJ0PR04MB7680.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-oob-tlc-oobclassifiers: OLM:1728;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 36oLPC/0Omt6LZe627Pmg3GjmfGrsp5EAlSN+qVRYCcEBk+xSayUYHoYXY8/+tz0A9wsaX6ysMMgAAi4ZrD/tZ+gmtl443fWBhOV3rdcPNcAnahBucUv4rtxpYKy1FG3RRJnk9xIbCOCqgerNMqb2G9JKxtovyQOf9tBjqBWFlJw57joXAIWwlPP0BrkZRNOnCcnRBnwANopT6xvHp34Xx34dRC/BT1PvWrQKRYPXl2l9r7btIUSXi9nzrUVwxOPofQLedZ967AGyb7kVl2txjIukwEOCqGi5+5tMa5N06/YYnn0T2kg0RZS3ylXdZhJQSX86e3MG6KK0sX9xHt14fQh2WymY7Qqbo+g520YCqIWCFVGIpauTEo9DnYltdk5xhEbJKMBn6uxoFCmFUH64ADThIcnsGwWPXnAOAwLUdASMQJDQyxNGWKgw+kLX8yEPBvHVoN/nKFLRtZyoKTQqfApMY0ZU3GWrtrr++V43qw1Twg7JqwtTfpJ61p6jRUZpn1+m5C01m1Vzf6D2uDuWZRup1rJJD7sbAF15vte7cicxxl4vIvH5Ip+hjHH0uGvZNHz5IncXJv8vPoe3hYZat8x6tmUpfr/jYvM86XQtsc=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR04MB4965.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39860400002)(346002)(136003)(376002)(396003)(366004)(33656002)(26005)(86362001)(55016002)(316002)(9686003)(2906002)(52536014)(76116006)(38100700002)(478600001)(4744005)(8936002)(7696005)(186003)(71200400001)(8676002)(53546011)(122000001)(6506007)(66946007)(66556008)(64756008)(66446008)(66476007)(5660300002)(110136005);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: =?us-ascii?Q?zEbZW3yuUhO2xmevE7z/GmfktT8Atqi0ZYQHgMIrjy4EZ/is2l3N4fWsT8YQ?=
+ =?us-ascii?Q?c5D0oxaif+CCpIAZ3jWY4uCHHM0XvfcFEmOCoGDa9qc/pUc/RYWY1IYPpNBn?=
+ =?us-ascii?Q?cLEE1j/4oQhqoSUyDQdT/M/E8cMj2cy0D/CMgfgT1IDg/r+ZbC0PRlKoeaV/?=
+ =?us-ascii?Q?0fh7mrt2hjTW3GtIFI2YBW7EmyRu3DrzlEJf8GLfmlszSvQS7HzDjKDMDg05?=
+ =?us-ascii?Q?Bgzf9EzKZSQb4xKkPTSbVLvpuXMsskPVsexqYbPtSd4WNog59ZCj3/SjuZ6A?=
+ =?us-ascii?Q?5YRwKV/xxL/97wZd1tTN8kJh1yPLo1gvFaJS73O8mfRIXFr6e7cJktXEtSP+?=
+ =?us-ascii?Q?VZhf3J8+BqynWY+AntYILz4jusr7Bfx0aUYTtez8w3/MWJGPlAt+22j7r1+N?=
+ =?us-ascii?Q?wxn+XmyRah49K/X2DIMF9rB9UDj2ScByLLkMhGwBUHIMFDitxUm7F6nAWUTs?=
+ =?us-ascii?Q?e1e6R+pgRGAWUwbcjwlNDZlr75MacXILkhRrYX7bJqynZ/ffwjuHUNUaqr97?=
+ =?us-ascii?Q?YU0/3OBEXV8ZExdJihDGQQ+//IduMR99miu1HJEjN25lWr6ylxRlk8DZEVsi?=
+ =?us-ascii?Q?LBWnNfLfAg7W5XkrWX8oftq9ZfbtK+2S8wkouXNzZQB6L/5YtRZr/7pcBoY8?=
+ =?us-ascii?Q?VXCTeEHUc8e92Ejf/+9+Qk2n6i4Xf/kKFgZZgfuqaTaZw/oLq1tdDDmWo+hg?=
+ =?us-ascii?Q?L8rlOk1Fw2Va3qjlOsAfxiBzWMU7+Fo6IeChFNjX2DoWp7MzyAM5MNtQ77/y?=
+ =?us-ascii?Q?DrxLH8Z6bULS8H4c4sRUyoX0kw2z4u1UhDlfFEOkrfozK1gEbbtC/2wiiHCz?=
+ =?us-ascii?Q?ASZW6OtY/3cDb5mFdT3cudQdgjexFEnu/XYiIKcjeqBcPjfXfCD9KKzNQ1ur?=
+ =?us-ascii?Q?30NM+7bOmMCJeMIcYfcy6dqzbRIZiFRoDW3NATeXWStvb6tkydC9c09c3YTl?=
+ =?us-ascii?Q?XKp3G7JdZR7rkTU/8dHx58cPASRcldokgxC5+F9kWHypJIemg9kE5YVL0kxI?=
+ =?us-ascii?Q?G9w+S34tR3q38CTr5lwpu18/tQYh8b/dR6Qwr5z5yyoQAAFVGiYzQXqpVwCN?=
+ =?us-ascii?Q?uqYAc6Fo2+4GqbxaU5G0fk3VFLKTQEC9j1h/5Az41+eonGooBoyXYrcbUrwE?=
+ =?us-ascii?Q?H7lY329fk76NuLNv+jleyxetBuTfVNJSZJNnmHtaLDMxIEdlueBXa6qF6dKA?=
+ =?us-ascii?Q?yhtIg+OBaEMZQnAWR/HWS3bJwXBbe0PgRQtRqqV2Hl3ws7x9y8mLXgyvbLpU?=
+ =?us-ascii?Q?T9lSF+LoCEqMi1GodYm2CTRbGW0gEchxmVGez6Ka4/07NzKGq6VaLQAYgafX?=
+ =?us-ascii?Q?AjAvDEMG4ypgB/FIIxrfcA38?=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR04MB4965.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 71edd4a7-ae54-4402-85ce-08d91580c470
+X-MS-Exchange-CrossTenant-originalarrivaltime: 12 May 2021 20:01:44.3612
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: COCTVi3BbwEGwZlSYOG0Ui+uy19X3UgUszOyqzypUU73YFg4FixkCEe5AWkqZfO3+Xpkqg3zxjtiwd8GDU2j3cY16spSZR1yGeJXp4yru4A=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR04MB7680
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: yangerkun <yangerkun@huawei.com>
-
-[ Upstream commit cf7b39a0cbf6bf57aa07a008d46cf695add05b4c ]
-
-We get a bug:
-
-BUG: KASAN: slab-out-of-bounds in iov_iter_revert+0x11c/0x404
-lib/iov_iter.c:1139
-Read of size 8 at addr ffff0000d3fb11f8 by task
-
-CPU: 0 PID: 12582 Comm: syz-executor.2 Not tainted
-5.10.0-00843-g352c8610ccd2 #2
-Hardware name: linux,dummy-virt (DT)
-Call trace:
- dump_backtrace+0x0/0x2d0 arch/arm64/kernel/stacktrace.c:132
- show_stack+0x28/0x34 arch/arm64/kernel/stacktrace.c:196
- __dump_stack lib/dump_stack.c:77 [inline]
- dump_stack+0x110/0x164 lib/dump_stack.c:118
- print_address_description+0x78/0x5c8 mm/kasan/report.c:385
- __kasan_report mm/kasan/report.c:545 [inline]
- kasan_report+0x148/0x1e4 mm/kasan/report.c:562
- check_memory_region_inline mm/kasan/generic.c:183 [inline]
- __asan_load8+0xb4/0xbc mm/kasan/generic.c:252
- iov_iter_revert+0x11c/0x404 lib/iov_iter.c:1139
- io_read fs/io_uring.c:3421 [inline]
- io_issue_sqe+0x2344/0x2d64 fs/io_uring.c:5943
- __io_queue_sqe+0x19c/0x520 fs/io_uring.c:6260
- io_queue_sqe+0x2a4/0x590 fs/io_uring.c:6326
- io_submit_sqe fs/io_uring.c:6395 [inline]
- io_submit_sqes+0x4c0/0xa04 fs/io_uring.c:6624
- __do_sys_io_uring_enter fs/io_uring.c:9013 [inline]
- __se_sys_io_uring_enter fs/io_uring.c:8960 [inline]
- __arm64_sys_io_uring_enter+0x190/0x708 fs/io_uring.c:8960
- __invoke_syscall arch/arm64/kernel/syscall.c:36 [inline]
- invoke_syscall arch/arm64/kernel/syscall.c:48 [inline]
- el0_svc_common arch/arm64/kernel/syscall.c:158 [inline]
- do_el0_svc+0x120/0x290 arch/arm64/kernel/syscall.c:227
- el0_svc+0x1c/0x28 arch/arm64/kernel/entry-common.c:367
- el0_sync_handler+0x98/0x170 arch/arm64/kernel/entry-common.c:383
- el0_sync+0x140/0x180 arch/arm64/kernel/entry.S:670
-
-Allocated by task 12570:
- stack_trace_save+0x80/0xb8 kernel/stacktrace.c:121
- kasan_save_stack mm/kasan/common.c:48 [inline]
- kasan_set_track mm/kasan/common.c:56 [inline]
- __kasan_kmalloc+0xdc/0x120 mm/kasan/common.c:461
- kasan_kmalloc+0xc/0x14 mm/kasan/common.c:475
- __kmalloc+0x23c/0x334 mm/slub.c:3970
- kmalloc include/linux/slab.h:557 [inline]
- __io_alloc_async_data+0x68/0x9c fs/io_uring.c:3210
- io_setup_async_rw fs/io_uring.c:3229 [inline]
- io_read fs/io_uring.c:3436 [inline]
- io_issue_sqe+0x2954/0x2d64 fs/io_uring.c:5943
- __io_queue_sqe+0x19c/0x520 fs/io_uring.c:6260
- io_queue_sqe+0x2a4/0x590 fs/io_uring.c:6326
- io_submit_sqe fs/io_uring.c:6395 [inline]
- io_submit_sqes+0x4c0/0xa04 fs/io_uring.c:6624
- __do_sys_io_uring_enter fs/io_uring.c:9013 [inline]
- __se_sys_io_uring_enter fs/io_uring.c:8960 [inline]
- __arm64_sys_io_uring_enter+0x190/0x708 fs/io_uring.c:8960
- __invoke_syscall arch/arm64/kernel/syscall.c:36 [inline]
- invoke_syscall arch/arm64/kernel/syscall.c:48 [inline]
- el0_svc_common arch/arm64/kernel/syscall.c:158 [inline]
- do_el0_svc+0x120/0x290 arch/arm64/kernel/syscall.c:227
- el0_svc+0x1c/0x28 arch/arm64/kernel/entry-common.c:367
- el0_sync_handler+0x98/0x170 arch/arm64/kernel/entry-common.c:383
- el0_sync+0x140/0x180 arch/arm64/kernel/entry.S:670
-
-Freed by task 12570:
- stack_trace_save+0x80/0xb8 kernel/stacktrace.c:121
- kasan_save_stack mm/kasan/common.c:48 [inline]
- kasan_set_track+0x38/0x6c mm/kasan/common.c:56
- kasan_set_free_info+0x20/0x40 mm/kasan/generic.c:355
- __kasan_slab_free+0x124/0x150 mm/kasan/common.c:422
- kasan_slab_free+0x10/0x1c mm/kasan/common.c:431
- slab_free_hook mm/slub.c:1544 [inline]
- slab_free_freelist_hook mm/slub.c:1577 [inline]
- slab_free mm/slub.c:3142 [inline]
- kfree+0x104/0x38c mm/slub.c:4124
- io_dismantle_req fs/io_uring.c:1855 [inline]
- __io_free_req+0x70/0x254 fs/io_uring.c:1867
- io_put_req_find_next fs/io_uring.c:2173 [inline]
- __io_queue_sqe+0x1fc/0x520 fs/io_uring.c:6279
- __io_req_task_submit+0x154/0x21c fs/io_uring.c:2051
- io_req_task_submit+0x2c/0x44 fs/io_uring.c:2063
- task_work_run+0xdc/0x128 kernel/task_work.c:151
- get_signal+0x6f8/0x980 kernel/signal.c:2562
- do_signal+0x108/0x3a4 arch/arm64/kernel/signal.c:658
- do_notify_resume+0xbc/0x25c arch/arm64/kernel/signal.c:722
- work_pending+0xc/0x180
-
-blkdev_read_iter can truncate iov_iter's count since the count + pos may
-exceed the size of the blkdev. This will confuse io_read that we have
-consume the iovec. And once we do the iov_iter_revert in io_read, we
-will trigger the slab-out-of-bounds. Fix it by reexpand the count with
-size has been truncated.
-
-blkdev_write_iter can trigger the problem too.
-
-Signed-off-by: yangerkun <yangerkun@huawei.com>
-Acked-by: Pavel Begunkov <asml.silencec@gmail.com>
-Link: https://lore.kernel.org/r/20210401071807.3328235-1-yangerkun@huawei.com
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- fs/block_dev.c | 20 +++++++++++++++++---
- 1 file changed, 17 insertions(+), 3 deletions(-)
-
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 718533f0fb90..cacea6bafc22 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -1903,6 +1903,7 @@ ssize_t blkdev_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 	struct inode *bd_inode = bdev_file_inode(file);
- 	loff_t size = i_size_read(bd_inode);
- 	struct blk_plug plug;
-+	size_t shorted = 0;
- 	ssize_t ret;
- 
- 	if (bdev_read_only(I_BDEV(bd_inode)))
-@@ -1920,12 +1921,17 @@ ssize_t blkdev_write_iter(struct kiocb *iocb, struct iov_iter *from)
- 	if ((iocb->ki_flags & (IOCB_NOWAIT | IOCB_DIRECT)) == IOCB_NOWAIT)
- 		return -EOPNOTSUPP;
- 
--	iov_iter_truncate(from, size - iocb->ki_pos);
-+	size -= iocb->ki_pos;
-+	if (iov_iter_count(from) > size) {
-+		shorted = iov_iter_count(from) - size;
-+		iov_iter_truncate(from, size);
-+	}
- 
- 	blk_start_plug(&plug);
- 	ret = __generic_file_write_iter(iocb, from);
- 	if (ret > 0)
- 		ret = generic_write_sync(iocb, ret);
-+	iov_iter_reexpand(from, iov_iter_count(from) + shorted);
- 	blk_finish_plug(&plug);
- 	return ret;
- }
-@@ -1937,13 +1943,21 @@ ssize_t blkdev_read_iter(struct kiocb *iocb, struct iov_iter *to)
- 	struct inode *bd_inode = bdev_file_inode(file);
- 	loff_t size = i_size_read(bd_inode);
- 	loff_t pos = iocb->ki_pos;
-+	size_t shorted = 0;
-+	ssize_t ret;
- 
- 	if (pos >= size)
- 		return 0;
- 
- 	size -= pos;
--	iov_iter_truncate(to, size);
--	return generic_file_read_iter(iocb, to);
-+	if (iov_iter_count(to) > size) {
-+		shorted = iov_iter_count(to) - size;
-+		iov_iter_truncate(to, size);
-+	}
-+
-+	ret = generic_file_read_iter(iocb, to);
-+	iov_iter_reexpand(to, iov_iter_count(to) + shorted);
-+	return ret;
- }
- EXPORT_SYMBOL_GPL(blkdev_read_iter);
- 
--- 
-2.30.2
-
+On 5/12/21 02:50, Nikolay Borisov wrote:=0A=
+> Instead of having a mixed bag of opencoded usage and helper usage,=0A=
+> simply replace opencoded sites with the appropriate helper. No=0A=
+> functional changes.=0A=
+>=0A=
+> Signed-off-by: Nikolay Borisov <nborisov@suse.com>=0A=
+=0A=
+Not sure if that is kept open coded to make code easy to read.=0A=
+=0A=
+In either case looks good.=0A=
+=0A=
+Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>=0A=
+=0A=
+=0A=
