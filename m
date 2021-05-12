@@ -2,97 +2,89 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DF59C43461
-	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 22:58:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8EC6C433B4
+	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 22:59:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 53D45613EE
-	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 22:58:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8BFE0613E6
+	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 22:59:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235855AbhELW7u (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 May 2021 18:59:50 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48650 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1443376AbhELWSB (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 May 2021 18:18:01 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 8DCE160FE5;
-        Wed, 12 May 2021 22:16:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1620857812;
-        bh=gWvXwEcUW9/zyCDBF+2nlh6sqFqdf0UI2tvHhr1sEBI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=HGr9heSTZtAV6hJ5Uuoc0TrX22mINbku96TDtiPDJ084KaKqhXEFugrSKPQfNUhU2
-         riINRXq+ogjYsM29IVthNd95eYfXF/RsaYH7xzp4Fw8yy+SeciMASLxH2E3NHCH3RH
-         R+LWxFsOcUPva+cE1D7AmmgPLFP8PSFkHOpHQFxQH4pJdfEJS4bP16B2tzO4Dkjxns
-         NYKXG+TX3H0RHzfBfTZAM6w13rTIBaZzBqKZ/C97gYTeKMsGg2lECJMVFO9PZK+ihS
-         AJZgMwQtnSzzEde48iIQ/IyVvwUs65yzGeQyAbo3sEE6wJnZ1FhW54IHPX7b9M/O2+
-         cpZzTb+2e9Dhw==
-Date:   Wed, 12 May 2021 15:16:49 -0700
-From:   Keith Busch <kbusch@kernel.org>
-To:     Sagi Grimberg <sagi@grimberg.me>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Jeffle Xu <jefflexu@linux.alibaba.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        "Wunderlich, Mark" <mark.wunderlich@intel.com>,
-        "Vasudevan, Anil" <anil.vasudevan@intel.com>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-nvme@lists.infradead.org
-Subject: Re: [PATCH 15/15] nvme-multipath: enable polled I/O
-Message-ID: <20210512221649.GB2270434@dhcp-10-100-145-180.wdc.com>
-References: <20210512131545.495160-1-hch@lst.de>
- <20210512131545.495160-16-hch@lst.de>
- <2ae11b40-1d03-af08-aade-022fc1f0a743@grimberg.me>
+        id S232644AbhELW7z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 May 2021 18:59:55 -0400
+Received: from mail-pl1-f179.google.com ([209.85.214.179]:39487 "EHLO
+        mail-pl1-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1348890AbhELWYP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 12 May 2021 18:24:15 -0400
+Received: by mail-pl1-f179.google.com with SMTP id t4so13310764plc.6
+        for <linux-block@vger.kernel.org>; Wed, 12 May 2021 15:23:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=9zLY425xAPm5dg8y0L8KPWDn3DL0qDj00Tbv6wVX/9I=;
+        b=AI+NOomPFZjOmNzed4c7N0mMyDlAPJE1y6HnCk0qkFby3yhivyOIDPOh+ktNgnNZMP
+         GKJ2dlhJbNFSTY8IHSuvZ0rDfunqWA8MzHeT7b5L9Hb9agBCNZFoeMPrw+bhb4OcuqQB
+         /ABw1BMlcsVjYR5E/DCXXFeoHoeVKzuV623B9EBYAIJLx/lTcxaictHXk5XzxcFtC7xo
+         YAzF75NjOKjAI3sR9Z7D4aEUId9oKDp2lTSfGR2ikgTSIa1Cu2p5MfdfKxJMVttYHHjY
+         p1UwdRXu/KT5Qgyb7zKzGR+FAfdbFwLJMw7scGBh2xZjOWc9au3hTa5DH4/yJhXNcuen
+         GGxQ==
+X-Gm-Message-State: AOAM530fohXzk/q54GL/gFl6VeAZTq8Qc4KRFdn2lYHTwYgppCElDDPq
+        nViGo642lLIDlBumKs76itU=
+X-Google-Smtp-Source: ABdhPJxrZQcPLl4CynVlQ3IEHFgWOzKF9tFptOnxnNlSwn8giYHLIv85KPFvOMiOoAUfarY76YEYQg==
+X-Received: by 2002:a17:902:d718:b029:ee:cf89:57ea with SMTP id w24-20020a170902d718b02900eecf8957eamr37652876ply.3.1620858185660;
+        Wed, 12 May 2021 15:23:05 -0700 (PDT)
+Received: from [192.168.51.110] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
+        by smtp.gmail.com with ESMTPSA id m14sm690975pff.17.2021.05.12.15.23.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 12 May 2021 15:23:03 -0700 (PDT)
+Subject: Re: [PATCH] block/partitions/efi.c: Fix the efi_partition()
+ kernel-doc header
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Alexander Viro <viro@math.psu.edu>
+References: <20210512201700.9788-1-bvanassche@acm.org>
+ <ef6562fa-6f8f-da28-b0f7-90a126ab4222@kernel.dk>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <6be8f403-aa1e-7149-a2cf-a5925c471efc@acm.org>
+Date:   Wed, 12 May 2021 15:23:02 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2ae11b40-1d03-af08-aade-022fc1f0a743@grimberg.me>
+In-Reply-To: <ef6562fa-6f8f-da28-b0f7-90a126ab4222@kernel.dk>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, May 12, 2021 at 03:10:58PM -0700, Sagi Grimberg wrote:
+On 5/12/21 2:18 PM, Jens Axboe wrote:
+> On 5/12/21 2:17 PM, Bart Van Assche wrote:
+>> Fix the following kernel-doc warning:
+>>
+>> block/partitions/efi.c:685: warning: wrong kernel-doc identifier on line:
+>>   * efi_partition(struct parsed_partitions *state)
+>>
+>> Cc: Alexander Viro <viro@math.psu.edu>
+>> Fixes: a22f8253014b ("[PATCH] partition parsing cleanup")
 > 
-> > Set the poll queue flag to enable polling, given that the multipath
-> > node just dispatches the bios to a lower queue.
-> > 
-> > Signed-off-by: Christoph Hellwig <hch@lst.de>
-> > ---
-> >   drivers/nvme/host/multipath.c | 9 +++++++++
-> >   1 file changed, 9 insertions(+)
-> > 
-> > diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
-> > index 516fe977606d..e95b93655d06 100644
-> > --- a/drivers/nvme/host/multipath.c
-> > +++ b/drivers/nvme/host/multipath.c
-> > @@ -446,6 +446,15 @@ int nvme_mpath_alloc_disk(struct nvme_ctrl *ctrl, struct nvme_ns_head *head)
-> >   		goto out;
-> >   	blk_queue_flag_set(QUEUE_FLAG_NONROT, q);
-> >   	blk_queue_flag_set(QUEUE_FLAG_NOWAIT, q);
-> > +	/*
-> > +	 * This assumes all controllers that refer to a namespace either
-> > +	 * support poll queues or not.  That is not a strict guarantee,
-> > +	 * but if the assumption is wrong the effect is only suboptimal
-> > +	 * performance but not correctness problem.
-> > +	 */
-> > +	if (ctrl->tagset->nr_maps > HCTX_TYPE_POLL &&
-> > +	    ctrl->tagset->map[HCTX_TYPE_POLL].nr_queues)
-> > +		blk_queue_flag_set(QUEUE_FLAG_POLL, q);
+> Heh, I think using a sha from the history tree might cause more
+> harm than good. If you want it applied to any stable, probably
+> better to just use:
 > 
-> If one controller does not support polling and the other does, won't
-> the block layer fail to map a queue for REQ_POLLED requests?
-> 
-> Maybe clear in the else case here?
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
 
-This only gets called once per head, though, so it's just going to
-inherit whatever capabilities the first controller happens to have. If
-we do set QUEUE_FLAG_POLL, but the chosen path happens to not support
-it, then submit_bio_checks() will strip off the bio flag and it will be
-processed as a non-polled request.
+You are right, but it is not my intention to send this patch to any 
+stable tree. I'm fine with leaving out the Fixes: tag. If it would be 
+inconvenient for you to do this then I will repost this patch.
 
-If the first controller can't support a polled queue, then other
-controllers that do will just have unusable resources.
+Thanks,
+
+Bart.
+
+
