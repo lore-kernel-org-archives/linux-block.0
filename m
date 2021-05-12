@@ -2,86 +2,92 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9919AC43461
-	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 13:16:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84DBEC433B4
+	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 13:39:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6311761363
-	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 13:16:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4F627613EE
+	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 13:39:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232123AbhELNSE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 May 2021 09:18:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45556 "EHLO
+        id S230300AbhELNlE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 May 2021 09:41:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50844 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232167AbhELNRm (ORCPT
+        with ESMTP id S230265AbhELNlD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 May 2021 09:17:42 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49E77C06138D;
-        Wed, 12 May 2021 06:16:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=ErQiIq/YOmz4YzZ4E99a6RCK5eOX97ipCw7O3ph9DFs=; b=EQDE4xee/RkNRgVsT4OjfS6yh4
-        ruKZgSDj7EHjo6N4MP7LWp/Z9GNkxpGCZQagOyTBpNK12CkFqg/UD4nSmtRHwXqhoTHyfZWQfjqrG
-        9RIThTi0y3AB2WXSIpC4Pxo2phhhm7maPm+Sz7SyDf/qEThHO0yp3Yzyz9nRoJwxtyzwxW1X5jmjI
-        qYjVqfbcDOQ2G0SbOBvS4TZcn8XC1OieR6AfhLDuwFPtREuMWk+mP0Q++P/9WimijUU6cTLQWMNlt
-        27CaKQKjdv+DIEv+3SBIQvq4dL2RhVoW20+2YmzNeAo7D7HmMMpXsGdsaFmngES4fNGG9wxTxJLVQ
-        0ajtsp/g==;
-Received: from [2001:4bb8:198:fbc8:1036:7ab9:f97a:adbc] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
-        id 1lgoiw-00AO5j-FW; Wed, 12 May 2021 13:16:27 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Jeffle Xu <jefflexu@linux.alibaba.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Keith Busch <kbusch@kernel.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        "Wunderlich, Mark" <mark.wunderlich@intel.com>,
-        "Vasudevan, Anil" <anil.vasudevan@intel.com>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-nvme@lists.infradead.org
-Subject: [PATCH 14/15] nvme-multipath: set QUEUE_FLAG_NOWAIT
-Date:   Wed, 12 May 2021 15:15:44 +0200
-Message-Id: <20210512131545.495160-15-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210512131545.495160-1-hch@lst.de>
-References: <20210512131545.495160-1-hch@lst.de>
+        Wed, 12 May 2021 09:41:03 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABCE8C061574
+        for <linux-block@vger.kernel.org>; Wed, 12 May 2021 06:39:54 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id jc24so834808pjb.2
+        for <linux-block@vger.kernel.org>; Wed, 12 May 2021 06:39:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=7HnfwX7m3Z+g9y+GxvV9dTr4oQgwcIKMOrB57DgGB/M=;
+        b=RTwXYeJiCx5LbA/TppKdWG0bNmgqampo4zDXVYfA3AqbhFdlwCw6wfiKqLIhVRtIfb
+         B21DPt8xHlw5rCM8LXxfjz4tQk2HAaxCGEQcTciSfS/n2YFZ+4Rhi8zibR8jxWcZwOFv
+         lRKod4qWmA5J6HeVQKaKZ9sI7OCtqJMAwknWMBp5BYjMwP9EJwNo1v6Ozv4V+xiuq/eK
+         RfYjLjgOhHeKoKhf+YfcXLDrRV2NDeY6XM8ttaNLryA9S8q4hZcFuhvqTexYvaKvKMZ/
+         Xf5JNRv1IA6j20ir1aCmw+4BxFof+6PFo20aHoS0ToPpVZQw6F5pT8VZ8LTkePK/7xg6
+         YSqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=7HnfwX7m3Z+g9y+GxvV9dTr4oQgwcIKMOrB57DgGB/M=;
+        b=XIZJntdPY8yoEEDwAeLy+JOWruCXwjz0Pkkn02TtsuLHhkNZiEMfArK63ThdWuFO3g
+         KUTu23EpYwo7CYAtWTUJgnD1UpQdrFcsTynXEdfDBHT8+cH4al/Hx4XFwd9elCyW8LzY
+         T5CmU9tecEjGipi1MUP11b+tMRqEdyfoLwfSioas5OLrdaIwC6+Vbk1P3wkyeZLvBfwv
+         BOP/Yvs/kjQBQQQ8tdT6MbVerkYp3a6p7OCCVpigmbnZ/iHE7h8bx2orbMCQ3zoNh7Ch
+         IY+BtdYuQH1g3dm7yqi/ny2H0GlD56IyTS4f6y4alscWMlpsvPgU3kQn1TIIkZ4NEtZ8
+         sHqA==
+X-Gm-Message-State: AOAM530GI+3FWHKFeYt0R7ysObDb1xslsnkKFZ2QhbYVVM3psn6zmb8u
+        gERxdaNQfAio13xPPmBW0i4Oi+9M7pbD0A==
+X-Google-Smtp-Source: ABdhPJxP6vRQYyKOUIGJG6xxYEUOrOMhrrtAzel+K3wr2JRaGqTBKmFUGojyyUTsAfc0BvuvA9M1Fg==
+X-Received: by 2002:a17:90a:1382:: with SMTP id i2mr10981240pja.83.1620826794133;
+        Wed, 12 May 2021 06:39:54 -0700 (PDT)
+Received: from [192.168.4.41] (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
+        by smtp.gmail.com with ESMTPSA id 80sm49501pgc.23.2021.05.12.06.39.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 12 May 2021 06:39:53 -0700 (PDT)
+Subject: Re: [PATCH BUGFIX 0/1] block, bfq: a bugfix for stable merge
+To:     Paolo Valente <paolo.valente@linaro.org>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@redhat.com
+References: <20210512094352.85545-1-paolo.valente@linaro.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <d83a2097-3800-a222-4580-ae692bfac030@kernel.dk>
+Date:   Wed, 12 May 2021 07:39:53 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20210512094352.85545-1-paolo.valente@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The nvme multipathing code just dispatches bios to one of the blk-mq
-based paths and never blocks on its own, so set QUEUE_FLAG_NOWAIT
-to support REQ_NOWAIT bios.
+On 5/12/21 3:43 AM, Paolo Valente wrote:
+> Hi,
+> this patch fixes a bug I've found while debugging a failure reported
+> by Yi Zhang [1].
+> 
+> This patch seems to make that failure disappear [1]. Yet it was tested
+> only together with other debug patches (which add logs and invariant
+> checks), so I don't know whether the other patches influenced the
+> outcome as well. At any rate, this patch does fix a bug.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/nvme/host/multipath.c | 2 ++
- 1 file changed, 2 insertions(+)
+Applied, thanks.
 
-diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
-index 74455960337b..516fe977606d 100644
---- a/drivers/nvme/host/multipath.c
-+++ b/drivers/nvme/host/multipath.c
-@@ -445,6 +445,8 @@ int nvme_mpath_alloc_disk(struct nvme_ctrl *ctrl, struct nvme_ns_head *head)
- 	if (!q)
- 		goto out;
- 	blk_queue_flag_set(QUEUE_FLAG_NONROT, q);
-+	blk_queue_flag_set(QUEUE_FLAG_NOWAIT, q);
-+
- 	/* set to a default value for 512 until disk is validated */
- 	blk_queue_logical_block_size(q, 512);
- 	blk_set_stacking_limits(&q->limits);
 -- 
-2.30.2
+Jens Axboe
 
