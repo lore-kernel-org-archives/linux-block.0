@@ -6,51 +6,51 @@ X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3C76C433ED
-	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 07:02:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96852C43461
+	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 07:02:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9C9BE610A7
-	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 07:02:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7CD756192B
+	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 07:02:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230202AbhELHDV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 May 2021 03:03:21 -0400
-Received: from mail-pj1-f50.google.com ([209.85.216.50]:33573 "EHLO
-        mail-pj1-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230280AbhELHDQ (ORCPT
+        id S230253AbhELHDW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 May 2021 03:03:22 -0400
+Received: from mail-pj1-f54.google.com ([209.85.216.54]:44650 "EHLO
+        mail-pj1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230292AbhELHDS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 May 2021 03:03:16 -0400
-Received: by mail-pj1-f50.google.com with SMTP id b13-20020a17090a8c8db029015cd97baea9so1002880pjo.0;
-        Wed, 12 May 2021 00:02:09 -0700 (PDT)
+        Wed, 12 May 2021 03:03:18 -0400
+Received: by mail-pj1-f54.google.com with SMTP id lj11-20020a17090b344bb029015bc3073608so2780136pjb.3;
+        Wed, 12 May 2021 00:02:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=t9xWyIt+M2Ul+XOAUCZ5mkanX2OLCMFRGNsaqRwjMSM=;
-        b=K8eqNNHXgyl+xjczx19xYR7NRxaFhAZ+LLIUggUW1EQu+zDosry9TxUcT+Cv8iLIK2
-         tqIRXNv9Wsq/w3njTdIOx11Qr3Zf0BWdsIfdQuBW0PchKhCsLwm5HrYWi1wvoScFld5N
-         ue12hTlrRQTEREpz26AuPnMap4Negr1pC0C17BqlWZDj0VQ3UCeVhH4i9Mi954DXHtDN
-         k3SoKsmxBDN2GxpAQjrYRgneY0cmFTnhCQ6IqUNkFp/B5GqaXM5ppkR3fMLyC6JK/aot
-         I3uyuiVfENFJX4/n95y18GExm2rIVGm/6AJHkxDEIjFw4nRTyoC5PzDzmemQcArVGvor
-         Ss7Q==
-X-Gm-Message-State: AOAM533GLT40WiPf/MD8TD3YVGefTAL5AEDqOlGYd22h5PJHzU9xoZzH
-        OSSLsz2i4MRuSZJbtdjJg6E=
-X-Google-Smtp-Source: ABdhPJx0x1toQi2VR2s06jsBSAYUe/iCHDxy4C9qb0vDCyZ+S0Qkwgd5ld7YNXEBYlBzEYQYNaqqcA==
-X-Received: by 2002:a17:90a:1382:: with SMTP id i2mr38084191pja.176.1620802929195;
+        bh=4L1CM5TjzwngNWpSW5lfB0TalYgC1UQCXnGH/wxMcYc=;
+        b=SvFqJ5h1Tcq3/m8UE6MEqsRovCIGJEBlhD2/nKQezdfj3e8U9yfUVFFksBz3Rw0ECR
+         fEch/1wpCPtvOm20xWVyv0dtecFtqj7P47zqWXmXxdxS5eQ6mX59UYGgrlew4aKJzGRW
+         6YzjMl2pBKqhyEFbYLd8VR+tIXuiBypN7QdUx+daPTlc+t8ugInKr9qzB924yF7M4/Ar
+         k8qb2XVxPQ+hnDzfy+3yis5+RQntxayG6i/JLteH3L1h5+it4MJnv4NfhMdM3E6X64xj
+         AQR7Rs6Ph2/+qXz3evIjZSkyGcLzmq3U2EbPZ5PCHGjawu7qMk1fr4tf/DEv9nI73OUa
+         qCfA==
+X-Gm-Message-State: AOAM531O9yKu3gqbXE7U0P/PrDmHa/gTmSBl/VCBd5J3bGj+aKqRbpeb
+        wyaOQKbiz5T1pIfROdGlvyY=
+X-Google-Smtp-Source: ABdhPJz9fwE4W3zj6q7xPB3oxXrCTaGFpysEzh+cDt24WcK0QMFwqTD/o5kQFDv8DpI4j1rtBo2WhA==
+X-Received: by 2002:a17:90a:2844:: with SMTP id p4mr9728467pjf.89.1620802929782;
         Wed, 12 May 2021 00:02:09 -0700 (PDT)
 Received: from 42.do-not-panic.com (42.do-not-panic.com. [157.230.128.187])
-        by smtp.gmail.com with ESMTPSA id g15sm14537679pfv.127.2021.05.12.00.02.01
+        by smtp.gmail.com with ESMTPSA id n8sm15211264pfu.111.2021.05.12.00.02.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Wed, 12 May 2021 00:02:03 -0700 (PDT)
 Received: by 42.do-not-panic.com (Postfix, from userid 1000)
-        id 3DA7B42403; Wed, 12 May 2021 06:46:35 +0000 (UTC)
+        id 1D7DD42079; Wed, 12 May 2021 06:46:35 +0000 (UTC)
 From:   Luis Chamberlain <mcgrof@kernel.org>
 To:     axboe@kernel.dk
 Cc:     bvanassche@acm.org, ming.lei@redhat.com, hch@infradead.org,
         jack@suse.cz, osandov@fb.com, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org, Luis Chamberlain <mcgrof@kernel.org>
-Subject: [PATCH v1 4/8] block: move disk unregistration work from del_gendisk() to a helper
-Date:   Wed, 12 May 2021 06:46:25 +0000
-Message-Id: <20210512064629.13899-5-mcgrof@kernel.org>
+Subject: [PATCH v1 1/8] block: refcount the request_queue early in __device_add_disk()
+Date:   Wed, 12 May 2021 06:46:22 +0000
+Message-Id: <20210512064629.13899-2-mcgrof@kernel.org>
 X-Mailer: git-send-email 2.23.0.rc1
 In-Reply-To: <20210512064629.13899-1-mcgrof@kernel.org>
 References: <20210512064629.13899-1-mcgrof@kernel.org>
@@ -60,101 +60,96 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-There is quite a bit of code on del_gendisk() which relates to
-unregistering the disk, using register_disk() as an counter.
-Move all this code into a helper instead of re-writing our own,
-which we'll need later to handle errors on add_disk().
+We refcount the request_queue right now towards the end of the
+__device_add_disk(), however when we add error handling on this
+function we'll want to refcount the request_queue first, to help
+make less complicated changes on drivers on their error paths.
 
-Since disk unregistrationa also deals with parition unregistration,
-provide a halper for that as well, as we'll later need this when
-adding error handling for add_disk().
+For instance, today a driver may call add_disk without error handling
+but still handle other errors:
+
+int foo_block_add(...)
+{
+	...
+	queue = blk_mq_init_queue(...);
+	...
+	disk->queue = queue;
+	disk = alloc_disk(...);
+	if (!disk)
+		goto out_free_queue;
+	...
+        add_disk(disk);
+	...
+        return 0;
+
+out_free_queue:
+        blk_cleanup_queue(queue);
+	/* Note: we never call put_disk() as add_disk() never failed */
+	...
+}
+
+We want drivers to cleanup with put_disk() on the error path if
+add_disk() fails. However, calling blk_cleanup_queue() will already
+put the queue, and so the last put_disk() on the error path will
+be extra. This can be simplified later if once error handling is
+added to __device_add_disk(), if refcounting the request_queue
+fails right away on __device_add_disk() we just return early and
+set disk->NULL for the driver. That would ensure driver error
+paths chug on with their error paths, and all they'd need to
+expand with is the missing put_disk().
+
+The collateral evolution for adding error paths for add_disk() becomes
+larger with the alternative of replacing the blk_cleanup_queue() with
+a put_disk(). We'd still need to sprinkle then some blk_cleanup_queue()
+calls on the driver paths up above prior to add_disk(). And how would
+we know we reached a part of add_disk() which did refcount then?
+
+A related commit is 5a0ec388ef0 ("pktcdvd: Fix pkt_setup_dev() error
+path") which *had* to take the approach of removing the blk_cleanup_queue()
+because otherwise the driver crashes.
+
+Moving this to the top ensure our future error path can easily just
+handle this itself. For instance, if it was not able to refcount the
+request_queue it can disk->queue to NULL, that way allowing a
+blk_cleanup_queue() call followed but a put_disk(). And if the
+refcount was incremented, we'd still be able to keep the same error
+path of blk_cleanup_queue() followed by put_disk().
 
 Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
 ---
- block/genhd.c | 56 +++++++++++++++++++++++++++++----------------------
- 1 file changed, 32 insertions(+), 24 deletions(-)
+ block/genhd.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/block/genhd.c b/block/genhd.c
-index 40a34981f9e2..baa68192ebb3 100644
+index 39ca97b0edc6..51dff87c4756 100644
 --- a/block/genhd.c
 +++ b/block/genhd.c
-@@ -438,6 +438,31 @@ static void disk_announce(struct gendisk *disk)
- 	disk_uevent(disk, KOBJ_ADD);
- }
+@@ -504,6 +504,12 @@ static void __device_add_disk(struct device *parent, struct gendisk *disk,
+ 	dev_t devt;
+ 	int retval;
  
-+static void unregister_disk_partitions(struct gendisk *disk)
-+{
 +	/*
-+	 * Block lookups of the disk until all bdevs are unhashed and the
-+	 * disk is marked as dead (GENHD_FL_UP cleared).
++	 * Take an extra ref on queue which will be put on disk_release()
++	 * so that it sticks around as long as @disk is there.
 +	 */
-+	down_write(&bdev_lookup_sem);
++	WARN_ON_ONCE(!blk_get_queue(disk->queue));
 +
-+	mutex_lock(&disk->part0->bd_mutex);
-+	blk_drop_partitions(disk);
-+	mutex_unlock(&disk->part0->bd_mutex);
-+	fsync_bdev(disk->part0);
-+	__invalidate_device(disk->part0, true);
-+
-+	/*
-+	 * Unhash the bdev inode for this device so that it can't be looked
-+	 * up any more even if openers still hold references to it.
-+	 */
-+	remove_inode_hash(disk->part0->bd_inode);
-+
-+	set_capacity(disk, 0);
-+	disk->flags &= ~GENHD_FL_UP;
-+	up_write(&bdev_lookup_sem);
-+}
-+
- static void disk_invalidate(struct gendisk *disk)
- {
- 	if (!(disk->flags & GENHD_FL_HIDDEN)) {
-@@ -463,6 +488,12 @@ static void disk_invalidate(struct gendisk *disk)
- 	device_del(disk_to_dev(disk));
- }
+ 	/*
+ 	 * The disk queue should now be all set with enough information about
+ 	 * the device for the elevator code to pick an adequate default
+@@ -556,12 +562,6 @@ static void __device_add_disk(struct device *parent, struct gendisk *disk,
+ 	if (register_queue)
+ 		blk_register_queue(disk);
  
-+static void unregister_disk(struct gendisk *disk)
-+{
-+	unregister_disk_partitions(disk);
-+	disk_invalidate(disk);
-+}
-+
- static void register_disk(struct device *parent, struct gendisk *disk,
- 			  const struct attribute_group **groups)
- {
-@@ -639,30 +670,7 @@ void del_gendisk(struct gendisk *disk)
- 
- 	blk_integrity_del(disk);
- 	disk_del_events(disk);
 -	/*
--	 * Block lookups of the disk until all bdevs are unhashed and the
--	 * disk is marked as dead (GENHD_FL_UP cleared).
+-	 * Take an extra ref on queue which will be put on disk_release()
+-	 * so that it sticks around as long as @disk is there.
 -	 */
--	down_write(&bdev_lookup_sem);
+-	WARN_ON_ONCE(!blk_get_queue(disk->queue));
 -
--	mutex_lock(&disk->part0->bd_mutex);
--	blk_drop_partitions(disk);
--	mutex_unlock(&disk->part0->bd_mutex);
--
--	fsync_bdev(disk->part0);
--	__invalidate_device(disk->part0, true);
--
--	/*
--	 * Unhash the bdev inode for this device so that it can't be looked
--	 * up any more even if openers still hold references to it.
--	 */
--	remove_inode_hash(disk->part0->bd_inode);
--
--	set_capacity(disk, 0);
--	disk->flags &= ~GENHD_FL_UP;
--	up_write(&bdev_lookup_sem);
--
--	disk_invalidate(disk);
-+	unregister_disk(disk);
+ 	disk_add_events(disk);
+ 	blk_integrity_add(disk);
  }
- EXPORT_SYMBOL(del_gendisk);
- 
 -- 
 2.30.2
 
