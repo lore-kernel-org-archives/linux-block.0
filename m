@@ -2,85 +2,218 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-19.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F4D0C433ED
-	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 19:35:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65539C43470
+	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 19:37:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6ACE161289
-	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 19:35:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4DF7861289
+	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 19:37:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239472AbhELT1Z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 May 2021 15:27:25 -0400
-Received: from mx2.suse.de ([195.135.220.15]:44562 "EHLO mx2.suse.de"
+        id S232303AbhELTgP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 May 2021 15:36:15 -0400
+Received: from mail.kernel.org ([198.145.29.99]:51020 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S237832AbhELR4g (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 May 2021 13:56:36 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id 87A0AB20B;
-        Wed, 12 May 2021 17:55:26 +0000 (UTC)
-Subject: Re: [PATCH v1 8/8] block: add add_disk() failure injection support
-To:     Luis Chamberlain <mcgrof@kernel.org>,
-        Brendan Higgins <brendanhiggins@google.com>,
-        Akinobu Mita <akinobu.mita@gmail.com>
-Cc:     axboe@kernel.dk, bvanassche@acm.org, ming.lei@redhat.com,
-        hch@infradead.org, jack@suse.cz, osandov@fb.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210512064629.13899-1-mcgrof@kernel.org>
- <20210512064629.13899-9-mcgrof@kernel.org>
- <e938c21f-3872-232c-4956-dfa53aec579b@suse.de>
- <20210512165639.GB4332@42.do-not-panic.com>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <989175a7-5533-02ef-c096-b24b2769c9cf@suse.de>
-Date:   Wed, 12 May 2021 19:55:25 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.9.1
+        id S1352368AbhELSDH (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 12 May 2021 14:03:07 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 34D6C61412;
+        Wed, 12 May 2021 18:01:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1620842519;
+        bh=7JjN/D17G6ME5Mc+DmYKPPS1cVShSzMCm9Pl9HYk81k=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=gdqnyp2EBrYfzVAtamMSAXO0zNZ9iGMLT10oyg+v32tRhV2GuoRsX35IEj2bTXvYD
+         XK9Jj1bbOvbq3xNF41aOaVkWzzeFGIdTciHJi8YMtvc2I7UFx2eJKWNOYqQ1DkKktT
+         GWsFOAG45uNPX3u69YgxzHKLHD57FjN9uQ7YKMa3GMPqn6qsw3/Cyinx2B0KFI1FTm
+         hQbnjniQ2bWwiBXWlB0lTbXlnyI7uSvBLAGZcEb6ELiiEUVi2UMD5wy5PKbYr7UjQ9
+         leDNLDtb97SDhl/i8AwqjbBBkZkrd9Fz5hnMl0zTlU1a+sovC9Uf86FbBm61mgHCC4
+         oXPlPiNaJJeLQ==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     yangerkun <yangerkun@huawei.com>,
+        Pavel Begunkov <asml.silencec@gmail.com>,
+        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.12 35/37] block: reexpand iov_iter after read/write
+Date:   Wed, 12 May 2021 14:01:02 -0400
+Message-Id: <20210512180104.664121-35-sashal@kernel.org>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20210512180104.664121-1-sashal@kernel.org>
+References: <20210512180104.664121-1-sashal@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20210512165639.GB4332@42.do-not-panic.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+X-stable: review
+X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/12/21 6:56 PM, Luis Chamberlain wrote:
-> On Wed, May 12, 2021 at 05:22:48PM +0200, Hannes Reinecke wrote:
-[ .. ]
->> So I'd rather delegate the topic of error injection to a more general
->> discussion (LSF springs to mind ...), and then agree on a framework which is
->> suitable for every function.
-> 
-> Or we just get cranking and produce proof of concepts to compare and
-> contrast later. At least I hope this patch and the respective blktests
-> patches suffice to help demo what we need to test.
-> 
-Yeah; I know; 'tis a hard topic.
-(Will we have another ALPSS this year? Would be ideal to discuss things 
-there. Christoph?)
+From: yangerkun <yangerkun@huawei.com>
 
-What I would love to see is to facilitate kernel live patching for 
-testing, blanking out the function body under test and just return 
-specific error codes.
-That would be _ideal_ for testing, as we don't have to modify the kernel 
-at all, we just need to compile it with the appropriate compiler options 
-for live patching.
-And then we should be able compile modules for the functions to test, 
-load the module, do the test, remove the module, and everything would be 
-back to normal again.
+[ Upstream commit cf7b39a0cbf6bf57aa07a008d46cf695add05b4c ]
 
-I know, but one can dream ...
+We get a bug:
 
-But maybe I can trick you in trying it ... hmm?
+BUG: KASAN: slab-out-of-bounds in iov_iter_revert+0x11c/0x404
+lib/iov_iter.c:1139
+Read of size 8 at addr ffff0000d3fb11f8 by task
 
-Cheers,
+CPU: 0 PID: 12582 Comm: syz-executor.2 Not tainted
+5.10.0-00843-g352c8610ccd2 #2
+Hardware name: linux,dummy-virt (DT)
+Call trace:
+ dump_backtrace+0x0/0x2d0 arch/arm64/kernel/stacktrace.c:132
+ show_stack+0x28/0x34 arch/arm64/kernel/stacktrace.c:196
+ __dump_stack lib/dump_stack.c:77 [inline]
+ dump_stack+0x110/0x164 lib/dump_stack.c:118
+ print_address_description+0x78/0x5c8 mm/kasan/report.c:385
+ __kasan_report mm/kasan/report.c:545 [inline]
+ kasan_report+0x148/0x1e4 mm/kasan/report.c:562
+ check_memory_region_inline mm/kasan/generic.c:183 [inline]
+ __asan_load8+0xb4/0xbc mm/kasan/generic.c:252
+ iov_iter_revert+0x11c/0x404 lib/iov_iter.c:1139
+ io_read fs/io_uring.c:3421 [inline]
+ io_issue_sqe+0x2344/0x2d64 fs/io_uring.c:5943
+ __io_queue_sqe+0x19c/0x520 fs/io_uring.c:6260
+ io_queue_sqe+0x2a4/0x590 fs/io_uring.c:6326
+ io_submit_sqe fs/io_uring.c:6395 [inline]
+ io_submit_sqes+0x4c0/0xa04 fs/io_uring.c:6624
+ __do_sys_io_uring_enter fs/io_uring.c:9013 [inline]
+ __se_sys_io_uring_enter fs/io_uring.c:8960 [inline]
+ __arm64_sys_io_uring_enter+0x190/0x708 fs/io_uring.c:8960
+ __invoke_syscall arch/arm64/kernel/syscall.c:36 [inline]
+ invoke_syscall arch/arm64/kernel/syscall.c:48 [inline]
+ el0_svc_common arch/arm64/kernel/syscall.c:158 [inline]
+ do_el0_svc+0x120/0x290 arch/arm64/kernel/syscall.c:227
+ el0_svc+0x1c/0x28 arch/arm64/kernel/entry-common.c:367
+ el0_sync_handler+0x98/0x170 arch/arm64/kernel/entry-common.c:383
+ el0_sync+0x140/0x180 arch/arm64/kernel/entry.S:670
 
-Hannes
+Allocated by task 12570:
+ stack_trace_save+0x80/0xb8 kernel/stacktrace.c:121
+ kasan_save_stack mm/kasan/common.c:48 [inline]
+ kasan_set_track mm/kasan/common.c:56 [inline]
+ __kasan_kmalloc+0xdc/0x120 mm/kasan/common.c:461
+ kasan_kmalloc+0xc/0x14 mm/kasan/common.c:475
+ __kmalloc+0x23c/0x334 mm/slub.c:3970
+ kmalloc include/linux/slab.h:557 [inline]
+ __io_alloc_async_data+0x68/0x9c fs/io_uring.c:3210
+ io_setup_async_rw fs/io_uring.c:3229 [inline]
+ io_read fs/io_uring.c:3436 [inline]
+ io_issue_sqe+0x2954/0x2d64 fs/io_uring.c:5943
+ __io_queue_sqe+0x19c/0x520 fs/io_uring.c:6260
+ io_queue_sqe+0x2a4/0x590 fs/io_uring.c:6326
+ io_submit_sqe fs/io_uring.c:6395 [inline]
+ io_submit_sqes+0x4c0/0xa04 fs/io_uring.c:6624
+ __do_sys_io_uring_enter fs/io_uring.c:9013 [inline]
+ __se_sys_io_uring_enter fs/io_uring.c:8960 [inline]
+ __arm64_sys_io_uring_enter+0x190/0x708 fs/io_uring.c:8960
+ __invoke_syscall arch/arm64/kernel/syscall.c:36 [inline]
+ invoke_syscall arch/arm64/kernel/syscall.c:48 [inline]
+ el0_svc_common arch/arm64/kernel/syscall.c:158 [inline]
+ do_el0_svc+0x120/0x290 arch/arm64/kernel/syscall.c:227
+ el0_svc+0x1c/0x28 arch/arm64/kernel/entry-common.c:367
+ el0_sync_handler+0x98/0x170 arch/arm64/kernel/entry-common.c:383
+ el0_sync+0x140/0x180 arch/arm64/kernel/entry.S:670
+
+Freed by task 12570:
+ stack_trace_save+0x80/0xb8 kernel/stacktrace.c:121
+ kasan_save_stack mm/kasan/common.c:48 [inline]
+ kasan_set_track+0x38/0x6c mm/kasan/common.c:56
+ kasan_set_free_info+0x20/0x40 mm/kasan/generic.c:355
+ __kasan_slab_free+0x124/0x150 mm/kasan/common.c:422
+ kasan_slab_free+0x10/0x1c mm/kasan/common.c:431
+ slab_free_hook mm/slub.c:1544 [inline]
+ slab_free_freelist_hook mm/slub.c:1577 [inline]
+ slab_free mm/slub.c:3142 [inline]
+ kfree+0x104/0x38c mm/slub.c:4124
+ io_dismantle_req fs/io_uring.c:1855 [inline]
+ __io_free_req+0x70/0x254 fs/io_uring.c:1867
+ io_put_req_find_next fs/io_uring.c:2173 [inline]
+ __io_queue_sqe+0x1fc/0x520 fs/io_uring.c:6279
+ __io_req_task_submit+0x154/0x21c fs/io_uring.c:2051
+ io_req_task_submit+0x2c/0x44 fs/io_uring.c:2063
+ task_work_run+0xdc/0x128 kernel/task_work.c:151
+ get_signal+0x6f8/0x980 kernel/signal.c:2562
+ do_signal+0x108/0x3a4 arch/arm64/kernel/signal.c:658
+ do_notify_resume+0xbc/0x25c arch/arm64/kernel/signal.c:722
+ work_pending+0xc/0x180
+
+blkdev_read_iter can truncate iov_iter's count since the count + pos may
+exceed the size of the blkdev. This will confuse io_read that we have
+consume the iovec. And once we do the iov_iter_revert in io_read, we
+will trigger the slab-out-of-bounds. Fix it by reexpand the count with
+size has been truncated.
+
+blkdev_write_iter can trigger the problem too.
+
+Signed-off-by: yangerkun <yangerkun@huawei.com>
+Acked-by: Pavel Begunkov <asml.silencec@gmail.com>
+Link: https://lore.kernel.org/r/20210401071807.3328235-1-yangerkun@huawei.com
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ fs/block_dev.c | 20 +++++++++++++++++---
+ 1 file changed, 17 insertions(+), 3 deletions(-)
+
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 09d6f7229db9..a5a6a7930e5e 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -1684,6 +1684,7 @@ ssize_t blkdev_write_iter(struct kiocb *iocb, struct iov_iter *from)
+ 	struct inode *bd_inode = bdev_file_inode(file);
+ 	loff_t size = i_size_read(bd_inode);
+ 	struct blk_plug plug;
++	size_t shorted = 0;
+ 	ssize_t ret;
+ 
+ 	if (bdev_read_only(I_BDEV(bd_inode)))
+@@ -1701,12 +1702,17 @@ ssize_t blkdev_write_iter(struct kiocb *iocb, struct iov_iter *from)
+ 	if ((iocb->ki_flags & (IOCB_NOWAIT | IOCB_DIRECT)) == IOCB_NOWAIT)
+ 		return -EOPNOTSUPP;
+ 
+-	iov_iter_truncate(from, size - iocb->ki_pos);
++	size -= iocb->ki_pos;
++	if (iov_iter_count(from) > size) {
++		shorted = iov_iter_count(from) - size;
++		iov_iter_truncate(from, size);
++	}
+ 
+ 	blk_start_plug(&plug);
+ 	ret = __generic_file_write_iter(iocb, from);
+ 	if (ret > 0)
+ 		ret = generic_write_sync(iocb, ret);
++	iov_iter_reexpand(from, iov_iter_count(from) + shorted);
+ 	blk_finish_plug(&plug);
+ 	return ret;
+ }
+@@ -1718,13 +1724,21 @@ ssize_t blkdev_read_iter(struct kiocb *iocb, struct iov_iter *to)
+ 	struct inode *bd_inode = bdev_file_inode(file);
+ 	loff_t size = i_size_read(bd_inode);
+ 	loff_t pos = iocb->ki_pos;
++	size_t shorted = 0;
++	ssize_t ret;
+ 
+ 	if (pos >= size)
+ 		return 0;
+ 
+ 	size -= pos;
+-	iov_iter_truncate(to, size);
+-	return generic_file_read_iter(iocb, to);
++	if (iov_iter_count(to) > size) {
++		shorted = iov_iter_count(to) - size;
++		iov_iter_truncate(to, size);
++	}
++
++	ret = generic_file_read_iter(iocb, to);
++	iov_iter_reexpand(to, iov_iter_count(to) + shorted);
++	return ret;
+ }
+ EXPORT_SYMBOL_GPL(blkdev_read_iter);
+ 
 -- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
+2.30.2
+
