@@ -2,152 +2,293 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78E58C433ED
-	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 01:40:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B781C433ED
+	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 01:58:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4720561927
-	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 01:40:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 10C236191D
+	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 01:58:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229925AbhELBlV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 May 2021 21:41:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59338 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229951AbhELBlG (ORCPT
+        id S230118AbhELB70 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 May 2021 21:59:26 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25618 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229848AbhELB7Z (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 May 2021 21:41:06 -0400
-Received: from mail-qk1-x731.google.com (mail-qk1-x731.google.com [IPv6:2607:f8b0:4864:20::731])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE6F2C06175F;
-        Tue, 11 May 2021 18:38:38 -0700 (PDT)
-Received: by mail-qk1-x731.google.com with SMTP id q136so20786930qka.7;
-        Tue, 11 May 2021 18:38:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition;
-        bh=d3aJ5j7JBzKc8yEhunqWFAOzUi7zPVe+7NyqT4o60cM=;
-        b=PamcIlzQ+uY1mZJVPp5xmvsy/F+ht6T23gkJYSsTYC1EdUJAUJFnV33pxVPpEDcQlV
-         pu+PzGeV0NXACy9NbTkAQnpwt2kIYf99BWoZPH+p64MWzvj1PThC2yEeou3lRM0vwNWg
-         +IGpSmRiq8UYzTlck0yGHskwhTPd/37ZSM89Mj3KMcPm0Z8y0UR9ToS4plpDhWw2Ss5u
-         bReABk0CmHPJ+kU5a6D2+9//iRTlK/MzQoHNpiWQMqzIBNxkQ8c8XbW2uRRVAkQ88Cit
-         sg6TUw4dATGs2+qM8TT9UWfFQVqqJ0tNNCNDUwMc4iQQEhoZsxDfvAf5G35yBv9DHgFn
-         1knQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :mime-version:content-disposition;
-        bh=d3aJ5j7JBzKc8yEhunqWFAOzUi7zPVe+7NyqT4o60cM=;
-        b=NrQ3T/2I68vV2GN5qpdH8D6/s4EQCd6/Geq49hYE2XIsTS3glBskNJnu/pMgX80bz7
-         IM3GblYhKehQkI9QT6I6dRsIphjCgqWHC2K9W/V6c6zPneUdCINqhibJGNwusq44Zq+6
-         7AF4AvvSeDVZy4fTS8u3t8cHN3OaSizhSo2H4OVZLaNSQiIK3kaCG6jFUtbSVC17RuBS
-         KtdB226HSdgig9XzXCDoAT2z10W+2Tg++q3aYgQCG+pqyby8Ybj4Svz93+rxhGcBebR5
-         qGufmdUcItGbQ+zV8En7MtyFCkWQQwZZMiJzwF2/qjQ4uemFfcGU8WrJ7AdQXQqDwh3T
-         bQeg==
-X-Gm-Message-State: AOAM531aLFR6nwo7FAgoYBUgTOp5h7EukDoHp9+aQD8Nut9UJ8AQnrZr
-        xT9a2E6nwXlb5VylAn9LKVU=
-X-Google-Smtp-Source: ABdhPJy4FOzO4zz4CgFvrNhDRcz4ErZEHo5xCufKzsS69hNlRbRfkz8CUqITZz6C2dCdKhYihBI1Eg==
-X-Received: by 2002:a05:620a:1311:: with SMTP id o17mr19479984qkj.37.1620783517750;
-        Tue, 11 May 2021 18:38:37 -0700 (PDT)
-Received: from localhost (dhcp-6c-ae-f6-dc-d8-61.cpe.echoes.net. [199.96.183.179])
-        by smtp.gmail.com with ESMTPSA id d2sm6113849qkn.95.2021.05.11.18.38.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 May 2021 18:38:37 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Tue, 11 May 2021 21:38:36 -0400
-From:   Tejun Heo <tj@kernel.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-        kernel-team@fb.com, Dan Schatzberg <dschatzberg@fb.com>
-Subject: [PATCH block-5.13] blk-iocost: fix weight updates of inner active
- iocgs
-Message-ID: <YJsxnLZV1MnBcqjj@slm.duckdns.org>
+        Tue, 11 May 2021 21:59:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1620784698;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=IrSN/q1U2oWQiHJSxXKdOTlolgWacceb6n0DE2pKfEE=;
+        b=AlZ4hx649lGI8/0kzQWZoN+tfEB/SbTiVu+Qzul2zW6PehHYY+1SUqrmWL4/LKmtH05GGG
+        99IAy6KmU2h3u/3B9nrsRCDKpi3kYGoSN+pvu36PwJ/X/yzmbHIXSh+7o68HxcrXDYUjBP
+        THBvKPnYHgvSbW7nY6XKeeX7l94Kgxs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-521-7ZPIN5GwNgGi24_gTeHvtQ-1; Tue, 11 May 2021 21:58:16 -0400
+X-MC-Unique: 7ZPIN5GwNgGi24_gTeHvtQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CE27D803620;
+        Wed, 12 May 2021 01:58:14 +0000 (UTC)
+Received: from T590 (ovpn-12-110.pek2.redhat.com [10.72.12.110])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 19F032C617;
+        Wed, 12 May 2021 01:58:06 +0000 (UTC)
+Date:   Wed, 12 May 2021 09:58:01 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     John Garry <john.garry@huawei.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
+        kashyap.desai@broadcom.com, chenxiang66@hisilicon.com,
+        yama@redhat.com, dgilbert@interlog.com
+Subject: Re: [PATCH v2] blk-mq: Use request queue-wide tags for tagset-wide
+ sbitmap
+Message-ID: <YJs2KWMCn2kpyryT@T590>
+References: <1620749743-36000-1-git-send-email-john.garry@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <1620749743-36000-1-git-send-email-john.garry@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When the weight of an active iocg is updated, weight_updated() is called
-which in turn calls __propagate_weights() to update the active and inuse
-weights so that the effective hierarchical weights are update accordingly.
+On Wed, May 12, 2021 at 12:15:43AM +0800, John Garry wrote:
+> The tags used for an IO scheduler are currently per hctx.
+> 
+> As such, when q->nr_hw_queues grows, so does the request queue total IO
+> scheduler tag depth.
+> 
+> This may cause problems for SCSI MQ HBAs whose total driver depth is
+> fixed.
+> 
+> Ming and Yanhui report higher CPU usage and lower throughput in scenarios
+> where the fixed total driver tag depth is appreciably lower than the total
+> scheduler tag depth:
+> https://lore.kernel.org/linux-block/440dfcfc-1a2c-bd98-1161-cec4d78c6dfc@huawei.com/T/#mc0d6d4f95275a2743d1c8c3e4dc9ff6c9aa3a76b
+> 
+> In that scenario, since the scheduler tag is got first, much contention
+> is introduced since a driver tag may not be available after we have got
+> the sched tag.
+> 
+> Improve this scenario by introducing request queue-wide tags for when
+> a tagset-wide sbitmap is used. The static sched requests are still
+> allocated per hctx, as requests are initialised per hctx, as in
+> blk_mq_init_request(..., hctx_idx, ...) ->
+> set->ops->init_request(.., hctx_idx, ...).
+> 
+> For simplicity of resizing the request queue sbitmap when updating the
+> request queue depth, just init at the max possible size, so we don't need
+> to deal with the possibly with swapping out a new sbitmap for old if
+> we need to grow.
+> 
+> Signed-off-by: John Garry <john.garry@huawei.com>
+> ---
+> 
+> Please retest, thanks! For some reason I could not recreate the original
+> issue, but I am using qemu...
+> 
+> Changes since v1:
+> - Embed sbitmaps in request_queue struct
+> - Relocate IO sched functions to blk-mq-sched.c
+> - Fix error path code
+> 
+> diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+> index 42a365b1b9c0..9a012e0818cb 100644
+> --- a/block/blk-mq-sched.c
+> +++ b/block/blk-mq-sched.c
+> @@ -507,11 +507,9 @@ static void blk_mq_sched_free_tags(struct blk_mq_tag_set *set,
+>  				   struct blk_mq_hw_ctx *hctx,
+>  				   unsigned int hctx_idx)
+>  {
+> -	unsigned int flags = set->flags & ~BLK_MQ_F_TAG_HCTX_SHARED;
+> -
+>  	if (hctx->sched_tags) {
+>  		blk_mq_free_rqs(set, hctx->sched_tags, hctx_idx);
+> -		blk_mq_free_rq_map(hctx->sched_tags, flags);
+> +		blk_mq_free_rq_map(hctx->sched_tags, set->flags);
+>  		hctx->sched_tags = NULL;
+>  	}
+>  }
+> @@ -521,12 +519,10 @@ static int blk_mq_sched_alloc_tags(struct request_queue *q,
+>  				   unsigned int hctx_idx)
+>  {
+>  	struct blk_mq_tag_set *set = q->tag_set;
+> -	/* Clear HCTX_SHARED so tags are init'ed */
+> -	unsigned int flags = set->flags & ~BLK_MQ_F_TAG_HCTX_SHARED;
+>  	int ret;
+>  
+>  	hctx->sched_tags = blk_mq_alloc_rq_map(set, hctx_idx, q->nr_requests,
+> -					       set->reserved_tags, flags);
+> +					       set->reserved_tags, set->flags);
+>  	if (!hctx->sched_tags)
+>  		return -ENOMEM;
+>  
+> @@ -544,16 +540,40 @@ static void blk_mq_sched_tags_teardown(struct request_queue *q)
+>  	int i;
+>  
+>  	queue_for_each_hw_ctx(q, hctx, i) {
+> -		/* Clear HCTX_SHARED so tags are freed */
+> -		unsigned int flags = hctx->flags & ~BLK_MQ_F_TAG_HCTX_SHARED;
+> -
+>  		if (hctx->sched_tags) {
+> -			blk_mq_free_rq_map(hctx->sched_tags, flags);
+> +			blk_mq_free_rq_map(hctx->sched_tags, hctx->flags);
+>  			hctx->sched_tags = NULL;
+>  		}
+>  	}
+>  }
+>  
+> +static int blk_mq_init_sched_shared_sbitmap(struct request_queue *queue)
+> +{
+> +	struct blk_mq_tag_set *set = queue->tag_set;
+> +	int ret;
+> +
+> +	/*
+> +	 * Set initial depth at max so that we don't need to reallocate for
+> +	 * updating nr_requests.
+> +	 */
+> +	ret = blk_mq_init_bitmaps(&queue->sched_bitmap_tags,
+> +				  &queue->sched_breserved_tags,
+> +				  set, MAX_SCHED_RQ, set->reserved_tags);
+> +	if (ret)
+> +		return ret;
+> +
+> +	sbitmap_queue_resize(&queue->sched_bitmap_tags,
+> +			     queue->nr_requests - set->reserved_tags);
+> +
+> +	return 0;
+> +}
+> +
+> +static void blk_mq_exit_sched_shared_sbitmap(struct request_queue *queue)
+> +{
+> +	sbitmap_queue_free(&queue->sched_bitmap_tags);
+> +	sbitmap_queue_free(&queue->sched_breserved_tags);
+> +}
+> +
+>  int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
+>  {
+>  	struct blk_mq_hw_ctx *hctx;
+> @@ -578,12 +598,25 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
+>  	queue_for_each_hw_ctx(q, hctx, i) {
+>  		ret = blk_mq_sched_alloc_tags(q, hctx, i);
+>  		if (ret)
+> -			goto err;
+> +			goto err_free_tags;
+> +	}
+> +
+> +	if (blk_mq_is_sbitmap_shared(q->tag_set->flags)) {
+> +		ret = blk_mq_init_sched_shared_sbitmap(q);
+> +		if (ret)
+> +			goto err_free_tags;
+> +
+> +		queue_for_each_hw_ctx(q, hctx, i) {
+> +			hctx->sched_tags->bitmap_tags =
+> +						&q->sched_bitmap_tags;
+> +			hctx->sched_tags->breserved_tags =
+> +						&q->sched_breserved_tags;
+> +		}
 
-The current implementation is incorrect for inner active nodes. For an
-active leaf iocg, inuse can be any value between 1 and active and the
-difference represents how much the iocg is donating. When weight is updated,
-as long as inuse is clamped between 1 and the new weight, we're alright and
-this is what __propagate_weights() currently implements.
+The above assignment can be folded into blk_mq_init_sched_shared_sbitmap().
 
-However, that's not how an active inner node's inuse is set. An inner node's
-inuse is solely determined by the ratio between the sums of inuse's and
-active's of its children - ie. they're results of propagating the leaves'
-active and inuse weights upwards. __propagate_weights() incorrectly applies
-the same clamping as for a leaf when an active inner node's weight is
-updated. Consider a hierarchy which looks like the following with saturating
-workloads in AA and BB.
+>  	}
+>  
+>  	ret = e->ops.init_sched(q, e);
+>  	if (ret)
+> -		goto err;
+> +		goto err_free_sbitmap;
+>  
+>  	blk_mq_debugfs_register_sched(q);
+>  
+> @@ -603,7 +636,10 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
+>  
+>  	return 0;
+>  
+> -err:
+> +err_free_sbitmap:
+> +	if (blk_mq_is_sbitmap_shared(q->tag_set->flags))
+> +		blk_mq_exit_sched_shared_sbitmap(q);
+> +err_free_tags:
+>  	blk_mq_sched_free_requests(q);
+>  	blk_mq_sched_tags_teardown(q);
+>  	q->elevator = NULL;
+> @@ -641,5 +677,7 @@ void blk_mq_exit_sched(struct request_queue *q, struct elevator_queue *e)
+>  	if (e->type->ops.exit_sched)
+>  		e->type->ops.exit_sched(e);
+>  	blk_mq_sched_tags_teardown(q);
+> +	if (blk_mq_is_sbitmap_shared(q->tag_set->flags))
+> +		blk_mq_exit_sched_shared_sbitmap(q);
 
-     R
-   /   \
-  A     B
-  |     |
- AA     BB
+The above two lines can be moved to blk_mq_sched_tags_teardown().
 
-1. For both A and B, active=100, inuse=100, hwa=0.5, hwi=0.5.
+>  	q->elevator = NULL;
+>  }
+> diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
+> index 5b18ab915c65..aff037cfd8e7 100644
+> --- a/block/blk-mq-sched.h
+> +++ b/block/blk-mq-sched.h
+> @@ -5,6 +5,8 @@
+>  #include "blk-mq.h"
+>  #include "blk-mq-tag.h"
+>  
+> +#define MAX_SCHED_RQ (16 * BLKDEV_MAX_RQ)
+> +
+>  void blk_mq_sched_assign_ioc(struct request *rq);
+>  
+>  bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
+> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+> index 2a37731e8244..e3ab8631be22 100644
+> --- a/block/blk-mq-tag.c
+> +++ b/block/blk-mq-tag.c
+> @@ -13,6 +13,7 @@
+>  #include <linux/delay.h>
+>  #include "blk.h"
+>  #include "blk-mq.h"
+> +#include "blk-mq-sched.h"
+>  #include "blk-mq-tag.h"
+>  
+>  /*
+> @@ -466,19 +467,39 @@ static int blk_mq_init_bitmap_tags(struct blk_mq_tags *tags,
+>  	return -ENOMEM;
+>  }
+>  
+> -int blk_mq_init_shared_sbitmap(struct blk_mq_tag_set *set, unsigned int flags)
+> +int blk_mq_init_bitmaps(struct sbitmap_queue *bitmap_tags,
+> +			struct sbitmap_queue *breserved_tags,
+> +			struct blk_mq_tag_set *set,
 
-2. echo 200 > A/io.weight
+The 'set' parameter can be killed, meantime pass 'node' & 'alloc_policy',
+just like blk_mq_init_bitmap_tags()'s type, then blk_mq_init_bitmaps()
+can be re-used by blk_mq_init_bitmap_tags() for avoiding to duplicate
+bitmap allocation code.
 
-3. __propagate_weights() update A's active to 200 and leave inuse at 100 as
-   it's already between 1 and the new active, making A:active=200,
-   A:inuse=100. As R's active_sum is updated along with A's active,
-   A:hwa=2/3, B:hwa=1/3. However, because the inuses didn't change, the
-   hwi's remain unchanged at 0.5.
+> +			unsigned int queue_depth, unsigned int reserved)
 
-4. The weight of A is now twice that of B but AA and BB still have the same
-   hwi of 0.5 and thus are doing the same amount of IOs.
+>  {
+> -	unsigned int depth = set->queue_depth - set->reserved_tags;
+> +	unsigned int depth = queue_depth - reserved;
+>  	int alloc_policy = BLK_MQ_FLAG_TO_ALLOC_POLICY(set->flags);
+>  	bool round_robin = alloc_policy == BLK_TAG_ALLOC_RR;
+> -	int i, node = set->numa_node;
+>  
+> -	if (bt_alloc(&set->__bitmap_tags, depth, round_robin, node))
+> +	if (bt_alloc(bitmap_tags, depth, round_robin, set->numa_node))
+>  		return -ENOMEM;
+> -	if (bt_alloc(&set->__breserved_tags, set->reserved_tags,
+> -		     round_robin, node))
+> +	if (bt_alloc(breserved_tags, set->reserved_tags,
 
-Fix it by making __propgate_weights() always calculate the inuse of an
-active inner iocg based on the ratio of child_inuse_sum to child_active_sum.
+s/set->reserved_tags/reserved/
 
-Signed-off-by: Tejun Heo <tj@kernel.org>
-Reported-by: Dan Schatzberg <dschatzberg@fb.com>
-Fixes: 7caa47151ab2 ("blkcg: implement blk-iocost")
-Cc: stable@vger.kernel.org # v5.4+
----
- block/blk-iocost.c |   14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index e0c4baa018578..c2d6bc88d3f15 100644
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -1069,7 +1069,17 @@ static void __propagate_weights(struct ioc_gq *iocg, u32 active, u32 inuse,
- 
- 	lockdep_assert_held(&ioc->lock);
- 
--	inuse = clamp_t(u32, inuse, 1, active);
-+	/*
-+	 * For an active leaf node, its inuse shouldn't be zero or exceed
-+	 * @active. An active internal node's inuse is solely determined by the
-+	 * inuse to active ratio of its children regardless of @inuse.
-+	 */
-+	if (list_empty(&iocg->active_list) && iocg->child_active_sum) {
-+		inuse = DIV64_U64_ROUND_UP(active * iocg->child_inuse_sum,
-+					   iocg->child_active_sum);
-+	} else {
-+		inuse = clamp_t(u32, inuse, 1, active);
-+	}
- 
- 	iocg->last_inuse = iocg->inuse;
- 	if (save)
-@@ -1086,7 +1096,7 @@ static void __propagate_weights(struct ioc_gq *iocg, u32 active, u32 inuse,
- 		/* update the level sums */
- 		parent->child_active_sum += (s32)(active - child->active);
- 		parent->child_inuse_sum += (s32)(inuse - child->inuse);
--		/* apply the udpates */
-+		/* apply the updates */
- 		child->active = active;
- 		child->inuse = inuse;
- 
+Thanks, 
+Ming
+
