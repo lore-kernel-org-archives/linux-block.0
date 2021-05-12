@@ -7,42 +7,42 @@ X-Spam-Status: No, score=-19.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D397AC433B4
-	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 19:44:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77C04C43470
+	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 19:44:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 92F91613AA
-	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 19:44:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4B82061439
+	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 19:44:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237832AbhELTgS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 May 2021 15:36:18 -0400
-Received: from mail.kernel.org ([198.145.29.99]:52152 "EHLO mail.kernel.org"
+        id S245680AbhELTg1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 May 2021 15:36:27 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60210 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1352751AbhELSEJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 May 2021 14:04:09 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 239176143D;
-        Wed, 12 May 2021 18:03:00 +0000 (UTC)
+        id S1353195AbhELSK5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 12 May 2021 14:10:57 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id D8B606192E;
+        Wed, 12 May 2021 18:05:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1620842581;
-        bh=kR4X2Y4LqWXFJzaZR/OSMHuq0a3gRRAtvhiJq2yNFWE=;
+        s=k20201202; t=1620842741;
+        bh=g3SKePqvbPvcT2QInwD3FC5nVIPtwIIb1TlThJlxC7w=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=gDa4WIwWELVBQiBoqma0YAcgfp+4oP0niibJTmzIExAfQKoRSrCKBU9EWscqdqFPU
-         zvjiEQ/bFZ5ud+P4HopZkGbEu66jH9gMfbDi1Ih8tPoPb5SsY0p1UXC4IinLeH3Ecd
-         ZWQITC65zferDac1EWDgS42vHWOVQP0dI6PPEPyZPEtjitorAUOCMoaMSMDdq8kYf2
-         LvUnxUMgU1z/jWRTXCb5j60c0k2Aj9jWExh8GFHhNziN8s0h8KbFa69uER2PDdef9y
-         /UEoKy5/t/8PkJWDZK9uQKtrRNk8MhC1C5diocqZNwuBcLF0NHpQ+x51YFhNOYYCbN
-         3xWu1wy0ErcrA==
+        b=iRbLSLEcTc61API3aRqlqVSabDCd6LP9cCmYDaQCfgRnNmMGpNcfAvQlotYOjcSOm
+         gWtpjb72pYQ4yVfPUDHmqkM45ARZP/9u6CnIbed/p+8H5963HxQQ8WRy6Or20jYJVV
+         GhPdZocAQDij5grJoB3cBCl/kS/1ZaKp5IxaJp/ZFNgutUqIAirqGeYPVWTXETdf61
+         1/OR9bOa3CP8EglCUcmIISAlH3Fpo98bGCUTFBnDI8IXGvQEVzCW+BS+n8HYcKEuVF
+         mG2BbXfRa99OR78f05GfhvbkkC0Xo2SZ5mY4O0oAy7U2oqMYY+hs6/PeRg8IH/XczD
+         Sp4Vq1BwqYqoA==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     yangerkun <yangerkun@huawei.com>,
         Pavel Begunkov <asml.silencec@gmail.com>,
         Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.11 33/35] block: reexpand iov_iter after read/write
-Date:   Wed, 12 May 2021 14:02:03 -0400
-Message-Id: <20210512180206.664536-33-sashal@kernel.org>
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.14 11/12] block: reexpand iov_iter after read/write
+Date:   Wed, 12 May 2021 14:05:21 -0400
+Message-Id: <20210512180522.665788-11-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210512180206.664536-1-sashal@kernel.org>
-References: <20210512180206.664536-1-sashal@kernel.org>
+In-Reply-To: <20210512180522.665788-1-sashal@kernel.org>
+References: <20210512180522.665788-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -160,10 +160,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 17 insertions(+), 3 deletions(-)
 
 diff --git a/fs/block_dev.c b/fs/block_dev.c
-index b988f78ad4b7..cd9db68960fe 100644
+index 23fb999b49e1..a56974d04010 100644
 --- a/fs/block_dev.c
 +++ b/fs/block_dev.c
-@@ -1684,6 +1684,7 @@ ssize_t blkdev_write_iter(struct kiocb *iocb, struct iov_iter *from)
+@@ -1906,6 +1906,7 @@ ssize_t blkdev_write_iter(struct kiocb *iocb, struct iov_iter *from)
  	struct inode *bd_inode = bdev_file_inode(file);
  	loff_t size = i_size_read(bd_inode);
  	struct blk_plug plug;
@@ -171,7 +171,7 @@ index b988f78ad4b7..cd9db68960fe 100644
  	ssize_t ret;
  
  	if (bdev_read_only(I_BDEV(bd_inode)))
-@@ -1701,12 +1702,17 @@ ssize_t blkdev_write_iter(struct kiocb *iocb, struct iov_iter *from)
+@@ -1920,12 +1921,17 @@ ssize_t blkdev_write_iter(struct kiocb *iocb, struct iov_iter *from)
  	if ((iocb->ki_flags & (IOCB_NOWAIT | IOCB_DIRECT)) == IOCB_NOWAIT)
  		return -EOPNOTSUPP;
  
@@ -190,7 +190,7 @@ index b988f78ad4b7..cd9db68960fe 100644
  	blk_finish_plug(&plug);
  	return ret;
  }
-@@ -1718,13 +1724,21 @@ ssize_t blkdev_read_iter(struct kiocb *iocb, struct iov_iter *to)
+@@ -1937,13 +1943,21 @@ ssize_t blkdev_read_iter(struct kiocb *iocb, struct iov_iter *to)
  	struct inode *bd_inode = bdev_file_inode(file);
  	loff_t size = i_size_read(bd_inode);
  	loff_t pos = iocb->ki_pos;
