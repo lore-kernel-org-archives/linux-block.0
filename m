@@ -7,44 +7,43 @@ X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
 	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CFDFC433B4
-	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 22:58:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D25EC43461
+	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 22:58:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2DDED613E6
-	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 22:58:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5874A613EE
+	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 22:58:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234199AbhELW7R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S234918AbhELW7R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Wed, 12 May 2021 18:59:17 -0400
-Received: from mail-qv1-f47.google.com ([209.85.219.47]:43524 "EHLO
-        mail-qv1-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345739AbhELVny (ORCPT
+Received: from mail-qk1-f180.google.com ([209.85.222.180]:40826 "EHLO
+        mail-qk1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1346661AbhELVoQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 May 2021 17:43:54 -0400
-Received: by mail-qv1-f47.google.com with SMTP id v18so2739662qvx.10;
-        Wed, 12 May 2021 14:42:42 -0700 (PDT)
+        Wed, 12 May 2021 17:44:16 -0400
+Received: by mail-qk1-f180.google.com with SMTP id f18so1908373qko.7;
+        Wed, 12 May 2021 14:43:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
         bh=nWpDQmZNg8zKVk12QskQ7NNS05C4fI/JmZBKLdKyu8Q=;
-        b=kayPXPu78XNcbu5cKQfIDzRckMy6PDltHyfZmhF7etxDnfYutovRHvz7avHvFH0S6P
-         gWDak1c3hftC8g4o6uB1bfW1KgFECfHq4XMN8tCJqbRfrjWze7Z0qfvtWCdut+d7kO34
-         zLhSInBELI2HqSHBJ2wXyVSlMsemlSuSuIx79hH85k72El3zDJ0iD8Mo10H17BRkOXeS
-         bczTbM7drvwRqtQImL2s7mIv52XL1Ya6ntiVwP2btLO2EQFuD4kBZuN0j+cwEUIwUgxI
-         v02gVdnRFNwzHoj2bU0O24znwjPULzJTNBam5iA2i/dEiuwU0epAWehd9AFQbjmWwpjC
-         I+yQ==
-X-Gm-Message-State: AOAM5339eCeuK/4JwHeqgHx4WtMLfswBgq6AdolqAaE4nnt/nCxGbPI4
-        AW8arVzzzuUAKXNWFKzpXr4=
-X-Google-Smtp-Source: ABdhPJyQfuitcMrAy159D1EWSmAvwixoWGUhMcEbMkPwnZu1KEiGdYKWQ1QjgHqpg1FJYlvEW8gmvw==
-X-Received: by 2002:a0c:a909:: with SMTP id y9mr37501332qva.20.1620855761936;
-        Wed, 12 May 2021 14:42:41 -0700 (PDT)
+        b=o1jEnQAI1niWkNH9z7VH3QIFYxIbytLPFkJbhZE9z5PcTj093cVqD1m+POeBtzuu57
+         xJRLaeaT7G7LtEErT5CSyHQgjcelV9U0M4vQWnm5nxWR0hzLlM1sTOPqCYiQ0xiEJkYJ
+         h0iK146hXq32SxeLAt0SHSyAxwkGV6oGHZwA/1DGLWP4pEEzEBL6hHC6WWIBd0rlW+n9
+         EHYvUmsKTVNdaQZsHB4bVePS4Cex8xdnLXIzmiqQRudAWSHvGcR3jwsVcYnkT5AWTxdL
+         Jso/Gm5DOvgDiKBanHyWk2yiUFLxVtTe5gzYgrOtoyOYyTDdZ/Jx8gNBuxipgNmGQfSZ
+         t2Mw==
+X-Gm-Message-State: AOAM532Sk9Ok6aYmLonjHaUjYvstBvcotQUZo5soBeYPxiHoXG22GG8E
+        SnDzmluDi0KLBAPJtMGBbXQ=
+X-Google-Smtp-Source: ABdhPJxHg6k8rV7EcmCHMksmgDbuJ4bvztCFiTBTf+jeuEkuvXgT9EZ1bU2CW3wZIEtVpGmthvm32w==
+X-Received: by 2002:a05:620a:b1b:: with SMTP id t27mr28617638qkg.42.1620855782980;
+        Wed, 12 May 2021 14:43:02 -0700 (PDT)
 Received: from ?IPv6:2600:1700:65a0:78e0:c65a:d038:3389:f848? ([2600:1700:65a0:78e0:c65a:d038:3389:f848])
-        by smtp.gmail.com with ESMTPSA id d21sm877778qtp.74.2021.05.12.14.42.40
+        by smtp.gmail.com with ESMTPSA id g185sm1021532qkf.62.2021.05.12.14.43.01
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 12 May 2021 14:42:41 -0700 (PDT)
-Subject: Re: [PATCH 06/15] blk-mq: remove blk_qc_t_to_tag and
- blk_qc_t_is_internal
+        Wed, 12 May 2021 14:43:02 -0700 (PDT)
+Subject: Re: [PATCH 07/15] blk-mq: remove blk_qc_t_valid
 To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
 Cc:     Jeffle Xu <jefflexu@linux.alibaba.com>,
         Ming Lei <ming.lei@redhat.com>,
@@ -55,14 +54,14 @@ Cc:     Jeffle Xu <jefflexu@linux.alibaba.com>,
         linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         linux-nvme@lists.infradead.org
 References: <20210512131545.495160-1-hch@lst.de>
- <20210512131545.495160-7-hch@lst.de>
+ <20210512131545.495160-8-hch@lst.de>
 From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <9f8a7bf6-366f-bcb2-f5d0-fb9bbf6678d7@grimberg.me>
-Date:   Wed, 12 May 2021 14:42:39 -0700
+Message-ID: <0dd86996-1274-b1a8-571f-4d5b9f71c2ed@grimberg.me>
+Date:   Wed, 12 May 2021 14:43:00 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.8.1
 MIME-Version: 1.0
-In-Reply-To: <20210512131545.495160-7-hch@lst.de>
+In-Reply-To: <20210512131545.495160-8-hch@lst.de>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
