@@ -2,155 +2,115 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA4DAC433B4
-	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 09:42:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0679C433B4
+	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 09:47:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B03D7613AA
-	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 09:42:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 98721613AA
+	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 09:47:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230230AbhELJnM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 May 2021 05:43:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53896 "EHLO
+        id S230019AbhELJs3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 May 2021 05:48:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55088 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230176AbhELJnL (ORCPT
+        with ESMTP id S230186AbhELJs3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 May 2021 05:43:11 -0400
-Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84003C06175F
-        for <linux-block@vger.kernel.org>; Wed, 12 May 2021 02:42:03 -0700 (PDT)
-Received: by mail-ej1-x629.google.com with SMTP id j10so6985938ejb.3
-        for <linux-block@vger.kernel.org>; Wed, 12 May 2021 02:42:03 -0700 (PDT)
+        Wed, 12 May 2021 05:48:29 -0400
+Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37CFDC06174A
+        for <linux-block@vger.kernel.org>; Wed, 12 May 2021 02:47:21 -0700 (PDT)
+Received: by mail-ej1-x62c.google.com with SMTP id w3so34073186ejc.4
+        for <linux-block@vger.kernel.org>; Wed, 12 May 2021 02:47:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=J5ilOFgohDPowmInai3EYFncza98UL+il5HL3oO9vVE=;
-        b=P1O9HrOSfZr0fdZnh9cx07Q3tIkAsfdOggSGcISUJ47Em9U+qMku0KDscLgHJswPb/
-         VToYR/Yi42SMNo3Lk8RrUJNeEeNct4jSIQRXdbui0zTvO+dd5A9tJXZQnkjqSDinKHRt
-         FZi7FTiEhYU5nCNmXQgyrusQQdlxTl07Iku0oUSEiCSBtT9CTngKsOfP2dlsKGnuQfXl
-         BOxmebktZozSxzyE5IxfLd+Cw2xHZl/xbi07EdN4hzlRv+fdOTxa8gU50MwukvrZZCUf
-         1VykBN9ABHxUhync1Vcp6iQdGv9p1qHJBnFrkyBBeTIXmMEB+mswsL1HbMDpFhC84aU1
-         CgGQ==
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=sv961MJyocNObPGcZa967XLagc7KlobuPCBUYNDEQvo=;
+        b=xIOvEfAOy7t8SB+dFMOMRDVmUL/m6ixXM4m6TxkP4uzUmVfp2IIPBPyTl8YrmElxbX
+         QAFyAea8LnhvGo0kdytldq5/dC1fCII0ocXGObB6fXysMIcHLueqcBmWNw9o1aMvMm/S
+         E68bLKHOUj0Geap5G3MlovyTuTCUGcMUs0q8CuxBXH500GD5DPAe8LZguZqhe0ML96CP
+         iiqV3ZrRkA4pAOj/baoMr3DEfD5ZXtSOAtb3loRmRxXDQOPnIrKXXeMUVUBvnXKyRZnX
+         Oc06UhFG1b2CAX9zVCbLC691Iv8Po9CTcrWW+n+lM0f1bqM9/P3HkaTYGRjQEehDPbgj
+         eYKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=J5ilOFgohDPowmInai3EYFncza98UL+il5HL3oO9vVE=;
-        b=TP2f99GhJVvBYR7Ghs8nepWUbj3pVlYCvsO31CEcmUq2LTYHjc8YN3iEU4qtvHOWVx
-         qx/il0iTGeLkoRZ3ikjhBO/8ZURZqyELm7DD8WWeMQpyFPg7iDWI+5cWurZVIrb5XfJI
-         m3zPJUAvORZE1oCV8mLNRqwv3KKykWjsFdDS3bQchhP+nNjYMazWDZzI5fWrIb8Vqud7
-         PR60hR9iQIbIPwt2o6I23rqxHCFhFCOaMFCKBZgSaNCkYUscSi4YHY19QCdzzFR64PB5
-         SrJRMSK8IMYFPvAzPli1oKJLENfr52kt78B9S20MstNPL84jRRcZqdN3jcgEhbNx85cU
-         ALoQ==
-X-Gm-Message-State: AOAM530SrYwpi6yG2D0RuT135r15ns3Hpr5YvApl1QQj2jKa6f3fbJ9x
-        pgiEp+vkEsmBqP+jPodmOFzmXw==
-X-Google-Smtp-Source: ABdhPJzRu72gJjn0WIjo+2j/Y6e4RQU7/05oZiXpUIngV0qidNDYedy94Ac5BQGj8E054nxxwzLMBA==
-X-Received: by 2002:a17:907:3da4:: with SMTP id he36mr35931348ejc.308.1620812522246;
-        Wed, 12 May 2021 02:42:02 -0700 (PDT)
-Received: from localhost.localdomain ([83.216.184.132])
-        by smtp.gmail.com with ESMTPSA id p22sm17068261edr.4.2021.05.12.02.42.01
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=sv961MJyocNObPGcZa967XLagc7KlobuPCBUYNDEQvo=;
+        b=aBujMS3rS1Dz3F0VYi/MqlDAaLknzvMLkxPEzvoCUOxyTiXocVnay4xBau7Sy1cIGI
+         y1/WcJm8ttatJgIt8VfbWX5vFenpkGuKT2JgZe6GbSpThwRPCT4KH60zmt0aCPf52aSk
+         slRpxYmiT4OHrH+96M/R6wZwvGtm+TeJ/SIi3MgSUSO3CaUy7bc3xKAyXkeb3k6M86LA
+         qeG9KFdEFu5tJIhsj5XXtm+EqGvyN6clFoIlI1RJUB+lE90mrST8bhmmJJZdlSrhI3sF
+         FqaPy0r5b2JIOUiw5PfVpNslwKEfkN1oyARuCMJSRx/50mDTwcH4UpDhOVVkY3+ZlGrt
+         Dksw==
+X-Gm-Message-State: AOAM530WuGA1gwXXq5KC1L0LdngiGSB4hCVda/TgvVVLwk94zAmhV8YY
+        x/cFDp3xJOOBk1L8fl4tNjoVrrZRZqsTF6Yp
+X-Google-Smtp-Source: ABdhPJyuzUgQJa4i7aUIDYkPuuUXGAkzqLoSi3I21f/iXc8hYGFWTCS2oi1FMNXFSiS1nJC6MOo3+g==
+X-Received: by 2002:a17:906:d145:: with SMTP id br5mr35836821ejb.452.1620812839886;
+        Wed, 12 May 2021 02:47:19 -0700 (PDT)
+Received: from [192.168.0.13] ([83.216.184.132])
+        by smtp.gmail.com with ESMTPSA id d25sm13572340ejd.59.2021.05.12.02.47.18
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 12 May 2021 02:42:01 -0700 (PDT)
+        Wed, 12 May 2021 02:47:19 -0700 (PDT)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: block, bfq: NULL pointer dereference in bfq_rq_pos_tree_lookup()
 From:   Paolo Valente <paolo.valente@linaro.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@redhat.com, Paolo Valente <paolo.valente@linaro.org>,
-        Pietro Pedroni <pedroni.pietro.96@gmail.com>
-Subject: [PATCH BUGFIX 1/1] block, bfq: avoid circular stable merges
-Date:   Wed, 12 May 2021 11:43:52 +0200
-Message-Id: <20210512094352.85545-2-paolo.valente@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20210512094352.85545-1-paolo.valente@linaro.org>
-References: <20210512094352.85545-1-paolo.valente@linaro.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <abe6426476d4e87bd3977079380bc7c3f508328d.camel@gmx.de>
+Date:   Wed, 12 May 2021 11:49:34 +0200
+Cc:     lkml <linux-kernel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <DB1E4403-5102-4D01-A8F6-2F12191F7761@linaro.org>
+References: <8c38408d27f1032f2a664838e523376c5da09a80.camel@gmx.de>
+ <9732EA9F-E15B-48E1-9B92-2D74F75C6331@linaro.org>
+ <e0ece2e6349e92adc3da6d8c2ae6ff8a4172e4ad.camel@gmx.de>
+ <abe6426476d4e87bd3977079380bc7c3f508328d.camel@gmx.de>
+To:     Mike Galbraith <efault@gmx.de>
+X-Mailer: Apple Mail (2.3445.104.11)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-BFQ may merge a new bfq_queue, stably, with the last bfq_queue
-created. In particular, BFQ first waits a little bit for some I/O to
-flow inside the new queue, say Q2, if this is needed to understand
-whether it is better or worse to merge Q2 with the last queue created,
-say Q1. This delayed stable merge is performed by assigning
-bic->stable_merge_bfqq = Q1, for the bic associated with Q1.
 
-Yet, while waiting for some I/O to flow in Q2, a non-stable queue
-merge of Q2 with Q1 may happen, causing the bic previously associated
-with Q2 to be associated with exactly Q1 (bic->bfqq = Q1). After that,
-Q2 and Q1 may happen to be split, and, in the split, Q1 may happen to
-be recycled as a non-shared bfq_queue. In that case, Q1 may then
-happen to undergo a stable merge with the bfq_queue pointed by
-bic->stable_merge_bfqq. Yet bic->stable_merge_bfqq still points to
-Q1. So Q1 would be merged with itself.
 
-This commit fixes this error by intercepting this situation, and
-canceling the schedule of the stable merge.
+> Il giorno 8 mag 2021, alle ore 06:49, Mike Galbraith <efault@gmx.de> =
+ha scritto:
+>=20
+> On Mon, 2021-05-03 at 14:41 +0200, Mike Galbraith wrote:
+>> On Mon, 2021-05-03 at 11:52 +0200, Paolo Valente wrote:
+>>> Hi Mike,
+>>> I've waited a little bit before replying, because I've worked on a =
+dev
+>>> patch series, for debugging another crash. I'd like to use
+>>> this series for your failure too, as the OOPS you report
+>>> unfortunately does not ring any bell :(
+>>>=20
+>>> So, could you please try to apply this patch series?  If it doesn't
+>>> apply, I'll rebase it.
+>>=20
+>> This bug isn't deterministic, but I can wedge your set into my devel
+>> trees, and see if anything falls out.
+>=20
+> What fell out was not the least bit useful.  After days of box working
+> just fine despite bug being given ample enticement, it didn't take the
+> bait.  I then build master sans patch set, which exploded on its very
+> first distro build, after which bug (snickered mightily and) went back
+> to into hiding.
+>=20
 
-Fixes: 430a67f9d616 ("block, bfq: merge bursts of newly-created queues")
-Signed-off-by: Pietro Pedroni <pedroni.pietro.96@gmail.com>
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
----
- block/bfq-iosched.c | 31 +++++++++++++++++++++++++++++--
- 1 file changed, 29 insertions(+), 2 deletions(-)
+Not easy to debug this way :)
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 0270cd7ca165..4c3dcf43b0e2 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -372,9 +372,38 @@ struct bfq_queue *bic_to_bfqq(struct bfq_io_cq *bic, bool is_sync)
- 	return bic->bfqq[is_sync];
- }
- 
-+static void bfq_put_stable_ref(struct bfq_queue *bfqq);
-+
- void bic_set_bfqq(struct bfq_io_cq *bic, struct bfq_queue *bfqq, bool is_sync)
- {
-+	/*
-+	 * If bfqq != NULL, then a non-stable queue merge between
-+	 * bic->bfqq and bfqq is happening here. This causes troubles
-+	 * in the following case: bic->bfqq has also been scheduled
-+	 * for a possible stable merge with bic->stable_merge_bfqq,
-+	 * and bic->stable_merge_bfqq == bfqq happens to
-+	 * hold. Troubles occur because bfqq may then undergo a split,
-+	 * thereby becoming eligible for a stable merge. Yet, if
-+	 * bic->stable_merge_bfqq points exactly to bfqq, then bfqq
-+	 * would be stably merged with itself. To avoid this anomaly,
-+	 * we cancel the stable merge if
-+	 * bic->stable_merge_bfqq == bfqq.
-+	 */
- 	bic->bfqq[is_sync] = bfqq;
-+
-+	if (bfqq && bic->stable_merge_bfqq == bfqq) {
-+		/*
-+		 * Actually, these same instructions are executed also
-+		 * in bfq_setup_cooperator, in case of abort or actual
-+		 * execution of a stable merge. We could avoid
-+		 * repeating these instructions there too, but if we
-+		 * did so, we would nest even more complexity in this
-+		 * function.
-+		 */
-+		bfq_put_stable_ref(bic->stable_merge_bfqq);
-+
-+		bic->stable_merge_bfqq = NULL;
-+	}
- }
- 
- struct bfq_data *bic_to_bfqd(struct bfq_io_cq *bic)
-@@ -2631,8 +2660,6 @@ static bool bfq_may_be_close_cooperator(struct bfq_queue *bfqq,
- static bool idling_boosts_thr_without_issues(struct bfq_data *bfqd,
- 					     struct bfq_queue *bfqq);
- 
--static void bfq_put_stable_ref(struct bfq_queue *bfqq);
--
- /*
-  * Attempt to schedule a merge of bfqq with the currently in-service
-  * queue or with a close queue among the scheduled queues.  Return
--- 
-2.20.1
+At any rate, I've just posted the fix contained in my debug patch =
+series.
+
+Thanks,
+Paolo
+
+> 	-Mike
+>=20
 
