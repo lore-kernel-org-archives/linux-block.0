@@ -7,44 +7,43 @@ X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
 	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 366EEC433ED
-	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 21:41:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D586C433ED
+	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 21:41:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 05950613E6
-	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 21:41:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EA1B9613E6
+	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 21:41:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230295AbhELVmF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 May 2021 17:42:05 -0400
-Received: from mail-qk1-f172.google.com ([209.85.222.172]:36642 "EHLO
-        mail-qk1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1386454AbhELUz5 (ORCPT
+        id S231130AbhELVmO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 May 2021 17:42:14 -0400
+Received: from mail-oi1-f170.google.com ([209.85.167.170]:45987 "EHLO
+        mail-oi1-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1345134AbhELU7s (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 May 2021 16:55:57 -0400
-Received: by mail-qk1-f172.google.com with SMTP id c20so12649907qkm.3;
-        Wed, 12 May 2021 13:54:40 -0700 (PDT)
+        Wed, 12 May 2021 16:59:48 -0400
+Received: by mail-oi1-f170.google.com with SMTP id n184so23479899oia.12;
+        Wed, 12 May 2021 13:58:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
         bh=nWpDQmZNg8zKVk12QskQ7NNS05C4fI/JmZBKLdKyu8Q=;
-        b=LZAhKZRJzEs0GYh23U+HdYiA4FqSPNp3glE+7LQD5v6xe8xskRT6hpVzNQ1so2oMrV
-         AJBjj7jTgBi3MT2usKi+ELizCkUSQ62yUHGweQ8tEyk2NXZVzwTUEN//dBEexDWaB9IL
-         kvw1zZoTAQq2JSXLUMsPJ7+slGr6DyrDVD9qlB7cyDCPpbX6N1chevmY5s91Elv7hHjY
-         6LwGejZaiGOAMWWLwcs7hlLUggV/LJb/m2bjxw78TlRMSFkfwI/QiC/6hBHeniYYGJRJ
-         +TWSpcS2jdwdjpWpOhxZMP2S528w+DaN/JldhRYoSQRafqxWkCLW7gZhgUzCrXbeDf5s
-         lmbw==
-X-Gm-Message-State: AOAM53178tvjWlrwyVAXxonAwCwvQ/7LRKyehtfA8hEeUtjqjkChVg6W
-        WAIB3Z0MslKLwE2zMX8YjzzyoAmV3NI=
-X-Google-Smtp-Source: ABdhPJw3ba7TDy9IXhuSNfnoRNLweJN6Sxi95AmyabzWqR4IojtKhY12rFTIDEHLbQim/UIuTomsBg==
-X-Received: by 2002:ae9:edcf:: with SMTP id c198mr26913097qkg.54.1620852880078;
-        Wed, 12 May 2021 13:54:40 -0700 (PDT)
+        b=qO/6ug2dOyxGE83h71DCfO5Vbw2wWSH4ozsNTcs98oKkpIS0iYnhvpKw/jdPRHOCjs
+         Zm4CYG0kiWQh+rkXaCXfMDe+i/GY8NEN17DCax65/6Nn1Dbq4EyJ83/jntPFXvzTz5+/
+         8FwJY48ufp16ozSqW5L/XM7k82jPdtvxwXIWhA5LIMxFgl8Pb6eZGfnJuRavHYcBzOFB
+         d+8CRXCnyfL1RBHEr4YavEyAEsJILRa2FI8VWUj4oLFfafTvNRvB2ehM82cLq+UbJ2f5
+         5rgPrbj4QXQOLf2eRcr9PzejoLCFWU82UmW4DX3NNkQ/58OC2JpBYFnvyxTs8VeJB4GO
+         3MVw==
+X-Gm-Message-State: AOAM532Tm14bWff2aoiV0FX/snDFUGwAIXs7GQBTI7j5aFngbsJG9w3T
+        WyCk8X3D6erDJh3pU/h70KU=
+X-Google-Smtp-Source: ABdhPJxIt33KmeXNXDucfoZBOm9x/wAiZEW2osKajoIJW1cYbUKVk4S5avEIuomHeoZsyKU0Jwknrg==
+X-Received: by 2002:aca:5c44:: with SMTP id q65mr26899108oib.12.1620853102255;
+        Wed, 12 May 2021 13:58:22 -0700 (PDT)
 Received: from ?IPv6:2600:1700:65a0:78e0:c65a:d038:3389:f848? ([2600:1700:65a0:78e0:c65a:d038:3389:f848])
-        by smtp.gmail.com with ESMTPSA id l16sm964832qkg.91.2021.05.12.13.54.38
+        by smtp.gmail.com with ESMTPSA id w6sm203220otj.5.2021.05.12.13.58.20
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 12 May 2021 13:54:39 -0700 (PDT)
-Subject: Re: [PATCH 02/15] block: don't try to poll multi-bio I/Os in
- __blkdev_direct_IO
+        Wed, 12 May 2021 13:58:21 -0700 (PDT)
+Subject: Re: [PATCH 04/15] blk-mq: factor out a blk_qc_to_hctx helper
 To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
 Cc:     Jeffle Xu <jefflexu@linux.alibaba.com>,
         Ming Lei <ming.lei@redhat.com>,
@@ -55,14 +54,14 @@ Cc:     Jeffle Xu <jefflexu@linux.alibaba.com>,
         linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         linux-nvme@lists.infradead.org
 References: <20210512131545.495160-1-hch@lst.de>
- <20210512131545.495160-3-hch@lst.de>
+ <20210512131545.495160-5-hch@lst.de>
 From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <ad73f9ea-bc57-2a9c-5c32-547d188c7a1e@grimberg.me>
-Date:   Wed, 12 May 2021 13:54:37 -0700
+Message-ID: <030d24a1-de26-e71d-2b44-bc213abf5219@grimberg.me>
+Date:   Wed, 12 May 2021 13:58:19 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.8.1
 MIME-Version: 1.0
-In-Reply-To: <20210512131545.495160-3-hch@lst.de>
+In-Reply-To: <20210512131545.495160-5-hch@lst.de>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
