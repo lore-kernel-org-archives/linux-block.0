@@ -2,71 +2,58 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C6E1C433B4
-	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 10:01:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ED51C433B4
+	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 11:36:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 351D2613B9
-	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 10:01:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CEF85613CD
+	for <linux-block@archiver.kernel.org>; Wed, 12 May 2021 11:36:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230104AbhELKDC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 May 2021 06:03:02 -0400
-Received: from mail.wangsu.com ([123.103.51.227]:59092 "EHLO wangsu.com"
-        rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-        id S230114AbhELKC5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 May 2021 06:02:57 -0400
-Received: from fedora33.wangsu.com (unknown [59.61.78.138])
-        by app2 (Coremail) with SMTP id 4zNnewAHDwd+p5tg+R4CAA--.3295S2;
-        Wed, 12 May 2021 18:01:40 +0800 (CST)
-From:   Lin Feng <linf@wangsu.com>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linf@wangsu.com,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] blkdev.h: remove unused codes blk_account_rq
-Date:   Wed, 12 May 2021 18:01:24 +0800
-Message-Id: <20210512100124.173769-1-linf@wangsu.com>
-X-Mailer: git-send-email 2.30.2
+        id S230114AbhELLhP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 May 2021 07:37:15 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:2654 "EHLO
+        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230019AbhELLhO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 12 May 2021 07:37:14 -0400
+Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.58])
+        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4FgCNd5qHHzmVcB;
+        Wed, 12 May 2021 19:33:53 +0800 (CST)
+Received: from huawei.com (10.175.127.227) by DGGEMS409-HUB.china.huawei.com
+ (10.3.19.209) with Microsoft SMTP Server id 14.3.498.0; Wed, 12 May 2021
+ 19:35:58 +0800
+From:   Sun Ke <sunke32@huawei.com>
+To:     <josef@toxicpanda.com>, <axboe@kernel.dk>, <Markus.Elfring@web.de>
+CC:     <linux-block@vger.kernel.org>, <nbd@other.debian.org>,
+        <linux-kernel@vger.kernel.org>, <sunke32@huawei.com>
+Subject: [PATCH 0/2] fix a NULL pointer bug and simplify the code
+Date:   Wed, 12 May 2021 19:43:29 +0800
+Message-ID: <20210512114331.1233964-1-sunke32@huawei.com>
+X-Mailer: git-send-email 2.25.4
 MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: 4zNnewAHDwd+p5tg+R4CAA--.3295S2
-X-Coremail-Antispam: 1UD129KBjvdXoWrtF1fAw4rXFWxZFWUCryUWrg_yoWDGrX_u3
-        40kr4IkrWrGr43Ww4UJFW3tFWYgryxJa17uFsaqrWxJ3WkGanYvw48JFnxGay7Wa97Cr13
-        X3W0g3s3Zr1fWjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJ3UbIYCTnIWIevJa73UjIFyTuYvj4RJUUUUUUUU
-X-CM-SenderInfo: holqwq5zdqw23xof0z/
+X-Originating-IP: [10.175.127.227]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Last users of blk_account_rq gone with patch commit a1ce35fa49852db
-("block: remove dead elevator code") and now it gets no caller, it can
-be safely removed.
+fix a NULL pointer bug and simplify the code
 
-Signed-off-by: Lin Feng <linf@wangsu.com>
----
- include/linux/blkdev.h | 5 -----
- 1 file changed, 5 deletions(-)
+They should have been applied for 5.12, something was wrong.
+So, send them again. 
 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 1255823b2bc0..f69c75bd6d27 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -676,11 +676,6 @@ bool blk_queue_flag_test_and_set(unsigned int flag, struct request_queue *q);
- extern void blk_set_pm_only(struct request_queue *q);
- extern void blk_clear_pm_only(struct request_queue *q);
- 
--static inline bool blk_account_rq(struct request *rq)
--{
--	return (rq->rq_flags & RQF_STARTED) && !blk_rq_is_passthrough(rq);
--}
--
- #define list_entry_rq(ptr)	list_entry((ptr), struct request, queuelist)
- 
- #define rq_data_dir(rq)		(op_is_write(req_op(rq)) ? WRITE : READ)
+Sun Ke (2):
+  nbd: Fix NULL pointer in flush_workqueue
+  nbd: share nbd_put and return by goto put_nbd
+
+ drivers/block/nbd.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
 -- 
-2.30.2
+2.25.4
 
