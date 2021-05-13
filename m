@@ -2,185 +2,72 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45D7CC433B4
-	for <linux-block@archiver.kernel.org>; Thu, 13 May 2021 12:05:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE6B8C433ED
+	for <linux-block@archiver.kernel.org>; Thu, 13 May 2021 14:16:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 13A646127A
-	for <linux-block@archiver.kernel.org>; Thu, 13 May 2021 12:05:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A16BD6142C
+	for <linux-block@archiver.kernel.org>; Thu, 13 May 2021 14:16:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233603AbhEMMGf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 May 2021 08:06:35 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2651 "EHLO
-        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231772AbhEMMGb (ORCPT
+        id S234301AbhEMORM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 May 2021 10:17:12 -0400
+Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:44976 "EHLO
+        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S234249AbhEMORK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 May 2021 08:06:31 -0400
-Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.58])
-        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4FgqyW6WSPzQlWF;
-        Thu, 13 May 2021 20:01:55 +0800 (CST)
-Received: from localhost.localdomain (10.69.192.58) by
- DGGEMS407-HUB.china.huawei.com (10.3.19.207) with Microsoft SMTP Server id
- 14.3.498.0; Thu, 13 May 2021 20:05:12 +0800
-From:   John Garry <john.garry@huawei.com>
-To:     <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-scsi@vger.kernel.org>, <ming.lei@redhat.com>,
-        <kashyap.desai@broadcom.com>, <chenxiang66@hisilicon.com>,
-        <yama@redhat.com>, <dgilbert@interlog.com>,
-        John Garry <john.garry@huawei.com>
-Subject: [PATCH v3 1/2] blk-mq: Some tag allocation code refactoring
-Date:   Thu, 13 May 2021 20:00:57 +0800
-Message-ID: <1620907258-30910-2-git-send-email-john.garry@huawei.com>
-X-Mailer: git-send-email 2.8.1
-In-Reply-To: <1620907258-30910-1-git-send-email-john.garry@huawei.com>
-References: <1620907258-30910-1-git-send-email-john.garry@huawei.com>
+        Thu, 13 May 2021 10:17:10 -0400
+Received: from cwcc.thunk.org (pool-72-74-133-215.bstnma.fios.verizon.net [72.74.133.215])
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 14DEFVOa009307
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 13 May 2021 10:15:32 -0400
+Received: by cwcc.thunk.org (Postfix, from userid 15806)
+        id 9B67515C3B1D; Thu, 13 May 2021 10:15:31 -0400 (EDT)
+Date:   Thu, 13 May 2021 10:15:31 -0400
+From:   "Theodore Ts'o" <tytso@mit.edu>
+To:     Changheun Lee <nanich.lee@samsung.com>
+Cc:     alex_y_xu@yahoo.ca, axboe@kernel.dk, bgoncalv@redhat.com,
+        bvanassche@acm.org, dm-crypt@saout.de, hch@lst.de,
+        jaegeuk@kernel.org, linux-block@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-nvme@lists.infradead.org, ming.lei@redhat.com,
+        yi.zhang@redhat.com
+Subject: Re: regression: data corruption with ext4 on LUKS on nvme with
+ torvalds master
+Message-ID: <YJ00g8oBZkduQXIe@mit.edu>
+References: <CGME20210513100034epcas1p4b23892cd77bde73c777eea6dc51c16a4@epcas1p4.samsung.com>
+ <20210513094222.17635-1-nanich.lee@samsung.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.69.192.58]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210513094222.17635-1-nanich.lee@samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The tag allocation code to alloc the sbitmap pairs is common for regular
-bitmaps tags and shared sbitmap, so refactor into a common function.
+On Thu, May 13, 2021 at 06:42:22PM +0900, Changheun Lee wrote:
+> 
+> Problem might be casued by exhausting of memory. And memory exhausting
+> would be caused by setting of small bio_max_size. Actually it was not
+> reproduced in my VM environment at first. But, I reproduced same problem
+> when bio_max_size is set with 8KB forced. Too many bio allocation would
+> be occurred by setting of 8KB bio_max_size.
 
-Also remove superfluous "flags" argument from blk_mq_init_shared_sbitmap().
+Hmm... I'm not sure how to align your diagnosis with the symptoms in
+the bug report.  If we were limited by memory, that should slow down
+the I/O, but we should still be making forward progress, no?  And a
+forced reboot should not result in data corruption, unless maybe there
+was a missing check for a failed memory allocation, causing data to be
+written to the wrong location, a missing error check leading to the
+block or file system layer not noticing that a write had failed
+(although again, memory exhaustion should not lead to failed writes;
+it might slow us down, sure, but if writes are being failed, something
+is Badly Going Wrong --- things like writes to the swap device or
+writes by the page cleaner must succeed, or else Things Would Go Bad
+In A Hurry).
 
-Signed-off-by: John Garry <john.garry@huawei.com>
----
- block/blk-mq-tag.c | 54 ++++++++++++++++++++++++++++------------------
- block/blk-mq-tag.h |  9 +++++---
- block/blk-mq.c     |  2 +-
- 3 files changed, 40 insertions(+), 25 deletions(-)
-
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index 2a37731e8244..45479c0f88a2 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -445,39 +445,54 @@ static int bt_alloc(struct sbitmap_queue *bt, unsigned int depth,
- 				       node);
- }
- 
--static int blk_mq_init_bitmap_tags(struct blk_mq_tags *tags,
--				   int node, int alloc_policy)
-+int blk_mq_init_bitmaps(struct sbitmap_queue *bitmap_tags,
-+			struct sbitmap_queue *breserved_tags,
-+			unsigned int queue_depth, unsigned int reserved,
-+			int node, int alloc_policy)
- {
--	unsigned int depth = tags->nr_tags - tags->nr_reserved_tags;
-+	unsigned int depth = queue_depth - reserved;
- 	bool round_robin = alloc_policy == BLK_TAG_ALLOC_RR;
- 
--	if (bt_alloc(&tags->__bitmap_tags, depth, round_robin, node))
-+	if (bt_alloc(bitmap_tags, depth, round_robin, node))
- 		return -ENOMEM;
--	if (bt_alloc(&tags->__breserved_tags, tags->nr_reserved_tags,
--		     round_robin, node))
-+	if (bt_alloc(breserved_tags, reserved, round_robin, node))
- 		goto free_bitmap_tags;
- 
-+	return 0;
-+
-+free_bitmap_tags:
-+	sbitmap_queue_free(bitmap_tags);
-+	return -ENOMEM;
-+}
-+
-+static int blk_mq_init_bitmap_tags(struct blk_mq_tags *tags,
-+				   int node, int alloc_policy)
-+{
-+	int ret;
-+
-+	ret = blk_mq_init_bitmaps(&tags->__bitmap_tags,
-+				  &tags->__breserved_tags,
-+				  tags->nr_tags, tags->nr_reserved_tags,
-+				  node, alloc_policy);
-+	if (ret)
-+		return ret;
-+
- 	tags->bitmap_tags = &tags->__bitmap_tags;
- 	tags->breserved_tags = &tags->__breserved_tags;
- 
- 	return 0;
--free_bitmap_tags:
--	sbitmap_queue_free(&tags->__bitmap_tags);
--	return -ENOMEM;
- }
- 
--int blk_mq_init_shared_sbitmap(struct blk_mq_tag_set *set, unsigned int flags)
-+int blk_mq_init_shared_sbitmap(struct blk_mq_tag_set *set)
- {
--	unsigned int depth = set->queue_depth - set->reserved_tags;
- 	int alloc_policy = BLK_MQ_FLAG_TO_ALLOC_POLICY(set->flags);
--	bool round_robin = alloc_policy == BLK_TAG_ALLOC_RR;
--	int i, node = set->numa_node;
-+	int i, ret;
- 
--	if (bt_alloc(&set->__bitmap_tags, depth, round_robin, node))
--		return -ENOMEM;
--	if (bt_alloc(&set->__breserved_tags, set->reserved_tags,
--		     round_robin, node))
--		goto free_bitmap_tags;
-+	ret = blk_mq_init_bitmaps(&set->__bitmap_tags, &set->__breserved_tags,
-+				  set->queue_depth, set->reserved_tags,
-+				  set->numa_node, alloc_policy);
-+	if (ret)
-+		return ret;
- 
- 	for (i = 0; i < set->nr_hw_queues; i++) {
- 		struct blk_mq_tags *tags = set->tags[i];
-@@ -487,9 +502,6 @@ int blk_mq_init_shared_sbitmap(struct blk_mq_tag_set *set, unsigned int flags)
- 	}
- 
- 	return 0;
--free_bitmap_tags:
--	sbitmap_queue_free(&set->__bitmap_tags);
--	return -ENOMEM;
- }
- 
- void blk_mq_exit_shared_sbitmap(struct blk_mq_tag_set *set)
-diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
-index 7d3e6b333a4a..2a718c8d080f 100644
---- a/block/blk-mq-tag.h
-+++ b/block/blk-mq-tag.h
-@@ -26,11 +26,14 @@ extern struct blk_mq_tags *blk_mq_init_tags(unsigned int nr_tags,
- 					unsigned int reserved_tags,
- 					int node, unsigned int flags);
- extern void blk_mq_free_tags(struct blk_mq_tags *tags, unsigned int flags);
-+extern int blk_mq_init_bitmaps(struct sbitmap_queue *bitmap_tags,
-+			       struct sbitmap_queue *breserved_tags,
-+			       unsigned int queue_depth,
-+			       unsigned int reserved,
-+			       int node, int alloc_policy);
- 
--extern int blk_mq_init_shared_sbitmap(struct blk_mq_tag_set *set,
--				      unsigned int flags);
-+extern int blk_mq_init_shared_sbitmap(struct blk_mq_tag_set *set);
- extern void blk_mq_exit_shared_sbitmap(struct blk_mq_tag_set *set);
--
- extern unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data);
- extern void blk_mq_put_tag(struct blk_mq_tags *tags, struct blk_mq_ctx *ctx,
- 			   unsigned int tag);
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 466676bc2f0b..499ad5462f7e 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -3488,7 +3488,7 @@ int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set)
- 	if (blk_mq_is_sbitmap_shared(set->flags)) {
- 		atomic_set(&set->active_queues_shared_sbitmap, 0);
- 
--		if (blk_mq_init_shared_sbitmap(set, set->flags)) {
-+		if (blk_mq_init_shared_sbitmap(set)) {
- 			ret = -ENOMEM;
- 			goto out_free_mq_rq_maps;
- 		}
--- 
-2.26.2
-
+						- Ted
