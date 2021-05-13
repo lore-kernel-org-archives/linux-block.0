@@ -5,45 +5,45 @@ X-Spam-Level:
 X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F171FC433B4
-	for <linux-block@archiver.kernel.org>; Thu, 13 May 2021 10:03:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BE9DC433ED
+	for <linux-block@archiver.kernel.org>; Thu, 13 May 2021 10:03:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 91306613D6
-	for <linux-block@archiver.kernel.org>; Thu, 13 May 2021 10:03:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EBF2A61260
+	for <linux-block@archiver.kernel.org>; Thu, 13 May 2021 10:03:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232841AbhEMKE1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 May 2021 06:04:27 -0400
-Received: from mx2.suse.de ([195.135.220.15]:37442 "EHLO mx2.suse.de"
+        id S232845AbhEMKE2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 May 2021 06:04:28 -0400
+Received: from mx2.suse.de ([195.135.220.15]:37416 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232815AbhEMKEQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        id S232813AbhEMKEQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
         Thu, 13 May 2021 06:04:16 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1620900186; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1620900185; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=0Q6ThoS9c4shqaPBcM7YVpxtTsCqScDLVsepBzmlgCI=;
-        b=KB4VO2b29rr8hcdZZAjHAppb7tKug2TKs7hwZV1cULAeBgNVDz9y3rAzxIUyt8uz4zhN1m
-        wbkrBEc19J6BDwt9BDdkNjqE7EkKbsb19lj8El+kyBKqof1o5TWtGOxWrVw6bpy14oUpOL
-        hA7SOkSFBinvHJbDqRzyWiVv2QpDJHA=
+        bh=lutTQX8ZA5u3khaAXqUgHLKbfap899noTeivh9Sx9NQ=;
+        b=X9zTq81SYVIejJbZ3hqVnPgnP7pcUDx2BE/zHP4wRq7hBon4FcfafyN+fXITzioqYy+QoR
+        pBz0uhcESpMAUzIdg50l7VW/TsBGw3s6HDsmczQ3YLqYI5+JC1vvrfRDwWsaYqSOxIH89y
+        FBMrmVY8k7hSXXCMQGggw+D5zhxq8r4=
 Received: from relay2.suse.de (unknown [195.135.221.27])
-        by mx2.suse.de (Postfix) with ESMTP id EB135AFF6;
+        by mx2.suse.de (Postfix) with ESMTP id B132FAFF5;
         Thu, 13 May 2021 10:03:05 +0000 (UTC)
 From:   Juergen Gross <jgross@suse.com>
 To:     xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
 Cc:     Juergen Gross <jgross@suse.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
         Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
         =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
         Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 3/8] xen/blkfront: don't take local copy of a request from the ring page
-Date:   Thu, 13 May 2021 12:02:57 +0200
-Message-Id: <20210513100302.22027-4-jgross@suse.com>
+Subject: [PATCH 2/8] xen/blkfront: read response from backend only once
+Date:   Thu, 13 May 2021 12:02:56 +0200
+Message-Id: <20210513100302.22027-3-jgross@suse.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20210513100302.22027-1-jgross@suse.com>
 References: <20210513100302.22027-1-jgross@suse.com>
@@ -53,97 +53,121 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In order to avoid a malicious backend being able to influence the local
-copy of a request build the request locally first and then copy it to
-the ring page instead of doing it the other way round as today.
+In order to avoid problems in case the backend is modifying a response
+on the ring page while the frontend has already seen it, just read the
+response into a local buffer in one go and then operate on that buffer
+only.
 
 Signed-off-by: Juergen Gross <jgross@suse.com>
 ---
- drivers/block/xen-blkfront.c | 25 +++++++++++++++----------
- 1 file changed, 15 insertions(+), 10 deletions(-)
+ drivers/block/xen-blkfront.c | 35 ++++++++++++++++++-----------------
+ 1 file changed, 18 insertions(+), 17 deletions(-)
 
 diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
-index a8b56c153330..c6a05de4f15f 100644
+index 10df39a8b18d..a8b56c153330 100644
 --- a/drivers/block/xen-blkfront.c
 +++ b/drivers/block/xen-blkfront.c
-@@ -546,7 +546,7 @@ static unsigned long blkif_ring_get_request(struct blkfront_ring_info *rinfo,
- 	rinfo->shadow[id].status = REQ_WAITING;
- 	rinfo->shadow[id].associated_id = NO_ASSOCIATED_ID;
- 
--	(*ring_req)->u.rw.id = id;
-+	rinfo->shadow[id].req.u.rw.id = id;
- 
- 	return id;
- }
-@@ -554,11 +554,12 @@ static unsigned long blkif_ring_get_request(struct blkfront_ring_info *rinfo,
- static int blkif_queue_discard_req(struct request *req, struct blkfront_ring_info *rinfo)
+@@ -1557,7 +1557,7 @@ static bool blkif_completion(unsigned long *id,
+ static irqreturn_t blkif_interrupt(int irq, void *dev_id)
  {
- 	struct blkfront_info *info = rinfo->dev_info;
--	struct blkif_request *ring_req;
-+	struct blkif_request *ring_req, *final_ring_req;
- 	unsigned long id;
+ 	struct request *req;
+-	struct blkif_response *bret;
++	struct blkif_response bret;
+ 	RING_IDX i, rp;
+ 	unsigned long flags;
+ 	struct blkfront_ring_info *rinfo = (struct blkfront_ring_info *)dev_id;
+@@ -1574,8 +1574,9 @@ static irqreturn_t blkif_interrupt(int irq, void *dev_id)
+ 	for (i = rinfo->ring.rsp_cons; i != rp; i++) {
+ 		unsigned long id;
  
- 	/* Fill out a communications ring structure. */
--	id = blkif_ring_get_request(rinfo, req, &ring_req);
-+	id = blkif_ring_get_request(rinfo, req, &final_ring_req);
-+	ring_req = &rinfo->shadow[id].req;
- 
- 	ring_req->operation = BLKIF_OP_DISCARD;
- 	ring_req->u.discard.nr_sectors = blk_rq_sectors(req);
-@@ -569,8 +570,8 @@ static int blkif_queue_discard_req(struct request *req, struct blkfront_ring_inf
- 	else
- 		ring_req->u.discard.flag = 0;
- 
--	/* Keep a private copy so we can reissue requests when recovering. */
--	rinfo->shadow[id].req = *ring_req;
-+	/* Copy the request to the ring page. */
-+	*final_ring_req = *ring_req;
- 
- 	return 0;
- }
-@@ -703,6 +704,7 @@ static int blkif_queue_rw_req(struct request *req, struct blkfront_ring_info *ri
- {
- 	struct blkfront_info *info = rinfo->dev_info;
- 	struct blkif_request *ring_req, *extra_ring_req = NULL;
-+	struct blkif_request *final_ring_req, *final_extra_ring_req;
- 	unsigned long id, extra_id = NO_ASSOCIATED_ID;
- 	bool require_extra_req = false;
- 	int i;
-@@ -747,7 +749,8 @@ static int blkif_queue_rw_req(struct request *req, struct blkfront_ring_info *ri
- 	}
- 
- 	/* Fill out a communications ring structure. */
--	id = blkif_ring_get_request(rinfo, req, &ring_req);
-+	id = blkif_ring_get_request(rinfo, req, &final_ring_req);
-+	ring_req = &rinfo->shadow[id].req;
- 
- 	num_sg = blk_rq_map_sg(req->q, req, rinfo->shadow[id].sg);
- 	num_grant = 0;
-@@ -798,7 +801,9 @@ static int blkif_queue_rw_req(struct request *req, struct blkfront_ring_info *ri
- 		ring_req->u.rw.nr_segments = num_grant;
- 		if (unlikely(require_extra_req)) {
- 			extra_id = blkif_ring_get_request(rinfo, req,
--							  &extra_ring_req);
-+							  &final_extra_ring_req);
-+			extra_ring_req = &rinfo->shadow[extra_id].req;
+-		bret = RING_GET_RESPONSE(&rinfo->ring, i);
+-		id   = bret->id;
++		RING_COPY_RESPONSE(&rinfo->ring, i, &bret);
++		id = bret.id;
 +
+ 		/*
+ 		 * The backend has messed up and given us an id that we would
+ 		 * never have given to it (we stamp it up to BLK_RING_SIZE -
+@@ -1583,39 +1584,39 @@ static irqreturn_t blkif_interrupt(int irq, void *dev_id)
+ 		 */
+ 		if (id >= BLK_RING_SIZE(info)) {
+ 			WARN(1, "%s: response to %s has incorrect id (%ld)\n",
+-			     info->gd->disk_name, op_name(bret->operation), id);
++			     info->gd->disk_name, op_name(bret.operation), id);
+ 			/* We can't safely get the 'struct request' as
+ 			 * the id is busted. */
+ 			continue;
+ 		}
+ 		req  = rinfo->shadow[id].request;
+ 
+-		if (bret->operation != BLKIF_OP_DISCARD) {
++		if (bret.operation != BLKIF_OP_DISCARD) {
  			/*
- 			 * Only the first request contains the scatter-gather
- 			 * list.
-@@ -840,10 +845,10 @@ static int blkif_queue_rw_req(struct request *req, struct blkfront_ring_info *ri
- 	if (setup.segments)
- 		kunmap_atomic(setup.segments);
+ 			 * We may need to wait for an extra response if the
+ 			 * I/O request is split in 2
+ 			 */
+-			if (!blkif_completion(&id, rinfo, bret))
++			if (!blkif_completion(&id, rinfo, &bret))
+ 				continue;
+ 		}
  
--	/* Keep a private copy so we can reissue requests when recovering. */
--	rinfo->shadow[id].req = *ring_req;
-+	/* Copy request(s) to the ring page. */
-+	*final_ring_req = *ring_req;
- 	if (unlikely(require_extra_req))
--		rinfo->shadow[extra_id].req = *extra_ring_req;
-+		*final_extra_ring_req = *extra_ring_req;
+ 		if (add_id_to_freelist(rinfo, id)) {
+ 			WARN(1, "%s: response to %s (id %ld) couldn't be recycled!\n",
+-			     info->gd->disk_name, op_name(bret->operation), id);
++			     info->gd->disk_name, op_name(bret.operation), id);
+ 			continue;
+ 		}
  
- 	if (new_persistent_gnts)
- 		gnttab_free_grant_references(setup.gref_head);
+-		if (bret->status == BLKIF_RSP_OKAY)
++		if (bret.status == BLKIF_RSP_OKAY)
+ 			blkif_req(req)->error = BLK_STS_OK;
+ 		else
+ 			blkif_req(req)->error = BLK_STS_IOERR;
+ 
+-		switch (bret->operation) {
++		switch (bret.operation) {
+ 		case BLKIF_OP_DISCARD:
+-			if (unlikely(bret->status == BLKIF_RSP_EOPNOTSUPP)) {
++			if (unlikely(bret.status == BLKIF_RSP_EOPNOTSUPP)) {
+ 				struct request_queue *rq = info->rq;
+ 				printk(KERN_WARNING "blkfront: %s: %s op failed\n",
+-					   info->gd->disk_name, op_name(bret->operation));
++					   info->gd->disk_name, op_name(bret.operation));
+ 				blkif_req(req)->error = BLK_STS_NOTSUPP;
+ 				info->feature_discard = 0;
+ 				info->feature_secdiscard = 0;
+@@ -1625,15 +1626,15 @@ static irqreturn_t blkif_interrupt(int irq, void *dev_id)
+ 			break;
+ 		case BLKIF_OP_FLUSH_DISKCACHE:
+ 		case BLKIF_OP_WRITE_BARRIER:
+-			if (unlikely(bret->status == BLKIF_RSP_EOPNOTSUPP)) {
++			if (unlikely(bret.status == BLKIF_RSP_EOPNOTSUPP)) {
+ 				printk(KERN_WARNING "blkfront: %s: %s op failed\n",
+-				       info->gd->disk_name, op_name(bret->operation));
++				       info->gd->disk_name, op_name(bret.operation));
+ 				blkif_req(req)->error = BLK_STS_NOTSUPP;
+ 			}
+-			if (unlikely(bret->status == BLKIF_RSP_ERROR &&
++			if (unlikely(bret.status == BLKIF_RSP_ERROR &&
+ 				     rinfo->shadow[id].req.u.rw.nr_segments == 0)) {
+ 				printk(KERN_WARNING "blkfront: %s: empty %s op failed\n",
+-				       info->gd->disk_name, op_name(bret->operation));
++				       info->gd->disk_name, op_name(bret.operation));
+ 				blkif_req(req)->error = BLK_STS_NOTSUPP;
+ 			}
+ 			if (unlikely(blkif_req(req)->error)) {
+@@ -1646,9 +1647,9 @@ static irqreturn_t blkif_interrupt(int irq, void *dev_id)
+ 			fallthrough;
+ 		case BLKIF_OP_READ:
+ 		case BLKIF_OP_WRITE:
+-			if (unlikely(bret->status != BLKIF_RSP_OKAY))
++			if (unlikely(bret.status != BLKIF_RSP_OKAY))
+ 				dev_dbg(&info->xbdev->dev, "Bad return from blkdev data "
+-					"request: %x\n", bret->status);
++					"request: %x\n", bret.status);
+ 
+ 			break;
+ 		default:
 -- 
 2.26.2
 
