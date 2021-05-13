@@ -2,96 +2,127 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E4F8C43460
-	for <linux-block@archiver.kernel.org>; Thu, 13 May 2021 21:18:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DCB7C433ED
+	for <linux-block@archiver.kernel.org>; Thu, 13 May 2021 22:32:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 64E3A613F2
-	for <linux-block@archiver.kernel.org>; Thu, 13 May 2021 21:18:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1C07F613CD
+	for <linux-block@archiver.kernel.org>; Thu, 13 May 2021 22:32:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233369AbhEMVT2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 May 2021 17:19:28 -0400
-Received: from mail-pl1-f175.google.com ([209.85.214.175]:42497 "EHLO
-        mail-pl1-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233360AbhEMVT1 (ORCPT
+        id S233630AbhEMWd3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 May 2021 18:33:29 -0400
+Received: from ale.deltatee.com ([204.191.154.188]:58984 "EHLO
+        ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233549AbhEMWdZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 May 2021 17:19:27 -0400
-Received: by mail-pl1-f175.google.com with SMTP id v13so15048931ple.9;
-        Thu, 13 May 2021 14:18:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=mvZf3JNCBPnJCp6W7ETlVadxetawitWuzaHn0wwc8uQ=;
-        b=m+BERp7WpecMgXSUo2TqCeMMhexujZybqwtaJl5bIibPHVygfFECcd9NcP+pMJlzSc
-         v/g6lHBNP52HfgTrDqAbpZ2TWfGVOEVUU6HaCPc+N/Bu149Vm8OanAoIxTGeIoDjRPPJ
-         dts1k6x5x/AWeSizxRYXxEY5J6sacxvRF0OU/wHTaqw58l02/uBt0P1/MJceCx7jSO7p
-         dNYeltKVzKL3wtp+JnqBCqk98JG5b7SlY9TWO8uYFN6WpDD3bSY+Qz/fYevQsxrRH+vw
-         tGYZ4DTwpXfsblGeBmzhbJyJSqh9nquu1ND7DsomFMZ7gmOjtsb9i9fL1q7fVsRRC4Fp
-         W5IQ==
-X-Gm-Message-State: AOAM531i+nuGrJ9JnpsSrjuGUk1cpjzhYSzZVYpYyjW31jKMvTla8wg8
-        IXmnHkc7ybpGnjr5bscy98uEL2UApiAJrg==
-X-Google-Smtp-Source: ABdhPJwewpa0foiOfv5+uWT766FJFkGKaXiL58aPMNLdz8Z3MaXuEV5io4OkQpitS3h5OFIBnffzhg==
-X-Received: by 2002:a17:90b:84:: with SMTP id bb4mr6992032pjb.60.1620940697238;
-        Thu, 13 May 2021 14:18:17 -0700 (PDT)
-Received: from ?IPv6:2601:647:4000:d7:54a8:4531:57a:cfd8? ([2601:647:4000:d7:54a8:4531:57a:cfd8])
-        by smtp.gmail.com with ESMTPSA id l35sm2809109pgm.10.2021.05.13.14.18.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 May 2021 14:18:16 -0700 (PDT)
-Subject: Re: regression: data corruption with ext4 on LUKS on nvme with
- torvalds master
-To:     Mikulas Patocka <mpatocka@redhat.com>,
-        Milan Broz <gmazyland@gmail.com>,
-        Theodore Ts'o <tytso@mit.edu>,
-        Changheun Lee <nanich.lee@samsung.com>
-Cc:     alex_y_xu@yahoo.ca, axboe@kernel.dk, bgoncalv@redhat.com,
-        dm-crypt@saout.de, hch@lst.de, jaegeuk@kernel.org,
-        linux-block@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        ming.lei@redhat.com, yi.zhang@redhat.com, dm-devel@redhat.com
-References: <a01ab479-69e8-9395-7d24-9de1eec28aff@acm.org>
- <0e7b0b6e-e78c-f22d-af8d-d7bdcb597bea@gmail.com>
- <alpine.LRH.2.02.2105131510330.21927@file01.intranet.prod.int.rdu2.redhat.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <fdee795d-7a4b-9506-b9ca-359b9bcbec34@acm.org>
-Date:   Thu, 13 May 2021 14:18:14 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.0
+        Thu, 13 May 2021 18:33:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=deltatee.com; s=20200525; h=Subject:MIME-Version:References:In-Reply-To:
+        Message-Id:Date:Cc:To:From:content-disposition;
+        bh=kGb8w7OA+VecwjXRg6RAtUZUrHcBmrTzMPMqQqpjkm8=; b=eGbHnD9CNeacCKyZbuiHdS6KFZ
+        NNh/EZ5WKODS1Ve6hb1tF/uAsrIqT4gYpJq4dxG0nF2fvIpAi7TpV7+/Y6LNZx1pFlY/hFAgny73W
+        YtwZdP5IKdbhnFLh6KOTjJPOyogKxWXzq0K5Uu3ECThupT7cYwnsUUsGUYZBl9Fc4L7bqM9BzM7kp
+        WC8F7PvsKKU2uOJ6Z2Fe47S/Ut/YmpU8uQ9Z/nZuPUE3EHFlWo3EHFOsmuSzH7OEgCTdiaglnj5LW
+        nloEQgOv8SrxTyCv/NT8SVr0wrClZ2lqYuGBcRUJczrCPrgJ3bbnOLMmFmVp7MYt9Q7mA3ab0Nreo
+        FRk7EUkg==;
+Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
+        by ale.deltatee.com with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <gunthorp@deltatee.com>)
+        id 1lhJsL-0000nD-QQ; Thu, 13 May 2021 16:32:15 -0600
+Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.92)
+        (envelope-from <gunthorp@deltatee.com>)
+        id 1lhJsF-0001SX-Uh; Thu, 13 May 2021 16:32:07 -0600
+From:   Logan Gunthorpe <logang@deltatee.com>
+To:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-mm@kvack.org, iommu@lists.linux-foundation.org
+Cc:     Stephen Bates <sbates@raithlin.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        =?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Don Dutile <ddutile@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Jakowski Andrzej <andrzej.jakowski@intel.com>,
+        Minturn Dave B <dave.b.minturn@intel.com>,
+        Jason Ekstrand <jason@jlekstrand.net>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Xiong Jianxin <jianxin.xiong@intel.com>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Logan Gunthorpe <logang@deltatee.com>
+Date:   Thu, 13 May 2021 16:31:43 -0600
+Message-Id: <20210513223203.5542-3-logang@deltatee.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20210513223203.5542-1-logang@deltatee.com>
+References: <20210513223203.5542-1-logang@deltatee.com>
 MIME-Version: 1.0
-In-Reply-To: <alpine.LRH.2.02.2105131510330.21927@file01.intranet.prod.int.rdu2.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 172.16.1.31
+X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, iommu@lists.linux-foundation.org, sbates@raithlin.com, hch@lst.de, jgg@ziepe.ca, christian.koenig@amd.com, jhubbard@nvidia.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, jason@jlekstrand.net, dave.hansen@linux.intel.com, helgaas@kernel.org, dan.j.williams@intel.com, andrzej.jakowski@intel.com, dave.b.minturn@intel.com, jianxin.xiong@intel.com, ira.weiny@intel.com, robin.murphy@arm.com, logang@deltatee.com
+X-SA-Exim-Mail-From: gunthorp@deltatee.com
+Subject: [PATCH v2 02/22] PCI/P2PDMA: Use a buffer on the stack for collecting the acs list
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/13/21 12:22 PM, Mikulas Patocka wrote:
-> We already had problems with too large bios in dm-crypt and we fixed it by 
-> adding this piece of code:
-> 
->         /*
->          * Check if bio is too large, split as needed.
->          */
->         if (unlikely(bio->bi_iter.bi_size > (BIO_MAX_VECS << PAGE_SHIFT)) &&
->             (bio_data_dir(bio) == WRITE || cc->on_disk_tag_size))
->                 dm_accept_partial_bio(bio, ((BIO_MAX_VECS << PAGE_SHIFT) >> SECTOR_SHIFT));
-> 
-> It will ask the device mapper to split the bio if it is too large. So, 
-> crypt_alloc_buffer can't receive a bio that is larger than BIO_MAX_VECS << 
-> PAGE_SHIFT.
+In order to call the calc_map_type_and_dist_warn() function from
+a dma_map operation, the function must not sleep. The only reason
+it sleeps is to allocate memory for the seq_buf to print a verbose
+warning telling the user how to disable ACS for that path.
 
-Hi Mikulas,
+Instead of allocating the memory with kmalloc, allocate it on
+the stack with a smaller buffer. A 128B buffer is enough to print
+10 pci device names. A system with 10 bridge ports between two devices
+that have ACS enabled would be unusually large, so this should
+still be a reasonable limit.
 
-Are you perhaps referring to commit 4e870e948fba ("dm crypt: fix error
-with too large bios")? Did that commit go upstream before multi-page
-bvec support? Can larger bios be supported in case of two or more
-contiguous pages now that multi-page bvec support is upstream?
+This also allows cleaning up the awkward (and broken) return with
+-ENOMEM which contradicts the return type and the caller was
+not prepared for.
 
-Thanks,
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+---
+ drivers/pci/p2pdma.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-Bart.
+diff --git a/drivers/pci/p2pdma.c b/drivers/pci/p2pdma.c
+index 6f90e9812f6e..3a5fb63c5f2c 100644
+--- a/drivers/pci/p2pdma.c
++++ b/drivers/pci/p2pdma.c
+@@ -500,11 +500,10 @@ calc_map_type_and_dist_warn(struct pci_dev *provider, struct pci_dev *client,
+ {
+ 	struct seq_buf acs_list;
+ 	bool acs_redirects;
++	char buf[128];
+ 	int ret;
+ 
+-	seq_buf_init(&acs_list, kmalloc(PAGE_SIZE, GFP_KERNEL), PAGE_SIZE);
+-	if (!acs_list.buffer)
+-		return -ENOMEM;
++	seq_buf_init(&acs_list, buf, sizeof(buf));
+ 
+ 	ret = calc_map_type_and_dist(provider, client, dist, &acs_redirects,
+ 				     &acs_list);
+@@ -522,8 +521,6 @@ calc_map_type_and_dist_warn(struct pci_dev *provider, struct pci_dev *client,
+ 			 pci_name(provider));
+ 	}
+ 
+-	kfree(acs_list.buffer);
+-
+ 	return ret;
+ }
+ 
+-- 
+2.20.1
+
