@@ -7,36 +7,36 @@ X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54DC6C43470
-	for <linux-block@archiver.kernel.org>; Thu, 13 May 2021 22:32:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37884C43600
+	for <linux-block@archiver.kernel.org>; Thu, 13 May 2021 22:32:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2E35161443
-	for <linux-block@archiver.kernel.org>; Thu, 13 May 2021 22:32:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1A49361354
+	for <linux-block@archiver.kernel.org>; Thu, 13 May 2021 22:32:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233633AbhEMWd3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 May 2021 18:33:29 -0400
-Received: from ale.deltatee.com ([204.191.154.188]:58974 "EHLO
+        id S233549AbhEMWdc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 May 2021 18:33:32 -0400
+Received: from ale.deltatee.com ([204.191.154.188]:58988 "EHLO
         ale.deltatee.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230213AbhEMWdZ (ORCPT
+        with ESMTP id S233556AbhEMWd0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 May 2021 18:33:25 -0400
+        Thu, 13 May 2021 18:33:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=deltatee.com; s=20200525; h=Subject:MIME-Version:References:In-Reply-To:
         Message-Id:Date:Cc:To:From:content-disposition;
-        bh=DGEbO1eDsmi+omtiZtoL8bN3wHWEYyZxOXmeMgj8t5E=; b=YeD+bra3l3uIf07AwPoKcCDa4Z
-        JfnhnF/wgBgfdJ84A3ZDSr+qlE7cCVn2z0uGxlci+fWP7OKTeWw3/yzUEp1ZhC2t9KgFJ0qYmkNKd
-        FH9FUq94L7wlEqzzOlnpClMKI2U7IpxFXwQVaGzI7Khfkt9nzLl+RSS8QHlF8nglOnJrADHtYn1Zv
-        cIzkZK72rbD+ve6pt291ikLf40mIxO2vGdumHGtH3Ykc+TyNm2TafzntSERgJ2bbZ8OQIDciQWDfg
-        QB60+m/XtVqPSUGx7WKmh8O/rFhKxYTYKSdWAyWvClIyOO1Sz74t2kBUCAMGdulRNKr8U11s9LDND
-        bDQMd57g==;
+        bh=M9URDKLIjWjYTVDR2jo0iTH/7oGIDWR/L4jsn5dDFEQ=; b=n061DgFCU9NzN4lKQkcvE0Vgff
+        KqhQDsQf0FiHKJh0lpMDW4cqOXRvLM/1rmcyvnVpn/5jOAJSiT/yAzjgyESNl4ZXz+x7ORPlwQVjh
+        SSm0Re7Hp1abk1zwbYETKG6X5/K7JsNKOCnjUK3UmCvlBxfkfTH+qwQbextk6lh11y0h6q58XSIQw
+        6gOm0v5wVAy8/07ejEh5EqIUurPNcs1vtn25yGx05VbRETmh+h2ex+rOAzXUDibvFm2ryrZdrgWkq
+        YeZI+qDF6xJDuqpnUx1/jIX8Tvr5C7DvFVIDvpZsoLK6/v3ulzBnPocYSJspfOD6XijvgJtl+IlbT
+        GAESFp5w==;
 Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
         by ale.deltatee.com with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.92)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1lhJsL-0000nC-QQ; Thu, 13 May 2021 16:32:14 -0600
+        id 1lhJsL-0000nF-QQ; Thu, 13 May 2021 16:32:15 -0600
 Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.92)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1lhJsF-0001SV-Pg; Thu, 13 May 2021 16:32:07 -0600
+        id 1lhJsG-0001Se-6p; Thu, 13 May 2021 16:32:08 -0600
 From:   Logan Gunthorpe <logang@deltatee.com>
 To:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
@@ -59,8 +59,8 @@ Cc:     Stephen Bates <sbates@raithlin.com>,
         Ira Weiny <ira.weiny@intel.com>,
         Robin Murphy <robin.murphy@arm.com>,
         Logan Gunthorpe <logang@deltatee.com>
-Date:   Thu, 13 May 2021 16:31:42 -0600
-Message-Id: <20210513223203.5542-2-logang@deltatee.com>
+Date:   Thu, 13 May 2021 16:31:45 -0600
+Message-Id: <20210513223203.5542-5-logang@deltatee.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20210513223203.5542-1-logang@deltatee.com>
 References: <20210513223203.5542-1-logang@deltatee.com>
@@ -69,152 +69,85 @@ Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 172.16.1.31
 X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, iommu@lists.linux-foundation.org, sbates@raithlin.com, hch@lst.de, jgg@ziepe.ca, christian.koenig@amd.com, jhubbard@nvidia.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, jason@jlekstrand.net, dave.hansen@linux.intel.com, helgaas@kernel.org, dan.j.williams@intel.com, andrzej.jakowski@intel.com, dave.b.minturn@intel.com, jianxin.xiong@intel.com, ira.weiny@intel.com, robin.murphy@arm.com, logang@deltatee.com
 X-SA-Exim-Mail-From: gunthorp@deltatee.com
-Subject: [PATCH v2 01/22] PCI/P2PDMA: Rename upstream_bridge_distance() and rework documentation
+Subject: [PATCH v2 04/22] PCI/P2PDMA: Avoid pci_get_slot() which sleeps
 X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
 X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The function upstream_bridge_distance() has evolved such that it's name
-is no longer entirely reflective of what the function does.
+In order to use upstream_bridge_distance_warn() from a dma_map function,
+it must not sleep. However, pci_get_slot() takes the pci_bus_sem so it
+might sleep.
 
-The function not only calculates the distance between two peers but also
-calculates how the DMA addresses for those two peers should be mapped.
+In order to avoid this, try to get the host bridge's device from the first
+element in the device list. It should be impossible for the host bridge's
+device to go away while references are held on child devices, so the first
+element should not be able to change and, thus, this should be safe.
 
-Thus, rename the function to calc_map_type_and_dist() and rework the
-documentation some to better describe the two pieces of information
-the function returns.
+Introduce a static function called pci_host_bridge_dev() to obtain the
+host bridge's root device.
 
 Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
 ---
- drivers/pci/p2pdma.c | 63 ++++++++++++++++++++++----------------------
- 1 file changed, 32 insertions(+), 31 deletions(-)
+ drivers/pci/p2pdma.c | 34 ++++++++++++++++++++++++++++++++--
+ 1 file changed, 32 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/pci/p2pdma.c b/drivers/pci/p2pdma.c
-index 196382630363..6f90e9812f6e 100644
+index 09c864f193d2..175da3a9c8fb 100644
 --- a/drivers/pci/p2pdma.c
 +++ b/drivers/pci/p2pdma.c
-@@ -354,7 +354,7 @@ static bool host_bridge_whitelist(struct pci_dev *a, struct pci_dev *b)
- }
+@@ -308,10 +308,41 @@ static const struct pci_p2pdma_whitelist_entry {
+ 	{}
+ };
  
- static enum pci_p2pdma_map_type
--__upstream_bridge_distance(struct pci_dev *provider, struct pci_dev *client,
-+__calc_map_type_and_dist(struct pci_dev *provider, struct pci_dev *client,
- 		int *dist, bool *acs_redirects, struct seq_buf *acs_list)
++/*
++ * This lookup function tries to find the PCI device corresponding to a given
++ * host bridge.
++ *
++ * It assumes the host bridge device is the first PCI device in the
++ * bus->devices list and that the devfn is 00.0. These assumptions should hold
++ * for all the devices in the whitelist above.
++ *
++ * This function is equivalent to pci_get_slot(host->bus, 0), however it does
++ * not take the pci_bus_sem lock seeing __host_bridge_whitelist() must not
++ * sleep.
++ *
++ * For this to be safe, the caller should hold a reference to a device on the
++ * bridge, which should ensure the host_bridge device will not be freed
++ * or removed from the head of the devices list.
++ */
++static struct pci_dev *pci_host_bridge_dev(struct pci_host_bridge *host)
++{
++	struct pci_dev *root;
++
++	root = list_first_entry_or_null(&host->bus->devices,
++					struct pci_dev, bus_list);
++
++	if (!root)
++		return NULL;
++	if (root->devfn != PCI_DEVFN(0, 0))
++		return NULL;
++
++	return root;
++}
++
+ static bool __host_bridge_whitelist(struct pci_host_bridge *host,
+ 				    bool same_host_bridge)
  {
- 	struct pci_dev *a = provider, *b = client, *bb;
-@@ -433,17 +433,18 @@ static unsigned long map_types_idx(struct pci_dev *client)
- }
+-	struct pci_dev *root = pci_get_slot(host->bus, PCI_DEVFN(0, 0));
++	struct pci_dev *root = pci_host_bridge_dev(host);
+ 	const struct pci_p2pdma_whitelist_entry *entry;
+ 	unsigned short vendor, device;
  
- /*
-- * Find the distance through the nearest common upstream bridge between
-- * two PCI devices.
-+ * Calculate the P2PDMA mapping type and distance between two PCI devices.
-  *
-- * If the two devices are the same device then 0 will be returned.
-+ * If the two devices are the same device then PCI_P2PDMA_MAP_BUS_ADDR
-+ * and a distance of 0 will be returned.
-  *
-  * If there are two virtual functions of the same device behind the same
-- * bridge port then 2 will be returned (one step down to the PCIe switch,
-- * then one step back to the same device).
-+ * bridge port then PCI_P2PDMA_MAP_BUS_ADDR and a distance of 2 will be
-+ * returned (one step down to the PCIe switch, then one step back to the
-+ * same device).
-  *
-  * In the case where two devices are connected to the same PCIe switch, the
-- * value 4 will be returned. This corresponds to the following PCI tree:
-+ * distance of 4 will be returned. This corresponds to the following PCI tree:
-  *
-  *     -+  Root Port
-  *      \+ Switch Upstream Port
-@@ -454,31 +455,31 @@ static unsigned long map_types_idx(struct pci_dev *client)
-  *
-  * The distance is 4 because we traverse from Device A through the downstream
-  * port of the switch, to the common upstream port, back up to the second
-- * downstream port and then to Device B.
-- *
-- * Any two devices that cannot communicate using p2pdma will return
-- * PCI_P2PDMA_MAP_NOT_SUPPORTED.
-+ * downstream port and then to Device B. The mapping type returned will depend
-+ * on the ACS redirection setting of the bridges along the path. If ACS
-+ * redirect is set on any bridge port in the path then the TLPs will go through
-+ * the host bridge. Otherwise PCI_P2PDMA_MAP_BUS_ADDR is returned.
-  *
-  * Any two devices that have a data path that goes through the host bridge
-- * will consult a whitelist. If the host bridges are on the whitelist,
-- * this function will return PCI_P2PDMA_MAP_THRU_HOST_BRIDGE.
-- *
-- * If either bridge is not on the whitelist this function returns
-- * PCI_P2PDMA_MAP_NOT_SUPPORTED.
-+ * will consult a whitelist. If the host bridge is in the whitelist,
-+ * this function will return PCI_P2PDMA_MAP_THRU_HOST_BRIDGE with the
-+ * distance set to the number of ports per above. If the device is not
-+ * in the whitelist the type will be returned PCI_P2PDMA_MAP_NOT_SUPPORTED.
-  *
-- * If a bridge which has any ACS redirection bits set is in the path,
-- * acs_redirects will be set to true. In this case, a list of all infringing
-- * bridge addresses will be populated in acs_list (assuming it's non-null)
-- * for printk purposes.
-+ * If any ACS redirect bits are set, then the acs_redirects boolean will be
-+ * set to true and their pci device name will be appended to the acs_list
-+ * seq_buf. This seq_buf is used to print a warning informing the user
-+ * how to disable ACS using a command line parameter.
-+ * (See calc_map_type_and_dist_warn() below)
-  */
- static enum pci_p2pdma_map_type
--upstream_bridge_distance(struct pci_dev *provider, struct pci_dev *client,
-+calc_map_type_and_dist(struct pci_dev *provider, struct pci_dev *client,
- 		int *dist, bool *acs_redirects, struct seq_buf *acs_list)
- {
- 	enum pci_p2pdma_map_type map_type;
+@@ -320,7 +351,6 @@ static bool __host_bridge_whitelist(struct pci_host_bridge *host,
  
--	map_type = __upstream_bridge_distance(provider, client, dist,
--					      acs_redirects, acs_list);
-+	map_type = __calc_map_type_and_dist(provider, client, dist,
-+					    acs_redirects, acs_list);
+ 	vendor = root->vendor;
+ 	device = root->device;
+-	pci_dev_put(root);
  
- 	if (map_type == PCI_P2PDMA_MAP_THRU_HOST_BRIDGE) {
- 		if (!cpu_supports_p2pdma() &&
-@@ -494,8 +495,8 @@ upstream_bridge_distance(struct pci_dev *provider, struct pci_dev *client,
- }
- 
- static enum pci_p2pdma_map_type
--upstream_bridge_distance_warn(struct pci_dev *provider, struct pci_dev *client,
--			      int *dist)
-+calc_map_type_and_dist_warn(struct pci_dev *provider, struct pci_dev *client,
-+			    int *dist)
- {
- 	struct seq_buf acs_list;
- 	bool acs_redirects;
-@@ -505,8 +506,8 @@ upstream_bridge_distance_warn(struct pci_dev *provider, struct pci_dev *client,
- 	if (!acs_list.buffer)
- 		return -ENOMEM;
- 
--	ret = upstream_bridge_distance(provider, client, dist, &acs_redirects,
--				       &acs_list);
-+	ret = calc_map_type_and_dist(provider, client, dist, &acs_redirects,
-+				     &acs_list);
- 	if (acs_redirects) {
- 		pci_warn(client, "ACS redirect is set between the client and provider (%s)\n",
- 			 pci_name(provider));
-@@ -565,11 +566,11 @@ int pci_p2pdma_distance_many(struct pci_dev *provider, struct device **clients,
- 		}
- 
- 		if (verbose)
--			ret = upstream_bridge_distance_warn(provider,
--					pci_client, &distance);
-+			ret = calc_map_type_and_dist_warn(provider, pci_client,
-+							  &distance);
- 		else
--			ret = upstream_bridge_distance(provider, pci_client,
--						       &distance, NULL, NULL);
-+			ret = calc_map_type_and_dist(provider, pci_client,
-+						     &distance, NULL, NULL);
- 
- 		pci_dev_put(pci_client);
- 
+ 	for (entry = pci_p2pdma_whitelist; entry->vendor; entry++) {
+ 		if (vendor != entry->vendor || device != entry->device)
 -- 
 2.20.1
 
