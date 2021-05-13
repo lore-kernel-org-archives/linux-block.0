@@ -2,117 +2,122 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B05BC433ED
-	for <linux-block@archiver.kernel.org>; Thu, 13 May 2021 01:26:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D63ABC433B4
+	for <linux-block@archiver.kernel.org>; Thu, 13 May 2021 07:24:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 12540611AE
-	for <linux-block@archiver.kernel.org>; Thu, 13 May 2021 01:26:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9766C611CA
+	for <linux-block@archiver.kernel.org>; Thu, 13 May 2021 07:24:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230216AbhEMB2D (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 May 2021 21:28:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:57032 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230322AbhEMB2C (ORCPT
+        id S230517AbhEMHZ4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 May 2021 03:25:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33262 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231186AbhEMHZz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 May 2021 21:28:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620869213;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=0IeOLvkrAZQGTtr6LkMNlIliT+Himhj1UgnIENWNGN4=;
-        b=SW//Z+E/Nv7AR/eGCAZrvhG+how9cxrfXK43c8uppYGYFOxt2yp933cJLUX5kXgbTK4a7A
-        6+7S01hRP0OHtG1c+hOFat4rZrrxYJTRV8Ac4j9dy0tgQznjT5PLjq/uHvMaiZKqVm1t8V
-        2Rw2fWGTs4FFhiCoB/KVsS+Py4CzfV4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-448-Vn8JPlHkNsmVXoreJ5GFCQ-1; Wed, 12 May 2021 21:26:49 -0400
-X-MC-Unique: Vn8JPlHkNsmVXoreJ5GFCQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 312B5801107;
-        Thu, 13 May 2021 01:26:48 +0000 (UTC)
-Received: from T590 (ovpn-12-78.pek2.redhat.com [10.72.12.78])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 42FC25D9D7;
-        Thu, 13 May 2021 01:26:34 +0000 (UTC)
-Date:   Thu, 13 May 2021 09:26:30 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Sagi Grimberg <sagi@grimberg.me>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Jeffle Xu <jefflexu@linux.alibaba.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Keith Busch <kbusch@kernel.org>,
-        "Wunderlich, Mark" <mark.wunderlich@intel.com>,
-        "Vasudevan, Anil" <anil.vasudevan@intel.com>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-nvme@lists.infradead.org
-Subject: Re: [PATCH 12/15] block: switch polling to be bio based
-Message-ID: <YJyARt6S2JQ9H/Ew@T590>
-References: <20210512131545.495160-1-hch@lst.de>
- <20210512131545.495160-13-hch@lst.de>
- <45d66945-165c-ae48-69f4-75dc553b0386@grimberg.me>
+        Thu, 13 May 2021 03:25:55 -0400
+Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2729AC061574;
+        Thu, 13 May 2021 00:24:45 -0700 (PDT)
+Received: by mail-pg1-x52a.google.com with SMTP id l70so5819291pga.1;
+        Thu, 13 May 2021 00:24:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-transfer-encoding:content-language;
+        bh=rgXzYYK5Z0MLecdxrChbPktgTp37eF6Gz82P771tZ9Y=;
+        b=aliCCdsndaLIJHzenXEP2v4OAlnRaIuN4jnQ0SBGwc4KQWKn7U5OzyXxbGn3QeUKhg
+         kdeprgYn6hBiZtpZdzDe79aD0V2nGSCmPeZPs+1pdWwVohAwDr5XNWIN5gyvOB70vd3Y
+         dTBH4+SEIezEZKW8e9lK8gbgmvN+04YI9Dy/DE9G3pPVot2Tspcq3P5VmHsBOpO+1XRu
+         j7cUts4NK6dJrhyKks/QeO+lmNPnRphVila4we/7mYxGiZ0tnmxbKMe8Ky7C9MTAvGU/
+         urGh9pNr/7Vr8LoDy7VLYGS2H04Pd5y2Hvwwy4NJezFaULBPrv/pfi1Gl65TDjcIk1Q+
+         wUow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=rgXzYYK5Z0MLecdxrChbPktgTp37eF6Gz82P771tZ9Y=;
+        b=R6bzusk62TYOEgxVPf9YOZ+wsGDqW2R7pYWF/MuYU+IngAAShU6qzJU4BAsi99IVP4
+         TSo7Dl5ibPjlbsNH9mN6w96VjHQ77s8F+Oh9rSWWcMxbwL/LKWF/xbVfTkbl/LNxK6Op
+         st5esdK7Pjlc0P6BRt8oQPho7LjOha+OK7XUyeomlOCl/a6+Mflu5tRpTKWYsTSF9CaO
+         NBXGfKtPmOYppiHk3DhRuO8na9pZTjCVVgd/LNIpQMPcE5TYnQdVIgl4G3abLS2iiex1
+         ZHJooYts6Y8122+YIwfZgZqFwUpDqQvkJnKgPBElFpwPjkrmdHoX7ZRCVSNwfxCcUyn5
+         mFqQ==
+X-Gm-Message-State: AOAM532HHntV+NFkrBk01wuGgubvNZ1YqO++ktfaaVTQ4NK+4Mhh0pit
+        gVLFcy0QjgMuhM/fwWJ0hx8=
+X-Google-Smtp-Source: ABdhPJwXx2OG5VpEqLvmWJKr9VJYqB7FB0b1I2Ulw/Z+ul3Z1eFnl+dLZ1lBmiKOpg8es32j4owqzg==
+X-Received: by 2002:a62:528e:0:b029:1f5:c5ee:a487 with SMTP id g136-20020a62528e0000b02901f5c5eea487mr38685998pfb.7.1620890684676;
+        Thu, 13 May 2021 00:24:44 -0700 (PDT)
+Received: from [10.6.2.84] ([89.187.161.155])
+        by smtp.gmail.com with ESMTPSA id n9sm1514251pgt.35.2021.05.13.00.24.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 13 May 2021 00:24:44 -0700 (PDT)
+Subject: Re: [PATCH] md: don't account io stat for split bio
+To:     Christoph Hellwig <hch@infradead.org>, Song Liu <song@kernel.org>
+Cc:     Artur Paszkiewicz <artur.paszkiewicz@intel.com>,
+        linux-raid <linux-raid@vger.kernel.org>,
+        linux-block@vger.kernel.org,
+        Pawe?? Wiejacha <pawel.wiejacha@rtbhouse.com>
+References: <20210508034815.123565-1-jgq516@gmail.com>
+ <YJjL6AQ+mMgzmIqM@infradead.org>
+ <14a350ee-1ec9-6a15-dd76-fb01d8dd2235@gmail.com>
+ <6ffb719e-bb56-8f61-9cd3-a0852c4acb7d@intel.com>
+ <c1bc42ff-eae7-d0ba-505d-9c6a19d60e93@gmail.com>
+ <CAPhsuW44cc2p+29_rLqrq7i3R0d03sjtwRQtbLRkta+jzsdYsw@mail.gmail.com>
+ <YJot2JAZkQi7RPGS@infradead.org>
+From:   Guoqing Jiang <jgq516@gmail.com>
+Message-ID: <5e91dccb-31f3-daa0-f974-9c3211cc6b15@gmail.com>
+Date:   Thu, 13 May 2021 15:24:27 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <45d66945-165c-ae48-69f4-75dc553b0386@grimberg.me>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <YJot2JAZkQi7RPGS@infradead.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, May 12, 2021 at 03:03:40PM -0700, Sagi Grimberg wrote:
-> 
-> 
-> On 5/12/21 6:15 AM, Christoph Hellwig wrote:
-> > Replace the blk_poll interface that requires the caller to keep a queue
-> > and cookie from the submissions with polling based on the bio.
-> > 
-> > Polling for the bio itself leads to a few advantages:
-> > 
-> >   - the cookie construction can made entirely private in blk-mq.c
-> >   - the caller does not need to remember the request_queue and cookie
-> >     separately and thus sidesteps their lifetime issues
-> >   - keeping the device and the cookie inside the bio allows to trivially
-> >     support polling BIOs remapping by stacking drivers
-> >   - a lot of code to propagate the cookie back up the submission path can
-> >     be removed entirely.
-> > 
-> > Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-...
 
-> > +int bio_poll(struct bio *bio, unsigned int flags)
-> > +{
-> > +	struct request_queue *q = bio->bi_bdev->bd_disk->queue;
-> > +	blk_qc_t cookie = READ_ONCE(bio->bi_cookie);
-> > +
-> > +	if (cookie == BLK_QC_T_NONE ||
-> > +	    !test_bit(QUEUE_FLAG_POLL, &q->queue_flags))
-> > +		return 0;
-> > +
-> > +	if (current->plug)
-> > +		blk_flush_plug_list(current->plug, false);
-> > +
-> > +	/* not yet implemented, so this should not happen */
-> > +	if (WARN_ON_ONCE(!queue_is_mq(q)))
-> 
-> What happens if the I/O wasn't (yet) queued to the bottom device
-> (i.e. no available path in nvme-mpath)?
-> 
-> In this case the disk would be the mpath device node (which is
-> not mq...)
+On 5/11/21 3:10 PM, Christoph Hellwig wrote:
+> On Mon, May 10, 2021 at 11:58:32PM -0700, Song Liu wrote:
+>> IIUC, the sysfs node is needed to get better performance (by disabling
+>> accounting)?
+> FYI, we already have that sysfs file in the block layer
+> ("queue/iostats"), please just observe QUEUE_FLAG_IO_STAT flag.
 
-->bi_cookie is only set in blk_mq_start_request() for blk-mq request,
-if the I/O isn't queued to bottom device, it won't be polled because
-->bi_cookie is still BLK_QC_T_NONE.
+Seems only nvdimm observe the flag before call bio_{start,end}_io_acct.
+Does it make sense to make the checking mandatory? Something like.
 
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -1315,6 +1315,9 @@ static unsigned long __part_start_io_acct(struct 
+block_device *part,
+         const int sgrp = op_stat_group(op);
+         unsigned long now = READ_ONCE(jiffies);
+
++       if (!blk_queue_io_stat(part->bd_disk->queue))
++               return 0;
++
+         part_stat_lock();
+         update_io_ticks(part, now, false);
+         part_stat_inc(part, ios[sgrp]);
+@@ -1351,6 +1354,9 @@ static void __part_end_io_acct(struct block_device 
+*part, unsigned int op,
+         unsigned long now = READ_ONCE(jiffies);
+         unsigned long duration = now - start_time;
+
++       if (!blk_queue_io_stat(part->bd_disk->queue))
++               return;
++
 
 Thanks,
-Ming
-
+Guoqing
