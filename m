@@ -2,128 +2,108 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-20.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B823C433ED
-	for <linux-block@archiver.kernel.org>; Thu, 13 May 2021 15:59:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43D57C433B4
+	for <linux-block@archiver.kernel.org>; Thu, 13 May 2021 17:03:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 36A866142E
-	for <linux-block@archiver.kernel.org>; Thu, 13 May 2021 15:59:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 190AF61354
+	for <linux-block@archiver.kernel.org>; Thu, 13 May 2021 17:03:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234954AbhEMQAX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 May 2021 12:00:23 -0400
-Received: from mail-pl1-f173.google.com ([209.85.214.173]:46893 "EHLO
-        mail-pl1-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234949AbhEMQAX (ORCPT
+        id S229717AbhEMRFA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 May 2021 13:05:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49726 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229797AbhEMRE6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 May 2021 12:00:23 -0400
-Received: by mail-pl1-f173.google.com with SMTP id s20so14610427plr.13;
-        Thu, 13 May 2021 08:59:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=sC9rS2dsZghLNP4cQrgEl3m85yFLwm9XaohEby3pw50=;
-        b=RNxDtndZ2FbFHXEwkwpkMUmEqYt5xX4dC4P0P7Axp6tGYABzi5MeoGO2dbRc3TPFYS
-         DZHbl8bDdDPd8ZuuAoNPiw5Hjqj5t9+hwjeRDqDiaMDTrC2vkPF62HF59XEZMc1/4h0Z
-         4VEnXdu6rM0IryXkEmqNTkRbUvpBOEpHHVlY/2MVUolz7iWWCeSPWPY5YNke0tZPmmH9
-         a+6Fq3ow+RNVw2uV7rPhIWob/GRhPiHEwb4epYSGuQuEGrHBNLp9H3USw96hvqyYh9Ma
-         yLznlrnRI/0PpiX+xgu59+MTgSl3uQVreYZ8r0G01KK4bMM/kUbhAYnA1RFIDHT3shB4
-         U39w==
-X-Gm-Message-State: AOAM531nDQMyK/FaUR/scokeFFtgaUUKLJMMC8kZLTsos5nAkw6CJCbg
-        tRPey0kinmAOesqtv41IPnJDSLhYjmkqAw==
-X-Google-Smtp-Source: ABdhPJyKQvVPuce3z1l4PmtlSaJD2TKIxNY5wls14OzgkkacwtnJxux5VVxX2A9kPeGYMqj6U7DU/w==
-X-Received: by 2002:a17:902:7d8b:b029:ef:8306:6ae7 with SMTP id a11-20020a1709027d8bb02900ef83066ae7mr9036878plm.26.1620921553393;
-        Thu, 13 May 2021 08:59:13 -0700 (PDT)
-Received: from ?IPv6:2601:647:4000:d7:6dd7:5386:8c63:ccae? ([2601:647:4000:d7:6dd7:5386:8c63:ccae])
-        by smtp.gmail.com with ESMTPSA id t4sm2410467pfq.165.2021.05.13.08.59.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 13 May 2021 08:59:12 -0700 (PDT)
-Subject: Re: regression: data corruption with ext4 on LUKS on nvme with
- torvalds master
-To:     Theodore Ts'o <tytso@mit.edu>,
-        Changheun Lee <nanich.lee@samsung.com>
-Cc:     alex_y_xu@yahoo.ca, axboe@kernel.dk, bgoncalv@redhat.com,
-        dm-crypt@saout.de, hch@lst.de, jaegeuk@kernel.org,
-        linux-block@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        ming.lei@redhat.com, yi.zhang@redhat.com
-References: <CGME20210513100034epcas1p4b23892cd77bde73c777eea6dc51c16a4@epcas1p4.samsung.com>
- <20210513094222.17635-1-nanich.lee@samsung.com> <YJ00g8oBZkduQXIe@mit.edu>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <a01ab479-69e8-9395-7d24-9de1eec28aff@acm.org>
-Date:   Thu, 13 May 2021 08:59:10 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.0
+        Thu, 13 May 2021 13:04:58 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EF79C061574
+        for <linux-block@vger.kernel.org>; Thu, 13 May 2021 10:03:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Type:MIME-Version:Message-ID:
+        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=fiCWapO073jEA0FUhOiRuc4EhkynRDlHMqEG2raIyC4=; b=zqGQUb/zw4xOK/n5ziSLL5ZDYS
+        4ggTWxZEvp57J1Ajy6OQaXn24aXWeBSH/XRSvEhStFKaJGl8BfcLkjQmELcnmRWwcqhW8c6DK1fLW
+        WEQi5bqUQw3vu5idBHVtNVC8+Ccf/jxjMQN2gwnwXdBbjNyPDopO4RoAYhExjv5h8mPKhXGl1hl0k
+        t/Q1TJWUuJ0bNPY5AxQslF7wvheu3UmpR2P0o8nm5/iafE4o7qoT4fgYB06oGeNXkvXXxG501e8zf
+        Soigj4ipNRK87pE87zzeISKB4VQYwjUixf7RrsJ4x0qqEa4oB+uDa8jqrbdzLGmaLUCzMt1XTd/Kg
+        cMRO8oHg==;
+Received: from [2001:4bb8:198:fbc8:26bf:3bb3:2a36:e078] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
+        id 1lhEkR-00BPAu-EY; Thu, 13 May 2021 17:03:44 +0000
+Date:   Thu, 13 May 2021 19:03:40 +0200
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
+        Sagi Grimberg <sagi@grimberg.me>,
+        linux-nvme@lists.infradead.org
+Subject: [GIT PULL] nvme fixes for Linux 5.13
+Message-ID: <YJ1b7OeZpoR3j13K@infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <YJ00g8oBZkduQXIe@mit.edu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/13/21 7:15 AM, Theodore Ts'o wrote:
-> On Thu, May 13, 2021 at 06:42:22PM +0900, Changheun Lee wrote:
->>
->> Problem might be casued by exhausting of memory. And memory exhausting
->> would be caused by setting of small bio_max_size. Actually it was not
->> reproduced in my VM environment at first. But, I reproduced same problem
->> when bio_max_size is set with 8KB forced. Too many bio allocation would
->> be occurred by setting of 8KB bio_max_size.
-> 
-> Hmm... I'm not sure how to align your diagnosis with the symptoms in
-> the bug report.  If we were limited by memory, that should slow down
-> the I/O, but we should still be making forward progress, no?  And a
-> forced reboot should not result in data corruption, unless maybe there
-> was a missing check for a failed memory allocation, causing data to be
-> written to the wrong location, a missing error check leading to the
-> block or file system layer not noticing that a write had failed
-> (although again, memory exhaustion should not lead to failed writes;
-> it might slow us down, sure, but if writes are being failed, something
-> is Badly Going Wrong --- things like writes to the swap device or
-> writes by the page cleaner must succeed, or else Things Would Go Bad
-> In A Hurry).
+The following changes since commit efed9a3337e341bd0989161b97453b52567bc59d:
 
-After the LUKS data corruption issue was reported I decided to take a
-look at the dm-crypt code. In that code I found the following:
+  kyber: fix out of bounds access when preempted (2021-05-11 08:12:14 -0600)
 
-static void clone_init(struct dm_crypt_io *io, struct bio *clone)
-{
-	struct crypt_config *cc = io->cc;
+are available in the Git repository at:
 
-	clone->bi_private = io;
-	clone->bi_end_io  = crypt_endio;
-	bio_set_dev(clone, cc->dev->bdev);
-	clone->bi_opf	  = io->base_bio->bi_opf;
-}
-[ ... ]
-static struct bio *crypt_alloc_buffer(struct dm_crypt_io *io, unsigned size)
-{
-	[ ... ]
-	clone = bio_alloc_bioset(GFP_NOIO, nr_iovecs, &cc->bs);
-	[ ... ]
-	clone_init(io, clone);
-	[ ... ]
-	for (i = 0; i < nr_iovecs; i++) {
-		[ ... ]
-		bio_add_page(clone, page, len, 0);
+  git://git.infradead.org/nvme.git tags/nvme-5.13-2021-05-13
 
-		remaining_size -= len;
-	}
-	[ ... ]
-}
+for you to fetch changes up to e181811bd04d874fe48bbfa1165a82068b58144d:
 
-My interpretation is that crypt_alloc_buffer() allocates a bio,
-associates it with the underlying device and clones a bio. The input bio
-may have a size up to UINT_MAX while the new limit for the size of the
-cloned bio is max_sectors * 512. That causes bio_add_page() to fail if
-the input bio is larger than max_sectors * 512, hence the data
-corruption. Please note that this is a guess only and that I'm not
-familiar with the dm-crypt code.
+  nvmet: use new ana_log_size instead the old one (2021-05-13 16:33:32 +0200)
 
-Bart.
+----------------------------------------------------------------
+nvme fix for Linux 5.13
+
+ - correct the check for using the inline bio in nvmet
+   (Chaitanya Kulkarni)
+ - demote unsupported command warnings (Chaitanya Kulkarni)
+ - fix corruption due to double initializing ANA state (me, Hou Pu)
+ - reset ns->file when open fails (Daniel Wagner)
+ - fix a NULL deref when SEND is completed with error in nvmet-rdma
+   (Michal Kalderon)
+
+----------------------------------------------------------------
+Chaitanya Kulkarni (5):
+      nvmet: fix inline bio check for bdev-ns
+      nvmet: fix inline bio check for passthru
+      nvmet: demote discovery cmd parse err msg to debug
+      nvmet: use helper to remove the duplicate code
+      nvmet: demote fabrics cmd parse err msg to debug
+
+Christoph Hellwig (1):
+      nvme-multipath: fix double initialization of ANA state
+
+Daniel Wagner (1):
+      nvmet: seset ns->file when open fails
+
+Hou Pu (1):
+      nvmet: use new ana_log_size instead the old one
+
+Michal Kalderon (1):
+      nvmet-rdma: Fix NULL deref when SEND is completed with error
+
+ drivers/nvme/host/core.c          |  3 ++-
+ drivers/nvme/host/multipath.c     | 55 +++++++++++++++++++++------------------
+ drivers/nvme/host/nvme.h          |  8 ++++--
+ drivers/nvme/target/admin-cmd.c   |  7 ++---
+ drivers/nvme/target/discovery.c   |  2 +-
+ drivers/nvme/target/fabrics-cmd.c |  6 ++---
+ drivers/nvme/target/io-cmd-bdev.c |  2 +-
+ drivers/nvme/target/io-cmd-file.c |  8 +++---
+ drivers/nvme/target/nvmet.h       |  6 +++++
+ drivers/nvme/target/passthru.c    |  2 +-
+ drivers/nvme/target/rdma.c        |  4 +--
+ 11 files changed, 58 insertions(+), 45 deletions(-)
